@@ -17,6 +17,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 package com.mosync.internal.android;
 
+import static com.mosync.internal.android.MoSyncHelpers.DebugPrint;
+
 import static com.mosync.internal.android.MoSyncHelpers.EXTENT;
 import static com.mosync.internal.android.MoSyncHelpers.SYSLOG;
 import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_BLUETOOTH_TURNED_OFF;
@@ -26,6 +28,7 @@ import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_SCREEN_STATE
 import static com.mosync.internal.generated.MAAPI_consts.IOCTL_UNAVAILABLE;
 import static com.mosync.internal.generated.MAAPI_consts.MAS_CREATE_IF_NECESSARY;
 import static com.mosync.internal.generated.MAAPI_consts.MA_NFC_NOT_AVAILABLE;
+import static com.mosync.internal.generated.MAAPI_consts.MA_NOTIFICATION_RES_UNSUPPORTED;
 import static com.mosync.internal.generated.MAAPI_consts.NOTIFICATION_TYPE_APPLICATION_LAUNCHER;
 import static com.mosync.internal.generated.MAAPI_consts.RES_BAD_INPUT;
 import static com.mosync.internal.generated.MAAPI_consts.RES_OK;
@@ -45,11 +48,15 @@ import static com.mosync.internal.generated.MAAPI_consts.TRANS_ROT270;
 import static com.mosync.internal.generated.MAAPI_consts.TRANS_ROT90;
 import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_ALERT;
 
+import static com.mosync.internal.generated.MAAPI_consts.MA_RESOURCE_OPEN;
+import static com.mosync.internal.generated.MAAPI_consts.MA_RESOURCE_CLOSE;
+
 import java.io.File;
 import java.io.FileDescriptor;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
@@ -136,7 +143,12 @@ public class MoSyncThread extends Thread
 		long programOffset,
 		FileDescriptor resource,
 		long resourceOffset);
-	public native boolean nativeLoadResource(ByteBuffer resource);
+	//public native boolean nativeLoadResource(ByteBuffer resource);
+	public native boolean nativeLoadResource(
+		FileDescriptor resource,
+		long resoruceOffset,
+		int handle,
+		int placeholder);
 	public native ByteBuffer nativeLoadCombined(ByteBuffer combined);
 	public native void nativeRun();
 	public native void nativePostEvent(int[] eventBuffer);
@@ -200,6 +212,8 @@ public class MoSyncThread extends Thread
 	 * a handle used for full screen camera preview
 	 */
 	private int cameraScreen;
+
+	FileDescriptor mResourceFd = null;
 
 	/**
 	 * This is the size of the header of the asset file
@@ -697,6 +711,7 @@ public class MoSyncThread extends Thread
 			AssetManager assetManager = mContext.getAssets();
 			AssetFileDescriptor pAfd = assetManager.openFd(RESOURCE_FILE);
 			FileDescriptor pFd = pAfd.getFileDescriptor();
+			mResourceOffset = pAfd.getStartOffset();
 			return pFd;
 		}
 		catch (Exception e)
@@ -2219,6 +2234,40 @@ public class MoSyncThread extends Thread
 	}
 
 	/**
+	 * maLoadResource
+	 */
+	int maLoadResource(int handle, int placeholder, int flag)
+	{
+		SYSLOG("maLoadResource");
+		// Try to load the resource file, if we get an exception
+		// it just means that this application has no resource file
+		// and that is not an error.
+		if (((flag & MA_RESOURCE_OPEN) != 0) && (mResourceFd == null)) {
+			mResourceFd = getResourceFileDesriptor();
+		}
+
+		// We have a program file so now we sends it to the native side
+		// so it will be loaded into memory. The data section will also be
+		// created and if there are any resources they will be loaded.
+		if (null != mResourceFd) {
+			if (false == nativeLoadResource(mResourceFd, mResourceOffset,
+					handle,
+					placeholder)) {
+				logError("maLoadResource - "
+						+ "ERROR Load resource was unsuccesfull");
+				return 1;
+			}
+		}
+
+		if ((flag & MA_RESOURCE_CLOSE) != 0) {
+			mResourceFd = null;
+			mResourceOffset = 0;
+		}
+
+		return 0;
+	}
+
+	/**
 	 * maLoadProgram
 	 */
 	void maLoadProgram(int data, int reload)
@@ -3057,7 +3106,6 @@ public class MoSyncThread extends Thread
 	 */
 	int maNotificationLocalCreate()
 	{
-		//Log.i("MoSync", "maNotificationLocalCreate");
 		return mMoSyncNotifications.maNotificationLocalCreate(mContext);
 	}
 
@@ -3126,11 +3174,10 @@ public class MoSyncThread extends Thread
 	 * typically the email address of an account set up by the application's developer.
 	 * @return MA_NOTIFICATION_RES_OK if no error occurred.
      * MA_NOTIFICATION_RES_ALREADY_REGISTERED if the application is already registered for receiving push notifications.
+     * MA_NOTIFICATION_RES_UNSUPPORTED
 	 */
 	int maNotificationPushRegister(int pushNotificationTypes, String accountID)
 	{
-		Log.e("@@MoSync", "maNotificationPushRegister");
-
 		// Ignore the first param on Android.
 		return mMoSyncNotifications.maNotificationPushRegister(accountID);
 	}
@@ -3213,6 +3260,18 @@ public class MoSyncThread extends Thread
 	int maNotificationPushSetMessageTitle(String title)
 	{
 		return mMoSyncNotifications.maNotificationPushSetMessageTitle(title);
+	}
+
+	/**
+	 * Set the display flags applied to the incoming push notifications.
+	 * @param flag One of the constants:
+	 *  - MA_NOTIFICATION_DISPLAY_FLAG_DEFAULT
+	 *  - MA_NOTIFICATION_DISPLAY_FLAG_ANYTIME
+	 * @return MA_NOTIFICATION_RES_OK, MA_NOTIFICATION_RES_ERROR.
+	 */
+	int maNotificationPushSetDisplayFlag(int flag)
+	{
+		return mMoSyncNotifications.maNotificationPushSetDisplayFlag(flag);
 	}
 
 	/**

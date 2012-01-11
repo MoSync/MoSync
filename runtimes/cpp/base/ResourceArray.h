@@ -155,6 +155,23 @@ namespace Base {
 			}
 		}
 
+		bool is_loaded(unsigned index) {
+			void **res = mRes;
+			if(index&DYNAMIC_PLACEHOLDER_BIT) {
+				res = dynRes;
+				index = index&(~DYNAMIC_PLACEHOLDER_BIT);
+				TESTINDEX(index, dynResSize);
+			} else {
+				TESTINDEX(index, mN);
+			}
+
+			if (res[index] != NULL)
+			{
+				return true;
+			}
+			return false;
+		}
+
 		unsigned size() {
 			return mN;
 		}

@@ -249,7 +249,9 @@ CONSTRUCTOR_ARGUMENTS(INIT_ARG_VAR, COMMA),
 #ifdef TELEPHONY
 gTelephony(NULL),
 #endif
-gBtDeviceArray(8, 0)
+gBtDeviceArray(8, 0),
+resourcesCount(-1),
+resource(NULL)
 {
 	init();
 	ClearNetworkingVariables();
