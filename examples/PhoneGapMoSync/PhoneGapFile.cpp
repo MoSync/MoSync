@@ -24,6 +24,7 @@ MA 02110-1301, USA.
  */
 
 #include <mastring.h>
+#include <matime.h>
 #include <conprint.h>
 #include <MAUtil/String.h>
 #include <MAUtil/HashDict.h>
@@ -203,9 +204,8 @@ static String FileGetDate(const String& path)
 	}
 	maFileClose(file);
 
-	// TODO: Implement string formatting of date/time/timezone.
-	// Can you obtain time zone in MoSync?
-	return "Mon Dec 19 2011 12:46:43 GMT+0100 (CET)";
+	// Return time in format "Mon Dec 19 2011 12:46:43 GMT+0100 (CET)".
+	return sprint_time(date);
 }
 
 /**
@@ -480,6 +480,13 @@ String PhoneGapFile::emitFile(
 		"\"size\":" + size + "}";
 }
 
+String PhoneGapFile::emitMetadata(
+	const String& modificationTime)
+{
+	return
+		"{\"modificationTime\":\"" + modificationTime + "\"}";
+}
+
 void PhoneGapFile::callSuccess(
 	const String& callbackID,
 	const String& args,
@@ -523,6 +530,10 @@ void PhoneGapFile::handleMessage(PhoneGapMessage& message)
 	else if (message.getParam("action") == "getFileMetadata")
 	{
 		actionGetFileMetadata(message);
+	}
+	else if (message.getParam("action") == "getMetadata")
+	{
+		actionGetMetadata(message);
 	}
 	else if (message.getParam("action") == "write")
 	{
@@ -676,6 +687,27 @@ void PhoneGapFile::actionGetFileMetadata(PhoneGapMessage& message)
 	callSuccess(
 		callbackID,
 		file,
+		"window.localFileSystem._castDate");
+}
+
+/**
+ * Return a Metadata object.
+ */
+void PhoneGapFile::actionGetMetadata(PhoneGapMessage& message)
+{
+	lprintfln("@@@ actionGetMetadata\n");
+
+	String callbackID = message.getParam("PhoneGapCallBackId");
+
+	String fullPath = message.getArgsField("fullPath");
+
+	String metadata = emitMetadata(
+		FileGetDate(fullPath));
+
+	// Note that _castDate is used here.
+	callSuccess(
+		callbackID,
+		metadata,
 		"window.localFileSystem._castDate");
 }
 

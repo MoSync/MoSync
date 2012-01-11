@@ -68,6 +68,9 @@ public:
 		const MAUtil::String& lastModifiedDate,
 		const MAUtil::String& size);
 
+	MAUtil::String emitMetadata(
+		const MAUtil::String& modificationTime);
+
 	void callSuccess(
 		const MAUtil::String& callbackID,
 		const MAUtil::String& args,
@@ -98,6 +101,8 @@ public:
 	 * Return a File object.
 	 */
 	void actionGetFileMetadata(PhoneGapMessage& message);
+
+	void actionGetMetadata(PhoneGapMessage& message);
 
 	void actionWrite(PhoneGapMessage& message);
 

@@ -39,6 +39,11 @@ var FileSys = function()
 
     FileSys.writeText = function(path, data, fun)
     {
+        FileSys.writeTextAtPosition(path, data, 0, fun);
+    };
+
+    FileSys.writeTextAtPosition = function(path, data, position, fun)
+    {
         window.requestFileSystem(
             LocalFileSystem.PERSISTENT,
             0,
@@ -58,6 +63,7 @@ var FileSys = function()
                         {
                             fun(false);
                         };
+                        writer.seek(position);
                         writer.write(data);
                     },
                     error(fun));
@@ -149,6 +155,63 @@ var FileSys = function()
             error(fun));
     };
 
+    FileSys.getMetaData = function(path, fun)
+    {
+        window.requestFileSystem(
+            LocalFileSystem.PERSISTENT,
+            0,
+            function (fileSystem)
+            {
+                fileSystem.root.getFile(
+                    path,
+                    { create: false },
+                    function(fileEntry)
+                    {
+                        fileEntry.getMetadata(
+                            function(metadata) { fun(true, metadata); },
+                            error(fun));
+                    },
+                    error(fun));
+            },
+            error(fun));
+    };
+
+    FileSys.getMetaData = function(path, fun)
+    {
+        window.requestFileSystem(
+            LocalFileSystem.PERSISTENT,
+            0,
+            function (fileSystem)
+            {
+                fileSystem.root.getFile(
+                    path,
+                    { create: false },
+                    function(fileEntry)
+                    {
+                        fileEntry.getMetadata(
+                            function(metadata) { fun(true, metadata); },
+                            error(fun));
+                    },
+                    error(fun));
+            },
+            error(fun));
+    };
+
+    FileSys.moveFile = function(path, newPath, fun)
+    {
+        window.requestFileSystem(
+            LocalFileSystem.PERSISTENT,
+            0,
+            function (fileSystem)
+            {
+                console.log(
+                    "================ FileSys.moveFile fileSystem.root.fullPath: " +
+                    fileSystem.root.fullPath);
+                //PrintObject(fileSystem);
+            },
+            error(fun));
+    };
+
     return FileSys;
 }();
 
@@ -175,7 +238,19 @@ function testFileSystem()
 
         if (success)
         {
-            FileSys.truncate("hello2.txt", 5, fileTruncated);
+            // This does not work, since seek does not work. Skip for now.
+            // FileSys.writeTextAtPosition("hello2.txt", "Micke", 5, fileWritten2);
+            FileSys.truncate("hello2.txt", 10, fileTruncated);
+        }
+    }
+
+    function fileWritten2(success, data)
+    {
+        console.log("@@@@@ FileWritten2 result: " + success);
+
+        if (success)
+        {
+            FileSys.truncate("hello2.txt", 10, fileTruncated);
         }
     }
 
@@ -192,16 +267,43 @@ function testFileSystem()
     function fileReadAsDataURL(success, url)
     {
         console.log("@@@@@ FileReadAsDataURL result: " + success);
-        console.log("@@@@@ FileReadAsDataURL url: " + url);
-        var i = url.indexOf(",");
-        var data = url.substring(i + 1);
-        console.log("@@@@@ FileReadAsDataURL data: " + data);
-        var decodedData = atob(data);
-        console.log("@@@@@ FileReadAsDataURL data: " + decodedData);
 
+        if (success)
+        {
+            console.log("@@@@@ FileReadAsDataURL url: " + url);
+            var i = url.indexOf(",");
+            var data = url.substring(i + 1);
+            console.log("@@@@@ FileReadAsDataURL data: " + data);
+            var decodedData = atob(data);
+            console.log("@@@@@ FileReadAsDataURL decodedData: " + decodedData);
+
+            // Next test.
+            FileSys.getMetaData("hello2.txt", fileMetaData);
+        }
     }
 
-    // Kick off test.
+    function fileMetaData(success, metadata)
+    {
+        console.log("@@@@@ FileMetaData success: " + success);
+        console.log("@@@@@ FileMetaData modificationTime: " + metadata.modificationTime);
+
+        if (success)
+        {
+            FileSys.moveFile("hello2.txt", "hello3.txt", fileMoved);
+        }
+    }
+
+    function fileMoved(success)
+    {
+        console.log("@@@@@ FileMoved success: " + success);
+
+        if (success)
+        {
+
+        }
+    }
+
+    // Start first test.
     writeFile();
 }
 
