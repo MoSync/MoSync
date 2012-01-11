@@ -2738,12 +2738,16 @@ return 0; \
 
 		case maIOCtl_maCaptureGetProperty:
 		{
+			int _valueBufferSize = c;
+			int _valueBuffer = (int) SYSCALL_THIS->GetValidatedMemRange(
+				b,
+				_valueBufferSize * sizeof(char));
 			const char *_property = SYSCALL_THIS->GetValidatedStr(a);
 			return _maCaptureGetProperty(
 				(int)gCore->mem_ds,
 				_property,
-				b,
-				c,
+				_valueBuffer,
+				_valueBufferSize,
 				mJNIEnv,
 				mJThis);
 		}
@@ -2752,22 +2756,30 @@ return 0; \
 			return _maCaptureAction(a, mJNIEnv, mJThis);
 
 		case maIOCtl_maCaptureWriteImage:
+		{
+			const char *_path = SYSCALL_THIS->GetValidatedStr(b);
 			return _maCaptureWriteImage(
-				(int)gCore->mem_ds,
 				a,
-				b,
+				_path,
 				c,
 				mJNIEnv,
 				mJThis);
+		}
 
 		case maIOCtl_maCaptureGetVideoPath:
+		{
+			int _pathBufferSize = c;
+			int _pathBuffer = (int) SYSCALL_THIS->GetValidatedMemRange(
+				b,
+				_pathBufferSize * sizeof(char));
 			return _maCaptureGetVideoPath(
 				(int)gCore->mem_ds,
 				a,
-				b,
-				c,
+				_pathBuffer,
+				_pathBufferSize,
 				mJNIEnv,
 				mJThis);
+		}
 
 		case maIOCtl_maCaptureDestroyData:
 			return _maCaptureDestroyData(a, mJNIEnv, mJThis);

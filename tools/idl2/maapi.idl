@@ -9746,6 +9746,19 @@ group CaptureAPI "Capture API" {
 			* Platform: iOS.
 			*/
 			FLASH_NOT_SUPPORTED = -12;
+
+			/**
+			* @brief Indicates that the recording max duration is not supported.
+			* Platform: Android.
+			*/
+			MAX_DURATION_NOT_SUPPORTED = -13;
+
+			/**
+			* @brief Indicates that a call to maCaptureGetProperty was unsuccessfull
+			* because the property was not previously set.
+			* Platform: Android.
+			*/
+			PROPERTY_VALUE_UNDEFINED = -14;
 		}
 	} // end of Capture Result Codes
 
@@ -9757,6 +9770,11 @@ group CaptureAPI "Capture API" {
 			*
 			* @validvalue Positive integer value.
 			* Default value is platform specific.
+			*
+			* On iOS the maximum duration is by defualt set to 600 seconds.
+			*
+			* On Android devices with API level lower than 8
+			* it returns #MA_CAPTURE_RES_MAX_DURATION_NOT_SUPPORTED.
 			*
 			* @getandset
 			*
@@ -9772,9 +9790,12 @@ group CaptureAPI "Capture API" {
 			/**
 			* @brief Set the video recording quality.
 			* Platform: Android and iOS.
+			* Android: Note that some devices the default camera either does not support low-res video capture,
+			* or it doesn't understand/process the MediaStore.EXTRA_SIZE_LIMIT correctly.
 			*
 			* @validvalue One of the \link #MA_CAPTURE_VIDEO_QUALITY_LOW MA_CAPTURE_VIDEO_QUALITY \endlink constants.
-			* Default value is MA_CAPTURE_VIDEO_QUALITY_MEDIUM.
+			* iOS: Default value is MA_CAPTURE_VIDEO_QUALITY_MEDIUM.
+			* Android: Default value is MA_CAPTURE_VIDEO_QUALITY_HIGH.
 			*
 			* @getandset
 			*
@@ -9788,7 +9809,7 @@ group CaptureAPI "Capture API" {
 			VIDEO_QUALITY = "videoQuality";
 
 			/**
-			* @brief Set the video recording quality.
+			* @brief Set the display name for the next captured images.
 			* Platform: Android.
 			*
 			* @validvalue Any string.
@@ -9803,23 +9824,6 @@ group CaptureAPI "Capture API" {
 			* \endcode
 			*/
 			DISPLAY_NAME = "displayName";
-
-			/**
-			* @brief
-			* Platform: Android.
-			*
-			* @validvalue Positive integer value.
-			*
-			* @getandset
-			*
-			* @par Example
-			* \code
-			*   char buf[256];
-			*   sprintf(buf, "%s", "My title");
-			*	maCaptureSetProperty(MA_CAPTURE_ORIENTATION, buf);
-			* \endcode
-			*/
-			ORIENTATION = "orientation";
 
 			/**
 			* @brief Store the recorded movie/taken photo to the user’s Camera Roll album.
@@ -9898,14 +9902,14 @@ group CaptureAPI "Capture API" {
 	group CaptureVideoQuality "Capture Video Quality" {
 		constset int MA_CAPTURE_VIDEO_QUALITY_ {
 			/// Use low-quality video recording.
-			/// Platform: iOS.
+			/// Platform: iOS and Android.
 			LOW = 0;
-			/// Use medium-quality video recording.
-			/// Platform: iOS.
-			MEDIUM = 1;
 			/// The highest-quality video recording supported for the active camera on the device.
-			/// Platform: iOS.
-			HIGH = 2;
+			/// Platform: iOS and Android.
+			HIGH = 1;
+			/// Use medium-quality video recording.
+			/// Platform: iOS only.
+			MEDIUM = 2;
 		}
 	} // end of Capture Media Types
 
@@ -9932,7 +9936,7 @@ group CaptureAPI "Capture API" {
 			/// Platform: Android and iOS.
 			VIDEO = 1;
 			/// Send if the user cancels taking image/video.
-			/// Platform: iOS only.
+			/// Platform: iOS and Android.
 			CANCEL = 2;
 		}
 	} // end of Capture Event type
@@ -9963,6 +9967,7 @@ group CaptureAPI "Capture API" {
 		*  - #MA_CAPTURE_RES_OK if no error occurred.
 		*  - #MA_CAPTURE_RES_INVALID_PROPERTY if the property name is not valid.
 		*  - #MA_CAPTURE_RES_INVALID_PROPERTY_VALUE if the property value is not valid.
+		*  - #MA_CAPTURE_RES_MAX_DURATION_NOT_SUPPORTED if the duration limit is not supported ( Android only).
 		*/
 		int maCaptureSetProperty(in MAString property, in MAString value);
 
@@ -9978,6 +9983,8 @@ group CaptureAPI "Capture API" {
 		* - #MA_CAPTURE_RES_OK if no error occurred.
 		* - #MA_CAPTURE_RES_INVALID_PROPERTY if the property name is not valid.
 		* - #MA_CAPTURE_RES_INVALID_STRING_BUFFER_SIZE if the buffer size was to small.
+		* - #MA_CAPTURE_RES_PROPERTY_VALUE_UNDEFINED if the property was not previously set ( Android only).
+		* - #MA_CAPTURE_RES_MAX_DURATION_NOT_SUPPORTED if the duration limit is not supported ( Android only).
 		*/
 		int maCaptureGetProperty(in MAString property, out MAString value range("bufSize"), in int bufSize);
 

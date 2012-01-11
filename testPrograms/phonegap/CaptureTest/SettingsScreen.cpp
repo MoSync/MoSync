@@ -40,6 +40,7 @@
 #define SHOW_IMAGE_SCREEN_TEXT "Show taken picture"
 #define SHOW_VIDEO_SCREEN_TEXT "Play recorded video"
 #define CAMERA_ROLL_LABEL_TEXT "Use camera roll"
+#define GALLERY_LABEL_TEXT "Use Gallery"
 #define CAMERA_CONTROLS_LABEL_TEXT "Use camera controls"
 
 #define VIDEO_QUALITY_LOW_TEXT "low"
@@ -90,10 +91,17 @@ SettingsScreen::SettingsScreen(SettingsScreenListener& listener) :
 	mGetMaxDurationBtn->addButtonListener(this);
 	mSetVideoQualityBtn->addButtonListener(this);
 	mGetVideoQualityBtn->addButtonListener(this);
-	mSetFlashModeBtn->addButtonListener(this);
-	mGetFlashModeBtn->addButtonListener(this);
-	mCameraRollCheckBox->addCheckBoxListener(this);
-	mCameraControlsCheckBox->addCheckBoxListener(this);
+	if ( isIOS() )
+	{
+		mSetFlashModeBtn->addButtonListener(this);
+		mGetFlashModeBtn->addButtonListener(this);
+		mCameraRollCheckBox->addCheckBoxListener(this);
+		mCameraControlsCheckBox->addCheckBoxListener(this);
+	}
+	else
+	{
+		mGalleryFlag->addCheckBoxListener(this);
+	}
 	mTakePictureBtn->addButtonListener(this);
 	mRecordVideoBtn->addButtonListener(this);
 	mShowImageScreen->addButtonListener(this);
@@ -109,10 +117,17 @@ SettingsScreen::~SettingsScreen()
 	mGetMaxDurationBtn->removeButtonListener(this);
 	mSetVideoQualityBtn->removeButtonListener(this);
 	mGetVideoQualityBtn->removeButtonListener(this);
-	mSetFlashModeBtn->removeButtonListener(this);
-	mGetFlashModeBtn->removeButtonListener(this);
-	mCameraRollCheckBox->removeCheckBoxListener(this);
-	mCameraControlsCheckBox->removeCheckBoxListener(this);
+	if ( isIOS() )
+	{
+		mSetFlashModeBtn->removeButtonListener(this);
+		mGetFlashModeBtn->removeButtonListener(this);
+		mCameraRollCheckBox->removeCheckBoxListener(this);
+		mCameraControlsCheckBox->removeCheckBoxListener(this);
+	}
+	else
+	{
+		mGalleryFlag->removeCheckBoxListener(this);
+	}
 	mTakePictureBtn->removeButtonListener(this);
 	mRecordVideoBtn->removeButtonListener(this);
 	mShowImageScreen->removeButtonListener(this);
@@ -182,6 +197,7 @@ void SettingsScreen::addGetDurationRow(ListView* listView)
 
 	mMaxDurationLabel = new Label();
 	mMaxDurationLabel->setText(MAX_DURATION_LABEL_TEXT);
+//	mMaxDurationLabel->setFontColor(0x123456);
 	mMaxDurationLabel->fillSpaceHorizontally();
 
 	mGetMaxDurationBtn = new Button();
@@ -257,6 +273,26 @@ void SettingsScreen::addCameraRollFlagRow(ListView* listView)
 }
 
 /**
+ * Adds a list row for setting the save to gallery flag.
+ */
+void SettingsScreen::addGalleryFlagRow(ListView* listView)
+{
+	ListViewItem* listItem;
+	Label* label;
+
+	listItem = new ListViewItem();
+	listView->addChild(listItem);
+
+	label = new Label();
+	label->setText(GALLERY_LABEL_TEXT);
+
+	mGalleryFlag = new CheckBox();
+	mGalleryFlag->setState(true);
+	listItem->addChild(this->createRow(label, mGalleryFlag));
+	listView->addChild(label);
+}
+
+/**
  * Adds a list row for setting the camera controls flag.
  */
 void SettingsScreen::addCameraControlsFlagRow(ListView* listView)
@@ -296,14 +332,21 @@ void SettingsScreen::createMainLayout() {
 	// Add options for setting and getting the video quality value.
 	this->addVideoQualityRows(listView);
 
-	// Add options for setting and getting the flash mode value.
-	this->addFlashModeRows(listView);
+	if ( isIOS())
+	{
+		// Add options for setting and getting the flash mode value.
+		this->addFlashModeRows(listView);
 
-	// Add option for setting the camera roll flag.
-	this->addCameraRollFlagRow(listView);
+		// Add option for setting the camera roll flag.
+		this->addCameraRollFlagRow(listView);
 
-	// Add option for setting the camera controls flag.
-	this->addCameraControlsFlagRow(listView);
+		// Add option for setting the camera controls flag.
+		this->addCameraControlsFlagRow(listView);
+	}
+	else
+	{
+		this->addGalleryFlagRow(listView);
+	}
 
 	// Add take picture button.
 	mTakePictureBtn = new Button();
@@ -333,16 +376,19 @@ void SettingsScreen::createMainLayout() {
  */
 void SettingsScreen::buttonClicked(Widget* button)
 {
+	printf("Emma -------------- buttonClicked");
 	char buf[BUF_SIZE];
 	int syscallResult;
 	if (button == mGetMaxDurationBtn)
 	{
+		printf("Emma --------------- getDuration was clicked");
 		syscallResult = maCaptureGetProperty(
 			MA_CAPTURE_MAX_DURATION, buf, BUF_SIZE);
-		if (syscallResult == syscallResult)
+		if (MA_CAPTURE_RES_OK == syscallResult)
 		{
 			String text = MAX_DURATION_LABEL_TEXT;
 			text += buf;
+			printf(buf);
 			mMaxDurationLabel->setText(text);
 		}
 		else
@@ -369,11 +415,13 @@ void SettingsScreen::buttonClicked(Widget* button)
 	}
 	else if (button == mRecordVideoBtn)
 	{
-		if (this->isUserInputDataValid())
-		{
+		// No need the max duration could be set because not all Android devices
+		// support duration limit.
+//		if (this->isUserInputDataValid())
+//		{
 			syscallResult = maCaptureAction(MA_CAPTURE_ACTION_RECORD_VIDEO);
 			printf("result maCaptureAction(MA_CAPTURE_ACTION_RECORD_VIDEO) = %d", syscallResult);
-		}
+//		}
 	}
 	else if (button == mTakePictureBtn)
 	{
@@ -451,7 +499,7 @@ bool SettingsScreen::isUserInputDataValid()
 
 /**
  * Check if the max video duration value given by the user is valid.
- * @return True if data si valid, false otherwise.
+ * @return True if data is valid, false otherwise.
  */
 bool SettingsScreen::isMaxVideoDurationValid()
 {

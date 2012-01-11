@@ -3264,18 +3264,20 @@ namespace Base
 		return result;
 	}
 
-	int _maCaptureWriteImage(int memStart, MAHandle handle, int fullPathBuffer, int fullPathBufSize, JNIEnv* jNIEnv, jobject jThis)
+	int _maCaptureWriteImage(MAHandle handle, const char* fullPathBuffer, int fullPathBufSize, JNIEnv* jNIEnv, jobject jThis)
 	{
+		jstring jstrValue = jNIEnv->NewStringUTF(fullPathBuffer);
 		jclass cls = jNIEnv->GetObjectClass(jThis);
-		jmethodID methodID = jNIEnv->GetMethodID(cls, "maCaptureWriteImage", "(III)I");
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maCaptureWriteImage", "(ILjava/lang/String;I)I");
 		if (methodID == 0)
 		{
 			return 0;
 		}
 
-		int result = jNIEnv->CallIntMethod(jThis, methodID, handle, fullPathBuffer - memStart, fullPathBufSize);
+		int result = jNIEnv->CallIntMethod(jThis, methodID, handle, jstrValue, fullPathBufSize);
 
 		jNIEnv->DeleteLocalRef(cls);
+		jNIEnv->DeleteLocalRef(jstrValue);
 
 		return result;
 	}
@@ -3283,6 +3285,7 @@ namespace Base
 	int _maCaptureGetVideoPath(int memStart, MAHandle handle, int buffer, int bufferSize, JNIEnv* jNIEnv, jobject jThis)
 	{
 		jclass cls = jNIEnv->GetObjectClass(jThis);
+
 		jmethodID methodID = jNIEnv->GetMethodID(cls, "maCaptureGetVideoPath", "(III)I");
 		if (methodID == 0)
 		{

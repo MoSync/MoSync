@@ -18,33 +18,31 @@ MA 02110-1301, USA.
 package com.mosync.internal.android;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.Hashtable;
-import java.util.TimerTask;
 
-import com.mosync.internal.android.MoSyncCapture.CaptureObject.CaptureType;
 import com.mosync.internal.android.MoSyncThread.ImageCache;
-import com.mosync.internal.android.notifications.LocalNotificationObject;
-import com.mosync.internal.generated.IX_WIDGET;
-import com.mosync.nativeui.util.HandleTable;
+import com.mosync.nativeui.core.NativeUI;
 import com.mosync.nativeui.util.properties.BooleanConverter;
 import com.mosync.nativeui.util.properties.IntConverter;
 import com.mosync.nativeui.util.properties.InvalidPropertyValueException;
-import com.mosync.nativeui.util.properties.PropertyConversionException;
 
 import android.app.Activity;
-import android.content.ContentValues;
+import android.content.ActivityNotFoundException;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.provider.MediaStore.MediaColumns;
 import android.util.Log;
 
 import static com.mosync.internal.generated.MAAPI_consts.MA_CAPTURE_ACTION_RECORD_VIDEO;
-import static com.mosync.internal.generated.MAAPI_consts.MA_CAPTURE_ACTION_STOP_RECORDING;
 import static com.mosync.internal.generated.MAAPI_consts.MA_CAPTURE_ACTION_TAKE_PICTURE;
 import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_CAPTURE;
 import static com.mosync.internal.generated.MAAPI_consts.MA_CAPTURE_EVENT_TYPE_IMAGE;
@@ -54,17 +52,18 @@ import static com.mosync.internal.generated.MAAPI_consts.MA_CAPTURE_DISPLAY_NAME
 import static com.mosync.internal.generated.MAAPI_consts.MA_CAPTURE_GALLERY;
 import static com.mosync.internal.generated.MAAPI_consts.MA_CAPTURE_MAX_DURATION;
 import static com.mosync.internal.generated.MAAPI_consts.MA_CAPTURE_VIDEO_QUALITY;
-import static com.mosync.internal.generated.MAAPI_consts.MA_CAPTURE_RES_INVALID_ACTION;
+import static com.mosync.internal.generated.MAAPI_consts.MA_CAPTURE_VIDEO_QUALITY_LOW;
+import static com.mosync.internal.generated.MAAPI_consts.MA_CAPTURE_VIDEO_QUALITY_HIGH;
 import static com.mosync.internal.generated.MAAPI_consts.MA_CAPTURE_RES_OK;
-import static com.mosync.internal.generated.MAAPI_consts.MA_CAPTURE_RES_CAMERA_NOT_AVAILABLE;
-import static com.mosync.internal.generated.MAAPI_consts.MA_CAPTURE_RES_VIDEO_NOT_SUPPORTED;
-import static com.mosync.internal.generated.MAAPI_consts.MA_CAPTURE_RES_PICTURE_NOT_SUPPORTED;
 import static com.mosync.internal.generated.MAAPI_consts.MA_CAPTURE_RES_INVALID_HANDLE;
 import static com.mosync.internal.generated.MAAPI_consts.MA_CAPTURE_RES_INVALID_PROPERTY;
 import static com.mosync.internal.generated.MAAPI_consts.MA_CAPTURE_RES_INVALID_PROPERTY_VALUE;
+import static com.mosync.internal.generated.MAAPI_consts.MA_CAPTURE_RES_PROPERTY_VALUE_UNDEFINED;
+import static com.mosync.internal.generated.MAAPI_consts.MA_CAPTURE_RES_MAX_DURATION_NOT_SUPPORTED;
+import static com.mosync.internal.generated.MAAPI_consts.MA_CAPTURE_RES_INVALID_ACTION;
 import static com.mosync.internal.generated.MAAPI_consts.MA_CAPTURE_RES_INVALID_STRING_BUFFER_SIZE;
-import static com.mosync.internal.generated.MAAPI_consts.MA_NOTIFICATION_RES_INVALID_PROPERTY_NAME;
-import static com.mosync.internal.generated.MAAPI_consts.MA_NOTIFICATION_RES_INVALID_PROPERTY_VALUE;
+import static com.mosync.internal.generated.MAAPI_consts.MA_CAPTURE_RES_FILE_INVALID_NAME;
+import static com.mosync.internal.generated.MAAPI_consts.MA_CAPTURE_RES_FILE_ALREADY_EXISTS;
 
 /**
  * Class that implements Capture API.
@@ -74,41 +73,31 @@ public class MoSyncCapture
 {
 
 	/**
+	 * Store the type of the capture.
+	 */
+	enum CaptureType {
+		IMAGE, VIDEO
+	}
+
+	/**
 	 * Request codes for Camera intent.
 	 */
 	public static final int CAPTURE_MODE_RECORD_VIDEO_REQUEST = 0;
 	public static final int CAPTURE_MODE_STOP_RECORDING_REQUEST = 1;
 	public static final int CAPTURE_MODE_TAKE_PICTURE_REQUEST = 2;
 
-	// Used as a key for determining whether or not a photo was taken.
+	// The value for HIGH and LOW video quality.
+	public static final int CAPTURE_VIDEO_QUALITY_HIGH = 1;
+	public static final int CAPTURE_VIDEO_QUALITY_LOW = 0;
+
+	// The default value for properties that are not set.
+	public static final int CAPTURE_DEFAULT_PROPERTY_VALUE = -1;
+
+	// String used as a key for determining whether or not a photo was taken.
 	public static final String PHOTO_TAKEN = "photo_taken";
 
-	/**
-	 * Class for holding capture object information.
-	 * After a photo is captured a new CaptureObject is created and it
-	 * contains the imageUri, the path.
-	 * After a video is recorded a new CaptureObject is created and it
-	 * contains the videoUri the absolute path to it etc.
-	 * @author emma.
-	 *
-	 */
-	public class CaptureObject
-	{
-
-// Store the type of the capture.
-//		public enum CaptureType {
-//			IMAGE, VIDEO
-//		}
-//
-//		public CaptureObject(CaptureType type)
-//		{
-//			mCaptureType = type;
-//		}
-
-		//public CaptureType mCaptureType;
-
-		public String mPath = null;
-	}
+	// The MediaStore.EXTRA_DURATION_LIMIT String which is available since API level 8.
+	public static final String EXTRA_DURATION_LIMIT = "android.intent.extra.durationLimit";
 
 	/**
 	 * Constructor Capture API.
@@ -141,10 +130,46 @@ public class MoSyncCapture
 	 */
 	int maCaptureSetProperty(String property, String value)
 	{
+		Log.e("@@MoSync","maCaptureSetProperty");
+
 		try{
 			if ( property.equals(MA_CAPTURE_DISPLAY_NAME) )
 			{
 
+			}
+			else if ( property.equals(MA_CAPTURE_MAX_DURATION) )
+			{
+				// EXTRA_DURATION_LIMIT is supported on Android 2.2 and higher.
+				// Version.SDK_INT is not available on sdk 3.
+				int target = IntConverter.convert( Build.VERSION.SDK );
+				if ( target >= 8 )
+				{
+					mVideoDurationLimit = IntConverter.convert(value);
+				}
+				else
+				{
+					Log.e("@@MoSync","maCaptureSetProperty property " + property +
+							" is not supported on current platform.");
+					return MA_CAPTURE_RES_MAX_DURATION_NOT_SUPPORTED;
+				}
+			}
+			else if ( property.equals( MA_CAPTURE_VIDEO_QUALITY) )
+			{
+				// Quality can be 0 or 1.
+				int quality = IntConverter.convert(value);
+				if ( quality == MA_CAPTURE_VIDEO_QUALITY_LOW )
+				{
+					mVideoQuality = CAPTURE_VIDEO_QUALITY_LOW;
+				}
+				else if ( quality == MA_CAPTURE_VIDEO_QUALITY_HIGH )
+				{
+					mVideoQuality = CAPTURE_VIDEO_QUALITY_HIGH;
+				}
+				else
+				{
+					Log.e("@@MoSync","maCaptureSetProperty: Invalid video quality value " + value);
+					throw new InvalidPropertyValueException(property, value);
+				}
 			}
 			else if ( property.equals(MA_CAPTURE_GALLERY) )
 			{
@@ -157,11 +182,12 @@ public class MoSyncCapture
 				Log.e("@@MoSync","maCaptureSetProperty: Invalid property name " + property);
 				return MA_CAPTURE_RES_INVALID_PROPERTY;
 			}
-		} catch(InvalidPropertyValueException ipve)
+		} catch(Exception ex)
 		{
-			Log.e("@@MoSync","maCaptureSetProperty: Error while converting property value " + value + ":" + ipve.getMessage() );
+			Log.e("@@MoSync","maCaptureSetProperty: Error while converting property value " + value + ":" + ex.getMessage() );
 			return MA_CAPTURE_RES_INVALID_PROPERTY_VALUE;
 		}
+
 		return MA_CAPTURE_RES_OK;
 	}
 
@@ -177,10 +203,51 @@ public class MoSyncCapture
 	 */
 	int maCaptureGetProperty(String property, int valueBuffer, int valueSize)
 	{
+		Log.e("@@MoSync","maCaptureGetProperty");
+
 		String result = null;
 		if ( property.equals(MA_CAPTURE_GALLERY) )
 		{
 			result = String.valueOf(mStoreToGallery);
+		}
+		else if ( property.equals(MA_CAPTURE_MAX_DURATION) )
+		{
+			// EXTRA_DURATION_LIMIT is supported on Android 2.2 and higher.
+			// Version.SDK_INT is not available on sdk 3.
+			int target = IntConverter.convert( Build.VERSION.SDK );
+			if ( target >= 8 )
+			{
+				// Return max duration only if it was explicitly set.
+				if ( mVideoDurationLimit != CAPTURE_DEFAULT_PROPERTY_VALUE )
+				{
+					result = Integer.toString(mVideoDurationLimit);
+				}
+				else
+				{
+					Log.e("@@MoSync", "maCaptureGetProperty property " + property +
+							" was not set. ");
+					return MA_CAPTURE_RES_PROPERTY_VALUE_UNDEFINED;
+				}
+			}
+			else
+			{
+				Log.e("@@MoSync","maCaptureGetProperty property " + property +
+						" is not supported on current platform.");
+				return MA_CAPTURE_RES_MAX_DURATION_NOT_SUPPORTED;
+			}
+		}
+		else if ( property.equals( MA_CAPTURE_VIDEO_QUALITY) )
+		{
+			if ( mVideoQuality != CAPTURE_DEFAULT_PROPERTY_VALUE )
+			{
+				result = Integer.toString(mVideoQuality);
+			}
+			else
+			{
+				Log.e("@@MoSync", "maCaptureGetProperty property " + property +
+						" was not set. ");
+				return MA_CAPTURE_RES_PROPERTY_VALUE_UNDEFINED;
+			}
 		}
 		else
 		{
@@ -202,7 +269,7 @@ public class MoSyncCapture
 		mMoSyncThread.mMemDataSection.put( byteArray );
 		mMoSyncThread.mMemDataSection.put( (byte)0 );
 
-		return MA_CAPTURE_RES_OK; // result.getBytes();
+		return MA_CAPTURE_RES_OK;
 	}
 
 	/**
@@ -232,7 +299,7 @@ public class MoSyncCapture
 			default:
 			{
 				Log.e("@@MoSync","Capture: maCaptureAction invalid action " + action);
-				break;
+				return MA_CAPTURE_RES_INVALID_ACTION;
 			}
 		}
 		return MA_CAPTURE_RES_OK;
@@ -249,8 +316,48 @@ public class MoSyncCapture
 	*  - #MA_CAPTURE_RES_FILE_INVALID_NAME if the fullPath param is invalid.
 	*  - #MA_CAPTURE_RES_FILE_ALREADY_EXISTS if the file already exists.
 	*/
-	int maCaptureWriteImage(int handle, int fullPathBuffer, int fullPathBufSize)
+	int maCaptureWriteImage(int handle, String fullPathBuffer, int fullPathBufSize)
 	{
+		MoSyncCaptureObject capture = m_captureObjects.get(handle);
+		if ( null == capture ||  capture.getType() != CaptureType.IMAGE )
+		{
+			Log.e("@@MoSync", "maCaptureWriteImage: Invalid image handle: "+ handle);
+			return MA_CAPTURE_RES_INVALID_HANDLE;
+		}
+
+		Bitmap bitmap = grabImage(capture.getData());
+
+		// Store the bitmap to a specified file.
+		OutputStream outStream = null;
+		//File file = new File(Environment.getExternalStorageDirectory().toString(), "forTest.jpg");
+		File file = new File(fullPathBuffer);
+
+        // Check if file already exists.
+        if ( file.exists() )
+        {
+			Log.e("@@MoSync","maCaptureWriteImage File already exists.");
+			return MA_CAPTURE_RES_FILE_ALREADY_EXISTS;
+        }
+
+        if ( file.isFile() )
+        {
+            try {
+                outStream = new FileOutputStream(file);
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outStream);
+                outStream.flush();
+                outStream.close();
+               }
+               catch(Exception e)
+               {
+					Log.e("@@MoSync","maCaptureWriteImage Error while creating file.");
+					return MA_CAPTURE_RES_INVALID_HANDLE;
+               }
+        }
+        else
+        {
+			Log.e("@@MoSync","maCaptureWriteImage Invalid path.");
+			return MA_CAPTURE_RES_FILE_INVALID_NAME;
+        }
 
 		return MA_CAPTURE_RES_OK;
 	}
@@ -267,13 +374,15 @@ public class MoSyncCapture
 	*/
 	int maCaptureGetVideoPath(int handle, int buffer, int bufferSize)
 	{
-		CaptureObject capture = m_captureObjects.get(handle);
-		if ( null == capture )
+		MoSyncCaptureObject capture = m_captureObjects.get(handle);
+		if ( null == capture ||  capture.getType() != CaptureType.VIDEO )
 		{
 			Log.e("@@MoSync", "maCaptureGetVideoPath: Invalid video handle: "+ handle);
 			return MA_CAPTURE_RES_INVALID_HANDLE;
 		}
+
 		String result = capture.mPath;
+
 		if( result.length( ) + 1 > bufferSize )
 		{
 			Log.e( "MoSync", "maCaptureGetVideoPath: Buffer size " + bufferSize +
@@ -300,6 +409,15 @@ public class MoSyncCapture
 	*/
 	int maCaptureDestroyData(int handle)
 	{
+		MoSyncCaptureObject capture = m_captureObjects.get(handle);
+		if ( null == capture )
+		{
+			Log.e("@@MoSync","maCaptureDestroyData: Invalid handle");
+			return MA_CAPTURE_RES_INVALID_HANDLE;
+		}
+
+		m_captureObjects.remove(capture);
+
 		return MA_CAPTURE_RES_OK;
 	}
 
@@ -311,20 +429,45 @@ public class MoSyncCapture
 	 */
 	public static void handlePicture(Intent data)
 	{
-		//int imageHandle = data.getExtras().getInt("data");
 	    Bitmap photo = (Bitmap) data.getExtras().get("data");
 
         // Create handle.
         int dataHandle = mMoSyncThread.nativeCreatePlaceholder();
+        // Store the image in the NativeUI image table.
 		mImageTable.put(dataHandle, new ImageCache(null, photo));
+		NativeUI.setImageTable(mImageTable);
 
-		// Create new CaptureObject.
-//		CaptureObject capture = new CaptureObject(CaptureType.IMAGE);
-//		m_captureObjects.put(dataHandle, capture);
+		// Create and store a new CaptureObject.
+		MoSyncCaptureObject capture = new MoSyncCaptureObject(CaptureType.IMAGE);
+		capture.setData(mImageUri);
+		m_captureObjects.put(dataHandle, capture);
 
 	    // Post MoSync event.
-	    postEventNotificationReceived(MA_CAPTURE_EVENT_TYPE_IMAGE, dataHandle); // + the default image name
+	    postEventNotificationReceived(MA_CAPTURE_EVENT_TYPE_IMAGE, dataHandle);
 	}
+
+	/**
+	 * Grab the bitmap of the new capture.
+	 * @param imageUri
+	 * @return The bitmap.
+	 */
+    public Bitmap grabImage(Uri imageUri)
+    {
+        getActivity().getContentResolver().notifyChange(imageUri, null);
+
+        Bitmap bitmap = null;
+        try
+        {
+            bitmap = android.provider.MediaStore.Images.Media.getBitmap(
+					getActivity().getContentResolver(), imageUri);
+        } catch (FileNotFoundException e) {
+          e.printStackTrace();
+        } catch (IOException e) {
+			Log.e("@@MoSync","Capture error: failed to load capture.");
+			e.printStackTrace();
+        }
+        return bitmap;
+    }
 
 	/**
 	 * Handle the result after a video was recorded and the control
@@ -333,12 +476,13 @@ public class MoSyncCapture
 	 */
 	public static void handleVideo(Intent data)
 	{
+		String videoPath = null;
+
 		mVideoUri = data.getData();
-		Log.e("emma",mVideoUri.getPath());
-		// here it is /external/video/media/16, instead of DCIM/MOV_0077.mp4
+
 		if ( mVideoUri == null )
 		{
-			Log.e("emma","uri is null");
+			Log.e("@@MoSync","Capture error video is null");
 			return;
 		}
 
@@ -357,33 +501,26 @@ public class MoSyncCapture
 		}
 		if ( cursor.moveToFirst() )
 		{
-			Log.e("emma",cursor.getString(column_index));
-			// Here save name to mPath of captureObject.
+			videoPath = cursor.getString(column_index);
+			Log.e("@@MoSync", "Capture: video stored at " + videoPath);
 		}
-		//   /sdcard/DCIM/100ANDRO/MOV_0079.mp4
+
         // Create handle.
         int dataHandle = mMoSyncThread.nativeCreatePlaceholder();
 
-        // Create a new CaptureObject.
+        // Create and store a new CaptureObject.
+        MoSyncCaptureObject capture = new MoSyncCaptureObject(CaptureType.VIDEO);
+        capture.setData(mVideoUri);
+        capture.mPath = videoPath;
+		m_captureObjects.put(dataHandle, capture);
 
 		// Post MoSync event.
 		postEventNotificationReceived(MA_CAPTURE_EVENT_TYPE_VIDEO, dataHandle);
 	}
 
 	/**
-	 * Handle the result after a video was recorded and the control
-	 * went back to MoSync activity.
-	 * @param data
-	 */
-	public static void handleStopRecording(Intent data)
-	{
-
-		// Post MoSync event.
-		postEventNotificationReceived(MA_CAPTURE_EVENT_TYPE_VIDEO, -1);
-	}
-
-	/**
-	 *
+	 * Handle capture cancel.
+	 * Post event to the MoSync queue.
 	 */
 	public static void handleCaptureCanceled()
 	{
@@ -413,14 +550,50 @@ public class MoSyncCapture
 	}
 
 	/**
+	 * Start video recording.
+	 */
+	private void recordVideo()
+	{
+		Log.e("@@MoSync","maCaptureAction: Video recording started");
+		// Hack on Motorola: the activity is called com.motorola.Camera.Camcorder.
+		Intent videoIntent = new Intent(android.provider.MediaStore.ACTION_VIDEO_CAPTURE);
+
+		// Set properties that have assigned values.
+		if ( mVideoDurationLimit != CAPTURE_DEFAULT_PROPERTY_VALUE )
+		{
+			videoIntent.putExtra(EXTRA_DURATION_LIMIT, mVideoDurationLimit);
+
+		}
+		// High is already set by
+		if ( mVideoQuality != CAPTURE_VIDEO_QUALITY_HIGH )
+		{
+			videoIntent.putExtra(MediaStore.EXTRA_VIDEO_QUALITY, mVideoQuality);
+		}
+
+		// Launch the camera application.
+		try{getActivity().startActivityForResult(videoIntent, CAPTURE_MODE_RECORD_VIDEO_REQUEST);
+		}catch(ActivityNotFoundException anfe)
+		{
+			Log.e("@@MoSync","maCaptureAction error: There is no video recording available.");
+		}
+	}
+
+	/**
 	 * Start Camera activity that captures an image and returns it.
 	 */
 	private void takePicture()
 	{
 		Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
-		File file = new File(Environment.getExternalStorageDirectory(), "testMyFile.jpg");
-		mImageUri = Uri.fromFile(file);
-		// mImageUri = getTempImageUri();
+
+		// Create a file to store the image.
+		if ( mStoreToGallery )
+		{
+			mImageUri = getImageUri();
+		}
+		else
+		{
+			mImageUri = getTempImageUri();
+		}
 
 		/**
 		 * On 1.5 documentation: "If the EXTRA_OUTPUT is not present, then a small
@@ -430,12 +603,14 @@ public class MoSyncCapture
 		 */
 		cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, mImageUri);
 
+		// Launch the camera application.
 		getActivity().startActivityForResult(cameraIntent, CAPTURE_MODE_TAKE_PICTURE_REQUEST);
 	}
 
 	/**
-	 *
-	 * @return
+	 * Create a temporary file when taking a picture, so that a new file won't
+	 * be created.
+	 * @return The image uri.
 	 */
     private Uri getTempImageUri()
     {
@@ -443,9 +618,9 @@ public class MoSyncCapture
         Uri imgUri = null;
         try
         {
-            // place where to store camera taken picture
-            photo = this.createTemporaryFile("testFile", ".jpg");
-            // the abs path of the temp file will be : /mnt/sdcard/.temp/testAgainDATEINMILLIS.jpg
+            // Place where to store captured image.
+            photo = this.createTemporaryFile("MoSyncTempFile", ".jpg");
+            // The abs path of the temp file will be : /mnt/sdcard/.temp/MoSyncTempFile.jpg
             imgUri = Uri.fromFile(photo);
             photo.delete();
         }
@@ -457,17 +632,30 @@ public class MoSyncCapture
     }
 
     /**
-     *
-     * @param part
-     * @param ext
-     * @return
-     * @throws Exception
+     * Create a file for storing the new capture.
+     * @return The image uri.
+     */
+    private Uri getImageUri()
+    {
+		File photo = new File(Environment.getExternalStorageDirectory(), "MoSyncFile.jpg");
+		Uri imgUri = null;
+
+		imgUri = Uri.fromFile(photo);
+
+		return imgUri;
+    }
+
+    /**
+     * Create a temporary file and return it.
+     * @param part The file name.
+     * @param ext The file extension.
+     * @return the temporary file.
      */
 	private File createTemporaryFile(String part, String ext) throws Exception
 	{
 	    File tempDir= Environment.getExternalStorageDirectory();
 	    tempDir=new File(tempDir.getAbsolutePath()+"/.temp/");
-//	    tempDir = new File(tempDir.getAbsolutePath());
+
 	    if(!tempDir.exists())
 	    {
 	        tempDir.mkdir();
@@ -475,28 +663,6 @@ public class MoSyncCapture
 	    return File.createTempFile(part, ext, tempDir);
 	}
 
-	/**
-	 * Start
-	 */
-	private void recordVideo()
-	{
-		// On Motorola the activity is called com.motorola.Camera.Camcorder
-		Intent videoIntent = new Intent(android.provider.MediaStore.ACTION_VIDEO_CAPTURE);
-		videoIntent.putExtra(MediaStore.EXTRA_DURATION_LIMIT, "10");
-//    	cameraIntent.putExtra(MediaStore.EXTRA_MEDIA_ALBUM, "MyAlbum");
-//    	cameraIntent.putExtra(MediaStore.EXTRA_MEDIA_ARTIST, "Artist");
-		videoIntent.putExtra(MediaStore.EXTRA_VIDEO_QUALITY, 0);
-
-		getActivity().startActivityForResult(videoIntent, CAPTURE_MODE_RECORD_VIDEO_REQUEST);
-	}
-
-	/**
-	 * Stop video recording activity and return to MoSync.
-	 */
-	private void stopRecording()
-	{
-
-	}
 	/************************ Class members ************************/
 
 	/**
@@ -510,21 +676,17 @@ public class MoSyncCapture
     private static Hashtable<Integer, ImageCache> mImageTable;
 
 	/**
-	 * A table that contains a mapping between a handle and a capture object.
-	 */
-//	private HandleTable<CaptureObject> m_handles =
-//		new HandleTable<CaptureObject>();
-	/**
 	 * A table that contains mapping between a handle and a capture object.
 	 * The capture object represents a captured image or recorded video.
 	 * The key is the handle of the image or video.
 	 */
-	private static Hashtable<Integer,CaptureObject> m_captureObjects =
-		new Hashtable<Integer,CaptureObject>();
+	private static Hashtable<Integer,MoSyncCaptureObject> m_captureObjects =
+		new Hashtable<Integer,MoSyncCaptureObject>();
+
 	/**
 	 * The current image.
 	 */
-	private Uri mImageUri;
+	private static Uri mImageUri;
 
 	/**
 	 * The current video.
@@ -535,13 +697,32 @@ public class MoSyncCapture
 	 * Store the state of the last capture action.
 	 * Modify if when a picture is taken.
 	 */
-	public static boolean mPhotoTaken = false;
+	private static boolean mPhotoTaken = false;
+
+	/**
+	 * Capture properties: storeToGallery, videoDurationLimit, videoQuality.
+	 * These properties are set before captures are taken, and are applied
+	 * for each new image/video.
+	 */
 
 	/**
 	 * Indicates if the captured image should be stored in Gallery.
-	 * By default a captured image is store in Gallery album.
+	 * By default a captured image is stored in Gallery album.
 	 * If the value is set to false then a temporary file will be used
 	 * instead, and no file will be generated after the image capture.
 	 */
-	public static boolean mStoreToGallery = true;
+	private static boolean mStoreToGallery = true;
+
+	/**
+	 * Indicates the duration limit for the video recording.
+	 * Value is in seconds.
+	 */
+	private int mVideoDurationLimit = CAPTURE_DEFAULT_PROPERTY_VALUE;
+
+	/**
+	 * Indicates the video quality of the next recordings.
+	 * Note: some devices the default camera either does not support low-res video capture,
+	 * or it doesn't understand/process the MediaStore.EXTRA_SIZE_LIMIT correctly.
+	 */
+	private int mVideoQuality = CAPTURE_DEFAULT_PROPERTY_VALUE;//CAPTURE_VIDEO_QUALITY_HIGH;
 }

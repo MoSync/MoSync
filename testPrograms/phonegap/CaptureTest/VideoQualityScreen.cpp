@@ -40,6 +40,7 @@ MA 02110-1301, USA.
 #include <MAUtil/util.h>
 
 #include "VideoQualityScreen.h"
+#include "Util.h"
 
 /**
  * Constructor.
@@ -77,17 +78,35 @@ void VideoQualityScreen::createMainLayout()
 	mListView->addChild(mQualityLowListItem);
 	mQualityLowListItem->setText(VIDEO_QUALITY_LOW_TEXT);
 
-	mQualityMediumListItem = new ListViewItem();
-	mListView->addChild(mQualityMediumListItem);
-	mQualityMediumListItem->setText(VIDEO_QUALITY_MEDIUM_TEXT);
+	if ( isIOS() )
+	{
+		mQualityMediumListItem = new ListViewItem();
+		mListView->addChild(mQualityMediumListItem);
+		mQualityMediumListItem->setText(VIDEO_QUALITY_MEDIUM_TEXT);
+	}
 
 	mQualityHighListItem = new ListViewItem();
 	mListView->addChild(mQualityHighListItem);
 	mQualityHighListItem->setText(VIDEO_QUALITY_HIGH_TEXT);
 
-	// Set the default value.
-	mQualityMediumListItem->setBackgroundColor(SELECTED_QUALITY_COLOR);
-	mSelectedListItem = mQualityMediumListItem;
+	// Set and highlight the default value.
+	if ( isIOS() )
+	{
+		highlightDefaultSetting(mQualityMediumListItem);
+	}
+	else
+	{
+		highlightDefaultSetting(mQualityHighListItem);
+	}
+}
+
+/**
+ * Select and highlight a default quality value.
+ */
+void VideoQualityScreen::highlightDefaultSetting(ListViewItem* item)
+{
+	item->setBackgroundColor(SELECTED_QUALITY_COLOR);
+	mSelectedListItem = item;
 }
 
 /**
@@ -99,31 +118,37 @@ void VideoQualityScreen::listViewItemClicked(
     ListView* listView,
     ListViewItem* listViewItem)
 {
-	mQualityHighListItem->setBackgroundColor(UNSELECTED_QUALITY_COLOR);
-	mQualityMediumListItem->setBackgroundColor(UNSELECTED_QUALITY_COLOR);
-	mQualityLowListItem->setBackgroundColor(UNSELECTED_QUALITY_COLOR);
-	int selectedQuality;
+	if ( mListView == listView )
+	{
+		mQualityHighListItem->setBackgroundColor(UNSELECTED_QUALITY_COLOR);
+		if ( isIOS() )
+		{
+			mQualityMediumListItem->setBackgroundColor(UNSELECTED_QUALITY_COLOR);
+		}
+		mQualityLowListItem->setBackgroundColor(UNSELECTED_QUALITY_COLOR);
+		int selectedQuality;
 
-	if (listViewItem == mQualityLowListItem)
-	{
-		selectedQuality = MA_CAPTURE_VIDEO_QUALITY_LOW;
-		mQualityLowListItem->setBackgroundColor(SELECTED_QUALITY_COLOR);
-	}
-	else if (listViewItem == mQualityMediumListItem)
-	{
-		selectedQuality = MA_CAPTURE_VIDEO_QUALITY_MEDIUM;
-		mQualityMediumListItem->setBackgroundColor(SELECTED_QUALITY_COLOR);
-	}
-	else if (listViewItem == mQualityHighListItem)
-	{
-		selectedQuality = MA_CAPTURE_VIDEO_QUALITY_HIGH;
-		mQualityHighListItem->setBackgroundColor(SELECTED_QUALITY_COLOR);
-	}
+		if (listViewItem == mQualityLowListItem)
+		{
+			selectedQuality = MA_CAPTURE_VIDEO_QUALITY_LOW;
+			mQualityLowListItem->setBackgroundColor(SELECTED_QUALITY_COLOR);
+		}
+		else if (listViewItem == mQualityHighListItem)
+		{
+			selectedQuality = MA_CAPTURE_VIDEO_QUALITY_HIGH;
+			mQualityHighListItem->setBackgroundColor(SELECTED_QUALITY_COLOR);
+		}
+		else if (listViewItem == mQualityMediumListItem)
+		{
+			selectedQuality = MA_CAPTURE_VIDEO_QUALITY_MEDIUM;
+			mQualityMediumListItem->setBackgroundColor(SELECTED_QUALITY_COLOR);
+		}
 
-	// Set the selected video quality.
-	String value = MAUtil::integerToString(selectedQuality);
-	int syscallResult = maCaptureSetProperty(
-		MA_CAPTURE_VIDEO_QUALITY,
-		value.c_str());
-	printf("maCaptureSetProperty(MA_CAPTURE_VIDEO_QUALITY) - %d", syscallResult);
+		// Set the selected video quality.
+		String value = MAUtil::integerToString(selectedQuality);
+		int syscallResult = maCaptureSetProperty(
+			MA_CAPTURE_VIDEO_QUALITY,
+			value.c_str());
+		printf("maCaptureSetProperty(MA_CAPTURE_VIDEO_QUALITY) - %d", syscallResult);
+	}
 }

@@ -61,9 +61,10 @@ void ImageScreen::createMainLayout()
 	Screen::setMainWidget(mainLayout);
 
 	mImage = new Image();
-	mImage->setHeight(this->getHeight());
-	mImage->setWidth(this->getWidth());
+//	mImage->setHeight(this->getHeight());
+//	mImage->setWidth(this->getWidth());
+	mImage->fillSpaceHorizontally();
+	mImage->fillSpaceVertically();
 	mImage->setScaleMode(IMAGE_SCALE_XY);
 	mainLayout->addChild(mImage);
-//	Screen::setMainWidget(mImage);
 }

@@ -70,6 +70,11 @@ private:
         ListView* listView,
         ListViewItem* listViewItem);
 
+    /**
+     * Select and highlight a default quality value.
+     */
+    void highlightDefaultSetting(ListViewItem* item);
+
 private:
     /**
      * Used for displaying the video quality constants.

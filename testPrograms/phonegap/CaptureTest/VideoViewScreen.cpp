@@ -58,6 +58,7 @@ VideoViewScreen::~VideoViewScreen()
  */
 void VideoViewScreen::setVideoFilePath(const MAUtil::String& path)
 {
+//	mVideoView->setPath("sdcard/DCIM/100ANDRO/MOV_0081.mp4");
 	mVideoView->setPath(path);
 }
 
@@ -69,11 +70,6 @@ void VideoViewScreen::createMainLayout()
 	VerticalLayout* mainLayout = new VerticalLayout();
 	Screen::setMainWidget(mainLayout);
 
-	mVideoView = new VideoView();
-	mVideoView->setWidth(this->getWidth());
-	mVideoView->setHeight(2 * this->getHeight() / 3);
-	mainLayout->addChild(mVideoView);
-
 	mPlayBtn = new Button();
 	mPlayBtn->setText(PLAY_BUTTON_TEXT);
 	mPlayBtn->fillSpaceHorizontally();
@@ -83,6 +79,14 @@ void VideoViewScreen::createMainLayout()
 	mPauseBtn->setText(PAUSE_BUTTON_TEXT);
 	mPauseBtn->fillSpaceHorizontally();
 	mainLayout->addChild(mPauseBtn);
+
+	mVideoView = new VideoView();
+	mVideoView->fillSpaceHorizontally();
+	mVideoView->fillSpaceVertically();
+//	mVideoView->setWidth(this->getWidth());
+//	mVideoView->setHeight(2 * this->getHeight() / 3);
+	mainLayout->addChild(mVideoView);
+
 }
 
 /**

@@ -316,12 +316,9 @@ public class MoSync extends Activity
 		else if ( resultCode == RESULT_OK &&
 				requestCode == MoSyncCapture.CAPTURE_MODE_RECORD_VIDEO_REQUEST )
 		{
+			// A video was recorded.
 			MoSyncCapture.handleVideo(data);
 		}
-//		else if ( requestCode == MoSyncCapture.CAPTURE_MODE_STOP_RECORDING_REQUEST )
-//		{
-//			MoSyncCapture.handleStopRecording(data);
-//		}
 		else if ( resultCode == RESULT_OK &&
 				requestCode == MoSyncCapture.CAPTURE_MODE_TAKE_PICTURE_REQUEST )
 		{
@@ -339,7 +336,7 @@ public class MoSync extends Activity
 	protected void onSaveInstanceState( Bundle outState )
 	{
 		Log.e("@@MoSync", "onSaveInstanceState");
-	    outState.putBoolean( MoSyncCapture.PHOTO_TAKEN, MoSyncCapture.mPhotoTaken );
+	    //outState.putBoolean( MoSyncCapture.PHOTO_TAKEN, MoSyncCapture.mPhotoTaken );
 	}
 
 	@Override

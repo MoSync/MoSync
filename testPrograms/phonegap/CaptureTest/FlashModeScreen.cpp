@@ -101,31 +101,34 @@ void FlashModeScreen::listViewItemClicked(
     ListView* listView,
     ListViewItem* listViewItem)
 {
-	mFlashAutoListItem->setBackgroundColor(UNSELECTED_QUALITY_COLOR);
-	mFlashOnListItem->setBackgroundColor(UNSELECTED_QUALITY_COLOR);
-	mFlashOffListItem->setBackgroundColor(UNSELECTED_QUALITY_COLOR);
-	int selectedFlashMode;
+	if ( mListView == listView )
+	{
+		mFlashAutoListItem->setBackgroundColor(UNSELECTED_QUALITY_COLOR);
+		mFlashOnListItem->setBackgroundColor(UNSELECTED_QUALITY_COLOR);
+		mFlashOffListItem->setBackgroundColor(UNSELECTED_QUALITY_COLOR);
+		int selectedFlashMode;
 
-	if (listViewItem == mFlashAutoListItem)
-	{
-		selectedFlashMode = MA_CAPTURE_FLASH_AUTO;
-		mFlashAutoListItem->setBackgroundColor(SELECTED_QUALITY_COLOR);
-	}
-	else if (listViewItem == mFlashOnListItem)
-	{
-		selectedFlashMode = MA_CAPTURE_FLASH_ON;
-		mFlashOnListItem->setBackgroundColor(SELECTED_QUALITY_COLOR);
-	}
-	else if (listViewItem == mFlashOffListItem)
-	{
-		selectedFlashMode = MA_CAPTURE_FLASH_OFF;
-		mFlashOffListItem->setBackgroundColor(SELECTED_QUALITY_COLOR);
-	}
+		if (listViewItem == mFlashAutoListItem)
+		{
+			selectedFlashMode = MA_CAPTURE_FLASH_AUTO;
+			mFlashAutoListItem->setBackgroundColor(SELECTED_QUALITY_COLOR);
+		}
+		else if (listViewItem == mFlashOnListItem)
+		{
+			selectedFlashMode = MA_CAPTURE_FLASH_ON;
+			mFlashOnListItem->setBackgroundColor(SELECTED_QUALITY_COLOR);
+		}
+		else if (listViewItem == mFlashOffListItem)
+		{
+			selectedFlashMode = MA_CAPTURE_FLASH_OFF;
+			mFlashOffListItem->setBackgroundColor(SELECTED_QUALITY_COLOR);
+		}
 
-	// Set the selected video quality.
-	String value = MAUtil::integerToString(selectedFlashMode);
-	int syscallResult = maCaptureSetProperty(
-		MA_CAPTURE_FLASH,
-		value.c_str());
-	printf("maCaptureSetProperty(MA_CAPTURE_FLASH) - %d", syscallResult);
+		// Set the selected video quality.
+		String value = MAUtil::integerToString(selectedFlashMode);
+		int syscallResult = maCaptureSetProperty(
+			MA_CAPTURE_FLASH,
+			value.c_str());
+		printf("maCaptureSetProperty(MA_CAPTURE_FLASH) - %d", syscallResult);
+	}
 }

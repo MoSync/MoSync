@@ -3261,7 +3261,7 @@ public class MoSyncThread extends Thread
 	*  - #MA_CAPTURE_RES_FILE_INVALID_NAME if the fullPath param is invalid.
 	*  - #MA_CAPTURE_RES_FILE_ALREADY_EXISTS if the file already exists.
 	*/
-	int maCaptureWriteImage(int handle, int fullPathBuffer, int fullPathBufSize)
+	int maCaptureWriteImage(int handle, String fullPathBuffer, int fullPathBufSize)
 	{
 		return mMoSyncCapture.maCaptureWriteImage(handle, fullPathBuffer, fullPathBufSize);
 	}

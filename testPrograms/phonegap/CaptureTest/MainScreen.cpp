@@ -33,6 +33,7 @@
 #include "ImageScreen.h"
 #include "VideoViewScreen.h"
 #include "FlashModeScreen.h"
+#include "Util.h"
 
 /**
  * Constructor.
@@ -51,9 +52,13 @@ MainScreen::MainScreen() :
 	mVideoQualityScreen = new VideoQualityScreen();
 	mImageScreen = new ImageScreen();
 	mVideoScreen = new VideoViewScreen();
-	mFlashModeScreen = new FlashModeScreen();
+	if ( isIOS() )
+	{
+		mFlashModeScreen = new FlashModeScreen();
+	}
 
 	this->push(mSettingsScreen);
+
 	Environment::getEnvironment().addCustomEventListener(this);
 }
 
