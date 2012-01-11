@@ -27,11 +27,7 @@ public:
 		// Enable message sending from JavaScript to C++.
 		enableWebViewMessages();
 
-		// Remove this line to enable the user to
-		// zoom the web page. To disable zoom is one
-		// way of making web pages display in a
-		// reasonable degault size on devices with
-		// different screen sizes.
+		// Enable zooming.
 		getWebView()->enableZoom();
 
 		// The page in the "LocalFiles" folder to

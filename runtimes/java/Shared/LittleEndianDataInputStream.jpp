@@ -46,7 +46,7 @@ final class LittleEndianDataInputStream extends InputStream {
 #define MARK_ARGS(m) m(int, readlimit)
 	OVERLOAD(void, mark, MARK_ARGS);
 	OVERLOAD(boolean, markSupported, VOID_ARGS);
-	OVERLOAD(void, reset, VOID_ARGS, throws IOException);
+	//OVERLOAD(void, reset, VOID_ARGS, throws IOException);
 
 	public final int tell() {
 		return pos;
@@ -58,6 +58,10 @@ final class LittleEndianDataInputStream extends InputStream {
 		if(res >= 0)
 			pos++;
 		return res;
+	}
+	public final void reset() throws IOException {
+		stream.reset();
+		pos = 0;
 	}
 	public final int skipBytes(int n) throws IOException {
 		int res = stream.skipBytes(n);

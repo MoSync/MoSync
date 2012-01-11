@@ -708,7 +708,7 @@ public class WebWidget extends Widget
 			EventQueue.getDefault().postWidgetEvent(
 				IX_WIDGET.MAW_EVENT_WEB_VIEW_HOOK_INVOKED,
 				mWebWidget.getHandle(),
-				IX_WIDGET.MAW_CONSTANT_SOFT,
+				IX_WIDGET.MAW_CONSTANT_MESSAGE,
 				urlData);
 
 			result.confirm("ok");

@@ -3194,6 +3194,22 @@ namespace Base
 		return result;
 	}
 
+	int _maNotificationPushSetDisplayFlag(int flag, JNIEnv* jNIEnv, jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maNotificationPushSetDisplayFlag", "(I)I");
+		if (methodID == 0)
+		{
+			return 0;
+		}
+
+		int result = jNIEnv->CallIntMethod(jThis, methodID, flag);
+
+		jNIEnv->DeleteLocalRef(cls);
+
+		return result;
+	}
+
 	int _maSyscallPanicsEnable(JNIEnv* jNIEnv, jobject jThis)
 	{
 		jclass cls = jNIEnv->GetObjectClass(jThis);
