@@ -83,7 +83,7 @@ bool PhoneGapMessageHandler::handleMessage(PhoneGapMessage& message)
 	else if ((message.getParam("service") == "Notification") &&
 			(message.getParam("action") == "vibrate"))
 	{
-		int duration = message.getJSONFieldInt("duration");
+		int duration = message.getArgsFieldInt("duration");
 		maVibrate(duration);
 	}
 	//Process the beep message
@@ -112,6 +112,14 @@ bool PhoneGapMessageHandler::handleMessage(PhoneGapMessage& message)
 	{
 		mPhoneGapFile.handleMessage(message);
 	}
+	else
+	{
+		// Message was not handled.
+		return false;
+	}
+
+	// Message was handled.
+	return true;
 }
 
 void PhoneGapMessageHandler::sendConnectionType(MAUtil::String callbackID)
@@ -132,15 +140,17 @@ void PhoneGapMessageHandler::sendConnectionType(MAUtil::String callbackID)
 	{
 		sprintf(networkType, "3g");
 	}
+
 	//create the callback
-	//TODO: we need to convert the type to PhoneGaps simplified version
 	sprintf(
 		buffer,
-		"'%s', \"{ 'status' : 1, 'message': '%s'}\"",
-		callbackID.c_str(),
+		"\\\"%s\\\"",
 		networkType);
 
-	sendPhoneGapSuccess(buffer);
+	callSuccess(
+		callbackID,
+		PHONEGAP_CALLBACK_STATUS_OK,
+		buffer);
 }
 
 /**
@@ -183,28 +193,32 @@ void PhoneGapMessageHandler::sendDeviceProperties(MAUtil::String callbackID)
 		|| (osVersionRes < 0))
 	{
 		//send an error to PhoneGap
-		sendPhoneGapError(
-			"MoSync: Failed to get device informations",
-			callbackID);
+		callError(
+			callbackID,
+			PHONEGAP_CALLBACK_STATUS_ERROR,
+			"MoSync: Failed to get device information");
 		return;
 	}
 
 	// Send the result back to PhoneGap.
 	sprintf(buffer,
-		"'%s', \"{ 'status' : 1,"
-		"'message': \\\"{"
-			"'platform': '%s',"
-			"'name': '%s',"
-			"'uuid': '%s',"
-			"'version':'%s',"
-			"'phonegap': '1.2.0'}\\\"}\"",
-		callbackID.c_str(),
+		"\\'{"
+			"\"platform\":\"%s\","
+			"\"name\":\"%s\","
+			"\"uuid\":\"%s\","
+			"\"version\":\"%s\","
+			"\"phonegap\":\"1.2.0\""
+		"}\\'",
 		deviceOS,
 		deviceName,
 		deviceUUID,
 		deviceOSVersion
 		);
-	sendPhoneGapSuccess(buffer);
+
+	callSuccess(
+		callbackID,
+		PHONEGAP_CALLBACK_STATUS_OK,
+		buffer);
 }
 
 /**
@@ -222,7 +236,6 @@ void PhoneGapMessageHandler::enableHardware()
  */
 void PhoneGapMessageHandler::customEvent(const MAEvent& event)
 {
-	lprintfln("Got a custom event with Type %d", event.type);
 	if (event.type == EVENT_TYPE_LOCATION)
 	{
 		mPhoneGapSensors.sendLocationData(event);
@@ -246,34 +259,146 @@ void PhoneGapMessageHandler::sensorEvent(MASensor sensorData)
 	}
 }
 
+///**
+// * General wrapper for phoneGap success callback.
+// * If an operation is successful this function should be called.
+// *
+// * @param data the data that should be passed to the callback function
+// */
+//void PhoneGapMessageHandler::sendPhoneGapSuccess(const char* data)
+//{
+//	char script[1024];
+//	sprintf(script, "PhoneGap.CallbackSuccess(%s)", data);
+//	mWebView->callJS(script);
+//}
+//
+///**
+// * General wrapper for phoneGap success callback.
+// * If an operation is successful this function should be called.
+// *
+// * @param data the data that should be passed to the callback function
+// */
+//void PhoneGapMessageHandler::sendPhoneGapError(
+//		const char* data,
+//		MAUtil::String callbackID)
+//{
+//	char script[1024];
+//	sprintf(
+//		script,
+//		"PhoneGap.CallbackError(\"%s\", \"{\"message\" : \"%s\"}\")",
+//		callbackID.c_str(),
+//		data);
+//	mWebView->callJS(script);
+//}
+
 /**
- * General wrapper for phoneGap success callback.
- * If an operation is successful this function should be called.
+ * Call the PhoneGap success function.
  *
- * @param data the data that should be passed to the callback function
+ * @param callbackID The id of the JS callback function.
+ * @param status Status code.
+ * @param args Return values as a JSON string.
+ * @param keepCallback true if this callback should be kept by PhoneGap.
+ * @param castFunction Name of an optional JS function that
+ * will convert the JSON args to a JS object.
  */
-void PhoneGapMessageHandler::sendPhoneGapSuccess(const char* data)
+void PhoneGapMessageHandler::callSuccess(
+	const String& callbackID,
+	const MAUtil::String& status,
+	const String& args,
+	bool keepCallback,
+	const String& castFunction
+	)
 {
-	char script[1024];
-	sprintf(script, "PhoneGap.CallbackSuccess(%s)", data);
+	callCallback(
+		"PhoneGap.CallbackSuccess",
+		callbackID,
+		status,
+		args,
+		keepCallback,
+		castFunction);
+}
+
+/**
+ * Call the PhoneGap error function.
+ *
+ * @param callbackID The id of the JS callback function.
+ * @param errorCode The error code.
+ * @param errorMessage Optional error message.
+ * @param keepCallback true if this callback should be kept by PhoneGap.
+ */
+void PhoneGapMessageHandler::callError(
+	const String& callbackID,
+	const String& errorCode,
+	const String& errorMessage,
+	bool keepCallback
+	)
+{
+	String args =
+		"{\"code\":" + errorCode +
+		"\"message\":\"" + errorMessage + "\"}";
+
+	callCallback(
+		"PhoneGap.CallbackError",
+		callbackID,
+		PHONEGAP_CALLBACK_STATUS_ERROR,
+		args,
+		keepCallback);
+}
+
+/**
+ * Evaluate a callback function in JavaScript.
+ *
+ * @param callbackFunction The JS function to handle the callback.
+ * @param callbackID The id of the JS callback.
+ * @param status Status code.
+ * @param args Result values as a JSON string.
+ * @param keepCallback true if this callback should be kept by PhoneGap.
+ * @param castFunction Name of an optional JS function that
+ * will convert the JSON args to a JS object.
+ */
+void PhoneGapMessageHandler::callCallback(
+	const String& callbackFunction,
+	const String& callbackID,
+	const MAUtil::String& status,
+	const String& args,
+	bool keepCallback,
+	const String& castFunction
+	)
+{
+	// Generate JavaScipt code.
+
+	String script = callbackFunction + "(";
+	script += "'" + callbackID + "'";
+
+	script += ",'{";
+	script += "\"status\":" + status;
+	script += ",\"message\": " + args;
+
+	if (keepCallback)
+	{
+		script += ",\"keepCallback\":true";
+	}
+
+	script += "}'";
+
+	if (castFunction.size() > 0)
+	{
+		script += ",'" + castFunction + "'";
+	}
+
+	script += ")";
+
+	lprintfln("@@@ callCallback: %s", script.c_str());
+
 	mWebView->callJS(script);
 }
 
 /**
- * General wrapper for phoneGap success callback.
- * If an operation is successful this function should be called.
+ * Evaluate JavaScript code in the WebView.
  *
- * @param data the data that should be passed to the callback function
+ * @param script Code that should be evaluated.
  */
-void PhoneGapMessageHandler::sendPhoneGapError(
-		const char* data,
-		MAUtil::String callbackID)
+void PhoneGapMessageHandler::callJS(const String& script)
 {
-	char script[1024];
-	sprintf(
-		script,
-		"PhoneGap.CallbackError('%s', \"{'message' : '%s'}\")",
-		callbackID.c_str(),
-		data);
 	mWebView->callJS(script);
 }

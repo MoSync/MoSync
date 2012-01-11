@@ -1198,9 +1198,9 @@ namespace Base
 
 	// TODO : Implement maInvokeExtension
 
-	SYSCALL(int,  maInvokeExtension(int function, int a, int b, int c))
+	SYSCALL(longlong,  maExtensionFunctionInvoke(MAExtensionFunction function, int a, int b, int c))
 	{
-		SYSLOG("maInvokeExtension NOT IMPLEMENTED");
+		SYSLOG("maExtensionFunctionInvoke NOT IMPLEMENTED");
 		return -1;
 	}
 
@@ -1571,6 +1571,135 @@ return 0; \
 		case maIOCtl_maFrameBufferClose:
 			SYSLOG("maIOCtl_maFrameBufferClose");
 			return _maFrameBufferClose(mJNIEnv, mJThis);
+
+
+		// Audio API
+
+		case maIOCtl_maAudioDataCreateFromResource:
+		{
+			SYSLOG("maIOCtl_maAudioDataCreateFromResource");
+
+			const char* mime = SYSCALL_THIS->GetValidatedStr(a);
+			int data = b;
+			int offset = c;
+			int length = SYSCALL_THIS->GetValidatedStackValue(0);
+			int flags = SYSCALL_THIS->GetValidatedStackValue(4);
+
+			return _maAudioDataCreateFromResource(mime, data, offset, length, flags, mJNIEnv, mJThis);
+		}
+
+		case  maIOCtl_maAudioDataCreateFromURL:
+		{
+			SYSLOG("maIOCtl_maAudioDataCreateFromURL");
+
+			const char* mime = SYSCALL_THIS->GetValidatedStr(a);
+			const char* url = SYSCALL_THIS->GetValidatedStr(b);
+			int flags = c;
+
+			return _maAudioDataCreateFromURL(mime, url, flags, mJNIEnv, mJThis);
+		}
+
+		case maIOCtl_maAudioDataDestroy:
+		{
+			SYSLOG("maIOCtl_maAudioDataDestroy");
+			int audioData = a;
+
+			return _maAudioDataDestroy(audioData, mJNIEnv, mJThis);
+		}
+
+		case maIOCtl_maAudioInstanceCreate:
+		{
+			SYSLOG("maIOCtl_maAudioInstanceCreate");
+
+			int audioData = a;
+
+			return _maAudioInstanceCreate(audioData, mJNIEnv, mJThis);
+		}
+
+		case maIOCtl_maAudioInstanceDestroy:
+		{
+			SYSLOG("maIOCtl_maAudioInstanceDestroy");
+
+			int audioInstance = a;
+
+			return _maAudioInstanceDestroy(audioInstance, mJNIEnv, mJThis);
+		}
+
+		case maIOCtl_maAudioGetLength:
+		{
+			SYSLOG("maIOCtl_maAudioGetLength");
+
+			int audioInstance = a;
+
+			return _maAudioGetLength(audioInstance, mJNIEnv, mJThis);
+		}
+
+		case maIOCtl_maAudioSetNumberOfLoops:
+		{
+			SYSLOG("maIOCtl_maAudioSetNumberOfLoops");
+
+			int audioInstance = a;
+			int loops = b;
+
+			return _maAudioSetNumberOfLoops(audioInstance, loops, mJNIEnv, mJThis);
+		}
+
+		case maIOCtl_maAudioPrepare:
+		{
+			SYSLOG("maIOCtl_maAudioPrepare");
+
+			int audioInstance = a;
+			int async = b;
+
+			return _maAudioPrepare(audioInstance, async, mJNIEnv, mJThis);
+		}
+
+		case maIOCtl_maAudioPlay:
+		{
+			SYSLOG("maIOCtl_maAudioPlay");
+
+			int audioInstance = a;
+
+			return _maAudioPlay(audioInstance, mJNIEnv, mJThis);
+		}
+
+		case maIOCtl_maAudioSetPosition:
+		{
+			SYSLOG("maIOCtl_maAudioSetPosition");
+
+			int audioInstance = a;
+			int milliseconds = b;
+
+			return _maAudioSetPosition(audioInstance, milliseconds, mJNIEnv, mJThis);
+		}
+
+		case maIOCtl_maAudioGetPosition:
+		{
+			SYSLOG("maIOCtl_maAudioGetPosition");
+
+			int audioInstance = a;
+
+			return _maAudioGetPosition(audioInstance, mJNIEnv, mJThis);
+		}
+
+		case maIOCtl_maAudioSetVolume:
+		{
+			SYSLOG("maIOCtl_maAudioSetVolume");
+
+			int audioInstance = a;
+			float volume = (float)b;
+
+			return _maAudioSetVolume(audioInstance, volume, mJNIEnv, mJThis);
+		}
+
+		case maIOCtl_maAudioStop:
+		{
+			SYSLOG("maIOCtl_maAudioStop");
+
+			int audioInstance = a;
+
+			return _maAudioStop(audioInstance, mJNIEnv, mJThis);
+		}
 
 		// Audio buffer syscalls
 

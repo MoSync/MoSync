@@ -25,6 +25,14 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 using namespace std;
 
+#ifndef MIN
+#define MIN(x, y) ((x)<(y)?(x):(y))
+#endif
+
+#ifndef MAX
+#define MAX(x, y) ((x)>(y)?(x):(y))
+#endif
+
 struct Group;
 struct Statement {
 	string comment;
@@ -146,10 +154,23 @@ void streamConstants(ostream& stream, const vector<ConstSet>& constSets, int ix)
 void streamIoctlDefines(ostream& stream, const Interface& ioctls, const string& headerName, int ix, bool java);
 void streamIoctlFunction(ostream& stream, const Interface& inf, const Function& f,
 	const string& ioctlName, int fnOffset = 0);
+void streamIoctlFunction(ostream& stream, const Interface& inf, const Function& f,
+	const string& ioctlName, const string& fnName);
 void streamCppDefs(ostream& stream, const Interface& inf, int ix, const string& headerName);
 
 void streamInvokeSyscall(ostream&, const Interface&, bool java, int argOffset = 0);
 void streamHeaderFunctions(ostream& stream, const Interface& inf, bool syscall);
+
+std::string getCSharpType(const Interface& maapi, const std::string& maapiType, bool in);
+void outputCSharpSyscallArg(ostream& maapiFile, int i, const string& coreobject);
+void outputCSharpSyscallNativeArg(ostream& maapiFile, int i, const string& coreobject);
+void outputCSharpIoctlArg(ostream& maapiFile, int i, const string& coreobject);
+void outputCSharpSyscallArgTyped(ostream& maapiFile, int& i, const Argument& a, const Interface& maapi, const string& coreobject);
+void outputCSharpIoctlArgTyped(ostream& maapiFile, int& argindex, const Argument& a, const Interface& maapi, const string& coreobject);
+size_t streamCSharpOffsets(ostream& stream, const Interface& inf, const Struct& s, size_t offset, int indent);
+void streamCSharpConstants(ostream& maapiFile, const Interface& maapi);
+void streamCSharpFunctionDelegates(ostream& maapiFile, const Interface& maapi);
+void streamIoctlFunctionInvokeCSharp(ostream& maapiFile, const Function& f, const Interface& maapi, const std::string& object="mIoctls.",  const std::string& coreObject="mCore.");
 
 //implemented by the user
 void streamInvokePrefix(ostream&, const Function&);

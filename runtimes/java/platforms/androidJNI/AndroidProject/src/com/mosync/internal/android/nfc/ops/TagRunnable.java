@@ -38,6 +38,7 @@ public abstract class TagRunnable<TagType extends INFCTag> implements RunnableWi
 		} catch (TagLostException e) {
 			return createDefaultEvent(MA_NFC_TAG_CONNECTION_LOST);
 		} catch (Exception e) {
+			e.printStackTrace();
 			return createDefaultEvent(MA_NFC_TAG_IO_ERROR);
 		}
 	}
