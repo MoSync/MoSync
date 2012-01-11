@@ -139,6 +139,9 @@ namespace Base {
 		 */
 		bool is_loaded(unsigned index);
 
+		/**
+		 * @return The size of the static resource array.
+		 */
 		unsigned size();
 
 		/**

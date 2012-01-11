@@ -293,11 +293,10 @@ static void writeManifest(const char* filename, const SETTINGS& s, const Runtime
 		<<"\t\t</activity>\n"
 		;
 	file <<"\t\t<service android:name=\"com.mosync.internal.android.notifications.LocalNotificationsService\" />\n";
-	file <<"\t\t<service android:name=\".MoSyncService\" />\n";
+   // if (ri.androidVersion >= 8) {
+writeC2DMReceiver(file, packageName);
 
-	if (ri.androidVersion >= 8) {
-		writeC2DMReceiver(file, packageName);
-	}
+	//}
 	file <<"\t</application>\n"
 		<<"\t<uses-sdk android:minSdkVersion=\""<<ri.androidVersion<<"\" />\n"
 		;
@@ -380,18 +379,16 @@ static void writePermissions(ostream& stream, const SETTINGS& s, const RuntimeIn
 	// Always add this.
 	writePermission(stream, true, "android.permission.READ_PHONE_STATE");
 
-	// Only add this for android 2.2 and higher. Permission for Google C2DM Service for push notifications.
-	if (ri.androidVersion >= 8)
+	// Permission for Google C2DM Service for push notifications.
+	if (isPermissionSet(permissionSet, PUSH_NOTIFICATIONS))
 	{
-		if (isPermissionSet(permissionSet, PUSH_NOTIFICATIONS))
-		{
-			stream <<"\t<permission android:name=\"com.mosync.java.android.permission.C2D_MESSAGE\"\n";
-			stream <<"\t\tandroid:protectionLevel=\"signature\" />\n";
-		}
-		string permMessage = packageName + ".permission.C2D_MESSAGE";
-		writePermission(stream, isPermissionSet(permissionSet, PUSH_NOTIFICATIONS), permMessage.c_str());
-		writePermission(stream, isPermissionSet(permissionSet, PUSH_NOTIFICATIONS), "com.google.android.c2dm.permission.RECEIVE");
+		stream <<"\t<permission android:name=\""<<packageName<<".permission.C2D_MESSAGE\"\n";
+		stream <<"\t\tandroid:protectionLevel=\"signature\" />\n";
 	}
+	writePermission(stream, isPermissionSet(permissionSet, PUSH_NOTIFICATIONS), "android.permission.WAKE_LOCK");
+	string permMessage = packageName + ".permission.C2D_MESSAGE";
+	writePermission(stream, isPermissionSet(permissionSet, PUSH_NOTIFICATIONS), permMessage.c_str());
+	writePermission(stream, isPermissionSet(permissionSet, PUSH_NOTIFICATIONS), "com.google.android.c2dm.permission.RECEIVE");
 }
 static void writePermission(ostream& stream, bool flag, const char* nativePerm) {
 	if (flag) {

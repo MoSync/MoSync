@@ -165,6 +165,9 @@ namespace Base {
 		return false;
 	}
 
+	/**
+	 * @return The size of the static resource array.
+	 */
 	unsigned ResourceArray::size() {
 		return mResSize;
 	}

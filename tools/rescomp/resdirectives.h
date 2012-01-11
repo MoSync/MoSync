@@ -83,6 +83,7 @@ public:
 	void setResource(string resource);
 	string getUniqueToken();
 	virtual void writeDirectives(ostringstream& output, bool asVariant);
+	virtual void writeResourceTypeDirective(ostringstream& output);
 	virtual void initDirectiveFromAttributes(const char **attributes);
 	virtual string validate();
 };
@@ -100,18 +101,21 @@ public:
 };
 
 class MediaResourceDirective : public FileResourceDirective {
-private:
+protected:
 	string fMimeType;
 public:
 	MediaResourceDirective() : FileResourceDirective("media", false) { }
 	void setMimeType(string mimeType);
-	void writeDirectives(ostringstream& output, bool asVariant);
+	virtual string getMimeType();
+	void writeResourceTypeDirective(ostringstream& output);
 	virtual void initDirectiveFromAttributes(const char **attributes);
+	virtual string validate();
 };
 
 class AudioResourceDirective : public MediaResourceDirective {
 public:
 	AudioResourceDirective() : MediaResourceDirective() { }
+	virtual string validate();
 };
 
 class StringResourceDirective : public ResourceDirective {

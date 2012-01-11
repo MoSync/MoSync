@@ -32,6 +32,7 @@ import com.mosync.internal.android.MoSyncThread;
 
 /*
  * Helpers for maOptionDialog syscalls.
+ * @author emma tresanszki
  */
 public class MoSyncOptionsDialog
 {
