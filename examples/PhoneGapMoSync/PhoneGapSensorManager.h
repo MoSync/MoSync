@@ -12,6 +12,9 @@
 #include <NativeUI/WebView.h>
 #include "PhoneGapMessage.h"
 
+// The maximum amount of sensors in a device
+#define MAXIMUM_SENSORS 8
+
 class PhoneGapSensorManager
 {
 public:
@@ -32,6 +35,11 @@ public:
 	 */
 	void handleMessage(PhoneGapMessage& message);
 
+	/**
+	 * Dispatching of sensor events.
+	 * @param sensorData The sensor data of the event
+	 */
+	void sendSensorData(MASensor sensorData);
 private:
 
 	void findSensors(PhoneGapMessage& message);
@@ -43,6 +51,17 @@ private:
 	 * Used for communicating with PhoneGap
 	 */
 	NativeUI::WebView* mWebView;
+
+	/**
+	 * Stores the CallbackIDs of the various sensors so the result can be sent
+	 * after receiving the sensor event
+	 */
+	MAUtil::String mSensorWatchCallBack[MAXIMUM_SENSORS];
+
+	/**
+	 * Makes sure that only a single reading will be returned
+	 */
+	bool mSensorSingleReadFlag[MAXIMUM_SENSORS];
 
 };
 

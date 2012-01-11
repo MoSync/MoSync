@@ -8,101 +8,143 @@ var deviceInfo = function() {
     document.getElementById("colorDepth").innerHTML = screen.colorDepth;
 };
 
-var getLocation = function() {
-    var suc = function(p) {
-        alert(p.coords.latitude + " " + p.coords.longitude);
-    };
-    var locFail = function() {
-    };
-    navigator.geolocation.watchPosition(suc, locFail);
-};
-
-var beep = function() {
-    navigator.notification.beep(2);
-};
-
-var vibrate = function() {
-    navigator.notification.vibrate(1000);
-};
-
 function roundNumber(num) {
     var dec = 3;
     var result = Math.round(num * Math.pow(10, dec)) / Math.pow(10, dec);
     return result;
 }
 
-var accelerationWatch = null;
+var accelerometer = new SensorConnection('Accelerometer');
+accelerometer.addEventListener("onsensordata", function(event)
+		{
+			updateAcceleration(event.data);
+		});
 
 function updateAcceleration(a) {
-    document.getElementById('x').innerHTML = roundNumber(a.x);
-    document.getElementById('y').innerHTML = roundNumber(a.y);
-    document.getElementById('z').innerHTML = roundNumber(a.z);
+    document.getElementById('accel-x').innerHTML = roundNumber(a.x);
+    document.getElementById('accel-y').innerHTML = roundNumber(a.y);
+    document.getElementById('accel-z').innerHTML = roundNumber(a.z);
 }
 
 var toggleAccel = function() {
-    if (accelerationWatch !== null) {
-        navigator.accelerometer.clearWatch(accelerationWatch);
+    if (accelerometer.status == "watching") {
+    	accelerometer.endWatch();
         updateAcceleration({
             x : "",
             y : "",
             z : ""
         });
-        accelerationWatch = null;
     } else {
-        var options = {};
-        options.frequency = 1000;
-        accelerationWatch = navigator.accelerometer.watchAcceleration(
-                updateAcceleration, function(ex) {
-                    alert("accel fail (" + ex.name + ": " + ex.message + ")");
-                }, options);
+        accelerometer.startWatch({interval:1000});
     }
 };
 
-var preventBehavior = function(e) {
-    e.preventDefault();
+var magnetometer = new SensorConnection('MagneticField');
+magnetometer.addEventListener("onsensordata", function(event)
+		{
+			updateMagneticField(event.data);
+		});
+
+function updateMagneticField(a) {
+    document.getElementById('magnetic-x').innerHTML = roundNumber(a.x);
+    document.getElementById('magnetic-y').innerHTML = roundNumber(a.y);
+    document.getElementById('magnetic-z').innerHTML = roundNumber(a.z);
+}
+
+var toggleMagnetic = function() {
+    if (magnetometer.status == "watching") {
+    	magnetometer.endWatch();
+    	updateMagneticField({
+            x : "",
+            y : "",
+            z : ""
+        });
+    } else {
+    	magnetometer.startWatch({interval:1000});
+    }
 };
 
-function dump_pic(data) {
-    var viewport = document.getElementById('viewport');
-    console.log(data);
-    viewport.style.display = "";
-    viewport.style.position = "absolute";
-    viewport.style.top = "10px";
-    viewport.style.left = "10px";
-    document.getElementById("test_img").src = "data:image/jpeg;base64," + data;
+var orientation = new SensorConnection('Orientation');
+orientation.addEventListener("onsensordata", function(event)
+		{
+			updateOrientation(event.data);
+		});
+
+function updateOrientation(a) {
+    document.getElementById('orientation-x').innerHTML = roundNumber(a.x);
+    document.getElementById('orientation-y').innerHTML = roundNumber(a.y);
+    document.getElementById('orientation-z').innerHTML = roundNumber(a.z);
 }
+
+var toggleOrientation = function() {
+    if (orientation.status == "watching") {
+    	orientation.endWatch();
+    	updateOrientation({
+            x : "",
+            y : "",
+            z : ""
+        });
+    } else {
+    	orientation.startWatch({interval:1000});
+    }
+};
+
+var proximity = new SensorConnection('Proximity');
+proximity.addEventListener("onsensordata", function(event)
+		{
+			updateProximity(event.data);
+		});
+
+function updateProximity(a) {
+    document.getElementById('proximity-x').innerHTML = roundNumber(a.x);
+    document.getElementById('proximity-y').innerHTML = roundNumber(a.y);
+    document.getElementById('proximity-z').innerHTML = roundNumber(a.z);
+}
+
+var toggleProximity = function() {
+    if (proximity.status == "watching") {
+    	proximity.endWatch();
+    	updateProximity({
+            x : "",
+            y : "",
+            z : ""
+        });
+    } else {
+    	proximity.startWatch({interval:1000});
+    }
+};
+
+var gyroscope = new SensorConnection('Gyroscope');
+gyroscope.addEventListener("onsensordata", function(event)
+		{
+			updateGyroscope(event.data);
+		});
+
+function updateGyroscope(a) {
+    document.getElementById('gyroscope-x').innerHTML = roundNumber(a.x);
+    document.getElementById('gyroscope-y').innerHTML = roundNumber(a.y);
+    document.getElementById('gyroscope-z').innerHTML = roundNumber(a.z);
+}
+
+var toggleGyroscope = function() {
+    if (gyroscope.status == "watching") {
+    	gyroscope.endWatch();
+    	updateGyroscope({
+            x : "",
+            y : "",
+            z : ""
+        });
+    } else {
+    	gyroscope.startWatch({interval:1000});
+    }
+};
+
 
 function fail(msg) {
     alert(msg);
 }
 
-function show_pic() {
-    navigator.camera.getPicture(dump_pic, fail, {
-        quality : 50
-    });
-}
 
-function close() {
-    var viewport = document.getElementById('viewport');
-    viewport.style.position = "relative";
-    viewport.style.display = "none";
-}
-
-function contacts_success(contacts) {
-    alert(contacts.length
-            + ' contacts returned.'
-            + (contacts[2] && contacts[2].name ? (' Third contact is ' + contacts[2].name.formatted)
-                    : ''));
-}
-
-function get_contacts() {
-    var obj = new ContactFindOptions();
-    obj.filter = "";
-    obj.multiple = true;
-    navigator.contacts.find(
-            [ "displayName", "name" ], contacts_success,
-            fail, obj);
-}
 
 function check_network() {
     var networkState = navigator.network.connection.type;
@@ -123,22 +165,17 @@ function find_sensors() {
 	var results = navigator.findSensors();
 	results.onsuccess = function()
 						{
+							sensorList="";
 							for(var i = 0; i < results.result.length; i++)
 							{
-								alert("name:" + results.result[i].name + " type:" + results.result[i].type);
+								sensorList += results.result[i].type + "<br/>";
+								//alert("name:" + results.result[i].name + " type:" + results.result[i].type);
 							}
+							alert(sensorList);
+							document.getElementByID("sensorList").innerHTML = sensorList;
 						};
 }
 
-var accelerometer = new SensorConnection('Accelerometer');
-
-function start_accelerometer() {
-	accelerometer.startWatch({interval:1000});
-}
-
-function stop_accelerometer() {
-	accelerometer.endWatch();
-}
 
 function init() {
     // the next line makes it impossible to see Contacts on the HTC Evo since it

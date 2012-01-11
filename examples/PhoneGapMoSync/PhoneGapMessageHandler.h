@@ -183,6 +183,14 @@ public:
 	 */
 	void callJS(const MAUtil::String& script);
 
+	/**
+	 * Set the target class for sensor event messages.
+	 * @param sensor The sensor that is configured.
+	 * @param toSensorManager If true, the SensorManager object will receive the events, normal PhoneGap API if false
+	 */
+	void setSensorEventTarget(int sensor, bool toSensorManager);
+
+
 private:
 	/**
 	 * The WebView used by PhoneGap.
@@ -203,6 +211,11 @@ private:
 	 * PhoneGap File API message handler.
 	 */
 	PhoneGapFile mPhoneGapFile;
+
+	/**
+	 * Controls where each sensor event is delivered.
+	 */
+	bool mSensorEventToManager[MAXIMUM_SENSORS];
 };
 
 #endif
