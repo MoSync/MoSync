@@ -60,6 +60,13 @@ public:
 	~DisplayNotificationScreen();
 
 	/**
+	 * This screen is notified when registration is done.
+	 * @param registrationStatus True if registration succeed, false if
+	 * it failed.
+	 */
+	void pushRegistrationDone(bool registrationStatus);
+
+	/**
 	 * Displays notification's content on the screen.
 	 */
 	void pushNotificationReceived(

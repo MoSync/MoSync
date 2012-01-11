@@ -232,7 +232,7 @@
 
     NSString *url=[NSString stringWithString:request.URL.absoluteString];
 	//Hook by-pass system for the case of the MoSync coder using the
-	//set url property.
+	//set url property. used by maWidgetSetProperty syscall
     NSNumber *unHookCount = [urlsToNotHook objectForKey:url];
     BOOL skipHook = NO;
     if(unHookCount)
@@ -248,6 +248,51 @@
             [urlsToNotHook setValue:newCount forKey:url];
         }
     }
+
+    //High performace protocol used mainly for high speed communication
+    // JavaScript sets this property when it has a stream to be sent to C++
+    if ((skipHook == NO) && ([url isEqualToString:@"mosync://DataAvailable"]))
+    {
+        //loop until there is no message in the JavaScript Queue
+        while (true) {
+            // We call into JavaScript directly to get the data
+            NSString* messageData =
+                [webView stringByEvaluatingJavaScriptFromString:
+                 @"mosync.bridge.getMessageData()"];
+            //If there is no message left JavaScript will return an empty string
+            if(messageData.length == 0)
+            {
+                break;
+            }
+
+            //create the event to be passed to the mosync program
+            MAEvent event;
+            event.type = EVENT_TYPE_WIDGET;
+            MAWidgetEventData *eventData = new MAWidgetEventData;
+            eventData->eventType = MAW_EVENT_WEB_VIEW_HOOK_INVOKED;
+            eventData->widgetHandle = handle;
+
+            //We create a placeholder resource that holds the message string
+            MAHandle messageHandle = (MAHandle) Base::gSyscall->resources.create_RT_PLACEHOLDER();
+            int size = (int)[messageData lengthOfBytesUsingEncoding:NSASCIIStringEncoding];
+            Base::MemStream* ms = new Base::MemStream(size);
+            Base::gSyscall->resources.add_RT_BINARY(messageHandle, ms);
+            ms->seek(Base::Seek::Start, 0);
+            ms->write([messageData cStringUsingEncoding:NSASCIIStringEncoding], size);
+
+            eventData->urlData = messageHandle;
+            event.data = (MAAddress)eventData;
+
+            //put the event into the event queue
+            Base::gEventQueue.put(event);
+        }
+
+        //This url should not be loaded in the webview
+        return NO;
+    }
+
+    //The process continues here if an oridinary hook is suppoed to happen
+    //or some other URL is supposed to be loaded
 	NSStringCompareOptions options = NSRegularExpressionSearch|NSCaseInsensitiveSearch;
 	NSRange softHookRange = [url rangeOfString:softHookPattern options:options];
     NSRange hardHookRange = [url rangeOfString:hardHookPattern options:options];

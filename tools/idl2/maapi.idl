@@ -995,6 +995,24 @@ interface MAAPI {
 	*/
 	int maLoadResources(in MAHandle data);
 
+	constset int MA_RESOURCE_ {
+		OPEN = 0x1;
+		CLOSE = 0x2;
+	}
+	/**
+	* Loads a specific resource in the given placeholder.
+	* \param handle The handle of the resource that needs to be loaded
+	* \param placeholder The placeholder where to load the resource from handle.
+	* \param flag One of the MA_RESOURCE_OPEN, MA_RESOURCE_CLOSE,
+	* MA_RESOURCE_OPEN|MA_RESOURCE_CLOSE to control the resource binary.
+	*/
+	int maLoadResource(in MAHandle handle, in MAHandle placeholder, in int flag);
+
+	/*
+	* Returns the number of available resources.
+	*/
+	int maCountResources();
+
 	/**
 	* Loads a new program from the a data object, closes the running program, and starts the new one.
 	* The format of the data object is a MoSync program file concatenated with a resource file.
@@ -4150,6 +4168,7 @@ group WidgetAPI "Widget API" {
 				* One of:
 				*  #MAW_CONSTANT_SOFT
 				*  #MAW_CONSTANT_HARD
+				*  #MAW_CONSTANT_MESSAGE
 				*/
 				int hookType;
 
@@ -4440,6 +4459,15 @@ group WidgetAPI "Widget API" {
 		* #MAW_EVENT_WEB_VIEW_HOOK_INVOKED.
 		*/
 		HARD = 6;
+
+		/**
+		* @brief The hook type is a message sendt from JavaScript.
+		* Used in #MAW_EVENT_WEB_VIEW_HOOK_INVOKED.
+		* This type of hook does not use any hook pattern, it is
+		* always sent from the browser, using a platform specific
+		* method (which is abstracted away in the libraries).
+		*/
+		MESSAGE = 7;
 
 		/**
 		* @brief The popover arrow should point up. Used in
@@ -9283,19 +9311,19 @@ group NotificationAPI "Notification API" {
 			INVALID_HANDLE = -1;
 
 			/**
-			* @brief Indicates that the call to maNotificationSetProperty or maNotificationGetProperty received
+			* @brief Indicates that the call to maNotificationLocalSetProperty or maNotificationLocalGetProperty received
 			* an invalid property name.
 			*/
 			INVALID_PROPERTY_NAME = -3;
 
 			/**
-			* @brief Indicates that the call to maNotificationSetProperty or maNotificationGetProperty received
+			* @brief Indicates that the call to maNotificationLocalSetProperty or maNotificationLocalGetProperty received
 			* an invalid property value.
 			*/
 			INVALID_PROPERTY_VALUE = -4;
 
 			/**
-			* @brief Indicates that the call to maNotificationGetProperty or maNotificationPushGetData needs a larger buffer.
+			* @brief Indicates that the call to maNotificationLocalGetProperty or maNotificationPushGetData needs a larger buffer.
 			*/
 			INVALID_STRING_BUFFER_SIZE = -5;
 
@@ -9305,22 +9333,35 @@ group NotificationAPI "Notification API" {
 			UNSUPPORTED = -6;
 
 			/**
+			* @brief Indicates that maNotficationLocalSetProperty cannot be called after scheduling via
+			* maNotificationLocalSchedule, or that the call to maNotificationLocalSchedule failed because
+			* the notification was already scheduled.
+			*/
+			ALREADY_SCHEDULED = -7;
+
+			/**
+			* @brief Indicates that the call to maNotificationLocalUnschedule failed because the notification
+			* was not scheduled.
+			*/
+			CANNOT_UNSCHEDULE = -8;
+
+			/**
 			* @brief Indicates that the call to maNotificationPushRegister was unsuccessful because
 			* the application is already registered for receiving push notification.
 			*/
-			ALREADY_REGISTERED = -7;
+			ALREADY_REGISTERED = -9;
 
 			/**
 			* @brief Indicates that the call to maNotificationPushUnregister was unsuccessful because
 			* the application is not registered for receiving push notification.
 			*/
-			NOT_REGISTERED = -8;
+			NOT_REGISTERED = -10;
 
 			/**
 			* @brief Indicates that the call to maNotificationPushRegister was unsuccessful because
 			* the application did not finish processing a previous registration request.
 			*/
-			REGISTRATION_IN_PROGRESS = -9;
+			REGISTRATION_IN_PROGRESS = -11;
 
 			/**
 			* @brief Indicates that the call to maNotificationPushRegister was unsuccesfull because the
@@ -9328,7 +9369,7 @@ group NotificationAPI "Notification API" {
 			* The application should use exponential back off and retry.
 			* Platform: Android only.
 			*/
-			REGISTRATION_SERVICE_NOT_AVAILABLE = -10;
+			REGISTRATION_SERVICE_NOT_AVAILABLE = -12;
 
 			/**
 			* @brief Indicates that the call to maNotificationPushRegister was unsuccesfull because there is no
@@ -9336,14 +9377,14 @@ group NotificationAPI "Notification API" {
 			* The application should ask the user to open the account manager and add a Google account.
 			* Platform: Android only.
 			*/
-			REGISTRATION_ACCOUNT_MISSING = -11;
+			REGISTRATION_ACCOUNT_MISSING = -13;
 
 			/**
 			* @brief Indicates that the call to maNotificationPushRegister was unsuccesfull because the password was bad.
 			* The application should ask the user to enter his/her password, and let user retry manually later.
 			* Platform: Android only.
 			*/
-			REGISTRATION_AUTHENTICATION_FAILED = -12;
+			REGISTRATION_AUTHENTICATION_FAILED = -14;
 
 			/**
 			* @brief Indicates that the call to maNotificationPushRegister was unsuccesfull because the user has too many
@@ -9351,36 +9392,36 @@ group NotificationAPI "Notification API" {
 			* The application should tell the user to uninstall some other applications, let user retry manually.
 			* Platform: Android only.
 			*/
-			REGISTRATION_TOO_MANY_REGISTRATIONS = -13;
+			REGISTRATION_TOO_MANY_REGISTRATIONS = -15;
 
 			/**
 			* @brief Indicates that the call to maNotificationPushRegister was unsuccesfull because the sender account
 			* is not recognized.
 			* Platform: Android only.
 			*/
-			REGISTRATION_INVALID_SENDER = -14;
+			REGISTRATION_INVALID_SENDER = -16;
 
 			/**
 			* @brief  Indicates that the call to maNotificationPushRegister was unsuccesfull because of incorrect
 			* phone registration with Google. This phone doesn't currently support C2DM.
 			* Platform: Android only.
 			*/
-			REGISTRATION_PHONE_REGISTRATION_ERROR = -15;
+			REGISTRATION_PHONE_REGISTRATION_ERROR = -17;
 
 			/**
 			* @brief Indicates that the call to maNotificationPushGetRegistration needs a larger buffer.
 			*/
-			REGISTRATION_MESSAGE_BUF_TOO_SMALL = -16;
+			REGISTRATION_MESSAGE_BUF_TOO_SMALL = -18;
 
 			/**
 			* @brief Indicates that the call to maNotificationPushGetRegistration occured before trying to register.
 			*/
-			REGISTRATION_NOT_CALLED = -17;
+			REGISTRATION_NOT_CALLED = -19;
 
 			/**
 			* @brief Indicates that the call to an notification syscall was unsuccessful.
 			*/
-			ERROR = -18;
+			ERROR = -20;
 		}
 	} // end of Notification Result Codes
 
@@ -9414,6 +9455,34 @@ group NotificationAPI "Notification API" {
 			AUTO_CANCEL = 16;
 		}
 	} // end of Notification Flags
+
+		group NotificationDisplayFlags "Notification Display Flags" {
+		constset int MA_NOTIFICATION_DISPLAY_FLAG_ {
+			/**
+			* For local notifications: if set, the incoming notifications will be displayed to
+			* the user only if the application is in background.
+			* For push notifications: if set, the incoming notifications will be displayed to
+			* the user only if the application is not in use.
+			* Note that the received push notification event will always be received regardless
+			* of this flag.
+			* This setting is enabled by default.
+			* Platform: Android only.
+			*/
+			DEFAULT = 0;
+
+			/**
+			* If set, all the incoming notification will be displayed to the user regardless of
+			* it's focus state.
+			* For local notifications: this means that the user will get the notifications when the
+			* application is in background, but also in foreground.
+			* For push notifications: this means that the user will get the notifications when the
+			* application is closed, but also when it's in use.
+			* Note that the  event will always be received regardless of this flag.
+			* Platform: Android only.
+			*/
+			ANYTIME = 1;
+		}
+	} // end of Notification Display Flags
 
 	group NotificationPushTypes "Notification Push Types" {
 		constset int MA_NOTIFICATION_PUSH_TYPE_ {
@@ -9564,14 +9633,14 @@ group NotificationAPI "Notification API" {
 			TICKER_TEXT = "tickerText";
 
 			/**
-			* @brief Set or get the flags applied to the local notification.
+			* @brief Set the flags applied to the local notification.
 			* Platform: Android.
 			*
 			* @validvalue One of the constants:
-			* - MA_NOTIFICATION_FLAG_INSISTENT
-			* - MA_NOTIFICATION_FLAG_AUTO_CANCEL
-			* - MA_NOTIFICATION_FLAG_HIGH_PRIORITY
-			* - MA_NOTIFICATION_FLAG_NO_CLEAR.
+			* - #MA_NOTIFICATION_FLAG_INSISTENT
+			* - #MA_NOTIFICATION_FLAG_AUTO_CANCEL
+			* - #MA_NOTIFICATION_FLAG_HIGH_PRIORITY
+			* - #MA_NOTIFICATION_FLAG_NO_CLEAR.
 			*
 			* @setonly
 			*
@@ -9581,6 +9650,25 @@ group NotificationAPI "Notification API" {
 			* \endcode
 			*/
 			FLAG = "flag";
+
+			/**
+			* @brief Set the display flag applied to the local notification.
+			* Note the regardless of this flag, the #EVENT_TYPE_LOCAL_NOTIFICATION event will be received.
+			* Platform: Android.
+			*
+			* @validvalue One of the constants:
+			* - #MA_NOTIFICATION_DISPLAY_FLAG_DEFAULT Which is enabled by default.
+			* - #MA_NOTIFICATION_DISPLAY_FLAG_ ANYTIME.
+			*
+			* @setonly
+			*
+			* @par Example
+			* \code
+			*    // Display the notification even when the application is in foreground.
+			*    maNotificationLocalSetProperty(notificationHandle, MA_NOTIFICATION_LOCAL_DISPLAY_FLAG, MA_NOTIFICATION_DISPLAY_FLAG_ANYTIME);
+			* \endcode
+			*/
+			DISPLAY_FLAG = "displayFlag";
 
 			/**
 			* @brief Enable/disable the the default vibration when an alert is displayed.
@@ -9644,7 +9732,7 @@ group NotificationAPI "Notification API" {
 			* - a value for the ledARGB field (for the color),
 			* - the ledOffMS field (length of time, in milliseconds, to keep the light off),
 			* - the ledOnMS (length of time, in milliseconds, to keep the light on).
-			*  returns MA_NOTIFICATION_ERROR if the current device doesn't support flashing LED.
+			*  returns #MA_NOTIFICATION_ERROR if the current device doesn't support flashing LED.
 			* @setonly
 			*
 			* @par Example
@@ -9667,9 +9755,10 @@ group NotificationAPI "Notification API" {
 			/// Specific to iOS. On Android it will be #MA_NOTIFICATION_PUSH_TYPE_ALERT.
 			int type;
 
-			/// The  buffer that will contain the message displayed in the notification alert.
+			/// The  buffer that will contain the message displayed in the notification alert,
+			/// or the notification content on Android.
 			/// This buffer will be filled only if the type is MA_NOTIFICATION_PUSH_TYPE_ALERT.
-			/// Platform: iOS only.
+			/// Platform: iOS and Android.
 			MAString alertMessage;
 
 			/// The size of the buffer that will contain the notification alert message.
@@ -9725,6 +9814,7 @@ group NotificationAPI "Notification API" {
 		* - #MA_NOTIFICATION_RES_INVALID_HANDLE if the notificationHandle is invalid.
 		* - #MA_NOTIFICATION_RES_INVALID_PROPERTY_NAME if the property name is not valid.
 		* - #MA_NOTIFICATION_RES_INVALID_PROPERTY_VALUE if the property value is not valid.
+		* - #MA_NOTIFICATION_RES_ALREADY_SCHEDULED if the notification is scheduled.
 		*/
 		int maNotificationLocalSetProperty(in MAHandle notificationHandle, in MAString property, in MAString value);
 
@@ -9747,12 +9837,16 @@ group NotificationAPI "Notification API" {
 
 		/**
 		* \brief Schedules a local notification for delivery at its encapsulated date and time.
+		* By default, the notifications are displayed to the user only if the application is
+		* in background. But on Android you can configure this by setting the
+		* #MA_NOTIFICATION_LOCAL_DISPLAY_FLAG property.
 		*
 		* \param notificationHandle Handle to a local notification object.
 		*
 		* \returns One of the next constants:
 		* - #MA_NOTIFICATION_RES_OK if no error occurred.
 		* - #MA_NOTIFICATION_RES_INVALID_HANDLE if the notificationHandle is invalid.
+		* - #MA_NOTIFICATION_RES_ALREADY_SCHEDULED if the notification was already scheduled.
 		*/
 		int maNotificationLocalSchedule(in MAHandle notificationHandle);
 
@@ -9766,6 +9860,7 @@ group NotificationAPI "Notification API" {
 		* \returns One of the next constants:
 		* - #MA_NOTIFICATION_RES_OK if no error occurred.
 		* - #MA_NOTIFICATION_RES_INVALID_HANDLE if the notificationHandle is invalid.
+		* - #MA_NOTIFICATION_RES_CANNOT_UNSCHEDULE if the notification was not scheduled.
 		*/
 		int maNotificationLocalUnschedule(in MAHandle notificationHandle);
 
@@ -9790,6 +9885,7 @@ group NotificationAPI "Notification API" {
 		* - #MA_NOTIFICATION_RES_OK if no error occurred.
 		* - #MA_NOTIFICATION_ALREADY_REGISTERED if the application is already registered for
 		* receiving push notifications.
+		* - #MA_NOTIFICATION_RES_UNSUPPORTED if notifications are not supported on current platform.
 		*/
 		int maNotificationPushRegister(in MAHandle pushNotificationTypes, in MAString accountID);
 
@@ -9883,6 +9979,22 @@ group NotificationAPI "Notification API" {
 		* - #MA_NOTIFICATION_RES_ERROR.
 		*/
 		int maNotificationPushSetMessageTitle(in MAString messageTitle);
+
+		/**
+		* \brief Set the display flags applied to the incoming push notifications.
+		* Note that regardless of this setting, the #EVENT_TYPE_PUSH_NOTIFICATION event
+		* will be received for each incoming notification.
+		* #MA_NOTIFICATION_DISPLAY_DEFAULT is enabled by default.
+		* Platform: Android only.
+		* \param displayFlag One of the constants:
+		* - #MA_NOTIFICATION_DISPLAY_FLAG_DEFAULT Which is enabled by default.
+		* - #MA_NOTIFICATION_DISPLAY_FLAG_ANYTIME.
+		* \return One of the next constants:
+		* - #MA_NOTIFICATION_RES_OK if no error occurred.
+		* - #MA_NOTIFICATION_RES_ERROR if push notifications are not supported,
+		* or the input value is not valid.
+		*/
+		int maNotificationPushSetDisplayFlag(in int displayFlag);
 	}//End of Notification Functions
 } // End of Notification API
 
