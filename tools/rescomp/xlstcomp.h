@@ -112,7 +112,7 @@ struct ParserState {
 };
 
 const char* findAttr(const char* name, const char** attributes);
-
+bool equalsIgnoreCase(const char* str1, const char* str2);
 void disposeDirective(ResourceDirective* directive);
 
 #endif /* XLSTCOMP_H_ */

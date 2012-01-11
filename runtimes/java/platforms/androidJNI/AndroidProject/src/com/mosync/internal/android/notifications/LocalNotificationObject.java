@@ -34,6 +34,13 @@ import static com.mosync.internal.generated.MAAPI_consts.MA_NOTIFICATION_LOCAL_T
 import static com.mosync.internal.generated.MAAPI_consts.MA_NOTIFICATION_LOCAL_FIRE_DATE;
 import static com.mosync.internal.generated.MAAPI_consts.MA_NOTIFICATION_LOCAL_CONTENT_TITLE;
 import static com.mosync.internal.generated.MAAPI_consts.MA_NOTIFICATION_LOCAL_FLAG;
+import static com.mosync.internal.generated.MAAPI_consts.MA_NOTIFICATION_LOCAL_DISPLAY_FLAG;
+import static com.mosync.internal.generated.MAAPI_consts.MA_NOTIFICATION_FLAG_AUTO_CANCEL;
+import static com.mosync.internal.generated.MAAPI_consts.MA_NOTIFICATION_FLAG_HIGH_PRIORITY;
+import static com.mosync.internal.generated.MAAPI_consts.MA_NOTIFICATION_FLAG_INSISTENT;
+import static com.mosync.internal.generated.MAAPI_consts.MA_NOTIFICATION_FLAG_NO_CLEAR;
+import static com.mosync.internal.generated.MAAPI_consts.MA_NOTIFICATION_DISPLAY_FLAG_DEFAULT;
+import static com.mosync.internal.generated.MAAPI_consts.MA_NOTIFICATION_DISPLAY_FLAG_ANYTIME;
 import static com.mosync.internal.generated.MAAPI_consts.MA_NOTIFICATION_LOCAL_SOUND_PATH;
 import static com.mosync.internal.generated.MAAPI_consts.MA_NOTIFICATION_LOCAL_PLAY_SOUND;
 import static com.mosync.internal.generated.MAAPI_consts.MA_NOTIFICATION_LOCAL_VIBRATE;
@@ -188,7 +195,32 @@ public class LocalNotificationObject {
 		else if ( name.equals(MA_NOTIFICATION_LOCAL_FLAG) )
 		{
 			int flag = IntConverter.convert(value);
-			mNotification.defaults |= flag;
+			switch (flag)
+			{
+				case MA_NOTIFICATION_FLAG_AUTO_CANCEL:
+				case MA_NOTIFICATION_FLAG_HIGH_PRIORITY:
+				case MA_NOTIFICATION_FLAG_INSISTENT:
+				case MA_NOTIFICATION_FLAG_NO_CLEAR:
+					mNotification.defaults |= flag;
+					break;
+				default:
+					throw new InvalidPropertyValueException(name, value);
+			}
+		}
+		else if ( name.equals(MA_NOTIFICATION_LOCAL_DISPLAY_FLAG) )
+		{
+			int flag = IntConverter.convert(value);
+			switch (flag)
+			{
+				case MA_NOTIFICATION_DISPLAY_FLAG_DEFAULT:
+					mDisplayOnlyIfInBackground = true;
+					break;
+				case MA_NOTIFICATION_DISPLAY_FLAG_ANYTIME:
+					mDisplayOnlyIfInBackground = false;
+					break;
+				default:
+					throw new InvalidPropertyValueException(name, value);
+			}
 		}
 		else if ( name.equals(MA_NOTIFICATION_LOCAL_VIBRATE) )
 		{
@@ -331,6 +363,17 @@ public class LocalNotificationObject {
 	}
 
 	/**
+	 * Gets the display flag for this notification object.
+	 * @return true if the notification should be displayed only
+	 * if the app is in background, false if the notification should
+	 * be displayed regardless the focus state.
+	 */
+	public Boolean showOnlyInBackground()
+	{
+		return mDisplayOnlyIfInBackground;
+	}
+
+	/**
 	 * Get the content body of the notification.
 	 * @return The body.
 	 */
@@ -436,4 +479,11 @@ public class LocalNotificationObject {
 	 */
 	private Boolean mFlashingLights = false;
 	private Boolean mFlashingDefault = false;
+
+	/**
+	 * Display this notification only if the application is in background.
+	 * If set to false the notification will be presented to the user
+	 * regardless of the focus state of the application.
+	 */
+	private Boolean mDisplayOnlyIfInBackground = true;
 }

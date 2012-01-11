@@ -26,6 +26,8 @@ MA 02110-1301, USA.
 #define DEFAULT_ALERT_MESSAGE_TEXT "Message: "
 #define DEFAULT_SOUND_TEXT "Sound: "
 #define DEFAULT_BADGE_NUMBER_TEXT "Badge number: "
+#define APPLICATION_REGISTERED "Application has registered for push notifications"
+#define APPLICATION_CANNOT_REGISTER "Application did not register for push notifications"
 
 // Default width for numeric edit box widgets.
 #define NUMERIC_EDIT_BOX_WIDTH 70
@@ -64,6 +66,20 @@ DisplayNotificationScreen::DisplayNotificationScreen():
  */
 DisplayNotificationScreen::~DisplayNotificationScreen()
 {
+}
+
+/**
+ * This screen is notified when registration is done.
+ * @param registrationStatus True if registration succeed, false if
+ * it failed.
+ */
+void DisplayNotificationScreen::pushRegistrationDone(bool registrationStatus)
+{
+	if ( registrationStatus )
+		mMessageLabel->setText(APPLICATION_REGISTERED);
+	else
+		mMessageLabel->setText(APPLICATION_CANNOT_REGISTER);
+
 }
 
 /**
@@ -134,8 +150,13 @@ void DisplayNotificationScreen::createMainLayout()
 	RelativeLayout* mainLayout = new RelativeLayout();
 	Screen::setMainWidget(mainLayout);
 
-	int screenWidth = this->getWidth();
-	int screenHeight = this->getHeight();
+    // Get the screen size.
+    MAExtent screenSize = maGetScrSize();
+    int screenWidth = EXTENT_X(screenSize);
+    int screenHeight = EXTENT_Y(screenSize);
+
+	printf("screen height = %d",screenHeight);
+	printf("screen WIDTH = %d",screenWidth);
 	// Only 3 widgets for this screen.
 	int widgetHeight = screenHeight / 3;
 	int top = 0, left = 0;
@@ -144,6 +165,7 @@ void DisplayNotificationScreen::createMainLayout()
 	mMessageLabel = new Label();
 	mMessageLabel->setSize(screenWidth, widgetHeight);
 	mMessageLabel->setPropertyInt(MAW_WIDGET_TOP, top);
+	mMessageLabel->setFontColor(0xFF0000);
 	mMessageLabel->setPropertyInt(MAW_WIDGET_LEFT, left);
 	mMessageLabel->setText(DEFAULT_ALERT_MESSAGE_TEXT);
 	mainLayout->addChild(mMessageLabel);

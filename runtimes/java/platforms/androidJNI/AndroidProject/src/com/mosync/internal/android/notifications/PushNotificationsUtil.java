@@ -20,6 +20,9 @@ package com.mosync.internal.android.notifications;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.util.Log;
+
+import static com.mosync.internal.generated.MAAPI_consts.MA_NOTIFICATION_DISPLAY_FLAG_DEFAULT;
 
 /**
  * Utility class for storing and accessing
@@ -36,6 +39,7 @@ public class PushNotificationsUtil
     public static final String PREFERENCE = "com.mosync.internal.android.notifications";
     public static final String NOTIFICATION_TITLE = "title";
     public static final String NOTIFICATION_TICKER = "ticker";
+    public static final String NOTIFICATION_DISPLAY_FLAG = "displayFlag";
 
     /**
      * Get the registration back off time.
@@ -99,5 +103,37 @@ public class PushNotificationsUtil
         Editor editor = prefs.edit();
         editor.putString(NOTIFICATION_TITLE, text);
         editor.commit();
+    }
+
+    /**
+     * Store push notifications display flag,
+     * so it can be accessed for incoming notifications.
+     *
+     * @param context
+     * @param flag The display flag.
+     */
+    static void setPushNotificationDisplayFlag(Context context, int flag)
+    {
+        final SharedPreferences prefs = context.getSharedPreferences(
+                PREFERENCE,
+                Context.MODE_PRIVATE);
+        Editor editor = prefs.edit();
+        editor.putInt(NOTIFICATION_DISPLAY_FLAG, flag);
+        editor.commit();
+    }
+
+    /**
+     * Get the text that was set for notification title.
+     * @param context
+     * @return The preferred display flag, or
+     * 0 if it was not defined.
+     */
+    public static int getPushNotificationDisplayFlag(Context context)
+    {
+        final SharedPreferences prefs = context.getSharedPreferences(
+                PREFERENCE,
+                Context.MODE_PRIVATE);
+
+        return prefs.getInt(NOTIFICATION_DISPLAY_FLAG, MA_NOTIFICATION_DISPLAY_FLAG_DEFAULT);
     }
 }

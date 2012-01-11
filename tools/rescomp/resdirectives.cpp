@@ -16,6 +16,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 */
 
 #include "resdirectives.h"
+#include "xlstcomp.h"
+#include "File.h"
 #include <string>
 #include <stdio.h>
 #include <stdlib.h>
@@ -126,12 +128,16 @@ void FileResourceDirective::writeDirectives(ostringstream& output, bool asVarian
 		gLastLFileDirective = lfileDirective;
 	}
 	ResourceDirective::writeDirectives(output, asVariant);
+	writeResourceTypeDirective(output);
+}
+
+void FileResourceDirective::writeResourceTypeDirective(ostringstream& output) {
 	string resourceStr = string("\"") + fResource + string("\"");
 	if (fUseIncludeDirective) {
-		output << '.' << fResType << "\n";
+		output << "." << fResType << "\n";
 		output << ".include " << resourceStr << "\n";
 	} else {
-		output << '.' << fResType << " " << resourceStr << "\n";
+		output << "." << fResType << " " << resourceStr << "\n";
 	}
 }
 
@@ -154,8 +160,29 @@ string FileResourceDirective::getUniqueToken() {
 	return fResource + "|" + fFile;
 }
 
-void MediaResourceDirective::writeDirectives(ostringstream& output, bool asVariant) {
-	output << ".media \"" << fMimeType << "\",\"" << fResource << "\"\n";
+void MediaResourceDirective::writeResourceTypeDirective(ostringstream& output) {
+	if (!fUseIncludeDirective) {
+		output << ".media \"" << getMimeType() << "\",\"" << fResource << "\"\n";
+	} else {
+		FileResourceDirective::writeResourceTypeDirective(output);
+	}
+}
+
+string MediaResourceDirective::getMimeType() {
+	if (!fMimeType.empty()) {
+		return fMimeType;
+	}
+	const char* ext = getExtension(fResource).c_str();
+	if (equalsIgnoreCase(ext, "mp4") || equalsIgnoreCase(ext, "mp3") || equalsIgnoreCase(ext, "m4a")) {
+		return "audio/mpeg";
+	} else if (equalsIgnoreCase(ext, "wav")) {
+		return "audio/x-wav";
+	}
+	return string();
+}
+
+string MediaResourceDirective::validate() {
+	return FileResourceDirective::validate();
 }
 
 void MediaResourceDirective::initDirectiveFromAttributes(const char** attributes) {
@@ -185,12 +212,13 @@ void StringResourceDirective::writeDirectives(ostringstream& output, bool asVari
 	size_t currentOffset = 0;
 	bool isInSpecialString = false;
 	bool wasInSpecialString = false;
+	bool final = false;
 	size_t len = fStringValue.length();
 	const char* chArray = fStringValue.c_str();
-	while (currentPos < len) {
+	while (!final) {
 		char ch = chArray[currentPos];
 		isInSpecialString = isSpecialChar(ch);
-		if (isInSpecialString ^ wasInSpecialString) {
+		if (final || (isInSpecialString ^ wasInSpecialString)) {
 			size_t lenToWrite = currentPos - currentOffset;
 			if (isInSpecialString) {
 				writeDirectiveAsString(output, currentOffset, lenToWrite);
@@ -200,7 +228,10 @@ void StringResourceDirective::writeDirectives(ostringstream& output, bool asVari
 			currentOffset = currentPos;
 		}
 		wasInSpecialString = isInSpecialString;
-		currentPos++;
+		if (!final) {
+			currentPos++;
+		}
+		final = len < currentPos;
 	}
 }
 
@@ -216,6 +247,14 @@ string StringResourceDirective::getUniqueToken() {
 void PlaceholderDirective::writeDirectives(ostringstream& output, bool asVariant) {
 	ResourceDirective::writeDirectives(output, asVariant);
 	output << '.' << fResType << '\n';
+}
+
+string AudioResourceDirective::validate() {
+	string mimeType = getMimeType();
+	if (mimeType.length() < 5 || mimeType.substr(0, 5) != "audio") {
+		return "(" + fResource + ") Audio tags require a mime type that starts with \'audio\', or the audio file must be .mp3, .mp4, .m4a or .wav.";
+	}
+	return MediaResourceDirective::validate();
 }
 
 const char* findAttr(const char* name, const char** attributes) {
