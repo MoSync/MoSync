@@ -204,10 +204,18 @@ final public class Core {
 
 		InputStream resources = GET_RESOURCE(resname);
 		if(resources == null) {
+#ifdef _JavaME
+			mSyscall.LoadResources(null, null);
+#elif defined(_android)
 			mSyscall.LoadResourcesFromStream(null, null);
+#endif
 		} else {
 			LittleEndianDataInputStream llis = new LittleEndianDataInputStream(resources);
+#ifdef _JavaME
+			mSyscall.LoadResources(llis, resname);
+#elif defined(_android)
 			mSyscall.LoadResourcesFromStream(llis, resname);
+#endif
 			llis.close();
 		}
 	}
@@ -274,10 +282,10 @@ final public class Core {
 
 		InputStream resources = GET_RESOURCE(resname);
 		if(resources == null) {
-			mSyscall.LoadResourcesFromStream(null, null);
+			mSyscall.LoadResources(null, null);
 		} else {
 			LittleEndianDataInputStream llis = new LittleEndianDataInputStream(resources);
-			mSyscall.LoadResourcesFromStream(llis, resname);
+			mSyscall.LoadResources(llis, resname);
 			llis.close();
 		}
 	}
@@ -291,9 +299,9 @@ final public class Core {
 		LittleEndianDataInputStream file = new LittleEndianDataInputStream(programStream);
 		LoadVMApp(file);
 		if(file.available()==0) {
-			mSyscall.LoadResourcesFromStream(null, null);		
+			mSyscall.LoadResources(null, null);
 		} else {
-			mSyscall.LoadResourcesFromStream(file, null);
+			mSyscall.LoadResources(file, null);
 		}
 	}
 #endif
