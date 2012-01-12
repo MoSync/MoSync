@@ -12,6 +12,7 @@ using System.Net.Sockets;
 using Microsoft.Phone.Tasks;
 using System.Threading;
 using System.Collections.Generic;
+using System.IO;
 
 namespace MoSync
 {
@@ -364,9 +365,19 @@ namespace MoSync
             {
                 Connection c = mConnections[_conn];
                 Resource res = runtime.GetResource(MoSync.Constants.RT_BINARY, _data);
-                Memory mem = (Memory)res.GetInternalObject();
+				Stream s = (Stream)res.GetInternalObject();
                 runtime.SetResourceRaw(_data, Resource.Flux);
-                cd(c, mem.GetData(),
+				MemoryStream mem = null;
+				if (s.GetType() == typeof(MemoryStream))
+				{
+					mem = (MemoryStream)s;
+				}
+				else
+				{
+					MoSync.Util.CriticalError("Only binaries (non-ubins) are allowed for maConn(Read/Write)(To/From)Data");
+				}
+
+                cd(c, mem.GetBuffer(),
                     delegate(int handle, int connOp, int result)
                     {
                         runtime.SetResourceRaw(_data, res);

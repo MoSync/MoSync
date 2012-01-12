@@ -49,10 +49,12 @@ namespace MoSync
 
             syscalls.maCreateData = delegate(int placeholder, int size)
             {
-                Memory mem = null;
+                //Memory mem = null;
+				MemoryStream mem = null;
                 try
                 {
-                    mem = new Memory(size);
+                    //mem = new Memory(size);
+					mem = new MemoryStream(size);
                 }
                 catch (OutOfMemoryException e)
                 {
@@ -67,22 +69,29 @@ namespace MoSync
             syscalls.maWriteData = delegate(int data, int src, int offset, int size)
             {
                 Resource res = runtime.GetResource(MoSync.Constants.RT_BINARY, data);
-                Memory mem = (Memory)res.GetInternalObject();
-                mem.WriteMemoryAtAddress(offset, core.GetDataMemory(), src, size);
+                Stream mem = (Stream)res.GetInternalObject();
+				mem.Seek(offset, SeekOrigin.Begin);
+				mem.Write(core.GetDataMemory().GetData(), src, size);
+                //mem.WriteMemoryAtAddress(offset, core.GetDataMemory(), src, size);
             };
 
             syscalls.maReadData = delegate(int data, int dst, int offset, int size)
             {
                 Resource res = runtime.GetResource(MoSync.Constants.RT_BINARY, data);
-                Memory mem = (Memory)res.GetInternalObject();
-                core.GetDataMemory().WriteMemoryAtAddress(dst, mem, offset, size);
+                //Memory mem = (Memory)res.GetInternalObject();
+				Stream mem = (Stream)res.GetInternalObject();
+				mem.Seek(offset, SeekOrigin.Begin);
+				mem.Read(core.GetDataMemory().GetData(), dst, size);
+				//core.GetDataMemory().WriteMemoryAtAddress(dst, mem, offset, size);
             };
 
             syscalls.maGetDataSize = delegate(int data)
             {
                 Resource res = runtime.GetResource(MoSync.Constants.RT_BINARY, data);
-                Memory mem = (Memory)res.GetInternalObject();
-                return mem.GetSizeInBytes();
+                //Memory mem = (Memory)res.GetInternalObject();
+				Stream mem = (Stream)res.GetInternalObject();
+				//return mem.GetSizeInBytes();
+				return (int)mem.Length;
             };
 
             syscalls.maCopyData = delegate(int _params)

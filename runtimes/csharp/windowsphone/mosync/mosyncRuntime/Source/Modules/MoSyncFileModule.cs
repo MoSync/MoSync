@@ -233,18 +233,21 @@ namespace MoSync
                 IsolatedStorageFileStream fileStream = file.FileStream;
                 fileStream.SetLength(0);
                 Resource dataRes = runtime.GetResource(MoSync.Constants.RT_BINARY, _data);
-                Memory data = (Memory)dataRes.GetInternalObject();
-                fileStream.Write(data.GetData(), 0, data.GetData().Length);
-                return 1;
+                Stream data = (Stream)dataRes.GetInternalObject();
+				data.Seek(0, SeekOrigin.Begin);
+                //fileStream.Write(data.GetData(), 0, data.GetData().Length);
+				data.CopyTo(fileStream);
+				return 1;
             };
 
             syscalls.maReadStore = delegate(int _store, int _placeholder)
             {
                 File file = mStoreHandles[_store];
                 IsolatedStorageFileStream fileStream = file.FileStream;
-                Memory mem = new Memory((int)fileStream.Length);
-                fileStream.Seek(0, SeekOrigin.Begin);
-                fileStream.Read(mem.GetData(), 0, (int)fileStream.Length);
+                //Memory mem = new Memory((int)fileStream.Length);
+				MemoryStream mem = new MemoryStream((int)fileStream.Length);
+				fileStream.Seek(0, SeekOrigin.Begin);
+                fileStream.Read(mem.GetBuffer(), 0, (int)fileStream.Length);
                 runtime.SetResource(_placeholder, new Resource(mem, MoSync.Constants.RT_BINARY));
                 return MoSync.Constants.RES_OK;
             };
@@ -347,8 +350,11 @@ namespace MoSync
                 if (fileStream == null)
                     return MoSync.Constants.MA_FERR_GENERIC;
                 Resource dataRes = runtime.GetResource(MoSync.Constants.RT_BINARY, _data);
-                Memory data = (Memory)dataRes.GetInternalObject();
-                data.WriteFromStream(_offset, fileStream, _len);
+                //Memory data = (Memory)dataRes.GetInternalObject();
+				Stream data = (Stream)dataRes.GetInternalObject();
+				MoSync.Util.CopySeekableStreams(fileStream, (int)fileStream.Position,
+					data, _offset, _len);
+				//data.WriteFromStream(_offset, fileStream, _len);
                 return 0;
             };
 
@@ -361,10 +367,14 @@ namespace MoSync
                 if (fileStream == null)
                     return MoSync.Constants.MA_FERR_GENERIC;
                 Resource dataRes = runtime.GetResource(MoSync.Constants.RT_BINARY, _data);
-                Memory data = (Memory)dataRes.GetInternalObject();
-                byte[] bytes = new byte[_len];
-                data.ReadBytes(bytes, _offset, _len);
-                fileStream.Write(bytes, 0, _len);
+                //Memory data = (Memory)dataRes.GetInternalObject();
+				Stream data = (Stream)dataRes.GetInternalObject();
+                //byte[] bytes = new byte[_len];
+                //data.ReadBytes(bytes, _offset, _len);
+				MoSync.Util.CopySeekableStreams( data, _offset,
+					fileStream, (int)fileStream.Position,
+					_len);
+                //fileStream.Write(bytes, 0, _len);
                 fileStream.Flush();
                 return 0;
             };

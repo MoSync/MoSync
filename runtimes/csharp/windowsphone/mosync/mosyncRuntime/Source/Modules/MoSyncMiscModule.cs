@@ -4,8 +4,6 @@ using Microsoft.Phone.Info;
 using System.Windows;
 using System.Collections.Generic;
 using System.Net.NetworkInformation;
-using Microsoft.Xna.Framework.Audio;
-using Microsoft.Xna.Framework;
 using System.Globalization;
 
 namespace MoSync
@@ -94,12 +92,6 @@ namespace MoSync
             {
             };
 
-            syscalls.maSoundPlay = delegate(int _sound_res, int _offset, int _size)
-            {
-                // not implemented, but I don't wanna throw exceptions.
-                return -1;
-            };
-
 			syscalls.maVibrate = delegate(int _ms)
 			{
 				if (mVibrateController == null)
@@ -121,8 +113,9 @@ namespace MoSync
                 throw new Exception("maLoadProgram not available in rebuild mode");
 #else
                 Resource res = runtime.GetResource(MoSync.Constants.RT_BINARY, _data);
-                Memory mem = (Memory)res.GetInternalObject();
-                MoSync.Machine.SetLoadProgram(mem.GetStream(), _reload != 0);
+                //Memory mem = (Memory)res.GetInternalObject();
+				Stream mem = (Stream)res.GetInternalObject();
+                MoSync.Machine.SetLoadProgram(mem, _reload != 0);
                 throw new Util.ExitException(0);
 #endif
             };

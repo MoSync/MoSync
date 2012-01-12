@@ -6,6 +6,91 @@ using System.Windows;
 
 namespace MoSync
 {
+
+	// Read only, used for ubins.
+	public class BoundedStream : Stream
+	{
+		private Stream mStream = null;
+		private long mOffset;
+		private long mLength;
+		private long mPosition;
+		public BoundedStream(Stream stream, long offset, long length)
+		{
+			mStream = stream;
+			mOffset = offset;
+			mLength = length;
+			mPosition = 0;
+		}
+
+		public override bool CanRead { get { return true; } }
+		public override bool CanWrite { get { return false; } }
+		public override bool CanSeek { get { return true; } }
+
+		public override long Position
+		{
+			set
+			{
+				mPosition = value;
+				if (value > mLength || value < 0)
+					throw new IOException("Invalid position.");
+				mStream.Seek(mOffset + mPosition, SeekOrigin.Begin);
+			}
+
+			get
+			{
+				return mPosition;
+			}
+		}
+
+		public override long Length
+		{
+			get
+			{
+				return mLength;
+			}
+		}
+
+		public override long Seek(long offset, SeekOrigin origin)
+		{
+			switch (origin)
+			{
+				case SeekOrigin.Begin:
+					this.Position = offset;
+					break;
+				case SeekOrigin.Current:
+					this.Position = mPosition + offset;
+					break;
+				case SeekOrigin.End:
+					this.Position = mLength - offset;
+					break;
+			}
+
+			return this.Position;
+		}
+
+		public override int Read(byte[] buffer, int offset, int count)
+		{
+			int res = mStream.Read(buffer, offset, count);
+			mPosition = mStream.Position - mOffset;
+			return res;
+		}
+
+		public override void Write(byte[] buffer, int offset, int count)
+		{
+			throw new NotImplementedException();
+		}
+
+		public override void Flush()
+		{
+			throw new NotImplementedException();
+		}
+
+		public override void SetLength(long value)
+		{
+			throw new NotImplementedException();
+		}
+	}
+
     // This is a class used to hold a mosync resoruce
     // Each resource has a specific type and a platform
     // specific internal object.

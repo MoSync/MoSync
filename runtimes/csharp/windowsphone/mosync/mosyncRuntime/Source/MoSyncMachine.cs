@@ -130,8 +130,11 @@ namespace MoSync
             Core core = new MoSync.CoreInterpreted(programResInfo.Stream);
             Init(core, resources);
             programResInfo.Stream.Close();
-            if (resources != null)
-                resources.Close();
+
+			// do not close resources, they might contain ubins..
+			// maybe make BoundedStream reference counted?
+            //if (resources != null)
+            //    resources.Close();
         }
 
         public static Machine CreateInterpretedMachine(String programFile, String resourceFile)
