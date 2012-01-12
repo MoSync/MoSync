@@ -1,11 +1,18 @@
 
+/**
+ * Returns an object that manages device sensor enumeration
+ * @param type (optional) The type of sensor to look for. Null for every sensor
+ */
 navigator.findSensors = function(type)
 {
-	return new SensorRequest(type)
-
-    return sensorRequest;
+	return new SensorRequest(type);
 };
 
+/**
+ * This object handles sensor enumeration
+ * @param type (optional) The type of sensor to look for. Null for every sensor
+ * @event onsuccess Called when enumeration is finished, with a list of the device sensors
+ */
 function SensorRequest(type)
 {
 	var self = this;
@@ -18,29 +25,20 @@ function SensorRequest(type)
 	}
 	this.type = type;
 	var callbackId = "SensorManager" + PhoneGap.callbackId++;
-    PhoneGap.callbacks[callbackId] = {success:	function(sensorList)
-        											{
-        												self.result = sensorList.result;
-        												self.readyState = "done";
-        												for(var i = 0; i < self.events.onsuccess.length; i++)
-        												{
-        													self.events.onsuccess[i](event);
-        												}
-        											},
-        									fail:	function()
-        											{
-        												self.readyState = "done";
-        												for(var i = 0; i < self.events.onerror.length; i++)
-        												{
-        													self.events.onerror[i](event);
-        												}
-        											}
-        								};
+    PhoneGap.callbacks[callbackId] = {success:
+    									function(sensorList)
+        								{
+        									self.result = sensorList.result;
+        									self.readyState = "done";
+        									for(var i = 0; i < self.events.onsuccess.length; i++)
+        									{
+        										self.events.onsuccess[i](self.result);
+        									}
+        								}
+        							};
 
-    bridge.PhoneGap.send(callbackId, "SensorManager", "findSensors","{\"type\":\"" + type + "\"}");
 	this.events = {
 			"onsuccess": [],
-			"onerror": [],
 	};
 	this.addEventListener = function(event, listener, captureMethod)
 	{
@@ -64,8 +62,17 @@ function SensorRequest(type)
 			}
 		}
 	};
+
+	bridge.PhoneGap.send(callbackId, "SensorManager", "findSensors","{\"type\":\"" + type + "\"}");
 }
 
+/**
+ * This object represents a connection to a sensor
+ * @param options (Object or string) The sensor to connect to
+ * @event onsensordata Called when there is new data from the sensor
+ * @event onerror Called when there is an error
+ * @event onstatuschange Called when the status of the connection has changed
+ */
 function SensorConnection(options)
 {
 	var self = this;

@@ -17,22 +17,23 @@ MA 02110-1301, USA.
 */
 
 /**
- * @file PhoneGapSensorManager.cpp
+ * @file SensorManager.cpp
  * @author Iraklis Rossis
  *
- * Implementation of PhoneGap sensor calls made from JavaScript.
+ * Implementation of W3C sensor calls made from JavaScript.
  */
 
 #include <conprint.h>
 #include <MAUtil/String.h>
 #include "PhoneGapMessageHandler.h"
+#include "SensorManager.h"
 
 using namespace MAUtil;
 
 /**
  * Constructor.
  */
-PhoneGapSensorManager::PhoneGapSensorManager(PhoneGapMessageHandler* messageHandler)
+SensorManager::SensorManager(PhoneGapMessageHandler* messageHandler)
 	: mMessageHandler(messageHandler)
 {
 	for(int i = 0; i< MAXIMUM_SENSORS; i++)
@@ -44,7 +45,7 @@ PhoneGapSensorManager::PhoneGapSensorManager(PhoneGapMessageHandler* messageHand
 /**
  * Destructor.
  */
-PhoneGapSensorManager::~PhoneGapSensorManager()
+SensorManager::~SensorManager()
 {
 }
 
@@ -52,7 +53,7 @@ PhoneGapSensorManager::~PhoneGapSensorManager()
  * Implementation of sensor API:s exposed to JavaScript.
  * @return true if message was handled, false if not.
  */
-void PhoneGapSensorManager::handleMessage(PhoneGapMessage& message)
+void SensorManager::handleMessage(PhoneGapMessage& message)
 {
 	String action = message.getParam("action");
 	lprintfln("@@@ sensor manager: %s", action.c_str());
@@ -85,7 +86,7 @@ void PhoneGapSensorManager::handleMessage(PhoneGapMessage& message)
 		{
 			maType = SENSOR_TYPE_PROXIMITY;
 		}
-		lprintfln("maType %d", maType);
+
 		if(maType != 0)
 		{
 			if(action == "startSensor")
@@ -96,13 +97,15 @@ void PhoneGapSensorManager::handleMessage(PhoneGapMessage& message)
 					interval = 0;
 					mSensorSingleReadFlag[maType] = true;
 				}
+
 				int result = maSensorStart(maType,interval);
 				if(result == SENSOR_ERROR_NONE)
 				{
+					//The the message handler to send sensor events to this object
 					mMessageHandler->setSensorEventTarget(maType, true);
 					mSensorWatchCallBack[maType] = message.getParam("PhoneGapCallBackId");
 				}
-				else
+				else //There was an error
 				{
 					mSensorSingleReadFlag[maType] = false;
 					char *errorArgs;
@@ -129,6 +132,7 @@ void PhoneGapSensorManager::handleMessage(PhoneGapMessage& message)
 			else
 			{
 				int result = maSensorStop(maType);
+				//The the message handler to stop sending this object sensor events
 				mMessageHandler->setSensorEventTarget(maType, false);
 				if(result != SENSOR_ERROR_NONE)
 				{
@@ -154,13 +158,20 @@ void PhoneGapSensorManager::handleMessage(PhoneGapMessage& message)
 	}
 }
 
-void PhoneGapSensorManager::findSensors(PhoneGapMessage& message)
+/**
+ * Handles the findSensor message. It then posts the list
+ * of sensors back to Phonegap
+ * @param message The phonegap message
+ */
+void SensorManager::findSensors(PhoneGapMessage& message)
 {
 	String type = message.getArgsField("type");
-	String result = "{result:[";
+	String result = "{result:["; //Start building the reply message
 	int errorCode;
 	int longInterval = 10000;
 
+	//Type can be either empty (which means enumerate everything), or
+	//a single sensor type
 	if(type == "" || type == "Accelerometer")
 	{
 		errorCode = maSensorStart(SENSOR_TYPE_ACCELEROMETER, longInterval);
@@ -238,18 +249,24 @@ void PhoneGapSensorManager::findSensors(PhoneGapMessage& message)
  * Dispatching of sensor events.
  * @param sensorData The sensor data of the event
  */
-void PhoneGapSensorManager::sendSensorData(MASensor sensorData)
+void SensorManager::sendSensorData(MASensor sensorData)
 {
 	char result[256];
-	int timestamp = maGetMilliSecondCount();
-	sprintf(result,"{\"x\":%f,\"y\":%f,\"z\":%f,\"timestamp\":%d,\"reason\":\"watch\"}", sensorData.values[0], sensorData.values[1], sensorData.values[2], timestamp);
+	int timestamp = maGetMilliSecondCount(); //Time of sampling
+
+	sprintf(result,"{\"x\":%f,\"y\":%f,\"z\":%f,\"timestamp\":%d,\"reason\":\"watch\"}",
+			sensorData.values[0], sensorData.values[1], sensorData.values[2], timestamp);
+
 	bool keepCallback = true;
+
+	//Check to see if this is a single reading only
 	if(mSensorSingleReadFlag[sensorData.type] == true)
 	{
 		mSensorSingleReadFlag[sensorData.type] = false;
 		keepCallback = false;
 		maSensorStop(sensorData.type);
 	}
+
 	mMessageHandler->callSuccess(
 			mSensorWatchCallBack[sensorData.type],
 			PHONEGAP_CALLBACK_STATUS_OK,
