@@ -32,6 +32,7 @@ MA 02110-1301, USA.
 #include "PhoneGapMessage.h"
 #include "PhoneGapSensors.h"
 #include "PhoneGapFile.h"
+#include "SensorManager.h"
 
 // PhoneGap callback result codes.
 #define PHONEGAP_CALLBACK_STATUS_NO_RESULT "0"
@@ -182,6 +183,14 @@ public:
 	 */
 	void callJS(const MAUtil::String& script);
 
+	/**
+	 * Set the target class for sensor event messages.
+	 * @param sensor The sensor that is configured.
+	 * @param toSensorManager If true, the SensorManager object will receive the events, normal PhoneGap API if false
+	 */
+	void setSensorEventTarget(int sensor, bool toSensorManager);
+
+
 private:
 	/**
 	 * The WebView used by PhoneGap.
@@ -194,9 +203,19 @@ private:
 	PhoneGapSensors mPhoneGapSensors;
 
 	/**
+	 * W3C sensor manager API:s message handler.
+	 */
+	SensorManager mPhoneGapSensorManager;
+
+	/**
 	 * PhoneGap File API message handler.
 	 */
 	PhoneGapFile mPhoneGapFile;
+
+	/**
+	 * Controls where each sensor event is delivered.
+	 */
+	bool mSensorEventToManager[MAXIMUM_SENSORS];
 };
 
 #endif
