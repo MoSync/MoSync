@@ -43,8 +43,7 @@ PhoneGapMessageHandler::PhoneGapMessageHandler(NativeUI::WebView* webView) :
 	mWebView(webView),
 	mPhoneGapSensors(this),
 	mPhoneGapFile(this),
-	mPhoneGapSensorManager(this)
-	mPhoneGapFile(this),
+	mPhoneGapSensorManager(this),
 	mPhoneGapNotificationManager(NULL)
 {
 	enableHardware();
@@ -217,9 +216,16 @@ void PhoneGapMessageHandler::sendDeviceProperties(MAUtil::String callbackID)
 		deviceOSVersion,
 		256);
 
+	//Due to some limitations on some devices
+	//We have to check the UUID separately
+	if(uuidRes < 0)
+	{
+		//PhoneGap does not return an error if it cannot read UUID
+		//So we just return a value for the phoneGap apps to work
+		sprintf(deviceUUID, "Not Accessible");
+	}
 	//if Any of the above commands fail send an error to PhoneGap
 	if((nameRes < 0)
-		|| (uuidRes < 0)
 		|| (osRes < 0)
 		|| (osVersionRes < 0))
 	{
