@@ -46,6 +46,9 @@ MA 02110-1301, USA.
 #define PHONEGAP_CALLBACK_STATUS_JSON_EXCEPTION "8"
 #define PHONEGAP_CALLBACK_STATUS_ERROR "9"
 
+// Forward declarations
+class PhoneGapNotificationManager;
+
 /**
  * Class that implements JavaScript calls.
  *
@@ -216,6 +219,11 @@ private:
 	 * Controls where each sensor event is delivered.
 	 */
 	bool mSensorEventToManager[MAXIMUM_SENSORS];
+
+	/**
+	 * PhoneGap Notification API's message handler.
+	 */
+	PhoneGapNotificationManager* mPhoneGapNotificationManager;
 };
 
 #endif
