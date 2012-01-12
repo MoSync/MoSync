@@ -40,9 +40,14 @@ using namespace Wormhole; // Class WebAppMoblet
 PhoneGapMessageHandler::PhoneGapMessageHandler(NativeUI::WebView* webView) :
 	mWebView(webView),
 	mPhoneGapSensors(this),
-	mPhoneGapFile(this)
+	mPhoneGapFile(this),
+	mPhoneGapSensorManager(this)
 {
 	enableHardware();
+	for(int i = 0; i < MAXIMUM_SENSORS; i++)
+	{
+		mSensorEventToManager[MAXIMUM_SENSORS] = false;
+	}
 }
 
 /**
@@ -108,6 +113,10 @@ bool PhoneGapMessageHandler::handleMessage(PhoneGapMessage& message)
 	{
 		mPhoneGapSensors.handleMessage(message);
 	}
+	else if (message.getParam("service") == "SensorManager")
+		{
+			mPhoneGapSensorManager.handleMessage(message);
+		}
 	else if (message.getParam("service") == "File")
 	{
 		mPhoneGapFile.handleMessage(message);
@@ -249,13 +258,20 @@ void PhoneGapMessageHandler::customEvent(const MAEvent& event)
  */
 void PhoneGapMessageHandler::sensorEvent(MASensor sensorData)
 {
-	if (sensorData.type == SENSOR_TYPE_ACCELEROMETER)
+	if(mSensorEventToManager[sensorData.type] == false)
 	{
-		mPhoneGapSensors.sendAccelerometerData(sensorData);
+		if (sensorData.type == SENSOR_TYPE_ACCELEROMETER)
+		{
+			mPhoneGapSensors.sendAccelerometerData(sensorData);
+		}
+		else if (sensorData.type == SENSOR_TYPE_ORIENTATION)
+		{
+			mPhoneGapSensors.sendCompassData(sensorData);
+		}
 	}
-	else if (sensorData.type == SENSOR_TYPE_ORIENTATION)
+	else
 	{
-		mPhoneGapSensors.sendCompassData(sensorData);
+		mPhoneGapSensorManager.sendSensorData(sensorData);
 	}
 }
 
@@ -401,4 +417,14 @@ void PhoneGapMessageHandler::callCallback(
 void PhoneGapMessageHandler::callJS(const String& script)
 {
 	mWebView->callJS(script);
+}
+
+/**
+ * Set the target class for sensor event messages.
+ * @param sensor The sensor that is configured.
+ * @param toSensorManager If true, the SensorManager object will receive the events, normal PhoneGap API if false
+ */
+void PhoneGapMessageHandler::setSensorEventTarget(int sensor, bool toSensorManager)
+{
+	mSensorEventToManager[sensor] = toSensorManager;
 }
