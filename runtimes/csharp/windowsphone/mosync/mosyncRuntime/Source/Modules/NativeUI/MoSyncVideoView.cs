@@ -18,7 +18,7 @@ MA 02110-1301, USA.
  * @file MoSyncVideoView.cs
  * @author ovidel
  *
- * @brief This represents the VideoView Widget implementation for the NativeUI
+ * @brief VideoView Widget implementation for the NativeUI
  *        component on Windows Phone 7, language C#
  *
  * @platform WP 7.1
@@ -60,13 +60,58 @@ namespace MoSync
 
                 //this.progressTimer = new DispatcherTimer();
                 //this.progressTimer.Interval = TimeSpan.FromSeconds(1);
-                //this.progressTimer.Tick += new EventHandler(this.ProgressTimer_Tick);
 
                 //SetCurrentPosition();
 
                 // Play Video
                 mMediaElement.Play();
                 //progressTimer.Start();
+
+                /**
+                 * the delegates that respond to the widget's events
+                 */
+
+                // MAW_VIDEO_VIEW_STATE_FINISHED
+                mMediaElement.MediaEnded += new RoutedEventHandler(
+                    delegate(object from, RoutedEventArgs args)
+                    {
+                        // post the event to MoSync runtime
+                        Memory eventData = new Memory(8);
+                        const int MAWidgetEventData_eventType = 0;
+                        const int MAWidgetEventData_widgetHandle = 4;
+                        eventData.WriteInt32(MAWidgetEventData_eventType, MoSync.Constants.MAW_VIDEO_VIEW_STATE_FINISHED);
+                        eventData.WriteInt32(MAWidgetEventData_widgetHandle, mHandle);
+                        mRuntime.PostCustomEvent(MoSync.Constants.EVENT_TYPE_WIDGET, eventData);
+                    }
+                ); // end of mMediaElement.MediaEnded
+
+                 // MAW_VIDEO_VIEW_STATE_SOURCE_READY
+                 mMediaElement.MediaOpened += new RoutedEventHandler(
+                    delegate(object from, RoutedEventArgs args)
+                    {
+                        // post the event to MoSync runtime
+                        Memory eventData = new Memory(8);
+                        const int MAWidgetEventData_eventType = 0;
+                        const int MAWidgetEventData_widgetHandle = 4;
+                        eventData.WriteInt32(MAWidgetEventData_eventType, MoSync.Constants.MAW_VIDEO_VIEW_STATE_SOURCE_READY);
+                        eventData.WriteInt32(MAWidgetEventData_widgetHandle, mHandle);
+                        mRuntime.PostCustomEvent(MoSync.Constants.EVENT_TYPE_WIDGET, eventData);
+                    }
+                ); // end of mMediaElement.MediaOpened
+
+                 // MAW_VIDEO_VIEW_STATE_INTERRUPTED
+                 mMediaElement.MediaFailed += new EventHandler<ExceptionRoutedEventArgs>(
+                    delegate(object from, ExceptionRoutedEventArgs args)
+                    {
+                        // post the event to MoSync runtime
+                        Memory eventData = new Memory(8);
+                        const int MAWidgetEventData_eventType = 0;
+                        const int MAWidgetEventData_widgetHandle = 4;
+                        eventData.WriteInt32(MAWidgetEventData_eventType, MoSync.Constants.MAW_VIDEO_VIEW_STATE_INTERRUPTED);
+                        eventData.WriteInt32(MAWidgetEventData_widgetHandle, mHandle);
+                        mRuntime.PostCustomEvent(MoSync.Constants.EVENT_TYPE_WIDGET, eventData);
+                    }
+                ); // end of mMediaElement.MediaOpened
             }
 
 
@@ -199,22 +244,49 @@ namespace MoSync
                 }
             }
 
-            // play the video
+            // play the video and MAW_VIDEO_VIEW_STATE_PLAYING
             private void playVideo()
             {
+                // play it
                 mMediaElement.Play();
+
+                // announce the event
+                Memory eventData = new Memory(8);
+                const int MAWidgetEventData_eventType = 0;
+                const int MAWidgetEventData_widgetHandle = 4;
+                eventData.WriteInt32(MAWidgetEventData_eventType, MoSync.Constants.MAW_VIDEO_VIEW_STATE_PLAYING);
+                eventData.WriteInt32(MAWidgetEventData_widgetHandle, mHandle);
+                mRuntime.PostCustomEvent(MoSync.Constants.EVENT_TYPE_WIDGET, eventData);
             }
 
-            // pause the video
+            // pause the video and MAW_VIDEO_VIEW_STATE_PAUSED
             private void pauseVideo()
             {
+                // tea break
                 mMediaElement.Pause();
+
+                // announce the event
+                Memory eventData = new Memory(8);
+                const int MAWidgetEventData_eventType = 0;
+                const int MAWidgetEventData_widgetHandle = 4;
+                eventData.WriteInt32(MAWidgetEventData_eventType, MoSync.Constants.MAW_VIDEO_VIEW_STATE_PAUSED);
+                eventData.WriteInt32(MAWidgetEventData_widgetHandle, mHandle);
+                mRuntime.PostCustomEvent(MoSync.Constants.EVENT_TYPE_WIDGET, eventData);
             }
 
-            // stop the video
+            // stop the video and MAW_VIDEO_VIEW_STATE_STOPPED
             private void stopVideo()
             {
+                // stop it
                 mMediaElement.Stop();
+
+                // announce the event
+                Memory eventData = new Memory(8);
+                const int MAWidgetEventData_eventType = 0;
+                const int MAWidgetEventData_widgetHandle = 4;
+                eventData.WriteInt32(MAWidgetEventData_eventType, MoSync.Constants.MAW_VIDEO_VIEW_STATE_STOPPED);
+                eventData.WriteInt32(MAWidgetEventData_widgetHandle, mHandle);
+                mRuntime.PostCustomEvent(MoSync.Constants.EVENT_TYPE_WIDGET, eventData);
             }
 
         }
