@@ -29,6 +29,7 @@ MA 02110-1301, USA.
 #include "PhoneGapMessageHandler.h"
 #include "MAHeaders.h"
 #include "PhoneGapNotificationManager.h"
+#include "maapi.h"
 
 // NameSpaces we want to access.
 using namespace MAUtil; // Class Moblet, String
@@ -138,6 +139,19 @@ bool PhoneGapMessageHandler::handleMessage(PhoneGapMessage& message)
 	// Message was handled.
 	return true;
 }
+
+/**
+ * processes the Key Events and sends the appropriate message to
+ * PhoneGap
+ */
+void PhoneGapMessageHandler::processKeyEvent(int keyCode, int NativeCode)
+{
+	if(MAK_BACK == keyCode)
+	{
+		mWebView->callJS("PhoneGapCommandResult('backbutton');");
+	}
+}
+
 
 void PhoneGapMessageHandler::sendConnectionType(MAUtil::String callbackID)
 {
@@ -257,6 +271,16 @@ void PhoneGapMessageHandler::customEvent(const MAEvent& event)
 	{
 		mPhoneGapSensors.sendLocationData(event);
 	}
+	else if (event.type == EVENT_TYPE_FOCUS_LOST)
+	{
+		//let the phoneGap app know that it should go to sleep
+		mWebView->callJS("PhoneGapCommandResult('pause');");
+	}
+	else if (event.type == EVENT_TYPE_FOCUS_GAINED)
+	{
+		//let the PhoneGap side know that it should resume
+		mWebView->callJS("PhoneGapCommandResult('resume');");
+	}
 }
 
 /**
@@ -282,38 +306,6 @@ void PhoneGapMessageHandler::sensorEvent(MASensor sensorData)
 		mPhoneGapSensorManager.sendSensorData(sensorData);
 	}
 }
-
-///**
-// * General wrapper for phoneGap success callback.
-// * If an operation is successful this function should be called.
-// *
-// * @param data the data that should be passed to the callback function
-// */
-//void PhoneGapMessageHandler::sendPhoneGapSuccess(const char* data)
-//{
-//	char script[1024];
-//	sprintf(script, "PhoneGap.CallbackSuccess(%s)", data);
-//	mWebView->callJS(script);
-//}
-//
-///**
-// * General wrapper for phoneGap success callback.
-// * If an operation is successful this function should be called.
-// *
-// * @param data the data that should be passed to the callback function
-// */
-//void PhoneGapMessageHandler::sendPhoneGapError(
-//		const char* data,
-//		MAUtil::String callbackID)
-//{
-//	char script[1024];
-//	sprintf(
-//		script,
-//		"PhoneGap.CallbackError(\"%s\", \"{\"message\" : \"%s\"}\")",
-//		callbackID.c_str(),
-//		data);
-//	mWebView->callJS(script);
-//}
 
 /**
  * Call the PhoneGap success function.

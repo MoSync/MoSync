@@ -65,6 +65,17 @@ public:
 	}
 
 	/**
+	 * This method is called when a key is pressed. It closes
+	 * the application when the back key (on Android) is pressed.
+	 * Forwards the event to PhoneGapMessageHandler.
+	 */
+	void keyPressEvent(int keyCode, int nativeCode)
+	{
+		//forward to PhoneGap MessageHandler
+		mPhoneGapMessageHandler->processKeyEvent(keyCode, nativeCode);
+	}
+
+	/**
 	 * This method handles messages sent from the WebView.
 	 * @param webView The WebView that sent the message.
 	 * @param urlData Data object that holds message content.
