@@ -219,6 +219,7 @@ namespace ResourceCompiler
 		{
 			return handle;
 		}
+
 		return resourceSmartHandles[handle - 1];
 	}
 
@@ -248,7 +249,7 @@ namespace ResourceCompiler
 			}
 		}
 
-		// since this resource is already loaded, just close the resoruce file
+		// since this resource is already loaded, just close the resource file
 		if (lastLoadedResource != -1)
 		{
 			loadResource(lastLoadedResource, MA_RESOURCE_CLOSE);
