@@ -150,8 +150,8 @@ void PhoneGapNotificationManager::didReceivePushNotification(
  */
 void PhoneGapNotificationManager::didApplicationRegistered(MAUtil::String& token)
 {
-	printf("PhoneGapNotificationManager::didApplicationRegistered");
-	String tokenJSONString = PhoneGapMessage::JSONStringify(token);
+	lprintfln("PhoneGapNotificationManager::didApplicationRegistered");
+	String tokenJSONString = PhoneGapMessage::JSONStringify(token.c_str());
 	mMessageHandler->callSuccess(
 		mRegistrationCallBack,
 		PHONEGAP_CALLBACK_STATUS_OK,
@@ -178,7 +178,7 @@ void PhoneGapNotificationManager::didFaildToRegister(
 	MAUtil::String& error)
 {
 	printf("PhoneGapNotificationManager::didFaildToRegister");
-	String errorJSONString = PhoneGapMessage::JSONStringify(error);
+	String errorJSONString = PhoneGapMessage::JSONStringify(error.c_str());
 	if (errorJSONString.length() > 1)
 	{
 		errorJSONString.remove(0, 1);
