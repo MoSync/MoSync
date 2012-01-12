@@ -154,6 +154,9 @@
     <ClCompile Include="..\..\base\MoSyncDB.cpp">
       <Filter>base</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\base\ResourceArray.cpp">
+      <Filter>base</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\base\base_errors.h">

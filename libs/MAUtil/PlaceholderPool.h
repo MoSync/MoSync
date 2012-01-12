@@ -31,6 +31,8 @@ namespace MAUtil {
 *
 * Such handles are used to construct new MoSync resources,
 * such as images, sound clips or data objects.
+*
+* \deprecated Use maDestroyPlaceholder() instead.
 */
 namespace PlaceholderPool {
 	/**
