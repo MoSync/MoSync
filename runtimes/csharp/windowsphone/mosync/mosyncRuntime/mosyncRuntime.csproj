@@ -89,6 +89,7 @@
     <Compile Include="Source\Modules\NativeUI\MoSyncTabScreen.cs" />
     <Compile Include="Source\Modules\NativeUI\MoSyncProgressBar.cs" />
     <Compile Include="Source\Modules\NativeUI\MoSyncEditBox.cs" />
+    <Compile Include="Source\Modules\NativeUI\MoSyncVideoView.cs" />
     <Compile Include="Source\Modules\NativeUI\MoSyncWebView.cs" />
     <Compile Include="Source\Modules\NativeUI\MoSyncButton.cs" />
     <Compile Include="Source\Modules\NativeUI\MoSyncCheckBox.cs" />
