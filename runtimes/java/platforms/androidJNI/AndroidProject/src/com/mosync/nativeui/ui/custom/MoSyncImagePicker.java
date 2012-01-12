@@ -54,6 +54,7 @@ import com.mosync.java.android.R;
 
 /*
  *  Helpers for the maOpenImageBrowser syscall.
+ *  @author emma tresanszki
  */
 public class MoSyncImagePicker
 {

@@ -62,7 +62,9 @@ namespace MoSync
                     return MoSync.Constants.RES_OUT_OF_MEMORY;
                 }
 
-                runtime.SetResource(placeholder, new Resource(mem, MoSync.Constants.RT_BINARY));
+				Resource res = runtime.GetResource(MoSync.Constants.RT_PLACEHOLDER, placeholder);
+				res.SetInternalObject(mem);
+				res.SetResourceType(MoSync.Constants.RT_BINARY);
                 return MoSync.Constants.RES_OK;
             };
 

@@ -25,6 +25,11 @@ MA 02110-1301, USA.
 
 #define IP_LABEL_TEXT "IP:"
 #define PORT_LABEL_TEXT "Port:"
+#define TICKER_LABEL "Ticker:"
+#define TICKER_DEFAULT "Ticker text"
+#define TITLE_LABEL "Title:"
+#define TITLE_DEFAULT "Default title"
+#define SHOW_ONLY_IF_NOT_RUNNING "Show only if not running"
 #define CONNECTION_NOT_ESTABLISHED "Connection status: not connected!"
 #define CONNECTION_CONNECTING "Connection status: connecting.."
 #define CONNECTION_ESTABLISHED "Connection status: connected!"
@@ -47,10 +52,16 @@ MA 02110-1301, USA.
 #include <maapi.h>
 #include <MAUtil/util.h>
 
+#include <Notification/NotificationManager.h>
+#include <Notification/PushNotification.h>
+#include <Notification/PushNotificationListener.h>
+
 #include "SettingsScreen.h"
 #include "Util.h"
 #include "TCPConnection.h"
 #include "Listeners.h"
+
+using namespace Notification;
 
 /**
  * Constructor.
@@ -62,17 +73,29 @@ SettingsScreen::SettingsScreen(SettingsScreenListener* listener):
 	mIPEditBox(NULL),
 	mPortEditBox(NULL),
 	mConnectionStatusLabel(NULL),
-	mConnectButton(NULL)
+	mConnectButton(NULL),
+	mTickerText(NULL),
+	mContentTitle(NULL),
+	mShowOnlyIfInBackground(NULL)
 {
 	setTitle(SCREEN_TITLE_NAME);
 	this->createMainLayout();
 
 	mIPEditBox->addEditBoxListener(this);
 	mPortEditBox->addEditBoxListener(this);
+	mTickerText->addEditBoxListener(this);
+	mContentTitle->addEditBoxListener(this);
 	mConnectButton->addButtonListener(this);
 
-	mIPEditBox->setText("192.168.1.116");
-	mPortEditBox->setText("4567");
+	if (isAndroid())
+	{
+		mShowOnlyIfInBackground->addCheckBoxListener(this);
+	}
+
+	mIPEditBox->setText("192.168.1.111");
+	mPortEditBox->setText("6789");
+	Notification::NotificationManager::getInstance()->setPushNotificationsTickerText(mTickerText->getText());
+	Notification::NotificationManager::getInstance()->setPushNotificationsTitle(mContentTitle->getText());
 }
 
 /**
@@ -80,6 +103,12 @@ SettingsScreen::SettingsScreen(SettingsScreenListener* listener):
  */
 SettingsScreen::~SettingsScreen()
 {
+	if (isAndroid())
+	{
+		mShowOnlyIfInBackground->removeCheckBoxListener(this);
+		mTickerText->removeEditBoxListener(this);
+		mContentTitle->removeEditBoxListener(this);
+	}
 	mIPEditBox->removeEditBoxListener(this);
 	mPortEditBox->removeEditBoxListener(this);
 	mConnectButton->removeButtonListener(this);
@@ -131,18 +160,41 @@ void SettingsScreen::createMainLayout()
 	mPortEditBox->setInputMode(EDIT_BOX_INPUT_MODE_NUMERIC);
 	listView->addChild(this->createListViewItem(PORT_LABEL_TEXT, mPortEditBox));
 
-	// Add connection status label.
-	listItem = new ListViewItem;
-	listView->addChild(listItem);
-	mConnectionStatusLabel = new Label();
-	mConnectionStatusLabel->setText(CONNECTION_NOT_ESTABLISHED);
-	listItem->addChild(mConnectionStatusLabel);
+	if ( isAndroid() )
+	{
+		mShowOnlyIfInBackground = new CheckBox();
+		mShowOnlyIfInBackground->setState(true);
+		listView->addChild(createListViewItem(SHOW_ONLY_IF_NOT_RUNNING, mShowOnlyIfInBackground));
 
-	listItem = new ListViewItem;
-	listView->addChild(listItem);
-	mConnectButton = new Button();
-	mConnectButton->setText(CONNECT_BUTTON_TEXT);
-	listItem->addChild(mConnectButton);
+		mTickerText = new EditBox();
+		mTickerText->setText(TICKER_DEFAULT);
+		listView->addChild(createListViewItem(TICKER_LABEL, mTickerText));
+
+		mContentTitle = new EditBox();
+		mContentTitle->setText(TITLE_DEFAULT);
+		listView->addChild(createListViewItem(TITLE_LABEL, mContentTitle));
+	}
+
+	// Android: If the registrationID was already saved from previous launches,
+	// do not connect again.
+	MAHandle myStore = maOpenStore("MyStore", 0);
+	if ( isAndroid() && myStore == STERR_NONEXISTENT
+		||
+		!isAndroid() )
+	{
+		// Add connection status label.
+		listItem = new ListViewItem;
+		listView->addChild(listItem);
+		mConnectionStatusLabel = new Label();
+		mConnectionStatusLabel->setText(CONNECTION_NOT_ESTABLISHED);
+		listItem->addChild(mConnectionStatusLabel);
+
+		listItem = new ListViewItem;
+		listView->addChild(listItem);
+		mConnectButton = new Button();
+		mConnectButton->setText(CONNECT_BUTTON_TEXT);
+		listItem->addChild(mConnectButton);
+	}
 }
 
 /**
@@ -155,11 +207,16 @@ void SettingsScreen::buttonClicked(Widget* button)
 	printf("SettingsScreen::buttonClicked");
 	if (button == mConnectButton)
 	{
+
+		mIPEditBox->hideKeyboard();
+		mPortEditBox->hideKeyboard();
+
 		if (mListener)
 		{
 			mListener->connectToServer(mIPEditBox->getText(),
 				mPortEditBox->getText());
 		}
+
 		mConnectButton->setEnabled(false);
 		mConnectionStatusLabel->setText(CONNECTION_CONNECTING);
 	}
@@ -173,7 +230,34 @@ void SettingsScreen::buttonClicked(Widget* button)
  */
 void SettingsScreen::editBoxReturn(EditBox* editBox)
 {
+	if ( mTickerText  == editBox )
+		Notification::NotificationManager::getInstance()->setPushNotificationsTickerText(mTickerText->getText());
+	else if ( mContentTitle == editBox )
+		Notification::NotificationManager::getInstance()->setPushNotificationsTitle(mContentTitle->getText());
+
 	editBox->hideKeyboard();
+}
+
+/**
+ * This method is called when the state of the check box was changed
+ * by the user.
+ * @param checkBox The check box object that generated the event.
+ * @param state True if the check box is checked, false otherwise.
+ */
+void SettingsScreen::checkBoxStateChanged(
+    CheckBox* checkBox,
+    bool state)
+{
+	if ( checkBox == mShowOnlyIfInBackground )
+	{
+		if ( mShowOnlyIfInBackground->isChecked() )
+			Notification::NotificationManager::getInstance()->
+				setPushNotificationsDisplayFlag(NOTIFICATION_DISPLAY_DEFAULT);
+		else
+			Notification::NotificationManager::getInstance()->
+				setPushNotificationsDisplayFlag(NOTIFICATION_DISPLAY_ANYTIME);
+
+	}
 }
 
 /**

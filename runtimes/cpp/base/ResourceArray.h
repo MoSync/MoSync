@@ -1,19 +1,27 @@
-/* Copyright (C) 2009 Mobile Sorcery AB
+/*
+Copyright (C) 2011 MoSync AB
 
-This program is free software; you can redistribute it and/or modify it under
-the terms of the GNU General Public License, version 2, as published by
-the Free Software Foundation.
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License,
+version 2, as published by the Free Software Foundation.
 
 This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-for more details.
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with this program; see the file COPYING.  If not, write to the Free
-Software Foundation, 59 Temple Place - Suite 330, Boston, MA
-02111-1307, USA.
+along with this program; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+MA 02110-1301, USA.
 */
+
+/**
+ * @file ResourceArray.h
+ *
+ * This file contains the class ResourceArray, which holds
+ * statically and dynamically allocated resources.
+ */
 
 #ifndef _BASE_RESOURCE_ARRAY_H_
 #define _BASE_RESOURCE_ARRAY_H_
@@ -25,11 +33,18 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "base_errors.h"
 using namespace MoSyncError;
 
-// platform specific
+// ResourceDefs.h is platform specific and contains the TYPES
+// macro. It expands by applying another macro to define
+// types and delete operations on types. This file is located
+// at different places in each runtime, but typically it
+// should be found in the main cpp directory for the platform.
 #include "ResourceDefs.h"
 
 namespace Base {
 
+	/**
+	 * TODO: Document what this class is used for.
+	 */
 	class Label {
 	public:
 		Label(const char *name, int index) {
@@ -62,335 +77,183 @@ namespace Base {
 #define DECLARE_SIZEFUNCS(R, T, D) uint size_##R(T*);
 		TYPES(DECLARE_SIZEFUNCS);
 #endif
-    
+
 #define DECLARE_RESOURCE_TYPES(R, T, D) typedef T R##_Type;
     TYPES(DECLARE_RESOURCE_TYPES);
 
 #define ROOM(func) if((func) == RES_OUT_OF_MEMORY) { BIG_PHAT_ERROR(ERR_RES_OOM); }
 
-	//Internally, "resource" and "object" are used interchangably.
+	/**
+	 * Class that holds resources.
+	 * Internally, "resource" and "object" are used interchangably.
+	 */
 	class ResourceArray {	//type and bound-safe
 	public:
+		/**
+		 * Constructor.
+		 */
 		ResourceArray(
 #ifdef RESOURCE_MEMORY_LIMIT
 			uint resMax
 #endif
-			) : mN(0), mRes(NULL), mTypes(NULL), 
+			);
+
 #ifdef RESOURCE_MEMORY_LIMIT
-			mResmemMax(resMax),
-			mResmem(0),
+		uint getResmemMax() const { return mResmemMax; }
+		uint getResmem() const { return mResmem; }
 #endif
-			dynResSize(1),
-			dynResCapacity(1), 
-			dynRes(NULL)
-			{}
-		void init(unsigned nRes) {  //saves all the old objects
-			unsigned oldN = mN;
-			mN = MAX(nRes + 1, oldN);
-			void** oldRes = mRes;
-			byte* oldTypes = mTypes;
-			mRes = new void*[mN];
-			MYASSERT(mRes != NULL, ERR_OOM);
-			mTypes = new byte[mN];
-			MYASSERT(mTypes != NULL, ERR_OOM);
-			if(oldRes) {
-				memcpy(mRes, oldRes, oldN*sizeof(void*));
-				memcpy(mTypes, oldTypes, oldN*sizeof(byte));
-				delete[] oldRes;
-				delete[] oldTypes;
-			}
-			if(mN > oldN) { //clear the new objects
-				//pointer arithmetic bug
-				//memset(mRes + oldN*sizeof(void*), 0, (mN - oldN)*sizeof(void*));
-				memset(&mRes[oldN], 0, (mN - oldN) * sizeof(void*));
 
-				memset(mTypes + oldN, RT_PLACEHOLDER, (mN - oldN));
-			}
-		}
+		/**
+		 * Initialize the static resource array.
+		 * This function saves the old objects present
+		 * in the array.
+		 * @param numResources The number of resource in the new array.
+		 */
+		void init(unsigned numResources);
 
-#define DYNAMIC_PLACEHOLDER_BIT 0x40000000
+		/**
+		 * Destructor.
+		 */
+		~ResourceArray();
 
-		~ResourceArray() {
-			for(unsigned i=1; i<mN; i++) {
-				LOGD("RA %i\n", i);
-				_destroy(i);
-			}
-			delete[] mRes;
-			delete[] mTypes;
-			
-			for(unsigned i=1; i<dynResSize; i++) {
-				LOGD("DA %i\n", i);
-				_destroy(i | DYNAMIC_PLACEHOLDER_BIT);
-			}
-			if(dynRes) {
-				delete[] dynRes;
-				delete[] dynResTypes;
-			}
-		}
-
-#define DEFINE_ADD(R, T, D) int add_##R(unsigned index, T* o) { return _add(index, o, R); }\
-	int dadd_##R(unsigned index, T* o) { return _dadd(index, o, R); }
+// Define functions for each resource data type, to add a resource,
+// to get a resource, and to extract a resource.
+// TODO: What does extract do?
+#define DEFINE_ADD(R, T, D) int add_##R(unsigned index, T* obj) { return _add(index, obj, R); }\
+	int dadd_##R(unsigned index, T* obj) { return _dadd(index, obj, R); }
 #define DEFINE_GET(R, T, D) T* get_##R(unsigned index) { return (T*)_get(index, R); }
 #define DEFINE_EXTRACT(R, T, D) T* extract_##R(unsigned index) { return (T*)_extract(index, R); }
 		TYPES(DEFINE_ADD);
 		TYPES(DEFINE_GET);
 		TYPES(DEFINE_EXTRACT);
 
-#define TESTINDEX(index, size) { MYASSERT(size>1, ERR_RES_NO_RESOURCES); if((index) >= size || (index) == 0 ) {\
-	LOG("Bad resource index: %i. size=%i.\n", index, size);\
-	BIG_PHAT_ERROR(ERR_RES_INVALID_INDEX); } }
+		void destroy(unsigned index);
 
-		void destroy(unsigned index) {
-			_destroy(index);
-		}
+		byte get_type(unsigned index);
 
-		byte get_type(unsigned index) {
-			if(index&DYNAMIC_PLACEHOLDER_BIT) {
-				index&=~DYNAMIC_PLACEHOLDER_BIT;
-				TESTINDEX(index, dynResSize);
-				return dynResTypes[index];
-			} else {
-				TESTINDEX(index, mN);
-				return mTypes[index];
-			}
-		}
+		/**
+		 * It is used to see if a resource is already loaded.
+		 * Works with both static and dynamic resources.
+		 * @param index The handle to the resource.
+		 * @return true if a resource is already loaded, false if not.
+		 */
+		bool is_loaded(unsigned index);
 
-		unsigned size() {
-			return mN;
-		}
+		/**
+		 * @return The size of the static resource array.
+		 */
+		unsigned size();
 
-		// used for maCreatePlaceholder
-		unsigned int create_RT_PLACEHOLDER() {
-			if(dynResSize+1>dynResCapacity) {
-				void ** oldPlaceholders = dynRes;
-				byte *oldPlaceholderTypes = dynResTypes;
-				dynRes = new void*[(dynResCapacity)*2];
-				MYASSERT(dynRes != NULL, ERR_OOM);
-				dynResTypes = new byte[(dynResCapacity)*2];
-				MYASSERT(dynResTypes != NULL, ERR_OOM);
-				memset(dynRes, 0, sizeof(void*)*(dynResCapacity*2));
+		/**
+		 * Implementation of maCreatePlaceholder.
+		 * @return A placeholder handle.
+		 */
+		unsigned int create_RT_PLACEHOLDER();
 
-				if(oldPlaceholders != NULL) {
-					memcpy(dynRes, oldPlaceholders, dynResCapacity*sizeof(void*));
-					memcpy(dynResTypes, oldPlaceholderTypes, dynResCapacity*sizeof(byte));
+		/**
+		 * Check if a handle refers to an existing dynamic resource object.
+		 * @param index Placeholder handle.
+		 * @return Non zero if data object exists, zero if it does not exist.
+		 */
+		int isDynamicResource(unsigned index);
 
-					delete []oldPlaceholders;
-					delete []oldPlaceholderTypes;
-				}
+		/**
+		 * Destroy a placeholder. Mark this placeholder as free
+		 * and store the index in the pool of free placeholders.
+		 * @param index The placeholder handle.
+		 * @return Status code.
+		 */
+		int _maDestroyPlaceholder(unsigned index);
 
-				dynResCapacity = (dynResCapacity)*2;
-			}
-
-			dynResTypes[dynResSize] = RT_PLACEHOLDER;
-			dynResSize++;
-			return (dynResSize-1)|DYNAMIC_PLACEHOLDER_BIT;
-		}
-
-#ifdef RESOURCE_MEMORY_LIMIT
-		uint getResmemMax() const { return mResmemMax; }
-		uint getResmem() const { return mResmem; }
-#endif
-		
-		void logEverything() {
-#define RESOURCE_STRINGS(R, T, D) resourceStrings[R] = #R;
-			const char *resourceStrings[128] = {0};			
-			TYPES(RESOURCE_STRINGS)
-
-#ifdef LOGGING_ENABLED
-			LOG("Num static resources: %d\n", mN);
-			LOG("Num dynamic resources: %d\n", dynResSize);
-			for(unsigned int i = 0; i < mN; i++) {
-				byte type = mTypes[i];
-				LOG("Static resource %d is of type %s\n", i, resourceStrings[type]);
-			}
-			
-			for(unsigned int i = 0; i < dynResSize; i++) {
-				byte type = dynResTypes[i];
-				LOG("Dynamic resource %d is of type %s\n", i, resourceStrings[type]);
-			}
-#endif	
-		}
+		void logEverything();
 
 	private:
-
-		//**************************************************************************
-		// size calculation functions
-		//**************************************************************************
 
 		/**
 		 * Delete and add a resource ("dadd").
 		 * @param index Resource index.
-		 * @param o Pointer to object data.
+		 * @param obj Pointer to object data.
 		 * @param type Resource type.
 		 */
-		int _dadd(unsigned index, void* o, byte type) {
-			if(index&DYNAMIC_PLACEHOLDER_BIT) {
-				unsigned pIndex = index&(~DYNAMIC_PLACEHOLDER_BIT);
-				TESTINDEX(pIndex, dynResSize);
-				if(dynRes[pIndex] != NULL) {
-					_destroy(index);
-				}
-				return _add(index, o, type);
-			} else {
-				TESTINDEX(index, mN);
-				if(mRes[index] != NULL) {
-					_destroy(index);
-				}
-				return _add(index, o, type);
-			}
-		}
+		int _dadd(unsigned index, void* obj, byte type);
 
 		/**
 		 * Add a resource.
 		 * @param index Resource index.
-		 * @param o Pointer to object data.
+		 * @param obj Pointer to object data.
 		 * @param type Resource type.
 		 */
-		int _add(unsigned index, void* o, byte type) {
-			void **res = mRes;
-			byte *types = mTypes;
-			if(index&DYNAMIC_PLACEHOLDER_BIT) {
-				res = dynRes;
-				types = dynResTypes;
-				index = index&(~DYNAMIC_PLACEHOLDER_BIT);
-				TESTINDEX(index, dynResSize);
-			} else {
-				TESTINDEX(index, mN);
-			}
+		int _add(unsigned index, void* obj, byte type);
 
-			// o is the resource data. If the resource is NULL
-			// and not a placeholder or in flux (resource is changing)
-			// then create a panic.
-			if (o == NULL && (type != RT_PLACEHOLDER && type != RT_FLUX)) {
-				DEBIG_PHAT_ERROR;
-			}
+		/**
+		 * Gets a pointer to the data for the given handle.
+		 * @param index The resource handle.
+		 * @param R The resource type.
+		 * @return a pointer to the data for the given handle.
+		 */
+		void* _get(unsigned index, byte R);
 
-			// Resource at this index must not be in use, but it can be a
-			// placeholder. If the resource is in use, a panic is generated.
-			if(res[index] != NULL || types[index] != RT_PLACEHOLDER) {
-				BIG_PHAT_ERROR(ERR_RES_OVERWRITE);
-			}
+		void* _extract(unsigned index, byte R);
+
+		void __destroy(void* obj, byte type, unsigned index);
+
+		void _destroy(unsigned index);
 
 #ifdef RESOURCE_MEMORY_LIMIT
-			int oldResmem = mResmem;
-			switch(type) {
-#define CASE_ADDMEM(R, T, D) case R: mResmem += size_##R((T*)o); break;
-				TYPES(CASE_ADDMEM);
-			}
-			if(mResmem >= mResmemMax) {
-				//BIG_PHAT_ERROR(ERR_RES_OOM);
-				mResmem = oldResmem;
-				__destroy(o, type, index);	//avoids memory leaks
-				return RES_OUT_OF_MEMORY;
-			}
-#endif	//RESOURCE_MEMORY_LIMIT
-			res[index] = o;
-			types[index] = type;
-			return RES_OK;
-		}
-
-		void* _get(unsigned index, byte R) {
-			void **res = mRes;
-			byte *types = mTypes;
-			if(index&DYNAMIC_PLACEHOLDER_BIT) {
-				res = dynRes;
-				types = dynResTypes;
-				index = index&(~DYNAMIC_PLACEHOLDER_BIT);
-				TESTINDEX(index, dynResSize);
-			} else {
-				TESTINDEX(index, mN);
-			}			
-
-			if(types[index] != R) {
-				BIG_PHAT_ERROR(ERR_RES_INVALID_TYPE);
-			}
-			return res[index];
-		}
-
-		void* _extract(unsigned index, byte R) {
-			void **res = mRes;
-			byte *types = mTypes;
-			if(index&DYNAMIC_PLACEHOLDER_BIT) {
-				res = dynRes;
-				types = dynResTypes;
-				index = index&(~DYNAMIC_PLACEHOLDER_BIT);
-				TESTINDEX(index, dynResSize);
-			} else {
-				TESTINDEX(index, mN);
-			}			
-
-			if(types[index] != R) {
-				BIG_PHAT_ERROR(ERR_RES_INVALID_TYPE);
-			}
-
-#ifdef RESOURCE_MEMORY_LIMIT
-			switch(types[index]) {
-#define CASE_SUBMEM(R, T, D) case R: mResmem -= size_##R((T*)res[index]); break;
-				TYPES(CASE_SUBMEM);
-			}
-			if(mResmem > mResmemMax) {
-				DEBIG_PHAT_ERROR;
-			}
-#endif	//RESOURCE_MEMORY_LIMIT
-
-			void* temp = res[index];
-			res[index] = NULL;
-			types[index] = RT_PLACEHOLDER;
-			return temp;
-		}
-
-		void __destroy(void* o, byte type, unsigned index) {
-			switch(type) {
-#define CASE_DELETE(R, T, D) case R: D ((T*)o);\
-	LOGD("%s: %s %s %i\n", #R, #D, #T, index); break;
-				TYPES(CASE_DELETE);
-			}
-		}
-
-		void _destroy(unsigned index) {
-			void **res = mRes;
-			byte *types = mTypes;
-			if(index&DYNAMIC_PLACEHOLDER_BIT) {
-				res = dynRes;
-				types = dynResTypes;
-				index = index&(~DYNAMIC_PLACEHOLDER_BIT);
-				TESTINDEX(index, dynResSize);
-			} else {
-				TESTINDEX(index, mN);
-			}
-
-			MYASSERT(types[index] != RT_FLUX, ERR_RES_DESTROY_FLUX);
-
-#ifdef RESOURCE_MEMORY_LIMIT
-			switch(types[index]) {
-#define CASE_SUBMEM(R, T, D) case R: mResmem -= size_##R((T*)res[index]); break;
-				TYPES(CASE_SUBMEM);
-			}
-			if(mResmem > mResmemMax) {
-				DEBIG_PHAT_ERROR;
-			}
-#endif	//RESOURCE_MEMORY_LIMIT
-
-			__destroy(res[index], types[index], index);
-
-			res[index] = NULL;
-			types[index] = RT_PLACEHOLDER;
-		}
-
-		unsigned mN;
-		void** mRes;
-		byte* mTypes;
-
-#ifdef RESOURCE_MEMORY_LIMIT
+		// Max size of all resource data.
 		const uint mResmemMax;
+
+		// Current size of all resource data.
 		uint mResmem;
 #endif
 
-		byte*  dynResTypes;
-		unsigned dynResSize;
-		unsigned dynResCapacity;
-		void** dynRes;
+		// ****** Static resources ****** //
+
+		// Static resources are predefined resources defined
+		// at build time, using .res files.
+
+		// Number of resources (size of resource array).
+		unsigned mResSize;
+		// Reseource array (pointers to resource data).
+		void** mRes;
+		// Resource type info array.
+		byte* mResTypes;
+
+		// ****** Dynamic resources ****** //
+
+		// Dynamic resources are allocated at runtime, and use
+		// placeholders (handles) to reference data. Dynamic
+		// resources are stored in an array. The array grows
+		// if neccessary. A handle is an index into this array.
+		// Dynamic resources start at index 1, so first element
+		// of the array is unused (?).
+
+		// Number of dynamic resources.
+		unsigned mDynResSize;
+		// Total size of dynamic resource array.
+		unsigned mDynResCapacity;
+		// Dynamic resource array.
+		void** mDynRes;
+		// Dynamic resource type info array.
+		byte* mDynResTypes;
+
+		// ****** Dynamic resource handle pool ****** //
+
+		// This is a pool of free handles (array indexes) that
+		// can be reused by maCreatePlaceholder. Free indexes
+		// are stored in an array that can grow dynamically.
+		// This array is used as a stack.
+
+		// Number of free handles stored in the array.
+		// This points to the top of the stack.
+		unsigned mDynResPoolSize;
+		// Total size of the array.
+		unsigned mDynResPoolCapacity;
+		// The array with free handle indexes.
+		unsigned* mDynResPool;
 	};
+	// End of class ResourceArray
 }
+// End of namespace Base
 
 #endif // _BASE_RESOURCE_ARRAY_H_

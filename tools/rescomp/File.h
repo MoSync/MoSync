@@ -102,4 +102,6 @@ private:
 	String	m_path;
 };
 
+String getExtension(String filename);
+
 #endif //_SE_MSAB_FILE_H_
