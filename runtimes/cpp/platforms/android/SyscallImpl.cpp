@@ -1257,82 +1257,7 @@ namespace Base
 		return _maOpenGLCloseFullscreen(mJNIEnv, mJThis);
 	}
 
-// the wrapper generator can't yet handle a few set of functions
-// in the opengles 2.0 api (so we manually override them).
-// remove implementations for broken bindings..
-// override implementations for broken bindings..
-#undef maIOCtl_glGetPointerv_case
-#define maIOCtl_glGetPointerv_case(func) \
-case maIOCtl_glGetPointerv: \
-{\
-GLenum _pname = (GLuint)a; \
-void* _pointer = GVMR(b, MAAddress);\
-wrap_glGetPointerv(_pname, _pointer); \
-return 0; \
-}
-
-#undef maIOCtl_glGetVertexAttribPointerv_case
-#define maIOCtl_glGetVertexAttribPointerv_case(func) \
-case maIOCtl_glGetVertexAttribPointerv: \
-{\
-GLuint _index = (GLuint)a; \
-GLenum _pname = (GLuint)b; \
-void* _pointer = GVMR(c, MAAddress);\
-wrap_glGetVertexAttribPointerv(_index, _pname, _pointer); \
-return 0; \
-}
-
-
-#undef maIOCtl_glShaderSource_case
-#define maIOCtl_glShaderSource_case(func) \
-case maIOCtl_glShaderSource: \
-{ \
-GLuint _shader = (GLuint)a; \
-GLsizei _count = (GLsizei)b; \
-void* _string = GVMR(c, MAAddress); \
-const GLint* _length = GVMR(SYSCALL_THIS->GetValidatedStackValue(0 VSV_ARGPTR_USE), GLint); \
-wrap_glShaderSource(_shader, _count, _string, _length); \
-return 0; \
-}
-
-    void wrap_glShaderSource(GLuint shader, GLsizei count, void* strings, const GLint* length) {
-        int* stringsArray = (int*)strings;
-        const GLchar** strCopies = new const GLchar*[count];
-
-        for(int i = 0; i < count; i++) {
-            void* src = GVMR(stringsArray[i], MAAddress);
-            strCopies[i] = (GLchar*)src;
-        }
-#ifndef _android_1
-        glShaderSource(shader, count, strCopies, length);
-#endif
-        delete strCopies;
-    }
-
-    void wrap_glGetVertexAttribPointerv(GLuint index, GLenum pname, void* pointer) {
-        GLvoid* outPointer;
-#ifndef _android_1
-        glGetVertexAttribPointerv(index, pname, &outPointer);
-
-        if(pname != GL_VERTEX_ATTRIB_ARRAY_POINTER)
-            return;
-#endif
-        *(int*)pointer = gSyscall->TranslateNativePointerToMoSyncPointer(outPointer);
-    }
-
-    void wrap_glGetPointerv(GLenum pname, void* pointer) {
-        GLvoid* outPointer;
-        glGetPointerv(pname, &outPointer);
-
-        if(pname != GL_COLOR_ARRAY_POINTER &&
-           pname != GL_NORMAL_ARRAY_POINTER &&
-           pname != GL_POINT_SIZE_ARRAY_POINTER_OES &&
-           pname != GL_TEXTURE_COORD_ARRAY_POINTER &&
-           pname != GL_VERTEX_ARRAY_POINTER)
-            return;
-
-        *(int*)pointer = gSyscall->TranslateNativePointerToMoSyncPointer(outPointer);
-    }
+#include "GLFixes.h"
 
 	/**
 	 * Utility function for displaying and catching pending
@@ -1571,6 +1496,135 @@ return 0; \
 		case maIOCtl_maFrameBufferClose:
 			SYSLOG("maIOCtl_maFrameBufferClose");
 			return _maFrameBufferClose(mJNIEnv, mJThis);
+
+
+		// Audio API
+
+		case maIOCtl_maAudioDataCreateFromResource:
+		{
+			SYSLOG("maIOCtl_maAudioDataCreateFromResource");
+
+			const char* mime = SYSCALL_THIS->GetValidatedStr(a);
+			int data = b;
+			int offset = c;
+			int length = SYSCALL_THIS->GetValidatedStackValue(0);
+			int flags = SYSCALL_THIS->GetValidatedStackValue(4);
+
+			return _maAudioDataCreateFromResource(mime, data, offset, length, flags, mJNIEnv, mJThis);
+		}
+
+		case  maIOCtl_maAudioDataCreateFromURL:
+		{
+			SYSLOG("maIOCtl_maAudioDataCreateFromURL");
+
+			const char* mime = SYSCALL_THIS->GetValidatedStr(a);
+			const char* url = SYSCALL_THIS->GetValidatedStr(b);
+			int flags = c;
+
+			return _maAudioDataCreateFromURL(mime, url, flags, mJNIEnv, mJThis);
+		}
+
+		case maIOCtl_maAudioDataDestroy:
+		{
+			SYSLOG("maIOCtl_maAudioDataDestroy");
+			int audioData = a;
+
+			return _maAudioDataDestroy(audioData, mJNIEnv, mJThis);
+		}
+
+		case maIOCtl_maAudioInstanceCreate:
+		{
+			SYSLOG("maIOCtl_maAudioInstanceCreate");
+
+			int audioData = a;
+
+			return _maAudioInstanceCreate(audioData, mJNIEnv, mJThis);
+		}
+
+		case maIOCtl_maAudioInstanceDestroy:
+		{
+			SYSLOG("maIOCtl_maAudioInstanceDestroy");
+
+			int audioInstance = a;
+
+			return _maAudioInstanceDestroy(audioInstance, mJNIEnv, mJThis);
+		}
+
+		case maIOCtl_maAudioGetLength:
+		{
+			SYSLOG("maIOCtl_maAudioGetLength");
+
+			int audioInstance = a;
+
+			return _maAudioGetLength(audioInstance, mJNIEnv, mJThis);
+		}
+
+		case maIOCtl_maAudioSetNumberOfLoops:
+		{
+			SYSLOG("maIOCtl_maAudioSetNumberOfLoops");
+
+			int audioInstance = a;
+			int loops = b;
+
+			return _maAudioSetNumberOfLoops(audioInstance, loops, mJNIEnv, mJThis);
+		}
+
+		case maIOCtl_maAudioPrepare:
+		{
+			SYSLOG("maIOCtl_maAudioPrepare");
+
+			int audioInstance = a;
+			int async = b;
+
+			return _maAudioPrepare(audioInstance, async, mJNIEnv, mJThis);
+		}
+
+		case maIOCtl_maAudioPlay:
+		{
+			SYSLOG("maIOCtl_maAudioPlay");
+
+			int audioInstance = a;
+
+			return _maAudioPlay(audioInstance, mJNIEnv, mJThis);
+		}
+
+		case maIOCtl_maAudioSetPosition:
+		{
+			SYSLOG("maIOCtl_maAudioSetPosition");
+
+			int audioInstance = a;
+			int milliseconds = b;
+
+			return _maAudioSetPosition(audioInstance, milliseconds, mJNIEnv, mJThis);
+		}
+
+		case maIOCtl_maAudioGetPosition:
+		{
+			SYSLOG("maIOCtl_maAudioGetPosition");
+
+			int audioInstance = a;
+
+			return _maAudioGetPosition(audioInstance, mJNIEnv, mJThis);
+		}
+
+		case maIOCtl_maAudioSetVolume:
+		{
+			SYSLOG("maIOCtl_maAudioSetVolume");
+
+			int audioInstance = a;
+			float volume = (float)b;
+
+			return _maAudioSetVolume(audioInstance, volume, mJNIEnv, mJThis);
+		}
+
+		case maIOCtl_maAudioStop:
+		{
+			SYSLOG("maIOCtl_maAudioStop");
+
+			int audioInstance = a;
+
+			return _maAudioStop(audioInstance, mJNIEnv, mJThis);
+		}
 
 		// Audio buffer syscalls
 
