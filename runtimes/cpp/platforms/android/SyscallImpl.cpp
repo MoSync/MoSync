@@ -167,16 +167,21 @@ namespace Base
 	char* Syscall::loadBinary(int resourceIndex, int size)
 	{
 		SYSLOG("loadBinary");
-		//get current thread's JNIEnvrionmental variable
+		//get current thread's JNIEnvironmental variable
 		JNIEnv * env = getJNIEnvironment();
+
+		// Debug print.
+		/*
 		char* b = (char*)malloc(200);
 		sprintf(b, "loadBinary index:%d size:%d", resourceIndex, size);
-		//__android_log_write(ANDROID_LOG_INFO, "MoSync Syscall", b);
+		__android_log_write(ANDROID_LOG_INFO, "MoSync Syscall", b);
 		free(b);
+		*/
 
 		char* buffer = (char*)malloc(size);
-		jobject byteBuffer = env->NewDirectByteBuffer((void*)buffer, size);
+		if(buffer == NULL) return NULL;
 
+		jobject byteBuffer = env->NewDirectByteBuffer((void*)buffer, size);
 		if(byteBuffer == NULL) return NULL;
 
 		jclass cls = env->GetObjectClass(mJThis);
@@ -193,6 +198,7 @@ namespace Base
 			free(buffer);
 			return NULL;
 		}
+
 		return buffer;
 	}
 

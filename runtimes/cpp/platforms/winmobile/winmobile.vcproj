@@ -554,6 +554,9 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\base\ResourceArray.cpp"
+				>
+			<File
 				RelativePath="..\..\base\ResourceArray.h"
 				>
 			</File>
