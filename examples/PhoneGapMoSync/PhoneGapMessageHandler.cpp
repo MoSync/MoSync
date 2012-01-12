@@ -28,6 +28,7 @@ MA 02110-1301, USA.
 #include <conprint.h>
 #include "PhoneGapMessageHandler.h"
 #include "MAHeaders.h"
+#include "PhoneGapNotificationManager.h"
 
 // NameSpaces we want to access.
 using namespace MAUtil; // Class Moblet, String
@@ -40,9 +41,11 @@ using namespace Wormhole; // Class WebAppMoblet
 PhoneGapMessageHandler::PhoneGapMessageHandler(NativeUI::WebView* webView) :
 	mWebView(webView),
 	mPhoneGapSensors(this),
-	mPhoneGapFile(this)
+	mPhoneGapFile(this),
+	mPhoneGapNotificationManager(NULL)
 {
 	enableHardware();
+	mPhoneGapNotificationManager = new PhoneGapNotificationManager(this);
 }
 
 /**
@@ -50,7 +53,7 @@ PhoneGapMessageHandler::PhoneGapMessageHandler(NativeUI::WebView* webView) :
  */
 PhoneGapMessageHandler::~PhoneGapMessageHandler()
 {
-	// Nothing needs to be explicitly destroyed.
+	delete mPhoneGapNotificationManager;
 }
 
 /**
@@ -111,6 +114,10 @@ bool PhoneGapMessageHandler::handleMessage(PhoneGapMessage& message)
 	else if (message.getParam("service") == "File")
 	{
 		mPhoneGapFile.handleMessage(message);
+	}
+	else if (message.getParam("service") == "PushNotification")
+	{
+		mPhoneGapNotificationManager->handleMessage(message);
 	}
 	else
 	{
@@ -335,7 +342,7 @@ void PhoneGapMessageHandler::callError(
 {
 	String args =
 		"{\"code\":" + errorCode +
-		"\"message\":\"" + errorMessage + "\"}";
+		",\"message\":\"" + errorMessage + "\"}";
 
 	callCallback(
 		"PhoneGap.CallbackError",
