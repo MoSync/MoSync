@@ -301,6 +301,8 @@
 		85F2559711AC162700EB47EE /* libMoSyncLib.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 85F2550D11AC125400EB47EE /* libMoSyncLib.a */; };
 		85F25A3611AD614700EB47EE /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; };
 		85F25A3711AD614700EB47EE /* MoSyncAppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1D3623250D0F684500981E51 /* MoSyncAppDelegate.mm */; };
+		E413FAB814C0604D00BF1E3D /* ResourceArray.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E413FAB714C0604D00BF1E3D /* ResourceArray.cpp */; };
+		E413FABA14C0606A00BF1E3D /* ResourceArray.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E413FAB714C0604D00BF1E3D /* ResourceArray.cpp */; };
 		E4B3144E14B483FF009F88B4 /* MoSync.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85407550149F9E62001B14C0 /* MoSync.mm */; };
 		E4B3145014B48404009F88B4 /* MoSyncExtension.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85407552149F9E62001B14C0 /* MoSyncExtension.mm */; };
 		E4D36EA81459AC5B00477B1E /* AudioData.mm in Sources */ = {isa = PBXBuildFile; fileRef = E4D36EA51459AC5B00477B1E /* AudioData.mm */; };
@@ -557,6 +559,7 @@
 		85F2558711AC155D00EB47EE /* MoSync.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MoSync.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		85F2558911AC155D00EB47EE /* MoSyncWithLib-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "MoSyncWithLib-Info.plist"; sourceTree = "<group>"; };
 		8D1107310486CEB800E47090 /* MoSync-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "MoSync-Info.plist"; plistStructureDefinitionIdentifier = "com.apple.xcode.plist.structure-definition.iphone.info-plist"; sourceTree = "<group>"; };
+		E413FAB714C0604D00BF1E3D /* ResourceArray.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ResourceArray.cpp; path = ../../../base/ResourceArray.cpp; sourceTree = "<group>"; };
 		E4D36EA41459AC5B00477B1E /* AudioData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AudioData.h; sourceTree = "<group>"; };
 		E4D36EA51459AC5B00477B1E /* AudioData.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = AudioData.mm; sourceTree = "<group>"; };
 		E4D36EA61459AC5B00477B1E /* AudioSyscall.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AudioSyscall.h; sourceTree = "<group>"; };
@@ -991,6 +994,7 @@
 				85BF2B521134052300BB0201 /* networking.cpp */,
 				85BF2B541134052300BB0201 /* NotSupportedException.h */,
 				85BF2B551134052300BB0201 /* ResourceArray.h */,
+				E413FAB714C0604D00BF1E3D /* ResourceArray.cpp */,
 				85BF2B561134052300BB0201 /* Stream.cpp */,
 				85BF2B571134052300BB0201 /* Stream.h */,
 				85BF2B581134052300BB0201 /* StreamHelpers.h */,
@@ -1374,6 +1378,7 @@
 				43B16FEB147BF9FC00B6BB8A /* NSStringExpanded.mm in Sources */,
 				85407553149F9E62001B14C0 /* MoSync.mm in Sources */,
 				85407554149F9E62001B14C0 /* MoSyncExtension.mm in Sources */,
+				E413FAB814C0604D00BF1E3D /* ResourceArray.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1405,6 +1410,7 @@
 				85F2552711AC12DE00EB47EE /* MemStream.cpp in Sources */,
 				85F2552811AC12DE00EB47EE /* networking.cpp in Sources */,
 				85F2552911AC12DE00EB47EE /* Stream.cpp in Sources */,
+				E413FABA14C0606A00BF1E3D /* ResourceArray.cpp in Sources */,
 				85F2552A11AC12DE00EB47EE /* Syscall.cpp in Sources */,
 				85F2552B11AC12DE00EB47EE /* ThreadPool.cpp in Sources */,
 				85F2552C11AC12DE00EB47EE /* FileImpl.cpp in Sources */,
