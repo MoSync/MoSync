@@ -1,35 +1,35 @@
 <!DOCTYPE html>
 <!--
-	Test program to make Wormhole performance benchmarks.
+    Test program to make Wormhole performance benchmarks.
 -->
 <html>
 <head>
 <style>
 html
 {
-	/* Set page attributes. */
-	margin: 0;
-	padding: 0;
-	width: 100%;
-	height: 100%;
-	background-color: #FFFFFF;
+    /* Set page attributes. */
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #FFFFFF;
 
-	/* Disable text selection in all browsers. */
-	-webkit-user-select: none;
-	-khtml-user-select: none;
-	-moz-user-select: none;
-	-o-user-select: none;
-	user-select: none;
+    /* Disable text selection in all browsers. */
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -o-user-select: none;
+    user-select: none;
 }
 
 #LogoBox
 {
-	/* Center element horizontally. */
-	display: table;
-	margin: auto auto;
+    /* Center element horizontally. */
+    display: table;
+    margin: auto auto;
 
-	/* Set width of box. */
-	width: 10em;
+    /* Set width of box. */
+    width: 10em;
 }
 
 #TouchArea
@@ -50,23 +50,23 @@ html
 
 #LogoBox img
 {
-	/* Make image same with as LogoBox. */
-	width: 10em;
+    /* Make image same with as LogoBox. */
+    width: 10em;
 }
 
 #TextBox
 {
-	/* Text attributes. */
-	font-size: 1.0em;
-	font-family: sans-serif;
-	font-weight: bold;
-	text-align: center;
+    /* Text attributes. */
+    font-size: 1.0em;
+    font-family: sans-serif;
+    font-weight: bold;
+    text-align: center;
 }
 </style>
 
 <!--
-	Import the bridge library for communication between
-	JavaScript and C++.
+    Import the bridge library for communication between
+    JavaScript and C++.
 -->
 <script src="js/mosync-bridge.js"></script>
 
@@ -81,23 +81,23 @@ var RoundtripCount = 0;
 
 function SetText(text)
 {
-	var textBox = document.getElementById("TextBox");
-	textBox.innerHTML = text;
-	console.log(text);
+    var textBox = document.getElementById("TextBox");
+    textBox.innerHTML = text;
+    //console.log(text);
 }
 
 function GetText()
 {
-	var textBox = document.getElementById("TextBox");
-	return textBox.innerHTML;
+    var textBox = document.getElementById("TextBox");
+    return textBox.innerHTML;
 }
 
 function TestStart()
 {
-	SetText("<p>Running Wormhole performance tests...</p>");
+    SetText("<p>Running Wormhole performance tests...</p>");
 
-	// Start first test.
-	StringMessageStart();
+    // Start first test.
+    StringMessageStart();
 }
 
 /**
@@ -105,20 +105,25 @@ function TestStart()
  */
 function StringMessageStart()
 {
-	ThroughputCount = 0;
-	ThroughputStartTime = new Date().getTime();
+    ThroughputCount = 0;
+    ThroughputStartTime = new Date().getTime();
 
-	for (var i = 0; i < Iterations; ++i)
-	{
-		for (var j = 0; j < Iterations; ++j)
-		{
-			++ThroughputCount;
-			mosync.bridge.send(["StringMessage", "One", "Two & three"]);
+    //var param = "MoSync goes FranÅÄÖais! Kudos to Younes Moumen, CTO";
+    var param = "MoSync goes Fran" + String.fromCharCode(231) + "ais! Kudos to Younes Moumen, CTO";
+    //param = mosync.encoder.encodeUTF8(param);
+    for (var i = 0; i < Iterations; ++i)
+    {
+        for (var j = 0; j < Iterations; ++j)
+        {
+            ++ThroughputCount;
 
-		}
-		mosync.bridge.sendAll();
-	}
-	mosync.bridge.send(["StringMessageEnd"]);
+            //mosync.bridge.send(["StringMessage", "One", "Two & three"]);
+            mosync.bridge.send(["StringMessage", "One", param]);
+
+        }
+        mosync.bridge.sendAll();
+    }
+    mosync.bridge.send(["StringMessageEnd"]);
 }
 
 /**
@@ -126,19 +131,19 @@ function StringMessageStart()
  */
 function StringMessageEnd()
 {
-	// Compute performance.
-	var timeTaken = new Date().getTime() - ThroughputStartTime;
-	var messagesPerSecond = (ThroughputCount / timeTaken) * 1000;
+    // Compute performance.
+    var timeTaken = new Date().getTime() - ThroughputStartTime;
+    var messagesPerSecond = (ThroughputCount / timeTaken) * 1000;
 
-	// Display result.
-	messagesPerSecond = Math.round(messagesPerSecond*100)/100;
-	SetText(GetText()
-		+ "<p>String messages/s: "
-		+ messagesPerSecond
-		+ "</p>");
+    // Display result.
+    messagesPerSecond = Math.round(messagesPerSecond*100)/100;
+    SetText(GetText()
+        + "<p>String messages/s: "
+        + messagesPerSecond
+        + "</p>");
 
-	// Start next test.
-	JSONMessageStart();
+    // Start next test.
+    //JSONMessageStart();
 }
 
 /**
@@ -146,23 +151,23 @@ function StringMessageEnd()
  */
 function JSONMessageStart()
 {
-	ThroughputCount = 0;
-	ThroughputStartTime = new Date().getTime();
+    ThroughputCount = 0;
+    ThroughputStartTime = new Date().getTime();
 
-	for (var i = 0; i < Iterations / 10; ++i)
-	{
-		for (var j = 0; j < Iterations; ++j)
-		{
-			++ThroughputCount;
-			mosync.bridge.sendJSON({
-				messageName: "JSONMessage",
-				param1: "One",
-				param2: "Two & three"
-			});
-		}
-		mosync.bridge.sendAllJSON();
-	}
-	mosync.bridge.sendJSON({messageName: "JSONMessageEnd"});
+    for (var i = 0; i < Iterations / 10; ++i)
+    {
+        for (var j = 0; j < Iterations; ++j)
+        {
+            ++ThroughputCount;
+            mosync.bridge.sendJSON({
+                messageName: "JSONMessage",
+                param1: "One",
+                param2: "Two & three"
+            });
+        }
+        mosync.bridge.sendAllJSON();
+    }
+    mosync.bridge.sendJSON({messageName: "JSONMessageEnd"});
 }
 
 /**
@@ -170,19 +175,19 @@ function JSONMessageStart()
  */
 function JSONMessageEnd()
 {
-	// Compute performance.
-	var timeTaken = new Date().getTime() - ThroughputStartTime;
-	var messagesPerSecond = (ThroughputCount / timeTaken) * 1000;
+    // Compute performance.
+    var timeTaken = new Date().getTime() - ThroughputStartTime;
+    var messagesPerSecond = (ThroughputCount / timeTaken) * 1000;
 
-	// Display result.
-	messagesPerSecond = Math.round(messagesPerSecond*100)/100;
-	SetText(GetText()
-		+ "<p>JSON messages/s: "
-		+ messagesPerSecond
-		+ "</p>");
+    // Display result.
+    messagesPerSecond = Math.round(messagesPerSecond*100)/100;
+    SetText(GetText()
+        + "<p>JSON messages/s: "
+        + messagesPerSecond
+        + "</p>");
 
-	// Start next test.
-	StringRoundtripStart();
+    // Start next test.
+    StringRoundtripStart();
 }
 
 /**
@@ -190,9 +195,9 @@ function JSONMessageEnd()
  */
 function StringRoundtripStart()
 {
-	RoundtripStartTime = new Date().getTime();
-	RoundtripCount = 0;
-	mosync.bridge.send(["StringRoundtripMessage"]);
+    RoundtripStartTime = new Date().getTime();
+    RoundtripCount = 0;
+    mosync.bridge.send(["StringRoundtripMessage"]);
 }
 
 /**
@@ -200,28 +205,28 @@ function StringRoundtripStart()
  */
 function StringRoundtripCallback()
 {
-	++RoundtripCount;
-	if (RoundtripCount < Iterations)
-	{
-		// Do more roundtrips.
-		mosync.bridge.send(["StringRoundtripMessage"]);
-	}
-	else
-	{
-		// Report result.
-		var timeTaken = new Date().getTime() - RoundtripStartTime;
-		var messagesPerSecond = (RoundtripCount / timeTaken) * 1000;
+    ++RoundtripCount;
+    if (RoundtripCount < Iterations)
+    {
+        // Do more roundtrips.
+        mosync.bridge.send(["StringRoundtripMessage"]);
+    }
+    else
+    {
+        // Report result.
+        var timeTaken = new Date().getTime() - RoundtripStartTime;
+        var messagesPerSecond = (RoundtripCount / timeTaken) * 1000;
 
-		// Display result.
-		messagesPerSecond = Math.round(messagesPerSecond*100)/100;
-		SetText(GetText()
-			+ "<p>String roundtrips/s: "
-			+ messagesPerSecond
-			+ "</p>");
+        // Display result.
+        messagesPerSecond = Math.round(messagesPerSecond*100)/100;
+        SetText(GetText()
+            + "<p>String roundtrips/s: "
+            + messagesPerSecond
+            + "</p>");
 
-		// Next test.
-		JSONRoundtripStart();
-	}
+        // Next test.
+        JSONRoundtripStart();
+    }
 }
 
 /**
@@ -229,9 +234,9 @@ function StringRoundtripCallback()
  */
 function JSONRoundtripStart()
 {
-	RoundtripStartTime = new Date().getTime();
-	RoundtripCount = 0;
-	mosync.bridge.sendJSON({messageName: "JSONRoundtripMessage"});
+    RoundtripStartTime = new Date().getTime();
+    RoundtripCount = 0;
+    mosync.bridge.sendJSON({messageName: "JSONRoundtripMessage"});
 }
 
 /**
@@ -239,27 +244,27 @@ function JSONRoundtripStart()
  */
 function JSONRoundtripCallback()
 {
-	++RoundtripCount;
-	if (RoundtripCount < Iterations)
-	{
-		// Do more roundtrips.
-		mosync.bridge.sendJSON({messageName: "JSONRoundtripMessage"});
-	}
-	else
-	{
-		// Report result.
-		var timeTaken = new Date().getTime() - RoundtripStartTime;
-		var messagesPerSecond = (RoundtripCount / timeTaken) * 1000;
+    ++RoundtripCount;
+    if (RoundtripCount < Iterations)
+    {
+        // Do more roundtrips.
+        mosync.bridge.sendJSON({messageName: "JSONRoundtripMessage"});
+    }
+    else
+    {
+        // Report result.
+        var timeTaken = new Date().getTime() - RoundtripStartTime;
+        var messagesPerSecond = (RoundtripCount / timeTaken) * 1000;
 
-		// Display result.
-		messagesPerSecond = Math.round(messagesPerSecond*100)/100;
-		SetText(GetText()
-			+ "<p>JSON roundtrips/s: "
-			+ messagesPerSecond
-			+ "</p>");
+        // Display result.
+        messagesPerSecond = Math.round(messagesPerSecond*100)/100;
+        SetText(GetText()
+            + "<p>JSON roundtrips/s: "
+            + messagesPerSecond
+            + "</p>");
 
-		// This was the last test.
-	}
+        // This was the last test.
+    }
 }
 
 /**
@@ -269,30 +274,30 @@ function JSONRoundtripCallback()
  */
 function TestPromptBare()
 {
-	var iterations = Iterations;
+    var iterations = Iterations;
 
-	var startTime = new Date().getTime();
+    var startTime = new Date().getTime();
 
-	for (var i = 0; i < iterations; ++i)
-	{
-		var result = prompt(LongMessage);
-		if (result != "ok")
-		{
-			console.log("@@@@@@ TestPromptBare failed");
-			return;
-		}
-	}
+    for (var i = 0; i < iterations; ++i)
+    {
+        var result = prompt(LongMessage);
+        if (result != "ok")
+        {
+            //console.log("@@@@@@ TestPromptBare failed");
+            return;
+        }
+    }
 
-	// Report result.
-	var timeTaken = new Date().getTime() - startTime;
-	var promptsPerSecond = (iterations / timeTaken) * 1000;
+    // Report result.
+    var timeTaken = new Date().getTime() - startTime;
+    var promptsPerSecond = (iterations / timeTaken) * 1000;
 
-	// Display result.
-	promptsPerSecond = Math.round(promptsPerSecond*100)/100;
-	SetText(GetText()
-		+ "<p>Prompts/second: "
-		+ promptsPerSecond
-		+ "</p>");
+    // Display result.
+    promptsPerSecond = Math.round(promptsPerSecond*100)/100;
+    SetText(GetText()
+        + "<p>Prompts/second: "
+        + promptsPerSecond
+        + "</p>");
 }
 
 </script>
@@ -300,11 +305,11 @@ function TestPromptBare()
 
 <body>
 <div id="LogoBox"">
-	<img src="images/MoSyncLogo.png"/>
+    <img src="images/MoSyncLogo.png"/>
 </div>
 <div>
-	<div id="TouchArea" ontouchend="TestStart()">Start performance test</div>
-	<div id="TextBox"></div>
+    <div id="TouchArea" ontouchend="TestStart()">Start performance test</div>
+    <div id="TextBox"></div>
 </div>
 </body>
 </html>

@@ -24,13 +24,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.webkit.JsPromptResult;
 import android.webkit.JsResult;
 import android.webkit.WebChromeClient;
 import android.webkit.WebStorage;
-import android.webkit.WebSettings;
 
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -624,6 +622,11 @@ public class WebWidget extends Widget
 		 * The web view widget.
 		 */
 		private WebWidget mWebWidget;
+
+		// TODO: Use this charset as an alternative to the UTF8 length
+		// counting fix on mosync-bridge.js. If so, use in onJsPrompt
+		// as: message.getBytes(mCharset).
+		//private Charset mCharset = Charset.forName("ISO-8859-1");
 
 		/**
 		 * Constructor.
