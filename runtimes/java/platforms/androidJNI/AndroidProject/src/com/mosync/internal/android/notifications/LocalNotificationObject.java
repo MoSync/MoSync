@@ -306,6 +306,7 @@ public class LocalNotificationObject {
 		}
 		else
 		{
+			Log.e("@@MoSync","maNotificationLocalSetProperty: Invalid property name " + name);
 			return MA_NOTIFICATION_RES_INVALID_PROPERTY_NAME;
 		}
 		return MA_NOTIFICATION_RES_OK;

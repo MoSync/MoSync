@@ -37,8 +37,8 @@ public:
 
 		// The page in the "LocalFiles" folder to
 		// show when the application starts.
-		//showPage("index.html");
 		showPage("index.html");
+		//showPage("filesystest-index.html");
 
 		// Initialize PhoneGap.
 		mPhoneGapMessageHandler->initializePhoneGap();
@@ -62,6 +62,17 @@ public:
 			WebViewMessage::unescape(stringData).c_str());
 
 		free(stringData);
+	}
+
+	/**
+	 * This method is called when a key is pressed. It closes
+	 * the application when the back key (on Android) is pressed.
+	 * Forwards the event to PhoneGapMessageHandler.
+	 */
+	void keyPressEvent(int keyCode, int nativeCode)
+	{
+		//forward to PhoneGap MessageHandler
+		mPhoneGapMessageHandler->processKeyEvent(keyCode, nativeCode);
 	}
 
 	/**

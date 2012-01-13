@@ -127,6 +127,12 @@ public:
 	void sendDeviceProperties(MAUtil::String callbackID);
 
 	/**
+	 * processes the Key Events and sends the appropriate message to
+	 * PhoneGap
+	 */
+	void processKeyEvent(int keyCode, int NativeCode);
+
+	/**
 	 * Call the PhoneGap success function.
 	 *
 	 * @param callbackID The id of the JS callback function.
@@ -224,6 +230,16 @@ private:
 	 * Controls where each sensor event is delivered.
 	 */
 	bool mSensorEventToManager[MAXIMUM_SENSORS];
+
+	/**
+	 * Controls where each sensor event is delivered.
+	 */
+	bool mSensorEventToManager[MAXIMUM_SENSORS];
+
+	/**
+	 * PhoneGap Notification API's message handler.
+	 */
+	PhoneGapNotificationManager* mPhoneGapNotificationManager;
 };
 
 #endif
