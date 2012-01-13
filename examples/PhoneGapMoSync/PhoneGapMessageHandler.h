@@ -199,7 +199,6 @@ public:
 	 */
 	void setSensorEventTarget(int sensor, bool toSensorManager);
 
-
 private:
 	/**
 	 * The WebView used by PhoneGap.
@@ -230,16 +229,6 @@ private:
 	 * Controls where each sensor event is delivered.
 	 */
 	bool mSensorEventToManager[MAXIMUM_SENSORS];
-
-	/**
-	 * Controls where each sensor event is delivered.
-	 */
-	bool mSensorEventToManager[MAXIMUM_SENSORS];
-
-	/**
-	 * PhoneGap Notification API's message handler.
-	 */
-	PhoneGapNotificationManager* mPhoneGapNotificationManager;
 };
 
 #endif
