@@ -21,18 +21,10 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 using namespace MAUtil;
 
-static Vector<MAHandle> sPool;
-
 MAHandle PlaceholderPool::alloc() {
-	if(sPool.size() == 0)
-		return maCreatePlaceholder();
-	int index = sPool.size() - 1;
-	MAHandle h = sPool[index];
-	sPool.remove(index);
-	return h;
+	return maCreatePlaceholder();
 }
 
 void PlaceholderPool::put(MAHandle h) {
-	maDestroyObject(h);
-	sPool.add(h);
+	maDestroyPlaceholder(h);
 }

@@ -10,6 +10,7 @@
 <property key="build.prefs:additional.libraries/Release" value="MAUtil.lib, NativeUI.lib, Notification.lib"/>
 <property key="build.prefs:additional.library.paths/Debug" value=""/>
 <property key="build.prefs:additional.library.paths/Release" value=""/>
+<property key="build.prefs:app.permissions" value="File\ Storage Internet\ Access Push\ Notifications Vibrate"/>
 <property key="build.prefs:extra.link.sw/Debug" value=""/>
 <property key="build.prefs:extra.link.sw/Release" value=""/>
 <property key="build.prefs:extra.res.sw/Debug" value=""/>
