@@ -22,9 +22,7 @@ MA 02110-1301, USA.
  **/
 
 #include "rescomp.h"
-#include "VariantResourceLookup.h"
-
-ResourceCompiler::VariantResourceLookup* resManager;
+#include "ResCompiler.h"
 
 int loadResource(MAHandle handle)
 {
