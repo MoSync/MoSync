@@ -21,18 +21,17 @@ MA 02110-1301, USA.
  * @date 22 Nov 2011
  **/
 
-#ifndef __RESCOMP_H__
-#define __RESCOMP_H__
+#ifndef __RESCOMPILER_H__
+#define __RESCOMPILER_H__
 
-#include "VariantResourceLookup.h"
-
-ResourceCompiler::VariantResourceLookup* resManager;
+#include <ma.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-	int resource_selector();
+	int loadResource(MAHandle handle);
+	int unloadResource(MAHandle handle);
 
 #ifdef __cplusplus
 }	//extern "C"
