@@ -2364,7 +2364,7 @@ FileWriter.prototype.write = function (text) {
     if (typeof me.onwritestart === "function") {
         me.onwritestart({ "type": "writestart", "target": me });
     }
-
+    //console.log("================== write - this.position: " + this.position);
     // Write file
     navigator.fileMgr.write(this.fileName, text, this.position,
 
@@ -2438,7 +2438,8 @@ FileWriter.prototype.seek = function(offset) {
     if (this.readyState === FileWriter.WRITING) {
         throw FileError.INVALID_STATE_ERR;
     }
-
+    //console.log("================== seek - offset: " + offset);
+    //console.log("================== seek - this.length: " + this.length);
     if (!offset) {
         return;
     }
@@ -2457,6 +2458,7 @@ FileWriter.prototype.seek = function(offset) {
     else {
         this.position = offset;
     }
+    //console.log("================== seek - this.position: " + this.position);
 };
 
 /**

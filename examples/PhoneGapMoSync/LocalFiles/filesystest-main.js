@@ -176,27 +176,6 @@ var FileSys = function()
             error(fun));
     };
 
-    FileSys.getMetaData = function(path, fun)
-    {
-        window.requestFileSystem(
-            LocalFileSystem.PERSISTENT,
-            0,
-            function (fileSystem)
-            {
-                fileSystem.root.getFile(
-                    path,
-                    { create: false },
-                    function(fileEntry)
-                    {
-                        fileEntry.getMetadata(
-                            function(metadata) { fun(true, metadata); },
-                            error(fun));
-                    },
-                    error(fun));
-            },
-            error(fun));
-    };
-
     FileSys.moveFile = function(path, newPath, fun)
     {
         window.requestFileSystem(
@@ -204,6 +183,47 @@ var FileSys = function()
             0,
             function (fileSystem)
             {
+                fileSystem.root.getFile(
+                        path,
+                        { create: false },
+                        function(fileEntry)
+                        {
+                            // Default values if this is a file at the root
+                            // of the local file system.
+                            var newParentPath = fileSystem.root.fullPath;
+                            var newFileName = newPath;
+
+                            // The new full path name.
+                            var newFullPath = fileSystem.root.fullPath + "/" + newPath;
+
+                            // Split into parent path and file name if the file
+                            // is is not at the root of the local file system.
+                            var index = newFullPath.lastIndexOf("/");
+                            if (index > -1)
+                            {
+                                newParentPath = newFullPath.substring(0, index);
+                                newFileName = newFullPath.substring(index + 1);
+                            }
+
+                            // Find directory name.
+                            var directoryName = "";
+                            index = newParentPath.lastIndexOf("/");
+                            if (index > -1)
+                            {
+                                directoryName = newParentPath.substring(index + 1);
+                            }
+
+                            parentDirectory = new DirectoryEntry();
+                            parentDirectory.fullPath = newParentPath;
+                            parentDirectory.name = directoryName;
+
+                            fileEntry.moveTo(
+                                parentDirectory,
+                                newFileName,
+                                function(result) { console.log("XXXXXXXXXXXXXXX"); PrintObject(result); fun(true); },
+                                error(fun));
+                        },
+                        error(fun));
                 console.log(
                     "================ FileSys.moveFile fileSystem.root.fullPath: " +
                     fileSystem.root.fullPath);

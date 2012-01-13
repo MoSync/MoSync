@@ -112,6 +112,8 @@ public:
 
 	void actionTruncate(PhoneGapMessage& message);
 
+	void actionMoveTo(PhoneGapMessage& message);
+
 private:
 	PhoneGapMessageHandler* mMessageHandler;
 };
