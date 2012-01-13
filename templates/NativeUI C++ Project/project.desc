@@ -1,6 +1,7 @@
 id = project.nativeuicpp
 name = MoSync NativeUI C++ Project
 description = A project that uses the high level C++ Native UI API.
+required-capabilities = NativeUI
 
 [Files]
 main.cpp
