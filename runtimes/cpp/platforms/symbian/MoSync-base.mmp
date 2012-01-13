@@ -47,6 +47,7 @@ SOURCE            Recompiler.cpp
 
 SOURCEPATH ..\..\base
 SOURCE            Syscall.cpp
+SOURCE            ResourceArray.cpp
 SOURCE            Stream.cpp
 SOURCE            MemStream.cpp
 SOURCE            FileStream.cpp
@@ -75,7 +76,7 @@ LIBRARY mediaclientaudio.lib
 LIBRARY VibraCtrl.lib
 LIBRARY apgrfx.lib
 LIBRARY smcm.lib msgs.lib mtur.lib gsmu.lib
-LIBRARY mediaclientaudiostream.lib 
+LIBRARY mediaclientaudiostream.lib
 LIBRARY mediaclientvideo.lib
 LIBRARY Lbs.lib
 LIBRARY insock.lib
