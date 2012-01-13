@@ -547,6 +547,25 @@ interface MAAPI {
 	MAHandle maCreatePlaceholder();
 
 	/**
+	* Releases a handle returned by maCreatePlaceholder().
+	* If the handle refers to an object, such as an image or a data object,
+	* that object is destroyed, as if maDestroyObject() had been called.
+	*
+	* The released handle may be reused by the system
+	* and returned by future calls to maCreatePlaceholder(),
+	* or by other system functions that allocate resources dynamically.
+	*
+	* This function is preferred to maDestroyObject(), unless you need
+	* to reuse the handle.
+	*
+	* Attempting to destroy a handle that has already been released,
+	* or was not returned by maCreatePlaceholder(), will cause a MoSync Panic.
+	*
+	* @param handle The handle to be released.
+	*/
+	void maDestroyPlaceholder(in MAHandle handle);
+
+	/**
 	* Destroys an object of any type. The handle becomes a placeholder.
 	*/
 	void maDestroyObject(in MAHandle handle);
@@ -555,6 +574,7 @@ interface MAAPI {
 	* Returns the size, in bytes, of a data object.
 	*/
 	int maGetDataSize(in MAHandle data);
+
 	/**
 	* Reads \a size bytes from a data object, starting at \a offset,
 	* into memory pointed to by \a dst.
@@ -562,6 +582,7 @@ interface MAAPI {
 	* it is not supported and will result in a MoSync Panic.
 	*/
 	void maReadData(in MAHandle data, out MAAddress dst, in int offset, in int size);
+
 	/**
 	* Writes \a size bytes to a data object, starting at \a offset,
 	* from memory pointed to by \a src.
@@ -578,6 +599,7 @@ interface MAAPI {
 		int srcOffset;
 		int size;
 	}
+
 	/**
 	* Copies \a size bytes from data object \a src to \a dst, at the specified offsets.
 	*/
@@ -1868,6 +1890,7 @@ interface MAAPI {
 		UBIN = 5;
 		SKIP = 6;
 		LABEL = 9;
+		NIL = 10; // Placeholder that is not used.
 		FLUX = 127;
 	}
 
