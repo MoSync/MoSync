@@ -46,6 +46,12 @@ var mosync = (function()
         (navigator.userAgent.indexOf("Windows Phone OS") != -1)
             ? true : false;
 
+    // Logging.
+    mosync.log = function(message)
+    {
+        console.log("@@@ " + message);
+    };
+
     // The encoder submodule.
 
     mosync.encoder = (function()
