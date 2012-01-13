@@ -146,11 +146,13 @@ static String FileGetMimeType(const String& filePath)
 }
 
 /**
- * TODO: This wound work to get a directory name if
+ * TODO: This must work to get a directory name if
  * the path ends with a slash, e.g.: /sdcard/MyMusic/
  */
 static String FileGetName(const String& filePath)
 {
+	// TODO: Remove last slash if path ends with a slash.
+
 	// Find last slash.
 	int pos = filePath.findLastOf('/');
 	if (String::npos == pos)
@@ -529,7 +531,7 @@ static int FileCopyOrMove(
 	}
 
 	lprintfln(">>>>> FileMove 5");
-	// If this is a move operation, delete the soruce file.
+	// If this is a move operation, delete the source file.
 	if (move)
 	{
 		// TODO: Add error checking.
@@ -669,9 +671,17 @@ void PhoneGapFile::handleMessage(PhoneGapMessage& message)
 	{
 		actionTruncate(message);
 	}
+	else if (message.getParam("action") == "copyTo")
+	{
+		actionCopyToOrMoveTo(message, false);
+	}
 	else if (message.getParam("action") == "moveTo")
 	{
-		actionMoveTo(message);
+		actionCopyToOrMoveTo(message, true);
+	}
+	else if (message.getParam("action") == "remove")
+	{
+		actionRemove(message);
 	}
 }
 
@@ -939,7 +949,7 @@ void PhoneGapFile::actionTruncate(PhoneGapMessage& message)
 //I/maWriteLog(20616): @@@ URL: mosync://PhoneGap?service=File&action=moveTo&args={"fullPath":"/mnt/sdcard/hello2.txt","pa
 //rent":{"isFile":false,"isDirectory":true,"name":"sdcard","fullPath":"/mnt/sdcard","filesystem":null},"newName":"hello3.t
 //xt"}&PhoneGapCallBackId=File19
-void PhoneGapFile::actionMoveTo(PhoneGapMessage& message)
+void PhoneGapFile::actionCopyToOrMoveTo(PhoneGapMessage& message, bool move)
 {
 	lprintfln("@@@ actionMoveTo\n");
 
@@ -991,7 +1001,7 @@ void PhoneGapFile::actionMoveTo(PhoneGapMessage& message)
 	lprintfln(">>>>> movefile destinationName: %s", destinationName.c_str());
 	lprintfln(">>>>> movefile fullDestinationPath: %s", fullDestinationPath.c_str());
 
-	int result = FileCopyOrMove(sourcePath, fullDestinationPath, true);
+	int result = FileCopyOrMove(sourcePath, fullDestinationPath, move);
 	if (result < 0)
 	{
 		lprintfln(">>>>> movefile callFileError(callbackID, FILEERROR_NOT_FOUND_ERR);");
@@ -1003,6 +1013,31 @@ void PhoneGapFile::actionMoveTo(PhoneGapMessage& message)
 	String fileEntry = emitFileEntry(
 		destinationName,
 		fullDestinationPath);
+	callSuccess(
+		callbackID,
+		fileEntry,
+		"window.localFileSystem._castEntry");
+}
+
+void PhoneGapFile::actionRemove(PhoneGapMessage& message)
+{
+	lprintfln("@@@ actionRemove\n");
+
+	String callbackID = message.getParam("PhoneGapCallBackId");
+
+	String path = message.getArgsField("fullPath");
+
+	bool success = FileDelete(path);
+	if (!success)
+	{
+		callFileError(callbackID, FILEERROR_NOT_FOUND_ERR);
+		return;
+	}
+
+	// Send back FileEntry data.
+	String fileEntry = emitFileEntry(
+		FileGetName(path),
+		path);
 	callSuccess(
 		callbackID,
 		fileEntry,

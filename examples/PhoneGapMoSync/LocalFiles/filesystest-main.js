@@ -1,3 +1,9 @@
+// Test script for PhoneGap File API.
+
+function MyLog(s)
+{
+    mosync.log(s);
+}
 
 function PrintObject(obj, indent)
 {
@@ -12,7 +18,7 @@ function PrintObject(obj, indent)
     {
         if (typeof obj[field] != "function")
         {
-            console.log("  " + indent + "[" + field + ": " + obj[field] + "]");
+            MyLog("  " + indent + "[" + field + ": " + obj[field] + "]");
             if ((null != obj[field]) && (typeof obj[field] == "object"))
             {
                 PrintObject(obj[field], indent + "  ");
@@ -32,7 +38,7 @@ var FileSys = function()
     {
         return function(result)
         {
-            console.log("@@@ FileSys error: " + result.code);
+            MyLog("@@@ FileSys error: " + result.code);
             fun(false, null);
         };
     }
@@ -176,7 +182,7 @@ var FileSys = function()
             error(fun));
     };
 
-    FileSys.moveFile = function(path, newPath, fun)
+    FileSys.copyOrMoveFile = function(path, newPath, fun, move)
     {
         window.requestFileSystem(
             LocalFileSystem.PERSISTENT,
@@ -217,17 +223,65 @@ var FileSys = function()
                             parentDirectory.fullPath = newParentPath;
                             parentDirectory.name = directoryName;
 
-                            fileEntry.moveTo(
-                                parentDirectory,
-                                newFileName,
-                                function(result) { console.log("XXXXXXXXXXXXXXX"); PrintObject(result); fun(true); },
-                                error(fun));
+                            if (move)
+                            {
+                                fileEntry.moveTo(
+                                    parentDirectory,
+                                    newFileName,
+                                    function(result) {
+                                        MyLog("XXXXXXXXXXX MOVE");
+                                        PrintObject(result);
+                                        fun(true); },
+                                    error(fun));
+                            }
+                            else
+                            {
+                                fileEntry.copyTo(
+                                    parentDirectory,
+                                    newFileName,
+                                    function(fileEntry) {
+                                        MyLog("XXXXXXXXXXX COPY");
+                                        PrintObject(result);
+                                        fun(true, fileEntry); },
+                                    error(fun));
+                            }
                         },
                         error(fun));
-                console.log(
+                MyLog(
                     "================ FileSys.moveFile fileSystem.root.fullPath: " +
                     fileSystem.root.fullPath);
                 //PrintObject(fileSystem);
+            },
+            error(fun));
+    };
+
+    FileSys.copyFile = function(path, newPath, fun)
+    {
+        return FileSys.copyOrMoveFile(path, newPath, fun, false);
+    };
+
+    FileSys.moveFile = function(path, newPath, fun)
+    {
+        return FileSys.copyOrMoveFile(path, newPath, fun, true);
+    };
+
+    FileSys.removeFile = function(path, fun)
+    {
+        window.requestFileSystem(
+            LocalFileSystem.PERSISTENT,
+            0,
+            function (fileSystem)
+            {
+                fileSystem.root.getFile(
+                    path,
+                    { create: false },
+                    function(fileEntry)
+                    {
+                        fileEntry.remove(
+                            function(fileEntry) { fun(true, fileEntry); },
+                            error(fun));
+                    },
+                    error(fun));
             },
             error(fun));
     };
@@ -244,7 +298,7 @@ function testFileSystem()
 
     function fileWritten(success)
     {
-        console.log("@@@@@ FileWritten result: " + success);
+        MyLog("@@@@@ FileWritten result: " + success);
         if (success)
         {
             FileSys.readText("hello2.txt", fileRead);
@@ -253,8 +307,8 @@ function testFileSystem()
 
     function fileRead(success, data)
     {
-        console.log("@@@@@ FileRead result: " + success);
-        console.log("@@@@@ FileRead data: " + data);
+        MyLog("@@@@@ FileRead result: " + success);
+        MyLog("@@@@@ FileRead data: " + data);
 
         if (success)
         {
@@ -266,7 +320,7 @@ function testFileSystem()
 
     function fileWritten2(success, data)
     {
-        console.log("@@@@@ FileWritten2 result: " + success);
+        MyLog("@@@@@ FileWritten2 result: " + success);
 
         if (success)
         {
@@ -276,7 +330,7 @@ function testFileSystem()
 
     function fileTruncated(success, data)
     {
-        console.log("@@@@@ FileTruncated result: " + success);
+        MyLog("@@@@@ FileTruncated result: " + success);
 
         if (success)
         {
@@ -286,16 +340,16 @@ function testFileSystem()
 
     function fileReadAsDataURL(success, url)
     {
-        console.log("@@@@@ FileReadAsDataURL result: " + success);
+        MyLog("@@@@@ FileReadAsDataURL result: " + success);
 
         if (success)
         {
-            console.log("@@@@@ FileReadAsDataURL url: " + url);
+            MyLog("@@@@@ FileReadAsDataURL url: " + url);
             var i = url.indexOf(",");
             var data = url.substring(i + 1);
-            console.log("@@@@@ FileReadAsDataURL data: " + data);
+            MyLog("@@@@@ FileReadAsDataURL data: " + data);
             var decodedData = atob(data);
-            console.log("@@@@@ FileReadAsDataURL decodedData: " + decodedData);
+            MyLog("@@@@@ FileReadAsDataURL decodedData: " + decodedData);
 
             // Next test.
             FileSys.getMetaData("hello2.txt", fileMetaData);
@@ -304,8 +358,8 @@ function testFileSystem()
 
     function fileMetaData(success, metadata)
     {
-        console.log("@@@@@ FileMetaData success: " + success);
-        console.log("@@@@@ FileMetaData modificationTime: " + metadata.modificationTime);
+        MyLog("@@@@@ FileMetaData success: " + success);
+        MyLog("@@@@@ FileMetaData modificationTime: " + metadata.modificationTime);
 
         if (success)
         {
@@ -315,11 +369,31 @@ function testFileSystem()
 
     function fileMoved(success)
     {
-        console.log("@@@@@ FileMoved success: " + success);
+        MyLog("@@@@@ FileMoved success: " + success);
 
         if (success)
         {
+            FileSys.copyFile("hello3.txt", "hello4.txt", fileCopied);
+        }
+    }
 
+    function fileCopied(success)
+    {
+        MyLog("@@@@@ FileCopied success: " + success);
+
+        if (success)
+        {
+            FileSys.removeFile("hello4.txt", fileRemoved);
+        }
+    }
+
+    function fileRemoved(success)
+    {
+        MyLog("@@@@@ FileRemoved success: " + success);
+
+        if (success)
+        {
+            // TODO: Add next test.
         }
     }
 
@@ -328,45 +402,45 @@ function testFileSystem()
 }
 
 function XtestFileSystem() {
-    console.log("@@ Calling window.requestFileSystem");
+    MyLog("@@ Calling window.requestFileSystem");
     window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, gotFileSystem, filefail);
     //window.requestFileSystem(LocalFileSystem.TEMPORARY, 0, gotFileSystem, filefail);
 }
 
 function gotFileSystem(fileSystem)
 {
-    console.log("@@ gotFileSystem");
+    MyLog("@@ gotFileSystem");
     PrintObject(fileSystem);
-    console.log("@@ Calling fileSystem.root.getFile");
+    MyLog("@@ Calling fileSystem.root.getFile");
     fileSystem.root.getFile("helloworld.txt", {create: true}, gotOpenFileEntry, filefail);
 }
 
 function gotOpenFileEntry(fileEntry) {
     gFileEntry = fileEntry;
-    console.log("@@ gotOpenFileEntry");
-    console.log("@@ Calling fileEntry.createWriter");
+    MyLog("@@ gotOpenFileEntry");
+    MyLog("@@ Calling fileEntry.createWriter");
     fileEntry.createWriter(gotFileWriter, filefail);
 }
 
 function gotFileWriter(writer) {
-    console.log("@@ gotFileWriter");
+    MyLog("@@ gotFileWriter");
     writer.onwrite = function(obj) {
-        console.log("@@ writer.onwrite obj: " + obj);
+        MyLog("@@ writer.onwrite obj: " + obj);
         PrintObject(obj);
         readFileEntry(gFileEntry);
     };
     writer.error = function(obj) {
-        console.log("@@ writer.error");
+        MyLog("@@ writer.error");
         PrintObject(obj);
     };
     writer.write("Hello World");
-    console.log("@@ writer.write called");
+    MyLog("@@ writer.write called");
 }
 
 function readFileEntry(fileEntry)
 {
-    console.log("@@ readFileEntry");
-    console.log("@@ Calling fileEntry.file");
+    MyLog("@@ readFileEntry");
+    MyLog("@@ Calling fileEntry.file");
     fileEntry.file(function(file)
     {
         readAsText(file);
@@ -375,41 +449,41 @@ function readFileEntry(fileEntry)
 }
 
 function readAsText(file) {
-    console.log("@@ readAsText");
+    MyLog("@@ readAsText");
     var reader = new FileReader();
     reader.onload = function(obj)
     {
-        console.log("@@ reader.onload");
+        MyLog("@@ reader.onload");
         PrintObject(obj);
     };
     reader.onerror = function(obj)
     {
-        console.log("@@ reader.onerror");
+        MyLog("@@ reader.onerror");
         PrintObject(obj);
     };
-    console.log("@@ Calling reader.readAsText");
+    MyLog("@@ Calling reader.readAsText");
     reader.readAsText(file);
 }
 
 function readFile(file){
-    console.log("@@ readFile");
+    MyLog("@@ readFile");
     readDataUrl(file);
     readAsText(file);
 }
 
 function readDataUrl(file) {
-    console.log("@@ readDataUrl");
+    MyLog("@@ readDataUrl");
     var reader = new FileReader();
     reader.onloadend = function(evt) {
-        console.log("Read as data URL");
-        console.log(evt.target.result);
+        MyLog("Read as data URL");
+        MyLog(evt.target.result);
     };
     reader.readAsDataURL(file);
 }
 
 
 function filefail(error) {
-    console.log("@@ filefail code: " + error.code);
+    MyLog("@@ filefail code: " + error.code);
 }
 
 // ---------------------------------------------------------------
@@ -480,7 +554,7 @@ var preventBehavior = function(e) {
 
 function dump_pic(data) {
     var viewport = document.getElementById('viewport');
-    console.log(data);
+    MyLog(data);
     viewport.style.display = "";
     viewport.style.position = "absolute";
     viewport.style.top = "10px";

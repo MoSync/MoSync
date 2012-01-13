@@ -112,7 +112,9 @@ public:
 
 	void actionTruncate(PhoneGapMessage& message);
 
-	void actionMoveTo(PhoneGapMessage& message);
+	void actionCopyToOrMoveTo(PhoneGapMessage& message, bool move);
+
+	void actionRemove(PhoneGapMessage& message);
 
 private:
 	PhoneGapMessageHandler* mMessageHandler;
