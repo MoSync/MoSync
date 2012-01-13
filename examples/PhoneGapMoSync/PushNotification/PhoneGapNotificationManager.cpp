@@ -35,9 +35,10 @@ MA 02110-1301, USA.
 #include <Notification/NotificationManager.h>
 #include <Notification/PushNotification.h>
 
-#include "PhoneGapMessage.h"
-#include "PhoneGapMessageHandler.h"
+#include "../PhoneGapMessage.h"
+#include "../PhoneGapMessageHandler.h"
 #include "PhoneGapNotificationManager.h"
+#include "Util.h"
 
 using namespace MAUtil;
 using namespace Notification;
@@ -47,9 +48,19 @@ using namespace Notification;
  */
 PhoneGapNotificationManager::PhoneGapNotificationManager(
 	PhoneGapMessageHandler* messageHandler) :
-		mMessageHandler(messageHandler)
+		mMessageHandler(messageHandler),
+		mConnection(NULL)
 {
 	NotificationManager::getInstance()->addPushNotificationListener(this);
+	mConnection = new TCPConnection();
+	if (isIOS())
+	{
+		mConnection->connect(IOS_SERVER_IP, IOS_SERVER_PORT);
+	}
+	else if (isAndroid())
+	{
+		mConnection->connect(ANDROID_SERVER_IP, ANDROID_SERVER_PORT);
+	}
 }
 
 /**
@@ -77,7 +88,7 @@ void PhoneGapNotificationManager::handleMessage(PhoneGapMessage& message)
 		else if (message.getParam("action") == "accountID")
 		{
 			printf("PhoneGapNotificationManager::handleMessage set accountID");
-			mAccountID = message.getParam("args");
+			mAccountID = this->parseJSString(message.getParam("args"));
 		}
 		else if (message.getParam("action") == "register")
 		{
@@ -156,6 +167,9 @@ void PhoneGapNotificationManager::didApplicationRegistered(MAUtil::String& token
 		mRegistrationCallBack,
 		PHONEGAP_CALLBACK_STATUS_OK,
 		tokenJSONString.c_str());
+
+	// Send the token to the server.
+	mConnection->sendData(token);
 }
 
 /**
@@ -239,4 +253,37 @@ void PhoneGapNotificationManager::setPushNotificationTypes(
 			PHONEGAP_CALLBACK_STATUS_ERROR,
 			INVALID_TYPES_PARAM);
 	}
+}
+
+/**
+ * Remove the quotation marks from the begging and ending of a given string.
+ * For example if the given string is "myString" the returned string will
+ * be myString.
+ * @param string String to be parsed.
+ * @return The parsed string.
+ */
+MAUtil::String PhoneGapNotificationManager::parseJSString(
+	const MAUtil::String& string)
+{
+	MAUtil::String returnedString(string);
+	if (returnedString.length() > 0)
+	{
+		char firstChar = returnedString[0];
+		if (firstChar == '\"')
+		{
+			returnedString.remove(0, 1);
+		}
+	}
+
+	if (returnedString.length() > 0)
+	{
+		int lastCharIndex = returnedString.length() - 1;
+		char lastChar = returnedString[lastCharIndex];
+		if (lastChar == '\"')
+		{
+			returnedString.remove(lastCharIndex, 1);
+		}
+	}
+
+	return returnedString;
 }

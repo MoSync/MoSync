@@ -28,7 +28,7 @@ MA 02110-1301, USA.
 #include <conprint.h>
 #include "PhoneGapMessageHandler.h"
 #include "MAHeaders.h"
-#include "PhoneGapNotificationManager.h"
+#include "PushNotification/PhoneGapNotificationManager.h"
 
 // NameSpaces we want to access.
 using namespace MAUtil; // Class Moblet, String
