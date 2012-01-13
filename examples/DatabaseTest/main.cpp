@@ -54,11 +54,9 @@ class DBUtil
 public:
 	/**
 	 * Get the path to the local file system.
-	 * @param path Reference to string that will
-	 * receive the path. The path ends with a slash.
-	 * @return true on success, false on error.
+	 * @return Path that ends with a slash.
 	 */
-	static bool getLocalPath(String& path)
+	static String getLocalPath()
 	{
 		int bufferSize = 1024;
 		char buffer[bufferSize];
@@ -68,18 +66,13 @@ public:
 			buffer,
 			bufferSize);
 
-		// Check if there was an error.
+		// If there was an error, return default root path.
 		if (size < 0 || size > bufferSize)
 		{
-			// Error.
-			return false;
+			return "/";
 		}
-		else
-		{
-			// Success
-			path = buffer;
-			return true;
-		}
+
+		return buffer;
 	}
 
 	/**
@@ -192,9 +185,7 @@ public:
 		// Open the database. It will be created if it does not exist.
 		// The database will be created in the local directory of the
 		// application.
-		MAUtil::String path;
-		bool success = DBUtil::getLocalPath(path);
-		SHOULD_HOLD(success, "getLocalPath failed");
+		MAUtil::String path = DBUtil::getLocalPath();
 		path += "PetsDatabase";
 		printf("Database path:\n  %s\n", path.c_str());
 		MAHandle db = maDBOpen(path.c_str());

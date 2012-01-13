@@ -18,6 +18,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 /** Copyright (c) Mobile Sorcery AB 2005-2006 **/
 
 #include "File.h"
+#include <string>
 #include <list>
 #include "filelist/filelist.h"
 
@@ -117,4 +118,12 @@ std::list<File> File::listFiles ( void )
 	g_fileList = NULL;
 
 	return l;
+}
+
+String getExtension(String filename) {
+	int ix = filename.find_last_of('.');
+	if (ix != String::npos) {
+		return filename.substr(ix + 1, filename.length() - ix - 1);
+	}
+	return String();
 }

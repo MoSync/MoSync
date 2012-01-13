@@ -19,23 +19,25 @@ package com.mosync.internal.android;
 
 import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_WIDGET;
 
+import android.util.Log;
+
 import com.mosync.internal.generated.IX_WIDGET;
 
 /**
  * Class that handles posting of events to the MoSync
  * event queue.
- * 
+ *
  * TODO: Move posting of other event types here.
  */
 public class EventQueue
 {
 	public static MoSyncThread sMoSyncThread;
-	
-	private static EventQueue DEFAULT = new EventQueue( );	
+
+	private static EventQueue DEFAULT = new EventQueue( );
 
 	/**
 	 * Post a widget event.
-	 * 
+	 *
 	 * @param widgetEventType The type of the widget event.
 	 * @param widgetHandle The handle of the widget.
 	 * @param auxParam1 Parameter used by some (used by some
@@ -52,13 +54,12 @@ public class EventQueue
 		int auxParam2)
 	{
 		int event[] = new int[5];
-		
+
 		event[0] = EVENT_TYPE_WIDGET;
 		event[1] = widgetEventType;
 		event[2] = widgetHandle;
 		event[3] = auxParam1;
 		event[4] = auxParam2;
-		
 		sMoSyncThread.postEvent(event);
 	}
 
@@ -76,7 +77,7 @@ public class EventQueue
 
 	/**
 	 * Posts a widget clicked event.
-	 * 
+	 *
 	 * @param widgetHandle The widget that was clicked.
 	 * @param checked If a checkbox or toggle button was clicked, this determines if it is checked or not.
 	 */
@@ -91,7 +92,7 @@ public class EventQueue
 
 	/**
 	 * Posts an event that describes which item in a list that was clicked.
-	 * 
+	 *
 	 * @param widgetHandle The list that sends the event.
 	 * @param position The position in the list of the view.
 	 */
@@ -106,7 +107,7 @@ public class EventQueue
 
 	/**
 	 * Sends a tab changed event from the given tabScreen.
-	 * 
+	 *
 	 * @param tabScreen The tab screen that sends the event.
 	 * @param newTabIndex The index of the new tab.
 	 */
@@ -118,11 +119,11 @@ public class EventQueue
 			newTabIndex,
 			0);
 	}
-	
+
 	/**
 	 * Posts an event from a stack screen has been popped, and a handle to the
 	 * screen that was popped.
-	 * 
+	 *
 	 * @param stackScreenHandle The stack screen that has been popped.
 	 * @param poppedFromScreenHandle The screen that was popped from.
 	 * @param poppedToScreenHandle The next screen that will be shown.
