@@ -1118,6 +1118,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\..\base\ResourceArray.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\..\base\ResourceArray.h"
 					>
 				</File>

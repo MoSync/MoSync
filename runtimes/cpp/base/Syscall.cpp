@@ -699,6 +699,17 @@ namespace Base {
 		return (MAHandle) SYSCALL_THIS->resources.create_RT_PLACEHOLDER();
 	}
 
+	SYSCALL(void, maDestroyPlaceholder(MAHandle handle)) {
+		// If this is an existing dynamically allocated object,
+		// we destroy the object.
+		if (SYSCALL_THIS->resources.isDynamicResource(handle)) {
+			maDestroyObject(handle);
+		}
+
+		// Destroy (free) the placeholder.
+		SYSCALL_THIS->resources._maDestroyPlaceholder(handle);
+	}
+
 	SYSCALL(void, maDestroyObject(MAHandle handle)) {
 #ifdef _android
 		// On Android, we call into the Java side to

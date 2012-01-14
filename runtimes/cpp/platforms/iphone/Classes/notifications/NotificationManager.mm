@@ -668,7 +668,7 @@ static NotificationManager *sharedInstance = nil;
     {
         messageString = mDeviceToken;
     }
-    else if (!mRegistrationError)
+    else if (mRegistrationError)
     {
         messageString = mRegistrationError;
         result = MA_NOTIFICATION_RES_ERROR;
