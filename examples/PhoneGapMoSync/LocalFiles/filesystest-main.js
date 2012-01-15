@@ -1,3 +1,9 @@
+// Test script for PhoneGap File API.
+
+function MyLog(s)
+{
+    mosync.log(s);
+}
 
 function PrintObject(obj, indent)
 {
@@ -12,7 +18,7 @@ function PrintObject(obj, indent)
     {
         if (typeof obj[field] != "function")
         {
-            console.log("  " + indent + "[" + field + ": " + obj[field] + "]");
+            MyLog("  " + indent + "[" + field + ": " + obj[field] + "]");
             if ((null != obj[field]) && (typeof obj[field] == "object"))
             {
                 PrintObject(obj[field], indent + "  ");
@@ -23,7 +29,7 @@ function PrintObject(obj, indent)
 
 var FileSys = function()
 {
-    var self = {};
+    var FileSys = {};
 
     /**
      * Make an error handling function that calls fun.
@@ -32,12 +38,17 @@ var FileSys = function()
     {
         return function(result)
         {
-            console.log("@@@ FileSys error: " + result.code);
+            MyLog("@@@ FileSys error: " + result.code);
             fun(false, null);
         };
     }
 
-    self.writeText = function(path, data, fun)
+    FileSys.writeText = function(path, data, fun)
+    {
+        FileSys.writeTextAtPosition(path, data, 0, fun);
+    };
+
+    FileSys.writeTextAtPosition = function(path, data, position, fun)
     {
         window.requestFileSystem(
             LocalFileSystem.PERSISTENT,
@@ -58,6 +69,7 @@ var FileSys = function()
                         {
                             fun(false);
                         };
+                        writer.seek(position);
                         writer.write(data);
                     },
                     error(fun));
@@ -65,7 +77,7 @@ var FileSys = function()
             error(fun));
     };
 
-    self.readText = function(path, fun)
+    FileSys.readText = function(path, fun)
     {
         window.requestFileSystem(
             LocalFileSystem.PERSISTENT,
@@ -93,14 +105,200 @@ var FileSys = function()
             error(fun));
     };
 
-    return self;
+    FileSys.readAsDataURL = function(path, fun)
+    {
+        window.requestFileSystem(
+            LocalFileSystem.PERSISTENT,
+            0,
+            function (fileSystem)
+            {
+                fileSystem.root.getFile(
+                    path,
+                    { create: true },
+                    function(fileEntry)
+                    {
+                        var reader = new FileReader();
+                        reader.onload = function(obj)
+                        {
+                            fun(true, obj.target.result);
+                        };
+                        reader.onerror = function(obj)
+                        {
+                             fun(false, null);
+                        };
+                        reader.readAsDataURL(fileEntry);
+                    },
+                    error(fun));
+            },
+            error(fun));
+    };
+
+    FileSys.truncate = function(path, size, fun)
+    {
+        window.requestFileSystem(
+            LocalFileSystem.PERSISTENT,
+            0,
+            function (fileSystem)
+            {
+                fileSystem.root.getFile(
+                    path,
+                    { create: true },
+                    function(fileEntry)
+                    {
+                        var writer = new FileWriter(fileEntry);
+                        writer.onwrite = function(obj)
+                        {
+                            fun(true);
+                        };
+                        writer.error = function(obj)
+                        {
+                            fun(false);
+                        };
+                        writer.truncate(size);
+                    },
+                    error(fun));
+            },
+            error(fun));
+    };
+
+    FileSys.getMetaData = function(path, fun)
+    {
+        window.requestFileSystem(
+            LocalFileSystem.PERSISTENT,
+            0,
+            function (fileSystem)
+            {
+                fileSystem.root.getFile(
+                    path,
+                    { create: false },
+                    function(fileEntry)
+                    {
+                        fileEntry.getMetadata(
+                            function(metadata) { fun(true, metadata); },
+                            error(fun));
+                    },
+                    error(fun));
+            },
+            error(fun));
+    };
+
+    FileSys.copyOrMoveFile = function(path, newPath, fun, move)
+    {
+        window.requestFileSystem(
+            LocalFileSystem.PERSISTENT,
+            0,
+            function (fileSystem)
+            {
+                fileSystem.root.getFile(
+                        path,
+                        { create: false },
+                        function(fileEntry)
+                        {
+                            // Default values if this is a file at the root
+                            // of the local file system.
+                            var newParentPath = fileSystem.root.fullPath;
+                            var newFileName = newPath;
+
+                            // The new full path name.
+                            var newFullPath = fileSystem.root.fullPath + "/" + newPath;
+
+                            // Split into parent path and file name if the file
+                            // is is not at the root of the local file system.
+                            var index = newFullPath.lastIndexOf("/");
+                            if (index > -1)
+                            {
+                                newParentPath = newFullPath.substring(0, index);
+                                newFileName = newFullPath.substring(index + 1);
+                            }
+
+                            // Find directory name.
+                            var directoryName = "";
+                            index = newParentPath.lastIndexOf("/");
+                            if (index > -1)
+                            {
+                                directoryName = newParentPath.substring(index + 1);
+                            }
+
+                            parentDirectory = new DirectoryEntry();
+                            parentDirectory.fullPath = newParentPath;
+                            parentDirectory.name = directoryName;
+
+                            if (move)
+                            {
+                                fileEntry.moveTo(
+                                    parentDirectory,
+                                    newFileName,
+                                    function(result) {
+                                        MyLog("XXXXXXXXXXX MOVE");
+                                        PrintObject(result);
+                                        fun(true); },
+                                    error(fun));
+                            }
+                            else
+                            {
+                                fileEntry.copyTo(
+                                    parentDirectory,
+                                    newFileName,
+                                    function(fileEntry) {
+                                        MyLog("XXXXXXXXXXX COPY");
+                                        PrintObject(result);
+                                        fun(true, fileEntry); },
+                                    error(fun));
+                            }
+                        },
+                        error(fun));
+                MyLog(
+                    "================ FileSys.moveFile fileSystem.root.fullPath: " +
+                    fileSystem.root.fullPath);
+                //PrintObject(fileSystem);
+            },
+            error(fun));
+    };
+
+    FileSys.copyFile = function(path, newPath, fun)
+    {
+        return FileSys.copyOrMoveFile(path, newPath, fun, false);
+    };
+
+    FileSys.moveFile = function(path, newPath, fun)
+    {
+        return FileSys.copyOrMoveFile(path, newPath, fun, true);
+    };
+
+    FileSys.removeFile = function(path, fun)
+    {
+        window.requestFileSystem(
+            LocalFileSystem.PERSISTENT,
+            0,
+            function (fileSystem)
+            {
+                fileSystem.root.getFile(
+                    path,
+                    { create: false },
+                    function(fileEntry)
+                    {
+                        fileEntry.remove(
+                            function(fileEntry) { fun(true, fileEntry); },
+                            error(fun));
+                    },
+                    error(fun));
+            },
+            error(fun));
+    };
+
+    return FileSys;
 }();
 
 function testFileSystem()
 {
+    function writeFile()
+    {
+        FileSys.writeText("hello2.txt", "Hello\nWonderful\nWorld!", fileWritten);
+    }
+
     function fileWritten(success)
     {
-        console.log("@@@@@ FileWritten result: " + success);
+        MyLog("@@@@@ FileWritten result: " + success);
         if (success)
         {
             FileSys.readText("hello2.txt", fileRead);
@@ -109,63 +307,140 @@ function testFileSystem()
 
     function fileRead(success, data)
     {
-        console.log("@@@@@ FileRead result: " + success);
-        console.log("@@@@@ FileRead data: " + data);
+        MyLog("@@@@@ FileRead result: " + success);
+        MyLog("@@@@@ FileRead data: " + data);
+
+        if (success)
+        {
+            // This does not work, since seek does not work. Skip for now.
+            // FileSys.writeTextAtPosition("hello2.txt", "Micke", 5, fileWritten2);
+            FileSys.truncate("hello2.txt", 10, fileTruncated);
+        }
     }
 
-    FileSys.writeText("hello2.txt", "Hello\nWonderful\nWorld!", fileWritten);
-}
-
-function foo()
-{
-    function bar()
+    function fileWritten2(success, data)
     {
-        return 44;
+        MyLog("@@@@@ FileWritten2 result: " + success);
+
+        if (success)
+        {
+            FileSys.truncate("hello2.txt", 10, fileTruncated);
+        }
     }
 
-    return bar();
+    function fileTruncated(success, data)
+    {
+        MyLog("@@@@@ FileTruncated result: " + success);
+
+        if (success)
+        {
+            FileSys.readAsDataURL("hello2.txt", fileReadAsDataURL);
+        }
+    }
+
+    function fileReadAsDataURL(success, url)
+    {
+        MyLog("@@@@@ FileReadAsDataURL result: " + success);
+
+        if (success)
+        {
+            MyLog("@@@@@ FileReadAsDataURL url: " + url);
+            var i = url.indexOf(",");
+            var data = url.substring(i + 1);
+            MyLog("@@@@@ FileReadAsDataURL data: " + data);
+            var decodedData = atob(data);
+            MyLog("@@@@@ FileReadAsDataURL decodedData: " + decodedData);
+
+            // Next test.
+            FileSys.getMetaData("hello2.txt", fileMetaData);
+        }
+    }
+
+    function fileMetaData(success, metadata)
+    {
+        MyLog("@@@@@ FileMetaData success: " + success);
+        MyLog("@@@@@ FileMetaData modificationTime: " + metadata.modificationTime);
+
+        if (success)
+        {
+            FileSys.moveFile("hello2.txt", "hello3.txt", fileMoved);
+        }
+    }
+
+    function fileMoved(success)
+    {
+        MyLog("@@@@@ FileMoved success: " + success);
+
+        if (success)
+        {
+            FileSys.copyFile("hello3.txt", "hello4.txt", fileCopied);
+        }
+    }
+
+    function fileCopied(success)
+    {
+        MyLog("@@@@@ FileCopied success: " + success);
+
+        if (success)
+        {
+            FileSys.removeFile("hello4.txt", fileRemoved);
+        }
+    }
+
+    function fileRemoved(success)
+    {
+        MyLog("@@@@@ FileRemoved success: " + success);
+
+        if (success)
+        {
+            // TODO: Add next test.
+        }
+    }
+
+    // Start first test.
+    writeFile();
 }
 
 function XtestFileSystem() {
-    console.log("@@ Calling window.requestFileSystem");
+    MyLog("@@ Calling window.requestFileSystem");
     window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, gotFileSystem, filefail);
     //window.requestFileSystem(LocalFileSystem.TEMPORARY, 0, gotFileSystem, filefail);
 }
 
 function gotFileSystem(fileSystem)
 {
-    console.log("@@ gotFileSystem");
+    MyLog("@@ gotFileSystem");
     PrintObject(fileSystem);
-    console.log("@@ Calling fileSystem.root.getFile");
+    MyLog("@@ Calling fileSystem.root.getFile");
     fileSystem.root.getFile("helloworld.txt", {create: true}, gotOpenFileEntry, filefail);
 }
 
 function gotOpenFileEntry(fileEntry) {
     gFileEntry = fileEntry;
-    console.log("@@ gotOpenFileEntry");
-    console.log("@@ Calling fileEntry.createWriter");
+    MyLog("@@ gotOpenFileEntry");
+    MyLog("@@ Calling fileEntry.createWriter");
     fileEntry.createWriter(gotFileWriter, filefail);
 }
 
 function gotFileWriter(writer) {
-    console.log("@@ gotFileWriter");
+    MyLog("@@ gotFileWriter");
     writer.onwrite = function(obj) {
-        console.log("@@ writer.onwrite obj: " + obj);
+        MyLog("@@ writer.onwrite obj: " + obj);
         PrintObject(obj);
         readFileEntry(gFileEntry);
     };
     writer.error = function(obj) {
-        console.log("@@ writer.error");
+        MyLog("@@ writer.error");
         PrintObject(obj);
     };
     writer.write("Hello World");
-    console.log("@@ writer.write called");
+    MyLog("@@ writer.write called");
 }
 
 function readFileEntry(fileEntry)
 {
-    console.log("@@ readFileEntry");
-    console.log("@@ Calling fileEntry.file");
+    MyLog("@@ readFileEntry");
+    MyLog("@@ Calling fileEntry.file");
     fileEntry.file(function(file)
     {
         readAsText(file);
@@ -174,41 +449,41 @@ function readFileEntry(fileEntry)
 }
 
 function readAsText(file) {
-    console.log("@@ readAsText");
+    MyLog("@@ readAsText");
     var reader = new FileReader();
     reader.onload = function(obj)
     {
-        console.log("@@ reader.onload");
+        MyLog("@@ reader.onload");
         PrintObject(obj);
     };
     reader.onerror = function(obj)
     {
-        console.log("@@ reader.onerror");
+        MyLog("@@ reader.onerror");
         PrintObject(obj);
     };
-    console.log("@@ Calling reader.readAsText");
+    MyLog("@@ Calling reader.readAsText");
     reader.readAsText(file);
 }
 
 function readFile(file){
-    console.log("@@ readFile");
+    MyLog("@@ readFile");
     readDataUrl(file);
     readAsText(file);
 }
 
 function readDataUrl(file) {
-    console.log("@@ readDataUrl");
+    MyLog("@@ readDataUrl");
     var reader = new FileReader();
     reader.onloadend = function(evt) {
-        console.log("Read as data URL");
-        console.log(evt.target.result);
+        MyLog("Read as data URL");
+        MyLog(evt.target.result);
     };
     reader.readAsDataURL(file);
 }
 
 
 function filefail(error) {
-    console.log("@@ filefail code: " + error.code);
+    MyLog("@@ filefail code: " + error.code);
 }
 
 // ---------------------------------------------------------------
@@ -279,7 +554,7 @@ var preventBehavior = function(e) {
 
 function dump_pic(data) {
     var viewport = document.getElementById('viewport');
-    console.log(data);
+    MyLog(data);
     viewport.style.display = "";
     viewport.style.position = "absolute";
     viewport.style.top = "10px";
