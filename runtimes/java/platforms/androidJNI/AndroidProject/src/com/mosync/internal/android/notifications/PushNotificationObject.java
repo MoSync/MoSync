@@ -23,7 +23,6 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 
-import com.google.android.c2dm.C2DMBaseReceiver;
 import com.mosync.java.android.C2DMReceiver;
 import com.mosync.java.android.MoSync;
 

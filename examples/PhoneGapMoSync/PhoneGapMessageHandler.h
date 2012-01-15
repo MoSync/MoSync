@@ -46,6 +46,9 @@ MA 02110-1301, USA.
 #define PHONEGAP_CALLBACK_STATUS_JSON_EXCEPTION "8"
 #define PHONEGAP_CALLBACK_STATUS_ERROR "9"
 
+// Forward declarations
+class PhoneGapNotificationManager;
+
 /**
  * Class that implements JavaScript calls.
  *
@@ -122,6 +125,12 @@ public:
 	 * @param callbackID ID of the PhoneGapCallback to be used
 	 */
 	void sendDeviceProperties(MAUtil::String callbackID);
+
+	/**
+	 * processes the Key Events and sends the appropriate message to
+	 * PhoneGap
+	 */
+	void processKeyEvent(int keyCode, int NativeCode);
 
 	/**
 	 * Call the PhoneGap success function.
@@ -216,6 +225,11 @@ private:
 	 * Controls where each sensor event is delivered.
 	 */
 	bool mSensorEventToManager[MAXIMUM_SENSORS];
+
+	/**
+	 * PhoneGap Notification API's message handler.
+	 */
+	PhoneGapNotificationManager* mPhoneGapNotificationManager;
 };
 
 #endif

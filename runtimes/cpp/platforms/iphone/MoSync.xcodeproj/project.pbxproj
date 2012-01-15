@@ -24,6 +24,7 @@
 		288765A50DF7441C002DB57D /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 288765A40DF7441C002DB57D /* CoreGraphics.framework */; };
 		29B46B3D1407FAA5009491A6 /* PimContactItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B46B3B1407FAA5009491A6 /* PimContactItem.m */; };
 		29B46B3E1407FAA5009491A6 /* PimContactsList.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B46B3C1407FAA5009491A6 /* PimContactsList.m */; };
+		4140734414C34EB80006D18C /* ResourceArray.h in Headers */ = {isa = PBXBuildFile; fileRef = 85BF2B551134052300BB0201 /* ResourceArray.h */; };
 		4142402614766C03006977A1 /* MoSyncDB.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4142402414766C03006977A1 /* MoSyncDB.cpp */; };
 		4142402714766C03006977A1 /* MoSyncDB.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4142402414766C03006977A1 /* MoSyncDB.cpp */; };
 		4142402814766C03006977A1 /* MoSyncDB.h in Headers */ = {isa = PBXBuildFile; fileRef = 4142402514766C03006977A1 /* MoSyncDB.h */; };
@@ -32,6 +33,9 @@
 		418047B8147E8B6A0048FB95 /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = 418047B5147E8B6A0048FB95 /* Reachability.m */; };
 		41804802147E91050048FB95 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 41804801147E91050048FB95 /* SystemConfiguration.framework */; };
 		4192E7B813F5801900C10302 /* CameraConfirgurator.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4192E7B713F5801900C10302 /* CameraConfirgurator.mm */; };
+		41B4F2B214C34EF000D087F1 /* Capture.h in Headers */ = {isa = PBXBuildFile; fileRef = 41B4F2B014C34EF000D087F1 /* Capture.h */; };
+		41B4F2B314C34EF000D087F1 /* Capture.mm in Sources */ = {isa = PBXBuildFile; fileRef = 41B4F2B114C34EF000D087F1 /* Capture.mm */; };
+		41B4F2B414C34EF000D087F1 /* Capture.mm in Sources */ = {isa = PBXBuildFile; fileRef = 41B4F2B114C34EF000D087F1 /* Capture.mm */; };
 		41BD2ED114768C40005ADEB9 /* AudioSyscall.mm in Sources */ = {isa = PBXBuildFile; fileRef = E4D36EA71459AC5B00477B1E /* AudioSyscall.mm */; };
 		41BD2ED214768C47005ADEB9 /* AudioSyscall.h in Headers */ = {isa = PBXBuildFile; fileRef = E4D36EA61459AC5B00477B1E /* AudioSyscall.h */; };
 		41BD2ED314768C4D005ADEB9 /* AudioData.mm in Sources */ = {isa = PBXBuildFile; fileRef = E4D36EA51459AC5B00477B1E /* AudioData.mm */; };
@@ -346,6 +350,8 @@
 		41804801147E91050048FB95 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		4192E7B613F5801900C10302 /* CameraConfirgurator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CameraConfirgurator.h; sourceTree = "<group>"; };
 		4192E7B713F5801900C10302 /* CameraConfirgurator.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = CameraConfirgurator.mm; sourceTree = "<group>"; };
+		41B4F2B014C34EF000D087F1 /* Capture.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Capture.h; sourceTree = "<group>"; };
+		41B4F2B114C34EF000D087F1 /* Capture.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = Capture.mm; sourceTree = "<group>"; };
 		41EB03E3146A69BF0088E3A4 /* libsqlite3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsqlite3.dylib; path = /usr/lib/libsqlite3.dylib; sourceTree = "<absolute>"; };
 		4318696E13F68D410051D97A /* PimContactItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PimContactItem.h; sourceTree = "<group>"; };
 		4318697013F68D410051D97A /* PimContactsList.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PimContactsList.h; sourceTree = "<group>"; };
@@ -645,6 +651,7 @@
 				85BF2B0C1134036D00BB0201 /* impl */,
 				43B16FE6147BF9AA00B6BB8A /* utils */,
 				1D3623240D0F684500981E51 /* MoSyncAppDelegate.h */,
+				41B4F2AF14C34EF000D087F1 /* capture */,
 				1D3623250D0F684500981E51 /* MoSyncAppDelegate.mm */,
 				28D7ACF60DDB3853001CB0EB /* MoSyncViewController.h */,
 				8558307E11C79B030008FDC1 /* MoSyncViewController.mm */,
@@ -739,6 +746,15 @@
 				0B10E8D114064DDB00B6DA6B /* MessageUI.framework */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		41B4F2AF14C34EF000D087F1 /* capture */ = {
+			isa = PBXGroup;
+			children = (
+				41B4F2B014C34EF000D087F1 /* Capture.h */,
+				41B4F2B114C34EF000D087F1 /* Capture.mm */,
+			);
+			path = capture;
 			sourceTree = "<group>";
 		};
 		4318696C13F68D410051D97A /* pim */ = {
@@ -1167,6 +1183,8 @@
 				41BD2ED514768C5D005ADEB9 /* AudioInstance.h in Headers */,
 				418047B7147E8B6A0048FB95 /* Reachability.h in Headers */,
 				43B16FEA147BF9FC00B6BB8A /* NSStringExpanded.h in Headers */,
+				4140734414C34EB80006D18C /* ResourceArray.h in Headers */,
+				41B4F2B214C34EF000D087F1 /* Capture.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1379,6 +1397,7 @@
 				85407553149F9E62001B14C0 /* MoSync.mm in Sources */,
 				85407554149F9E62001B14C0 /* MoSyncExtension.mm in Sources */,
 				E413FAB814C0604D00BF1E3D /* ResourceArray.cpp in Sources */,
+				41B4F2B314C34EF000D087F1 /* Capture.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1481,6 +1500,7 @@
 				41BD2ED614768C63005ADEB9 /* AudioInstance.mm in Sources */,
 				418047B8147E8B6A0048FB95 /* Reachability.m in Sources */,
 				43B16FEC147BF9FC00B6BB8A /* NSStringExpanded.mm in Sources */,
+				41B4F2B414C34EF000D087F1 /* Capture.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

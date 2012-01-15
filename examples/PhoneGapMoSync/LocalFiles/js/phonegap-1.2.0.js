@@ -103,8 +103,8 @@ PhoneGap.exec = function(success, fail, service, action, args)
     bridge.PhoneGap.send(callbackId, service, action, JSON.stringify(args));
 };
 
-// MOSYNC: We currently do not call this function, but call
-// PhoneGap.CallbackSuccess and PhoneGap.CallbackError from C++.
+// MOSYNC: We currently only call this function for key, pause and resume events
+//We call PhoneGap.CallbackSuccess and PhoneGap.CallbackError directly  from C++.
 PhoneGapCommandResult = function(status,callbackId,args,cast)
 {
     if(status === "backbutton") {
