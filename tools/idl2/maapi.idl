@@ -4222,9 +4222,9 @@ group WidgetAPI "Widget API" {
 				* @brief The handle to url data. This is string data,
 				* there is NO null terminating character. The encoding
 				* of the data is determined by the application.
-				* The data MUST be deallocated with maDestroyObject after
-				* it hs been used. Each event allocates a new data object
-				* for the url data.
+				* The data object MUST be deallocated with maDestroyPlaceholder
+				* after it has been used, since each event allocates a new data
+				* object for the url data (which could end up consuming all memory).
 				*/
 				MAHandle urlData;
 			} webViewHookInfo;
@@ -4429,7 +4429,7 @@ group WidgetAPI "Widget API" {
 		*
 		* NOTE: When you get this message you have ownership
 		* of the url data handle and you have the responsibility to
-		* deallocate it using maDestroyObject.
+		* deallocate it using maDestroyPlaceholder.
 		*
 		* To get this event, you need to register a hook pattern, using
 		* maWidgetSetProperty with the properties #MAW_WEB_VIEW_SOFT_HOOK
@@ -6307,8 +6307,8 @@ group WidgetAPI "Widget API" {
 		*
 		* Note that when receiving event #MAW_EVENT_WEB_VIEW_HOOK_INVOKED
 		* you MUST deallocate the urlData handle of the event by calling
-		* maDestroyObject on the handle. Destory the handle when you are done
-		* reading the url data, to avoid that memory will get used up.
+		* maDestroyPlaceholder on the handle. Destory the handle when you are
+		* done reading the url data, to avoid that memory will get used up.
 		*
 		* The pattern is a url pattern specified using regular expression
 		* syntax, according to the ICU regular expression standard, using
@@ -6367,8 +6367,8 @@ group WidgetAPI "Widget API" {
 		*
 		* Note that when receiving event #MAW_EVENT_WEB_VIEW_HOOK_INVOKED
 		* you MUST deallocate the urlData handle of the event by calling
-		* maDestroyObject on the handle. Destory the handle when you are done
-		* reading the url data, to avoid that memory will get used up.
+		* maDestroyPlaceholder on the handle. Destory the handle when you are
+		* done reading the url data, to avoid that memory will get used up.
 		*
 		* The pattern is a url pattern specified using regular expression
 		* syntax, according to the ICU regular expression standard, using
