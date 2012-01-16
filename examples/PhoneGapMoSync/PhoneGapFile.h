@@ -68,6 +68,9 @@ public:
 		const MAUtil::String& lastModifiedDate,
 		const MAUtil::String& size);
 
+	MAUtil::String emitMetadata(
+		const MAUtil::String& modificationTime);
+
 	void callSuccess(
 		const MAUtil::String& callbackID,
 		const MAUtil::String& args,
@@ -99,6 +102,8 @@ public:
 	 */
 	void actionGetFileMetadata(PhoneGapMessage& message);
 
+	void actionGetMetadata(PhoneGapMessage& message);
+
 	void actionWrite(PhoneGapMessage& message);
 
 	void actionReadAsText(PhoneGapMessage& message);
@@ -106,6 +111,10 @@ public:
 	void actionReadAsDataURL(PhoneGapMessage& message);
 
 	void actionTruncate(PhoneGapMessage& message);
+
+	void actionCopyToOrMoveTo(PhoneGapMessage& message, bool move);
+
+	void actionRemove(PhoneGapMessage& message);
 
 private:
 	PhoneGapMessageHandler* mMessageHandler;

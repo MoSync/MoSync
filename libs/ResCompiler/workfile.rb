@@ -15,7 +15,7 @@ mod.class_eval do
 
 	def setup_base
 		@SOURCES = ["."]
-		#@IGNORED_HEADERS = ["WidgetUtil.h"]
+		@IGNORED_HEADERS = ["ByteArrayStream.h", "rescomp.h", "rescompdefines.h", "ResourceSetLookup.h", "VariantResourceLookup.h"]
 		@INSTALL_INCDIR = "ResCompiler"
 		@NAME = "rescompiler"
 	end
