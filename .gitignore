@@ -22,7 +22,9 @@ IX_*.h
 
 MAHeaders.h
 program
+program.comb
 resources
+resources.deps
 log.txt
 panic.report
 Stabs.tab
