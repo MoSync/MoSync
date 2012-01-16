@@ -440,6 +440,7 @@ namespace MoSync
 
 			if (transWidth <= 0 || transHeight <= 0) return;
 
+			// TODO: Port clipping section.
 			/*
 			if (left >= clipRect.x + clipRect.width)
 				return;

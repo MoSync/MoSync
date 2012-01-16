@@ -318,8 +318,15 @@ namespace MoSync
 			{
 				BitmapImage im = new BitmapImage();
 				im.CreateOptions = BitmapCreateOptions.None;
-				im.SetSource(stream);
-				wb = new WriteableBitmap(im);
+				try
+				{
+					im.SetSource(stream);
+					wb = new WriteableBitmap(im);
+				}
+				catch (Exception e)
+				{
+					wb = null;
+				}
 			});
 			return wb;
 		}
