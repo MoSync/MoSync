@@ -383,7 +383,7 @@ namespace MoSync
                         Names = { new InputScopeName() { NameValue = scopeValue } }
                     };
                 }
-                catch (NotImplementedException e)
+                catch (NotImplementedException)
                 {
                     //TODO: return an error value
                 }
