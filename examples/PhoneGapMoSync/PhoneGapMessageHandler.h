@@ -33,6 +33,7 @@ MA 02110-1301, USA.
 #include "PhoneGapSensors.h"
 #include "PhoneGapFile.h"
 #include "SensorManager.h"
+#include "PhoneGapCapture.h"
 
 // PhoneGap callback result codes.
 #define PHONEGAP_CALLBACK_STATUS_NO_RESULT "0"
@@ -220,6 +221,11 @@ private:
 	 * PhoneGap File API message handler.
 	 */
 	PhoneGapFile mPhoneGapFile;
+
+	/**
+	 * PhoneGap Capture API message handler.
+	 */
+	PhoneGapCapture mPhoneGapCapture;
 
 	/**
 	 * Controls where each sensor event is delivered.
