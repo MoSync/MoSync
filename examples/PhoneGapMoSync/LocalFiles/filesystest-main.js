@@ -550,6 +550,37 @@ function testFileSystem()
 	writeFile();
 }
 
+/**
+ * Will overwrite previous testFileSystem ;-)
+ * Tests directory functions.
+ */
+function testFileSystem()
+{
+	function writeFiles()
+	{
+		FileSys.writeText("foz/hello1.txt", "Hello World", reportResult);
+		FileSys.writeText("foz/baz/hello2.txt", "Hello World", reportResult);
+		FileSys.writeText("foz/baz/hello3.txt", "Hello World", listFiles);
+	}
+
+	function listFiles(success)
+	{
+		MyLog("@@@@@ listFiles got result: " + success);
+		if (success)
+		{
+			//FileSys.removeDirectory("foz", reportResult);
+			FileSys.removeFile("foz", reportResult);
+		}
+	}
+
+	function reportResult(success)
+	{
+		MyLog("reportResult: " + success);
+	}
+
+	writeFiles();
+}
+
 function XtestFileSystem() {
 	MyLog("@@ Calling window.requestFileSystem");
 	window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, gotFileSystem, filefail);
