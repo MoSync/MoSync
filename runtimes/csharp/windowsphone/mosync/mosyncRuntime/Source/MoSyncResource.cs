@@ -10,7 +10,7 @@ namespace MoSync
 	// Read only, used for ubins.
 	public class BoundedStream : Stream
 	{
-		private Stream mStream = null;
+		private readonly Stream mStream;
 		private readonly long mOffset;
 		private readonly long mLength;
 		private long mPosition;
@@ -74,6 +74,7 @@ namespace MoSync
 				return 0;
 			if (mPosition + count > mLength)
 				count = (int)mLength - (int)mPosition;
+			mStream.Seek(mOffset + mPosition, SeekOrigin.Begin);
 			int res = mStream.Read(buffer, offset, count);
 			mPosition = mStream.Position - mOffset;
 			return res;
