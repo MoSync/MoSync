@@ -244,6 +244,9 @@ IMPLEMENTS MoSync
 	int mFrameBufferAddr;
 
 	Object mFlux = new Object();
+	Object mDestroyedPlaceholder = new Object();
+	int[] mDestroyedPlaceholders = new int[32];	// arbitrary starting size
+	int mDPP = 0;
 
 	//***************************************************************************
 	//Destructor
@@ -1655,6 +1658,16 @@ public
 			mDynamicResArray = new Object[1];
 			mDynamicSize = 0;
 		}
+
+		// check the mDestroyedPlaceholders array first.
+		if(mDPP != 0) {
+			mDPP--;
+			int index = mDestroyedPlaceholders[mDPP];
+			mDynamicResArray[index] = null;
+			return index | DYNARES_BIT;
+		}
+
+		// if no mDestroyedPlaceholders remain, allocate a new one.
 		if(mDynamicSize == mDynamicResArray.length) {
 			Object[] oldDynRes = mDynamicResArray;
 			mDynamicResArray = new Object[mDynamicResArray.length * 2];
@@ -1663,9 +1676,28 @@ public
 		return (mDynamicSize++) | DYNARES_BIT;
 	}
 
+	SYSCALL(void) maDestroyPlaceholder(MAHandle handle) {
+		MYASSERT((handle & DYNARES_BIT) != 0);
+		int index = handle & ~DYNARES_BIT;
+		MYASSERT(mDynamicResArray[index] != mFlux);
+		MYASSERT(mDynamicResArray[index] != mDestroyedPlaceholder);
+		mDynamicResArray[index] = mDestroyedPlaceholder;
+
+		// add index into array.
+		// double array length if needed.
+		if(mDestroyedPlaceholders.length == mDPP) {
+			int[] newDP = new int[mDPP * 2];
+			System.arraycopy(mDestroyedPlaceholders, 0, newDP, 0, mDPP);
+			mDestroyedPlaceholders = newDP;
+		}
+		mDestroyedPlaceholders[mDPP] = index;
+		mDPP++;
+	}
+
 	SYSCALL(void) maDestroyObject(MAHandle handle) {
 		if(getResource(handle) != null) {
 			MYASSERT(getResource(handle) != mFlux);
+			MYASSERT(getResource(handle) != mDestroyedPlaceholder);
 			setResource(handle, null);
 		}
 	}
