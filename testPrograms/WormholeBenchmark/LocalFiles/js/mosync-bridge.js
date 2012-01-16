@@ -28,304 +28,368 @@ MA 02110-1301, USA.
  */
 var mosync = (function()
 {
-	var mosync = {};
+    var mosync = {};
 
-	// Detect platform.
+    // Detect platform.
 
-	mosync.isAndroid =
-		(navigator.userAgent.indexOf("Android") != -1)
-			? true : false;
+    mosync.isAndroid =
+        (navigator.userAgent.indexOf("Android") != -1)
+            ? true : false;
 
-	mosync.isIOS =
-		(navigator.userAgent.indexOf("iPod") != -1)
-		|| (navigator.userAgent.indexOf("iPhone") != -1)
-		|| (navigator.userAgent.indexOf("iPad") != -1)
-			? true : false;
+    mosync.isIOS =
+        (navigator.userAgent.indexOf("iPod") != -1)
+        || (navigator.userAgent.indexOf("iPhone") != -1)
+        || (navigator.userAgent.indexOf("iPad") != -1)
+            ? true : false;
 
-	mosync.isWindowsPhone =
-		(navigator.userAgent.indexOf("Windows Phone OS") != -1)
-			? true : false;
+    mosync.isWindowsPhone =
+        (navigator.userAgent.indexOf("Windows Phone OS") != -1)
+            ? true : false;
 
-	// The encoder submodule.
+    // Logging.
+    mosync.log = function(message)
+    {
+        console.log("@@@ " + message);
+    };
 
-	mosync.encoder = (function()
-	{
-		var encoder = {};
-		var firstChar = 33;
-		var lastChar = 126;
-		var base = lastChar - firstChar;
+    // The encoder submodule.
 
-		encoder.itox = function(i)
-		{
-			var n = i;
-			var digits = [];
+    mosync.encoder = (function()
+    {
+        var encoder = {};
+        var firstChar = 33;
+        var lastChar = 126;
+        var base = lastChar - firstChar;
 
-			while (n > base)
-			{
-				digits.push((n % base) + firstChar);
-				n = (n / base) >> 0;
-			}
-			digits.push(n + firstChar);
+        encoder.itox = function(i)
+        {
+            var n = i;
+            var digits = [];
 
-			return String.fromCharCode.apply(null, digits);
-		};
+            while (n > base)
+            {
+                digits.push((n % base) + firstChar);
+                n = (n / base) >> 0;
+            }
+            digits.push(n + firstChar);
 
-		encoder.xtoi = function(s)
-		{
-			var n = 0;
-			var length = s.length;
+            return String.fromCharCode.apply(null, digits);
+        };
 
-			for (var i = 0; i < length; ++i)
-			{
-				n += Math.pow(base, i) * (s.charCodeAt(i) - firstChar);
-			}
+        encoder.xtoi = function(s)
+        {
+            var n = 0;
+            var length = s.length;
 
-			return n;
-		};
+            for (var i = 0; i < length; ++i)
+            {
+                n += Math.pow(base, i) * (s.charCodeAt(i) - firstChar);
+            }
 
-		encoder.encodeString = function(s)
-		{
-			return ""
-				+ encoder.itox(s.length)
-				+ " "
-				+ s
-				+ " ";
-		};
+            return n;
+        };
 
-		return encoder;
-	}
-	)();
+        // Thanks to: http://jsfromhell.com/geral/utf-8
+        // Athor: Jonas Raoni Soares Silva
+        encoder.encodeUTF8 = function(s){
+            for(var c, i = -1, l = (s = s.split("")).length, o = String.fromCharCode; ++i < l;
+                s[i] = (c = s[i].charCodeAt(0)) >= 127 ? o(0xc0 | (c >>> 6)) + o(0x80 | (c & 0x3f)) : s[i]
+            );
+            return s.join("");
+        };
 
-	// The bridge submodule.
+        // Thanks to: http://jsfromhell.com/geral/utf-8
+        // Athor: Jonas Raoni Soares Silva
+        encoder.decodeUTF8 = function(s){
+            for(var a, b, i = -1, l = (s = s.split("")).length, o = String.fromCharCode, c = "charCodeAt"; ++i < l;
+                ((a = s[i][c](0)) & 0x80) &&
+                (s[i] = (a & 0xfc) == 0xc0 && ((b = s[i + 1][c](0)) & 0xc0) == 0x80 ?
+                o(((a & 0x03) << 6) + (b & 0x3f)) : o(128), s[++i] = "")
+            );
+            return s.join("");
+        };
 
-	mosync.bridge = (function()
-	{
-		var bridge = {};
-		var callbackTable = {};
-		var callbackIdCounter = 0;
-		var messageQueue = [];
-		var messageSender = null;
-		var messageQueueJSON = [];
-		var messageSenderJSON = null;
-		var rawMessageQueue = [];
+        encoder.lengthAsUTF8 = function(s)
+        {
+            //console.log("===== inside lengthAsUTF8 s: " + s);
+            var length = 0;
+            for (var i = 0; i < s.length; ++i)
+            {
+                var c = s.charCodeAt(i);
 
-		/**
-		 * Send message strings to C++. If a callback function is
-		 * supplied, a callbackId parameter will be added to
-		 * the message, this id can be used when sending a reply
-		 * back to JavaScript from C++.
-		 *
-		 * This method queues messages and can be called multiple
-		 * times in sqeuential JS code. When execution of sequential
-		 * code is done, a timer will get activated and send all messages
-		 * in the queue in one chunk. This enhances performance of
-		 * message sending.
-		 *
-		 * @param message An array of message strings.
-		 *
-		 * @param callbackFun An optional function to receive the
-		 * result of the message asynchronosly. The id of the
-		 * callback function is added after the strings in the
-		 * messageStrings array.
-		 */
-		bridge.send = function(messageStrings, callbackFun)
-		{
-			var callbackId = null;
+                if (c < 128)
+                {
+                    length += 1;
+                }
+                else if ((c > 127) && (c < 2048))
+                {
+                    length += 2;
+                }
+                else
+                {
+                    length += 3;
+                }
+            }
+            return length;
+        };
 
-			// If there is a callback function supplied, create
-			// a callbackId and add it to the callback table.
-			if (undefined != callbackFun)
-			{
-				callbackIdCounter = callbackIdCounter + 1;
-				callbackTable[callbackIdCounter] = callbackFun;
-				callbackId = callbackIdCounter;
-			}
+        encoder.encodeString = function(s)
+        {
+            var length;
+            if (mosync.isAndroid)
+            {
+                //console.log("encoder.lengthAsUTF8 s: " + s);
 
-			// Add message strings to queue.
-			for (var i in messageStrings)
-			{
-				messageQueue.push(messageStrings[i]);
-			}
+                length = encoder.lengthAsUTF8(s);
 
-			// If we have a callbackId, push that too, as a string value.
-			if (null != callbackId)
-			{
-				messageQueue.push("" + callbackId);
-			}
+                //console.log("encoder.lengthAsUTF8 length: " + length);
+            }
+            else
+            {
+                //console.log("encoder.lengthAsUTF8 should not happen");
+                length = s.length;
+            }
+            return ""
+                + encoder.itox(length)
+                + " "
+                + s
+                + " ";
+        };
 
-			// Start timer for sender function.
-			// This will get called once sequential
-			// execution of JS code is done.
-			if (null == messageSender)
-			{
-				messageSender = setTimeout(function()
-				{
-					messageSender = null;
-					bridge.sendAll();
-				},
-				1);
-			}
-		};
+        return encoder;
+    }
+    )();
 
-		/**
-		 * Send a JSON message to C++. If a callback function is
-		 * supplied, a callbackId parameter will be added to
-		 * the message, this id can be used when sending a reply
-		 * back to JavaScript from C++.
-		 *
-		 * This method queues a message and can be called multiple
-		 * times in sqeuential JS code. When execution of sequential
-		 * code is done, a timer will get activated and send all messages
-		 * in the queue in one chunk. This enhances performance of
-		 * message sending.
-		 *
-		 * @param message A dictionary with the message parameters.
-		 * The parameter "messageName" specifyes the name of the
-		 * message selector (the "command name") and must always be
-		 * included.
-		 *
-		 * @param callbackFun An optional function to receive the
-		 * result of the message asynchronosly.
-		 */
-		bridge.sendJSON = function(message, callbackFun)
-		{
-			// If there is a callback function supplied, create
-			// a callbackId and add it to the callback table.
-			if (undefined != callbackFun)
-			{
-				callbackIdCounter = callbackIdCounter + 1;
-				callbackTable[callbackIdCounter] = callbackFun;
-				message["callbackId"] = callbackIdCounter;
-			}
+    // The bridge submodule.
 
-			// Add message to queue.
-			messageQueueJSON.push(message);
+    mosync.bridge = (function()
+    {
+        var bridge = {};
+        var callbackTable = {};
+        var callbackIdCounter = 0;
+        var messageQueue = [];
+        var messageSender = null;
+        var messageQueueJSON = [];
+        var messageSenderJSON = null;
+        var rawMessageQueue = [];
 
-			// Start timer for sender function.
-			// This will get called once sequential
-			// execution of JS code is done.
-			if (null == messageSenderJSON)
-			{
-				messageSenderJSON = setTimeout(function()
-				{
-					messageSenderJSON = null;
-					bridge.sendAllJSON();
-				},
-				1);
-			}
-		};
+        /**
+         * Send message strings to C++. If a callback function is
+         * supplied, a callbackId parameter will be added to
+         * the message, this id can be used when sending a reply
+         * back to JavaScript from C++.
+         *
+         * This method queues messages and can be called multiple
+         * times in sqeuential JS code. When execution of sequential
+         * code is done, a timer will get activated and send all messages
+         * in the queue in one chunk. This enhances performance of
+         * message sending.
+         *
+         * @param message An array of message strings.
+         *
+         * @param callbackFun An optional function to receive the
+         * result of the message asynchronosly. The id of the
+         * callback function is added after the strings in the
+         * messageStrings array.
+         */
+        bridge.send = function(messageStrings, callbackFun)
+        {
+            var callbackId = null;
 
-		/**
-		 * Send all queued message strings.
-		 */
-		bridge.sendAll = function()
-		{
-			// Check that messageQueue is not empty!
-			if (messageQueue.length > 0)
-			{
-				// Add the "ms:" token to the beginning of the data
-				// to signify that this as a message array. This is
-				// used by the C++ message parser to handle different
-				// types of message formats.
-				var data = "ms:";
-				for (var i in messageQueue)
-				{
-					data += mosync.encoder.encodeString(messageQueue[i]);
-				}
-				messageQueue = [];
-				bridge.sendRaw(data);
-			}
-		};
+            // If there is a callback function supplied, create
+            // a callbackId and add it to the callback table.
+            if (undefined != callbackFun)
+            {
+                callbackIdCounter = callbackIdCounter + 1;
+                callbackTable[callbackIdCounter] = callbackFun;
+                callbackId = callbackIdCounter;
+            }
 
-		/**
-		 * Send all queued JSON messages.
-		 */
-		bridge.sendAllJSON = function()
-		{
-			// Check that messageQueue is not empty!
-			if (messageQueueJSON.length > 0)
-			{
-				// Add the "ma:" token to the beginning of the data
-				// to signify that this as a message array. This is
-				// used by the C++ message parser to handle different
-				// types of message formats.
-				var data = "ma:" + JSON.stringify(messageQueueJSON);
-				messageQueueJSON = [];
-				bridge.sendRaw(data);
-			}
-		};
+            // Add message strings to queue.
+            for (var i in messageStrings)
+            {
+                messageQueue.push(messageStrings[i]);
+            }
 
-		/**
-		 * Send raw data to the C++ side.
-		 */
-		bridge.sendRaw = function(data)
-		{
-			if (mosync.isAndroid)
-			{
-				prompt(data, "");
-			}
-			else if (mosync.isIOS)
-			{
-				rawMessageQueue.push(data);
-				window.location = "mosync://DataAvailable";
-			}
-			else if (mosync.isWindowsPhone)
-			{
-				window.external.notify(data);
-			}
-			else
-			{
-				alert("bridge.sendRaw: unknown platform");
-			}
-		};
+            // If we have a callbackId, push that too, as a string value.
+            if (null != callbackId)
+            {
+                messageQueue.push("" + callbackId);
+            }
 
-		/**
-		 *
-		 */
-		bridge.getMessageData = function()
-		{
-			if(rawMessageQueue.length == 0)
-			{
-				//return an empty string so the runtime knows we don't have anything
-				return "";
-			}
-			var message = rawMessageQueue.pop();
-			return message;
-		};
+            // Start timer for sender function.
+            // This will get called once sequential
+            // execution of JS code is done.
+            if (null == messageSender)
+            {
+                messageSender = setTimeout(function()
+                {
+                    messageSender = null;
+                    bridge.sendAll();
+                },
+                1);
+            }
+        };
 
-		/**
-		 * This function is meant to be used to call back from C++ to
-		 * JavaScript. The function takes a variable number of parameters.
-		 *
-		 * For example, to return the value 'Hello World' to the callback
-		 * with id 82, you can use this code in a WebAppMoblet:
-		 *
-		 *   callJS("mosync.bridge.reply(82, 'Hello World')");
-		 *
-		 * You can obtain the callbackId from the C++ WebViewMessage
-		 * object, if you use that class to parse the message.
-		 *
-		 * @param callBackId The first parameter is the id of the
-		 * callback function. Remaning parameters are applied to the
-		 * function refered to by the callbackId.
-		 */
-		bridge.reply = function(callbackId)
-		{
-			var callbackFun = callbackTable[callbackId];
-			if (undefined != callbackFun)
-			{
-				// Remove the first param, the callbackId.
-				var args = Array.prototype.slice.call(arguments);
-				args.shift();
+        /**
+         * Send a JSON message to C++. If a callback function is
+         * supplied, a callbackId parameter will be added to
+         * the message, this id can be used when sending a reply
+         * back to JavaScript from C++.
+         *
+         * This method queues a message and can be called multiple
+         * times in sqeuential JS code. When execution of sequential
+         * code is done, a timer will get activated and send all messages
+         * in the queue in one chunk. This enhances performance of
+         * message sending.
+         *
+         * @param message A dictionary with the message parameters.
+         * The parameter "messageName" specifyes the name of the
+         * message selector (the "command name") and must always be
+         * included.
+         *
+         * @param callbackFun An optional function to receive the
+         * result of the message asynchronosly.
+         */
+        bridge.sendJSON = function(message, callbackFun)
+        {
+            // If there is a callback function supplied, create
+            // a callbackId and add it to the callback table.
+            if (undefined != callbackFun)
+            {
+                callbackIdCounter = callbackIdCounter + 1;
+                callbackTable[callbackIdCounter] = callbackFun;
+                message["callbackId"] = callbackIdCounter;
+            }
 
-				// Call the function.
-				callbackFun.apply(null, args);
-			}
-		};
+            // Add message to queue.
+            messageQueueJSON.push(message);
 
-		return bridge;
-	})();
+            // Start timer for sender function.
+            // This will get called once sequential
+            // execution of JS code is done.
+            if (null == messageSenderJSON)
+            {
+                messageSenderJSON = setTimeout(function()
+                {
+                    messageSenderJSON = null;
+                    bridge.sendAllJSON();
+                },
+                1);
+            }
+        };
 
-	// Return the library object.
-	return mosync;
+        /**
+         * Send all queued message strings.
+         */
+        bridge.sendAll = function()
+        {
+            // Check that messageQueue is not empty!
+            if (messageQueue.length > 0)
+            {
+                // Add the "ms:" token to the beginning of the data
+                // to signify that this as a message array. This is
+                // used by the C++ message parser to handle different
+                // types of message formats.
+                var data = "ms:";
+                for (var i in messageQueue)
+                {
+                    data += mosync.encoder.encodeString(messageQueue[i]);
+                }
+                messageQueue = [];
+                bridge.sendRaw(data);
+            }
+        };
+
+        /**
+         * Send all queued JSON messages.
+         */
+        bridge.sendAllJSON = function()
+        {
+            // Check that messageQueue is not empty!
+            if (messageQueueJSON.length > 0)
+            {
+                // Add the "ma:" token to the beginning of the data
+                // to signify that this as a message array. This is
+                // used by the C++ message parser to handle different
+                // types of message formats.
+                var data = "ma:" + JSON.stringify(messageQueueJSON);
+                messageQueueJSON = [];
+                bridge.sendRaw(data);
+            }
+        };
+
+        /**
+         * Send raw data to the C++ side.
+         */
+        bridge.sendRaw = function(data)
+        {
+            if (mosync.isAndroid)
+            {
+                prompt(data, "");
+            }
+            else if (mosync.isIOS)
+            {
+                rawMessageQueue.push(data);
+                window.location = "mosync://DataAvailable";
+            }
+            else if (mosync.isWindowsPhone)
+            {
+                window.external.notify(data);
+            }
+            else
+            {
+                alert("bridge.sendRaw: unknown platform");
+            }
+        };
+
+        /**
+         *
+         */
+        bridge.getMessageData = function()
+        {
+            if(rawMessageQueue.length == 0)
+            {
+                //return an empty string so the runtime knows we don't have anything
+                return "";
+            }
+            var message = rawMessageQueue.pop();
+            return message;
+        };
+
+        /**
+         * This function is meant to be used to call back from C++ to
+         * JavaScript. The function takes a variable number of parameters.
+         *
+         * For example, to return the value 'Hello World' to the callback
+         * with id 82, you can use this code in a WebAppMoblet:
+         *
+         *   callJS("mosync.bridge.reply(82, 'Hello World')");
+         *
+         * You can obtain the callbackId from the C++ WebViewMessage
+         * object, if you use that class to parse the message.
+         *
+         * @param callBackId The first parameter is the id of the
+         * callback function. Remaning parameters are applied to the
+         * function refered to by the callbackId.
+         */
+        bridge.reply = function(callbackId)
+        {
+            var callbackFun = callbackTable[callbackId];
+            if (undefined != callbackFun)
+            {
+                // Remove the first param, the callbackId.
+                var args = Array.prototype.slice.call(arguments);
+                args.shift();
+
+                // Call the function.
+                callbackFun.apply(null, args);
+            }
+        };
+
+        return bridge;
+    })();
+
+    // Return the library object.
+    return mosync;
 })();
