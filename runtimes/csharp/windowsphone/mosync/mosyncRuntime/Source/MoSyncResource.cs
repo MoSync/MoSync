@@ -10,9 +10,9 @@ namespace MoSync
 	// Read only, used for ubins.
 	public class BoundedStream : Stream
 	{
-		private Stream mStream = null;
-		private long mOffset;
-		private long mLength;
+		private readonly Stream mStream;
+		private readonly long mOffset;
+		private readonly long mLength;
 		private long mPosition;
 		public BoundedStream(Stream stream, long offset, long length)
 		{
@@ -70,6 +70,11 @@ namespace MoSync
 
 		public override int Read(byte[] buffer, int offset, int count)
 		{
+			if (mPosition == mLength)
+				return 0;
+			if (mPosition + count > mLength)
+				count = (int)mLength - (int)mPosition;
+			mStream.Seek(mOffset + mPosition, SeekOrigin.Begin);
 			int res = mStream.Read(buffer, offset, count);
 			mPosition = mStream.Position - mOffset;
 			return res;
@@ -77,41 +82,41 @@ namespace MoSync
 
 		public override void Write(byte[] buffer, int offset, int count)
 		{
-			throw new NotImplementedException();
+			throw new NotSupportedException();
 		}
 
 		public override void Flush()
 		{
-			throw new NotImplementedException();
+			throw new NotSupportedException();
 		}
 
 		public override void SetLength(long value)
 		{
-			throw new NotImplementedException();
+			throw new NotSupportedException();
 		}
 	}
 
-    // This is a class used to hold a mosync resoruce
-    // Each resource has a specific type and a platform
-    // specific internal object.
-    public class Resource
-    {
-        protected Object mInternalObject;
-        protected int mResourceType;
+	// This is a class used to hold a mosync resoruce
+	// Each resource has a specific type and a platform
+	// specific internal object.
+	public class Resource
+	{
+		protected Object mInternalObject;
+		protected int mResourceType;
 		protected bool mIsDynamicPlaceholder = false;
-        public static readonly Resource Flux = new Resource(null, Constants.RT_FLUX);
+		public static readonly Resource Flux = new Resource(null, Constants.RT_FLUX);
 
 		// used for unloaded resources
 		BoundedStream mStream;
 
-        public Resource(Object internalObject, int resourceType, bool isDynamicPlaceholder=false, BoundedStream stream=null)
-        {
-            mInternalObject = internalObject;
-            mResourceType = resourceType;
+		public Resource(Object internalObject, int resourceType, bool isDynamicPlaceholder = false, BoundedStream stream = null)
+		{
+			mInternalObject = internalObject;
+			mResourceType = resourceType;
 			mIsDynamicPlaceholder = isDynamicPlaceholder;
 
 			mStream = stream;
-        }
+		}
 
 
 
@@ -136,24 +141,24 @@ namespace MoSync
 			mIsDynamicPlaceholder = s;
 		}
 
-        public void SetInternalObject(Object internalObject)
-        {
-            mInternalObject = internalObject;
-        }
+		public void SetInternalObject(Object internalObject)
+		{
+			mInternalObject = internalObject;
+		}
 
-        public void SetResourceType(int type)
-        {
-            mResourceType = type;
-        }
+		public void SetResourceType(int type)
+		{
+			mResourceType = type;
+		}
 
-        public int GetResourceType()
-        {
-            return mResourceType;
-        }
+		public int GetResourceType()
+		{
+			return mResourceType;
+		}
 
-        public Object GetInternalObject()
-        {
-            return mInternalObject;
-        }
-    }
+		public Object GetInternalObject()
+		{
+			return mInternalObject;
+		}
+	}
 }
