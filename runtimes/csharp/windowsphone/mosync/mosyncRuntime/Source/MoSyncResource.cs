@@ -101,12 +101,30 @@ namespace MoSync
 		protected bool mIsDynamicPlaceholder = false;
         public static readonly Resource Flux = new Resource(null, Constants.RT_FLUX);
 
-        public Resource(Object internalObject, int resourceType, bool isDynamicPlaceholder=false)
+		// used for unloaded resources
+		BoundedStream mStream;
+
+        public Resource(Object internalObject, int resourceType, bool isDynamicPlaceholder=false, BoundedStream stream=null)
         {
             mInternalObject = internalObject;
             mResourceType = resourceType;
 			mIsDynamicPlaceholder = isDynamicPlaceholder;
+
+			mStream = stream;
         }
+
+
+
+		// null if label, sprite, ubin
+		public BoundedStream GetFileStream()
+		{
+			return mStream;
+		}
+
+		public void SetFileStream(BoundedStream stream)
+		{
+			mStream = stream;
+		}
 
 		public bool IsDynamicPlaceholder()
 		{

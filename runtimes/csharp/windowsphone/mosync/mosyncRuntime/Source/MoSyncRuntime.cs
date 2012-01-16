@@ -70,6 +70,7 @@ namespace MoSync
 
 		protected Dictionary<int, Resource> mResources = new Dictionary<int, Resource>();
 		protected int mCurrentResourceHandle;
+		protected int mStaticResourceCount;
 		public readonly Dictionary<String, int> mLabels = new Dictionary<String, int>();
 
 		private List<Event> mEvents = new List<Event>();
@@ -246,6 +247,32 @@ namespace MoSync
 				mResources[res].SetResourceType(MoSync.Constants.RT_PLACEHOLDER);
 				mResources[res].SetInternalObject(null);
 			};
+
+			mSyscalls.maLoadResource = delegate(int _handle, int _placeholder, int _flag)
+			{
+				Resource res = mResources[_handle];
+				BoundedStream stream = res.GetFileStream();
+				if(stream == null)
+					return 0;
+				if(res.GetInternalObject() != null)
+					return 0;
+				stream.Seek(0, SeekOrigin.Begin);
+				LoadResource(stream, (byte)res.GetResourceType(), (uint)stream.Length, res);
+				return 1;
+			};
+
+			mSyscalls.maLoadResources = delegate(int _data)
+			{
+				Resource res = GetResource(MoSync.Constants.RT_BINARY, _data);
+				Stream data = (Stream)res.GetInternalObject();
+				return LoadResources(data, false)?1:0;
+			};
+
+			mSyscalls.maCountResources = delegate()
+			{
+				return mStaticResourceCount;
+			};
+
 		}
 
 		// will reset the runtime.
@@ -291,7 +318,58 @@ namespace MoSync
 			return res;
 		}
 
-		public bool LoadResources(Stream file)
+		public void LoadResource(Stream file, byte type, uint size, Resource resource)
+		{
+			switch (type)
+			{
+				case MoSync.Constants.RT_PLACEHOLDER:
+					break;
+				case MoSync.Constants.RT_UBIN:
+					{
+						resource.SetResourceType(MoSync.Constants.RT_BINARY);
+						resource.SetInternalObject(new BoundedStream(file, file.Position, (long)size));
+						file.Seek(size, SeekOrigin.Current);
+					}
+					break;
+				case MoSync.Constants.RT_BINARY:
+					{
+						byte[] bytes = new byte[size];
+						file.Read(bytes, 0, (int)size);
+						MemoryStream memStream = new MemoryStream(bytes);
+						resource.SetInternalObject(memStream);
+					}
+					break;
+				case MoSync.Constants.RT_IMAGE:
+					{
+						byte[] bytes = new byte[size];
+						file.Read(bytes, 0, (int)size);
+						using (MemoryStream ms = new MemoryStream(bytes, 0, bytes.Length))
+						{
+							resource.SetInternalObject(MoSync.Util.CreateWriteableBitmapFromStream(ms));
+							ms.Close();
+						}
+					}
+					break;
+				case MoSync.Constants.RT_LABEL:
+					{
+						byte[] bytes = new byte[size];
+						file.Read(bytes, 0, (int)size);
+						if (bytes[size - 1] != 0)
+							throw new Exception("invalid label (no null terminator)");
+						String s = System.Text.Encoding.UTF8.GetString(bytes, 0, (int)size - 1);
+						if (mLabels.ContainsKey(s))
+							throw new Exception("duplicate label");
+						mLabels.Add(s, mCurrentResourceHandle);
+					}
+					break;
+				default:
+					Util.Log("Unknown resource type " + type + ", size " + size + "\n");
+					file.Seek(size, SeekOrigin.Current);
+					break;
+			}
+		}
+
+		public bool LoadResources(Stream file, bool initial=true)
 		{
 			if (MoSync.Util.StreamReadInt8(file) != 'M')
 				return false;
@@ -307,6 +385,7 @@ namespace MoSync
 
 
 			mCurrentResourceHandle = 1;
+			mStaticResourceCount = 0;
 
 			while (true)
 			{
@@ -319,55 +398,24 @@ namespace MoSync
 				Resource resource = new Resource(null, type);
 				mResources.Add(mCurrentResourceHandle, resource);
 
-				switch (type)
+				if (initial &&
+					(
+					type == MoSync.Constants.RT_BINARY ||
+					type == MoSync.Constants.RT_IMAGE ||
+					type == MoSync.Constants.RT_SPRITE
+					))
 				{
-					case MoSync.Constants.RT_PLACEHOLDER:
-						break;
-					case MoSync.Constants.RT_UBIN:
-						{
-							resource.SetResourceType(MoSync.Constants.RT_BINARY);
-							resource.SetInternalObject(new BoundedStream(file, file.Position, (long)size));
-							file.Seek(size, SeekOrigin.Current);
-						}
-						break;
-					case MoSync.Constants.RT_BINARY:
-						{
-							byte[] bytes = new byte[size];
-							file.Read(bytes, 0, (int)size);
-							MemoryStream memStream = new MemoryStream(bytes);
-							resource.SetInternalObject(memStream);
-						}
-						break;
-					case MoSync.Constants.RT_IMAGE:
-						{
-							byte[] bytes = new byte[size];
-							file.Read(bytes, 0, (int)size);
-							using (MemoryStream ms = new MemoryStream(bytes, 0, bytes.Length))
-							{
-								resource.SetInternalObject(MoSync.Util.CreateWriteableBitmapFromStream(ms));
-								ms.Close();
-							}
-						}
-						break;
-					case MoSync.Constants.RT_LABEL:
-						{
-							byte[] bytes = new byte[size];
-							file.Read(bytes, 0, (int)size);
-							if (bytes[size - 1] != 0)
-								throw new Exception("invalid label (no null terminator)");
-							String s = System.Text.Encoding.UTF8.GetString(bytes, 0, (int)size - 1);
-							if (mLabels.ContainsKey(s))
-								throw new Exception("duplicate label");
-							mLabels.Add(s, mCurrentResourceHandle);
-						}
-						break;
-					default:
-						Util.Log("Unknown resource type " + type + ", size " + size + "\n");
-						file.Seek(size, SeekOrigin.Current);
-						break;
+					resource.SetFileStream(new BoundedStream(file, file.Position, (long)size));
+					file.Seek(size, SeekOrigin.Current);
+				}
+				else
+				{
+
+					LoadResource(file, type, size, resource);
 				}
 
 				mCurrentResourceHandle++;
+				mStaticResourceCount++;
 			}
 
 			return true;
