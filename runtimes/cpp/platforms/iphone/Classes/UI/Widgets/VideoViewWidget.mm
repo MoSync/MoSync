@@ -123,6 +123,21 @@
         TEST_FOR_NEGATIVE_VALUE([value floatValue]);
         [mMoviePlayerController setCurrentPlaybackTime:[value floatValue]];
     }
+    else if ([key isEqualToString:@MAW_VIDEO_VIEW_CONTROL])
+    {
+        if ([value isEqualToString:@"true"])
+        {
+            [mMoviePlayerController setControlStyle:MPMovieControlStyleEmbedded];
+        }
+        else if ([value isEqualToString:@"false"])
+        {
+            [mMoviePlayerController setControlStyle:MPMovieControlStyleNone];
+        }
+        else
+        {
+            return MAW_RES_INVALID_PROPERTY_VALUE;
+        }
+    }
     else
     {
         return [super setPropertyWithKey:key toValue:value];
@@ -148,6 +163,18 @@
     {
         return[[NSString alloc] initWithFormat:@"%f", [mMoviePlayerController currentPlaybackTime]];
 	}
+    else if ([key isEqualToString:@MAW_VIDEO_VIEW_CONTROL])
+    {
+        MPMovieControlStyle controlStyle = mMoviePlayerController.controlStyle;
+        if (controlStyle == MPMovieControlStyleEmbedded)
+        {
+            return [[NSString alloc] initWithString:@"true"];
+        }
+        else
+        {
+            return [[NSString alloc] initWithString:@"false"];
+        }
+    }
     else
     {
 		return [super getPropertyWithKey:key];
