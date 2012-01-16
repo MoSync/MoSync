@@ -44,6 +44,7 @@ PhoneGapMessageHandler::PhoneGapMessageHandler(NativeUI::WebView* webView) :
 	mPhoneGapSensors(this),
 	mPhoneGapFile(this),
 	mPhoneGapSensorManager(this),
+	mPhoneGapCapture(this),
 	mPhoneGapNotificationManager(NULL)
 {
 	enableHardware();
@@ -118,9 +119,9 @@ bool PhoneGapMessageHandler::handleMessage(PhoneGapMessage& message)
 		mPhoneGapSensors.handleMessage(message);
 	}
 	else if (message.getParam("service") == "SensorManager")
-		{
-			mPhoneGapSensorManager.handleMessage(message);
-		}
+	{
+		mPhoneGapSensorManager.handleMessage(message);
+	}
 	else if (message.getParam("service") == "File")
 	{
 		mPhoneGapFile.handleMessage(message);
@@ -128,6 +129,10 @@ bool PhoneGapMessageHandler::handleMessage(PhoneGapMessage& message)
 	else if (message.getParam("service") == "PushNotification")
 	{
 		mPhoneGapNotificationManager->handleMessage(message);
+	}
+	else if (message.getParam("service") == "Capture")
+	{
+		mPhoneGapCapture.handleMessage(message);
 	}
 	else
 	{
