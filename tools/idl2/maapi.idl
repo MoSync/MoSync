@@ -6929,6 +6929,22 @@ group WidgetAPI "Widget API" {
 		* \endcode
 		*/
 		CURRENT_POSITION = "currentPosition";
+
+		/**
+		* @brief Show/hide video control.
+		* Default value is "true"(video control is shown).
+		*
+		* @validvalue "true" show the video control, "false" hide the video control.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+		*   char buf[BUFFER_SIZE];
+        *   maWidgetGetProperty(videoViewHandle, MAW_VIDEO_VIEW_CONTROL, buf, BUFFER_SIZE);
+		* \endcode
+		*/
+		CONTROL = "control";
 	}
 	} // end of WidgetVideoViewProperties
 
