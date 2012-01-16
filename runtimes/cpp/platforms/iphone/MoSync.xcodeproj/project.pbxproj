@@ -33,9 +33,6 @@
 		418047B8147E8B6A0048FB95 /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = 418047B5147E8B6A0048FB95 /* Reachability.m */; };
 		41804802147E91050048FB95 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 41804801147E91050048FB95 /* SystemConfiguration.framework */; };
 		4192E7B813F5801900C10302 /* CameraConfirgurator.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4192E7B713F5801900C10302 /* CameraConfirgurator.mm */; };
-		41B4F2B214C34EF000D087F1 /* Capture.h in Headers */ = {isa = PBXBuildFile; fileRef = 41B4F2B014C34EF000D087F1 /* Capture.h */; };
-		41B4F2B314C34EF000D087F1 /* Capture.mm in Sources */ = {isa = PBXBuildFile; fileRef = 41B4F2B114C34EF000D087F1 /* Capture.mm */; };
-		41B4F2B414C34EF000D087F1 /* Capture.mm in Sources */ = {isa = PBXBuildFile; fileRef = 41B4F2B114C34EF000D087F1 /* Capture.mm */; };
 		41BD2ED114768C40005ADEB9 /* AudioSyscall.mm in Sources */ = {isa = PBXBuildFile; fileRef = E4D36EA71459AC5B00477B1E /* AudioSyscall.mm */; };
 		41BD2ED214768C47005ADEB9 /* AudioSyscall.h in Headers */ = {isa = PBXBuildFile; fileRef = E4D36EA61459AC5B00477B1E /* AudioSyscall.h */; };
 		41BD2ED314768C4D005ADEB9 /* AudioData.mm in Sources */ = {isa = PBXBuildFile; fileRef = E4D36EA51459AC5B00477B1E /* AudioData.mm */; };
@@ -126,6 +123,10 @@
 		43D8047F13EFBCB200183387 /* VideoViewWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43D8046B13EFBCB200183387 /* VideoViewWidget.mm */; };
 		43D8048013EFBCB200183387 /* VideoViewWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43D8046B13EFBCB200183387 /* VideoViewWidget.mm */; };
 		43D8048413EFBEEE00183387 /* MediaPlayer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 43D8048213EFBCC700183387 /* MediaPlayer.framework */; };
+		43F9CBB614C4192800DE2285 /* Capture.h in Headers */ = {isa = PBXBuildFile; fileRef = 43F9CBB414C4192800DE2285 /* Capture.h */; };
+		43F9CBB714C4192800DE2285 /* Capture.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43F9CBB514C4192800DE2285 /* Capture.mm */; };
+		43F9CBB814C4192800DE2285 /* Capture.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43F9CBB514C4192800DE2285 /* Capture.mm */; };
+		43F9CBBB14C4198400DE2285 /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 43F9CBB914C4197400DE2285 /* MobileCoreServices.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		43FBCABF1433627400301E39 /* PimContactItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B46B3B1407FAA5009491A6 /* PimContactItem.m */; };
 		43FBCAC01433627400301E39 /* PimContactsList.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B46B3C1407FAA5009491A6 /* PimContactsList.m */; };
 		85037840133A2275009251E2 /* StackScreenWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8503783F133A2275009251E2 /* StackScreenWidget.mm */; };
@@ -405,6 +406,9 @@
 		43D8046A13EFBCB200183387 /* VideoViewWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VideoViewWidget.h; sourceTree = "<group>"; };
 		43D8046B13EFBCB200183387 /* VideoViewWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = VideoViewWidget.mm; sourceTree = "<group>"; };
 		43D8048213EFBCC700183387 /* MediaPlayer.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MediaPlayer.framework; path = System/Library/Frameworks/MediaPlayer.framework; sourceTree = SDKROOT; };
+		43F9CBB414C4192800DE2285 /* Capture.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Capture.h; path = capture/Capture.h; sourceTree = "<group>"; };
+		43F9CBB514C4192800DE2285 /* Capture.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = Capture.mm; path = capture/Capture.mm; sourceTree = "<group>"; };
+		43F9CBB914C4197400DE2285 /* MobileCoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MobileCoreServices.framework; path = System/Library/Frameworks/MobileCoreServices.framework; sourceTree = SDKROOT; };
 		8503783E133A2275009251E2 /* StackScreenWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StackScreenWidget.h; sourceTree = "<group>"; };
 		8503783F133A2275009251E2 /* StackScreenWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = StackScreenWidget.mm; sourceTree = "<group>"; };
 		850943291185AF87004A3B2D /* SyscallImpl.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = SyscallImpl.mm; path = impl/SyscallImpl.mm; sourceTree = "<group>"; };
@@ -580,6 +584,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				43CE0BF61463EE5F00F8FFC3 /* iAd.framework in Frameworks */,
+				43F9CBBB14C4198400DE2285 /* MobileCoreServices.framework in Frameworks */,
 				431869B313F691A30051D97A /* CoreMotion.framework in Frameworks */,
 				431869AB13F68E8A0051D97A /* EventKit.framework in Frameworks */,
 				431869A813F68E560051D97A /* AddressBook.framework in Frameworks */,
@@ -730,6 +735,7 @@
 		29B97323FDCFA39411CA2CEA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				43F9CBB914C4197400DE2285 /* MobileCoreServices.framework */,
 				43CE0BF51463EE5F00F8FFC3 /* iAd.framework */,
 				431869B213F691A30051D97A /* CoreMotion.framework */,
 				431869AA13F68E8A0051D97A /* EventKit.framework */,
@@ -820,6 +826,15 @@
 				43CE0BEC1463E9C600F8FFC3 /* NotificationManager.mm */,
 			);
 			name = notifications;
+			sourceTree = "<group>";
+		};
+		43F9CBB214C4190400DE2285 /* capture */ = {
+			isa = PBXGroup;
+			children = (
+				43F9CBB414C4192800DE2285 /* Capture.h */,
+				43F9CBB514C4192800DE2285 /* Capture.mm */,
+			);
+			name = capture;
 			sourceTree = "<group>";
 		};
 		8500CD3E132E506D0003A01E /* External */ = {

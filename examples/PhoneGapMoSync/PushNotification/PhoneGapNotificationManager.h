@@ -30,7 +30,8 @@ MA 02110-1301, USA.
 #include <NativeUI/WebView.h>
 #include <Notification/PushNotificationListener.h>
 
-#include "PhoneGapMessage.h"
+#include "../PhoneGapMessage.h"
+#include "TCPConnection.h"
 
 // Forward declaration
 class Notification::PushNotification;
@@ -96,8 +97,23 @@ private:
 	 */
 	void setPushNotificationTypes(PhoneGapMessage& message);
 
+	/**
+	 * Remove the quotation marks from the begging and ending of a given string.
+	 * For example if the given string is "myString" the returned string will
+	 * be myString.
+	 * @param string String to be parsed.
+	 * @return The parsed string.
+	 */
+	MAUtil::String parseJSString(const MAUtil::String& string);
+
 private:
 	PhoneGapMessageHandler* mMessageHandler;
+
+	/**
+	 * Used for sending the device token / application id to a specified
+	 * server.
+	 */
+	TCPConnection* mConnection;
 
 	/**
 	 * Stores the CallbackID of the caller so the result can be sent

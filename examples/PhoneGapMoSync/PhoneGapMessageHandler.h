@@ -200,7 +200,6 @@ public:
 	 */
 	void setSensorEventTarget(int sensor, bool toSensorManager);
 
-
 private:
 	/**
 	 * The WebView used by PhoneGap.

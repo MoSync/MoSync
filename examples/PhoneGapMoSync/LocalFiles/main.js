@@ -316,7 +316,7 @@ function push_notification_did_registered(token)
 
 	// Add a span node with the token.
 	spanTag = document.createElement('span');
-	spanTag.innerHTML = token;
+	spanTag.innerHTML = split_token(token);
 	spanTag.className = "tokenText";
 	popOverTextDiv.appendChild(spanTag);
 
@@ -424,6 +424,32 @@ function new_push_notification(pushNotification)
 	popOverTextDiv.appendChild(document.createElement('br'));
 
 	show_pop_over();
+}
+
+/**
+ * Split a given token into small strings.
+ *
+ * @param {String} token The given token.
+ * @return {String} br tag will be added to the given token after
+ * sequences of chars.
+ */
+function split_token(token)
+{
+	if (!token)
+	{
+		return "";
+	}
+
+	// Split token in multiple strings with a fixed length.
+	var stringArray = token.match(/.{1,20}/g);
+	var returnedString = "";
+
+	for (var i = 0; i < stringArray.length; i++)
+	{
+		returnedString = returnedString + stringArray[i] + "<br/>";
+	}
+
+	return returnedString;
 }
 
 function init() {
