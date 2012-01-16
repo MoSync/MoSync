@@ -277,7 +277,24 @@ static bool FileCreate(const String& path)
  */
 static bool FileDelete(const String& path)
 {
-	MAHandle file = maFileOpen(path.c_str(), MA_ACCESS_READ_WRITE);
+	String p = path;
+
+	// Check that the file exists and try adding a
+	// trailing slash if this should be a directory
+	// path that misses the slash. In MoSync, all
+	// directory paths must end with a slash.
+	if (!FileExists(p))
+	{
+		p += "/";
+		if (!FileExists(p))
+		{
+			// This is neither a file, nor a directory.
+			return false;
+		}
+	}
+
+	// If we go here p is an existing path.
+	MAHandle file = maFileOpen(p.c_str(), MA_ACCESS_READ_WRITE);
 	if (file < 0)
 	{
 		return false;
