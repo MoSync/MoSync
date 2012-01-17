@@ -132,6 +132,22 @@ namespace NativeUI
         virtual int currentPlaybackTime();
 
         /**
+         * Show video control.
+         */
+        void showControl();
+
+        /**
+         * Hide video control.
+         */
+        void hideControl();
+
+        /**
+         * Check if the video control is visible.
+         * @return true if the video control is visible, false otherwise.
+         */
+        bool isControlVisible();
+
+        /**
          * Add an video view event listener.
          * @param listener The listener that will receive video view events.
          */

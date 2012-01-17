@@ -273,22 +273,6 @@ static bool FileCreate(const String& path)
 }
 
 /**
- * Delete file/directory.
- */
-static bool FileDelete(const String& path)
-{
-	MAHandle file = maFileOpen(path.c_str(), MA_ACCESS_READ_WRITE);
-	if (file < 0)
-	{
-		return false;
-	}
-
-	int result = maFileDelete(file);
-	maFileClose(file);
-	return 0 == result;
-}
-
-/**
  * Truncate a file.
  * @return New file length on success, <0 on error.
  */
@@ -448,13 +432,123 @@ static int FileRead(const String& path, String& data)
 }
 
 /**
- * Copy or move a file.
+ * Delete a file we know exists.
+ */
+static int FileDeleteFile(const String& path)
+{
+	MAHandle file = maFileOpen(path.c_str(), MA_ACCESS_READ_WRITE);
+	if (file < 0)
+	{
+		return -1;
+	}
+
+	int result = maFileDelete(file);
+	maFileClose(file);
+	return 0 == result;
+}
+
+/**
+ * Delete a directory recursively.
+ * Path MUST end with a slash.
+ */
+static int FileDeleteDirectory(const String& path)
+{
+	char nameBuf[2048];
+
+	// Open directory listing.
+	MAHandle list = maFileListStart(path.c_str(), "", MA_FL_SORT_NONE);
+	if (list < 0)
+	{
+		return -1;
+	}
+
+	// Delete all files in this directory and in subdirectories.
+	while (true)
+	{
+		// Move to next file.
+		int result = maFileListNext(list, nameBuf, 2048);
+		if (0 == result)
+		{
+			// No more files.
+			break;
+		}
+		if (0 > result)
+		{
+			// Error.
+			return -1;
+		}
+
+		String fullPath = path + nameBuf;
+
+		lprintfln("===== FileDeleteDirectory fullPath: %s", fullPath.c_str());
+
+		// Is this a directory?
+		if ('/' == nameBuf[result - 1])
+		{
+
+			// Delete recursively.
+			FileDeleteDirectory(fullPath);
+		}
+		else
+		{
+			// Delete file.
+			FileDeleteFile(fullPath);
+		}
+	}
+
+	// Close the directory listing.
+	maFileListClose(list);
+
+	// Delete the directory.
+	FileDeleteFile(path);
+}
+
+/**
+ * Delete file or directory. This is the top-level function.
+ * Directories are deleted recursively.
+ * TODO: In PhoneGap a directory MUST NOT be recursively deleted.
+ * on remove. The directory must be empty. Delete recursively on
+ * removeRecursively. Implement this.
+ */
+static int FileDelete(const String& path)
+{
+	// If path ends with a slash we know it should be
+	// a directory.
+	if (path[path.size() - 1] == '/')
+	{
+		if (FileExists(path))
+		{
+			return FileDeleteDirectory(path);
+		}
+		else
+		{
+			// Directory does not exist.
+			return -1;
+		}
+	}
+	else
+	{
+		// The file can still be a directory, but if the path
+		// exists, it is just a file. If the path with a trailing
+		// slash exists, it is a directory.
+		if (FileExists(path))
+		{
+			return FileDeleteFile(path);
+		}
+		else if (FileExists(path + "/"))
+		{
+			return FileDeleteDirectory(path + "/");
+		}
+	}
+}
+
+/**
+ * Copy a file. Overwrites the destination file.
  * @return 0 on success <0 on error.
  */
-static int FileCopyOrMove(
+static int FileCopyFile(
 	const String& sourcePath,
-	const String& destinationPath,
-	bool move)
+	const String& destinationPath)
 {
 	// Open source file.
 	MAHandle sourceFile = maFileOpen(sourcePath.c_str(), MA_ACCESS_READ_WRITE);
@@ -463,6 +557,7 @@ static int FileCopyOrMove(
 		return -1;
 	}
 
+	// Check that source file exists.
 	int exists = maFileExists(sourceFile);
 	if (1 != exists)
 	{
@@ -470,6 +565,7 @@ static int FileCopyOrMove(
 		return -1;
 	}
 
+	// Get and check source size.
 	int fileSize = maFileSize(sourceFile);
 	if (fileSize < 0)
 	{
@@ -477,72 +573,156 @@ static int FileCopyOrMove(
 		return -1;
 	}
 
+	// Create data object for source data to copy.
 	MAHandle data = maCreatePlaceholder();
 	int createDataResult = maCreateData(data, fileSize);
 	if (RES_OK != createDataResult)
 	{
 		maFileClose(sourceFile);
-		//maDestroyPlaceholder(data);
+		maDestroyPlaceholder(data);
 		return -1;
 	}
 
-	lprintfln(">>>>> FileMove 1");
 	int readResult = maFileReadToData(sourceFile, data, 0, fileSize);
 	if (readResult < 0)
 	{
 		maFileClose(sourceFile);
-		//maDestroyPlaceholder(data);
+		maDestroyPlaceholder(data);
 		return -1;
 	}
 
-	lprintfln(">>>>> FileMove 2");
-
-	// This deletes the destination file if it exists.
-	FileDelete(destinationPath);
+	// This deletes the destination file if it already exists.
+	FileDeleteFile(destinationPath);
 
 	// Create destination file.
 	bool createSuccess = FileCreatePath(destinationPath);
 	if (!createSuccess)
 	{
-		lprintfln(">>>>> FileMove !createSuccess");
 		maFileClose(sourceFile);
-		//maDestroyPlaceholder(data);
+		maDestroyPlaceholder(data);
 		return -1;
 	}
 
-	lprintfln(">>>>> FileMove 3");
 	// Open destination file.
 	MAHandle destinationFile = maFileOpen(destinationPath.c_str(), MA_ACCESS_READ_WRITE);
 	if (destinationFile < 0)
 	{
 		maFileClose(sourceFile);
-		//maDestroyPlaceholder(data);
+		maDestroyPlaceholder(data);
 		return -1;
 	}
 
-	lprintfln(">>>>> FileMove 4");
+	// Write data to destination file.
 	int writeResult = maFileWriteFromData(destinationFile, data, 0, fileSize);
 	if (writeResult < 0)
 	{
 		maFileClose(sourceFile);
 		maFileClose(destinationFile);
-		//maDestroyPlaceholder(data);
+		maDestroyPlaceholder(data);
 		return -1;
 	}
 
-	lprintfln(">>>>> FileMove 5");
-	// If this is a move operation, delete the source file.
-	if (move)
-	{
-		// TODO: Add error checking.
-		maFileDelete(sourceFile);
-	}
-
+	// Close files and free data object.
 	maFileClose(sourceFile);
 	maFileClose(destinationFile);
-	//maDestroyPlaceholder(data);
+	maDestroyPlaceholder(data);
 
+	// Success.
 	return 0;
+}
+
+/**
+ * Copy the files in a directory recursively.
+ */
+static int FileCopyDirectory(
+	const String& sourcePath,
+	const String& destinationPath)
+{
+	char nameBuf[2048];
+
+	// Open directory listing of source dir.
+	MAHandle list = maFileListStart(sourcePath.c_str(), "", MA_FL_SORT_NONE);
+	if (list < 0)
+	{
+		return -1;
+	}
+
+	// Copy all files in this directory and in subdirectories.
+	while (true)
+	{
+		// Move to next file.
+		int result = maFileListNext(list, nameBuf, 2048);
+		if (0 == result)
+		{
+			// No more files.
+			break;
+		}
+		if (0 > result)
+		{
+			// Error.
+			return -1;
+		}
+
+		String fullSourcePath = sourcePath + nameBuf;
+		String fullDestinationPath = destinationPath + nameBuf;
+
+		lprintfln("===== FileCopyDirectory fullSourcePath: %s", fullSourcePath.c_str());
+		lprintfln("===== FileCopyDirectory fullDestinationPath: %s", fullDestinationPath.c_str());
+
+		// Is this a directory?
+		if ('/' == nameBuf[result - 1])
+		{
+
+			// Copy recursively.
+			FileCopyDirectory(fullSourcePath, fullDestinationPath);
+		}
+		else
+		{
+			// Copy file.
+			FileCopyFile(fullSourcePath, fullDestinationPath);
+		}
+	}
+
+	// Close the directory listing.
+	maFileListClose(list);
+}
+
+/**
+ * Copy file or directory structure.
+ */
+static int FileCopy(
+	const String& sourcePath,
+	const String& destinationPath)
+{
+
+	// If path ends with a slash we know it should be
+	// a directory.
+	if (sourcePath[sourcePath.size() - 1] == '/')
+	{
+		if (FileExists(sourcePath))
+		{
+			return FileCopyDirectory(sourcePath, destinationPath);
+		}
+		else
+		{
+			// Directory does not exist.
+			return -1;
+		}
+	}
+	else
+	{
+		// The file can still be a directory, but if the path
+		// exists, it is just a file. If the path with a trailing
+		// slash exists, it is a directory.
+		if (FileExists(sourcePath))
+		{
+			return FileCopyDirectory(sourcePath, destinationPath);
+		}
+		else if (FileExists(sourcePath + "/"))
+		{
+			return FileCopyDirectory(sourcePath + "/", destinationPath);
+		}
+	}
 }
 
 /**
@@ -683,6 +863,10 @@ void PhoneGapFile::handleMessage(PhoneGapMessage& message)
 	{
 		actionRemove(message);
 	}
+
+	// TODO: Implement getDirectory to create a directory.
+	// TODO: Make getFile to create a file.
+	// TODO: Implement DirectoryReader.readEntries.
 }
 
 /**
@@ -1001,13 +1185,16 @@ void PhoneGapFile::actionCopyToOrMoveTo(PhoneGapMessage& message, bool move)
 	lprintfln(">>>>> movefile destinationName: %s", destinationName.c_str());
 	lprintfln(">>>>> movefile fullDestinationPath: %s", fullDestinationPath.c_str());
 
-	int result = FileCopyOrMove(sourcePath, fullDestinationPath, move);
-	if (result < 0)
-	{
-		lprintfln(">>>>> movefile callFileError(callbackID, FILEERROR_NOT_FOUND_ERR);");
-		callFileError(callbackID, FILEERROR_NOT_FOUND_ERR);
-		return;
-	}
+	// TODO: Implement this.
+	maPanic(0, "File Copy/Move not implemented");
+
+//	int result = FileCopyOrMove(sourcePath, fullDestinationPath, move);
+//	if (result < 0)
+//	{
+//		lprintfln(">>>>> movefile callFileError(callbackID, FILEERROR_NOT_FOUND_ERR);");
+//		callFileError(callbackID, FILEERROR_NOT_FOUND_ERR);
+//		return;
+//	}
 
 	// Send back FileEntry data.
 	String fileEntry = emitFileEntry(
@@ -1027,12 +1214,14 @@ void PhoneGapFile::actionRemove(PhoneGapMessage& message)
 
 	String path = message.getArgsField("fullPath");
 
-	bool success = FileDelete(path);
-	if (!success)
-	{
-		callFileError(callbackID, FILEERROR_NOT_FOUND_ERR);
-		return;
-	}
+	FileDeleteDirectory(path);
+
+//	bool success = FileDelete(path);
+//	if (!success)
+//	{
+//		callFileError(callbackID, FILEERROR_NOT_FOUND_ERR);
+//		return;
+//	}
 
 	// Send back FileEntry data.
 	String fileEntry = emitFileEntry(
