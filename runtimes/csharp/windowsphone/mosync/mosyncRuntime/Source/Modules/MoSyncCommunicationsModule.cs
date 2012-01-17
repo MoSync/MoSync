@@ -304,15 +304,15 @@ namespace MoSync
                 mConnections.Clear();
             });
 
-            mResultHandler = delegate(int handle, int connOp, int result)
-            {
-                Memory evt = new Memory(4 * 4);
-                evt.WriteInt32(MoSync.Struct.MAEvent.type, MoSync.Constants.EVENT_TYPE_CONN);
-                evt.WriteInt32(MoSync.Struct.MAConnEventData.handle, handle);
-				evt.WriteInt32(MoSync.Struct.MAConnEventData.opType, connOp);
-				evt.WriteInt32(MoSync.Struct.MAConnEventData.result, result);
-                runtime.PostEvent(new Event(evt));
-            };
+						mResultHandler = delegate(int handle, int connOp, int result)
+						{
+							Memory evt = new Memory(4 * 4);
+							evt.WriteInt32(MoSync.Struct.MAEvent.type, MoSync.Constants.EVENT_TYPE_CONN);
+							evt.WriteInt32(MoSync.Struct.MAEvent.conn.handle, handle);
+							evt.WriteInt32(MoSync.Struct.MAEvent.conn.opType, connOp);
+							evt.WriteInt32(MoSync.Struct.MAEvent.conn.result, result);
+							runtime.PostEvent(new Event(evt));
+						};
 
             syscalls.maConnect = delegate(int _url)
             {

@@ -461,5 +461,11 @@ namespace MoSync
 			mResources.Add(mCurrentResourceHandle++, res);
 			return mCurrentResourceHandle - 1;
 		}
+
+		public void RemoveResource(int handle)
+		{
+			if (!mResources.Remove(handle))
+				MoSync.Util.CriticalError("Could not destroy placeholder!");
+		}
 	}
 }

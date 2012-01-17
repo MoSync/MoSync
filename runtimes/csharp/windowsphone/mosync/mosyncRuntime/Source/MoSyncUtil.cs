@@ -323,7 +323,7 @@ namespace MoSync
 					im.SetSource(stream);
 					wb = new WriteableBitmap(im);
 				}
-				catch (Exception e)
+				catch (Exception)
 				{
 					wb = null;
 				}

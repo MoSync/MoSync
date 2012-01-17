@@ -73,11 +73,18 @@ namespace MoSync
                 return (int)Util.ToUnixTime(System.DateTime.Now);
             };
 
-            syscalls.maCreatePlaceholder = delegate()
-            {
-				Resource res = new Resource(null, MoSync.Constants.RT_PLACEHOLDER, true);
-                return runtime.AddResource(res);
-            };
+						syscalls.maCreatePlaceholder = delegate()
+						{
+							Resource res = new Resource(null, MoSync.Constants.RT_PLACEHOLDER, true);
+							return runtime.AddResource(res);
+						};
+
+						syscalls.maDestroyPlaceholder = delegate(int res)
+						{
+							if (!runtime.GetResource(0, res).IsDynamicPlaceholder())
+								MoSync.Util.CriticalError("maDestroyPlaceholder can only be used on handles created by maCreatePlaceholder.");
+							runtime.RemoveResource(res);
+						};
 
             syscalls.maFindLabel = delegate(int _name)
             {

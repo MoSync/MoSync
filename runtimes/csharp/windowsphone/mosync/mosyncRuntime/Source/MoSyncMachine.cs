@@ -153,8 +153,8 @@ namespace MoSync
 
             MoSync.Machine mosyncMachine = new MoSync.Machine(true);
             mosyncMachine.Init(core, resources);
-            if (resources != null)
-                resources.Close();
+            //if (resources != null)
+                //resources.Close();
             return mosyncMachine;
         }
 
