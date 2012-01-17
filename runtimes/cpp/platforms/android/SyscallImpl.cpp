@@ -1634,6 +1634,15 @@ namespace Base
 			return _maAudioSetVolume(audioInstance, volume, mJNIEnv, mJThis);
 		}
 
+		case maIOCtl_maAudioPause:
+		{
+			SYSLOG("maIOCtl_maAudioPause");
+
+			int audioInstance = a;
+
+			return _maAudioPause(audioInstance, mJNIEnv, mJThis);
+		}
+
 		case maIOCtl_maAudioStop:
 		{
 			SYSLOG("maIOCtl_maAudioStop");

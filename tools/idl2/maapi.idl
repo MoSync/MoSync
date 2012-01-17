@@ -8706,7 +8706,8 @@ group NFCAPI "NFC API" {
 			MAAudioData maAudioDataCreateFromResource(in MAString mime, in MAHandle data, in int offset, in int length, in int flags);
 
 			/**
-			*
+			* \brief Creates a MAAudioData from a URL
+			* The URL is being
 			*/
 			MAAudioData maAudioDataCreateFromURL(in MAString mime, in MAString url, in int flags);
 
@@ -8745,6 +8746,7 @@ group NFCAPI "NFC API" {
 			* Notes:
 			* Android: If a streaming audio is already playing and a new one is being prepared,
 			* the playing audio will stop.
+			*
 			* \param audio The audio instance
 			* \param async 0 if synchronus, 1 if asynchronous
 			* \return 	MA_AUDIO_ERR_OK on success
@@ -8760,6 +8762,8 @@ group NFCAPI "NFC API" {
 			* Android: If the audio hasn't been prepared it will be synchrounous prepared before playing,
 			* this means that there might be a delay before this call returns. Always make sure that your
 			* audio has been properly prepared before playing.
+			*
+			* \param audio The audio instance
 			*/
 			int maAudioPlay(in MAAudioInstance audio);
 
