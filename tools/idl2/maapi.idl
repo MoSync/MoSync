@@ -8122,7 +8122,7 @@ group NFCAPI "NFC API" {
 
 		/**
 		* Creates a new NDEF message, to be used primarily by
-		* \code maNFCWriteDefMessage.
+		* \code maNFCWriteDefMessage. \endcode
 		* \param recordCount The number of records in the created message
 		* \return The handle to the created NDEF message; clients are
 		* responsible for destroying the message.
@@ -9651,6 +9651,7 @@ group NotificationAPI "Notification API" {
 			* @par Example
 			* \code
 			*	maNotificationLocalSetProperty(notificationHandle, MA_NOTIFICATION_LOCAL_FLASH_LIGHTS, "true");
+			* \endcode
 			*/
 			FLASH_LIGHTS = "flashLights";
 
@@ -9672,6 +9673,7 @@ group NotificationAPI "Notification API" {
 			* \code
 			* 	// In this example, the green light repeatedly flashes on for 300 milliseconds and turns off for one second.
 			*	maNotificationLocalSetProperty(notificationHandle, MA_NOTIFICATION_LOCAL_FLASH_LIGHTS_PATTERN, "0xff00ff00,300,1000");
+			* \endcode
 			*/
 			FLASH_LIGHTS_PATTERN = "flashLightsPattern";
 		}
