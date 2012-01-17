@@ -6933,6 +6933,7 @@ group WidgetAPI "Widget API" {
 		/**
 		* @brief Show/hide video control.
 		* Default value is "true"(video control is shown).
+		* Platform: iOS.
 		*
 		* @validvalue "true" show the video control, "false" hide the video control.
 		*
