@@ -109,11 +109,6 @@ private:
 	void addCameraRollFlagRow(ListView* listView);
 
 	/**
-	 * Adds a list row for setting the save to gallery flag.
-	 */
-	void addGalleryFlagRow(ListView* listView);
-
-	/**
 	 * Adds a list row for setting the camera controls flag.
 	 */
 	void addCameraControlsFlagRow(ListView* listView);
@@ -221,11 +216,6 @@ private:
      * Used for setting the camera roll flag.
      */
     CheckBox* mCameraRollCheckBox;
-
-    /**
-     * Used for getting the save to galler flag.
-     */
-    CheckBox* mGalleryFlag;
 
     /**
      * Used for setting the camera controls flag.
