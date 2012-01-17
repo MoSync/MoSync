@@ -99,6 +99,13 @@ private:
 	 * @return true if the platform is Android, false otherwise.
 	 */
 	bool isAndroid();
+
+	/**
+	 * Handle the click event for video control button.
+	 * Show/hide the video control and change button's text.
+	 */
+	void handleVideoControlButtonClicked();
+
 private:
 	/**
 	 * Main layout.
@@ -116,6 +123,10 @@ private:
 	Button* mSeekTo;
 	Button* mCurrentTime;
 
+	/**
+	 * Show/hide video control.
+	 */
+	Button* mVideoControl;
 };
 
 

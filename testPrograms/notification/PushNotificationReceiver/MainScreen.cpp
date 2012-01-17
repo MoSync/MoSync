@@ -130,7 +130,7 @@ void MainScreen::storeRegistrationID(MAUtil::String* token)
 	}
 
 	// Finally, send it over TCP to the server.
-	//mConnection->sendData(token);
+//	mConnection->sendData(token);
 }
 
 /**
