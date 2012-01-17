@@ -3,7 +3,7 @@
 #include <MAUtil/Moblet.h>
 #include <NativeUI/Widgets.h>
 #include <NativeUI/WidgetUtil.h>
-#include <ResCompiler/rescomp.h>
+#include <ResCompiler/ResCompiler.h>
 
 #include "MAHeaders.h"
 
