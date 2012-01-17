@@ -69,6 +69,7 @@ struct SETTINGS {
     // BlackBerry specific settings
     const char* blackberryJde;
     const char* blackberrySignKey;
+    bool blackberryPackAsCOD;
 
     // JavaME specific settings
     const char* javameKeystore;
