@@ -2265,7 +2265,7 @@ public class MoSyncThread extends Thread
 
 		if ((flag & MA_RESOURCE_CLOSE) != 0) {
 			mResourceFd = null;
-			mResourceOffset = 0;
+			//mResourceOffset = 0;
 		}
 
 		return 0;
