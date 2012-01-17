@@ -388,7 +388,7 @@ void PhoneGapMessageHandler::callCallback(
 
 	script += ",'{";
 	script += "\"status\":" + status;
-	script += ",\"message\": " + args;
+	script += ",\"message\":" + args;
 
 	if (keepCallback)
 	{

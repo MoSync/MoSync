@@ -168,7 +168,7 @@ PhoneGap.CallbackSuccess = function(callbackId, args, cast)
     var commandResult;
     try
     {
-        mosync.log("@@ PhoneGap.CallbackSuccess: " + callbackId + " args: " + args);
+        mosync.log("PhoneGap.CallbackSuccess: " + callbackId + " args: " + args);
 
         commandResult = JSON.parse(args);
 
@@ -179,7 +179,7 @@ PhoneGap.CallbackSuccess = function(callbackId, args, cast)
     }
     catch(exception)
     {
-        mosync.log(exception.message);
+        mosync.log("PhoneGap.CallbackSuccess Exception: " + exception.message);
     }
 
     if (PhoneGap.callbacks[callbackId] ) {
@@ -192,7 +192,8 @@ PhoneGap.CallbackSuccess = function(callbackId, args, cast)
                 }
             }
             catch (e) {
-                mosync.log("Error in success callback: "+callbackId+" = " + e.message);
+                mosync.log("PhoneGap.CallbackSuccess Error in success callback: " +
+                    callbackId + " = " + e.message);
             }
         }
 
@@ -201,6 +202,7 @@ PhoneGap.CallbackSuccess = function(callbackId, args, cast)
             delete PhoneGap.callbacks[callbackId];
         }
     }
+
     // Note that in WP7, this method can return a value to the native calling code
     return "";
 };
@@ -231,7 +233,7 @@ PhoneGap.CallbackError = function (callbackId, args, cast) {
             }
         }
         catch (e) {
-            mosync.log("Error in error callback: "+callbackId+" = "+e);
+            mosync.log("Error in error callback: " + callbackId + " = " + e);
         }
 
         // Clear callback if not expecting any more results
@@ -2895,11 +2897,9 @@ LocalFileSystem.prototype._castFS = function (pluginResult) {
 LocalFileSystem.prototype._castEntry = function(pluginResult) {
     var entry = null;
     if (pluginResult.message.isDirectory) {
-        mosync.log("This is a dir");
         entry = new DirectoryEntry();
     }
     else if (pluginResult.message.isFile) {
-        mosync.log("This is a file");
         entry = new FileEntry();
     }
     entry.isDirectory = pluginResult.message.isDirectory;
@@ -2923,11 +2923,9 @@ LocalFileSystem.prototype._castEntries = function(pluginResult) {
 LocalFileSystem.prototype._createEntry = function(castMe) {
     var entry = null;
     if (castMe.isDirectory) {
-        mosync.log("This is a dir");
         entry = new DirectoryEntry();
     }
     else if (castMe.isFile) {
-        mosync.log("This is a file");
         entry = new FileEntry();
     }
     entry.isDirectory = castMe.isDirectory;

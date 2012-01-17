@@ -44,317 +44,369 @@ function PrintObject(obj, indent)
 	}
 }
 
+/**
+ * Wrapper around the PhoneGap File API.
+ * The intention is to simplify the File API.
+ * All functions take one callback function,
+ * rather than two functions (success and fail)
+ * as in the PhoneGap API. The first parameter of
+ * the callback is always a boolean that indicates
+ * if the call was successful or not. The result
+ * is passed in an optional second parameter.
+ */
 var FileSys = function()
 {
 	var FileSys = {};
 
-	/**
-	 * Make generic error handling function that calls fun.
-	 */
-	function error(fun)
+	FileSys.create = function(uri, fun)
 	{
-		return function(result)
+		var fileSys = FileSys.createInstance();
+
+		if ("LocalFileSystem" == uri)
 		{
-			MyLog("@@@ FileSys error: " + result.code);
-			fun(false, null);
-		};
-	}
-
-	FileSys.writeText = function(path, data, fun)
-	{
-		FileSys.writeTextAtPosition(path, data, 0, fun);
-	};
-
-	FileSys.writeTextAtPosition = function(path, data, position, fun)
-	{
-		window.requestFileSystem(
-			LocalFileSystem.PERSISTENT,
-			0,
-			function (fileSystem)
-			{
-				fileSystem.root.getFile(
-					path,
-					{ create: true },
-					function(fileEntry)
-					{
-						var writer = new FileWriter(fileEntry);
-						writer.onwrite = function(obj)
-						{
-							fun(true);
-						};
-						writer.error = function(obj)
-						{
-							fun(false);
-						};
-						writer.seek(position);
-						writer.write(data);
-					},
-					error(fun));
-			},
-			error(fun));
-	};
-
-	FileSys.readText = function(path, fun)
-	{
-		window.requestFileSystem(
-			LocalFileSystem.PERSISTENT,
-			0,
-			function (fileSystem)
-			{
-				fileSystem.root.getFile(
-					path,
-					{ create: true },
-					function(fileEntry)
-					{
-						var reader = new FileReader();
-						reader.onload = function(obj)
-						{
-							fun(true, obj.target.result);
-						};
-						reader.onerror = function(obj)
-						{
-							 fun(false, null);
-						};
-						reader.readAsText(fileEntry);
-					},
-					error(fun));
-			},
-			error(fun));
-	};
-
-	FileSys.readAsDataURL = function(path, fun)
-	{
-		window.requestFileSystem(
-			LocalFileSystem.PERSISTENT,
-			0,
-			function (fileSystem)
-			{
-				fileSystem.root.getFile(
-					path,
-					{ create: true },
-					function(fileEntry)
-					{
-						var reader = new FileReader();
-						reader.onload = function(obj)
-						{
-							fun(true, obj.target.result);
-						};
-						reader.onerror = function(obj)
-						{
-							 fun(false, null);
-						};
-						reader.readAsDataURL(fileEntry);
-					},
-					error(fun));
-			},
-			error(fun));
-	};
-
-	FileSys.truncate = function(path, size, fun)
-	{
-		window.requestFileSystem(
-			LocalFileSystem.PERSISTENT,
-			0,
-			function (fileSystem)
-			{
-				fileSystem.root.getFile(
-					path,
-					{ create: true },
-					function(fileEntry)
-					{
-						var writer = new FileWriter(fileEntry);
-						writer.onwrite = function(obj)
-						{
-							fun(true);
-						};
-						writer.error = function(obj)
-						{
-							fun(false);
-						};
-						writer.truncate(size);
-					},
-					error(fun));
-			},
-			error(fun));
-	};
-
-	FileSys.getMetaData = function(path, fun)
-	{
-		window.requestFileSystem(
-			LocalFileSystem.PERSISTENT,
-			0,
-			function (fileSystem)
-			{
-				fileSystem.root.getFile(
-					path,
-					{ create: false },
-					function(fileEntry)
-					{
-						fileEntry.getMetadata(
-							function(metadata) { fun(true, metadata); },
-							error(fun));
-					},
-					error(fun));
-			},
-			error(fun));
-	};
-
-	/**
-	 * Copy of move a file from a source path to a
-	 * destination path.
-	 * @param path Full source path.
-	 * @param newPath Full destination path.
-	 * @param move true if the file should be moved,
-	 * false if it should be copied.
-	 */
-	FileSys.copyOrMoveFile = function(path, newPath, fun, move)
-	{
-		window.requestFileSystem(
-			LocalFileSystem.PERSISTENT,
-			0,
-			function (fileSystem)
-			{
-				fileSystem.root.getFile(
-					path,
-					{ create: false },
-					function(fileEntry)
-					{
-						// Full parent directory path of new file destination,
-						// excluding the file name.
-						var newParentPath;
-
-						// New file name.
-						var newFileName;
-
-						// The new full path name.
-						var newFullPath = fileSystem.root.fullPath + "/" + newPath;
-
-						// Split into parent path and file name if the file
-						// is not at the root of the local file system.
-						var index = newFullPath.lastIndexOf("/");
-						if (index > -1)
-						{
-							newParentPath = newFullPath.substring(0, index);
-							newFileName = newFullPath.substring(index + 1);
-
-							MyLog("copyOrMoveFile newParentPath: " + newParentPath);
-							MyLog("copyOrMoveFile newFileName: " + newFileName);
-						}
-						else
-						{
-							// Path name is invalid.
-							error(fun);
-						}
-
-						// Find destination directory name.
-						// TODO: This will break if file is at the
-						// root of the file system.
-						var directoryName = "";
-						index = newParentPath.lastIndexOf("/");
-						if (index > -1)
-						{
-							directoryName = newParentPath.substring(index + 1);
-							MyLog("copyOrMoveFile directoryName: " + directoryName);
-						}
-
-						// Create destination directory object.
-						var parentDirectory = new DirectoryEntry();
-						parentDirectory.fullPath = newParentPath;
-						parentDirectory.name = directoryName;
-
-						if (move)
-						{
-							fileEntry.moveTo(
-								parentDirectory,
-								newFileName,
-								function(result) {
-									MyLog("FileSys.copyOrMoveFile MOVE");
-									PrintObject(result);
-									fun(true, result); },
-								error(fun));
-						}
-						else
-						{
-							fileEntry.copyTo(
-								parentDirectory,
-								newFileName,
-								function(result) {
-									MyLog("FileSys.copyOrMoveFile COPY");
-									PrintObject(result);
-									fun(true, result); },
-								error(fun));
-						}
-					},
-					error(fun));
-			},
-			error(fun));
-	};
-
-	FileSys.copyFile = function(path, newPath, fun)
-	{
-		return FileSys.copyOrMoveFile(path, newPath, fun, false);
-	};
-
-	FileSys.moveFile = function(path, newPath, fun)
-	{
-		return FileSys.copyOrMoveFile(path, newPath, fun, true);
-	};
-
-	FileSys.removeFile = function(path, fun)
-	{
-		window.requestFileSystem(
-			LocalFileSystem.PERSISTENT,
-			0,
-			function (fileSystem)
-			{
-				fileSystem.root.getFile(
-					path,
-					{ create: false },
-					function(fileEntry)
-					{
-						fileEntry.remove(
-							function(fileEntry) { fun(true, fileEntry); },
-							error(fun));
-					},
-					error(fun));
-			},
-			error(fun));
-	};
-
-	FileSys.removeDirectory = function(path, fun)
-	{
-		window.requestFileSystem(
-			LocalFileSystem.PERSISTENT,
-			0,
-			function (fileSystem)
-			{
-				var fullPath = fileSystem.root.fullPath + "/" + path;
-
-				// Find directory name.
-				var directoryName = "";
-				var index = fullPath.lastIndexOf("/");
-				if (index > -1)
+			window.requestFileSystem(
+				LocalFileSystem.PERSISTENT,
+				0,
+				function (fileSystem)
 				{
-					directoryName = fullPath.substring(index + 1);
-					MyLog("removeDirectory directoryName: " + directoryName);
+					fileSys.fileSystem = fileSystem;
+					fun(true, fileSys);
+				},
+				function ()
+				{
+					fileSys.fileSystem = null;
+					fun(false, null);
+				});
+		}
+		else
+		{
+			// TODO: File system URIs not implemeted.
+			fun(false, null);
+		}
+	};
+
+	FileSys.createInstance = function()
+	{
+		var fileSys = {};
+
+		fileSys.fileSystem = null;
+
+		/**
+		 * Make generic error handling function that calls
+		 * the specified function.
+		 */
+		function error(fun, id)
+		{
+			return function(result)
+			{
+				MyLog("FileSys.error: " + result.code);
+				if (id)
+				{
+					MyLog("error id: " + id);
 				}
+				fun(false, null);
+			};
+		}
 
-				// Create destination directory object.
-				var directory = new DirectoryEntry();
-				directory.fullPath = fullPath;
-				directory.name = directoryName;
+		fileSys.writeText = function(path, data, fun)
+		{
+			fileSys.writeTextAtPosition(path, data, 0, fun);
+		};
 
-				directory.remove(
-					function(entry) { fun(true, entry); },
-					error(fun));
-			},
-			error(fun));
+		/**
+		 * Write at the specified position (offset) in the file.
+		 * TODO: This does not seem to work. Seek seems to be broken
+		 * in PhoneGap. Truncates the file.
+		 */
+		fileSys.writeTextAtPosition = function(path, data, position, fun)
+		{
+			fileSys.fileSystem.root.getFile(
+				path,
+				{ create: true },
+				function(fileEntry)
+				{
+					var writer = new FileWriter(fileEntry);
+					writer.onwrite = function(obj)
+					{
+						fun(true);
+					};
+					writer.error = function(obj)
+					{
+						fun(false);
+					};
+					writer.seek(position);
+					writer.write(data);
+				},
+				error(fun));
+		};
+
+		fileSys.readText = function(path, fun)
+		{
+			fileSys.fileSystem.root.getFile(
+				path,
+				{ create: true },
+				function(fileEntry)
+				{
+					var reader = new FileReader();
+					reader.onload = function(obj)
+					{
+						fun(true, obj.target.result);
+					};
+					reader.onerror = function(obj)
+					{
+						 fun(false, null);
+					};
+					reader.readAsText(fileEntry);
+				},
+				error(fun));
+		};
+
+		fileSys.readAsDataURL = function(path, fun)
+		{
+			fileSys.fileSystem.root.getFile(
+				path,
+				{ create: true },
+				function(fileEntry)
+				{
+					var reader = new FileReader();
+					reader.onload = function(obj)
+					{
+						fun(true, obj.target.result);
+					};
+					reader.onerror = function(obj)
+					{
+						 fun(false, null);
+					};
+					reader.readAsDataURL(fileEntry);
+				},
+				error(fun));
+		};
+
+		fileSys.truncate = function(path, size, fun)
+		{
+			fileSys.fileSystem.root.getFile(
+				path,
+				{ create: true },
+				function(fileEntry)
+				{
+					var writer = new FileWriter(fileEntry);
+					writer.onwrite = function(obj)
+					{
+						fun(true);
+					};
+					writer.error = function(obj)
+					{
+						fun(false);
+					};
+					writer.truncate(size);
+				},
+				error(fun));
+		};
+
+		fileSys.getMetaData = function(path, fun)
+		{
+			fileSys.fileSystem.root.getFile(
+				path,
+				{ create: false },
+				function(fileEntry)
+				{
+					fileEntry.getMetadata(
+						function(metadata) { fun(true, metadata); },
+						error(fun));
+				},
+				error(fun));
+		};
+
+		/**
+		 * Copy of move a file from a source path to a
+		 * destination path.
+		 * @param path Full source path.
+		 * @param newPath Full destination path.
+		 * @param move true if the file should be moved,
+		 * false if it should be copied.
+		 */
+		fileSys.copyOrMove = function(path, newPath, fun, move)
+		{
+			fileSys.fileSystem.root.getFile(
+				path,
+				{ create: false },
+				function(fileEntry)
+				{
+					var uri = fileEntry.toURI();
+					console.log("################# uri: " + uri);
+
+					// Full parent directory path of new file destination,
+					// excluding the file name.
+					var newParentPath;
+
+					// New file name.
+					var newFileName;
+
+					// The new full path name.
+					var newFullPath = fileSystem.root.fullPath + "/" + newPath;
+
+					// Split into parent path and file name if the file
+					// is not at the root of the local file system.
+					var index = newFullPath.lastIndexOf("/");
+					if (index > -1)
+					{
+						newParentPath = newFullPath.substring(0, index);
+						newFileName = newFullPath.substring(index + 1);
+
+						MyLog("copyOrMoveFile newParentPath: " + newParentPath);
+						MyLog("copyOrMoveFile newFileName: " + newFileName);
+					}
+					else
+					{
+						// Path name is invalid.
+						error(fun);
+					}
+
+					// Find destination directory name.
+					// TODO: This will break if file is at the
+					// root of the file system.
+					var directoryName = "";
+					index = newParentPath.lastIndexOf("/");
+					if (index > -1)
+					{
+						directoryName = newParentPath.substring(index + 1);
+						MyLog("copyOrMoveFile directoryName: " + directoryName);
+					}
+
+					// Create destination directory object.
+					var parentDirectory = new DirectoryEntry();
+					parentDirectory.fullPath = newParentPath;
+					parentDirectory.name = directoryName;
+
+					if (move)
+					{
+						fileEntry.moveTo(
+							parentDirectory,
+							newFileName,
+							function(result) {
+								PrintObject(result);
+								fun(true, result); },
+							error(fun));
+					}
+					else
+					{
+						fileEntry.copyTo(
+							parentDirectory,
+							newFileName,
+							function(result) {
+								PrintObject(result);
+								fun(true, result); },
+							error(fun));
+					}
+				},
+				error(fun));
+		};
+
+		fileSys.copy = function(path, newPath, fun)
+		{
+			return fileSys.copyOrMove(path, newPath, fun, false);
+		};
+
+		fileSys.move = function(path, newPath, fun)
+		{
+			return fileSys.copyOrMove(path, newPath, fun, true);
+		};
+
+		/**
+		 * Create a file.
+		 * @param path File path relative to the
+		 * file system root.
+		 * @fun Function that is called with the result.
+		 */
+		fileSys.createFile = function(path, fun)
+		{
+			fileSys.fileSystem.root.getFile(
+				path,
+				{ create: true, exclusive: false },
+				function(entry) { fun(true, entry); },
+				error(fun));
+		};
+
+		fileSys.removeFile = function(path, fun)
+		{
+			fileSys.fileSystem.root.getFile(
+				path,
+				{ create: false },
+				function(fileEntry)
+				{
+					fileEntry.remove(
+						function(fileEntry) { fun(true, fileEntry); },
+						error(fun));
+				},
+				error(fun));
+		};
+
+		/**
+		 * Create a directory.
+		 * @param path Directory path relative to the
+		 * file system root.
+		 * @fun Function that is called with the result.
+		 */
+		fileSys.createDirectory = function(path, fun)
+		{
+			fileSys.fileSystem.root.getDirectory(
+				path,
+				{ create: true, exclusive: false },
+				function(entry) { fun(true, entry); },
+				error(fun));
+		};
+
+		fileSys.removeDirectory = function(path, fun)
+		{
+			var fullPath = fileSys.fileSystem.root.fullPath + "/" + path;
+
+			// Find directory name.
+			var directoryName = "";
+			var index = fullPath.lastIndexOf("/");
+			if (index > -1)
+			{
+				directoryName = fullPath.substring(index + 1);
+				MyLog("removeDirectory directoryName: " + directoryName);
+			}
+
+			// Create destination directory object.
+			var directory = new DirectoryEntry();
+			directory.fullPath = fullPath;
+			directory.name = directoryName;
+
+			directory.removeRecursively(
+				function(entry) { fun(true, entry); },
+				error(fun));
+		};
+
+		fileSys.readDirectory = function(path, fun)
+		{
+			fileSys.fileSystem.root.getDirectory(
+				path,
+				{ create: false, exclusive: false },
+				function(directory)
+				{
+					PrintObject(directory);
+					var directoryReader = directory.createReader();
+					PrintObject(directoryReader);
+					directoryReader.readEntries(
+						function(entries) { fun(true, entries); },
+						error(fun));
+				},
+				error(fun));
+		};
+
+		return fileSys;
 	};
 
 	return FileSys;
 }();
 
-function testFileSystem()
+/**
+ * This test is obsolete.
+ * TODO: Remove when integrated in test below.
+ */
+function obsoleteTestFileSystem()
 {
 	// ****** Write/Read files ****** //
 
@@ -526,7 +578,7 @@ function testFileSystem()
 
 	function fileRemovedDirectory(success)
 	{
-		MyLog("@@@@@ FileRemovedDirectory result: " + success);
+		MyLog("FileRemovedDirectory result: " + success);
 
 		if (success)
 		{
@@ -537,8 +589,8 @@ function testFileSystem()
 
 	function fileReadFromCopiedDirectory(success, data)
 	{
-		MyLog("@@@@@ FileReadFromCopiedDirectory result: " + success);
-		MyLog("@@@@@ FileReadFromCopiedDirectory data: " + data);
+		MyLog("FileReadFromCopiedDirectory result: " + success);
+		MyLog("FileReadFromCopiedDirectory data: " + data);
 
 		if (success)
 		{
@@ -550,36 +602,111 @@ function testFileSystem()
 	writeFile();
 }
 
-/**
- * Will overwrite previous testFileSystem ;-)
- * Tests directory functions.
- */
 function testFileSystem()
 {
-	function writeFiles()
+	var fileSys = FileSys.create("LocalFileSystem");
+
+	// Set up test.
+	function createFiles()
 	{
-		FileSys.writeText("foz/hello1.txt", "Hello World", reportResult);
-		FileSys.writeText("foz/baz/hello2.txt", "Hello World", reportResult);
-		FileSys.writeText("foz/baz/hello3.txt", "Hello World", listFiles);
+		// Create directories and empty files.
+		fileSys.createDirectory("foa", createFilesShouldPass);
+		fileSys.createDirectory("foa/foo", createFilesShouldPass);
+		fileSys.createFile("foa/hello.txt", createFilesShouldPass);
+		fileSys.createFile("foa/foo/hello.txt", createFilesShouldPass);
+
+		// Write files to directories.
+		fileSys.writeText("foo/hello1.txt", "Hello World", createFilesShouldPass);
+		fileSys.writeText("foo/bar/hello2.txt", "Hello World", createFilesShouldPass);
+		fileSys.writeText("foo/bar/hello3.txt", "Hello World", testReadDirectory);
 	}
 
-	function listFiles(success)
+	// Test that directory contents are as expected.
+	function testReadDirectory(success)
 	{
-		MyLog("@@@@@ listFiles got result: " + success);
 		if (success)
 		{
-			//FileSys.removeDirectory("foz", reportResult);
-			FileSys.removeFile("foz", reportResult);
+			fileSys.readDirectory("foo", testReadDirectoryDone);
+		}
+		else
+		{
+			fail();
 		}
 	}
 
-	function reportResult(success)
+	function testReadDirectoryDone(success, files)
 	{
-		MyLog("reportResult: " + success);
+		var passed = false;
+
+		if (success)
+		{
+			// TODO: Rewritethis, won't work.
+			// Make sort order independent.
+			passed = true
+				&& files[0].name == "hello1.txt"
+				&& files[0].isFile
+				&& files[1].name == "bar"
+				&& files[1].isDirectory;
+		}
+
+		if (passed)
+		{
+			// Next test. Copy directory tree.
+			FileSys.copy("foa", "fob", testCopyDirectoryDone);
+		}
+		else
+		{
+			fail("testReadDirectoryDone failed");
+		}
 	}
 
-	writeFiles();
+	function testCopyDirectoryDone(success)
+	{
+		if (success)
+		{
+			FileSys.move("fob", "foc", testMoveDirectoryDone);
+		}
+		else
+		{
+			fail("testCopyDirectoryDone failed");
+		}
+	}
+
+	function testMoveDirectoryDone(success)
+	{
+		if (success)
+		{
+			// TODO: Check file system.
+		}
+		else
+		{
+			fail("testMoveDirectoryDone failed");
+		}
+
+		// Next test: Read, copy move delete elete files.
+		// Then delete directories.
+	}
+
+	function fail(message)
+	{
+		MyLog("FileSystem test failed: " + message);
+		alert("FileSystem test failed: " + message);
+	}
+
+	function createFilesShouldPass(success)
+	{
+		if (!success)
+		{
+			fail("createFiles failed");
+		}
+	}
+
+	createFiles();
 }
+
+
+// =========================================================================== //
+
 
 function XtestFileSystem() {
 	MyLog("@@ Calling window.requestFileSystem");
