@@ -74,10 +74,8 @@ namespace NativeUI
 		*
 		* @param urlData The handle to url data. This is string data,
 		* there is NO null terminating character. The encoding
-		* of the data is determined by the application.
-		* The data MUST be deallocated with maDestroyObject after
-		* it hs been used. Each event allocates a new data object
-		* for the url data.
+		* of the data is determined by the application. The data
+		* object is only valid during the duration of this call.
 		*/
 		virtual void webViewHookInvoked(
 			WebView* webView,

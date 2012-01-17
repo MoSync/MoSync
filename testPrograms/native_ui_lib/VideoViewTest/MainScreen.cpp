@@ -30,6 +30,11 @@
 #include <maprofile.h>
 
 #include "MainScreen.h"
+
+// Text for video control button.
+#define SHOW_VIDEO_CONTROL_BUTTON_TEXT "Show video control"
+#define HIDE_VIDEO_CONTROL_BUTTON_TEXT "Hide video control"
+
 /**
  * Constructor.
  */
@@ -44,7 +49,8 @@ MainScreen::MainScreen() :
 	mStop(NULL),
 	mGetDuration(NULL),
 	mSeekTo(NULL),
-	mCurrentTime(NULL)
+	mCurrentTime(NULL),
+	mVideoControl(NULL)
 {
 	createMainLayout();
 
@@ -55,6 +61,7 @@ MainScreen::MainScreen() :
 	mGetDuration->addButtonListener(this);
 	mSeekTo->addButtonListener(this);
 	mCurrentTime->addButtonListener(this);
+	mVideoControl->addButtonListener(this);
 
 	mVideoView->addVideoViewListener(this);
 }
@@ -71,6 +78,7 @@ MainScreen::~MainScreen()
     mGetDuration->removeButtonListener(this);
     mSeekTo->removeButtonListener(this);
     mCurrentTime->removeButtonListener(this);
+    mVideoControl->removeButtonListener(this);
 
     mVideoView->removeVideoViewListener(this);
 }
@@ -113,6 +121,10 @@ void MainScreen::createMainLayout() {
     mGetDuration = new Button();
     mGetDuration->setText("Get Duration");
     mMainLayout->addChild(mGetDuration);
+
+    mVideoControl = new Button();
+    mVideoControl->setText(HIDE_VIDEO_CONTROL_BUTTON_TEXT);
+    mMainLayout->addChild(mVideoControl);
 
     HorizontalLayout* layout = new HorizontalLayout();
     mMainLayout->addChild(layout);
@@ -175,6 +187,10 @@ void MainScreen::buttonClicked(Widget* button)
     {
         int result = mVideoView->currentPlaybackTime();
         printf("result currentPlaybackTime = %d", result);
+    }
+    else if (button == mVideoControl)
+    {
+        this->handleVideoControlButtonClicked();
     }
 
 }
@@ -241,4 +257,26 @@ bool MainScreen::isAndroid()
 	{
 		return false;
 	}
+}
+
+/**
+ * Handle the click event for video control button.
+ * Show/hide the video control and change button's text.
+ */
+void MainScreen::handleVideoControlButtonClicked()
+{
+	if (strcmp(mVideoControl->getText().c_str(), HIDE_VIDEO_CONTROL_BUTTON_TEXT) == 0)
+	{
+		mVideoView->hideControl();
+		mVideoControl->setText(SHOW_VIDEO_CONTROL_BUTTON_TEXT);
+	}
+	else
+	{
+		mVideoView->showControl();
+		mVideoControl->setText(HIDE_VIDEO_CONTROL_BUTTON_TEXT);
+	}
+
+	bool value = mVideoView->isControlVisible();
+	printf("MainScreen::handleVideoControlButtonClicked - control visible = %d",
+		value);
 }

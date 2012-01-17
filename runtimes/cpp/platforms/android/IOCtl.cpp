@@ -3210,6 +3210,111 @@ namespace Base
 		return result;
 	}
 
+	int _maCaptureSetProperty(const char* property, const char* value, JNIEnv* jNIEnv, jobject jThis)
+	{
+		jstring jstrProp = jNIEnv->NewStringUTF(property);
+		jstring jstrValue = jNIEnv->NewStringUTF(value);
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maCaptureSetProperty", "(Ljava/lang/String;Ljava/lang/String;)I");
+		if (methodID == 0)
+		{
+			return 0;
+		}
+
+		int result = jNIEnv->CallIntMethod(jThis, methodID, jstrProp, jstrValue);
+
+		jNIEnv->DeleteLocalRef(cls);
+		jNIEnv->DeleteLocalRef(jstrValue);
+		jNIEnv->DeleteLocalRef(jstrProp);
+
+		return result;
+	}
+
+	int _maCaptureGetProperty(int memStart, const char* property, int memBuffer, int bufSize, JNIEnv* jNIEnv, jobject jThis)
+	{
+		jstring jstrProp = jNIEnv->NewStringUTF(property);
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maCaptureGetProperty", "(Ljava/lang/String;II)I");
+		if (methodID == 0)
+		{
+			return 0;
+		}
+
+		int result = jNIEnv->CallIntMethod(jThis, methodID, jstrProp, memBuffer - memStart, bufSize);
+
+		jNIEnv->DeleteLocalRef(cls);
+		jNIEnv->DeleteLocalRef(jstrProp);
+
+		return result;
+	}
+
+	int _maCaptureAction(int action, JNIEnv* jNIEnv, jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maCaptureAction", "(I)I");
+		if (methodID == 0)
+		{
+			return 0;
+		}
+
+		int result = jNIEnv->CallIntMethod(jThis, methodID, action);
+
+		jNIEnv->DeleteLocalRef(cls);
+
+		return result;
+	}
+
+	int _maCaptureWriteImage(MAHandle handle, const char* fullPathBuffer, int fullPathBufSize, JNIEnv* jNIEnv, jobject jThis)
+	{
+		jstring jstrValue = jNIEnv->NewStringUTF(fullPathBuffer);
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maCaptureWriteImage", "(ILjava/lang/String;I)I");
+		if (methodID == 0)
+		{
+			return 0;
+		}
+
+		int result = jNIEnv->CallIntMethod(jThis, methodID, handle, jstrValue, fullPathBufSize);
+
+		jNIEnv->DeleteLocalRef(cls);
+		jNIEnv->DeleteLocalRef(jstrValue);
+
+		return result;
+	}
+
+	int _maCaptureGetVideoPath(int memStart, MAHandle handle, int buffer, int bufferSize, JNIEnv* jNIEnv, jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maCaptureGetVideoPath", "(III)I");
+		if (methodID == 0)
+		{
+			return 0;
+		}
+
+		int result = jNIEnv->CallIntMethod(jThis, methodID, handle, buffer - memStart, bufferSize);
+
+		jNIEnv->DeleteLocalRef(cls);
+
+		return result;
+	}
+
+	int _maCaptureDestroyData(MAHandle handle, JNIEnv* jNIEnv, jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maCaptureDestroyData", "(I)I");
+		if (methodID == 0)
+		{
+			return 0;
+		}
+
+		int result = jNIEnv->CallIntMethod(jThis, methodID, handle);
+
+		jNIEnv->DeleteLocalRef(cls);
+
+		return result;
+	}
+
 	int _maSyscallPanicsEnable(JNIEnv* jNIEnv, jobject jThis)
 	{
 		jclass cls = jNIEnv->GetObjectClass(jThis);
