@@ -23,6 +23,12 @@ MA 02110-1301, USA.
  * Library for JavaScript to C++ communication on the MoSync platform.
  */
 
+var mosync = {};
+mosync.log = function(message)
+{
+	console.log("@@@ " + message);
+};
+
 /**
  * Create a global instance of the library.
  */

@@ -547,6 +547,25 @@ interface MAAPI {
 	MAHandle maCreatePlaceholder();
 
 	/**
+	* Releases a handle returned by maCreatePlaceholder().
+	* If the handle refers to an object, such as an image or a data object,
+	* that object is destroyed, as if maDestroyObject() had been called.
+	*
+	* The released handle may be reused by the system
+	* and returned by future calls to maCreatePlaceholder(),
+	* or by other system functions that allocate resources dynamically.
+	*
+	* This function is preferred to maDestroyObject(), unless you need
+	* to reuse the handle.
+	*
+	* Attempting to destroy a handle that has already been released,
+	* or was not returned by maCreatePlaceholder(), will cause a MoSync Panic.
+	*
+	* @param handle The handle to be released.
+	*/
+	void maDestroyPlaceholder(in MAHandle handle);
+
+	/**
 	* Destroys an object of any type. The handle becomes a placeholder.
 	*/
 	void maDestroyObject(in MAHandle handle);
@@ -555,6 +574,7 @@ interface MAAPI {
 	* Returns the size, in bytes, of a data object.
 	*/
 	int maGetDataSize(in MAHandle data);
+
 	/**
 	* Reads \a size bytes from a data object, starting at \a offset,
 	* into memory pointed to by \a dst.
@@ -562,6 +582,7 @@ interface MAAPI {
 	* it is not supported and will result in a MoSync Panic.
 	*/
 	void maReadData(in MAHandle data, out MAAddress dst, in int offset, in int size);
+
 	/**
 	* Writes \a size bytes to a data object, starting at \a offset,
 	* from memory pointed to by \a src.
@@ -578,6 +599,7 @@ interface MAAPI {
 		int srcOffset;
 		int size;
 	}
+
 	/**
 	* Copies \a size bytes from data object \a src to \a dst, at the specified offsets.
 	*/
@@ -1891,6 +1913,7 @@ interface MAAPI {
 		UBIN = 5;
 		SKIP = 6;
 		LABEL = 9;
+		NIL = 10; // Placeholder that is not used.
 		FLUX = 127;
 	}
 
@@ -4199,9 +4222,9 @@ group WidgetAPI "Widget API" {
 				* @brief The handle to url data. This is string data,
 				* there is NO null terminating character. The encoding
 				* of the data is determined by the application.
-				* The data MUST be deallocated with maDestroyObject after
-				* it hs been used. Each event allocates a new data object
-				* for the url data.
+				* The data object MUST be deallocated with maDestroyPlaceholder
+				* after it has been used, since each event allocates a new data
+				* object for the url data (which could end up consuming all memory).
 				*/
 				MAHandle urlData;
 			} webViewHookInfo;
@@ -4406,7 +4429,7 @@ group WidgetAPI "Widget API" {
 		*
 		* NOTE: When you get this message you have ownership
 		* of the url data handle and you have the responsibility to
-		* deallocate it using maDestroyObject.
+		* deallocate it using maDestroyPlaceholder.
 		*
 		* To get this event, you need to register a hook pattern, using
 		* maWidgetSetProperty with the properties #MAW_WEB_VIEW_SOFT_HOOK
@@ -6284,8 +6307,8 @@ group WidgetAPI "Widget API" {
 		*
 		* Note that when receiving event #MAW_EVENT_WEB_VIEW_HOOK_INVOKED
 		* you MUST deallocate the urlData handle of the event by calling
-		* maDestroyObject on the handle. Destory the handle when you are done
-		* reading the url data, to avoid that memory will get used up.
+		* maDestroyPlaceholder on the handle. Destory the handle when you are
+		* done reading the url data, to avoid that memory will get used up.
 		*
 		* The pattern is a url pattern specified using regular expression
 		* syntax, according to the ICU regular expression standard, using
@@ -6344,8 +6367,8 @@ group WidgetAPI "Widget API" {
 		*
 		* Note that when receiving event #MAW_EVENT_WEB_VIEW_HOOK_INVOKED
 		* you MUST deallocate the urlData handle of the event by calling
-		* maDestroyObject on the handle. Destory the handle when you are done
-		* reading the url data, to avoid that memory will get used up.
+		* maDestroyPlaceholder on the handle. Destory the handle when you are
+		* done reading the url data, to avoid that memory will get used up.
 		*
 		* The pattern is a url pattern specified using regular expression
 		* syntax, according to the ICU regular expression standard, using
@@ -6906,6 +6929,22 @@ group WidgetAPI "Widget API" {
 		* \endcode
 		*/
 		CURRENT_POSITION = "currentPosition";
+
+		/**
+		* @brief Show/hide video control.
+		* Default value is "true"(video control is shown).
+		*
+		* @validvalue "true" show the video control, "false" hide the video control.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+		*   char buf[BUFFER_SIZE];
+        *   maWidgetGetProperty(videoViewHandle, MAW_VIDEO_VIEW_CONTROL, buf, BUFFER_SIZE);
+		* \endcode
+		*/
+		CONTROL = "control";
 	}
 	} // end of WidgetVideoViewProperties
 
@@ -8083,7 +8122,7 @@ group NFCAPI "NFC API" {
 
 		/**
 		* Creates a new NDEF message, to be used primarily by
-		* \code maNFCWriteDefMessage.
+		* \code maNFCWriteDefMessage. \endcode
 		* \param recordCount The number of records in the created message
 		* \return The handle to the created NDEF message; clients are
 		* responsible for destroying the message.
@@ -9612,6 +9651,7 @@ group NotificationAPI "Notification API" {
 			* @par Example
 			* \code
 			*	maNotificationLocalSetProperty(notificationHandle, MA_NOTIFICATION_LOCAL_FLASH_LIGHTS, "true");
+			* \endcode
 			*/
 			FLASH_LIGHTS = "flashLights";
 
@@ -9633,6 +9673,7 @@ group NotificationAPI "Notification API" {
 			* \code
 			* 	// In this example, the green light repeatedly flashes on for 300 milliseconds and turns off for one second.
 			*	maNotificationLocalSetProperty(notificationHandle, MA_NOTIFICATION_LOCAL_FLASH_LIGHTS_PATTERN, "0xff00ff00,300,1000");
+			* \endcode
 			*/
 			FLASH_LIGHTS_PATTERN = "flashLightsPattern";
 		}

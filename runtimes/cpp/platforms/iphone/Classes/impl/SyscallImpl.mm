@@ -613,7 +613,7 @@ namespace Base {
             NSEnumerator *familyEnumerator=[[familyNames objectEnumerator] retain];
 
             NSString *familyName;
-            while(familyName=[familyEnumerator nextObject])
+            while((familyName=[familyEnumerator nextObject]))
             {
                 //These are the names we need
                 NSArray *fontNamesInFamily=[UIFont fontNamesForFamilyName:familyName];
@@ -1309,79 +1309,7 @@ namespace Base {
 
 #ifdef SUPPORT_OPENGL_ES
 
-
-// override implementations for broken bindings..
-#undef maIOCtl_glGetPointerv_case
-#define maIOCtl_glGetPointerv_case(func) \
-case maIOCtl_glGetPointerv: \
-{\
-GLenum _pname = (GLuint)a; \
-void* _pointer = GVMR(b, MAAddress);\
-wrap_glGetPointerv(_pname, _pointer); \
-return 0; \
-}
-
-#undef maIOCtl_glGetVertexAttribPointerv_case
-#define maIOCtl_glGetVertexAttribPointerv_case(func) \
-case maIOCtl_glGetVertexAttribPointerv: \
-{\
-GLuint _index = (GLuint)a; \
-GLenum _pname = (GLuint)b; \
-void* _pointer = GVMR(c, MAAddress);\
-wrap_glGetVertexAttribPointerv(_index, _pname, _pointer); \
-return 0; \
-}
-
-#undef maIOCtl_glShaderSource_case
-#define maIOCtl_glShaderSource_case(func) \
-case maIOCtl_glShaderSource: \
-{ \
-GLuint _shader = (GLuint)a; \
-GLsizei _count = (GLsizei)b; \
-void* _string = GVMR(c, MAAddress); \
-const GLint* _length = GVMR(SYSCALL_THIS->GetValidatedStackValue(0 VSV_ARGPTR_USE), GLint); \
-wrap_glShaderSource(_shader, _count, _string, _length); \
-return 0; \
-} \
-
-    void wrap_glShaderSource(GLuint shader, GLsizei count, void* strings, const GLint* length) {
-
-        int* stringsArray = (int*)strings;
-        const GLchar** strCopies = new const GLchar*[count];
-
-        for(int i = 0; i < count; i++) {
-            void* src = GVMR(stringsArray[i], MAAddress);
-            strCopies[i] = (GLchar*)src;
-        }
-
-        glShaderSource(shader, count, strCopies, length);
-        delete strCopies;
-    }
-
-
-    void wrap_glGetVertexAttribPointerv(GLuint index, GLenum pname, void* pointer) {
-        GLvoid* outPointer;
-        glGetVertexAttribPointerv(index, pname, &outPointer);
-
-        if(pname != GL_VERTEX_ATTRIB_ARRAY_POINTER)
-            return;
-
-        *(int*)pointer = gSyscall->TranslateNativePointerToMoSyncPointer(outPointer);
-    }
-
-    void wrap_glGetPointerv(GLenum pname, void* pointer) {
-        GLvoid* outPointer;
-        glGetPointerv(pname, &outPointer);
-
-        if(pname != GL_COLOR_ARRAY_POINTER &&
-           pname != GL_NORMAL_ARRAY_POINTER &&
-           pname != GL_POINT_SIZE_ARRAY_POINTER_OES &&
-           pname != GL_TEXTURE_COORD_ARRAY_POINTER &&
-           pname != GL_VERTEX_ARRAY_POINTER)
-            return;
-
-        *(int*)pointer = gSyscall->TranslateNativePointerToMoSyncPointer(outPointer);
-    }
+#include "GLFixes.h"
 
 	int maOpenGLInitFullscreen(int glApi) {
 		if(sOpenGLScreen != -1) return 0;

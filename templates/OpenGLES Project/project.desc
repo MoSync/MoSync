@@ -1,6 +1,7 @@
 id = project.opengles
 name = MoSync OpenGL Project
 description = A project that uses the OpenGLES functionality in MoSync.
+required-capabilities = OpenGL
 
 [Files]
 main.cpp
