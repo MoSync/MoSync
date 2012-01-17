@@ -152,7 +152,6 @@ String UriNdefRecord::getUri() {
 	valid = false;
 	int tnf = getTnf();
 	byte type[1];
-	byte payload[256];
 	switch (tnf) {
 	case MA_NFC_NDEF_TNF_ABSOLUTE_URI:
 		valid = true;
