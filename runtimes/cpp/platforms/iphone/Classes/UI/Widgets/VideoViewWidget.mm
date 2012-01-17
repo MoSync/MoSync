@@ -45,6 +45,7 @@
         [mMoviePlayerController.view setFrame: smallView.bounds];
         view = smallView;
         [view addSubview:mMoviePlayerController.view];
+        [mMoviePlayerController setScalingMode:MPMovieScalingModeAspectFit];
 
         [[NSNotificationCenter defaultCenter] addObserver:self
                                                  selector:@selector(moviePlaybackComplete:)
@@ -92,11 +93,14 @@
 {
     if ([key isEqualToString:@MAW_VIDEO_VIEW_PATH])
     {
-        NSString *filepath = [[NSBundle mainBundle] pathForResource:value ofType:@"m4v"];
-        if (filepath)
+        NSURL *fileURL = [NSURL fileURLWithPath:value];
+        if (fileURL)
         {
-            NSURL *fileURL = [NSURL fileURLWithPath:filepath];
             [mMoviePlayerController setContentURL:fileURL];
+        }
+        else
+        {
+            return MAW_RES_INVALID_PROPERTY_VALUE;
         }
     }
     else if ([key isEqualToString:@MAW_VIDEO_VIEW_URL])
@@ -118,6 +122,21 @@
     {
         TEST_FOR_NEGATIVE_VALUE([value floatValue]);
         [mMoviePlayerController setCurrentPlaybackTime:[value floatValue]];
+    }
+    else if ([key isEqualToString:@MAW_VIDEO_VIEW_CONTROL])
+    {
+        if ([value isEqualToString:@"true"])
+        {
+            [mMoviePlayerController setControlStyle:MPMovieControlStyleEmbedded];
+        }
+        else if ([value isEqualToString:@"false"])
+        {
+            [mMoviePlayerController setControlStyle:MPMovieControlStyleNone];
+        }
+        else
+        {
+            return MAW_RES_INVALID_PROPERTY_VALUE;
+        }
     }
     else
     {
@@ -144,6 +163,18 @@
     {
         return[[NSString alloc] initWithFormat:@"%f", [mMoviePlayerController currentPlaybackTime]];
 	}
+    else if ([key isEqualToString:@MAW_VIDEO_VIEW_CONTROL])
+    {
+        MPMovieControlStyle controlStyle = mMoviePlayerController.controlStyle;
+        if (controlStyle == MPMovieControlStyleEmbedded)
+        {
+            return [[NSString alloc] initWithString:@"true"];
+        }
+        else
+        {
+            return [[NSString alloc] initWithString:@"false"];
+        }
+    }
     else
     {
 		return [super getPropertyWithKey:key];
@@ -193,6 +224,10 @@
 
         event.data = (int)eventData;
         Base::gEventQueue.put(event);
+    }
+    else
+    {
+        NSLog(@"VideoViewWidget::moviePlaybackComplete error = %@", [error description]);
     }
 }
 

@@ -176,6 +176,9 @@ function find_sensors() {
 						};
 }
 
+function captureTest() {
+	Capture.prototype.captureImage(function(mediaFiles){alert(mediaFiles[0].fullPath + "  " + mediaFiles[0].name);}, function(){}, {duration:10});
+}
 
 function init() {
     // the next line makes it impossible to see Contacts on the HTC Evo since it

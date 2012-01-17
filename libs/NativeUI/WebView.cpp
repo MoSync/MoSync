@@ -117,8 +117,8 @@ namespace NativeUI
 	*
 	* Note that when receiving event #MAW_EVENT_WEB_VIEW_HOOK_INVOKED
 	* you MUST deallocate the urlData handle of the event by calling
-	* maDestroyObject on the handle. Destroy the handle when you are done
-	* reading the url data, to avoid that memory will get used up.
+	* maDestroyPlaceholder on the handle. Destroy the handle when you are
+	* done reading the url data, to avoid that memory will get used up.
 	*
 	* The pattern is a url pattern specified using regular expression
 	* syntax, according to the ICU regular expression standard, using
@@ -174,7 +174,7 @@ namespace NativeUI
 	*
 	* Note that when receiving event #MAW_EVENT_WEB_VIEW_HOOK_INVOKED
 	* you MUST deallocate the urlData handle of the event by calling
-	* maDestroyObject on the handle. Destory the handle when you are done
+	* maDestroyPlaceholder on the handle. Destory the handle when you are done
 	* reading the url data, to avoid that memory will get used up.
 	*
 	* The pattern is a url pattern specified using regular expression
@@ -454,7 +454,7 @@ namespace NativeUI
             }
 
 			// Here the data object gets detroyed.
-            maDestroyObject(url);
+            maDestroyPlaceholder(url);
         }
     }
 

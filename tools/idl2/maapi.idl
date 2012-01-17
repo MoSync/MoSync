@@ -1469,6 +1469,12 @@ interface MAAPI {
 		* \brief Send when the application receives a push notification.
 		*/
 		PUSH_NOTIFICATION = 46;
+
+		/**
+		* \brief Send before the Native Image Picker is dismissed.
+		* This event will contain a MACaptureEventData struct.
+		*/
+		CAPTURE = 47;
 		}
 
 	/**
@@ -1517,6 +1523,17 @@ interface MAAPI {
 		/// this variable will contain the error code.
 		/// One of the \link #MA_ADS_ERROR_INTERNAL MA_ADS_ERROR \endlink constants.
 		int bannerErrorCode;
+	}
+
+	/**
+	* \brief An event send by the Native Image Picker(Capture API).
+	*/
+	struct MACaptureEventData {
+		/// One of the \link #MA_CAPTURE_EVENT_TYPE_IMAGE MA_CAPTURE_EVENT_TYPE \endlink constants.
+		int type;
+		/// Handle to a video/image data object.
+		/// This value is set only if the event type is MA_CAPTURE_EVENT_TYPE_IMAGE or MA_CAPTURE_EVENT_TYPE_VIDEO.
+		MAHandle handle;
 	}
 
 	/**
@@ -1636,6 +1653,12 @@ interface MAAPI {
 			* Valid only if the event type is \link #EVENT_TYPE_PUSH_NOTIFICATION PUSH_NOTIFICATION \endlink.
 			*/
 			MAHandle pushNotificationHandle;
+
+			/**
+			* Store the result for a capture action.
+			* Valid only if the event type is \link #EVENT_TYPE_CAPTURE CAPTURE \endlink.
+			*/
+			MACaptureEventData captureData;
 
 			/**
 			* Used by custom events. See invididual event descriptions.
@@ -4199,9 +4222,9 @@ group WidgetAPI "Widget API" {
 				* @brief The handle to url data. This is string data,
 				* there is NO null terminating character. The encoding
 				* of the data is determined by the application.
-				* The data MUST be deallocated with maDestroyObject after
-				* it hs been used. Each event allocates a new data object
-				* for the url data.
+				* The data object MUST be deallocated with maDestroyPlaceholder
+				* after it has been used, since each event allocates a new data
+				* object for the url data (which could end up consuming all memory).
 				*/
 				MAHandle urlData;
 			} webViewHookInfo;
@@ -4406,7 +4429,7 @@ group WidgetAPI "Widget API" {
 		*
 		* NOTE: When you get this message you have ownership
 		* of the url data handle and you have the responsibility to
-		* deallocate it using maDestroyObject.
+		* deallocate it using maDestroyPlaceholder.
 		*
 		* To get this event, you need to register a hook pattern, using
 		* maWidgetSetProperty with the properties #MAW_WEB_VIEW_SOFT_HOOK
@@ -6284,8 +6307,8 @@ group WidgetAPI "Widget API" {
 		*
 		* Note that when receiving event #MAW_EVENT_WEB_VIEW_HOOK_INVOKED
 		* you MUST deallocate the urlData handle of the event by calling
-		* maDestroyObject on the handle. Destory the handle when you are done
-		* reading the url data, to avoid that memory will get used up.
+		* maDestroyPlaceholder on the handle. Destory the handle when you are
+		* done reading the url data, to avoid that memory will get used up.
 		*
 		* The pattern is a url pattern specified using regular expression
 		* syntax, according to the ICU regular expression standard, using
@@ -6344,8 +6367,8 @@ group WidgetAPI "Widget API" {
 		*
 		* Note that when receiving event #MAW_EVENT_WEB_VIEW_HOOK_INVOKED
 		* you MUST deallocate the urlData handle of the event by calling
-		* maDestroyObject on the handle. Destory the handle when you are done
-		* reading the url data, to avoid that memory will get used up.
+		* maDestroyPlaceholder on the handle. Destory the handle when you are
+		* done reading the url data, to avoid that memory will get used up.
 		*
 		* The pattern is a url pattern specified using regular expression
 		* syntax, according to the ICU regular expression standard, using
@@ -6906,6 +6929,22 @@ group WidgetAPI "Widget API" {
 		* \endcode
 		*/
 		CURRENT_POSITION = "currentPosition";
+
+		/**
+		* @brief Show/hide video control.
+		* Default value is "true"(video control is shown).
+		*
+		* @validvalue "true" show the video control, "false" hide the video control.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+		*   char buf[BUFFER_SIZE];
+        *   maWidgetGetProperty(videoViewHandle, MAW_VIDEO_VIEW_CONTROL, buf, BUFFER_SIZE);
+		* \endcode
+		*/
+		CONTROL = "control";
 	}
 	} // end of WidgetVideoViewProperties
 
@@ -9891,6 +9930,383 @@ group NotificationAPI "Notification API" {
 		int maNotificationPushSetDisplayFlag(in int displayFlag);
 	}//End of Notification Functions
 } // End of Notification API
+
+group CaptureAPI "Capture API" {
+	group CaptureResultCodes "Capture result codes" {
+		constset int MA_CAPTURE_RES_ {
+			/**
+			* @brief Indicates that the call was successful.
+			* Platform: Android and iOS.
+			*/
+			OK = 0;
+
+			/**
+			* @brief The given file name is invalid.
+			* Platform: iOS.
+			*/
+			FILE_INVALID_NAME = -1;
+
+			/**
+			* @brief The file already exists.
+			* Platform: iOS.
+			*/
+			FILE_ALREADY_EXISTS = -2;
+
+			/**
+			* @brief Indicates that the call to maCaptureSetProperty or maCaptureGetProperty received
+			* an invalid property name.
+			* Platform: iOS and Android.
+			*/
+			INVALID_PROPERTY = -3;
+
+			/**
+			* @brief Indicates that the call to maCaptureSetProperty or maCaptureGetProperty received
+			* an invalid property value.
+			* Platform: iOS and Android.
+			*/
+			INVALID_PROPERTY_VALUE = -4;
+
+			/**
+			* @brief Indicates that the call to maCaptureGetProperty needs a larger buffer.
+			* Platform: iOS and Android.
+			*/
+			INVALID_STRING_BUFFER_SIZE = -5;
+
+			/**
+			* @brief Indicates that the call to maCaptureAction received an invalid action type.
+			* Platform: iOS and Android.
+			*/
+			INVALID_ACTION = -6;
+
+			/**
+			* @brief Indicates that the call to maCaptureDestroyData received an invalid handle.
+			* Platform: iOS and Android.
+			*/
+			INVALID_HANDLE = -7;
+
+			/**
+			* @brief Indicates that capture is not supported on current platform.
+			* Platform: iOS.
+			*/
+			UNSUPPORTED = -8;
+
+			/**
+			* @brief Indicates that camera is not available at the moment.
+			* Platform: iOS.
+			*/
+			CAMERA_NOT_AVAILABLE = -9;
+
+			/**
+			* @brief Indicates that video recording is not supported.
+			* Platform: iOS.
+			*/
+			VIDEO_NOT_SUPPORTED = -10;
+
+			/**
+			* @brief Indicates that camera picture mode is not supported.
+			* Platform: iOS.
+			*/
+			PICTURE_NOT_SUPPORTED = -11;
+
+			/**
+			* @brief Indicates that flash mode is not supported.
+			* Platform: iOS.
+			*/
+			FLASH_NOT_SUPPORTED = -12;
+
+			/**
+			* @brief Indicates that the recording max duration is not supported.
+			* Platform: Android.
+			*/
+			MAX_DURATION_NOT_SUPPORTED = -13;
+
+			/**
+			* @brief Indicates that a call to maCaptureGetProperty was unsuccessfull
+			* because the property was not previously set.
+			* Platform: Android.
+			*/
+			PROPERTY_VALUE_UNDEFINED = -14;
+		}
+	} // end of Capture Result Codes
+
+	group CaptureProperties "Capture Properties" {
+		constset MAString MA_CAPTURE_ {
+			/**
+			* @brief Maximum duration video that should be recorded, in seconds.
+			* Platform: Android and iOS.
+			*
+			* @validvalue Positive integer value.
+			* Default value is platform specific.
+			*
+			* On iOS the maximum duration is by defualt set to 600 seconds.
+			*
+			* On Android devices with API level lower than 8
+			* it returns #MA_CAPTURE_RES_MAX_DURATION_NOT_SUPPORTED.
+			*
+			* @getandset
+			*
+			* @par Example
+			* \code
+			*   char buf[256];
+			*   sprintf(buf, "%d", 100);
+			*	maCaptureSetProperty(MA_CAPTURE_MAX_DURATION, buf);
+			* \endcode
+			*/
+			MAX_DURATION = "maxDuration";
+
+			/**
+			* @brief Set the video recording quality.
+			* Platform: Android and iOS.
+			* Android: Note that some devices the default camera either does not support low-res video capture,
+			* or it doesn't understand/process the MediaStore.EXTRA_SIZE_LIMIT correctly.
+			*
+			* @validvalue One of the \link #MA_CAPTURE_VIDEO_QUALITY_LOW MA_CAPTURE_VIDEO_QUALITY \endlink constants.
+			* iOS: Default value is MA_CAPTURE_VIDEO_QUALITY_MEDIUM.
+			* Android: Default value is MA_CAPTURE_VIDEO_QUALITY_HIGH.
+			*
+			* @getandset
+			*
+			* @par Example
+			* \code
+			*   char buf[256];
+			*   sprintf(buf, "%d", MA_CAPTURE_VIDEO_QUALITY_HIGH);
+			*	maCaptureSetProperty(MA_CAPTURE_VIDEO_QUALITY, buf);
+			* \endcode
+			*/
+			VIDEO_QUALITY = "videoQuality";
+
+			/**
+			* @brief Set the display name for the next captured images.
+			* Platform: Android.
+			*
+			* @validvalue Any string.
+			*
+			* @getandset
+			*
+			* @par Example
+			* \code
+			*   char buf[256];
+			*   sprintf(buf, "%s", "My title");
+			*	maCaptureSetProperty(MA_CAPTURE_DISPLAY_NAME, buf);
+			* \endcode
+			*/
+			DISPLAY_NAME = "displayName";
+
+			/**
+			* @brief Store the recorded movie/taken photo to the user’s Camera Roll album.
+			* Platform: iOS.
+			*
+			* @validvalue "false" or "true".
+			* Default value: "true".
+			*
+			* @getandset
+			*
+			* @par Example
+			* \code
+			*   char buf[256];
+			*   sprintf(buf, "%s", "true");
+			*	maCaptureSetProperty(MA_CAPTURE_CAMERA_ROLL, buf);
+			* \endcode
+			*/
+			CAMERA_ROLL = "cameraRoll";
+
+			/**
+			* @brief Store the recorded movie/taken photo to the user’s Gallery album.
+			* Platform: Android.
+			*
+			* @validvalue "false" or "true".
+			* Default value: "true".
+			*
+			* @getandset
+			*
+			* @par Example
+			* \code
+			*   char buf[256];
+			*   sprintf(buf, "%s", "true");
+			*	maCaptureSetProperty(MA_CAPTURE_GALLERY, buf);
+			* \endcode
+			*/
+			GALLERY = "gallery";
+
+			/**
+			* @brief Set the flash mode used by the active camera.
+			* Platform: iOS.
+			*
+			* @validvalue One of the \link #MA_CAPTURE_FLASH_AUTO MA_CAPTURE_FLASH \endlink constants.
+			* Default value: #MA_CAPTURE_FLASH_AUTO.
+			*
+			* @getandset
+			*
+			* @par Example
+			* \code
+			*   char buf[256];
+			*   sprintf(buf, "%d", MA_CAPTURE_FLASH_OFF);
+			*	maCaptureSetProperty(MA_CAPTURE_FLASH, buf);
+			* \endcode
+			*/
+			FLASH = "flash";
+
+			/**
+			* @brief Show/hide default camera controls.
+			* Platform: iOS.
+			*
+			* @validvalue "true" or "false".
+			* Default value: "true".
+			*
+			* @getandset
+			*
+			* @par Example
+			* \code
+			*   char buf[256];
+			*   sprintf(buf, "%s", "false");
+			*	maCaptureSetProperty(MA_CAPTURE_CAMERA_CONTROLS, buf);
+			* \endcode
+			*/
+			CAMERA_CONTROLS = "cameraControls";
+		}
+	} // end of Capture properties
+
+	group CaptureVideoQuality "Capture Video Quality" {
+		constset int MA_CAPTURE_VIDEO_QUALITY_ {
+			/// Use low-quality video recording.
+			/// Platform: iOS and Android.
+			LOW = 0;
+			/// The highest-quality video recording supported for the active camera on the device.
+			/// Platform: iOS and Android.
+			HIGH = 1;
+			/// Use medium-quality video recording.
+			/// Platform: iOS only.
+			MEDIUM = 2;
+		}
+	} // end of Capture Media Types
+
+	group CaptureAction "Capture Action" {
+		constset int MA_CAPTURE_ACTION_ {
+			/// Start the picker with video mode and stores the result in a data object.
+			/// Platform: Android and iOS.
+			RECORD_VIDEO = 0;
+			/// Stops the recording.
+			/// Platform: iOS only.
+			STOP_RECORDING = 1;
+			/// Starts the picker with picture mode and  stores the picture in a data object.
+			/// Platform: Android and iOS.
+			TAKE_PICTURE = 2;
+		}
+	} // end of Capture Action
+
+	group CaptureEventType "Capture Event type" {
+		constset int MA_CAPTURE_EVENT_TYPE_ {
+			/// Send after a image has been taken.
+			/// Platform: Android and iOS.
+			IMAGE = 0;
+			/// Send after a video has been taken.
+			/// Platform: Android and iOS.
+			VIDEO = 1;
+			/// Send if the user cancels taking image/video.
+			/// Platform: iOS and Android.
+			CANCEL = 2;
+		}
+	} // end of Capture Event type
+
+	group CaptureFlashMode "Capture flash mode" {
+		constset int MA_CAPTURE_FLASH_ {
+			/// Specifies that the device should consider ambient light conditions to automatically
+			/// determine whether or not to use flash illumination.
+			/// Platform: iOS.
+			AUTO = 0;
+			/// Specifies that flash illumination is always on, no matter what the ambient light conditions are.
+			/// Platform: iOS.
+			ON = 1;
+			/// Specifies that flash illumination is always off, no matter what the ambient light conditions are.
+			/// Platform: iOS.
+			OFF = 2;
+		}
+	} // end of Capture flash mode
+
+	group CaptureFunctions "Capture Functions" {
+		/**
+		* \brief Sets the properties to the Native Image Picker.
+		* \param property A string representing which property to set.
+		*  One of the \link #MA_CAPTURE_ MA_CAPTURE \endlink constants.
+		* \param value The value that will be assigned to the property.
+		*
+		* \returns One of the next constants:
+		*  - #MA_CAPTURE_RES_OK if no error occurred.
+		*  - #MA_CAPTURE_RES_INVALID_PROPERTY if the property name is not valid.
+		*  - #MA_CAPTURE_RES_INVALID_PROPERTY_VALUE if the property value is not valid.
+		*  - #MA_CAPTURE_RES_MAX_DURATION_NOT_SUPPORTED if the duration limit is not supported ( Android only).
+		*/
+		int maCaptureSetProperty(in MAString property, in MAString value);
+
+		/**
+		* \brief Retrieves the properties from the Native Image Picker.
+		*
+		* \param property A string representing which property to get.
+		*  One of the \link #MA_CAPTURE_ MA_CAPTURE \endlink constants.
+		* \param value A buffer that will hold the value of the property, represented as a string.
+		* \param bufSize Size of the buffer.
+		*
+		* \returns One of the next constants:
+		* - #MA_CAPTURE_RES_OK if no error occurred.
+		* - #MA_CAPTURE_RES_INVALID_PROPERTY if the property name is not valid.
+		* - #MA_CAPTURE_RES_INVALID_STRING_BUFFER_SIZE if the buffer size was to small.
+		* - #MA_CAPTURE_RES_PROPERTY_VALUE_UNDEFINED if the property was not previously set ( Android only).
+		* - #MA_CAPTURE_RES_MAX_DURATION_NOT_SUPPORTED if the duration limit is not supported ( Android only).
+		*/
+		int maCaptureGetProperty(in MAString property, out MAString value range("bufSize"), in int bufSize);
+
+		/**
+		* \brief Perform an action on the image picker.
+		* \param action One of the \link #MA_CAPTURE_ACTION_ MA_CAPTURE_ACTION \endlink constants.
+		*
+		* \returns One of the next constants:
+		*  - #MA_CAPTURE_RES_OK if no error occurred.
+		*  - #MA_CAPTURE_RES_INVALID_ACTION if the given action is invalid.
+		*  - #MA_CAPTURE_RES_CAMERA_NOT_AVAILABLE if camera is not available at the moment.
+		*  - #MA_CAPTURE_RES_VIDEO_NOT_SUPPORTED if video recording is not supported.
+		*  - #MA_CAPTURE_RES_PICTURE_NOT_SUPPORTED if camera picture mode is not supported.
+		*/
+		int maCaptureAction(in int action);
+
+		/**
+		* \brief Save a image data object to a file.
+		* \param handle Handle to a image data object.
+		* \param fullPath A buffer containing the a full path where the file will be created.
+		* \param fullPathBufSize The size of the fullPath buffer.
+		*
+		* \returns One of the next constants:
+		*  - #MA_CAPTURE_RES_OK if no error occurred.
+		*  - #MA_CAPTURE_RES_INVALID_HANDLE if the given handle was invalid.
+		*  - #MA_CAPTURE_RES_FILE_INVALID_NAME if the fullPath param is invalid.
+		*  - #MA_CAPTURE_RES_FILE_ALREADY_EXISTS if the file already exists.
+		*/
+		int maCaptureWriteImage(in MAHandle handle, in MAString fullPath, in int fullPathBufSize);
+
+		/**
+		* \brief Get full path to a recorded video.
+		* \param handle Handle to a video data object.
+		* \param buffer Will contain the full path to the video file.
+		* \param bufferSize Maximum size of the buffer.
+		*
+		* \returns One of the next constants:
+		*  - MA_CAPTURE_RES_OK if no error occurred.
+		*  - MA_CAPTURE_RES_INVALID_HANDLE if the given handle was invalid.
+		*  - MA_CAPTURE_RES_INVALID_STRING_BUFFER_SIZE if the buffer size was to small.
+		*/
+		int maCaptureGetVideoPath(in MAHandle handle, out MAString buffer range("bufferSize"), in int bufferSize);
+
+		/**
+		* \brief Destroys a image/video data object.
+		* \param handle Handle to a image/video data object.
+		*
+		* \returns One of the next constants:
+		*  - #MA_CAPTURE_RES_OK if no error occurred.
+		*  - #MA_CAPTURE_RES_INVALID_HANDLE if the given handle was invalid.
+		*/
+		int maCaptureDestroyData(in MAHandle handle);
+	}//End of Capture Functions
+
+} // End of Capture API
 
 }
 	constset int IOCTL_ {
