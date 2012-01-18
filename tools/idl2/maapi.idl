@@ -4999,9 +4999,9 @@ group WidgetAPI "Widget API" {
 		/**
 		* @brief Sets the transparency of the widget background.
 		*
-		* @validvalue A floay between 0.0 and 1.0, where 0.0 is fully transparent and 1.0 is opaque.
+		* @validvalue A float between 0.0 and 1.0, where 0.0 is fully transparent and 1.0 is opaque.
 		*
-		* @setonly
+		* @setandget
 		*
 		* @par Example
 		* \code
