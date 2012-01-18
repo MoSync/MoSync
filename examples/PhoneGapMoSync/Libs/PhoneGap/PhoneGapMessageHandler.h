@@ -23,8 +23,8 @@ MA 02110-1301, USA.
  * Implementation of PhoneGap calls made from JavaScript.
  */
 
-#ifndef PHONEGAP_MESSAGE_HANDLER_H_
-#define PHONEGAP_MESSAGE_HANDLER_H_
+#ifndef LIBS_PHONEGAP_PHONEGAPMESSAGEHANDLER_H_
+#define LIBS_PHONEGAP_PHONEGAPMESSAGEHANDLER_H_
 
 #include <Wormhole/WebViewMessage.h>
 #include <NativeUI/WebView.h>
@@ -32,8 +32,8 @@ MA 02110-1301, USA.
 #include "PhoneGapMessage.h"
 #include "PhoneGapSensors.h"
 #include "PhoneGapFile.h"
-#include "SensorManager.h"
 #include "PhoneGapCapture.h"
+#include "../W3C/SensorManager.h"
 
 // PhoneGap callback result codes.
 #define PHONEGAP_CALLBACK_STATUS_NO_RESULT "0"
@@ -48,7 +48,7 @@ MA 02110-1301, USA.
 #define PHONEGAP_CALLBACK_STATUS_ERROR "9"
 
 // Forward declarations
-class PhoneGapNotificationManager;
+class PushNotificationManager;
 
 /**
  * Class that implements JavaScript calls.
@@ -232,9 +232,9 @@ private:
 	bool mSensorEventToManager[MAXIMUM_SENSORS];
 
 	/**
-	 * PhoneGap Notification API's message handler.
+	 * Notification API message handler.
 	 */
-	PhoneGapNotificationManager* mPhoneGapNotificationManager;
+	PushNotificationManager* mPushNotificationManager;
 };
 
 #endif

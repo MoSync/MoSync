@@ -24,8 +24,8 @@ MA 02110-1301, USA.
  * @brief Send package to a server application using TCP socket.
  */
 
-#ifndef TCPCONNECTION_H_
-#define TCPCONNECTION_H_
+#ifndef LIBS_NOTIFICATION_TCPCONNECTION_H_
+#define LIBS_NOTIFICATION_TCPCONNECTION_H_
 
 #include <MAUtil/Connection.h>
 
@@ -103,4 +103,4 @@ private:
 	bool mMessageSent;
 };
 
-#endif /* TCPCONNECTION_H_ */
+#endif

@@ -17,56 +17,50 @@ MA 02110-1301, USA.
 */
 
 /**
- * @file SensorManager.h
+ * @file PhoneGapCapture.h
  * @author Iraklis Rossis
  *
- * Implementation of W3C sensor API for Javascript.
+ * Implementation of PhoneGap capture calls made from JavaScript.
  */
 
-#ifndef SENSORMANAGER_H_
-#define SENSORMANAGER_H_
+#ifndef LIBS_PHONEGAP_PHONEGAPCAPTURE_H_
+#define LIBS_PHONEGAP_PHONEGAPCAPTURE_H_
 
 #include <Wormhole/WebViewMessage.h>
 #include <NativeUI/WebView.h>
 #include "PhoneGapMessage.h"
 
-// The maximum amount of sensors in a device
-#define MAXIMUM_SENSORS 8
+class PhoneGapMessageHandler;
 
-class SensorManager
+/**
+ * Class that implements PhoneGap Capture APIs.
+ */
+class PhoneGapCapture: public MAUtil::CustomEventListener
 {
 public:
 	/**
 	 * Constructor.
 	 */
-	SensorManager(PhoneGapMessageHandler* messageHandler);
-
+	PhoneGapCapture(PhoneGapMessageHandler* messageHandler);
 
 	/**
 	 * Destructor.
 	 */
-	virtual ~SensorManager();
+	virtual ~PhoneGapCapture();
 
 	/**
-	 * Implementation of the Sensor Manager API exposed to JavaScript.
+	 * Implementation of Capture API exposed to JavaScript.
 	 * @return true if message was handled, false if not.
 	 */
 	void handleMessage(PhoneGapMessage& message);
 
 	/**
-	 * Dispatching of sensor events.
-	 * @param sensorData The sensor data of the event
+	 * Event handler for capture events
+	 * @param event the event struct.
 	 */
-	void sendSensorData(MASensor sensorData);
+	virtual void customEvent(const MAEvent &event);
+
 private:
-
-	/**
-	 * Handles the findSensor message. It then posts the list
-	 * of sensors back to Phonegap
-	 * @param message The phonegap message
-	 */
-	void findSensors(PhoneGapMessage& message);
-
 	PhoneGapMessageHandler* mMessageHandler;
 
 	/**
@@ -76,17 +70,11 @@ private:
 	NativeUI::WebView* mWebView;
 
 	/**
-	 * Stores the CallbackIDs of the various sensors so the result can be sent
-	 * after receiving the sensor event
+	 * Stores the CallbackID of the capture call so the result can be sent
+	 * after receiving the media data
 	 */
-	MAUtil::String mSensorWatchCallBack[MAXIMUM_SENSORS];
-
-	/**
-	 * Makes sure that only a single reading will be returned
-	 */
-	bool mSensorSingleReadFlag[MAXIMUM_SENSORS];
-
+	MAUtil::String mCaptureCallBack;
 };
 
 
-#endif /* SENSORMANAGER_H_ */
+#endif

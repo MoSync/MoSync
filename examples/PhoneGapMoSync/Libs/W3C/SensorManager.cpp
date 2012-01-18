@@ -25,7 +25,7 @@ MA 02110-1301, USA.
 
 #include <conprint.h>
 #include <MAUtil/String.h>
-#include "PhoneGapMessageHandler.h"
+#include "../PhoneGap/PhoneGapMessageHandler.h"
 #include "SensorManager.h"
 
 using namespace MAUtil;

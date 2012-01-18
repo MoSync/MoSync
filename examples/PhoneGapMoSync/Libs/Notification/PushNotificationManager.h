@@ -17,41 +17,41 @@ MA 02110-1301, USA.
 */
 
 /**
- * @file PhoneGapNotificationManager.h
+ * @file PushNotificationManager.h
  * @author Bogdan Iusco
  *
- * Implementation of PhoneGap push notification calls made from JavaScript.
+ * Implementation of notification calls made from JavaScript.
  */
 
-#ifndef PHONEGAP_NOTIFICATION_MANAGER_H_
-#define PHONEGAP_NOTIFICATION_MANAGER_H_
+#ifndef LIBS_NOTIFICATION_PUSHNOTIFICATIONMANAGER_H_
+#define LIBS_NOTIFICATION_PUSHNOTIFICATIONMANAGER_H_
 
 #include <Wormhole/WebViewMessage.h>
 #include <NativeUI/WebView.h>
 #include <Notification/PushNotificationListener.h>
 
-#include "../PhoneGapMessage.h"
+#include "../PhoneGap/PhoneGapMessage.h"
 #include "TCPConnection.h"
 
 // Forward declaration
 class Notification::PushNotification;
 
 /**
- * Class that implements PhoneGap Notification APIs.
+ * Class that implements Notification APIs.
  */
-class PhoneGapNotificationManager:
+class PushNotificationManager:
 	public Notification::PushNotificationListener
 {
 public:
 	/**
 	 * Constructor.
 	 */
-	PhoneGapNotificationManager(PhoneGapMessageHandler* messageHandler);
+	PushNotificationManager(PhoneGapMessageHandler* messageHandler);
 
 	/**
 	 * Destructor.
 	 */
-	virtual ~PhoneGapNotificationManager();
+	virtual ~PushNotificationManager();
 
 	/**
 	 * Implementation of Notification API exposed to JavaScript.
@@ -147,4 +147,4 @@ private:
 	int mPushNotificationTypes;
 };
 
-#endif /* PHONEGAP_NOTIFICATION_MANAGER_H_ */
+#endif

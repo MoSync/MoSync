@@ -23,8 +23,8 @@ MA 02110-1301, USA.
  * Implementation of PhoneGap calls made from JavaScript.
  */
 
-#ifndef PHONEGAP_FILE_H_
-#define PHONEGAP_FILE_H_
+#ifndef LIBS_PHONEGAP_PHONEGAPFILE_H_
+#define LIBS_PHONEGAP_PHONEGAPFILE_H_
 
 #include <Wormhole/WebViewMessage.h>
 #include <NativeUI/WebView.h>

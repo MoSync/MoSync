@@ -17,10 +17,10 @@ MA 02110-1301, USA.
 */
 
 /**
- * @file PhoneGapNotificationManager.h
+ * @file PushNotificationManager.cpp
  * @author Bogdan Iusco
  *
- * Implementation of PhoneGap push notification calls made from JavaScript.
+ * Implementation of notification calls made from JavaScript.
  */
 
 // Error message for invalid push notification types param.
@@ -35,9 +35,9 @@ MA 02110-1301, USA.
 #include <Notification/NotificationManager.h>
 #include <Notification/PushNotification.h>
 
-#include "../PhoneGapMessage.h"
-#include "../PhoneGapMessageHandler.h"
-#include "PhoneGapNotificationManager.h"
+#include "../PhoneGap/PhoneGapMessage.h"
+#include "../PhoneGap/PhoneGapMessageHandler.h"
+#include "PushNotificationManager.h"
 #include "Util.h"
 
 using namespace MAUtil;
@@ -46,7 +46,7 @@ using namespace Notification;
 /**
  * Constructor.
  */
-PhoneGapNotificationManager::PhoneGapNotificationManager(
+PushNotificationManager::PushNotificationManager(
 	PhoneGapMessageHandler* messageHandler) :
 		mMessageHandler(messageHandler),
 		mConnection(NULL)
@@ -66,7 +66,7 @@ PhoneGapNotificationManager::PhoneGapNotificationManager(
 /**
  * Destructor.
  */
-PhoneGapNotificationManager::~PhoneGapNotificationManager()
+PushNotificationManager::~PushNotificationManager()
 {
 	NotificationManager::getInstance()->removePushNotificationListener(this);
 }
@@ -75,24 +75,24 @@ PhoneGapNotificationManager::~PhoneGapNotificationManager()
  * Implementation of Notification API exposed to JavaScript.
  * @return true if message was handled, false if not.
  */
-void PhoneGapNotificationManager::handleMessage(PhoneGapMessage& message)
+void PushNotificationManager::handleMessage(PhoneGapMessage& message)
 {
-	// Push notification request from PhoneGap.
+	// Push notification request from JavaScript.
 	if ((message.getParam("service") == "PushNotification"))
 	{
 		if (message.getParam("action") == "types")
 		{
-			printf("PhoneGapNotificationManager::handleMessage set types");
+			//printf("PushNotificationManager::handleMessage set types");
 			this->setPushNotificationTypes(message);
 		}
 		else if (message.getParam("action") == "accountID")
 		{
-			printf("PhoneGapNotificationManager::handleMessage set accountID");
+			printf("PushNotificationManager::handleMessage set accountID");
 			mAccountID = this->parseJSString(message.getParam("args"));
 		}
 		else if (message.getParam("action") == "register")
 		{
-			printf("PhoneGapNotificationManager::handleMessage register");
+			printf("PushNotificationManager::handleMessage register");
 			mRegistrationCallBack = message.getParam("PhoneGapCallBackId");
 			NotificationManager::getInstance()->registerPushNotification(
 				mPushNotificationTypes,
@@ -100,13 +100,13 @@ void PhoneGapNotificationManager::handleMessage(PhoneGapMessage& message)
 		}
 		else if (message.getParam("action") == "unregister")
 		{
-			printf("PhoneGapNotificationManager::handleMessage unregister");
+			printf("PushNotificationManager::handleMessage unregister");
 			mUnregisterCallBack = message.getParam("PhoneGapCallBackId");
 			NotificationManager::getInstance()->unregisterPushNotification();
 		}
 		else if (message.getParam("action") == "listener")
 		{
-			printf("PhoneGapNotificationManager::handleMessage listener");
+			printf("PushNotificationManager::handleMessage listener");
 			mListenerCallBack = message.getParam("PhoneGapCallBackId");
 		}
 	}
@@ -116,10 +116,10 @@ void PhoneGapNotificationManager::handleMessage(PhoneGapMessage& message)
  * Called when the application receives a push notification.
  * @param pushNotification The received push notification.
  */
-void PhoneGapNotificationManager::didReceivePushNotification(
+void PushNotificationManager::didReceivePushNotification(
 	PushNotification& pushNotification)
 {
-	printf("PhoneGapNotificationManager::didReceivePushNotification");
+	printf("PushNotificationManager::didReceivePushNotification");
 
 	char data[JS_BUF_SIZE];
 	MAUtil::String message;
@@ -159,9 +159,9 @@ void PhoneGapNotificationManager::didReceivePushNotification(
 /**
  * Called when application has been registered for push notifications.
  */
-void PhoneGapNotificationManager::didApplicationRegistered(MAUtil::String& token)
+void PushNotificationManager::didApplicationRegistered(MAUtil::String& token)
 {
-	lprintfln("PhoneGapNotificationManager::didApplicationRegistered");
+	lprintfln("PushNotificationManager::didApplicationRegistered");
 	String tokenJSONString = PhoneGapMessage::JSONStringify(token.c_str());
 	mMessageHandler->callSuccess(
 		mRegistrationCallBack,
@@ -176,9 +176,9 @@ void PhoneGapNotificationManager::didApplicationRegistered(MAUtil::String& token
  * Called when the application has been unregistered for push notifications.
  * Platform: Android only.
  */
-void PhoneGapNotificationManager::didApplicationUnregister()
+void PushNotificationManager::didApplicationUnregister()
 {
-	printf("PhoneGapNotificationManager::didApplicationUnregister");
+	printf("PushNotificationManager::didApplicationUnregister");
 	mMessageHandler->callSuccess(
 		mUnregisterCallBack,
 		PHONEGAP_CALLBACK_STATUS_OK,
@@ -188,10 +188,10 @@ void PhoneGapNotificationManager::didApplicationUnregister()
 /**
  * Called if the application did not registered for push notifications.
  */
-void PhoneGapNotificationManager::didFaildToRegister(
+void PushNotificationManager::didFaildToRegister(
 	MAUtil::String& error)
 {
-	printf("PhoneGapNotificationManager::didFaildToRegister");
+	printf("PushNotificationManager::didFaildToRegister");
 	String errorJSONString = PhoneGapMessage::JSONStringify(error.c_str());
 	if (errorJSONString.length() > 1)
 	{
@@ -216,7 +216,7 @@ void PhoneGapNotificationManager::didFaildToRegister(
  * If bit mask does not contain at least one good value the error callback
  * method will be called.
  */
-void PhoneGapNotificationManager::setPushNotificationTypes(
+void PushNotificationManager::setPushNotificationTypes(
 	PhoneGapMessage& message)
 {
 	MAUtil::String callbackID  = message.getParam("PhoneGapCallBackId");
@@ -262,7 +262,7 @@ void PhoneGapNotificationManager::setPushNotificationTypes(
  * @param string String to be parsed.
  * @return The parsed string.
  */
-MAUtil::String PhoneGapNotificationManager::parseJSString(
+MAUtil::String PushNotificationManager::parseJSString(
 	const MAUtil::String& string)
 {
 	MAUtil::String returnedString(string);

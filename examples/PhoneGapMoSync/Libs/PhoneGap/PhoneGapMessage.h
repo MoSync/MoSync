@@ -23,8 +23,8 @@ MA 02110-1301, USA.
  * Class for parsing messages from a WebView.
  */
 
-#ifndef PHONEGAP_MESSAGE_H_
-#define PHONEGAP_MESSAGE_H_
+#ifndef LIBS_PHONEGAP_PHONEGAPMESSAGE_H_
+#define LIBS_PHONEGAP_PHONEGAPMESSAGE_H_
 
 #include <ma.h>
 #include <MAUtil/String.h>

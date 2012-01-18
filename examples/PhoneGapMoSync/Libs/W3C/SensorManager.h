@@ -17,50 +17,56 @@ MA 02110-1301, USA.
 */
 
 /**
- * @file PhoneGapCapture.h
+ * @file SensorManager.h
  * @author Iraklis Rossis
  *
- * Implementation of PhoneGap capture calls made from JavaScript.
+ * Implementation of W3C sensor API for Javascript.
  */
 
-#ifndef PHONEGAPCAPTURE_H_
-#define PHONEGAPCAPTURE_H_
+#ifndef LIBS_W3C_SENSORMANAGER_H_
+#define LIBS_W3C_SENSORMANAGER_H_
 
 #include <Wormhole/WebViewMessage.h>
 #include <NativeUI/WebView.h>
-#include "PhoneGapMessage.h"
+#include "../PhoneGap/PhoneGapMessage.h"
 
-class PhoneGapMessageHandler;
+// The maximum amount of sensors in a device
+#define MAXIMUM_SENSORS 8
 
-/**
- * Class that implements PhoneGap Capture APIs.
- */
-class PhoneGapCapture: public MAUtil::CustomEventListener
+class SensorManager
 {
 public:
 	/**
 	 * Constructor.
 	 */
-	PhoneGapCapture(PhoneGapMessageHandler* messageHandler);
+	SensorManager(PhoneGapMessageHandler* messageHandler);
+
 
 	/**
 	 * Destructor.
 	 */
-	virtual ~PhoneGapCapture();
+	virtual ~SensorManager();
 
 	/**
-	 * Implementation of Capture API exposed to JavaScript.
+	 * Implementation of the Sensor Manager API exposed to JavaScript.
 	 * @return true if message was handled, false if not.
 	 */
 	void handleMessage(PhoneGapMessage& message);
 
 	/**
-	 * Event handler for capture events
-	 * @param event the event struct.
+	 * Dispatching of sensor events.
+	 * @param sensorData The sensor data of the event
 	 */
-	virtual void customEvent(const MAEvent &event);
-
+	void sendSensorData(MASensor sensorData);
 private:
+
+	/**
+	 * Handles the findSensor message. It then posts the list
+	 * of sensors back to Phonegap
+	 * @param message The phonegap message
+	 */
+	void findSensors(PhoneGapMessage& message);
+
 	PhoneGapMessageHandler* mMessageHandler;
 
 	/**
@@ -70,11 +76,17 @@ private:
 	NativeUI::WebView* mWebView;
 
 	/**
-	 * Stores the CallbackID of the capture call so the result can be sent
-	 * after receiving the media data
+	 * Stores the CallbackIDs of the various sensors so the result can be sent
+	 * after receiving the sensor event
 	 */
-	MAUtil::String mCaptureCallBack;
+	MAUtil::String mSensorWatchCallBack[MAXIMUM_SENSORS];
+
+	/**
+	 * Makes sure that only a single reading will be returned
+	 */
+	bool mSensorSingleReadFlag[MAXIMUM_SENSORS];
+
 };
 
 
-#endif /* PHONEGAPCAPTURE_H_ */
+#endif /* SENSORMANAGER_H_ */

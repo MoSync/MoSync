@@ -23,8 +23,8 @@ MA 02110-1301, USA.
  * Utility functions for the application.
  */
 
-#ifndef UTIL_H_
-#define UTIL_H_
+#ifndef LIBS_NOTIFICATION_UTIL_H_
+#define LIBS_NOTIFICATION_UTIL_H_
 
 #include <maprofile.h>	// Profile database.
 #include <mastring.h>		// C string functions
@@ -69,4 +69,4 @@ static bool isIOS()
 	}
 }
 
-#endif /* UTIL_H_ */
+#endif

@@ -23,13 +23,13 @@ MA 02110-1301, USA.
  * Implementation of PhoneGap calls made from JavaScript.
  */
 
-#include <Wormhole/FileUtil.h>
+#include <maapi.h>
 #include <mastdlib.h> // C string conversion functions
 #include <conprint.h>
-#include "PhoneGapMessageHandler.h"
+#include <Wormhole/FileUtil.h>
 #include "MAHeaders.h"
-#include "PushNotification/PhoneGapNotificationManager.h"
-#include "maapi.h"
+#include "PhoneGapMessageHandler.h"
+#include "../Notification/PushNotificationManager.h"
 
 // NameSpaces we want to access.
 using namespace MAUtil; // Class Moblet, String
@@ -45,10 +45,11 @@ PhoneGapMessageHandler::PhoneGapMessageHandler(NativeUI::WebView* webView) :
 	mPhoneGapFile(this),
 	mPhoneGapSensorManager(this),
 	mPhoneGapCapture(this),
-	mPhoneGapNotificationManager(NULL)
+	mPushNotificationManager(NULL)
 {
 	enableHardware();
-	mPhoneGapNotificationManager = new PhoneGapNotificationManager(this);
+
+	mPushNotificationManager = new PushNotificationManager(this);
 
 	for(int i = 0; i < MAXIMUM_SENSORS; i++)
 	{
@@ -61,7 +62,7 @@ PhoneGapMessageHandler::PhoneGapMessageHandler(NativeUI::WebView* webView) :
  */
 PhoneGapMessageHandler::~PhoneGapMessageHandler()
 {
-	delete mPhoneGapNotificationManager;
+	delete mPushNotificationManager;
 }
 
 /**
@@ -129,7 +130,7 @@ bool PhoneGapMessageHandler::handleMessage(PhoneGapMessage& message)
 	}
 	else if (message.getParam("service") == "PushNotification")
 	{
-		mPhoneGapNotificationManager->handleMessage(message);
+		mPushNotificationManager->handleMessage(message);
 	}
 	else if (message.getParam("service") == "Capture")
 	{

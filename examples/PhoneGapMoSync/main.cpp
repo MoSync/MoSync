@@ -7,7 +7,7 @@
 
 // Include Moblet for web applications.
 #include <Wormhole/WebAppMoblet.h>
-#include "PhoneGapMessageHandler.h"
+#include "Libs/PhoneGap/PhoneGapMessageHandler.h"
 
 // Namespaces we want to access.
 using namespace MAUtil; // Class Moblet
