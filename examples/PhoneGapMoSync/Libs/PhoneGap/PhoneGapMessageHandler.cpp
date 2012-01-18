@@ -147,17 +147,15 @@ bool PhoneGapMessageHandler::handleMessage(PhoneGapMessage& message)
 }
 
 /**
- * processes the Key Events and sends the appropriate message to
- * PhoneGap
+ * Processes the Key Events and sends the appropriate message to PhoneGap.
  */
 void PhoneGapMessageHandler::processKeyEvent(int keyCode, int NativeCode)
 {
-	if(MAK_BACK == keyCode)
+	if (MAK_BACK == keyCode)
 	{
 		mWebView->callJS("PhoneGapCommandResult('backbutton');");
 	}
 }
-
 
 void PhoneGapMessageHandler::sendConnectionType(MAUtil::String callbackID)
 {

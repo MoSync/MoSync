@@ -65,13 +65,12 @@ public:
 	}
 
 	/**
-	 * This method is called when a key is pressed. It closes
-	 * the application when the back key (on Android) is pressed.
+	 * This method is called when a key is pressed.
 	 * Forwards the event to PhoneGapMessageHandler.
 	 */
 	void keyPressEvent(int keyCode, int nativeCode)
 	{
-		//forward to PhoneGap MessageHandler
+		// Forward to PhoneGap MessageHandler.
 		mPhoneGapMessageHandler->processKeyEvent(keyCode, nativeCode);
 	}
 
