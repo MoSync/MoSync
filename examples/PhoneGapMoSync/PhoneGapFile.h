@@ -92,10 +92,17 @@ public:
 	 */
 	void actionRequestFileSystem(PhoneGapMessage& message);
 
+	void actionResolveLocalFileSystemURI(PhoneGapMessage& message);
+
 	/**
 	 * Return a FileEntry object.
 	 */
 	void actionGetFile(PhoneGapMessage& message);
+
+	/**
+	 * Return a DirectoryEntry object.
+	 */
+	void actionGetDirectory(PhoneGapMessage& message);
 
 	/**
 	 * Return a File object.
@@ -112,9 +119,17 @@ public:
 
 	void actionTruncate(PhoneGapMessage& message);
 
-	void actionCopyToOrMoveTo(PhoneGapMessage& message, bool move);
+	void actionCopyTo(PhoneGapMessage& message);
+
+	void actionMoveTo(PhoneGapMessage& message);
+
+	void actionCopyMoveHelper(PhoneGapMessage& message, bool move);
 
 	void actionRemove(PhoneGapMessage& message);
+
+	void actionRemoveRecursively(PhoneGapMessage& message);
+
+	void actionReadEntries(PhoneGapMessage& message);
 
 private:
 	PhoneGapMessageHandler* mMessageHandler;
