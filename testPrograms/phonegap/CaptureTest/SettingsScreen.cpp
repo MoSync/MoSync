@@ -40,7 +40,6 @@
 #define SHOW_IMAGE_SCREEN_TEXT "Show taken picture"
 #define SHOW_VIDEO_SCREEN_TEXT "Play recorded video"
 #define CAMERA_ROLL_LABEL_TEXT "Use camera roll"
-#define GALLERY_LABEL_TEXT "Use Gallery"
 #define CAMERA_CONTROLS_LABEL_TEXT "Use camera controls"
 
 #define VIDEO_QUALITY_LOW_TEXT "low"
@@ -98,10 +97,6 @@ SettingsScreen::SettingsScreen(SettingsScreenListener& listener) :
 		mCameraRollCheckBox->addCheckBoxListener(this);
 		mCameraControlsCheckBox->addCheckBoxListener(this);
 	}
-	else
-	{
-		mGalleryFlag->addCheckBoxListener(this);
-	}
 	mTakePictureBtn->addButtonListener(this);
 	mRecordVideoBtn->addButtonListener(this);
 	mShowImageScreen->addButtonListener(this);
@@ -123,10 +118,6 @@ SettingsScreen::~SettingsScreen()
 		mGetFlashModeBtn->removeButtonListener(this);
 		mCameraRollCheckBox->removeCheckBoxListener(this);
 		mCameraControlsCheckBox->removeCheckBoxListener(this);
-	}
-	else
-	{
-		mGalleryFlag->removeCheckBoxListener(this);
 	}
 	mTakePictureBtn->removeButtonListener(this);
 	mRecordVideoBtn->removeButtonListener(this);
@@ -273,26 +264,6 @@ void SettingsScreen::addCameraRollFlagRow(ListView* listView)
 }
 
 /**
- * Adds a list row for setting the save to gallery flag.
- */
-void SettingsScreen::addGalleryFlagRow(ListView* listView)
-{
-	ListViewItem* listItem;
-	Label* label;
-
-	listItem = new ListViewItem();
-	listView->addChild(listItem);
-
-	label = new Label();
-	label->setText(GALLERY_LABEL_TEXT);
-
-	mGalleryFlag = new CheckBox();
-	mGalleryFlag->setState(true);
-	listItem->addChild(this->createRow(label, mGalleryFlag));
-	listView->addChild(label);
-}
-
-/**
  * Adds a list row for setting the camera controls flag.
  */
 void SettingsScreen::addCameraControlsFlagRow(ListView* listView)
@@ -343,10 +314,6 @@ void SettingsScreen::createMainLayout() {
 		// Add option for setting the camera controls flag.
 		this->addCameraControlsFlagRow(listView);
 	}
-	else
-	{
-		this->addGalleryFlagRow(listView);
-	}
 
 	// Add take picture button.
 	mTakePictureBtn = new Button();
@@ -376,12 +343,10 @@ void SettingsScreen::createMainLayout() {
  */
 void SettingsScreen::buttonClicked(Widget* button)
 {
-	printf("Emma -------------- buttonClicked");
 	char buf[BUF_SIZE];
 	int syscallResult;
 	if (button == mGetMaxDurationBtn)
 	{
-		printf("Emma --------------- getDuration was clicked");
 		syscallResult = maCaptureGetProperty(
 			MA_CAPTURE_MAX_DURATION, buf, BUF_SIZE);
 		if (MA_CAPTURE_RES_OK == syscallResult)

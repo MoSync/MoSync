@@ -10078,23 +10078,6 @@ group CaptureAPI "Capture API" {
 			VIDEO_QUALITY = "videoQuality";
 
 			/**
-			* @brief Set the display name for the next captured images.
-			* Platform: Android.
-			*
-			* @validvalue Any string.
-			*
-			* @getandset
-			*
-			* @par Example
-			* \code
-			*   char buf[256];
-			*   sprintf(buf, "%s", "My title");
-			*	maCaptureSetProperty(MA_CAPTURE_DISPLAY_NAME, buf);
-			* \endcode
-			*/
-			DISPLAY_NAME = "displayName";
-
-			/**
 			* @brief Store the recorded movie/taken photo to the user’s Camera Roll album.
 			* Platform: iOS.
 			*
@@ -10111,24 +10094,6 @@ group CaptureAPI "Capture API" {
 			* \endcode
 			*/
 			CAMERA_ROLL = "cameraRoll";
-
-			/**
-			* @brief Store the recorded movie/taken photo to the user’s Gallery album.
-			* Platform: Android.
-			*
-			* @validvalue "false" or "true".
-			* Default value: "true".
-			*
-			* @getandset
-			*
-			* @par Example
-			* \code
-			*   char buf[256];
-			*   sprintf(buf, "%s", "true");
-			*	maCaptureSetProperty(MA_CAPTURE_GALLERY, buf);
-			* \endcode
-			*/
-			GALLERY = "gallery";
 
 			/**
 			* @brief Set the flash mode used by the active camera.
