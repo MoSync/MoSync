@@ -79,6 +79,7 @@ SettingsScreen::SettingsScreen(SettingsScreenListener& listener) :
 	mCameraRollCheckBox(NULL),
 	mCameraControlsCheckBox(NULL),
 	mTakePictureBtn(NULL),
+	mTakenPicturePath(NULL),
 	mRecordVideoBtn(NULL),
 	mShowImageScreen(NULL),
 	mShowVideoScreen(NULL)
@@ -101,6 +102,15 @@ SettingsScreen::SettingsScreen(SettingsScreenListener& listener) :
 	mRecordVideoBtn->addButtonListener(this);
 	mShowImageScreen->addButtonListener(this);
 	mShowVideoScreen->addButtonListener(this);
+}
+
+/**
+ * Set the captured image path to the label.
+ * @param path the full path.
+ */
+void SettingsScreen::setCapturedImagePath(const MAUtil::String path)
+{
+	mTakenPicturePath->setText("Saved at: " + path);
 }
 
 /**
@@ -319,6 +329,14 @@ void SettingsScreen::createMainLayout() {
 	mTakePictureBtn = new Button();
 	mTakePictureBtn->setText(TAKE_PICTURE_BTN_TEXT);
 	this->addButtonToListView(mTakePictureBtn, listView);
+
+	if (isAndroid())
+	{
+		mTakenPicturePath = new Label();
+		ListViewItem* listItem = new ListViewItem();
+		listItem->addChild(mTakenPicturePath);
+		listView->addChild(listItem);
+	}
 
 	// Add record video button.
 	mRecordVideoBtn = new Button();

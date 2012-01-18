@@ -2837,6 +2837,21 @@ namespace Base
 				mJThis);
 		}
 
+		case maIOCtl_maCaptureGetImagePath:
+		{
+			int _pathBufferSize = c;
+			int _pathBuffer = (int) SYSCALL_THIS->GetValidatedMemRange(
+				b,
+				_pathBufferSize * sizeof(char));
+			return _maCaptureGetImagePath(
+				(int)gCore->mem_ds,
+				a,
+				_pathBuffer,
+				_pathBufferSize,
+				mJNIEnv,
+				mJThis);
+		}
+
 		case maIOCtl_maCaptureGetVideoPath:
 		{
 			int _pathBufferSize = c;

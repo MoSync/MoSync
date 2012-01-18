@@ -3282,6 +3282,23 @@ namespace Base
 		return result;
 	}
 
+	int _maCaptureGetImagePath(int memStart, MAHandle handle, int buffer, int bufferSize, JNIEnv* jNIEnv, jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maCaptureGetImagePath", "(III)I");
+		if (methodID == 0)
+		{
+			return 0;
+		}
+
+		int result = jNIEnv->CallIntMethod(jThis, methodID, handle, buffer - memStart, bufferSize);
+
+		jNIEnv->DeleteLocalRef(cls);
+
+		return result;
+	}
+
 	int _maCaptureGetVideoPath(int memStart, MAHandle handle, int buffer, int bufferSize, JNIEnv* jNIEnv, jobject jThis)
 	{
 		jclass cls = jNIEnv->GetObjectClass(jThis);

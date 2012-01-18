@@ -902,6 +902,8 @@ namespace Base
 
 	int _maCaptureWriteImage(MAHandle handle, const char* fullPathBuffer, int fullPathBufSize, JNIEnv* jNIEnv, jobject jThis);
 
+	int _maCaptureGetImagePath(int memStart, MAHandle handle, int buffer, int bufferSize, JNIEnv* jNIEnv, jobject jThis);
+
 	int _maCaptureGetVideoPath(int memStart, MAHandle handle, int buffer, int bufferSize, JNIEnv* jNIEnv, jobject jThis);
 
 	int _maCaptureDestroyData(MAHandle handle, JNIEnv* jNIEnv, jobject jThis);

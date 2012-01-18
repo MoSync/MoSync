@@ -532,13 +532,9 @@ public class MoSyncCapture
 
 		// Get the bitmap.
 	    BitmapFactory.Options mDecodingOptions = new BitmapFactory.Options() ;
-	    // Return a smaller image to save memory and avoid OutOfMemory.
-	    mDecodingOptions.inSampleSize = 2;
-
+	    // Return a smaller image to save memory and avoid memory issues.
+	    mDecodingOptions.inSampleSize = 4;
 	    photo = BitmapFactory.decodeFile(filePath, mDecodingOptions);
-
-		// The second option which causes OutOfMemory exception after several times.
-//		photo = grabImage(mImageUri);
 
 		if ( photo == null )
 		{
@@ -551,8 +547,6 @@ public class MoSyncCapture
         // Store the image in the NativeUI image table.
 		mImageTable.put(dataHandle, new ImageCache(null, photo));
 		NativeUI.setImageTable(mImageTable);
-		// Not needed.
-//		recycleImageData(photo);
 
 		// Create and store a new CaptureObject.
 		MoSyncCaptureObject capture = new MoSyncCaptureObject(CaptureType.IMAGE);
