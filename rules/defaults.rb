@@ -74,8 +74,8 @@ def set_defaults
 	# If true, the GCC version number will be added to BUILDDIR names for native projects.
 	# Useful if you often switch between different versions of GCC.
 	default_const(:USE_GCC_VERSION_IN_BUILDDIR_NAME, false)
-	if(USE_GCC_VERSION_IN_BUILDDIR_NAME && self.class.const_defined?(:NativeGccWork) && self.is_a?(NativeGccWork))
-		builddir_postfix = @gcc_version
+	if(USE_GCC_VERSION_IN_BUILDDIR_NAME)
+		builddir_postfix = '_'+@gcc_version.strip
 	else
 		builddir_postfix = ''
 	end
