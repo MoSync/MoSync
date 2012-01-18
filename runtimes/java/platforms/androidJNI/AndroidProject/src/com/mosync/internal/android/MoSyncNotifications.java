@@ -19,17 +19,12 @@ package com.mosync.internal.android;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.content.pm.PackageManager.NameNotFoundException;
-import android.content.pm.PermissionInfo;
 import android.os.Build;
 import android.util.Log;
 
 import com.mosync.internal.android.notifications.LocalNotificationsManager;
 import com.mosync.internal.android.notifications.PushNotificationsManager;
-import com.mosync.internal.android.notifications.PushRegistrationData;
-import com.mosync.nativeui.util.properties.FloatConverter;
 import com.mosync.nativeui.util.properties.IntConverter;
 import com.mosync.nativeui.util.properties.PropertyConversionException;
 

@@ -22,7 +22,9 @@ IX_*.h
 
 MAHeaders.h
 program
+program.comb
 resources
+resources.deps
 log.txt
 panic.report
 Stabs.tab
@@ -33,6 +35,10 @@ stabs.tab
 fp.xml
 profile.txt
 .DS_Store
+_masterdump.s
+data_section.bin
+rebuild.build.cs
+rebuild.build.cpp
 
 config_platform.h
 
@@ -109,9 +115,6 @@ config_platform.h
 /runtimes/cpp/platforms/iphone/Classes/helpers/maapi_defs.h
 /runtimes/cpp/platforms/iphone/Classes/syscall_static_cpp.h
 
-/runtimes/cpp/platforms/iphone/Classes/data_section.bin
-/runtimes/cpp/platforms/iphone/Classes/rebuild.build.cpp
-/runtimes/cpp/platforms/iphone/data_section.bin
 /runtimes/cpp/platforms/iphone/template/
 
 /runtimes/cpp/platforms/winmobile/winmobile.sln

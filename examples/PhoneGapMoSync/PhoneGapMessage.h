@@ -42,7 +42,7 @@ public:
 	/**
 	 * Make a JSON stringified string.
 	 */
-	static MAUtil::String JSONStringify(const char* str);
+	static MAUtil::String PhoneGapMessage::JSONStringify(const char* str);
 
 	static MAUtil::String PhoneGapMessage::base64Encode(const char* input);
 

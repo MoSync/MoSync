@@ -103,8 +103,8 @@ PhoneGap.exec = function(success, fail, service, action, args)
     bridge.PhoneGap.send(callbackId, service, action, JSON.stringify(args));
 };
 
-// MOSYNC: We currently do not call this function, but call
-// PhoneGap.CallbackSuccess and PhoneGap.CallbackError from C++.
+// MOSYNC: We currently only call this function for key, pause and resume events
+//We call PhoneGap.CallbackSuccess and PhoneGap.CallbackError directly  from C++.
 PhoneGapCommandResult = function(status,callbackId,args,cast)
 {
     if(status === "backbutton") {
@@ -1093,7 +1093,14 @@ Capture.prototype.captureImage = function (successCallback, errorCallback, optio
  * @param {CaptureVideoOptions} options
  */
 Capture.prototype.captureVideo = function(successCallback, errorCallback, options){
-    PhoneGap.exec(successCallback, errorCallback, "Capture", "captureVideo", options);
+	PhoneGap.exec(	function(mediaFiles)
+					{
+						successCallback(Capture.prototype._castMediaFile(mediaFiles).message);
+					},
+					function(error)
+					{
+						errorCallback({code:CaptureError[error.code]});
+					}, "Capture", "captureVideo", options);
 };
 
 /**
