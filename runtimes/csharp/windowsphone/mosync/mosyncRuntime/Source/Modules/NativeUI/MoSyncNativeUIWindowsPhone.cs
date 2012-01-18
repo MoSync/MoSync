@@ -303,6 +303,14 @@ namespace MoSync
                     double val = double.Parse(value);
                     mView.Opacity = val;
                 }
+                get
+                {
+                    if (null != mView.Opacity)
+                    {
+                        return mView.Opacity.ToString();
+                    }
+                    return "1";
+                }
             }
 
             public WidgetBaseWindowsPhone()
