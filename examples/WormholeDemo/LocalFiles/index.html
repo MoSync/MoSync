@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Tweet Reader</title>
+
+<!-- import JQTouch -->
+<script src="js/jqtouch/jqtouch.min.js" type="application/x-javascript"
+	charset="utf-8"></script>
+
+<!-- Import JQTouch default style (iPhone look). Replace the string "themes/default" with "themes/jqt" for a neutral (black) theme -->
+<link type="text/css" rel="stylesheet" media="screen"
+	href="js/jqtouch/jqtouch.css">
+<link type="text/css" rel="stylesheet" media="screen"
+	href="js/themes/apple/theme.css">
+<!-- include JQuery through Google API => Always have the latest version -->
+<script src="js/jqtouch/jquery-1.4.2.min.js" type="text/javascript"
+	charset="utf-8"></script>
+<script src="js/jqtouch/jqtouch.js" type="application/x-javascript"
+	charset="utf-8"></script>
+
+<!-- Import the bridge library. -->
+<script src="js/bridge.js"></script>
+
+<script type="text/javascript" charset="utf-8" src="js/phonegap-bridge.js"></script>
+<script type="text/javascript" charset="utf-8" src="js/phonegap-1.2.0.js"></script>
+<script type="text/javascript" charset="utf-8" src="js/mosync-pushnotifications.js"></script>
+<script type="text/javascript" charset="utf-8" src="js/w3c-sensormanager.js"></script>
+
+<!-- JavaScript goes here -->
+<script type="text/javascript">
+			// Fire up JQTouch
+			var jQT = $.jQTouch({
+				statusBar: 'black'
+			});
+
+			// Make sure we get the correct event type on every touch system.
+			var userAgent = navigator.userAgent.toLowerCase();
+			var isiPhone =
+				(userAgent.indexOf('iphone') != -1 ||
+				userAgent.indexOf('ipod') != -1)
+					? true : false;
+			var clickEvent = isiPhone ? 'tap' : 'click';
+
+			var deviceInfo = function() {
+				document.getElementById("platform_li").innerHTML = "Platform: " + device.platform;
+				document.getElementById("plaformversion_li").innerHTML = "Version: " + device.version;
+				document.getElementById("deviceName_li").innerHTML = "Device: " + device.name;
+			};
+
+			/**
+			 * Will be called after all the markup in <body> was loaded
+			 */
+			function initialize()
+			{
+				$("#submitButton").bind(clickEvent, function(e)
+				{
+					getTweets();
+				});
+				$("#favoriteButton").bind(clickEvent, function(e)
+				{
+					addFavoriteUser();
+				});
+				$("#backButton").bind(clickEvent, function(e)
+				{
+					goBack();
+				});
+
+				$("#DeviceInfo").bind('pageAnimationStart', function(event, info){
+
+				})
+
+				document.addEventListener("deviceready", deviceInfo, true);
+			}
+		</script>
+
+<!-- CSS styles -->
+<style type="text/css">
+</style>
+</head>
+
+<!-- A simple JQTouch layout consisting of two views -->
+<body onload="initialize()">
+	<div id="jqt">
+		<!-- "Page 1" -->
+		<div id="mainPage">
+			<div class="toolbar">
+				<h1>WormHole</h1>
+			</div>
+			<ul class="rounded" style="text-align: center">
+				<li>
+				Welcome to Wormhole Demo!!
+				</li>
+			</ul>
+			<ul class="rounded">
+				<li class="arrow"><a href="#DeviceInfo" id="DeviceInfoLink">View
+						Device Information</a></li>
+				<li class="arrow"><a href="#PhoneGapSensors" id="PhoneGapSensorsLink">PhoneGap
+						Compatible Sensors</a></li>
+				<li class="arrow"><a href="W3cSensors" id="w3cSensorsLink">W3C Sensors</a></li>
+				<li class="arrow"><a id="PhoneGapContact">Contacts</a></li>
+				<li class="arrow"><a id="PhoneGapCamera">Camera</a></li>
+				<li class="arrow"><a id="PhoneGapFile">File</a></li>
+				<li class="arrow"><a id="PhoneGapNotifications">PhoneGap
+						Compatible Notifications</a></li>
+				<li class="arrow"><a id="PushNotifications">Push
+						Notifications</a></li>
+			</ul>
+
+		</div>
+
+		<div id="DeviceInfo">
+			<div class="toolbar">
+				<a class="button back" href="#mainPage" id="backButton">Back</a>
+				<h1 id="InfoTitle">Device Information</h1>
+			</div>
+
+			<ul id="deviceInfoList" class="rounded">
+				<li id="platform_li">Platform: Android</li>
+				<li id="plaformversion_li">version: 2.3.3</li>
+				<li id="deviceName_li">Device Name: GT-I9100</li>
+			</ul>
+		</div>
+
+		<div id="PhoneGapSensors">
+			<div class="toolbar">
+				<h1 id="InfoTitle">Sensors 1</h1>
+				<a class="button back" href="#mainPage" id="backButton">Back</a>
+			</div>
+
+			<ul id="Accelerometer" class="rounded">
+				<li>
+					<dl id="accel-data">
+						<dt>X:</dt><dd id="accelx">&nbsp;</dd>
+						<dt>Y:</dt><dd id="accely">&nbsp;</dd>
+						<dt>Z:</dt><dd id="accelz">&nbsp;</dd>
+					</dl>
+				</li>
+				<li id="toggelAccelData_li">Toggle Accelerometer</li>
+			</ul>
+			<ul id="GeoLocation" class="rounded">
+				<li>
+					<dl id="Geo-data">
+						<dt>Latt:</dt><dd id="geoLat">&nbsp;</dd>
+						<dt>Long:</dt><dd id="geoLong">&nbsp;</dd>
+					</dl></li>
+				<li id="toggelGeodata_li">Toggle GeoLocation</li>
+			</ul>
+			<ul id="Compass" class="rounded">
+				<li>
+					<dl id="Compass-data">
+						<dt>Heading:</dt><dd id="CompassHeading">&nbsp;</dd>
+					</dl></li>
+				<li id="Compass_li">Toggle Compass</li>
+			</ul>
+		</div>
+
+		<div id="W3cSensors">
+			<div class="toolbar">
+				<h1 id="InfoTitle">Sensors 2</h1>
+				<a class="button back" href="#mainPage" id="backButton">Back</a>
+			</div>
+
+			<ul id="Accelerometer" class="rounded">
+				<li>
+					<dl id="accel-data">
+						<dt>X:</dt><dd id="accelx">&nbsp;</dd>
+						<dt>Y:</dt><dd id="accely">&nbsp;</dd>
+						<dt>Z:</dt><dd id="accelz">&nbsp;</dd>
+					</dl>
+				</li>
+				<li id="toggelAccelData_li">Toggle Accelerometer</li>
+			</ul>
+			<ul id="MagneticField" class="rounded">
+				<li>
+					<dl id="Geo-data">
+						<dt>Latt:</dt><dd id="geoLat">&nbsp;</dd>
+						<dt>Long:</dt><dd id="geoLong">&nbsp;</dd>
+					</dl></li>
+				<li id="toggelGeodata_li">Toggle Magnetic Field</li>
+			</ul>
+			<ul id="Orientation" class="rounded">
+				<li>
+					<dl id="Compass-data">
+						<dt>Heading:</dt><dd id="CompassHeading">&nbsp;</dd>
+					</dl></li>
+				<li id="Compass_li">Toggle Orientation</li>
+			</ul>
+			<ul id="Proximity" class="rounded">
+				<li>
+					<dl id="Compass-data">
+						<dt>Heading:</dt><dd id="CompassHeading">&nbsp;</dd>
+					</dl></li>
+				<li id="Compass_li">Toggle Proximity</li>
+			</ul>
+			<ul id="Gyroscope" class="rounded">
+				<li>
+					<dl id="Compass-data">
+						<dt>Heading:</dt><dd id="CompassHeading">&nbsp;</dd>
+					</dl></li>
+				<li id="Compass_li">Toggle Gyroscope</li>
+			</ul>
+		</div>
+
+	</div>
+</body>
+</html>
