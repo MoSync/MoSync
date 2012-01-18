@@ -308,7 +308,7 @@ void PhoneGapMessageHandler::sensorEvent(MASensor sensorData)
 		{
 			mPhoneGapSensors.sendAccelerometerData(sensorData);
 		}
-		else if (sensorData.type == SENSOR_TYPE_ORIENTATION)
+		else if (sensorData.type == SENSOR_TYPE_MAGNETIC_FIELD)
 		{
 			mPhoneGapSensors.sendCompassData(sensorData);
 		}

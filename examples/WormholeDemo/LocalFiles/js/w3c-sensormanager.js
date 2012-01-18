@@ -76,6 +76,7 @@ function SensorRequest(type)
 function SensorConnection(options)
 {
 	var self = this;
+	alert(options);
 	if(typeof options == "string")
 	{
 		this.type = options;

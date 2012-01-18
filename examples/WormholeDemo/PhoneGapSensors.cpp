@@ -112,6 +112,7 @@ void PhoneGapSensors::sendLocationData(const MAEvent& event)
 	MALocation& loc = *(MALocation*)event.data;
 	char result[1024];
 	bool keepCallBack;
+
 	// This is used to prevent PhoneGap from deleting the callback after
 	// receiving the first result.
 	if (mLocationWatchStarted) {
@@ -126,14 +127,14 @@ void PhoneGapSensors::sendLocationData(const MAEvent& event)
 
 	// Call the PhoneGap function, can call the commandResult function too.
 	sprintf(result,
-		"{coords:{"
-			"latitude:%f,"
-			"longitude:%f,"
-			"altitude:%f,"
-			"accuracy:%f,"
-			"altitudeAccuracy:%f,"
-			"heading:%f,"
-			"speed:%f"
+		"{\"coords\":{"
+			"\"latitude\":%f,"
+			"\"longitude\":%f,"
+			"\"altitude\":%f,"
+			"\"accuracy\":%f,"
+			"\"altitudeAccuracy\":%f,"
+			"\"heading\":%f,"
+			"\"speed\":%f"
 			"}}",
 		loc.lat,
 		loc.lon,
@@ -170,7 +171,7 @@ void PhoneGapSensors::sendCompassData(MASensor sensorData)
 {
 	sendCompassData(mCompassWatchCallBack, sensorData);
 	// Stop the sensor since it was a one time call.
-	maSensorStop(SENSOR_TYPE_ORIENTATION);
+	maSensorStop(SENSOR_TYPE_MAGNETIC_FIELD);
 }
 
 /**
@@ -228,11 +229,12 @@ void PhoneGapSensors::sendCompassData(
 		MASensor sensorData)
 {
 	char result[1024];
+	lprintfln("!!!!!!!!!!!!!!! mag event");
 	//Call the Phonegap function, Can call the commandResult function too
 	sprintf(
 			result,
 			"{\"magneticHeading\":%f }",
-			sensorData.values[1] // only x is considered as compass heading in PhoneGap
+			sensorData.values[0] // only x is considered as compass heading in PhoneGap
 			);
 	mMessageHandler->callSuccess(
 		callbackID,
@@ -290,15 +292,16 @@ void PhoneGapSensors::processCompassRequest(
 		bool isWatched)
 {
 	// In PhoneGap, compass is actually the orientation sensor.
-	int res = maSensorStart(SENSOR_TYPE_ORIENTATION, SENSOR_RATE_NORMAL);
+	int res = maSensorStart(SENSOR_TYPE_MAGNETIC_FIELD , SENSOR_RATE_NORMAL);
 	if (res < 0)
 	{
+		lprintfln("!!!!!!!!!!!!!!! mag failed");
 		mMessageHandler->callError(
 			callbackID,
 			PHONEGAP_CALLBACK_STATUS_ERROR,
 			"MoSync: Failed to Start Compass");
 		return;
 	}
-
+	lprintfln("!!!!!!!!!!!!!!! mag started");
 	mCompassWatchCallBack = callbackID;
 }
