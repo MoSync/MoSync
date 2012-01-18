@@ -283,6 +283,10 @@ public class Widget
 				return "false";
 			}
 		}
+		else if(property.equals( IX_WIDGET.MAW_WIDGET_ALPHA ) )
+		{
+			return Float.toString(m_alpha);
+		}
 		return INVALID_PROPERTY_NAME;
 	}
 
