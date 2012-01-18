@@ -969,7 +969,7 @@ void PhoneGapFile::actionRequestFileSystem(PhoneGapMessage& message)
 	}
 
 	// TODO: Replace hard-coded path with platform aware path handling.
-	String rootEntry = emitDirectoryEntry("sdcard", "/mnt/sdcard");
+	String rootEntry = emitDirectoryEntry("sdcard", "/sdcard");
 	String fileSystemInfo = emitFileSystemInfo("persistent", rootEntry);
 	callSuccess(
 		callbackID,
@@ -982,6 +982,43 @@ void PhoneGapFile::actionResolveLocalFileSystemURI(PhoneGapMessage& message)
 	lprintfln("@@@ actionResolveLocalFileSystemURI\n");
 
 	String callbackID = message.getParam("PhoneGapCallBackId");
+
+	String uri = message.getArgsField("uri");
+
+	// Get path.
+	const char* pURL = uri.c_str();
+	lprintfln(">>> pURL: %s", pURL);
+	const char* pPath = strstr(pURL, "file://");
+	if (NULL == pPath)
+	{
+		callFileError(callbackID, "1000");
+		return;
+	}
+	if (pURL != pPath)
+	{
+		callFileError(callbackID, FILEERROR_SYNTAX_ERR);
+		return;
+	}
+
+	// Move to after "file://"
+	pPath += 7;
+
+	// Check that this is an existing directory.
+	if (!FileIsDirectory(pPath))
+	{
+		callFileError(callbackID, FILEERROR_NOT_FOUND_ERR);
+		return;
+	}
+
+	String entry = emitDirectoryEntry(
+		FileGetName(pPath),
+		pPath);
+	callSuccess(
+		callbackID,
+		entry,
+		"window.localFileSystem._castEntry");
+
+
 }
 
 /**

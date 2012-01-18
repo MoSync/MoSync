@@ -58,6 +58,13 @@ var FileSys = function()
 {
 	var FileSys = {};
 
+	/**
+	 * The file system object is returned to funcion fun.
+	 * @param uri "LocalFileSystem" for the local file
+	 * system or a uri in the form "file://...", for
+	 * example "file:///sdcard".
+	 * @param fun A function on the form fun(success, fileSys)
+	 */
 	FileSys.create = function(uri, fun)
 	{
 		var fileSys = FileSys.createInstance();
@@ -69,17 +76,31 @@ var FileSys = function()
 				0,
 				function (fileSystem)
 				{
-					fileSys.fileSystem = fileSystem;
+					fileSys.root = fileSystem.root;
 					fun(true, fileSys);
 				},
 				function ()
 				{
-					fileSys.fileSystem = null;
+					fileSys.root = null;
 					fun(false, null);
 				});
 		}
 		else
 		{
+			window.resolveLocalFileSystemURI(
+				uri,
+				function (directoryEntry)
+				{
+					console.log("@@@ resolveLocalFileSystemURI success");
+					fileSys.root = directoryEntry;
+					fun(true, fileSys);
+				},
+				function ()
+				{
+					console.log("@@@ resolveLocalFileSystemURI error");
+					fileSys.root = null;
+					fun(false, null);
+				});
 			// TODO: File system URIs not implemeted.
 			fun(false, null);
 		}
@@ -89,7 +110,7 @@ var FileSys = function()
 	{
 		var fileSys = {};
 
-		fileSys.fileSystem = null;
+		fileSys.root = null;
 
 		/**
 		 * Make generic error handling function that calls
@@ -120,9 +141,9 @@ var FileSys = function()
 		 */
 		fileSys.writeTextAtPosition = function(path, data, position, fun)
 		{
-			fileSys.fileSystem.root.getFile(
+			fileSys.root.getFile(
 				path,
-				{ create: true },
+				{ create: true, exclusive: false },
 				function(fileEntry)
 				{
 					var writer = new FileWriter(fileEntry);
@@ -142,9 +163,9 @@ var FileSys = function()
 
 		fileSys.readText = function(path, fun)
 		{
-			fileSys.fileSystem.root.getFile(
+			fileSys.root.getFile(
 				path,
-				{ create: true },
+				{ create: false, exclusive: false },
 				function(fileEntry)
 				{
 					var reader = new FileReader();
@@ -163,9 +184,9 @@ var FileSys = function()
 
 		fileSys.readAsDataURL = function(path, fun)
 		{
-			fileSys.fileSystem.root.getFile(
+			fileSys.root.getFile(
 				path,
-				{ create: true },
+				{ create: false, exclusive: false },
 				function(fileEntry)
 				{
 					var reader = new FileReader();
@@ -184,9 +205,9 @@ var FileSys = function()
 
 		fileSys.truncate = function(path, size, fun)
 		{
-			fileSys.fileSystem.root.getFile(
+			fileSys.root.getFile(
 				path,
-				{ create: true },
+				{ create: false, exclusive: false },
 				function(fileEntry)
 				{
 					var writer = new FileWriter(fileEntry);
@@ -205,9 +226,9 @@ var FileSys = function()
 
 		fileSys.getMetaData = function(path, fun)
 		{
-			fileSys.fileSystem.root.getFile(
+			fileSys.root.getFile(
 				path,
-				{ create: false },
+				{ create: false, exclusive: false },
 				function(fileEntry)
 				{
 					fileEntry.getMetadata(
@@ -227,9 +248,9 @@ var FileSys = function()
 		 */
 		fileSys.copyOrMove = function(path, newPath, fun, move)
 		{
-			fileSys.fileSystem.root.getFile(
+			fileSys.root.getFile(
 				path,
-				{ create: false },
+				{ create: false, exclusive: false },
 				function(fileEntry)
 				{
 					var uri = fileEntry.toURI();
@@ -320,7 +341,7 @@ var FileSys = function()
 		 */
 		fileSys.createFile = function(path, fun)
 		{
-			fileSys.fileSystem.root.getFile(
+			fileSys.root.getFile(
 				path,
 				{ create: true, exclusive: false },
 				function(entry) { fun(true, entry); },
@@ -329,9 +350,9 @@ var FileSys = function()
 
 		fileSys.removeFile = function(path, fun)
 		{
-			fileSys.fileSystem.root.getFile(
+			fileSys.root.getFile(
 				path,
-				{ create: false },
+				{ create: false, exclusive: false },
 				function(fileEntry)
 				{
 					fileEntry.remove(
@@ -349,7 +370,7 @@ var FileSys = function()
 		 */
 		fileSys.createDirectory = function(path, fun)
 		{
-			fileSys.fileSystem.root.getDirectory(
+			fileSys.root.getDirectory(
 				path,
 				{ create: true, exclusive: false },
 				function(entry) { fun(true, entry); },
@@ -358,7 +379,7 @@ var FileSys = function()
 
 		fileSys.removeDirectory = function(path, fun)
 		{
-			var fullPath = fileSys.fileSystem.root.fullPath + "/" + path;
+			var fullPath = fileSys.root.fullPath + "/" + path;
 
 			// Find directory name.
 			var directoryName = "";
@@ -381,14 +402,12 @@ var FileSys = function()
 
 		fileSys.readDirectory = function(path, fun)
 		{
-			fileSys.fileSystem.root.getDirectory(
+			fileSys.root.getDirectory(
 				path,
 				{ create: false, exclusive: false },
 				function(directory)
 				{
-					PrintObject(directory);
 					var directoryReader = directory.createReader();
-					PrintObject(directoryReader);
 					directoryReader.readEntries(
 						function(entries) { fun(true, entries); },
 						error(fun));
@@ -402,9 +421,250 @@ var FileSys = function()
 	return FileSys;
 }();
 
+function testFileSystem()
+{
+	// A file system object, created last
+	// in this function.
+	var fileSys;
+
+	var tests;
+	var testIndex = 0;
+
+	function nextTest()
+	{
+		if (testIndex < tests.length)
+		{
+			++testIndex;
+			return tests[testIndex - 1];
+		}
+		else
+		{
+			return function()
+			{
+				MyLog("End of tests");
+				alert("End of tests");
+			};
+		}
+	}
+
+	function runNextTest(success)
+	{
+		MyLog("Running next test");
+		nextTest()(success);
+	}
+
+	tests = [
+		createFiles,
+		readDirectory("foa", checkDirectoryContents),
+		copyDirectory("foa", "fob"),
+		readDirectory("fob", checkDirectoryContents),
+		moveDirectory("fob", "foc"),
+		readDirectory("foc", checkDirectoryContents),
+		allTestsPassed()
+	];
+
+	// Set up test.
+	function createFiles(success)
+	{
+		// Create directories and some empty files.
+		fileSys.createDirectory("foa", createFilesShouldPass);
+		fileSys.createDirectory("foa/bar", createFilesShouldPass);
+		fileSys.createFile("foa/hello.txt", createFilesShouldPass);
+		fileSys.createFile("foa/bar/hello.txt", createFilesShouldPass);
+		fileSys.createDirectory("foo", createFilesShouldPass);
+		fileSys.createDirectory("foo/bar", createFilesShouldPass);
+
+		// Write files to directories.
+		fileSys.writeText("foo/hello1.txt", "Hello World", createFilesShouldPass);
+		fileSys.writeText("foo/bar/hello2.txt", "Hello World", createFilesShouldPass);
+		fileSys.writeText("foo/bar/hello3.txt", "Hello World", createFilesDone);
+	}
+
+	function createFilesShouldPass(success)
+	{
+		if (!success)
+		{
+			fail("createFiles failed");
+		}
+	}
+
+	/**
+	 * Run next test.
+	 */
+	function createFilesDone(success)
+	{
+		if (success)
+		{
+			runNextTest(success);
+		}
+		else
+		{
+			fail("createFilesDone failed");
+		}
+	}
+
+	function readDirectory(path, checkFun)
+	{
+		return function(success)
+		{
+			if (success)
+			{
+				fileSys.readDirectory(
+					path,
+					readDirectoryDone(path, checkFun));
+			}
+			else
+			{
+				fail("readDirectory failed " + path);
+			}
+		};
+	}
+
+	/**
+	 * Check that directory contents are as expected.
+	 */
+	function readDirectoryDone(path, checkFun)
+	{
+		return function(success, files)
+		{
+			if (success && checkFun(files))
+			{
+				runNextTest(success);
+			}
+			else
+			{
+				fail("readDirectoryDone failed: " + path);
+			}
+		};
+	}
+
+	function copyDirectory(sourcePath, destPath)
+	{
+		return function(success)
+		{
+			if (success)
+			{
+				fileSys.copy(
+					sourcePath,
+					destPath,
+					copyDirectoryDone(destPath));
+			}
+			else
+			{
+				fail("testCopyDirectory failed: " +
+					sourcePath + " " + destPath);
+			}
+		};
+	}
+
+	function copyDirectoryDone(destPath)
+	{
+		return function(success)
+		{
+			if (success)
+			{
+				runNextTest(success);
+			}
+			else
+			{
+				fail("copyDirectoryDone failed " + destPath);
+			}
+		};
+	}
+
+	function moveDirectory(sourcePath, destPath)
+	{
+		return function(success)
+		{
+			if (success)
+			{
+				fileSys.move(
+					sourcePath,
+					destPath,
+					moveDirectoryDone(destPath));
+			}
+			else
+			{
+				fail("moveDirectory failed: " +
+					sourcePath + " " + destPath);
+			}
+		};
+	}
+
+	function moveDirectoryDone(destPath)
+	{
+		return function(success)
+		{
+			if (success)
+			{
+				runNextTest(success);
+			}
+			else
+			{
+				fail("moveDirectoryDone failed " + destPath);
+			}
+		};
+	}
+
+	function allTestsPassed()
+	{
+		return function(success)
+		{
+			MyLog("All tests passed: " + success);
+			alert("All tests passed: " + success);
+		};
+	}
+
+	function checkDirectoryContents(files)
+	{
+		var passed = 0;
+
+		for (var i = 0; i < files.length; ++i)
+		{
+			var entry = files[i];
+			if (entry.name == "hello.txt" && entry.isFile && !entry.isDirectory)
+			{
+				++passed;
+			}
+			if (entry.name == "bar" && !entry.isFile && entry.isDirectory)
+			{
+				++passed;
+			}
+			else
+			{
+				// Should not happen.
+				passed = 0;
+				break;
+			}
+		}
+
+		return (passed == 2);
+	}
+
+	function fail(message)
+	{
+		MyLog("FileSystem test failed: " + message);
+		alert("FileSystem test failed: " + message);
+	}
+
+	// Create the file system object and start test.
+	FileSys.create(
+		"file:///sdcard",
+		function(success, fs)
+		{
+			if (success)
+			{
+				fileSys = fs;
+
+				// Start first test.
+				runNextTest(success);
+			}
+		});
+}
+
 /**
  * This test is obsolete.
- * TODO: Remove when integrated in test below.
+ * TODO: Remove when integrated in test above.
  */
 function obsoleteTestFileSystem()
 {
@@ -601,109 +861,6 @@ function obsoleteTestFileSystem()
 	// Start first test.
 	writeFile();
 }
-
-function testFileSystem()
-{
-	var fileSys = FileSys.create("LocalFileSystem");
-
-	// Set up test.
-	function createFiles()
-	{
-		// Create directories and empty files.
-		fileSys.createDirectory("foa", createFilesShouldPass);
-		fileSys.createDirectory("foa/foo", createFilesShouldPass);
-		fileSys.createFile("foa/hello.txt", createFilesShouldPass);
-		fileSys.createFile("foa/foo/hello.txt", createFilesShouldPass);
-
-		// Write files to directories.
-		fileSys.writeText("foo/hello1.txt", "Hello World", createFilesShouldPass);
-		fileSys.writeText("foo/bar/hello2.txt", "Hello World", createFilesShouldPass);
-		fileSys.writeText("foo/bar/hello3.txt", "Hello World", testReadDirectory);
-	}
-
-	// Test that directory contents are as expected.
-	function testReadDirectory(success)
-	{
-		if (success)
-		{
-			fileSys.readDirectory("foo", testReadDirectoryDone);
-		}
-		else
-		{
-			fail();
-		}
-	}
-
-	function testReadDirectoryDone(success, files)
-	{
-		var passed = false;
-
-		if (success)
-		{
-			// TODO: Rewritethis, won't work.
-			// Make sort order independent.
-			passed = true
-				&& files[0].name == "hello1.txt"
-				&& files[0].isFile
-				&& files[1].name == "bar"
-				&& files[1].isDirectory;
-		}
-
-		if (passed)
-		{
-			// Next test. Copy directory tree.
-			FileSys.copy("foa", "fob", testCopyDirectoryDone);
-		}
-		else
-		{
-			fail("testReadDirectoryDone failed");
-		}
-	}
-
-	function testCopyDirectoryDone(success)
-	{
-		if (success)
-		{
-			FileSys.move("fob", "foc", testMoveDirectoryDone);
-		}
-		else
-		{
-			fail("testCopyDirectoryDone failed");
-		}
-	}
-
-	function testMoveDirectoryDone(success)
-	{
-		if (success)
-		{
-			// TODO: Check file system.
-		}
-		else
-		{
-			fail("testMoveDirectoryDone failed");
-		}
-
-		// Next test: Read, copy move delete elete files.
-		// Then delete directories.
-	}
-
-	function fail(message)
-	{
-		MyLog("FileSystem test failed: " + message);
-		alert("FileSystem test failed: " + message);
-	}
-
-	function createFilesShouldPass(success)
-	{
-		if (!success)
-		{
-			fail("createFiles failed");
-		}
-	}
-
-	createFiles();
-}
-
 
 // =========================================================================== //
 
