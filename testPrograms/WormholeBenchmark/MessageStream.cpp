@@ -147,7 +147,7 @@ namespace App
 		// Zero terminate string.
 		*mEnd = 0;
 
-//		lprintfln("@@@ mStart: %s", mStart);
+		//lprintfln("@@@ mStart: %s", mStart);
 
 		// Return string start.
 		return mStart;

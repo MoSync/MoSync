@@ -94,6 +94,7 @@
     <ClCompile Include="..\..\base\MoSyncDB.cpp" />
     <ClCompile Include="..\..\base\networking.cpp" />
     <ClCompile Include="..\..\base\pim.cpp" />
+    <ClCompile Include="..\..\base\ResourceArray.cpp" />
     <ClCompile Include="..\..\base\Stream.cpp" />
     <ClCompile Include="..\..\base\Syscall.cpp" />
     <ClCompile Include="..\..\base\ThreadPool.cpp">

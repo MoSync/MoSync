@@ -24,6 +24,7 @@ MA 02110-1301, USA.
  */
 
 #include <mastring.h>
+#include <matime.h>
 #include <conprint.h>
 #include <MAUtil/String.h>
 #include <MAUtil/HashDict.h>
@@ -134,7 +135,7 @@ static String FileGetMimeType(const String& filePath)
 	for (int i = 0; i < size; ++i)
 	{
 		char* ext2 = MimeTypeDictionary[i][0];
-		lprintfln("@@@@@ FileGetMimeType size: %i ext: %s ext2: %s", size, ext, ext2);
+		//lprintfln("@@@@@ FileGetMimeType size: %i ext: %s ext2: %s", size, ext, ext2);
 		if (0 == stricmp(ext, ext2))
 		{
 			return MimeTypeDictionary[i][1];
@@ -145,11 +146,13 @@ static String FileGetMimeType(const String& filePath)
 }
 
 /**
- * TODO: This wound work to get a directory name if
+ * TODO: This must work to get a directory name if
  * the path ends with a slash, e.g.: /sdcard/MyMusic/
  */
 static String FileGetName(const String& filePath)
 {
+	// TODO: Remove last slash if path ends with a slash.
+
 	// Find last slash.
 	int pos = filePath.findLastOf('/');
 	if (String::npos == pos)
@@ -203,9 +206,8 @@ static String FileGetDate(const String& path)
 	}
 	maFileClose(file);
 
-	// TODO: Implement string formatting of date/time/timezone.
-	// Can you obtain time zone in MoSync?
-	return "Mon Dec 19 2011 12:46:43 GMT+0100 (CET)";
+	// Return time in format "Mon Dec 19 2011 12:46:43 GMT+0100 (CET)".
+	return sprint_time(date);
 }
 
 /**
@@ -248,10 +250,10 @@ static String FileGetParentDirectory(const String& fullPath)
 		return "";
 	}
 
-	lprintfln("@@@@@@@ FileGetParentDirectory: %s", (path.substr(0, pos)).c_str());
+	lprintfln("@@@@@@@ FileGetParentDirectory: %s", (path.substr(0, pos + 1)).c_str());
 
 	// Return parent path, including the slash.
-	return path.substr(0, pos);
+	return path.substr(0, pos + 1);
 }
 
 /**
@@ -271,6 +273,53 @@ static bool FileCreate(const String& path)
 }
 
 /**
+ * Truncate a file.
+ * @return New file length on success, <0 on error.
+ */
+static int FileTruncate(const String& path, int size)
+{
+	MAHandle file = maFileOpen(path.c_str(), MA_ACCESS_READ_WRITE);
+	if (file < 0)
+	{
+		return -1;
+	}
+
+	int exists = maFileExists(file);
+	if (1 != exists)
+	{
+		// Error.
+		maFileClose(file);
+		return -1;
+	}
+
+	int fileSize = maFileSize(file);
+	if (fileSize < 0)
+	{
+		// Error.
+		maFileClose(file);
+		return -1;
+	}
+
+	if (fileSize < size)
+	{
+		// No need to truncate, return current file size.
+		maFileClose(file);
+		return fileSize;
+	}
+
+	int result = maFileTruncate(file, size);
+	maFileClose(file);
+	if (0 == result)
+	{
+		// Success, return truncated size.
+		return size;
+	}
+
+	// Error.
+	return -1;
+}
+
+/**
  * Create path recursively if parts of the path
  * do not exist.
  */
@@ -278,6 +327,11 @@ static bool FileCreatePath(const String& path)
 {
 	// Get parent directory and check if it exists.
 	String parentPath = FileGetParentDirectory(path);
+	if (0 == parentPath.size())
+	{
+		return false;
+	}
+
 	if (!FileExists(parentPath))
 	{
 		// It does not exist, create it recursively.
@@ -304,6 +358,17 @@ static int FileWrite(const String& path, const String& data, int position)
 
 	// TODO: Now we assume file must exist. Is that ok?
 	//int exists = maFileExists(file);
+
+	// TODO: Should we check that position is within file size?
+	// int size = maFileSize(file);
+
+	// If we start writing from the beginning of the file, we truncate
+	// the file. Not clear what the specification says about this.
+	// TODO: Check how this should work! It makes no sense to truncate here.
+//	if (position == 0)
+//	{
+//		maFileTruncate(file, 0);
+//	}
 
 	int result = maFileSeek(file, position, MA_SEEK_SET);
 
@@ -336,7 +401,7 @@ static int FileRead(const String& path, String& data)
 	}
 
 	int size = maFileSize(file);
-	if (file < 0)
+	if (size < 0)
 	{
 		return -1;
 	}
@@ -364,6 +429,300 @@ static int FileRead(const String& path, String& data)
 	free(buf);
 
 	return 1;
+}
+
+/**
+ * Delete a file we know exists.
+ */
+static int FileDeleteFile(const String& path)
+{
+	MAHandle file = maFileOpen(path.c_str(), MA_ACCESS_READ_WRITE);
+	if (file < 0)
+	{
+		return -1;
+	}
+
+	int result = maFileDelete(file);
+	maFileClose(file);
+	return 0 == result;
+}
+
+/**
+ * Delete a directory recursively.
+ * Path MUST end with a slash.
+ */
+static int FileDeleteDirectory(const String& path)
+{
+	char nameBuf[2048];
+
+	// Open directory listing.
+	MAHandle list = maFileListStart(path.c_str(), "", MA_FL_SORT_NONE);
+	if (list < 0)
+	{
+		return -1;
+	}
+
+	// Delete all files in this directory and in subdirectories.
+	while (true)
+	{
+		// Move to next file.
+		int result = maFileListNext(list, nameBuf, 2048);
+		if (0 == result)
+		{
+			// No more files.
+			break;
+		}
+		if (0 > result)
+		{
+			// Error.
+			return -1;
+		}
+
+		String fullPath = path + nameBuf;
+
+		lprintfln("===== FileDeleteDirectory fullPath: %s", fullPath.c_str());
+
+		// Is this a directory?
+		if ('/' == nameBuf[result - 1])
+		{
+
+			// Delete recursively.
+			FileDeleteDirectory(fullPath);
+		}
+		else
+		{
+			// Delete file.
+			FileDeleteFile(fullPath);
+		}
+	}
+
+	// Close the directory listing.
+	maFileListClose(list);
+
+	// Delete the directory.
+	FileDeleteFile(path);
+}
+
+/**
+ * Delete file or directory. This is the top-level function.
+ * Directories are deleted recursively.
+ * TODO: In PhoneGap a directory MUST NOT be recursively deleted.
+ * on remove. The directory must be empty. Delete recursively on
+ * removeRecursively. Implement this.
+ */
+static int FileDelete(const String& path)
+{
+	// If path ends with a slash we know it should be
+	// a directory.
+	if (path[path.size() - 1] == '/')
+	{
+		if (FileExists(path))
+		{
+			return FileDeleteDirectory(path);
+		}
+		else
+		{
+			// Directory does not exist.
+			return -1;
+		}
+	}
+	else
+	{
+		// The file can still be a directory, but if the path
+		// exists, it is just a file. If the path with a trailing
+		// slash exists, it is a directory.
+		if (FileExists(path))
+		{
+			return FileDeleteFile(path);
+		}
+		else if (FileExists(path + "/"))
+		{
+			return FileDeleteDirectory(path + "/");
+		}
+	}
+}
+
+/**
+ * Copy a file. Overwrites the destination file.
+ * @return 0 on success <0 on error.
+ */
+static int FileCopyFile(
+	const String& sourcePath,
+	const String& destinationPath)
+{
+	// Open source file.
+	MAHandle sourceFile = maFileOpen(sourcePath.c_str(), MA_ACCESS_READ_WRITE);
+	if (sourceFile < 0)
+	{
+		return -1;
+	}
+
+	// Check that source file exists.
+	int exists = maFileExists(sourceFile);
+	if (1 != exists)
+	{
+		maFileClose(sourceFile);
+		return -1;
+	}
+
+	// Get and check source size.
+	int fileSize = maFileSize(sourceFile);
+	if (fileSize < 0)
+	{
+		maFileClose(sourceFile);
+		return -1;
+	}
+
+	// Create data object for source data to copy.
+	MAHandle data = maCreatePlaceholder();
+	int createDataResult = maCreateData(data, fileSize);
+	if (RES_OK != createDataResult)
+	{
+		maFileClose(sourceFile);
+		maDestroyPlaceholder(data);
+		return -1;
+	}
+
+	int readResult = maFileReadToData(sourceFile, data, 0, fileSize);
+	if (readResult < 0)
+	{
+		maFileClose(sourceFile);
+		maDestroyPlaceholder(data);
+		return -1;
+	}
+
+	// This deletes the destination file if it already exists.
+	FileDeleteFile(destinationPath);
+
+	// Create destination file.
+	bool createSuccess = FileCreatePath(destinationPath);
+	if (!createSuccess)
+	{
+		maFileClose(sourceFile);
+		maDestroyPlaceholder(data);
+		return -1;
+	}
+
+	// Open destination file.
+	MAHandle destinationFile = maFileOpen(destinationPath.c_str(), MA_ACCESS_READ_WRITE);
+	if (destinationFile < 0)
+	{
+		maFileClose(sourceFile);
+		maDestroyPlaceholder(data);
+		return -1;
+	}
+
+	// Write data to destination file.
+	int writeResult = maFileWriteFromData(destinationFile, data, 0, fileSize);
+	if (writeResult < 0)
+	{
+		maFileClose(sourceFile);
+		maFileClose(destinationFile);
+		maDestroyPlaceholder(data);
+		return -1;
+	}
+
+	// Close files and free data object.
+	maFileClose(sourceFile);
+	maFileClose(destinationFile);
+	maDestroyPlaceholder(data);
+
+	// Success.
+	return 0;
+}
+
+/**
+ * Copy the files in a directory recursively.
+ */
+static int FileCopyDirectory(
+	const String& sourcePath,
+	const String& destinationPath)
+{
+	char nameBuf[2048];
+
+	// Open directory listing of source dir.
+	MAHandle list = maFileListStart(sourcePath.c_str(), "", MA_FL_SORT_NONE);
+	if (list < 0)
+	{
+		return -1;
+	}
+
+	// Copy all files in this directory and in subdirectories.
+	while (true)
+	{
+		// Move to next file.
+		int result = maFileListNext(list, nameBuf, 2048);
+		if (0 == result)
+		{
+			// No more files.
+			break;
+		}
+		if (0 > result)
+		{
+			// Error.
+			return -1;
+		}
+
+		String fullSourcePath = sourcePath + nameBuf;
+		String fullDestinationPath = destinationPath + nameBuf;
+
+		lprintfln("===== FileCopyDirectory fullSourcePath: %s", fullSourcePath.c_str());
+		lprintfln("===== FileCopyDirectory fullDestinationPath: %s", fullDestinationPath.c_str());
+
+		// Is this a directory?
+		if ('/' == nameBuf[result - 1])
+		{
+
+			// Copy recursively.
+			FileCopyDirectory(fullSourcePath, fullDestinationPath);
+		}
+		else
+		{
+			// Copy file.
+			FileCopyFile(fullSourcePath, fullDestinationPath);
+		}
+	}
+
+	// Close the directory listing.
+	maFileListClose(list);
+}
+
+/**
+ * Copy file or directory structure.
+ */
+static int FileCopy(
+	const String& sourcePath,
+	const String& destinationPath)
+{
+
+	// If path ends with a slash we know it should be
+	// a directory.
+	if (sourcePath[sourcePath.size() - 1] == '/')
+	{
+		if (FileExists(sourcePath))
+		{
+			return FileCopyDirectory(sourcePath, destinationPath);
+		}
+		else
+		{
+			// Directory does not exist.
+			return -1;
+		}
+	}
+	else
+	{
+		// The file can still be a directory, but if the path
+		// exists, it is just a file. If the path with a trailing
+		// slash exists, it is a directory.
+		if (FileExists(sourcePath))
+		{
+			return FileCopyDirectory(sourcePath, destinationPath);
+		}
+		else if (FileExists(sourcePath + "/"))
+		{
+			return FileCopyDirectory(sourcePath + "/", destinationPath);
+		}
+	}
 }
 
 /**
@@ -421,6 +780,13 @@ String PhoneGapFile::emitFile(
 		"\"size\":" + size + "}";
 }
 
+String PhoneGapFile::emitMetadata(
+	const String& modificationTime)
+{
+	return
+		"{\"modificationTime\":\"" + modificationTime + "\"}";
+}
+
 void PhoneGapFile::callSuccess(
 	const String& callbackID,
 	const String& args,
@@ -465,6 +831,10 @@ void PhoneGapFile::handleMessage(PhoneGapMessage& message)
 	{
 		actionGetFileMetadata(message);
 	}
+	else if (message.getParam("action") == "getMetadata")
+	{
+		actionGetMetadata(message);
+	}
 	else if (message.getParam("action") == "write")
 	{
 		actionWrite(message);
@@ -473,6 +843,30 @@ void PhoneGapFile::handleMessage(PhoneGapMessage& message)
 	{
 		actionReadAsText(message);
 	}
+	else if (message.getParam("action") == "readAsDataURL")
+	{
+		actionReadAsDataURL(message);
+	}
+	else if (message.getParam("action") == "truncate")
+	{
+		actionTruncate(message);
+	}
+	else if (message.getParam("action") == "copyTo")
+	{
+		actionCopyToOrMoveTo(message, false);
+	}
+	else if (message.getParam("action") == "moveTo")
+	{
+		actionCopyToOrMoveTo(message, true);
+	}
+	else if (message.getParam("action") == "remove")
+	{
+		actionRemove(message);
+	}
+
+	// TODO: Implement getDirectory to create a directory.
+	// TODO: Make getFile to create a file.
+	// TODO: Implement DirectoryReader.readEntries.
 }
 
 /**
@@ -612,6 +1006,27 @@ void PhoneGapFile::actionGetFileMetadata(PhoneGapMessage& message)
 		"window.localFileSystem._castDate");
 }
 
+/**
+ * Return a Metadata object.
+ */
+void PhoneGapFile::actionGetMetadata(PhoneGapMessage& message)
+{
+	lprintfln("@@@ actionGetMetadata\n");
+
+	String callbackID = message.getParam("PhoneGapCallBackId");
+
+	String fullPath = message.getArgsField("fullPath");
+
+	String metadata = emitMetadata(
+		FileGetDate(fullPath));
+
+	// Note that _castDate is used here.
+	callSuccess(
+		callbackID,
+		metadata,
+		"window.localFileSystem._castDate");
+}
+
 void PhoneGapFile::actionWrite(PhoneGapMessage& message)
 {
 	lprintfln("@@@ actionWrite\n");
@@ -630,7 +1045,7 @@ void PhoneGapFile::actionWrite(PhoneGapMessage& message)
 	}
 
 	// Send back the new file size.
-	char sizeBuf[64];
+	char sizeBuf[32];
 	sprintf(sizeBuf, "%i", FileGetSize(fullPath));
 	callSuccess(
 		callbackID,
@@ -647,8 +1062,10 @@ void PhoneGapFile::actionReadAsText(PhoneGapMessage& message)
 	String callbackID = message.getParam("PhoneGapCallBackId");
 
 	String fullPath = message.getArgsField("fileName");
-	String encoding = message.getArgsField("encoding");
-	// TODO: Encoding param is not used.
+
+	// TODO: Encoding param is not used. This is the requested
+	// encoding of the data send back to PhoneGap.
+	//String encoding = message.getArgsField("encoding");
 
 	String content;
 	int result = FileRead(fullPath, content);
@@ -661,5 +1078,157 @@ void PhoneGapFile::actionReadAsText(PhoneGapMessage& message)
 	// Send back the file content.
 	callSuccess(
 		callbackID,
-		PhoneGapMessage::JSONStringify(content));
+		PhoneGapMessage::JSONStringify(content.c_str()));
+}
+
+void PhoneGapFile::actionReadAsDataURL(PhoneGapMessage& message)
+{
+	lprintfln("@@@ actionReadAsDataURL\n");
+
+	String callbackID = message.getParam("PhoneGapCallBackId");
+
+	String fullPath = message.getArgsField("fileName");
+
+	String content;
+	int result = FileRead(fullPath, content);
+	if (result < 0)
+	{
+		callFileError(callbackID, FILEERROR_NO_MODIFICATION_ALLOWED_ERR);
+		return;
+	}
+
+	String base64URL = "\"data:";
+	base64URL += FileGetMimeType(fullPath);
+	base64URL += ";base64,";
+	base64URL += PhoneGapMessage::base64Encode(content.c_str());
+	base64URL += "\"";
+
+	// Send back the file content.
+	callSuccess(callbackID, base64URL);
+}
+
+void PhoneGapFile::actionTruncate(PhoneGapMessage& message)
+{
+	lprintfln("@@@ actionTruncate\n");
+
+	String callbackID = message.getParam("PhoneGapCallBackId");
+
+	String fullPath = message.getArgsField("fileName");
+
+	int size = message.getArgsFieldInt("size");
+
+	int result = FileTruncate(fullPath, size);
+	if (result < 0)
+	{
+		callFileError(callbackID, FILEERROR_NOT_FOUND_ERR);
+		return;
+	}
+
+	// Send back the result, the new length of the file.
+	char lengthBuf[32];
+	sprintf(lengthBuf, "%i", result);
+	callSuccess(callbackID, lengthBuf);
+}
+
+//I/maWriteLog(20616): @@@ URL: mosync://PhoneGap?service=File&action=moveTo&args={"fullPath":"/mnt/sdcard/hello2.txt","pa
+//rent":{"isFile":false,"isDirectory":true,"name":"sdcard","fullPath":"/mnt/sdcard","filesystem":null},"newName":"hello3.t
+//xt"}&PhoneGapCallBackId=File19
+void PhoneGapFile::actionCopyToOrMoveTo(PhoneGapMessage& message, bool move)
+{
+	lprintfln("@@@ actionMoveTo\n");
+
+	String callbackID = message.getParam("PhoneGapCallBackId");
+
+	String sourcePath = message.getArgsField("fullPath");
+
+	String destinationName = message.getArgsField("newName");
+
+	String destinationPath;
+
+	// Get the destination path from the JSON tree.
+
+	// Get the root node for the message parameters.
+	YAJLDom::Value* argsNode = message.getJSONRoot();
+	if (NULL == argsNode || YAJLDom::Value::NUL == argsNode->getType())
+	{
+		callFileError(callbackID, FILEERROR_NO_MODIFICATION_ALLOWED_ERR);
+		return;
+	}
+
+	// Get the node for the parent directory.
+	YAJLDom::Value* parentNode = argsNode->getValueForKey("parent");
+	if (NULL != parentNode && YAJLDom::Value::MAP == parentNode->getType())
+	{
+		YAJLDom::Value* pathNode = parentNode->getValueForKey("fullPath");
+		if (NULL != pathNode && YAJLDom::Value::NUL != pathNode->getType())
+		{
+			destinationPath = pathNode->toString();
+		}
+	}
+
+	// Check that we have the required path names.
+	if ((sourcePath.size() == 0) ||
+		(destinationName.size() == 0) ||
+		(destinationPath.size() == 0))
+	{
+		callFileError(callbackID, FILEERROR_NO_MODIFICATION_ALLOWED_ERR);
+		return;
+	}
+
+	// Move the file.
+
+	String fullDestinationPath = destinationPath + "/";
+	fullDestinationPath += destinationName;
+
+	lprintfln(">>>>> movefile sourcePath: %s", sourcePath.c_str());
+	lprintfln(">>>>> movefile destinationPath: %s", destinationPath.c_str());
+	lprintfln(">>>>> movefile destinationName: %s", destinationName.c_str());
+	lprintfln(">>>>> movefile fullDestinationPath: %s", fullDestinationPath.c_str());
+
+	// TODO: Implement this.
+	maPanic(0, "File Copy/Move not implemented");
+
+//	int result = FileCopyOrMove(sourcePath, fullDestinationPath, move);
+//	if (result < 0)
+//	{
+//		lprintfln(">>>>> movefile callFileError(callbackID, FILEERROR_NOT_FOUND_ERR);");
+//		callFileError(callbackID, FILEERROR_NOT_FOUND_ERR);
+//		return;
+//	}
+
+	// Send back FileEntry data.
+	String fileEntry = emitFileEntry(
+		destinationName,
+		fullDestinationPath);
+	callSuccess(
+		callbackID,
+		fileEntry,
+		"window.localFileSystem._castEntry");
+}
+
+void PhoneGapFile::actionRemove(PhoneGapMessage& message)
+{
+	lprintfln("@@@ actionRemove\n");
+
+	String callbackID = message.getParam("PhoneGapCallBackId");
+
+	String path = message.getArgsField("fullPath");
+
+	FileDeleteDirectory(path);
+
+//	bool success = FileDelete(path);
+//	if (!success)
+//	{
+//		callFileError(callbackID, FILEERROR_NOT_FOUND_ERR);
+//		return;
+//	}
+
+	// Send back FileEntry data.
+	String fileEntry = emitFileEntry(
+		FileGetName(path),
+		path);
+	callSuccess(
+		callbackID,
+		fileEntry,
+		"window.localFileSystem._castEntry");
 }

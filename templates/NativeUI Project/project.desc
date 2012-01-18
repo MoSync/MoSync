@@ -1,6 +1,7 @@
 id = project.nativeui
 name = MoSync NativeUI Project
 description = A project that uses the Native UI functionality in MoSync.
+required-capabilities = NativeUI
 
 [Files]
 main.cpp

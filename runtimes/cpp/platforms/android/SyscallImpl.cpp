@@ -167,16 +167,21 @@ namespace Base
 	char* Syscall::loadBinary(int resourceIndex, int size)
 	{
 		SYSLOG("loadBinary");
-		//get current thread's JNIEnvrionmental variable
+		//get current thread's JNIEnvironmental variable
 		JNIEnv * env = getJNIEnvironment();
+
+		// Debug print.
+		/*
 		char* b = (char*)malloc(200);
 		sprintf(b, "loadBinary index:%d size:%d", resourceIndex, size);
-		//__android_log_write(ANDROID_LOG_INFO, "MoSync Syscall", b);
+		__android_log_write(ANDROID_LOG_INFO, "MoSync Syscall", b);
 		free(b);
+		*/
 
 		char* buffer = (char*)malloc(size);
-		jobject byteBuffer = env->NewDirectByteBuffer((void*)buffer, size);
+		if(buffer == NULL) return NULL;
 
+		jobject byteBuffer = env->NewDirectByteBuffer((void*)buffer, size);
 		if(byteBuffer == NULL) return NULL;
 
 		jclass cls = env->GetObjectClass(mJThis);
@@ -193,6 +198,7 @@ namespace Base
 			free(buffer);
 			return NULL;
 		}
+
 		return buffer;
 	}
 
@@ -2665,7 +2671,14 @@ namespace Base
 				c,
 				_valueBufferSize * sizeof(char));
 
-			return _maAdsBannerGetProperty((int)gCore->mem_ds, _ad, _property, _valueBuffer, _valueBufferSize, mJNIEnv, mJThis);
+			return _maAdsBannerGetProperty(
+				(int)gCore->mem_ds,
+				_ad,
+				_property,
+				_valueBuffer,
+				_valueBufferSize,
+				mJNIEnv,
+				mJThis);
 		}
 
 		// ********** Notifications API **********
@@ -2699,7 +2712,14 @@ namespace Base
 				c,
 				_valueBufferSize * sizeof(char));
 
-			return _maNotificationLocalGetProperty((int)gCore->mem_ds, _notification, _property, _valueBuffer, _valueBufferSize, mJNIEnv, mJThis);
+			return _maNotificationLocalGetProperty(
+				(int)gCore->mem_ds,
+				_notification,
+				_property,
+				_valueBuffer,
+				_valueBufferSize,
+				mJNIEnv,
+				mJThis);
 		}
 
 		case maIOCtl_maNotificationLocalSchedule:
@@ -2773,6 +2793,69 @@ namespace Base
 
 		case maIOCtl_maNotificationPushSetDisplayFlag:
 			return _maNotificationPushSetDisplayFlag(a, mJNIEnv, mJThis);
+
+		// ********** Capture API **********
+
+		case maIOCtl_maCaptureSetProperty:
+		{
+			const char *_property = SYSCALL_THIS->GetValidatedStr(a);
+			const char *_value = SYSCALL_THIS->GetValidatedStr(b);
+			return _maCaptureSetProperty(
+					_property,
+					_value,
+					mJNIEnv,
+					mJThis);
+		}
+
+		case maIOCtl_maCaptureGetProperty:
+		{
+			int _valueBufferSize = c;
+			int _valueBuffer = (int) SYSCALL_THIS->GetValidatedMemRange(
+				b,
+				_valueBufferSize * sizeof(char));
+			const char *_property = SYSCALL_THIS->GetValidatedStr(a);
+			return _maCaptureGetProperty(
+				(int)gCore->mem_ds,
+				_property,
+				_valueBuffer,
+				_valueBufferSize,
+				mJNIEnv,
+				mJThis);
+		}
+
+		case maIOCtl_maCaptureAction:
+			return _maCaptureAction(a, mJNIEnv, mJThis);
+
+		case maIOCtl_maCaptureWriteImage:
+		{
+			const char *_path = SYSCALL_THIS->GetValidatedStr(b);
+			return _maCaptureWriteImage(
+				a,
+				_path,
+				c,
+				mJNIEnv,
+				mJThis);
+		}
+
+		case maIOCtl_maCaptureGetVideoPath:
+		{
+			int _pathBufferSize = c;
+			int _pathBuffer = (int) SYSCALL_THIS->GetValidatedMemRange(
+				b,
+				_pathBufferSize * sizeof(char));
+			return _maCaptureGetVideoPath(
+				(int)gCore->mem_ds,
+				a,
+				_pathBuffer,
+				_pathBufferSize,
+				mJNIEnv,
+				mJThis);
+		}
+
+		case maIOCtl_maCaptureDestroyData:
+			return _maCaptureDestroyData(a, mJNIEnv, mJThis);
+
+		// ********** Panics **********
 
 		case maIOCtl_maSyscallPanicsEnable:
 			SYSLOG("maIOCtl_maSyscallPanicsEnable");

@@ -1,0 +1,35 @@
+<resources>
+	<image id="PLATFORM" resource="platform_more.png" loadType="unloaded"/>
+	<condition platform="ios">
+		<image id="PLATFORM" resource="platform_ios.png" loadType="unloaded"/>
+	</condition>
+	<condition platform="android">
+		<image id="PLATFORM" resource="platform_android.png" loadType="unloaded"/>
+	</condition>
+	<condition platform="windows phone">
+		<image id="PLATFORM" resource="platform_windows.png" loadType="unloaded"/>
+	</condition>
+	<condition platform="blackberry">
+		<image id="PLATFORM" resource="platform_blackberry.png" loadType="unloaded"/>
+	</condition>
+	<condition platform="windows mobile">
+		<image id="PLATFORM" resource="platform_wm.png" loadType="unloaded"/>
+	</condition>
+	<condition platform="symbian">
+		<image id="PLATFORM" resource="platform_symbian.png" loadType="unloaded"/>
+	</condition>
+	<condition platform="j2me">
+		<image id="PLATFORM" resource="platform_j2me.png" loadType="unloaded"/>
+	</condition>
+
+	<image id="SCREEN_TYPE" resource="screen_small.png" loadType="unloaded"/>
+	<condition screenSize="normal">
+		<image id="SCREEN_TYPE" resource="screen_medium.png" loadType="unloaded"/>
+	</condition>
+	<condition screenSize="large">
+		<image id="SCREEN_TYPE" resource="screen_large.png" loadType="unloaded"/>
+	</condition>
+	<condition screenSize="xlarge">
+		<image id="SCREEN_TYPE" resource="screen_xlarge.png" loadType="unloaded"/>
+	</condition>	
+</resources>
