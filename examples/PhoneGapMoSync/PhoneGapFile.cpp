@@ -210,10 +210,7 @@ static String FileGetDate(const String& path)
 	return sprint_time(date);
 }
 
-/**
- * TODO: Handle the case of a directory that does not end with /.
- */
-static bool FileExists(const String& path)
+static bool FileExistsHelper(const String& path)
 {
 	MAHandle file = maFileOpen(path.c_str(), MA_ACCESS_READ_WRITE);
 	if (file < 0)
@@ -222,7 +219,58 @@ static bool FileExists(const String& path)
 	}
 	int exists = maFileExists(file);
 	maFileClose(file);
+
 	return 1 == exists;
+}
+
+/**
+ * Check that a file exists.
+ * Handle the case of a directory name that does not end with /.
+ * MoSync File API requires directory paths to end with a slash.
+ */
+static bool FileExists(const String& path)
+{
+	if (FileExistsHelper(path))
+	{
+		return true;
+	}
+	else if (FileExistsHelper(path + '/'))
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
+static bool FileIsDirectory(const String& path)
+{
+	if (path[path.size() - 1] == '/')
+	{
+		return FileExistsHelper(path);
+	}
+	else if (FileExistsHelper(path + '/'))
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
+/**
+ * Add a trailing slash to the path name if not present.
+ * The MoSync File API requires directory paths end with a slash.
+ * @param path Path modified if trailing slash is missing.
+ */
+static void FileMakeDirectoryPath(String& path)
+{
+	if (path[path.size() - 1] != '/')
+	{
+		path += '/';
+	}
 }
 
 /**
@@ -432,10 +480,18 @@ static int FileRead(const String& path, String& data)
 }
 
 /**
- * Delete a file we know exists.
+ * Delete a file or directory. If the file is a
+ * directory it must me empty.
  */
-static int FileDeleteFile(const String& path)
+static int FileDeleteFile(const String& pathParam)
 {
+	String path = pathParam;
+
+	if (FileIsDirectory(path))
+	{
+		FileMakeDirectoryPath(path);
+	}
+
 	MAHandle file = maFileOpen(path.c_str(), MA_ACCESS_READ_WRITE);
 	if (file < 0)
 	{
@@ -449,11 +505,14 @@ static int FileDeleteFile(const String& path)
 
 /**
  * Delete a directory recursively.
- * Path MUST end with a slash.
  */
-static int FileDeleteDirectory(const String& path)
+static int FileDeleteDirectory(const String& pathParam)
 {
 	char nameBuf[2048];
+
+	String path = pathParam;
+
+	FileMakeDirectoryPath(path);
 
 	// Open directory listing.
 	MAHandle list = maFileListStart(path.c_str(), "", MA_FL_SORT_NONE);
@@ -501,45 +560,6 @@ static int FileDeleteDirectory(const String& path)
 
 	// Delete the directory.
 	FileDeleteFile(path);
-}
-
-/**
- * Delete file or directory. This is the top-level function.
- * Directories are deleted recursively.
- * TODO: In PhoneGap a directory MUST NOT be recursively deleted.
- * on remove. The directory must be empty. Delete recursively on
- * removeRecursively. Implement this.
- */
-static int FileDelete(const String& path)
-{
-	// If path ends with a slash we know it should be
-	// a directory.
-	if (path[path.size() - 1] == '/')
-	{
-		if (FileExists(path))
-		{
-			return FileDeleteDirectory(path);
-		}
-		else
-		{
-			// Directory does not exist.
-			return -1;
-		}
-	}
-	else
-	{
-		// The file can still be a directory, but if the path
-		// exists, it is just a file. If the path with a trailing
-		// slash exists, it is a directory.
-		if (FileExists(path))
-		{
-			return FileDeleteFile(path);
-		}
-		else if (FileExists(path + "/"))
-		{
-			return FileDeleteDirectory(path + "/");
-		}
-	}
 }
 
 /**
@@ -635,10 +655,17 @@ static int FileCopyFile(
  * Copy the files in a directory recursively.
  */
 static int FileCopyDirectory(
-	const String& sourcePath,
-	const String& destinationPath)
+	const String& sourcePathParam,
+	const String& destinationPathParam)
 {
 	char nameBuf[2048];
+
+	String sourcePath = sourcePathParam;
+	String destinationPath = destinationPathParam;
+
+	// Make sure both source and destination paths end with a slash.
+	FileMakeDirectoryPath(sourcePath);
+	FileMakeDirectoryPath(destinationPath);
 
 	// Open directory listing of source dir.
 	MAHandle list = maFileListStart(sourcePath.c_str(), "", MA_FL_SORT_NONE);
@@ -672,7 +699,6 @@ static int FileCopyDirectory(
 		// Is this a directory?
 		if ('/' == nameBuf[result - 1])
 		{
-
 			// Copy recursively.
 			FileCopyDirectory(fullSourcePath, fullDestinationPath);
 		}
@@ -694,34 +720,70 @@ static int FileCopy(
 	const String& sourcePath,
 	const String& destinationPath)
 {
-
-	// If path ends with a slash we know it should be
-	// a directory.
-	if (sourcePath[sourcePath.size() - 1] == '/')
+	if (FileIsDirectory(sourcePath))
 	{
-		if (FileExists(sourcePath))
-		{
-			return FileCopyDirectory(sourcePath, destinationPath);
-		}
-		else
-		{
-			// Directory does not exist.
-			return -1;
-		}
+		return FileCopyDirectory(sourcePath, destinationPath);
+	}
+	else if (FileExistsHelper(sourcePath))
+	{
+		return FileCopyFile(sourcePath, destinationPath);
 	}
 	else
 	{
-		// The file can still be a directory, but if the path
-		// exists, it is just a file. If the path with a trailing
-		// slash exists, it is a directory.
-		if (FileExists(sourcePath))
-		{
-			return FileCopyDirectory(sourcePath, destinationPath);
-		}
-		else if (FileExists(sourcePath + "/"))
-		{
-			return FileCopyDirectory(sourcePath + "/", destinationPath);
-		}
+		return -1;
+	}
+}
+
+/**
+ * Move file.
+ */
+static int FileMoveFile(
+	const String& sourcePath,
+	const String& destinationPath)
+{
+	// Copy source to target.
+	int result = FileCopyFile(sourcePath, destinationPath);
+	if (result > -1)
+	{
+		// Delete source.
+		return FileDeleteFile(sourcePath);
+	}
+}
+
+/**
+ * Move directory structure.
+ */
+static int FileMoveDirectory(
+	const String& sourcePath,
+	const String& destinationPath)
+{
+	// Copy source to target.
+	int result = FileCopyDirectory(sourcePath, destinationPath);
+	if (result > -1)
+	{
+		// Delete source.
+		return FileDeleteDirectory(sourcePath);
+	}
+}
+
+/**
+ * Move file or directory structure.
+ */
+static int FileMove(
+	const String& sourcePath,
+	const String& destinationPath)
+{
+	if (FileIsDirectory(sourcePath))
+	{
+		return FileMoveDirectory(sourcePath, destinationPath);
+	}
+	else if (FileExistsHelper(sourcePath))
+	{
+		return FileMoveFile(sourcePath, destinationPath);
+	}
+	else
+	{
+		return -1;
 	}
 }
 
@@ -823,9 +885,17 @@ void PhoneGapFile::handleMessage(PhoneGapMessage& message)
 	{
 		actionRequestFileSystem(message);
 	}
+	else if (message.getParam("action") == "resolveLocalFileSystemURI")
+	{
+		actionResolveLocalFileSystemURI(message);
+	}
 	else if (message.getParam("action") == "getFile")
 	{
 		actionGetFile(message);
+	}
+	else if (message.getParam("action") == "getDirectory")
+	{
+		actionGetDirectory(message);
 	}
 	else if (message.getParam("action") == "getFileMetadata")
 	{
@@ -853,20 +923,24 @@ void PhoneGapFile::handleMessage(PhoneGapMessage& message)
 	}
 	else if (message.getParam("action") == "copyTo")
 	{
-		actionCopyToOrMoveTo(message, false);
+		actionCopyTo(message);
 	}
 	else if (message.getParam("action") == "moveTo")
 	{
-		actionCopyToOrMoveTo(message, true);
+		actionMoveTo(message);
 	}
 	else if (message.getParam("action") == "remove")
 	{
 		actionRemove(message);
 	}
-
-	// TODO: Implement getDirectory to create a directory.
-	// TODO: Make getFile to create a file.
-	// TODO: Implement DirectoryReader.readEntries.
+	else if (message.getParam("action") == "removeRecursively")
+	{
+		actionRemoveRecursively(message);
+	}
+	else if (message.getParam("action") == "readEntries")
+	{
+		actionReadEntries(message);
+	}
 }
 
 /**
@@ -895,12 +969,56 @@ void PhoneGapFile::actionRequestFileSystem(PhoneGapMessage& message)
 	}
 
 	// TODO: Replace hard-coded path with platform aware path handling.
-	String rootEntry = emitDirectoryEntry("sdcard", "/mnt/sdcard");
+	String rootEntry = emitDirectoryEntry("sdcard", "/sdcard");
 	String fileSystemInfo = emitFileSystemInfo("persistent", rootEntry);
 	callSuccess(
 		callbackID,
 		fileSystemInfo,
 		"window.localFileSystem._castFS");
+}
+
+void PhoneGapFile::actionResolveLocalFileSystemURI(PhoneGapMessage& message)
+{
+	lprintfln("@@@ actionResolveLocalFileSystemURI\n");
+
+	String callbackID = message.getParam("PhoneGapCallBackId");
+
+	String uri = message.getArgsField("uri");
+
+	// Get path.
+	const char* pURL = uri.c_str();
+	lprintfln(">>> pURL: %s", pURL);
+	const char* pPath = strstr(pURL, "file://");
+	if (NULL == pPath)
+	{
+		callFileError(callbackID, "1000");
+		return;
+	}
+	if (pURL != pPath)
+	{
+		callFileError(callbackID, FILEERROR_SYNTAX_ERR);
+		return;
+	}
+
+	// Move to after "file://"
+	pPath += 7;
+
+	// Check that this is an existing directory.
+	if (!FileIsDirectory(pPath))
+	{
+		callFileError(callbackID, FILEERROR_NOT_FOUND_ERR);
+		return;
+	}
+
+	String entry = emitDirectoryEntry(
+		FileGetName(pPath),
+		pPath);
+	callSuccess(
+		callbackID,
+		entry,
+		"window.localFileSystem._castEntry");
+
+
 }
 
 /**
@@ -919,28 +1037,11 @@ void PhoneGapFile::actionGetFile(PhoneGapMessage& message)
 	// Get flags "create" and "exclusive".
 	bool create = false;
 	bool exclusive = false;
-
-	// There must exist a root node for the arguments.
-	YAJLDom::Value* argsNode = message.getJSONRoot();
-	if (NULL == argsNode || YAJLDom::Value::NUL == argsNode->getType())
+	bool success = message.getJSONParamsOptionsCreateExclusive(create, exclusive);
+	if (!success)
 	{
 		callFileError(callbackID, FILEERROR_NO_MODIFICATION_ALLOWED_ERR);
 		return;
-	}
-
-	YAJLDom::Value* optionsNode = argsNode->getValueForKey("options");
-	if (NULL != optionsNode && YAJLDom::Value::NUL != optionsNode->getType())
-	{
-		YAJLDom::Value* createNode = optionsNode->getValueForKey("create");
-		if (NULL != optionsNode && YAJLDom::Value::NUL != optionsNode->getType())
-		{
-			create = createNode->toBoolean();
-		}
-		YAJLDom::Value* exclusiveNode = optionsNode->getValueForKey("exclusive");
-		if (NULL != exclusiveNode && YAJLDom::Value::NUL != exclusiveNode->getType())
-		{
-			exclusive = exclusiveNode->toBoolean();
-		}
 	}
 
 	// Create file if requested.
@@ -975,6 +1076,77 @@ void PhoneGapFile::actionGetFile(PhoneGapMessage& message)
 	callSuccess(
 		callbackID,
 		fileEntry,
+		"window.localFileSystem._castEntry");
+}
+
+
+//mosync://PhoneGap?service=File&action=getDirectory&args={"fullPath":"/mnt/sdcard","path":"
+//fob1"}&PhoneGapCallBackId=File21"
+
+/**
+ * Return a DirectoryEntry object.
+ */
+void PhoneGapFile::actionGetDirectory(PhoneGapMessage& message)
+{
+	lprintfln("@@@ actionGetDirectory\n");
+
+	String callbackID = message.getParam("PhoneGapCallBackId");
+
+	String fullPath = message.getArgsField("fullPath");
+	String path = message.getArgsField("path");
+	String fullFilePath = fullPath + "/" + path;
+
+	// Add a trailing slash if not present. MoSync API requires this.
+	if (fullFilePath[fullFilePath.size() - 1] != '/')
+	{
+		fullFilePath += "/";
+	}
+
+	// Get flags "create" and "exclusive".
+	bool create = false;
+	bool exclusive = false;
+	bool success = message.getJSONParamsOptionsCreateExclusive(create, exclusive);
+	if (!success)
+	{
+		callFileError(callbackID, FILEERROR_NO_MODIFICATION_ALLOWED_ERR);
+		return;
+	}
+
+	// Create directory if requested.
+	if (create)
+	{
+		if (exclusive)
+		{
+			// The file must not exist if "exclusive" is true.
+			if (FileExists(fullFilePath))
+			{
+				callFileError(callbackID, FILEERROR_PATH_EXISTS_ERR);
+				return;
+			}
+		}
+
+		if (!FileExists(fullFilePath))
+		{
+			// Create the directory.
+			// TODO: Invoke error if parent directory does not
+			// exist to be compatible with the PhoneGap spec.
+			bool success = FileCreatePath(fullFilePath);
+			if (!success)
+			{
+				callFileError(callbackID, FILEERROR_NO_MODIFICATION_ALLOWED_ERR);
+				return;
+			}
+		}
+	}
+
+	// Send back DirectoryEntry data.
+	String directoryEntry = emitDirectoryEntry(
+		path,
+		// Remove the trailing slash from the full path.
+		fullFilePath.substr(0, fullFilePath.size() - 1));
+	callSuccess(
+		callbackID,
+		directoryEntry,
 		"window.localFileSystem._castEntry");
 }
 
@@ -1130,40 +1302,38 @@ void PhoneGapFile::actionTruncate(PhoneGapMessage& message)
 	callSuccess(callbackID, lengthBuf);
 }
 
-//I/maWriteLog(20616): @@@ URL: mosync://PhoneGap?service=File&action=moveTo&args={"fullPath":"/mnt/sdcard/hello2.txt","pa
-//rent":{"isFile":false,"isDirectory":true,"name":"sdcard","fullPath":"/mnt/sdcard","filesystem":null},"newName":"hello3.t
-//xt"}&PhoneGapCallBackId=File19
-void PhoneGapFile::actionCopyToOrMoveTo(PhoneGapMessage& message, bool move)
+void PhoneGapFile::actionCopyTo(PhoneGapMessage& message)
+{
+	lprintfln("@@@ actionCopyTo\n");
+
+	actionCopyMoveHelper(message, false);
+}
+
+void PhoneGapFile::actionMoveTo(PhoneGapMessage& message)
 {
 	lprintfln("@@@ actionMoveTo\n");
 
+	actionCopyMoveHelper(message, true);
+}
+
+//I/maWriteLog(20616): @@@ URL: mosync://PhoneGap?service=File&action=moveTo&args={"fullPath":"/mnt/sdcard/hello2.txt","pa
+//rent":{"isFile":false,"isDirectory":true,"name":"sdcard","fullPath":"/mnt/sdcard","filesystem":null},"newName":"hello3.t
+//xt"}&PhoneGapCallBackId=File19
+void PhoneGapFile::actionCopyMoveHelper(PhoneGapMessage& message, bool move)
+{
 	String callbackID = message.getParam("PhoneGapCallBackId");
 
 	String sourcePath = message.getArgsField("fullPath");
 
 	String destinationName = message.getArgsField("newName");
 
-	String destinationPath;
-
 	// Get the destination path from the JSON tree.
-
-	// Get the root node for the message parameters.
-	YAJLDom::Value* argsNode = message.getJSONRoot();
-	if (NULL == argsNode || YAJLDom::Value::NUL == argsNode->getType())
+	String destinationPath;
+	bool success = message.getJSONParamParentFullPath(destinationPath);
+	if (!success)
 	{
 		callFileError(callbackID, FILEERROR_NO_MODIFICATION_ALLOWED_ERR);
 		return;
-	}
-
-	// Get the node for the parent directory.
-	YAJLDom::Value* parentNode = argsNode->getValueForKey("parent");
-	if (NULL != parentNode && YAJLDom::Value::MAP == parentNode->getType())
-	{
-		YAJLDom::Value* pathNode = parentNode->getValueForKey("fullPath");
-		if (NULL != pathNode && YAJLDom::Value::NUL != pathNode->getType())
-		{
-			destinationPath = pathNode->toString();
-		}
 	}
 
 	// Check that we have the required path names.
@@ -1175,34 +1345,66 @@ void PhoneGapFile::actionCopyToOrMoveTo(PhoneGapMessage& message, bool move)
 		return;
 	}
 
-	// Move the file.
+	bool isDirectory;
 
-	String fullDestinationPath = destinationPath + "/";
-	fullDestinationPath += destinationName;
+	// Check that sourcePath exists.
+	if (FileIsDirectory(sourcePath))
+	{
+		isDirectory = true;
+	}
+	else if (FileExistsHelper(sourcePath))
+	{
+		isDirectory = false;
+	}
+	else
+	{
+		callFileError(callbackID, FILEERROR_NO_MODIFICATION_ALLOWED_ERR);
+		return;
+	}
 
-	lprintfln(">>>>> movefile sourcePath: %s", sourcePath.c_str());
-	lprintfln(">>>>> movefile destinationPath: %s", destinationPath.c_str());
-	lprintfln(">>>>> movefile destinationName: %s", destinationName.c_str());
-	lprintfln(">>>>> movefile fullDestinationPath: %s", fullDestinationPath.c_str());
+	// Compose the full destination path.
+	String fullDestinationPath = destinationPath + "/" + destinationName;
 
-	// TODO: Implement this.
-	maPanic(0, "File Copy/Move not implemented");
+	lprintfln(">>>>> sourcePath: %s", sourcePath.c_str());
+	lprintfln(">>>>> destinationPath: %s", destinationPath.c_str());
+	lprintfln(">>>>> destinationName: %s", destinationName.c_str());
+	lprintfln(">>>>> fullDestinationPath: %s", fullDestinationPath.c_str());
 
-//	int result = FileCopyOrMove(sourcePath, fullDestinationPath, move);
-//	if (result < 0)
-//	{
-//		lprintfln(">>>>> movefile callFileError(callbackID, FILEERROR_NOT_FOUND_ERR);");
-//		callFileError(callbackID, FILEERROR_NOT_FOUND_ERR);
-//		return;
-//	}
+	int result;
 
-	// Send back FileEntry data.
-	String fileEntry = emitFileEntry(
-		destinationName,
-		fullDestinationPath);
+	if (move)
+	{
+		result = FileMove(sourcePath, fullDestinationPath);
+	}
+	else
+	{
+		result = FileCopy(sourcePath, fullDestinationPath);
+	}
+
+	if (result < 0)
+	{
+		lprintfln(">>>>> callFileError(callbackID, FILEERROR_NOT_FOUND_ERR);");
+		callFileError(callbackID, FILEERROR_NOT_FOUND_ERR);
+		return;
+	}
+
+	// Send back entry data.
+	String entry;
+	if (isDirectory)
+	{
+		entry = emitDirectoryEntry(
+			destinationName,
+			fullDestinationPath);
+	}
+	else
+	{
+		entry = emitFileEntry(
+			destinationName,
+			fullDestinationPath);
+	}
 	callSuccess(
 		callbackID,
-		fileEntry,
+		entry,
 		"window.localFileSystem._castEntry");
 }
 
@@ -1214,21 +1416,120 @@ void PhoneGapFile::actionRemove(PhoneGapMessage& message)
 
 	String path = message.getArgsField("fullPath");
 
-	FileDeleteDirectory(path);
+	int result = FileDeleteFile(path);
+	if (result < 0)
+	{
+		callFileError(callbackID, FILEERROR_NOT_FOUND_ERR);
+		return;
+	}
 
-//	bool success = FileDelete(path);
-//	if (!success)
-//	{
-//		callFileError(callbackID, FILEERROR_NOT_FOUND_ERR);
-//		return;
-//	}
+	callSuccess(callbackID, "\"ok\"");
+}
 
-	// Send back FileEntry data.
-	String fileEntry = emitFileEntry(
-		FileGetName(path),
-		path);
+/**
+ * This is only valid for directories.
+ */
+void PhoneGapFile::actionRemoveRecursively(PhoneGapMessage& message)
+{
+	lprintfln("@@@ actionRemoveRecursively\n");
+
+	String callbackID = message.getParam("PhoneGapCallBackId");
+
+	String path = message.getArgsField("fullPath");
+
+	int result = FileDeleteDirectory(path);
+	if (result < 0)
+	{
+		callFileError(callbackID, FILEERROR_NOT_FOUND_ERR);
+		return;
+	}
+
+	callSuccess(callbackID, "\"ok\"");
+}
+
+// mosync://PhoneGap?service=File&action=readEntries&args={"fullPath":"/mnt/sdcard/fob1"}&
+// PhoneGapCallBackId=File21
+void PhoneGapFile::actionReadEntries(PhoneGapMessage& message)
+{
+	lprintfln("@@@ actionReadEntries\n");
+
+	String callbackID = message.getParam("PhoneGapCallBackId");
+
+	String path = message.getArgsField("fullPath");
+
+	// Open entry array.
+	String entries = "[";
+
+	char nameBuf[2048];
+
+	// Make sure path end with a slash.
+	FileMakeDirectoryPath(path);
+
+	// Open directory listing.
+	MAHandle list = maFileListStart(
+		path.c_str(),
+		"",
+		MA_FL_SORT_NAME | MA_FL_ORDER_ASCENDING);
+	if (list < 0)
+	{
+		callFileError(callbackID, FILEERROR_NOT_FOUND_ERR);
+		return;
+	}
+
+	// List all files in this directory.
+	while (true)
+	{
+		// Move to next file.
+		int result = maFileListNext(list, nameBuf, 2048);
+		if (0 == result)
+		{
+			// No more files.
+			break;
+		}
+		if (0 > result)
+		{
+			maFileListClose(list);
+			callFileError(callbackID, FILEERROR_NOT_FOUND_ERR);
+			return;
+		}
+
+		// Add separating comma if needed.
+		if (entries.size() > 1)
+		{
+			entries += ",";
+		}
+
+		// Full path to entry.
+		String fullPath = path + nameBuf;
+
+		// Is this a directory?
+		if ('/' == nameBuf[result - 1])
+		{
+			// We remove the trailing slash of the directory.
+			String pathWithNoSlash = fullPath.substr(0, fullPath.size() - 1);
+			String entry = emitDirectoryEntry(
+				FileGetName(pathWithNoSlash),
+				pathWithNoSlash);
+			entries += entry;
+		}
+		else
+		{
+			String entry = emitFileEntry(
+				FileGetName(fullPath),
+				fullPath);
+			entries += entry;
+		}
+	}
+
+	// Close the directory listing.
+	maFileListClose(list);
+
+	// Close entry array.
+	entries += "]";
+
+	// Return result to PhoneGap.
 	callSuccess(
 		callbackID,
-		fileEntry,
-		"window.localFileSystem._castEntry");
+		entries,
+		"window.localFileSystem._castEntries");
 }
