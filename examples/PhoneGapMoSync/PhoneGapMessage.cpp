@@ -218,3 +218,70 @@ int PhoneGapMessage::getArgsFieldInt(const MAUtil::String& fieldName)
 
 	return 0;
 }
+
+/**
+ * Get the options parameters "create" and "exclusive"
+ * from the JSON tree.
+ * @return true on success, false on error.
+ */
+bool PhoneGapMessage::getJSONParamsOptionsCreateExclusive(
+	bool& create,
+	bool& exclusive)
+{
+	// Default values.
+	create = false;
+	exclusive = false;
+
+	YAJLDom::Value* argsNode = getJSONRoot();
+	if (NULL == argsNode || YAJLDom::Value::NUL == argsNode->getType())
+	{
+		return false;
+	}
+
+	YAJLDom::Value* optionsNode = argsNode->getValueForKey("options");
+	if (NULL != optionsNode && YAJLDom::Value::NUL != optionsNode->getType())
+	{
+		YAJLDom::Value* createNode = optionsNode->getValueForKey("create");
+		if (NULL != optionsNode && YAJLDom::Value::NUL != optionsNode->getType())
+		{
+			create = createNode->toBoolean();
+		}
+		YAJLDom::Value* exclusiveNode = optionsNode->getValueForKey("exclusive");
+		if (NULL != exclusiveNode && YAJLDom::Value::NUL != exclusiveNode->getType())
+		{
+			exclusive = exclusiveNode->toBoolean();
+		}
+
+		return true;
+	}
+
+	return false;
+}
+
+/**
+ * Get the parent fullPath of a directory entry from the JSON tree.
+ * @return true on success, false on error.
+ */
+bool PhoneGapMessage::getJSONParamParentFullPath(String& destinationPath)
+{
+	// Get the root node for the message parameters.
+	YAJLDom::Value* argsNode = getJSONRoot();
+	if (NULL == argsNode || YAJLDom::Value::NUL == argsNode->getType())
+	{
+		return false;
+	}
+
+	// Get the node for the parent directory.
+	YAJLDom::Value* parentNode = argsNode->getValueForKey("parent");
+	if (NULL != parentNode && YAJLDom::Value::MAP == parentNode->getType())
+	{
+		YAJLDom::Value* pathNode = parentNode->getValueForKey("fullPath");
+		if (NULL != pathNode && YAJLDom::Value::NUL != pathNode->getType())
+		{
+			destinationPath = pathNode->toString();
+			return true;
+		}
+	}
+
+	return false;
+}
