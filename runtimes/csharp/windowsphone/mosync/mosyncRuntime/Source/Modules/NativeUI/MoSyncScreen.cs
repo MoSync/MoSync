@@ -39,7 +39,6 @@ namespace MoSync
         public class Screen : WidgetBaseWindowsPhone, IScreen
         {
             protected PhoneApplicationPage mPage;
-            protected Microsoft.Phone.Shell.ApplicationBar mApplicationBar;
 
             //The constructor
             public Screen()
@@ -47,8 +46,6 @@ namespace MoSync
                 mPage = new PhoneApplicationPage();
                 mView = mPage;
 
-                ((Application.Current.RootVisual as PhoneApplicationFrame).Content as PhoneApplicationPage).ApplicationBar = new Microsoft.Phone.Shell.ApplicationBar();
-                ((Application.Current.RootVisual as PhoneApplicationFrame).Content as PhoneApplicationPage).ApplicationBar.IsVisible = true;
                 /**
                  * This will add a BackKeyPress event handler to the Application.Current.RootVisual, this is application wide
                  */
@@ -62,7 +59,7 @@ namespace MoSync
              * @param from Object the object that triggers the event
              * @param args System.ComponentModel.CancelEventArgs the event arguments
              */
-            private void BackKeyPressHandler(object from, System.ComponentModel.CancelEventArgs args)
+            public void BackKeyPressHandler(object from, System.ComponentModel.CancelEventArgs args)
             {
                 //Will check if the event is not canceled
                 if (false == args.Cancel)
@@ -91,7 +88,15 @@ namespace MoSync
                     }
                     else if(this is StackScreen && !(this.GetParent() is TabScreen))
                     {
-                        if ((this as StackScreen).StackCount() > 1 && (this as StackScreen).GetBackButtonEnabled() == true)
+                        if (this.GetParent() is PanoramaView)
+                        {
+                            if ((this.GetParent() as PanoramaView).getSelectedScreen().Equals(this) && (this as StackScreen).StackCount() > 1)
+                            {
+                                (this as StackScreen).Pop();
+                                args.Cancel = true;
+                            }
+                        }
+                        else if((this as StackScreen).StackCount() > 1 && (this as StackScreen).GetBackButtonEnabled() == true)
                         {
                             //Do a pop and cancel the event
                             (this as StackScreen).Pop();
@@ -106,22 +111,11 @@ namespace MoSync
             {
                 base.AddChild(child);
 
-                if (child is ApplicationBar)
+                WidgetBaseWindowsPhone w = (WidgetBaseWindowsPhone)child;
+                MoSync.Util.RunActionOnMainThreadSync(() =>
                 {
-                    MoSync.Util.RunActionOnMainThreadSync(() =>
-                    {
-                        //((Application.Current.RootVisual as PhoneApplicationFrame).Content as PhoneApplicationPage).ApplicationBar = (child as ApplicationBar).GetApplicationBar();
-                        mPage.ApplicationBar = (child as ApplicationBar).GetApplicationBar();
-                    });
-                }
-                else
-                {
-                    WidgetBaseWindowsPhone w = (WidgetBaseWindowsPhone)child;
-                    MoSync.Util.RunActionOnMainThreadSync(() =>
-                    {
-                        mPage.Content = w.View;
-                    });
-                }
+                    mPage.Content = w.View;
+                });
             }
 
             /**
@@ -168,7 +162,6 @@ namespace MoSync
                 MoSync.Util.RunActionOnMainThreadSync(() =>
                 {
                     PhoneApplicationFrame frame = (PhoneApplicationFrame)Application.Current.RootVisual;
-
                     frame.Content = mPage;
                 });
             }

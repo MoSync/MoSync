@@ -41,7 +41,6 @@ namespace MoSync
         public class PanoramaView : Screen
         {
             protected Microsoft.Phone.Controls.Panorama mPanorama;
-
             /**
              * The constructor
              */
@@ -186,6 +185,11 @@ namespace MoSync
                 {
                     return mPanorama.SelectedIndex.ToString();
                 }
+            }
+
+            public IScreen getSelectedScreen()
+            {
+                return mChildren[mPanorama.SelectedIndex] as IScreen;
             }
         }
     }

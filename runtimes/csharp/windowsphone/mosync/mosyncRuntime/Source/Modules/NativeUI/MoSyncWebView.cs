@@ -187,23 +187,9 @@ namespace MoSync
                     delegate(object from, NotifyEventArgs args)
                     {
                         String str = args.Value;
-                        MoSync.Util.Log(str + "\n");
+                        //MoSync.Util.Log(str + "\n");
 
-                        int hookType = 0;
-
-                        //determine the hook type
-                        if (Regex.IsMatch(str, mHardHook))
-                        {
-                            hookType = MoSync.Constants.MAW_CONSTANT_HARD;
-                        }
-                        else if (Regex.IsMatch(str, mSoftHook))
-                        {
-                            hookType = MoSync.Constants.MAW_CONSTANT_SOFT;
-                        }
-                        else
-                        {
-                            return;
-                        }
+                        int hookType = MoSync.Constants.MAW_CONSTANT_SOFT;
 
                         //the MAW_EVENT_WEB_VIEW_HOOK_INVOKED needs a chunk of 16 bytes of memory
                         Memory eventData = new Memory(16);

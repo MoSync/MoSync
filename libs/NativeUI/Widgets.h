@@ -37,6 +37,9 @@ MA 02110-1301, USA.
 #define NATIVEUI_WIDGETS_H_
 
 #include "ActivityIndicator.h"
+#include "ApplicationBarButton.h"
+#include "ApplicationBarMenuItem.h"
+#include "ApplicationBar.h"
 #include "Button.h"
 #include "ButtonListener.h"
 #include "CameraPreview.h"
@@ -61,6 +64,7 @@ MA 02110-1301, USA.
 #include "NavigationBarListener.h"
 #include "NumberPicker.h"
 #include "NumberPickerListener.h"
+#include "PanoramaView.h"
 #include "ProgressBar.h"
 #include "RelativeLayout.h"
 #include "Screen.h"
