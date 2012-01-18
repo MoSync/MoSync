@@ -62,6 +62,11 @@ public:
 	 */
 	virtual ~SettingsScreen();
 
+    /**
+     * Set the captured image path to the label.
+     * @param path the full path.
+     */
+    void setCapturedImagePath(const MAUtil::String path);
 private:
 	/**
 	 * Creates and adds main layout to the screen.
@@ -226,6 +231,11 @@ private:
      * Used for showing the Native Image Picker(image mode).
      */
     Button* mTakePictureBtn;
+
+    /**
+     * Used for showing where the image capture was saved.
+     */
+    Label* mTakenPicturePath;
 
     /**
      * Used for showing the Native Image Picker(video mode).
