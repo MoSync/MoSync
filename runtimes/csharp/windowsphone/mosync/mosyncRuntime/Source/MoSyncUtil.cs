@@ -318,10 +318,16 @@ namespace MoSync
 			{
 				BitmapImage im = new BitmapImage();
 				im.CreateOptions = BitmapCreateOptions.None;
-				im.SetSource(stream);
-				wb = new WriteableBitmap(im);
+				try
+				{
+					im.SetSource(stream);
+					wb = new WriteableBitmap(im);
+				}
+				catch (Exception)
+				{
+					wb = null;
+				}
 			});
-
 			return wb;
 		}
 
@@ -335,6 +341,21 @@ namespace MoSync
 			wb = new WriteableBitmap(im);
 
 			return wb;
+		}
+
+		public static bool CopySeekableStreams(Stream src, int srcOfs, Stream dst, int dstOfs, int count)
+		{
+			src.Seek(srcOfs, SeekOrigin.Begin);
+			dst.Seek(dstOfs, SeekOrigin.Begin);
+
+			for (int i = 0; i < count; i++)
+			{
+				int read = src.ReadByte();
+				if(read == -1) return false;
+				dst.WriteByte((byte)read);
+			}
+
+			return true;
 		}
 	}
 }

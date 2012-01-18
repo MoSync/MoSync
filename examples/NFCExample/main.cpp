@@ -250,7 +250,6 @@ public:
 		} else if (EVENT_TYPE_NFC_TAG_DATA_WRITTEN == event.type) {
 			// We get this event whenever we wrote something
 			MANFCEventData nfcEventData = event.nfc;
-			MAHandle ndef = nfcEventData.handle;
 			setMode(_read);
 			if (nfcEventData.result >= 0) {
 				// The dstId of NDEF write operations is the NDEF message handle
@@ -359,7 +358,7 @@ public:
 		MAHandle rec = maNFCGetNDEFRecord(msg, 0);
 		MimeMediaNdefRecord vCardRec = MimeMediaNdefRecord(rec);
 		vCardRec.setMimeType(String(VCARD_MIME_TYPE));
-		char* vCard = "BEGIN:VCARD\n"
+		const char* vCard = "BEGIN:VCARD\n"
 				"VERSION:3.0"
 				"N:X;Mr\n"
 				"FN: Mr X\n"
@@ -384,7 +383,7 @@ public:
 			for (int i = 0; i < records; i++) {
 				MAHandle record = maNFCGetNDEFRecord(ndef, i);
 				// Try to idenfify what kind of NDEF it is...
-				char* icon = getIcon(record);
+				const char* icon = getIcon(record);
 				String text = getText(record);
 				// ...and output it to the UI.
 				showStatus(icon, text.c_str(), 0);
@@ -404,8 +403,8 @@ public:
 	 * Returns an appropriate icon depending on the type
 	 * of NDEF content.
 	 */
-	char* getIcon(MAHandle record) {
-		char* icon = INFO_ICON;
+	const char* getIcon(MAHandle record) {
+		const char* icon = INFO_ICON;
 		if (UriNdefRecord::isValid(record)) {
 			icon = URL_ICON;
 		} else if (MimeMediaNdefRecord::isMimeType(record, VCARD_MIME_TYPE)) {
