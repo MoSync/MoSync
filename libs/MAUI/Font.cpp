@@ -19,7 +19,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "Font.h"
 #include <MAUtil/Graphics.h>
-#include <MAUtil/PlaceholderPool.h>
 
 #include <conprint.h>
 
@@ -60,7 +59,7 @@ namespace MAUI {
 		unsigned int readSize = BUFFER_SIZE;
 		if(sFilePos+readSize > sFileSize) {
 			readSize-=(sFilePos+BUFFER_SIZE)-sFileSize;
-		}	
+		}
 
 		maReadData(sFile, sData, sFilePos, readSize);
 	}
@@ -126,7 +125,7 @@ namespace MAUI {
 	int parseBitmapFontGeneratorFile(MAHandle file, int end, Charset *charset) {
 		char ident[4];
 		// read magic
-		//maReadData(file, ident, filePtr, 4); 
+		//maReadData(file, ident, filePtr, 4);
 		readChars(ident, 4);
 		int version = ident[3];
 		if(ident[0] != 'B' || ident[1] != 'M' || ident[2] != 'F' || version < 2 || version > 3) {
@@ -170,7 +169,7 @@ namespace MAUI {
 					//    BYTE packed  :1;
 					//    BYTE encoded :1;      // Added with version 2
 					//    BYTE reserved:6;
-					//}; 
+					//};
 					//int blockSize = readInt(file, &filePtr);
 					{
 						//int filePtrBefore = filePtr;
@@ -185,7 +184,7 @@ namespace MAUI {
 						else
 							skipBytes(5);
 
-						//int currentBlockSize = (filePtr-filePtrBefore)+4;	
+						//int currentBlockSize = (filePtr-filePtrBefore)+4;
 						//printf("blockSize: %d, currentBlockSize: %d\n", blockSize, currentBlockSize);
 					}
 					break;
@@ -217,7 +216,7 @@ namespace MAUI {
 						int numTimes = skipValue/numBytesPerChar;
 						while(numTimes--) {
 							//printf("Reading char block! filePtr: %d\n", filePtr);
-							
+
 							unsigned int c;
 							if(version == 2)
 								c = readShort();
@@ -240,7 +239,7 @@ namespace MAUI {
 						}
 
 						//int currentBlockSize = (filePtr-filePtrBefore)+4;
-						//printf("blockSize: %d, currentBlockSize: %d\n", blockSize, currentBlockSize);		
+						//printf("blockSize: %d, currentBlockSize: %d\n", blockSize, currentBlockSize);
 					}
 					break;
 				default:
@@ -266,8 +265,7 @@ namespace MAUI {
 
 	Font::~Font() {
 		if(mFontImage) {
-			maDestroyObject(mFontImage);
-			PlaceholderPool::put(mFontImage);
+			maDestroyPlaceholder(mFontImage);
 		}
 	}
 
@@ -279,11 +277,11 @@ namespace MAUI {
 	const char* Font::getName() const {
 		return mCharset->name;
 	}
-	
+
 	void Font::setLineSpacing(int size) {
 		mLineSpacing = size;
 	}
-	
+
 	int Font::getLineSpacing() const {
 		return mLineSpacing;
 	}
@@ -310,7 +308,7 @@ namespace MAUI {
 		}
 		closeFontReader();
 
-		this->mFontImage = PlaceholderPool::alloc();//maCreatePlaceholder();
+		this->mFontImage = maCreatePlaceholder();
 		int err;
 		if((err=maCreateImageFromData(this->mFontImage, font, 8+fontInfoSize, imageSize))!=RES_OK) {
 			if(err==RES_OUT_OF_MEMORY)
@@ -412,7 +410,7 @@ namespace MAUI {
 					lineBreaks[j++] = lastSpace+1;
 					i = lastSpace+1;
 					lastSpace = -1;
-				} 
+				}
 				cursor.x = x + chars[str[i]].xAdvance;
 			}
 
@@ -488,7 +486,7 @@ namespace MAUI {
 
 			str++;
 			i++;
-		}	
+		}
 
 		return EXTENT(width, height);
 	}
@@ -559,9 +557,9 @@ namespace MAUI {
 	Rect Font::calculateRectOfIndex(int index, const char *str, const Rect& bound) const {
 		int line = calculateLine(index, str, bound);
 		int lineBreak = 0;
-		if(line>0) 
+		if(line>0)
 			lineBreak = getLineBreak(line-1, str, bound);
-	
+
 		MAPoint2d cursor = {0, 0};
 		cursor.y+=line*mCharset->lineHeight;
 		MAExtent lineRect = getStringDimensions(&str[lineBreak], index-lineBreak);

@@ -2336,7 +2336,7 @@ namespace Base {
 		sMainWnd = info.window;
 
 		sTextBoxInBuf = (wchar_t*)inText;
-		sTextBoxOutSize = maxSize;
+		sTextBoxOutSize = maxSize+1;
 		sTextBoxOutBuf = (wchar_t*)outText;
 
 #if 0	// direct edit-box in window. No worky.

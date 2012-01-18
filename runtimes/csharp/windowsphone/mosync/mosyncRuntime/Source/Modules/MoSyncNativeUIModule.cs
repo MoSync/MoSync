@@ -116,7 +116,7 @@ namespace MoSync
                 {
                     widget.SetProperty(property, value);
                 }
-                catch (InvalidPropertyNameException e)
+                catch (InvalidPropertyNameException)
                 {
                     MoSync.Util.Log(widget.GetType().ToString() + " invalid property name: " + property);
                     return MoSync.Constants.MAW_RES_INVALID_PROPERTY_NAME;
