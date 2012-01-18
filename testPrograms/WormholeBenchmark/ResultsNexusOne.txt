@@ -12,6 +12,24 @@ JSON roundtrips/s: 112.49
 
 --------------------------------
 
+Nexus One, debug mode, new mosync-bridge.js that uses concat:
+
+String messages/s: 10582
+JSON messages/s: 177
+String roundtrips/s: 224
+JSON roundtrips/s: 111
+
+--------------------------------
+
+Nexus One, release mode, new mosync-bridge.js that uses concat:
+
+String messages/s: 15128
+JSON messages/s: 391
+String roundtrips/s: 250
+JSON roundtrips/s: 174
+
+--------------------------------
+
 Nexus One, UTF8-encoding, debug mode, mosync-bridge.js:
 
 String messages/s: 5479.45

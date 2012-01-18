@@ -32,7 +32,7 @@ MA 02110-1301, USA.
 
 #include "MessageStream.h"
 
-namespace App
+namespace Wormhole
 {
 	/**
 	 * Constructor.

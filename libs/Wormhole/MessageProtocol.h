@@ -31,13 +31,13 @@ MA 02110-1301, USA.
  * Class for reading the protocol of a message from a WebView.
  */
 
-#ifndef MESSAGE_PROTOCOL_H_
-#define MESSAGE_PROTOCOL_H_
+#ifndef WORMHOLE_MESSAGE_PROTOCOL_H_
+#define WORMHOLE_MESSAGE_PROTOCOL_H_
 
 #include <ma.h>
 #include <NativeUI/WebView.h>
 
-namespace App
+namespace Wormhole
 {
 
 /**

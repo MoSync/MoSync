@@ -32,7 +32,7 @@ MA 02110-1301, USA.
 
 #include "MessageProtocol.h"
 
-namespace App
+namespace Wormhole
 {
 	MessageProtocol::MessageProtocol(MAHandle dataHandle)
 	{

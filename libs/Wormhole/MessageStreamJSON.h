@@ -31,8 +31,8 @@ MA 02110-1301, USA.
  * Class for parsing JSON messages from a WebView.
  */
 
-#ifndef MESSAGE_STREAM_JSON_H_
-#define MESSAGE_STREAM_JSON_H_
+#ifndef WORMHOLE_MESSAGE_STREAM_JSON_H_
+#define WORMHOLE_MESSAGE_STREAM_JSON_H_
 
 #include <ma.h>
 #include <MAUtil/String.h>
@@ -40,7 +40,7 @@ MA 02110-1301, USA.
 #include <NativeUI/WebView.h>
 #include <yajl/YAJLDom.h>
 
-namespace App
+namespace Wormhole
 {
 
 /**

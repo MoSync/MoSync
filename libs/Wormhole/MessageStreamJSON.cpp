@@ -34,7 +34,7 @@ MA 02110-1301, USA.
 
 using namespace MAUtil;
 
-namespace App
+namespace Wormhole
 {
 	/**
 	 * Constructor. Here we parse the message.
@@ -95,7 +95,7 @@ namespace App
 	bool MessageStreamJSON::is(const char* paramName)
 	{
 		YAJLDom::Value* value = getParamNode("messageName");
-		if (NULL != value && YAJLDom::Value::STRING == value->getType());
+		if (NULL != value && YAJLDom::Value::STRING == value->getType())
 		{
 //			YAJLDom::StringValue* stringValue = (YAJLDom::StringValue*) value;
 //			return 0 == strncmp(
@@ -114,7 +114,7 @@ namespace App
 	String MessageStreamJSON::getParam(const char* paramName)
 	{
 		YAJLDom::Value* value = getParamNode(paramName);
-		if (NULL != value && YAJLDom::Value::STRING == value->getType());
+		if (NULL != value && YAJLDom::Value::STRING == value->getType())
 		{
 			return value->toString();
 		}
@@ -128,7 +128,7 @@ namespace App
 	int MessageStreamJSON::getParamInt(const char* paramName)
 	{
 		YAJLDom::Value* value = getParamNode(paramName);
-		if (NULL != value && YAJLDom::Value::NUMBER == value->getType());
+		if (NULL != value && YAJLDom::Value::NUMBER == value->getType())
 		{
 			return value->toInt();
 		}
