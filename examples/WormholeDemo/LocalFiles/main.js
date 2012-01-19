@@ -59,9 +59,9 @@ function toggleMagFieldW3C()
 	}
 }
 
-var orientation = new SensorConnection("Orientation");
+var orientationSensor = new SensorConnection("Orientation");
 
-orientation.addEventListener("onsensordata", updateOrientDataW3C);
+orientationSensor.addEventListener("onsensordata", updateOrientDataW3C);
 
 function updateOrientDataW3C(sensorData){
 	document.getElementById('OrientationW3C').innerHTML = sensorData.data.x;
@@ -69,16 +69,13 @@ function updateOrientDataW3C(sensorData){
 
 function toggleOrientationW3C()
 {
-	alert(typeof orientation);
-	if(orientation.status == "open")
+	if(orientationSensor.status == "open")
 	{
-		alert("1");
-		orientation.startWatch({interval:1000});
-		alert("2");
+		orientationSensor.startWatch({interval:1000});
 	}
 	else
 	{
-		orientation.endWatch();
+		orientationSensor.endWatch();
 		updateOrientDataW3C({data:{
 			x: "&nbsp;",
 			y: "&nbsp;",
@@ -99,7 +96,6 @@ function updateGyroDataW3C(sensorData){
 
 function toggleGyroscopeW3C()
 {
-	alert(typeof gyroscope);
 	if(gyroscope.status == "open")
 	{
 		gyroscope.startWatch({interval:1000});
@@ -125,7 +121,6 @@ function updateProxDataW3C(sensorData){
 
 function toggleProximityW3C()
 {
-	alert(typeof proximity);
 	if(proximity.status == "open")
 	{
 		proximity.startWatch({interval:1000});
