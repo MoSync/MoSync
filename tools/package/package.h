@@ -57,6 +57,7 @@ struct SETTINGS {
 	const char* WPconfig;
 	const char* WPtarget;
 	bool WPgenerateOnly;
+	const char* WPguid;
 
 	// Android specific settings
     const char* androidPackage;

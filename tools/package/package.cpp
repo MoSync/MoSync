@@ -168,6 +168,8 @@ int main(int argc, const char** argv) {
 			setString(i, argc, argv, s.WPconfig);
 		} else if(streq(argv[i], "--wp-target")) { // Windows Phone specific
 			setString(i, argc, argv, s.WPtarget);
+		} else if(streq(argv[i], "--wp-guid")) { // Windows Phone specific
+			setString(i, argc, argv, s.WPguid);
 		} else if(streq(argv[i], "--wp-project-only")) { // Windows Phone specific
 			s.WPgenerateOnly = true;
 		} else if(streq(argv[i], "--cs-output")) {
