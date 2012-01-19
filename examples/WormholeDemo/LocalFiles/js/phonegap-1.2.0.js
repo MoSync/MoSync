@@ -1080,7 +1080,14 @@ Capture.prototype.captureAudio = function(successCallback, errorCallback, option
  * @param {CaptureImageOptions} options
  */
 Capture.prototype.captureImage = function (successCallback, errorCallback, options) {
-    PhoneGap.exec(successCallback, errorCallback, "Capture", "captureImage", options);
+	PhoneGap.exec(	function(mediaFiles)
+					{
+						successCallback(Capture.prototype._castMediaFile(mediaFiles).message);
+					},
+					function(error)
+					{
+						errorCallback({code:CaptureError[error.code]});
+					}, "Capture", "captureImage", options);
 };
 
 /**

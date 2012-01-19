@@ -28,7 +28,7 @@
 <script type="text/javascript" charset="utf-8" src="js/mosync-pushnotifications.js"></script>
 <script type="text/javascript" charset="utf-8" src="js/w3c-sensormanager.js"></script>
 <script type="text/javascript" charset="utf-8" src="main.js"></script>
-<script type="text/javascript" charset="utf-8" src="phonegapSensors"></script>
+<script type="text/javascript" charset="utf-8" src="phonegapSensors.js"></script>
 
 <!-- JavaScript goes here -->
 <script type="text/javascript">
@@ -91,13 +91,10 @@
 				<li class="arrow"><a href="#PhoneGapSensors" id="PhoneGapSensorsLink">PhoneGap
 						Compatible Sensors</a></li>
 				<li class="arrow"><a href="#W3cSensors" id="w3cSensorsLink">W3C Sensors</a></li>
-				<li class="arrow"><a id="PhoneGapContact">Contacts</a></li>
-				<li class="arrow"><a id="PhoneGapCamera">Camera</a></li>
+				<li class="arrow"><a href="#capture" id="PhoneGapCapture">Capture</a></li>
 				<li class="arrow"><a id="PhoneGapFile">File</a></li>
-				<li class="arrow"><a id="PhoneGapNotifications">PhoneGap
+				<li class="arrow"><a href="#notifications" id="PhoneGapNotifications">PhoneGap
 						Compatible Notifications</a></li>
-				<li class="arrow"><a id="PushNotifications">Push
-						Notifications</a></li>
 			</ul>
 
 		</div>
@@ -199,6 +196,31 @@
 			</ul>
 		</div>
 
+		<div id="capture">
+			<div class="toolbar">
+				<h1>Phonegap Capture</h1>
+				<a class="button back" onclick="jQT.goBack()" id="backButton">Back</a>
+			</div>
+			<ul class="rounded">
+				<li onclick="captureVideo()">Capture video</li>
+			</ul>
+			<video id="videoWidget" controls height="250" width="250"></video>
+			<ul class="rounded">
+				<li onclick="captureImage()">Capture picture</li>
+			</ul>
+			<img id="capturedImage" src="images/MoSyncLogo.png" height="250" width="250"/>
+		</div>
+
+		<div id="notifications">
+			<div class="toolbar">
+				<h1>Phonegap Notifications</h1>
+				<a class="button back" onclick="jQT.goBack()" id="backButton">Back</a>
+			</div>
+			<ul class="rounded">
+				<li onclick="navigator.notification.beep(3);">Beep</li>
+				<li onclick="navigator.notification.vibrate(1000);">Vibrate</li>
+			</ul>
+		</div>
 	</div>
 </body>
 </html>

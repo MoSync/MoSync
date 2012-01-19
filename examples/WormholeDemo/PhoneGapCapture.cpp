@@ -174,7 +174,7 @@ void PhoneGapCapture::customEvent(const MAEvent &event)
 					128);
 
 			//Images need to be stored. We use maLocalTime to get a unique number for the filename
-			sprintf(pathBuffer,"%scapturedImages/img%d.%s", localPath, maLocalTime(), extension);
+			sprintf(pathBuffer,"%simg%d.%s", localPath, maLocalTime(), extension);
 			int result = maCaptureWriteImage(eventData.handle, pathBuffer, 256);
 			lprintfln("########## result:%d", result);
 			sprintf(messageBuffer, "{\"message\":[{\"fullPath\":\"%s\",\"name\":\"%s\"}]}",

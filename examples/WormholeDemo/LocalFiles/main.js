@@ -1,9 +1,8 @@
-document.addEventListener("deviceready", deviceInfo, true);
-var deviceInfo = function() {
-				document.getElementById("platform_li").innerHTML = "Platform: " + device.platform;
-				document.getElementById("plaformversion_li").innerHTML = "Version: " + device.version;
-				document.getElementById("deviceName_li").innerHTML = "Device: " + device.name;
-};
+document.addEventListener("deviceready", function() {
+	document.getElementById("platform_li").innerHTML = "Platform: " + device.platform;
+	document.getElementById("plaformversion_li").innerHTML = "Version: " + device.version;
+	document.getElementById("deviceName_li").innerHTML = "Device: " + device.name;
+}, true);
 
 var accelerometer = new SensorConnection("Accelerometer");
 
@@ -134,4 +133,30 @@ function toggleProximityW3C()
 			z: "&nbsp;"
 		}});
 	}
+}
+
+function captureVideo()
+{
+	navigator.device.capture.captureVideo(
+			function(mediaFiles)
+			{
+				document.getElementById('videoWidget').setAttribute("src", "file://" + mediaFiles[0].fullPath);
+			},
+			function(error)
+			{
+				alert("Error " + error.code);
+			});
+}
+
+function captureImage()
+{
+	navigator.device.capture.captureImage(
+			function(mediaFiles)
+			{
+				document.getElementById('capturedImage').setAttribute("src", "file://" + mediaFiles[0].fullPath);
+			},
+			function(error)
+			{
+				alert("Error " + error.code);
+			});
 }

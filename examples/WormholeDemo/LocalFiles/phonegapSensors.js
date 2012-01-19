@@ -33,9 +33,9 @@ function roundNumber(num) {
 }
 
 function updateAccelPhonegap(a) {
-	document.getElementById('accelPGx').innerHTML = roundNumber(a.x);
-	document.getElementById('accelPGy').innerHTML = roundNumber(a.y);
-	document.getElementById('accelPGz').innerHTML = roundNumber(a.z);
+	document.getElementById('accelPGx').innerHTML = a.x;
+	document.getElementById('accelPGy').innerHTML = a.y;
+	document.getElementById('accelPGz').innerHTML = a.z;
 }
 
 var geolocationWatch = null;
