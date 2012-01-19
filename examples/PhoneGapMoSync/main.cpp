@@ -8,12 +8,17 @@
 // Include Moblet for web applications.
 #include <Wormhole/WebAppMoblet.h>
 #include <Wormhole/MessageProtocol.h>
-#include "Libs/JSONMessageHandler.h"
+#include <Wormhole/MessageStream.h>
+#include <Wormhole/Libs/JSONMessage.h>
+#include <Wormhole/Libs/PhoneGap/PhoneGapMessageHandler.h>
+#include <Wormhole/Libs/JSNativeUI/NativeUIMessageHandler.h>
+#include <Wormhole/Libs/JSNativeUI/ResourceMessageHandler.h>
+#include "MAHeaders.h"
 
 // Namespaces we want to access.
 using namespace MAUtil; // Class Moblet
 using namespace NativeUI; // WebView widget.
-using namespace Wormhole; // Class WebAppMoblet
+using namespace Wormhole;
 
 /**
  * The application class.
@@ -24,7 +29,12 @@ public:
 	MyMoblet()
 	{
 		// Create message handler for PhoneGap.
-		mJSONMessageHandler = new JSONMessageHandler(getWebView());
+		mPhoneGapMessageHandler = new PhoneGapMessageHandler(getWebView());
+
+		// Set the beep sound. This is defined in the
+		// Resources/Resources.lst file. You can change
+		// this by changing the sound file in that folder.
+		mPhoneGapMessageHandler->setBeepSound(BEEP_WAV);
 
 		// Enable message sending from JavaScript to C++.
 		enableWebViewMessages();
@@ -41,15 +51,15 @@ public:
 		showPage("index.html");
 
 		// Initialize PhoneGap.
-		mJSONMessageHandler->initializePhoneGap();
+		mPhoneGapMessageHandler->initializePhoneGap();
 	}
 
 	virtual ~MyMoblet()
 	{
-		if (NULL != mJSONMessageHandler)
+		if (NULL != mPhoneGapMessageHandler)
 		{
-			delete mJSONMessageHandler;
-			mJSONMessageHandler = NULL;
+			delete mPhoneGapMessageHandler;
+			mPhoneGapMessageHandler = NULL;
 		}
 	}
 
@@ -82,7 +92,7 @@ public:
 	void keyPressEvent(int keyCode, int nativeCode)
 	{
 		// Forward to PhoneGap MessageHandler.
-		mJSONMessageHandler->processKeyEvent(keyCode, nativeCode);
+		mPhoneGapMessageHandler->processKeyEvent(keyCode, nativeCode);
 	}
 
 	/**
@@ -109,12 +119,10 @@ public:
 			// Loop through messages.
 			while (message.next())
 			{
-				lprintfln("@@@ MOSYNC: Got next message");
 				// This detects the PhoneGap protocol.
 				if (message.is("PhoneGap"))
 				{
-					lprintfln("@@@ MOSYNC: Message is phonegap");
-					mJSONMessageHandler->handlePhoneGapMessage(message);
+					mPhoneGapMessageHandler->handlePhoneGapMessage(message);
 				}
 
 				// TODO: Add other protocols here as needed.
@@ -141,7 +149,7 @@ public:
 	 */
 	void handleMessageStream(WebView* webView, MAHandle data)
 	{
-		Wormhole::MessageStream stream(webView, data);
+		MessageStream stream(webView, data);
 
 		const char* p;
 
@@ -165,7 +173,7 @@ public:
 	}
 
 private:
-	JSONMessageHandler* mJSONMessageHandler;
+	PhoneGapMessageHandler* mPhoneGapMessageHandler;
 
 	/**
 	 * Handler for NAtiveUI messages
@@ -176,7 +184,6 @@ private:
 	 * Handler for resource messages used for NativeUI
 	 */
 	ResourceMessageHandler* mResourceMessageHandler;
-
 };
 
 /**
