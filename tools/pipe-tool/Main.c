@@ -745,6 +745,8 @@ Build application (-B) options:\n\
   -no-verify           prevent code verification\n\
   -java                build a Java class file\n\
   -gcj=flags           for -java option: set flags for GCJ\n\
+  -cpp                 build C++ source code\n\
+  -cs                  build C# source code\n\
 \n\
 Resource compiler (-R) options:\n\
   -depend=file         output dependencies in makefile syntax\n\

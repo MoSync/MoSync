@@ -74,6 +74,21 @@ public:
 	 */
 	int getArgsFieldInt(const MAUtil::String& fieldName);
 
+	/**
+	 * Get the options parameters "create" and "exclusive"
+	 * from the JSON tree.
+	 * @return true on success, false on error.
+	 */
+	bool getJSONParamsOptionsCreateExclusive(
+		bool& create,
+		bool& exclusive);
+
+	/**
+	 * Get the parent fullPath of a directory entry from the JSON tree.
+	 * @return true on success, false on error.
+	 */
+	bool getJSONParamParentFullPath(MAUtil::String& destinationPath);
+
 protected:
 	MAUtil::YAJLDom::Value* mJSONRoot;
 };

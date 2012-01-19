@@ -27,7 +27,9 @@ def get_gcc_version_string(gcc)
 		parts = line.split(/ /)
 		#puts "yo: #{parts.inspect}"
 		if(parts[0] == "gcc" && parts[1] == "version")
-			return parts[2]
+			return parts[2].strip
+		elsif(parts[0] == 'clang' && parts[1] == 'version')
+			return "clang#{parts[2].strip}"
 		end
 	end
 	error("Could not find gcc version.")
@@ -108,8 +110,17 @@ module GccVersion
 			if(is_v4)
 				warning("GCC sub-version: #{gcc_version[2, 1].to_i}")
 			end
+
+			# Assuming for the moment that clang is command-line-compatible with gcc 4.2.
+			isClang = gcc_version.start_with?('clang')
+			if(isClang)
+				set_class_var(gccVersionClass, :@@GCC_IS_V4, true)
+				set_class_var(gccVersionClass, :@@GCC_V4_SUB, 2)
+			end
+			set_class_var(gccVersionClass, :@@GCC_IS_CLANG, isClang)
 		end
 		@gcc_version = @@gcc_version
+		@GCC_IS_CLANG = get_class_var(gccVersionClass, :@@GCC_IS_CLANG)
 		@GCC_IS_V4 = get_class_var(gccVersionClass, :@@GCC_IS_V4)
 		if(@GCC_IS_V4)
 			@GCC_V4_SUB = get_class_var(gccVersionClass, :@@GCC_V4_SUB)
