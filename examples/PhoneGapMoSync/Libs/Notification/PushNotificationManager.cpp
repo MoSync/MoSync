@@ -36,7 +36,7 @@ MA 02110-1301, USA.
 #include <Notification/PushNotification.h>
 #include "../JSONMessageHandler.h"
 #include "PushNotificationManager.h"
-#include "Util.h"
+
 
 using namespace MAUtil;
 using namespace Notification;
@@ -51,14 +51,6 @@ PushNotificationManager::PushNotificationManager(
 {
 	NotificationManager::getInstance()->addPushNotificationListener(this);
 	mConnection = new TCPConnection();
-	if (isIOS())
-	{
-		mConnection->connect(IOS_SERVER_IP, IOS_SERVER_PORT);
-	}
-	else if (isAndroid())
-	{
-		mConnection->connect(ANDROID_SERVER_IP, ANDROID_SERVER_PORT);
-	}
 }
 
 /**
@@ -67,6 +59,17 @@ PushNotificationManager::PushNotificationManager(
 PushNotificationManager::~PushNotificationManager()
 {
 	NotificationManager::getInstance()->removePushNotificationListener(this);
+}
+
+/**
+ * Connects to a push notification server
+ *
+ * @param serverIP IPAddress of the server
+ * @param port TCP port number of the server
+ */
+void PushNotificationManager::connectToServer(MAUtil::String & serverIP, const int port)
+{
+	mConnection->connect(serverIP, port);
 }
 
 /**
@@ -87,6 +90,12 @@ void PushNotificationManager::handleMessage(JSONMessage& message)
 		{
 			printf("PushNotificationManager::handleMessage set accountID");
 			mAccountID = this->parseJSString(message.getParam("args"));
+		}
+		else if (message.getParam("action") == "initialize")
+		{
+			MAUtil::String serverAddress = message.getParam("serverAddress");
+			int serverPort = stringToInteger(message.getParam("serverPort"));
+			connectToServer(serverAddress, serverPort);
 		}
 		else if (message.getParam("action") == "register")
 		{
