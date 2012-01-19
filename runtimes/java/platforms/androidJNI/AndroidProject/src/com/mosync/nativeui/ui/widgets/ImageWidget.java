@@ -59,8 +59,8 @@ public class ImageWidget extends Widget
 		if ( property.equals( IX_WIDGET.MAW_WIDGET_ALPHA ) )
 		{
 			float alpha = FloatConverter.convert( value );
-			int intAlpha = (int) (alpha * 255.0f);
-			imageView.setAlpha(intAlpha);
+			m_alpha = (int) (alpha * 255.0f);
+			imageView.setAlpha(m_alpha);
 			return true;
 		}
 
@@ -106,14 +106,21 @@ public class ImageWidget extends Widget
 	@Override
 	public String getProperty(String property)
 	{
-		ImageView imageView = (ImageView) getView( );
+//		ImageView imageView = (ImageView) getView( );
 		if( property.equals(IX_WIDGET.MAW_WIDGET_ALPHA ) )
 		{
-			return Float.toString(imageView.getAlpha());
+			return Integer.toString(m_alpha);
+			// TODO Keep it and call it for API level 11.
+//			return Float.toString(imageView.getAlpha());
 		}
 		else
 		{
 			return super.getProperty( property );
 		}
 	}
+
+	/**
+	 * The alpha is stored.
+	 */
+	private int m_alpha = 0xff;
 }

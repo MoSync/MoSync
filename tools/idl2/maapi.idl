@@ -4998,6 +4998,7 @@ group WidgetAPI "Widget API" {
 
 		/**
 		* @brief Sets the transparency of the widget background.
+		* On Android this property is available for the moment only on Layouts and ImageWidget widgets.
 		*
 		* @validvalue A float between 0.0 and 1.0, where 0.0 is fully transparent and 1.0 is opaque.
 		*
