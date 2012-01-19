@@ -2671,7 +2671,14 @@ namespace Base
 				c,
 				_valueBufferSize * sizeof(char));
 
-			return _maAdsBannerGetProperty((int)gCore->mem_ds, _ad, _property, _valueBuffer, _valueBufferSize, mJNIEnv, mJThis);
+			return _maAdsBannerGetProperty(
+				(int)gCore->mem_ds,
+				_ad,
+				_property,
+				_valueBuffer,
+				_valueBufferSize,
+				mJNIEnv,
+				mJThis);
 		}
 
 		// ********** Notifications API **********
@@ -2705,7 +2712,14 @@ namespace Base
 				c,
 				_valueBufferSize * sizeof(char));
 
-			return _maNotificationLocalGetProperty((int)gCore->mem_ds, _notification, _property, _valueBuffer, _valueBufferSize, mJNIEnv, mJThis);
+			return _maNotificationLocalGetProperty(
+				(int)gCore->mem_ds,
+				_notification,
+				_property,
+				_valueBuffer,
+				_valueBufferSize,
+				mJNIEnv,
+				mJThis);
 		}
 
 		case maIOCtl_maNotificationLocalSchedule:
@@ -2779,6 +2793,84 @@ namespace Base
 
 		case maIOCtl_maNotificationPushSetDisplayFlag:
 			return _maNotificationPushSetDisplayFlag(a, mJNIEnv, mJThis);
+
+		// ********** Capture API **********
+
+		case maIOCtl_maCaptureSetProperty:
+		{
+			const char *_property = SYSCALL_THIS->GetValidatedStr(a);
+			const char *_value = SYSCALL_THIS->GetValidatedStr(b);
+			return _maCaptureSetProperty(
+					_property,
+					_value,
+					mJNIEnv,
+					mJThis);
+		}
+
+		case maIOCtl_maCaptureGetProperty:
+		{
+			int _valueBufferSize = c;
+			int _valueBuffer = (int) SYSCALL_THIS->GetValidatedMemRange(
+				b,
+				_valueBufferSize * sizeof(char));
+			const char *_property = SYSCALL_THIS->GetValidatedStr(a);
+			return _maCaptureGetProperty(
+				(int)gCore->mem_ds,
+				_property,
+				_valueBuffer,
+				_valueBufferSize,
+				mJNIEnv,
+				mJThis);
+		}
+
+		case maIOCtl_maCaptureAction:
+			return _maCaptureAction(a, mJNIEnv, mJThis);
+
+		case maIOCtl_maCaptureWriteImage:
+		{
+			const char *_path = SYSCALL_THIS->GetValidatedStr(b);
+			return _maCaptureWriteImage(
+				a,
+				_path,
+				c,
+				mJNIEnv,
+				mJThis);
+		}
+
+		case maIOCtl_maCaptureGetImagePath:
+		{
+			int _pathBufferSize = c;
+			int _pathBuffer = (int) SYSCALL_THIS->GetValidatedMemRange(
+				b,
+				_pathBufferSize * sizeof(char));
+			return _maCaptureGetImagePath(
+				(int)gCore->mem_ds,
+				a,
+				_pathBuffer,
+				_pathBufferSize,
+				mJNIEnv,
+				mJThis);
+		}
+
+		case maIOCtl_maCaptureGetVideoPath:
+		{
+			int _pathBufferSize = c;
+			int _pathBuffer = (int) SYSCALL_THIS->GetValidatedMemRange(
+				b,
+				_pathBufferSize * sizeof(char));
+			return _maCaptureGetVideoPath(
+				(int)gCore->mem_ds,
+				a,
+				_pathBuffer,
+				_pathBufferSize,
+				mJNIEnv,
+				mJThis);
+		}
+
+		case maIOCtl_maCaptureDestroyData:
+			return _maCaptureDestroyData(a, mJNIEnv, mJThis);
+
+		// ********** Panics **********
 
 		case maIOCtl_maSyscallPanicsEnable:
 			SYSLOG("maIOCtl_maSyscallPanicsEnable");

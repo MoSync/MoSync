@@ -51,7 +51,11 @@ public:
 	}
 
 	void notifyProgress(MAUtil::Downloader* downloader, int downloadedBytes, int totalBytes) {
-		printf("progress %d%%\n", downloadedBytes/totalBytes * 100);
+		if(totalBytes) {
+			printf("progress %d%%\n", (downloadedBytes * 100)/totalBytes);
+		} else {
+			printf("progress %i bytes\n", downloadedBytes);
+		}
 		Environment::getEnvironment().removeTimer(this);
 	}
 
