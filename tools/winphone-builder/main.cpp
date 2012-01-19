@@ -340,12 +340,12 @@ int main(int argc, char **argv) {
 	pugi::xml_node rootNameSpaceNode = getNode(project, "PropertyGroup/RootNamespace");
 	pugi::xml_node assemblyNameNode = getNode(project, "PropertyGroup/AssemblyName");
 	pugi::xml_node xapFileNameNode = getNode(project, "PropertyGroup/XapFilename");
-	pugi::xml_node silverlightAppEntryNode = getNode(project, "PropertyGroup/SilverlightAppEntry");
+	//pugi::xml_node silverlightAppEntryNode = getNode(project, "PropertyGroup/SilverlightAppEntry");
 
 	rootNameSpaceNode.first_child().set_value(projectName.c_str());
 	assemblyNameNode.first_child().set_value(projectName.c_str());
 	xapFileNameNode.first_child().set_value((createFileName(projectName) + ".xap").c_str());
-	silverlightAppEntryNode.first_child().set_value((createFileName(projectName) + ".App").c_str());
+	//silverlightAppEntryNode.first_child().set_value((createFileName(projectName) + ".App").c_str());
 
 	if(inputAppManifestFile != "" && outputAppManifestFile != "")
 	{
