@@ -28,8 +28,8 @@ MA 02110-1301, USA.
 #include <conprint.h>
 #include <MAUtil/String.h>
 #include <MAUtil/HashDict.h>
+#include "../JSONMessageHandler.h"
 #include "PhoneGapFile.h"
-#include "PhoneGapMessageHandler.h"
 
 using namespace MAUtil;
 
@@ -790,7 +790,7 @@ static int FileMove(
 /**
  * Constructor.
  */
-PhoneGapFile::PhoneGapFile(PhoneGapMessageHandler* messageHandler)
+PhoneGapFile::PhoneGapFile(JSONMessageHandler* messageHandler)
 	: mMessageHandler(messageHandler)
 {
 }
@@ -879,7 +879,7 @@ void PhoneGapFile::callFileError(
  * Implementation of File API exposed to JavaScript.
  * @return true if message was handled, false if not.
  */
-void PhoneGapFile::handleMessage(PhoneGapMessage& message)
+void PhoneGapFile::handleMessage(JSONMessage& message)
 {
 	if (message.getParam("action") == "requestFileSystem")
 	{
@@ -946,7 +946,7 @@ void PhoneGapFile::handleMessage(PhoneGapMessage& message)
 /**
  * Return a FileSystem object.
  */
-void PhoneGapFile::actionRequestFileSystem(PhoneGapMessage& message)
+void PhoneGapFile::actionRequestFileSystem(JSONMessage& message)
 {
 	lprintfln("@@@ actionRequestFileSystem\n");
 
@@ -977,7 +977,7 @@ void PhoneGapFile::actionRequestFileSystem(PhoneGapMessage& message)
 		"window.localFileSystem._castFS");
 }
 
-void PhoneGapFile::actionResolveLocalFileSystemURI(PhoneGapMessage& message)
+void PhoneGapFile::actionResolveLocalFileSystemURI(JSONMessage& message)
 {
 	lprintfln("@@@ actionResolveLocalFileSystemURI\n");
 
@@ -1024,7 +1024,7 @@ void PhoneGapFile::actionResolveLocalFileSystemURI(PhoneGapMessage& message)
 /**
  * Return a FileEntry object.
  */
-void PhoneGapFile::actionGetFile(PhoneGapMessage& message)
+void PhoneGapFile::actionGetFile(JSONMessage& message)
 {
 	lprintfln("@@@ actionGetFile\n");
 
@@ -1086,7 +1086,7 @@ void PhoneGapFile::actionGetFile(PhoneGapMessage& message)
 /**
  * Return a DirectoryEntry object.
  */
-void PhoneGapFile::actionGetDirectory(PhoneGapMessage& message)
+void PhoneGapFile::actionGetDirectory(JSONMessage& message)
 {
 	lprintfln("@@@ actionGetDirectory\n");
 
@@ -1153,7 +1153,7 @@ void PhoneGapFile::actionGetDirectory(PhoneGapMessage& message)
 /**
  * Return a File object.
  */
-void PhoneGapFile::actionGetFileMetadata(PhoneGapMessage& message)
+void PhoneGapFile::actionGetFileMetadata(JSONMessage& message)
 {
 	lprintfln("@@@ actionGetFileMetadata\n");
 
@@ -1181,7 +1181,7 @@ void PhoneGapFile::actionGetFileMetadata(PhoneGapMessage& message)
 /**
  * Return a Metadata object.
  */
-void PhoneGapFile::actionGetMetadata(PhoneGapMessage& message)
+void PhoneGapFile::actionGetMetadata(JSONMessage& message)
 {
 	lprintfln("@@@ actionGetMetadata\n");
 
@@ -1199,7 +1199,7 @@ void PhoneGapFile::actionGetMetadata(PhoneGapMessage& message)
 		"window.localFileSystem._castDate");
 }
 
-void PhoneGapFile::actionWrite(PhoneGapMessage& message)
+void PhoneGapFile::actionWrite(JSONMessage& message)
 {
 	lprintfln("@@@ actionWrite\n");
 
@@ -1227,7 +1227,7 @@ void PhoneGapFile::actionWrite(PhoneGapMessage& message)
 //mosync://PhoneGap?service=File&action=readAsText&args=
 //{"fileName":"/mnt/sdcard/helloworld.txt","encoding":"UTF-8"}&PhoneGapCallBackId=File8
 
-void PhoneGapFile::actionReadAsText(PhoneGapMessage& message)
+void PhoneGapFile::actionReadAsText(JSONMessage& message)
 {
 	lprintfln("@@@ actionReadAsText\n");
 
@@ -1250,10 +1250,10 @@ void PhoneGapFile::actionReadAsText(PhoneGapMessage& message)
 	// Send back the file content.
 	callSuccess(
 		callbackID,
-		PhoneGapMessage::JSONStringify(content.c_str()));
+		JSONMessage::JSONStringify(content.c_str()));
 }
 
-void PhoneGapFile::actionReadAsDataURL(PhoneGapMessage& message)
+void PhoneGapFile::actionReadAsDataURL(JSONMessage& message)
 {
 	lprintfln("@@@ actionReadAsDataURL\n");
 
@@ -1272,14 +1272,14 @@ void PhoneGapFile::actionReadAsDataURL(PhoneGapMessage& message)
 	String base64URL = "\"data:";
 	base64URL += FileGetMimeType(fullPath);
 	base64URL += ";base64,";
-	base64URL += PhoneGapMessage::base64Encode(content.c_str());
+	base64URL += JSONMessage::base64Encode(content.c_str());
 	base64URL += "\"";
 
 	// Send back the file content.
 	callSuccess(callbackID, base64URL);
 }
 
-void PhoneGapFile::actionTruncate(PhoneGapMessage& message)
+void PhoneGapFile::actionTruncate(JSONMessage& message)
 {
 	lprintfln("@@@ actionTruncate\n");
 
@@ -1302,14 +1302,14 @@ void PhoneGapFile::actionTruncate(PhoneGapMessage& message)
 	callSuccess(callbackID, lengthBuf);
 }
 
-void PhoneGapFile::actionCopyTo(PhoneGapMessage& message)
+void PhoneGapFile::actionCopyTo(JSONMessage& message)
 {
 	lprintfln("@@@ actionCopyTo\n");
 
 	actionCopyMoveHelper(message, false);
 }
 
-void PhoneGapFile::actionMoveTo(PhoneGapMessage& message)
+void PhoneGapFile::actionMoveTo(JSONMessage& message)
 {
 	lprintfln("@@@ actionMoveTo\n");
 
@@ -1319,7 +1319,7 @@ void PhoneGapFile::actionMoveTo(PhoneGapMessage& message)
 //I/maWriteLog(20616): @@@ URL: mosync://PhoneGap?service=File&action=moveTo&args={"fullPath":"/mnt/sdcard/hello2.txt","pa
 //rent":{"isFile":false,"isDirectory":true,"name":"sdcard","fullPath":"/mnt/sdcard","filesystem":null},"newName":"hello3.t
 //xt"}&PhoneGapCallBackId=File19
-void PhoneGapFile::actionCopyMoveHelper(PhoneGapMessage& message, bool move)
+void PhoneGapFile::actionCopyMoveHelper(JSONMessage& message, bool move)
 {
 	String callbackID = message.getParam("PhoneGapCallBackId");
 
@@ -1408,7 +1408,7 @@ void PhoneGapFile::actionCopyMoveHelper(PhoneGapMessage& message, bool move)
 		"window.localFileSystem._castEntry");
 }
 
-void PhoneGapFile::actionRemove(PhoneGapMessage& message)
+void PhoneGapFile::actionRemove(JSONMessage& message)
 {
 	lprintfln("@@@ actionRemove\n");
 
@@ -1429,7 +1429,7 @@ void PhoneGapFile::actionRemove(PhoneGapMessage& message)
 /**
  * This is only valid for directories.
  */
-void PhoneGapFile::actionRemoveRecursively(PhoneGapMessage& message)
+void PhoneGapFile::actionRemoveRecursively(JSONMessage& message)
 {
 	lprintfln("@@@ actionRemoveRecursively\n");
 
@@ -1449,7 +1449,7 @@ void PhoneGapFile::actionRemoveRecursively(PhoneGapMessage& message)
 
 // mosync://PhoneGap?service=File&action=readEntries&args={"fullPath":"/mnt/sdcard/fob1"}&
 // PhoneGapCallBackId=File21
-void PhoneGapFile::actionReadEntries(PhoneGapMessage& message)
+void PhoneGapFile::actionReadEntries(JSONMessage& message)
 {
 	lprintfln("@@@ actionReadEntries\n");
 

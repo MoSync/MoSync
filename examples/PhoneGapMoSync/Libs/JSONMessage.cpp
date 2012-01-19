@@ -17,13 +17,13 @@ MA 02110-1301, USA.
 */
 
 /**
- * @file PhoneGapMessage.cpp
+ * @file JSONMessage.cpp
  * @author Mikael Kindborg
  *
- * Class for parsing messages from a WebView.
+ * Class for parsing JSON messages from a WebView.
  */
 
-#include "PhoneGapMessage.h"
+#include "JSONMessage.h"
 #include <mastring.h>
 
 using namespace MAUtil;
@@ -38,7 +38,7 @@ static void CharToHex(unsigned char c, char* hexBuf)
 /**
  * Make a JSON stringified string.
  */
-String PhoneGapMessage::JSONStringify(const char* str)
+String JSONMessage::JSONStringify(const char* str)
 {
 	String jsonString = "\"";
 	int length = strlen(str);
@@ -86,7 +86,7 @@ String PhoneGapMessage::JSONStringify(const char* str)
 /**
  * Based on: http://en.wikibooks.org/wiki/Algorithm_Implementation/Miscellaneous/Base64#C.2B.2B
  */
-String PhoneGapMessage::base64Encode(const char* input)
+String JSONMessage::base64Encode(const char* input)
 {
 	const char* encodeLookup =
 		"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
@@ -140,82 +140,62 @@ String PhoneGapMessage::base64Encode(const char* input)
 /**
  * Constructor.
  */
-PhoneGapMessage::PhoneGapMessage(NativeUI::WebView* webView, MAHandle dataHandle) :
-	Wormhole::WebViewMessage(webView, dataHandle),
-	mJSONRoot(NULL)
+JSONMessage::JSONMessage(NativeUI::WebView* webView, MAHandle dataHandle) :
+	Wormhole::MessageStreamJSON(webView, dataHandle)
 {
-	if (this->hasParam("args"))
-	{
-		String args = this->getParam("args");
-		// Is this JSON?
-		if (MAUtil::String::npos != args.find("{"))
-		{
-			mJSONRoot = YAJLDom::parse(
-				(const unsigned char*)args.c_str(),
-				args.size());
-		}
-	}
 }
 
 /**
  * Destructor.
  */
-PhoneGapMessage::~PhoneGapMessage()
+JSONMessage::~JSONMessage()
 {
-	if (NULL != mJSONRoot)
-	{
-		// The root must not be NULL or Value::NUL.
-		if (NULL != mJSONRoot && YAJLDom::Value::NUL != mJSONRoot->getType())
-		{
-			// Delete the JSON tree.
-			YAJLDom::deleteValue(mJSONRoot);
-			mJSONRoot = NULL;
-		}
-	}
 }
 
 /**
- * @return The JSON root node.
+ * @return The string value of a field in the JSON data.
+ * Return empty string if the field does not exist.
  */
-MAUtil::YAJLDom::Value* PhoneGapMessage::getJSONRoot()
+MAUtil::String JSONMessage::getArgsField(const MAUtil::String& fieldName)
 {
-	return mJSONRoot;
-}
-
-/**
- * @return The string value of a field at the top-level
- * of the JSON tree. Return empty string if the field
- * does not exist.
- */
-MAUtil::String PhoneGapMessage::getArgsField(const MAUtil::String& fieldName)
-{
-	if (NULL != mJSONRoot)
+	YAJLDom::Value* argsNode = getParamNode("args");
+	if (NULL != argsNode && YAJLDom::Value::MAP == argsNode->getType())
 	{
-		YAJLDom::Value* value = mJSONRoot->getValueForKey(fieldName.c_str());
+		YAJLDom::Value* value = argsNode->getValueForKey(fieldName.c_str());
 		if (NULL != value && YAJLDom::Value::STRING == value->getType())
 		{
 			return value->toString();
 		}
 	}
-
 	return "";
 }
 
 /**
- * @return The integer value of a field at the top-level
- * of the JSON tree. Return 0 if the field does not exist.
+ * @return The integer value of a field in the JSON data.
+ * Return 0 if the field does not exist.
  */
-int PhoneGapMessage::getArgsFieldInt(const MAUtil::String& fieldName)
+int JSONMessage::getArgsFieldInt(const MAUtil::String& fieldName)
 {
-	if (NULL != mJSONRoot)
+	YAJLDom::Value* argsNode = getParamNode("args");
+	lprintfln(">>>>>>>>> step 1 argsNode: %s", (argsNode->toString()).c_str());
+
+	if (YAJLDom::Value::NUL == argsNode->getType()) lprintfln(">>>> NUL");
+	if (YAJLDom::Value::BOOLEAN == argsNode->getType()) lprintfln(">>>> BOOLEAN");
+	if (YAJLDom::Value::NUMBER == argsNode->getType()) lprintfln(">>>> NUMBER");
+	if (YAJLDom::Value::ARRAY == argsNode->getType()) lprintfln(">>>> ARRAY");
+	if (YAJLDom::Value::MAP == argsNode->getType()) lprintfln(">>>> MAP");
+	if (YAJLDom::Value::STRING == argsNode->getType()) lprintfln(">>>> STRING");
+
+	if (NULL != argsNode && YAJLDom::Value::NUL != argsNode->getType())
 	{
-		YAJLDom::Value* value = mJSONRoot->getValueForKey(fieldName.c_str());
+		lprintfln(">>>>>>>>> step 2");
+		YAJLDom::Value* value = argsNode->getValueForKey(fieldName.c_str());
 		if (NULL != value && YAJLDom::Value::NUMBER == value->getType())
 		{
+			lprintfln(">>>>>>>>> step 3");
 			return value->toInt();
 		}
 	}
-
 	return 0;
 }
 
@@ -224,7 +204,7 @@ int PhoneGapMessage::getArgsFieldInt(const MAUtil::String& fieldName)
  * from the JSON tree.
  * @return true on success, false on error.
  */
-bool PhoneGapMessage::getJSONParamsOptionsCreateExclusive(
+bool JSONMessage::getJSONParamsOptionsCreateExclusive(
 	bool& create,
 	bool& exclusive)
 {
@@ -232,8 +212,9 @@ bool PhoneGapMessage::getJSONParamsOptionsCreateExclusive(
 	create = false;
 	exclusive = false;
 
-	YAJLDom::Value* argsNode = getJSONRoot();
-	if (NULL == argsNode || YAJLDom::Value::NUL == argsNode->getType())
+	// Get the root node for the message parameters.
+	YAJLDom::Value* argsNode = getParamNode("args");
+	if (NULL == argsNode || YAJLDom::Value::MAP != argsNode->getType())
 	{
 		return false;
 	}
@@ -262,11 +243,11 @@ bool PhoneGapMessage::getJSONParamsOptionsCreateExclusive(
  * Get the parent fullPath of a directory entry from the JSON tree.
  * @return true on success, false on error.
  */
-bool PhoneGapMessage::getJSONParamParentFullPath(String& destinationPath)
+bool JSONMessage::getJSONParamParentFullPath(String& destinationPath)
 {
 	// Get the root node for the message parameters.
-	YAJLDom::Value* argsNode = getJSONRoot();
-	if (NULL == argsNode || YAJLDom::Value::NUL == argsNode->getType())
+	YAJLDom::Value* argsNode = getParamNode("args");
+	if (NULL == argsNode || YAJLDom::Value::MAP != argsNode->getType())
 	{
 		return false;
 	}

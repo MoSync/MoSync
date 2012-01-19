@@ -7,7 +7,8 @@
 
 // Include Moblet for web applications.
 #include <Wormhole/WebAppMoblet.h>
-#include "Libs/PhoneGap/PhoneGapMessageHandler.h"
+#include <Wormhole/MessageProtocol.h>
+#include "Libs/JSONMessageHandler.h"
 
 // Namespaces we want to access.
 using namespace MAUtil; // Class Moblet
@@ -23,7 +24,7 @@ public:
 	MyMoblet()
 	{
 		// Create message handler for PhoneGap.
-		mPhoneGapMessageHandler = new PhoneGapMessageHandler(getWebView());
+		mJSONMessageHandler = new JSONMessageHandler(getWebView());
 
 		// Enable message sending from JavaScript to C++.
 		enableWebViewMessages();
@@ -38,12 +39,23 @@ public:
 		// The page in the "LocalFiles" folder to
 		// show when the application starts.
 		showPage("index.html");
-		//showPage("filesystest-index.html");
 
 		// Initialize PhoneGap.
-		mPhoneGapMessageHandler->initializePhoneGap();
+		mJSONMessageHandler->initializePhoneGap();
 	}
 
+	virtual ~MyMoblet()
+	{
+		if (NULL != mJSONMessageHandler)
+		{
+			delete mJSONMessageHandler;
+			mJSONMessageHandler = NULL;
+		}
+	}
+
+	/**
+	 * For debugging.
+	 */
 	void printMessage(MAHandle dataHandle)
 	{
 		// Get length of the data, it is not zero terminated.
@@ -58,8 +70,7 @@ public:
 		// Zero terminate.
 		stringData[dataSize] = 0;
 
-		lprintfln("@@@ URL: %s\n",
-			WebViewMessage::unescape(stringData).c_str());
+		lprintfln("@@@ MOSYNC Message: %s\n", stringData);
 
 		free(stringData);
 	}
@@ -71,7 +82,7 @@ public:
 	void keyPressEvent(int keyCode, int nativeCode)
 	{
 		// Forward to PhoneGap MessageHandler.
-		mPhoneGapMessageHandler->processKeyEvent(keyCode, nativeCode);
+		mJSONMessageHandler->processKeyEvent(keyCode, nativeCode);
 	}
 
 	/**
@@ -82,24 +93,48 @@ public:
 	 * the life-time of the call of this method, then it
 	 * will be deallocated.
 	 */
-	void handleWebViewMessage(WebView* webView, MAHandle urlData)
+	void handleWebViewMessage(WebView* webView, MAHandle data)
 	{
-		printMessage(urlData);
+		// For debugging.
+		printMessage(data);
 
-		// Create message object. This parses the message.
-		PhoneGapMessage message(webView, urlData);
-		if (message.is("PhoneGap"))
+		// Check the message protocol.
+		MessageProtocol protocol(data);
+		if (protocol.isMessageArrayJSON())
 		{
-			mPhoneGapMessageHandler->handleMessage(message);
-		}
+			// Create the message object. This parses the message data.
+			// The message object contains one or more messages.
+			JSONMessage message(webView, data);
 
-		// Tell the WebView that we have processed the message, so that
-		// it can send the next one.
-		callJS("bridge.messagehandler.processedMessage()");
+			// Loop through messages.
+			while (message.next())
+			{
+				lprintfln("@@@ MOSYNC: Got next message");
+				// This detects the PhoneGap protocol.
+				if (message.is("PhoneGap"))
+				{
+					lprintfln("@@@ MOSYNC: Message is phonegap");
+					mJSONMessageHandler->handlePhoneGapMessage(message);
+				}
+
+				// TODO: Add other protocols here as needed.
+				// Use the messageName param as the protocol identifier,
+				// them make else if statements to branch off message
+				// handling to the respective modules.
+			}
+		}
+		else if (protocol.isMessageStream())
+		{
+			 // TODO: Add message handler if string streams are used.
+		}
+		else
+		{
+			lprintfln("@@@ MOSYNC: Undefined message protocol");
+		}
 	}
 
 private:
-	PhoneGapMessageHandler* mPhoneGapMessageHandler;
+	JSONMessageHandler* mJSONMessageHandler;
 };
 
 /**

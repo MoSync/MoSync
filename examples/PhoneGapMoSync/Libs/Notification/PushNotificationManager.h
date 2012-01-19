@@ -29,8 +29,7 @@ MA 02110-1301, USA.
 #include <Wormhole/WebViewMessage.h>
 #include <NativeUI/WebView.h>
 #include <Notification/PushNotificationListener.h>
-
-#include "../PhoneGap/PhoneGapMessage.h"
+#include "../JSONMessage.h"
 #include "TCPConnection.h"
 
 // Forward declaration
@@ -46,7 +45,7 @@ public:
 	/**
 	 * Constructor.
 	 */
-	PushNotificationManager(PhoneGapMessageHandler* messageHandler);
+	PushNotificationManager(JSONMessageHandler* messageHandler);
 
 	/**
 	 * Destructor.
@@ -57,7 +56,7 @@ public:
 	 * Implementation of Notification API exposed to JavaScript.
 	 * @return true if message was handled, false if not.
 	 */
-	void handleMessage(PhoneGapMessage& message);
+	void handleMessage(JSONMessage& message);
 
 private:
 	/**
@@ -95,7 +94,7 @@ private:
 	 * If bit mask does not contain at least one good value the error callback
 	 * method will be called.
 	 */
-	void setPushNotificationTypes(PhoneGapMessage& message);
+	void setPushNotificationTypes(JSONMessage& message);
 
 	/**
 	 * Remove the quotation marks from the begging and ending of a given string.
@@ -107,7 +106,7 @@ private:
 	MAUtil::String parseJSString(const MAUtil::String& string);
 
 private:
-	PhoneGapMessageHandler* mMessageHandler;
+	JSONMessageHandler* mMessageHandler;
 
 	/**
 	 * Used for sending the device token / application id to a specified

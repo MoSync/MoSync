@@ -26,13 +26,13 @@ MA 02110-1301, USA.
 #include <conprint.h>
 #include <MAUtil/String.h>
 #include <maxtoa.h>
+#include "../JSONMessageHandler.h"
 #include "PhoneGapCapture.h"
-#include "PhoneGapMessageHandler.h"
 
 /**
  * Constructor.
  */
-PhoneGapCapture::PhoneGapCapture(PhoneGapMessageHandler* messageHandler)
+PhoneGapCapture::PhoneGapCapture(JSONMessageHandler* messageHandler)
 	: mMessageHandler(messageHandler)
 {
 	MAUtil::Environment::getEnvironment().addCustomEventListener(this);
@@ -49,7 +49,7 @@ PhoneGapCapture::~PhoneGapCapture()
  * Implementation of capture API:s exposed to JavaScript.
  * @return true if message was handled, false if not.
  */
-void PhoneGapCapture::handleMessage(PhoneGapMessage& message)
+void PhoneGapCapture::handleMessage(JSONMessage& message)
 {
 	if(message.getParam("action") == "captureVideo")
 	{

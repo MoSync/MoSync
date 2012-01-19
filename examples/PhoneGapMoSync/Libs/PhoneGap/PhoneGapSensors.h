@@ -28,9 +28,9 @@ MA 02110-1301, USA.
 
 #include <Wormhole/WebViewMessage.h>
 #include <NativeUI/WebView.h>
-#include "PhoneGapMessage.h"
 
-class PhoneGapMessageHandler;
+class JSONMessage;
+class JSONMessageHandler;
 
 /**
  * Class that implements PhoneGap sensor APIs.
@@ -41,7 +41,7 @@ public:
 	/**
 	 * Constructor.
 	 */
-	PhoneGapSensors(PhoneGapMessageHandler* messageHandler);
+	PhoneGapSensors(JSONMessageHandler* messageHandler);
 
 	/**
 	 * Destructor.
@@ -52,7 +52,7 @@ public:
 	 * Implementation of File API exposed to JavaScript.
 	 * @return true if message was handled, false if not.
 	 */
-	void handleMessage(PhoneGapMessage& message);
+	void handleMessage(JSONMessage& message);
 
 	void sendAccelerometerData(MASensor sensorData);
 
@@ -108,7 +108,7 @@ private:
 			MASensor sensorData);
 
 private:
-	PhoneGapMessageHandler* mMessageHandler;
+	JSONMessageHandler* mMessageHandler;
 
 	/**
 	 * A Pointer to the main webview

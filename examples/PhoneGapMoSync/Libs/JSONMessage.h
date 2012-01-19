@@ -17,60 +17,54 @@ MA 02110-1301, USA.
 */
 
 /**
- * @file PhoneGapMessage.h
+ * @file JSONMessage.h
  * @author Mikael Kindborg
  *
- * Class for parsing messages from a WebView.
+ * Class for parsing JSON messages from a WebView.
  */
 
-#ifndef LIBS_PHONEGAP_PHONEGAPMESSAGE_H_
-#define LIBS_PHONEGAP_PHONEGAPMESSAGE_H_
+#ifndef WORMHOLE_LIBS_JSONMESSAGE_H_
+#define WORMHOLE_LIBS_JSONMESSAGE_H_
 
 #include <ma.h>
 #include <MAUtil/String.h>
 #include <MAUtil/HashMap.h>
 #include <NativeUI/WebView.h>
-#include <Wormhole/WebViewMessage.h>
+#include <Wormhole/MessageStreamJSON.h>
 #include <yajl/YAJLDom.h>
 
 /**
  * Class that parses PhoneGap messages.
  */
-class PhoneGapMessage : public Wormhole::WebViewMessage
+class JSONMessage : public Wormhole::MessageStreamJSON
 {
 public:
 	/**
 	 * Make a JSON stringified string.
 	 */
-	static MAUtil::String PhoneGapMessage::JSONStringify(const char* str);
+	static MAUtil::String JSONMessage::JSONStringify(const char* str);
 
-	static MAUtil::String PhoneGapMessage::base64Encode(const char* input);
+	static MAUtil::String JSONMessage::base64Encode(const char* input);
 
 	/**
 	 * Constructor.
 	 */
-	PhoneGapMessage(NativeUI::WebView* webView, MAHandle dataHandle);
+	JSONMessage(NativeUI::WebView* webView, MAHandle dataHandle);
 
 	/**
 	 * Destructor.
 	 */
-	virtual ~PhoneGapMessage();
+	virtual ~JSONMessage();
 
 	/**
-	 * @return The JSON root node.
-	 */
-	MAUtil::YAJLDom::Value* getJSONRoot();
-
-	/**
-	 * @return The string value of a field at the top-level
-	 * of the JSON tree. Return empty string if the field
-	 * does not exist.
+	 * @return The string value of a field in the JSON data.
+	 * Return empty string if the field does not exist.
 	 */
 	MAUtil::String getArgsField(const MAUtil::String& fieldName);
 
 	/**
-	 * @return The integer value of a field at the top-level
-	 * of the JSON tree. Return 0 if the field does not exist.
+	 * @return The integer value of a field in the JSON data.
+	 * Return 0 if the field does not exist.
 	 */
 	int getArgsFieldInt(const MAUtil::String& fieldName);
 
@@ -88,9 +82,6 @@ public:
 	 * @return true on success, false on error.
 	 */
 	bool getJSONParamParentFullPath(MAUtil::String& destinationPath);
-
-protected:
-	MAUtil::YAJLDom::Value* mJSONRoot;
 };
 
 #endif

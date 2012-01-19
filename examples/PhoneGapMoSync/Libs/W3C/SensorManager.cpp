@@ -25,7 +25,7 @@ MA 02110-1301, USA.
 
 #include <conprint.h>
 #include <MAUtil/String.h>
-#include "../PhoneGap/PhoneGapMessageHandler.h"
+#include "../JSONMessageHandler.h"
 #include "SensorManager.h"
 
 using namespace MAUtil;
@@ -33,7 +33,7 @@ using namespace MAUtil;
 /**
  * Constructor.
  */
-SensorManager::SensorManager(PhoneGapMessageHandler* messageHandler)
+SensorManager::SensorManager(JSONMessageHandler* messageHandler)
 	: mMessageHandler(messageHandler)
 {
 	for(int i = 0; i< MAXIMUM_SENSORS; i++)
@@ -53,7 +53,7 @@ SensorManager::~SensorManager()
  * Implementation of sensor API:s exposed to JavaScript.
  * @return true if message was handled, false if not.
  */
-void SensorManager::handleMessage(PhoneGapMessage& message)
+void SensorManager::handleMessage(JSONMessage& message)
 {
 	String action = message.getParam("action");
 	lprintfln("@@@ sensor manager: %s", action.c_str());
@@ -163,7 +163,7 @@ void SensorManager::handleMessage(PhoneGapMessage& message)
  * of sensors back to Phonegap
  * @param message The phonegap message
  */
-void SensorManager::findSensors(PhoneGapMessage& message)
+void SensorManager::findSensors(JSONMessage& message)
 {
 	String type = message.getArgsField("type");
 	String result = "{result:["; //Start building the reply message

@@ -28,9 +28,9 @@ MA 02110-1301, USA.
 
 #include <Wormhole/WebViewMessage.h>
 #include <NativeUI/WebView.h>
-#include "PhoneGapMessage.h"
 
-class PhoneGapMessageHandler;
+class JSONMessage;
+class JSONMessageHandler;
 
 /**
  * Class that implements PhoneGap Capture APIs.
@@ -41,7 +41,7 @@ public:
 	/**
 	 * Constructor.
 	 */
-	PhoneGapCapture(PhoneGapMessageHandler* messageHandler);
+	PhoneGapCapture(JSONMessageHandler* messageHandler);
 
 	/**
 	 * Destructor.
@@ -52,7 +52,7 @@ public:
 	 * Implementation of Capture API exposed to JavaScript.
 	 * @return true if message was handled, false if not.
 	 */
-	void handleMessage(PhoneGapMessage& message);
+	void handleMessage(JSONMessage& message);
 
 	/**
 	 * Event handler for capture events
@@ -61,7 +61,7 @@ public:
 	virtual void customEvent(const MAEvent &event);
 
 private:
-	PhoneGapMessageHandler* mMessageHandler;
+	JSONMessageHandler* mMessageHandler;
 
 	/**
 	 * A Pointer to the main webview

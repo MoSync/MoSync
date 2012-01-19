@@ -28,10 +28,12 @@ MA 02110-1301, USA.
 
 #include <Wormhole/WebViewMessage.h>
 #include <NativeUI/WebView.h>
-#include "../PhoneGap/PhoneGapMessage.h"
 
 // The maximum amount of sensors in a device
 #define MAXIMUM_SENSORS 8
+
+class JSONMessage;
+class JSONMessageHandler;
 
 class SensorManager
 {
@@ -39,7 +41,7 @@ public:
 	/**
 	 * Constructor.
 	 */
-	SensorManager(PhoneGapMessageHandler* messageHandler);
+	SensorManager(JSONMessageHandler* messageHandler);
 
 
 	/**
@@ -51,7 +53,7 @@ public:
 	 * Implementation of the Sensor Manager API exposed to JavaScript.
 	 * @return true if message was handled, false if not.
 	 */
-	void handleMessage(PhoneGapMessage& message);
+	void handleMessage(JSONMessage& message);
 
 	/**
 	 * Dispatching of sensor events.
@@ -65,9 +67,9 @@ private:
 	 * of sensors back to Phonegap
 	 * @param message The phonegap message
 	 */
-	void findSensors(PhoneGapMessage& message);
+	void findSensors(JSONMessage& message);
 
-	PhoneGapMessageHandler* mMessageHandler;
+	JSONMessageHandler* mMessageHandler;
 
 	/**
 	 * A Pointer to the main webview

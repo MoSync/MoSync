@@ -26,14 +26,14 @@ MA 02110-1301, USA.
 #include <conprint.h>
 #include <MAUtil/String.h>
 #include "PhoneGapFile.h"
-#include "PhoneGapMessageHandler.h"
+#include "../JSONMessageHandler.h"
 
 using namespace MAUtil;
 
 /**
  * Constructor.
  */
-PhoneGapSensors::PhoneGapSensors(PhoneGapMessageHandler* messageHandler)
+PhoneGapSensors::PhoneGapSensors(JSONMessageHandler* messageHandler)
 	: mMessageHandler(messageHandler)
 {
 	mAccelerometerWatchStarted = false;
@@ -50,7 +50,7 @@ PhoneGapSensors::~PhoneGapSensors()
  * Implementation of sensor API:s exposed to JavaScript.
  * @return true if message was handled, false if not.
  */
-void PhoneGapSensors::handleMessage(PhoneGapMessage& message)
+void PhoneGapSensors::handleMessage(JSONMessage& message)
 {
 	// Accelerometer request from PhoneGap
 	if ((message.getParam("service") == "Accelerometer"))

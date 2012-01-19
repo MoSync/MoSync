@@ -29,9 +29,10 @@ MA 02110-1301, USA.
 #include <Wormhole/WebViewMessage.h>
 #include <NativeUI/WebView.h>
 #include <MAUtil/String.h>
-#include "PhoneGapMessage.h"
+//#include "PhoneGapMessage.h"
 
-class PhoneGapMessageHandler;
+class JSONMessage;
+class JSONMessageHandler;
 
 /**
  * Class that implements PhoneGap File API.
@@ -42,7 +43,7 @@ public:
 	/**
 	 * Constructor.
 	 */
-	PhoneGapFile(PhoneGapMessageHandler* messageHandler);
+	PhoneGapFile(JSONMessageHandler* messageHandler);
 
 	/**
 	 * Destructor.
@@ -85,54 +86,54 @@ public:
 	/**
 	 * Implementation of File API exposed to JavaScript.
 	 */
-	void handleMessage(PhoneGapMessage& message);
+	void handleMessage(JSONMessage& message);
 
 	/**
 	 * Return a FileSystem object.
 	 */
-	void actionRequestFileSystem(PhoneGapMessage& message);
+	void actionRequestFileSystem(JSONMessage& message);
 
-	void actionResolveLocalFileSystemURI(PhoneGapMessage& message);
+	void actionResolveLocalFileSystemURI(JSONMessage& message);
 
 	/**
 	 * Return a FileEntry object.
 	 */
-	void actionGetFile(PhoneGapMessage& message);
+	void actionGetFile(JSONMessage& message);
 
 	/**
 	 * Return a DirectoryEntry object.
 	 */
-	void actionGetDirectory(PhoneGapMessage& message);
+	void actionGetDirectory(JSONMessage& message);
 
 	/**
 	 * Return a File object.
 	 */
-	void actionGetFileMetadata(PhoneGapMessage& message);
+	void actionGetFileMetadata(JSONMessage& message);
 
-	void actionGetMetadata(PhoneGapMessage& message);
+	void actionGetMetadata(JSONMessage& message);
 
-	void actionWrite(PhoneGapMessage& message);
+	void actionWrite(JSONMessage& message);
 
-	void actionReadAsText(PhoneGapMessage& message);
+	void actionReadAsText(JSONMessage& message);
 
-	void actionReadAsDataURL(PhoneGapMessage& message);
+	void actionReadAsDataURL(JSONMessage& message);
 
-	void actionTruncate(PhoneGapMessage& message);
+	void actionTruncate(JSONMessage& message);
 
-	void actionCopyTo(PhoneGapMessage& message);
+	void actionCopyTo(JSONMessage& message);
 
-	void actionMoveTo(PhoneGapMessage& message);
+	void actionMoveTo(JSONMessage& message);
 
-	void actionCopyMoveHelper(PhoneGapMessage& message, bool move);
+	void actionCopyMoveHelper(JSONMessage& message, bool move);
 
-	void actionRemove(PhoneGapMessage& message);
+	void actionRemove(JSONMessage& message);
 
-	void actionRemoveRecursively(PhoneGapMessage& message);
+	void actionRemoveRecursively(JSONMessage& message);
 
-	void actionReadEntries(PhoneGapMessage& message);
+	void actionReadEntries(JSONMessage& message);
 
 private:
-	PhoneGapMessageHandler* mMessageHandler;
+	JSONMessageHandler* mMessageHandler;
 };
 
 #endif

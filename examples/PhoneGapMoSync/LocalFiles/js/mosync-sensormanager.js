@@ -1,3 +1,27 @@
+/*
+Copyright (C) 2012 MoSync AB
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License,
+version 2, as published by the Free Software Foundation.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+MA 02110-1301, USA.
+*/
+
+/**
+ * @file mosync-sensormanager.js
+ * @author Iraklis
+ *
+ * Implementation of W3C sensor API.
+ */
 
 /**
  * Returns an object that manages device sensor enumeration
@@ -25,17 +49,17 @@ function SensorRequest(type)
 	}
 	this.type = type;
 	var callbackId = "SensorManager" + PhoneGap.callbackId++;
-    PhoneGap.callbacks[callbackId] = {success:
-    									function(sensorList)
-        								{
-        									self.result = sensorList.result;
-        									self.readyState = "done";
-        									for(var i = 0; i < self.events.onsuccess.length; i++)
-        									{
-        										self.events.onsuccess[i](self.result);
-        									}
-        								}
-        							};
+	PhoneGap.callbacks[callbackId] = {
+		success: function(sensorList)
+		{
+			self.result = sensorList.result;
+			self.readyState = "done";
+			for(var i = 0; i < self.events.onsuccess.length; i++)
+			{
+				self.events.onsuccess[i](self.result);
+			}
+		}
+	};
 
 	this.events = {
 			"onsuccess": [],
@@ -63,7 +87,11 @@ function SensorRequest(type)
 		}
 	};
 
-	bridge.PhoneGap.send(callbackId, "SensorManager", "findSensors","{\"type\":\"" + type + "\"}");
+	mosync.bridge.PhoneGap.send(
+		callbackId,
+		"SensorManager",
+		"findSensors",
+		{"type":"" + type});
 }
 
 /**
@@ -76,6 +104,7 @@ function SensorRequest(type)
 function SensorConnection(options)
 {
 	var self = this;
+
 	if(typeof options == "string")
 	{
 		this.type = options;
@@ -89,63 +118,74 @@ function SensorConnection(options)
 		this.type = options.type;
 	}
 
-	this.startWatch = 	function(watchOptions)
-						{
-							if(self.status != "open")
-							{
-								var exception = new DOMException();
-								exception.code = DOMException.INVALID_STATE_ERR;
-								throw exception;
-								return;
-							}
-							this.setStatus("watching");
-							var callbackId = "SensorManager" + PhoneGap.callbackId++;
-							PhoneGap.callbacks[callbackId] = {
-									success:self.sensorEvent,
-									fail:self.sensorError
-							};
-							bridge.PhoneGap.send(callbackId,
-												"SensorManager",
-												"startSensor",
-												"{\"type\":\"" + self.type + "\", \"interval\":" + watchOptions.interval + "}");
-						};
-
-	this.endWatch = 	function()
-						{
-							if(self.status != "watching")
-							{
-								var exception = new DOMException();
-								exception.code = DOMException.INVALID_STATE_ERR;
-								throw exception;
-								return;
-							}
-							this.setStatus("open");
-							bridge.PhoneGap.send(null, "SensorManager", "stopSensor","{\"type\":\"" + self.type + "\"}");
-						};
-
-	this.read = 		function()
-						{
-							if(self.status != "open")
-							{
-								var exception = new DOMException();
-								exception.code = DOMException.INVALID_STATE_ERR;
-								throw exception;
-								return;
-							}
-							var callbackId = "SensorManager" + PhoneGap.callbackId++;
-							PhoneGap.callbacks[callbackId] = {
-									success:self.sensorEvent
-							};
-							bridge.PhoneGap.send(callbackId,
-									"SensorManager",
-									"startSensor",
-									"{\"type\":\"" + self.type + "\", \"interval\":-1}");
-						};
-	this.events = {
-					"onsensordata": [],
-					"onerror": [],
-					"onstatuschange":[]
+	this.startWatch = function(watchOptions)
+	{
+		if(self.status != "open")
+		{
+			var exception = new DOMException();
+			exception.code = DOMException.INVALID_STATE_ERR;
+			throw exception;
+			return;
+		}
+		this.setStatus("watching");
+		var callbackId = "SensorManager" + PhoneGap.callbackId++;
+		PhoneGap.callbacks[callbackId] = {
+				success:self.sensorEvent,
+				fail:self.sensorError
+		};
+		mosync.bridge.PhoneGap.send(
+			callbackId,
+			"SensorManager",
+			"startSensor",
+			{"type":"" + self.type, "interval":"" + watchOptions.interval});
 	};
+
+	this.endWatch = function()
+	{
+		if(self.status != "watching")
+		{
+			var exception = new DOMException();
+			exception.code = DOMException.INVALID_STATE_ERR;
+			throw exception;
+			return;
+		}
+		this.setStatus("open");
+		mosync.bridge.PhoneGap.send(
+			null,
+			"SensorManager",
+			"stopSensor",
+			{"type":"" + self.type});
+	};
+
+	this.read = function()
+	{
+		if(self.status != "open")
+		{
+			var exception = new DOMException();
+			exception.code = DOMException.INVALID_STATE_ERR;
+			throw exception;
+			return;
+		}
+
+		var callbackId = "SensorManager" + PhoneGap.callbackId++;
+
+		PhoneGap.callbacks[callbackId] = {
+			success:self.sensorEvent
+		};
+
+		mosync.bridge.PhoneGap.send(
+			callbackId,
+			"SensorManager",
+			"startSensor",
+			{"type":"" + self.type, "interval":-1});
+	};
+
+	this.events = {
+		"onsensordata": [],
+		"onerror": [],
+		"onstatuschange":[]
+	};
+
 	this.addEventListener = function(event, listener, captureMethod)
 	{
 		if(self.events[event] != undefined)
@@ -168,17 +208,18 @@ function SensorConnection(options)
 			}
 		}
 	};
+
 	this.sensorEvent = function(sensorData)
 	{
 		var event = {
-						data: {
-							x: sensorData.x,
-							y: sensorData.y,
-							z: sensorData.z
-						},
-						accuracy: "high",
-						timestamp: sensorData.timestamp,
-						reason:sensorData.reason
+			data: {
+				x: sensorData.x,
+				y: sensorData.y,
+				z: sensorData.z
+			},
+			accuracy: "high",
+			timestamp: sensorData.timestamp,
+			reason: sensorData.reason
 		};
 
 		for(var i = 0; i < self.events.onsensordata.length; i++)
@@ -186,12 +227,13 @@ function SensorConnection(options)
 			self.events.onsensordata[i](event);
 		}
 	};
+
 	this.sensorError = function(errorData)
 	{
 		this.setStatus("error");
 		var sensorError = {
-							code: errorData.code,
-							message: errorData.message
+			code: errorData.code,
+			message: errorData.message
 		};
 		self.error = sensorError;
 		for(var i = 0; i < self.events.onerror.length; i++)
@@ -199,6 +241,7 @@ function SensorConnection(options)
 			self.events.onerror[i](sensorError);
 		}
 	};
+
 	this.setStatus = function(status)
 	{
 		if(status != self.status)

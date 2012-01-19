@@ -34,9 +34,7 @@ MA 02110-1301, USA.
 
 #include <Notification/NotificationManager.h>
 #include <Notification/PushNotification.h>
-
-#include "../PhoneGap/PhoneGapMessage.h"
-#include "../PhoneGap/PhoneGapMessageHandler.h"
+#include "../JSONMessageHandler.h"
 #include "PushNotificationManager.h"
 #include "Util.h"
 
@@ -47,7 +45,7 @@ using namespace Notification;
  * Constructor.
  */
 PushNotificationManager::PushNotificationManager(
-	PhoneGapMessageHandler* messageHandler) :
+	JSONMessageHandler* messageHandler) :
 		mMessageHandler(messageHandler),
 		mConnection(NULL)
 {
@@ -75,7 +73,7 @@ PushNotificationManager::~PushNotificationManager()
  * Implementation of Notification API exposed to JavaScript.
  * @return true if message was handled, false if not.
  */
-void PushNotificationManager::handleMessage(PhoneGapMessage& message)
+void PushNotificationManager::handleMessage(JSONMessage& message)
 {
 	// Push notification request from JavaScript.
 	if ((message.getParam("service") == "PushNotification"))
@@ -162,7 +160,7 @@ void PushNotificationManager::didReceivePushNotification(
 void PushNotificationManager::didApplicationRegistered(MAUtil::String& token)
 {
 	lprintfln("PushNotificationManager::didApplicationRegistered");
-	String tokenJSONString = PhoneGapMessage::JSONStringify(token.c_str());
+	String tokenJSONString = JSONMessage::JSONStringify(token.c_str());
 	mMessageHandler->callSuccess(
 		mRegistrationCallBack,
 		PHONEGAP_CALLBACK_STATUS_OK,
@@ -192,7 +190,7 @@ void PushNotificationManager::didFaildToRegister(
 	MAUtil::String& error)
 {
 	printf("PushNotificationManager::didFaildToRegister");
-	String errorJSONString = PhoneGapMessage::JSONStringify(error.c_str());
+	String errorJSONString = JSONMessage::JSONStringify(error.c_str());
 	if (errorJSONString.length() > 1)
 	{
 		errorJSONString.remove(0, 1);
@@ -217,7 +215,7 @@ void PushNotificationManager::didFaildToRegister(
  * method will be called.
  */
 void PushNotificationManager::setPushNotificationTypes(
-	PhoneGapMessage& message)
+	JSONMessage& message)
 {
 	MAUtil::String callbackID  = message.getParam("PhoneGapCallBackId");
 	int types = message.getParamInt("args");
