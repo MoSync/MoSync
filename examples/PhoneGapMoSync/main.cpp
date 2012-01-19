@@ -125,7 +125,7 @@ public:
 		}
 		else if (protocol.isMessageStream())
 		{
-			 // TODO: Add message handler if string streams are used.
+			handleMessageStream(webView, data);
 		}
 		else
 		{
@@ -133,8 +133,50 @@ public:
 		}
 	}
 
+	/**
+	 * Handles Stream messages(high performance), it is mainly used for NativeUI
+	 *
+	 * @param webView a pointer to the web view posting this message
+	 * @param data the stream of messages
+	 */
+	void handleMessageStream(WebView* webView, MAHandle data)
+	{
+		Wormhole::MessageStream stream(webView, data);
+
+		const char* p;
+
+		while (p = stream.getNext())
+		{
+			if (0 == strcmp(p, "NativeUI"))
+			{
+				//Forward NativeUI messages to the respective message handler
+				mNativeUIMessageHandler->handleMessage(stream);
+			}
+			else if (0 == strcmp(p, "Resource"))
+			{
+				//Forward Resource messages to the respective message handler
+				mResourceMessageHandler->handleMessage(stream);
+			}
+			else if (0 == strcmp(p, "close"))
+			{
+				close();
+			}
+		}
+	}
+
 private:
 	JSONMessageHandler* mJSONMessageHandler;
+
+	/**
+	 * Handler for NAtiveUI messages
+	 */
+	NativeUIMessageHandler* mNativeUIMessageHandler;
+
+	/**
+	 * Handler for resource messages used for NativeUI
+	 */
+	ResourceMessageHandler* mResourceMessageHandler;
+
 };
 
 /**
