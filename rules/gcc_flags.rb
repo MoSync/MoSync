@@ -68,6 +68,11 @@ if(PROFILING)
 	base_flags += " -pg"
 end
 
+if(@GCC_IS_CLANG)
+	base_flags << ' -ccc-host-triple mapip-unknown-unknown -ccc-clang-archs mapip -DMAPIP -v'
+	version_warnings << ' -Wno-error'
+end
+
 if(@GCC_IS_V4) then
 	if(HOST != :win32)
 		base_flags += " -fvisibility=hidden"

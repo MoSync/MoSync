@@ -3340,6 +3340,21 @@ public class MoSyncThread extends Thread
 	}
 
 	/**
+	* Get full path to a taken picture.
+	* @param handle Handle to an image data object.
+	* @param buffer Will contain the full path to the image file.
+	* @param bufferSize Maximum size of the buffer.
+	* @return One of the next constants:
+	*  - MA_CAPTURE_RES_OK if no error occurred.
+	*  - MA_CAPTURE_RES_INVALID_HANDLE if the given handle was invalid.
+	*  - MA_CAPTURE_RES_INVALID_STRING_BUFFER_SIZE if the buffer size was to small.
+	*/
+	int maCaptureGetImagePath(int handle, int buffer, int bufferSize)
+	{
+		return mMoSyncCapture.maCaptureGetImagePath(handle, buffer, bufferSize);
+	}
+
+	/**
 	* Get full path to a recorded video.
 	* @param handle Handle to a video data object.
 	* @param buffer Will contain the full path to the video file.

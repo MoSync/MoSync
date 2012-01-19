@@ -20,7 +20,6 @@ MA 02110-1301, USA.
  * FacebookResponse.cpp
  */
 
-#include <MAUtil/PlaceholderPool.h>
 #ifdef NEWLIB
 #include <locale.h>
 #endif
@@ -47,11 +46,11 @@ YAJLDom::Value* FacebookResponse::getJsonData() const {
 }
 
 MAHandle FacebookResponse::getImageData() const {
-	MAHandle data = MAUtil::PlaceholderPool::alloc();
+	MAHandle data = maCreatePlaceholder();
 	maCreateData(data, getDataSize());
 	maWriteData(data, getData(), 0, getDataSize());
-	MAHandle image = MAUtil::PlaceholderPool::alloc();
+	MAHandle image = maCreatePlaceholder();
 	maCreateImageFromData(image, data, 0, getDataSize());
-	MAUtil::PlaceholderPool::put(data);
+	maDestroyPlaceholder(data);
 	return image;
 }

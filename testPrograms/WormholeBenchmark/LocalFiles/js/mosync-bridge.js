@@ -144,7 +144,9 @@ var mosync = (function()
 			}
 
 			// Add message strings to queue.
-			for (var i in messageStrings)
+
+			var length = messageStrings.length;
+			for (var i = 0; i < length; ++i)
 			{
 				messageQueue.push(messageStrings[i]);
 			}
@@ -224,14 +226,15 @@ var mosync = (function()
 		bridge.sendAll = function()
 		{
 			// Check that messageQueue is not empty!
-			if (messageQueue.length > 0)
+			var length = messageQueue.length;
+			if (length > 0)
 			{
 				// Add the "ms:" token to the beginning of the data
 				// to signify that this as a message array. This is
 				// used by the C++ message parser to handle different
 				// types of message formats.
 				var data = "ms:";
-				for (var i in messageQueue)
+				for (var i = 0; i < length; ++i)
 				{
 					data = data.concat(mosync.encoder.encodeString(String(messageQueue[i])));
 				}

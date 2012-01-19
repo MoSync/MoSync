@@ -15,7 +15,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
-/** 
+/**
 * \file MapTile.h
 * \brief Single tile from a map source
 * \author Lars-Åke Vinberg
@@ -27,16 +27,15 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "DateTime.h"
 #include "LonLat.h"
 #include "DebugPrintf.h"
-#include <MAUtil/PlaceholderPool.h>
 #include "TraceScope.h"
 
 
 
 namespace MAP
 {
-	
+
 	using namespace MAPUtil;
-	
+
 	class MapSource;
 
 	//=========================================================================
@@ -55,7 +54,7 @@ namespace MAP
 		 */
 		MapTile( MapSource* source, const int gridX, const int gridY, const int magnification, const LonLat center, MAHandle image
 				#ifdef StoreCompressedTilesInCache
-				, int contentLength 
+				, int contentLength
 				#endif
 			) :
 			mSource( source ),
@@ -76,14 +75,14 @@ namespace MAP
 		 */
 		virtual ~MapTile( )
 		{
-			MAUtil::PlaceholderPool::put(mImage);
+			maDestroyPlaceholder(mImage);
 		}
 		/**
 		 * Sets last access timestamp to current time.
 		 */
-		void stamp( ) 
-		{ 
-			mLastAccessTime = DateTime::now( ); 
+		void stamp( )
+		{
+			mLastAccessTime = DateTime::now( );
 		}
 		/**
 		 * Returns the source for this tile.
@@ -95,54 +94,54 @@ namespace MAP
 		/**
 		 * Returns X coordinate of tile in tile grid.
 		 */
-		int getGridX( ) const					
-		{ 
-			return mGridX; 
+		int getGridX( ) const
+		{
+			return mGridX;
 		}
 		/**
 		 * Returns Y coordinate of tile in tile grid.
 		 */
-		int getGridY( ) const					
-		{ 
-			return mGridY; 
+		int getGridY( ) const
+		{
+			return mGridY;
 		}
 		/**
 		 * Returns zoom level of tile.
 		 */
-		int getMagnification( ) const			
-		{ 
-			return mMagnification; 
+		int getMagnification( ) const
+		{
+			return mMagnification;
 		}
 		/**
 		 * Returns center of tile in longitude/latitude.
 		 */
-		LonLat getCenter( ) const				
-		{ 
-			return mCenter; 
+		LonLat getCenter( ) const
+		{
+			return mCenter;
 		}
 		/**
 		 * Returns the map image of the tile.
 		 */
-		MAHandle getImage( ) const				
-		{ 
-			return mImage; 
+		MAHandle getImage( ) const
+		{
+			return mImage;
 		}
 		/**
 		 * Returns last access time of the tile.
 		 */
-		DateTime getLastAccessTime( ) const		
-		{ 
-			return mLastAccessTime; 
+		DateTime getLastAccessTime( ) const
+		{
+			return mLastAccessTime;
 		}
-		
+
 		/**
 		 * Returns milliseconds since the tile was created.
 		 */
-		int getMilliSecondsSinceCreated( ) const		
-		{ 
-			return maGetMilliSecondCount() - mCreationTime; 
-		}		
-		
+		int getMilliSecondsSinceCreated( ) const
+		{
+			return maGetMilliSecondCount() - mCreationTime;
+		}
+
 		#ifdef StoreCompressedTilesInCache
 
 		int getContentLength( ) const
