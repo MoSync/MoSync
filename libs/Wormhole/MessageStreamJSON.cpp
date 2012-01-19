@@ -97,6 +97,14 @@ namespace Wormhole
 		YAJLDom::Value* value = getParamNode("messageName");
 		if (NULL != value && YAJLDom::Value::STRING == value->getType())
 		{
+		// Commented out code that was intended to be used with
+		// pointers into the unparsed JSON data. This was made as
+		// part of a project to remove creation of String objects
+		// from YAJLDom. But this was never finished. A problem
+		// with the raw string data is that it needs to be unstringified,
+		// and therefore one of the benefits of using raw data gets lost,
+		// you still need to create a new string. Code left here as a
+		// reference.
 //			YAJLDom::StringValue* stringValue = (YAJLDom::StringValue*) value;
 //			return 0 == strncmp(
 //				paramName,
@@ -108,7 +116,7 @@ namespace Wormhole
 	}
 
 	/**
-	 * Returns the string value of a message parameter.
+	 * Returns the string value of a top-level message parameter.
 	 * @return The param value as a string.
 	 */
 	String MessageStreamJSON::getParam(const char* paramName)
@@ -122,7 +130,7 @@ namespace Wormhole
 	}
 
 	/**
-	 * Returns the integer value of a message parameter.
+	 * Returns the integer value of a top-level message parameter.
 	 * @return The param value as an int.
 	 */
 	int MessageStreamJSON::getParamInt(const char* paramName)
@@ -136,7 +144,7 @@ namespace Wormhole
 	}
 
 	/**
-	 * Checks if the given parameter name is in the message.
+	 * Checks if the given top-level parameter name is in the message.
 	 */
 	bool MessageStreamJSON::hasParam(const char* paramName)
 	{
@@ -145,7 +153,7 @@ namespace Wormhole
 	}
 
 	/**
-	 * Get the node of a parameter in the current message.
+	 * Get the node of a top-level parameter in the current message.
 	 */
 	YAJLDom::Value* MessageStreamJSON::getParamNode(const char* paramName)
 	{
@@ -158,6 +166,14 @@ namespace Wormhole
 			}
 		}
 		return NULL;
+	}
+
+	/**
+	 * @return The JSON root node.
+	 */
+	MAUtil::YAJLDom::Value* MessageStreamJSON::getJSONRoot()
+	{
+		return mJSONRoot;
 	}
 
 	/**

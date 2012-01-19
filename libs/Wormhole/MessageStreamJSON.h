@@ -88,26 +88,31 @@ public:
 	bool is(const char* paramName);
 
 	/**
-	 * Returns the string value of a message parameter.
+	 * Returns the string value of a top-level message parameter.
 	 * @return The param value as a string.
 	 */
 	MAUtil::String getParam(const char* paramName);
 
 	/**
-	 * Returns the integer value of a message parameter.
+	 * Returns the integer value of a top-level message parameter.
 	 * @return The param value as an int.
 	 */
 	int getParamInt(const char* paramName);
 
 	/**
-	 * Checks if the given parameter name is in the message.
+	 * Checks if the given top-level parameter name is in the message.
 	 */
 	bool hasParam(const char* paramName);
 
 	/**
-	 * Get the node of a parameter in the current message.
+	 * Get the node of a top-level parameter in the current message.
 	 */
 	MAUtil::YAJLDom::Value* getParamNode(const char* paramName);
+
+	/**
+	 * @return The JSON root node.
+	 */
+	MAUtil::YAJLDom::Value* getJSONRoot();
 
 	/**
 	 * Parse the message. This finds the message name and
@@ -121,7 +126,7 @@ private:
 	 */
 	NativeUI::WebView* mWebView;
 
-public:
+protected:
 	/**
 	 * Table for message parameters.
 	 */

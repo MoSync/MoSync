@@ -2,22 +2,35 @@
 
 require File.expand_path('../../rules/mosync_lib.rb')
 
-mod = Module.new
-mod.class_eval do
-	def setup_native
-		@LOCAL_DLLS = ["mosync", "mastd", "mautil", "mafs", "nativeui", "yajl"]
-		setup_base
-	end
-
+work = PipeLibWork.new
+work.instance_eval do
 	def setup_pipe
-		setup_base
+		@SOURCES = [
+			".",
+			"Libs",
+			#"Libs/Notification",
+			"Libs/PhoneGap",
+			"Libs/W3C"]
+
+		@EXTRA_INCLUDES = ['.']
+
+		copyFilesSubDir("")
+		copyFilesSubDir("Libs")
+		#copyFilesSubDir("Libs/Notification")
+		copyFilesSubDir("Libs/PhoneGap")
+		copyFilesSubDir("Libs/W3C")
+
+		@HEADER_DIRS = ['.']
+		@INSTALL_INCDIR = "Wormhole"
+
+		@NAME = "Wormhole"
 	end
 
-	def setup_base
-		@SOURCES = ["."]
-		@INSTALL_INCDIR = "Wormhole"
-		@NAME = "Wormhole"
+	def copyFilesSubDir(name)
+		@INSTALL_INCDIR = "Wormhole/" + name
+		@HEADER_DIRS = [name]
+		copyHeaders
 	end
 end
 
-MoSyncLib.invoke(mod)
+work.invoke
