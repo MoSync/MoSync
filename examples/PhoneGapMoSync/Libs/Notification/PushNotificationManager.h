@@ -65,7 +65,6 @@ private:
 	 */
 	virtual void didReceivePushNotification(
 		Notification::PushNotification& pushNotification);
-
 	/**
 	 * Called when application has been registered for push notifications.
 	 */
@@ -95,6 +94,14 @@ private:
 	 * method will be called.
 	 */
 	void setPushNotificationTypes(JSONMessage& message);
+
+	/**
+	 * Connects to a push notification server
+	 *
+	 * @param serverIP IPAddress of the server
+	 * @param port TCP port number of the server
+	 */
+	void connectToServer(MAUtil::String & serverIP, const int port);
 
 	/**
 	 * Remove the quotation marks from the begging and ending of a given string.

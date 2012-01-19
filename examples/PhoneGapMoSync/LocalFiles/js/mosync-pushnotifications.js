@@ -67,6 +67,20 @@ PushNotificationManager.type = {
 		alert: 4
 	};
 
+
+PushNotificationManager.prototype.initialize = function(serverAddress, serverPort)
+{
+	PhoneGap.exec(
+			onSuccess,
+			onError,
+			"PushNotification",
+			"initialize",
+			{
+				"serverAddress": serverAddress,
+				"serverPort": serverPort
+			});
+};
+
 /**
  * Asynchronously starts the registration process.
  *
