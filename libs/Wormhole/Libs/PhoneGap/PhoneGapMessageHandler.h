@@ -41,7 +41,7 @@ MA 02110-1301, USA.
 #include "PhoneGapFile.h"
 #include "PhoneGapCapture.h"
 #include "../W3C/SensorManager.h"
-//#include "../Notification/PushNotificationManager.h"
+#include "../Notification/PushNotificationManager.h"
 
 // PhoneGap callback result codes.
 #define PHONEGAP_CALLBACK_STATUS_NO_RESULT "0"
@@ -228,7 +228,7 @@ namespace Wormhole
 		/**
 		 * Notification API message handler.
 		 */
-		//PushNotificationManager* mPushNotificationManager;
+		PushNotificationManager mPushNotificationManager;
 
 		/**
 		 * The beep sound.

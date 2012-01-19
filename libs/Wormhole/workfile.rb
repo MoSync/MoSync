@@ -8,15 +8,16 @@ work.instance_eval do
 		@SOURCES = [
 			".",
 			"Libs",
-			#"Libs/Notification",
+			"Libs/JSNativeUI",
+			"Libs/Notification",
 			"Libs/PhoneGap",
 			"Libs/W3C"]
 
 		@EXTRA_INCLUDES = ['.']
 
-		copyFilesSubDir("")
 		copyFilesSubDir("Libs")
-		#copyFilesSubDir("Libs/Notification")
+		copyFilesSubDir("Libs/JSNativeUI")
+		copyFilesSubDir("Libs/Notification")
 		copyFilesSubDir("Libs/PhoneGap")
 		copyFilesSubDir("Libs/W3C")
 

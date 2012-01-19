@@ -44,12 +44,10 @@ namespace Wormhole
 		mPhoneGapSensorManager(this),
 		mPhoneGapFile(this),
 		mPhoneGapCapture(this),
-		//mPushNotificationManager(NULL)
+		mPushNotificationManager(this),
 		mBeepSound(0)
 	{
 		enableHardware();
-
-		//mPushNotificationManager = new PushNotificationManager(this);
 
 		for(int i = 0; i < MAXIMUM_SENSORS; i++)
 		{
@@ -62,7 +60,6 @@ namespace Wormhole
 	 */
 	PhoneGapMessageHandler::~PhoneGapMessageHandler()
 	{
-		//delete mPushNotificationManager;
 	}
 
 	/**
@@ -140,8 +137,7 @@ namespace Wormhole
 		}
 		else if (message.getParam("service") == "PushNotification")
 		{
-			// TODO: Uncomment to enable push notifications.
-			//mPushNotificationManager->handleMessage(message);
+			mPushNotificationManager.handleMessage(message);
 		}
 		else if (message.getParam("service") == "Capture")
 		{

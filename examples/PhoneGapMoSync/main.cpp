@@ -8,7 +8,11 @@
 // Include Moblet for web applications.
 #include <Wormhole/WebAppMoblet.h>
 #include <Wormhole/MessageProtocol.h>
+#include <Wormhole/MessageStream.h>
+#include <Wormhole/Libs/JSONMessage.h>
 #include <Wormhole/Libs/PhoneGap/PhoneGapMessageHandler.h>
+#include <Wormhole/Libs/JSNativeUI/NativeUIMessageHandler.h>
+#include <Wormhole/Libs/JSNativeUI/ResourceMessageHandler.h>
 #include "MAHeaders.h"
 
 // Namespaces we want to access.
@@ -145,7 +149,7 @@ public:
 	 */
 	void handleMessageStream(WebView* webView, MAHandle data)
 	{
-		Wormhole::MessageStream stream(webView, data);
+		MessageStream stream(webView, data);
 
 		const char* p;
 
