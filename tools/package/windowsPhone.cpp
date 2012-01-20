@@ -47,6 +47,10 @@ void packageWindowsPhone(const SETTINGS& s, const RuntimeInfo& ri) {
 	string templateLocation = string(ri.path) + "/template";
 	string templateFileLocation = string(ri.path) + "/template/mosync.csproj";
 	string csprojOutputFile = dst + "/project/mosync.csproj";
+
+	string appManifestInputFile = string(ri.path) + "/template/Properties/WMAppManifest.xml";
+	string appManifestOutputFile = dst + "/project/Properties/WMAppManifest.xml";
+
 	string csprojOutput = dst + "/project";
 	string outputType = s.outputType ? string(s.outputType) : string("interpreted");
 
@@ -54,9 +58,19 @@ void packageWindowsPhone(const SETTINGS& s, const RuntimeInfo& ri) {
 	copyFilesRecursively(templateLocation.c_str(), csprojOutput.c_str());
 
 	generateCmd << getBinary("winphone-builder") <<
+		" -version " << s.version <<
+		" -company-name " << s.vendor <<
+		" -input-app-manifest-file " << file(appManifestInputFile) <<
+		" -output-app-manifest-file " << file(appManifestOutputFile) <<
+		" -project-name " << s.name <<
 		" -output-type " << outputType <<
 		" -input-file " << file(templateFileLocation) <<
 		" -output-file " << file(csprojOutputFile);
+
+	if(s.WPguid)
+	{
+		generateCmd << " -guid " << s.WPguid;
+	}
 
 	sh(generateCmd.str().c_str(), s.silent);
 
@@ -79,19 +93,17 @@ void packageWindowsPhone(const SETTINGS& s, const RuntimeInfo& ri) {
 	}
 
 	// Icons!
-	/*
 	if (s.icon) {
-		const string sizes[3] = { "57x57", "72x72", "114x114" };
-		const string filenames[3] = { "Icon.png", "Icon-72.png", "Icon@2x.png" };
+		const string sizes[2] = { "62x62", "173x173"};
+		const string filenames[2] = { "ApplicationIcon.png", "Background.png"};
 
-		for(int i = 0; i < 3; i++) {
+		for(int i = 0; i < 2; i++) {
 			std::ostringstream iconInjectCmd;
 			string size = sizes[i];
-			string outputIcon = xcodeprojOutput + "/" + filenames[i];
-			injectIcon("iOS", size.c_str(), s.icon, outputIcon.c_str(), s.silent);
+			string outputIcon = csprojOutput + "/" + filenames[i];
+			injectIcon("WP7", size.c_str(), s.icon, outputIcon.c_str(), s.silent);
 		}
 	}
-	*/
 
 	if (!s.WPgenerateOnly) {
 #ifdef PLATFORM_WIN32
