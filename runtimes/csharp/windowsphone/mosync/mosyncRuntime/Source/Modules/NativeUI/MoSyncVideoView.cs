@@ -26,6 +26,7 @@ MA 02110-1301, USA.
 
 using System;
 using System.Net;
+using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Threading;
@@ -40,32 +41,18 @@ namespace MoSync
         /**
         * VideoView class defines the attributes and behavior of a "video player"
         */
-        public class MoSyncVideoView : WidgetBaseWindowsPhone
+        public class VideoView : WidgetBaseWindowsPhone
         {
             private MediaElement mMediaElement;
-            private FrameworkElement mSeekControl;
-            private DispatcherTimer mProgressTimer;
-
 
             /**
              * Constructor
              */
-            public MoSyncVideoView()
+            public VideoView()
             {
                 mMediaElement = new MediaElement();
 
-                mMediaElement.Stretch = Stretch.Fill;
-                mMediaElement.Volume = 10;
-                mMediaElement.Source = new Uri("http://qthttp.apple.com.edgesuite.net/1010qwoeiuryfg/sl.m3u8");
-
-                //this.progressTimer = new DispatcherTimer();
-                //this.progressTimer.Interval = TimeSpan.FromSeconds(1);
-
-                //SetCurrentPosition();
-
-                // Play Video
-                mMediaElement.Play();
-                //progressTimer.Start();
+                mView = mMediaElement;
 
                 /**
                  * the delegates that respond to the widget's events
@@ -111,7 +98,7 @@ namespace MoSync
                         eventData.WriteInt32(MAWidgetEventData_widgetHandle, mHandle);
                         mRuntime.PostCustomEvent(MoSync.Constants.EVENT_TYPE_WIDGET, eventData);
                     }
-                ); // end of mMediaElement.MediaOpened
+                ); // end of mMediaElement.MediaFailed
             }
 
 
@@ -220,28 +207,7 @@ namespace MoSync
             // helper method for setting the video's URI
             private void setURI(String myURI)
             {
-                // set video
-                try
-                {
-                    mMediaElement.Source = new Uri(myURI);
-                }
-                catch (ArgumentNullException /*e*/)
-                {
-                    mMediaElement.Source = null;
-                }
-                catch (UriFormatException /*e*/)
-                {
-                    mMediaElement.Source = null;
-                }
-
-                // Stop Progress Timer
-                if (mProgressTimer != null)
-                {
-                    if (mProgressTimer.IsEnabled)
-                    {
-                        mProgressTimer.Stop();
-                    }
-                }
+                // set video here
             }
 
             // play the video and MAW_VIDEO_VIEW_STATE_PLAYING
@@ -250,7 +216,7 @@ namespace MoSync
                 // play it
                 mMediaElement.Play();
 
-                // announce the event
+                // post the playing event
                 Memory eventData = new Memory(8);
                 const int MAWidgetEventData_eventType = 0;
                 const int MAWidgetEventData_widgetHandle = 4;
@@ -289,6 +255,33 @@ namespace MoSync
                 mRuntime.PostCustomEvent(MoSync.Constants.EVENT_TYPE_WIDGET, eventData);
             }
 
-        }
+            private Uri _SelectedVideoProperty;
+            public Uri SelectedVideoProperty
+            {
+                get
+                {
+                    return this._SelectedVideoProperty;
+                }
+                set
+                {
+                    this._SelectedVideoProperty = value;
+                    this.NotifyPropertyChanged("SelectedVideoProperty");
+                }
+            }
+
+
+            // Utility
+
+            public event PropertyChangedEventHandler PropertyChanged;
+
+            private void NotifyPropertyChanged(String info)
+            {
+                if (PropertyChanged != null)
+                {
+                    PropertyChanged(this, new PropertyChangedEventArgs(info));
+                }
+            }
+
+        } // end of class VideoView
     } // end of namespace NativeUI
 } // end of namespace MoSync
