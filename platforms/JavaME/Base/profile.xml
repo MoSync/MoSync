@@ -16,7 +16,7 @@
     <capability name="Fine" state="UNSUPPORTED" fragmentation="buildtime"/>
     <capability name="Coarse" state="UNSUPPORTED" fragmentation="buildtime"/>
   </capability>
-  <capability name="BlueTooth" state="UNSUPPORTED" fragmentation="buildtime"/>
+  <capability name="Bluetooth" state="UNSUPPORTED" fragmentation="buildtime"/>
   <capability name="Contacts" state="UNSUPPORTED" fragmentation="buildtime"/>
   <capability name="Calendar" state="UNSUPPORTED" fragmentation="buildtime"/>
   <capability name="Camera" state="UNSUPPORTED" fragmentation="buildtime"/>

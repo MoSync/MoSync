@@ -204,7 +204,7 @@ class JavaMEPlatform
     end
 
     def map_capability_name runtime_cap
-        return ["BlueTooth"] if(runtime_cap == "MA_PROF_SUPPORT_JAVAPACKAGE_BLUETOOTH")
+        return ["Bluetooth"] if(runtime_cap == "MA_PROF_SUPPORT_JAVAPACKAGE_BLUETOOTH")
         return ["Location"] if (runtime_cap == "MA_PROF_SUPPORT_JAVAPACKAGE_LOCATIONAPI")
         return ["SMS"] if (runtime_cap == "MA_PROF_SUPPORT_JAVAPACKAGE_WMAPI")
         return ["Camera"] if (runtime_cap == "MA_PROF_SUPPORT_CAMERA")
