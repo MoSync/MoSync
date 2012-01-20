@@ -62,15 +62,17 @@ namespace Wormhole
 	 */
 	bool NativeUIMessageHandler::handleMessage(Wormhole::MessageStream& stream)
 	{
-		char buffer[128];
-		const char * action = stream.getNext();
-
+		char buffer[1024];
+		printf("Getting the next action \n");
+		char * action = (char*)stream.getNext();
+		printf("action: %s\n", action);
 		// Widget Handling Calls
 		if(0 == strcmp("maWidgetCreate", action))
 		{
-			const char* widgetType = stream.getNext();
-			const char* widgetID = stream.getNext();
-			const char* callbackID = stream.getNext();
+			char* widgetType = (char*)stream.getNext();
+			char* widgetID = (char*)stream.getNext();
+			char* callbackID = (char*)stream.getNext();
+			printf("maWidgetCreate: %s, %s, %s\n", widgetType, widgetID, callbackID);
 			int numParams = stringToInteger(stream.getNext());
 
 			MAWidgetHandle widget = maWidgetCreate(widgetType);
@@ -85,26 +87,38 @@ namespace Wormhole
 				{
 					for(int i = 0; i < numParams/2; i++)
 					{
-						const char* property = stream.getNext();
-						const char* value = stream.getNext();
-						maWidgetSetProperty(widget, property, value);
+						char* property = (char*)stream.getNext();
+						char* value = (char*)stream.getNext();
+						printf("maWidgetSetProperty %s, %s\n", property, value);
+						int res = maWidgetSetProperty(widget, property, value);
+						if(res < 0)
+						{
+							printf("could not set property\n");
+						}
+						else
+						{
+							printf("set property done\n");
+						}
 					}
 				}
 				//We use a special callback for widget creation
+				printf("calling CallBack \n");
 				sprintf(
 					buffer,
 					"mosync.nativeui.createCallback('%s', '%s', %d)",
 					callbackID,
 					widgetID,
 					widget);
+				printf("Done creatign the script %s\n", buffer);
 				mWebView->callJS(buffer);
+				printf("done Calling Callback");
 			}
 
 		}
 		else if(0 == strcmp("maWidgetDestroy", action))
 		{
 			MAWidgetHandle widget = stringToInteger(stream.getNext());
-			const char* callbackID = stream.getNext();
+			char* callbackID = (char*)stream.getNext();
 
 			int res = maWidgetDestroy(widget);
 			if(res < 0)
@@ -122,7 +136,7 @@ namespace Wormhole
 		{
 			MAWidgetHandle parent = stringToInteger(stream.getNext());
 			MAWidgetHandle child = stringToInteger(stream.getNext());
-			const char* callbackID = stream.getNext();
+			char* callbackID = (char*)stream.getNext();
 			int res = maWidgetAddChild(parent, child);
 			if(res < 0)
 			{
@@ -137,10 +151,10 @@ namespace Wormhole
 		}
 		else if(0 == strcmp("maWidgetInsertChild", action))
 		{
-			MAWidgetHandle parent = stringToInteger(stream.getNext());
-			MAWidgetHandle child = stringToInteger(stream.getNext());
-			int index = stringToInteger(stream.getNext());
-			const char* callbackID = stream.getNext();
+			MAWidgetHandle parent = stringToInteger((char*)stream.getNext());
+			MAWidgetHandle child = stringToInteger((char*)stream.getNext());
+			int index = stringToInteger((char*)stream.getNext());
+			char* callbackID = (char*)stream.getNext();
 			int res = maWidgetInsertChild(parent, child, index);
 			if(res < 0)
 			{
@@ -156,7 +170,7 @@ namespace Wormhole
 		else if(0 == strcmp("maWidgetRemoveChild", action))
 		{
 			MAWidgetHandle child = stringToInteger(stream.getNext());
-			const char* callbackID = stream.getNext();
+			char* callbackID = (char*)stream.getNext();
 
 			int res = maWidgetRemoveChild(child);
 			if(res < 0)
@@ -173,8 +187,8 @@ namespace Wormhole
 		else if(0 == strcmp("maWidgetModalDialogShow", action))
 		{
 			MAWidgetHandle dialogHandle =
-					stringToInteger(stream.getNext());
-			const char* callbackID = stream.getNext();
+				stringToInteger(stream.getNext());
+			char* callbackID = (char*)stream.getNext();
 			int res = maWidgetModalDialogShow(dialogHandle);
 			if(res < 0)
 			{
@@ -191,7 +205,7 @@ namespace Wormhole
 		{
 			MAWidgetHandle dialogHandle =
 					stringToInteger(stream.getNext());
-			const char* callbackID = stream.getNext();
+			char* callbackID = (char*)stream.getNext();
 			int res = maWidgetModalDialogHide(dialogHandle);
 			if(res < 0)
 			{
@@ -208,7 +222,7 @@ namespace Wormhole
 		{
 			MAWidgetHandle screenHandle =
 					stringToInteger(stream.getNext());
-			const char* callbackID = stream.getNext();
+			char* callbackID = (char*)stream.getNext();
 			int res = maWidgetScreenShow(screenHandle);
 			if(res < 0)
 			{
@@ -227,7 +241,7 @@ namespace Wormhole
 					stringToInteger(stream.getNext());
 			MAWidgetHandle newScreen =
 					stringToInteger(stream.getNext());
-			const char* callbackID = stream.getNext();
+			char* callbackID = (char*)stream.getNext();
 			int res = maWidgetStackScreenPush(stackScreen, newScreen);
 			if(res < 0)
 			{
@@ -244,7 +258,7 @@ namespace Wormhole
 		{
 			MAWidgetHandle stackScreen =
 					stringToInteger(stream.getNext());
-			const char* callbackID = stream.getNext();
+			char* callbackID = (char*)stream.getNext();
 			int res = maWidgetStackScreenPop(stackScreen);
 			if(res < 0)
 			{
@@ -261,9 +275,9 @@ namespace Wormhole
 		{
 			MAWidgetHandle widget =
 					stringToInteger(stream.getNext());
-			const char *property = stream.getNext();
-			const char *value = stream.getNext();
-			const char* callbackID = stream.getNext();
+			char *property = (char*)stream.getNext();
+			char *value = (char*)stream.getNext();
+			char* callbackID = (char*)stream.getNext();
 			int res = maWidgetSetProperty(widget, property, value);
 			if(res < 0)
 			{
@@ -281,8 +295,8 @@ namespace Wormhole
 			char value[1024];
 			MAWidgetHandle widget =
 					stringToInteger(stream.getNext());
-			const char* property = stream.getNext();
-			const char* callbackID = stream.getNext();
+			char* property = (char*)stream.getNext();
+			char* callbackID = (char*)stream.getNext();
 
 			int res = maWidgetGetProperty(widget, property, value, 1024);
 			if(res < 0)
@@ -300,14 +314,15 @@ namespace Wormhole
 		// Tell the WebView that we have processed the stream, so that
 		// it can send the next one.
 
-		char replyScript[256];
-		const char * mosyncCallBackId = stream.getNext();
+		char replyScript[1024];
+		char * mosyncCallBackId = (char*)stream.getNext();
 		if(mosyncCallBackId != NULL)
 		{
 			sprintf(
 					replyScript,
 					"mosync.bridge.reply(%s)",
 					mosyncCallBackId);
+			printf("calling general callback %s\n", replyScript);
 			mWebView->callJS(replyScript);
 		}
 
@@ -319,7 +334,7 @@ namespace Wormhole
 	 */
 	void NativeUIMessageHandler::customEvent(const MAEvent& event)
 	{
-		char buffer[128];
+		char buffer[1024];
 
 		if(event.type == EVENT_TYPE_WIDGET)
 		{
@@ -412,14 +427,14 @@ namespace Wormhole
 
 	void NativeUIMessageHandler::sendNativeUIError(const char *data)
 	{
-		char script[1024];
+		char script[2048];
 		sprintf(script, "mosync.nativeui.error(%s)", data);
 		mWebView->callJS(script);
 	}
 
 	void NativeUIMessageHandler::sendNativeUISuccess(const char *data)
 	{
-		char script[1024];
+		char script[2048];
 		sprintf(script, "mosync.nativeui.success(%s)", data);
 		mWebView->callJS(script);
 	}
