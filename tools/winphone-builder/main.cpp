@@ -38,50 +38,16 @@ using namespace std;
 // AppManifest.xml should be modified from here to.
 // Add input parameters for project name, company name, version etc.
 
-#if 0	//unused
-static string integerToString(int i) {
-	char temp[16];
-	sprintf(temp, "%i", i);
-	return temp;
-}
-
-static char *readFileIntoMem(const char* filename, int *len) {
-	FILE *file = fopen(filename, "rb");
-	if(!file) return NULL;
-	fseek(file, 0, SEEK_END);
-	int length = ftell(file);
-	fseek(file, 0, SEEK_SET);
-	char *memory = new char[length];
-	fread(memory, length, 1, file);
-	fclose(file);
-	*len = length;
-	return memory;
-}
-
-static bool writeMemIntoFile(const char* filename, const char *mem, int len) {
-	FILE *file = fopen(filename, "wb");
-	if(!file) return false;
-	fwrite(mem, len, 1, file);
-	fclose(file);
-	return true;
-}
-#endif
-
 static void error(const char *why) GCCATTRIB(noreturn);
+static pugi::xml_node getNode(const pugi::xml_node& node, const std::string& xpath);
+static std::string createFileName(const std::string& name);
+static bool saveXML(pugi::xml_document& document, const std::string& outputFile);
+static bool updateWMAppManifest(const std::string& filename, const std::string& output, const std::string& projectName, const std::string& companyName, const std::string& version, const std::string& guid);
+
 static void error(const char *why) {
 	printf("error: %s\n", why);
 	exit(1);
 }
-
-#if 0	//unused
-static void replaceTemplateDefine(string &templateFile, const string &whatToReplace, const string &replacement) {
-	size_t index;
-	while((index=templateFile.find(whatToReplace))!=string::npos) {
-		int endOfReplacement = index+whatToReplace.length();
-		templateFile = templateFile.substr(0, index) + replacement + templateFile.substr(endOfReplacement, templateFile.size()-endOfReplacement);
-	}
-}
-#endif
 
 static pugi::xml_node getNode(const pugi::xml_node& node, const std::string& xpath)
 {
@@ -101,21 +67,12 @@ struct LibraryReference
 	std::string value;
 };
 
-std::string createFileName(const std::string& name)
+static std::string createFileName(const std::string& name)
 {
-	std::string ret = name;
-	for(size_t i = 0; i < ret.size(); i++)
-	{
-		if(ret[i] < 32)
-		{
-			ret[i] = '_';
-		}
-	}
-
-	return ret;
+	return name;
 }
 
-bool saveXML(pugi::xml_document& document, const std::string& outputFile)
+static bool saveXML(pugi::xml_document& document, const std::string& outputFile)
 {
 	pugi::xml_node decl = document.prepend_child(pugi::node_declaration);
 	decl.append_attribute("version").set_value("1.0");
@@ -128,7 +85,7 @@ bool saveXML(pugi::xml_document& document, const std::string& outputFile)
 	return true;
 }
 
-bool updateWMAppManifest(const std::string& filename, const std::string& output, const std::string& projectName, const std::string& companyName, const std::string& version, const std::string& guid)
+static bool updateWMAppManifest(const std::string& filename, const std::string& output, const std::string& projectName, const std::string& companyName, const std::string& version, const std::string& guid)
 {
 	pugi::xml_document document;
 	pugi::xml_parse_result res = document.load_file(filename.c_str());
