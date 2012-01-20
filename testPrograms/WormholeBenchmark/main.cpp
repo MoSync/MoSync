@@ -6,15 +6,15 @@
  */
 
 #include <Wormhole/WebAppMoblet.h>
+#include <Wormhole/MessageProtocol.h>
+#include <Wormhole/MessageStream.h>
+#include <Wormhole/MessageStreamJSON.h>
 #include <conprint.h>
-#include "MessageProtocol.h"
-#include "MessageStream.h"
-#include "MessageStreamJSON.h"
 
 // Namespaces we want to access.
 using namespace MAUtil; // Class Moblet
 using namespace NativeUI; // WebView widget.
-using namespace Wormhole; // Class WebAppMoblet
+using namespace Wormhole;
 
 /**
  * The application class.
@@ -45,7 +45,7 @@ public:
 	 */
 	void handleWebViewMessage(WebView* webView, MAHandle data)
 	{
-		App::MessageProtocol protocol(data);
+		MessageProtocol protocol(data);
 
 		if (protocol.isMessageStream())
 		{
@@ -63,7 +63,7 @@ public:
 
 	void handleMessageStream(WebView* webView, MAHandle data)
 	{
-		App::MessageStream stream(webView, data);
+		MessageStream stream(webView, data);
 
 		const char* p;
 
@@ -89,7 +89,7 @@ public:
 
 	void handleMessageStreamJSON(WebView* webView, MAHandle data)
 	{
-		App::MessageStreamJSON message(webView, data);
+		MessageStreamJSON message(webView, data);
 
 		while (message.next())
 		{
@@ -97,7 +97,7 @@ public:
 		}
 	}
 
-	void handleJSONMessage(App::MessageStreamJSON& message)
+	void handleJSONMessage(MessageStreamJSON& message)
 	{
 		if (message.is("JSONMessage"))
 		{

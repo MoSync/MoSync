@@ -7,12 +7,18 @@
 
 // Include Moblet for web applications.
 #include <Wormhole/WebAppMoblet.h>
-#include "PhoneGapMessageHandler.h"
+#include <Wormhole/MessageProtocol.h>
+#include <Wormhole/MessageStream.h>
+#include <Wormhole/Libs/JSONMessage.h>
+#include <Wormhole/Libs/PhoneGap/PhoneGapMessageHandler.h>
+#include <Wormhole/Libs/JSNativeUI/NativeUIMessageHandler.h>
+#include <Wormhole/Libs/JSNativeUI/ResourceMessageHandler.h>
+#include "MAHeaders.h"
 
 // Namespaces we want to access.
 using namespace MAUtil; // Class Moblet
 using namespace NativeUI; // WebView widget.
-using namespace Wormhole; // Class WebAppMoblet
+using namespace Wormhole;
 
 /**
  * The application class.
@@ -24,6 +30,11 @@ public:
 	{
 		// Create message handler for PhoneGap.
 		mPhoneGapMessageHandler = new PhoneGapMessageHandler(getWebView());
+
+		// Set the beep sound. This is defined in the
+		// Resources/Resources.lst file. You can change
+		// this by changing the sound file in that folder.
+		mPhoneGapMessageHandler->setBeepSound(BEEP_WAV);
 
 		// Enable message sending from JavaScript to C++.
 		enableWebViewMessages();
@@ -38,12 +49,23 @@ public:
 		// The page in the "LocalFiles" folder to
 		// show when the application starts.
 		showPage("index.html");
-		//showPage("filesystest-index.html");
 
 		// Initialize PhoneGap.
 		mPhoneGapMessageHandler->initializePhoneGap();
 	}
 
+	virtual ~MyMoblet()
+	{
+		if (NULL != mPhoneGapMessageHandler)
+		{
+			delete mPhoneGapMessageHandler;
+			mPhoneGapMessageHandler = NULL;
+		}
+	}
+
+	/**
+	 * For debugging.
+	 */
 	void printMessage(MAHandle dataHandle)
 	{
 		// Get length of the data, it is not zero terminated.
@@ -58,20 +80,18 @@ public:
 		// Zero terminate.
 		stringData[dataSize] = 0;
 
-		lprintfln("@@@ URL: %s\n",
-			WebViewMessage::unescape(stringData).c_str());
+		lprintfln("@@@ MOSYNC Message: %s\n", stringData);
 
 		free(stringData);
 	}
 
 	/**
-	 * This method is called when a key is pressed. It closes
-	 * the application when the back key (on Android) is pressed.
+	 * This method is called when a key is pressed.
 	 * Forwards the event to PhoneGapMessageHandler.
 	 */
 	void keyPressEvent(int keyCode, int nativeCode)
 	{
-		//forward to PhoneGap MessageHandler
+		// Forward to PhoneGap MessageHandler.
 		mPhoneGapMessageHandler->processKeyEvent(keyCode, nativeCode);
 	}
 
@@ -83,24 +103,87 @@ public:
 	 * the life-time of the call of this method, then it
 	 * will be deallocated.
 	 */
-	void handleWebViewMessage(WebView* webView, MAHandle urlData)
+	void handleWebViewMessage(WebView* webView, MAHandle data)
 	{
-		printMessage(urlData);
+		// For debugging.
+		printMessage(data);
 
-		// Create message object. This parses the message.
-		PhoneGapMessage message(webView, urlData);
-		if (message.is("PhoneGap"))
+		// Check the message protocol.
+		MessageProtocol protocol(data);
+		if (protocol.isMessageArrayJSON())
 		{
-			mPhoneGapMessageHandler->handleMessage(message);
-		}
+			// Create the message object. This parses the message data.
+			// The message object contains one or more messages.
+			JSONMessage message(webView, data);
 
-		// Tell the WebView that we have processed the message, so that
-		// it can send the next one.
-		callJS("bridge.messagehandler.processedMessage()");
+			// Loop through messages.
+			while (message.next())
+			{
+				// This detects the PhoneGap protocol.
+				if (message.is("PhoneGap"))
+				{
+					mPhoneGapMessageHandler->handlePhoneGapMessage(message);
+				}
+
+				// TODO: Add other protocols here as needed.
+				// Use the messageName param as the protocol identifier,
+				// them make else if statements to branch off message
+				// handling to the respective modules.
+			}
+		}
+		else if (protocol.isMessageStream())
+		{
+			handleMessageStream(webView, data);
+		}
+		else
+		{
+			lprintfln("@@@ MOSYNC: Undefined message protocol");
+		}
+	}
+
+	/**
+	 * Handles Stream messages(high performance), it is mainly used for NativeUI
+	 *
+	 * @param webView a pointer to the web view posting this message
+	 * @param data the stream of messages
+	 */
+	void handleMessageStream(WebView* webView, MAHandle data)
+	{
+		MessageStream stream(webView, data);
+
+		const char* p;
+
+		while (p = stream.getNext())
+		{
+			if (0 == strcmp(p, "NativeUI"))
+			{
+				//Forward NativeUI messages to the respective message handler
+				mNativeUIMessageHandler->handleMessage(stream);
+			}
+			else if (0 == strcmp(p, "Resource"))
+			{
+				//Forward Resource messages to the respective message handler
+				mResourceMessageHandler->handleMessage(stream);
+			}
+			else if (0 == strcmp(p, "close"))
+			{
+				close();
+			}
+		}
 	}
 
 private:
 	PhoneGapMessageHandler* mPhoneGapMessageHandler;
+
+	/**
+	 * Handler for NAtiveUI messages
+	 */
+	NativeUIMessageHandler* mNativeUIMessageHandler;
+
+	/**
+	 * Handler for resource messages used for NativeUI
+	 */
+	ResourceMessageHandler* mResourceMessageHandler;
 };
 
 /**

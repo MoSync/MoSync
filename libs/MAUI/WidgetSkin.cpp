@@ -17,12 +17,11 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "WidgetSkin.h"
 #include <MAUtil/Graphics.h>
-#include <MAUtil/PlaceholderPool.h>
 
 namespace MAUtil {
 	template<> hash_val_t THashFunction<MAUI::WidgetSkin::CacheKey>(const MAUI::WidgetSkin::CacheKey& data) {
 		return THashFunction<int>(data.w | (data.h<<12) | (((int)data.type)<<24)) - THashFunction<int>((int)data.skin);
-	}	
+	}
 }
 
 namespace MAUI {
@@ -34,7 +33,7 @@ namespace MAUI {
 		endX(32),
 		startY(16),
 		endY(32),
-		selectedTransparent(true), 
+		selectedTransparent(true),
 		unselectedTransparent(true)
 		{
 			rebuildRects();
@@ -47,7 +46,7 @@ namespace MAUI {
 		endX(endX),
 		startY(startY),
 		endY(endY),
-		selectedTransparent(selectedTransparent), 
+		selectedTransparent(selectedTransparent),
 		unselectedTransparent(unselectedTransparent)
 		{
 			setSelectedImage(selectedImage);
@@ -67,7 +66,7 @@ namespace MAUI {
 		this->selectedImage = image;
 		if(!selectedImage) return;
 		MAExtent imgSize = maGetImageSize(image);
-		
+
 		selectedImageWidth = EXTENT_X(imgSize);
 		selectedImageHeight = EXTENT_Y(imgSize);
 
@@ -91,7 +90,7 @@ namespace MAUI {
 		this->unselectedImage = image;
 		if(!unselectedImage) return;
 		MAExtent imgSize = maGetImageSize(image);
-		
+
 		unselectedImageWidth = EXTENT_X(imgSize);
 		unselectedImageHeight = EXTENT_Y(imgSize);
 
@@ -108,7 +107,7 @@ namespace MAUI {
 			imageHeight = unselectedImageHeight;
 		}
 
-		rebuildRects();	
+		rebuildRects();
 	}
 
 	void WidgetSkin::setStartX(int x) {
@@ -135,16 +134,16 @@ namespace MAUI {
 		maGetImageData(image, &data[dstPoint->x+dstPoint->y*scanLength], srcRect, scanLength);
 	}
 
-	
+
 	int WidgetSkin::calculateNumTiles(int width, int height) {
 		int numTilesX = 0;
 		int numTilesY = 0;
 		if(top.width)
-			numTilesX = (width-(right.width+left.width))/top.width; 
-		
+			numTilesX = (width-(right.width+left.width))/top.width;
+
 		if(left.height)
 			numTilesY =  (height-(top.height+bottom.height))/left.height;
-		
+
 		int numTiles = numTilesX*numTilesY;
 		if(left.width)
 			numTiles += numTilesY;
@@ -153,28 +152,28 @@ namespace MAUI {
 		if(top.height)
 			numTiles += numTilesX;
 		if(bottom.height)
-			numTiles += numTilesX;	
+			numTiles += numTilesX;
 		return numTiles;
 	}
-	
+
 	#define DEFAULT_CACHE_THRESHOLD (16*1024*1024)
 
 	HashMap<WidgetSkin::CacheKey, WidgetSkin::CacheElement> WidgetSkin::sCache;
 	int WidgetSkin::maxCacheSize = 	DEFAULT_CACHE_THRESHOLD;
 	bool WidgetSkin::useCache = false;
-	
+
 	void WidgetSkin::setMaxCacheSize(int c) {
 		maxCacheSize = c;
 	}
-	
+
 	void WidgetSkin::setCacheEnabled(bool e) {
 		useCache = e;
 	}
-	
-		
+
+
 	void WidgetSkin::flushCacheUntilNewImageFits(int numPixels) {
 		int totalPixelsInCache = numPixels;
-		
+
 		HashMap<CacheKey, CacheElement>::Iterator iter = sCache.begin();
 		while(iter != sCache.end()) {
 			totalPixelsInCache += iter->first.w*iter->first.h;
@@ -182,10 +181,10 @@ namespace MAUI {
 		}
 
 		int currentTime = maGetMilliSecondCount();
-		
+
 		while(totalPixelsInCache>maxCacheSize) {
 			int oldest = currentTime;
-			iter = sCache.begin();	
+			iter = sCache.begin();
 			HashMap<CacheKey, CacheElement>::Iterator best = sCache.end();
 			while(iter != sCache.end()) {
 				if(iter->second.lastUsed<oldest) {
@@ -195,34 +194,32 @@ namespace MAUI {
 				iter++;
 			}
 			if(best == sCache.end()) break;
-			maDestroyObject(best->second.image);
-			PlaceholderPool::put(best->second.image);
+			maDestroyPlaceholder(best->second.image);
 			sCache.erase(best);
 			totalPixelsInCache-=iter->first.w*iter->first.h;
 		}
 	}
-	
+
 	void WidgetSkin::flushCache() {
 		HashMap<CacheKey, CacheElement>::Iterator iter = sCache.begin();
 		while(iter != sCache.end()) {
-			maDestroyObject(iter->second.image);
-			PlaceholderPool::put(iter->second.image);
+			maDestroyPlaceholder(iter->second.image);
 			iter++;
 		}
 		sCache.clear();
 	}
-			
+
 	void WidgetSkin::addToCache(const CacheKey& key, const CacheElement& elem) {
 		sCache.insert(key, elem);
 	}
-	
+
 	MAHandle WidgetSkin::getFromCache(const CacheKey& key) {
 		HashMap<CacheKey, CacheElement>::Iterator s = sCache.find(key);
 		if(s == sCache.end()) return 0;
 		else return s->second.image;
-		
+
 	}
-		
+
 	void WidgetSkin::draw(int x, int y, int width, int height, eType type) {
 		MAHandle cached = 0;
 
@@ -232,10 +229,10 @@ namespace MAUI {
 			drawDirect(x, y, width, height, type);
 			return;
 		}
-		
+
 		CacheKey newKey = CacheKey(this, width, height, type);
 		cached =  getFromCache(newKey);
-		
+
 		// If we didn't find a cached widgetskin, let's generate one and save it in the cache.
 		if(!cached) {
 			// set malloc handler to null so that we can catch if we're out of heap and write directly to the screen then.
@@ -243,15 +240,15 @@ namespace MAUI {
 			int *data = new int[width*height];
 			if(!data) {
 				drawDirect(x, y, width, height, type);
-				return;		
+				return;
 			}
 			set_malloc_handler(mh);
 			drawToData(data, 0, 0, width, height, type);
 			CacheElement cacheElem;
 
-			flushCacheUntilNewImageFits(width*height);	
-			
-			cacheElem.image = PlaceholderPool::alloc();
+			flushCacheUntilNewImageFits(width*height);
+
+			cacheElem.image = maCreatePlaceholder();
 			if(maCreateImageRaw(cacheElem.image,data,EXTENT(width,height),1)!=RES_OK) {
 				maPanic(1, "Could not create raw image");
 			}
@@ -261,7 +258,7 @@ namespace MAUI {
 			cached = cacheElem.image;
 			addToCache(newKey, cacheElem);
 		}
-		
+
 		// Draw the cached widgetskin.
 		Gfx_drawImage(cached, x, y);
 	}
@@ -306,7 +303,7 @@ namespace MAUI {
 			int h = center.height;
 			if(j+center.height>y+height-bottom.height) {
 				center.height -= (j+center.height)-(y+height-bottom.height);
-			} 
+			}
 			for(int i = x+left.width; i < x+width-right.width; i+=center.width) {
 				dst.x = i; dst.y = j;
 				int w = center.width;
@@ -333,13 +330,13 @@ namespace MAUI {
 				if(i+top.width>x+width-right.width) {
 					top.width -= (i+w1)-(x+width-right.width);
 					bottom.width -= (i+w1)-(x+width-right.width);
-				} 
+				}
 				//maDrawImageRegion(image, &top, &dst, TRANS_NONE);
 				//maDrawImageRegion(image, &bottom, &dst2, TRANS_NONE);
 				drawRegion(image, data, width, &top, &dst);
 				drawRegion(image, data, width, &bottom, &dst2);
 
-				top.width = w1;			
+				top.width = w1;
 				bottom.width = w2;
 		}
 		}
@@ -354,13 +351,13 @@ namespace MAUI {
 				if(i+left.height>y+height-bottom.height) {
 					left.height -= (i+w1)-(y+height-bottom.height);
 					right.height -= (i+w1)-(y+height-bottom.height);
-				} 
+				}
 				//maDrawImageRegion(image, &left, &dst, TRANS_NONE);
 				//maDrawImageRegion(image, &right, &dst2, TRANS_NONE);
 				drawRegion(image, data, width, &left, &dst);
 				drawRegion(image, data, width, &right, &dst2);
 
-				left.height = w1;			
+				left.height = w1;
 				right.height = w2;
 		}
 		}
@@ -406,7 +403,7 @@ namespace MAUI {
 			int h = center.height;
 			if(j+center.height>y+height-bottom.height) {
 				center.height -= (j+center.height)-(y+height-bottom.height);
-			} 
+			}
 			for(int i = x+left.width; i < x+width-right.width; i+=center.width) {
 				dst.x = i; dst.y = j;
 				int w = center.width;
@@ -433,13 +430,13 @@ namespace MAUI {
 				if(i+top.width>x+width-right.width) {
 					top.width -= (i+w1)-(x+width-right.width);
 					bottom.width -= (i+w1)-(x+width-right.width);
-				} 
+				}
 				//maDrawImageRegion(image, &top, &dst, TRANS_NONE);
 				//maDrawImageRegion(image, &bottom, &dst2, TRANS_NONE);
 				Gfx_drawImageRegion(image, &top, &dst, TRANS_NONE);
 				Gfx_drawImageRegion(image, &bottom, &dst2, TRANS_NONE);
 
-				top.width = w1;			
+				top.width = w1;
 				bottom.width = w2;
 		}
 		}
@@ -454,13 +451,13 @@ namespace MAUI {
 				if(i+left.height>y+height-bottom.height) {
 					left.height -= (i+w1)-(y+height-bottom.height);
 					right.height -= (i+w1)-(y+height-bottom.height);
-				} 
+				}
 				//maDrawImageRegion(image, &left, &dst, TRANS_NONE);
 				//maDrawImageRegion(image, &right, &dst2, TRANS_NONE);
 				Gfx_drawImageRegion(image, &left, &dst, TRANS_NONE);
 				Gfx_drawImageRegion(image, &right, &dst2, TRANS_NONE);
 
-				left.height = w1;			
+				left.height = w1;
 				right.height = w2;
 		}
 		}
@@ -532,8 +529,8 @@ namespace MAUI {
 		if(startX>imageWidth)	maPanic(0, "WidgetSkin::rebuildRects startX>imageWidth");
 		if(endX>imageWidth)		maPanic(0, "WidgetSkin::rebuildRects endX>imageWidth");
 		if(startY>imageHeight)	maPanic(0, "WidgetSkin::rebuildRects startY>imageHeight");
-		if(endY>imageHeight)	maPanic(0, "WidgetSkin::rebuildRects endY>imageHeight");		
-#endif		
+		if(endY>imageHeight)	maPanic(0, "WidgetSkin::rebuildRects endY>imageHeight");
+#endif
 
 		SET_RECT(topLeft,     0,      0,      startX,     startY);
 		SET_RECT(top,         startX, 0,      endX,       startY);

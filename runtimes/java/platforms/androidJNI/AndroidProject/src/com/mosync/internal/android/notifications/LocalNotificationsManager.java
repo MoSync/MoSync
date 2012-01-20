@@ -316,7 +316,7 @@ public class LocalNotificationsManager
 	 */
 	public static void focusGained()
 	{
-		Log.e("@MoSync","LocalNotificationsManager - focusGained");
+//		Log.e("@MoSync","LocalNotificationsManager - focusGained");
 
 		mFocusState = true;
 	}
@@ -327,7 +327,7 @@ public class LocalNotificationsManager
 	 */
 	public static void focusLost()
 	{
-		Log.e("@MoSync","LocalNotificationsManager - focusLost");
+//		Log.e("@MoSync","LocalNotificationsManager - focusLost");
 
 		mFocusState = false;
 	}

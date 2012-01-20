@@ -62,6 +62,11 @@ public:
 	 */
 	virtual ~SettingsScreen();
 
+    /**
+     * Set the captured image path to the label.
+     * @param path the full path.
+     */
+    void setCapturedImagePath(const MAUtil::String path);
 private:
 	/**
 	 * Creates and adds main layout to the screen.
@@ -107,11 +112,6 @@ private:
 	 * Adds a list row for setting the camera roll flag.
 	 */
 	void addCameraRollFlagRow(ListView* listView);
-
-	/**
-	 * Adds a list row for setting the save to gallery flag.
-	 */
-	void addGalleryFlagRow(ListView* listView);
 
 	/**
 	 * Adds a list row for setting the camera controls flag.
@@ -223,11 +223,6 @@ private:
     CheckBox* mCameraRollCheckBox;
 
     /**
-     * Used for getting the save to galler flag.
-     */
-    CheckBox* mGalleryFlag;
-
-    /**
      * Used for setting the camera controls flag.
      */
     CheckBox* mCameraControlsCheckBox;
@@ -236,6 +231,11 @@ private:
      * Used for showing the Native Image Picker(image mode).
      */
     Button* mTakePictureBtn;
+
+    /**
+     * Used for showing where the image capture was saved.
+     */
+    Label* mTakenPicturePath;
 
     /**
      * Used for showing the Native Image Picker(video mode).
