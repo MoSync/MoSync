@@ -25,8 +25,7 @@ MA 02110-1301, USA.
 #define JSONPARSER_H_
 
 #include <MAUtil/Set.h>
-
-#include "YAJLDom.h"
+#include <yajl/YAJLDom.h>
 #include "../GraphAPI/GetFacebookObjects/FacebookObjects/Utilities.h"
 #include "../LOG.h"
 

@@ -41,9 +41,11 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define SMS_SEND "SMS/Send"
 #define SMS_RECEIVE "SMS/Receive"
 #define SMS_READ "SMS/Read"
-#define VIBRATE "Vibrate"
+#define VIBRATE "Vibration"
+#define VIBRATE_DEPRECATED "Vibrate"
 #define HOMESCREEN "Home Screen"
-#define AUTOSTART "Auto Start"
+#define AUTOSTART "Autostart"
+#define AUTOSTART_DEPRECATED "Auto Start"
 #define NFC "NFC"
 #define PUSH_NOTIFICATIONS "Push Notifications"
 

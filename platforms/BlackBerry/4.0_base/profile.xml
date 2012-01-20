@@ -5,7 +5,7 @@
   <capability name="Internet Access" state="REQUIRES_PERMISSION">
   <capability name="HTTPS" state="REQUIRES_PERMISSION"/>
   </capability>
-  <capability name="File System" state="REQUIRES_PERMISSION" fragmentation="runtime"/>
+  <capability name="File Storage" state="REQUIRES_PERMISSION" fragmentation="runtime"/>
   <capability name="SMS" state="REQUIRES_PERMISSION" fragmentation="runtime"/>
   <capability name="Contacts" state="REQUIRES_PERMISSION" fragmentation="runtime"/>
   <capability name="Calendar" state="REQUIRES_PERMISSION" fragmentation="runtime"/>

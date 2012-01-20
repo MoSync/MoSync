@@ -108,6 +108,7 @@
     <ClCompile Include="Shared.cpp" />
     <ClCompile Include="Symbian9Injector.cpp" />
     <ClCompile Include="WinmobileInjector.cpp" />
+    <ClCompile Include="WP7Injector.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AndroidInjector.h" />
@@ -122,6 +123,7 @@
     <ClInclude Include="Shared.h" />
     <ClInclude Include="Symbian9Injector.h" />
     <ClInclude Include="WinmobileInjector.h" />
+    <ClInclude Include="WP7Injector.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

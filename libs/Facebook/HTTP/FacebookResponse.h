@@ -24,7 +24,7 @@ MA 02110-1301, USA.
 #define FACEBOOKRESPONSE_H_
 
 #include <maapi.h>
-#include "../JSON_lib/YAJLDom.h"
+#include <yajl/YAJLDom.h>
 #include "HttpResponse.h"
 
 using namespace MAUtil;
