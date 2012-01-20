@@ -1,7 +1,12 @@
+var localPath;
+
 document.addEventListener("deviceready", function() {
 	document.getElementById("platform_li").innerHTML = "Platform: " + device.platform;
 	document.getElementById("plaformversion_li").innerHTML = "Version: " + device.version;
 	document.getElementById("deviceName_li").innerHTML = "Device: " + device.name;
+	bridge.file.getLocalPath(function(path){
+		localPath=path;
+	});
 }, true);
 
 var accelerometer = new SensorConnection("Accelerometer");
@@ -159,4 +164,9 @@ function captureImage()
 			{
 				alert("Error " + error.code);
 			});
+}
+
+function readData()
+{
+
 }
