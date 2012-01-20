@@ -41,7 +41,6 @@ static int j_inject(const char *jarFile, const char *pngFile) {
 	{
 		ifstream mfIn("META-INF/MANIFEST.MF");
 		ostringstream mfStrOut;
-		bool found = false;
 		while(1) {
 			mfIn.getline(buf, sizeof(buf));
 			if(!mfIn.good())
@@ -51,13 +50,8 @@ static int j_inject(const char *jarFile, const char *pngFile) {
 				// Modifying the manifest will lead to deployment problems,
 				// hence this fix
 				//mfStrOut << "MIDlet-1: " << name << ", " << pngFile << ", " << midlet << "\n";
-				found = true;
 			}
 			mfStrOut << buf << "\n";
-		}
-		if(!found) {
-			printf("Didn't find MIDlet-1! Not a valid J2ME application!\n");
-			return 1;
 		}
 		mfIn.close();
 		ofstream mfFileOut("META-INF/MANIFEST.MF");
