@@ -25,9 +25,6 @@ MA 02110-1301, USA.
 
 #include <ma.h>
 #include <mastdlib.h>
-#ifdef MAPIP
-#include <maprofile.h>
-#endif
 #include <conprint.h>
 
 #include "MAHeaders.h"
@@ -251,10 +248,8 @@ int MAMain()
 				maSetDrawTarget(0);
 				maSetColor(0x081020);
 				maFillRect(0, 0, gScreenWidth, gScreenHeight);
-#ifdef MA_PROF_SUPPORT_STYLUS
 			} else if(event.type == EVENT_TYPE_POINTER_PRESSED) {
 				mode ^= 1;
-#endif	// MA_PROF_SUPPORT_STYLUS
 			} else if(event.type == EVENT_TYPE_SCREEN_CHANGED) {
 				updateScreenDimensions();
 			} else if(event.type == EVENT_TYPE_CLOSE ||
