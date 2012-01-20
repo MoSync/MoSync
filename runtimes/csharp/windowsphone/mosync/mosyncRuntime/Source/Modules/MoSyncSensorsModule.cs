@@ -9,23 +9,24 @@ using System.Device.Location;
 
 namespace MoSync
 {
-    public class SensorsModule : IIoctlModule
-    {
-        private Accelerometer mAccelerometer = null;
-        private Compass mCompass = null;
-        private Gyroscope mGyroscope = null;
-        private Motion mMotion = null;
+	public class SensorsModule : IIoctlModule
+	{
+		private Accelerometer mAccelerometer = null;
+		private Compass mCompass = null;
+		private Gyroscope mGyroscope = null;
+		private Motion mMotion = null;
 		private GeoCoordinateWatcher mGeoWatcher = null;
 
-        private void SendSensorEventVector(Runtime runtime, int type, Vector3 data)
-        {
-            Memory eventData = new Memory(4 * 4);
-            eventData.WriteInt32(MoSync.Struct.MASensor.type, type);
-			eventData.WriteInt32(MoSync.Struct.MASensor.values + 0, MoSync.Util.ConvertToInt(data.X));
-			eventData.WriteInt32(MoSync.Struct.MASensor.values + 4, MoSync.Util.ConvertToInt(data.Y));
-			eventData.WriteInt32(MoSync.Struct.MASensor.values + 8, MoSync.Util.ConvertToInt(data.Z));
-            runtime.PostCustomEvent(MoSync.Constants.EVENT_TYPE_SENSOR, eventData);
-        }
+		private void SendSensorEventVector(Runtime runtime, int type, Vector3 data)
+		{
+			Memory evt = new Memory(5 * 4);
+			evt.WriteInt32(MoSync.Struct.MAEvent.type, MoSync.Constants.EVENT_TYPE_SENSOR);
+			evt.WriteInt32(MoSync.Struct.MAEvent.sensor.type, type);
+			evt.WriteInt32(MoSync.Struct.MAEvent.sensor.values + 0, MoSync.Util.ConvertToInt(data.X));
+			evt.WriteInt32(MoSync.Struct.MAEvent.sensor.values + 4, MoSync.Util.ConvertToInt(data.Y));
+			evt.WriteInt32(MoSync.Struct.MAEvent.sensor.values + 8, MoSync.Util.ConvertToInt(data.Z));
+			runtime.PostEvent(new Event(evt));
+		}
 
 		private void SendGeoEvent(Runtime runtime)
 		{
@@ -33,7 +34,7 @@ namespace MoSync
 
 		private int GetSensorIntervalDefaults(int interval)
 		{
-			switch(interval)
+			switch (interval)
 			{
 				case MoSync.Constants.SENSOR_RATE_FASTEST: return 50;
 				case MoSync.Constants.SENSOR_RATE_GAME: return 80;
@@ -44,113 +45,113 @@ namespace MoSync
 
 		}
 
-        public void Init(Ioctls ioctls, Core core, Runtime runtime)
-        {
+		public void Init(Ioctls ioctls, Core core, Runtime runtime)
+		{
 
-            ioctls.maSensorStart = delegate(int _sensor, int _interval)
-            {
+			ioctls.maSensorStart = delegate(int _sensor, int _interval)
+			{
 				_interval = GetSensorIntervalDefaults(_interval);
 
 				TimeSpan time = TimeSpan.FromMilliseconds((double)_interval);
 
-                if (_sensor == MoSync.Constants.SENSOR_TYPE_ACCELEROMETER &&
-                    Accelerometer.IsSupported)
-                {
-                    mAccelerometer = new Accelerometer();
+				if (_sensor == MoSync.Constants.SENSOR_TYPE_ACCELEROMETER &&
+						Accelerometer.IsSupported)
+				{
+					mAccelerometer = new Accelerometer();
 					mAccelerometer.TimeBetweenUpdates = time;
-                    mAccelerometer.CurrentValueChanged +=
-                        delegate(object sender, SensorReadingEventArgs<AccelerometerReading> args)
-                        {
-                            Vector3 acc = args.SensorReading.Acceleration;
-                            SendSensorEventVector(runtime, MoSync.Constants.SENSOR_TYPE_ACCELEROMETER, acc);
-                        };
+					mAccelerometer.CurrentValueChanged +=
+						delegate(object sender, SensorReadingEventArgs<AccelerometerReading> args)
+						{
+							Vector3 acc = args.SensorReading.Acceleration;
+							SendSensorEventVector(runtime, MoSync.Constants.SENSOR_TYPE_ACCELEROMETER, acc);
+						};
 
 					mAccelerometer.Start();
-                }
-                else if (_sensor == MoSync.Constants.SENSOR_TYPE_GYROSCOPE &&
-                    Gyroscope.IsSupported)
-                {
-                    mGyroscope = new Gyroscope();
+				}
+				else if (_sensor == MoSync.Constants.SENSOR_TYPE_GYROSCOPE &&
+						Gyroscope.IsSupported)
+				{
+					mGyroscope = new Gyroscope();
 					mGyroscope.TimeBetweenUpdates = time;
-                    mGyroscope.CurrentValueChanged +=
-                        delegate(object sender, SensorReadingEventArgs<GyroscopeReading> args)
-                        {
-                            Vector3 rot = args.SensorReading.RotationRate;
-                            SendSensorEventVector(runtime, MoSync.Constants.SENSOR_TYPE_GYROSCOPE, rot);
-                        };
+					mGyroscope.CurrentValueChanged +=
+						delegate(object sender, SensorReadingEventArgs<GyroscopeReading> args)
+						{
+							Vector3 rot = args.SensorReading.RotationRate;
+							SendSensorEventVector(runtime, MoSync.Constants.SENSOR_TYPE_GYROSCOPE, rot);
+						};
 
 					mGyroscope.Start();
-                }
-                else if (_sensor == MoSync.Constants.SENSOR_TYPE_MAGNETIC_FIELD &&
-                    Compass.IsSupported)
-                {
-                    mCompass = new Compass();
+				}
+				else if (_sensor == MoSync.Constants.SENSOR_TYPE_MAGNETIC_FIELD &&
+						Compass.IsSupported)
+				{
+					mCompass = new Compass();
 					mCompass.TimeBetweenUpdates = time;
-                    mCompass.CurrentValueChanged +=
-                        delegate(object sender, SensorReadingEventArgs<CompassReading> args)
-                        {
-                            Vector3 rot = args.SensorReading.MagnetometerReading;
-                            SendSensorEventVector(runtime, MoSync.Constants.SENSOR_TYPE_MAGNETIC_FIELD, rot);
-                        };
+					mCompass.CurrentValueChanged +=
+						delegate(object sender, SensorReadingEventArgs<CompassReading> args)
+						{
+							Vector3 rot = args.SensorReading.MagnetometerReading;
+							SendSensorEventVector(runtime, MoSync.Constants.SENSOR_TYPE_MAGNETIC_FIELD, rot);
+						};
 
 					mCompass.Start();
-                }
+				}
 #if false
-                else if (_sensor == MoSync.Constants.SENSOR_TYPE_ORIENTATION &&
-                    Motion.IsSupported)
-                {
-                    mMotion = new Motion();
-                    mMotion.TimeBetweenUpdates = new TimeSpan(intervalIn100Nanoseconds);
-                    mMotion.CurrentValueChanged +=
-                               delegate(object sender, SensorReadingEventArgs<MotionReading> args)
-                               {
-                               };
-                }
+        else if (_sensor == MoSync.Constants.SENSOR_TYPE_ORIENTATION &&
+					Motion.IsSupported)
+				{
+					mMotion = new Motion();
+					mMotion.TimeBetweenUpdates = new TimeSpan(intervalIn100Nanoseconds);
+					mMotion.CurrentValueChanged +=
+						delegate(object sender, SensorReadingEventArgs<MotionReading> args)
+						{
+						};
+				}
 #endif
-                else
-                    return MoSync.Constants.SENSOR_ERROR_NOT_AVAILABLE;
+				else
+					return MoSync.Constants.SENSOR_ERROR_NOT_AVAILABLE;
 
-                return MoSync.Constants.SENSOR_ERROR_NONE;
-            };
+				return MoSync.Constants.SENSOR_ERROR_NONE;
+			};
 
-            ioctls.maSensorStop = delegate(int _sensor)
-            {
-                switch (_sensor)
-                {
-                    case MoSync.Constants.SENSOR_TYPE_ACCELEROMETER:
-                        if (mAccelerometer != null)
-                        {
-                            mAccelerometer.Stop();
-                            mAccelerometer = null;
-                        }
-                        break;
-                    case MoSync.Constants.SENSOR_TYPE_GYROSCOPE:
-                        if (mGyroscope != null)
-                        {
-                            mGyroscope.Stop();
-                            mGyroscope = null;
-                        }
-                        break;
-                    case MoSync.Constants.SENSOR_TYPE_MAGNETIC_FIELD:
-                        if (mCompass != null)
-                        {
-                            mCompass.Stop();
-                            mCompass = null;
-                        }
-                        break;
-                    case MoSync.Constants.SENSOR_TYPE_ORIENTATION:
-                        if (mMotion != null)
-                        {
-                            mMotion.Stop();
-                            mMotion = null;
-                        }
-                        break;
-                }
-                return MoSync.Constants.SENSOR_ERROR_NONE;
-            };
+			ioctls.maSensorStop = delegate(int _sensor)
+			{
+				switch (_sensor)
+				{
+					case MoSync.Constants.SENSOR_TYPE_ACCELEROMETER:
+						if (mAccelerometer != null)
+						{
+							mAccelerometer.Stop();
+							mAccelerometer = null;
+						}
+						break;
+					case MoSync.Constants.SENSOR_TYPE_GYROSCOPE:
+						if (mGyroscope != null)
+						{
+							mGyroscope.Stop();
+							mGyroscope = null;
+						}
+						break;
+					case MoSync.Constants.SENSOR_TYPE_MAGNETIC_FIELD:
+						if (mCompass != null)
+						{
+							mCompass.Stop();
+							mCompass = null;
+						}
+						break;
+					case MoSync.Constants.SENSOR_TYPE_ORIENTATION:
+						if (mMotion != null)
+						{
+							mMotion.Stop();
+							mMotion = null;
+						}
+						break;
+				}
+				return MoSync.Constants.SENSOR_ERROR_NONE;
+			};
 
-            ioctls.maLocationStart = delegate()
-            {
+			ioctls.maLocationStart = delegate()
+			{
 				if (mGeoWatcher == null)
 				{
 					mGeoWatcher = new GeoCoordinateWatcher();
@@ -172,19 +173,19 @@ namespace MoSync
 					mGeoWatcher.Start();
 				}
 
-                return 0;
-            };
+				return 0;
+			};
 
-            ioctls.maLocationStop = delegate()
-            {
+			ioctls.maLocationStop = delegate()
+			{
 				if (mGeoWatcher != null)
 				{
 					mGeoWatcher.Stop();
 					mGeoWatcher = null;
 				}
 
-                return 0;
-            };
-        }
-    }
+				return 0;
+			};
+		}
+	}
 }
