@@ -5785,6 +5785,7 @@ group WidgetAPI "Widget API" {
 
 		/**
 		* @brief Specifies what editing mode the edit box should have.
+		* Those flags are mutual exclusive, so the previous value is always ignored.
 		*
 		* @validvalue One of the values #MAW_EDIT_BOX_TYPE_ANY, #MAW_EDIT_BOX_TYPE_EMAILADDR,
 		* #MAW_EDIT_BOX_TYPE_NUMERIC, #MAW_EDIT_BOX_TYPE_PHONENUMBER, #MAW_EDIT_BOX_TYPE_URL,
@@ -5801,6 +5802,7 @@ group WidgetAPI "Widget API" {
 
 		/**
 		* @brief Specifies the editing flags applied to the edit box.
+		* Those flags are mutual exclusive, so the previous value is always ignored.
 		*
 		* @validvalue One of the values #MAW_EDIT_BOX_FLAG_PASSWORD,
 		* #MAW_EDIT_BOX_FLAG_SENSITIVE, #MAW_EDIT_BOX_FLAG_INITIAL_CAPS_ALL_CHARACTERS,
@@ -5824,10 +5826,92 @@ group WidgetAPI "Widget API" {
 		*
 		* @par Example
 		* \code
-		*	maWidgetSetProperty(labelHandle, MAW_EDIT_BOX_FONT_COLOR, "0xff0000");
+		*	maWidgetSetProperty(editBoxHandle, MAW_EDIT_BOX_FONT_COLOR, "0xff0000");
 		* \endcode
 		*/
 		FONT_COLOR = "fontColor";
+
+		/**
+		* @brief Set the number of lines.
+		* Makes the edit box exactly this many lines tall. Note that setting this value
+		* overrides any other (minimum / maximum) number of lines or height setting.
+		* A single line edit box will set this value to 1.
+		* This property will automatically set MAW_EDIT_BOX_TYPE_ANY input mode, so that
+		* the edit box will become multiline.
+		* Available on Android only.
+		*
+		* @validvalue A positive integer.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(editBoxHandle, MAW_EDIT_BOX_LINES_NUMBER, "2");
+		* \endcode
+		*/
+		LINES_NUMBER = "linesNumber";
+
+		/**
+		* @brief Makes the edit box at most this many lines tall.
+		* Setting this value overrides any other (maximum) height setting.
+		* Available on Android only.
+		*
+		* @validvalue A positive integer.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(editBoxHandle, MAW_EDIT_BOX_MAX_LINES, "2");
+		* \endcode
+		*/
+		MAX_LINES = "maxLines";
+
+		/**
+		* @brief Makes the edit box at least this many lines tall.
+		* Setting this value overrides any other (minimum) height setting.
+		* Available on Android only.
+		*
+		* @validvalue A positive integer.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(editBoxHandle, MAW_EDIT_BOX_MIN_LINES, "1");
+		* \endcode
+		*/
+		MIN_LINES = "minLines";
+
+		/**
+		* @brief Sets or gets the maximum input lenght of the edit box.
+		* Setting this value enables multiline input mode by default.
+		* Available on Android only.
+		*
+		* @validvalue A positive integer.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(editBoxHandle, MAW_EDIT_BOX_MAX_LENGTH, "10");
+		* \endcode
+		*/
+		MAX_LENGTH = "maxLength";
+
+		/**
+		* @brief Sets the font color of the placeholder text when an edit box is empty.
+		*
+		* @validvalue A hexadecimal value 0xRRGGBB, where R, G and B are the red, green and blue components respectively.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(editBoxHandle, MAW_EDIT_BOX_PLACEHOLDER_FONT_COLOR, "0xff0000");
+		* \endcode
+		*/
+		PLACEHOLDER_FONT_COLOR = "placeholderFontColor";
 	}
 	} // end of WidgetEditBoxProperties
 
