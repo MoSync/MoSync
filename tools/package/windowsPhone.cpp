@@ -93,19 +93,17 @@ void packageWindowsPhone(const SETTINGS& s, const RuntimeInfo& ri) {
 	}
 
 	// Icons!
-	/*
 	if (s.icon) {
-		const string sizes[3] = { "57x57", "72x72", "114x114" };
-		const string filenames[3] = { "Icon.png", "Icon-72.png", "Icon@2x.png" };
+		const string sizes[2] = { "62x62", "173x173"};
+		const string filenames[2] = { "ApplicationIcon.png", "Background.png"};
 
-		for(int i = 0; i < 3; i++) {
+		for(int i = 0; i < 2; i++) {
 			std::ostringstream iconInjectCmd;
 			string size = sizes[i];
-			string outputIcon = xcodeprojOutput + "/" + filenames[i];
-			injectIcon("iOS", size.c_str(), s.icon, outputIcon.c_str(), s.silent);
+			string outputIcon = csprojOutput + "/" + filenames[i];
+			injectIcon("WP7", size.c_str(), s.icon, outputIcon.c_str(), s.silent);
 		}
 	}
-	*/
 
 	if (!s.WPgenerateOnly) {
 #ifdef PLATFORM_WIN32
