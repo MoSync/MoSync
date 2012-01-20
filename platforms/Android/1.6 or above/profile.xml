@@ -1,3 +1,0 @@
-<platform family="Android" variant="1.6 or above" runtime="android_4/1" inherit="Android/1.5 or above">
-  <capability name="Bluetooth" state="REQUIRES_PERMISSION"/>
-</platform>
