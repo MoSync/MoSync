@@ -47,8 +47,9 @@ static void initInjectors() {
 	gInjectors["symbian9"] = new Symbian9Injector();
 	gInjectors["android"] = new AndroidInjector();
 	gInjectors["iOS"] = new IOSInjector();
+#ifdef _WIN32 // for now..
 	gInjectors["WP7"] = new WP7Injector();
-
+#endif
 }
 
 static bool parseCmdLine(map<string, string>& params, int argc, char **argv) {
