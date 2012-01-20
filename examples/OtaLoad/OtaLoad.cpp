@@ -42,7 +42,6 @@ MA 02110-1301, USA.
 #include <MAUtil/Connection.h>
 #include <MAUtil/Moblet.h>
 #include <MAUtil/String.h>
-#include <MAUtil/PlaceholderPool.h>
 #include <MAUtil/util.h>
 #ifdef MAPIP
 #include <maprofile.h>
@@ -61,7 +60,7 @@ static const char* MODSAV = "OtaLoad.mod.sav";
 class MyMoblet : public Moblet, HttpConnectionListener {
 public:
 	MyMoblet() : mState(eIdle), mHttp(this) {
-		mProgram = PlaceholderPool::alloc();
+		mProgram = maCreatePlaceholder();
 
 		//read program from cache
 		MAHandle store = maOpenStore(SAV, 0);
@@ -98,13 +97,13 @@ private:
 		//read Last-Modified header from cache
 		MAHandle store = maOpenStore(MODSAV, 0);
 		if(store > 0) {
-			MAHandle data = PlaceholderPool::alloc();
+			MAHandle data = maCreatePlaceholder();
 			maReadStore(store, data);
 			int size = maGetDataSize(data);
 			if(size > 0) {
 				mLastModified.resize(size);
 				maReadData(data, mLastModified.pointer(), 0, size);
-				PlaceholderPool::put(data);
+				maDestroyPlaceholder(data);
 			}
 		}
 	}
@@ -141,13 +140,13 @@ private:
 #endif	// MA_PROF_SUPPORT_STYLUS
 
 	void startDownload() {
-	
+
 		if(0 == strcmp(URL, ""))
 		{
 			printf("No url provided, \nsee source code for \ninformation on how \nto use this example");
 			return;
 		}
-	
+
 		printf("Downloading from %s\n", URL);
 		//in case of re-download
 		mHttp.close();
@@ -199,7 +198,7 @@ private:
 
 		//save Last-Modified header to cache
 		mHttp.getResponseHeader("last-modified", &mLastModified);
-		MAHandle data = PlaceholderPool::alloc();
+		MAHandle data = maCreatePlaceholder();
 		maCreateData(data, mLastModified.length());
 		maWriteData(data, mLastModified.c_str(), 0, mLastModified.length());
 		MAHandle store = maOpenStore(MODSAV, MAS_CREATE_IF_NECESSARY);
@@ -212,7 +211,7 @@ private:
 			}
 			maCloseStore(store, 0);
 		}
-		PlaceholderPool::put(data);
+		maDestroyPlaceholder(data);
 
 		//save program to cache
 		store = maOpenStore(SAV, MAS_CREATE_IF_NECESSARY);

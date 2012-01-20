@@ -10,7 +10,7 @@ work.instance_eval do
 	@LSTFILES = ['Resources/Resources.lst']
 	@LIBRARIES = ['mautil', 'wormhole', 'mafs', 'nativeui']
 	@EXTRA_LINKFLAGS = standardMemorySettings(11)
-	@NAME = 'WebViewLoveSms'
+	@NAME = 'NFCExample'
 end
 
 work.invoke

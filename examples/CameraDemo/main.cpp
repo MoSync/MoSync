@@ -38,7 +38,6 @@ MA 02110-1301, USA.
 // getting and setting widget properties.
 #include "WidgetUtil.h"
 
-#include <MAUtil/PlaceholderPool.h>
 #include <conprint.h>
 #include <MAUtil/String.h>
 #include "SettingsScreen.h"

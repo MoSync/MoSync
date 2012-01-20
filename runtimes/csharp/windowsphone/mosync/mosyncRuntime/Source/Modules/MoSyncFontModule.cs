@@ -41,11 +41,11 @@ namespace MoSync
 			mAvailableFonts.Add(new FontInfo() { family = new FontFamily("Arial"), weight = FontWeights.Normal, style = FontStyles.Normal });
 			mAvailableFonts.Add(new FontInfo() { family = new FontFamily("Arial"), weight = FontWeights.Black, style = FontStyles.Normal });
 			mAvailableFonts.Add(new FontInfo() { family = new FontFamily("Arial"), weight = FontWeights.Bold, style = FontStyles.Normal });
-			mAvailableFonts.Add(new FontInfo() { family = new FontFamily("Arial"), weight = FontWeights.Normal, style = FontStyles.Italic});
+			mAvailableFonts.Add(new FontInfo() { family = new FontFamily("Arial"), weight = FontWeights.Normal, style = FontStyles.Italic });
 			mAvailableFonts.Add(new FontInfo() { family = new FontFamily("Calibri"), weight = FontWeights.Normal, style = FontStyles.Normal });
 			mAvailableFonts.Add(new FontInfo() { family = new FontFamily("Calibri"), weight = FontWeights.Bold, style = FontStyles.Normal });
 			mAvailableFonts.Add(new FontInfo() { family = new FontFamily("Calibri"), weight = FontWeights.Normal, style = FontStyles.Italic });
-			mAvailableFonts.Add(new FontInfo() { family = new FontFamily("Comic Sans MS"), weight = FontWeights.Normal, style = FontStyles.Normal});
+			mAvailableFonts.Add(new FontInfo() { family = new FontFamily("Comic Sans MS"), weight = FontWeights.Normal, style = FontStyles.Normal });
 			mAvailableFonts.Add(new FontInfo() { family = new FontFamily("Comic Sans MS"), weight = FontWeights.Bold, style = FontStyles.Normal });
 			mAvailableFonts.Add(new FontInfo() { family = new FontFamily("Courier New"), weight = FontWeights.Normal, style = FontStyles.Normal });
 			mAvailableFonts.Add(new FontInfo() { family = new FontFamily("Courier New"), weight = FontWeights.Bold, style = FontStyles.Normal });
@@ -81,7 +81,7 @@ namespace MoSync
 			mAvailableFonts.Add(new FontInfo() { family = new FontFamily("Wingdings"), weight = FontWeights.Normal, style = FontStyles.Normal });
 		}
 
-//		private List<GlyphTypeface> mFonts = new List<GlyphTypeface>();
+		//		private List<GlyphTypeface> mFonts = new List<GlyphTypeface>();
 		private List<FontInfo> mFonts = new List<FontInfo>();
 
 		int mCurrentFont = -1;
@@ -126,9 +126,9 @@ namespace MoSync
 
 				String fontName = core.GetDataMemory().ReadStringAtAddress(_postScriptName);
 
-				foreach(FontInfo finfo in mAvailableFonts)
+				foreach (FontInfo finfo in mAvailableFonts)
 				{
-					if(finfo.GetFullName() == fontName)
+					if (finfo.GetFullName() == fontName)
 					{
 						mFonts.Add(finfo);
 						return mFonts.Count - 1;
@@ -143,6 +143,14 @@ namespace MoSync
 
 				//RES_FONT_NO_TYPE_STYLE_COMBINATION
 				//RES_FONT_INVALID_SIZE
+				foreach (FontInfo finfo in mAvailableFonts)
+				{
+					if (finfo.GetFullName() == "Segoe WP")
+					{
+						mFonts.Add(finfo);
+						return mFonts.Count - 1;
+					}
+				}
 
 				switch (_type)
 				{

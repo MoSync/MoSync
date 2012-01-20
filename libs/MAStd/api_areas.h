@@ -108,10 +108,10 @@ Create, read, write binary objects, destroy objects, create resource handles.
 </td>
 <td>
 maCreateData(), maCreatePlaceholder(), maDestroyObject(), maGetDataSize(), maReadData(),<br>
-maWriteData()
+maWriteData(), maDestroyPlaceholder()
 </td>
 <td>
-MAUtil::DataHandler, MAUtil::PlaceholderPool
+MAUtil::DataHandler
 </td>
 <td>
 &nbsp;

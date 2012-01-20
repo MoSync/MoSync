@@ -13,7 +13,7 @@
     <capability name="Fine" state="REQUIRES_PERMISSION"/>
     <capability name="Coarse" state="REQUIRES_PERMISSION"/>
   </capability>
-  <capability name="BlueTooth" state="REQUIRES_PERMISSION"/>
+  <capability name="Bluetooth" state="REQUIRES_PERMISSION"/>
   <capability name="Contacts" state="REQUIRES_PERMISSION"/>
   <capability name="Calendar" state="REQUIRES_PERMISSION"/>
   <capability name="Camera" state="REQUIRES_PERMISSION"/>

@@ -316,17 +316,20 @@ public class MoSync extends Activity
 		else if ( resultCode == RESULT_OK &&
 				requestCode == MoSyncCapture.CAPTURE_MODE_RECORD_VIDEO_REQUEST )
 		{
+			Log.e("@@MoSync","Capture ready, control returned to MoSync activity.");
 			// A video was recorded.
 			MoSyncCapture.handleVideo(data);
 		}
 		else if ( resultCode == RESULT_OK &&
 				requestCode == MoSyncCapture.CAPTURE_MODE_TAKE_PICTURE_REQUEST )
 		{
+			Log.e("@@MoSync","Capture ready, control returned to MoSync activity.");
 			// A picture was taken.
 			MoSyncCapture.handlePicture(data);
 		}
 		else if ( resultCode == RESULT_CANCELED )
 		{
+			Log.e("@@MoSync","Capture canceled, control returned to MoSync activity.");
 			// Send MoSync event: the capture was canceled by the user.
 			MoSyncCapture.handleCaptureCanceled();
 		}
@@ -336,17 +339,12 @@ public class MoSync extends Activity
 	protected void onSaveInstanceState( Bundle outState )
 	{
 		Log.e("@@MoSync", "onSaveInstanceState");
-	    //outState.putBoolean( MoSyncCapture.PHOTO_TAKEN, MoSyncCapture.mPhotoTaken );
 	}
 
 	@Override
 	protected void onRestoreInstanceState( Bundle savedInstanceState)
 	{
 	    Log.i( "@@MoSync", "onRestoreInstanceState");
-//	    if( savedInstanceState.getBoolean( MoSyncCapture.PHOTO_TAKEN ) )
-//	    {
-//	    	MoSyncCapture.handlePicture(data)();
-//	    }
 	}
 
 	/**

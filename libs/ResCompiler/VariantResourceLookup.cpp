@@ -110,7 +110,7 @@ namespace ResourceCompiler
 		{
 			resourceTypes[i] = buffer->readByte();
 		}
-
+		PRINTINTARRAY(resourceTypes, numberOfResources);
 		DELETE(buffer)
 	}
 
@@ -241,7 +241,7 @@ namespace ResourceCompiler
 		int lastLoadedResource = -1;
 		for (int i=0; i<numberOfResources; i++)
 		{
-			if ( !checkDelayed || ((resourceTypes[getSmartHandle(i+1)] & 0x40) == 0) )
+			if ( !checkDelayed || ((resourceTypes[getSmartHandle(i+1) - 1] & 0x40) == 0) )
 			{
 				loadResource(i + 1, flag);
 				lastLoadedResource = i + 1;
