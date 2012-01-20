@@ -155,19 +155,47 @@ namespace MoSync
 				if (mGeoWatcher == null)
 				{
 					mGeoWatcher = new GeoCoordinateWatcher();
-					mGeoWatcher.MovementThreshold = 20;
+					//mGeoWatcher.MovementThreshold = 20;
 
 					mGeoWatcher.StatusChanged += delegate(object sender,
 						GeoPositionStatusChangedEventArgs args)
 					{
-
+						int maState;
+						switch (args.Status)
+						{
+							case GeoPositionStatus.Disabled:
+								maState = MoSync.Constants.MA_LPS_OUT_OF_SERVICE;
+								break;
+							case GeoPositionStatus.NoData:
+							case GeoPositionStatus.Initializing:
+								maState = MoSync.Constants.MA_LPS_TEMPORARILY_UNAVAILABLE;
+								break;
+							case GeoPositionStatus.Ready:
+								maState = MoSync.Constants.MA_LPS_AVAILABLE;
+								break;
+							default:
+								throw new Exception("invalid GeoPositionStatus");
+						}
+						Memory evt = new Memory(2 * 4);
+						evt.WriteInt32(MoSync.Struct.MAEvent.type, MoSync.Constants.EVENT_TYPE_LOCATION_PROVIDER);
+						evt.WriteInt32(MoSync.Struct.MAEvent.state, maState);
+						runtime.PostEvent(new Event(evt));
 					};
 
 					mGeoWatcher.PositionChanged += delegate(object sender,
 						GeoPositionChangedEventArgs<GeoCoordinate> args)
 					{
-
-
+						int maValidity = args.Position.Location.IsUnknown ?
+							MoSync.Constants.MA_LOC_INVALID : MoSync.Constants.MA_LOC_QUALIFIED;
+						Memory evt = new Memory(4 + 4 * 8 + 4);
+						GeoCoordinate l = args.Position.Location;
+						evt.WriteInt32(MoSync.Struct.MALocation.state, maValidity);
+						evt.WriteDouble(MoSync.Struct.MALocation.lat, l.Latitude);
+						evt.WriteDouble(MoSync.Struct.MALocation.lon, l.Longitude);
+						evt.WriteDouble(MoSync.Struct.MALocation.horzAcc, l.HorizontalAccuracy);
+						evt.WriteDouble(MoSync.Struct.MALocation.vertAcc, l.VerticalAccuracy);
+						evt.WriteFloat(MoSync.Struct.MALocation.alt, (float)l.Altitude);
+						runtime.PostCustomEvent(MoSync.Constants.EVENT_TYPE_LOCATION, evt);
 					};
 
 					mGeoWatcher.Start();
