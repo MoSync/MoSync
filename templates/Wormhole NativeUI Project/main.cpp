@@ -30,6 +30,10 @@ public:
 	{
 		// Create message handler for PhoneGap.
 		mPhoneGapMessageHandler = new PhoneGapMessageHandler(getWebView());
+		// Create message handler for NativeUI.
+		mNativeUIMessageHandler = new NativeUIMessageHandler(getWebView());
+		// Create message handler for Resources.
+		mResourceMessageHandler = new ResourceMessageHandler(getWebView());
 
 		// Set the beep sound. This is defined in the
 		// Resources/Resources.lst file. You can change
