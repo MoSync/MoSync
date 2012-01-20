@@ -1,0 +1,6 @@
+<platform family="Android" variant="2.0 or above" runtime="android_7/1" inherit="Android/1.6 or above">
+  <capability name="Autostart" state="REQUIRES_PERMISSION"/>
+  <capability name="NFC" state="REQUIRES_PERMISSION"/>
+  <capability name="Push Notifications" state="REQUIRES_PERMISSION"/>
+  <capability name="Home Screen" state="REQUIRES_PERMISSION"/>
+</platform>
