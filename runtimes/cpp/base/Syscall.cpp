@@ -232,9 +232,9 @@ namespace Base {
 					// On all platforms except Android, we load and add
 					// the image data. "dadd" means "delete and add",
 					// and is defined in runtimes\cpp\base\ResourceArray.h
-                    RT_IMAGE_Type* image = loadImage(b);
-                    if(!image)
-                        BIG_PHAT_ERROR(ERR_IMAGE_LOAD_FAILED);
+					RT_IMAGE_Type* image = loadImage(b);
+					if(!image)
+						BIG_PHAT_ERROR(ERR_IMAGE_LOAD_FAILED);
 					ROOM(resources.dadd_RT_IMAGE(rI, image));
 #else
 					// On Android images are stored on the Java side.
@@ -319,8 +319,6 @@ namespace Base {
 	* Loads all resources from the stream, except images, binaries and sprites.
 	*/
 	bool Syscall::loadResources(Stream& file, const char* aFilename)  {
-
-		int startPos = 0;
 		bool hasResources = true;
 		if(!file.isOpen())
 			hasResources = false;
@@ -330,7 +328,6 @@ namespace Base {
 			TEST(file.tell(pos));
 			if(len == pos)
 				hasResources = false;
-			startPos = pos;
 		}
 		if(!hasResources/* && aFilename != NULL*/) {
 			resources.init(0);
@@ -369,9 +366,7 @@ namespace Base {
 
 			int index = rI - 1;
 
-			resourceOffset[index] = 0;
-			file.tell(resourceOffset[index]);
-			resourceOffset[index] -= startPos;
+			TEST(file.tell(resourceOffset[index]));
 			resourceSize[index] = size;
 			resourceType[index] = type;
 
@@ -463,7 +458,7 @@ namespace Base {
 			return true;
 		}
 
-		TEST(file.seek(Seek::Current, offset));
+		TEST(file.seek(Seek::Start, offset));
 
 		switch(type) {
 		case RT_BINARY:
@@ -697,6 +692,17 @@ namespace Base {
 
 	SYSCALL(MAHandle, maCreatePlaceholder()) {
 		return (MAHandle) SYSCALL_THIS->resources.create_RT_PLACEHOLDER();
+	}
+
+	SYSCALL(void, maDestroyPlaceholder(MAHandle handle)) {
+		// If this is an existing dynamically allocated object,
+		// we destroy the object.
+		if (SYSCALL_THIS->resources.isDynamicResource(handle)) {
+			maDestroyObject(handle);
+		}
+
+		// Destroy (free) the placeholder.
+		SYSCALL_THIS->resources._maDestroyPlaceholder(handle);
 	}
 
 	SYSCALL(void, maDestroyObject(MAHandle handle)) {

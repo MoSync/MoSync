@@ -42,7 +42,9 @@ public:
 	/**
 	 * Make a JSON stringified string.
 	 */
-	static MAUtil::String JSONStringify(const MAUtil::String& str);
+	static MAUtil::String PhoneGapMessage::JSONStringify(const char* str);
+
+	static MAUtil::String PhoneGapMessage::base64Encode(const char* input);
 
 	/**
 	 * Constructor.
@@ -71,6 +73,21 @@ public:
 	 * of the JSON tree. Return 0 if the field does not exist.
 	 */
 	int getArgsFieldInt(const MAUtil::String& fieldName);
+
+	/**
+	 * Get the options parameters "create" and "exclusive"
+	 * from the JSON tree.
+	 * @return true on success, false on error.
+	 */
+	bool getJSONParamsOptionsCreateExclusive(
+		bool& create,
+		bool& exclusive);
+
+	/**
+	 * Get the parent fullPath of a directory entry from the JSON tree.
+	 * @return true on success, false on error.
+	 */
+	bool getJSONParamParentFullPath(MAUtil::String& destinationPath);
 
 protected:
 	MAUtil::YAJLDom::Value* mJSONRoot;

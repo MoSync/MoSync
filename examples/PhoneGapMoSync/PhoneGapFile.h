@@ -68,6 +68,9 @@ public:
 		const MAUtil::String& lastModifiedDate,
 		const MAUtil::String& size);
 
+	MAUtil::String emitMetadata(
+		const MAUtil::String& modificationTime);
+
 	void callSuccess(
 		const MAUtil::String& callbackID,
 		const MAUtil::String& args,
@@ -89,19 +92,44 @@ public:
 	 */
 	void actionRequestFileSystem(PhoneGapMessage& message);
 
+	void actionResolveLocalFileSystemURI(PhoneGapMessage& message);
+
 	/**
 	 * Return a FileEntry object.
 	 */
 	void actionGetFile(PhoneGapMessage& message);
 
 	/**
+	 * Return a DirectoryEntry object.
+	 */
+	void actionGetDirectory(PhoneGapMessage& message);
+
+	/**
 	 * Return a File object.
 	 */
 	void actionGetFileMetadata(PhoneGapMessage& message);
 
+	void actionGetMetadata(PhoneGapMessage& message);
+
 	void actionWrite(PhoneGapMessage& message);
 
 	void actionReadAsText(PhoneGapMessage& message);
+
+	void actionReadAsDataURL(PhoneGapMessage& message);
+
+	void actionTruncate(PhoneGapMessage& message);
+
+	void actionCopyTo(PhoneGapMessage& message);
+
+	void actionMoveTo(PhoneGapMessage& message);
+
+	void actionCopyMoveHelper(PhoneGapMessage& message, bool move);
+
+	void actionRemove(PhoneGapMessage& message);
+
+	void actionRemoveRecursively(PhoneGapMessage& message);
+
+	void actionReadEntries(PhoneGapMessage& message);
 
 private:
 	PhoneGapMessageHandler* mMessageHandler;

@@ -293,10 +293,9 @@ static void writeManifest(const char* filename, const SETTINGS& s, const Runtime
 		<<"\t\t</activity>\n"
 		;
 	file <<"\t\t<service android:name=\"com.mosync.internal.android.notifications.LocalNotificationsService\" />\n";
-   // if (ri.androidVersion >= 8) {
-writeC2DMReceiver(file, packageName);
 
-	//}
+	writeC2DMReceiver(file, packageName);
+
 	file <<"\t</application>\n"
 		<<"\t<uses-sdk android:minSdkVersion=\""<<ri.androidVersion<<"\" />\n"
 		;
@@ -338,6 +337,7 @@ static void writePermissions(ostream& stream, const SETTINGS& s, const RuntimeIn
 	parsePermissions(permissionSet, s.permissions);
 
 	writePermission(stream, isPermissionSet(permissionSet, VIBRATE), "android.permission.VIBRATE");
+	writePermission(stream, isPermissionSet(permissionSet, VIBRATE_DEPRECATED), "android.permission.VIBRATE");
 	writePermission(stream, isPermissionSet(permissionSet, INTERNET), "android.permission.INTERNET");
 	writePermission(stream, isPermissionSet(permissionSet, INTERNET), "android.permission.ACCESS_NETWORK_STATE");
 	writePermission(stream, isPermissionSet(permissionSet, LOCATION_COARSE), "android.permission.ACCESS_COARSE_LOCATION");
@@ -357,6 +357,7 @@ static void writePermissions(ostream& stream, const SETTINGS& s, const RuntimeIn
 	writePermission(stream, isPermissionSet(permissionSet, HOMESCREEN), "com.android.launcher.permission.INSTALL_SHORTCUT");
 	writePermission(stream, isPermissionSet(permissionSet, HOMESCREEN), "com.android.launcher.permission.UNINSTALL_SHORTCUT");
 	writePermission(stream, isPermissionSet(permissionSet, AUTOSTART), "android.permission.RECEIVE_BOOT_COMPLETED");
+	writePermission(stream, isPermissionSet(permissionSet, AUTOSTART_DEPRECATED), "android.permission.RECEIVE_BOOT_COMPLETED");
 
 	// Only add this for android 1.6 and higher.
 	if (ri.androidVersion >= 4)

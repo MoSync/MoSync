@@ -319,10 +319,10 @@ namespace MoSync
 				transWidth,
 				transHeight;
 
-			int dirHorizontalX = 0,
+			/*int dirHorizontalX = 0,
 				dirHorizontalY = 0,
 				dirVerticalX = 0,
-				dirVerticalY = 0;
+				dirVerticalY = 0;*/
 
 			switch (transformMode)
 			{
@@ -335,8 +335,8 @@ namespace MoSync
 					transBottomRightY = v + height - 1;
 					transWidth = width;
 					transHeight = height;
-					dirHorizontalX = 1;
-					dirVerticalY = 1;
+					//dirHorizontalX = 1;
+					//dirVerticalY = 1;
 					break;
 				case MoSync.Constants.TRANS_ROT90:
 					srcPitchX = -img.PixelWidth;
@@ -347,8 +347,8 @@ namespace MoSync
 					transBottomRightY = v;
 					transWidth = height;
 					transHeight = width;
-					dirHorizontalY = -1;
-					dirVerticalX = 1;
+					//dirHorizontalY = -1;
+					//dirVerticalX = 1;
 					break;
 				case MoSync.Constants.TRANS_ROT180:
 					srcPitchX = -bpp;
@@ -359,8 +359,8 @@ namespace MoSync
 					transBottomRightY = v;
 					transWidth = width;
 					transHeight = height;
-					dirHorizontalX = -1;
-					dirVerticalY = -1;
+					//dirHorizontalX = -1;
+					//dirVerticalY = -1;
 					break;
 				case MoSync.Constants.TRANS_ROT270:
 					srcPitchX = img.PixelWidth;
@@ -371,8 +371,8 @@ namespace MoSync
 					transBottomRightY = v + height - 1;
 					transWidth = height;
 					transHeight = width;
-					dirHorizontalY = 1;
-					dirVerticalX = -1;
+					//dirHorizontalY = 1;
+					//dirVerticalX = -1;
 					break;
 				case MoSync.Constants.TRANS_MIRROR:
 					srcPitchX = -bpp;
@@ -383,8 +383,8 @@ namespace MoSync
 					transBottomRightY = v + height - 1;
 					transWidth = width;
 					transHeight = height;
-					dirHorizontalX = -1;
-					dirVerticalY = 1;
+					//dirHorizontalX = -1;
+					//dirVerticalY = 1;
 					break;
 				case MoSync.Constants.TRANS_MIRROR_ROT90:
 					srcPitchX = -img.PixelWidth;
@@ -395,8 +395,8 @@ namespace MoSync
 					transBottomRightY = v;
 					transWidth = height;
 					transHeight = width;
-					dirHorizontalY = -1;
-					dirVerticalX = -1;
+					//dirHorizontalY = -1;
+					//dirVerticalX = -1;
 					break;
 				case MoSync.Constants.TRANS_MIRROR_ROT180:
 					srcPitchX = bpp;
@@ -407,8 +407,8 @@ namespace MoSync
 					transBottomRightY = v;
 					transWidth = width;
 					transHeight = height;
-					dirHorizontalX = 1;
-					dirVerticalY = -1;
+					//dirHorizontalX = 1;
+					//dirVerticalY = -1;
 					break;
 				case MoSync.Constants.TRANS_MIRROR_ROT270:
 					srcPitchX = img.PixelWidth;
@@ -419,8 +419,8 @@ namespace MoSync
 					transBottomRightY = v + height - 1;
 					transWidth = height;
 					transHeight = width;
-					dirHorizontalY = 1;
-					dirVerticalX = 1;
+					//dirHorizontalY = 1;
+					//dirVerticalX = 1;
 					break;
 				default:
 					MoSync.Util.CriticalError("Invalid transform!");
@@ -440,6 +440,7 @@ namespace MoSync
 
 			if (transWidth <= 0 || transHeight <= 0) return;
 
+			// TODO: Port clipping section.
 			/*
 			if (left >= clipRect.x + clipRect.width)
 				return;

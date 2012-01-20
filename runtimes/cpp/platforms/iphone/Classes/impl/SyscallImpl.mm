@@ -47,6 +47,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #import "CameraPreviewWidget.h"
 #import "CameraConfirgurator.h"
 #import "ImagePickerController.h"
+#import "Capture.h"
 #include "netImpl.h"
 #import "Reachability.h"
 
@@ -351,6 +352,7 @@ namespace Base {
         MAAudioClose();
         [OptionsDialogView deleteInstance];
         [ImagePickerController deleteInstance];
+        [Capture deleteInstance];
 	}
 
 
@@ -611,7 +613,7 @@ namespace Base {
             NSEnumerator *familyEnumerator=[[familyNames objectEnumerator] retain];
 
             NSString *familyName;
-            while(familyName=[familyEnumerator nextObject])
+            while((familyName=[familyEnumerator nextObject]))
             {
                 //These are the names we need
                 NSArray *fontNamesInFamily=[UIFont fontNamesForFamilyName:familyName];
@@ -1307,79 +1309,7 @@ namespace Base {
 
 #ifdef SUPPORT_OPENGL_ES
 
-
-// override implementations for broken bindings..
-#undef maIOCtl_glGetPointerv_case
-#define maIOCtl_glGetPointerv_case(func) \
-case maIOCtl_glGetPointerv: \
-{\
-GLenum _pname = (GLuint)a; \
-void* _pointer = GVMR(b, MAAddress);\
-wrap_glGetPointerv(_pname, _pointer); \
-return 0; \
-}
-
-#undef maIOCtl_glGetVertexAttribPointerv_case
-#define maIOCtl_glGetVertexAttribPointerv_case(func) \
-case maIOCtl_glGetVertexAttribPointerv: \
-{\
-GLuint _index = (GLuint)a; \
-GLenum _pname = (GLuint)b; \
-void* _pointer = GVMR(c, MAAddress);\
-wrap_glGetVertexAttribPointerv(_index, _pname, _pointer); \
-return 0; \
-}
-
-#undef maIOCtl_glShaderSource_case
-#define maIOCtl_glShaderSource_case(func) \
-case maIOCtl_glShaderSource: \
-{ \
-GLuint _shader = (GLuint)a; \
-GLsizei _count = (GLsizei)b; \
-void* _string = GVMR(c, MAAddress); \
-const GLint* _length = GVMR(SYSCALL_THIS->GetValidatedStackValue(0 VSV_ARGPTR_USE), GLint); \
-wrap_glShaderSource(_shader, _count, _string, _length); \
-return 0; \
-} \
-
-    void wrap_glShaderSource(GLuint shader, GLsizei count, void* strings, const GLint* length) {
-
-        int* stringsArray = (int*)strings;
-        const GLchar** strCopies = new const GLchar*[count];
-
-        for(int i = 0; i < count; i++) {
-            void* src = GVMR(stringsArray[i], MAAddress);
-            strCopies[i] = (GLchar*)src;
-        }
-
-        glShaderSource(shader, count, strCopies, length);
-        delete strCopies;
-    }
-
-
-    void wrap_glGetVertexAttribPointerv(GLuint index, GLenum pname, void* pointer) {
-        GLvoid* outPointer;
-        glGetVertexAttribPointerv(index, pname, &outPointer);
-
-        if(pname != GL_VERTEX_ATTRIB_ARRAY_POINTER)
-            return;
-
-        *(int*)pointer = gSyscall->TranslateNativePointerToMoSyncPointer(outPointer);
-    }
-
-    void wrap_glGetPointerv(GLenum pname, void* pointer) {
-        GLvoid* outPointer;
-        glGetPointerv(pname, &outPointer);
-
-        if(pname != GL_COLOR_ARRAY_POINTER &&
-           pname != GL_NORMAL_ARRAY_POINTER &&
-           pname != GL_POINT_SIZE_ARRAY_POINTER_OES &&
-           pname != GL_TEXTURE_COORD_ARRAY_POINTER &&
-           pname != GL_VERTEX_ARRAY_POINTER)
-            return;
-
-        *(int*)pointer = gSyscall->TranslateNativePointerToMoSyncPointer(outPointer);
-    }
+#include "GLFixes.h"
 
 	int maOpenGLInitFullscreen(int glApi) {
 		if(sOpenGLScreen != -1) return 0;
@@ -1994,6 +1924,31 @@ return 0; \
         return [[NotificationManager getInstance] getApplicationIconBadgeNumber];
 	}
 
+    SYSCALL(int, maCaptureSetProperty(const char* property, const char* value))
+	{
+        return [[Capture getInstance] setProperty:property withValue:value];
+	}
+    SYSCALL(int, maCaptureGetProperty(const char* property, char* value, const int bufSize))
+	{
+        return [[Capture getInstance] getProperty:property value:value maxSize:bufSize];
+	}
+    SYSCALL(int, maCaptureAction(const int action))
+	{
+        return [[Capture getInstance] action:action];
+	}
+    SYSCALL(int, maCaptureWriteImage(const int handle, const char* fullPath, const int fullPathSize))
+	{
+        return [[Capture getInstance] writeImage:handle withPath:fullPath maxSize:fullPathSize];
+	}
+    SYSCALL(int, maCaptureGetVideoPath(const int handle, char* buffer, const int bufferSize))
+	{
+        return [[Capture getInstance] getVideoPath:handle buffer:buffer maxSize:bufferSize];
+	}
+    SYSCALL(int, maCaptureDestroyData(const int handle))
+	{
+        return [[Capture getInstance] destroyData:handle];
+	}
+
 	SYSCALL(longlong, maIOCtl(int function, int a, int b, int c))
 	{
 		switch(function) {
@@ -2103,6 +2058,13 @@ return 0; \
 		maIOCtl_case(maDBCursorGetColumnText);
 		maIOCtl_case(maDBCursorGetColumnInt);
 		maIOCtl_case(maDBCursorGetColumnDouble);
+		maIOCtl_case(maCaptureSetProperty);
+		maIOCtl_case(maCaptureGetProperty);
+		maIOCtl_case(maCaptureAction);
+		maIOCtl_case(maCaptureWriteImage);
+		maIOCtl_case(maCaptureGetVideoPath);
+		maIOCtl_case(maCaptureDestroyData);
+
 		maIOCtl_IX_WIDGET_caselist
 #ifdef SUPPORT_OPENGL_ES
 		maIOCtl_IX_OPENGL_ES_caselist;

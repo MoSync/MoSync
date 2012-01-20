@@ -85,11 +85,13 @@ var mosync = (function()
 
 		encoder.encodeString = function(s)
 		{
-			return ""
+			var encodedString = "";
+			return encodedString.concat(encoder.itox(s.length), " ", s, " ");
+				/*""
 				+ encoder.itox(s.length)
 				+ " "
 				+ s
-				+ " ";
+				+ " ";*/
 		};
 
 		return encoder;
@@ -150,8 +152,9 @@ var mosync = (function()
 			// If we have a callbackId, push that too, as a string value.
 			if (null != callbackId)
 			{
-				messageQueue.push("" + callbackId);
+				messageQueue.push(String(callbackId));
 			}
+
 
 			// Start timer for sender function.
 			// This will get called once sequential
@@ -230,8 +233,9 @@ var mosync = (function()
 				var data = "ms:";
 				for (var i in messageQueue)
 				{
-					data += mosync.encoder.encodeString(messageQueue[i]);
+					data = data.concat(mosync.encoder.encodeString(String(messageQueue[i])));
 				}
+
 				messageQueue = [];
 				bridge.sendRaw(data);
 			}

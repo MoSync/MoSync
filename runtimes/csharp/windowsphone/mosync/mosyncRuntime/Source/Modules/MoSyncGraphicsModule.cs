@@ -368,12 +368,9 @@ namespace MoSync
 					}
 				}
 
-				runtime.SetResource(_placeholder,
-					new Resource(
-						bitmap,
-						MoSync.Constants.RT_IMAGE
-						)
-					);
+				Resource res = runtime.GetResource(MoSync.Constants.RT_PLACEHOLDER, _placeholder);
+				res.SetInternalObject(bitmap);
+				res.SetResourceType(MoSync.Constants.RT_IMAGE);
 				return MoSync.Constants.RES_OK;
 			};
 
@@ -448,19 +445,22 @@ namespace MoSync
 			syscalls.maCreateImageFromData = delegate(int _placeholder, int _data, int _offset, int _size)
 			{
 				Resource res = runtime.GetResource(MoSync.Constants.RT_BINARY, _data);
-				Memory mem = (Memory)res.GetInternalObject();
-
-				Stream s = mem.GetStream(_offset, _size);
+				if (res == null)
+					return MoSync.Constants.RES_BAD_INPUT;
+				Stream bin = (Stream)res.GetInternalObject();
+				if (bin == null)
+					return MoSync.Constants.RES_BAD_INPUT;
+				BoundedStream s = new BoundedStream(bin, _offset, _size);
+				//Stream s = mem.GetStream(_offset, _size);
 				WriteableBitmap bitmap = MoSync.Util.CreateWriteableBitmapFromStream(s);
 				s.Close();
-				runtime.SetResource(
-					_placeholder,
-					new Resource(
-						bitmap,
-						MoSync.Constants.RT_IMAGE
-						)
-				);
 
+				if (bitmap == null)
+					return MoSync.Constants.RES_BAD_INPUT;
+
+				Resource imageRes = runtime.GetResource(MoSync.Constants.RT_PLACEHOLDER, _placeholder);
+				imageRes.SetInternalObject(bitmap);
+				imageRes.SetResourceType(MoSync.Constants.RT_IMAGE);
 				return MoSync.Constants.RES_OK;
 			};
 		}

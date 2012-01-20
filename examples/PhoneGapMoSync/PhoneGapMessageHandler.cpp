@@ -28,6 +28,8 @@ MA 02110-1301, USA.
 #include <conprint.h>
 #include "PhoneGapMessageHandler.h"
 #include "MAHeaders.h"
+#include "PushNotification/PhoneGapNotificationManager.h"
+#include "maapi.h"
 
 // NameSpaces we want to access.
 using namespace MAUtil; // Class Moblet, String
@@ -40,9 +42,18 @@ using namespace Wormhole; // Class WebAppMoblet
 PhoneGapMessageHandler::PhoneGapMessageHandler(NativeUI::WebView* webView) :
 	mWebView(webView),
 	mPhoneGapSensors(this),
-	mPhoneGapFile(this)
+	mPhoneGapFile(this),
+	mPhoneGapSensorManager(this),
+	mPhoneGapCapture(this),
+	mPhoneGapNotificationManager(NULL)
 {
 	enableHardware();
+	mPhoneGapNotificationManager = new PhoneGapNotificationManager(this);
+
+	for(int i = 0; i < MAXIMUM_SENSORS; i++)
+	{
+		mSensorEventToManager[MAXIMUM_SENSORS] = false;
+	}
 }
 
 /**
@@ -50,7 +61,7 @@ PhoneGapMessageHandler::PhoneGapMessageHandler(NativeUI::WebView* webView) :
  */
 PhoneGapMessageHandler::~PhoneGapMessageHandler()
 {
-	// Nothing needs to be explicitly destroyed.
+	delete mPhoneGapNotificationManager;
 }
 
 /**
@@ -108,9 +119,21 @@ bool PhoneGapMessageHandler::handleMessage(PhoneGapMessage& message)
 	{
 		mPhoneGapSensors.handleMessage(message);
 	}
+	else if (message.getParam("service") == "SensorManager")
+	{
+		mPhoneGapSensorManager.handleMessage(message);
+	}
 	else if (message.getParam("service") == "File")
 	{
 		mPhoneGapFile.handleMessage(message);
+	}
+	else if (message.getParam("service") == "PushNotification")
+	{
+		mPhoneGapNotificationManager->handleMessage(message);
+	}
+	else if (message.getParam("service") == "Capture")
+	{
+		mPhoneGapCapture.handleMessage(message);
 	}
 	else
 	{
@@ -121,6 +144,19 @@ bool PhoneGapMessageHandler::handleMessage(PhoneGapMessage& message)
 	// Message was handled.
 	return true;
 }
+
+/**
+ * processes the Key Events and sends the appropriate message to
+ * PhoneGap
+ */
+void PhoneGapMessageHandler::processKeyEvent(int keyCode, int NativeCode)
+{
+	if(MAK_BACK == keyCode)
+	{
+		mWebView->callJS("PhoneGapCommandResult('backbutton');");
+	}
+}
+
 
 void PhoneGapMessageHandler::sendConnectionType(MAUtil::String callbackID)
 {
@@ -186,9 +222,16 @@ void PhoneGapMessageHandler::sendDeviceProperties(MAUtil::String callbackID)
 		deviceOSVersion,
 		256);
 
+	//Due to some limitations on some devices
+	//We have to check the UUID separately
+	if(uuidRes < 0)
+	{
+		//PhoneGap does not return an error if it cannot read UUID
+		//So we just return a value for the phoneGap apps to work
+		sprintf(deviceUUID, "Not Accessible");
+	}
 	//if Any of the above commands fail send an error to PhoneGap
 	if((nameRes < 0)
-		|| (uuidRes < 0)
 		|| (osRes < 0)
 		|| (osVersionRes < 0))
 	{
@@ -240,6 +283,16 @@ void PhoneGapMessageHandler::customEvent(const MAEvent& event)
 	{
 		mPhoneGapSensors.sendLocationData(event);
 	}
+	else if (event.type == EVENT_TYPE_FOCUS_LOST)
+	{
+		//let the phoneGap app know that it should go to sleep
+		mWebView->callJS("PhoneGapCommandResult('pause');");
+	}
+	else if (event.type == EVENT_TYPE_FOCUS_GAINED)
+	{
+		//let the PhoneGap side know that it should resume
+		mWebView->callJS("PhoneGapCommandResult('resume');");
+	}
 }
 
 /**
@@ -249,47 +302,22 @@ void PhoneGapMessageHandler::customEvent(const MAEvent& event)
  */
 void PhoneGapMessageHandler::sensorEvent(MASensor sensorData)
 {
-	if (sensorData.type == SENSOR_TYPE_ACCELEROMETER)
+	if(mSensorEventToManager[sensorData.type] == false)
 	{
-		mPhoneGapSensors.sendAccelerometerData(sensorData);
+		if (sensorData.type == SENSOR_TYPE_ACCELEROMETER)
+		{
+			mPhoneGapSensors.sendAccelerometerData(sensorData);
+		}
+		else if (sensorData.type == SENSOR_TYPE_ORIENTATION)
+		{
+			mPhoneGapSensors.sendCompassData(sensorData);
+		}
 	}
-	else if (sensorData.type == SENSOR_TYPE_ORIENTATION)
+	else
 	{
-		mPhoneGapSensors.sendCompassData(sensorData);
+		mPhoneGapSensorManager.sendSensorData(sensorData);
 	}
 }
-
-///**
-// * General wrapper for phoneGap success callback.
-// * If an operation is successful this function should be called.
-// *
-// * @param data the data that should be passed to the callback function
-// */
-//void PhoneGapMessageHandler::sendPhoneGapSuccess(const char* data)
-//{
-//	char script[1024];
-//	sprintf(script, "PhoneGap.CallbackSuccess(%s)", data);
-//	mWebView->callJS(script);
-//}
-//
-///**
-// * General wrapper for phoneGap success callback.
-// * If an operation is successful this function should be called.
-// *
-// * @param data the data that should be passed to the callback function
-// */
-//void PhoneGapMessageHandler::sendPhoneGapError(
-//		const char* data,
-//		MAUtil::String callbackID)
-//{
-//	char script[1024];
-//	sprintf(
-//		script,
-//		"PhoneGap.CallbackError(\"%s\", \"{\"message\" : \"%s\"}\")",
-//		callbackID.c_str(),
-//		data);
-//	mWebView->callJS(script);
-//}
 
 /**
  * Call the PhoneGap success function.
@@ -335,7 +363,7 @@ void PhoneGapMessageHandler::callError(
 {
 	String args =
 		"{\"code\":" + errorCode +
-		"\"message\":\"" + errorMessage + "\"}";
+		",\"message\":\"" + errorMessage + "\"}";
 
 	callCallback(
 		"PhoneGap.CallbackError",
@@ -372,7 +400,7 @@ void PhoneGapMessageHandler::callCallback(
 
 	script += ",'{";
 	script += "\"status\":" + status;
-	script += ",\"message\": " + args;
+	script += ",\"message\":" + args;
 
 	if (keepCallback)
 	{
@@ -401,4 +429,14 @@ void PhoneGapMessageHandler::callCallback(
 void PhoneGapMessageHandler::callJS(const String& script)
 {
 	mWebView->callJS(script);
+}
+
+/**
+ * Set the target class for sensor event messages.
+ * @param sensor The sensor that is configured.
+ * @param toSensorManager If true, the SensorManager object will receive the events, normal PhoneGap API if false
+ */
+void PhoneGapMessageHandler::setSensorEventTarget(int sensor, bool toSensorManager)
+{
+	mSensorEventToManager[sensor] = toSensorManager;
 }

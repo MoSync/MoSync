@@ -4,8 +4,6 @@ using Microsoft.Phone.Info;
 using System.Windows;
 using System.Collections.Generic;
 using System.Net.NetworkInformation;
-using Microsoft.Xna.Framework.Audio;
-using Microsoft.Xna.Framework;
 using System.Globalization;
 
 namespace MoSync
@@ -75,10 +73,18 @@ namespace MoSync
                 return (int)Util.ToUnixTime(System.DateTime.Now);
             };
 
-            syscalls.maCreatePlaceholder = delegate()
-            {
-                return runtime.AddResource(new Resource(null, MoSync.Constants.RT_PLACEHOLDER));
-            };
+						syscalls.maCreatePlaceholder = delegate()
+						{
+							Resource res = new Resource(null, MoSync.Constants.RT_PLACEHOLDER, true);
+							return runtime.AddResource(res);
+						};
+
+						syscalls.maDestroyPlaceholder = delegate(int res)
+						{
+							if (!runtime.GetResource(0, res).IsDynamicPlaceholder())
+								MoSync.Util.CriticalError("maDestroyPlaceholder can only be used on handles created by maCreatePlaceholder.");
+							runtime.RemoveResource(res);
+						};
 
             syscalls.maFindLabel = delegate(int _name)
             {
@@ -92,12 +98,6 @@ namespace MoSync
 
             syscalls.maResetBacklight = delegate()
             {
-            };
-
-            syscalls.maSoundPlay = delegate(int _sound_res, int _offset, int _size)
-            {
-                // not implemented, but I don't wanna throw exceptions.
-                return -1;
             };
 
 			syscalls.maVibrate = delegate(int _ms)
@@ -121,8 +121,9 @@ namespace MoSync
                 throw new Exception("maLoadProgram not available in rebuild mode");
 #else
                 Resource res = runtime.GetResource(MoSync.Constants.RT_BINARY, _data);
-                Memory mem = (Memory)res.GetInternalObject();
-                MoSync.Machine.SetLoadProgram(mem.GetStream(), _reload != 0);
+                //Memory mem = (Memory)res.GetInternalObject();
+				Stream mem = (Stream)res.GetInternalObject();
+                MoSync.Machine.SetLoadProgram(mem, _reload != 0);
                 throw new Util.ExitException(0);
 #endif
             };
