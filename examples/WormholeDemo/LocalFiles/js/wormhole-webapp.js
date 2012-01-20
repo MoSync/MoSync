@@ -1,4 +1,454 @@
 /*
+Copyright (C) 2011 MoSync AB
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License,
+version 2, as published by the Free Software Foundation.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+MA 02110-1301, USA.
+*/
+
+/**
+ * @file mosync-bridge.js
+ * @author Mikael Kindborg, Ali Sarrafi
+ *
+ * Library for JavaScript to C++ communication on the MoSync platform.
+ */
+
+/**
+ * Create a global instance of the library.
+ */
+var mosync = (function()
+{
+	var mosync = {};
+
+	// Detect platform.
+
+	mosync.isAndroid =
+		(navigator.userAgent.indexOf("Android") != -1)
+			? true : false;
+
+	mosync.isIOS =
+		(navigator.userAgent.indexOf("iPod") != -1)
+		|| (navigator.userAgent.indexOf("iPhone") != -1)
+		|| (navigator.userAgent.indexOf("iPad") != -1)
+			? true : false;
+
+	mosync.isWindowsPhone =
+		(navigator.userAgent.indexOf("Windows Phone OS") != -1)
+			? true : false;
+
+	// console.log does not work on WP7.
+	if (mosync.isWindowsPhone)
+	{
+		console.log = function(s) { };
+	}
+
+	// The encoder submodule.
+
+	mosync.encoder = (function()
+	{
+		var encoder = {};
+		var firstChar = 33;
+		var lastChar = 126;
+		var base = lastChar - firstChar;
+
+		encoder.itox = function(i)
+		{
+			var n = i;
+			var digits = [];
+
+			while (n > base)
+			{
+				digits.push((n % base) + firstChar);
+				n = (n / base) >> 0;
+			}
+			digits.push(n + firstChar);
+
+			return String.fromCharCode.apply(null, digits);
+		};
+
+		encoder.xtoi = function(s)
+		{
+			var n = 0;
+			var length = s.length;
+
+			for (var i = 0; i < length; ++i)
+			{
+				n += Math.pow(base, i) * (s.charCodeAt(i) - firstChar);
+			}
+
+			return n;
+		};
+
+		encoder.encodeString = function(s)
+		{
+			var encodedString = "";
+			return encodedString.concat(encoder.itox(s.length), " ", s, " ");
+				/*""
+				+ encoder.itox(s.length)
+				+ " "
+				+ s
+				+ " ";*/
+		};
+
+		return encoder;
+	}
+	)();
+
+	// The bridge submodule.
+
+	mosync.bridge = (function()
+	{
+		var bridge = {};
+		var callbackTable = {};
+		var callbackIdCounter = 0;
+		var messageQueue = [];
+		var messageSender = null;
+		var messageQueueJSON = [];
+		var messageSenderJSON = null;
+		var rawMessageQueue = [];
+
+		/**
+		 * Send message strings to C++. If a callback function is
+		 * supplied, a callbackId parameter will be added to
+		 * the message, this id can be used when sending a reply
+		 * back to JavaScript from C++.
+		 *
+		 * This method queues messages and can be called multiple
+		 * times in sqeuential JS code. When execution of sequential
+		 * code is done, a timer will get activated and send all messages
+		 * in the queue in one chunk. This enhances performance of
+		 * message sending.
+		 *
+		 * @param message An array of message strings.
+		 *
+		 * @param callbackFun An optional function to receive the
+		 * result of the message asynchronosly. The id of the
+		 * callback function is added after the strings in the
+		 * messageStrings array.
+		 */
+		bridge.send = function(messageStrings, callbackFun)
+		{
+			var callbackId = null;
+
+			// If there is a callback function supplied, create
+			// a callbackId and add it to the callback table.
+			if (undefined != callbackFun)
+			{
+				callbackIdCounter = callbackIdCounter + 1;
+				callbackTable[callbackIdCounter] = callbackFun;
+				callbackId = callbackIdCounter;
+			}
+
+			// Add message strings to queue.
+
+			var length = messageStrings.length;
+			for (var i = 0; i < length; ++i)
+			{
+				messageQueue.push(messageStrings[i]);
+			}
+
+			// If we have a callbackId, push that too, as a string value.
+			if (null != callbackId)
+			{
+				messageQueue.push(String(callbackId));
+			}
+
+
+			// Start timer for sender function.
+			// This will get called once sequential
+			// execution of JS code is done.
+			if (null == messageSender)
+			{
+				messageSender = setTimeout(function()
+				{
+					messageSender = null;
+					bridge.sendAll();
+				},
+				1);
+			}
+		};
+
+		/**
+		 * Send a JSON message to C++. If a callback function is
+		 * supplied, a callbackId parameter will be added to
+		 * the message, this id can be used when sending a reply
+		 * back to JavaScript from C++.
+		 *
+		 * This method queues a message and can be called multiple
+		 * times in sqeuential JS code. When execution of sequential
+		 * code is done, a timer will get activated and send all messages
+		 * in the queue in one chunk. This enhances performance of
+		 * message sending.
+		 *
+		 * @param message A dictionary with the message parameters.
+		 * The parameter "messageName" specifyes the name of the
+		 * message selector (the "command name") and must always be
+		 * included.
+		 *
+		 * @param callbackFun An optional function to receive the
+		 * result of the message asynchronosly.
+		 */
+		bridge.sendJSON = function(message, callbackFun)
+		{
+			// If there is a callback function supplied, create
+			// a callbackId and add it to the callback table.
+			if (undefined != callbackFun)
+			{
+				callbackIdCounter = callbackIdCounter + 1;
+				callbackTable[callbackIdCounter] = callbackFun;
+				message["callbackId"] = callbackIdCounter;
+			}
+
+			// Add message to queue.
+			messageQueueJSON.push(message);
+
+			// Start timer for sender function.
+			// This will get called once sequential
+			// execution of JS code is done.
+			if (null == messageSenderJSON)
+			{
+				messageSenderJSON = setTimeout(function()
+				{
+					messageSenderJSON = null;
+					bridge.sendAllJSON();
+				},
+				1);
+			}
+		};
+
+		/**
+		 * Send all queued message strings.
+		 */
+		bridge.sendAll = function()
+		{
+			// Check that messageQueue is not empty!
+			var length = messageQueue.length;
+			if (length > 0)
+			{
+				// Add the "ms:" token to the beginning of the data
+				// to signify that this as a message array. This is
+				// used by the C++ message parser to handle different
+				// types of message formats.
+				var data = "ms:";
+				for (var i = 0; i < length; ++i)
+				{
+					data = data.concat(mosync.encoder.encodeString(String(messageQueue[i])));
+				}
+
+				messageQueue = [];
+				bridge.sendRaw(data);
+			}
+		};
+
+		/**
+		 * Send all queued JSON messages.
+		 */
+		bridge.sendAllJSON = function()
+		{
+			// Check that messageQueue is not empty!
+			if (messageQueueJSON.length > 0)
+			{
+				// Add the "ma:" token to the beginning of the data
+				// to signify that this as a message array. This is
+				// used by the C++ message parser to handle different
+				// types of message formats.
+				var data = "ma:" + JSON.stringify(messageQueueJSON);
+				messageQueueJSON = [];
+				bridge.sendRaw(data);
+			}
+		};
+
+		/**
+		 * Send raw data to the C++ side.
+		 */
+		bridge.sendRaw = function(data)
+		{
+			if (mosync.isAndroid)
+			{
+				prompt(data, "");
+			}
+			else if (mosync.isIOS)
+			{
+				rawMessageQueue.push(data);
+				window.location = "mosync://DataAvailable";
+			}
+			else if (mosync.isWindowsPhone)
+			{
+				window.external.notify(data);
+			}
+			else
+			{
+				alert("bridge.sendRaw: unknown platform");
+			}
+		};
+
+		/**
+		 *
+		 */
+		bridge.getMessageData = function()
+		{
+			if(rawMessageQueue.length == 0)
+			{
+				//return an empty string so the runtime knows we don't have anything
+				return "";
+			}
+			var message = rawMessageQueue.pop();
+			return message;
+		};
+
+		/**
+		 * This function is meant to be used to call back from C++ to
+		 * JavaScript. The function takes a variable number of parameters.
+		 *
+		 * For example, to return the value 'Hello World' to the callback
+		 * with id 82, you can use this code in a WebAppMoblet:
+		 *
+		 *   callJS("mosync.bridge.reply(82, 'Hello World')");
+		 *
+		 * You can obtain the callbackId from the C++ WebViewMessage
+		 * object, if you use that class to parse the message.
+		 *
+		 * @param callBackId The first parameter is the id of the
+		 * callback function. Remaning parameters are applied to the
+		 * function refered to by the callbackId.
+		 */
+		bridge.reply = function(callbackId)
+		{
+			var callbackFun = callbackTable[callbackId];
+			if (undefined != callbackFun)
+			{
+				// Remove the first param, the callbackId.
+				var args = Array.prototype.slice.call(arguments);
+				args.shift();
+
+				// Call the function.
+				callbackFun.apply(null, args);
+			}
+		};
+
+		return bridge;
+	})();
+
+	// Return the library object.
+	return mosync;
+})();
+/*
+Copyright (C) 2011 MoSync AB
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License,
+version 2, as published by the Free Software Foundation.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+MA 02110-1301, USA.
+*/
+
+/**
+ * @file phonegap-bridge.js
+ * @author Ali Sarrafi
+ *
+ * Glue between PhoneGap and the MoSync Wormhole bridge.
+ */
+
+mosync.bridge.PhoneGap = {};
+
+// TODO: Is this needed? Remove?
+//mosync.bridge.PhoneGap.CallBackTable = {};
+
+/**
+ * sends a message through bridge as a PhoneGap message
+ *
+ * @param callbackId ID of the PhoneGap Callback to be used
+ * @param service name of the PhoneGap Service
+ * @param action action name for the specified service
+ * @param args extra arguments as JSON
+ */
+mosync.bridge.PhoneGap.send = function(callbackId, service, action, args)
+{
+	//Generate a MoSync Message from the phonegap command
+	var command = {
+		"messageName": "PhoneGap",
+		"service": service,
+		"action": action,
+		"args": args,
+		"PhoneGapCallBackId": callbackId,
+	};
+
+    // Call into Mosync C++ through bridge library.
+	mosync.bridge.sendJSON(command, null);
+};
+
+/**
+ * Starts watching the phone position and listening to the GPS events
+ * Overrides the original geolocation api
+ * to use MoSync Location API.
+ *
+ * @param success the callback function for returning the success result
+ * @param fail callback function for failure
+ */
+navigator.geolocation.watchPosition = function(success, fail)
+{
+	var callbackId = "GeoLocation" + PhoneGap.callbackId++;
+    if (typeof success == "function" || typeof fail == "function")
+	{
+        PhoneGap.callbacks[callbackId] = {success:success, fail:fail};
+    }
+    mosync.bridge.PhoneGap.send(callbackId, "GeoLocation", "watchPosition");
+};
+
+/**
+ * Gets the current GPS position once
+ * Overrides the original geolocation api
+ * to use MoSync Location API.
+ *
+ * @param success the callback function for returning the success result
+ * @param fail callback function for failure
+ */
+navigator.geolocation.getCurrentPosition = function(success, fail)
+{
+	var callbackId = "GeoLocation" + PhoneGap.callbackId++;
+    if (typeof success == "function" || typeof fail == "function")
+	{
+        PhoneGap.callbacks[callbackId] = {success:success, fail:fail};
+    }
+    mosync.bridge.PhoneGap.send(callbackId, "GeoLocation", "getCurrentPosition");
+};
+
+/**
+ * Stops watching the phone position and listening to the GPS events
+ * Overrides the original geolocation api
+ * to use MoSync Location API.
+ *
+ * @param success the callback function for returning the success result
+ * @param fail callback function for failure
+ */
+navigator.geolocation.clearWatch = function(success, fail)
+{
+	var callbackId = "GeoLocation" + PhoneGap.callbackId++;
+    if (typeof success == "function" || typeof fail == "function")
+	{
+        PhoneGap.callbacks[callbackId] = {success:success, fail:fail};
+    }
+    mosync.bridge.PhoneGap.send(callbackId, "GeoLocation", "clearWatch");
+};
+/*
  * PhoneGap for MoSync.
  *
  * PhoneGap is available under *either* the terms of the modified BSD license *or* the
@@ -3522,3 +3972,514 @@ PhoneGap.addConstructor(function() {
     }
 });
 } // End of notification API
+/*
+Copyright (C) 2012 MoSync AB
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License,
+version 2, as published by the Free Software Foundation.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+MA 02110-1301, USA.
+*/
+
+/**
+ * @file mosync-sensormanager.js
+ * @author Iraklis
+ *
+ * Implementation of W3C sensor API.
+ */
+
+/**
+ * Returns an object that manages device sensor enumeration
+ * @param type (optional) The type of sensor to look for. Null for every sensor
+ */
+navigator.findSensors = function(type)
+{
+	return new SensorRequest(type);
+};
+
+/**
+ * This object handles sensor enumeration
+ * @param type (optional) The type of sensor to look for. Null for every sensor
+ * @event onsuccess Called when enumeration is finished, with a list of the device sensors
+ */
+function SensorRequest(type)
+{
+	var self = this;
+
+	this.result = [];
+	this.readyState = "processing";
+	if(type == undefined)
+	{
+		type = "";
+	}
+	this.type = type;
+	var callbackId = "SensorManager" + PhoneGap.callbackId++;
+	PhoneGap.callbacks[callbackId] = {
+		success: function(sensorList)
+		{
+			self.result = sensorList.result;
+			self.readyState = "done";
+			for(var i = 0; i < self.events.onsuccess.length; i++)
+			{
+				self.events.onsuccess[i](self.result);
+			}
+		}
+	};
+
+	this.events = {
+			"onsuccess": [],
+	};
+	this.addEventListener = function(event, listener, captureMethod)
+	{
+		if(self.events[event] != undefined)
+		{
+			self.events[event].push(listener);
+		}
+	};
+
+	this.removeEventListener = function(event, listener)
+	{
+		if(self.events[event] != undefined)
+		{
+			for(var i = 0; i < self.events[event].length; i++)
+			{
+				if(self.events[event] == listener)
+				{
+					self.events[event].splice(i,1);
+					return;
+				}
+			}
+		}
+	};
+
+	mosync.bridge.PhoneGap.send(
+		callbackId,
+		"SensorManager",
+		"findSensors",
+		{"type":"" + type});
+}
+
+/**
+ * This object represents a connection to a sensor
+ * @param options (Object or string) The sensor to connect to
+ * @event onsensordata Called when there is new data from the sensor
+ * @event onerror Called when there is an error
+ * @event onstatuschange Called when the status of the connection has changed
+ */
+function SensorConnection(options)
+{
+	var self = this;
+
+	if(typeof options == "string")
+	{
+		this.type = options;
+	}
+	else if(typeof options.name == "string")
+	{
+		this.type = options.name;
+	}
+	else
+	{
+		this.type = options.type;
+	}
+
+	this.startWatch = function(watchOptions)
+	{
+		if(self.status != "open")
+		{
+			var exception = new DOMException();
+			exception.code = DOMException.INVALID_STATE_ERR;
+			throw exception;
+			return;
+		}
+		this.setStatus("watching");
+		var callbackId = "SensorManager" + PhoneGap.callbackId++;
+		PhoneGap.callbacks[callbackId] = {
+				success:self.sensorEvent,
+				fail:self.sensorError
+		};
+		mosync.bridge.PhoneGap.send(
+			callbackId,
+			"SensorManager",
+			"startSensor",
+			{"type":"" + self.type, "interval":"" + watchOptions.interval});
+	};
+
+	this.endWatch = function()
+	{
+		if(self.status != "watching")
+		{
+			var exception = new DOMException();
+			exception.code = DOMException.INVALID_STATE_ERR;
+			throw exception;
+			return;
+		}
+		this.setStatus("open");
+		mosync.bridge.PhoneGap.send(
+			null,
+			"SensorManager",
+			"stopSensor",
+			{"type":"" + self.type});
+	};
+
+	this.read = function()
+	{
+		if(self.status != "open")
+		{
+			var exception = new DOMException();
+			exception.code = DOMException.INVALID_STATE_ERR;
+			throw exception;
+			return;
+		}
+
+		var callbackId = "SensorManager" + PhoneGap.callbackId++;
+
+		PhoneGap.callbacks[callbackId] = {
+			success:self.sensorEvent
+		};
+
+		mosync.bridge.PhoneGap.send(
+			callbackId,
+			"SensorManager",
+			"startSensor",
+			{"type":"" + self.type, "interval":-1});
+	};
+
+	this.events = {
+		"onsensordata": [],
+		"onerror": [],
+		"onstatuschange":[]
+	};
+
+	this.addEventListener = function(event, listener, captureMethod)
+	{
+		if(self.events[event] != undefined)
+		{
+			self.events[event].push(listener);
+		}
+	};
+
+	this.removeEventListener = function(event, listener)
+	{
+		if(self.events[event] != undefined)
+		{
+			for(var i = 0; i < self.events[event].length; i++)
+			{
+				if(self.events[event] == listener)
+				{
+					self.events[event].splice(i,1);
+					return;
+				}
+			}
+		}
+	};
+
+	this.sensorEvent = function(sensorData)
+	{
+		var event = {
+			data: {
+				x: sensorData.x,
+				y: sensorData.y,
+				z: sensorData.z
+			},
+			accuracy: "high",
+			timestamp: sensorData.timestamp,
+			reason: sensorData.reason
+		};
+
+		for(var i = 0; i < self.events.onsensordata.length; i++)
+		{
+			self.events.onsensordata[i](event);
+		}
+	};
+
+	this.sensorError = function(errorData)
+	{
+		this.setStatus("error");
+		var sensorError = {
+			code: errorData.code,
+			message: errorData.message
+		};
+		self.error = sensorError;
+		for(var i = 0; i < self.events.onerror.length; i++)
+		{
+			self.events.onerror[i](sensorError);
+		}
+	};
+
+	this.setStatus = function(status)
+	{
+		if(status != self.status)
+		{
+			self.status = status;
+			for(var i = 0; i < self.events.onstatuschange.length; i++)
+			{
+				self.events.onstatuschange[i](status);
+			}
+		}
+	};
+
+	this.setStatus("open");
+}/*
+Copyright (C) 2012 MoSync AB
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License,
+version 2, as published by the Free Software Foundation.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+MA 02110-1301, USA.
+*/
+
+/**
+ * @file mosync-pushnotifications.js
+ * @author Bogdan
+ *
+ * Implementation of push notification API.
+ */
+
+if (!PhoneGap.hasResource("pushNotification"))
+{
+PhoneGap.addResource("pushNotification");
+
+/**
+ * This class provides access to device Push Notification Service.
+ * @constructor
+ */
+var PushNotificationManager = function() {
+	/**
+	 * The last known acceleration.  type=Acceleration()
+	 */
+	this.lastPushNotificationData = null;
+};
+
+/** @constructor */
+var PushNotificationData = function(message, sound, iconBadge)
+{
+  this.message = message;
+  this.sound = sound;
+  this.iconBadge = iconBadge;
+};
+
+/**
+ * Constants indicating the types of push notifications the application
+ * accepts.
+ * Specific to iOS.
+ * On Android PUSH_NOTIFICATION_TYPE_ALERT is set by default.
+ */
+PushNotificationManager.type = {
+		/**
+		 * The application accepts notifications that badge the application icon.
+		 */
+		badge: 1,
+		/**
+		 * The application accepts alert sounds as notifications.
+		 */
+		sound: 2,
+		/**
+		 * The application accepts alert messages as notifications.
+		 */
+		alert: 4
+	};
+
+
+PushNotificationManager.prototype.initialize = function(serverAddress, serverPort)
+{
+	PhoneGap.exec(
+			onSuccess,
+			onError,
+			"PushNotification",
+			"initialize",
+			{
+				"serverAddress": serverAddress,
+				"serverPort": serverPort
+			});
+};
+
+/**
+ * Asynchronously starts the registration process.
+ *
+ * @param {Function} successCallback    The function to call when the
+ * registration data is available.
+ * @param {Function} errorCallback      The function to call when there
+ * is an error getting the registration data.
+ */
+PushNotificationManager.prototype.register = function(
+		successCallback,
+		errorCallback)
+{
+	// successCallback required
+	if (typeof successCallback !== "function") {
+		console.log("PushNotificationManager Error: successCallback is not a function");
+		return;
+	}
+
+	// errorCallback required
+	if (errorCallback && (typeof errorCallback !== "function")) {
+		console.log("PushNotificationManager Error: errorCallback is not a function");
+		return;
+	}
+
+	var onSuccess = function(result)
+	{
+		successCallback(result);
+	};
+
+	var onError = function(err)
+	{
+		errorCallback(err);
+	};
+
+	PhoneGap.exec(onSuccess, onError, "PushNotification", "register", null);
+};
+
+/**
+ * Unregister application for receiving push notifications.
+ *
+ * @param {Function} callback    The function to call when the application
+ * has unregistered. This method is called only on Android platform.
+ */
+PushNotificationManager.prototype.unregister = function(callback)
+{
+	console.log("PushNotificationManager.prototype.unregister");
+	if (callback && (typeof callback !== "function")) {
+		console.log("PushNotificationManager Error: callback is not a function");
+		return;
+	}
+
+	var onSuccess = function(result)
+	{
+		callback();
+	};
+	PhoneGap.exec(onSuccess, null, "PushNotification", "unregister");
+};
+
+/**
+ * Set push notification allowed types.
+ * Call this method before registering the application for receiving push
+ * notification.
+ *
+ * @param {Function} successCallback    The function to call on success. (OPTIONAL)
+ * @param {Function} errorCallback      The function to call on error. (OPTIONAL)
+ * @param {Array.<PushNotificationManager.type>} types    Types of the notifications
+ * accepted by the application. If this param is not specified the application
+ * will be registered for receiving all types of notification. This param is
+ * applied only for iOS platform. Android platform will ignore this value.
+ */
+PushNotificationManager.prototype.types = function(
+	successCallback,
+	errorCallback,
+	types)
+{
+	console.log("PushNotificationManager.prototype.types");
+
+	// Convert types param to a bitmask.
+	var bitmask = 0;
+	if (!types)
+	{
+		bitmask = PushNotificationManager.type.badge |
+				  PushNotificationManager.type.sound |
+				  PushNotificationManager.type.alert;
+	}
+	else if(typeof types == "array")
+	{
+		for(i in types) {
+			bitmask = bitmask | types[i];
+		}
+	}
+	else
+	{
+		console.log("PushNotificationManager Error: types is not an array");
+		return;
+	}
+
+	var onSuccess = function(result)
+	{
+		if (successCallback && (typeof successCallback == "function"))
+		{
+			successCallback(err);
+		}
+	};
+
+	var onError = function(err)
+	{
+		if (errorCallback && (typeof errorCallback == "function"))
+		{
+			 errorCallback(err);
+		}
+	};
+
+	PhoneGap.exec(onSuccess, onError, "PushNotification", "types", bitmask);
+};
+
+/**
+ * Set the account ID used for registering the application.
+ * Call this method before registering the application.
+ *
+ * @param {String} accountID    Is the ID of the account authorized to send messages
+ * to the application, typically the email address of an account set up
+ * by the application's developer.
+ * On iOS platform this param is ignored.
+ *
+ */
+PushNotificationManager.prototype.accountID = function(
+	accountID)
+{
+	console.log("PushNotificationManager.prototype.accountID");
+    PhoneGap.exec(null, null, "PushNotification", "accountID", accountID);
+};
+
+/**
+ * Listener for push notification
+ *
+ * @param newPushNotificationCallback The function to call when a new push notification is received,
+ */
+PushNotificationManager.prototype.listener = function(newPushNotificationCallback)
+{
+	console.log("PushNotificationManager.prototype.listener");
+	// newPushNotificationCallback required
+	if (typeof newPushNotificationCallback !== "function") {
+		console.log("PushNotificationManager Error: newPushNotificationCallback is not a function");
+		return;
+	}
+
+	var self = this;
+
+	var onSuccess = function(result)
+	{
+		var data = JSON.parse(result);
+		var message = data.message ? data.message : "";
+		var sound = data.sound ? data.sound : "";
+		var iconBadge = data.iconBadge ? data.iconBadge : 0;
+		self.lastPushNotificationData = new PushNotificationData(
+			message,
+			sound,
+			iconBadge);
+		newPushNotificationCallback(self.lastPushNotificationData);
+	};
+
+	PhoneGap.exec(onSuccess, null, "PushNotification", "listener");
+};
+
+PhoneGap.addConstructor(function() {
+	if (typeof navigator.pushNotification === "undefined") {
+		navigator.pushNotification = new PushNotificationManager();
+	}
+});
+} // End of Push Notification API

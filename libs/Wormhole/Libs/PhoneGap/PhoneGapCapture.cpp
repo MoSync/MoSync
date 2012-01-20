@@ -179,7 +179,7 @@ namespace Wormhole
 				//Images need to be stored. We use maLocalTime to get a unique number for the filename
 				sprintf(
 					pathBuffer,
-					"%scapturedImages/img%d.%s",
+					"%simg%d.%s",
 					localPath,
 					maLocalTime(),
 					extension.c_str());
