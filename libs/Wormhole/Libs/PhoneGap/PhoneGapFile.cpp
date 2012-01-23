@@ -145,27 +145,54 @@ namespace Wormhole
 		return MimeTypeDefault;
 	}
 
-	/**
-	 * TODO: This must work to get a directory name if
-	 * the path ends with a slash, e.g.: /sdcard/MyMusic/
-	 */
-	static String FileGetName(const String& filePath)
+	static String FileGetLocalPath()
 	{
-		// TODO: Remove last slash if path ends with a slash.
+		int bufferSize = 2048;
+		char buffer[bufferSize];
+
+		int size = maGetSystemProperty(
+			"mosync.path.local",
+			buffer,
+			bufferSize);
+
+		// If there was an error, return default root path.
+		if (size < 0 || size > bufferSize)
+		{
+			return "/";
+		}
+
+		return buffer;
+	}
+
+	/**
+	 * It should work also to get a directory name if the
+	 * path ends with a slash, e.g.: "/sdcard/MyMusic/"
+	 * or even for "/" in which case an empty string will
+	 * be returned.
+	 */
+	static String FileGetName(const String& p)
+	{
+		String path = p;
+
+		// Remove last slash if path ends with a slash.
+		if ('/' == path[path.size() - 1])
+		{
+			path = path.substr(0, path.size() - 1);
+		}
 
 		// Find last slash.
-		int pos = filePath.findLastOf('/');
+		int pos = path.findLastOf('/');
 		if (String::npos == pos)
 		{
 			// No slash found, just return the file path.
-			return filePath;
+			return path;
 		}
 
 		// Move to position after the '/'
 		pos = pos + 1;
 
 		// Return file name.
-		return filePath.substr(pos, filePath.size() - pos);
+		return path.substr(pos, path.size() - pos);
 	}
 
 	/**
@@ -963,8 +990,26 @@ namespace Wormhole
 			return;
 		}
 
-		// TODO: Replace hard-coded path with platform aware path handling.
-		String rootEntry = emitDirectoryEntry("sdcard", "/sdcard");
+		// Get local root path and remove trailing slash, if any.
+		String path = FileGetLocalPath();
+
+		// If we get just a slash, we won't remove the last slash.
+		// TODO: It is unclear if PhoneGap requires all path names
+		// to not end with a slash, or if it does not matter. Typical
+		// directory entry has name "sdcard" and full path "/sdcard".
+		if (path.size() == 1 && '/' == path[0])
+		{
+			// Just a slash, do nothing.
+		}
+		else if (path.size() > 1 && '/' == path[path.size() - 1])
+		{
+			// Remove last slash.
+			path = path.substr(0, path.size() - 1);
+		}
+		String rootEntry = emitDirectoryEntry(
+			FileGetName(path),
+			path);
+
 		String fileSystemInfo = emitFileSystemInfo("persistent", rootEntry);
 		callSuccess(
 			callbackID,
@@ -983,7 +1028,7 @@ namespace Wormhole
 		const char* pPath = strstr(pURL, "file://");
 		if (NULL == pPath)
 		{
-			callFileError(callbackID, "1000");
+			callFileError(callbackID, FILEERROR_SYNTAX_ERR);
 			return;
 		}
 		if (pURL != pPath)
@@ -1009,8 +1054,6 @@ namespace Wormhole
 			callbackID,
 			entry,
 			"window.localFileSystem._castEntry");
-
-
 	}
 
 	/**
