@@ -57,6 +57,7 @@ struct SETTINGS {
 	const char* WPconfig;
 	const char* WPtarget;
 	bool WPgenerateOnly;
+	const char* WPguid;
 
 	// Android specific settings
     const char* androidPackage;
@@ -69,6 +70,7 @@ struct SETTINGS {
     // BlackBerry specific settings
     const char* blackberryJde;
     const char* blackberrySignKey;
+    bool blackberryPackAsCOD;
 
     // JavaME specific settings
     const char* javameKeystore;

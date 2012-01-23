@@ -24,9 +24,13 @@
 		288765A50DF7441C002DB57D /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 288765A40DF7441C002DB57D /* CoreGraphics.framework */; };
 		29B46B3D1407FAA5009491A6 /* PimContactItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B46B3B1407FAA5009491A6 /* PimContactItem.m */; };
 		29B46B3E1407FAA5009491A6 /* PimContactsList.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B46B3C1407FAA5009491A6 /* PimContactsList.m */; };
+		4140734414C34EB80006D18C /* ResourceArray.h in Headers */ = {isa = PBXBuildFile; fileRef = 85BF2B551134052300BB0201 /* ResourceArray.h */; };
 		4142402614766C03006977A1 /* MoSyncDB.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4142402414766C03006977A1 /* MoSyncDB.cpp */; };
 		4142402714766C03006977A1 /* MoSyncDB.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4142402414766C03006977A1 /* MoSyncDB.cpp */; };
 		4142402814766C03006977A1 /* MoSyncDB.h in Headers */ = {isa = PBXBuildFile; fileRef = 4142402514766C03006977A1 /* MoSyncDB.h */; };
+		417495FA14C4CB0E00D04A32 /* Capture.mm in Sources */ = {isa = PBXBuildFile; fileRef = 41B4F2B114C34EF000D087F1 /* Capture.mm */; };
+		417495FC14C4CB0F00D04A32 /* Capture.mm in Sources */ = {isa = PBXBuildFile; fileRef = 41B4F2B114C34EF000D087F1 /* Capture.mm */; };
+		417495FD14C4CB1300D04A32 /* Capture.h in Headers */ = {isa = PBXBuildFile; fileRef = 41B4F2B014C34EF000D087F1 /* Capture.h */; };
 		418047B6147E8B6A0048FB95 /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = 418047B5147E8B6A0048FB95 /* Reachability.m */; };
 		418047B7147E8B6A0048FB95 /* Reachability.h in Headers */ = {isa = PBXBuildFile; fileRef = 418047B4147E8B6A0048FB95 /* Reachability.h */; };
 		418047B8147E8B6A0048FB95 /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = 418047B5147E8B6A0048FB95 /* Reachability.m */; };
@@ -122,9 +126,6 @@
 		43D8047F13EFBCB200183387 /* VideoViewWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43D8046B13EFBCB200183387 /* VideoViewWidget.mm */; };
 		43D8048013EFBCB200183387 /* VideoViewWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43D8046B13EFBCB200183387 /* VideoViewWidget.mm */; };
 		43D8048413EFBEEE00183387 /* MediaPlayer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 43D8048213EFBCC700183387 /* MediaPlayer.framework */; };
-		43F9CBB614C4192800DE2285 /* Capture.h in Headers */ = {isa = PBXBuildFile; fileRef = 43F9CBB414C4192800DE2285 /* Capture.h */; };
-		43F9CBB714C4192800DE2285 /* Capture.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43F9CBB514C4192800DE2285 /* Capture.mm */; };
-		43F9CBB814C4192800DE2285 /* Capture.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43F9CBB514C4192800DE2285 /* Capture.mm */; };
 		43F9CBBB14C4198400DE2285 /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 43F9CBB914C4197400DE2285 /* MobileCoreServices.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		43FBCABF1433627400301E39 /* PimContactItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B46B3B1407FAA5009491A6 /* PimContactItem.m */; };
 		43FBCAC01433627400301E39 /* PimContactsList.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B46B3C1407FAA5009491A6 /* PimContactsList.m */; };
@@ -350,6 +351,8 @@
 		41804801147E91050048FB95 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		4192E7B613F5801900C10302 /* CameraConfirgurator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CameraConfirgurator.h; sourceTree = "<group>"; };
 		4192E7B713F5801900C10302 /* CameraConfirgurator.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = CameraConfirgurator.mm; sourceTree = "<group>"; };
+		41B4F2B014C34EF000D087F1 /* Capture.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Capture.h; sourceTree = "<group>"; };
+		41B4F2B114C34EF000D087F1 /* Capture.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = Capture.mm; sourceTree = "<group>"; };
 		41EB03E3146A69BF0088E3A4 /* libsqlite3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsqlite3.dylib; path = /usr/lib/libsqlite3.dylib; sourceTree = "<absolute>"; };
 		4318696E13F68D410051D97A /* PimContactItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PimContactItem.h; sourceTree = "<group>"; };
 		4318697013F68D410051D97A /* PimContactsList.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PimContactsList.h; sourceTree = "<group>"; };
@@ -403,8 +406,6 @@
 		43D8046A13EFBCB200183387 /* VideoViewWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VideoViewWidget.h; sourceTree = "<group>"; };
 		43D8046B13EFBCB200183387 /* VideoViewWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = VideoViewWidget.mm; sourceTree = "<group>"; };
 		43D8048213EFBCC700183387 /* MediaPlayer.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MediaPlayer.framework; path = System/Library/Frameworks/MediaPlayer.framework; sourceTree = SDKROOT; };
-		43F9CBB414C4192800DE2285 /* Capture.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Capture.h; path = capture/Capture.h; sourceTree = "<group>"; };
-		43F9CBB514C4192800DE2285 /* Capture.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = Capture.mm; path = capture/Capture.mm; sourceTree = "<group>"; };
 		43F9CBB914C4197400DE2285 /* MobileCoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MobileCoreServices.framework; path = System/Library/Frameworks/MobileCoreServices.framework; sourceTree = SDKROOT; };
 		8503783E133A2275009251E2 /* StackScreenWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StackScreenWidget.h; sourceTree = "<group>"; };
 		8503783F133A2275009251E2 /* StackScreenWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = StackScreenWidget.mm; sourceTree = "<group>"; };
@@ -641,7 +642,6 @@
 		080E96DDFE201D6D7F000001 /* Classes */ = {
 			isa = PBXGroup;
 			children = (
-				43F9CBB214C4190400DE2285 /* capture */,
 				8540754E149F9E55001B14C0 /* Extensions */,
 				43CE0BE01463E98F00F8FFC3 /* notifications */,
 				43CE0BDE1463E98700F8FFC3 /* ads */,
@@ -654,6 +654,7 @@
 				85BF2B0C1134036D00BB0201 /* impl */,
 				43B16FE6147BF9AA00B6BB8A /* utils */,
 				1D3623240D0F684500981E51 /* MoSyncAppDelegate.h */,
+				41B4F2AF14C34EF000D087F1 /* capture */,
 				1D3623250D0F684500981E51 /* MoSyncAppDelegate.mm */,
 				28D7ACF60DDB3853001CB0EB /* MoSyncViewController.h */,
 				8558307E11C79B030008FDC1 /* MoSyncViewController.mm */,
@@ -751,6 +752,15 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		41B4F2AF14C34EF000D087F1 /* capture */ = {
+			isa = PBXGroup;
+			children = (
+				41B4F2B014C34EF000D087F1 /* Capture.h */,
+				41B4F2B114C34EF000D087F1 /* Capture.mm */,
+			);
+			path = capture;
+			sourceTree = "<group>";
+		};
 		4318696C13F68D410051D97A /* pim */ = {
 			isa = PBXGroup;
 			children = (
@@ -814,15 +824,6 @@
 				43CE0BEC1463E9C600F8FFC3 /* NotificationManager.mm */,
 			);
 			name = notifications;
-			sourceTree = "<group>";
-		};
-		43F9CBB214C4190400DE2285 /* capture */ = {
-			isa = PBXGroup;
-			children = (
-				43F9CBB414C4192800DE2285 /* Capture.h */,
-				43F9CBB514C4192800DE2285 /* Capture.mm */,
-			);
-			name = capture;
 			sourceTree = "<group>";
 		};
 		8500CD3E132E506D0003A01E /* External */ = {
@@ -1186,7 +1187,8 @@
 				41BD2ED514768C5D005ADEB9 /* AudioInstance.h in Headers */,
 				418047B7147E8B6A0048FB95 /* Reachability.h in Headers */,
 				43B16FEA147BF9FC00B6BB8A /* NSStringExpanded.h in Headers */,
-				43F9CBB614C4192800DE2285 /* Capture.h in Headers */,
+				4140734414C34EB80006D18C /* ResourceArray.h in Headers */,
+				417495FD14C4CB1300D04A32 /* Capture.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1399,7 +1401,7 @@
 				85407553149F9E62001B14C0 /* MoSync.mm in Sources */,
 				85407554149F9E62001B14C0 /* MoSyncExtension.mm in Sources */,
 				E413FAB814C0604D00BF1E3D /* ResourceArray.cpp in Sources */,
-				43F9CBB714C4192800DE2285 /* Capture.mm in Sources */,
+				417495FA14C4CB0E00D04A32 /* Capture.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1502,7 +1504,7 @@
 				41BD2ED614768C63005ADEB9 /* AudioInstance.mm in Sources */,
 				418047B8147E8B6A0048FB95 /* Reachability.m in Sources */,
 				43B16FEC147BF9FC00B6BB8A /* NSStringExpanded.mm in Sources */,
-				43F9CBB814C4192800DE2285 /* Capture.mm in Sources */,
+				417495FC14C4CB0F00D04A32 /* Capture.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

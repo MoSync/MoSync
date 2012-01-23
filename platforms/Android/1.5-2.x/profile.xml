@@ -1,0 +1,3 @@
+<platform family="Android" variant="1.5-2.x" runtime="android_3/1" inherit="Android">
+  <capability name="Bluetooth" state="UNSUPPORTED"/>
+</platform>

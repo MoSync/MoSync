@@ -77,10 +77,19 @@ public:
 	void NativeUIMoblet::keyPressEvent(int keyCode, int nativeCode)
 	{
 	    // Close the application if the back key is pressed.
-//	    if(MAK_BACK == keyCode)
-//	    {
-//	        closeEvent();
-//	    }
+	    if(MAK_BACK == keyCode)
+	    {
+			// Exit only is this is the top screen in the stack.
+			// If there are more that one screen on the stack,
+			// we will instead go back to the previous screen.
+			// This behaviour is built into the stack screen
+			// widget, and can be turned on/off with the property
+			// MAW_STACK_SCREEN_BACK_BUTTON_ENABLED.
+			if (mMainScreen->getStackSize() <= 1)
+			{
+				closeEvent();
+			}
+	    }
 	}
 
 private:

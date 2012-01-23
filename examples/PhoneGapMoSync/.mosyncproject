@@ -6,11 +6,11 @@
 <property key="build.prefs:additional.include.paths/Debug" value=""/>
 <property key="build.prefs:additional.include.paths/Release" value=""/>
 <property key="build.prefs:additional.libraries" value="MAUtil.lib, NativeUI.lib, MAFS.lib, Wormhole.lib"/>
-<property key="build.prefs:additional.libraries/Debug" value="MAUtilD.lib, NativeUID.lib, MAFSD.lib, WormholeD.lib, yajlD.lib, NotificationD.lib, RescompilerD.lib"/>
-<property key="build.prefs:additional.libraries/Release" value="MAUtil.lib, NativeUI.lib, MAFS.lib, Wormhole.lib, yajl.lib, Notification.lib, Rescompiler.lib"/>
+<property key="build.prefs:additional.libraries/Debug" value="MAUtilD.lib, NativeUID.lib, MAFSD.lib, WormholeD.lib, yajlD.lib, NotificationD.lib"/>
+<property key="build.prefs:additional.libraries/Release" value="MAUtil.lib, NativeUI.lib, MAFS.lib, Wormhole.lib, yajl.lib, Notification.lib"/>
 <property key="build.prefs:additional.library.paths/Debug" value=""/>
 <property key="build.prefs:additional.library.paths/Release" value=""/>
-<property key="build.prefs:app.permissions" value="Auto\ Start Bluetooth Calendar Calendar/Read Calendar/Write Camera Contacts Contacts/Read Contacts/Write File\ Storage Home\ Screen Internet\ Access Location Location/Coarse Location/Fine Power\ Management Push\ Notifications SMS SMS/Read SMS/Receive SMS/Send Vibrate"/>
+<property key="build.prefs:app.permissions" value="Bluetooth Calendar Calendar/Read Calendar/Write Camera Contacts Contacts/Read Contacts/Write File\ Storage Home\ Screen Internet\ Access Location Location/Coarse Location/Fine Power\ Management SMS SMS/Read SMS/Receive SMS/Send Vibrate"/>
 <property key="build.prefs:extra.link.sw/Debug" value=""/>
 <property key="build.prefs:extra.link.sw/Release" value=""/>
 <property key="build.prefs:extra.res.sw/Debug" value=""/>

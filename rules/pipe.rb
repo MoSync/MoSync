@@ -18,6 +18,10 @@ require "#{File.dirname(__FILE__)}/gcc.rb"
 require "#{File.dirname(__FILE__)}/mosync_util.rb"
 require "#{File.dirname(__FILE__)}/targets.rb"
 
+# load local_config.rb, if it exists.
+lc = "#{File.dirname(__FILE__)}/local_config.rb"
+require lc if(File.exists?(lc))
+
 module MoSyncInclude
 	def mosync_include; "#{mosyncdir}/include" + sub_include; end
 	def mosync_libdir; "#{mosyncdir}/lib"; end
@@ -90,7 +94,10 @@ class PipeGccWork < GccWork
 	def gccVersionClass; PipeGccWork; end
 	include GccVersion
 
-	def gcc; mosyncdir + "/bin/xgcc"; end
+	def gcc
+		default_const(:GCC_DRIVER_NAME, mosyncdir + "/bin/xgcc")
+		return GCC_DRIVER_NAME
+	end
 
 	def gccmode; "-S"; end
 	def host_flags;

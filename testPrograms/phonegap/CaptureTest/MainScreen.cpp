@@ -134,6 +134,13 @@ void MainScreen::customEvent(const MAEvent& event)
 
 			mLatestPictureTakenHandle = eventData.handle;
 			mImageScreen->setImage(mLatestPictureTakenHandle);
+			if ( isAndroid() )
+			{
+				char buf[MAX_BUF_SIZE];
+				int res = maCaptureGetImagePath(mLatestPictureTakenHandle, buf, MAX_BUF_SIZE);
+				printf("image file path = %s", buf);
+				mSettingsScreen->setCapturedImagePath(buf);
+			}
 		}
 		else if (eventData.type == MA_CAPTURE_EVENT_TYPE_VIDEO)
 		{

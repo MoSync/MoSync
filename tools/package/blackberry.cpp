@@ -54,26 +54,28 @@ void packageBlackberry(const SETTINGS& s, const RuntimeInfo& ri) {
 	testName(s);
 	testBlackberryJde(s);
 
-	std::stringstream cmd;
-	string bbbin = string(s.blackberryJde) + "/bin";
-	string bblib = string(s.blackberryJde) + "/lib";
-	const char* codnameParam =
-			(ri.blackberryVersion <= 4 && ri.blackberryMinor < 3) ?
-					"codename" : "codname";
+	if (s.blackberryPackAsCOD) {
+		std::stringstream cmd;
+		string bbbin = string(s.blackberryJde) + "/bin";
+		string bblib = string(s.blackberryJde) + "/lib";
+		const char* codnameParam =
+				(ri.blackberryVersion <= 4 && ri.blackberryMinor < 3) ?
+						"codename" : "codname";
 
-	cmd << "java -Xmx256m -classpath \""<<bbbin<<"/rapc.jar\""
-		" net.rim.tools.compiler.Compiler"
-		" -noshortname -verbose -warning"
-		" -listing="<<s.name<<" \"import="<<bblib<<"/net_rim_api.jar\""
-		" \""<<codnameParam<<"="<<s.name<<"\" -quiet -midlet"
-		" \"jad="<<s.name<<".jad\" \""<<s.name<<".jar\"";
-	sh(cmd.str().c_str());
+		cmd << "java -Xmx256m -classpath \""<<bbbin<<"/rapc.jar\""
+			" net.rim.tools.compiler.Compiler"
+			" -noshortname -verbose -warning"
+			" -listing="<<s.name<<" \"import="<<bblib<<"/net_rim_api.jar\""
+			" \""<<codnameParam<<"="<<s.name<<"\" -quiet -midlet"
+			" \"jad="<<s.name<<".jad\" \""<<s.name<<".jar\"";
+		sh(cmd.str().c_str());
 
-	/*std::string codName(s.name);
-	codName += ".cod";
-	std::string newName = s.dst + ("/" + codName);
-	remove(newName.c_str());
-	renameFile(newName, codName);*/
+		/*std::string codName(s.name);
+		codName += ".cod";
+		std::string newName = s.dst + ("/" + codName);
+		remove(newName.c_str());
+		renameFile(newName, codName);*/
 
-	// TODO: if the COD is a zip file, re-zip it for better compression.
+		// TODO: if the COD is a zip file, re-zip it for better compression.
+	}
 }

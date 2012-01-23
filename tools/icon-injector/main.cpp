@@ -24,6 +24,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #ifdef _WIN32 // for now..
 #include "WinmobileInjector.h"
+#include "WP7Injector.h"
 #endif
 
 #include "MoreInjector.h"
@@ -46,6 +47,9 @@ static void initInjectors() {
 	gInjectors["symbian9"] = new Symbian9Injector();
 	gInjectors["android"] = new AndroidInjector();
 	gInjectors["iOS"] = new IOSInjector();
+#ifdef _WIN32 // for now..
+	gInjectors["WP7"] = new WP7Injector();
+#endif
 }
 
 static bool parseCmdLine(map<string, string>& params, int argc, char **argv) {
@@ -62,7 +66,6 @@ static bool parseCmdLine(map<string, string>& params, int argc, char **argv) {
 	}
 	return true;
 }
-
 
 int main(int argc, char **argv) {
 	map<string, string> params;

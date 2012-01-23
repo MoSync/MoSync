@@ -4222,9 +4222,9 @@ group WidgetAPI "Widget API" {
 				* @brief The handle to url data. This is string data,
 				* there is NO null terminating character. The encoding
 				* of the data is determined by the application.
-				* The data MUST be deallocated with maDestroyObject after
-				* it hs been used. Each event allocates a new data object
-				* for the url data.
+				* The data object MUST be deallocated with maDestroyPlaceholder
+				* after it has been used, since each event allocates a new data
+				* object for the url data (which could end up consuming all memory).
 				*/
 				MAHandle urlData;
 			} webViewHookInfo;
@@ -4429,7 +4429,7 @@ group WidgetAPI "Widget API" {
 		*
 		* NOTE: When you get this message you have ownership
 		* of the url data handle and you have the responsibility to
-		* deallocate it using maDestroyObject.
+		* deallocate it using maDestroyPlaceholder.
 		*
 		* To get this event, you need to register a hook pattern, using
 		* maWidgetSetProperty with the properties #MAW_WEB_VIEW_SOFT_HOOK
@@ -4606,7 +4606,7 @@ group WidgetAPI "Widget API" {
     * NOTE: there is a slightly different behaviour depending on the platform:
     *  - on iOS the source is loaded into memory when
     *  MAW_VIDEO_VIEW_STATE_PLAYING is received.
-    *   - on Android the source is loaded into memory when
+    *   - on Android and WindowsPhone the source is loaded into memory when
     *  MAW_VIDEO_VIEW_STATE_SOURCE_READY is received.
 	*/
 	group VideoViewEvent "Video view event" {
@@ -4635,11 +4635,13 @@ group WidgetAPI "Widget API" {
 		* @brief The source is ready to be played.
 		* NOTE: On Android this event is received after loading url/path.
 		*       On iOS this event is received after PLAYING event is received.
+		*		On WindowsPhone this event is received after media loding has finished
 		*/
 		SOURCE_READY = 5;
 
 		/**
 		* @brief Playback is temporarily interruped(maybe there's no data in the buffer).
+		* NOTE: On WindowsPhone 7 this occurs when an error is encountered.
 		*/
 		INTERRUPTED = 6;
 
@@ -6307,8 +6309,8 @@ group WidgetAPI "Widget API" {
 		*
 		* Note that when receiving event #MAW_EVENT_WEB_VIEW_HOOK_INVOKED
 		* you MUST deallocate the urlData handle of the event by calling
-		* maDestroyObject on the handle. Destory the handle when you are done
-		* reading the url data, to avoid that memory will get used up.
+		* maDestroyPlaceholder on the handle. Destory the handle when you are
+		* done reading the url data, to avoid that memory will get used up.
 		*
 		* The pattern is a url pattern specified using regular expression
 		* syntax, according to the ICU regular expression standard, using
@@ -6367,8 +6369,8 @@ group WidgetAPI "Widget API" {
 		*
 		* Note that when receiving event #MAW_EVENT_WEB_VIEW_HOOK_INVOKED
 		* you MUST deallocate the urlData handle of the event by calling
-		* maDestroyObject on the handle. Destory the handle when you are done
-		* reading the url data, to avoid that memory will get used up.
+		* maDestroyPlaceholder on the handle. Destory the handle when you are
+		* done reading the url data, to avoid that memory will get used up.
 		*
 		* The pattern is a url pattern specified using regular expression
 		* syntax, according to the ICU regular expression standard, using
@@ -7849,9 +7851,9 @@ group OpenGLES "OpenGLES" {
 		* \param title The title of the message box shown.
 		* \param message The message should be short, not more than 40 characters,
 		* to ensure its visibility on all screen sizes.
-		* \button1 The text on the first button. On Android it indicates a positive selection.
-		* \button2 The text on the second button. On Android it indicates a neutral selection.
-		* \button3 The text on the third button. On Android it indicates that a negative selection.
+		* \param button1 The text on the first button. On Android it indicates a positive selection.
+		* \param button2 The text on the second button. On Android it indicates a neutral selection.
+		* \param button3 The text on the third button. On Android it indicates that a negative selection.
 		*/
 		void maAlert(in MAString title, in MAString message, in MAString button1, in MAString button2, in MAString button3);
 
@@ -8123,7 +8125,7 @@ group NFCAPI "NFC API" {
 
 		/**
 		* Creates a new NDEF message, to be used primarily by
-		* \code maNFCWriteDefMessage.
+		* \code maNFCWriteDefMessage. \endcode
 		* \param recordCount The number of records in the created message
 		* \return The handle to the created NDEF message; clients are
 		* responsible for destroying the message.
@@ -9652,6 +9654,7 @@ group NotificationAPI "Notification API" {
 			* @par Example
 			* \code
 			*	maNotificationLocalSetProperty(notificationHandle, MA_NOTIFICATION_LOCAL_FLASH_LIGHTS, "true");
+			* \endcode
 			*/
 			FLASH_LIGHTS = "flashLights";
 
@@ -9673,6 +9676,7 @@ group NotificationAPI "Notification API" {
 			* \code
 			* 	// In this example, the green light repeatedly flashes on for 300 milliseconds and turns off for one second.
 			*	maNotificationLocalSetProperty(notificationHandle, MA_NOTIFICATION_LOCAL_FLASH_LIGHTS_PATTERN, "0xff00ff00,300,1000");
+			* \endcode
 			*/
 			FLASH_LIGHTS_PATTERN = "flashLightsPattern";
 		}
@@ -10077,23 +10081,6 @@ group CaptureAPI "Capture API" {
 			VIDEO_QUALITY = "videoQuality";
 
 			/**
-			* @brief Set the display name for the next captured images.
-			* Platform: Android.
-			*
-			* @validvalue Any string.
-			*
-			* @getandset
-			*
-			* @par Example
-			* \code
-			*   char buf[256];
-			*   sprintf(buf, "%s", "My title");
-			*	maCaptureSetProperty(MA_CAPTURE_DISPLAY_NAME, buf);
-			* \endcode
-			*/
-			DISPLAY_NAME = "displayName";
-
-			/**
 			* @brief Store the recorded movie/taken photo to the user’s Camera Roll album.
 			* Platform: iOS.
 			*
@@ -10110,24 +10097,6 @@ group CaptureAPI "Capture API" {
 			* \endcode
 			*/
 			CAMERA_ROLL = "cameraRoll";
-
-			/**
-			* @brief Store the recorded movie/taken photo to the user’s Gallery album.
-			* Platform: Android.
-			*
-			* @validvalue "false" or "true".
-			* Default value: "true".
-			*
-			* @getandset
-			*
-			* @par Example
-			* \code
-			*   char buf[256];
-			*   sprintf(buf, "%s", "true");
-			*	maCaptureSetProperty(MA_CAPTURE_GALLERY, buf);
-			* \endcode
-			*/
-			GALLERY = "gallery";
 
 			/**
 			* @brief Set the flash mode used by the active camera.
@@ -10271,7 +10240,7 @@ group CaptureAPI "Capture API" {
 
 		/**
 		* \brief Save a image data object to a file.
-		* \param handle Handle to a image data object.
+		* \param handle Handle to an image data object.
 		* \param fullPath A buffer containing the a full path where the file will be created.
 		* \param fullPathBufSize The size of the fullPath buffer.
 		*
@@ -10282,6 +10251,20 @@ group CaptureAPI "Capture API" {
 		*  - #MA_CAPTURE_RES_FILE_ALREADY_EXISTS if the file already exists.
 		*/
 		int maCaptureWriteImage(in MAHandle handle, in MAString fullPath, in int fullPathBufSize);
+
+		/**
+		* \brief Get full path to a taken picture.
+		* Available on Android only.
+		* \param handle Handle to an image data object.
+		* \param buffer Will contain the full path of the image file.
+		* \param bufferSize Maximum size of the buffer.
+		*
+		* \returns One of the next constants:
+		*  - MA_CAPTURE_RES_OK if no error occurred.
+		*  - MA_CAPTURE_RES_INVALID_HANDLE if the given handle was invalid.
+		*  - MA_CAPTURE_RES_INVALID_STRING_BUFFER_SIZE if the buffer size was to small.
+		*/
+		int maCaptureGetImagePath(in MAHandle handle, out MAString buffer range("bufferSize"), in int bufferSize);
 
 		/**
 		* \brief Get full path to a recorded video.
