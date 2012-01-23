@@ -37,17 +37,17 @@ namespace MoSync
     namespace NativeUI
     {
         /**
-         * The ToggleButton class defining a ToggleButton button. 
+         * The ToggleButton class defining a ToggleButton button.
          */
         public class ToggleButton : WidgetBaseWindowsPhone
         {
             /**
-             * The native ToggleButton widget. 
+             * The native ToggleButton widget.
              */
             protected Microsoft.Phone.Controls.ToggleSwitch mToggleButton;
 
             /**
-             * Constructor 
+             * Constructor
              */
             public ToggleButton()
             {
@@ -78,7 +78,7 @@ namespace MoSync
                        //posting a CustomEvent
                        mRuntime.PostCustomEvent(MoSync.Constants.EVENT_TYPE_WIDGET, eventData);
                    });
-                
+
             }
 
             /**
@@ -108,4 +108,3 @@ namespace MoSync
         }
     }
 }
-

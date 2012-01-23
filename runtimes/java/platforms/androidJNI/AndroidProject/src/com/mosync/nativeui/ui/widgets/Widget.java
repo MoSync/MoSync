@@ -18,14 +18,12 @@ MA 02110-1301, USA.
 package com.mosync.nativeui.ui.widgets;
 
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.GradientDrawable.Orientation;
 import android.view.View;
 
-import com.mosync.internal.android.MoSyncThread;
 import com.mosync.internal.generated.IX_WIDGET;
 import com.mosync.nativeui.core.NativeUI;
 import com.mosync.nativeui.core.Types;
@@ -283,6 +281,10 @@ public class Widget
 				return "false";
 			}
 		}
+		else if(property.equals( IX_WIDGET.MAW_WIDGET_ALPHA ) )
+		{
+			return Float.toString(m_alpha);
+		}
 		return INVALID_PROPERTY_NAME;
 	}
 
@@ -393,5 +395,8 @@ public class Widget
 			return;
 		}
 		background.setAlpha( alpha & 0xff );
+		// Needed so that the view can be refreshed, if this
+		// property is set dynamically, after the view is drawn.
+		getView( ).invalidateDrawable(background);
 	}
 }

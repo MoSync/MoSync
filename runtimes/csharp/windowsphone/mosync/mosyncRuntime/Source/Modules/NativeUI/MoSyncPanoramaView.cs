@@ -41,7 +41,6 @@ namespace MoSync
         public class PanoramaView : Screen
         {
             protected Microsoft.Phone.Controls.Panorama mPanorama;
-
             /**
              * The constructor
              */
@@ -58,7 +57,14 @@ namespace MoSync
              */
             public override void AddChild(IWidget child)
             {
-                if (child is Screen)
+                if (child is ApplicationBar)
+                {
+                    MoSync.Util.RunActionOnMainThreadSync(() =>
+                    {
+                        mPage.ApplicationBar = (child as ApplicationBar).GetApplicationBar();
+                    });
+                }
+                else if (child is Screen)
                 {
                     MoSync.Util.RunActionOnMainThreadSync(() =>
                     {
@@ -179,6 +185,11 @@ namespace MoSync
                 {
                     return mPanorama.SelectedIndex.ToString();
                 }
+            }
+
+            public IScreen getSelectedScreen()
+            {
+                return mChildren[mPanorama.SelectedIndex] as IScreen;
             }
         }
     }

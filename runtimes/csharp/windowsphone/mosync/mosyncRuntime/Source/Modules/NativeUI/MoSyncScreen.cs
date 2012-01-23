@@ -59,7 +59,7 @@ namespace MoSync
              * @param from Object the object that triggers the event
              * @param args System.ComponentModel.CancelEventArgs the event arguments
              */
-            private void BackKeyPressHandler(object from, System.ComponentModel.CancelEventArgs args)
+            public void BackKeyPressHandler(object from, System.ComponentModel.CancelEventArgs args)
             {
                 //Will check if the event is not canceled
                 if (false == args.Cancel)
@@ -88,7 +88,15 @@ namespace MoSync
                     }
                     else if(this is StackScreen && !(this.GetParent() is TabScreen))
                     {
-                        if ((this as StackScreen).StackCount() > 1 && (this as StackScreen).GetBackButtonEnabled() == true)
+                        if (this.GetParent() is PanoramaView)
+                        {
+                            if ((this.GetParent() as PanoramaView).getSelectedScreen().Equals(this) && (this as StackScreen).StackCount() > 1)
+                            {
+                                (this as StackScreen).Pop();
+                                args.Cancel = true;
+                            }
+                        }
+                        else if((this as StackScreen).StackCount() > 1 && (this as StackScreen).GetBackButtonEnabled() == true)
                         {
                             //Do a pop and cancel the event
                             (this as StackScreen).Pop();
@@ -102,6 +110,7 @@ namespace MoSync
             public override void AddChild(IWidget child)
             {
                 base.AddChild(child);
+
                 WidgetBaseWindowsPhone w = (WidgetBaseWindowsPhone)child;
                 MoSync.Util.RunActionOnMainThreadSync(() =>
                 {
