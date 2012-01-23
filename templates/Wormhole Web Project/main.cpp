@@ -147,7 +147,18 @@ public:
 	 */
 	void handleMessageStream(WebView* webView, MAHandle data)
 	{
-		//Nothing to do here
+		MessageStream stream(webView, data);
+
+		const char* p;
+
+		while (p = stream.getNext())
+		{
+			//close the app on a close message
+			if (0 == strcmp(p, "close"))
+			{
+				close();
+			}
+		}
 	}
 
 private:
