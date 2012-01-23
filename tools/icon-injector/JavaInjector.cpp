@@ -26,11 +26,13 @@ using namespace std;
 
 namespace MoSync {
 
+void read72line(ifstream& input, char* buf, int bufSize);
+
 static int j_inject(const char *jarFile, const char *pngFile) {
 	int res;
 
 	//extract manifest
-	char buf[1024];
+	char buf[8192];
 	sprintf(buf, "unzip -o \"%s\" \"%s\"", jarFile, "META-INF/MANIFEST.MF");
 	res = run(buf);
 	if(res != 0)
@@ -42,7 +44,7 @@ static int j_inject(const char *jarFile, const char *pngFile) {
 		ifstream mfIn("META-INF/MANIFEST.MF");
 		ostringstream mfStrOut;
 		while(1) {
-			mfIn.getline(buf, sizeof(buf));
+			read72line(mfIn, buf, sizeof(buf));
 			if(!mfIn.good())
 				break;
 			char name[1024], midlet[1024];
@@ -50,6 +52,7 @@ static int j_inject(const char *jarFile, const char *pngFile) {
 				// Modifying the manifest will lead to deployment problems,
 				// hence this fix
 				//mfStrOut << "MIDlet-1: " << name << ", " << pngFile << ", " << midlet << "\n";
+				printf("Found icon file in manifest: %s\n", icon);
 			}
 			mfStrOut << buf << "\n";
 		}
@@ -71,6 +74,22 @@ static int j_inject(const char *jarFile, const char *pngFile) {
 	return 0;
 }
 
+void read72line(ifstream& input, char* buf, int bufSize) {
+	bool readNextLine = true;
+	int offset = 0;
+	while (readNextLine) {
+		input.getline(buf + offset, bufSize - offset);
+		streamsize read = input.gcount();
+		offset += read - 1;
+		// Manifests w exactly 72 bytes in a line should continue on the
+		// next if there is a space at the first character position on that line.
+		bool isSpace = input.peek() == ' ';
+		if (isSpace) {
+			input.ignore(1, ' ');
+		}
+		readNextLine = input.good() && offset < bufSize && (read >= 72 || read <= 73) && isSpace;
+	}
+}
 
 void JavaInjector::inject(const Icon* icon, const std::map<std::string, std::string>& params) {
 	string size = verifyParameter(params, "size");
