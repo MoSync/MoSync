@@ -100,7 +100,7 @@ PhoneGap.exec = function(success, fail, service, action, args)
     }
 
     // MOSYNC: Use the bridge library to send the message to C++.
-    mosync.bridge.PhoneGap.send(callbackId, service, action, args);
+    bridge.PhoneGap.send(callbackId, service, action, JSON.stringify(args));
 };
 
 // MOSYNC: We currently only call this function for key, pause and resume events
@@ -141,13 +141,13 @@ function PrintObj(obj, indent)
         indent = "";
     }
 
-    console.log(indent + "@@ PrintObj");
+    mosync.log(indent + "@@ PrintObj");
 
     for (var field in obj)
     {
         if (typeof obj[field] != "function")
         {
-            console.log("  " + indent + "[" + field + ": " + obj[field] + "]");
+            mosync.log("  " + indent + "[" + field + ": " + obj[field] + "]");
             if ((null != obj[field]) && (typeof obj[field] == "object"))
             {
                 PrintObj(obj[field], indent + "  ");
@@ -168,7 +168,7 @@ PhoneGap.CallbackSuccess = function(callbackId, args, cast)
     var commandResult;
     try
     {
-        console.log("PhoneGap.CallbackSuccess: " + callbackId + " args: " + args);
+        mosync.log("@@ PhoneGap.CallbackSuccess: " + callbackId + " args: " + args);
 
         commandResult = JSON.parse(args);
 
@@ -179,7 +179,7 @@ PhoneGap.CallbackSuccess = function(callbackId, args, cast)
     }
     catch(exception)
     {
-        console.log("PhoneGap.CallbackSuccess Exception: " + exception.message);
+        mosync.log(exception.message);
     }
 
     if (PhoneGap.callbacks[callbackId] ) {
@@ -192,8 +192,7 @@ PhoneGap.CallbackSuccess = function(callbackId, args, cast)
                 }
             }
             catch (e) {
-                console.log("PhoneGap.CallbackSuccess Error in success callback: " +
-                    callbackId + " = " + e.message);
+                mosync.log("Error in success callback: "+callbackId+" = " + e.message);
             }
         }
 
@@ -202,7 +201,6 @@ PhoneGap.CallbackSuccess = function(callbackId, args, cast)
             delete PhoneGap.callbacks[callbackId];
         }
     }
-
     // Note that in WP7, this method can return a value to the native calling code
     return "";
 };
@@ -233,7 +231,7 @@ PhoneGap.CallbackError = function (callbackId, args, cast) {
             }
         }
         catch (e) {
-            console.log("Error in error callback: " + callbackId + " = " + e);
+            mosync.log("Error in error callback: "+callbackId+" = "+e);
         }
 
         // Clear callback if not expecting any more results
@@ -319,7 +317,7 @@ PhoneGap.safeClone = function(obj)
     }
     catch(e)
     {
-        console.log("CloneError::" + e.message);
+        mosync.log("CloneError::" + e.message);
     }
     return null;
 };
@@ -453,7 +451,7 @@ PhoneGap.addConstructor = function(func)
         try {
             func();
         } catch(e) {
-            console.log("Failed to run constructor: " + e);
+            mosync.log("Failed to run constructor: " + e);
         }
     });
 };
@@ -477,7 +475,7 @@ PhoneGap.addPlugin = function(name, obj) {
         window.plugins[name] = obj;
     }
     else {
-        console.log("Error: Plugin "+name+" already exists.");
+        mosync.log("Error: Plugin "+name+" already exists.");
     }
 };
 
@@ -625,7 +623,7 @@ document.addEventListener('DOMContentLoaded', function() {
 PhoneGap.m_document_addEventListener = document.addEventListener;
 document.addEventListener = function(evt, handler, capture)
 {
-    console.log("document.addEventListener event named " + evt);
+    mosync.log("document.addEventListener event named " + evt);
 
     var e = evt.toLowerCase();
     if (e === 'deviceready')
@@ -658,7 +656,7 @@ document.addEventListener = function(evt, handler, capture)
 PhoneGap.m_document_removeEventListener = document.removeEventListener;
 document.removeEventListener = function(evt, handler, capture)
 {
-    console.log("document.removeEventListener event named " + evt);
+    mosync.log("document.removeEventListener event named " + evt);
 
     var e = evt.toLowerCase();
 
@@ -730,13 +728,13 @@ Accelerometer.prototype.getCurrentAcceleration = function(successCallback, error
 
     // successCallback required
     if (typeof successCallback !== "function") {
-        console.log("Accelerometer Error: successCallback is not a function");
+        mosync.log("Accelerometer Error: successCallback is not a function");
         return;
     }
 
     // errorCallback optional
     if (errorCallback && (typeof errorCallback !== "function")) {
-        console.log("Accelerometer Error: errorCallback is not a function");
+        mosync.log("Accelerometer Error: errorCallback is not a function");
         return;
     }
 
@@ -745,7 +743,7 @@ Accelerometer.prototype.getCurrentAcceleration = function(successCallback, error
     var onSuccess = function(result)
     {
         var accResult = JSON.parse(result);
-        console.log("Accel x = " + accResult.x);
+        mosync.log("Accel x = " + accResult.x);
         self.lastAcceleration = new Acceleration(accResult.x,accResult.y,accResult.z);
         successCallback(self.lastAcceleration);
     }
@@ -773,19 +771,19 @@ Accelerometer.prototype.watchAcceleration = function(successCallback, errorCallb
 
     // successCallback required
     if (typeof successCallback !== "function") {
-        console.log("Accelerometer Error: successCallback is not a function");
+        mosync.log("Accelerometer Error: successCallback is not a function");
         return;
     }
 
     // errorCallback optional
     if (errorCallback && (typeof errorCallback !== "function")) {
-        console.log("Accelerometer Error: errorCallback is not a function");
+        mosync.log("Accelerometer Error: errorCallback is not a function");
         return;
     }
 
     var onSuccess = function (result) {
         var accResult = JSON.parse(result);
-        console.log("Accel x = " + accResult.x);
+        mosync.log("Accel x = " + accResult.x);
         self.lastAcceleration = new Acceleration(accResult.x, accResult.y, accResult.z);
         successCallback(self.lastAcceleration);
     }
@@ -821,7 +819,7 @@ function()
 {
     if (!navigator.accelerometer)
     {
-        console.log("Installing accelerometer");
+        mosync.log("Installing accelerometer");
         navigator.accelerometer = new Accelerometer();
     }
 });
@@ -904,16 +902,16 @@ Camera.prototype.PictureSourceType = Camera.PictureSourceType;
  * @param {Object} options
  */
 Camera.prototype.getPicture = function(successCallback, errorCallback, options) {
-    console.log("Camera.prototype.getPicture");
+    mosync.log("Camera.prototype.getPicture");
     // successCallback required
     if (typeof successCallback !== "function") {
-        console.log("Camera Error: successCallback is not a function");
+        mosync.log("Camera Error: successCallback is not a function");
         return;
     }
 
     // errorCallback optional
     if (errorCallback && (typeof errorCallback !== "function")) {
-        console.log("Camera Error: errorCallback is not a function");
+        mosync.log("Camera Error: errorCallback is not a function");
         return;
     }
 
@@ -1083,13 +1081,13 @@ Capture.prototype.captureAudio = function(successCallback, errorCallback, option
  */
 Capture.prototype.captureImage = function (successCallback, errorCallback, options) {
 	PhoneGap.exec(	function(mediaFiles)
-			{
-				successCallback(Capture.prototype._castMediaFile(mediaFiles).message);
-			},
-			function(error)
-			{
-				errorCallback({code:CaptureError[error.code]});
-			}, "Capture", "captureImage", options);
+					{
+						successCallback(Capture.prototype._castMediaFile(mediaFiles).message);
+					},
+					function(error)
+					{
+						errorCallback({code:CaptureError[error.code]});
+					}, "Capture", "captureImage", options);
 };
 
 /**
@@ -1101,13 +1099,13 @@ Capture.prototype.captureImage = function (successCallback, errorCallback, optio
  */
 Capture.prototype.captureVideo = function(successCallback, errorCallback, options){
 	PhoneGap.exec(	function(mediaFiles)
-			{
-				successCallback(Capture.prototype._castMediaFile(mediaFiles).message);
-			},
-			function(error)
-			{
-				errorCallback({code:CaptureError[error.code]});
-			}, "Capture", "captureVideo", options);
+					{
+						successCallback(Capture.prototype._castMediaFile(mediaFiles).message);
+					},
+					function(error)
+					{
+						errorCallback({code:CaptureError[error.code]});
+					}, "Capture", "captureVideo", options);
 };
 
 /**
@@ -1182,7 +1180,7 @@ PhoneGap.addConstructor(function () {
         navigator.device = window.device = new Device();
     }
     if (typeof navigator.device.capture === "undefined") {
-        console.log("Installing capture");
+        mosync.log("Installing capture");
         navigator.device.capture = window.device.capture = new Capture();
     }
 });
@@ -1223,13 +1221,13 @@ Compass.prototype.getCurrentHeading = function(successCallback, errorCallback, o
 
     // successCallback required
     if (typeof successCallback !== "function") {
-        console.log("Compass Error: successCallback is not a function");
+        mosync.log("Compass Error: successCallback is not a function");
         return;
     }
 
     // errorCallback optional
     if (errorCallback && (typeof errorCallback !== "function")) {
-        console.log("Compass Error: errorCallback is not a function");
+        mosync.log("Compass Error: errorCallback is not a function");
         //return;
 
         errorCallback = function(){};
@@ -1241,7 +1239,7 @@ Compass.prototype.getCurrentHeading = function(successCallback, errorCallback, o
         var onSuccess = function(result)
         {
             var compassResult = JSON.parse(result);
-            console.log("compassResult = " + compassResult);
+            mosync.log("compassResult = " + compassResult);
             self.lastHeading = compassResult;
             successCallback(self.lastHeading);
         }
@@ -1283,13 +1281,13 @@ Compass.prototype.watchHeading= function(successCallback, errorCallback, options
 
     // successCallback required
     if (typeof successCallback !== "function") {
-        console.log("Compass Error: successCallback is not a function");
+        mosync.log("Compass Error: successCallback is not a function");
         return -1; // in case caller later calls clearWatch with this id
     }
 
     // errorCallback optional
     if (errorCallback && (typeof errorCallback !== "function")) {
-        console.log("Compass Error: errorCallback is not a function");
+        mosync.log("Compass Error: errorCallback is not a function");
         return -1; // in case caller later calls clearWatch with this id
     }
 
@@ -1576,7 +1574,7 @@ Contacts.prototype.find = function(fields, successCB, errorCB, options) {
             errorCB({"code": ContactError.INVALID_ARGUMENT_ERROR});
             },0);
         }
-        console.log("Contacts.find::ContactError::INVALID_ARGUMENT_ERROR");
+        mosync.log("Contacts.find::ContactError::INVALID_ARGUMENT_ERROR");
     }
     else
     {
@@ -1676,7 +1674,7 @@ var Device = function() {
     this.getInfo(
         function (res) {
             var info = JSON.parse(res);
-            console.log("GotDeviceInfo :: " + info.version);
+            mosync.log("GotDeviceInfo :: " + info.version);
             me.available = true;
             me.platform = info.platform;
             me.version = info.version;
@@ -1688,7 +1686,7 @@ var Device = function() {
         },
         function(e) {
             me.available = false;
-            console.log("Error initializing PhoneGap: " + e);
+            mosync.log("Error initializing PhoneGap: " + e);
         });
 };
 
@@ -1702,13 +1700,13 @@ Device.prototype.getInfo = function(successCallback, errorCallback) {
 
     // successCallback required
     if (typeof successCallback !== "function") {
-        console.log("Device Error: successCallback is not a function");
+        mosync.log("Device Error: successCallback is not a function");
         return;
     }
 
     // errorCallback optional
     if (errorCallback && (typeof errorCallback !== "function")) {
-        console.log("Device Error: errorCallback is not a function");
+        mosync.log("Device Error: errorCallback is not a function");
         return;
     }
 
@@ -1776,7 +1774,7 @@ if(!window.localStorage)
                 key = this.keys[n];
                 if(!this.hasOwnProperty(key))
                 {
-                    console.log("didn't have a prop, now we do ...");
+                    mosync.log("didn't have a prop, now we do ...");
                     Object.defineProperty( this, key,
                     {
 
@@ -2380,7 +2378,7 @@ FileWriter.prototype.write = function (text) {
     if (typeof me.onwritestart === "function") {
         me.onwritestart({ "type": "writestart", "target": me });
     }
-    //console.log("================== write - this.position: " + this.position);
+    //mosync.log("================== write - this.position: " + this.position);
     // Write file
     navigator.fileMgr.write(this.fileName, text, this.position,
 
@@ -2454,8 +2452,8 @@ FileWriter.prototype.seek = function(offset) {
     if (this.readyState === FileWriter.WRITING) {
         throw FileError.INVALID_STATE_ERR;
     }
-    //console.log("================== seek - offset: " + offset);
-    //console.log("================== seek - this.length: " + this.length);
+    //mosync.log("================== seek - offset: " + offset);
+    //mosync.log("================== seek - this.length: " + this.length);
     if (!offset) {
         return;
     }
@@ -2474,7 +2472,7 @@ FileWriter.prototype.seek = function(offset) {
     else {
         this.position = offset;
     }
-    //console.log("================== seek - this.position: " + this.position);
+    //mosync.log("================== seek - this.position: " + this.position);
 };
 
 /**
@@ -2911,9 +2909,11 @@ LocalFileSystem.prototype._castFS = function (pluginResult) {
 LocalFileSystem.prototype._castEntry = function(pluginResult) {
     var entry = null;
     if (pluginResult.message.isDirectory) {
+        mosync.log("This is a dir");
         entry = new DirectoryEntry();
     }
     else if (pluginResult.message.isFile) {
+        mosync.log("This is a file");
         entry = new FileEntry();
     }
     entry.isDirectory = pluginResult.message.isDirectory;
@@ -2937,9 +2937,11 @@ LocalFileSystem.prototype._castEntries = function(pluginResult) {
 LocalFileSystem.prototype._createEntry = function(castMe) {
     var entry = null;
     if (castMe.isDirectory) {
+        mosync.log("This is a dir");
         entry = new DirectoryEntry();
     }
     else if (castMe.isFile) {
+        mosync.log("This is a file");
         entry = new FileEntry();
     }
     entry.isDirectory = castMe.isDirectory;
@@ -3108,25 +3110,25 @@ var Media = function(src, successCallback, errorCallback, statusCallback, positi
 
     // successCallback optional
     if (successCallback && (typeof successCallback !== "function")) {
-        console.log("Media Error: successCallback is not a function");
+        mosync.log("Media Error: successCallback is not a function");
         return;
     }
 
     // errorCallback optional
     if (errorCallback && (typeof errorCallback !== "function")) {
-        console.log("Media Error: errorCallback is not a function");
+        mosync.log("Media Error: errorCallback is not a function");
         return;
     }
 
     // statusCallback optional
     if (statusCallback && (typeof statusCallback !== "function")) {
-        console.log("Media Error: statusCallback is not a function");
+        mosync.log("Media Error: statusCallback is not a function");
         return;
     }
 
     // statusCallback optional
     if (positionCallback && (typeof positionCallback !== "function")) {
-        console.log("Media Error: positionCallback is not a function");
+        mosync.log("Media Error: positionCallback is not a function");
         return;
     }
 
@@ -3331,13 +3333,13 @@ var Connection = function()
     var me = this;
     this.getInfo(
         function(type) {
-            console.log("getInfo result" + type);
+            mosync.log("getInfo result" + type);
             // Need to send events if we are on or offline
             if (type == "none") {
                 // set a timer if still offline at the end of timer send the offline event
                 me._timer = setTimeout(function(){
                     me.type = type;
-                    console.log("PhoneGap.fireEvent::offline");
+                    mosync.log("PhoneGap.fireEvent::offline");
                     PhoneGap.fireEvent(document,'offline');
                     me._timer = null;
                     }, me.timeout);
@@ -3348,7 +3350,7 @@ var Connection = function()
                     me._timer = null;
                 }
                 me.type = type;
-                console.log("PhoneGap.fireEvent::online " + me.type);
+                mosync.log("PhoneGap.fireEvent::online " + me.type);
                 PhoneGap.fireEvent(document,'online');
             }
 
@@ -3356,12 +3358,12 @@ var Connection = function()
             if (me._firstRun)
             {
                 me._firstRun = false;
-                console.log("onPhoneGapConnectionReady");
+                mosync.log("onPhoneGapConnectionReady");
                 PhoneGap.onPhoneGapConnectionReady.fire();
             }
         },
         function(e) {
-            console.log("Error initializing Network Connection: " + e);
+            mosync.log("Error initializing Network Connection: " + e);
         });
 };
 
