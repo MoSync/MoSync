@@ -29,6 +29,8 @@
 
 #include "MainScreen.h"
 
+#define MAX_TEXT_LENGTH_LABEL "Max text length"
+
 
 /**
  * Constructor.
@@ -41,6 +43,7 @@ MainScreen::MainScreen() :
 	mGetTextButton(NULL),
 	mGetTextLabel(NULL),
 	mKeyboardButton(NULL),
+	mMaxTextLengthEditBox(NULL),
 	mKeyboard(false)
 {
 	createMainLayout();
@@ -48,6 +51,7 @@ MainScreen::MainScreen() :
 	mSetTextButton->addButtonListener(this);
 	mGetTextButton->addButtonListener(this);
 	mKeyboardButton->addButtonListener(this);
+	mMaxTextLengthEditBox->addEditBoxListener(this);
 	mEditBox->addEditBoxListener(this);
 }
 
@@ -56,10 +60,11 @@ MainScreen::MainScreen() :
  */
 MainScreen::~MainScreen()
 {
-    mSetTextButton->removeButtonListener(this);
-    mGetTextButton->removeButtonListener(this);
-    mKeyboardButton->removeButtonListener(this);
-    mEditBox->removeEditBoxListener(this);
+	mSetTextButton->removeButtonListener(this);
+	mGetTextButton->removeButtonListener(this);
+	mKeyboardButton->removeButtonListener(this);
+	mEditBox->removeEditBoxListener(this);
+	mMaxTextLengthEditBox->removeEditBoxListener(this);
 }
 
 /**
@@ -69,35 +74,36 @@ MainScreen::~MainScreen()
  */
 void MainScreen::buttonClicked(Widget* button)
 {
-    if (button == mSetTextButton)
-    {
-        mEditBox->setText("DEFAULT");
-    }
-    else if (button == mGetTextButton)
-    {
+	if (button == mSetTextButton)
+	{
+		mEditBox->setText("DEFAULT");
+	}
+	else if (button == mGetTextButton)
+	{
 		mGetTextLabel->setText(mEditBox->getText());
 
-        MAUtil::String text = mEditBox->getText();
-        printf("get text = %s", text.c_str());
-    }
-    else if (button == mKeyboardButton)
-    {
-        mKeyboard = !mKeyboard;
-        if (mKeyboard)
-        {
-            mEditBox->showKeyboard();
-        }
-        else
-        {
-            mEditBox->hideKeyboard();
-        }
-    }
+		MAUtil::String text = mEditBox->getText();
+		printf("get text = %s", text.c_str());
+	}
+	else if (button == mKeyboardButton)
+	{
+		mKeyboard = !mKeyboard;
+		if (mKeyboard)
+		{
+			mEditBox->showKeyboard();
+		}
+		else
+		{
+			mEditBox->hideKeyboard();
+		}
+	}
 }
 
 /**
  * Creates and adds main layout to the screen.
  */
-void MainScreen::createMainLayout() {
+void MainScreen::createMainLayout()
+{
 	// Create and add the main layout to the screen.
 	mMainLayout = new VerticalLayout();
 //	mMainLayout->setBackgroundColor(0xFF0000);
@@ -129,6 +135,8 @@ void MainScreen::createMainLayout() {
 	mKeyboardButton->setText("Show/hide keyboard");
 	mMainLayout->addChild(mKeyboardButton);
 
+	this->createMaxTextLengthWidgets(mMainLayout);
+
 	mEditBoxEmail = new EditBox();
 	mEditBoxEmail->setPlaceholder("Enter email address...");
 	mEditBoxEmail->setInputMode(EDIT_BOX_INPUT_MODE_EMAILADDR);
@@ -151,6 +159,28 @@ void MainScreen::createMainLayout() {
 }
 
 /**
+ * Create and add widgets for testing the max text length property.
+ * @param mainLayout Widgets will be added to it.
+ */
+void MainScreen::createMaxTextLengthWidgets(VerticalLayout* mainLayout)
+{
+	// Create layout for widgets.
+	HorizontalLayout* layout = new HorizontalLayout();
+	mainLayout->addChild(layout);
+
+	// Add label with info.
+	Label* label = new Label();
+	label->setText(MAX_TEXT_LENGTH_LABEL);
+	layout->addChild(label);
+
+	// Create the edit box.
+	mMaxTextLengthEditBox = new EditBox();
+	mMaxTextLengthEditBox->setInputMode(EDIT_BOX_INPUT_MODE_DECIMAL);
+	mMaxTextLengthEditBox->setWidth(this->getWidth() / 2);
+	layout->addChild(mMaxTextLengthEditBox);
+}
+
+/**
  * This method is called when an edit box gains focus.
  * The virtual keyboard is shown.
  * Only for iphone platform.
@@ -158,10 +188,10 @@ void MainScreen::createMainLayout() {
  */
 void MainScreen::editBoxEditingDidBegin(EditBox* editBox)
 {
-    if (editBox == mEditBox)
-    {
-        printf("editBoxEditingDidBegin for mEditBox");
-    }
+	if (editBox == mEditBox)
+	{
+		printf("editBoxEditingDidBegin for mEditBox");
+	}
 }
 
 /**
@@ -172,11 +202,11 @@ void MainScreen::editBoxEditingDidBegin(EditBox* editBox)
  */
 void MainScreen::editBoxEditingDidEnd(EditBox* editBox)
 {
-    if (editBox == mEditBox)
-    {
-        printf("editBoxEditingDidEnd for mEditBox");
-        mEditBox->hideKeyboard();
-    }
+	if (editBox == mEditBox)
+	{
+		printf("editBoxEditingDidEnd for mEditBox");
+		mEditBox->hideKeyboard();
+	}
 }
 
 /**
@@ -186,13 +216,22 @@ void MainScreen::editBoxEditingDidEnd(EditBox* editBox)
  * @param text The new text.
  */
 void MainScreen::editBoxTextChanged(
-    EditBox* editBox,
-    const MAUtil::String& text)
+	EditBox* editBox,
+	const MAUtil::String& text)
 {
-    if (editBox == mEditBox)
-    {
-        printf("editBoxTextChanged for mEditBox text = %s", text.c_str());
-    }
+	if (editBox == mEditBox)
+	{
+		printf("editBoxTextChanged for mEditBox text = %s", text.c_str());
+	}
+	else if (editBox == mMaxTextLengthEditBox)
+	{
+		int maxTextLength = MAUtil::stringToInteger(
+			mMaxTextLengthEditBox->getText());
+		if (maxTextLength != 0)
+		{
+			mEditBox->setMaxLength(maxTextLength);
+		}
+	}
 }
 
 /**
@@ -204,9 +243,5 @@ void MainScreen::editBoxTextChanged(
  */
 void MainScreen::editBoxReturn(EditBox* editBox)
 {
-    if (editBox == mEditBox)
-    {
-        printf("editBoxReturn for mEditBox");
-        mEditBox->hideKeyboard();
-    }
+	 mEditBox->hideKeyboard();
 }

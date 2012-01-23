@@ -118,6 +118,12 @@ private:
 	 */
 	void createMainLayout();
 
+	/**
+	 * Create and add widgets for testing the max text length property.
+	 * @param mainLayout Widgets will be added to it.
+	 */
+	void createMaxTextLengthWidgets(VerticalLayout* mainLayout);
+
 private:
 	/**
 	 * Main layout.
@@ -129,6 +135,11 @@ private:
 	Button* mGetTextButton;
 	Label* mGetTextLabel;
 	Button* mKeyboardButton;
+
+	/**
+	 * The max input text length for mEditBox.
+	 */
+	EditBox* mMaxTextLengthEditBox;
 
 	EditBox* mEditBoxEmail;
 	EditBox* mEditBoxDecimal;
