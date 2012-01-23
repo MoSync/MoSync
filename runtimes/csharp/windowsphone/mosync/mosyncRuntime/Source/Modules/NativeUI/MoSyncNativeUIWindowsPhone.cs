@@ -305,11 +305,7 @@ namespace MoSync
                 }
                 get
                 {
-                    if (null != mView.Opacity)
-                    {
-                        return mView.Opacity.ToString();
-                    }
-                    return "1";
+                    return mView.Opacity.ToString();
                 }
             }
 
