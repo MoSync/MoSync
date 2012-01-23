@@ -4923,7 +4923,7 @@ group WidgetAPI "Widget API" {
 		/**
 		* @brief A panorama control is a Windows Phone 7 specific control
 		* Available only on Windows Phone 7
-		* Seen \ref WidgetPanoramaViewProperties "Panorama View properties" for the properties available
+		* See \ref WidgetPanoramaViewProperties "Panorama View properties" for the properties available
 		*/
 		PANORAMA_VIEW = "PanoramaView";
 	}
@@ -5184,7 +5184,7 @@ group WidgetAPI "Widget API" {
 		* 	char currentScreenBuffer[BUFFER_SIZE];
 		* 	int result = maWidgetGetProperty(
 		* 		panoramaViewHandle,
-		* 		MAW_WEB_VIEW_CURRENT_SCREEN,
+		* 		MAW_PANORAMA_VIEW_CURRENT_SCREEN,
 		* 		currentScreenBuffer,
 		*		BUFFER_SIZE);
 		* 	if (result > 0)
@@ -5201,6 +5201,7 @@ group WidgetAPI "Widget API" {
 		 * @validvalue MoSync handle to an uncompressed image resource. The size of the image should be large enough to fill the space used by the panorama
 		 *
 		 * @setonly
+		 *
 		 * @par Example
 		 * \code
 		 *	maWidgetSetProperty(panoramaViewHandle, MAW_PANORAMA_VIEW_BACKGROUND_IMAGE, toString(R_MY_IMG));
