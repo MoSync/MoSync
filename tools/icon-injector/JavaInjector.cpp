@@ -87,7 +87,7 @@ void read72line(ifstream& input, char* buf, int bufSize) {
 		if (isSpace) {
 			input.ignore(1, ' ');
 		}
-		readNextLine = input.good() && offset < bufSize && (read >= 72 || read <= 73) && isSpace;
+		readNextLine = input.good() && offset < bufSize && read >= 72 && read <= 73 && isSpace;
 	}
 }
 
