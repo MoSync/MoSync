@@ -147,6 +147,7 @@ namespace NativeUI
 
     /**
      * Show video control.
+     * Platform: iOS.
      */
     void VideoView::showControl()
     {
@@ -155,6 +156,7 @@ namespace NativeUI
 
     /**
      * Hide video control.
+     * Platform: iOS.
      */
     void VideoView::hideControl()
     {
@@ -163,6 +165,7 @@ namespace NativeUI
 
     /**
      * Check if the video control is visible.
+     * Platform: iOS.
      */
     bool VideoView::isControlVisible()
     {
