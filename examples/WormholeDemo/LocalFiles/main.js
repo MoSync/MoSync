@@ -1,11 +1,16 @@
-var localPath;
+var userFilesDir;
 
 document.addEventListener("deviceready", function() {
 	document.getElementById("platform_li").innerHTML = "Platform: " + device.platform;
 	document.getElementById("plaformversion_li").innerHTML = "Version: " + device.version;
 	document.getElementById("deviceName_li").innerHTML = "Device: " + device.name;
-	bridge.file.getLocalPath(function(path){
-		localPath=path;
+	window.resolveLocalFileSystemURI("file:///UserFiles/",function(dirEntry){
+		userFilesDir = dirEntry;
+		alert(userFilesDir.fullPath);
+	},
+	function(error)
+	{
+		alert(error);
 	});
 }, true);
 
@@ -145,6 +150,7 @@ function captureVideo()
 	navigator.device.capture.captureVideo(
 			function(mediaFiles)
 			{
+				alert(mediaFiles[0].fullPath);
 				document.getElementById('videoWidget').setAttribute("src", "file://" + mediaFiles[0].fullPath);
 			},
 			function(error)
@@ -167,6 +173,27 @@ function captureImage()
 }
 
 function readData()
+{
+
+}
+
+function refreshFiles()
+{
+
+}
+
+function setFile(contents)
+{
+	//alert(contents);
+	jQT.goTo('#filePage','pop');
+}
+
+function createFile()
+{
+
+}
+
+function deleteFile()
 {
 
 }
