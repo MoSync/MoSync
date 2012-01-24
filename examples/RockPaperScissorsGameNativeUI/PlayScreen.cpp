@@ -545,21 +545,9 @@ void PlayScreen::setupUI()
 	}
 
 	// Get the screen size.
-	if (NULL != strstr(MA_PROF_STRING_PLATFORM, "android"))
-	{
-		MAExtent screenSize = maGetScrSize();
-		mScreenWidth = EXTENT_X(screenSize);
-		mScreenHeight = EXTENT_Y(screenSize);
-	}
-	else
-	{
-		char width[10];
-		char height[10];
-		maWidgetGetProperty(mScreen, MAW_WIDGET_WIDTH, width, 10);
-		maWidgetGetProperty(mScreen, MAW_WIDGET_HEIGHT, height, 10);
-		mScreenWidth = MAUtil::stringToInteger(width,10);
-		mScreenHeight = MAUtil::stringToInteger(height,10);
-	}
+	MAExtent screenSize = maGetScrSize();
+	mScreenWidth = EXTENT_X(screenSize);
+	mScreenHeight = EXTENT_Y(screenSize);
 
 	// Set the necessary size for fonts and padding.
 	setSizes();
