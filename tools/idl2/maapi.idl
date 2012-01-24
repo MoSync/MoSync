@@ -5889,7 +5889,7 @@ group WidgetAPI "Widget API" {
 		/**
 		* @brief Sets or gets the maximum input lenght of the edit box.
 		* Setting this value enables multiline input mode by default.
-		* Available on Android only.
+		* Available on Android and iOS.
 		*
 		* @validvalue A positive integer.
 		*

@@ -1,11 +1,27 @@
-var localPath;
+var userFilesDir;
+var textChanged = false;
+var currentFile;
 
 document.addEventListener("deviceready", function() {
 	document.getElementById("platform_li").innerHTML = "Platform: " + device.platform;
 	document.getElementById("plaformversion_li").innerHTML = "Version: " + device.version;
 	document.getElementById("deviceName_li").innerHTML = "Device: " + device.name;
-	bridge.file.getLocalPath(function(path){
-		localPath=path;
+	window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, function(fileSystem)
+	{
+		fileSystem.root.getDirectory("UserFiles",
+				{create: false, exclusive: false},
+				function(dirEntry)
+				{
+					userFilesDir = dirEntry;
+				},
+				function(error)
+				{
+					alert(error);
+				});
+	},
+	function(error)
+	{
+		alert("fs error");
 	});
 }, true);
 
@@ -145,6 +161,7 @@ function captureVideo()
 	navigator.device.capture.captureVideo(
 			function(mediaFiles)
 			{
+				alert(mediaFiles[0].fullPath);
 				document.getElementById('videoWidget').setAttribute("src", "file://" + mediaFiles[0].fullPath);
 			},
 			function(error)
@@ -166,7 +183,83 @@ function captureImage()
 			});
 }
 
-function readData()
+function refreshFiles()
 {
+	var dirReader = userFilesDir.createReader();
+	$('#fileList > li').remove();
+	dirReader.readEntries(function(entries)
+	{
+		for(var i = 0; i < entries.length; i++)
+		{
+			var newLi = document.createElement("li");
+			var newA = document.createElement("a");
+			$(newA).data('file', entries[i]);
+			newA.setAttribute("onclick", "setFile($(this).data('file'))");
+			newA.innerHTML = entries[i].name;
+			newLi.appendChild(newA);
+			$('#fileList').append(newLi);
+		}
+	},
+	function(error)
+	{
+		alert("errer");
+	});
+}
 
+function setFile(file)
+{
+	jQT.goTo('#filePage','pop');
+	$('#filePanelTitle').html(file.name);
+	currentFile = file;
+	var reader = new FileReader();
+	reader.onloadend = function(evt){
+		$('#fileContents').val(evt.target.result);
+	};
+	reader.readAsText(file);
+}
+
+function createFile()
+{
+	var fileName = prompt("New File");
+	if(fileName != "")
+	{
+		userFilesDir.getFile(fileName, {create: true, exclusive: true},function(){
+			refreshFiles();
+		},
+		function()
+		{
+			alert("error");
+		});
+	}
+}
+
+function deleteFile()
+{
+	if(confirm("Delete " + currentFile.name + "?") == true)
+	{
+		currentFile.remove();
+		jQT.goBack();
+	}
+}
+
+function textHasChanged()
+{
+	textChanged = true;
+}
+
+function textLostFocus()
+{
+	if(textChanged == true)
+	{
+		textChanged = false;
+		currentFile.createWriter(function(writer){
+			writer.seek(0);
+			text = $('#fileContents').val();
+			writer.write(text);
+			writer.truncate(text.length);
+		},
+		function(error){
+			alert("error");
+		});
+	}
 }
