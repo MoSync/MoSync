@@ -8,14 +8,6 @@ Test script for PhoneGap File API.
 /**
  * For debugging.
  */
-function MyLog(s)
-{
-	console.log(s);
-}
-
-/**
- * For debugging.
- */
 function PrintObject(obj, indent)
 {
 	if (undefined === indent)
@@ -23,13 +15,13 @@ function PrintObject(obj, indent)
 		indent = "";
 	}
 
-	MyLog(indent + "@@ PrintObject");
+	console.log(indent + "@@ PrintObject");
 
 	for (var field in obj)
 	{
 		if (typeof obj[field] != "function")
 		{
-			MyLog("  " + indent + "[" + field + ": " + obj[field] + "]");
+			console.log("  " + indent + "[" + field + ": " + obj[field] + "]");
 			if ((null != obj[field]) && (typeof obj[field] == "object"))
 			{
 				PrintObject(obj[field], indent + "  ");
@@ -95,8 +87,6 @@ var FileSys = function()
 					fileSys.root = null;
 					fun(false, null);
 				});
-			// TODO: File system URIs not implemeted.
-			fun(false, null);
 		}
 	};
 
@@ -114,10 +104,10 @@ var FileSys = function()
 		{
 			return function(result)
 			{
-				MyLog("FileSys.error: " + result.code);
+				console.log("FileSys.error: " + result.code);
 				if (id)
 				{
-					MyLog("error id: " + id);
+					console.log("error id: " + id);
 				}
 				fun(false, null);
 			};
@@ -248,7 +238,7 @@ var FileSys = function()
 				function(fileEntry)
 				{
 					var uri = fileEntry.toURI();
-					console.log("################# uri: " + uri);
+					console.log("@@@@@@@@@@@ uri: " + uri);
 
 					// Full parent directory path of new file destination,
 					// excluding the file name.
@@ -258,7 +248,7 @@ var FileSys = function()
 					var newFileName;
 
 					// The new full path name.
-					var newFullPath = fileSystem.root.fullPath + "/" + newPath;
+					var newFullPath = fileSys.root.fullPath + "/" + newPath;
 
 					// Split into parent path and file name if the file
 					// is not at the root of the local file system.
@@ -268,8 +258,8 @@ var FileSys = function()
 						newParentPath = newFullPath.substring(0, index);
 						newFileName = newFullPath.substring(index + 1);
 
-						MyLog("copyOrMoveFile newParentPath: " + newParentPath);
-						MyLog("copyOrMoveFile newFileName: " + newFileName);
+						console.log("copyOrMoveFile newParentPath: " + newParentPath);
+						console.log("copyOrMoveFile newFileName: " + newFileName);
 					}
 					else
 					{
@@ -285,7 +275,7 @@ var FileSys = function()
 					if (index > -1)
 					{
 						directoryName = newParentPath.substring(index + 1);
-						MyLog("copyOrMoveFile directoryName: " + directoryName);
+						console.log("copyOrMoveFile directoryName: " + directoryName);
 					}
 
 					// Create destination directory object.
@@ -381,7 +371,7 @@ var FileSys = function()
 			if (index > -1)
 			{
 				directoryName = fullPath.substring(index + 1);
-				MyLog("deleteDirectory directoryName: " + directoryName);
+				console.log("deleteDirectory directoryName: " + directoryName);
 			}
 
 			// Create destination directory object.
@@ -453,7 +443,7 @@ function testFileSystem()
 		{
 			return function()
 			{
-				MyLog("End of tests");
+				console.log("End of tests");
 				alert("End of tests");
 			};
 		}
@@ -465,7 +455,7 @@ function testFileSystem()
 	 */
 	function runNextTest(success)
 	{
-		MyLog("Running next test");
+		console.log("Running next test");
 		nextTest()(success);
 	}
 
@@ -490,6 +480,7 @@ function testFileSystem()
 		writeFile("foc/bar/test.txt", "Hello World 2"),
 		readFile("foc/bar/test.txt", "Hello World 2"),
 		// File tests.
+		readFileAsDataURL("foc/bar/test.txt", "Hello World 2"),
 		truncateFile("foc/bar/test.txt", 5, "Hello"),
 		copyFile("foc/bar/test.txt", "foc/bar/test2.txt"),
 		readFile("foc/bar/test2.txt", "Hello"),
@@ -715,7 +706,44 @@ function testFileSystem()
 				}
 			}
 
-			fail("readFileDone failed " + path);
+			fail("readFileDone failed");
+		};
+	}
+
+	function readFileAsDataURL(path, expectedData)
+	{
+		return function(success)
+		{
+			if (success)
+			{
+				fileSys.readAsDataURL(path, readFileAsDataURLDone(expectedData));
+			}
+			else
+			{
+				fail("readFileAsDataURL failed " + path);
+			}
+		};
+	}
+
+	function readFileAsDataURLDone(expectedData)
+	{
+		return function(success, url)
+		{
+			if (success)
+			{
+				// Get data part of the url.
+				var i = url.indexOf(",");
+				var data = url.substring(i + 1);
+				var decodedData = atob(data);
+
+				if (decodedData == expectedData)
+				{
+					runNextTest(success);
+					return;
+				}
+			}
+
+			fail("readFileAsDataURLDone failed");
 		};
 	}
 
@@ -755,11 +783,11 @@ function testFileSystem()
 		{
 			if (success)
 			{
-				fileSys.copy(sourcePath, destPath, copyFileDone));
+				fileSys.copy(sourcePath, destPath, copyFileDone);
 			}
 			else
 			{
-				fail("copyFile failed " + path);
+				fail("copyFile failed " + sourcePath);
 			}
 		};
 	}
@@ -772,7 +800,7 @@ function testFileSystem()
 		}
 		else
 		{
-			fail("copyFileDone failed " + path);
+			fail("copyFileDone failed");
 		}
 	}
 
@@ -782,11 +810,11 @@ function testFileSystem()
 		{
 			if (success)
 			{
-				fileSys.move(sourcePath, destPath, moveFileDone));
+				fileSys.move(sourcePath, destPath, moveFileDone);
 			}
 			else
 			{
-				fail("moveFile failed " + path);
+				fail("moveFile failed " + sourcePath);
 			}
 		};
 	}
@@ -799,7 +827,7 @@ function testFileSystem()
 		}
 		else
 		{
-			fail("moveFileDone failed " + path);
+			fail("moveFileDone failed");
 		}
 	}
 
@@ -826,20 +854,45 @@ function testFileSystem()
 		}
 		else
 		{
-			fail("deleteFileDone failed " + path);
+			fail("deleteFileDone failed");
 		}
 	}
 
 	function fileShouldNotExist(path)
 	{
-		// TODO: Implement.
+		// Try to read, if it fails, we assume the file does not exist.
+		return function(success)
+		{
+			if (success)
+			{
+				fileSys.readText(path, fileShouldNotExistDone);
+			}
+			else
+			{
+				fail("fileShouldNotExist failed " + path);
+			}
+		};
+	}
+
+	function fileShouldNotExistDone(success, data)
+	{
+		if (!success)
+		{
+			// Success, file did not exist we assume
+			// (there could of course be other errors).
+			runNextTest();
+		}
+		else
+		{
+			fail("fileShouldNotExistDone failed");
+		}
 	}
 
 	function allTestsPassed()
 	{
 		return function(success)
 		{
-			MyLog("All tests passed: " + success);
+			console.log("All tests passed: " + success);
 			alert("All tests passed: " + success);
 		};
 	}
@@ -855,7 +908,7 @@ function testFileSystem()
 			{
 				++passed;
 			}
-			if (entry.name == "bar" && !entry.isFile && entry.isDirectory)
+			else if (entry.name == "bar" && !entry.isFile && entry.isDirectory)
 			{
 				++passed;
 			}
@@ -872,13 +925,14 @@ function testFileSystem()
 
 	function fail(message)
 	{
-		MyLog("FileSystem test failed: " + message);
+		console.log("FileSystem test failed: " + message);
 		alert("FileSystem test failed: " + message);
 	}
 
 	// Create the file system object and start test.
 	FileSys.create(
-		"file:///sdcard",
+		// "file:///sdcard",
+		"LocalFileSystem",
 		function(success, fs)
 		{
 			if (success)
@@ -890,24 +944,3 @@ function testFileSystem()
 			}
 		});
 }
-
-/*
-
-	function fileReadAsDataURL(success, url)
-	{
-		MyLog("@@@@@ FileReadAsDataURL result: " + success);
-
-		if (success)
-		{
-			MyLog("@@@@@ FileReadAsDataURL url: " + url);
-			var i = url.indexOf(",");
-			var data = url.substring(i + 1);
-			MyLog("@@@@@ FileReadAsDataURL data: " + data);
-			var decodedData = atob(data);
-			MyLog("@@@@@ FileReadAsDataURL decodedData: " + decodedData);
-
-			// Next test.
-			FileSys.getMetaData("hello2.txt", fileMetaData);
-		}
-	}
-*/

@@ -48,7 +48,7 @@ public:
 
 		// The page in the "LocalFiles" folder to
 		// show when the application starts.
-		showPage("index.html");
+		showPage("filesystest-index.html");
 
 		// Initialize PhoneGap.
 		mPhoneGapMessageHandler->initializePhoneGap();
@@ -80,7 +80,10 @@ public:
 		// Zero terminate.
 		stringData[dataSize] = 0;
 
-		lprintfln("@@@ MOSYNC Message: %s\n", stringData);
+		// We can get a buffer overrun in lprintfln if
+		// string is too big, use maWriteLog instead.
+		lprintfln("@@@ MOSYNC Message:");
+		maWriteLog(stringData, dataSize);
 
 		free(stringData);
 	}
@@ -124,16 +127,11 @@ public:
 				{
 					mPhoneGapMessageHandler->handlePhoneGapMessage(message);
 				}
-
-				// TODO: Add other protocols here as needed.
-				// Use the messageName param as the protocol identifier,
-				// them make else if statements to branch off message
-				// handling to the respective modules.
 			}
 		}
 		else if (protocol.isMessageStream())
 		{
-			handleMessageStream(webView, data);
+			// Add code here is needed.
 		}
 		else
 		{
@@ -141,49 +139,8 @@ public:
 		}
 	}
 
-	/**
-	 * Handles Stream messages(high performance), it is mainly used for NativeUI
-	 *
-	 * @param webView a pointer to the web view posting this message
-	 * @param data the stream of messages
-	 */
-	void handleMessageStream(WebView* webView, MAHandle data)
-	{
-		MessageStream stream(webView, data);
-
-		const char* p;
-
-		while (p = stream.getNext())
-		{
-			if (0 == strcmp(p, "NativeUI"))
-			{
-				//Forward NativeUI messages to the respective message handler
-				mNativeUIMessageHandler->handleMessage(stream);
-			}
-			else if (0 == strcmp(p, "Resource"))
-			{
-				//Forward Resource messages to the respective message handler
-				mResourceMessageHandler->handleMessage(stream);
-			}
-			else if (0 == strcmp(p, "close"))
-			{
-				close();
-			}
-		}
-	}
-
 private:
 	PhoneGapMessageHandler* mPhoneGapMessageHandler;
-
-	/**
-	 * Handler for NAtiveUI messages
-	 */
-	NativeUIMessageHandler* mNativeUIMessageHandler;
-
-	/**
-	 * Handler for resource messages used for NativeUI
-	 */
-	ResourceMessageHandler* mResourceMessageHandler;
 };
 
 /**
