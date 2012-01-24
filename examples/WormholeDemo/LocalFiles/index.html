@@ -200,7 +200,7 @@
 				<a class="button back" onclick="jQT.goBack()" id="backButton">Back</a>
 			</div>
 			<ul class="rounded">
-				<li><video id="videoWidget" controls style="width:100%;height:50%"></video></li>
+				<li id="videoWidgetContainer"><video id="videoWidget" controls style="width:100%;height:50%"></video></li>
 				<li><a href="#" onclick="captureVideo()">Capture video</a></li>
 			</ul>
 			<ul class="rounded">
@@ -228,17 +228,6 @@
 			<input type="button" class="button" value="+" onclick="createFile()"/>
 			<ul id="fileList">
 			</ul>
-			<!--
-			<ul class="rounded">
-				<li><label>File name:</label><input id="fileNameBox" type="text" style="width:60%" value="example.data"/></li>
-			</ul>
-			<ul class="rounded">
-				<li><a href="#" onclick="readData();">Read</a></li>
-				<li><a href="#" onclick="writedata();">Write</a></li>
-			</ul>
-			<ul class="rounded">
-				<li><textarea rows="20" style="font-size:20pt"></textarea></li>
-			</ul>-->
 		</div>
 		<div id="filePage">
 			<div class="toolbar">
