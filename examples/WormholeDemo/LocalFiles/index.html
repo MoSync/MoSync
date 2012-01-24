@@ -226,10 +226,7 @@
 				<a class="button back" onclick="jQT.goBack()" id="backButton">Back</a>
 			</div>
 			<input type="button" class="button" value="+" onclick="createFile()"/>
-			<ul>
-				<li><a id="File1" onclick="setFile('file1');">File1</a></li>
-				<li><a id="File2" onclick="setFile('file2');">File2</a></li>
-				<li><a id="File3" onclick="setFile('file3');">File3</a></li>
+			<ul id="fileList">
 			</ul>
 			<!--
 			<ul class="rounded">
@@ -245,12 +242,12 @@
 		</div>
 		<div id="filePage">
 			<div class="toolbar">
-				<h1>File</h1>
+				<h1 id="filePanelTitle">File</h1>
 				<a class="button back" onclick="jQT.goBack()" id="backButtonxvxcv">Back</a>
 			</div>
 			<input type="button" class="button" value="Delete" onclick="deleteFile()"/>
 			<ul>
-				<li><textarea id="fileContents" rows="20" style="font-size:20pt"></textarea></li>
+				<li><textarea id="fileContents" rows="20" style="font-size:20pt" onchange="textHasChanged()" onblur="textLostFocus()"></textarea></li>
 			</ul>
 		</div>
 	</div>
