@@ -29,6 +29,8 @@ MA 02110-1301, USA.
 
 #include "Util.h"
 
+#define BUF_MAX 256
+
 int screenWidth;
 int screenHeight;
 
@@ -58,7 +60,9 @@ int getScreenHeight()
  */
 bool isAndroid()
 {
-	if (NULL != strstr(MA_PROF_STRING_PLATFORM, "android"))
+	char platform[BUF_MAX];
+	maGetSystemProperty("mosync.device.OS", platform, BUF_MAX);
+	if ( strcmp(platform,"Android") == 0 )
 	{
 		return true;
 	}
