@@ -19,6 +19,17 @@ namespace MoSync
 			public FontFamily family;
 			public FontWeight weight;
 			public FontStyle style;
+			public double size = 11;	// SDK default
+
+			public FontInfo Clone()
+			{
+				FontInfo fi = new FontInfo();
+				fi.family = family;
+				fi.weight = weight;
+				fi.style = style;
+				fi.size = size;
+				return fi;
+			}
 
 			public String GetFullName()
 			{
@@ -35,7 +46,6 @@ namespace MoSync
 
 		private void InitAvailableFonts()
 		{
-
 			// I couldn't find a way of enumerating this info. So the list had to be hard coded.
 			// SystemTypefaces GlyphTypefaces can't be set as a fontsource. Probably only works with custom ttf/otf fonts.
 			mAvailableFonts.Add(new FontInfo() { family = new FontFamily("Arial"), weight = FontWeights.Normal, style = FontStyles.Normal });
@@ -130,7 +140,9 @@ namespace MoSync
 				{
 					if (finfo.GetFullName() == fontName)
 					{
-						mFonts.Add(finfo);
+						FontInfo nfi = finfo.Clone();
+						nfi.size = _size;
+						mFonts.Add(nfi);
 						return mFonts.Count - 1;
 					}
 				}
@@ -140,30 +152,42 @@ namespace MoSync
 
 			ioctls.maFontLoadDefault = delegate(int _type, int _style, int _size)
 			{
-
-				//RES_FONT_NO_TYPE_STYLE_COMBINATION
-				//RES_FONT_INVALID_SIZE
-				foreach (FontInfo finfo in mAvailableFonts)
-				{
-					if (finfo.GetFullName() == "Segoe WP")
-					{
-						mFonts.Add(finfo);
-						return mFonts.Count - 1;
-					}
-				}
-
+				string name;
 				switch (_type)
 				{
 					case MoSync.Constants.FONT_TYPE_MONOSPACE:
+						name = "Courier New";
 						break;
 					case MoSync.Constants.FONT_TYPE_SERIF:
+						name = "Times New Roman";
 						break;
 					case MoSync.Constants.FONT_TYPE_SANS_SERIF:
+						name = "Segoe WP";
 						break;
 					default:
 						return MoSync.Constants.RES_FONT_NO_TYPE_STYLE_COMBINATION;
 				}
 
+				FontWeight w = FontWeights.Normal;
+				FontStyle s = FontStyles.Normal;
+				if ((_style & MoSync.Constants.FONT_STYLE_BOLD) != 0)
+					w = FontWeights.Bold;
+				if ((_style & MoSync.Constants.FONT_STYLE_ITALIC) != 0)
+					s = FontStyles.Italic;
+
+				mFonts.Add(new FontInfo() {
+					family = new FontFamily(name),
+					weight = w,
+					style = s,
+					size = _size,
+				});
+
+				return mFonts.Count - 1;
+			};
+
+			ioctls.maFontDelete = delegate(int _handle)
+			{
+				mFonts.RemoveAt(_handle);
 				return 0;
 			};
 		}
