@@ -176,6 +176,11 @@ namespace MoSync
 			System.Buffer.BlockCopy(mData, src, bytes, 0, size);
 		}
 
+		public void WriteBytes(int dst, byte[] bytes, int size)
+		{
+			System.Buffer.BlockCopy(bytes, 0, mData, dst, size);
+		}
+
 		// size equals the amount of integers
 		public void ReadIntegers(int[] integers, int src, int size)
 		{
