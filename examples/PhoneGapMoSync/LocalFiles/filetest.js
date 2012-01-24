@@ -113,9 +113,54 @@ var FileSys = function()
 			};
 		}
 
+		fileSys.fileExists = function(path, fun)
+		{
+			fileSys.root.getFile(
+				path,
+				{ create: false, exclusive: false },
+				function(fileEntry)
+				{
+					FileMgr.prototype.testFileExists(
+						fileEntry.fullPath,
+						function(exists)
+						{
+							fun(true, exists);
+						},
+						error(fun));
+				},
+				error(fun));
+		};
+
 		fileSys.writeText = function(path, data, fun)
 		{
-			fileSys.writeTextAtPosition(path, data, 0, fun);
+			fileSys.fileExists(
+				path,
+				function(success, exists)
+				{
+					if (success)
+					{
+						fileSys.truncate(
+							path,
+							0,
+							function(success)
+							{
+								if (success)
+								{
+									console.log("@@@ fileSys.writeText 1 path: " + path + " data: " + data);
+									fileSys.writeTextAtPosition(path, data, 0, fun);
+								}
+								else
+								{
+									fun(false);
+								}
+							});
+					}
+					else
+					{
+						console.log("@@@ fileSys.writeText 2 path: " + path + " data: " + data);
+						fileSys.writeTextAtPosition(path, data, 0, fun);
+					}
+				});
 		};
 
 		/**
@@ -195,11 +240,11 @@ var FileSys = function()
 				function(fileEntry)
 				{
 					var writer = new FileWriter(fileEntry);
-					writer.onwrite = function(obj)
+					writer.onwrite = function()
 					{
 						fun(true);
 					};
-					writer.error = function(obj)
+					writer.error = function()
 					{
 						fun(false);
 					};
@@ -455,46 +500,75 @@ function testFileSystem()
 	 */
 	function runNextTest(success)
 	{
-		console.log("Running next test");
-		nextTest()(success);
+		setTimeout(
+			function()
+			{
+				console.log("Running next test");
+				nextTest()(success);
+			},
+			0);
+	}
+
+	function mark(x)
+	{
+		return function(success)
+		{
+			console.log(">>>>>>>>>>>> Mark " + x);
+			runNextTest(success);
+		};
 	}
 
 	// Create the test suite.
 	tests = [
+	    mark(1),
 	    // Set up initial file structure.
 		createFiles,
 		// Do tests on directories.
+	    mark(2),
 		readDirectory("foa", checkDirectoryContents),
+	    mark(3),
 		copyDirectory("foa", "fob"),
+	    mark(4),
 		readDirectory("fob", checkDirectoryContents),
+	    mark(5),
 		moveDirectory("fob", "foc"),
+	    mark(6),
 		readDirectory("foc", checkDirectoryContents),
 		// Check file contents.
+	    mark(7),
 		readFile("foo/hello1.txt", "Hello World"),
+	    mark(8),
 		readFile("foo/bar/hello2.txt", "Hello World"),
+	    mark(9),
 		readFile("foo/bar/hello3.txt", "Hello World"),
+	    mark(10),
 		// Write new file.
 		writeFile("foc/bar/test.txt", "Hello World"),
+	    mark(6),
 		readFile("foc/bar/test.txt", "Hello World"),
+	    mark(7),
 		// Overwrite existing file.
 		writeFile("foc/bar/test.txt", "Hello World 2"),
 		readFile("foc/bar/test.txt", "Hello World 2"),
 		// File tests.
 		readFileAsDataURL("foc/bar/test.txt", "Hello World 2"),
 		truncateFile("foc/bar/test.txt", 5, "Hello"),
+	    mark(8),
 		copyFile("foc/bar/test.txt", "foc/bar/test2.txt"),
 		readFile("foc/bar/test2.txt", "Hello"),
 		moveFile("foc/bar/test2.txt", "foc/bar/test3.txt"),
 		fileShouldNotExist("foc/bar/test2.txt"),
 		readFile("foc/bar/test3.txt", "Hello"),
 		deleteFile("foc/bar/test3.txt"),
+	    mark(9),
 		fileShouldNotExist("foc/bar/test3.txt"),
 		// Delete directories.
 		deleteFiles,
+	    mark(10),
 		fileShouldNotExist("foo/hello1.txt"),
 		fileShouldNotExist("foo/bar/hello2.txt"),
 		fileShouldNotExist("foo/bar/hello3.txt"),
-		allTestsPassed()
+		allTestsPassed
 	];
 
 	// Set up test state.
@@ -502,6 +576,9 @@ function testFileSystem()
 	{
 		if (success)
 		{
+			// Note: This is a bit nasty, because we rely on these calls
+			// to be processed sequentially.
+
 			// Create directories and some empty files.
 			fileSys.createDirectory("foa", createFilesShouldPass);
 			fileSys.createDirectory("foa/bar", createFilesShouldPass);
@@ -515,17 +592,9 @@ function testFileSystem()
 			fileSys.writeText("foo/bar/hello2.txt", "Hello World", createFilesShouldPass);
 			fileSys.writeText("foo/bar/hello3.txt", "Hello World", createFilesDone);
 		}
-	}
-
-	// Clean up.
-	function deleteFiles(success)
-	{
-		if (success)
+		else
 		{
-			// Create directories and some empty files.
-			fileSys.deleteDirectory("foc", deleteFilesShouldPass);
-			fileSys.deleteDirectory("foo/bar", deleteFilesShouldPass);
-			fileSys.deleteDirectory("foo", deleteFilesShouldPass);
+			fail("createFiles fail");
 		}
 	}
 
@@ -533,21 +602,10 @@ function testFileSystem()
 	{
 		if (!success)
 		{
-			fail("createFiles failed");
+			fail("createFiles fail");
 		}
 	}
 
-	function deleteFilesShouldPass(success)
-	{
-		if (!success)
-		{
-			fail("deleteFiles failed");
-		}
-	}
-
-	/**
-	 * Run next test.
-	 */
 	function createFilesDone(success)
 	{
 		if (success)
@@ -556,7 +614,47 @@ function testFileSystem()
 		}
 		else
 		{
-			fail("createFilesDone failed");
+			fail("createFilesDone fail");
+		}
+	}
+
+	// Clean up.
+	function deleteFiles(success)
+	{
+		if (success)
+		{
+			// Note: Here too, we rely on these calls
+			// to be processed sequentially.
+
+			// Create directories and some empty files.
+			fileSys.deleteDirectory("foa", deleteFilesShouldPass);
+			fileSys.deleteDirectory("foc", deleteFilesShouldPass);
+			fileSys.deleteDirectory("foo/bar", deleteFilesShouldPass);
+			fileSys.deleteDirectory("foo", deleteFilesDone);
+		}
+		else
+		{
+			fail("createFiles fail");
+		}
+	}
+
+	function deleteFilesShouldPass(success)
+	{
+		if (!success)
+		{
+			fail("deleteFiles fail");
+		}
+	}
+
+	function deleteFilesDone(success)
+	{
+		if (success)
+		{
+			runNextTest(success);
+		}
+		else
+		{
+			fail("deleteFilesDone fail");
 		}
 	}
 
@@ -699,6 +797,7 @@ function testFileSystem()
 		{
 			if (success)
 			{
+				console.log("readFileDone data: " + data + " expected: " + expectedData);
 				if (data == expectedData)
 				{
 					runNextTest(success);
@@ -706,7 +805,7 @@ function testFileSystem()
 				}
 			}
 
-			fail("readFileDone failed");
+			fail("readFileDone fail");
 		};
 	}
 
@@ -743,7 +842,7 @@ function testFileSystem()
 				}
 			}
 
-			fail("readFileAsDataURLDone failed");
+			fail("readFileAsDataURLDone fail");
 		};
 	}
 
@@ -753,7 +852,7 @@ function testFileSystem()
 		{
 			if (success)
 			{
-				fileSys.truncate(path, newSize, truncateFileDone(expectedData));
+				fileSys.truncate(path, newSize, truncateFileDone(path, expectedData));
 			}
 			else
 			{
@@ -762,12 +861,13 @@ function testFileSystem()
 		};
 	}
 
-	function truncateFileDone(expectedData)
+	function truncateFileDone(path, expectedData)
 	{
 		return function(success)
 		{
 			if (success)
 			{
+				// Read the file to verify expected data.
 				readFile(path, expectedData)(success);
 			}
 			else
@@ -800,7 +900,7 @@ function testFileSystem()
 		}
 		else
 		{
-			fail("copyFileDone failed");
+			fail("copyFileDone fail");
 		}
 	}
 
@@ -827,7 +927,7 @@ function testFileSystem()
 		}
 		else
 		{
-			fail("moveFileDone failed");
+			fail("moveFileDone fail");
 		}
 	}
 
@@ -854,7 +954,7 @@ function testFileSystem()
 		}
 		else
 		{
-			fail("deleteFileDone failed");
+			fail("deleteFileDone fail");
 		}
 	}
 
@@ -874,27 +974,24 @@ function testFileSystem()
 		};
 	}
 
-	function fileShouldNotExistDone(success, data)
+	function fileShouldNotExistDone(success, notUsed)
 	{
 		if (!success)
 		{
 			// Success, file did not exist we assume
 			// (there could of course be other errors).
-			runNextTest();
+			runNextTest(true);
 		}
 		else
 		{
-			fail("fileShouldNotExistDone failed");
+			fail("fileShouldNotExistDone fail");
 		}
 	}
 
-	function allTestsPassed()
+	function allTestsPassed(success)
 	{
-		return function(success)
-		{
-			console.log("All tests passed: " + success);
-			alert("All tests passed: " + success);
-		};
+		console.log("All tests passed: " + success);
+		alert("All tests passed: " + success);
 	}
 
 	function checkDirectoryContents(files)
@@ -931,8 +1028,8 @@ function testFileSystem()
 
 	// Create the file system object and start test.
 	FileSys.create(
-		// "file:///sdcard",
-		"LocalFileSystem",
+		"file:///sdcard",
+		//"LocalFileSystem",
 		function(success, fs)
 		{
 			if (success)
