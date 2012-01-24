@@ -26,7 +26,7 @@ MA 02110-1301, USA.
 
 /**
  * @file WebAppMoblet.h
- * @author Mikael KIndborg
+ * @author Mikael Kindborg
  *
  * @brief High-level moblet that has a WebView and supports
  * communication between a JavaScript and C++.

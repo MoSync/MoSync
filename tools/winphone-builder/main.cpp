@@ -38,50 +38,16 @@ using namespace std;
 // AppManifest.xml should be modified from here to.
 // Add input parameters for project name, company name, version etc.
 
-#if 0	//unused
-static string integerToString(int i) {
-	char temp[16];
-	sprintf(temp, "%i", i);
-	return temp;
-}
-
-static char *readFileIntoMem(const char* filename, int *len) {
-	FILE *file = fopen(filename, "rb");
-	if(!file) return NULL;
-	fseek(file, 0, SEEK_END);
-	int length = ftell(file);
-	fseek(file, 0, SEEK_SET);
-	char *memory = new char[length];
-	fread(memory, length, 1, file);
-	fclose(file);
-	*len = length;
-	return memory;
-}
-
-static bool writeMemIntoFile(const char* filename, const char *mem, int len) {
-	FILE *file = fopen(filename, "wb");
-	if(!file) return false;
-	fwrite(mem, len, 1, file);
-	fclose(file);
-	return true;
-}
-#endif
-
 static void error(const char *why) GCCATTRIB(noreturn);
+static pugi::xml_node getNode(const pugi::xml_node& node, const std::string& xpath);
+static std::string createFileName(const std::string& name);
+static bool saveXML(pugi::xml_document& document, const std::string& outputFile);
+static bool updateWMAppManifest(const std::string& filename, const std::string& output, const std::string& projectName, const std::string& companyName, const std::string& version, const std::string& guid);
+
 static void error(const char *why) {
 	printf("error: %s\n", why);
 	exit(1);
 }
-
-#if 0	//unused
-static void replaceTemplateDefine(string &templateFile, const string &whatToReplace, const string &replacement) {
-	size_t index;
-	while((index=templateFile.find(whatToReplace))!=string::npos) {
-		int endOfReplacement = index+whatToReplace.length();
-		templateFile = templateFile.substr(0, index) + replacement + templateFile.substr(endOfReplacement, templateFile.size()-endOfReplacement);
-	}
-}
-#endif
 
 static pugi::xml_node getNode(const pugi::xml_node& node, const std::string& xpath)
 {
@@ -101,6 +67,54 @@ struct LibraryReference
 	std::string value;
 };
 
+static std::string createFileName(const std::string& name)
+{
+	return name;
+}
+
+static bool saveXML(pugi::xml_document& document, const std::string& outputFile)
+{
+	pugi::xml_node decl = document.prepend_child(pugi::node_declaration);
+	decl.append_attribute("version").set_value("1.0");
+	decl.append_attribute("encoding").set_value("utf-8");
+	if(!document.save_file(outputFile.c_str(), " ", 1U, pugi::encoding_utf8))
+	{
+		return false;
+	}
+
+	return true;
+}
+
+static bool updateWMAppManifest(const std::string& filename, const std::string& output, const std::string& projectName, const std::string& companyName, const std::string& version, const std::string& guid)
+{
+	pugi::xml_document document;
+	pugi::xml_parse_result res = document.load_file(filename.c_str());
+	if(res.status != pugi::status_ok) {
+		error("WMAppManifest.xml parsing failed!");
+		return false;
+	}
+
+	pugi::xpath_query appQuery("Deployment/App");
+	pugi::xml_node app = document.select_single_node(appQuery).node();
+
+	app.attribute("Title").set_value(projectName.c_str());
+	app.attribute("Author").set_value(companyName.c_str());
+	app.attribute("Publisher").set_value(companyName.c_str());
+	app.attribute("Version").set_value(version.c_str());
+	app.attribute("ProductID").set_value(("{" + guid + "}").c_str());
+
+	pugi::xpath_query tileTitleQuery("Tokens/PrimaryToken/TemplateType5/Title");
+	pugi::xml_node tileTitle = app.select_single_node(tileTitleQuery).node();
+	tileTitle.first_child().set_value(projectName.c_str());
+
+	if(!saveXML(document, output))
+	{
+		return false;
+	}
+
+	return true;
+}
+
 int main(int argc, char **argv) {
 
 	string inputFile = "";
@@ -119,6 +133,11 @@ int main(int argc, char **argv) {
 	string dataSectionFileRelativePath = "RebuildData\\data_section.bin";
 	string rebuildCsFileRelativePath = "RebuildData\\rebuild.build.cs";
 	string projectName = "mosync";
+	string companyName = "MoSync AB";
+	string appVersion = "1.0";
+	string guid = "2b77ba5b-5284-42e4-8fe3-dfa5d683553c";
+	string inputAppManifestFile = ""; // defaults to none.
+	string outputAppManifestFile = ""; // defaults to none.
 	string runtimePath = "Libraries\\mosyncRuntime\\mosyncRuntime.dll";
 
 	bool hasResourceFile = true;
@@ -131,6 +150,21 @@ int main(int argc, char **argv) {
 			i++;
 			if(i>=argc) error("Invalid argument to -project-name.");
 			projectName = argv[i];
+		} else
+		if(strcmp("-company-name", argv[i])==0) {
+			i++;
+			if(i>=argc) error("Invalid argument to -company-name.");
+			companyName = argv[i];
+		} else
+		if(strcmp("-version", argv[i])==0) {
+			i++;
+			if(i>=argc) error("Invalid argument to -version.");
+			appVersion = argv[i];
+		} else
+		if(strcmp("-guid", argv[i])==0) {
+			i++;
+			if(i>=argc) error("Invalid argument to -guid.");
+			guid = argv[i];
 		} else
 		if(strcmp("-runtime-path", argv[i])==0) {
 			i++;
@@ -154,6 +188,16 @@ int main(int argc, char **argv) {
 			i++;
 			if(i>=argc) error("Invalid argument to -input.");
 			inputFile = argv[i];
+		} else
+		if(strcmp("-input-app-manifest-file", argv[i])==0) {
+			i++;
+			if(i>=argc) error("Invalid argument to -input-app-manifest-file.");
+			inputAppManifestFile = argv[i]; // WMAppManifest.xml
+		} else
+		if(strcmp("-output-app-manifest-file", argv[i])==0) {
+			i++;
+			if(i>=argc) error("Invalid argument to -output-app-manifest-file.");
+			outputAppManifestFile = argv[i]; // WMAppManifest.xml
 		} else
 		if(strcmp("-output-type", argv[i])==0) {
 				i++;
@@ -252,16 +296,27 @@ int main(int argc, char **argv) {
 
 	pugi::xml_node rootNameSpaceNode = getNode(project, "PropertyGroup/RootNamespace");
 	pugi::xml_node assemblyNameNode = getNode(project, "PropertyGroup/AssemblyName");
+	pugi::xml_node xapFileNameNode = getNode(project, "PropertyGroup/XapFilename");
+	//pugi::xml_node silverlightAppEntryNode = getNode(project, "PropertyGroup/SilverlightAppEntry");
+
 	rootNameSpaceNode.first_child().set_value(projectName.c_str());
 	assemblyNameNode.first_child().set_value(projectName.c_str());
+	xapFileNameNode.first_child().set_value((createFileName(projectName) + ".xap").c_str());
+	//silverlightAppEntryNode.first_child().set_value((createFileName(projectName) + ".App").c_str());
 
-	pugi::xml_node decl = document.prepend_child(pugi::node_declaration);
-	decl.append_attribute("version").set_value("1.0");
-	decl.append_attribute("encoding").set_value("utf-8");
-	if(!document.save_file(outputFile.c_str(), " ", 1U, pugi::encoding_utf8))
+	if(inputAppManifestFile != "" && outputAppManifestFile != "")
 	{
-		error("Xml writing failed!");
-		return 0;
+		if(!updateWMAppManifest(inputAppManifestFile, outputAppManifestFile, projectName, companyName, appVersion, guid))
+		{
+			error("WMAppManifest.xml writing failed!");
+			return 1;
+		}
+	}
+
+	if(!saveXML(document, outputFile))
+	{
+		error("csproj xml writing failed!");
+		return 1;
 	}
 
 	return 0;

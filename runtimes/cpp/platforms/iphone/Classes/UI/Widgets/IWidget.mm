@@ -301,6 +301,10 @@
         UIControl* controller = (UIControl*) view; // TODO: is this correct?
         return controller.enabled ? @"true" : @"false";
     }
+    else if ([key isEqualToString:@MAW_WIDGET_ALPHA])
+    {
+        return [[[NSNumber numberWithFloat: view.alpha] stringValue] retain];
+    }
 	return nil;
 }
 

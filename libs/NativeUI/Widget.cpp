@@ -27,6 +27,7 @@ MA 02110-1301, USA.
 
 #include <mavsprintf.h>
 #include <mastdlib.h>
+#include <madmath.h>
 
 #include "Widget.h"
 #include "WidgetManager.h"
@@ -631,6 +632,32 @@ namespace NativeUI
         }
 
         return false;
+    }
+
+    /**
+     * Set widget's alpha value.
+     * @value Floating-point number in the range 0.0 to 1.0, where 0.0
+     * represents totally transparent and 1.0 represents totally opaque.
+     * If the value is out of this range the alpha value is not set.
+     */
+    void Widget::setAlpha(const float value)
+    {
+        if (value >=  0.0 && value <= 1.0)
+        {
+            this->setPropertyFloat(MAW_WIDGET_ALPHA, value);
+        }
+    }
+
+    /**
+     * Get widget's alpha value.
+     * @return Floating-point number in the range 0.0 to 1.0, where 0.0
+     * represents totally transparent and 1.0 represents totally opaque.
+     */
+    float Widget::getAlpha()
+    {
+         MAUtil::String alphaString = this->getPropertyString(MAW_WIDGET_ALPHA);
+         double alpha = atof(alphaString.c_str());
+         return (float) alpha;
     }
 
     /**

@@ -19,51 +19,60 @@ package com.mosync.nativeui.ui.widgets;
 
 import android.graphics.Bitmap;
 import android.widget.ImageView;
+import android.widget.VideoView;
 
 import com.mosync.internal.generated.IX_WIDGET;
 import com.mosync.nativeui.core.NativeUI;
+import com.mosync.nativeui.util.properties.FloatConverter;
 import com.mosync.nativeui.util.properties.IntConverter;
 import com.mosync.nativeui.util.properties.InvalidPropertyValueException;
 import com.mosync.nativeui.util.properties.PropertyConversionException;
 
 /**
  * Wraps the behavior of an Image view.
- * 
+ *
  * @author fmattias
  */
 public class ImageWidget extends Widget
 {
 	/**
 	 * Constructor.
-	 * 
+	 *
 	 * @param handle handle Integer handle corresponding to this instance.
 	 * @param view An image view wrapped by this widget.
 	 */
 	public ImageWidget(int handle, ImageView imageView)
 	{
 		super( handle, imageView );
-		
+
 		/**
 		 * Defaults to no scaling.
 		 */
-		imageView.setScaleType(ImageView.ScaleType.CENTER);		
+		imageView.setScaleType(ImageView.ScaleType.CENTER);
 	}
 
 	@Override
 	public boolean setProperty(String property, String value)
 			throws PropertyConversionException, InvalidPropertyValueException
 	{
+		ImageView imageView = (ImageView) getView( );
+		if ( property.equals( IX_WIDGET.MAW_WIDGET_ALPHA ) )
+		{
+			float alpha = FloatConverter.convert( value );
+			m_alpha = (int) (alpha * 255.0f);
+			imageView.setAlpha(m_alpha);
+			return true;
+		}
+
 		if( super.setProperty(property, value) )
 		{
 			return true;
 		}
-		
-		ImageView imageView = (ImageView) getView( );
+
 		if( property.equals( IX_WIDGET.MAW_IMAGE_IMAGE ) )
 		{
 			Bitmap image = NativeUI.getBitmap( IntConverter.convert( value ) );
 			imageView.setImageBitmap( image );
-			return true;
 		}
 		else if( property.equals( IX_WIDGET.MAW_IMAGE_SCALE_MODE ) )
 		{
@@ -83,12 +92,35 @@ public class ImageWidget extends Widget
 			{
 				throw new InvalidPropertyValueException( property , value );
 			}
-			
-			return true;
-		}		
+		}
 		else
 		{
 			return false;
 		}
+		return true;
 	}
+
+	/**
+	 * @see Widget.getProperty.
+	 */
+	@Override
+	public String getProperty(String property)
+	{
+//		ImageView imageView = (ImageView) getView( );
+		if( property.equals(IX_WIDGET.MAW_WIDGET_ALPHA ) )
+		{
+			return Integer.toString(m_alpha);
+			// TODO Keep it and call it for API level 11.
+//			return Float.toString(imageView.getAlpha());
+		}
+		else
+		{
+			return super.getProperty( property );
+		}
+	}
+
+	/**
+	 * The alpha is stored.
+	 */
+	private int m_alpha = 0xff;
 }

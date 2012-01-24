@@ -4606,7 +4606,7 @@ group WidgetAPI "Widget API" {
     * NOTE: there is a slightly different behaviour depending on the platform:
     *  - on iOS the source is loaded into memory when
     *  MAW_VIDEO_VIEW_STATE_PLAYING is received.
-    *   - on Android the source is loaded into memory when
+    *   - on Android and WindowsPhone the source is loaded into memory when
     *  MAW_VIDEO_VIEW_STATE_SOURCE_READY is received.
 	*/
 	group VideoViewEvent "Video view event" {
@@ -4635,11 +4635,13 @@ group WidgetAPI "Widget API" {
 		* @brief The source is ready to be played.
 		* NOTE: On Android this event is received after loading url/path.
 		*       On iOS this event is received after PLAYING event is received.
+		*		On WindowsPhone this event is received after media loding has finished
 		*/
 		SOURCE_READY = 5;
 
 		/**
 		* @brief Playback is temporarily interruped(maybe there's no data in the buffer).
+		* NOTE: On WindowsPhone 7 this occurs when an error is encountered.
 		*/
 		INTERRUPTED = 6;
 
@@ -4921,7 +4923,7 @@ group WidgetAPI "Widget API" {
 		/**
 		* @brief A panorama control is a Windows Phone 7 specific control
 		* Available only on Windows Phone 7
-		* Seen \ref WidgetPanoramaViewProperties "Panorama View properties" for the properties available
+		* See \ref WidgetPanoramaViewProperties "Panorama View properties" for the properties available
 		*/
 		PANORAMA_VIEW = "PanoramaView";
 	}
@@ -4998,10 +5000,11 @@ group WidgetAPI "Widget API" {
 
 		/**
 		* @brief Sets the transparency of the widget background.
+		* On Android this property is available for the moment only on Layouts and ImageWidget widgets.
 		*
-		* @validvalue A floay between 0.0 and 1.0, where 0.0 is fully transparent and 1.0 is opaque.
+		* @validvalue A float between 0.0 and 1.0, where 0.0 is fully transparent and 1.0 is opaque.
 		*
-		* @setonly
+		* @setandget
 		*
 		* @par Example
 		* \code
@@ -5181,7 +5184,7 @@ group WidgetAPI "Widget API" {
 		* 	char currentScreenBuffer[BUFFER_SIZE];
 		* 	int result = maWidgetGetProperty(
 		* 		panoramaViewHandle,
-		* 		MAW_WEB_VIEW_CURRENT_SCREEN,
+		* 		MAW_PANORAMA_VIEW_CURRENT_SCREEN,
 		* 		currentScreenBuffer,
 		*		BUFFER_SIZE);
 		* 	if (result > 0)
@@ -5198,6 +5201,7 @@ group WidgetAPI "Widget API" {
 		 * @validvalue MoSync handle to an uncompressed image resource. The size of the image should be large enough to fill the space used by the panorama
 		 *
 		 * @setonly
+		 *
 		 * @par Example
 		 * \code
 		 *	maWidgetSetProperty(panoramaViewHandle, MAW_PANORAMA_VIEW_BACKGROUND_IMAGE, toString(R_MY_IMG));
@@ -5784,6 +5788,7 @@ group WidgetAPI "Widget API" {
 
 		/**
 		* @brief Specifies what editing mode the edit box should have.
+		* Those flags are mutual exclusive, so the previous value is always ignored.
 		*
 		* @validvalue One of the values #MAW_EDIT_BOX_TYPE_ANY, #MAW_EDIT_BOX_TYPE_EMAILADDR,
 		* #MAW_EDIT_BOX_TYPE_NUMERIC, #MAW_EDIT_BOX_TYPE_PHONENUMBER, #MAW_EDIT_BOX_TYPE_URL,
@@ -5800,6 +5805,7 @@ group WidgetAPI "Widget API" {
 
 		/**
 		* @brief Specifies the editing flags applied to the edit box.
+		* Those flags are mutual exclusive, so the previous value is always ignored.
 		*
 		* @validvalue One of the values #MAW_EDIT_BOX_FLAG_PASSWORD,
 		* #MAW_EDIT_BOX_FLAG_SENSITIVE, #MAW_EDIT_BOX_FLAG_INITIAL_CAPS_ALL_CHARACTERS,
@@ -5823,10 +5829,92 @@ group WidgetAPI "Widget API" {
 		*
 		* @par Example
 		* \code
-		*	maWidgetSetProperty(labelHandle, MAW_EDIT_BOX_FONT_COLOR, "0xff0000");
+		*	maWidgetSetProperty(editBoxHandle, MAW_EDIT_BOX_FONT_COLOR, "0xff0000");
 		* \endcode
 		*/
 		FONT_COLOR = "fontColor";
+
+		/**
+		* @brief Set the number of lines.
+		* Makes the edit box exactly this many lines tall. Note that setting this value
+		* overrides any other (minimum / maximum) number of lines or height setting.
+		* A single line edit box will set this value to 1.
+		* This property will automatically set MAW_EDIT_BOX_TYPE_ANY input mode, so that
+		* the edit box will become multiline.
+		* Available on Android only.
+		*
+		* @validvalue A positive integer.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(editBoxHandle, MAW_EDIT_BOX_LINES_NUMBER, "2");
+		* \endcode
+		*/
+		LINES_NUMBER = "linesNumber";
+
+		/**
+		* @brief Makes the edit box at most this many lines tall.
+		* Setting this value overrides any other (maximum) height setting.
+		* Available on Android only.
+		*
+		* @validvalue A positive integer.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(editBoxHandle, MAW_EDIT_BOX_MAX_LINES, "2");
+		* \endcode
+		*/
+		MAX_LINES = "maxLines";
+
+		/**
+		* @brief Makes the edit box at least this many lines tall.
+		* Setting this value overrides any other (minimum) height setting.
+		* Available on Android only.
+		*
+		* @validvalue A positive integer.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(editBoxHandle, MAW_EDIT_BOX_MIN_LINES, "1");
+		* \endcode
+		*/
+		MIN_LINES = "minLines";
+
+		/**
+		* @brief Sets or gets the maximum input lenght of the edit box.
+		* Setting this value enables multiline input mode by default.
+		* Available on Android and iOS.
+		*
+		* @validvalue A positive integer.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(editBoxHandle, MAW_EDIT_BOX_MAX_LENGTH, "10");
+		* \endcode
+		*/
+		MAX_LENGTH = "maxLength";
+
+		/**
+		* @brief Sets the font color of the placeholder text when an edit box is empty.
+		*
+		* @validvalue A hexadecimal value 0xRRGGBB, where R, G and B are the red, green and blue components respectively.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(editBoxHandle, MAW_EDIT_BOX_PLACEHOLDER_FONT_COLOR, "0xff0000");
+		* \endcode
+		*/
+		PLACEHOLDER_FONT_COLOR = "placeholderFontColor";
 	}
 	} // end of WidgetEditBoxProperties
 
@@ -6933,6 +7021,7 @@ group WidgetAPI "Widget API" {
 		/**
 		* @brief Show/hide video control.
 		* Default value is "true"(video control is shown).
+		* Platform: iOS.
 		*
 		* @validvalue "true" show the video control, "false" hide the video control.
 		*
@@ -7848,9 +7937,9 @@ group OpenGLES "OpenGLES" {
 		* \param title The title of the message box shown.
 		* \param message The message should be short, not more than 40 characters,
 		* to ensure its visibility on all screen sizes.
-		* \button1 The text on the first button. On Android it indicates a positive selection.
-		* \button2 The text on the second button. On Android it indicates a neutral selection.
-		* \button3 The text on the third button. On Android it indicates that a negative selection.
+		* \param button1 The text on the first button. On Android it indicates a positive selection.
+		* \param button2 The text on the second button. On Android it indicates a neutral selection.
+		* \param button3 The text on the third button. On Android it indicates that a negative selection.
 		*/
 		void maAlert(in MAString title, in MAString message, in MAString button1, in MAString button2, in MAString button3);
 

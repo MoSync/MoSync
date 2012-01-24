@@ -80,6 +80,21 @@ namespace NativeUI
     }
 
     /**
+     * Set the font color of the placeholder text when the edit box is empty.
+     * @param color A hexadecimal value 0xRRGGBB, where R, G and B are the
+     *              red, green and blue components respectively.
+     * @return Any of the following result codes:
+     * - #MAW_RES_OK if the property could be set.
+     * - #MAW_RES_INVALID_PROPERTY_VALUE if the color value was invalid.
+     */
+    int EditBox::setPlaceholderFontColor(const int color)
+    {
+        char buffer[BUF_SIZE];
+        sprintf(buffer, "0x%.6X", color);
+        return this->setProperty(MAW_EDIT_BOX_PLACEHOLDER_FONT_COLOR, buffer);
+    }
+
+    /**
      * Set a text in the edit box that acts as a placeholder when an
      * edit box is empty.
      * @param text The given text.
@@ -143,6 +158,67 @@ namespace NativeUI
     void EditBox::setInputFlag(EditBoxInputFlag inputFlag)
     {
         this->setPropertyInt(MAW_EDIT_BOX_INPUT_FLAG, inputFlag);
+    }
+
+    /**
+     * Set the number of lines.
+     * Makes the edit box exactly this many lines tall. Note that setting this value
+     * overrides any other (minimum / maximum) number of lines or height setting.
+     * A single line edit box will set this value to 1.
+     * Available on Android only.
+     *
+     * @param lines The number of lines.
+     */
+    void EditBox::setLinesNumber(int lines)
+    {
+		this->setPropertyInt(MAW_EDIT_BOX_LINES_NUMBER, lines);
+    }
+
+    /**
+     * Makes the edit box at most this many lines tall.
+     * Setting this value overrides any other (maximum) height setting.
+     * Available on Android only.
+     *
+     * @param maxLines The maximum number of lines.
+     */
+    void EditBox::setMaxLines(int maxLines)
+    {
+		this->setPropertyInt(MAW_EDIT_BOX_MAX_LINES, maxLines);
+    }
+
+    /**
+     * Makes the edit box at least this many lines tall.
+     * Setting this value overrides any other (minimum) height setting.
+     * Available on Android only.
+     *
+     * @param minLines The minimum number of lines.
+     */
+    void EditBox::setMinLines(int minLines)
+    {
+		this->setPropertyInt(MAW_EDIT_BOX_MIN_LINES, minLines);
+    }
+
+    /**
+     * Sets the maximum input length of the edit box.
+     * Setting this value enables multiline input mode by default.
+     * Available on Android only.
+     *
+     * @param maxLength The maximum length.
+     */
+    void EditBox::setMaxLength(int maxLength)
+    {
+		this->setPropertyInt(MAW_EDIT_BOX_MAX_LENGTH, maxLength);
+    }
+
+    /**
+     * Gets the maximum input length of the edit box.
+     * Available on Android and iOS.
+     *
+     * @return Maximum input length.
+     */
+    int EditBox::getMaxLength(int maxLength)
+    {
+        return this->getPropertyInt(MAW_EDIT_BOX_MAX_LENGTH);
     }
 
     /**

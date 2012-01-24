@@ -60,7 +60,7 @@ bool convertInstanceToImageFormat(const IconInstance *iconInstance,
 	if(extension == "svg") {
 		ostringstream batik;
 		batik << "java -jar \""<<mosyncdir<<"/bin/Batik/batik-rasterizer.jar\""
-			" "<<src<<" -d \""<<dstFilename<<"\"";
+			" \""<<src<<"\" -d \""<<dstFilename<<"\"";
 		if(size != "default") {
 			unsigned int n;
 			unsigned w, h;

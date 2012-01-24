@@ -1,0 +1,66 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+	<meta name="viewport" content="width=320; user-scalable=no" />
+	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+	<title>PhoneGap</title>
+	  <link rel="stylesheet" href="master.css" type="text/css" media="screen" title="no title" charset="utf-8">
+	  <script type="text/javascript" charset="utf-8" src="js/wormhole-webapp.js"></script>
+	<script type="text/javascript">
+		/**
+		* Handles key press events,
+		* Refer to Mosync documentation for key code details
+		*/
+		function close()
+		{
+			//Close the Application if the Back key is pressed
+			mosync.bridge.send([
+					"close"
+				], null);
+		}
+
+		/**
+		* Displays the device information on the screen
+		*/
+		var deviceInfo = function() {
+			document.getElementById("platform").innerHTML = device.platform;
+			document.getElementById("version").innerHTML = device.version;
+			document.getElementById("uuid").innerHTML = device.uuid;
+			document.getElementById("name").innerHTML = device.name;
+			document.getElementById("width").innerHTML = screen.width;
+			document.getElementById("height").innerHTML = screen.height;
+			document.getElementById("colorDepth").innerHTML = screen.colorDepth;
+		};
+
+		/**
+		* Initialization function
+		*/
+		function init() {
+			// the next line makes it impossible to see Contacts on the HTC Evo since it
+			// doesn't have a scroll button
+			// document.addEventListener("touchmove", preventBehavior, false);
+			document.addEventListener("deviceready", deviceInfo, true);
+			document.addEventListener("backbutton", close, true);
+		}
+
+		/**
+		* vibrates for 1 second
+		*/
+		var vibrate = function() {
+			navigator.notification.vibrate(1000);
+		};
+
+	</script>
+  </head>
+  <body onload="init();">
+	<div id="stage" class="theme">
+		<h1>Welcome to Wormhole!</h1>
+		<div id="info">
+			<h4>Platform: <span id="platform"> &nbsp;</span>,   Version: <span id="version">&nbsp;</span></h4>
+			<h4>UUID: <span id="uuid"> &nbsp;</span>,   Name: <span id="name">&nbsp;</span></h4>
+			<h4>Width: <span id="width"> &nbsp;</span>,   Height: <span id="height">&nbsp;
+					   </span>, Color Depth: <span id="colorDepth"></span></h4>
+		 </div>
+		<a href="#" class="btn large" onclick="vibrate();">Vibrate</a>
+  </body>
+</html>

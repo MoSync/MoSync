@@ -477,6 +477,7 @@ namespace MoSync
 						textBlock.FontFamily = finfo.family;
 						textBlock.FontStyle = finfo.style;
 						textBlock.FontWeight = finfo.weight;
+						textBlock.FontSize = finfo.size;
 					});
 
 				return 0;

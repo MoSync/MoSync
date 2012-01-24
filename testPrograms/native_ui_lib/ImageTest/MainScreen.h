@@ -38,7 +38,9 @@ using namespace NativeUI;
  */
 class MainScreen:
 	public Screen,
-	public WidgetEventListener
+	public WidgetEventListener,
+	public ButtonListener,
+	public SliderListener
 {
 
 public:
@@ -68,6 +70,22 @@ private:
 	 */
 	void createMainLayout();
 
+	/**
+	 * This method is called when the value of the slider was modified by
+	 * the user.
+	 * @param slider The slider object that generated the event.
+	 * @param sliderValue The new slider's value.
+	 */
+	virtual void sliderValueChanged(
+		Slider* slider,
+		const int sliderValue);
+
+    /**
+     * This method is called if the touch-up event was inside the
+     * bounds of the button.
+     * @param button The button object that generated the event.
+     */
+    virtual void buttonClicked(Widget* button);
 private:
 	/**
 	 * Main layout.
@@ -75,6 +93,14 @@ private:
 	VerticalLayout* mMainLayout;
 
 	Image* mImage;
+
+	Button* mGetImageAlpha;
+	Label* mImageAlpha;
+	Slider* mImageSlider;
+	VerticalLayout* mLayout;
+	Button* mGetLayoutAlpha;
+	Label* mLayoutAlpha;
+	Slider* mLayoutSlider;
 };
 
 

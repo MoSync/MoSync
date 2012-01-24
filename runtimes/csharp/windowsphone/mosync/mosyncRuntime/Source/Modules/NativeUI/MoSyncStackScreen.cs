@@ -47,7 +47,7 @@ namespace MoSync
             /**
              * The constructor
              */
-            public StackScreen()
+            public StackScreen() : base()
             {
                 mStack = new System.Collections.Generic.Stack<IScreen>();
             }
@@ -57,10 +57,13 @@ namespace MoSync
              */
             public override void AddChild(IWidget child)
             {
-                MoSync.Util.RunActionOnMainThreadSync(() =>
-                    {
-                        mPage.Content = (child as NativeUI.WidgetBaseWindowsPhone).View;
-                    });
+                if (child is Screen)
+                {
+                    MoSync.Util.RunActionOnMainThreadSync(() =>
+                        {
+                            mPage.Content = (child as NativeUI.WidgetBaseWindowsPhone).View;
+                        });
+                }
                 /**
                  * Manualy add the child to the children array
                  */
@@ -117,10 +120,10 @@ namespace MoSync
                  */
                 if (0 < mStack.Count)
                 {
-					MoSync.Util.RunActionOnMainThreadSync(() =>
-					{
+                    //MoSync.Util.RunActionOnMainThreadSync(() =>
+					//{
 						(View as Microsoft.Phone.Controls.PhoneApplicationPage).Content = (mStack.Peek() as NativeUI.WidgetBaseWindowsPhone).View;
-					});
+					//});
                 }
             }
 
