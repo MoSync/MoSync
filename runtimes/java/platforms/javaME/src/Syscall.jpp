@@ -1890,7 +1890,8 @@ public
 
 	SYSCALL(int) maLoadResource(final MAHandle handle, final MAHandle placeholder, final int flag) {
 		try {
-			if (((flag & MA_RESOURCE_OPEN) != 0) && (ledis == null))
+			//if (((flag & MA_RESOURCE_OPEN) != 0) && (ledis == null))
+			if ((ledis == null) || ((flag & MA_RESOURCE_OPEN) != 0))
 			{
 				mResources = GET_RESOURCE(mResourcesFilename);
 				if(mResources == null) {
@@ -1900,14 +1901,23 @@ public
 				ledis = new LittleEndianDataInputStream(mResources);
 			}
 
-			ledis.mark(ledis.available());
 			if (ledis == null) {
 				return 0;
 			}
-			int ret = (LoadResource(ledis, handle, placeholder)?1:0);
-			ledis.reset();
 
-			if ((flag & MA_RESOURCE_CLOSE) != 0)
+			if ( ledis.markSupported() )
+			{
+				ledis.mark(ledis.available());
+			}
+
+			int ret = (LoadResource(ledis, handle, placeholder)?1:0);
+
+			if ( ledis.markSupported() )
+			{
+				ledis.reset();
+			}
+
+			if (!ledis.markSupported() || ((flag & MA_RESOURCE_CLOSE) != 0))
 			{
 				if (ledis != null) {
 					ledis.close();

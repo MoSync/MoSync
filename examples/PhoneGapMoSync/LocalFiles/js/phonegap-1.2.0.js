@@ -165,6 +165,7 @@ function PrintObj(obj, indent)
  */
 PhoneGap.CallbackSuccess = function(callbackId, args, cast)
 {
+	alert(args);
     var commandResult;
     try
     {

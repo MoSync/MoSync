@@ -301,6 +301,61 @@ namespace MoSync
 			return clippedPoints1;
 		}
 
+		public static void ClipRectangle(
+			int inX, int inY, int inW, int inH,
+			int clipX, int clipY, int clipW, int clipH,
+			out int outX, out int outY, out int outW, out int outH)
+		{
+			outX = inX;
+			outY = inY;
+			outW = inW;
+			outH = inH;
+
+			if (outX < clipX)
+			{
+				outW -= clipX - outX;
+				outX = clipX;
+			}
+
+			if (outY < clipY)
+			{
+				outH -= clipY - outY;
+				outY = clipY;
+			}
+
+			if (outX > clipX + clipW)
+			{
+				outX = clipX + clipW;
+				outW = 0;
+			}
+
+			if (outY > clipY + clipH)
+			{
+				outY = clipY + clipH;
+				outW = 0;
+			}
+
+			if (outX + outW > clipX + clipW)
+			{
+				outW -= (outX + outW) - (clipX + clipW);
+			}
+
+			if (outY + outH > clipY + clipH)
+			{
+				outH -= (outY + outH) - (clipY + clipH);
+			}
+
+			if (outW < 0)
+			{
+				outW = 0;
+			}
+
+			if (outH < 0)
+			{
+				outH = 0;
+			}
+		}
+
 		public static void DrawImageRegion(WriteableBitmap dst, int left, int top,
 				Rect srcRect, WriteableBitmap img, int transformMode)
 		{
@@ -495,7 +550,7 @@ namespace MoSync
 					}
 					else if (sa == 0)
 					{
-						dst.Pixels[dstScan] = (int)dstCol;
+						//dst.Pixels[dstScan] = (int)dstCol;
 					}
 					else
 					{
@@ -512,8 +567,9 @@ namespace MoSync
 									(((dg + (((sg - dg) * (sa)) >> 8)) << 8) & 0x0000ff00) |
 									(((db + (((sb - db) * (sa)) >> 8)) << 0) & 0x000000ff));
 					}
+
 					srcScan += srcPitchX;
-					dstScan++;
+					dstScan ++;
 				}
 				srcPixel += srcPitchY;
 				dstPixel += dst.PixelWidth;
