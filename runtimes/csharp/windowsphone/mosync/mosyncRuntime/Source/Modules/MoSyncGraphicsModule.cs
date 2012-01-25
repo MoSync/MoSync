@@ -108,6 +108,11 @@ namespace MoSync
 
 			syscalls.maSetClipRect = delegate(int x, int y, int w, int h)
 			{
+				MoSync.GraphicsUtil.ClipRectangle(
+					x, y, w, h,
+					0, 0, mCurrentDrawTarget.PixelWidth, mCurrentDrawTarget.PixelHeight,
+					out x, out y, out w, out h);
+
 				mClipRect.X = x;
 				mClipRect.Y = y;
 				mClipRect.Width = w;
@@ -137,7 +142,28 @@ namespace MoSync
 
 			syscalls.maFillRect = delegate(int x, int y, int w, int h)
 			{
-				mCurrentDrawTarget.FillRectangle(x, y, x + w, y + h, (int)mCurrentColor);
+				// this function has a bug (it only fills one pixel less than the image.)
+				//mCurrentDrawTarget.FillRectangle(x, y, x + w, y + h, (int)mCurrentColor);
+
+				MoSync.GraphicsUtil.ClipRectangle(
+					x, y, w, h,
+					(int)mClipRect.X, (int)mClipRect.Y, (int)mClipRect.Width, (int)mClipRect.Height,
+					out x, out y, out w, out h);
+
+				if (w <= 0 || h <= 0)
+					return;
+
+				int index = x + y * mCurrentDrawTarget.PixelWidth;
+				while(h-- != 0)
+				{
+					int width = w;
+					while(width-- != 0)
+					{
+						mCurrentDrawTarget.Pixels[index] = (int)mCurrentColor;
+						index++;
+					}
+					index += -w + mCurrentDrawTarget.PixelWidth;
+				}
 			};
 
 			syscalls.maLine = delegate(int x1, int y1, int x2, int y2)
