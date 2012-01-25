@@ -470,18 +470,16 @@ namespace Wormhole
 			return -1;
 		}
 
-		/*int exists = maFileExists(file);
+		int exists = maFileExists(file);
 		if (1 != exists)
 		{
 			maFileClose(file);
 			return -1;
-		}*/
+		}
 
 		int size = maFileSize(file);
-		lprintfln("@@@ FileRead file size: %i path: %s", size, path.c_str());
 		if (size < 0)
 		{
-		lprintfln("@@@ FileRead opps");
 			maFileClose(file);
 			return -1;
 		}

@@ -77,13 +77,11 @@ var FileSys = function()
 				uri,
 				function (directoryEntry)
 				{
-					console.log("@@@ resolveLocalFileSystemURI success");
 					fileSys.root = directoryEntry;
 					fun(true, fileSys);
 				},
 				function ()
 				{
-					console.log("@@@ resolveLocalFileSystemURI error");
 					fileSys.root = null;
 					fun(false, null);
 				});
@@ -104,11 +102,13 @@ var FileSys = function()
 		{
 			return function(result)
 			{
-				console.log("FileSys.error: " + result.code);
+				var message = "FileSys.error: " + result.code;
 				if (id)
 				{
-					console.log("error id: " + id);
+					message += " error id: " + id;
 				}
+				console.log(message);
+				alert(message);
 				fun(false, null);
 			};
 		}
@@ -139,26 +139,31 @@ var FileSys = function()
 				{
 					if (success)
 					{
-						fileSys.truncate(
-							path,
-							0,
-							function(success)
-							{
-								if (success)
+						if (exists)
+						{
+							fileSys.truncate(
+								path,
+								0,
+								function(success)
 								{
-									console.log("@@@ fileSys.writeText 1 path: " + path + " data: " + data);
-									fileSys.writeTextAtPosition(path, data, 0, fun);
-								}
-								else
-								{
-									fun(false);
-								}
-							});
+									if (success)
+									{
+										fileSys.writeTextAtPosition(path, data, 0, fun);
+									}
+									else
+									{
+										error(fun);
+									}
+								});
+						}
+						else
+						{
+							fileSys.writeTextAtPosition(path, data, 0, fun);
+						}
 					}
 					else
 					{
-						console.log("@@@ fileSys.writeText 2 path: " + path + " data: " + data);
-						fileSys.writeTextAtPosition(path, data, 0, fun);
+						error(fun);
 					}
 				});
 		};
@@ -180,9 +185,9 @@ var FileSys = function()
 					{
 						fun(true);
 					};
-					writer.error = function(obj)
+					writer.onerror = function(obj)
 					{
-						fun(false);
+						error(fun);
 					};
 					writer.seek(position);
 					writer.write(data);
@@ -244,9 +249,9 @@ var FileSys = function()
 					{
 						fun(true);
 					};
-					writer.error = function()
+					writer.onerror = function()
 					{
-						fun(false);
+						error(fun);
 					};
 					writer.truncate(size);
 				},
@@ -283,7 +288,6 @@ var FileSys = function()
 				function(fileEntry)
 				{
 					var uri = fileEntry.toURI();
-					console.log("@@@@@@@@@@@ uri: " + uri);
 
 					// Full parent directory path of new file destination,
 					// excluding the file name.
@@ -302,9 +306,6 @@ var FileSys = function()
 					{
 						newParentPath = newFullPath.substring(0, index);
 						newFileName = newFullPath.substring(index + 1);
-
-						console.log("copyOrMoveFile newParentPath: " + newParentPath);
-						console.log("copyOrMoveFile newFileName: " + newFileName);
 					}
 					else
 					{
@@ -320,7 +321,6 @@ var FileSys = function()
 					if (index > -1)
 					{
 						directoryName = newParentPath.substring(index + 1);
-						console.log("copyOrMoveFile directoryName: " + directoryName);
 					}
 
 					// Create destination directory object.
@@ -334,7 +334,6 @@ var FileSys = function()
 							parentDirectory,
 							newFileName,
 							function(result) {
-								PrintObject(result);
 								fun(true, result); },
 							error(fun));
 					}
@@ -344,7 +343,6 @@ var FileSys = function()
 							parentDirectory,
 							newFileName,
 							function(result) {
-								PrintObject(result);
 								fun(true, result); },
 							error(fun));
 					}
@@ -416,7 +414,6 @@ var FileSys = function()
 			if (index > -1)
 			{
 				directoryName = fullPath.substring(index + 1);
-				console.log("deleteDirectory directoryName: " + directoryName);
 			}
 
 			// Create destination directory object.
@@ -488,8 +485,8 @@ function testFileSystem()
 		{
 			return function()
 			{
-				console.log("End of tests");
-				alert("End of tests");
+				console.log("Unexpected end of tests");
+				alert("Unexpected end of tests");
 			};
 		}
 	}
@@ -500,71 +497,48 @@ function testFileSystem()
 	 */
 	function runNextTest(success)
 	{
+		//nextTest()(success);
 		setTimeout(
 			function()
 			{
-				console.log("Running next test");
 				nextTest()(success);
 			},
 			0);
 	}
 
-	function mark(x)
-	{
-		return function(success)
-		{
-			console.log(">>>>>>>>>>>> Mark " + x);
-			runNextTest(success);
-		};
-	}
-
 	// Create the test suite.
 	tests = [
-	    mark(1),
+	    function(success) { alert("Running File tests"); runNextTest(success); },
 	    // Set up initial file structure.
 		createFiles,
 		// Do tests on directories.
-	    mark(2),
 		readDirectory("foa", checkDirectoryContents),
-	    mark(3),
 		copyDirectory("foa", "fob"),
-	    mark(4),
 		readDirectory("fob", checkDirectoryContents),
-	    mark(5),
 		moveDirectory("fob", "foc"),
-	    mark(6),
 		readDirectory("foc", checkDirectoryContents),
 		// Check file contents.
-	    mark(7),
 		readFile("foo/hello1.txt", "Hello World"),
-	    mark(8),
 		readFile("foo/bar/hello2.txt", "Hello World"),
-	    mark(9),
 		readFile("foo/bar/hello3.txt", "Hello World"),
-	    mark(10),
 		// Write new file.
 		writeFile("foc/bar/test.txt", "Hello World"),
-	    mark(6),
 		readFile("foc/bar/test.txt", "Hello World"),
-	    mark(7),
 		// Overwrite existing file.
 		writeFile("foc/bar/test.txt", "Hello World 2"),
 		readFile("foc/bar/test.txt", "Hello World 2"),
 		// File tests.
 		readFileAsDataURL("foc/bar/test.txt", "Hello World 2"),
 		truncateFile("foc/bar/test.txt", 5, "Hello"),
-	    mark(8),
 		copyFile("foc/bar/test.txt", "foc/bar/test2.txt"),
 		readFile("foc/bar/test2.txt", "Hello"),
 		moveFile("foc/bar/test2.txt", "foc/bar/test3.txt"),
 		fileShouldNotExist("foc/bar/test2.txt"),
 		readFile("foc/bar/test3.txt", "Hello"),
 		deleteFile("foc/bar/test3.txt"),
-	    mark(9),
 		fileShouldNotExist("foc/bar/test3.txt"),
 		// Delete directories.
 		deleteFiles,
-	    mark(10),
 		fileShouldNotExist("foo/hello1.txt"),
 		fileShouldNotExist("foo/bar/hello2.txt"),
 		fileShouldNotExist("foo/bar/hello3.txt"),
@@ -797,7 +771,6 @@ function testFileSystem()
 		{
 			if (success)
 			{
-				console.log("readFileDone data: " + data + " expected: " + expectedData);
 				if (data == expectedData)
 				{
 					runNextTest(success);
@@ -1028,8 +1001,8 @@ function testFileSystem()
 
 	// Create the file system object and start test.
 	FileSys.create(
-		"file:///sdcard",
-		//"LocalFileSystem",
+		//"file:///sdcard",
+		"LocalFileSystem",
 		function(success, fs)
 		{
 			if (success)

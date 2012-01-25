@@ -82,8 +82,8 @@ public:
 
 		// We can get a buffer overrun in lprintfln if
 		// string is too big, use maWriteLog instead.
-		lprintfln("@@@ MOSYNC Message:");
-		maWriteLog(stringData, dataSize);
+		//lprintfln("@@@ MOSYNC Message:");
+		//maWriteLog(stringData, dataSize);
 
 		free(stringData);
 	}
