@@ -143,7 +143,6 @@ PhoneGapCommandResult = function(status,callbackId,args,cast)
  */
 PhoneGap.CallbackSuccess = function(callbackId, args, cast)
 {
-	alert(args);
     var commandResult;
     try
     {
@@ -1060,7 +1059,14 @@ Capture.prototype.captureAudio = function(successCallback, errorCallback, option
  * @param {CaptureImageOptions} options
  */
 Capture.prototype.captureImage = function (successCallback, errorCallback, options) {
-    PhoneGap.exec(successCallback, errorCallback, "Capture", "captureImage", options);
+	PhoneGap.exec(	function(mediaFiles)
+			{
+				successCallback(Capture.prototype._castMediaFile(mediaFiles).message);
+			},
+			function(error)
+			{
+				errorCallback({code:CaptureError[error.code]});
+			}, "Capture", "captureImage", options);
 };
 
 /**
@@ -1072,13 +1078,13 @@ Capture.prototype.captureImage = function (successCallback, errorCallback, optio
  */
 Capture.prototype.captureVideo = function(successCallback, errorCallback, options){
 	PhoneGap.exec(	function(mediaFiles)
-					{
-						successCallback(Capture.prototype._castMediaFile(mediaFiles).message);
-					},
-					function(error)
-					{
-						errorCallback({code:CaptureError[error.code]});
-					}, "Capture", "captureVideo", options);
+			{
+				successCallback(Capture.prototype._castMediaFile(mediaFiles).message);
+			},
+			function(error)
+			{
+				errorCallback({code:CaptureError[error.code]});
+			}, "Capture", "captureVideo", options);
 };
 
 /**
