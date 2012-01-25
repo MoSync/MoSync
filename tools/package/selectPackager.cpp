@@ -45,9 +45,8 @@ void package(const SETTINGS& s) {
 	testProfileType(s);
 
 	ProfileType profileType =
-	        s.profileType && !strcmp("platform", s.profileType) ?
-				PLATFORM_BASED :
-				DEVICE_BASED;
+		(s.profileType && !strcmp("platform", s.profileType)) ?
+		PLATFORM_BASED : DEVICE_BASED;
 
 	// find profile info
 	RuntimeInfo ri;
