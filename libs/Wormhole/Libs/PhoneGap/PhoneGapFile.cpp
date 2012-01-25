@@ -429,9 +429,6 @@ namespace Wormhole
 			return -1;
 		}
 
-		// TODO: Now we assume file must exist. Is that ok?
-		//int exists = maFileExists(file);
-
 		// TODO: Should we check that position is within file size?
 		// int size = maFileSize(file);
 
@@ -473,15 +470,24 @@ namespace Wormhole
 			return -1;
 		}
 
+		int exists = maFileExists(file);
+		if (1 != exists)
+		{
+			maFileClose(file);
+			return -1;
+		}
+
 		int size = maFileSize(file);
 		if (size < 0)
 		{
+			maFileClose(file);
 			return -1;
 		}
 
 		char* buf = (char*) malloc(size + 1);
 		if (NULL == buf)
 		{
+			maFileClose(file);
 			return -1;
 		}
 
@@ -905,65 +911,79 @@ namespace Wormhole
 	 */
 	void PhoneGapFile::handleMessage(JSONMessage& message)
 	{
-		if (message.getParam("action") == "requestFileSystem")
+		String action = message.getParam("action");
+
+		if (action == "requestFileSystem")
 		{
 			actionRequestFileSystem(message);
 		}
-		else if (message.getParam("action") == "resolveLocalFileSystemURI")
+		else if (action == "resolveLocalFileSystemURI")
 		{
 			actionResolveLocalFileSystemURI(message);
 		}
-		else if (message.getParam("action") == "getFile")
+		else if (action == "getFile")
 		{
 			actionGetFile(message);
 		}
-		else if (message.getParam("action") == "getDirectory")
+		else if (action == "getDirectory")
 		{
 			actionGetDirectory(message);
 		}
-		else if (message.getParam("action") == "getFileMetadata")
+		else if (action == "getFileMetadata")
 		{
 			actionGetFileMetadata(message);
 		}
-		else if (message.getParam("action") == "getMetadata")
+		else if (action == "getMetadata")
 		{
 			actionGetMetadata(message);
 		}
-		else if (message.getParam("action") == "write")
+		else if (action == "write")
 		{
 			actionWrite(message);
 		}
-		else if (message.getParam("action") == "readAsText")
+		else if (action == "readAsText")
 		{
 			actionReadAsText(message);
 		}
-		else if (message.getParam("action") == "readAsDataURL")
+		else if (action == "readAsDataURL")
 		{
 			actionReadAsDataURL(message);
 		}
-		else if (message.getParam("action") == "truncate")
+		else if (action == "truncate")
 		{
 			actionTruncate(message);
 		}
-		else if (message.getParam("action") == "copyTo")
+		else if (action == "copyTo")
 		{
 			actionCopyTo(message);
 		}
-		else if (message.getParam("action") == "moveTo")
+		else if (action == "moveTo")
 		{
 			actionMoveTo(message);
 		}
-		else if (message.getParam("action") == "remove")
+		else if (action == "remove")
 		{
 			actionRemove(message);
 		}
-		else if (message.getParam("action") == "removeRecursively")
+		else if (action == "removeRecursively")
 		{
 			actionRemoveRecursively(message);
 		}
-		else if (message.getParam("action") == "readEntries")
+		else if (action == "readEntries")
 		{
 			actionReadEntries(message);
+		}
+		else if (action == "testFileExists")
+		{
+			actionTestFileExists(message);
+		}
+		else if (action == "testDirectoryExists")
+		{
+			actionTestDirectoryExists(message);
+		}
+		else if (action == "getFreeDiskSpace")
+		{
+			actionGetFreeDiskSpace(message);
 		}
 	}
 
@@ -1251,7 +1271,6 @@ namespace Wormhole
 
 	//mosync://PhoneGap?service=File&action=readAsText&args=
 	//{"fileName":"/mnt/sdcard/helloworld.txt","encoding":"UTF-8"}&PhoneGapCallBackId=File8
-
 	void PhoneGapFile::actionReadAsText(JSONMessage& message)
 	{
 		String callbackID = message.getParam("PhoneGapCallBackId");
@@ -1535,5 +1554,55 @@ namespace Wormhole
 			callbackID,
 			entries,
 			"window.localFileSystem._castEntries");
+	}
+
+	void PhoneGapFile::actionTestFileExists(JSONMessage& message)
+	{
+		String callbackID = message.getParam("PhoneGapCallBackId");
+
+		String path = message.getArgsField("fileName");
+
+		String exists = "false";
+		if (FileExists(path))
+		{
+			exists = "true";
+		}
+
+		// Return result to PhoneGap.
+		callSuccess(
+			callbackID,
+			exists);
+	}
+
+	void PhoneGapFile::actionTestDirectoryExists(JSONMessage& message)
+	{
+		String callbackID = message.getParam("PhoneGapCallBackId");
+
+		String path = message.getArgsField("dirName");
+
+		String exists = "false";
+		if (FileExists(path))
+		{
+			exists = "true";
+		}
+
+		// Return result to PhoneGap.
+		callSuccess(
+			callbackID,
+			exists);
+	}
+
+	/**
+	 * TODO: How should we implement this? Which file system are
+	 * we talking about? Unsupported for now.
+	 */
+	void PhoneGapFile::actionGetFreeDiskSpace(JSONMessage& message)
+	{
+		String callbackID = message.getParam("PhoneGapCallBackId");
+
+		// Return -1 as the result to PhoneGap.
+		callSuccess(
+			callbackID,
+			"-1");
 	}
 } // namespace
