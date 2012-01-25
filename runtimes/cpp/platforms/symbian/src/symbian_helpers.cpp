@@ -601,8 +601,7 @@ int LoadEncodedImageWAlphaL(const TDesC8& aEncodedData, TAlphaBitmap** ptab) {
 	CImageDecoder* temp = NULL;
 	ITRAP(temp = CImageDecoder::DataNewL(FSS, aEncodedData, KPngMime));
 	if(!temp) {
-		//fixme
-		LTRAP(temp = CImageDecoder::DataNewL(FSS, aEncodedData, KJpegMime));
+		LTRAP_BASE(temp = CImageDecoder::DataNewL(FSS, aEncodedData, KJpegMime), return RES_BAD_INPUT);
 	}
 	TCleaner<CImageDecoder> decoder(temp);
 	CleanupStack::PushL(decoder());
@@ -635,7 +634,7 @@ int LoadEncodedImageWAlphaL(const TDesC8& aEncodedData, TAlphaBitmap** ptab) {
 #else
 	const TSize& imgSize(frameInfo.iOverallSizeInPixels);
 #endif
-	LHEL_BASE(bmpClr->Create(imgSize, mode), return NULL);	//fixme
+	LHEL_OOM(bmpClr->Create(imgSize, mode));
 
 	//Create Synchronizer
 	TCleaner<CLocalSynchronizer> sync(new CLocalSynchronizer);
@@ -658,8 +657,7 @@ int LoadEncodedImageWAlphaL(const TDesC8& aEncodedData, TAlphaBitmap** ptab) {
 		decoder->Convert(sync->Status(), *bmpClr);  //Perform decoding
 	}
 	sync->Wait();
-	//fixme
-	LHEL(sync->Status()->Int());
+	LHEL_BASE(sync->Status()->Int(), return RES_BAD_INPUT);
 
 	//dump loaded bitmap
 	//LHEL(bitmap->Save(_L("C:\\dump.bmp")));
@@ -667,6 +665,7 @@ int LoadEncodedImageWAlphaL(const TDesC8& aEncodedData, TAlphaBitmap** ptab) {
 	*ptab = new TAlphaBitmap(bmpClr(), bmpMask());
 	if(!*ptab)
 		// does cleanup get done here?
+		// yes, everything's wrapped in TCleaners.
 		return RES_OUT_OF_MEMORY;
 
 	//Cleanup
