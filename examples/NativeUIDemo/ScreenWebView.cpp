@@ -67,11 +67,6 @@ ScreenWebView::ScreenWebView():
 {
 	setTitle(TAB_SCREEN_TITLE);
 
-	// Get the screen size. This shows how to get a property
-	// value for a property for which there is no predefined method.
-	mScreenHeight = getHeight();
-	mScreenWidth = getWidth();
-
 	// Create and add the main layout to the screen.
 	VerticalLayout* mainLayout = new VerticalLayout();
 	setMainWidget(mainLayout);
@@ -90,6 +85,10 @@ ScreenWebView::ScreenWebView():
 	{
 		// Set the screen icon for iOS.
 		setIcon(RES_TAB_ICON_WEB_VIEW);
+
+		// Get the screen size.
+		mScreenHeight = getHeight();
+		mScreenWidth = getWidth();
 
 		// Create and add the navigation bar to the main layout.
 		mNavBarWidget = new NavigationBar();

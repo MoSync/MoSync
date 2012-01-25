@@ -143,6 +143,7 @@ PhoneGapCommandResult = function(status,callbackId,args,cast)
  */
 PhoneGap.CallbackSuccess = function(callbackId, args, cast)
 {
+	alert(args);
     var commandResult;
     try
     {

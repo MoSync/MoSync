@@ -29,13 +29,17 @@ MA 02110-1301, USA.
 #include <maprofile.h>	// Profile database.
 #include <mastring.h>		// C string functions
 
+#define BUF_MAX 256
+
 /**
  * Detects if the current platform is Android.
  * @return true if the platform is Android, false otherwise.
  */
 static bool isAndroid()
 {
-	if ( NULL != strstr(MA_PROF_STRING_PLATFORM, "android"))
+	char platform[BUF_MAX];
+	maGetSystemProperty("mosync.device.OS", platform, BUF_MAX);
+	if ( strcmp(platform,"Android") == 0 )
 	{
 		return true;
 	}
