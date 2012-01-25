@@ -419,6 +419,11 @@ public class MoSyncFile {
 			return MA_FERR_GENERIC;
 		}
 
+		if (null == fileHandle.mFileChannel)
+		{
+			return MA_FERR_NOTFOUND;
+		}
+
 		try
 		{
 			return (int)fileHandle.mFileChannel.size();
@@ -581,6 +586,11 @@ public class MoSyncFile {
 			return MA_FERR_NOTFOUND;
 		}
 
+		if (null == fileHandle.mFileChannel)
+		{
+			return MA_FERR_NOTFOUND;
+		}
+
 		synchronized(mMoSyncThread) { try
 		{
 			fileHandle.mFileChannel.truncate(offset);
@@ -652,8 +662,14 @@ public class MoSyncFile {
 	int maFileWrite(int file, int src, int len)
 	{
 		log("maFileWrite ("+file+")");
+
 		MoSyncFileHandle fileHandle = mFileHandles.get(file);
 		if (null == fileHandle)
+		{
+			return MA_FERR_NOTFOUND;
+		}
+
+		if (null == fileHandle.mFileChannel)
 		{
 			return MA_FERR_NOTFOUND;
 		}
@@ -684,10 +700,16 @@ public class MoSyncFile {
 	int maFileWriteFromData(int file, int data, int offset, int len)
 	{
 		log("maFileWriteFromData ("+file+")");
+
 		MoSyncFileHandle fileHandle = mFileHandles.get(file);
 		if (null == fileHandle)
 		{
 			logerr("maFileWriteFromData: MA_FERR_NOTFOUND file handle not found");
+			return MA_FERR_NOTFOUND;
+		}
+
+		if (null == fileHandle.mFileChannel)
+		{
 			return MA_FERR_NOTFOUND;
 		}
 
@@ -759,7 +781,19 @@ public class MoSyncFile {
 		MoSyncFileHandle fileHandle = mFileHandles.get(file);
 		if (null == fileHandle)
 		{
-			logerr("maFileRead Error: MA_FERR_NOTFOUND ("+file+")");
+			logerr("maFileRead Error: MA_FERR_NOTFOUND 1 ("+file+")");
+			return MA_FERR_NOTFOUND;
+		}
+
+		if (null == fileHandle.mFileChannel)
+		{
+			return MA_FERR_NOTFOUND;
+		}
+
+		// File must exist on disk to be read.
+		if (!fileHandle.mFile.exists())
+		{
+			logerr("maFileRead Error: MA_FERR_NOTFOUND 2 ("+file+")");
 			return MA_FERR_NOTFOUND;
 		}
 
@@ -795,6 +829,11 @@ public class MoSyncFile {
 		if (null == fileHandle)
 		{
 			logerr("maFileReadToData MA_FERR_NOTFOUND ("+file+")");
+			return MA_FERR_NOTFOUND;
+		}
+
+		if (null == fileHandle.mFileChannel)
+		{
 			return MA_FERR_NOTFOUND;
 		}
 
@@ -858,6 +897,11 @@ public class MoSyncFile {
 			return MA_FERR_NOTFOUND;
 		}
 
+		if (null == fileHandle.mFileChannel)
+		{
+			return MA_FERR_NOTFOUND;
+		}
+
 		synchronized(mMoSyncThread) { try
 		{
 			int position = (int)fileHandle.mFileChannel.position();
@@ -887,6 +931,11 @@ public class MoSyncFile {
 		if (null == fileHandle)
 		{
 			logerr("maFileSeek: MA_FERR_NOTFOUND");
+			return MA_FERR_NOTFOUND;
+		}
+
+		if (null == fileHandle.mFileChannel)
+		{
 			return MA_FERR_NOTFOUND;
 		}
 
