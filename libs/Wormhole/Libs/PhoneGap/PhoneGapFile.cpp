@@ -540,7 +540,7 @@ namespace Wormhole
 		FileMakeDirectoryPath(path);
 
 		// Open directory listing.
-		MAHandle list = maFileListStart(path.c_str(), "*+", MA_FL_SORT_NONE);
+		MAHandle list = maFileListStart(path.c_str(), "*", MA_FL_SORT_NONE);
 		if (list < 0)
 		{
 			return -1;
@@ -691,7 +691,7 @@ namespace Wormhole
 		FileMakeDirectoryPath(destinationPath);
 
 		// Open directory listing of source dir.
-		MAHandle list = maFileListStart(sourcePath.c_str(), "*+", MA_FL_SORT_NONE);
+		MAHandle list = maFileListStart(sourcePath.c_str(), "*", MA_FL_SORT_NONE);
 		if (list < 0)
 		{
 			return -1;
@@ -1471,7 +1471,7 @@ namespace Wormhole
 		// Open directory listing.
 		MAHandle list = maFileListStart(
 			path.c_str(),
-			"*+",
+			"*",
 			MA_FL_SORT_NAME | MA_FL_ORDER_ASCENDING);
 		if (list < 0)
 		{
