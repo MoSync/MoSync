@@ -48,7 +48,7 @@ public:
 
 		// The page in the "LocalFiles" folder to
 		// show when the application starts.
-		showPage("filesystest-index.html");
+		showPage("index.html");
 
 		// Initialize PhoneGap.
 		mPhoneGapMessageHandler->initializePhoneGap();
