@@ -28,7 +28,7 @@ fileList.each { |fileName|
 # Write JavaScript Templates
 # Use the same notations for new templates
 File.open(
-  "../../../templates/Wormhole NativeUI Project/wormhole-nativeui.js",
+  "../../../templates/Wormhole NativeUI Project/wormhole.js",
   "w") do |targetFile|
 
   fileList.each do |filename|
@@ -39,25 +39,20 @@ File.open(
   end
 end
 FileUtils.cp(
-  "../../../templates/Wormhole NativeUI Project/wormhole-nativeui.js",
+  "../../../templates/Wormhole NativeUI Project/wormhole.js",
   "#{mosyncDir}/jslib/")
 
 File.open(
-  "../../../templates/Wormhole Web Project/wormhole-webapp.js",
+  "../../../templates/Wormhole Web Project/wormhole.js",
   "w") do |targetFile|
 
   fileList.each do |filename|
-    if((!filename.include?("nativeui")) &&
-      (!filename.include?("resource")))
-
       File.open(filename, "r") do |sourceFile|
         fileContent = sourceFile.read;
         targetFile.write(fileContent);
-      end
-
     end
   end
 end
 FileUtils.cp(
-  "../../../templates/Wormhole Web Project/wormhole-webapp.js",
+  "../../../templates/Wormhole Web Project/wormhole.js",
   "#{mosyncDir}/jslib/")
