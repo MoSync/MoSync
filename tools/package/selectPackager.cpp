@@ -267,6 +267,8 @@ static bool parseProfileInfo(ProfileType profileType, Profile* p, const SETTINGS
 			sscanf(major.getValue().c_str(), "%i", &pi.blackberryVersion);
 			sscanf(minor.getValue().c_str(), "%i", &pi.blackberryMinor);
 		}
+		Capability cldc = p->getCapability("CLDC");
+		pi.isCldc10 = (cldc.getValue() == "1.0");
 	}
 	if (iconX > 0 && iconY > 0) {
 		char buf[32];
