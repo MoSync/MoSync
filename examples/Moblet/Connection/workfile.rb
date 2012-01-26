@@ -7,6 +7,7 @@ work.instance_eval do
 	@SOURCES = ["."]
 	@LIBRARIES = ["mautil"]
 	@NAME = "Connection"
+	@PACK_PARAMETERS = ' --s60v3uid E3450F2B --s60v2uid 00297B7A'
 end
 
 work.invoke
