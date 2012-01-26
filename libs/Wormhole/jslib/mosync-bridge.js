@@ -47,9 +47,13 @@ var mosync = (function()
 			? true : false;
 
 	// console.log does not work on WP7.
-	if (mosync.isWindowsPhone)
+	if (typeof console === "undefined")
 	{
-		console.log = function(s) { };
+		console = {}
+	}
+	if (typeof console.log === "undefined")
+	{
+		console.log = function(s) {};
 	}
 
 	// The encoder submodule.
