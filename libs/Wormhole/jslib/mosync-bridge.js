@@ -17,6 +17,11 @@ MA 02110-1301, USA.
 */
 
 /**
+ Bridge
+ =======
+Bridge is the blah blah
+*/
+/**
  * @file mosync-bridge.js
  * @author Mikael Kindborg, Ali Sarrafi
  *

@@ -17,6 +17,12 @@ MA 02110-1301, USA.
 */
 
 /**
+ Sensor Manager
+ =======
+ Sensor Manager is the blah blah
+*/
+
+/**
  * @file mosync-sensormanager.js
  * @author Iraklis
  *

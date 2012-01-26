@@ -6,6 +6,11 @@
  * Provides support for designing UI both programatically and declaratively.
  * Should be used together with mosync-resource.js
  */
+/**
+ Native UI
+ =======
+ Native UI is the blah blah
+*/
 
 /**
  * @namespace The mosync.nativeui module

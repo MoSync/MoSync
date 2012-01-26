@@ -17,6 +17,12 @@ MA 02110-1301, USA.
 */
 
 /**
+ Push Notifications
+ =======
+ Push Notifications is the blah blah
+*/
+
+/**
  * @file mosync-pushnotifications.js
  * @author Bogdan
  *
