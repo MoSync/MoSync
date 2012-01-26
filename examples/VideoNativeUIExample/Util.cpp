@@ -25,8 +25,6 @@ MA 02110-1301, USA.
 
 #include <maapi.h>
 
-#include <maprofile.h>		// Profile database
-
 #include "Util.h"
 
 #define BUF_MAX 256
