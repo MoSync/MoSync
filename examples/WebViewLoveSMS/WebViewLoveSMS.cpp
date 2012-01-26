@@ -64,7 +64,7 @@ using namespace Wormhole;
  * You can turn off SMS sending during debugging
  * by setting this variable to false.
  */
-static bool sSendSMSForReal = false;
+static bool sSendSMSForReal = true;
 
 /**
  * The application class.
