@@ -42,11 +42,10 @@ static int j_inject(const char *jarFile, const char *pngFile) {
 	//parse / modify
 	{
 		ifstream mfIn("META-INF/MANIFEST.MF");
-		ostringstream mfStrOut;
 		while(1) {
-			read72line(mfIn, buf, sizeof(buf));
 			if(!mfIn.good())
 				break;
+			read72line(mfIn, buf, sizeof(buf));
 			char name[1024], midlet[1024];
 			if(sscanf(buf, "MIDlet-1: %[^,], %[^,], %s", name, icon, midlet) == 3) {
 				// Modifying the manifest will lead to deployment problems,
@@ -54,11 +53,8 @@ static int j_inject(const char *jarFile, const char *pngFile) {
 				//mfStrOut << "MIDlet-1: " << name << ", " << pngFile << ", " << midlet << "\n";
 				printf("Found icon file in manifest: %s\n", icon);
 			}
-			mfStrOut << buf << "\n";
 		}
 		mfIn.close();
-		ofstream mfFileOut("META-INF/MANIFEST.MF");
-		mfFileOut << mfStrOut.str();
 	}
 
 	// Rename our png file

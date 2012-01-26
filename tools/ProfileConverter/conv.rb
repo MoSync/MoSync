@@ -171,6 +171,14 @@ class JavaMEPlatform
         return result;
     end
 
+    def to_cldc_xml(runtime)
+        version = "1.1"
+        if (runtime && runtime.caps.has_key?("MA_PROF_SUPPORT_CLDC_10"))
+            version = "1.0"
+        end
+        return self.create_capability_tag("CLDC", version, "SUPPORTED", "buildtime", "property");
+    end
+
     def to_xml(runtime, family, variant, runtimeDir, inherit, write_caps, is_abstract)
         xml = "<platform family=\"" << family
         xml << "\" variant=\"" << variant.to_s << "\" "
@@ -193,6 +201,7 @@ class JavaMEPlatform
             xml << self.to_capability_xml(runtime, "MA_PROF_SUPPORT_JAVAPACKAGE_FILECONNECTION");
             xml << self.to_capability_xml(runtime, "MA_PROF_SUPPORT_JAVAPACKAGE_PIMAPI");
             xml << self.to_icon_size_xml(runtime);
+            xml << self.to_cldc_xml(runtime);
         end
         xml << "</platform>\n"
         return xml
