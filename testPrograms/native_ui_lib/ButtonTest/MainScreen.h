@@ -53,6 +53,7 @@ public:
     /**
      * This method is called when there is an touch-down event for
      * a button.
+     * Platform: iOS and Android.
      * @param button The button object that generated the event.
      */
     virtual void buttonPressed(Widget* button);
@@ -60,6 +61,7 @@ public:
     /**
      * This method is called when there is an touch-up event for
      * a button.
+     * Platform: iOS and Android.
      * @param button The button object that generated the event.
      */
     virtual void buttonReleased(Widget* button);
@@ -67,6 +69,7 @@ public:
     /**
      * This method is called if the touch-up event was inside the
      * bounds of the button.
+     * Platform: iOS and Android.
      * @param button The button object that generated the event.
      */
     virtual void buttonClicked(Widget* button);
@@ -94,6 +97,8 @@ private:
 	VerticalLayout* mMainLayout;
 
 	Button* mButton;
+	Button* mTestFontLabel;
+	ListView* mEvents;
 };
 
 

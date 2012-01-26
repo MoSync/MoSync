@@ -35,11 +35,13 @@
 MainScreen::MainScreen() :
 	Screen(),
 	mMainLayout(NULL),
-	mButton(NULL)
+	mButton(NULL),
+	mEvents(NULL)
 {
 	createMainLayout();
 	mButton->addEventListener(this);
 	mButton->addButtonListener(this);
+	mTestFontLabel->addButtonListener(this);
 }
 
 /**
@@ -49,6 +51,7 @@ MainScreen::~MainScreen()
 {
 	mButton->removeEventListener(this);
 	mButton->removeButtonListener(this);
+	mTestFontLabel->removeButtonListener(this);
 }
 
 /**
@@ -109,16 +112,22 @@ void MainScreen::createMainLayout() {
 	int fontHandle = maFontLoadWithName(buf, 10);
 
 	// Set the handle to a label
-	Button* testFontLabel = new Button();
-	testFontLabel->setText("Test for this font!");
-	testFontLabel->setFontColor(0xFF0000);
-	testFontLabel->setFont(fontHandle);
-	mMainLayout->addChild(testFontLabel);
+	mTestFontLabel = new Button();
+	mTestFontLabel->setText("Test for this font!");
+	mTestFontLabel->setFontColor(0xFF0000);
+	mTestFontLabel->setFont(fontHandle);
+	mMainLayout->addChild(mTestFontLabel);
+
+	mEvents = new ListView();
+	mEvents->fillSpaceHorizontally();
+	mEvents->fillSpaceVertically();
+	mMainLayout->addChild(mEvents);
 }
 
 /**
  * This method is called when there is an touch-down event for
  * a button.
+ * Platform: iOS and Android.
  * @param button The button object that generated the event.
  */
 void MainScreen::buttonPressed(Widget* button)
@@ -127,11 +136,15 @@ void MainScreen::buttonPressed(Widget* button)
     {
         printf("mButton pointerPressedEvent");
     }
+    Label* event = new Label();
+    event->setText("buttonPressed");
+    mEvents->addChild(event);
 }
 
 /**
  * This method is called when there is an touch-up event for
  * a button.
+ * Platform: iOS and Android.
  * @param button The button object that generated the event.
  */
 void MainScreen::buttonReleased(Widget* button)
@@ -140,11 +153,15 @@ void MainScreen::buttonReleased(Widget* button)
     {
         printf("mButton pointerReleasedEvent");
     }
+    Label* event = new Label();
+    event->setText("buttonReleased");
+    mEvents->addChild(event);
 }
 
 /**
  * This method is called if the touch-up event was inside the
  * bounds of the button.
+ * Platform: iOS and Android.
  * @param button The button object that generated the event.
  */
 void MainScreen::buttonClicked(Widget* button)
@@ -153,4 +170,7 @@ void MainScreen::buttonClicked(Widget* button)
     {
         printf("mButton buttonClickedEvent");
     }
+    Label* event = new Label();
+    event->setText("buttonClicked");
+    mEvents->addChild(event);
 }

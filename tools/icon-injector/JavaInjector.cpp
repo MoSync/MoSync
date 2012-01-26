@@ -76,7 +76,7 @@ void read72line(ifstream& input, char* buf, int bufSize) {
 	while (readNextLine) {
 		input.getline(buf + offset, bufSize - offset);
 		streamsize read = input.gcount();
-		offset += read - 1;
+		offset += (int)read - 1;
 		// Manifests w exactly 72 bytes in a line should continue on the
 		// next if there is a space at the first character position on that line.
 		bool isSpace = input.peek() == ' ';

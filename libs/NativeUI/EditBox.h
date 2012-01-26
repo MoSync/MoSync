@@ -240,11 +240,19 @@ namespace NativeUI
         /**
          * Sets the maximum input length of the edit box.
          * Setting this value enables multiline input mode by default.
-         * Available on Android only.
+         * Available on Android and iOS.
          *
          * @param maxLength The maximum length.
          */
         void setMaxLength(int maxLength);
+
+        /**
+         * Gets the maximum input length of the edit box.
+         * Available on Android and iOS.
+         *
+         * @return Maximum input length.
+         */
+        int getMaxLength(int maxLength);
 
         /**
          * Set the input flags that are to be applied to the edit box.

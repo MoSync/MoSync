@@ -1,0 +1,59 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <meta name="viewport" content="width=320; user-scalable=no" />
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+    <title>PhoneGap</title>
+    <link rel="stylesheet" href="master.css" type="text/css" media="screen" title="no title" charset="utf-8">
+    <script type="text/javascript" charset="utf-8" src="js/mosync-bridge.js"></script>
+    <script type="text/javascript" charset="utf-8" src="js/phonegap-bridge.js"></script>
+    <script type="text/javascript" charset="utf-8" src="js/phonegap-1.2.0.js"></script>
+    <script type="text/javascript" charset="utf-8" src="js/mosync-sensormanager.js"></script>
+    <script type="text/javascript" charset="utf-8" src="sensortest.js"></script>
+  </head>
+  <body onload="init();" id="stage" class="theme">
+    <h1>W3C Sensor Manager Test</h1>
+    <div id="info">
+        <h4>Platform: <span id="platform"> &nbsp;</span>,   Version: <span id="version">&nbsp;</span></h4>
+        <h4>UUID: <span id="uuid"> &nbsp;</span>,   Name: <span id="name">&nbsp;</span></h4>
+        <h4>Width: <span id="width"> &nbsp;</span>,   Height: <span id="height">&nbsp;
+                   </span>, Color Depth: <span id="colorDepth"></span></h4>
+     </div>
+    <p id="sensorList"></p>
+    <a href="#" class="btn large" onclick="captureTest();">captureTest</a>
+    <dl id="accel-data">
+      <dt>X:</dt><dd id="accel-x">&nbsp;</dd>
+      <dt>Y:</dt><dd id="accel-y">&nbsp;</dd>
+      <dt>Z:</dt><dd id="accel-z">&nbsp;</dd>
+    </dl>
+    <a href="#" class="btn large" onclick="toggleAccel();">Toggle Accelerometer</a>
+     <dl id="magnetic-data">
+      <dt>X:</dt><dd id="magnetic-x">&nbsp;</dd>
+      <dt>Y:</dt><dd id="magnetic-y">&nbsp;</dd>
+      <dt>Z:</dt><dd id="magnetic-z">&nbsp;</dd>
+    </dl>
+    <a href="#" class="btn large" onclick="toggleMagnetic();">Toggle MagneticField</a>
+     <dl id="orientation-data">
+      <dt>X:</dt><dd id="orientation-x">&nbsp;</dd>
+      <dt>Y:</dt><dd id="orientation-y">&nbsp;</dd>
+      <dt>Z:</dt><dd id="orientation-z">&nbsp;</dd>
+    </dl>
+    <a href="#" class="btn large" onclick="toggleOrientation();">Toggle Orientation</a>
+     <dl id="proximity-data">
+      <dt>X:</dt><dd id="proximity-x">&nbsp;</dd>
+      <dt>Y:</dt><dd id="proximity-y">&nbsp;</dd>
+      <dt>Z:</dt><dd id="proximity-z">&nbsp;</dd>
+    </dl>
+    <a href="#" class="btn large" onclick="toggleProximity();">Toggle Proximity</a>
+     <dl id="gyroscope-data">
+      <dt>X:</dt><dd id="gyroscope-x">&nbsp;</dd>
+      <dt>Y:</dt><dd id="gyroscope-y">&nbsp;</dd>
+      <dt>Z:</dt><dd id="gyroscope-z">&nbsp;</dd>
+    </dl>
+    <a href="#" class="btn large" onclick="toggleGyroscope();">Toggle Gyroscope</a>
+    <a href="index.html" class="btn large" onclick="">Go Back</a>
+    <div id="viewport" class="viewport" style="display: none;">
+      <img style="width:60px;height:60px" id="test_img" src="" />
+    </div>
+  </body>
+</html>

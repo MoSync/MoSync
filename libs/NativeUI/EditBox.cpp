@@ -211,6 +211,17 @@ namespace NativeUI
     }
 
     /**
+     * Gets the maximum input length of the edit box.
+     * Available on Android and iOS.
+     *
+     * @return Maximum input length.
+     */
+    int EditBox::getMaxLength(int maxLength)
+    {
+        return this->getPropertyInt(MAW_EDIT_BOX_MAX_LENGTH);
+    }
+
+    /**
      * Add an edit box event listener.
      * @param listener The listener that will receive edit box events.
      */

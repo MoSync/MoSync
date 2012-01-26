@@ -20,7 +20,7 @@
 <script src="js/jqtouch/jqtouch.js" type="application/x-javascript"
 	charset="utf-8"></script>
 
-<script type="text/javascript" charset="utf-8" src="js/wormhole-webapp.js"></script>
+<script type="text/javascript" charset="utf-8" src="js/wormhole.js"></script>
 <script type="text/javascript" charset="utf-8" src="main.js"></script>
 <script type="text/javascript" charset="utf-8" src="phonegapSensors.js"></script>
 
@@ -54,10 +54,14 @@
 				{
 					addFavoriteUser();
 				});
-				$("button back").bind(clickEvent, function(e)
+				$("button.back").bind(clickEvent, function(e)
 				{
 					jQT.goBack();
 				});
+				$("#fileStorage").bind('pageAnimationStart',function()
+				{
+					refreshFiles();
+				})
 			}
 		</script>
 
@@ -221,6 +225,10 @@
 				<h1>File storage</h1>
 				<a class="button back" onclick="jQT.goBack()" id="backButton">Back</a>
 			</div>
+			<input type="button" class="button" value="+" onclick="createFile()"/>
+			<ul id="fileList">
+			</ul>
+			<!--
 			<ul class="rounded">
 				<li><label>File name:</label><input id="fileNameBox" type="text" style="width:60%" value="example.data"/></li>
 			</ul>
@@ -230,6 +238,16 @@
 			</ul>
 			<ul class="rounded">
 				<li><textarea rows="20" style="font-size:20pt"></textarea></li>
+			</ul>-->
+		</div>
+		<div id="filePage">
+			<div class="toolbar">
+				<h1 id="filePanelTitle">File</h1>
+				<a class="button back" onclick="jQT.goBack()" id="backButtonxvxcv">Back</a>
+			</div>
+			<input type="button" class="button" value="Delete" onclick="deleteFile()"/>
+			<ul>
+				<li><textarea id="fileContents" rows="20" style="font-size:20pt" onchange="textHasChanged()" onblur="textLostFocus()"></textarea></li>
 			</ul>
 		</div>
 	</div>

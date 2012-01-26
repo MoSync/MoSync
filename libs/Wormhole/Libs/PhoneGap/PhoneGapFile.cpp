@@ -145,27 +145,54 @@ namespace Wormhole
 		return MimeTypeDefault;
 	}
 
-	/**
-	 * TODO: This must work to get a directory name if
-	 * the path ends with a slash, e.g.: /sdcard/MyMusic/
-	 */
-	static String FileGetName(const String& filePath)
+	static String FileGetLocalPath()
 	{
-		// TODO: Remove last slash if path ends with a slash.
+		int bufferSize = 2048;
+		char buffer[bufferSize];
+
+		int size = maGetSystemProperty(
+			"mosync.path.local",
+			buffer,
+			bufferSize);
+
+		// If there was an error, return default root path.
+		if (size < 0 || size > bufferSize)
+		{
+			return "/";
+		}
+
+		return buffer;
+	}
+
+	/**
+	 * It should work also to get a directory name if the
+	 * path ends with a slash, e.g.: "/sdcard/MyMusic/"
+	 * or even for "/" in which case an empty string will
+	 * be returned.
+	 */
+	static String FileGetName(const String& p)
+	{
+		String path = p;
+
+		// Remove last slash if path ends with a slash.
+		if ('/' == path[path.size() - 1])
+		{
+			path = path.substr(0, path.size() - 1);
+		}
 
 		// Find last slash.
-		int pos = filePath.findLastOf('/');
+		int pos = path.findLastOf('/');
 		if (String::npos == pos)
 		{
 			// No slash found, just return the file path.
-			return filePath;
+			return path;
 		}
 
 		// Move to position after the '/'
 		pos = pos + 1;
 
 		// Return file name.
-		return filePath.substr(pos, filePath.size() - pos);
+		return path.substr(pos, path.size() - pos);
 	}
 
 	/**
@@ -402,9 +429,6 @@ namespace Wormhole
 			return -1;
 		}
 
-		// TODO: Now we assume file must exist. Is that ok?
-		//int exists = maFileExists(file);
-
 		// TODO: Should we check that position is within file size?
 		// int size = maFileSize(file);
 
@@ -446,15 +470,24 @@ namespace Wormhole
 			return -1;
 		}
 
+		int exists = maFileExists(file);
+		if (1 != exists)
+		{
+			maFileClose(file);
+			return -1;
+		}
+
 		int size = maFileSize(file);
 		if (size < 0)
 		{
+			maFileClose(file);
 			return -1;
 		}
 
 		char* buf = (char*) malloc(size + 1);
 		if (NULL == buf)
 		{
+			maFileClose(file);
 			return -1;
 		}
 
@@ -513,7 +546,7 @@ namespace Wormhole
 		FileMakeDirectoryPath(path);
 
 		// Open directory listing.
-		MAHandle list = maFileListStart(path.c_str(), "", MA_FL_SORT_NONE);
+		MAHandle list = maFileListStart(path.c_str(), "*", MA_FL_SORT_NONE);
 		if (list < 0)
 		{
 			return -1;
@@ -664,7 +697,7 @@ namespace Wormhole
 		FileMakeDirectoryPath(destinationPath);
 
 		// Open directory listing of source dir.
-		MAHandle list = maFileListStart(sourcePath.c_str(), "", MA_FL_SORT_NONE);
+		MAHandle list = maFileListStart(sourcePath.c_str(), "*", MA_FL_SORT_NONE);
 		if (list < 0)
 		{
 			return -1;
@@ -878,65 +911,79 @@ namespace Wormhole
 	 */
 	void PhoneGapFile::handleMessage(JSONMessage& message)
 	{
-		if (message.getParam("action") == "requestFileSystem")
+		String action = message.getParam("action");
+
+		if (action == "requestFileSystem")
 		{
 			actionRequestFileSystem(message);
 		}
-		else if (message.getParam("action") == "resolveLocalFileSystemURI")
+		else if (action == "resolveLocalFileSystemURI")
 		{
 			actionResolveLocalFileSystemURI(message);
 		}
-		else if (message.getParam("action") == "getFile")
+		else if (action == "getFile")
 		{
 			actionGetFile(message);
 		}
-		else if (message.getParam("action") == "getDirectory")
+		else if (action == "getDirectory")
 		{
 			actionGetDirectory(message);
 		}
-		else if (message.getParam("action") == "getFileMetadata")
+		else if (action == "getFileMetadata")
 		{
 			actionGetFileMetadata(message);
 		}
-		else if (message.getParam("action") == "getMetadata")
+		else if (action == "getMetadata")
 		{
 			actionGetMetadata(message);
 		}
-		else if (message.getParam("action") == "write")
+		else if (action == "write")
 		{
 			actionWrite(message);
 		}
-		else if (message.getParam("action") == "readAsText")
+		else if (action == "readAsText")
 		{
 			actionReadAsText(message);
 		}
-		else if (message.getParam("action") == "readAsDataURL")
+		else if (action == "readAsDataURL")
 		{
 			actionReadAsDataURL(message);
 		}
-		else if (message.getParam("action") == "truncate")
+		else if (action == "truncate")
 		{
 			actionTruncate(message);
 		}
-		else if (message.getParam("action") == "copyTo")
+		else if (action == "copyTo")
 		{
 			actionCopyTo(message);
 		}
-		else if (message.getParam("action") == "moveTo")
+		else if (action == "moveTo")
 		{
 			actionMoveTo(message);
 		}
-		else if (message.getParam("action") == "remove")
+		else if (action == "remove")
 		{
 			actionRemove(message);
 		}
-		else if (message.getParam("action") == "removeRecursively")
+		else if (action == "removeRecursively")
 		{
 			actionRemoveRecursively(message);
 		}
-		else if (message.getParam("action") == "readEntries")
+		else if (action == "readEntries")
 		{
 			actionReadEntries(message);
+		}
+		else if (action == "testFileExists")
+		{
+			actionTestFileExists(message);
+		}
+		else if (action == "testDirectoryExists")
+		{
+			actionTestDirectoryExists(message);
+		}
+		else if (action == "getFreeDiskSpace")
+		{
+			actionGetFreeDiskSpace(message);
 		}
 	}
 
@@ -963,8 +1010,26 @@ namespace Wormhole
 			return;
 		}
 
-		// TODO: Replace hard-coded path with platform aware path handling.
-		String rootEntry = emitDirectoryEntry("sdcard", "/sdcard");
+		// Get local root path and remove trailing slash, if any.
+		String path = FileGetLocalPath();
+
+		// If we get just a slash, we won't remove the last slash.
+		// TODO: It is unclear if PhoneGap requires all path names
+		// to not end with a slash, or if it does not matter. Typical
+		// directory entry has name "sdcard" and full path "/sdcard".
+		if (path.size() == 1 && '/' == path[0])
+		{
+			// Just a slash, do nothing.
+		}
+		else if (path.size() > 1 && '/' == path[path.size() - 1])
+		{
+			// Remove last slash.
+			path = path.substr(0, path.size() - 1);
+		}
+		String rootEntry = emitDirectoryEntry(
+			FileGetName(path),
+			path);
+
 		String fileSystemInfo = emitFileSystemInfo("persistent", rootEntry);
 		callSuccess(
 			callbackID,
@@ -983,7 +1048,7 @@ namespace Wormhole
 		const char* pPath = strstr(pURL, "file://");
 		if (NULL == pPath)
 		{
-			callFileError(callbackID, "1000");
+			callFileError(callbackID, FILEERROR_SYNTAX_ERR);
 			return;
 		}
 		if (pURL != pPath)
@@ -1009,8 +1074,6 @@ namespace Wormhole
 			callbackID,
 			entry,
 			"window.localFileSystem._castEntry");
-
-
 	}
 
 	/**
@@ -1208,7 +1271,6 @@ namespace Wormhole
 
 	//mosync://PhoneGap?service=File&action=readAsText&args=
 	//{"fileName":"/mnt/sdcard/helloworld.txt","encoding":"UTF-8"}&PhoneGapCallBackId=File8
-
 	void PhoneGapFile::actionReadAsText(JSONMessage& message)
 	{
 		String callbackID = message.getParam("PhoneGapCallBackId");
@@ -1428,7 +1490,7 @@ namespace Wormhole
 		// Open directory listing.
 		MAHandle list = maFileListStart(
 			path.c_str(),
-			"",
+			"*",
 			MA_FL_SORT_NAME | MA_FL_ORDER_ASCENDING);
 		if (list < 0)
 		{
@@ -1492,5 +1554,55 @@ namespace Wormhole
 			callbackID,
 			entries,
 			"window.localFileSystem._castEntries");
+	}
+
+	void PhoneGapFile::actionTestFileExists(JSONMessage& message)
+	{
+		String callbackID = message.getParam("PhoneGapCallBackId");
+
+		String path = message.getArgsField("fileName");
+
+		String exists = "false";
+		if (FileExists(path))
+		{
+			exists = "true";
+		}
+
+		// Return result to PhoneGap.
+		callSuccess(
+			callbackID,
+			exists);
+	}
+
+	void PhoneGapFile::actionTestDirectoryExists(JSONMessage& message)
+	{
+		String callbackID = message.getParam("PhoneGapCallBackId");
+
+		String path = message.getArgsField("dirName");
+
+		String exists = "false";
+		if (FileExists(path))
+		{
+			exists = "true";
+		}
+
+		// Return result to PhoneGap.
+		callSuccess(
+			callbackID,
+			exists);
+	}
+
+	/**
+	 * TODO: How should we implement this? Which file system are
+	 * we talking about? Unsupported for now.
+	 */
+	void PhoneGapFile::actionGetFreeDiskSpace(JSONMessage& message)
+	{
+		String callbackID = message.getParam("PhoneGapCallBackId");
+
+		// Return -1 as the result to PhoneGap.
+		callSuccess(
+			callbackID,
+			"-1");
 	}
 } // namespace
