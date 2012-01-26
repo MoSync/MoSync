@@ -25,8 +25,6 @@ function initFileManager()
 	{
 		alert("fs error");
 	});
-
-	$('#newfileNameContainer').hide();
 }
 
 /**
@@ -68,6 +66,7 @@ function setFile(file)
 	//We programmatically go to the file editing panel
 	jQT.goTo('#filePage','pop');
 	$('#filePanelTitle').html(file.name);
+	$('#fileName').val(file.name);
 	currentFile = file;
 	var reader = new FileReader();
 	reader.onloadend = function(evt){
@@ -85,7 +84,40 @@ function setFile(file)
  */
 function createFile()
 {
-	$('#newFileNameContainer').show();
+	userFilesDir.createReader().readEntries(
+		function(entries)
+		{
+			var defaultNewFileName =  "NewFile";
+			var count = 1;
+			var newFileName;
+			var conflict;
+			do
+			{
+				conflict = false;
+				newFileName = defaultNewFileName + "_" + count;
+				count++;
+				for(var i = 0; i < entries.length; i++)
+				{
+					if(entries[i].name == newFileName)
+					{
+						conflict = true;
+						break;
+					}
+				}
+			}while(conflict);
+			userFilesDir.getFile(newFileName, {create: true, exclusive: true},
+					function(){
+						refreshFiles();
+					},
+					function()
+					{
+						alert("error");
+					});
+		},
+		function(error)
+		{
+			alert("error");
+		});
 }
 
 /**
@@ -126,5 +158,20 @@ function textLostFocus()
 		function(error){
 			alert("error");
 		});
+	}
+}
+
+function fileNameLostFocus()
+{
+	var newFileName = $('#fileName').val();
+	if(newFileName != currentFile.name)
+	{
+		currentFile.moveTo(userFilesDir, newFileName,
+			function(){
+				$('#filePanelTitle').html(newFileName);
+			},
+			function(){
+				alert("error");
+			});
 	}
 }
