@@ -63,16 +63,13 @@ namespace Wormhole
 	bool NativeUIMessageHandler::handleMessage(Wormhole::MessageStream& stream)
 	{
 		char buffer[1024];
-		printf("Getting the next action \n");
 		char * action = (char*)stream.getNext();
-		printf("action: %s\n", action);
 		// Widget Handling Calls
 		if(0 == strcmp("maWidgetCreate", action))
 		{
 			char* widgetType = (char*)stream.getNext();
 			char* widgetID = (char*)stream.getNext();
 			char* callbackID = (char*)stream.getNext();
-			printf("maWidgetCreate: %s, %s, %s\n", widgetType, widgetID, callbackID);
 			int numParams = stringToInteger(stream.getNext());
 
 			MAWidgetHandle widget = maWidgetCreate(widgetType);
@@ -89,29 +86,17 @@ namespace Wormhole
 					{
 						char* property = (char*)stream.getNext();
 						char* value = (char*)stream.getNext();
-						printf("maWidgetSetProperty %s, %s\n", property, value);
-						int res = maWidgetSetProperty(widget, property, value);
-						if(res < 0)
-						{
-							printf("could not set property\n");
-						}
-						else
-						{
-							printf("set property done\n");
-						}
+						maWidgetSetProperty(widget, property, value);
 					}
 				}
 				//We use a special callback for widget creation
-				printf("calling CallBack \n");
 				sprintf(
 					buffer,
 					"mosync.nativeui.createCallback('%s', '%s', %d)",
 					callbackID,
 					widgetID,
 					widget);
-				printf("Done creatign the script %s\n", buffer);
 				mWebView->callJS(buffer);
-				printf("done Calling Callback");
 			}
 
 		}
@@ -322,7 +307,6 @@ namespace Wormhole
 					replyScript,
 					"mosync.bridge.reply(%s)",
 					mosyncCallBackId);
-			printf("calling general callback %s\n", replyScript);
 			mWebView->callJS(replyScript);
 		}
 

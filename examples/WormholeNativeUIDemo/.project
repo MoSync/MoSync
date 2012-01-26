@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>WormholeDemo</name>
+	<name>WormholeNativeUIDemo</name>
 	<comment></comment>
 	<projects>
 	</projects>
@@ -24,7 +24,7 @@
 	</natures>
 	<filteredResources>
 		<filter>
-			<id>1327416139028</id>
+			<id>1327397613437</id>
 			<name></name>
 			<type>6</type>
 			<matcher>
