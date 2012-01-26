@@ -87,8 +87,8 @@ html
 }
 </style>
 
-<!-- Import the JavScript to C++ bridge. -->
-<script src="js/bridge.js"></script>
+<!-- Import the JavaScript to C++ bridge. -->
+<script src="js/mosync-bridge.js"></script>
 
 <script>
 // Global variables that hold message content.
@@ -127,7 +127,7 @@ function SendSMS(textMessage)
   if (ValidatePhoneNo())
   {
     DisplayMessage('Sending...');
-    bridge.messagehandler.send(
+    mosync.bridge.sendJSON(
       { messageName: 'SendSMS',
         phoneNo: GetPhoneNo(),
         message: textMessage },
@@ -253,7 +253,7 @@ CreateMessageStrings();
 </div>
 <script>
   // This informs the application that the page is loaded.
-  bridge.messagehandler.send({ messageName: 'PageLoaded' }, null);
+  mosync.bridge.sendJSON({ messageName: 'PageLoaded' });
 </script>
 </body>
 </html>

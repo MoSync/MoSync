@@ -48,11 +48,12 @@ MA 02110-1301, USA.
  * your loved one. ;-)
  */
 
-#include <ma.h>						// MoSync API (base API).
-#include <maheap.h>					// C memory allocation functions.
-#include <mastring.h>				// C String functions.
-#include <mavsprintf.h>				// sprintf etc.
-#include <Wormhole/WebAppMoblet.h>	// Moblet for web applications.
+#include <ma.h>						    // MoSync API (base API).
+#include <maheap.h>					    // C memory allocation functions.
+#include <mastring.h>				    // C String functions.
+#include <mavsprintf.h>				    // sprintf etc.
+#include <Wormhole/WebAppMoblet.h>	    // Moblet for web applications.
+#include <Wormhole/MessageStreamJSON.h>	// Messages from JavaScript.
 
 using namespace MAUtil;
 using namespace NativeUI;
@@ -73,9 +74,21 @@ class LoveSMSMoblet : public WebAppMoblet
 public:
 	LoveSMSMoblet()
 	{
+		// Extract files in LocalFiles folder to the device.
 		extractFileSystem();
+
+		// Enable message sending from JavaScript to C++.
 		enableWebViewMessages();
+
+		// Change this line to enableZoom to enable the
+		// user to zoom the web page. To disable zoom is
+		// one way of making web pages display in a
+		// reasonable default size on devices with
+		// different screen sizes.
 		getWebView()->disableZoom();
+
+		// The page in the "LocalFiles" folder to
+		// show when the application starts.
 		showPage("PageMain.html");
 	}
 
@@ -87,11 +100,18 @@ public:
 	 * the life-time of the call of this method, then it
 	 * will be deallocated.
 	 */
-	void handleWebViewMessage(WebView* webView, MAHandle urlData)
+	void handleWebViewMessage(WebView* webView, MAHandle data)
 	{
-		// Create message object. This parses the message.
-		WebViewMessage message(webView, urlData);
+		MessageStreamJSON message(webView, data);
 
+		while (message.next())
+		{
+			handleMessage(message);
+		}
+	}
+
+	void handleMessage(MessageStreamJSON& message)
+	{
 		// Handle the message.
 		if (message.is("SendSMS"))
 		{
@@ -103,14 +123,10 @@ public:
 		else if (message.is("PageLoaded"))
 		{
 			// Load and set saved phone number.
-			// We could implement a JavaScript File API to do
-			// this, which would be a much more general way.
+			// We could alternatively use a JavaScript File API
+			// to do this.
 			setSavedPhoneNo();
 		}
-
-		// Tell the WebView that we have processed the message, so that
-		// it can send the next one.
-		callJS("bridge.messagehandler.processedMessage()");
 	}
 
 	/**
