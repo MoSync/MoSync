@@ -25,6 +25,8 @@ function initFileManager()
 	{
 		alert("fs error");
 	});
+
+	$('#newfileNameContainer').hide();
 }
 
 /**
@@ -83,17 +85,7 @@ function setFile(file)
  */
 function createFile()
 {
-	var fileName = prompt("New File");
-	if(fileName != "")
-	{
-		userFilesDir.getFile(fileName, {create: true, exclusive: true},function(){
-			refreshFiles();
-		},
-		function()
-		{
-			alert("error");
-		});
-	}
+	$('#newFileNameContainer').show();
 }
 
 /**
