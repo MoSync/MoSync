@@ -94,7 +94,7 @@ void InitLog(const char* filenameOverride) {
 					LOG("Could not read counter file.\n");
 				}
 			} while(0);
-			
+
 			TBuf<32> tempFileName;
 #ifdef __SERIES60_3X__
 			_LIT(KLogFileFormat, "C:\\data\\msrlog%03i.txt");
@@ -110,7 +110,7 @@ void InitLog(const char* filenameOverride) {
 				LOG("Removing file no. %i\n", iDelete);
 				FSS.Delete(tempFileName);
 			}
-			
+
 			// save counter to file
 			WriteFileStream file(KCounterFile);
 			if(!file.write(&i, sizeof(i))) {
@@ -218,7 +218,7 @@ char* strrchr(const char* str, int c) {
 
 size_t strlen(const char* str) {
 	TPtrC8 ptr(CBP str);
-	return ptr.Length();	
+	return ptr.Length();
 }
 
 int strcmp(const char* a, const char* b) {
@@ -582,8 +582,17 @@ void TAlphaBitmap::SetClipRect(const TRect& aRect) {
 	mClipRect = aRect;
 }
 
+#ifdef DEBUGGING_MODE
+static TUint32 crc32(const TDesC8& td) {
+	TUint32 res;
+	Mem::Crc32(res, td.Ptr(), td.Length());
+	return res;
+}
+#endif
+
 // todo: check for KErrOutOfMemory (-4) at all trap points.
 int LoadEncodedImageWAlphaL(const TDesC8& aEncodedData, TAlphaBitmap** ptab) {
+	LOGD("LEIWA: %i bytes, CRC32: 0x%08x\n", aEncodedData.Size(), crc32(aEncodedData));
 	MyRFs myrfs;
 	myrfs.Connect();
 	//Initialize decoder
@@ -592,7 +601,7 @@ int LoadEncodedImageWAlphaL(const TDesC8& aEncodedData, TAlphaBitmap** ptab) {
 	CImageDecoder* temp = NULL;
 	ITRAP(temp = CImageDecoder::DataNewL(FSS, aEncodedData, KPngMime));
 	if(!temp) {
-		LTRAP(temp = CImageDecoder::DataNewL(FSS, aEncodedData, KJpegMime));
+		LTRAP_BASE(temp = CImageDecoder::DataNewL(FSS, aEncodedData, KJpegMime), return RES_BAD_INPUT);
 	}
 	TCleaner<CImageDecoder> decoder(temp);
 	CleanupStack::PushL(decoder());
@@ -625,9 +634,9 @@ int LoadEncodedImageWAlphaL(const TDesC8& aEncodedData, TAlphaBitmap** ptab) {
 #else
 	const TSize& imgSize(frameInfo.iOverallSizeInPixels);
 #endif
-	LHEL_BASE(bmpClr->Create(imgSize, mode), return NULL);
+	LHEL_OOM(bmpClr->Create(imgSize, mode));
 
-	//Create Synchronizer  
+	//Create Synchronizer
 	TCleaner<CLocalSynchronizer> sync(new CLocalSynchronizer);
 	if(!sync)
 		return RES_OUT_OF_MEMORY;
@@ -648,13 +657,15 @@ int LoadEncodedImageWAlphaL(const TDesC8& aEncodedData, TAlphaBitmap** ptab) {
 		decoder->Convert(sync->Status(), *bmpClr);  //Perform decoding
 	}
 	sync->Wait();
-	LHEL(sync->Status()->Int());
+	LHEL_BASE(sync->Status()->Int(), return RES_BAD_INPUT);
 
 	//dump loaded bitmap
 	//LHEL(bitmap->Save(_L("C:\\dump.bmp")));
 
 	*ptab = new TAlphaBitmap(bmpClr(), bmpMask());
 	if(!*ptab)
+		// does cleanup get done here?
+		// yes, everything's wrapped in TCleaners.
 		return RES_OUT_OF_MEMORY;
 
 	//Cleanup
