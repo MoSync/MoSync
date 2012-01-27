@@ -703,6 +703,20 @@ Accelerometer.ERROR_MSG = ["Not running", "Starting", "", "Failed to start"];
  * @param {Function} successCallback    The function to call when the acceleration data is available
  * @param {Function} errorCallback      The function to call when there is an error getting the acceleration data. (OPTIONAL)
  * @param {AccelerationOptions} options The options for getting the accelerometer data such as timeout. (OPTIONAL)
+ \code
+ function onSuccess(acceleration) {
+    alert('Acceleration X: ' + acceleration.x + '\n' +
+          'Acceleration Y: ' + acceleration.y + '\n' +
+          'Acceleration Z: ' + acceleration.z + '\n' +
+          'Timestamp: '      + acceleration.timestamp + '\n');
+};
+
+function onError() {
+    alert('onError!');
+};
+
+navigator.accelerometer.getCurrentAcceleration(onSuccess, onError);
+ \endcode
  */
 Accelerometer.prototype.getCurrentAcceleration = function(successCallback, errorCallback, options) {
 
@@ -745,6 +759,20 @@ Accelerometer.prototype.getCurrentAcceleration = function(successCallback, error
  * @param {Function} errorCallback      The function to call when there is an error getting the acceleration data. (OPTIONAL)
  * @param {AccelerationOptions} options The options for getting the accelerometer data such as timeout. (OPTIONAL)
  * @return String                       The watch id that must be passed to #clearWatch to stop watching.
+ \code
+ function onSuccess(acceleration) {
+    alert('Acceleration X: ' + acceleration.x + '\n' +
+          'Acceleration Y: ' + acceleration.y + '\n' +
+          'Acceleration Z: ' + acceleration.z + '\n' +
+          'Timestamp: '      + acceleration.timestamp + '\n');
+};
+
+function onError() {
+    alert('onError!');
+};
+
+navigator.accelerometer.getCurrentAcceleration(onSuccess, onError);
+ \endcode
  */
 Accelerometer.prototype.watchAcceleration = function(successCallback, errorCallback, options)
 {
@@ -788,6 +816,13 @@ Accelerometer.prototype.watchAcceleration = function(successCallback, errorCallb
  * Clears the specified accelerometer watch.
  *
  * @param {String} id       The id of the watch returned from #watchAcceleration.
+ \code
+ var watchID = navigator.accelerometer.watchAcceleration(onSuccess, onError, options);
+
+// ... later on ...
+
+navigator.accelerometer.clearWatch(watchID);
+ \endcode
  */
 Accelerometer.prototype.clearWatch = function(id) {
 
@@ -834,6 +869,18 @@ var Camera = function() {
  *              { quality: 80,
  *                destinationType: Camera.DestinationType.DATA_URL,
  *                sourceType: Camera.PictureSourceType.PHOTOLIBRARY})
+ \code
+ navigator.camera.getPicture(onSuccess, onFail, { quality: 50 }); 
+
+function onSuccess(imageData) {
+    var image = document.getElementById('myImage');
+    image.src = "data:image/jpeg;base64," + imageData;
+}
+
+function onFail(message) {
+    alert('Failed because: ' + message);
+}
+ \endcode
  */
 Camera.DestinationType = {
     DATA_URL: 0,                // Return base64 encoded string
@@ -880,6 +927,18 @@ Camera.prototype.PictureSourceType = Camera.PictureSourceType;
  * @param {Function} successCallback
  * @param {Function} errorCallback
  * @param {Object} options
+ \code
+ navigator.camera.getPicture(onSuccess, onFail, { quality: 50 }); 
+
+function onSuccess(imageData) {
+    var image = document.getElementById('myImage');
+    image.src = "data:image/jpeg;base64," + imageData;
+}
+
+function onFail(message) {
+    alert('Failed because: ' + message);
+}
+ \endcode
  */
 Camera.prototype.getPicture = function(successCallback, errorCallback, options) {
     console.log("Camera.prototype.getPicture");
@@ -1047,6 +1106,24 @@ var Capture = function(){
  * @param {Function} successCB
  * @param {Function} errorCB
  * @param {CaptureAudioOptions} options
+ \code
+ // capture callback
+var captureSuccess = function(mediaFiles) {
+    var i, path, len;
+    for (i = 0, len = mediaFiles.length; i < len; i += 1) {
+        path = mediaFiles[i].fullPath;
+        // do something interesting with the file
+    }
+};
+
+// capture error callback
+var captureError = function(error) {
+    navigator.notification.alert('Error code: ' + error.code, null, 'Capture Error');
+};
+
+// start audio capture
+navigator.device.capture.captureAudio(captureSuccess, captureError, {limit:2});
+ \endcode
  */
 Capture.prototype.captureAudio = function(successCallback, errorCallback, options){
     PhoneGap.exec(successCallback, errorCallback, "Capture", "captureAudio", options);
@@ -1058,6 +1135,24 @@ Capture.prototype.captureAudio = function(successCallback, errorCallback, option
  * @param {Function} successCB
  * @param {Function} errorCB
  * @param {CaptureImageOptions} options
+ \code
+ // capture callback
+var captureSuccess = function(mediaFiles) {
+    var i, path, len;
+    for (i = 0, len = mediaFiles.length; i < len; i += 1) {
+        path = mediaFiles[i].fullPath;
+        // do something interesting with the file
+    }
+};
+
+// capture error callback
+var captureError = function(error) {
+    navigator.notification.alert('Error code: ' + error.code, null, 'Capture Error');
+};
+
+// start image capture
+navigator.device.capture.captureImage(captureSuccess, captureError, {limit:2});
+\endcode
  */
 Capture.prototype.captureImage = function (successCallback, errorCallback, options) {
 	PhoneGap.exec(	function(mediaFiles)
@@ -1076,6 +1171,24 @@ Capture.prototype.captureImage = function (successCallback, errorCallback, optio
  * @param {Function} successCB
  * @param {Function} errorCB
  * @param {CaptureVideoOptions} options
+ \code
+ // capture callback
+var captureSuccess = function(mediaFiles) {
+    var i, path, len;
+    for (i = 0, len = mediaFiles.length; i < len; i += 1) {
+        path = mediaFiles[i].fullPath;
+        // do something interesting with the file
+    }
+};
+
+// capture error callback
+var captureError = function(error) {
+    navigator.notification.alert('Error code: ' + error.code, null, 'Capture Error');
+};
+
+// start video capture
+navigator.device.capture.captureVideo(captureSuccess, captureError, {limit:2});
+ \endcode
  */
 Capture.prototype.captureVideo = function(successCallback, errorCallback, options){
 	PhoneGap.exec(	function(mediaFiles)
@@ -1196,6 +1309,17 @@ Compass.ERROR_MSG = ["Not running", "Starting", "", "Failed to start", "Not Supp
  * @param {Function} successCallback The function to call when the heading data is available
  * @param {Function} errorCallback The function to call when there is an error getting the heading data. (OPTIONAL)
  * @param {PositionOptions} options The options for getting the heading data such as timeout. (OPTIONAL)
+ \code
+ function onSuccess(heading) {
+    alert('Heading: ' + heading.magneticHeading);
+};
+
+function onError(error) {
+    alert('CompassError: ' error.code);
+};
+
+navigator.compass.getCurrentHeading(onSuccess, onError);
+\endcode
  */
 Compass.prototype.getCurrentHeading = function(successCallback, errorCallback, options) {
 
@@ -1253,6 +1377,20 @@ Compass.prototype.getCurrentHeading = function(successCallback, errorCallback, o
  * @param {Function} errorCallback      The function to call when there is an error getting the heading data. (OPTIONAL)
  * @param {HeadingOptions} options      The options for getting the heading data such as timeout and the frequency of the watch. (OPTIONAL)
  * @return String                       The watch id that must be passed to #clearWatch to stop watching.
+ \code
+ function onSuccess(heading) {
+    var element = document.getElementById('heading');
+    element.innerHTML = 'Heading: ' + heading.magneticHeading;
+};
+
+function onError(compassError) {
+        alert('Compass error: ' + compassError.code);
+};
+
+var options = { frequency: 3000 };  // Update every 3 seconds
+
+var watchID = navigator.compass.watchHeading(onSuccess, onError, options);
+ \endcode
  */
 Compass.prototype.watchHeading= function(successCallback, errorCallback, options) {
 
@@ -1296,6 +1434,13 @@ Compass.prototype.watchHeading= function(successCallback, errorCallback, options
  * Clears the specified heading watch.
  *
  * @param {String} id       The ID of the watch returned from #watchHeading.
+ \code
+ var watchID = navigator.compass.watchHeading(onSuccess, onError, options);
+
+// ... later on ...
+
+navigator.compass.clearWatch(watchID);
+ \endcode
  */
 Compass.prototype.clearWatch = function(id) {
 
@@ -1541,6 +1686,21 @@ var Contacts = function() {
 * @param errorCB error callback
 * @param {ContactFindOptions} options that can be applied to contact searching
 * @return array of Contacts matching search criteria
+\code
+function onSuccess(contacts) {
+    alert('Found ' + contacts.length + ' contacts.');
+};
+
+function onError(contactError) {
+    alert('onError!');
+};
+
+// find all contacts with 'Bob' in any name field
+var options = new ContactFindOptions();
+options.filter="Bob"; 
+var fields = ["displayName", "name"];
+navigator.contacts.find(fields, onSuccess, onError, options);
+\endcode
 */
 Contacts.prototype.find = function(fields, successCB, errorCB, options) {
     if (successCB === null) {
@@ -1575,6 +1735,9 @@ Contacts.prototype.find = function(fields, successCB, errorCB, options) {
 * contact.save().
 * @param properties an object who's properties will be examined to create a new Contact
 * @returns new Contact object
+\code
+var myContact = navigator.contacts.create({"displayName": "Test User"});
+\endcode
 */
 Contacts.prototype.create = function(properties) {
     var i;
@@ -2578,6 +2741,24 @@ var DirectoryReader = function(fullPath){
  *
  * @param {Function} successCallback is called with a list of entries
  * @param {Function} errorCallback is called with a FileError
+ \code
+ function success(entries) {
+    var i;
+    for (i=0; i<entries.length; i++) {
+        console.log(entries[i].name);
+    }
+}
+
+function fail(error) {
+    alert("Failed to list directory contents: " + error.code);
+}
+
+// Get a directory reader
+var directoryReader = dirEntry.createReader();
+
+// Get a list of all the entries in the directory
+directoryReader.readEntries(success,fail);
+ \endcode
  */
 DirectoryReader.prototype.readEntries = function(successCallback, errorCallback) {
     PhoneGap.exec(successCallback, errorCallback, "File", "readEntries", {fullPath: this.fullPath});
@@ -2608,6 +2789,24 @@ var DirectoryEntry = function() {
  * @param {DOMString} newName the new name of the entry, defaults to the current name
  * @param {Function} successCallback is called with the new entry
  * @param {Function} errorCallback is called with a FileError
+ \code
+ function win(entry) {
+    console.log("New Path: " + entry.fullPath);
+}
+
+function fail(error) {
+    alert(error.code);
+}
+
+function copyDir(entry) {
+    var parent = document.getElementById('parent').value,
+        newName = document.getElementById('newName').value,
+        parentEntry = new DirectoryEntry({fullPath: parent});
+
+    // copy the directory to a new directory and rename it
+    entry.copyTo(parentEntry, newName, success, fail);
+}
+ \endcode
  */
 DirectoryEntry.prototype.copyTo = function(parent, newName, successCallback, errorCallback) {
     PhoneGap.exec(successCallback, errorCallback, "File", "copyTo", {fullPath: this.fullPath, parent:parent, newName: newName});
@@ -2618,6 +2817,18 @@ DirectoryEntry.prototype.copyTo = function(parent, newName, successCallback, err
  *
  * @param {Function} successCallback is called with a Metadata object
  * @param {Function} errorCallback is called with a FileError
+ \code
+ function success(metadata) {
+    console.log("Last Modified: " + metadata.modificationTime);
+}
+
+function fail(error) {
+    alert(error.code);
+}
+
+// Request the metadata object for this entry
+entry.getMetadata(success, fail);
+\endcode
  */
 DirectoryEntry.prototype.getMetadata = function(successCallback, errorCallback) {
     PhoneGap.exec(successCallback, errorCallback, "File", "getMetadata", {fullPath: this.fullPath});
@@ -2628,6 +2839,18 @@ DirectoryEntry.prototype.getMetadata = function(successCallback, errorCallback) 
  *
  * @param {Function} successCallback is called with a parent entry
  * @param {Function} errorCallback is called with a FileError
+ \code
+ function success(parent) {
+    console.log("Parent Name: " + parent.name);
+}
+
+function fail(error) {
+    alert('Failed to get parent directory: ' + error.code);
+}
+
+// Get the parent DirectoryEntry
+entry.getParent(success, fail);
+\endcode
  */
 DirectoryEntry.prototype.getParent = function(successCallback, errorCallback) {
     PhoneGap.exec(successCallback, errorCallback, "File", "getParent", {fullPath: this.fullPath});
@@ -2640,6 +2863,24 @@ DirectoryEntry.prototype.getParent = function(successCallback, errorCallback) {
  * @param {DOMString} newName the new name of the entry, defaults to the current name
  * @param {Function} successCallback is called with the new entry
  * @param {Function} errorCallback is called with a FileError
+ \code
+ function success(entry) {
+    console.log("New Path: " + entry.fullPath);
+}
+
+function fail(error) {
+    alert(error.code);
+}
+
+function moveDir(entry) {
+    var parent = document.getElementById('parent').value,
+        newName = document.getElementById('newName').value,
+        parentEntry = new DirectoryEntry({fullPath: parent});
+
+    // move the directory to a new directory and rename it
+    entry.moveTo(parentEntry, newName, success, fail);
+}
+ \endcode
  */
 DirectoryEntry.prototype.moveTo = function(parent, newName, successCallback, errorCallback) {
     PhoneGap.exec(successCallback, errorCallback, "File", "moveTo", {fullPath: this.fullPath, parent: parent, newName: newName});
@@ -2650,6 +2891,18 @@ DirectoryEntry.prototype.moveTo = function(parent, newName, successCallback, err
  *
  * @param {Function} successCallback is called with no parameters
  * @param {Function} errorCallback is called with a FileError
+ \code
+ function success(entry) {
+    console.log("Removal succeeded");
+}
+
+function fail(error) {
+    alert('Error removing directory: ' + error.code);
+}
+
+// remove this directory
+entry.remove(success, fail);
+\endcode
  */
 DirectoryEntry.prototype.remove = function(successCallback, errorCallback) {
     PhoneGap.exec(successCallback, errorCallback, "File", "remove", {fullPath: this.fullPath});
@@ -2660,6 +2913,11 @@ DirectoryEntry.prototype.remove = function(successCallback, errorCallback) {
  *
  * @param {DOMString} mimeType for a FileEntry, the mime type to be used to interpret the file, when loaded through this URI.
  * @return uri
+ \code
+ // Get the URI for this directory
+var uri = entry.toURI();
+console.log(uri);
+\endcode
  */
 DirectoryEntry.prototype.toURI = function(mimeType) {
 
@@ -2668,6 +2926,10 @@ DirectoryEntry.prototype.toURI = function(mimeType) {
 
 /**
  * Creates a new DirectoryReader to read entries from this directory
+ \code
+ // create a directory reader
+var directoryReader = entry.createReader();
+ \endcode
  */
 DirectoryEntry.prototype.createReader = function(successCallback, errorCallback) {
     return new DirectoryReader(this.fullPath);
@@ -2680,6 +2942,18 @@ DirectoryEntry.prototype.createReader = function(successCallback, errorCallback)
  * @param {Flags} options to create or excluively create the directory
  * @param {Function} successCallback is called with the new entry
  * @param {Function} errorCallback is called with a FileError
+ \code
+ function success(parent) {
+    console.log("Parent Name: " + parent.name);
+}
+
+function fail(error) {
+    alert("Unable to create new directory: " + error.code);
+}
+
+// Retrieve an existing directory, or create it if it does not already exist
+entry.getDirectory("newDir", {create: true, exclusive: false}, success, fail);
+\endcode
  */
 DirectoryEntry.prototype.getDirectory = function (path, options, successCallback, errorCallback) {
     PhoneGap.exec(successCallback, errorCallback, "File", "getDirectory", { fullPath: this.fullPath, path: path, options: options });
@@ -2692,6 +2966,18 @@ DirectoryEntry.prototype.getDirectory = function (path, options, successCallback
  * @param {Flags} options to create or excluively create the file
  * @param {Function} successCallback is called with the new entry
  * @param {Function} errorCallback is called with a FileError
+ \code
+function success(parent) {
+    console.log("Parent Name: " + parent.name);
+}
+
+function fail(error) {
+    alert("Failed to retrieve file: " + error.code);
+}
+
+// Retrieve an existing file, or create it if it does not exist
+entry.getFile("newFile.txt", {create: true, exclusive: false}, success, fail);
+\endcode
  */
 DirectoryEntry.prototype.getFile = function (path, options, successCallback, errorCallback) {
     PhoneGap.exec(successCallback, errorCallback, "File", "getFile", { fullPath: this.fullPath, path: path, options: options });
@@ -2702,6 +2988,18 @@ DirectoryEntry.prototype.getFile = function (path, options, successCallback, err
  *
  * @param {Function} successCallback is called with no parameters
  * @param {Function} errorCallback is called with a FileError
+ \code
+ function success(parent) {
+    console.log("Remove Recursively Succeeded");
+}
+
+function fail(error) {
+    alert("Failed to remove directory or it's contents: " + error.code);
+}
+
+// remove the directory and all it's contents
+entry.removeRecursively(success, fail);
+ \endcode
  */
 DirectoryEntry.prototype.removeRecursively = function(successCallback, errorCallback) {
     PhoneGap.exec(successCallback, errorCallback, "File", "removeRecursively", {fullPath: this.fullPath});
@@ -2839,6 +3137,14 @@ LocalFileSystem.APPLICATION = 3;
  * @param {int} type of file system being requested
  * @param {Function} successCallback is called with the new FileSystem
  * @param {Function} errorCallback is called with a FileError
+ \code
+ function onSuccess(fileSystem) {
+    console.log(fileSystem.name);
+}
+
+// request the persistent file system
+window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, onSuccess, onError);
+ \endcode
  */
 LocalFileSystem.prototype.requestFileSystem = function(type, size, successCallback, errorCallback) {
     if (type < 0 || type > 3) {
@@ -2858,6 +3164,13 @@ LocalFileSystem.prototype.requestFileSystem = function(type, size, successCallba
  * @param {DOMString} uri referring to a local file in a filesystem
  * @param {Function} successCallback is called with the new entry
  * @param {Function} errorCallback is called with a FileError
+ \code
+ function onSuccess(fileEntry) {
+    console.log(fileEntry.name);
+}
+
+window.resolveLocalFileSystemURI("file:///example.txt", onSuccess, onError);
+ \endcode
  */
 LocalFileSystem.prototype.resolveLocalFileSystemURI = function(uri, successCallback, errorCallback) {
     PhoneGap.exec(successCallback, errorCallback, "File", "resolveLocalFileSystemURI", {uri: uri});
@@ -3007,6 +3320,33 @@ FileTransferError.CONNECTION_ERR = 3;
 * @param successCallback (Function}  Callback to be invoked when upload has completed
 * @param errorCallback {Function}    Callback to be invoked upon error
 * @param options {FileUploadOptions} Optional parameters such as file name and mimetype
+\code
+// !! Assumes variable fileURI contains a valid URI to a  text file on the device
+
+var win = function(r) {
+    console.log("Code = " + r.responseCode);
+    console.log("Response = " + r.response);
+    console.log("Sent = " + r.bytesSent);
+}
+
+var fail = function(error) {
+    alert("An error has occurred: Code = " = error.code);
+}
+
+var options = new FileUploadOptions();
+options.fileKey="file";
+options.fileName=fileURI.substr(fileURI.lastIndexOf('/')+1);
+options.mimeType="text/plain";
+
+var params = new Object();
+params.value1 = "test";
+params.value2 = "param";
+
+options.params = params;
+
+var ft = new FileTransfer();
+ft.upload(fileURI, "http://some.server.com/upload.php", win, fail, options);
+\endcode
 */
 FileTransfer.prototype.upload = function(filePath, server, successCallback, errorCallback, options, debug) {
 
@@ -3153,6 +3493,25 @@ MediaError.MEDIA_ERR_STOP_STATE = 8;
 
 /**
  * Start or resume playing audio file.
+ \code
+ // Play audio
+//
+function playAudio(url) {
+    // Play the audio file at url
+    var my_media = new Media(url,
+        // success callback
+        function() {
+            console.log("playAudio():Audio Success");
+        },
+        // error callback
+        function(err) {
+            console.log("playAudio():Audio Error: "+err);
+    });
+
+    // Play audio
+    my_media.play();
+}
+ \endcode
  */
 Media.prototype.play = function() {
     PhoneGap.exec(null, null, "Media", "startPlayingAudio", {id: this.id, src: this.src});
@@ -3160,6 +3519,30 @@ Media.prototype.play = function() {
 
 /**
  * Stop playing audio file.
+ \code
+ // Play audio
+//
+function playAudio(url) {
+    // Play the audio file at url
+    var my_media = new Media(url,
+        // success callback
+        function() {
+            console.log("playAudio():Audio Success");
+        },
+        // error callback
+        function(err) {
+            console.log("playAudio():Audio Error: "+err);
+    });
+
+    // Play audio
+    my_media.play();
+
+    // Pause after 10 seconds
+    setTimeout(function() {
+        my_media.stop();
+    }, 10000);        
+}
+\endcode
  */
 Media.prototype.stop = function() {
     return PhoneGap.exec(null, null, "Media", "stopPlayingAudio", {id: this.id});
@@ -3167,6 +3550,16 @@ Media.prototype.stop = function() {
 
 /**
  * Seek or jump to a new time in the track..
+ \code
+// Audio player
+    //
+    var my_media = new Media(src, onSuccess, onError);
+    my_media.play();
+    // SeekTo to 10 seconds after 5 seconds
+    setTimeout(function() {
+        my_media.seekTo(10000);
+    }, 5000);
+ \endcode
  */
 Media.prototype.seekTo = function(milliseconds) {
     PhoneGap.exec(null, null, "Media", "seekToAudio", {id: this.id, milliseconds: milliseconds});
@@ -3174,6 +3567,30 @@ Media.prototype.seekTo = function(milliseconds) {
 
 /**
  * Pause playing audio file.
+ \code
+ // Play audio
+//
+function playAudio(url) {
+    // Play the audio file at url
+    var my_media = new Media(url,
+        // success callback
+        function() {
+            console.log("playAudio():Audio Success");
+        },
+        // error callback
+        function(err) {
+            console.log("playAudio():Audio Error: "+err);
+    });
+
+    // Play audio
+    my_media.play();
+
+    // Pause after 10 seconds
+    setTimeout(function() {
+        media.pause();
+    }, 10000);        
+}
+ \endcode
  */
 Media.prototype.pause = function() {
     PhoneGap.exec(null, null, "Media", "pausePlayingAudio", {id: this.id});
@@ -3184,6 +3601,25 @@ Media.prototype.pause = function() {
  * The duration is only set for audio that is playing, paused or stopped.
  *
  * @return      duration or -1 if not known.
+ \code
+ // Audio player
+    //
+    var my_media = new Media(src, onSuccess, onError);
+
+    // Get duration
+    var counter = 0;
+    var timerDur = setInterval(function() {
+        counter = counter + 100;
+        if (counter > 2000) {
+            clearInterval(timerDur);
+        }
+        var dur = my_media.getDuration();
+        if (dur > 0) {
+            clearInterval(timerDur);
+            document.getElementById('audio_duration').innerHTML = (dur) + " sec";
+        }
+   }, 100);
+ \endcode
  */
 Media.prototype.getDuration = function() {
     return this._duration;
@@ -3191,6 +3627,28 @@ Media.prototype.getDuration = function() {
 
 /**
  * Get position of audio.
+ \code
+     // Audio player
+    //
+    var my_media = new Media(src, onSuccess, onError);
+
+    // Update media position every second
+    var mediaTimer = setInterval(function() {
+        // get media position
+        my_media.getCurrentPosition(
+            // success callback
+            function(position) {
+                if (position > -1) {
+                    console.log((position) + " sec");
+                }
+            },
+            // error callback
+            function(e) {
+                console.log("Error getting pos=" + e);
+            }
+        );
+    }, 1000);
+ \endcode
  */
 Media.prototype.getCurrentPosition = function(success, fail) {
     PhoneGap.exec(success, fail, "Media", "getCurrentPositionAudio", {id: this.id});
@@ -3198,6 +3656,26 @@ Media.prototype.getCurrentPosition = function(success, fail) {
 
 /**
  * Start recording audio file.
+ \code
+ // Record audio
+// 
+function recordAudio() {
+    var src = "myrecording.mp3";
+    var mediaRec = new Media(src,
+        // success callback
+        function() {
+            console.log("recordAudio():Audio Success");
+        },
+
+        // error callback
+        function(err) {
+            console.log("recordAudio():Audio Error: "+ err.code);
+        });
+
+    // Record audio
+    mediaRec.startRecord();
+}
+ \endcode
  */
 Media.prototype.startRecord = function() {
     PhoneGap.exec(null, null, "Media", "startRecordingAudio", {id: this.id, src: this.src});
@@ -3205,6 +3683,31 @@ Media.prototype.startRecord = function() {
 
 /**
  * Stop recording audio file.
+ \code
+ // Record audio
+// 
+function recordAudio() {
+    var src = "myrecording.mp3";
+    var mediaRec = new Media(src,
+        // success callback
+        function() {
+            console.log("recordAudio():Audio Success");
+        },
+
+        // error callback
+        function(err) {
+            console.log("recordAudio():Audio Error: "+ err.code);
+        });
+
+    // Record audio
+    mediaRec.startRecord();
+
+    // Stop recording after 10 seconds
+    setTimeout(function() {
+        mediaRec.stopRecord();
+    }, 10000);
+}
+\endcode
  */
 Media.prototype.stopRecord = function() {
     PhoneGap.exec(null, null, "Media", "stopRecordingAudio", {id: this.id});
@@ -3212,6 +3715,15 @@ Media.prototype.stopRecord = function() {
 
 /**
  * Release the resources.
+ \code
+     // Audio player
+    //
+    var my_media = new Media(src, onSuccess, onError);
+
+    my_media.play();
+    my_media.stop();
+    my_media.release();
+ \endcode
  */
 Media.prototype.release = function() {
     PhoneGap.exec(null, null, "Media", "release", {id: this.id});
@@ -3397,6 +3909,24 @@ var Notification = function() {
  * @param {Function} completeCallback   The callback that is called when user clicks on a button.
  * @param {String} title                Title of the alert dialog (default: Alert)
  * @param {String} buttonLabel          Label of the close button (default: OK)
+ \code
+ // Android / BlackBerry WebWorks (OS 5.0 and higher) / iPhone
+//
+function alertDismissed() {
+    // do something
+}
+
+navigator.notification.alert(
+    'You are the winner!',  // message
+    alertDismissed,         // callback
+    'Game Over',            // title
+    'Done'                  // buttonName
+);
+
+// BlackBerry (OS 4.6) / webOS
+//
+navigator.notification.alert('You are the winner!');
+\endcode
  */
 Notification.prototype.alert = function(message, completeCallback, title, buttonLabel)
 {
@@ -3413,6 +3943,23 @@ Notification.prototype.alert = function(message, completeCallback, title, button
  * @param {Function} resultCallback     The callback that is called when user clicks on a button.
  * @param {String} title                Title of the alert dialog (default: Confirm)
  * @param {String} buttonLabels         Comma separated list of the labels of the buttons (default: 'OK,Cancel')
+ \code
+ // process the confirmation dialog result
+function onConfirm(button) {
+    alert('You selected button ' + button);
+}
+
+// Show a custom confirmation dialog
+//
+function showConfirm() {
+    navigator.notification.confirm(
+        'You are the winner!',  // message
+        onConfirm,              // callback to invoke with index of button pressed
+        'Game Over',            // title
+        'Restart,Exit'          // buttonLabels
+    );
+}
+\endcode
  */
 Notification.prototype.confirm = function(message, resultCallback, title, buttonLabels)
 {
@@ -3475,6 +4022,11 @@ Notification.prototype.blink = function(count, colour) {
  * Causes the device to vibrate.
  *
  * @param {Integer} mills       The number of milliseconds to vibrate for.
+ \code
+ // Vibrate for 2.5 seconds
+//
+navigator.notification.vibrate(2500);
+\endcode
  */
 Notification.prototype.vibrate = function(mills)
 {
@@ -3486,6 +4038,10 @@ Notification.prototype.vibrate = function(mills)
  * A packaged resource is played "repeatCount" times.
  *
  * @param {Integer} repeatCount       The number of beeps. default 1
+ \code
+ // Beep twice!
+navigator.notification.beep(2);
+\endcode
  */
 Notification.prototype.beep = function(repeatCount)
 {
