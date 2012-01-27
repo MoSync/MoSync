@@ -241,6 +241,9 @@
 			</div>
 			<input type="button" class="button" value="Delete" onclick="deleteFile()"/>
 			<ul>
+				<li><input type="text" id="fileName" onblur="fileNameLostFocus()"/></li>
+			</ul>
+			<ul>
 				<li><textarea id="fileContents" rows="20" style="font-size:20pt" onchange="textHasChanged()" onblur="textLostFocus()"></textarea></li>
 			</ul>
 		</div>
