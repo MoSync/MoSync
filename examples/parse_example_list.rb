@@ -13,16 +13,15 @@ def parseExampleList
    if((!line.include?("#"))&&(!line.include?("[")))
        if(line.include?("="))
          lineSplit = line.split("=")[1].strip
-         if(File.exist?(type + File::SEPARATOR + lineSplit))
-           subDirs.push(type + File::SEPARATOR + lineSplit)
+         if(File.exist?(lineSplit))
+           subDirs.push(type + "/" + lineSplit)
          end
        else
-         if(File.exist?(type + File::SEPARATOR + line.strip))
-           subDirs.push(type + File::SEPARATOR + line.strip)
+         if(File.exist?(line.strip))
+           subDirs.push(type + "/" + line.strip)
          end
        end
    end
  end
  return subDirs
 end
-
