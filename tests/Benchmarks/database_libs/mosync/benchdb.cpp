@@ -9,7 +9,7 @@
  *
  */
 
-#include "benchdb.h"
+#include <benchdb/benchdb.h>
 
 BenchDBConnector::BenchDBConnector(BenchResult& br) : mHttp(this) //constructor, taking the complete url of the publish_script as an arg
 , mIsConnected(false)
@@ -24,9 +24,9 @@ BenchDBConnector::BenchDBConnector(BenchResult& br) : mHttp(this) //constructor,
 
 	//remove whitespaces, and use a placeholder device name if maGetSystemProperty fails
 	if(ret < 0){
-		br.phone = "ThisIsATestPhone";
+		br.phone = "unknownDevice";
 	}else{
-		for(int i = 0, j = 0; i < strlen(devProperties); ++i){
+		for(int i = 0, j = 0; i < strlen(devProperties) && i < 20; ++i){
 			if(devProperties[i] == ' '){
 				//do nothing
 			}else{
@@ -37,10 +37,7 @@ BenchDBConnector::BenchDBConnector(BenchResult& br) : mHttp(this) //constructor,
 		br.phone = devPropertiesUrlEnc;
 	}
 
-	br.git_hash = "789";
-	br.nativeSdkVer = "0";
-	br.revision = "0";
-	br.runtime = "MoSync";
+	br.runtime = "MoSync"; //this is of course always going to be the MoSync revision
 
 	printf("Publishing result via url:");
 

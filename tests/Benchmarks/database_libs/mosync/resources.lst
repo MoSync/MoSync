@@ -1,0 +1,5 @@
+.res R_BUILDINFO
+.string "Version 2.7 Pyramid" 
+.string "111020-1533" 
+.string "8b61cfb83c4f2dc3fb300f8cdf921775995da0ac" 
+.string "06a60ec772d99af7e325b0ad64ba82a11d56bae6" 

@@ -30,7 +30,8 @@
 #include <conprint.h>
 #include <limits.h>
 #include <maassert.h>
-#include "benchdb.h"
+#include <benchdb/benchdb.h>
+#include "buildinfo.h"
 
 #define SP
 
@@ -85,6 +86,13 @@ public:
 	 */
 	DBMoblet(BenchResult & br)
 	{
+		/*
+		 * Read build info from buildinfo.h
+		 */
+
+		br.git_hash = BUILDVAR2;
+		br.revision = BUILDVAR1;
+
 		BenchDBConnector * bdbc = new BenchDBConnector(br);
 	}
 
@@ -139,7 +147,7 @@ int MAMain ( void )
         printf("----------------------------------------------------\n");
         nreps=4;
 //        linpack(nreps, arsize);
-        while (linpack(nreps,arsize)<10.)
+        while (linpack(nreps,arsize)<2.)
             nreps*=2;
         free(mempool);
         printf("Finished!\n");
@@ -202,7 +210,7 @@ static REAL linpack(long nreps,int arsize)
             nreps,totalt,100.*tdgefa/totalt,
             100.*tdgesl/totalt,100.*toverhead/totalt,
             kflops/1000.0);
-    if(totalt > 10.){ //publish the result in the benchmark database when we get a run that lasts for more than 10 seconds
+    if(totalt > 2.){ //publish the result in the benchmark database when we get a run that lasts for more than 10 seconds
     	BenchResult br;
 
     	br.benchmark = "linpack"; //specify the name of this benchmark

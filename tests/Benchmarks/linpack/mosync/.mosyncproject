@@ -4,11 +4,12 @@
 <build.cfg id="Release" types="Release"/>
 <properties>
 <property key="build.prefs:additional.include.paths/Debug" value=""/>
-<property key="build.prefs:additional.include.paths/Release" value="C:/MoSync/include/benchdb"/>
+<property key="build.prefs:additional.include.paths/Release" value=""/>
 <property key="build.prefs:additional.libraries/Debug" value="MAUtilD.lib"/>
 <property key="build.prefs:additional.libraries/Release" value="MAUtil.lib, benchdb.lib"/>
 <property key="build.prefs:additional.library.paths/Debug" value=""/>
 <property key="build.prefs:additional.library.paths/Release" value="C:/MoSync/lib/benchdb"/>
+<property key="build.prefs:app.permissions" value="File\ Storage Internet\ Access Vibrate"/>
 <property key="build.prefs:extra.link.sw/Debug" value=""/>
 <property key="build.prefs:extra.link.sw/Release" value=""/>
 <property key="build.prefs:extra.res.sw/Debug" value=""/>
@@ -23,7 +24,7 @@
 <property key="build.prefs:project.type" value=""/>
 <property key="dependency.strategy" value="0"/>
 <property key="excludes/Debug" value="linpack.c"/>
-<property key="excludes/Release" value="benchdb.*"/>
+<property key="excludes/Release" value="getbuildinfo.c getbuildinfo.bat getbuildinfo.exe"/>
 <property key="symbian.uids:uid.s60v2uid" value="0x042db65a"/>
 <property key="symbian.uids:uid.s60v3uid" value="0xe811792f"/>
 <property key="template.id" value="project.c"/>
