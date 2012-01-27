@@ -17,7 +17,9 @@ FilesIncludedInWormholeJS = [
 
 # Specify directories to copy wormhole.js here.
 DirectoriesToCopyWormholeJSTo = [
-  "../../../examples/WebViewLoveSMS/LocalFiles/js/"
+  "../../../examples/WebViewLoveSMS/LocalFiles/js/",
+  "../../../templates/Wormhole NativeUI Project/",
+  "../../../templates/Wormhole Web Project/"
 ]
 
 # Divider between files included in wormhole.js
@@ -72,10 +74,15 @@ def main
   elsif (ARGV.include? "copy")
     copyJSFilesToMoSync
     copyWormholeJS
+  elsif (ARGV.include? "all")
+    buildWormholeJS
+    copyJSFilesToMoSync
+    copyWormholeJS
   else
     puts "Usage:"
     puts "  buildJS build  Builds wormhole.js"
     puts "  buildJS copy   Copies wormhole.js"
+    puts "  buildJS all    Builds + Copies wormhole.js"
   end
 end
 
