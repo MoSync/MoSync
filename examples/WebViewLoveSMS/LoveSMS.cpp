@@ -17,7 +17,7 @@ MA 02110-1301, USA.
 */
 
 /**
- * @file WebViewLoveSMS.cpp
+ * @file LoveSMS.cpp
  * @author Mikael Kindborg
  *
  * Application for sending Love SMSs.
