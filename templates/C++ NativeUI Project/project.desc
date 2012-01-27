@@ -1,6 +1,6 @@
 id = project.nativeuicpp
-name = MoSync NativeUI C++ Project
-description = A project that uses the high level C++ Native UI API.
+name = C++ NativeUI Project
+description = A standard ANSI C++ application template that uses the Moblet framework and the NativeUI Library.
 required-capabilities = NativeUI
 
 [Files]

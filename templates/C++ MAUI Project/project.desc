@@ -1,6 +1,6 @@
 id = project.maui
-name = MoSync MAUI Project
-description = A Moblet project with stub code for using MAUI, the graphical user interface library.
+name = C++ MAUI Project
+description = A standard ANSI C++ application template that uses the Moblet framework and the MAUI user interface library.
 
 [Files]
 main.cpp

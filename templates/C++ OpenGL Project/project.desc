@@ -1,6 +1,6 @@
 id = project.opengles
-name = MoSync OpenGL Project
-description = A project that uses the OpenGLES functionality in MoSync.
+name = C++ OpenGL Project
+description = A standard ANSI C++ application template that inclues the Moblet framework and basic OpenGL code.
 required-capabilities = OpenGL
 
 [Files]
