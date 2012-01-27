@@ -134,28 +134,6 @@ PhoneGapCommandResult = function(status,callbackId,args,cast)
     }
 };
 
-function PrintObj(obj, indent)
-{
-    if (undefined === indent)
-    {
-        indent = "";
-    }
-
-    console.log(indent + "@@ PrintObj");
-
-    for (var field in obj)
-    {
-        if (typeof obj[field] != "function")
-        {
-            console.log("  " + indent + "[" + field + ": " + obj[field] + "]");
-            if ((null != obj[field]) && (typeof obj[field] == "object"))
-            {
-                PrintObj(obj[field], indent + "  ");
-            }
-        }
-    }
-}
-
 /**
  * Called by native code when returning successful result from an action.
  *
@@ -165,12 +143,9 @@ function PrintObj(obj, indent)
  */
 PhoneGap.CallbackSuccess = function(callbackId, args, cast)
 {
-	alert(args);
     var commandResult;
     try
     {
-        console.log("PhoneGap.CallbackSuccess: " + callbackId + " args: " + args);
-
         commandResult = JSON.parse(args);
 
         if (typeof cast !== 'undefined')
@@ -181,6 +156,7 @@ PhoneGap.CallbackSuccess = function(callbackId, args, cast)
     catch(exception)
     {
         console.log("PhoneGap.CallbackSuccess Exception: " + exception.message);
+        return exception.message;
     }
 
     if (PhoneGap.callbacks[callbackId] ) {
@@ -193,8 +169,7 @@ PhoneGap.CallbackSuccess = function(callbackId, args, cast)
                 }
             }
             catch (e) {
-                console.log("PhoneGap.CallbackSuccess Error in success callback: " +
-                    callbackId + " = " + e.message);
+                console.log("Error in success callback: "+callbackId+" = " + e.message);
             }
         }
 
@@ -224,6 +199,7 @@ PhoneGap.CallbackError = function (callbackId, args, cast) {
     }
     catch(exception)
     {
+        console.log("PhoneGap.CallbackError Exception: " + exception.message);
         return exception.message;
     }
 
@@ -234,7 +210,7 @@ PhoneGap.CallbackError = function (callbackId, args, cast) {
             }
         }
         catch (e) {
-            console.log("Error in error callback: " + callbackId + " = " + e);
+            console.log("Error in error callback: "+callbackId+" = "+e);
         }
 
         // Clear callback if not expecting any more results
@@ -1083,7 +1059,14 @@ Capture.prototype.captureAudio = function(successCallback, errorCallback, option
  * @param {CaptureImageOptions} options
  */
 Capture.prototype.captureImage = function (successCallback, errorCallback, options) {
-    PhoneGap.exec(successCallback, errorCallback, "Capture", "captureImage", options);
+	PhoneGap.exec(	function(mediaFiles)
+			{
+				successCallback(Capture.prototype._castMediaFile(mediaFiles).message);
+			},
+			function(error)
+			{
+				errorCallback({code:CaptureError[error.code]});
+			}, "Capture", "captureImage", options);
 };
 
 /**
@@ -1095,13 +1078,13 @@ Capture.prototype.captureImage = function (successCallback, errorCallback, optio
  */
 Capture.prototype.captureVideo = function(successCallback, errorCallback, options){
 	PhoneGap.exec(	function(mediaFiles)
-					{
-						successCallback(Capture.prototype._castMediaFile(mediaFiles).message);
-					},
-					function(error)
-					{
-						errorCallback({code:CaptureError[error.code]});
-					}, "Capture", "captureVideo", options);
+			{
+				successCallback(Capture.prototype._castMediaFile(mediaFiles).message);
+			},
+			function(error)
+			{
+				errorCallback({code:CaptureError[error.code]});
+			}, "Capture", "captureVideo", options);
 };
 
 /**
@@ -2374,7 +2357,7 @@ FileWriter.prototype.write = function (text) {
     if (typeof me.onwritestart === "function") {
         me.onwritestart({ "type": "writestart", "target": me });
     }
-    //console.log("================== write - this.position: " + this.position);
+
     // Write file
     navigator.fileMgr.write(this.fileName, text, this.position,
 
@@ -2468,7 +2451,6 @@ FileWriter.prototype.seek = function(offset) {
     else {
         this.position = offset;
     }
-    //console.log("================== seek - this.position: " + this.position);
 };
 
 /**
@@ -3398,7 +3380,7 @@ PhoneGap.addConstructor(function() {
  */
 
 if (!PhoneGap.hasResource("notification")) {
-    PhoneGap.addResource("notification");
+PhoneGap.addResource("notification");
 
 /**
  * This class provides access to notifications on the device.

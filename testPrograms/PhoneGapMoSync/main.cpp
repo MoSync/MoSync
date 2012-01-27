@@ -36,19 +36,22 @@ public:
 		// this by changing the sound file in that folder.
 		mPhoneGapMessageHandler->setBeepSound(BEEP_WAV);
 
+		// Extract files in LocalFiles folder to the device.
+		extractFileSystem();
+
 		// Enable message sending from JavaScript to C++.
 		enableWebViewMessages();
 
-		// Remove this line to enable the user to
-		// zoom the web page. To disable zoom is one
-		// way of making web pages display in a
-		// reasonable degault size on devices with
+		// Change this line to enableZoom to enable the
+		// user to zoom the web page. To disable zoom is
+		// one way of making web pages display in a
+		// reasonable default size on devices with
 		// different screen sizes.
 		getWebView()->disableZoom();
 
 		// The page in the "LocalFiles" folder to
 		// show when the application starts.
-		showPage("filesystest-index.html");
+		showPage("index.html");
 
 		// Initialize PhoneGap.
 		mPhoneGapMessageHandler->initializePhoneGap();
@@ -82,8 +85,8 @@ public:
 
 		// We can get a buffer overrun in lprintfln if
 		// string is too big, use maWriteLog instead.
-		lprintfln("@@@ MOSYNC Message:");
-		maWriteLog(stringData, dataSize);
+		//lprintfln("@@@ MOSYNC Message:");
+		//maWriteLog(stringData, dataSize);
 
 		free(stringData);
 	}
@@ -113,7 +116,7 @@ public:
 
 		// Check the message protocol.
 		MessageProtocol protocol(data);
-		if (protocol.isMessageArrayJSON())
+		if (protocol.isMessageStreamJSON())
 		{
 			// Create the message object. This parses the message data.
 			// The message object contains one or more messages.
