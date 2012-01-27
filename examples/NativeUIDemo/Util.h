@@ -26,8 +26,8 @@ MA 02110-1301, USA.
 #ifndef UTIL_H_
 #define UTIL_H_
 
-#include <maprofile.h>	// Profile database.
 #include <mastring.h>		// C string functions
+#include "mavsprintf.h"
 
 #define BUF_MAX 256
 
@@ -35,18 +35,21 @@ MA 02110-1301, USA.
  * Detects if the current platform is Android.
  * @return true if the platform is Android, false otherwise.
  */
-static bool isAndroid()
+static int getPlatform()
 {
 	char platform[BUF_MAX];
 	maGetSystemProperty("mosync.device.OS", platform, BUF_MAX);
-	if ( strcmp(platform,"Android") == 0 )
+
+	if(strcmp(platform, "Android") == 0)
 	{
-		return true;
+		return 0;
 	}
 	else
 	{
-		return false;
+		if(strcmp(platform, "iPhone OS") == 0)
+			return 1;
 	}
+	return 2;
 }
 
 #endif /* UTIL_H_ */
