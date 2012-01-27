@@ -17,21 +17,46 @@ MA 02110-1301, USA.
 */
 
 /**
- * @file WebGeoLocation.cpp
+ * @file GeoLocation.cpp
  * @author Mikael Kindborg
  *
- * Application for testing communication between JavaScript in a
- * WebView and MoSync C++ code.
+ * Purpose
+ * -------
+ *
+ * This is a low-level example that shows the basic mechanism for
+ * communicating between JavaScript and C++. There are other examples
+ * that demonstrate the use of high-level Wormhole classes to reduce
+ * the amount of code you need to write in an application.
+ *
+ * This example is intended for the technically interested developer
+ * who wants to learn how the JS to C++ bridge works at the lowest level,
+ * without having to analyse all the code in the Wormhole library.
+ *
+ * Here, a stripped down code example is provided. The Wormhole C++
+ * library is not used at all. Also, the mechanism of bundling files in
+ * the LocalFiles folder is not used. The HTML and JavaScript is included
+ * in one file, GeoLocation.html, which is included in the application as
+ * a text resource. Since the communication mechanism is dependent on a
+ * callback function on the JavaScript side, in the file mosync-bridge.js,
+ * this example includes the relevant parts of mosync-bridge.js in the
+ * file GeoLocation.html.
+ *
+ * Note that this example uses low-level syscalls to create the user
+ * interface. You can use the C++ NativeUI library for this, which is
+ * shown in other examples.
+ *
+ * When writing a real-work application, you are strongly recommended
+ * to use the high-level mechanisms in the Wormhole library. This is
+ * much more convenient and the underlying mechanism may change in the
+ * future, which makes using the library a more robust alternative.
+ *
+ * What the application does
+ * -------------------------
  *
  * The application displays the current location, which is fetched
  * via MoSync C++ code (sycalls maLocationStart and maLocationStop,
  * and events of type EVENT_TYPE_LOCATION) and communicated back
  * to the WebView by calling JavaScript from C++.
- *
- * This is a low-level example that shows the basic mechanism for
- * communicating between JavaScript and C++. There are other example
- * programs that demonstrate the use of high-level library classes
- * that reduce the amount of code you need to write in the application.
  */
 
 #include <ma.h>				// MoSync API (base API).
@@ -57,7 +82,7 @@ public:
 		int widget = maWidgetCreate(MAW_WEB_VIEW);
 		if (widget < 0)
 		{
-			maPanic(0, "NativeUI is only available on Android and iOS.");
+			maPanic(0, "NativeUI is only available on Android, iOS, and Windows Phone 7.");
 		}
 		else
 		{
@@ -127,7 +152,7 @@ public:
 	void createUI()
 	{
 		// Create screen that holds the WebView.
-		mScreen = maWidgetCreate(MAW_SCREEN);
+		mScreen = maWidgetCreate("Screen");
 
 		// Create the WebView.
 		mWebView = createWebView();
@@ -142,7 +167,7 @@ public:
 	MAWidgetHandle createWebView()
 	{
 		// Create the WebView
-		MAWidgetHandle webView = maWidgetCreate(MAW_WEB_VIEW);
+		MAWidgetHandle webView = maWidgetCreate("WebView");
 
 		// Set size of the WebView to fill the parent.
 		maWidgetSetProperty(webView, "width", "-1");
@@ -153,17 +178,10 @@ public:
 		maWidgetSetProperty(webView, "enableZoom", "false");
 
 		// Get the HTML for the page from a resource.
-		MAUtil::String html = Util::createTextFromHandle(
-			GEOLOCATIONPAGE_HTML);
+		MAUtil::String html = Util::createTextFromHandle(GEOLOCATION_HTML);
 
 		// Set the HTML the WebView displays.
 		maWidgetSetProperty(webView, "html", html.c_str());
-
-		// Set a hook to trap "mosync://" urls.
-		maWidgetSetProperty(
-				webView,
-				MAW_WEB_VIEW_HARD_HOOK,
-				"mosync://.*");
 
 		return webView;
 	}
@@ -224,15 +242,15 @@ public:
 			// when we are done with using it, since a new data object
 			// is allocated for each message. (In the high-level library
 			// this is done automatically.)
-			maDestroyObject(widgetEvent->urlData);
+			maDestroyPlaceholder(widgetEvent->urlData);
 
 			// Check the message string and execute the corresponding syscall.
-			if (0 == message.find("mosync://StartTrackingGeoLocation"))
+			if (0 == message.find("StartTrackingGeoLocation"))
 			{
 				maLocationStart();
 			}
 			else
-			if (0 == message.find("mosync://StopTrackingGeoLocation"))
+			if (0 == message.find("StopTrackingGeoLocation"))
 			{
 				maLocationStop();
 			}

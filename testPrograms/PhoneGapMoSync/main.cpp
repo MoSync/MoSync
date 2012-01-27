@@ -11,12 +11,14 @@
 #include <Wormhole/MessageStream.h>
 #include <Wormhole/Libs/JSONMessage.h>
 #include <Wormhole/Libs/PhoneGap/PhoneGapMessageHandler.h>
+#include <Wormhole/Libs/JSNativeUI/NativeUIMessageHandler.h>
+#include <Wormhole/Libs/JSNativeUI/ResourceMessageHandler.h>
 #include "MAHeaders.h"
 
 // Namespaces we want to access.
 using namespace MAUtil; // Class Moblet
 using namespace NativeUI; // WebView widget.
-using namespace Wormhole; // Class WebAppMoblet
+using namespace Wormhole;
 
 /**
  * The application class.
@@ -34,13 +36,16 @@ public:
 		// this by changing the sound file in that folder.
 		mPhoneGapMessageHandler->setBeepSound(BEEP_WAV);
 
+		// Extract files in LocalFiles folder to the device.
+		extractFileSystem();
+
 		// Enable message sending from JavaScript to C++.
 		enableWebViewMessages();
 
-		// Remove this line to enable the user to
-		// zoom the web page. To disable zoom is one
-		// way of making web pages display in a
-		// reasonable degault size on devices with
+		// Change this line to enableZoom to enable the
+		// user to zoom the web page. To disable zoom is
+		// one way of making web pages display in a
+		// reasonable default size on devices with
 		// different screen sizes.
 		getWebView()->disableZoom();
 
@@ -52,6 +57,18 @@ public:
 		mPhoneGapMessageHandler->initializePhoneGap();
 	}
 
+	virtual ~MyMoblet()
+	{
+		if (NULL != mPhoneGapMessageHandler)
+		{
+			delete mPhoneGapMessageHandler;
+			mPhoneGapMessageHandler = NULL;
+		}
+	}
+
+	/**
+	 * For debugging.
+	 */
 	void printMessage(MAHandle dataHandle)
 	{
 		// Get length of the data, it is not zero terminated.
@@ -66,20 +83,21 @@ public:
 		// Zero terminate.
 		stringData[dataSize] = 0;
 
-		lprintfln("@@@ URL: %s\n",
-			WebViewMessage::unescape(stringData).c_str());
+		// We can get a buffer overrun in lprintfln if
+		// string is too big, use maWriteLog instead.
+		//lprintfln("@@@ MOSYNC Message:");
+		//maWriteLog(stringData, dataSize);
 
 		free(stringData);
 	}
 
 	/**
-	 * This method is called when a key is pressed. It closes
-	 * the application when the back key (on Android) is pressed.
+	 * This method is called when a key is pressed.
 	 * Forwards the event to PhoneGapMessageHandler.
 	 */
 	void keyPressEvent(int keyCode, int nativeCode)
 	{
-		//forward to PhoneGap MessageHandler
+		// Forward to PhoneGap MessageHandler.
 		mPhoneGapMessageHandler->processKeyEvent(keyCode, nativeCode);
 	}
 
@@ -112,32 +130,16 @@ public:
 				{
 					mPhoneGapMessageHandler->handlePhoneGapMessage(message);
 				}
-
-				// TODO: Add other protocols here as needed.
-				// Use the messageName param as the protocol identifier,
-				// them make else if statements to branch off message
-				// handling to the respective modules.
 			}
 		}
 		else if (protocol.isMessageStream())
 		{
-			handleMessageStream(webView, data);
+			// Add code here is needed.
 		}
 		else
 		{
 			lprintfln("@@@ MOSYNC: Undefined message protocol");
 		}
-	}
-
-	/**
-	 * Handles Stream messages(high performance), it is mainly used for NativeUI
-	 *
-	 * @param webView a pointer to the web view posting this message
-	 * @param data the stream of messages
-	 */
-	void handleMessageStream(WebView* webView, MAHandle data)
-	{
-		//Nothing to do here
 	}
 
 private:

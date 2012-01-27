@@ -50,9 +50,12 @@ namespace Wormhole
  *
  * Standard protocol prefixes are:
  *
- *   "ma:" MessageArrayJSON (sent with function mosync.bridge.sendJSON)
+ *   "ma:" MessageStreamJSON (sent with function mosync.bridge.sendJSON
  *
- *   "ms:" MessageStream (sent width function mosync.bridge.send)
+ *   "ms:" MessageStream (sent with function mosync.bridge.send)
+ *
+ * Note: "ma" is short for "message array", since JSON message
+ * objects are sent as an array.
  *
  * You can also use your own prefix and send the message string
  * using function mosync.bridge.sendRaw. The prefix must be two
@@ -73,7 +76,7 @@ public:
 
 	bool isMessageStream();
 
-	bool isMessageArrayJSON();
+	bool isMessageStreamJSON();
 
 private:
 	char mProtocol[3];

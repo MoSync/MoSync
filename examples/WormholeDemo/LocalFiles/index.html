@@ -20,9 +20,11 @@
 <script src="js/jqtouch/jqtouch.js" type="application/x-javascript"
 	charset="utf-8"></script>
 
-<script type="text/javascript" charset="utf-8" src="js/wormhole-webapp.js"></script>
+<script type="text/javascript" charset="utf-8" src="js/wormhole.js"></script>
 <script type="text/javascript" charset="utf-8" src="main.js"></script>
 <script type="text/javascript" charset="utf-8" src="phonegapSensors.js"></script>
+<script type="text/javascript" charset="utf-8" src="w3csensors.js"></script>
+<script type="text/javascript" charset="utf-8" src="filemanager.js"></script>
 
 <!-- JavaScript goes here -->
 <script type="text/javascript">
@@ -46,18 +48,12 @@
 			 */
 			function initialize()
 			{
-				$("#submitButton").bind(clickEvent, function(e)
-				{
-					getTweets();
-				});
-				$("#favoriteButton").bind(clickEvent, function(e)
-				{
-					addFavoriteUser();
-				});
 				$("button.back").bind(clickEvent, function(e)
 				{
 					jQT.goBack();
 				});
+				//We bind this to make sure that the file list refreshes
+				//as soon as the user goes to the file manager page
 				$("#fileStorage").bind('pageAnimationStart',function()
 				{
 					refreshFiles();
@@ -70,10 +66,10 @@
 </style>
 </head>
 
-<!-- A simple JQTouch layout consisting of two views -->
+<!-- A simple JQTouch layout-->
 <body onload="initialize()">
 	<div id="jqt">
-		<!-- "Page 1" -->
+		<!-- The main application menu -->
 		<div id="mainPage">
 			<div class="toolbar">
 				<h1>WormHole</h1>
@@ -97,6 +93,7 @@
 
 		</div>
 
+		<!-- A panel listing info about the device and the OS-->
 		<div id="DeviceInfo">
 			<div class="toolbar">
 				<a class="button back" onclick="jQT.goBack()" id="backButton1">Back</a>
@@ -110,6 +107,7 @@
 			</ul>
 		</div>
 
+		<!-- Demo of the PhoneGap Sensor API-->
 		<div id="PhoneGapSensors">
 			<div class="toolbar">
 				<h1 id="InfoTitle">Phonegap Sensors</h1>
@@ -144,6 +142,7 @@
 			</ul>
 		</div>
 
+		<!-- Demo of the W3C Sensor API specification implementation-->
 		<div id="W3cSensors">
 			<div class="toolbar">
 				<h1 id="InfoTitle">Sensors 2</h1>
@@ -194,13 +193,14 @@
 			</ul>
 		</div>
 
+		<!-- A panel that demonstrates media capture capabilities-->
 		<div id="capture">
 			<div class="toolbar">
 				<h1>Phonegap Capture</h1>
 				<a class="button back" onclick="jQT.goBack()" id="backButton">Back</a>
 			</div>
 			<ul class="rounded">
-				<li><video id="videoWidget" controls style="width:100%;height:50%"></video></li>
+				<li id="videoWidgetContainer"><video id="videoWidget" controls style="width:100%;height:50%"></video></li>
 				<li><a href="#" onclick="captureVideo()">Capture video</a></li>
 			</ul>
 			<ul class="rounded">
@@ -209,6 +209,7 @@
 			</ul>
 		</div>
 
+		<!-- PhoneGap notification API-->
 		<div id="notifications">
 			<div class="toolbar">
 				<h1>Phonegap Notifications</h1>
@@ -220,32 +221,28 @@
 			</ul>
 		</div>
 
+		<!-- File API demonstration. This panel is a list of files in a single folder-->
 		<div id="fileStorage">
 			<div class="toolbar">
 				<h1>File storage</h1>
 				<a class="button back" onclick="jQT.goBack()" id="backButton">Back</a>
 			</div>
+			<!-- Adds a new file-->
 			<input type="button" class="button" value="+" onclick="createFile()"/>
 			<ul id="fileList">
 			</ul>
-			<!--
-			<ul class="rounded">
-				<li><label>File name:</label><input id="fileNameBox" type="text" style="width:60%" value="example.data"/></li>
-			</ul>
-			<ul class="rounded">
-				<li><a href="#" onclick="readData();">Read</a></li>
-				<li><a href="#" onclick="writedata();">Write</a></li>
-			</ul>
-			<ul class="rounded">
-				<li><textarea rows="20" style="font-size:20pt"></textarea></li>
-			</ul>-->
 		</div>
+
+		<!-- This panel is accessed when the user selects a file-->
 		<div id="filePage">
 			<div class="toolbar">
 				<h1 id="filePanelTitle">File</h1>
 				<a class="button back" onclick="jQT.goBack()" id="backButtonxvxcv">Back</a>
 			</div>
 			<input type="button" class="button" value="Delete" onclick="deleteFile()"/>
+			<ul>
+				<li><input type="text" id="fileName" onblur="fileNameLostFocus()"/></li>
+			</ul>
 			<ul>
 				<li><textarea id="fileContents" rows="20" style="font-size:20pt" onchange="textHasChanged()" onblur="textLostFocus()"></textarea></li>
 			</ul>

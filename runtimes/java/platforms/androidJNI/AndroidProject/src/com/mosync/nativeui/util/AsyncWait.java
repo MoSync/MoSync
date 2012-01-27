@@ -23,7 +23,7 @@ import java.util.concurrent.ArrayBlockingQueue;
  * A utility class that simplifies the waiting for asynchronous
  * events. This class is only intended to be used for sharing
  * a single result between two threads.
- * 
+ *
  * @author fmattias
  *
  * @param <T> The result type.
@@ -35,28 +35,36 @@ public class AsyncWait<T>
 	 * posted.
 	 */
 	private ArrayBlockingQueue<T> m_result = new ArrayBlockingQueue<T>( 1 );
-	
+	private boolean mActive = true;
+
 	/**
 	 * Set the result, marking the object ready for result.
-	 * 
+	 *
 	 * @param result The result to set.
 	 */
 	public void setResult(T result)
 	{
-		m_result.add( result );
+		try
+		{
+			m_result.add( result );
+		}
+		catch(NullPointerException npe)
+		{
+			mActive = false;
+		}
 	}
-	
+
 	/**
 	 * Waits for the result and returns it.
-	 * 
+	 *
 	 * TODO: Add timeout
-	 * 
+	 *
 	 * @return The result that has been set.
 	 * @throws InterruptedException
 	 */
 	public T getResult() throws InterruptedException
 	{
-		while(true)
+		while(mActive)
 		{
 			try
 			{
@@ -64,8 +72,9 @@ public class AsyncWait<T>
 			}
 			catch(InterruptedException ie)
 			{
-				
+
 			}
 		}
+		return null;
 	}
 }
