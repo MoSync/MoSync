@@ -102,7 +102,7 @@ MAWidgetHandle createButton(const char* text, int fontColor, int fontSize,
 		button, MAW_BUTTON_TEXT_HORIZONTAL_ALIGNMENT, MAW_ALIGNMENT_CENTER);
 
 	setWidgetProperty(button,MAW_BUTTON_FONT_SIZE, fontSize);
-	setWidgetProperty(button,MAW_BUTTON_FONT_COLOR, DARK_GREY, 16);
+	setWidgetProperty(button,MAW_BUTTON_FONT_COLOR, fontColor, 16);
 
 	return button;
 }
