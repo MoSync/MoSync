@@ -1,7 +1,8 @@
-[examples]
 # This file contains a list of examples that should be included in the released packages,
 # it is used by eclipse to switch to an example workspace.
+# Each section corresponds to a directory and example project type
 # File format: project name = project location (relative to the examples directory)
+[cpp]
 3dlines = 3dLines
 AdvGraphics
 debugging
@@ -44,7 +45,8 @@ FacebookDemo
 SensorTest
 DeviceFonts
 DeviceFontsNativeUI
+NFCExample
+[html5]
 WebViewGeoLocation
 WebViewLoveSMS
 WebViewTwitter
-NFCExample

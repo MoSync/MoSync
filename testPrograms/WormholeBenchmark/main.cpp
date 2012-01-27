@@ -24,6 +24,9 @@ class MyMoblet : public WebAppMoblet
 public:
 	MyMoblet()
 	{
+		// Extract files in LocalFiles folder to the device.
+		extractFileSystem();
+
 		// Enable message sending from JavaScript to C++.
 		enableWebViewMessages();
 
@@ -51,7 +54,7 @@ public:
 		{
 			 handleMessageStream(webView, data);
 		}
-		else if (protocol.isMessageArrayJSON())
+		else if (protocol.isMessageStreamJSON())
 		{
 			 handleMessageStreamJSON(webView, data);
 		}

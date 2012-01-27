@@ -70,7 +70,7 @@ namespace Wormhole
 		// Send native ready event to PhoneGap using the lazy version.
 		// This way we allow PhoneGap to initialize itself whenever
 		// it is convenient.
-		mWebView->callJS("{_nativeReady = true;}");
+		callJS("{_nativeReady = true;}");
 	}
 
 	/**
@@ -161,7 +161,7 @@ namespace Wormhole
 	{
 		if (MAK_BACK == keyCode)
 		{
-			mWebView->callJS("PhoneGapCommandResult('backbutton');");
+			callJS("PhoneGapCommandResult('backbutton');");
 		}
 	}
 
@@ -293,12 +293,12 @@ namespace Wormhole
 		else if (event.type == EVENT_TYPE_FOCUS_LOST)
 		{
 			//let the phoneGap app know that it should go to sleep
-			mWebView->callJS("PhoneGapCommandResult('pause');");
+			callJS("PhoneGapCommandResult('pause');");
 		}
 		else if (event.type == EVENT_TYPE_FOCUS_GAINED)
 		{
 			//let the PhoneGap side know that it should resume
-			mWebView->callJS("PhoneGapCommandResult('resume');");
+			callJS("PhoneGapCommandResult('resume');");
 		}
 	}
 
@@ -368,9 +368,18 @@ namespace Wormhole
 		bool keepCallback
 		)
 	{
+		// Use string "error" if there is
+		// no error message.
+		// TODO: Does PhoneGap use this param?
+		String err = errorMessage;
+		if (0 == err.size())
+		{
+			err = "error";
+		}
+
 		String args =
 			"{\"code\":" + errorCode +
-			",\"message\":\"" + errorMessage + "\"}";
+			",\"message\":\"" + err + "\"}";
 
 		callCallback(
 			"PhoneGap.CallbackError",
@@ -423,7 +432,7 @@ namespace Wormhole
 
 		script += ")";
 
-		mWebView->callJS(script);
+		callJS(script);
 	}
 
 	/**

@@ -133,6 +133,16 @@ namespace Wormhole
 
 		void actionReadEntries(JSONMessage& message);
 
+		void actionTestFileExists(JSONMessage& message);
+
+		void actionTestDirectoryExists(JSONMessage& message);
+
+		/**
+		 * TODO: How should we implement this? Which file system are
+		 * we talking about? Unsupported for now.
+		 */
+		void actionGetFreeDiskSpace(JSONMessage& message);
+
 	private:
 		PhoneGapMessageHandler* mMessageHandler;
 	};
