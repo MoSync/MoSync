@@ -18,8 +18,8 @@ FilesIncludedInWormholeJS = [
 # Specify directories to copy wormhole.js here.
 DirectoriesToCopyWormholeJSTo = [
   "../../../examples/WebViewLoveSMS/LocalFiles/js/",
-  "../../../templates/Wormhole NativeUI Project/LocalFiles/js/",
-  "../../../templates/Wormhole Web Project/LocalFiles/js/"
+  "../../../templates/Wormhole NativeUI Project/",
+  "../../../templates/Wormhole Web Project/"
 ]
 
 # Divider between files included in wormhole.js
