@@ -55,11 +55,11 @@ MAWidgetHandle createLabel(int width, const char* text,
 {
 	MAWidgetHandle label = maWidgetCreate(MAW_LABEL);
 
-	// Set the label font color.
-	setWidgetProperty(label, MAW_LABEL_FONT_COLOR, fontColor, 16);
+	// Set the label's font color to black.
+	maWidgetSetProperty(label, MAW_LABEL_FONT_COLOR, "0x000000");
 
 	// Set the label font size.
-	setWidgetProperty(label, MAW_LABEL_FONT_SIZE, fontSize);
+	setWidgetProperty(label, MAW_LABEL_FONT_SIZE, 20);
 
 	// Set the widget size.
 	setWidgetProperty(label, MAW_WIDGET_WIDTH, width);
@@ -102,7 +102,7 @@ MAWidgetHandle createButton(const char* text, int fontColor, int fontSize,
 		button, MAW_BUTTON_TEXT_HORIZONTAL_ALIGNMENT, MAW_ALIGNMENT_CENTER);
 
 	setWidgetProperty(button,MAW_BUTTON_FONT_SIZE, fontSize);
-	setWidgetProperty(button,MAW_BUTTON_FONT_COLOR, fontColor, 16);
+	setWidgetProperty(button,MAW_BUTTON_FONT_COLOR, DARK_GREY, 16);
 
 	return button;
 }
