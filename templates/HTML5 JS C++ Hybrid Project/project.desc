@@ -1,18 +1,18 @@
 id = project.html5.hybrid
 type = html5
-name = HTML5/C++ Project
-description = Project for mixed HTML5/C++ applications.
+name = HTML5/JS/C++ Hybrid Project
+description = Template for Hybrid HTML5/JS/C++ projects.
 
 [Files]
 index.html -> LocalFiles/index.html
-bridge.js -> LocalFiles/js/bridge.js
+wormhole.js -> LocalFiles/js/wormhole.js
 MoSyncLogo.png -> LocalFiles/images/MoSyncLogo.png
 Resources.lst -> Resources/Resources.lst
 main.cpp
 
 [Settings]
-build.prefs:additional.libraries=MAUtil.lib, NativeUI.lib, MAFS.lib, Wormhole.lib
-build.prefs:additional.libraries/Debug=MAUtilD.lib, NativeUID.lib, MAFSD.lib, WormholeD.lib
+build.prefs:additional.libraries=MAUtil.lib, NativeUI.lib, MAFS.lib, Wormhole.lib, yajl.lib, Notification.lib
+build.prefs:additional.libraries/Debug=MAUtilD.lib, NativeUID.lib, MAFSD.lib, WormholeD.lib, yajlD.lib, NotificationD.lib
 build.prefs:memory.data/Release=4096
 build.prefs:memory.heap/Release=3072
 build.prefs:memory.stack/Release=512

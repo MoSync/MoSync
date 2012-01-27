@@ -1,7 +1,7 @@
 id = project.wormhole.web
 type = html5
-name = Wormhole Web Based Project
-description = Project for using javaSCript and HTML in creating UI and accessing device functionality.
+name = HTML5/JS WebUI Project
+description = Template for HTML5/JS projects that use HTML/CSS UI.
 
 [Files]
 index.html -> LocalFiles/index.html
@@ -12,8 +12,8 @@ beep.wav -> Resources/beep.wav
 main.cpp
 
 [Settings]
-build.prefs:additional.libraries=MAUtil.lib, NativeUI.lib, MAFS.lib, Wormhole.lib,  yajl.lib, Notification.lib
-build.prefs:additional.libraries/Debug=MAUtilD.lib, NativeUID.lib, MAFSD.lib, WormholeD.lib,  yajlD.lib, NotificationD.lib
+build.prefs:additional.libraries=MAUtil.lib, NativeUI.lib, MAFS.lib, Wormhole.lib, yajl.lib, Notification.lib
+build.prefs:additional.libraries/Debug=MAUtilD.lib, NativeUID.lib, MAFSD.lib, WormholeD.lib, yajlD.lib, NotificationD.lib
 build.prefs:memory.data/Release=4096
 build.prefs:memory.heap/Release=3072
 build.prefs:memory.stack/Release=512

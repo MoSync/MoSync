@@ -1,7 +1,7 @@
 id = project.wormhole.natvieui
 type = html5
-name = Wormhole Native UI Based Project
-description = Project for using javaSCript and HTML in creating Native UI Applications.
+name = HTML5 JS NativeUI Project
+description = Template for HTML5/JS projects that use Native UI.
 
 [Files]
 index.html -> LocalFiles/index.html
