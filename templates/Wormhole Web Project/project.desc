@@ -5,7 +5,7 @@ description = Project for using javaSCript and HTML in creating UI and accessing
 
 [Files]
 index.html -> LocalFiles/index.html
-wormhole-webapp.js -> LocalFiles/js/wormhole-webapp.js
+wormhole.js -> LocalFiles/js/wormhole.js
 master.css -> LocalFiles/master.css
 Resources.lst -> Resources/Resources.lst
 beep.wav -> Resources/beep.wav

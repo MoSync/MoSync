@@ -20,7 +20,7 @@
 <script src="js/jqtouch/jqtouch.js" type="application/x-javascript"
 	charset="utf-8"></script>
 
-<script type="text/javascript" charset="utf-8" src="js/wormhole-webapp.js"></script>
+<script type="text/javascript" charset="utf-8" src="js/wormhole.js"></script>
 <script type="text/javascript" charset="utf-8" src="main.js"></script>
 <script type="text/javascript" charset="utf-8" src="phonegapSensors.js"></script>
 <script type="text/javascript" charset="utf-8" src="w3csensors.js"></script>
@@ -240,6 +240,9 @@
 				<a class="button back" onclick="jQT.goBack()" id="backButtonxvxcv">Back</a>
 			</div>
 			<input type="button" class="button" value="Delete" onclick="deleteFile()"/>
+			<ul>
+				<li><input type="text" id="fileName" onblur="fileNameLostFocus()"/></li>
+			</ul>
 			<ul>
 				<li><textarea id="fileContents" rows="20" style="font-size:20pt" onchange="textHasChanged()" onblur="textLostFocus()"></textarea></li>
 			</ul>

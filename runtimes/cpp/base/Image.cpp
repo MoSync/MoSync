@@ -555,7 +555,7 @@ void Image::drawImageRegion(int left, int top, ClipRect *srcRect, Image *img, in
 	if(transWidth <= 0 || transHeight<= 0) return;
 
 	unsigned char *dst = &data[left*bytesPerPixel + top*pitch];
-	unsigned char *src = &img->data[transTopLeftX*img->bytesPerPixel + transTopLeftY*img->alphaPitch];
+	unsigned char *src = &img->data[transTopLeftX*img->bytesPerPixel + transTopLeftY*img->pitch];
 
 #define DUMP(x) LOG("%s: %i\n", #x, x);
 #define DUMPX(x) LOG("%s: 0x%x\n", #x, x);

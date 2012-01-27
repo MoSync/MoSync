@@ -30,6 +30,10 @@ public:
 	{
 		// Create message handler for PhoneGap.
 		mPhoneGapMessageHandler = new PhoneGapMessageHandler(getWebView());
+		// Create message handler for NativeUI.
+		mNativeUIMessageHandler = new NativeUIMessageHandler(getWebView());
+		// Create message handler for Resources.
+		mResourceMessageHandler = new ResourceMessageHandler(getWebView());
 
 		// Set the beep sound. This is defined in the
 		// Resources/Resources.lst file. You can change
@@ -39,16 +43,29 @@ public:
 		// Enable message sending from JavaScript to C++.
 		enableWebViewMessages();
 
-		// Remove this line to enable the user to
-		// zoom the web page. To disable zoom is one
-		// way of making web pages display in a
-		// reasonable degault size on devices with
-		// different screen sizes.
+
+		//The webview that processes our Javascript code it hidden
+		// users can create other webviews from html
 		getWebView()->disableZoom();
+		getWebView()->setVisible(false);
 
 		// The page in the "LocalFiles" folder to
 		// show when the application starts.
-		showPage("filesystest-index.html");
+		showPage("index.html");
+
+		//Send the Device Screen size to JavaScript
+		MAExtent scrSize = maGetScrSize();
+		int width = EXTENT_X(scrSize);
+		int height = EXTENT_Y(scrSize);
+		char buf[512];
+		sprintf(
+				buf,
+				"{mosyncScreenWidth=%d, mosyncScreenHeight = %d;}",
+				width,
+				height);
+
+		lprintfln(buf);
+		callJS(buf);
 
 		// Initialize PhoneGap.
 		mPhoneGapMessageHandler->initializePhoneGap();
@@ -106,11 +123,11 @@ public:
 	void handleWebViewMessage(WebView* webView, MAHandle data)
 	{
 		// For debugging.
-		printMessage(data);
+	//	printMessage(data);
 
 		// Check the message protocol.
 		MessageProtocol protocol(data);
-		if (protocol.isMessageArrayJSON())
+		if (protocol.isMessageStreamJSON())
 		{
 			// Create the message object. This parses the message data.
 			// The message object contains one or more messages.

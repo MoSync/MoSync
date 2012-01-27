@@ -38,23 +38,24 @@ var mosync = (function()
 	// Detect platform.
 
 	mosync.isAndroid =
-		(navigator.userAgent.indexOf("Android") != -1)
-			? true : false;
+		navigator.userAgent.indexOf("Android") != -1;
 
 	mosync.isIOS =
-		(navigator.userAgent.indexOf("iPod") != -1)
-		|| (navigator.userAgent.indexOf("iPhone") != -1)
-		|| (navigator.userAgent.indexOf("iPad") != -1)
-			? true : false;
+		(navigator.userAgent.indexOf("iPod") != -1) ||
+		(navigator.userAgent.indexOf("iPhone") != -1) ||
+		(navigator.userAgent.indexOf("iPad") != -1);
 
 	mosync.isWindowsPhone =
-		(navigator.userAgent.indexOf("Windows Phone OS") != -1)
-			? true : false;
+		navigator.userAgent.indexOf("Windows Phone OS") != -1;
 
 	// console.log does not work on WP7.
-	if (mosync.isWindowsPhone)
+	if (typeof console === "undefined")
 	{
-		console.log = function(s) { };
+		console = {}
+	}
+	if (typeof console.log === "undefined")
+	{
+		console.log = function(s) {};
 	}
 
 	// The encoder submodule.
@@ -241,7 +242,7 @@ var mosync = (function()
 			if (length > 0)
 			{
 				// Add the "ms:" token to the beginning of the data
-				// to signify that this as a message array. This is
+				// to signify that this as a message stream. This is
 				// used by the C++ message parser to handle different
 				// types of message formats.
 				var data = "ms:";
@@ -293,18 +294,19 @@ var mosync = (function()
 			}
 			else
 			{
-				alert("bridge.sendRaw: unknown platform");
+				alert("mosync.bridge.sendRaw: unknown platform");
 			}
 		};
 
 		/**
-		 *
+		 * Called from iOS runtime to get message.
 		 */
 		bridge.getMessageData = function()
 		{
-			if(rawMessageQueue.length == 0)
+			if (rawMessageQueue.length == 0)
 			{
-				//return an empty string so the runtime knows we don't have anything
+				// Return an empty string so the iOS runtime
+				// knows we don't have any message.
 				return "";
 			}
 			var message = rawMessageQueue.pop();

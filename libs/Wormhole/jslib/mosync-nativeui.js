@@ -1171,7 +1171,7 @@ mosync.nativeui.UIReady = function() {
  * @param id
  *            ID of the currewnt widget
  */
-mosync.nativeui.createChilds = function(parent, widget) {
+mosync.nativeui.createChildren = function(parent, widget) {
 	if (widget != undefined) {
 		var node = widget;
 		var nodeChilds = node.childNodes;
@@ -1188,7 +1188,7 @@ mosync.nativeui.createChilds = function(parent, widget) {
 								+ mosync.nativeui.widgetCounter;
 						mosync.nativeui.widgetCounter++;
 					}
-					mosync.nativeui.createChilds(node, nodeChilds[i]);
+					mosync.nativeui.createChildren(node, nodeChilds[i]);
 				}
 			}
 		}
@@ -1249,7 +1249,7 @@ mosync.nativeui.initUI = function() {
 				MoSyncNodes[i].id = "widget" + mosync.nativeui.widgetCounter;
 				mosync.nativeui.widgetCounter++;
 			}
-			mosync.nativeui.createChilds(null, MoSyncNodes[i]);
+			mosync.nativeui.createChildren(null, MoSyncNodes[i]);
 		}
 	}
 	mosync.nativeui.showInterval = self.setInterval(

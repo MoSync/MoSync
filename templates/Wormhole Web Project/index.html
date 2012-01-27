@@ -5,8 +5,20 @@
 	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
 	<title>PhoneGap</title>
 	  <link rel="stylesheet" href="master.css" type="text/css" media="screen" title="no title" charset="utf-8">
-	  <script type="text/javascript" charset="utf-8" src="js/wormhole-webapp.js"></script>
+	  <script type="text/javascript" charset="utf-8" src="js/wormhole.js"></script>
 	<script type="text/javascript">
+		/**
+		* Handles key press events,
+		* Refer to Mosync documentation for key code details
+		*/
+		function close()
+		{
+			//Close the Application if the Back key is pressed
+			mosync.bridge.send([
+					"close"
+				], null);
+		}
+
 		/**
 		* Displays the device information on the screen
 		*/
@@ -28,6 +40,7 @@
 			// doesn't have a scroll button
 			// document.addEventListener("touchmove", preventBehavior, false);
 			document.addEventListener("deviceready", deviceInfo, true);
+			document.addEventListener("backbutton", close, true);
 		}
 
 		/**
