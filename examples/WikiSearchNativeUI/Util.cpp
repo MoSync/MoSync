@@ -59,7 +59,7 @@ MAWidgetHandle createLabel(int width, const char* text,
 	maWidgetSetProperty(label, MAW_LABEL_FONT_COLOR, "0x000000");
 
 	// Set the label font size.
-	setWidgetProperty(label, MAW_LABEL_FONT_SIZE, 20);
+	setWidgetProperty(label, MAW_LABEL_FONT_SIZE, fontSize);
 
 	// Set the widget size.
 	setWidgetProperty(label, MAW_WIDGET_WIDTH, width);
