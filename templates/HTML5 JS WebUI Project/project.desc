@@ -1,7 +1,7 @@
 id = project.wormhole.web
 type = html5
 name = HTML5/JS WebUI Project
-description = Template for HTML5/JS projects that use HTML/CSS UI.
+description = Template for HTML5/JS projects that use HTML/CSS for the UI. Access device functionality from JavaScript.
 
 [Files]
 index.html -> LocalFiles/index.html

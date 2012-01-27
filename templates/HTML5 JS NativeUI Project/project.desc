@@ -1,7 +1,7 @@
 id = project.wormhole.natvieui
 type = html5
 name = HTML5 JS NativeUI Project
-description = Template for HTML5/JS projects that use Native UI.
+description = Template for HTML5/JS projects that use Native UI. Create the UI in HTML/JavaScript and access device functionality from JavaScript.
 
 [Files]
 index.html -> LocalFiles/index.html

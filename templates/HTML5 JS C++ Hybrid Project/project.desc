@@ -1,7 +1,7 @@
 id = project.html5.hybrid
 type = html5
 name = HTML5/JS/C++ Hybrid Project
-description = Template for Hybrid HTML5/JS/C++ projects.
+description = Template for hybrid HTML5/JS/C++ projects. Extend the application with C/C++ code. Build the UI in HTML/CSS or use NativeUI.
 
 [Files]
 index.html -> LocalFiles/index.html
