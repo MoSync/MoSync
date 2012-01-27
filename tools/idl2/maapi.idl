@@ -1459,8 +1459,8 @@ interface MAAPI {
 
 		/**
 		* \brief Send when the application receives an unregistration result.
-		* The application unregistered from Apple Push Service, or Google C2DM Service,
-		* and will not receive anymore push messages.
+		* The application unregistered from Google C2DM Service, and will not
+		* receive anymore push messages.
 		* Platform: Android only.
 		*/
 		PUSH_NOTIFICATION_UNREGISTRATION = 45;
@@ -9573,7 +9573,7 @@ group NotificationAPI "Notification API" {
 			*
 			* @par Example
 			* \code
-			*	maNotificationLocalSetProperty(notificationHandle, MA_NOTIFICATION_LOCAL_ALERT_BODY, "Did you forget something?");
+			*	maNotificationLocalSetProperty(notificationHandle, MA_NOTIFICATION_LOCAL_CONTENT_BODY, "Did you forget something?");
 			* \endcode
 			*/
 			CONTENT_BODY = "content_body";
@@ -9918,7 +9918,7 @@ group NotificationAPI "Notification API" {
 		*
 		* \returns One of the next constants:
 		* - #MA_NOTIFICATION_RES_OK if no error occurred.
-		* - #MA_NOTIFICATION_NOT_REGISTERED if the application was not registered for receiving
+		* - #MA_NOTIFICATION_RES_NOT_REGISTERED if the application was not registered for receiving
 		* push notification.
 		*/
 		int maNotificationPushUnregister();
