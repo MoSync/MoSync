@@ -127,7 +127,7 @@ public:
 
 		// Check the message protocol.
 		MessageProtocol protocol(data);
-		if (protocol.isMessageArrayJSON())
+		if (protocol.isMessageStreamJSON())
 		{
 			// Create the message object. This parses the message data.
 			// The message object contains one or more messages.
