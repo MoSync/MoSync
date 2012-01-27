@@ -17,36 +17,36 @@ MA 02110-1301, USA.
 */
 
 /**
- * @file file.js
+ * @file mosync-file.js
  * @author Mikael Kindborg
  *
- * This file extends the bridge library wil functions
- * for file access.
+ * Very simple library for file access. Extends the
+ * mosync object with new functions.
  */
 
 /**
  * The file submodule.
  */
-bridge.file = {};
+mosync.file = {};
 
 /**
  * Get the path to the local storage area on the device.
  * The path is returned asynchronously to the callback function.
  */
-bridge.file.getLocalPath = function(callbackFun)
+mosync.file.getLocalPath = function(callbackFun)
 {
-	bridge.messagehandler.send(
-		{ "messageName": "bridge.file.getLocalPath" },
+	mosync.bridge.sendJSON(
+		{ "messageName": "mosync.file.getLocalPath" },
 		callbackFun);
 };
 
 /**
  * Read the contents of a text file asynchronously.
  */
-bridge.file.read = function(filePath, callbackFun)
+mosync.file.read = function(filePath, callbackFun)
 {
-	bridge.messagehandler.send(
-		{ "messageName": "bridge.file.read",
+	mosync.bridge.sendJSON(
+		{ "messageName": "mosync.file.read",
 		  "filePath": filePath },
 		callbackFun);
 };
@@ -54,10 +54,10 @@ bridge.file.read = function(filePath, callbackFun)
 /**
  * Write the contents of a text file asynchronously.
  */
-bridge.file.write = function(filePath, data, callbackFun)
+mosync.file.write = function(filePath, data, callbackFun)
 {
-	bridge.messagehandler.send(
-		{ "messageName": "bridge.file.write",
+	mosync.bridge.sendJSON(
+		{ "messageName": "mosync.file.write",
 		  "filePath": filePath,
 		  "data": data },
 		callbackFun);
@@ -67,9 +67,9 @@ bridge.file.write = function(filePath, data, callbackFun)
  * Add function for logging to the top-level
  * of the bridge object.
  */
-bridge.log = function(message)
+mosync.log = function(message)
 {
-	bridge.messagehandler.send(
+	mosync.bridge.sendJSON(
 		{ "messageName": "bridge.log",
 		  "message": message },
 		null);

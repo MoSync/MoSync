@@ -17,28 +17,28 @@ MA 02110-1301, USA.
 */
 
 /**
- * @file MessageHandler.cpp
+ * @file FileMessageHandler.cpp
  * @author Mikael Kindborg
  *
  * Implementation of system calls made from JavaScript.
  */
 
 #include <Wormhole/FileUtil.h>
-#include "MessageHandler.h"
+#include "FileMessageHandler.h"
 
 using namespace Wormhole;
 
 /**
  * Constructor.
  */
-MessageHandler::MessageHandler()
+FileMessageHandler::FileMessageHandler()
 {
 }
 
 /**
  * Destructor.
  */
-MessageHandler::~MessageHandler()
+FileMessageHandler::~FileMessageHandler()
 {
 	// Nothing needs to be explicitly destroyed.
 }
@@ -47,21 +47,21 @@ MessageHandler::~MessageHandler()
  * Implementation of standard API exposed to JavaScript.
  * @return true if message was handled, false if not.
  */
-bool MessageHandler::handleMessage(WebViewMessage& message)
+bool FileMessageHandler::handleMessage(MessageStreamJSON& message)
 {
-	if (message.is("bridge.file.getLocalPath"))
+	if (message.is("mosync.file.getLocalPath"))
 	{
 		handleFileGetLocalPath(message);
 	}
-	else if (message.is("bridge.file.read"))
+	else if (message.is("mosync.file.read"))
 	{
 		handleFileRead(message);
 	}
-	else if (message.is("bridge.file.write"))
+	else if (message.is("mosync.file.write"))
 	{
 		handleFileWrite(message);
 	}
-	else if (message.is("bridge.log"))
+	else if (message.is("mosync.log"))
 	{
 		handleLog(message);
 	}
@@ -78,8 +78,8 @@ bool MessageHandler::handleMessage(WebViewMessage& message)
 /**
  * Handle the getLocalPath message.
  */
-void MessageHandler::handleFileGetLocalPath(
-	WebViewMessage& message)
+void FileMessageHandler::handleFileGetLocalPath(
+	MessageStreamJSON& message)
 {
 	FileUtil fileUtil;
 	MAUtil::String path = fileUtil.getLocalPath();
@@ -96,7 +96,7 @@ void MessageHandler::handleFileGetLocalPath(
 /**
  * Handle the file read message.
  */
-void MessageHandler::handleFileRead(WebViewMessage& message)
+void FileMessageHandler::handleFileRead(MessageStreamJSON& message)
 {
 	FileUtil fileUtil;
 	MAUtil::String inText;
@@ -116,8 +116,9 @@ void MessageHandler::handleFileRead(WebViewMessage& message)
 /**
  * Handle the file write message.
  */
-void MessageHandler::handleFileWrite(WebViewMessage& message)
+void FileMessageHandler::handleFileWrite(MessageStreamJSON& message)
 {
+	maWriteLog("@@@ 1", 4);
 	FileUtil fileUtil;
 	bool success = fileUtil.writeTextToFile(
 		message.getParam("filePath"),
@@ -135,22 +136,22 @@ void MessageHandler::handleFileWrite(WebViewMessage& message)
 /**
  * Handle the log message.
  */
-void MessageHandler::handleLog(WebViewMessage& message)
+void FileMessageHandler::handleLog(MessageStreamJSON& message)
 {
 	MAUtil::String s = message.getParam("message");
-	maWriteLog(s.c_str(), s.length());
+	maWriteLog(s.c_str(), s.size());
 }
 
 /**
  * Calls a JavaScript callback function using the "callbackId"
  * parameter. The callbackId is supplied automatically when
- * using the bridge.messagehandler.send function.
+ * using the mosync.bridge.sendJSON function.
  * @param result A string that contains the data to be returned
  * to the JavaScript callback function.
  * @return true on success, false on error.
  */
-bool MessageHandler::replyString(
-	WebViewMessage& message,
+bool FileMessageHandler::replyString(
+	MessageStreamJSON& message,
 	const MAUtil::String& result)
 {
 	// Message must have an callbackId parameter.
@@ -163,7 +164,7 @@ bool MessageHandler::replyString(
 	MAUtil::String callbackId = message.getParam("callbackId");
 
 	// Call JavaScript reply handler.
-	MAUtil::String script = "bridge.messagehandler.reply(";
+	MAUtil::String script = "mosync.bridge.reply(";
 	script += callbackId + ", " + "'" + result + "')";
 	message.getWebView()->callJS(script);
 
@@ -173,12 +174,12 @@ bool MessageHandler::replyString(
 /**
  * Calls a JavaScript callback function using the "callbackId"
  * parameter. The callbackId is supplied automatically when
- * using the bridge.messagehandler.send function.
+ * using the mosync.bridge.sendJSON function.
  * @param result A boolean to be returned
  * to the JavaScript callback function.
  * @return true on success, false on error.
  */
-bool MessageHandler::replyBoolean(WebViewMessage& message, bool result)
+bool FileMessageHandler::replyBoolean(MessageStreamJSON& message, bool result)
 {
 	// Message must have an callbackId parameter.
 	if (!message.hasParam("callbackId"))
@@ -190,7 +191,7 @@ bool MessageHandler::replyBoolean(WebViewMessage& message, bool result)
 	MAUtil::String callbackId = message.getParam("callbackId");
 
 	// Call JavaScript reply handler.
-	MAUtil::String script = "bridge.messagehandler.reply(";
+	MAUtil::String script = "mosync.bridge.reply(";
 	if (result)
 	{
 		script += callbackId + ", true)";
@@ -208,10 +209,10 @@ bool MessageHandler::replyBoolean(WebViewMessage& message, bool result)
  * Calls a JavaScript callback function using the "callbackId"
  * parameter. Returns null to the callback function.
  * The callbackId is supplied automatically when
- * using the bridge.messagehandler.send function.
+ * using the mosync.bridge.sendJSON function.
  * @return true on success, false on error.
  */
-bool MessageHandler::replyNull(WebViewMessage& message)
+bool FileMessageHandler::replyNull(MessageStreamJSON& message)
 {
 	// Message must have an callbackId parameter.
 	if (!message.hasParam("callbackId"))
@@ -223,7 +224,7 @@ bool MessageHandler::replyNull(WebViewMessage& message)
 	MAUtil::String callbackId = message.getParam("callbackId");
 
 	// Call JavaScript reply handler.
-	MAUtil::String script = "bridge.messagehandler.reply(";
+	MAUtil::String script = "mosync.bridge.reply(";
 	script += callbackId + ", null)";
 	message.getWebView()->callJS(script);
 

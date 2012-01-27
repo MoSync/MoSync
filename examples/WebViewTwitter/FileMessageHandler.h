@@ -17,92 +17,92 @@ MA 02110-1301, USA.
 */
 
 /**
- * @file MessageHandler.h
+ * @file FileMessageHandler.h
  * @author Mikael Kindborg
  *
- * Implementation of system calls made from JavaScript.
+ * Implementation of file calls made from JavaScript.
  */
 
-#ifndef WEB_VIEW_MESSAGE_HANDLER_H_
-#define WEB_VIEW_MESSAGE_HANDLER_H_
+#ifndef FILE_MESSAGE_HANDLER_H_
+#define FILE_MESSAGE_HANDLER_H_
 
-#include <Wormhole/WebViewMessage.h>
+#include <Wormhole/MessageStreamJSON.h>
 
 /**
  * Class that implements JavaScript calls.
  *
- * The JavaScript side is in file extendedbridge.js.
+ * The JavaScript side is in file mosync-file.js.
  */
-class MessageHandler
+class FileMessageHandler
 {
 public:
 	/**
 	 * Constructor.
 	 */
-	MessageHandler();
+	FileMessageHandler();
 
 	/**
 	 * Destructor.
 	 */
-	virtual ~MessageHandler();
+	virtual ~FileMessageHandler();
 
 	/**
 	 * Implementation of standard API exposed to JavaScript.
 	 * @return true if message was handled, false if not.
 	 */
-	bool handleMessage(Wormhole::WebViewMessage& message);
+	bool handleMessage(Wormhole::MessageStreamJSON& message);
 
 protected:
 	/**
 	 * Handle the getLocalPath message.
 	 */
-	void handleFileGetLocalPath(Wormhole::WebViewMessage& message);
+	void handleFileGetLocalPath(Wormhole::MessageStreamJSON& message);
 
 	/**
 	 * Handle the file read message.
 	 */
-	void handleFileRead(Wormhole::WebViewMessage& message);
+	void handleFileRead(Wormhole::MessageStreamJSON& message);
 
 	/**
 	 * Handle the file write message.
 	 */
-	void handleFileWrite(Wormhole::WebViewMessage& message);
+	void handleFileWrite(Wormhole::MessageStreamJSON& message);
 
 	/**
 	 * Handle the log message.
 	 */
-	void handleLog(Wormhole::WebViewMessage& message);
+	void handleLog(Wormhole::MessageStreamJSON& message);
 
 	/**
 	 * Calls a JavaScript callback function using the "callbackId"
 	 * parameter. The callbackId is supplied automatically when
-	 * using the bridge.messagehandler.send function.
+	 * using the mosync.bridge.sendJSON function.
 	 * @param result A string that contains the data to be returned
 	 * to the JavaScript callback function.
 	 * @return true on success, false on error.
 	 */
 	bool replyString(
-		Wormhole::WebViewMessage& message,
+		Wormhole::MessageStreamJSON& message,
 		const MAUtil::String& result);
 
 	/**
 	 * Calls a JavaScript callback function using the "callbackId"
 	 * parameter. The callbackId is supplied automatically when
-	 * using the bridge.messagehandler.send function.
+	 * using the mosync.bridge.sendJSON function.
 	 * @param result A boolean to be returned
 	 * to the JavaScript callback function.
 	 * @return true on success, false on error.
 	 */
-	bool replyBoolean(Wormhole::WebViewMessage& message, bool result);
+	bool replyBoolean(Wormhole::MessageStreamJSON& message, bool result);
 
 	/**
 	 * Calls a JavaScript callback function using the "callbackId"
 	 * parameter. Returns null to the callback function.
 	 * The callbackId is supplied automatically when
-	 * using the bridge.messagehandler.send function.
+	 * using the mosync.bridge.sendJSON function.
 	 * @return true on success, false on error.
 	 */
-	bool replyNull(Wormhole::WebViewMessage& message);
+	bool replyNull(Wormhole::MessageStreamJSON& message);
 
 };
 

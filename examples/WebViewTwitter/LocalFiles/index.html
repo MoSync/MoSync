@@ -11,15 +11,16 @@
 		<!-- Import JQTouch default style (iPhone look). Replace the string "themes/default" with "themes/jqt" for a neutral (black) theme -->
 		<link type="text/css" rel="stylesheet" media="screen" href="js/jqtouch/jqtouch.css">
 		<link type="text/css" rel="stylesheet" media="screen" href="js/themes/apple/theme.css">
+
 		<!-- include JQuery through Google API => Always have the latest version -->
 		<script src="js/jqtouch/jquery-1.4.2.min.js" type="text/javascript" charset="utf-8"></script>
 		<script src="js/jqtouch/jqtouch.js" type="application/x-javascript" charset="utf-8"></script>
 
-		<!-- Import the bridge library. -->
-		<script src="js/bridge.js"></script>
+		<!-- Import the mosync library. -->
+		<script src="js/mosync-bridge.js"></script>
 
 		<!-- Import file extensions. -->
-		<script src="js/file.js"></script>
+		<script src="js/mosync-file.js"></script>
 
 		<!-- JavaScript goes here -->
 		<script type="text/javascript">
@@ -33,12 +34,7 @@
 			var gParsedFavorites = "";
 
 			// Make sure we get the correct event type on every touch system.
-			var userAgent = navigator.userAgent.toLowerCase();
-			var isiPhone =
-				(userAgent.indexOf('iphone') != -1 ||
-				userAgent.indexOf('ipod') != -1)
-					? true : false;
-			var clickEvent = isiPhone ? 'tap' : 'click';
+			var clickEvent = mosync.isIOS ? 'tap' : 'click';
 
 			/**
 			 * Outputs the received tweets to the user-interface
@@ -133,7 +129,7 @@
 
 				// Get path to local file directory, then
 				// read favourite users from that directory.
-				bridge.file.getLocalPath(read);
+				mosync.file.getLocalPath(read);
 
 				function read(path)
 				{
@@ -144,7 +140,7 @@
 					}
 
 					filePath = path + "SavedUsers";
-					bridge.file.read(filePath, handleResult);
+					mosync.file.read(filePath, handleResult);
 				}
 
 				function handleResult(data)
@@ -167,6 +163,7 @@
 			 */
 			function addFavoriteUser()
 			{
+				mosync.log("@@@ addFavoriteUser");
 				// Get the username from the input field
 				var userName = document.getElementById("usernameInput").value;
 
@@ -199,7 +196,7 @@
 					}
 
 					// Write user list.
-					bridge.file.write(filePath, userList, reportResult);
+					mosync.file.write(filePath, userList, reportResult);
 				}
 
 				function reportResult(success)
