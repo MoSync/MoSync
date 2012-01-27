@@ -1,6 +1,6 @@
 id = project.c
-name = MoSync C Project
-description = A MoSync C project with a main file and stub code.
+name = C Basic Project
+description = A standard ANSI C project template consisting of a main file with a small code example.
 
 [Files]
 main.c

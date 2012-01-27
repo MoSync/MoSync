@@ -1,0 +1,5 @@
+id = project.empty
+name = C Empty Project
+description = A standard ANSI C project template with standard settings but no main file, roll your own.
+
+[Settings]
