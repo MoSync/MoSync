@@ -136,8 +136,8 @@ namespace NativeUI
         {
             maPanic(0,
 				"This application uses Native UI, which currently "
-				"works on iOS and Android only - please select "
-				"an iOS or Android target profile in the "
+				"works on iOS, Android and WindowsPhone only - please select "
+				"an iOS, Android or WindowsPhone target profile in the "
 				"right-hand profile panel.");
         }
     }
