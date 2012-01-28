@@ -135,7 +135,8 @@ namespace MoSync
 					double size = 0;
 					if (double.TryParse(value, out size))
 					{
-						mLabel.FontSize = size;
+                        // for some values better use the default size of the platform
+                        mLabel.FontSize = size <= 0 ? 11 : size;
 					}
 				}
 			}
