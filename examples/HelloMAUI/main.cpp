@@ -96,9 +96,22 @@ public:
 	 */
 	void createUI()
 	{
+		// Get the height of the display. We use this
+		// to size our font.
+		int displayHeight = EXTENT_Y(maGetScrSize());
+
+		// Get the width of the display. We use this
+		// to size our widgets.
+		int displayWidth = EXTENT_X(maGetScrSize());
+
 		// Create a font object. The font resource and other
 		// resources are defined in the file "resources.lst".
-		MAUI::Font* font = new MAUI::Font(RES_FONT);
+		MAUI::Font* font;
+		if (600 < displayHeight) {
+			font = new MAUI::Font(RES_FONT_BIG);
+		} else {
+			font = new MAUI::Font(RES_FONT);
+		}
 
 		// Create a "skin" for the buttons. This will give the
 		// buttons a customised appearance. The skin is divided
@@ -114,9 +127,6 @@ public:
 			true,  // Is selected image transparent?
 			true); // Is unselected image transparent?
 
-		// Get the width of the display. We use this
-		// to size our widgets.
-		int displayWidth = EXTENT_X(maGetScrSize());
 
 		// Create the screen's main widget -- a layout with
 		// one column and four rows. Because this is the top-level
