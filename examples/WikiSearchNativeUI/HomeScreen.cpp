@@ -528,13 +528,18 @@ void HomeScreen::widgetClicked(MAHandle widgetHandle)
 		// If All category is selected, all the other ones are selected also.
 		char buf[6];
 		maWidgetGetProperty(mCategoryBoxes[0], MAW_CHECK_BOX_CHECKED, buf, 6);
+
+		// make sure the first 4 chars are lower case so we can have our strcmp with "true"
+		for(int i = 0; i < 4; i++) {
+			buf[i] = tolower(buf[i]);
+		}
+
 		if (strcmp(buf,"true") == 0)
 		{
 			// Check the other ones.
 			for (int i=1; i < mCategoryBoxes.size(); i++)
 			{
-				maWidgetSetProperty(
-					mCategoryBoxes[i], MAW_CHECK_BOX_CHECKED, "true");
+				maWidgetSetProperty(mCategoryBoxes[i], MAW_CHECK_BOX_CHECKED, "true");
 			}
 		}
 		else
@@ -542,8 +547,7 @@ void HomeScreen::widgetClicked(MAHandle widgetHandle)
 			// Uncheck all.
 			for (int i=1; i < mCategoryBoxes.size(); i++)
 			{
-				maWidgetSetProperty(
-					mCategoryBoxes[i], MAW_CHECK_BOX_CHECKED, "false");
+				maWidgetSetProperty(mCategoryBoxes[i], MAW_CHECK_BOX_CHECKED, "false");
 			}
 		}
 	}
