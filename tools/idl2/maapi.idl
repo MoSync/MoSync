@@ -10346,9 +10346,9 @@ group CaptureAPI "Capture API" {
 		* \param bufferSize Maximum size of the buffer.
 		*
 		* \returns One of the next constants:
-		*  - MA_CAPTURE_RES_OK if no error occurred.
-		*  - MA_CAPTURE_RES_INVALID_HANDLE if the given handle was invalid.
-		*  - MA_CAPTURE_RES_INVALID_STRING_BUFFER_SIZE if the buffer size was to small.
+		*  - #MA_CAPTURE_RES_OK if no error occurred.
+		*  - #MA_CAPTURE_RES_INVALID_HANDLE if the given handle was invalid.
+		*  - #MA_CAPTURE_RES_INVALID_STRING_BUFFER_SIZE if the buffer size was to small.
 		*/
 		int maCaptureGetImagePath(in MAHandle handle, out MAString buffer range("bufferSize"), in int bufferSize);
 
@@ -10359,9 +10359,9 @@ group CaptureAPI "Capture API" {
 		* \param bufferSize Maximum size of the buffer.
 		*
 		* \returns One of the next constants:
-		*  - MA_CAPTURE_RES_OK if no error occurred.
-		*  - MA_CAPTURE_RES_INVALID_HANDLE if the given handle was invalid.
-		*  - MA_CAPTURE_RES_INVALID_STRING_BUFFER_SIZE if the buffer size was to small.
+		*  - #MA_CAPTURE_RES_OK if no error occurred.
+		*  - #MA_CAPTURE_RES_INVALID_HANDLE if the given handle was invalid.
+		*  - #MA_CAPTURE_RES_INVALID_STRING_BUFFER_SIZE if the buffer size was to small.
 		*/
 		int maCaptureGetVideoPath(in MAHandle handle, out MAString buffer range("bufferSize"), in int bufferSize);
 
