@@ -15,11 +15,19 @@ FilesIncludedInWormholeJS = [
   "mosync-pushnotifications.js"
 ]
 
-# Specify directories to copy wormhole.js here.
+# Specify directories to copy wormhole.js to.
 DirectoriesToCopyWormholeJSTo = [
-  "../../../examples/WebViewLoveSMS/LocalFiles/js/",
-  "../../../templates/Wormhole NativeUI Project/",
-  "../../../templates/Wormhole Web Project/"
+  "../../../templates/An Empty Project/",
+  "../../../templates/C Basic Project/",
+  "../../../templates/C NativeUI Project/",
+  "../../../templates/C Newlib Project/",
+  "../../../templates/C++ Moblet Project/",
+  "../../../templates/C++ NativeUI Project/",
+  "../../../templates/C++ OpenGL Project/",
+  "../../../templates/C++ STL Project/",
+  "../../../templates/HTML5 JS C++ Hybrid Project/",
+  "../../../templates/HTML5 JS NativeUI Project/",
+  "../../../templates/HTML5 JS WebUI Project/"
 ]
 
 # Divider between files included in wormhole.js
@@ -57,7 +65,7 @@ def buildWormholeJS
   wormholejs = ""
   fileList.each do |fileName|
     File.open(fileName, "r") do |sourceFile|
-      fileContent = sourceFile.read;
+      fileContent = sourceFile.read
       wormholejs = wormholejs + Divider + "// File: " + fileName + "\n\n" + fileContent
     end
   end

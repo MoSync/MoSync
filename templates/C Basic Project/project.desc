@@ -1,0 +1,8 @@
+id = project.c
+name = C Basic Project
+description = A standard ANSI C project template consisting of a main file with a small code example.
+
+[Files]
+main.c
+
+[Settings]
