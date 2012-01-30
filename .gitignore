@@ -42,6 +42,8 @@ rebuild.build.cpp
 
 config_platform.h
 
+wormhole.js
+
 /*.bat
 
 /ipch/*

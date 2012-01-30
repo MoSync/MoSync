@@ -53,6 +53,10 @@ void packageWindowsPhone(const SETTINGS& s, const RuntimeInfo& ri) {
 
 	string csprojOutput = dst + "/project";
 	string outputType = s.outputType ? string(s.outputType) : string("interpreted");
+	if(s.csOutputDir)
+	{
+		outputType = "rebuilt";
+	}
 
 	_mkdir(csprojOutput.c_str());
 	copyFilesRecursively(templateLocation.c_str(), csprojOutput.c_str());
@@ -72,6 +76,11 @@ void packageWindowsPhone(const SETTINGS& s, const RuntimeInfo& ri) {
 		generateCmd << " -guid " << s.WPguid;
 	}
 
+	if(!s.resource)
+	{
+		generateCmd << " -exclude-resource-file";
+	}
+
 	sh(generateCmd.str().c_str(), s.silent);
 
 	// Copy program files to xcode template
@@ -88,8 +97,8 @@ void packageWindowsPhone(const SETTINGS& s, const RuntimeInfo& ri) {
 	if(s.resource) {
 		copyFile(resourceFileCopy.c_str(), s.resource);
 	} else {
-		ofstream empty(resourceFileCopy.c_str());
-		empty.close();
+		//ofstream empty(resourceFileCopy.c_str());
+		//empty.close();
 	}
 
 	// Icons!
