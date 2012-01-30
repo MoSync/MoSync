@@ -1,6 +1,6 @@
 id = project.cpp.stl
-name = MoSync C++ STL Project
-description = MoSync C++ project configured to use STL (Standard Template Library).
+name = C++ STL Project
+description = A standard ANSI C++ application template consisting of a main file with a small code example and  includes the C++ Standard Template Library.
 
 [Files]
 main.cpp
