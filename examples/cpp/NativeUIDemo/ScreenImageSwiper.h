@@ -34,6 +34,9 @@ MA 02110-1301, USA.
 // Include all the wrappers.
 #include <NativeUI/Widgets.h>
 
+// Include ads banner wrapper.
+#include <Ads/Banner.h>
+
 #include "MAHeaders.h"
 
 #include "conprint.h"
@@ -317,6 +320,11 @@ private:
 	 * Pointer to array of ScreenImage pointers.
 	 */
 	MAUtil::Vector<ScreenImage*> mImages;
+
+	/**
+	 * Ads banner that will be added on top of the screen.
+	 */
+	Ads::Banner* mAdsBanner;
 
 	/**
 	 * Number of images.
