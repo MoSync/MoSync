@@ -1,0 +1,10 @@
+id = project.moblet
+name = C++ Moblet Project
+description = A standard ANSI C++ application template that uses the Moblet event-handling framework.
+
+[Files]
+main.cpp
+
+[Settings]
+build.prefs:additional.libraries=MAUtil.lib
+build.prefs:additional.libraries/Debug=MAUtilD.lib

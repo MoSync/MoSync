@@ -3,61 +3,96 @@
 # add them to templates and MoSync apckage
 require "fileutils"
 
-# Add or rename the JavaScript Files Here
-fileList = [
+# Specify the JavaScript files to be
+# included in wormhole.js here.
+FilesIncludedInWormholeJS = [
   "mosync-bridge.js",
-  "mosync-resource.js",
   "phonegap-bridge.js",
-  "mosync-nativeui.js",
   "phonegap-1.2.0.js",
+  "mosync-resource.js",
+  "mosync-nativeui.js",
   "mosync-sensormanager.js",
   "mosync-pushnotifications.js"
-  ]
+]
 
-# Get the Mosync directory Path
-mosyncDir = ENV["MOSYNCDIR"]
+# Specify directories to copy wormhole.js to.
+DirectoriesToCopyWormholeJSTo = [
+  "../../../templates/An Empty Project/",
+  "../../../templates/C Basic Project/",
+  "../../../templates/C NativeUI Project/",
+  "../../../templates/C Newlib Project/",
+  "../../../templates/C++ Moblet Project/",
+  "../../../templates/C++ NativeUI Project/",
+  "../../../templates/C++ OpenGL Project/",
+  "../../../templates/C++ STL Project/",
+  "../../../templates/HTML5 JS C++ Hybrid Project/",
+  "../../../templates/HTML5 JS NativeUI Project/",
+  "../../../templates/HTML5 JS WebUI Project/"
+]
 
-# Copy original files for reference
-if(!File.exist?("#{mosyncDir}/jslib"))
-  FileUtils.mkdir("#{mosyncDir}/jslib")
-end
-fileList.each { |fileName|
-  FileUtils.cp(fileName, "#{mosyncDir}/jslib/")
-}
+# Divider between files included in wormhole.js
+Divider = "\n// =============================================================\n//\n"
 
-# Write JavaScript Templates
-# Use the same notations for new templates
-File.open(
-  "../../../templates/Wormhole NativeUI Project/wormhole-nativeui.js",
-  "w") do |targetFile|
-
-  fileList.each do |filename|
-    File.open(filename, "r") do |sourceFile|
-      fileContent = sourceFile.read;
-      targetFile.write(fileContent);
-    end
+def copyWormholeJS
+  dirList = DirectoriesToCopyWormholeJSTo
+  dirList.each do |dirName|
+    FileUtils.cp("wormhole.js", dirName)
   end
 end
-FileUtils.cp(
-  "../../../templates/Wormhole NativeUI Project/wormhole-nativeui.js",
-  "#{mosyncDir}/jslib/")
 
-File.open(
-  "../../../templates/Wormhole Web Project/wormhole-webapp.js",
-  "w") do |targetFile|
+def copyJSFilesToMoSync
+  fileList = FilesIncludedInWormholeJS
+  fileList << "wormhole.js"
 
-  fileList.each do |filename|
-    if((!filename.include?("nativeui")) &&
-      (!filename.include?("resource")))
+  # Get the Mosync directory path
+  mosyncDir = ENV["MOSYNCDIR"]
 
-      File.open(filename, "r") do |sourceFile|
-        fileContent = sourceFile.read;
-        targetFile.write(fileContent);
-      end
+  # Make sure target dir in MoSync dir exists
+  if (!File.exist?("#{mosyncDir}/jslib"))
+    FileUtils.mkdir("#{mosyncDir}/jslib")
+  end
 
+  # Copy files to the MoSync dir
+  fileList.each { |fileName|
+    FileUtils.cp(fileName, "#{mosyncDir}/jslib/")
+  }
+end
+
+def buildWormholeJS
+  fileList = FilesIncludedInWormholeJS
+
+  # Create wormhole.js by concatenating all files.
+  wormholejs = ""
+  fileList.each do |fileName|
+    File.open(fileName, "r") do |sourceFile|
+      fileContent = sourceFile.read
+      wormholejs = wormholejs + Divider + "// File: " + fileName + "\n\n" + fileContent
     end
   end
+
+  # Write wormhole.js
+  File.open("wormhole.js", "w") do |targetFile|
+    targetFile.write(wormholejs)
+  end
 end
-FileUtils.cp(
-  "../../../templates/Wormhole Web Project/wormhole-webapp.js",
-  "#{mosyncDir}/jslib/")
+
+def main
+  if (ARGV.include? "build")
+    buildWormholeJS
+  elsif (ARGV.include? "copy")
+    copyJSFilesToMoSync
+    copyWormholeJS
+  elsif (ARGV.include? "all")
+    buildWormholeJS
+    copyJSFilesToMoSync
+    copyWormholeJS
+  else
+    puts "Usage:"
+    puts "  buildJS build  Builds wormhole.js"
+    puts "  buildJS copy   Copies wormhole.js"
+    puts "  buildJS all    Builds + Copies wormhole.js"
+  end
+end
+
+# Call main function
+main

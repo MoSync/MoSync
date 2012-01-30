@@ -1,0 +1,23 @@
+id = project.wormhole.natvieui
+type = html5
+name = HTML5 JS NativeUI Project
+description = Template for HTML5/JS projects that use Native UI. Create the UI in HTML/JavaScript and access device functionality from JavaScript.
+
+[Files]
+index.html -> LocalFiles/index.html
+Resources.lst -> Resources/Resources.lst
+beep.wav -> Resources/beep.wav
+main.cpp
+wormhole.js -> LocalFiles/js/wormhole.js
+TabIconWebViewAndroid.png -> LocalFiles/img/TabIconWebViewAndroid.png
+TabIconWebView.png -> LocalFiles/img/TabIconWebView.png
+
+[Settings]
+build.prefs:additional.libraries=MAUtil.lib, NativeUI.lib, MAFS.lib, Wormhole.lib, Notification.lib, yajl.lib
+build.prefs:additional.libraries/Debug=MAUtilD.lib, NativeUID.lib, MAFSD.lib, WormholeD.lib, NotificationD.lib, yajlD.lib
+build.prefs:memory.data/Release=4096
+build.prefs:memory.heap/Release=3072
+build.prefs:memory.stack/Release=512
+build.prefs:memory.data/Debug=4096
+build.prefs:memory.heap/Debug=3072
+build.prefs:memory.stack/Debug=512
