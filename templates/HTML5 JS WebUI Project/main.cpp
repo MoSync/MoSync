@@ -11,8 +11,6 @@
 #include <Wormhole/MessageStream.h>
 #include <Wormhole/Libs/JSONMessage.h>
 #include <Wormhole/Libs/PhoneGap/PhoneGapMessageHandler.h>
-#include <Wormhole/Libs/JSNativeUI/NativeUIMessageHandler.h>
-#include <Wormhole/Libs/JSNativeUI/ResourceMessageHandler.h>
 #include "MAHeaders.h"
 
 // Namespaces we want to access.
@@ -28,44 +26,30 @@ class MyMoblet : public WebAppMoblet
 public:
 	MyMoblet()
 	{
-		// Create message handler for PhoneGap.
-		mPhoneGapMessageHandler = new PhoneGapMessageHandler(getWebView());
-		// Create message handler for NativeUI.
-		mNativeUIMessageHandler = new NativeUIMessageHandler(getWebView());
-		// Create message handler for Resources.
-		mResourceMessageHandler = new ResourceMessageHandler(getWebView());
-
-		// Set the beep sound. This is defined in the
-		// Resources/Resources.lst file. You can change
-		// this by changing the sound file in that folder.
-		mPhoneGapMessageHandler->setBeepSound(BEEP_WAV);
+		// Extract files in LocalFiles folder to the device.
+		extractFileSystem();
 
 		// Enable message sending from JavaScript to C++.
 		enableWebViewMessages();
 
-
-		//The webview that processes our Javascript code it hidden
-		// users can create other webviews from html
+		// Change this line to enableZoom to enable the
+		// user to zoom the web page. To disable zoom is
+		// one way of making web pages display in a
+		// reasonable default size on devices with
+		// different screen sizes.
 		getWebView()->disableZoom();
-		getWebView()->setVisible(false);
 
 		// The page in the "LocalFiles" folder to
 		// show when the application starts.
 		showPage("index.html");
 
-		//Send the Device Screen size to JavaScript
-		MAExtent scrSize = maGetScrSize();
-		int width = EXTENT_X(scrSize);
-		int height = EXTENT_Y(scrSize);
-		char buf[512];
-		sprintf(
-				buf,
-				"{mosyncScreenWidth=%d, mosyncScreenHeight = %d;}",
-				width,
-				height);
+		// Create message handler for PhoneGap.
+		mPhoneGapMessageHandler = new PhoneGapMessageHandler(getWebView());
 
-		lprintfln(buf);
-		callJS(buf);
+		// Set the beep sound. This is defined in the
+		// Resources/Resources.lst file. You can change
+		// this by changing the sound file in that folder.
+		mPhoneGapMessageHandler->setBeepSound(BEEP_WAV);
 
 		// Initialize PhoneGap.
 		mPhoneGapMessageHandler->initializePhoneGap();
@@ -123,7 +107,7 @@ public:
 	void handleWebViewMessage(WebView* webView, MAHandle data)
 	{
 		// For debugging.
-	//	printMessage(data);
+		printMessage(data);
 
 		// Check the message protocol.
 		MessageProtocol protocol(data);
@@ -172,17 +156,8 @@ public:
 
 		while (p = stream.getNext())
 		{
-			if (0 == strcmp(p, "NativeUI"))
-			{
-				//Forward NativeUI messages to the respective message handler
-				mNativeUIMessageHandler->handleMessage(stream);
-			}
-			else if (0 == strcmp(p, "Resource"))
-			{
-				//Forward Resource messages to the respective message handler
-				mResourceMessageHandler->handleMessage(stream);
-			}
-			else if (0 == strcmp(p, "close"))
+			//close the app on a close message
+			if (0 == strcmp(p, "close"))
 			{
 				close();
 			}
@@ -191,16 +166,6 @@ public:
 
 private:
 	PhoneGapMessageHandler* mPhoneGapMessageHandler;
-
-	/**
-	 * Handler for NAtiveUI messages
-	 */
-	NativeUIMessageHandler* mNativeUIMessageHandler;
-
-	/**
-	 * Handler for resource messages used for NativeUI
-	 */
-	ResourceMessageHandler* mResourceMessageHandler;
 };
 
 /**

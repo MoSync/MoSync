@@ -60,7 +60,7 @@ namespace Wormhole
 			(mProtocol[2] == ':');
 	}
 
-	bool MessageProtocol::isMessageArrayJSON()
+	bool MessageProtocol::isMessageStreamJSON()
 	{
 		return
 			(mProtocol[0] == 'm') &&
