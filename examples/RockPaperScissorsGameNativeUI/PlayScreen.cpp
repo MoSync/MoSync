@@ -488,6 +488,10 @@ MAWidgetHandle PlayScreen::createImageButton(
 {
 	MAWidgetHandle imageButton = maWidgetCreate(MAW_IMAGE_BUTTON);
 
+	// Set the widget size.
+	setWidgetProperty(imageButton, MAW_WIDGET_WIDTH, width);
+	setWidgetProperty(imageButton, MAW_WIDGET_HEIGHT, height);
+
 	// Set the background image.
 	setWidgetProperty(
 		imageButton,
@@ -496,10 +500,6 @@ MAWidgetHandle PlayScreen::createImageButton(
 
 	// Set the scale mode to not scaling the image.
 	maWidgetSetProperty(imageButton, "scaleMode", "scalePreserveAspect");
-
-	// Set the widget size.
-	setWidgetProperty(imageButton, MAW_WIDGET_WIDTH, width);
-	setWidgetProperty(imageButton, MAW_WIDGET_HEIGHT, height);
 
 	maWidgetSetProperty(
 		imageButton,

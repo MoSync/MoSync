@@ -90,6 +90,17 @@ namespace MoSync
                     {
                         mView.SetValue(Canvas.WidthProperty, value);
                         fillSpaceHorizontalyEnabled = false;
+                        Type objType = mView.GetType();
+                        if (objType.GetProperty("Parent") != null)
+                        {
+                            var property = objType.GetProperty("Parent");
+                            Object parent = property.GetValue(mView, null);
+                            if (null != parent && parent is Grid)
+                            {
+                                int columnIndex = Grid.GetColumn((FrameworkElement)mView);
+                                (parent as Grid).ColumnDefinitions[columnIndex].Width = new GridLength(value, GridUnitType.Pixel);
+                            }
+                        }
                     }
                     else if(-1 == value)
                     {
@@ -147,6 +158,18 @@ namespace MoSync
                     {
                         mView.SetValue(Canvas.HeightProperty, value);
                         fillSpaceVerticalyEnabled = false;
+
+                        Type objType = mView.GetType();
+                        if (objType.GetProperty("Parent") != null)
+                        {
+                            var property = objType.GetProperty("Parent");
+                            Object parent = property.GetValue(mView, null);
+                            if (null != parent && parent is Grid)
+                            {
+                                int rowIndex = Grid.GetRow((FrameworkElement)mView);
+                                (parent as Grid).RowDefinitions[rowIndex].Height = new GridLength(value, GridUnitType.Pixel);
+                            }
+                        }
                     }
                     else if(-1 == value)
                     {

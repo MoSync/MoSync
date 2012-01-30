@@ -89,6 +89,7 @@ namespace MoSync
                 this.fillSpaceHorizontalyEnabled = false;
 
                 mView = mGrid;
+                mGrid.Margin = new Thickness(0.0);
 #if DEBUG
                 mGrid.ShowGridLines = true;
 #endif
@@ -118,6 +119,11 @@ namespace MoSync
 
                     mGrid.RowDefinitions.Insert(mGrid.RowDefinitions.Count - 1, rowDef);
 
+                    if (widget.View is FrameworkElement)
+                    {
+                        (widget.View as FrameworkElement).HorizontalAlignment = this.mGrid.HorizontalAlignment;
+                        (widget.View as FrameworkElement).VerticalAlignment = this.mGrid.VerticalAlignment;
+                    }
                     mGrid.Children.Add(widget.View);
 
                     Grid.SetColumn((widget.View as System.Windows.FrameworkElement), 1);
@@ -181,8 +187,8 @@ namespace MoSync
                     else if (value.Equals(MoSync.Constants.MAW_ALIGNMENT_CENTER))
                     {
                         mGrid.HorizontalAlignment = HorizontalAlignment.Center;
-                        mSpacerRight.Width = new GridLength(1, GridUnitType.Star);
-                        mSpacerLeft.Width = new GridLength(1, GridUnitType.Star);
+                        mSpacerRight.Width = new GridLength(1, GridUnitType.Auto);
+                        mSpacerLeft.Width = new GridLength(1, GridUnitType.Auto);
                     }
                 }
             }
@@ -210,8 +216,8 @@ namespace MoSync
                     else if (value.Equals(MoSync.Constants.MAW_ALIGNMENT_CENTER))
                     {
                         mGrid.VerticalAlignment = VerticalAlignment.Center;
-                        mSpacerDown.Height = new GridLength(1, GridUnitType.Star);
-                        mSpacerUp.Height = new GridLength(1, GridUnitType.Star);
+                        mSpacerDown.Height = new GridLength(1, GridUnitType.Auto);
+                        mSpacerUp.Height = new GridLength(1, GridUnitType.Auto);
                     }
                 }
             }

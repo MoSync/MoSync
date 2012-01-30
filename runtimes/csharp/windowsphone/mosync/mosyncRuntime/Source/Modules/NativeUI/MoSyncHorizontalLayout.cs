@@ -102,7 +102,7 @@ namespace MoSync
                     ColumnDefinition columnDef = new ColumnDefinition();
 
                     if (widget.fillSpaceHorizontalyEnabled) columnDef.Width = new System.Windows.GridLength(1, System.Windows.GridUnitType.Star);
-                    else if (double.IsNaN(widget.Width) == false && 0 != widget.Height)
+                    else if (double.IsNaN(widget.Width) == false && 0 != widget.Width)
                     {
                         columnDef.Width = new System.Windows.GridLength(widget.Width, System.Windows.GridUnitType.Pixel);
                     }
@@ -112,6 +112,12 @@ namespace MoSync
                     }
 
                     mGrid.ColumnDefinitions.Insert(mGrid.ColumnDefinitions.Count - 1, columnDef);
+
+                    if (widget.View is FrameworkElement)
+                    {
+                        (widget.View as FrameworkElement).HorizontalAlignment = this.mGrid.HorizontalAlignment;
+                        (widget.View as FrameworkElement).VerticalAlignment = this.mGrid.VerticalAlignment;
+                    }
 
                     mGrid.Children.Add(widget.View);
 
@@ -174,8 +180,8 @@ namespace MoSync
                     else if (value.Equals(MoSync.Constants.MAW_ALIGNMENT_CENTER))
                     {
                         mGrid.HorizontalAlignment = HorizontalAlignment.Center;
-                        mSpacerRight.Width = new GridLength(1, GridUnitType.Star);
-                        mSpacerLeft.Width = new GridLength(1, GridUnitType.Star);
+                        mSpacerRight.Width = new GridLength(1, GridUnitType.Auto);
+                        mSpacerLeft.Width = new GridLength(1, GridUnitType.Auto);
                     }
                 }
             }
@@ -201,8 +207,8 @@ namespace MoSync
                     else if (value.Equals(MoSync.Constants.MAW_ALIGNMENT_CENTER))
                     {
                         mGrid.VerticalAlignment = VerticalAlignment.Center;
-                        mSpacerDown.Height = new GridLength(1, GridUnitType.Star);
-                        mSpacerUp.Height = new GridLength(1, GridUnitType.Star);
+                        mSpacerDown.Height = new GridLength(1, GridUnitType.Auto);
+                        mSpacerUp.Height = new GridLength(1, GridUnitType.Auto);
                     }
                 }
             }
