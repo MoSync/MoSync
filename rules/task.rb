@@ -222,7 +222,7 @@ class FileTask < Task
 		super(work)
 		@NAME = name.to_s
 		# names may not contain '~', the unix home directory hack, because File.exist?() doesn't parse it.
-		if(@NAME.include?('~'))
+		if(@NAME.start_with?('~'))
 			error "Bad filename: #{@NAME}"
 		end
 	end

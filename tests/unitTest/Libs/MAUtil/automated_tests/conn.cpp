@@ -283,6 +283,19 @@ public:
 			fail();
 			return;
 		}
+		MAConnAddr addr;
+		int res = mConn.getAddr(&addr);
+		if(res >= 0) {
+			union {
+				char c[4];
+				int i;
+			} u;
+			u.i = addr.inet4.addr;
+			printf("Remote: %i.%i.%i.%i:%i\n",
+				u.c[0], u.c[1], u.c[2], u.c[3], addr.inet4.port);
+		} else {
+			printf("getAddr error: %i\n", res);
+		}
 		conn->read(mReadBuffer, DATA_SIZE);
 	}
 	virtual void connReadFinished(Connection* conn, int result) {
