@@ -1,4 +1,4 @@
-/**
+/*
 PhoneGap
 ========
 
@@ -436,7 +436,7 @@ PhoneGap.addConstructor = function(func)
     });
 };
 
-/**
+/*
  * Plugins object
  */
 if (!window.plugins) {
@@ -562,7 +562,7 @@ PhoneGap.initializationComplete = function(feature) {
     }
 };
 
-/**
+/*
  * Create all PhoneGap objects once page has fully loaded and native side is ready.
  */
 PhoneGap.Channel.join(
@@ -670,7 +670,9 @@ if (!PhoneGap.hasResource("accelerometer"))
 {
 PhoneGap.addResource("accelerometer");
 
-/** @constructor */
+/**
+ * @constructor
+ */
 var Acceleration = function(x, y, z) {
   this.x = x;
   this.y = y;
@@ -870,7 +872,7 @@ var Camera = function() {
  *                destinationType: Camera.DestinationType.DATA_URL,
  *                sourceType: Camera.PictureSourceType.PHOTOLIBRARY})
  \code
- navigator.camera.getPicture(onSuccess, onFail, { quality: 50 }); 
+ navigator.camera.getPicture(onSuccess, onFail, { quality: 50 });
 
 function onSuccess(imageData) {
     var image = document.getElementById('myImage');
@@ -928,7 +930,7 @@ Camera.prototype.PictureSourceType = Camera.PictureSourceType;
  * @param {Function} errorCallback
  * @param {Object} options
  \code
- navigator.camera.getPicture(onSuccess, onFail, { quality: 50 }); 
+ navigator.camera.getPicture(onSuccess, onFail, { quality: 50 });
 
 function onSuccess(imageData) {
     var image = document.getElementById('myImage');
@@ -1268,6 +1270,7 @@ var CaptureAudioOptions = function(){
     // The selected audio mode. Must match with one of the elements in supportedAudioModes array.
     this.mode = null;
 };
+
 PhoneGap.addConstructor(function () {
     if (typeof navigator.device === "undefined") {
         navigator.device = window.device = new Device();
@@ -1277,7 +1280,9 @@ PhoneGap.addConstructor(function () {
         navigator.device.capture = window.device.capture = new Capture();
     }
 });
-}/*
+}
+
+/*
  * PhoneGap is available under *either* the terms of the modified BSD license *or* the
  * MIT License (2008). See http://opensource.org/licenses/alphabetical for full text.
  *
@@ -1697,7 +1702,7 @@ function onError(contactError) {
 
 // find all contacts with 'Bob' in any name field
 var options = new ContactFindOptions();
-options.filter="Bob"; 
+options.filter="Bob";
 var fields = ["displayName", "name"];
 navigator.contacts.find(fields, onSuccess, onError, options);
 \endcode
@@ -1779,7 +1784,7 @@ var ContactFindOptions = function(filter, multiple) {
     this.multiple = multiple || false;
 };
 
-/**
+/*
  * Add the contact interface into the browser.
  */
 PhoneGap.addConstructor(function() {
@@ -2050,30 +2055,6 @@ if(!window.localStorage)
           //  window.external.Notify("DOMStorage/" + this._type + "/clear/");
         }
     };
-
-    // initialize DOMStorage
- /*
-    Object.defineProperty( window, "localStorage",
-    {
-        writable: false,
-        configurable: false,
-        value:new DOMStorage("localStorage")
-    });
-    if(window.localStorage != null) {
-        window.localStorage.initialize();
-    }
-
-    Object.defineProperty( window, "sessionStorage",
-    {
-        writable: false,
-        configurable: false,
-        value:new DOMStorage("sessionStorage")
-    });
-   if(window.sessionStorage != null) {
-        window.sessionStorage.initialize();
-    }*/
-
-
 })();};
 
 /*
@@ -2132,7 +2113,9 @@ FileError.PATH_EXISTS_ERR = 12;
 // File manager
 //-----------------------------------------------------------------------------
 
-/** @constructor */
+/**
+ * @constructor
+ */
 var FileMgr = function() {
 };
 
@@ -3121,7 +3104,9 @@ FileEntry.prototype.file = function(successCallback, errorCallback) {
     PhoneGap.exec(successCallback, errorCallback, "File", "getFileMetadata", {fullPath: this.fullPath});
 };
 
-/** @constructor */
+/**
+ * @constructor
+ */
 var LocalFileSystem = function() {
 };
 
@@ -3261,7 +3246,7 @@ LocalFileSystem.prototype._castDate = function (pluginResult) {
     return pluginResult;
 };
 
-/**
+/*
  * Add the FileSystem interface into the browser.
  */
 PhoneGap.addConstructor(function () {
@@ -3540,7 +3525,7 @@ function playAudio(url) {
     // Pause after 10 seconds
     setTimeout(function() {
         my_media.stop();
-    }, 10000);        
+    }, 10000);
 }
 \endcode
  */
@@ -3588,7 +3573,7 @@ function playAudio(url) {
     // Pause after 10 seconds
     setTimeout(function() {
         media.pause();
-    }, 10000);        
+    }, 10000);
 }
  \endcode
  */
@@ -3658,7 +3643,7 @@ Media.prototype.getCurrentPosition = function(success, fail) {
  * Start recording audio file.
  \code
  // Record audio
-// 
+//
 function recordAudio() {
     var src = "myrecording.mp3";
     var mediaRec = new Media(src,
@@ -3685,7 +3670,7 @@ Media.prototype.startRecord = function() {
  * Stop recording audio file.
  \code
  // Record audio
-// 
+//
 function recordAudio() {
     var src = "myrecording.mp3";
     var mediaRec = new Media(src,

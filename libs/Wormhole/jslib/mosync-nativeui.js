@@ -6,11 +6,6 @@
  * Provides support for designing UI both programatically and declaratively.
  * Should be used together with mosync-resource.js
  */
-/**
- Native UI
- =======
- Native UI is the blah blah
-*/
 
 /**
  * @namespace The mosync.nativeui module
@@ -20,16 +15,19 @@ mosync.nativeui = {};
 /**
  * A hash containing all callback functions that are registered for getting
  * response of creating a widget
+ * @private
  */
 mosync.nativeui.callBackTable = {};
 
 /**
  * List of registered callback functions for WidgetEvents
+ * @private
  */
 mosync.nativeui.eventCallBackTable = {};
 
 /**
  * used to generate IDs for widgets that do not have one
+ * @private
  */
 mosync.nativeui.widgetCounter = 0;
 
@@ -49,6 +47,7 @@ mosync.nativeui.widgetCounter = 0;
  * @param processedCallback
  *            optional call back for knowing that the message is processed
  *
+ * @private
  */
 mosync.nativeui.maWidgetCreate = function(
 		widgetType,
@@ -93,6 +92,7 @@ mosync.nativeui.maWidgetCreate = function(
  * @param processedCallback
  *            optional call back for knowing that the message is processed See
  *            mosync.nativeui.getElementById for getting handles
+ * @private
  */
 mosync.nativeui.maWidgetDestroy = function(widgetID, successCallBack,
 		errorCallback, processedCallback) {
@@ -117,6 +117,7 @@ mosync.nativeui.maWidgetDestroy = function(widgetID, successCallBack,
  * @param processedCallback
  *            optional call back for knowing that the message is processed
  *
+ * @private
  */
 mosync.nativeui.maWidgetAddChild = function(widgetID, childID, successCallback,
 		errorCallback, processedCallback) {
@@ -145,6 +146,7 @@ mosync.nativeui.maWidgetAddChild = function(widgetID, childID, successCallback,
  * @param processedCallback
  *            optional call back for knowing that the message is processed
  *
+ * @private
  */
 mosync.nativeui.maWidgetInsertChild = function(widgetID, childID, index,
 		successCallback, errorCallback, processedCallback) {
@@ -170,6 +172,7 @@ mosync.nativeui.maWidgetInsertChild = function(widgetID, childID, index,
  * @param processedCallback
  *            optional call back for knowing that the message is processed
  *
+ * @private
  */
 mosync.nativeui.maWidgetRemoveChild = function(childID, successCallback,
 		errorCallback, processedCallback) {
@@ -192,6 +195,7 @@ mosync.nativeui.maWidgetRemoveChild = function(childID, successCallback,
  * @param processedCallback
  *            optional call back for knowing that the message is processed
  *
+ * @private
  */
 mosync.nativeui.maWidgetScreenShow = function(screenID, successCallback,
 		errorCallback, processedCallback) {
@@ -213,6 +217,7 @@ mosync.nativeui.maWidgetScreenShow = function(screenID, successCallback,
  * @param processedCallback
  *            optional call back for knowing that the message is processed
  *
+ * @private
  */
 mosync.nativeui.maWidgetModalDialogShow = function(dialogID, successCallback,
 		errorCallback, processedCallback) {
@@ -234,6 +239,7 @@ mosync.nativeui.maWidgetModalDialogShow = function(dialogID, successCallback,
  * @param processedCallback
  *            optional call back for knowing that the message is processed
  *
+ * @private
  */
 mosync.nativeui.maWidgetModalDialogHide = function(dialogID, successCallback,
 		errorCallback, processedCallback) {
@@ -259,6 +265,7 @@ mosync.nativeui.maWidgetModalDialogHide = function(dialogID, successCallback,
  * @param processedCallback
  *            optional call back for knowing that the message is processed
  *
+ * @private
  */
 mosync.nativeui.maWidgetStackScreenPush = function(stackScreenID, screenID,
 		successCallback, errorCallback, processedCallback) {
@@ -285,6 +292,7 @@ mosync.nativeui.maWidgetStackScreenPush = function(stackScreenID, screenID,
  * @param processedCallback
  *            optional call back for knowing that the message is processed
  *
+ * @private
  */
 mosync.nativeui.maWidgetStackScreenPop = function(stackScreenID,
 		successCallback, errorCallback, processedCallback) {
@@ -313,6 +321,7 @@ mosync.nativeui.widgetPropertyIndexNo = 0;
  * @param processedCallback
  *            optional call back for knowing that the message is processed
  *
+ * @private
  */
 mosync.nativeui.maWidgetSetProperty = function(widgetID, property, value,
 		successCallback, errorCallback, processedCallback) {
@@ -341,6 +350,7 @@ mosync.nativeui.maWidgetSetProperty = function(widgetID, property, value,
  * @param processedCallback
  *            optional call back for knowing that the message is processed
  *
+ * @private
  */
 mosync.nativeui.maWidgetGetProperty = function(widgetID, property,
 		successCallback, errorCallback, processedCallback) {
@@ -361,6 +371,7 @@ mosync.nativeui.maWidgetGetProperty = function(widgetID, property,
  * @param callbackID
  *            Javascript Id of the widget
  *
+ * @private
  */
 mosync.nativeui.createCallback = function(callbackID, widgetID, handle) {
 	var callBack = mosync.nativeui.callBackTable[callbackID];
@@ -394,6 +405,7 @@ mosync.nativeui.success = function(callbackID) {
  *            retrieved property's name
  * @param value
  *            value for the retrieved property
+ * @private
  */
 mosync.nativeui.error = function(callbackID) {
 	var callBack = mosync.nativeui.callBackTable[callbackID];
@@ -416,6 +428,7 @@ mosync.nativeui.error = function(callbackID) {
  *            Type of the event (maybe followed by at most 3 event data
  *            variables)
  *
+ * @private
  */
 mosync.nativeui.event = function(widgetHandle, eventType) {
 
@@ -445,6 +458,7 @@ mosync.nativeui.NativeElementsTable = {};
  *            Type of the events the users wants to listen to.
  * @param callBackFunction
  *            function that will be called when the widget sends an event.
+ * @private
  */
 mosync.nativeui.registerEventListener = function(widgetID, eventType,
 		listenerFunction) {
@@ -461,15 +475,16 @@ mosync.nativeui.registerEventListener = function(widgetID, eventType,
 /**
  *
  * A widget object that user can interact with instead of using the low level
- * functions. It is used in
+ * functions. This class is not useddirectly see mosync.nativeui.create for usage.
  *
- * @class represents a widget that can be manipulated
+ *
  * @param widgetType
  *            Type of the widget that has been created
  * @param widgetID
  *            ID of the widget used for identifying the widget(can be ignored by
  *            the user)
  *
+
  */
 mosync.nativeui.NativeWidgetElement = function(widgetType, widgetID, params,
 		successCallback, errorCallback) {
@@ -486,6 +501,7 @@ mosync.nativeui.NativeWidgetElement = function(widgetType, widgetID, params,
 	 * Internal function used for synchronizing the widget operations. It makes
 	 * sure that the widget is created before calling any other functions.
 	 *
+	 * @private
 	 */
 	this.processedMessage = function() {
 		function clone(obj) {
@@ -531,7 +547,7 @@ mosync.nativeui.NativeWidgetElement = function(widgetType, widgetID, params,
 	 *
 	 * @private
 	 */
-	var onSuccess = function(widgetID, widgetHandle) {
+	this.onSuccess = function(widgetID, widgetHandle) {
 		self.created = true;
 		self.handle = widgetHandle;
 		if (self.eventQueue) {
@@ -550,7 +566,7 @@ mosync.nativeui.NativeWidgetElement = function(widgetType, widgetID, params,
 	 *
 	 * @private
 	 */
-	var onError = function(errorCode) {
+	this.onError = function(errorCode) {
 		self.latestError = errorCode;
 		if (errorCallback) {
 			errorCallback.apply(null, [ errorCode ]);
@@ -607,6 +623,20 @@ mosync.nativeui.NativeWidgetElement = function(widgetType, widgetID, params,
 	 *            type of the event that the user wants to listen to
 	 * @param listenerFunction
 	 *            a function that will be called when that event is fired.
+	 *
+	 *	\code
+	 *	//Create a new button and add an event listener to it
+	 *	var myButton = mosync.nativeui.create("Button" ,"myButton",
+	 *	{
+	 *		//properties of the button
+	 *		"width": "100%",
+	 *		"text": "Click Me!"
+	 *	});
+	 *	myButton.addEventListener("Clicked", function()
+	 *	{
+	 *		alert("second button is cliecked");
+	 *	});
+	 *	\endcode
 	 *
 	 */
 	this.addEventListener = function(eventType, listenerFunction) {
@@ -696,6 +726,7 @@ mosync.nativeui.NativeWidgetElement = function(widgetType, widgetID, params,
 	/**
 	 * Adds the current widget as a child to another widget.
 	 *
+
 	 * @param parentId
 	 *            JavaScript ID of the parent widget.
 	 * @param successCallback
@@ -705,6 +736,20 @@ mosync.nativeui.NativeWidgetElement = function(widgetType, widgetID, params,
 	 *            (optional) a function that will be called when the operation
 	 *            encounters an error
 	 *
+	 *	\code
+	 *	//Create a new button and add an event listener to it
+	 *	var secondButton = mosync.nativeui.create("Button" ,"SecondButton",
+	 *	{
+	 *		//properties of the button
+	 *		"width": "100%",
+	 *		"text": "Second Button"
+	 *	});
+	 *	secondButton.addTo("mainLayout");
+	 *	secondButton.addEventListener("Clicked", function()
+	 *	{
+	 *		alert("second button is cliecked");
+	 *	});
+	 *	\endcode
 	 */
 	this.addTo = function(parentId, successCallback, errorCallback) {
 		var parent = document.getNativeElementById(parentId);
@@ -853,6 +898,11 @@ mosync.nativeui.NativeWidgetElement = function(widgetType, widgetID, params,
  * returns the object that can be used to change the properties of the specified
  * widget.
  *
+ * \code
+ *    var myScreen = document.getNativeElementById("MyScreen")
+ *    myScreen.show()
+ * \endcode
+ *
  * @param widgetID
  *            the ID attribute used for identifying the widget in DOM
  *
@@ -862,10 +912,15 @@ document.getNativeElementById = function(widgetID) {
 };
 
 /**
- * creates a widget and returns a NativeWidgetElement object.
+ * creates a widget and returns a mosync.nativeui.NativeWidgetElement object.
+ * The object then can be used for modifying the respecitve NativeElement.
  *
- * usage: var myButton = mosync.nativeui.create("Button", "myButton");
- *
+ * \code
+ * 		var myButton = mosync.nativeui.create("Button", "myButton", {
+ *					"text" : "Click Me!",
+ *					"width" : "100%"
+ * 					});
+ * \endcode
  *
  * @param widgetType
  *            type of the widet that should be created
@@ -890,28 +945,38 @@ mosync.nativeui.create = function(widgetType, widgetID, params,
 /**
  * Stores the number of widgets that are waiting to be created. Used when
  * parsing the XML based input
+ * @private
  */
 mosync.nativeui.numWidgetsRequested = 0;
 
 /**
  * Stores the number of widgets that are created. Used when parsing the XML
  * based input
+ * @private
  */
 mosync.nativeui.numWidgetsCreated = 0;
 
 /**
  * The interval for checking the availability of all widgets Used when parsing
  * the XML based input
+ * @private
  */
 mosync.nativeui.showInterval;
 
 /**
  * List of WidetIDs and handles. Used for accessign widgets through their IDs
+ * @private
  */
 mosync.nativeui.widgetIDList = {};
 
 /**
- * Provides access to C++ handles through IDs.
+ * Provides access to C++ handles through IDs. It is accessible though document object as well.
+ *
+ * \code
+ *
+ *   var myButton = document.getElementsById("MyButton");
+ *   myButton.addTo("myLayout");
+ * \endcode
  *
  * @param elementID
  *            ID of the widget in question
@@ -928,6 +993,7 @@ mosync.nativeui.getElementById = function(elementID) {
  * @param attributeName
  *            name of the attribute used in HTML markup
  * @returns new name for the attribute
+ * @private
  */
 mosync.nativeui.getNativeAttrName = function(attributeName) {
 	switch (String(attributeName).toLowerCase()) {
@@ -1071,6 +1137,7 @@ mosync.nativeui.getNativeAttrValue = function(value) {
  *            ID of the widget in question
  * @param parentID
  *            Id of the parentWidget
+ * @private
  */
 mosync.nativeui.createWidget = function(widget, parent) {
 	var widgetNode = widget;
@@ -1128,8 +1195,7 @@ mosync.nativeui.createWidget = function(widget, parent) {
 	var currentWidget = mosync.nativeui
 			.create(widgetType, widgetID, propertyList,
 					function(widgetID, handle) {
-						var thisWidget = document
-								.getNativeElementById(widgetID);
+						var thisWidget = document.getNativeElementById(widgetID);
 						mosync.nativeui.numWidgetsRequested--;
 						if (imageResources != null) {
 							mosync.resource.loadImage(imageResources.value,
@@ -1155,8 +1221,10 @@ mosync.nativeui.createWidget = function(widget, parent) {
  * A function that is called when the UI is ready. By default it loads the
  * element with ID "mainScreen" Override this function to add extra
  * functionality. See mosync.nativeui.initUI for more information
+ * @private
  */
-mosync.nativeui.UIReady = function() {
+mosync.nativeui.UIReady = function()
+{
 	// This is the low level way of showing the default screen
 	// If you want to override this fucntion,
 	// use document.getNativeElementById instead
@@ -1170,6 +1238,7 @@ mosync.nativeui.UIReady = function() {
  *            ID of the parent Widget
  * @param id
  *            ID of the currewnt widget
+ * @private
  */
 mosync.nativeui.createChildren = function(parent, widget) {
 	if (widget != undefined) {
@@ -1198,7 +1267,8 @@ mosync.nativeui.createChildren = function(parent, widget) {
 
 /**
  * Checks the status of UI and calls UIReady when it is ready.
- * @internal
+ *
+ * @private
  */
 mosync.nativeui.CheckUIStatus = function() {
 	if (0 == mosync.nativeui.numWidgetsRequested) {
@@ -1214,6 +1284,7 @@ mosync.nativeui.CheckUIStatus = function() {
  *  mosync.nativeui.showScreen("myNewScreen");
  *
  * @param screenID
+ * @private
  */
 mosync.nativeui.showScreen = function(screenID) {
 	if (numWidgetsCreated == numWidgetsRequested) {
@@ -1227,7 +1298,7 @@ mosync.nativeui.showScreen = function(screenID) {
  * Initializes the UI system and parsing of the XML input.
  * This function should be called when the document body is loaded.
  *
- * usage:
+ * \code
  *  <body onload="mosync.nativeui.initUI()">
  *
  *  After finalizing the widgets, the UI system will call the UIReady function.
@@ -1237,6 +1308,8 @@ mosync.nativeui.showScreen = function(screenID) {
  *  {
  *  //Do something, and show your main screen
  *  }
+ * \endcode
+ *
  *
  */
 mosync.nativeui.initUI = function() {

@@ -16,13 +16,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301, USA.
 */
 
-/**
- Push Notifications
- =======
- Push Notifications is the blah blah
-*/
 
-/**
+/*
  * @file mosync-pushnotifications.js
  * @author Bogdan
  *
@@ -44,7 +39,9 @@ var PushNotificationManager = function() {
 	this.lastPushNotificationData = null;
 };
 
-/** @constructor */
+/**
+ * @constructor
+ */
 var PushNotificationData = function(message, sound, iconBadge)
 {
   this.message = message;
@@ -59,15 +56,15 @@ var PushNotificationData = function(message, sound, iconBadge)
  * On Android PUSH_NOTIFICATION_TYPE_ALERT is set by default.
  */
 PushNotificationManager.type = {
-		/**
+		/*
 		 * The application accepts notifications that badge the application icon.
 		 */
 		badge: 1,
-		/**
+		/*
 		 * The application accepts alert sounds as notifications.
 		 */
 		sound: 2,
-		/**
+		/*
 		 * The application accepts alert messages as notifications.
 		 */
 		alert: 4
