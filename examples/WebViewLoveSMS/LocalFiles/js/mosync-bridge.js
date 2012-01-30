@@ -33,15 +33,18 @@ var mosync = (function()
 	// Detect platform.
 
 	mosync.isAndroid =
-		navigator.userAgent.indexOf("Android") != -1;
+		(navigator.userAgent.indexOf("Android") != -1)
+			? true : false;
 
 	mosync.isIOS =
-		(navigator.userAgent.indexOf("iPod") != -1) ||
-		(navigator.userAgent.indexOf("iPhone") != -1) ||
-		(navigator.userAgent.indexOf("iPad") != -1);
+		(navigator.userAgent.indexOf("iPod") != -1)
+		|| (navigator.userAgent.indexOf("iPhone") != -1)
+		|| (navigator.userAgent.indexOf("iPad") != -1)
+			? true : false;
 
 	mosync.isWindowsPhone =
-		navigator.userAgent.indexOf("Windows Phone OS") != -1;
+		(navigator.userAgent.indexOf("Windows Phone OS") != -1)
+			? true : false;
 
 	// console.log does not work on WP7.
 	if (typeof console === "undefined")
@@ -237,7 +240,7 @@ var mosync = (function()
 			if (length > 0)
 			{
 				// Add the "ms:" token to the beginning of the data
-				// to signify that this as a message stream. This is
+				// to signify that this as a message array. This is
 				// used by the C++ message parser to handle different
 				// types of message formats.
 				var data = "ms:";
@@ -289,19 +292,18 @@ var mosync = (function()
 			}
 			else
 			{
-				alert("mosync.bridge.sendRaw: unknown platform");
+				alert("bridge.sendRaw: unknown platform");
 			}
 		};
 
 		/**
-		 * Called from iOS runtime to get message.
+		 *
 		 */
 		bridge.getMessageData = function()
 		{
-			if (rawMessageQueue.length == 0)
+			if(rawMessageQueue.length == 0)
 			{
-				// Return an empty string so the iOS runtime
-				// knows we don't have any message.
+				//return an empty string so the runtime knows we don't have anything
 				return "";
 			}
 			var message = rawMessageQueue.pop();
