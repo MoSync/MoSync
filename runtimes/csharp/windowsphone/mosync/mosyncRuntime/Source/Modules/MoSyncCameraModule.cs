@@ -10,6 +10,7 @@ namespace MoSync
 {
     public class CameraModule : IIoctlModule
     {
+		/*
 		private PhotoCamera mCamera = null;
 		private VideoBrush mVideoBrush = null;
 		private EventHandler<ContentReadyEventArgs> mCameraSnapshotDelegate = null;
@@ -32,9 +33,12 @@ namespace MoSync
 			dim = resolutions.Current;
 			return true;
 		}
+		*/
 
 		public void Init(Ioctls ioctls, Core core, Runtime runtime)
 		{
+			// Fix later :)
+			/*
 			mCamera = new PhotoCamera(CameraType.Primary);
 			mVideoBrush = new VideoBrush();
 			mVideoBrush.SetSource(mCamera);
@@ -160,8 +164,8 @@ namespace MoSync
 					{
 						Resource res = runtime.GetResource(MoSync.Constants.RT_PLACEHOLDER, _placeHolder);
 						Stream data = args.ImageStream;
-						Memory dataMem = new Memory((int)data.Length);
-						dataMem.WriteFromStream(0, data, (int)data.Length);
+						MemoryStream dataMem = new MemoryStream((int)data.Length);
+						MoSync.Util.CopySeekableStreams(data, 0, dataMem, 0, (int)data.Length);
 						res.SetInternalObject(dataMem);
 					});
 					are.Set();
@@ -205,7 +209,7 @@ namespace MoSync
 				return 0;
 			};
 
-
+			*/
 		}
 	} // end class CameraModule
 } // end namespace MoSync
