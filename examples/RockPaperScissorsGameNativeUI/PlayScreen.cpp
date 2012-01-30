@@ -541,7 +541,7 @@ void PlayScreen::setupUI()
 	// Error handling for devices that do not support NativeUI.
 	if ( -1 == mScreen )
 	{
-		maPanic(0, "NativeUI is only available on Android and iOS.");
+		maPanic(0, "NativeUI is only available on Android, iOS and WindowsPhone7.");
 	}
 
 	// Get the screen size.
@@ -655,7 +655,7 @@ MAWidgetHandle PlayScreen::createMainLayout()
 	// Set a background color for the main layout.
 	setWidgetProperty(mainLayout, MAW_WIDGET_BACKGROUND_COLOR, SEA_GREEN, 16);
 
-	// Add some space before the start button.
+	// Add some space in front of the start button.
 	maWidgetAddChild(
 		mainLayout,
 		createSpacer(mScreenWidth, mScreenHeight / 40));
