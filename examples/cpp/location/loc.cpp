@@ -104,7 +104,8 @@ public:
 			if(loc.lon < -180.0 || loc.lon > 180.0 || loc.lat < -90.0 || loc.lat > 90.0) {
 				printf("invalid lat or lon\n");
 			} else {
-				printf("%i %.8g %.8g %.4g %.4g\n", loc.state, loc.lat, loc.lon, loc.horzAcc, loc.vertAcc);
+				printf("%i %.8g %.8g %.4g %.4g %.4g\n",
+					loc.state, loc.lat, loc.lon, loc.horzAcc, loc.vertAcc, loc.alt);
 			}
 
 			printf("%i ms\n", maGetMilliSecondCount() - mLastTime);
