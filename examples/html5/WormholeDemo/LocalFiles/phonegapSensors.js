@@ -1,4 +1,9 @@
+// Sensors implemented by PhoneGap.
+
+// ************ Accelerometer ************
+
 var accelPhonegapWatch = null;
+
 function toggleAccelPhonegap()
 {
 	if (accelPhonegapWatch !== null) {
@@ -13,12 +18,12 @@ function toggleAccelPhonegap()
 		var options = {};
 		options.frequency = 1000;
 		accelPhonegapWatch = navigator.accelerometer.watchAcceleration(
-				updateAccelPhonegap, function(ex) {
-					alert("accel fail (" + ex.name + ": " + ex.message + ")");
-				}, options);
+			updateAccelPhonegap,
+			errorAccelPhonegap,
+			options);
 	}
 }
-
+/*
 function roundNumber(num) {
 	if(typeof num == "number")
 	{
@@ -31,19 +36,29 @@ function roundNumber(num) {
 		return num;
 	}
 }
+*/
 
-function updateAccelPhonegap(a) {
-	document.getElementById('accelPGx').innerHTML = a.x;
-	document.getElementById('accelPGy').innerHTML = a.y;
-	document.getElementById('accelPGz').innerHTML = a.z;
+function updateAccelPhonegap(accel) {
+	document.getElementById('accelPGx').innerHTML = accel.x;
+	document.getElementById('accelPGy').innerHTML = accel.y;
+	document.getElementById('accelPGz').innerHTML = accel.z;
 }
 
+function errorAccelPhonegap(error) {
+	document.getElementById('accelPGx').innerHTML = "n/a";
+	document.getElementById('accelPGy').innerHTML = "n/a";
+	document.getElementById('accelPGz').innerHTML = "n/a";
+}
+
+// ************ GeoLocation ************
+
 var geolocationWatch = null;
+
 function toggleGeolocation()
 {
 	if (geolocationWatch !== null) {
 		navigator.geolocation.clearWatch(geolocationWatch);
-		updateGeolocation({coords:{
+		updateGeolocation({ coords: {
 			latitude : "&nbsp;",
 			longitude : "&nbsp;",
 			altitude : "&nbsp;"
@@ -53,19 +68,28 @@ function toggleGeolocation()
 		var options = {};
 		options.frequency = 1000;
 		geolocationWatch = navigator.geolocation.watchPosition(
-				updateGeolocation, function(ex) {
-					alert("geolocation fail (" + ex.name + ": " + ex.message + ")");
-				}, options);
+			updateGeolocation,
+			errorGeolocation,
+			options);
 	}
 }
 
-function updateGeolocation(a) {
-	document.getElementById('geoLat').innerHTML = a.coords.latitude;
-	document.getElementById('geoLong').innerHTML = a.coords.longitude;
-	document.getElementById('geoAlt').innerHTML = a.coords.altitude;
+function updateGeolocation(loc) {
+	document.getElementById('geoLat').innerHTML = loc.coords.latitude;
+	document.getElementById('geoLong').innerHTML = loc.coords.longitude;
+	document.getElementById('geoAlt').innerHTML = loc.coords.altitude;
 }
 
+function errorGeolocation(loc) {
+	document.getElementById('geoLat').innerHTML = "n/a";
+	document.getElementById('geoLong').innerHTML = "n/a";
+	document.getElementById('geoAlt').innerHTML = "n/a";
+}
+
+// ************ Compass ************
+
 var compassWatch = null;
+
 function toggleCompass()
 {
 	if (compassWatch !== null) {
@@ -78,12 +102,17 @@ function toggleCompass()
 		var options = {};
 		options.frequency = 1000;
 		compassWatch = navigator.compass.watchHeading(
-				updateCompass, function(ex) {
-					alert("compass fail (" + ex.name + ": " + ex.message + ")");
-				}, options);
+			updateCompass,
+			errorCompass,
+			options);
 	}
 }
 
-function updateCompass(a) {
-	document.getElementById('CompassHeading').innerHTML = a.magneticHeading;
+function updateCompass(result) {
+	document.getElementById('CompassHeading').innerHTML =
+		result.magneticHeading;
+}
+
+function errorCompass(error) {
+	document.getElementById('CompassHeading').innerHTML = "n/a";
 }
