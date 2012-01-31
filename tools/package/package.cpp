@@ -52,8 +52,8 @@ static const char* sUsage =
 "                              Format: major[.minor][.micro][.qualifier]\n"
 "                              Some parts may be ignored by some platforms.\n"
 "     --permissions <perms>    Output: Permissions requested from the platform.\n"
-"                              Comma-separated list containing any combination of\n"
-"                              these strings: <todo>\n"
+"                              Comma-separated list containing any combination\n"
+"                              of these strings: <todo>\n"
 "     --debug                  Output: use debug runtime.\n"
 "     --s60v3uid <8-digit hex> Output: Symbian UID, 3rd edition.\n"
 "     --s60v2uid <8-digit hex> Output: Symbian UID, 2nd edition.\n"
@@ -76,6 +76,11 @@ static const char* sUsage =
 "     --android-alias <alias>  Key alias (Android only).\n"
 "     --android-keypass <password>\n"
 "                              Key password (Android only).\n"
+"     --wp-config              Configuration name (Windows Phone only).\n"
+//"     --wp-target              Ignored (Windows Phone only).\n"
+"     --wp-guid                Application's GUID (Windows Phone only).\n"
+"     --wp-project-only        Don't build the generated Windows Phone project.\n"
+"                              Required on non-Windows hosts.\n"
 // Re-enable later
 //"     --blackberry-packcod     Pack BlackBerry using the COD file format (BlackBerry only).\n"
 //"     --blackberry-jde <jde-location>\n"
@@ -83,10 +88,10 @@ static const char* sUsage =
 //"     --blackberry-signkey <password>\n"
 //"                              Signing file password (BlackBerry only).\n"
 "     --javame-keystore <file> Keystore for signing (JavaME only).\n"
-"     --javame-storepass <password>"
+"     --javame-storepass <password>\n"
 "                              Keystore password (JavaME only).\n"
 "     --javame-alias <alias>   Key alias (JavaME only).\n"
-"     --javame-keypass <password>"
+"     --javame-keypass <password>\n"
 "                              Key password (JavaME only).\n"
 " -s, --silent                 Output: Supress additional output, e.g. warnings.\n"
 "\n"
@@ -249,8 +254,10 @@ void testName(const SETTINGS& s) {
 void testProfileType(const SETTINGS& s) {
 	if (s.profileType) {
 		if (strcmp(s.profileType, "device") &&
-			strcmp(s.profileType, "platform")) {
-			printf("Profile type must be \"device\" or \"platform\"\n");
+			strcmp(s.profileType, "platform"))
+		{
+			printf("Invalid profile type: \"%s\"\n", s.profileType);
+			printf("Must be \"device\" or \"platform\"\n");
 			exit(1);
 		}
 	}

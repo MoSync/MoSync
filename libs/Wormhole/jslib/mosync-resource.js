@@ -1,4 +1,4 @@
-/**
+/*
  * @file mosync.resource.js
  * @author Ali Sarrafi
  *

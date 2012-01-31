@@ -9,6 +9,8 @@ NAME MOSR // 4-letter ID, unique resource identifier for the application
 #include <avkon.rsg>
 #include <MoSync.hrh>
 
+CHARACTER_SET UTF8
+
 RESOURCE RSS_SIGNATURE { } // Needs to be left empty
 
 RESOURCE TBUF r_default_document_name { buf=""; }

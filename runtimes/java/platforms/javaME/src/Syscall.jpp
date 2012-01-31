@@ -1905,19 +1905,23 @@ public
 				return 0;
 			}
 
+#define LEDIS_MARK 0
+#if LEDIS_MARK
 			if ( ledis.markSupported() )
 			{
 				ledis.mark(ledis.available());
 			}
+#endif
 
 			int ret = (LoadResource(ledis, handle, placeholder)?1:0);
-
+#if LEDIS_MARK
 			if ( ledis.markSupported() )
 			{
 				ledis.reset();
 			}
 
 			if (!ledis.markSupported() || ((flag & MA_RESOURCE_CLOSE) != 0))
+#endif
 			{
 				if (ledis != null) {
 					ledis.close();
