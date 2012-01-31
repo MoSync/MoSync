@@ -24,7 +24,6 @@
   <capability name="Compass" state="REQUIRES_PERMISSION"/>
   <capability name="Device Fonts" state="SUPPORTED"/>
   <capability name="NFC" state="UNSUPPORTED"/>
-  <capability name="OpenGL" state="REQUIRES_PERMISSION"/>
   <capability name="HTML5" state="SUPPORTED"/>
   <capability name="NativeUI" state="SUPPORTED"/>
 </platform>
