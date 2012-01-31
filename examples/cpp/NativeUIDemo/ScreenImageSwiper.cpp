@@ -48,11 +48,18 @@ MA 02110-1301, USA.
 
 #define DEFAULT_IMAGE_INDEX				0
 
+/**
+ * Google Publisher ID for ads banner.
+ * Replace this constant with your publisher id.
+ */
+#define ADS_PUBLISHER_ID "a14dbba084368db"
+
 /*
  * Constructor
  */
 ScreenImageSwiper::ScreenImageSwiper():
-	Screen()
+	Screen(),
+	mAdsBanner(NULL)
 {
 	createUI();
 
@@ -67,6 +74,9 @@ ScreenImageSwiper::~ScreenImageSwiper()
 {
 	// Remove the timer
 	MAUtil::Environment::getEnvironment().removeTimer(this);
+
+	// Delete the ads banner.
+	delete mAdsBanner;
 }
 
 /*
@@ -104,6 +114,13 @@ void ScreenImageSwiper::createUI()
 		// Set screen icon for iOS.
 		setIcon(RES_TAB_ICON_IMAGE_SWIPER);
 	}
+
+	// Create ads banner.
+	mAdsBanner = new Ads::Banner(ADS_PUBLISHER_ID);
+	mAdsBanner->requestContent(true);
+
+	// Add banner to layout.
+	mMainLayout->addBanner(mAdsBanner);
 
 	// Get the screen size.
 	getScreenSize();
