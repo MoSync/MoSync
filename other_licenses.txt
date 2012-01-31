@@ -174,3 +174,7 @@ build-one.rb
 /runtimes/csharp/windowsphone/mosync/mosync/mosync.csproj
 /tools/winphone-builder/pugixml-1.0
 
+/libs/Wormhole/jslib/mdDocs
+/libs/Wormhole/jslib/template
+
+/tools/ReleasePackageBuild/JoDoc
