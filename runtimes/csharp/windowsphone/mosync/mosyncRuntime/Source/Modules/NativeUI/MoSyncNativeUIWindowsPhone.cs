@@ -264,12 +264,20 @@ namespace MoSync
                 set
                 {
                     bool val = Boolean.Parse(value);
-                    if (false == val) mView.Visibility = Visibility.Collapsed;
-                    else mView.Visibility = Visibility.Visible;
-                }
-                get
-                {
-                    if (Visibility.Collapsed == mView.Visibility)
+                    if(false == val)
+					{
+						mView.IsHitTestVisible = false;
+						mView.Opacity = 0.0;
+					}
+					else
+					{
+						mView.IsHitTestVisible = true;
+						mView.Opacity = 1.0;
+					}
+				}
+				get
+				{
+				if (false == mView.IsHitTestVisible)
                     {
                         return "false";
                     }

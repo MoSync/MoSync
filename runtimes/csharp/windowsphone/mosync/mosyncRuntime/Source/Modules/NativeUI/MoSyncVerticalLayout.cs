@@ -57,6 +57,12 @@ namespace MoSync
             //The main column of the Grid object (an vertical layout is a grid with one column)
             protected ColumnDefinition mColDef;
 
+            //the inter widget spacer unit type
+            protected GridUnitType mGridUnitType;
+
+            //the inter widget spacer value
+            protected int mGridUnitTypeValue;
+
             /**
              * The constructor
              */
@@ -88,7 +94,11 @@ namespace MoSync
                 this.fillSpaceVerticalyEnabled = false;
                 this.fillSpaceHorizontalyEnabled = false;
 
+                mGridUnitType = GridUnitType.Pixel;
+                mGridUnitTypeValue = 0;
+
                 mView = mGrid;
+
                 mGrid.Margin = new Thickness(0.0);
 #if DEBUG
                 mGrid.ShowGridLines = true;
@@ -106,17 +116,30 @@ namespace MoSync
                 {
                     WidgetBaseWindowsPhone widget = (child as WidgetBaseWindowsPhone);
                     RowDefinition rowDef = new RowDefinition();
+                    RowDefinition uSpacerRowDef = new RowDefinition();
+                    RowDefinition bSpacerRowDef = new RowDefinition();
 
-                    if (widget.fillSpaceVerticalyEnabled) rowDef.Height = new System.Windows.GridLength(1, System.Windows.GridUnitType.Star);
+                    if (widget.fillSpaceVerticalyEnabled)
+                    {
+                        rowDef.Height = new System.Windows.GridLength(1, System.Windows.GridUnitType.Star);
+                        mGridUnitType = GridUnitType.Auto;
+                        mGridUnitTypeValue = 1;
+                    }
                     else if (double.IsNaN(widget.Height) == false && 0 != widget.Height)
                     {
                         rowDef.Height = new System.Windows.GridLength(widget.Height, System.Windows.GridUnitType.Pixel);
+                        mGridUnitType = GridUnitType.Auto;
+                        mGridUnitTypeValue = 1;
                     }
                     else
                     {
                         rowDef.Height = new System.Windows.GridLength(1, System.Windows.GridUnitType.Auto);
                     }
 
+                    uSpacerRowDef.Height = new System.Windows.GridLength(mGridUnitTypeValue, mGridUnitType);
+                    bSpacerRowDef.Height = new System.Windows.GridLength(mGridUnitTypeValue, mGridUnitType);
+
+                    mGrid.RowDefinitions.Insert(mGrid.RowDefinitions.Count - 1, uSpacerRowDef);
                     mGrid.RowDefinitions.Insert(mGrid.RowDefinitions.Count - 1, rowDef);
 
                     if (widget.View is FrameworkElement)
@@ -128,6 +151,9 @@ namespace MoSync
 
                     Grid.SetColumn((widget.View as System.Windows.FrameworkElement), 1);
                     Grid.SetRow((widget.View as System.Windows.FrameworkElement), mGrid.RowDefinitions.Count - 2);
+
+                    mGrid.RowDefinitions.Insert(mGrid.RowDefinitions.Count - 1, bSpacerRowDef);
+                    setSpacers(mGridUnitTypeValue, mGridUnitType);
                 });
             }
 
@@ -158,7 +184,9 @@ namespace MoSync
                 {
                     WidgetBaseWindowsPhone widget = (child as WidgetBaseWindowsPhone);
                     int x = Grid.GetRow((widget.View) as System.Windows.FrameworkElement);
+                    mGrid.RowDefinitions.RemoveAt(x + 1);
                     mGrid.RowDefinitions.RemoveAt(x);
+                    mGrid.RowDefinitions.RemoveAt(x - 1);
                     mGrid.Children.Remove((child as WidgetBaseWindowsPhone).View);
                 });
                 base.RemoveChild(child);
@@ -203,18 +231,30 @@ namespace MoSync
                 {
                     if (value.Equals(MoSync.Constants.MAW_ALIGNMENT_BOTTOM))
                     {
+                        mGridUnitType = GridUnitType.Pixel;
+                        mGridUnitTypeValue = 0;
+                        setSpacers(mGridUnitTypeValue, mGridUnitType);
+
                         mGrid.VerticalAlignment = VerticalAlignment.Bottom;
                         mSpacerUp.Height = new GridLength(1, GridUnitType.Star);
                         mSpacerDown.Height = new GridLength(0);
                     }
                     else if (value.Equals(MoSync.Constants.MAW_ALIGNMENT_TOP))
                     {
+                        mGridUnitType = GridUnitType.Pixel;
+                        mGridUnitTypeValue = 0;
+                        setSpacers(mGridUnitTypeValue, mGridUnitType);
+
                         mGrid.VerticalAlignment = VerticalAlignment.Top;
                         mSpacerDown.Height = new GridLength(1, GridUnitType.Star);
                         mSpacerUp.Height = new GridLength(0);
                     }
                     else if (value.Equals(MoSync.Constants.MAW_ALIGNMENT_CENTER))
                     {
+                        mGridUnitType = GridUnitType.Star;
+                        mGridUnitTypeValue = 1;
+                        setSpacers(mGridUnitTypeValue, mGridUnitType);
+
                         mGrid.VerticalAlignment = VerticalAlignment.Center;
                         mSpacerDown.Height = new GridLength(1, GridUnitType.Auto);
                         mSpacerUp.Height = new GridLength(1, GridUnitType.Auto);
@@ -287,6 +327,23 @@ namespace MoSync
                         mPaddingRight = val;
                         mSpacerRight.Width = new GridLength(mPaddingRight);
                     }
+                }
+            }
+
+            //Sets all the inter widget spacers to 0 or star
+            public void setSpacers(int gridUnitValue, GridUnitType gridUnitType)
+            {
+                for (int i = 1; i < mGrid.RowDefinitions.Count - 1; i += 2)
+                {
+                    mGrid.RowDefinitions[i].Height = new GridLength(gridUnitValue, gridUnitType);
+                }
+                if (0 == mPaddingBottom)
+                {
+                    mSpacerDown.Height = new GridLength(0, GridUnitType.Pixel);
+                }
+                if (0 == mPaddingTop)
+                {
+                    mSpacerUp.Height = new GridLength(0, GridUnitType.Pixel);
                 }
             }
         }
