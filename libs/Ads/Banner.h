@@ -35,6 +35,9 @@ MA 02110-1301, USA.
 #include <MAUtil/String.h>
 #include <MAUtil/Vector.h>
 
+/**
+* \brief MoSync Ads API.
+*/
 namespace Ads
 {
 

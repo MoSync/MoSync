@@ -26,6 +26,7 @@ module Defaults
 def set_defaults
 	# Array of Strings, directories that will be searched for source files.
 	default(:SOURCES, [])
+
 	# String, extra flags used when compiling C files.
 	default(:EXTRA_CFLAGS, "")
 	# String, extra flags used when compiling C++ files.
@@ -42,9 +43,11 @@ def set_defaults
 	default(:EXTRA_SOURCETASKS, [])
 	# Array of FileTasks, precompiled object files, to link with.
 	default(:EXTRA_OBJECTS, [])
+
 	# Array of Tasks that should be invoked before the others.
 	# For example, resource generation.
 	default(:PREREQUISITES, [])
+
 	# Array of Strings, names of static libraries built earlier, to link with.
 	default(:LOCAL_LIBS, [])
 	# Array of Strings, names of shared libraries built earlier, to link with.
@@ -55,11 +58,23 @@ def set_defaults
 	default(:WHOLE_LIBS, [])
 	# Array of Strings, names of libraries to link with.
 	default(:LIBRARIES, [])
+
+	# Array of Strings, paths to LST files containing resource definitions.
+	# If this is false or nil, it will be populated from @SOURCES.
+	default(:LSTFILES, false)
+	# String, path to file to be fed into rescomp.
+	# Overrides @LSTFILES and @resourceTask.
+	default(:LSTX, false)
+	# String, platforms used by rescomp.
+	default(:RES_PLATFORM, '')
+
 	# Hash(String,String). Key is the filename of a source file.
 	# Value is extra compile flags to be used when compiling that file.
 	default(:SPECIFIC_CFLAGS, {})
+
 	# String, extra flags used when invoking MoRE in PipeExeWork's automatic "run" target
 	default(:EXTRA_EMUFLAGS, '')
+
 	# String, name of the base build directory.
 	default(:BUILDDIR_BASE, "build/")
 	# String, added to the beginning of build directories.

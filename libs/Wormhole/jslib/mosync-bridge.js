@@ -16,7 +16,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301, USA.
 */
 
-/**
+
+/*
  * @file mosync-bridge.js
  * @author Mikael Kindborg, Ali Sarrafi
  *
@@ -90,15 +91,71 @@ var mosync = (function()
 			return n;
 		};
 
+		// Thanks to: http://jsfromhell.com/geral/utf-8
+		// Author: Jonas Raoni Soares Silva
+		// Note: Function not used.
+		encoder.encodeUTF8 = function(s){
+			for(var c, i = -1, l = (s = s.split("")).length, o = String.fromCharCode; ++i < l;
+				s[i] = (c = s[i].charCodeAt(0)) >= 127 ? o(0xc0 | (c >>> 6)) + o(0x80 | (c & 0x3f)) : s[i]
+			);
+			return s.join("");
+		};
+
+		// Thanks to: http://jsfromhell.com/geral/utf-8
+		// Author: Jonas Raoni Soares Silva
+		// Note: Function not used.
+		encoder.decodeUTF8 = function(s){
+			for(var a, b, i = -1, l = (s = s.split("")).length, o = String.fromCharCode, c = "charCodeAt"; ++i < l;
+				((a = s[i][c](0)) & 0x80) &&
+				(s[i] = (a & 0xfc) == 0xc0 && ((b = s[i + 1][c](0)) & 0xc0) == 0x80 ?
+				o(((a & 0x03) << 6) + (b & 0x3f)) : o(128), s[++i] = "")
+			);
+			return s.join("");
+		};
+
+		/**
+		 * @return The length in bytes of the string encoded
+		 * as UTF8.
+		 */
+		encoder.lengthAsUTF8 = function(s)
+		{
+			var length = 0;
+			for (var i = 0; i < s.length; ++i)
+			{
+				var c = s.charCodeAt(i);
+
+				if (c < 128)
+				{
+					length += 1;
+				}
+				else if ((c > 127) && (c < 2048))
+				{
+					length += 2;
+				}
+				else
+				{
+					length += 3;
+				}
+			}
+			return length;
+		};
+
+		/**
+		 * Encode a string with a length value followed by string data.
+		 */
 		encoder.encodeString = function(s)
 		{
+			var length;
 			var encodedString = "";
-			return encodedString.concat(encoder.itox(s.length), " ", s, " ");
-				/*""
-				+ encoder.itox(s.length)
-				+ " "
-				+ s
-				+ " ";*/
+			if (mosync.isAndroid)
+			{
+				length = encoder.lengthAsUTF8(s);
+			}
+			else
+			{
+				length = s.length;
+			}
+			return encodedString.concat(encoder.itox(length), " ", s, " ");
 		};
 
 		return encoder;

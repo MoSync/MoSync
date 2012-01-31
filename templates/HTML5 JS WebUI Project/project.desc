@@ -6,7 +6,7 @@ description = Template for HTML5/JS projects that use HTML/CSS for the UI. Acces
 [Files]
 index.html -> LocalFiles/index.html
 wormhole.js -> LocalFiles/js/wormhole.js
-master.css -> LocalFiles/master.css
+style.css -> LocalFiles/style.css
 Resources.lst -> Resources/Resources.lst
 beep.wav -> Resources/beep.wav
 main.cpp
