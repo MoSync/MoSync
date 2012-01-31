@@ -218,3 +218,27 @@ class BundleTask < FileTask
 		sh "#{mosyncdir}/bin/Bundle -in \"#{@srcDir}\" -out \"#{@NAME}\""
 	end
 end
+
+class RescompTask < FileTask
+	def initialize(work, targetDir, src, platform)
+		super(work, targetDir + '~tmpres.lst')
+		@targetDir = targetDir
+		@src = src
+		@platform = platform
+		@prerequisites << FileTask.new(work, src)
+		initFlags
+	end
+	def needed?(log = true)
+		return true if(super(log))
+		return flagsNeeded?(log)
+	end
+	def cFlags
+		return " -L \"#{@platform}\" \"#{@targetDir}\" \"#{@src}\""
+	end
+	def execute
+		execFlags
+		sh "#{mosyncdir}/bin/rescomp#{cFlags}"
+	end
+
+	include FlagsChanged
+end

@@ -6,8 +6,9 @@ description = Template for hybrid HTML5/JS/C++ projects. Extend the application 
 [Files]
 index.html -> LocalFiles/index.html
 wormhole.js -> LocalFiles/js/wormhole.js
-MoSyncLogo.png -> LocalFiles/images/MoSyncLogo.png
+style.css -> LocalFiles/style.css
 Resources.lst -> Resources/Resources.lst
+beep.wav -> Resources/beep.wav
 main.cpp
 
 [Settings]

@@ -20,6 +20,13 @@ namespace MoSync
 	{
 		delegate void ResultHandler(int handle, int connOp, int result);
 
+		static void WriteIPv4(Memory m, int addr, IPEndPoint ie)
+		{
+			m.WriteInt32(addr + MoSync.Struct.MAConnAddr.family, MoSync.Constants.CONN_FAMILY_INET4);
+			m.WriteBytes(addr + MoSync.Struct.MAConnAddr.inet4.addr, ie.Address.GetAddressBytes(), 4);
+			m.WriteInt16(addr + MoSync.Struct.MAConnAddr.inet4.port, (short)ie.Port);
+		}
+
 		// represents either a Socket or a WebRequest
 		abstract class Connection
 		{
@@ -32,7 +39,7 @@ namespace MoSync
 
 			// immediate
 			public abstract void close();
-			public abstract int getAddr(int _addr);
+			public abstract int getAddr(Memory m, int _addr);
 		}
 
 		class SocketConnection : Connection
@@ -116,11 +123,19 @@ namespace MoSync
 			{
 				mSocket.Close();
 			}
-			public override int getAddr(int _addr)
+			public override int getAddr(Memory m, int _addr)
 			{
 				EndPoint endPoint = mSocket.RemoteEndPoint;
-				SocketAddress socketAddress = endPoint.Serialize();
-				return -1;
+				switch (endPoint.AddressFamily)
+				{
+					case AddressFamily.InterNetwork:
+						WriteIPv4(m, _addr, (IPEndPoint)endPoint);
+						return 0;
+					case AddressFamily.Unspecified:
+						return -1;
+					default:
+						return MoSync.Constants.CONNERR_INTERNAL;
+				}
 			}
 		}
 
@@ -272,8 +287,9 @@ namespace MoSync
 				if (mRequest != null)
 					mRequest.Abort();
 			}
-			public override int getAddr(int _addr)
+			public override int getAddr(Memory m, int _addr)
 			{
+				// not available for WebRequests on WindowsPhone.
 				return -1;
 			}
 			public String getResponseHeader(String key)
@@ -351,10 +367,10 @@ namespace MoSync
 
 			syscalls.maConnGetAddr = delegate(int _conn, int _addr)
 			{
-				if (_conn == 0) // todo: local address
+				if (_conn == MoSync.Constants.HANDLE_LOCAL) // unavailable
 					return -1;
 				Connection c = mConnections[_conn];
-				return c.getAddr(_addr);
+				return c.getAddr(core.GetDataMemory(), _addr);
 			};
 
 			syscalls.maConnRead = delegate(int _conn, int _dst, int _size)
