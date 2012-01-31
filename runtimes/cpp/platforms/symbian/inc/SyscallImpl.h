@@ -57,7 +57,7 @@ private:
 	enum StreamState {
 		SS_IDLE, SS_OPENING, SS_PREPARING, SS_LOADING, SS_PLAYING, SS_PAUSED, SS_ERROR
 	};
-	
+
 	enum CameraState {
 		CS_IDLE, CS_RESERVING, CS_POWERING, CS_POWERED
 	};
@@ -132,6 +132,8 @@ private:
 
 	void CallHandlerL(TInt status);
 	void HangupHandlerL(TInt status);
+
+	int platformTel(const char* tel);
 #endif	//CALL
 
 	//Location API
@@ -184,11 +186,11 @@ private:
 	int maCameraStart();
 	int maCameraStop();
 	int maCameraSnapshot(int formatIndex, MAHandle placeholder);
-	
+
 	TCameraInfo gCameraInfo;
 	CCamera::TFormat gCameraFormat;
 	MAHandle gCameraPlaceholder;
-	
+
 	//MCameraObserver
 	virtual void ReserveComplete(TInt aError);
 	virtual void PowerOnComplete(TInt aError);
@@ -263,10 +265,10 @@ private:
 		TInt16 mWriteBuffer[SOUND_NSAMPLES * SOUND_NCHANNELS];
 		TInt32 mMixBuffer[SOUND_NSAMPLES * SOUND_NCHANNELS];
 		TPtrC8 mWritePtr;
-		
+
 		CMdaAudioOutputStream* mStream;
 		TMdaAudioDataSettings mStreamSettings;
-		
+
 		CMMFCodec* mCodec;
 
 		bool mStart;
@@ -283,7 +285,7 @@ private:
 #ifdef MMF
 	RMMFController gController;
 	CMMFControllerEventMonitor* gControllerEventMonitor;
-	
+
 	//MMMFControllerEventMonitorObserver
 	void HandleEvent(const TMMFEvent& aEvent);
 #else	//Mda
@@ -298,12 +300,12 @@ private:
 	int maAudioBufferInit(const MAAudioBufferInfo*);
 	int maAudioBufferReady();
 	int maAudioBufferClose();
-	
+
 	//MMdaAudioOutputStreamCallback
 	void MaoscOpenComplete(TInt aError);
 	void MaoscBufferCopied(TInt aError, const TDesC8 &aBuffer);
 	void MaoscPlayComplete(TInt aError);
-	
+
 	struct {
 		TMdaAudioDataSettings::TAudioCaps sampleRateId;
 		TMdaAudioDataSettings::TAudioCaps chanId;
@@ -320,7 +322,7 @@ private:
 #endif
 
 	int maGetSystemProperty(const char* key, char* buf, int size);
-	
+
 	int maTextBox(const wchar* title, const wchar* inText, wchar* outText,
 		int maxSize, int constraints);
 
@@ -336,9 +338,9 @@ private:
 	void RestoreDrawTarget();
 
 	int gStartTime;
-	
+
 	HashMap<FileList> gFileLists;
-	
+
 	int getVolumeInfo(MAHandle file, TVolumeInfo& vi);
 
 #ifdef	__SERIES60_3X__
@@ -349,11 +351,11 @@ private:
 #endif
 
 private:
-#define NETWORKING_H  
+#define NETWORKING_H
 #include "netImpl.h"
 
 private:
-#define BTIMPL_H  
+#define BTIMPL_H
 #include "btImpl.h"
 
 #ifdef GUIDO
