@@ -75,7 +75,6 @@ p {
 
 #sidebar li {
 	color:#DD0000;
-
  	font-size:18px;
 	list-style:disc;
 	margin:15px 0px;
@@ -102,20 +101,10 @@ p {
   padding-left:20px;
   padding-right:40px;
 }
-#contents_index ul {
-	margin:  0 auto;
-	padding: 20px;
-}
 
-#contents_index li {
-	list-style:none;
-	margin: auto;
-	float: left;
-	margin:30px;
+#contents_index a {
 	font-size: 18px;
 	color: black;
-	 border: 1px solid #CCC;
-	padding: 5px;
 }
 
 

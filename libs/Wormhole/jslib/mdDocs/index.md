@@ -1,10 +1,10 @@
 
 
 <div id="contents_index">
-
-
 			<h1>Wormhole API Documentation</h1>
-			<table border="1" bordercolor="#A09F9F" style="background-color:#EFEFEF" width="100%" cellpadding="3" cellspacing="0">
+			<table id="index_table" border="1"  style="background-color:#EFEFEF;border-color:#989898"
+					width="100%" height="500px" cellpadding="20" cellspacing="0">
+
 				<tr>
 					<td>Sensor Manager</td>
 					<td>Native UI</td>
@@ -26,22 +26,4 @@
 					<td>Storage <br>(PhoneGap Compatible)</td>
 				</tr>
 			</table>
-			
-
-
-
-<!--	<ul>
-	<li>Sensor Manager</li>
-	<li>Native UI</li>
-	<li>Push Notifications</li>
-	<li>Notification (PhoneGap Compatible)</li>
-	<li>Accelerometer (PhoneGap Compatible)</li>
-	<li>Compass (PhoneGap Compatible)</li>
-	<li>Device (PhoneGap Compatible)</li>
-	<li>Connection (PhoneGap Compatible)</li>
-	<li>Capture (PhoneGap Compatible)</li>
-	<li>File (PhoneGap Compatible)</li>
-	<li>Geolocation (PhoneGap Compatible)</li>
-	<li>Storage (PhoneGap Compatible)</li>	
-	</ul>-->
 </div>
