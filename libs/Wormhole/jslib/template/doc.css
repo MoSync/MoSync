@@ -1,13 +1,4 @@
-/**
-	doc.css
-	=======
 
-	Requires `docbody.css`, which is split with the intention of using
-	documentation in a jo app without messing with the `body` definition
-	in the app.
-
-	Support for printed media is included for generating nice PDF files.
-*/
 p {
 	text-align: left;
 }
@@ -21,37 +12,112 @@ p {
 	font-size: 20px;
 }
 
-/* using `<cite>` for pretty titles */
-cite {
-	position: relative;
-	line-height: .9;
-	background: #07c7c3;
-	display: block;
-	text-align: right;
-	font-size: 70px;
-	color: #fff;
-	font-style: normal;
-	margin: 0;
-	padding: 20px 30px 20px 20px;
-	letter-spacing: -10px;
-	overflow: hidden;
+#header_bar {
+  background-color:#515151;
+  background:#515151 -webkit-gradient(
+    linear,
+    left top,
+    left bottom,
+    color-stop(0.2, #515151),
+    color-stop(0.8, #302F2D)
+  );
+  background:-moz-linear-gradient(center bottom , #515151 20%, #747474 80%);
+  border-top:1px solid #919192;
+  height:64px;
+  left:0px;
+  position:fixed;
+  top:0px;
+  width:100%;
+  z-index:1;
+  font-color: white;
+}
+#header_bar h1  {
+	color:#F6F4F2;
+	font-size:26px;
+	font-weight:normal;
+	margin:0px;
+	text-align:center;
+	text-shadow:0px -1px 1px #222222;
 }
 
-cite>cite {
-	letter-spacing: 0;
-	margin: 0;
-	padding: 0;
-	font-size: 25%;
-	margin-right: -10px;
-	font-style: italic;
-	background: transparent;
-	overflow: visible;
+#header_bar a img {
+	height:64px;
+	float: none;
+	margin:0px;
+	position: absolute;
+	top:0px;
+	left: 0px;
 }
 
-cite a[href] {
-	background: inherit;
-	padding: 0;
+#header_bar small {
+  color:#EFEFEF;
+  font-size:14px;
+  line-height:32px;
+  position:absolute;
+  top:0px;
+  right:20px;
+  text-shadow:-1px 1px 1px #666666;
 }
+
+#sidebar {
+  background-color:#ECEAE7;
+  bottom:0px;
+  left:0px;
+  overflow:auto;
+  padding-left:20px;
+  padding-right:40px;
+  position:fixed;
+  text-align:left;
+  top:66px;
+  width:280px;
+  z-index:1;
+}
+
+#sidebar li {
+	color:#DD0000;
+
+ 	font-size:18px;
+	list-style:disc;
+	margin:15px 0px;
+	text-shadow:#FFFFFF 0px 1px 1px;
+}
+#contents_div {
+  bottom:0px;
+  left:340px;
+  position:fixed;
+  overflow:auto;
+  right:0px;
+  top:64px;
+  padding-left:20px;
+  padding-right:40px;
+}
+
+#contents_index {
+  bottom:0px;
+  left:340px;
+  position:fixed;
+  overflow:auto;
+  right:0px;
+  top:64px;
+  padding-left:20px;
+  padding-right:40px;
+}
+#contents_index ul {
+	margin:  0 auto;
+	padding: 20px;
+}
+
+#contents_index li {
+	list-style:none;
+	margin: auto;
+	float: left;
+	margin:30px;
+	font-size: 18px;
+	color: black;
+	 border: 1px solid #CCC;
+	padding: 5px;
+}
+
 
 em {
 	font-weight: normal;
@@ -63,7 +129,10 @@ blockquote em {
 }
 
 ul > li {
-	list-style: disc;
+  list-style:disc;
+  margin:15px 0px;
+  text-shadow:#FFFFFF 0px 1px 1px;
+	/*list-style: disc;*/
 }
 
 ul {
@@ -112,12 +181,12 @@ blockquote code {
 
 h1 {
 	margin-top: 0;
-	color: #07c7c3;
+	color: black;
 	font-size: 38px;
 	font-weight: normal;
 	margin-bottom: 0;
-	margin-left: -1px;
-	letter-spacing: -1px;
+	margin-left: 0px;
+	letter-spacing: 0px;
 }
 
 h2 {
@@ -163,15 +232,6 @@ a[href] {
 	white-space: nowrap;
 	text-decoration: none;
 	color: inherit;
-	padding: 1px .6em;
-	background: #f5f6f7;
-	background: rgba(0, 0, 0, .05);
-	-webkit-border-radius: .6em;
-	-moz-border-radius: .6em;
-	border-radius: .6em;
-	-webkit-transition: background .2s ease-out, -webkit-box-shadow .1s ease-out, color .15s ease-out;
-	-moz-transition: background .2s ease-out, -webkit-box-shadow .1s ease-out, color .15s ease-out;
-	-o-transition: background .2s ease-out, -webkit-box-shadow .1s ease-out, color .15s ease-out;
 }
 
 pre code a[href] {
@@ -225,7 +285,7 @@ th {
 }
 
 th:first {
-	border-left: 1px solid #0d0d0d;	
+	border-left: 1px solid #0d0d0d;
 }
 
 td {
@@ -281,24 +341,24 @@ hr:before {
 		margin: 0;
 		font-size: 89%;
 	}
-	
+
 	h1, h2 {
 		page-break-after: avoid;
 	}
-	
+
 	h1>p, h2>p{
 		page-break-before: avoid;
 	}
-	
+
 	pre {
 		page-break-before: auto;
 		page-break-inside: avoid;
 	}
-	
+
 	blockquote {
 		page-break-inside: avoid;
 	}
-	
+
 	hr {
 		page-break-before: always;
 		font-size: inherit;
@@ -309,7 +369,7 @@ hr:before {
 		content: "";
 		font-size: inherit;
 	}
-	
+
 	a[href] {
 		background: none;
 		padding: 0;
@@ -317,7 +377,7 @@ hr:before {
 		-moz-border-radius: none;
 		border-radius: none;
 	}
-	
+
 	#index {
 		display: none;
 	}

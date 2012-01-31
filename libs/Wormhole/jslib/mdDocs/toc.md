@@ -1,17 +1,19 @@
 
-WormHole
+Wormhole
 -------------------
 - Sensor Manager
 - Native UI
 - Push Notifications
-- Notification (PhoneGap Compatible)
-- Accelerometer (PhoneGap Compatible)
-- Compass (PhoneGap Compatible)
-- Device (PhoneGap Compatible)
-- Connection (PhoneGap Compatible)
-- Capture (PhoneGap Compatible)
-- File (PhoneGap Compatible)
-- Geolocation (PhoneGap Compatible)
-- Storage (PhoneGap Compatible)
+- Notification
+- Accelerometer
+- Compass
+- Device
+- Connection
+- Capture
+- File
+- Geolocation
+- Storage
 
 [Keyword Index](./_index.html)
+
+[License](./licenses.md.html)
