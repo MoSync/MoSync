@@ -4291,7 +4291,7 @@ group WidgetAPI "Widget API" {
 			int videoViewState;
 
 			/**
-			* Send by the OptionDialog view when a #MAW_EVENT_OPTION_DIALOG_BUTTON_CLICKED event is received.
+			* Send by the OptionDialog view when a #EVENT_TYPE_OPTIONS_BOX_BUTTON_CLICKED event is received.
 			*/
 			int optionDialogButtonIndex;
 		}
@@ -9680,7 +9680,7 @@ group NotificationAPI "Notification API" {
 			*
 			* @validvalue One of the constants:
 			* - #MA_NOTIFICATION_DISPLAY_FLAG_DEFAULT Which is enabled by default.
-			* - #MA_NOTIFICATION_DISPLAY_FLAG_ ANYTIME.
+			* - #MA_NOTIFICATION_DISPLAY_FLAG_ANYTIME.
 			*
 			* @setonly
 			*
@@ -9755,7 +9755,7 @@ group NotificationAPI "Notification API" {
 			* - a value for the ledARGB field (for the color),
 			* - the ledOffMS field (length of time, in milliseconds, to keep the light off),
 			* - the ledOnMS (length of time, in milliseconds, to keep the light on).
-			*  returns #MA_NOTIFICATION_ERROR if the current device doesn't support flashing LED.
+			*  returns #MA_NOTIFICATION_RES_ERROR if the current device doesn't support flashing LED.
 			* @setonly
 			*
 			* @par Example
@@ -9879,7 +9879,7 @@ group NotificationAPI "Notification API" {
 		* Calling this method also programmatically dismisses the notification if
 		* it is currently displaying an alert.
 		*
-		* \param bannerHandle Handle to a local notification object.
+		* \param notificationHandle Handle to a local notification object.
 		*
 		* \returns One of the next constants:
 		* - #MA_NOTIFICATION_RES_OK if no error occurred.
@@ -9925,9 +9925,9 @@ group NotificationAPI "Notification API" {
 
 		/**
 		* \brief Gets the latest push notification registration response.
-		* \param buffer The registrationID if the registration was successfull, or the error messsage otherwise.
-		* \param bufSize Size of the buffer.
-		* \response  One of the next constants:
+		* \param registrationMesssage The registrationID if the registration was successfull, or the error messsage otherwise.
+		* \param registrationMessageSize Size of the buffer.
+		* \returns  One of the next constants:
 		* - #MA_NOTIFICATION_RES_OK if the application registered successfully.
 		* - #MA_NOTIFICATION_RES_REGISTRATION_NOT_CALLED if maNotificationPushRegister was not called.
 		* - #MA_NOTIFICATION_RES_REGISTRATION_MESSAGE_BUF_TOO_SMALL if the buffer is too small.
@@ -10008,7 +10008,7 @@ group NotificationAPI "Notification API" {
 		* \brief Set the display flags applied to the incoming push notifications.
 		* Note that regardless of this setting, the #EVENT_TYPE_PUSH_NOTIFICATION event
 		* will be received for each incoming notification.
-		* #MA_NOTIFICATION_DISPLAY_DEFAULT is enabled by default.
+		* #MA_NOTIFICATION_DISPLAY_FLAG_DEFAULT is enabled by default.
 		* Platform: Android only.
 		* \param displayFlag One of the constants:
 		* - #MA_NOTIFICATION_DISPLAY_FLAG_DEFAULT Which is enabled by default.
@@ -10134,7 +10134,7 @@ group CaptureAPI "Capture API" {
 			* On Android devices with API level lower than 8
 			* it returns #MA_CAPTURE_RES_MAX_DURATION_NOT_SUPPORTED.
 			*
-			* @getandset
+			* @setandget
 			*
 			* @par Example
 			* \code
@@ -10155,7 +10155,7 @@ group CaptureAPI "Capture API" {
 			* iOS: Default value is MA_CAPTURE_VIDEO_QUALITY_MEDIUM.
 			* Android: Default value is MA_CAPTURE_VIDEO_QUALITY_HIGH.
 			*
-			* @getandset
+			* @setandget
 			*
 			* @par Example
 			* \code
@@ -10173,7 +10173,7 @@ group CaptureAPI "Capture API" {
 			* @validvalue "false" or "true".
 			* Default value: "true".
 			*
-			* @getandset
+			* @setandget
 			*
 			* @par Example
 			* \code
@@ -10191,7 +10191,7 @@ group CaptureAPI "Capture API" {
 			* @validvalue One of the \link #MA_CAPTURE_FLASH_AUTO MA_CAPTURE_FLASH \endlink constants.
 			* Default value: #MA_CAPTURE_FLASH_AUTO.
 			*
-			* @getandset
+			* @setandget
 			*
 			* @par Example
 			* \code
@@ -10204,12 +10204,13 @@ group CaptureAPI "Capture API" {
 
 			/**
 			* @brief Show/hide default camera controls.
+			* @brief Show/hide default camera controls.
 			* Platform: iOS.
 			*
 			* @validvalue "true" or "false".
 			* Default value: "true".
 			*
-			* @getandset
+			* @setandget
 			*
 			* @par Example
 			* \code
@@ -10283,7 +10284,7 @@ group CaptureAPI "Capture API" {
 		/**
 		* \brief Sets the properties to the Native Image Picker.
 		* \param property A string representing which property to set.
-		*  One of the \link #MA_CAPTURE_ MA_CAPTURE \endlink constants.
+		*  One of the \link #MA_CAPTURE_VIDEO_QUALITY MA_CAPTURE \endlink constants.
 		* \param value The value that will be assigned to the property.
 		*
 		* \returns One of the next constants:
@@ -10298,7 +10299,7 @@ group CaptureAPI "Capture API" {
 		* \brief Retrieves the properties from the Native Image Picker.
 		*
 		* \param property A string representing which property to get.
-		*  One of the \link #MA_CAPTURE_ MA_CAPTURE \endlink constants.
+		*  One of the \link #MA_CAPTURE_VIDEO_QUALITY MA_CAPTURE \endlink constants.
 		* \param value A buffer that will hold the value of the property, represented as a string.
 		* \param bufSize Size of the buffer.
 		*
@@ -10313,7 +10314,7 @@ group CaptureAPI "Capture API" {
 
 		/**
 		* \brief Perform an action on the image picker.
-		* \param action One of the \link #MA_CAPTURE_ACTION_ MA_CAPTURE_ACTION \endlink constants.
+		* \param action One of the \link #MA_CAPTURE_ACTION_TAKE_PICTURE MA_CAPTURE_ACTION \endlink constants.
 		*
 		* \returns One of the next constants:
 		*  - #MA_CAPTURE_RES_OK if no error occurred.

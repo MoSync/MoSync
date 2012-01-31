@@ -299,6 +299,63 @@ MAUtil::DataHandler
 <td><br>
 </td>
 </tr>
+
+<tr style="background-color: rgb(207, 226, 243);">
+<td>
+<strong>Capture</strong>
+</td>
+<td>Access the default camera on the device to capture images and record video.<br>
+</td>
+<td>maCaptureSetProperty(), maCaptureGetProperty(), maCaptureAction(), maCaptureWriteImage(), maCaptureGetImagePath(), maCaptureGetVideoPath(), maCaptureDestroyData()<br>
+</td>
+<td><br>
+</td>
+<td>\ref CaptureAPI<br>
+</td>
+</tr>
+
+<tr style="background-color: rgb(207, 226, 243);">
+<td>
+<strong>Advertising</strong>
+</td>
+<td>The Ads API allows user to create and add banners to applications.<br>
+</td>
+<td>maAdsBannerCreate(), maAdsBannerDestroy(), maAdsAddBannerToLayout(), maAdsRemoveBannerFromLayout(), maAdsBannerSetProperty(), maAdsBannerGetProperty()<br>
+</td>
+<td>\ref AdsAPI<br>
+</td>
+<td>\ref Ads<br>
+</td>
+</tr>
+
+<tr style="background-color: rgb(207, 226, 243);">
+<td>
+<strong>Local and Push Notifications</strong>
+</td>
+<td>Handle both push notifications and local notifications.<br>
+</td>
+<td>maNotificationLocalCreate(), maNotificationLocalDestroy(), maNotificationLocalSetProperty(), maNotificationLocalGetProperty(), maNotificationLocalSchedule(), maNotificationLocalUnschedule(), maNotificationPushRegister(), maNotificationPushUnregister(), maNotificationPushGetRegistration(), maNotificationPushGetData(), maNotificationPushDestroy(), maNotificationSetIconBadge(), maNotificationGetIconBadge(), maNotificationPushSetTickerText(), maNotificationPushSetMessageTitle(), maNotificationPushSetDisplayFlag()<br>
+</td>
+<td>\ref Notification<br>
+</td>
+<td>\ref NotificationAPI<br>
+</td>
+</tr>
+
+<tr style="background-color: rgb(207, 226, 243);">
+<td>
+<strong>Device fonts</strong>
+</td>
+<td>Set device fonts for maDrawText(), maDrawTextW(), and for NativeUI widgets.<br>
+</td>
+<td>maFontLoadDefault(), maFontSetCurrent(), maFontGetCount(), maFontGetName(), maFontLoadWithName(), maFontDelete()<br>
+</td>
+<td><br>
+</td>
+<td><br>
+</td>
+</tr>
+
 <tr style="background-color: rgb(207, 226, 243);">
 <td>
 <strong>Miscellaneous functions</strong>
