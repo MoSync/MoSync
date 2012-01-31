@@ -1,2 +1,4 @@
 <platform family="Android" inherit="SmartPhone" abstract="true">
+  <capability name="OpenGL ES 1.0" state="SUPPORTED"/>
+  <capability name="OpenGL ES 2.0" state="SUPPORTED"/>
 </platform>
