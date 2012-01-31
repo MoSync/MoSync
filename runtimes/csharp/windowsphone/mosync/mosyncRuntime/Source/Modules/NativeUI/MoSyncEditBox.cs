@@ -53,9 +53,19 @@ namespace MoSync
             protected System.Windows.Controls.TextBox mEditBox;
 
             /**
+             * Password box control used when in password mode
+             */
+            protected System.Windows.Controls.PasswordBox mPasswordBox;
+
+            /**
              * if set to true, indicates that all the text is a watermark/placeholder
              */
             protected bool mIsWatermarkMode;
+
+            /**
+             * if set to true, indicates that we are in password mode
+             */
+            protected bool mIsPasswordMode;
 
             /**
              * if true, indicates that this is the first char entered so delete 
@@ -73,6 +83,10 @@ namespace MoSync
              */
             protected String mPlaceholderText;
 
+            /**
+             * The grid contains the edit box and the password box
+             */
+            protected System.Windows.Controls.Grid mEditBoxGrid;
 
             /**
              * Constructor
@@ -80,8 +94,15 @@ namespace MoSync
             public EditBox()
             {
                 mEditBox = new System.Windows.Controls.TextBox();
-                View = mEditBox;
+                mPasswordBox = new System.Windows.Controls.PasswordBox();
+                // by default, the password box is not visible
+                mPasswordBox.Visibility = Visibility.Collapsed;
 
+                createTheEditBoxGrid();
+
+                mView = mEditBoxGrid;
+
+                mIsPasswordMode = false;
                 mIsWatermarkMode = false;
                 mPlaceholderText = "";
 
@@ -136,6 +157,7 @@ namespace MoSync
                             {
                                 Placeholder = mPlaceholderText;
                                 mFirstChar = true;
+                                mIsWatermarkMode = true;
                             }
                         }
 
@@ -165,6 +187,7 @@ namespace MoSync
                           */
                         if (mFirstChar)
                         {
+                            mIsWatermarkMode = false;
                             mFirstChar = false;
                             mEditBox.Text = "";
 
@@ -185,6 +208,67 @@ namespace MoSync
                 ); // end of TextInputStart
 
                 /**
+                 * @brief Sent from the Password box when it gains focus(the user selects the widget).
+                 * The virtual keyboard is shown.
+                 *        MAW_EVENT_EDIT_BOX_EDITING_DID_BEGIN
+                 */
+                mPasswordBox.GotFocus += new RoutedEventHandler(
+                    delegate(object from, RoutedEventArgs args)
+                    {
+                        /**
+                         * post the event to MoSync runtime
+                         */
+                        Memory eventData = new Memory(8);
+                        const int MAWidgetEventData_eventType = 0;
+                        const int MAWidgetEventData_widgetHandle = 4;
+                        eventData.WriteInt32(MAWidgetEventData_eventType, MoSync.Constants.MAW_EVENT_EDIT_BOX_EDITING_DID_BEGIN);
+                        eventData.WriteInt32(MAWidgetEventData_widgetHandle, mHandle);
+                        mRuntime.PostCustomEvent(MoSync.Constants.EVENT_TYPE_WIDGET, eventData);
+                    }
+                ); // end of mPasswordBox.GotFocus
+
+
+                /**
+                  * @brief Sent from the Password box when it loses focus.
+                  * The virtual keyboard is hidden.
+                  *        MAW_EVENT_EDIT_BOX_EDITING_DID_END
+                  */
+                mPasswordBox.LostFocus += new RoutedEventHandler(
+                    delegate(object from, RoutedEventArgs args)
+                    {
+                        /**
+                         * post the event to MoSync runtime
+                         */
+                        Memory eventData = new Memory(8);
+                        const int MAWidgetEventData_eventType = 0;
+                        const int MAWidgetEventData_widgetHandle = 4;
+                        eventData.WriteInt32(MAWidgetEventData_eventType, MoSync.Constants.MAW_EVENT_EDIT_BOX_EDITING_DID_END);
+                        eventData.WriteInt32(MAWidgetEventData_widgetHandle, mHandle);
+                        mRuntime.PostCustomEvent(MoSync.Constants.EVENT_TYPE_WIDGET, eventData);
+                    }
+                ); // end of mPasswordBox.LostFocus
+
+
+                /**
+                  * @brief Sent from the Password box when the text was changed.
+                  *        MAW_EVENT_EDIT_BOX_TEXT_CHANGED
+                  */
+                mPasswordBox.TextInputStart += new TextCompositionEventHandler(
+                    delegate(object from, TextCompositionEventArgs args)
+                    {
+                        /**
+                         * post the event to MoSync runtime
+                         */
+                        Memory eventData = new Memory(8);
+                        const int MAWidgetEventData_eventType = 0;
+                        const int MAWidgetEventData_widgetHandle = 4;
+                        eventData.WriteInt32(MAWidgetEventData_eventType, MoSync.Constants.MAW_EVENT_EDIT_BOX_TEXT_CHANGED);
+                        eventData.WriteInt32(MAWidgetEventData_widgetHandle, mHandle);
+                        mRuntime.PostCustomEvent(MoSync.Constants.EVENT_TYPE_WIDGET, eventData);
+                    }
+                ); // end of mPasswordBox.TextInputStart
+
+                /**
                  * @brief Sent from the Edit box when the return button was pressed.
                  * On iphone platform the virtual keyboard is not closed after receiving this event.
                  * EDIT_BOX_RETURN
@@ -201,10 +285,25 @@ namespace MoSync
             {
                 set
                 {
-                    mEditBox.Text = value;
+                    if (mIsPasswordMode)
+                    {
+                        mPasswordBox.Password = value;
+                    }
+                    else
+                    {
+                        mEditBox.Text = value;
+                    }
                 }
                 get
                 {
+                    if (mIsPasswordMode)
+                    {
+                        return mPasswordBox.Password;
+                    }
+                    if (mIsWatermarkMode)
+                    {
+                        return "";
+                    }
                     return mEditBox.Text;
                 }
             }
@@ -234,7 +333,6 @@ namespace MoSync
                     mEditBox.Text = mPlaceholderText;
                 }
             }
-
 
             /**
              * Property for showing/hidding the keyboard
@@ -285,11 +383,11 @@ namespace MoSync
                         return;
                     }
 
-
+                    setPasswordMode(false);
                     switch (inputType)
                     {
                         case 0:			    //todo: check if Default this is equivalent option to MAW_EDIT_BOX_TYPE_ANY
-                            setInputMode(System.Windows.Input.InputScopeNameValue.Default);
+                            setInputMode(System.Windows.Input.InputScopeNameValue.Text);
                             break;
                         case 1:             //MAW_EDIT_BOX_TYPE_EMAILADDR
                             setInputMode(System.Windows.Input.InputScopeNameValue.EmailSmtpAddress);
@@ -332,9 +430,13 @@ namespace MoSync
                         return;
                     }
 
+                    // by default, the editbox will be visible
+                    setPasswordMode(false);
                     switch (inputFlag)
                     {
                         case 0:			    //MAW_EDIT_BOX_FLAG_PASSWORD
+                            // make the passwordBox visible
+                            setPasswordMode(true);
                             setInputMode(System.Windows.Input.InputScopeNameValue.Password);
                             break;
                         case 1:             //MAW_EDIT_BOX_FLAG_SENSITIVE
@@ -365,6 +467,7 @@ namespace MoSync
                     mForegroundColor = brush;
 
                     mEditBox.Foreground = mForegroundColor;
+                    mPasswordBox.Foreground = mForegroundColor;
                 }
             }
 
@@ -387,9 +490,67 @@ namespace MoSync
                 {
                     //TODO: return an error value
                 }
-
             }
 
+            /**
+             * Switches the edit box between password mode and edit mode.
+             * @param passwordMode: indicates if we need to switch to passwordMode or not.
+             * Values: true (switch to password mode), false (switch to edit mode)
+             */
+            protected void setPasswordMode(bool passwordMode)
+            {
+                mIsPasswordMode = passwordMode;
+                if (passwordMode)
+                {
+                    mPasswordBox.Visibility = Visibility.Visible;
+                    mEditBox.Visibility = Visibility.Collapsed;
+                }
+                else
+                {
+                    mEditBox.Visibility = Visibility.Visible;
+                    mPasswordBox.Visibility = Visibility.Collapsed;
+                }
+            }
+
+            /**
+             * Creates the grid that contains the edit box and the password box.
+             * The two input modes are stacked inside the grid and when the user
+             * switches between them, their visibility is changed (for example,
+             * when we enter password mode, the edit box visibility is set to Collapsed
+             * and the password box visibility to Visible).
+             */
+            protected void createTheEditBoxGrid()
+            {
+                mEditBoxGrid = new System.Windows.Controls.Grid();
+
+                ColumnDefinition colDef1 = new ColumnDefinition();
+                // We set the Star GridUnitType for both the row and the column because we want
+                // the edit box/password box to fill the grid
+                colDef1.Width = new GridLength(1, GridUnitType.Star);
+                mEditBoxGrid.ColumnDefinitions.Add(colDef1);
+
+                RowDefinition rowDef1 = new RowDefinition();
+                rowDef1.Height = new GridLength(1, GridUnitType.Star);
+                mEditBoxGrid.RowDefinitions.Add(rowDef1);
+
+                /**
+                * Add the password box
+                */
+                Grid.SetRow(mPasswordBox, 0);
+                Grid.SetColumn(mPasswordBox, 0);
+
+                /**
+                 * Add the edit box
+                 */
+                Grid.SetRow(mEditBox, 0);
+                Grid.SetColumn(mEditBox, 0);
+
+                /**
+                 * Make the password box and the edit box the children of the mEditBoxGrid object
+                 */
+                mEditBoxGrid.Children.Add(mPasswordBox);
+                mEditBoxGrid.Children.Add(mEditBox);
+            }
         } // class EditBox
     } // namespace NativeUI
 } // namespace MoSync
