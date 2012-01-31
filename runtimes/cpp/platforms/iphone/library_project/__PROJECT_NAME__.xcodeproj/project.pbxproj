@@ -33,6 +33,7 @@
 		85F25A3611AD614700EB47EE /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; };
 		85F25A3711AD614700EB47EE /* MoSyncAppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1D3623250D0F684500981E51 /* MoSyncAppDelegate.mm */; };
 		85F25B0C11AD728A00EB47EE /* rebuild.build.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85F25B0B11AD728A00EB47EE /* rebuild.build.cpp */; };
+		E4A6E14E14D8030300616741 /* Icon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = E4A6E14D14D8030300616741 /* Icon@2x.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -69,6 +70,7 @@
 		85F25B0011AD723900EB47EE /* cpp_defs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = cpp_defs.h; path = helpers/cpp_defs.h; sourceTree = "<group>"; };
 		85F25B0111AD723900EB47EE /* cpp_maapi.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = cpp_maapi.h; path = helpers/cpp_maapi.h; sourceTree = "<group>"; };
 		85F25B0B11AD728A00EB47EE /* rebuild.build.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = rebuild.build.cpp; sourceTree = "<group>"; };
+		E4A6E14D14D8030300616741 /* Icon@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Icon@2x.png"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -147,6 +149,7 @@
 		29B97317FDCFA39411CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				E4A6E14D14D8030300616741 /* Icon@2x.png */,
 				85796C5312719251002B7859 /* Icon-72.png */,
 				85796C5412719251002B7859 /* Icon.png */,
 				8519011E1199B90400B71F58 /* data_section.bin */,
@@ -244,6 +247,7 @@
 				85F2555B11AC155D00EB47EE /* data_section.bin in Resources */,
 				85796C5512719251002B7859 /* Icon-72.png in Resources */,
 				85796C5612719251002B7859 /* Icon.png in Resources */,
+				E4A6E14E14D8030300616741 /* Icon@2x.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
