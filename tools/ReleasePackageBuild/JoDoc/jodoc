@@ -1,0 +1,422 @@
+#!/usr/bin/env perl
+# Everything moved into one file, does things the right way
+use strict;
+use warnings;
+use Getopt::Long;
+use IPC::Open2;
+
+# parse the input options
+my $markdown_bin;
+my $outputdir;
+my $title;
+my $toc;
+my $template;
+my $smartypants_bin;
+my $use_smartypants;
+my $use_tidy;
+my $tidy_bin;
+my $template_html = do { local $/; <DATA> };
+my %h1s           = ();
+my %processed     = ();
+my %files_to_h1s  = ();
+my @fileset = ();
+
+my $result = GetOptions(
+    "markdown|m=s"  => \$markdown_bin,
+    "output|o=s"    => \$outputdir,
+    "title|t=s"     => \$title,
+    "toc=s"         => \$toc,
+    "template=s"    => \$template,
+    "s"             => \$use_smartypants,
+    "smartypants=s" => \$smartypants_bin,
+    "tidy"          => \$use_tidy,
+    "htmltidy=s"    => \$tidy_bin
+);
+
+# Exit nicer than an empty die
+exit(-1) unless ($result);
+
+die "You need to specify --output or -o if you use --toc.\n"
+  if ( $toc && !defined($outputdir) );
+
+$title = "joDoc" unless ( defined($title) );
+
+if ($template) {
+    $template_html = read_file($template);
+}
+
+# grab comments out of incoming text
+sub docker {
+    my $input = shift;
+    my @output = $input =~ m{/\*\*(?:.|[\r\n])*?\*/}g;
+    s{(\*/|/\*\*)}{}g   for @output;
+    s{([\r\n]+)\s}{$1}g for @output;
+    return join( "\n", @output );
+}
+
+# put a nice header on the html output
+# templates can use $body, $title
+sub html_head {
+    my $body = shift;
+
+    my $output = $template_html;
+
+    $output =~ s{\$title}{$title}g;
+    $output =~ s{\$body}{$body}g;
+
+    return $output;
+}
+
+# Read file into a string
+sub read_file {
+    my $in = shift;
+    my $out;
+    open( my $fh, '<', $in ) or die $!;
+    {
+
+        # Deactivate input record separator
+        local $/;
+        $out = <$fh>;
+    }
+    close $fh or die $!;
+    return $out;
+}
+
+# Write a file out
+sub write_file {
+    my $file      = shift;
+    my $outstring = shift;
+    open( my $fh, '>', $file ) or die $!;
+    print $fh $outstring;
+    close $fh or die $!;
+    return;
+}
+
+# link together all the html output, make an index at the bottom of each page
+# will link between all files in the output
+sub autolink {
+    my @keywords = keys %h1s;
+
+    # Make the most specific keywords appear first, very important
+    @keywords = reverse sort { lc($a) cmp lc($b) } @keywords;
+
+    # let whitespace match correctly in an h1 tag
+    s{\s}{\\s}g for @keywords;
+
+    # prepare for the regex
+    my $keys = join( "|", @keywords );
+    for my $file ( keys %processed ) {
+        my $input = $processed{$file};
+
+        # put an external css class on outbound links
+        $input =~
+          s{(\<a)\s+(href=\"(?:http|mailto|ftp))}{$1 class=\"external\" $2}g;
+        if (@keywords) {
+
+            # make anything refing a keywork link to it
+            if ($outputdir) {
+                $input =~ s/
+                (\W+)         # The word should be delimited by something
+                ($keys)       # Search for any of the keywords
+                (?!\<\/a|\w+) # Except if if it's in a tag or the prefix to another word
+                /$1\<a href=\"$h1s{$2}\#$2\"\>$2\<\/a\>/gx
+                  ;    # Link it to the proper page and h1 tag
+
+                # make a #tag for the keyword h1 tag
+                $input =~ s{\<h1\>\<a href="[^\#\>]*#}{\<h1\>\<a name="}g;
+            }
+            else {
+                $input =~ s/
+                (\W+)         # The word should be delimited by something
+                ($keys)       # Search for any of the keywords
+                (?!\<\/a|\w+) # Except if if it's in a tag or the prefix to another word
+                /$1\<a href=\"\#$2\"\>$2\<\/a\>/gx
+                  ;    # Link it to the proper h1 tag
+
+                # make a #tag for the keyword h1 tag
+                $input =~ s{\<h1\>\<a href="#}{\<h1\>\<a name="}g;
+            }
+        }
+
+        $processed{$file} = $input;
+    }
+    return;
+}
+
+# Make an alphasorted index
+sub indexer {
+    my @keywords   = keys %h1s;
+    my $index      = qq(\n\n<hr>\n\n<h1>Index</h1>\n<div id="index">\n);
+    my $lastletter = "ZZ";
+
+    for my $i ( sort { lc($a) cmp lc($b) } @keywords ) {
+        my $letter = uc( substr( $i, 0, 1 ) );
+        if ( $letter ne $lastletter ) {
+            if ( $lastletter ne "ZZ" ) {
+                $index .= "</ul>\n";
+            }
+            $index .= "\n<h2>$letter</h2>\n";
+            $index .= "\n<ul>\n";
+            $lastletter = $letter;
+        }
+        if ($outputdir) {
+            $index .= qq(<li><a href="$h1s{$i}#$i">$i</a></li>\n);
+        }
+        else {
+            $index .= qq(<li><a href="#$i">$i</a></li>\n);
+        }
+
+    }
+    $index .= "</ul></div>\n\n";
+    return $index;
+}
+
+# Pipe stuff through markdown for parsing
+sub markdown_pipe {
+    my $in  = shift;
+    my @out = ();
+
+    # Use pipes instead of temp files
+    # The magic here is what you expect open(HANDLE, "| $markdown_bin |") to do.
+    my $pid = open2( my $chld_out, my $chld_in, "perl " . $markdown_bin ) or die $!;
+    print $chld_in $in;
+    close $chld_in or die $!;
+    while (<$chld_out>) {
+        push( @out, $_ );
+    }
+    close $chld_out or die $!;
+
+    # We don't leave a process behind!
+    waitpid( $pid, 0 );
+    return join( "", @out );
+}
+
+sub smartypants_pipe {
+    my $in  = shift;
+    my @out = ();
+    my $pid = open2( my $chld_out, my $chld_in, "$smartypants_bin" )
+      or die $!;
+    print $chld_in $in;
+    close $chld_in or die $!;
+    while (<$chld_out>) {
+        push( @out, $_ );
+    }
+    close $chld_out or die $!;
+
+    # We don't leave a process behind!
+    waitpid( $pid, 0 );
+    return join( "", @out );
+}
+
+sub tidy_pipe {
+    my $in  = shift;
+    my @out = ();
+    my $pid = open2( my $chld_out, my $chld_in, "$tidy_bin" )
+      or die $!;
+    print $chld_in $in;
+    close $chld_in or die $!;
+    while (<$chld_out>) {
+        push( @out, $_ );
+    }
+    close $chld_out or die $!;
+
+    # We don't leave a process behind!
+    waitpid( $pid, 0 );
+    return join( "", @out );
+}
+
+# Find all the h1tags for all files
+sub h1finder {
+    %h1s          = ();
+    %files_to_h1s = ();
+    for my $file ( keys %processed ) {
+        my @h1 = $processed{$file} =~ m{\<h1\>([^\<]+)\</h1\>}g;
+        $h1s{$_} = $file for @h1;
+        $files_to_h1s{$file} = \@h1;
+    }
+    return;
+}
+
+# Expand {} blocks in table of contents
+sub toclinker {
+    my $indent         = shift;
+    my $pathpart       = shift;
+    my @matching_files = keys %files_to_h1s;
+    @matching_files = grep { m{$pathpart} } @matching_files;
+    my @matching_h1s = ();
+    push( @matching_h1s, @{ $files_to_h1s{$_} } ) for @matching_files;
+    @matching_h1s = sort { lc($a) cmp lc($b) } @matching_h1s;
+    $_ = $indent . '* ' . $_ . "\n" for @matching_h1s;
+
+    # escape _ characters to make markdown happy
+    my $match = join( "", @matching_h1s );
+    $match =~ s/\_/\\_/g;
+    return $match;
+}
+
+# munge output file names
+sub munge {
+    my %munged_processed = ();
+    for my $file ( keys %processed ) {
+        $munged_processed{munge_filename($file)} = $processed{$file};
+    }
+    %processed = %munged_processed;
+    return;
+}
+
+sub munge_filename {
+	my $file = shift;
+	
+    my @path_parts = split( m{/}, $file );
+    s{^\.+}{}g for @path_parts;
+
+    # Remove empty path parts, looks prettier that way
+    @path_parts = grep { $_ ne "" } @path_parts;
+    my $path = join( '_', @path_parts );
+    my $munged = $path . '.html';
+
+	return $munged;
+}	
+
+# Create a JSON output of the index
+sub index_to_json {
+    my @keywords = keys %h1s;
+    @keywords = sort { lc($a) cmp lc($b) } @keywords;
+    $_ = qq({"term":"$_","url":"$h1s{$_}"}) for @keywords;
+    return '[' . join( ',', @keywords ) . ']';
+}
+
+sub main {
+
+    # If not specified, find a markdown parser in the path
+    chomp( $markdown_bin    = qx(which markdown) )    unless $markdown_bin;
+    chomp( $smartypants_bin = qx(which smartypants) ) unless $smartypants_bin;
+    chomp( $tidy_bin        = qx(which tidy) )        unless $tidy_bin;
+
+    # We can't do anything if we can't call markdown
+    die "Markdown parser not found!\n" unless ( -x $markdown_bin );
+    die "Smartypants prettifier not found!\n"
+      if ( $use_smartypants && !( -x $smartypants_bin ) );
+    die "HTMLTidy prettifier not found!\n"
+      if ( $use_tidy && !( -x $tidy_bin ) );
+
+    # Slurp all the files and process them
+    # recurse current directory if no input arguments	
+    my @files = @ARGV;
+    @files = glob("./*") unless ( $ARGV[0] );
+    for my $file (@files) {
+        unless ( -e $file ) {
+            warn "$file not found!\n";
+            next;
+        }
+
+        # recurse
+        if ( -d $file ) {
+            my @subdir = glob("$file/*");
+            push( @files, @subdir );
+            next;
+        }
+
+        if ( $file =~ m{\.(js|css|mdown|html|md|markdown|htm)$}i ) {
+            my $content = read_file($file);
+
+            # javascript and css files get "cleaned"
+            if ( $file =~ m{\.(js|css)$} ) {
+                $content = docker($content);
+            }
+
+            # pure htmlfiles don't have markdown applied
+            unless ( $file =~ m{\.html$} ) {
+                $content = markdown_pipe($content);
+            }
+            $processed{$file} = $content;
+			push(@fileset, munge_filename($file));
+        }
+    }
+
+    #TODO: This is a nasty hack, but it works. Fix when times are better.
+    if ($toc) {
+        h1finder;
+        my @toclinked;
+        open( my $fh, '<', $toc ) or die $!;
+        my @content = <$fh>;
+        close $fh or die $!;
+        for my $line (@content) {
+            if ( $line =~ m/(\s*).\s*{(.+)}/ ) {
+                $line = toclinker( $1, $2 );
+            }
+            push( @toclinked, $line );
+        }
+        $processed{_content} = markdown_pipe( join( "", @toclinked ) );
+    }
+    munge;
+    h1finder;
+    autolink;
+
+    # Print docs to separate files in the same hierarchy as the input
+    if ($outputdir) {
+        $processed{"_index.html"} = indexer;
+        mkdir $outputdir;
+        for my $file ( keys %processed ) {
+
+# if the processed output doesn't have at least ONE WORD CHARACTER, then it's blank.
+            if ( $processed{$file} =~ m{\w} ) {
+
+                # Don't wrap html files with <html> tags
+                unless ( $file =~ m{\.htm[l]?\.html$}i ) {
+                    $processed{$file} = html_head( $processed{$file} );
+                }
+                if ($use_tidy) {
+                    $processed{$file} = tidy_pipe( $processed{$file} );
+                }
+                if ($use_smartypants) {
+                    $processed{$file} = smartypants_pipe( $processed{$file} );
+                }
+                write_file( $outputdir . '/' . $file, $processed{$file} );
+            }
+            else {
+                warn "File $file contained no content, not creating file\n";
+            }
+        }
+        write_file( $outputdir . '/_index.json', index_to_json );
+    }
+
+    # Print to stdout
+    else {
+		my $tempout = '';
+		
+		for my $i (@fileset) {
+			$tempout .= $processed{$i};
+		}
+#        my $tempout = join( "", values %processed );
+        $tempout = html_head($tempout) . indexer;
+        if ($use_tidy) {
+            $tempout = tidy_pipe($tempout);
+        }
+        if ($use_smartypants) {
+            $tempout = smartypants_pipe($tempout);
+        }
+        print $tempout;
+    }
+    return;
+}
+
+main;
+
+# default html template, mobile compatible
+__DATA__
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>$title</title>
+<meta name="generator" content="joDoc">
+<link rel="stylesheet" type="text/css" href="docbody.css">
+<link rel="stylesheet" type="text/css" href="doc.css">
+<meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no, width=device-width">
+<meta name="format-detection" content="false">
+</head>
+<body>
+$body
+</body>
+</html>
