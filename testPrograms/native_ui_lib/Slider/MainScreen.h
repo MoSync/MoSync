@@ -35,7 +35,8 @@ using namespace NativeUI;
 class MainScreen:
 	public Screen,
 	public ButtonListener,
-	public SliderListener
+	public SliderListener,
+	public EditBoxListener
 {
 
 public:
@@ -86,6 +87,19 @@ private:
 	 * Creates and adds main layout to the screen.
 	 */
 	void createMainLayout();
+
+    /**
+     * This method is called when the return button was pressed.
+     * On iphone platform the virtual keyboard is not hidden after
+     * receiving this event.
+     * @param editBox The edit box object that generated the event.
+     */
+    virtual void editBoxReturn(EditBox* editBox);
+
+    /**
+     * Set slider's value according to the given value.
+     */
+    void setSliderValue();
 
 private:
 	/**

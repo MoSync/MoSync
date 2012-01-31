@@ -1459,8 +1459,8 @@ interface MAAPI {
 
 		/**
 		* \brief Send when the application receives an unregistration result.
-		* The application unregistered from Apple Push Service, or Google C2DM Service,
-		* and will not receive anymore push messages.
+		* The application unregistered from Google C2DM Service, and will not
+		* receive anymore push messages.
 		* Platform: Android only.
 		*/
 		PUSH_NOTIFICATION_UNREGISTRATION = 45;
@@ -9243,8 +9243,8 @@ group AdsAPI "Ads API" {
 		* For more info see Widget API.
 		*
 		* \returns
-		*  - MA_ADS_RES_UNSUPPORTED if ads are not supported on current system.
-		*  - MA_ADS_RES_ERROR if a error occurred while creating the banner widget.
+		*  - #MA_ADS_RES_UNSUPPORTED if ads are not supported on current system.
+		*  - #MA_ADS_RES_ERROR if a error occurred while creating the banner widget.
 		*  - a handle to a new banner widget(the handle value is >= 0).
 		*/
 		int maAdsBannerCreate(in int bannerSize, in MAString publisherID);
@@ -9255,8 +9255,8 @@ group AdsAPI "Ads API" {
 		* \param bannerHandle Handle to a banner.
 		*
 		* \returns One of the next constants:
-		* - MA_ADS_RES_OK if no error occurred.
-		* - MA_ADS_RES_INVALID_BANNER_HANDLE if the banner handle is invalid.
+		* - #MA_ADS_RES_OK if no error occurred.
+		* - #MA_ADS_RES_INVALID_BANNER_HANDLE if the banner handle is invalid.
 		*/
 		int maAdsBannerDestroy(in MAHandle bannerHandle);
 
@@ -9267,9 +9267,9 @@ group AdsAPI "Ads API" {
 		* \param layoutHandle Handle to a layout.
 		*
 		* \returns One of the next constants:
-		* - MA_ADS_RES_OK if no error occurred.
-		* - MA_ADS_RES_INVALID_BANNER_HANDLE if the banner handle is invalid.
-		* - MA_ADS_RES_INVALID_LAYOUT_HANDLE if the layout handle is invalid.
+		* - #MA_ADS_RES_OK if no error occurred.
+		* - #MA_ADS_RES_INVALID_BANNER_HANDLE if the banner handle is invalid.
+		* - #MA_ADS_RES_INVALID_LAYOUT_HANDLE if the layout handle is invalid.
 		*/
 		int maAdsAddBannerToLayout(in MAHandle bannerHandle, in MAHandle layoutHandle);
 
@@ -9280,9 +9280,9 @@ group AdsAPI "Ads API" {
 		* \param layoutHandle Handle to a layout.
 		*
 		* \returns One of the next constants:
-		* - MA_ADS_RES_OK if no error occurred.
-		* - MA_ADS_RES_INVALID_BANNER_HANDLE if the banner handle is invalid.
-		* - MA_ADS_RES_INVALID_LAYOUT_HANDLE if the layout handle is invalid.
+		* - #MA_ADS_RES_OK if no error occurred.
+		* - #MA_ADS_RES_INVALID_BANNER_HANDLE if the banner handle is invalid.
+		* - #MA_ADS_RES_INVALID_LAYOUT_HANDLE if the layout handle is invalid.
 		*/
 		int maAdsRemoveBannerFromLayout(in MAHandle bannerHandle, in MAHandle layoutHandle);
 
@@ -9294,10 +9294,10 @@ group AdsAPI "Ads API" {
 		* \param value The value that will be assigned to the property.
 		*
 		* \returns One of the next result codes:
-		* - MA_ADS_RES_OK if no error occurred.
-		* - MA_ADS_RES_INVALID_BANNER_HANDLE if the banner handle is invalid.
-		* - MA_ADS_RES_INVALID_PROPERTY_NAME if the property name is not valid.
-		* - MA_ADS_RES_INVALID_PROPERTY_VALUE if the property value is not valid.
+		* - #MA_ADS_RES_OK if no error occurred.
+		* - #MA_ADS_RES_INVALID_BANNER_HANDLE if the banner handle is invalid.
+		* - #MA_ADS_RES_INVALID_PROPERTY_NAME if the property name is not valid.
+		* - #MA_ADS_RES_INVALID_PROPERTY_VALUE if the property value is not valid.
 		*/
 		int maAdsBannerSetProperty(in MAHandle bannerHandle, in MAString property, in MAString value);
 
@@ -9310,10 +9310,10 @@ group AdsAPI "Ads API" {
 		* \param bufSize Size of the buffer.
 		*
 		* \returns One of the next result codes:
-		* - MA_ADS_RES_OK if no error occurred.
-		* - MA_ADS_RES_INVALID_BANNER_HANDLE if the banner handle is invalid.
-		* - MA_ADS_RES_INVALID_PROPERTY_NAME if the property name is not valid.
-		* - MA_ADS_RES_INVALID_STRING_BUFFER_SIZE if the buffer size was to small.
+		* - #MA_ADS_RES_OK if no error occurred.
+		* - #MA_ADS_RES_INVALID_BANNER_HANDLE if the banner handle is invalid.
+		* - #MA_ADS_RES_INVALID_PROPERTY_NAME if the property name is not valid.
+		* - #MA_ADS_RES_INVALID_STRING_BUFFER_SIZE if the buffer size was to small.
 		*/
 		int maAdsBannerGetProperty(in MAHandle bannerHandle, in MAString property, out MAString value range("bufSize"), in int bufSize);
 	}//End of Ads Functions
@@ -9573,7 +9573,7 @@ group NotificationAPI "Notification API" {
 			*
 			* @par Example
 			* \code
-			*	maNotificationLocalSetProperty(notificationHandle, MA_NOTIFICATION_LOCAL_ALERT_BODY, "Did you forget something?");
+			*	maNotificationLocalSetProperty(notificationHandle, MA_NOTIFICATION_LOCAL_CONTENT_BODY, "Did you forget something?");
 			* \endcode
 			*/
 			CONTENT_BODY = "content_body";
@@ -9809,8 +9809,8 @@ group NotificationAPI "Notification API" {
 		* \brief Creates a new local notification object.
 		*
 		* \returns
-		*  - MA_NOTIFICATION_RES_UNSUPPORTED if the notifications are not supported on current system.
-		*  - MA_NOTIFICATION_RES_ERROR if a error occurred while creating the notification object.
+		*  - #MA_NOTIFICATION_RES_UNSUPPORTED if the notifications are not supported on current system.
+		*  - #MA_NOTIFICATION_RES_ERROR if a error occurred while creating the notification object.
 		*  - a handle to a new local notification object(the handle value is >= 0).
 		*/
 		MAHandle maNotificationLocalCreate();
@@ -9907,7 +9907,7 @@ group NotificationAPI "Notification API" {
 		*
 		* \returns One of the next constants:
 		* - #MA_NOTIFICATION_RES_OK if no error occurred.
-		* - #MA_NOTIFICATION_ALREADY_REGISTERED if the application is already registered for
+		* - #MA_NOTIFICATION_RES_ALREADY_REGISTERED if the application is already registered for
 		* receiving push notifications.
 		* - #MA_NOTIFICATION_RES_UNSUPPORTED if notifications are not supported on current platform.
 		*/
@@ -9918,7 +9918,7 @@ group NotificationAPI "Notification API" {
 		*
 		* \returns One of the next constants:
 		* - #MA_NOTIFICATION_RES_OK if no error occurred.
-		* - #MA_NOTIFICATION_NOT_REGISTERED if the application was not registered for receiving
+		* - #MA_NOTIFICATION_RES_NOT_REGISTERED if the application was not registered for receiving
 		* push notification.
 		*/
 		int maNotificationPushUnregister();
@@ -9930,8 +9930,8 @@ group NotificationAPI "Notification API" {
 		* \response  One of the next constants:
 		* - #MA_NOTIFICATION_RES_OK if the application registered successfully.
 		* - #MA_NOTIFICATION_RES_REGISTRATION_NOT_CALLED if maNotificationPushRegister was not called.
-		* - MA_NOTIFICATION_RES_REGISTRATION_MESSAGE_BUF_TOO_SMALL if the buffer is too small.
-		* - MA_NOTIFICATION_RES_ERROR if registration has failed.
+		* - #MA_NOTIFICATION_RES_REGISTRATION_MESSAGE_BUF_TOO_SMALL if the buffer is too small.
+		* - #MA_NOTIFICATION_RES_ERROR if registration has failed.
 		*/
 		int maNotificationPushGetRegistration(out MAString registrationMesssage range("registrationMessageSize"),
 											 in int registrationMessageSize);
@@ -10346,9 +10346,9 @@ group CaptureAPI "Capture API" {
 		* \param bufferSize Maximum size of the buffer.
 		*
 		* \returns One of the next constants:
-		*  - MA_CAPTURE_RES_OK if no error occurred.
-		*  - MA_CAPTURE_RES_INVALID_HANDLE if the given handle was invalid.
-		*  - MA_CAPTURE_RES_INVALID_STRING_BUFFER_SIZE if the buffer size was to small.
+		*  - #MA_CAPTURE_RES_OK if no error occurred.
+		*  - #MA_CAPTURE_RES_INVALID_HANDLE if the given handle was invalid.
+		*  - #MA_CAPTURE_RES_INVALID_STRING_BUFFER_SIZE if the buffer size was to small.
 		*/
 		int maCaptureGetImagePath(in MAHandle handle, out MAString buffer range("bufferSize"), in int bufferSize);
 
@@ -10359,9 +10359,9 @@ group CaptureAPI "Capture API" {
 		* \param bufferSize Maximum size of the buffer.
 		*
 		* \returns One of the next constants:
-		*  - MA_CAPTURE_RES_OK if no error occurred.
-		*  - MA_CAPTURE_RES_INVALID_HANDLE if the given handle was invalid.
-		*  - MA_CAPTURE_RES_INVALID_STRING_BUFFER_SIZE if the buffer size was to small.
+		*  - #MA_CAPTURE_RES_OK if no error occurred.
+		*  - #MA_CAPTURE_RES_INVALID_HANDLE if the given handle was invalid.
+		*  - #MA_CAPTURE_RES_INVALID_STRING_BUFFER_SIZE if the buffer size was to small.
 		*/
 		int maCaptureGetVideoPath(in MAHandle handle, out MAString buffer range("bufferSize"), in int bufferSize);
 

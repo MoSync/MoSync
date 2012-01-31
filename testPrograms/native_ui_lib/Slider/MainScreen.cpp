@@ -51,6 +51,7 @@ MainScreen::MainScreen() :
     mIncreaseValueButton->addButtonListener(this);
     mDecreseValueButton->addButtonListener(this);
     mSlider->addSliderListener(this);
+    mEditBox->addEditBoxListener(this);
 }
 
 /**
@@ -63,6 +64,7 @@ MainScreen::~MainScreen()
     mIncreaseValueButton->removeButtonListener(NULL);
     mDecreseValueButton->removeButtonListener(NULL);
     mSlider->removeSliderListener(this);
+    mEditBox->removeEditBoxListener(this);
 }
 
 /**
@@ -112,13 +114,9 @@ void MainScreen::createMainLayout() {
 void MainScreen::buttonClicked(Widget* button)
 {
     if (button == mSetValueButton)
-    {
-        MAUtil::String stringValue;
-        stringValue = mEditBox->getText();
-        int value = atoi(stringValue.c_str());
-        printf("set slider's value = %d", value);
-        mSlider->setValue(value);
-    }
+	{
+		this->setSliderValue();
+	}
     else if (button == mGetValueButton)
     {
 		mGetValueLabel->setText(MAUtil::integerToString(mSlider->getValue()));
@@ -149,4 +147,31 @@ void MainScreen::sliderValueChanged(
     {
         printf("mSlider value changed - %d", sliderValue);
     }
+}
+
+/**
+ * This method is called when the return button was pressed.
+ * On iphone platform the virtual keyboard is not hidden after
+ * receiving this event.
+ * @param editBox The edit box object that generated the event.
+ */
+void MainScreen::editBoxReturn(EditBox* editBox)
+{
+	if (editBox == mEditBox)
+	{
+		editBox->hideKeyboard();
+		this->setSliderValue();
+	}
+}
+
+/**
+ * Set slider's value according to the given value.
+ */
+void MainScreen::setSliderValue()
+{
+    MAUtil::String stringValue;
+    stringValue = mEditBox->getText();
+    int value = atoi(stringValue.c_str());
+    printf("set slider's value = %d", value);
+    mSlider->setValue(value);
 }
