@@ -181,11 +181,16 @@ namespace MoSync
 			}
 		};
 
+		public static void ShowMessage(String text, bool log=true)
+		{
+			if(log)
+				Log(text);
+			Deployment.Current.Dispatcher.BeginInvoke(() => MessageBox.Show(text));
+		}
+
 		public static void CriticalError(String text)
 		{
 			Log(text);
-			//System.Environment.Exit(1);
-			//MessageBox.Show(text);
 			if (System.Diagnostics.Debugger.IsAttached)
 			{
 				System.Diagnostics.Debugger.Break();
