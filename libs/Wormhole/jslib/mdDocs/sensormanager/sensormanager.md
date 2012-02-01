@@ -1,7 +1,7 @@
 Sensor Manager
 ==============
 
-W3C Compliant Sensor API.
+>W3C Compliant Sensor API.
 
 Methods
 -------

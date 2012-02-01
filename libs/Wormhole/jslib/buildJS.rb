@@ -36,6 +36,9 @@ Divider = "\n// =============================================================\n/
 def copyWormholeJS
   dirList = DirectoriesToCopyWormholeJSTo
   dirList.each do |dirName|
+    if(!File.exist?(dirName))
+      FileUtils.mkdir_p(dirname)
+    end
     FileUtils.cp("wormhole.js", dirName)
   end
 end
