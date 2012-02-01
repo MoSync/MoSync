@@ -17,17 +17,11 @@ FilesIncludedInWormholeJS = [
 
 # Specify directories to copy wormhole.js to.
 DirectoriesToCopyWormholeJSTo = [
-  "../../../templates/An Empty Project/",
-  "../../../templates/C Basic Project/",
-  "../../../templates/C NativeUI Project/",
-  "../../../templates/C Newlib Project/",
-  "../../../templates/C++ Moblet Project/",
-  "../../../templates/C++ NativeUI Project/",
-  "../../../templates/C++ OpenGL Project/",
-  "../../../templates/C++ STL Project/",
   "../../../templates/HTML5 JS C++ Hybrid Project/",
   "../../../templates/HTML5 JS NativeUI Project/",
-  "../../../templates/HTML5 JS WebUI Project/"
+  "../../../templates/HTML5 JS WebUI Project/",
+  "../../../examples/html5/WormholeDemo/LocalFiles/js/",
+  "../../../examples/html5/WormholeNativeUIDemo/LocalFiles/js/"
 ]
 
 # Divider between files included in wormhole.js
