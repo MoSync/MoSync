@@ -1350,12 +1350,25 @@ mosync.nativeui.initUI = function() {
 };
 
 /*
- * store the screen size information coming from MoSync
- * in the namespace
+ * Store the screen size information coming from MoSync
+ * in the mosync.nativeui namespace.
  */
-if (mosyncScreenWidth) {
+if (typeof mosyncScreenWidth != "undefined" &&
+	typeof mosyncScreenHeight != "undefined")
+{
 	mosync.nativeui.screenWidth = mosyncScreenWidth;
-}
-if (mosyncScreenHeight) {
 	mosync.nativeui.screenHeight = mosyncScreenHeight;
+}
+else
+{
+	try
+	{
+		mosync.nativeui.screenWidth = window.screen.availWidth;
+		mosync.nativeui.screenHeight = window.screen.availHeight;
+	}
+	catch (error)
+	{
+		mosync.nativeui.screenWidth = window.innerWidth;
+		mosync.nativeui.screenHeight = window.innerHeight;
+	}
 }
