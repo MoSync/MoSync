@@ -91,7 +91,7 @@
             now = (new Date).getTime();
             delta = now - lastTime;
             lastTime = now;
-            if (jQTSettings.debug) {
+            if (true){//jQTSettings.debug) {
                 if (message) {
                     _log(delta + ': ' + message);
                 } else {
@@ -324,6 +324,16 @@
         }
         function hashChangeHandler(e) {
             _debug();
+            // Don't know what this function does, but it fails
+            // if these are undefined. Exit if this is the case.
+            if (typeof hist[0] == 'undefined')
+            {
+                return;
+            }
+            if (typeof hist[1] == 'undefined')
+            {
+                return;
+            }
             if (location.hash === hist[0].hash) {
                 _debug('We are on the right panel');
             } else {

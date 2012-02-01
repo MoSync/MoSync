@@ -1348,7 +1348,7 @@ Compass.prototype.getCurrentHeading = function(successCallback, errorCallback, o
         var onSuccess = function(result)
         {
             var compassResult = JSON.parse(result);
-            console.log("compassResult = " + compassResult);
+            //console.log("compassResult = " + compassResult);
             self.lastHeading = compassResult;
             successCallback(self.lastHeading);
         }
