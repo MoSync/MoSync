@@ -89,6 +89,11 @@ namespace MoSync
             protected System.Windows.Controls.Grid mEditBoxGrid;
 
             /**
+             * The placeholder font color
+             */
+            SolidColorBrush mWaterMarkBrush;
+
+            /**
              * Constructor
              */
             public EditBox()
@@ -105,6 +110,10 @@ namespace MoSync
                 mIsPasswordMode = false;
                 mIsWatermarkMode = false;
                 mPlaceholderText = "";
+
+                // by default, the placeholder font color is gray
+                mWaterMarkBrush = new SolidColorBrush();
+                mWaterMarkBrush.Color = Colors.Gray;
 
                 mForegroundColor = mEditBox.Foreground;
 
@@ -275,13 +284,21 @@ namespace MoSync
             {
                 set
                 {
-                    if (mIsPasswordMode)
+                    if (mIsWatermarkMode)
                     {
-                        mPasswordBox.Password = value;
+                        setWatermarkMode(false);
+                        mEditBox.Text = value;
                     }
                     else
                     {
-                        mEditBox.Text = value;
+                        if (mIsPasswordMode)
+                        {
+                            mPasswordBox.Password = value;
+                        }
+                        else
+                        {
+                            mEditBox.Text = value;
+                        }
                     }
                 }
                 get
@@ -312,15 +329,28 @@ namespace MoSync
                 {
                     mIsWatermarkMode = true;
 
-                    // save the "normal" brush
-                    mForegroundColor = mEditBox.Foreground;
-
-                    SolidColorBrush waterMarkBrush = new SolidColorBrush();
-                    waterMarkBrush.Color = Colors.Gray;
-                    mEditBox.Foreground = waterMarkBrush;
+                    mEditBox.Foreground = mWaterMarkBrush;
                     mPlaceholderText = value;
 
                     mEditBox.Text = mPlaceholderText;
+                }
+            }
+
+            /**
+             * Property for setting the placeholder (watermark) font color
+             */
+            [MoSyncWidgetProperty(MoSync.Constants.MAW_EDIT_BOX_PLACEHOLDER_FONT_COLOR)]
+            public String PlaceholderColor
+            {
+                set
+                {
+                    MoSync.Util.convertStringToColor(value, out mWaterMarkBrush);
+                    // if we're in watermark mode, we need to change the color of the
+                    // placeholder now
+                    if (mIsWatermarkMode)
+                    {
+                        mEditBox.Foreground = mWaterMarkBrush;
+                    }
                 }
             }
 
@@ -458,8 +488,11 @@ namespace MoSync
                     MoSync.Util.convertStringToColor(value, out brush);
                     mForegroundColor = brush;
 
-                    mEditBox.Foreground = mForegroundColor;
-                    mPasswordBox.Foreground = mForegroundColor;
+                    if (!mIsWatermarkMode)
+                    {
+                        mEditBox.Foreground = mForegroundColor;
+                        mPasswordBox.Foreground = mForegroundColor;
+                    }
                 }
             }
 
