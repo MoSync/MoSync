@@ -147,7 +147,7 @@ var mosync = (function()
 		{
 			var length;
 			var encodedString = "";
-			if (mosync.isAndroid)
+			if (mosync.isAndroid || mosync.isIOS)
 			{
 				length = encoder.lengthAsUTF8(s);
 			}

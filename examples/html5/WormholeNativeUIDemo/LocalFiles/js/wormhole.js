@@ -1,3 +1,8 @@
+
+// =============================================================
+//
+// File: mosync-bridge.js
+
 /*
 Copyright (C) 2011 MoSync AB
 
@@ -16,7 +21,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301, USA.
 */
 
-/**
+
+/*
  * @file mosync-bridge.js
  * @author Mikael Kindborg, Ali Sarrafi
  *
@@ -33,23 +39,24 @@ var mosync = (function()
 	// Detect platform.
 
 	mosync.isAndroid =
-		(navigator.userAgent.indexOf("Android") != -1)
-			? true : false;
+		navigator.userAgent.indexOf("Android") != -1;
 
 	mosync.isIOS =
-		(navigator.userAgent.indexOf("iPod") != -1)
-		|| (navigator.userAgent.indexOf("iPhone") != -1)
-		|| (navigator.userAgent.indexOf("iPad") != -1)
-			? true : false;
+		(navigator.userAgent.indexOf("iPod") != -1) ||
+		(navigator.userAgent.indexOf("iPhone") != -1) ||
+		(navigator.userAgent.indexOf("iPad") != -1);
 
 	mosync.isWindowsPhone =
-		(navigator.userAgent.indexOf("Windows Phone OS") != -1)
-			? true : false;
+		navigator.userAgent.indexOf("Windows Phone OS") != -1;
 
 	// console.log does not work on WP7.
-	if (mosync.isWindowsPhone)
+	if (typeof console === "undefined")
 	{
-		console.log = function(s) { };
+		console = {}
+	}
+	if (typeof console.log === "undefined")
+	{
+		console.log = function(s) {};
 	}
 
 	// The encoder submodule.
@@ -89,15 +96,71 @@ var mosync = (function()
 			return n;
 		};
 
+		// Thanks to: http://jsfromhell.com/geral/utf-8
+		// Author: Jonas Raoni Soares Silva
+		// Note: Function not used.
+		encoder.encodeUTF8 = function(s){
+			for(var c, i = -1, l = (s = s.split("")).length, o = String.fromCharCode; ++i < l;
+				s[i] = (c = s[i].charCodeAt(0)) >= 127 ? o(0xc0 | (c >>> 6)) + o(0x80 | (c & 0x3f)) : s[i]
+			);
+			return s.join("");
+		};
+
+		// Thanks to: http://jsfromhell.com/geral/utf-8
+		// Author: Jonas Raoni Soares Silva
+		// Note: Function not used.
+		encoder.decodeUTF8 = function(s){
+			for(var a, b, i = -1, l = (s = s.split("")).length, o = String.fromCharCode, c = "charCodeAt"; ++i < l;
+				((a = s[i][c](0)) & 0x80) &&
+				(s[i] = (a & 0xfc) == 0xc0 && ((b = s[i + 1][c](0)) & 0xc0) == 0x80 ?
+				o(((a & 0x03) << 6) + (b & 0x3f)) : o(128), s[++i] = "")
+			);
+			return s.join("");
+		};
+
+		/**
+		 * @return The length in bytes of the string encoded
+		 * as UTF8.
+		 */
+		encoder.lengthAsUTF8 = function(s)
+		{
+			var length = 0;
+			for (var i = 0; i < s.length; ++i)
+			{
+				var c = s.charCodeAt(i);
+
+				if (c < 128)
+				{
+					length += 1;
+				}
+				else if ((c > 127) && (c < 2048))
+				{
+					length += 2;
+				}
+				else
+				{
+					length += 3;
+				}
+			}
+			return length;
+		};
+
+		/**
+		 * Encode a string with a length value followed by string data.
+		 */
 		encoder.encodeString = function(s)
 		{
+			var length;
 			var encodedString = "";
-			return encodedString.concat(encoder.itox(s.length), " ", s, " ");
-				/*""
-				+ encoder.itox(s.length)
-				+ " "
-				+ s
-				+ " ";*/
+			if (mosync.isAndroid || mosync.isIOS)
+			{
+				length = encoder.lengthAsUTF8(s);
+			}
+			else
+			{
+				length = s.length;
+			}
+			return encodedString.concat(encoder.itox(length), " ", s, " ");
 		};
 
 		return encoder;
@@ -236,7 +299,7 @@ var mosync = (function()
 			if (length > 0)
 			{
 				// Add the "ms:" token to the beginning of the data
-				// to signify that this as a message array. This is
+				// to signify that this as a message stream. This is
 				// used by the C++ message parser to handle different
 				// types of message formats.
 				var data = "ms:";
@@ -288,18 +351,19 @@ var mosync = (function()
 			}
 			else
 			{
-				alert("bridge.sendRaw: unknown platform");
+				alert("mosync.bridge.sendRaw: unknown platform");
 			}
 		};
 
 		/**
-		 *
+		 * Called from iOS runtime to get message.
 		 */
 		bridge.getMessageData = function()
 		{
-			if(rawMessageQueue.length == 0)
+			if (rawMessageQueue.length == 0)
 			{
-				//return an empty string so the runtime knows we don't have anything
+				// Return an empty string so the iOS runtime
+				// knows we don't have any message.
 				return "";
 			}
 			var message = rawMessageQueue.pop();
@@ -342,121 +406,11 @@ var mosync = (function()
 	// Return the library object.
 	return mosync;
 })();
-/**
- * @file mosync.resource.js
- * @author Ali Sarrafi
- *
- * The library for loading Image resources into Mosync program from Javascript.
- * This library only supports image resources and used  together with the
- * NativeUI library.
- */
 
+// =============================================================
+//
+// File: phonegap-bridge.js
 
-/**
- * The Resource handler submodule of the bridge module.
- */
-mosync.resource = {};
-
-
-/**
- * A Hash containing all registered callback functions for
- * loadImage function.
- */
-mosync.resource.imageCallBackTable = {};
-
-mosync.resource.imageIDTable = {};
-
-mosync.resource.imageDownloadQueue = [];
-
-/**
- * Loads images into image handles for use in MoSync UI systems.
- *
- *  @param imagePath relative path to the image file.
- *  @param imageID a custom ID used for refering to the image in JavaScript
- *  @param callBackFunction a function that will be called when the image is ready.
- */
-mosync.resource.loadImage = function(imagePath, imageID, successCallback) {
-	mosync.resource.imageCallBackTable[imageID] = successCallback;
-	mosync.bridge.send(
-			[
-				"Resource",
-				"loadImage",
-				imagePath,
-				imageID
-			], null);
-};
-
-/**
- * A function that is called by C++ to pass the loaded image information.
- *
- * @param imageID JavaScript ID of the image
- * @param imageHandle C++ handle of the imge which can be used for refering to the loaded image
- */
-mosync.resource.imageLoaded = function(imageID, imageHandle) {
-	var callbackFun = mosync.resource.imageCallBackTable[imageID];
-	if (undefined != callbackFun)
-	{
-		var args = Array.prototype.slice.call(arguments);
-
-		// Call the function.
-		callbackFun.apply(null, args);
-	}
-};
-
-/**
- * Loads images into image handles from a remote URL for use in MoSync UI systems.
- *
- *  @param imageURL URL to the image file.
- *  @param imageID a custom ID used for refering to the image in JavaScript
- *  @param callBackFunction a function that will be called when the image is ready.
- */
-mosync.resource.loadRemoteImage = function(imageURL, imageID, callBackFunction) {
-	mosync.resource.imageCallBackTable[imageID] = callBackFunction;
-	var message = [
-		"Resource",
-		"loadRemoteImage",
-		imageURL,
-		imageID
-	];
-	// Add message to queue.
-	mosync.resource.imageDownloadQueue.push(message);
-
-	if (1 == mosync.resource.imageDownloadQueue.length)
-	{
-		mosync.bridge.send(message, null);
-	}
-
-};
-
-mosync.resource.imageDownloadStarted = function(imageID, imageHandle)
-{
-	mosync.resource.imageIDTable[imageHandle] = imageID;
-};
-
-mosync.resource.imageDownloadFinished = function(imageHandle)
-{
-	var imageID = mosync.resource.imageIDTable[imageHandle];
-	var callbackFun = mosync.resource.imageCallBackTable[imageID];
-	if (undefined != callbackFun)
-	{
-		// Call the function.
-		callbackFun(imageID, imageHandle);
-	}
-	// Remove first message.
-	if (mosync.resource.imageDownloadQueue.length > 0)
-	{
-		mosync.resource.imageDownloadQueue.shift();
-	}
-
-	// If there are more messages, send the next
-	// message in the queue.
-	if (mosync.resource.imageDownloadQueue.length > 0)
-	{
-		mosync.bridge.send(
-				mosync.resource.imageDownloadQueue[0],
-				null);
-	}
-};
 /*
 Copyright (C) 2011 MoSync AB
 
@@ -563,1275 +517,18 @@ navigator.geolocation.clearWatch = function(success, fail)
     }
     mosync.bridge.PhoneGap.send(callbackId, "GeoLocation", "clearWatch");
 };
-/**
- * @file mosync.nativeui.js
- * @author Ali Sarrafi
- *
- * The library for supporting Native widgets in Javascript and Web applications.
- * Provides support for designing UI both programatically and declaratively.
- * Should be used together with mosync-resource.js
- */
 
-/**
- * @namespace The mosync.nativeui module
- */
-mosync.nativeui = {};
-
-/**
- * A hash containing all callback functions that are registered for getting
- * response of creating a widget
- */
-mosync.nativeui.callBackTable = {};
-
-/**
- * List of registered callback functions for WidgetEvents
- */
-mosync.nativeui.eventCallBackTable = {};
-
-/**
- * used to generate IDs for widgets that do not have one
- */
-mosync.nativeui.widgetCounter = 0;
-
-/**
- * Creates a mosync.nativeui Widget and registers it callback for return of the
- * handle, Used internally use mosync.nativeui.create in your code.
- *
- * @param widgetType
- *            A string that includes type of the widget defined in MoSync Api
- *            reference
- * @param widgetID
- *            An ID set by the user for high level access to the widget
- * @param successCallback
- *            The function that would be called when the widget is created
- * @param errorCallback
- *            The function that would be called if an error happens
- * @param processedCallback
- *            optional call back for knowing that the message is processed
- *
- */
-mosync.nativeui.maWidgetCreate = function(
-		widgetType,
-		widgetID,
-		successCallback,
-		errorCallback,
-		processedCallback,
-		properties)
-{
-
-	callbackID = "create" + widgetID;
-	var message = ["NativeUI","maWidgetCreate", widgetType, widgetID,
-			callbackID ];
-	if (properties) {
-		var params = [];
-		var ii = 0;
-		for ( var key in properties) {
-			params[ii] = String(mosync.nativeui.getNativeAttrName(key));
-			ii++;
-			params[ii] = String(mosync.nativeui
-					.getNativeAttrValue(properties[key]));
-			ii++;
-		}
-		message.push(String(params.length));
-		message = message.concat(params);
-	} else {
-		message.push("0");
-	}
-
-	mosync.bridge.send(message, processedCallback);
-	mosync.nativeui.callBackTable[callbackID] = {
-		success : successCallback,
-		error : errorCallback
-	};
-};
-
-/**
- * Destroys a widget
- *
- * @param widgetID
- *            ID for the widget in Question
- * @param processedCallback
- *            optional call back for knowing that the message is processed See
- *            mosync.nativeui.getElementById for getting handles
- */
-mosync.nativeui.maWidgetDestroy = function(widgetID, successCallBack,
-		errorCallback, processedCallback) {
-	callbackID = "destroy" + widgetID;
-	var mosyncWidgetHandle = mosync.nativeui.widgetIDList[widgetID];
-	mosync.bridge.send([ "NativeUI", "maWidgetDestroy",
-			mosyncWidgetHandle + "", callbackID ], processedCallback);
-	mosync.nativeui.callBackTable[callbackID] = {
-		success : successCallback,
-		error : errorCallback
-	};
-};
-
-/**
- * Adds a widget to the given parent as a child. Letting the parent widget
- * layout the child.
- *
- * @param widgetID
- *            ID of the widget assigned by the user
- * @param childID
- *            ID of the widget to be added as a child
- * @param processedCallback
- *            optional call back for knowing that the message is processed
- *
- */
-mosync.nativeui.maWidgetAddChild = function(widgetID, childID, successCallback,
-		errorCallback, processedCallback) {
-	callbackID = "addChild" + widgetID + childID;
-	var mosyncWidgetHandle = mosync.nativeui.widgetIDList[widgetID];
-	var mosyncChildHandle = mosync.nativeui.widgetIDList[childID];
-	mosync.bridge.send([ "NativeUI", "maWidgetAddChild",
-			mosyncWidgetHandle + "", mosyncChildHandle + "", callbackID ],
-			processedCallback);
-	mosync.nativeui.callBackTable[callbackID] = {
-		success : successCallback,
-		error : errorCallback
-	};
-};
-
-/**
- * Inserts a widget to the given parent as a child at an index. Letting the
- * parent widget layout the child.
- *
- * @param widgetID
- *            ID of the parent widget
- * @param childID
- *            ID of the child widget
- * @param index
- *            place for the child widget, -1 means last
- * @param processedCallback
- *            optional call back for knowing that the message is processed
- *
- */
-mosync.nativeui.maWidgetInsertChild = function(widgetID, childID, index,
-		successCallback, errorCallback, processedCallback) {
-	callbackID = "insertChild" + widgetID;
-	var mosyncWidgetHandle = mosync.nativeui.widgetIDList[widgetID];
-	var mosyncChildHandle = mosync.nativeui.widgetIDList[childID];
-	mosync.bridge.send(
-			[ "NativeUI", "maWidgetInsertChild", mosyncWidgetHandle + "",
-					mosyncChildHandle + "", index, callbackID ],
-			processedCallback);
-	mosync.nativeui.callBackTable[callbackID] = {
-		success : successCallback,
-		error : errorCallback
-	};
-};
-
-/**
- * Removes a child widget from its parent (but does not destroy it). Removing a
- * currently visible top-level widget causes the MoSync view to become visible.
- *
- * @param childID
- *            ID for the child widget
- * @param processedCallback
- *            optional call back for knowing that the message is processed
- *
- */
-mosync.nativeui.maWidgetRemoveChild = function(childID, successCallback,
-		errorCallback, processedCallback) {
-	callbackID = "removeChild" + childID;
-	var mosyncChildHandle = mosync.nativeui.widgetIDList[childID];
-	mosync.bridge.send([ "NativeUI", "maWidgetRemoveChild",
-			mosyncChildHandle + "", callbackID ], processedCallback);
-	mosync.nativeui.callBackTable[callbackID] = {
-		success : successCallback,
-		error : errorCallback
-	};
-};
-
-/**
- * Shows a screen. If native UI hasn't been initialized, it is also initialized
- * and disables regular MoSync drawing.
- *
- * @param childID
- *            Id of the screen that should be shown
- * @param processedCallback
- *            optional call back for knowing that the message is processed
- *
- */
-mosync.nativeui.maWidgetScreenShow = function(screenID, successCallback,
-		errorCallback, processedCallback) {
-	callbackID = "screenShow" + screenID;
-	var mosyncScreenHandle = mosync.nativeui.widgetIDList[screenID];
-	mosync.bridge.send([ "NativeUI", "maWidgetScreenShow",
-			mosyncScreenHandle + "", callbackID ], processedCallback);
-	mosync.nativeui.callBackTable[callbackID] = {
-		success : successCallback,
-		error : errorCallback
-	};
-};
-
-/**
- * Shows a modalDialog.
- *
- * @param childID
- *            Id of the screen that should be shown
- * @param processedCallback
- *            optional call back for knowing that the message is processed
- *
- */
-mosync.nativeui.maWidgetModalDialogShow = function(dialogID, successCallback,
-		errorCallback, processedCallback) {
-	callbackID = "dialogShow" + dialogID;
-	var mosyncDialogHandle = mosync.nativeui.widgetIDList[dialogID];
-	mosync.bridge.send([ "NativeUI", "maWidgetModalDialogShow",
-			mosyncDialogHandle + "", callbackID ], processedCallback);
-	mosync.nativeui.callBackTable[callbackID] = {
-		success : successCallback,
-		error : errorCallback
-	};
-};
-
-/**
- * Hides a modalDialog.
- *
- * @param childID
- *            Id of the screen that should be shown
- * @param processedCallback
- *            optional call back for knowing that the message is processed
- *
- */
-mosync.nativeui.maWidgetModalDialogHide = function(dialogID, successCallback,
-		errorCallback, processedCallback) {
-	callbackID = "dialogHide" + dialogID;
-	var mosyncDialogHandle = mosync.nativeui.widgetIDList[dialogID];
-	mosync.bridge.send([ "NativeUI", "maWidgetModalDialogHide",
-			mosyncDialogHandle + "", callbackID ], processedCallback);
-	mosync.nativeui.callBackTable[callbackID] = {
-		success : successCallback,
-		error : errorCallback
-	};
-};
-
-/**
- * Pushes a screen to the given screen stack, hides the current screen and shows
- * the pushed screen it. Pushing it to the stack will make it automatically go
- * back to the previous screen when popped.
- *
- * @param stackScreenID
- *            Javascript ID of the stackscreen widget
- * @param screenID
- *            Javascript ID of the screen widget
- * @param processedCallback
- *            optional call back for knowing that the message is processed
- *
- */
-mosync.nativeui.maWidgetStackScreenPush = function(stackScreenID, screenID,
-		successCallback, errorCallback, processedCallback) {
-	callbackID = "StackScreenPush" + screenID;
-	var mosyncStackScreenHandle = mosync.nativeui.widgetIDList[stackScreenID];
-	var mosyncScreenHandle = mosync.nativeui.widgetIDList[screenID];
-	mosync.bridge.send(
-			[ "NativeUI", "maWidgetStackScreenPush",
-					mosyncStackScreenHandle + "", mosyncScreenHandle + "",
-					callbackID ], processedCallback);
-	mosync.nativeui.callBackTable[callbackID] = {
-		success : successCallback,
-		error : errorCallback
-	};
-};
-
-/**
- * Pops a screen from a screen stack, hides the current screen and shows the
- * popped screen before the If there is no previous screen in the screen stack,
- * an empty screen will be shown.
- *
- * @param stackScreenID
- *            JavaScript ID of the StackScreen
- * @param processedCallback
- *            optional call back for knowing that the message is processed
- *
- */
-mosync.nativeui.maWidgetStackScreenPop = function(stackScreenID,
-		successCallback, errorCallback, processedCallback) {
-	callbackID = "StackScreenPop" + stackScreenID
-			+ Math.round(Math.random() * 100);
-	var mosyncStackScreenHandle = mosync.nativeui.widgetIDList[stackScreenID];
-	mosync.bridge.send([ "NativeUI", "maWidgetStackScreenPop",
-			mosyncStackScreenHandle, callbackID ], processedCallback);
-	mosync.nativeui.callBackTable[callbackID] = {
-		success : successCallback,
-		error : errorCallback
-	};
-};
-
-mosync.nativeui.widgetPropertyIndexNo = 0;
-
-/**
- * Sets a specified property on the given widget.
- *
- * @param widgetID
- *            JavaScript ID of the widget
- * @param property
- *            name of the property
- * @param value
- *            value of the property
- * @param processedCallback
- *            optional call back for knowing that the message is processed
- *
- */
-mosync.nativeui.maWidgetSetProperty = function(widgetID, property, value,
-		successCallback, errorCallback, processedCallback) {
-
-	// make sure the id is unique for this call
-	callbackID = "setProperty" + widgetID + property
-			+ mosync.nativeui.widgetPropertyIndexNo++;
-	var widgetHandle = mosync.nativeui.widgetIDList[widgetID];
-	mosync.bridge.send([ "NativeUI", "maWidgetSetProperty", widgetHandle + "",
-			property, value + "", callbackID ], processedCallback);
-	mosync.nativeui.callBackTable[callbackID] = {
-		success : successCallback,
-		error : errorCallback
-	};
-};
-
-/**
- * Retrieves a specified property from the given widget.
- *
- * @param widgetID
- *            JavaScript ID of the widget
- * @param property
- *            name of the property that should be retrived
- * @param callBackFunction
- *            the function that will be called when the property is retrived
- * @param processedCallback
- *            optional call back for knowing that the message is processed
- *
- */
-mosync.nativeui.maWidgetGetProperty = function(widgetID, property,
-		successCallback, errorCallback, processedCallback) {
-	callbackID = "getProperty" + widgetID + property;
-	var widgetHandle = mosync.nativeui.widgetIDList[widgetID];
-	mosync.bridge.send([ "NativeUI", "maWidgetGetProperty", widgetHandle + "",
-			property, callbackID ], processedCallback);
-	mosync.nativeui.callBackTable[callbackID] = {
-		success : successCallback,
-		error : errorCallback
-	};
-};
-
-/**
- * This function is called by C++ to inform creation of a widget If a creation
- * callback is registered it will be called
- *
- * @param callbackID
- *            Javascript Id of the widget
- *
- */
-mosync.nativeui.createCallback = function(callbackID, widgetID, handle) {
-	var callBack = mosync.nativeui.callBackTable[callbackID];
-	mosync.nativeui.widgetIDList[widgetID] = handle;
-
-	if (callBack.success) {
-		var args = Array.prototype.slice.call(arguments);
-		args.shift();
-		callBack.success.apply(null, args);
-	}
-};
-
-mosync.nativeui.success = function(callbackID) {
-	var callBack = mosync.nativeui.callBackTable[callbackID];
-
-	if (callBack.success) {
-		var args = Array.prototype.slice.call(arguments);
-		// remove the callbakID from the argument list
-		args.shift();
-		callBack.success.apply(null, args);
-	}
-};
-
-/**
- * The callback function for getting the widgetProperty. If a property callback
- * is registered it will be called
- *
- * @param widgetHandle
- *            C++ ID of the widget sent from C++
- * @param property
- *            retrieved property's name
- * @param value
- *            value for the retrieved property
- */
-mosync.nativeui.error = function(callbackID) {
-	var callBack = mosync.nativeui.callBackTable[callbackID];
-	var args = Array.prototype.slice.call(arguments);
-	args.shift();
-	if (callBack.error != undefined) {
-		var args = Array.prototype.slice.call(arguments);
-		callBack.error.apply(null, args);
-	}
-};
-
-/**
- * Is called by C++ when receiving a widget event. It in turn calls the
- * registered listener for the specific Widget. You normally do not use this
- * function is called internally.
- *
- * @param widgetHandle
- *            C++ ID (MoSync Handle) of the widget that has triggered the event
- * @param eventType
- *            Type of the event (maybe followed by at most 3 event data
- *            variables)
- *
- */
-mosync.nativeui.event = function(widgetHandle, eventType) {
-
-	var callbackID = widgetHandle + eventType;
-	var callbackFunctions = mosync.nativeui.eventCallBackTable[callbackID];
-	// if we have a listener registered for this combination call it
-	if (callbackFunctions != undefined) {
-		// extract the function arguments
-		var args = Array.prototype.slice.call(arguments);
-		for (key in callbackFunctions) {
-
-			var callbackFun = callbackFunctions[key];
-			// Call the function.
-			callbackFun.apply(null, args);
-		}
-	}
-};
-
-mosync.nativeui.NativeElementsTable = {};
-
-/**
- * Registers a callback function for receiving widget events.
- *
- * @param widgetID
- *            JavaScript ID of the widget.
- * @param eventType
- *            Type of the events the users wants to listen to.
- * @param callBackFunction
- *            function that will be called when the widget sends an event.
- */
-mosync.nativeui.registerEventListener = function(widgetID, eventType,
-		listenerFunction) {
-	var widgetHandle = mosync.nativeui.widgetIDList[widgetID];
-	var callbackID = widgetHandle + eventType;
-	if (mosync.nativeui.eventCallBackTable[callbackID]) {
-		mosync.nativeui.eventCallBackTable[callbackID].push(listenerFunction);
-	} else {
-		mosync.nativeui.eventCallBackTable[callbackID] = [ listenerFunction ];
-	}
-
-};
-
-/**
- *
- * A widget object that user can interact with instead of using the low level
- * functions. It is used in
- *
- * @class represents a widget that can be manipulated
- * @param widgetType
- *            Type of the widget that has been created
- * @param widgetID
- *            ID of the widget used for identifying the widget(can be ignored by
- *            the user)
- *
- */
-mosync.nativeui.NativeWidgetElement = function(widgetType, widgetID, params,
-		successCallback, errorCallback) {
-	var self = this;
-
-	self.commandQueue = [];
-
-	self.params = params;
-
-	self.eventQueue = [];
-
-	var type = widgetType;
-	/**
-	 * Internal function used for synchronizing the widget operations. It makes
-	 * sure that the widget is created before calling any other functions.
-	 *
-	 */
-	this.processedMessage = function() {
-		function clone(obj) {
-			if (null == obj || "object" != typeof obj)
-				return obj;
-			var copy = obj.constructor();
-			for ( var attr in obj) {
-				if (obj.hasOwnProperty(attr))
-					copy[attr] = obj[attr];
-			}
-			return copy;
-		}
-		// Clone the command Queue and try to send everything at once.
-		var newCommandQueue = clone(self.commandQueue);
-		self.commandQueue = [];
-		if (newCommandQueue.length > 0) {
-			for ( var i = 0; i < newCommandQueue.length; i++) {
-				newCommandQueue[i].func.apply(null, newCommandQueue[i].args);
-			}
-		}
-
-	};
-
-	// Detect to see if the current widget is a screen
-	this.isScreen = ((type == "Screen") || (type == "TabScreen") || (type == "StackScreen")) ? true
-			: false;
-
-	// Detect to see if the current widget is a dialog
-	this.isDialog = (type == "ModalDialog") ? true : false;
-
-	/*
-	 * if the widgetID is not defined by the user, we will generate one
-	 */
-	if (widgetID) {
-		self.id = widgetID;
-	} else {
-		self.id = "natvieWidget" + widgetType + mosync.nativeui.widgetCounter;
-		mosync.nativeui.widgetCounter++;
-	}
-
-	/**
-	 * Internal success function used for creation of the widget
-	 *
-	 * @private
-	 */
-	var onSuccess = function(widgetID, widgetHandle) {
-		self.created = true;
-		self.handle = widgetHandle;
-		if (self.eventQueue) {
-			for (key in self.eventQueue) {
-				self.addEventListener(self.eventQueue[key].event,
-						self.eventQueue[key].callback);
-			}
-		}
-		if (successCallback) {
-
-			successCallback.apply(null, [ widgetID ]);
-		}
-	};
-	/**
-	 * Internal error function used for creation of the widget
-	 *
-	 * @private
-	 */
-	var onError = function(errorCode) {
-		self.latestError = errorCode;
-		if (errorCallback) {
-			errorCallback.apply(null, [ errorCode ]);
-		}
-
-	};
-	/*
-	 * Create the widget in the Native Side
-	 */
-	mosync.nativeui.maWidgetCreate(widgetType, self.id, onSuccess, onError,
-			self.processedMessage, self.params);
-
-	/**
-	 * sets a property to the widget in question
-	 */
-	this.setProperty = function(property, value, successCallback, errorCallback) {
-		if (self.created) {
-			mosync.nativeui.maWidgetSetProperty(self.id, property, value,
-					successCallback, errorCallback, self.processedMessage);
-		} else {
-			self.commandQueue.push({
-				func : self.setProperty,
-				args : [ property, value, successCallback, errorCallback ]
-			});
-		}
-	};
-
-	/**
-	 * retirves a property and call the respective callback
-	 *
-	 * @param property
-	 *            name of the property
-	 * @param successCallback
-	 *            a function that will be called if the operation is successfull
-	 * @param errorCallback
-	 *            a function that will be called if an error occurs
-	 */
-	this.getProperty = function(property, successCallback, errorCallback) {
-		if (self.created) {
-			mosync.nativeui.maWidgetGetProperty(self.id, property,
-					successCallback, errorCallback, self.processedMessage);
-		} else {
-			self.commandQueue.push({
-				func : self.getProperty,
-				args : [ property, successCallback, errorCallback ]
-			});
-		}
-	};
-
-	/**
-	 * Registers an event listener for this widget
-	 *
-	 * @param eventType
-	 *            type of the event that the user wants to listen to
-	 * @param listenerFunction
-	 *            a function that will be called when that event is fired.
-	 *
-	 */
-	this.addEventListener = function(eventType, listenerFunction) {
-		if (self.created) {
-			mosync.nativeui.registerEventListener(self.id, eventType,
-					listenerFunction);
-		} else {
-			self.eventQueue.push({
-				event : eventType,
-				callback : listenerFunction
-			});
-		}
-
-	};
-
-	/**
-	 * Adds a child widget to the cureent widget
-	 *
-	 * @param childID
-	 *            the ID for th echild widget
-	 * @param successCallback
-	 *            a function that will be called if the operation is successfull
-	 * @param errorCallback
-	 *            a function that will be called if an error occurs
-	 *
-	 */
-	this.addChild = function(childID, successCallback, errorCallback) {
-
-		if ((self.created) && (childID != undefined)) {
-			mosync.nativeui.maWidgetAddChild(self.id, childID, successCallback,
-					errorCallback, self.processedMessage);
-		} else {
-			self.commandQueue.push({
-				func : self.addChild,
-				args : [ childID, successCallback, errorCallback ]
-			});
-		}
-	};
-
-	/**
-	 * Inserts a new child widget in the specifed index
-	 *
-	 * @param childID
-	 *            ID of the child widget
-	 * @param index
-	 *            the index for the place that the new child should be insterted
-	 * @param successCallback
-	 *            a function that will be called if the operation is successfull
-	 * @param errorCallback
-	 *            a function that will be called if an error occurs
-	 */
-	this.insertChild = function(childID, index, successCallback, errorCallback) {
-		if ((self.created) && (childID != undefined)) {
-			mosync.nativeui.maWidgetInsertChild(self.id, childID, index,
-					successCallback, errorCallback, self.processedMessage);
-		} else {
-			self.commandQueue.push({
-				func : self.insertChild,
-				args : [ childID, index, successCallback, errorCallback ]
-			});
-		}
-	};
-
-	/**
-	 * Removes a child widget fro mthe child list of the current widget
-	 *
-	 * @param childID
-	 *            Id of the child widget that will be removed
-	 * @param successCallback
-	 *            a function that will be called if the operation is successfull
-	 * @param errorCallback
-	 *            a function that will be called if an error occurs
-	 *
-	 */
-	this.removeChild = function(childID, successCallback, errorCallback) {
-		if ((self.created) && (childID != undefined)) {
-			mosync.nativeui.maWidgetRemoveChild(childID, successCallback,
-					errorCallback, self.processedMessage);
-		} else {
-			self.commandQueue.push({
-				func : self.removeChild,
-				args : [ childID, successCallback, errorCallback ]
-			});
-		}
-	};
-
-	/**
-	 * Adds the current widget as a child to another widget.
-	 *
-	 * @param parentId
-	 *            JavaScript ID of the parent widget.
-	 * @param successCallback
-	 *            (optional) a function that will be called when the operation
-	 *            is done successfully
-	 * @param errorCallback
-	 *            (optional) a function that will be called when the operation
-	 *            encounters an error
-	 *
-	 */
-	this.addTo = function(parentId, successCallback, errorCallback) {
-		var parent = document.getNativeElementById(parentId);
-		if ((self.created) && (parent != undefined) && (parent.created)
-				&& (self.created != undefined)) {
-			mosync.nativeui.maWidgetAddChild(parentId, self.id,
-					successCallback, errorCallback, self.processedMessage);
-		} else {
-			self.commandQueue.push({
-				func : self.addTo,
-				args : [ parentId, successCallback, errorCallback ]
-			});
-		}
-	};
-	/*
-	 * Only create screen related functions if the widget is a screen
-	 */
-	if (self.isScreen) {
-		/**
-		 * Shows a screen widget on the screen. Will call the error callback if
-		 * the widget is not of type screen.
-		 *
-		 * @param successCallback
-		 *            a function that will be called if the operation is
-		 *            successfull
-		 * @param errorCallback
-		 *            a function that will be called if an error occurs
-		 *
-		 */
-		this.show = function(successCallback, errorCallback) {
-			if (self.created) {
-				mosync.nativeui.maWidgetScreenShow(self.id, successCallback,
-						errorCallback, self.processedMessage);
-			} else {
-				self.commandQueue.push({
-					func : self.show,
-					args : [ successCallback, errorCallback ]
-				});
-			}
-		};
-
-		/**
-		 * pushs a screen to a stackscreen
-		 *
-		 * @param stackScreenID
-		 *            the ID for the stackscreen that should be used for pushing
-		 *            the current screen
-		 * @param successCallback
-		 *            a function that will be called if the operation is
-		 *            successfull
-		 * @param errorCallback
-		 *            a function that will be called if an error occurs
-		 */
-		this.pushTo = function(stackScreenID, successCallback, errorCallback) {
-			var stackScreen = document.getNativeElementById(stackScreenID);
-			if ((self.created) && (stackScreen != undefined)
-					&& (stackScreen.created) && (self.created != undefined)) {
-				mosync.nativeui.maWidgetStackScreenPush(stackScreenID, self.id,
-						successCallback, errorCallback, self.processedMessage);
-			} else {
-				self.commandQueue.push({
-					func : self.pushTo,
-					args : [ stackScreenID, successCallback, errorCallback ]
-				});
-			}
-		};
-
-		/**
-		 * Pops a screen fr om the current stackscreen, Use only for StackScreen
-		 * widgets
-		 *
-		 * @param successCallback
-		 *            a function that will be called if the operation is
-		 *            successfull
-		 * @param errorCallback
-		 *            a function that will be called if an error occurs
-		 */
-		this.pop = function(successCallback, errorCallback) {
-			if (self.created) {
-				mosync.nativeui.maWidgetStackScreenPop(self.id,
-						successCallback, errorCallback, self.processedMessage);
-			} else {
-				self.commandQueue.push({
-					func : self.pop,
-					args : [ successCallback, errorCallback ]
-				});
-			}
-		};
-	}
-	/*
-	 * Create dialog functions for dialog widgets only
-	 */
-	if (this.isDialog) {
-		/**
-		 * Shows a modal dialog widget on the screen.
-		 *
-		 * @param successCallback
-		 *            a function that will be called if the operation is
-		 *            successfull
-		 * @param errorCallback
-		 *            a function that will be called if an error occurs
-		 *
-		 */
-		this.showDialog = function(successCallback, errorCallback) {
-			if (self.created) {
-				mosync.nativeui.maWidgetModalDialogShow(self.id,
-						successCallback, errorCallback, self.processedMessage);
-			} else {
-				self.commandQueue.push({
-					func : self.showDialog,
-					args : [ successCallback, errorCallback ]
-				});
-			}
-		};
-
-		/**
-		 * Hides a modal dialog widget from the screen.
-		 *
-		 * @param successCallback
-		 *            a function that will be called if the operation is
-		 *            successfull
-		 * @param errorCallback
-		 *            a function that will be called if an error occurs
-		 *
-		 */
-		this.hideDialog = function(successCallback, errorCallback) {
-			if (self.created) {
-				mosync.nativeui.maWidgetModalDialogHide(self.id,
-						successCallback, errorCallback, self.processedMessage);
-			} else {
-				self.commandQueue.push({
-					func : self.hideDialog,
-					args : [ successCallback, errorCallback ]
-				});
-			}
-		};
-
-	}
-	// add the current widget to the table
-	mosync.nativeui.NativeElementsTable[this.id] = this;
-
-};
-
-/**
- * Used to access the nativeWidgetElements created from the HTML markup. It
- * returns the object that can be used to change the properties of the specified
- * widget.
- *
- * @param widgetID
- *            the ID attribute used for identifying the widget in DOM
- *
- */
-document.getNativeElementById = function(widgetID) {
-	return mosync.nativeui.NativeElementsTable[widgetID];
-};
-
-/**
- * creates a widget and returns a NativeWidgetElement object.
- *
- * usage: var myButton = mosync.nativeui.create("Button", "myButton");
- *
- *
- * @param widgetType
- *            type of the widet that should be created
- * @param widgetID
- *            ID that will be used for refrencing to the widget
- * @param successCallback
- *            (optional) a function that will be called when the operation is
- *            done successfully
- * @param errorCallback
- *            (optional) a function that will be called when the operation
- *            encounters an error
- *
- * @returns {mosync.nativeui.NativeWidgetElement}
- */
-mosync.nativeui.create = function(widgetType, widgetID, params,
-		successCallback, errorCallback) {
-	var widget = new mosync.nativeui.NativeWidgetElement(widgetType, widgetID,
-			params, successCallback, errorCallback);
-	return widget;
-};
-
-/**
- * Stores the number of widgets that are waiting to be created. Used when
- * parsing the XML based input
- */
-mosync.nativeui.numWidgetsRequested = 0;
-
-/**
- * Stores the number of widgets that are created. Used when parsing the XML
- * based input
- */
-mosync.nativeui.numWidgetsCreated = 0;
-
-/**
- * The interval for checking the availability of all widgets Used when parsing
- * the XML based input
- */
-mosync.nativeui.showInterval;
-
-/**
- * List of WidetIDs and handles. Used for accessign widgets through their IDs
- */
-mosync.nativeui.widgetIDList = {};
-
-/**
- * Provides access to C++ handles through IDs.
- *
- * @param elementID
- *            ID of the widget in question
- * @returns MoSync handle value for that widget
- */
-mosync.nativeui.getElementById = function(elementID) {
-	return mosync.nativeui.widgetIDList[elementID];
-};
-
-/**
- * An internal function that returns the correct property name Used to overcome
- * case sensitivity problems in browsers.
- *
- * @param attributeName
- *            name of the attribute used in HTML markup
- * @returns new name for the attribute
- */
-mosync.nativeui.getNativeAttrName = function(attributeName) {
-	switch (String(attributeName).toLowerCase()) {
-	case "fontsize":
-		return "fontSize";
-		break;
-	case "fontcolor":
-		return "fontColor";
-		break;
-	case "backgrouncolor":
-		return "backgroundColor";
-		break;
-	case "backgroundgradient":
-		return "backgroundGradient";
-		break;
-	case "currenttab":
-		return "currentTab";
-		break;
-	case "backbuttonenabled":
-		return "backButtonEnabled";
-		break;
-	case "textverticalalignment":
-		return "textVerticalAlignment";
-		break;
-	case "texthorizontalalignment":
-		return "textHorizontalAlignment";
-		break;
-	case "fonthandle":
-		return "fontHandle";
-		break;
-	case "maxnumberoflines":
-		return "maxNumberOfLines";
-		break;
-	case "backgroundimage":
-		return "backgroundImage";
-		break;
-	case "scalemode":
-		return "scaleMode";
-		break;
-	case "showkeyboard":
-		return "showKeyboard";
-		break;
-	case "editmode":
-		return "editMode";
-		break;
-	case "inputmode":
-		return "inputMode";
-		break;
-	case "inputflag":
-		return "inputFlag";
-		break;
-	case "accessorytype":
-		return "accessoryType";
-		break;
-	case "childverticalalignment":
-		return "childVerticalAlignment";
-		break;
-	case "childhorizontalalignment":
-		return "childHorizontalAlignment";
-		break;
-	case "paddingtop":
-		return "paddingTop";
-		break;
-	case "paddingleft":
-		return "paddingLeft";
-		break;
-	case "paddingright":
-		return "paddingRight";
-		break;
-	case "paddingbottom":
-		return "paddingBottom";
-		break;
-	case "softhook":
-		return "softHook";
-		break;
-	case "hardhook":
-		return "hardHook";
-		break;
-	case "horizontalscrollbarenabled":
-		return "horizontalScrollBarEnabled";
-		break;
-	case "verticalscrollbarenabled":
-		return "verticalScrollBarEnabled";
-		break;
-	case "enablezoom":
-		return "enableZoom";
-		break;
-	case "incrementprogress":
-		return "incrementProgress";
-		break;
-	case "inprogress":
-		return "inProgress";
-		break;
-	case "increasevalue":
-		return "increaseValue";
-		break;
-	case "decreasevalue":
-		return "decreaseValue";
-		break;
-	case "maxdate":
-		return "maxDate";
-		break;
-	case "mindate":
-		return "minDate";
-		break;
-	case "dayofmonth":
-		return "dayOfMonth";
-		break;
-	case "currenthour":
-		return "currentHour";
-		break;
-	case "currentminute":
-		return "currentMinute";
-		break;
-	case "minvalue":
-		return "minValue";
-		break;
-	case "maxvalue":
-		return "maxValue";
-		break;
-
-	default:
-		return attributeName;
-	}
-};
-
-mosync.nativeui.getNativeAttrValue = function(value) {
-	switch (String(value).toLowerCase()) {
-	case "100%":
-		return "-1";
-		break;
-	default:
-		return value;
-	}
-};
-
-/**
- * Creates a widget, sets its property and adds it to its parent.
- *
- * @param widgetID
- *            ID of the widget in question
- * @param parentID
- *            Id of the parentWidget
- */
-mosync.nativeui.createWidget = function(widget, parent) {
-	var widgetNode = widget;
-	var widgetID = widget.id;
-	var imageResources = null;
-	var widgetType = widgetNode.getAttribute("widgetType");
-	mosync.nativeui.numWidgetsRequested++;
-	var attributeList = widgetNode.attributes;
-	var propertyList = {};
-	var eventList = null;
-	for ( var i = 0; i < attributeList.length; i++) {
-		// TODO: Add more event types and translate the attributes.
-		if (attributeList[i].specified) {
-			var attrName = mosync.nativeui
-					.getNativeAttrName(attributeList[i].name);
-			var attrValue = mosync.nativeui
-					.getNativeAttrValue(attributeList[i].value);
-			if ((attrName != "id") && (attrName != "widgettype")
-					&& (attrValue != null)) {
-				if (attrName == "onevent") {
-
-					var functionData = attrValue;
-					eventList = {
-						type : "Clicked",
-						func : function(widgetHandle, eventType) {
-							// TODO: Improve event function parsing mechanism
-							eval(functionData);
-						}
-					};
-				} else if ((attrName == "image") || (attrName == "icon")) {
-					imageResources = {
-						propertyType : attrName,
-						value : attrValue
-					};
-				} else if ((mosync.isAndroid) && (attrName == "icon_android")) {
-					console.log("detected an Icon" + attrValue);
-					imageResources = {
-						propertyType : "icon",
-						value : attrValue
-					};
-				} else if ((mosync.isIOS) && (attrName == "icon_ios")) {
-					imageResources = {
-						propertyType : "icon",
-						value : attrValue
-					};
-				} else {
-					if ((attrName != "icon_ios")
-							&& (attrName != "icon_android")) {
-						propertyList[attrName] = attrValue;
-					}
-				}
-			}
-		}
-	}
-	var currentWidget = mosync.nativeui
-			.create(widgetType, widgetID, propertyList,
-					function(widgetID, handle) {
-						var thisWidget = document
-								.getNativeElementById(widgetID);
-						mosync.nativeui.numWidgetsRequested--;
-						if (imageResources != null) {
-							mosync.resource.loadImage(imageResources.value,
-									widgetID + "image", function(imageID,
-											imageHandle) {
-										thisWidget.setProperty(
-												imageResources.propertyType,
-												imageHandle, null, null);
-
-									});
-						}
-						if (eventList != null) {
-							thisWidget.addEventListener(eventList.type,
-									eventList.func);
-						}
-					}, null);
-	if (parent != null) {
-		currentWidget.addTo(parent.id);
-	}
-};
-
-/**
- * A function that is called when the UI is ready. By default it loads the
- * element with ID "mainScreen" Override this function to add extra
- * functionality. See mosync.nativeui.initUI for more information
- */
-mosync.nativeui.UIReady = function() {
-	// This is the low level way of showing the default screen
-	// If you want to override this fucntion,
-	// use document.getNativeElementById instead
-	mosync.nativeui.maWidgetScreenShow("mainScreen");
-};
-
-/**
- * Recursively creates the UI from the HTML5 markup.
- *
- * @param parentid
- *            ID of the parent Widget
- * @param id
- *            ID of the currewnt widget
- */
-mosync.nativeui.createChilds = function(parent, widget) {
-	if (widget != undefined) {
-		var node = widget;
-		var nodeChilds = node.childNodes;
-		mosync.nativeui.createWidget(node, parent);
-		if (nodeChilds != null) {
-			for ( var i = 0; i < nodeChilds.length; i++) {
-
-				if ((nodeChilds[i] != null)
-						&& (nodeChilds[i].tagName != undefined)) {
-					if ((nodeChilds[i].id == null)
-							|| (nodeChilds[i].id == undefined)
-							|| (nodeChilds[i].id == "")) {
-						nodeChilds[i].id = "widget"
-								+ mosync.nativeui.widgetCounter;
-						mosync.nativeui.widgetCounter++;
-					}
-					mosync.nativeui.createChilds(node, nodeChilds[i]);
-				}
-			}
-		}
-
-	}
-};
-
-/**
- * Checks the status of UI and calls UIReady when it is ready.
- * @internal
- */
-mosync.nativeui.CheckUIStatus = function() {
-	if (0 == mosync.nativeui.numWidgetsRequested) {
-		window.clearInterval(mosync.nativeui.showInterval);
-		mosync.nativeui.UIReady();
-	}
-};
-
-/**
- * Shows a MoSync Screen, can be used to change the current screen.
- *
- * usage example:
- *  mosync.nativeui.showScreen("myNewScreen");
- *
- * @param screenID
- */
-mosync.nativeui.showScreen = function(screenID) {
-	if (numWidgetsCreated == numWidgetsRequested) {
-		mosync.nativeui
-				.maWidgetScreenShow(mosync.nativeui.widgetIDList[screenID]);
-
-	}
-};
-
-/**
- * Initializes the UI system and parsing of the XML input.
- * This function should be called when the document body is loaded.
- *
- * usage:
- *  <body onload="mosync.nativeui.initUI()">
- *
- *  After finalizing the widgets, the UI system will call the UIReady function.
- *  In order to add your operation you can override the UIReady function as below:
- *
- *  mosync.nativeui.UIReady = function()
- *  {
- *  //Do something, and show your main screen
- *  }
- *
- */
-mosync.nativeui.initUI = function() {
-	var MoSyncDiv = document.getElementById("NativeUI");
-	MoSyncDiv.style.display = "none"; //hide the Native Container
-	var MoSyncNodes = document.getElementById("NativeUI").childNodes;
-	for ( var i = 1; i < MoSyncNodes.length; i++) {
-		if ((MoSyncNodes[i] != null) && (MoSyncNodes[i].tagName != undefined)) {
-			if (MoSyncNodes[i].id == null) {
-				MoSyncNodes[i].id = "widget" + mosync.nativeui.widgetCounter;
-				mosync.nativeui.widgetCounter++;
-			}
-			mosync.nativeui.createChilds(null, MoSyncNodes[i]);
-		}
-	}
-	mosync.nativeui.showInterval = self.setInterval(
-			"mosync.nativeui.CheckUIStatus()", 100);
-};
+// =============================================================
+//
+// File: phonegap-1.2.0.js
 
 /*
- * store the screen size information coming from MoSync
- * in the namespace
- */
-if (mosyncScreenWidth) {
-	mosync.nativeui.screenWidth = mosyncScreenWidth;
-}
-if (mosyncScreenHeight) {
-	mosync.nativeui.screenHeight = mosyncScreenHeight;
-}
-/*
- * PhoneGap for MoSync.
- *
- * PhoneGap is available under *either* the terms of the modified BSD license *or* the
- * MIT License (2008). See http://opensource.org/licenses/alphabetical for full text.
- *
+PhoneGap
+========
+
+PhoneGap is available under *either* the terms of the modified BSD license *or* the
+MIT License (2008). See http://opensource.org/licenses/alphabetical for full text.
+
  * Copyright (c) 2005-2010, Nitobi Software Inc.
  * Copyright (c) 2010-2011, IBM Corporation
  * Copyright (c) 2011, Microsoft Corporation
@@ -1962,28 +659,6 @@ PhoneGapCommandResult = function(status,callbackId,args,cast)
     }
 };
 
-function PrintObj(obj, indent)
-{
-    if (undefined === indent)
-    {
-        indent = "";
-    }
-
-    console.log(indent + "@@ PrintObj");
-
-    for (var field in obj)
-    {
-        if (typeof obj[field] != "function")
-        {
-            console.log("  " + indent + "[" + field + ": " + obj[field] + "]");
-            if ((null != obj[field]) && (typeof obj[field] == "object"))
-            {
-                PrintObj(obj[field], indent + "  ");
-            }
-        }
-    }
-}
-
 /**
  * Called by native code when returning successful result from an action.
  *
@@ -1996,8 +671,6 @@ PhoneGap.CallbackSuccess = function(callbackId, args, cast)
     var commandResult;
     try
     {
-        console.log("PhoneGap.CallbackSuccess: " + callbackId + " args: " + args);
-
         commandResult = JSON.parse(args);
 
         if (typeof cast !== 'undefined')
@@ -2008,6 +681,7 @@ PhoneGap.CallbackSuccess = function(callbackId, args, cast)
     catch(exception)
     {
         console.log("PhoneGap.CallbackSuccess Exception: " + exception.message);
+        return exception.message;
     }
 
     if (PhoneGap.callbacks[callbackId] ) {
@@ -2020,8 +694,7 @@ PhoneGap.CallbackSuccess = function(callbackId, args, cast)
                 }
             }
             catch (e) {
-                console.log("PhoneGap.CallbackSuccess Error in success callback: " +
-                    callbackId + " = " + e.message);
+                console.log("Error in success callback: "+callbackId+" = " + e.message);
             }
         }
 
@@ -2051,6 +724,7 @@ PhoneGap.CallbackError = function (callbackId, args, cast) {
     }
     catch(exception)
     {
+        console.log("PhoneGap.CallbackError Exception: " + exception.message);
         return exception.message;
     }
 
@@ -2061,7 +735,7 @@ PhoneGap.CallbackError = function (callbackId, args, cast) {
             }
         }
         catch (e) {
-            console.log("Error in error callback: " + callbackId + " = " + e);
+            console.log("Error in error callback: "+callbackId+" = "+e);
         }
 
         // Clear callback if not expecting any more results
@@ -2286,7 +960,7 @@ PhoneGap.addConstructor = function(func)
     });
 };
 
-/**
+/*
  * Plugins object
  */
 if (!window.plugins) {
@@ -2412,7 +1086,7 @@ PhoneGap.initializationComplete = function(feature) {
     }
 };
 
-/**
+/*
  * Create all PhoneGap objects once page has fully loaded and native side is ready.
  */
 PhoneGap.Channel.join(
@@ -2520,7 +1194,9 @@ if (!PhoneGap.hasResource("accelerometer"))
 {
 PhoneGap.addResource("accelerometer");
 
-/** @constructor */
+/**
+ * @constructor
+ */
 var Acceleration = function(x, y, z) {
   this.x = x;
   this.y = y;
@@ -2553,6 +1229,20 @@ Accelerometer.ERROR_MSG = ["Not running", "Starting", "", "Failed to start"];
  * @param {Function} successCallback    The function to call when the acceleration data is available
  * @param {Function} errorCallback      The function to call when there is an error getting the acceleration data. (OPTIONAL)
  * @param {AccelerationOptions} options The options for getting the accelerometer data such as timeout. (OPTIONAL)
+ \code
+ function onSuccess(acceleration) {
+    alert('Acceleration X: ' + acceleration.x + '\n' +
+          'Acceleration Y: ' + acceleration.y + '\n' +
+          'Acceleration Z: ' + acceleration.z + '\n' +
+          'Timestamp: '      + acceleration.timestamp + '\n');
+};
+
+function onError() {
+    alert('onError!');
+};
+
+navigator.accelerometer.getCurrentAcceleration(onSuccess, onError);
+ \endcode
  */
 Accelerometer.prototype.getCurrentAcceleration = function(successCallback, errorCallback, options) {
 
@@ -2595,6 +1285,20 @@ Accelerometer.prototype.getCurrentAcceleration = function(successCallback, error
  * @param {Function} errorCallback      The function to call when there is an error getting the acceleration data. (OPTIONAL)
  * @param {AccelerationOptions} options The options for getting the accelerometer data such as timeout. (OPTIONAL)
  * @return String                       The watch id that must be passed to #clearWatch to stop watching.
+ \code
+ function onSuccess(acceleration) {
+    alert('Acceleration X: ' + acceleration.x + '\n' +
+          'Acceleration Y: ' + acceleration.y + '\n' +
+          'Acceleration Z: ' + acceleration.z + '\n' +
+          'Timestamp: '      + acceleration.timestamp + '\n');
+};
+
+function onError() {
+    alert('onError!');
+};
+
+navigator.accelerometer.getCurrentAcceleration(onSuccess, onError);
+ \endcode
  */
 Accelerometer.prototype.watchAcceleration = function(successCallback, errorCallback, options)
 {
@@ -2638,6 +1342,13 @@ Accelerometer.prototype.watchAcceleration = function(successCallback, errorCallb
  * Clears the specified accelerometer watch.
  *
  * @param {String} id       The id of the watch returned from #watchAcceleration.
+ \code
+ var watchID = navigator.accelerometer.watchAcceleration(onSuccess, onError, options);
+
+// ... later on ...
+
+navigator.accelerometer.clearWatch(watchID);
+ \endcode
  */
 Accelerometer.prototype.clearWatch = function(id) {
 
@@ -2684,6 +1395,18 @@ var Camera = function() {
  *              { quality: 80,
  *                destinationType: Camera.DestinationType.DATA_URL,
  *                sourceType: Camera.PictureSourceType.PHOTOLIBRARY})
+ \code
+ navigator.camera.getPicture(onSuccess, onFail, { quality: 50 });
+
+function onSuccess(imageData) {
+    var image = document.getElementById('myImage');
+    image.src = "data:image/jpeg;base64," + imageData;
+}
+
+function onFail(message) {
+    alert('Failed because: ' + message);
+}
+ \endcode
  */
 Camera.DestinationType = {
     DATA_URL: 0,                // Return base64 encoded string
@@ -2730,6 +1453,18 @@ Camera.prototype.PictureSourceType = Camera.PictureSourceType;
  * @param {Function} successCallback
  * @param {Function} errorCallback
  * @param {Object} options
+ \code
+ navigator.camera.getPicture(onSuccess, onFail, { quality: 50 });
+
+function onSuccess(imageData) {
+    var image = document.getElementById('myImage');
+    image.src = "data:image/jpeg;base64," + imageData;
+}
+
+function onFail(message) {
+    alert('Failed because: ' + message);
+}
+ \endcode
  */
 Camera.prototype.getPicture = function(successCallback, errorCallback, options) {
     console.log("Camera.prototype.getPicture");
@@ -2897,6 +1632,24 @@ var Capture = function(){
  * @param {Function} successCB
  * @param {Function} errorCB
  * @param {CaptureAudioOptions} options
+ \code
+ // capture callback
+var captureSuccess = function(mediaFiles) {
+    var i, path, len;
+    for (i = 0, len = mediaFiles.length; i < len; i += 1) {
+        path = mediaFiles[i].fullPath;
+        // do something interesting with the file
+    }
+};
+
+// capture error callback
+var captureError = function(error) {
+    navigator.notification.alert('Error code: ' + error.code, null, 'Capture Error');
+};
+
+// start audio capture
+navigator.device.capture.captureAudio(captureSuccess, captureError, {limit:2});
+ \endcode
  */
 Capture.prototype.captureAudio = function(successCallback, errorCallback, options){
     PhoneGap.exec(successCallback, errorCallback, "Capture", "captureAudio", options);
@@ -2908,6 +1661,24 @@ Capture.prototype.captureAudio = function(successCallback, errorCallback, option
  * @param {Function} successCB
  * @param {Function} errorCB
  * @param {CaptureImageOptions} options
+ \code
+ // capture callback
+var captureSuccess = function(mediaFiles) {
+    var i, path, len;
+    for (i = 0, len = mediaFiles.length; i < len; i += 1) {
+        path = mediaFiles[i].fullPath;
+        // do something interesting with the file
+    }
+};
+
+// capture error callback
+var captureError = function(error) {
+    navigator.notification.alert('Error code: ' + error.code, null, 'Capture Error');
+};
+
+// start image capture
+navigator.device.capture.captureImage(captureSuccess, captureError, {limit:2});
+\endcode
  */
 Capture.prototype.captureImage = function (successCallback, errorCallback, options) {
 	PhoneGap.exec(	function(mediaFiles)
@@ -2926,6 +1697,24 @@ Capture.prototype.captureImage = function (successCallback, errorCallback, optio
  * @param {Function} successCB
  * @param {Function} errorCB
  * @param {CaptureVideoOptions} options
+ \code
+ // capture callback
+var captureSuccess = function(mediaFiles) {
+    var i, path, len;
+    for (i = 0, len = mediaFiles.length; i < len; i += 1) {
+        path = mediaFiles[i].fullPath;
+        // do something interesting with the file
+    }
+};
+
+// capture error callback
+var captureError = function(error) {
+    navigator.notification.alert('Error code: ' + error.code, null, 'Capture Error');
+};
+
+// start video capture
+navigator.device.capture.captureVideo(captureSuccess, captureError, {limit:2});
+ \endcode
  */
 Capture.prototype.captureVideo = function(successCallback, errorCallback, options){
 	PhoneGap.exec(	function(mediaFiles)
@@ -3005,6 +1794,7 @@ var CaptureAudioOptions = function(){
     // The selected audio mode. Must match with one of the elements in supportedAudioModes array.
     this.mode = null;
 };
+
 PhoneGap.addConstructor(function () {
     if (typeof navigator.device === "undefined") {
         navigator.device = window.device = new Device();
@@ -3014,7 +1804,9 @@ PhoneGap.addConstructor(function () {
         navigator.device.capture = window.device.capture = new Capture();
     }
 });
-}/*
+}
+
+/*
  * PhoneGap is available under *either* the terms of the modified BSD license *or* the
  * MIT License (2008). See http://opensource.org/licenses/alphabetical for full text.
  *
@@ -3046,6 +1838,17 @@ Compass.ERROR_MSG = ["Not running", "Starting", "", "Failed to start", "Not Supp
  * @param {Function} successCallback The function to call when the heading data is available
  * @param {Function} errorCallback The function to call when there is an error getting the heading data. (OPTIONAL)
  * @param {PositionOptions} options The options for getting the heading data such as timeout. (OPTIONAL)
+ \code
+ function onSuccess(heading) {
+    alert('Heading: ' + heading.magneticHeading);
+};
+
+function onError(error) {
+    alert('CompassError: ' error.code);
+};
+
+navigator.compass.getCurrentHeading(onSuccess, onError);
+\endcode
  */
 Compass.prototype.getCurrentHeading = function(successCallback, errorCallback, options) {
 
@@ -3069,7 +1872,7 @@ Compass.prototype.getCurrentHeading = function(successCallback, errorCallback, o
         var onSuccess = function(result)
         {
             var compassResult = JSON.parse(result);
-            console.log("compassResult = " + compassResult);
+            //console.log("compassResult = " + compassResult);
             self.lastHeading = compassResult;
             successCallback(self.lastHeading);
         }
@@ -3103,6 +1906,20 @@ Compass.prototype.getCurrentHeading = function(successCallback, errorCallback, o
  * @param {Function} errorCallback      The function to call when there is an error getting the heading data. (OPTIONAL)
  * @param {HeadingOptions} options      The options for getting the heading data such as timeout and the frequency of the watch. (OPTIONAL)
  * @return String                       The watch id that must be passed to #clearWatch to stop watching.
+ \code
+ function onSuccess(heading) {
+    var element = document.getElementById('heading');
+    element.innerHTML = 'Heading: ' + heading.magneticHeading;
+};
+
+function onError(compassError) {
+        alert('Compass error: ' + compassError.code);
+};
+
+var options = { frequency: 3000 };  // Update every 3 seconds
+
+var watchID = navigator.compass.watchHeading(onSuccess, onError, options);
+ \endcode
  */
 Compass.prototype.watchHeading= function(successCallback, errorCallback, options) {
 
@@ -3146,6 +1963,13 @@ Compass.prototype.watchHeading= function(successCallback, errorCallback, options
  * Clears the specified heading watch.
  *
  * @param {String} id       The ID of the watch returned from #watchHeading.
+ \code
+ var watchID = navigator.compass.watchHeading(onSuccess, onError, options);
+
+// ... later on ...
+
+navigator.compass.clearWatch(watchID);
+ \endcode
  */
 Compass.prototype.clearWatch = function(id) {
 
@@ -3391,6 +2215,21 @@ var Contacts = function() {
 * @param errorCB error callback
 * @param {ContactFindOptions} options that can be applied to contact searching
 * @return array of Contacts matching search criteria
+\code
+function onSuccess(contacts) {
+    alert('Found ' + contacts.length + ' contacts.');
+};
+
+function onError(contactError) {
+    alert('onError!');
+};
+
+// find all contacts with 'Bob' in any name field
+var options = new ContactFindOptions();
+options.filter="Bob";
+var fields = ["displayName", "name"];
+navigator.contacts.find(fields, onSuccess, onError, options);
+\endcode
 */
 Contacts.prototype.find = function(fields, successCB, errorCB, options) {
     if (successCB === null) {
@@ -3425,6 +2264,9 @@ Contacts.prototype.find = function(fields, successCB, errorCB, options) {
 * contact.save().
 * @param properties an object who's properties will be examined to create a new Contact
 * @returns new Contact object
+\code
+var myContact = navigator.contacts.create({"displayName": "Test User"});
+\endcode
 */
 Contacts.prototype.create = function(properties) {
     var i;
@@ -3466,7 +2308,7 @@ var ContactFindOptions = function(filter, multiple) {
     this.multiple = multiple || false;
 };
 
-/**
+/*
  * Add the contact interface into the browser.
  */
 PhoneGap.addConstructor(function() {
@@ -3737,30 +2579,6 @@ if(!window.localStorage)
           //  window.external.Notify("DOMStorage/" + this._type + "/clear/");
         }
     };
-
-    // initialize DOMStorage
- /*
-    Object.defineProperty( window, "localStorage",
-    {
-        writable: false,
-        configurable: false,
-        value:new DOMStorage("localStorage")
-    });
-    if(window.localStorage != null) {
-        window.localStorage.initialize();
-    }
-
-    Object.defineProperty( window, "sessionStorage",
-    {
-        writable: false,
-        configurable: false,
-        value:new DOMStorage("sessionStorage")
-    });
-   if(window.sessionStorage != null) {
-        window.sessionStorage.initialize();
-    }*/
-
-
 })();};
 
 /*
@@ -3819,7 +2637,9 @@ FileError.PATH_EXISTS_ERR = 12;
 // File manager
 //-----------------------------------------------------------------------------
 
-/** @constructor */
+/**
+ * @constructor
+ */
 var FileMgr = function() {
 };
 
@@ -4208,7 +3028,7 @@ FileWriter.prototype.write = function (text) {
     if (typeof me.onwritestart === "function") {
         me.onwritestart({ "type": "writestart", "target": me });
     }
-    //console.log("================== write - this.position: " + this.position);
+
     // Write file
     navigator.fileMgr.write(this.fileName, text, this.position,
 
@@ -4302,7 +3122,6 @@ FileWriter.prototype.seek = function(offset) {
     else {
         this.position = offset;
     }
-    //console.log("================== seek - this.position: " + this.position);
 };
 
 /**
@@ -4429,6 +3248,24 @@ var DirectoryReader = function(fullPath){
  *
  * @param {Function} successCallback is called with a list of entries
  * @param {Function} errorCallback is called with a FileError
+ \code
+ function success(entries) {
+    var i;
+    for (i=0; i<entries.length; i++) {
+        console.log(entries[i].name);
+    }
+}
+
+function fail(error) {
+    alert("Failed to list directory contents: " + error.code);
+}
+
+// Get a directory reader
+var directoryReader = dirEntry.createReader();
+
+// Get a list of all the entries in the directory
+directoryReader.readEntries(success,fail);
+ \endcode
  */
 DirectoryReader.prototype.readEntries = function(successCallback, errorCallback) {
     PhoneGap.exec(successCallback, errorCallback, "File", "readEntries", {fullPath: this.fullPath});
@@ -4459,6 +3296,24 @@ var DirectoryEntry = function() {
  * @param {DOMString} newName the new name of the entry, defaults to the current name
  * @param {Function} successCallback is called with the new entry
  * @param {Function} errorCallback is called with a FileError
+ \code
+ function win(entry) {
+    console.log("New Path: " + entry.fullPath);
+}
+
+function fail(error) {
+    alert(error.code);
+}
+
+function copyDir(entry) {
+    var parent = document.getElementById('parent').value,
+        newName = document.getElementById('newName').value,
+        parentEntry = new DirectoryEntry({fullPath: parent});
+
+    // copy the directory to a new directory and rename it
+    entry.copyTo(parentEntry, newName, success, fail);
+}
+ \endcode
  */
 DirectoryEntry.prototype.copyTo = function(parent, newName, successCallback, errorCallback) {
     PhoneGap.exec(successCallback, errorCallback, "File", "copyTo", {fullPath: this.fullPath, parent:parent, newName: newName});
@@ -4469,6 +3324,18 @@ DirectoryEntry.prototype.copyTo = function(parent, newName, successCallback, err
  *
  * @param {Function} successCallback is called with a Metadata object
  * @param {Function} errorCallback is called with a FileError
+ \code
+ function success(metadata) {
+    console.log("Last Modified: " + metadata.modificationTime);
+}
+
+function fail(error) {
+    alert(error.code);
+}
+
+// Request the metadata object for this entry
+entry.getMetadata(success, fail);
+\endcode
  */
 DirectoryEntry.prototype.getMetadata = function(successCallback, errorCallback) {
     PhoneGap.exec(successCallback, errorCallback, "File", "getMetadata", {fullPath: this.fullPath});
@@ -4479,6 +3346,18 @@ DirectoryEntry.prototype.getMetadata = function(successCallback, errorCallback) 
  *
  * @param {Function} successCallback is called with a parent entry
  * @param {Function} errorCallback is called with a FileError
+ \code
+ function success(parent) {
+    console.log("Parent Name: " + parent.name);
+}
+
+function fail(error) {
+    alert('Failed to get parent directory: ' + error.code);
+}
+
+// Get the parent DirectoryEntry
+entry.getParent(success, fail);
+\endcode
  */
 DirectoryEntry.prototype.getParent = function(successCallback, errorCallback) {
     PhoneGap.exec(successCallback, errorCallback, "File", "getParent", {fullPath: this.fullPath});
@@ -4491,6 +3370,24 @@ DirectoryEntry.prototype.getParent = function(successCallback, errorCallback) {
  * @param {DOMString} newName the new name of the entry, defaults to the current name
  * @param {Function} successCallback is called with the new entry
  * @param {Function} errorCallback is called with a FileError
+ \code
+ function success(entry) {
+    console.log("New Path: " + entry.fullPath);
+}
+
+function fail(error) {
+    alert(error.code);
+}
+
+function moveDir(entry) {
+    var parent = document.getElementById('parent').value,
+        newName = document.getElementById('newName').value,
+        parentEntry = new DirectoryEntry({fullPath: parent});
+
+    // move the directory to a new directory and rename it
+    entry.moveTo(parentEntry, newName, success, fail);
+}
+ \endcode
  */
 DirectoryEntry.prototype.moveTo = function(parent, newName, successCallback, errorCallback) {
     PhoneGap.exec(successCallback, errorCallback, "File", "moveTo", {fullPath: this.fullPath, parent: parent, newName: newName});
@@ -4501,6 +3398,18 @@ DirectoryEntry.prototype.moveTo = function(parent, newName, successCallback, err
  *
  * @param {Function} successCallback is called with no parameters
  * @param {Function} errorCallback is called with a FileError
+ \code
+ function success(entry) {
+    console.log("Removal succeeded");
+}
+
+function fail(error) {
+    alert('Error removing directory: ' + error.code);
+}
+
+// remove this directory
+entry.remove(success, fail);
+\endcode
  */
 DirectoryEntry.prototype.remove = function(successCallback, errorCallback) {
     PhoneGap.exec(successCallback, errorCallback, "File", "remove", {fullPath: this.fullPath});
@@ -4511,6 +3420,11 @@ DirectoryEntry.prototype.remove = function(successCallback, errorCallback) {
  *
  * @param {DOMString} mimeType for a FileEntry, the mime type to be used to interpret the file, when loaded through this URI.
  * @return uri
+ \code
+ // Get the URI for this directory
+var uri = entry.toURI();
+console.log(uri);
+\endcode
  */
 DirectoryEntry.prototype.toURI = function(mimeType) {
 
@@ -4519,6 +3433,10 @@ DirectoryEntry.prototype.toURI = function(mimeType) {
 
 /**
  * Creates a new DirectoryReader to read entries from this directory
+ \code
+ // create a directory reader
+var directoryReader = entry.createReader();
+ \endcode
  */
 DirectoryEntry.prototype.createReader = function(successCallback, errorCallback) {
     return new DirectoryReader(this.fullPath);
@@ -4531,6 +3449,18 @@ DirectoryEntry.prototype.createReader = function(successCallback, errorCallback)
  * @param {Flags} options to create or excluively create the directory
  * @param {Function} successCallback is called with the new entry
  * @param {Function} errorCallback is called with a FileError
+ \code
+ function success(parent) {
+    console.log("Parent Name: " + parent.name);
+}
+
+function fail(error) {
+    alert("Unable to create new directory: " + error.code);
+}
+
+// Retrieve an existing directory, or create it if it does not already exist
+entry.getDirectory("newDir", {create: true, exclusive: false}, success, fail);
+\endcode
  */
 DirectoryEntry.prototype.getDirectory = function (path, options, successCallback, errorCallback) {
     PhoneGap.exec(successCallback, errorCallback, "File", "getDirectory", { fullPath: this.fullPath, path: path, options: options });
@@ -4543,6 +3473,18 @@ DirectoryEntry.prototype.getDirectory = function (path, options, successCallback
  * @param {Flags} options to create or excluively create the file
  * @param {Function} successCallback is called with the new entry
  * @param {Function} errorCallback is called with a FileError
+ \code
+function success(parent) {
+    console.log("Parent Name: " + parent.name);
+}
+
+function fail(error) {
+    alert("Failed to retrieve file: " + error.code);
+}
+
+// Retrieve an existing file, or create it if it does not exist
+entry.getFile("newFile.txt", {create: true, exclusive: false}, success, fail);
+\endcode
  */
 DirectoryEntry.prototype.getFile = function (path, options, successCallback, errorCallback) {
     PhoneGap.exec(successCallback, errorCallback, "File", "getFile", { fullPath: this.fullPath, path: path, options: options });
@@ -4553,6 +3495,18 @@ DirectoryEntry.prototype.getFile = function (path, options, successCallback, err
  *
  * @param {Function} successCallback is called with no parameters
  * @param {Function} errorCallback is called with a FileError
+ \code
+ function success(parent) {
+    console.log("Remove Recursively Succeeded");
+}
+
+function fail(error) {
+    alert("Failed to remove directory or it's contents: " + error.code);
+}
+
+// remove the directory and all it's contents
+entry.removeRecursively(success, fail);
+ \endcode
  */
 DirectoryEntry.prototype.removeRecursively = function(successCallback, errorCallback) {
     PhoneGap.exec(successCallback, errorCallback, "File", "removeRecursively", {fullPath: this.fullPath});
@@ -4674,7 +3628,9 @@ FileEntry.prototype.file = function(successCallback, errorCallback) {
     PhoneGap.exec(successCallback, errorCallback, "File", "getFileMetadata", {fullPath: this.fullPath});
 };
 
-/** @constructor */
+/**
+ * @constructor
+ */
 var LocalFileSystem = function() {
 };
 
@@ -4690,6 +3646,14 @@ LocalFileSystem.APPLICATION = 3;
  * @param {int} type of file system being requested
  * @param {Function} successCallback is called with the new FileSystem
  * @param {Function} errorCallback is called with a FileError
+ \code
+ function onSuccess(fileSystem) {
+    console.log(fileSystem.name);
+}
+
+// request the persistent file system
+window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, onSuccess, onError);
+ \endcode
  */
 LocalFileSystem.prototype.requestFileSystem = function(type, size, successCallback, errorCallback) {
     if (type < 0 || type > 3) {
@@ -4709,6 +3673,13 @@ LocalFileSystem.prototype.requestFileSystem = function(type, size, successCallba
  * @param {DOMString} uri referring to a local file in a filesystem
  * @param {Function} successCallback is called with the new entry
  * @param {Function} errorCallback is called with a FileError
+ \code
+ function onSuccess(fileEntry) {
+    console.log(fileEntry.name);
+}
+
+window.resolveLocalFileSystemURI("file:///example.txt", onSuccess, onError);
+ \endcode
  */
 LocalFileSystem.prototype.resolveLocalFileSystemURI = function(uri, successCallback, errorCallback) {
     PhoneGap.exec(successCallback, errorCallback, "File", "resolveLocalFileSystemURI", {uri: uri});
@@ -4799,7 +3770,7 @@ LocalFileSystem.prototype._castDate = function (pluginResult) {
     return pluginResult;
 };
 
-/**
+/*
  * Add the FileSystem interface into the browser.
  */
 PhoneGap.addConstructor(function () {
@@ -4858,6 +3829,33 @@ FileTransferError.CONNECTION_ERR = 3;
 * @param successCallback (Function}  Callback to be invoked when upload has completed
 * @param errorCallback {Function}    Callback to be invoked upon error
 * @param options {FileUploadOptions} Optional parameters such as file name and mimetype
+\code
+// !! Assumes variable fileURI contains a valid URI to a  text file on the device
+
+var win = function(r) {
+    console.log("Code = " + r.responseCode);
+    console.log("Response = " + r.response);
+    console.log("Sent = " + r.bytesSent);
+}
+
+var fail = function(error) {
+    alert("An error has occurred: Code = " = error.code);
+}
+
+var options = new FileUploadOptions();
+options.fileKey="file";
+options.fileName=fileURI.substr(fileURI.lastIndexOf('/')+1);
+options.mimeType="text/plain";
+
+var params = new Object();
+params.value1 = "test";
+params.value2 = "param";
+
+options.params = params;
+
+var ft = new FileTransfer();
+ft.upload(fileURI, "http://some.server.com/upload.php", win, fail, options);
+\endcode
 */
 FileTransfer.prototype.upload = function(filePath, server, successCallback, errorCallback, options, debug) {
 
@@ -5004,6 +4002,25 @@ MediaError.MEDIA_ERR_STOP_STATE = 8;
 
 /**
  * Start or resume playing audio file.
+ \code
+ // Play audio
+//
+function playAudio(url) {
+    // Play the audio file at url
+    var my_media = new Media(url,
+        // success callback
+        function() {
+            console.log("playAudio():Audio Success");
+        },
+        // error callback
+        function(err) {
+            console.log("playAudio():Audio Error: "+err);
+    });
+
+    // Play audio
+    my_media.play();
+}
+ \endcode
  */
 Media.prototype.play = function() {
     PhoneGap.exec(null, null, "Media", "startPlayingAudio", {id: this.id, src: this.src});
@@ -5011,6 +4028,30 @@ Media.prototype.play = function() {
 
 /**
  * Stop playing audio file.
+ \code
+ // Play audio
+//
+function playAudio(url) {
+    // Play the audio file at url
+    var my_media = new Media(url,
+        // success callback
+        function() {
+            console.log("playAudio():Audio Success");
+        },
+        // error callback
+        function(err) {
+            console.log("playAudio():Audio Error: "+err);
+    });
+
+    // Play audio
+    my_media.play();
+
+    // Pause after 10 seconds
+    setTimeout(function() {
+        my_media.stop();
+    }, 10000);
+}
+\endcode
  */
 Media.prototype.stop = function() {
     return PhoneGap.exec(null, null, "Media", "stopPlayingAudio", {id: this.id});
@@ -5018,6 +4059,16 @@ Media.prototype.stop = function() {
 
 /**
  * Seek or jump to a new time in the track..
+ \code
+// Audio player
+    //
+    var my_media = new Media(src, onSuccess, onError);
+    my_media.play();
+    // SeekTo to 10 seconds after 5 seconds
+    setTimeout(function() {
+        my_media.seekTo(10000);
+    }, 5000);
+ \endcode
  */
 Media.prototype.seekTo = function(milliseconds) {
     PhoneGap.exec(null, null, "Media", "seekToAudio", {id: this.id, milliseconds: milliseconds});
@@ -5025,6 +4076,30 @@ Media.prototype.seekTo = function(milliseconds) {
 
 /**
  * Pause playing audio file.
+ \code
+ // Play audio
+//
+function playAudio(url) {
+    // Play the audio file at url
+    var my_media = new Media(url,
+        // success callback
+        function() {
+            console.log("playAudio():Audio Success");
+        },
+        // error callback
+        function(err) {
+            console.log("playAudio():Audio Error: "+err);
+    });
+
+    // Play audio
+    my_media.play();
+
+    // Pause after 10 seconds
+    setTimeout(function() {
+        media.pause();
+    }, 10000);
+}
+ \endcode
  */
 Media.prototype.pause = function() {
     PhoneGap.exec(null, null, "Media", "pausePlayingAudio", {id: this.id});
@@ -5035,6 +4110,25 @@ Media.prototype.pause = function() {
  * The duration is only set for audio that is playing, paused or stopped.
  *
  * @return      duration or -1 if not known.
+ \code
+ // Audio player
+    //
+    var my_media = new Media(src, onSuccess, onError);
+
+    // Get duration
+    var counter = 0;
+    var timerDur = setInterval(function() {
+        counter = counter + 100;
+        if (counter > 2000) {
+            clearInterval(timerDur);
+        }
+        var dur = my_media.getDuration();
+        if (dur > 0) {
+            clearInterval(timerDur);
+            document.getElementById('audio_duration').innerHTML = (dur) + " sec";
+        }
+   }, 100);
+ \endcode
  */
 Media.prototype.getDuration = function() {
     return this._duration;
@@ -5042,6 +4136,28 @@ Media.prototype.getDuration = function() {
 
 /**
  * Get position of audio.
+ \code
+     // Audio player
+    //
+    var my_media = new Media(src, onSuccess, onError);
+
+    // Update media position every second
+    var mediaTimer = setInterval(function() {
+        // get media position
+        my_media.getCurrentPosition(
+            // success callback
+            function(position) {
+                if (position > -1) {
+                    console.log((position) + " sec");
+                }
+            },
+            // error callback
+            function(e) {
+                console.log("Error getting pos=" + e);
+            }
+        );
+    }, 1000);
+ \endcode
  */
 Media.prototype.getCurrentPosition = function(success, fail) {
     PhoneGap.exec(success, fail, "Media", "getCurrentPositionAudio", {id: this.id});
@@ -5049,6 +4165,26 @@ Media.prototype.getCurrentPosition = function(success, fail) {
 
 /**
  * Start recording audio file.
+ \code
+ // Record audio
+//
+function recordAudio() {
+    var src = "myrecording.mp3";
+    var mediaRec = new Media(src,
+        // success callback
+        function() {
+            console.log("recordAudio():Audio Success");
+        },
+
+        // error callback
+        function(err) {
+            console.log("recordAudio():Audio Error: "+ err.code);
+        });
+
+    // Record audio
+    mediaRec.startRecord();
+}
+ \endcode
  */
 Media.prototype.startRecord = function() {
     PhoneGap.exec(null, null, "Media", "startRecordingAudio", {id: this.id, src: this.src});
@@ -5056,6 +4192,31 @@ Media.prototype.startRecord = function() {
 
 /**
  * Stop recording audio file.
+ \code
+ // Record audio
+//
+function recordAudio() {
+    var src = "myrecording.mp3";
+    var mediaRec = new Media(src,
+        // success callback
+        function() {
+            console.log("recordAudio():Audio Success");
+        },
+
+        // error callback
+        function(err) {
+            console.log("recordAudio():Audio Error: "+ err.code);
+        });
+
+    // Record audio
+    mediaRec.startRecord();
+
+    // Stop recording after 10 seconds
+    setTimeout(function() {
+        mediaRec.stopRecord();
+    }, 10000);
+}
+\endcode
  */
 Media.prototype.stopRecord = function() {
     PhoneGap.exec(null, null, "Media", "stopRecordingAudio", {id: this.id});
@@ -5063,6 +4224,15 @@ Media.prototype.stopRecord = function() {
 
 /**
  * Release the resources.
+ \code
+     // Audio player
+    //
+    var my_media = new Media(src, onSuccess, onError);
+
+    my_media.play();
+    my_media.stop();
+    my_media.release();
+ \endcode
  */
 Media.prototype.release = function() {
     PhoneGap.exec(null, null, "Media", "release", {id: this.id});
@@ -5232,7 +4402,7 @@ PhoneGap.addConstructor(function() {
  */
 
 if (!PhoneGap.hasResource("notification")) {
-    PhoneGap.addResource("notification");
+PhoneGap.addResource("notification");
 
 /**
  * This class provides access to notifications on the device.
@@ -5248,6 +4418,24 @@ var Notification = function() {
  * @param {Function} completeCallback   The callback that is called when user clicks on a button.
  * @param {String} title                Title of the alert dialog (default: Alert)
  * @param {String} buttonLabel          Label of the close button (default: OK)
+ \code
+ // Android / BlackBerry WebWorks (OS 5.0 and higher) / iPhone
+//
+function alertDismissed() {
+    // do something
+}
+
+navigator.notification.alert(
+    'You are the winner!',  // message
+    alertDismissed,         // callback
+    'Game Over',            // title
+    'Done'                  // buttonName
+);
+
+// BlackBerry (OS 4.6) / webOS
+//
+navigator.notification.alert('You are the winner!');
+\endcode
  */
 Notification.prototype.alert = function(message, completeCallback, title, buttonLabel)
 {
@@ -5264,6 +4452,23 @@ Notification.prototype.alert = function(message, completeCallback, title, button
  * @param {Function} resultCallback     The callback that is called when user clicks on a button.
  * @param {String} title                Title of the alert dialog (default: Confirm)
  * @param {String} buttonLabels         Comma separated list of the labels of the buttons (default: 'OK,Cancel')
+ \code
+ // process the confirmation dialog result
+function onConfirm(button) {
+    alert('You selected button ' + button);
+}
+
+// Show a custom confirmation dialog
+//
+function showConfirm() {
+    navigator.notification.confirm(
+        'You are the winner!',  // message
+        onConfirm,              // callback to invoke with index of button pressed
+        'Game Over',            // title
+        'Restart,Exit'          // buttonLabels
+    );
+}
+\endcode
  */
 Notification.prototype.confirm = function(message, resultCallback, title, buttonLabels)
 {
@@ -5326,6 +4531,11 @@ Notification.prototype.blink = function(count, colour) {
  * Causes the device to vibrate.
  *
  * @param {Integer} mills       The number of milliseconds to vibrate for.
+ \code
+ // Vibrate for 2.5 seconds
+//
+navigator.notification.vibrate(2500);
+\endcode
  */
 Notification.prototype.vibrate = function(mills)
 {
@@ -5337,6 +4547,10 @@ Notification.prototype.vibrate = function(mills)
  * A packaged resource is played "repeatCount" times.
  *
  * @param {Integer} repeatCount       The number of beeps. default 1
+ \code
+ // Beep twice!
+navigator.notification.beep(2);
+\endcode
  */
 Notification.prototype.beep = function(repeatCount)
 {
@@ -5350,6 +4564,1497 @@ PhoneGap.addConstructor(function() {
     }
 });
 } // End of notification API
+
+// =============================================================
+//
+// File: mosync-resource.js
+
+/*
+ * @file mosync.resource.js
+ * @author Ali Sarrafi
+ *
+ * The library for loading Image resources into Mosync program from Javascript.
+ * This library only supports image resources and used  together with the
+ * NativeUI library.
+ */
+
+
+/**
+ * The Resource handler submodule of the bridge module.
+ */
+mosync.resource = {};
+
+
+/**
+ * A Hash containing all registered callback functions for
+ * loadImage function.
+ */
+mosync.resource.imageCallBackTable = {};
+
+mosync.resource.imageIDTable = {};
+
+mosync.resource.imageDownloadQueue = [];
+
+/**
+ * Loads images into image handles for use in MoSync UI systems.
+ *
+ *  @param imagePath relative path to the image file.
+ *  @param imageID a custom ID used for refering to the image in JavaScript
+ *  @param callBackFunction a function that will be called when the image is ready.
+ */
+mosync.resource.loadImage = function(imagePath, imageID, successCallback) {
+	mosync.resource.imageCallBackTable[imageID] = successCallback;
+	mosync.bridge.send(
+			[
+				"Resource",
+				"loadImage",
+				imagePath,
+				imageID
+			], null);
+};
+
+/**
+ * A function that is called by C++ to pass the loaded image information.
+ *
+ * @param imageID JavaScript ID of the image
+ * @param imageHandle C++ handle of the imge which can be used for refering to the loaded image
+ */
+mosync.resource.imageLoaded = function(imageID, imageHandle) {
+	var callbackFun = mosync.resource.imageCallBackTable[imageID];
+	if (undefined != callbackFun)
+	{
+		var args = Array.prototype.slice.call(arguments);
+
+		// Call the function.
+		callbackFun.apply(null, args);
+	}
+};
+
+/**
+ * Loads images into image handles from a remote URL for use in MoSync UI systems.
+ *
+ *  @param imageURL URL to the image file.
+ *  @param imageID a custom ID used for refering to the image in JavaScript
+ *  @param callBackFunction a function that will be called when the image is ready.
+ */
+mosync.resource.loadRemoteImage = function(imageURL, imageID, callBackFunction) {
+	mosync.resource.imageCallBackTable[imageID] = callBackFunction;
+	var message = [
+		"Resource",
+		"loadRemoteImage",
+		imageURL,
+		imageID
+	];
+	// Add message to queue.
+	mosync.resource.imageDownloadQueue.push(message);
+
+	if (1 == mosync.resource.imageDownloadQueue.length)
+	{
+		mosync.bridge.send(message, null);
+	}
+
+};
+
+mosync.resource.imageDownloadStarted = function(imageID, imageHandle)
+{
+	mosync.resource.imageIDTable[imageHandle] = imageID;
+};
+
+mosync.resource.imageDownloadFinished = function(imageHandle)
+{
+	var imageID = mosync.resource.imageIDTable[imageHandle];
+	var callbackFun = mosync.resource.imageCallBackTable[imageID];
+	if (undefined != callbackFun)
+	{
+		// Call the function.
+		callbackFun(imageID, imageHandle);
+	}
+	// Remove first message.
+	if (mosync.resource.imageDownloadQueue.length > 0)
+	{
+		mosync.resource.imageDownloadQueue.shift();
+	}
+
+	// If there are more messages, send the next
+	// message in the queue.
+	if (mosync.resource.imageDownloadQueue.length > 0)
+	{
+		mosync.bridge.send(
+				mosync.resource.imageDownloadQueue[0],
+				null);
+	}
+};
+
+// =============================================================
+//
+// File: mosync-nativeui.js
+
+/**
+ * @file mosync.nativeui.js
+ * @author Ali Sarrafi
+ *
+ * The library for supporting Native widgets in Javascript and Web applications.
+ * Provides support for designing UI both programatically and declaratively.
+ * Should be used together with mosync-resource.js
+ */
+
+/**
+ * @namespace The mosync.nativeui module
+ */
+mosync.nativeui = {};
+
+/**
+ * A hash containing all callback functions that are registered for getting
+ * response of creating a widget
+ * @private
+ */
+mosync.nativeui.callBackTable = {};
+
+/**
+ * List of registered callback functions for WidgetEvents
+ * @private
+ */
+mosync.nativeui.eventCallBackTable = {};
+
+/**
+ * used to generate IDs for widgets that do not have one
+ * @private
+ */
+mosync.nativeui.widgetCounter = 0;
+
+/**
+ * Creates a mosync.nativeui Widget and registers it callback for return of the
+ * handle, Used internally use mosync.nativeui.create in your code.
+ *
+ * @param widgetType
+ *            A string that includes type of the widget defined in MoSync Api
+ *            reference
+ * @param widgetID
+ *            An ID set by the user for high level access to the widget
+ * @param successCallback
+ *            The function that would be called when the widget is created
+ * @param errorCallback
+ *            The function that would be called if an error happens
+ * @param processedCallback
+ *            optional call back for knowing that the message is processed
+ *
+ * @private
+ */
+mosync.nativeui.maWidgetCreate = function(
+		widgetType,
+		widgetID,
+		successCallback,
+		errorCallback,
+		processedCallback,
+		properties)
+{
+
+	callbackID = "create" + widgetID;
+	var message = ["NativeUI","maWidgetCreate", widgetType, widgetID,
+			callbackID ];
+	if (properties) {
+		var params = [];
+		var ii = 0;
+		for ( var key in properties) {
+			params[ii] = String(mosync.nativeui.getNativeAttrName(key));
+			ii++;
+			params[ii] = String(mosync.nativeui
+					.getNativeAttrValue(properties[key]));
+			ii++;
+		}
+		message.push(String(params.length));
+		message = message.concat(params);
+	} else {
+		message.push("0");
+	}
+
+	mosync.bridge.send(message, processedCallback);
+	mosync.nativeui.callBackTable[callbackID] = {
+		success : successCallback,
+		error : errorCallback
+	};
+};
+
+/**
+ * Destroys a widget
+ *
+ * @param widgetID
+ *            ID for the widget in Question
+ * @param processedCallback
+ *            optional call back for knowing that the message is processed See
+ *            mosync.nativeui.getElementById for getting handles
+ * @private
+ */
+mosync.nativeui.maWidgetDestroy = function(widgetID, successCallBack,
+		errorCallback, processedCallback) {
+	callbackID = "destroy" + widgetID;
+	var mosyncWidgetHandle = mosync.nativeui.widgetIDList[widgetID];
+	mosync.bridge.send([ "NativeUI", "maWidgetDestroy",
+			mosyncWidgetHandle + "", callbackID ], processedCallback);
+	mosync.nativeui.callBackTable[callbackID] = {
+		success : successCallback,
+		error : errorCallback
+	};
+};
+
+/**
+ * Adds a widget to the given parent as a child. Letting the parent widget
+ * layout the child.
+ *
+ * @param widgetID
+ *            ID of the widget assigned by the user
+ * @param childID
+ *            ID of the widget to be added as a child
+ * @param processedCallback
+ *            optional call back for knowing that the message is processed
+ *
+ * @private
+ */
+mosync.nativeui.maWidgetAddChild = function(widgetID, childID, successCallback,
+		errorCallback, processedCallback) {
+	callbackID = "addChild" + widgetID + childID;
+	var mosyncWidgetHandle = mosync.nativeui.widgetIDList[widgetID];
+	var mosyncChildHandle = mosync.nativeui.widgetIDList[childID];
+	mosync.bridge.send([ "NativeUI", "maWidgetAddChild",
+			mosyncWidgetHandle + "", mosyncChildHandle + "", callbackID ],
+			processedCallback);
+	mosync.nativeui.callBackTable[callbackID] = {
+		success : successCallback,
+		error : errorCallback
+	};
+};
+
+/**
+ * Inserts a widget to the given parent as a child at an index. Letting the
+ * parent widget layout the child.
+ *
+ * @param widgetID
+ *            ID of the parent widget
+ * @param childID
+ *            ID of the child widget
+ * @param index
+ *            place for the child widget, -1 means last
+ * @param processedCallback
+ *            optional call back for knowing that the message is processed
+ *
+ * @private
+ */
+mosync.nativeui.maWidgetInsertChild = function(widgetID, childID, index,
+		successCallback, errorCallback, processedCallback) {
+	callbackID = "insertChild" + widgetID;
+	var mosyncWidgetHandle = mosync.nativeui.widgetIDList[widgetID];
+	var mosyncChildHandle = mosync.nativeui.widgetIDList[childID];
+	mosync.bridge.send(
+			[ "NativeUI", "maWidgetInsertChild", mosyncWidgetHandle + "",
+					mosyncChildHandle + "", index, callbackID ],
+			processedCallback);
+	mosync.nativeui.callBackTable[callbackID] = {
+		success : successCallback,
+		error : errorCallback
+	};
+};
+
+/**
+ * Removes a child widget from its parent (but does not destroy it). Removing a
+ * currently visible top-level widget causes the MoSync view to become visible.
+ *
+ * @param childID
+ *            ID for the child widget
+ * @param processedCallback
+ *            optional call back for knowing that the message is processed
+ *
+ * @private
+ */
+mosync.nativeui.maWidgetRemoveChild = function(childID, successCallback,
+		errorCallback, processedCallback) {
+	callbackID = "removeChild" + childID;
+	var mosyncChildHandle = mosync.nativeui.widgetIDList[childID];
+	mosync.bridge.send([ "NativeUI", "maWidgetRemoveChild",
+			mosyncChildHandle + "", callbackID ], processedCallback);
+	mosync.nativeui.callBackTable[callbackID] = {
+		success : successCallback,
+		error : errorCallback
+	};
+};
+
+/**
+ * Shows a screen. If native UI hasn't been initialized, it is also initialized
+ * and disables regular MoSync drawing.
+ *
+ * @param childID
+ *            Id of the screen that should be shown
+ * @param processedCallback
+ *            optional call back for knowing that the message is processed
+ *
+ * @private
+ */
+mosync.nativeui.maWidgetScreenShow = function(screenID, successCallback,
+		errorCallback, processedCallback) {
+	callbackID = "screenShow" + screenID;
+	var mosyncScreenHandle = mosync.nativeui.widgetIDList[screenID];
+	mosync.bridge.send([ "NativeUI", "maWidgetScreenShow",
+			mosyncScreenHandle + "", callbackID ], processedCallback);
+	mosync.nativeui.callBackTable[callbackID] = {
+		success : successCallback,
+		error : errorCallback
+	};
+};
+
+/**
+ * Shows a modalDialog.
+ *
+ * @param childID
+ *            Id of the screen that should be shown
+ * @param processedCallback
+ *            optional call back for knowing that the message is processed
+ *
+ * @private
+ */
+mosync.nativeui.maWidgetModalDialogShow = function(dialogID, successCallback,
+		errorCallback, processedCallback) {
+	callbackID = "dialogShow" + dialogID;
+	var mosyncDialogHandle = mosync.nativeui.widgetIDList[dialogID];
+	mosync.bridge.send([ "NativeUI", "maWidgetModalDialogShow",
+			mosyncDialogHandle + "", callbackID ], processedCallback);
+	mosync.nativeui.callBackTable[callbackID] = {
+		success : successCallback,
+		error : errorCallback
+	};
+};
+
+/**
+ * Hides a modalDialog.
+ *
+ * @param childID
+ *            Id of the screen that should be shown
+ * @param processedCallback
+ *            optional call back for knowing that the message is processed
+ *
+ * @private
+ */
+mosync.nativeui.maWidgetModalDialogHide = function(dialogID, successCallback,
+		errorCallback, processedCallback) {
+	callbackID = "dialogHide" + dialogID;
+	var mosyncDialogHandle = mosync.nativeui.widgetIDList[dialogID];
+	mosync.bridge.send([ "NativeUI", "maWidgetModalDialogHide",
+			mosyncDialogHandle + "", callbackID ], processedCallback);
+	mosync.nativeui.callBackTable[callbackID] = {
+		success : successCallback,
+		error : errorCallback
+	};
+};
+
+/**
+ * Pushes a screen to the given screen stack, hides the current screen and shows
+ * the pushed screen it. Pushing it to the stack will make it automatically go
+ * back to the previous screen when popped.
+ *
+ * @param stackScreenID
+ *            Javascript ID of the stackscreen widget
+ * @param screenID
+ *            Javascript ID of the screen widget
+ * @param processedCallback
+ *            optional call back for knowing that the message is processed
+ *
+ * @private
+ */
+mosync.nativeui.maWidgetStackScreenPush = function(stackScreenID, screenID,
+		successCallback, errorCallback, processedCallback) {
+	callbackID = "StackScreenPush" + screenID;
+	var mosyncStackScreenHandle = mosync.nativeui.widgetIDList[stackScreenID];
+	var mosyncScreenHandle = mosync.nativeui.widgetIDList[screenID];
+	mosync.bridge.send(
+			[ "NativeUI", "maWidgetStackScreenPush",
+					mosyncStackScreenHandle + "", mosyncScreenHandle + "",
+					callbackID ], processedCallback);
+	mosync.nativeui.callBackTable[callbackID] = {
+		success : successCallback,
+		error : errorCallback
+	};
+};
+
+/**
+ * Pops a screen from a screen stack, hides the current screen and shows the
+ * popped screen before the If there is no previous screen in the screen stack,
+ * an empty screen will be shown.
+ *
+ * @param stackScreenID
+ *            JavaScript ID of the StackScreen
+ * @param processedCallback
+ *            optional call back for knowing that the message is processed
+ *
+ * @private
+ */
+mosync.nativeui.maWidgetStackScreenPop = function(stackScreenID,
+		successCallback, errorCallback, processedCallback) {
+	callbackID = "StackScreenPop" + stackScreenID
+			+ Math.round(Math.random() * 100);
+	var mosyncStackScreenHandle = mosync.nativeui.widgetIDList[stackScreenID];
+	mosync.bridge.send([ "NativeUI", "maWidgetStackScreenPop",
+			mosyncStackScreenHandle, callbackID ], processedCallback);
+	mosync.nativeui.callBackTable[callbackID] = {
+		success : successCallback,
+		error : errorCallback
+	};
+};
+
+mosync.nativeui.widgetPropertyIndexNo = 0;
+
+/**
+ * Sets a specified property on the given widget.
+ *
+ * @param widgetID
+ *            JavaScript ID of the widget
+ * @param property
+ *            name of the property
+ * @param value
+ *            value of the property
+ * @param processedCallback
+ *            optional call back for knowing that the message is processed
+ *
+ * @private
+ */
+mosync.nativeui.maWidgetSetProperty = function(widgetID, property, value,
+		successCallback, errorCallback, processedCallback) {
+
+	// make sure the id is unique for this call
+	callbackID = "setProperty" + widgetID + property
+			+ mosync.nativeui.widgetPropertyIndexNo++;
+	var widgetHandle = mosync.nativeui.widgetIDList[widgetID];
+	mosync.bridge.send([ "NativeUI", "maWidgetSetProperty", widgetHandle + "",
+			property, value + "", callbackID ], processedCallback);
+	mosync.nativeui.callBackTable[callbackID] = {
+		success : successCallback,
+		error : errorCallback
+	};
+};
+
+/**
+ * Retrieves a specified property from the given widget.
+ *
+ * @param widgetID
+ *            JavaScript ID of the widget
+ * @param property
+ *            name of the property that should be retrived
+ * @param callBackFunction
+ *            the function that will be called when the property is retrived
+ * @param processedCallback
+ *            optional call back for knowing that the message is processed
+ *
+ * @private
+ */
+mosync.nativeui.maWidgetGetProperty = function(widgetID, property,
+		successCallback, errorCallback, processedCallback) {
+	callbackID = "getProperty" + widgetID + property;
+	var widgetHandle = mosync.nativeui.widgetIDList[widgetID];
+	mosync.bridge.send([ "NativeUI", "maWidgetGetProperty", widgetHandle + "",
+			property, callbackID ], processedCallback);
+	mosync.nativeui.callBackTable[callbackID] = {
+		success : successCallback,
+		error : errorCallback
+	};
+};
+
+/**
+ * This function is called by C++ to inform creation of a widget If a creation
+ * callback is registered it will be called
+ *
+ * @param callbackID
+ *            Javascript Id of the widget
+ *
+ * @private
+ */
+mosync.nativeui.createCallback = function(callbackID, widgetID, handle) {
+	var callBack = mosync.nativeui.callBackTable[callbackID];
+	mosync.nativeui.widgetIDList[widgetID] = handle;
+
+	if (callBack.success) {
+		var args = Array.prototype.slice.call(arguments);
+		args.shift();
+		callBack.success.apply(null, args);
+	}
+};
+
+mosync.nativeui.success = function(callbackID) {
+	var callBack = mosync.nativeui.callBackTable[callbackID];
+
+	if (callBack.success) {
+		var args = Array.prototype.slice.call(arguments);
+		// remove the callbakID from the argument list
+		args.shift();
+		callBack.success.apply(null, args);
+	}
+};
+
+/**
+ * The callback function for getting the widgetProperty. If a property callback
+ * is registered it will be called
+ *
+ * @param widgetHandle
+ *            C++ ID of the widget sent from C++
+ * @param property
+ *            retrieved property's name
+ * @param value
+ *            value for the retrieved property
+ * @private
+ */
+mosync.nativeui.error = function(callbackID) {
+	var callBack = mosync.nativeui.callBackTable[callbackID];
+	var args = Array.prototype.slice.call(arguments);
+	args.shift();
+	if (callBack.error != undefined) {
+		var args = Array.prototype.slice.call(arguments);
+		callBack.error.apply(null, args);
+	}
+};
+
+/**
+ * Is called by C++ when receiving a widget event. It in turn calls the
+ * registered listener for the specific Widget. You normally do not use this
+ * function is called internally.
+ *
+ * @param widgetHandle
+ *            C++ ID (MoSync Handle) of the widget that has triggered the event
+ * @param eventType
+ *            Type of the event (maybe followed by at most 3 event data
+ *            variables)
+ *
+ * @private
+ */
+mosync.nativeui.event = function(widgetHandle, eventType) {
+
+	var callbackID = widgetHandle + eventType;
+	var callbackFunctions = mosync.nativeui.eventCallBackTable[callbackID];
+	// if we have a listener registered for this combination call it
+	if (callbackFunctions != undefined) {
+		// extract the function arguments
+		var args = Array.prototype.slice.call(arguments);
+		for (key in callbackFunctions) {
+
+			var callbackFun = callbackFunctions[key];
+			// Call the function.
+			callbackFun.apply(null, args);
+		}
+	}
+};
+
+mosync.nativeui.NativeElementsTable = {};
+
+/**
+ * Registers a callback function for receiving widget events.
+ *
+ * @param widgetID
+ *            JavaScript ID of the widget.
+ * @param eventType
+ *            Type of the events the users wants to listen to.
+ * @param callBackFunction
+ *            function that will be called when the widget sends an event.
+ * @private
+ */
+mosync.nativeui.registerEventListener = function(widgetID, eventType,
+		listenerFunction) {
+	var widgetHandle = mosync.nativeui.widgetIDList[widgetID];
+	var callbackID = widgetHandle + eventType;
+	if (mosync.nativeui.eventCallBackTable[callbackID]) {
+		mosync.nativeui.eventCallBackTable[callbackID].push(listenerFunction);
+	} else {
+		mosync.nativeui.eventCallBackTable[callbackID] = [ listenerFunction ];
+	}
+
+};
+
+/**
+ *
+ * A widget object that user can interact with instead of using the low level
+ * functions. This class is not useddirectly see  mosync.nativeui.create  for usage.
+ *
+ *
+ * @param widgetType
+ *            Type of the widget that has been created
+ * @param widgetID
+ *            ID of the widget used for identifying the widget(can be ignored by
+ *            the user)
+ * @param params A dictionary that includes a list of properties to be set on the widget
+ * @param successCallback
+ *            a function that will be called if the operation is successfull
+ * @param errorCallback
+ *            a function that will be called if an error occurs
+ *
+ * \code
+ *         mosync.nativeui.NativeWidgetElement(widgetType, widgetID, params, successCallback, errorCallback)
+ * \endcode
+ *
+ *
+ */
+mosync.nativeui.NativeWidgetElement = function(widgetType, widgetID, params,
+		successCallback, errorCallback) {
+	var self = this;
+
+	self.commandQueue = [];
+
+	self.params = params;
+
+	self.eventQueue = [];
+
+	var type = widgetType;
+	/**
+	 * Internal function used for synchronizing the widget operations. It makes
+	 * sure that the widget is created before calling any other functions.
+	 *
+	 * @private
+	 */
+	this.processedMessage = function() {
+		function clone(obj) {
+			if (null == obj || "object" != typeof obj)
+				return obj;
+			var copy = obj.constructor();
+			for ( var attr in obj) {
+				if (obj.hasOwnProperty(attr))
+					copy[attr] = obj[attr];
+			}
+			return copy;
+		}
+		// Clone the command Queue and try to send everything at once.
+		var newCommandQueue = clone(self.commandQueue);
+		self.commandQueue = [];
+		if (newCommandQueue.length > 0) {
+			for ( var i = 0; i < newCommandQueue.length; i++) {
+				newCommandQueue[i].func.apply(null, newCommandQueue[i].args);
+			}
+		}
+
+	};
+
+	// Detect to see if the current widget is a screen
+	this.isScreen = ((type == "Screen") || (type == "TabScreen") || (type == "StackScreen")) ? true
+			: false;
+
+	// Detect to see if the current widget is a dialog
+	this.isDialog = (type == "ModalDialog") ? true : false;
+
+	/*
+	 * if the widgetID is not defined by the user, we will generate one
+	 */
+	if (widgetID) {
+		self.id = widgetID;
+	} else {
+		self.id = "natvieWidget" + widgetType + mosync.nativeui.widgetCounter;
+		mosync.nativeui.widgetCounter++;
+	}
+
+	/**
+	 * Internal success function used for creation of the widget
+	 *
+	 * @private
+	 */
+	this.onSuccess = function(widgetID, widgetHandle) {
+		self.created = true;
+		self.handle = widgetHandle;
+		if (self.eventQueue) {
+			for (key in self.eventQueue) {
+				self.addEventListener(self.eventQueue[key].event,
+						self.eventQueue[key].callback);
+			}
+		}
+		if (successCallback) {
+
+			successCallback.apply(null, [ widgetID ]);
+		}
+	};
+	/**
+	 * Internal error function used for creation of the widget
+	 *
+	 * @private
+	 */
+	this.onError = function(errorCode) {
+		self.latestError = errorCode;
+		if (errorCallback) {
+			errorCallback.apply(null, [ errorCode ]);
+		}
+
+	};
+	/*
+	 * Create the widget in the Native Side
+	 */
+	mosync.nativeui.maWidgetCreate(widgetType, self.id, this.onSuccess, this.onError,
+			self.processedMessage, self.params);
+
+	/**
+	 * sets a property to the widget in question
+	 *
+	 * @param property
+	 *            name of the property
+	 * @param successCallback
+	 *            a function that will be called if the operation is successfull
+	 * @param errorCallback
+	 *            a function that will be called if an error occurs
+	 * \code
+	 * 		myWidget.setProperty("width", "100%")
+	 * \endcode
+	 */
+	this.setProperty = function(property, value, successCallback, errorCallback) {
+		if (self.created) {
+			mosync.nativeui.maWidgetSetProperty(self.id, property, value,
+					successCallback, errorCallback, self.processedMessage);
+		} else {
+			self.commandQueue.push({
+				func : self.setProperty,
+				args : [ property, value, successCallback, errorCallback ]
+			});
+		}
+	};
+
+	/**
+	 * retirves a property and call the respective callback
+	 *
+	 * @param property
+	 *            name of the property
+	 * @param successCallback
+	 *            a function that will be called if the operation is successfull.
+	 *            The value and wigetID will be passed to this function.
+	 * @param errorCallback
+	 *            a function that will be called if an error occurs
+	 */
+	this.getProperty = function(property, successCallback, errorCallback) {
+		if (self.created) {
+			mosync.nativeui.maWidgetGetProperty(self.id, property,
+					successCallback, errorCallback, self.processedMessage);
+		} else {
+			self.commandQueue.push({
+				func : self.getProperty,
+				args : [ property, successCallback, errorCallback ]
+			});
+		}
+	};
+
+	/**
+	 * Registers an event listener for this widget
+	 *
+	 * @param eventType
+	 *            type of the event that the user wants to listen to
+	 * @param listenerFunction
+	 *            a function that will be called when that event is fired.
+	 *
+	 *	\code
+	 *	//Create a new button and add an event listener to it
+	 *	var myButton = mosync.nativeui.create("Button" ,"myButton",
+	 *	{
+	 *		//properties of the button
+	 *		"width": "100%",
+	 *		"text": "Click Me!"
+	 *	});
+	 *	myButton.addEventListener("Clicked", function()
+	 *	{
+	 *		alert("second button is cliecked");
+	 *	});
+	 *	\endcode
+	 *
+	 */
+	this.addEventListener = function(eventType, listenerFunction) {
+		if (self.created) {
+			mosync.nativeui.registerEventListener(self.id, eventType,
+					listenerFunction);
+		} else {
+			self.eventQueue.push({
+				event : eventType,
+				callback : listenerFunction
+			});
+		}
+
+	};
+
+	/**
+	 * Adds a child widget to the cureent widget
+	 *
+	 * @param childID
+	 *            the ID for th echild widget
+	 * @param successCallback
+	 *            a function that will be called if the operation is successfull
+	 * @param errorCallback
+	 *            a function that will be called if an error occurs
+	 *
+	 */
+	this.addChild = function(childID, successCallback, errorCallback) {
+
+		if ((self.created) && (childID != undefined)) {
+			mosync.nativeui.maWidgetAddChild(self.id, childID, successCallback,
+					errorCallback, self.processedMessage);
+		} else {
+			self.commandQueue.push({
+				func : self.addChild,
+				args : [ childID, successCallback, errorCallback ]
+			});
+		}
+	};
+
+	/**
+	 * Inserts a new child widget in the specifed index
+	 *
+	 * @param childID
+	 *            ID of the child widget
+	 * @param index
+	 *            the index for the place that the new child should be insterted
+	 * @param successCallback
+	 *            a function that will be called if the operation is successfull
+	 * @param errorCallback
+	 *            a function that will be called if an error occurs
+	 */
+	this.insertChild = function(childID, index, successCallback, errorCallback) {
+		if ((self.created) && (childID != undefined)) {
+			mosync.nativeui.maWidgetInsertChild(self.id, childID, index,
+					successCallback, errorCallback, self.processedMessage);
+		} else {
+			self.commandQueue.push({
+				func : self.insertChild,
+				args : [ childID, index, successCallback, errorCallback ]
+			});
+		}
+	};
+
+	/**
+	 * Removes a child widget fro mthe child list of the current widget
+	 *
+	 * @param childID
+	 *            Id of the child widget that will be removed
+	 * @param successCallback
+	 *            a function that will be called if the operation is successfull
+	 * @param errorCallback
+	 *            a function that will be called if an error occurs
+	 *
+	 */
+	this.removeChild = function(childID, successCallback, errorCallback) {
+		if ((self.created) && (childID != undefined)) {
+			mosync.nativeui.maWidgetRemoveChild(childID, successCallback,
+					errorCallback, self.processedMessage);
+		} else {
+			self.commandQueue.push({
+				func : self.removeChild,
+				args : [ childID, successCallback, errorCallback ]
+			});
+		}
+	};
+
+	/**
+	 * Adds the current widget as a child to another widget.
+	 *
+
+	 * @param parentId
+	 *            JavaScript ID of the parent widget.
+	 * @param successCallback
+	 *            (optional) a function that will be called when the operation
+	 *            is done successfully
+	 * @param errorCallback
+	 *            (optional) a function that will be called when the operation
+	 *            encounters an error
+	 *
+	 *	\code
+	 *	//Create a new button and add an event listener to it
+	 *	var secondButton = mosync.nativeui.create("Button" ,"SecondButton",
+	 *	{
+	 *		//properties of the button
+	 *		"width": "100%",
+	 *		"text": "Second Button"
+	 *	});
+	 *	secondButton.addTo("mainLayout");
+	 *	secondButton.addEventListener("Clicked", function()
+	 *	{
+	 *		alert("second button is cliecked");
+	 *	});
+	 *	\endcode
+	 */
+	this.addTo = function(parentId, successCallback, errorCallback) {
+		var parent = document.getNativeElementById(parentId);
+		if ((self.created) && (parent != undefined) && (parent.created)
+				&& (self.created != undefined)) {
+			mosync.nativeui.maWidgetAddChild(parentId, self.id,
+					successCallback, errorCallback, self.processedMessage);
+		} else {
+			self.commandQueue.push({
+				func : self.addTo,
+				args : [ parentId, successCallback, errorCallback ]
+			});
+		}
+	};
+	/*
+	 * Only create screen related functions if the widget is a screen
+	 */
+	if (self.isScreen) {
+		/**
+		 * Shows a screen widget on the screen. Will be set to null if the widget
+		 * is not of type screen.
+		 *
+		 * @param successCallback
+		 *            a function that will be called if the operation is
+		 *            successfull
+		 * @param errorCallback
+		 *            a function that will be called if an error occurs
+		 *
+		 */
+		this.show = function(successCallback, errorCallback) {
+			if (self.created) {
+				mosync.nativeui.maWidgetScreenShow(self.id, successCallback,
+						errorCallback, self.processedMessage);
+			} else {
+				self.commandQueue.push({
+					func : self.show,
+					args : [ successCallback, errorCallback ]
+				});
+			}
+		};
+
+		/**
+		 * Pushes a screen to a stackscreen
+		 *
+		 * @param stackScreenID
+		 *            the ID for the stackscreen that should be used for pushing
+		 *            the current screen
+		 * @param successCallback
+		 *            a function that will be called if the operation is
+		 *            successfull
+		 * @param errorCallback
+		 *            a function that will be called if an error occurs
+		 */
+		this.pushTo = function(stackScreenID, successCallback, errorCallback) {
+			var stackScreen = document.getNativeElementById(stackScreenID);
+			if ((self.created) && (stackScreen != undefined)
+					&& (stackScreen.created) && (self.created != undefined)) {
+				mosync.nativeui.maWidgetStackScreenPush(stackScreenID, self.id,
+						successCallback, errorCallback, self.processedMessage);
+			} else {
+				self.commandQueue.push({
+					func : self.pushTo,
+					args : [ stackScreenID, successCallback, errorCallback ]
+				});
+			}
+		};
+
+		/**
+		 * Pops a screen fr om the current stackscreen, Use only for StackScreen
+		 * widgets
+		 *
+		 * @param successCallback
+		 *            a function that will be called if the operation is
+		 *            successfull
+		 * @param errorCallback
+		 *            a function that will be called if an error occurs
+		 */
+		this.pop = function(successCallback, errorCallback) {
+			if (self.created) {
+				mosync.nativeui.maWidgetStackScreenPop(self.id,
+						successCallback, errorCallback, self.processedMessage);
+			} else {
+				self.commandQueue.push({
+					func : self.pop,
+					args : [ successCallback, errorCallback ]
+				});
+			}
+		};
+	}
+	/*
+	 * Create dialog functions for dialog widgets only
+	 */
+	if (this.isDialog) {
+		/**
+		 * Shows a modal dialog widget on the screen.
+		 *
+		 * @param successCallback
+		 *            a function that will be called if the operation is
+		 *            successfull
+		 * @param errorCallback
+		 *            a function that will be called if an error occurs
+		 *
+		 */
+		this.showDialog = function(successCallback, errorCallback) {
+			if (self.created) {
+				mosync.nativeui.maWidgetModalDialogShow(self.id,
+						successCallback, errorCallback, self.processedMessage);
+			} else {
+				self.commandQueue.push({
+					func : self.showDialog,
+					args : [ successCallback, errorCallback ]
+				});
+			}
+		};
+
+		/**
+		 * Hides a modal dialog widget from the screen.
+		 *
+		 * @param successCallback
+		 *            a function that will be called if the operation is
+		 *            successfull
+		 * @param errorCallback
+		 *            a function that will be called if an error occurs
+		 *
+		 */
+		this.hideDialog = function(successCallback, errorCallback) {
+			if (self.created) {
+				mosync.nativeui.maWidgetModalDialogHide(self.id,
+						successCallback, errorCallback, self.processedMessage);
+			} else {
+				self.commandQueue.push({
+					func : self.hideDialog,
+					args : [ successCallback, errorCallback ]
+				});
+			}
+		};
+
+	}
+	// add the current widget to the table
+	mosync.nativeui.NativeElementsTable[this.id] = this;
+
+};
+
+/**
+ * Used to access the nativeWidgetElements created from the HTML markup. It
+ * returns the object that can be used to change the properties of the specified
+ * widget.
+ *
+ * \code
+ *    var myScreen = document.getNativeElementById("MyScreen")
+ *    myScreen.show()
+ * \endcode
+ *
+ * @param widgetID
+ *            the ID attribute used for identifying the widget in DOM
+ *
+ */
+document.getNativeElementById = function(widgetID) {
+	return mosync.nativeui.NativeElementsTable[widgetID];
+};
+
+/**
+ * creates a widget and returns a mosync.nativeui.NativeWidgetElement object.
+ * The object then can be used for modifying the respecitve NativeElement.
+ *
+ * \code
+ * 		var myButton = mosync.nativeui.create("Button", "myButton", {
+ *					"text" : "Click Me!",
+ *					"width" : "100%"
+ * 					});
+ * \endcode
+ *
+ * @param widgetType
+ *            type of the widet that should be created
+ * @param widgetID
+ *            ID that will be used for refrencing to the widget
+ * @param successCallback
+ *            (optional) a function that will be called when the operation is
+ *            done successfully
+ * @param errorCallback
+ *            (optional) a function that will be called when the operation
+ *            encounters an error
+ *
+ * @returns {mosync.nativeui.NativeWidgetElement}
+ */
+mosync.nativeui.create = function(widgetType, widgetID, params,
+		successCallback, errorCallback) {
+	var widget = new mosync.nativeui.NativeWidgetElement(widgetType, widgetID,
+			params, successCallback, errorCallback);
+	return widget;
+};
+
+/**
+ * Stores the number of widgets that are waiting to be created. Used when
+ * parsing the XML based input
+ * @private
+ */
+mosync.nativeui.numWidgetsRequested = 0;
+
+/**
+ * Stores the number of widgets that are created. Used when parsing the XML
+ * based input
+ * @private
+ */
+mosync.nativeui.numWidgetsCreated = 0;
+
+/**
+ * The interval for checking the availability of all widgets Used when parsing
+ * the XML based input
+ * @private
+ */
+mosync.nativeui.showInterval;
+
+/**
+ * List of WidetIDs and handles. Used for accessign widgets through their IDs
+ * @private
+ */
+mosync.nativeui.widgetIDList = {};
+
+/**
+ * Provides access to C++ handles through IDs. It is accessible though document object as well.
+ *
+ * \code
+ *
+ *   var myButton = document.getElementsById("MyButton");
+ *   myButton.addTo("myLayout");
+ * \endcode
+ *
+ * @param elementID
+ *            ID of the widget in question
+ * @returns MoSync handle value for that widget
+ */
+mosync.nativeui.getElementById = function(elementID) {
+	return mosync.nativeui.widgetIDList[elementID];
+};
+
+/**
+ * An internal function that returns the correct property name Used to overcome
+ * case sensitivity problems in browsers.
+ *
+ * @param attributeName
+ *            name of the attribute used in HTML markup
+ * @returns new name for the attribute
+ * @private
+ */
+mosync.nativeui.getNativeAttrName = function(attributeName) {
+	switch (String(attributeName).toLowerCase()) {
+	case "fontsize":
+		return "fontSize";
+		break;
+	case "fontcolor":
+		return "fontColor";
+		break;
+	case "backgrouncolor":
+		return "backgroundColor";
+		break;
+	case "backgroundgradient":
+		return "backgroundGradient";
+		break;
+	case "currenttab":
+		return "currentTab";
+		break;
+	case "backbuttonenabled":
+		return "backButtonEnabled";
+		break;
+	case "textverticalalignment":
+		return "textVerticalAlignment";
+		break;
+	case "texthorizontalalignment":
+		return "textHorizontalAlignment";
+		break;
+	case "fonthandle":
+		return "fontHandle";
+		break;
+	case "maxnumberoflines":
+		return "maxNumberOfLines";
+		break;
+	case "backgroundimage":
+		return "backgroundImage";
+		break;
+	case "scalemode":
+		return "scaleMode";
+		break;
+	case "showkeyboard":
+		return "showKeyboard";
+		break;
+	case "editmode":
+		return "editMode";
+		break;
+	case "inputmode":
+		return "inputMode";
+		break;
+	case "inputflag":
+		return "inputFlag";
+		break;
+	case "accessorytype":
+		return "accessoryType";
+		break;
+	case "childverticalalignment":
+		return "childVerticalAlignment";
+		break;
+	case "childhorizontalalignment":
+		return "childHorizontalAlignment";
+		break;
+	case "paddingtop":
+		return "paddingTop";
+		break;
+	case "paddingleft":
+		return "paddingLeft";
+		break;
+	case "paddingright":
+		return "paddingRight";
+		break;
+	case "paddingbottom":
+		return "paddingBottom";
+		break;
+	case "softhook":
+		return "softHook";
+		break;
+	case "hardhook":
+		return "hardHook";
+		break;
+	case "horizontalscrollbarenabled":
+		return "horizontalScrollBarEnabled";
+		break;
+	case "verticalscrollbarenabled":
+		return "verticalScrollBarEnabled";
+		break;
+	case "enablezoom":
+		return "enableZoom";
+		break;
+	case "incrementprogress":
+		return "incrementProgress";
+		break;
+	case "inprogress":
+		return "inProgress";
+		break;
+	case "increasevalue":
+		return "increaseValue";
+		break;
+	case "decreasevalue":
+		return "decreaseValue";
+		break;
+	case "maxdate":
+		return "maxDate";
+		break;
+	case "mindate":
+		return "minDate";
+		break;
+	case "dayofmonth":
+		return "dayOfMonth";
+		break;
+	case "currenthour":
+		return "currentHour";
+		break;
+	case "currentminute":
+		return "currentMinute";
+		break;
+	case "minvalue":
+		return "minValue";
+		break;
+	case "maxvalue":
+		return "maxValue";
+		break;
+
+	default:
+		return attributeName;
+	}
+};
+
+mosync.nativeui.getNativeAttrValue = function(value) {
+	switch (String(value).toLowerCase()) {
+	case "100%":
+		return "-1";
+		break;
+	default:
+		return value;
+	}
+};
+
+/**
+ * Creates a widget, sets its property and adds it to its parent.
+ *
+ * @param widgetID
+ *            ID of the widget in question
+ * @param parentID
+ *            Id of the parentWidget
+ * @private
+ */
+mosync.nativeui.createWidget = function(widget, parent) {
+	var widgetNode = widget;
+	var widgetID = widget.id;
+	var imageResources = null;
+	var widgetType = widgetNode.getAttribute("widgetType");
+	mosync.nativeui.numWidgetsRequested++;
+	var attributeList = widgetNode.attributes;
+	var propertyList = {};
+	var eventList = null;
+	for ( var i = 0; i < attributeList.length; i++) {
+		// TODO: Add more event types and translate the attributes.
+		if (attributeList[i].specified) {
+			var attrName = mosync.nativeui
+					.getNativeAttrName(attributeList[i].name);
+			var attrValue = mosync.nativeui
+					.getNativeAttrValue(attributeList[i].value);
+			if ((attrName != "id") && (attrName != "widgettype")
+					&& (attrValue != null)) {
+				if (attrName == "onevent") {
+
+					var functionData = attrValue;
+					eventList = {
+						type : "Clicked",
+						func : function(widgetHandle, eventType) {
+							// TODO: Improve event function parsing mechanism
+							eval(functionData);
+						}
+					};
+				} else if ((attrName == "image") || (attrName == "icon")) {
+					imageResources = {
+						propertyType : attrName,
+						value : attrValue
+					};
+				} else if ((mosync.isAndroid) && (attrName == "icon_android")) {
+					console.log("detected an Icon" + attrValue);
+					imageResources = {
+						propertyType : "icon",
+						value : attrValue
+					};
+				} else if ((mosync.isIOS) && (attrName == "icon_ios")) {
+					imageResources = {
+						propertyType : "icon",
+						value : attrValue
+					};
+				} else {
+					if ((attrName != "icon_ios")
+							&& (attrName != "icon_android")) {
+						propertyList[attrName] = attrValue;
+					}
+				}
+			}
+		}
+	}
+	var currentWidget = mosync.nativeui
+			.create(widgetType, widgetID, propertyList,
+					function(widgetID, handle) {
+						var thisWidget = document.getNativeElementById(widgetID);
+						mosync.nativeui.numWidgetsRequested--;
+						if (imageResources != null) {
+							mosync.resource.loadImage(imageResources.value,
+									widgetID + "image", function(imageID,
+											imageHandle) {
+										thisWidget.setProperty(
+												imageResources.propertyType,
+												imageHandle, null, null);
+
+									});
+						}
+						if (eventList != null) {
+							thisWidget.addEventListener(eventList.type,
+									eventList.func);
+						}
+					}, null);
+	if (parent != null) {
+		currentWidget.addTo(parent.id);
+	}
+};
+
+/**
+ * A function that is called when the UI is ready. By default it loads the
+ * element with ID "mainScreen" Override this function to add extra
+ * functionality. See mosync.nativeui.initUI for more information
+ *
+ */
+mosync.nativeui.UIReady = function()
+{
+	// This is the low level way of showing the default screen
+	// If you want to override this fucntion,
+	// use document.getNativeElementById instead
+	mosync.nativeui.maWidgetScreenShow("mainScreen");
+};
+
+/**
+ * Recursively creates the UI from the HTML5 markup.
+ *
+ * @param parentid
+ *            ID of the parent Widget
+ * @param id
+ *            ID of the currewnt widget
+ * @private
+ */
+mosync.nativeui.createChildren = function(parent, widget) {
+	if (widget != undefined) {
+		var node = widget;
+		var nodeChilds = node.childNodes;
+		mosync.nativeui.createWidget(node, parent);
+		if (nodeChilds != null) {
+			for ( var i = 0; i < nodeChilds.length; i++) {
+
+				if ((nodeChilds[i] != null)
+						&& (nodeChilds[i].tagName != undefined)) {
+					if ((nodeChilds[i].id == null)
+							|| (nodeChilds[i].id == undefined)
+							|| (nodeChilds[i].id == "")) {
+						nodeChilds[i].id = "widget"
+								+ mosync.nativeui.widgetCounter;
+						mosync.nativeui.widgetCounter++;
+					}
+					mosync.nativeui.createChildren(node, nodeChilds[i]);
+				}
+			}
+		}
+
+	}
+};
+
+/**
+ * Checks the status of UI and calls UIReady when it is ready.
+ *
+ * @private
+ */
+mosync.nativeui.CheckUIStatus = function() {
+	if (0 == mosync.nativeui.numWidgetsRequested) {
+		window.clearInterval(mosync.nativeui.showInterval);
+		mosync.nativeui.UIReady();
+	}
+};
+
+/**
+ * Shows a MoSync Screen, can be used to change the current screen.
+ *
+ * usage example:
+ *  mosync.nativeui.showScreen("myNewScreen");
+ *
+ * @param screenID
+ * @private
+ */
+mosync.nativeui.showScreen = function(screenID) {
+	if (numWidgetsCreated == numWidgetsRequested) {
+		mosync.nativeui
+				.maWidgetScreenShow(mosync.nativeui.widgetIDList[screenID]);
+
+	}
+};
+
+/**
+ * Initializes the UI system and parsing of the XML input.
+ * This function should be called when the document body is loaded.
+ *
+ * \code
+ *  <body onload="mosync.nativeui.initUI()">
+ *
+ *  After finalizing the widgets, the UI system will call the UIReady function.
+ *  In order to add your operation you can override the UIReady function as below:
+ *
+ *  mosync.nativeui.UIReady = function()
+ *  {
+ *  //Do something, and show your main screen
+ *  }
+ * \endcode
+ *
+ *
+ */
+mosync.nativeui.initUI = function() {
+	var MoSyncDiv = document.getElementById("NativeUI");
+	MoSyncDiv.style.display = "none"; //hide the Native Container
+	var MoSyncNodes = document.getElementById("NativeUI").childNodes;
+	for ( var i = 1; i < MoSyncNodes.length; i++) {
+		if ((MoSyncNodes[i] != null) && (MoSyncNodes[i].tagName != undefined)) {
+			if (MoSyncNodes[i].id == null) {
+				MoSyncNodes[i].id = "widget" + mosync.nativeui.widgetCounter;
+				mosync.nativeui.widgetCounter++;
+			}
+			mosync.nativeui.createChildren(null, MoSyncNodes[i]);
+		}
+	}
+	mosync.nativeui.showInterval = self.setInterval(
+			"mosync.nativeui.CheckUIStatus()", 100);
+};
+
+/*
+ * store the screen size information coming from MoSync
+ * in the namespace
+ */
+if (mosyncScreenWidth) {
+	mosync.nativeui.screenWidth = mosyncScreenWidth;
+}
+if (mosyncScreenHeight) {
+	mosync.nativeui.screenHeight = mosyncScreenHeight;
+}
+
+// =============================================================
+//
+// File: mosync-sensormanager.js
+
 /*
 Copyright (C) 2012 MoSync AB
 
@@ -5368,16 +6073,19 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301, USA.
 */
 
-/**
- * @file mosync-sensormanager.js
- * @author Iraklis
- *
- * Implementation of W3C sensor API.
- */
 
 /**
  * Returns an object that manages device sensor enumeration
  * @param type (optional) The type of sensor to look for. Null for every sensor
+ /code
+	var sensorReq = navigator.findSensors();
+
+	sensorReq.addEventListener('onsuccess', function() {
+		for(var count = 0; count < this.result.length; count++) {
+			window.console.log("Discovered: " + this.result[count].name);
+		}
+	});
+/endcode
  */
 navigator.findSensors = function(type)
 {
@@ -5385,9 +6093,19 @@ navigator.findSensors = function(type)
 };
 
 /**
- * This object handles sensor enumeration
- * @param type (optional) The type of sensor to look for. Null for every sensor
- * @event onsuccess Called when enumeration is finished, with a list of the device sensors
+The SensorRequest object handles the device sensor enumeration
+_Constructor_
+@param type (optional) The sensor type. If specified, only that kind of sensor will be queried.
+It can be one of the following:
+	+"Accelerometer"
+	+"MagneticField"
+	+"Orientation"
+	+"Gyroscope"
+	+"Proximity"
+
+@field result 	A Sensor array with the sensors that were discovered in the system.
+				It should be read only after the 'onsuccess' event has fired.
+@field readyState A string describing the state of the request. Can be either "processing" or "done"
  */
 function SensorRequest(type)
 {
@@ -5413,10 +6131,19 @@ function SensorRequest(type)
 		}
 	};
 
+	/**
+		@event onsuccess Called when enumeration has finished
+		@param result A Sensor array with the sensors that were discovered in the system.
+	*/
 	this.events = {
 			"onsuccess": [],
 	};
-	this.addEventListener = function(event, listener, captureMethod)
+	/**
+		Registers a callback to an event
+		@param event The name of the event
+		@param listener The callback function
+	*/
+	this.addEventListener = function(event, listener)
 	{
 		if(self.events[event] != undefined)
 		{
@@ -5424,6 +6151,11 @@ function SensorRequest(type)
 		}
 	};
 
+	/**
+		Unregisters a callback from an event
+		@param event The name of the event
+		@param listener The callback function
+	*/
 	this.removeEventListener = function(event, listener)
 	{
 		if(self.events[event] != undefined)
@@ -5448,10 +6180,35 @@ function SensorRequest(type)
 
 /**
  * This object represents a connection to a sensor
+ _Constructor_
  * @param options (Object or string) The sensor to connect to
- * @event onsensordata Called when there is new data from the sensor
+ *
  * @event onerror Called when there is an error
  * @event onstatuschange Called when the status of the connection has changed
+/code
+//Initialization of W3C Accelerometer sensor
+var accelerometer = new SensorConnection("Accelerometer");
+
+accelerometer.addEventListener("onsensordata", updateAccelerometer);
+
+function updateAccelerometer(sensorData){
+	window.console.log("X:" + sensorData.data.x);
+	window.console.log("Y:" + sensorData.data.y);
+	window.console.log("Z:" + sensorData.data.z);
+}
+
+function toggleAccelerometer()
+{
+	if(accelerometer.status == "open")
+	{
+		accelerometer.startWatch({interval:1000});
+	}
+	else
+	{
+		accelerometer.endWatch();
+	}
+}
+/endcode
  */
 function SensorConnection(options)
 {
@@ -5470,6 +6227,11 @@ function SensorConnection(options)
 		this.type = options.type;
 	}
 
+	/**
+		Starts the periodic sampling of the sensor
+		@param watchOptions Struct containing the sampling options
+		@param watchOptions.interval the sampling period in milliseconds
+	*/
 	this.startWatch = function(watchOptions)
 	{
 		if(self.status != "open")
@@ -5492,6 +6254,9 @@ function SensorConnection(options)
 			{"type":"" + self.type, "interval":"" + watchOptions.interval});
 	};
 
+	/**
+		Stops the sampling process
+	*/
 	this.endWatch = function()
 	{
 		if(self.status != "watching")
@@ -5509,6 +6274,9 @@ function SensorConnection(options)
 			{"type":"" + self.type});
 	};
 
+	/**
+		Initiates a single sampling of the sensor data
+	*/
 	this.read = function()
 	{
 		if(self.status != "open")
@@ -5531,13 +6299,33 @@ function SensorConnection(options)
 			"startSensor",
 			{"type":"" + self.type, "interval":-1});
 	};
-
+	/**
+	 onsensordata Called when there is new data from the sensor
+	 @param sensorData Struct containing sampling information from the sensor
+	 @param sensorData.data A (x,y,z) vector with the sensor reading
+	 @param sensorData.timestamp Time of sampling
+	 @param sensorData.reason "read" or "watch"
+	 @endparam
+	 onerror Called when there is an error
+	 @param sensorError Struct containing the error information
+	 @param sensorError.message A string describing the error
+	 @param sensorError.code The error code
+	 @endparam
+	 @event onstatuschange Called when the status of the sensor changes
+	 @param status The new status
+	 @endparam
+	*/
 	this.events = {
 		"onsensordata": [],
 		"onerror": [],
 		"onstatuschange":[]
 	};
 
+	/**
+		Registers a callback to an event
+		@param event The name of the event
+		@param listener The callback function
+	*/
 	this.addEventListener = function(event, listener, captureMethod)
 	{
 		if(self.events[event] != undefined)
@@ -5546,6 +6334,11 @@ function SensorConnection(options)
 		}
 	};
 
+	/**
+		Unregisters a callback from an event
+		@param event The name of the event
+		@param listener The callback function
+	*/
 	this.removeEventListener = function(event, listener)
 	{
 		if(self.events[event] != undefined)
@@ -5607,7 +6400,13 @@ function SensorConnection(options)
 	};
 
 	this.setStatus("open");
-}/*
+}
+
+// =============================================================
+//
+// File: mosync-pushnotifications.js
+
+/*
 Copyright (C) 2012 MoSync AB
 
 This program is free software; you can redistribute it and/or
@@ -5625,7 +6424,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301, USA.
 */
 
-/**
+
+/*
  * @file mosync-pushnotifications.js
  * @author Bogdan
  *
@@ -5647,7 +6447,9 @@ var PushNotificationManager = function() {
 	this.lastPushNotificationData = null;
 };
 
-/** @constructor */
+/**
+ * @constructor
+ */
 var PushNotificationData = function(message, sound, iconBadge)
 {
   this.message = message;
@@ -5662,15 +6464,15 @@ var PushNotificationData = function(message, sound, iconBadge)
  * On Android PUSH_NOTIFICATION_TYPE_ALERT is set by default.
  */
 PushNotificationManager.type = {
-		/**
+		/*
 		 * The application accepts notifications that badge the application icon.
 		 */
 		badge: 1,
-		/**
+		/*
 		 * The application accepts alert sounds as notifications.
 		 */
 		sound: 2,
-		/**
+		/*
 		 * The application accepts alert messages as notifications.
 		 */
 		alert: 4
