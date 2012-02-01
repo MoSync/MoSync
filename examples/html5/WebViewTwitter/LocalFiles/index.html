@@ -29,6 +29,8 @@
 				statusBar: 'black'
 			});
 
+			jQT.settings.debug = true;
+
 			// We defince the parsed favorites as global functions because
 			// we use them in multiple places.
 			var gParsedFavorites = "";
@@ -47,7 +49,11 @@
 				tweetsTitle.innerHTML = username;
 				var results_ul = document.getElementById("results_ul");
 				// If it is the loading indicator do not parse it.
-				if (tweets == "loading...")
+				if (tweets == null)
+				{
+					results_ul.innerHTML = "<li>No tweets to display</li>";
+				}
+				else if (tweets == "Loading...")
 				{
 					results_ul.innerHTML = "<li>" + tweets + "</li>";
 				}
@@ -56,7 +62,7 @@
 					var results = "";
 					if ((tweets.length == 0) || (tweets.error == "Not found"))
 					{
-						results = "<li>No tweets could be found check the username!</li>";
+						results = "<li>No tweets could be found. Please check the username.</li>";
 					}
 					else
 					{
@@ -84,7 +90,7 @@
 			 */
 			function getTweetsForUser(username)
 			{
-				showTweets("loading...", username);
+				showTweets("Loading...", username);
 
 				// Prepare the Twitter url, so it can be passed as a GET parameter.
 				var twitterUrl = "http://api.twitter.com/1/statuses/user_timeline.json?screen_name=" + username;
@@ -124,12 +130,10 @@
 			 */
 			function readFavoriteUsers(callbackFun)
 			{
+				console.log("@@@ readFavoriteUsers");
+
 				// Path to file with user data.
 				var filePath;
-
-				// Get path to local file directory, then
-				// read favourite users from that directory.
-				mosync.file.getLocalPath(read);
 
 				function read(path)
 				{
@@ -147,6 +151,10 @@
 				{
 					callbackFun(data, filePath);
 				}
+
+				// Get path to local file directory, then
+				// read favourite users from that directory.
+				mosync.file.getLocalPath(read);
 			}
 
 			/**
@@ -163,19 +171,19 @@
 			 */
 			function addFavoriteUser()
 			{
-				mosync.log("@@@ addFavoriteUser");
+				console.log("@@@ addFavoriteUser");
+
 				// Get the username from the input field
 				var userName = document.getElementById("usernameInput").value;
 
-				if(userName.length == 0)
+				if (userName.length == 0)
 				{
 					alert("Invalid username!!!")
 					jQT.goTo('#theform');
 					return;
 				}
-				var userList;
 
-				readFavoriteUsers(addUser);
+				var userList;
 
 				function addUser(userData, filePath)
 				{
@@ -211,6 +219,8 @@
 						alert("Could not save user");
 					}
 				}
+
+				readFavoriteUsers(addUser);
 			}
 
 			function displayFavoriteUsers(userData)
@@ -331,7 +341,7 @@
 			<ul id="results_ul" class="rounded">
 				<li>Loading...</li>
 			</ul>
-		</ul>
+		</div>
 
 	</div>
 </body>
