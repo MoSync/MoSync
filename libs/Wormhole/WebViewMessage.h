@@ -29,6 +29,11 @@ MA 02110-1301, USA.
  * @author Mikael Kindborg
  *
  * Class for parsing messages from a WebView.
+ *
+ * @deprecated Use class MessageStream or MessageStreamJSON
+ * instead of this class. This class cannot be used with the
+ * the new version of the Wormhole JavaScrip library. It is
+ * included only for backwards compatibility.
  */
 
 #ifndef WORMHOLE_WEB_VIEW_MESSAGE_H_

@@ -67,6 +67,8 @@ public:
 	 */
 	void handleWebViewMessage(WebView* webView, MAHandle data)
 	{
+		printMessage(data);
+
 		// Create message object. This parses the message.
 		MessageStreamJSON message(webView, data);
 
@@ -76,6 +78,30 @@ public:
 			// Let the message handler handle the message.
 			mMessageHandler.handleMessage(message);
 		}
+	}
+
+	/**
+	 * For debugging.
+	 */
+	void printMessage(MAHandle dataHandle)
+	{
+		// Get length of the data, it is not zero terminated.
+		int dataSize = maGetDataSize(dataHandle);
+
+		// Allocate buffer for string data.
+		char* stringData = (char*) malloc(dataSize + 1);
+
+		// Get the data.
+		maReadData(dataHandle, stringData, 0, dataSize);
+
+		// Zero terminate.
+		stringData[dataSize] = 0;
+
+		// Print unparsed message data.
+		maWriteLog("@@@ MOSYNC Message:", 19);
+		maWriteLog(stringData, dataSize);
+
+		free(stringData);
 	}
 };
 // End of class TwitterMoblet

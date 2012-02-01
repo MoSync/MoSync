@@ -29,6 +29,7 @@ DirectoriesToCopyWormholeJSTo = [
 DirectoriesToCopyMoSyncBridgeTo = [
   "../../../examples/html5/WebViewLoveSMS/LocalFiles/js/",
   "../../../examples/html5/WebViewTwitter/LocalFiles/js/",
+  "../../../examples/html5/NFCExample/LocalFiles/js/",
   "../../../testPrograms/WormholeBenchmark/LocalFiles/js/"
 ]
 

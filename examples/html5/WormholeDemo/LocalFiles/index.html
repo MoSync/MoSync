@@ -264,10 +264,12 @@
 			</div>
 			<input type="button" class="button" value="Delete" onclick="deleteFile()"/>
 			<ul>
-				<li><input type="text" id="fileName" onblur="fileNameLostFocus()"/></li>
+				<li><input type="text" id="fileName"/></li>
+				<li><a href="#" onclick="renameCurrentFile();">Rename</a></li>
 			</ul>
 			<ul>
-				<li><textarea id="fileContents" rows="20" style="font-size:20pt" onchange="textHasChanged()" onblur="textLostFocus()"></textarea></li>
+				<li><textarea id="fileContents" rows="20" style="font-size:20pt"></textarea></li>
+				<li><a href="#" onclick="saveCurrentFile();">Save</a></li>
 			</ul>
 		</div>
 	</div>
