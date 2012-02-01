@@ -61,24 +61,29 @@ p {
 
 #sidebar {
   background-color:#ECEAE7;
+	font-family:helvetica, arial, sans-serif;
   bottom:0px;
+	border-right: 1px #A5A4A2;
+	border-right-style:solid;
   left:0px;
   overflow:auto;
   padding-left:20px;
-  padding-right:40px;
+  padding-right:10px;
   position:fixed;
   text-align:left;
   top:66px;
-  width:280px;
+  width:240px;
   z-index:1;
 }
 
 #sidebar li {
-	color:#DD0000;
+	color:#0065A0;
  	font-size:18px;
-	list-style:disc;
-	margin:15px 0px;
+	text-align: left;
+	list-style:none;
+	margin:5px 0px;
 	text-shadow:#FFFFFF 0px 1px 1px;
+	
 }
 #contents_div {
   bottom:0px;
@@ -89,9 +94,15 @@ p {
   top:64px;
   padding-left:20px;
   padding-right:40px;
+  padding-top: 10px;
+}
+
+#contents_div a[href] {
+	color:#0065A0;
 }
 
 #contents_index {
+  color:black;
   bottom:0px;
   left:340px;
   position:fixed;
@@ -141,24 +152,7 @@ blockquote {
 	margin: 1.5em 30px;
 	padding: 10px 10px 0 10px;
 }
-blockquote:before {
-	font-style: normal;
-	content: '\201C';
-	font-size: 60px;
-	position: absolute;
-	top: -15px;
-	left: -35px;
-	color: #e5e6e7;
-}
-blockquote:after {
-	font-style: normal;
-	content: '\201E';
-	font-size: 60px;
-	position: absolute;
-	bottom: -20px;
-	right: -35px;
-	color: #e5e6e7;
-}
+
 
 blockquote p {
 	margin: 0 0 10px 0;
@@ -171,7 +165,8 @@ blockquote code {
 h1 {
 	margin-top: 0;
 	color: black;
-	font-size: 38px;
+	font-family: Helvetica, Arial, sans-serif;
+	font-size: 28px;
 	font-weight: normal;
 	margin-bottom: 0;
 	margin-left: 0px;
@@ -184,6 +179,7 @@ h2 {
 	color: #0d0d0d;
 	font-size: 18px;
 	font-weight: normal;
+	font-family: Helvetica, Arial, sans-serif;
 }
 h2:after, h3:after {
 	content: ":";
