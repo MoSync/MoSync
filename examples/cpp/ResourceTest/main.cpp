@@ -14,15 +14,15 @@ using namespace NativeUI;
 #define SCREEN_TEXT "Screen"
 
 /**
- * Moblet to be used as a template for a Native UI application.
+ * Moblet to be used as a template for a Resource Example application.
  */
-class NativeUIMoblet : public Moblet, public ButtonListener
+class ResourceMoblet : public Moblet, public ButtonListener
 {
 public:
 	/**
 	 * The constructor creates the user interface.
 	 */
-	NativeUIMoblet()
+	ResourceMoblet()
 	{
 		createUI();
 	}
@@ -30,12 +30,9 @@ public:
 	/**
 	 * Destructor.
 	 */
-	virtual ~NativeUIMoblet()
+	~ResourceMoblet()
 	{
-		mPlatformButton->removeButtonListener(this);
-		mScreenButton->removeButtonListener(this);
-		// All the children will be deleted.
-		delete mMainScreen;
+		clean();
 	}
 
 	/**
@@ -153,6 +150,7 @@ public:
 			if (mMainScreen->isVisible())
 			{
 				// Call close to exit the application.
+				clean();
 				close();
 			}
 			else
@@ -169,7 +167,7 @@ public:
 	* Only for iphone platform.
 	* @param button The button object that generated the event.
 	*/
-	virtual void buttonPressed(Widget* button)
+	void buttonPressed(Widget* button)
 	{
 	};
 
@@ -179,7 +177,7 @@ public:
 	* Only for iphone platform.
 	* @param button The button object that generated the event.
 	*/
-	virtual void buttonReleased(Widget* button)
+	void buttonReleased(Widget* button)
 	{
 	};
 
@@ -188,7 +186,7 @@ public:
 	* bounds of the button.
 	* @param button The button object that generated the event.
 	*/
-	virtual void buttonClicked(Widget* button)
+	void buttonClicked(Widget* button)
 	{
 		if (button == mPlatformButton)
 		{
@@ -202,6 +200,10 @@ public:
 		}
 	}
 
+	/**
+	* This method is called when there is an touch-down event.
+	* @param p The point where the touch event occurred.
+	*/
 	void pointerPressEvent (MAPoint2d p)
 	{
 		if (!mMainScreen->isVisible())
@@ -211,19 +213,44 @@ public:
 		}
 	}
 
+	/**
+	 * Cleans everything
+	 */
+	void clean()
+	{
+		//Remove the listeners
+		mPlatformButton->removeButtonListener(this);
+		mScreenButton->removeButtonListener(this);
+
+		//Unload the resources
+		unloadResource(PLATFORM);
+		unloadResource(SCREEN_TYPE);
+
+		//Delete the screens.
+		//All the children will be deleted.
+		delete mPlatformScreen;
+		mPlatformScreen = NULL;
+
+		delete mScreenScreen;
+		mScreenScreen = NULL;
+
+		delete mMainScreen;
+		mMainScreen = NULL;
+	}
+
 private:
-    Screen* mMainScreen;			//A Native UI screen
-    VerticalLayout* mMainLayout;	//A Native UI layout
-    Button* mPlatformButton;		//A Native UI button
-    Button* mScreenButton;			//A Native UI button
+    Screen* mMainScreen;				//A Native UI screen
+    VerticalLayout* mMainLayout;		//A Native UI layout
+    Button* mPlatformButton;			//A Native UI button
+    Button* mScreenButton;				//A Native UI button
 
-    Screen* mPlatformScreen;
-    RelativeLayout* mPlatformLayout;
-    Image* mPlatformImage;
+    Screen* mPlatformScreen;			//A Native UI screen
+    RelativeLayout* mPlatformLayout;	//A Native UI layout
+    Image* mPlatformImage;				//A Native UI image
 
-    Screen* mScreenScreen;
-    RelativeLayout* mScreenLayout;
-    Image* mScreenImage;
+    Screen* mScreenScreen;				//A Native UI screen
+    RelativeLayout* mScreenLayout;		//A Native UI layout
+    Image* mScreenImage;				//A Native UI image
 };
 
 /**
@@ -232,6 +259,6 @@ private:
 extern "C" int MAMain()
 {
 	printf("MAMain");
-	Moblet::run(new NativeUIMoblet());
+	Moblet::run(new ResourceMoblet());
 	return 0;
 }
