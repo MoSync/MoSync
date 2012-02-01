@@ -274,11 +274,11 @@
 
             //We create a placeholder resource that holds the message string
             MAHandle messageHandle = (MAHandle) Base::gSyscall->resources.create_RT_PLACEHOLDER();
-            int size = (int)[messageData lengthOfBytesUsingEncoding:NSASCIIStringEncoding];
+            int size = (int)[messageData lengthOfBytesUsingEncoding:NSUTF8StringEncoding];
             Base::MemStream* ms = new Base::MemStream(size);
             Base::gSyscall->resources.add_RT_BINARY(messageHandle, ms);
             ms->seek(Base::Seek::Start, 0);
-            ms->write([messageData cStringUsingEncoding:NSASCIIStringEncoding], size);
+            ms->write([messageData cStringUsingEncoding:NSUTF8StringEncoding], size);
 
             eventData->urlData = messageHandle;
             event.data = (MAAddress)eventData;
