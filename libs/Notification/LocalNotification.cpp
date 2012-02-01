@@ -415,6 +415,9 @@ namespace Notification
     /**
      * Set the sound to play when an alert is displayed.
      * Could be ignored if using setPlaySound(false).
+     * The sound file should be saved in a notifications folder under sdcard storage.
+     * Note that some devices can only play notification sounds stored in the
+     * internal storage, in the \system\media\audio\notifications folder.
      * Platform: Android.
      * @param path A valid path to an audio file.
      * @return Any of the following result codes:
