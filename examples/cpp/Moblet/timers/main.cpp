@@ -23,7 +23,7 @@ MA 02110-1301, USA.
  *
  * Prerequisites: The first Moblet example, some familiarity with
  * the graphics API.
- * 
+ *
 **/
 
 #include <conprint.h>
@@ -45,13 +45,13 @@ using namespace MAUtil;
 // The ground level above the bottom of the screen
 #define FLOOR_HEIGHT 18
 // Floor level adjusted by size of object
-#define FLOOR_Y (OBJ_SIZE + (FLOOR_HEIGHT))  
+#define FLOOR_Y (OBJ_SIZE + (FLOOR_HEIGHT))
 // Newtonian gravity constant, swedish edition
 #define GRAVITY 9.82
 // How much velocity we lose at each bounce
 #define BOUNCE_PERC 0.9
 // How much positive velocity we gain when pressing fire
-#define FIRE_VELOCITY (screenHeight*0.04) 
+#define FIRE_VELOCITY (screenHeight*0.04)
 
 // Take a guess
 #define TEXT_COLOR 0xffffff
@@ -112,17 +112,17 @@ public:
 			return;
 		}
 		// instead of clearing the entire screen, we cunningly
-		// erase only the area covered by our bouncing box by 
+		// erase only the area covered by our bouncing box by
 		// drawing it again using the background color.
 		drawObject(BACK_COLOR);
 
 		// Do some physics: v = v - g*t^2
-		velocity -= (t*t*GRAVITY)/(1000000); // 
+		velocity -= (t*t*GRAVITY)/(1000000); //
 		// update box position
 		y += (int)velocity;
 
 		// make sure we don't fall through the floor
-		if(y <= FLOOR_Y) { 
+		if(y <= FLOOR_Y) {
 			y = FLOOR_Y;
 			velocity = -velocity*BOUNCE_PERC;
 		}
@@ -131,7 +131,7 @@ public:
 		maUpdateScreen();
 		t += TIMER_PERIOD;
 	}
-	
+
 	/**
 	 * The Moblet class inherits KeyListener, and automatically registers itself
 	 * to recieve key events. Therefore, it must implement the functions keyPressEvent
@@ -142,7 +142,6 @@ public:
 	**/
 
 	void keyPressEvent(int keyCode, int nativeCode) {
-#ifndef MA_PROF_SUPPORT_STYLUS
 		switch(keyCode) {
 			case MAK_FIRE:
 				if(y == FLOOR_Y)  {
@@ -158,7 +157,6 @@ public:
 			default:
 				break;
 		}
-#endif
 	}
 
 	virtual void pointerPressEvent(MAPoint2d p) {

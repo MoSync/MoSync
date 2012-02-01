@@ -44,11 +44,9 @@ bool EventHandler::rsk=false;
 
 bool EventHandler::focus = true;
 
-#ifdef MA_PROF_SUPPORT_STYLUS
 bool EventHandler::pointer_pressed=false;
 bool EventHandler::pointer_released=false;
 MAPoint2d EventHandler::point;
-#endif	// MA_PROF_SUPPORT_STYLUS
 
 void EventHandler::updateEvents() {
 	left_pressed = right_pressed = up_pressed = down_pressed = fire_pressed = pound_pressed = star_pressed = lsk_pressed = rsk_pressed = false;
@@ -86,7 +84,7 @@ void EventHandler::updateEvents() {
 			up_pressed = true;
 			break;
 		case MAK_DOWN:
-		case MAK_8:				
+		case MAK_8:
 			down = true;
 			down_pressed = true;
 			break;
@@ -141,7 +139,6 @@ void EventHandler::updateEvents() {
 			rsk = false;
 			break;
 		}
-#ifdef MA_PROF_SUPPORT_STYLUS
 		if(event.type == EVENT_TYPE_POINTER_PRESSED) {
 			pointer_pressed = true;
 			point.x = event.point.x;
@@ -153,6 +150,5 @@ void EventHandler::updateEvents() {
 			point.x = event.point.x;
 			point.y = event.point.y;
 		}
-#endif	// MA_PROF_SUPPORT_STYLUS
 	}
 }
