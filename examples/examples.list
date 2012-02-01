@@ -44,8 +44,10 @@ FacebookDemo
 SensorTest
 DeviceFonts
 DeviceFontsNativeUI
-NFCExample
 [html5]
 WebViewGeoLocation
 WebViewLoveSMS
 WebViewTwitter
+WormholeDemo
+WormholeNativeUIDemo
+NFCExample
