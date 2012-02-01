@@ -11,5 +11,5 @@ unknown.png; Public Domain, created by Roger Cook, Don Shanosky
 write_tag; Creative Commons - Attribution (CC BY 3.0), created by the Noun
     Project
 
-The HTML background was created using the CSS pattern generator at 
+The HTML background was created using the CSS pattern generator at
 http://www.patternify.com.
