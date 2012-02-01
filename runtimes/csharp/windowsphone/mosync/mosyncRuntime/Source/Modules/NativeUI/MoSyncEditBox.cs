@@ -68,7 +68,7 @@ namespace MoSync
             protected bool mIsPasswordMode;
 
             /**
-             * if true, indicates that this is the first char entered so delete 
+             * if true, indicates that this is the first char entered so delete
              * the watermark/placeholder
              */
             protected bool mFirstChar;
@@ -150,15 +150,10 @@ namespace MoSync
                         /**
                          * simulating the placeholder/watermark
                          */
-                        if (mIsWatermarkMode)
+                        // if no text has been entered by the user than leave the watermark text
+                        if (mEditBox.Text.Equals(""))
                         {
-                            // if no text has been entered by the user than leave the watermark text
-                            if (mEditBox.Text.Equals(""))
-                            {
-                                Placeholder = mPlaceholderText;
-                                mFirstChar = true;
-                                mIsWatermarkMode = true;
-                            }
+                            setWatermarkMode(true);
                         }
 
                         /**
@@ -187,12 +182,7 @@ namespace MoSync
                           */
                         if (mFirstChar)
                         {
-                            mIsWatermarkMode = false;
-                            mFirstChar = false;
-                            mEditBox.Text = "";
-
-                            // change the foreground to "normal" for user input
-                            mEditBox.Foreground = mForegroundColor;
+                            setWatermarkMode(false);
                         }
 
                         /**
@@ -312,7 +302,7 @@ namespace MoSync
             /**
             * Property for setting the default text that the edit box will contain when first displayed
             *
-            * Since the Watermark is not yet implemented we use the solution suggested by MS 
+            * Since the Watermark is not yet implemented we use the solution suggested by MS
             * (http://msdn.microsoft.com/en-us/library/system.windows.controls.textbox(v=vs.95).aspx)
             */
             [MoSyncWidgetProperty(MoSync.Constants.MAW_EDIT_BOX_PLACEHOLDER)]
@@ -384,6 +374,7 @@ namespace MoSync
                     }
 
                     setPasswordMode(false);
+                    setWatermarkMode(true);
                     switch (inputType)
                     {
                         case 0:			    //todo: check if Default this is equivalent option to MAW_EDIT_BOX_TYPE_ANY
@@ -432,6 +423,7 @@ namespace MoSync
 
                     // by default, the editbox will be visible
                     setPasswordMode(false);
+                    setWatermarkMode(true);
                     switch (inputFlag)
                     {
                         case 0:			    //MAW_EDIT_BOX_FLAG_PASSWORD
@@ -509,6 +501,30 @@ namespace MoSync
                 {
                     mEditBox.Visibility = Visibility.Visible;
                     mPasswordBox.Visibility = Visibility.Collapsed;
+                }
+            }
+
+            /*
+             * Switches the editbox to the watermark mode.
+             * @param watermarkMode: indicates if we need to switch to watermarkMode or not.
+             * Values: true (switch to watermark mode), false (switch to edit mode)
+             */
+            protected void setWatermarkMode(bool watermarkMode)
+            {
+                if (watermarkMode)
+                {
+                    Placeholder = mPlaceholderText;
+                    mFirstChar = true;
+                    mIsWatermarkMode = true;
+                }
+                else
+                {
+                    mIsWatermarkMode = false;
+                    mFirstChar = false;
+                    mEditBox.Text = "";
+
+                    // change the foreground to "normal" for user input
+                    mEditBox.Foreground = mForegroundColor;
                 }
             }
 
