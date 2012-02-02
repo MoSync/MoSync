@@ -496,6 +496,21 @@ namespace MoSync
                 }
             }
 
+            //MAW_EDIT_BOX_MAX_LENGTH property implementation
+            [MoSyncWidgetProperty(MoSync.Constants.MAW_EDIT_BOX_MAX_LENGTH)]
+            public int MaxLength
+            {
+                set
+                {
+                    mPasswordBox.MaxLength = value;
+                    mEditBox.MaxLength = value;
+                }
+                get
+                {
+                    return mEditBox.MaxLength;
+                }
+            }
+
 
             /**
              * Helper function that sets the input mode of the edit box
