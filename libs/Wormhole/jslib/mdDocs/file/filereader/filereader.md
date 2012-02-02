@@ -19,7 +19,7 @@ Properties
 Methods
 -------
 
-- __abort__: Aborts reading file. 
+- __abort__: Aborts reading file.
 - __readAsDataURL__: Read file and return data as a base64 encoded data url.
 - __readAsText__: Reads text file.
 
@@ -35,7 +35,7 @@ Supported Platforms
 - iOS
 - Windows Phone 7 ( Mango )
 
-Read As Data URL 
+Read As Data URL
 ----------------
 
 __Parameters:__
@@ -57,7 +57,7 @@ Quick Example
 	var fail = function(evt) {
 		console.log(error.code);
 	};
-	
+
 	entry.file(win, fail);
 
 Read As Text
@@ -85,7 +85,7 @@ Quick Example
 	var fail = function(evt) {
 		console.log(error.code);
 	};
-	
+
 	entry.file(win, fail);
 
 Abort Quick Example
@@ -104,7 +104,7 @@ Abort Quick Example
 	function fail(error) {
 		console.log(error.code);
 	}
-	
+
 	entry.file(win, fail);
 
 Full Example
@@ -112,7 +112,7 @@ Full Example
 
 	<!DOCTYPE html>
 	<html>
-	  <head>
+	<head>
 		<title>FileReader Example</title>
 
 		<script type="text/javascript" charset="utf-8" src="wormhole.js"></script>
@@ -129,20 +129,20 @@ Full Example
 		function onDeviceReady() {
 			window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, gotFS, fail);
 		}
-		
+
 		function gotFS(fileSystem) {
 			fileSystem.root.getFile("readme.txt", null, gotFileEntry, fail);
 		}
-		
+
 		function gotFileEntry(fileEntry) {
 			fileEntry.file(gotFile, fail);
 		}
-		
+
 		function gotFile(file){
 			readDataUrl(file);
 			readAsText(file);
 		}
-		
+
 		function readDataUrl(file) {
 			var reader = new FileReader();
 			reader.onloadend = function(evt) {
@@ -151,7 +151,7 @@ Full Example
 			};
 			reader.readAsDataURL(file);
 		}
-		
+
 		function readAsText(file) {
 			var reader = new FileReader();
 			reader.onloadend = function(evt) {
@@ -160,17 +160,17 @@ Full Example
 			};
 			reader.readAsText(file);
 		}
-		
+
 		function fail(evt) {
 			console.log(evt.target.error.code);
 		}
-		
+
 		</script>
-	  </head>
-	  <body>
+	</head>
+	<body>
 		<h1>Example</h1>
 		<p>Read File</p>
-	  </body>
+	</body>
 	</html>
 
 <!--

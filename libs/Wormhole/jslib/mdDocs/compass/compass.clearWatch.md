@@ -78,6 +78,7 @@ Full Example
 		function onError(compassError) {
 			alert('Compass error: ' + compassError.code);
 		}
+
 		</script>
 	</head>
 	<body>
