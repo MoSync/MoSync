@@ -953,7 +953,7 @@ void updateGameOver() {
 	}
 }
 
-void loadSettingsFromStore() {	
+void loadSettingsFromStore() {
 	MAHandle settingsStore = maOpenStore("settings", 0);
 	if(settingsStore<=0)
 	{
@@ -962,7 +962,7 @@ void loadSettingsFromStore() {
 		maCreateData(MOTRIS_SETTINGS, sizeof(Settings));
 		return;
 	}
-	
+
 	maReadStore(settingsStore, MOTRIS_SETTINGS);
 	if(maGetDataSize(MOTRIS_SETTINGS)==(sizeof(Settings))) {
 		maReadData(MOTRIS_SETTINGS, &curSettings, 0, sizeof(Settings));
@@ -981,7 +981,7 @@ void saveSettingsToStore() {
 	{
 		return;
 	}
-	
+
 	maWriteData(MOTRIS_SETTINGS, &curSettings, 0, sizeof(Settings));
 	maWriteStore(settingsStore, MOTRIS_SETTINGS);
 }

@@ -12,16 +12,6 @@ Properties
 - __width:__ The width of the image or video in pixels. In the case of a sound clip, this attribute has value 0. (Number)
 - __duration:__ The length of the video or sound clip in seconds. In the case of an image, this attribute has value 0. (Number)
 
-BlackBerry WebWorks Quirks
---------------------------
-There is no API that provides format information of media files.  So the MediaFileData object returned by the MediaFile.getFormatData function will have the following default values:
-
-- __codecs:__ Not supported. The attribute will always be null.
-- __bitrate:__ Not supported.  The attribute will always be 0.
-- __height:__ Not supported.  The attribute will always be 0.
-- __width:__ Not supported.  The attribute will always be 0.
-- __duration:__ Not supported.  The attribute will always be 0.
-
 Android Quirks
 --------------
 Support for the MediaFileData properties is as follows:

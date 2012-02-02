@@ -18,11 +18,8 @@ When the capture operation is finished, it will invoke the CaptureCB callback wi
 
 Supported Platforms
 -------------------
-
 - Android
-- BlackBerry WebWorks (OS 5.0 and higher)
 - iOS
-- Windows Phone 7 ( Mango )
 
 Quick Example
 -------------
@@ -52,8 +49,7 @@ Full Example
       <head>
         <title>Capture Image</title>
 
-        <script type="text/javascript" charset="utf-8" src="phonegap.js"></script>
-        <script type="text/javascript" charset="utf-8" src="json2.js"></script>
+        <script type="text/javascript" charset="utf-8" src="js/wormhole.js"></script>
         <script type="text/javascript" charset="utf-8">
 
         // Called when capture operation is finished

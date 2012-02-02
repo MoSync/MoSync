@@ -121,16 +121,16 @@ MA 02110-1301, USA.
      */
     void MainScreen::buttonClicked(Widget* button)
     {
-    	if ( mClearButton == button )
-    	{
-    		clearButtonClicked();
-    	}
-    	else if ( mSubmitButton == button )
-    	{
-    		// Hide the keyboard if it isn't already dismissed.
-    		mPasswordBox->hideKeyboard();
-    		submitEditBoxContent();
-    	}
+		if ( mClearButton == button )
+		{
+		clearButtonClicked();
+		}
+		else if ( mSubmitButton == button )
+		{
+			// Hide the keyboard if it isn't already dismissed.
+			mPasswordBox->hideKeyboard();
+			submitEditBoxContent();
+		}
 
     }
 
@@ -142,7 +142,7 @@ MA 02110-1301, USA.
      */
     void MainScreen::editBoxReturn(EditBox* editBox)
     {
-    	submitEditBoxContent();
+		submitEditBoxContent();
     }
 
 	/**

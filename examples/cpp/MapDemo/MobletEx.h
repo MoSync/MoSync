@@ -31,11 +31,11 @@ namespace MapDemoUtil
 	//
 	class MobletEx : public Moblet
 	//=========================================================================
-	{ 
+	{
 	public:
-		MobletEx( ) 
-			: Moblet( ) 
-		{ 
+		MobletEx( )
+			: Moblet( )
+		{
 		}
 
 		virtual ~MobletEx( ) { }

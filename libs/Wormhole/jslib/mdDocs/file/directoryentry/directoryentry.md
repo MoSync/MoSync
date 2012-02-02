@@ -11,16 +11,16 @@ Properties
 - __name:__ The name of the DirectoryEntry, excluding the path leading to it. _(DOMString)_
 - __fullPath:__ The full absolute path from the root to the DirectoryEntry. _(DOMString)_
 
-NOTE: The following attributes are defined by the W3C specification, but are __not supported__ by PhoneGap:
+NOTE: The following attributes are defined by the W3C specification, but are __not supported__:
 
-- __filesystem:__ The file system on which the DirectoryEntry resides. _(FileSystem)_ 
+- __filesystem:__ The file system on which the DirectoryEntry resides. _(FileSystem)_
 
 Methods
 -------
 
 The following methods can be invoked on a DirectoryEntry object:
 
-- __getMetadata__: Look up metadata about a directory. 
+- __getMetadata__: Look up metadata about a directory.
 - __moveTo__: Move a directory to a different location on the file system.
 - __copyTo__: Copy a directory to a different location on the file system.
 - __toURI__: Return a URI that can be used to locate a directory.
@@ -36,7 +36,6 @@ Supported Platforms
 -------------------
 
 - Android
-- BlackBerry WebWorks (OS 5.0 and higher)
 - iOS
 - Windows Phone 7 ( Mango )
 
@@ -53,16 +52,16 @@ __Parameters:__
 
 __Quick Example__
 
-    function success(metadata) {
-        console.log("Last Modified: " + metadata.modificationTime);
-    }
+	function success(metadata) {
+		console.log("Last Modified: " + metadata.modificationTime);
+	}
 
-    function fail(error) {
-        alert(error.code);
-    }
+	function fail(error) {
+		alert(error.code);
+	}
 
-    // Request the metadata object for this entry
-    entry.getMetadata(success, fail);	
+	// Request the metadata object for this entry
+	entry.getMetadata(success, fail);
 
 
 moveTo
@@ -87,22 +86,22 @@ __Parameters:__
 
 __Quick Example__
 
-    function success(entry) {
-        console.log("New Path: " + entry.fullPath);
-    }
+	function success(entry) {
+		console.log("New Path: " + entry.fullPath);
+	}
 
-    function fail(error) {
-        alert(error.code);
-    }
-	
+	function fail(error) {
+		alert(error.code);
+	}
+
 	function moveDir(entry) {
-        var parent = document.getElementById('parent').value,
-            newName = document.getElementById('newName').value,
-            parentEntry = new DirectoryEntry({fullPath: parent});
+		var parent = document.getElementById('parent').value,
+			newName = document.getElementById('newName').value,
+			parentEntry = new DirectoryEntry({fullPath: parent});
 
-        // move the directory to a new directory and rename it
-        entry.moveTo(parentEntry, newName, success, fail);
-    }
+		// move the directory to a new directory and rename it
+		entry.moveTo(parentEntry, newName, success, fail);
+	}
 
 copyTo
 ------
@@ -110,7 +109,7 @@ copyTo
 Copy a directory to a different location on the file system. It is an error to attempt to:
 
 - copy a directory inside itself at any depth;
-- copy a directory into its parent if a name different from its current one is not provided. 
+- copy a directory into its parent if a name different from its current one is not provided.
 
 Directory copies are always recursive - that is, they copy all contents of the directory.
 
@@ -127,31 +126,31 @@ __Quick Example__
 	function win(entry) {
 		console.log("New Path: " + entry.fullPath);
 	}
-	
+
 	function fail(error) {
 		alert(error.code);
 	}
-	
-	function copyDir(entry) {
-        var parent = document.getElementById('parent').value,
-            newName = document.getElementById('newName').value,
-            parentEntry = new DirectoryEntry({fullPath: parent});
 
-        // copy the directory to a new directory and rename it
-        entry.copyTo(parentEntry, newName, success, fail);
-    }
+	function copyDir(entry) {
+		var parent = document.getElementById('parent').value,
+			newName = document.getElementById('newName').value,
+			parentEntry = new DirectoryEntry({fullPath: parent});
+
+		// copy the directory to a new directory and rename it
+		entry.copyTo(parentEntry, newName, success, fail);
+	}
 
 
 toURI
 -----
 
-Returns a URI that can be used to locate the directory. 
+Returns a URI that can be used to locate the directory.
 
 __Quick Example__
-	
-    // Get the URI for this directory
-    var uri = entry.toURI();
-    console.log(uri);
+
+	// Get the URI for this directory
+	var uri = entry.toURI();
+	console.log(uri);
 
 
 remove
@@ -168,23 +167,23 @@ __Parameters:__
 - __errorCallback__ - A callback that is called if an error occurs when attempting to delete the directory.  Invoked with a FileError object. _(Function)_
 
 __Quick Example__
-	
-    function success(entry) {
-        console.log("Removal succeeded");
-    }
 
-    function fail(error) {
-        alert('Error removing directory: ' + error.code);
-    }
+	function success(entry) {
+		console.log("Removal succeeded");
+	}
 
-    // remove this directory
-    entry.remove(success, fail);
+	function fail(error) {
+		alert('Error removing directory: ' + error.code);
+	}
+
+	// remove this directory
+	entry.remove(success, fail);
 
 
 getParent
 ---------
 
-Look up the parent DirectoryEntry containing the directory. 
+Look up the parent DirectoryEntry containing the directory.
 
 __Parameters:__
 
@@ -192,17 +191,17 @@ __Parameters:__
 - __errorCallback__ - A callback that is called if an error occurs when attempting to retrieve the parent DirectoryEntry.  Invoked with a FileError object. _(Function)_
 
 __Quick Example__
-	
-    function success(parent) {
-        console.log("Parent Name: " + parent.name);
-    }
- 
-    function fail(error) {
-        alert('Failed to get parent directory: ' + error.code);
-    }
-	
+
+	function success(parent) {
+		console.log("Parent Name: " + parent.name);
+	}
+
+	function fail(error) {
+		alert('Failed to get parent directory: ' + error.code);
+	}
+
 	// Get the parent DirectoryEntry
-	entry.getParent(success, fail);	
+	entry.getParent(success, fail);
 
 
 createReader
@@ -211,9 +210,9 @@ createReader
 Creates a new DirectoryReader to read entries in a directory.
 
 __Quick Example__
-	
-    // create a directory reader
-    var directoryReader = entry.createReader();	
+
+	// create a directory reader
+	var directoryReader = entry.createReader();
 
 
 getDirectory
@@ -231,17 +230,17 @@ __Parameters:__
 - __errorCallback__ - A callback that is called if an error occurs creating or looking up the directory.  Invoked with a FileError object. _(Function)_
 
 __Quick Example__
-	
-    function success(parent) {
-        console.log("Parent Name: " + parent.name);
-    }
 
-    function fail(error) {
-        alert("Unable to create new directory: " + error.code);
-    }
+	function success(parent) {
+		console.log("Parent Name: " + parent.name);
+	}
 
-    // Retrieve an existing directory, or create it if it does not already exist
-    entry.getDirectory("newDir", {create: true, exclusive: false}, success, fail);	
+	function fail(error) {
+		alert("Unable to create new directory: " + error.code);
+	}
+
+	// Retrieve an existing directory, or create it if it does not already exist
+	entry.getDirectory("newDir", {create: true, exclusive: false}, success, fail);
 
 
 getFile
@@ -259,24 +258,24 @@ __Parameters:__
 - __errorCallback__ - A callback that is called if an error occurs creating or looking up the file.  Invoked with a FileError object. _(Function)_
 
 __Quick Example__
-	
-    function success(parent) {
-        console.log("Parent Name: " + parent.name);
-    }
 
-    function fail(error) {
-        alert("Failed to retrieve file: " + error.code);
-    }
+	function success(parent) {
+		console.log("Parent Name: " + parent.name);
+	}
 
-    // Retrieve an existing file, or create it if it does not exist
-    entry.getFile("newFile.txt", {create: true, exclusive: false}, success, fail);	
+	function fail(error) {
+		alert("Failed to retrieve file: " + error.code);
+	}
+
+	// Retrieve an existing file, or create it if it does not exist
+	entry.getFile("newFile.txt", {create: true, exclusive: false}, success, fail);
 
 
 removeRecursively
 -----------------
 
-Deletes a directory and all of its contents.  In the event of an error (e.g. trying to delete 
-a directory that contains a file that cannot be removed), some of the contents of the directory may 
+Deletes a directory and all of its contents.  In the event of an error (e.g. trying to delete
+a directory that contains a file that cannot be removed), some of the contents of the directory may
 be deleted.   It is an error to attempt to:
 
 - delete the root directory of a filesystem.
@@ -287,14 +286,14 @@ __Parameters:__
 - __errorCallback__ - A callback that is called if an error occurs when attempting to delete the DirectoryEntry.  Invoked with a FileError object. _(Function)_
 
 __Quick Example__
-	
-    function success(parent) {
-        console.log("Remove Recursively Succeeded");
-    }
 
-    function fail(error) {
-        alert("Failed to remove directory or it's contents: " + error.code);
-    }
+	function success(parent) {
+		console.log("Remove Recursively Succeeded");
+	}
 
-    // remove the directory and all it's contents
-    entry.removeRecursively(success, fail);	
+	function fail(error) {
+		alert("Failed to remove directory or it's contents: " + error.code);
+	}
+
+	// remove the directory and all it's contents
+	entry.removeRecursively(success, fail);

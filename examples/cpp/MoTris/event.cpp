@@ -86,7 +86,7 @@ void EventHandler::updateEvents() {
 			up_pressed = true;
 			break;
 		case MAK_DOWN:
-		case MAK_8:				
+		case MAK_8:
 			down = true;
 			down_pressed = true;
 			break;

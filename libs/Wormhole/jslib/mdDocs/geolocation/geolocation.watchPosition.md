@@ -3,9 +3,10 @@ geolocation.watchPosition
 
 Watches for changes to the device's current position.
 
-    var watchId = navigator.geolocation.watchPosition(geolocationSuccess,
-                                                      [geolocationError],
-                                                      [geolocationOptions]);
+	var watchId = navigator.geolocation.watchPosition(
+		geolocationSuccess,
+		[geolocationError],
+		[geolocationOptions]);
 
 Parameters
 ----------
@@ -28,81 +29,78 @@ Supported Platforms
 -------------------
 
 - Android
-- BlackBerry (OS 4.6)
-- BlackBerry WebWorks (OS 5.0 and higher)
-- iPhone
+- iOS
 - Windows Phone 7 ( Mango )
 
 Quick Example
 -------------
 
-    // onSuccess Callback
-    //   This method accepts a `Position` object, which contains
-    //   the current GPS coordinates
-    //
-    function onSuccess(position) {
-        var element = document.getElementById('geolocation');
-        element.innerHTML = 'Latitude: '  + position.coords.latitude      + '<br />' +
-                            'Longitude: ' + position.coords.longitude     + '<br />' +
-                            '<hr />'      + element.innerHTML;
-    }
+	// onSuccess Callback
+	//   This method accepts a `Position` object, which contains
+	//   the current GPS coordinates
+	//
+	function onSuccess(position) {
+		var element = document.getElementById('geolocation');
+		element.innerHTML = 'Latitude: '  + position.coords.latitude + '<br />' +
+							'Longitude: ' + position.coords.longitude + '<br />' +
+							'<hr />' + element.innerHTML;
+	}
 
-    // onError Callback receives a PositionError object
-    //
-    function onError(error) {
-        alert('code: '    + error.code    + '\n' +
-              'message: ' + error.message + '\n');
-    }
+	// onError Callback receives a PositionError object
+	//
+	function onError(error) {
+		alert('code: ' + error.code + '\n' +
+			'message: ' + error.message + '\n');
+	}
 
-    // Options: retrieve the location every 3 seconds
-    //
-    var watchID = navigator.geolocation.watchPosition(onSuccess, onError, { frequency: 3000 });
-    
+	// Options: retrieve the location every 3 seconds
+	//
+	var watchID = navigator.geolocation.watchPosition(onSuccess, onError, { frequency: 3000 });
 
 Full Example
 ------------
 
-    <!DOCTYPE html>
-    <html>
-      <head>
-        <title>Device Properties Example</title>
+	<!DOCTYPE html>
+	<html>
+	<head>
+		<title>Device Properties Example</title>
 
-        <script type="text/javascript" charset="utf-8" src="phonegap.js"></script>
-        <script type="text/javascript" charset="utf-8">
+		<script type="text/javascript" charset="utf-8" src="wormhole.js"></script>
+		<script type="text/javascript" charset="utf-8">
 
-        // Wait for PhoneGap to load
-        //
-        document.addEventListener("deviceready", onDeviceReady, false);
+		// Wait for Wormhole to load
+		//
+		document.addEventListener("deviceready", onDeviceReady, false);
 
-        var watchID = null;
+		var watchID = null;
 
-        // PhoneGap is ready
-        //
-        function onDeviceReady() {
-            // Update every 3 seconds
-            var options = { frequency: 3000 };
-            watchID = navigator.geolocation.watchPosition(onSuccess, onError, options);
-        }
-    
-        // onSuccess Geolocation
-        //
-        function onSuccess(position) {
-            var element = document.getElementById('geolocation');
-            element.innerHTML = 'Latitude: '  + position.coords.latitude      + '<br />' +
-                                'Longitude: ' + position.coords.longitude     + '<br />' +
-                                '<hr />'      + element.innerHTML;
-        }
-    
-	    // onError Callback receives a PositionError object
-	    //
-	    function onError(error) {
-	        alert('code: '    + error.code    + '\n' +
-	              'message: ' + error.message + '\n');
-	    }
+		// Wormhole is ready
+		//
+		function onDeviceReady() {
+			// Update every 3 seconds
+			var options = { frequency: 3000 };
+			watchID = navigator.geolocation.watchPosition(onSuccess, onError, options);
+		}
 
-        </script>
-      </head>
-      <body>
-        <p id="geolocation">Watching geolocation...</p>
-      </body>
-    </html>
+		// onSuccess Geolocation
+		//
+		function onSuccess(position) {
+			var element = document.getElementById('geolocation');
+			element.innerHTML = 'Latitude: '  + position.coords.latitude + '<br />' +
+								'Longitude: ' + position.coords.longitude + '<br />' +
+								'<hr />' + element.innerHTML;
+		}
+
+		// onError Callback receives a PositionError object
+		//
+		function onError(error) {
+			alert('code: ' + error.code + '\n' +
+				'message: ' + error.message + '\n');
+		}
+
+		</script>
+	</head>
+	<body>
+		<p id="geolocation">Watching geolocation...</p>
+	</body>
+	</html>

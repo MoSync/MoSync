@@ -17,10 +17,10 @@ MA 02110-1301, USA.
 */
 
 /**
-*MoSync provides Native UI support on Android and iPhone. This means that you can develop
+*MoSync provides Native UI support on Android, iOS and Windows Phone. This means that you can develop
 *user interfaces that use each target platform's own widgets.
 *We have mapped the different ways of coding UIs to a single API. A few properties/widgets
-*are only be available on one platform, but most are available on both Android and iPhone.
+*are only be available on one platform, but most are available on all three platforms (e.g. Android, iOs and Windows Phone).
 *
 *All native UI API functions begin with the prefix "maWidget". It is a minimal
 *API where widgets with different semantics in the UI can be created: widget
@@ -165,13 +165,13 @@ MA 02110-1301, USA.
 *	A view for selecting the time of day, in 24 hour mode.
 *
 *- \b ToggleButton \n
-*	Displays checked/unchecked states as a button with a "light" indicator and by default accompanied with the text "ON" or "OFF". It is available only on Android, and it is similar to the CheckBox on iOS.
+*	Displays checked/unchecked states as a button with a "light" indicator and by default accompanied with the text "ON" or "OFF". It is available on Android and windows Phone, and it is similar to the CheckBox on iOS.
 *
 *- \b VideoView \n
 *	Manages the playback of a movie from a file or a network stream.</li>
 *
 *- \b WebView \n
-*	A powerful widget that renders web content using the same WebKit rendering engines that powers the Safari and Android web browsers.
+*	A powerful widget that renders web content using the same WebKit rendering engines that powers the Safari and Android web browsers. It also runs on Windos Phone.
 *
 *
 *\b Properties
