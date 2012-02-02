@@ -57,16 +57,18 @@ void ImageScreenWithButtons::CreateUI() {
 
 	mPreviousImage = new NativeUI::Button();
 	mPreviousImage->setText("<--");
-	mPreviousImage->wrapContentHorizontally();
+	mNextImage->wrapContentHorizontally();
 	mPreviousImage->addButtonListener(this);
 
 	mButtonBar = new NativeUI::HorizontalLayout();
 
+	mButtonBar->fillSpaceHorizontally();
+	mButtonBar->wrapContentVertically();
+
+	mButtonBar->setChildHorizontalAlignment(MAW_ALIGNMENT_CENTER);
+
 	mButtonBar->addChild(mPreviousImage);
 	mButtonBar->addChild(mNextImage);
-
-	mButtonBar->wrapContentHorizontally();
-	mButtonBar->wrapContentVertically();
 
 	mMainLayout = new NativeUI::VerticalLayout();
 
@@ -76,16 +78,16 @@ void ImageScreenWithButtons::CreateUI() {
 	imageLayout = new NativeUI::HorizontalLayout();
 	imageLayout->fillSpaceHorizontally();
 	imageLayout->fillSpaceVertically();
-	imageLayout->setChildHorizontalAlignment(MAW_ALIGNMENT_CENTER);
+	imageLayout->setChildVerticalAlignment(MAW_ALIGNMENT_CENTER);
 
 	LoadImages();
 
-	mMainLayout->addChild(imageLayout);
-
-	mImages[DEFAULT_IMAGE_INDEX]->showImage();
-	imageLayout->addChild(mImages[DEFAULT_IMAGE_INDEX]);
 	mCurrentPosition = DEFAULT_IMAGE_INDEX;
+	imageLayout->addChild(mImages[DEFAULT_IMAGE_INDEX]);
+	mImages[DEFAULT_IMAGE_INDEX]->showImage();
+	imageLayout->setChildHorizontalAlignment(MAW_ALIGNMENT_CENTER);
 
+	mMainLayout->addChild(imageLayout);
 	mMainLayout->addChild(mButtonBar);
 
 	this->setMainWidget(mMainLayout);

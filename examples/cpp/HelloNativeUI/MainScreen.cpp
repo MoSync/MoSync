@@ -114,16 +114,16 @@ MA 02110-1301, USA.
 		mMainLayout->addChild(mSubmitButton);
 	}
 
-	/**
-	* This method is called if the touch-up event was inside the
-	* bounds of the button.
-	* @param button The button object that generated the event.
-	*/
-	void MainScreen::buttonClicked(Widget* button)
-	{
+    /**
+     * This method is called if the touch-up event was inside the
+     * bounds of the button.
+     * @param button The button object that generated the event.
+     */
+    void MainScreen::buttonClicked(Widget* button)
+    {
 		if ( mClearButton == button )
 		{
-			clearButtonClicked();
+		clearButtonClicked();
 		}
 		else if ( mSubmitButton == button )
 		{
@@ -132,18 +132,18 @@ MA 02110-1301, USA.
 			submitEditBoxContent();
 		}
 
-	}
+    }
 
-	/**
-	* This method is called when the return button was pressed.
-	* On iphone platform the virtual keyboard is not hidden after
-	* receiving this event.
-	* @param editBox The edit box object that generated the event.
-	*/
-	void MainScreen::editBoxReturn(EditBox* editBox)
-	{
+    /**
+     * This method is called when the return button was pressed.
+     * On iphone platform the virtual keyboard is not hidden after
+     * receiving this event.
+     * @param editBox The edit box object that generated the event.
+     */
+    void MainScreen::editBoxReturn(EditBox* editBox)
+    {
 		submitEditBoxContent();
-	}
+    }
 
 	/**
 	 * This method is called when the Clear button is clicked.
