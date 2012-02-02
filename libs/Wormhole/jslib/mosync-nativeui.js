@@ -489,10 +489,6 @@ mosync.nativeui.registerEventListener = function(widgetID, eventType,
  * @param errorCallback
  *            a function that will be called if an error occurs
  *
- * \code
- *         mosync.nativeui.NativeWidgetElement(widgetType, widgetID, params, successCallback, errorCallback)
- * \endcode
- *
  *
  */
 mosync.nativeui.NativeWidgetElement = function(widgetType, widgetID, params,
@@ -597,7 +593,10 @@ mosync.nativeui.NativeWidgetElement = function(widgetType, widgetID, params,
 	 *            a function that will be called if the operation is successfull
 	 * @param errorCallback
 	 *            a function that will be called if an error occurs
+	 * Example
+	 * -------
 	 * \code
+	 * 		var myWidget = mosync.nativeui.create("Button" ,"myButton");
 	 * 		myWidget.setProperty("width", "100%")
 	 * \endcode
 	 */
@@ -644,6 +643,8 @@ mosync.nativeui.NativeWidgetElement = function(widgetType, widgetID, params,
 	 * @param listenerFunction
 	 *            a function that will be called when that event is fired.
 	 *
+	 * Example
+	 * -------
 	 *	\code
 	 *	//Create a new button and add an event listener to it
 	 *	var myButton = mosync.nativeui.create("Button" ,"myButton",
@@ -682,6 +683,26 @@ mosync.nativeui.NativeWidgetElement = function(widgetType, widgetID, params,
 	 * @param errorCallback
 	 *            a function that will be called if an error occurs
 	 *
+	 * Example
+	 * -------
+	 * \code
+	 * 	 //Create a Native Screen
+	 *   var myScreen = mosync.nativeui.create("Screen" ,"myScreen", {
+	 *    	"title": "My Screen"
+	 *   });
+	 *
+	 *   //Create a Button
+	 *	 var myButton = mosync.nativeui.create("Button" ,"myButton",
+	 *	 {
+	 *		//properties of the button
+	 *		"width": "100%",
+	 *		"text": "Click Me!"
+	 *	 });
+	 *
+	 *	//Add the button to the Created Screen
+	 *  myScreen.addChild("myButton")
+	 * \endcode
+	 *
 	 */
 	this.addChild = function(childID, successCallback, errorCallback) {
 
@@ -707,6 +728,26 @@ mosync.nativeui.NativeWidgetElement = function(widgetType, widgetID, params,
 	 *            a function that will be called if the operation is successfull
 	 * @param errorCallback
 	 *            a function that will be called if an error occurs
+	 *
+	 * Example
+	 * -------
+	 * \code
+	 * 	 //Create a Native Screen
+	 *   var myScreen = mosync.nativeui.create("Screen" ,"myScreen", {
+	 *    	"title": "My Screen"
+	 *   });
+	 *
+	 *   //Create a Button
+	 *	 var myButton = mosync.nativeui.create("Button" ,"myButton",
+	 *	 {
+	 *		//properties of the button
+	 *		"width": "100%",
+	 *		"text": "Click Me!"
+	 *	 });
+	 *
+	 *	//Insert the button to the Created Screen child list
+	 *  myScreen.insertChild(0, "myButton")
+	 * \endcode
 	 */
 	this.insertChild = function(childID, index, successCallback, errorCallback) {
 		if ((self.created) && (childID != undefined)) {
@@ -730,6 +771,28 @@ mosync.nativeui.NativeWidgetElement = function(widgetType, widgetID, params,
 	 * @param errorCallback
 	 *            a function that will be called if an error occurs
 	 *
+	 * Example
+	 * -------
+	 * \code
+	 * 	 //Create a Native Screen
+	 *   var myScreen = mosync.nativeui.create("Screen" ,"myScreen", {
+	 *    	"title": "My Screen"
+	 *   });
+	 *
+	 *   //Create a Button
+	 *	 var myButton = mosync.nativeui.create("Button" ,"myButton",
+	 *	 {
+	 *		//properties of the button
+	 *		"width": "100%",
+	 *		"text": "Click Me!"
+	 *	 });
+	 *
+	 *	//Add myButton to the screen
+	 *  myButton.addTo("myScreen);
+	 *
+	 *	//Remove mybutton from the childs of myScreen
+	 *  myScreen.removeChild("myButton")
+	 * \endcode
 	 */
 	this.removeChild = function(childID, successCallback, errorCallback) {
 		if ((self.created) && (childID != undefined)) {
@@ -756,6 +819,8 @@ mosync.nativeui.NativeWidgetElement = function(widgetType, widgetID, params,
 	 *            (optional) a function that will be called when the operation
 	 *            encounters an error
 	 *
+	 * Example
+	 * -------
 	 *	\code
 	 *	//Create a new button and add an event listener to it
 	 *	var secondButton = mosync.nativeui.create("Button" ,"SecondButton",
@@ -798,6 +863,29 @@ mosync.nativeui.NativeWidgetElement = function(widgetType, widgetID, params,
 		 * @param errorCallback
 		 *            a function that will be called if an error occurs
 		 *
+		 * Example
+		 * -------
+		 * \code
+		 * 	 //Create a Native Screen
+		 *   var myScreen = mosync.nativeui.create("Screen" ,"myScreen", {
+		 *    	"title": "My Screen"
+		 *   });
+		 *
+		 *   //Create a Button
+		 *	 var myButton = mosync.nativeui.create("Button" ,"myButton",
+		 *	 {
+		 *		//properties of the button
+		 *		"width": "100%",
+		 *		"text": "Click Me!"
+		 *	 });
+		 *
+		 *	//Add the button to the Created Screen
+		 *  myScreen.addChild("myButton");
+		 *
+		 *  //Show the created screen on the device's screen
+		 *  myScreen.show();
+		 * \endcode
+		 *
 		 */
 		this.show = function(successCallback, errorCallback) {
 			if (self.created) {
@@ -822,6 +910,33 @@ mosync.nativeui.NativeWidgetElement = function(widgetType, widgetID, params,
 		 *            successfull
 		 * @param errorCallback
 		 *            a function that will be called if an error occurs
+		 *
+		 *
+		 * Example
+		 * -------
+		 * \code
+		 * 	 //Create a Native StackScreen
+		 *   var myStackScreen = mosync.nativeui.create("StackScreen" ,"myStackScreen");
+		 *   var myScreen = mosync.nativeui.create("Screen" ,"myScreen", {
+		 *    	"title": "My Screen"
+		 *   });
+		 *
+		 *   //Create a Button
+		 *	 var myButton = mosync.nativeui.create("Button" ,"myButton",
+		 *	 {
+		 *		//properties of the button
+		 *		"width": "100%",
+		 *		"text": "Click Me!"
+		 *	 });
+		 *
+		 *	//Add the button to the Created Screen
+		 *  myScreen.addChild("myButton");
+		 *
+		 *  //Show the created screen on the device's screen
+		 *  myStackScreen.show();
+		 *
+		 *  myScreen.pushTo("myStackScreen")
+		 * \endcode
 		 */
 		this.pushTo = function(stackScreenID, successCallback, errorCallback) {
 			var stackScreen = document.getNativeElementById(stackScreenID);
@@ -838,6 +953,7 @@ mosync.nativeui.NativeWidgetElement = function(widgetType, widgetID, params,
 		};
 
 		/**
+		 *
 		 * Pops a screen fr om the current stackscreen, Use only for StackScreen
 		 * widgets
 		 *
@@ -846,6 +962,35 @@ mosync.nativeui.NativeWidgetElement = function(widgetType, widgetID, params,
 		 *            successfull
 		 * @param errorCallback
 		 *            a function that will be called if an error occurs
+		 *
+		 * Example
+		 * -------
+		 * \code
+		 * 	 //Create a Native StackScreen
+		 *   var myStackScreen = mosync.nativeui.create("StackScreen" ,"myStackScreen");
+		 *   var myScreen = mosync.nativeui.create("Screen" ,"myScreen", {
+		 *    	"title": "My Screen"
+		 *   });
+		 *
+		 *   //Create a Button
+		 *	 var myButton = mosync.nativeui.create("Button" ,"myButton",
+		 *	 {
+		 *		//properties of the button
+		 *		"width": "100%",
+		 *		"text": "Click Me!"
+		 *	 });
+		 *
+		 *	//Add the button to the Created Screen
+		 *  myScreen.addChild("myButton");
+		 *
+		 *  //Show the created screen on the device's screen
+		 *  myStackScreen.show();
+		 *
+		 *  myScreen.pushTo("myStackScreen");
+		 *
+		 *  myStackScreen.pop();
+		 * \endcode
+		 *
 		 */
 		this.pop = function(successCallback, errorCallback) {
 			if (self.created) {
@@ -918,14 +1063,18 @@ mosync.nativeui.NativeWidgetElement = function(widgetType, widgetID, params,
  * returns the object that can be used to change the properties of the specified
  * widget.
  *
- * \code
- *    var myScreen = document.getNativeElementById("MyScreen")
- *    myScreen.show()
- * \endcode
  *
  * @param widgetID
  *            the ID attribute used for identifying the widget in DOM
  *
+ * Example
+ * -------
+ * \code
+ * 	  //Get the screen widget
+ *    var myScreen = document.getNativeElementById("MyScreen")
+ *    /7Show it on the device's screen
+ *    myScreen.show()
+ * \endcode
  */
 document.getNativeElementById = function(widgetID) {
 	return mosync.nativeui.NativeElementsTable[widgetID];
@@ -935,12 +1084,6 @@ document.getNativeElementById = function(widgetID) {
  * creates a widget and returns a mosync.nativeui.NativeWidgetElement object.
  * The object then can be used for modifying the respecitve NativeElement.
  *
- * \code
- * 		var myButton = mosync.nativeui.create("Button", "myButton", {
- *					"text" : "Click Me!",
- *					"width" : "100%"
- * 					});
- * \endcode
  *
  * @param widgetType
  *            type of the widet that should be created
@@ -953,7 +1096,17 @@ document.getNativeElementById = function(widgetID) {
  *            (optional) a function that will be called when the operation
  *            encounters an error
  *
- * @returns {mosync.nativeui.NativeWidgetElement}
+ * @returns An object of type mosync.nativeui.NativeWidgetElement
+ *
+ * Example:
+ * --------
+ * \code
+ * 		var myButton = mosync.nativeui.create("Button", "myButton", {
+ *					"text" : "Click Me!",
+ *					"width" : "100%"
+ * 					});
+ * \endcode
+
  */
 mosync.nativeui.create = function(widgetType, widgetID, params,
 		successCallback, errorCallback) {
@@ -992,15 +1145,19 @@ mosync.nativeui.widgetIDList = {};
 /**
  * Provides access to C++ handles through IDs. It is accessible though document object as well.
  *
+ *
+ * @param elementID
+ *            ID of the widget in question
+ * @returns MoSync handle value for that widget
+ *
+ * Example
+ * -------
  * \code
  *
  *   var myButton = document.getElementsById("MyButton");
  *   myButton.addTo("myLayout");
  * \endcode
- *
- * @param elementID
- *            ID of the widget in question
- * @returns MoSync handle value for that widget
+ * @private
  */
 mosync.nativeui.getElementById = function(elementID) {
 	return mosync.nativeui.widgetIDList[elementID];
@@ -1319,11 +1476,13 @@ mosync.nativeui.showScreen = function(screenID) {
  * This function should be called when the document body is loaded.
  *
  * \code
+ *  <!-- the function can be called in the initialization phase of HTML document.-->
  *  <body onload="mosync.nativeui.initUI()">
- *
+ * \endcode
  *  After finalizing the widgets, the UI system will call the UIReady function.
  *  In order to add your operation you can override the UIReady function as below:
  *
+ * \code
  *  mosync.nativeui.UIReady = function()
  *  {
  *  //Do something, and show your main screen
@@ -1350,12 +1509,25 @@ mosync.nativeui.initUI = function() {
 };
 
 /*
- * store the screen size information coming from MoSync
- * in the namespace
+ * Store the screen size information coming from MoSync
+ * in the mosync.nativeui namespace.
  */
-if (mosyncScreenWidth) {
+if (typeof mosyncScreenWidth != "undefined" &&
+	typeof mosyncScreenHeight != "undefined")
+{
 	mosync.nativeui.screenWidth = mosyncScreenWidth;
-}
-if (mosyncScreenHeight) {
 	mosync.nativeui.screenHeight = mosyncScreenHeight;
+}
+else
+{
+	try
+	{
+		mosync.nativeui.screenWidth = window.screen.availWidth;
+		mosync.nativeui.screenHeight = window.screen.availHeight;
+	}
+	catch (error)
+	{
+		mosync.nativeui.screenWidth = window.innerWidth;
+		mosync.nativeui.screenHeight = window.innerHeight;
+	}
 }
