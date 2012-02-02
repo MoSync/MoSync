@@ -17,89 +17,82 @@ Properties
 Description
 -----------
 
-The `Coordinates` object is created and populated by PhoneGap, and attached to the `Position` object. The `Position` object is then returned to the user through a callback function.
+The `Coordinates` object is attached to the `Position` object. The `Position` object is returned to the user through a callback function.
 
 Supported Platforms
 -------------------
 
 - Android
-- BlackBerry (OS 4.6)
-- BlackBerry WebWorks (OS 5.0 and higher)
-- iPhone
+- iOS
 - Windows Phone 7 ( Mango )
 
 Quick Example
 -------------
 
-    // onSuccess Callback
-    //
-    var onSuccess = function(position) {
-        alert('Latitude: '          + position.coords.latitude          + '\n' +
-              'Longitude: '         + position.coords.longitude         + '\n' +
-              'Altitude: '          + position.coords.altitude          + '\n' +
-              'Accuracy: '          + position.coords.accuracy          + '\n' +
-              'Altitude Accuracy: ' + position.coords.altitudeAccuracy  + '\n' +
-              'Heading: '           + position.coords.heading           + '\n' +
-              'Speed: '             + position.coords.speed             + '\n' +
-              'Timestamp: '         + new Date(position.timestamp)      + '\n');
-    };
+	// onSuccess Callback
+	//
+	var onSuccess = function(position) {
+		alert('Latitude: ' + position.coords.latitude + '\n' +
+			'Longitude: ' + position.coords.longitude + '\n' +
+			'Altitude: ' + position.coords.altitude + '\n' +
+			'Accuracy: ' + position.coords.accuracy + '\n' +
+			'Altitude Accuracy: ' + position.coords.altitudeAccuracy + '\n' +
+			'Heading: ' + position.coords.heading + '\n' +
+			'Speed: ' + position.coords.speed + '\n' +
+			'Timestamp: ' + new Date(position.timestamp) + '\n');
+	};
 
-    // onError Callback
-    //
-    var onError = function() {
-        alert('onError!');
-    };
+	// onError Callback
+	//
+	var onError = function() {
+		alert('onError!');
+	};
 
-    navigator.geolocation.getCurrentPosition(onSuccess, onError);
+	navigator.geolocation.getCurrentPosition(onSuccess, onError);
 
 Full Example
 ------------
 
-    <!DOCTYPE html>
-    <html>
-      <head>
-        <title>Geolocation Position Example</title>
-        <script type="text/javascript" charset="utf-8" src="phonegap.js"></script>
-        <script type="text/javascript" charset="utf-8">
+	<!DOCTYPE html>
+	<html>
+	  <head>
+		<title>Geolocation Position Example</title>
+		<script type="text/javascript" charset="utf-8" src="wormhole.js"></script>
+		<script type="text/javascript" charset="utf-8">
 
-        // Set an event to wait for PhoneGap to load
-        //
-        document.addEventListener("deviceready", onDeviceReady, false);
+		// Set an event to wait for Wormhole to load
+		//
+		document.addEventListener("deviceready", onDeviceReady, false);
 
-        // PhoneGap is loaded and Ready
-        //
-        function onDeviceReady() {
-            navigator.geolocation.getCurrentPosition(onSuccess, onError);
-        }
-    
-        // Display `Position` properties from the geolocation
-        //
-        function onSuccess(position) {
-            var div = document.getElementById('myDiv');
-        
-            div.innerHTML = 'Latitude: '             + position.coords.latitude  + '<br/>' +
-                            'Longitude: '            + position.coords.longitude + '<br/>' +
-                            'Altitude: '             + position.coords.altitude  + '<br/>' +
-                            'Accuracy: '             + position.coords.accuracy  + '<br/>' +
-                            'Altitude Accuracy: '    + position.coords.altitudeAccuracy  + '<br/>' +
-                            'Heading: '              + position.coords.heading   + '<br/>' +
-                            'Speed: '                + position.coords.speed     + '<br/>';
-        }
-    
-        // Show an alert if there is a problem getting the geolocation
-        //
-        function onError() {
-            alert('onError!');
-        }
+		// Wormhole is loaded and Ready
+		//
+		function onDeviceReady() {
+			navigator.geolocation.getCurrentPosition(onSuccess, onError);
+		}
 
-        </script>
-      </head>
-      <body>
-        <div id="myDiv"></div>
-      </body>
-    </html>
-    
-Android Quirks
--------------
+		// Display `Position` properties from the geolocation
+		//
+		function onSuccess(position) {
+			var div = document.getElementById('myDiv');
 
-__altitudeAccuracy:__ This property is not support by Android devices, it will always return null.
+			div.innerHTML = 'Latitude: ' + position.coords.latitude + '<br/>' +
+							'Longitude: ' + position.coords.longitude + '<br/>' +
+							'Altitude: ' + position.coords.altitude  + '<br/>' +
+							'Accuracy: ' + position.coords.accuracy  + '<br/>' +
+							'Altitude Accuracy: ' + position.coords.altitudeAccuracy + '<br/>' +
+							'Heading: ' + position.coords.heading + '<br/>' +
+							'Speed: ' + position.coords.speed + '<br/>';
+		}
+
+		// Show an alert if there is a problem getting the geolocation
+		//
+		function onError() {
+			alert('onError!');
+		}
+
+		</script>
+	</head>
+	<body>
+		<div id="myDiv"></div>
+	</body>
+	</html>

@@ -7,5 +7,5 @@ Example
 -------
 
 function(CompassError) {
-    // Handle the error
+	// Handle the error
 }
