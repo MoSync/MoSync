@@ -50,7 +50,7 @@ Full Example
 	<head>
 		<title>Acceleration Example</title>
 
-		<script type="text/javascript" charset="utf-8" src="wormhole.js"></script>
+		<script type="text/javascript" charset="utf-8" src="js/wormhole.js"></script>
 		<script type="text/javascript" charset="utf-8">
 
 		// The watch id references the current `watchAcceleration`

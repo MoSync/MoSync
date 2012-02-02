@@ -57,7 +57,7 @@ Full Example
 	<html>
 	  <head>
 		<title>Geolocation Position Example</title>
-		<script type="text/javascript" charset="utf-8" src="wormhole.js"></script>
+		<script type="text/javascript" charset="utf-8" src="js/wormhole.js"></script>
 		<script type="text/javascript" charset="utf-8">
 
 		// Set an event to wait for Wormhole to load
