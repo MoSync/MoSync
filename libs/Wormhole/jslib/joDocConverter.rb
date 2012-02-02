@@ -86,8 +86,6 @@ js_files.each { |mdFile, fileName|
             destComments.push("\n**ReturnValue:** #{splittedLine[1]} #{splittedLine[2..-1].join(" ")}")
           elsif(strippedLine.strip.start_with?("\\code"))
             enteredCodeMode = true
-            destComments.push("Example\n");
-            destComments.push("-------\n");
           elsif(strippedLine.strip.start_with?("\\endcode"))
             enteredCodeMode = false
             destComments.push("\n");
