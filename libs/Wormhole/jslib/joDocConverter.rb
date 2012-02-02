@@ -4,12 +4,12 @@ require "fileutils"
 js_files = {
   "nativeui.md" => "mosync-nativeui.js",
   "bridge.md" => "mosync-bridge.js",
-  "sensormanager.md" => "mosync-sensormanager.js",
+ # "sensormanager.md" => "mosync-sensormanager.js",
   "pushnotifications.md" => "mosync-pushnotifications.js",
   "resource.md" =>"mosync-resource.js"
   }
 
-isInCodeBlock = false
+isInCommentBlock = false
 hasStartedParamBlock = false
 shouldAddFunctionDefinition = false
 functionList = Array.new
@@ -24,11 +24,11 @@ js_files.each { |mdFile, fileName|
   sourceFile  = File.new(fileName, "r")
   destFile = File.new("tempDocs/Fixed_#{fileName}", "w")
     while(line = sourceFile.gets)
-      if(isInCodeBlock == false)
+      if(isInCommentBlock == false)
         if(line.strip.start_with?("/**"))
           destComments = Array.new
           destComments.push("#{line.strip}")
-          isInCodeBlock = true;
+          isInCommentBlock = true;
         elsif(shouldAddFunctionDefinition == true)
           if(line.strip != "")
             newComments = Array.new
@@ -49,6 +49,7 @@ js_files.each { |mdFile, fileName|
               newComments[1] = functionName.strip
               newComments[2] = "=" * newComments[1].length
             end
+            markdown_mode = false
             newComments.concat(destComments[1..-1])
             shouldAddFunctionDefinition = false
             if(!ignoreMode)
@@ -64,21 +65,21 @@ js_files.each { |mdFile, fileName|
       else
         if(line.include?("*/"))
           destComments.push("#{line.strip}\n")
-          isInCodeBlock = false;
+          isInCommentBlock = false;
           shouldAddFunctionDefinition = true
           hasStartedParamBlock = false
         else
           if(line.strip.start_with?("*"))
             strippedLine = line.strip[1..-1]
           else
-            strippedLine = line
+            strippedLine = line.strip
           end
           # Detecting Specific Tags in the comments
 
           if(strippedLine.strip.start_with?("@private"))
             ignoreMode = true
           elsif(markdown_mode == true)
-            destComments.push(line)
+            destComments.push(strippedLine)
           elsif(strippedLine.strip.start_with?("@param"))
             splittedLine = strippedLine.split(" ")
             if(hasStartedParamBlock == false)
