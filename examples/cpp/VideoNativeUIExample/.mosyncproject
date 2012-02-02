@@ -1,7 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project supports-build-configs="true" version="1.2">
+<project supports-build-configs="true" version="1.4">
 <build.cfg id="Debug" types="Debug"/>
 <build.cfg id="Release" types="Release"/>
+<criteria>
+<filter type="com.mobilesorcery.sdk.capabilities.devices.elementfactory">
+<capabilities optional="" required="File\ Storage Internet\ Access"/>
+</filter>
+</criteria>
 <properties>
 <property key="build.prefs:additional.include.paths/Debug" value="%mosync-home%/include"/>
 <property key="build.prefs:additional.include.paths/Release" value="%mosync-home%/include"/>
@@ -10,7 +15,7 @@
 <property key="build.prefs:additional.library.paths/Debug" value="%mosync-home%/lib/pipe"/>
 <property key="build.prefs:additional.library.paths/Release" value="%mosync-home%/lib/pipe"/>
 <property key="build.prefs:app.name/Release" value="VideoNativeUIExample"/>
-<property key="build.prefs:app.permissions" value="File\ Storage Internet\ Access Vibrate"/>
+<property key="build.prefs:app.permissions" value="File\ Storage Internet\ Access Vibration"/>
 <property key="build.prefs:extra.link.sw/Debug" value=""/>
 <property key="build.prefs:extra.link.sw/Release" value=""/>
 <property key="build.prefs:extra.res.sw/Debug" value=""/>
@@ -29,6 +34,8 @@
 <property key="dependency.strategy" value="0"/>
 <property key="excludes/Debug" value=""/>
 <property key="excludes/Release" value=""/>
+<property key="profile.mgr.type" value="0"/>
 <property key="template.id" value="project.empty"/>
+<property key="winmobilecs:guid" value="8a563c20-2d54-102f-8007-4d67c284689e"/>
 </properties>
 </project>

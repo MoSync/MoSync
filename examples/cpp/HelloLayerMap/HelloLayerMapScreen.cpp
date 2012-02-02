@@ -62,23 +62,23 @@ namespace HelloLayerMap
 		// LayerDataSource overrides
 		//
 		//-------------------------------------------------------------------------
-		virtual void refresh( ) 
+		virtual void refresh( )
 		//-------------------------------------------------------------------------
-		{ 
-			/* nothing to refresh */ 
+		{
+			/* nothing to refresh */
 		}
 
 		//-------------------------------------------------------------------------
-		virtual int size( ) 
+		virtual int size( )
 		//-------------------------------------------------------------------------
-		{ 
-			return mItems.size( ); 
+		{
+			return mItems.size( );
 		}
 
 		//-------------------------------------------------------------------------
-		virtual GeoPoint* getItem( int index ) 
+		virtual GeoPoint* getItem( int index )
 		//-------------------------------------------------------------------------
-		{ 
+		{
 			return index >= mItems.size( ) ? NULL : mItems[index];
 		}
 
@@ -125,7 +125,7 @@ namespace HelloLayerMap
 		static const bool DrawTextAtItem = false;
 	public:
 		//-------------------------------------------------------------------------
-		TestLayerRenderer( ) 
+		TestLayerRenderer( )
 		//-------------------------------------------------------------------------
 		{
 			mLabelFont = newobject( Font, new Font( RES_FONT_VERDANA13WHITE ) );
@@ -282,7 +282,7 @@ namespace HelloLayerMap
 		mMap = newobject( MapWidget, new MapWidget( 0, 0, width, height, NULL ) );
 		mMap->setViewport( viewport );
 		//
-		// barcelona  2.15058 41.3740 
+		// barcelona  2.15058 41.3740
 		// http://local.google.com/?ll=41.373781,2.150016
 		//
 		mMap->setCenterPosition( LonLat( 18.07, 59.33 ), 10, true, false );
@@ -344,7 +344,7 @@ namespace HelloLayerMap
 			moblet.Terminate( );
 			return;
 		}
-		
+
 		(void)mMap->handleKeyPress( keyCode );
 	}
 
@@ -380,7 +380,7 @@ namespace HelloLayerMap
 		//
 		int curTimeMs = maGetMilliSecondCount( );
 		int deltaTimeMs = curTimeMs - pointerPressTimeMs;
-		if ( deltaTimeMs < DoubleClickTimeMs ) 
+		if ( deltaTimeMs < DoubleClickTimeMs )
 		{
 			HelloLayerMapMoblet& moblet = (HelloLayerMapMoblet&)Environment::getEnvironment( );
 			moblet.Terminate( );
@@ -410,7 +410,7 @@ namespace HelloLayerMap
 		lastPointerMoveMs = curTimeMs;
 		int dx = ( p.x - pointerPressX ) * TapPanAcceleration;
 		int dy = ( p.y - pointerPressY ) * TapPanAcceleration;
-		PixelCoordinate px = PixelCoordinate(	pointerPressCenter.getMagnification( ), 
+		PixelCoordinate px = PixelCoordinate(	pointerPressCenter.getMagnification( ),
 												pointerPressCenter.getX( ) - dx,
 												pointerPressCenter.getY( ) + dy );
         LonLat newPos = LonLat( px );
@@ -422,7 +422,7 @@ namespace HelloLayerMap
 	void HelloLayerMapScreen::pointerMoveEvent( MAPoint2d p )
 	//-------------------------------------------------------------------------
 	{
-		if( scrolling ) 
+		if( scrolling )
 			return;
 		int curTimeMs = maGetMilliSecondCount( );
 		if ( curTimeMs < lastPointerMoveMs + TapPanIntervalMs )
@@ -451,7 +451,7 @@ namespace HelloLayerMap
 	//-------------------------------------------------------------------------
 	{
 		MapSource* current = mMap->getMapSource( );
-		if ( current == mOpenStreetMapSource ) 
+		if ( current == mOpenStreetMapSource )
 			mMap->setMapSource( mGoogleStreetMapSource );
 		else if ( current == mGoogleStreetMapSource )
 			mMap->setMapSource( mGoogleAerialMapSource );

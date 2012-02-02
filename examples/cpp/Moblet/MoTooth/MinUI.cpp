@@ -523,7 +523,7 @@ namespace MinUI {
 	//******************************************************************************
 	StringLabel::StringLabel(const String& string, int color)
 		//keeping a copy of the string will keep the c_str() valid.
-		: Label(string.c_str(), color), mString(string) {}	
+		: Label(string.c_str(), color), mString(string) {}
 
 	//******************************************************************************
 	// Image

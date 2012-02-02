@@ -29,21 +29,21 @@ using namespace MAPUtil;
 namespace MapDemoUI
 {
 	//=========================================================================
-	class ShowMenuAction: public Action 
+	class ShowMenuAction: public Action
 	//=========================================================================
 	{
 	public:
 		ShowMenuAction( IActionSource* source );
-		
+
 		virtual ~ShowMenuAction( );
 		//
 		// Action overrides
 		//
 		virtual const char* getShortName( ) const;
-		
-		virtual Action* clone( ) const 
-		{ 
-			return newobject( ShowMenuAction, new ShowMenuAction( mSource ) ); 
+
+		virtual Action* clone( ) const
+		{
+			return newobject( ShowMenuAction, new ShowMenuAction( mSource ) );
 		}
 
 	protected:

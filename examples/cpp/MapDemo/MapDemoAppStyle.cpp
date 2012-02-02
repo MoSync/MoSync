@@ -132,14 +132,14 @@ namespace MapDemo
 					return mFontSmallWhite;
 				if ( color == Color::blue )
 					return mFontSmallBlue;
-				if ( color == Color::black ) 
+				if ( color == Color::black )
 					return mFontSmallBlack;
 			}
 			break;
 		case FontSize_Medium:
 			if ( bold )
 			{
-				if ( color == Color::white ) 
+				if ( color == Color::white )
 					return mFontMediumBoldWhite;
 			}
 			else

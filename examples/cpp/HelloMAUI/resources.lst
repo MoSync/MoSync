@@ -2,6 +2,10 @@
 .bin
 .include "resources/Font.mof"
 
+.res RES_FONT_BIG
+.bin
+.include "resources/win7MAUI.mof"
+
 .res RES_BUTTON_SELECTED
 .image "resources/ButtonNinePatchSelected.png"
 

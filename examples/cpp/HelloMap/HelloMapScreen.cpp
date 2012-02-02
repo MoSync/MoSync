@@ -138,7 +138,7 @@ namespace HelloMap
 		//
 		int curTimeMs = maGetMilliSecondCount( );
 		int deltaTimeMs = curTimeMs - pointerPressTimeMs;
-		if ( deltaTimeMs < DoubleClickTimeMs ) 
+		if ( deltaTimeMs < DoubleClickTimeMs )
 		{
 			HelloMapMoblet& moblet = (HelloMapMoblet&)Environment::getEnvironment( );
 			moblet.Terminate( );
