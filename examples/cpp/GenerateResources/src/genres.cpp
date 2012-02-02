@@ -28,24 +28,24 @@ public:
 		maSetColor(0xFFFFFF);
 		MAExtent ss = maGetScrSize();
 		maFillRect(0,0, EXTENT_X(ss), EXTENT_Y(ss));
-		
+
 		maDrawImage(RES_COMBO5, 0, 0);
 		y += EXTENT_Y(maGetImageSize(RES_COMBO5));
-		
+
 		maDrawImage(RES_COMBO10, 0, y);
 		y += EXTENT_Y(maGetImageSize(RES_COMBO10));
-		
+
 		maDrawImage(RES_SPINNER_ANIM, 0, y);
 		y += EXTENT_Y(maGetImageSize(RES_SPINNER_ANIM));
-		
+
 		MAUI::Font f(RES_FONT_ARIAL);
 		f.drawString("Hello World!", 0, y);
 		y += f.getCharset().lineHeight;
-		
+
 		f.setResource(RES_FONT_COURIER);
 		f.drawString("Hello World!", 0, y);
 		y += f.getCharset().lineHeight;
-		
+
 		maSoundPlay(RES_MOBILESORCERY2, 0, maGetDataSize(RES_MOBILESORCERY2));
 	}
 

@@ -427,4 +427,3 @@ void NativeUIMessageHandler::sendNativeUISuccess(const char *data)
 	sprintf(script, "mosync.nativeui.success(%s)", data);
 	mWebView->callJS(script);
 }
-

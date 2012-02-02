@@ -21,7 +21,7 @@ MA 02110-1301, USA.
 using namespace MAUI;
 using namespace MAUtil;
 
-namespace MapDemoUI 
+namespace MapDemoUI
 {
 	//-------------------------------------------------------------------------
 	AppScreen::AppScreen( MobletEx* moblet )

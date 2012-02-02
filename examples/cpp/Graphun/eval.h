@@ -38,7 +38,7 @@ typedef unsigned short word;
 typedef unsigned int dword;
 
 // enumerator for the different token types
-enum eTokenType 
+enum eTokenType
 {
 	MINUS,
 	PLUS,
@@ -60,7 +60,7 @@ enum eTokenType
 #define IS_EVALUATABLE_LEFT(x) ((x) == NUMBER || (x) == VARIABLE || (x) == FUNCTION || (x)==LPAREN)
 #define IS_EVALUATABLE_RIGHT(x) ((x) == NUMBER || (x) == VARIABLE || (x)==RPAREN)
 
-struct Function 
+struct Function
 {
 	Function(void *ptr, int num_arguments, const char *name);
 	void *ptr;
@@ -68,7 +68,7 @@ struct Function
 	char name[256];
 };
 
-struct Variable 
+struct Variable
 {
 	Variable(float value, const char *name);
 	float value;
@@ -76,9 +76,9 @@ struct Variable
 };
 
 // struct used to hold the different tokens of the parsed infix string
-// as numbers is found they are stored in the num field (unused for other 
+// as numbers is found they are stored in the num field (unused for other
 // tokens)
-struct Token 
+struct Token
 {
 	Token(eTokenType type=NONE);
 	Token(eTokenType type, float num);
@@ -86,7 +86,7 @@ struct Token
 	Token(eTokenType type, Function *func);
 	eTokenType type;
 
-	union 
+	union
 	{
 		float num; // used if token is a number.
 		Variable *var; // used if token is a variable.
@@ -94,10 +94,10 @@ struct Token
 	};
 };
 
-// temp, should have dynamical amount of arguments 
+// temp, should have dynamical amount of arguments
 typedef float (*float_func_ptr) (float a);
 
-class Scope 
+class Scope
 {
 public:
 	void setVariable(const char *name, float v);
@@ -116,12 +116,12 @@ public:
 	Expression(Scope &scope);
 	~Expression();
 
-	// this function takes a string containing an arithmetic 
-	// expression in infix notation and compiles it into an 
+	// this function takes a string containing an arithmetic
+	// expression in infix notation and compiles it into an
 	// internal reverse polish notation representation.
 	// which can then easily be evaluated (and re-evaluated)
-	// This is done by first tokenizing the string 
-	// and then parsing the tokens, converting 
+	// This is done by first tokenizing the string
+	// and then parsing the tokens, converting
 	// the infix notation to rpn.
 	bool compile(const char *string);
 
@@ -145,7 +145,7 @@ private:
 	// It is done recursivly for each parenthesis.
 	int _compile(int start, Vector<Token>& tokens, Vector<Token>& rpn);
 	Vector<Token> rpn;
-	
+
 	Scope &scope;
 };
 

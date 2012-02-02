@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project supports-build-configs="true" version="1.4">
-<build.cfg id="Debug" types="Debug"/>
-<build.cfg id="Release" types="Release"/>
+<project supports-build-configs="false" version="1.4">
+<criteria>
+<filter type="com.mobilesorcery.sdk.capabilities.devices.elementfactory">
+<capabilities optional="" required="File\ Storage Internet\ Access"/>
+</filter>
+</criteria>
 <properties>
 <property key="build.prefs:additional.include.paths" value="%mosync-home%/include"/>
 <property key="build.prefs:additional.include.paths/Debug" value="%mosync-home%/include"/>
@@ -38,5 +41,8 @@
 <property key="excludes/Debug" value=""/>
 <property key="excludes/Release" value=""/>
 <property key="template.id" value="project.cpp"/>
+<property key="excludes" value=""/>
+<property key="profile.mgr.type" value="0"/>
+<property key="winmobilecs:guid" value="4712e6c0-2e12-102f-8088-bfd156f1e6aa"/>
 </properties>
 </project>

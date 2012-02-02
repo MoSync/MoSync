@@ -64,8 +64,9 @@ var toggleMagnetic = function() {
 	}
 };
 
-var orientation = new SensorConnection('Orientation');
-orientation.addEventListener("onsensordata", function(event)
+var orientationSensor = new SensorConnection('Orientation');
+
+orientationSensor.addEventListener("onsensordata", function(event)
 		{
 			updateOrientation(event.data);
 		});
@@ -77,15 +78,15 @@ function updateOrientation(a) {
 }
 
 var toggleOrientation = function() {
-	if (orientation.status == "watching") {
-		orientation.endWatch();
+	if (orientationSensor.status == "watching") {
+		orientationSensor.endWatch();
 		updateOrientation({
 			x : "",
 			y : "",
 			z : ""
 		});
 	} else {
-		orientation.startWatch({interval:1000});
+		orientationSensor.startWatch({interval:1000});
 	}
 };
 

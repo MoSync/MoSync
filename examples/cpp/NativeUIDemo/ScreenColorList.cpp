@@ -90,11 +90,11 @@ void ScreenColorList::createUI()
 {
 	// Set title and icon of the stack screen.
 	setTitle("Colors");
-	if (isAndroid())
+	if (getPlatform() == 0)
 	{
 		setIcon(RES_TAB_ICON_COLORS_ANDROID);
 	}
-	else
+	else if(getPlatform() == 1)
 	{
 		setIcon(RES_TAB_ICON_COLORS);
 	}
@@ -140,7 +140,7 @@ void ScreenColorList::createUI()
 MAHandle ScreenColorList::createColorImage(int color, int width, int height)
 {
 	MAHandle image = maCreatePlaceholder();
-	maCreateDrawableImage(image, 30, 30);
+	maCreateDrawableImage(image, width, height);
 	MAHandle previousDrawTarget = maSetDrawTarget(image);
 	maSetColor(color);
 	maFillRect(0, 0, width, height);

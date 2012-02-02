@@ -21,7 +21,7 @@ MA 02110-1301, USA.
 
 #include "AppScreenBase.h"
 
-namespace MapDemoUI 
+namespace MapDemoUI
 {
 	//=========================================================================
 	// Simple app screen - one widget, softkey bar.
@@ -31,7 +31,7 @@ namespace MapDemoUI
 	{
 	public:
 		AppScreen( MobletEx* mMoblet );
-		
+
 		virtual ~AppScreen( );
 
 		virtual void enumerateActions( Vector<Action*>& list );

@@ -96,9 +96,22 @@ public:
 	 */
 	void createUI()
 	{
+		// Get the height of the display. We use this
+		// to size our font.
+		int displayHeight = EXTENT_Y(maGetScrSize());
+
+		// Get the width of the display. We use this
+		// to size our widgets.
+		int displayWidth = EXTENT_X(maGetScrSize());
+
 		// Create a font object. The font resource and other
 		// resources are defined in the file "resources.lst".
-		MAUI::Font* font = new MAUI::Font(RES_FONT);
+		MAUI::Font* font;
+		if (600 < displayHeight) {
+			font = new MAUI::Font(RES_FONT_BIG);
+		} else {
+			font = new MAUI::Font(RES_FONT);
+		}
 
 		// Create a "skin" for the buttons. This will give the
 		// buttons a customised appearance. The skin is divided
@@ -114,9 +127,6 @@ public:
 			true,  // Is selected image transparent?
 			true); // Is unselected image transparent?
 
-		// Get the width of the display. We use this
-		// to size our widgets.
-		int displayWidth = EXTENT_X(maGetScrSize());
 
 		// Create the screen's main widget -- a layout with
 		// one column and four rows. Because this is the top-level
@@ -477,19 +487,19 @@ public:
 	 * This method is called when the user closes a textbox
 	 * opened by calling maTextBox.
 	 */
-    void textBoxClosed(int result, int textLength)
-    {
+	void textBoxClosed(int result, int textLength)
+	{
 		// If the user press Ok in the textbox...
-    	if (MA_TB_RES_OK == result)
-    	{
+		if (MA_TB_RES_OK == result)
+		{
 			// ...we get the text and set the contents of the
-    		// password box to it.
+			// password box to it.
 
-    		// Note: In order to use the text the user entered
+			// Note: In order to use the text the user entered
 			// we need to convert the wide string in mTextBoxBuffer
-    		// to a byte string. The following is a very simplistic
-    		// way of doing this that will work only for the basic
-    		// ASCII character set.
+			// to a byte string. The following is a very simplistic
+			// way of doing this that will work only for the basic
+			// ASCII character set.
 			char buffer[256];
 			int i;
 			for (i = 0; i < textLength; ++i)
@@ -506,14 +516,14 @@ public:
 			// Uncomment this line to display the text in
 			// the instructions label.
 			//mInstructions->setCaption(buffer);
-    	}
-    	else
-    	{
-    		// The user pressed cancel, we handle this
-    		// as a password of length zero.
-    		checkPasswordLength(0);
-    	}
-    }
+		}
+		else
+		{
+			// The user pressed cancel, we handle this
+			// as a password of length zero.
+			checkPasswordLength(0);
+		}
+	}
 
 private:
 	// Here we put the instance variables (member variables

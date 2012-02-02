@@ -63,14 +63,14 @@ static MAHandle generateImage(int width, int height, int r, int g, int b) {
 	int *temp = new int[width*height];
 	int *dst = temp;
 	double longestLength;
-	if(width<height) 
-		longestLength = width>>1; 
-	else 
+	if(width<height)
+		longestLength = width>>1;
+	else
 		longestLength = height>>1;
 
 	for(int j = 0; j < height; j++) {
 		for(int i = 0; i < width; i++) {
-			double d = sqrt((double)((width>>1)-i)*((width>>1)-i) + 
+			double d = sqrt((double)((width>>1)-i)*((width>>1)-i) +
 				((height>>1)-j)*((height>>1)-j));
 			d /= longestLength;
 			d = 1.0-d;
@@ -100,7 +100,7 @@ static void drawImages() {
 	int h = EXTENT_Y(scr)>>1;
 	for(int i = 0; i < gNumImages; i++) {
 		int x = (int)(cos(a*1.5+time*1.1)*50.0) + w;
-		int y = (int)(sin(a*1.09+time*1.2)*50.0) + h;		
+		int y = (int)(sin(a*1.09+time*1.2)*50.0) + h;
 		MAExtent imageSize = maGetImageSize(gImages[i]);
 		maDrawImage(gImages[i], x-(EXTENT_X(imageSize)>>1), y-(EXTENT_Y(imageSize)>>1));
 		a+=1.0;

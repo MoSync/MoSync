@@ -69,7 +69,7 @@ int MAMain()
 		MAEvent event;
 		while(maGetEvent(&event)) {
 			if(event.type == EVENT_TYPE_CLOSE ||
-				(event.type == EVENT_TYPE_KEY_PRESSED && 
+				(event.type == EVENT_TYPE_KEY_PRESSED &&
 				(event.key == MAK_0 || event.key == MAK_SOFTRIGHT || event.key == MAK_BACK)))
 			{
 				maExit(0);

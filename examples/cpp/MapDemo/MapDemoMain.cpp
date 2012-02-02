@@ -38,7 +38,7 @@ extern "C" int MAMain( )
 		newobject(MapDemo::MapDemoAppStyle, new MapDemo::MapDemoAppStyle()));
 	MapDemo::MapDemoMoblet* moblet =
 		newobject(MapDemo::MapDemoMoblet, new MapDemo::MapDemoMoblet());
-	
+
 	Moblet::run( moblet );
 
 	deleteobject( moblet );
