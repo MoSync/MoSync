@@ -42,14 +42,12 @@ static void initInjectors() {
 	gInjectors["j2me"] = new JavaInjector();
 #ifdef WIN32 // for now..
 	gInjectors["winmobile"] = new WinmobileInjector();
+	gInjectors["WP7"] = new WP7Injector();
 #endif
 	gInjectors["more"] = new MoreInjector();
 	gInjectors["symbian9"] = new Symbian9Injector();
 	gInjectors["android"] = new AndroidInjector();
 	gInjectors["iOS"] = new IOSInjector();
-#ifdef _WIN32 // for now..
-	gInjectors["WP7"] = new WP7Injector();
-#endif
 }
 
 static bool parseCmdLine(map<string, string>& params, int argc, char **argv) {
@@ -71,8 +69,8 @@ int main(int argc, char **argv) {
 	map<string, string> params;
 	if(!parseCmdLine(params, argc, argv)) errorExit("Couldn't parse the command-line\n");
 	string src = Injector::verifyParameter(params, "src");
-	Icon* icon = Icon::parse(src);
 	string platform = Injector::verifyParameter(params, "platform");
+	Icon* icon = Icon::parse(src, platform);
 	initInjectors();
 	map<string, Injector*>::iterator i = gInjectors.find(platform);
 	if(i == gInjectors.end()) errorExit("Not an available platform.\n");

@@ -475,7 +475,7 @@ mosync.nativeui.registerEventListener = function(widgetID, eventType,
 /**
  *
  * A widget object that user can interact with instead of using the low level
- * functions. This class is not useddirectly see mosync.nativeui.create for usage.
+ * functions. This class is not useddirectly see  mosync.nativeui.create  for usage.
  *
  *
  * @param widgetType
@@ -483,8 +483,17 @@ mosync.nativeui.registerEventListener = function(widgetID, eventType,
  * @param widgetID
  *            ID of the widget used for identifying the widget(can be ignored by
  *            the user)
+ * @param params A dictionary that includes a list of properties to be set on the widget
+ * @param successCallback
+ *            a function that will be called if the operation is successfull
+ * @param errorCallback
+ *            a function that will be called if an error occurs
  *
-
+ * \code
+ *         mosync.nativeui.NativeWidgetElement(widgetType, widgetID, params, successCallback, errorCallback)
+ * \endcode
+ *
+ *
  */
 mosync.nativeui.NativeWidgetElement = function(widgetType, widgetID, params,
 		successCallback, errorCallback) {
@@ -576,11 +585,21 @@ mosync.nativeui.NativeWidgetElement = function(widgetType, widgetID, params,
 	/*
 	 * Create the widget in the Native Side
 	 */
-	mosync.nativeui.maWidgetCreate(widgetType, self.id, onSuccess, onError,
+	mosync.nativeui.maWidgetCreate(widgetType, self.id, this.onSuccess, this.onError,
 			self.processedMessage, self.params);
 
 	/**
 	 * sets a property to the widget in question
+	 *
+	 * @param property
+	 *            name of the property
+	 * @param successCallback
+	 *            a function that will be called if the operation is successfull
+	 * @param errorCallback
+	 *            a function that will be called if an error occurs
+	 * \code
+	 * 		myWidget.setProperty("width", "100%")
+	 * \endcode
 	 */
 	this.setProperty = function(property, value, successCallback, errorCallback) {
 		if (self.created) {
@@ -600,7 +619,8 @@ mosync.nativeui.NativeWidgetElement = function(widgetType, widgetID, params,
 	 * @param property
 	 *            name of the property
 	 * @param successCallback
-	 *            a function that will be called if the operation is successfull
+	 *            a function that will be called if the operation is successfull.
+	 *            The value and wigetID will be passed to this function.
 	 * @param errorCallback
 	 *            a function that will be called if an error occurs
 	 */
@@ -769,8 +789,8 @@ mosync.nativeui.NativeWidgetElement = function(widgetType, widgetID, params,
 	 */
 	if (self.isScreen) {
 		/**
-		 * Shows a screen widget on the screen. Will call the error callback if
-		 * the widget is not of type screen.
+		 * Shows a screen widget on the screen. Will be set to null if the widget
+		 * is not of type screen.
 		 *
 		 * @param successCallback
 		 *            a function that will be called if the operation is
@@ -792,7 +812,7 @@ mosync.nativeui.NativeWidgetElement = function(widgetType, widgetID, params,
 		};
 
 		/**
-		 * pushs a screen to a stackscreen
+		 * Pushes a screen to a stackscreen
 		 *
 		 * @param stackScreenID
 		 *            the ID for the stackscreen that should be used for pushing
@@ -1221,7 +1241,7 @@ mosync.nativeui.createWidget = function(widget, parent) {
  * A function that is called when the UI is ready. By default it loads the
  * element with ID "mainScreen" Override this function to add extra
  * functionality. See mosync.nativeui.initUI for more information
- * @private
+ *
  */
 mosync.nativeui.UIReady = function()
 {
