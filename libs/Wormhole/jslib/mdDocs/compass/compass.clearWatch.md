@@ -31,7 +31,7 @@ Full Example
 	<head>
 		<title>Compass Example</title>
 
-		<script type="text/javascript" charset="utf-8" src="wormhole.js"></script>
+		<script type="text/javascript" charset="utf-8" src="js/wormhole.js"></script>
 		<script type="text/javascript" charset="utf-8">
 
 		// The watch id references the current `watchHeading`
