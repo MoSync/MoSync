@@ -474,7 +474,7 @@ void CreateNotificationScreen::resetView()
 	{
 		mContentTitle->setText(DEFAULT_CONTENT_TITLE_EDIT_BOX_TEXT);
 		mTickerText->setText(DEFAULT_TICKER_TEXT_EDIT_BOX_TEXT);
-		mSoundPath->setText(DEFAULT_SOUND_PATH_EDIT_BOX_TEXT);
+		mSoundPath->setText("");
 		mVibrate->setState(false);
 		mVibrateDuration->setText(DEFAULT_VIBRATION_EDIT_BOX_TEXT);
 		mFlash->setState(false);

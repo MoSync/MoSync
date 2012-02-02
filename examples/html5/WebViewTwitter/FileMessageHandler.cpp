@@ -26,6 +26,7 @@ MA 02110-1301, USA.
 #include <Wormhole/FileUtil.h>
 #include "FileMessageHandler.h"
 
+using namespace MAUtil;
 using namespace Wormhole;
 
 /**
@@ -82,7 +83,7 @@ void FileMessageHandler::handleFileGetLocalPath(
 	MessageStreamJSON& message)
 {
 	FileUtil fileUtil;
-	MAUtil::String path = fileUtil.getLocalPath();
+	String path = fileUtil.getLocalPath();
 	if (0 == path.length())
 	{
 		replyNull(message);
@@ -99,7 +100,7 @@ void FileMessageHandler::handleFileGetLocalPath(
 void FileMessageHandler::handleFileRead(MessageStreamJSON& message)
 {
 	FileUtil fileUtil;
-	MAUtil::String inText;
+	String inText;
 	bool success = fileUtil.readTextFromFile(
 		message.getParam("filePath"),
 		inText);
@@ -138,7 +139,7 @@ void FileMessageHandler::handleFileWrite(MessageStreamJSON& message)
  */
 void FileMessageHandler::handleLog(MessageStreamJSON& message)
 {
-	MAUtil::String s = message.getParam("message");
+	String s = message.getParam("message");
 	maWriteLog(s.c_str(), s.size());
 }
 
@@ -152,20 +153,24 @@ void FileMessageHandler::handleLog(MessageStreamJSON& message)
  */
 bool FileMessageHandler::replyString(
 	MessageStreamJSON& message,
-	const MAUtil::String& result)
+	const String& result)
 {
 	// Message must have an callbackId parameter.
-	if (!message.hasParam("callbackId"))
+	if (hasNoCallbackId(message))
 	{
 		return false;
 	}
 
 	// Get the callbackID parameter.
-	MAUtil::String callbackId = message.getParam("callbackId");
+	String callbackId = getCallBackId(message);
 
 	// Call JavaScript reply handler.
-	MAUtil::String script = "mosync.bridge.reply(";
+	String script = "mosync.bridge.reply(";
 	script += callbackId + ", " + "'" + result + "')";
+
+	maWriteLog("P1", 2);
+	maWriteLog(script.c_str(), script.size());
+
 	message.getWebView()->callJS(script);
 
 	return true;
@@ -182,16 +187,16 @@ bool FileMessageHandler::replyString(
 bool FileMessageHandler::replyBoolean(MessageStreamJSON& message, bool result)
 {
 	// Message must have an callbackId parameter.
-	if (!message.hasParam("callbackId"))
+	if (hasNoCallbackId(message))
 	{
 		return false;
 	}
 
 	// Get the callbackID parameter.
-	MAUtil::String callbackId = message.getParam("callbackId");
+	String callbackId = getCallBackId(message);
 
 	// Call JavaScript reply handler.
-	MAUtil::String script = "mosync.bridge.reply(";
+	String script = "mosync.bridge.reply(";
 	if (result)
 	{
 		script += callbackId + ", true)";
@@ -200,6 +205,10 @@ bool FileMessageHandler::replyBoolean(MessageStreamJSON& message, bool result)
 	{
 		script += callbackId + ", false)";
 	}
+
+	maWriteLog("P2", 2);
+	maWriteLog(script.c_str(), script.size());
+
 	message.getWebView()->callJS(script);
 
 	return true;
@@ -215,18 +224,41 @@ bool FileMessageHandler::replyBoolean(MessageStreamJSON& message, bool result)
 bool FileMessageHandler::replyNull(MessageStreamJSON& message)
 {
 	// Message must have an callbackId parameter.
-	if (!message.hasParam("callbackId"))
+	if (hasNoCallbackId(message))
 	{
 		return false;
 	}
 
 	// Get the callbackID parameter.
-	MAUtil::String callbackId = message.getParam("callbackId");
+	String callbackId = getCallBackId(message);
 
 	// Call JavaScript reply handler.
-	MAUtil::String script = "mosync.bridge.reply(";
+	String script = "mosync.bridge.reply(";
 	script += callbackId + ", null)";
+
+	maWriteLog("P3", 2);
+	maWriteLog(script.c_str(), script.size());
+
 	message.getWebView()->callJS(script);
 
 	return true;
+}
+
+/**
+ * Utility method to check if there is a callbackId.
+ */
+bool FileMessageHandler::hasNoCallbackId(MessageStreamJSON& message)
+{
+	return !message.hasParam("callbackId");
+}
+
+/**
+ * Utility method for getting the message callbackId as a string.
+ */
+String FileMessageHandler::getCallBackId(MessageStreamJSON& message)
+{
+	int id = message.getParamInt("callbackId");
+	char buf[32];
+	sprintf(buf, "%i", id);
+	return buf;
 }

@@ -18,20 +18,20 @@ MA 02110-1301, USA.
 
 /**
  * @file main.cpp
+ * @author Mattias Bybro
  *
  * This is a sample NFC app.
  *
- * To enable NFC for an app, NFC permissions need to be set and an nfc.xml file
- * defining the type of tags to trigger upon.
+ * To enable NFC for an app, NFC permissions need to be set and
+ *  an nfc.xml file defining the type of tags to trigger upon.
  *
- * This example makes use of MoSync HTML5/JavaScript functionality for the
- * user interface.
- *
- * \author Mattias Bybro
+ * This example makes use of MoSync HTML5/JavaScript functionality
+ * for the user interface.
  */
 
-// Include Moblet for web applications.
+// Include Moblet and message class for web applications.
 #include <Wormhole/WebAppMoblet.h>
+#include <Wormhole/MessageStreamJSON.h>
 // Utility functions for working with NDEF tags
 #include "nfcutil.h"
 // Other includes
@@ -84,8 +84,8 @@ private:
 	// UI state
 	bool fExitOnBack;
 	bool fDisallowStatusMessages;
-public:
 
+public:
 	NFCMoblet() {
 		initWebView();
 		fDisallowStatusMessages = false;
@@ -93,6 +93,7 @@ public:
 
 	void initWebView() {
 		// Initialize the web view and show the main page.
+		extractFileSystem();
 		enableWebViewMessages();
 		getWebView()->disableZoom();
 		showPage("index.html");
@@ -105,14 +106,25 @@ public:
 	 * - WriteSampleURL, for writing an example NDEF URI
 	 * - WriteSampleVCard, for writing an example NDEF vCard
 	 */
-	void handleWebViewMessage(WebView* webView, MAHandle urlData) {
-		WebViewMessage message(webView, urlData);
+	void handleWebViewMessage(WebView* webView, MAHandle data) {
+		MessageStreamJSON message(webView, data);
+		while (message.next())
+		{
+			handleMessage(message);
+		}
+	}
+
+	void handleMessage(MessageStreamJSON& message) {
 		if (message.is("StartNFC")) {
 			// First, let's start listening to NFC events...
 			if (maNFCStart()) {
 				// For the off-chance of a device not having NFC,
 				// show an error message.
-				showStatus(ERROR_ICON, "This device does not have NFC, or NFC is disabled.<br/><b>Please quit.</b", 0);
+				showStatus(
+					ERROR_ICON,
+					"This device does not have NFC, or NFC is disabled.<br/>"
+					"<b>Please quit.</b>",
+					0);
 				// And this flag is just a hack to never clear
 				// the above message.
 				fDisallowStatusMessages = true;
@@ -131,9 +143,6 @@ public:
 			setMode(_write);
 			fSampleTag = createSampleVCardTag();
 		}
-		// Tell the WebView that we have processed the message, so that
-		// it can send the next one.
-		callJS("bridge.messagehandler.processedMessage()");
 	}
 
 	/**
@@ -166,18 +175,18 @@ public:
 			// We got an event, now we need to get the actual tag.
 			MAHandle tag = maNFCReadTag(nfcEventData.handle);
 			setCurrentTag(tag);
-			// And buzz a bit
+			// And buzz a bit.
 			maVibrate(100);
 		}
 		// Then, we just check whether we're in read or write
 		// mode and the delegate to the proper
 		// event handling code.
 		switch (fMode) {
-		case _write:
-			customEventWrite(event);
-			break;
-		default:
-			customEventRead(event);
+			case _write:
+				customEventWrite(event);
+				break;
+			default:
+				customEventRead(event);
 		}
 	}
 
@@ -191,15 +200,25 @@ public:
 					// Please note; we always need to convert to
 					// a tag of the proper type. (Destruction of these
 					// tags is automatic when the original tag is destroyed.)
-					MAHandle ndef = maNFCGetTypedTag(fCurrentTag, MA_NFC_TAG_TYPE_NDEF);
+					MAHandle ndef = maNFCGetTypedTag(
+						fCurrentTag,
+						MA_NFC_TAG_TYPE_NDEF);
 					handleNDEF(ndef);
 				} else if (maNFCIsType(fCurrentTag, MA_NFC_TAG_TYPE_MIFARE_CL)) {
-					MAHandle mfc = maNFCGetTypedTag(fCurrentTag, MA_NFC_TAG_TYPE_MIFARE_CL);
+					MAHandle mfc = maNFCGetTypedTag(
+						fCurrentTag,
+						MA_NFC_TAG_TYPE_MIFARE_CL);
 					handleMifare("Mifare Classic", mfc);
 				} else if (maNFCIsType(fCurrentTag, MA_NFC_TAG_TYPE_MIFARE_UL)) {
-					MAHandle mfu = maNFCGetTypedTag(fCurrentTag, MA_NFC_TAG_TYPE_MIFARE_UL);
+					MAHandle mfu = maNFCGetTypedTag(
+						fCurrentTag,
+						MA_NFC_TAG_TYPE_MIFARE_UL);
 					int size = maNFCGetSize(mfu);
-					handleMifare(size > 64 ? "Mifare Ultralight C" : "Mifare Ultralight", mfu);
+					handleMifare(
+						size > 64 ?
+							"Mifare Ultralight C" :
+							"Mifare Ultralight",
+						mfu);
 				} else {
 					handleUnknownTag();
 				}
@@ -209,7 +228,10 @@ public:
 			MANFCEventData& data = (MANFCEventData&) event.nfc;
 			int tag = data.handle;
 			if (data.result < 0) {
-				sprintf(fInfoBuffer, "Failed to read tag (try again.) Error code: %d", data.result);
+				sprintf(
+					fInfoBuffer,
+					"Failed to read tag (try again.) Error code: %d",
+					data.result);
 				showStatus(ERROR_ICON, fInfoBuffer, TOAST_PERIOD);
 			} else if (maNFCIsType(tag, MA_NFC_TAG_TYPE_NDEF)) {
 				handleNDEF(tag);
@@ -228,16 +250,23 @@ public:
 			// the tag is either a) An NDEF tag, or b) a tag
 			// that can be formatted into an NDEF tag.
 			if (maNFCIsType(fCurrentTag, MA_NFC_TAG_TYPE_NDEF)) {
-				tagToWrite = maNFCGetTypedTag(fCurrentTag, MA_NFC_TAG_TYPE_NDEF);
+				tagToWrite = maNFCGetTypedTag(
+					fCurrentTag,
+					MA_NFC_TAG_TYPE_NDEF);
 			} else if (maNFCIsType(fCurrentTag, MA_NFC_TAG_TYPE_NDEF_FORMATTABLE)) {
-				tagToWrite = maNFCGetTypedTag(fCurrentTag, MA_NFC_TAG_TYPE_NDEF_FORMATTABLE);
+				tagToWrite = maNFCGetTypedTag(
+					fCurrentTag,
+					MA_NFC_TAG_TYPE_NDEF_FORMATTABLE);
 			}
 
 			if (tagToWrite) {
 				// Almost there now...
 				if (maNFCIsReadOnly(tagToWrite) > 0) {
 					setMode(_read);
-					showStatus(ERROR_ICON, "Tag is read-only, cannot write.", TOAST_PERIOD);
+					showStatus(
+						ERROR_ICON,
+						"Tag is read-only, cannot write.",
+						TOAST_PERIOD);
 				} else {
 					// ...and since the tag is writeable,
 					// let's write a sample tag to it!
@@ -245,7 +274,10 @@ public:
 				}
 			} else {
 				setMode(_read);
-				showStatus(ERROR_ICON, "Cannot write to this tag type.", TOAST_PERIOD);
+				showStatus(
+					ERROR_ICON,
+					"Cannot write to this tag type.",
+					TOAST_PERIOD);
 			}
 		} else if (EVENT_TYPE_NFC_TAG_DATA_WRITTEN == event.type) {
 			// We get this event whenever we wrote something
@@ -257,7 +289,12 @@ public:
 				sprintf(fInfoBuffer, "Wrote tag. (%d bytes)", size);
 				showStatus(INFO_ICON, fInfoBuffer, TOAST_PERIOD);
 			} else {
-				showStatus(ERROR_ICON, "<b>Unable to write tag</b><br><i>Note: The sample vCard is too large for a Mifare Ultralight tag.</i>", TOAST_PERIOD);
+				showStatus(
+					ERROR_ICON,
+					"<b>Unable to write tag</b><br/>"
+					"<i>Note: The sample vCard is too large "
+					"for a Mifare Ultralight tag.</i>",
+					TOAST_PERIOD);
 			}
 		}
 	}
@@ -296,13 +333,21 @@ public:
 	void setMode(Mode mode) {
 		fMode = mode;
 		switch (mode) {
-		case _write:
-			showStatus(WRITE_TAG_ICON, "<b>Ready to write</b><br/>Please hold a tag close to the device to write to it.<br/>Press BACK to cancel.", 0);
-			maVibrate(100);
-			break;
-		default:
-			showStatus(READ_TAG_ICON, "<b>Waiting for a tag</b><br/>Hold a tag close to the device to show its contents.", 0);
-			fExitOnBack = true;
+			case _write:
+				showStatus(
+					WRITE_TAG_ICON,
+					"<b>Ready to write</b><br/>Please hold a tag close to "
+					"the device to write to it.<br/>Press BACK to cancel.",
+					0);
+				maVibrate(100);
+				break;
+			default:
+				showStatus(
+					READ_TAG_ICON,
+					"<b>Waiting for a tag</b><br/>Hold a tag close to "
+					"the device to show its contents.",
+					0);
+				fExitOnBack = true;
 		}
 	}
 
@@ -358,11 +403,12 @@ public:
 		MAHandle rec = maNFCGetNDEFRecord(msg, 0);
 		MimeMediaNdefRecord vCardRec = MimeMediaNdefRecord(rec);
 		vCardRec.setMimeType(String(VCARD_MIME_TYPE));
-		const char* vCard = "BEGIN:VCARD\n"
-				"VERSION:3.0"
-				"N:X;Mr\n"
-				"FN: Mr X\n"
-				"END:VCARD";
+		const char* vCard =
+			"BEGIN:VCARD\n"
+			"VERSION:3.0"
+			"N:X;Mr\n"
+			"FN: Mr X\n"
+			"END:VCARD";
 		maNFCSetNDEFPayload(rec, vCard, strlen(vCard));
 		return msg;
 	}
