@@ -74,8 +74,8 @@ PushNotificationManager.type = {
 PushNotificationManager.prototype.initialize = function(serverAddress, serverPort)
 {
 	PhoneGap.exec(
-			onSuccess,
-			onError,
+			null,
+			null,
 			"PushNotification",
 			"initialize",
 			{
