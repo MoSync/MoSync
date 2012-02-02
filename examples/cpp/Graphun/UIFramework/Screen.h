@@ -51,6 +51,7 @@ namespace MoSync {
 
 	class Widget : public UIItem {
 	public:
+		static int getLastError();
 		Widget(const String& widgetType);
 		void addChild(Widget* widget);
 	};

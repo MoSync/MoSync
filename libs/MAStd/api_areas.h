@@ -322,9 +322,9 @@ MAUtil::DataHandler
 </td>
 <td>maAdsBannerCreate(), maAdsBannerDestroy(), maAdsAddBannerToLayout(), maAdsRemoveBannerFromLayout(), maAdsBannerSetProperty(), maAdsBannerGetProperty()<br>
 </td>
-<td>\ref AdsAPI<br>
-</td>
 <td>\ref Ads<br>
+</td>
+<td>\ref AdsAPI<br>
 </td>
 </tr>
 

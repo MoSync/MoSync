@@ -543,13 +543,11 @@ public class MoSyncCameraController {
 	 */
 	private void setNewSize(int formatIndex)
 	{
-		int width = userWidths.get(formatIndex).intValue();
-		int height = userHeights.get(formatIndex).intValue();
     	try
     	{
 			Camera.Parameters parameters = getCurrentParameters();
 			List <Camera.Size> supportedSizes =  parameters.getSupportedPictureSizes();
-			Camera.Size optimalPictureSize = mPreview.getOptimalSize(supportedSizes, width, height);
+			Camera.Size optimalPictureSize = supportedSizes.get(formatIndex);
 			parameters.setPictureSize(optimalPictureSize.width,optimalPictureSize.height);
 			mCamera.setParameters(parameters);
     	}
@@ -611,4 +609,35 @@ public class MoSyncCameraController {
 			}
 		}
 	};
+
+
+	public void getSize(int index, int format)
+	{
+		Camera.Parameters parameters = getCurrentParameters();
+		List <Camera.Size> supportedSizes =  parameters.getSupportedPictureSizes();
+		int []size;
+		size = new int[2];
+		size[0] = supportedSizes.get(index).width;
+		size[1] = supportedSizes.get(index).height;
+
+		mMoSyncThread.mMemDataSection.position( format );
+		mMoSyncThread.mMemDataSection.put( int2byte(size) );
+		mMoSyncThread.mMemDataSection.put( (byte)0 );
+	}
+
+	private byte[] int2byte(int[]src)
+	{
+		int srcLength = src.length;
+		    byte[]dst = new byte[srcLength << 2];
+
+		    for (int i=0; i<srcLength; i++) {
+				int x = src[i];
+				int j = i << 2;
+				dst[j++] = (byte) ((x >>> 0) & 0xff);
+				dst[j++] = (byte) ((x >>> 8) & 0xff);
+				dst[j++] = (byte) ((x >>> 16) & 0xff);
+				dst[j++] = (byte) ((x >>> 24) & 0xff);
+		    }
+		    return dst;
+	}
 }
