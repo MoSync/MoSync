@@ -84,9 +84,17 @@ namespace MoSync {
 	}
 
 
+	static int sLastError = 0;
+
+	int Widget::getLastError()
+	{
+		return sLastError;
+	}
+
 	Widget::Widget(const String& widgetType) {
 		mType = widgetType;
 		mHandle = maWidgetCreate(widgetType.c_str());
+		sLastError = mHandle;
 		sItems[mHandle] = this;
 	}
 

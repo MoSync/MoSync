@@ -2,68 +2,91 @@
 
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<title>Wormhole Demo</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
-<!-- import JQTouch -->
-<script src="js/jqtouch/jqtouch.min.js" type="application/x-javascript"
-	charset="utf-8"></script>
+	<title>Wormhole Demo</title>
 
-<!-- Import JQTouch default style (iPhone look). Replace the string "themes/default" with "themes/jqt" for a neutral (black) theme -->
-<link type="text/css" rel="stylesheet" media="screen"
-	href="js/jqtouch/jqtouch.css">
-<link type="text/css" rel="stylesheet" media="screen"
-	href="js/themes/apple/theme.css">
-<!-- include JQuery through Google API => Always have the latest version -->
-<script src="js/jqtouch/jquery-1.4.2.min.js" type="text/javascript"
-	charset="utf-8"></script>
-<script src="js/jqtouch/jqtouch.js" type="application/x-javascript"
-	charset="utf-8"></script>
+	<!-- import JQTouch -->
+	<script src="js/jqtouch/jqtouch.min.js" type="application/x-javascript"
+		charset="utf-8"></script>
 
-<script type="text/javascript" charset="utf-8" src="js/wormhole.js"></script>
-<script type="text/javascript" charset="utf-8" src="main.js"></script>
-<script type="text/javascript" charset="utf-8" src="phonegapSensors.js"></script>
-<script type="text/javascript" charset="utf-8" src="w3csensors.js"></script>
-<script type="text/javascript" charset="utf-8" src="filemanager.js"></script>
+	<!-- Import JQTouch default style (iPhone look). Replace the string "themes/default" with "themes/jqt" for a neutral (black) theme -->
+	<link type="text/css" rel="stylesheet" media="screen"
+		href="js/jqtouch/jqtouch.css">
+	<link type="text/css" rel="stylesheet" media="screen"
+		href="js/themes/apple/theme.css">
+	<!-- include JQuery through Google API => Always have the latest version -->
+	<script src="js/jqtouch/jquery-1.4.2.min.js" type="text/javascript"
+		charset="utf-8"></script>
+	<script src="js/jqtouch/jqtouch.js" type="application/x-javascript"
+		charset="utf-8"></script>
 
-<!-- JavaScript goes here -->
-<script type="text/javascript">
-			// Fire up JQTouch
-			var jQT = $.jQTouch({
-				statusBar: 'black'
+	<script type="text/javascript" charset="utf-8" src="js/wormhole.js"></script>
+	<script type="text/javascript" charset="utf-8" src="main.js"></script>
+	<script type="text/javascript" charset="utf-8" src="phonegapSensors.js"></script>
+	<script type="text/javascript" charset="utf-8" src="w3csensors.js"></script>
+	<script type="text/javascript" charset="utf-8" src="filemanager.js"></script>
+
+	<!-- JavaScript goes here -->
+	<script type="text/javascript">
+		// Fire up JQTouch
+		var jQT = $.jQTouch({
+			statusBar: "black"
+		});
+
+		// Make sure we get the correct event type on every touch system.
+		//var clickEvent = mosync.isIOS ? "tap" : "click";
+		var clickEvent = "click";
+
+		/**
+		 * Will be called after all the markup in <body> was loaded
+		 */
+		function initialize()
+		{
+			// This is the on-screen back button in jQTouch.
+			$("button.back").bind(clickEvent, function(e)
+			{
+				console.log("@@@ BACK 1.1");
+				jQT.goBack();
+				console.log("@@@ BACK 2.1");
 			});
 
-			// Make sure we get the correct event type on every touch system.
-			var userAgent = navigator.userAgent.toLowerCase();
-			var isiPhone =
-				(userAgent.indexOf('iphone') != -1 ||
-				userAgent.indexOf('ipod') != -1)
-					? true : false;
-			var clickEvent = isiPhone ? 'tap' : 'click';
+			// This is the PhoneGap back button event, triggered by the
+			// physical back button (on Android).
+			document.addEventListener(
+				"backbutton",
+				function()
+				{
+					console.log("@@@ BACKBUTTON pressed");
+					console.log("@@@ jQT.hist.length: " + jQT.hist.length);
+					// Are we on the first page?
+					if (jQT.hist.length == 1)
+					{
+						// Close the application.
+						mosync.bridge.send(["close"]);
+					}
+					else
+					{
+						console.log("@@@ BACK 1.2");
+						// Same action as software back button.
+						jQT.goBack();
+						console.log("@@@ BACK 2.2");
+					}
+				},
+				true);
 
-
-
-			/**
-			 * Will be called after all the markup in <body> was loaded
-			 */
-			function initialize()
+			// We bind this to make sure that the file list refreshes
+			// as soon as the user goes to the file manager page.
+			$("#fileStorage").bind("pageAnimationStart", function()
 			{
-				$("button.back").bind(clickEvent, function(e)
-				{
-					jQT.goBack();
-				});
-				//We bind this to make sure that the file list refreshes
-				//as soon as the user goes to the file manager page
-				$("#fileStorage").bind('pageAnimationStart',function()
-				{
-					refreshFiles();
-				})
-			}
-		</script>
+				refreshFiles();
+			});
+		}
+	</script>
 
-<!-- CSS styles -->
-<style type="text/css">
-</style>
+	<!-- CSS styles -->
+	<style type="text/css">
+	</style>
 </head>
 
 <!-- A simple JQTouch layout-->
@@ -127,9 +150,9 @@
 			<ul id="GeoLocation" class="rounded">
 				<li>
 					<dl id="Geo-data">
-						<dt>Latt:</dt><dd id="geoLat">&nbsp;</dd>
-						<dt>Long:</dt><dd id="geoLong">&nbsp;</dd>
-						<dt>Alt:</dt><dd id="geoAlt">&nbsp;</dd>
+						<dt>Latitude:</dt><dd id="geoLat">&nbsp;</dd>
+						<dt>Longitude:</dt><dd id="geoLong">&nbsp;</dd>
+						<dt>Altitude:</dt><dd id="geoAlt">&nbsp;</dd>
 					</dl></li>
 				<li><a href="#" id="toggelGeodata_li" onclick="toggleGeolocation()">Toggle GeoLocation</a></li>
 			</ul>
@@ -241,10 +264,12 @@
 			</div>
 			<input type="button" class="button" value="Delete" onclick="deleteFile()"/>
 			<ul>
-				<li><input type="text" id="fileName" onblur="fileNameLostFocus()"/></li>
+				<li><input type="text" id="fileName"/></li>
+				<li><a href="#" onclick="renameCurrentFile();">Rename</a></li>
 			</ul>
 			<ul>
-				<li><textarea id="fileContents" rows="20" style="font-size:20pt" onchange="textHasChanged()" onblur="textLostFocus()"></textarea></li>
+				<li><textarea id="fileContents" rows="20" style="font-size:20pt"></textarea></li>
+				<li><a href="#" onclick="saveCurrentFile();">Save</a></li>
 			</ul>
 		</div>
 	</div>

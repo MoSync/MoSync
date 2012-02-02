@@ -259,6 +259,11 @@ MainScreen::MainScreen() {
 	layout->addChild(horizontalLayout);
 
 	mGLView = new Widget("GLView");
+	if(Widget::getLastError() < 0)
+	{
+		maPanic(1, "OpenGL|ES unavailable!");
+	}
+
 	layout->addChild(mGLView);
 
 	mGLView->setProperty("width", -1);

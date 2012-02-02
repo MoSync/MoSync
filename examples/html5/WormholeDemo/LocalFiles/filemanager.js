@@ -1,5 +1,4 @@
 var userFilesDir; //DirectoryEntry for the UserFiles directory
-var textChanged = false; //Flag to check if there are changes to be saved
 var currentFile; //The file that is being edited
 
 /**
@@ -65,9 +64,10 @@ function setFile(file)
 {
 	//We programmatically go to the file editing panel
 	jQT.goTo('#filePage','pop');
-	$('#filePanelTitle').html(file.name);
-	$('#fileName').val(file.name);
 	currentFile = file;
+
+	$('#filePanelTitle').html(currentFile.name);
+	$('#fileName').val(currentFile.name);
 	var reader = new FileReader();
 	reader.onloadend = function(evt){
 		//Sets the file contents to the text area
@@ -76,7 +76,7 @@ function setFile(file)
 		$('#fileContents').val(evt.target.result);
 	};
 	//This call will evoke the onloaded callback above
-	reader.readAsText(file);
+	reader.readAsText(currentFile);
 }
 
 /**
@@ -134,34 +134,26 @@ function deleteFile()
 }
 
 /**
- * Keep track of file text being changed in order to save it later
+ * Saves the new contents of the file currently being edited
  */
-function textHasChanged()
+function saveCurrentFile()
 {
-	textChanged = true;
+	currentFile.createWriter(function(writer){
+		writer.seek(0);
+		text = $('#fileContents').val();
+		writer.write(text);
+		writer.truncate(text.length);
+	},
+	function(error){
+		alert("error");
+	});
 }
+
 
 /**
- * Checks if there have been changes to the file after the textarea loses focus and saves them if needed
+ * Renames the file that is currently being edited
  */
-function textLostFocus()
-{
-	if(textChanged == true)
-	{
-		textChanged = false;
-		currentFile.createWriter(function(writer){
-			writer.seek(0);
-			text = $('#fileContents').val();
-			writer.write(text);
-			writer.truncate(text.length);
-		},
-		function(error){
-			alert("error");
-		});
-	}
-}
-
-function fileNameLostFocus()
+function renameCurrentFile()
 {
 	var newFileName = $('#fileName').val();
 	if(newFileName != currentFile.name)

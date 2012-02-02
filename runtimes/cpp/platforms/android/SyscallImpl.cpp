@@ -1,5 +1,4 @@
-/* Copyright (C) 2010 MoSync AB
-/* Copyright (C) 2010 MoSync AB
+/* Copyright (C) 2012 MoSync AB
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License, version 2, as published by
@@ -2164,20 +2163,13 @@ namespace Base
 		{
 
 			// b is pointer to struct 	MA_CAMERA_FORMAT
-				MA_CAMERA_FORMAT* sizeInfo = (MA_CAMERA_FORMAT*) SYSCALL_THIS->GetValidatedMemRange(b, sizeof(MA_CAMERA_FORMAT));
 
-			// Size of buffer to store device name.
-			int width = sizeInfo->width;
-
-			// Size of buffer to store device name.
-			int height = sizeInfo->height;
 
 
 			// Returns 1 for success, 0 for no more devices.
 			return _maCameraFormat(
 				a,
-				width,
-				height,
+				b,
 				mJNIEnv,
 				mJThis);
 		}

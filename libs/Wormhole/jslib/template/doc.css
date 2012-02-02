@@ -203,11 +203,11 @@ code {
 pre {
 	display: block;
 	background: #f5f6f7;
-	margin: 1.5em 20px;
-	padding: 10px 1.5em;
-	-webkit-border-radius: 4px;
-	-moz-border-radius: 4px;
-	border-radius: 4px;
+	margin: 20px;
+	padding: 20px;
+	-webkit-border-radius: 10px;
+	-moz-border-radius: 10px;
+	border-radius: 10px;
 	white-space: pre-wrap;
 }
 
