@@ -29,7 +29,6 @@ timers = Moblet/timers
 MultiTouch = Moblet/MultiTouch
 MoSketch
 MoSound
-MoTooth = Moblet/MoTooth
 MoTris
 OtaLoad
 GLMoblet_OpenGLES1 = OpenGLES/GLMoblet_OpenGLES1
@@ -45,8 +44,10 @@ FacebookDemo
 SensorTest
 DeviceFonts
 DeviceFontsNativeUI
-NFCExample
 [html5]
 WebViewGeoLocation
 WebViewLoveSMS
 WebViewTwitter
+WormholeDemo
+WormholeNativeUIDemo
+NFCExample

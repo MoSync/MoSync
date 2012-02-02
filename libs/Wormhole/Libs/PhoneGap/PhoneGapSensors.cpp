@@ -233,7 +233,7 @@ namespace Wormhole
 		//Call the Phonegap function, Can call the commandResult function too
 		sprintf(
 				result,
-				"{\"magneticHeading\":%f }",
+				"\\'{\"magneticHeading\":%f }\\'",
 				sensorData.values[1] // only x is considered as compass heading in PhoneGap
 				);
 		mMessageHandler->callSuccess(

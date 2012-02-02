@@ -22,7 +22,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <vector>
 
 namespace MoSync {
-	
+
 /**
 *	This struct represents a single size variation of a MoSync application icon,
 *	basically a size string (WxH format) mapped to a relative file path.
@@ -51,7 +51,7 @@ public:
 	 *	</icon>
 	 *
 	 */
-	static Icon* parse(const std::string& filename);
+	static Icon* parse(const std::string& filename, std::string& platform);
 	void addInstance(const std::string& size, const std::string& filename);
 	const IconInstance* findBestInstance(const std::string& size, const std::string& ext="") const;
 	std::vector<IconInstance*>& getInstances();

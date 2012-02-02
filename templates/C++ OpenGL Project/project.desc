@@ -1,7 +1,7 @@
 id = project.opengles
 name = C++ OpenGL Project
 description = A standard ANSI C++ application template that includes the Moblet framework and basic OpenGL code.
-required-capabilities = OpenGL
+required-capabilities = OpenGL ES 1.0, OpenGL ES 2.0
 
 [Files]
 main.cpp

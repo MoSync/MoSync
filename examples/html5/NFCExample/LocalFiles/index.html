@@ -47,6 +47,7 @@ html
 	padding: 10px;
 	opacity: 0.9;
 }
+
 .InfoBox
 {
 	/* Text attributes. */
@@ -74,20 +75,19 @@ html
 	Import the josync library to enable communication
 	between JavaScript and C++ .
 -->
-<script src="js/bridge.js"></script>
+<script src="js/mosync-bridge.js"></script>
 
 <script>
 
 function WriteURLToTag() {
-	bridge.messagehandler.send({messageName: "WriteSampleURL"}, null);
+	mosync.bridge.sendJSON({messageName: "WriteSampleURL"});
 }
 
 function WriteVCardToTag() {
-	bridge.messagehandler.send({messageName: "WriteSampleVCard"}, null);
+	mosync.bridge.sendJSON({messageName: "WriteSampleVCard"});
 }
 
 function showWriteAlert() {
-	
 }
 
 function updateInfo(icon, info) {
@@ -106,13 +106,20 @@ function updateInfo(icon, info) {
 <img alt="MoSync" src="images/MoSyncLogo.png">
 <br/>
 <br/>
-<b>MoSync NFC Example</b><br/>
-Hold a tag close to the device to dump it's contents onto the screen.<br/><br/>
-To write an example tag, click one of the buttons below. Then hold a writable tag close to the device.<br/><br/>
+<b>MoSync NFC Example</b>
+<br/>
+Hold a tag close to the device to dump it's contents onto the screen.
+<br/>
+<br/>
+To write an example tag, click one of the buttons below. Then hold a
+writable tag close to the device.
+<br/>
+<br/>
 </div>
 <div id="WriteToTagButton" onclick="WriteURLToTag()">
 Write Web Address &gt;&nbsp;&nbsp;
-</div><div id="WriteToTagButton" onclick="WriteVCardToTag()">
+</div>
+<div id="WriteToTagButton" onclick="WriteVCardToTag()">
 Write vCard &gt;&nbsp;&nbsp;
 </div>
 <div class="InfoBox">
@@ -126,6 +133,6 @@ Write vCard &gt;&nbsp;&nbsp;
 </div>
 </body>
 <script>
-bridge.messagehandler.send({messageName: "StartNFC"}, null);
+mosync.bridge.sendJSON({messageName: "StartNFC"});
 </script>
 </html>
