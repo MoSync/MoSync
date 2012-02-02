@@ -1,5 +1,5 @@
-File
-====
+File Object
+===========
 
 This object contains attributes of a single file.
 

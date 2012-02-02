@@ -3,7 +3,7 @@ Sensor Manager
 
 > A W3C compliant sensor API
 
-This is an implementation of the W3C specifications for device sensor management, as found here: <http://dev.w3.org/2009/dap/system-info/Sensors.html/>
+This is an implementation of the W3C specifications for device sensor management, as found in [W3C Sensor API Specification](http://dev.w3.org/2009/dap/system-info/Sensors.html).
 
 Functions
 ----------
