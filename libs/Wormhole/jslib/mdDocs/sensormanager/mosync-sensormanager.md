@@ -3,7 +3,32 @@ Sensor Manager
 
 > A W3C compliant sensor API
 
-This is an implementation of the W3C specifications for device sensor management, as found here: http://dev.w3.org/2009/dap/system-info/Sensors.html
+This is an implementation of the W3C specifications for device sensor management, as found here: <http://dev.w3.org/2009/dap/system-info/Sensors.html/>
+
+Functions
+----------
+ * navigator.findSensors
+
+Objects
+---------
+ * SensorRequest
+
+Methods
+---------
+ * SensorRequest.addEventListener(event, listener)
+ * SensorRequest.removeEventListener(event, listener)
+
+ * SensorConnection.startWatch(watchOptions)
+ * SensorConnection.endWatch()
+ * SensorConnection.read()
+ * SensorRequest.addEventListener(event, listener)
+ * SensorRequest.removeEventListener(event, listener)
+
+Data Structs
+-------------
+ * sensorData
+ * sensorError
+
 
 navigator.findSensors
 =====================
