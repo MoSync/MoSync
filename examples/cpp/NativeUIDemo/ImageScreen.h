@@ -9,8 +9,7 @@
 #include <NativeUI/Image.h>
 
 /**
- * An extension to the Image widget which
- * uses ubin (unloaded binary) resources.
+ * An extension to the Image widget.
  */
 class CustomImage: public NativeUI::Image {
 public:

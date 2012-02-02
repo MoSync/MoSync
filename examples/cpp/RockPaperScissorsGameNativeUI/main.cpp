@@ -26,7 +26,7 @@ MA 02110-1301, USA.
  * In Moblet.cpp we manage the entire application.
  * In Playscreen.cpp we define the UI elements.
  * And in Game.cpp we handle the game logic.
-
+ *
  * Note also that this example will not work on the MoSync emulator (MoRE)
  * because it has no Native UI support yet.
  *

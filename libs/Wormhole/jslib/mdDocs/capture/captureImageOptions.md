@@ -22,10 +22,6 @@ Android Quirks
 
 - The __mode__ parameter is not supported.  The image size and format cannot be altered programmatically; however, the image size can be altered by the device user.  Images are saved in JPEG format (image/jpeg).
 
-BlackBerry WebWorks Quirks
---------------------------
-
-- The __mode__ parameter is not supported.  The image size and format cannot be altered programmatically; however, the image size can be altered by the device user.  Images are saved in JPEG format (image/jpeg).
 
 iOS Quirks
 ----------

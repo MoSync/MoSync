@@ -101,6 +101,8 @@ wormhole.js
 /libs/newlib/libc/sys/mosync/maapi.h
 /libs/newlib/libc/sys/mosync/maapi_defs.h
 
+/libs/Wormhole/jslib/html5
+
 /testPrograms/_masterdump.s
 /testPrograms/temp.s
 /testPrograms/copyfiles.bat
