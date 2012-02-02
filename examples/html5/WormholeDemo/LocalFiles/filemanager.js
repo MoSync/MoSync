@@ -6,10 +6,16 @@ var currentFile; //The file that is being edited
  */
 function initFileManager()
 {
-	window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, function(fileSystem)
-	{
-		//"root" is actually the local file storage directory for our app
-		fileSystem.root.getDirectory("UserFiles",
+	window.requestFileSystem(
+		LocalFileSystem.PERSISTENT,
+		0,
+		// Success callback.
+		function(fileSystem)
+		{
+			//The "root" is actually the local file storage
+			//directory for our app
+			fileSystem.root.getDirectory(
+				"UserFiles",
 				{create: false, exclusive: false},
 				function(dirEntry)
 				{
@@ -19,11 +25,12 @@ function initFileManager()
 				{
 					alert(error);
 				});
-	},
-	function(error)
-	{
-		alert("fs error");
-	});
+		},
+		// Error callback.
+		function(error)
+		{
+			alert("fs error");
+		});
 }
 
 /**
@@ -85,6 +92,7 @@ function setFile(file)
 function createFile()
 {
 	userFilesDir.createReader().readEntries(
+		// Success callback.
 		function(entries)
 		{
 			var defaultNewFileName =  "NewFile";
@@ -104,16 +112,21 @@ function createFile()
 						break;
 					}
 				}
-			}while(conflict);
-			userFilesDir.getFile(newFileName, {create: true, exclusive: true},
-					function(){
-						refreshFiles();
-					},
-					function()
-					{
-						alert("error");
-					});
+			}
+			while(conflict);
+
+			userFilesDir.getFile(
+				newFileName,
+				{create: true, exclusive: true},
+				function(){
+					refreshFiles();
+				},
+				function()
+				{
+					alert("error");
+				});
 		},
+		// Error callback.
 		function(error)
 		{
 			alert("error");
@@ -138,17 +151,28 @@ function deleteFile()
  */
 function saveCurrentFile()
 {
-	currentFile.createWriter(function(writer){
-		writer.seek(0);
-		text = $('#fileContents').val();
-		writer.write(text);
-		writer.truncate(text.length);
-	},
-	function(error){
-		alert("error");
-	});
+	// We are lazy here and do not handle success/error
+	// callbacks from write and truncate.
+	var text = $('#fileContents').val();
+	// Write file.
+	currentFile.createWriter(
+		function(writer){
+			writer.seek(0);
+			writer.write(text);
+		},
+		function(error){
+			alert("Cannot save file");
+		});
+	// Need to truncate to remove old file data
+	// in case file is shorter after write.
+	currentFile.createWriter(
+		function(writer){
+			writer.truncate(text.length);
+		},
+		function(error){
+			alert("Cannot save file");
+		});
 }
-
 
 /**
  * Renames the file that is currently being edited

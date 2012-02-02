@@ -32,23 +32,23 @@ namespace MapDemo
 	//
 	// Repositions map of a MapWidget to the specified location
 	//
-	class MapLocationAction: public Action 
+	class MapLocationAction: public Action
 	//=========================================================================
 	{
 	public:
 		MapLocationAction( MapWidget* widget, LonLat location, const char* label );
-		
+
 		virtual	~MapLocationAction( );
 		//
 		// Action overrides
 		//
 		virtual const char* getShortName( ) const;
-		
-		virtual Action* clone( ) const 
-		{ 
-			return newobject( MapLocationAction, new MapLocationAction( mWidget, mLocation, mLabel ) ); 
+
+		virtual Action* clone( ) const
+		{
+			return newobject( MapLocationAction, new MapLocationAction( mWidget, mLocation, mLabel ) );
 		}
-		
+
 	protected:
 		//
 		// Action protected overrides

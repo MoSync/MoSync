@@ -226,7 +226,7 @@ MAWidgetHandle BasicScreen::createTopLayout()
 	setWidgetSize(
 		topLayout,
 		MAW_CONSTANT_FILL_AVAILABLE_SPACE,
-		mScreenHeight / 8);
+		mScreenHeight / 5);
 
 	return topLayout;
 }

@@ -26,27 +26,27 @@ namespace MapDemoUtil
 	//=========================================================================
 	{
 	public:
-		Color( ) 
-		{ 
+		Color( )
+		{
 		}
 
 	private:
-		Color( int val ) 
-			: mVal( val ) 
-		{ 
+		Color( int val )
+			: mVal( val )
+		{
 		}
 
 	public:
 		~Color( ) { } // must not be virtual, to avoid vtable
 
-		static Color fromInt( int val ) 
+		static Color fromInt( int val )
 		{
-			return Color( val ); 
+			return Color( val );
 		}
 
-		int val( ) const 
+		int val( ) const
 		{
-			return mVal; 
+			return mVal;
 		}
 
 		static const Color black;
@@ -59,16 +59,15 @@ namespace MapDemoUtil
 		int mVal;
 	};
 
-	inline bool operator == ( const Color& a, const Color& b ) 
+	inline bool operator == ( const Color& a, const Color& b )
 	{
-		return a.val( ) == b.val( ); 
+		return a.val( ) == b.val( );
 	}
 
-	inline bool operator != ( const Color& a, const Color& b ) 
+	inline bool operator != ( const Color& a, const Color& b )
 	{
-		return a.val( ) != b.val( ); 
+		return a.val( ) != b.val( );
 	}
 }
 
 #endif // COLOR_H_
-

@@ -21,11 +21,11 @@ MA 02110-1301, USA.
 //
 // Author: Niklas Nummelin
 //
-// Description: Used to compile and evaluate floating point 
-// expressions consisting of arithmetical operations, 
-// functions and variables. 
+// Description: Used to compile and evaluate floating point
+// expressions consisting of arithmetical operations,
+// functions and variables.
 //
-// Todo: compile rpn expression into x86 fpu code 
+// Todo: compile rpn expression into x86 fpu code
 // (should be pretty easy)
 // -------------------------------------------------------
 
@@ -33,50 +33,50 @@ MA 02110-1301, USA.
 #include "eval.h"
 #include <stdlib.h>
 
-Function::Function(void *ptr, int num_arguments, const char *name) : ptr(ptr), num_arguments(num_arguments)  
+Function::Function(void *ptr, int num_arguments, const char *name) : ptr(ptr), num_arguments(num_arguments)
 {
 	strcpy(this->name, name);
 }
 
-Variable::Variable(float value, const char *name) : value(value) 
+Variable::Variable(float value, const char *name) : value(value)
 {
 	strcpy(this->name, name);
 }
 
 
-Token::Token(eTokenType type) : type(type) 
+Token::Token(eTokenType type) : type(type)
 {
 }
 
-Token::Token(eTokenType type, float num) : type(type), num(num) 
+Token::Token(eTokenType type, float num) : type(type), num(num)
 {
 }
 
-Token::Token(eTokenType type, Variable *var) : type(type), var(var) 
+Token::Token(eTokenType type, Variable *var) : type(type), var(var)
 {
 }
 
-Token::Token(eTokenType type, Function *func) : type(type), func(func) 
+Token::Token(eTokenType type, Function *func) : type(type), func(func)
 {
 }
 
 
-void Scope::setVariable(const char *name, float v) 
+void Scope::setVariable(const char *name, float v)
 {
 	Map<String, Variable*>::Iterator
 		iter = variables.find(String(name));
 
-	if(iter!=variables.end()) 
+	if(iter!=variables.end())
 	{
 		(*iter).second->value = v;
-	} 
-	else 
+	}
+	else
 	{
 		variables[name] = new Variable(v, name);
 	}
 }
 
-Variable* Scope::getVariable(const char *name) 
+Variable* Scope::getVariable(const char *name)
 {
 	Map<String, Variable*>::Iterator
 		iter = variables.find(String(name));
@@ -90,22 +90,22 @@ Variable* Scope::getVariable(const char *name)
 	}
 }
 
-void Scope::setFunction(const char *name, void *ptr, int args) 
+void Scope::setFunction(const char *name, void *ptr, int args)
 {
 	Map<String, Function*>::Iterator
 		iter = functions.find(name);
-	if(iter!=functions.end()) 
+	if(iter!=functions.end())
 	{
 		(*iter).second->ptr = ptr;
 		(*iter).second->num_arguments = args;
-	} 
-	else 
+	}
+	else
 	{
-		functions[name] = new Function(ptr, args, name);	
+		functions[name] = new Function(ptr, args, name);
 	}
 }
 
-Function* Scope::getFunction(const char *name) 
+Function* Scope::getFunction(const char *name)
 {
 	Map<String, Function*>::Iterator
 		iter = functions.find(String(name));
@@ -119,31 +119,31 @@ Function* Scope::getFunction(const char *name)
 	}
 }
 
-Expression::Expression(Scope &scope) : scope(scope) 
+Expression::Expression(Scope &scope) : scope(scope)
 {
 }
 
-// this function takes a string containing an arithmetic 
-// expression in infix notation and compiles it into an 
+// this function takes a string containing an arithmetic
+// expression in infix notation and compiles it into an
 // internal reverse polish notation representation.
 // which can then easily be evaluated (and re-evaluated)
-// This is done by first tokenizing the string 
-// and then parse the tokens, converting 
+// This is done by first tokenizing the string
+// and then parse the tokens, converting
 // the infix notation to rpn.
-bool Expression::compile(const char *string) 
+bool Expression::compile(const char *string)
 {
 	const char *src = string;
 	Vector<Token> tokens;
 
 	// tokenize it and parse and convert numbers.
-	while(*src) 
+	while(*src)
 	{
-		if(IS_WHITESPACE(*src)) 
+		if(IS_WHITESPACE(*src))
 		{
 			src++;
 			continue;
 		}
-		switch(*src) 
+		switch(*src)
 		{
 		case '(': tokens.add(Token(LPAREN)); break;
 		case ')': tokens.add(Token(RPAREN)); break;
@@ -152,7 +152,7 @@ bool Expression::compile(const char *string)
 		case '*': tokens.add(Token(MUL)); break;
 		case '/': tokens.add(Token(DIV)); break;
 		default:
-			if(IS_NUMBER(*src)) 
+			if(IS_NUMBER(*src))
 				{
 					char num[32];
 					num[0] = *src;
@@ -181,13 +181,13 @@ bool Expression::compile(const char *string)
 					tokens.add(Token(NUMBER, i));
 					continue;
 				}
-			else if(IS_LETTER(*src)) 
+			else if(IS_LETTER(*src))
 			{
 				char litteral[255];
 				litteral[0] = *src;
 				src++;
 				char *litteral_dest = litteral+1;
-				while(IS_LETTER(*src)||IS_NUMBER(*src)) 
+				while(IS_LETTER(*src)||IS_NUMBER(*src))
 				{
 					*litteral_dest = *src;
 					litteral_dest++;
@@ -197,24 +197,24 @@ bool Expression::compile(const char *string)
 
 				while(IS_WHITESPACE(*src)) src++;
 
-				if(*src=='(') 
+				if(*src=='(')
 				{
 					tokens.add(Token(FUNCTION, scope.getFunction(litteral)));
 					src++;
-				} 
-				else 
+				}
+				else
 				{
 					tokens.add(Token(VARIABLE, scope.getVariable(litteral)));
 				}
 
-				continue;					
+				continue;
 			}
 			else return false;
 		}
 		src++;
 	}
 
-	// compile! this is done recursivly 
+	// compile! this is done recursivly
 	rpn.clear();
 	_compile(0, tokens, rpn);
 
@@ -223,11 +223,11 @@ bool Expression::compile(const char *string)
 }
 
 // Used to print the resulting rpn expression.
-void Expression::print() 
+void Expression::print()
 {
-	for(int i = 0; i < rpn.size(); i++) 
+	for(int i = 0; i < rpn.size(); i++)
 	{
-		switch(rpn[i].type) 
+		switch(rpn[i].type)
 		{
 		case VARIABLE:
 			printf("%s ", rpn[i].var->name);
@@ -267,7 +267,7 @@ void Expression::print()
 // When the expression has been evaluated only one
 // value is remaining on the stack, this is the
 // result, which is returned.
-float Expression::evaluate() 
+float Expression::evaluate()
 {
 	static Stack<float> values;
 	values.clear();
@@ -335,43 +335,43 @@ int Expression::_compile(int start, Vector<Token>& tokens, Vector<Token>& rpn)
 	int i;
 	Stack<eTokenType> opStack;
 	eTokenType lastTok = NONE;
-	for(i = start; i < tokens.size(); i++) 
+	for(i = start; i < tokens.size(); i++)
 	{
 		if(tokens[i].type == RPAREN) break;
 
-		switch(tokens[i].type) 
+		switch(tokens[i].type)
 		{
 		case PLUS:
 		case MINUS:
 			// do some simple optimizations of the
-			// expression (instead of having unary 
+			// expression (instead of having unary
 			// operations for these kind of series)
-			if(lastTok==MINUS) 
+			if(lastTok==MINUS)
 			{
-				if(tokens[i].type==MINUS) 
+				if(tokens[i].type==MINUS)
 				{
 					opStack.pop();
 					opStack.push(PLUS);
 					break;
 				}
-			} 
-			else if(lastTok==PLUS) 
+			}
+			else if(lastTok==PLUS)
 			{
-				if(tokens[i].type==MINUS) 
+				if(tokens[i].type==MINUS)
 				{
 					opStack.pop();
 					opStack.push(MINUS);
 					break;
-				}						
-			} 
-			else 
+				}
+			}
+			else
 			{
 				// if next token is a number and this
 				// token is a minus (unary) then just negate the number
-				if(	i+1<tokens.size() && 
+				if(	i+1<tokens.size() &&
 					IS_EVALUATABLE_LEFT(tokens[i+1].type) &&
-					!(IS_EVALUATABLE_RIGHT(lastTok)) && 
-					tokens[i].type == MINUS) 
+					!(IS_EVALUATABLE_RIGHT(lastTok)) &&
+					tokens[i].type == MINUS)
 				{
 					opStack.push(MINUS);
 					rpn.add(Token(NUMBER, 0.0));
@@ -391,51 +391,51 @@ int Expression::_compile(int start, Vector<Token>& tokens, Vector<Token>& rpn)
 			// if we found a left parenthesis lets recurse into it and increment our
 			// index with the amount of tokens that has been parsed through the
 			// recursion. Else just add the number to the rpn expression.
-			if(tokens[i].type==LPAREN||tokens[i].type==FUNCTION) 
+			if(tokens[i].type==LPAREN||tokens[i].type==FUNCTION)
 			{
-				if(tokens[i].type==FUNCTION) 
+				if(tokens[i].type==FUNCTION)
 				{
-					int last_i = i; 
+					int last_i = i;
 					i+=_compile(i+1, tokens, rpn)+1;
 					rpn.add(tokens[last_i]);
-				} 
-				else 
+				}
+				else
 				{
 					i+=_compile(i+1, tokens, rpn)+1;
 				}
-			} 
-			else 
+			}
+			else
 			{
 				rpn.add(tokens[i]);
 			}
 
 			// if our operator stack isn't empty lets peek the last operator
 			// and see if it is time to add it to the rpn (according to predecence)
-			if(!opStack.empty()) 
+			if(!opStack.empty())
 			{
 				eTokenType lastOp = opStack.peek();
 				eTokenType nextOp = NONE;
 				if(i+1<tokens.size())
 					nextOp = tokens[i+1].type;
 				if((lastOp == PLUS || lastOp == MINUS) &&
-					(nextOp == PLUS || nextOp == MINUS || nextOp == RPAREN || nextOp == NONE)) 
+					(nextOp == PLUS || nextOp == MINUS || nextOp == RPAREN || nextOp == NONE))
 				{
 					rpn.add(Token(lastOp));
 					opStack.pop();
 				}
-				else if((lastOp == MUL || lastOp == DIV)) 
+				else if((lastOp == MUL || lastOp == DIV))
 				{
 					rpn.add(Token(lastOp));
 					opStack.pop();
-					if(nextOp == PLUS || nextOp == MINUS || nextOp == RPAREN || nextOp == NONE) 
-					{	
-						// nothing has lower predecence than these operators so just empty 
+					if(nextOp == PLUS || nextOp == MINUS || nextOp == RPAREN || nextOp == NONE)
+					{
+						// nothing has lower predecence than these operators so just empty
 						// the operator stack and add the operators to the rpn expression
-						while(opStack.empty()!=true) 
+						while(opStack.empty()!=true)
 						{
 							rpn.add(Token(opStack.peek()));
 							opStack.pop();
-						}					
+						}
 					}
 				}
 			}
@@ -450,7 +450,7 @@ int Expression::_compile(int start, Vector<Token>& tokens, Vector<Token>& rpn)
 	}
 
 	// add the remaining operators to the rpn expression
-	while(opStack.empty()!=true) 
+	while(opStack.empty()!=true)
 	{
 		rpn.add(Token(opStack.peek()));
 		opStack.pop();

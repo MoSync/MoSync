@@ -25,11 +25,12 @@ MA 02110-1301, USA.
  * are created and connected to the main tab screen.
  */
 
-#include <maprofile.h>
 #include "ScreenMain.h"
 #include "ScreenColorList.h"
 #include "ScreenWebView.h"
 #include "ScreenImageSwiper.h"
+#include "ImageScreen.h"
+#include "Util.h"
 
 // Indexes for the tab screens.
 #define COLOR_TAB		0
@@ -46,15 +47,30 @@ class ScreenMainWithThreeTabs :
 public:
 	ScreenMainWithThreeTabs() : ScreenMain()
 	{
-		// Create child screens.
-		mColorScreen = new ScreenColorList();
-		mWebScreen = new ScreenWebView();
-		mImageScreen = new ScreenImageSwiper();
+		lprintfln("platform %d", getPlatform());
+		if(getPlatform() != 2)
+		{
+			// Create child screens.
+			mColorScreen = new ScreenColorList();
+			mWebScreen = new ScreenWebView();
+			mImageScreen = new ScreenImageSwiper();
 
-		// Add them as tabs.
-		this->addTab(mColorScreen);
-		this->addTab(mWebScreen);
-		this->addTab(mImageScreen);
+			// Add them as tabs.
+			this->addTab(mColorScreen);
+			this->addTab(mWebScreen);
+			this->addTab(mImageScreen);
+		}
+		else
+		{
+			mColorScreen = new ScreenColorList();
+			mWebScreen = new ScreenWebView();
+			mScreenImageShow = new ImageScreenWithButtons();
+
+			// Add them as tabs.
+			this->addTab(mColorScreen);
+			this->addTab(mWebScreen);
+			this->addTab(mScreenImageShow);
+		}
 	}
 
 	/**
@@ -167,6 +183,11 @@ private:
 	 * The web screen.
 	 */
 	ScreenWebView* mWebScreen;
+
+	 /**
+	  * The image view for WP7
+	  */
+	ImageScreenWithButtons* mScreenImageShow;
 };
 
 /**

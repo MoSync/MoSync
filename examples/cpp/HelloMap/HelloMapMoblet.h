@@ -30,7 +30,7 @@ namespace HelloMap
 	{
 	public:
 		HelloMapMoblet( );
-		
+
 		virtual ~HelloMapMoblet( );
 
 		void Terminate( ) { mRun = false; }

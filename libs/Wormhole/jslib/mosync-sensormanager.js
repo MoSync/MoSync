@@ -194,7 +194,7 @@ function SensorConnection(options)
 			callbackId,
 			"SensorManager",
 			"startSensor",
-			{"type":"" + self.type, "interval":"" + watchOptions.interval});
+			{"type":"" + self.type, "interval":watchOptions.interval});
 	};
 
 	/**

@@ -32,7 +32,7 @@ MA 02110-1301, USA.
 using namespace MAUI;
 using namespace MAUtil;
 
-namespace MapDemoUI 
+namespace MapDemoUI
 {
 	class KeyRepeatTimer;
 
@@ -41,29 +41,29 @@ namespace MapDemoUI
 	// Abstract base class for AppScreen variations.
 	// Handles menus, messages, modal screens
 	//
-	class AppScreenBase : public Screen, 
-		IMessageListener, 
-		TimerListener, 
-		IKeyHandler, 
+	class AppScreenBase : public Screen,
+		IMessageListener,
+		TimerListener,
+		IKeyHandler,
 		IPointerHandler,
 		public IActionSource
 	//=========================================================================
 	{
 	public:
 		AppScreenBase( MobletEx* mMoblet );
-		
+
 		virtual ~AppScreenBase( );
 
 		void setClientWidget( Widget* widget );
-		
-		static Screen* getCurrentScreen( ) 
+
+		static Screen* getCurrentScreen( )
 		{
-			return currentScreen; 
-		}	
-		
-		Moblet* getMoblet( ) 
-		{ 
-			return mMoblet; 
+			return currentScreen;
+		}
+
+		Moblet* getMoblet( )
+		{
+			return mMoblet;
 		}
 
 		//

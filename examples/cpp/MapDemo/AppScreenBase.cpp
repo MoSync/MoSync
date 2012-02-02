@@ -23,7 +23,7 @@ MA 02110-1301, USA.
 #include "AppStyleMgr.h"
 #include "IKeyHandler.h"
 
-namespace MapDemoUI 
+namespace MapDemoUI
 {
 	static const int KeyRepeatMs = 150;
 	static const int MessagePostTimeMs = 2000;
@@ -159,7 +159,7 @@ namespace MapDemoUI
 	void AppScreenBase::keyReleaseEvent( int keyCode, int nativeCode )
 	//-------------------------------------------------------------------------
 	{
-		if ( mKeyTimer != NULL ) 
+		if ( mKeyTimer != NULL )
 		{
 			Environment::getEnvironment( ).removeTimer( mKeyTimer );
 			deleteobject( mKeyTimer );

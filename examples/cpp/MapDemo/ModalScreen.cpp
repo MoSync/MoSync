@@ -21,7 +21,7 @@ MA 02110-1301, USA.
 
 using namespace MapDemoUtil;
 
-namespace MapDemoUI 
+namespace MapDemoUI
 {
 	//-------------------------------------------------------------------------
 	ModalScreen::ModalScreen( )
@@ -69,7 +69,7 @@ namespace MapDemoUI
 		Vector<IModalScreenListener*>* listeners = getBroadcasterListeners<IModalScreenListener>( *this );
 		for ( int i = 0; i < listeners->size(); i++ )
 			(*listeners)[i]->screenClosed( this );
-		
+
 		deleteconstobject( this );
 	}
 

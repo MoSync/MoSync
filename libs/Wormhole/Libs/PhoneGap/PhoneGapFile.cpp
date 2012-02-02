@@ -1210,8 +1210,16 @@ namespace Wormhole
 
 		String fullPath = message.getArgsField("fullPath");
 
+		// TODO: What should we do if FileGetSize fails?
+		// Return an error?
+		// Set size to zero for now.
+		int size = FileGetSize(fullPath);
+		if (size < 0)
+		{
+			size = 0;
+		}
 		char sizeBuf[64];
-		sprintf(sizeBuf, "%i", FileGetSize(fullPath));
+		sprintf(sizeBuf, "%i", size);
 
 		String file = emitFile(
 			FileGetName(fullPath),

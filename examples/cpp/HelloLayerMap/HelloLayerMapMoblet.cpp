@@ -48,7 +48,7 @@ namespace HelloLayerMap
 		GoogleMapSource::ApiKey = GOOGLE_API_KEY;
 		#endif
 
-		
+
 		mScreen = newobject( HelloLayerMapScreen, new HelloLayerMapScreen( ) );
 		mScreen->show( );
 	}

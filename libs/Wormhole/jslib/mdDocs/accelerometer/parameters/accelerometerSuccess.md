@@ -3,9 +3,9 @@ accelerometerSuccess
 
 onSuccess callback function that provides the Acceleration information.
 
-    function(acceleration) {
-        // Do something
-    }
+	function(acceleration) {
+		// Do something
+	}
 
 Parameters
 ----------
@@ -15,9 +15,9 @@ Parameters
 Example
 -------
 
-    function onSuccess(acceleration) {
-        alert('Acceleration X: ' + acceleration.x + '\n' +
-              'Acceleration Y: ' + acceleration.y + '\n' +
-              'Acceleration Z: ' + acceleration.z + '\n' +
-              'Timestamp: '      + acceleration.timestamp + '\n');
-    };
+	function onSuccess(acceleration) {
+		alert('Acceleration X: ' + acceleration.x + '\n' +
+			'Acceleration Y: ' + acceleration.y + '\n' +
+			'Acceleration Z: ' + acceleration.z + '\n' +
+			'Timestamp: ' + acceleration.timestamp + '\n');
+	};
