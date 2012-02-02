@@ -71,7 +71,7 @@ ScreenWebView::ScreenWebView():
 	VerticalLayout* mainLayout = new VerticalLayout();
 	setMainWidget(mainLayout);
 
-	if (isAndroid())
+	if (getPlatform() == 0)
 	{
 		// Set the screen icon for Android.
 		setIcon(RES_TAB_ICON_WEB_VIEW_ANDROID);
@@ -81,7 +81,7 @@ ScreenWebView::ScreenWebView():
 		mScreenWidth = EXTENT_X(screenSize);
 		mScreenHeight = EXTENT_Y(screenSize);
 	}
-	else
+	else if(getPlatform() == 1)
 	{
 		// Set the screen icon for iOS.
 		setIcon(RES_TAB_ICON_WEB_VIEW);
@@ -96,6 +96,13 @@ ScreenWebView::ScreenWebView():
 		mNavBarWidget->setBackButtonTitle("");
 		mNavBarWidget->fillSpaceHorizontally();
 		mainLayout->addChild(mNavBarWidget);
+	}
+	else if(getPlatform() == 2)
+	{
+		// Get the screen size.
+		MAExtent screenSize = maGetScrSize();
+		mScreenWidth = EXTENT_X(screenSize);
+		mScreenHeight = EXTENT_Y(screenSize);
 	}
 
 	// Create and add the address bar to the main layout.

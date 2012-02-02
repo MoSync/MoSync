@@ -26,7 +26,7 @@ MA 02110-1301, USA.
 
 using namespace MAP;
 
-namespace HelloMap 
+namespace HelloMap
 {
 	//=========================================================================
 	//

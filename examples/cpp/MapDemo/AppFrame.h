@@ -34,7 +34,7 @@ namespace MapDemoUI
 	{
 	public:
 		AppFrame(int x, int y, int width, int height, Widget* parent, int columns, int rows );
-		
+
 		virtual ~AppFrame( );
 		//
 		// Message handling

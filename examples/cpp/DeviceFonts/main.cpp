@@ -55,7 +55,7 @@ public:
 
 		//Here we load a default font, which is used for the first collumn
 		mDefaultFont = maFontLoadDefault(FONT_TYPE_SANS_SERIF, 0, mFontSize);
-                
+
 		//Check if it's implemented on the current platform
 		if(-1 == mDefaultFont)
 		{

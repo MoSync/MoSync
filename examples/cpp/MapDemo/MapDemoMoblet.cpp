@@ -52,7 +52,7 @@ namespace MapDemo
 		GoogleMapSource::ApiKey = GOOGLE_API_KEY;
 		#endif
 
-		
+
 		mScreen = newobject( MapDemoScreen, new MapDemoScreen( (MobletEx*)this ) );
 		mScreen->show( );
 	}

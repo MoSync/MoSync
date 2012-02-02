@@ -33,7 +33,7 @@ namespace MapDemoUI
 	{
 	public:
 		MenuItem( Action* action );
-		
+
 		virtual ~MenuItem( );
 
 		Action* getAction( ) const;

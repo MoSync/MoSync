@@ -55,15 +55,15 @@ Menu::Menu(int textColor, int selectedTextColor, int x, int y, int width, int he
 	this->selectable = selectable;
 }
 
-void Menu::setX(int x) { 
-	this->x = x; 
+void Menu::setX(int x) {
+	this->x = x;
 }
 
-void Menu::setY(int y) { 
-	this->y = y; 
+void Menu::setY(int y) {
+	this->y = y;
 }
 
-void Menu::clear() { 
+void Menu::clear() {
 	menuItems.clear();
 }
 
@@ -72,7 +72,7 @@ void Menu::addMenuListener(MenuListener *menuListener) {
 }
 
 void Menu::addMenuItem(String menuItem) {
-	menuItems.add(menuItem);	
+	menuItems.add(menuItem);
 }
 
 void Menu::setMenuItem(int i, String menuItem) {
@@ -165,7 +165,7 @@ void Menu::update() {
 
 	if(!menuItems.size()) return;
 
-	//if(selectable) 
+	//if(selectable)
 	{
 		if(EventHandler::down_pressed) {
 			//curSelMenuItem=(curSelMenuItem+1)%menuItems.size();
@@ -310,13 +310,13 @@ void EditBox::update() {
 	}
 	if(EventHandler::up_pressed) {
 		curCharacter--;
-		if(curCharacter<0) curCharacter = strlen((char*)characterList)-1; 
+		if(curCharacter<0) curCharacter = strlen((char*)characterList)-1;
 		curName[curNameIndex] = characterList[curCharacter];
 	}
 	if(EventHandler::down_pressed) {
 		curCharacter++;
 		int s = strlen((char*)characterList);
-		if(curCharacter>=s) curCharacter = 0;	
+		if(curCharacter>=s) curCharacter = 0;
 		curName[curNameIndex] = characterList[curCharacter];
 	}
 

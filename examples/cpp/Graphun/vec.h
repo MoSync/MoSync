@@ -84,19 +84,19 @@ public:
 
 	//! projects this vector onto v
 	inline void project(const vec2 &v)
-	{	
-		*this = projected(v);	
+	{
+		*this = projected(v);
 	}
 
 	//! returns this vector projected onto v
 	inline vec2 projected(const vec2 &v) const
-	{   
-		return v * (dot(v))/(v.dot(v));	
+	{
+		return v * (dot(v))/(v.dot(v));
 	}
 
 	//! computes the angle between 2 arbitrary vectors
 	inline float angle(const vec2 &v) const
-	{   
+	{
 		return acos((dot(v)) / (length()*v.length()));
 	}
 
@@ -183,19 +183,19 @@ public:
 
 	//! projects this vector onto v
 	inline void project(const vec3 &v)
-	{	
-		*this = projected(v);	
+	{
+		*this = projected(v);
 	}
 
 	//! returns this vector projected onto v
 	inline vec3 projected(const vec3 &v) const
-	{   
-		return v * (dot(v))/(v.dot(v));	
+	{
+		return v * (dot(v))/(v.dot(v));
 	}
 
 	//! computes the angle between 2 arbitrary vectors
 	inline float angle(const vec3 &v) const
-	{   
+	{
 		return acos((dot(v)) / (length()*v.length()));
 	}
 
@@ -249,7 +249,7 @@ public:
 		tmp1 = axis.x*axis.z*t;
 		tmp2 = axis.y*s;
 		float m20 = tmp1 - tmp2;
-		float m02 = tmp1 + tmp2;    
+		float m02 = tmp1 + tmp2;
 		tmp1 = axis.y*axis.z*t;
 		tmp2 = axis.x*s;
 		float m21 = tmp1 + tmp2;

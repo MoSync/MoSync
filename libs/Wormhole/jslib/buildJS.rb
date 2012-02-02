@@ -40,7 +40,7 @@ def copyWormholeJS
   dirList = DirectoriesToCopyWormholeJSTo
   dirList.each do |dirName|
     if(!File.exist?(dirName))
-      FileUtils.mkdir_p(dirname)
+      FileUtils.mkdir_p(dirName)
     end
     FileUtils.cp("wormhole.js", dirName)
   end

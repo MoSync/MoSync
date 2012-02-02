@@ -31,7 +31,7 @@ using namespace MapDemoUtil;
 namespace MapDemoUI
 {
 	//=========================================================================
-	class AppStyle 
+	class AppStyle
 	//=========================================================================
 	{
 	public:

@@ -31,7 +31,7 @@ int MAMain(void) {
 	//Logging print, Formatted, with end of LiNe.
 	//This function calls maWriteLog(), which logs binary data.
 	lprintfln("Hello World.");
-	
+
 	for(i=0; i<10; i++) {
 		lprintfln("Number %i", i);
 		if(i > 3) {
@@ -39,6 +39,6 @@ int MAMain(void) {
 			maPanic(0, "i became greater than 3!");
 		}
 	}
-	
+
 	return 0;
 }
