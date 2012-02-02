@@ -21,7 +21,7 @@ Properties
 Methods
 -------
 
-- __abort__: Aborts writing file. 
+- __abort__: Aborts writing file.
 - __seek__: Moves the file pointer to the byte specified.
 - __truncate__: Shortens the file to the length specified.
 - __write__: Writes data to the file.
@@ -33,11 +33,12 @@ The `FileWriter` object is a way to write files from the devices file system.  U
 
 A FileWriter is created for a single file. You can use it to write to a file multiple times. The FileWriter maintains the file's position and length attributes, so you can seek and write anywhere in the file. By default, the FileWriter writes to the beginning of the file (will overwrite existing data). Set the optional append boolean to true in the FileWriter's constructor to begin writing to the end of the file.
 
+NOTE: __write__ does not adjust the file length if you overwrite an existing file with shorter content. Use __truncate__ with the new content length to remove old data at the end of the file, if desired.
+
 Supported Platforms
 -------------------
 
 - Android
-- BlackBerry WebWorks (OS 5.0 and higher)
 - iOS
 - Windows Phone 7 ( Mango )
 
@@ -46,111 +47,111 @@ Seek Quick Example
 
 	function win(writer) {
 		// fast forwards file pointer to end of file
-		writer.seek(writer.length);	
+		writer.seek(writer.length);
 	};
 
 	var fail = function(evt) {
-    	console.log(error.code);
+		console.log(error.code);
 	};
-	
-    entry.createWriter(win, fail);
+
+	entry.createWriter(win, fail);
 
 Truncate Quick Example
 --------------------------
 
 	function win(writer) {
-		writer.truncate(10);	
+		writer.truncate(10);
 	};
 
 	var fail = function(evt) {
-    	console.log(error.code);
+		console.log(error.code);
 	};
-	
-    entry.createWriter(win, fail);
+
+	entry.createWriter(win, fail);
 
 Write Quick Example
--------------------	
+-------------------
 
 	function win(writer) {
 		writer.onwrite = function(evt) {
-        	console.log("write success");
-        };
+			console.log("write success");
+		};
 		writer.write("some sample text");
 	};
 
 	var fail = function(evt) {
-    	console.log(error.code);
+		console.log(error.code);
 	};
-	
-    entry.createWriter(win, fail);
+
+	entry.createWriter(win, fail);
 
 Append Quick Example
---------------------	
+--------------------
 
 	function win(writer) {
 		writer.onwrite = function(evt) {
-        	console.log("write success");
-        };
-        writer.seek(writer.length);
+			console.log("write success");
+		};
+		writer.seek(writer.length);
 		writer.write("appended text");
 	};
 
 	var fail = function(evt) {
-    	console.log(error.code);
+		console.log(error.code);
 	};
-	
-    entry.createWriter(win, fail);
-	
+
+	entry.createWriter(win, fail);
+
 Abort Quick Example
 -------------------
 
 	function win(writer) {
 		writer.onwrite = function(evt) {
-        	console.log("write success");
-        };
+			console.log("write success");
+		};
 		writer.write("some sample text");
 		writer.abort();
 	};
 
 	var fail = function(evt) {
-    	console.log(error.code);
+		console.log(error.code);
 	};
-	
-    entry.createWriter(win, fail);
+
+	entry.createWriter(win, fail);
 
 Full Example
 ------------
-    <!DOCTYPE html>
-    <html>
-      <head>
-        <title>FileWriter Example</title>
+	<!DOCTYPE html>
+	<html>
+	  <head>
+		<title>FileWriter Example</title>
 
-        <script type="text/javascript" charset="utf-8" src="phonegap.0.9.4.js"></script>
-        <script type="text/javascript" charset="utf-8">
+		<script type="text/javascript" charset="utf-8" src="wormhole.js"></script>
+		<script type="text/javascript" charset="utf-8">
 
-        // Wait for PhoneGap to load
-        //
-        document.addEventListener("deviceready", onDeviceReady, false);
+		// Wait for Wormhole to load
+		//
+		document.addEventListener("deviceready", onDeviceReady, false);
 
-        // PhoneGap is ready
-        //
-        function onDeviceReady() {
+		// Wormhole is ready
+		//
+		function onDeviceReady() {
 			window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, gotFS, fail);
-        }
-		
+		}
+
 		function gotFS(fileSystem) {
 			fileSystem.root.getFile("readme.txt", null, gotFileEntry, fail);
 		}
-		
+
 		function gotFileEntry(fileEntry) {
 			fileEntry.createWriter(gotFileWriter, fail);
 		}
-		
+
 		function gotFileWriter(writer) {
-	        writer.onwrite = function(evt) {
-                console.log("write success");
-            };
-            writer.write("some sample text");
+			writer.onwrite = function(evt) {
+				console.log("write success");
+			};
+			writer.write("some sample text");
 			// contents of file now 'some sample text'
 			writer.truncate(11);
 			// contents of file now 'some sample'
@@ -159,15 +160,15 @@ Full Example
 			writer.write(" different text");
 			// contents of file now 'some different text'
 		}
-        
-        function fail(error) {
-            console.log(error.code);
-        }
-        
-        </script>
-      </head>
-      <body>
-        <h1>Example</h1>
-        <p>Write File</p>
-      </body>
-    </html>
+
+		function fail(error) {
+			console.log(error.code);
+		}
+
+		</script>
+	  </head>
+	  <body>
+		<h1>Example</h1>
+		<p>Write File</p>
+	  </body>
+	</html>
