@@ -171,8 +171,6 @@ var FileSys = function()
 
 		/**
 		 * Write at the specified position (offset) in the file.
-		 * TODO: This does not seem to work. Seek seems to be broken
-		 * in PhoneGap. Truncates the file.
 		 */
 		fileSys.writeTextAtPosition = function(path, data, position, fun)
 		{
