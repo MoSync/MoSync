@@ -24,7 +24,7 @@ FileUtils.cp "template/WHTemplate.html", "tempDocs"
 FileUtils.cp "mdDocs/toc.md", "tempDocs"
 
 FileUtils.cd("tempDocs")
-system("../../../../tools/ReleasePackageBuild/JoDoc/jodoc --output ../html5  --title \"Wormhole API Documentation\" --template WHTemplate.html --toc toc.md --markdown ../../../../tools/ReleasePackageBuild/JoDoc/Markdown.pl *.js *.md")
+system("perl ../../../../tools/ReleasePackageBuild/JoDoc/jodoc --output ../html5  --title \"Wormhole API Documentation\" --template WHTemplate.html --toc toc.md --markdown ../../../../tools/ReleasePackageBuild/JoDoc/Markdown.pl *.js *.md")
 
 FileUtils.cd("../")
 style_list = Dir["template/**"]

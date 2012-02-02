@@ -16,6 +16,7 @@ functionList = Array.new
 parentName = "";
 moduleName = "";
 ignoreMode = false;
+markdown_mode = false
 if(!File.exist?("tempDocs"))
   FileUtils.mkdir("tempDocs")
 end
@@ -44,9 +45,10 @@ js_files.each { |mdFile, fileName|
             else
               parentName = functionName.strip
             end
-            newComments[1] = functionName.strip
-
-            newComments[2] = "=" * newComments[1].length
+            if(markdown_mode == false)
+              newComments[1] = functionName.strip
+              newComments[2] = "=" * newComments[1].length
+            end
             newComments.concat(destComments[1..-1])
             shouldAddFunctionDefinition = false
             if(!ignoreMode)
@@ -65,11 +67,18 @@ js_files.each { |mdFile, fileName|
           isInCodeBlock = false;
           shouldAddFunctionDefinition = true
           hasStartedParamBlock = false
-        elsif(line.strip.start_with?("*"))
-          strippedLine = line.strip[1..-1]
+        else
+          if(line.strip.start_with?("*"))
+            strippedLine = line.strip[1..-1]
+          else
+            strippedLine = line
+          end
           # Detecting Specific Tags in the comments
+
           if(strippedLine.strip.start_with?("@private"))
             ignoreMode = true
+          elsif(markdown_mode == true)
+            destComments.push(line)
           elsif(strippedLine.strip.start_with?("@param"))
             splittedLine = strippedLine.split(" ")
             if(hasStartedParamBlock == false)
@@ -79,8 +88,8 @@ js_files.each { |mdFile, fileName|
             else
               destComments.push(" * **#{splittedLine[1]}** #{splittedLine[2..-1].join(" ")}")
             end
-#          elsif(strippedLine.strip.start_with?("@endparam"))
-#            hasStartedParamBlock = false
+          elsif(strippedLine.strip.start_with?("@markdown"))
+            markdown_mode = true
           elsif(strippedLine.strip.start_with?("@returns"))
             splittedLine = strippedLine.split(" ")
             destComments.push("\n**ReturnValue:** #{splittedLine[1]} #{splittedLine[2..-1].join(" ")}")
