@@ -1,4 +1,4 @@
-require "jcode"
+
 require "fileutils"
 
 js_files = {
@@ -44,7 +44,6 @@ js_files.each { |mdFile, fileName|
             else
               parentName = functionName.strip
             end
-
             newComments[1] = functionName.strip
 
             newComments[2] = "=" * newComments[1].length
