@@ -79,7 +79,7 @@ function SensorRequest(type)
 		@param result A Sensor array with the sensors that were discovered in the system.
 	*/
 	this.events = {
-			"onsuccess": [],
+			"onsuccess": []
 	};
 	/**
 		Registers a callback to an event

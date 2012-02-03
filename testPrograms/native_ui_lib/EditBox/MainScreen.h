@@ -145,7 +145,7 @@ private:
 	 * @param mainLayout Widgets will be added to it.
 	 * @param text The text that will fill the label.
 	 */
-	void createDecimalEditBoxView(EditBox* editBox, VerticalLayout* mainLayout, MAUtil::String text);
+	void createDecimalEditBoxView(EditBox* &editBox, VerticalLayout* mainLayout, MAUtil::String text);
 
 	/**
 	 * Gets the index of a string. Returns -1 if the string is not inside the array

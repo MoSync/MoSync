@@ -638,7 +638,7 @@ SYSCALL(void, maConnWriteFromData(MAHandle conn, MAHandle data, int offset, int 
 }
 
 SYSCALL(MAHandle, maHttpCreate(const char* url, int method)) {
-	LOGST("Connect %i %s", gConnNextHandle, url);
+	LOGST("HttpCreate %i %s", gConnNextHandle, url);
 	if(gConnections.size() >= CONN_MAX)
 		return CONNERR_MAX;
 	HttpConnection* conn;

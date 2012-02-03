@@ -35,5 +35,5 @@
 	</condition>
 	<condition screenSize="xlarge">
 		<image id="RES_SCREEN_TYPE" resource="screen_xlarge.png" loadType="unloaded"/>
-	</condition>	
+	</condition>
 </resources>

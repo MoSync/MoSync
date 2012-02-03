@@ -1,46 +1,41 @@
-/*
-Copyright (C) 2012 MoSync AB
 
-This program is free software; you can redistribute it and/or
-modify it under the terms of the GNU General Public License,
-version 2, as published by the Free Software Foundation.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
-MA 02110-1301, USA.
-*/
-
-
-/*
+/**
  * @file mosync-pushnotifications.js
- * @author Bogdan
+ * @author Bogdan Iusco
  *
- * Implementation of push notification API.
+ * The library for supporting Push Notifications in Javascript and
+ * Web applications.
  */
 
+/**
+ * @private
+ */
 if (!PhoneGap.hasResource("pushNotification"))
 {
 PhoneGap.addResource("pushNotification");
 
 /**
  * This class provides access to device Push Notification Service.
- * @constructor
  */
 var PushNotificationManager = function() {
 	/**
-	 * The last known acceleration.  type=Acceleration()
+	 * The last received push notification.
+	 * @private
 	 */
 	this.lastPushNotificationData = null;
 };
 
 /**
- * @constructor
+ * Create a push notification object.
+ *
+ * @param message
+ *            push notification's message.
+ * @param sound
+ *           push notification's sound filename.
+ * @param iconBadge
+ *           push notification's icon badge.
+ *
+ * @private
  */
 var PushNotificationData = function(message, sound, iconBadge)
 {
@@ -50,32 +45,41 @@ var PushNotificationData = function(message, sound, iconBadge)
 };
 
 /**
- * Constants indicating the types of push notifications the application
- * accepts.
+ * Constants indicating the types of notifications the application accepts.
  * Specific to iOS.
- * On Android PUSH_NOTIFICATION_TYPE_ALERT is set by default.
+ * On Android alert type is set by default.
  */
 PushNotificationManager.type = {
-		/*
+		/**
 		 * The application accepts notifications that badge the application icon.
 		 */
 		badge: 1,
-		/*
+		/**
 		 * The application accepts alert sounds as notifications.
 		 */
 		sound: 2,
-		/*
+		/**
 		 * The application accepts alert messages as notifications.
 		 */
 		alert: 4
 	};
 
-
+/**
+ * Create a conection with a server.
+ * Device token / application id will be send to the remote server.
+ *
+ * @param serverAddress
+ *            server's ip address.
+ * @param serverPort
+ *            server's port number.
+ *
+ * @private
+ */
 PushNotificationManager.prototype.initialize = function(serverAddress, serverPort)
 {
 	PhoneGap.exec(
-			onSuccess,
-			onError,
+			null,
+			null,
 			"PushNotification",
 			"initialize",
 			{
@@ -87,10 +91,27 @@ PushNotificationManager.prototype.initialize = function(serverAddress, serverPor
 /**
  * Asynchronously starts the registration process.
  *
- * @param {Function} successCallback    The function to call when the
- * registration data is available.
- * @param {Function} errorCallback      The function to call when there
- * is an error getting the registration data.
+ * @param successCallback
+ *            the function to call when registration data is available.
+ * @param errorCallback
+ *            the function to call if an error occured while registering.
+ *
+ * Example
+ * -------
+ * \code
+ * // The application has successfuly registered for receiving push notifications.
+ * function push_notification_did_registered(token) {};
+ *
+ * // The application did not registered for receiving push notifications.
+ * function push_notification_failed_to_register(error) {}
+ *
+ * // Create a push notification manager object.
+ * var pushNotificationManager = new PushNotificationManager();
+ * pushNotificationManager.register(
+ *     push_notification_did_registered,
+ *     push_notification_failed_to_register);
+ * \endcode
+ *
  */
 PushNotificationManager.prototype.register = function(
 		successCallback,
@@ -124,12 +145,23 @@ PushNotificationManager.prototype.register = function(
 /**
  * Unregister application for receiving push notifications.
  *
- * @param {Function} callback    The function to call when the application
- * has unregistered. This method is called only on Android platform.
+ * @param callback
+ *            the function to call when the application has unregistered.
+ *            This method is called only on Android platform.
+ *
+ * Example
+ * -------
+ * \code
+ * function push_notification_did_unregister() {}
+ *
+ * // Create a push notification manager object.
+ * pushNotificationManager.unregister(push_notification_did_unregister);
+ *
+ * \endcode
+ *
  */
 PushNotificationManager.prototype.unregister = function(callback)
 {
-	console.log("PushNotificationManager.prototype.unregister");
 	if (callback && (typeof callback !== "function")) {
 		console.log("PushNotificationManager Error: callback is not a function");
 		return;
@@ -139,27 +171,57 @@ PushNotificationManager.prototype.unregister = function(callback)
 	{
 		callback();
 	};
+
 	PhoneGap.exec(onSuccess, null, "PushNotification", "unregister");
 };
 
 /**
  * Set push notification allowed types.
  * Call this method before registering the application for receiving push
- * notification.
+ * notifications.
  *
- * @param {Function} successCallback    The function to call on success. (OPTIONAL)
- * @param {Function} errorCallback      The function to call on error. (OPTIONAL)
- * @param {Array.<PushNotificationManager.type>} types    Types of the notifications
- * accepted by the application. If this param is not specified the application
- * will be registered for receiving all types of notification. This param is
- * applied only for iOS platform. Android platform will ignore this value.
+ * @param successCallback
+ *           the function to call if the types were set successfuly.
+ * @param errorCallback
+ *           the function to call if the types param is invalid.
+ * @param types
+ *           types of the notifications accepted by the application.
+ *           If this param is not specified the application will be registered
+ *           for receiving all types of notification.
+ *
+ * Example
+ * -------
+ * \code
+ * 	var typesArray = [PushNotificationManager.type.badge,
+ *                    PushNotificationManager.type.sound,
+ *                    PushNotificationManager.type.alert];
+ *
+ * // Create a push notification manager object.
+ * var pushNotificationManager = new PushNotificationManager();
+ * pushNotificationManager.types(null, null, typesArray);
+ *
+ * \endcode
  */
 PushNotificationManager.prototype.types = function(
 	successCallback,
 	errorCallback,
 	types)
 {
-	console.log("PushNotificationManager.prototype.types");
+	var onSuccess = function(result)
+	{
+		if (successCallback && (typeof successCallback == "function"))
+		{
+			successCallback(err);
+		}
+	};
+
+	var onError = function(err)
+	{
+		if (errorCallback && (typeof errorCallback == "function"))
+		{
+			 errorCallback(err);
+		}
+	};
 
 	// Convert types param to a bitmask.
 	var bitmask = 0;
@@ -177,25 +239,9 @@ PushNotificationManager.prototype.types = function(
 	}
 	else
 	{
-		console.log("PushNotificationManager Error: types is not an array");
+		onError("Types param is not an array");
 		return;
 	}
-
-	var onSuccess = function(result)
-	{
-		if (successCallback && (typeof successCallback == "function"))
-		{
-			successCallback(err);
-		}
-	};
-
-	var onError = function(err)
-	{
-		if (errorCallback && (typeof errorCallback == "function"))
-		{
-			 errorCallback(err);
-		}
-	};
 
 	PhoneGap.exec(onSuccess, onError, "PushNotification", "types", bitmask);
 };
@@ -204,29 +250,49 @@ PushNotificationManager.prototype.types = function(
  * Set the account ID used for registering the application.
  * Call this method before registering the application.
  *
- * @param {String} accountID    Is the ID of the account authorized to send messages
- * to the application, typically the email address of an account set up
- * by the application's developer.
- * On iOS platform this param is ignored.
+ * @param  accountID
+ *             the account id authorized to send messages to the application,
+ *             typically the email address of an account set up by the
+ *              application's developer.
+ *             Use this function only on Android platform.
  *
+ * Example
+ * -------
+ * \code
+ * // Create a push notification manager object.
+ * var pushNotificationManager = new PushNotificationManager();
+ * pushNotificationManager.accountID("your_account_id");
+ *
+ * \endcode
  */
 PushNotificationManager.prototype.accountID = function(
 	accountID)
 {
-	console.log("PushNotificationManager.prototype.accountID");
     PhoneGap.exec(null, null, "PushNotification", "accountID", accountID);
 };
 
 /**
- * Listener for push notification
+ * Listener for push notification.
  *
- * @param newPushNotificationCallback The function to call when a new push notification is received,
+ * @param callback
+ *            The function to call when a new push notification is received.
+ *
+ * Example
+ * -------
+ * \code
+ * function did_receive_push_notification(pushNotification)
+ * {
+ *     alert(pushNotification.message);
+ * }
+ * // Create a push notification manager object.
+ * var pushNotificationManager = new PushNotificationManager();
+ * pushNotificationManager.listener(did_receive_push_notification);
+ *
+ * \endcode
  */
-PushNotificationManager.prototype.listener = function(newPushNotificationCallback)
+PushNotificationManager.prototype.listener = function(callback)
 {
-	console.log("PushNotificationManager.prototype.listener");
-	// newPushNotificationCallback required
-	if (typeof newPushNotificationCallback !== "function") {
+	if (typeof callback !== "function") {
 		console.log("PushNotificationManager Error: newPushNotificationCallback is not a function");
 		return;
 	}
@@ -243,12 +309,15 @@ PushNotificationManager.prototype.listener = function(newPushNotificationCallbac
 			message,
 			sound,
 			iconBadge);
-		newPushNotificationCallback(self.lastPushNotificationData);
+		callback(self.lastPushNotificationData);
 	};
 
 	PhoneGap.exec(onSuccess, null, "PushNotification", "listener");
 };
 
+/**
+ * @private
+ */
 PhoneGap.addConstructor(function() {
 	if (typeof navigator.pushNotification === "undefined") {
 		navigator.pushNotification = new PushNotificationManager();

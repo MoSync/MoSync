@@ -479,6 +479,13 @@ namespace MoSync
 				BoundedStream s = new BoundedStream(bin, _offset, _size);
 				//Stream s = mem.GetStream(_offset, _size);
 				WriteableBitmap bitmap = MoSync.Util.CreateWriteableBitmapFromStream(s);
+				/*if (bitmap == null)
+				{
+					byte[] buffer = new byte[_size];
+					s.Position = 0;
+					s.Read(buffer, 0, _size);
+					Util.WriteBytesToFile(buffer, _data.ToString() + ".png", FileMode.Create);
+				}*/
 				s.Close();
 
 				if (bitmap == null)

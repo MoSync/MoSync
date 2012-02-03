@@ -1,7 +1,7 @@
 Push Notifications
 ==================
 
-Support for Push Notifications and local device notifications.
+>Support for Push Notifications and local device notifications.
 
 Methods
 -------

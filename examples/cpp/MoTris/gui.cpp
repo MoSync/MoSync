@@ -123,7 +123,6 @@ void Menu::show() {
 	}
 }
 
-#ifdef MA_PROF_SUPPORT_STYLUS
 int Menu::handlePointerPress(MAPoint2d point)
 {
 	int index = -1;
@@ -154,7 +153,6 @@ int Menu::handlePointerPress(MAPoint2d point)
 	}
 	return index;
 }
-#endif	// MA_PROF_SUPPORT_STYLUS
 
 void Menu::update() {
 	if(EventHandler::updated) {

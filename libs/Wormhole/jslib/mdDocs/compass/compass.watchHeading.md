@@ -3,8 +3,11 @@ compass.watchHeading
 
 At a regular interval, get the compass heading in degrees.
 
-    var watchID = navigator.compass.watchHeading(compassSuccess, compassError, [compassOptions]);
-                                                           
+	var watchID = navigator.compass.watchHeading(
+		compassSuccess,
+		compassError,
+		[compassOptions]);
+
 Description
 -----------
 
@@ -18,88 +21,87 @@ Supported Platforms
 -------------------
 
 - Android
-- iPhone
+- iOS
 - Windows Phone 7 ( Mango ) if available in hardware
 
 
 Quick Example
 -------------
 
-    function onSuccess(heading) {
-        var element = document.getElementById('heading');
-        element.innerHTML = 'Heading: ' + heading.magneticHeading;
-    };
+	function onSuccess(heading) {
+		var element = document.getElementById('heading');
+		element.innerHTML = 'Heading: ' + heading.magneticHeading;
+	};
 
-    function onError(compassError) {
-            alert('Compass error: ' + compassError.code);
-    };
+	function onError(compassError) {
+		alert('Compass error: ' + compassError.code);
+	};
 
-    var options = { frequency: 3000 };  // Update every 3 seconds
-    
-    var watchID = navigator.compass.watchHeading(onSuccess, onError, options);
+	var options = { frequency: 3000 };  // Update every 3 seconds
+
+	var watchID = navigator.compass.watchHeading(onSuccess, onError, options);
 
 Full Example
 ------------
 
-    <!DOCTYPE html>
-    <html>
-      <head>
-        <title>Compass Example</title>
+	<!DOCTYPE html>
+	<html>
+	<head>
+		<title>Compass Example</title>
 
-        <script type="text/javascript" charset="utf-8" src="phonegap.js"></script>
-        <script type="text/javascript" charset="utf-8">
+		<script type="text/javascript" charset="utf-8" src="js/wormhole.js"></script>
+		<script type="text/javascript" charset="utf-8">
 
-        // The watch id references the current `watchHeading`
-        var watchID = null;
-        
-        // Wait for PhoneGap to load
-        //
-        document.addEventListener("deviceready", onDeviceReady, false);
+		// The watch id references the current `watchHeading`
+		var watchID = null;
 
-        // PhoneGap is ready
-        //
-        function onDeviceReady() {
-            startWatch();
-        }
+		// Wait for Wormhole to load
+		//
+		document.addEventListener("deviceready", onDeviceReady, false);
 
-        // Start watching the compass
-        //
-        function startWatch() {
-            
-            // Update compass every 3 seconds
-            var options = { frequency: 3000 };
-            
-            watchID = navigator.compass.watchHeading(onSuccess, onError, options);
-        }
-        
-        // Stop watching the compass
-        //
-        function stopWatch() {
-            if (watchID) {
-                navigator.compass.clearWatch(watchID);
-                watchID = null;
-            }
-        }
-        
-        // onSuccess: Get the current heading
-        //
-        function onSuccess(heading) {
-            var element = document.getElementById('heading');
-            element.innerHTML = 'Heading: ' + heading.magneticHeading;
-        }
+		// Wormhole is ready
+		//
+		function onDeviceReady() {
+			startWatch();
+		}
 
-        // onError: Failed to get the heading
-        //
-        function onError(compassError) {
-            alert('Compass error: ' + compassError.code);
-        }
+		// Start watching the compass
+		//
+		function startWatch() {
 
-        </script>
-      </head>
-      <body>
-        <div id="heading">Waiting for heading...</div>
-        <button onclick="startWatch();">Start Watching</button>
-        <button onclick="stopWatch();">Stop Watching</button>
-      </body>
-    </html>
-    
+			// Update compass every 3 seconds
+			var options = { frequency: 3000 };
+
+			watchID = navigator.compass.watchHeading(onSuccess, onError, options);
+		}
+
+		// Stop watching the compass
+		//
+		function stopWatch() {
+			if (watchID) {
+				navigator.compass.clearWatch(watchID);
+				watchID = null;
+			}
+		}
+
+		// onSuccess: Get the current heading
+		//
+		function onSuccess(heading) {
+			var element = document.getElementById('heading');
+			element.innerHTML = 'Heading: ' + heading.magneticHeading;
+		}
+
+		// onError: Failed to get the heading
+		//
+		function onError(compassError) {
+			alert('Compass error: ' + compassError.code);
+		}
+
+		</script>
+	</head>
+	<body>
+		<div id="heading">Waiting for heading...</div>
+		<button onclick="startWatch();">Start Watching</button>
+		<button onclick="stopWatch();">Stop Watching</button>
+	</body>
+	</html>
