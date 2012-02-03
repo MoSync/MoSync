@@ -17,7 +17,6 @@ pg_files.each { |fileName|
   end
     }
 
-
 puts "running converter"
 system "ruby joDocConverter.rb"
 FileUtils.cp "template/WHTemplate.html", "tempDocs"

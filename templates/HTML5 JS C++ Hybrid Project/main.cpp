@@ -142,7 +142,7 @@ public:
 			{
 				mPhoneGapMessageHandler.handlePhoneGapMessage(message);
 			}
-			// Here we add your own messages. See index.html for
+			// Here we add our own messages. See index.html for
 			// the JavaScript code used to send the message.
 			else if (message.is("Custom"))
 			{

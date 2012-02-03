@@ -3,9 +3,9 @@ geolocationError
 
 The user's callback function that is called when there is an error for geolocation functions.
 
-    function(error) {
-        // Handle the error
-    }
+	function(error) {
+		// Handle the error
+	}
 
 Parameters
 ----------

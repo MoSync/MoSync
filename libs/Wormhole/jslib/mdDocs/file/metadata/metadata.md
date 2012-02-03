@@ -17,7 +17,6 @@ Supported Platforms
 -------------------
 
 - Android
-- BlackBerry WebWorks (OS 5.0 and higher)
 - iOS
 - Windows Phone 7 ( Mango )
 
@@ -27,6 +26,6 @@ Quick Example
 	function win(metadata) {
 		console.log("Last Modified: " + metadata.modificationTime);
 	}
-	
+
 	// Request the metadata object for this entry
 	entry.getMetadata(win, null);
