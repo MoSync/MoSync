@@ -336,6 +336,7 @@ namespace MoSync
 			syscalls.maConnect = delegate(int _url)
 			{
 				String url = core.GetDataMemory().ReadStringAtAddress(_url);
+				//Util.Log("maConnect(" + url + ")\n");
 				if (url.StartsWith("btspp"))
 					return MoSync.Constants.CONNERR_UNAVAILABLE;
 				Uri uri = new Uri(url);
@@ -431,6 +432,7 @@ namespace MoSync
 			syscalls.maHttpCreate = delegate(int _url, int _method)
 			{
 				String url = core.GetDataMemory().ReadStringAtAddress(_url);
+				//Util.Log("maHttpCreate(" + url + ")\n");
 				Uri uri = new Uri(url);
 				WebRequestConnection c = new WebRequestConnection(uri, mNextConnHandle, _method);
 				mConnections.Add(mNextConnHandle, c);
