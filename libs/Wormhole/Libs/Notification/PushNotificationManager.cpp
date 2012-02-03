@@ -89,18 +89,16 @@ namespace Wormhole
 			}
 			else if (message.getParam("action") == "accountID")
 			{
-				printf("PushNotificationManager::handleMessage set accountID");
 				mAccountID = this->parseJSString(message.getParam("args"));
 			}
 			else if (message.getParam("action") == "initialize")
 			{
-				MAUtil::String serverAddress = message.getParam("serverAddress");
-				int serverPort = stringToInteger(message.getParam("serverPort"));
+				MAUtil::String serverAddress = message.getArgsField("serverAddress");
+				int serverPort = stringToInteger(message.getArgsField("serverPort"));
 				connectToServer(serverAddress, serverPort);
 			}
 			else if (message.getParam("action") == "register")
 			{
-				printf("PushNotificationManager::handleMessage register");
 				mRegistrationCallBack = message.getParam("PhoneGapCallBackId");
 				NotificationManager::getInstance()->registerPushNotification(
 					mPushNotificationTypes,
@@ -108,13 +106,11 @@ namespace Wormhole
 			}
 			else if (message.getParam("action") == "unregister")
 			{
-				printf("PushNotificationManager::handleMessage unregister");
 				mUnregisterCallBack = message.getParam("PhoneGapCallBackId");
 				NotificationManager::getInstance()->unregisterPushNotification();
 			}
 			else if (message.getParam("action") == "listener")
 			{
-				printf("PushNotificationManager::handleMessage listener");
 				mListenerCallBack = message.getParam("PhoneGapCallBackId");
 			}
 		}
@@ -127,8 +123,6 @@ namespace Wormhole
 	void PushNotificationManager::didReceivePushNotification(
 		PushNotification& pushNotification)
 	{
-		printf("PushNotificationManager::didReceivePushNotification");
-
 		char data[JS_BUF_SIZE];
 		MAUtil::String message;
 		if (pushNotification.containsMessage())
@@ -185,7 +179,6 @@ namespace Wormhole
 	 */
 	void PushNotificationManager::didApplicationUnregister()
 	{
-		printf("PushNotificationManager::didApplicationUnregister");
 		mMessageHandler->callSuccess(
 			mUnregisterCallBack,
 			PHONEGAP_CALLBACK_STATUS_OK,
@@ -195,10 +188,9 @@ namespace Wormhole
 	/**
 	 * Called if the application did not registered for push notifications.
 	 */
-	void PushNotificationManager::didFaildToRegister(
+	void PushNotificationManager::didFailedToRegister(
 		MAUtil::String& error)
 	{
-		printf("PushNotificationManager::didFaildToRegister");
 		String errorJSONString = JSONMessage::JSONStringify(error.c_str());
 		if (errorJSONString.length() > 1)
 		{
