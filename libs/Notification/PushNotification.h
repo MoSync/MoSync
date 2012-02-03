@@ -16,6 +16,15 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301, USA.
 */
 
+/*! \addtogroup NotificationLib
+ *  @{
+ */
+
+/**
+ *  @defgroup NotificationLib Notification Library
+ *  @{
+ */
+
 /**
  * @file PushNotification.h
  * @author Emma Tresanszki and Bogdan Iusco
@@ -34,13 +43,16 @@ MA 02110-1301, USA.
 
 #include <MAUtil/String.h>
 
+/**
+* \brief MoSync Notification API classes.
+*/
 namespace Notification
 {
     // Forward declaration
     class NotificationManager;
 
     /**
-     * Push notifications are used for displaying alerts, playing sounds
+     * @brief Push notifications are used for displaying alerts, playing sounds
      * and for badging application icon.
      * A push notification is send from a server and received by an application.
      * An application can register for receiving push notifications using
@@ -164,3 +176,5 @@ namespace Notification
 }
 
 #endif /* NOTIFICATION_PUSH_NOTIFICATION_H_ */
+
+/*! @} */
