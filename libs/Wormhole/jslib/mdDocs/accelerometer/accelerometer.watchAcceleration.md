@@ -3,10 +3,11 @@ accelerometer.watchAcceleration
 
 At a regular interval, get the acceleration along the x, y, and z axis.
 
-    var watchID = navigator.accelerometer.watchAcceleration(accelerometerSuccess,
-                                                           accelerometerError,
-                                                           [accelerometerOptions]);
-                                                           
+	var watchID = navigator.accelerometer.watchAcceleration(
+		accelerometerSuccess,
+		accelerometerError,
+		[accelerometerOptions]);
+
 Description
 -----------
 
@@ -20,97 +21,89 @@ Supported Platforms
 -------------------
 
 - Android
-- BlackBerry WebWorks (OS 5.0 and higher)
-- iPhone
-
+- iOS
+- Windows Phone 7 ( Mango )
 
 Quick Example
 -------------
 
-    function onSuccess(acceleration) {
-        alert('Acceleration X: ' + acceleration.x + '\n' +
-              'Acceleration Y: ' + acceleration.y + '\n' +
-              'Acceleration Z: ' + acceleration.z + '\n' +
-              'Timestamp: '      + acceleration.timestamp + '\n');
-    };
+	function onSuccess(acceleration) {
+		alert('Acceleration X: ' + acceleration.x + '\n' +
+			'Acceleration Y: ' + acceleration.y + '\n' +
+			'Acceleration Z: ' + acceleration.z + '\n' +
+			'Timestamp: ' + acceleration.timestamp + '\n');
+	};
 
-    function onError() {
-        alert('onError!');
-    };
+	function onError() {
+		alert('onError!');
+	};
 
-    var options = { frequency: 3000 };  // Update every 3 seconds
-    
-    var watchID = navigator.accelerometer.watchAcceleration(onSuccess, onError, options);
+	var options = { frequency: 3000 };  // Update every 3 seconds
+
+	var watchID = navigator.accelerometer.watchAcceleration(onSuccess, onError, options);
 
 Full Example
 ------------
 
-    <!DOCTYPE html>
-    <html>
-      <head>
-        <title>Acceleration Example</title>
+	<!DOCTYPE html>
+	<html>
+	<head>
+		<title>Acceleration Example</title>
 
-        <script type="text/javascript" charset="utf-8" src="phonegap.js"></script>
-        <script type="text/javascript" charset="utf-8">
+		<script type="text/javascript" charset="utf-8" src="js/wormhole.js"></script>
+		<script type="text/javascript" charset="utf-8">
 
-        // The watch id references the current `watchAcceleration`
-        var watchID = null;
-        
-        // Wait for PhoneGap to load
-        //
-        document.addEventListener("deviceready", onDeviceReady, false);
+		// The watch id references the current `watchAcceleration`
+		var watchID = null;
 
-        // PhoneGap is ready
-        //
-        function onDeviceReady() {
-            startWatch();
-        }
+		// Wait for Wormhole to load
+		//
+		document.addEventListener("deviceready", onDeviceReady, false);
 
-        // Start watching the acceleration
-        //
-        function startWatch() {
-            
-            // Update acceleration every 3 seconds
-            var options = { frequency: 3000 };
-            
-            watchID = navigator.accelerometer.watchAcceleration(onSuccess, onError, options);
-        }
-        
-        // Stop watching the acceleration
-        //
-        function stopWatch() {
-            if (watchID) {
-                navigator.accelerometer.clearWatch(watchID);
-                watchID = null;
-            }
-        }
-        
-        // onSuccess: Get a snapshot of the current acceleration
-        //
-        function onSuccess(acceleration) {
-            var element = document.getElementById('accelerometer');
-            element.innerHTML = 'Acceleration X: ' + acceleration.x + '<br />' +
-                                'Acceleration Y: ' + acceleration.y + '<br />' +
-                                'Acceleration Z: ' + acceleration.z + '<br />' +
-                                'Timestamp: '      + acceleration.timestamp + '<br />';
-        }
+		// Wormhole is ready
+		//
+		function onDeviceReady() {
+			startWatch();
+		}
 
-        // onError: Failed to get the acceleration
-        //
-        function onError() {
-            alert('onError!');
-        }
+		// Start watching the acceleration
+		//
+		function startWatch() {
 
-        </script>
-      </head>
-      <body>
-        <div id="accelerometer">Waiting for accelerometer...</div>
-      </body>
-    </html>
-    
- iPhone Quirks
--------------
+			// Update acceleration every 3 seconds
+			var options = { frequency: 3000 };
 
-- At the interval requested, PhoneGap will call the success callback function and pass the accelerometer results.
-- However, in requests to the device PhoneGap restricts the interval to minimum of every 40ms and a maximum of every 1000ms.
-  - For example, if you request an interval of 3 seconds (3000ms), PhoneGap will request an interval of 1 second from the device but invoke the success callback at the requested interval of 3 seconds.
+			watchID = navigator.accelerometer.watchAcceleration(onSuccess, onError, options);
+		}
+
+		// Stop watching the acceleration
+		//
+		function stopWatch() {
+			if (watchID) {
+				navigator.accelerometer.clearWatch(watchID);
+				watchID = null;
+			}
+		}
+
+		// onSuccess: Get a snapshot of the current acceleration
+		//
+		function onSuccess(acceleration) {
+			var element = document.getElementById('accelerometer');
+			element.innerHTML = 'Acceleration X: ' + acceleration.x + '<br />' +
+								'Acceleration Y: ' + acceleration.y + '<br />' +
+								'Acceleration Z: ' + acceleration.z + '<br />' +
+								'Timestamp: ' + acceleration.timestamp + '<br />';
+		}
+
+		// onError: Failed to get the acceleration
+		//
+		function onError() {
+			alert('onError!');
+		}
+
+		</script>
+	</head>
+	<body>
+		<div id="accelerometer">Waiting for accelerometer...</div>
+	</body>
+	</html>

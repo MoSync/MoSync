@@ -142,7 +142,6 @@ public:
 	**/
 
 	void keyPressEvent(int keyCode, int nativeCode) {
-#ifndef MA_PROF_SUPPORT_STYLUS
 		switch(keyCode) {
 			case MAK_FIRE:
 				if(y == FLOOR_Y)  {
@@ -158,7 +157,6 @@ public:
 			default:
 				break;
 		}
-#endif
 	}
 
 	virtual void pointerPressEvent(MAPoint2d p) {

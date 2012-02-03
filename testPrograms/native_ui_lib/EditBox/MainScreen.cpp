@@ -214,6 +214,7 @@ void MainScreen::createMainLayout()
 	mEditBox = new EditBox();
 	mEditBox->setPlaceholder("Enter text...");
 	mEditBox->fillSpaceHorizontally();
+	mEditBox->setHeight(100);
 	mMainLayout->addChild(mEditBox);
 
 	HorizontalLayout* layout = new HorizontalLayout();
@@ -236,6 +237,7 @@ void MainScreen::createMainLayout()
 	mKeyboardButton->fillSpaceHorizontally();
 	mMainLayout->addChild(mKeyboardButton);
 
+	// Create layout for widgets.
 	this->createDecimalEditBoxView(mMaxTextLengthEditBox, mMainLayout, MAX_TEXT_LENGTH_LABEL_TEXT);
 	this->createDecimalEditBoxView(mMaxLinesEditBox, mMainLayout, MAX_LINES_LABEL_TEXT);
 	this->createDecimalEditBoxView(mMinLinesEditBox, mMainLayout, MIN_LINES_LABEL_TEXT);
@@ -253,7 +255,7 @@ void MainScreen::createMainLayout()
  * @param editBox The editbox to be created and added on the screen.
  * @param mainLayout Widgets will be added to it.
  */
-void MainScreen::createDecimalEditBoxView(EditBox* editBox, VerticalLayout* mainLayout, String text)
+void MainScreen::createDecimalEditBoxView(EditBox* &editBox, VerticalLayout* mainLayout, String text)
 {
 	// Create layout for widgets.
 	HorizontalLayout* layout = new HorizontalLayout();
@@ -460,32 +462,36 @@ void MainScreen::editBoxTextChanged(
 		if (maxTextLength != 0)
 		{
 			mEditBox->setMaxLength(maxTextLength);
-			mGetTextLabel->setText("max text changed!");
+			mGetTextLabel->setText("Max text length changed!");
 		}
 	}
 	else if (editBox == mMaxLinesEditBox)
 	{
 		int maxLines = MAUtil::stringToInteger(
 			mMaxLinesEditBox->getText());
-		mMaxLinesEditBox->setMaxLines(maxLines);
+		mEditBox->setMaxLines(maxLines);
+		mGetTextLabel->setText("Max lines changed!");
 	}
 	else if (editBox == mMinLinesEditBox)
 	{
 		int minLines = MAUtil::stringToInteger(
 			mMinLinesEditBox->getText());
-		mMinLinesEditBox->setMinLines(minLines);
+		mEditBox->setMinLines(minLines);
+		mGetTextLabel->setText("Min lines changed!");
 	}
 	else if (editBox == mPlaceholderColorEditBox)
 	{
 		int placeHolderColor = MAUtil::stringToInteger(
 			mPlaceholderColorEditBox->getText());
-		mPlaceholderColorEditBox->setPlaceholderFontColor(placeHolderColor);
+		mEditBox->setPlaceholderFontColor(placeHolderColor);
+		mGetTextLabel->setText("Placeholder color changed!");
 	}
 	else if (editBox == mLinesNumberEditBox)
 	{
 		int linesNumber = MAUtil::stringToInteger(
 				mLinesNumberEditBox->getText());
-		mLinesNumberEditBox->setLinesNumber(linesNumber);
+		mEditBox->setLinesNumber(linesNumber);
+		mGetTextLabel->setText("Lines number changed!");
 	}
 }
 

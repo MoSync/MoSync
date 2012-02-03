@@ -19,10 +19,6 @@ MA 02110-1301, USA.
 #ifndef _EVENT_H_
 #define _EVENT_H_
 
-#ifdef MAPIP
-#include <maprofile.h>
-#endif
-
 class EventHandler {
 private:
 
@@ -31,10 +27,8 @@ public:
 	static bool left, right, up, down, fire, pound, star;
 	static bool lsk_pressed, rsk_pressed;
 	static bool lsk, rsk;
-#ifdef MA_PROF_SUPPORT_STYLUS
 	static bool pointer_pressed, pointer_released;
 	static MAPoint2d point;
-#endif	// MA_PROF_SUPPORT_STYLUS
 	static bool quit;
 	static bool updated;
 	static bool focus;

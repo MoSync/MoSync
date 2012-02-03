@@ -18,7 +18,6 @@ Supported Platforms
 -------------------
 
 - Android
-- BlackBerry WebWorks (OS 5.0 and higher)
 - iOS
 - Windows Phone 7 ( Mango )
 
@@ -36,23 +35,23 @@ File System Quick Example
 Full Example
 ------------
 
-    <!DOCTYPE html>
-    <html>
-      <head>
-        <title>File System Example</title>
+	<!DOCTYPE html>
+	<html>
+	  <head>
+		<title>File System Example</title>
 
-        <script type="text/javascript" charset="utf-8" src="phonegap.js"></script>
-        <script type="text/javascript" charset="utf-8">
+		<script type="text/javascript" charset="utf-8" src="js/wormhole.js"></script>
+		<script type="text/javascript" charset="utf-8">
 
-        // Wait for PhoneGap to load
-        //
-        document.addEventListener("deviceready", onDeviceReady, false);
+		// Wait for Wormhole to load
+		//
+		document.addEventListener("deviceready", onDeviceReady, false);
 
-        // PhoneGap is ready
-        //
-        function onDeviceReady() {
+		// Wormhole is ready
+		//
+		function onDeviceReady() {
 			window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, onFileSystemSuccess, fail);
-        }
+		}
 
 		function onFileSystemSuccess(fileSystem) {
 			console.log(fileSystem.name);
@@ -63,10 +62,10 @@ Full Example
 			console.log(evt.target.error.code);
 		}
 		
-        </script>
-      </head>
-      <body>
-        <h1>Example</h1>
-        <p>File System</p>
-      </body>
-    </html>
+		</script>
+	  </head>
+	  <body>
+		<h1>Example</h1>
+		<p>File System</p>
+	  </body>
+	</html>

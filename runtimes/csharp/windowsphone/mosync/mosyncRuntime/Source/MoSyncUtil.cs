@@ -345,8 +345,9 @@ namespace MoSync
 					im.SetSource(stream);
 					wb = new WriteableBitmap(im);
 				}
-				catch (Exception)
+				catch (Exception e)
 				{
+					Util.Log(e.StackTrace);
 					wb = null;
 				}
 			});

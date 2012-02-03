@@ -51,7 +51,7 @@
 			 */
 			function vibrate()
 			{
-				// Send to custom message beep to C++.
+				// Send message to C++ to make device vibrate.
 				// We use the JSON format. The message will
 				// be delivered to C++ in a JSON array.
 				mosync.bridge.sendJSON(
@@ -67,7 +67,7 @@
 			 */
 			function beep()
 			{
-				// Send to custom message beep to C++.
+				// Send message to C++ to make device beep.
 				// Here we used the string stream format.
 				mosync.bridge.send(["Custom", "beep"]);
 			}

@@ -21,9 +21,6 @@ MA 02110-1301, USA.
 
 #include <MAUtil/Vector.h>
 #include <MAUtil/String.h>
-#ifdef MAPIP
-#include <maprofile.h>
-#endif
 
 #include "event.h"
 
@@ -67,10 +64,7 @@ public:
 	int getCurrentlySelectedMenuIndex();
 	void show();
 	void update();
-
-#ifdef MA_PROF_SUPPORT_STYLUS
 	int handlePointerPress(MAPoint2d point);
-#endif	// MA_PROF_SUPPORT_STYLUS
 
 private:
 	int curSelMenuItem;

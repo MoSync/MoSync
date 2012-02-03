@@ -8,7 +8,7 @@ work.instance_eval do
 	@SOURCES = ['.']
 	@PREREQUISITES = [BundleTask.new(self, './Resources/LocalFiles.bin', './LocalFiles')]
 	@LSTFILES = ['Resources/Resources.lst']
-	@LIBRARIES = ['mautil', 'wormhole', 'mafs', 'nativeui']
+	@LIBRARIES = ['mautil', 'wormhole', 'mafs', 'nativeui', 'yajl', 'Notification']
 	@EXTRA_LINKFLAGS = standardMemorySettings(11)
 	@NAME = 'WebViewLoveSms'
 end
