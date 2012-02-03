@@ -30,21 +30,21 @@ namespace MapDemoUI
 	//=========================================================================
 	// Forces exit of the app.
 	//
-	class ExitAction: public Action 
+	class ExitAction: public Action
 	//=========================================================================
 	{
 	public:
 		ExitAction( MobletEx* moblet );
-		
+
 		virtual ~ExitAction( );
 		//
 		// Action overrides
 		//
 		virtual const char* getShortName( ) const;
 
-		virtual Action* clone( ) const 
+		virtual Action* clone( ) const
 		{
-			return newobject( ExitAction, new ExitAction( mMoblet ) ); 
+			return newobject( ExitAction, new ExitAction( mMoblet ) );
 		}
 
 	protected:

@@ -28,7 +28,7 @@ MA 02110-1301, USA.
 using namespace MAUI;
 using namespace MapDemoUtil;
 
-namespace MapDemoUI 
+namespace MapDemoUI
 {
 	//
 	// Forward declarations
@@ -49,15 +49,15 @@ namespace MapDemoUI
 	//
 	// Abstract class.
 	//
-	class ModalScreen : public Screen, 
-		public IKeyHandler, 
+	class ModalScreen : public Screen,
+		public IKeyHandler,
 		public Broadcaster<IModalScreenListener>,
 		public IClosable
 	//=========================================================================
 	{
 	public:
 		ModalScreen( );
-		
+
 		virtual ~ModalScreen( );
 		//
 		// public methods
@@ -77,7 +77,7 @@ namespace MapDemoUI
 		void pointerReleaseEvent(MAPoint2d point);
 
 		virtual void show( );
-		
+
 		virtual void show( Screen* previous );
 		//
 		// IKeyHandler implementation

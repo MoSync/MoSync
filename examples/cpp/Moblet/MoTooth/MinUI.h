@@ -239,7 +239,7 @@ namespace MinUI {
 	protected:
 		//Widget
 		void doDraw();
-		
+
 		MAHandle mHandle;
 	};
 

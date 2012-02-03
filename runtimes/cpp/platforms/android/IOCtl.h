@@ -759,7 +759,7 @@ namespace Base
 
 	int _maCameraFormatNumber(JNIEnv* jNIEnv, jobject jThis);
 
-	int _maCameraFormat(int index, int width, int height, JNIEnv* jNIEnv, jobject jThis);
+	int _maCameraFormat(int index, int sizeInfoBuffer, JNIEnv* jNIEnv, jobject jThis);
 
 	int _maCameraSetProperty(const char *property, const char* value,
 							JNIEnv* jNIEnv, jobject jThis);

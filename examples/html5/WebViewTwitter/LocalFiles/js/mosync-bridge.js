@@ -16,7 +16,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301, USA.
 */
 
-/**
+
+/*
  * @file mosync-bridge.js
  * @author Mikael Kindborg, Ali Sarrafi
  *
@@ -199,7 +200,7 @@ var mosync = (function()
 
 			// If there is a callback function supplied, create
 			// a callbackId and add it to the callback table.
-			if (undefined != callbackFun)
+			if (callbackFun)
 			{
 				callbackIdCounter = callbackIdCounter + 1;
 				callbackTable[callbackIdCounter] = callbackFun;
@@ -259,7 +260,7 @@ var mosync = (function()
 		{
 			// If there is a callback function supplied, create
 			// a callbackId and add it to the callback table.
-			if (undefined != callbackFun)
+			if (callbackFun)
 			{
 				callbackIdCounter = callbackIdCounter + 1;
 				callbackTable[callbackIdCounter] = callbackFun;
@@ -383,7 +384,7 @@ var mosync = (function()
 		bridge.reply = function(callbackId)
 		{
 			var callbackFun = callbackTable[callbackId];
-			if (undefined != callbackFun)
+			if (callbackFun)
 			{
 				// Remove the first param, the callbackId.
 				var args = Array.prototype.slice.call(arguments);

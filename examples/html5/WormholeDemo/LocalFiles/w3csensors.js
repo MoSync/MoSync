@@ -14,7 +14,8 @@ function updateAccelW3C(sensorData){
 }
 
 /**
- * This function changes the state of the W3C accelerometer sensor when it's called
+ * This function changes the state of the W3C accelerometer
+ * sensor when it's called
  */
 function toggleAccelW3C()
 {
@@ -49,7 +50,8 @@ function updateMagDataW3C(sensorData){
 }
 
 /**
- * This function changes the state of the W3C magnetic field sensor when it's called
+ * This function changes the state of the W3C magnetic field
+ * sensor when it's called
  */
 function toggleMagFieldW3C()
 {
@@ -82,7 +84,8 @@ function updateOrientDataW3C(sensorData){
 }
 
 /**
- * This function changes the state of the W3C orientation sensor when it's called
+ * This function changes the state of the W3C orientation
+ * sensor when it's called
  */
 function toggleOrientationW3C()
 {
@@ -150,7 +153,8 @@ function updateProxDataW3C(sensorData){
 }
 
 /**
- * This function changes the state of the W3C proximity sensor when it's called
+ * This function changes the state of the W3C proximity sensor
+ * when it's called
  */
 function toggleProximityW3C()
 {

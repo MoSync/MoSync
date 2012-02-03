@@ -103,7 +103,7 @@ void FirstPersonCamera::updateAxes() {
 	mDirection = cameraOriginalLook;
 	mDirection.rotate(pitch, yaw, 0);
 	mDirection.normalize();
-		
+
 	mStrafeDirection = cameraOriginalStrafe;
 	mStrafeDirection.rotate(pitch, yaw, 0);
 	mStrafeDirection.normalize();

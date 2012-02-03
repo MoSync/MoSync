@@ -25,7 +25,7 @@ MA 02110-1301, USA.
 namespace MapDemoUI
 {
 	//=========================================================================
-	class CloseMenuAction: public Action 
+	class CloseMenuAction: public Action
 	//=========================================================================
 	{
 	public:
@@ -35,10 +35,10 @@ namespace MapDemoUI
 		// Action overrides
 		//
 		virtual const char* getShortName( ) const {  return "Back"; }
-		
-		virtual Action* clone( ) const 
+
+		virtual Action* clone( ) const
 		{
-			return newobject( CloseMenuAction, new CloseMenuAction( mMenu ) ); 
+			return newobject( CloseMenuAction, new CloseMenuAction( mMenu ) );
 		}
 
 	protected:

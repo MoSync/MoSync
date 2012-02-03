@@ -4058,14 +4058,14 @@ public class MoSyncThread extends Thread
 	 * @return 1 for success
 	 */
 
-	int maCameraFormat(int index, int width, int height)
+	int maCameraFormat(int index, final int format)
 	{
 		if(mMoSyncCameraController == null)
 		{
 			return IOCTL_UNAVAILABLE;
 		}
 
-		mMoSyncCameraController.addSize(index, width, height);
+		mMoSyncCameraController.getSize(index, format);
 		return 1;
 	}
 

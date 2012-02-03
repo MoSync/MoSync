@@ -4,18 +4,19 @@ require "fileutils"
 js_files = {
   "nativeui.md" => "mosync-nativeui.js",
   "bridge.md" => "mosync-bridge.js",
-  "sensormanager.md" => "mosync-sensormanager.js",
+ # "sensormanager.md" => "mosync-sensormanager.js",
   "pushnotifications.md" => "mosync-pushnotifications.js",
   "resource.md" =>"mosync-resource.js"
   }
 
-isInCodeBlock = false
+isInCommentBlock = false
 hasStartedParamBlock = false
 shouldAddFunctionDefinition = false
 functionList = Array.new
 parentName = "";
 moduleName = "";
 ignoreMode = false;
+markdown_mode = false
 if(!File.exist?("tempDocs"))
   FileUtils.mkdir("tempDocs")
 end
@@ -23,11 +24,11 @@ js_files.each { |mdFile, fileName|
   sourceFile  = File.new(fileName, "r")
   destFile = File.new("tempDocs/Fixed_#{fileName}", "w")
     while(line = sourceFile.gets)
-      if(isInCodeBlock == false)
+      if(isInCommentBlock == false)
         if(line.strip.start_with?("/**"))
           destComments = Array.new
           destComments.push("#{line.strip}")
-          isInCodeBlock = true;
+          isInCommentBlock = true;
         elsif(shouldAddFunctionDefinition == true)
           if(line.strip != "")
             newComments = Array.new
@@ -44,9 +45,11 @@ js_files.each { |mdFile, fileName|
             else
               parentName = functionName.strip
             end
-            newComments[1] = functionName.strip
-
-            newComments[2] = "=" * newComments[1].length
+            if(markdown_mode == false)
+              newComments[1] = functionName.strip
+              newComments[2] = "=" * newComments[1].length
+            end
+            markdown_mode = false
             newComments.concat(destComments[1..-1])
             shouldAddFunctionDefinition = false
             if(!ignoreMode)
@@ -62,14 +65,21 @@ js_files.each { |mdFile, fileName|
       else
         if(line.include?("*/"))
           destComments.push("#{line.strip}\n")
-          isInCodeBlock = false;
+          isInCommentBlock = false;
           shouldAddFunctionDefinition = true
           hasStartedParamBlock = false
-        elsif(line.strip.start_with?("*"))
-          strippedLine = line.strip[1..-1]
+        else
+          if(line.strip.start_with?("*"))
+            strippedLine = line.strip[1..-1]
+          else
+            strippedLine = line.strip
+          end
           # Detecting Specific Tags in the comments
+
           if(strippedLine.strip.start_with?("@private"))
             ignoreMode = true
+          elsif(markdown_mode == true)
+            destComments.push(strippedLine)
           elsif(strippedLine.strip.start_with?("@param"))
             splittedLine = strippedLine.split(" ")
             if(hasStartedParamBlock == false)
@@ -79,15 +89,13 @@ js_files.each { |mdFile, fileName|
             else
               destComments.push(" * **#{splittedLine[1]}** #{splittedLine[2..-1].join(" ")}")
             end
-#          elsif(strippedLine.strip.start_with?("@endparam"))
-#            hasStartedParamBlock = false
+          elsif(strippedLine.strip.start_with?("@markdown"))
+            markdown_mode = true
           elsif(strippedLine.strip.start_with?("@returns"))
             splittedLine = strippedLine.split(" ")
             destComments.push("\n**ReturnValue:** #{splittedLine[1]} #{splittedLine[2..-1].join(" ")}")
           elsif(strippedLine.strip.start_with?("\\code"))
             enteredCodeMode = true
-            destComments.push("Example\n");
-            destComments.push("-------\n");
           elsif(strippedLine.strip.start_with?("\\endcode"))
             enteredCodeMode = false
             destComments.push("\n");

@@ -22,13 +22,15 @@ DirectoriesToCopyWormholeJSTo = [
   "../../../templates/HTML5 JS WebUI Project/",
   "../../../examples/html5/WormholeDemo/LocalFiles/js/",
   "../../../examples/html5/WormholeNativeUIDemo/LocalFiles/js/",
-  "../../../testPrograms/PhoneGapMoSync/LocalFiles/js/"
+  "../../../testPrograms/PhoneGapMoSync/LocalFiles/js/",
+  "../../../testPrograms/phonegap/WormholePushNotificationTest/LocalFiles/js/"
 ]
 
 # Specify directories to copy mosync-bridge.js to.
 DirectoriesToCopyMoSyncBridgeTo = [
   "../../../examples/html5/WebViewLoveSMS/LocalFiles/js/",
   "../../../examples/html5/WebViewTwitter/LocalFiles/js/",
+  "../../../examples/html5/NFCExample/LocalFiles/js/",
   "../../../testPrograms/WormholeBenchmark/LocalFiles/js/"
 ]
 
@@ -38,6 +40,9 @@ Divider = "\n// =============================================================\n/
 def copyWormholeJS
   dirList = DirectoriesToCopyWormholeJSTo
   dirList.each do |dirName|
+    if(!File.exist?(dirName))
+      FileUtils.mkdir_p(dirName)
+    end
     FileUtils.cp("wormhole.js", dirName)
   end
 end

@@ -151,7 +151,7 @@ void Grid::initContext(int w, int h) {
 	initGL();
 	resizeWindow(0, 0, width, height);
 }
-	
+
 void Grid::setShadingEnabled(bool enabled) {
 	mShadingEnabled = enabled;
 }
@@ -297,4 +297,3 @@ void Grid::updateGrid() {
 		y+=deltaY;
 	}
 }
-

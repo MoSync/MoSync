@@ -259,10 +259,10 @@ void MainScreen::didApplicationRegistered(MAUtil::String& token)
 /**
  * Called if the application did not registered for push notification.
  */
-void MainScreen::didFaildToRegister(
+void MainScreen::didFailedToRegister(
     MAUtil::String& error)
 {
-    printf("MainScreen::didFaildToRegister %s", error.c_str());
+    printf("MainScreen::didFailedToRegister %s", error.c_str());
     mConnection->sendData(error);
     maMessageBox(REGISTRATION_ERROR_TITLE, error.c_str());
 }

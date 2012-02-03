@@ -1,15 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project supports-build-configs="true" version="1.2">
+<project supports-build-configs="true" version="1.4">
 <build.cfg id="Debug" types="Debug"/>
 <build.cfg id="Release" types="Release"/>
+<criteria>
+<filter type="com.mobilesorcery.sdk.capabilities.devices.elementfactory">
+<capabilities optional="" required="File\ Storage Internet\ Access"/>
+</filter>
+</criteria>
 <properties>
 <property key="build.prefs:additional.include.paths/Debug" value=""/>
 <property key="build.prefs:additional.include.paths/Release" value=""/>
 <property key="build.prefs:additional.libraries" value="MAUtil.lib"/>
-<property key="build.prefs:additional.libraries/Debug" value="MAUtilD.lib, NativeUID.lib, RescompilerD.lib"/>
-<property key="build.prefs:additional.libraries/Release" value="MAUtil.lib, NativeUI.lib, Rescompiler.lib"/>
+<property key="build.prefs:additional.libraries/Debug" value="MAUtilD.lib, NativeUID.lib"/>
+<property key="build.prefs:additional.libraries/Release" value="MAUtil.lib, NativeUI.lib"/>
 <property key="build.prefs:additional.library.paths/Debug" value=""/>
 <property key="build.prefs:additional.library.paths/Release" value=""/>
+<property key="build.prefs:app.permissions" value="File\ Storage Internet\ Access Vibration"/>
 <property key="build.prefs:extra.link.sw/Debug" value=""/>
 <property key="build.prefs:extra.link.sw/Release" value=""/>
 <property key="build.prefs:extra.res.sw/Debug" value=""/>
@@ -26,6 +32,10 @@
 <property key="dependency.strategy" value="0"/>
 <property key="excludes/Debug" value=""/>
 <property key="excludes/Release" value=""/>
+<property key="profile.mgr.type" value="0"/>
+<property key="symbian.uids:uid.s60v2uid" value="0x073bc609"/>
+<property key="symbian.uids:uid.s60v3uid" value="0xe9f999c9"/>
 <property key="template.id" value="project.nativeui"/>
+<property key="winmobilecs:guid" value="03998400-2af0-102f-800e-a3d013feb766"/>
 </properties>
 </project>

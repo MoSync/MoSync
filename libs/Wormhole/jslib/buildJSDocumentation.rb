@@ -17,20 +17,20 @@ pg_files.each { |fileName|
   end
     }
 
-
 puts "running converter"
 system "ruby joDocConverter.rb"
 FileUtils.cp "template/WHTemplate.html", "tempDocs"
 FileUtils.cp "mdDocs/toc.md", "tempDocs"
 
 FileUtils.cd("tempDocs")
+system("chmod +x ../../../../tools/ReleasePackageBuild/JoDoc/jodoc")
 system("../../../../tools/ReleasePackageBuild/JoDoc/jodoc --output ../html5  --title \"Wormhole API Documentation\" --template WHTemplate.html --toc toc.md --markdown ../../../../tools/ReleasePackageBuild/JoDoc/Markdown.pl *.js *.md")
 
 FileUtils.cd("../")
-style_list = Dir["template/**/**"]
-
+style_list = Dir["template/**"]
+puts style_list
 style_list.each { |file|
-  FileUtils.cp file, "html5/"
+  FileUtils.cp_r file, "html5/"
 }
 
 FileUtils.cp "html5/index.md.html", "html5/index.html"
@@ -45,7 +45,13 @@ html_files.each do |filename|
     dest_doc = Nokogiri::HTML(File.read(filename))
     content_dest = dest_doc.css('#sidebar')[0]
     content_dest.inner_html = content_source.inner_html
+    #prettify the code
+    dest_doc.css('#contents_div pre').each do |tag|
+      tag['class'] = 'prettyprint'
+    end
+
     File.open(filename, 'w') { |file| file.write dest_doc.to_html }
+
   end
 end
 FileUtils.rm_rf "tempDocs"

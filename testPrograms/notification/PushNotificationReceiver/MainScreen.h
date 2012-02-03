@@ -105,7 +105,7 @@ private:
     /**
      * Called if the application did not registered for push notifications.
      */
-    virtual void didFaildToRegister(
+    virtual void didFailedToRegister(
         MAUtil::String& error);
 
     /**

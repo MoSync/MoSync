@@ -29,7 +29,7 @@ namespace HelloLayerMap
 	{
 	public:
 		HelloLayerMapMoblet( );
-		
+
 		virtual ~HelloLayerMapMoblet( );
 
 		void Terminate() { mRun = false; }

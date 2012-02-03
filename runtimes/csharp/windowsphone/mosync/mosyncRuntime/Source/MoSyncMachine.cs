@@ -64,20 +64,16 @@ namespace MoSync
 
         private void ThreadEntry()
         {
-            if (System.Diagnostics.Debugger.IsAttached)
-                CoreRun();
-            else
-            {
-                try
-                {
-                    CoreRun();
-                }
-                catch (Exception e)
-                {
-                    System.Diagnostics.Debug.WriteLine(e.StackTrace);
-                    MoSync.Util.CriticalError(e.ToString());
-                };
-            }
+			try
+			{
+				CoreRun();
+			}
+			catch (Exception e)
+			{
+				System.Diagnostics.Debug.WriteLine(e.StackTrace);
+				MoSync.Util.ShowMessage(e.ToString());
+				return;
+			};
         }
 
         public void Run()
@@ -193,7 +189,7 @@ namespace MoSync
                     else
                     {   // no reload
                         throw e;
-                    }
+					}
                 }
             }
         }
