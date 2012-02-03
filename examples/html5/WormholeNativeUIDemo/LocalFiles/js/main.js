@@ -1,3 +1,36 @@
+	/**
+	* Handles key press events,
+	* Refer to Mosync documentation for key code details
+	*/
+	function close()
+	{
+		//Close the Application if the Back key is pressed
+		mosync.bridge.send([
+				"close"
+			], null);
+	}
+	/**
+	* Event comming from the library indicating the UI is ready to be shown
+	* We override the default operation of the library to add some new functionality.
+	*/
+	mosync.nativeui.UIReady = function()
+	{
+		document.addEventListener("deviceready", onDeviceReady, true);
+		//First get an instance of the scree nwe want to show
+		var mainScreen = document.getNativeElementById("mainScreen");
+		//show the screen
+		mainScreen.show();
+	};
+
+	/**
+	* Initialize the mosync.nativeui System
+	*/
+	function initialize()
+	{
+		document.addEventListener("backbutton", close, true);
+		mosync.nativeui.initUI();
+	}
+
 function onDeviceReady() {
 			var platform = document.getNativeElementById("DeviceOSLabel");
 			platform.setProperty("text" , "Platform: " + device.platform);
@@ -24,7 +57,7 @@ function toggleAccelPhonegap()
 		options.frequency = 1000;
 		accelPhonegapWatch = navigator.accelerometer.watchAcceleration(
 				updateAccelPhonegap, function(ex) {
-					alert("accel fail (" + ex.name + ": " + ex.message + ")");
+					console.log("accel fail (" + ex.name + ": " + ex.message + ")");
 				}, options);
 	}
 }
@@ -92,7 +125,6 @@ function toggleCompass()
 		});
 		compassWatch = null;
 	} else {
-		alert("starting Comapss watch");
 		var options = {};
 		options.frequency = 1000;
 		compassWatch = navigator.compass.watchHeading(
@@ -103,37 +135,6 @@ function toggleCompass()
 }
 
 function updateCompass(a) {
-	alert("updating compass");
 	var data = document.getNativeElementById("CompassLabel");
 	data.setProperty("text" , "Compass Heading: " +  a.magneticHeading);
-}
-
-var latestRecodedVideo = [];
-function captureVideo()
-{
-	navigator.device.capture.captureVideo(
-			function(mediaFiles)
-			{
-				alert(mediaFiles[0].fullPath);
-				latestRecodedVideo = mediaFiles;
-			},
-			function(error)
-			{
-				alert("Error " + error.code);
-			});
-}
-
-var latestCapturedImage = [];
-
-function captureImage()
-{
-	navigator.device.capture.captureImage(
-			function(mediaFiles)
-			{
-				latestCapturedImage = mediaFiles;
-			},
-			function(error)
-			{
-				alert("Error " + error.code);
-			});
 }

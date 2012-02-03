@@ -181,10 +181,10 @@ void MainScreen::didApplicationUnregister()
 /**
  * Called if the application did not registered for push notifications.
  */
-void MainScreen::didFaildToRegister(
+void MainScreen::didFailedToRegister(
     MAUtil::String& error)
 {
-	printf("MainScreen::didFaildToRegister");
+	printf("MainScreen::didFailedToRegister");
 	mDisplayNotificationScreen->pushRegistrationDone(false);
 }
 

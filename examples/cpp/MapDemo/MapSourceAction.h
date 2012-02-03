@@ -37,18 +37,18 @@ namespace MapDemo
 	{
 	public:
 		MapSourceAction( MapWidget* widget, MapSource* source, const char* label );
-		
+
 		virtual	~MapSourceAction( );
 		//
 		// Action overrides
 		//
 		virtual const char* getShortName( ) const;
-		
-		virtual Action* clone( ) const 
-		{ 
+
+		virtual Action* clone( ) const
+		{
 			return newobject( MapSourceAction, new MapSourceAction( mWidget, mSource, mLabel ) );
 		}
-		
+
 	protected:
 		//
 		// Action protected overrides

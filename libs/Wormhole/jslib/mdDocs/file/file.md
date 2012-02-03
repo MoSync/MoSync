@@ -13,11 +13,14 @@ Objects
 - FileError
 - FileReader
 - FileSystem
-- FileTransfer
-- FileTransferError
-- FileUploadOptions
-- FileUploadResult
 - FileWriter
 - Flags
 - LocalFileSystem
 - Metadata
+
+<!--
+- FileTransfer
+- FileTransferError
+- FileUploadOptions
+- FileUploadResult
+-->

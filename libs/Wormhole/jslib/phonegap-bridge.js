@@ -44,7 +44,7 @@ mosync.bridge.PhoneGap.send = function(callbackId, service, action, args)
 		"service": service,
 		"action": action,
 		"args": args,
-		"PhoneGapCallBackId": callbackId,
+		"PhoneGapCallBackId": callbackId
 	};
 
     // Call into Mosync C++ through bridge library.

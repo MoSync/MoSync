@@ -87,8 +87,8 @@ void (*instructionTable[16])(int);
          0xf9,0xf9,0x9e,0x9e,0x9e,
          0xf8,0x88,0xfe,0x99,0x9e,
          0xf8,0xf8,0xff,0x8f,0x88,
-   }; 
-    
+   };
+
 #define SCHIP_FONT_SIZE 10*10
 #define SCHIP_CHAR_SIZE 8*10
    byte schip_font[SCHIP_FONT_SIZE]=
@@ -97,13 +97,13 @@ void (*instructionTable[16])(int);
 	 0x18, 0x38, 0x58, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x3C,
 	 0x3E, 0x7F, 0xC3, 0x06, 0x0C, 0x18, 0x30, 0x60, 0xFF, 0xFF,
 	 0x3C, 0x7E, 0xC3, 0x03, 0x0E, 0x0E, 0x03, 0xC3, 0x7E, 0x3C,
-	 0x06, 0x0E, 0x1E, 0x36, 0x66, 0xC6, 0xFF, 0xFF, 0x06, 0x06, 
+	 0x06, 0x0E, 0x1E, 0x36, 0x66, 0xC6, 0xFF, 0xFF, 0x06, 0x06,
 	 0xFF, 0xFF, 0xC0, 0xC0, 0xFC, 0xFE, 0x03, 0xC3, 0x7E, 0x3C,
 	 0x3E, 0x7C, 0xC0, 0xC0, 0xFC, 0xFE, 0xC3, 0xC3, 0x7E, 0x3C,
 	 0xFF, 0xFF, 0x03, 0x06, 0x0C, 0x18, 0x30, 0x60, 0x60, 0x60,
 	 0x3C, 0x7E, 0xC3, 0xC3, 0x7E, 0x7E, 0xC3, 0xC3, 0x7E, 0x3C,
 	 0x3C, 0x7E, 0xC3, 0xC3, 0x7F, 0x3F, 0x03, 0x03, 0x3E, 0x7C,
-     }; 
+     };
 
 class EventHandler {
 private:
@@ -117,7 +117,7 @@ public:
 
 	EventHandler() {
 		left = false;
-		right = false; 
+		right = false;
 		up = false;
 		down = false;
 		fire = false;
@@ -136,10 +136,10 @@ public:
 			} else if(event.type == EVENT_TYPE_KEY_PRESSED) {
 				switch(event.key) {
 				case MAK_0:
-					keys[0] = true; 
+					keys[0] = true;
 					break;
 				case MAK_1:
-					keys[1] = true; 
+					keys[1] = true;
 					break;
 				case MAK_2:
 					keys[2] = true;
@@ -148,25 +148,25 @@ public:
 					keys[3] = true;
 					break;
 				case MAK_4:
-					keys[4] = true; 
+					keys[4] = true;
 					break;
 				case MAK_5:
 					keys[5] = true;
 					break;
 				case MAK_6:
-					keys[6] = true; 
+					keys[6] = true;
 					break;
 				case MAK_7:
 					keys[7] = true;
 					break;
 				case MAK_8:
-					keys[8] = true; 
+					keys[8] = true;
 					break;
 				case MAK_9:
 					keys[9] = true;
 					break;
 				case MAK_POUND:
-					keys[10] = true; 
+					keys[10] = true;
 					break;
 				case MAK_STAR:
 					keys[11] = true;
@@ -196,10 +196,10 @@ public:
 			else if(event.type == EVENT_TYPE_KEY_RELEASED) {
 				switch(event.key) {
 				case MAK_0:
-					keys[0] = false; 
+					keys[0] = false;
 					break;
 				case MAK_1:
-					keys[1] = false; 
+					keys[1] = false;
 					break;
 				case MAK_2:
 					keys[2] = false;
@@ -208,25 +208,25 @@ public:
 					keys[3] = false;
 					break;
 				case MAK_4:
-					keys[4] = false; 
+					keys[4] = false;
 					break;
 				case MAK_5:
 					keys[5] = false;
 					break;
 				case MAK_6:
-					keys[6] = false; 
+					keys[6] = false;
 					break;
 				case MAK_7:
 					keys[7] = false;
 					break;
 				case MAK_8:
-					keys[8] = false; 
+					keys[8] = false;
 					break;
 				case MAK_9:
 					keys[9] = false;
 					break;
 				case MAK_POUND:
-					keys[10] = false; 
+					keys[10] = false;
 					break;
 				case MAK_STAR:
 					keys[11] = false;
@@ -285,14 +285,14 @@ void drawOutLinedRect(int x1, int y1, int x2, int y2, int outLineCol, int bkgCol
 void inst_ext_scdown(int opcode) {
 }
 
-//00E0 	cls 	Clear the screen 	
+//00E0 	cls 	Clear the screen
 #define INST_EXT_CLS 0xe0
 void inst_ext_cls(int opcode) {
 	memset(screen, 0, currentScreenSize*sizeof(int));
 	for(int i = 0; i < currentScreenSize; i++) screen[i] |= DIRTY_FLAG;
 }
 
-//00EE 	rts 	return from subroutine call 	
+//00EE 	rts 	return from subroutine call
 #define INST_EXT_RTS 0xee
 void inst_ext_rts(int opcode) {
 	stackPointer--;
@@ -314,7 +314,7 @@ void inst_ext_scleft(int opcode) {
 void inst_ext_low(int opcode) {
 }
 
-//00FF 	high 	enable extended screen mode (128 x 64) 	Super only 
+//00FF 	high 	enable extended screen mode (128 x 64) 	Super only
 #define INST_EXT_HIGH 0xff
 void inst_ext_high(int opcode) {
 }
@@ -327,8 +327,8 @@ void (*inst_ext_table[256])(int);
 void init_inst_ext_table() {
 	for(int i = 0; i < 256; i++) {
 		inst_ext_table[i] = inst_ext_dummy;
-	}	
-	
+	}
+
 	for(int i = INST_EXT_SCDOWN_START; i <= INST_EXT_SCDOWN_END; i++) {
 		inst_ext_table[i] = inst_ext_scdown;
 	}
@@ -346,7 +346,7 @@ void inst_ext(int opcode) {
 	inst_ext_table[ext_opcode](opcode);
 }
 
-//1xxx  	 jmp xxx  	 jump to address xxx  
+//1xxx  	 jmp xxx  	 jump to address xxx
 #define INST_JMP 1
 void inst_jmp(int opcode) {
 	programCounter = opcode&0xfff;
@@ -359,26 +359,26 @@ void inst_jsr(int opcode) {
 	programCounter = opcode&0xfff;
 }
 
-//3rxx  	 skeq vr,xx  	 skip if register r = constant  	
-#define INST_SKEQ_CONST 3 
+//3rxx  	 skeq vr,xx  	 skip if register r = constant
+#define INST_SKEQ_CONST 3
 void inst_skeq_const(int opcode) {
 	if(regs[(opcode&0x0f00)>>8]==(opcode&0x00ff)) programCounter+=2;
 }
 
-//4rxx 	skne vr,xx 	skip if register r <> constant 	
+//4rxx 	skne vr,xx 	skip if register r <> constant
 #define INST_SKNE_CONST 4
 void inst_skne_const(int opcode) {
 	if(regs[(opcode&0x0f00)>>8]!=(opcode&0x00ff)) programCounter+=2;
 }
 
-//5ry0 	skeq vr,vy 	skip if register r = register y 	
-#define INST_SKEQ_REG 5 
+//5ry0 	skeq vr,vy 	skip if register r = register y
+#define INST_SKEQ_REG 5
 void inst_skeq_reg(int opcode) {
 	if(regs[(opcode&0x0f00)>>8]==regs[(opcode&0x00f0)>>4]) programCounter+=2;
 }
 
-//6rxx 	mov vr,xx 	move constant to register r 	
-#define INST_MOV_CONST 6 
+//6rxx 	mov vr,xx 	move constant to register r
+#define INST_MOV_CONST 6
 void inst_mov_const(int opcode) {
 	regs[(opcode&0x0f00)>>8] = opcode&0x00ff;
 }
@@ -393,31 +393,31 @@ void inst_add_const(int opcode) {
 
 // extended register instruction set
 
-// 8ry0 	mov vr,vy 	move register vy into vr 
+// 8ry0 	mov vr,vy 	move register vy into vr
 #define INST_REG_MOV 0
 void inst_reg_mov(int opcode) {
 	regs[(opcode&0x0f00)>>8] = regs[(opcode&0x00f0)>>4];
 }
 
-// 8ry1 	or rx,ry 	or register vy into register vx 	
+// 8ry1 	or rx,ry 	or register vy into register vx
 #define INST_REG_OR 1
 void inst_reg_or(int opcode) {
 	regs[(opcode&0x0f00)>>8] |= regs[(opcode&0x00f0)>>4];
 }
 
-// 8ry2 	and rx,ry 	and register vy into register vx 
+// 8ry2 	and rx,ry 	and register vy into register vx
 #define INST_REG_AND 2
 void inst_reg_and(int opcode) {
 	regs[(opcode&0x0f00)>>8] &= regs[(opcode&0x00f0)>>4];
 }
 
-// 8ry3  	xor rx,ry	exclusive or register ry into register rx  	
+// 8ry3  	xor rx,ry	exclusive or register ry into register rx
 #define INST_REG_XOR 3
 void inst_reg_xor(int opcode) {
 	regs[(opcode&0x0f00)>>8] ^= regs[(opcode&0x00f0)>>4];
 }
 
-// 8ry4 	add vr,vy 	add register vy to vr,carry in vf 	
+// 8ry4 	add vr,vy 	add register vy to vr,carry in vf
 #define INST_REG_ADD 4
 void inst_reg_add(int opcode) {
 	int vr = (opcode&0x0f00)>>8;
@@ -438,7 +438,7 @@ void inst_reg_sub(int opcode) {
 	regs[vr] &= 0xff;
 }
 
-// 8r06 	shr vr 		shift register vy right, bit 0 goes into register vf 	
+// 8r06 	shr vr 		shift register vy right, bit 0 goes into register vf
 #define INST_REG_SHR 6
 void inst_reg_shr(int opcode) {
 	int vr = (opcode&0x0f00)>>8;
@@ -504,7 +504,7 @@ void inst_mvi(int opcode) {
 // bxxx  	 jmi xxx  	 Jump to address xxx+register v0
 #define INST_JMI 11
 void inst_jmi(int opcode) {
-	programCounter = (opcode&0xfff) + regs[0]; 
+	programCounter = (opcode&0xfff) + regs[0];
 }
 
 // crxx  	 rand vr,xxx     	 vr = random number less than or equal to xxx
@@ -513,22 +513,22 @@ void inst_rand(int opcode) {
 	regs[(opcode&0x0f00)>>8] = rand()%((opcode&0x00ff)+1);
 }
 
-// drys  	 sprite rx,ry,s  	 Draw sprite at screen location rx,ry height s  	 
-// Sprites stored in memory at location in index register, maximum 8 bits wide. 
-// Wraps around the screen. If when drawn, clears a pixel, 
-// vf is set to 1 otherwise it is zero. All drawing is xor drawing 
+// drys  	 sprite rx,ry,s  	 Draw sprite at screen location rx,ry height s
+// Sprites stored in memory at location in index register, maximum 8 bits wide.
+// Wraps around the screen. If when drawn, clears a pixel,
+// vf is set to 1 otherwise it is zero. All drawing is xor drawing
 // (e.g. it toggles the screen pixels)
 
-// dry0  	 xsprite rx,ry  	 
-// Draws extended sprite at screen location rx,ry  	 
+// dry0  	 xsprite rx,ry
+// Draws extended sprite at screen location rx,ry
 // As above,but sprite is always 16 x 16. Superchip only, not yet implemented
 #define INST_SPRITE 13
 void inst_sprite(int opcode) {
 	// sprite
 	int x = regs[(opcode&0x0f00)>>8];
 	int y = regs[(opcode&0x00f0)>>4];
-	int height = opcode&0x000f;			
-	if(height==0) height = 16;	
+	int height = opcode&0x000f;
+	if(height==0) height = 16;
 	byte *spritePtr = &memory[indexRegister];
 	int sx;
 	x&=currentScreenWidthMask;
@@ -544,11 +544,11 @@ void inst_sprite(int opcode) {
 				screen[sx+y_ofs]^=PIXEL_LIT;
 				screen[sx+y_ofs]|=DIRTY_FLAG;
 			}
-			
+
 			if(!(screen[sx+y_ofs]&=PIXEL_LIT)) {
 				regs[0xf] |= 1;
 			}
-			
+
 			sx=(sx+1)&currentScreenWidthMask;
 		}
 		spritePtr++;
@@ -557,7 +557,7 @@ void inst_sprite(int opcode) {
 }
 
 //ek9e  skpr k  skip if key (register rk) pressed  	 The key is a key number, see the chip-8 documentation
-//eka1 	skup k 	skip if key (register rk) not pressed 	
+//eka1 	skup k 	skip if key (register rk) not pressed
 #define INST_SKIP_KEY 14
 void inst_skip_key(int opcode) {
 	switch(opcode&0x000f)
@@ -569,13 +569,13 @@ void inst_skip_key(int opcode) {
 
 // extented instruction set 2
 
-// fr07  	gdelay vr  	get delay timer into vr  	
+// fr07  	gdelay vr  	get delay timer into vr
 #define INST_EXT2_GDELAY 0x07
 void inst_ext2_gdelay(int opcode) {
 	regs[(opcode&0x0f00)>>8] = delayTimer;
 }
 
-// fr0a 	key vr 		wait for for keypress,put key in register vr 	
+// fr0a 	key vr 		wait for for keypress,put key in register vr
 #define INST_EXT2_KEY 0x0a
 void inst_ext2_key(int opcode) {
 	int i;
@@ -596,19 +596,19 @@ void inst_ext2_key(int opcode) {
 	regs[(opcode&0x0f00)>>8] = i;
 }
 
-// fr15 	sdelay vr 	set the delay timer to vr 	
+// fr15 	sdelay vr 	set the delay timer to vr
 #define INST_EXT2_SDELAY 0x17
 void inst_ext2_sdelay(int opcode) {
 	delayTimer = regs[(opcode&0x0f00)>>8];
 }
 
-// fr18 	ssound vr 	set the sound timer to vr 	
+// fr18 	ssound vr 	set the sound timer to vr
 #define INST_EXT2_SSOUND 0x18
 void inst_ext2_ssound(int opcode) {
 	soundTimer = regs[(opcode&0x0f00)>>8];
 }
 
-// fr1e 	adi vr 		add register vr to the index register 	
+// fr1e 	adi vr 		add register vr to the index register
 #define INST_EXT2_ADI 0x1e
 void inst_ext2_adi(int opcode) {
 	indexRegister += regs[(opcode&0x0f00)>>8];
@@ -638,7 +638,7 @@ void inst_ext2_bcd(int opcode) {
 	memory[indexRegister+2] = (byte) (vr%10);
 }
 
-// fr55 	str v0-vr 	store registers v0-vr at location I onwards 	
+// fr55 	str v0-vr 	store registers v0-vr at location I onwards
 // I is incremented to point to the next location on. e.g. I = I + r + 1
 #define INST_EXT2_STR 0x55
 void inst_ext2_str(int opcode) {
@@ -664,7 +664,7 @@ void inst_ext2_ldr(int opcode) {
 }
 
 void inst_ext2_dummy(int opcode) {
-	
+
 }
 
 void (*inst_ext2_table[256])(int);
@@ -774,7 +774,7 @@ int currentOpcode;
 void executeOpcode() {
 	// fetch opcode
 	currentOpcode = (memory[programCounter]<<8)+(memory[programCounter+1]);
-	
+
 	//drawMonitor();
 
 	// increment program counter
@@ -857,7 +857,7 @@ void updateScreen() {
 	for(int j = 0; j < currentScreenHeight; j++) {
 		x = startX;
 		for(int i = 0; i < currentScreenWidth; i++) {
-			if(screen[index]&DIRTY_FLAG) 
+			if(screen[index]&DIRTY_FLAG)
 			{
 				if(screen[index]&PIXEL_LIT) maSetColor(0xffffff);
 				else maSetColor(0x000000);
@@ -907,7 +907,7 @@ extern "C" {
 				event.updateEvents();
 				if(event.quit) {
 					break;
-				}	
+				}
 			}
 		}
 

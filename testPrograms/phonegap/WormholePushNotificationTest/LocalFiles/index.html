@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+<style>
+html
+{
+	/* Set page attributes. */
+	margin: 0;
+	padding: 0;
+	width: 100%;
+	height: 100%;
+	background-color: #FFFFFF;
+
+	/* Disable text selection in all browsers. */
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-o-user-select: none;
+	user-select: none;
+}
+
+.PushNotificationElement
+{
+	/* Text attributes. */
+	font-size: 25px;
+	font-family: sans-serif;
+	font-weight: bold;
+	text-align: center;
+}
+
+.TokenTitle
+{
+	/* Text attributes. */
+	font-size: 14px;
+	font-family: sans-serif;
+	font-weight: bold;
+	text-align: center;
+}
+
+</style>
+
+<script type="text/javascript" charset="utf-8" src="js/wormhole.js"></script>
+<script type="text/javascript" charset="utf-8" src="js/main.js"></script>
+</head>
+
+<body>
+	<div id="connectToServerContent">
+		Server address: <input type="text" id="serverAddress" value="192.168.1.112"/><br />
+		Server port: <input type="text" id="serverPort"  value="4567"/> <br />
+		<input type="button" value="Connect to server" onClick="connectToServerButtonClicked();" />
+	</div>
+
+	<div id="registerPushNotificationButton" style="display:none">
+		<input type="button" onclick="registerPushNotification();" value="Register Push Notification"/>
+	</div>
+
+	<div id="pushNotificationContent" style="display:none">
+		<p class="PushNotificationElement"> Message: </p>
+		<div id="pushNotificationMessage"></div>
+		<br/>
+
+		<p class="PushNotificationElement"> Sound: </p>
+		<div id="pushNotificationSound"></div>
+		<br/>
+
+		<p class="PushNotificationElement"> Icon badge:</p>
+		<div id="pushNotificationIconBadge"></div>
+	</div>
+
+	<div id="deviceTokenContent" style="display:none" class="TokenTitle">
+		<p class="">Device token / Application ID</p>
+		<div id="deviceToken"></div>
+	</div>
+
+</body>
+</html>

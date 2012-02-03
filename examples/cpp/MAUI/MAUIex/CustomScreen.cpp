@@ -22,7 +22,7 @@ MA 02110-1301, USA.
 CustomScreen::CustomScreen(Screen *previous) : previous(previous) {
 	mainLayout = createMainLayout("", "Back");
 	listBox = (ListBox*) mainLayout->getChildren()[0];
-	
+
 	digClock = new Clock(0, 0, scrWidth-PADDING*2, 32, listBox, gFont);
 	digClock->setType(Clock::DIGITAL);
 

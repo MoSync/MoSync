@@ -85,9 +85,9 @@ extern "C" {
 
 		for(int i = 0; i < NUM_INTENSITIES; i++) {
 			for(int j = 0; j < NUM_LETTERS; j++) {
-			matrixCharToTileMapLut[j][i].left = (j&0xf)<<4; 
+			matrixCharToTileMapLut[j][i].left = (j&0xf)<<4;
 			matrixCharToTileMapLut[j][i].top = (i<<5) + (j>>1); //((i<<1) + (j>>4))<<4;
-			matrixCharToTileMapLut[j][i].width = 16; 
+			matrixCharToTileMapLut[j][i].width = 16;
 			matrixCharToTileMapLut[j][i].height = 16;
 
 			}
@@ -117,7 +117,7 @@ extern "C" {
 				characters[x].character = rand()&(NUM_LETTERS-1);
 			}
 		}
-	
+
 		int index = -1;
 		for(int j = 0; j < tileMapSizeY-1; j++) {
 			for(int i = 0; i < tileMapSizeX; i++) {
@@ -125,11 +125,11 @@ extern "C" {
 				int intensity = characters[index].intensity;
 				if(!intensity) continue;
 				intensity--;
-				if(intensity>0) {			
+				if(intensity>0) {
 					characters[index].intensity = intensity;
-					MAPoint2d dstPoint = {i<<4, j<<4};//MAPoint2d dstPoint = {i*16, j*16};	
-					maDrawImageRegion(R_MOTRIX, &matrixCharToTileMapLut[characters[index].character][characters[index].intensity], &dstPoint, 0); 
-				} else {	
+					MAPoint2d dstPoint = {i<<4, j<<4};//MAPoint2d dstPoint = {i*16, j*16};
+					maDrawImageRegion(R_MOTRIX, &matrixCharToTileMapLut[characters[index].character][characters[index].intensity], &dstPoint, 0);
+				} else {
 					characters[index].intensity = 0;
 				}
 
@@ -146,11 +146,11 @@ extern "C" {
 			int intensity = characters[index].intensity;
 			if(!intensity) continue;
 			intensity--;
-			if(intensity>0) {			
+			if(intensity>0) {
 				characters[index].intensity = intensity;
-				MAPoint2d dstPoint = {i<<4, (tileMapSizeY-1)<<4};//MAPoint2d dstPoint = {i*16, j*16};	
-				maDrawImageRegion(R_MOTRIX, &matrixCharToTileMapLut[characters[index].character][characters[index].intensity], &dstPoint, 0); 
-			} else {	
+				MAPoint2d dstPoint = {i<<4, (tileMapSizeY-1)<<4};//MAPoint2d dstPoint = {i*16, j*16};
+				maDrawImageRegion(R_MOTRIX, &matrixCharToTileMapLut[characters[index].character][characters[index].intensity], &dstPoint, 0);
+			} else {
 				characters[index].intensity = 0;
 			}
 		}

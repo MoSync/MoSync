@@ -28,7 +28,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 using namespace MAP;
 using namespace MAUI;
 
-namespace HelloLayerMap 
+namespace HelloLayerMap
 {
 	class TestDataSource;
 

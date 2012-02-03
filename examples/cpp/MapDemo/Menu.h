@@ -25,7 +25,7 @@ MA 02110-1301, USA.
 
 using namespace MapDemoUtil;
 
-namespace MapDemoUI 
+namespace MapDemoUI
 {
 	class IActionSource;
 	class SoftKeyBar;

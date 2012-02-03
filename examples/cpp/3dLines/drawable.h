@@ -90,7 +90,7 @@ public:
 	int getNumVertices();
 
 	/**
- 	 * \brief Transforms the object and stores the new coordinates for rendering.
+	 * \brief Transforms the object and stores the new coordinates for rendering.
 	 * \note Call this before you call render if you want to apply transformations.
 	 */
 	void transform();

@@ -102,7 +102,7 @@ public:
 		// Uncomment to print message data for debugging.
 		// You need to build the project in debug mode for
 		// the log output to be displayed.
-		//printMessage(data);
+		printMessage(data);
 
 		// Check the message protocol.
 		MessageProtocol protocol(data);

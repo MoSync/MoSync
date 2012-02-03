@@ -27,7 +27,7 @@ MA 02110-1301, USA.
 using namespace MAP;
 using namespace MapDemoUI;
 
-namespace MapDemo 
+namespace MapDemo
 {
 	//=========================================================================
 	//
@@ -38,7 +38,7 @@ namespace MapDemo
 	{
 	public:
 		MapDemoScreen( MobletEx* mMoblet );
-		
+
 		virtual ~MapDemoScreen( );
 
 		//

@@ -90,12 +90,12 @@ void ScreenImageSwiper::createUI()
 	// Set the screen title.
 	setTitle(TXT_SCREEN_TITLE);
 
-	if (isAndroid())
+	if (getPlatform() == 0)
 	{
 		// Set screen icon for Android.
 		setIcon(RES_TAB_ICON_IMAGE_SWIPER_ANDROID);
 	}
-	else
+	else if(getPlatform() == 1)
 	{
 		// Create the navigation bar for iOS.
 		mTitleWidget = new NavigationBar();
@@ -195,8 +195,17 @@ void ScreenImageSwiper::setupImages(int width, int height)
  */
 void ScreenImageSwiper::getScreenSize()
 {
-	if (isAndroid())
+	if (getPlatform() == 1)
 	{
+		/// Extract the screen width
+		mScreenWidth = getWidth();
+
+		/// Extract the screen height
+		mScreenHeight = getHeight();
+	}
+	else
+	{
+
 		/// Get screen dimensions.
 		MAExtent size = maGetScrSize();
 
@@ -205,14 +214,6 @@ void ScreenImageSwiper::getScreenSize()
 
 		/// Extract the screen height
 		mScreenHeight = EXTENT_Y(size);
-	}
-	else
-	{
-		/// Extract the screen width
-		mScreenWidth = getWidth();
-
-		/// Extract the screen height
-		mScreenHeight = getHeight();
 	}
 }
 

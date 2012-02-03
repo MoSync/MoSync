@@ -1629,18 +1629,18 @@ namespace Base
 		return result;
 	}
 
-	int _maCameraFormat(int index, int width, int height, JNIEnv* jNIEnv, jobject jThis)
+	int _maCameraFormat(int index, int sizeInfoBuffer, JNIEnv* jNIEnv, jobject jThis)
 	{
 		// Get the Java method
 		jclass cls = jNIEnv->GetObjectClass(jThis);
-		jmethodID methodID = jNIEnv->GetMethodID(cls, "maCameraFormat", "(III)I");
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maCameraFormat", "(II)I");
 		if (methodID == 0)
 		{
 			return 0;
 		}
 
 		// Call the Java method
-		int result = jNIEnv->CallIntMethod(jThis, methodID, index, width, height);
+		int result = jNIEnv->CallIntMethod(jThis, methodID, index, sizeInfoBuffer);
 
 		// Delete allocated memory
 

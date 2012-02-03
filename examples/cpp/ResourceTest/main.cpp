@@ -1,41 +1,65 @@
 #include <ma.h>
 #include <mavsprintf.h>
 #include <MAUtil/Moblet.h>
-#include <NativeUI/Widgets.h>
-#include <NativeUI/WidgetUtil.h>
+#include <MAUI/Screen.h>
+#include <MAUI/Layout.h>
+#include <MAUI/Label.h>
+#include <MAUI/WidgetSkin.h>
+#include <MAUI/Image.h>
 #include <ResCompiler/ResCompiler.h>
 
 #include "MAHeaders.h"
 
 using namespace MAUtil;
-using namespace NativeUI;
+using namespace MAUI;
 
 #define PLATFORM_TEXT "Platform"
 #define SCREEN_TEXT "Screen"
 
+#define SKIN_X_START	16
+#define SKIN_X_END		32
+#define SKIN_Y_START	16
+#define SKIN_Y_END		32
+
+#define COLOR_BLACK		0x000000
+#define COLOR_WHITE		0xFFFFFF
+
 /**
- * Moblet to be used as a template for a Native UI application.
+ * Moblet to be used as a template for a Resource Example application.
  */
-class NativeUIMoblet : public Moblet, public ButtonListener
+class ResourceMoblet : public Moblet
 {
 public:
 	/**
 	 * The constructor creates the user interface.
 	 */
-	NativeUIMoblet()
+	ResourceMoblet()
 	{
 		createUI();
+
+		//Show the main screen
+		mMainScreen->show();
+		bMainScreenVisible = true;
 	}
 
 	/**
 	 * Destructor.
 	 */
-	virtual ~NativeUIMoblet()
+	~ResourceMoblet()
 	{
-		mPlatformButton->removeButtonListener(this);
-		mScreenButton->removeButtonListener(this);
-		// All the children will be deleted.
-		delete mMainScreen;
+		clean();
+	}
+
+	void getScreenSize()
+	{
+		/// Get screen dimensions.
+		MAExtent size = maGetScrSize();
+
+		/// Extract the screen width
+		mScreenWidth = EXTENT_X(size);
+
+		/// Extract the screen height
+		mScreenHeight = EXTENT_Y(size);
 	}
 
 	/**
@@ -47,97 +71,93 @@ public:
 		mMainScreen = new Screen();
 
 		//Create a Vertical Layout that will hold widgets
-		mMainLayout = new VerticalLayout();
+		mMainLayout = new Layout(0, 0, mScreenWidth, mScreenHeight, NULL, 1, 2);
+		mMainLayout->setBackgroundColor(COLOR_BLACK);
+		mMainLayout->setDrawBackground(true);
+		mMainLayout->setPaddingTop(4*mScreenHeight/10);
 
-		//Let the layout fill the entire screen
-		mMainLayout->fillSpaceHorizontally();
-		mMainLayout->fillSpaceVertically();
+		// Create a font object.
+		MAUI::Font* font = new MAUI::Font(RES_FONT);
 
+		// Create a "skin" for the buttons. This will give the
+		// buttons a customised appearance. The skin is divided
+		// into nine parts ("nine patch image"), where the center
+		// part will be stretched to fit the size of the button.
+		WidgetSkin* buttonSkin = new MAUI::WidgetSkin(
+			RES_BUTTON_PRESSED,   // Image for selected state.
+			RES_BUTTON_IDLE, // Image for unselected state.
+			SKIN_X_START, // X coordinate for start of center patch.
+			SKIN_X_END, // X coordinate for end of center patch.
+			SKIN_Y_START, // Y coordinate for start of center patch.
+			SKIN_Y_END, // Y coordinate for end of center patch.
+			true,  // Is selected image transparent?
+			true); // Is unselected image transparent?
 
 		//Create a Native UI button
-		mPlatformButton = new Button();
+		mPlatformButton = new Label(0, mScreenHeight/10, mScreenWidth, mScreenHeight/10, mMainLayout, PLATFORM_TEXT, 0, font);
+		mPlatformButton->setSkin(buttonSkin);
 
-		//Let the button fill it's layout
-		mPlatformButton->fillSpaceHorizontally();
-		//mButton->fillSpaceVertically();
-
-		//Set the moblet to receive events from the button
-		mPlatformButton->addButtonListener(this);
-
-		//Set the text of the button
-		mPlatformButton->setText(PLATFORM_TEXT);
-
-		//Add the button to the layout
-		mMainLayout->addChild(mPlatformButton);
+		// Centre the button text horizontally and vertically.
+		mPlatformButton->setHorizontalAlignment(Label::HA_CENTER);
+		mPlatformButton->setVerticalAlignment(Label::VA_CENTER);
 
 		//Create a Native UI button
-		mScreenButton = new Button();
+		mScreenButton = new Label(0, mScreenHeight/10, mScreenWidth, mScreenHeight/10, mMainLayout, SCREEN_TEXT, 0, font);
+		mScreenButton->setSkin(buttonSkin);
 
-		//Let the button fill it's layout
-		mScreenButton->fillSpaceHorizontally();
-
-		//Set the moblet to receive events from the button
-		mScreenButton->addButtonListener(this);
-
-		//Set the text of the button
-		mScreenButton->setText(SCREEN_TEXT);
-
-		//Add the button to the layout
-		mMainLayout->addChild(mScreenButton);
+		// Centre the button text horizontally and vertically.
+		mScreenButton->setHorizontalAlignment(Label::HA_CENTER);
+		mScreenButton->setVerticalAlignment(Label::VA_CENTER);
 
 		//Add the layout to the screen
-		mMainScreen->setMainWidget(mMainLayout);
-
-		//Show the screen
-		mMainScreen->setVisible(true);
-		mMainScreen->show();
-
+		mMainScreen->setMain(mMainLayout);
 	}
 
 	void createPlatformUI()
 	{
 		mPlatformScreen = new Screen();
-		mPlatformScreen->fillSpaceHorizontally();
-		mPlatformScreen->fillSpaceVertically();
 
-		mPlatformLayout = new RelativeLayout();
-		mPlatformLayout->fillSpaceHorizontally();
-		mPlatformLayout->fillSpaceVertically();
+		mPlatformLayout = new Layout(0, 0, mScreenWidth, mScreenHeight, NULL, 1, 1);
+		mPlatformLayout->setBackgroundColor(COLOR_WHITE);
+		mPlatformLayout->setDrawBackground(true);
 
-		loadResource(PLATFORM);
-		mPlatformImage = new Image();
+		loadResource(RES_PLATFORM);
+
+		int imgSize = maGetImageSize(RES_PLATFORM);
+
+		mPlatformLayout->setPaddingLeft((mScreenWidth - EXTENT_X(imgSize)) >> 1);
+		mPlatformLayout->setPaddingTop((mScreenHeight - EXTENT_Y(imgSize)) >> 1);
+
+		mPlatformImage = new Image(0, 0, 0, 0, mPlatformLayout, true, true, RES_PLATFORM);
 		mPlatformImage->setBackgroundColor(0xFFFFFF);
-		mPlatformImage->fillSpaceHorizontally();
-		mPlatformImage->fillSpaceVertically();
-		mPlatformImage->setImage(PLATFORM);
 
-		mPlatformLayout->addChild(mPlatformImage);
-		mPlatformScreen->addChild(mPlatformLayout);
+		mPlatformScreen->setMain(mPlatformLayout);
 	}
 
 	void createScreenUI()
 	{
 		mScreenScreen = new Screen();
-		mScreenScreen->fillSpaceHorizontally();
-		mScreenScreen->fillSpaceVertically();
 
-		mScreenLayout = new RelativeLayout();
-		mScreenLayout->fillSpaceHorizontally();
-		mScreenLayout->fillSpaceVertically();
+		mScreenLayout = new Layout(0, 0, mScreenWidth, mScreenHeight, NULL, 1, 1);
+		mScreenLayout->setBackgroundColor(COLOR_WHITE);
+		mScreenLayout->setDrawBackground(true);
 
-		loadResource(SCREEN_TYPE);
-		mScreenImage = new Image();
+		loadResource(RES_SCREEN_TYPE);
+
+		int imgSize = maGetImageSize(RES_SCREEN_TYPE);
+
+		mScreenLayout->setPaddingLeft((mScreenWidth - EXTENT_X(imgSize)) >> 1);
+		mScreenLayout->setPaddingTop((mScreenHeight - EXTENT_Y(imgSize)) >> 1);
+
+		mScreenImage = new Image(0, 0, 0, 0, mScreenLayout, true, true, RES_SCREEN_TYPE);
 		mScreenImage->setBackgroundColor(0xFFFFFF);
-		mScreenImage->fillSpaceHorizontally();
-		mScreenImage->fillSpaceVertically();
-		mScreenImage->setImage(SCREEN_TYPE);
 
-		mScreenLayout->addChild(mScreenImage);
-		mScreenScreen->addChild(mScreenLayout);
+		mScreenScreen->setMain(mScreenLayout);
 	}
 
 	void createUI()
 	{
+		getScreenSize();
 		createMainUI();
 		createPlatformUI();
 		createScreenUI();
@@ -150,80 +170,85 @@ public:
 	{
 		if (MAK_BACK == keyCode || MAK_0 == keyCode)
 		{
-			if (mMainScreen->isVisible())
+			if (bMainScreenVisible)
 			{
 				// Call close to exit the application.
+				clean();
 				close();
 			}
 			else
 			{
-				mMainScreen->setVisible(true);
+				bMainScreenVisible = true;
 				mMainScreen->show();
 			}
 		}
 	}
 
 	/**
-	* This method is called when there is an touch-down event for
-	* a button.
-	* Only for iphone platform.
-	* @param button The button object that generated the event.
+	* This method is called when there is an touch-down event.
+	* @param p The point where the touch event occurred.
 	*/
-	virtual void buttonPressed(Widget* button)
+	void pointerPressEvent(MAPoint2d p)
 	{
-	};
-
-	/**
-	* This method is called when there is an touch-up event for
-	* a button.
-	* Only for iphone platform.
-	* @param button The button object that generated the event.
-	*/
-	virtual void buttonReleased(Widget* button)
-	{
-	};
-
-	/**
-	* This method is called if the touch-up event was inside the
-	* bounds of the button.
-	* @param button The button object that generated the event.
-	*/
-	virtual void buttonClicked(Widget* button)
-	{
-		if (button == mPlatformButton)
+		if (bMainScreenVisible)
 		{
-			mPlatformScreen->show();
-			mMainScreen->setVisible(false);
+			if (mPlatformButton->contains(p.x, p.y))
+			{
+				mPlatformScreen->show();
+				bMainScreenVisible = false;
+			}
+			else if (mScreenButton->contains(p.x, p.y))
+			{
+				mScreenScreen->show();
+				bMainScreenVisible = false;
+			}
 		}
-		else if (button == mScreenButton)
+		else
 		{
-			mScreenScreen->show();
-			mMainScreen->setVisible(false);
-		}
-	}
-
-	void pointerPressEvent (MAPoint2d p)
-	{
-		if (!mMainScreen->isVisible())
-		{
-			mMainScreen->setVisible(true);
+			bMainScreenVisible = true;
 			mMainScreen->show();
 		}
 	}
 
+	/**
+	 * Cleans everything
+	 */
+	void clean()
+	{
+		//Unload the resources
+		unloadResource(RES_PLATFORM);
+		unloadResource(RES_SCREEN_TYPE);
+
+		//Delete the screens.
+		//All the children will be deleted.
+		delete mPlatformScreen;
+		mPlatformScreen = NULL;
+
+		delete mScreenScreen;
+		mScreenScreen = NULL;
+
+		delete mMainScreen;
+		mMainScreen = NULL;
+	}
+
 private:
-    Screen* mMainScreen;			//A Native UI screen
-    VerticalLayout* mMainLayout;	//A Native UI layout
-    Button* mPlatformButton;		//A Native UI button
-    Button* mScreenButton;			//A Native UI button
+	int mScreenWidth;
+	int mScreenHeight;
 
-    Screen* mPlatformScreen;
-    RelativeLayout* mPlatformLayout;
-    Image* mPlatformImage;
+	bool bMainScreenVisible;
 
-    Screen* mScreenScreen;
-    RelativeLayout* mScreenLayout;
-    Image* mScreenImage;
+    Screen* mMainScreen;				//A MAUI screen
+    Layout* mMainLayout;				//A MAUI layout
+    Label* mPlatformButton;				//A MAUI label
+    Label* mScreenButton;				//A MAUI label
+
+    Screen* mPlatformScreen;			//A MAUI screen
+    Layout* mPlatformLayout;			//A MAUI layout
+    Image* mPlatformImage;				//A MAUI image
+
+    Screen* mScreenScreen;				//A MAUI screen
+    Layout* mScreenLayout;				//A MAUI layout
+    Image* mScreenImage;				//A MAUI image
 };
 
 /**
@@ -231,7 +256,6 @@ private:
  */
 extern "C" int MAMain()
 {
-	printf("MAMain");
-	Moblet::run(new NativeUIMoblet());
+	Moblet::run(new ResourceMoblet());
 	return 0;
 }
