@@ -181,11 +181,15 @@ namespace MoSync
 			}
 		};
 
-		public static void ShowMessage(String text, bool log=true)
+		public static void ShowMessage(String text, bool log=true, String caption="")
 		{
 			if(log)
 				Log(text);
-			Deployment.Current.Dispatcher.BeginInvoke(() => MessageBox.Show(text));
+
+			if(caption == "")
+				Deployment.Current.Dispatcher.BeginInvoke(() => MessageBox.Show(text));
+			else
+				Deployment.Current.Dispatcher.BeginInvoke(() => MessageBox.Show(text, caption, MessageBoxButton.OK));
 		}
 
 		public static void CriticalError(String text)

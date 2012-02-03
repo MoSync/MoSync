@@ -5,6 +5,7 @@ using System.Windows;
 using System.Collections.Generic;
 using System.Net.NetworkInformation;
 using System.Globalization;
+using Microsoft.Xna.Framework.GamerServices;
 
 namespace MoSync
 {
@@ -33,6 +34,7 @@ namespace MoSync
     public class MiscModule : ISyscallModule, IIoctlModule
     {
 		private Microsoft.Devices.VibrateController mVibrateController = null;
+		private Runtime mRuntime = null;
 
         public void Init(Syscalls syscalls, Core core, Runtime runtime)
         {
@@ -129,8 +131,23 @@ namespace MoSync
             };
         }
 
+		/*
+		private void OnAlertMessageBoxClosed(IAsyncResult ar)
+		{
+			int? buttonIndex = Guide.EndShowMessageBox(ar);
+
+			Memory eventData = new Memory(8);
+			eventData.WriteInt32(MoSync.Struct.MAEvent.type, MoSync.Constants.EVENT_TYPE_ALERT);
+			eventData.WriteInt32(MoSync.Struct.MAEvent.alertButtonIndex, (int)(buttonIndex + 1));
+
+			mRuntime.PostEvent(new Event(eventData));
+		}
+		*/
+
         public void Init(Ioctls ioctls, Core core, Runtime runtime)
         {
+			mRuntime = runtime;
+
             // add system property providers
             SystemPropertyManager.mSystemPropertyProviders.Clear();
 
@@ -156,6 +173,34 @@ namespace MoSync
                 MoSync.Util.Log(bytes);
                 return 0;
             };
+
+			ioctls.maMessageBox = delegate(int _caption, int _message)
+			{
+				String message = core.GetDataMemory().ReadStringAtAddress(_message);
+				String caption = core.GetDataMemory().ReadStringAtAddress(_caption);
+				MoSync.Util.ShowMessage(message, false, caption);
+				return 0;
+			};
+
+			/*
+			ioctls.maAlert = delegate(int _title, int _message, int _b1, int _b2, int _b3)
+			{
+				String title = core.GetDataMemory().ReadStringAtAddress(_title);
+				String message = core.GetDataMemory().ReadStringAtAddress(_message);
+				List<string> buttons = new List<string>();
+				if (_b1 != 0)
+					buttons.Add(core.GetDataMemory().ReadStringAtAddress(_b1));
+				if (_b2 != 0)
+					buttons.Add(core.GetDataMemory().ReadStringAtAddress(_b2));
+				if (_b3 != 0)
+					buttons.Add(core.GetDataMemory().ReadStringAtAddress(_b3));
+
+				Guide.BeginShowMessageBox(title, message,
+					buttons, 0, MessageBoxIcon.None, new AsyncCallback(OnAlertMessageBoxClosed), null);
+
+				return 0;
+			};
+			*/
 
             ioctls.maGetSystemProperty = delegate(int _key, int _buf, int _size)
             {
