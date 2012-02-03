@@ -94,15 +94,15 @@ namespace MoSync
                 this.fillSpaceVerticalyEnabled = false;
                 this.fillSpaceHorizontalyEnabled = false;
 
-                mGridUnitType = GridUnitType.Pixel;
-                mGridUnitTypeValue = 0;
+                mGridUnitType = GridUnitType.Auto;
+                mGridUnitTypeValue = 1;
 
                 mView = mGrid;
 
                 mGrid.Margin = new Thickness(0.0);
-#if DEBUG
-                mGrid.ShowGridLines = true;
-#endif
+//#if DEBUG
+//                mGrid.ShowGridLines = true;
+//#endif
             }
 
             /**
