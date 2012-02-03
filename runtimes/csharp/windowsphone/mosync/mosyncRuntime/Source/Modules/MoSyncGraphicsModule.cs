@@ -350,9 +350,8 @@ namespace MoSync
 
 				Rect srcRect = new Rect(srcRectX, srcRectY, srcRectW, srcRectH);
 				Rect dstRect = new Rect(dstPointX, dstPointY, srcRectW, srcRectH);
-				// mCurrentDrawTarget.Blit(dstRect, src, srcRect, WriteableBitmapExtensions.BlendMode.Alpha);
 
-				GraphicsUtil.DrawImageRegion(mCurrentDrawTarget, dstPointX, dstPointY, srcRect, src, transformMode);
+				GraphicsUtil.DrawImageRegion(mCurrentDrawTarget, dstPointX, dstPointY, srcRect, src, transformMode, mClipRect);
 			};
 
 			syscalls.maCreateDrawableImage = delegate(int placeholder, int width, int height)
