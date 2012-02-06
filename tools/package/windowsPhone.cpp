@@ -37,6 +37,7 @@ void packageWindowsPhone(const SETTINGS& s, const RuntimeInfo& ri) {
 	testName(s);
 	testVendor(s);
 	testVersion(s);
+	testVsBuildPath(s);
 
 	std::ostringstream generateCmd;
 	std::ostringstream buildCmd;
@@ -119,12 +120,12 @@ void packageWindowsPhone(const SETTINGS& s, const RuntimeInfo& ri) {
 		//testIOSSdk(s);
 
 		// todo: find this programatically...
-		std::string msBuildPath =
-			"/Windows/Microsoft.NET/Framework/v4.0.30319/MSBuild.exe";
+		//std::string vsBuildPath =
+		//	"/Windows/Microsoft.NET/Framework/v4.0.30319/MSBuild.exe";
 
 		_chdir(csprojOutput.c_str());
 
-		buildCmd << msBuildPath << " mosync.csproj";
+		buildCmd << s.WPvsBuildPath << " mosync.csproj";
 
 		// Set our configuration.
 		buildCmd << " /p:Configuration=" << s.WPconfig;
