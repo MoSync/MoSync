@@ -28,25 +28,25 @@ Supported Platforms
 Execute SQL Quick Example
 ------------------
 
-	function queryDB(tx) {
-		tx.executeSql('SELECT * FROM DEMO', [], querySuccess, errorCB);
-	}
-
-	function querySuccess(tx, results) {
-		var len = results.rows.length;
-	   	console.log("DEMO table: " + len + " rows found.");
-	   	for (var i=0; i<len; i++){
-	    	console.log("Row = " + i + " ID = " + results.rows.item(i).id + " Data =  " + results.rows.item(i).data);
+		function queryDB(tx) {
+			tx.executeSql('SELECT * FROM DEMO', [], querySuccess, errorCB);
 		}
-	}
-	
-	function errorCB(err) {
-		alert("Error processing SQL: "+err.code);
-	}
-	
-	var db = window.openDatabase("Database", "1.0", "PhoneGap Demo", 200000);
-	db.transaction(queryDB, errorCB);
 
+		function querySuccess(tx, results) {
+			var len = results.rows.length;
+			console.log("DEMO table: " + len + " rows found.");
+			for (var i=0; i<len; i++){
+				console.log("Row = " + i + " ID = " + results.rows.item(i).id + " Data =  " + results.rows.item(i).data);
+			}
+		}
+
+		function errorCB(err) {
+			alert("Error processing SQL: "+err.code);
+		}
+
+		var db = window.openDatabase("Database", "1.0", "PhoneGap Demo", 200000);
+		db.transaction(queryDB, errorCB);
+		
 Full Example
 ------------
 
