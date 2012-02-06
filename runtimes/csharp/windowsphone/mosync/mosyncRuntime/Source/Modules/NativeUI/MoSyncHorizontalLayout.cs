@@ -91,8 +91,8 @@ namespace MoSync
                 mGrid.ColumnDefinitions.Add(mSpacerLeft);
                 mGrid.ColumnDefinitions.Add(mSpacerRight);
 
-                mGridUnitType = GridUnitType.Pixel;
-                mGridUnitTypeValue = 0;
+                mGridUnitType = GridUnitType.Auto;
+                mGridUnitTypeValue = 1;
 
                 this.fillSpaceVerticalyEnabled = false;
                 this.fillSpaceHorizontalyEnabled = false;
@@ -100,9 +100,9 @@ namespace MoSync
                 mView = mGrid;
 
                 mGrid.Margin = new Thickness(0);
-#if DEBUG
-                mGrid.ShowGridLines = true;
-#endif
+//#if DEBUG
+//                mGrid.ShowGridLines = true;
+//#endif
             }
 
             //add child

@@ -18,7 +18,7 @@ Methods
  * SensorRequest.addEventListener(event, listener)
  * SensorRequest.removeEventListener(event, listener)
 
- * SensorConnection.startWatch(watchOptions)
+ * SensorConnection.startWatch()
  * SensorConnection.endWatch()
  * SensorConnection.read()
  * SensorRequest.addEventListener(event, listener)
@@ -133,14 +133,9 @@ Usage
 			}
 		}
 
-SensorConnection.startWatch(watchOptions)
+SensorConnection.startWatch()
 ==================
 Starts the periodic sampling of the sensor
-	
-Paremeters
--------------
-* __watchOptions__ Struct containing the sampling options
-* __watchOptions.interval__ the sampling period in milliseconds
 
 SensorConnection.endWatch()
 ==========================
