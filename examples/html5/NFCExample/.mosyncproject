@@ -2,6 +2,12 @@
 <project supports-build-configs="true" version="1.4">
 <build.cfg id="Debug" types="Debug"/>
 <build.cfg id="Release" types="Release"/>
+<criteria>
+<filter mgr="0" profiles="" require="0" type="com.mobilesorcery.mosync.filters.profile" vendors="Android,BlackBerry,JavaME,Moblin,Symbian,Windows Mobile,Windows Phone,iOS"/>
+<filter type="com.mobilesorcery.sdk.capabilities.devices.elementfactory">
+<capabilities optional="" required="File\ Storage NFC HTML5"/>
+</filter>
+</criteria>
 <properties>
 <property key="android:package.name" value="com.mosync.nfc.NFCExample"/>
 <property key="android:version.number" value="1"/>
@@ -37,6 +43,7 @@
 <property key="dependency.strategy" value="0"/>
 <property key="excludes/Debug" value=""/>
 <property key="excludes/Release" value=""/>
+<property key="profile.mgr.type" value="0"/>
 <property key="standard.excludes" value="%test.ns:test.res%"/>
 <property key="symbian.uids:cert.file" value="/Applications/MoSync/etc/default.cert"/>
 <property key="symbian.uids:key.file" value="/Applications/MoSync/etc/default.key"/>
