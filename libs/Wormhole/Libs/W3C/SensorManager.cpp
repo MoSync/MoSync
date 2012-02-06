@@ -99,7 +99,7 @@ namespace Wormhole
 						mSensorSingleReadFlag[maType] = true;
 					}
 
-					int result = maSensorStart(maType,interval);
+					int result = maSensorStart(maType,SENSOR_RATE_NORMAL);
 					if(result == SENSOR_ERROR_NONE)
 					{
 						//The the message handler to send sensor events to this object
