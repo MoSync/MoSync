@@ -548,7 +548,7 @@ namespace MoSync
 					}
 					else if (sa == 0)
 					{
-						//dst.Pixels[dstScan] = (int)dstCol;
+						dst.Pixels[dstScan] = (int)dstCol;
 					}
 					else
 					{
@@ -560,10 +560,10 @@ namespace MoSync
 						uint dg = (((dstCol) & 0x0000ff00) >> 8);
 						uint db = (((dstCol) & 0x000000ff) >> 0);
 
-						dst.Pixels[dstScan] = (int)(
-									(((dr + (((sr - dr) * (sa)) >> 8)) << 16) & 0x00ff0000) |
-									(((dg + (((sg - dg) * (sa)) >> 8)) << 8) & 0x0000ff00) |
-									(((db + (((sb - db) * (sa)) >> 8)) << 0) & 0x000000ff));
+						dst.Pixels[dstScan] = (int)(0xff000000 |
+									(((dr + (((sr - dr) * (sa)) / 255)) << 16) & 0x00ff0000) |
+									(((dg + (((sg - dg) * (sa)) / 255)) << 8) & 0x0000ff00) |
+									(((db + (((sb - db) * (sa)) / 255)) << 0) & 0x000000ff));
 					}
 
 					srcScan += srcPitchX;
