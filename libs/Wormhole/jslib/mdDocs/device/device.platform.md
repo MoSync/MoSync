@@ -22,20 +22,19 @@ Full Example
       <head>
         <title>Device Properties Example</title>
 
-        <script type="text/javascript" charset="utf-8" src="phonegap.js"></script>
+        <script type="text/javascript" charset="utf-8" src="js/wormhole.js"></script>
         <script type="text/javascript" charset="utf-8">
 
-        // Wait for PhoneGap to load
+        // Wait for Wormhole to load
         //
         document.addEventListener("deviceready", onDeviceReady, false);
 
-        // PhoneGap is ready
+        // Wormhole is ready
         //
         function onDeviceReady() {
             var element = document.getElementById('deviceProperties');
     
             element.innerHTML = 'Device Name: '     + device.name     + '<br />' + 
-                                'Device PhoneGap: ' + device.phonegap + '<br />' + 
                                 'Device Platform: ' + device.platform + '<br />' + 
                                 'Device UUID: '     + device.uuid     + '<br />' + 
                                 'Device Version: '  + device.version  + '<br />';
