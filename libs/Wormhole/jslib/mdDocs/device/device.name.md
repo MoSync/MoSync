@@ -14,20 +14,8 @@ Supported Platforms
 -------------------
 
 - Android
-- BlackBerry
-- BlackBerry WebWorks (OS 5.0 and higher)
 - iPhone
 - Windows Phone 7 ( Mango )
-
-Quick Example
--------------
-
-    // Android:    Nexus One       returns "Passion" (Nexus One code name)
-    //             Motorola Droid  returns "voles"
-    // BlackBerry: Bold 8900       returns "8900"
-    // iPhone:     All devices     returns a name set by iTunes e.g. "Joe's iPhone"
-    //
-    var name = device.name;
 
 Full Example
 ------------
@@ -37,20 +25,19 @@ Full Example
       <head>
         <title>Device Properties Example</title>
 
-        <script type="text/javascript" charset="utf-8" src="phonegap.js"></script>
+        <script type="text/javascript" charset="utf-8" src="js/wormhole.js"></script>
         <script type="text/javascript" charset="utf-8">
 
-        // Wait for PhoneGap to load
+        // Wait for Wormhole to load
         //
         document.addEventListener("deviceready", onDeviceReady, false);
 
-        // PhoneGap is ready
+        // Wormhole is ready
         //
         function onDeviceReady() {
             var element = document.getElementById('deviceProperties');
     
             element.innerHTML = 'Device Name: '     + device.name     + '<br />' + 
-                                'Device PhoneGap: ' + device.phonegap + '<br />' + 
                                 'Device Platform: ' + device.platform + '<br />' + 
                                 'Device UUID: '     + device.uuid     + '<br />' + 
                                 'Device Version: '  + device.version  + '<br />';

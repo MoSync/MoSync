@@ -60,14 +60,14 @@ Full Example
       <head>
         <title>Contact Example</title>
 
-        <script type="text/javascript" charset="utf-8" src="phonegap.js"></script>
+        <script type="text/javascript" charset="utf-8" src="js/wormhole.js"></script>
         <script type="text/javascript" charset="utf-8">
 
-        // Wait for PhoneGap to load
+        // Wait for Wormhole to load
         //
         document.addEventListener("deviceready", onDeviceReady, false);
 
-        // PhoneGap is ready
+        // Wormhole is ready
         //
         function onDeviceReady() {
 			window.localStorage.setItem("key", "value");

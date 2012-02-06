@@ -677,7 +677,7 @@ mosync.nativeui.NativeWidgetElement = function(widgetType, widgetID, params,
 	 * Adds a child widget to the cureent widget
 	 *
 	 * @param childID
-	 *            the ID for th echild widget
+	 *            the ID for the child widget
 	 * @param successCallback
 	 *            a function that will be called if the operation is successfull
 	 * @param errorCallback
@@ -762,7 +762,7 @@ mosync.nativeui.NativeWidgetElement = function(widgetType, widgetID, params,
 	};
 
 	/**
-	 * Removes a child widget fro mthe child list of the current widget
+	 * Removes a child widget from the child list of the current widget
 	 *
 	 * @param childID
 	 *            Id of the child widget that will be removed
@@ -900,7 +900,7 @@ mosync.nativeui.NativeWidgetElement = function(widgetType, widgetID, params,
 		};
 
 		/**
-		 * Pushes a screen to a stackscreen
+		 * Pushes a screen to a StackScreen
 		 *
 		 * @param stackScreenID
 		 *            the ID for the stackscreen that should be used for pushing
@@ -954,7 +954,7 @@ mosync.nativeui.NativeWidgetElement = function(widgetType, widgetID, params,
 
 		/**
 		 *
-		 * Pops a screen fr om the current stackscreen, Use only for StackScreen
+		 * Pops a screen from the current stackscreen, Use only for StackScreen
 		 * widgets
 		 *
 		 * @param successCallback
@@ -1072,7 +1072,7 @@ mosync.nativeui.NativeWidgetElement = function(widgetType, widgetID, params,
  * \code
  * 	  //Get the screen widget
  *    var myScreen = document.getNativeElementById("MyScreen")
- *    /7Show it on the device's screen
+ *    //Show it on the device's screen
  *    myScreen.show()
  * \endcode
  */
@@ -1086,7 +1086,7 @@ document.getNativeElementById = function(widgetID) {
  *
  *
  * @param widgetType
- *            type of the widet that should be created
+ *            type of the widget that should be created
  * @param widgetID
  *            ID that will be used for refrencing to the widget
  * @param successCallback
