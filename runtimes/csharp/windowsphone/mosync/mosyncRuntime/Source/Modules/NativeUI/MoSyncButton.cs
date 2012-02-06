@@ -68,6 +68,9 @@ namespace MoSync
                 fillSpaceVerticalyEnabled = false;
                 fillSpaceHorizontalyEnabled = false;
 
+                this.Width = MoSync.Constants.MAW_CONSTANT_WRAP_CONTENT;
+                this.Height = MoSync.Constants.MAW_CONSTANT_WRAP_CONTENT;
+
                 //The click handle the button component
                 mButton.Click += new RoutedEventHandler(
                     delegate(Object from, RoutedEventArgs evt)
