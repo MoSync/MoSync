@@ -46,14 +46,14 @@ Full Example
       <head>
         <title>navigator.network.connection.type Example</title>
         
-        <script type="text/javascript" charset="utf-8" src="phonegap.js"></script>
+        <script type="text/javascript" charset="utf-8" src="js/wormhole.js"></script>
         <script type="text/javascript" charset="utf-8">
             
-        // Wait for PhoneGap to load
+        // Wait for Wormhole to load
         // 
         document.addEventListener("deviceready", onDeviceReady, false);
         
-        // PhoneGap is loaded and it is now safe to make calls PhoneGap methods
+        // Wormhole is loaded and it is now safe to make calls Wormhole methods
         //
         function onDeviceReady() {
             checkConnection();
