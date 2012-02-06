@@ -327,16 +327,15 @@ namespace MoSync
              * MAW_WIDGET_ALPHA implementation
              */
             [MoSyncWidgetProperty(MoSync.Constants.MAW_WIDGET_ALPHA)]
-            public string Alpha
+            public double Alpha
             {
                 set
                 {
-                    double val = double.Parse(value);
-                    mView.Opacity = val;
+                    mView.Opacity = value;
                 }
                 get
                 {
-                    return mView.Opacity.ToString();
+                    return mView.Opacity;
                 }
             }
 
