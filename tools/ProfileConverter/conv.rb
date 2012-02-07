@@ -281,6 +281,7 @@ RELEVANT_DEFINES = {
 	:android_4 => [],
 	:android_7 => [],
 	:iphoneos => [],
+	:winphone => [],
 }
 
 CAP_TYPES = {
@@ -320,6 +321,7 @@ runtimes = {
 	:android_4 => [],
 	:android_7 => [],
 	:iphoneos => [],
+	:winphone => [],
 }
 
 
