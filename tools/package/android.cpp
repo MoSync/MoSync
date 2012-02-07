@@ -236,7 +236,7 @@ static void injectIcons(const SETTINGS& s, const RuntimeInfo& ri) {
 			string outputDir = string(s.dst) + directories.at(i);
 			_mkdir(outputDir.c_str());
 			string outputIcon = outputDir + "/icon.png";
-			injectIcon("android", size.c_str(), s.icon, file(outputIcon).c_str(), s.silent);
+			injectIcon("Android", size.c_str(), s.icon, file(outputIcon).c_str(), s.silent);
 		}
 	}
 }
