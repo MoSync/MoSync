@@ -51,8 +51,16 @@
     /**
      * CLLocationManager does not offer a way of setting an update interval.
      * Used a timer for reading location data at a given time interval.
+     * This timer is used for the magnetic field sensor
      */
     NSTimer* locationManagerTimer;
+
+    /**
+     * CLLocationManager does not offer a way of setting an update interval.
+     * Used a timer for reading location data at a given time interval.
+     * This timer is used for the compass sensor
+     */
+    NSTimer* compassManagerTimer;
 
     /**
      * The flag is set is the proximity sensor is started.

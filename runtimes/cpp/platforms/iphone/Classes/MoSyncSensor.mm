@@ -336,7 +336,7 @@
 
 -(void) startMagnetometerOnNewThread:(NSNumber*) interval
 {
-    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+    //NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
     [locationManager startUpdatingHeading];
 
 	// Start the magnetometer sensor.
@@ -354,7 +354,8 @@
     [[NSRunLoop currentRunLoop] addTimer:locationManagerTimer forMode:NSDefaultRunLoopMode];
     [[NSRunLoop currentRunLoop] run];
 
-    [pool release];
+    [locationManagerTimer release];
+    //[pool release];
 }
 
 /**
@@ -397,6 +398,7 @@
 		return SENSOR_ERROR_ALREADY_ENABLED;
 	}
 
+
     NSNumber* updateInterval = [[NSNumber numberWithInt:interval] autorelease];
     [NSThread detachNewThreadSelector:@selector(startCompassOnNewThread:) toTarget:self withObject:updateInterval];
 
@@ -405,7 +407,7 @@
 
 -(void) startCompassOnNewThread:(NSNumber*) interval
 {
-    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+    //NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
     [locationManager startUpdatingHeading];
     isCompassRunning = TRUE;
 	// Start the compass.
@@ -414,15 +416,15 @@
     // Used a timer that reads location data at a specified interval.
     double intervalInMilliseconds = [self getUpdateIntervalFromRate:[interval intValue]];
     NSTimeInterval updateInterval = intervalInMilliseconds / SECOND;
-    locationManagerTimer =  [NSTimer scheduledTimerWithTimeInterval:updateInterval
+    compassManagerTimer =  [NSTimer scheduledTimerWithTimeInterval:updateInterval
                                                              target:self
                                                            selector:@selector(readCompassData:)
                                                            userInfo:nil
                                                             repeats:YES];
-    [[NSRunLoop currentRunLoop] addTimer:locationManagerTimer forMode:NSDefaultRunLoopMode];
+    [[NSRunLoop currentRunLoop] addTimer:compassManagerTimer forMode:NSDefaultRunLoopMode];
     [[NSRunLoop currentRunLoop] run];
-
-    [pool release];
+    [compassManagerTimer release];
+    //[pool release];
 }
 
 /**
@@ -433,9 +435,9 @@
 {
 	if(isCompassRunning)
     {
-		[locationManagerTimer invalidate];
-        [locationManagerTimer release];
-        locationManagerTimer = nil;
+		[compassManagerTimer invalidate];
+        [compassManagerTimer release];
+        compassManagerTimer = nil;
         if(!isMagnetometerSensorRunning)
         {
             [locationManager stopUpdatingHeading];
