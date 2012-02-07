@@ -113,6 +113,10 @@
 - (void)sendEvent:(UIEvent *)event
 {
     [super sendEvent:event];
+
+    // Fix for MOSYNC-1593 Swipe Jesture doesn't work on images screen on NativeUIDemo.
+    // On iOS 5 touchesMoved, touchesEnded and touchesCancelled methods are not called.
+    // So we listen for all UIWindow related events, but handle only the touch related events.
     UIEventType eventType = event.type;
     if (eventType == UIEventTypeTouches)
     {
@@ -125,7 +129,7 @@
         UITouch *touch = [[touches allObjects] objectAtIndex:0];
         if(touch.phase ==  UITouchPhaseBegan)
         {
-                [self handleTouchesBegan:touches];
+            [self handleTouchesBegan:touches];
         }
         else if(touch.phase == UITouchPhaseMoved)
         {
