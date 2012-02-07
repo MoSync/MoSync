@@ -3700,6 +3700,11 @@ public class MoSyncThread extends Thread
 		return mMoSyncAudio.maAudioSetVolume(audio, volume);
 	}
 
+	int maAudioPause(int audio)
+	{
+		return mMoSyncAudio.maAudioPause(audio);
+	}
+
 	int maAudioStop(int audio)
 	{
 		return mMoSyncAudio.maAudioStop(audio);
