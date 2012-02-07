@@ -30,6 +30,7 @@ MA 02110-1301, USA.
 #include <mastdlib.h>
 #include <mactype.h>
 #include <maxtoa.h>
+#include "mavsprintf.h"
 
 // Include the resources for images.
 //#include "MAHeaders.h"
@@ -272,7 +273,10 @@ int setWidgetProperty(MAWidgetHandle aWidget, const char* aProperty,
 	// Buffer for property values.
 	char buf[10];
 
-	itoa( aValue, buf, base);
+	if(16 == base)
+		sprintf(buf, "0x%.6X", aValue);
+	else
+		itoa( aValue, buf, base);
 	// Apply the property to the widget.
 	return maWidgetSetProperty(aWidget, aProperty, buf);
 }
