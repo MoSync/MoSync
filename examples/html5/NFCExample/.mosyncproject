@@ -3,7 +3,6 @@
 <build.cfg id="Debug" types="Debug"/>
 <build.cfg id="Release" types="Release"/>
 <criteria>
-<filter mgr="0" profiles="" require="0" type="com.mobilesorcery.mosync.filters.profile" vendors="Android,BlackBerry,JavaME,Moblin,Symbian,Windows Mobile,Windows Phone,iOS"/>
 <filter type="com.mobilesorcery.sdk.capabilities.devices.elementfactory">
 <capabilities optional="" required="File\ Storage NFC HTML5"/>
 </filter>
@@ -45,10 +44,7 @@
 <property key="excludes/Release" value=""/>
 <property key="profile.mgr.type" value="0"/>
 <property key="standard.excludes" value="%test.ns:test.res%"/>
-<property key="symbian.uids:cert.file" value="/Applications/MoSync/etc/default.cert"/>
-<property key="symbian.uids:key.file" value="/Applications/MoSync/etc/default.key"/>
-<property key="symbian.uids:pass.key" value="default"/>
-<property key="symbian.uids:proj.spec.keys" value="true"/>
+<property key="symbian.uids:proj.spec.keys" value="false"/>
 <property key="symbian.uids:uid.s60v2uid" value="0x0de13aac"/>
 <property key="symbian.uids:uid.s60v3uid" value="0xe0e7fa89"/>
 <property key="template.id" value="project.html5.hybrid"/>

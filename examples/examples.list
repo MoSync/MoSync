@@ -44,6 +44,7 @@ FacebookDemo
 SensorTest
 DeviceFonts
 DeviceFontsNativeUI
+ResourceTest
 [html5]
 WebViewGeoLocation
 WebViewLoveSMS
