@@ -159,7 +159,6 @@
 	}
 
 	accelerometer.delegate = nil;
-	[accelerometer release];
 	accelerometer = nil;
 
 	return SENSOR_ERROR_NONE;

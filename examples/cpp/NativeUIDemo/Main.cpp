@@ -33,6 +33,7 @@ MA 02110-1301, USA.
 #include <NativeUI/Widgets.h>// Include all widgets
 
 #include "ScreenMain.h"			// Main UI screen
+#include "Util.h"
 
 using namespace MAUtil;
 using namespace NativeUI;
@@ -79,7 +80,7 @@ public:
 	 */
 	void pointerPressEvent(MAPoint2d point)
 	{
-		mMainScreen->handlePointerPressed(point);
+		if(getPlatform() != 2) mMainScreen->handlePointerPressed(point);
 	}
 
 	/**
@@ -88,7 +89,7 @@ public:
 	 */
 	void pointerMoveEvent(MAPoint2d point)
 	{
-		mMainScreen->handlePointerMoved(point);
+		if(getPlatform() != 2) mMainScreen->handlePointerMoved(point);
 	}
 
 	/**

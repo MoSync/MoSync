@@ -193,4 +193,3 @@ namespace MapDemoUI
 		mRightLabel->setCaption( action == NULL ? "" : action->getShortName( ) );
 	}
 }
-

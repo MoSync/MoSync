@@ -37,7 +37,7 @@ namespace MAUI {
 		};
 
 
-	Clock::Clock(int x, int y, int width, int height, Widget *parent) : 
+	Clock::Clock(int x, int y, int width, int height, Widget *parent) :
 			Widget(x, y, width, height, parent),
 			color(0xffffff),
 			type(ANALOGUE),
@@ -45,12 +45,12 @@ namespace MAUI {
 			{
 		setTimeType(LOCAL);
 		setDrawBackground(false);
-	
+
 		//MAUtil::Environment::getEnvironment().addTimer(this, 1000, -1);
 		//requestRepaint();
 	}
 
-	Clock::Clock(int x, int y, int width, int height, Widget* parent, Font *font) 
+	Clock::Clock(int x, int y, int width, int height, Widget* parent, Font *font)
 		: Widget(x, y, width, height, parent),
 		  color(0xffffff),
 		  type(ANALOGUE),
@@ -58,7 +58,7 @@ namespace MAUI {
 	{
 		setTimeType(LOCAL);
 		setDrawBackground(false);
-	
+
 		//TODO: synchronize timer so it runs very soon after second-switch.
 		//MAUtil::Environment::getEnvironment().addTimer(this, 1000, -1);
 		//requestRepaint();
@@ -104,8 +104,8 @@ namespace MAUI {
 		int width = EXTENT_X(e);
 		int height = EXTENT_Y(e);
 
-		font->drawString(digitalString, 
-			(paddedBounds.width>>1) - (width>>1), 
+		font->drawString(digitalString,
+			(paddedBounds.width>>1) - (width>>1),
 			(paddedBounds.height>>1) - (height>>1));
 
 	}
@@ -117,7 +117,7 @@ namespace MAUI {
 		double secAngleDelta = minAngleDelta;
 
 		int radius = paddedBounds.width < paddedBounds.height ? paddedBounds.width : paddedBounds.height;
-		radius >>= 1;	
+		radius >>= 1;
 		double angle;
 		int cx = (paddedBounds.width/2);
 		int cy = (paddedBounds.height/2);
@@ -138,11 +138,11 @@ namespace MAUI {
 		drawLine(cx, cy, 0, radius, (2.0*PI)/4.0 - secAngleDelta*sec, color);
 
 		// draw minute indicator
-		drawLine(cx, cy, 0, (radius>>1)+(radius>>2), (2.0*PI)/4.0 - minAngleDelta*min, color);		
-		
+		drawLine(cx, cy, 0, (radius>>1)+(radius>>2), (2.0*PI)/4.0 - minAngleDelta*min, color);
+
 		// draw hour indicator
-		drawLine(cx, cy, 0, (radius>>1), (2.0*PI)/4.0 - hourAngleDelta*hour - 
-			((double)min/60.0)*hourAngleDelta, color);	
+		drawLine(cx, cy, 0, (radius>>1), (2.0*PI)/4.0 - hourAngleDelta*hour -
+			((double)min/60.0)*hourAngleDelta, color);
 	}
 
 	void Clock::drawWidget() {
@@ -167,7 +167,7 @@ namespace MAUI {
 		this->color = color;
 		requestRepaint();
 	}
-		
+
 	void Clock::setTimeType(eTimeType timeType) {
 		this->timeType = timeType;
 		currentTime = getTime();

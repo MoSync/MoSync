@@ -79,7 +79,7 @@ function SensorRequest(type)
 		@param result A Sensor array with the sensors that were discovered in the system.
 	*/
 	this.events = {
-			"onsuccess": [],
+			"onsuccess": []
 	};
 	/**
 		Registers a callback to an event
@@ -172,10 +172,8 @@ function SensorConnection(options)
 
 	/**
 		Starts the periodic sampling of the sensor
-		@param watchOptions Struct containing the sampling options
-		@param watchOptions.interval the sampling period in milliseconds
 	*/
-	this.startWatch = function(watchOptions)
+	this.startWatch = function()
 	{
 		if(self.status != "open")
 		{
@@ -194,7 +192,7 @@ function SensorConnection(options)
 			callbackId,
 			"SensorManager",
 			"startSensor",
-			{"type":"" + self.type, "interval":"" + watchOptions.interval});
+			{"type":"" + self.type, "interval":0});
 	};
 
 	/**

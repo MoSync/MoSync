@@ -350,9 +350,8 @@ namespace MoSync
 
 				Rect srcRect = new Rect(srcRectX, srcRectY, srcRectW, srcRectH);
 				Rect dstRect = new Rect(dstPointX, dstPointY, srcRectW, srcRectH);
-				// mCurrentDrawTarget.Blit(dstRect, src, srcRect, WriteableBitmapExtensions.BlendMode.Alpha);
 
-				GraphicsUtil.DrawImageRegion(mCurrentDrawTarget, dstPointX, dstPointY, srcRect, src, transformMode);
+				GraphicsUtil.DrawImageRegion(mCurrentDrawTarget, dstPointX, dstPointY, srcRect, src, transformMode, mClipRect);
 			};
 
 			syscalls.maCreateDrawableImage = delegate(int placeholder, int width, int height)
@@ -479,6 +478,13 @@ namespace MoSync
 				BoundedStream s = new BoundedStream(bin, _offset, _size);
 				//Stream s = mem.GetStream(_offset, _size);
 				WriteableBitmap bitmap = MoSync.Util.CreateWriteableBitmapFromStream(s);
+				/*if (bitmap == null)
+				{
+					byte[] buffer = new byte[_size];
+					s.Position = 0;
+					s.Read(buffer, 0, _size);
+					Util.WriteBytesToFile(buffer, _data.ToString() + ".png", FileMode.Create);
+				}*/
 				s.Close();
 
 				if (bitmap == null)

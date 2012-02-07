@@ -5889,7 +5889,7 @@ group WidgetAPI "Widget API" {
 		/**
 		* @brief Sets or gets the maximum input lenght of the edit box.
 		* Setting this value enables multiline input mode by default.
-		* Available on Android and iOS.
+		* Available on Android, iOS and Windows Phone.
 		*
 		* @validvalue A positive integer.
 		*
@@ -9611,6 +9611,9 @@ group NotificationAPI "Notification API" {
 
 			/**
 			* @brief Set the sound to play when an alert is displayed.
+			* The sound file should be saved in a notifications folder under sdcard storage.
+			* Note that some devices can only play notification sounds stored in the internal storage,
+			* in the \system\media\audio\notifications folder.
 			* Platform: Android.
 			*
 			* @validvalue a valid path to an audio file.

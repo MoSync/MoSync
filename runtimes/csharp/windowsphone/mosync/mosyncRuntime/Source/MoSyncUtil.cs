@@ -181,11 +181,20 @@ namespace MoSync
 			}
 		};
 
+		public static void ShowMessage(String text, bool log=true, String caption="")
+		{
+			if(log)
+				Log(text);
+
+			if(caption == "")
+				Deployment.Current.Dispatcher.BeginInvoke(() => MessageBox.Show(text));
+			else
+				Deployment.Current.Dispatcher.BeginInvoke(() => MessageBox.Show(text, caption, MessageBoxButton.OK));
+		}
+
 		public static void CriticalError(String text)
 		{
 			Log(text);
-			//System.Environment.Exit(1);
-			//MessageBox.Show(text);
 			if (System.Diagnostics.Debugger.IsAttached)
 			{
 				System.Diagnostics.Debugger.Break();
@@ -291,6 +300,8 @@ namespace MoSync
 		public static void convertStringToColor(string value, out System.Windows.Media.SolidColorBrush brush)
 		{
 			brush = null;
+
+            // value starts with "0x"
 			if (value.Length == 8 && value[0].Equals('0') && value[1].Equals('x'))
 			{
 				//converting the string from value into RGB bytes
@@ -300,6 +311,7 @@ namespace MoSync
 				byte A = 255;
 				brush = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(A, R, G, B));
 			}
+            // value starts with "#"
 			else if (value.Length == 7 && value[0].Equals('#'))
 			{
 				//converting the string from value into RGB bytes
@@ -309,6 +321,16 @@ namespace MoSync
 				byte A = 255;
 				brush = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(A, R, G, B));
 			}
+            // value doesn't have the normal hex sign
+            else if (value.Length == 6)
+            {
+                //converting the string from value into RGB bytes
+                byte R = Byte.Parse(value.Substring(0, 2), System.Globalization.NumberStyles.HexNumber);
+                byte G = Byte.Parse(value.Substring(2, 2), System.Globalization.NumberStyles.HexNumber);
+                byte B = Byte.Parse(value.Substring(4, 2), System.Globalization.NumberStyles.HexNumber);
+                byte A = 255;
+                brush = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(A, R, G, B));
+            }
 		}
 
 		public static WriteableBitmap CreateWriteableBitmapFromStream(Stream stream)
@@ -323,8 +345,9 @@ namespace MoSync
 					im.SetSource(stream);
 					wb = new WriteableBitmap(im);
 				}
-				catch (Exception)
+				catch (Exception e)
 				{
+					Util.Log(e.StackTrace);
 					wb = null;
 				}
 			});

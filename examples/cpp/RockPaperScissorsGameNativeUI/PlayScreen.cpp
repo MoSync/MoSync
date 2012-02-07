@@ -808,6 +808,4 @@ void PlayScreen::setSizes()
 		mPaddingSize = PADDING;
 	}
 }
-
 } // namespace RockPaperScissors
-

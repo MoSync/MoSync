@@ -22,13 +22,13 @@ extern "C" int MAMain( )
 //-------------------------------------------------------------------------
 {
 	HelloLayerMap::HelloLayerMapMoblet* moblet = newobject( HelloLayerMap::HelloLayerMapMoblet, new HelloLayerMap::HelloLayerMapMoblet( ) );
-	
+
 	Moblet::run( moblet );
 
 	deleteobject( moblet );
 	MapCache::shutdown( );
-	
+
 	MemoryMgr::dump( );
-	
+
 	return 0;
 }

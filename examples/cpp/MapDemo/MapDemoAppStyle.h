@@ -33,7 +33,7 @@ namespace MapDemo
 	{
 	public:
 		MapDemoAppStyle( );
-		
+
 		virtual ~MapDemoAppStyle( );
 		//
 		// For client to implement
@@ -68,4 +68,3 @@ namespace MapDemo
 }
 
 #endif // MAPDEMOAPPSTYLE_H_
-

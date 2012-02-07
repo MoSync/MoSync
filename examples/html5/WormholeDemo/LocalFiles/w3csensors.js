@@ -14,13 +14,14 @@ function updateAccelW3C(sensorData){
 }
 
 /**
- * This function changes the state of the W3C accelerometer sensor when it's called
+ * This function changes the state of the W3C accelerometer
+ * sensor when it's called
  */
 function toggleAccelW3C()
 {
 	if(accelerometer.status == "open")
 	{
-		accelerometer.startWatch({interval:1000});
+		accelerometer.startWatch();
 	}
 	else
 	{
@@ -49,13 +50,14 @@ function updateMagDataW3C(sensorData){
 }
 
 /**
- * This function changes the state of the W3C magnetic field sensor when it's called
+ * This function changes the state of the W3C magnetic field
+ * sensor when it's called
  */
 function toggleMagFieldW3C()
 {
 	if(magneticField.status == "open")
 	{
-		magneticField.startWatch({interval:1000});
+		magneticField.startWatch();
 	}
 	else
 	{
@@ -82,13 +84,14 @@ function updateOrientDataW3C(sensorData){
 }
 
 /**
- * This function changes the state of the W3C orientation sensor when it's called
+ * This function changes the state of the W3C orientation
+ * sensor when it's called
  */
 function toggleOrientationW3C()
 {
 	if(orientationSensor.status == "open")
 	{
-		orientationSensor.startWatch({interval:1000});
+		orientationSensor.startWatch();
 	}
 	else
 	{
@@ -123,7 +126,7 @@ function toggleGyroscopeW3C()
 {
 	if(gyroscope.status == "open")
 	{
-		gyroscope.startWatch({interval:1000});
+		gyroscope.startWatch();
 	}
 	else
 	{
@@ -150,13 +153,14 @@ function updateProxDataW3C(sensorData){
 }
 
 /**
- * This function changes the state of the W3C proximity sensor when it's called
+ * This function changes the state of the W3C proximity sensor
+ * when it's called
  */
 function toggleProximityW3C()
 {
 	if(proximity.status == "open")
 	{
-		proximity.startWatch({interval:1000});
+		proximity.startWatch();
 	}
 	else
 	{

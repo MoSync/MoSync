@@ -158,7 +158,7 @@ namespace MapDemo
 	//-------------------------------------------------------------------------
 	{
 		MapSource* current = mMap->getMapSource( );
-		if ( current == mOpenStreetMapSource ) 
+		if ( current == mOpenStreetMapSource )
 			mMap->setMapSource( mGoogleStreetMapSource );
 		else if ( current == mGoogleStreetMapSource )
 			mMap->setMapSource( mGoogleAerialMapSource );

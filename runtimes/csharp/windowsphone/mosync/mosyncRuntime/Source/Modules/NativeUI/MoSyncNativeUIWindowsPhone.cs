@@ -45,6 +45,12 @@ namespace MoSync
             public bool fillSpaceHorizontalyEnabled;
             public bool fillSpaceVerticalyEnabled;
 
+            //Width
+            private double mWidth;
+
+            //Height
+            private double mHeight;
+
             public UIElement View
             {
                 get { return mView; }
@@ -89,12 +95,25 @@ namespace MoSync
                     if (value > 0)
                     {
                         mView.SetValue(Canvas.WidthProperty, value);
+                        mWidth = value;
                         fillSpaceHorizontalyEnabled = false;
+                        Type objType = mView.GetType();
+                        if (objType.GetProperty("Parent") != null)
+                        {
+                            var property = objType.GetProperty("Parent");
+                            Object parent = property.GetValue(mView, null);
+                            if (null != parent && parent is Grid)
+                            {
+                                int columnIndex = Grid.GetColumn((FrameworkElement)mView);
+                                (parent as Grid).ColumnDefinitions[columnIndex].Width = new GridLength(value, GridUnitType.Pixel);
+                            }
+                        }
                     }
                     else if(-1 == value)
                     {
                         mView.SetValue(Canvas.HorizontalAlignmentProperty, HorizontalAlignment.Stretch);
                         fillSpaceHorizontalyEnabled = true;
+                        mWidth = value;
 
                         //In case of setting the widget property after it is added
                         //to a parent widget
@@ -115,6 +134,7 @@ namespace MoSync
 					{
                         mView.SetValue(Canvas.HorizontalAlignmentProperty, HorizontalAlignment.Center);
                         fillSpaceHorizontalyEnabled = false;
+                        mWidth = value;
 
                         //In case of setting the widget property after it is added
                         //to a parent widget
@@ -147,11 +167,25 @@ namespace MoSync
                     {
                         mView.SetValue(Canvas.HeightProperty, value);
                         fillSpaceVerticalyEnabled = false;
+                        mHeight = value;
+
+                        Type objType = mView.GetType();
+                        if (objType.GetProperty("Parent") != null)
+                        {
+                            var property = objType.GetProperty("Parent");
+                            Object parent = property.GetValue(mView, null);
+                            if (null != parent && parent is Grid)
+                            {
+                                int rowIndex = Grid.GetRow((FrameworkElement)mView);
+                                (parent as Grid).RowDefinitions[rowIndex].Height = new GridLength(value, GridUnitType.Pixel);
+                            }
+                        }
                     }
                     else if(-1 == value)
                     {
                         mView.SetValue(Canvas.VerticalAlignmentProperty, VerticalAlignment.Stretch);
                         fillSpaceVerticalyEnabled = true;
+                        mHeight = value;
 
                         //In case of setting the widget property after it is added
                         //to a parent widget
@@ -171,6 +205,7 @@ namespace MoSync
                     {
                         mView.SetValue(Canvas.VerticalAlignmentProperty, VerticalAlignment.Center);
                         fillSpaceVerticalyEnabled = false;
+                        mHeight = value;
 
                         //In case of setting the widget property after it is added
                         //to a parent widget
@@ -241,12 +276,20 @@ namespace MoSync
                 set
                 {
                     bool val = Boolean.Parse(value);
-                    if (false == val) mView.Visibility = Visibility.Collapsed;
-                    else mView.Visibility = Visibility.Visible;
-                }
-                get
-                {
-                    if (Visibility.Collapsed == mView.Visibility)
+                    if(false == val)
+					{
+						mView.IsHitTestVisible = false;
+						mView.Opacity = 0.0;
+					}
+					else
+					{
+						mView.IsHitTestVisible = true;
+						mView.Opacity = 1.0;
+					}
+				}
+				get
+				{
+				if (false == mView.IsHitTestVisible)
                     {
                         return "false";
                     }
@@ -296,16 +339,15 @@ namespace MoSync
              * MAW_WIDGET_ALPHA implementation
              */
             [MoSyncWidgetProperty(MoSync.Constants.MAW_WIDGET_ALPHA)]
-            public string Alpha
+            public double Alpha
             {
                 set
                 {
-                    double val = double.Parse(value);
-                    mView.Opacity = val;
+                    mView.Opacity = value;
                 }
                 get
                 {
-                    return mView.Opacity.ToString();
+                    return mView.Opacity;
                 }
             }
 

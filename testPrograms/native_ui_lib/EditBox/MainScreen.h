@@ -39,7 +39,8 @@ using namespace NativeUI;
 class MainScreen:
 	public Screen,
 	public ButtonListener,
-	public EditBoxListener
+	public EditBoxListener,
+	public ListViewListener
 {
 
 public:
@@ -54,7 +55,6 @@ public:
 	~MainScreen();
 
 private:
-
     /**
      * This method is called when there is an touch-down event for
      * a button.
@@ -77,6 +77,14 @@ private:
      * @param button The button object that generated the event.
      */
     virtual void buttonClicked(Widget* button);
+
+    /**
+     * This method is called when the user selects an item from
+     * the list view
+     * @param listView The list view object that generated the event
+     * @param listViewItem The ListViewItem object that was clicked.
+     */
+    virtual void listViewItemClicked(ListView* listView, ListViewItem* listViewItem);
 
     /**
      * This method is called when an edit box gains focus.
@@ -119,10 +127,44 @@ private:
 	void createMainLayout();
 
 	/**
-	 * Create and add widgets for testing the max text length property.
+	 * Creates the input mode list view
 	 * @param mainLayout Widgets will be added to it.
 	 */
-	void createMaxTextLengthWidgets(VerticalLayout* mainLayout);
+	void createInputModeListView(VerticalLayout* mainLayout);
+
+	/**
+	 * Creates the input flag list view
+	 * @param mainLayout Widgets will be added to it.
+	 */
+	void createInputFlagListView(VerticalLayout* mainLayout);
+
+	/**
+	 * Creates a horizontal layout, adds it to the main layout, initializes the
+	 * edit box and a label and adds it to the horizontal layout.
+	 * @param editBox The editbox to be created and added on the screen.
+	 * @param mainLayout Widgets will be added to it.
+	 * @param text The text that will fill the label.
+	 */
+	void createDecimalEditBoxView(EditBox* &editBox, VerticalLayout* mainLayout, MAUtil::String text);
+
+	/**
+	 * Gets the index of a string. Returns -1 if the string is not inside the array
+	 * @param array The String array in which to search
+	 * @param text The list view item text
+	 */
+	int getIndexForString(const MAUtil::String* array, MAUtil::String text);
+
+	/**
+	 * Set the input mode of the edit box
+	 * @param mode The input mode code
+	 */
+	void setInputMode(int mode);
+
+	/**
+	 * Set the input flag of the edit box
+	 * @param flag The input flag code
+	 */
+	void setInputFlag(int flag);
 
 private:
 	/**
@@ -140,10 +182,34 @@ private:
 	 * The max input text length for mEditBox.
 	 */
 	EditBox* mMaxTextLengthEditBox;
+	EditBox* mPasswordEditBox;
 
-	EditBox* mEditBoxEmail;
-	EditBox* mEditBoxDecimal;
-	EditBox* mEditBoxUrl;
+	ListView* mInputModeListView;
+	ListView* mInputFlagListView;
+
+	/**
+	 * The maximum number of lines for mEditBox
+	 */
+	EditBox* mMaxLinesEditBox;
+	Label* mMaxLinesLabel;
+
+	/**
+	 * The minimum number of lines for mEditBox
+	 */
+	EditBox* mMinLinesEditBox;
+	Label* mMinLinesLabel;
+
+	/**
+	 * The placeholder color for mEditBox
+	 */
+	EditBox* mPlaceholderColorEditBox;
+	Label* mPlaceholderColorLabel;
+
+	/**
+	 * The lines number for mEditBox
+	 */
+	EditBox* mLinesNumberEditBox;
+	Label *mLinesNumberLabel;
 
 	bool mKeyboard;
 };

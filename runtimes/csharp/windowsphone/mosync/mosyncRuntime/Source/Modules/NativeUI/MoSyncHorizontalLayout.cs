@@ -51,11 +51,22 @@ namespace MoSync
             //row definitions used as spacers for the padding system
             protected RowDefinition mSpacerUp;
             protected RowDefinition mSpacerDown;
+
+            //column definitions used as spacers for the padding system
             protected ColumnDefinition mSpacerLeft;
             protected ColumnDefinition mSpacerRight;
 
             //the main row of the Grid object (an horizontal layout is a grid with one row)
             protected RowDefinition mRowDef;
+
+            //the inter widget spacer unit type
+            protected GridUnitType mGridUnitType;
+
+            //the inter widget spacer value
+            protected int mGridUnitTypeValue;
+
+            //boolean which indicates that the paddings are set by the user
+            protected bool mPaddingSetByUser;
 
             //the constructor
             public HorizontalLayout()
@@ -83,13 +94,20 @@ namespace MoSync
                 mGrid.ColumnDefinitions.Add(mSpacerLeft);
                 mGrid.ColumnDefinitions.Add(mSpacerRight);
 
+                mGridUnitType = GridUnitType.Auto;
+                mGridUnitTypeValue = 1;
+
                 this.fillSpaceVerticalyEnabled = false;
                 this.fillSpaceHorizontalyEnabled = false;
 
+                mPaddingSetByUser = false;
+
                 mView = mGrid;
-#if DEBUG
-                mGrid.ShowGridLines = true;
-#endif
+
+                mGrid.Margin = new Thickness(0);
+//#if DEBUG
+//              mGrid.ShowGridLines = true;
+//#endif
             }
 
             //add child
@@ -99,24 +117,59 @@ namespace MoSync
                 MoSync.Util.RunActionOnMainThreadSync(() =>
                 {
                     WidgetBaseWindowsPhone widget = (child as WidgetBaseWindowsPhone);
-                    ColumnDefinition columnDef = new ColumnDefinition();
+                    ColumnDefinition columnDef = new ColumnDefinition(); //The column definition for the widget
 
-                    if (widget.fillSpaceHorizontalyEnabled) columnDef.Width = new System.Windows.GridLength(1, System.Windows.GridUnitType.Star);
-                    else if (double.IsNaN(widget.Width) == false && 0 != widget.Height)
+                    //In order to be able to set various properties on the layout
+                    //there appeared the need for two spacers, left spacer, and
+                    //right spacer. For each widget one of each would be added
+                    //to the layout.
+
+                    ColumnDefinition leftSpacerColumnDef = new ColumnDefinition();
+                    ColumnDefinition rightSpacerColumnDef = new ColumnDefinition();
+
+                    if (widget.fillSpaceHorizontalyEnabled)
+                    {
+                        //Check if the paddings are not set by the user
+                        if (false == mPaddingSetByUser)
+                        {
+                            setPaddingSpacers(0, GridUnitType.Pixel);
+                        }
+                        columnDef.Width = new System.Windows.GridLength(1, System.Windows.GridUnitType.Star);
+                        mGridUnitType = GridUnitType.Pixel;
+                        mGridUnitTypeValue = 0;
+                    }
+                    else if (double.IsNaN(widget.Width) == false) //Absolute value
                     {
                         columnDef.Width = new System.Windows.GridLength(widget.Width, System.Windows.GridUnitType.Pixel);
                     }
-                    else
+                    else //Wrapt content as default
                     {
+                        //Check if the paddings are not set by the user
+                        if (false == mPaddingSetByUser)
+                        {
+                            setPaddingSpacers(0, GridUnitType.Pixel);
+                        }
                         columnDef.Width = new System.Windows.GridLength(1, System.Windows.GridUnitType.Auto);
+                        mGridUnitType = GridUnitType.Pixel;
+                        mGridUnitTypeValue = 0;
                     }
 
+                    mGrid.ColumnDefinitions.Insert(mGrid.ColumnDefinitions.Count - 1, leftSpacerColumnDef);
                     mGrid.ColumnDefinitions.Insert(mGrid.ColumnDefinitions.Count - 1, columnDef);
+                    mGrid.ColumnDefinitions.Insert(mGrid.ColumnDefinitions.Count - 1, rightSpacerColumnDef);
+
+                    Grid.SetRow((widget.View as System.Windows.FrameworkElement), 1);
+                    Grid.SetColumn((widget.View as System.Windows.FrameworkElement), mGrid.ColumnDefinitions.Count - 3);
+
+                    if (widget.View is FrameworkElement)
+                    {
+                        (widget.View as FrameworkElement).HorizontalAlignment = this.mGrid.HorizontalAlignment;
+                        (widget.View as FrameworkElement).VerticalAlignment = this.mGrid.VerticalAlignment;
+                    }
 
                     mGrid.Children.Add(widget.View);
 
-                    Grid.SetColumn((widget.View as System.Windows.FrameworkElement), mGrid.ColumnDefinitions.Count - 2);
-                    Grid.SetRow((widget.View as System.Windows.FrameworkElement), 1);
+                    setSpacers(mGridUnitTypeValue, mGridUnitType);
                 });
             }
 
@@ -147,7 +200,9 @@ namespace MoSync
                 {
                     WidgetBaseWindowsPhone widget = (child as WidgetBaseWindowsPhone);
                     int x = Grid.GetColumn((widget.View) as System.Windows.FrameworkElement);
+                    mGrid.ColumnDefinitions.RemoveAt(x + 1);
                     mGrid.ColumnDefinitions.RemoveAt(x);
+                    mGrid.ColumnDefinitions.RemoveAt(x - 1);
                     mGrid.Children.Remove((child as WidgetBaseWindowsPhone).View);
                 });
                 base.RemoveChild(child);
@@ -164,18 +219,33 @@ namespace MoSync
                         mGrid.HorizontalAlignment = HorizontalAlignment.Left;
                         mSpacerRight.Width = new GridLength(1, GridUnitType.Star);
                         mSpacerLeft.Width = new GridLength(0);
+
+                        mPaddingSetByUser = true;
                     }
                     else if (value.Equals(MoSync.Constants.MAW_ALIGNMENT_RIGHT))
                     {
                         mGrid.HorizontalAlignment = HorizontalAlignment.Right;
                         mSpacerRight.Width = new GridLength(0);
                         mSpacerLeft.Width = new GridLength(1, GridUnitType.Star);
+
+                        mPaddingSetByUser = true;
                     }
                     else if (value.Equals(MoSync.Constants.MAW_ALIGNMENT_CENTER))
                     {
                         mGrid.HorizontalAlignment = HorizontalAlignment.Center;
                         mSpacerRight.Width = new GridLength(1, GridUnitType.Star);
                         mSpacerLeft.Width = new GridLength(1, GridUnitType.Star);
+
+                        for (int i = 0; i < this.mChildren.Count; i++)
+                        {
+                            if (true == (this.mChildren[i] as WidgetBaseWindowsPhone).fillSpaceHorizontalyEnabled)
+                            {
+                                mSpacerRight.Width = new GridLength(1, GridUnitType.Auto);
+                                mSpacerLeft.Width = new GridLength(1, GridUnitType.Auto);
+                            }
+                        }
+
+                        mPaddingSetByUser = true;
                     }
                 }
             }
@@ -195,14 +265,16 @@ namespace MoSync
                     else if (value.Equals(MoSync.Constants.MAW_ALIGNMENT_TOP))
                     {
                         mGrid.VerticalAlignment = VerticalAlignment.Top;
+
                         mSpacerDown.Height = new GridLength(1, GridUnitType.Star);
                         mSpacerUp.Height = new GridLength(0);
                     }
                     else if (value.Equals(MoSync.Constants.MAW_ALIGNMENT_CENTER))
                     {
                         mGrid.VerticalAlignment = VerticalAlignment.Center;
-                        mSpacerDown.Height = new GridLength(1, GridUnitType.Star);
-                        mSpacerUp.Height = new GridLength(1, GridUnitType.Star);
+
+                        mSpacerDown.Height = new GridLength(1, GridUnitType.Auto);
+                        mSpacerUp.Height = new GridLength(1, GridUnitType.Auto);
                     }
                 }
             }
@@ -248,6 +320,8 @@ namespace MoSync
                     {
                         mPaddingLeft = val;
                         mSpacerLeft.Width = new GridLength(mPaddingLeft);
+
+                        mPaddingSetByUser = true;
                     }
                 }
             }
@@ -263,8 +337,50 @@ namespace MoSync
                     {
                         mPaddingRight = val;
                         mSpacerRight.Width = new GridLength(mPaddingRight);
+
+                        mPaddingSetByUser = true;
                     }
                 }
+            }
+
+            //Sets all the inter widget spacers to 0 or star
+            public void setSpacers(int gridUnitValue, GridUnitType gridUnitType)
+            {
+                if(0 != mGrid.ColumnDefinitions[1].Width.Value || false == mGrid.ColumnDefinitions[1].Width.IsAbsolute)
+                    mGrid.ColumnDefinitions[1].Width = new GridLength(0, GridUnitType.Pixel);
+                if (0 != mGrid.ColumnDefinitions[mGrid.ColumnDefinitions.Count - 2].Width.Value || false == mGrid.ColumnDefinitions[mGrid.ColumnDefinitions.Count - 2].Width.IsAbsolute)
+                    mGrid.ColumnDefinitions[mGrid.ColumnDefinitions.Count - 2].Width = new GridLength(0, GridUnitType.Pixel);
+
+                int step = 0;
+
+                for (int i = 3; i < mGrid.ColumnDefinitions.Count - 2; i++)
+                {
+                    step++;
+                    if (2 >= step)
+                    {
+                        mGrid.ColumnDefinitions[i].Width = new GridLength(gridUnitValue, gridUnitType);
+                    }
+                    else step = 0;
+                }
+            }
+
+            private void setPaddingSpacers(int gridUnitValue, GridUnitType gridUnitType)
+            {
+                mGrid.ColumnDefinitions[0].Width = new GridLength(gridUnitValue, gridUnitType);
+                mGrid.ColumnDefinitions[mGrid.ColumnDefinitions.Count - 1].Width = new GridLength(gridUnitValue, gridUnitType);
+            }
+
+            private void writeStatus()
+            {
+                String s = "Horizontal ";
+                for (int i = 0; i < mGrid.ColumnDefinitions.Count; i++)
+                {
+                    s += mGrid.ColumnDefinitions[i].Width.Value.ToString();
+                    s += " ";
+                    s += mGrid.ColumnDefinitions[i].Width.GridUnitType.ToString();
+                    s += " | ";
+                }
+                MessageBox.Show(s);
             }
         }
     }

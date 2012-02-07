@@ -104,6 +104,15 @@ protected:
 	 */
 	bool replyNull(Wormhole::MessageStreamJSON& message);
 
+	/**
+	 * Utility method to check if there is a callbackId.
+	 */
+	bool hasNoCallbackId(Wormhole::MessageStreamJSON& message);
+
+	/**
+	 * Utility method for getting the message callbackId as a string.
+	 */
+	MAUtil::String getCallBackId(Wormhole::MessageStreamJSON& message);
 };
 
 #endif

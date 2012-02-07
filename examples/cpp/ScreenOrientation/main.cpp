@@ -112,4 +112,3 @@ extern "C" int MAMain()
 	MAUtil::Moblet::run(new MyMoblet());
 	return 0;
 };
-

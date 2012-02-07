@@ -84,9 +84,17 @@ namespace MoSync {
 	}
 
 
+	static int sLastError = 0;
+
+	int Widget::getLastError()
+	{
+		return sLastError;
+	}
+
 	Widget::Widget(const String& widgetType) {
 		mType = widgetType;
 		mHandle = maWidgetCreate(widgetType.c_str());
+		sLastError = mHandle;
 		sItems[mHandle] = this;
 	}
 
@@ -170,14 +178,14 @@ namespace MoSync {
 	StackScreen::StackScreen() {
 		mType = "StackScreen";
 		mHandle = maWidgetCreate("StackScreen");
-		
+
 		// check if this is supported, NativeUI is only
 		// supported on Android and iOS devices/emulators
 		if (-1 == mHandle)
 		{
 			maPanic(0, "NativeUI is only available on Android and iOS.");
 		}
-		
+
 		sItems[mHandle] = this;
 	}
 
@@ -220,7 +228,7 @@ namespace MoSync {
 		//if(!mStack.size()) return;
 		//mStack[mStack.size()-1]->willAppear();
 	}
-	
+
 	int StackScreen::stackSize()
 	{
 		return mStack.size();

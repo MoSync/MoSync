@@ -84,14 +84,19 @@ BasicScreen::~BasicScreen()
 void BasicScreen::setSizes()
 {
 	// For small screens, use small fonts and padding.
-	if (mScreenHeight < 600 )
+	if ( mScreenHeight < 600 )
 	{
 		mFontSize = FONT_SMALL;
 		mPaddingSize = PADDING_SMALL;
 	}
-	else
+	else if( mScreenHeight < 800 )
 	{
 		mFontSize = FONT_LARGE;
+		mPaddingSize = PADDING;
+	}
+	else
+	{
+		mFontSize = FONT_EXTRA_LARGE;
 		mPaddingSize = PADDING;
 	}
 }
@@ -226,7 +231,7 @@ MAWidgetHandle BasicScreen::createTopLayout()
 	setWidgetSize(
 		topLayout,
 		MAW_CONSTANT_FILL_AVAILABLE_SPACE,
-		mScreenHeight / 8);
+		mScreenHeight / 5);
 
 	return topLayout;
 }

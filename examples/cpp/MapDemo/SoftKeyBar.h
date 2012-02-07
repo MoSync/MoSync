@@ -36,7 +36,7 @@ namespace MapDemoUI
 	{
 	public:
 		SoftKeyBar( int x, int y, int width, int height, Widget* parent );
-		
+
 		virtual ~SoftKeyBar( );
 		//
 		// Widget overrides

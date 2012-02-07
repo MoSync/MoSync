@@ -29,24 +29,24 @@ namespace MapDemoUI
 	class Menu;
 
 	//=========================================================================
-	class TriggerMenuSelectionAction: public Action 
+	class TriggerMenuSelectionAction: public Action
 	//=========================================================================
 	{
 	public:
 		TriggerMenuSelectionAction( Menu* menu );
-		
+
 		virtual ~TriggerMenuSelectionAction( );
 		//
 		// Action overrides
 		//
-		virtual const char* getShortName( ) const 
-		{  
-			return "OK"; 
+		virtual const char* getShortName( ) const
+		{
+			return "OK";
 		}
 
-		virtual Action* clone( ) const 
-		{ 
-			return newobject( TriggerMenuSelectionAction, new TriggerMenuSelectionAction( mMenu ) ); 
+		virtual Action* clone( ) const
+		{
+			return newobject( TriggerMenuSelectionAction, new TriggerMenuSelectionAction( mMenu ) );
 		}
 
 	protected:

@@ -322,9 +322,9 @@ MAUtil::DataHandler
 </td>
 <td>maAdsBannerCreate(), maAdsBannerDestroy(), maAdsAddBannerToLayout(), maAdsRemoveBannerFromLayout(), maAdsBannerSetProperty(), maAdsBannerGetProperty()<br>
 </td>
-<td>\ref AdsAPI<br>
-</td>
 <td>\ref Ads<br>
+</td>
+<td>\ref AdsAPI<br>
 </td>
 </tr>
 
@@ -384,7 +384,7 @@ MAUtil::DataHandler
 <td>
 <strong>Native user interface</strong>
 </td>
-<td>Access to device specific UI system. Currently only available for Android and iOS.<br>
+<td>Access to device specific UI system. Currently only available for Android, iOS and Windows Phone 7.<br>
 </td>
 <td>maWidgetCreate(), maWidgetDestroy(), maWidgetAddChild(), maWidgetInsertChild(), maWidgetRemoveChild(), maWidgetScreenShow(), maWidgetStackScreenPush(), maWidgetStackScreenPop(), maWidgetSetProperty(), maWidgetGetProperty()<br>
 </td>

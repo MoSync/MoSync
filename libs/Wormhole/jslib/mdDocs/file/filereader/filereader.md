@@ -19,7 +19,7 @@ Properties
 Methods
 -------
 
-- __abort__: Aborts reading file. 
+- __abort__: Aborts reading file.
 - __readAsDataURL__: Read file and return data as a base64 encoded data url.
 - __readAsText__: Reads text file.
 
@@ -32,11 +32,10 @@ Supported Platforms
 -------------------
 
 - Android
-- BlackBerry WebWorks (OS 5.0 and higher)
 - iOS
 - Windows Phone 7 ( Mango )
 
-Read As Data URL 
+Read As Data URL
 ----------------
 
 __Parameters:__
@@ -49,17 +48,17 @@ Quick Example
 	function win(file) {
 		var reader = new FileReader();
 		reader.onloadend = function(evt) {
-        	console.log("read success");
-            console.log(evt.target.result);
-        };
+			console.log("read success");
+			console.log(evt.target.result);
+		};
 		reader.readAsDataURL(file);
 	};
 
 	var fail = function(evt) {
-    	console.log(error.code);
+		console.log(error.code);
 	};
-	
-    entry.file(win, fail);
+
+	entry.file(win, fail);
 
 Read As Text
 ------------
@@ -67,7 +66,9 @@ Read As Text
 __Parameters:__
 
 - file - the file object to read
-- encoding - the encoding to use to encode the file's content. Default is UTF8.
+- encoding - the encoding to use to encode the file's content. <!-- Default is UTF8. -->
+
+NOTE: __encoding__ parameter is currently not supported.
 
 Quick Example
 -------------
@@ -75,17 +76,17 @@ Quick Example
 	function win(file) {
 		var reader = new FileReader();
 		reader.onloadend = function(evt) {
-        	console.log("read success");
-            console.log(evt.target.result);
-        };
+			console.log("read success");
+			console.log(evt.target.result);
+		};
 		reader.readAsText(file);
 	};
 
 	var fail = function(evt) {
-    	console.log(error.code);
+		console.log(error.code);
 	};
-	
-    entry.file(win, fail);
+
+	entry.file(win, fail);
 
 Abort Quick Example
 -------------------
@@ -93,85 +94,87 @@ Abort Quick Example
 	function win(file) {
 		var reader = new FileReader();
 		reader.onloadend = function(evt) {
-        	console.log("read success");
-            console.log(evt.target.result);
-        };
+			console.log("read success");
+			console.log(evt.target.result);
+		};
 		reader.readAsText(file);
 		reader.abort();
 	};
 
-    function fail(error) {
-    	console.log(error.code);
-    }
-	
-    entry.file(win, fail);
+	function fail(error) {
+		console.log(error.code);
+	}
+
+	entry.file(win, fail);
 
 Full Example
 ------------
 
-    <!DOCTYPE html>
-    <html>
-      <head>
-        <title>FileReader Example</title>
+	<!DOCTYPE html>
+	<html>
+	<head>
+		<title>FileReader Example</title>
 
-        <script type="text/javascript" charset="utf-8" src="phonegap.js"></script>
-        <script type="text/javascript" charset="utf-8">
+		<script type="text/javascript" charset="utf-8" src="js/wormhole.js"></script>
+		<script type="text/javascript" charset="utf-8">
 
-        // Wait for PhoneGap to load
-        //
-        function onLoad() {
-            document.addEventListener("deviceready", onDeviceReady, false);
-        }
+		// Wait for Wormhole to load
+		//
+		function onLoad() {
+			document.addEventListener("deviceready", onDeviceReady, false);
+		}
 
-        // PhoneGap is ready
-        //
-        function onDeviceReady() {
+		// Wormhole is ready
+		//
+		function onDeviceReady() {
 			window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, gotFS, fail);
-        }
-		
+		}
+
 		function gotFS(fileSystem) {
 			fileSystem.root.getFile("readme.txt", null, gotFileEntry, fail);
 		}
-		
+
 		function gotFileEntry(fileEntry) {
 			fileEntry.file(gotFile, fail);
 		}
-		
-        function gotFile(file){
+
+		function gotFile(file){
 			readDataUrl(file);
 			readAsText(file);
 		}
-        
-        function readDataUrl(file) {
-            var reader = new FileReader();
-            reader.onloadend = function(evt) {
-                console.log("Read as data URL");
-                console.log(evt.target.result);
-            };
-            reader.readAsDataURL(file);
-        }
-        
-        function readAsText(file) {
-            var reader = new FileReader();
-            reader.onloadend = function(evt) {
-                console.log("Read as text");
-                console.log(evt.target.result);
-            };
-            reader.readAsText(file);
-        }
-        
-        function fail(evt) {
-            console.log(evt.target.error.code);
-        }
-        
-        </script>
-      </head>
-      <body>
-        <h1>Example</h1>
-        <p>Read File</p>
-      </body>
-    </html>
 
+		function readDataUrl(file) {
+			var reader = new FileReader();
+			reader.onloadend = function(evt) {
+				console.log("Read as data URL");
+				console.log(evt.target.result);
+			};
+			reader.readAsDataURL(file);
+		}
+
+		function readAsText(file) {
+			var reader = new FileReader();
+			reader.onloadend = function(evt) {
+				console.log("Read as text");
+				console.log(evt.target.result);
+			};
+			reader.readAsText(file);
+		}
+
+		function fail(evt) {
+			console.log(evt.target.error.code);
+		}
+
+		</script>
+	</head>
+	<body>
+		<h1>Example</h1>
+		<p>Read File</p>
+	</body>
+	</html>
+
+<!--
 iOS Quirks
 ----------
 - __encoding__ parameter is not supported, UTF8 encoding is always used.
+-->

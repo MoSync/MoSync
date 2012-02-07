@@ -44,7 +44,7 @@ mosync.bridge.PhoneGap.send = function(callbackId, service, action, args)
 		"service": service,
 		"action": action,
 		"args": args,
-		"PhoneGapCallBackId": callbackId,
+		"PhoneGapCallBackId": callbackId
 	};
 
     // Call into Mosync C++ through bridge library.
@@ -52,55 +52,64 @@ mosync.bridge.PhoneGap.send = function(callbackId, service, action, args)
 };
 
 /**
- * Starts watching the phone position and listening to the GPS events
- * Overrides the original geolocation api
- * to use MoSync Location API.
- *
- * @param success the callback function for returning the success result
- * @param fail callback function for failure
+ * Add support for location services if the platform does not support it by default
  */
-navigator.geolocation.watchPosition = function(success, fail)
+if(navigator.geolocation == undefined)
 {
-	var callbackId = "GeoLocation" + PhoneGap.callbackId++;
-    if (typeof success == "function" || typeof fail == "function")
-	{
-        PhoneGap.callbacks[callbackId] = {success:success, fail:fail};
-    }
-    mosync.bridge.PhoneGap.send(callbackId, "GeoLocation", "watchPosition");
-};
+	navigator.getlocation = {};
 
-/**
- * Gets the current GPS position once
- * Overrides the original geolocation api
- * to use MoSync Location API.
- *
- * @param success the callback function for returning the success result
- * @param fail callback function for failure
- */
-navigator.geolocation.getCurrentPosition = function(success, fail)
-{
-	var callbackId = "GeoLocation" + PhoneGap.callbackId++;
-    if (typeof success == "function" || typeof fail == "function")
+	/**
+	 * Starts watching the phone position and listening to the GPS events
+	 * Overrides the original geolocation api
+	 * to use MoSync Location API.
+	 *
+	 * @param success the callback function for returning the success result
+	 * @param fail callback function for failure
+	 */
+	navigator.geolocation.watchPosition = function(success, fail)
 	{
-        PhoneGap.callbacks[callbackId] = {success:success, fail:fail};
-    }
-    mosync.bridge.PhoneGap.send(callbackId, "GeoLocation", "getCurrentPosition");
-};
+		var callbackId = "GeoLocation" + PhoneGap.callbackId++;
+	    if (typeof success == "function" || typeof fail == "function")
+		{
+	        PhoneGap.callbacks[callbackId] = {success:success, fail:fail};
+	    }
+	    mosync.bridge.PhoneGap.send(callbackId, "GeoLocation", "watchPosition");
+	};
 
-/**
- * Stops watching the phone position and listening to the GPS events
- * Overrides the original geolocation api
- * to use MoSync Location API.
- *
- * @param success the callback function for returning the success result
- * @param fail callback function for failure
- */
-navigator.geolocation.clearWatch = function(success, fail)
-{
-	var callbackId = "GeoLocation" + PhoneGap.callbackId++;
-    if (typeof success == "function" || typeof fail == "function")
+	/**
+	 * Gets the current GPS position once
+	 * Overrides the original geolocation api
+	 * to use MoSync Location API.
+	 *
+	 * @param success the callback function for returning the success result
+	 * @param fail callback function for failure
+	 */
+	navigator.geolocation.getCurrentPosition = function(success, fail)
 	{
-        PhoneGap.callbacks[callbackId] = {success:success, fail:fail};
-    }
-    mosync.bridge.PhoneGap.send(callbackId, "GeoLocation", "clearWatch");
-};
+		var callbackId = "GeoLocation" + PhoneGap.callbackId++;
+	    if (typeof success == "function" || typeof fail == "function")
+		{
+	        PhoneGap.callbacks[callbackId] = {success:success, fail:fail};
+	    }
+	    mosync.bridge.PhoneGap.send(callbackId, "GeoLocation", "getCurrentPosition");
+	};
+
+	/**
+	 * Stops watching the phone position and listening to the GPS events
+	 * Overrides the original geolocation api
+	 * to use MoSync Location API.
+	 *
+	 * @param success the callback function for returning the success result
+	 * @param fail callback function for failure
+	 */
+	navigator.geolocation.clearWatch = function(success, fail)
+	{
+		var callbackId = "GeoLocation" + PhoneGap.callbackId++;
+	    if (typeof success == "function" || typeof fail == "function")
+		{
+	        PhoneGap.callbacks[callbackId] = {success:success, fail:fail};
+	    }
+	    mosync.bridge.PhoneGap.send(callbackId, "GeoLocation", "clearWatch");
+	};
+
+}

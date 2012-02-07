@@ -52,32 +52,32 @@ namespace MapDemoUtil
 	public:
 		virtual ~MessageMgr( );
 
-		static MessageMgr* get( ) 
-		{ 
-			if ( sSingleton == NULL ) 
-			{ 
-				sSingleton = newobject( MessageMgr, new MessageMgr( ) ); 
-			} 
-			return sSingleton; 
+		static MessageMgr* get( )
+		{
+			if ( sSingleton == NULL )
+			{
+				sSingleton = newobject( MessageMgr, new MessageMgr( ) );
+			}
+			return sSingleton;
 		}
 
-		static void shutdown( ) 
-		{ 
-			deleteobject( sSingleton ); 
+		static void shutdown( )
+		{
+			deleteobject( sSingleton );
 		}
 
 		void postMessage( const char *fmt, ... ) GCCATTRIB(format(printf, 2, 3));
-		
+
 		void postProgress( float progress );
-		
-		const char* getMessage( ) const 
-		{ 
-			return mMessage.c_str( ); 
+
+		const char* getMessage( ) const
+		{
+			return mMessage.c_str( );
 		}
 
-		float getProgress( ) const 
-		{ 
-			return mProgress; 
+		float getProgress( ) const
+		{
+			return mProgress;
 		}
 
 	private:
