@@ -71,6 +71,9 @@
 		case SENSOR_TYPE_MAGNETIC_FIELD:
 			result = [self startMagnetometer:value];
 			break;
+        case SENSOR_TYPE_COMPASS:
+			result = [self startCompass:value];
+			break;
 		default:
 			result = SENSOR_ERROR_NOT_AVAILABLE;
 	}
@@ -100,6 +103,9 @@
 			break;
 		case SENSOR_TYPE_MAGNETIC_FIELD:
 			result = [self stopMagnetometer];
+			break;
+        case SENSOR_TYPE_COMPASS:
+			result = [self stopCompass];
 			break;
 		default:
 			result = SENSOR_ERROR_NOT_AVAILABLE;
@@ -375,6 +381,73 @@
 }
 
 /**
+ * Start the compass.
+ * @param interval How fast to read data(time interval in milliseconds).
+ * @return SENSOR_ERROR_NONE if the sensor has been started, or a code error otherwise.
+ */
+-(int)startCompass:(const int)interval
+{
+	if(![CLLocationManager headingAvailable]) {
+		return SENSOR_ERROR_NOT_AVAILABLE;
+	}
+
+	if(isCompassRunning) {
+		return SENSOR_ERROR_ALREADY_ENABLED;
+	}
+
+    NSNumber* updateInterval = [[NSNumber numberWithInt:interval] autorelease];
+    [NSThread detachNewThreadSelector:@selector(startCompassOnNewThread:) toTarget:self withObject:updateInterval];
+
+	return SENSOR_ERROR_NONE;
+}
+
+-(void) startCompassOnNewThread:(NSNumber*) interval
+{
+    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+    [locationManager startUpdatingHeading];
+
+	// Start the compass.
+    // Location manager does not have an update interval property and it sends too fast data
+    // for our current event system.
+    // Used a timer that reads location data at a specified interval.
+    double intervalInMilliseconds = [self getUpdateIntervalFromRate:[interval intValue]];
+    NSTimeInterval updateInterval = intervalInMilliseconds / SECOND;
+    locationManagerTimer =  [NSTimer scheduledTimerWithTimeInterval:updateInterval
+                                                             target:self
+                                                           selector:@selector(readCompassData:)
+                                                           userInfo:nil
+                                                            repeats:YES];
+    [[NSRunLoop currentRunLoop] addTimer:locationManagerTimer forMode:NSDefaultRunLoopMode];
+    [[NSRunLoop currentRunLoop] run];
+
+	isMagnetometerSensorRunning = TRUE;
+    [pool release];
+}
+
+/**
+ * Stop the compass.
+ * @return SENSOR_ERROR_NONE if the sensor has been stopped, or a code error otherwise.
+ */
+-(int)stopCompass
+{
+	if(isCompassRunning)
+    {
+		[locationManagerTimer invalidate];
+        [locationManagerTimer release];
+        locationManagerTimer = nil;
+
+		[locationManager stopUpdatingHeading];
+		isCompassRunning = FALSE;
+	}
+    else
+    {
+		return SENSOR_ERROR_NOT_ENABLED;
+	}
+
+	return SENSOR_ERROR_NONE;
+}
+
+/**
  * Get the update interval associated with a rate constant.
  * @param rate One of the next constants:
  * - SENSOR_RATE_FASTEST
@@ -500,6 +573,24 @@
 }
 
 /**
+ * This method is invoked at a specified interval.
+ * Sends events with compass data.
+ * @param timer Timer used for this call.
+ */
+- (void)readCompassData:(NSTimer*) timer
+{
+    CLHeading* heading = [locationManager heading];
+    if (heading)
+    {
+        MAEvent event;
+        event.type = EVENT_TYPE_SENSOR;
+        event.sensor.type = SENSOR_TYPE_COMPASS;
+        event.sensor.values[0] = heading.magneticHeading;
+        Base::gEventQueue.put(event);
+    }
+}
+
+/**
  * Release all the objects.
  */
 - (void) dealloc {
@@ -509,6 +600,7 @@
 	[self stopProximity];
 	[self stopOrientation];
 	[self stopMagnetometer];
+    [self stopCompass];
 
 	[accelerometer release];
 	[motionManager release];

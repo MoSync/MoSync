@@ -68,6 +68,11 @@
      * The flag is set is the magnetometer sensor is started.
      */
     BOOL isMagnetometerSensorRunning;
+
+    /**
+     * The flag is set is the heading sensor is started.
+     */
+    BOOL isCompassRunning;
 }
 
 /**
@@ -152,6 +157,19 @@
  * @return SENSOR_ERROR_NONE if the sensor has been stopped, or a code error otherwise.
  */
 -(int) stopMagnetometer;
+
+/**
+ * Start the heading sensor.
+ * @param interval How fast to read data(time interval in milliseconds).
+ * @return SENSOR_ERROR_NONE if the sensor has been started, or a code error otherwise.
+ */
+-(int)startCompass:(const int)interval;
+
+/**
+ * Stop the compass.
+ * @return SENSOR_ERROR_NONE if the sensor has been stopped, or a code error otherwise.
+ */
+-(int) stopCompass;
 
 /**
  * Get the update interval associated with a rate constant.

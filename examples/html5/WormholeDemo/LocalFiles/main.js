@@ -26,14 +26,16 @@ function captureVideo()
 		 */
 		function(mediaFiles)
 		{
+			//document.getElementByID("videoSource").setAttribute("src", "file://" + mediaFiles[0].fullPath);
 			//The following code is required to circumvent an iOS 4 bug
-			$('#videoWidget').remove();
+			/*$('#videoWidget').remove();
 			var videoWidget = document.createElement('video');
 			videoWidget.setAttribute("id", "videoWidget");
 			videoWidget.setAttribute("controls", "true");
 			videoWidget.setAttribute("style", "width:100%;height:50%");
-			videoWidget.setAttribute("src", "file://" + mediaFiles[0].fullPath);
-			$('#videoWidgetContainer').append(videoWidget);
+			videoWidget.setAttribute("src", "file://" + mediaFiles[0].fullPath);*/
+			var videoContainer = document.getElementById("videoWidget");
+			videoContainer.innerHTML = '<source src="file://' + mediaFiles[0].fullPath + '" codecs="video/mp4"></source>';
 		},
 		function(error)
 		{
