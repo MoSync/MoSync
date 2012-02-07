@@ -82,7 +82,7 @@ int main(int argc, char **argv) {
 	// We support old, inconsistent platforms as well as the new platform based format
 	string newPlatform = oldInjectors[platform];
 	if (!newPlatform.empty()) {
-		printf("(Using platform %s instead of %s)\n", newPlatform.c_str(), platform.c_str());
+		//printf("(Using platform %s instead of %s)\n", newPlatform.c_str(), platform.c_str());
 		platform = newPlatform;
 	}
 	map<string, Injector*>::iterator i = gInjectors.find(platform);
