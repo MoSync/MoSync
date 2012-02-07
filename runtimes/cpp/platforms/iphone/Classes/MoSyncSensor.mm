@@ -345,6 +345,7 @@
     // Used a timer that reads location data at a specified interval.
     double intervalInMilliseconds = [self getUpdateIntervalFromRate:[interval intValue]];
     NSTimeInterval updateInterval = intervalInMilliseconds / SECOND;
+    isMagnetometerSensorRunning = TRUE;
     locationManagerTimer =  [NSTimer scheduledTimerWithTimeInterval:updateInterval
                                                              target:self
                                                            selector:@selector(readMagnetometerData:)
@@ -353,7 +354,6 @@
     [[NSRunLoop currentRunLoop] addTimer:locationManagerTimer forMode:NSDefaultRunLoopMode];
     [[NSRunLoop currentRunLoop] run];
 
-	isMagnetometerSensorRunning = TRUE;
     [pool release];
 }
 
@@ -368,8 +368,10 @@
 		[locationManagerTimer invalidate];
         [locationManagerTimer release];
         locationManagerTimer = nil;
-
-		[locationManager stopUpdatingHeading];
+        if(!isCompassRunning)
+        {
+            [locationManager stopUpdatingHeading];
+        }
 		isMagnetometerSensorRunning = FALSE;
 	}
     else
@@ -405,7 +407,7 @@
 {
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
     [locationManager startUpdatingHeading];
-
+    isCompassRunning = TRUE;
 	// Start the compass.
     // Location manager does not have an update interval property and it sends too fast data
     // for our current event system.
@@ -420,7 +422,6 @@
     [[NSRunLoop currentRunLoop] addTimer:locationManagerTimer forMode:NSDefaultRunLoopMode];
     [[NSRunLoop currentRunLoop] run];
 
-	isMagnetometerSensorRunning = TRUE;
     [pool release];
 }
 
@@ -435,8 +436,10 @@
 		[locationManagerTimer invalidate];
         [locationManagerTimer release];
         locationManagerTimer = nil;
-
-		[locationManager stopUpdatingHeading];
+        if(!isMagnetometerSensorRunning)
+        {
+            [locationManager stopUpdatingHeading];
+        }
 		isCompassRunning = FALSE;
 	}
     else
