@@ -32,10 +32,10 @@
 }
 
 - (id)initWithFrame:(CGRect)rect;
-- (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event;
-- (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event;
-- (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event;
-- (void)touchesCancelled:(NSSet *)touches withEvent:(UIEvent *)event;
+- (void) handleTouchesBegan:(NSSet *)touches;
+- (void) handleTouchesMoved:(NSSet *)touches;
+- (void) handleTouchesEnded:(NSSet *)touches;
+- (void) handleTouchesCancelled:(NSSet *)touches;
 @end
 
 @implementation MoSyncUIWindow
@@ -54,7 +54,8 @@
     return scale;
 }
 
-- (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
+- (void) handleTouchesBegan:(NSSet *)touches
+{
 	CGFloat screenScale = [self getScreenScale];
 
     for (UITouch *touch in touches)
@@ -67,7 +68,8 @@
 	}
 }
 
-- (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event {
+- (void) handleTouchesMoved:(NSSet *)touches
+{
 	CGFloat screenScale = [self getScreenScale];
 
 	for (UITouch *touch in touches)
@@ -80,7 +82,8 @@
 	}
 }
 
-- (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event {
+- (void) handleTouchesEnded:(NSSet *)touches
+{
 	CGFloat screenScale = [self getScreenScale];
 
     for (UITouch *touch in touches)
@@ -94,7 +97,8 @@
 	}
 }
 
-- (void)touchesCancelled:(NSSet *)touches withEvent:(UIEvent *)event {
+- (void) handleTouchesCancelled:(NSSet *)touches
+{
 	for (UITouch *touch in touches)
 	{
 		if(touch.phase ==  UITouchPhaseCancelled) {
@@ -104,6 +108,38 @@
 			[touchHelper removeTouch: touch];
 		}
 	}
+}
+
+- (void)sendEvent:(UIEvent *)event
+{
+    [super sendEvent:event];
+    UIEventType eventType = event.type;
+    if (eventType == UIEventTypeTouches)
+    {
+        NSSet* touches = [event allTouches];
+        if ([touches count] == 0)
+        {
+            return;
+        }
+
+        UITouch *touch = [[touches allObjects] objectAtIndex:0];
+        if(touch.phase ==  UITouchPhaseBegan)
+        {
+                [self handleTouchesBegan:touches];
+        }
+        else if(touch.phase == UITouchPhaseMoved)
+        {
+            [self handleTouchesMoved:touches];
+        }
+        else if(touch.phase == UITouchPhaseCancelled)
+        {
+            [self handleTouchesCancelled:touches];
+        }
+        else if(touch.phase == UITouchPhaseEnded)
+        {
+            [self handleTouchesEnded:touches];
+        }
+    }
 }
 @end
 
