@@ -13,6 +13,7 @@ document.addEventListener(
 	},
 	true);
 
+var videoPath;
 /**
  * Open the native Video Capture interface to record a single movie
  */
