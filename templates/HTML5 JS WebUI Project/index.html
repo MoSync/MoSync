@@ -3,8 +3,8 @@
 * @file index.html
 * @author Ali Sarrafi
 *
-* Template application that provides access to device servies
-* in HTML5/JavaScript.
+* Template application that includes librares to access device servies
+* from JavaScript.
 -->
 <html>
 	<head>
@@ -43,7 +43,6 @@
 				document.getElementById("name").innerHTML = device.name;
 				document.getElementById("width").innerHTML = screen.width;
 				document.getElementById("height").innerHTML = screen.height;
-				document.getElementById("colorDepth").innerHTML = screen.colorDepth;
 			}
 
 			/**
@@ -61,6 +60,18 @@
 			{
 				navigator.notification.beep(1);
 			}
+
+			/**
+			 * Change page background to random color.
+			 */
+			function changeColor()
+			{
+				var color = "#" +
+					(Math.random() * 0xFFFFFF + 0x1000000)
+						.toString(16).substr(1,6);
+				document.documentElement.style.backgroundColor = color;
+				document.body.style.backgroundColor = color;
+			}
 		</script>
 	</head>
 	<body onload="initialize();">
@@ -73,10 +84,10 @@
 				<div class="infoItem">Name: <span id="name">&nbsp;</span></div>
 				<div class="infoItem">Width: <span id="width">&nbsp;</span> (CSS pixels)</div>
 				<div class="infoItem">Height: <span id="height">&nbsp;</span> (CSS pixels)</div>
-				<div class="infoItem">Color Depth: <span id="colorDepth"></span></div>
 			</div>
 			<div class="pane button" onclick="vibrate();">Vibrate</div>
 			<div class="pane button" onclick="beep();">Beep</div>
+			<div class="pane button" onclick="changeColor();">Change Color</div>
 		</div>
 	</body>
 </html>

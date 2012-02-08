@@ -1,10 +1,10 @@
 /** CHANGE COLORS HERE **/
 
 body, .toolbar, #jqt ul, #jqt ul.individual li,#jqt ul li a.active,#jqt .info,#jqt #plastic,#tabbar, .s-scrollpane {
-    background-color: #519d00; /* main background color */
+    background-color: #DAA520; /* main background color */
 }
 #jqt h1, #jqt h2, #jqt ul li a,#jqt .whiteButton, #jqt .button.active, #jqt .cancel.active, #jqt .add.active, #jqt .back.active,#jqt ul li small,#tabbar .badge,#jqt .info,#jqt .info a  {
-    color: #2e6c00; /* main text color */
+    color: #A0522D; /* main text color */
 }
 
 /** END **/
@@ -156,17 +156,19 @@ body, .toolbar, #jqt ul, #jqt ul.individual li, #jqt ul li a.active,#tabbar,.s-s
     margin-top: 0;
 }
 #jqt ul {
-    color: #aaa;
+    background: #fff;
+    color: black;
     font: bold 18px "Helvetica Neue", Helvetica;
     padding: 0;
     margin: 15px 10px 17px 10px;
+    border: 1px solid #B4B4B4;
 }
 #jqt ul.rounded {
     -webkit-border-radius: 8px;
     -webkit-box-shadow: rgba(0,0,0,.3) 1px 1px 3px;
 }
 #jqt ul.rounded li a, #jqt ul.individual li a {
-  color: white;
+  color: black;
   text-shadow: 0 1px 1px rgba(0,0,0,0.5);
 }
 #jqt ul.rounded li:first-child, #jqt ul.rounded li:first-child a {
@@ -179,11 +181,11 @@ body, .toolbar, #jqt ul, #jqt ul.individual li, #jqt ul li a.active,#tabbar,.s-s
     -webkit-border-bottom-right-radius: 8px;
 }
 #jqt ul li {
-    color: white;
+   	color: #black;
     list-style-type: none;
     padding: 10px 10px 10px 10px;
     overflow: hidden;
-    border-top: 1px solid rgba(255,255,255,0.8);
+    border-top: 1px solid #B4B4B4;
 }
 #jqt ul li:first-child, #jqt ul.individual li {
   border: none;
@@ -303,7 +305,7 @@ body, .toolbar, #jqt ul, #jqt ul.individual li, #jqt ul li a.active,#tabbar,.s-s
 #jqt ul li input[type="url"],
 #jqt ul li textarea,
 #jqt ul li select {
-    color: white;
+    color: black;
     background: transparent url('data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==');
     border: 0;
     font: normal 17px "Helvetica Neue", Helvetica;
@@ -314,7 +316,7 @@ body, .toolbar, #jqt ul, #jqt ul.individual li, #jqt ul li a.active,#tabbar,.s-s
     -webkit-appearance: textarea;
 }
 #jqt ul li input::-webkit-input-placeholder, #jqt ul li textarea::-webkit-input-placeholder {
-    color: rgba(255,255,255,0.4);
+    color: rgba(0,0,0,0.4);
 }
 #jqt ul li textarea {
     height: 120px;
@@ -469,7 +471,7 @@ body, .toolbar, #jqt ul, #jqt ul.individual li, #jqt ul li a.active,#tabbar,.s-s
 }
 #jqt ul.edgetoedge li.sep {
     background: rgba(255,255,255,0.25);
-    color: #fff;
+    color: black;
     font-size: 16px;
     padding: 2px 10px;
     text-shadow: 0 1px 1px rgba(0,0,0,0.5);

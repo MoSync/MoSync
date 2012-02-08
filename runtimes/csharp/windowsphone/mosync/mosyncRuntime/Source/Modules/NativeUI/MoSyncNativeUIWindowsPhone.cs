@@ -45,6 +45,12 @@ namespace MoSync
             public bool fillSpaceHorizontalyEnabled;
             public bool fillSpaceVerticalyEnabled;
 
+            //Width
+            private double mWidth;
+
+            //Height
+            private double mHeight;
+
             public UIElement View
             {
                 get { return mView; }
@@ -89,6 +95,7 @@ namespace MoSync
                     if (value > 0)
                     {
                         mView.SetValue(Canvas.WidthProperty, value);
+                        mWidth = value;
                         fillSpaceHorizontalyEnabled = false;
                         Type objType = mView.GetType();
                         if (objType.GetProperty("Parent") != null)
@@ -106,6 +113,7 @@ namespace MoSync
                     {
                         mView.SetValue(Canvas.HorizontalAlignmentProperty, HorizontalAlignment.Stretch);
                         fillSpaceHorizontalyEnabled = true;
+                        mWidth = value;
 
                         //In case of setting the widget property after it is added
                         //to a parent widget
@@ -126,6 +134,7 @@ namespace MoSync
 					{
                         mView.SetValue(Canvas.HorizontalAlignmentProperty, HorizontalAlignment.Center);
                         fillSpaceHorizontalyEnabled = false;
+                        mWidth = value;
 
                         //In case of setting the widget property after it is added
                         //to a parent widget
@@ -158,6 +167,7 @@ namespace MoSync
                     {
                         mView.SetValue(Canvas.HeightProperty, value);
                         fillSpaceVerticalyEnabled = false;
+                        mHeight = value;
 
                         Type objType = mView.GetType();
                         if (objType.GetProperty("Parent") != null)
@@ -175,6 +185,7 @@ namespace MoSync
                     {
                         mView.SetValue(Canvas.VerticalAlignmentProperty, VerticalAlignment.Stretch);
                         fillSpaceVerticalyEnabled = true;
+                        mHeight = value;
 
                         //In case of setting the widget property after it is added
                         //to a parent widget
@@ -194,6 +205,7 @@ namespace MoSync
                     {
                         mView.SetValue(Canvas.VerticalAlignmentProperty, VerticalAlignment.Center);
                         fillSpaceVerticalyEnabled = false;
+                        mHeight = value;
 
                         //In case of setting the widget property after it is added
                         //to a parent widget
@@ -327,16 +339,15 @@ namespace MoSync
              * MAW_WIDGET_ALPHA implementation
              */
             [MoSyncWidgetProperty(MoSync.Constants.MAW_WIDGET_ALPHA)]
-            public string Alpha
+            public double Alpha
             {
                 set
                 {
-                    double val = double.Parse(value);
-                    mView.Opacity = val;
+                    mView.Opacity = value;
                 }
                 get
                 {
-                    return mView.Opacity.ToString();
+                    return mView.Opacity;
                 }
             }
 

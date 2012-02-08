@@ -2,6 +2,7 @@
 
 <html>
 <head>
+	<meta name="viewport" content="width=320; user-scalable=no" />
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 	<title>Wormhole Demo</title>
@@ -13,8 +14,8 @@
 	<!-- Import JQTouch default style (iPhone look). Replace the string "themes/default" with "themes/jqt" for a neutral (black) theme -->
 	<link type="text/css" rel="stylesheet" media="screen"
 		href="js/jqtouch/jqtouch.css">
-	<link type="text/css" rel="stylesheet" media="screen"
-		href="js/themes/apple/theme.css">
+	<!-- <link type="text/css" rel="stylesheet" media="screen"
+		href="js/themes/apple/theme.css"> -->
 	<!-- include JQuery through Google API => Always have the latest version -->
 	<script src="js/jqtouch/jquery-1.4.2.min.js" type="text/javascript"
 		charset="utf-8"></script>
@@ -29,14 +30,71 @@
 
 	<!-- JavaScript goes here -->
 	<script type="text/javascript">
-		// Fire up JQTouch
-		var jQT = $.jQTouch({
-			statusBar: "black"
-		});
+		/**
+		* A function that dynamically adds CSS or JavaScript files to the curent HTML file
+		*
+		* @param filename name of the file that should be added
+		* @param filetype type of the file can be either 'css' or 'script'
+		*/
+		function loadjscssfile(filename, filetype)
+		{
+			 if (filetype=="js"){ //if filename is a external JavaScript file
+			  var fileref=document.createElement('script')
+			  fileref.setAttribute("type","text/javascript")
+			  fileref.setAttribute("src", filename)
+			 }
+			 else if (filetype=="css"){ //if filename is an external CSS file
+			  var fileref=document.createElement("link")
+			  fileref.setAttribute("rel", "stylesheet")
+			  fileref.setAttribute("type", "text/css")
+			  fileref.setAttribute("href", filename)
+			 }
+			 if (typeof fileref!="undefined")
+			  document.getElementsByTagName("head")[0].appendChild(fileref)
+		}
+
+		//Load different themes for different platforms
+		if(mosync.isIOS)
+		{
+			loadjscssfile("js/themes/apple/theme.css", "css");
+			// Fire up JQTouch
+			var jQT = $.jQTouch({
+				statusBar : 'black',
+			});
+		}
+		else if(mosync.isAndroid)
+		{
+			loadjscssfile("js/themes/artspot/theme.css", "css");
+			// Fire up JQTouch without animations due to its limitations on Android
+			var jQT = $.jQTouch({
+				statusBar : 'black',
+				useAnimations: false
+			});
+		}
+		else if (mosync.isWindowsPhone)
+		{
+			loadjscssfile("js/themes/jqt/theme.css", "css");
+			// Fire up JQTouch without animations due to its limitations on Windows Phone
+			var jQT = $.jQTouch({
+				statusBar : 'black',
+				useAnimations: false
+			});
+		}
+		else
+		{
+			loadjscssfile("js/themes/apple/theme.css", "css");
+			// Fire up JQTouch
+			var jQT = $.jQTouch({
+				statusBar : 'black',
+				useAnimations: false
+			});
+		}
+
+
 
 		// Make sure we get the correct event type on every touch system.
-		//var clickEvent = mosync.isIOS ? "tap" : "click";
-		var clickEvent = "click";
+		var clickEvent = mosync.isIOS ? "tap" : "click";
+		//var clickEvent = "click";
 
 		/**
 		 * Will be called after all the markup in <body> was loaded
@@ -95,7 +153,7 @@
 		<!-- The main application menu -->
 		<div id="mainPage">
 			<div class="toolbar">
-				<h1>WormHole</h1>
+				<h1>Wormole</h1>
 			</div>
 			<ul class="rounded" style="text-align: center">
 				<li>

@@ -29,6 +29,7 @@ import android.webkit.JsPromptResult;
 import android.webkit.JsResult;
 import android.webkit.WebChromeClient;
 import android.webkit.WebStorage;
+import android.webkit.GeolocationPermissions.Callback;
 
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -401,6 +402,8 @@ public class WebWidget extends Widget
 			String databasePath = context.getDir("database", Context.MODE_PRIVATE).getPath();
 			this.getSettings().setDatabasePath(databasePath);
 
+			//enable support for geolocation in webview
+			this.getSettings().setGeolocationEnabled(true);
 
 			//enable support for DOM Storage and Database
 			this.getSettings().setDatabaseEnabled(true);
@@ -650,6 +653,17 @@ public class WebWidget extends Widget
 				WebStorage.QuotaUpdater quotaUpdater)
 		{
 			quotaUpdater.updateQuota(estimatedSize * 2);
+		}
+
+		/**
+		 * support for geolocation permissions
+		 */
+		@Override
+		public void onGeolocationPermissionsShowPrompt(String origin,
+		Callback callback) {
+		// TODO Auto-generated method stub
+		super.onGeolocationPermissionsShowPrompt(origin, callback);
+		callback.invoke(origin, true, false);
 		}
 
 // Commented out this method, because the console messages and JavaScript

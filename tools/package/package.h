@@ -58,6 +58,7 @@ struct SETTINGS {
 	const char* WPtarget;
 	bool WPgenerateOnly;
 	const char* WPguid;
+	const char* WPvsBuildPath;
 
 	// Android specific settings
     const char* androidPackage;
@@ -99,6 +100,8 @@ void testCsOutputDir(const SETTINGS&);
 
 void testIOSCert(const SETTINGS&);
 void testIOSSdk(const SETTINGS&);
+
+void testVsBuildPath(const SETTINGS& s);
 
 void testAndroidPackage(const SETTINGS&);
 void testAndroidVersionCode(const SETTINGS&);

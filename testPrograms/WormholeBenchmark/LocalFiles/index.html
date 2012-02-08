@@ -4,6 +4,10 @@
 -->
 <html>
 <head>
+
+<meta name="viewport" content="width=320; user-scalable=no" />
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
 <style>
 html
 {
@@ -108,7 +112,7 @@ function StringMessageStart()
     ThroughputCount = 0;
     ThroughputStartTime = new Date().getTime();
 
-    //var param = "MoSync goes Fran≈ƒ÷ais! Kudos to Younes Moumen, CTO";
+    //var param = "MoSync goes Fran√Ö√Ñ√ñais! Kudos to Younes Moumen, CTO";
     var param = "MoSync goes Fran" + String.fromCharCode(231) + "ais! Kudos to Younes Moumen, CTO";
     //param = mosync.encoder.encodeUTF8(param);
     for (var i = 0; i < Iterations; ++i)
@@ -308,7 +312,7 @@ function TestPromptBare()
     <img src="images/MoSyncLogo.png"/>
 </div>
 <div>
-    <div id="TouchArea" ontouchend="TestStart()">Start performance test</div>
+    <div id="TouchArea" onclick="TestStart()">Start performance test</div>
     <div id="TextBox"></div>
 </div>
 </body>

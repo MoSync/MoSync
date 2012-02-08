@@ -35,7 +35,7 @@ namespace MoSync
 
         public int GetStackValue(int offset)
         {
-            return mDataMemory.ReadInt32(GetStackPointer() - offset);
+            return mDataMemory.ReadInt32(GetStackPointer() + offset);
         }
 
         // will reset the program.
