@@ -27,9 +27,11 @@
 #include <maassert.h>
 #include <mawstring.h>
 #include <mastdlib.h>
-#include <maprofile.h>
+#include <mastring.h>		// C string functions
 
 #include "MainScreen.h"
+
+#define BUF_MAX 256
 
 // Text for video control button.
 #define SHOW_VIDEO_CONTROL_BUTTON_TEXT "Show video control"
@@ -139,7 +141,7 @@ void MainScreen::createMainLayout() {
 
     if (isAndroid())
     {
-        mEditBox->setText("http://www.mosync.com/files/videos/heineken.3gp");
+        mEditBox->setText("http://www.mosync.com/files/videos/Video.3gp");
     }
     else
     {
@@ -249,7 +251,10 @@ void MainScreen::videoViewStateChanged(
  */
 bool MainScreen::isAndroid()
 {
-	if (NULL != strstr(MA_PROF_STRING_PLATFORM, "android"))
+	char platform[BUF_MAX];
+	maGetSystemProperty("mosync.device.OS", platform, BUF_MAX);
+
+	if(strcmp(platform, "Android") == 0)
 	{
 		return true;
 	}
