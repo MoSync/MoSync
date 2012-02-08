@@ -70,6 +70,7 @@
 				statusBar : 'black',
 				useAnimations: false
 			});
+			$('#videoPanel').remove();
 		}
 		else if (mosync.isWindowsPhone)
 		{
@@ -139,6 +140,11 @@
 			{
 				refreshFiles();
 			});
+
+			if(mosync.isAndroid)
+			{
+				$('#videoPanel').remove();
+			}
 		}
 	</script>
 
@@ -280,8 +286,8 @@
 				<h1>Phonegap Capture</h1>
 				<a class="button back" onclick="jQT.goBack()" id="backButton">Back</a>
 			</div>
-			<ul class="rounded">
-				<li id="videoWidgetContainer"><video id="videoWidget" controls style="width:100%;height:50%"><source id="videoSource"></source></video></li>
+			<ul id="videoPanel" class="rounded">
+				<li id="videoWidgetContainer"><video id="videoWidget" controls style="width:100%;height:50%"></video></li>
 				<li><a href="#" onclick="captureVideo()">Capture video</a></li>
 			</ul>
 			<ul class="rounded">
