@@ -81,6 +81,9 @@ static const char* sUsage =
 "     --wp-guid                Application's GUID (Windows Phone only).\n"
 "     --wp-project-only        Don't build the generated Windows Phone project.\n"
 "                              Required on non-Windows hosts.\n"
+"     --wp-vs-build-path       The path to the MS build executable for building\n"
+"                              the generated Windows Phone project\n"
+"                              (Windows only).\n"
 // Re-enable later
 //"     --blackberry-packcod     Pack BlackBerry using the COD file format (BlackBerry only).\n"
 //"     --blackberry-jde <jde-location>\n"
@@ -179,6 +182,8 @@ int main(int argc, const char** argv) {
 			setString(i, argc, argv, s.WPguid);
 		} else if(streq(argv[i], "--wp-project-only")) { // Windows Phone specific
 			s.WPgenerateOnly = true;
+		} else if(streq(argv[i], "--wp-vs-build-path")) {
+			setString(i, argc, argv, s.WPvsBuildPath);
 		} else if(streq(argv[i], "--cs-output")) {
 			setString(i, argc, argv, s.csOutputDir);
 		} else if(streq(argv[i], "--cpp-output")) {
@@ -335,6 +340,14 @@ void testCsOutputDir(const SETTINGS& s) {
 		exit(1);
 	}
 }
+
+void testVsBuildPath(const SETTINGS& s) {
+	if (!s.WPgenerateOnly && !s.WPvsBuildPath) {
+		printf("Must specify either MS build path or generate only!\n");
+		exit(1);
+	}
+}
+
 void testAndroidPackage(const SETTINGS& s) {
 	if (!s.androidPackage) {
 		printf("Must specify Android package!\n");

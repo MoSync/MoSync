@@ -28,7 +28,7 @@ void injectIcon(const char* platform, const char* size, const char* srcIcon, con
 	ostringstream iconInjectCmd;
 
 	// TODO: That "-lenient yes" switch must be removed...
-	iconInjectCmd << getBinary("icon-injector") << " -lenient yes -platform " << platform << " -src " <<
+	iconInjectCmd << getBinary("icon-injector") << " -lenient yes -platform \"" << platform << "\" -src " <<
 		file(srcIcon) << " -size " << size << " -dst " << file(dst);
 
 	sh(iconInjectCmd.str().c_str(), silent);

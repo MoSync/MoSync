@@ -63,6 +63,9 @@ namespace MoSync
             //the inter widget spacer value
             protected int mGridUnitTypeValue;
 
+            //boolean which indicates that the paddings are set by the user
+            protected bool mPaddingSetByUser;
+
             /**
              * The constructor
              */
@@ -97,6 +100,8 @@ namespace MoSync
                 mGridUnitType = GridUnitType.Auto;
                 mGridUnitTypeValue = 1;
 
+                mPaddingSetByUser = false;
+
                 mView = mGrid;
 
                 mGrid.Margin = new Thickness(0.0);
@@ -115,32 +120,53 @@ namespace MoSync
                 MoSync.Util.RunActionOnMainThreadSync(() =>
                 {
                     WidgetBaseWindowsPhone widget = (child as WidgetBaseWindowsPhone);
-                    RowDefinition rowDef = new RowDefinition();
-                    RowDefinition uSpacerRowDef = new RowDefinition();
-                    RowDefinition bSpacerRowDef = new RowDefinition();
+                    RowDefinition rowDef = new RowDefinition(); //The row definition for the widget
 
-                    if (widget.fillSpaceVerticalyEnabled)
+                    //In order to be able to set various properties on the layout
+                    //there appeared the need for two spacers, top spacer, and
+                    //bottom spacer. For each widget one of each would be added
+                    //to the layout.
+
+                    RowDefinition upperSpacerRowDef = new RowDefinition(); //The row definition for the upper spacer
+                    RowDefinition bottomSpacerRowDef = new RowDefinition(); //The row definition for the bottom spacer
+
+                    if (widget.fillSpaceVerticalyEnabled) //FillSpaceVerticaly
                     {
+                        //Check if the paddings are not set by the user
+                        if (false == mPaddingSetByUser)
+                        {
+                            setPaddingSpacers(0, GridUnitType.Pixel);
+                        }
+                        else
+                        {
+                            setPaddingSpacers(1, GridUnitType.Auto);
+                        }
                         rowDef.Height = new System.Windows.GridLength(1, System.Windows.GridUnitType.Star);
-                        mGridUnitType = GridUnitType.Auto;
-                        mGridUnitTypeValue = 1;
+                        mGridUnitType = GridUnitType.Pixel;
+                        mGridUnitTypeValue = 0;
                     }
-                    else if (double.IsNaN(widget.Height) == false && 0 != widget.Height)
+                    else if(double.IsNaN( widget.Height ) == false) //Absolute value
                     {
                         rowDef.Height = new System.Windows.GridLength(widget.Height, System.Windows.GridUnitType.Pixel);
-                        mGridUnitType = GridUnitType.Auto;
-                        mGridUnitTypeValue = 1;
                     }
-                    else
+                    else //Wrap content as default
                     {
+                        //Check if the paddings are not set by the user
+                        if (false == mPaddingSetByUser)
+                        {
+                            setPaddingSpacers(0, GridUnitType.Pixel);
+                        }
                         rowDef.Height = new System.Windows.GridLength(1, System.Windows.GridUnitType.Auto);
+                        mGridUnitType = GridUnitType.Pixel;
+                        mGridUnitTypeValue = 0;
                     }
 
-                    uSpacerRowDef.Height = new System.Windows.GridLength(mGridUnitTypeValue, mGridUnitType);
-                    bSpacerRowDef.Height = new System.Windows.GridLength(mGridUnitTypeValue, mGridUnitType);
-
-                    mGrid.RowDefinitions.Insert(mGrid.RowDefinitions.Count - 1, uSpacerRowDef);
+                    mGrid.RowDefinitions.Insert(mGrid.RowDefinitions.Count - 1, upperSpacerRowDef);
                     mGrid.RowDefinitions.Insert(mGrid.RowDefinitions.Count - 1, rowDef);
+                    mGrid.RowDefinitions.Insert(mGrid.RowDefinitions.Count - 1, bottomSpacerRowDef);
+
+                    Grid.SetColumn((widget.View as System.Windows.FrameworkElement), 1);
+                    Grid.SetRow((widget.View as System.Windows.FrameworkElement), mGrid.RowDefinitions.Count - 3);
 
                     if (widget.View is FrameworkElement)
                     {
@@ -149,10 +175,6 @@ namespace MoSync
                     }
                     mGrid.Children.Add(widget.View);
 
-                    Grid.SetColumn((widget.View as System.Windows.FrameworkElement), 1);
-                    Grid.SetRow((widget.View as System.Windows.FrameworkElement), mGrid.RowDefinitions.Count - 2);
-
-                    mGrid.RowDefinitions.Insert(mGrid.RowDefinitions.Count - 1, bSpacerRowDef);
                     setSpacers(mGridUnitTypeValue, mGridUnitType);
                 });
             }
@@ -231,33 +253,27 @@ namespace MoSync
                 {
                     if (value.Equals(MoSync.Constants.MAW_ALIGNMENT_BOTTOM))
                     {
-                        mGridUnitType = GridUnitType.Pixel;
-                        mGridUnitTypeValue = 0;
-                        setSpacers(mGridUnitTypeValue, mGridUnitType);
-
                         mGrid.VerticalAlignment = VerticalAlignment.Bottom;
                         mSpacerUp.Height = new GridLength(1, GridUnitType.Star);
                         mSpacerDown.Height = new GridLength(0);
+
+                        mPaddingSetByUser = true;
                     }
                     else if (value.Equals(MoSync.Constants.MAW_ALIGNMENT_TOP))
                     {
-                        mGridUnitType = GridUnitType.Pixel;
-                        mGridUnitTypeValue = 0;
-                        setSpacers(mGridUnitTypeValue, mGridUnitType);
-
                         mGrid.VerticalAlignment = VerticalAlignment.Top;
                         mSpacerDown.Height = new GridLength(1, GridUnitType.Star);
                         mSpacerUp.Height = new GridLength(0);
+
+                        mPaddingSetByUser = true;
                     }
                     else if (value.Equals(MoSync.Constants.MAW_ALIGNMENT_CENTER))
                     {
-                        mGridUnitType = GridUnitType.Star;
-                        mGridUnitTypeValue = 1;
-                        setSpacers(mGridUnitTypeValue, mGridUnitType);
-
                         mGrid.VerticalAlignment = VerticalAlignment.Center;
                         mSpacerDown.Height = new GridLength(1, GridUnitType.Auto);
                         mSpacerUp.Height = new GridLength(1, GridUnitType.Auto);
+
+                        mPaddingSetByUser = true;
                     }
                 }
             }
@@ -275,6 +291,8 @@ namespace MoSync
                     {
                         mPaddingBottom = val;
                         mSpacerDown.Height = new GridLength(mPaddingBottom);
+
+                        mPaddingSetByUser = true;
                     }
                 }
             }
@@ -292,6 +310,8 @@ namespace MoSync
                     {
                         mPaddingTop = val;
                         mSpacerUp.Height = new GridLength(mPaddingTop);
+
+                        mPaddingSetByUser = true;
                     }
                 }
             }
@@ -330,21 +350,31 @@ namespace MoSync
                 }
             }
 
-            //Sets all the inter widget spacers to 0 or star
-            public void setSpacers(int gridUnitValue, GridUnitType gridUnitType)
+            //Sets all the inter widget spacers to 0, star or auto
+            private void setSpacers(int gridUnitValue, GridUnitType gridUnitType)
             {
-                for (int i = 1; i < mGrid.RowDefinitions.Count - 1; i += 2)
+                if (0 != mGrid.RowDefinitions[1].Height.Value || false == mGrid.RowDefinitions[1].Height.IsAbsolute)
+                    mGrid.RowDefinitions[1].Height = new GridLength(0, GridUnitType.Pixel);
+                if (0 != mGrid.RowDefinitions[mGrid.RowDefinitions.Count - 2].Height.Value || false == mGrid.RowDefinitions[mGrid.RowDefinitions.Count - 2].Height.IsAbsolute)
+                    mGrid.RowDefinitions[mGrid.RowDefinitions.Count - 2].Height = new GridLength(0, GridUnitType.Pixel);
+
+                int step = 0;
+
+                for (int i = 3; i < mGrid.RowDefinitions.Count - 2; i++)
                 {
-                    mGrid.RowDefinitions[i].Height = new GridLength(gridUnitValue, gridUnitType);
+                    step++;
+                    if (2 >= step)
+                    {
+                        mGrid.RowDefinitions[i].Height = new GridLength(gridUnitValue, gridUnitType);
+                    }
+                    else step = 0;
                 }
-                if (0 == mPaddingBottom)
-                {
-                    mSpacerDown.Height = new GridLength(0, GridUnitType.Pixel);
-                }
-                if (0 == mPaddingTop)
-                {
-                    mSpacerUp.Height = new GridLength(0, GridUnitType.Pixel);
-                }
+            }
+
+            private void setPaddingSpacers(int gridUnitValue, GridUnitType gridUnitType)
+            {
+                mGrid.RowDefinitions[0].Height = new GridLength(gridUnitValue, gridUnitType);
+                mGrid.RowDefinitions[mGrid.RowDefinitions.Count - 1].Height = new GridLength(gridUnitValue, gridUnitType);
             }
         }
     }

@@ -489,7 +489,7 @@ namespace MoSync
 			};
 		}
 
-		protected Syscalls.Delegate_maUpdateScreen mOldUpdateScreenImplementation;
+		protected Syscalls.Delegate_maUpdateScreen mOldUpdateScreenImplementation = null;
 		public void Init(Ioctls ioctls, Core core, Runtime runtime)
 		{
 
@@ -536,8 +536,17 @@ namespace MoSync
 
 			ioctls.maFrameBufferClose = delegate()
 			{
+				if (mOldUpdateScreenImplementation == null)
+					return 0;
 				Syscalls syscalls = runtime.GetSyscalls();
 				syscalls.maUpdateScreen = mOldUpdateScreenImplementation;
+				mOldUpdateScreenImplementation = null;
+				if(mCurrentDrawTarget == mFrontBuffer)
+					mCurrentDrawTarget = mBackBuffer;
+
+				System.Buffer.BlockCopy(mBackBuffer.Pixels, 0, mFrontBuffer.Pixels, 0, mFrontBuffer.PixelWidth * mFrontBuffer.PixelHeight * 4);
+				InvalidateWriteableBitmapBackBufferOnMainThread(mFrontBuffer);
+
 				return 1;
 			};
 

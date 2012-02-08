@@ -47,8 +47,7 @@ class ScreenMainWithThreeTabs :
 public:
 	ScreenMainWithThreeTabs() : ScreenMain()
 	{
-		lprintfln("platform %d", getPlatform());
-		if(getPlatform() != 2)
+		if(getPlatform() != WINDOWSPHONE7)
 		{
 			// Create child screens.
 			mColorScreen = new ScreenColorList();

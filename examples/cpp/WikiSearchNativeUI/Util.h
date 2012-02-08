@@ -60,7 +60,9 @@ enum Colors{
 	/** The color used for buttons and spacers. */
 	DARK_GREY  = 0x333333 ,
 	/** The background color used for other layouts. */
-	DARK_WHITE = 0xF7F7F7
+	DARK_WHITE = 0xF7F7F7,
+	/** The font color for the list view items */
+	BLACK = 0x000000
 };
 
 /** Utility sizes. */
@@ -71,6 +73,7 @@ enum WidgetSize{
 	PADDING           = 10 ,
 	FONT_SMALL        = 12 ,
 	FONT_LARGE        = 15 ,
+	FONT_EXTRA_LARGE  = 25 ,
 	/* The maximum value for the slider.It shouldn't be bigger, because the parsing would take a very long time. */
 	SLIDER_MAX_VALUE  = 50 ,
 	/** The maximum progress that the progress bar can reach. */

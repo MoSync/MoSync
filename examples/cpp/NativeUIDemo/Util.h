@@ -31,9 +31,15 @@ MA 02110-1301, USA.
 
 #define BUF_MAX 256
 
+enum platform_code{
+	ANDROID = 0,
+	IOS = 1,
+	WINDOWSPHONE7 = 2
+};
+
 /**
- * Detects if the current platform is Android.
- * @return true if the platform is Android, false otherwise.
+ * Detects the current platform
+ * @return platform_code specific for Android, iPhone OS or WindowsPhone
  */
 static int getPlatform()
 {
@@ -42,14 +48,14 @@ static int getPlatform()
 
 	if(strcmp(platform, "Android") == 0)
 	{
-		return 0;
+		return ANDROID;
 	}
 	else
 	{
 		if(strcmp(platform, "iPhone OS") == 0)
-			return 1;
+			return IOS;
 	}
-	return 2;
+	return WINDOWSPHONE7;
 }
 
 #endif /* UTIL_H_ */
