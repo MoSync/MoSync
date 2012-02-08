@@ -1,31 +1,51 @@
+<!DOCTYPE html>
 <!--
 * @file index.html
 * @author Ali Sarrafi
 *
-* Template application that provides Native UI functionality from
-* HTML5 aand JavaScript.
-*
-* The entire UI and application logic can be implemented
-* in JavaScript.
-* Please refer to the Wiki Page for more documentation
+* Example Application that shows how you can use JavaScript with NativeUI and device APIs
 -->
-
-<!DOCTYPE html>
-
 <html>
-
 <head>
+	<meta name="viewport" content="width=320, user-scalable=no">
+	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+	<script type="text/javascript" charset="utf-8" src="js/wormhole.js"></script>
+	<script type="text/javascript" charset="utf-8" src="js/main.js"></script>
+	<script type="text/javascript">
+		/**
+		 * Initialization.
+		 */
+		function initialize()
+		{
+			document.addEventListener("backbutton", close, true);
+			mosync.nativeui.initUI();
+		}
 
-<meta name="viewport" content="width=320, user-scalable=no">
+		/**
+		 * Handle the backbutton event.
+		 */
+		function close()
+		{
+			// Close the application if the back key is pressed.
+			mosync.bridge.send(["close"]);
+		}
 
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-
-<!-- Import Wormhole Library. -->
-<script type="text/javascript" charset="utf-8" src="js/wormhole.js"></script>
-
-<!-- The functionality for the app is implemented in main.js file -->
-<script type="text/javascript" charset="utf-8" src="js/main.js"></script>
-
+		/**
+		 * Called by the NativeUI library when the UI is ready to
+		 * be shown. Show the main screen here.
+		 *
+		 * Here we illustrate how to add events to widgets and how to
+		 * create widgets from JavaScript code.
+		 */
+		mosync.nativeui.UIReady = function()
+		{
+			// First get the screen we want to show.
+			var mainScreen = document.getNativeElementById("mainScreen");
+			document.addEventListener("deviceready", onDeviceReady, true);
+			// Show the screen.
+			mainScreen.show();
+		}
+	</script>
 </head>
 
 <body onload="initialize()">

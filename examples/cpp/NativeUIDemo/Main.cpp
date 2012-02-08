@@ -80,7 +80,7 @@ public:
 	 */
 	void pointerPressEvent(MAPoint2d point)
 	{
-		if(getPlatform() != 2) mMainScreen->handlePointerPressed(point);
+		if(getPlatform() != WINDOWSPHONE7) mMainScreen->handlePointerPressed(point);
 	}
 
 	/**
@@ -89,7 +89,7 @@ public:
 	 */
 	void pointerMoveEvent(MAPoint2d point)
 	{
-		if(getPlatform() != 2) mMainScreen->handlePointerMoved(point);
+		if(getPlatform() != WINDOWSPHONE7) mMainScreen->handlePointerMoved(point);
 	}
 
 	/**
