@@ -1,14 +1,14 @@
 # Copyright (C) 2010 MoSync AB
-# 
+#
 # This program is free software; you can redistribute it and/or modify it under
 # the terms of the GNU General Public License, version 2, as published by
 # the Free Software Foundation.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
 # or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
 # for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with this program; see the file COPYING.  If not, write to the Free
 # Software Foundation, 59 Temple Place - Suite 330, Boston, MA
@@ -46,14 +46,14 @@ class RuntimeSetting
         @shouldParallelize = parallelize
     end
 
-    def getName 
+    def getName
         return @name
     end
-    
+
     def getPattern
         return @pattern
     end
-    
+
     def shouldParallelize?
         return @shouldParallelize
     end
@@ -64,7 +64,7 @@ end
 ##
 # Represents a runtime build task. A command line
 # to RuntimeBuilder.rb is supplied to it, from which
-# different peices of information is inferred. 
+# different peices of information is inferred.
 #
 ##
 class RuntimeBuildTask
@@ -165,7 +165,7 @@ class WorkPackage
         return @taskList.length( )
     end
 
-    def getLog 
+    def getLog
         return @logList
     end
 end
@@ -180,7 +180,8 @@ SETTINGS = Array::new( [
                             RuntimeSetting::new( "iphoneos", "iphoneos", false ),
                             RuntimeSetting::new( "s60", "s60", false ),
                             RuntimeSetting::new( "wm", "(wm|sp)", false ),
-                            RuntimeSetting::new( "moblin", "moblin", false )
+                            RuntimeSetting::new( "moblin", "moblin", false ),
+                            RuntimeSetting::new( "winphone", "winphone", false )
                        ] )
 
 ##
@@ -303,7 +304,7 @@ def runBuildTasks ( srcPath, workList, maxThreads = 4 )
     end
 
     # Wait for threads
-    threadList.each do |t| 
+    threadList.each do |t|
         t.join( )
     end
 
@@ -355,7 +356,7 @@ def runConvAndCollectOutput ( outPath, srcPath )
     ensure
         FileUtils.cd( currPath )
     end
-  
+
     return resultList
 end
 
@@ -371,13 +372,13 @@ def groupRuntimeList ( runtimeList )
     resultMap = Hash.new( )
 
     runtimeList.each do |item|
+
         name = item.getRuntimeName( )
         type = getRuntimeTypeFromName( name )
 
         if ( resultMap[type].nil? == true )
             resultMap[type] = Array::new( )
         end
-    
         resultMap[type].push( item )
     end
 
@@ -392,7 +393,7 @@ end
 # will be divided into four tasks per package, if not
 # all of the runtimes of the same type will be put into the
 # same work package.
-# 
+#
 # @param runtimeMap A map containing the build tasks grouped
 #                   by runtime type.
 #
@@ -447,7 +448,7 @@ end
 # @return srcPath - Path to the MoSync source tree.
 # @return filterMap - A map of filters to use for selecting runtimes
 ##
-def parseArgs 
+def parseArgs
     # Parse args
     if ( ARGV.length < 2 )
         printUsageAndExit( )
@@ -457,11 +458,11 @@ def parseArgs
 
     filterMap = Hash::new( )
     if ( ARGV.length > 2 )
-        ARGV[2,ARGV.length-1].each do |name|  
+        ARGV[2,ARGV.length-1].each do |name|
             filterMap[name] = true
         end
     end
-    
+
     return outPath, srcPath, filterMap
 end
 
@@ -481,7 +482,7 @@ def main
     puts "-------------------\n"
     buildTasks = runConvAndCollectOutput( outPath, srcPath )
     puts "OK\n\n"
-    
+
     # Filter tasks
     if ( filterMap.empty? == false )
         buildTasks = buildTasks.select do |task|
@@ -490,7 +491,7 @@ def main
             filterMap[type].nil? == false
         end
     end
-  
+
     # Group runtimes and build work packages
     groupedBuildTasks = groupRuntimeList( buildTasks )
     workList = createWorkList( groupedBuildTasks ).shuffle( )
