@@ -13,13 +13,6 @@ Details
 
 When you call a Database objects transaction method it's callback methods will be called with a SQLTransaction object.  The user can build up a database transaction by calling the executeSql method multiple times.  
 
-Supported Platforms
--------------------
-
-- Android
-- BlackBerry WebWorks (OS 6.0 and higher)
-- iPhone
-
 Execute SQL Quick Example
 ------------------
 

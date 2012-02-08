@@ -31,14 +31,6 @@ The following methods can be invoked on a DirectoryEntry object:
 - __getFile__: Create or look up a file.
 - __removeRecursively__: Delete a directory and all of its contents.
 
-
-Supported Platforms
--------------------
-
-- Android
-- iOS
-- Windows Phone 7 ( Mango )
-
 getMetadata
 -----------
 

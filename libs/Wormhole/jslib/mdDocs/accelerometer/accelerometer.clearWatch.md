@@ -7,12 +7,6 @@ Stop watching the `Acceleration` referenced by the watch ID parameter.
 
 - __watchID__: The ID returned by `accelerometer.watchAcceleration`.
 
-Supported Platforms
--------------------
-
-- Android
-- iOS
-- Windows Phone 7 ( Mango )
 
 Quick Example
 -------------

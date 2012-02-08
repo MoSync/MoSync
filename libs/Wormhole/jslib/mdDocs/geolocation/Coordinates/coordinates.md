@@ -19,13 +19,6 @@ Description
 
 The `Coordinates` object is attached to the `Position` object. The `Position` object is returned to the user through a callback function.
 
-Supported Platforms
--------------------
-
-- Android
-- iOS
-- Windows Phone 7 ( Mango )
-
 Quick Example
 -------------
 

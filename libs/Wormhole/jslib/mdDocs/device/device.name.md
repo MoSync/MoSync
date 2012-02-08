@@ -10,13 +10,6 @@ Description
 
 `device.name` returns the name of the device's model or product. This value is set by the device manufacturer and may be different across versions of the same product.
 
-Supported Platforms
--------------------
-
-- Android
-- iPhone
-- Windows Phone 7 ( Mango )
-
 Full Example
 ------------
 

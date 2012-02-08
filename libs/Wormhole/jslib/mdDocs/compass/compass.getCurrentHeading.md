@@ -12,13 +12,6 @@ The compass is a sensor that detects the direction or heading that the device is
 
 The compass heading information is returned via a CompassHeading object using the `compassSuccess` callback function.
 
-Supported Platforms
--------------------
-
-- Android
-- iOS
-- Windows Phone 7 ( Mango ) if available in hardware
-
 Quick Example
 -------------
 
