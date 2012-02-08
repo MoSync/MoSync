@@ -106,6 +106,10 @@ namespace MoSync
 			{
 				if (mVibrateController == null)
 					mVibrateController = Microsoft.Devices.VibrateController.Default;
+				
+				// more than 5 seconds aren't allowed..
+				if (_ms > 5000)
+					_ms = 5000;
 
 				if (_ms < 0)
 					return _ms;
@@ -114,7 +118,7 @@ namespace MoSync
 				else
 					mVibrateController.Start(TimeSpan.FromMilliseconds(_ms));
 
-				return 0;
+				return 1;
 			};
 
             syscalls.maLoadProgram = delegate(int _data, int _reload)
