@@ -158,10 +158,10 @@ namespace MoSync
                 switch (pinfo.PropertyType.Name)
                 {
                     case "Double":
-                        pinfo.SetValue(this, Convert.ToDouble(stringValue), null);
+                        pinfo.SetValue(this, Convert.ToDouble(stringValue, System.Globalization.CultureInfo.InvariantCulture), null);
                         break;
                     case "Float":
-                        pinfo.SetValue(this, Convert.ToSingle(stringValue), null);
+						pinfo.SetValue(this, Convert.ToSingle(stringValue, System.Globalization.CultureInfo.InvariantCulture), null);
                         break;
                     case "Int32":
                         pinfo.SetValue(this, Convert.ToInt32(stringValue), null);
