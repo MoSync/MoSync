@@ -106,7 +106,7 @@ namespace MoSync
 			{
 				if (mVibrateController == null)
 					mVibrateController = Microsoft.Devices.VibrateController.Default;
-				
+
 				// more than 5 seconds aren't allowed..
 				if (_ms > 5000)
 					_ms = 5000;
