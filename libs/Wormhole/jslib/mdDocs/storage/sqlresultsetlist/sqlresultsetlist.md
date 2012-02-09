@@ -18,13 +18,6 @@ Details
 
 The SQLResultSetList contains the data returned from a SQL select statement.  The object contains a length property letting you know how many rows the select statement has been returned.  To get a row of data you would call the `item` method specifing an index.  The item method returns a JavaScript Object who's properties are the columns of the database the select statement was executed against.
 
-Supported Platforms
--------------------
-
-- Android
-- BlackBerry WebWorks (OS 6.0 and higher)
-- iPhone
-
 Execute SQL Quick Example
 ------------------
 

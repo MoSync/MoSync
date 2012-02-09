@@ -400,6 +400,9 @@ namespace MoSync
 				File file = mFileHandles[_file];
 				if (file.IsDirectory)
 					return MoSync.Constants.MA_FERR_WRONG_TYPE;
+				if (file.Exists == false)
+					return MoSync.Constants.MA_FERR_GENERIC;
+
 				IsolatedStorageFileStream fileStream = file.FileStream;
 				SeekOrigin origin;
 				switch (_whence)
@@ -470,6 +473,9 @@ namespace MoSync
 			ioctls.maFileSize = delegate(int _file)
 			{
 				File file = mFileHandles[_file];
+				if (file.Exists == false)
+					return MoSync.Constants.MA_FERR_GENERIC;
+
 				return file.Size();
 			};
 

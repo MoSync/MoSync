@@ -1,7 +1,7 @@
 
 
 <div id="contents_index">
-			<h1>Wormhole API Documentation</h1>
+			<h1>JavaScript API Documentation</h1>
 			<table id="index_table" border="1"  style="background-color:#EFEFEF;border-color:#989898"
 					width="100%" height="500px" cellpadding="20" cellspacing="0">
 

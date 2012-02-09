@@ -74,9 +74,6 @@ class LoveSMSMoblet : public WebAppMoblet
 public:
 	LoveSMSMoblet()
 	{
-		// Extract files in LocalFiles folder to the device.
-		extractFileSystem();
-
 		// Enable message sending from JavaScript to C++.
 		enableWebViewMessages();
 

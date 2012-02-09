@@ -17,12 +17,6 @@ The `accelerometer.watchAcceleration` gets the device's current acceleration at 
 
 The returned watch ID references references the accelerometer watch interval. The watch ID can be used with `accelerometer.clearWatch` to stop watching the accelerometer.
 
-Supported Platforms
--------------------
-
-- Android
-- iOS
-- Windows Phone 7 ( Mango )
 
 Quick Example
 -------------

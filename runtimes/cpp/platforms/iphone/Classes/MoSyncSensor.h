@@ -51,8 +51,16 @@
     /**
      * CLLocationManager does not offer a way of setting an update interval.
      * Used a timer for reading location data at a given time interval.
+     * This timer is used for the magnetic field sensor
      */
     NSTimer* locationManagerTimer;
+
+    /**
+     * CLLocationManager does not offer a way of setting an update interval.
+     * Used a timer for reading location data at a given time interval.
+     * This timer is used for the compass sensor
+     */
+    NSTimer* compassManagerTimer;
 
     /**
      * The flag is set is the proximity sensor is started.
@@ -68,6 +76,11 @@
      * The flag is set is the magnetometer sensor is started.
      */
     BOOL isMagnetometerSensorRunning;
+
+    /**
+     * The flag is set is the heading sensor is started.
+     */
+    BOOL isCompassRunning;
 }
 
 /**
@@ -152,6 +165,19 @@
  * @return SENSOR_ERROR_NONE if the sensor has been stopped, or a code error otherwise.
  */
 -(int) stopMagnetometer;
+
+/**
+ * Start the heading sensor.
+ * @param interval How fast to read data(time interval in milliseconds).
+ * @return SENSOR_ERROR_NONE if the sensor has been started, or a code error otherwise.
+ */
+-(int)startCompass:(const int)interval;
+
+/**
+ * Stop the compass.
+ * @return SENSOR_ERROR_NONE if the sensor has been stopped, or a code error otherwise.
+ */
+-(int) stopCompass;
 
 /**
  * Get the update interval associated with a rate constant.

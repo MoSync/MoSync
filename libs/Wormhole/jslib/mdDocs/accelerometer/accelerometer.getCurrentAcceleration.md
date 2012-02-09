@@ -12,12 +12,6 @@ The accelerometer is a motion sensor that detects the change (delta) in movement
 
 The acceleration is returned using the `accelerometerSuccess` callback function.
 
-Supported Platforms
--------------------
-
-- Android
-- iOS
-- Windows Phone 7 ( Mango )
 
 Quick Example
 -------------

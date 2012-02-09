@@ -7,13 +7,6 @@ The device will play a beep sound.
 
 - __times:__ The number of times to repeat the beep (`Number`)
 
-Supported Platforms
--------------------
-
-- Android
-- iOS
-- Windows Phone 7 ( Mango )
-
 Quick Example
 -------------
 

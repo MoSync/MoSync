@@ -16,11 +16,6 @@ The capture operation ends when either the user exits the camera application, or
 
 When the capture operation is finished, it will invoke the CaptureCB callback with an array of MediaFile objects describing each captured image file.  If the operation is terminated by the user before an image is captured, the CaptureErrorCB callback will be invoked with a CaptureError object with the CaptureError.`CAPTURE_NO_MEDIA_FILES` error code.
 
-Supported Platforms
--------------------
-- Android
-- iOS
-
 Quick Example
 -------------
 
