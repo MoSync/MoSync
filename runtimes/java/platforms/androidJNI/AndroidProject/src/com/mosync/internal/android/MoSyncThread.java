@@ -1697,7 +1697,7 @@ public class MoSyncThread extends Thread
 		if (imageResource == null)
 		{
 			logError("maGetImageSize : no such resource");
-			return -1;
+			maPanic(0, "PANIC, Checking image size for non image resource");
 		}
 
 		return EXTENT(
