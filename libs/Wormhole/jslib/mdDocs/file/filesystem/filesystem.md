@@ -14,13 +14,6 @@ Details
 
 The `FileSystem` object represents information about the file system. The name of the file system will be unique across the list of exposed file systems.  The root property contains a `DirectoryEntry` object which represents the root directory of the file system.
 
-Supported Platforms
--------------------
-
-- Android
-- iOS
-- Windows Phone 7 ( Mango )
-
 File System Quick Example
 -------------------------
 

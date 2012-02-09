@@ -1,15 +1,12 @@
 /**
  * @file main.cpp
  *
- * This template application shows how to extend the functionality
- * in HTML5/JS with custom code written in C++. See code below
- * for custom code added in methods handleMessageStreamJSON()
- * and handleMessageStream().
+ * Demo application that shows how to use the Wormhole JavaScript
+ * library. This file contains the C++ code that implements native
+ * functions in the JavaScript library.
  *
- * When reading the code below, it is good to know that there are
- * two message formats: JSON and string streams. String streams are
- * generally faster. See comments in the code below for further details.
- * PhoneGap uses JSON messages, NativeUI uses string streams.
+ * You don't need to change any code in this file unless you wish to
+ * implement some specific functionality in C/C++.
  */
 
 #include <Wormhole/WebAppMoblet.h>
@@ -102,7 +99,7 @@ public:
 		// Uncomment to print message data for debugging.
 		// You need to build the project in debug mode for
 		// the log output to be displayed.
-		printMessage(data);
+		//printMessage(data);
 
 		// Check the message protocol.
 		MessageProtocol protocol(data);

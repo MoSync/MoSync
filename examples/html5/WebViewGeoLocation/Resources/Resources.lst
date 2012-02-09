@@ -1,3 +1,3 @@
-.res GEOLOCATION_HTML
+.res INDEX_HTML
 .bin
-.include "GeoLocation.html"
+.include "index.html"

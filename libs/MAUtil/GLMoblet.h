@@ -111,7 +111,7 @@ public:
 	/**
 	* Sets the amount of calls to 'draw' per second. This is the optimal
 	* amount of frames per second. If 'draw' do complex drawing it might
-	* get invoked less times per second. Default is 50 frames per second.
+	* get invoked less times per second. Default is as fast as possible.
 	*/
 	void setPreferredFramesPerSecond(float fps);
 

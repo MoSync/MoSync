@@ -28,27 +28,7 @@ MA 02110-1301, USA.
 */
 #include <ma.h>
 #include <conprint.h>
-#ifdef MAPIP
-#include <maprofile.h>
-#endif
 #include "MAHeaders.h"
-
-//
-// Handle different decoding capabilities of different
-// runtimes.
-//
-#if defined( MA_PROF_STRING_PLATFORM_WM5 ) || \
-	defined( MA_PROF_STRING_PLATFORM_WM6 ) || \
-	defined( MA_PROF_STRING_PLATFORM_WM6PRO ) || \
-	defined( MA_PROF_STRING_PLATFORM_SP2003 ) || \
-	defined( MA_PROF_STRING_PLATFORM_MOBLIN )
-#define SOUND_RESOURCE R_MOSO_WAV
-#else
-#define SOUND_RESOURCE R_MOSO_MP3
-#endif
-
-
-
 
 extern "C" {
 /**
@@ -60,7 +40,10 @@ int MAMain()
 	//MAExtent e = maGetScrSize();
 
 	/// play R_MOSO sound
-	maSoundPlay(SOUND_RESOURCE, 0, maGetDataSize(SOUND_RESOURCE));
+	if ( maSoundPlay(R_MOSO_MP3, 0, maGetDataSize(R_MOSO_MP3)) < 0 )
+	{
+		maSoundPlay(R_MOSO_WAV, 0, maGetDataSize(R_MOSO_WAV));
+	}
 
 	printf("Press 0/RSK to exit.");
 

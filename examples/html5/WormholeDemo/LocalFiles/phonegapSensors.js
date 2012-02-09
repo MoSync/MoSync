@@ -1,4 +1,8 @@
-// Sensors implemented by PhoneGap.
+/**
+ * @file phonegapSensors.js
+ *
+ * Demo of sensors implemented by PhoneGap.
+ */
 
 // ************ Accelerometer ************
 
@@ -93,7 +97,7 @@ var compassWatch = null;
 function toggleCompass()
 {
 	if (compassWatch !== null) {
-		navigator.geolocation.clearWatch(compassWatch);
+		navigator.compass.clearWatch(compassWatch);
 		updateCompass({
 			magneticHeading : "&nbsp;"
 		});

@@ -29,14 +29,6 @@ Methods
 - __file__: Creates a File object containing file properties.
 
 
-Supported Platforms
--------------------
-
-- Android
-- iOS
-- Windows Phone 7 ( Mango )
-
-
 getMetadata
 ----------------
 

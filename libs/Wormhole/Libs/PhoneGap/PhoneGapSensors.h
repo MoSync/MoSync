@@ -145,6 +145,11 @@ namespace Wormhole
 		 * after receiving the sensor event
 		 */
 		MAUtil::String mCompassWatchCallBack;
+
+		/**
+		 * Compass Watch flag which indicates the type of call from PhoneGap
+		 */
+		bool mCompassWatchStarted;
 	};
 } // namespace
 

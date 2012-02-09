@@ -7976,8 +7976,10 @@ group SensorAPI "Sensor API" {
 			ORIENTATION = 3;
 			// A constant describing a gyroscope sensor type.
 			GYROSCOPE = 4;
-			// A constant describing an proximity sensor type.
+			// A constant describing a proximity sensor type.
 			PROXIMITY = 5;
+			// A constant describing a compass sensor type.
+			COMPASS = 6;
 		}
 
 		} // end of sensor types

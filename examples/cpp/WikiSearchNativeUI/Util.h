@@ -60,7 +60,9 @@ enum Colors{
 	/** The color used for buttons and spacers. */
 	DARK_GREY  = 0x333333 ,
 	/** The background color used for other layouts. */
-	DARK_WHITE = 0xF7F7F7
+	DARK_WHITE = 0xF7F7F7,
+	/** The font color for the list view items */
+	BLACK = 0x000000
 };
 
 /** Utility sizes. */

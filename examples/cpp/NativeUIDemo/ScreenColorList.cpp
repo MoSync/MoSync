@@ -90,11 +90,11 @@ void ScreenColorList::createUI()
 {
 	// Set title and icon of the stack screen.
 	setTitle("Colors");
-	if (getPlatform() == 0)
+	if (getPlatform() == ANDROID)
 	{
 		setIcon(RES_TAB_ICON_COLORS_ANDROID);
 	}
-	else if(getPlatform() == 1)
+	else if(getPlatform() == IOS)
 	{
 		setIcon(RES_TAB_ICON_COLORS);
 	}
