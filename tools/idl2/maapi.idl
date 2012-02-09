@@ -8757,6 +8757,7 @@ group NFCAPI "NFC API" {
 
 			constset int MA_AUDIO_ERR_ {
 				OK = 0;
+				// Invalid instance, the given MAAudioInstance can't do this
 				INVALID_INSTANCE = -2;
 				INVALID_DATA = -3;
 				INVALID_FILENAME = -4;
@@ -8774,111 +8775,149 @@ group NFCAPI "NFC API" {
 		} // end of Audio API constants
 
 		/**
-		* A multi sound audio API which allows applications to play
+		* The Audio API gives the developer more control
 		* Only available on Android and iOS
 		*/
 		group AudioAPIFunctions "Audio API Functions" {
 
 			/**
-			* \brief creates a MAAudioData from a binary MoSync resource
+			* @brief creates a MAAudioData from a binary MoSync resource
 			* Loads a binary resource and creates a MAAudioData if possible
-			* \param mime	The mime string for the resource. Can be NULL
-			* \param data	The binary resource
-			* \param offset The offset in the binary file to where the data starts
-			* \param length	The length of the data to use
-			* \param flags	MA_AUDIO_DATA_STREAM means that the audio should be streamed
-			*		either from disk or over HTTP. This is for music playback.
-			*		Sound effects should have the flag set to 0.
-			* \return	A MAAudioData index >0
-			*		<0 on fail
+			* @param mime	The mime string for the resource. Can be NULL
+			* @param data	The binary resource
+			* @param offset The offset in the binary file to where the data starts
+			* @param length	The length of the data to use
+			* @param flags	MA_AUDIO_DATA_STREAM means that the audio should be streamed
+			*				either from disk or over HTTP. This is only for music playback,
+			*				sound effects should have the flag set to 0.
+			* @return		A MAAudioData index >0
+			*				<0 on fail
 			*/
 			MAAudioData maAudioDataCreateFromResource(in MAString mime, in MAHandle data, in int offset, in int length, in int flags);
 
 			/**
-			* \brief Creates a MAAudioData from a URL
-			* The URL is being
+			* @brief Creates a MAAudioData from a URL
+			* The URL is being used to load audio resource over HTTP or from disk.
+			* @param mime 	The mime string for the resource. Can be NULL
+			* @param url 	The URL to the resource file. Accepts 'http://' or 'http://' for
+			*				streaming from internet. Without protcol file is assumed.
+			* @param flags 	MA_AUDIO_DATA_STREAM means that the audio should be streamed
+			*				either from disk or over HTTP. This is only for music playback,
+			*				sound effects should have this flag set to 0.
+			* @return 		A MAAudioData > 0
+			*				<0 on fail.
 			*/
 			MAAudioData maAudioDataCreateFromURL(in MAString mime, in MAString url, in int flags);
 
 			/**
+			* @brief Destroys a MAAudioData handle and releases used memory
 			*
+			* @param audioData 	The audio data
+			* @return 			MA_AUDIO_ERR_OK on success
+			*					<0 on fail.
 			*/
 			int maAudioDataDestroy(in MAAudioData audioData);
 
 			/**
+			* @brief Creates a audio instance from a audio data
+			*
+			* @param audioData 	The audio data handle
+			*
+			* @return 			A MAAudioInstance handle
+			* 					<0 on error.
 			*
 			*/
 			MAAudioInstance maAudioInstanceCreate(in MAAudioData audioData);
 
 			/**
-			*
+			* @brief Destroys a MAAudioInstance handle releases used memory
+			* @param audioInstance 	The audio instance handle
+			* @return 				MA_AUDIO_ERR_OK on success,
+			*						<0 on error.
 			*/
 			int maAudioInstanceDestroy(in MAAudioInstance audioInstance);
 
 			/**
-			*
+			* @brief Returns the lenght in milliseconds for this instance.
+			* @param audio 	The audio instance handle
+			* @return 		The lenght in milliseconds,
+			*				<0 on error.
 			*/
 			int maAudioGetLength(in MAAudioInstance audio);
 
 			/**
+			* @brief Sets the number of loops this instance will play
 			*
+			* @param audio 	The audio instance handle
+			* @param loops 	0 means play once,
+			*				>0 means loop 'loops' times,
+			* 				-1 means loop forever.
 			*/
 			int maAudioSetNumberOfLoops(in MAAudioInstance audio, in int loops);
 
 			/**
-			* \brief Prepares an audio instance before playback
+			* @brief Prepares an audio instance before playback
 			* If asynchronous the call will return directly, but the
 			* audio instance will not be ready for playback.
 			* If synchronous the call will block until finished
 			* and the audio instance will be ready directly.
 			* An EVENT_TYPE_AUDIO_PREPARED event will be triggered for the asynchronous prepare.
-			* Notes:
-			* Android: If a streaming audio is already playing and a new one is being prepared,
-			* the playing audio will stop.
+			* @attention 	If a streaming audio is already playing and a new one is being prepared,
+			* 				the playing audio will stop.
 			*
-			* \param audio The audio instance
-			* \param async 0 if synchronus, 1 if asynchronous
-			* \return 	MA_AUDIO_ERR_OK on success
+			* @param audio The audio instance
+			* @param async 0 if synchronus, 1 if asynchronous
+			* @return 	MA_AUDIO_ERR_OK on success
 			*		MA_AUDIO_ERR_INVALID_INSTANCE on invalid audio instance
 			*		MA_AUDIO_ERR_ALREADY_PREPARED on already prepared audio instance
 			*/
 			int maAudioPrepare(in MAAudioInstance audio, in int async);
 
 			/**
-			* \brief Plays the current sound in the audio instance
+			* @brief Plays the current sound in the audio instance
 			* If the sound hasn't been prepared it will be prepared before playing.
-			* Notes:
-			* Android: If the audio hasn't been prepared it will be synchrounous prepared before playing,
-			* this means that there might be a delay before this call returns. Always make sure that your
-			* audio has been properly prepared before playing.
+			* @attention 	If the audio hasn't been prepared, on Android, it will be synchrounous
+			*				prepared before playing, this means that there might be a delay before
+			*				this call returns. Always make sure that your audio has been properly
+			*				prepared before playing.
 			*
-			* \param audio The audio instance
+			* @param audio The audio instance
 			*/
 			int maAudioPlay(in MAAudioInstance audio);
 
 			/**
-			*
+			* @brief Sets the current position in milliseconds
+			* @param audio 			The audio instance handle
+			* @param milliseconds 	The number of milliseconds from the start
+			* @return 				MA_AUDIO_ERR_OK on success,
+			*						<0 on error.
 			*/
 			int maAudioSetPosition(in MAAudioInstance audio, in int milliseconds);
 
 			/**
-			*
+			* @brief Gets the current position in milliseconds
+			* @param audio 	The audio instance handle
+			* @return 		The current playing position in milliseconds,
+			*				<0 on error.
 			*/
 			int maAudioGetPosition(in MAAudioInstance audio);
 
 			/**
-			*
+			* @brief Sets the volume for this audio instance
+			* @param audio 		The audio instance handle
+			* @return 			MA_AUDIO_ERR_OK on success,
+			*					<0 on error
 			*/
 			int maAudioSetVolume(in MAAudioInstance audio, in float volume);
 
 			/**
-			* \brief Pauses the the audio instance.
+			* @brief Pauses the the audio instance.
 			* It will stay prepared, so the sound can be resumed at any time using maAudioPlay.
 			*/
 			int maAudioPause(in MAAudioInstance audio);
 
 			/**
-			* \brief Stops the the audio instance and sets the position to the beginning.
+			* @brief Stops the the audio instance and sets the position to the beginning.
 			* The audio instance will be unprepared, meaning all it's prepared buffers will
 			* be unloaded. In order to play the sound again the instance has to be prepared.
 			*/
