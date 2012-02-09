@@ -1,17 +1,26 @@
-function onDeviceReady() {
-			var platform = document.getNativeElementById("DeviceOSLabel");
-			platform.setProperty("text" , "Platform: " + device.platform);
-			var version = document.getNativeElementById("OSVersionLabel");
-			version.setProperty("text" , "Version: " + device.version);
-			var uuid = document.getNativeElementById("UUIDLabel");
-			uuid.setProperty("text" , "UUID: " + device.uuid);
-			var deviceName = document.getNativeElementById("DeviceNameLabel");
-			deviceName.setProperty("text" , "Device Name: " + device.name);
+/**
+ * @file main.js
+ *
+ * Functions to display device info and handle sensors.
+ */
+
+function onDeviceReady()
+{
+	var platform = document.getNativeElementById("DeviceOSLabel");
+	platform.setProperty("text" , "Platform: " + device.platform);
+	var version = document.getNativeElementById("OSVersionLabel");
+	version.setProperty("text" , "Version: " + device.version);
+	var uuid = document.getNativeElementById("UUIDLabel");
+	uuid.setProperty("text" , "UUID: " + device.uuid);
+	var deviceName = document.getNativeElementById("DeviceNameLabel");
+	deviceName.setProperty("text" , "Device Name: " + device.name);
 }
+
 var accelPhonegapWatch = null;
 function toggleAccelPhonegap()
 {
-	if (accelPhonegapWatch !== null) {
+	if (accelPhonegapWatch !== null)
+	{
 		navigator.accelerometer.clearWatch(accelPhonegapWatch);
 		updateAccelPhonegap({
 			x : " ",
@@ -19,18 +28,21 @@ function toggleAccelPhonegap()
 			z : " "
 		});
 		accelPhonegapWatch = null;
-	} else {
+	}
+	else
+	{
 		var options = {};
 		options.frequency = 1000;
 		accelPhonegapWatch = navigator.accelerometer.watchAcceleration(
-				updateAccelPhonegap, function(ex) {
-					console.log("accel fail (" + ex.name + ": " + ex.message + ")");
-				}, options);
+			updateAccelPhonegap, function(ex) {
+				console.log("accel fail (" + ex.name + ": " + ex.message + ")");
+			}, options);
 	}
 }
 
-function roundNumber(num) {
-	if(typeof num == "number")
+function roundNumber(num)
+{
+	if (typeof num == "number")
 	{
 		var dec = 3;
 		var result = Math.round(num * Math.pow(10, dec)) / Math.pow(10, dec);
@@ -42,7 +54,8 @@ function roundNumber(num) {
 	}
 }
 
-function updateAccelPhonegap(a) {
+function updateAccelPhonegap(a)
+{
 	var data = document.getNativeElementById("AccelX");
 	data.setProperty("text" , "X: " + a.x);
 
@@ -56,7 +69,8 @@ function updateAccelPhonegap(a) {
 var geolocationWatch = null;
 function toggleGeolocation()
 {
-	if (geolocationWatch !== null) {
+	if (geolocationWatch !== null)
+	{
 		navigator.geolocation.clearWatch(geolocationWatch);
 		console.log("Starting location");
 		updateGeolocation({coords:{
@@ -65,17 +79,20 @@ function toggleGeolocation()
 			altitude : " "
 		}});
 		geolocationWatch = null;
-	} else {
+	}
+	else
+	{
 		var options = {};
 		options.frequency = 1000;
 		geolocationWatch = navigator.geolocation.watchPosition(
-				updateGeolocation, function(ex) {
-					alert("geolocation fail (" + ex.name + ": " + ex.message + ")");
-				}, options);
+			updateGeolocation, function(ex) {
+				alert("geolocation fail (" + ex.name + ": " + ex.message + ")");
+			}, options);
 	}
 }
 
-function updateGeolocation(a) {
+function updateGeolocation(a)
+{
 	var data = document.getNativeElementById("LocLat");
 	data.setProperty("text" , "Latitude: " + a.coords.latitude);
 
@@ -86,23 +103,27 @@ function updateGeolocation(a) {
 var compassWatch = null;
 function toggleCompass()
 {
-	if (compassWatch !== null) {
+	if (compassWatch !== null)
+	{
 		navigator.compass.clearWatch(compassWatch);
 		updateCompass({
 			magneticHeading : " "
 		});
 		compassWatch = null;
-	} else {
+	}
+	else
+	{
 		var options = {};
 		options.frequency = 1000;
 		compassWatch = navigator.compass.watchHeading(
-				updateCompass, function(ex) {
-					alert("compass fail (" + ex.name + ": " + ex.message + ")");
-				}, options);
+			updateCompass, function(ex) {
+				alert("compass fail (" + ex.name + ": " + ex.message + ")");
+			}, options);
 	}
 }
 
-function updateCompass(a) {
+function updateCompass(a)
+{
 	var data = document.getNativeElementById("CompassLabel");
 	data.setProperty("text" , "Compass Heading: " +  a.magneticHeading);
 }

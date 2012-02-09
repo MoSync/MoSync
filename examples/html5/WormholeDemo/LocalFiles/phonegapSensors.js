@@ -1,4 +1,8 @@
-// Sensors implemented by PhoneGap.
+/**
+ * @file phonegapSensors.js
+ *
+ * Demo of sensors implemented by PhoneGap.
+ */
 
 // ************ Accelerometer ************
 
