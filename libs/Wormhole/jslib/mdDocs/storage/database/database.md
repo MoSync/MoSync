@@ -14,12 +14,6 @@ Details
 
 A Database object is returned from a call to `window.openDatabase()`.
 
-Supported Platforms
--------------------
-
-- Android
-- BlackBerry WebWorks (OS 6.0 and higher)
-- iPhone
 
 Transaction Quick Example
 ------------------

@@ -9,13 +9,6 @@ Properties
 - __create:__ Used to indicate that the file or directory should be created, if it does not exist. _(boolean)_
 - __exclusive:__ By itself, exclusive has no effect. Used with create, it causes the file or directory creation to fail if the target path already exists. _(boolean)_
 
-Supported Platforms
--------------------
-
-- Android
-- iOS
-- Windows Phone 7 ( Mango )
-
 Quick Example
 -------------
 

@@ -5,13 +5,6 @@ Get the operating system version.
 
     var string = device.version;
 
-Supported Platforms
--------------------
-
-- Android 2.1+
-- iPhone
-- Windows Phone 7 ( Mango )
-
 Full Example
 ------------
 

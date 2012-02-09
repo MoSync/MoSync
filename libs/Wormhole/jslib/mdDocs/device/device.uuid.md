@@ -10,13 +10,6 @@ Description
 
 The details of how a UUID is generated are determined by the device manufacturer and specific to the device's platform or model.
 
-Supported Platforms
--------------------
-
-- Android
-- iPhone
-- Windows Phone 7 ( Mango )
-
 
 Full Example
 ------------
