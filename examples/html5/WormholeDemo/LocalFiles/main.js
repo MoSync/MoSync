@@ -1,4 +1,11 @@
-// Startning point of the program.
+/**
+ * @file main.js
+ *
+ * The starting point of the program and some of the functions
+ * used by the demo.
+ */
+
+// Define the starting point of the program.
 document.addEventListener(
 	"deviceready",
 	function() {
@@ -13,7 +20,6 @@ document.addEventListener(
 	},
 	true);
 
-var videoPath;
 /**
  * Open the native Video Capture interface to record a single movie
  */
