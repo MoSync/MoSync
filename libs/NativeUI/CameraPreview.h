@@ -41,6 +41,7 @@ namespace NativeUI
 {
 	/** \brief An instance of CameraPreview allows users to visualize the
 	 * camera controller.
+	 * Note: This is not available on Windows Phone 7.
 	 *
 	 * A Camera Preview is a widget that is used to display  a live view
 	 * of the camera rendered by the viewfinder.
