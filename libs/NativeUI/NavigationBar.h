@@ -50,6 +50,7 @@ namespace NativeUI
      * -on iOS it can have a back button on the left.
      * -on Android there's no extra button, the device's back button is used
      * instead.
+	 * Note: This widget is not available on Windows Phone 7.
      *
      */
     class NavigationBar : public Widget

@@ -68,6 +68,7 @@ namespace NativeUI
 		/**
 		 * Set the icon of the screen. The icon is displayed
 		 * on tab screens.
+		 * Note: this is not available on Windows Phone 7.
 		 * @param imageHandle Handle to an image with the icon.
 		 * @return The result code.
 		 */
