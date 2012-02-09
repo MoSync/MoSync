@@ -364,6 +364,7 @@ mosync.nativeui.maWidgetGetProperty = function(widgetID, property,
 	};
 };
 
+
 /**
  * This function is called by C++ to inform creation of a widget If a creation
  * callback is registered it will be called
@@ -1114,6 +1115,20 @@ mosync.nativeui.create = function(widgetType, widgetID, params,
 			params, successCallback, errorCallback);
 	return widget;
 };
+
+/**
+ * Destrys all of the created widgets and cleans up the memory.
+ * @private
+ */
+mosync.nativeui.destroyAll = function()
+{
+	for(each widget in mosync.nativeui.widgetIDList)
+	{
+		//Destroy all widgets and do not wait for anything
+		mosync.nativeui.maWidgetDestroy(widget, null, null, null);
+	}
+};
+
 
 /**
  * Stores the number of widgets that are waiting to be created. Used when
