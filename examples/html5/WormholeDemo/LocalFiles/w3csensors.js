@@ -161,6 +161,9 @@ function toggleProximityW3C()
 	if(proximity.status == "open")
 	{
 		proximity.startWatch();
+		updateProxDataW3C({data:{
+			x: 0,
+		}});
 	}
 	else
 	{
