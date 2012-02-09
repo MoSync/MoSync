@@ -32,11 +32,8 @@ MA 02110-1301, USA.
 // Include utility class for integer-to-string conversions.
 #include <MAUtil/util.h>
 
-#include <maprofile.h>
 #include <ma.h>
 #include <mastring.h>
-
-// Include the resources for images.
 #include "MAHeaders.h"
 
 // Include application's Moblet class.
@@ -66,7 +63,6 @@ PlayScreen::PlayScreen() :
 	mRivalWeapon(-1),
 	mStartButton(-1),
 	mScoreInfo(-1),
-	mExitButton(-1),
 	mScreenWidth(-1),
 	mScreenHeight(-1),
 	mFontTitleSize(-1),
@@ -140,13 +136,8 @@ void PlayScreen::customEvent(const MAEvent& event)
  */
 void PlayScreen::widgetClicked(MAHandle widgetHandle)
 {
-	// Exit the application when the exit button is clicked.
-	if (widgetHandle == mExitButton)
-	{
-		RockPaperScissorsMoblet::getInstance()->closeEvent();
-	}
 	// Start a game round if start button is clicked.
-	else if (widgetHandle == mStartButton && !mTimerStarted)
+	if (widgetHandle == mStartButton && !mTimerStarted)
 	{
 		// Restore the background color to default.
 		setWidgetProperty(
@@ -583,7 +574,7 @@ void PlayScreen::setupUI()
 	setLabelText(mScoreInfo, defaultText.c_str());
 	maWidgetAddChild(mMainLayout, mScoreInfo);
 
-	// Exit button in a horizontal layout.
+	// Horizontal layout for a future option menu
 	MAWidgetHandle bottomMenu = maWidgetCreate(MAW_HORIZONTAL_LAYOUT);
 
 	// Set the size for this layout;
@@ -609,9 +600,6 @@ void PlayScreen::setupUI()
 		bottomMenu,
 		createLabel(MAW_CONSTANT_WRAP_CONTENT, 0, 0, ""));
 
-	// Create exit button.
-	mExitButton = createButton("  Exit  " );
-	maWidgetAddChild(bottomMenu, mExitButton);
 	maWidgetAddChild(mMainLayout, bottomMenu);
 
 	// Add the main layout to the screen
@@ -621,8 +609,7 @@ void PlayScreen::setupUI()
 /**
  * Create all the widgets in the UI.
  * The start button, count down label, flickering label,
- * weapon buttons, rival weapon, spacer, score label,
- * exit button.
+ * weapon buttons, rival weapon, spacer, score label.
  */
 MAWidgetHandle PlayScreen::createMainLayout()
 {

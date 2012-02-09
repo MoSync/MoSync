@@ -1399,9 +1399,6 @@ var watchID = navigator.compass.watchHeading(onSuccess, onError, options);
  */
 Compass.prototype.watchHeading= function(successCallback, errorCallback, options) {
 
-    // Default interval (100 msec)
-    var frequency = (options !== undefined) ? options.frequency : 100;
-
     // successCallback required
     if (typeof successCallback !== "function") {
         console.log("Compass Error: successCallback is not a function");
@@ -1414,14 +1411,27 @@ Compass.prototype.watchHeading= function(successCallback, errorCallback, options
         return -1; // in case caller later calls clearWatch with this id
     }
 
+    var id;
     if(this.isCompassSupported)
-    {
-        var self = this;
-        var onInterval = function()
+	{
+		id = PhoneGap.createUUID();
+		var onSuccess = function(result)
         {
-            self.getCurrentHeading(successCallback,errorCallback,options);
+            var compassResult = JSON.parse(result);
+            //console.log("compassResult = " + compassResult);
+            self.lastHeading = compassResult;
+            successCallback(self.lastHeading);
         }
-        return window.setInterval(onInterval,frequency);
+
+        var onError = function(err)
+        {
+            if(err == 4)
+            {
+                self.isCompassSupported = false;
+            }
+            errorCallback(err);
+        }
+		PhoneGap.exec(onSuccess, onError, "Compass", "startWatch", {id: id});
     }
     else
     {
@@ -1432,6 +1442,7 @@ Compass.prototype.watchHeading= function(successCallback, errorCallback, options
         window.setTimeout(funk,0);
         return -1;
     }
+    return id;
 };
 
 
@@ -1449,8 +1460,7 @@ navigator.compass.clearWatch(watchID);
  */
 Compass.prototype.clearWatch = function(id) {
 
-    // Stop javascript timer
-    clearInterval(id);
+    PhoneGap.exec(null, null, "Compass", "stopWatch", {id: id});
 
 };
 

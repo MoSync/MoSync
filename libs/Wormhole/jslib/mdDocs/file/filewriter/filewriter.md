@@ -35,12 +35,6 @@ A FileWriter is created for a single file. You can use it to write to a file mul
 
 NOTE: __write__ does not adjust the file length if you overwrite an existing file with shorter content. Use __truncate__ with the new content length to remove old data at the end of the file, if desired.
 
-Supported Platforms
--------------------
-
-- Android
-- iOS
-- Windows Phone 7 ( Mango )
 
 Seek Quick Example
 ------------------------------

@@ -31,14 +31,6 @@ The following methods can be invoked on a DirectoryEntry object:
 - __getFile__: Create or look up a file.
 - __removeRecursively__: Delete a directory and all of its contents.
 
-
-Supported Platforms
--------------------
-
-- Android
-- iOS
-- Windows Phone 7 ( Mango )
-
 getMetadata
 -----------
 
@@ -69,9 +61,9 @@ moveTo
 
 Move a directory to a different location on the file system. It is an error to attempt to:
 
-- move a directory inside itself or to any child at any depth;
-- move a directory into its parent if a name different from its current one is not provided;
-- move a directory to a path occupied by a file;
+- move a directory inside itself or to any child at any depth.
+- move a directory into its parent if a name different from its current one is not provided.
+- move a directory to a path occupied by a file.
 - move a directory to a path occupied by a directory which is not empty.
 
 In addition, an attempt to move a directory on top of an existing empty directory must attempt to delete and replace that directory.
@@ -108,7 +100,7 @@ copyTo
 
 Copy a directory to a different location on the file system. It is an error to attempt to:
 
-- copy a directory inside itself at any depth;
+- copy a directory inside itself at any depth.
 - copy a directory into its parent if a name different from its current one is not provided.
 
 Directory copies are always recursive - that is, they copy all contents of the directory.
@@ -158,7 +150,7 @@ remove
 
 Deletes a directory. It is an error to attempt to:
 
-- delete a directory that is not empty;
+- delete a directory that is not empty.
 - delete the root directory of a filesystem.
 
 __Parameters:__
