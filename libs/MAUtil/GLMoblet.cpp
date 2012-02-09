@@ -73,7 +73,7 @@ public:
 };
 
 GLMoblet::GLMoblet(int apiVersions) :
-	mPreferredMillisecondsPerFrame(50),
+	mPreferredMillisecondsPerFrame(-1),
 	mFramesSinceStartDrawing(0),
 	mMillisOfStartDrawing(0),
 	mIsDrawing(false)
@@ -116,8 +116,10 @@ GLMoblet::ApiVersion GLMoblet::getApiVersion() const {
 
 void GLMoblet::startDrawing() {
 	if(mIsDrawing) return;
-//	Environment::getEnvironment().addIdleListener(mListener);
-	Environment::getEnvironment().addTimer(mListener, mPreferredMillisecondsPerFrame, -1);
+	if(mPreferredMillisecondsPerFrame <= 0)
+		Environment::getEnvironment().addIdleListener(mListener);
+	else
+		Environment::getEnvironment().addTimer(mListener, mPreferredMillisecondsPerFrame, -1);
 	mIsDrawing = true;
 
 	mFramesSinceStartDrawing = 0;
@@ -126,7 +128,7 @@ void GLMoblet::startDrawing() {
 
 void GLMoblet::stopDrawing() {
 	if(!mIsDrawing) return;
-//	Environment::getEnvironment().removeIdleListener(mListener);
+	Environment::getEnvironment().removeIdleListener(mListener);
 	Environment::getEnvironment().removeTimer(mListener);
 	mIsDrawing = false;
 }
