@@ -43,9 +43,6 @@ MA 02110-1301, USA.
 #include <MAUtil/Moblet.h>
 #include <MAUtil/String.h>
 #include <MAUtil/util.h>
-#ifdef MAPIP
-#include <maprofile.h>
-#endif
 
 using namespace MAUtil;
 
@@ -71,11 +68,7 @@ public:
 				printf("Cache read failed: %i\n", res);
 			} else {
 				printf("Program cached (%i bytes).\n", maGetDataSize(mProgram));
-#ifdef MA_PROF_SUPPORT_STYLUS
 				printf("Tap screen or press fire to run.\n");
-#else	// MA_PROF_SUPPORT_STYLUS
-				printf("Press fire to run.\n");
-#endif	// MA_PROF_SUPPORT_STYLUS
 			}
 			printf("Press 6/LSK to check for update.\n");
 			readLastModified();
@@ -131,13 +124,11 @@ private:
 		}
 	}
 
-#ifdef MA_PROF_SUPPORT_STYLUS
 	virtual void pointerPressEvent(MAPoint2d p) {
 		if(mState == eReady) {
 			maLoadProgram(mProgram, 1);
 		}
 	}
-#endif	// MA_PROF_SUPPORT_STYLUS
 
 	void startDownload() {
 
@@ -160,11 +151,7 @@ private:
 	virtual void httpFinished(HttpConnection*, int result) {
 		if(result == 304) {	//Not Modified
 			printf("Program unchanged.\n");
-#ifdef MA_PROF_SUPPORT_STYLUS
 			printf("Tap screen or press Fire to run.\n");
-#else	// MA_PROF_SUPPORT_STYLUS
-			printf("Press Fire to run.\n");
-#endif	// MA_PROF_SUPPORT_STYLUS
 			mState = eReady;
 			return;
 		}
@@ -226,11 +213,7 @@ private:
 		}
 
 		printf("Program downloaded.\n");
-#ifdef MA_PROF_SUPPORT_STYLUS
 		printf("Tap screen or press Fire to run.\n");
-#else	// MA_PROF_SUPPORT_STYLUS
-		printf("Press Fire to run.\n");
-#endif	// MA_PROF_SUPPORT_STYLUS
 		mState = eReady;
 	}
 };
