@@ -54,6 +54,12 @@ var mosync = (function()
 		console.log = function(s) {};
 	}
 
+	// alert is missing on WP7.
+	if (!window.alert)
+	{
+		window.alert = function(s) {};
+	}
+
 	// The encoder submodule.
 
 	mosync.encoder = (function()
