@@ -2,6 +2,11 @@
 <project supports-build-configs="true" version="1.4">
 <build.cfg id="Debug" types="Debug"/>
 <build.cfg id="Release" types="Release"/>
+<criteria>
+<filter type="com.mobilesorcery.sdk.capabilities.devices.elementfactory">
+<capabilities optional="" required="Bluetooth Calendar Camera Contacts File\ Storage Home\ Screen Internet\ Access Location Power\ Management SMS"/>
+</filter>
+</criteria>
 <properties>
 <property key="build.prefs:additional.include.paths/Debug" value=""/>
 <property key="build.prefs:additional.include.paths/Release" value=""/>
@@ -28,6 +33,8 @@
 <property key="dependency.strategy" value="0"/>
 <property key="excludes/Debug" value=""/>
 <property key="excludes/Release" value=""/>
+<property key="profile.mgr.type" value="0"/>
 <property key="template.id" value="project.html5.hybrid"/>
+<property key="winmobilecs:guid" value="b6e82120-3611-102f-8077-c7b78500e67e"/>
 </properties>
 </project>
