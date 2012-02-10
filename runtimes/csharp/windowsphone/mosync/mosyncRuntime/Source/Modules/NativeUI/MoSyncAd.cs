@@ -51,15 +51,27 @@ namespace MoSync
              */
             public Ad()
             {
-                mAd = new Microsoft.Advertising.Mobile.UI.AdControl("1e187355-ffe2-4842-bf48-8bd96d89739d",
-                                                                    "81674",
-                                                                    true);
+                mAd = new Microsoft.Advertising.Mobile.UI.AdControl();
 
-                mAd.Width = 480;
-                mAd.Height = 80;
+                // by default we set the size to X-Large Banner
+                mAd.Width = 300;
+                mAd.Height = 50;
+
                 mAd.HorizontalAlignment = HorizontalAlignment.Left;
                 mAd.VerticalAlignment = VerticalAlignment.Top;
                 View = mAd;
+            }
+
+            public string AdUnitID
+            {
+                get { return mAd.AdUnitId; }
+                set { mAd.AdUnitId = value; }
+            }
+
+            public string ApplicationID
+            {
+                get { return mAd.ApplicationId; }
+                set { mAd.ApplicationId = value; }
             }
         }
     }

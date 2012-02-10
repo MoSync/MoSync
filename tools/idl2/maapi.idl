@@ -9216,6 +9216,13 @@ group AdsAPI "Ads API" {
 			// Of size 728*90.
 			// Availabe only on Android.
 			LEADERBOARD = 3;
+			// Of size 300*50 - X-Large Banner
+			// Available only on Windows Phone 7.1.
+			WP7_XLARGE = 4;
+			// Of size 480*80 - XX-Large Banner
+			// Available only on Windows Phone 7.1
+			WP7_XXLARGE = 5;
+
 		}
 	} // end of Ads Constants
 
@@ -9237,8 +9244,8 @@ group AdsAPI "Ads API" {
 	group AdsFunctions "Ads Functions" {
 		/**
 		* \brief Creates a new banner.
-		* \param bannerSize One of the MA_ADS_SIZE_ constants. Only for Android platform.
-		* \param publisherID Only for Android platform.
+		* \param bannerSize One of the MA_ADS_SIZE_ constants. Only for Android and WP7.1 platforms.
+		* \param publisherID Only for Android and WP 7.1 platforms.
 		* This param is ignored on iOS platform.
 		*
 		* \note A banner is a widget type object.

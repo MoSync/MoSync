@@ -37,7 +37,7 @@ using System.Windows.Shapes;
 
 namespace MoSync
 {
-    public class MoSyncAdsModule : IIoctlModule
+    public class AdsModule : IIoctlModule
     {
         protected MoSync.NativeUI.Ad mAd;
 
@@ -48,9 +48,32 @@ namespace MoSync
                 MoSync.Util.RunActionOnMainThreadSync(() =>
                     {
                         mAd = new NativeUI.Ad();
+
+                        if (_bannerSize == MoSync.Constants.MA_ADS_SIZE_WP7_XLARGE)
+                        {
+                            mAd.Width = 300;
+                            mAd.Height = 50;
+                        }
+                        else if (_bannerSize == MoSync.Constants.MA_ADS_SIZE_WP7_XXLARGE)
+                        {
+                            mAd.Width = 480;
+                            mAd.Height = 80;
+                        }
+
+                        String publisherID = core.GetDataMemory().ReadStringAtAddress(_publisherID);
+                        string[] values = publisherID.Split('|');
+                        if (values.Length == 2)
+                        {
+                            mAd.ApplicationID = values[0];
+                            mAd.AdUnitID = values[1];
+                        }
                     }
                 );
                 int handle = runtime.GetModule<NativeUIModule>().AddWidget(mAd);
+                if (handle < 0)
+                {
+                    return MoSync.Constants.MA_ADS_RES_ERROR;
+                }
 
                 return handle;
             };
@@ -62,7 +85,7 @@ namespace MoSync
                     return MoSync.Constants.MA_ADS_RES_INVALID_BANNER_HANDLE;
                 }
 
-                // TODO: destroy
+                mAd = null;
 
                 return MoSync.Constants.MA_ADS_RES_OK;
             };
@@ -103,11 +126,70 @@ namespace MoSync
 
             ioctls.maAdsBannerSetProperty = delegate(int _bannerHandle, int _property, int _value)
             {
+                MoSync.NativeUI.Ad ad = (MoSync.NativeUI.Ad)runtime.GetModule<NativeUIModule>().GetWidget(_bannerHandle);
+                if (runtime.GetModule<NativeUIModule>().GetWidget(_bannerHandle).GetHandle() < 0)
+                {
+                    return MoSync.Constants.MA_ADS_RES_INVALID_BANNER_HANDLE;
+                }
+
+                String property = core.GetDataMemory().ReadStringAtAddress(_property);
+                if (property.Equals(MoSync.Constants.MA_ADS_HEIGHT))
+                {
+                }
+                else if (property.Equals(MoSync.Constants.MA_ADS_WIDTH))
+                {
+                }
+                else if (property.Equals(MoSync.Constants.MA_ADS_VISIBLE))
+                {
+                }
+                else if (property.Equals(MoSync.Constants.MA_ADS_ENABLED))
+                {
+                }
+                else if (property.Equals(MoSync.Constants.MA_ADS_TEST_DEVICE))
+                {
+                    return MoSync.Constants.MA_ADS_RES_UNSUPPORTED;
+                }
+                else if (property.Equals(MoSync.Constants.MA_ADS_REQUEST_CONTENT))
+                {
+                    return MoSync.Constants.MA_ADS_RES_UNSUPPORTED;
+                }
+                else if (property.Equals(MoSync.Constants.MA_ADS_IS_READY))
+                {
+                    return MoSync.Constants.MA_ADS_RES_UNSUPPORTED;
+                }
+                else if (property.Equals(MoSync.Constants.MA_ADS_COLOR_BG))
+                {
+                }
+                else if (property.Equals(MoSync.Constants.MA_ADS_COLOR_BG_TOP))
+                {
+                    return MoSync.Constants.MA_ADS_RES_UNSUPPORTED;
+                }
+                else if (property.Equals(MoSync.Constants.MA_ADS_COLOR_BORDER))
+                {
+                }
+                else if (property.Equals(MoSync.Constants.MA_ADS_COLOR_LINK))
+                {
+                    return MoSync.Constants.MA_ADS_RES_UNSUPPORTED;
+                }
+                else if (property.Equals(MoSync.Constants.MA_ADS_COLOR_TEXT))
+                {
+                }
+                else if (property.Equals(MoSync.Constants.MA_ADS_COLOR_URL))
+                {
+                    return MoSync.Constants.MA_ADS_RES_UNSUPPORTED;
+                }
+                else
+                {
+                    return MoSync.Constants.MA_ADS_RES_INVALID_PROPERTY_NAME;
+                }
+
                 return MoSync.Constants.MA_ADS_RES_OK;
             };
 
             ioctls.maAdsBannerGetProperty = delegate(int _bannerHandle, int _property, int _value, int _bufSize)
             {
+                String property = core.GetDataMemory().ReadStringAtAddress(_property);
+
                 return MoSync.Constants.MA_ADS_RES_OK;
             };
         }
