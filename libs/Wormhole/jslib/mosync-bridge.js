@@ -145,16 +145,13 @@ var mosync = (function()
 		 */
 		encoder.encodeString = function(s)
 		{
-			var length;
+			// On all current platforms (Android, iOS, Windows Phone)
+			// strings are converted to UTF8 strings when passed from JS
+			// to the underlying layer (Java, Objective-C, C#). Therefore
+			// we need to calculate the length of the UTF8 encoded string
+			// data and use that as the length of the message string.
+			var length = encoder.lengthAsUTF8(s);
 			var encodedString = "";
-			if (mosync.isAndroid || mosync.isIOS)
-			{
-				length = encoder.lengthAsUTF8(s);
-			}
-			else
-			{
-				length = s.length;
-			}
 			return encodedString.concat(encoder.itox(length), " ", s, " ");
 		};
 

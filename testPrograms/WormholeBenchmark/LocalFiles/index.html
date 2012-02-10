@@ -101,7 +101,33 @@ function TestStart()
     SetText("<p>Running Wormhole performance tests...</p>");
 
     // Start first test.
-    StringMessageStart();
+    UTF8Test();
+}
+
+function UTF8Test()
+{
+	var data = String.fromCharCode(197, 196, 214);
+
+	mosync.bridge.send(["UTF8Test", data]);
+}
+
+function UTF8TestResult(charCodes)
+{
+	if (charCodes == "195 133 195 132 195 150 ")
+	{
+		SetText(GetText() + "<p>UTF8 test passed</p>");
+
+		// Run next test.
+		StringMessageStart();
+	}
+	else
+	{
+		SetText(GetText()
+	        + "<p>UTF8 test failed: <br/>"
+	        + "Expected: 195 133 195 132 195 150 <br/>"
+	        + "Got: " + charCodes
+	        + "</p>");
+	}
 }
 
 /**
