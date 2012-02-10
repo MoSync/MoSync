@@ -9,8 +9,10 @@ Resources.lst -> Resources/Resources.lst
 beep.wav -> Resources/beep.wav
 main.cpp
 wormhole.js -> LocalFiles/js/wormhole.js
-TabIconWebViewAndroid.png -> LocalFiles/img/TabIconWebViewAndroid.png
-TabIconWebView.png -> LocalFiles/img/TabIconWebView.png
+Android_TabIconDevice.png -> LocalFiles/img/Android_TabIconDevice.png
+IOS_TabIconDevice.png -> LocalFiles/img/IOS_TabIconDevice.png
+Android_TabIconWebView.png -> LocalFiles/img/Android_TabIconWebView.png
+IOS_TabIconWebView.png -> LocalFiles/img/IOS_TabIconWebView.png
 
 [Settings]
 build.prefs:additional.libraries=MAUtil.lib, NativeUI.lib, MAFS.lib, Wormhole.lib, Notification.lib, yajl.lib
