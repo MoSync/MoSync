@@ -98,6 +98,13 @@ namespace MoSync
                     return -1;
             };
 
+            /*
+             * PhoneApplicationService.Current.UserIdleDetectionMode
+             * Disabling this will stop the screen from timing out and locking.
+             * Discussion: this needs to be re-enabled for the backlight to work
+             *             so an maStartBacklight should be needed for WP7;
+             *             what about maToggleBacklight(bool)?
+             */
             syscalls.maResetBacklight = delegate()
             {
             };
@@ -284,7 +291,7 @@ namespace MoSync
                 }
             }
 
-            // imsi
+            // imsi - not available in WP7.1
             if (key.Equals("mosync.imsi"))
             {
                 //TODO
@@ -349,7 +356,7 @@ namespace MoSync
                 return Microsoft.Phone.Net.NetworkInformation.NetworkInterface.NetworkInterfaceType.ToString();
             }
 
-            // in case of no information return empty
+            // in case of no information
             return "not available";
         }
 
