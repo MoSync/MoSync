@@ -9,6 +9,7 @@
 #import <UIKit/UIKit.h>
 #import "GLView.h"
 #import <time.h>
+#import "BenchDB.h"
 
 @interface GLViewController : UIViewController <GLViewDelegate>
 {
@@ -56,6 +57,8 @@
     
     //allocate the label
     UITextView *mTextView;
+    
+    struct BenchResult mBr;
     
     bool mDone;
 }

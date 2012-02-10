@@ -47,6 +47,7 @@
                 mTextView.text = [mTextView.text stringByAppendingFormat:@"#planes x FPS: %f\n", mNumPlanes*(mFrameCounter / mTimeSlot)];
                 printf("#planes (fill rate tests): %d\n", mNumPlanes);
                 printf("#planes x FPS: %f\n", mNumPlanes*(mFrameCounter / mTimeSlot));
+                mBr.test1 = mNumPlanes*(mFrameCounter / mTimeSlot);
                 mTest = 2; //do next test
                 mStartTime = [self currTime]; //reset the timer for the next test
                 mTimeSlot = 0.0f; //reset timer
@@ -87,6 +88,7 @@
                 mTextView.text = [mTextView.text stringByAppendingFormat:@"#planes x FPS: %f\n", mNumPlanes*(mFrameCounter / mTimeSlot)];
                 printf("#planes (fill rate tests): %d\n", mNumPlanes);
                 printf("#planes x FPS: %f\n", mNumPlanes*(mFrameCounter / mTimeSlot));
+                mBr.test2 = mNumPlanes*(mFrameCounter / mTimeSlot);
                 mTest = 3; //do next test
                 mStartTime = [self currTime]; //reset the timer for the next test
                 mFrameCounter = 0; //reset the FPS counter for the next test
@@ -124,6 +126,7 @@
                 printf("#Vertices (dynamic object test): %d\n", mNumPolygons);
                 printf("drawing time (secs): %f\nobject coordinates calc time (secs): %f\n", mGLTimeSlot, mMoTimeSlot);
                 printf("drawing time/object coord calc time ratio: %f\n", mGLTimeSlot/mMoTimeSlot);
+                mBr.test3 = mNumPolygons;
                 mTest = 4; //do next test
                 mStartTime = [self currTime]; //reset the timer for the next test
                 mFrameCounter = 0; //reset the FPS counter for the next test
@@ -150,8 +153,15 @@
                 mTextView.text = [mTextView.text stringByAppendingString:@"Test #4: Rotating textured box\n"];
                 printf("Test #4: Rotating textured box\n");
                 [self showStats];
+                mBr.test4 = mFrameCounter / mTimeSlot;
                 mTest = -1; //last test
                 //[theView removeFromSuperview]; //remove the viev
+                
+                //send results to database
+                mBr.benchmark = "opengl";
+                
+                BenchDBConnector * bdbc = [[BenchDBConnector alloc] init];
+                [bdbc submit:mBr];
                 
                 //set the label's text
                 mTextView.text = [mTextView.text stringByAppendingString:@"Tests completed!"];
