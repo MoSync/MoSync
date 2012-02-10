@@ -20,5 +20,6 @@
 <property key="com.mobilesorcery.sdk.html5.support" value="true"/>
 <property key="profile.mgr.type" value="0"/>
 <property key="template.id" value="project.wormhole.natvieui"/>
+<property key="winmobilecs:guid" value="b59dd070-3559-102f-8008-7d46fb96e1d0"/>
 </properties>
 </project>

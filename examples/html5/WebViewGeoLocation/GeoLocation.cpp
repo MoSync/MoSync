@@ -178,7 +178,7 @@ public:
 		maWidgetSetProperty(webView, "enableZoom", "false");
 
 		// Get the HTML for the page from a resource.
-		MAUtil::String html = Util::createTextFromHandle(GEOLOCATION_HTML);
+		MAUtil::String html = Util::createTextFromHandle(INDEX_HTML);
 
 		// Set the HTML the WebView displays.
 		maWidgetSetProperty(webView, "html", html.c_str());

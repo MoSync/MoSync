@@ -1697,7 +1697,7 @@ public class MoSyncThread extends Thread
 		if (imageResource == null)
 		{
 			logError("maGetImageSize : no such resource");
-			return -1;
+			maPanic(0, "PANIC, Checking image size for non image resource");
 		}
 
 		return EXTENT(
@@ -3698,6 +3698,11 @@ public class MoSyncThread extends Thread
 	int maAudioSetVolume(int audio, float volume)
 	{
 		return mMoSyncAudio.maAudioSetVolume(audio, volume);
+	}
+
+	int maAudioPause(int audio)
+	{
+		return mMoSyncAudio.maAudioPause(audio);
 	}
 
 	int maAudioStop(int audio)

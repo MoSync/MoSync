@@ -19,12 +19,7 @@ MA 02110-1301, USA.
 /**
  * @file main.cpp
  *
- * Demo application that shows how to use the Wormhole JavaScript
- * library. This file contains the C++ code that implements native
- * functions in the JavaScript library.
- *
- * You don't need to change any code in this file unless you wish to
- * implement some specific functionality in C/C++.
+ * The C++ back-end of the JavaScript application code.
  */
 
 #include <Wormhole/WebAppMoblet.h>
@@ -58,9 +53,10 @@ public:
 		// Enable message sending from JavaScript to C++.
 		enableWebViewMessages();
 
-		// Show the WebView that contains the HTML/CSS UI
-		// and the JavaScript code.
-		getWebView()->setVisible(true);
+		// The WebView that runs our JavaScript code is hidden.
+		// You can create visible WebViews in the HTML Native UI
+		// markup.
+		getWebView()->setVisible(false);
 
 		// The page in the "LocalFiles" folder to
 		// show when the application starts.
@@ -73,7 +69,7 @@ public:
 		char buf[512];
 		sprintf(
 			buf,
-			"{mosyncScreenWidth=%d; mosyncScreenHeight=%d;}",
+			"{mosyncScreenWidth=%d; mosyncScreenHeight = %d;}",
 			width,
 			height);
 		callJS(buf);
@@ -157,17 +153,8 @@ public:
 			{
 				mPhoneGapMessageHandler.handlePhoneGapMessage(message);
 			}
-			// Here we add your own messages. See index.html for
-			// the JavaScript code used to send the message.
-			else if (message.is("Custom"))
-			{
-				String command = message.getParam("command");
-				if (command == "vibrate")
-				{
-					int duration = message.getParamInt("duration");
-					maVibrate(duration);
-				}
-			}
+
+			// Here you can add your own message handing as needed.
 		}
 	}
 
@@ -207,17 +194,8 @@ public:
 				// Close the application (calls method in class Moblet).
 				close();
 			}
-			// Here we add your own messages. See index.html for
-			// the JavaScript code used to send the message.
-			else if (0 == strcmp(p, "Custom"))
-			{
-				const char* command = stream.getNext();
-				if (NULL != command && (0 == strcmp(command, "beep")))
-				{
-					// This is how to play the sound in the resource BEEP_WAV.
-					maSoundPlay(BEEP_WAV, 0, maGetDataSize(BEEP_WAV));
-				}
-			}
+
+			// Here you can add your own message handing as needed.
 		}
 	}
 
