@@ -26,6 +26,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "WinmobileInjector.h"
 #endif
 
+#include "WP7Injector.h"
 #include "MoreInjector.h"
 #include "Symbian9Injector.h"
 #include "AndroidInjector.h"
@@ -36,16 +37,25 @@ using namespace std;
 using namespace MoSync;
 
 map<string, Injector*> gInjectors;
+map<string, string> oldInjectors;
 
 static void initInjectors() {
-	gInjectors["j2me"] = new JavaInjector();
+	gInjectors["JavaME"] = new JavaInjector();
 #ifdef WIN32 // for now..
-	gInjectors["winmobile"] = new WinmobileInjector();
+	gInjectors["Windows Mobile"] = new WinmobileInjector();
 #endif
+	gInjectors["Windows Phone"] = new WP7Injector();
 	gInjectors["more"] = new MoreInjector();
-	gInjectors["symbian9"] = new Symbian9Injector();
-	gInjectors["android"] = new AndroidInjector();
+	gInjectors["Symbian"] = new Symbian9Injector();
+	gInjectors["Android"] = new AndroidInjector();
 	gInjectors["iOS"] = new IOSInjector();
+
+	oldInjectors["j2me"] = "JavaME";
+	oldInjectors["winmobile"] = "Windows Mobile";
+	oldInjectors["WP7"] = "Windows Phone";
+	oldInjectors["symbian9"] = "Symbian";
+	oldInjectors["android"] = "Android";
+	// iOS = iOS
 }
 
 static bool parseCmdLine(map<string, string>& params, int argc, char **argv) {
@@ -63,17 +73,24 @@ static bool parseCmdLine(map<string, string>& params, int argc, char **argv) {
 	return true;
 }
 
-
 int main(int argc, char **argv) {
 	map<string, string> params;
 	if(!parseCmdLine(params, argc, argv)) errorExit("Couldn't parse the command-line\n");
 	string src = Injector::verifyParameter(params, "src");
-	Icon* icon = Icon::parse(src);
 	string platform = Injector::verifyParameter(params, "platform");
 	initInjectors();
+	// We support old, inconsistent platforms as well as the new platform based format
+	string newPlatform = oldInjectors[platform];
+	if (!newPlatform.empty()) {
+		//printf("(Using platform %s instead of %s)\n", newPlatform.c_str(), platform.c_str());
+		platform = newPlatform;
+	}
 	map<string, Injector*>::iterator i = gInjectors.find(platform);
 	if(i == gInjectors.end()) errorExit("Not an available platform.\n");
 	string dst = Injector::verifyParameter(params, "dst");
+
+	Icon* icon = Icon::parse(src, platform);
+
 	Injector* injector = (*i).second;
 	injector->inject(icon, params);
 

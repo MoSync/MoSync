@@ -20,6 +20,11 @@
 
 @interface EditBoxWidget : IWidget <UITextFieldDelegate> {
 	UITextField* textField;
+
+    /**
+     * Maximum text length for this edit box.
+     */
+    int mMaxTextLength;
 }
 
 - (id)init;

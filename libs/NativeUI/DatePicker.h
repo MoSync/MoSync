@@ -69,6 +69,7 @@ namespace NativeUI
 	 *
 	 * Note: The default minimal date on Android is 01/01/1900.
 	 * Note: The default maximal date on Android is 12/31/2100.
+	 * Note: This is not available on Windows Phone 7.
 	 */
 	class DatePicker : public Widget
 	{

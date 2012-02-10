@@ -73,6 +73,6 @@ public class VideoViewFactory implements AbstractViewFactory
 		MediaController mc = new MediaController(activity);
 		videoView.setMediaController(mc);
 
-		return new VideoViewWidget( handle, videoView );
+		return new VideoViewWidget( handle, videoView, mc);
 	}
 }

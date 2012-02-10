@@ -29,6 +29,11 @@ MA 02110-1301, USA.
  * @author Mikael Kindborg
  *
  * Class for parsing messages from a WebView.
+ *
+ * @deprecated Use class MessageStream or MessageStreamJSON
+ * instead of this class. This class cannot be used with the
+ * the new version of the Wormhole JavaScrip library. It is
+ * included only for backwards compatibility.
  */
 
 #ifndef WORMHOLE_WEB_VIEW_MESSAGE_H_
@@ -61,10 +66,17 @@ class WebViewMessage
 public:
 	/**
 	 * Take a string that is "percent encoded" and decode it.
-	 * @param url Encoded string.
+	 * @param str Encoded string.
 	 * @return The decoded string.
 	 */
-	static MAUtil::String unescape(const MAUtil::String& url);
+	static MAUtil::String unescape(const MAUtil::String& str);
+
+	/**
+	 * Take a string and "percent encode" it.
+	 * @param str String to be encoded.
+	 * @return The encoded string.
+	 */
+	static MAUtil::String escape(const MAUtil::String& str);
 
 	/**
 	 * Constructor.

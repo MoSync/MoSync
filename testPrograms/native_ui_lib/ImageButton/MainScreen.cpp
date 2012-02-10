@@ -38,7 +38,8 @@
 MainScreen::MainScreen() :
 	Screen(),
 	mMainLayout(NULL),
-	mImageButton(NULL)
+	mImageButton(NULL),
+	mEvents(NULL)
 {
 	createMainLayout();
 	mImageButton->addButtonListener(this);
@@ -70,12 +71,16 @@ void MainScreen::createMainLayout() {
 	mImageButton->setText("click me");
 	printf("result setImage = %d", result);
 
+	mEvents = new ListView();
+	mEvents->fillSpaceHorizontally();
+	mEvents->fillSpaceVertically();
+	mMainLayout->addChild(mEvents);
 }
 
 /**
  * This method is called when there is an touch-down event for
  * a button.
- * Only for iphone platform
+ * Platform: iOS and Android.
  * @param button The button object that generated the event.
  */
 void MainScreen::buttonPressed(Widget* button)
@@ -84,12 +89,15 @@ void MainScreen::buttonPressed(Widget* button)
     {
         printf("button pressed event for mImageButton");
     }
+    Label* event = new Label();
+    event->setText("buttonPressed");
+    mEvents->addChild(event);
 }
 
 /**
  * This method is called when there is an touch-up event for
  * a button.
- * Only for iphone platform
+ * Platform: iOS and Android.
  * @param button The button object that generated the event.
  */
 void MainScreen::buttonReleased(Widget* button)
@@ -98,11 +106,15 @@ void MainScreen::buttonReleased(Widget* button)
     {
         printf("button released event for mImageButton");
     }
+    Label* event = new Label();
+    event->setText("buttonReleased");
+    mEvents->addChild(event);
 }
 
 /**
  * This method is called if the touch-up event was inside the
  * bounds of the button.
+ * Platform: iOS and Android.
  * @param button The button object that generated the event.
  */
 void MainScreen::buttonClicked(Widget* button)
@@ -111,4 +123,7 @@ void MainScreen::buttonClicked(Widget* button)
     {
         printf("button clicked event for mImageButton");
     }
+    Label* event = new Label();
+    event->setText("buttonClicked");
+    mEvents->addChild(event);
 }

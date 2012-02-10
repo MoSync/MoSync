@@ -222,7 +222,7 @@ class FileTask < Task
 		super(work)
 		@NAME = name.to_s
 		# names may not contain '~', the unix home directory hack, because File.exist?() doesn't parse it.
-		if(@NAME.include?('~'))
+		if(@NAME.start_with?('~'))
 			error "Bad filename: #{@NAME}"
 		end
 	end
@@ -253,6 +253,7 @@ class FileTask < Task
 	# Prints the reason the task is needed, if <tt>log</tt>.
 	def needed?(log = true)
 		if(!File.exist?(@NAME))
+			puts 'In '+FileUtils.pwd if(log)
 			puts "Because file does not exist:" if(log)
 			return true
 		end
@@ -347,6 +348,7 @@ end
 # For example, if you want to create 'foo/bar', you need not create two DirTasks. One will suffice.
 class DirTask < FileTask
 	def execute
+		p @NAME
 		FileUtils.mkdir_p @NAME
 	end
 	def timestamp

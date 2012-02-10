@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<!--
+* @file index.html
+* @author Ali Sarrafi
+*
+* Example Application that shows how you can use JavaScript
+* with NativeUI and device APIs.
+-->
+<html>
+<head>
+	<meta name="viewport" content="width=320, user-scalable=no">
+	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+	<script type="text/javascript" charset="utf-8" src="js/wormhole.js"></script>
+	<script type="text/javascript" charset="utf-8" src="main.js"></script>
+	<script type="text/javascript">
+		/**
+		 * Initialization.
+		 */
+		function initialize()
+		{
+			document.addEventListener("backbutton", close, true);
+			mosync.nativeui.initUI();
+		}
+
+		/**
+		 * Handle the backbutton event.
+		 */
+		function close()
+		{
+			// Close the application if the back key is pressed.
+			mosync.bridge.send(["close"]);
+		}
+
+		/**
+		 * Called by the NativeUI library when the UI is ready to
+		 * be shown. Show the main screen here.
+		 *
+		 * Here we illustrate how to add events to widgets and how to
+		 * create widgets from JavaScript code.
+		 */
+		mosync.nativeui.UIReady = function()
+		{
+			// The function onDeviceReady is in main.js and will
+			// be called on this event.
+			document.addEventListener("deviceready", onDeviceReady, true);
+
+			// Show the main screen.
+			var mainScreen = document.getNativeElementById("mainScreen");
+			mainScreen.show();
+		}
+	</script>
+</head>
+
+<body onload="initialize()">
+	<!-- All of the Native UI widgets should be wraped inside a tag with id="NativeUI" -->
+	<div id="NativeUI">
+		<!-- The element with id="mainScreen" is start screen. -->
+		<div widgetType="TabScreen" id="mainScreen">
+			<!-- Device Screen -->
+			<div widgetType="Screen" id="DeviceScreen" title="Device"
+				icon_android="img/Android_TabIconDevice.png"
+				icon_iOS="img/IOS_TabIconDevice.png">
+				<div widgetType="VerticalLayout" id="DeviceInfoLayout" width="100%" height="100%">
+					<div widgetType="Label" id="DeviceOSLabel" width="100%"
+						text="Platform:" fontSize="19" fontColor="0xEE3B3B"></div>
+					<div widgetType="Label" id="OSVersionLabel" width="100%"
+						text="OSVersion:" fontSize="19" fontColor="0xEE3B3B"></div>
+					<div widgetType="Label" id="UUIDLabel" width="100%"
+						text="UUID:" fontSize="19" fontColor="0xEE3B3B"></div>
+					<div widgetType="Label" id="DeviceNameLabel" width="100%"
+						text="Device Name:" fontSize="19" fontColor="0xEE3B3B"></div>
+					<div widgetType="Button" id="VibrateButton" width="100%"
+						text="Vibrate" onevent="navigator.notification.vibrate(1000);" ></div>
+					<div widgetType="Button" id="BeepButton" width="100%"
+						text="Beep" onevent="navigator.notification.beep(3);" ></div>
+				</div>
+			</div>
+			<!-- Sensor Screen -->
+			<div widgetType="Screen" id="SensorScreen" title="Sensors"
+				icon_android="img/Android_TabIconSensor.png"
+				icon_iOS="img/IOS_TabIconSensor.png">
+				<div widgetType="VerticalLayout" id="SensorsLayout" width="100%">
+					<div widgetType="HorizontalLayout" id="AccelerometerLayout"
+						width="100%" height="-2">
+						<div widgetType="Label" id="AccelX" width="100%"
+							text="x: " fontSize="14"></div>
+						<div widgetType="Label" id="AccelY" width="100%"
+							text="y: " fontSize="14"></div>
+						<div widgetType="Label" id="AccelZ" width="100%"
+							text="z: " fontSize="14"></div>
+					</div>
+					<div widgetType="Button" id="ToggleAccelButton" width="100%"
+						text="Toggle Accelerometer" onevent="toggleAccelPhonegap()"></div>
+					<div widgetType="HorizontalLayout" id="LocationLayout" width="100%">
+						<div widgetType="Label" id="LocLat" width="100%"
+							text="Latitude" fontSize="14"></div>
+						<div widgetType="Label" id="LocLong" width="100%"
+							text="Longtitude" fontSize="14"></div>
+					</div>
+					<div widgetType="Button" id="ToggleLocButton" width="100%"
+						text="Toggle Location" onevent="toggleGeolocation()"></div>
+					<div widgetType="HorizontalLayout" id="CompassLayout" width="100%">
+						<div widgetType="Label" id="CompassLabel" width="100%"
+							text="Compass Heading:" fontSize="14"></div>
+					</div>
+					<div widgetType="Button" id="ToggleCompassButton" width="100%"
+						text="Toggle Compass" onevent="toggleCompass()"></div>
+				</div>
+			</div>
+			<!-- Map Screen -->
+			<div widgetType="Screen" id="MapScreen" title="Map"
+				icon_android="img/Android_TabIconMap.png"
+				icon_iOS="img/IOS_TabIconMap.png">
+				<div widgetType="WebView" id="WebView" width="100%" height="100%"
+					url="http://maps.google.com"></div>
+			</div>
+		</div>
+	</div>
+</body>
+</html>

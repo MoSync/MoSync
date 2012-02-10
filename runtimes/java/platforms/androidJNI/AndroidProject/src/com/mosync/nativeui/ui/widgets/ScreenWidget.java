@@ -20,6 +20,7 @@ package com.mosync.nativeui.ui.widgets;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.util.Log;
 import android.view.ViewGroup;
 
 import com.mosync.internal.generated.IX_WIDGET;
@@ -157,6 +158,7 @@ public class ScreenWidget extends Layout
 	{
 		m_iconChangedListener = iconChangedListener;
 	}
+
 	/**
 	 * A listener class for when the title of a screen changes,
 	 * so that the for example the tab screen has a chance

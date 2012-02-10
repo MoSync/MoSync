@@ -50,7 +50,7 @@ namespace NativeUI
         /**
          * This method is called when there is an touch-down event for
          * a button.
-         * Only for iphone platform.
+         * Platform: iOS and Android.
          * @param button The button object that generated the event.
          */
         virtual void buttonPressed(Widget* button) {};
@@ -58,7 +58,7 @@ namespace NativeUI
         /**
          * This method is called when there is an touch-up event for
          * a button.
-         * Only for iphone platform.
+         * Platform: iOS and Android.
          * @param button The button object that generated the event.
          */
         virtual void buttonReleased(Widget* button) {};
@@ -66,6 +66,7 @@ namespace NativeUI
         /**
          * This method is called if the touch-up event was inside the
          * bounds of the button.
+         * Platform: iOS and Android.
          * @param button The button object that generated the event.
          */
         virtual void buttonClicked(Widget* button) = 0;

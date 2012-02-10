@@ -23,6 +23,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 
+import com.mosync.java.android.C2DMReceiver;
 import com.mosync.java.android.MoSync;
 
 /**
@@ -53,7 +54,7 @@ public class PushNotificationObject
 	 * Apply the ticker text, message payload and title.
 	 * @param context Application's context.
 	 */
-	public void triggerNotification(Context context)
+	public void triggerNotification(Context context, int id)
 	{
 		NotificationManager notificationManager = (NotificationManager) context
 		.getSystemService(Context.NOTIFICATION_SERVICE);
@@ -63,7 +64,10 @@ public class PushNotificationObject
 		notification.flags |= Notification.FLAG_AUTO_CANCEL;
 
 		Intent intent = new Intent(context, MoSync.class);
-		intent.putExtra("payload", mMessage);
+		intent.putExtra(C2DMReceiver.MOSYNC_INTENT_EXTRA_MESSAGE, mMessage);
+		intent.putExtra(C2DMReceiver.MOSYNC_INTENT_EXTRA_NOTIFICATION, true);
+		// Send also the notification handle so it can later be used at posting events.
+		intent.putExtra(C2DMReceiver.MOSYNC_INTENT_EXTRA_NOTIFICATION_HANDLE, id);
 		PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
 		notification.setLatestEventInfo(context, mMessageTitle, mMessage, pendingIntent);
 		notificationManager.notify(0, notification);

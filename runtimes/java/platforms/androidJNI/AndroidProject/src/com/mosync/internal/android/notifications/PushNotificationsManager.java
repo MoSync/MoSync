@@ -17,7 +17,6 @@ MA 02110-1301, USA.
 
 package com.mosync.internal.android.notifications;
 
-import android.os.Build;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
@@ -35,12 +34,12 @@ import static com.mosync.internal.generated.MAAPI_consts.MA_NOTIFICATION_RES_ALR
 import static com.mosync.internal.generated.MAAPI_consts.MA_NOTIFICATION_RES_INVALID_STRING_BUFFER_SIZE;
 import static com.mosync.internal.generated.MAAPI_consts.MA_NOTIFICATION_RES_INVALID_HANDLE;
 import static com.mosync.internal.generated.MAAPI_consts.MA_NOTIFICATION_RES_REGISTRATION_NOT_CALLED;
-import static com.mosync.internal.generated.MAAPI_consts.MA_NOTIFICATION_RES_UNSUPPORTED;
 import static com.mosync.internal.generated.MAAPI_consts.MA_NOTIFICATION_RES_REGISTRATION_IN_PROGRESS;
 import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_PUSH_NOTIFICATION;
 import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_PUSH_NOTIFICATION_UNREGISTRATION;
 import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_PUSH_NOTIFICATION_REGISTRATION;
-
+import static com.mosync.internal.generated.MAAPI_consts.MA_NOTIFICATION_DISPLAY_FLAG_DEFAULT;
+import static com.mosync.internal.generated.MAAPI_consts.MA_NOTIFICATION_DISPLAY_FLAG_ANYTIME;
 
 /**
  * The Notifications Manager that holds all the notifications that were
@@ -61,27 +60,38 @@ public class PushNotificationsManager
 		mMosyncThread = mThread;
 		mAppContext = context;
 		ref = this;
+		// Store the default display flag in SharedPreferences.
+		PushNotificationsUtil.setPushNotificationDisplayFlag(
+				mMosyncThread.getActivity(), MA_NOTIFICATION_DISPLAY_FLAG_DEFAULT);
+		mRegistrationInfo.registrationInProgress = false;
 	}
 
 	/**
 	 * Handles an C2DM intent.
-	 * Routine: C2DM message is received, the MoSync activity
-	 * is launched, and this function is called.
+	 * Routine: C2DM message is received.
+	 * If the MoSync activity is started by clicking on the
+	 * notification this function is called.
 	 * @param intent
 	 * @return {@code true} If the intent was a C2DM intent and handled.
 	 */
 	public static boolean handlePushNotificationIntent(Intent intent)
 	{
 		Log.e("@@MoSync", "handlePushNotificationIntent");
-		// Get message from intent.
+
 		PushNotificationsManager instance = getRef();
-		if ( instance == null )
+		if ( null == instance )
 		{
 			return false;
 		}
-		// Process the new incoming message.
-		instance.messageReceived(intent.getStringExtra(C2DMReceiver.MOSYNC_INTENT_EXTRA_MESSAGE));
 
+		int notificationHandle = intent.getIntExtra(C2DMReceiver.MOSYNC_INTENT_EXTRA_NOTIFICATION_HANDLE, -1);
+		if ( -1 != notificationHandle )
+		{
+			// Post a message to MoSync queue.
+			postEventNotificationReceived(notificationHandle);
+		}
+		// Some error occurred and the notification handle that was passed
+		// was invalid.
 		return true;
 	}
 
@@ -102,7 +112,7 @@ public class PushNotificationsManager
 		mRegistrationInfo.registrationInProgress = false;
 		mRegistrationInfo.registrationSuccess = true;
 		mRegistrationInfo.registrationID = regId;
-//		mRegistrationInfo.registrationAttempted = true;
+
 		// Raise a MoSync event, notify that the request was processed.
 		postEventRegistration(EVENT_TYPE_PUSH_NOTIFICATION_REGISTRATION);
 	}
@@ -116,6 +126,7 @@ public class PushNotificationsManager
 		mRegistrationInfo.registrationSuccess = false;
 		mRegistrationInfo.registrationInProgress = false;
 		mRegistrationInfo.errorMessage = regError;
+
 		// Raise a MoSync event, notify that the request was processed,
 		// unconditioned by the result.
 		postEventRegistration(EVENT_TYPE_PUSH_NOTIFICATION_REGISTRATION);
@@ -132,31 +143,55 @@ public class PushNotificationsManager
 
 	/**
 	 * The manager is notified by a new incoming message.
-	 * @param mess The C2DM message.
+	 * @param message The C2DM message.
+	 * @param showNotification True if the notification should be
+	 * displayed to the user.
 	 */
-	public void messageReceived(String message)
+	public void messageReceived(String message, Boolean showNotification)
 	{
 		Log.e("@@MoSync","C2DM messageReceived");
+
 		// Create local notification object.
 		int newHandle = createNotification(mMosyncThread.getActivity(), message);
-		// Launch the notification now.
-		triggerNotification(mMosyncThread.getActivity(), newHandle);
 
+		if ( showNotification )
+		{
+			// Launch the notification now.
+			triggerNotification(mMosyncThread.getActivity(), newHandle);
+		}
+
+		// Post a message to MoSync queue.
 		postEventNotificationReceived(newHandle);
 	}
 
+	/**
+	 * The manager is notified by a new incoming message.
+	 * This will trigger a notification immediately,
+	 * and after the MoSync activity is started the event will
+	 * be received.
+	 * @param message
+	 * @param context
+	 */
+	public static void messageReceivedWhenAppNotRunning(String message, Context context)
+	{
+		Log.e("@@MoSync","C2DM messageReceived when application is not running");
+
+		int newHandle = createNotification(context, message);
+		triggerNotification(context, newHandle);
+		// MoSyncThread will be able to queue events only after the activity is started.
+	}
 	/**
 	 * Launch local notification for a received message.
 	 * @param id The notification handle.
 	 * @return True if the local notification object exists.
 	 */
-	public Boolean triggerNotification(Context context, int id)
+	public static Boolean triggerNotification(Context context, int id)
 	{
 		PushNotificationObject notification =
 			m_NotificationTable.get(id);
-		if ( notification == null )
+		if ( null == notification )
 			return false;
-		notification.triggerNotification(context);
+		notification.triggerNotification(context, id);
 		return true;
 	}
 
@@ -166,7 +201,7 @@ public class PushNotificationsManager
 	 * @param message The content body of the notification.
 	 * @return The new notification handle.
 	 */
-	public int createNotification(Context context, String message)
+	public static int createNotification(Context context, String message)
 	{
 		int icon = context.getResources().getIdentifier(
 				"icon",
@@ -189,7 +224,7 @@ public class PushNotificationsManager
 	 * Send the handle of the push notification.
 	 * @param index The notification handle.
 	 */
-	private void postEventNotificationReceived(int handle)
+	private static void postEventNotificationReceived(int handle)
 	{
 		int[] event = new int[2];
 		event[0] = EVENT_TYPE_PUSH_NOTIFICATION;
@@ -225,19 +260,12 @@ public class PushNotificationsManager
 	 */
 	public int register(String accountID)
 	{
-		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.FROYO)
-		{
-			// No need to send registration request, it can be handled locally.
-			Log.e("@@MoSync", "Current Android version does not support C2DM. Use Android 2.2 or higher.");
-			registrationFail(PushRegistrationData.REG_ERR_MESSAGE_PHONE_ERROR);
-			return MA_NOTIFICATION_RES_UNSUPPORTED;
-		}
-		else if ( mRegistrationInfo.registrationInProgress )
+		if ( mRegistrationInfo.registrationInProgress )
 		{
 			Log.e("@@MoSync","One registration is already in progress.");
 			return MA_NOTIFICATION_RES_REGISTRATION_IN_PROGRESS;
 		}
-		else if ( mRegistrationInfo.registrationSuccess )
+		if ( mRegistrationInfo.registrationSuccess )
 		{
 			Log.e("@@MoSync", "Application is already registered to C2DM");
 			return MA_NOTIFICATION_RES_ALREADY_REGISTERED;
@@ -298,8 +326,10 @@ public class PushNotificationsManager
 	 */
 	public int getPushData(int notificationHandle, int payloadBuffer, int bufferSize)
 	{
+		Log.e("@@MoSync","maNotificationPushGetData");
+
 		PushNotificationObject notification = m_NotificationTable.get(notificationHandle);
-		if ( notification == null )
+		if ( null == notification )
 		{
 			Log.e("@@MoSync Notification", "maNotificationPushGetData received invalid handle " + notificationHandle);
 			return MA_NOTIFICATION_RES_INVALID_HANDLE;
@@ -330,13 +360,13 @@ public class PushNotificationsManager
 	 */
 	public int destroyNotification(int notificationHandle)
 	{
-
 		PushNotificationObject notification = m_NotificationTable.get(notificationHandle);
-		if ( notification == null )
+		if ( null == notification )
 		{
 			Log.e("@@MoSync","maNotificationPushDestroy Invalid handle");
 			return MA_NOTIFICATION_RES_INVALID_HANDLE;
 		}
+
 		m_NotificationTable.remove(notificationHandle);
 		return MA_NOTIFICATION_RES_OK;
 	}
@@ -364,19 +394,15 @@ public class PushNotificationsManager
 				writeToMoSyncMemory(mRegistrationInfo.errorMessage,registrationBuf);
 				return MA_NOTIFICATION_RES_ERROR;
 			}
-			else
+			if( mRegistrationInfo.registrationID.length( ) + 1 > registrationBufSize )
 			{
-				if( mRegistrationInfo.registrationID.length( ) + 1 > registrationBufSize )
-				{
-					Log.e( "@@MoSync Notification", "getPushData: Buffer size " + registrationBufSize +
-							" too short to hold buffer of size: " + mRegistrationInfo.registrationID.length( ) + 1 );
-					return MA_NOTIFICATION_RES_INVALID_STRING_BUFFER_SIZE;
-				}
-
-				writeToMoSyncMemory(mRegistrationInfo.registrationID, registrationBuf);
-
-				return MA_NOTIFICATION_RES_OK;
+				Log.e( "@@MoSync Notification", "getPushData: Buffer size " + registrationBufSize +
+						" too short to hold buffer of size: " + mRegistrationInfo.registrationID.length( ) + 1 );
+				return MA_NOTIFICATION_RES_INVALID_STRING_BUFFER_SIZE;
 			}
+
+			writeToMoSyncMemory(mRegistrationInfo.registrationID, registrationBuf);
+			return MA_NOTIFICATION_RES_OK;
 		}
 		else
 		{
@@ -403,11 +429,36 @@ public class PushNotificationsManager
 		PushNotificationsUtil.setPushNotificationTitle(mMosyncThread.getActivity(), title);
 	}
 
+	/**
+	 * Store the display flag in Preferences.
+	 * @param displayFlag
+	 * @return MA_NOTIFICATION_RES_OK or MA_NOTIFICATION_RES_ERROR.
+	 */
+	public int setDisplayFlag(int displayFlag)
+	{
+		switch ( displayFlag)
+		{
+			case MA_NOTIFICATION_DISPLAY_FLAG_DEFAULT:
+				PushNotificationsUtil.setPushNotificationDisplayFlag(
+						mMosyncThread.getActivity(), MA_NOTIFICATION_DISPLAY_FLAG_DEFAULT);
+				break;
+			case MA_NOTIFICATION_DISPLAY_FLAG_ANYTIME:
+				PushNotificationsUtil.setPushNotificationDisplayFlag(
+						mMosyncThread.getActivity(), MA_NOTIFICATION_DISPLAY_FLAG_ANYTIME);
+				break;
+			default:
+			{
+				Log.e("@@MoSync", "maNotificationPushSetDisplayFlag Invalid flag");
+				return MA_NOTIFICATION_RES_ERROR;
+			}
+		}
+		return MA_NOTIFICATION_RES_OK;
+	}
 	/************************ Class members ************************/
 	/**
 	 * The MoSync thread object.
 	 */
-	private MoSyncThread mMosyncThread;
+	private static MoSyncThread mMosyncThread;
 
 	/**
 	 * Hold the latest registration information.
@@ -422,7 +473,7 @@ public class PushNotificationsManager
 	/**
 	 * A table that contains a mapping between a handle and a push notification.
 	 */
-	private HandleTable<PushNotificationObject> m_NotificationTable = new HandleTable<PushNotificationObject>();
+	private static HandleTable<PushNotificationObject> m_NotificationTable = new HandleTable<PushNotificationObject>();
 
 	/**
 	 * A static reference to this object.

@@ -1,0 +1,39 @@
+<resources>
+	<image id="RES_BUTTON_IDLE" resource="buttonIdle.png"/>
+	<image id="RES_BUTTON_PRESSED" resource="buttonPressed.png"/>
+	<binary id="RES_FONT" resource="Font.mof"/>
+
+	<image id="RES_PLATFORM" resource="platform_more.png" loadType="unloaded"/>
+	<condition platform="ios">
+		<image id="RES_PLATFORM" resource="platform_ios.png" loadType="unloaded"/>
+	</condition>
+	<condition platform="android">
+		<image id="RES_PLATFORM" resource="platform_android.png" loadType="unloaded"/>
+	</condition>
+	<condition platform="windows phone">
+		<image id="RES_PLATFORM" resource="platform_windows.png" loadType="unloaded"/>
+	</condition>
+	<condition platform="blackberry">
+		<image id="RES_PLATFORM" resource="platform_blackberry.png" loadType="unloaded"/>
+	</condition>
+	<condition platform="windows mobile">
+		<image id="RES_PLATFORM" resource="platform_wm.png" loadType="unloaded"/>
+	</condition>
+	<condition platform="symbian">
+		<image id="RES_PLATFORM" resource="platform_symbian.png" loadType="unloaded"/>
+	</condition>
+	<condition platform="j2me">
+		<image id="RES_PLATFORM" resource="platform_j2me.png" loadType="unloaded"/>
+	</condition>
+
+	<image id="RES_SCREEN_TYPE" resource="screen_small.png" loadType="unloaded"/>
+	<condition screenSize="normal">
+		<image id="RES_SCREEN_TYPE" resource="screen_medium.png" loadType="unloaded"/>
+	</condition>
+	<condition screenSize="large">
+		<image id="RES_SCREEN_TYPE" resource="screen_large.png" loadType="unloaded"/>
+	</condition>
+	<condition screenSize="xlarge">
+		<image id="RES_SCREEN_TYPE" resource="screen_xlarge.png" loadType="unloaded"/>
+	</condition>
+</resources>

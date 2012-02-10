@@ -146,6 +146,40 @@ namespace NativeUI
     }
 
     /**
+     * Show video control.
+     * Platform: iOS.
+     */
+    void VideoView::showControl()
+    {
+        this->setProperty(MAW_VIDEO_VIEW_CONTROL, "true");
+    }
+
+    /**
+     * Hide video control.
+     * Platform: iOS.
+     */
+    void VideoView::hideControl()
+    {
+        this->setProperty(MAW_VIDEO_VIEW_CONTROL, "false");
+    }
+
+    /**
+     * Check if the video control is visible.
+     * Platform: iOS.
+     */
+    bool VideoView::isControlVisible()
+    {
+        const MAUtil::String value =
+            this->getPropertyString(MAW_VIDEO_VIEW_CONTROL);
+        if (strcmp(value.c_str(), "true") == 0)
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      * Add an video view event listener.
      * @param listener The listener that will receive video view events.
      */

@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<!--
+* @file index.html
+* @author Ali Sarrafi
+*
+* Template application that shows how to send custom messages to C++.
+-->
+<html>
+	<head>
+		<meta name="viewport" content="width=320, user-scalable=no">
+		<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+		<title>Wormhole Template App</title>
+		<link rel="stylesheet" href="style.css" type="text/css" media="screen" title="no title" charset="utf-8">
+		<script type="text/javascript" charset="utf-8" src="js/wormhole.js"></script>
+		<script type="text/javascript">
+			/**
+			 * Initialization.
+			 */
+			function initialize()
+			{
+				document.addEventListener("deviceready", displayDeviceInfo, true);
+				document.addEventListener("backbutton", close, true);
+			}
+
+			/**
+			 * Handle the backbutton event.
+			 */
+			function close()
+			{
+				// Close the application if the back key is pressed.
+				mosync.bridge.send(["close"]);
+			}
+
+			/**
+			 * Displays the device information on the screen.
+			 */
+			function displayDeviceInfo()
+			{
+				document.getElementById("platform").innerHTML = device.platform;
+				document.getElementById("version").innerHTML = device.version;
+				document.getElementById("uuid").innerHTML = device.uuid;
+				document.getElementById("name").innerHTML = device.name;
+				document.getElementById("width").innerHTML = screen.width;
+				document.getElementById("height").innerHTML = screen.height;
+			}
+
+			/**
+			 * Vibrate for 1 second.
+			 */
+			function vibrate()
+			{
+				// Send message to C++ to make device vibrate.
+				// We use the JSON format. The message will
+				// be delivered to C++ in a JSON array.
+				mosync.bridge.sendJSON(
+				{
+					"messageName":"Custom",
+					"command":"vibrate",
+					"duration":1000
+				});
+			}
+
+			/**
+			 * Play one beep sound.
+			 */
+			function beep()
+			{
+				// Send message to C++ to make device beep.
+				// Here we used the string stream format.
+				mosync.bridge.send(["Custom", "beep"]);
+			}
+
+			/**
+			 * Change page background to random color.
+			 */
+			function changeColor()
+			{
+				var color = "#" +
+					(Math.random() * 0xFFFFFF + 0x1000000)
+						.toString(16).substr(1,6);
+				document.documentElement.style.backgroundColor = color;
+				document.body.style.backgroundColor = color;
+			}
+		</script>
+	</head>
+	<body onload="initialize();">
+		<div id="screen">
+			<div class="pane" id="heading">Customized Wormhole Technology</div>
+			<div class="pane" id="info">
+				<div class="infoItem">Platform: <span id="platform">&nbsp;</span></div>
+				<div class="infoItem">Version: <span id="version">&nbsp;</span></div>
+				<div class="infoItem">UUID: <span id="uuid">&nbsp;</span></div>
+				<div class="infoItem">Name: <span id="name">&nbsp;</span></div>
+				<div class="infoItem">Width: <span id="width">&nbsp;</span></div>
+				<div class="infoItem">Height: <span id="height">&nbsp;</span></div>
+			</div>
+			<div class="pane button" onclick="vibrate();">Vibrate</div>
+			<div class="pane button" onclick="beep();">Beep</div>
+			<div class="pane button" onclick="changeColor();">Change Color</div>
+		</div>
+	</body>
+</html>

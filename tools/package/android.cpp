@@ -236,7 +236,7 @@ static void injectIcons(const SETTINGS& s, const RuntimeInfo& ri) {
 			string outputDir = string(s.dst) + directories.at(i);
 			_mkdir(outputDir.c_str());
 			string outputIcon = outputDir + "/icon.png";
-			injectIcon("android", size.c_str(), s.icon, file(outputIcon).c_str(), s.silent);
+			injectIcon("Android", size.c_str(), s.icon, file(outputIcon).c_str(), s.silent);
 		}
 	}
 }
@@ -293,9 +293,9 @@ static void writeManifest(const char* filename, const SETTINGS& s, const Runtime
 		<<"\t\t</activity>\n"
 		;
 	file <<"\t\t<service android:name=\"com.mosync.internal.android.notifications.LocalNotificationsService\" />\n";
-    if (ri.androidVersion >= 8) {
-		writeC2DMReceiver(file, packageName);
-	}
+
+	writeC2DMReceiver(file, packageName);
+
 	file <<"\t</application>\n"
 		<<"\t<uses-sdk android:minSdkVersion=\""<<ri.androidVersion<<"\" />\n"
 		;
@@ -337,6 +337,7 @@ static void writePermissions(ostream& stream, const SETTINGS& s, const RuntimeIn
 	parsePermissions(permissionSet, s.permissions);
 
 	writePermission(stream, isPermissionSet(permissionSet, VIBRATE), "android.permission.VIBRATE");
+	writePermission(stream, isPermissionSet(permissionSet, VIBRATE_DEPRECATED), "android.permission.VIBRATE");
 	writePermission(stream, isPermissionSet(permissionSet, INTERNET), "android.permission.INTERNET");
 	writePermission(stream, isPermissionSet(permissionSet, INTERNET), "android.permission.ACCESS_NETWORK_STATE");
 	writePermission(stream, isPermissionSet(permissionSet, LOCATION_COARSE), "android.permission.ACCESS_COARSE_LOCATION");
@@ -356,6 +357,7 @@ static void writePermissions(ostream& stream, const SETTINGS& s, const RuntimeIn
 	writePermission(stream, isPermissionSet(permissionSet, HOMESCREEN), "com.android.launcher.permission.INSTALL_SHORTCUT");
 	writePermission(stream, isPermissionSet(permissionSet, HOMESCREEN), "com.android.launcher.permission.UNINSTALL_SHORTCUT");
 	writePermission(stream, isPermissionSet(permissionSet, AUTOSTART), "android.permission.RECEIVE_BOOT_COMPLETED");
+	writePermission(stream, isPermissionSet(permissionSet, AUTOSTART_DEPRECATED), "android.permission.RECEIVE_BOOT_COMPLETED");
 
 	// Only add this for android 1.6 and higher.
 	if (ri.androidVersion >= 4)
@@ -378,18 +380,16 @@ static void writePermissions(ostream& stream, const SETTINGS& s, const RuntimeIn
 	// Always add this.
 	writePermission(stream, true, "android.permission.READ_PHONE_STATE");
 
-	// Only add this for android 2.2 and higher. Permission for Google C2DM Service for push notifications.
-	if (ri.androidVersion >= 8)
+	// Permission for Google C2DM Service for push notifications.
+	if (isPermissionSet(permissionSet, PUSH_NOTIFICATIONS))
 	{
-		if (isPermissionSet(permissionSet, PUSH_NOTIFICATIONS))
-		{
-			stream <<"\t<permission android:name=\"com.mosync.java.android.permission.C2D_MESSAGE\"\n";
-			stream <<"\t\tandroid:protectionLevel=\"signature\" />\n";
-		}
-		string permMessage = packageName + ".permission.C2D_MESSAGE";
-		writePermission(stream, isPermissionSet(permissionSet, PUSH_NOTIFICATIONS), permMessage.c_str());
-		writePermission(stream, isPermissionSet(permissionSet, PUSH_NOTIFICATIONS), "com.google.android.c2dm.permission.RECEIVE");
+		stream <<"\t<permission android:name=\""<<packageName<<".permission.C2D_MESSAGE\"\n";
+		stream <<"\t\tandroid:protectionLevel=\"signature\" />\n";
 	}
+	writePermission(stream, isPermissionSet(permissionSet, PUSH_NOTIFICATIONS), "android.permission.WAKE_LOCK");
+	string permMessage = packageName + ".permission.C2D_MESSAGE";
+	writePermission(stream, isPermissionSet(permissionSet, PUSH_NOTIFICATIONS), permMessage.c_str());
+	writePermission(stream, isPermissionSet(permissionSet, PUSH_NOTIFICATIONS), "com.google.android.c2dm.permission.RECEIVE");
 }
 static void writePermission(ostream& stream, bool flag, const char* nativePerm) {
 	if (flag) {

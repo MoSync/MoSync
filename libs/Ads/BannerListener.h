@@ -16,6 +16,15 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301, USA.
 */
 
+/*! \addtogroup AdsLib
+ *  @{
+ */
+
+/**
+ *  @defgroup AdsLib Advertising Library
+ *  @{
+ */
+
 /**
  * @file BannerListener.h
  * @author Bogdan Iusco
@@ -27,6 +36,9 @@ MA 02110-1301, USA.
 #ifndef ADS_BANNER_LISTENER_H_
 #define ADS_BANNER_LISTENER_H_
 
+/**
+ * \brief MoSync Ads API.
+ */
 namespace Ads
 {
     // Forward declaration.
@@ -71,3 +83,5 @@ namespace Ads
 } // namespace Ads
 
 #endif /* ADS_BANNER_LISTENER_H_ */
+
+/*! @} */

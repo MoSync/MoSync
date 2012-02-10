@@ -96,7 +96,7 @@ public class TabScreenWidget extends ScreenWidget
 		tab.addTab( tabSpec );
 		m_tabIndexToScreen.put( screen, indexOfNewTab );
 		screen.setTitleChangedListener( this );
-		screen.setIconChangedListener(this);
+		screen.setIconChangedListener( this );
 	}
 
 	private void setIndicators(TabSpec tabSpec, String title, Drawable icon)

@@ -24,7 +24,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 using namespace std;
 
-static string parseBlackberryVersion(const RuntimeInfo& ri) {
+/*static string parseBlackberryVersion(const RuntimeInfo& ri) {
 	unsigned major = ri.blackberryVersion, minor = ri.blackberryMinor;
 	bool bad = false;
 	bad |= major < 4;
@@ -46,26 +46,36 @@ static string parseBlackberryVersion(const RuntimeInfo& ri) {
 	default:
 		exit(42);
 	}
-}
+}*/
 
 // reads JAD and JAR from cwd, outputs COD file to s.dst.
 void packageBlackberry(const SETTINGS& s, const RuntimeInfo& ri) {
 	testDst(s);
 	testName(s);
-	std::stringstream cmd;
-	string bbdir = mosyncdir()+string("/bin/bb")+parseBlackberryVersion(ri);
-	cmd << "java -Xmx256m -classpath \""<<bbdir<<"/rapc.jar\""
-		" net.rim.tools.compiler.Compiler"
-		" \"import="<<bbdir<<"/net_rim_api.jar\""
-		" \"codename="<<s.name<<"\" -midlet"
-		" \"jad="<<s.name<<".jad\" \""<<s.name<<".jar\"";
-	sh(cmd.str().c_str());
+	testBlackberryJde(s);
 
-	std::string codName(s.name);
-	codName += ".cod";
-	std::string newName = s.dst + ("/" + codName);
-	remove(newName.c_str());
-	renameFile(newName, codName);
+	if (s.blackberryPackAsCOD) {
+		std::stringstream cmd;
+		string bbbin = string(s.blackberryJde) + "/bin";
+		string bblib = string(s.blackberryJde) + "/lib";
+		const char* codnameParam =
+				(ri.blackberryVersion <= 4 && ri.blackberryMinor < 3) ?
+						"codename" : "codname";
 
-	// TODO: if the COD is a zip file, re-zip it for better compression.
+		cmd << "java -Xmx256m -classpath \""<<bbbin<<"/rapc.jar\""
+			" net.rim.tools.compiler.Compiler"
+			" -noshortname -verbose -warning"
+			" -listing="<<s.name<<" \"import="<<bblib<<"/net_rim_api.jar\""
+			" \""<<codnameParam<<"="<<s.name<<"\" -quiet -midlet"
+			" \"jad="<<s.name<<".jad\" \""<<s.name<<".jar\"";
+		sh(cmd.str().c_str());
+
+		/*std::string codName(s.name);
+		codName += ".cod";
+		std::string newName = s.dst + ("/" + codName);
+		remove(newName.c_str());
+		renameFile(newName, codName);*/
+
+		// TODO: if the COD is a zip file, re-zip it for better compression.
+	}
 }

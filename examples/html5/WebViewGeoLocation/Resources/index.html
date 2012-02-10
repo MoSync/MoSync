@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<!--
+  This a low-level example of how to communicate between
+  JavaScript and C++. The program has a buttons for starting
+  and stopping tracking the location of the device. When location
+  is tracked, location events are captured on the C++ sice and
+  the current location is then sent to the JavaScript side.
+
+  The JavaScript code below includes a shortened version of the
+  file mosync-bridge.js, with the functions needed to send to
+  send raw text messages to C++, and a function called from the
+  iOS runtime to retrieve messages.
+-->
+<html>
+<head>
+	<meta name="viewport" content="width=320, user-scalable=no">
+	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+	<script type="text/javascript">
+	function StartTrackingGeoLocation()
+	{
+		SetLocationStatus("Location tracking started");
+		SetLocationData("");
+
+		// This results in MoSync C++ code being called.
+		mosync.bridge.sendRaw("StartTrackingGeoLocation");
+	}
+
+	function StopTrackingGeoLocation()
+	{
+		SetLocationStatus("Location tracking stopped");
+		SetLocationData("");
+
+		// This results in MoSync C++ code being called.
+		mosync.bridge.sendRaw("StopTrackingGeoLocation");
+	}
+
+	function SetLocationStatus(message)
+	{
+		document.getElementById("LocationStatus").innerHTML = message;
+	}
+
+	function SetLocationData(message)
+	{
+		document.getElementById("LocationData").innerHTML = message;
+	}
+
+	function GeoLocationUpdated(lat, lon)
+	{
+		SetLocationData("Latitude: " + lat + "<br />Longitude: " + lon);
+	}
+
+	/**
+	 * The following is a shortened version of mosync-bridge.js
+	 * (which is included in wormhole.js). Relevant parts of the
+	 * code are copied here to illustrate the low-level bridge
+	 * mechanism.
+	 */
+
+	/**
+	 * Create a global instance of the mosync object.
+	 */
+	var mosync = (function()
+	{
+		var mosync = {};
+
+		// Detect platform.
+
+		mosync.isAndroid =
+			navigator.userAgent.indexOf("Android") != -1;
+
+		mosync.isIOS =
+			(navigator.userAgent.indexOf("iPod") != -1) ||
+			(navigator.userAgent.indexOf("iPhone") != -1) ||
+			(navigator.userAgent.indexOf("iPad") != -1);
+
+		mosync.isWindowsPhone =
+			navigator.userAgent.indexOf("Windows Phone OS") != -1;
+
+		// The bridge submodule.
+
+		mosync.bridge = (function()
+		{
+			var bridge = {};
+			var rawMessageQueue = [];
+
+			/**
+			 * Send raw data to the C++ side.
+			 */
+			bridge.sendRaw = function(data)
+			{
+				if (mosync.isAndroid)
+				{
+					prompt(data, "");
+				}
+				else if (mosync.isIOS)
+				{
+					rawMessageQueue.push(data);
+					window.location = "mosync://DataAvailable";
+				}
+				else if (mosync.isWindowsPhone)
+				{
+					window.external.notify(data);
+				}
+				else
+				{
+					alert("mosync.bridge.sendRaw: unknown platform");
+				}
+			};
+
+			/**
+			 * Called from iOS runtime to get message.
+			 */
+			bridge.getMessageData = function()
+			{
+				if (rawMessageQueue.length == 0)
+				{
+					// Return an empty string so the iOS runtime
+					// knows we don't have any message.
+					return "";
+				}
+				var message = rawMessageQueue.pop();
+				return message;
+			};
+
+			return bridge;
+		})();
+
+		return mosync;
+	})();
+	</script>
+</head>
+<body>
+	<div>
+		<h2>Location Tracker</h2>
+	</div>
+	<div>
+		<input type="button" value="Start" onclick="StartTrackingGeoLocation()" />
+		<input type="button" value="Stop" onclick="StopTrackingGeoLocation()" />
+	</div>
+	<div>
+		<p id="LocationStatus"></p>
+	</div>
+	<div>
+		<p id="LocationData"></p>
+	</div>
+</body>
+</html>

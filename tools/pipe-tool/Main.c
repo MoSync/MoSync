@@ -175,9 +175,9 @@ int main(int argc,char *argv[])
 
 	CurrentModel = MODEL_null;
 
-	Default_DataSize  = 0x20000;	// 128
-	Default_StackSize = 0x08000;	// 32	
-	Default_HeapSize  = 0x10000;	// 64
+	Default_DataSize  = 1024<<10; // 1024 kb
+	Default_StackSize = 128<<10; // 128 kb
+	Default_HeapSize  = 512<<10; // 512 kb
 	Default_AppCode = 'TEST';
 	Do_Dump_Symbols = 0;
 	relPath[0] = 0;
@@ -745,6 +745,8 @@ Build application (-B) options:\n\
   -no-verify           prevent code verification\n\
   -java                build a Java class file\n\
   -gcj=flags           for -java option: set flags for GCJ\n\
+  -cpp                 build C++ source code\n\
+  -cs                  build C# source code\n\
 \n\
 Resource compiler (-R) options:\n\
   -depend=file         output dependencies in makefile syntax\n\

@@ -31,19 +31,21 @@ namespace MAUtil {
 *
 * Such handles are used to construct new MoSync resources,
 * such as images, sound clips or data objects.
+*
+* \deprecated Use maCreatePlacholder() and maDestroyPlaceholder() instead.
 */
 namespace PlaceholderPool {
 	/**
 	* Retrieves and removes a MAHandle from the pool, or,
 	* if the pool is empty, allocates a new MAHandle.
 	*/
-	MAHandle alloc();
+	MAHandle alloc() GCCATTRIB(deprecated);
 
 	/**
 	* Adds a MAHandle to the pool. If the MAHandle refers to a valid MoSync Object,
 	* that object is destroyed.
 	*/
-	void put(MAHandle h);
+	void put(MAHandle h) GCCATTRIB(deprecated);
 }
 
 }

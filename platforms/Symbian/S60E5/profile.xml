@@ -1,0 +1,5 @@
+<platform family="Symbian" variant="S60E5" runtime="s60v5/1" inherit="Symbian">
+  <capability name="Location" state="REQUIRES_PERMISSION">
+    <capability name="Fine" state="REQUIRES_PERMISSION"/>
+  </capability>
+</platform>

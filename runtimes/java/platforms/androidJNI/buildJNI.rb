@@ -78,9 +78,7 @@ ENV['MOSYNC_JAVA_SRC'] = cpath
 
 puts "android version is: #{androidVersion}"
 if((androidVersion == "3") ||(androidVersion == "4"))
-	cp "#{cpath}/AndroidProject/jni/Application_1.mk", "#{cpath}/AndroidProject/jni/Application.mk"
-else
-	cp "#{cpath}/AndroidProject/jni/Application_2.mk", "#{cpath}/AndroidProject/jni/Application.mk"
+	ENV['ANDROID_API_BELOW_7'] = "true"
 end
 
 if androidNDKPath == nil

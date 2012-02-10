@@ -25,6 +25,6 @@ else
 end
 
 SUBDIRS = stdlibs + ["MAUtil", "MTXml", "MAUI", "MAUI-revamp", "MATest", "MAP",
-	"Testify", "MAFS", "yajl", "Ads", "Facebook", "NativeUI", "Wormhole", "Notification"]
+	"Testify", "stlport", "MAFS", "yajl", "Ads", "Facebook", "NativeUI", "Notification", "ResCompiler", "Wormhole"]
 
 Targets.invoke

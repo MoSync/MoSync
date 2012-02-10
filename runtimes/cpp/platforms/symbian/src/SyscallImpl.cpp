@@ -64,7 +64,6 @@ using namespace MoSyncError;
 static int maSendToBackground();
 static int maBringToForeground();
 
-
 #ifdef CALL
 //***************************************************************************
 //CNotifyExample
@@ -249,7 +248,9 @@ CONSTRUCTOR_ARGUMENTS(INIT_ARG_VAR, COMMA),
 #ifdef TELEPHONY
 gTelephony(NULL),
 #endif
-gBtDeviceArray(8, 0)
+gBtDeviceArray(8, 0),
+resourcesCount(-1),
+resource(NULL)
 {
 	init();
 	ClearNetworkingVariables();
@@ -364,7 +365,7 @@ void Base::StopEverything() {
 		if(syscall) {
 			syscall->StopEverything();
 		}
-	}	
+	}
 }
 
 void Syscall::StopEverything() {
@@ -435,7 +436,7 @@ void Syscall::RestoreDrawTarget() {
 
 void Syscall::platformDestruct() {
 	LOG("platformDestruct()\n");
-	
+
 	StopEverything();
 
 #ifdef __SERIES60_3X__
@@ -446,7 +447,7 @@ void Syscall::platformDestruct() {
 	LOG("gServer.Close();\n");
 	gServer.Close();
 #endif
-	
+
 #if defined(SUPPORT_MOSYNC_SERVER) || defined(__S60_50__)
 	//calls Cancel, which should really call the server's cancel mechanism...
 	//except it doesn't have one. tricky...
@@ -504,7 +505,7 @@ void Syscall::platformDestruct() {
 	gKeyLock.Close();
 
 	SAFE_DELETE(gVibraControl);
-	
+
 	gFileLists.close();
 
 	DebugMarkEnd();
@@ -819,7 +820,7 @@ SYSCALL(MAHandle, maSetDrawTarget(MAHandle handle)) {
 	} else {
 		TAlphaBitmap* img = SYSCALL_THIS->resources.extract_RT_IMAGE(handle);
 		gScreenEngine.SetDrawSurfaceL(img);
-		gDrawTarget = img; 
+		gDrawTarget = img;
 		ROOM(SYSCALL_THIS->resources.add_RT_FLUX(handle, NULL));
 	}
 	gDrawTargetHandle = handle;
@@ -1041,7 +1042,7 @@ SYSCALL(int, maCreateImageRaw(MAHandle placeholder, const void* src,
 	SYSCALL_THIS->ValidateMemRange(src, sizeof(int)*EXTENT_X(size)*EXTENT_Y(size));
 	CHECK_INT_ALIGNMENT(src);
 	int* srcInt = ALIGN_INT(src);
-	
+
 	int width = EXTENT_X(size);
 	int height = EXTENT_Y(size);
 
@@ -1052,7 +1053,7 @@ SYSCALL(int, maCreateImageRaw(MAHandle placeholder, const void* src,
 	CleanupStack::PushL(clr());
 
 	LHEL_OOM(clr->Create(TSize(width, height), EColor16M));
-	
+
 		//CCoeEnv::Static()->SystemGc().Device()->DisplayMode());
 	//TBitmapUtil::SetPixel does no conversion.
 	//suboptimal on 2nd ed.
@@ -1284,7 +1285,7 @@ static int LaunchBrowser(const char* url) {
 	return KErrNone;
 }
 
-SYSCALL(longlong, maInvokeExtension(int, int, int, int)) {
+SYSCALL(longlong, maExtensionFunctionInvoke(int, int, int, int)) {
 	BIG_PHAT_ERROR(ERR_FUNCTION_UNIMPLEMENTED);
 }
 
@@ -1319,10 +1320,10 @@ SYSCALL(longlong, maIOCtl(int function, int a, int b, int c)) {
 		return 0;
 	case maIOCtl_maBtGetNewDevice:
 		return SYSCALL_THIS->maBtGetNewDevice(GVMRA(MABtDevice));
-		
+
 	case maIOCtl_maBtCancelDiscovery:
 		return BLUETOOTH(maBtCancelDiscovery)();
-		
+
 	case maIOCtl_maBtStartServiceDiscovery:
 		BLUETOOTH(maBtStartServiceDiscovery)(GVMRA(MABtAddr), GVMR(b, MAUUID));
 		return 0;
@@ -1379,12 +1380,15 @@ SYSCALL(longlong, maIOCtl(int function, int a, int b, int c)) {
 				return CONNERR_GENERIC;
 			}
 			return 0;
-		//} else if(sstrcmp(url, "tel:") == 0) {
+#ifdef CALL
+		} else if(sstrcmp(url, "tel:") == 0) {
+			return platformTel(url + 4);
+#endif
 		} else {
 			return CONNERR_UNAVAILABLE;
 		}
 	}
-	
+
 #ifdef WLAN
 	case maIOCtl_maWlanStartDiscovery:
 		return maWlanStartDiscovery();
@@ -1394,7 +1398,7 @@ SYSCALL(longlong, maIOCtl(int function, int a, int b, int c)) {
 
 	case maIOCtl_maSendTextSMS: {
 		const char* sa = SYSCALL_THIS->GetValidatedStr(a);
-		const char* sb = SYSCALL_THIS->GetValidatedStr(b);		
+		const char* sb = SYSCALL_THIS->GetValidatedStr(b);
 		LOG("maSendTextSMS \"%s\" \"%s\"\n", sa, sb);
 #ifdef __SERIES60_3X__
 		HBufC16* recipientNumber = CreateHBufC16FromCStringLC(sa);
@@ -1437,9 +1441,9 @@ SYSCALL(longlong, maIOCtl(int function, int a, int b, int c)) {
 	case maIOCtl_maCallDial: {
 		const char* number = SYSCALL_THIS->GetValidatedStr(a);
 		TPtrC8 np(CBP number);
-		
+
 		LOG("maCallDial \"%s\"\n", number);
-		
+
 		if(gCallSync->Status()->Int() == KRequestPending ||
 			gHangupSync->Status()->Int() == KRequestPending ||
 			gCallIdIsValid)
@@ -1464,7 +1468,7 @@ SYSCALL(longlong, maIOCtl(int function, int a, int b, int c)) {
 		gCallSync->SetActive();
 		return 0;
 	}
-	
+
 	case maIOCtl_maCallAnswer: {
 		LOG("maCallAnswer\n");
 		if(gCallSync->Status()->Int() == KRequestPending ||
@@ -1548,7 +1552,7 @@ SYSCALL(longlong, maIOCtl(int function, int a, int b, int c)) {
 			SYSCALL_THIS->GetValidatedMemRange(a, gScreenEngine.GetFrameBufferLen()));
 	case maIOCtl_maFrameBufferClose:
 		return gScreenEngine.FrameBufferClose();
-		
+
 #ifdef SUPPORT_AUDIOBUFFER
 	case maIOCtl_maAudioBufferInit:
 		return maAudioBufferInit(GVMRA(MAAudioBufferInfo));
@@ -1562,7 +1566,7 @@ SYSCALL(longlong, maIOCtl(int function, int a, int b, int c)) {
 		return maSendToBackground();
 	case maIOCtl_maBringToForeground:
 		return maBringToForeground();
-	
+
 	case maIOCtl_maCameraFormatNumber:
 		return maCameraFormatNumber();
 	case maIOCtl_maCameraFormat:
@@ -1633,6 +1637,32 @@ SYSCALL(longlong, maIOCtl(int function, int a, int b, int c)) {
 		return IOCTL_UNAVAILABLE;
 	}
 }
+
+#ifdef CALL
+int Syscall::platformTel(const char* tel) {
+	TPtrC8 np(CBP tel);
+
+	LOG("platformTel \"%s\"\n", tel);
+
+	if(gCallSync->Status()->Int() == KRequestPending ||
+		gHangupSync->Status()->Int() == KRequestPending ||
+		gCallIdIsValid)
+	{
+		LOG("Call already in progress!\n");
+		return -2;
+	}
+
+	CTelephony::TCallParamsV1 params;
+	CTelephony::TCallParamsV1Pckg paramPckg(params);
+	params.iIdRestrict = CTelephony::ESendMyId;
+	CTelephony::TTelNumber tNumber;
+	tNumber.Copy(np);
+	gTelephony->DialNewCall(*gCallSync->Status(), paramPckg, tNumber, gCallId,
+		CTelephony::EVoiceLine);
+	gCallSync->SetActive();
+	return 0;
+}
+#endif
 
 //------------------------------------------------------------------------------
 // maGetSystemProperty
@@ -1739,7 +1769,7 @@ static const TDesC& getIso639() {
 	m(ELangWelsh, cy)\
 	m(ELangZulu, zu)\
 
-	
+
 #define CASE_LANGUAGE(id, iso) case id: { _LIT(KTemp, #iso); return KTemp(); }
 	switch(tl) {
 		//case ELangEnglish: { _LIT(KTemp, "en"); return KTemp(); }
@@ -1800,7 +1830,7 @@ int Syscall::maGetSystemProperty(const char* key, char* buf, int size) {
 	if(keyC8.Compare(KISO639) == 0) {
 		value.Set(getIso639());
 	}
-	
+
 	Smartie<HBufC16> valBuf;
 	if(keyC8.Compare(KDevice) == 0) {
 		_LIT16(KSeparator, "::");
@@ -1830,7 +1860,7 @@ int Syscall::maGetSystemProperty(const char* key, char* buf, int size) {
     	val.Append(KSeparator);
     	val.Append(versionString);
     }
-		
+
 		value.Set(*valBuf);
 	}
 	int len = value.Length();
@@ -1855,7 +1885,7 @@ private:
 	int mPos;
 public:
 	TDriveList mList;
-	
+
 	RootFileList() : mPos(0) {}
 	int next(char* nameBuf, int bufSize) {
 		LOGD("RootFileList::next(%i)\n", mPos);
@@ -1884,7 +1914,7 @@ private:
 	int mPos;
 public:
 	CDir* mDir;
-	
+
 	DirFileList() : mPos(0), mDir(NULL) {}
 	~DirFileList() {
 		if(mDir)
@@ -1973,7 +2003,7 @@ MAHandle Syscall::maFileListStart(const char* path, const char* filter, int sort
 		TPtrC8 filterPtrC8(CBP filter);
 		Smartie<HBufC16> desc(HBufC16::NewL(pathPtrC8.Length() + filterPtrC8.Length()));
 		TPtr16 des(desc->Des());
-		
+
 		//Append(des, pathPtrC8);
 		//gotta swap '/' to '\'
 		for(int i=0; i<pathPtrC8.Length(); i++) {
@@ -1982,7 +2012,7 @@ MAHandle Syscall::maFileListStart(const char* path, const char* filter, int sort
 			else
 				des.Append(pathPtrC8[i]);
 		}
-		
+
 		Append(des, filterPtrC8);
 		Smartie<HBufC8> temp8(CreateHBufC8FromDesC16L(des));
 		LOGD("GetDir '%S'\n", temp8());
@@ -2112,14 +2142,14 @@ int Syscall::maFileTotalSpace(MAHandle file) {
 	return I64LOW(MIN(vi.iSize, TInt64(0x7fffffff)));
 }
 
-	
+
 //------------------------------------------------------------------------------
 // CellID
 //------------------------------------------------------------------------------
 #ifndef __SERIES60_3X__	//Series 60, 2nd Ed.
 int Syscall::maGetCellInfo(MACellInfo* ci) {
 	RBasicGsmPhone phone;
-	RTelServer server;		
+	RTelServer server;
 
 	LHEL(server.Connect());
 	// load a phone profile
@@ -2716,7 +2746,7 @@ SYSCALL(int, maSoundIsPlaying()) {
 
 SYSCALL(int, maSoundGetVolume()) {
 	return gSoundVolume;
-}	
+}
 
 SYSCALL(void, maSoundSetVolume(int vol)) {
 	LOGA("SV %i\n", vol);
@@ -2796,7 +2826,7 @@ int Syscall::maAudioBufferInit(const MAAudioBufferInfo* info) {
 	gAudioBuffer.des.Set(
 		CBP GetValidatedMemRange((int)info->buffer, info->bufferSize),
 		info->bufferSize);
-	
+
 	switch(info->sampleRate) {
 #define CASE_SAMPLE_RATE(rate)\
 	case rate: gAudioBuffer.sampleRateId = TMdaAudioDataSettings::ESampleRate##rate##Hz; break;
@@ -2817,7 +2847,7 @@ int Syscall::maAudioBufferInit(const MAAudioBufferInfo* info) {
 		LOG("Unsupported channel number: %i\n", info->numChannels);
 		return -1;
 	}
-	
+
 	gAudioBuffer.ready = false;
 
 	LOGA("CMAOS:NewL\n");
@@ -3120,6 +3150,6 @@ int Syscall::maTextBox(const wchar* title, const wchar* inText, wchar* outText,
 	e.textbox.textboxResult = res;
 	e.textbox.textboxLength = tOutText.Length();
 	gAppView.AddEvent(e);
-	
+
 	return res;
 }

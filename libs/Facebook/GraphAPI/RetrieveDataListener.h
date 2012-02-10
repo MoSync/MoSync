@@ -26,7 +26,7 @@ MA 02110-1301, USA.
 
 #include <maapi.h>
 #include <MAUtil/String.h>
-#include "../JSON_lib/YAJLDom.h"
+#include <yajl/YAJLDom.h>
 #include "ErrorListener.h"
 
 class FacebookRequest;

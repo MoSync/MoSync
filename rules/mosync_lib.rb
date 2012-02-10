@@ -1,14 +1,14 @@
 # Copyright (C) 2009 Mobile Sorcery AB
-# 
+#
 # This program is free software; you can redistribute it and/or modify it under
 # the terms of the GNU General Public License, version 2, as published by
 # the Free Software Foundation.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
 # or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
 # for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with this program; see the file COPYING.  If not, write to the Free
 # Software Foundation, 59 Temple Place - Suite 330, Boston, MA
@@ -27,7 +27,7 @@ module MoSyncMod
 	def modSetup
 		@EXTRA_INCLUDES = @EXTRA_INCLUDES.to_a + [mosync_include]
 	end
-	
+
 	def copyHeaders(endings = ['.h', '.hpp'])
 		dir = mosync_include + "/" + @INSTALL_INCDIR
 		# create a bunch of CopyFileTasks, then invoke them all.
@@ -39,9 +39,9 @@ module MoSyncMod
 		end
 		@prerequisites = [DirTask.new(self, dir)] + @prerequisites
 	end
-	
+
 	private
-	
+
 	def collect_headers(ending)
 		default(:HEADER_DIRS, @SOURCES)
 		files = []
@@ -58,6 +58,7 @@ end
 class MoSyncDllWork < DllWork
 	include MoSyncMod
 	def setup
+		set_defaults
 		setup_native
 		modSetup
 		if(HOST == :win32)
@@ -72,6 +73,7 @@ end
 class PipeLibWork < PipeGccWork
 	include MoSyncMod
 	def setup
+		set_defaults
 		@FLAGS = " -L -quiet"
 		setup_pipe
 		modSetup
@@ -119,6 +121,6 @@ def MoSyncLib.invoke(mod)
 	target :clean_native do
 		MoSyncLib.clean(MoSyncDllWork.new, mod)
 	end
-	
+
 	Targets.invoke
 end

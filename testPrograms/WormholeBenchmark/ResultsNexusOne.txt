@@ -1,0 +1,140 @@
+
+These results will vary slightly from run to run.
+
+--------------------------------
+
+Nexus One, debug mode, mosync-bridge.js:
+
+String messages/s: 7621.95
+JSON messages/s: 176.76
+String roundtrips/s: 229.89
+JSON roundtrips/s: 112.49
+
+--------------------------------
+
+Nexus One, debug mode, new mosync-bridge.js that uses concat:
+
+String messages/s: 10582
+JSON messages/s: 177
+String roundtrips/s: 224
+JSON roundtrips/s: 111
+
+--------------------------------
+
+Nexus One, release mode, new mosync-bridge.js that uses concat:
+
+String messages/s: 15128
+JSON messages/s: 391
+String roundtrips/s: 250
+JSON roundtrips/s: 174
+
+--------------------------------
+
+Nexus One, UTF8-encoding, debug mode, mosync-bridge.js:
+
+String messages/s: 5479.45
+JSON messages/s: 178.79
+String roundtrips/s: 216.92
+JSON roundtrips/s: 105.49
+
+--------------------------------
+
+Nexus One, UTF8-length counting, debug mode, mosync-bridge.js:
+
+String messages/s: 6317.12
+JSON messages/s: -
+String roundtrips/s: -
+JSON roundtrips/s: -
+
+--------------------------------
+
+Nexus One, UTF8-encoding, release mode, mosync-bridge.js:
+
+String messages/s: 6476.68
+JSON messages/s: 395.41
+String roundtrips/s: 217.39
+JSON roundtrips/s: 176.68
+
+--------------------------------
+
+Nexus One, recompiler, mosync-bridge.js:
+
+String messages/s: 15128.59
+JSON messages/s: 2487.56
+String roundtrips/s: 303.95
+JSON roundtrips/s: 248.76
+
+--------------------------------
+
+To compare, calling "prompt" from JS to Native Android:
+
+Message: "hello"
+Prompts/second: 1739.1304
+
+Message: 30000 characters
+Prompts/second: 296.7359
+
+--------------------------------
+
+OLD TEST DATA
+
+Just kept as a reference.
+
+100 characters/message
+
+document.location:
+Running Wormhole performance tests...
+Throughput/second: 134.7709
+Data throughput/second: 26.7165
+Roundtrip messages/second: 120.048
+JS UrlEncodings/second: 55555.5556
+C++ UrlDecodings/second: 30.217
+
+prompt:
+Throughput/second: 209.6436
+Data throughput/second: 27.1739
+Roundtrip messages/second: 151.1716
+JS UrlEncodings/second: 64516.129
+C++ UrlDecodings/second: 30.248
+
+200 characters/message
+prompt:
+Throughput/second: 201.2072
+Data throughput/second: 11.2296
+Roundtrip messages/second: 139.47
+JS UrlEncodings/second: 47619.0476
+C++ UrlDecodings/second: 11.7041
+
+300 characters/message
+prompt:
+no logging!
+Throughput/second: 220.7506
+Data throughput/second: 6.0661
+Roundtrip messages/second: 154.0832
+JS UrlEncodings/second: 36363.6364
+C++ UrlDecodings/second: 6.1835
+
+300 characters/message:
+prompt:
+Throughput/second: 230.1496
+Data throughput/second: 175.4386
+Roundtrip messages/second: 160.7717
+JS UrlEncodings/second: 42553.1915
+C++ UrlDecodings/second: 0
+
+1000 characters/message:
+prompt:
+Throughput/second: 185.0139
+Data throughput/second: 153.8462
+Roundtrip messages/second: 153.7279
+JS UrlEncodings/second: 17391.3043
+C++ UrlDecodings/second: 0
+
+10000 characters/message:
+Throughput/second: 187.7934
+Data throughput/second: 52.7704
+Roundtrip messages/second: 152.207
+JS UrlEncodings/second: 2076.8432
+C++ UrlDecodings/second: 0
+
+--------------------------------

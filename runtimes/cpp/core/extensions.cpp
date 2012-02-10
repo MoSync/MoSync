@@ -116,6 +116,7 @@ void loadExtensions(const char* extConfFileName) {
 	// and we're done.
 }
 
+/*
 extern "C" longlong maInvokeExtension(uint function, int a, int b, int c);
 extern "C" longlong maInvokeExtension(uint function, int a, int b, int c) {
 	function--;
@@ -125,4 +126,9 @@ extern "C" longlong maInvokeExtension(uint function, int a, int b, int c) {
 	dv.MA_LL_HI = gCore->regs[Core::REG_r14];
 	dv.MA_LL_LO = gCore->regs[Core::REG_r15];
 	return dv.ll;
+}
+*/
+extern "C" longlong maExtensionFunctionInvoke(uint function, int a, int b, int c);
+extern "C" longlong maExtensionFunctionInvoke(uint function, int a, int b, int c) {
+	return MA_EXTENSION_FUNCTION_UNAVAILABLE;
 }

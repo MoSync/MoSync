@@ -1,0 +1,3 @@
+.res INDEX_HTML
+.bin
+.include "index.html"

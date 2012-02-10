@@ -39,6 +39,7 @@ MA 02110-1301, USA.
 #define FLASH_COLOR_LABEL_TEXT "Flash color:"
 #define FLASH_ON_LABEL_TEXT "Flash On for:(seconds)"
 #define FLASH_OFF_LABEL_TEXT "Flash Off for:(seconds)"
+#define SHOW_ONLY_IF_IN_BACKGROUND "Show only when in background"
 #define FIRE_TIME_LABEL_TEXT "Schedule in(seconds):"
 #define SECONDS_LABEL_TEXT " seconds"
 #define SEND_BUTTON_TEXT "SEND"
@@ -90,6 +91,7 @@ CreateNotificationScreen::CreateNotificationScreen():
 	mFlashColor(NULL),
 	mFlashOnLength(NULL),
 	mFlashOffLength(NULL),
+	mShowOnlyIfInBackground(NULL),
 	mTime(NULL),
 	mCreateNotificationButton(NULL)
 {
@@ -203,14 +205,12 @@ void CreateNotificationScreen::createMainLayout()
 	// ================ Play sound =====================
 	mPlaySound = new CheckBox();
 	listView->addChild(createListViewItem(PLAY_SOUND_LABEL_TEXT, mPlaySound));
-	printf("after play sound");
 
 	if ( isAndroid() )
 	{
 		// ================ Sound path=====================
 		mSoundPath = new EditBox();
 		listView->addChild(createListViewItem(SOUND_PATH_LABEL_TEXT, mSoundPath));
-		printf("after create sound path");
 
 		// ================ Vibrate =====================
 		mVibrate = new CheckBox();
@@ -231,7 +231,11 @@ void CreateNotificationScreen::createMainLayout()
 		listView->addChild(createListViewItem(FLASH_ON_LABEL_TEXT, mFlashOnLength));
 		mFlashOffLength = new EditBox();
 		mFlashOffLength->setInputMode(EDIT_BOX_INPUT_MODE_NUMERIC);
-		listItem->addChild(createListViewItem(FLASH_OFF_LABEL_TEXT, mFlashOffLength));
+		listView->addChild(createListViewItem(FLASH_OFF_LABEL_TEXT, mFlashOffLength));
+
+		mShowOnlyIfInBackground = new CheckBox();
+		mShowOnlyIfInBackground->setState(true);
+		listView->addChild(createListViewItem(SHOW_ONLY_IF_IN_BACKGROUND, mShowOnlyIfInBackground));
 	}
 
 	// ================ Fire time =====================
@@ -313,6 +317,7 @@ void CreateNotificationScreen::buttonClicked(Widget* button)
 		}
 
 		LocalNotification* notification = new LocalNotification();
+
 		mLocalNotificationVector.add(notification);
 
 		// Set fire date.
@@ -363,17 +368,17 @@ void CreateNotificationScreen::buttonClicked(Widget* button)
 			if ( mFlash->isChecked() )
 			{
 				// Check if flashing LED is possible on the device.
-				if ( notification->setFlashLights(true) )
+				if ( MA_NOTIFICATION_RES_OK == notification->setFlashLights(true) )
 				{
 					mFlashColor->setText("IS available");
-						if ( checkFlashPattern() )
-						{
-							struct NotificationFlashLights pattern = NotificationFlashLights(
-										MAUtil::stringToInteger(mFlashColor->getText()),
-										MAUtil::stringToInteger(mFlashOnLength->getText()),
-										MAUtil::stringToInteger(mFlashOffLength->getText()));
-							notification->setFlashLightsPattern(pattern);
-						}
+					if ( checkFlashPattern() )
+					{
+						struct NotificationFlashLights pattern = NotificationFlashLights(
+									MAUtil::stringToInteger(mFlashColor->getText()),
+									MAUtil::stringToInteger(mFlashOnLength->getText()),
+									MAUtil::stringToInteger(mFlashOffLength->getText()));
+						notification->setFlashLightsPattern(pattern);
+					}
 				}
 				else
 				{
@@ -391,14 +396,27 @@ void CreateNotificationScreen::buttonClicked(Widget* button)
 			{
 				notification->setFlashLights(false);
 			}
+
 			if ( playSound )
 			{
 				notification->setSound(mSoundPath->getText());
 			}
+
+			if ( mShowOnlyIfInBackground->isChecked() )
+			{
+				// Show the notification only if the app is in background.
+				notification->setDisplayFlag(NOTIFICATION_DISPLAY_DEFAULT);
+			}
+			else
+			{
+				// Show the notification even if app is in foreground.
+				notification->setDisplayFlag(NOTIFICATION_DISPLAY_ANYTIME);
+			}
 		}
 
+//		notification->setFlag(NOTIFICATION_FLAG_AUTO_CANCEL);
 		NotificationManager::getInstance()->scheduleLocalNotification(notification);
-		printf("notification created");
+		printf("notification created with handle = %d ", notification->getHandle());
 		this->resetView();
 	}
 }
@@ -456,7 +474,7 @@ void CreateNotificationScreen::resetView()
 	{
 		mContentTitle->setText(DEFAULT_CONTENT_TITLE_EDIT_BOX_TEXT);
 		mTickerText->setText(DEFAULT_TICKER_TEXT_EDIT_BOX_TEXT);
-		mSoundPath->setText(DEFAULT_SOUND_PATH_EDIT_BOX_TEXT);
+		mSoundPath->setText("");
 		mVibrate->setState(false);
 		mVibrateDuration->setText(DEFAULT_VIBRATION_EDIT_BOX_TEXT);
 		mFlash->setState(false);

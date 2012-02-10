@@ -17,10 +17,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 package com.mosync.internal.android.notifications;
 
-import java.util.Timer;
-import java.util.TimerTask;
-
-import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -62,9 +58,6 @@ public class LocalNotificationsService extends Service
 		if (null != sMe)
 		{
 			Log.i("@@@MoSync", "NotificationsService.startService - service is already running");
-			// Schedule the new notification.
-//			scheduleNotification(notification);
-//			return;
 		}
 
 		mLatestNotification = notification;
@@ -73,7 +66,6 @@ public class LocalNotificationsService extends Service
 		// Here we set a flag to signal that the service was started
 		// from the MoSync application.
 		serviceIntent.putExtra("StartedByTheMoSyncApplication", true);
-		serviceIntent.setAction(Integer.toString(notification.getId()));
 		context.startService(serviceIntent);
 	}
 
@@ -104,6 +96,8 @@ public class LocalNotificationsService extends Service
 	public static void removeServiceNotification(
 		int notificationId, Context context)
 	{
+		Log.e("@@MoSync", "LocalNotification: remove service notification");
+
 		// We use a wrapper class to be backwards compatible.
 		// Loading the wrapper class will throw an error on
 		// platforms that does not support it.
@@ -190,8 +184,8 @@ public class LocalNotificationsService extends Service
 		// Stop the service if there is no intent.
 		if (null == intent)
 		{
-//			Log.i("@@@MoSync", "NotificationsService.startMe: "
-//				+ "stopping service because intent is null");
+			Log.i("@@@MoSync", "NotificationsService.startMe: "
+				+ "stopping service because intent is null");
 			stopSelf();
 			return;
 		}
@@ -201,8 +195,8 @@ public class LocalNotificationsService extends Service
 			intent.getBooleanExtra("StartedByTheMoSyncApplication", false);
 		if (!startFlag)
 		{
-//			Log.i("@@@MoSync", "NotificationsService.startMe: "
-//				+ "stopping service because startFlag is false");
+			Log.i("@@@MoSync", "NotificationsService.startMe: "
+				+ "stopping service because startFlag is false");
 			stopSelf();
 			return;
 		}
@@ -210,43 +204,13 @@ public class LocalNotificationsService extends Service
 		// sMe must be set.
 		if (null == sMe)
 		{
-//			Log.i("@@@MoSync", "NotificationsService.startMe: "
-//				+ "stopping service because sMe is null");
+			Log.i("@@@MoSync", "NotificationsService.startMe: "
+				+ "stopping service because sMe is null");
 			stopSelf();
 			return;
 		}
-//		intent.getAction(); get the ID
 
-		scheduleNotification();
-	}
-
-	/**
-	 * Schedule a status bar notification.
-	 */
-	private void scheduleNotification()
-	{
-		Log.e("@@MoSync","scheduleNotification");
-
-		// If the fire date is not set, trigger it now.
-		if ( mLatestNotification.getFireDate() == -1 )
-		{
-			triggerNotification();
-		}
-		else
-		{
-		    Timer timer = new Timer();
-		    TimerTask timerTask = new TimerTask()
-		    {
-		        @Override
-		        public void run()
-		        {
-		            triggerNotification();
-		        }
-		    };
-
-	        long task = mLatestNotification.getFireDate() - System.currentTimeMillis();
-		    timer.schedule(timerTask, task);
-		}
+		triggerNotification();
 	}
 
 	/**
@@ -256,48 +220,61 @@ public class LocalNotificationsService extends Service
 	{
 		Log.e("@@MoSync","triggerNotification");
 
-		// The notification is already created, just trigger it.
-		mLatestNotification.trigger();
-
-		Context context = getApplicationContext();
-		Intent intent = new Intent(context, MoSync.class);
-		intent.addFlags(
-			Intent.FLAG_ACTIVITY_NEW_TASK |
-			Intent.FLAG_ACTIVITY_REORDER_TO_FRONT |
-			Intent.FLAG_ACTIVITY_SINGLE_TOP |
-			Intent.FLAG_DEBUG_LOG_RESOLUTION |
-			0);
-		PendingIntent contentIntent = PendingIntent.getActivity(
-			context,
-			0,
-			intent,
-			0
-		    );
-		mLatestNotification.getNotification().setLatestEventInfo(
-			context,
-			mLatestNotification.getTitle(),
-			mLatestNotification.getText(),
-			contentIntent);
-
-		// Post a MoSync event.
+		// Post a MoSync event regardless of the focus state.
 		LocalNotificationsManager.postEventNotificationReceived(mLatestNotification.getId());
 
-		// We use a wrapper class to be backwards compatible.
-		// Loading the wrapper class will throw an error on
-		// platforms that does not support it.
-		try
+		// Show the notification only if:
+		//  - #MA_NOTIFICATION_DISPLAY_FLAG_ANYTIME property is set.
+		//  - or Application is in background and #MA_NOTIFICATION_DISPLAY_FLAG_DEFAULT is set.
+		if ( !mLatestNotification.showOnlyInBackground()
+				||
+			( mLatestNotification.showOnlyInBackground() && !LocalNotificationsManager.getFocusState() ) )
 		{
-			// Start as foreground service on Android >= 5.
-			// This displays the notification.
-			new StartForegroundWrapper().startForeground(
-				this, mLatestNotification.getId(), mLatestNotification.getNotification());
+			// The notification is already created, just trigger it.
+			mLatestNotification.trigger();
+
+			Context context = getApplicationContext();
+			Intent intent = new Intent(context, MoSync.class);
+			intent.addFlags(
+				Intent.FLAG_ACTIVITY_NEW_TASK |
+				Intent.FLAG_ACTIVITY_REORDER_TO_FRONT |
+				Intent.FLAG_ACTIVITY_SINGLE_TOP |
+				Intent.FLAG_DEBUG_LOG_RESOLUTION |
+				0);
+			PendingIntent contentIntent = PendingIntent.getActivity(
+				context,
+				0,
+				intent,
+				0
+			    );
+			mLatestNotification.getNotification().setLatestEventInfo(
+				context,
+				mLatestNotification.getTitle(),
+				mLatestNotification.getText(),
+				contentIntent);
+
+			// We use a wrapper class to be backwards compatible.
+			// Loading the wrapper class will throw an error on
+			// platforms that does not support it.
+			try
+			{
+				// Start as foreground service on Android >= 5.
+				// This displays the notification.
+				new StartForegroundWrapper().startForeground(
+					this, mLatestNotification.getId(), mLatestNotification.getNotification());
+			}
+			catch (java.lang.VerifyError error)
+			{
+				// Just add the notification on Android < 5.
+				NotificationManager notificationManager = (NotificationManager)
+					getSystemService(Context.NOTIFICATION_SERVICE);
+				notificationManager.notify(mLatestNotification.getId(), mLatestNotification.getNotification());
+			}
 		}
-		catch (java.lang.VerifyError error)
+		else
 		{
-			// Just add the notification on Android < 5.
-			NotificationManager notificationManager = (NotificationManager)
-				getSystemService(Context.NOTIFICATION_SERVICE);
-			notificationManager.notify(mLatestNotification.getId(), mLatestNotification.getNotification());
+			Log.e("@@MoSync", "LocalNotification received: not displayed because app is in foreground.");
+			return;
 		}
 	}
 

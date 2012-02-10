@@ -16,6 +16,15 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301, USA.
 */
 
+/*! \addtogroup NotificationLib
+ *  @{
+ */
+
+/**
+ *  @defgroup NotificationLib Notification Library
+ *  @{
+ */
+
 /**
  * @file NotificationManager.h
  * @author Emma Tresanszki and Bogdan Iusco
@@ -33,22 +42,34 @@ MA 02110-1301, USA.
 #include <MAUtil/Map.h>
 #include <MAUtil/Environment.h>
 
+#include "LocalNotification.h"
+
+/**
+* \brief MoSync Notification API classes.
+*/
 namespace Notification
 {
 
     /**
-     * Constants indicating the types of push notifications the application
-     * accepts.
+     * @brief Constants indicating the types of push notifications
+     * the application accepts.
      * Specific to iOS.
      * On Android PUSH_NOTIFICATION_TYPE_ALERT is set by default.
      */
     enum PushNotificationType
     {
-        // The application accepts notifications that badge the application icon.
+        /**
+         * @brief The application accepts notifications that badge the
+         * application icon.
+         */
         PUSH_NOTIFICATION_TYPE_BADGE = 0x01,
-        // The application accepts alert sounds as notifications.
+        /**
+         * @brief The application accepts alert sounds as notifications.
+         */
         PUSH_NOTIFICATION_TYPE_SOUND = 0x02,
-        // The application accepts alert messages as notifications.
+        /**
+         * @brief The application accepts alert messages as notifications.
+         */
         PUSH_NOTIFICATION_TYPE_ALERT = 0x04
     };
 
@@ -58,8 +79,8 @@ namespace Notification
      * Platform: Android only.
      */
     /**
-     * Indicates that the device can't read the response, or there was a 500/503
-     * from the server that can be retried later.
+     * @brief Indicates that the device can't read the response, or there was
+     * a 500/503 from the server that can be retried later.
      * The application should use exponential back off and retry.
      * Platform: Android only.
      */
@@ -67,7 +88,7 @@ namespace Notification
         "SERVICE_NOT_AVAILABLE";
 
     /**
-     * Indicates that there is no Google account on the phone.
+     * @brief Indicates that there is no Google account on the phone.
      * The application should ask the user to open the account manager and add
      * a Google account.
      * Platform: Android only.
@@ -76,7 +97,7 @@ namespace Notification
         "ACCOUNT_MISSING";
 
     /**
-     * Indicates that the Google password was bad.
+     * @brief Indicates that the Google password was bad.
      * The application should ask the user to enter his/her password, and let
      * user retry manually later.
      * Platform: Android only.
@@ -85,7 +106,7 @@ namespace Notification
         "AUTHENTICATION_FAILED";
 
     /**
-     * Indicates that the user has too many applications registered.
+     * @brief Indicates that the user has too many applications registered.
      * The application should tell the user to uninstall some other applications,
      * let user retry manually.
      * Platform: Android only.
@@ -94,7 +115,7 @@ namespace Notification
         "TOO_MANY_REGISTRATIONS";
 
     /**
-     * Indicates that the sender account is not recognized.
+     * @brief Indicates that the sender account is not recognized.
      * Platform: Android only.
      */
     const MAUtil::String NOTIFICATIONS_REGISTRATION_ERR_INVALID_SENDER =
@@ -156,9 +177,17 @@ namespace Notification
         /**
          * Schedules a local notification for delivery at its encapsulated
          * date and time.
+         * By default, the notifications are displayed to the user only if the application
+         * is in background. But on Android you can configure this via the
+         * #MA_NOTIFICATION_LOCAL_DISPLAY_FLAG property by calling setDisplayFlag().
          * @param localNotification Handle to a local notification object.
+         * @return One of the constants:
+         *  - #MA_NOTIFICATION_RES_OK if no error occurred.
+         *  - #MA_NOTIFICATION_RES_INVALID_HANDLE if the notificationHandle is invalid.
+         *  - #MA_NOTIFICATION_RES_ALREADY_SCHEDULED if the notification was already
+         *  scheduled.
          */
-        void scheduleLocalNotification(
+        int scheduleLocalNotification(
             LocalNotification* localNotification);
 
         /**
@@ -166,8 +195,13 @@ namespace Notification
          * calling this method also programmatically dismisses the notification
          * if  it is currently displaying an alert.
          * @param localNotification Handle to a local notification object.
+         * @return One of the constants:
+         *  - #MA_NOTIFICATION_RES_OK
+         *  - #MA_NOTIFICATION_RES_INVALID_HANDLE if the notificationHandle is invalid.
+         *  - #MA_NOTIFICATION_RES_CANNOT_UNSCHEDULE If the notification was not
+         *  scheduled.
          */
-        void unscheduleLocalNotification(
+        int unscheduleLocalNotification(
             LocalNotification* localNotification);
 
         /**
@@ -188,9 +222,11 @@ namespace Notification
          *  PUSH_NOTIFICATION_TYPE_BADGE | PUSH_NOTIFICATION_TYPE_ALERT, "");
          *
          *  @return One of the next result codes:
-         *  - MA_NOTIFICATION_RES_OK if no error occurred.
-         *  - MA_NOTIFICATION_RES_ALREADY_REGISTERED if the application is already
+         *  - #MA_NOTIFICATION_RES_OK if no error occurred.
+         *  - #MA_NOTIFICATION_RES_ALREADY_REGISTERED if the application is already
          *    registered for receiving push notifications.
+         *  - #MA_NOTIFICATION_RES_UNSUPPORTED if notifications are not supported
+         *  on current platform.
          */
         int registerPushNotification(
             const int types,
@@ -235,14 +271,35 @@ namespace Notification
         int getApplicationIconBadgeNumber();
 
         /**
+         * Set the display flags applied to the incoming push notifications.
+         * Note that regardless of this setting, the didReceivePushNotification
+         * callback will be made for each incoming notification.
+         * #NOTIFICATION_DISPLAY_DEFAULT is enabled by default.
+         * Platform: Android only.
+         * @param displayFlag  is the required state of the application for
+         * a notification to be displayed. One of the constants:
+         *  - #NOTIFICATION_DISPLAY_DEFAULT
+         *  - #NOTIFICATION_DISPLAY_ANYTIME.
+         * @return Any of the following result codes:
+         * - #MA_NOTIFICATION_RES_OK if the property could be set.
+         * - #MA_NOTIFICATION_RES_INVALID_PROPERTY_NAME if the property name
+         * was invalid for the target platform.
+         */
+        int setPushNotificationsDisplayFlag(const NotificationDisplayFlag displayFlag);
+
+        /**
          * Set the  message title in the notification area for incoming push
          * notifications.
          * This call does not alter already received notifications.
          * Platform: Android only.
          * @param title The title that goes in the expanded entry of the
          * notification.
+         * @return Any of the following result codes:
+         * - #MA_NOTIFICATION_RES_OK if the property could be set.
+         * - #MA_NOTIFICATION_RES_INVALID_PROPERTY_NAME if the property name
+         * was invalid for the target platform.
          */
-        void setPushNotificationsTitle(const MAUtil::String& title);
+        int setPushNotificationsTitle(const MAUtil::String& title);
 
         /**
          * Set the ticker text in the notification status bar for incoming push
@@ -251,8 +308,12 @@ namespace Notification
          * Platform: Android only.
          * @param ticker The text that flows by in the status bar when the
          * notification first activates.
+         * @return Any of the following result codes:
+         * - #MA_NOTIFICATION_RES_OK if the property could be set.
+         * - #MA_NOTIFICATION_RES_INVALID_PROPERTY_NAME if the property name
+         * was invalid for the target platform.
          */
-        void setPushNotificationsTickerText(const MAUtil::String& ticker);
+        int setPushNotificationsTickerText(const MAUtil::String& ticker);
 
         /**
          * Get the message title of the incoming notifications.
@@ -335,3 +396,5 @@ namespace Notification
 } // namespace Notification
 
 #endif /* NOTIFICATION_NOTIFICATION_MANAGER_H_ */
+
+/*! @} */

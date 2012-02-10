@@ -35,21 +35,21 @@ namespace Wormhole
 {
 	/**
 	 * Take a string that is "percent encoded" and decode it.
-	 * @param url Encoded string.
+	 * @param str Encoded string.
 	 * @return The decoded string.
 	 */
-	MAUtil::String WebViewMessage::unescape(const MAUtil::String& url)
+	MAUtil::String WebViewMessage::unescape(const MAUtil::String& str)
 	{
 		// The decoded string.
 		MAUtil::String result = "";
 
-		for (int i = 0; i < url.length(); ++i)
+		for (int i = 0; i < str.length(); ++i)
 		{
 			// If the current character is the '%' escape char...
-			if ('%' == (char) url[i])
+			if ('%' == (char) str[i])
 			{
 				// Get the char value of the two digit hex value.
-				MAUtil::String hex = url.substr(i + 1, 2);
+				MAUtil::String hex = str.substr(i + 1, 2);
 				long charValue = strtol(
 					hex.c_str(),
 					NULL,
@@ -63,7 +63,38 @@ namespace Wormhole
 			else
 			{
 				// Not encoded, just copy the character.
-				result += url[i];
+				result += str[i];
+			}
+		}
+
+		return result;
+	}
+
+	/**
+	 * Take a string and "percent encode" it.
+	 * @param str String to be encoded.
+	 * @return The encoded string.
+	 */
+	MAUtil::String WebViewMessage::escape(const MAUtil::String& str)
+	{
+		// The encoded string.
+		MAUtil::String result = "";
+		char buf[8];
+
+		for (int i = 0; i < str.length(); ++i)
+		{
+			char c = str[i];
+			if ((48 <= c && c <= 57) ||  // 0-9
+				(65 <= c && c <= 90) ||  // a..z
+				(97 <= c && c <= 122))   // A..Z
+			{
+				result.append(&str[i], 1);
+			}
+			else
+			{
+				result += "%";
+				sprintf(buf, "%02X", str[i]);
+				result += buf;
 			}
 		}
 

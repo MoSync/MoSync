@@ -1,0 +1,15 @@
+id = project.nativeui
+name = C NativeUI Project
+description = A standard ANSI C application template that has its own event loop and uses the Widget API.
+required-capabilities = NativeUI
+
+[Files]
+main.c
+
+[Settings]
+build.prefs:memory.data/Release=4096
+build.prefs:memory.heap/Release=3072
+build.prefs:memory.stack/Release=512
+build.prefs:memory.data/Debug=4096
+build.prefs:memory.heap/Debug=3072
+build.prefs:memory.stack/Debug=512

@@ -31,6 +31,7 @@ MA 02110-1301, USA.
  *
  * \brief An instance of TimePicker allow to an users to select times.
  * For time picker events see TimePickerListener.
+ * Note: This is not available on Windows Phone 7.
  */
 
 #ifndef NATIVEUI_TIME_PICKER_H_
@@ -49,6 +50,7 @@ namespace NativeUI
      * The time picker is initialized with system time.
      * The hour and each minute digit can be controlled by vertical spinners.
      * The hour can be entered by keyboard input.
+     * Note: This is not available on Windows Phone 7.
      */
     class TimePicker : public Widget
     {

@@ -17,6 +17,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 package com.mosync.internal.android;
 
+import static com.mosync.internal.android.MoSyncHelpers.DebugPrint;
+
 import static com.mosync.internal.android.MoSyncHelpers.EXTENT;
 import static com.mosync.internal.android.MoSyncHelpers.SYSLOG;
 import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_BLUETOOTH_TURNED_OFF;
@@ -45,11 +47,15 @@ import static com.mosync.internal.generated.MAAPI_consts.TRANS_ROT270;
 import static com.mosync.internal.generated.MAAPI_consts.TRANS_ROT90;
 import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_ALERT;
 
+import static com.mosync.internal.generated.MAAPI_consts.MA_RESOURCE_OPEN;
+import static com.mosync.internal.generated.MAAPI_consts.MA_RESOURCE_CLOSE;
+
 import java.io.File;
 import java.io.FileDescriptor;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
@@ -83,6 +89,7 @@ import android.graphics.Path;
 import android.graphics.PorterDuff.Mode;
 import android.graphics.Rect;
 import android.graphics.Region;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.opengl.GLUtils;
 import android.os.Build;
@@ -96,6 +103,8 @@ import android.util.Log;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.FrameLayout;
+import android.provider.Settings.Secure;
+import android.net.ConnectivityManager;
 
 import com.mosync.internal.android.MoSyncFont.MoSyncFontHandle;
 import com.mosync.internal.android.nfc.MoSyncNFC;
@@ -133,7 +142,12 @@ public class MoSyncThread extends Thread
 		long programOffset,
 		FileDescriptor resource,
 		long resourceOffset);
-	public native boolean nativeLoadResource(ByteBuffer resource);
+	//public native boolean nativeLoadResource(ByteBuffer resource);
+	public native boolean nativeLoadResource(
+		FileDescriptor resource,
+		long resoruceOffset,
+		int handle,
+		int placeholder);
 	public native ByteBuffer nativeLoadCombined(ByteBuffer combined);
 	public native void nativeRun();
 	public native void nativePostEvent(int[] eventBuffer);
@@ -141,12 +155,14 @@ public class MoSyncThread extends Thread
 		int resourceIndex,
 		int length);
 	public native int nativeCreatePlaceholder();
+	public native void nativeExit();
 
 	// Modules that handle syscalls for various subsystems.
 	// We delegate syscalls from this class to the modules.
 	MoSyncNetwork mMoSyncNetwork;
 	MoSyncBluetooth mMoSyncBluetooth;
 	MoSyncSound mMoSyncSound;
+	MoSyncAudio mMoSyncAudio;
 	MoSyncLocation mMoSyncLocation;
 	MoSyncHomeScreen mMoSyncHomeScreen;
 	MoSyncNativeUI mMoSyncNativeUI;
@@ -160,7 +176,13 @@ public class MoSyncThread extends Thread
 	MoSyncNFC mMoSyncNFC;
 	MoSyncAds mMoSyncAds;
 	MoSyncNotifications mMoSyncNotifications;
+	MoSyncCapture mMoSyncCapture;
 	MoSyncDB mMoSyncDB;
+
+	/**
+	 * Synchronization monitor for postEvent
+	 */
+	private final Object mPostEventMonitor = new Object();
 
 	static final String PROGRAM_FILE = "program.mp3";
 	static final String RESOURCE_FILE = "resources.mp3";
@@ -190,6 +212,8 @@ public class MoSyncThread extends Thread
 	 * a handle used for full screen camera preview
 	 */
 	private int cameraScreen;
+
+	FileDescriptor mResourceFd = null;
 
 	/**
 	 * This is the size of the header of the asset file
@@ -259,6 +283,8 @@ public class MoSyncThread extends Thread
 
 	int mTextConsoleHeight;
 
+	private volatile boolean mIsSleeping;
+
 	/**
 	 * Ascent of text in the default console font.
 	 */
@@ -272,6 +298,12 @@ public class MoSyncThread extends Thread
 	// Rectangle objects used for drawing in maDrawImageRegion().
 	private final Rect mMaDrawImageRegionTempSourceRect = new Rect();
 	private final Rect mMaDrawImageRegionTempDestRect = new Rect();
+
+
+	/**
+	 * An Instance of Connectivity Manager used for detecting connection type
+	 */
+	private ConnectivityManager mConnectivityManager;
 
 	int mMaxStoreId = 0;
 
@@ -301,8 +333,11 @@ public class MoSyncThread extends Thread
 
 		mHasDied = false;
 
+		mIsSleeping = false;
+
 		mMoSyncNetwork = new MoSyncNetwork(this);
 		mMoSyncSound = new MoSyncSound(this);
+		mMoSyncAudio = new MoSyncAudio(this);
 		mMoSyncLocation = new MoSyncLocation(this);
 		mMoSyncHomeScreen = new MoSyncHomeScreen(this);
 		mMoSyncNativeUI = new MoSyncNativeUI(this, mImageResources);
@@ -372,8 +407,14 @@ public class MoSyncThread extends Thread
 		}
 
 		mMoSyncAds = new MoSyncAds(this);
+
 		mMoSyncNotifications = new MoSyncNotifications(this);
+
+		mMoSyncCapture = new MoSyncCapture(this, mImageResources);
+
 		mMoSyncDB = new MoSyncDB();
+
+		mConnectivityManager = (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
 
 		nativeInitRuntime();
 	}
@@ -398,15 +439,21 @@ public class MoSyncThread extends Thread
 	 * Do cleanup here (but it is not guaranteed that
 	 * this will be called.)
 	 */
-    public void onDestroy()
+	public void onDestroy()
 	{
-    	if (null != mMoSyncBluetooth)
-    	{
-    		// Delegate onDestroy to the Bluetooth object.
-    		mMoSyncBluetooth.onDestroy();
-    		mMoSyncBluetooth = null;
-    	}
-    }
+		if (null != mMoSyncBluetooth)
+		{
+			// Delegate onDestroy to the Bluetooth object.
+			mMoSyncBluetooth.onDestroy();
+			mMoSyncBluetooth = null;
+		}
+
+		if(null != mMoSyncNetwork)
+		{
+			mMoSyncNetwork.killAllConnections();
+			mMoSyncNetwork = null;
+		}
+	}
 
 	/**
 	 * Return the activity that this thread is related to.
@@ -560,38 +607,26 @@ public class MoSyncThread extends Thread
 	 */
 	public void threadPanic(int errorCode, String message)
 	{
-		new Exception("STACKTRACE: threadPanic").printStackTrace();
-
-		//Log.i("@@@ MoSync",
-		//	"PANIC - errorCode: " + errorCode + " message: " + message);
+		//new Exception("STACKTRACE: threadPanic").printStackTrace();
 
 		mHasDied = true;
 
-		try
-		{
-			// Launch panic dialog.
-			MoSyncPanicDialog.sPanicMessage = message;
-			Intent myIntent = new Intent(
-				mMoSyncView.getContext(), MoSyncPanicDialog.class);
-			mMoSyncView.getContext().startActivity(myIntent);
+		// Launch panic dialog.
+		MoSyncPanicDialog.sPanicMessage = message;
+		Intent myIntent = new Intent(
+			mMoSyncView.getContext(), MoSyncPanicDialog.class);
+		mMoSyncView.getContext().startActivity(myIntent);
 
-			// Sleep so that the MoSync thread is kept alive while
-			// the dialog is open.
-			while (true)
-			{
-				try
-				{
-					sleep(Long.MAX_VALUE);
-				}
-				catch (Exception e)
-				{
-					logError("threadPanic exception 1:" + e, e);
-				}
-			}
-		}
-		catch (Exception e)
+		while(true)
 		{
-			logError("threadPanic exception 2:" + e, e);
+			try
+			{
+				sleep(500);
+			}
+			catch(Exception e)
+			{
+				Log.i("MoSync Thread","oops.. got an exception, conutine until application ends");
+			}
 		}
 	}
 
@@ -680,6 +715,7 @@ public class MoSyncThread extends Thread
 			AssetManager assetManager = mContext.getAssets();
 			AssetFileDescriptor pAfd = assetManager.openFd(RESOURCE_FILE);
 			FileDescriptor pFd = pAfd.getFileDescriptor();
+			mResourceOffset = pAfd.getStartOffset();
 			return pFd;
 		}
 		catch (Exception e)
@@ -746,7 +782,6 @@ public class MoSyncThread extends Thread
 			// TODO: Check return value for error.
 			dataHandle = nativeCreatePlaceholder();
 		}
-
 		// Allocate data. This calls maCreateData and will create a
 		// new data object.
 		int result = nativeCreateBinaryResource(dataHandle, data.length);
@@ -902,13 +937,17 @@ public class MoSyncThread extends Thread
 	/**
 	 * Post a event to the MoSync event queue.
 	 */
-	public synchronized void postEvent(int[] event)
+	public void postEvent(int[] event)
 	{
-		// Add event to queue.
-		nativePostEvent(event);
-
-		// Wake up thread if sleeping.
-		interrupt();
+		synchronized(mPostEventMonitor) {
+			// Add event to queue.
+			nativePostEvent(event);
+			// Wake up thread if sleeping.
+			if(mIsSleeping)
+			{
+				interrupt();
+			}
+		}
 	}
 
 	/**
@@ -2199,6 +2238,40 @@ public class MoSyncThread extends Thread
 	}
 
 	/**
+	 * maLoadResource
+	 */
+	int maLoadResource(int handle, int placeholder, int flag)
+	{
+		SYSLOG("maLoadResource");
+		// Try to load the resource file, if we get an exception
+		// it just means that this application has no resource file
+		// and that is not an error.
+		if (((flag & MA_RESOURCE_OPEN) != 0) && (mResourceFd == null)) {
+			mResourceFd = getResourceFileDesriptor();
+		}
+
+		// We have a program file so now we sends it to the native side
+		// so it will be loaded into memory. The data section will also be
+		// created and if there are any resources they will be loaded.
+		if (null != mResourceFd) {
+			if (false == nativeLoadResource(mResourceFd, mResourceOffset,
+					handle,
+					placeholder)) {
+				logError("maLoadResource - "
+						+ "ERROR Load resource was unsuccesfull");
+				return 1;
+			}
+		}
+
+		if ((flag & MA_RESOURCE_CLOSE) != 0) {
+			mResourceFd = null;
+			//mResourceOffset = 0;
+		}
+
+		return 0;
+	}
+
+	/**
 	 * maLoadProgram
 	 */
 	void maLoadProgram(int data, int reload)
@@ -2231,6 +2304,7 @@ public class MoSyncThread extends Thread
 	{
 		SYSLOG("maWait");
 
+		mIsSleeping = true;
 		try
 		{
 	 		if (timeout<=0)
@@ -2251,6 +2325,8 @@ public class MoSyncThread extends Thread
 		{
 			logError("Thread sleep failed : " + e.toString(), e);
 		}
+
+		mIsSleeping = false;
 
 		SYSLOG("maWait returned");
 	}
@@ -2452,6 +2528,23 @@ public class MoSyncThread extends Thread
 		{
 			property = Build.FINGERPRINT;
 		}
+		else if(key.equals("mosync.device.name"))
+		{
+			property = Build.DEVICE;
+		}
+		else if(key.equals("mosync.device.UUID"))
+		{
+			property = Secure.getString( mContext.getContentResolver(),
+					Secure.ANDROID_ID);
+		}
+		else if(key.equals("mosync.device.OS"))
+		{
+			property = "Android";
+		}
+		else if(key.equals("mosync.device.OS.version"))
+		{
+			property = Build.VERSION.RELEASE;
+		}
 		else if (key.equals("mosync.path.local"))
 		{
 			String path = getActivity().getFilesDir().getAbsolutePath() + "/";
@@ -2468,6 +2561,12 @@ public class MoSyncThread extends Thread
 				getActivity().getFilesDir().getAbsolutePath() + "/";
 			//Log.i("@@@ MoSync", "Property mosync.path.local.url: " + url);
 			property = url;
+		}
+		else if (key.equals("mosync.network.type"))
+		{
+			//get the connection that we are using right now
+			NetworkInfo info = mConnectivityManager.getActiveNetworkInfo();
+			property = getNetworkNameFromInfo(info);
 		}
 
 		if (null == property) { return -2; }
@@ -2500,6 +2599,39 @@ public class MoSyncThread extends Thread
 	}
 
 	/**
+	 * converts the network information into a single string indicating
+	 * the type of the network.
+	 *
+	 * @param info NetowrkInformation obtained from a ConnectivityManager instance
+	 * @return a String indicating the type of the connection, for Mobile networks
+	 * it returns the exact type of mobile network, e.g. GSM, GPRS, or HSDPA...
+	 * The result might contain the full name and version of the mobiel network type
+	 */
+	private String getNetworkNameFromInfo(NetworkInfo info)
+	{
+	       if (info != null) {
+	            String type = info.getTypeName();
+	            if(type == null)
+	            {
+					return "unknown";
+	            }
+	            else if (type.toLowerCase().equals("mobile"))
+	            {
+					//return a generic default
+					return "mobile";
+	            }
+	            else
+	            {
+					return "wifi";
+	            }
+	        }
+	        else
+	        {
+				return "none";
+	        }
+	}
+
+	/**
 	 * Perform a platform request.
 	 * @param url The url that specifies the request.
 	 * @return
@@ -2515,6 +2647,19 @@ public class MoSyncThread extends Thread
 
 			return 0;
 		}
+/*
+		else if(url.startsWith("tel://"))
+		{
+			if(!(mContext.getPackageManager().checkPermission("android.permission.NFC",
+					mContext.getPackageName()) == PackageManager.PERMISSION_GRANTED))
+			{
+
+			}
+
+			Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse(url));
+			((Activity)mContext).startActivity(intent);
+		}
+*/
 		return -1;
 	}
 
@@ -2965,7 +3110,6 @@ public class MoSyncThread extends Thread
 	 */
 	int maNotificationLocalCreate()
 	{
-		//Log.i("MoSync", "maNotificationLocalCreate");
 		return mMoSyncNotifications.maNotificationLocalCreate(mContext);
 	}
 
@@ -3007,7 +3151,8 @@ public class MoSyncThread extends Thread
 	 * Schedules a local notification for delivery at its encapsulated date and time.
 	 * @param handle Handle to a local notification object.
 	 * @return MA_NOTIFICATION_RES_OK if no error occurred,
-	 * MA_NOTIFICATION_RES_INVALID_HANDLE if the notificationHandle is invalid.
+	 * MA_NOTIFICATION_RES_INVALID_HANDLE if the notificationHandle is invalid,
+	 * MA_NOTIFICATION_RES_ALREADY_SCHEDULED if it was already scheduled.
 	 */
 	int maNotificationLocalSchedule(int handle)
 	{
@@ -3019,6 +3164,7 @@ public class MoSyncThread extends Thread
 	 * @param handle Handle to a local notification object.
 	 * @return MA_NOTIFICATION_RES_OK if no error occurred,
 	 * MA_NOTIFICATION_RES_INVALID_HANDLE if the notificationHandle is invalid.
+	 * MA_NOTIFICATION_RES_CANNOT_UNSCHEDULE if it wasn't scheduled before.
 	 */
 	int maNotificationLocalUnschedule(int handle)
 	{
@@ -3032,11 +3178,10 @@ public class MoSyncThread extends Thread
 	 * typically the email address of an account set up by the application's developer.
 	 * @return MA_NOTIFICATION_RES_OK if no error occurred.
      * MA_NOTIFICATION_RES_ALREADY_REGISTERED if the application is already registered for receiving push notifications.
+     * MA_NOTIFICATION_RES_UNSUPPORTED
 	 */
 	int maNotificationPushRegister(int pushNotificationTypes, String accountID)
 	{
-		Log.e("@@MoSync", "maNotificationPushRegister");
-
 		// Ignore the first param on Android.
 		return mMoSyncNotifications.maNotificationPushRegister(accountID);
 	}
@@ -3119,6 +3264,121 @@ public class MoSyncThread extends Thread
 	int maNotificationPushSetMessageTitle(String title)
 	{
 		return mMoSyncNotifications.maNotificationPushSetMessageTitle(title);
+	}
+
+	/**
+	 * Set the display flags applied to the incoming push notifications.
+	 * @param flag One of the constants:
+	 *  - MA_NOTIFICATION_DISPLAY_FLAG_DEFAULT
+	 *  - MA_NOTIFICATION_DISPLAY_FLAG_ANYTIME
+	 * @return MA_NOTIFICATION_RES_OK, MA_NOTIFICATION_RES_ERROR.
+	 */
+	int maNotificationPushSetDisplayFlag(int flag)
+	{
+		return mMoSyncNotifications.maNotificationPushSetDisplayFlag(flag);
+	}
+
+	/**
+	 * Sets the properties to the Native Image Picker.
+	 * @param property property A string representing which property to set.
+	 * One of the #MA_CAPTURE_ MA_CAPTURE constants.
+	 * @param value The value that will be assigned to the property.
+	 * @return One of the next constants:
+	 *  - #MA_CAPTURE_RES_OK if no error occurred.
+	 *  - #MA_CAPTURE_RES_INVALID_PROPERTY if the property name is not valid.
+	 *  - #MA_CAPTURE_RES_INVALID_PROPERTY_VALUE if the property value is not valid.
+	 */
+	int maCaptureSetProperty(String property, String value)
+	{
+		return mMoSyncCapture.maCaptureSetProperty(property, value);
+	}
+
+	/**
+	 * Retrieves the properties from the Native Image Picker.
+	 * @param property A string representing which property to get.
+	 * @param value A buffer that will hold the value of the property, represented as a string.
+	 * @valueSize the value buffer size.
+	 * @return One of the next constants:
+	 * - #MA_CAPTURE_RES_OK if no error occurred.
+	 * - #MA_CAPTURE_RES_INVALID_PROPERTY if the property name is not valid.
+	 * - #MA_CAPTURE_RES_INVALID_STRING_BUFFER_SIZE if the buffer size was to small.
+	 */
+	int maCaptureGetProperty(String property, int valueBuffer, int valueSize)
+	{
+		return mMoSyncCapture.maCaptureGetProperty(property, valueBuffer, valueSize);
+	}
+
+	/**
+	* Perform an action on the image picker.
+	* @param action One of the #MA_CAPTURE_ACTION_ MA_CAPTURE_ACTION constants.
+	* @return One of the next constants:
+	*  - #MA_CAPTURE_RES_OK if no error occurred.
+	*  - #MA_CAPTURE_RES_INVALID_ACTION if the given action is invalid.
+	*  - #MA_CAPTURE_RES_CAMERA_NOT_AVAILABLE if camera is not available at the moment.
+	*  - #MA_CAPTURE_RES_VIDEO_NOT_SUPPORTED if video recording is not supported.
+	*  - #MA_CAPTURE_RES_PICTURE_NOT_SUPPORTED if camera picture mode is not supported.
+	*/
+	int maCaptureAction(int action)
+	{
+		return mMoSyncCapture.maCaptureAction(action);
+	}
+
+	/**
+	* Save a image data object to a file.
+	* @param handle Handle to a image data object.
+	* @param fullPath A buffer containing the a full path where the file will be created.
+	* @param fullPathBufSize The size of the fullPath buffer.
+	* @return One of the next constants:
+	*  - #MA_CAPTURE_RES_OK if no error occurred.
+	*  - #MA_CAPTURE_RES_INVALID_HANDLE if the given handle was invalid.
+	*  - #MA_CAPTURE_RES_FILE_INVALID_NAME if the fullPath param is invalid.
+	*  - #MA_CAPTURE_RES_FILE_ALREADY_EXISTS if the file already exists.
+	*/
+	int maCaptureWriteImage(int handle, String fullPathBuffer, int fullPathBufSize)
+	{
+		return mMoSyncCapture.maCaptureWriteImage(handle, fullPathBuffer, fullPathBufSize);
+	}
+
+	/**
+	* Get full path to a taken picture.
+	* @param handle Handle to an image data object.
+	* @param buffer Will contain the full path to the image file.
+	* @param bufferSize Maximum size of the buffer.
+	* @return One of the next constants:
+	*  - MA_CAPTURE_RES_OK if no error occurred.
+	*  - MA_CAPTURE_RES_INVALID_HANDLE if the given handle was invalid.
+	*  - MA_CAPTURE_RES_INVALID_STRING_BUFFER_SIZE if the buffer size was to small.
+	*/
+	int maCaptureGetImagePath(int handle, int buffer, int bufferSize)
+	{
+		return mMoSyncCapture.maCaptureGetImagePath(handle, buffer, bufferSize);
+	}
+
+	/**
+	* Get full path to a recorded video.
+	* @param handle Handle to a video data object.
+	* @param buffer Will contain the full path to the video file.
+	* @param bufferSize Maximum size of the buffer.
+	* @return One of the next constants:
+	*  - MA_CAPTURE_RES_OK if no error occurred.
+	*  - MA_CAPTURE_RES_INVALID_HANDLE if the given handle was invalid.
+	*  - MA_CAPTURE_RES_INVALID_STRING_BUFFER_SIZE if the buffer size was to small.
+	*/
+	int maCaptureGetVideoPath(int handle, int buffer, int bufferSize)
+	{
+		return mMoSyncCapture.maCaptureGetVideoPath(handle, buffer, bufferSize);
+	}
+
+	/**
+	* Destroys a image/video data object.
+	* @param handle Handle to a image/video data object.
+	* @return One of the next constants:
+	*  - #MA_CAPTURE_RES_OK if no error occurred.
+	*  - #MA_CAPTURE_RES_INVALID_HANDLE if the given handle was invalid.
+	*/
+	int maCaptureDestroyData(int handle)
+	{
+		return mMoSyncCapture.maCaptureDestroyData(handle);
 	}
 
 	/**
@@ -3378,6 +3638,73 @@ public class MoSyncThread extends Thread
 	{
 		return mMoSyncSound.maSoundIsPlaying();
 	}
+
+	int maAudioDataCreateFromResource(String mime, int data,
+			int offset, int length, int flags)
+	{
+		return mMoSyncAudio.maAudioDataCreateFromResource(mime, data, offset, length, flags);
+	}
+
+	int maAudioDataCreateFromURL(String mime, String url, int flags)
+	{
+		return mMoSyncAudio.maAudioDataCreateFromURL(mime, url, flags);
+	}
+
+	int maAudioDataDestroy(int audioData)
+	{
+		return mMoSyncAudio.maAudioDataDestroy(audioData);
+	}
+
+	int maAudioInstanceCreate(int audioData)
+	{
+		return mMoSyncAudio.maAudioInstanceCreate(audioData);
+	}
+
+	int maAudioInstanceDestroy(int audioInstance)
+	{
+		return mMoSyncAudio.maAudioInstanceDestroy(audioInstance);
+	}
+
+	int maAudioGetLength(int audio)
+	{
+		return mMoSyncAudio.maAudioGetLength(audio);
+	}
+
+	int maAudioSetNumberOfLoops(int audio, int loops)
+	{
+		return mMoSyncAudio.maAudioSetNumberOfLoops(audio, loops);
+	}
+
+	int maAudioPrepare(int audio, int async)
+	{
+		return mMoSyncAudio.maAudioPrepare(audio, async);
+	}
+
+	int maAudioPlay(int audio)
+	{
+		return mMoSyncAudio.maAudioPlay(audio);
+	}
+
+	int maAudioSetPosition(int audio, int milliseconds)
+	{
+		return mMoSyncAudio.maAudioSetPosition(audio, milliseconds);
+	}
+
+	int maAudioGetPosition(int audio)
+	{
+		return mMoSyncAudio.maAudioGetPosition(audio);
+	}
+
+	int maAudioSetVolume(int audio, float volume)
+	{
+		return mMoSyncAudio.maAudioSetVolume(audio, volume);
+	}
+
+	int maAudioStop(int audio)
+	{
+		return mMoSyncAudio.maAudioStop(audio);
+	}
+
 
 	public int maAudioBufferInit(int info)
 	{
@@ -3731,14 +4058,14 @@ public class MoSyncThread extends Thread
 	 * @return 1 for success
 	 */
 
-	int maCameraFormat(int index, int width, int height)
+	int maCameraFormat(int index, final int format)
 	{
 		if(mMoSyncCameraController == null)
 		{
 			return IOCTL_UNAVAILABLE;
 		}
 
-		mMoSyncCameraController.addSize(index, width, height);
+		mMoSyncCameraController.getSize(index, format);
 		return 1;
 	}
 
@@ -4526,6 +4853,14 @@ public class MoSyncThread extends Thread
 			columnIndex,
 			doubleValueAddress,
 			this);
+	}
+
+	/**
+	 * Ends the application by calling the native exit() function
+	 */
+	public void exitApplication()
+	{
+		nativeExit();
 	}
 
 	/**

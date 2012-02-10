@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<buildSequence>
+<buildStep type="bundle">
+<bundle foe="true" inFile="%current-project%/LocalFiles" name="HTML5/JavaScript bundling" outFile="%current-project%/Resources/LocalFiles.bin"/>
+</buildStep>
+<buildStep type="resource"/>
+<buildStep type="compile"/>
+<buildStep type="link"/>
+<buildStep type="pack"/>
+<buildStep type="copy.build.results"/>
+</buildSequence>

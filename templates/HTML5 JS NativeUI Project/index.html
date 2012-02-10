@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<!--
+* @file index.html
+* @author Ali Sarrafi
+*
+* Template application that provides Native UI functionality from
+* HTML5 aand JavaScript.
+-->
+<html>
+<head>
+	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+	<script type="text/javascript" charset="utf-8" src="js/wormhole.js"></script>
+	<script type="text/javascript">
+		/**
+		 * Initialization.
+		 */
+		function initialize()
+		{
+			document.addEventListener("backbutton", close, true);
+			mosync.nativeui.initUI();
+		}
+
+		/**
+		 * Handle the backbutton event.
+		 */
+		function close()
+		{
+			// Close the application if the back key is pressed.
+			mosync.bridge.send(["close"]);
+		}
+
+		/**
+		 * Called by the NativeUI library when the UI is ready to
+		 * be shown. Show the main screen here.
+		 *
+		 * Here we illustrate how to add events to widgets and how to
+		 * create widgets from JavaScript code.
+		 */
+		mosync.nativeui.UIReady = function()
+		{
+			// First get the screen we want to show.
+			var mainScreen = document.getNativeElementById("mainScreen");
+
+			// Show the screen.
+			mainScreen.show();
+
+			// Get an instacne of the second button created in the markup.
+			var myButton = document.getNativeElementById("vibrateButton");
+
+			// Add an event listener to it. This is an alternative to
+			// specify a function name in the markup.
+			myButton.addEventListener("Clicked", function()
+			{
+				navigator.notification.vibrate(1000);
+			});
+
+			// Create a button in JavaScript.
+			var helloButton = mosync.nativeui.create("Button", "SecondButton",
+			{
+				// Declarative way of setting properties.
+				"width": "100%",
+				"text": "Say Hello",
+				fontSize: "20"
+			});
+			// Here is how to set properties in code.
+			helloButton.setProperty("fontColor", "0x000088");
+			// Setting the clicked function.
+			helloButton.addEventListener("Clicked", function()
+			{
+				alert("Hello World!");
+			});
+			// Add to layout.
+			helloButton.addTo("mainLayout");
+		}
+
+		/**
+		 * Number of clicks on counterButton.
+		 */
+		var clickCounter = 0;
+
+		/**
+		 * Called when counterButton is clicked.
+		 */
+		function counterButtonClicked()
+		{
+			var label = document.getNativeElementById("textLabel");
+			label.setProperty(
+				"text",
+				"No. of clicks: " + (++clickCounter));
+		}
+	</script>
+</head>
+
+<body onload="initialize()">
+	<!-- All of the mosync.nativeui widgets should be wraped inside a tag with id="NativeUI" -->
+	<div id="NativeUI">
+		<!-- the element with id="mainScreen" is loaded to the device screen  by default -->
+		<div widgetType="TabScreen" id="mainScreen">
+			<div widgetType="Screen" id="firstScreen" title="Widget Screen">
+				<div widgetType="VerticalLayout" id="mainLayout"
+					width="-1" height="-1">
+					<div widgetType="Label" id="textLabel" width="100%"
+						text="Native UI in JavaScript"
+						fontSize="26" fontColor="0xAA0000">
+					</div>
+					<div widgetType="Button" id="counterButton"
+						width="100%" text="Click Me!"
+						onEvent="counterButtonClicked()">
+					</div>
+					<div widgetType="Button" id="vibrateButton"
+						width="100%" text="Vibrate">
+					</div>
+				</div>
+			</div>
+			<div widgetType="Screen" id="secondScreen" title="Web Screen"
+				icon_android="img/TabIconWebViewAndroid.png"
+				icon_iOS="img/TabIconWebView.png">
+				<div widgetType="WebView" id="webBrowser"
+					width="100%" height="100%" url="http://www.google.com">
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+</html>

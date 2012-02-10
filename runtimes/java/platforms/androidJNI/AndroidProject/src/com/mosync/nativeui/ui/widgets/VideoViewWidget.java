@@ -19,10 +19,12 @@ package com.mosync.nativeui.ui.widgets;
 
 import static com.mosync.internal.android.MoSyncHelpers.SYSLOG;
 import android.net.Uri;
+import android.widget.MediaController;
 import android.widget.VideoView;
 
 import com.mosync.internal.android.EventQueue;
 import com.mosync.internal.generated.IX_WIDGET;
+import com.mosync.nativeui.util.properties.BooleanConverter;
 import com.mosync.nativeui.util.properties.IntConverter;
 import com.mosync.nativeui.util.properties.InvalidPropertyValueException;
 import com.mosync.nativeui.util.properties.PropertyConversionException;
@@ -40,10 +42,11 @@ public class VideoViewWidget extends Widget
 	 * @param handle Integer handle corresponding to this instance.
 	 * @param progressbar A video view wrapped by this widget.
 	 */
-	public VideoViewWidget(int handle, VideoView videoView)
+	public VideoViewWidget(int handle, VideoView videoView, MediaController mc)
 	{
 		super( handle, videoView );
 		mHandle = handle;
+		mMediaController = mc;
 		mPlaybackWasStopped = false;
 	}
 
@@ -60,7 +63,20 @@ public class VideoViewWidget extends Widget
 		}
 
 		VideoView videoView = (VideoView) getView( );
-		if( property.equals( IX_WIDGET.MAW_VIDEO_VIEW_PATH ) )
+		if( property.equals( IX_WIDGET.MAW_VIDEO_VIEW_CONTROL ) )
+		{
+
+			mShowMediaControlls = BooleanConverter.convert(value);
+			if ( mShowMediaControlls )
+			{
+				videoView.setMediaController(mMediaController);
+			}
+			else
+			{
+				videoView.setMediaController(null);
+			}
+		}
+		else if( property.equals( IX_WIDGET.MAW_VIDEO_VIEW_PATH ) )
 		{
 			// Store the last played source, so it can be loaded before starting playback.
 			mLastLocalSource = value;
@@ -160,6 +176,10 @@ public class VideoViewWidget extends Widget
 		{
 			return Integer.toString( videoView.getBufferPercentage( ) );
 		}
+		else if( property.equals( IX_WIDGET.MAW_VIDEO_VIEW_CONTROL ) )
+		{
+			return Boolean.toString(mShowMediaControlls);
+		}
 		else
 		{
 			return super.getProperty( property );
@@ -170,6 +190,17 @@ public class VideoViewWidget extends Widget
 	 * The handle of this widget.
 	 */
 	private int mHandle = 0;
+
+	/**
+	 * The controls for media player.
+	 * They are shown by default.
+	 */
+	private MediaController mMediaController;
+
+	/**
+	 * Store the state of the MediaControlls.
+	 */
+	private boolean mShowMediaControlls = true;
 
 	/**
 	 * Fixing bug: after stopPlayback(), start() cannot load the source.

@@ -1,0 +1,17 @@
+id = project.opengles
+name = C++ OpenGL Project
+description = A standard ANSI C++ application template that includes the Moblet framework and basic OpenGL code.
+required-capabilities = OpenGL ES 1.0, OpenGL ES 2.0
+
+[Files]
+main.cpp
+
+[Settings]
+build.prefs:additional.libraries=MAUtil.lib
+build.prefs:additional.libraries/Debug=MAUtilD.lib
+build.prefs:memory.data/Release=4096
+build.prefs:memory.heap/Release=3072
+build.prefs:memory.stack/Release=512
+build.prefs:memory.data/Debug=4096
+build.prefs:memory.heap/Debug=3072
+build.prefs:memory.stack/Debug=512
