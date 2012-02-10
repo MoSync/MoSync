@@ -1,36 +1,3 @@
-	/**
-	* Handles key press events,
-	* Refer to Mosync documentation for key code details
-	*/
-	function close()
-	{
-		//Close the Application if the Back key is pressed
-		mosync.bridge.send([
-				"close"
-			], null);
-	}
-	/**
-	* Event comming from the library indicating the UI is ready to be shown
-	* We override the default operation of the library to add some new functionality.
-	*/
-	mosync.nativeui.UIReady = function()
-	{
-		document.addEventListener("deviceready", onDeviceReady, true);
-		//First get an instance of the scree nwe want to show
-		var mainScreen = document.getNativeElementById("mainScreen");
-		//show the screen
-		mainScreen.show();
-	};
-
-	/**
-	* Initialize the mosync.nativeui System
-	*/
-	function initialize()
-	{
-		document.addEventListener("backbutton", close, true);
-		mosync.nativeui.initUI();
-	}
-
 function onDeviceReady() {
 			var platform = document.getNativeElementById("DeviceOSLabel");
 			platform.setProperty("text" , "Platform: " + device.platform);
@@ -91,6 +58,7 @@ function toggleGeolocation()
 {
 	if (geolocationWatch !== null) {
 		navigator.geolocation.clearWatch(geolocationWatch);
+		console.log("Starting location");
 		updateGeolocation({coords:{
 			latitude : " ",
 			longitude : " ",

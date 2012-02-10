@@ -19,12 +19,6 @@ Details
 
 localStorage provides an interface to a W3C Storage interface.  It allows one to save data as key-value pairs.
 
-Supported Platforms
--------------------
-
-- Android
-- BlackBerry WebWorks (OS 6.0 and higher)
-- iPhone
 
 Key Quick Example
 -------------

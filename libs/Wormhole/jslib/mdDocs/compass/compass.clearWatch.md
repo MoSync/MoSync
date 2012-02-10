@@ -7,13 +7,6 @@ Stop watching the compass referenced by the watch ID parameter.
 
 - __watchID__: The ID returned by `compass.watchHeading`.
 
-Supported Platforms
--------------------
-
-- Android
-- iOS
-- Windows Phone 7 ( Mango ) if available in hardware
-
 Quick Example
 -------------
 

@@ -42,9 +42,3 @@ Methods
 - capture.captureImage: Launch the device camera application for taking image(s).
 - capture.captureVideo: Launch the device video recorder application for recording video(s).
 
-
-Supported Platforms
--------------------
-
-- Android
-- iOS

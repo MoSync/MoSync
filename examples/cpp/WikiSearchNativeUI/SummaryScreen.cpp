@@ -167,6 +167,12 @@ void SummaryScreen::fillListBox()
 				listItem,
 				MAW_LIST_VIEW_ITEM_TEXT,
 				WARNING_NOTHING_SELECTED.c_str() );
+
+		setWidgetProperty(
+				listItem,
+				MAW_LIST_VIEW_ITEM_FONT_COLOR,
+				BLACK, 16);
+
 		maWidgetAddChild(mListView, listItem);
 	}
 
@@ -179,6 +185,11 @@ void SummaryScreen::fillListBox()
 				listItem,
 				MAW_LIST_VIEW_ITEM_TEXT,
 				mSnippets[i].c_str() );
+
+		setWidgetProperty(
+				listItem,
+				MAW_LIST_VIEW_ITEM_FONT_COLOR,
+				BLACK, 16);
 
 		mSnippetLabels.add(listItem);
 		maWidgetAddChild(mListView,mSnippetLabels[i]);

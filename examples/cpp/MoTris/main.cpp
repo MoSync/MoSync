@@ -29,9 +29,6 @@ MA 02110-1301, USA.
 #include <mastdlib.h>
 #include <mastring.h>
 #include <mavsprintf.h>
-#ifdef MAPIP
-#include <maprofile.h>
-#endif
 #include <MAUtil/Vector.h>
 #include <MAUtil/String.h>
 #include <MAUtil/Geometry.h>
@@ -625,7 +622,6 @@ void updateField() {
 	}
 }
 
-#ifdef MA_PROF_SUPPORT_STYLUS
 void resetEventHandler() {
 	EventHandler::left_pressed = EventHandler::up_pressed = EventHandler::right_pressed = EventHandler::down_pressed = false;
 	EventHandler::left = EventHandler::up = EventHandler::right = EventHandler::down = false;
@@ -638,13 +634,11 @@ void resetEventHandler() {
 	EventHandler::point.x = -1;
 	EventHandler::point.y = -1;
 }
-#endif	// MA_PROF_SUPPORT_STYLUS
 
 char score[255];
 char rows[255];
 char level[255];
 
-#ifdef MA_PROF_SUPPORT_STYLUS
 void showNavKeys(MAPoint2d point) {
 	MAExtent e = maGetScrSize();
 	int w = EXTENT_X(e);
@@ -703,7 +697,6 @@ void showNavKeys(MAPoint2d point) {
 		EventHandler::right_pressed = EventHandler::right = true;
 	}
 }
-#endif	// MA_PROF_SUPPORT_STYLUS
 
 void showScore() {
 	MAExtent e = maGetScrSize();
@@ -718,12 +711,12 @@ void showScore() {
 	MAExtent tl = maGetTextSize(level);
 
 	int x = (w>>1)+14;
-#ifdef MA_PROF_SUPPORT_STYLUS
-	int y = centerY - ((PLAY_FIELD_Y>>1)*brickSize);
-#else	// MA_PROF_SUPPORT_STYLUS
+//#ifdef MA_PROF_SUPPORT_STYLUS
+//	int y = centerY - ((PLAY_FIELD_Y>>1)*brickSize);
+//#else	// MA_PROF_SUPPORT_STYLUS
 	int h = EXTENT_Y(e);
 	int y = (h>>1)-EXTENT_Y(ts)*2 - 2*(EXTENT_Y(tr)>>1);
-#endif	// MA_PROF_SUPPORT_STYLUS
+//#endif	// MA_PROF_SUPPORT_STYLUS
 
 	drawOutLinedRect(x, y, (w>>1)+85, y+(EXTENT_Y(ts)+EXTENT_Y(tr)+EXTENT_Y(tl))*2, BORDER_COLOR, BACKGROUND_COLOR);
 
@@ -763,7 +756,7 @@ class MainMenuListener : public MenuListener {
 					break;
 			}
 		}
-#ifdef MA_PROF_SUPPORT_STYLUS
+
 		if(EventHandler::pointer_pressed) {
 			pushGameMode(MENU_INIT);
 			switch(menu->handlePointerPress(EventHandler::point)) {
@@ -781,7 +774,6 @@ class MainMenuListener : public MenuListener {
 					break;
 			}
 		}
-#endif	// MA_PROF_SUPPORT_STYLUS
 	}
 };
 
@@ -807,7 +799,7 @@ class PauseMenuListener : public MenuListener {
 					break;
 			}
 		}
-#ifdef MA_PROF_SUPPORT_STYLUS
+
 		if(EventHandler::pointer_pressed) {
 			pushGameMode(MENU_INIT);
 			switch(menu->handlePointerPress(EventHandler::point)) {
@@ -828,7 +820,6 @@ class PauseMenuListener : public MenuListener {
 					break;
 			}
 		}
-#endif	// MA_PROF_SUPPORT_STYLUS
 	}
 };
 
@@ -840,9 +831,7 @@ class SetNameEditBoxListener : public EditBoxListener {
 
 	void onEvent(EditBox *editBox) {
 		if(EventHandler::fire_pressed
-#ifdef MA_PROF_SUPPORT_STYLUS
 			|| EventHandler::pointer_pressed
-#endif	// MA_PROF_SUPPORT_STYLUS
 		)
 		{
 			curSettings.userName[0] = 0;
@@ -881,7 +870,6 @@ class SettingsMenuListener : public MenuListener, public EditBoxListener {
 					break;
 			}
 		}
-#ifdef MA_PROF_SUPPORT_STYLUS
 		if(EventHandler::pointer_pressed) {
 			pushGameMode(MENU_INIT);
 			switch(menu->handlePointerPress(EventHandler::point)) {
@@ -894,16 +882,13 @@ class SettingsMenuListener : public MenuListener, public EditBoxListener {
 				break;
 			}
 		}
-#endif	// MA_PROF_SUPPORT_STYLUS
 	}
 };
 
 class HighScoreListListener : public MenuListener {
 	void onEvent(int index, Menu *menu) {
 		if(EventHandler::fire_pressed
-#ifdef MA_PROF_SUPPORT_STYLUS
 			|| EventHandler::pointer_pressed
-#endif	// MA_PROF_SUPPORT_STYLUS
 		) {
 			popGameMode();
 		}
@@ -944,9 +929,7 @@ void showGameOver() {
 
 void updateGameOver() {
 	if(EventHandler::fire_pressed
-#ifdef MA_PROF_SUPPORT_STYLUS
 		|| EventHandler::pointer_pressed
-#endif	// MA_PROF_SUPPORT_STYLUS
 		) {
 		addPlayerToHighScore();
 		curGameMode = MENU_INIT;
@@ -1121,12 +1104,10 @@ int MAMain()
 				mainMenu.show();
 				mainMenu.update();
 
-#ifdef MA_PROF_SUPPORT_STYLUS
 				if(EventHandler::pointer_pressed ||
 					EventHandler::pointer_released) {
 						mainMenu.handlePointerPress(EventHandler::point);
 				}
-#endif	// MA_PROF_SUPPORT_STYLUS
 			}
 			else if(curGameMode == PAUSE_MENU_INIT) {
 				drawBackground(w, h, BKG_PATTERN_X, BKG_PATTERN_Y);
@@ -1176,9 +1157,8 @@ int MAMain()
 				clearPlayer();
 				renderPlayer();
 
-#ifdef MA_PROF_SUPPORT_STYLUS
+				// The nav keys are not shown for touch devices because they're too small.
 				//showNavKeys(EventHandler::point);
-#endif	// MA_PROF_SUPPORT_STYLUS
 
 				if(EventHandler::up_pressed ||
 					EventHandler::down_pressed ||

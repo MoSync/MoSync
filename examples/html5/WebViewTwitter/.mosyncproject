@@ -2,6 +2,12 @@
 <project supports-build-configs="true" version="1.4">
 <build.cfg id="Debug" types="Debug"/>
 <build.cfg id="Release" types="Release"/>
+<criteria>
+<filter mgr="0" profiles="" require="0" type="com.mobilesorcery.mosync.filters.profile" vendors="Android,BlackBerry,JavaME,Moblin,Symbian,Windows Mobile,Windows Phone,iOS"/>
+<filter type="com.mobilesorcery.sdk.capabilities.devices.elementfactory">
+<capabilities optional="" required="File\ Storage Internet\ Access HTML5"/>
+</filter>
+</criteria>
 <properties>
 <property key="android:package.name" value="com.mosync.webviewtwitter"/>
 <property key="build.prefs:additional.include.paths" value="%mosync-home%/include"/>
@@ -43,6 +49,8 @@
 <property key="dependency.strategy" value="0"/>
 <property key="excludes/Debug" value=""/>
 <property key="excludes/Release" value=""/>
+<property key="profile.mgr.type" value="0"/>
 <property key="template.id" value="project.c"/>
+<property key="winmobilecs:guid" value="4d4c3860-32ff-102f-8050-8dfa75cd1113"/>
 </properties>
 </project>

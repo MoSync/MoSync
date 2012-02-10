@@ -276,10 +276,9 @@ public:
 
 	void setupCameraSize()
 	{
-		MA_CAMERA_FORMAT *cameraFormat = new(MA_CAMERA_FORMAT);
-		cameraFormat->height = 270;
-		cameraFormat->width = 270;
-		maCameraFormat(0, cameraFormat);
+		int numFormats = maCameraFormatNumber();
+		//Choose the smallest possible format.
+		mCameraFormat = numFormats-1;
 	}
 
 	/**
@@ -362,7 +361,7 @@ public:
 			maDestroyObject(mLastEnc);
 		}
 		mLastEnc = maCreatePlaceholder();
-		maCameraSnapshot(0, mLastEnc);
+		maCameraSnapshot(mCameraFormat, mLastEnc);
 		setupCameraProperties();
 		maCameraStart();
 	}
@@ -431,6 +430,9 @@ private:
 
 	/* maximum zoom supported by the camera*/
 	int maxZoom;
+
+	/* Size of the taken picture */
+	int mCameraFormat;
 };
 
 // That's the screen class finished, now we move on to the Moblet that

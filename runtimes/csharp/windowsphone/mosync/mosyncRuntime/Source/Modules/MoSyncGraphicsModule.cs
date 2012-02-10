@@ -476,15 +476,7 @@ namespace MoSync
 				if (bin == null)
 					return MoSync.Constants.RES_BAD_INPUT;
 				BoundedStream s = new BoundedStream(bin, _offset, _size);
-				//Stream s = mem.GetStream(_offset, _size);
 				WriteableBitmap bitmap = MoSync.Util.CreateWriteableBitmapFromStream(s);
-				/*if (bitmap == null)
-				{
-					byte[] buffer = new byte[_size];
-					s.Position = 0;
-					s.Read(buffer, 0, _size);
-					Util.WriteBytesToFile(buffer, _data.ToString() + ".png", FileMode.Create);
-				}*/
 				s.Close();
 
 				if (bitmap == null)
@@ -497,7 +489,7 @@ namespace MoSync
 			};
 		}
 
-		protected Syscalls.Delegate_maUpdateScreen mOldUpdateScreenImplementation;
+		protected Syscalls.Delegate_maUpdateScreen mOldUpdateScreenImplementation = null;
 		public void Init(Ioctls ioctls, Core core, Runtime runtime)
 		{
 
@@ -544,8 +536,17 @@ namespace MoSync
 
 			ioctls.maFrameBufferClose = delegate()
 			{
+				if (mOldUpdateScreenImplementation == null)
+					return 0;
 				Syscalls syscalls = runtime.GetSyscalls();
 				syscalls.maUpdateScreen = mOldUpdateScreenImplementation;
+				mOldUpdateScreenImplementation = null;
+				if(mCurrentDrawTarget == mFrontBuffer)
+					mCurrentDrawTarget = mBackBuffer;
+
+				System.Buffer.BlockCopy(mBackBuffer.Pixels, 0, mFrontBuffer.Pixels, 0, mFrontBuffer.PixelWidth * mFrontBuffer.PixelHeight * 4);
+				InvalidateWriteableBitmapBackBufferOnMainThread(mFrontBuffer);
+
 				return 1;
 			};
 

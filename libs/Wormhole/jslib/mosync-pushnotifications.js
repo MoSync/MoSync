@@ -15,7 +15,7 @@ if (!PhoneGap.hasResource("pushNotification"))
 PhoneGap.addResource("pushNotification");
 
 /**
- * This class provides access to device Push Notification Service.
+ * This class provides access to device Push Notifications Service.
  */
 var PushNotificationManager = function() {
 	/**
@@ -47,18 +47,24 @@ var PushNotificationData = function(message, sound, iconBadge)
 /**
  * Constants indicating the types of notifications the application accepts.
  * Specific to iOS.
- * On Android alert type is set by default.
+ *
+ * On Android alert type is set by default. Types on iOS include:
+ *
+ *  - badge: The application accepts notifications that badge the application icon.
+ *  - sound: The application accepts alert sounds as notifications.
+ *  - alert: The application accepts alert messages as notifications.
+ *
  */
 PushNotificationManager.type = {
-		/**
+		/*
 		 * The application accepts notifications that badge the application icon.
 		 */
 		badge: 1,
-		/**
+		/*
 		 * The application accepts alert sounds as notifications.
 		 */
 		sound: 2,
-		/**
+		/*
 		 * The application accepts alert messages as notifications.
 		 */
 		alert: 4

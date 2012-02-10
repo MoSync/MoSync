@@ -106,6 +106,10 @@ namespace MoSync
 			{
 				if (mVibrateController == null)
 					mVibrateController = Microsoft.Devices.VibrateController.Default;
+				
+				// more than 5 seconds aren't allowed..
+				if (_ms > 5000)
+					_ms = 5000;
 
 				if (_ms < 0)
 					return _ms;
@@ -114,7 +118,7 @@ namespace MoSync
 				else
 					mVibrateController.Start(TimeSpan.FromMilliseconds(_ms));
 
-				return 0;
+				return 1;
 			};
 
             syscalls.maLoadProgram = delegate(int _data, int _reload)
@@ -179,6 +183,53 @@ namespace MoSync
 				String message = core.GetDataMemory().ReadStringAtAddress(_message);
 				String caption = core.GetDataMemory().ReadStringAtAddress(_caption);
 				MoSync.Util.ShowMessage(message, false, caption);
+				return 0;
+			};
+
+			ioctls.maTextBox = delegate(int _title, int _inText, int _outText, int _maxSize, int _constraints)
+			{
+				bool passwordMode = false;
+				if ((_constraints & MoSync.Constants.MA_TB_FLAG_PASSWORD) != 0)
+					passwordMode = true;
+
+				if ((_constraints & MoSync.Constants.MA_TB_TYPE_MASK) != MoSync.Constants.MA_TB_TYPE_ANY)
+					return MoSync.Constants.MA_TB_RES_TYPE_UNAVAILABLE;
+
+				try
+				{
+					Guide.BeginShowKeyboardInput(Microsoft.Xna.Framework.PlayerIndex.One,
+						core.GetDataMemory().ReadWStringAtAddress(_title), "",
+						core.GetDataMemory().ReadWStringAtAddress(_inText),
+						delegate(IAsyncResult result)
+						{
+							string text = Guide.EndShowKeyboardInput(result);
+
+							Memory eventData = new Memory(12);
+							eventData.WriteInt32(MoSync.Struct.MAEvent.type, MoSync.Constants.EVENT_TYPE_TEXTBOX);
+							int res = MoSync.Constants.MA_TB_RES_OK;
+							int len = 0;
+							if (text == null)
+							{
+								res = MoSync.Constants.MA_TB_RES_CANCEL;
+							}
+							else
+							{
+								len = text.Length;
+							}
+
+							eventData.WriteInt32(MoSync.Struct.MAEvent.textboxResult, res);
+							eventData.WriteInt32(MoSync.Struct.MAEvent.textboxLength, len);
+							core.GetDataMemory().WriteWStringAtAddress(_outText, text, _maxSize);
+							mRuntime.PostEvent(new Event(eventData));
+						},
+						null
+						, passwordMode);
+				}
+				catch (Exception)
+				{
+					return -1;
+				}
+
 				return 0;
 			};
 

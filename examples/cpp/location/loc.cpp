@@ -26,7 +26,6 @@ MA 02110-1301, USA.
 
 #include <conprint.h>
 #include <maassert.h>
-#include <maprofile.h>
 #include <MAUtil/Moblet.h>
 
 using namespace MAUtil;
@@ -44,11 +43,7 @@ public:
 	* collecting location information.
 	*/
 	LocationMoblet() {
-#ifdef MA_PROF_SUPPORT_STYLUS
-		printf("Instructions:\n-Press Fire/LSK to start/stop.\n-Tap the screen to start/stop.\n-Press 0/RSK to exit.\n");
-#else	// MA_PROF_SUPPORT_STYLUS
-		printf("Instructions:\n-Press Fire/LSK to start/stop.\n-Press 0/RSK to exit.\n");
-#endif	// MA_PROF_SUPPORT_STYLUS
+		printf("Instructions:\n-Press Fire/LSK or tap the screen to start/stop.\n-Press 0/RSK to exit.\n");
 
 		start();
 	}

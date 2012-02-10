@@ -134,6 +134,10 @@ namespace MoSync
                         {
                             setPaddingSpacers(0, GridUnitType.Pixel);
                         }
+                        else
+                        {
+                            setPaddingSpacers(1, GridUnitType.Auto);
+                        }
                         columnDef.Width = new System.Windows.GridLength(1, System.Windows.GridUnitType.Star);
                         mGridUnitType = GridUnitType.Pixel;
                         mGridUnitTypeValue = 0;
@@ -242,6 +246,7 @@ namespace MoSync
                             {
                                 mSpacerRight.Width = new GridLength(1, GridUnitType.Auto);
                                 mSpacerLeft.Width = new GridLength(1, GridUnitType.Auto);
+                                break;
                             }
                         }
 

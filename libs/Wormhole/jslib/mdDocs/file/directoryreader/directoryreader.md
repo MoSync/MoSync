@@ -9,13 +9,6 @@ Methods
 - __readEntries__: Read the entries in a directory.
 
 
-Supported Platforms
--------------------
-
-- Android
-- iOS
-- Windows Phone 7 ( Mango )
-
 readEntries
 -----------
 
