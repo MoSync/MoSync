@@ -214,6 +214,7 @@ void MainScreen::createMainLayout()
 	mEditBox = new EditBox();
 	mEditBox->setPlaceholder("Enter text...");
 	mEditBox->setHeight(100);
+	mEditBox->fillSpaceHorizontally();
 	mMainListView->addChild(mEditBox);
 
 	HorizontalLayout* layout = new HorizontalLayout();
