@@ -1122,7 +1122,7 @@ mosync.nativeui.create = function(widgetType, widgetID, params,
  */
 mosync.nativeui.destroyAll = function()
 {
-	for(each widget in mosync.nativeui.widgetIDList)
+	for(var widget in mosync.nativeui.widgetIDList)
 	{
 		//Destroy all widgets and do not wait for anything
 		mosync.nativeui.maWidgetDestroy(widget, null, null, null);
