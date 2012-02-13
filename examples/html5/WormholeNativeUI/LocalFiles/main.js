@@ -1,3 +1,21 @@
+/*
+Copyright (C) 2012 MoSync AB
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License,
+version 2, as published by the Free Software Foundation.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+MA 02110-1301, USA.
+*/
+
 /**
  * @file main.js
  *
@@ -85,9 +103,16 @@ function toggleGeolocation()
 		var options = {};
 		options.frequency = 1000;
 		geolocationWatch = navigator.geolocation.watchPosition(
-			updateGeolocation, function(ex) {
-				alert("geolocation fail (" + ex.name + ": " + ex.message + ")");
-			}, options);
+			// Success function.
+			updateGeolocation,
+			// Error function.
+			function(ex) {
+				var data = document.getNativeElementById("LocLat");
+				data.setProperty("text" , "Latitude: n/a");
+				data = document.getNativeElementById("LocLong");
+				data.setProperty("text" , "Longtitude: n/a");
+			},
+			options);
 	}
 }
 
@@ -95,8 +120,7 @@ function updateGeolocation(a)
 {
 	var data = document.getNativeElementById("LocLat");
 	data.setProperty("text" , "Latitude: " + a.coords.latitude);
-
-	var data = document.getNativeElementById("LocLong");
+	data = document.getNativeElementById("LocLong");
 	data.setProperty("text" , "Longtitude: " + a.coords.longitude);
 }
 
@@ -116,14 +140,21 @@ function toggleCompass()
 		var options = {};
 		options.frequency = 1000;
 		compassWatch = navigator.compass.watchHeading(
-			updateCompass, function(ex) {
-				alert("compass fail (" + ex.name + ": " + ex.message + ")");
-			}, options);
+			// Success function.
+			updateCompass,
+			// Error function.
+			function(ex) {
+				var data = document.getNativeElementById("CompassLabel");
+				data.setProperty(
+					"text",
+					"Compass error: " + ex.name + ": " + ex.message);
+			},
+			options);
 	}
 }
 
 function updateCompass(a)
 {
 	var data = document.getNativeElementById("CompassLabel");
-	data.setProperty("text" , "Compass Heading: " +  a.magneticHeading);
+	data.setProperty("text", "Compass Heading: " +  a.magneticHeading);
 }

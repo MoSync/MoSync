@@ -16,7 +16,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301, USA.
 */
 
-/**
+
+/*
  * @file mosync-bridge.js
  * @author Mikael Kindborg, Ali Sarrafi
  *
@@ -51,6 +52,12 @@ var mosync = (function()
 	if (typeof console.log === "undefined")
 	{
 		console.log = function(s) {};
+	}
+
+	// alert is missing on WP7.
+	if (!window.alert)
+	{
+		window.alert = function(s) {};
 	}
 
 	// The encoder submodule.
@@ -144,16 +151,13 @@ var mosync = (function()
 		 */
 		encoder.encodeString = function(s)
 		{
-			var length;
+			// On all current platforms (Android, iOS, Windows Phone)
+			// strings are converted to UTF8 strings when passed from JS
+			// to the underlying layer (Java, Objective-C, C#). Therefore
+			// we need to calculate the length of the UTF8 encoded string
+			// data and use that as the length of the message string.
+			var length = encoder.lengthAsUTF8(s);
 			var encodedString = "";
-			if (mosync.isAndroid)
-			{
-				length = encoder.lengthAsUTF8(s);
-			}
-			else
-			{
-				length = s.length;
-			}
 			return encodedString.concat(encoder.itox(length), " ", s, " ");
 		};
 
@@ -199,7 +203,7 @@ var mosync = (function()
 
 			// If there is a callback function supplied, create
 			// a callbackId and add it to the callback table.
-			if (undefined != callbackFun)
+			if (callbackFun)
 			{
 				callbackIdCounter = callbackIdCounter + 1;
 				callbackTable[callbackIdCounter] = callbackFun;
@@ -259,7 +263,7 @@ var mosync = (function()
 		{
 			// If there is a callback function supplied, create
 			// a callbackId and add it to the callback table.
-			if (undefined != callbackFun)
+			if (callbackFun)
 			{
 				callbackIdCounter = callbackIdCounter + 1;
 				callbackTable[callbackIdCounter] = callbackFun;
@@ -383,7 +387,7 @@ var mosync = (function()
 		bridge.reply = function(callbackId)
 		{
 			var callbackFun = callbackTable[callbackId];
-			if (undefined != callbackFun)
+			if (callbackFun)
 			{
 				// Remove the first param, the callbackId.
 				var args = Array.prototype.slice.call(arguments);

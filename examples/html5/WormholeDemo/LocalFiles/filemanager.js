@@ -1,3 +1,21 @@
+/*
+Copyright (C) 2012 MoSync AB
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License,
+version 2, as published by the Free Software Foundation.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+MA 02110-1301, USA.
+*/
+
 /**
  * @file filenmaneger.js
  *
@@ -26,6 +44,7 @@ function initFileManager()
 				function(dirEntry)
 				{
 					userFilesDir = dirEntry;
+					refreshFiles();
 				},
 				function(error)
 				{
@@ -153,6 +172,7 @@ function deleteFile()
 	if (confirm("Delete " + currentFile.name + "?") == true)
 	{
 		currentFile.remove();
+		refreshFiles();
 		// Go back to the file list.
 		jQT.goBack();
 	}
@@ -197,6 +217,17 @@ function renameCurrentFile()
 		currentFile.moveTo(userFilesDir, newFileName,
 			function(){
 				$('#filePanelTitle').html(newFileName);
+				//Reopening the file, because the move action closes it on some platforms
+				userFilesDir.getFile(newFileName,{create: false},
+						function(file)
+						{
+							currentFile = file;
+							refreshFiles();
+						},
+						function()
+						{
+							alert("error");
+						});
 			},
 			function(){
 				alert("error");

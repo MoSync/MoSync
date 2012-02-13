@@ -4001,6 +4001,31 @@ namespace Base
 		return (int)result;
 	}
 
+	int _maAudioPause(
+		int audioInstance,
+		JNIEnv* jNIEnv,
+		jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+
+		jmethodID methodID = jNIEnv->GetMethodID(
+			cls,
+			"maAudioPause",
+			"(I)I");
+
+		if (methodID == 0)
+			return -1;
+
+		jint result = jNIEnv->CallIntMethod(
+			jThis,
+			methodID,
+			audioInstance);
+
+		jNIEnv->DeleteLocalRef(cls);
+
+		return (int)result;
+	}
+
 	int _maAudioStop(
 		int audioInstance,
 		JNIEnv* jNIEnv,
