@@ -51,22 +51,24 @@ var mosync = (function()
 
 	// Alerts and logging.
 
+	mosync.notification = {};
+
 	/**
 	 * Displays a "toast" message box using HTML,
 	 * similar to a Toast on Android. Can be used
 	 * as a replacement for alert on platforms that
 	 * do not support it.
 	 *
-	 * If you wish to alter the appearance of the message
-	 * box, the easiest option at present is to copy the
-	 * source code and modyfy it for use in your application.
-	 *
 	 * @param message String with message to show.
 	 * @param durationInMilliseconds Optional parameter
 	 * that specifies the time the message will be shown,
 	 * defaults to 3000 (three seconds) if omitted.
+	 *
+	 * Note: This function works less well together with
+	 * JavaScript libraries that manipulate the DOM at
+	 * the same time.
 	 */
-	mosync.showHTMLToast = function(message, durationInMilliseconds)
+	mosync.notification.HTMLToast = function(message, durationInMilliseconds)
 	{
 		var toast = document.createElement("div");
 		var width = window.innerWidth - 40;
@@ -121,6 +123,22 @@ var mosync = (function()
 			timeToDisplayToast);
 	};
 
+	/**
+	 * Displays a native message box.
+	 *
+	 * @param title String with message box title.
+	 * @param message String with message to show.
+	 */
+	mosync.notification.messageBox = function(title, message)
+	{
+		mosync.bridge.sendJSON({
+			messageName:"PhoneGap",
+			service:"mosync",
+			action:"mosync.notification.messageBox",
+			title:title,
+			message:message});
+	};
+
 	// console.log does not work on WP7.
 	if (typeof console === "undefined")
 	{
@@ -132,11 +150,12 @@ var mosync = (function()
 		console.log = function(s) {};
 	}
 
-	// alert does not work on WP7.
+	// alert does not work on WP7, replace with
+	// call to maMessageBox.
 	if (mosync.isWindowsPhone)
 	{
 		window.alert = function(message) {
-			mosync.showHTMLToast(message);
+			mosync.notification.messageBox("Message", message);
 		};
 	}
 
