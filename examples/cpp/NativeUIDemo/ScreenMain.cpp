@@ -97,7 +97,7 @@ public:
 			// Is this the color screen (first tab)?
 			if (COLOR_TAB == mCurrentTabIndex)
 			{
-				// Exit only is this is the top screen in the stack.
+				// Exit only if this is the top screen in the stack.
 				// If there are more that one screen on the stack,
 				// we will instead go back to the previous screen.
 				// This behaviour is built into the stack screen

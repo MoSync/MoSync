@@ -109,7 +109,7 @@ var FileSys = function()
 					message += " error id: " + id;
 				}
 				console.log(message);
-				alert(message);
+				showMessage(message);
 				fun(false, null);
 			};
 		}
@@ -503,7 +503,7 @@ function testFileSystem()
 			return function()
 			{
 				console.log("Unexpected end of tests");
-				alert("Unexpected end of tests");
+				showMessage("Unexpected end of tests");
 			};
 		}
 	}
@@ -525,7 +525,7 @@ function testFileSystem()
 
 	// Create the test suite.
 	tests = [
-	    function(success) { alert("Running File tests"); runNextTest(success); },
+	    function(success) { showMessage("Running File tests..."); runNextTest(success); },
 	    // Set up initial file structure.
 		createFiles,
 		// Do tests on directories.
@@ -1002,7 +1002,7 @@ function testFileSystem()
 	function allTestsPassed(success)
 	{
 		console.log("All tests passed: " + success);
-		alert("All tests passed: " + success);
+		showMessage("All tests passed: " + success);
 	}
 
 	function checkDirectoryContents(files)
@@ -1034,7 +1034,7 @@ function testFileSystem()
 	function fileTestFail(message)
 	{
 		console.log("FileSystem test failed: " + message);
-		alert("FileSystem test failed: " + message);
+		showMessage("FileSystem test failed: " + message);
 	}
 
 	// Create the file system object and start test.

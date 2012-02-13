@@ -142,7 +142,7 @@ public class EditBoxWidget extends LabelWidget
 			switch(constraints)
 			{
 			case IX_WIDGET.MAW_EDIT_BOX_FLAG_PASSWORD:
-				m_inputFlagConstraints = InputType.TYPE_TEXT_VARIATION_PASSWORD;
+				m_inputFlagConstraints = InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD;
 				break;
 			case IX_WIDGET.MAW_EDIT_BOX_FLAG_SENSITIVE:
 				m_inputFlagConstraints = InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS;

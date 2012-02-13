@@ -205,11 +205,13 @@ namespace NativeUI
 
 		/**
 		* Enable the zoom controls of the web view.
+		* Note that this is not available on Windows Phone 7
 		*/
 		virtual void enableZoom();
 
 		/**
 		* Disable the zoom controls of the web view.
+		* Note that this is not available on Windows Phone 7
 		*/
 		virtual void disableZoom();
 
