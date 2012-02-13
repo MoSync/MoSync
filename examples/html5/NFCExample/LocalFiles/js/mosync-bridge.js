@@ -29,7 +29,12 @@ MA 02110-1301, USA.
  */
 var mosync = (function()
 {
+	// The main object of the library.
 	var mosync = {};
+
+	// This variable keeps track of the time out for our
+	// HTML "Toasts", so that they display sequentially.
+	var HTMLToastTimeOut = 0;
 
 	// Detect platform.
 
@@ -44,6 +49,78 @@ var mosync = (function()
 	mosync.isWindowsPhone =
 		navigator.userAgent.indexOf("Windows Phone OS") != -1;
 
+	// Alerts and logging.
+
+	/**
+	 * Displays a "toast" message box using HTML,
+	 * similar to a Toast on Android. Can be used
+	 * as a replacement for alert on platforms that
+	 * do not support it.
+	 *
+	 * If you wish to alter the appearance of the message
+	 * box, the easiest option at present is to copy the
+	 * source code and modyfy it for use in your application.
+	 *
+	 * @param message String with message to show.
+	 * @param durationInMilliseconds Optional parameter
+	 * that specifies the time the message will be shown,
+	 * defaults to 3000 (three seconds) if omitted.
+	 */
+	mosync.showHTMLToast = function(message, durationInMilliseconds)
+	{
+		var toast = document.createElement("div");
+		var width = window.innerWidth - 40;
+		toast.style.width = width + "px";
+		toast.style.position = "absolute";
+		toast.style.left = "10px";
+		toast.style.top = "10px";
+		toast.style.padding = "10px";
+		toast.style.borderRadius = '8px';
+		toast.style.MozBorderRadius = '8px';
+		toast.style.WebkitBorderRadius = '8px';
+		toast.style.background = "#FFFFFF";
+		toast.style.border = "1px solid #000000";
+		toast.style.fontFamily = "sans-serif";
+		toast.style.fontSize = "18px";
+		toast.style.fontWeight = "bold";
+		toast.style.color = "#000000";
+		toast.style.visibility = "visible";
+		toast.style.zIndex = "10000";
+		toast.innerHTML = message;
+
+		// Default value of toast display time.
+		var duration = 3000;
+		if (durationInMilliseconds)
+		{
+			duration = durationInMilliseconds;
+		}
+
+		// Time duration until time to display this toast.
+		var timeToDisplayToast = 0;
+		var timeNow = new Date().getTime();
+		var timeToNextTimeout = HTMLToastTimeOut - timeNow;
+		if (timeToNextTimeout > 0)
+		{
+			timeToDisplayToast = timeToNextTimeout;
+		}
+
+		// Update time point for accumulated time out.
+		HTMLToastTimeOut = timeNow + timeToDisplayToast + duration;
+
+		setTimeout(
+			function()
+			{
+				document.body.appendChild(toast);
+				setTimeout(
+					function()
+					{
+						document.body.removeChild(toast);
+					},
+					duration);
+			},
+			timeToDisplayToast);
+	};
+
 	// console.log does not work on WP7.
 	if (typeof console === "undefined")
 	{
@@ -51,13 +128,16 @@ var mosync = (function()
 	}
 	if (typeof console.log === "undefined")
 	{
+		// TODO: Send console output somewhere.
 		console.log = function(s) {};
 	}
 
-	// alert is missing on WP7.
-	if (!window.alert)
+	// alert does not work on WP7.
+	if (mosync.isWindowsPhone)
 	{
-		window.alert = function(s) {};
+		window.alert = function(message) {
+			mosync.showHTMLToast(message);
+		};
 	}
 
 	// The encoder submodule.
