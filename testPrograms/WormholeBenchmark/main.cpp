@@ -105,6 +105,24 @@ public:
 			{
 				callJS("StringRoundtripCallback()");
 			}
+			else if (0 == strcmp(p, "UTF8Test"))
+			{
+				const char* p1 = stream.getNext();
+
+				String result = "UTF8TestResult('";
+				for (int i = 0; i < strlen(p1); ++i)
+				{
+					char buf[16];
+					sprintf(buf, "%u", (unsigned char)(p1[i]));
+					result += buf;
+					result += " ";
+				}
+				result += "')";
+
+				maWriteLog(result.c_str(), result.size());
+
+				callJS(result);
+			}
 		}
 	}
 

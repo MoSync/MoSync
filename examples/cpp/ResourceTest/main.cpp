@@ -1,3 +1,26 @@
+/* Copyright (C) 2011 MoSync AB
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License,
+version 2, as published by the Free Software Foundation.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+MA 02110-1301, USA.
+*/
+
+/**
+ * @file main.cpp
+ * @author Florin Leu
+ * @date 15 Dec 2011
+ **/
+
 #include <ma.h>
 #include <mavsprintf.h>
 #include <MAUtil/Moblet.h>
@@ -10,9 +33,6 @@
 
 #include "MAHeaders.h"
 
-using namespace MAUtil;
-using namespace MAUI;
-
 #define PLATFORM_TEXT "Platform"
 #define SCREEN_TEXT "Screen"
 
@@ -23,6 +43,9 @@ using namespace MAUI;
 
 #define COLOR_BLACK		0x000000
 #define COLOR_WHITE		0xFFFFFF
+
+using namespace MAUtil;
+using namespace MAUI;
 
 /**
  * Moblet to be used as a template for a Resource Example application.

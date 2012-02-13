@@ -44,6 +44,7 @@ function initFileManager()
 				function(dirEntry)
 				{
 					userFilesDir = dirEntry;
+					refreshFiles();
 				},
 				function(error)
 				{
@@ -171,6 +172,7 @@ function deleteFile()
 	if (confirm("Delete " + currentFile.name + "?") == true)
 	{
 		currentFile.remove();
+		refreshFiles();
 		// Go back to the file list.
 		jQT.goBack();
 	}
@@ -215,6 +217,17 @@ function renameCurrentFile()
 		currentFile.moveTo(userFilesDir, newFileName,
 			function(){
 				$('#filePanelTitle').html(newFileName);
+				//Reopening the file, because the move action closes it on some platforms
+				userFilesDir.getFile(newFileName,{create: false},
+						function(file)
+						{
+							currentFile = file;
+							refreshFiles();
+						},
+						function()
+						{
+							alert("error");
+						});
 			},
 			function(){
 				alert("error");
