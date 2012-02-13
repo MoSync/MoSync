@@ -17,6 +17,10 @@
 
 #import "ScreenWidgetController.h"
 #import "ScreenOrientation.h"
+#import "MoSyncUI.h"
+#import "MoSyncUISyscalls.h"
+#include "Platform.h"
+#include <helpers/CPP_IX_WIDGET.h>
 
 @implementation ScreenWidgetController
 
@@ -64,6 +68,30 @@
     // e.g. self.myOutlet = nil;
 }
 
+/**
+ * Called before performing a one-step user interface rotation.
+ * @param interfaceOrientation The new orientation for the user interface.
+ * @param duration The duration of the pending rotation, measured in seconds.
+ */
+- (void)willAnimateRotationToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation duration:(NSTimeInterval)duration
+{
+    // Store the new screen orientation.
+    [[ScreenOrientation getInstance] currentOrientationChanged:interfaceOrientation];
+
+    // Get current screen handle.
+    MoSyncUI* mosyncUI = getMoSyncUI();
+    IWidget* currentScreen = [mosyncUI getCurrentlyShownScreen];
+    int screenHandle = [currentScreen getWidgetHandle];
+
+    // Send MoSync Widget event notifying that the screen will change its orientation.
+    MAEvent event;
+	event.type = EVENT_TYPE_WIDGET;
+	MAWidgetEventData *eventData = new MAWidgetEventData;
+	eventData->eventType = MAW_EVENT_SCREEN_ORIENTATION_WILL_CHANGE;
+	eventData->widgetHandle = screenHandle;
+	event.data = (int)eventData;
+	Base::gEventQueue.put(event);
+}
 
 - (void)dealloc {
     [super dealloc];

@@ -231,6 +231,10 @@ void MainScreen::changeOrientationBitmask(const bool cond,
 void MainScreen::orientationWillChange()
 {
 	printf("MainScreen::orientationWillChange");
+	int screenHeight = this->getHeight();
+	int screenWidth = this->getWidth();
+	printf("screenHeight = %d screenWidth = %d", screenHeight, screenWidth);
+
 	int orientation = maScreenGetCurrentOrientation();
 	MAUtil::String orientationText;
 	switch (orientation)

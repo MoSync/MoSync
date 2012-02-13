@@ -283,10 +283,10 @@
 - (NSString*)getPropertyWithKey: (NSString*)key {
 
 	if([key isEqualToString:@MAW_WIDGET_WIDTH]) {
-		return [[[NSNumber numberWithInt: view.frame.size.width*getScreenScale()] stringValue] retain];
+		return [[[NSNumber numberWithInt: view.bounds.size.width*getScreenScale()] stringValue] retain];
 	}
 	else if([key isEqualToString:@MAW_WIDGET_HEIGHT]) {
-		return [[[NSNumber numberWithInt: view.frame.size.height*getScreenScale()] stringValue] retain];
+		return [[[NSNumber numberWithInt: view.bounds.size.height*getScreenScale()] stringValue] retain];
 	}
 	else if([key isEqualToString:@MAW_WIDGET_LEFT]) {
 		return [[[NSNumber numberWithInt: view.frame.origin.x*getScreenScale()] stringValue] retain];
