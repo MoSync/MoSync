@@ -1,10 +1,9 @@
 <!DOCTYPE html>
 <!--
 * @file index.html
-* @author Ali Sarrafi
 *
-* Template application that provides Native UI functionality from
-* HTML5 aand JavaScript.
+* Template application that provides Native UI functionality in
+* HTML5 and JavaScript.
 -->
 <html>
 <head>
@@ -44,32 +43,34 @@
 			// Show the screen.
 			mainScreen.show();
 
-			// Get an instacne of the second button created in the markup.
-			var myButton = document.getNativeElementById("vibrateButton");
+			// Get an instacne of the vibrate button created in the markup.
+			var vibrateButton = document.getNativeElementById("vibrateButton");
 
 			// Add an event listener to it. This is an alternative to
 			// specify a function name in the markup.
-			myButton.addEventListener("Clicked", function()
+			vibrateButton.addEventListener("Clicked", function()
 			{
 				navigator.notification.vibrate(1000);
 			});
 
 			// Create a button in JavaScript.
-			var helloButton = mosync.nativeui.create("Button", "SecondButton",
+			var helloButton = mosync.nativeui.create("Button", "helloButton",
 			{
 				// Declarative way of setting properties.
 				"width": "100%",
-				"text": "Say Hello",
-				fontSize: "20"
+				"text": "Say Hello"
 			});
+
 			// Here is how to set properties in code.
-			helloButton.setProperty("fontColor", "0x000088");
+			helloButton.setProperty("fontSize", "20");
+
 			// Setting the clicked function.
 			helloButton.addEventListener("Clicked", function()
 			{
-				alert("Hello World!");
+				helloButton.setProperty("text",  "Hello World!");
 			});
-			// Add to layout.
+
+			// Add button to layout.
 			helloButton.addTo("mainLayout");
 		}
 
@@ -84,37 +85,41 @@
 		function counterButtonClicked()
 		{
 			var label = document.getNativeElementById("textLabel");
-			label.setProperty(
-				"text",
-				"No. of clicks: " + (++clickCounter));
+			++clickCounter;
+			label.setProperty("text", "No. of clicks: " + clickCounter);
 		}
 	</script>
 </head>
 
 <body onload="initialize()">
-	<!-- All of the mosync.nativeui widgets should be wraped inside a tag with id="NativeUI" -->
+	<!-- All of the mosync.nativeui widgets should be wraped inside a
+		tag with id="NativeUI" -->
 	<div id="NativeUI">
-		<!-- the element with id="mainScreen" is loaded to the device screen  by default -->
+		<!-- The element with id="mainScreen" has two tabs with screens -->
 		<div widgetType="TabScreen" id="mainScreen">
-			<div widgetType="Screen" id="firstScreen" title="Widget Screen">
+			<!-- First Screen -->
+			<div widgetType="Screen" id="widgetScreen" title="Widgets"
+				icon_android="img/Android_TabIconDevice.png"
+				icon_iOS="img/IOS_TabIconDevice.png">
 				<div widgetType="VerticalLayout" id="mainLayout"
 					width="-1" height="-1">
 					<div widgetType="Label" id="textLabel" width="100%"
 						text="Native UI in JavaScript"
-						fontSize="26" fontColor="0xAA0000">
+						fontSize="26" fontColor="0xFFFFFF">
 					</div>
 					<div widgetType="Button" id="counterButton"
-						width="100%" text="Click Me!"
-						onEvent="counterButtonClicked()">
+						width="100%" text="Click Me!" fontSize="20"
+						onevent="counterButtonClicked()">
 					</div>
 					<div widgetType="Button" id="vibrateButton"
-						width="100%" text="Vibrate">
+						width="100%" text="Vibrate"  fontSize="20">
 					</div>
 				</div>
 			</div>
-			<div widgetType="Screen" id="secondScreen" title="Web Screen"
-				icon_android="img/TabIconWebViewAndroid.png"
-				icon_iOS="img/TabIconWebView.png">
+			<!-- Second Screen -->
+			<div widgetType="Screen" id="webScreen" title="Web"
+				icon_android="img/Android_TabIconWebView.png"
+				icon_iOS="img/IOS_TabIconWebView.png">
 				<div widgetType="WebView" id="webBrowser"
 					width="100%" height="100%" url="http://www.google.com">
 				</div>
