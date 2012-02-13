@@ -137,13 +137,6 @@
 				},
 				true);
 
-			// We bind this to make sure that the file list refreshes
-			// as soon as the user goes to the file manager page.
-			$("#fileStorage").bind("pageAnimationStart", function()
-			{
-				refreshFiles();
-			});
-
 			// The <video> tag is kinda useless on Android.
 			if (mosync.isAndroid)
 			{
@@ -324,7 +317,7 @@
 		<div id="filePage">
 			<div class="toolbar">
 				<h1 id="filePanelTitle">File</h1>
-				<a class="button back" onclick="jQT.goBack()" id="backButtonxvxcv">Back</a>
+				<a class="button back" onclick="refreshFiles();jQT.goBack()">Back</a>
 			</div>
 			<input type="button" class="button" value="Delete" onclick="deleteFile()"/>
 			<ul>
