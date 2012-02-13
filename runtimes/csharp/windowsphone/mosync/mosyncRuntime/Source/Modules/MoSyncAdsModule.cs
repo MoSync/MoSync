@@ -49,6 +49,8 @@ namespace MoSync
                     {
                         mAd = new NativeUI.Ad();
 
+                        // If the banner size is a known windows phone 7 size, we set it.
+                        // The default value is 300*50 (X-Large banner).
                         if (_bannerSize == MoSync.Constants.MA_ADS_SIZE_WP7_XLARGE)
                         {
                             mAd.Width = 300;
@@ -60,8 +62,11 @@ namespace MoSync
                             mAd.Height = 80;
                         }
 
+                        // the publisherID for windows phone contains two components separated by '|'.
+                        // The first one represents the application ID and the second one the ad unit ID.
                         String publisherID = core.GetDataMemory().ReadStringAtAddress(_publisherID);
                         string[] values = publisherID.Split('|');
+                        // only if both values are present we set the properties
                         if (values.Length == 2)
                         {
                             mAd.ApplicationID = values[0];
@@ -69,6 +74,7 @@ namespace MoSync
                         }
                     }
                 );
+
                 int handle = runtime.GetModule<NativeUIModule>().AddWidget(mAd);
                 if (handle < 0)
                 {
@@ -135,15 +141,59 @@ namespace MoSync
                 String property = core.GetDataMemory().ReadStringAtAddress(_property);
                 if (property.Equals(MoSync.Constants.MA_ADS_HEIGHT))
                 {
+                    string value = core.GetDataMemory().ReadStringAtAddress(_value);
                 }
                 else if (property.Equals(MoSync.Constants.MA_ADS_WIDTH))
                 {
+                    string value = core.GetDataMemory().ReadStringAtAddress(_value);
                 }
                 else if (property.Equals(MoSync.Constants.MA_ADS_VISIBLE))
                 {
+                    String value = core.GetDataMemory().ReadStringAtAddress(_value);
+                    if (value.Equals("true"))
+                    {
+                        MoSync.Util.RunActionOnMainThreadSync(() =>
+                            {
+                                mAd.Visible = "true";
+                            }
+                        );
+                    }
+                    else if (value.Equals("false"))
+                    {
+                        MoSync.Util.RunActionOnMainThreadSync(() =>
+                            {
+                                mAd.Visible = "false";
+                            }
+                        );
+                    }
+                    else
+                    {
+                        return MoSync.Constants.MA_ADS_RES_INVALID_PROPERTY_VALUE;
+                    }
                 }
                 else if (property.Equals(MoSync.Constants.MA_ADS_ENABLED))
                 {
+                    String value = core.GetDataMemory().ReadStringAtAddress(_value);
+                    if (value.Equals("true"))
+                    {
+                        MoSync.Util.RunActionOnMainThreadSync(() =>
+                            {
+                                mAd.Enabled = "true";
+                            }
+                        );
+                    }
+                    else if (value.Equals("false"))
+                    {
+                        MoSync.Util.RunActionOnMainThreadSync(() =>
+                            {
+                                mAd.Enabled = "false";
+                            }
+                        );
+                    }
+                    else
+                    {
+                        return MoSync.Constants.MA_ADS_RES_INVALID_PROPERTY_VALUE;
+                    }
                 }
                 else if (property.Equals(MoSync.Constants.MA_ADS_TEST_DEVICE))
                 {
@@ -159,6 +209,7 @@ namespace MoSync
                 }
                 else if (property.Equals(MoSync.Constants.MA_ADS_COLOR_BG))
                 {
+                    string value = core.GetDataMemory().ReadStringAtAddress(_value);
                 }
                 else if (property.Equals(MoSync.Constants.MA_ADS_COLOR_BG_TOP))
                 {
@@ -166,6 +217,12 @@ namespace MoSync
                 }
                 else if (property.Equals(MoSync.Constants.MA_ADS_COLOR_BORDER))
                 {
+                    string value = core.GetDataMemory().ReadStringAtAddress(_value);
+                    MoSync.Util.RunActionOnMainThreadSync(() =>
+                        {
+                            mAd.BorderColor = value;
+                        }
+                    );
                 }
                 else if (property.Equals(MoSync.Constants.MA_ADS_COLOR_LINK))
                 {
@@ -173,6 +230,7 @@ namespace MoSync
                 }
                 else if (property.Equals(MoSync.Constants.MA_ADS_COLOR_TEXT))
                 {
+                    string value = core.GetDataMemory().ReadStringAtAddress(_value);
                 }
                 else if (property.Equals(MoSync.Constants.MA_ADS_COLOR_URL))
                 {

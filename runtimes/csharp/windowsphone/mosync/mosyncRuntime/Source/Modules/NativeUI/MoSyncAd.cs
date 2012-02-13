@@ -36,6 +36,7 @@ using System.Windows.Media.Animation;
 using System.Windows.Shapes;
 using Microsoft.Advertising.Mobile.UI;
 using Microsoft.Advertising.Mobile;
+using System.Text;
 
 namespace MoSync
 {
@@ -72,6 +73,34 @@ namespace MoSync
             {
                 get { return mAd.ApplicationId; }
                 set { mAd.ApplicationId = value; }
+            }
+
+            public string BorderColor
+            {
+                get { return GetStringFromColor((SolidColorBrush)mAd.BorderBrush); }
+                set { mAd.BorderBrush = GetColorFromHexa(value); }
+            }
+
+            public SolidColorBrush GetColorFromHexa(string hexaColor)
+            {
+                return new SolidColorBrush(
+                    Color.FromArgb(
+                        Convert.ToByte("FF", 16),
+                        Convert.ToByte(hexaColor.Substring(2, 2), 16),
+                        Convert.ToByte(hexaColor.Substring(4, 2), 16),
+                        Convert.ToByte(hexaColor.Substring(6, 2), 16)
+                    )
+                );
+            }
+
+            public string GetStringFromColor(SolidColorBrush color)
+            {
+                StringBuilder sb = new StringBuilder(6);
+                sb.AppendFormat("{0:x2}", color.Color.R);
+                sb.AppendFormat("{0:x2}", color.Color.G);
+                sb.AppendFormat("{0:x2}", color.Color.B);
+                string stringColor = sb.ToString().ToUpper();
+                return "0x" + stringColor;
             }
         }
     }
