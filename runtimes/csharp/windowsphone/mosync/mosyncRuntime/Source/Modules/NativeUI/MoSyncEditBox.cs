@@ -502,8 +502,11 @@ namespace MoSync
             {
                 set
                 {
-                    mPasswordBox.MaxLength = value;
-                    mEditBox.MaxLength = value;
+                    if (value >= 0)
+                    {
+                        mPasswordBox.MaxLength = value;
+                        mEditBox.MaxLength = value;
+                    }
                 }
                 get
                 {
