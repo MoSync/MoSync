@@ -1,4 +1,4 @@
-﻿/* Copyright (C) 2011 MoSync AB
+﻿/* Copyright (C) 2012 MoSync AB
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License,
@@ -54,33 +54,85 @@ namespace MoSync
             {
                 mAd = new Microsoft.Advertising.Mobile.UI.AdControl();
 
-                // by default we set the size to X-Large Banner
-                mAd.Width = 300;
-                mAd.Height = 50;
-
                 mAd.HorizontalAlignment = HorizontalAlignment.Left;
                 mAd.VerticalAlignment = VerticalAlignment.Top;
                 View = mAd;
             }
 
+            /**
+             * Property for setting the ad unit id.
+             */
             public string AdUnitID
             {
-                get { return mAd.AdUnitId; }
                 set { mAd.AdUnitId = value; }
             }
 
+            /**
+             * Property for setting the application id.
+             */
             public string ApplicationID
             {
-                get { return mAd.ApplicationId; }
                 set { mAd.ApplicationId = value; }
             }
 
+            /**
+             * Property for enabling/disabling the ad control.
+             */
+
+            public new string Enabled
+            {
+                get
+                {
+                    if (mAd.IsEnabled)
+                    {
+                        return "true";
+                    }
+                    return "false";
+                }
+                set
+                {
+                    if (value.Equals("true"))
+                    {
+                        mAd.IsEnabled = true;
+                    }
+                    else
+                    {
+                        mAd.IsEnabled = false;
+                    }
+                }
+            }
+
+            /**
+             * Property for setting the border color.
+             */
             public string BorderColor
             {
                 get { return GetStringFromColor((SolidColorBrush)mAd.BorderBrush); }
                 set { mAd.BorderBrush = GetColorFromHexa(value); }
             }
 
+            /**
+             * Property for setting the text color.
+             */
+            public string TextColor
+            {
+                get { return GetStringFromColor((SolidColorBrush)mAd.Foreground); }
+                set { mAd.Foreground = GetColorFromHexa(value); }
+            }
+
+            /**
+             * Property for setting the background color.
+             */
+            public new string BackgroundColor
+            {
+                get { return GetStringFromColor((SolidColorBrush)mAd.Background); }
+                set { mAd.Background = GetColorFromHexa(value); }
+            }
+
+            /**
+             * Creates a SolidColorBrush from a string that contains a color
+             * represented in hexa (ex: '0xff3421').
+             */
             public SolidColorBrush GetColorFromHexa(string hexaColor)
             {
                 return new SolidColorBrush(
@@ -93,6 +145,9 @@ namespace MoSync
                 );
             }
 
+            /**
+             * Creates a hex string (ex: '0xad11F1') from a SolidColorBrush.
+             */
             public string GetStringFromColor(SolidColorBrush color)
             {
                 StringBuilder sb = new StringBuilder(6);
