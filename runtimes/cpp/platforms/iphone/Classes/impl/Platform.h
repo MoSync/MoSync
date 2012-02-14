@@ -88,7 +88,6 @@ public:
 			for(int i = 0; i < height; i++) {
 				for(int j = 0; j < width; j++) {
 					int* iptr = (int*)&this->data[j*4 + i*rowBytes];
-					int c = *iptr;
 					*iptr |= 0xff000000;
 				}
 			}
