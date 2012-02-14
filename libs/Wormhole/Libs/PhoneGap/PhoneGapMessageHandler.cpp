@@ -90,8 +90,18 @@ namespace Wormhole
 	 */
 	bool PhoneGapMessageHandler::handlePhoneGapMessage(JSONMessage& message)
 	{
+		// MoSync servcies implemented on top of the PhoneGap protocol
+		// for convenience. We can move this to its own message handler
+		// at a later point.
+		if ((message.getParam("service") == "mosync") &&
+			(message.getParam("action") == "mosync.notification.messageBox"))
+		{
+			String titleText = message.getParam("title");
+			String messageText = message.getParam("message");
+			maMessageBox(titleText.c_str(), messageText.c_str());
+		}
 		// Send device information to PhoneGap
-		if ((message.getParam("service") == "Device") &&
+		else if ((message.getParam("service") == "Device") &&
 				(message.getParam("action") == "Get"))
 		{
 			sendDeviceProperties(message.getParam("PhoneGapCallBackId"));
