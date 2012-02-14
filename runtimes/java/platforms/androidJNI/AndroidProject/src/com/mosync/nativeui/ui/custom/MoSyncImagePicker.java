@@ -70,6 +70,9 @@ public class MoSyncImagePicker
 	final int ROTATE_CLOCKWISE = 90;
 	final int ROTATE_COUNTERCLOCKWISE = -90;
 
+	// Spacer height between dialog title and gallery.
+	final int SPACER_HEIGHT = 2;
+
 	//-------------------------- IMPLEMENTATION --------------------------//
 
 	/**
@@ -124,11 +127,17 @@ public class MoSyncImagePicker
 			layout.setVerticalGravity(Gravity.CENTER);
 			layout.setHorizontalGravity(Gravity.CENTER);
 			layout.setLayoutParams(new LinearLayout.LayoutParams(
-			        LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT));
+					LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT));
+
+			// Add a spacer of 2px to avoid title overlapping.
+			LinearLayout spacer = new LinearLayout(getActivity());
+			spacer.setLayoutParams(new LinearLayout.LayoutParams(
+					LayoutParams.FILL_PARENT, SPACER_HEIGHT));
+			layout.addView(spacer);
 
 			Gallery gallery = new Gallery(getActivity());
-			gallery.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT,
-					LayoutParams.FILL_PARENT));
+			gallery.setLayoutParams(new LayoutParams(
+					LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT));
 			// Do not call onItemSelected during fling to be faster.
 			gallery.setCallbackDuringFling(false);
 
@@ -138,7 +147,8 @@ public class MoSyncImagePicker
 
 			mPreview = new ImageView(getActivity());
 			// Set fixed size, otherwise the widget will resize itself each time an item is selected.
-			mPreview.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, mScrHeight/2) );
+			mPreview.setLayoutParams(new LayoutParams(
+					LayoutParams.FILL_PARENT, mScrHeight/2) );
 			mPreview.setMinimumWidth(mScrWidth/2);
 
 			// Show preview of the first image.
@@ -152,7 +162,7 @@ public class MoSyncImagePicker
 			RelativeLayout buttonsLayout = new RelativeLayout(getActivity());
 			buttonsLayout.setVerticalGravity(Gravity.TOP);
 			buttonsLayout.setLayoutParams(new RelativeLayout.LayoutParams(
-			        LayoutParams.FILL_PARENT, mScrHeight/6));
+			        LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT));
 
 			mRotateCounterclockwise = new Button(getActivity());
 			mRotateCounterclockwise.setText("Rotate left");
@@ -532,7 +542,7 @@ public class MoSyncImagePicker
             ImageView imgView = new ImageView(mContext);
             // Scale the gallery images to be smaller that the preview.
             // Make them square.
-            imgView.setLayoutParams(new Gallery.LayoutParams(mScrWidth/3, mScrWidth/3));
+            imgView.setLayoutParams(new Gallery.LayoutParams(mScrWidth/4, mScrWidth/4));
 
             // Check if the bitmap is already in cache.
             if ( mBitmapCache.size() <= position )

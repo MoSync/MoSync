@@ -192,6 +192,11 @@ namespace MoSync
 			mainPage.MouseMove += this.MouseMove;
 			mainPage.MouseLeftButtonUp += MouseLeftButtonUp;
 
+			// clear the list of system property providers
+			// We clear it before we initialize all the modules, because
+			// different modules might register system property providers.
+			SystemPropertyManager.ClearSystemPropertyProviders();
+
 			RegisterCleaner(() =>
 			{
 				Util.RunActionOnMainThreadSync(() =>

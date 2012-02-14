@@ -56,7 +56,7 @@ mosync.bridge.PhoneGap.send = function(callbackId, service, action, args)
  */
 if(navigator.geolocation == undefined)
 {
-	navigator.getlocation = {};
+	navigator.geolocation = {};
 
 	/**
 	 * Starts watching the phone position and listening to the GPS events

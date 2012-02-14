@@ -109,7 +109,7 @@ var FileSys = function()
 					message += " error id: " + id;
 				}
 				console.log(message);
-				showMessage(message);
+				alert(message);
 				fun(false, null);
 			};
 		}
@@ -241,7 +241,7 @@ var FileSys = function()
 							};
 							reader.onerror = function(obj)
 							{
-								 fun(false, null);
+								error(fun);
 							};
 							reader.readAsDataURL(file);
 						},
@@ -503,7 +503,7 @@ function testFileSystem()
 			return function()
 			{
 				console.log("Unexpected end of tests");
-				showMessage("Unexpected end of tests");
+				alert("Unexpected end of tests");
 			};
 		}
 	}
@@ -523,10 +523,19 @@ function testFileSystem()
 			0);
 	}
 
+	function logProgress(mark)
+	{
+		return function(success)
+		{
+			mosync.notification.HTMLToast(mark, 3000);
+			runNextTest(success);
+		};
+	}
+
 	// Create the test suite.
 	tests = [
-	    function(success) { showMessage("Running File tests..."); runNextTest(success); },
-	    // Set up initial file structure.
+		logProgress("Running File tests..."),
+		// Set up initial file structure.
 		createFiles,
 		// Do tests on directories.
 		readDirectory("foa", checkDirectoryContents),
@@ -538,7 +547,6 @@ function testFileSystem()
 		readFile("foo/hello1.txt", "Hello World"),
 		readFile("foo/bar/hello2.txt", "Hello World"),
 		readFile("foo/bar/hello3.txt", "Hello World"),
-		// Write new file.
 		writeFile("foc/bar/test.txt", "Hello World"),
 		readFile("foc/bar/test.txt", "Hello World"),
 		// Overwrite existing file.
@@ -844,9 +852,8 @@ function testFileSystem()
 				// Get data part of the url.
 				var i = url.indexOf(",");
 				var data = url.substring(i + 1);
-				var decodedData = atob(data);
-
-				if (decodedData == expectedData)
+				// atob is not implemented on WP7, compare raw data instead.
+				if (data == "SGVsbG8gV29ybGQgMg==")
 				{
 					runNextTest(success);
 					return;
@@ -1002,7 +1009,7 @@ function testFileSystem()
 	function allTestsPassed(success)
 	{
 		console.log("All tests passed: " + success);
-		showMessage("All tests passed: " + success);
+		alert("All tests passed: " + success);
 	}
 
 	function checkDirectoryContents(files)
@@ -1034,7 +1041,7 @@ function testFileSystem()
 	function fileTestFail(message)
 	{
 		console.log("FileSystem test failed: " + message);
-		showMessage("FileSystem test failed: " + message);
+		alert("FileSystem test failed: " + message);
 	}
 
 	// Create the file system object and start test.
