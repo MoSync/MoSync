@@ -13,9 +13,9 @@
 -->
 <html>
 <head>
-	<meta name="viewport" content="width=320; user-scalable=no" />
+	<meta name="viewport" content="width=320, user-scalable=no">
 	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
-	<script>
+	<script type="text/javascript">
 	function StartTrackingGeoLocation()
 	{
 		SetLocationStatus("Location tracking started");
@@ -100,10 +100,6 @@
 				else if (mosync.isWindowsPhone)
 				{
 					window.external.notify(data);
-				}
-				else
-				{
-					alert("mosync.bridge.sendRaw: unknown platform");
 				}
 			};
 

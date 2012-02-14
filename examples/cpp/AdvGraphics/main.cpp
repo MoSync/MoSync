@@ -28,9 +28,6 @@ MA 02110-1301, USA.
 #include <ma.h>
 #include <mastdlib.h>
 #include <conprint.h>
-#ifdef MAPIP
-#include <maprofile.h>
-#endif
 
 #include "MAHeaders.h"
 
@@ -52,10 +49,8 @@ public:
 #define RGBA(r, g, b, a) ((r)<<16)|((g)<<8)|((b))|((a)<<24)
 #define MAX_IMAGES 100
 
-#ifdef MA_PROF_SUPPORT_STYLUS
 int gIndex = 0;
 int gTimeToUpdate = 0;
-#endif	// MA_PROF_SUPPORT_STYLUS
 int gNumImages = 0;
 MAHandle gImages[MAX_IMAGES];
 
@@ -108,33 +103,19 @@ static void drawImages() {
 }
 
 static void showInstruction() {
-#ifdef MA_PROF_SUPPORT_STYLUS
 	if (gTimeToUpdate <= maGetMilliSecondCount()) {
 		gIndex=!gIndex;
 		gTimeToUpdate = maGetMilliSecondCount() + 1000;
 	}
 
-	static const char* text[2] = {
-			"Tap the screen to cast a spell.",
-			"Press fire to cast a spell."
-	};
-#else	// MA_PROF_SUPPORT_STYLUS
-	static const char* text = "Press fire to cast a spell.";
-#endif
-#ifdef MA_PROF_SUPPORT_STYLUS
-	int textHeight = EXTENT_Y(maGetTextSize(text[gIndex]));
-#else	// MA_PROF_SUPPORT_STYLUS
+	static const char* text = "Press Fire or tap the screen to cast a spell.";
+
 	int textHeight = EXTENT_Y(maGetTextSize(text));
-#endif	// MA_PROF_SUPPORT_STYLUS
 	int screenWidth = EXTENT_X(maGetScrSize());
 	maSetColor(0);	//black
 	maFillRect(0,0, screenWidth, textHeight);
 	maSetColor(~0);	//white
-#ifdef MA_PROF_SUPPORT_STYLUS
-	maDrawText(0, 0, text[gIndex]);
-#else	// MA_PROF_SUPPORT_STYLUS
 	maDrawText(0, 0, text);
-#endif	// MA_PROF_SUPPORT_STYLUS
 }
 
 extern "C" {
@@ -181,10 +162,8 @@ int MAMain()
 						break;
 
 				}
-#ifdef MA_PROF_SUPPORT_STYLUS
 			} else if(event.type == EVENT_TYPE_POINTER_PRESSED) {
 				createImage();
-#endif	// MA_PROF_SUPPORT_STYLUS
 			} else if(event.type == EVENT_TYPE_CLOSE) {
 				run = false;
 			} else if(event.type == EVENT_TYPE_FOCUS_LOST) {

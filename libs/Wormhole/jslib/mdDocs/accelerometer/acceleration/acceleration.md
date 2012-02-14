@@ -11,13 +11,6 @@ Properties
 - __z:__ Amount of motion on the z-axis. Range [0, 1] (`Number`)
 - __timestamp:__ Creation timestamp in milliseconds. (`DOMTimeStamp`)
 
-Supported Platforms
--------------------
-
-- Android
-- iOS
-- Windows Phone 7 ( Mango )
-
 Quick Example
 -------------
 

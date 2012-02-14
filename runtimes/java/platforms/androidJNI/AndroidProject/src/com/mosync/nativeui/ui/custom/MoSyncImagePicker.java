@@ -31,25 +31,30 @@ import android.content.res.TypedArray;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.Gallery;
 import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.mosync.internal.android.MoSyncThread;
 import com.mosync.internal.android.MoSyncThread.ImageCache;
 import com.mosync.java.android.R;
+import com.mosync.nativeui.util.properties.ColorConverter;
 
 
 /*
@@ -61,6 +66,9 @@ public class MoSyncImagePicker
 	// Events for when the Ok or Cancel button are hit.
 	final int PICKER_CANCELED = 0;
 	final int PICKER_READY = 1;
+
+	final int ROTATE_CLOCKWISE = 90;
+	final int ROTATE_COUNTERCLOCKWISE = -90;
 
 	//-------------------------- IMPLEMENTATION --------------------------//
 
@@ -75,8 +83,8 @@ public class MoSyncImagePicker
 		mPaths = new ArrayList<String>();
 		mNames = new ArrayList<String>();
 		mBitmapCache = new ArrayList<Bitmap>();
+		mRotateSequence = new ArrayList<Integer>();
 		// Set the decoder options for the bitmaps.
-		mDecodingOptions.inPreferredConfig = Bitmap.Config.ARGB_8888;
 		// Decode to a smaller image to save memory and run faster.
 		// Powers of 2 are often faster/easier for the decoder to honor.
         mDecodingOptions.inSampleSize = 4;
@@ -128,27 +136,67 @@ public class MoSyncImagePicker
 			gallery.setAdapter(new CustomAdapter(getActivity()));
 			layout.addView(gallery);
 
-			final ImageView preview = new ImageView(getActivity());
+			mPreview = new ImageView(getActivity());
 			// Set fixed size, otherwise the widget will resize itself each time an item is selected.
-			preview.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, mScrHeight/2) );
-			preview.setMinimumWidth(mScrWidth/2);
+			mPreview.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, mScrHeight/2) );
+			mPreview.setMinimumWidth(mScrWidth/2);
 
+			// Show preview of the first image.
 			Bitmap bitmap = BitmapFactory.decodeFile(mPaths.get(0), mDecodingOptions);
-			preview.setImageBitmap(bitmap);
-			if ( bitmap.getWidth() > preview.getLayoutParams().width
-					&&
-				bitmap.getHeight() > preview.getLayoutParams().height )
-            {
-				// Scale it to fit.
-				preview.setScaleType(ScaleType.FIT_CENTER);
-            }
-            else
-            {
-				// If image is smaller that the layout params of this imageview,
-				// scale center.
-				preview.setScaleType(ScaleType.CENTER_INSIDE);
-            }
-			layout.addView(preview);
+			mPreviewBitmap = bitmap;
+			mPreview.setImageBitmap(bitmap);
+			scalePreview(mPreview, mPreviewBitmap);
+			layout.addView(mPreview);
+
+			// Layout with rotate options in the corners.
+			RelativeLayout buttonsLayout = new RelativeLayout(getActivity());
+			buttonsLayout.setVerticalGravity(Gravity.TOP);
+			buttonsLayout.setLayoutParams(new RelativeLayout.LayoutParams(
+			        LayoutParams.FILL_PARENT, mScrHeight/6));
+
+			mRotateCounterclockwise = new Button(getActivity());
+			mRotateCounterclockwise.setText("Rotate left");
+			RelativeLayout.LayoutParams leftParams = new RelativeLayout.LayoutParams(
+					RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT );
+			leftParams.addRule( RelativeLayout.ALIGN_PARENT_LEFT );
+			mRotateCounterclockwise.setLayoutParams( leftParams );
+			mRotateCounterclockwise.setTextColor(ColorConverter.convert("0xFFFFFF"));
+			mRotateCounterclockwise.setOnClickListener(new OnClickListener() {
+
+				@Override
+				public void onClick(View v) {
+					// Save sequence.
+					mRotateSequence.add(ROTATE_COUNTERCLOCKWISE);
+					// Rotate left and store the current preview bitmap.
+					mPreviewBitmap = getRotatedBitmap(mPreviewBitmap, ROTATE_COUNTERCLOCKWISE);
+					// Update UI.
+		            mPreview.setImageBitmap(mPreviewBitmap);
+				}
+			});
+
+			mRotateClockwise = new Button(getActivity());
+			mRotateClockwise.setText("Rotate right");
+			RelativeLayout.LayoutParams rightParams = new RelativeLayout.LayoutParams(
+					RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT );
+			rightParams.addRule( RelativeLayout.ALIGN_PARENT_RIGHT );
+			mRotateClockwise.setLayoutParams( rightParams );
+			mRotateClockwise.setTextColor(ColorConverter.convert("0xFFFFFF"));
+			mRotateClockwise.setOnClickListener(new OnClickListener() {
+
+				@Override
+				public void onClick(View v) {
+					// Save sequence.
+					mRotateSequence.add(ROTATE_CLOCKWISE);
+					// Rotate right and store the current preview bitmap.
+					mPreviewBitmap = getRotatedBitmap(mPreviewBitmap, ROTATE_CLOCKWISE);
+					// Update UI.
+					mPreview.setImageBitmap(mPreviewBitmap);
+				}
+			});
+
+			buttonsLayout.addView(mRotateCounterclockwise);
+			buttonsLayout.addView(mRotateClockwise);
+			layout.addView(buttonsLayout);
 
 			gallery.setOnItemSelectedListener(new OnItemSelectedListener() {
 
@@ -160,23 +208,16 @@ public class MoSyncImagePicker
 					// even after the dialog is closed.
 //					Toast.makeText(getActivity(), mNames.get(pos), Toast.LENGTH_SHORT).show();
 
-					if ( mBitmapCache.get(pos).getWidth() > preview.getLayoutParams().width
-							&&
-						mBitmapCache.get(pos).getHeight() > preview.getLayoutParams().height )
-		            {
-						// Scale it to fit.
-						preview.setScaleType(ScaleType.FIT_CENTER);
-		            }
-		            else
-		            {
-						// If image is smaller that the layout params of this imageview,
-						// scale center.
-						preview.setScaleType(ScaleType.CENTER_INSIDE);
-		            }
+					// Do not save rotate sequence among selections.
+					mRotateSequence.clear();
+
+					// Set the current preview bitmap: bitmap stored by the Adapter.
+					mPreviewBitmap = mBitmapCache.get(pos);
+					scalePreview(mPreview, mPreviewBitmap);
 
 					// Refresh the preview image.
 					// Get the bitmap stored by the Adapter.
-		            preview.setImageBitmap(mBitmapCache.get(pos));
+		            mPreview.setImageBitmap(mPreviewBitmap);
 
 		            // Save the position of the last selected images.
 		            mPosition = pos;
@@ -204,7 +245,7 @@ public class MoSyncImagePicker
 					Toast.makeText(getActivity(), mNames.get(mPosition), Toast.LENGTH_SHORT).show();
 
 					// Save the handle of the selected item and post event.
-					mImageHandle = getSelectedImageHandle(mBitmapCache.get(mPosition));
+					mImageHandle = getSelectedImageHandle(mPreviewBitmap);
 					// Clear the bitmap cache before closing the dialog.
 					mBitmapCache.clear();
 					postImagePickerEvent(PICKER_READY);
@@ -231,6 +272,28 @@ public class MoSyncImagePicker
 		// Display the dialog until user provides a selection, or cancels the
 		// request.
 		alertDialog.show();
+	}
+
+	/**
+	 * Scale the bitmap to fit the preview view.
+	 * @param preview The preview Image widget.
+	 * @param bitmap The bitmap content for the preview.
+	 */
+	private void scalePreview(ImageView preview, Bitmap bitmap)
+	{
+		if ( bitmap.getWidth() > preview.getLayoutParams().width
+				&&
+			bitmap.getHeight() > preview.getLayoutParams().height )
+        {
+			// Scale it to fit.
+			preview.setScaleType(ScaleType.FIT_CENTER);
+        }
+        else
+        {
+			// If image is smaller that the layout params of this imageview,
+			// scale center.
+			preview.setScaleType(ScaleType.CENTER_INSIDE);
+        }
 	}
 
 	/**
@@ -347,6 +410,28 @@ public class MoSyncImagePicker
 		return mMoSyncThread.getActivity();
 	}
 
+	/**
+	 * Rotate a bitmap.
+	 * @param originalBitmap The original bitmap.
+	 * @param degrees The rotation.
+	 * @return the resulting bitmap.
+	 */
+	private Bitmap getRotatedBitmap(Bitmap originalBitmap, int degrees)
+	{
+        Matrix matrix = new Matrix();
+        matrix.postRotate(degrees);
+        Bitmap rotatedBitmap = null;
+        try{
+			rotatedBitmap = Bitmap.createBitmap(
+					originalBitmap, 0, 0, originalBitmap.getWidth(), originalBitmap.getHeight(), matrix, true);
+        }catch ( IllegalArgumentException iae)
+        {
+			Log.i("@@MoSync","maImagePickerOpen Cannot rotate bitmap");
+        }
+
+        return rotatedBitmap;
+	}
+
     /**
      * Get the handle of the selected item.
      * Further, post it in a EVENT_TYPE_IMAGE_PICKER event.
@@ -366,6 +451,7 @@ public class MoSyncImagePicker
 			originalSizeH > mScrHeight *4)
         {
 			mImageTable.put(dataHandle, new ImageCache(null, scaledBitmap));
+
             return dataHandle;
         }
         else if ( originalSizeW > mScrWidth  *2
@@ -381,10 +467,22 @@ public class MoSyncImagePicker
 			mDecodingOptions.inSampleSize = 1;
         }
 
+        /**
+         * If the bitmap needs decoding again compute the same rotating
+         * sequence as the user did.
+         */
         Bitmap newBitmap = BitmapFactory.decodeFile(mPaths.get(mPosition), mDecodingOptions);
+        if ( !mRotateSequence.isEmpty() )
+        {
+			for (int i=0; i < mRotateSequence.size(); i++)
+			{
+				newBitmap = getRotatedBitmap(newBitmap, mRotateSequence.get(i));
+			}
+        }
+
 		if (null == newBitmap)
 		{
-			Log.i("MoSync","maImagePickerOpen Cannot create handle");
+			Log.i("@@MoSync","maImagePickerOpen Cannot create handle");
 			return -1;
 //			maPanic(1, "maImagePickerOpen: Unable to create handle");
 		}
@@ -394,6 +492,11 @@ public class MoSyncImagePicker
         return dataHandle;
     }
 
+    /**
+     * Custom adapter for the gallery view list.
+     * @author emma
+     *
+     */
     public class CustomAdapter extends BaseAdapter
     {
         int mGalleryItemBackg;
@@ -503,4 +606,28 @@ public class MoSyncImagePicker
 	 */
 	BitmapFactory.Options mDecodingOptions = new BitmapFactory.Options() ;
 
+	/**
+	 * The preview image.
+	 */
+	private ImageView mPreview = null;
+
+	/**
+	 * The current bitmap in the preview view. Can be rotated.
+	 */
+	private Bitmap mPreviewBitmap = null;
+
+	/**
+	 * The rotate buttons.
+	 */
+	private Button mRotateClockwise = null;
+	private Button mRotateCounterclockwise = null;
+
+	/**
+	 * Save the sequence in which the preview is rotated.
+	 * If the user selects another item the rotation is not saved.
+	 * When user presses OK the sequence needs to be taken into
+	 * account because if the photo needs to be decoded again,
+	 * it will also be rotated.
+	 */
+	private List<Integer> mRotateSequence;
 }

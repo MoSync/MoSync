@@ -42,7 +42,8 @@ namespace NativeUI
 {
 
 	/**
-	 * \brief Class that represents a visible screen.
+	 * \brief Class that represents a visible panorama view. Note that
+	 * this is available only on Windows Phone 7.
 	 */
 	class PanoramaView : public Screen
 	{

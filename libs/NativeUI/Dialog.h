@@ -66,6 +66,29 @@ namespace NativeUI
 
 	/**
 	 * \brief Class that represents a modal dialog.
+	 * A dialog cannot have any parent, it acts only as a container of other widgets.
+	 * A dialog is a sort of modal view, that can look different depending on
+	 * the platform:
+	 * -On Android it is a modal alert dialog.
+	 * -On iPad it is a PopoverController, and on iPhone it is a modal view.
+	 *
+	 * When a Dialog widget is created it is empty, it has no content.
+	 * Use setMainWidget(widget) to set the main widget of the dialog.
+	 *
+	 * A Dialog gets visible only after calling show() method.
+	 * To show a Dialog call show(), to hide it call: hide().
+	 *
+	 * On iPad there are two specific methods:
+	 * 	- setArrowPosition that sets the position of the popover origin arrow on
+	 * the screen.
+	 *  - canBeDismissed that allows or prohibits the user from dismissing a
+	 *  popover dialog by tapping outside of it.
+	 *
+	 * Note: On Android setting widget specific properties has effects only in
+	 * the dialog content(that is in fact the main widget), and not on the title bar.
+	 * Note: This widget is not available on Windows Phone 7.
+	 *
+	 * For dialog events see DialogListener.
 	 *
 	 */
 	class Dialog : public Widget

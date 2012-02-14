@@ -9,14 +9,6 @@ Description
 This property is a fast way to determine the device's network connection state, and type of connection.
 
 
-Supported Platforms
--------------------
-
-- iOS
-- Android
-- BlackBerry WebWorks (OS 5.0 and higher)
-- Windows Phone 7 ( Mango )
-
 Quick Example
 -------------
 

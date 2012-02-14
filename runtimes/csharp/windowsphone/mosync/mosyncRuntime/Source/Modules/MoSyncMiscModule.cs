@@ -12,8 +12,14 @@ namespace MoSync
     public class SystemPropertyManager
     {
         public delegate String SystemPropertyProvider(String key);
-        public static Dictionary<String, SystemPropertyProvider> mSystemPropertyProviders =
+        private static Dictionary<String, SystemPropertyProvider> mSystemPropertyProviders =
             new Dictionary<string, SystemPropertyProvider>();
+
+
+		public static void ClearSystemPropertyProviders()
+		{
+			mSystemPropertyProviders.Clear();
+		}
 
         public static void RegisterSystemPropertyProvider(String key, SystemPropertyProvider provider)
         {
@@ -106,7 +112,7 @@ namespace MoSync
 			{
 				if (mVibrateController == null)
 					mVibrateController = Microsoft.Devices.VibrateController.Default;
-				
+
 				// more than 5 seconds aren't allowed..
 				if (_ms > 5000)
 					_ms = 5000;
@@ -151,9 +157,6 @@ namespace MoSync
         public void Init(Ioctls ioctls, Core core, Runtime runtime)
         {
 			mRuntime = runtime;
-
-            // add system property providers
-            SystemPropertyManager.mSystemPropertyProviders.Clear();
 
             /**
              * Register system properties
