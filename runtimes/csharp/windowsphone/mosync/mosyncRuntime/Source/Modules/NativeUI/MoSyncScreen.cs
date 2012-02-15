@@ -92,14 +92,14 @@ namespace MoSync
                         {
                             if ((this.GetParent() as PanoramaView).getSelectedScreen().Equals(this) && (this as StackScreen).StackCount() > 1)
                             {
-                                (this as StackScreen).Pop();
+                                (this as StackScreen).PopFromBackButtonPressed();
                                 args.Cancel = true;
                             }
                         }
                         else if((this as StackScreen).StackCount() > 1 && (this as StackScreen).GetBackButtonEnabled() == true)
                         {
                             //Do a pop and cancel the event
-                            (this as StackScreen).Pop();
+                            (this as StackScreen).PopFromBackButtonPressed();
                             args.Cancel = true;
                         }
                     }
