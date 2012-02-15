@@ -309,6 +309,7 @@ namespace MAP
 		mSource( NULL ),
 		mIdleListener( NULL ),
 		mFont( NULL ),
+		mHasTimer(true),
 		mInDraw( NULL ),
 		mShowPixelScale( false ),
 		mShowHairlineCross( false ),
