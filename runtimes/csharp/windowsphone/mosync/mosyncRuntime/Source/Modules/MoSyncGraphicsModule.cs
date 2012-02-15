@@ -26,7 +26,6 @@ namespace MoSync
 
 		TextBlock textBlock = new TextBlock();
 
-
 		void GetTextSize(String text, out int w, out int h)
 		{
 			int textWidth = 0, textHeight = 0;
