@@ -7,9 +7,6 @@
 using namespace MAUtil;
 using namespace NativeUI;
 
-#define PRESS_ME_MESSAGE "Press me"
-#define HELLO_WORLD_MESSAGE "Hello World!"
-
 /**
  * Moblet to be used as a template for a Native UI application.
  */
@@ -61,7 +58,7 @@ public:
 		mButton->addButtonListener(this);
 
 		//Set the text of the button
-		mButton->setText(PRESS_ME_MESSAGE);
+		mButton->setText("Press Me");
 
 		//Add the button to the layout
 		mLayout->addChild(mButton);
@@ -71,7 +68,6 @@ public:
 
 		//Show the screen
 		mScreen->show();
-
 	}
 
 	/**
@@ -87,34 +83,13 @@ public:
 	}
 
 	/**
-	* This method is called when there is an touch-down event for
-	* a button.
-	* Only for iphone platform.
-	* @param button The button object that generated the event.
-	*/
-	virtual void buttonPressed(Widget* button)
-	{
-		((Button*) button)->setText(HELLO_WORLD_MESSAGE);
-	};
-
-	/**
-	* This method is called when there is an touch-up event for
-	* a button.
-	* Only for iphone platform.
-	* @param button The button object that generated the event.
-	*/
-	virtual void buttonReleased(Widget* button)
-	{
-		((Button*) button)->setText(PRESS_ME_MESSAGE);
-	};
-
-	/**
 	* This method is called if the touch-up event was inside the
 	* bounds of the button.
 	* @param button The button object that generated the event.
 	*/
 	virtual void buttonClicked(Widget* button)
 	{
+		((Button*) button)->setText("Hello World");
 	}
 
 private:
