@@ -1367,7 +1367,8 @@ mosync.nativeui.createWidget = function(widget, parent) {
 					.getNativeAttrValue(attributeList[i].value);
 			if ((attrName != "id") && (attrName != "widgettype")
 					&& (attrValue != null)) {
-				if (attrName == "onevent") {
+				if ((attrName.toLowerCase() == "onevent") ||
+					(attrName.toLowerCase() == "onclick")) {
 
 					var functionData = attrValue;
 					eventList = {
@@ -1377,7 +1378,7 @@ mosync.nativeui.createWidget = function(widget, parent) {
 							eval(functionData);
 						}
 					};
-				} else if ((attrName == "image") || (attrName == "icon")) {
+				} else if ((attrName.toLowerCase() == "image") || (attrName.toLowerCase() == "icon")) {
 					imageResources = {
 						propertyType : attrName,
 						value : attrValue
@@ -1394,8 +1395,8 @@ mosync.nativeui.createWidget = function(widget, parent) {
 						value : attrValue
 					};
 				} else {
-					if ((attrName != "icon_ios")
-							&& (attrName != "icon_android")) {
+					if ((attrName.toLowerCase() != "icon_ios")
+							&& (attrName.toLowerCase() != "icon_android")) {
 						propertyList[attrName] = attrValue;
 					}
 				}

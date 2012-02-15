@@ -90,6 +90,40 @@ namespace MoSync
              */
             public void Pop()
             {
+                postPopEvent();
+
+                /**
+                 * If the stack is not empty show the top element of the stack
+                 */
+                if (0 < mStack.Count)
+                {
+                    MoSync.Util.RunActionOnMainThreadSync(() =>
+					{
+						(View as Microsoft.Phone.Controls.PhoneApplicationPage).Content = (mStack.Peek() as NativeUI.WidgetBaseWindowsPhone).View;
+					});
+                }
+            }
+
+            /**
+             * The pop from back call implementation
+             */
+            public void PopFromBackButtonPressed()
+            {
+                postPopEvent();
+                /**
+                 * If the stack is not empty show the top element of the stack
+                 */
+                if (0 < mStack.Count)
+                {
+                    (View as Microsoft.Phone.Controls.PhoneApplicationPage).Content = (mStack.Peek() as NativeUI.WidgetBaseWindowsPhone).View;
+                }
+            }
+
+            /**
+             * Pops the screen form the stack and posts the custom event
+             */
+            private void postPopEvent()
+            {
                 /**
                  * If the stack has more than one item pop it and post the MAW_EVENT_STACK_SCREEN_POPPED event
                  */
@@ -113,17 +147,6 @@ namespace MoSync
                      * posting a CustomEvent
                      */
                     mRuntime.PostCustomEvent(MoSync.Constants.EVENT_TYPE_WIDGET, eventData);
-                }
-
-                /**
-                 * If the stack is not empty show the top element of the stack
-                 */
-                if (0 < mStack.Count)
-                {
-                    //MoSync.Util.RunActionOnMainThreadSync(() =>
-					//{
-						(View as Microsoft.Phone.Controls.PhoneApplicationPage).Content = (mStack.Peek() as NativeUI.WidgetBaseWindowsPhone).View;
-					//});
                 }
             }
 

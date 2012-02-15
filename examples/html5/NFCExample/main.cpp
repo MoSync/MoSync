@@ -93,7 +93,6 @@ public:
 
 	void initWebView() {
 		// Initialize the web view and show the main page.
-		extractFileSystem();
 		enableWebViewMessages();
 		getWebView()->disableZoom();
 		showPage("index.html");

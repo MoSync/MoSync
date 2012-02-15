@@ -44,6 +44,7 @@ namespace MapDemo
 
 		mMap->setFont( AppStyleMgr::getStyle( )->getFont( FontSize_Smallest, Color::black, false ) );
 		setClientWidget( mMap );
+
 		//
 		// Create map sources
 		//
@@ -51,12 +52,12 @@ namespace MapDemo
 		mGoogleStreetMapSource = newobject( GoogleMapSource, new GoogleMapSource( GoogleMapKind_StreetMap ) );
 		mGoogleAerialMapSource = newobject( GoogleMapSource, new GoogleMapSource( GoogleMapKind_Aerial ) );
 		mGoogleHybridMapSource = newobject( GoogleMapSource, new GoogleMapSource( GoogleMapKind_Hybrid ) );
+
 		//
 		// Have to wait until we have proper width and height
 		//
-		mMap->setMapSource( mOpenStreetMapSource );
-
 		mMap->setCenterPosition( LonLat( 18.07, 59.33 ), 10, true, false );
+		mMap->setMapSource( mOpenStreetMapSource );
 	}
 
 	//-------------------------------------------------------------------------
