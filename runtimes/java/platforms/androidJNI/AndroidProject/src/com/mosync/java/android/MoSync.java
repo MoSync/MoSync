@@ -220,11 +220,10 @@ public class MoSync extends Activity
 
 		if (theMoSyncThreadIsDead()) { return ; }
 
-		// The MoSync view comes to foreground and is visible.
-		mMoSyncThread.setMoSyncView(mMoSyncView);
 		mMoSyncThread.acquireHardware();
 
 		mMoSyncThread.onResume();
+
 		if (nfcForegroundHandler != null) {
 			nfcForegroundHandler.enableForeground();
 		}
@@ -243,15 +242,17 @@ public class MoSync extends Activity
     protected void onPause()
 	{
 		Log.i("MoSync", "onPause");
+
+		// TODO: Why is this done before super.onPause()?
+		// Move to after super.onPause() if not need to call before it.
 		mMoSyncThread.releaseHardware();
+
 		super.onPause();
 
 		if (theMoSyncThreadIsDead()) { return ; }
 
-		// The view is not to be updated, inform the thread about this.
-		mMoSyncThread.setMoSyncView(null);
-
 		mMoSyncThread.onPause();
+
 		if (nfcForegroundHandler != null) {
 			nfcForegroundHandler.disableForeground();
 		}
