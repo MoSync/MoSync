@@ -195,10 +195,14 @@ namespace MoSync
 		public static void CriticalError(String text)
 		{
 			Log(text);
+
+// Enable this if you want the debugger to automatically break here.
+#if false
 			if (System.Diagnostics.Debugger.IsAttached)
 			{
 				System.Diagnostics.Debugger.Break();
 			}
+#endif
 			Deployment.Current.Dispatcher.BeginInvoke(() => MessageBox.Show(text));
 			throw new ExitException(-1);
 		}
