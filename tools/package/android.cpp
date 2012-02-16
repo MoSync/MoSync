@@ -293,6 +293,7 @@ static void writeManifest(const char* filename, const SETTINGS& s, const Runtime
 		<<"\t\t</activity>\n"
 		;
 	file <<"\t\t<service android:name=\"com.mosync.internal.android.notifications.LocalNotificationsService\" />\n";
+	file <<"\t\t<service android:name=\".MoSyncService\" />\n";
 
 	writeC2DMReceiver(file, packageName);
 
