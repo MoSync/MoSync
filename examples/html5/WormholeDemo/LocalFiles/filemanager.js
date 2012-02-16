@@ -1,8 +1,32 @@
-var userFilesDir; //DirectoryEntry for the UserFiles directory
-var currentFile; //The file that is being edited
+/*
+Copyright (C) 2012 MoSync AB
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License,
+version 2, as published by the Free Software Foundation.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+MA 02110-1301, USA.
+*/
 
 /**
- * This function initializes the file manager
+ * @file filenmaneger.js
+ *
+ * Functions used by the File Storage demo.
+ */
+
+var userFilesDir; // DirectoryEntry for the UserFiles directory.
+var currentFile; // The file that is being edited.
+
+/**
+ * This function initializes the file manager.
  */
 function initFileManager()
 {
@@ -20,6 +44,7 @@ function initFileManager()
 				function(dirEntry)
 				{
 					userFilesDir = dirEntry;
+					refreshFiles();
 				},
 				function(error)
 				{
@@ -34,27 +59,32 @@ function initFileManager()
 }
 
 /**
- * This function refreshes the file list in the file manager panel
+ * This function refreshes the file list in the file manager panel.
  */
 function refreshFiles()
 {
-	var dirReader = userFilesDir.createReader();
-	//Clear the file list
+	// Clear the file list.
 	$('#fileList > li').remove();
+
+	// Read files.
+	var dirReader = userFilesDir.createReader();
 	dirReader.readEntries(function(entries)
 	{
 		for(var i = 0; i < entries.length; i++)
 		{
-			//Create a nested <li><a> structure for each file returned
-			var newLi = document.createElement("li");
-			var newA = document.createElement("a");
-			//Store the file data to the <a> element
-			$(newA).data('file', entries[i]);
-			//Set the <a> element to call the setFile function with the stored file when clicked
-			newA.setAttribute("onclick", "setFile($(this).data('file'))");
-			newA.innerHTML = entries[i].name;
-			newLi.appendChild(newA);
-			$('#fileList').append(newLi);
+			// Create a nested <li><a> structure for each file returned.
+			var newListElementTag = document.createElement("li");
+			var newActhorTag = document.createElement("a");
+
+			// Store the file data to the <a> element.
+			$(newActhorTag).data('file', entries[i]);
+
+			// Set the <a> element to call the setFile function with the
+			// stored file when clicked.
+			newActhorTag.setAttribute("onclick", "setFile($(this).data('file'))");
+			newActhorTag.innerHTML = entries[i].name;
+			newListElementTag.appendChild(newActhorTag);
+			$('#fileList').append(newListElementTag);
 		}
 	},
 	function(error)
@@ -64,12 +94,12 @@ function refreshFiles()
 }
 
 /**
- * Sets the file editing panel to the selected file
- * @param file FilEntry with the info about the selected file
+ * Sets the file editing panel to the selected file.
+ * @param file FilEntry with the info about the selected file.
  */
 function setFile(file)
 {
-	//We programmatically go to the file editing panel
+	// We programmatically go to the file editing panel.
 	jQT.goTo('#filePage','pop');
 	currentFile = file;
 
@@ -77,12 +107,13 @@ function setFile(file)
 	$('#fileName').val(currentFile.name);
 	var reader = new FileReader();
 	reader.onloadend = function(evt){
-		//Sets the file contents to the text area
-		//We use val() instead of html() or innerHTML because
-		//it's consistent between transitions to other files
+		// Sets the file contents to the text area.
+		// We use val() instead of html() or innerHTML because
+		// it's consistent between transitions to other files.
 		$('#fileContents').val(evt.target.result);
 	};
-	//This call will evoke the onloaded callback above
+
+	// This call will invoke the onloaded callback above.
 	reader.readAsText(currentFile);
 }
 
@@ -134,20 +165,21 @@ function createFile()
 }
 
 /**
- * Deletes the file that is currently being edited
+ * Deletes the file that is currently being edited.
  */
 function deleteFile()
 {
-	if(confirm("Delete " + currentFile.name + "?") == true)
+	if (confirm("Delete " + currentFile.name + "?") == true)
 	{
 		currentFile.remove();
-		//Go back to the file list
+		refreshFiles();
+		// Go back to the file list.
 		jQT.goBack();
 	}
 }
 
 /**
- * Saves the new contents of the file currently being edited
+ * Saves the new contents of the file currently being edited.
  */
 function saveCurrentFile()
 {
@@ -175,7 +207,7 @@ function saveCurrentFile()
 }
 
 /**
- * Renames the file that is currently being edited
+ * Renames the file that is currently being edited.
  */
 function renameCurrentFile()
 {
@@ -185,6 +217,17 @@ function renameCurrentFile()
 		currentFile.moveTo(userFilesDir, newFileName,
 			function(){
 				$('#filePanelTitle').html(newFileName);
+				//Reopening the file, because the move action closes it on some platforms
+				userFilesDir.getFile(newFileName,{create: false},
+						function(file)
+						{
+							currentFile = file;
+							refreshFiles();
+						},
+						function()
+						{
+							alert("error");
+						});
 			},
 			function(){
 				alert("error");

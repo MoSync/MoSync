@@ -17,6 +17,9 @@ namespace MoSync
 		private Motion mMotion = null;
 		private GeoCoordinateWatcher mGeoWatcher = null;
 
+		private bool mCompassEnabled = false;
+		private bool mMagneticFieldEnabled = false;
+
 		private void SendSensorEventVector(Runtime runtime, int type, Vector3 data)
 		{
 			Memory evt = new Memory(5 * 4);
@@ -57,6 +60,9 @@ namespace MoSync
 				if (_sensor == MoSync.Constants.SENSOR_TYPE_ACCELEROMETER &&
 						Accelerometer.IsSupported)
 				{
+					if (mAccelerometer != null)
+						return MoSync.Constants.SENSOR_ERROR_ALREADY_ENABLED;
+
 					mAccelerometer = new Accelerometer();
 					mAccelerometer.TimeBetweenUpdates = time;
 					mAccelerometer.CurrentValueChanged +=
@@ -71,6 +77,9 @@ namespace MoSync
 				else if (_sensor == MoSync.Constants.SENSOR_TYPE_GYROSCOPE &&
 						Gyroscope.IsSupported)
 				{
+					if (mGyroscope != null)
+						return MoSync.Constants.SENSOR_ERROR_ALREADY_ENABLED;
+
 					mGyroscope = new Gyroscope();
 					mGyroscope.TimeBetweenUpdates = time;
 					mGyroscope.CurrentValueChanged +=
@@ -78,24 +87,61 @@ namespace MoSync
 						{
 							Vector3 rot = args.SensorReading.RotationRate;
 							SendSensorEventVector(runtime, MoSync.Constants.SENSOR_TYPE_GYROSCOPE, rot);
+
 						};
 
 					mGyroscope.Start();
 				}
-				else if (_sensor == MoSync.Constants.SENSOR_TYPE_MAGNETIC_FIELD &&
+				else if ((_sensor == MoSync.Constants.SENSOR_TYPE_MAGNETIC_FIELD || _sensor == MoSync.Constants.SENSOR_TYPE_COMPASS) &&
 						Compass.IsSupported)
 				{
-					mCompass = new Compass();
-					mCompass.TimeBetweenUpdates = time;
-					mCompass.CurrentValueChanged +=
-						delegate(object sender, SensorReadingEventArgs<CompassReading> args)
-						{
-							Vector3 rot = args.SensorReading.MagnetometerReading;
-							SendSensorEventVector(runtime, MoSync.Constants.SENSOR_TYPE_MAGNETIC_FIELD, rot);
-						};
+					if (_sensor == MoSync.Constants.SENSOR_TYPE_MAGNETIC_FIELD &&
+						mMagneticFieldEnabled == true)
+						return MoSync.Constants.SENSOR_ERROR_ALREADY_ENABLED;
 
-					mCompass.Start();
+					if (_sensor == MoSync.Constants.SENSOR_TYPE_COMPASS &&
+						mCompassEnabled == true)
+						return MoSync.Constants.SENSOR_ERROR_ALREADY_ENABLED;
+
+					if (mCompass == null)
+					{
+						mCompass = new Compass();
+						mCompass.TimeBetweenUpdates = time;
+					}
+					else
+					{
+						if(time < mCompass.TimeBetweenUpdates)
+							mCompass.TimeBetweenUpdates = time;
+					}
+
+					if (mCompassEnabled == false && mMagneticFieldEnabled == false)
+					{
+						mCompass.CurrentValueChanged +=
+							delegate(object sender, SensorReadingEventArgs<CompassReading> args)
+							{
+								if (mMagneticFieldEnabled)
+								{
+									Vector3 rot = args.SensorReading.MagnetometerReading;
+									SendSensorEventVector(runtime, MoSync.Constants.SENSOR_TYPE_MAGNETIC_FIELD, rot);
+								}
+
+								if (mCompassEnabled)
+								{
+									Vector3 heading = new Vector3();
+									heading.X = (float)args.SensorReading.MagneticHeading;
+									SendSensorEventVector(runtime, MoSync.Constants.SENSOR_TYPE_COMPASS, heading);
+								}
+							};
+
+						mCompass.Start();
+					}
+
+					if (_sensor == MoSync.Constants.SENSOR_TYPE_MAGNETIC_FIELD)
+						mMagneticFieldEnabled = true;
+					else if (_sensor == MoSync.Constants.SENSOR_TYPE_COMPASS)
+						mCompassEnabled = true;
 				}
+
 #if false
         else if (_sensor == MoSync.Constants.SENSOR_TYPE_ORIENTATION &&
 					Motion.IsSupported)
@@ -124,6 +170,10 @@ namespace MoSync
 							mAccelerometer.Stop();
 							mAccelerometer = null;
 						}
+						else
+						{
+							return MoSync.Constants.SENSOR_ERROR_NOT_ENABLED;
+						}
 						break;
 					case MoSync.Constants.SENSOR_TYPE_GYROSCOPE:
 						if (mGyroscope != null)
@@ -131,19 +181,43 @@ namespace MoSync
 							mGyroscope.Stop();
 							mGyroscope = null;
 						}
+						else
+						{
+							return MoSync.Constants.SENSOR_ERROR_NOT_ENABLED;
+						}
 						break;
 					case MoSync.Constants.SENSOR_TYPE_MAGNETIC_FIELD:
-						if (mCompass != null)
+						if(!mMagneticFieldEnabled)
+							return MoSync.Constants.SENSOR_ERROR_NOT_ENABLED;
+
+						if (mCompass != null && !mCompassEnabled)
 						{
 							mCompass.Stop();
 							mCompass = null;
 						}
+						
+						mMagneticFieldEnabled = false;
+						break;
+					case MoSync.Constants.SENSOR_TYPE_COMPASS:
+						if (!mCompassEnabled)
+							return MoSync.Constants.SENSOR_ERROR_NOT_ENABLED;
+
+						if (mCompass != null && !mMagneticFieldEnabled)
+						{
+							mCompass.Stop();
+							mCompass = null;
+						}
+						mCompassEnabled = false;
 						break;
 					case MoSync.Constants.SENSOR_TYPE_ORIENTATION:
 						if (mMotion != null)
 						{
 							mMotion.Stop();
 							mMotion = null;
+						}
+						else
+						{
+							return MoSync.Constants.SENSOR_ERROR_NOT_ENABLED;
 						}
 						break;
 				}

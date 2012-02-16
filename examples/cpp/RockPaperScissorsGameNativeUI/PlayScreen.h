@@ -244,8 +244,7 @@ private: // methods
 	/**
 	 * Create all the widgets in the UI.
 	 * The start button, count down label, flickering label,
-	 * weapon buttons, rival weapon, spacer, score label,
-	 * exit button.
+	 * weapon buttons, rival weapon, spacer, score label.
 	 */
 	MAWidgetHandle createMainLayout();
 
@@ -290,9 +289,6 @@ private: // members
 
 	/** Score label. */
 	MAWidgetHandle mScoreInfo;
-
-	/** Exit button. */
-	MAWidgetHandle mExitButton;
 
 	/** Screen size. */
 	int mScreenWidth;

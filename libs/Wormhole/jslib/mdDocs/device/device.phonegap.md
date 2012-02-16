@@ -10,13 +10,6 @@ Description
 
 `device.Wormhole` returns the version of Wormhole running on the device.
 
-Supported Platforms
--------------------
-
-- Android
-- iPhone
-- Windows Phone 7 ( Mango )
-
 Quick Example
 -------------
 

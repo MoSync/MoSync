@@ -96,6 +96,23 @@ namespace MoSync
                     System.Windows.Controls.ListBoxItem item = new System.Windows.Controls.ListBoxItem();
                     WidgetBaseWindowsPhone widget = (child as WidgetBaseWindowsPhone);
                     item.Content = widget.View;
+                    if (widget.fillSpaceHorizontalyEnabled)
+                    {
+                        item.HorizontalContentAlignment = HorizontalAlignment.Stretch;
+                    }
+                    else
+                    {
+                        item.HorizontalContentAlignment = HorizontalAlignment.Left;
+                    }
+
+                    if (widget.fillSpaceVerticalyEnabled)
+                    {
+                        item.VerticalContentAlignment = VerticalAlignment.Stretch;
+                    }
+                    else
+                    {
+                        item.VerticalContentAlignment = VerticalAlignment.Center;
+                    }
 					mList.Items.Add(item);
                 });
             }

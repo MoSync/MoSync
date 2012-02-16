@@ -22,13 +22,6 @@ Details
 
 The `LocalFileSystem` object methods are defined on the __window__ object.
 
-Supported Platforms
--------------------
-
-- Android
-- iOS
-- Windows Phone 7 ( Mango )
-
 Request File System Quick Example
 ---------------------------------
 

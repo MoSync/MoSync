@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html>
 <head>
+<meta name="viewport" content="width=320, user-scalable=no">
+<meta http-equiv="Content-type" content="text/html; charset=utf-8">
 <style>
 html
 {
@@ -75,9 +77,9 @@ html
 	Import the josync library to enable communication
 	between JavaScript and C++ .
 -->
-<script src="js/mosync-bridge.js"></script>
+<script type="text/javascript" charset="utf-8" src="js/mosync-bridge.js"></script>
 
-<script>
+<script type="text/javascript">
 
 function WriteURLToTag() {
 	mosync.bridge.sendJSON({messageName: "WriteSampleURL"});

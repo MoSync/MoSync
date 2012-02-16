@@ -77,15 +77,20 @@ public:
 		// Check if NativeUI is supported by the runtime platform.
 		// For example, MoRE does not support NativeUI at the time
 		// of writing this program.
-		if (-1 == screen)
+		if (IOCTL_UNAVAILABLE == screen)
 		{
-			maPanic(0, "OpenGL is only available on Android and iOS.");
+			maPanic(0, "NativeUI is not available.");
 		}
 
 		// Create a GL_VIEW widget and add it to the screen.
 		// widgetSetPropertyInt is a helper function defined
 		// in WidgetUtil.cpp.
 		mGLView = maWidgetCreate(MAW_GL_VIEW);
+		if (MAW_RES_INVALID_TYPE_NAME == mGLView)
+		{
+			maPanic(1, "OpenGL|ES unavailable. OpenGL|ES is only available on Android and iOS. Also, please check that the device is able to run the version of OpenGL|ES you requested.");
+		}
+
 		widgetSetPropertyInt(
 			mGLView,
 			MAW_WIDGET_WIDTH,

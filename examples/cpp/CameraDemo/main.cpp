@@ -156,30 +156,46 @@ public:
 		mZoomInButton = new Button();
 		mZoomInButton->setText("Zoom +");
 		mZoomInButton->fillSpaceHorizontally();
-		mZoomInButton->setHeight(60);
 		mZoomInButton->addButtonListener(this);
 
 		mShowLastImageButton = new Button();
 		mShowLastImageButton->setText("Image");
 		mShowLastImageButton->fillSpaceHorizontally();
-		mShowLastImageButton->setHeight(60);
 		mShowLastImageButton->addButtonListener(this);
 
 		mSettingsButton = new Button();
 		mSettingsButton->setText("Settings");
 		mSettingsButton->fillSpaceHorizontally();
-		mSettingsButton->setHeight(60);
 		mSettingsButton->addButtonListener(this);
 
 		mZoomOutButton = new Button();
 		mZoomOutButton->setText("Zoom -");
 		mZoomOutButton->fillSpaceHorizontally();
-		mZoomOutButton->setHeight(60);
 		mZoomOutButton->addButtonListener(this);
 
 		mSecondLayoutWidget = new HorizontalLayout();
 		mSecondLayoutWidget->fillSpaceHorizontally();
-		mSecondLayoutWidget->setHeight(60);
+
+		if(isWP7())
+		{
+			mZoomInButton->setHeight(80);
+			mZoomInButton->setFontSize(17);
+			mZoomOutButton->setHeight(80);
+			mZoomOutButton->setFontSize(17);
+			mSettingsButton->setHeight(80);
+			mSettingsButton->setFontSize(17);
+			mShowLastImageButton->setHeight(80);
+			mShowLastImageButton->setFontSize(17);
+			mSecondLayoutWidget->setHeight(80);
+		}
+		else
+		{
+			mZoomInButton->setHeight(60);
+			mZoomOutButton->setHeight(60);
+			mSettingsButton->setHeight(60);
+			mShowLastImageButton->setHeight(60);
+			mSecondLayoutWidget->setHeight(60);
+		}
 
 		//Adding buttons to the horizontal Layout
 		mSecondLayoutWidget->addChild(mZoomInButton);
@@ -276,10 +292,9 @@ public:
 
 	void setupCameraSize()
 	{
-		MA_CAMERA_FORMAT *cameraFormat = new(MA_CAMERA_FORMAT);
-		cameraFormat->height = 270;
-		cameraFormat->width = 270;
-		maCameraFormat(0, cameraFormat);
+		int numFormats = maCameraFormatNumber();
+		//Choose the smallest possible format.
+		mCameraFormat = numFormats-1;
 	}
 
 	/**
@@ -362,7 +377,7 @@ public:
 			maDestroyObject(mLastEnc);
 		}
 		mLastEnc = maCreatePlaceholder();
-		maCameraSnapshot(0, mLastEnc);
+		maCameraSnapshot(mCameraFormat, mLastEnc);
 		setupCameraProperties();
 		maCameraStart();
 	}
@@ -431,6 +446,22 @@ private:
 
 	/* maximum zoom supported by the camera*/
 	int maxZoom;
+
+	/* Size of the taken picture */
+	int mCameraFormat;
+
+	/**
+	 * isWP7 function verifies if the platform is Windows Phone 7
+	 * @return true if we are running on WP7 otherwise false
+	 */
+	bool isWP7()
+	{
+		char platform[20];
+		maGetSystemProperty("mosync.device.OS", platform, 20);
+
+		if(strcmp(platform, "iPhone OS") == 0 || strcmp(platform, "Android") == 0) return false;
+		return true;
+	}
 };
 
 // That's the screen class finished, now we move on to the Moblet that

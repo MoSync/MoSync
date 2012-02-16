@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project supports-build-configs="false" version="1.4">
+<project supports-build-configs="true" version="1.4">
 <criteria>
 <filter type="com.mobilesorcery.sdk.capabilities.devices.elementfactory">
 <capabilities optional="" required="File\ Storage Internet\ Access"/>
@@ -38,11 +38,11 @@
 <property key="build.prefs:memory.stack/Release" value="512"/>
 <property key="build.prefs:project.type" value=""/>
 <property key="dependency.strategy" value="0"/>
+<property key="excludes" value=""/>
 <property key="excludes/Debug" value=""/>
 <property key="excludes/Release" value=""/>
-<property key="template.id" value="project.cpp"/>
-<property key="excludes" value=""/>
 <property key="profile.mgr.type" value="0"/>
+<property key="template.id" value="project.cpp"/>
 <property key="winmobilecs:guid" value="4712e6c0-2e12-102f-8088-bfd156f1e6aa"/>
 </properties>
 </project>
