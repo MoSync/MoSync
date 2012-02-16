@@ -2246,7 +2246,9 @@ public class MoSyncThread extends Thread
 		// Try to load the resource file, if we get an exception
 		// it just means that this application has no resource file
 		// and that is not an error.
-		if (((flag & MA_RESOURCE_OPEN) != 0) && (mResourceFd == null)) {
+		if (((mResourceFd != null) && (!mResourceFd.valid())) ||
+				(((flag & MA_RESOURCE_OPEN) != 0) && (mResourceFd == null)))
+		{
 			mResourceFd = getResourceFileDesriptor();
 		}
 
@@ -2714,7 +2716,10 @@ public class MoSyncThread extends Thread
 			}
 
 			SYSLOG("Decode a bitmap!");
-			Bitmap bitmap = BitmapFactory.decodeByteArray(ra, 0, length);
+
+			Bitmap bitmap = decodeImageFromData(ra, null);
+
+			//Bitmap bitmap = BitmapFactory.decodeByteArray(ra, 0, length);
 			if(bitmap != null)
 			{
 				SYSLOG("Bitmap was created!");

@@ -15,8 +15,6 @@
 #define LABEL_BG_COLOR					0x111111
 #define FONT_COLOR						0xFFFFFF
 
-#define FRAME_DELAY						50
-
 #define DEFAULT_IMAGE_INDEX				0
 
 ImageScreenWithButtons::ImageScreenWithButtons() :
@@ -31,7 +29,7 @@ ImageScreenWithButtons::~ImageScreenWithButtons() {
 	delete mNextImage;
 	delete mPreviousImage;
 
-	delete imageLayout;
+	delete mImageLayout;
 	delete mButtonBar;
 	delete mMainLayout;
 
@@ -75,19 +73,33 @@ void ImageScreenWithButtons::CreateUI() {
 	mMainLayout->fillSpaceHorizontally();
 	mMainLayout->fillSpaceVertically();
 
-	imageLayout = new NativeUI::HorizontalLayout();
-	imageLayout->fillSpaceHorizontally();
-	imageLayout->fillSpaceVertically();
-	imageLayout->setChildVerticalAlignment(MAW_ALIGNMENT_CENTER);
+	mImageLayout = new NativeUI::HorizontalLayout();
+	mImageLayout->fillSpaceHorizontally();
+	mImageLayout->fillSpaceVertically();
+	mImageLayout->setChildVerticalAlignment(MAW_ALIGNMENT_CENTER);
 
 	LoadImages();
 
 	mCurrentPosition = DEFAULT_IMAGE_INDEX;
-	imageLayout->addChild(mImages[DEFAULT_IMAGE_INDEX]);
+	mImageLayout->addChild(mImages[DEFAULT_IMAGE_INDEX]);
 	mImages[DEFAULT_IMAGE_INDEX]->showImage();
-	imageLayout->setChildHorizontalAlignment(MAW_ALIGNMENT_CENTER);
+	mImageLayout->setChildHorizontalAlignment(MAW_ALIGNMENT_CENTER);
 
-	mMainLayout->addChild(imageLayout);
+	mImageNameLayout = new NativeUI::HorizontalLayout();
+	mImageNameLayout->fillSpaceHorizontally();
+	mImageNameLayout->wrapContentVertically();
+	mImageNameLayout->setChildHorizontalAlignment(MAW_ALIGNMENT_CENTER);
+
+	mImageName = new NativeUI::Label();
+	mImageName->wrapContentVertically();
+	mImageName->wrapContentVertically();
+	mImageName->setText(mImages[DEFAULT_IMAGE_INDEX]->getName());
+	mImageName->setFontColor(FONT_COLOR);
+
+	mImageNameLayout->addChild(mImageName);
+
+	mMainLayout->addChild(mImageLayout);
+	mMainLayout->addChild(mImageNameLayout);
 	mMainLayout->addChild(mButtonBar);
 
 	this->setMainWidget(mMainLayout);
@@ -146,17 +158,19 @@ void ImageScreenWithButtons::LoadImages() {
 		mCurrentPosition++;
 		mCurrentPosition %= mImagesSize;
 
-		imageLayout->removeChild(mImages[lastPosition]);
+		mImageLayout->removeChild(mImages[lastPosition]);
 		mImages[mCurrentPosition]->showImage();
-		imageLayout->addChild(mImages[mCurrentPosition]);
+		mImageLayout->addChild(mImages[mCurrentPosition]);
+		mImageName->setText(mImages[mCurrentPosition]->getName());
 	} else if (mPreviousImage == button) {
 		int lastPosition = mCurrentPosition;
 		mCurrentPosition = mImagesSize + (mCurrentPosition - 1);
 		mCurrentPosition %= mImagesSize;
 
-		imageLayout->removeChild(mImages[lastPosition]);
+		mImageLayout->removeChild(mImages[lastPosition]);
 		mImages[mCurrentPosition]->showImage();
-		imageLayout->addChild(mImages[mCurrentPosition]);
+		mImageLayout->addChild(mImages[mCurrentPosition]);
+		mImageName->setText(mImages[mCurrentPosition]->getName());
 	}
 }
 
