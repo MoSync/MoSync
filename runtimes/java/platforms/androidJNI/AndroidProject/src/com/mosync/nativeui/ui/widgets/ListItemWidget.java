@@ -18,6 +18,7 @@ MA 02110-1301, USA.
 package com.mosync.nativeui.ui.widgets;
 
 import android.graphics.Typeface;
+import android.util.TypedValue;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -35,7 +36,7 @@ import com.mosync.nativeui.util.properties.PropertyConversionException;
 /**
  * A class that represents a standardized list element, that
  * contains a label and an optional icon.
- * 
+ *
  * @author fmattias
  */
 public class ListItemWidget extends Layout
@@ -44,14 +45,14 @@ public class ListItemWidget extends Layout
 	 * Label in the list layout.
 	 */
 	private TextView m_label = null;
-	
+
 	/**
 	 * Icon in the list layout.
 	 */
 	private ImageView m_icon = null;
 
 	/**
-	 * 
+	 *
 	 * @param handle
 	 * @param layout
 	 * @param label
@@ -60,7 +61,7 @@ public class ListItemWidget extends Layout
 	public ListItemWidget(int handle, ViewGroup layout, TextView label, ImageView icon)
 	{
 		super( handle, layout );
-		
+
 		m_label = label;
 		m_icon = icon;
 	}
@@ -84,16 +85,16 @@ public class ListItemWidget extends Layout
 		}
 		else if (property.equals( IX_WIDGET.MAW_LIST_VIEW_ITEM_FONT_SIZE ) )
 		{
-			m_label.setTextSize( FloatConverter.convert(value) );
+			m_label.setTextSize(TypedValue.COMPLEX_UNIT_PX, FloatConverter.convert(value) );
 		}
 		else
 		{
 			return super.setProperty( property, value );
 		}
-		
+
 		return true;
 	}
-	
+
 	@Override
 	public String getProperty(String property)
 	{
