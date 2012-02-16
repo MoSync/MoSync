@@ -7,13 +7,6 @@ Vibrates the device for the specified amount of time.
 
 - __time:__ Milliseconds to vibrate the device. 1000 milliseconds equals 1 second (`Number`)
 
-Supported Platforms
--------------------
-
-- Android
-- iOS
-- Windows Phone 7
-
 Quick Example
 -------------
 

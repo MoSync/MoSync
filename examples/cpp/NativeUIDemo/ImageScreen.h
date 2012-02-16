@@ -7,6 +7,7 @@
 #include <NativeUI/VerticalLayout.h>
 #include <NativeUI/Button.h>
 #include <NativeUI/Image.h>
+#include <NativeUI/Label.h>
 
 /**
  * An extension to the Image widget.
@@ -81,7 +82,9 @@ private:
 	NativeUI::HorizontalLayout* mButtonBar;
 	MAUtil::Vector<CustomImage*> mImages;
 	NativeUI::VerticalLayout* mMainLayout;
-	NativeUI::HorizontalLayout* imageLayout;
+	NativeUI::HorizontalLayout* mImageLayout;
+	NativeUI::HorizontalLayout* mImageNameLayout;
+	NativeUI::Label* mImageName;
 	int mScreenWidth;
 	int mScreenHeight;
 	int mCurrentPosition;

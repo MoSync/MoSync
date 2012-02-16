@@ -1124,6 +1124,12 @@ namespace Base
 		JNIEnv* jNIEnv,
 		jobject jThis);
 
+	//int maAudioPause(in MAAudioInstance audio);
+	int _maAudioPause(
+		int audio,
+		JNIEnv* jNIEnv,
+		jobject jThis);
+
 	//int maAudioStop(in MAAudioInstance audio);
 	int _maAudioStop(
 		int audio,

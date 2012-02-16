@@ -12,12 +12,6 @@ window.openDatabase returns a new Database object.
 
 This method will create a new SQL Lite Database and return a Database object.  Use the Database Object to manipulate the data.
 
-Supported Platforms
--------------------
-
-- Android
-- BlackBerry WebWorks (OS 6.0 and higher)
-- iPhone
 
 Quick Example
 -------------

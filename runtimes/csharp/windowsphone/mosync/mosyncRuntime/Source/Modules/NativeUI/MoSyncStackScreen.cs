@@ -61,7 +61,8 @@ namespace MoSync
                 {
                     MoSync.Util.RunActionOnMainThreadSync(() =>
                         {
-                            mPage.Content = (child as NativeUI.WidgetBaseWindowsPhone).View;
+                            mPage.Children.Add(((child as NativeUI.Screen).View as Grid));
+                            Grid.SetColumn(mPage.Children[mPage.Children.Count - 1] as Grid, 0);
                         });
                 }
                 /**
@@ -90,6 +91,40 @@ namespace MoSync
              */
             public void Pop()
             {
+                postPopEvent();
+
+                /**
+                 * If the stack is not empty show the top element of the stack
+                 */
+                if (0 < mStack.Count)
+                {
+                    MoSync.Util.RunActionOnMainThreadSync(() =>
+					{
+                        Grid.SetColumn(mPage.Children[mPage.Children.Count - 1] as Grid, 0);
+					});
+                }
+            }
+
+            /**
+             * The pop from back call implementation
+             */
+            public void PopFromBackButtonPressed()
+            {
+                postPopEvent();
+                /**
+                 * If the stack is not empty show the top element of the stack
+                 */
+                if (0 < mStack.Count)
+                {
+                    Grid.SetColumn(mPage.Children[mPage.Children.Count - 1] as Grid, 0);
+                }
+            }
+
+            /**
+             * Pops the screen form the stack and posts the custom event
+             */
+            private void postPopEvent()
+            {
                 /**
                  * If the stack has more than one item pop it and post the MAW_EVENT_STACK_SCREEN_POPPED event
                  */
@@ -105,25 +140,17 @@ namespace MoSync
                     const int MAWidgetEventData_fromHandle = 8;
                     const int MAWidgetEventData_toHandle = 12;
 
+                    mPage.Children.Remove((mStack.Peek() as Screen).View as FrameworkElement);
+
                     eventData.WriteInt32(MAWidgetEventData_eventType, MoSync.Constants.MAW_EVENT_STACK_SCREEN_POPPED);
                     eventData.WriteInt32(MAWidgetEventData_widgetHandle, mHandle);
                     eventData.WriteInt32(MAWidgetEventData_fromHandle, (mStack.Pop() as Screen).GetHandle());
                     eventData.WriteInt32(MAWidgetEventData_toHandle, (mStack.Peek() as Screen).GetHandle());
+
                     /**
                      * posting a CustomEvent
                      */
                     mRuntime.PostCustomEvent(MoSync.Constants.EVENT_TYPE_WIDGET, eventData);
-                }
-
-                /**
-                 * If the stack is not empty show the top element of the stack
-                 */
-                if (0 < mStack.Count)
-                {
-                    //MoSync.Util.RunActionOnMainThreadSync(() =>
-					//{
-						(View as Microsoft.Phone.Controls.PhoneApplicationPage).Content = (mStack.Peek() as NativeUI.WidgetBaseWindowsPhone).View;
-					//});
                 }
             }
 

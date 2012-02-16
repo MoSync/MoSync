@@ -17,12 +17,6 @@ The `compass.watchHeading` gets the device's current heading at a regular interv
 
 The returned watch ID references references the compass watch interval. The watch ID can be used with `compass.clearWatch` to stop watching the compass.
 
-Supported Platforms
--------------------
-
-- Android
-- iOS
-- Windows Phone 7 ( Mango ) if available in hardware
 
 
 Quick Example

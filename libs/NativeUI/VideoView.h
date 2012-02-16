@@ -32,6 +32,7 @@ MA 02110-1301, USA.
  * \brief An instance of VideoView is used for managing the playback of a movie
  * from a file or a network stream.
  * For video view events see VideoViewListener.
+ * Note: This widget is not available on Windows Phone 7.
  */
 
 #ifndef NATIVEUI_VIDEO_VIEW_H_
@@ -50,6 +51,7 @@ namespace NativeUI
      * movie from a file or a network stream.
      *
      * For video view events see VideoViewListener.
+	 * Note: This widget is not available on Windows Phone 7.
      */
     class VideoView : public Widget
     {

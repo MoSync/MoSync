@@ -12,8 +12,14 @@ namespace MoSync
     public class SystemPropertyManager
     {
         public delegate String SystemPropertyProvider(String key);
-        public static Dictionary<String, SystemPropertyProvider> mSystemPropertyProviders =
+        private static Dictionary<String, SystemPropertyProvider> mSystemPropertyProviders =
             new Dictionary<string, SystemPropertyProvider>();
+
+
+		public static void ClearSystemPropertyProviders()
+		{
+			mSystemPropertyProviders.Clear();
+		}
 
         public static void RegisterSystemPropertyProvider(String key, SystemPropertyProvider provider)
         {
@@ -106,7 +112,7 @@ namespace MoSync
 			{
 				if (mVibrateController == null)
 					mVibrateController = Microsoft.Devices.VibrateController.Default;
-				
+
 				// more than 5 seconds aren't allowed..
 				if (_ms > 5000)
 					_ms = 5000;
@@ -151,9 +157,6 @@ namespace MoSync
         public void Init(Ioctls ioctls, Core core, Runtime runtime)
         {
 			mRuntime = runtime;
-
-            // add system property providers
-            SystemPropertyManager.mSystemPropertyProviders.Clear();
 
             /**
              * Register system properties
@@ -260,7 +263,33 @@ namespace MoSync
                 if (value == null)
                     return -2;
                 if (value.Length + 1 <= _size)
+                {
+                    if(key.Equals("mosync.network.type"))
+                    {
+                        /**
+                         * This code converts the result return by the GetSystemProperty
+                         * for the "mosync.network.type" key to be supported by the current
+                         * MoSync SDK 3.0
+                         */
+                        if (value.ToLower().Contains("wireless"))
+                        {
+                            value = "wifi";
+                        }
+                        else if(value.ToLower().Contains("ethernet"))
+                        {
+                            value = "ethernet";
+                        }
+                        else if(value.ToLower().Contains("mobilebroadbandgsm"))
+                        {
+                            value = "2g";
+                        }
+                        else if (value.ToLower().Contains("mobilebroadbandcdma"))
+                        {
+                            value = "3g";
+                        }
+                    }
                     core.GetDataMemory().WriteStringAtAddress(_buf, value, _size);
+                }
                 return value.Length + 1;
             };
         }

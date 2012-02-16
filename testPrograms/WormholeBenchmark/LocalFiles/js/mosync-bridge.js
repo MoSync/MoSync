@@ -16,7 +16,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301, USA.
 */
 
-/**
+
+/*
  * @file mosync-bridge.js
  * @author Mikael Kindborg, Ali Sarrafi
  *
@@ -28,7 +29,12 @@ MA 02110-1301, USA.
  */
 var mosync = (function()
 {
+	// The main object of the library.
 	var mosync = {};
+
+	// This variable keeps track of the time out for our
+	// HTML "Toasts", so that they display sequentially.
+	var HTMLToastTimeOut = 0;
 
 	// Detect platform.
 
@@ -43,6 +49,96 @@ var mosync = (function()
 	mosync.isWindowsPhone =
 		navigator.userAgent.indexOf("Windows Phone OS") != -1;
 
+	// Alerts and logging.
+
+	mosync.notification = {};
+
+	/**
+	 * Displays a "toast" message box using HTML,
+	 * similar to a Toast on Android. Can be used
+	 * as a replacement for alert on platforms that
+	 * do not support it.
+	 *
+	 * @param message String with message to show.
+	 * @param durationInMilliseconds Optional parameter
+	 * that specifies the time the message will be shown,
+	 * defaults to 3000 (three seconds) if omitted.
+	 *
+	 * Note: This function works less well together with
+	 * JavaScript libraries that manipulate the DOM at
+	 * the same time.
+	 */
+	mosync.notification.HTMLToast = function(message, durationInMilliseconds)
+	{
+		var toast = document.createElement("div");
+		var width = window.innerWidth - 40;
+		toast.style.width = width + "px";
+		toast.style.position = "absolute";
+		toast.style.left = "10px";
+		toast.style.top = "10px";
+		toast.style.padding = "10px";
+		toast.style.borderRadius = '8px';
+		toast.style.MozBorderRadius = '8px';
+		toast.style.WebkitBorderRadius = '8px';
+		toast.style.background = "#FFFFFF";
+		toast.style.border = "1px solid #000000";
+		toast.style.fontFamily = "sans-serif";
+		toast.style.fontSize = "18px";
+		toast.style.fontWeight = "bold";
+		toast.style.color = "#000000";
+		toast.style.visibility = "visible";
+		toast.style.zIndex = "10000";
+		toast.innerHTML = message;
+
+		// Default value of toast display time.
+		var duration = 3000;
+		if (durationInMilliseconds)
+		{
+			duration = durationInMilliseconds;
+		}
+
+		// Time duration until time to display this toast.
+		var timeToDisplayToast = 0;
+		var timeNow = new Date().getTime();
+		var timeToNextTimeout = HTMLToastTimeOut - timeNow;
+		if (timeToNextTimeout > 0)
+		{
+			timeToDisplayToast = timeToNextTimeout;
+		}
+
+		// Update time point for accumulated time out.
+		HTMLToastTimeOut = timeNow + timeToDisplayToast + duration;
+
+		setTimeout(
+			function()
+			{
+				document.body.appendChild(toast);
+				setTimeout(
+					function()
+					{
+						document.body.removeChild(toast);
+					},
+					duration);
+			},
+			timeToDisplayToast);
+	};
+
+	/**
+	 * Displays a native message box.
+	 *
+	 * @param title String with message box title.
+	 * @param message String with message to show.
+	 */
+	mosync.notification.messageBox = function(title, message)
+	{
+		mosync.bridge.sendJSON({
+			messageName:"PhoneGap",
+			service:"mosync",
+			action:"mosync.notification.messageBox",
+			title:title,
+			message:message});
+	};
+
 	// console.log does not work on WP7.
 	if (typeof console === "undefined")
 	{
@@ -50,7 +146,17 @@ var mosync = (function()
 	}
 	if (typeof console.log === "undefined")
 	{
+		// TODO: Send console output somewhere.
 		console.log = function(s) {};
+	}
+
+	// alert does not work on WP7, replace with
+	// call to maMessageBox.
+	if (mosync.isWindowsPhone)
+	{
+		window.alert = function(message) {
+			mosync.notification.messageBox("Message", message);
+		};
 	}
 
 	// The encoder submodule.
@@ -144,16 +250,13 @@ var mosync = (function()
 		 */
 		encoder.encodeString = function(s)
 		{
-			var length;
+			// On all current platforms (Android, iOS, Windows Phone)
+			// strings are converted to UTF8 strings when passed from JS
+			// to the underlying layer (Java, Objective-C, C#). Therefore
+			// we need to calculate the length of the UTF8 encoded string
+			// data and use that as the length of the message string.
+			var length = encoder.lengthAsUTF8(s);
 			var encodedString = "";
-			if (mosync.isAndroid)
-			{
-				length = encoder.lengthAsUTF8(s);
-			}
-			else
-			{
-				length = s.length;
-			}
 			return encodedString.concat(encoder.itox(length), " ", s, " ");
 		};
 
@@ -199,7 +302,7 @@ var mosync = (function()
 
 			// If there is a callback function supplied, create
 			// a callbackId and add it to the callback table.
-			if (undefined != callbackFun)
+			if (callbackFun)
 			{
 				callbackIdCounter = callbackIdCounter + 1;
 				callbackTable[callbackIdCounter] = callbackFun;
@@ -259,7 +362,7 @@ var mosync = (function()
 		{
 			// If there is a callback function supplied, create
 			// a callbackId and add it to the callback table.
-			if (undefined != callbackFun)
+			if (callbackFun)
 			{
 				callbackIdCounter = callbackIdCounter + 1;
 				callbackTable[callbackIdCounter] = callbackFun;
@@ -383,7 +486,7 @@ var mosync = (function()
 		bridge.reply = function(callbackId)
 		{
 			var callbackFun = callbackTable[callbackId];
-			if (undefined != callbackFun)
+			if (callbackFun)
 			{
 				// Remove the first param, the callbackId.
 				var args = Array.prototype.slice.call(arguments);

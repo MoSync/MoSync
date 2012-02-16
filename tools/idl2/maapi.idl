@@ -400,6 +400,7 @@ interface MAAPI {
 
 	/**
 	* Returns the screen size.
+	* Returns the screen size.
 	*/
 	MAExtent maGetScrSize();
 
@@ -5320,7 +5321,8 @@ group WidgetAPI "Widget API" {
 		/**
 		* @brief Sets the font size in points of the label's text.
 		*
-		* @validvalue A float that specifies the number of points.
+		* @validvalue A float that specifies the number of pixels on Android
+		* and WP7, and number of points on iOS.
 		*
 		* @setonly
 		*
@@ -5444,7 +5446,8 @@ group WidgetAPI "Widget API" {
 		/**
 		* @brief Sets the font size in points of the button's text.
 		*
-		* @validvalue A float that specifies the number of points.
+		* @validvalue A float that specifies the number of pixels on Android
+		* and WP7, and number of points on iOS.
 		*
 		* @setonly
 		*
@@ -5553,7 +5556,8 @@ group WidgetAPI "Widget API" {
 		/**
 		* @brief Sets the font size in points of the button's text.
 		*
-		* @validvalue A float that specifies the number of points.
+		* @validvalue A float that specifies the number of pixels on Android
+		* and WP7, and number of points on iOS.
 		*
 		* @setonly
 		*
@@ -5980,7 +5984,8 @@ group WidgetAPI "Widget API" {
 		/**
 		* @brief Sets the font size in points of the text part.
 		*
-		* @validvalue A float that specifies the number of points.
+		* @validvalue A float that specifies the number of pixels on Android
+		* and WP7, and number of points on iOS.
 		*
 		* @setonly
 		*
@@ -7105,7 +7110,8 @@ group WidgetAPI "Widget API" {
 		/**
 		* @brief Sets the font size in points of the title.
 		*
-		* @validvalue A float that specifies the number of points.
+		* @validvalue A float that specifies the number of pixels on Android
+		* and WP7, and number of points on iOS.
 		*
 		* @setonly
 		*
@@ -8759,6 +8765,7 @@ group NFCAPI "NFC API" {
 
 			constset int MA_AUDIO_ERR_ {
 				OK = 0;
+				// Invalid instance, the given MAAudioInstance can't do this
 				INVALID_INSTANCE = -2;
 				INVALID_DATA = -3;
 				INVALID_FILENAME = -4;
@@ -8776,109 +8783,157 @@ group NFCAPI "NFC API" {
 		} // end of Audio API constants
 
 		/**
-		* A multi sound audio API which allows applications to play
-		* Only available on Android and iOS
+		* The Audio API gives the developer more control over playing music and
+		* and sound effects in MoSync applications.
+		* The Audio API uses streaming and non-streaming audio sources.
+		* The streaming could be songs for playing in the background in games.
+		* The non-streaming sounds should instead be used as sound effects.
+		* Please consider using short, as in a couple of seconds, samples in MP3
+		* format instead of WAV due to differences between platforms and WAV
+		* playback problems on Android.
+		* @attention The Audio API is only available on Android and iOS!
 		*/
 		group AudioAPIFunctions "Audio API Functions" {
 
 			/**
-			* \brief creates a MAAudioData from a binary MoSync resource
-			* Loads a binary resource and creates a MAAudioData if possible
-			* \param mime	The mime string for the resource. Can be NULL
-			* \param data	The binary resource
-			* \param offset The offset in the binary file to where the data starts
-			* \param length	The length of the data to use
-			* \param flags	MA_AUDIO_DATA_STREAM means that the audio should be streamed
-			*		either from disk or over HTTP. This is for music playback.
-			*		Sound effects should have the flag set to 0.
-			* \return	A MAAudioData index >0
-			*		<0 on fail
+			* @brief Creates a MAAudioData handle from a MoSync resource.
+			* @param mime 	The mime string for the resource. Can be NULL
+			* @param data 	The binary resource
+			* @param offset The offset in the binary file to where the data starts
+			* @param length The length of the data to use
+			* @param flags 	MA_AUDIO_DATA_STREAM means that the audio should be streamed
+			*				either from disk or over HTTP. This is only for music playback,
+			*				sound effects should have the flag set to 0.
+			* @return A MAAudioData handle or <0 on error.
 			*/
 			MAAudioData maAudioDataCreateFromResource(in MAString mime, in MAHandle data, in int offset, in int length, in int flags);
 
 			/**
-			*
+			* @brief Creates a MAAudioData handle from an URL or file path.
+			* @param mime 	The mime string for the resource. Can be NULL
+			* @param url 	The URL to the resource file. Accepts 'http://' or 'http://' for
+			*				streaming from internet. Without protcol file is assumed.
+			* @param flags 	MA_AUDIO_DATA_STREAM means that the audio should be streamed
+			*				either from disk or over HTTP. This is only for music playback,
+			*				sound effects should have this flag set to 0.
+			* @return 		A MAAudioData handle or <0 on error.
+			* @attention 	iOS Only supports loading local files.
 			*/
 			MAAudioData maAudioDataCreateFromURL(in MAString mime, in MAString url, in int flags);
 
 			/**
+			* @brief Destroys a MAAudioData handle and releases used memory
 			*
+			* @param audioData 	The MAAudioData handle.
+			* @return 			MA_AUDIO_ERR_OK on success or <0 on fail.
 			*/
 			int maAudioDataDestroy(in MAAudioData audioData);
 
 			/**
+			* @brief Creates a MAAudioInstance handle from a MAAudioData handle.
+			*
+			* @param audioData 	The MAAudioData handle
+			*
+			* @return 			A MAAudioInstance handle or <0 on error.
 			*
 			*/
 			MAAudioInstance maAudioInstanceCreate(in MAAudioData audioData);
 
 			/**
-			*
+			* @brief Destroys a MAAudioInstance handle releases used memory
+			* @param audioInstance 	The MAAudioInstance handle
+			* @return 				MA_AUDIO_ERR_OK on success,
+			*						<0 on error.
 			*/
 			int maAudioInstanceDestroy(in MAAudioInstance audioInstance);
 
 			/**
-			*
+			* @brief Returns the lenght in milliseconds for this instance.
+			* @param audio 	The MAAudioInstance handle
+			* @return 		The lenght in milliseconds,
+			*				<0 on error.
 			*/
 			int maAudioGetLength(in MAAudioInstance audio);
 
 			/**
+			* @brief Sets the number of loops this instance will play
 			*
+			* @param audio 	The MAAudioInstance handle
+			* @param loops 	0 means play once,
+			*				>0 means loop 'loops' times,
+			* 				-1 means loop forever.
+			* @return 		MA_AUDIO_ERR_OK on success, <0 on error.
 			*/
 			int maAudioSetNumberOfLoops(in MAAudioInstance audio, in int loops);
 
 			/**
-			* \brief Prepares an audio instance before playback
-			* If asynchronous the call will return directly, but the
-			* audio instance will not be ready for playback.
-			* If synchronous the call will block until finished
-			* and the audio instance will be ready directly.
-			* An EVENT_TYPE_AUDIO_PREPARED event will be triggered for the asynchronous prepare.
-			* Notes:
-			* Android: If a streaming audio is already playing and a new one is being prepared,
-			* the playing audio will stop.
-			* \param audio The audio instance
-			* \param async 0 if synchronus, 1 if asynchronous
-			* \return 	MA_AUDIO_ERR_OK on success
+			* @brief Prepares an MAAudioInstance before playback.
+			* If prepared asynchronous the call will return directly, but the
+			* MAAudioInstance will not be ready for playback until
+			* an EVENT_TYPE_AUDIO_PREPARED event has been sent.
+			* If synchronous the call will block execution until finished
+			* and the MAAudioInstance will be ready directly.
+			* @attention 	If a streaming audio is already playing and a new one is being prepared,
+			* 				on some platforms the playing audio will stop.
+			*
+			* @param audio The MAAudioInstance handle
+			* @param async 0 if synchronus, 1 if asynchronous
+			* @return 	MA_AUDIO_ERR_OK on success
 			*		MA_AUDIO_ERR_INVALID_INSTANCE on invalid audio instance
 			*		MA_AUDIO_ERR_ALREADY_PREPARED on already prepared audio instance
 			*/
 			int maAudioPrepare(in MAAudioInstance audio, in int async);
 
 			/**
-			* \brief Plays the current sound in the audio instance
-			* If the sound hasn't been prepared it will be prepared before playing.
-			* Notes:
-			* Android: If the audio hasn't been prepared it will be synchrounous prepared before playing,
-			* this means that there might be a delay before this call returns. Always make sure that your
-			* audio has been properly prepared before playing.
+			* @brief Plays the current MAAudioInstance.
+			* @attention 	If the audio hasn't been prepared, on Android, it will be synchrounous
+			*				prepared before playing, this means that there might be a delay before
+			*				this call returns. Always make sure that your audio has been properly
+			*				prepared before playing.
+			* @param audio The MAAudioInstance handle.
+			* @return MA_AUDIO_ERR_OK on success, <0 on error.
 			*/
 			int maAudioPlay(in MAAudioInstance audio);
 
 			/**
-			*
+			* @brief Sets the current position in milliseconds.
+			* @param audio 			The MAAudioInstance handle.
+			* @param milliseconds 	The number of milliseconds from the start.
+			* @return 				MA_AUDIO_ERR_OK on success,
+			*						<0 on error.
 			*/
 			int maAudioSetPosition(in MAAudioInstance audio, in int milliseconds);
 
 			/**
-			*
+			* @brief Gets the current position in milliseconds.
+			* @param audio 	The MAAudioInstance handle.
+			* @return 		The current playing position in milliseconds,
+			*				<0 on error.
 			*/
 			int maAudioGetPosition(in MAAudioInstance audio);
 
 			/**
-			*
+			* @brief Sets the volume for this MAAudioInstance.
+			* @param audio 		The MAAudioInstance handle.
+			* @return 			MA_AUDIO_ERR_OK on success,
+			*					<0 on error
 			*/
 			int maAudioSetVolume(in MAAudioInstance audio, in float volume);
 
 			/**
-			* \brief Pauses the the audio instance.
+			* @brief Pauses the MAAudioInstance if it's playing.
 			* It will stay prepared, so the sound can be resumed at any time using maAudioPlay.
+			* @param audio The MAAudioInstance handle.
+			* @return MA_AUDIO_ERR_OK on success, <0 on error.
 			*/
 			int maAudioPause(in MAAudioInstance audio);
 
 			/**
-			* \brief Stops the the audio instance and sets the position to the beginning.
-			* The audio instance will be unprepared, meaning all it's prepared buffers will
-			* be unloaded. In order to play the sound again the instance has to be prepared.
+			* @brief Stops the the audio instance and sets the position to the beginning.
+			* The audio instance might be unprepared, meaning all it's prepared buffers might
+			* be released.
+			* @param audio The MAAudioInstance handle.
+			* @return MA_AUDIO_ERR_OK on success, <0 on error.
 			*/
 			int maAudioStop(in MAAudioInstance audio);
 		}// End of Audio API Functions

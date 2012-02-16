@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html>
 <head>
 	<meta name="viewport" content="width=320, user-scalable=no">
@@ -11,7 +10,8 @@
 	<script src="js/jqtouch/jqtouch.min.js" type="application/x-javascript"
 		charset="utf-8"></script>
 
-	<!-- Import JQTouch default style (iPhone look). Replace the string "themes/default" with "themes/jqt" for a neutral (black) theme -->
+	<!-- Import JQTouch default style (iPhone look). Replace the string
+		"themes/default" with "themes/jqt" for a neutral (black) theme -->
 	<link type="text/css" rel="stylesheet" media="screen"
 		href="js/jqtouch/jqtouch.css">
 	<!-- <link type="text/css" rel="stylesheet" media="screen"
@@ -28,44 +28,55 @@
 	<script type="text/javascript" charset="utf-8" src="w3csensors.js"></script>
 	<script type="text/javascript" charset="utf-8" src="filemanager.js"></script>
 
-	<!-- JavaScript goes here -->
 	<script type="text/javascript">
 		/**
-		* A function that dynamically adds CSS or JavaScript files to the curent HTML file
-		*
-		* @param filename name of the file that should be added
-		* @param filetype type of the file can be either 'css' or 'script'
-		*/
+		 * Dynamically load a CSS or JavaScript file to the
+		 * current HTML file.
+		 *
+		 * @param filename Name of the file that should be added.
+		 * @param filetype Type of the file, can be either 'css' or 'script'.
+		 */
 		function loadjscssfile(filename, filetype)
 		{
-			 if (filetype=="js"){ //if filename is a external JavaScript file
-			  var fileref=document.createElement('script')
-			  fileref.setAttribute("type","text/javascript")
-			  fileref.setAttribute("src", filename)
-			 }
-			 else if (filetype=="css"){ //if filename is an external CSS file
-			  var fileref=document.createElement("link")
-			  fileref.setAttribute("rel", "stylesheet")
-			  fileref.setAttribute("type", "text/css")
-			  fileref.setAttribute("href", filename)
-			 }
-			 if (typeof fileref!="undefined")
-			  document.getElementsByTagName("head")[0].appendChild(fileref)
+			var fileref = null;
+
+			if (filetype == "js")
+			{
+				// If filename is a external JavaScript file.
+				fileref = document.createElement('script');
+				fileref.setAttribute("type","text/javascript");
+				fileref.setAttribute("src", filename);
+			}
+			else if (filetype == "css")
+			{
+				// If filename is an external CSS file.
+				fileref = document.createElement("link");
+				fileref.setAttribute("rel", "stylesheet");
+				fileref.setAttribute("type", "text/css");
+				fileref.setAttribute("href", filename);
+			}
+
+			// Add the object to the head tag.
+			if (fileref != null)
+			{
+				document.getElementsByTagName("head")[0].appendChild(fileref);
+			}
 		}
 
-		//Load different themes for different platforms
-		if(mosync.isIOS)
+		// Load different themes for different platforms.
+		if (mosync.isIOS)
 		{
 			loadjscssfile("js/themes/apple/theme.css", "css");
-			// Fire up JQTouch
+			// Fire up JQTouch.
 			var jQT = $.jQTouch({
 				statusBar : 'black',
 			});
 		}
-		else if(mosync.isAndroid)
+		else if (mosync.isAndroid)
 		{
 			loadjscssfile("js/themes/artspot/theme.css", "css");
-			// Fire up JQTouch without animations due to its limitations on Android
+			// Fire up JQTouch without animations due to its
+			// limitations on Android.
 			var jQT = $.jQTouch({
 				statusBar : 'black',
 				useAnimations: false
@@ -75,7 +86,8 @@
 		else if (mosync.isWindowsPhone)
 		{
 			loadjscssfile("js/themes/jqt/theme.css", "css");
-			// Fire up JQTouch without animations due to its limitations on Windows Phone
+			// Fire up JQTouch without animations due to its
+			// limitations on Windows Phone.
 			var jQT = $.jQTouch({
 				statusBar : 'black',
 				useAnimations: false
@@ -84,30 +96,25 @@
 		else
 		{
 			loadjscssfile("js/themes/apple/theme.css", "css");
-			// Fire up JQTouch
+			// Fire up JQTouch.
 			var jQT = $.jQTouch({
 				statusBar : 'black',
 				useAnimations: false
 			});
 		}
 
-
-
 		// Make sure we get the correct event type on every touch system.
 		var clickEvent = mosync.isIOS ? "tap" : "click";
-		//var clickEvent = "click";
 
 		/**
-		 * Will be called after all the markup in <body> was loaded
+		 * Will be called after all the markup in <body> was loaded.
 		 */
 		function initialize()
 		{
 			// This is the on-screen back button in jQTouch.
 			$("button.back").bind(clickEvent, function(e)
 			{
-				console.log("@@@ BACK 1.1");
 				jQT.goBack();
-				console.log("@@@ BACK 2.1");
 			});
 
 			// This is the PhoneGap back button event, triggered by the
@@ -116,8 +123,6 @@
 				"backbutton",
 				function()
 				{
-					console.log("@@@ BACKBUTTON pressed");
-					console.log("@@@ jQT.hist.length: " + jQT.hist.length);
 					// Are we on the first page?
 					if (jQT.hist.length == 1)
 					{
@@ -126,36 +131,24 @@
 					}
 					else
 					{
-						console.log("@@@ BACK 1.2");
 						// Same action as software back button.
 						jQT.goBack();
-						console.log("@@@ BACK 2.2");
 					}
 				},
 				true);
 
-			// We bind this to make sure that the file list refreshes
-			// as soon as the user goes to the file manager page.
-			$("#fileStorage").bind("pageAnimationStart", function()
-			{
-				refreshFiles();
-			});
-
-			if(mosync.isAndroid)
+			// The <video> tag is kinda useless on Android.
+			if (mosync.isAndroid)
 			{
 				$('#videoPanel').remove();
 			}
 		}
 	</script>
-
-	<!-- CSS styles -->
-	<style type="text/css">
-	</style>
 </head>
 
-<!-- A simple JQTouch layout-->
 <body onload="initialize()">
 	<div id="jqt">
+
 		<!-- The main application menu -->
 		<div id="mainPage">
 			<div class="toolbar">
@@ -163,24 +156,26 @@
 			</div>
 			<ul class="rounded" style="text-align: center">
 				<li>
-				Welcome to Wormhole Demo!!
+					Welcome to Wormhole Demo!
 				</li>
 			</ul>
 			<ul class="rounded">
 				<li class="arrow"><a href="#DeviceInfo" id="DeviceInfoLink">View
-						Device Information</a></li>
-				<li class="arrow"><a href="#PhoneGapSensors" id="PhoneGapSensorsLink">PhoneGap
-						Compatible Sensors</a></li>
-				<li class="arrow"><a href="#W3cSensors" id="w3cSensorsLink">W3C Sensors</a></li>
-				<li class="arrow"><a href="#capture" id="PhoneGapCapture">Capture</a></li>
-				<li class="arrow"><a href="#fileStorage" id="fileStorageLink">File storage</a></li>
-				<li class="arrow"><a href="#notifications" id="PhoneGapNotifications">PhoneGap
-						Compatible Notifications</a></li>
+					Device Information</a></li>
+				<li class="arrow"><a href="#PhoneGapSensors" id="PhoneGapSensorsLink">
+					PhoneGap Compatible Sensors</a></li>
+				<li class="arrow"><a href="#W3cSensors" id="w3cSensorsLink">
+					W3C Sensors</a></li>
+				<li class="arrow"><a href="#capture" id="PhoneGapCapture">
+					Capture</a></li>
+				<li class="arrow"><a href="#fileStorage" id="fileStorageLink">
+					File Storage</a></li>
+				<li class="arrow"><a href="#notifications" id="PhoneGapNotifications">
+					PhoneGap Compatible Notifications</a></li>
 			</ul>
-
 		</div>
 
-		<!-- A panel listing info about the device and the OS-->
+		<!-- A panel listing info about the device and the OS -->
 		<div id="DeviceInfo">
 			<div class="toolbar">
 				<a class="button back" onclick="jQT.goBack()" id="backButton1">Back</a>
@@ -194,7 +189,7 @@
 			</ul>
 		</div>
 
-		<!-- Demo of the PhoneGap Sensor API-->
+		<!-- Demo of the PhoneGap Sensor API -->
 		<div id="PhoneGapSensors">
 			<div class="toolbar">
 				<h1 id="InfoTitle">Phonegap Sensors</h1>
@@ -229,7 +224,7 @@
 			</ul>
 		</div>
 
-		<!-- Demo of the W3C Sensor API specification implementation-->
+		<!-- Demo of the W3C Sensor API specification implementation -->
 		<div id="W3cSensors">
 			<div class="toolbar">
 				<h1 id="InfoTitle">Sensors 2</h1>
@@ -280,7 +275,7 @@
 			</ul>
 		</div>
 
-		<!-- A panel that demonstrates media capture capabilities-->
+		<!-- A panel that demonstrates media capture capabilities -->
 		<div id="capture">
 			<div class="toolbar">
 				<h1>Phonegap Capture</h1>
@@ -296,7 +291,7 @@
 			</ul>
 		</div>
 
-		<!-- PhoneGap notification API-->
+		<!-- PhoneGap notification API -->
 		<div id="notifications">
 			<div class="toolbar">
 				<h1>Phonegap Notifications</h1>
@@ -308,7 +303,7 @@
 			</ul>
 		</div>
 
-		<!-- File API demonstration. This panel is a list of files in a single folder-->
+		<!-- File API demonstration. This panel is a list of files in a single folder -->
 		<div id="fileStorage">
 			<div class="toolbar">
 				<h1>File storage</h1>
@@ -320,11 +315,11 @@
 			</ul>
 		</div>
 
-		<!-- This panel is accessed when the user selects a file-->
+		<!-- This panel is accessed when the user selects a file -->
 		<div id="filePage">
 			<div class="toolbar">
 				<h1 id="filePanelTitle">File</h1>
-				<a class="button back" onclick="jQT.goBack()" id="backButtonxvxcv">Back</a>
+				<a class="button back" onclick="refreshFiles();jQT.goBack()">Back</a>
 			</div>
 			<input type="button" class="button" value="Delete" onclick="deleteFile()"/>
 			<ul>

@@ -17,84 +17,32 @@ MA 02110-1301, USA.
 */
 
 /**
- * @file WebViewUtil.cpp
+ * @file FileUtil.cpp
  * @author Mikael Kindborg
  *
- * This file contains a utility library for working with WebViews.
+ * Utility library for working with files.
  */
 
 #include <ma.h>				// MoSync API
-#include <maprofile.h>		// Profile database
 #include <maheap.h>			// C memory allocation
 #include <mastring.h>		// C string functions
 #include <mavsprintf.h>		// C string functions
 #include <MAUtil/String.h>	// C++ String class
-#include <IX_WIDGET.h>		// Widget API
 #include <conprint.h>
-#include "WebViewUtil.h"
+#include "FileUtil.h"
 
 using namespace MoSync;
 
-// ================= Class PlatformUtil =================
+// ================= Class Platform =================
 
 /**
- * Create a PlatformHandler for the current platform.
- * The caller has the responsibility of deallocating the
- * returned instance.
+ * Create a Platform instance.
  */
 Platform* Platform::create()
 {
-	Platform::checkNativeUISupport();
-
-	if (Platform::isAndroid())
-	{
-		return new PlatformAndroid();
-	}
-	else if (Platform::isIOS())
-	{
-		return new PlatformIOS();
-	}
-	else
-	{
-		return NULL;
-	}
+	return new Platform();
 }
 
-/**
- * Error handling for devices that do not support NativeUI.
- * Here we throw a panic if NativeUI is not supported.
- */
-void Platform::checkNativeUISupport()
-{
-	int widget = maWidgetCreate(MAW_WEB_VIEW);
-	if (-1 == widget)
-	{
-		maPanic(0, "NativeUI is only available on Android and iOS.");
-	}
-	else
-	{
-		maWidgetDestroy(widget);
-	}
-}
-
-/**
- * Detects if the current platform is Android.
- * @return true if the platform is Android, false otherwise.
- */
-bool Platform::isAndroid()
-{
-	return NULL != strstr(MA_PROF_STRING_PLATFORM, "android");
-}
-
-/**
- * Detects if the current platform is iOS.
- * @return true if the platform is iOS, false otherwise.
- */
-bool Platform::isIOS()
-{
-	// TODO: Find a proper way to detect iOS.
-	return ! Platform::isAndroid();
-}
 
 /**
  * Constructor.
@@ -110,8 +58,6 @@ Platform::~Platform()
 {
 	// Nothing needs to be explicitly destroyed.
 }
-
-// ================= Class Platform =================
 
 /**
  * Get the path to the local file system.
@@ -328,182 +274,18 @@ MAUtil::String Platform::createTextFromHandle(MAHandle handle)
 		return "";
 	}
 
-    // Read text data from handle.
-    maReadData(handle, tempText, 0, size);
+	// Read text data from handle.
+	maReadData(handle, tempText, 0, size);
 
-    // Zero terminate string.
-    tempText[size] = 0;
+	// Zero terminate string.
+	tempText[size] = 0;
 
-    // Create String object.
-    MAUtil::String text = tempText;
+	// Create String object.
+	MAUtil::String text = tempText;
 
-    // Free temporary text.
-    free(tempText);
+	// Free temporary text.
+	free(tempText);
 
-    // Return text object.
-    return text;
-}
-
-// ================= Class PlatformUtilAndroid =================
-
-/**
- * Constructor.
- */
-PlatformAndroid::PlatformAndroid()
-{
-}
-
-/**
- * Destructor.
- */
-PlatformAndroid::~PlatformAndroid()
-{
-	// Nothing needs to be explicitly destroyed.
-}
-
-// ================= Class PlatformUtilIOS =================
-
-/**
- * Constructor.
- */
-PlatformIOS::PlatformIOS()
-{
-}
-
-/**
- * Destructor.
- */
-PlatformIOS::~PlatformIOS()
-{
-	// Nothing needs to be explicitly destroyed.
-}
-
-// ================= Class WebViewMessage =================
-
-/**
- * Registers a url hook for the given web view.
- * @param webView The web view to get messages from.
- */
-void WebViewMessage::getMessagesFor(MAWidgetHandle webView)
-{
-	maWidgetSetProperty(
-		webView,
-		MAW_WEB_VIEW_HARD_HOOK,
-		"mosync://.*");
-}
-
-/**
- * Constructor.
- */
-WebViewMessage::WebViewMessage(MAHandle dataHandle)
-{
-	if (NULL != dataHandle)
-	{
-		// Get length of the data, it is not zero terminated.
-		int dataSize = maGetDataSize(dataHandle);
-
-		// Allocate buffer for string data.
-		char* stringData = (char*) malloc(dataSize + 1);
-
-		// Get the data.
-		maReadData(dataHandle, stringData, 0, dataSize);
-
-		// Zero terminate.
-		stringData[dataSize] = 0;
-
-		// Set string data.
-		char* p = stringData + strlen("mosync://");
-		mMessageString = p;
-
-		// Destroy string data.
-		free(stringData);
-
-		// Destroy the data handle
-		maDestroyObject(dataHandle);
-	}
-}
-
-/**
- * Destructor.
- */
-WebViewMessage::~WebViewMessage()
-{
-	// Nothing needs to be explicitly destroyed.
-}
-
-/**
- * Returns the message string.
- */
-MAUtil::String WebViewMessage::getMessageString()
-{
-	return mMessageString.c_str();
-}
-
-/**
- * Checks if this message matches the given message name.
- */
-bool WebViewMessage::is(const MAUtil::String& messageName)
-{
-	// Start of messageName should be found at start of message string.
-	return 0 == mMessageString.find(messageName);
-}
-
-/**
- * Returns the parameter part of a message.
- */
-MAUtil::String WebViewMessage::getParams()
-{
-	// Must be at least three characters in a message
-	// that has a data part.
-	if (mMessageString.length() < 3)
-	{
-		return "";
-	}
-
-	// Find first slash.
-	int index = mMessageString.find("/");
-	if (MAUtil::String::npos == index)
-	{
-		return "";
-	}
-
-	// Return the substring after the slash.
-	return mMessageString.substr(index + 1);
-}
-
-/**
- * Returns a message parameter by index.
- * Parameters are separated by slashes.
- */
-MAUtil::String WebViewMessage::getParam(int index)
-{
-	// Get params.
-	MAUtil::String params = getParams();
-
-	// Find start slash of the param we look for.
-	int start = 0;
-	for (int i = 0; i < index; ++i)
-	{
-		start = params.find("/", start);
-		if (MAUtil::String::npos == start)
-		{
-			// Param not found.
-			return "";
-		}
-		// Move to position after slash.
-		start = start + 1;
-	}
-
-	// Is this the last param?
-	int end = params.find("/", start);
-	if (MAUtil::String::npos == end)
-	{
-		// Yes, last param, return rest of the string.
-		return params.substr(start);
-	}
-	else
-	{
-		// No, not last param, return param part of the string.
-		return params.substr(start, end);
-	}
+	// Return text object.
+	return text;
 }

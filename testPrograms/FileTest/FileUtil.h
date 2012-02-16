@@ -17,18 +17,17 @@ MA 02110-1301, USA.
 */
 
 /**
- * @file WebViewUtil.h
+ * @file FileUtil.h
  * @author Mikael Kindborg
  *
- * This file contains a utility library for working with WebViews.
+ * Utility library for working with files.
  */
 
-#ifndef MOSYNC_WEBVIEWUTIL_H_
-#define MOSYNC_WEBVIEWUTIL_H_
+#ifndef MOSYNC_FILEUTIL_H_
+#define MOSYNC_FILEUTIL_H_
 
 #include <ma.h>
 #include <MAUtil/String.h>
-#include <IX_WIDGET.h>
 
 namespace MoSync {
 
@@ -42,24 +41,6 @@ public:
 	 * Create an instance for the current platform.
 	 */
 	static Platform* create();
-
-	/**
-	 * Error handling for devices that do not support NativeUI.
-	 * Here we throw a panic if NativeUI is not supported.
-	 */
-	static void checkNativeUISupport();
-
-	/**
-	 * Detects if the current platform is Android.
-	 * @return true if the platform is Android, false otherwise.
-	 */
-	static bool isAndroid();
-
-	/**
-	 * Detects if the current platform is iOS.
-	 * @return true if the platform is iOS, false otherwise.
-	 */
-	static bool isIOS();
 
 	/**
 	 * Constructor.
@@ -129,106 +110,6 @@ public:
 	 * @return Handle to the open file, <0 on error.
 	 */
 	virtual MAHandle openFileForReading(const MAUtil::String& filePath);
-};
-
-/**
- * Class that contains Android platform utility methods.
- */
-class PlatformAndroid : public Platform
-{
-public:
-	/**
-	 * Constructor.
-	 */
-	PlatformAndroid();
-
-	/**
-	 * Destructor.
-	 */
-	virtual ~PlatformAndroid();
-};
-
-/**
- * Class that contains iOS platform utility methods.
- */
-class PlatformIOS : public Platform
-{
-public:
-	/**
-	 * Constructor.
-	 */
-	PlatformIOS();
-
-	/**
-	 * Destructor.
-	 */
-	virtual ~PlatformIOS();
-};
-
-/**
- * Class that reads and parses messages in the form of urls
- * sent from a web view as MAW_EVENT_WEB_VIEW_HOOK_INVOKED events.
- *
- * Message (urls) used with this class has the format:
- *
- *   mosync://MessageName/Param1/Param2/...
- *
- * Example JavaScript call (with no parameters):
- *
- *   document.location = "mosync://GetGeoLocation";
- *
- * To receive messages from a web from do an initial call to:
- *
- *   WebViewUtil::getMessagesFor(webView);
- *
- * TODO: Add copy constructor and assignment operator.
- */
-class WebViewMessage
-{
-private:
-	/**
-	 * The message string.
-	 */
-	MAUtil::String mMessageString;
-
-public:
-	/**
-	 * Registers a url hook for the given web view.
-	 * @param webView The web view to get messages from.
-	 */
-	static void getMessagesFor(MAWidgetHandle webView);
-
-public:
-	/**
-	 * Constructor.
-	 */
-	WebViewMessage(MAHandle dataHandle);
-
-	/**
-	 * Destructor.
-	 */
-	virtual ~WebViewMessage();
-
-	/**
-	 * Returns the message string.
-	 */
-	MAUtil::String getMessageString();
-
-	/**
-	 * Checks if this message matches the given message name.
-	 */
-	bool is(const MAUtil::String& messageName);
-
-	/**
-	 * Returns the parameter part of a message.
-	 */
-	MAUtil::String getParams();
-
-	/**
-	 * Returns a message parameter by index.
-	 * Parameters are separated by slashes.
-	 */
-	MAUtil::String getParam(int index);
 };
 
 } // namespace MoSync

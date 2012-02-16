@@ -86,7 +86,7 @@ public:
 
 		// The page in the "LocalFiles" folder to
 		// show when the application starts.
-		showPage("PageMain.html");
+		showPage("index.html");
 	}
 
 	/**

@@ -23,33 +23,28 @@ namespace MoSync
 
             ioctls.maAudioDataCreateFromResource = delegate(int _mime, int _data, int _offset, int _length, int _flags)
             {
-
-                return MoSync.Constants.MA_AUDIO_ERR_INVALID_SOUND_FORMAT;
+				return MoSync.Constants.IOCTL_UNAVAILABLE;
             };
 
             ioctls.maAudioDataDestroy = delegate(int _audioData)
             {
-
-                return MoSync.Constants.MA_AUDIO_ERR_OK;
+				return MoSync.Constants.IOCTL_UNAVAILABLE;
             };
 
 
             ioctls.maAudioInstanceCreate = delegate(int _audioData)
             {
-
-                return MoSync.Constants.MA_AUDIO_ERR_INVALID_DATA;
+				return MoSync.Constants.IOCTL_UNAVAILABLE;
             };
 
             ioctls.maAudioInstanceDestroy = delegate(int _audioInstance)
             {
-
-                return MoSync.Constants.MA_AUDIO_ERR_OK;
+				return MoSync.Constants.IOCTL_UNAVAILABLE;
             };
 
             ioctls.maAudioPlay = delegate(int _audioInstance)
             {
-
-                return MoSync.Constants.MA_AUDIO_ERR_OK;
+				return MoSync.Constants.IOCTL_UNAVAILABLE;
             };
         }
     }

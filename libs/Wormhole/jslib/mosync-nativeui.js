@@ -1,3 +1,21 @@
+/*
+Copyright (C) 2012 MoSync AB
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License,
+version 2, as published by the Free Software Foundation.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+MA 02110-1301, USA.
+*/
+
 /**
  * @file mosync.nativeui.js
  * @author Ali Sarrafi
@@ -363,6 +381,7 @@ mosync.nativeui.maWidgetGetProperty = function(widgetID, property,
 		error : errorCallback
 	};
 };
+
 
 /**
  * This function is called by C++ to inform creation of a widget If a creation
@@ -1116,6 +1135,20 @@ mosync.nativeui.create = function(widgetType, widgetID, params,
 };
 
 /**
+ * Destrys all of the created widgets and cleans up the memory.
+ * @private
+ */
+mosync.nativeui.destroyAll = function()
+{
+	for(var widget in mosync.nativeui.widgetIDList)
+	{
+		//Destroy all widgets and do not wait for anything
+		mosync.nativeui.maWidgetDestroy(widget, null, null, null);
+	}
+};
+
+
+/**
  * Stores the number of widgets that are waiting to be created. Used when
  * parsing the XML based input
  * @private
@@ -1334,7 +1367,8 @@ mosync.nativeui.createWidget = function(widget, parent) {
 					.getNativeAttrValue(attributeList[i].value);
 			if ((attrName != "id") && (attrName != "widgettype")
 					&& (attrValue != null)) {
-				if (attrName == "onevent") {
+				if ((attrName.toLowerCase() == "onevent") ||
+					(attrName.toLowerCase() == "onclick")) {
 
 					var functionData = attrValue;
 					eventList = {
@@ -1344,7 +1378,7 @@ mosync.nativeui.createWidget = function(widget, parent) {
 							eval(functionData);
 						}
 					};
-				} else if ((attrName == "image") || (attrName == "icon")) {
+				} else if ((attrName.toLowerCase() == "image") || (attrName.toLowerCase() == "icon")) {
 					imageResources = {
 						propertyType : attrName,
 						value : attrValue
@@ -1361,8 +1395,8 @@ mosync.nativeui.createWidget = function(widget, parent) {
 						value : attrValue
 					};
 				} else {
-					if ((attrName != "icon_ios")
-							&& (attrName != "icon_android")) {
+					if ((attrName.toLowerCase() != "icon_ios")
+							&& (attrName.toLowerCase() != "icon_android")) {
 						propertyList[attrName] = attrValue;
 					}
 				}
