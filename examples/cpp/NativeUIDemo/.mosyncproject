@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project supports-build-configs="false" version="1.4">
+<project supports-build-configs="true" version="1.4">
 <criteria>
 <filter type="com.mobilesorcery.sdk.capabilities.devices.elementfactory">
 <capabilities optional="" required="File\ Storage Internet\ Access"/>
