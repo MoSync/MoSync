@@ -106,7 +106,8 @@ namespace NativeUI
 
         /**
          * Set the font size in points of the item's text.
-         * @param size A float that specifies the number of points.
+         * @param size A float that specifies the number of pixels for Android
+         * and WP7, and number of points on iOS.
          * @return Any of the following result codes:
          * - #MAW_RES_OK if the property could be set.
          * - #MAW_RES_INVALID_PROPERTY_VALUE if the size value was invalid.

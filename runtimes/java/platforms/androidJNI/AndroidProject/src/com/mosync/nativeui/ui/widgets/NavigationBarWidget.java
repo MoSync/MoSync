@@ -19,6 +19,7 @@ package com.mosync.nativeui.ui.widgets;
 
 import android.graphics.Bitmap;
 import android.graphics.Typeface;
+import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -109,7 +110,7 @@ public class NavigationBarWidget extends Widget
 		}
 		else if( property.equals( IX_WIDGET.MAW_NAV_BAR_TITLE_FONT_SIZE ) )
 		{
-			text.setTextSize( FloatConverter.convert( value ) );
+			text.setTextSize(TypedValue.COMPLEX_UNIT_PX, FloatConverter.convert( value ) );
 		}
 		else
 		{
