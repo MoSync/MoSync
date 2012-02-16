@@ -57,6 +57,7 @@ namespace MoSync
                 //as the Pivot control
                 mPage.Children.Add(mPivot);
                 Grid.SetColumn(mPivot, 0);
+                Grid.SetRow(mPivot, 0);
             }
 
             /**

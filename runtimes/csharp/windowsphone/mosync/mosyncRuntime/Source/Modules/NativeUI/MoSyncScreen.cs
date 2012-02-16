@@ -46,6 +46,7 @@ namespace MoSync
             {
                 mPage = new Grid();
                 mPage.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+                mPage.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) });
                 mView = mPage;
 
                 /**
@@ -118,6 +119,7 @@ namespace MoSync
                 {
                     mPage.Children.Add(w.View);
                     Grid.SetColumn((w.View as FrameworkElement), 0);
+                    Grid.SetRow((w.View as FrameworkElement), 0);
                 });
             }
 
@@ -134,6 +136,7 @@ namespace MoSync
                     if (0 < mChildren.Count)
                     {
                         Grid.SetColumn((mPage.Children[mPage.Children.Count - 1] as FrameworkElement), 0);
+                        Grid.SetRow((mPage.Children[mPage.Children.Count - 1] as FrameworkElement), 0);
                     }
                 });
             }
@@ -153,6 +156,7 @@ namespace MoSync
                         if (0 < mChildren.Count)
                         {
                             Grid.SetColumn((mPage.Children[mPage.Children.Count - 1] as FrameworkElement), 0);
+                            Grid.SetRow((mPage.Children[mPage.Children.Count - 1] as FrameworkElement), 0);
                         }
                     });
                 }

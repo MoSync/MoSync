@@ -50,6 +50,7 @@ namespace MoSync
 
                 mPage.Children.Add(mPanorama);
                 Grid.SetColumn(mPanorama, 0);
+                Grid.SetRow(mPanorama, 0);
             }
 
             /**
