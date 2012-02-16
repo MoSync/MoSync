@@ -61,7 +61,8 @@ namespace MoSync
                 {
                     MoSync.Util.RunActionOnMainThreadSync(() =>
                         {
-                            mPage.Content = (child as NativeUI.WidgetBaseWindowsPhone).View;
+                            mPage.Children.Add(((child as NativeUI.Screen).View as Grid));
+                            Grid.SetColumn(mPage.Children[mPage.Children.Count - 1] as Grid, 0);
                         });
                 }
                 /**
@@ -99,7 +100,7 @@ namespace MoSync
                 {
                     MoSync.Util.RunActionOnMainThreadSync(() =>
 					{
-						(View as Microsoft.Phone.Controls.PhoneApplicationPage).Content = (mStack.Peek() as NativeUI.WidgetBaseWindowsPhone).View;
+                        Grid.SetColumn(mPage.Children[mPage.Children.Count - 1] as Grid, 0);
 					});
                 }
             }
@@ -115,7 +116,7 @@ namespace MoSync
                  */
                 if (0 < mStack.Count)
                 {
-                    (View as Microsoft.Phone.Controls.PhoneApplicationPage).Content = (mStack.Peek() as NativeUI.WidgetBaseWindowsPhone).View;
+                    Grid.SetColumn(mPage.Children[mPage.Children.Count - 1] as Grid, 0);
                 }
             }
 
@@ -139,10 +140,13 @@ namespace MoSync
                     const int MAWidgetEventData_fromHandle = 8;
                     const int MAWidgetEventData_toHandle = 12;
 
+                    mPage.Children.Remove((mStack.Peek() as Screen).View as FrameworkElement);
+
                     eventData.WriteInt32(MAWidgetEventData_eventType, MoSync.Constants.MAW_EVENT_STACK_SCREEN_POPPED);
                     eventData.WriteInt32(MAWidgetEventData_widgetHandle, mHandle);
                     eventData.WriteInt32(MAWidgetEventData_fromHandle, (mStack.Pop() as Screen).GetHandle());
                     eventData.WriteInt32(MAWidgetEventData_toHandle, (mStack.Peek() as Screen).GetHandle());
+
                     /**
                      * posting a CustomEvent
                      */
