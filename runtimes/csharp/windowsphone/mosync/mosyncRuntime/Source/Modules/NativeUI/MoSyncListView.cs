@@ -102,7 +102,7 @@ namespace MoSync
                     }
                     else
                     {
-                        item.HorizontalContentAlignment = HorizontalAlignment.Center;
+                        item.HorizontalContentAlignment = HorizontalAlignment.Left;
                     }
 
                     if (widget.fillSpaceVerticalyEnabled)
