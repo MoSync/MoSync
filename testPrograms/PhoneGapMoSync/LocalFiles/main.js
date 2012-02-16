@@ -1,4 +1,12 @@
 /**
+ * Display a message.
+ */
+function showMessage(message)
+{
+	document.getElementById("info").innerHTML = "<h4>" + message + "</h4>";
+}
+
+/**
  * The number of milliseconds to wait before executing the animation step.
  * Used in showing / hiding the push notification popover.
  */
@@ -67,7 +75,7 @@ var deviceInfo = function() {
 
 var getLocation = function() {
 	var suc = function(p) {
-		alert(p.coords.latitude + " " + p.coords.longitude);
+		showMessage(p.coords.latitude + " " + p.coords.longitude);
 	};
 	var locFail = function() {
 	};
@@ -110,7 +118,7 @@ var toggleAccel = function() {
 		options.frequency = 1000;
 		accelerationWatch = navigator.accelerometer.watchAcceleration(
 				updateAcceleration, function(ex) {
-					alert("accel fail (" + ex.name + ": " + ex.message + ")");
+					showMessage("accel fail (" + ex.name + ": " + ex.message + ")");
 				}, options);
 	}
 };
@@ -130,7 +138,7 @@ function dump_pic(data) {
 }
 
 function fail(msg) {
-	alert(msg);
+	showMessage(msg);
 }
 
 function show_pic() {
@@ -146,7 +154,7 @@ function close() {
 }
 
 function contacts_success(contacts) {
-	alert(contacts.length
+	showMessage(contacts.length
 			+ ' contacts returned.'
 			+ (contacts[2] && contacts[2].name ? (' Third contact is ' + contacts[2].name.formatted)
 					: ''));
@@ -457,4 +465,11 @@ function init() {
 	// doesn't have a scroll button
 	// document.addEventListener("touchmove", preventBehavior, false);
 	document.addEventListener("deviceready", deviceInfo, true);
+	document.addEventListener(
+		"backbutton",
+		function()
+		{
+			mosync.bridge.send(["close"]);
+		},
+		true);
 }

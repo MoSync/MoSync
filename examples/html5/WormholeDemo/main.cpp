@@ -1,15 +1,30 @@
+/*
+Copyright (C) 2012 MoSync AB
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License,
+version 2, as published by the Free Software Foundation.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+MA 02110-1301, USA.
+*/
+
 /**
  * @file main.cpp
  *
- * This template application shows how to extend the functionality
- * in HTML5/JS with custom code written in C++. See code below
- * for custom code added in methods handleMessageStreamJSON()
- * and handleMessageStream().
+ * Demo application that shows how to use the Wormhole JavaScript
+ * library. This file contains the C++ code that implements native
+ * functions in the JavaScript library.
  *
- * When reading the code below, it is good to know that there are
- * two message formats: JSON and string streams. String streams are
- * generally faster. See comments in the code below for further details.
- * PhoneGap uses JSON messages, NativeUI uses string streams.
+ * You don't need to change any code in this file unless you wish to
+ * implement some specific functionality in C/C++.
  */
 
 #include <Wormhole/WebAppMoblet.h>
@@ -102,7 +117,7 @@ public:
 		// Uncomment to print message data for debugging.
 		// You need to build the project in debug mode for
 		// the log output to be displayed.
-		printMessage(data);
+		//printMessage(data);
 
 		// Check the message protocol.
 		MessageProtocol protocol(data);
