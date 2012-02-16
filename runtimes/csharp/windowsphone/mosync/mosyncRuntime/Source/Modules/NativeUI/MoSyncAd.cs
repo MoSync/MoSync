@@ -54,9 +54,63 @@ namespace MoSync
             {
                 mAd = new Microsoft.Advertising.Mobile.UI.AdControl();
 
+                //add the event handlers
+                mAd.ErrorOccurred += new EventHandler<Microsoft.Advertising.AdErrorEventArgs>(adControlErrorOccurred);
+                mAd.IsEngagedChanged += new EventHandler(adControlEngagedChanged);
+                mAd.AdRefreshed += new EventHandler(adControlRefreshed);
+
                 mAd.HorizontalAlignment = HorizontalAlignment.Left;
                 mAd.VerticalAlignment = VerticalAlignment.Top;
                 View = mAd;
+            }
+
+            /**
+             * Raised when the AdControl encounters an error.
+             */
+            void adControlErrorOccurred(object sender, Microsoft.Advertising.AdErrorEventArgs e)
+            {
+                /**
+                 * post the event to MoSync runtime
+                 */
+                Memory eventData = new Memory(8);
+                const int MAWidgetEventData_eventType = 0;
+                const int MAWidgetEventData_widgetHandle = 4;
+                eventData.WriteInt32(MAWidgetEventData_eventType, MoSync.Constants.MA_ADS_EVENT_FAILED);
+                eventData.WriteInt32(MAWidgetEventData_widgetHandle, mHandle);
+                mRuntime.PostCustomEvent(MoSync.Constants.EVENT_TYPE_ADS_BANNER, eventData);
+            }
+
+            /*
+             * Raised when the user clicks the ad and the action dialog box appears.
+             * This event pauses the application when the action dialog box appears; for example, when the user clicks the ad.
+             */
+            void adControlEngagedChanged(object sender, EventArgs args)
+            {
+                /**
+                 * post the event to MoSync runtime
+                 */
+                Memory eventData = new Memory(8);
+                const int MAWidgetEventData_eventType = 0;
+                const int MAWidgetEventData_widgetHandle = 4;
+                eventData.WriteInt32(MAWidgetEventData_eventType, MoSync.Constants.MA_ADS_EVENT_ON_LEAVE_APPLICATION);
+                eventData.WriteInt32(MAWidgetEventData_widgetHandle, mHandle);
+                mRuntime.PostCustomEvent(MoSync.Constants.EVENT_TYPE_ADS_BANNER, eventData);
+            }
+
+            /*
+             * Raised when the AdControl receives a new ad.
+             */
+            void adControlRefreshed(object sender, EventArgs args)
+            {
+                /**
+                 * post the event to MoSync runtime
+                 */
+                Memory eventData = new Memory(8);
+                const int MAWidgetEventData_eventType = 0;
+                const int MAWidgetEventData_widgetHandle = 4;
+                eventData.WriteInt32(MAWidgetEventData_eventType, MoSync.Constants.MA_ADS_EVENT_LOADED);
+                eventData.WriteInt32(MAWidgetEventData_widgetHandle, mHandle);
+                mRuntime.PostCustomEvent(MoSync.Constants.EVENT_TYPE_ADS_BANNER, eventData);
             }
 
             /**

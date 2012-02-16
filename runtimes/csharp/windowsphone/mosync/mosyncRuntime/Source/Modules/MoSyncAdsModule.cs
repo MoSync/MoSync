@@ -96,6 +96,8 @@ namespace MoSync
                 {
                     return MoSync.Constants.MA_ADS_RES_ERROR;
                 }
+                mAd.SetHandle(handle);
+                mAd.SetRuntime(runtime);
 
                 return handle;
             };
@@ -144,8 +146,11 @@ namespace MoSync
                     return MoSync.Constants.MA_ADS_RES_INVALID_LAYOUT_HANDLE;
                 }
 
+                // add the banner to the parent widget
                 runtime.GetModule<NativeUIModule>().GetWidget(_layoutHandle).AddChild(
                     runtime.GetModule<NativeUIModule>().GetWidget(_bannerHandle));
+                // set the parent of the banner to be the layout on which is added
+                mAd.SetParent(runtime.GetModule<NativeUIModule>().GetWidget(_layoutHandle));
 
                 return MoSync.Constants.MA_ADS_RES_OK;
             };
