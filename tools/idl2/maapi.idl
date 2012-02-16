@@ -5701,15 +5701,19 @@ group WidgetAPI "Widget API" {
 			/**
 			* This flag is a hint to the implementation that during text editing,
 			* the initial letter of each word should be capitalized.
+			* Not available on Windows Phone 7.1.
 			*/
 			INITIAL_CAPS_WORD = 2;
 			/**
 			* This flag is a hint to the implementation that during text editing,
 			* the initial letter of each sentence should be capitalized.
+			* Input flag not available on Windows Phone 7.1 but the edit box
+			* type 'ANY' does this by default.
 			*/
 			INITIAL_CAPS_SENTENCE = 3;
 			/**
 			* Capitalize all characters automatically.
+			* Not available on Windows Phone 7.1.
 			*/
 			INITIAL_CAPS_ALL_CHARACTERS = 4;
 	    }
