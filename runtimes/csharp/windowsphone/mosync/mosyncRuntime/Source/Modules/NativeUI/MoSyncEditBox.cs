@@ -407,7 +407,8 @@ namespace MoSync
                     setWatermarkMode(true);
                     switch (inputType)
                     {
-                        case 0:			    //todo: check if Default this is equivalent option to MAW_EDIT_BOX_TYPE_ANY
+                        case 0:			    //MAW_EDIT_BOX_TYPE_ANY
+                            mEditBox.AcceptsReturn = true;
                             setInputMode(System.Windows.Input.InputScopeNameValue.Text);
                             break;
                         case 1:             //MAW_EDIT_BOX_TYPE_EMAILADDR
@@ -426,6 +427,7 @@ namespace MoSync
                             setInputMode(System.Windows.Input.InputScopeNameValue.Digits);
                             break;
                         case 6:             //MAW_EDIT_BOX_TYPE_SINGLE_LINE any text except for line breaks
+                            mEditBox.AcceptsReturn = false;
                             mEditBox.TextWrapping = TextWrapping.NoWrap;
                             break;
                     }
