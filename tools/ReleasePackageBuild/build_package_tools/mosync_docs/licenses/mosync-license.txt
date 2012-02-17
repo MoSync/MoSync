@@ -46,3 +46,5 @@ iphone-apns was originally written by Oliver Pahl, who has given permission to u
 http://blog.toshsoft.de/index.php?/archives/3-Sending-Apple-Push-Notifications-APN-in-C-Updated-Using-CA-Cert.html
 
 microsoft-public-license.txt covers the WritableBitmapEx library and the silverlight toolkit
+
+The MoSync Advertising API makes use of Google AdMob code to load ads. For its terms of use, see: http://www.admob.com/home/terms.
