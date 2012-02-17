@@ -485,6 +485,7 @@ static void nativePostEvent(JNIEnv* env, jobject jthis, jintArray eventBuffer)
 		 * intArray[3] - Hook type.
 		 * intArray[4] - Handle to url data.
 		 *
+		 * WIDGET_EVENT_RATING_STAR_VALUE_CHANGED
 		 */
 
 		// Allocate the widget event data structure.
@@ -545,6 +546,12 @@ static void nativePostEvent(JNIEnv* env, jobject jthis, jintArray eventBuffer)
 		{
 			widgetEvent->hookType = intArray[3];
 			widgetEvent->urlData = intArray[4];
+		}
+		else if (widgetEventType == MAW_EVENT_RATING_BAR_VALUE_CHANGED)
+		{
+			//widgetEvent->value = intArray[3];
+			memcpy( widgetEvent->value, intArray + 3, sizeof(jint) );
+			widgetEvent->fromUser = intArray[4];
 		}
 
 		event.data = (int)widgetEvent;

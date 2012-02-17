@@ -4295,6 +4295,20 @@ group WidgetAPI "Widget API" {
 			* Send by the OptionDialog view when a #EVENT_TYPE_OPTIONS_BOX_BUTTON_CLICKED event is received.
 			*/
 			int optionDialogButtonIndex;
+
+			struct {
+					/**
+					* The rating bar new value, when a #MAW_EVENT_RATING_BAR_VALUE_CHANGED event is received.
+					*/
+					float value;
+
+					/**
+					* The author that issued the event: the user, or programatically, when a
+					* #MAW_EVENT_RATING_BAR_VALUE_CHANGED event is received.
+					*/
+					int fromUser;
+			} ratingBarValueInfo;
+
 		}
 	}
 
@@ -4445,6 +4459,10 @@ group WidgetAPI "Widget API" {
 		*/
 		DIALOG_DISMISSED = 22;
 
+		/**
+		* @brief Sent when the value in a Rating Bar.
+		*/
+		RATING_BAR_VALUE_CHANGED = 23;
 	}
 
 	} // end of WidgetEventTypes
@@ -4927,6 +4945,31 @@ group WidgetAPI "Widget API" {
 		* See \ref WidgetPanoramaViewProperties "Panorama View properties" for the properties available
 		*/
 		PANORAMA_VIEW = "PanoramaView";
+
+		/**
+		* @brief A radio button available only on Android.
+		* Checking one radio button that belongs to a radio group unchecks any previously checked radio button within the same group.
+		* Intially, all of the radio buttons are unchecked.
+		* While it is not possible to uncheck a particular radio button, the radio group can be cleared to remove the checked state.
+		* See \ref WidgetRadioButtonProperties "Radio Button properties" for the properties available.
+		*/
+		RADIO_BUTTON = "RadioButton";
+
+		/**
+		* \brief A radio group is available only on Android.
+		* This class is used to create a multiple-exclusion scope for a set of the \link #MAW_RADIO_BUTTON RADIO_BUTTONS \endlink .
+		* See \ref WidgetRadioGroupProperties "Radio Group properties" for the properties available.
+		*/
+		RADIO_GROUP = "RadioGroup";
+
+		/**
+		* @brief A RatingBar is an extension of Slider and ProgressBar that shows a rating in stars.
+		* The user can touch/drag or use arrow keys to set the rating when using the default size RatingBar.
+		* When using a RatingBar that supports user interaction, placing widgets to the left or right of the
+		* RatingBar is discouraged.
+		* See \ref WidgetRatingBarProperties "Rating Bar properties" for the properties available.
+		*/
+		RATING_BAR = "RatingBar";
 	}
 	} // end of WidgetTypes
 
@@ -7199,6 +7242,124 @@ group WidgetAPI "Widget API" {
 
 	}
 	} // end of WidgetmodalDialogProperties
+
+	/**
+	* The available widget properties for a #MAW_RADIO_BUTTON. See \ref WidgetProperties "Widget properties" for more properties.
+	*/
+	group WidgetRadioButtonProperties "Radio Button properties" {
+	constset MAString MAW_RADIO_BUTTON_ {
+		/**
+		* @brief Set or get the checked state of the radio button.
+		* @validvalue A boolean string 'true' or 'false'.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+		*   maWidgetSetProperty(radioButtonHandle, MAW_RADIO_BUTTON_CHECKED, "true");
+		* \endcode
+		*/
+		CHECKED = "checked";
+
+		/**
+		* @brief Change the checked state of the view to the inverse of its current state.
+		* If the radio button is already checked, this method will not toggle the radio button.
+		* @validvalue No neccessary value needed.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*   maWidgetSetProperty(radioButtonHandle, MAW_RADIO_BUTTON_TOGGLE, "");
+		* \endcode
+		*/
+		TOGGLE = "toggle";
+		//TODO TEXT_COLOR, TEXT, GROUP_WITH(handle)
+	}
+	} // end of WidgetRadioButtonProperties
+
+	/**
+	* The available widget properties for a #MAW_RADIO_GROUP. See \ref WidgetProperties "Widget properties" for more properties.
+	*/
+	group WidgetRadioGroupProperties "Radio Button properties" {
+	constset MAString MAW_RADIO_GROUP_ {
+		/**
+		* @brief Set or get the checked state of the radio button.
+		* @validvalue An int specifying the radio button handle.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+		*   // Attach two radio buttons to this group.
+		*   maWidgetSetProperty(radioGroupHandle, MAW_RADIO_BUTTON_CHECKED, "3");
+		*   maWidgetSetProperty(radioGroupHandle, MAW_RADIO_BUTTON_CHECKED, "4");
+		* \endcode
+		*/
+		GROUP = "checked";
+
+		/**
+		* @brief Clear the selection.
+		* When the selection is cleared, no radio button in this group is selected and MAW_RADIO_GROUP_GET_CHECKED returns 0.
+		* @validvalue No neccessary value needed.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*   maWidgetSetProperty(radioGroupnHandle, MAW_RADIO_GROUP_CLEAR_CHECK, "");
+		* \endcode
+		*/
+		CLEAR_CHECK = "clearCheck";
+	}
+	} // end of WidgetRadioGroupProperties
+
+	/**
+	* The available widget properties for a #MAW_RATING_BAR. See \ref WidgetProperties "Widget properties" for more properties.
+	*/
+	group WidgetRatingBarProperties "Rating Bar properties" {
+	constset MAString MAW_RATING_BAR_ {
+		/**
+		* @brief Set or get the number of stars to show.
+		* @validvalue An int that specifies the number of stars to show.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+		*   maWidgetSetProperty(ratingBarHandle, MAW_RATING_BAR_NUM_STAR, "4");
+		* \endcode
+		*/
+		NUM_STAR = "numStar";
+
+		/*
+		* @brief Set or get the current rating (number of stars filled).
+		*
+		* @validvalue A float that specifies the number of stars filled.
+		*
+		* @setandget
+		* @par Example
+		* \code
+		*   maWidgetSetProperty(ratingBarHandle, MAW_RATING_BAR_RATING, "3");
+		* \endcode
+		*/
+		RATING = "rating";
+
+		/**
+		* @brief Set or get the step size (granularity) of this rating bar.
+		*
+		* @validvalue A float that specifies the step size.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+		*   maWidgetSetProperty(ratingBarHandle, MAW_RATING_BAR_GRANULARITY, "1");
+		* \endcode
+		*/
+		GRANULARITY = "granularity";
+	}
+	} // end of WidgetRatingBarProperties
 	} // end of WidgetProperties
 
 	typedef int MAWidgetHandle;

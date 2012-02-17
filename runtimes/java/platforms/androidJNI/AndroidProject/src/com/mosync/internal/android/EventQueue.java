@@ -234,6 +234,22 @@ public class EventQueue
 
 		sMoSyncThread.postEvent(event);
 	}
+	/**
+	 * Sends the rating set by a user in a Rating Bar view.
+	 * @param widgetHandle The rating bar that sends the event.
+	 * @param rating The number of stars filled.
+	 */
+	public void postRatingBarChanged(int widgetHandle, float rating)
+	{
+		int event[] = new int[4];
+
+		event[0] = EVENT_TYPE_WIDGET;
+		event[1] = IX_WIDGET.MAW_EVENT_RATING_BAR_CHANGED;
+		event[2] = widgetHandle;
+		event[3] =  Float.floatToIntBits(rating);
+
+		sMoSyncThread.postEvent(event);
+	}
 
 	public static EventQueue getDefault()
 	{
