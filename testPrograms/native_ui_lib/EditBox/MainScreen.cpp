@@ -77,6 +77,12 @@ enum InputFlagType {
 	CAPS_SENTENCE
 };
 
+enum FontSize {
+	FONT_SMALL        = 12 ,
+	FONT_LARGE        = 15 ,
+	FONT_EXTRA_LARGE  = 25 ,
+};
+
 /**
  * Constructor.
  */
@@ -101,6 +107,25 @@ MainScreen::MainScreen() :
 	mLinesNumberLabel(NULL),
 	mKeyboard(false)
 {
+	// Set the screen size, available for each screen.
+	MAExtent screenSize = maGetScrSize();
+	mScreenWidth = EXTENT_X(screenSize);
+	mScreenHeight = EXTENT_Y(screenSize);
+
+	// For small screens, use small fonts and padding.
+	if ( mScreenHeight < 600 )
+	{
+		mFontSize = FONT_SMALL;
+	}
+	else if( mScreenHeight < 800 )
+	{
+		mFontSize = FONT_LARGE;
+	}
+	else
+	{
+		mFontSize = FONT_EXTRA_LARGE;
+	}
+
 	createMainLayout();
 
 	mSetTextButton->addButtonListener(this);
@@ -207,15 +232,13 @@ void MainScreen::createMainLayout()
 	mMainListView = new ListView();
 	Screen::setMainWidget(mMainListView);
 
-	Label* info1 = new Label();
-	info1->setText("First edit box with Capitalize all characters");
-	mMainListView->addChild(info1);
-
+	VerticalLayout* editBoxLayout = new VerticalLayout();
 	mEditBox = new EditBox();
 	mEditBox->setPlaceholder("Enter text...");
 	mEditBox->setHeight(100);
 	mEditBox->fillSpaceHorizontally();
-	mMainListView->addChild(mEditBox);
+	editBoxLayout->addChild(mEditBox);
+	mMainListView->addChild(editBoxLayout);
 
 	HorizontalLayout* layout = new HorizontalLayout();
 	layout->setHeight(75);
@@ -282,17 +305,17 @@ void MainScreen::createDecimalEditBoxView(EditBox* &editBox, ListView* mainListV
 void MainScreen::createInputModeListView(ListView* mainListView)
 {
 	mInputModeListView = new ListView();
+	mInputModeListView->setHeight(200);
 
 	for(int i = 0; i < INPUT_MODES_COUNT; i++)
 	{
 		Label* inputModeLabel = new Label();
 		inputModeLabel->setText(inputModes[i]);
-		inputModeLabel->setFontSize(24);
+		inputModeLabel->setFontSize(mFontSize);
 		mInputModeListView->addChild(inputModeLabel);
 	}
 
 	mInputModeListView->fillSpaceHorizontally();
-	mInputModeListView->fillSpaceVertically();
 	mainListView->addChild(mInputModeListView);
 }
 
@@ -303,17 +326,17 @@ void MainScreen::createInputModeListView(ListView* mainListView)
 void MainScreen::createInputFlagListView(ListView* mainListView)
 {
 	mInputFlagListView = new ListView();
+	mInputFlagListView->setHeight(200);
 
 	for(int i = 0; i < INPUT_FLAGS_COUNT; i++)
 	{
 		Label* inputFlagLabel = new Label();
 		inputFlagLabel->setText(inputFlags[i]);
-		inputFlagLabel->setFontSize(24);
+		inputFlagLabel->setFontSize(mFontSize);
 		mInputFlagListView->addChild(inputFlagLabel);
 	}
 
 	mInputFlagListView->fillSpaceHorizontally();
-	mInputFlagListView->fillSpaceVertically();
 	mainListView->addChild(mInputFlagListView);
 }
 
