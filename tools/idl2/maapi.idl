@@ -4309,6 +4309,11 @@ group WidgetAPI "Widget API" {
 					int fromUser;
 			} ratingBarValueInfo;
 
+			/**
+			* The selected radio button from a radio group, when a #MAW_EVENT_RADIO_GROUP_ITEM_SELECTED event
+			* is received.
+			*/
+			int radioGroupItemHandle;
 		}
 	}
 
@@ -4460,9 +4465,14 @@ group WidgetAPI "Widget API" {
 		DIALOG_DISMISSED = 22;
 
 		/**
-		* @brief Sent when the value in a Rating Bar.
+		* @brief Send when the value in a Rating Bar.
 		*/
 		RATING_BAR_VALUE_CHANGED = 23;
+
+		/**
+		* @brief Send when one of the radio buttons in a radio group is selected.
+		*/
+		RADIO_GROUP_ITEM_SELECTED = 24;
 	}
 
 	} // end of WidgetEventTypes
@@ -4947,7 +4957,7 @@ group WidgetAPI "Widget API" {
 		PANORAMA_VIEW = "PanoramaView";
 
 		/**
-		* @brief A radio button available only on Android.
+		* @brief A radio button available only on Android. A radio button can only have a #RADIO_GROUP parent.
 		* Checking one radio button that belongs to a radio group unchecks any previously checked radio button within the same group.
 		* Intially, all of the radio buttons are unchecked.
 		* While it is not possible to uncheck a particular radio button, the radio group can be cleared to remove the checked state.
@@ -7250,6 +7260,7 @@ group WidgetAPI "Widget API" {
 	constset MAString MAW_RADIO_BUTTON_ {
 		/**
 		* @brief Set or get the checked state of the radio button.
+		*
 		* @validvalue A boolean string 'true' or 'false'.
 		*
 		* @setandget
@@ -7264,6 +7275,7 @@ group WidgetAPI "Widget API" {
 		/**
 		* @brief Change the checked state of the view to the inverse of its current state.
 		* If the radio button is already checked, this method will not toggle the radio button.
+		*
 		* @validvalue No neccessary value needed.
 		*
 		* @setonly
@@ -7274,7 +7286,34 @@ group WidgetAPI "Widget API" {
 		* \endcode
 		*/
 		TOGGLE = "toggle";
-		//TODO TEXT_COLOR, TEXT, GROUP_WITH(handle)
+
+		/**
+		* @brief Set or get the text to display.
+		*
+		* @validvalue A null-terminated string.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+		*   maWidgetSetProperty(radioButtonHandle, MAW_RADIO_BUTTON_TEXT, "Option A");
+		* \endcode
+		*/
+		TEXT = "text";
+
+		/**
+		* @brief Specifies the text color of the radio button.
+		*
+		* @validvalue A hexadecimal value 0xRRGGBB, where R, G and B are the red, green and blue components respectively.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(widgetHandle, MAW_RADIO_BUTTON_TEXT_COLOR, "0xff0000"); // Red
+		* \endcode
+		*/
+		TEXT_COLOR = "textColor";
 	}
 	} // end of WidgetRadioButtonProperties
 
@@ -7284,23 +7323,27 @@ group WidgetAPI "Widget API" {
 	group WidgetRadioGroupProperties "Radio Button properties" {
 	constset MAString MAW_RADIO_GROUP_ {
 		/**
-		* @brief Set or get the checked state of the radio button.
+		* @brief Add the radio buttons grouped in this widget.
+		* This is the only widget type that accepts Radio Buttons as children.
+		*
 		* @validvalue An int specifying the radio button handle.
 		*
-		* @setandget
+		* @setonly
 		*
 		* @par Example
 		* \code
 		*   // Attach two radio buttons to this group.
-		*   maWidgetSetProperty(radioGroupHandle, MAW_RADIO_BUTTON_CHECKED, "3");
-		*   maWidgetSetProperty(radioGroupHandle, MAW_RADIO_BUTTON_CHECKED, "4");
+		*   maWidgetSetProperty(radioGroupHandle, MAW_RADIO_GROUP_ADD_VIEW, "3");
+		*   maWidgetSetProperty(radioGroupHandle, MAW_RADIO_GROUP_ADD_VIEW, "4");
 		* \endcode
 		*/
-		GROUP = "checked";
+		ADD_VIEW = "addView";
 
 		/**
 		* @brief Clear the selection.
-		* When the selection is cleared, no radio button in this group is selected and MAW_RADIO_GROUP_GET_CHECKED returns 0.
+		* When the selection is cleared, no radio button in this group is selected and
+		* #MAW_RADIO_GROUP_GET_CHECKED returns 0.
+		*
 		* @validvalue No neccessary value needed.
 		*
 		* @setonly
@@ -7340,7 +7383,7 @@ group WidgetAPI "Widget API" {
 		* @setandget
 		* @par Example
 		* \code
-		*   maWidgetSetProperty(ratingBarHandle, MAW_RATING_BAR_RATING, "3");
+		*   maWidgetSetProperty(ratingBarHandle, MAW_RATING_BAR_RATING, "3.0");
 		* \endcode
 		*/
 		RATING = "rating";
@@ -7354,7 +7397,7 @@ group WidgetAPI "Widget API" {
 		*
 		* @par Example
 		* \code
-		*   maWidgetSetProperty(ratingBarHandle, MAW_RATING_BAR_GRANULARITY, "1");
+		*   maWidgetSetProperty(ratingBarHandle, MAW_RATING_BAR_GRANULARITY, "1.0");
 		* \endcode
 		*/
 		GRANULARITY = "granularity";

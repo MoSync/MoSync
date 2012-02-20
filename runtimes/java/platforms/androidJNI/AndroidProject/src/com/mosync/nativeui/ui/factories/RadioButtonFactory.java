@@ -20,6 +20,8 @@ package com.mosync.nativeui.ui.factories;
 import android.app.Activity;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.CompoundButton;
+import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 
@@ -30,7 +32,7 @@ import com.mosync.nativeui.ui.widgets.Widget;
 /**
  * Creates a radio button widget, that sends events once it's
  * state changes.
- * Radio buttons are automatically grouped inside RadioGroup element
+ * Radio buttons are grouped inside RadioGroup element
  * so that no more than one can be selected at a time.
  *
  * @author emma
@@ -42,15 +44,14 @@ public class RadioButtonFactory implements AbstractViewFactory
 	public Widget create(Activity activity, final int handle)
 	{
 		RadioButton radioButton = new RadioButton( activity );
-		radioButton.setOnClickListener(new OnClickListener() {
+		radioButton.setOnCheckedChangeListener(new OnCheckedChangeListener() {
 
 			@Override
-			public void onClick(View v) {
-
-//				EventQueue.getDefault( ).postWidgetClickedEvent( handle, isChecked );
-
+			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+				EventQueue.getDefault( ).postRadioButton(handle);
 			}
 		});
+
 		return new RadioButtonWidget( handle, radioButton);
 		}
 }

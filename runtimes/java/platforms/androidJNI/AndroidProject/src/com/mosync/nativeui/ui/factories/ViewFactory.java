@@ -127,6 +127,7 @@ public class ViewFactory
 		addFactory( IX_WIDGET.MAW_MODAL_DIALOG, new DialogFactory( ) );
 		addFactory( IX_WIDGET.MAW_NAV_BAR, new NavigationBarFactory( ) );
 		addFactory( IX_WIDGET.MAW_RADIO_BUTTON, new RadioButtonFactory( ) );
+		addFactory( IX_WIDGET.MAW_RADIO_GROUP, new RadioGroupFactory( ) );
 		addFactory( IX_WIDGET.MAW_RATING_BAR, new RatingBarFactory( ) );
 	}
 

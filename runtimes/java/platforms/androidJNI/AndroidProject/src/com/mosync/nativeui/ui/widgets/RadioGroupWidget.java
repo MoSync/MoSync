@@ -18,31 +18,28 @@ MA 02110-1301, USA.
 package com.mosync.nativeui.ui.widgets;
 
 import android.widget.RadioButton;
+import android.widget.RadioGroup;
 
 import com.mosync.internal.generated.IX_WIDGET;
 import com.mosync.nativeui.util.properties.BooleanConverter;
-import com.mosync.nativeui.util.properties.ColorConverter;
 import com.mosync.nativeui.util.properties.InvalidPropertyValueException;
 import com.mosync.nativeui.util.properties.PropertyConversionException;
 
 /**
- * A radio button widget is a two-states button that can be either checked
- * or unchecked.
- * Radio buttons are automatically grouped inside RadioGroup element
- * so that no more than one can be selected at a time.
+ * a radio group widget, that acts like a container for radio buttons.
  * @author emma
  */
-public class RadioButtonWidget extends Widget
+public class RadioGroupWidget extends Widget
 {
 	/**
 	 * Constructor.
 	 *
 	 * @param handle Integer handle corresponding to this instance.
-	 * @param radioButton A radioButton wrapped by this widget.
+	 * @param radioGroup A radio group wrapped by this widget.
 	 */
-	public RadioButtonWidget(int handle, RadioButton radioButton)
+	public RadioGroupWidget(int handle, RadioGroup radioGroup)
 	{
-		super( handle, radioButton );
+		super( handle, radioGroup );
 	}
 
 	@Override
@@ -54,18 +51,15 @@ public class RadioButtonWidget extends Widget
 			return true;
 		}
 
-		RadioButton radioButton = (RadioButton) getView( );
-		if( property.equals( IX_WIDGET.MAW_RADIO_BUTTON_TOGGLE ) )
+		RadioGroup radioGroup = (RadioGroup) getView( );
+		if( property.equals( IX_WIDGET.MAW_RADIO_GROUP_ADD_VIEW ) )
 		{
-			radioButton.toggle();
+			// Get the radio button widget and addview.
+
 		}
-		else if( property.equals( IX_WIDGET.MAW_RADIO_BUTTON_TEXT ) )
+		else if( property.equals( IX_WIDGET.MAW_RADIO_GROUP_CLEAR_CHECK ) )
 		{
-			radioButton.setText(value);
-		}
-		else if( property.equals( IX_WIDGET.MAW_RADIO_BUTTON_TEXT_COLOR ) )
-		{
-			radioButton.setTextColor( ColorConverter.convert( value ) );
+			radioGroup.clearCheck();
 		}
 		else
 		{
@@ -74,20 +68,4 @@ public class RadioButtonWidget extends Widget
 		return true;
 	}
 
-	/**
-	 * @see Widget.getProperty.
-	 */
-	@Override
-	public String getProperty(String property)
-	{
-		if( property.equals( IX_WIDGET.MAW_RADIO_BUTTON_TEXT ) )
-		{
-			RadioButton radioButton = (RadioButton) getView( );
-			return radioButton.getText().toString();
-		}
-		else
-		{
-			return super.getProperty( property );
-		}
-	}
 }

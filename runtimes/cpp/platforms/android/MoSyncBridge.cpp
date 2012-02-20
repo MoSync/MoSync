@@ -550,8 +550,12 @@ static void nativePostEvent(JNIEnv* env, jobject jthis, jintArray eventBuffer)
 		else if (widgetEventType == MAW_EVENT_RATING_BAR_VALUE_CHANGED)
 		{
 			//widgetEvent->value = intArray[3];
-			memcpy( widgetEvent->value, intArray + 3, sizeof(jint) );
+			//memcpy( widgetEvent->value, intArray + 3, sizeof(jint) );
 			widgetEvent->fromUser = intArray[4];
+		}
+		else if (widgetEventType == MAW_EVENT_RADIO_GROUP_ITEM_SELECTED)
+		{
+			widgetEvent->radioGroupItemHandle = intArray[3];
 		}
 
 		event.data = (int)widgetEvent;

@@ -18,35 +18,40 @@ MA 02110-1301, USA.
 package com.mosync.nativeui.ui.factories;
 
 import android.app.Activity;
-import android.widget.RatingBar;
-import android.widget.RatingBar.OnRatingBarChangeListener;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
+import android.widget.RadioGroup.OnCheckedChangeListener;
 
 import com.mosync.internal.android.EventQueue;
-import com.mosync.nativeui.ui.widgets.RatingBarWidget;
+import com.mosync.nativeui.ui.widgets.RadioGroupWidget;
 import com.mosync.nativeui.ui.widgets.Widget;
 
 /**
- * Creates an extension of SeekBar and ProgressBar that shows a rating in stars.
+ * Creates a radio group widget, that acts like a container for radio buttons.
+ * Radio buttons are grouped inside RadioGroup element so that no more than
+ * one can be selected at a time.
  *
  * @author emma
  */
-public class RatingBarFactory implements AbstractViewFactory
+public class RadioGroupFactory implements AbstractViewFactory
 {
 
 	@Override
 	public Widget create(Activity activity, final int handle)
 	{
-		RatingBar ratingBar = new RatingBar( activity );
-		ratingBar.setOnRatingBarChangeListener( new OnRatingBarChangeListener() {
+		RadioGroup radioGroup = new RadioGroup( activity );
+		radioGroup.setOnCheckedChangeListener(new OnCheckedChangeListener() {
 
 			@Override
-			public void onRatingChanged(RatingBar arg0, float rating, boolean fromUser) {
-				int intVal = (fromUser) ? 1 : 0;
-				EventQueue.getDefault( ).postRatingBarChanged(handle, rating, intVal);
+			public void onCheckedChanged(RadioGroup group, int checkedId) {
+				// Search the radio button with that id.
+				int radioButtonHandle = 0;
+				EventQueue.getDefault( ).postRadioGroupItemSelected(handle, radioButtonHandle);
 			}
 		});
 
-		return new RatingBarWidget( handle, ratingBar);
-	}
-
+		return new RadioGroupWidget( handle, radioGroup);
+		}
 }

@@ -20,7 +20,6 @@ package com.mosync.nativeui.ui.widgets;
 import android.widget.RatingBar;
 
 import com.mosync.internal.generated.IX_WIDGET;
-import com.mosync.nativeui.util.properties.BooleanConverter;
 import com.mosync.nativeui.util.properties.FloatConverter;
 import com.mosync.nativeui.util.properties.IntConverter;
 import com.mosync.nativeui.util.properties.InvalidPropertyValueException;
@@ -36,12 +35,11 @@ public class RatingBarWidget extends Widget
 	 * Constructor.
 	 *
 	 * @param handle Integer handle corresponding to this instance.
-	 * @param checkbox A checkbox wrapped by this widget.
+	 * @param ratingBar A rating bar wrapped by this widget.
 	 */
 	public RatingBarWidget(int handle, RatingBar ratingBar)
 	{
 		super( handle, ratingBar );
-		// TODO Auto-generated constructor stub
 	}
 
 	@Override

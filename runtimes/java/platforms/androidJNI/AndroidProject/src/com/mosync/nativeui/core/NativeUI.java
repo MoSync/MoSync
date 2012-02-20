@@ -25,6 +25,7 @@ import android.app.Activity;
 import android.graphics.Bitmap;
 import android.util.Log;
 import android.view.View;
+import android.widget.RadioButton;
 
 import com.mosync.internal.android.MoSyncCameraController;
 import com.mosync.internal.android.MoSyncHelpers;
@@ -44,6 +45,7 @@ import com.mosync.nativeui.ui.widgets.Layout;
 import com.mosync.nativeui.ui.widgets.ListItemWidget;
 import com.mosync.nativeui.ui.widgets.MoSyncScreenWidget;
 import com.mosync.nativeui.ui.widgets.NavigationBarWidget;
+import com.mosync.nativeui.ui.widgets.RadioButtonWidget;
 import com.mosync.nativeui.ui.widgets.ScreenWidget;
 import com.mosync.nativeui.ui.widgets.StackScreenWidget;
 import com.mosync.nativeui.ui.widgets.Widget;
@@ -307,6 +309,12 @@ public class NativeUI
 			Log.e( "MoSync", "maWidgetInsertChild: Cannot add a dialog to a widget. " );
 			return IX_WIDGET.MAW_RES_CANNOT_INSERT_DIALOG;
 		}
+		if ( child instanceof RadioButtonWidget )
+		{
+			Log.e( "MoSync", "maWidgetInsertChild: Cannot add a radio button to a layout, only to Radio Groups." );
+			return IX_WIDGET.MAW_RES_INVALID_HANDLE;
+		}
+
 		if ( parent.isDialog() )
 		{
 			DialogWidget parentAsDialog = (DialogWidget) parent;

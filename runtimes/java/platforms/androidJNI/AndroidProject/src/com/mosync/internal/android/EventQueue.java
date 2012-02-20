@@ -238,15 +238,50 @@ public class EventQueue
 	 * Sends the rating set by a user in a Rating Bar view.
 	 * @param widgetHandle The rating bar that sends the event.
 	 * @param rating The number of stars filled.
+	 * @param fromUser The author of the change event.
 	 */
-	public void postRatingBarChanged(int widgetHandle, float rating)
+	public void postRatingBarChanged(int widgetHandle, float rating, int fromUser)
+	{
+		int event[] = new int[5];
+
+		event[0] = EVENT_TYPE_WIDGET;
+		event[1] = IX_WIDGET.MAW_EVENT_RATING_BAR_VALUE_CHANGED;
+		event[2] = widgetHandle;
+		event[3] =  Float.floatToIntBits(rating);
+		event[4] = fromUser;
+
+		sMoSyncThread.postEvent(event);
+	}
+
+	/**
+	 * Sends the radio button handle when a selection is made.
+	 * @param widgethandle The radio group.
+	 * @param itemHandle The radio button.
+	 */
+	public void postRadioGroupItemSelected(int widgetHandle, int itemHandle)
 	{
 		int event[] = new int[4];
 
 		event[0] = EVENT_TYPE_WIDGET;
-		event[1] = IX_WIDGET.MAW_EVENT_RATING_BAR_CHANGED;
+		event[1] = IX_WIDGET.MAW_EVENT_RADIO_GROUP_ITEM_SELECTED;
 		event[2] = widgetHandle;
-		event[3] =  Float.floatToIntBits(rating);
+		event[3] =  itemHandle;
+
+		sMoSyncThread.postEvent(event);
+	}
+
+	/**
+	 * Sends the radio button state.
+	 * @param widgethandle The radio button that sends the event.
+	 * @param state
+	 */
+	public void postRadioButton(int widgetHandle)
+	{
+		int event[] = new int[3];
+
+		event[0] = EVENT_TYPE_WIDGET;
+//		event[1] = IX_WIDGET.MAW_EVENT_RADIO_GROUP_ITEM_SELECTED
+		event[2] = widgetHandle;
 
 		sMoSyncThread.postEvent(event);
 	}
