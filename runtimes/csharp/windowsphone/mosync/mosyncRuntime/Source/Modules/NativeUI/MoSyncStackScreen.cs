@@ -61,7 +61,13 @@ namespace MoSync
                 {
                     MoSync.Util.RunActionOnMainThreadSync(() =>
                         {
-                            mPage.Content = (child as NativeUI.WidgetBaseWindowsPhone).View;
+                            if (mPage.Children.Count > 0)
+                            {
+                                mPage.Children.RemoveAt(mPage.Children.Count - 1);
+                            }
+                            mPage.Children.Add((child as Screen).View);
+                            Grid.SetColumn(mPage.Children[mPage.Children.Count - 1] as Grid, 0);
+                            Grid.SetRow(mPage.Children[mPage.Children.Count - 1] as Grid, 0);
                         });
                 }
                 /**
@@ -99,7 +105,13 @@ namespace MoSync
                 {
                     MoSync.Util.RunActionOnMainThreadSync(() =>
 					{
-						(View as Microsoft.Phone.Controls.PhoneApplicationPage).Content = (mStack.Peek() as NativeUI.WidgetBaseWindowsPhone).View;
+                        if (mPage.Children.Count > 0)
+                        {
+                            mPage.Children.RemoveAt(mPage.Children.Count - 1);
+                        }
+                        mPage.Children.Add((mStack.Peek() as Screen).View);
+                        Grid.SetColumn(mPage.Children[mPage.Children.Count - 1] as Grid, 0);
+                        Grid.SetRow(mPage.Children[mPage.Children.Count - 1] as Grid, 0);
 					});
                 }
             }
@@ -115,7 +127,13 @@ namespace MoSync
                  */
                 if (0 < mStack.Count)
                 {
-                    (View as Microsoft.Phone.Controls.PhoneApplicationPage).Content = (mStack.Peek() as NativeUI.WidgetBaseWindowsPhone).View;
+                    if (mPage.Children.Count > 0)
+                    {
+                        mPage.Children.RemoveAt(mPage.Children.Count - 1);
+                    }
+                    mPage.Children.Add((mStack.Peek() as Screen).View);
+                    Grid.SetColumn(mPage.Children[mPage.Children.Count - 1] as Grid, 0);
+                    Grid.SetRow(mPage.Children[mPage.Children.Count - 1] as Grid, 0);
                 }
             }
 
@@ -143,6 +161,7 @@ namespace MoSync
                     eventData.WriteInt32(MAWidgetEventData_widgetHandle, mHandle);
                     eventData.WriteInt32(MAWidgetEventData_fromHandle, (mStack.Pop() as Screen).GetHandle());
                     eventData.WriteInt32(MAWidgetEventData_toHandle, (mStack.Peek() as Screen).GetHandle());
+
                     /**
                      * posting a CustomEvent
                      */

@@ -171,6 +171,7 @@ private:
 	 * Main layout.
 	 */
 	ListView* mMainListView;
+	VerticalLayout* mMainLayout;
 	EditBox* mEditBox;
 
 	Button* mSetTextButton;
@@ -212,6 +213,14 @@ private:
 	Label *mLinesNumberLabel;
 
 	bool mKeyboard;
+
+	/** Screen's width. */
+	int mScreenWidth;
+
+	/** Screen's height. */
+	int mScreenHeight;
+
+	int mFontSize;
 };
 
 

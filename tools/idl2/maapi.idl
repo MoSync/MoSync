@@ -400,6 +400,7 @@ interface MAAPI {
 
 	/**
 	* Returns the screen size.
+	* Returns the screen size.
 	*/
 	MAExtent maGetScrSize();
 
@@ -5320,7 +5321,8 @@ group WidgetAPI "Widget API" {
 		/**
 		* @brief Sets the font size in points of the label's text.
 		*
-		* @validvalue A float that specifies the number of points.
+		* @validvalue A float that specifies the number of pixels on Android
+		* and WP7, and number of points on iOS.
 		*
 		* @setonly
 		*
@@ -5444,7 +5446,8 @@ group WidgetAPI "Widget API" {
 		/**
 		* @brief Sets the font size in points of the button's text.
 		*
-		* @validvalue A float that specifies the number of points.
+		* @validvalue A float that specifies the number of pixels on Android
+		* and WP7, and number of points on iOS.
 		*
 		* @setonly
 		*
@@ -5553,7 +5556,8 @@ group WidgetAPI "Widget API" {
 		/**
 		* @brief Sets the font size in points of the button's text.
 		*
-		* @validvalue A float that specifies the number of points.
+		* @validvalue A float that specifies the number of pixels on Android
+		* and WP7, and number of points on iOS.
 		*
 		* @setonly
 		*
@@ -5984,7 +5988,8 @@ group WidgetAPI "Widget API" {
 		/**
 		* @brief Sets the font size in points of the text part.
 		*
-		* @validvalue A float that specifies the number of points.
+		* @validvalue A float that specifies the number of pixels on Android
+		* and WP7, and number of points on iOS.
 		*
 		* @setonly
 		*
@@ -7109,7 +7114,8 @@ group WidgetAPI "Widget API" {
 		/**
 		* @brief Sets the font size in points of the title.
 		*
-		* @validvalue A float that specifies the number of points.
+		* @validvalue A float that specifies the number of pixels on Android
+		* and WP7, and number of points on iOS.
 		*
 		* @setonly
 		*

@@ -59,7 +59,7 @@ public:
 		//Check if it's implemented on the current platform
 		if(-1 == mDefaultFont)
 		{
-			maPanic(0, "Device fonts is only available on Android and iOS.");
+			maPanic(0, "Device fonts is only available on Android, iOS and WP7.");
 		}
 
 		//This variable is used for scrolling the screen
