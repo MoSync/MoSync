@@ -31,6 +31,7 @@ MA 02110-1301, USA.
  * @date 1 Nov 2011
  *
  * @brief Provides a widget that displays advertisement to the user.
+ *
  * When the user taps a banner, it triggers an action programmed into
  * the advertisement.
  * Your application is notified when an action starts or stops.
