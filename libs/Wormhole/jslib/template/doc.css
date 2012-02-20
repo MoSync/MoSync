@@ -31,6 +31,7 @@ p {
   z-index:1;
   font-color: white;
 }
+
 #header_bar h1  {
 	color:#F6F4F2;
 	font-size:26px;
@@ -41,12 +42,11 @@ p {
 }
 
 #header_bar a img {
-	height:64px;
 	float: none;
 	margin:0px;
 	position: absolute;
-	top:0px;
-	left: 0px;
+	top:5px;
+	left: 5px;
 }
 
 #header_bar small {
