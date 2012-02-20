@@ -38,12 +38,15 @@ namespace MoSync
     {
         public class Screen : WidgetBaseWindowsPhone, IScreen
         {
-            protected PhoneApplicationPage mPage;
+            protected Grid mPage;
+            private string mTitle;
 
             //The constructor
             public Screen()
             {
-                mPage = new PhoneApplicationPage();
+                mPage = new Grid();
+                mPage.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+                mPage.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) });
                 mView = mPage;
 
                 /**
@@ -75,7 +78,7 @@ namespace MoSync
                             if ((this.mChildren[pivot.SelectedIndex] as StackScreen).StackCount() > 1 && (this.mChildren[pivot.SelectedIndex] as StackScreen).GetBackButtonEnabled() == true)
                             {
                                 //Do a pop and cancel the event
-                                (this.mChildren[pivot.SelectedIndex] as StackScreen).Pop();
+                                (this.mChildren[pivot.SelectedIndex] as StackScreen).PopFromBackButtonPressed();
                                 args.Cancel = true;
                             }
                         }
@@ -114,7 +117,9 @@ namespace MoSync
                 WidgetBaseWindowsPhone w = (WidgetBaseWindowsPhone)child;
                 MoSync.Util.RunActionOnMainThreadSync(() =>
                 {
-                    mPage.Content = w.View;
+                    mPage.Children.Add(w.View);
+                    Grid.SetColumn((w.View as FrameworkElement), 0);
+                    Grid.SetRow((w.View as FrameworkElement), 0);
                 });
             }
 
@@ -127,10 +132,11 @@ namespace MoSync
                 base.RemoveChild(child);
                 MoSync.Util.RunActionOnMainThreadSync(() =>
                 {
-                    mPage.Content = null;
+                    mPage.Children.Remove((child as WidgetBaseWindowsPhone).View as FrameworkElement);
                     if (0 < mChildren.Count)
                     {
-                        mPage.Content = (mChildren[mChildren.Count - 1] as WidgetBaseWindowsPhone).View;
+                        Grid.SetColumn((mPage.Children[mPage.Children.Count - 1] as FrameworkElement), 0);
+                        Grid.SetRow((mPage.Children[mPage.Children.Count - 1] as FrameworkElement), 0);
                     }
                 });
             }
@@ -146,9 +152,11 @@ namespace MoSync
                     base.RemoveChild(index);
                     MoSync.Util.RunActionOnMainThreadSync(() =>
                     {
+                        mPage.Children.RemoveAt(index);
                         if (0 < mChildren.Count)
                         {
-                            mPage.Content = (mChildren[mChildren.Count - 1] as WidgetBaseWindowsPhone).View;
+                            Grid.SetColumn((mPage.Children[mPage.Children.Count - 1] as FrameworkElement), 0);
+                            Grid.SetRow((mPage.Children[mPage.Children.Count - 1] as FrameworkElement), 0);
                         }
                     });
                 }
@@ -162,7 +170,7 @@ namespace MoSync
                 MoSync.Util.RunActionOnMainThreadSync(() =>
                 {
                     PhoneApplicationFrame frame = (PhoneApplicationFrame)Application.Current.RootVisual;
-                    frame.Content = mPage;
+                    (frame.Content as PhoneApplicationPage).Content = mPage;
                 });
             }
 
@@ -174,7 +182,15 @@ namespace MoSync
             {
                 set
                 {
-                    mPage.Title = value;
+                   mTitle = value;
+                }
+            }
+
+            public string getScreenTitle
+            {
+                get
+                {
+                    return mTitle;
                 }
             }
         }

@@ -5,6 +5,10 @@ require "fileutils"
 require "rubygems"
 require "nokogiri"
 
+def error_exit(message)
+  puts message
+  exit!(1)
+end
 if(!File.exist?("tempDocs"))
   FileUtils.mkdir("tempDocs")
 end
@@ -15,7 +19,7 @@ pg_files.each { |fileName|
   if(fileName.include?(".md"))
     FileUtils.cp fileName, "./tempDocs/"
   end
-    }
+}
 
 puts "running converter"
 system "ruby joDocConverter.rb"
@@ -23,8 +27,16 @@ FileUtils.cp "template/WHTemplate.html", "tempDocs"
 FileUtils.cp "mdDocs/toc.md", "tempDocs"
 
 FileUtils.cd("tempDocs")
-system("chmod +x ../../../../tools/ReleasePackageBuild/JoDoc/jodoc")
-system("../../../../tools/ReleasePackageBuild/JoDoc/jodoc --output ../html5  --title \"JavaScript API Documentation\" --template WHTemplate.html --toc toc.md --markdown ../../../../tools/ReleasePackageBuild/JoDoc/Markdown.pl *.js *.md")
+
+if(!system("chmod +x ../../../../tools/ReleasePackageBuild/JoDoc/jodoc"))
+  error_exit("failed to change mode of jodoc")
+end
+if(!system("chmod +x ../../../../tools/ReleasePackageBuild/JoDoc/Markdown.pl"))
+  error_exit("failed to change mode of markdown")
+end
+if(!system("../../../../tools/ReleasePackageBuild/JoDoc/jodoc --output ../html5  --title \"JavaScript API Documentation\" --template WHTemplate.html --toc toc.md --markdown ../../../../tools/ReleasePackageBuild/JoDoc/Markdown.pl *.js *.md"))
+  error_exit("failed to run jodoc")
+end
 
 FileUtils.cd("../")
 style_list = Dir["template/**"]

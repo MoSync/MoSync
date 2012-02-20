@@ -195,7 +195,7 @@ namespace MoSync
 							mCompass.Stop();
 							mCompass = null;
 						}
-						
+
 						mMagneticFieldEnabled = false;
 						break;
 					case MoSync.Constants.SENSOR_TYPE_COMPASS:

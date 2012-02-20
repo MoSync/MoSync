@@ -123,6 +123,13 @@ namespace MoSync
 				(int)screenHeight);
 
 			mMainImage.Source = mFrontBuffer;
+
+			// clear front and backbuffer.
+			for (int i = 0; i < mFrontBuffer.PixelWidth * mFrontBuffer.PixelHeight; i++)
+			{
+				mBackBuffer.Pixels[i] = mBackBuffer.Pixels[i] = (int)(0xff<<24);
+			}
+
 			mCurrentDrawTarget = mBackBuffer;
 
 			mCurrentWindowsColor = System.Windows.Media.Color.FromArgb(0xff,
@@ -358,6 +365,11 @@ namespace MoSync
 				MoSync.Util.RunActionOnMainThreadSync(() =>
 				{
 					bitmap = new WriteableBitmap(width, height);
+
+					for (int i = 0; i < bitmap.PixelWidth * bitmap.PixelHeight; i++)
+					{
+						bitmap.Pixels[i] = (int)(0xff << 24);
+					}
 				});
 
 				if (bitmap == null) return MoSync.Constants.RES_OUT_OF_MEMORY;
