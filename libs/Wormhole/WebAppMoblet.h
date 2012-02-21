@@ -42,6 +42,9 @@ MA 02110-1301, USA.
 #include "WebViewMessage.h"
 #include "FileUtil.h"
 
+/**
+ * @brief Classes for communication with JavaScript code
+ */
 namespace Wormhole
 {
 	// Forward declaration.

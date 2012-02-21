@@ -28,7 +28,7 @@ MA 02110-1301, USA.
  * @file FileUtil.h
  * @author Mikael Kindborg
  *
- * High-level utility functions for working with files.
+ * #brief High-level utility functions for working with files.
  */
 
 #ifndef WORMHOLE_FILE_UTIL_H_
@@ -40,7 +40,8 @@ MA 02110-1301, USA.
 namespace Wormhole
 {
 /**
- * Class that contains utility methods.
+ * @brief Class that contains utility methods.
+ *
  * TODO: Add copy constructor and assignment operator.
  */
 class FileUtil

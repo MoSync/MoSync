@@ -41,7 +41,6 @@ class Video;
 /**
  * \brief Class used for all the permissions that we can ask from Facebook
  */
-
 class GetPermissions
 {
 public:
