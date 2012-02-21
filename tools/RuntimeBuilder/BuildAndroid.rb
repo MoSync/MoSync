@@ -51,6 +51,10 @@ class RuntimeBuilder
 		return androidBuilder(runtime_dir, mode, "10", "7")
 	end
 
+	def android_7x(runtime_dir, mode)
+		return androidBuilder(runtime_dir, mode, "10", "7")
+	end
+
 	def android_8(runtime_dir, mode)
 		return androidBuilder(runtime_dir, mode, "10", "8")
 	end

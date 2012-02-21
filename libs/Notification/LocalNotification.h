@@ -32,6 +32,7 @@ MA 02110-1301, USA.
  *
  * @brief Local notifications are used for displaying alerts, playing sounds
  * and for badging application icon.
+ *
  * The operating system is responsible for delivering the notification at the
  * proper time; the application does not have to be running for this to happen.
  * When you create a local notification, you must specify when the system

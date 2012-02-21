@@ -28,7 +28,7 @@ MA 02110-1301, USA.
  * @file MessageStreamJSON.h
  * @author Mikael Kindborg
  *
- * Class for parsing JSON messages from a WebView.
+ * @brief Class for parsing JSON messages from a WebView.
  */
 
 #ifndef WORMHOLE_MESSAGE_STREAM_JSON_H_
@@ -44,7 +44,9 @@ namespace Wormhole
 {
 
 /**
- * Class that parses JSON messages in the form of urls sent from a
+ * @brief Class that parses JSON messages from the WebView.
+ *
+ * The messages are in the form of urls sent from a
  * WebView as MAW_EVENT_WEB_VIEW_HOOK_INVOKED events.
  *
  * Message data used with this class has the format:

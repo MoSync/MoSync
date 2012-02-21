@@ -280,6 +280,7 @@ RELEVANT_DEFINES = {
 	:android_3 => [],
 	:android_4 => [],
 	:android_7 => [],
+	:android_7x => [],
 	:iphoneos => [],
 	:winphone => [],
 }
@@ -320,6 +321,7 @@ runtimes = {
 	:android_3 => [],
 	:android_4 => [],
 	:android_7 => [],
+	:android_7x => [],
 	:iphoneos => [],
 	:winphone => [],
 }
@@ -722,7 +724,7 @@ runtimes.each do |platform_name, platform|
 		end
 
 		release_defines = ['PHONE_RELEASE', 'MOSYNC_COMMERCIAL']
-		if(platform_name == :sp2003 || platform_name == :wm5 || platform_name == :wm6 || platform_name == :wm6pro || platform_name == :s60v3 || platform_name == :s60v5 )
+		if(platform_name == :sp2003 || platform_name == :wm5 || platform_name == :wm6 || platform_name == :wm6pro || platform_name == :s60v3 || platform_name == :s60v5 || platform_name == :android_7x )
 			release_defines << "USE_ARM_RECOMPILER"
 		end
 		if(platform_name == :s60v3)

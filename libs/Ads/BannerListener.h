@@ -16,12 +16,12 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301, USA.
 */
 
-/*! \addtogroup AdsLib
+/*! \addtogroup AdvertisingLib
  *  @{
  */
 
 /**
- *  @defgroup AdsLib Advertising Library
+ *  @defgroup AdvertisingLib Advertising Library
  *  @{
  */
 
@@ -37,7 +37,7 @@ MA 02110-1301, USA.
 #define ADS_BANNER_LISTENER_H_
 
 /**
- * \brief MoSync Ads API.
+ * \brief MoSync Advertising API.
  */
 namespace Ads
 {
