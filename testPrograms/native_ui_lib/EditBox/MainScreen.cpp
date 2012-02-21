@@ -42,21 +42,21 @@ using namespace MAUtil;
 #define INPUT_FLAGS_COUNT 5
 
 const String inputModes[] = {
-		"MAW_EDIT_BOX_TYPE_ANY",
-		"MAW_EDIT_BOX_TYPE_EMAILADDR",
-		"MAW_EDIT_BOX_TYPE_NUMERIC",
-		"MAW_EDIT_BOX_TYPE_PHONENUMBER",
-		"MAW_EDIT_BOX_TYPE_URL",
-		"MAW_EDIT_BOX_TYPE_DECIMAL",
-		"MAW_EDIT_BOX_TYPE_SINGLELINE"
+		"ANY",
+		"EMAILADDR",
+		"NUMERIC",
+		"PHONENUMBER",
+		"URL",
+		"DECIMAL",
+		"SINGLELINE"
 };
 
 const String inputFlags[] = {
-		"MAW_EDIT_BOX_FLAG_PASSWORD",
-		"MAW_EDIT_BOX_FLAG_SENSITIVE",
-		"MAW_EDIT_BOX_FLAG_INITIAL_CAPS_ALL_CHARACTERS",
-		"MAW_EDIT_BOX_FLAG_INITIAL_CAPS_WORD",
-		"MAW_EDIT_BOX_FLAG_INITIAL_CAPS_SENTENCE"
+		"FLAG_PASSWORD",
+		"FLAG_SENSITIVE",
+		"FLAG_INITIAL_CAPS_ALL_CHARACTERS",
+		"FLAG_INITIAL_CAPS_WORD",
+		"FLAG_INITIAL_CAPS_SENTENCE"
 };
 
 enum InputModeType {
@@ -287,34 +287,33 @@ void MainScreen::buttonClicked(Widget* button)
  */
 void MainScreen::listViewItemClicked(ListView* listView, ListViewItem* listViewItem)
 {
+	int listViewItemIndex = -1;
 	for(int i = 0; i < listView->countChildWidgets(); i++)
 	{
 		ListViewItem* currentItem = (ListViewItem*)listView->getChild(i);
 		currentItem->setBackgroundColor(0xFFFFFF);
+
+		if (currentItem == listViewItem)
+		{
+			listViewItemIndex = i;
+		}
 	}
 
-	int resultCode;
-	int listViewItemIndex;
-	String listViewItemText;
 	if (listView == mInputModeListView)
 	{
-		listViewItemText = listViewItem->getPropertyString("text", resultCode);
 		listViewItem->setBackgroundColor(0xFF0000);
 
-		if (resultCode == MAW_RES_OK)
+		if (listViewItemIndex >= 0)
 		{
-			listViewItemIndex = this->getIndexForString(inputModes, listViewItemText);
 			this->setInputMode(listViewItemIndex);
 		}
 	}
 	else if (listView == mInputFlagListView)
 	{
-		listViewItemText = listViewItem->getPropertyString("text", resultCode);
 		listViewItem->setBackgroundColor(0xFF0000);
 
-		if (resultCode == MAW_RES_OK)
+		if (listViewItemIndex >= 0)
 		{
-			listViewItemIndex = this->getIndexForString(inputFlags, listViewItemText);
 			this->setInputFlag(listViewItemIndex);
 		}
 	}
@@ -360,7 +359,6 @@ void MainScreen::createInputModeListView(VerticalLayout* aVerticalLayout)
 	{
 		ListViewItem* inputModeItem = new ListViewItem();
 		inputModeItem->setText(inputModes[i]);
-		inputModeItem->setFontSize(mFontSize);
 		inputModeItem->setBackgroundColor(0xFFFFFF);
 		inputModeItem->setFontColor(0x000000);
 		inputModeItem->fillSpaceHorizontally();
@@ -385,7 +383,6 @@ void MainScreen::createInputFlagListView(VerticalLayout* aVerticalLayout)
 	{
 		ListViewItem* inputFlagItem = new ListViewItem();
 		inputFlagItem->setText(inputFlags[i]);
-		inputFlagItem->setFontSize(mFontSize);
 		inputFlagItem->setBackgroundColor(0xFFFFFF);
 		inputFlagItem->setFontColor(0x000000);
 		inputFlagItem->fillSpaceHorizontally();
@@ -394,24 +391,6 @@ void MainScreen::createInputFlagListView(VerticalLayout* aVerticalLayout)
 
 	mInputFlagListView->fillSpaceHorizontally();
 	aVerticalLayout->addChild(mInputFlagListView);
-}
-
-/**
- * Gets the index of a string. Returns -1 if the string is not inside the array
- * @param array The String array in which to search
- * @param text The list view item text
- */
-int MainScreen::getIndexForString(const String* array, String text)
-{
-	for (int i = 0; i < array->length(); i++)
-	{
-		if (array[i] == text)
-		{
-			return i;
-		}
-	}
-
-	return -1;
 }
 
 /**

@@ -149,13 +149,6 @@ private:
 	void createDecimalEditBoxView(EditBox* &editBox, VerticalLayout* aVerticalLayout, MAUtil::String text);
 
 	/**
-	 * Gets the index of a string. Returns -1 if the string is not inside the array
-	 * @param array The String array in which to search
-	 * @param text The list view item text
-	 */
-	int getIndexForString(const MAUtil::String* array, MAUtil::String text);
-
-	/**
 	 * Set the input mode of the edit box
 	 * @param mode The input mode code
 	 */
