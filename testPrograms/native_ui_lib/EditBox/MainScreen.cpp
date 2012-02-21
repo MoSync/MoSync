@@ -87,8 +87,7 @@ enum FontSize {
  * Constructor.
  */
 MainScreen::MainScreen() :
-	Screen(),
-	mMainListView(NULL),
+	TabScreen(),
 	mEditBox(NULL),
 	mSetTextButton(NULL),
 	mGetTextButton(NULL),
@@ -160,6 +159,95 @@ MainScreen::~MainScreen()
 }
 
 /**
+ * Creates and adds main layout to the screen.
+ */
+void MainScreen::createMainLayout()
+{
+	// create the first screen
+	Screen* firstScreen = new Screen();
+    firstScreen->setTitle("Edit box");
+
+    // create the vertical layout that will contain all the
+    // elements from the first screen
+    VerticalLayout* firstScreenVerticalLayout = new VerticalLayout();
+
+    // edit box creation
+	mEditBox = new EditBox();
+	mEditBox->setPlaceholder("Enter text...");
+	mEditBox->setHeight((mScreenHeight/12)*2);
+	mEditBox->fillSpaceHorizontally();
+	firstScreenVerticalLayout->addChild(mEditBox);
+
+	// create the horizontal layout that will contain the
+	// set text button (resets the text to 'DEFAULT') and the
+	// get text button
+	HorizontalLayout* layout = new HorizontalLayout();
+	layout->setHeight(mScreenHeight/12);
+	firstScreenVerticalLayout->addChild(layout);
+
+	mSetTextButton = new Button();
+	mSetTextButton->setText("Reset text to DEFAULT ");
+	layout->addChild(mSetTextButton);
+
+	mGetTextButton = new Button();
+	mGetTextButton->setText("Get text");
+	layout->addChild(mGetTextButton);
+
+	mGetTextLabel = new Label();
+	firstScreenVerticalLayout->addChild(mGetTextLabel);
+
+	// create and add the show/hide keyboard button
+	mKeyboardButton = new Button();
+	mKeyboardButton->setText("Show/hide keyboard");
+	mKeyboardButton->setHeight(mScreenHeight/12);
+	mKeyboardButton->fillSpaceHorizontally();
+	firstScreenVerticalLayout->addChild(mKeyboardButton);
+
+	// Create layout for widgets.
+	this->createDecimalEditBoxView(mMaxTextLengthEditBox, firstScreenVerticalLayout, MAX_TEXT_LENGTH_LABEL_TEXT);
+	this->createDecimalEditBoxView(mMaxLinesEditBox, firstScreenVerticalLayout, MAX_LINES_LABEL_TEXT);
+	this->createDecimalEditBoxView(mMinLinesEditBox, firstScreenVerticalLayout, MIN_LINES_LABEL_TEXT);
+	this->createDecimalEditBoxView(mLinesNumberEditBox, firstScreenVerticalLayout, LINES_NUMBER_LABEL_TEXT);
+	this->createDecimalEditBoxView(mPlaceholderColorEditBox, firstScreenVerticalLayout, PLACEHOLDER_COLOR_LABEL_TEXT);
+
+	// set the main widget for the first screen and
+	// then add it as a application tab
+	firstScreen->setMainWidget(firstScreenVerticalLayout);
+	this->addTab(firstScreen);
+
+	// create the second screen and the horizontal
+	// layout that will contain the input modes and flags lists
+	Screen* secondScreen = new Screen();
+	secondScreen->setTitle("Modes/flags");
+	VerticalLayout* secondScreenVerticalLayout = new VerticalLayout();
+
+	this->createInputModeListView(secondScreenVerticalLayout);
+
+	// create a black separator between the lists
+	HorizontalLayout* separatorLayout = new HorizontalLayout();
+	separatorLayout->setBackgroundColor(0x000000);
+	separatorLayout->setHeight(mScreenHeight/12);
+	secondScreenVerticalLayout->addChild(separatorLayout);
+
+	this->createInputFlagListView(secondScreenVerticalLayout);
+
+	// set the main widget for the second screen and
+	// then add it as a application tab
+	secondScreen->setMainWidget(secondScreenVerticalLayout);
+	this->addTab(secondScreen);
+
+	maSetColor(0x8A2BE2);
+}
+
+
+void MainScreen::tabScreenTabChanged(
+    TabScreen* tabScreen,
+    const int tabScreenIndex)
+{
+
+}
+
+/**
  * This method is called if the touch-up event was inside the
  * bounds of the button.
  * @param button The button object that generated the event.
@@ -199,12 +287,19 @@ void MainScreen::buttonClicked(Widget* button)
  */
 void MainScreen::listViewItemClicked(ListView* listView, ListViewItem* listViewItem)
 {
+	for(int i = 0; i < listView->countChildWidgets(); i++)
+	{
+		ListViewItem* currentItem = (ListViewItem*)listView->getChild(i);
+		currentItem->setBackgroundColor(0xFFFFFF);
+	}
+
 	int resultCode;
 	int listViewItemIndex;
 	String listViewItemText;
 	if (listView == mInputModeListView)
 	{
 		listViewItemText = listViewItem->getPropertyString("text", resultCode);
+		listViewItem->setBackgroundColor(0xFF0000);
 
 		if (resultCode == MAW_RES_OK)
 		{
@@ -215,6 +310,8 @@ void MainScreen::listViewItemClicked(ListView* listView, ListViewItem* listViewI
 	else if (listView == mInputFlagListView)
 	{
 		listViewItemText = listViewItem->getPropertyString("text", resultCode);
+		listViewItem->setBackgroundColor(0xFF0000);
+
 		if (resultCode == MAW_RES_OK)
 		{
 			listViewItemIndex = this->getIndexForString(inputFlags, listViewItemText);
@@ -224,67 +321,18 @@ void MainScreen::listViewItemClicked(ListView* listView, ListViewItem* listViewI
 }
 
 /**
- * Creates and adds main layout to the screen.
- */
-void MainScreen::createMainLayout()
-{
-	// Create and add the main layout to the screen.
-	mMainListView = new ListView();
-	Screen::setMainWidget(mMainListView);
-
-	VerticalLayout* editBoxLayout = new VerticalLayout();
-	mEditBox = new EditBox();
-	mEditBox->setPlaceholder("Enter text...");
-	mEditBox->setHeight(100);
-	mEditBox->fillSpaceHorizontally();
-	editBoxLayout->addChild(mEditBox);
-	mMainListView->addChild(editBoxLayout);
-
-	HorizontalLayout* layout = new HorizontalLayout();
-	layout->setHeight(75);
-	mMainListView->addChild(layout);
-
-	mSetTextButton = new Button();
-	mSetTextButton->setText("Reset text to DEFAULT ");
-	layout->addChild(mSetTextButton);
-
-	mGetTextButton = new Button();
-	mGetTextButton->setText("Get text");
-	layout->addChild(mGetTextButton);
-
-	mGetTextLabel = new Label();
-	mMainListView->addChild(mGetTextLabel);
-
-	mKeyboardButton = new Button();
-	mKeyboardButton->setText("Show/hide keyboard");
-	mKeyboardButton->fillSpaceHorizontally();
-	mMainListView->addChild(mKeyboardButton);
-
-	// Create layout for widgets.
-	this->createDecimalEditBoxView(mMaxTextLengthEditBox, mMainListView, MAX_TEXT_LENGTH_LABEL_TEXT);
-	this->createDecimalEditBoxView(mMaxLinesEditBox, mMainListView, MAX_LINES_LABEL_TEXT);
-	this->createDecimalEditBoxView(mMinLinesEditBox, mMainListView, MIN_LINES_LABEL_TEXT);
-	this->createDecimalEditBoxView(mLinesNumberEditBox, mMainListView, LINES_NUMBER_LABEL_TEXT);
-	this->createDecimalEditBoxView(mPlaceholderColorEditBox, mMainListView, PLACEHOLDER_COLOR_LABEL_TEXT);
-	this->createInputModeListView(mMainListView);
-	this->createInputFlagListView(mMainListView);
-
-	maSetColor(0x8A2BE2);
-}
-
-/**
  * Creates a horizontal layout, adds it to the main layout, initializes the
  * edit box and adds it to the horizontal layout.
  * @param editBox The editbox to be created and added on the screen.
  * @param mainLayout Widgets will be added to it.
  */
-void MainScreen::createDecimalEditBoxView(EditBox* &editBox, ListView* mainListView, String text)
+void MainScreen::createDecimalEditBoxView(EditBox* &editBox, VerticalLayout* aVerticalLayout, String text)
 {
 	// Create layout for widgets.
 	HorizontalLayout* layout = new HorizontalLayout();
-	layout->setHeight(65);
+	layout->setHeight(mScreenHeight/12);
 
-	mainListView->addChild(layout);
+	aVerticalLayout->addChild(layout);
 
 	// Add label with info.
 	Label* label = new Label();
@@ -302,42 +350,50 @@ void MainScreen::createDecimalEditBoxView(EditBox* &editBox, ListView* mainListV
  * Creates the input mode list view
  * @param mainLayout Widgets will be added to it.
  */
-void MainScreen::createInputModeListView(ListView* mainListView)
+void MainScreen::createInputModeListView(VerticalLayout* aVerticalLayout)
 {
 	mInputModeListView = new ListView();
-	mInputModeListView->setHeight(200);
+	mInputModeListView->setHeight(mScreenHeight/3);
+	mInputModeListView->setBackgroundColor(0xFFFFFF);
 
 	for(int i = 0; i < INPUT_MODES_COUNT; i++)
 	{
-		Label* inputModeLabel = new Label();
-		inputModeLabel->setText(inputModes[i]);
-		inputModeLabel->setFontSize(mFontSize);
-		mInputModeListView->addChild(inputModeLabel);
+		ListViewItem* inputModeItem = new ListViewItem();
+		inputModeItem->setText(inputModes[i]);
+		inputModeItem->setFontSize(mFontSize);
+		inputModeItem->setBackgroundColor(0xFFFFFF);
+		inputModeItem->setFontColor(0x000000);
+		inputModeItem->fillSpaceHorizontally();
+		mInputModeListView->addChild(inputModeItem);
 	}
 
 	mInputModeListView->fillSpaceHorizontally();
-	mainListView->addChild(mInputModeListView);
+	aVerticalLayout->addChild(mInputModeListView);
 }
 
 /**
  * Creates the input flag list view
  * @param mainLayout Widgets will be added to it.
  */
-void MainScreen::createInputFlagListView(ListView* mainListView)
+void MainScreen::createInputFlagListView(VerticalLayout* aVerticalLayout)
 {
 	mInputFlagListView = new ListView();
-	mInputFlagListView->setHeight(200);
+	mInputFlagListView->setHeight(mScreenHeight/3);
+	mInputFlagListView->setBackgroundColor(0xFFFFFF);
 
 	for(int i = 0; i < INPUT_FLAGS_COUNT; i++)
 	{
-		Label* inputFlagLabel = new Label();
-		inputFlagLabel->setText(inputFlags[i]);
-		inputFlagLabel->setFontSize(mFontSize);
-		mInputFlagListView->addChild(inputFlagLabel);
+		ListViewItem* inputFlagItem = new ListViewItem();
+		inputFlagItem->setText(inputFlags[i]);
+		inputFlagItem->setFontSize(mFontSize);
+		inputFlagItem->setBackgroundColor(0xFFFFFF);
+		inputFlagItem->setFontColor(0x000000);
+		inputFlagItem->fillSpaceHorizontally();
+		mInputFlagListView->addChild(inputFlagItem);
 	}
 
 	mInputFlagListView->fillSpaceHorizontally();
-	mainListView->addChild(mInputFlagListView);
+	aVerticalLayout->addChild(mInputFlagListView);
 }
 
 /**
