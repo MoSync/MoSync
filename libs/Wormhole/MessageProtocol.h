@@ -28,7 +28,7 @@ MA 02110-1301, USA.
  * @file MessageProtocol.h
  * @author Mikael Kindborg
  *
- * Class for reading the protocol of a message from a WebView.
+ * @brief Class for reading the protocol of a message from a WebView.
  */
 
 #ifndef WORMHOLE_MESSAGE_PROTOCOL_H_
@@ -41,6 +41,8 @@ namespace Wormhole
 {
 
 /**
+ * @brief Class that checks a Wormhole protocol.
+ *
  * This class checks the three character protocol specified
  * as part of a message sent from a WebView as a
  * MAW_EVENT_WEB_VIEW_HOOK_INVOKED event, using one of
