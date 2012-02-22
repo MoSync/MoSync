@@ -21,7 +21,10 @@ namespace test_mosync
     {
         ContentManager contentManager;
         GameTimer timer;
-        SpriteBatch spriteBatch;
+
+		MoSync.Machine mMachine;
+		MoSync.Runtime mRuntime;
+		MoSync.OpenGLESModule mOpenGLESModule;
 
         public GamePage()
         {
@@ -32,25 +35,50 @@ namespace test_mosync
 
             // Create a timer for this page
             timer = new GameTimer();
-            timer.UpdateInterval = TimeSpan.FromTicks(333333);
-            timer.Update += OnUpdate;
-            timer.Draw += OnDraw;
+			//timer.UpdateInterval = new TimeSpan(333333);
+			timer.UpdateInterval = TimeSpan.FromTicks(166667);
+			timer.FrameAction += SuppressFrame;
+			timer.Update += OnUpdate;
+			timer.Draw += OnDraw;
         }
+
+		AutoResetEvent DrawRequiredEvent = new AutoResetEvent(false);
+		AutoResetEvent DrawCompleteEvent = new AutoResetEvent(false);
+		GraphicsDevice MoSyncGraphicsDevice;
+		SpriteBatch SpriteBatch;
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             // Set the sharing mode of the graphics device to turn on XNA rendering
             SharedGraphicsDeviceManager.Current.GraphicsDevice.SetSharingMode(true);
 
-            // Create a new SpriteBatch, which can be used to draw textures.
-            spriteBatch = new SpriteBatch(SharedGraphicsDeviceManager.Current.GraphicsDevice);
+			mMachine = ((App)Application.Current).GetMachine();
+			mRuntime = mMachine.GetRuntime();
+			mOpenGLESModule = mRuntime.GetModule<MoSync.OpenGLESModule>();
+			//mOpenGLESModule.InitWithGraphicsDevice(SharedGraphicsDeviceManager.Current.GraphicsDevice);
+			MoSyncGraphicsDevice = SharedGraphicsDeviceManager.Current.GraphicsDevice;
+			MoSyncGraphicsDevice.PresentationParameters.IsFullScreen = false;
+	
+			mOpenGLESModule.InitWithGraphicsDevice(MoSyncGraphicsDevice);
 
             // TODO: use this.content to load your game content here
+			SpriteBatch = new SpriteBatch(SharedGraphicsDeviceManager.Current.GraphicsDevice);
 
-            // Start the timer
-            timer.Start();
+			mOpenGLESModule.SetOnUpdateScreenAction(() =>
+			{
+				// it's time to draw.
+				// stop supressing frames.
+				timer.FrameAction -= SuppressFrame;
 
-            base.OnNavigatedTo(e);
+				// wait for draw to complete.
+				DrawCompleteEvent.WaitOne();
+			});
+
+
+			base.OnNavigatedTo(e);
+
+			// Start the timer
+			timer.Start();
         }
 
         protected override void OnNavigatedFrom(NavigationEventArgs e)
@@ -60,27 +88,42 @@ namespace test_mosync
 
             // Set the sharing mode of the graphics device to turn off XNA rendering
             SharedGraphicsDeviceManager.Current.GraphicsDevice.SetSharingMode(false);
-
             base.OnNavigatedFrom(e);
         }
 
-        /// <summary>
-        /// Allows the page to run logic such as updating the world,
-        /// checking for collisions, gathering input, and playing audio.
-        /// </summary>
-        private void OnUpdate(object sender, GameTimerEventArgs e)
-        {
-            // TODO: Add your update logic here
-        }
+		private void OnUpdate(object sender, GameTimerEventArgs e)
+		{
+		}
+
+		private void SuppressFrame(object sender, EventArgs e)
+		{
+			GameTimer.SuppressFrame();
+		}
+
+#if true
+		private void CompleteFrame(object sender, EventArgs e)
+		{
+			// Remove this frame action
+			timer.FrameAction -= CompleteFrame;
+
+			// Supress this frame and set the following frames to be supressed (until further notice)
+			GameTimer.SuppressFrame();
+			timer.FrameAction += SuppressFrame;
+
+			// Notify the MoSync thread that the draw is complete.
+			DrawCompleteEvent.Set();
+		}
+#endif
 
         /// <summary>
         /// Allows the page to draw itself.
         /// </summary>
         private void OnDraw(object sender, GameTimerEventArgs e)
         {
-            SharedGraphicsDeviceManager.Current.GraphicsDevice.Clear(Color.CornflowerBlue);
-
-            // TODO: Add your drawing code here
+#if true	
+			// Set a frame action that notifies the mosync thread that the draw is complete.
+			timer.FrameAction += CompleteFrame;
+#endif
         }
     }
 }
