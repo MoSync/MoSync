@@ -80,6 +80,15 @@
 		432B98C91431FE5F00BDB926 /* MoSyncPanic.mm in Sources */ = {isa = PBXBuildFile; fileRef = 432B98C71431FE5F00BDB926 /* MoSyncPanic.mm */; };
 		432B98CA1431FE5F00BDB926 /* MoSyncPanic.mm in Sources */ = {isa = PBXBuildFile; fileRef = 432B98C71431FE5F00BDB926 /* MoSyncPanic.mm */; };
 		432B98CC1432040B00BDB926 /* PimError.h in Headers */ = {isa = PBXBuildFile; fileRef = 432B98CB1432040B00BDB926 /* PimError.h */; };
+		432D1AC114F4F3A70003CA80 /* SegmentedListViewWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 432D1ABF14F4F3A70003CA80 /* SegmentedListViewWidget.h */; };
+		432D1AC214F4F3A70003CA80 /* SegmentedListViewWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 432D1AC014F4F3A70003CA80 /* SegmentedListViewWidget.mm */; };
+		432D1AC314F4F3A70003CA80 /* SegmentedListViewWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 432D1AC014F4F3A70003CA80 /* SegmentedListViewWidget.mm */; };
+		432D1AD414F518DB0003CA80 /* SegmentedListViewSection.h in Headers */ = {isa = PBXBuildFile; fileRef = 432D1AD214F518DB0003CA80 /* SegmentedListViewSection.h */; };
+		432D1AD514F518DB0003CA80 /* SegmentedListViewSection.mm in Sources */ = {isa = PBXBuildFile; fileRef = 432D1AD314F518DB0003CA80 /* SegmentedListViewSection.mm */; };
+		432D1AD614F518DB0003CA80 /* SegmentedListViewSection.mm in Sources */ = {isa = PBXBuildFile; fileRef = 432D1AD314F518DB0003CA80 /* SegmentedListViewSection.mm */; };
+		432D1ADE14F51D2A0003CA80 /* SegmentedListViewItemWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 432D1ADC14F51D290003CA80 /* SegmentedListViewItemWidget.h */; };
+		432D1ADF14F51D2A0003CA80 /* SegmentedListViewItemWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 432D1ADD14F51D290003CA80 /* SegmentedListViewItemWidget.mm */; };
+		432D1AE014F51D2A0003CA80 /* SegmentedListViewItemWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 432D1ADD14F51D290003CA80 /* SegmentedListViewItemWidget.mm */; };
 		438DBD401475388500980239 /* AudioSyscall.mm in Sources */ = {isa = PBXBuildFile; fileRef = E4D36EA71459AC5B00477B1E /* AudioSyscall.mm */; };
 		438DBD451475393800980239 /* AudioInstance.mm in Sources */ = {isa = PBXBuildFile; fileRef = E4D36EAB1459B5B600477B1E /* AudioInstance.mm */; };
 		438DBD461475393800980239 /* AudioData.mm in Sources */ = {isa = PBXBuildFile; fileRef = E4D36EA51459AC5B00477B1E /* AudioData.mm */; };
@@ -378,6 +387,12 @@
 		432B98C61431FE5F00BDB926 /* MoSyncPanic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MoSyncPanic.h; sourceTree = "<group>"; };
 		432B98C71431FE5F00BDB926 /* MoSyncPanic.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MoSyncPanic.mm; sourceTree = "<group>"; };
 		432B98CB1432040B00BDB926 /* PimError.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PimError.h; sourceTree = "<group>"; };
+		432D1ABF14F4F3A70003CA80 /* SegmentedListViewWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SegmentedListViewWidget.h; path = SegmentedListView/SegmentedListViewWidget.h; sourceTree = "<group>"; };
+		432D1AC014F4F3A70003CA80 /* SegmentedListViewWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = SegmentedListViewWidget.mm; path = SegmentedListView/SegmentedListViewWidget.mm; sourceTree = "<group>"; };
+		432D1AD214F518DB0003CA80 /* SegmentedListViewSection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SegmentedListViewSection.h; path = SegmentedListView/SegmentedListViewSection.h; sourceTree = "<group>"; };
+		432D1AD314F518DB0003CA80 /* SegmentedListViewSection.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = SegmentedListViewSection.mm; path = SegmentedListView/SegmentedListViewSection.mm; sourceTree = "<group>"; };
+		432D1ADC14F51D290003CA80 /* SegmentedListViewItemWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SegmentedListViewItemWidget.h; path = SegmentedListView/SegmentedListViewItemWidget.h; sourceTree = "<group>"; };
+		432D1ADD14F51D290003CA80 /* SegmentedListViewItemWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = SegmentedListViewItemWidget.mm; path = SegmentedListView/SegmentedListViewItemWidget.mm; sourceTree = "<group>"; };
 		43A7684E1400F6BA009608A4 /* ImagePickerController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ImagePickerController.h; sourceTree = "<group>"; };
 		43A7684F1400F6BA009608A4 /* ImagePickerController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ImagePickerController.mm; sourceTree = "<group>"; };
 		43B16FE8147BF9FC00B6BB8A /* NSStringExpanded.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NSStringExpanded.h; path = utils/NSStringExpanded.h; sourceTree = "<group>"; };
@@ -795,6 +810,19 @@
 			path = contacts;
 			sourceTree = "<group>";
 		};
+		432D1ABD14F4F34E0003CA80 /* SegmentedListView */ = {
+			isa = PBXGroup;
+			children = (
+				432D1ABF14F4F3A70003CA80 /* SegmentedListViewWidget.h */,
+				432D1AC014F4F3A70003CA80 /* SegmentedListViewWidget.mm */,
+				432D1AD214F518DB0003CA80 /* SegmentedListViewSection.h */,
+				432D1AD314F518DB0003CA80 /* SegmentedListViewSection.mm */,
+				432D1ADC14F51D290003CA80 /* SegmentedListViewItemWidget.h */,
+				432D1ADD14F51D290003CA80 /* SegmentedListViewItemWidget.mm */,
+			);
+			name = SegmentedListView;
+			sourceTree = "<group>";
+		};
 		43B16FE6147BF9AA00B6BB8A /* utils */ = {
 			isa = PBXGroup;
 			children = (
@@ -901,6 +929,7 @@
 		85A158FA12F80E520044BBE1 /* Widgets */ = {
 			isa = PBXGroup;
 			children = (
+				432D1ABD14F4F34E0003CA80 /* SegmentedListView */,
 				0B436B9D14308D5400E69AB2 /* ModalDialogWidget.h */,
 				0B436B9E14308D5400E69AB2 /* ModalDialogWidget.mm */,
 				43D8045E13EFBCB200183387 /* ActivityIndicatorWidget.h */,
@@ -1189,6 +1218,9 @@
 				43B16FEA147BF9FC00B6BB8A /* NSStringExpanded.h in Headers */,
 				4140734414C34EB80006D18C /* ResourceArray.h in Headers */,
 				417495FD14C4CB1300D04A32 /* Capture.h in Headers */,
+				432D1AC114F4F3A70003CA80 /* SegmentedListViewWidget.h in Headers */,
+				432D1AD414F518DB0003CA80 /* SegmentedListViewSection.h in Headers */,
+				432D1ADE14F51D2A0003CA80 /* SegmentedListViewItemWidget.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1402,6 +1434,9 @@
 				85407554149F9E62001B14C0 /* MoSyncExtension.mm in Sources */,
 				E413FAB814C0604D00BF1E3D /* ResourceArray.cpp in Sources */,
 				417495FA14C4CB0E00D04A32 /* Capture.mm in Sources */,
+				432D1AC214F4F3A70003CA80 /* SegmentedListViewWidget.mm in Sources */,
+				432D1AD514F518DB0003CA80 /* SegmentedListViewSection.mm in Sources */,
+				432D1ADF14F51D2A0003CA80 /* SegmentedListViewItemWidget.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1505,6 +1540,9 @@
 				418047B8147E8B6A0048FB95 /* Reachability.m in Sources */,
 				43B16FEC147BF9FC00B6BB8A /* NSStringExpanded.mm in Sources */,
 				417495FC14C4CB0F00D04A32 /* Capture.mm in Sources */,
+				432D1AC314F4F3A70003CA80 /* SegmentedListViewWidget.mm in Sources */,
+				432D1AD614F518DB0003CA80 /* SegmentedListViewSection.mm in Sources */,
+				432D1AE014F51D2A0003CA80 /* SegmentedListViewItemWidget.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

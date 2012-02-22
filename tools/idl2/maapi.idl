@@ -4927,6 +4927,20 @@ group WidgetAPI "Widget API" {
 		* See \ref WidgetPanoramaViewProperties "Panorama View properties" for the properties available
 		*/
 		PANORAMA_VIEW = "PanoramaView";
+
+		/**
+		* @brief A SegmentedListView widget is used to present an indexed/grouped list of items.
+		* Only SegmentedListViewItem objects can be added to this list.
+		* Available on iOS platform.
+		*/
+		SEGMENTED_LIST_VIEW = "SegmentedListView";
+
+		/**
+		* @brief A SegmentedListViewItem widget is used to define the attributes and behaviour of the
+		* cells/items that appear in SegmentedListView objects.
+		* Available on iOS platform.
+		*/
+		SEGMENTED_LIST_VIEW_ITEM = "SegmentedListViewItem";
 	}
 	} // end of WidgetTypes
 
