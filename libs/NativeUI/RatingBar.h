@@ -50,6 +50,7 @@ namespace NativeUI
 
     /**
      * \brief An instance of RatingBar is used for displaying a rating in stars.
+     * Usually, the default stars number is 5.
      * The user can touch/drag or use arrow keys to set the rating when using
      * the default size RatingBar.
      * When using a RatingBar that supports user interaction, placing widgets to
@@ -80,6 +81,44 @@ namespace NativeUI
          * @param listener The listener that receives rating bar events.
          */
         virtual void removeRatingBarListener(RatingBarListener* listener);
+
+        /**
+         * Set the number of stars to show.
+         * Usually, the default stars number is 5.
+         * @param numStars The number of stars to show.
+         */
+        virtual void setNumberOfStars(int numStars);
+
+        /**
+         * Get the number of shown stars.
+         * @return The number of shown stars.
+         */
+        virtual int getNumberOfStars();
+
+        /**
+         * Set the current rating( number of stars filled).
+         * @param rating The number of stars filled.
+         */
+        virtual void setRating(float rating);
+
+        /**
+         * Get the current rating( number of stars filled).
+         * @return The number of stars filled.
+         */
+        virtual float getRating();
+
+        /**
+         * Set the step size ( granularity) of this rating bar.
+         * By default the granularity is 0.5.
+         * @param granularity The step size.
+         */
+        virtual void setGranularity(float granularity);
+
+        /**
+         * Get the step size ( granularity) of this rating bar.
+         * @return The step size.
+         */
+        virtual float getGranularity();
 
     protected:
         /**

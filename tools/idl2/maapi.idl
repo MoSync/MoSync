@@ -4314,6 +4314,11 @@ group WidgetAPI "Widget API" {
 			* is received.
 			*/
 			int radioGroupItemHandle;
+
+			/**
+			* The new state of a radio button, when a #RADIO_BUTTON_STATE_CHANGED event is received.
+			*/
+			int radioButtonState;
 		}
 	}
 
@@ -4473,6 +4478,11 @@ group WidgetAPI "Widget API" {
 		* @brief Send when one of the radio buttons in a radio group is selected.
 		*/
 		RADIO_GROUP_ITEM_SELECTED = 24;
+
+		/**
+		* @brief Send when  the radio button state is changed.
+		*/
+		RADIO_BUTTON_STATE_CHANGED = 25;
 	}
 
 	} // end of WidgetEventTypes
@@ -4959,7 +4969,7 @@ group WidgetAPI "Widget API" {
 		/**
 		* @brief A radio button available only on Android. A radio button can only have a #RADIO_GROUP parent.
 		* Checking one radio button that belongs to a radio group unchecks any previously checked radio button within the same group.
-		* Intially, all of the radio buttons are unchecked.
+		* Initially, all of the radio buttons are unchecked.
 		* While it is not possible to uncheck a particular radio button, the radio group can be cleared to remove the checked state.
 		* See \ref WidgetRadioButtonProperties "Radio Button properties" for the properties available.
 		*/
@@ -7259,15 +7269,16 @@ group WidgetAPI "Widget API" {
 	group WidgetRadioButtonProperties "Radio Button properties" {
 	constset MAString MAW_RADIO_BUTTON_ {
 		/**
-		* @brief Set or get the checked state of the radio button.
+		* @brief Get the checked state of the radio button.
 		*
 		* @validvalue A boolean string 'true' or 'false'.
 		*
-		* @setandget
+		* @getonly
 		*
 		* @par Example
 		* \code
-		*   maWidgetSetProperty(radioButtonHandle, MAW_RADIO_BUTTON_CHECKED, "true");
+		* 	char state[BUFFER_SIZE];
+		*   maWidgetGetProperty(radioButtonHandle, MAW_RADIO_BUTTON_CHECKED, state, BUFFER_SIZE);
 		* \endcode
 		*/
 		CHECKED = "checked";
@@ -7342,7 +7353,7 @@ group WidgetAPI "Widget API" {
 		/**
 		* @brief Clear the selection.
 		* When the selection is cleared, no radio button in this group is selected and
-		* #MAW_RADIO_GROUP_GET_CHECKED returns 0.
+		* #MAW_RADIO_GROUP_SELECTED returns -1.
 		*
 		* @validvalue No neccessary value needed.
 		*
@@ -7350,10 +7361,28 @@ group WidgetAPI "Widget API" {
 		*
 		* @par Example
 		* \code
-		*   maWidgetSetProperty(radioGroupnHandle, MAW_RADIO_GROUP_CLEAR_CHECK, "");
+		*   maWidgetSetProperty(radioGroupHandle, MAW_RADIO_GROUP_CLEAR_CHECK, "");
 		* \endcode
 		*/
 		CLEAR_CHECK = "clearCheck";
+
+		/**
+		* @brief Set or get the selected radio button in this group.
+		* Upon empty selection, get property returns -1.
+		* Setting -1 as the selection identifier clears the selection; such an operation
+		* is equivalent to invoking #MAW_RADIO_GROUP_CLEAR_CHECK.
+		*
+		* @validvalue A valid radio button handle.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+		*   char buttonHandle[BUF_SIZE];
+		*   maWidgetGetProperty(radioGroupHandle, MAW_RADIO_GROUP_SELECTED, buttonHandle, BUF_SIZE);
+		* \endcode
+		*/
+		SELECTED = "selected";
 	}
 	} // end of WidgetRadioGroupProperties
 
@@ -7364,6 +7393,7 @@ group WidgetAPI "Widget API" {
 	constset MAString MAW_RATING_BAR_ {
 		/**
 		* @brief Set or get the number of stars to show.
+		* Usually, the default stars number is 5.
 		* @validvalue An int that specifies the number of stars to show.
 		*
 		* @setandget
@@ -7390,7 +7420,7 @@ group WidgetAPI "Widget API" {
 
 		/**
 		* @brief Set or get the step size (granularity) of this rating bar.
-		*
+		* By default the granularity is 0.5.
 		* @validvalue A float that specifies the step size.
 		*
 		* @setandget

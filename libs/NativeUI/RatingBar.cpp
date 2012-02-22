@@ -49,6 +49,62 @@ namespace NativeUI
     }
 
     /**
+     * Set the number of stars to show.
+     * Usually, the default stars number is 5.
+     * @param numStars The number of stars to show.
+     */
+    void RatingBar::setNumberOfStars(int numStars)
+    {
+		this->setPropertyInt(MAW_RATING_BAR_NUM_STAR, numStars);
+    }
+
+    /**
+     * Get the number of shown stars.
+     * @return The number of shown stars.
+     */
+    int RatingBar::getNumberOfStars()
+    {
+		return this->getPropertyInt(MAW_RATING_BAR_NUM_STAR);
+    }
+
+    /**
+     * Set the current rating( number of stars filled).
+     * @param rating The number of stars filled.
+     */
+    void RatingBar::setRating(float rating)
+    {
+		this->setPropertyFloat(MAW_RATING_BAR_RATING, rating);
+    }
+
+    /**
+     * Get the current rating( number of stars filled).
+     * @return The number of stars filled.
+     */
+    float RatingBar::getRating()
+    {
+		return this->getPropertyFloat(MAW_RATING_BAR_RATING);
+    }
+
+    /**
+     * Set the step size ( granularity) of this rating bar.
+     * By default the granularity is 0.5.
+     * @param granularity The step size.
+     */
+    void RatingBar::setGranularity(float granularity)
+    {
+		this->setPropertyFloat(MAW_RATING_BAR_GRANULARITY, granularity);
+    }
+
+    /**
+     * Get the step size ( granularity) of this rating bar.
+     * @return The step size.
+     */
+    float RatingBar::getGranularity()
+    {
+		return this->getPropertyFloat(MAW_RATING_BAR_GRANULARITY);
+    }
+
+    /**
      * Add a rating bar event listener.
      * @param listener The listener that will receive rating bar events.
      */

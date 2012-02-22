@@ -35,6 +35,8 @@ using namespace NativeUI;
 
 class MainScreen:
 	public Screen,
+	public EditBoxListener,
+	public ButtonListener,
 	public RatingBarListener
 {
 
@@ -60,6 +62,31 @@ public:
         RatingBar* ratingBar,
         float value,
         bool fromUser);
+
+    /**
+     * This method is called when the return button was pressed.
+     * On iphone platform the virtual keyboard is not hidden after
+     * receiving this event.
+     * @param editBox The edit box object that generated the event.
+     */
+    virtual void editBoxReturn(EditBox* editBox);
+
+    /**
+     * This method is called when the edit box text was changed.
+     * @param editBox The edit box object that generated the event.
+     * @param text The new text.
+     */
+    virtual void editBoxTextChanged(
+        EditBox* editBox,
+        const MAUtil::String& text);
+
+    /**
+     * This method is called if the touch-up event was inside the
+     * bounds of the button.
+     * Platform: iOS and Android. TODO !!!!!!!!!!!!!!
+     * @param button The button object that generated the event.
+     */
+    virtual void buttonClicked(Widget* button);
 private:
 
 	/**
@@ -67,6 +94,14 @@ private:
 	 */
 	void createMainLayout();
 
+	/**
+	 * Add rows:
+	 * On the first line an info label and the edit box.
+	 * On the second line a button for getting the set info, and a label
+	 * for displaying the value.
+	 */
+	void addRow(MAUtil::String labelText, EditBox* &editBox,
+			Button* &button, MAUtil::String buttonText,Label* &getValueLabel);
 private:
 	/**
 	 * Main layout.
@@ -74,6 +109,16 @@ private:
 	VerticalLayout* mMainLayout;
 
 	RatingBar* mRatingBar;
+	EditBox* mRating;
+	Label* mRatingLabel;
+	Button* mGetRating;
+	EditBox* mGranularity;
+	Label* mGranularityLabel;
+	Button* mGetGranularity;
+	EditBox* mStars;
+	Label* mStarsLabel;
+	Button* mGetStars;
+	Label* mEventLabel;
 };
 
 

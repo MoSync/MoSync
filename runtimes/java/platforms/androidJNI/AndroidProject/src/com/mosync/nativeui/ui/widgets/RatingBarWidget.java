@@ -52,6 +52,7 @@ public class RatingBarWidget extends Widget
 		}
 
 		RatingBar ratingBar = (RatingBar) getView( );
+
 		if( property.equals( IX_WIDGET.MAW_RATING_BAR_NUM_STAR ) )
 		{
 			ratingBar.setNumStars(IntConverter.convert(value));

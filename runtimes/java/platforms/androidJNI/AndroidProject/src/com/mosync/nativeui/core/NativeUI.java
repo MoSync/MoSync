@@ -46,6 +46,7 @@ import com.mosync.nativeui.ui.widgets.ListItemWidget;
 import com.mosync.nativeui.ui.widgets.MoSyncScreenWidget;
 import com.mosync.nativeui.ui.widgets.NavigationBarWidget;
 import com.mosync.nativeui.ui.widgets.RadioButtonWidget;
+import com.mosync.nativeui.ui.widgets.RadioGroupWidget;
 import com.mosync.nativeui.ui.widgets.ScreenWidget;
 import com.mosync.nativeui.ui.widgets.StackScreenWidget;
 import com.mosync.nativeui.ui.widgets.Widget;
@@ -611,8 +612,48 @@ public class NativeUI
 
 		try
 		{
-			result =  widget.setProperty( key, value );
+			if ( widget instanceof RadioGroupWidget && key.equals(IX_WIDGET.MAW_RADIO_GROUP_ADD_VIEW) )
+			{
+				int radioButtonHandle = IntConverter.convert(value);
+				Widget child = m_widgetTable.get( radioButtonHandle );
+				if ( child != null && child instanceof RadioButtonWidget )
+				{
+					RadioButtonWidget radioButton = (RadioButtonWidget) child;
+					RadioGroupWidget radioGroup = (RadioGroupWidget) widget;
+					radioGroup.addButton( radioButton );
 
+					return IX_WIDGET.MAW_RES_OK;
+				}
+				else
+				{
+					Log.e( "MoSync", "Error while converting property value '" + value + ". Value needs to be a valid radio button handle" );
+					return IX_WIDGET.MAW_RES_INVALID_PROPERTY_VALUE;
+				}
+			}
+			if ( widget instanceof RadioGroupWidget && key.equals(IX_WIDGET.MAW_RADIO_GROUP_SELECTED) )
+			{
+				int radioButtonHandle = IntConverter.convert(value);
+				Widget child = m_widgetTable.get( radioButtonHandle );
+				RadioGroupWidget radioGroup = (RadioGroupWidget) widget;
+				if ( radioButtonHandle == -1 )
+				{
+					// Setting -1 as the selection identifier clears the selection.
+					radioGroup.checkRadioButton(-1);
+				}
+				else if ( child != null && child instanceof RadioButtonWidget )
+				{
+					RadioButtonWidget radioButton = (RadioButtonWidget) child;
+					radioGroup.checkRadioButton( radioButton.getId() );
+				}
+				else
+				{
+					Log.e( "MoSync", "Error while converting property value '" + value + ". Value needs to be a valid radio button handle" );
+					return IX_WIDGET.MAW_RES_INVALID_PROPERTY_VALUE;
+				}
+
+				return IX_WIDGET.MAW_RES_OK;
+			}
+			result =  widget.setProperty( key, value );
 		}
 		catch(PropertyConversionException pce)
 		{
@@ -663,7 +704,23 @@ public class NativeUI
 
 		String result;
 		try {
-			result = widget.getProperty( key );
+			if ( widget instanceof RadioGroupWidget && key.equals(IX_WIDGET.MAW_RADIO_GROUP_SELECTED) )
+			{
+				RadioGroupWidget radioGroup = (RadioGroupWidget) widget;
+				RadioButtonWidget selectedButton = radioGroup.getButton(radioGroup.getChecked());
+				if ( selectedButton == null )
+				{
+					result = "-1";
+				}
+				else
+				{
+					result = Integer.toString( selectedButton.getHandle() );
+				}
+			}
+			else
+			{
+				result = widget.getProperty( key );
+			}
 		}catch( FeatureNotAvailableException fnae)
 		{
 			Log.e("MoSync", "Feature not available exception: " + fnae.getMessage() );

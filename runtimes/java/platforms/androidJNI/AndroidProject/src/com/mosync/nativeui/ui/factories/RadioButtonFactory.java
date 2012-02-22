@@ -48,7 +48,7 @@ public class RadioButtonFactory implements AbstractViewFactory
 
 			@Override
 			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-				EventQueue.getDefault( ).postRadioButton(handle);
+				EventQueue.getDefault( ).postRadioButtonStateChanged(handle, isChecked);
 			}
 		});
 

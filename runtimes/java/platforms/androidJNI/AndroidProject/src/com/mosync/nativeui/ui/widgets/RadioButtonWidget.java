@@ -34,6 +34,8 @@ import com.mosync.nativeui.util.properties.PropertyConversionException;
  */
 public class RadioButtonWidget extends Widget
 {
+	private int mHandle = -1;
+
 	/**
 	 * Constructor.
 	 *
@@ -43,6 +45,17 @@ public class RadioButtonWidget extends Widget
 	public RadioButtonWidget(int handle, RadioButton radioButton)
 	{
 		super( handle, radioButton );
+		mHandle = handle;
+	}
+
+	/**
+	 * Get the id of this radio button.
+	 * @return
+	 */
+	public int getId()
+	{
+		RadioButton radioButton = (RadioButton) getView( );
+		return radioButton.getId();
 	}
 
 	@Override
@@ -80,10 +93,14 @@ public class RadioButtonWidget extends Widget
 	@Override
 	public String getProperty(String property)
 	{
+		RadioButton radioButton = (RadioButton) getView( );
 		if( property.equals( IX_WIDGET.MAW_RADIO_BUTTON_TEXT ) )
 		{
-			RadioButton radioButton = (RadioButton) getView( );
 			return radioButton.getText().toString();
+		}
+		else if( property.equals( IX_WIDGET.MAW_RADIO_BUTTON_CHECKED ) )
+		{
+			return Boolean.toString( radioButton.isChecked() );
 		}
 		else
 		{

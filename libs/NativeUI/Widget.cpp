@@ -219,7 +219,7 @@ namespace NativeUI
 
     /**
      * Get a widget property value as an integer.
-     * @param property A string representing which property to set.
+     * @param property A string representing which property to get.
      * @return The property value.
      */
     int Widget::getPropertyInt(
@@ -238,6 +238,58 @@ namespace NativeUI
         }
 
         return atoi(buffer);
+    }
+
+    /**
+     * Get a widget property value as a float, setting also the result code.
+     * @param property A string representing which property to set.
+     * @param resultCode Will contain the result code of the syscall.
+     *                   Can be any of the following result codes:
+     *                   - #MAW_RES_OK.
+     *                   - #MAW_RES_INVALID_HANDLE if the handle was invalid.
+     *                   - #MAW_RES_INVALID_PROPERTY_NAME if the property
+     *                     name was invalid.
+     *                   - #MAW_RES_INVALID_PROPERTY_VALUE if the property
+     *                     value was invalid.
+     *                   - #MAW_RES_INVALID_STRING_BUFFER_SIZE if the buffer
+     *                     size was too small.
+     *                   - #MAW_RES_ERROR otherwise.
+     * @return The property value.
+     */
+    float Widget::getPropertyFloat(
+        const MAUtil::String& property, int& resultCode)
+    {
+        char buffer[BUF_SIZE];
+        resultCode = maWidgetGetProperty(
+            mWidgetHandle,
+            property.c_str(),
+            buffer,
+            BUF_SIZE);
+
+        if ( resultCode >= 0 )
+        {
+            resultCode = MAW_RES_OK;
+        }
+        else
+        {
+			setLastErrorCode(resultCode, property);
+        }
+
+        double value = atof(buffer);
+        return (float) value;
+    }
+
+    /**
+     * Get a widget property value as a float.
+     * @param property A string representing which property to get.
+     * @return The property value.
+     */
+    float Widget::getPropertyFloat(
+        const MAUtil::String& property)
+    {
+        MAUtil::String propertyValue = getPropertyString(property);
+        double value = atof(propertyValue.c_str());
+        return (float) value;
     }
 
     /**

@@ -48,10 +48,14 @@ namespace NativeUI
     public:
         /**
          * This method is called when the value of the rating bar was changed.
+         * Clients can use the fromUser parameter to distinguish user-initiated
+         * changes from those that occurred programmatically.
+         * This will not be called continuously while the user is dragging, only
+         * when the user finalizes a rating by lifting the touch.
          * @param ratingBar The rating bar object that generated the event.
          * @param value The new value of the rating bar.
-         * @param romUser True if the value was changed by the user, false if it was
-         * set programmaticaly.
+         * @param fromUser True if the rating change was initiated by a user's
+         * touch gesture or arrow key/horizontal trackbell movement.
          */
         virtual void ratingChanged(
             RatingBar* ratingBar,

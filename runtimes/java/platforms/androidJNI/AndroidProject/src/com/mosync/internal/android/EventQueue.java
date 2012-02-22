@@ -247,7 +247,7 @@ public class EventQueue
 		event[0] = EVENT_TYPE_WIDGET;
 		event[1] = IX_WIDGET.MAW_EVENT_RATING_BAR_VALUE_CHANGED;
 		event[2] = widgetHandle;
-		event[3] =  Float.floatToIntBits(rating);
+		event[3] = Float.floatToIntBits(rating);
 		event[4] = fromUser;
 
 		sMoSyncThread.postEvent(event);
@@ -273,15 +273,16 @@ public class EventQueue
 	/**
 	 * Sends the radio button state.
 	 * @param widgethandle The radio button that sends the event.
-	 * @param state
+	 * @param checked The new state of the button.
 	 */
-	public void postRadioButton(int widgetHandle)
+	public void postRadioButtonStateChanged(int widgetHandle, boolean checked)
 	{
-		int event[] = new int[3];
+		int event[] = new int[4];
 
 		event[0] = EVENT_TYPE_WIDGET;
-//		event[1] = IX_WIDGET.MAW_EVENT_RADIO_GROUP_ITEM_SELECTED
+		event[1] = IX_WIDGET.MAW_EVENT_RADIO_BUTTON_STATE_CHANGED;
 		event[2] = widgetHandle;
+		event[3] = checked ? 1 : 0;
 
 		sMoSyncThread.postEvent(event);
 	}

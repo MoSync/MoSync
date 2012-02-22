@@ -17,11 +17,15 @@ MA 02110-1301, USA.
 
 package com.mosync.nativeui.ui.widgets;
 
+import java.util.List;
+
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 
 import com.mosync.internal.generated.IX_WIDGET;
+import com.mosync.nativeui.core.NativeUI;
 import com.mosync.nativeui.util.properties.BooleanConverter;
+import com.mosync.nativeui.util.properties.IntConverter;
 import com.mosync.nativeui.util.properties.InvalidPropertyValueException;
 import com.mosync.nativeui.util.properties.PropertyConversionException;
 
@@ -31,6 +35,8 @@ import com.mosync.nativeui.util.properties.PropertyConversionException;
  */
 public class RadioGroupWidget extends Widget
 {
+	private List<RadioButtonWidget> mButtons;
+
 	/**
 	 * Constructor.
 	 *
@@ -42,6 +48,68 @@ public class RadioGroupWidget extends Widget
 		super( handle, radioGroup );
 	}
 
+	/**
+	 * Add a radio button view to this group.
+	 * @param button The button.
+	 */
+	public void addButton(RadioButtonWidget button)
+	{
+		RadioGroup radioGroup = (RadioGroup) getView( );
+//		button.setId();
+		radioGroup.addView(button.getView());
+		mButtons.add(button);
+	}
+
+	/**
+	 *
+	 * @param id
+	 * @return
+	 */
+	public RadioButtonWidget getButton(int id)
+	{
+		for (int i=0; i < mButtons.size(); i++)
+		{
+			if ( mButtons.get(i).getId() == id )
+			{
+				return mButtons.get(i);
+			}
+		}
+		return null;
+	}
+
+	/**
+	 *
+	 * @param id
+	 * @return
+	 */
+	public int getButtonHandle(int id)
+	{
+		for (int i=0; i < mButtons.size(); i++)
+		{
+			if ( mButtons.get(i).getId() == id )
+			{
+				return mButtons.getHandle();
+			}
+		}
+		return -1;
+	}
+
+	/**
+	 * Check the button.
+	 * @param id The radio button id.
+	 */
+	public void checkRadioButton(int id)
+	{
+		RadioGroup radioGroup = (RadioGroup) getView( );
+		radioGroup.check(id);
+	}
+
+	public int getChecked()
+	{
+		RadioGroup radioGroup = (RadioGroup) getView( );
+		return radioGroup.getCheckedRadioButtonId();
+	}
+
 	@Override
 	public boolean setProperty(String property, String value)
 			throws PropertyConversionException, InvalidPropertyValueException
@@ -51,14 +119,9 @@ public class RadioGroupWidget extends Widget
 			return true;
 		}
 
-		RadioGroup radioGroup = (RadioGroup) getView( );
-		if( property.equals( IX_WIDGET.MAW_RADIO_GROUP_ADD_VIEW ) )
+		if( property.equals( IX_WIDGET.MAW_RADIO_GROUP_CLEAR_CHECK ) )
 		{
-			// Get the radio button widget and addview.
-
-		}
-		else if( property.equals( IX_WIDGET.MAW_RADIO_GROUP_CLEAR_CHECK ) )
-		{
+			RadioGroup radioGroup = (RadioGroup) getView( );
 			radioGroup.clearCheck();
 		}
 		else
@@ -68,4 +131,20 @@ public class RadioGroupWidget extends Widget
 		return true;
 	}
 
+	/**
+	 * @see Widget.getProperty.
+	 */
+//	@Override
+//	public String getProperty(String property)
+//	{
+//		RadioGroup radioGroup = (RadioGroup) getView( );
+//		if( property.equals( IX_WIDGET.MAW_RADIO_GROUP_SELECTED ) )
+//		{
+//			return radioGroup.getCheckedRadioButtonId().toString();
+//		}
+//		else
+//		{
+//			return super.getProperty( property );
+//		}
+//	}
 }
