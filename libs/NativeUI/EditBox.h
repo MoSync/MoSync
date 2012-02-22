@@ -47,7 +47,7 @@ namespace NativeUI
     class EditBoxListener;
 
     /**
-     * Types for edit box.
+     * \brief Types for edit box.
      */
     enum EditBoxMode
     {
@@ -56,13 +56,13 @@ namespace NativeUI
     };
 
     /**
-     * The EditBoxInputMode defines the type of text that the user is allowed to
-     * enter.
+     * \brief The EditBoxInputMode defines the type of text that the user is allowed
+     * to enter.
      */
     enum EditBoxInputMode
     {
 		/**
-		* \brief The user is allowed to enter any text, including line breaks.
+		* The user is allowed to enter any text, including line breaks.
 		*/
 		EDIT_BOX_INPUT_MODE_ANY = 0,
 		/**
@@ -93,7 +93,7 @@ namespace NativeUI
     };
 
     /**
-     * The EditBoxInputFlag defines how the input text is displayed/formatted.
+     * \brief The EditBoxInputFlag defines how the input text is displayed/formatted.
      */
     enum EditBoxInputFlag
     {
