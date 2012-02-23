@@ -47,7 +47,7 @@ namespace NativeUI
     {
     public:
         /**
-         * This method is called when a radio button from this group is selected.
+         * This method is called when a radio button from a radio group is selected.
          * When the selection is cleared, index is -1 and radioButton is null.
          * @param radioGroup The radio group object that generated the event.
          * @param index The index of the selected radio button inside this group.

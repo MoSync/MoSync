@@ -18,12 +18,9 @@ MA 02110-1301, USA.
 package com.mosync.nativeui.ui.factories;
 
 import android.app.Activity;
-import android.view.View;
-import android.view.View.OnClickListener;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.RadioButton;
-import android.widget.RadioGroup;
 
 import com.mosync.internal.android.EventQueue;
 import com.mosync.nativeui.ui.widgets.RadioButtonWidget;

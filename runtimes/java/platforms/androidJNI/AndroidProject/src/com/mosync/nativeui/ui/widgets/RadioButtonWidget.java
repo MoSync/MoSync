@@ -20,7 +20,6 @@ package com.mosync.nativeui.ui.widgets;
 import android.widget.RadioButton;
 
 import com.mosync.internal.generated.IX_WIDGET;
-import com.mosync.nativeui.util.properties.BooleanConverter;
 import com.mosync.nativeui.util.properties.ColorConverter;
 import com.mosync.nativeui.util.properties.InvalidPropertyValueException;
 import com.mosync.nativeui.util.properties.PropertyConversionException;
@@ -48,6 +47,11 @@ public class RadioButtonWidget extends Widget
 		mHandle = handle;
 	}
 
+	public int getHandle()
+	{
+		return mHandle;
+	}
+
 	/**
 	 * Get the id of this radio button.
 	 * @return
@@ -56,6 +60,12 @@ public class RadioButtonWidget extends Widget
 	{
 		RadioButton radioButton = (RadioButton) getView( );
 		return radioButton.getId();
+	}
+
+	public void setId(int id)
+	{
+		RadioButton radioButton = (RadioButton) getView( );
+		radioButton.setId(id);
 	}
 
 	@Override

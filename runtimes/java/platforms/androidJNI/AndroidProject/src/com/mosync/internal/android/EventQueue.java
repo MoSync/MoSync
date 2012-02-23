@@ -265,7 +265,7 @@ public class EventQueue
 		event[0] = EVENT_TYPE_WIDGET;
 		event[1] = IX_WIDGET.MAW_EVENT_RADIO_GROUP_ITEM_SELECTED;
 		event[2] = widgetHandle;
-		event[3] =  itemHandle;
+		event[3] = itemHandle;
 
 		sMoSyncThread.postEvent(event);
 	}

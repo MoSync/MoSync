@@ -132,7 +132,7 @@ namespace NativeUI
         {
 			for (int i=0; i < mRadioButtonListeners.size(); i++)
 			{
-				mRadioButtonListeners[i]->stateChanged(this, widgetEventData->radioButtonState);
+				mRadioButtonListeners[i]->radioButtonStateChanged(this, widgetEventData->radioButtonState);
 			}
         }
     }

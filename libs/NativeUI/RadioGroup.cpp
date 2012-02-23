@@ -44,25 +44,22 @@ namespace NativeUI
 	RadioGroup::~RadioGroup()
     {
         mRadioGroupListeners.clear();
+        for (int i = 0; i < mRadioButtons.size(); ++i)
+        {
+            delete mRadioButtons[i];
+        }
+        mRadioButtons.clear();
     }
 
     /**
      *  Add the radio buttons grouped in this widget.
      *  This is the only widget type that accepts Radio Buttons as children.
      *  @param radioButton The child widget.
-     *  @return True if successful, false if the button is not in this group.
      */
-    bool RadioGroup::addView(RadioButton* radioButton)
+    void RadioGroup::addView(RadioButton* radioButton)
     {
-		for (int i=0; i < mRadioButtons.size(); i++)
-		{
-			if ( mRadioButtons[i]->getWidgetHandle() == radioButton->getWidgetHandle() )
-			{
-				setPropertyInt(MAW_RADIO_GROUP_ADD_VIEW, radioButton->getWidgetHandle());
-				return true;
-			}
-		}
-		return false;
+		mRadioButtons.add(radioButton);
+		setPropertyInt(MAW_RADIO_GROUP_ADD_VIEW, radioButton->getWidgetHandle());
     }
 
     /**

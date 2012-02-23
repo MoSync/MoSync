@@ -619,6 +619,7 @@ public class NativeUI
 				if ( child != null && child instanceof RadioButtonWidget )
 				{
 					RadioButtonWidget radioButton = (RadioButtonWidget) child;
+					radioButton.setId(radioButtonHandle);
 					RadioGroupWidget radioGroup = (RadioGroupWidget) widget;
 					radioGroup.addButton( radioButton );
 

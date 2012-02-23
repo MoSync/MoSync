@@ -18,9 +18,6 @@ MA 02110-1301, USA.
 package com.mosync.nativeui.ui.factories;
 
 import android.app.Activity;
-import android.view.View;
-import android.view.View.OnClickListener;
-import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.RadioGroup.OnCheckedChangeListener;
 
@@ -46,9 +43,7 @@ public class RadioGroupFactory implements AbstractViewFactory
 
 			@Override
 			public void onCheckedChanged(RadioGroup group, int checkedId) {
-				// Search the radio button with that id.
-				int radioButtonHandle = 0;
-				EventQueue.getDefault( ).postRadioGroupItemSelected(handle, radioButtonHandle);
+				EventQueue.getDefault( ).postRadioGroupItemSelected(handle, checkedId);
 			}
 		});
 

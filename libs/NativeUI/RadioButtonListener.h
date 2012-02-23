@@ -51,7 +51,7 @@ namespace NativeUI
          * @param radioButton The radio button object that generated the event.
          * @param state The new state of the button.
          */
-        virtual void stateChanged(
+        virtual void radioButtonStateChanged(
             RadioButton* radioButton,
             bool state) = 0;
     };

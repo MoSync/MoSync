@@ -70,9 +70,8 @@ namespace NativeUI
          *  Add the radio buttons grouped in this widget.
          *  This is the only widget type that accepts Radio Buttons as children.
          *  @param radioButton The child widget.
-         *  @return True if successful, false if the button is not in this group.
          */
-        virtual bool addView(RadioButton* radioButton);
+        virtual void addView(RadioButton* radioButton);
 
         /**
          * Clear the selection.

@@ -83,7 +83,7 @@ public:
     /**
      * This method is called if the touch-up event was inside the
      * bounds of the button.
-     * Platform: iOS and Android. TODO !!!!!!!!!!!!!!
+     * Platform: iOS and Android.
      * @param button The button object that generated the event.
      */
     virtual void buttonClicked(Widget* button);

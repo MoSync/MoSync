@@ -55,7 +55,8 @@ namespace NativeUI
     /**
      * \brief An instance of RadioButton is used to create a two-states button that can
      * be either checked or unchecked.
-     * A radio button can only have a RadioGroup parent.
+     * A radio button can only have a RadioGroup parent. Add a radio button to a radio
+     * group by calling radioGroup->addView(radioButton).
      * Checking one radio button that belongs to a radio group unchecks any previously
      * checked radio button within the same group.
      * Initially, all of the radio buttons are unchecked.
