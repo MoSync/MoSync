@@ -69,15 +69,24 @@ namespace MoSync
              */
             void adControlErrorOccurred(object sender, Microsoft.Advertising.AdErrorEventArgs e)
             {
+                // TODO: handle the error
+                int errorCode = 0;
+
                 /**
                  * post the event to MoSync runtime
                  */
-                Memory eventData = new Memory(8);
-                const int MAWidgetEventData_eventType = 0;
+                Memory eventData = new Memory(16);
+                // set the main event type: EVENT_TYPE_ADS_BANNER
+                const int MAWidgetEventData_widgetEventType = 0;
                 const int MAWidgetEventData_widgetHandle = 4;
-                eventData.WriteInt32(MAWidgetEventData_eventType, MoSync.Constants.MA_ADS_EVENT_FAILED);
+                // set the banner event type: MA_ADS_EVENT_FAILED
+                const int MAWidgetEventData_eventType = 8;
+                const int MAWidgetEventData_errorCode = 12;
+                eventData.WriteInt32(MAWidgetEventData_widgetEventType, MoSync.Constants.EVENT_TYPE_ADS_BANNER);
                 eventData.WriteInt32(MAWidgetEventData_widgetHandle, mHandle);
-                mRuntime.PostCustomEvent(MoSync.Constants.EVENT_TYPE_ADS_BANNER, eventData);
+                eventData.WriteInt32(MAWidgetEventData_eventType, MoSync.Constants.MA_ADS_EVENT_FAILED);
+                eventData.WriteInt32(MAWidgetEventData_errorCode, errorCode);
+                mRuntime.PostEvent(new Event(eventData));
             }
 
             /*
@@ -89,12 +98,19 @@ namespace MoSync
                 /**
                  * post the event to MoSync runtime
                  */
-                Memory eventData = new Memory(8);
-                const int MAWidgetEventData_eventType = 0;
+                Memory eventData = new Memory(16);
+                // set the main event type: EVENT_TYPE_ADS_BANNER
+                const int MAWidgetEventData_widgetEventType = 0;
                 const int MAWidgetEventData_widgetHandle = 4;
-                eventData.WriteInt32(MAWidgetEventData_eventType, MoSync.Constants.MA_ADS_EVENT_ON_LEAVE_APPLICATION);
+                // set the banner event type: MA_ADS_EVENT_ON_LEAVE_APPLICATION
+                const int MAWidgetEventData_eventType = 8;
+                const int MAWidgetEventData_errorCode = 12;
+                eventData.WriteInt32(MAWidgetEventData_widgetEventType, MoSync.Constants.EVENT_TYPE_ADS_BANNER);
                 eventData.WriteInt32(MAWidgetEventData_widgetHandle, mHandle);
-                mRuntime.PostCustomEvent(MoSync.Constants.EVENT_TYPE_ADS_BANNER, eventData);
+                eventData.WriteInt32(MAWidgetEventData_eventType, MoSync.Constants.MA_ADS_EVENT_ON_LEAVE_APPLICATION);
+                // the error code is 0 in this case
+                eventData.WriteInt32(MAWidgetEventData_errorCode, 0);
+                mRuntime.PostEvent(new Event(eventData));
             }
 
             /*
@@ -105,12 +121,19 @@ namespace MoSync
                 /**
                  * post the event to MoSync runtime
                  */
-                Memory eventData = new Memory(8);
-                const int MAWidgetEventData_eventType = 0;
+                Memory eventData = new Memory(16);
+                // set the main event type: EVENT_TYPE_ADS_BANNER
+                const int MAWidgetEventData_widgetEventType = 0;
                 const int MAWidgetEventData_widgetHandle = 4;
-                eventData.WriteInt32(MAWidgetEventData_eventType, MoSync.Constants.MA_ADS_EVENT_LOADED);
+                // set the banner event type: MA_ADS_EVENT_LOADED
+                const int MAWidgetEventData_eventType = 8;
+                const int MAWidgetEventData_errorCode = 12;
+                eventData.WriteInt32(MAWidgetEventData_widgetEventType, MoSync.Constants.EVENT_TYPE_ADS_BANNER);
                 eventData.WriteInt32(MAWidgetEventData_widgetHandle, mHandle);
-                mRuntime.PostCustomEvent(MoSync.Constants.EVENT_TYPE_ADS_BANNER, eventData);
+                eventData.WriteInt32(MAWidgetEventData_eventType, MoSync.Constants.MA_ADS_EVENT_LOADED);
+                // the error code is 0 in this case
+                eventData.WriteInt32(MAWidgetEventData_errorCode, 0);
+                mRuntime.PostEvent(new Event(eventData));
             }
 
             /**

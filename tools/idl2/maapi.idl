@@ -9289,6 +9289,7 @@ group AdsAPI "Advertising API" {
 			LOADED = 1;
 			// This event is send after a banner view finishes executing an action that
 			// covered your application's user interface.
+			// Event not available on windows phone 7.1 on the AdControl
 			ON_DISMISS = 2;
 			// This event is send when the user taps the banner view.
 			// The application is moved to background after this event is send.
