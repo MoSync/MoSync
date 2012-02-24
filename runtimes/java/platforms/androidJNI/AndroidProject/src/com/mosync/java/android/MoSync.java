@@ -19,6 +19,9 @@ package com.mosync.java.android;
 
 import static com.mosync.internal.android.MoSyncHelpers.SYSLOG;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_CLOSE;
 import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_FOCUS_GAINED;
 import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_FOCUS_LOST;
@@ -51,10 +54,14 @@ import android.os.Handler;
 import android.util.Log;
 import android.view.KeyCharacterMap;
 import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
+import android.widget.Toast;
 
+import com.mosync.internal.android.EventQueue;
 import com.mosync.internal.android.Mediator;
 import com.mosync.internal.android.MoSyncCapture;
 import com.mosync.internal.android.MoSyncMultiTouchHandler;
@@ -66,6 +73,7 @@ import com.mosync.internal.android.nfc.MoSyncNFCForegroundUtil;
 import com.mosync.internal.android.nfc.MoSyncNFCService;
 import com.mosync.internal.android.notifications.LocalNotificationsManager;
 import com.mosync.internal.android.notifications.PushNotificationsManager;
+import com.mosync.internal.generated.IX_WIDGET;
 
 /**
  * Main MoSync activity
@@ -169,6 +177,11 @@ public class MoSync extends Activity
 		}
 
 		setContentView(root);
+	}
+
+	public View getRootView()
+	{
+		return getCurrentFocus();
 	}
 
 	@Override
@@ -296,6 +309,66 @@ public class MoSync extends Activity
 		// EVENT_TYPE_FOCUS_LOST.
 		sendCloseEvent();
     }
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu)
+	{
+		List<MenuItem> items = new ArrayList<MenuItem>();
+	    items.add( menu.add(0,1,0,"Search the new bla bla bla bla bla bla blah") ); // 1 is the item id
+	    items.add ( menu.add("Add a new bla bla bla bla bla bla bla blah") );
+	    items.add( menu.add("Remove") );
+	    items.add( menu.add("Plus") );
+	    items.add( menu.add("Minus") );
+	    items.add( menu.add("or") );
+	    items.add( menu.add("and") );
+	    items.get(0).setTitleCondensed("Search me");
+	    items.get(0).setIcon(R.drawable.icon);
+	    items.get(2).setIcon(R.drawable.icon);
+	    return true;
+//	    return super.onCreateOptionsMenu(menu);
+	}
+
+	@Override
+	public boolean onPrepareOptionsMenu(Menu menu)
+	{
+		menu.clear();
+		// Get the focused screen widget.
+		//ScreenWidget currentScreen = NativeUI.getScreen( getRootView() );
+		// Get the menu items for that screen.
+		List<MenuItem> items = new ArrayList<MenuItem>();
+			//currentScreen.getMenuItems();
+		for (int i=0; i < items.size(); i++)
+		{
+			menu.add ( items.get(i).getTitle() );
+		}
+
+		return super.onPrepareOptionsMenu(menu);
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item)
+	{
+		if ( item.getTitle().equals("Search") )
+		{
+
+			EventQueue.getDefault().postMenuItemSelected(1, item.getItemId());
+			Toast.makeText(this, "Selected", Toast.LENGTH_SHORT).show();
+			return true;
+		}
+
+		return super.onOptionsItemSelected(item);
+	}
+
+	@Override
+	public void onOptionsMenuClosed(Menu menu)
+	{
+		SYSLOG("Posting EVENT_TYPE_OPTIONS_MENU_CLOSED to MoSync");
+		int[] event = new int[1];
+		event[0] = IX_WIDGET.MAW_EVENT_OPTIONS_MENU_CLOSED;
+		mMoSyncThread.postEvent(event);
+
+		super.onOptionsMenuClosed(menu);
+	}
 
 	/**
 	 * This method is called when we get a result from a sub-activity.

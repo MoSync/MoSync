@@ -502,6 +502,8 @@ public class NativeUI
 
 		stackScreen.push( newScreen );
 
+		// emma
+//		m_currentScreen = newScreen;
 		return IX_WIDGET.MAW_RES_OK;
 	}
 
@@ -717,6 +719,18 @@ public class NativeUI
 				{
 					result = Integer.toString( selectedButton.getHandle() );
 				}
+			}
+			else if ( widget instanceof ScreenWidget && key.equals("Shown") )
+			{
+				MoSync activity = (MoSync) mMoSyncThread.getActivity();
+				View currentView = activity.getRootView();
+				if ( widget.getView() == currentView )
+				{
+					Log.e("@@MoSYnc", "Found the shown screen ---------------");
+					result = "true";
+				}
+				else
+					result = "false";
 			}
 			else
 			{

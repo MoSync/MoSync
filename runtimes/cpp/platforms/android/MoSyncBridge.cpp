@@ -560,6 +560,10 @@ static void nativePostEvent(JNIEnv* env, jobject jthis, jintArray eventBuffer)
 		{
 			widgetEvent->radioButtonState = intArray[3];
 		}
+		else if (widgetEventType == MAW_EVENT_OPTIONS_MENU_ITEM_SELECTED)
+		{
+			widgetEvent->optionsMenuItem = intArray[3];
+		}
 
 		event.data = (int)widgetEvent;
 	}

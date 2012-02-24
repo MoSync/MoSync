@@ -287,6 +287,23 @@ public class EventQueue
 		sMoSyncThread.postEvent(event);
 	}
 
+	/**
+	 * Sends the Option Menu item selected handle.
+	 * @param widgetHandle The single instance of the options menu.
+	 * @param itemHandle The widget handle of the menu item.
+	 */
+	public void postMenuItemSelected(int widgetHandle, int itemHandle)
+	{
+		int event[] = new int[4];
+
+		event[0] = EVENT_TYPE_WIDGET;
+		event[1] = IX_WIDGET.MAW_EVENT_OPTIONS_MENU_ITEM_SELECTED;
+		event[2] = widgetHandle;
+		event[3] = itemHandle;
+
+		sMoSyncThread.postEvent(event);
+	}
+
 	public static EventQueue getDefault()
 	{
 		return DEFAULT;

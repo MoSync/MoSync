@@ -6,7 +6,7 @@ the Free Software Foundation.
 
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+or FITNESS FOR A PARTICULAR PURPOSE.  ee the GNU General Public License
 for more details.
 
 You should have received a copy of the GNU General Public License
@@ -4316,9 +4316,14 @@ group WidgetAPI "Widget API" {
 			int radioGroupItemHandle;
 
 			/**
-			* The new state of a radio button, when a #RADIO_BUTTON_STATE_CHANGED event is received.
+			* The new state of a radio button, when a #MAW_EVENT_RADIO_BUTTON_STATE_CHANGED event is received.
 			*/
 			int radioButtonState;
+
+			/**
+			*  The selected menu item handle, when a #MAW_EVENT_OPTIONS_MENU_ITEM_SELECTED event is received.
+			*/
+			int optionsMenuItem;
 		}
 	}
 
@@ -4483,6 +4488,17 @@ group WidgetAPI "Widget API" {
 		* @brief Send when  the radio button state is changed.
 		*/
 		RADIO_BUTTON_STATE_CHANGED = 25;
+
+		/**
+		* @brief Send when the Options Menu is being closed (either by the user canceling
+		* the menu with the back/menu button, or when an item is selected).
+		*/
+		OPTIONS_MENU_CLOSED = 26;
+
+		/**
+		* @brief Send when an item in your options menu is selected.
+		*/
+		OPTIONS_MENU_ITEM_SELECTED = 27;
 	}
 
 	} // end of WidgetEventTypes
@@ -4990,6 +5006,7 @@ group WidgetAPI "Widget API" {
 		* See \ref WidgetRatingBarProperties "Rating Bar properties" for the properties available.
 		*/
 		RATING_BAR = "RatingBar";
+
 	}
 	} // end of WidgetTypes
 
