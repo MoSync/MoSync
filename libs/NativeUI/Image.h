@@ -41,7 +41,7 @@ namespace NativeUI
 {
 
     /**
-     * Types of scaling for the image.
+     * \brief Types of scaling for the image.
      */
     enum ImageScaleMode
     {

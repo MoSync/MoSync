@@ -16,12 +16,12 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301, USA.
 */
 
-/*! \addtogroup AdsLib
+/*! \addtogroup AdvertisingLib
  *  @{
  */
 
 /**
- *  @defgroup AdsLib Advertising Library
+ *  @defgroup AdvertisingLib Advertising Library
  *  @{
  */
 
@@ -31,6 +31,7 @@ MA 02110-1301, USA.
  * @date 1 Nov 2011
  *
  * @brief Provides a widget that displays advertisement to the user.
+ *
  * When the user taps a banner, it triggers an action programmed into
  * the advertisement.
  * Your application is notified when an action starts or stops.
@@ -45,7 +46,7 @@ MA 02110-1301, USA.
 #include <MAUtil/Vector.h>
 
 /**
- * \brief MoSync Ads API.
+ * \brief MoSync Advertising API.
  */
 namespace Ads
 {

@@ -32,6 +32,7 @@ MA 02110-1301, USA.
  *
  * @brief Push notifications are used for displaying alerts, playing sounds
  * and for badging application icon.
+ *
  * A push notification is send from a server and received by an application.
  * An application can register for receiving push notifications using
  * registerPushNotification function(NotificationManager class).
