@@ -55,7 +55,9 @@ namespace MoSync
 
                 //Setting the content of the View property of a Screen (which is a PhoneApplicationPage)
                 //as the Pivot control
-                (View as Microsoft.Phone.Controls.PhoneApplicationPage).Content = mPivot;
+                mPage.Children.Add(mPivot);
+                Grid.SetColumn(mPivot, 0);
+                Grid.SetRow(mPivot, 0);
             }
 
             /**
@@ -67,8 +69,11 @@ namespace MoSync
                 {
                     MoSync.Util.RunActionOnMainThreadSync(() =>
                         {
-                            mPivot.Items.Add(new Microsoft.Phone.Controls.PivotItem {
-                                Header = ((child as Screen).View as Microsoft.Phone.Controls.PhoneApplicationPage).Title,
+                            //pivotItem.Content = (child as Screen);
+
+                            mPivot.Items.Add(new Microsoft.Phone.Controls.PivotItem
+                            {
+                                Header = (child as Screen).getScreenTitle,
                                 Content = (child as Screen).View
                             });
                         }

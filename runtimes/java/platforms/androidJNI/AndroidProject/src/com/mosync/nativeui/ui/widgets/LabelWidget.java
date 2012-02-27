@@ -18,6 +18,7 @@ MA 02110-1301, USA.
 package com.mosync.nativeui.ui.widgets;
 
 import android.graphics.Typeface;
+import android.util.TypedValue;
 import android.widget.TextView;
 
 import com.mosync.internal.android.MoSyncFont;
@@ -84,7 +85,7 @@ public class LabelWidget extends Widget
 		}
 		else if( property.equals( IX_WIDGET.MAW_LABEL_FONT_SIZE ) )
 		{
-			textView.setTextSize( FloatConverter.convert( value ) );
+			textView.setTextSize( TypedValue.COMPLEX_UNIT_PX, FloatConverter.convert( value ) );
 		}
 		else if( property.equals( Types.WIDGET_PROPERTY_TEXT_HORIZONTAL_ALIGNMENT ) )
 		{

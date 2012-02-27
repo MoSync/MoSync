@@ -400,6 +400,7 @@ interface MAAPI {
 
 	/**
 	* Returns the screen size.
+	* Returns the screen size.
 	*/
 	MAExtent maGetScrSize();
 
@@ -5325,7 +5326,8 @@ group WidgetAPI "Widget API" {
 		/**
 		* @brief Sets the font size in points of the label's text.
 		*
-		* @validvalue A float that specifies the number of points.
+		* @validvalue A float that specifies the number of pixels on Android
+		* and WP7, and number of points on iOS.
 		*
 		* @setonly
 		*
@@ -5449,7 +5451,8 @@ group WidgetAPI "Widget API" {
 		/**
 		* @brief Sets the font size in points of the button's text.
 		*
-		* @validvalue A float that specifies the number of points.
+		* @validvalue A float that specifies the number of pixels on Android
+		* and WP7, and number of points on iOS.
 		*
 		* @setonly
 		*
@@ -5558,7 +5561,8 @@ group WidgetAPI "Widget API" {
 		/**
 		* @brief Sets the font size in points of the button's text.
 		*
-		* @validvalue A float that specifies the number of points.
+		* @validvalue A float that specifies the number of pixels on Android
+		* and WP7, and number of points on iOS.
 		*
 		* @setonly
 		*
@@ -5985,7 +5989,8 @@ group WidgetAPI "Widget API" {
 		/**
 		* @brief Sets the font size in points of the text part.
 		*
-		* @validvalue A float that specifies the number of points.
+		* @validvalue A float that specifies the number of pixels on Android
+		* and WP7, and number of points on iOS.
 		*
 		* @setonly
 		*
@@ -7110,7 +7115,8 @@ group WidgetAPI "Widget API" {
 		/**
 		* @brief Sets the font size in points of the title.
 		*
-		* @validvalue A float that specifies the number of points.
+		* @validvalue A float that specifies the number of pixels on Android
+		* and WP7, and number of points on iOS.
 		*
 		* @setonly
 		*
@@ -9012,7 +9018,7 @@ group NFCAPI "NFC API" {
 	*/
 	int maSyscallPanicsDisable();
 
-group AdsAPI "Ads API" {
+group AdsAPI "Advertising API" {
 	group AdsResultCodes "Ads result codes" {
 		constset int MA_ADS_RES_ {
 			/**
@@ -9060,7 +9066,7 @@ group AdsAPI "Ads API" {
 		}
 	} // end of Ads Result Codes
 
-	group AdsErrorCodes "Ads error codes" {
+	group AdsErrorCodes "Advertising error codes" {
 		constset int MA_ADS_ERROR_ {
 			/**
 			* @brief Indicates that something happened internally: for instance, the Activity may have been destroyed mid-refresh.
@@ -9107,7 +9113,7 @@ group AdsAPI "Ads API" {
 		}
 	} // end of Ads Error Codes
 
-	group AdsProperties "Ads Properties" {
+	group AdsProperties "Advertising Properties" {
 		constset MAString MA_ADS_ {
 			/**
 			* @brief Gets the height of the ads banner.
@@ -9310,7 +9316,7 @@ group AdsAPI "Ads API" {
 		}
 	} // end of Ads properties
 
-	group AdsConstants "Ads Constants" {
+	group AdsConstants "Advertising Constants" {
 		constset int MA_ADS_SIZE_ {
 			// An Ad can be created ony with those predefined sizes.
 			// This is the default banner of size 320*50.
@@ -9327,7 +9333,7 @@ group AdsAPI "Ads API" {
 		}
 	} // end of Ads Constants
 
-	group AdsEventTypes "Ads Event Types" {
+	group AdsEventTypes "Advertising Event Types" {
 		constset int MA_ADS_EVENT_ {
 			// This event is send when a banner view fails to load a new advertisement.
 			FAILED = 0;
@@ -9342,7 +9348,7 @@ group AdsAPI "Ads API" {
 		}
 	} // end of Ads Constants
 
-	group AdsFunctions "Ads Functions" {
+	group AdsFunctions "Advertising Functions" {
 		/**
 		* \brief Creates a new banner.
 		* \param bannerSize One of the MA_ADS_SIZE_ constants. Only for Android platform.
