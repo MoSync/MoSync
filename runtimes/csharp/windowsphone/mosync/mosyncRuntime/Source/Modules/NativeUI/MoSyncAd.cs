@@ -69,8 +69,15 @@ namespace MoSync
              */
             void adControlErrorOccurred(object sender, Microsoft.Advertising.AdErrorEventArgs e)
             {
-                // TODO: handle the error
                 int errorCode = 0;
+                if (e.Error.Message.Contains("HTTP") && e.Error.Message.Contains("404"))
+                {
+                    errorCode = MoSync.Constants.MA_ADS_ERROR_NETWORK;
+                }
+                else // if (e.Error.Message.Contains("No ad available"))
+                {
+                    errorCode = MoSync.Constants.MA_ADS_ERROR_NO_FILL;
+                }
 
                 /**
                  * post the event to MoSync runtime
@@ -79,7 +86,7 @@ namespace MoSync
                 // set the main event type: EVENT_TYPE_ADS_BANNER
                 const int MAWidgetEventData_widgetEventType = 0;
                 const int MAWidgetEventData_widgetHandle = 4;
-                // set the banner event type: MA_ADS_EVENT_FAILED
+                // set the banner event type: MA_ADS_EVENT_FsAILED
                 const int MAWidgetEventData_eventType = 8;
                 const int MAWidgetEventData_errorCode = 12;
                 eventData.WriteInt32(MAWidgetEventData_widgetEventType, MoSync.Constants.EVENT_TYPE_ADS_BANNER);

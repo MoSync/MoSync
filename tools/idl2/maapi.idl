@@ -9023,13 +9023,13 @@ group AdsAPI "Advertising API" {
 
 			/**
 			* @brief Indicates that the connection to the advertisements server failed.
-			* Platform: Android and iOS.
+			* Platform: Android, iOS and Windows Phone 7.1.
 			*/
 			NETWORK = -3;
 
 			/**
 			* @brief Indicates that no ad was returned due to lack of ad inventory.
-			* Platform: Android and iOS.
+			* Platform: Android, iOS and Windows Phone 7.1.
 			*/
 			NO_FILL = -4;
 
