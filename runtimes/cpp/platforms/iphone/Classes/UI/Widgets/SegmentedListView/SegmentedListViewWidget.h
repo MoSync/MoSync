@@ -33,7 +33,7 @@
  * @brief A SegmentedListView widget is used to present an indexed/grouped list of items.
  * Implements UITableViewDelegate and UITableViewDelegate for filling table's content.
  */
-@interface SegmentedListViewWidget : IWidget<UITableViewDelegate, UITableViewDelegate>
+@interface SegmentedListViewWidget : IWidget<UITableViewDelegate, UITableViewDataSource>
 {
     /**
      * Native list/table view object.
