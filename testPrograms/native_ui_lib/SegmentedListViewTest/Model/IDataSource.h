@@ -17,51 +17,43 @@
  */
 
 /**
- * @file ApplicationController.cpp
+ * @file IDataSource.h
  * @author Bogdan Iusco
- * @date 22 Feb 2012
+ * @date 28 Feb 2012
  *
- * @brief Application's controller.
+ * @brief Interface class for application data.
  */
+
+#ifndef IDATASOURCE_H_
+#define IDATASOURCE_H_
 
 #include <MAUtil/String.h>
 
-#include "ApplicationController.h"
-#include "../View/IndexedListScreen.h"
-#include "../Model/DataSource.h"
+// Forward declaration.
+class ListSection;
 
 using namespace MAUtil;
 
-
 /**
- * Constructor.
+ * @brief Abstract class for DataSource.
  */
-ApplicationController::ApplicationController():
-	mTabScreen(NULL),
-	mIndexedListViewScreen(NULL),
-	mDataSource(NULL)
+class IDataSource
 {
-	mDataSource = new DataSource();
-	mTabScreen = new TabScreen();
+public:
+	/**
+	 * Get the number of sections.
+	 * @return The number of sections.
+	 */
+	virtual const int getSectionCount() = 0;
 
-	this->createScreens();
+	/**
+	 * Get a specified section.
+	 * @param index Section's index to get.
+	 * @return The specified section if the index is valid, NULL otherwise.
+	 * The ownership of the result is NOT passed to the caller.
+	 */
+	virtual const ListSection* getSection(const int index) = 0;
+};
 
-	mTabScreen->show();
-}
 
-/**
- * Destructor.
- */
-ApplicationController::~ApplicationController()
-{
-	delete mTabScreen;
-}
-
-/**
- * Create screens and add them to tab screen.
- */
-void ApplicationController::createScreens()
-{
-	mIndexedListViewScreen = new IndexedListScreen(*mDataSource);
-	mTabScreen->addTab(mIndexedListViewScreen);
-}
+#endif /* IDATASOURCE_H_ */

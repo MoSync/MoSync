@@ -27,17 +27,27 @@
 
 #define SCREEN_TITLE "Indexed list"
 
+#include <MAUtil/String.h>
+
 #include "IndexedListScreen.h"
+#include "../Model/ListSection.h"
+
+using namespace MAUtil;
 
 /**
  * Constructor.
+ * @param dataSource Segmented list's data source.
  */
-IndexedListScreen::IndexedListScreen() :
+IndexedListScreen::IndexedListScreen(IDataSource& dataSource) :
 	Screen(),
+	mDataSource(dataSource),
 	mSegmentedListView(NULL)
 {
-	this->createUI();
 	this->setTitle(SCREEN_TITLE);
+
+	this->createUI();
+	this->populateList();
+
 }
 
 /**
@@ -56,4 +66,33 @@ void IndexedListScreen::createUI()
 	mSegmentedListView = new SegmentedListView();
 	this->setMainWidget(mSegmentedListView);
 
+}
+
+/**
+ * Populate list with data.
+ */
+void IndexedListScreen::populateList()
+{
+	int countSections = mDataSource.getSectionCount();
+	for (int i = 0; i < countSections; i++)
+	{
+		const ListSection* section = mDataSource.getSection(i);
+		const String& sectionTitle = section->getTitle();
+		printf("Add section title = %s", sectionTitle.c_str());
+		this->addSectionDataToList(*section);
+	}
+}
+
+/**
+ * Add a given section to list.
+ * @param section Section to add.
+ */
+void IndexedListScreen::addSectionDataToList(const ListSection& section)
+{
+	int countCells = section.getCellCount();
+	for (int i = 0; i < countCells; i++)
+	{
+		const String* cellText = section.getCellText(i);
+		printf("add cell %s", cellText->c_str());
+	}
 }

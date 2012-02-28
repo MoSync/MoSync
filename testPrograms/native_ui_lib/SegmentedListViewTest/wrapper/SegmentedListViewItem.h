@@ -58,7 +58,7 @@ namespace NativeUI
 		/**
 		 * Destructor.
 		 */
-		~SegmentedListViewItem();
+		virtual ~SegmentedListViewItem();
 	};
 
 } // namespace NativeUI

@@ -17,60 +17,48 @@
  */
 
 /**
- * @file ApplicationController.h
+ * @file CountrySegmentedListItem.h
  * @author Bogdan Iusco
- * @date 22 Feb 2012
+ * @date 28 Feb 2012
  *
- * @brief Application's controller.
+ * @brief Country item class for segmented list widget.
  */
 
-#ifndef APPLICATIONCONTROLLER_H_
-#define APPLICATIONCONTROLLER_H_
+#ifndef COUNTRYSEGMENTEDLISTITEM_H_
+#define COUNTRYSEGMENTEDLISTITEM_H_
 
-#include <NativeUI/TabScreen.h>
+#include <MAUtil/String.h>
 
-// Forward declarations.
-class IndexedListScreen;
-class DataSource;
+#include "../wrapper/SegmentedListViewItem.h"
 
 using namespace NativeUI;
+using namespace MAUtil;
 
-class ApplicationController
+class CountrySegmentedListItem : public SegmentedListViewItem
 {
 public:
 	/**
 	 * Constructor.
+	 * @param countryName String displayed on the list item.
 	 */
-	ApplicationController();
+	CountrySegmentedListItem(const String& countryName);
 
 	/**
 	 * Destructor.
 	 */
-	virtual ~ApplicationController();
+	virtual ~CountrySegmentedListItem();
 
 private:
 	/**
-	 * Create screens and add them to tab screen.
+	 * Create UI widgets and add them to item.
 	 */
-	void createScreens();
+	void createUI();
 
 private:
 	/**
-	 * Application's tab screen.
+	 * Country name displayed on the list item.
 	 */
-	TabScreen* mTabScreen;
-
-	/**
-	 * 1st tab screen.
-	 * Shows an alphabetical list.
-	 */
-	IndexedListScreen* mIndexedListViewScreen;
-
-	/**
-	 * Application data.
-	 */
-	DataSource* mDataSource;
+	String* mCountryName;
 };
 
-
-#endif /* APPLICATIONCONTROLLER_H_ */
+#endif /* COUNTRYSEGMENTEDLISTITEM_H_ */

@@ -29,22 +29,28 @@
 #define INDEXEDLISTSCREEN_H_
 
 #include <NativeUI/Screen.h>
+
 #include "../wrapper/SegmentedListView.h"
+#include "../Model/IDataSource.h"
 
 using namespace NativeUI;
+
+// Forward declaration.
+class ListSection;
 
 class IndexedListScreen: public Screen
 {
 public:
 	/**
 	 * Constructor.
+	 * @param dataSource Segmented list's data source.
 	 */
-	IndexedListScreen();
+	IndexedListScreen(IDataSource& dataSource);
 
 	/**
 	 * Destructor.
 	 */
-	~IndexedListScreen();
+	virtual ~IndexedListScreen();
 
 private:
 	/**
@@ -52,7 +58,23 @@ private:
 	 */
 	void createUI();
 
+	/**
+	 * Populate list with data.
+	 */
+	void populateList();
+
+	/**
+	 * Add a given section to list.
+	 * @param section Section to add.
+	 */
+	void addSectionDataToList(const ListSection& section);
+
 private:
+	/**
+	 * Data source for segmented list.
+	 */
+	IDataSource& mDataSource;
+
 	/**
 	 * Used for displaying items in a alphabetical list.
 	 */
