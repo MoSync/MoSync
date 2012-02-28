@@ -39,6 +39,12 @@
      * Native list/table view object.
      */
     UITableView* _tableView;
+
+    /**
+     * Sections for table view(SegmentedListViewSection objects).
+     * Each section contains one or more cells, title, header and footer text.
+     */
+    NSMutableArray* _sections;
 }
 
 /**

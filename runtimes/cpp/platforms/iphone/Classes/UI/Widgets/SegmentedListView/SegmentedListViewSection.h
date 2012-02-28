@@ -37,7 +37,54 @@
  */
 @interface SegmentedListViewSection : NSObject
 {
+    /**
+     * Section's title displayed on the right side of the table view.
+     * The table view must be in the plain style.
+     */
+    NSString* _title;
 
+    /**
+     * A string used as the title of the section header.
+     */
+    NSString* _headerTitle;
+
+    /**
+     * A string used as the title of the section footer.
+     */
+    NSString* _footerTitle;
+
+    /**
+     * Cells for section.
+     */
+    NSMutableArray* _cells;
 }
+
+@property(nonatomic, retain) NSString* title;
+@property(nonatomic, retain) NSString* headerTitle;
+@property(nonatomic, retain) NSString* footerTitle;
+
+/**
+ * Return the number of contained cells.
+ */
+-(NSInteger) countCells;
+
+/**
+ * Add a given cell.
+ * @param cell Cell to be added to section.
+ */
+-(void) addCell:(SegmentedListViewItemWidget*) cell;
+
+/**
+ * Remove a given cell from section.
+ * @param cell Cell to be removed.
+ */
+-(void) removeCell:(SegmentedListViewItemWidget*) cell;
+
+/**
+ * Get a cell at a given index.
+ * @param index Cell's index.
+ * @return Cell at the given index if the index is valid, nil otherwise.
+ */
+-(SegmentedListViewItemWidget*) cellWidgetAtIndex:(NSInteger) index;
 
 @end

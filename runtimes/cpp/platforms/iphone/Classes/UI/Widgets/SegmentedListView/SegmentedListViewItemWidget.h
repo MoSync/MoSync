@@ -36,7 +36,38 @@
  */
 @interface SegmentedListViewItemWidget : IWidget
 {
+    /**
+     * Cell that will be displayed inside SegmentedListViewWidget.
+     */
+    UITableViewCell* _cell;
 
+    /**
+     * Cell's height.
+     */
+    CGFloat _height;
 }
+
+@property(nonatomic, readonly) UITableViewCell* cell;
+@property(nonatomic, assign) CGFloat height;
+
+/**
+ * Init function.
+ */
+- (id)init;
+
+/**
+ * Sets a property.
+ * @param key The property of the widget that should be set.
+ * @param value The value of the property.
+ * @return MAW_RES_OK if the property was set, or an error code otherwise.
+ */
+- (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value;
+
+/**
+ * Returns a property value of the widget.
+ * @param key The property of the widget.
+ * @return The value for the given property.
+ */
+- (NSString*)getPropertyWithKey: (NSString*)key;
 
 @end

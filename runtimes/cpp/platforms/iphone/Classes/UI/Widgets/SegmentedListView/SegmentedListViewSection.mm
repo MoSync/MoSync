@@ -30,4 +30,72 @@
 
 @implementation SegmentedListViewSection
 
+@synthesize title = _title;
+@synthesize headerTitle = _headerTitle;
+@synthesize footerTitle = _footerTitle;
+
+/**
+ * Init function.
+ */
+-(id) init
+{
+    self = [super init];
+    if (self)
+    {
+        _cells = [[NSMutableArray alloc] init];
+    }
+
+    return self;
+}
+
+/**
+ * Return the number of contained cells.
+ */
+-(NSInteger) countCells
+{
+    return [_cells count];
+}
+
+/**
+ * Add a given cell.
+ * @param cell Cell to be added to section.
+ */
+-(void) addCell:(SegmentedListViewItemWidget*) cell
+{
+    [_cells addObject:cell];
+}
+
+/**
+ * Remove a given cell from section.
+ * @param cell Cell to be removed.
+ */
+-(void) removeCell:(SegmentedListViewItemWidget*) cell
+{
+    [_cells removeObject:cell];
+}
+
+/**
+ * Get a cell at a given index.
+ * @param index Cell's index.
+ * @return Cell at the given index if the index is valid, nil otherwise.
+ */
+-(SegmentedListViewItemWidget*) cellWidgetAtIndex:(NSInteger) index
+{
+    if (index < 0 || index >= [_cells count])
+    {
+        return nil;
+    }
+
+    return [_cells objectAtIndex:index];
+}
+
+/**
+ * Release all member objects.
+ */
+-(void) dealloc
+{
+    [_cells release];
+
+    [super dealloc];
+}
 @end

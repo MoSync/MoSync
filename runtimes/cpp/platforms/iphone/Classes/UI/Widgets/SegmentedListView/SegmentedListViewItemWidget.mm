@@ -31,4 +31,56 @@
 
 @implementation SegmentedListViewItemWidget
 
+@synthesize cell = _cell;
+@synthesize height = _height;
+
+static NSString* kReuseIdentifier = @"Cell";
+
+/**
+ * Init function.
+ */
+- (id)init
+{
+    self = [super init];
+    if (self)
+    {
+        _cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault
+                                       reuseIdentifier:kReuseIdentifier];
+        view = _cell;
+    }
+
+    return self;
+}
+
+/**
+ * Sets a property.
+ * @param key The property of the widget that should be set.
+ * @param value The value of the property.
+ * @return MAW_RES_OK if the property was set, or an error code otherwise.
+ */
+- (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value
+{
+    return [super setPropertyWithKey:key toValue:value];
+}
+
+/**
+ * Returns a property value of the widget.
+ * @param key The property of the widget.
+ * @return The value for the given property.
+ */
+- (NSString*)getPropertyWithKey: (NSString*)key
+{
+    return [super getPropertyWithKey:key];
+}
+
+/**
+ * Release all member data.
+ */
+-(void) dealloc
+{
+    // Do NOT release _cell object here. It will be released by the super class.
+
+    [super dealloc];
+}
+
 @end
