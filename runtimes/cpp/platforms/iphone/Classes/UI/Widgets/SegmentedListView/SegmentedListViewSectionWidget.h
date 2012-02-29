@@ -17,16 +17,18 @@
  */
 
 /**
- * @file SegmentedListViewSection.h
+ * @file SegmentedListViewSectionWidget.h
  * @author Bogdan Iusco
  * @date 22 Feb 2012
  *
- * @brief SegmentedListViewSection widget interface file.
- * A SegmentedListViewSection object wraps one or more SegmentedListViewItemWidget
+ * @brief SegmentedListViewSectionWidget widget interface file.
+ * A SegmentedListViewSectionWidget object wraps one or more SegmentedListViewItemWidget
  * objects and their characteristics(such as header and footer text).
  */
 
 #import <Foundation/Foundation.h>
+
+#import "IWidget.h"
 
 // Forward declaration.
 @class SegmentedListViewItemWidget;
@@ -35,7 +37,7 @@
  * @brief A SegmentedListViewSection object wraps one or more SegmentedListViewItemWidget
  * objects and their characteristics(such as header and footer text).
  */
-@interface SegmentedListViewSection : NSObject
+@interface SegmentedListViewSectionWidget : IWidget
 {
     /**
      * Section's title displayed on the right side of the table view.
@@ -62,6 +64,20 @@
 @property(nonatomic, retain) NSString* title;
 @property(nonatomic, retain) NSString* headerTitle;
 @property(nonatomic, retain) NSString* footerTitle;
+/**
+ * Sets a property.
+ * @param key The property of the widget that should be set.
+ * @param value The value of the property.
+ * @return MAW_RES_OK if the property was set, or an error code otherwise.
+ */
+- (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value;
+
+/**
+ * Returns a property value of the widget.
+ * @param key The property of the widget.
+ * @return The value for the given property.
+ */
+- (NSString*)getPropertyWithKey: (NSString*)key;
 
 /**
  * Return the number of contained cells.
@@ -72,7 +88,7 @@
  * Add a given cell.
  * @param cell Cell to be added to section.
  */
--(void) addCell:(SegmentedListViewItemWidget*) cell;
+-(void) addChild:(SegmentedListViewItemWidget*) cell;
 
 /**
  * Remove a given cell from section.

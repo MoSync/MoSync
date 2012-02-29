@@ -26,59 +26,60 @@ MA 02110-1301, USA.
  */
 
 /**
- * @file SegmentedListView.h
+ * @file SegmentedListViewSection.h
  * @author Bogdan Iusco
  *
- * @brief A SegmentedListView widget is used to present an indexed/grouped list
- * of items.
+ * @brief A SegmentedListViewSection widget is used to group one or more
+ * SegmentedListViewItem objects.
  * Available on iOS platform.
  */
 
-#ifndef NATIVEUI_SEGMENTED_LIST_VIEW_H_
-#define NATIVEUI_SEGMENTED_LIST_VIEW_H_
+#ifndef NATIVEUI_SEGMENTED_LIST_VIEW_SECTION_H_
+#define NATIVEUI_SEGMENTED_LIST_VIEW_SECTION_H_
 
 #include <NativeUI/Widget.h>
+#include <MAUtil/String.h>
 
 namespace NativeUI
 {
 
 	// Forward declaration
-	class SegmentedListViewSection;
+	class SegmentedListViewItem;
 
 	/**
-	 * @brief A SegmentedListView widget is used to present an indexed/grouped
-	 * list of items.
-	 * Only SegmentedListViewSection objects can be added to this list.
-	 * Available on iOS platform.
+	 * @brief A SegmentedListViewSection widget is used to group one or more
+	 * SegmentedListViewItem objects.
 	 */
-	class SegmentedListView: public Widget
+	class SegmentedListViewSection : public Widget
 	{
 	public:
 		/**
 		 * Constructor.
 		 */
-		SegmentedListView();
+		SegmentedListViewSection();
 
 		/**
 		 * Destructor.
 		 */
-		virtual ~SegmentedListView();
+		virtual ~SegmentedListViewSection();
 
 		/**
-		 * Add a section to this list.
-		 * @param section The section that will be added.
-		 * The ownership of the section object is passed to this method.
+		 * Add an list item to this section.
+		 * @param item The item that will be added.
+		 * The ownership of the item object is passed to this method.
 		 */
-		void addSection(SegmentedListViewSection* section);
+		void addItem(SegmentedListViewItem* item);
 
 		/**
-		 * Reload list view data.
-		 * Call this method after each modification done to list view data.
+		 * Set section title.
+		 * Section title will appear on the right side of the list.
 		 * Platform: iOS.
+		 *
+		 * @param title The given title.
 		 */
-		void reloadData();
+		void setTitle(const MAUtil::String& title);
 
-private:
+	private:
 		/**
 		 * Add a widget as a child of this widget.
 		 * @param widget The widget that will be added.
@@ -121,9 +122,7 @@ private:
 		 */
 		int removeChild(Widget* widget);
 	};
-
 } // namespace NativeUI
 
-#endif /* NATIVEUI_SEGMENTED_LIST_VIEW_H_ */
-
+#endif /* NATIVEUI_SEGMENTED_LIST_VIEW_SECTION_H_ */
 /*! @} */

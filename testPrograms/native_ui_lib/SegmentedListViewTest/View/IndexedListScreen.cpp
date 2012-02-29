@@ -30,7 +30,9 @@
 #include <MAUtil/String.h>
 
 #include "IndexedListScreen.h"
+#include "CountrySegmentedListItem.h"
 #include "../Model/ListSection.h"
+#include "../wrapper/SegmentedListViewSection.h"
 
 using namespace MAUtil;
 
@@ -47,7 +49,7 @@ IndexedListScreen::IndexedListScreen(IDataSource& dataSource) :
 
 	this->createUI();
 	this->populateList();
-
+	mSegmentedListView->reloadData();
 }
 
 /**
@@ -78,7 +80,6 @@ void IndexedListScreen::populateList()
 	{
 		const ListSection* section = mDataSource.getSection(i);
 		const String& sectionTitle = section->getTitle();
-		printf("Add section title = %s", sectionTitle.c_str());
 		this->addSectionDataToList(*section);
 	}
 }
@@ -89,10 +90,19 @@ void IndexedListScreen::populateList()
  */
 void IndexedListScreen::addSectionDataToList(const ListSection& section)
 {
+	SegmentedListViewSection* segmentedListViewSection =
+		new SegmentedListViewSection();
+	segmentedListViewSection->setTitle(section.getTitle());
+
 	int countCells = section.getCellCount();
 	for (int i = 0; i < countCells; i++)
 	{
 		const String* cellText = section.getCellText(i);
-		printf("add cell %s", cellText->c_str());
+
+		// Create cell and add it to section.
+		CountrySegmentedListItem* cell = new CountrySegmentedListItem(*cellText);
+		segmentedListViewSection->addItem(cell);
 	}
+
+	mSegmentedListView->addSection(segmentedListViewSection);
 }

@@ -26,7 +26,7 @@
  */
 
 #import "SegmentedListViewWidget.h"
-#import "SegmentedListViewSection.h"
+#import "SegmentedListViewSectionWidget.h"
 #import "SegmentedListViewItemWidget.h"
 
 @implementation SegmentedListViewWidget
@@ -39,10 +39,10 @@
     self = [super init];
     if (self)
     {
-        UITableView* tableView = [[UITableView alloc] init];
-        tableView.delegate = self;
-        tableView.dataSource = self;
-        view = tableView;
+        _tableView = [[UITableView alloc] initWithFrame:CGRectZero style:UITableViewStylePlain];
+        _tableView.delegate = self;
+        _tableView.dataSource = self;
+        view = _tableView;
 
         _sections = [[NSMutableArray alloc] init];
     }
@@ -58,7 +58,16 @@
  */
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value
 {
-    return [super setPropertyWithKey:key toValue:value];
+    int resultCode = MAW_RES_OK;
+    if ([key isEqualToString:@MAW_SEGMENTED_LIST_VIEW_RELOAD_DATA])
+    {
+        [_tableView reloadData];
+    }
+    else
+    {
+        resultCode = [super setPropertyWithKey:key toValue:value];
+    }
+    return resultCode;
 }
 
 /**
@@ -71,6 +80,15 @@
     return [super getPropertyWithKey:key];
 }
 
+/**
+ * Add a section to list.
+ */
+- (void)addChild: (SegmentedListViewSectionWidget*) section
+{
+    LOGIN;
+	[_sections addObject:section];
+}
+
 #pragma mark UITableViewDataSource
 
 /**
@@ -81,7 +99,7 @@
  */
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    SegmentedListViewSection* tableSection = [_sections objectAtIndex:section];
+    SegmentedListViewSectionWidget* tableSection = [_sections objectAtIndex:section];
     if (!tableSection)
     {
         return 0;
@@ -98,13 +116,13 @@
  */
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    SegmentedListViewSection* section = [_sections objectAtIndex:indexPath.section];
+    SegmentedListViewSectionWidget* section = [_sections objectAtIndex:indexPath.section];
     if (!section)
     {
         return nil;
     }
 
-    SegmentedListViewItemWidget *cellWidget = [section getCellWidget:indexPath.row];
+    SegmentedListViewItemWidget *cellWidget = [section cellWidgetAtIndex:indexPath.row];
     if (!cellWidget)
     {
         return nil;
@@ -131,7 +149,7 @@
  */
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
 {
-    SegmentedListViewSection* tableViewSection = [_sections objectAtIndex:section];
+    SegmentedListViewSectionWidget* tableViewSection = [_sections objectAtIndex:section];
     if (!tableViewSection)
     {
         return nil;
@@ -148,7 +166,7 @@
  */
 - (NSString *)tableView:(UITableView *)tableView titleForFooterInSection:(NSInteger)section
 {
-    SegmentedListViewSection* tableViewSection = [_sections objectAtIndex:section];
+    SegmentedListViewSectionWidget* tableViewSection = [_sections objectAtIndex:section];
     if (!tableViewSection)
     {
         return nil;
@@ -188,7 +206,7 @@
 - (NSArray *)sectionIndexTitlesForTableView:(UITableView *)tableView
 {
     NSMutableArray* array = [[[NSMutableArray alloc] init] autorelease];
-    for (SegmentedListViewSection* section in _sections)
+    for (SegmentedListViewSectionWidget* section in _sections)
     {
         [array addObject:section.title];
     }
@@ -206,12 +224,12 @@
  */
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    SegmentedListViewSection* section = [_sections objectAtIndex:indexPath.section];
+    SegmentedListViewSectionWidget* section = [_sections objectAtIndex:indexPath.section];
     if (!section)
     {
         return 0;
     }
-    SegmentedListViewItemWidget* cellWidget = [section getCellWidget:indexPath.row];
+    SegmentedListViewItemWidget* cellWidget = [section cellWidgetAtIndex:indexPath.row];
     return cellWidget.height;
 }
 

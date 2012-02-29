@@ -4930,10 +4930,18 @@ group WidgetAPI "Widget API" {
 
 		/**
 		* @brief A SegmentedListView widget is used to present an indexed/grouped list of items.
-		* Only SegmentedListViewItem objects can be added to this list.
+		* Only SegmentedListViewSection objects can be added to this list.
 		* Available on iOS platform.
 		*/
 		SEGMENTED_LIST_VIEW = "SegmentedListView";
+
+		/**
+		* @brief A SegmentedListViewSection widget is used to group one or more SegmentedListViewItem objects.
+		* Only SegmentedListViewItem objects can be added to this list.
+		* None of the widgets properties applies to this widget.
+		* Available on iOS platform.
+		*/
+		SEGMENTED_LIST_VIEW_SECTION = "SegmentedListViewSection";
 
 		/**
 		* @brief A SegmentedListViewItem widget is used to define the attributes and behaviour of the
@@ -7213,6 +7221,49 @@ group WidgetAPI "Widget API" {
 
 	}
 	} // end of WidgetmodalDialogProperties
+
+	group WidgetSegmentedListViewProperties "Segmented List View properties" {
+	constset MAString MAW_SEGMENTED_LIST_VIEW_ {
+		/**
+		* @brief Reloads data for a given section.
+		* Platform: iOS.
+		*
+		* @validvalue Section's handle that will be reloaded.
+		* If this value is an empty string all sections will be reloaded.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*   // Reload list view data.
+		*   maWidgetSetProperty(listHandle, MAW_SEGMENTED_LIST_VIEW_RELOAD_DATA, "");
+		* \endcode
+		*/
+		RELOAD_DATA = "ReloadData";
+	}
+	} // end of WidgetSegmentedListViewProperties
+
+	group WidgetSegmentedListViewSectionProperties "Segmented List View Section properties" {
+	constset MAString MAW_SEGMENTED_LIST_VIEW_SECTION_ {
+		/**
+		* @brief Set or get section title.
+		* Section title will appear on the right side of the list.
+		*
+		* Platform: iOS.
+		*
+		* @validvalue A string.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+		*   maWidgetSetProperty(listSectionHandle, MAW_SEGMENTED_LIST_VIEW_SECTION_TITLE, "A");
+		* \endcode
+		*/
+		TITLE = "Title";
+	}
+	} // end of WidgetSegmentedListViewProperties
+
 	} // end of WidgetProperties
 
 	typedef int MAWidgetHandle;

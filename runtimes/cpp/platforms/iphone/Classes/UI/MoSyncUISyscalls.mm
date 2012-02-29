@@ -27,7 +27,9 @@
 #import "ListViewWidget.h"
 #import "GLViewWidget.h"
 #import "OptionsDialogView.h"
-
+#import "SegmentedListViewWidget.h"
+#import "SegmentedListViewSectionWidget.h"
+#import "SegmentedListViewItemWidget.h"
 MoSyncUI* mosyncUI;
 
 MoSyncUI* getMoSyncUI() {
@@ -189,7 +191,10 @@ int maWidgetAddChild(MAWidgetHandle parentHandle, MAHandle childHandle) {
 	   !([parent class] == [RelativeLayoutWidget class]) &&
 	   !([parent class] == [ListViewWidget class]) &&
 	   !([parent class] == [ListViewItemWidget class]) &&
-	   !([parent class] == [ScreenWidget class]) &&
+	   !([parent class] == [SegmentedListViewWidget class]) &&
+	   !([parent class] == [SegmentedListViewSectionWidget class]) &&
+	   !([parent class] == [SegmentedListViewItemWidget class]) &&
+       !([parent class] == [ScreenWidget class]) &&
 	   !([parent superclass] == [ScreenWidget class])
 	   ) {
 		return MAW_RES_INVALID_LAYOUT;

@@ -29,6 +29,9 @@
 
 #import "IWidget.h"
 
+// Forward declaration
+@class SegmentedListViewSectionWidget;
+
 /**
  * @brief A SegmentedListView widget is used to present an indexed/grouped list of items.
  * Implements UITableViewDelegate and UITableViewDelegate for filling table's content.
@@ -41,7 +44,7 @@
     UITableView* _tableView;
 
     /**
-     * Sections for table view(SegmentedListViewSection objects).
+     * Sections for table view(SegmentedListViewSectionWidget objects).
      * Each section contains one or more cells, title, header and footer text.
      */
     NSMutableArray* _sections;
@@ -66,5 +69,10 @@
  * @return The value for the given property.
  */
 - (NSString*)getPropertyWithKey: (NSString*)key;
+
+/**
+ * Add a section to list.
+ */
+- (void) addChild: (SegmentedListViewSectionWidget*) section;
 
 @end

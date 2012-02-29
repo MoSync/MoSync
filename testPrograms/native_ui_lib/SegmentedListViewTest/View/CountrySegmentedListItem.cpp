@@ -40,6 +40,7 @@ CountrySegmentedListItem::CountrySegmentedListItem(const String& countryName) :
 	SegmentedListViewItem()
 {
 	mCountryName = new String(countryName);
+	this->createUI();
 }
 
 /**
@@ -56,9 +57,11 @@ CountrySegmentedListItem::~CountrySegmentedListItem()
 void CountrySegmentedListItem::createUI()
 {
 	RelativeLayout* layout = new RelativeLayout();
+	layout->setWidth(this->getWidth());
 	this->addChild(layout);
 
 	Label* label = new Label();
+	label->setWidth(this->getWidth()- LABEL_COORD_LEFT);
 	label->setText(*mCountryName);
 	label->setTopPosition(LABEL_COORD_TOP);
 	label->setLeftPosition(LABEL_COORD_LEFT);

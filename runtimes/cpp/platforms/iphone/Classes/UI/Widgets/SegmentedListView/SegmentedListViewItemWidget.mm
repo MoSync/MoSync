@@ -46,6 +46,7 @@ static NSString* kReuseIdentifier = @"Cell";
     {
         _cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault
                                        reuseIdentifier:kReuseIdentifier];
+        _height = _cell.bounds.size.height;
         view = _cell;
     }
 

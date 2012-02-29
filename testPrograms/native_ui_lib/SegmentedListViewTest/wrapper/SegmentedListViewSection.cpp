@@ -16,25 +16,34 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301, USA.
 */
 
+/*! \addtogroup NativeUILib
+ *  @{
+ */
+
 /**
- * @file SegmentedListView.cpp
+ *  @defgroup NativeUILib Native UI Library
+ *  @{
+ */
+
+/**
+ * @file SegmentedListViewSection.cpp
  * @author Bogdan Iusco
  *
- * @brief A SegmentedListView widget is used to present an indexed/grouped list
- * of items.
+ * @brief A SegmentedListViewSection widget is used to group one or more
+ * SegmentedListViewItem objects.
  * Available on iOS platform.
  */
 
-#include "SegmentedListView.h"
 #include "SegmentedListViewSection.h"
+#include "SegmentedListViewItem.h"
 
 namespace NativeUI
 {
 	/**
 	 * Constructor.
 	 */
-	SegmentedListView::SegmentedListView() :
-		Widget(MAW_SEGMENTED_LIST_VIEW)
+	SegmentedListViewSection::SegmentedListViewSection() :
+		Widget(MAW_SEGMENTED_LIST_VIEW_SECTION)
 	{
 
 	}
@@ -42,29 +51,31 @@ namespace NativeUI
 	/**
 	 * Destructor.
 	 */
-	SegmentedListView::~SegmentedListView()
+	SegmentedListViewSection::~SegmentedListViewSection()
 	{
 
 	}
 
 	/**
-	 * Reload list view data.
-	 * Call this method after each modification done to list view data.
+	 * Add an list item to this section.
+	 * @param item The item that will be added.
+	 * The ownership of the item object is passed to this method.
+	 */
+	void SegmentedListViewSection::addItem(SegmentedListViewItem* item)
+	{
+		this->addChild(item);
+	}
+
+	/**
+	 * Set section title.
+	 * Section title will appear on the right side of the list.
 	 * Platform: iOS.
+	 *
+	 * @param title The given title.
 	 */
-	void SegmentedListView::reloadData()
+	void SegmentedListViewSection::setTitle(const MAUtil::String& title)
 	{
-		this->setProperty(MAW_SEGMENTED_LIST_VIEW_RELOAD_DATA, "");
-	}
-
-	/**
-	 * Add a section to this list.
-	 * @param section The section that will be added.
-	 * The ownership of the section object is passed to this method.
-	 */
-	void SegmentedListView::addSection(SegmentedListViewSection* section)
-	{
-		this->addChild(section);
+		this->setProperty(MAW_SEGMENTED_LIST_VIEW_SECTION_TITLE, title);
 	}
 
 	/**
@@ -78,7 +89,7 @@ namespace NativeUI
 	 * - #MAW_RES_INVALID_HANDLE if any of the handles were invalid.
 	 * - #MAW_RES_ERROR if it could not be added for some other reason.
 	 */
-	int SegmentedListView::addChild(Widget* widget)
+	int SegmentedListViewSection::addChild(Widget* widget)
 	{
 		return Widget::addChild(widget);
 	}
@@ -96,7 +107,7 @@ namespace NativeUI
 	 * - #MAW_RES_INVALID_INDEX if the index was out of bounds.
 	 * - #MAW_RES_ERROR if it could not be added for some other reason.
 	 */
-	int SegmentedListView::insertChild(Widget* widget, const int index)
+	int SegmentedListViewSection::insertChild(Widget* widget, const int index)
 	{
 		return Widget::insertChild(widget, index);
 	}
@@ -113,7 +124,7 @@ namespace NativeUI
 	 * - #MAW_RES_INVALID_HANDLE if the handle was invalid.
 	 * - #MAW_RES_ERROR otherwise.
 	 */
-	int SegmentedListView::removeChild(Widget* widget)
+	int SegmentedListViewSection::removeChild(Widget* widget)
 	{
 		return Widget::removeChild(widget);
 	}
