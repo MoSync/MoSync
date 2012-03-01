@@ -77,6 +77,7 @@
     <Compile Include="Source\Modules\MoSyncMiscModule.cs" />
     <Compile Include="Source\Modules\MoSyncNativeUIModule.cs" />
     <Compile Include="Source\Modules\MoSyncOpenGLESModule.cs" />
+    <Compile Include="Source\Modules\MoSyncScreenOrientationModule.cs" />
     <Compile Include="Source\Modules\MoSyncSensorsModule.cs" />
     <Compile Include="Source\Modules\NativeUI\MoSyncActivityIndicator.cs" />
     <Compile Include="Source\Modules\NativeUI\MoSyncCameraPreview.cs" />

@@ -104,6 +104,13 @@ namespace NativeUI
 		 */
 		virtual void orientationWillChange();
 
+		/**
+		 * Called after the screen has finished rotating.
+		 * Subclasses may override this method to perform additional actions
+		 * after the rotation.
+		 */
+		virtual void orientationDidChange();
+
 	protected:
 		/**
 		 * Protected because only subclasses should use this constructor.

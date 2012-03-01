@@ -4450,6 +4450,11 @@ group WidgetAPI "Widget API" {
 		*/
 		SCREEN_ORIENTATION_WILL_CHANGE = 23;
 
+		/**
+		* Send by current screen after it finishes rotating.
+		* Sent only from the Windows Phone 7.1 platform.
+		*/
+		SCREEN_ORIENTATION_DID_CHANGE = 24;
 	}
 
 	} // end of WidgetEventTypes
@@ -7907,7 +7912,7 @@ group CameraFunctions "Camera Functions" {
 
 		/**
 		* Set supported screen orientations.
-		* Currently implemented only on iOS.
+		* Currently implemented on iOS and WindowsPhone 7.1.
 		* @param orientations A bitmask consisting of flags describing the supported screen orientations.
 		* The bitmask can be created using \link #MA_SCREEN_ORIENTATION_ MA_SCREEN_ORIENTATION \endlink
 		* values.
@@ -7920,7 +7925,7 @@ group CameraFunctions "Camera Functions" {
 
 		/**
 		* Get supported screen orientations.
-		* Currently implemented only on iOS.
+		* Currently implemented on iOS and WindowsPhone 7.1.
 		* @return A bitmask consisting of flags describing the supported screen orientations.
 		* The bitmask is created using \link #MA_SCREEN_ORIENTATION_ MA_SCREEN_ORIENTATION \endlink
 		* values.
@@ -7929,7 +7934,7 @@ group CameraFunctions "Camera Functions" {
 
 		/**
 		* Get current screen orientation.
-		* Currently implemented only on iOS.
+		* Currently implemented on iOS and WindowsPhone 7.1.
 		* @return One of the \link #MA_SCREEN_ORIENTATION_ MA_SCREEN_ORIENTATION \endlink constants.
 		*/
 		int maScreenGetCurrentOrientation();
