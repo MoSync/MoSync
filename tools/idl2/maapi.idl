@@ -6760,7 +6760,7 @@ group WidgetAPI "Widget API" {
 		*   maWidgetSetProperty(datePickerHandle, MAW_DATE_PICKER_MAX_DATE_YEAR, "2999");
 		* \endcode
 		*/
-		MAX_DATE_YEAR = "maxDateYear";
+		MAX_DATE_YEAR = "maxdateyear";
 
 		/**
 		* @brief Sets or gets the month of the maximal date supported by this DatePicker
@@ -6774,7 +6774,7 @@ group WidgetAPI "Widget API" {
 		*   maWidgetSetProperty(datePickerHandle, MAW_DATE_PICKER_MAX_DATE_MONTH, "12");
 		* \endcode
 		*/
-		MAX_DATE_MONTH = "maxDateMonth";
+		MAX_DATE_MONTH = "maxdatemonth";
 
 		/**
 		* @brief Sets or gets the day of the maximal date supported by this DatePicker
@@ -6789,7 +6789,7 @@ group WidgetAPI "Widget API" {
 		*   maWidgetSetProperty(datePickerHandle, MAW_DATE_PICKER_MAX_DATE_DAY, "31");
 		* \endcode
 		*/
-		MAX_DATE_DAY = "maxDateDay";
+		MAX_DATE_DAY = "maxdateday";
 
 
 		/**
@@ -6823,7 +6823,7 @@ group WidgetAPI "Widget API" {
 		*   maWidgetSetProperty(datePickerHandle, MAW_DATE_PICKER_MIN_DATE_YEAR, "1830");
 		* \endcode
 		*/
-		MIN_DATE_YEAR = "minDateYear";
+		MIN_DATE_YEAR = "mindateyear";
 
 		/**
 		* @brief Sets or gets the month of the minimal date supported by this DatePicker
@@ -6837,7 +6837,7 @@ group WidgetAPI "Widget API" {
 		*   maWidgetSetProperty(datePickerHandle, MAW_DATE_PICKER_MIN_DATE_MONTH, "1");
 		* \endcode
 		*/
-		MIN_DATE_MONTH = "minDateMonth";
+		MIN_DATE_MONTH = "mindatemonth";
 
 		/**
 		* @brief Sets or gets the day of the minimal date supported by this DatePicker
@@ -6852,7 +6852,7 @@ group WidgetAPI "Widget API" {
 		*   maWidgetSetProperty(datePickerHandle, MAW_DATE_PICKER_MIN_DATE_DAY, "1");
 		* \endcode
 		*/
-		MIN_DATE_DAY = "minDateDay";
+		MIN_DATE_DAY = "mindateday";
 
 		/**
 		* @brief Sets or gets the currently displayed year.
