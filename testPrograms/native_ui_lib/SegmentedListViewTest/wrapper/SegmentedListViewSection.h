@@ -79,6 +79,41 @@ namespace NativeUI
 		 */
 		void setTitle(const MAUtil::String& title);
 
+		/**
+		 * Get section title.
+		 * Platform: iOS.
+		 * @return Section title.
+		 */
+		MAUtil::String getTitle();
+
+		/**
+		 * Set the section header text.
+		 * Platform: iOS.
+		 * @param headerText The given header text.
+		 */
+		void setHeaderText(const MAUtil::String& headerText);
+
+		/**
+		 * Get the section header text.
+		 * Platform: iOS.
+		 * @return Header text.
+		 */
+		MAUtil::String getHeaderText();
+
+		/**
+		 * Set the section footer text.
+		 * Platform: iOS.
+		 * @param footerText The given footer text.
+		 */
+		void setFooterText(const MAUtil::String& footerText);
+
+		/**
+		 * Get the section footer text.
+		 * Platform: iOS.
+		 * @return Footer text.
+		 */
+		MAUtil::String getFooterText();
+
 	private:
 		/**
 		 * Add a widget as a child of this widget.

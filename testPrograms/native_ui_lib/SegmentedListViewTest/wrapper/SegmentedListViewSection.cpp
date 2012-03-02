@@ -79,6 +79,58 @@ namespace NativeUI
 	}
 
 	/**
+	 * Get section title.
+	 * Platform: iOS.
+	 * @return Section title.
+	 */
+	MAUtil::String SegmentedListViewSection::getTitle()
+	{
+		return this->getPropertyString(MAW_SEGMENTED_LIST_VIEW_SECTION_TITLE);
+	}
+
+	/**
+	 * Set the section header text.
+	 * Platform: iOS.
+	 * @param headerText The given header text.
+	 */
+	void SegmentedListViewSection::setHeaderText(
+		const MAUtil::String& headerText)
+	{
+		this->setProperty(MAW_SEGMENTED_LIST_VIEW_SECTION_HEADER, headerText);
+	}
+
+	/**
+	 * Get the section header text.
+	 * Platform: iOS.
+	 * @return Header text.
+	 */
+	MAUtil::String SegmentedListViewSection::getHeaderText()
+	{
+		return this->getPropertyString(MAW_SEGMENTED_LIST_VIEW_SECTION_HEADER);
+	}
+
+	/**
+	 * Set the section footer text.
+	 * Platform: iOS.
+	 * @param footerText The given footer text.
+	 */
+	void SegmentedListViewSection::setFooterText(
+		const MAUtil::String& footerText)
+	{
+		this->setProperty(MAW_SEGMENTED_LIST_VIEW_SECTION_FOOTER, footerText);
+	}
+
+	/**
+	 * Get the section footer text.
+	 * Platform: iOS.
+	 * @return Footer text.
+	 */
+	MAUtil::String SegmentedListViewSection::getFooterText()
+	{
+		return this->getPropertyString(MAW_SEGMENTED_LIST_VIEW_SECTION_FOOTER);
+	}
+
+	/**
 	 * Add a widget as a child of this widget.
 	 * @param widget The widget that will be added.
 	 * The ownership of the widget is passed to this function.
