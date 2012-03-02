@@ -7239,7 +7239,7 @@ group WidgetAPI "Widget API" {
 		*   maWidgetSetProperty(listHandle, MAW_SEGMENTED_LIST_VIEW_RELOAD_DATA, "");
 		* \endcode
 		*/
-		RELOAD_DATA = "ReloadData";
+		RELOAD_DATA = "reload_data";
 	}
 	} // end of WidgetSegmentedListViewProperties
 
@@ -7260,9 +7260,43 @@ group WidgetAPI "Widget API" {
 		*   maWidgetSetProperty(listSectionHandle, MAW_SEGMENTED_LIST_VIEW_SECTION_TITLE, "A");
 		* \endcode
 		*/
-		TITLE = "Title";
+		TITLE = "title";
+
+		/**
+		* @brief Set or get section header text.
+		* Section text will appear above the section items.
+		*
+		* Platform: iOS.
+		*
+		* @validvalue A string.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+		*   maWidgetSetProperty(listSectionHandle, MAW_SEGMENTED_LIST_VIEW_SECTION_HEADER, "Header text");
+		* \endcode
+		*/
+		HEADER = "header";
+
+		/**
+		* @brief Set or get section footer text.
+		* Section text will appear below the section items.
+		*
+		* Platform: iOS.
+		*
+		* @validvalue A string.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+		*   maWidgetSetProperty(listSectionHandle, MAW_SEGMENTED_LIST_VIEW_SECTION_FOOTER, "Footer text");
+		* \endcode
+		*/
+		FOOTER = "footer";
 	}
-	} // end of WidgetSegmentedListViewProperties
+	} // end of WidgetSegmentedListViewSectionProperties
 
 	} // end of WidgetProperties
 

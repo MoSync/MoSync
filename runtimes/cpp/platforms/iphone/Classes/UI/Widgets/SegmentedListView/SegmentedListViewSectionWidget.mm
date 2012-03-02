@@ -62,6 +62,14 @@
     {
         self.title = value;
     }
+    else if ([key isEqualToString:@MAW_SEGMENTED_LIST_VIEW_SECTION_HEADER])
+    {
+        self.headerTitle = value;
+    }
+    else if ([key isEqualToString:@MAW_SEGMENTED_LIST_VIEW_SECTION_FOOTER])
+    {
+        self.footerTitle = value;
+    }
     else
     {
         resultCode = [super setPropertyWithKey:key toValue:value];
@@ -77,7 +85,25 @@
  */
 - (NSString*)getPropertyWithKey: (NSString*)key
 {
-    return [super getPropertyWithKey:key];
+    NSString* returnValue;
+    if ([key isEqualToString:@MAW_SEGMENTED_LIST_VIEW_SECTION_TITLE])
+    {
+        returnValue = [self.title retain];
+    }
+    else if ([key isEqualToString:@MAW_SEGMENTED_LIST_VIEW_SECTION_HEADER])
+    {
+        returnValue = [self.headerTitle retain];
+    }
+    else if ([key isEqualToString:@MAW_SEGMENTED_LIST_VIEW_SECTION_FOOTER])
+    {
+        returnValue = [self.footerTitle retain];
+    }
+    else
+    {
+        returnValue = [super getPropertyWithKey:key];
+    }
+
+    return returnValue;
 }
 
 /**
