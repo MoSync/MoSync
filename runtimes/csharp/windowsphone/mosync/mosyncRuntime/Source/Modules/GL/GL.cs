@@ -65,12 +65,15 @@ class GL : GLConstants
 		public int type;
 		public int stride;
 		public int size;
+		public GLBuffer buffer;
+		public bool clientStateEnabled;
 	};
 
-	class GLBuffer
+	protected internal class GLBuffer
 	{
 		public byte[] data;
 		public bool dirty;
+		public int usage;
 	}
 
 	struct GLVertexType : IVertexType
@@ -112,11 +115,6 @@ class GL : GLConstants
 	private GraphicsDevice mGraphicsDevice;
 	private Color mCurrentClearColor;
 
-	protected internal bool mClientStateVertexEnabled = false;
-	protected internal bool mClientStateNormalEnabled = false;
-	protected internal bool[] mClientStateTcoordEnabled = new bool[GL.GL_MAX_TEXTURE_UNITS];
-	protected internal bool mClientStateColorEnabled = false;
-
 	private int mFogMode;
 	private float mFogDensity, mFogStart, mFogEnd;
 	private Color mFogColor = new Color();
@@ -131,11 +129,12 @@ class GL : GLConstants
 
 	private DepthStencilState mDepthStencilState;
 
-	protected internal GLPointer mCurrentVertexPointer;
-	protected internal GLPointer mCurrentColorPointer;
-	protected internal GLPointer[] mCurrentTexCoordPointer = new GLPointer[GL.GL_MAX_TEXTURE_UNITS];
-	protected internal GLPointer mCurrentNormalPointer;
+	protected GLPointer mCurrentVertexPointer;
+	protected GLPointer mCurrentColorPointer;
+	protected GLPointer[] mCurrentTexCoordPointer = new GLPointer[GL.GL_MAX_TEXTURE_UNITS];
+	protected GLPointer mCurrentNormalPointer;
 	private int mClientActiveTexture;
+	bool mNormalizeNormals = false;
 
 	RasterizerState mFrontFaceMode;
 	BlendState mCurrentBlendFunc;
@@ -172,7 +171,7 @@ class GL : GLConstants
 		List<VertexElement> elements = new List<VertexElement>();
 		int offset = 0;
 
-		if (gl.mClientStateVertexEnabled)
+		if (gl.mCurrentVertexPointer.clientStateEnabled)
 		{
 			int size = 0;
 			VertexElementFormat vformat = GetVertexElementFormat(gl.mCurrentVertexPointer.size, gl.mCurrentVertexPointer.type, out size);
@@ -185,7 +184,7 @@ class GL : GLConstants
 
 		for (int i = 0; i < GL.GL_MAX_TEXTURE_UNITS; i++)
 		{
-			if (gl.mClientStateTcoordEnabled[i])
+			if (gl.mCurrentTexCoordPointer[i].clientStateEnabled)
 			{
 				int size = 0;
 				VertexElementFormat vformat = GetVertexElementFormat(gl.mCurrentTexCoordPointer[i].size, gl.mCurrentTexCoordPointer[i].type, out size);
@@ -197,7 +196,7 @@ class GL : GLConstants
 			}
 		}
 
-		if (gl.mClientStateNormalEnabled)
+		if (gl.mCurrentNormalPointer.clientStateEnabled)
 		{
 			int size = 0;
 			VertexElementFormat vformat = GetVertexElementFormat(3, gl.mCurrentNormalPointer.type, out size);
@@ -208,7 +207,7 @@ class GL : GLConstants
 			offset += size;
 		}
 
-		if (gl.mClientStateColorEnabled)
+		if (gl.mCurrentColorPointer.clientStateEnabled)
 		{
 			int size = 0;
 			VertexElementFormat vformat = GetVertexElementFormat(gl.mCurrentColorPointer.size, gl.mCurrentColorPointer.type, out size);
@@ -294,7 +293,7 @@ class GL : GLConstants
 		return null;
 	}
 
-	int GetSizeOfType(int glType)
+	static int GetSizeOfType(int glType)
 	{
 		switch (glType)
 		{
@@ -314,11 +313,9 @@ class GL : GLConstants
 		return -1;
 	}
 
-	GLVertexType[] CreateVertexArrayFromPointers(int startIndex, int numVertices)
+	void CreateVertexArrayFromPointers(int startIndex, int numVertices, GLVertexType[] vertices)
 	{
-		GLVertexType[] vertices = Pool<GLVertexType>.GetElements(numVertices);
-
-		if (mClientStateVertexEnabled)
+		if (mCurrentVertexPointer.clientStateEnabled)
 		{
 			FloatConverterDelegate vertexConverter = GetFloatConverter(mCurrentVertexPointer.type);
 			int vcomponentbytes = GetSizeOfType(mCurrentVertexPointer.type);
@@ -341,7 +338,7 @@ class GL : GLConstants
 			}
 		}
 
-		if (mClientStateColorEnabled)
+		if (mCurrentColorPointer.clientStateEnabled)
 		{
 			FloatConverterDelegate colorConverter = GetFloatConverter(mCurrentColorPointer.type);
 			int ccomponentbytes = GetSizeOfType(mCurrentColorPointer.type);
@@ -365,7 +362,7 @@ class GL : GLConstants
 		}
 
 
-		if (mClientStateNormalEnabled)
+		if (mCurrentNormalPointer.clientStateEnabled)
 		{
 			FloatConverterDelegate normalConverter = GetFloatConverter(mCurrentNormalPointer.type);
 			int ncomponentbytes = GetSizeOfType(mCurrentNormalPointer.type);
@@ -382,13 +379,15 @@ class GL : GLConstants
 				vertices[i].normal.X = normalConverter(mCurrentNormalPointer.data, npointer + ncomponentbytes * 0);
 				vertices[i].normal.Y = normalConverter(mCurrentNormalPointer.data, npointer + ncomponentbytes * 1);
 				vertices[i].normal.Z = normalConverter(mCurrentNormalPointer.data, npointer + ncomponentbytes * 2);
+				if (mNormalizeNormals)
+					vertices[i].normal.Normalize();
 				npointer += nstride;
 			}
 
 		}
 
 
-		if (mClientStateTcoordEnabled[0])
+		if (mCurrentTexCoordPointer[0].clientStateEnabled)
 		{
 			FloatConverterDelegate texConverter = GetFloatConverter(mCurrentTexCoordPointer[0].type);
 			int tcomponentbytes = GetSizeOfType(mCurrentTexCoordPointer[0].type);
@@ -407,19 +406,14 @@ class GL : GLConstants
 				vertices[i].tcoord.Y = texConverter(mCurrentTexCoordPointer[0].data, tpointer + tcomponentbytes * 1);
 				if (ShouldTransformCoords)
 					vertices[i].tcoord = Vector2.Transform(vertices[i].tcoord, mMatrices[GLMatrixMode.TEXTURE]);
-				vertices[i].tcoord.X = vertices[i].tcoord.X;
-				vertices[i].tcoord.Y = vertices[i].tcoord.Y;
 				tpointer += tstride;
 			}
 		}
-
-		return vertices;
 	}
 
-	short[] CreateIndexArrayFromPointers(byte[] indecies, int indeciesOffset, int vertexCount, int type, out int maxIndex)
+	void CreateIndexArrayFromPointers(byte[] indecies, int indeciesOffset, int vertexCount, int type, short[] indexData, out int maxIndex)
 	{
 		maxIndex = 0;
-		short[] indexData = Pool<short>.GetElements(vertexCount);
 		if (type == GL.GL_UNSIGNED_SHORT)
 		{
 			int pointer = indeciesOffset;
@@ -440,7 +434,6 @@ class GL : GLConstants
 				pointer++;
 			}
 		}
-		return indexData;
 	}
 
 	public static short ReadInt16(byte[] buf, int offset)
@@ -486,6 +479,31 @@ class GL : GLConstants
 		return BitConverter.ToDouble(buf, offset);
 	}
 
+	Vector4 ReadFloatVector4(byte[] data, int offset)
+	{
+		return new Vector4(
+			ReadFloat(data, offset + 0 * 4),
+			ReadFloat(data, offset + 1 * 4),
+			ReadFloat(data, offset + 2 * 4),
+			ReadFloat(data, offset + 3 * 4)
+			);
+	}
+
+	Vector4 ReadFixedVector4(byte[] data, int offset)
+	{
+		return new Vector4(
+			ReadInt32(data, offset + 0 * 4) * fix2flt,
+			ReadInt32(data, offset + 1 * 4) * fix2flt,
+			ReadInt32(data, offset + 2 * 4) * fix2flt,
+			ReadInt32(data, offset + 3 * 4) * fix2flt
+			);
+	}
+
+	Vector3 ToVector3(Vector4 v)
+	{
+		return new Vector3(v.X, v.Y, v.Z);
+	}
+
 	int GetPrimitiveCount(PrimitiveType primitiveType, int vertexCount)
 	{
 		if (primitiveType == PrimitiveType.LineList)
@@ -515,6 +533,9 @@ class GL : GLConstants
 				break;
 			case GL_LINE_STRIP:
 				primitiveType = PrimitiveType.LineStrip;
+				break;
+			case GL_TRIANGLE_FAN:
+				primitiveType = PrimitiveType.TriangleList;
 				break;
 			default:
 				RaiseGLError(GL_INVALID_VALUE);
@@ -586,6 +607,28 @@ class GL : GLConstants
 		}
 	}
 
+	struct GLBlendFunc
+	{
+		public GLBlendFunc(int sf, int df)
+		{
+			sfactor = sf;
+			dfactor = df;
+		}
+
+		int sfactor;
+		int dfactor;
+	};
+
+	private Dictionary<GLBlendFunc, BlendState> mBlendStates = new Dictionary<GLBlendFunc, BlendState>();
+
+	public void SetupBlendStates()
+	{
+		//BlendState blendState = new BlendState();
+		//blendState.AlphaSourceBlend = Blend.Zero;
+		//blendState.AlphaDestinationBlend = Blend.SourceColor;
+		//mBlendStates.Add(new GLBlendFunc(GL_ZERO, GL_SRC_COLOR), blendState);
+	}
+
 	public void Init(GraphicsDevice g)
 	{
 		SetGraphicsDevice(g);
@@ -611,11 +654,11 @@ class GL : GLConstants
 		mMatrices[GLMatrixMode.TEXTURE] = Matrix.Identity;
 		mCurrentMatrix = GLMatrixMode.MODELVIEW;
 		 */
-		mClientStateVertexEnabled = false;
-		mClientStateNormalEnabled = false;
+		mCurrentVertexPointer.clientStateEnabled = false;
+		mCurrentNormalPointer.clientStateEnabled = false;		
 		for (int i = 0; i < GL.GL_MAX_TEXTURE_UNITS; i++)
-			mClientStateTcoordEnabled[i] = false;
-		mClientStateColorEnabled = false;
+			mCurrentTexCoordPointer[0].clientStateEnabled = false;
+		mCurrentColorPointer.clientStateEnabled = false;
 
 		mClientActiveTexture = 0; // GL_TEXTURE0
 
@@ -642,26 +685,163 @@ class GL : GLConstants
 		mDepthStencilState = DepthStencilState.None;
 
 		glDepthFunc(GL.GL_LESS);
+
+		mNormalizeNormals = false;
+		mSmoothShadingEnabled = true;
+
+		SetupBlendStates();
+	}
+
+	bool mSmoothShadingEnabled = true;
+	public void glShadeModel(int mode)
+	{
+		if (mode != GL.GL_FLAT && mode != GL.GL_SMOOTH)
+		{
+			RaiseGLError(GL.GL_INVALID_ENUM);
+			return;
+		}
+
+		if (mode == GL.GL_FLAT)
+		{
+			mSmoothShadingEnabled = false;
+		}
+		else
+		{
+			mSmoothShadingEnabled = true;
+		}
+	}
+
+	public String glGetString(int _enum)
+	{
+		switch (_enum)
+		{
+			case GL.GL_VENDOR:
+				return "MoSync";
+			case GL.GL_RENDERER:
+				return "XNA";
+			case GL.GL_VERSION:
+				return "1.0";
+			case GL.GL_EXTENSIONS:
+				return "";
+			default:
+				RaiseGLError(GL.GL_INVALID_ENUM);
+				return "";
+		}
+	}
+
+	public void glAlphaFunc(int func, float _ref)
+	{
+	}
+
+	public void glAlphaFuncx(int func, int _ref)
+	{
+	}
+
+	public void glEnable(int what)
+	{
+		switch (what)
+		{
+			case GL.GL_DEPTH_TEST:
+				mGraphicsDevice.DepthStencilState = DepthStencilState.Default;
+				break;
+			case GL.GL_ALPHA_TEST:
+				break;
+			case GL.GL_DITHER:
+				break;
+			case GL.GL_CULL_FACE:
+				mGraphicsDevice.RasterizerState = mFrontFaceMode;
+				break;
+			case GL.GL_BLEND:
+				mGraphicsDevice.BlendState = mCurrentBlendFunc;
+				break;
+			case GL.GL_TEXTURE_2D:
+				mBasicEffect.TextureEnabled = true;
+				break;
+			case GL.GL_LIGHT0:
+				mBasicEffect.DirectionalLight0.Enabled = true;
+				break;
+			case GL.GL_LIGHT1:
+				mBasicEffect.DirectionalLight1.Enabled = true;
+				break;
+			case GL.GL_LIGHT2:
+				mBasicEffect.DirectionalLight2.Enabled = true;
+				break;
+			case GL.GL_LIGHTING:
+				mBasicEffect.LightingEnabled = true;
+				break;
+			case GL.GL_NORMALIZE:
+				mNormalizeNormals = true;
+				break;
+			default:
+				RaiseGLError(GL.GL_INVALID_ENUM);
+				return;
+		}
+	}
+
+	public void glDisable(int what)
+	{
+		switch (what)
+		{
+			case GL.GL_DEPTH_TEST:
+				mGraphicsDevice.DepthStencilState = DepthStencilState.None;
+				//mGraphicsDevice.DepthStencilState = DepthStencilState.None;
+				//if (mDepthStencilState != mGraphicsDevice.DepthStencilState)
+				//	mGraphicsDevice.DepthStencilState = mDepthStencilState;
+				break;
+			case GL.GL_DITHER:
+				break;
+			case GL.GL_ALPHA_TEST:
+				break;
+			case GL.GL_CULL_FACE:
+				mGraphicsDevice.RasterizerState = RasterizerState.CullNone;
+				break;
+			case GL.GL_BLEND:
+				mGraphicsDevice.BlendState = BlendState.Opaque;
+				break;
+			case GL.GL_TEXTURE_2D:
+				mBasicEffect.TextureEnabled = false;
+				break;
+			case GL.GL_LIGHT0:
+				mBasicEffect.DirectionalLight0.Enabled = false;
+				break;
+			case GL.GL_LIGHT1:
+				mBasicEffect.DirectionalLight1.Enabled = false;
+				break;
+			case GL.GL_LIGHT2:
+				mBasicEffect.DirectionalLight2.Enabled = false;
+				break;
+			case GL.GL_LIGHTING:
+				mBasicEffect.LightingEnabled = false;
+				break;
+			case GL.GL_NORMALIZE:
+				mNormalizeNormals = false;
+				break;
+			default:
+				RaiseGLError(GL.GL_INVALID_ENUM);
+				return;
+		}
 	}
 
 	void SetupBasicEffectState()
 	{
 		mBasicEffect.View = mMatrices[GLMatrixMode.MODELVIEW];
 		mBasicEffect.Projection = mMatrices[GLMatrixMode.PROJECTION];
-		mBasicEffect.LightingEnabled = false;
+		//mBasicEffect.LightingEnabled = false;
 
-		if (mClientStateColorEnabled)
+		if (mSmoothShadingEnabled && mCurrentColorPointer.clientStateEnabled)
 			mBasicEffect.VertexColorEnabled = true;
 		else
 		{
 			mBasicEffect.VertexColorEnabled = false;
 			mBasicEffect.DiffuseColor = mCurrentColor.ToVector3();
-			mBasicEffect.Alpha = mCurrentColor.ToVector4().W;
+			mBasicEffect.Alpha = 1.0f;
 		}
 
-		//mBasicEffect.Parameters["WorldViewProj"].SetValue(mBasicEffect.World * mMatrices[GLMatrixMode.MODELVIEW] * mMatrices[GLMatrixMode.PROJECTION]);
-		if (mCurrentBoundTexture != -1)
-			mBasicEffect.Parameters["Texture"].SetValue(mTextures[mCurrentBoundTexture]);
+		mGraphicsDevice.BlendFactor = mCurrentColor;
+		mGraphicsDevice.BlendState = mCurrentBlendFunc;
+
+		//if (mCurrentBoundTexture != -1)
+		//	mBasicEffect.Parameters["Texture"].SetValue(mTextures[mCurrentBoundTexture]);
 	}
 
 	public void Close()
@@ -691,7 +871,6 @@ class GL : GLConstants
 	public void glMultMatrixf(byte[] data, int offset)
 	{
 		Matrix matrix = new Matrix(
-#if true
 		ReadFloat(data, offset + 0 * 16 + 0),
 		ReadFloat(data, offset + 0 * 16 + 4),
 		ReadFloat(data, offset + 0 * 16 + 8),
@@ -708,29 +887,33 @@ class GL : GLConstants
 		ReadFloat(data, offset + 3 * 16 + 4),
 		ReadFloat(data, offset + 3 * 16 + 8),
 		ReadFloat(data, offset + 3 * 16 + 12)
-#else
-		ReadFloat(data, offset + 0 * 16 + 0),
-		ReadFloat(data, offset + 1 * 16 + 0),
-		ReadFloat(data, offset + 2 * 16 + 0),
-		ReadFloat(data, offset + 3 * 16 + 0),
-		ReadFloat(data, offset + 0 * 16 + 4),
-		ReadFloat(data, offset + 1 * 16 + 4),
-		ReadFloat(data, offset + 2 * 16 + 4),
-		ReadFloat(data, offset + 3 * 16 + 4),
-		ReadFloat(data, offset + 0 * 16 + 8),
-		ReadFloat(data, offset + 1 * 16 + 8),
-		ReadFloat(data, offset + 2 * 16 + 8),
-		ReadFloat(data, offset + 3 * 16 + 8),
-		ReadFloat(data, offset + 0 * 16 + 12),
-		ReadFloat(data, offset + 1 * 16 + 12),
-		ReadFloat(data, offset + 2 * 16 + 12),
-		ReadFloat(data, offset + 3 * 16 + 12)
-#endif
-);
+		);
 
 		mMatrices[mCurrentMatrix] = matrix * mMatrices[mCurrentMatrix];
 	}
 
+	public void glMultMatrixx(byte[] data, int offset)
+	{
+		Matrix matrix = new Matrix(
+		ReadInt32(data, offset + 0 * 16 + 0) * fix2flt,
+		ReadInt32(data, offset + 0 * 16 + 4) * fix2flt,
+		ReadInt32(data, offset + 0 * 16 + 8) * fix2flt,
+		ReadInt32(data, offset + 0 * 16 + 12) * fix2flt,
+		ReadInt32(data, offset + 1 * 16 + 0) * fix2flt,
+		ReadInt32(data, offset + 1 * 16 + 4) * fix2flt,
+		ReadInt32(data, offset + 1 * 16 + 8) * fix2flt,
+		ReadInt32(data, offset + 1 * 16 + 12) * fix2flt,
+		ReadInt32(data, offset + 2 * 16 + 0) * fix2flt,
+		ReadInt32(data, offset + 2 * 16 + 4) * fix2flt,
+		ReadInt32(data, offset + 2 * 16 + 8) * fix2flt,
+		ReadInt32(data, offset + 2 * 16 + 12) * fix2flt,
+		ReadInt32(data, offset + 3 * 16 + 0) * fix2flt,
+		ReadInt32(data, offset + 3 * 16 + 4) * fix2flt,
+		ReadInt32(data, offset + 3 * 16 + 8) * fix2flt,
+		ReadInt32(data, offset + 3 * 16 + 12) * fix2flt
+		);
+		mMatrices[mCurrentMatrix] = matrix * mMatrices[mCurrentMatrix];
+	}
 	public void glPushMatrix()
 	{
 		mMatrixStack[mCurrentMatrix].Push(mMatrices[mCurrentMatrix]);
@@ -776,6 +959,7 @@ class GL : GLConstants
 		float width = right - left;
 		float height = bottom - top;
 		mMatrices[mCurrentMatrix] = Matrix.CreateOrthographic(width, height, near, far) * mMatrices[mCurrentMatrix];
+		glScalef(1, -1, 1);
 		glTranslatef(-width / 2.0f, -height / 2.0f, 0.0f); // glOrthof is a bit different than CreateOrthographic.
 	}
 
@@ -891,57 +1075,214 @@ class GL : GLConstants
 		if (sfactor == GL.GL_SRC_ALPHA && dfactor == GL.GL_ONE_MINUS_SRC_ALPHA)
 		{
 			mCurrentBlendFunc = BlendState.AlphaBlend;
+			return;
 		}
+		/*
+		BlendState blendState = null;
+		if(mBlendStates.TryGetValue(new GLBlendFunc(sfactor, dfactor), out blendState))
+		{
+			mCurrentBlendFunc = blendState;
+		}
+		 */
 	}
 
-	public void glEnable(int what)
+	public void glLightModelfv(int pname, byte[] floats, int offset)
 	{
-		switch (what)
-		{
-			case GL.GL_DEPTH_TEST:
-				mGraphicsDevice.DepthStencilState = DepthStencilState.Default;
-				break;
-			case GL.GL_CULL_FACE:
-				mGraphicsDevice.RasterizerState = mFrontFaceMode;
-				break;
-			case GL.GL_BLEND:
-				mGraphicsDevice.BlendState = mCurrentBlendFunc;
-				break;
-			case GL.GL_TEXTURE_2D:
-				mBasicEffect.TextureEnabled = true;
-				break;
-			default:
-				RaiseGLError(GL.GL_INVALID_ENUM);
-				return;
-		}
 	}
 
-	public void glDisable(int what)
+	public void glLightModelxv(int pname, byte[] fixeds, int offset)
 	{
-		switch (what)
+	}
+
+	public void glLightModelf(int pname, float param)
+	{
+	}
+
+	public void glLightModelx(int pname, int param)
+	{
+	}
+
+	public void glLightfv(int _light, int pname, byte[] floats, int offset)
+	{
+		DirectionalLight light = null;
+
+		switch (_light)
 		{
-			case GL.GL_DEPTH_TEST:
-				mGraphicsDevice.DepthStencilState = DepthStencilState.None;
-				//mGraphicsDevice.DepthStencilState = DepthStencilState.None;
-				//if (mDepthStencilState != mGraphicsDevice.DepthStencilState)
-				//	mGraphicsDevice.DepthStencilState = mDepthStencilState;
+			case GL.GL_LIGHT0:
+				light = mBasicEffect.DirectionalLight0;
 				break;
-			case GL.GL_CULL_FACE:
-				mGraphicsDevice.RasterizerState = RasterizerState.CullNone;
+			case GL.GL_LIGHT1:
+				light = mBasicEffect.DirectionalLight1;
 				break;
-			case GL.GL_BLEND:
-				mGraphicsDevice.BlendState = BlendState.Opaque;
-				break;
-			case GL.GL_TEXTURE_2D:
-				mBasicEffect.TextureEnabled = false;
+			case GL.GL_LIGHT2:
+				light = mBasicEffect.DirectionalLight2;
 				break;
 			default:
-				RaiseGLError(GL.GL_INVALID_ENUM);
 				return;
 		}
 
+		switch (pname)
+		{
+			case GL.GL_DIFFUSE:
+				light.DiffuseColor = ToVector3(ReadFloatVector4(floats, offset));
+				break;
+			case GL.GL_SPECULAR:
+				light.SpecularColor = ToVector3(ReadFloatVector4(floats, offset));
+				break;
+			case GL.GL_POSITION:
+				Vector4 pos = ReadFloatVector4(floats, offset);
+				if (pos.W == 0.0f)
+				{
+					light.Direction = ToVector3(pos);
+				}
+				break;
+
+		}
 	}
 
+	public void glLightxv(int _light, int pname, byte[] fixeds, int offset)
+	{
+		DirectionalLight light = null;
+
+		switch (_light)
+		{
+			case GL.GL_LIGHT0:
+				light = mBasicEffect.DirectionalLight0;
+				break;
+			case GL.GL_LIGHT1:
+				light = mBasicEffect.DirectionalLight1;
+				break;
+			case GL.GL_LIGHT2:
+				light = mBasicEffect.DirectionalLight2;
+				break;
+			default:
+				return;
+		}
+
+		switch (pname)
+		{
+			case GL.GL_DIFFUSE:
+				light.DiffuseColor = ToVector3(ReadFixedVector4(fixeds, offset));
+				break;
+			case GL.GL_SPECULAR:
+				light.SpecularColor = ToVector3(ReadFixedVector4(fixeds, offset));
+				break;
+			case GL.GL_POSITION:
+				Vector4 pos = ReadFixedVector4(fixeds, offset);
+				if (pos.W == 0.0f)
+				{
+					light.Direction = ToVector3(pos);
+				}
+				break;
+		}
+	}
+
+	public void glLightf(int light, int pname, float data)
+	{
+	}
+
+	public void glLightx(int light, int pname, int data)
+	{
+	}
+
+	bool VerifyMaterialParams(int face, int pname)
+	{
+		if (face != GL.GL_FRONT_AND_BACK)
+		{
+			RaiseGLError(GL.GL_INVALID_ENUM);
+			return false;
+		}
+
+		if (pname != GL.GL_AMBIENT && pname != GL.GL_DIFFUSE &&
+			pname != GL.GL_SPECULAR && pname != GL.GL_EMISSION &&
+			pname != GL.GL_AMBIENT_AND_DIFFUSE)
+		{
+			RaiseGLError(GL.GL_INVALID_ENUM);
+			return false;
+		}
+
+		return true;
+	}
+
+	public void glMaterialf(int face, int pname, float param)
+	{
+		if (face != GL.GL_FRONT_AND_BACK && pname != GL.GL_SHININESS)
+		{
+			RaiseGLError(GL.GL_INVALID_ENUM);
+			return;
+		}
+
+		mBasicEffect.SpecularPower = param;
+	}
+
+	public void glMaterialx(int face, int pname, int param)
+	{
+		if (face != GL.GL_FRONT_AND_BACK && pname != GL.GL_SHININESS)
+		{
+			RaiseGLError(GL.GL_INVALID_ENUM);
+			return;
+		}
+
+		mBasicEffect.SpecularPower = param * fix2flt;
+	}
+
+	public void glMaterialfv(int face, int pname, byte[] param, int offset)
+	{
+		if (!VerifyMaterialParams(face, pname))
+			return;
+
+		switch (pname)
+		{
+			case GL.GL_AMBIENT:
+				mBasicEffect.AmbientLightColor = ToVector3(ReadFloatVector4(param, offset));
+				break;
+			case GL.GL_DIFFUSE:
+				mBasicEffect.DiffuseColor = ToVector3(ReadFloatVector4(param, offset));
+				break;
+			case GL.GL_SPECULAR:
+				mBasicEffect.SpecularColor = ToVector3(ReadFloatVector4(param, offset));
+				break;
+			case GL.GL_EMISSION:
+				mBasicEffect.EmissiveColor = ToVector3(ReadFloatVector4(param, offset));
+				break;
+			case GL.GL_SHININESS:
+				mBasicEffect.SpecularPower = ReadFloat(param, offset);
+				break;
+			case GL.GL_AMBIENT_AND_DIFFUSE:
+				mBasicEffect.AmbientLightColor = ToVector3(ReadFloatVector4(param, offset));
+				mBasicEffect.DiffuseColor = ToVector3(ReadFloatVector4(param, offset));
+				break;
+		}
+	}
+
+	public void glMaterialxv(int face, int pname, byte[] param, int offset)
+	{
+		if (!VerifyMaterialParams(face, pname))
+			return;
+
+		switch (pname)
+		{
+			case GL.GL_AMBIENT:
+				mBasicEffect.AmbientLightColor = ToVector3(ReadFixedVector4(param, offset));
+				break;
+			case GL.GL_DIFFUSE:
+				mBasicEffect.DiffuseColor = ToVector3(ReadFixedVector4(param, offset));
+				break;
+			case GL.GL_SPECULAR:
+				mBasicEffect.SpecularColor = ToVector3(ReadFixedVector4(param, offset));
+				break;
+			case GL.GL_EMISSION:
+				mBasicEffect.EmissiveColor = ToVector3(ReadFixedVector4(param, offset));
+				break;
+			case GL.GL_SHININESS:
+				mBasicEffect.SpecularPower = ReadInt32(param, offset) * fix2flt;
+				break;
+			case GL.GL_AMBIENT_AND_DIFFUSE:
+				mBasicEffect.AmbientLightColor = ToVector3(ReadFixedVector4(param, offset));
+				mBasicEffect.DiffuseColor = ToVector3(ReadFixedVector4(param, offset));
+				break;
+		}
+	}
 	public void glScissor(int x, int y, int w, int h)
 	{
 		mGraphicsDevice.ScissorRectangle = new Rectangle(x, y, w, h);
@@ -1005,13 +1346,13 @@ class GL : GLConstants
 	public void glEnableClientState(int mode)
 	{
 		if (mode == GL_COLOR_ARRAY)
-			mClientStateColorEnabled = true;
+			mCurrentColorPointer.clientStateEnabled = true;
 		else if (mode == GL_TEXTURE_COORD_ARRAY)
-			mClientStateTcoordEnabled[mClientActiveTexture] = true;
+			mCurrentTexCoordPointer[mClientActiveTexture].clientStateEnabled = true;
 		else if (mode == GL_VERTEX_ARRAY)
-			mClientStateVertexEnabled = true;
+			mCurrentVertexPointer.clientStateEnabled = true;
 		else if (mode == GL_NORMAL_ARRAY)
-			mClientStateNormalEnabled = true;
+			mCurrentNormalPointer.clientStateEnabled = true;
 		else
 			RaiseGLError(GL_INVALID_VALUE);
 	}
@@ -1019,13 +1360,13 @@ class GL : GLConstants
 	public void glDisableClientState(int mode)
 	{
 		if (mode == GL_COLOR_ARRAY)
-			mClientStateColorEnabled = false;
+			mCurrentColorPointer.clientStateEnabled = false;
 		else if (mode == GL_TEXTURE_COORD_ARRAY)
-			mClientStateTcoordEnabled[mClientActiveTexture] = false;
+			mCurrentTexCoordPointer[mClientActiveTexture].clientStateEnabled = false;
 		else if (mode == GL_VERTEX_ARRAY)
-			mClientStateVertexEnabled = false;
+			mCurrentVertexPointer.clientStateEnabled = false;
 		else if (mode == GL_NORMAL_ARRAY)
-			mClientStateNormalEnabled = false;
+			mCurrentNormalPointer.clientStateEnabled = false;
 		else
 			RaiseGLError(GL_INVALID_VALUE);
 	}
@@ -1046,7 +1387,12 @@ class GL : GLConstants
 
 		if (mCurrentBoundArrayBuffer != -1)
 		{
+			mCurrentVertexPointer.buffer = mBuffers[mCurrentBoundArrayBuffer];
 			vertexPointer = mBuffers[mCurrentBoundArrayBuffer].data;
+		}
+		else
+		{
+			mCurrentVertexPointer.buffer = null;
 		}
 
 		mCurrentVertexPointer.size = size;
@@ -1083,7 +1429,12 @@ class GL : GLConstants
 
 		if (mCurrentBoundArrayBuffer != -1)
 		{
+			mCurrentTexCoordPointer[mClientActiveTexture].buffer = mBuffers[mCurrentBoundArrayBuffer];
 			texPointer = mBuffers[mCurrentBoundArrayBuffer].data;
+		}
+		else
+		{
+			mCurrentTexCoordPointer[mClientActiveTexture].buffer = null;
 		}
 
 		mCurrentTexCoordPointer[mClientActiveTexture].size = size;
@@ -1110,7 +1461,12 @@ class GL : GLConstants
 
 		if (mCurrentBoundArrayBuffer != -1)
 		{
+			mCurrentNormalPointer.buffer = mBuffers[mCurrentBoundArrayBuffer];
 			nPointer = mBuffers[mCurrentBoundArrayBuffer].data;
+		}
+		else
+		{
+			mCurrentNormalPointer.buffer = null;
 		}
 
 		mCurrentNormalPointer.type = type;
@@ -1136,7 +1492,12 @@ class GL : GLConstants
 
 		if (mCurrentBoundArrayBuffer != -1)
 		{
+			mCurrentColorPointer.buffer = mBuffers[mCurrentBoundArrayBuffer];
 			cPointer = mBuffers[mCurrentBoundArrayBuffer].data;
+		}
+		else
+		{
+			mCurrentColorPointer.buffer = null; ;
 		}
 
 		mCurrentColorPointer.size = size;
@@ -1146,9 +1507,170 @@ class GL : GLConstants
 		mCurrentColorPointer.offset = cOffset;
 	}
 
+	// Maybe use this to calculate hash of vertex data?
+	public class Jenkins96
+	{
+		private static uint a, b, c;
+
+		private static void Mix()
+		{
+			a -= b; a -= c; a ^= (c >> 13);
+			b -= c; b -= a; b ^= (a << 8);
+			c -= a; c -= b; c ^= (b >> 13);
+			a -= b; a -= c; a ^= (c >> 12);
+			b -= c; b -= a; b ^= (a << 16);
+			c -= a; c -= b; c ^= (b >> 5);
+			a -= b; a -= c; a ^= (c >> 3);
+			b -= c; b -= a; b ^= (a << 10);
+			c -= a; c -= b; c ^= (b >> 15);
+		}
+
+		public static uint ComputeHash(byte[] data, int offset, int length)
+		{
+			int len = offset + length;
+			a = b = 0x9e3779b9;
+			c = 0;
+			int i = offset;
+			while (i + 12 <= len)
+			{
+				a += (uint)data[i++] |
+					((uint)data[i++] << 8) |
+					((uint)data[i++] << 16) |
+					((uint)data[i++] << 24);
+				b += (uint)data[i++] |
+					((uint)data[i++] << 8) |
+					((uint)data[i++] << 16) |
+					((uint)data[i++] << 24);
+				c += (uint)data[i++] |
+					((uint)data[i++] << 8) |
+					((uint)data[i++] << 16) |
+					((uint)data[i++] << 24);
+				Mix();
+			}
+			c += (uint)len;
+			if (i < len)
+				a += data[i++];
+			if (i < len)
+				a += (uint)data[i++] << 8;
+			if (i < len)
+				a += (uint)data[i++] << 16;
+			if (i < len)
+				a += (uint)data[i++] << 24;
+			if (i < len)
+				b += (uint)data[i++];
+			if (i < len)
+				b += (uint)data[i++] << 8;
+			if (i < len)
+				b += (uint)data[i++] << 16;
+			if (i < len)
+				b += (uint)data[i++] << 24;
+			if (i < len)
+				c += (uint)data[i++] << 8;
+			if (i < len)
+				c += (uint)data[i++] << 16;
+			if (i < len)
+				c += (uint)data[i++] << 24;
+			Mix();
+			return c;
+		}
+	}
+
+	public class VertexBufferKey
+	{
+
+		private GLPointer mVertexPointer;
+		private GLPointer mTexCoordPointer;
+		private GLPointer mColorPointer;
+		private GLPointer mNormalPointer;
+		private int mStartIndex;
+		private int mVertexCount;
+		private uint mTotalHash;
+
+		public VertexBufferKey(GLPointer v, GLPointer t, GLPointer c, GLPointer n, int startIndex, int vertexCount)
+		{
+			mVertexPointer = v;
+			mTexCoordPointer = t;
+			mColorPointer = c;
+			mNormalPointer = n;
+			mStartIndex = startIndex;
+			mVertexCount = vertexCount;
+
+			mTotalHash = ComputeHash(startIndex, vertexCount);
+		}
+
+		public uint ComputeHash(int startIndex, int vertexCount)
+		{
+			uint hash;
+			int stride = mVertexPointer.stride;
+			if (stride == 0)
+				stride = GetSizeOfType(mVertexPointer.type) * mVertexPointer.size;
+
+			if ((mVertexPointer.buffer != null) && (mVertexPointer.buffer.usage == GL.GL_STATIC_DRAW))
+				hash = 0;
+			else
+				hash = Jenkins96.ComputeHash(mVertexPointer.data, mVertexPointer.offset + startIndex * stride, vertexCount * stride);
+
+			if (mTexCoordPointer.clientStateEnabled)
+			{
+				stride = mTexCoordPointer.stride;
+				if (stride == 0)
+					stride = GetSizeOfType(mTexCoordPointer.type) * mTexCoordPointer.size;
+
+				if ((mTexCoordPointer.buffer != null) && (mTexCoordPointer.buffer.usage == GL.GL_STATIC_DRAW))
+					hash ^= 0;
+				else
+					hash ^= Jenkins96.ComputeHash(mTexCoordPointer.data, mTexCoordPointer.offset + startIndex * stride, vertexCount * stride);
+			}
+
+			if (mColorPointer.clientStateEnabled)
+			{
+				stride = mColorPointer.stride;
+				if (stride == 0)
+					stride = GetSizeOfType(mColorPointer.type) * mColorPointer.size;
+
+				if ((mColorPointer.buffer != null) && (mColorPointer.buffer.usage == GL.GL_STATIC_DRAW))
+					hash ^= 0;
+				else
+					hash ^= Jenkins96.ComputeHash(mColorPointer.data, mColorPointer.offset + startIndex * stride, vertexCount * stride);
+			}
+
+			if (mNormalPointer.clientStateEnabled)
+			{
+				stride = mNormalPointer.stride;
+				if (stride == 0)
+					stride = GetSizeOfType(mNormalPointer.type) * mNormalPointer.size;
+
+				if ((mNormalPointer.buffer != null) && (mNormalPointer.buffer.usage == GL.GL_STATIC_DRAW))
+					hash ^= 0;
+				else
+					hash ^= Jenkins96.ComputeHash(mNormalPointer.data, mNormalPointer.offset + startIndex * stride, vertexCount * stride);
+			}
+			return hash;
+		}
+
+		public class EqualityComparer : IEqualityComparer<VertexBufferKey>
+		{
+			public bool Equals(VertexBufferKey x, VertexBufferKey y)
+			{
+				return ((x.mVertexPointer.Equals(y.mVertexPointer)) && (x.mTexCoordPointer.Equals(y.mTexCoordPointer)) &&
+						(x.mColorPointer.Equals(y.mColorPointer)) && (x.mNormalPointer.Equals(y.mNormalPointer)) &&
+						(x.mStartIndex == y.mStartIndex) && (x.mVertexCount == y.mVertexCount) && (x.mTotalHash == y.mTotalHash));
+
+			}
+			public int GetHashCode(VertexBufferKey x)
+			{
+				return x.mVertexPointer.GetHashCode() ^ x.mTexCoordPointer.GetHashCode() ^
+					x.mColorPointer.GetHashCode() ^ x.mNormalPointer.GetHashCode() ^
+					x.mStartIndex.GetHashCode() ^ x.mVertexCount.GetHashCode() ^ (int)x.mTotalHash;
+			}
+		}
+	}
+
+	Dictionary<VertexBufferKey, VertexBuffer> mCachedVertices = new Dictionary<VertexBufferKey, VertexBuffer>(new VertexBufferKey.EqualityComparer());
+
 	public void glDrawArrays(int mode, int startIndex, int vertexCount)
 	{
-		if (mClientStateVertexEnabled == false)
+		if (mCurrentVertexPointer.clientStateEnabled == false)
 			return;
 
 		if (vertexCount < 0)
@@ -1157,21 +1679,74 @@ class GL : GLConstants
 			return;
 		}
 
+		if (vertexCount == 0)
+		{
+			return;
+		}
+
 		PrimitiveType primitiveType;
 		if (!ConvertGLPrimitiveType(mode, out primitiveType))
 		{
-			if (mode != GL.GL_TRIANGLE_FAN)
-			{
-				RaiseGLError(GL_INVALID_VALUE);
-				return;
-			}
+			RaiseGLError(GL_INVALID_VALUE);
+			return;
 		}
 
 		SetupBasicEffectState();
 
 		mBasicEffect.CurrentTechnique.Passes[0].Apply();
 		VertexDeclaration decl = GLVertexType.GetVertexDeclaration();
-		GLVertexType[] vertices = CreateVertexArrayFromPointers(startIndex, vertexCount);
+
+		// this caching mechanism is only possible using buffers
+		// we should raise a flag it the data has been changed in a buffer
+		// and re-read it.
+#if false
+		VertexBuffer vertexBuffer = null;
+
+		VertexBufferKey vbk = new VertexBufferKey(mCurrentVertexPointer, mCurrentTexCoordPointer[0], mCurrentColorPointer, mCurrentNormalPointer,
+			startIndex, vertexCount);
+
+		if (!mCachedVertices.TryGetValue(vbk, out vertexBuffer))
+		{
+			GLVertexType[] vertices = new GLVertexType[vertexCount];
+			CreateVertexArrayFromPointers(startIndex, vertexCount, vertices);
+
+			// slow fallback for triangle fans.
+			if (mode == GL.GL_TRIANGLE_FAN)
+			{
+				// We simulate them using a triangle list.
+				primitiveType = PrimitiveType.TriangleList;
+				vertexCount = (vertices.Length - 2) * 3;
+				GLVertexType[] newVertices = new GLVertexType[vertexCount];
+				int newIndex = 0;
+				for (int i = 2; i < vertices.Length; i++)
+				{
+					newVertices[newIndex++] = vertices[0];
+					newVertices[newIndex++] = vertices[i - 1];
+					newVertices[newIndex++] = vertices[i];
+				}
+				vertices = newVertices;
+			}
+
+			// if everything matches except hash. Just upload new data..
+			// else create new buffer.
+			vertexBuffer = new VertexBuffer(mGraphicsDevice, decl, vertices.Length, BufferUsage.WriteOnly);
+			vertexBuffer.SetData<GLVertexType>(vertices);
+
+			mCachedVertices.Add(vbk, vertexBuffer);
+		}
+		else
+		{
+			if (mode == GL.GL_TRIANGLE_FAN)
+			{
+				primitiveType = PrimitiveType.TriangleList;
+			}
+		}
+		mGraphicsDevice.SetVertexBuffer(vertexBuffer);
+		int primitiveCount = GetPrimitiveCount(primitiveType, vertexBuffer.VertexCount);
+		mGraphicsDevice.DrawPrimitives(primitiveType, 0, primitiveCount);
+#else
+		GLVertexType[] vertices = new GLVertexType[vertexCount];
+		CreateVertexArrayFromPointers(startIndex, vertexCount, vertices);
 
 		// slow fallback for triangle fans.
 		if (mode == GL.GL_TRIANGLE_FAN)
@@ -1179,7 +1754,7 @@ class GL : GLConstants
 			// We simulate them using a triangle list.
 			primitiveType = PrimitiveType.TriangleList;
 			vertexCount = (vertices.Length - 2) * 3;
-			GLVertexType[] newVertices = Pool<GLVertexType>.GetElements(vertexCount);
+			GLVertexType[] newVertices = new GLVertexType[vertexCount];
 			int newIndex = 0;
 			for (int i = 2; i < vertices.Length; i++)
 			{
@@ -1187,20 +1762,18 @@ class GL : GLConstants
 				newVertices[newIndex++] = vertices[i - 1];
 				newVertices[newIndex++] = vertices[i];
 			}
-
-			Pool<GLVertexType>.LeaveElements(vertices);
 			vertices = newVertices;
 		}
-
-		int primitiveCount = GetPrimitiveCount(primitiveType, vertexCount);
+		int primitiveCount = GetPrimitiveCount(primitiveType, vertices.Length);
+		if (primitiveCount <= 0)
+			return;
 		mGraphicsDevice.DrawUserPrimitives<GLVertexType>(primitiveType, vertices, 0, primitiveCount, decl);
-
-		Pool<GLVertexType>.LeaveElements(vertices);
+#endif
 	}
 
 	public void glDrawElements(int mode, int count, int type, byte[] indecies, int indeciesOffset)
 	{
-		if (mClientStateVertexEnabled == false)
+		if (mCurrentVertexPointer.clientStateEnabled == false)
 			return;
 
 		if (count < 0)
@@ -1233,14 +1806,32 @@ class GL : GLConstants
 		}
 
 		int maxIndex = 0;
-		short[] indexData = CreateIndexArrayFromPointers(indecies, indeciesOffset, count, type, out maxIndex);
+		short[] indexData = new short[count];
+		CreateIndexArrayFromPointers(indecies, indeciesOffset, count, type, indexData, out maxIndex);
+
+		if (mode == GL.GL_TRIANGLE_FAN)
+		{
+			// We simulate them using a triangle list.
+			primitiveType = PrimitiveType.TriangleList;
+			count = (count - 2) * 3;
+			primitiveCount = GetPrimitiveCount(primitiveType, count);
+			short[] newIndecies = new short[count];
+			int newIndex = 0;
+			for (int i = 2; i < indexData.Length; i++)
+			{
+				newIndecies[newIndex++] = indexData[0];
+				newIndecies[newIndex++] = indexData[i - 1];
+				newIndecies[newIndex++] = indexData[i];
+			}
+			indexData = newIndecies;
+		}
 
 		VertexDeclaration decl = GLVertexType.GetVertexDeclaration();
-		GLVertexType[] vertices = CreateVertexArrayFromPointers(0, maxIndex + 1);
 
+		GLVertexType[] vertices = null;
+		vertices = new GLVertexType[maxIndex + 1];
+		CreateVertexArrayFromPointers(0, maxIndex + 1, vertices);
 		mGraphicsDevice.DrawUserIndexedPrimitives<GLVertexType>(primitiveType, vertices, 0, vertices.Length, indexData, 0, primitiveCount);
-		Pool<short>.LeaveElements(indexData);
-		Pool<GLVertexType>.LeaveElements(vertices);
 	}
 
 
@@ -1258,10 +1849,6 @@ class GL : GLConstants
 	{
 		//mDepthStencilState.StencilFunction = GetCompareFunction(tst);
 		//		mGraphicsDevice.DepthStencilState = mDepthStencilState;
-	}
-
-	public void glShadeModel(int model)
-	{
 	}
 
 	public void glHint(int type, int value)
@@ -1352,6 +1939,7 @@ class GL : GLConstants
 				Buffer.BlockCopy(data, dataOffset, dataCopy, 0, size);
 			}
 			mBuffers[buf].data = dataCopy;
+			mBuffers[buf].usage = usage;
 		}
 		catch (OutOfMemoryException)
 		{
@@ -1417,7 +2005,11 @@ class GL : GLConstants
 
 		if (texture < 0 || texture > mTextures.Count)
 		{
-			return;
+			int cnt = mTextures.Count;
+			for (int i = cnt; i < texture; i++)
+			{
+				mTextures.Add(null);
+			}
 		}
 
 		mCurrentBoundTexture = texture - 1;
@@ -1428,6 +2020,196 @@ class GL : GLConstants
 		{
 			mBasicEffect.Texture = (Texture2D)mTextures[mCurrentBoundTexture];
 		}
+	}
+
+	bool GetSurfaceFormat(int glformat, int type, out SurfaceFormat surfaceFormat, out int bytesPerPixel)
+	{
+		surfaceFormat = SurfaceFormat.Color;
+		bytesPerPixel = 4;
+		switch (glformat)
+		{
+			case GL.GL_ALPHA:
+				if (type == GL.GL_UNSIGNED_BYTE)
+				{
+					bytesPerPixel = 1;
+					surfaceFormat = SurfaceFormat.Alpha8;
+				}
+				else
+				{
+					RaiseGLError(GL.GL_INVALID_VALUE);
+					return false;
+				}
+				break;
+			case GL.GL_RGB:
+				if (type == GL.GL_UNSIGNED_SHORT_5_6_5)
+				{
+					bytesPerPixel = 2;
+					surfaceFormat = SurfaceFormat.Bgr565;
+				}
+				else if (type == GL.GL_UNSIGNED_BYTE)
+				{
+					bytesPerPixel = 3;
+					surfaceFormat = SurfaceFormat.Color;
+				}
+				else
+				{
+					RaiseGLError(GL.GL_INVALID_VALUE);
+					return false;
+				}
+				break;
+			case GL.GL_RGBA:
+				if (type == GL.GL_UNSIGNED_SHORT_4_4_4_4)
+				{
+					bytesPerPixel = 2;
+					surfaceFormat = SurfaceFormat.Bgra4444;
+				}
+				else if (type == GL.GL_UNSIGNED_SHORT_5_5_5_1)
+				{
+					bytesPerPixel = 2;
+					surfaceFormat = SurfaceFormat.Bgra5551;
+				}
+				else if (type == GL.GL_UNSIGNED_BYTE)
+					surfaceFormat = SurfaceFormat.Color;
+				else
+				{
+					RaiseGLError(GL.GL_INVALID_VALUE);
+					return false;
+				}
+				break;
+			case GL.GL_LUMINANCE:
+			case GL.GL_LUMINANCE_ALPHA:
+				if (type == GL.GL_UNSIGNED_BYTE)
+				{
+					surfaceFormat = SurfaceFormat.Color;
+					bytesPerPixel = 4;
+				}
+				else
+				{
+					RaiseGLError(GL.GL_INVALID_VALUE);
+					return false;
+				}
+				break;
+			default:
+				RaiseGLError(GL.GL_INVALID_ENUM);
+				return false;
+		}
+		return true;
+	}
+
+	bool SetConvertedPixels(SurfaceFormat surfaceFormat, int bytesPerPixel, int level, Texture2D texture, int format, int type, int xoffset, int yoffset, int width, int height, byte[] textureData, int textureDataOffset)
+	{
+		if (bytesPerPixel == 2)
+		{
+			byte[] pixels = new byte[width * height * 2];
+			int pitch = width * 2;
+			for (int j = 0; j < height; j++)
+			{
+				for (int i = 0; i < pitch; i += 2)
+				{
+					int rgb565 = (int)(textureData[textureDataOffset + 1] << 8) | (int)textureData[textureDataOffset + 0];
+					int r = (rgb565 >> 11) & 31;
+					int g = (rgb565 >> 5) & 64;
+					int b = rgb565 & 31;
+					int bgr565 = (b << 11) | (g << 5) | r;
+
+					pixels[j * pitch + i + 1] = (byte)((bgr565 & 0xff00) >> 8);
+					pixels[j * pitch + i + 0] = (byte)(bgr565 & 0xff);
+					textureDataOffset += 2;
+				}
+			}
+			textureDataOffset = 0;
+			textureData = pixels;
+		}
+		else if (bytesPerPixel == 3)
+		{
+			byte[] pixels = new byte[width * height * 4];
+			int pitch = width * 4;
+			for (int j = 0; j < height; j++)
+			{
+				for (int i = 0; i < pitch; i += 4)
+				{
+					pixels[j * pitch + i + 3] = 255;
+					pixels[j * pitch + i + 2] = textureData[textureDataOffset + 0];
+					pixels[j * pitch + i + 1] = textureData[textureDataOffset + 1];
+					pixels[j * pitch + i + 0] = textureData[textureDataOffset + 2];
+					textureDataOffset += 3;
+				}
+			}
+			textureDataOffset = 0;
+			textureData = pixels;
+		}
+		else if (bytesPerPixel == 4)
+		{
+			byte[] pixels = new byte[width * height * 4];
+
+			int pitch = width * 4;
+
+			if (format == GL.GL_ALPHA)
+			{
+				for (int j = 0; j < height; j++)
+				{
+					for (int i = 0; i < pitch; i += 4)
+					{
+						pixels[j * pitch + i + 3] = textureData[textureDataOffset];
+						pixels[j * pitch + i + 2] = 0;
+						pixels[j * pitch + i + 1] = 0;
+						pixels[j * pitch + i + 0] = 0;
+						textureDataOffset++;
+					}
+				}
+			}
+			else if (format == GL.GL_LUMINANCE)
+			{
+				for (int j = 0; j < height; j++)
+				{
+					for (int i = 0; i < pitch; i += 4)
+					{
+						pixels[j * pitch + i + 3] = 1;
+						pixels[j * pitch + i + 2] = textureData[textureDataOffset];
+						pixels[j * pitch + i + 1] = textureData[textureDataOffset];
+						pixels[j * pitch + i + 0] = textureData[textureDataOffset];
+						textureDataOffset++;
+					}
+				}
+			}
+			else if (format == GL.GL_LUMINANCE_ALPHA)
+			{
+				for (int j = 0; j < height; j++)
+				{
+					for (int i = 0; i < pitch; i += 4)
+					{
+						pixels[j * pitch + i + 3] = textureData[textureDataOffset++];
+						pixels[j * pitch + i + 2] = textureData[textureDataOffset];
+						pixels[j * pitch + i + 1] = textureData[textureDataOffset];
+						pixels[j * pitch + i + 0] = textureData[textureDataOffset];
+						textureDataOffset++;
+					}
+				}
+			}
+			else
+			{
+				//for (int j = height - 1; j >= 0; j--)
+				for (int j = 0; j < height; j++)
+				{
+					for (int i = 0; i < pitch; i += 4)
+					{
+						pixels[j * pitch + i + 3] = textureData[textureDataOffset + 3];
+						pixels[j * pitch + i + 2] = textureData[textureDataOffset + 0];
+						pixels[j * pitch + i + 1] = textureData[textureDataOffset + 1];
+						pixels[j * pitch + i + 0] = textureData[textureDataOffset + 2];
+						textureDataOffset += 4;
+					}
+				}
+
+			}
+
+			textureDataOffset = 0;
+			textureData = pixels;
+		}
+
+		texture.SetData<byte>(level, new Rectangle(xoffset, yoffset, width, height), textureData, textureDataOffset, width * height * bytesPerPixel);
+
+		return true;
 	}
 
 	public void glTexImage2D(int target, int level, int internalformat, int width, int height, int border, int format, int type, byte[] textureData, int textureDataOffset)
@@ -1450,98 +2232,98 @@ class GL : GLConstants
 			return;
 		}
 
-		SurfaceFormat surfaceFormat = new SurfaceFormat();
-		int bytesPerPixel = 4;
-		switch (format)
-		{
-			case GL.GL_ALPHA:
-				if (type == GL.GL_UNSIGNED_BYTE)
-				{
-					bytesPerPixel = 1;
-					surfaceFormat = SurfaceFormat.Alpha8;
-				}
-				else
-				{
-					RaiseGLError(GL.GL_INVALID_VALUE);
-					return;
-				}
-				break;
-			case GL.GL_RGB:
-				if (type == GL.GL_UNSIGNED_SHORT_5_6_5)
-				{
-					bytesPerPixel = 2;
-					surfaceFormat = SurfaceFormat.Bgr565;
-				}
-				if (type == GL.GL_UNSIGNED_BYTE)
-				{
-					surfaceFormat = SurfaceFormat.Color;
-				}
-				else
-				{
-					RaiseGLError(GL.GL_INVALID_VALUE);
-					return;
-				}
-				break;
-			case GL.GL_RGBA:
-				if (type == GL.GL_UNSIGNED_SHORT_4_4_4_4)
-				{
-					bytesPerPixel = 2;
-					surfaceFormat = SurfaceFormat.Bgra4444;
-				}
-				if (type == GL.GL_UNSIGNED_SHORT_5_5_5_1)
-				{
-					bytesPerPixel = 2;
-					surfaceFormat = SurfaceFormat.Bgra5551;
-				}
-				if (type == GL.GL_UNSIGNED_BYTE)
-					surfaceFormat = SurfaceFormat.Color;
-				else
-				{
-					RaiseGLError(GL.GL_INVALID_VALUE);
-					return;
-				}
-				break;
-			case GL.GL_LUMINANCE:
-			case GL.GL_LUMINANCE_ALPHA:
-			default:
-				RaiseGLError(GL.GL_INVALID_ENUM);
-				return;
-		}
+
 
 		// we don't support mipmapping just yet.
+#if false
 		if (level != 0)
 		{
 			RaiseGLError(GL.GL_INVALID_VALUE);
 			return;
 		}
+#endif
 
-		if (bytesPerPixel == 4)
+
+		Texture2D t = (Texture2D)mTextures[mCurrentBoundTexture];
+
+		int bytesPerPixel;
+		SurfaceFormat surfaceFormat;
+		if (!GetSurfaceFormat(format, type, out surfaceFormat, out bytesPerPixel))
 		{
-			byte[] pixels = new byte[width * height * 4];
-
-			int pitch = width * 4;
-
-			//for (int j = height - 1; j >= 0; j--)
-			for (int j = 0; j < height; j++)
-			{
-				for (int i = 0; i < pitch; i += 4)
-				{
-					pixels[j * pitch + i + 3] = textureData[textureDataOffset + 3];
-					pixels[j * pitch + i + 2] = textureData[textureDataOffset + 0];
-					pixels[j * pitch + i + 1] = textureData[textureDataOffset + 1];
-					pixels[j * pitch + i + 0] = textureData[textureDataOffset + 2];
-					textureDataOffset += 4;
-				}
-			}
-
-			textureDataOffset = 0;
-			textureData = pixels;
+			RaiseGLError(GL.GL_INVALID_VALUE);
+			return;
 		}
 
-		Texture2D t;
-		mTextures[mCurrentBoundTexture] = t = new Texture2D(mGraphicsDevice, width, height, false, surfaceFormat);
-		t.SetData<byte>(textureData, textureDataOffset, width * height * bytesPerPixel);
+		if (t == null)
+		{
+			t = new Texture2D(mGraphicsDevice, width, height, true, surfaceFormat);
+			mTextures[mCurrentBoundTexture] = t;
+		}
+
+		mGraphicsDevice.Textures[0] = null;
+
+		if(textureData != null)
+			SetConvertedPixels(surfaceFormat, bytesPerPixel, level, t,
+				format, type, 0, 0, width, height, textureData, textureDataOffset);
+
 		mBasicEffect.Texture = t;
+	}
+
+	public void glDeleteTextures(int[] textures)
+	{
+		for (int i = 0; i < textures.Length; i++)
+		{
+			mTextures[textures[i]].Dispose();
+			mTextures[textures[i]] = null;
+		}
+	}
+
+	public void glTexSubImage2D(int target, int level, int xoffset, int yoffset,
+		int width, int height, int format, int type, byte[] textureData, int textureDataOffset) {
+			if (target != GL.GL_TEXTURE_2D)
+			{
+				RaiseGLError(GL.GL_INVALID_ENUM);
+				return;
+			}
+
+			if (mCurrentBoundTexture == -1)
+			{
+				RaiseGLError(GL.GL_INVALID_OPERATION);
+				return;
+			}
+
+			Texture2D t = (Texture2D)mTextures[mCurrentBoundTexture];
+	
+			int bytesPerPixel;
+			SurfaceFormat surfaceFormat;
+
+			if (!GetSurfaceFormat(format, type, out surfaceFormat, out bytesPerPixel))
+			{
+				RaiseGLError(GL.GL_INVALID_VALUE);
+				return;
+			}
+
+			mGraphicsDevice.Textures[0] = null;
+
+			if (xoffset + width > t.Width ||
+				yoffset + height > t.Height ||
+				xoffset < 0 ||
+				yoffset < 0)
+			{
+				RaiseGLError(GL.GL_INVALID_OPERATION);
+				return;
+			}
+
+			try
+			{
+				SetConvertedPixels(surfaceFormat, bytesPerPixel, level, t,
+					format, type, xoffset, yoffset, width, height, textureData, textureDataOffset);
+			}
+			catch (Exception e)
+			{
+				int a = 2;
+			}
+			mBasicEffect.Texture = t;
 	}
 
 	public void glTexParameterx(int target, int pname, int param)

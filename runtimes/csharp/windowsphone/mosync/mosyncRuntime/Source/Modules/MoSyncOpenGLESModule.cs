@@ -80,7 +80,11 @@ namespace MoSync
 
 			ioctls.maOpenGLTexSubImage2D = delegate(int _res)
 			{
-				return MoSync.Constants.IOCTL_UNAVAILABLE;
+				Resource res = runtime.GetResource(MoSync.Constants.RT_IMAGE, _res);
+				WriteableBitmap src = (WriteableBitmap)res.GetInternalObject();
+				byte[] pixels = src.ToByteArray();
+				mGL.glTexSubImage2D(GL.GL_TEXTURE_2D, 0, 0, 0, src.PixelWidth, src.PixelHeight, GL.GL_RGBA, GL.GL_UNSIGNED_BYTE, pixels, 0);
+				return MoSync.Constants.MA_GL_TEX_IMAGE_2D_OK;
 			};
 
 			ioctls.glViewport = delegate(int _x, int _y, int _w, int _h)
@@ -91,7 +95,28 @@ namespace MoSync
 
 			ioctls.glGetError = delegate()
 			{
-				return mGL.glGetError();
+				int err = mGL.glGetError();
+				if (err != GL.GL_NO_ERROR)
+				{
+					int a = 2;
+					//err = GL.GL_NO_ERROR;
+				}
+				return err;
+			};
+
+			ioctls.glGetStringHandle = delegate(int _name)
+			{
+
+				String str = mGL.glGetString(_name);
+				char[] data = str.ToCharArray();
+				byte[] bytes = new byte[data.Length + 1];
+				bytes[data.Length] = 0;
+				for (int i = 0; i < data.Length; i++)
+				{
+					bytes[i] = (byte)data[i];
+				}
+
+				return runtime.AddResource(new Resource(new System.IO.MemoryStream(bytes), MoSync.Constants.RT_BINARY, true));
 			};
 
 			ioctls.glMatrixMode = delegate(int mode)
@@ -117,6 +142,16 @@ namespace MoSync
 			ioctls.glBlendFunc = delegate(int sfactor, int dfactor)
 			{
 				mGL.glBlendFunc(sfactor, dfactor); return 0;
+			};
+
+			ioctls.glAlphaFunc = delegate(int func, float _ref)
+			{
+				return 0;
+			};
+
+			ioctls.glAlphaFuncx = delegate(int func, int _ref)
+			{
+				return 0;
 			};
 
 			ioctls.glDepthFunc = delegate(int _func)
@@ -197,6 +232,11 @@ namespace MoSync
 			ioctls.glMultMatrixf = delegate(int _matrix)
 			{
 				mGL.glMultMatrixf(core.GetDataMemory().GetData(), _matrix); return 0;
+			};
+
+			ioctls.glMultMatrixx = delegate(int _matrix)
+			{
+				mGL.glMultMatrixx(core.GetDataMemory().GetData(), _matrix); return 0;
 			};
 
 			ioctls.glEnableClientState = delegate(int _array)
@@ -311,7 +351,37 @@ namespace MoSync
 
 			ioctls.glTexImage2D = delegate(int _target, int _level, int _internalformat, int _width, int _height, int _border, int _format, int _type, int _pixels)
 			{
-				mGL.glTexImage2D(_target, _level, _internalformat, _width, _height, _border, _format, _type, core.GetDataMemory().GetData(), _pixels);
+				if(_pixels == 0)
+					mGL.glTexImage2D(_target, _level, _internalformat, _width, _height, _border, _format, _type, null, _pixels);
+				else
+					mGL.glTexImage2D(_target, _level, _internalformat, _width, _height, _border, _format, _type, core.GetDataMemory().GetData(), _pixels);
+				return 0;
+			};
+
+			ioctls.glDeleteTextures = delegate(int _n, int _textures)
+			{
+				int[] textures = new int[_n];
+				for (int i = 0; i < _n; i++)
+				{
+					textures[i] = core.GetDataMemory().ReadInt32(_textures + i * 4);
+				}
+				mGL.glDeleteTextures(textures);
+				return 0;
+			};
+
+			ioctls.glTexSubImage2D = delegate(int _target, int _level, int _xofs, int _yofs, int _width, int _height, int _format, int _type, int _pixels)
+			{
+				mGL.glTexSubImage2D(_target, _level, _xofs, _yofs, _width, _height, _format, _type, core.GetDataMemory().GetData(), _pixels);
+				return 0;
+			};
+
+			ioctls.glCompressedTexImage2D = delegate(int _target, int _level, int _internalformat, int _width, int _height, int _border, int _imageSize, int _data)
+			{
+				return 0;
+			};
+
+			ioctls.glCompressedTexSubImage2D = delegate(int _target, int _level, int _xofs, int _yofs, int _width, int _height, int _format, int _imageSize, int _data)
+			{
 				return 0;
 			};
 
@@ -344,6 +414,50 @@ namespace MoSync
 				return 0;
 			};
 
+			ioctls.glMaterialf = delegate(int face, int pname, float value)
+			{
+				mGL.glMaterialf(face, pname, value); return 0;
+			};
+
+			ioctls.glMaterialx = delegate(int face, int pname, int value)
+			{
+				mGL.glMaterialx(face, pname, value); return 0;
+			};
+
+			ioctls.glMaterialfv = delegate(int face, int pname, int data)
+			{
+				mGL.glMaterialfv(face, pname, core.GetDataMemory().GetData(), data); return 0;
+			};
+
+			ioctls.glMaterialxv = delegate(int face, int pname, int data)
+			{
+				mGL.glMaterialxv(face, pname, core.GetDataMemory().GetData(), data); return 0;
+			};
+
+			ioctls.glLightf = delegate(int _light, int _pname, float _param)
+			{
+				mGL.glLightf(_light, _pname, _param); return 0;
+			};
+
+			ioctls.glLightx = delegate(int _light, int _pname, int _param)
+			{
+				mGL.glLightx(_light, _pname, _param); return 0;
+			};
+
+			ioctls.glLightfv = delegate(int _light, int _pname, int _pointer)
+			{
+				mGL.glLightfv(_light, _pname, core.GetDataMemory().GetData(), _pointer); return 0;
+			};
+
+			ioctls.glLightxv = delegate(int _light, int _pname, int _pointer)
+			{
+				mGL.glLightxv(_light, _pname, core.GetDataMemory().GetData(), _pointer); return 0;
+			};
+
+			ioctls.glShadeModel = delegate(int _mode)
+			{
+				mGL.glShadeModel(_mode); return 0;
+			};
         }
     }
 }

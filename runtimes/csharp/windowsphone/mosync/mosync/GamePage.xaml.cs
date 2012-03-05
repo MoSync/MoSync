@@ -1,4 +1,6 @@
-﻿using System;
+﻿#define USE_THREAD_LOCKED_VERSION
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -22,9 +24,11 @@ namespace test_mosync
         ContentManager contentManager;
         GameTimer timer;
 
+		bool mShouldDrawFrame = false;
 		MoSync.Machine mMachine;
 		MoSync.Runtime mRuntime;
 		MoSync.OpenGLESModule mOpenGLESModule;
+		bool mOnDrawInitialized = false;
 
         public GamePage()
         {
@@ -35,17 +39,21 @@ namespace test_mosync
 
             // Create a timer for this page
             timer = new GameTimer();
-			//timer.UpdateInterval = new TimeSpan(333333);
 			timer.UpdateInterval = TimeSpan.FromTicks(166667);
-			timer.FrameAction += SuppressFrame;
 			timer.Update += OnUpdate;
-			timer.Draw += OnDraw;
+#if USE_THREAD_LOCKED_VERSION
+			timer.FrameAction += PreDraw;
+#else
+#endif
         }
 
+		ManualResetEvent DrawCompleteEvent = new ManualResetEvent(true);
 		AutoResetEvent DrawRequiredEvent = new AutoResetEvent(false);
-		AutoResetEvent DrawCompleteEvent = new AutoResetEvent(false);
+
 		GraphicsDevice MoSyncGraphicsDevice;
-		SpriteBatch SpriteBatch;
+
+		//RenderTarget2D mBackBuffer;
+		//SpriteBatch SpriteBatch;
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
@@ -57,23 +65,46 @@ namespace test_mosync
 			mOpenGLESModule = mRuntime.GetModule<MoSync.OpenGLESModule>();
 			//mOpenGLESModule.InitWithGraphicsDevice(SharedGraphicsDeviceManager.Current.GraphicsDevice);
 			MoSyncGraphicsDevice = SharedGraphicsDeviceManager.Current.GraphicsDevice;
-			MoSyncGraphicsDevice.PresentationParameters.IsFullScreen = false;
-	
+			MoSyncGraphicsDevice.PresentationParameters.IsFullScreen = true;
+			SharedGraphicsDeviceManager.Current.SynchronizeWithVerticalRetrace = false;
 			mOpenGLESModule.InitWithGraphicsDevice(MoSyncGraphicsDevice);
 
             // TODO: use this.content to load your game content here
-			SpriteBatch = new SpriteBatch(SharedGraphicsDeviceManager.Current.GraphicsDevice);
+//			mBackBuffer = new RenderTarget2D(MoSyncGraphicsDevice, SharedGraphicsDeviceManager.DefaultBackBufferWidth, SharedGraphicsDeviceManager.DefaultBackBufferHeight);
+//			SpriteBatch = new SpriteBatch(SharedGraphicsDeviceManager.Current.GraphicsDevice);
+//			MoSyncGraphicsDevice.SetRenderTarget(mBackBuffer);
 
+#if USE_THREAD_LOCKED_VERSION
 			mOpenGLESModule.SetOnUpdateScreenAction(() =>
 			{
-				// it's time to draw.
-				// stop supressing frames.
-				timer.FrameAction -= SuppressFrame;
-
-				// wait for draw to complete.
+				mShouldDrawFrame = true;
+				if (!mOnDrawInitialized)
+					timer.Draw += OnDraw;
+				mOnDrawInitialized = true;
+				DrawRequiredEvent.Set();
 				DrawCompleteEvent.WaitOne();
+				mShouldDrawFrame = false;
 			});
 
+			MoSync.Util.SetPreRunOnMainThreadAction(() =>
+			{
+				mShouldDrawFrame = false;
+				timer.FrameAction -= PreDraw;
+				DrawRequiredEvent.Set();
+			});
+
+			MoSync.Util.SetPostRunOnMainThreadAction(() =>
+			{
+				mShouldDrawFrame = false;
+				timer.FrameAction += PreDraw;
+				DrawRequiredEvent.Set();
+			});
+#else
+			mOpenGLESModule.SetOnUpdateScreenAction(() =>
+			{
+				timer.Draw += OnDraw;
+			});
+#endif
 
 			base.OnNavigatedTo(e);
 
@@ -95,35 +126,34 @@ namespace test_mosync
 		{
 		}
 
-		private void SuppressFrame(object sender, EventArgs e)
+
+#if USE_THREAD_LOCKED_VERSION
+		private void PreDraw(object sender, EventArgs e)
 		{
-			GameTimer.SuppressFrame();
-		}
-
-#if true
-		private void CompleteFrame(object sender, EventArgs e)
-		{
-			// Remove this frame action
-			timer.FrameAction -= CompleteFrame;
-
-			// Supress this frame and set the following frames to be supressed (until further notice)
-			GameTimer.SuppressFrame();
-			timer.FrameAction += SuppressFrame;
-
-			// Notify the MoSync thread that the draw is complete.
 			DrawCompleteEvent.Set();
+			DrawCompleteEvent.Reset();
+
+			if (!DrawRequiredEvent.WaitOne(100))
+			{
+				mShouldDrawFrame = false;
+			}
+
+			if(!mShouldDrawFrame)
+				GameTimer.SuppressFrame();
 		}
-#endif
 
         /// <summary>
         /// Allows the page to draw itself.
         /// </summary>
         private void OnDraw(object sender, GameTimerEventArgs e)
         {
-#if true	
-			// Set a frame action that notifies the mosync thread that the draw is complete.
-			timer.FrameAction += CompleteFrame;
-#endif
+			// content will be presented right after we return from this function
         }
-    }
+#else
+        private void OnDraw(object sender, GameTimerEventArgs e)
+        {
+			timer.Draw -= OnDraw;
+        }
+#endif
+	}
 }
