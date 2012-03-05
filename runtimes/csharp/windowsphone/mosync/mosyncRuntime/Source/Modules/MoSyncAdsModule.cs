@@ -65,24 +65,31 @@ namespace MoSync
                         mAd = new NativeUI.Ad();
 
                         // If the banner size is a known windows phone 7 size, we set it.
-                        // The default value is 300*50 (X-Large banner).
-                        if (_bannerSize == MoSync.Constants.MA_ADS_SIZE_WP7_XLARGE)
+                        // The default value is 480*80 (XX-Large banner).
+                        switch (_bannerSize)
                         {
-                            mAd.Width = 300;
-                            mAd.Height = 50;
-                        }
-                        else if (_bannerSize == MoSync.Constants.MA_ADS_SIZE_WP7_XXLARGE)
-                        {
-                            mAd.Width = 480;
-                            mAd.Height = 80;
+                            case MoSync.Constants.MA_ADS_SIZE_WP7_XLARGE:
+                                mAd.Width = 300;
+                                mAd.Height = 50;
+                                break;
+                            case MoSync.Constants.MA_ADS_SIZE_WP7_XXLARGE:
+                                mAd.Width = 480;
+                                mAd.Height = 80;
+                                break;
+                            default:
+                                mAd.Width = 480;
+                                mAd.Height = 80;
+                                break;
                         }
 
                         // the publisherID for windows phone contains two components separated by '|'.
                         // The first one represents the application ID and the second one the ad unit ID.
+                        // The publisher ID structure(ex): f532778c-7db5-4a8b-a292-a45a684ed890
+                        // The ad unit ID structure(ex): 81103
                         String publisherID = core.GetDataMemory().ReadStringAtAddress(_publisherID);
                         string[] values = publisherID.Split('|');
                         // only if both values are present we set the properties
-                        if (values.Length == 2)
+                        if (2 == values.Length)
                         {
                             mAd.ApplicationID = values[0];
                             mAd.AdUnitID = values[1];
@@ -113,7 +120,7 @@ namespace MoSync
             */
             ioctls.maAdsBannerDestroy = delegate(int _bannerHandler)
             {
-                if (runtime.GetModule<NativeUIModule>().GetWidget(_bannerHandler).GetHandle() < 0)
+                if (!isHandleValid(runtime, _bannerHandler))
                 {
                     return MoSync.Constants.MA_ADS_RES_INVALID_BANNER_HANDLE;
                 }
@@ -137,11 +144,11 @@ namespace MoSync
             ioctls.maAdsAddBannerToLayout = delegate(int _bannerHandle, int _layoutHandle)
             {
                 // we first check if both the banner and the layout are widgets with a valid handle
-                if (runtime.GetModule<NativeUIModule>().GetWidget(_bannerHandle).GetHandle() < 0)
+                if (!isHandleValid(runtime, _bannerHandle))
                 {
                     return MoSync.Constants.MA_ADS_RES_INVALID_BANNER_HANDLE;
                 }
-                if (runtime.GetModule<NativeUIModule>().GetWidget(_layoutHandle).GetHandle() < 0)
+                if (!isHandleValid(runtime, _layoutHandle))
                 {
                     return MoSync.Constants.MA_ADS_RES_INVALID_LAYOUT_HANDLE;
                 }
@@ -169,11 +176,11 @@ namespace MoSync
             ioctls.maAdsRemoveBannerFromLayout = delegate(int _bannerHandle, int _layoutHandle)
             {
                 // we first check if both the banner and the layout are widgets with a valid handle
-                if (runtime.GetModule<NativeUIModule>().GetWidget(_bannerHandle).GetHandle() < 0)
+                if (!isHandleValid(runtime, _bannerHandle))
                 {
                     return MoSync.Constants.MA_ADS_RES_INVALID_BANNER_HANDLE;
                 }
-                if (runtime.GetModule<NativeUIModule>().GetWidget(_layoutHandle).GetHandle() < 0)
+                if (!isHandleValid(runtime, _layoutHandle))
                 {
                     return MoSync.Constants.MA_ADS_RES_INVALID_LAYOUT_HANDLE;
                 }
@@ -201,7 +208,7 @@ namespace MoSync
             {
                 // check if the banner is a widget with a valid handle
                 MoSync.NativeUI.Ad ad = (MoSync.NativeUI.Ad)runtime.GetModule<NativeUIModule>().GetWidget(_bannerHandle);
-                if (runtime.GetModule<NativeUIModule>().GetWidget(_bannerHandle).GetHandle() < 0)
+                if (!isHandleValid(runtime, _bannerHandle))
                 {
                     return MoSync.Constants.MA_ADS_RES_INVALID_BANNER_HANDLE;
                 }
@@ -209,130 +216,128 @@ namespace MoSync
                 String property = core.GetDataMemory().ReadStringAtAddress(_property);
                 // based on the string 'property' we set the ones that can be set on WP 7.1
                 // if a property is not available, we return MA_ADS_RES_INVALID_PROPERTY_NAME
-                if (property.Equals(MoSync.Constants.MA_ADS_HEIGHT))
+                string value = "";
+                int intValue = -1;
+                switch (property)
                 {
-                    string value = core.GetDataMemory().ReadStringAtAddress(_value);
-                    int intValue = Convert.ToInt32(value);
-                    if (intValue >= 0)
-                    {
-                        MoSync.Util.RunActionOnMainThreadSync(() =>
-                            {
-                                mAd.Height = intValue;
-                            }
-                        );
-                    }
-                    else
-                    {
-                        return MoSync.Constants.MA_ADS_RES_INVALID_PROPERTY_VALUE;
-                    }
-                }
-                else if (property.Equals(MoSync.Constants.MA_ADS_WIDTH))
-                {
-                    string value = core.GetDataMemory().ReadStringAtAddress(_value);
-                    int intValue = Convert.ToInt32(value);
-                    if (intValue >= 0)
-                    {
-                        MoSync.Util.RunActionOnMainThreadSync(() =>
-                            {
-                                mAd.Width = intValue;
-                            }
-                        );
-                    }
-                    else
-                    {
-                        return MoSync.Constants.MA_ADS_RES_INVALID_PROPERTY_VALUE;
-                    }
-                }
-                else if (property.Equals(MoSync.Constants.MA_ADS_VISIBLE))
-                {
-                    String value = core.GetDataMemory().ReadStringAtAddress(_value);
-                    if (value.Equals("true"))
-                    {
-                        MoSync.Util.RunActionOnMainThreadSync(() =>
-                            {
-                                mAd.Visible = "true";
-                            }
-                        );
-                    }
-                    else if (value.Equals("false"))
-                    {
-                        MoSync.Util.RunActionOnMainThreadSync(() =>
-                            {
-                                mAd.Visible = "false";
-                            }
-                        );
-                    }
-                    else
-                    {
-                        return MoSync.Constants.MA_ADS_RES_INVALID_PROPERTY_VALUE;
-                    }
-                }
-                else if (property.Equals(MoSync.Constants.MA_ADS_ENABLED))
-                {
-                    String value = core.GetDataMemory().ReadStringAtAddress(_value);
-                    if (value.Equals("true"))
-                    {
-                        MoSync.Util.RunActionOnMainThreadSync(() =>
-                            {
-                                mAd.Enabled = "true";
-                            }
-                        );
-                    }
-                    else if (value.Equals("false"))
-                    {
-                        MoSync.Util.RunActionOnMainThreadSync(() =>
-                            {
-                                mAd.Enabled = "false";
-                            }
-                        );
-                    }
-                    else
-                    {
-                        return MoSync.Constants.MA_ADS_RES_INVALID_PROPERTY_VALUE;
-                    }
-                }
-                else if (property.Equals(MoSync.Constants.MA_ADS_COLOR_BG))
-                {
-                    string value = core.GetDataMemory().ReadStringAtAddress(_value);
-                    if (!IsHexColor(value))
-                    {
-                        return MoSync.Constants.MA_ADS_RES_INVALID_PROPERTY_VALUE;
-                    }
-                    MoSync.Util.RunActionOnMainThreadSync(() =>
+                    case MoSync.Constants.MA_ADS_HEIGHT:
+                        value = core.GetDataMemory().ReadStringAtAddress(_value);
+                        intValue = -1;
+                        int.TryParse(value,out intValue);
+                        if (intValue >= 0)
                         {
-                            mAd.BackgroundColor = value;
+                            MoSync.Util.RunActionOnMainThreadSync(() =>
+                                {
+                                    mAd.Height = intValue;
+                                }
+                            );
                         }
-                    );
-                }
-                else if (property.Equals(MoSync.Constants.MA_ADS_COLOR_BORDER))
-                {
-                    string value = core.GetDataMemory().ReadStringAtAddress(_value);
-                    if (!IsHexColor(value))
-                    {
-                        return MoSync.Constants.MA_ADS_RES_INVALID_PROPERTY_VALUE;
-                    }
-                    MoSync.Util.RunActionOnMainThreadSync(() =>
+                        else
                         {
-                            mAd.BorderColor = value;
+                            return MoSync.Constants.MA_ADS_RES_INVALID_PROPERTY_VALUE;
                         }
-                    );
-                }
-                else if (property.Equals(MoSync.Constants.MA_ADS_COLOR_TEXT))
-                {
-                    string value = core.GetDataMemory().ReadStringAtAddress(_value);
-                    if (!IsHexColor(value))
-                    {
-                        return MoSync.Constants.MA_ADS_RES_INVALID_PROPERTY_VALUE;
-                    }
-                    MoSync.Util.RunActionOnMainThreadSync(() =>
+                        break;
+                    case MoSync.Constants.MA_ADS_WIDTH:
+                        value = core.GetDataMemory().ReadStringAtAddress(_value);
+                        intValue = -1;
+                        int.TryParse(value, out intValue);
+                        if (intValue >= 0)
                         {
-                            mAd.TextColor = value;
+                            MoSync.Util.RunActionOnMainThreadSync(() =>
+                                {
+                                    mAd.Width = intValue;
+                                }
+                            );
                         }
-                    );
-                }
-                else
-                {
-                    return MoSync.Constants.MA_ADS_RES_INVALID_PROPERTY_NAME;
+                        else
+                        {
+                            return MoSync.Constants.MA_ADS_RES_INVALID_PROPERTY_VALUE;
+                        }
+                        break;
+                    case MoSync.Constants.MA_ADS_VISIBLE:
+                        value = core.GetDataMemory().ReadStringAtAddress(_value).ToLower();
+                        if (value.Equals("true"))
+                        {
+                            MoSync.Util.RunActionOnMainThreadSync(() =>
+                                {
+                                    mAd.Visible = "true";
+                                }
+                            );
+                        }
+                        else if (value.Equals("false"))
+                        {
+                            MoSync.Util.RunActionOnMainThreadSync(() =>
+                                {
+                                    mAd.Visible = "false";
+                                }
+                            );
+                        }
+                        else
+                        {
+                            return MoSync.Constants.MA_ADS_RES_INVALID_PROPERTY_VALUE;
+                        }
+                        break;
+                    case MoSync.Constants.MA_ADS_ENABLED:
+                        value = core.GetDataMemory().ReadStringAtAddress(_value).ToLower();
+                        if (value.Equals("true"))
+                        {
+                            MoSync.Util.RunActionOnMainThreadSync(() =>
+                                {
+                                    mAd.Enabled = "true";
+                                }
+                            );
+                        }
+                        else if (value.Equals("false"))
+                        {
+                            MoSync.Util.RunActionOnMainThreadSync(() =>
+                                {
+                                    mAd.Enabled = "false";
+                                }
+                            );
+                        }
+                        else
+                        {
+                            return MoSync.Constants.MA_ADS_RES_INVALID_PROPERTY_VALUE;
+                        }
+                        break;
+                    case MoSync.Constants.MA_ADS_COLOR_BG:
+                        value = core.GetDataMemory().ReadStringAtAddress(_value);
+                        if (!IsHexColor(value))
+                        {
+                            return MoSync.Constants.MA_ADS_RES_INVALID_PROPERTY_VALUE;
+                        }
+                        MoSync.Util.RunActionOnMainThreadSync(() =>
+                            {
+                                mAd.BackgroundColor = value;
+                            }
+                        );
+                        break;
+                    case MoSync.Constants.MA_ADS_COLOR_BORDER:
+                        value = core.GetDataMemory().ReadStringAtAddress(_value);
+                        if (!IsHexColor(value))
+                        {
+                            return MoSync.Constants.MA_ADS_RES_INVALID_PROPERTY_VALUE;
+                        }
+                        MoSync.Util.RunActionOnMainThreadSync(() =>
+                            {
+                                mAd.BorderColor = value;
+                            }
+                        );
+                        break;
+                    case MoSync.Constants.MA_ADS_COLOR_TEXT:
+                        value = core.GetDataMemory().ReadStringAtAddress(_value);
+                        if (!IsHexColor(value))
+                        {
+                            return MoSync.Constants.MA_ADS_RES_INVALID_PROPERTY_VALUE;
+                        }
+                        MoSync.Util.RunActionOnMainThreadSync(() =>
+                            {
+                                mAd.TextColor = value;
+                            }
+                        );
+                        break;
+                    default:
+                        return MoSync.Constants.MA_ADS_RES_INVALID_PROPERTY_NAME;
                 }
 
                 return MoSync.Constants.MA_ADS_RES_OK;
@@ -355,76 +360,71 @@ namespace MoSync
             ioctls.maAdsBannerGetProperty = delegate(int _bannerHandle, int _property, int _value, int _bufSize)
             {
                 MoSync.NativeUI.Ad ad = (MoSync.NativeUI.Ad)runtime.GetModule<NativeUIModule>().GetWidget(_bannerHandle);
-                if (runtime.GetModule<NativeUIModule>().GetWidget(_bannerHandle).GetHandle() < 0)
+                if (!isHandleValid(runtime, _bannerHandle))
                 {
                     return MoSync.Constants.MA_ADS_RES_INVALID_BANNER_HANDLE;
                 }
 
                 String property = core.GetDataMemory().ReadStringAtAddress(_property);
-                if (property.Equals(MoSync.Constants.MA_ADS_HEIGHT))
+                string stringvalue = "";
+                switch (property)
                 {
-                    core.GetDataMemory().WriteStringAtAddress(
-                        _value,
-                        mAd.Height.ToString(),
-                        _bufSize);
-                }
-                else if (property.Equals(MoSync.Constants.MA_ADS_WIDTH))
-                {
-                    core.GetDataMemory().WriteStringAtAddress(
-                        _value,
-                        mAd.Width.ToString(),
-                        _bufSize);
-                }
-                else if (property.Equals(MoSync.Constants.MA_ADS_VISIBLE))
-                {
-                    string stringvalue = "";
-                    MoSync.Util.RunActionOnMainThreadSync(() =>
-                        {
-                            stringvalue = mAd.Visible;
-                        }
-                    );
-                    core.GetDataMemory().WriteStringAtAddress(
-                        _value,
-                        stringvalue,
-                        _bufSize);
-                }
-                else if (property.Equals(MoSync.Constants.MA_ADS_ENABLED))
-                {
-                    string stringvalue = "";
-                    MoSync.Util.RunActionOnMainThreadSync(() =>
-                        {
-                            stringvalue = mAd.Enabled;
-                        }
-                    );
-                    core.GetDataMemory().WriteStringAtAddress(
-                        _value,
-                        stringvalue,
-                        _bufSize);
-                }
-                else if (property.Equals(MoSync.Constants.MA_ADS_COLOR_BG))
-                {
-                    core.GetDataMemory().WriteStringAtAddress(
-                        _value,
-                        mAd.BackgroundColor,
-                        _bufSize);
-                }
-                else if (property.Equals(MoSync.Constants.MA_ADS_COLOR_BORDER))
-                {
-                    core.GetDataMemory().WriteStringAtAddress(
-                        _value,
-                        mAd.BorderColor,
-                        _bufSize);
-                }
-                else if (property.Equals(MoSync.Constants.MA_ADS_COLOR_TEXT))
-                {
-                    core.GetDataMemory().WriteStringAtAddress(
-                        _value,
-                        mAd.TextColor,
-                        _bufSize);
-                }
-                else
-                {
-                    return MoSync.Constants.MA_ADS_RES_INVALID_PROPERTY_NAME;
+                    case MoSync.Constants.MA_ADS_HEIGHT:
+                        core.GetDataMemory().WriteStringAtAddress(
+                            _value,
+                            mAd.Height.ToString(),
+                            _bufSize);
+                        break;
+                    case MoSync.Constants.MA_ADS_WIDTH:
+                        core.GetDataMemory().WriteStringAtAddress(
+                            _value,
+                            mAd.Width.ToString(),
+                            _bufSize);
+                        break;
+                    case MoSync.Constants.MA_ADS_VISIBLE:
+                        stringvalue = "";
+                        MoSync.Util.RunActionOnMainThreadSync(() =>
+                            {
+                                stringvalue = mAd.Visible;
+                            }
+                        );
+                        core.GetDataMemory().WriteStringAtAddress(
+                            _value,
+                            stringvalue,
+                            _bufSize);
+                        break;
+                    case MoSync.Constants.MA_ADS_ENABLED:
+                        stringvalue = "";
+                        MoSync.Util.RunActionOnMainThreadSync(() =>
+                            {
+                                stringvalue = mAd.Enabled;
+                            }
+                        );
+                        core.GetDataMemory().WriteStringAtAddress(
+                            _value,
+                            stringvalue,
+                            _bufSize);
+                        break;
+                    case MoSync.Constants.MA_ADS_COLOR_BG:
+                        core.GetDataMemory().WriteStringAtAddress(
+                            _value,
+                            mAd.BackgroundColor,
+                            _bufSize);
+                        break;
+                    case MoSync.Constants.MA_ADS_COLOR_BORDER:
+                        core.GetDataMemory().WriteStringAtAddress(
+                            _value,
+                            mAd.BorderColor,
+                            _bufSize);
+                        break;
+                    case MoSync.Constants.MA_ADS_COLOR_TEXT:
+                        core.GetDataMemory().WriteStringAtAddress(
+                            _value,
+                            mAd.TextColor,
+                            _bufSize);
+                        break;
+                    default:
+                        return MoSync.Constants.MA_ADS_RES_INVALID_PROPERTY_NAME;
                 }
 
                 return MoSync.Constants.MA_ADS_RES_OK;
@@ -446,6 +446,20 @@ namespace MoSync
             }
 
             return false;
+        }
+
+        /*
+         * Checks if a handle is a valid handler (a valid handle shouldn't be negative).
+         * @param runtime The current runtime
+         * @param handle The handle to be checked
+         */
+        private bool isHandleValid(Runtime runtime, int handle)
+        {
+            if (runtime.GetModule<NativeUIModule>().GetWidget(handle).GetHandle() < 0)
+            {
+                return false;
+            }
+            return true;
         }
     }
 }

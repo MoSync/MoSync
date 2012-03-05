@@ -42,6 +42,10 @@ namespace MoSync
 {
     namespace NativeUI
     {
+        /**
+         * The Ad class defines the attributes and behavior of an Ad. It maps the
+         * MoSync Ad with the AdControl present on the wp7.1 platform.
+         */
         public class Ad : WidgetBaseWindowsPhone
         {
             //Standard WP Image control
