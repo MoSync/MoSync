@@ -79,7 +79,17 @@ namespace Ads
          * @brief Size 728 * 90.
          * Available only on Android platform.
          */
-        BANNER_SIZE_LEADERBOARD
+        BANNER_SIZE_LEADERBOARD,
+		/**
+		 * @brief Size 300 * 50 - X-Large Banner
+		 * Available only on Windows Phone 7.1.
+		 */
+		BANNER_SIZE_WP7_XLARGE,
+		/**
+		  * @brief Size 480 * 80
+		  * Available only on Windows Phone 7.1
+		  */
+		BANNER_SIZE_WP7_XXLARGE
     };
 
 	/**
