@@ -1,19 +1,19 @@
 /* Copyright (C) 2009 Mobile Sorcery AB
 
-This program is free software; you can redistribute it and/or modify it under
-the terms of the GNU General Public License, version 2, as published by
-the Free Software Foundation.
+ This program is free software; you can redistribute it and/or modify it under
+ the terms of the GNU General Public License, version 2, as published by
+ the Free Software Foundation.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+ for more details.
 
-You should have received a copy of the GNU General Public License
-along with this program; see the file COPYING.  If not, write to the Free
-Software Foundation, 59 Temple Place - Suite 330, Boston, MA
-02111-1307, USA.
-*/
+ You should have received a copy of the GNU General Public License
+ along with this program; see the file COPYING.  If not, write to the Free
+ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
+ 02111-1307, USA.
+ */
 
 #ifndef _PLATFORM_H_
 #define _PLATFORM_H_
@@ -47,14 +47,12 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 namespace Core {
 	class VMCore;
 }
+
 extern Core::VMCore* gCore;
 extern bool gRunning;
 
-
-
 class Surface {
 public:
-
 
 	Surface(CGImageRef image) : image(image), context(NULL), data(NULL), mOwnData(false) {
 		CGDataProviderRef dpr = CGImageGetDataProvider(image);
@@ -70,6 +68,12 @@ public:
 		bool noAlpha = false;
 		int bpp = CGImageGetBitsPerPixel(image);
 
+		CGBitmapInfo bInfo = CGImageGetBitmapInfo(image);
+		if(bpp==32 && ((bInfo&kCGBitmapAlphaInfoMask)==kCGImageAlphaNoneSkipLast || (bInfo&kCGBitmapAlphaInfoMask)==kCGImageAlphaNoneSkipFirst))
+		{
+			bpp = 24;
+		}
+
 		if(bpp != 32) {
 			CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
 			this->data = new char[width*height*4];
@@ -78,42 +82,27 @@ public:
 			context = CGBitmapContextCreate(this->data, width, height, 8, rowBytes, colorSpace, kCGImageAlphaNoneSkipLast);
 			CGContextSetAllowsAntialiasing(context, false);
 			CGContextSetBlendMode(context, kCGBlendModeCopy);
-		
-			//CGContextSaveGState(context);
-			//CGContextTranslateCTM(context, 0, height);
-			//CGContextScaleCTM(context, 1.0, -1.0);
 			CGContextDrawImage(context, rect, image);
-			//CGContextRestoreGState(context);
-			
 			CGColorSpaceRelease(colorSpace);
-			
-			//CGContextSaveGState(context);
-			
 			noAlpha = true;
+			for(int i = 0; i < height; i++) {
+				for(int j = 0; j < width; j++) {
+					int* iptr = (int*)&this->data[j*4 + i*rowBytes];
+					*iptr |= 0xff000000;
+				}
+			}
 		}
 		
 		createImageDrawer();
 		
-         CGBitmapInfo bInfo = CGImageGetBitmapInfo(image);
-         if((bInfo&kCGBitmapByteOrderMask)==kCGBitmapByteOrder32Host) {
-             for(int i = 0; i < height; i++) {
-                 for(int j = 0; j < width; j++) {
-                     int* iptr = (int*)&this->data[j*4 + i*rowBytes];
-                     int c = *iptr;
-                     *iptr = (c&0xff00ff00) | ((c>>16)&0xff) | ((c&0xff)<<16);
-                 }
-             }
-             
-             /*
-			mImageDrawer->redMask = 0x000000ff;
-			mImageDrawer->redShift = 0;		
-			mImageDrawer->greenMask = 0x00ff00;
-			mImageDrawer->greenShift = 8;		
-			mImageDrawer->blueMask = 0xff0000;
-			mImageDrawer->blueShift = 16;		
-			mImageDrawer->alphaMask = 0xff000000;
-			mImageDrawer->alphaShift = 24;
-             */
+		if((bInfo&kCGBitmapByteOrderMask)==kCGBitmapByteOrder32Host) {
+			for(int i = 0; i < height; i++) {
+				for(int j = 0; j < width; j++) {
+					int* iptr = (int*)&this->data[j*4 + i*rowBytes];
+					int c = *iptr;
+					*iptr = (c&0xff00ff00) | ((c>>16)&0xff) | ((c&0xff)<<16);
+				}
+			}
 		}
         
 		if(noAlpha) {
@@ -123,19 +112,7 @@ public:
 	}
 	
 	void createImageDrawer() {
-		//CGBitmapInfo bInfo = CGImageGetBitmapInfo(image);
 		mImageDrawer = new Image((unsigned char*)data, NULL, width, height, rowBytes, Image::PIXELFORMAT_ARGB8888, false, false);
-	
-		/*
-		mImageDrawer->redMask = 0xff000000;
-		mImageDrawer->redShift = 24;		
-		mImageDrawer->greenMask = 0x00ff0000;
-		mImageDrawer->greenShift = 16;		
-		mImageDrawer->blueMask = 0x0000ff00;
-		mImageDrawer->blueShift = 8;		
-		mImageDrawer->alphaMask = 0x000000ff;
-		mImageDrawer->alphaShift = 0;		
-		 */
 	}
 	
 	void initFont() {
@@ -174,17 +151,10 @@ public:
 		CGDataProviderRelease(dataProvider);
 		CGColorSpaceRelease(colorSpace);
 		
-		//CGContextTranslateCTM(context, 0, height);
-		//CGContextScaleCTM(context, 1.0, -1.0);	
 		CGContextSetAllowsAntialiasing (context, false);
-		//CGContextSetInterpolationQuality(context, kCGInterpolationNone);
 		
 		rect = CGRectMake(0, 0, width, height);
-		
-		//CGContextSetRGBFillColor(context, 0, 0, 0, 1);
-		//CGContextFillRect(context, rect);	
-		//CGContextClearRect(context, CGRectMake(0, 0, width, height));
-		
+
 		initFont();
 		
 		CGContextSaveGState(context);
@@ -255,7 +225,7 @@ public:
 		pthread_cond_signal(&mCond);
 		pthread_mutex_unlock(&mMutex);
 	}
-		
+
 	void wait(int ms) {
 		pthread_mutex_lock(&mMutex);
 		if(count()==0) {
@@ -272,7 +242,7 @@ public:
 		}
 		pthread_mutex_unlock(&mMutex);	
 	}
-		
+
 	void addPointerEvent(int x, int y, int touchId, int type) {
 		if(!mEventOverflow) {
 			if(count() + 2 == EVENT_BUFFER_SIZE) {	//leave space for Close event
@@ -308,11 +278,11 @@ public:
 		event.data = (int)data;
 		put(event);
 	}
-		
+
 private:
 	pthread_mutex_t mMutex;
 	pthread_cond_t mCond;
-							
+
 	bool mEventOverflow;
 	bool mWaiting;
 	

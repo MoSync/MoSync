@@ -35,8 +35,8 @@ MA 02110-1301, USA.
  * @file Widget.h
  * @author Mikael Kindborg, Emma Tresanszki and Bogdan Iusco.
  *
- * \brief Widget is the base class of all widgets. This class is
- * used to wrap native widget handles and provides common
+ * \brief Widget is the base class of all widgets.
+ * This class is used to wrap native widget handles and provides common
  * methods for widgets and event support.
  */
 
@@ -55,6 +55,9 @@ MA 02110-1301, USA.
 #include <IX_WIDGET.h>
 #include "WidgetUtil.h"
 
+/**
+ * @brief A collection of widgets for designing native user interfaces
+ */
 namespace NativeUI
 {
 	/**

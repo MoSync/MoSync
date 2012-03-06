@@ -26,15 +26,25 @@
 @implementation EditBoxWidget
 
 - (id)init {
-	textField = [[UITextField alloc] initWithFrame:CGRectMake(0, 10, 100, 30)];
-	textField.borderStyle = UITextBorderStyleRoundedRect;
-	view = textField;			
-	id ret = [super init];
-	[self setAutoSizeParamX:WRAP_CONTENT andY:WRAP_CONTENT];
-	textField.delegate = self;
-    [textField addTarget:self action:@selector(textChanged) forControlEvents:UIControlEventEditingChanged];
-    mMaxTextLength = INT_MAX;
-	return ret;
+	self = [super init];
+    if (self)
+    {
+        textField = [[UITextField alloc] initWithFrame:CGRectMake(0, 10, 100, 30)];
+        textField.borderStyle = UITextBorderStyleRoundedRect;
+
+        view = textField;
+        [view setUserInteractionEnabled:YES];
+        view.contentMode = UIViewContentModeRedraw;
+        view.autoresizesSubviews = NO;
+        [textField setOpaque:NO];
+
+        [self setAutoSizeParamX:WRAP_CONTENT andY:WRAP_CONTENT];
+        textField.delegate = self;
+        [textField addTarget:self action:@selector(textChanged) forControlEvents:UIControlEventEditingChanged];
+        mMaxTextLength = INT_MAX;
+    }
+
+	return self;
 }
 
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value {

@@ -318,7 +318,7 @@ MAUtil::DataHandler
 <td>
 <strong>Advertising</strong>
 </td>
-<td>The Ads API allows user to create and add banners to applications.<br>
+<td>Create and add advertising banners to applications.<br>
 </td>
 <td>maAdsBannerCreate(), maAdsBannerDestroy(), maAdsAddBannerToLayout(), maAdsRemoveBannerFromLayout(), maAdsBannerSetProperty(), maAdsBannerGetProperty()<br>
 </td>

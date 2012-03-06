@@ -48,7 +48,9 @@ namespace MoSync
             {
                 mPanorama = new Microsoft.Phone.Controls.Panorama();
 
-                mPage.Content = mPanorama;
+                mPage.Children.Add(mPanorama);
+                Grid.SetColumn(mPanorama, 0);
+                Grid.SetRow(mPanorama, 0);
             }
 
             /**
@@ -63,7 +65,7 @@ namespace MoSync
                     {
                         mPanorama.Items.Add(new Microsoft.Phone.Controls.PanoramaItem
                         {
-                            Header = ((child as Screen).View as Microsoft.Phone.Controls.PhoneApplicationPage).Title,
+                            Header = (child as Screen).getScreenTitle,
                             Content = (child as Screen).View
                         });
                     });

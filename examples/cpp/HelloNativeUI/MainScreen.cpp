@@ -91,7 +91,7 @@ MA 02110-1301, USA.
 		mPasswordBox = new EditBox();
 		mPasswordBox->fillSpaceHorizontally();
 		mPasswordBox->wrapContentVertically();
-		mPasswordBox->setEditMode(EDIT_BOX_MODE_PASSWORD);
+		mPasswordBox->setInputFlag(EDIT_BOX_INPUT_FLAG_PASSWORD);
 		mMainLayout->addChild(mPasswordBox);
 
 		// The third widget is a button that clears the input edit box.

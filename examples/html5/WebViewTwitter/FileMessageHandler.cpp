@@ -83,10 +83,16 @@ void FileMessageHandler::handleFileGetLocalPath(
 	MessageStreamJSON& message)
 {
 	FileUtil fileUtil;
+	// fileUtil.getLocalPath() does not work correctly on Windows Phone
+	// because of a bug in maGetSystemProperty for "mosync.path.local".
 	String path = fileUtil.getLocalPath();
 	if (0 == path.length())
 	{
-		replyNull(message);
+		// This is a hack to make the program work on Windows Phone.
+		replyString(message, "/");
+
+		// Original code was:
+		// replyNull(message);
 	}
 	else
 	{
@@ -119,7 +125,6 @@ void FileMessageHandler::handleFileRead(MessageStreamJSON& message)
  */
 void FileMessageHandler::handleFileWrite(MessageStreamJSON& message)
 {
-	maWriteLog("@@@ 1", 4);
 	FileUtil fileUtil;
 	bool success = fileUtil.writeTextToFile(
 		message.getParam("filePath"),
@@ -168,9 +173,6 @@ bool FileMessageHandler::replyString(
 	String script = "mosync.bridge.reply(";
 	script += callbackId + ", " + "'" + result + "')";
 
-	maWriteLog("P1", 2);
-	maWriteLog(script.c_str(), script.size());
-
 	message.getWebView()->callJS(script);
 
 	return true;
@@ -206,9 +208,6 @@ bool FileMessageHandler::replyBoolean(MessageStreamJSON& message, bool result)
 		script += callbackId + ", false)";
 	}
 
-	maWriteLog("P2", 2);
-	maWriteLog(script.c_str(), script.size());
-
 	message.getWebView()->callJS(script);
 
 	return true;
@@ -235,9 +234,6 @@ bool FileMessageHandler::replyNull(MessageStreamJSON& message)
 	// Call JavaScript reply handler.
 	String script = "mosync.bridge.reply(";
 	script += callbackId + ", null)";
-
-	maWriteLog("P3", 2);
-	maWriteLog(script.c_str(), script.size());
 
 	message.getWebView()->callJS(script);
 
