@@ -28,6 +28,7 @@ import com.mosync.internal.generated.IX_WIDGET;
 import com.mosync.java.android.MoSync;
 import com.mosync.nativeui.core.NativeUI;
 import com.mosync.nativeui.core.NativeUI.RootViewReplacedListener;
+import com.mosync.nativeui.ui.widgets.ScreenWidget;
 import com.mosync.nativeui.ui.widgets.Widget;
 import com.mosync.nativeui.util.AsyncWait;
 import com.mosync.nativeui.ui.custom.MoSyncImagePicker;
@@ -409,6 +410,45 @@ public class MoSyncNativeUI implements RootViewReplacedListener
 	}
 
 	/**
+	 * Internal wrapper for maWidgetScreenAddOptionsMenuItem that
+	 * runs the call in the UI thread.
+	 */
+	public int maWidgetScreenAddOptionsMenuItem(
+			final int widgetHandle,
+			final String title,
+			final int iconHandle,
+			final int iconPredefined)
+	{
+		try
+		{
+			final AsyncWait<Integer> waiter = new AsyncWait<Integer>();
+			getActivity().runOnUiThread(new Runnable() {
+				public void run()
+				{
+					int result = mNativeUI.maWidgetScreenAddOptionsMenuItem(
+							widgetHandle, title, iconHandle,iconPredefined);
+					waiter.setResult(result);
+				}
+			});
+			return waiter.getResult();
+		}
+		catch(InterruptedException ie)
+		{
+			return -1;
+		}
+	}
+
+	public ScreenWidget getCurrentScreen()
+	{
+		return mNativeUI.getCurrentScreen();
+	}
+
+	public void setCurrentScreen(int handle)
+	{
+		mNativeUI.setCurrentScreen(handle);
+	}
+
+	/**
 	 * Internal wrapper for maImagePickerOpen that runs
 	 * the call in the UI thread.
 	 */
@@ -469,7 +509,6 @@ public class MoSyncNativeUI implements RootViewReplacedListener
 	@Override
 	public void rootViewReplaced(View newRoot)
 	{
-		Log.e("@@MoSync","MoSyncNativeUI rootViewReplaced -----------------");
 		((MoSync) getActivity()).setRootView( newRoot );
 	}
 

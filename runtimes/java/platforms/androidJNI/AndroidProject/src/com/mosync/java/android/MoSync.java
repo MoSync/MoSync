@@ -19,7 +19,6 @@ package com.mosync.java.android;
 
 import static com.mosync.internal.android.MoSyncHelpers.SYSLOG;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_CLOSE;
@@ -59,7 +58,6 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
-import android.widget.Toast;
 
 import com.mosync.internal.android.EventQueue;
 import com.mosync.internal.android.Mediator;
@@ -73,7 +71,8 @@ import com.mosync.internal.android.nfc.MoSyncNFCForegroundUtil;
 import com.mosync.internal.android.nfc.MoSyncNFCService;
 import com.mosync.internal.android.notifications.LocalNotificationsManager;
 import com.mosync.internal.android.notifications.PushNotificationsManager;
-import com.mosync.internal.generated.IX_WIDGET;
+import com.mosync.nativeui.ui.widgets.OptionsMenuItem;
+import com.mosync.nativeui.ui.widgets.ScreenWidget;
 
 /**
  * Main MoSync activity
@@ -177,11 +176,6 @@ public class MoSync extends Activity
 		}
 
 		setContentView(root);
-	}
-
-	public View getRootView()
-	{
-		return getCurrentFocus();
 	}
 
 	@Override
@@ -311,63 +305,77 @@ public class MoSync extends Activity
     }
 
 	@Override
-	public boolean onCreateOptionsMenu(Menu menu)
-	{
-		List<MenuItem> items = new ArrayList<MenuItem>();
-	    items.add( menu.add(0,1,0,"Search the new bla bla bla bla bla bla blah") ); // 1 is the item id
-	    items.add ( menu.add("Add a new bla bla bla bla bla bla bla blah") );
-	    items.add( menu.add("Remove") );
-	    items.add( menu.add("Plus") );
-	    items.add( menu.add("Minus") );
-	    items.add( menu.add("or") );
-	    items.add( menu.add("and") );
-	    items.get(0).setTitleCondensed("Search me");
-	    items.get(0).setIcon(R.drawable.icon);
-	    items.get(2).setIcon(R.drawable.icon);
-	    return true;
-//	    return super.onCreateOptionsMenu(menu);
-	}
-
-	@Override
+	/**
+	 * Initialize the content of the Options menu each
+	 * time Menu is pressed, based on the current screen.
+	 */
 	public boolean onPrepareOptionsMenu(Menu menu)
 	{
+		super.onPrepareOptionsMenu(menu);
+
+		// Remove all the items from the menu.
 		menu.clear();
+
 		// Get the focused screen widget.
-		//ScreenWidget currentScreen = NativeUI.getScreen( getRootView() );
-		// Get the menu items for that screen.
-		List<MenuItem> items = new ArrayList<MenuItem>();
-			//currentScreen.getMenuItems();
-		for (int i=0; i < items.size(); i++)
+		ScreenWidget currentScreen = mMoSyncThread.getCurrentScreen();
+		if ( currentScreen != null )
 		{
-			menu.add ( items.get(i).getTitle() );
-		}
-
-		return super.onPrepareOptionsMenu(menu);
-	}
-
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item)
-	{
-		if ( item.getTitle().equals("Search") )
-		{
-
-			EventQueue.getDefault().postMenuItemSelected(1, item.getItemId());
-			Toast.makeText(this, "Selected", Toast.LENGTH_SHORT).show();
+			// Get the menu items for that screen.
+			List<OptionsMenuItem> items = currentScreen.getMenuItems();
+			// Add each menu item to the options menu.
+			for (int i=0; i < items.size(); i++)
+			{
+				MenuItem item = menu.add ( 0, items.get(i).getId(), 0, items.get(i).getTitle() );
+				if ( items.get(i).hasIconFromResources() )
+				{
+					item.setIcon( items.get(i).getIconResId() );
+				}
+				else
+				{
+					item.setIcon( items.get(i).getIcon() );
+				}
+			}
 			return true;
 		}
 
-		return super.onOptionsItemSelected(item);
+		return false;
 	}
 
 	@Override
+	/**
+	 * Event received when an Options menu item is selected.
+	 */
+	public boolean onOptionsItemSelected(MenuItem item)
+	{
+		super.onOptionsItemSelected(item);
+
+		// Get the focused screen widget.
+		ScreenWidget currentScreen = mMoSyncThread.getCurrentScreen();
+		if ( currentScreen != null )
+		{
+			EventQueue.getDefault().postOptionsMenuItemSelected(
+					currentScreen.getHandle(),
+					item.getItemId());
+			return true;
+		}
+
+		return false;
+	}
+
+	@Override
+	/**
+	 * Event received when the Options menu is closed.
+	 */
 	public void onOptionsMenuClosed(Menu menu)
 	{
-		SYSLOG("Posting EVENT_TYPE_OPTIONS_MENU_CLOSED to MoSync");
-		int[] event = new int[1];
-		event[0] = IX_WIDGET.MAW_EVENT_OPTIONS_MENU_CLOSED;
-		mMoSyncThread.postEvent(event);
-
 		super.onOptionsMenuClosed(menu);
+
+		// Get the focused screen widget.
+		ScreenWidget currentScreen = mMoSyncThread.getCurrentScreen();
+		if ( currentScreen != null )
+		{
+			EventQueue.getDefault().postOptionsMenuClosed(currentScreen.getHandle());
+		}
 	}
 
 	/**

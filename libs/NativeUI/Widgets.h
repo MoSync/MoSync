@@ -71,6 +71,7 @@ MA 02110-1301, USA.
 #include "RatingBarListener.h"
 #include "RelativeLayout.h"
 #include "Screen.h"
+#include "ScreenListener.h"
 #include "SearchBar.h"
 #include "SearchBarListener.h"
 #include "Slider.h"

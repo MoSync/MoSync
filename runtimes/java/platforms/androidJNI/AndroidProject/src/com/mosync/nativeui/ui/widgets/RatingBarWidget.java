@@ -55,15 +55,34 @@ public class RatingBarWidget extends Widget
 
 		if( property.equals( IX_WIDGET.MAW_RATING_BAR_NUM_STAR ) )
 		{
-			ratingBar.setNumStars(IntConverter.convert(value));
+			int stars = IntConverter.convert(value);
+			if ( stars < 0 )
+			{
+				throw new InvalidPropertyValueException(property, value);
+			}
+			ratingBar.setNumStars(stars);
 		}
 		else if( property.equals( IX_WIDGET.MAW_RATING_BAR_RATING ) )
 		{
-			ratingBar.setRating(FloatConverter.convert(value));
+			Float rating = FloatConverter.convert(value);
+			if ( rating < 0 )
+			{
+				throw new InvalidPropertyValueException(property, value);
+			}
+			if ( rating % ratingBar.getStepSize() != 0 )
+			{
+				throw new InvalidPropertyValueException(property, value);
+			}
+			ratingBar.setRating(rating);
 		}
 		else if( property.equals( IX_WIDGET.MAW_RATING_BAR_GRANULARITY ) )
 		{
-			ratingBar.setStepSize(FloatConverter.convert(value));
+			Float granularity = FloatConverter.convert(value);
+			if ( granularity < 0 )
+			{
+				throw new InvalidPropertyValueException(property, value);
+			}
+			ratingBar.setStepSize(granularity);
 		}
 		else
 		{

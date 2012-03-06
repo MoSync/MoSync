@@ -5010,6 +5010,57 @@ group WidgetAPI "Widget API" {
 	}
 	} // end of WidgetTypes
 
+	/**
+	* The available constants for the Android predefined drawables used in OptionsMenu.
+	* The drawables can be set via #maWidgetScreenAddOptionsMenuItem syscall.
+	* The icons can be found here: http://androiddrawables.com/menu.html .
+	*/
+	group OptionsMenuIconConstants "Options menu icon constants" {
+	constset int MAW_OPTIONS_MENU_ICON_CONSTANT_ {
+		ADD = 17301555 ;
+		AGENDA = 17301556 ;
+		ALWAYS_LANDSCAPE_PORTRAIT = 17301557 ;
+		CALL = 17301558 ;
+		CAMERA = 17301559 ;
+		CLOSE_CLEAR_CANCEL = 17301560 ;
+		COMPASS = 17301561;
+		CROP = 17301562 ;
+		DAY =  17301563 ;
+		DELETE = 17301564 ;
+		DIRECTIONS = 17301565 ;
+		EDIT = 17301566 ;
+		GALLERY = 17301567 ;
+		HELP = 17301568 ;
+		INFO_DETAILS = 17301569 ;
+		MANAGE = 17301570 ;
+		MAPMODE = 17301571 ;
+		MONTH = 17301572 ;
+		MORE = 17301573 ;
+		MY_CALENDAR = 17301574 ;
+		MYLOCATION = 17301575 ;
+		MYPLACES = 17301576 ;
+		PREFERENCES = 17301577 ;
+		RECENT_HISTORY = 17301578 ;
+		REPORT_IMAGE = 17301579 ;
+		REVERT = 17301580 ;
+		ROTATE = 17301581 ;
+		SAVE = 17301582 ;
+		SEARCH = 17301583 ;
+		SEND = 17301584 ;
+		SET_AS = 17301585 ;
+		SHARE = 17301586 ;
+		SLIDESHOW = 17301587 ;
+		SORT_ALPHABETICALLY = 17301660 ;
+		SORT_BY_SIZE = 17301661 ;
+		TODAY = 17301588 ;
+		UPLOAD = 17301589 ;
+		UPLOAD_YOU_TUBE = 17301590 ;
+		VIEW = 17301591 ;
+		WEEK = 17301592 ;
+		ZOOM = 17301593 ;
+
+	}
+	} // end of OptionsMenuIconConstants
 
 	/**
 	* All widgets have a set of properties that can be set. In order to set them, use maWidgetSetProperty(). These properties may change
@@ -5179,7 +5230,7 @@ group WidgetAPI "Widget API" {
 		/**
 		* @brief Sets an icon for a screen. The icon is used by a tab screen to display an icon on the tab indicator.
 		*
-		* @validvalue MoSync handle to an uncompressed image resource. The size of the image should be small enough to fit in a tab indicatior.
+		* @validvalue MoSync handle to an uncompressed image resource. The size of the image should be small enough to fit in a tab indicator.
 		*
 		* @setonly
 		*
@@ -5189,6 +5240,21 @@ group WidgetAPI "Widget API" {
 		* \endcode
 		*/
 		ICON = "icon";
+
+		/**
+		* @brief Remove the options menu from this screen.
+		* The options menu can be added by calling #maWidgetScreenAddOptionsMenuItem for each item.
+		*
+		* @validvalue No value needed.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(screenHandle, MAW_SCREEN_REMOVE_OPTIONS_MENU, "");
+		* \endcode
+		*/
+		REMOVE_OPTIONS_MENU = "removeoptionsmenu";
 	}
 	} // end of WidgetScreenProperties
 
@@ -7341,7 +7407,7 @@ group WidgetAPI "Widget API" {
 		*	maWidgetSetProperty(widgetHandle, MAW_RADIO_BUTTON_TEXT_COLOR, "0xff0000"); // Red
 		* \endcode
 		*/
-		TEXT_COLOR = "textColor";
+		TEXT_COLOR = "textcolor";
 	}
 	} // end of WidgetRadioButtonProperties
 
@@ -7365,7 +7431,7 @@ group WidgetAPI "Widget API" {
 		*   maWidgetSetProperty(radioGroupHandle, MAW_RADIO_GROUP_ADD_VIEW, "4");
 		* \endcode
 		*/
-		ADD_VIEW = "addView";
+		ADD_VIEW = "addview";
 
 		/**
 		* @brief Clear the selection.
@@ -7381,7 +7447,7 @@ group WidgetAPI "Widget API" {
 		*   maWidgetSetProperty(radioGroupHandle, MAW_RADIO_GROUP_CLEAR_CHECK, "");
 		* \endcode
 		*/
-		CLEAR_CHECK = "clearCheck";
+		CLEAR_CHECK = "clearcheck";
 
 		/**
 		* @brief Set or get the selected radio button in this group.
@@ -7420,7 +7486,7 @@ group WidgetAPI "Widget API" {
 		*   maWidgetSetProperty(ratingBarHandle, MAW_RATING_BAR_NUM_STAR, "4");
 		* \endcode
 		*/
-		NUM_STAR = "numStar";
+		NUM_STAR = "numstar";
 
 		/*
 		* @brief Set or get the current rating (number of stars filled).
@@ -7638,6 +7704,28 @@ group WidgetAPI "Widget API" {
 	* - #MAW_RES_ERROR otherwise.
 	*/
 	int maWidgetGetProperty(in MAWidgetHandle widget, in MAString property, out MAString value range("bufSize"), in int bufSize);
+
+	/**
+	* Add an item to the Options Menu associated to a screen.
+	* Available on Android only.
+	* The options menu is where you should include actions and other options that are relevant to the current activity
+	* context, such as "Search," "Compose email," or "Settings".
+	* When opened, the first visible portion is the icon menu, which holds up to six menu items.
+	* If your menu includes more than six items, Android places the sixth item and the rest into the overflow menu,
+	* which the user can open by selecting More. Those items do not display icons.
+	* \param widget Handle to the screen widget.
+	* \param title The title associated for the new item. Can be left null.
+	* \iconHandle MoSync handle to an uncompressed image resource, or :
+	* a predefined Android icon, one of the \link #MAW_OPTIONS_MENU_ICON_CONSTANT \endlink constants.
+	* Can be left null.
+	* \iconPredefined Specifies if the icon is a project resource, or one of the predefined Android icons.
+	* By default it's value is 0.
+	*
+	* \returns The the item index on success, or any of the following result codes:
+	* - #MAW_RES_INVALID_HANDLE if the screen handle was invalid.
+	* - #MAW_RES_ERROR otherwise.
+	*/
+	int maWidgetScreenAddOptionsMenuItem(in MAWidgetHandle widget, in MAString title, in int iconHandle, in int iconPredefined);
 
 	} // end of group WidgetAPIFunctions
 

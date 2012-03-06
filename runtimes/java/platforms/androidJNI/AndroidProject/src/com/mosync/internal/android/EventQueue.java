@@ -113,6 +113,9 @@ public class EventQueue
 	 */
 	public void postWidgetTabChangedEvent(int tabScreen, int newTabIndex)
 	{
+		// Save the current tab screen.
+		sMoSyncThread.setCurrentScreen(tabScreen);
+
 		postWidgetEvent(
 			IX_WIDGET.MAW_EVENT_TAB_CHANGED,
 			tabScreen,
@@ -288,18 +291,33 @@ public class EventQueue
 	}
 
 	/**
-	 * Sends the Option Menu item selected handle.
-	 * @param widgetHandle The single instance of the options menu.
-	 * @param itemHandle The widget handle of the menu item.
+	 * Sends the Option Menu item selected event.
+	 * @param widgetHandle The screen widget handle.
+	 * @param index The menu item index.
 	 */
-	public void postMenuItemSelected(int widgetHandle, int itemHandle)
+	public void postOptionsMenuItemSelected(int widgetHandle, int index)
 	{
 		int event[] = new int[4];
 
 		event[0] = EVENT_TYPE_WIDGET;
 		event[1] = IX_WIDGET.MAW_EVENT_OPTIONS_MENU_ITEM_SELECTED;
 		event[2] = widgetHandle;
-		event[3] = itemHandle;
+		event[3] = index;
+
+		sMoSyncThread.postEvent(event);
+	}
+
+	/**
+	 * Sends the Option menu closed event.
+	 * @param widgetHandle The screen widget handle.
+	 */
+	public void postOptionsMenuClosed(int widgetHandle)
+	{
+		int event[] = new int[3];
+
+		event[0] = EVENT_TYPE_WIDGET;
+		event[1] = IX_WIDGET.MAW_EVENT_OPTIONS_MENU_CLOSED;
+		event[2] = widgetHandle;
 
 		sMoSyncThread.postEvent(event);
 	}
