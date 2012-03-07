@@ -42,6 +42,8 @@ namespace MoSync
             //The Grid that will be used as the VerticalLayout
             protected System.Windows.Controls.Grid mGrid;
 
+            protected System.Windows.Controls.ScrollViewer mScrollViewer;
+
             //Padding information
             protected double mPaddingBottom;
             protected double mPaddingTop;
@@ -327,6 +329,35 @@ namespace MoSync
                 set
                 {
                     mSpacerRight.Width = new GridLength(value);
+                }
+            }
+
+            /**
+             * MAW_VERTICAL_LAYOUT_SCROLLABLE implementation
+             */
+            [MoSyncWidgetProperty(MoSync.Constants.MAW_VERTICAL_LAYOUT_SCROLLABLE)]
+            public string Scrollable
+            {
+                set
+                {
+                    bool val;
+                    if (Boolean.TryParse(value, out val))
+                    {
+                        if (true == val)
+                        {
+                            mScrollViewer = new System.Windows.Controls.ScrollViewer();
+                            mScrollViewer.Content = mGrid;
+                            mView = mScrollViewer;
+                        }
+                        else
+                        {
+                            if (null != mScrollViewer)
+                            {
+                                mView = mGrid;
+                            }
+                        }
+                    }
+                    else throw new InvalidPropertyValueException();
                 }
             }
 
