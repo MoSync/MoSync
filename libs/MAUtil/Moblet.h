@@ -110,6 +110,11 @@ namespace MAUtil {
 		*/
 		static void ATTRIBUTE(noreturn, close());
 
+		/**
+		* Stops the running moblet.
+		*/
+		void exit();
+
 	protected:
 		/**
 		* Moblet's constructor is protected, forcing you to inherit the class.
@@ -123,13 +128,13 @@ namespace MAUtil {
 		* upon completing its current iteration.
 		*/
 		bool mRun;
-#if 0	//compiler warning: destructor never exits
+
 		/**
 		* Moblet's destructor calls close(), ensuring that a Moblet-based application
 		* doesn't run without a live Moblet.
 		*/
-		virtual ~Moblet() { close(); }
-#endif	//0
+		virtual ~Moblet() { exit(); }
+
 	private:
 		void runPendingTimers();
 		int timeToNextTimer();
