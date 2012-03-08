@@ -35,6 +35,20 @@ MA 02110-1301, USA.
 #define NUMBER_OF_HANDLES 10000
 
 /**
+ * Call maCreatePlaceholder and maDestroyPlaceholder
+ * without creating a data object.
+ */
+void testCreateDestory()
+{
+	MAHandle handle = maCreatePlaceholder();
+	if (handle > 0)
+	{
+		// Should not cause panic.
+		maDestroyPlaceholder(handle);
+	}
+}
+
+/**
  * Run a loop NUMBER_OF_ALLOCS times:
  *   maCreatePlaceholder()
  *   maCreateData(CHUNK_SIZE)
@@ -229,9 +243,8 @@ void testThatShouldCrashApp()
  */
 void testThatShouldPassSuccessfully()
 {
-	printf("Test 1: Negative tests\n");
-	printf("Negative tests currently disabled.\n");
-	//testNegativeCases();
+	printf("Test 1: Call maCreatePlaceholder and maDestroyPlaceholder\n");
+	testCreateDestory();
 
 	printf("Test 2: Call maDestroyPlaceholder on accumulated data\n");
 	testAccumulatedCreateData();
@@ -241,6 +254,10 @@ void testThatShouldPassSuccessfully()
 
 	printf("Test 4: Call only maDestroyPlaceholder\n");
 	testCreateData(false, true);
+
+	printf("Test 5: Negative tests\n");
+	printf("Negative tests are currently disabled.\n");
+	//testNegativeCases();
 }
 
 /**

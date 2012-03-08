@@ -249,7 +249,7 @@ namespace MoSync
 				mem.SetLength((int)fileStream.Length);
 				fileStream.Seek(0, SeekOrigin.Begin);
 				fileStream.Read(mem.GetBuffer(), 0, (int)fileStream.Length);
-				runtime.SetResource(_placeholder, new Resource(mem, MoSync.Constants.RT_BINARY));
+				runtime.SetResource(_placeholder, new Resource(mem, MoSync.Constants.RT_BINARY, true));
 				return MoSync.Constants.RES_OK;
 			};
 
