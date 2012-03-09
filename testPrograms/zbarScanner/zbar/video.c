@@ -55,7 +55,7 @@ static void _zbar_video_recycle_shadow (zbar_image_t *img)
     video_unlock(vdo);
 }
 
-zbar_video_t *zbar_video_create ()
+zbar_video_t *zbar_video_create (void)
 {
     zbar_video_t *vdo = calloc(1, sizeof(zbar_video_t));
     if(!vdo)
@@ -220,10 +220,12 @@ int zbar_video_get_height (const zbar_video_t *vdo)
     return(vdo->height);
 }
 
-uint32_t zbar_video_get_format (const zbar_video_t *vdo)
+#if 0
+static uint32_t zbar_video_get_format (const zbar_video_t *vdo)
 {
     return(vdo->format);
 }
+#endif
 
 static inline int video_init_images (zbar_video_t *vdo)
 {

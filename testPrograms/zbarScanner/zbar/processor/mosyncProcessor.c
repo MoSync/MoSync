@@ -76,9 +76,9 @@ int _zbar_event_wait (zbar_event_t *event,
             /* FIXME was that error or hang? */
             return(-1);
 
-        int sleep = _zbar_timer_check(timeout);
-        if(sleep)
-            proc_sleep(sleep);
+        int _sleep = _zbar_timer_check(timeout);
+        if(_sleep)
+            proc_sleep(_sleep);
     }
 
     rc = !event->state;

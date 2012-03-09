@@ -3406,12 +3406,12 @@ static void qr_code_data_clear(qr_code_data *_qrdata){
 }
 
 
-void qr_code_data_list_init(qr_code_data_list *_qrlist){
+static void qr_code_data_list_init(qr_code_data_list *_qrlist){
   _qrlist->qrdata=NULL;
   _qrlist->nqrdata=_qrlist->cqrdata=0;
 }
 
-void qr_code_data_list_clear(qr_code_data_list *_qrlist){
+static void qr_code_data_list_clear(qr_code_data_list *_qrlist){
   int i;
   for(i=0;i<_qrlist->nqrdata;i++)qr_code_data_clear(_qrlist->qrdata+i);
   free(_qrlist->qrdata);
@@ -3803,7 +3803,7 @@ static int qr_reader_try_configuration(qr_reader *_reader,
   return -1;
 }
 
-void qr_reader_match_centers(qr_reader *_reader,qr_code_data_list *_qrlist,
+static void qr_reader_match_centers(qr_reader *_reader,qr_code_data_list *_qrlist,
  qr_finder_center *_centers,int _ncenters,
  const unsigned char *_img,int _width,int _height){
   /*The number of centers should be small, so an O(n^3) exhaustive search of

@@ -62,5 +62,6 @@ int _zbar_qr_found_line(qr_reader *reader,
 int _zbar_qr_decode(qr_reader *reader,
                     zbar_image_scanner_t *iscn,
                     zbar_image_t *img);
+qr_finder_line* _zbar_decoder_get_qr_finder_line(zbar_decoder_t*);
 
 #endif

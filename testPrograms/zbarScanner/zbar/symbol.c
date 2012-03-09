@@ -202,7 +202,7 @@ char *zbar_symbol_xml (const zbar_symbol_t *sym,
 }
 
 
-zbar_symbol_set_t *_zbar_symbol_set_create ()
+zbar_symbol_set_t *_zbar_symbol_set_create (void)
 {
     zbar_symbol_set_t *syms = calloc(1, sizeof(*syms));
     _zbar_refcnt(&syms->refcnt, 1);

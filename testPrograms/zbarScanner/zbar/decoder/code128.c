@@ -261,8 +261,9 @@ static inline unsigned char validate_checksum (zbar_decoder_t *dcode)
     unsigned char check = dcode->buf[idx];
     dprintf(2, " chk=%02x(%02x)", sum, check);
     unsigned char err = (sum != check);
-    if(err)
+    if(err) {
         dprintf(1, " [checksum error]\n");
+		}
     return(err);
 }
 
@@ -381,12 +382,13 @@ static inline unsigned char postprocess (zbar_decoder_t *dcode)
                 cexp = 0;
             }
             if(code < CODE_C) {
-                if(code == SHIFT)
+                if(code == SHIFT) {
                     charset |= 0x80;
-                else if(code == FNC2)
+								} else if(code == FNC2) {
                     /* FIXME FNC2 - message append */;
-                else if(code == FNC3)
+								} else if(code == FNC3) {
                     /* FIXME FNC3 - initialize */;
+								}
             }
             else if(code == FNC1)
                 /* FIXME FNC1 - Code 128 subsets or ASCII 0x1d */;
@@ -401,10 +403,11 @@ static inline unsigned char postprocess (zbar_decoder_t *dcode)
                         _zbar_decoder_buf_dump(dcode->buf,
                                                 dcode->code128.character));
                 unsigned char newset = CODE_A - code;
-                if(newset != charset)
+                if(newset != charset) {
                     charset = newset;
-                else
+                } else {
                     /* FIXME FNC4 - extended ASCII */;
+								}
             }
             if(charset & 0x2)
                 cexp = i + 1;
@@ -502,8 +505,9 @@ zbar_symbol_type_t _zbar_decode_code128 (zbar_decoder_t *dcode)
             dprintf(2, " [invalid len]\n");
             sym = ZBAR_NONE;
         }
-        else
+        else {
             dprintf(2, " [valid end]\n");
+				}
         dcode128->character = -1;
         if(!sym)
             dcode->lock = 0;

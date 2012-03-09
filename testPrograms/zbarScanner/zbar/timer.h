@@ -37,7 +37,7 @@
  *     will be <= 0 if timer has expired
  */
 
-#if _POSIX_TIMERS > 0
+#if defined(_POSIX_TIMERS) && _POSIX_TIMERS > 0
 
 typedef struct timespec zbar_timer_t;
 

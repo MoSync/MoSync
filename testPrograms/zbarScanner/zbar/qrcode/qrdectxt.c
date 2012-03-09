@@ -3,10 +3,12 @@
    GNU Lesser General Public License as published by the Free Software
    Foundation; either version 2.1 of the License, or (at your option) any later
    version.*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-//#include <iconv.h>
+#include <stdint.h>
+
 #include "qrcode.h"
 #include "qrdec.h"
 #include "util.h"
@@ -14,6 +16,9 @@
 #include "error.h"
 #include "img_scanner.h"
 
+#define HAVE_ICONV 0
+
+#if HAVE_ICONV
 static int text_is_ascii(const unsigned char *_text,int _len){
   int i;
   for(i=0;i<_len;i++)if(_text[i]>=0x80)return 0;
@@ -30,7 +35,7 @@ static int text_is_latin1(const unsigned char *_text,int _len){
   return 1;
 }
 
-static void enc_list_mtf(void* _enc_list[3],void* _enc){
+static void enc_list_mtf(iconv_t _enc_list[3],iconv_t _enc){
   int i;
   for(i=0;i<3;i++)if(_enc_list[i]==_enc){
     int j;
@@ -39,37 +44,42 @@ static void enc_list_mtf(void* _enc_list[3],void* _enc){
     break;
   }
 }
+#endif
 
 int qr_code_data_list_extract_text(const qr_code_data_list *_qrlist,
                                    zbar_image_scanner_t *iscn,
                                    zbar_image_t *img)
 {
-  void*              sjis_cd;
-  void*              utf8_cd;
-  void*              latin1_cd;
-  const qr_code_data  *qrdata;
+#if HAVE_ICONV
+	iconv_t              sjis_cd;
+  iconv_t              utf8_cd;
+  iconv_t              latin1_cd;
+#endif
+	const qr_code_data  *qrdata;
   int                  nqrdata;
   unsigned char       *mark;
-  char               **text;
   int                  ntext;
   int                  i;
   qrdata=_qrlist->qrdata;
   nqrdata=_qrlist->nqrdata;
-  text=(char **)malloc(nqrdata*sizeof(*text));
   mark=(unsigned char *)calloc(nqrdata,sizeof(*mark));
   ntext=0;
+#if HAVE_ICONV
   /*This is the encoding the standard says is the default.*/
   latin1_cd=iconv_open("UTF-8","ISO8859-1");
   /*But this one is often used, as well.*/
   sjis_cd=iconv_open("UTF-8","SJIS");
   /*This is a trivial conversion just to check validity without extra code.*/
   utf8_cd=iconv_open("UTF-8","UTF-8");
+#endif
   for(i=0;i<nqrdata;i++)if(!mark[i]){
     const qr_code_data       *qrdataj;
     const qr_code_data_entry *entry;
-    void*                   enc_list[3];
-    void*                   eci_cd;
-    int                       sa[16];
+#if HAVE_ICONV
+    iconv_t                   enc_list[3];
+    iconv_t                   eci_cd;
+#endif
+	int                       sa[16];
     int                       sa_size;
     char                     *sa_text;
     size_t                    sa_ntext;
@@ -133,10 +143,12 @@ int qr_code_data_list_extract_text(const qr_code_data_list *_qrlist,
     sa_text=(char *)malloc((sa_ctext+1)*sizeof(*sa_text));
     sa_ntext=0;
     eci=-1;
+#if HAVE_ICONV
     enc_list[0]=sjis_cd;
     enc_list[1]=latin1_cd;
     enc_list[2]=utf8_cd;
-    eci_cd=(void*)-1;
+    eci_cd=(iconv_t)-1;
+#endif
     err=0;
     zbar_symbol_t *syms = NULL, **sym = &syms;
     for(j = 0; j < sa_size && !err; j++, sym = &(*sym)->next) {
@@ -167,12 +179,15 @@ int qr_code_data_list_extract_text(const qr_code_data_list *_qrlist,
       sym_add_point(*sym, qrdataj->bbox[3][0], qrdataj->bbox[3][1]);
       sym_add_point(*sym, qrdataj->bbox[1][0], qrdataj->bbox[1][1]);
 
+			printf("Decoding %i symbols.\n", qrdataj->nentries);
+
       for(k=0;k<qrdataj->nentries&&!err;k++){
         size_t              inleft;
-        size_t              outleft;
         char               *in;
+        size_t              outleft;
         char               *out;
         entry=qrdataj->entries+k;
+				printf("Symbol %i mode: %i\n", k, entry->mode);
         switch(entry->mode){
           case QR_MODE_NUM:{
             if(sa_ctext-sa_ntext>=(size_t)entry->payload.data.len){
@@ -223,6 +238,13 @@ int qr_code_data_list_extract_text(const qr_code_data_list *_qrlist,
           case QR_MODE_BYTE:{
             in=(char *)entry->payload.data.buf;
             inleft=entry->payload.data.len;
+#if !HAVE_ICONV
+            out=sa_text+sa_ntext;
+            outleft=sa_ctext-sa_ntext;
+						strncpy(out, in, inleft);
+						sa_ntext+=inleft;
+						printf("Copied %u bytes.\n", (unsigned)inleft);
+#else
             out=sa_text+sa_ntext;
             outleft=sa_ctext-sa_ntext;
             /*If we have no specified encoding, attempt to auto-detect it.*/
@@ -234,7 +256,7 @@ int qr_code_data_list_extract_text(const qr_code_data_list *_qrlist,
                 in+=3;
                 inleft-=3;
                 /*Actually try converting (to check validity).*/
-                err=utf8_cd==(void*)-1||
+                err=utf8_cd==(iconv_t)-1||
                  iconv(utf8_cd,&in,&inleft,&out,&outleft)==(size_t)-1;
                 if(!err){
                   sa_ntext=out-sa_text;
@@ -249,7 +271,7 @@ int qr_code_data_list_extract_text(const qr_code_data_list *_qrlist,
               /*If the text is 8-bit clean, prefer UTF-8 over SJIS, since SJIS
                  will corrupt the backslashes used for DoCoMo formats.*/
               else if(text_is_ascii((unsigned char *)in,inleft)){
-                enc_list_mtf(enc_list,utf8_cd);
+               enc_list_mtf(enc_list,utf8_cd);
               }
               /*Try our list of encodings.*/
               for(ei=0;ei<3;ei++)if(enc_list[ei]!=(iconv_t)-1){
@@ -286,17 +308,21 @@ int qr_code_data_list_extract_text(const qr_code_data_list *_qrlist,
                iconv(eci_cd,&in,&inleft,&out,&outleft)==(size_t)-1;
               if(!err)sa_ntext=out-sa_text;
             }
+#endif
           }break;
           /*Kanji mode always uses SJIS.*/
           case QR_MODE_KANJI:{
             in=(char *)entry->payload.data.buf;
             inleft=entry->payload.data.len;
+#if HAVE_ICONV
             out=sa_text+sa_ntext;
             outleft=sa_ctext-sa_ntext;
             err=sjis_cd==(iconv_t)-1||
              iconv(sjis_cd,&in,&inleft,&out,&outleft)==(size_t)-1;
             if(!err)sa_ntext=out-sa_text;
+#endif
           }break;
+#if HAVE_ICONV
           /*Check to see if a character set was specified.*/
           case QR_MODE_ECI:{
             const char *enc;
@@ -319,6 +345,7 @@ int qr_code_data_list_extract_text(const qr_code_data_list *_qrlist,
             eci=cur_eci;
             eci_cd=iconv_open("UTF-8",enc);
           }break;
+#endif
           /*Silence stupid compiler warnings.*/
           default:break;
         }
@@ -326,10 +353,14 @@ int qr_code_data_list_extract_text(const qr_code_data_list *_qrlist,
       /*If eci should be reset between codes, do so.*/
       if(eci<=QR_ECI_GLI1){
         eci=-1;
+#if HAVE_ICONV
         if(eci_cd!=(iconv_t)-1)iconv_close(eci_cd);
+#endif
       }
     }
+#if HAVE_ICONV
     if(eci_cd!=(iconv_t)-1)iconv_close(eci_cd);
+#endif
     if(!err){
       sa_text[sa_ntext++]='\0';
       if(sa_ctext+1>sa_ntext){
@@ -355,7 +386,7 @@ int qr_code_data_list_extract_text(const qr_code_data_list *_qrlist,
               if(syms->type == ZBAR_PARTIAL)
                   sa_sym->type = ZBAR_PARTIAL;
               else
-                  for(j = 0; j < syms->npts; j++) {
+                  for(j = 0; j < (int)syms->npts; j++) {
                       int u = syms->pts[j].x;
                       if(xmin >= u) xmin = u - 1;
                       if(xmax <= u) xmax = u + 1;
@@ -365,7 +396,7 @@ int qr_code_data_list_extract_text(const qr_code_data_list *_qrlist,
                   }
               syms->data = sa_text + syms->datalen;
               int next = (syms->next) ? syms->next->datalen : sa_ntext;
-              assert(next > syms->datalen);
+              assert(next > (int)syms->datalen);
               syms->datalen = next - syms->datalen - 1;
           }
           if(xmax >= -1) {
@@ -386,9 +417,11 @@ int qr_code_data_list_extract_text(const qr_code_data_list *_qrlist,
         free(sa_text);
     }
   }
+#if HAVE_ICONV
   if(utf8_cd!=(iconv_t)-1)iconv_close(utf8_cd);
   if(sjis_cd!=(iconv_t)-1)iconv_close(sjis_cd);
   if(latin1_cd!=(iconv_t)-1)iconv_close(latin1_cd);
+#endif
   free(mark);
   return ntext;
 }

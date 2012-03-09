@@ -41,7 +41,7 @@ void _zbar_refcnt_init ()
 
 #else
 
-void _zbar_refcnt_init ()
+void _zbar_refcnt_init (void)
 {
 }
 

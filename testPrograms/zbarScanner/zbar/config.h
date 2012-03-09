@@ -15,9 +15,9 @@
 #define ENABLE_CODE39
 #define ENABLE_CODE128
 #define ENABLE_PDF417
-//#define ENABLE_QRCODE
+#define ENABLE_QRCODE
 
 #define ZBAR_VERSION_MAJOR 0
-#define ZBAR_VERSION_MINOR 6
+#define ZBAR_VERSION_MINOR 10
 
 #endif /* CONFIG_H_ */

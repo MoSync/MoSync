@@ -39,7 +39,7 @@ typedef enum qr_mode{
 
 /*Check if a mode has a data buffer associated with it.
   Currently this is only modes with exactly one bit set.*/
-#define QR_MODE_HAS_DATA(_mode) (!((_mode)&(_mode)-1))
+#define QR_MODE_HAS_DATA(_mode) (!((_mode)&((_mode)-1)))
 
 /*ECI may be used to signal a character encoding for the data.*/
 typedef enum qr_eci_encoding{

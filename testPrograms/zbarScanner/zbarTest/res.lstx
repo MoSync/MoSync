@@ -1,0 +1,3 @@
+<resources>
+	<image id="RES_BARCODE_IMAGE" resource="barcode.jpg"/>
+</resources>

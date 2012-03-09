@@ -3,6 +3,7 @@
 
 #include <zbar.h>
 #include "decoder.h"
+#include "qrcode.h"
 
 #ifdef DEBUG_QR_FINDER
 # define DEBUG_LEVEL (DEBUG_QR_FINDER)

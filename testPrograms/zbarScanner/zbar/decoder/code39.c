@@ -138,8 +138,9 @@ static inline unsigned char code39_decode1 (unsigned char enc,
         enc |= 1;
         dprintf(2, "1");
     }
-    else
+    else {
         dprintf(2, "0");
+		}
     return(enc);
 }
 

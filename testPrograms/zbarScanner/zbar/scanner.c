@@ -162,7 +162,7 @@ static inline zbar_symbol_type_t process_edge (zbar_scanner_t *scn,
             ((y1 > 0) ? "SPACE" : "BAR"));
     scn->last_edge = scn->cur_edge;
 
-#if DEBUG_SVG > 1
+#if defined(DEBUG_SVG) && DEBUG_SVG > 1
     svg_path_moveto(SVG_ABS, scn->last_edge - (1 << ZBAR_FIXED) - ROUND, 0);
 #endif
 
@@ -198,7 +198,7 @@ zbar_symbol_type_t zbar_scanner_new_scan (zbar_scanner_t *scn)
     zbar_symbol_type_t edge = ZBAR_NONE;
     while(scn->y1_sign) {
         zbar_symbol_type_t tmp = zbar_scanner_flush(scn);
-        if(tmp < 0 || tmp > edge)
+        if(tmp > edge)
             edge = tmp;
     }
 
@@ -277,16 +277,18 @@ zbar_symbol_type_t zbar_scan_y (zbar_scanner_t *scn,
             dprintf(1, "\n");
         }
     }
-    else
+    else {
         dprintf(1, "\n");
+		}
     /* FIXME add fall-thru pass to decoder after heuristic "idle" period
        (eg, 6-8 * last width) */
     scn->x = x + 1;
     return(edge);
 }
 
+#if 0
 /* undocumented API for drawing cutesy debug graphics */
-void zbar_scanner_get_state (const zbar_scanner_t *scn,
+static void zbar_scanner_get_state (const zbar_scanner_t *scn,
                              unsigned *x,
                              unsigned *cur_edge,
                              unsigned *last_edge,
@@ -309,3 +311,4 @@ void zbar_scanner_get_state (const zbar_scanner_t *scn,
     if(y1_thresh) *y1_thresh = calc_thresh(mut_scn);
     dprintf(1, "\n");
 }
+#endif

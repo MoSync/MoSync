@@ -313,10 +313,10 @@ static inline void cache_sym (zbar_image_scanner_t *iscn,
         entry->time = sym->time;
         int near_thresh = (age < CACHE_PROXIMITY);
         int far_thresh = (age >= CACHE_HYSTERESIS);
-        int dup = (entry->cache_count >= 0);
-        if((!dup && !near_thresh) || far_thresh)
+        int _dup = (entry->cache_count >= 0);
+        if((!_dup && !near_thresh) || far_thresh)
             entry->cache_count = -CACHE_CONSISTENCY;
-        else if(dup || near_thresh)
+        else if(_dup || near_thresh)
             entry->cache_count++;
 
         sym->cache_count = entry->cache_count;
@@ -446,7 +446,7 @@ static void symbol_handler (zbar_decoder_t *dcode)
     _zbar_image_scanner_add_sym(iscn, sym);
 }
 
-zbar_image_scanner_t *zbar_image_scanner_create ()
+zbar_image_scanner_t *zbar_image_scanner_create (void)
 {
     zbar_image_scanner_t *iscn = calloc(1, sizeof(zbar_image_scanner_t));
     if(!iscn)
@@ -600,7 +600,7 @@ int zbar_scan_image (zbar_image_scanner_t *iscn,
     /* timestamp image
      * FIXME prefer video timestamp
      */
-#if _POSIX_TIMERS > 0
+#if defined(_POSIX_TIMERS) && _POSIX_TIMERS > 0
     struct timespec abstime;
     clock_gettime(CLOCK_REALTIME, &abstime);
     iscn->time = (abstime.tv_sec * 1000) + ((abstime.tv_nsec / 500000) + 1) / 2;

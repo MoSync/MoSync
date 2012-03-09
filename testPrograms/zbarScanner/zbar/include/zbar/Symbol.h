@@ -106,8 +106,8 @@ public:
 
         Point () { }
 
-        Point(int x, int y)
-            : x(x), y(y)
+        Point(int _x, int _y)
+            : x(_x), y(_y)
         { }
 
         /// copy constructor.

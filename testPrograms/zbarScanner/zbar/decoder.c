@@ -37,7 +37,7 @@
 #endif
 #include "debug.h"
 
-zbar_decoder_t *zbar_decoder_create ()
+zbar_decoder_t *zbar_decoder_create (void)
 {
     zbar_decoder_t *dcode = calloc(1, sizeof(zbar_decoder_t));
     dcode->buf_alloc = BUFFER_MIN;
@@ -369,7 +369,7 @@ int zbar_decoder_set_config (zbar_decoder_t *dcode,
         return(0);
     }
 
-    if(cfg >= 0 && cfg < ZBAR_CFG_NUM)
+    if(cfg < ZBAR_CFG_NUM)
         return(decoder_set_config_bool(dcode, sym, cfg, val));
     else if(cfg >= ZBAR_CFG_MIN_LEN && cfg <= ZBAR_CFG_MAX_LEN)
         return(decoder_set_config_int(dcode, sym, cfg, val));

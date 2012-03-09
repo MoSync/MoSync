@@ -124,9 +124,9 @@ public:
 
     /// start/stop video capture.
     /// see zbar_video_enable()
-    void enable (bool enable = true)
+    void enable (bool _enable = true)
     {
-        if(zbar_video_enable(_video, enable))
+        if(zbar_video_enable(_video, _enable))
             //throw_exception(_video);
             maPanic(0, "zbar no video");
     }

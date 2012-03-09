@@ -225,8 +225,9 @@ zbar_symbol_type_t _zbar_decode_i25 (zbar_decoder_t *dcode)
         dcode25->character = -1;
         return(ZBAR_NONE);
     }
-    else
+    else {
         dprintf(2, "\n");
+		}
 
     dcode->buf[dcode25->character++] = c + '0';
     dcode25->element = 10;

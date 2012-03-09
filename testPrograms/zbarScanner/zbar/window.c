@@ -26,7 +26,7 @@
 #include <time.h>       /* clock_gettime */
 #include <sys/time.h>   /* gettimeofday */
 
-zbar_window_t *zbar_window_create ()
+zbar_window_t *zbar_window_create (void)
 {
     zbar_window_t *w = calloc(1, sizeof(zbar_window_t));
     if(!w)
@@ -117,24 +117,24 @@ static inline int window_draw_overlay (zbar_window_t *w)
 
     if(w->overlay >= 2) {
         /* calculate/display frame rate */
-        unsigned long time;
-#if _POSIX_TIMERS > 0
+        unsigned long _time;
+#if defined(_POSIX_TIMERS) && _POSIX_TIMERS > 0
         struct timespec abstime;
         clock_gettime(CLOCK_REALTIME, &abstime);
-        time = (abstime.tv_sec * 1000) + ((abstime.tv_nsec / 500000) + 1) / 2;
+        _time = (abstime.tv_sec * 1000) + ((abstime.tv_nsec / 500000) + 1) / 2;
 #else
         struct timeval abstime;
         gettimeofday(&abstime, NULL);
-        time = (abstime.tv_sec * 1000) + ((abstime.tv_usec / 500) + 1) / 2;
+        _time = (abstime.tv_sec * 1000) + ((abstime.tv_usec / 500) + 1) / 2;
 #endif
         point_t p = { -8, -1 };
         char text[32];
         if(w->time) {
-            int avg = w->time_avg = (w->time_avg + time - w->time) / 2;
+            int avg = w->time_avg = (w->time_avg + _time - w->time) / 2;
             sprintf(text, "%d.%01d fps", 1000 / avg, (10000 / avg) % 10);
             _zbar_window_draw_text(w, 3, p, text);
         }
-        w->time = time;
+        w->time = _time;
     }
     return(0);
 }
@@ -163,7 +163,7 @@ inline int zbar_window_redraw (zbar_window_t *w)
         }
 
         if(!rc && (format_change || !w->scaled_size.x || !w->dst_width)) {
-            zprintf(24, "init: src=%.4s(%08x) %dx%d dst=%.4s(%08x) %dx%d\n",
+            zprintf(24, "init: src=%.4s(%08lx) %dx%d dst=%.4s(%08lx) %dx%d\n",
                     (char*)&w->src_format, w->src_format,
                     w->src_width, w->src_height,
                     (char*)&w->format, w->format,
@@ -213,7 +213,7 @@ inline int zbar_window_redraw (zbar_window_t *w)
             img->width != w->dst_width ||
             img->height != w->dst_height)) {
             /* save *converted* image for redraw */
-            zprintf(48, "convert: %.4s(%08x) %dx%d => %.4s(%08x) %dx%d\n",
+            zprintf(48, "convert: %.4s(%08lx) %dx%d => %.4s(%08lx) %dx%d\n",
                     (char*)&img->format, img->format, img->width, img->height,
                     (char*)&w->format, w->format, w->dst_width, w->dst_height);
             w->image = zbar_image_convert_resize(img, w->format,

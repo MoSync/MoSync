@@ -68,7 +68,7 @@ void zbar_set_verbosity (int level)
     _zbar_verbosity = level;
 }
 
-void zbar_increase_verbosity ()
+void zbar_increase_verbosity (void)
 {
     if(!_zbar_verbosity)
         _zbar_verbosity++;
@@ -109,8 +109,7 @@ const char *_zbar_error_string (const void *container,
         sev = sev_str[1];
 
     const char *mod;
-    if(err->module >= ZBAR_MOD_PROCESSOR &&
-       err->module < ZBAR_MOD_UNKNOWN)
+    if(err->module < ZBAR_MOD_UNKNOWN)
         mod = mod_str[err->module];
     else
         mod = mod_str[ZBAR_MOD_UNKNOWN];
@@ -118,7 +117,7 @@ const char *_zbar_error_string (const void *container,
     const char *func = (err->func) ? err->func : "<unknown>";
 
     const char *type;
-    if(err->type >= 0 && err->type < ZBAR_ERR_NUM)
+    if(err->type < ZBAR_ERR_NUM)
         type = err_str[err->type];
     else
         type = err_str[ZBAR_ERR_NUM];

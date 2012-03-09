@@ -25,7 +25,7 @@
 #include "image.h"
 #include "refcnt.h"
 
-zbar_image_t *zbar_image_create ()
+zbar_image_t *zbar_image_create (void)
 {
     zbar_image_t *img = calloc(1, sizeof(zbar_image_t));
     _zbar_refcnt_init();
@@ -158,7 +158,8 @@ void *zbar_image_get_userdata (const zbar_image_t *img)
     return(img->userdata);
 }
 
-zbar_image_t *zbar_image_copy (const zbar_image_t *src)
+#if 0
+static zbar_image_t *zbar_image_copy (const zbar_image_t *src)
 {
     zbar_image_t *dst = zbar_image_create();
     dst->format = src->format;
@@ -171,6 +172,7 @@ zbar_image_t *zbar_image_copy (const zbar_image_t *src)
     dst->cleanup = zbar_image_free_data;
     return(dst);
 }
+#endif
 
 const zbar_symbol_set_t *zbar_image_get_symbols (const zbar_image_t *img)
 {
