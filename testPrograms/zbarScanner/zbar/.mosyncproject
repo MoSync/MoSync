@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project supports-build-configs="true" version="1.4">
+<build.cfg id="Debug" types="Debug"/>
+<build.cfg id="Release" types="Release"/>
+<criteria>
+<filter type="com.mobilesorcery.sdk.capabilities.devices.elementfactory">
+<capabilities optional="" required=""/>
+</filter>
+</criteria>
+<properties>
+<property key="build.prefs:additional.include.paths/Debug" value="%mosync-home%/include/newlib/"/>
+<property key="build.prefs:additional.include.paths/Release" value="%mosync-home%/include/newlib/, %project:zbar%, %project:zbar%/include"/>
+<property key="build.prefs:additional.libraries/Debug" value="newlib.lib"/>
+<property key="build.prefs:additional.libraries/Release" value="newlib.lib"/>
+<property key="build.prefs:additional.library.paths/Debug" value="%mosync-home%/lib/newlib_debug/"/>
+<property key="build.prefs:additional.library.paths/Release" value="%mosync-home%/lib/newlib_release/"/>
+<property key="build.prefs:extra.link.sw/Release" value=""/>
+<property key="build.prefs:extra.res.sw/Release" value=""/>
+<property key="build.prefs:gcc.warnings/Release" value="0"/>
+<property key="build.prefs:ignore.default.include.paths/Debug" value="true"/>
+<property key="build.prefs:ignore.default.include.paths/Release" value="true"/>
+<property key="build.prefs:ignore.default.libraries/Debug" value="true"/>
+<property key="build.prefs:ignore.default.libraries/Release" value="true"/>
+<property key="build.prefs:ignore.default.library.paths/Debug" value="true"/>
+<property key="build.prefs:ignore.default.library.paths/Release" value="true"/>
+<property key="build.prefs:lib.output.path/Release" value="../lib/zbar.lib"/>
+<property key="build.prefs:memory.data/Debug" value="2048"/>
+<property key="build.prefs:memory.data/Release" value="2048"/>
+<property key="build.prefs:memory.heap/Debug" value="1536"/>
+<property key="build.prefs:memory.heap/Release" value="1536"/>
+<property key="build.prefs:memory.stack/Debug" value="256"/>
+<property key="build.prefs:memory.stack/Release" value="256"/>
+<property key="build.prefs:project.type" value="lib"/>
+<property key="dependency.strategy" value="0"/>
+<property key="excludes/Release" value="jpeg.c window/dib.c window/win.c window/win.h window/x.c window/x.h window/ximage.c window/xv.c video/vfw.c processor/posix.c processor/posix.h processor/win.c processor/x.c video/v4l1.c video/v4l2.c svg.c svg.h processor/null.c video/null.c window/null.c main.c processor.c processor.h processor decoder/qr_finder.c decoder/qr_finder.h qrcode qrcode.h"/>
+<property key="profile.mgr.type" value="0"/>
+<property key="template.id" value="project.c.newlib"/>
+</properties>
+</project>
