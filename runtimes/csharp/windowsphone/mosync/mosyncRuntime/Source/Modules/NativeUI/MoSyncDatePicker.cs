@@ -34,130 +34,233 @@ using System.Reflection;
 
 namespace MoSync
 {
-	namespace NativeUI
-	{
-		public class DatePicker : WidgetBaseWindowsPhone
-		{
-		protected Microsoft.Phone.Controls.DatePicker mDatePicker;
-			public DatePicker()
-			{
-				mDatePicker = new Microsoft.Phone.Controls.DatePicker();
-				mView = mDatePicker;
+    namespace NativeUI
+    {
+        public class DatePicker : WidgetBaseWindowsPhone
+        {
+            protected Microsoft.Phone.Controls.DatePicker mDatePicker;
 
-			}
+            protected DateTime mMaxDate;
+            protected DateTime mMinDate;
 
-			[MoSyncWidgetProperty(MoSync.Constants.MAW_DATE_PICKER_MAX_DATE)]
-			public string MaxDate
-			{
-				set
-				{
+            public DatePicker()
+            {
+                mDatePicker = new Microsoft.Phone.Controls.DatePicker();
+                mView = mDatePicker;
 
-				}
-			}
+                mMaxDate = DateTime.MaxValue;
+                mMinDate = DateTime.MinValue;
 
-			[MoSyncWidgetProperty(MoSync.Constants.MAW_DATE_PICKER_MIN_DATE)]
-			public string MinDate
-			{
-				set
-				{
+                mDatePicker.ValueChanged += new EventHandler<DateTimeValueChangedEventArgs>(
+                    delegate(object from, DateTimeValueChangedEventArgs args)
+                    {
+                        Memory eventData = new Memory(20);
 
-				}
-			}
+                        const int MAWidgetEventData_eventType = 0;
+                        const int MAWidgetEventData_widgetHandle = 4;
+                        const int MAWidgetEventDate_value_dayOfMonth = 8;
+                        const int MAWidgetEventDate_value_month = 12;
+                        const int MAWidgetEventDate_value_year = 16;
+                        eventData.WriteInt32(MAWidgetEventData_eventType, MoSync.Constants.MAW_EVENT_DATE_PICKER_VALUE_CHANGED);
+                        eventData.WriteInt32(MAWidgetEventData_widgetHandle, mHandle);
+                        eventData.WriteInt32(MAWidgetEventDate_value_dayOfMonth, mDatePicker.Value.Value.Day);
+                        eventData.WriteInt32(MAWidgetEventDate_value_month, mDatePicker.Value.Value.Month);
+                        eventData.WriteInt32(MAWidgetEventDate_value_year, mDatePicker.Value.Value.Year);
 
-			[MoSyncWidgetProperty(MoSync.Constants.MAW_DATE_PICKER_YEAR)]
-			public String Year
-			{
-				set
-				{
-					int year = 0;
-					if (int.TryParse(value, out year))
-					{
-						System.DateTime? myVal = mDatePicker.Value;
-						if (myVal.HasValue)
-						{
-							System.DateTime oldDate = myVal.GetValueOrDefault();
-							System.DateTime newDate = new System.DateTime(year, oldDate.Month, oldDate.Day);
-							mDatePicker.Value = newDate;
-						}
-					}
-				}
+                        mRuntime.PostCustomEvent(MoSync.Constants.EVENT_TYPE_WIDGET, eventData);
+                    });
+            }
 
-				get
-				{
-					String currentValue = "";
-					System.DateTime? myVal = mDatePicker.Value;
-					if (myVal.HasValue)
-					{
-						System.DateTime date = myVal.GetValueOrDefault();
-						currentValue = date.Year.ToString();
-					}
-					return currentValue;
-				}
-			}//end Year
+            [MoSyncWidgetProperty(MoSync.Constants.MAW_DATE_PICKER_MAX_DATE_YEAR)]
+            public int MaxDateYear
+            {
+                set
+                {
+                    try
+                    {
+                        mMaxDate = mMaxDate.AddYears(-1 * (mMaxDate.Year - value));
+                    }
+                    catch (Exception e)
+                    {
+                        throw new InvalidPropertyValueException();
+                    }
+                }
+                get
+                {
+                    return mMaxDate.Year;
+                }
+            }
 
-			[MoSyncWidgetProperty(MoSync.Constants.MAW_DATE_PICKER_MONTH)]
-			public String Month
-			{
-				set
-				{
-					int month = 0;
-					if (int.TryParse(value, out month))
-					{
-						System.DateTime? myVal = mDatePicker.Value;
-						if (myVal.HasValue)
-						{
-							System.DateTime oldDate = myVal.GetValueOrDefault();
-							System.DateTime newDate = new System.DateTime(oldDate.Year, month, oldDate.Day);
-							mDatePicker.Value = newDate;
-					}
-				}
-			}
+            [MoSyncWidgetProperty(MoSync.Constants.MAW_DATE_PICKER_MAX_DATE_MONTH)]
+            public int MaxDateMonth
+            {
+                set
+                {
+                    if (value <= 12 && value >= 1)
+                    {
+                        mMaxDate = mMaxDate.AddMonths(-1 * (mMaxDate.Month - value));
+                    }
+                    else throw new InvalidPropertyValueException();
+                }
+                get
+                {
+                    return mMaxDate.Month;
+                }
+            }
 
-				get
-				{
-					String currentValue = "";
-					System.DateTime? myVal = mDatePicker.Value;
-					if (myVal.HasValue)
-					{
-						System.DateTime date = myVal.GetValueOrDefault();
-						currentValue = date.Month.ToString();
-					}
-					return currentValue;
-				}
-			}//end Month
+            [MoSyncWidgetProperty(MoSync.Constants.MAW_DATE_PICKER_MAX_DATE_DAY)]
+            public int MaxDateDay
+            {
+                set
+                {
+                    int month = mMaxDate.Month;
 
-			[MoSyncWidgetProperty(MoSync.Constants.MAW_DATE_PICKER_DAY_OF_MONTH)]
-			public String dayOfMonth
-			{
-				set
-				{
-					int day = 0;
-					if (int.TryParse(value, out day))
-					{
-						System.DateTime? myVal = mDatePicker.Value;
-						if (myVal.HasValue)
-						{
-							System.DateTime oldDate = myVal.GetValueOrDefault();
-							System.DateTime newDate = new System.DateTime(oldDate.Year, oldDate.Month, day);
-							mDatePicker.Value = newDate;
-						}
-					}
-				}
+                    mMaxDate = mMaxDate.AddDays(value - mMaxDate.Day);
 
-				get
-				{
-					String currentValue = "";
-					System.DateTime? myVal = mDatePicker.Value;
-					if (myVal.HasValue)
-					{
-						System.DateTime date = myVal.GetValueOrDefault();
-						currentValue = date.Year.ToString();
-					}
-					return currentValue;
-				}
-			}//end Day
+                    //if the month have changed it means that the day value was not valid.
+                    if (month != mMaxDate.Month) throw new InvalidPropertyValueException();
+                }
+                get
+                {
+                    return mMaxDate.Day;
+                }
+            }
 
-		}//end DatePicker
+            [MoSyncWidgetProperty(MoSync.Constants.MAW_DATE_PICKER_MIN_DATE_YEAR)]
+            public int MinDateYear
+            {
+                set
+                {
+                    try
+                    {
+                        mMinDate = mMinDate.AddYears(-1 * (mMinDate.Year - value));
+                    }
+                    catch (Exception e)
+                    {
+                        throw new InvalidPropertyValueException();
+                    }
+                }
+                get
+                {
+                    return mMinDate.Year;
+                }
+            }
 
-	} //end NativeUI
+            [MoSyncWidgetProperty(MoSync.Constants.MAW_DATE_PICKER_MIN_DATE_MONTH)]
+            public int MinDateMonth
+            {
+                set
+                {
+                    if (value <= 12 && value >= 1)
+                    {
+                        mMinDate = mMinDate.AddMonths(-1 * (mMinDate.Month - value));
+                    }
+                    else throw new InvalidPropertyValueException();
+                }
+                get
+                {
+                    return mMinDate.Month;
+                }
+            }
+
+            [MoSyncWidgetProperty(MoSync.Constants.MAW_DATE_PICKER_MIN_DATE_DAY)]
+            public int MinDateDay
+            {
+                set
+                {
+                    int month = mMinDate.Month;
+
+                    mMinDate = mMinDate.AddDays(value - mMinDate.Day);
+
+                    //if the month have changed it means that the day value was not valid.
+                    if (month != mMinDate.Month) throw new InvalidPropertyValueException();
+                }
+                get
+                {
+                    return mMinDate.Day;
+                }
+            }
+
+            [MoSyncWidgetProperty(MoSync.Constants.MAW_DATE_PICKER_YEAR)]
+            public int Year
+            {
+                set
+                {
+                    System.DateTime? myVal = mDatePicker.Value;
+                    if (myVal.HasValue)
+                    {
+                        mDatePicker.Value = mDatePicker.Value.Value.AddYears(-1 * (mDatePicker.Value.Value.Year - value));
+                    }
+                }
+
+                get
+                {
+                    System.DateTime? myVal = mDatePicker.Value;
+                    if (myVal.HasValue)
+                    {
+                        return myVal.GetValueOrDefault().Year;
+                    }
+                    return 0;
+                }
+            }//end Year
+
+            [MoSyncWidgetProperty(MoSync.Constants.MAW_DATE_PICKER_MONTH)]
+            public int Month
+            {
+                set
+                {
+                    System.DateTime? myVal = mDatePicker.Value;
+                    if (myVal.HasValue)
+                    {
+                        int year = mDatePicker.Value.Value.Year;
+
+                        mDatePicker.Value = mDatePicker.Value.Value.AddMonths(-1 * (mDatePicker.Value.Value.Month - value));
+
+                        //if the year have changed it means that the day value was not valid.
+                        if (year != mDatePicker.Value.Value.Year) throw new InvalidPropertyValueException();
+                    }
+                }
+
+                get
+                {
+                    System.DateTime? myVal = mDatePicker.Value;
+                    if (myVal.HasValue)
+                    {
+                        return myVal.GetValueOrDefault().Month;
+                    }
+                    return 0;
+                }
+            }//end Month
+
+            [MoSyncWidgetProperty(MoSync.Constants.MAW_DATE_PICKER_DAY_OF_MONTH)]
+            public int dayOfMonth
+            {
+                set
+                {
+                    System.DateTime? myVal = mDatePicker.Value;
+                    if (myVal.HasValue)
+                    {
+                        int month = mDatePicker.Value.Value.Month;
+
+                        mDatePicker.Value = mDatePicker.Value.Value.AddDays(-1 * (mDatePicker.Value.Value.Day - value));
+
+                        //if the month have changed it means that the day value was not valid.
+                        if (month != mDatePicker.Value.Value.Month) throw new InvalidPropertyValueException();
+                    }
+                }
+
+                get
+                {
+                    System.DateTime? myVal = mDatePicker.Value;
+                    if (myVal.HasValue)
+                    {
+                        return myVal.GetValueOrDefault().Day;
+                    }
+                    return 0;
+                }
+            }//end Day
+
+        }//end DatePicker
+
+    } //end NativeUI
 }//end MoSync
