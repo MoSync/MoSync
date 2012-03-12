@@ -47,6 +47,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #import "CameraPreviewWidget.h"
 #import "CameraConfirgurator.h"
 #import "ImagePickerController.h"
+#import "ScreenOrientation.h"
 #import "Capture.h"
 #include "netImpl.h"
 #import "Reachability.h"
@@ -349,6 +350,8 @@ namespace Base {
         MAPimClose();
         [NotificationManager deleteInstance];
         [Ads deleteInstance];
+        [ScreenOrientation deleteInstance];
+
         MAAudioClose();
         [OptionsDialogView deleteInstance];
         [ImagePickerController deleteInstance];
@@ -1924,6 +1927,18 @@ namespace Base {
         return [[NotificationManager getInstance] getApplicationIconBadgeNumber];
 	}
 
+    SYSCALL(int, maScreenSetSupportedOrientations(const int orientations))
+	{
+        return [[ScreenOrientation getInstance] setSupportedOrientations:orientations];
+	}
+    SYSCALL(int, maScreenGetSupportedOrientations())
+	{
+        return [[ScreenOrientation getInstance] getSupportedOrientations];
+	}
+    SYSCALL(int, maScreenGetCurrentOrientation())
+	{
+        return [[ScreenOrientation getInstance] getCurrentScreenOrientation];
+    }
     SYSCALL(int, maCaptureSetProperty(const char* property, const char* value))
 	{
         return [[Capture getInstance] setProperty:property withValue:value];
@@ -1947,6 +1962,7 @@ namespace Base {
     SYSCALL(int, maCaptureDestroyData(const int handle))
 	{
         return [[Capture getInstance] destroyData:handle];
+
 	}
 
 	SYSCALL(longlong, maIOCtl(int function, int a, int b, int c))
@@ -2058,6 +2074,9 @@ namespace Base {
 		maIOCtl_case(maDBCursorGetColumnText);
 		maIOCtl_case(maDBCursorGetColumnInt);
 		maIOCtl_case(maDBCursorGetColumnDouble);
+		maIOCtl_case(maScreenSetSupportedOrientations);
+		maIOCtl_case(maScreenGetSupportedOrientations);
+		maIOCtl_case(maScreenGetCurrentOrientation);
 		maIOCtl_case(maCaptureSetProperty);
 		maIOCtl_case(maCaptureGetProperty);
 		maIOCtl_case(maCaptureAction);
