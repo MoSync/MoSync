@@ -18,7 +18,7 @@ MA 02110-1301, USA.
 
 /**
  * @file MainScreen.h
- * @author Bogdan Iusco
+ * @author Bogdan Iusco, Cipri Filipas
  */
 
 #ifndef MAINSCREEN_H_
@@ -93,21 +93,39 @@ private:
 	/**
 	 * Main layout.
 	 */
-	VerticalLayout* mMainLayout;
+    ListView* mList;
+
+    VerticalLayout* mMaxDateLayout;
+    VerticalLayout* mMinDateLayout;
+
 	Button* mSetDate;
 	Button* mGetDate;
-	Label*  mDisplayedDate;
-	HorizontalLayout* layout1;
 	Button* mSetMaxDate;
 	Button* mGetMaxDate;
-	HorizontalLayout* layout2;
-	Label*  mGetMaxDateValue;
-	Label*  mGetMinDateValue;
-	HorizontalLayout* layout3;
 	Button* mSetMinDate;
 	Button* mGetMinDate;
 
+	EditBox* mYearValueMaxDate;
+	EditBox* mMonthValueMaxDate;
+	EditBox* mDayValueMaxDate;
+	EditBox* mYearValueMinDate;
+	EditBox* mMonthValueMinDate;
+	EditBox* mDayValueMinDate;
+
+	Label* mYearLabelMaxDate;
+	Label* mMonthLabelMaxDate;
+	Label* mDayLabelMaxDate;
+	Label* mYearLabelMinDate;
+	Label* mMonthLabelMinDate;
+	Label* mDayLabelMinDate;
+	Label* mDisplayedDate;
+	Label* mGetMaxDateValue;
+	Label* mGetMinDateValue;
+
 	DatePicker* mDatePicker;
+
+	void CreateMaxDateLayout();
+	void CreateMinDateLayout();
 };
 
 
