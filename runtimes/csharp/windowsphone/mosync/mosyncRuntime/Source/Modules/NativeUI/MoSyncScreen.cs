@@ -53,6 +53,11 @@ namespace MoSync
                  * This will add a BackKeyPress event handler to the Application.Current.RootVisual, this is application wide
                  */
                 (Application.Current.RootVisual as Microsoft.Phone.Controls.PhoneApplicationFrame).BackKeyPress += new EventHandler<System.ComponentModel.CancelEventArgs>(BackKeyPressHandler);
+                /**
+                 * This will add a BackKeyPress event handler to the Application.Current.RootVisual, this is application wide
+                 */
+                (Application.Current.RootVisual as Microsoft.Phone.Controls.PhoneApplicationFrame).OrientationChanged += new EventHandler<Microsoft.Phone.Controls.OrientationChangedEventArgs>(OrientationChangedHandler);
+
             }
 
             /**
@@ -107,6 +112,41 @@ namespace MoSync
                         }
                     }
                 }
+            }
+
+            /**
+             * The Orientation changed event handler
+             * Currently it contains the functionality for the orientation changed event.
+             * @param from Object the object that triggers the event
+             * @param args Microsoft.Phone.Controls.OrientationChangedEventArgs the event arguments
+             */
+            public void OrientationChangedHandler(object from, Microsoft.Phone.Controls.OrientationChangedEventArgs args)
+            {
+                PhoneApplicationPage currentPage = (((PhoneApplicationFrame)Application.Current.RootVisual).Content as PhoneApplicationPage);
+
+                // change the current page in regard to the current orientaion
+                if (args.Orientation == PageOrientation.Landscape |
+                    args.Orientation == PageOrientation.LandscapeLeft |
+                    args.Orientation == PageOrientation.LandscapeRight)
+                {
+                    currentPage.Height = Application.Current.Host.Content.ActualWidth;
+                    currentPage.Width = Application.Current.Host.Content.ActualHeight;
+                }
+                else if (args.Orientation == PageOrientation.Portrait |
+                         args.Orientation == PageOrientation.PortraitDown |
+                         args.Orientation == PageOrientation.PortraitUp)
+                {
+                    currentPage.Height = Application.Current.Host.Content.ActualHeight;
+                    currentPage.Width = Application.Current.Host.Content.ActualWidth;
+                }
+
+                // send the event to the mosync runtime
+                Memory eventData = new Memory(8);
+                const int MAWidgetEventData_eventType = 0;
+                const int MAWidgetEventData_widgetHandle = 4;
+                eventData.WriteInt32(MAWidgetEventData_eventType, MoSync.Constants.MAW_EVENT_SCREEN_ORIENTATION_DID_CHANGE);
+                eventData.WriteInt32(MAWidgetEventData_widgetHandle, mHandle);
+                mRuntime.PostCustomEvent(MoSync.Constants.EVENT_TYPE_WIDGET, eventData);
             }
 
             //The AddChild implementation
