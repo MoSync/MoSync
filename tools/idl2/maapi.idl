@@ -4809,7 +4809,7 @@ group WidgetAPI "Widget API" {
 		VERTICAL_LAYOUT = "VerticalLayout";
 
 		/**
-		 * @brief A relative layout is a layout that layouts widgets relative to its coordinate system.
+		 * @brief A relative layout is a layout that layouts widgets relative to its coordinate system. See \ref WidgetRelativeLayoutProperties "Relative layout properties" for the properties available.
 		 */
 		RELATIVE_LAYOUT = "RelativeLayout";
 
@@ -6150,6 +6150,24 @@ group WidgetAPI "Widget API" {
 	}
 	} // end of WidgetHorizontalLayoutProperties
 
+	group WidgetRelativeLayoutProperties "Relative layout properties" {
+	constset MAString MAW_RELATIVE_LAYOUT_{
+		/**
+		* @brief Sets the isScrollable boolean
+		*
+		* @validvalue "true" or "false", for "true" the layout will become scrollable otherwise it will become unscrollable
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(verticalLayoutHandle, MAW_VERTICA_LAYOUT_SCROLLABLE, "true");
+		* \endcode
+		*/
+		SCROLLABLE = "scrollable";
+	}
+	}
+
 	/**
 	* The available widget properties for a #MAW_VERTICAL_LAYOUT. See \ref WidgetProperties "Widget properties" for more properties.
 	*/
@@ -6239,6 +6257,20 @@ group WidgetAPI "Widget API" {
 		* \endcode
 		*/
 		PADDING_BOTTOM = "paddingBottom";
+
+		/**
+		* @brief Sets the isScrollable boolean
+		*
+		* @validvalue "true" or "false", for "true" the layout will become scrollable otherwise it will become unscrollable
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(verticalLayoutHandle, MAW_VERTICA_LAYOUT_SCROLLABLE, "true");
+		* \endcode
+		*/
+		SCROLLABLE = "scrollable";
 	}
 	} // end of WidgetVerticalLayoutProperties
 

@@ -75,9 +75,9 @@ MainScreen::~MainScreen()
  */
 void MainScreen::createMainLayout() {
 	setTitle("Date Picker Test");
+
 	// Create and add the main layout to the screen.
-	mList = new ListView();
-	Screen::setMainWidget(mList);
+	mList = new VerticalLayout();
 
 	mDatePicker = new DatePicker();
 	mDatePicker->fillSpaceHorizontally();
@@ -99,6 +99,9 @@ void MainScreen::createMainLayout() {
 
 	mList->addChild(mMaxDateLayout);
 	mList->addChild(mMinDateLayout);
+
+	mList->setScrollable(true);
+	Screen::setMainWidget(mList);
 }
 
 void MainScreen::CreateMaxDateLayout()
