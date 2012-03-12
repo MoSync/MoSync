@@ -211,25 +211,18 @@ namespace NativeUI
          */
         virtual void handleWidgetEvent(MAWidgetEventData* widgetEventData);
 
-        /**
-         * Convert a tm struct to a Date struct.
-         * @param tmStruct The given tm type struct.
-         * @return The converted Date type struct.
-         */
-        virtual Date getDateFromTmStruct(const tm tmStruct);
-
-        /**
-         * Convert a Date struct to a tm struct.
-         * @param date The given Date type struct.
-         * @return The converted tm type struct.
-         */
-        virtual tm getTmFromDateStruct(const Date date);
-
     private:
         /**
          * Array with date picker listeners.
          */
         MAUtil::Vector<DatePickerListener*> mDatePickerListeners;
+
+        /**
+         * Auxiliary data used for the getters
+         */
+        Date* mMaxDate;
+        Date* mMinDate;
+        Date* mDisplayedDate;
 	};
 
 } // namespace NativeUI
