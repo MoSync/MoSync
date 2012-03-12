@@ -110,4 +110,26 @@ namespace NativeUI
 		maWidgetScreenShow(getWidgetHandle());
 	}
 
+	/**
+	 * Called just before the screen begins rotating.
+	 * Subclasses may override this method to perform additional actions
+	 * immediately prior to the rotation.
+	 */
+	void Screen::orientationWillChange()
+	{
+		// No implementation required.
+	}
+
+    /**
+     * This method is called when there is an event for this widget.
+     * It passes on the event to all widget's listeners.
+     * @param widgetEventData The data for the widget event.
+     */
+    void Screen::handleWidgetEvent(MAWidgetEventData* widgetEventData)
+    {
+        if (widgetEventData->eventType == MAW_EVENT_SCREEN_ORIENTATION_WILL_CHANGE)
+        {
+            this->orientationWillChange();
+        }
+    }
 } // namespace NativeUI
