@@ -41,6 +41,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.Advertising.Mobile, Version=5.2.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Reference Include="Microsoft.Advertising.Mobile.UI, Version=5.2.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
     <Reference Include="Microsoft.Devices.Sensors" />
     <Reference Include="Microsoft.Phone" />
     <Reference Include="Microsoft.Xna.Framework" />
@@ -70,6 +72,7 @@
     <Compile Include="Source\Modules\GL\GL.cs" />
     <Compile Include="Source\Modules\GL\GLConstants.cs" />
     <Compile Include="Source\Modules\GL\GLTypes.cs" />
+    <Compile Include="Source\Modules\MoSyncAdsModule.cs" />
     <Compile Include="Source\Modules\MoSyncAudioModule.cs" />
     <Compile Include="Source\Modules\MoSyncCameraModule.cs" />
     <Compile Include="Source\Modules\MoSyncCommunicationsModule.cs" />
@@ -82,8 +85,10 @@
     <Compile Include="Source\Modules\MoSyncMiscModule.cs" />
     <Compile Include="Source\Modules\MoSyncNativeUIModule.cs" />
     <Compile Include="Source\Modules\MoSyncOpenGLESModule.cs" />
+    <Compile Include="Source\Modules\MoSyncScreenOrientationModule.cs" />
     <Compile Include="Source\Modules\MoSyncSensorsModule.cs" />
     <Compile Include="Source\Modules\NativeUI\MoSyncActivityIndicator.cs" />
+    <Compile Include="Source\Modules\NativeUI\MoSyncAd.cs" />
     <Compile Include="Source\Modules\NativeUI\MoSyncCameraPreview.cs" />
     <Compile Include="Source\Modules\NativeUI\MoSyncPanoramaView.cs" />
     <Compile Include="Source\Modules\NativeUI\MoSyncStackScreen.cs" />
