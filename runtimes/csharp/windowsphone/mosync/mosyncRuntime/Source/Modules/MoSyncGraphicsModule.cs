@@ -189,6 +189,11 @@ namespace MoSync
 
 				MoSync.GraphicsUtil.ClipRectangle(
 					x, y, w, h,
+					0, 0, mCurrentDrawTarget.PixelWidth, mCurrentDrawTarget.PixelHeight,
+					out x, out y, out w, out h);
+
+				MoSync.GraphicsUtil.ClipRectangle(
+					x, y, w, h,
 					(int)mClipRect.X, (int)mClipRect.Y, (int)mClipRect.Width, (int)mClipRect.Height,
 					out x, out y, out w, out h);
 

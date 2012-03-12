@@ -2707,6 +2707,11 @@ namespace Base {
 			return res;
 		}
 #endif
+		if(strcmp(key, "mosync.path.local") == 0) {
+			strncpy(buf, "/", size);
+			return 1;
+		}
+
 		if(strcmp(key, "mosync.device") == 0) {
 			static const char model[] = "MoSync Emulator";
 			if(size >= (int)sizeof(model)) {
