@@ -120,6 +120,16 @@ namespace NativeUI
 		// No implementation required.
 	}
 
+	/**
+	 * Called after the screen has finished rotating.
+	 * Subclasses may override this method to perform additional actions
+	 * after the rotation.
+	 */
+	 void Screen::orientationDidChange()
+	 {
+		// No implementation required
+	 }
+
     /**
      * This method is called when there is an event for this widget.
      * It passes on the event to all widget's listeners.
@@ -131,5 +141,9 @@ namespace NativeUI
         {
             this->orientationWillChange();
         }
+		else if (widgetEventData->eventType == MAW_EVENT_SCREEN_ORIENTATION_DID_CHANGE)
+		{
+			this->orientationDidChange();
+		}
     }
 } // namespace NativeUI
