@@ -94,11 +94,11 @@ MAKE_UIWRAPPER_LAYOUTING_IMPLEMENTATION(MoSync, UIScrollView)
 		if(childView.frame.origin.y < minY)
 			minY = childView.frame.origin.y;
 
-		if(childView.frame.origin.x + childView.frame.size.width > maxX)
-			maxX = childView.frame.origin.x+childView.frame.size.width;
+		if(childView.frame.origin.x + childView.bounds.size.width > maxX)
+			maxX = childView.frame.origin.x+childView.bounds.size.width;
 
-		if(childView.frame.origin.y + childView.frame.size.height > maxY)
-			maxY = childView.frame.origin.y+childView.frame.size.height;
+		if(childView.frame.origin.y + childView.bounds.size.height > maxY)
+			maxY = childView.frame.origin.y+childView.bounds.size.height;
 	}
 
 	MoSyncTouchEnabledScrollView* sv = (MoSyncTouchEnabledScrollView*)view;

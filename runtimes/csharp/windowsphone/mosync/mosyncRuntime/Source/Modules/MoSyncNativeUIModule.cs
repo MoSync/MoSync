@@ -17,6 +17,16 @@ namespace MoSync
 			return w;
 		}
 
+        /*
+         * Ads a widget to the widgets array.
+         * @param adControl The widget to be added.
+         */
+        public int AddWidget(IWidget widget)
+        {
+            mWidgets.Add(widget);
+            return mWidgets.Count-1;
+        }
+
         public void Init(Ioctls ioctls, Core core, Runtime runtime)
         {
             mNativeUI = new NativeUI.NativeUIWindowsPhone();
