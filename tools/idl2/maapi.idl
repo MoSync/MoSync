@@ -2774,6 +2774,9 @@ interface MAAPI {
 		/**
 		* Values for the status field in the #EVENT_TYPE_SMS event.
 		* This event is sent on Android and iOS.
+		* Note: On iOS platforms the MA_SMS_RESULT_DELIVERED message corresponds
+		* To the SMS being successfully queued by the system. There is no way to
+		* know if it was actually delivered.
 		*/
 		constset int MA_SMS_RESULT_ {
 			/// The SMS was sent.
