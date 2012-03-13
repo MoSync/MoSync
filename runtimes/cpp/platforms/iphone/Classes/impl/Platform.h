@@ -191,6 +191,9 @@ public:
 // never use <0 for event type, just internal events :)
 #define IEVENT_TYPE_DEFLUX_BINARY -1
 
+// Space left for other events.
+#define QUEUE_EVENT_FREE_SPACE 20
+
 class EventQueue : public CircularFifo<MAEvent, EVENT_BUFFER_SIZE> {
 public:
 	EventQueue() : CircularFifo<MAEvent, EVENT_BUFFER_SIZE>(), mEventOverflow(false), mWaiting(false) {
@@ -216,14 +219,29 @@ public:
 			return true;
 		}
 	}
-	
-	
-	void put(const MAEvent& e) {
-		CircularFifo<MAEvent, EVENT_BUFFER_SIZE>::put(e);
 
-		pthread_mutex_lock(&mMutex);	
-		pthread_cond_signal(&mCond);
-		pthread_mutex_unlock(&mMutex);
+	void put(const MAEvent& e) {
+            CircularFifo<MAEvent, EVENT_BUFFER_SIZE>::put(e);
+
+            pthread_mutex_lock(&mMutex);
+            pthread_cond_signal(&mCond);
+            pthread_mutex_unlock(&mMutex);
+	}
+
+    /**
+     * Put event in queue only if there is free space.
+     * The event is ignored if there isn't enough free space.
+     * This method does not throw panic.
+     */
+    void putSafe(const MAEvent& e)
+    {
+        if (count() + QUEUE_EVENT_FREE_SPACE < EVENT_BUFFER_SIZE)
+        {
+            CircularFifo<MAEvent, EVENT_BUFFER_SIZE>::put(e);
+            pthread_mutex_lock(&mMutex);
+            pthread_cond_signal(&mCond);
+            pthread_mutex_unlock(&mMutex);
+        }
 	}
 
 	void wait(int ms) {
