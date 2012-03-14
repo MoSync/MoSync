@@ -63,17 +63,19 @@ namespace MoSync
              * Sets the upper range of the progress bar
              */
             [MoSyncWidgetProperty(MoSync.Constants.MAW_PROGRESS_BAR_MAX)]
-            public String Max
+            public int Max
             {
                 set
                 {
-                    int maxValue = 0;
-                    if (int.TryParse(value, out maxValue))
+                    // only positive integers are accepted
+                    if (0 > value)
                     {
-                        // only positive integers are accepted
-                        if (0 > maxValue) maxValue = 0;
-
-                        mProgressBar.Maximum = maxValue;
+                        mProgressBar.Maximum = 0;
+                        throw new InvalidPropertyValueException();
+                    }
+                    else
+                    {
+                        mProgressBar.Maximum = value;
                     }
                 }
             }
@@ -85,20 +87,21 @@ namespace MoSync
              * get: returns the current progress value
              */
             [MoSyncWidgetProperty(MoSync.Constants.MAW_PROGRESS_BAR_PROGRESS)]
-            public String Progress
+            public int Progress
             {
                 set
                 {
-                    int val = 0;
-                    if (int.TryParse(value, out val))
+                    if(value <= mProgressBar.Maximum)
+                        mProgressBar.Value = value;
+                    else
                     {
-                        mProgressBar.Value = (val <= mProgressBar.Maximum) ? val : mProgressBar.Maximum;
-                    }
+                        throw new InvalidPropertyValueException();
+                    };
                 }
 
                 get
                 {
-                    return mProgressBar.Value.ToString();
+                    return (int)mProgressBar.Value;
                 }
             }
 
@@ -108,15 +111,14 @@ namespace MoSync
              * If the new value is greater than the max, than the set value is the max value.
              */
             [MoSyncWidgetProperty(MoSync.Constants.MAW_PROGRESS_BAR_INCREMENT_PROGRESS)]
-            public String IncrementProgress
+            public int IncrementProgress
             {
                 set
                 {
-                    int incrementVal = 0;
-                    if (int.TryParse(value, out incrementVal))
                     {
-                        double newValue = mProgressBar.Value + incrementVal;
-                        mProgressBar.Value = (newValue > mProgressBar.Maximum) ? mProgressBar.Maximum : newValue;
+                        double newValue = mProgressBar.Value + value;
+
+                        this.Progress = (int)newValue;
                     }
                 }
             }

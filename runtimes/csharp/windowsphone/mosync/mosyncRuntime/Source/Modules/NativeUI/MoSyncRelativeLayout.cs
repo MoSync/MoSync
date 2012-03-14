@@ -42,6 +42,9 @@ namespace MoSync
             //Canvas is the content in which the children are aranged relatively to the parent
             protected System.Windows.Controls.Canvas mPanel;
 
+            //The scrollable view used for the scrollable property
+            protected System.Windows.Controls.ScrollViewer mScrollViewer;
+
             /**
              * The constructor
              */
@@ -95,6 +98,35 @@ namespace MoSync
                     mPanel.Children.Remove((child as WidgetBaseWindowsPhone).View);
                 });
                 base.RemoveChild(child);
+            }
+
+            /**
+             * MAW_VERTICAL_LAYOUT_SCROLLABLE implementation
+             */
+            [MoSyncWidgetProperty(MoSync.Constants.MAW_RELATIVE_LAYOUT_SCROLLABLE)]
+            public string Scrollable
+            {
+                set
+                {
+                    bool val;
+                    if (Boolean.TryParse(value, out val))
+                    {
+                        if (true == val)
+                        {
+                            mScrollViewer = new System.Windows.Controls.ScrollViewer();
+                            mScrollViewer.Content = mPanel;
+                            mView = mScrollViewer;
+                        }
+                        else
+                        {
+                            if (null != mScrollViewer)
+                            {
+                                mView = mPanel;
+                            }
+                        }
+                    }
+                    else throw new InvalidPropertyValueException();
+                }
             }
         }
     }
