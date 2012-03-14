@@ -7019,7 +7019,7 @@ group WidgetAPI "Widget API" {
 	constset MAString MAW_VIDEO_VIEW_ {
 		/**
 		* @brief Sets the video path.
-		* Note: available only for Android.
+		* Note: available on Android and Windows Phone.
 		* @validvalue Any valid path.
 		*
 		* @setonly
@@ -7081,7 +7081,7 @@ group WidgetAPI "Widget API" {
 		*
 		* NOTE: On Android this value can be retrieved after MAW_VIDEO_VIEW_STATE_SOURCE_READY is received.
 		*       On iOS this value can be retrieved after MAW_VIDEO_STATE_PLAYING is received.
-		* @validvalue An int.
+		* @validvalue An integer representing the total media duration in milliseconds.
 		*
 		* @getonly
 		*
@@ -7113,7 +7113,7 @@ group WidgetAPI "Widget API" {
 		/**
 		* @brief Gets the current position in the video file.
 		*
-		* @validvalue An int.
+		* @validvalue An integer representing the current media position in seconds.
 		*
 		* @getonly
 		*

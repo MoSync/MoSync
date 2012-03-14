@@ -54,11 +54,12 @@ const MAUtil::String SOURCE_ERROR       = "Some error occurred";
 /**
  * Strings for the Settings Screen.
  */
-const MAUtil::String DISPLAY_DURATION 	 = " Display Duration ";
-const MAUtil::String HOME_URL			 = " Home URL ";
-const MAUtil::String HOME_URL_ANDROID 	 = "http://www.mosync.com/files/videos/Video.3gp";
-const MAUtil::String HOME_URL_IOS 		 = "http://www.mosync.com/files/videos/ExVideo.m3u8";
-const MAUtil::String RESET_TO_DEFAULT 	 = "Reload default source";
+const MAUtil::String DISPLAY_DURATION 	   = " Display Duration ";
+const MAUtil::String HOME_URL			   = " Home URL ";
+const MAUtil::String HOME_URL_ANDROID 	   = "http://www.mosync.com/files/videos/Video.3gp";
+const MAUtil::String HOME_URL_IOS 		   = "http://www.mosync.com/files/videos/ExVideo.m3u8";
+const MAUtil::String HOME_URL_WINDOWSPHONE = "http://www.educationalquestions.com/video/ELL_PART_5_768k.wmv";
+const MAUtil::String RESET_TO_DEFAULT 	   = "Reload default source";
 
 void getScreenSize();
 int getScreenWidth();
