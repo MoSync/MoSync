@@ -79,6 +79,7 @@ namespace MoSync
 
             /**
              * HACK!
+             * author: Cipri Filipas
              * Description: this is required as a difference to the background image width and height because
              * the grid layout has some unremovable spacers that have almost this amount of pixels
              */
@@ -258,6 +259,7 @@ namespace MoSync
                                 mText.TextAlignment = TextAlignment.Center;
                                 mButton.HorizontalContentAlignment = HorizontalAlignment.Center;
                             }
+                            else throw new InvalidPropertyValueException();
                         }
                     }
                 }
@@ -291,6 +293,7 @@ namespace MoSync
                                 mText.VerticalAlignment = VerticalAlignment.Center;
                                 mButton.VerticalContentAlignment = VerticalAlignment.Center;
                             }
+                            else throw new InvalidPropertyValueException();
                         }
                     }
                 }
@@ -316,15 +319,11 @@ namespace MoSync
              * Sets the font size of the text displayed on the widget
              */
             [MoSyncWidgetProperty(MoSync.Constants.MAW_IMAGE_BUTTON_FONT_SIZE)]
-            public String FontSize
+            public double FontSize
             {
                 set
                 {
-                    double size;
-                    if (double.TryParse(value, out size))
-                    {
-                        mText.FontSize = size;
-                    }
+                    mText.FontSize = value;
                 }
             }
 
@@ -333,19 +332,13 @@ namespace MoSync
              * Sets the foreground image on the button
              */
             [MoSyncWidgetProperty(MoSync.Constants.MAW_IMAGE_BUTTON_IMAGE)]
-            public String Image
+            public int Image
             {
                 set
                 {
-                    int val = 0;
-                    if (!int.TryParse(value, out val))
-                    {
-                        return;
-                    }
-                    Resource res = mRuntime.GetResource(MoSync.Constants.RT_IMAGE, val);
+                    Resource res = mRuntime.GetResource(MoSync.Constants.RT_IMAGE, value);
                     if (null != res && res.GetInternalObject() != null)
                     {
-
                         /**
                          * Set the height and width of the foreground image
                          * The image will be scaled so that the width and height are equal to the TextBlock height.
@@ -360,6 +353,7 @@ namespace MoSync
 
                         mForegroundImage.Source = bmpSource;
                     }
+                    else throw new InvalidPropertyValueException();
                 }
             }
 
@@ -368,16 +362,11 @@ namespace MoSync
              * Sets the background image on the button
              */
             [MoSyncWidgetProperty(MoSync.Constants.MAW_IMAGE_BUTTON_BACKGROUND_IMAGE)]
-            public String BackgroundImage
+            public int BackgroundImage
             {
                 set
                 {
-                    int val = 0;
-                    if (!int.TryParse(value, out val))
-                    {
-                        return;
-                    }
-                    Resource res = mRuntime.GetResource(MoSync.Constants.RT_IMAGE, val);
+                    Resource res = mRuntime.GetResource(MoSync.Constants.RT_IMAGE, value);
                     if (null != res && res.GetInternalObject() != null)
                     {
                         System.Windows.Media.Imaging.BitmapSource bmpSource =
@@ -390,15 +379,21 @@ namespace MoSync
 
                         mBackgroundImage.Stretch = mStretchBackground;
                     }
+                    else throw new InvalidPropertyValueException();
                 }
             }
 
             [MoSyncWidgetProperty(MoSync.Constants.MAW_IMAGE_BUTTON_FONT_HANDLE)]
-            public String FontHandle
+            public int FontHandle
             {
                 set
                 {
+                    FontModule.FontInfo fontInfo =
+                        mRuntime.GetModule<FontModule>().GetFont(value);
 
+                    mText.FontFamily = fontInfo.family;
+                    mText.FontWeight = fontInfo.weight;
+                    mText.FontStyle = fontInfo.style;
                 }
             }
         }

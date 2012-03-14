@@ -93,7 +93,7 @@ private:
 	/**
 	 * Main layout.
 	 */
-    ListView* mList;
+    VerticalLayout* mList;
 
     VerticalLayout* mMaxDateLayout;
     VerticalLayout* mMinDateLayout;

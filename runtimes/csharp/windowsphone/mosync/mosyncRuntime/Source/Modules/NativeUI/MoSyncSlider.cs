@@ -89,93 +89,81 @@ namespace MoSync
 
             //MAW_SLIDER_MAX implementation
             [MoSyncWidgetProperty(MoSync.Constants.MAW_SLIDER_MAX)]
-            public string Max
+            public int Max
             {
                 set
                 {
-                    int maxVal;
-                    if(Int32.TryParse(value, out maxVal))
+                    if (0 <= value)
                     {
-                        if (0 <= maxVal)
+                        mMaxValue = value;
+                        if (value < mProgressValue)
                         {
-                            mMaxValue = maxVal;
-                            if (maxVal < mProgressValue)
-                            {
-                                mProgressValue = maxVal;
-                                Value = maxVal.ToString();
-                            }
-                            mSlider.Maximum = mMaxValue;
+                            mProgressValue = value;
+                            Value = value;
                         }
-                        else
-                        {
-                            mMaxValue = 0;
-                            mSlider.Maximum = mMaxValue;
-                        }
+                        mSlider.Maximum = mMaxValue;
+                    }
+                    else
+                    {
+                        mMaxValue = 0;
+                        mSlider.Maximum = mMaxValue;
                     }
                 }
                 get
                 {
-                    return mMaxValue.ToString();
+                    return mMaxValue;
                 }
             }
 
             //MAW_SLIDER_VALUE implementation
             [MoSyncWidgetProperty(MoSync.Constants.MAW_SLIDER_VALUE)]
-            public string Value
+            public int Value
             {
                 set
                 {
-                    int val;
-                    if (Int32.TryParse(value, out val))
+                    if (value < 0)
                     {
-                        if (val <= mMaxValue && val >= mMinValue)
+                        if (value <= mMaxValue && value >= mMinValue)
                         {
-                            mProgressValue = val;
+                            mProgressValue = value;
                             mSlider.Value = mProgressValue;
                         }
-                        else if (val > mMaxValue)
+                        else if (value > mMaxValue)
                         {
                             mSlider.Value = mMaxValue;
                             mProgressValue = mMaxValue;
                         }
-                        else if (val < mMinValue)
+                        else if (value < mMinValue)
                         {
                             mSlider.Value = mMinValue;
                             mProgressValue = mMinValue;
                         }
                     }
+                    else throw new InvalidPropertyValueException();
                 }
                 get
                 {
-                    return mProgressValue.ToString();
+                    return mProgressValue;
                 }
             }
 
             //MAW_SLIDER_INCREASE_VALUE implementation
             [MoSyncWidgetProperty(MoSync.Constants.MAW_SLIDER_INCREASE_VALUE)]
-            public string IncreaseValue
+            public int IncreaseValue
             {
                 set
                 {
-                    int val;
-                    if (Int32.TryParse(value, out val))
-                    {
-                        Value = (mProgressValue + val).ToString();
-                    }
+                    Value = (mProgressValue + value);
                 }
             }
 
             //MAW_SLIDER_DECREASE_VALUE implementation
             [MoSyncWidgetProperty(MoSync.Constants.MAW_SLIDER_DECREASE_VALUE)]
-            public string DecreaseValue
+            public int DecreaseValue
             {
                 set
                 {
-                    int val;
-                    if (Int32.TryParse(value, out val))
-                    {
-                        Value = (mProgressValue - val).ToString();
-                    }
+                    Value = (mProgressValue - value);
                 }
             }
         }

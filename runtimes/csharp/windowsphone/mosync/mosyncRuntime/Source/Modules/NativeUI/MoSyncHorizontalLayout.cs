@@ -252,6 +252,7 @@ namespace MoSync
 
                         mPaddingSetByUser = true;
                     }
+                    else throw new InvalidPropertyValueException();
                 }
             }
 
@@ -281,70 +282,48 @@ namespace MoSync
                         mSpacerDown.Height = new GridLength(1, GridUnitType.Auto);
                         mSpacerUp.Height = new GridLength(1, GridUnitType.Auto);
                     }
+                    else throw new InvalidPropertyValueException();
                 }
             }
 
             //MAW_HORIZONTAL_LAYOUT_PADDING_BOTTOM implementation
             [MoSyncWidgetProperty(MoSync.Constants.MAW_HORIZONTAL_LAYOUT_PADDING_BOTTOM)]
-            public String PaddingBottom
+            public double PaddingBottom
             {
                 set
                 {
-                    double val;
-                    if(Double.TryParse(value, out val))
-                    {
-                        mPaddingBottom = val;
-                        mSpacerDown.Height = new GridLength(mPaddingBottom);
-                    }
+                    mSpacerDown.Height = new GridLength(value);
                 }
             }
 
             //MAW_HORIZONTAL_LAYOUT_PADDING_TOP implementation
             [MoSyncWidgetProperty(MoSync.Constants.MAW_HORIZONTAL_LAYOUT_PADDING_TOP)]
-            public String PaddingTop
+            public double PaddingTop
             {
                 set
                 {
-                    double val;
-                    if (Double.TryParse(value, out val))
-                    {
-                        mPaddingTop = val;
-                        mSpacerUp.Height = new GridLength(mPaddingTop);
-                    }
+                    mSpacerUp.Height = new GridLength(value);
                 }
             }
 
             //MAW_HORIZONTAL_LAYOUT_PADDING_LEFT implementation
             [MoSyncWidgetProperty(MoSync.Constants.MAW_HORIZONTAL_LAYOUT_PADDING_LEFT)]
-            public String PaddingLeft
+            public double PaddingLeft
             {
                 set
                 {
-                    double val;
-                    if (Double.TryParse(value, out val))
-                    {
-                        mPaddingLeft = val;
-                        mSpacerLeft.Width = new GridLength(mPaddingLeft);
-
-                        mPaddingSetByUser = true;
-                    }
+                    mSpacerLeft.Width = new GridLength(value);
                 }
             }
 
             //MAW_HORIZONTAL_LAYOUT_PADDING_RIGHT implementation
             [MoSyncWidgetProperty(MoSync.Constants.MAW_HORIZONTAL_LAYOUT_PADDING_RIGHT)]
-            public String PaddingRight
+            public double PaddingRight
             {
                 set
                 {
-                    double val;
-                    if (Double.TryParse(value, out val))
-                    {
-                        mPaddingRight = val;
-                        mSpacerRight.Width = new GridLength(mPaddingRight);
-
-                        mPaddingSetByUser = true;
-                    }
+                    mSpacerRight.Width = new GridLength(value);
+                    mPaddingSetByUser = true;
                 }
             }
 
@@ -373,19 +352,6 @@ namespace MoSync
             {
                 mGrid.ColumnDefinitions[0].Width = new GridLength(gridUnitValue, gridUnitType);
                 mGrid.ColumnDefinitions[mGrid.ColumnDefinitions.Count - 1].Width = new GridLength(gridUnitValue, gridUnitType);
-            }
-
-            private void writeStatus()
-            {
-                String s = "Horizontal ";
-                for (int i = 0; i < mGrid.ColumnDefinitions.Count; i++)
-                {
-                    s += mGrid.ColumnDefinitions[i].Width.Value.ToString();
-                    s += " ";
-                    s += mGrid.ColumnDefinitions[i].Width.GridUnitType.ToString();
-                    s += " | ";
-                }
-                MessageBox.Show(s);
             }
         }
     }

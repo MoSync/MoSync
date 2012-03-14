@@ -75,6 +75,7 @@ namespace MoSync
                         mActivityIndicator.IsIndeterminate = myValue;
                         mActivityIndicator.Visibility = (myValue) ? Visibility.Visible : Visibility.Collapsed;
                     }
+                    else throw new InvalidPropertyValueException();
                 }
             }
 
