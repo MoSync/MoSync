@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project supports-build-configs="true" version="1.2">
+<project supports-build-configs="true" version="1.4">
 <build.cfg id="Debug" types="Debug"/>
 <build.cfg id="Release" types="Release"/>
 <properties>
@@ -10,7 +10,7 @@
 <property key="build.prefs:additional.libraries/Release" value="MAUtil.lib"/>
 <property key="build.prefs:additional.library.paths/Debug" value=""/>
 <property key="build.prefs:additional.library.paths/Release" value=""/>
-<property key="build.prefs:app.permissions" value="Internet\ Access Vibrate"/>
+<property key="build.prefs:app.permissions" value="Internet\ Access Vibration"/>
 <property key="build.prefs:extra.link.sw/Debug" value=""/>
 <property key="build.prefs:extra.link.sw/Release" value=""/>
 <property key="build.prefs:extra.res.sw/Debug" value=""/>
@@ -28,5 +28,6 @@
 <property key="excludes/Debug" value=""/>
 <property key="excludes/Release" value=""/>
 <property key="template.id" value="project.cpp"/>
+<property key="winmobilecs:guid" value="c4a0ecf0-4b44-102f-80ff-d309141fe961"/>
 </properties>
 </project>
