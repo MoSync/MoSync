@@ -46,7 +46,9 @@ VideoScreen::VideoScreen() :
 	mPlay(NULL),
 	mPause(NULL),
 	mStop(NULL),
+	mSeek(NULL),
 	mDuration(NULL),
+	mDebugInfo(NULL),
 	mEditBox(NULL),
 	mLoadLayout(NULL),
 	mSetUrl(NULL),
@@ -71,6 +73,7 @@ VideoScreen::VideoScreen() :
 	mPlay->addButtonListener(this);
 	mPause->addButtonListener(this);
 	mStop->addButtonListener(this);
+	mSeek->addButtonListener(this);
 	mSetUrl->addButtonListener(this);
 	mSetPath->addButtonListener(this);
 }
@@ -148,24 +151,38 @@ void VideoScreen::createPlaybackButtons()
 	mStop->setFontColor(INTENSE_BLUE);
 	mStop->setText("Stop");
 
+	// when pressed, the video is seeked to the middle
+	mSeek = new Button();
+	mSeek->setEnabled(false);
+	// Apply a background gradient on Android.
+	mSeek->setBackgroundGradient(SEA_GREEN, DARK_SEA_GREEN);
+	mSeek->setFontColor(INTENSE_BLUE);
+	mSeek->setText("Seek");
+
 	HorizontalLayout* playLayout = new HorizontalLayout();
 	playLayout->setChildHorizontalAlignment(MAW_ALIGNMENT_CENTER);
-	playLayout->setWidth(getScreenWidth()/3);
+	playLayout->setWidth(getScreenWidth()/4);
 	playLayout->addChild(mPlay);
 
 	HorizontalLayout* pauseLayout = new HorizontalLayout();
 	pauseLayout->setChildHorizontalAlignment(MAW_ALIGNMENT_CENTER);
-	pauseLayout->setWidth(getScreenWidth()/3);
+	pauseLayout->setWidth(getScreenWidth()/4);
 	pauseLayout->addChild(mPause);
 
 	HorizontalLayout* stopLayout = new HorizontalLayout();
 	stopLayout->setChildHorizontalAlignment(MAW_ALIGNMENT_CENTER);
-	stopLayout->setWidth(getScreenWidth()/3);
+	stopLayout->setWidth(getScreenWidth()/4);
 	stopLayout->addChild(mStop);
+
+	HorizontalLayout* seekLayout = new HorizontalLayout();
+	seekLayout->setChildHorizontalAlignment(MAW_ALIGNMENT_CENTER);
+	seekLayout->setWidth(getScreenWidth()/4);
+	seekLayout->addChild(mSeek);
 
 	mButtonsLayout->addChild(playLayout);
 	mButtonsLayout->addChild(pauseLayout);
 	mButtonsLayout->addChild(stopLayout);
+	mButtonsLayout->addChild(seekLayout);
 
 	mMainLayout->addChild(mButtonsLayout);
 }
@@ -240,6 +257,12 @@ void VideoScreen::addVideoWidgets()
 	mDuration->setText("Video Duration");
 	mMainLayout->addChild(mDuration);
 
+	// Add debug information label.
+	mDebugInfo = new Label();
+	mDebugInfo->setFontColor(INTENSE_BLUE);
+	mDebugInfo->setText("Debug information");
+	mMainLayout->addChild(mDebugInfo);
+
 	// Add a spacer of 10px before the buttons.
 	mTopSpacerLayout = new VerticalLayout();
 	mTopSpacerLayout->setBackgroundColor(INTENSE_BLUE);
@@ -298,6 +321,11 @@ void VideoScreen::buttonClicked(Widget* button)
 		mDuration->setText("Video Duration");
 		mVideoView->setPath(mEditBox->getText());
     }
+    else if (button == mSeek)
+    {
+		// for testing purposes only, well seek to the half of the video
+		mVideoView->seekTo(mVideoView->getDuration()/2);
+    }
 }
 
 /**
@@ -328,28 +356,35 @@ void VideoScreen::videoViewStateChanged(
         switch (videoViewState)
         {
             case MAW_VIDEO_VIEW_STATE_PLAYING:
+				mDebugInfo->setText("videoViewStateChanged called: STATE_PLAYING");
                 text = SOURCE_PLAYING;
                 mPause->setEnabled(true);
                 mStop->setEnabled(true);
+                mSeek->setEnabled(true);
                 // On iOS the source is loaded into memory and the duration
                 // can be retrieved.
                 if ( mVideoView->getDuration() > 0 )
                 {
-                mDuration->setText(
-					"Duration " +
-					getFormatedDuration( mVideoView->getDuration() ) );                }
+					mDuration->setText(
+						"Duration " +
+						getFormatedDuration(mVideoView->getDuration()));
+                }
                 break;
             case MAW_VIDEO_VIEW_STATE_PAUSED:
+				mDebugInfo->setText("videoViewStateChanged called: STATE_PAUSED");
                 text = SOURCE_PAUSED;
                 break;
             case MAW_VIDEO_VIEW_STATE_STOPPED:
+				mDebugInfo->setText("videoViewStateChanged called: STATE_STOPPED");
                 text = SOURCE_STOPPED;
                 break;
             case MAW_VIDEO_VIEW_STATE_SOURCE_READY:
+				mDebugInfo->setText("videoViewStateChanged called: STATE_READY");
                 text = SOURCE_READY;
                 // Now pause and stop can be enabled.
                 mPause->setEnabled(true);
                 mStop->setEnabled(true);
+                mSeek->setEnabled(true);
                 // On Android the source is loaded into memory at this point,
                 // and the duration can be retrieved.
                 if ( mVideoView->getDuration() > 0 )
@@ -360,15 +395,18 @@ void VideoScreen::videoViewStateChanged(
                 }
                 break;
             case MAW_VIDEO_VIEW_STATE_FINISHED:
+				mDebugInfo->setText("videoViewStateChanged called: STATE_FINISHED");
                 text = SOURCE_FINISHED;
                 break;
             case MAW_VIDEO_VIEW_STATE_INTERRUPTED:
+				mDebugInfo->setText("videoViewStateChanged called: STATE_INTERRUPTED");
                 text = SOURCE_ERROR;
                 // Disable the control buttons.
                 mPause->setEnabled(false);
                 mStop->setEnabled(false);
                 break;
             default:
+				mDebugInfo->setText("Unknown event type");
                 text = "Unknown event type for video view";
         }
         // Update the source status label.
