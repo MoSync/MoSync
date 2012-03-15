@@ -218,38 +218,4 @@ namespace NativeUI
 		removeListenerFromVector(mScreenListeners, listener);
     }
 
-
-    /**
-     * This method is called when there is an event for this widget.
-     * It passes on the event to all widget's listeners.
-     * @param widgetEventData The data for the widget event.
-     */
-    void Screen::handleWidgetEvent(MAWidgetEventData* widgetEventData)
-    {
-		Widget::handleWidgetEvent(widgetEventData);
-
-		if ( MAW_EVENT_OPTIONS_MENU_ITEM_SELECTED == widgetEventData->eventType )
-		{
-			for (int i=0; i < mScreenListeners.size(); i++)
-			{
-				mScreenListeners[i]->optionsMenuItemSelected(this, widgetEventData->optionsMenuItem);
-			}
-		}
-		else if( MAW_EVENT_OPTIONS_MENU_CLOSED == widgetEventData->eventType )
-		{
-			for (int i=0; i < mScreenListeners.size(); i++)
-			{
-				mScreenListeners[i]->optionsMenuClosed(this);
-			}
-		}
-        else if (widgetEventData->eventType == MAW_EVENT_SCREEN_ORIENTATION_WILL_CHANGE)
-        {
-            this->orientationWillChange();
-        }
-		else if (widgetEventData->eventType == MAW_EVENT_SCREEN_ORIENTATION_DID_CHANGE)
-		{
-			this->orientationDidChange();
-		}
-    }
-
 } // namespace NativeUI
