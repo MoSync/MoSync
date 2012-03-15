@@ -8673,7 +8673,7 @@ group NFCAPI "NFC API" {
 		}
 	}//end of NFC API
 
-	group DBAPI "DB API" {
+	group DBAPI "Database API" {
 		struct MADBBlob {
 			MAAddress data;
 			int size;
@@ -8879,7 +8879,7 @@ group NFCAPI "NFC API" {
 			 */
 			NULL = -4;
 		}
-	} // End of DB API
+	} // End of Database API
 
 	group AudioAPI "Audio API" {
 		typedef int MAAudioData;
