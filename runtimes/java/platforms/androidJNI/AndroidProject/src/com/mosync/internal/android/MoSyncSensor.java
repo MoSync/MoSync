@@ -132,7 +132,12 @@ public class MoSyncSensor implements SensorEventListener {
 	public MoSyncSensor(MoSyncThread thread)
 	{
 		mMoSyncThread = thread;
-		mSensorManager = (SensorManager)getActivity().getSystemService(Context.SENSOR_SERVICE);
+		try
+		{
+			mSensorManager = (SensorManager)getActivity().getSystemService(Context.SENSOR_SERVICE);
+		} catch (Exception ex)
+		{
+		}
 
 		// Set up conversion table
 		mSensorConversion.put(SENSOR_TYPE_ACCELEROMETER, Sensor.TYPE_ACCELEROMETER);
