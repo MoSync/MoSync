@@ -195,10 +195,14 @@ namespace MoSync
 		public static void CriticalError(String text)
 		{
 			Log(text);
+
+// Enable this if you want the debugger to automatically break here.
+#if false
 			if (System.Diagnostics.Debugger.IsAttached)
 			{
 				System.Diagnostics.Debugger.Break();
 			}
+#endif
 			Deployment.Current.Dispatcher.BeginInvoke(() => MessageBox.Show(text));
 			throw new ExitException(-1);
 		}
@@ -238,6 +242,19 @@ namespace MoSync
 			RunActionOnMainThread(action, true);
 		}
 
+
+		static Action sPreRunOnMainThreadAction = null;
+		public static void SetPreRunOnMainThreadAction(Action action)
+		{
+			sPreRunOnMainThreadAction = action;
+		}
+
+		static Action sPostRunOnMainThreadAction = null;
+		public static void SetPostRunOnMainThreadAction(Action action)
+		{
+			sPostRunOnMainThreadAction = action;
+		}
+
 		public static void RunActionOnMainThread(Action action, bool sync)
 		{
 			if (Thread.CurrentThread == sStartupThread)
@@ -248,6 +265,9 @@ namespace MoSync
 
 			if (sync)
 			{
+				if (sPreRunOnMainThreadAction != null)
+					sPreRunOnMainThreadAction();
+
 				using (AutoResetEvent are = new AutoResetEvent(false))
 				{
 					Deployment.Current.Dispatcher.BeginInvoke(() =>
@@ -257,6 +277,9 @@ namespace MoSync
 					});
 					are.WaitOne();
 				}
+
+				if (sPostRunOnMainThreadAction != null)
+					sPostRunOnMainThreadAction();
 			}
 			else
 			{

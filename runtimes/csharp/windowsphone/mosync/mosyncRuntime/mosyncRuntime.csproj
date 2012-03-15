@@ -45,6 +45,8 @@
     <Reference Include="Microsoft.Phone" />
     <Reference Include="Microsoft.Xna.Framework" />
     <Reference Include="Microsoft.Xna.Framework.GamerServices" />
+    <Reference Include="Microsoft.Xna.Framework.Graphics" />
+    <Reference Include="Microsoft.Xna.Framework.Interop" />
     <Reference Include="System.Device" />
     <Reference Include="System.Windows" />
     <Reference Include="system" />
@@ -61,10 +63,20 @@
     <Reference Include="Microsoft.Phone.Controls">
       <HintPath>Libraries\Microsoft.Phone.Controls\Microsoft.Phone.Controls.dll</HintPath>
     </Reference>
+	<Reference Include="Microsoft.Advertising.Mobile, Version=5.2.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+		<HintPath>Libraries\Microsoft.Advertising.Mobile\Microsoft.Advertising.Mobile.dll</HintPath>
+	</Reference>
+    <Reference Include="Microsoft.Advertising.Mobile.UI, Version=5.2.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+		<HintPath>Libraries\Microsoft.Advertising.Mobile.UI\Microsoft.Advertising.Mobile.UI.dll</HintPath>
+	</Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Source\maapi.cs" />
+    <Compile Include="Source\Modules\GL\GL.cs" />
+    <Compile Include="Source\Modules\GL\GLConstants.cs" />
+    <Compile Include="Source\Modules\GL\GLTypes.cs" />
+    <Compile Include="Source\Modules\MoSyncAdsModule.cs" />
     <Compile Include="Source\Modules\MoSyncAudioModule.cs" />
     <Compile Include="Source\Modules\MoSyncCameraModule.cs" />
     <Compile Include="Source\Modules\MoSyncCommunicationsModule.cs" />
@@ -77,8 +89,10 @@
     <Compile Include="Source\Modules\MoSyncMiscModule.cs" />
     <Compile Include="Source\Modules\MoSyncNativeUIModule.cs" />
     <Compile Include="Source\Modules\MoSyncOpenGLESModule.cs" />
+    <Compile Include="Source\Modules\MoSyncScreenOrientationModule.cs" />
     <Compile Include="Source\Modules\MoSyncSensorsModule.cs" />
     <Compile Include="Source\Modules\NativeUI\MoSyncActivityIndicator.cs" />
+    <Compile Include="Source\Modules\NativeUI\MoSyncAd.cs" />
     <Compile Include="Source\Modules\NativeUI\MoSyncCameraPreview.cs" />
     <Compile Include="Source\Modules\NativeUI\MoSyncPanoramaView.cs" />
     <Compile Include="Source\Modules\NativeUI\MoSyncStackScreen.cs" />

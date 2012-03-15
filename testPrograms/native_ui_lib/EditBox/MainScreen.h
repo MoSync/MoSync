@@ -130,13 +130,13 @@ private:
 	 * Creates the input mode list view
 	 * @param mainLayout Widgets will be added to it.
 	 */
-	void createInputModeListView(VerticalLayout* mainLayout);
+	void createInputModeListView(ListView* mainListView);
 
 	/**
 	 * Creates the input flag list view
 	 * @param mainLayout Widgets will be added to it.
 	 */
-	void createInputFlagListView(VerticalLayout* mainLayout);
+	void createInputFlagListView(ListView* mainListView);
 
 	/**
 	 * Creates a horizontal layout, adds it to the main layout, initializes the
@@ -145,7 +145,7 @@ private:
 	 * @param mainLayout Widgets will be added to it.
 	 * @param text The text that will fill the label.
 	 */
-	void createDecimalEditBoxView(EditBox* &editBox, VerticalLayout* mainLayout, MAUtil::String text);
+	void createDecimalEditBoxView(EditBox* &editBox, ListView* mainListView, MAUtil::String text);
 
 	/**
 	 * Gets the index of a string. Returns -1 if the string is not inside the array
@@ -170,6 +170,7 @@ private:
 	/**
 	 * Main layout.
 	 */
+	ListView* mMainListView;
 	VerticalLayout* mMainLayout;
 	EditBox* mEditBox;
 
@@ -212,6 +213,14 @@ private:
 	Label *mLinesNumberLabel;
 
 	bool mKeyboard;
+
+	/** Screen's width. */
+	int mScreenWidth;
+
+	/** Screen's height. */
+	int mScreenHeight;
+
+	int mFontSize;
 };
 
 

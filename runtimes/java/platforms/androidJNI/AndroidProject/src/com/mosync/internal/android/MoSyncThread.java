@@ -206,10 +206,15 @@ public class MoSyncThread extends Thread
 	private MoSyncView mMoSyncView;
 
 	/**
+	 * Flag that tells if the display should be updated.
+	 */
+	volatile private boolean mUpdateDisplay = true;
+
+	/**
 	 * true if the MoSync program is considered to be dead,
 	 * used for maPanic.
 	 */
-	private boolean mHasDied;
+	volatile private boolean mHasDied;
 
 	/**
 	 * a handle used for full screen camera preview
@@ -271,7 +276,7 @@ public class MoSyncThread extends Thread
 
 	int mClipLeft, mClipTop, mClipWidth, mClipHeight;
 
-	boolean mUsingFrameBuffer;
+	volatile boolean mUsingFrameBuffer;
 	int mFrameBufferAddress;
 	int mFrameBufferSize;
 	Bitmap mFrameBufferBitmap;
@@ -302,7 +307,6 @@ public class MoSyncThread extends Thread
 	private final Rect mMaDrawImageRegionTempSourceRect = new Rect();
 	private final Rect mMaDrawImageRegionTempDestRect = new Rect();
 
-
 	/**
 	 * An Instance of Connectivity Manager used for detecting connection type
 	 */
@@ -310,7 +314,8 @@ public class MoSyncThread extends Thread
 
 	int mMaxStoreId = 0;
 
-	public boolean mIsUpdatingScreen = false;
+	// TODO: Make this private and access via a method.
+	volatile public boolean mIsUpdatingScreen = false;
 
 	final static String storesPath = "MAStore";
 
@@ -429,11 +434,19 @@ public class MoSyncThread extends Thread
 
 	public void onResume()
 	{
+		// Turn on display update again.
+		mUpdateDisplay = true;
+
+		// Turn on sensors.
 		mMoSyncSensor.onResume();
 	}
 
 	public void onPause()
 	{
+		// Do not update the display when paused.
+		mUpdateDisplay = false;
+
+		// Pause sensors.
 		mMoSyncSensor.onPause();
 	}
 
@@ -1441,15 +1454,20 @@ public class MoSyncThread extends Thread
 	synchronized void maUpdateScreen()
 	{
 		//SYSLOG("maUpdateScreen");
+
 		Canvas lockedCanvas = null;
 
-		if(mOpenGLView != -1) {
+		if (mOpenGLView != -1) {
 			maWidgetSetProperty(mOpenGLView, "invalidate", "");
 			return;
 		}
 
-		if (mMoSyncView == null) return;
+		// We won't update the display if the app is not active,
+		// this is controlled by this flag.
+		if (!mUpdateDisplay) { return; }
 
+		// Mark that we are now updating the screen (we skip
+		// touch events occurring during drawing in class MoSync).
 		mIsUpdatingScreen = true;
 
 		try
@@ -1460,6 +1478,9 @@ public class MoSyncThread extends Thread
 			{
 				if (mUsingFrameBuffer)
 				{
+					// TODO: Document why this is commented out.
+					// Was this the old way of doing what is done below?
+					// Delete commented out code if not needed.
 					//mMemDataSection.position(mFrameBufferAddress);
 					//mFrameBufferBitmap.copyPixelsFromBuffer(mMemDataSection);
 
@@ -1469,7 +1490,7 @@ public class MoSyncThread extends Thread
 					// Clear the screen.. in this case draw the canvas black
 					lockedCanvas.drawRGB(0,0,0);
 
-					// Blit the framebuffer
+					// Blit the framebuffer.
 					lockedCanvas.drawBitmap(
 						mFrameBufferBitmap, 0, 0, mBlitPaint);
 				}
@@ -1497,12 +1518,16 @@ public class MoSyncThread extends Thread
 		mIsUpdatingScreen = false;
 	}
 
+	// TODO: WTH is this!!!
+	// Why was not method body also commented out?
+	// Doing that now. Previously only maResetBacklight
+	// was commented out.
 	/**
 	 * maResetBacklight
 	 */
-	{
-		SYSLOG("maResetBacklight");
-	}
+//	{
+//		SYSLOG("maResetBacklight");
+//	}
 
 	/**
 	 * maGetScrSize
@@ -2249,7 +2274,9 @@ public class MoSyncThread extends Thread
 		// Try to load the resource file, if we get an exception
 		// it just means that this application has no resource file
 		// and that is not an error.
-		if (((flag & MA_RESOURCE_OPEN) != 0) && (mResourceFd == null)) {
+		if (((mResourceFd != null) && (!mResourceFd.valid())) ||
+				(((flag & MA_RESOURCE_OPEN) != 0) && (mResourceFd == null)))
+		{
 			mResourceFd = getResourceFileDesriptor();
 		}
 
@@ -2717,7 +2744,10 @@ public class MoSyncThread extends Thread
 			}
 
 			SYSLOG("Decode a bitmap!");
-			Bitmap bitmap = BitmapFactory.decodeByteArray(ra, 0, length);
+
+			Bitmap bitmap = decodeImageFromData(ra, null);
+
+			//Bitmap bitmap = BitmapFactory.decodeByteArray(ra, 0, length);
 			if(bitmap != null)
 			{
 				SYSLOG("Bitmap was created!");

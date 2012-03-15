@@ -1,7 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project supports-build-configs="true" version="1.2">
+<project supports-build-configs="true" version="1.4">
 <build.cfg id="Debug" types="Debug"/>
 <build.cfg id="Release" types="Release"/>
+<criteria>
+<filter type="com.mobilesorcery.sdk.capabilities.devices.elementfactory">
+<capabilities optional="" required="Camera"/>
+</filter>
+</criteria>
 <properties>
 <property key="build.prefs:additional.include.paths" value="%mosync-home%/include"/>
 <property key="build.prefs:additional.include.paths/Debug" value="%mosync-home%/include"/>
@@ -38,8 +43,10 @@
 <property key="dependency.strategy" value="0"/>
 <property key="excludes/Debug" value=""/>
 <property key="excludes/Release" value=""/>
+<property key="profile.mgr.type" value="0"/>
 <property key="symbian.uids:uid.s60v2uid" value="0x0000000"/>
 <property key="symbian.uids:uid.s60v3uid" value="0xee1fd9d2"/>
 <property key="template.id" value="project.maui"/>
+<property key="winmobilecs:guid" value="52f42c90-3846-102f-8050-9f5a706ba24f"/>
 </properties>
 </project>

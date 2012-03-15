@@ -4475,30 +4475,41 @@ group WidgetAPI "Widget API" {
 		DIALOG_DISMISSED = 22;
 
 		/**
+		* Send by current screen just before it begins rotating.
+		*/
+		SCREEN_ORIENTATION_WILL_CHANGE = 23;
+
+		/**
+		* Send by current screen after it finishes rotating.
+		* Sent only from the Windows Phone 7.1 platform.
+		*/
+		SCREEN_ORIENTATION_DID_CHANGE = 24;
+
+		/**
 		* @brief Send when the value in a Rating Bar.
 		*/
-		RATING_BAR_VALUE_CHANGED = 23;
+		RATING_BAR_VALUE_CHANGED = 25;
 
 		/**
 		* @brief Send when one of the radio buttons in a radio group is selected.
 		*/
-		RADIO_GROUP_ITEM_SELECTED = 24;
+		RADIO_GROUP_ITEM_SELECTED = 26;
 
 		/**
 		* @brief Send when  the radio button state is changed.
 		*/
-		RADIO_BUTTON_STATE_CHANGED = 25;
+		RADIO_BUTTON_STATE_CHANGED = 27;
 
 		/**
 		* @brief Send when the Options Menu is being closed (either by the user canceling
 		* the menu with the back/menu button, or when an item is selected).
 		*/
-		OPTIONS_MENU_CLOSED = 26;
+		OPTIONS_MENU_CLOSED = 28;
 
 		/**
 		* @brief Send when an item in your options menu is selected.
 		*/
-		OPTIONS_MENU_ITEM_SELECTED = 27;
+		OPTIONS_MENU_ITEM_SELECTED = 29;
 	}
 
 	} // end of WidgetEventTypes
@@ -6876,7 +6887,8 @@ group WidgetAPI "Widget API" {
 	group WidgetDatePickerProperties "Date Picker properties" {
 	constset MAString MAW_DATE_PICKER_ {
 		/**
-		* @brief Sets or gets  maximal date supported by this DatePicker in milliseconds since January 1, 1970 00:00:00.
+		* @deprecated use MAX_DATE_YEAR, MAX_DATE_MONTH and MAX_DATE_DAY instead
+		* @brief Sets or gets  maximal date supported by this DatePicker in seconds since January 1, 1970 00:00:00.
 		* NOTE: On Android the default maximal date is 12/31/2100.
 		* NOTE: The property can be set on iOS only.
 		* @validvalue A long int that specifies the upper range of this date picker.
@@ -6885,14 +6897,61 @@ group WidgetAPI "Widget API" {
 		*
 		* @par Example
 		* \code
-        *   maWidgetSetProperty(datePickerHandle, MAW_DATE_PICKER_MAX_DATE, "101220100000");
+        *   maWidgetSetProperty(datePickerHandle, MAW_DATE_PICKER_MAX_DATE, "1291939200");
 		*   // Now the maximum date is  the 10th of December 2010.
 		* \endcode
 		*/
 		MAX_DATE = "maxDate";
 
 		/**
-		* @brief Sets or gets  minimal date supported by this DatePicker in milliseconds since January 1, 1970 00:00:00
+		* @brief Sets or gets the year of the maximal date supported by this DatePicker
+		* Note: On Android the default maximal date year  is 2100
+		* Note: On Windows Phone 7 the default maximal date year is 9999
+		* @validvalue An int that specifies the value of the year of the maximal date
+		* for this date picker.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+		*   maWidgetSetProperty(datePickerHandle, MAW_DATE_PICKER_MAX_DATE_YEAR, "2999");
+		* \endcode
+		*/
+		MAX_DATE_YEAR = "maxdateyear";
+
+		/**
+		* @brief Sets or gets the month of the maximal date supported by this DatePicker
+		* @validvalue An int that specifies the value of the month of the maximal date for
+		* this date picker. The value must be a number between 1 and 12
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+		*   maWidgetSetProperty(datePickerHandle, MAW_DATE_PICKER_MAX_DATE_MONTH, "12");
+		* \endcode
+		*/
+		MAX_DATE_MONTH = "maxdatemonth";
+
+		/**
+		* @brief Sets or gets the day of the maximal date supported by this DatePicker
+		* @validvalue An int that specifies the value of the day of the maximal date for
+		* this date picker. This number must be a valid day of the month specified with
+		* the MAX_DATE_MONTH property.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+		*   maWidgetSetProperty(datePickerHandle, MAW_DATE_PICKER_MAX_DATE_DAY, "31");
+		* \endcode
+		*/
+		MAX_DATE_DAY = "maxdateday";
+
+
+		/**
+		* @deprecated use MIN_DATE_YEAR, MIN_DATE_MONTH and MIN_DATE_DAY instead
+		* @brief Sets or gets  minimal date supported by this DatePicker in seconds since January 1, 1970 00:00:00
 		* Note: On Android the default minimal date is 01/01/1900.
 		* NOTE: The property can be set on iOS only.
 		* @validvalue A long int that specifies the minimal supported date.
@@ -6901,11 +6960,56 @@ group WidgetAPI "Widget API" {
 		*
 		* @par Example
 		* \code
-        *   maWidgetSetProperty(datePickerHandle, MAW_DATE_PICKER_MIN_DATE, "0101200000");
+        *   maWidgetSetProperty(datePickerHandle, MAW_DATE_PICKER_MIN_DATE, "946684800");
 		*   // Now the minimum date is the 1st of January 2000.
 		* \endcode
 		*/
 		MIN_DATE = "minDate";
+
+		/**
+		* @brief Sets or gets the year of the minimal date supported by this DatePicker
+		* Note: On Android the default minimal date year  is 1900
+		* Note: On Windows Phone 7 the default minimal date year is 1
+		* @validvalue An int that specifies the value of the year of the minimal date
+		* for this date picker.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+		*   maWidgetSetProperty(datePickerHandle, MAW_DATE_PICKER_MIN_DATE_YEAR, "1830");
+		* \endcode
+		*/
+		MIN_DATE_YEAR = "mindateyear";
+
+		/**
+		* @brief Sets or gets the month of the minimal date supported by this DatePicker
+		* @validvalue An int that specifies the value of the month of the minimal date for
+		* this date picker. The value must be a number between 1 and 12
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+		*   maWidgetSetProperty(datePickerHandle, MAW_DATE_PICKER_MIN_DATE_MONTH, "1");
+		* \endcode
+		*/
+		MIN_DATE_MONTH = "mindatemonth";
+
+		/**
+		* @brief Sets or gets the day of the minimal date supported by this DatePicker
+		* @validvalue An int that specifies the value of the day of the minimal date for
+		* this date picker. This number must be a valid day of the month specified with
+		* the MIN_DATE_MONTH property.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+		*   maWidgetSetProperty(datePickerHandle, MAW_DATE_PICKER_MIN_DATE_DAY, "1");
+		* \endcode
+		*/
+		MIN_DATE_DAY = "mindateday";
 
 		/**
 		* @brief Sets or gets the currently displayed year.
@@ -7062,7 +7166,7 @@ group WidgetAPI "Widget API" {
 	constset MAString MAW_VIDEO_VIEW_ {
 		/**
 		* @brief Sets the video path.
-		* Note: available only for Android.
+		* Note: available on Android and Windows Phone.
 		* @validvalue Any valid path.
 		*
 		* @setonly
@@ -7124,7 +7228,7 @@ group WidgetAPI "Widget API" {
 		*
 		* NOTE: On Android this value can be retrieved after MAW_VIDEO_VIEW_STATE_SOURCE_READY is received.
 		*       On iOS this value can be retrieved after MAW_VIDEO_STATE_PLAYING is received.
-		* @validvalue An int.
+		* @validvalue An integer representing the total media duration in milliseconds.
 		*
 		* @getonly
 		*
@@ -7156,7 +7260,7 @@ group WidgetAPI "Widget API" {
 		/**
 		* @brief Gets the current position in the video file.
 		*
-		* @validvalue An int.
+		* @validvalue An integer representing the current media position in seconds.
 		*
 		* @getonly
 		*
@@ -8218,6 +8322,7 @@ group CameraFunctions "Camera Functions" {
 		 * #SCREEN_ORIENTATION_PORTRAIT #SCREEN_ORIENTATION_DYNAMIC \endlink
 		 * constants.
 		 * @return \< 0 on error.
+		 * @deprecated use #maAlert instead.
 		 */
 		int maScreenSetOrientation(in int orientation);
 
@@ -8237,6 +8342,59 @@ group CameraFunctions "Camera Functions" {
 		 * @return \< 0 on error.
 		 */
 		int maScreenSetFullscreen(in int fullscreen);
+
+		/**
+		* Set supported screen orientations.
+		* Currently implemented on iOS and WindowsPhone 7.1.
+		* @param orientations A bitmask consisting of flags describing the supported screen orientations.
+		* The bitmask can be created using \link #MA_SCREEN_ORIENTATION_ MA_SCREEN_ORIENTATION \endlink
+		* values.
+		* @return One of the next constants:
+		* - #MA_SCREEN_ORIENTATION_RES_OK
+		* - #MA_SCREEN_ORIENTATION_RES_NOT_SUPPORTED
+		* - #MA_SCREEN_ORIENTATION_RES_INVALID_VALUE
+		*/
+		int maScreenSetSupportedOrientations(in int orientations);
+
+		/**
+		* Get supported screen orientations.
+		* Currently implemented on iOS and WindowsPhone 7.1.
+		* @return A bitmask consisting of flags describing the supported screen orientations.
+		* The bitmask is created using \link #MA_SCREEN_ORIENTATION_ MA_SCREEN_ORIENTATION \endlink
+		* values.
+		*/
+		int maScreenGetSupportedOrientations();
+
+		/**
+		* Get current screen orientation.
+		* Currently implemented on iOS and WindowsPhone 7.1.
+		* @return One of the \link #MA_SCREEN_ORIENTATION_ MA_SCREEN_ORIENTATION \endlink constants.
+		*/
+		int maScreenGetCurrentOrientation();
+
+		constset int MA_SCREEN_ORIENTATION_ {
+			/// The device is in portrait mode, with the device held upright and the home button on
+			/// the bottom.
+			PORTRAIT = 0x000001;
+			/// The device is in portrait mode but upside down, with the device held upright and the
+			/// home button at the top.
+			PORTRAIT_UPSIDE_DOWN = 0x000002;
+			/// The device is in landscape mode, with the device held upright and the home button on
+			/// the left side.
+			LANDSCAPE_LEFT = 0x000004;
+			/// The device is in landscape mode, with the device held upright and the home button on
+			/// the right side.
+			LANDSCAPE_RIGHT = 0x000008;
+		}
+
+		constset int MA_SCREEN_ORIENTATION_RES_ {
+			///
+			OK = 0;
+			///
+			NOT_SUPPORTED = -1;
+			///
+			INVALID_VALUE = -2;
+		}
 
 		/**
 		 * Turn on sending of screen state events. Off by default.
@@ -9298,7 +9456,7 @@ group NFCAPI "NFC API" {
 	*/
 	int maSyscallPanicsDisable();
 
-group AdsAPI "Ads API" {
+group AdsAPI "Advertising API" {
 	group AdsResultCodes "Ads result codes" {
 		constset int MA_ADS_RES_ {
 			/**
@@ -9346,7 +9504,7 @@ group AdsAPI "Ads API" {
 		}
 	} // end of Ads Result Codes
 
-	group AdsErrorCodes "Ads error codes" {
+	group AdsErrorCodes "Advertising error codes" {
 		constset int MA_ADS_ERROR_ {
 			/**
 			* @brief Indicates that something happened internally: for instance, the Activity may have been destroyed mid-refresh.
@@ -9362,13 +9520,13 @@ group AdsAPI "Ads API" {
 
 			/**
 			* @brief Indicates that the connection to the advertisements server failed.
-			* Platform: Android and iOS.
+			* Platform: Android, iOS and Windows Phone 7.1.
 			*/
 			NETWORK = -3;
 
 			/**
 			* @brief Indicates that no ad was returned due to lack of ad inventory.
-			* Platform: Android and iOS.
+			* Platform: Android, iOS and Windows Phone 7.1.
 			*/
 			NO_FILL = -4;
 
@@ -9393,7 +9551,7 @@ group AdsAPI "Ads API" {
 		}
 	} // end of Ads Error Codes
 
-	group AdsProperties "Ads Properties" {
+	group AdsProperties "Advertising Properties" {
 		constset MAString MA_ADS_ {
 			/**
 			* @brief Gets the height of the ads banner.
@@ -9596,7 +9754,7 @@ group AdsAPI "Ads API" {
 		}
 	} // end of Ads properties
 
-	group AdsConstants "Ads Constants" {
+	group AdsConstants "Advertising Constants" {
 		constset int MA_ADS_SIZE_ {
 			// An Ad can be created ony with those predefined sizes.
 			// This is the default banner of size 320*50.
@@ -9610,10 +9768,17 @@ group AdsAPI "Ads API" {
 			// Of size 728*90.
 			// Availabe only on Android.
 			LEADERBOARD = 3;
+			// Of size 300*50 - X-Large Banner
+			// Available only on Windows Phone 7.1.
+			WP7_XLARGE = 4;
+			// Of size 480*80 - XX-Large Banner
+			// Available only on Windows Phone 7.1
+			WP7_XXLARGE = 5;
+
 		}
 	} // end of Ads Constants
 
-	group AdsEventTypes "Ads Event Types" {
+	group AdsEventTypes "Advertising Event Types" {
 		constset int MA_ADS_EVENT_ {
 			// This event is send when a banner view fails to load a new advertisement.
 			FAILED = 0;
@@ -9621,6 +9786,7 @@ group AdsAPI "Ads API" {
 			LOADED = 1;
 			// This event is send after a banner view finishes executing an action that
 			// covered your application's user interface.
+			// Event not available on windows phone 7.1 on the AdControl
 			ON_DISMISS = 2;
 			// This event is send when the user taps the banner view.
 			// The application is moved to background after this event is send.
@@ -9628,11 +9794,11 @@ group AdsAPI "Ads API" {
 		}
 	} // end of Ads Constants
 
-	group AdsFunctions "Ads Functions" {
+	group AdsFunctions "Advertising Functions" {
 		/**
 		* \brief Creates a new banner.
-		* \param bannerSize One of the MA_ADS_SIZE_ constants. Only for Android platform.
-		* \param publisherID Only for Android platform.
+		* \param bannerSize One of the MA_ADS_SIZE_ constants. Only for Android and WP7.1 platforms.
+		* \param publisherID Only for Android and WP 7.1 platforms.
 		* This param is ignored on iOS platform.
 		*
 		* \note A banner is a widget type object.

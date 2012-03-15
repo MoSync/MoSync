@@ -15,7 +15,6 @@
  02111-1307, USA.
 */
 
-
 // sensor update interval values in milliseconds
 #define SENSOR_RATE_FASTEST_IOS 50
 #define SENSOR_RATE_GAME_IOS 80
@@ -25,26 +24,35 @@
 // used for converting milliseconds in seconds
 #define SECOND 1000.0
 
-#import "MoSyncSensor.h"
-
-#include "MosyncMain.h"
 #include <helpers/cpp_defs.h>
+
+#import "MoSyncSensor.h"
+#include "MosyncMain.h"
 
 @implementation MoSyncSensor
 
 /**
  * Init function.
  */
--(id) init {
-	operationQueue = [[NSOperationQueue alloc] init];
-	motionManager = [[CMMotionManager alloc] init];
-	locationManager = [[CLLocationManager alloc] init];
+-(id) init
+{
+    self = [super init];
+    if (self)
+    {
+        motionManager = [[CMMotionManager alloc] init];
+        locationManager = [[CLLocationManager alloc] init];
 
-	isProximitySensorRunning = FALSE;
-	isOrientationSensorRunning = FALSE;
-	isMagnetometerSensorRunning = FALSE;
+        dispatch_queue_t globalQueue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+        motionManagerTimer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, globalQueue);
+        locationManagerTimer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, globalQueue);
+        compassManagerTimer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, globalQueue);
 
-	return [super init];
+        isProximitySensorRunning = FALSE;
+        isOrientationSensorRunning = FALSE;
+        isMagnetometerSensorRunning = FALSE;
+    }
+
+	return self;
 }
 
 /**
@@ -53,9 +61,11 @@
  * @param value Update interval value.
  * @return SENSOR_ERROR_NONE if the sensor has been started, or a code error otherwise.
  */
--(int) startSensor: (int)sensorType  interval:(int)value {
+-(int) startSensor: (int)sensorType  interval:(int)value
+{
 	int result = SENSOR_ERROR_NONE;
-	switch (sensorType) {
+	switch (sensorType)
+    {
 		case SENSOR_TYPE_ACCELEROMETER:
 			result = [self startAccelerometer:value];
 			break;
@@ -86,9 +96,11 @@
  * @param sensorType What sensor to stop.
  * @return SENSOR_ERROR_NONE if the sensor has been stopped, or a code error otherwise.
  */
--(int) stopSensor: (int)sensorType {
+-(int) stopSensor: (int)sensorType
+{
 	int result = SENSOR_ERROR_NONE;
-	switch (sensorType) {
+	switch (sensorType)
+    {
 		case SENSOR_TYPE_ACCELEROMETER:
 			result = [self stopAccelerometer];
 			break;
@@ -119,37 +131,23 @@
  * @param interval Update interval value.
  * @return SENSOR_ERROR_NONE if the sensor has been started, or a code error otherwise.
  */
--(int) startAccelerometer:(int)interval {
-	if(nil != accelerometer) {
+-(int) startAccelerometer:(int)interval
+{
+	if(accelerometer)
+    {
 		return SENSOR_ERROR_ALREADY_ENABLED;
 	}
 
-	if(SENSOR_RATE_UI > interval) {
+	if(SENSOR_RATE_UI > interval)
+    {
 		return SENSOR_ERROR_INTERVAL_NOT_SET;
 	}
 
-	float updateValue = 0;
-	switch (interval) {
-		case SENSOR_RATE_FASTEST:
-			updateValue = SENSOR_RATE_FASTEST_IOS;
-			break;
-		case SENSOR_RATE_GAME:
-			updateValue = SENSOR_RATE_GAME_IOS;
-			break;
-		case SENSOR_RATE_NORMAL:
-			updateValue = SENSOR_RATE_NORMAL_IOS;
-			break;
-		case SENSOR_RATE_UI:
-			updateValue = SENSOR_RATE_UI_IOS;
-			break;
-		default:
-			updateValue = interval;
-	}
-
+	double intervalInMilliseconds = (double) [self getUpdateIntervalFromRate:interval];
 	accelerometer = [UIAccelerometer sharedAccelerometer];
 
 	// set the update interval(the value must be in seconds so we need to convert it from milliseconds).
-	accelerometer.updateInterval = updateValue / SECOND;
+	accelerometer.updateInterval = intervalInMilliseconds / SECOND;
 	accelerometer.delegate = self;
 
 	return SENSOR_ERROR_NONE;
@@ -159,8 +157,10 @@
  * Stop the accelerometer sensor.
  * @return SENSOR_ERROR_NONE if the sensor has been stopped, or a code error otherwise.
  */
--(int) stopAccelerometer {
-	if(nil == accelerometer) {
+-(int) stopAccelerometer
+{
+	if(!accelerometer)
+    {
 		return SENSOR_ERROR_NOT_ENABLED;
 	}
 
@@ -175,20 +175,47 @@
  * @param interval Update interval value.
  * @return SENSOR_ERROR_NONE if the sensor has been started, or a code error otherwise.
  */
--(int) startGyroscope:(int)interval {
-	if([motionManager isGyroActive]) {
+-(int) startGyroscope:(int)interval
+{
+	if([motionManager isGyroActive])
+    {
 		return SENSOR_ERROR_ALREADY_ENABLED;
 	}
 
-	if(SENSOR_RATE_UI > interval) {
+	if(SENSOR_RATE_UI > interval)
+    {
 		return SENSOR_ERROR_INTERVAL_NOT_SET;
 	}
 
 	// check if gyroscope is available.
 	if([motionManager isGyroAvailable])
     {
-		NSNumber* updateInterval = [[NSNumber numberWithInt:interval] autorelease];
-        [NSThread detachNewThreadSelector:@selector(startGyroscopeOnNewThread:) toTarget:self withObject:updateInterval];
+        double intervalInMilliseconds = (double) [self getUpdateIntervalFromRate:interval];
+        NSTimeInterval updateInterval = intervalInMilliseconds / SECOND ;
+
+        motionManager.gyroUpdateInterval = updateInterval;
+        [motionManager startGyroUpdates];
+
+        int repeatTime = (int) intervalInMilliseconds * NSEC_PER_MSEC;
+        dispatch_source_set_timer(motionManagerTimer,
+                                  dispatch_time(DISPATCH_TIME_NOW, repeatTime),
+                                  repeatTime,
+                                  0);
+        dispatch_source_set_event_handler(motionManagerTimer, ^{
+            CMGyroData* gyroData = [motionManager gyroData];
+            if (gyroData)
+            {
+                CMRotationRate rotate = gyroData.rotationRate;
+                MAEvent event;
+                event.type = EVENT_TYPE_SENSOR;
+                event.sensor.type = SENSOR_TYPE_GYROSCOPE;
+                event.sensor.values[0] = rotate.x;
+                event.sensor.values[1] = rotate.y;
+                event.sensor.values[2] = rotate.z;
+                Base::gEventQueue.putSafe(event);
+            }
+        });
+        dispatch_resume(motionManagerTimer);
 	}
     else
     {
@@ -198,36 +225,20 @@
 	return SENSOR_ERROR_NONE;
 }
 
- -(void) startGyroscopeOnNewThread:(NSNumber*) interval
-{
-    // set the update interval(the value must be in seconds so we need to convert it from milliseconds).
-    double intervalInMilliseconds = [self getUpdateIntervalFromRate:[interval intValue]];
-    NSTimeInterval updateInterval = intervalInMilliseconds / SECOND ;
-    motionManager.gyroUpdateInterval = updateInterval;
-    [motionManager startGyroUpdates];
-    motionManagerTimer =  [NSTimer scheduledTimerWithTimeInterval:updateInterval
-                                                             target:self
-                                                           selector:@selector(readGyroData:)
-                                                           userInfo:nil
-                                                            repeats:YES];
-    [[NSRunLoop currentRunLoop] addTimer:motionManagerTimer forMode:NSDefaultRunLoopMode];
-    [[NSRunLoop currentRunLoop] run];
-}
-
 /**
  * Stop the gyroscope sensor.
  * @return SENSOR_ERROR_NONE if the sensor has been stopped, or a code error otherwise.
  */
--(int) stopGyroscope {
-	if(![motionManager isGyroActive]) {
+-(int) stopGyroscope
+{
+	if(![motionManager isGyroActive])
+    {
 		return SENSOR_ERROR_NOT_ENABLED;
 	}
 
-    [motionManagerTimer invalidate];
-    [motionManagerTimer release];
-    motionManagerTimer = nil;
-
+    dispatch_suspend(motionManagerTimer);
 	[motionManager stopGyroUpdates];
+
 	return SENSOR_ERROR_NONE;
 }
 
@@ -235,20 +246,28 @@
  * Start the proximity sensor.
  * @return SENSOR_ERROR_NONE if the sensor has been started, or a code error otherwise.
  */
--(int)startProximity {
+-(int)startProximity
+{
 	UIDevice *device = [UIDevice currentDevice];
 
-	if(isProximitySensorRunning) {
+	if(isProximitySensorRunning)
+    {
 		return SENSOR_ERROR_ALREADY_ENABLED;
 	}
 
-	// start the proximity sensor
+	// start the proximity sensor.
 	device.proximityMonitoringEnabled = YES;
 
-	// check if the proximity sensor is available
-	if(YES == device.proximityMonitoringEnabled) {
-		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(proximityChanged) name:UIDeviceProximityStateDidChangeNotification object:nil];
-	} else {
+	// check if the proximity sensor is available.
+	if(YES == device.proximityMonitoringEnabled)
+    {
+		[[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(proximityChanged)
+                                                     name:UIDeviceProximityStateDidChangeNotification
+                                                   object:nil];
+	}
+    else
+    {
 		return SENSOR_ERROR_NOT_AVAILABLE;
 	}
 
@@ -260,35 +279,44 @@
  * Stop the proximity sensor.
  * @return SENSOR_ERROR_NONE if the sensor has been stopped, or a code error otherwise.
  */
--(int)stopProximity {
+-(int)stopProximity
+{
 	UIDevice *device = [UIDevice currentDevice];
 
-	if(isProximitySensorRunning) {
+	if(isProximitySensorRunning)
+    {
 		device.proximityMonitoringEnabled = NO;
-		[[NSNotificationCenter defaultCenter] removeObserver:self name:UIDeviceProximityStateDidChangeNotification object:nil];
+		[[NSNotificationCenter defaultCenter] removeObserver:self
+                                                        name:UIDeviceProximityStateDidChangeNotification
+                                                      object:nil];
 		isProximitySensorRunning = FALSE;
-	} else {
+	}
+    else
+    {
 		return SENSOR_ERROR_NOT_ENABLED;
 	}
 
 	return SENSOR_ERROR_NONE;
 }
 
-
 /**
  * Start the orientation sensor.
  * @return SENSOR_ERROR_NONE if the sensor has been started, or a code error otherwise.
  */
--(int)startOrientation {
-
-	if(isOrientationSensorRunning) {
+-(int)startOrientation
+{
+	if(isOrientationSensorRunning)
+    {
 		return SENSOR_ERROR_ALREADY_ENABLED;
 	}
 
-	// start the orientation sensor
+	// start the orientation sensor.
 	UIDevice *device = [UIDevice currentDevice];
 	[device beginGeneratingDeviceOrientationNotifications];
-	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(orientationChanged) name:UIDeviceOrientationDidChangeNotification object:nil];
+	[[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(orientationChanged)
+                                                 name:UIDeviceOrientationDidChangeNotification
+                                               object:nil];
 	isOrientationSensorRunning = TRUE;
     [self performSelector:@selector(orientationChanged)];
 
@@ -299,14 +327,20 @@
  * Stop the orientation sensor.
  * @return SENSOR_ERROR_NONE if the sensor has been stopped, or a code error otherwise.
  */
--(int)stopOrientation {
+-(int)stopOrientation
+{
 	UIDevice *device = [UIDevice currentDevice];
 
-	if(isOrientationSensorRunning) {
+	if(isOrientationSensorRunning)
+    {
 		[device endGeneratingDeviceOrientationNotifications];
-		[[NSNotificationCenter defaultCenter] removeObserver:self name:UIDeviceOrientationDidChangeNotification object:nil];
+		[[NSNotificationCenter defaultCenter] removeObserver:self
+                                                        name:UIDeviceOrientationDidChangeNotification
+                                                      object:nil];
 		isOrientationSensorRunning = FALSE;
-	} else {
+	}
+    else
+    {
 		return SENSOR_ERROR_NOT_ENABLED;
 	}
 
@@ -320,42 +354,45 @@
  */
 -(int)startMagnetometer:(const int)interval
 {
-	if(![CLLocationManager headingAvailable]) {
+	if(![CLLocationManager headingAvailable])
+    {
 		return SENSOR_ERROR_NOT_AVAILABLE;
 	}
 
-	if(isMagnetometerSensorRunning) {
+	if(isMagnetometerSensorRunning)
+    {
 		return SENSOR_ERROR_ALREADY_ENABLED;
 	}
 
-    NSNumber* updateInterval = [[NSNumber numberWithInt:interval] autorelease];
-    [NSThread detachNewThreadSelector:@selector(startMagnetometerOnNewThread:) toTarget:self withObject:updateInterval];
-
-	return SENSOR_ERROR_NONE;
-}
-
--(void) startMagnetometerOnNewThread:(NSNumber*) interval
-{
-    //NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-    [locationManager startUpdatingHeading];
-
-	// Start the magnetometer sensor.
+    // Start the magnetometer sensor.
     // Location manager does not have an update interval property and it sends too fast data
     // for our current event system.
     // Used a timer that reads location data at a specified interval.
-    double intervalInMilliseconds = [self getUpdateIntervalFromRate:[interval intValue]];
-    NSTimeInterval updateInterval = intervalInMilliseconds / SECOND;
-    isMagnetometerSensorRunning = TRUE;
-    locationManagerTimer =  [NSTimer scheduledTimerWithTimeInterval:updateInterval
-                                                             target:self
-                                                           selector:@selector(readMagnetometerData:)
-                                                           userInfo:nil
-                                                            repeats:YES];
-    [[NSRunLoop currentRunLoop] addTimer:locationManagerTimer forMode:NSDefaultRunLoopMode];
-    [[NSRunLoop currentRunLoop] run];
+    int intervalInMilliseconds = [self getUpdateIntervalFromRate:interval];
+    int repeatTime = intervalInMilliseconds * NSEC_PER_MSEC;
+    dispatch_source_set_timer(locationManagerTimer,
+                              dispatch_time(DISPATCH_TIME_NOW, repeatTime),
+                              repeatTime,
+                              0);
+    dispatch_source_set_event_handler(locationManagerTimer, ^{
+        CLHeading* heading = [locationManager heading];
+        if (heading)
+        {
+            MAEvent event;
+            event.type = EVENT_TYPE_SENSOR;
+            event.sensor.type = SENSOR_TYPE_MAGNETIC_FIELD;
+            event.sensor.values[0] = heading.x;
+            event.sensor.values[1] = heading.y;
+            event.sensor.values[2] = heading.z;
+            Base::gEventQueue.putSafe(event);
+        }
+    });
 
-    [locationManagerTimer release];
-    //[pool release];
+    isMagnetometerSensorRunning = TRUE;
+    [locationManager startUpdatingHeading];
+    dispatch_resume(locationManagerTimer);
+
+	return SENSOR_ERROR_NONE;
 }
 
 /**
@@ -366,14 +403,12 @@
 {
 	if(isMagnetometerSensorRunning)
     {
-		[locationManagerTimer invalidate];
-        [locationManagerTimer release];
-        locationManagerTimer = nil;
+        isMagnetometerSensorRunning = FALSE;
+        dispatch_suspend(locationManagerTimer);
         if(!isCompassRunning)
         {
             [locationManager stopUpdatingHeading];
         }
-		isMagnetometerSensorRunning = FALSE;
 	}
     else
     {
@@ -390,41 +425,43 @@
  */
 -(int)startCompass:(const int)interval
 {
-	if(![CLLocationManager headingAvailable]) {
+	if(![CLLocationManager headingAvailable])
+    {
 		return SENSOR_ERROR_NOT_AVAILABLE;
 	}
 
-	if(isCompassRunning) {
+	if(isCompassRunning)
+    {
 		return SENSOR_ERROR_ALREADY_ENABLED;
 	}
 
-
-    NSNumber* updateInterval = [[NSNumber numberWithInt:interval] autorelease];
-    [NSThread detachNewThreadSelector:@selector(startCompassOnNewThread:) toTarget:self withObject:updateInterval];
-
-	return SENSOR_ERROR_NONE;
-}
-
--(void) startCompassOnNewThread:(NSNumber*) interval
-{
-    //NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-    [locationManager startUpdatingHeading];
-    isCompassRunning = TRUE;
-	// Start the compass.
+    // Start the compass sensor.
     // Location manager does not have an update interval property and it sends too fast data
     // for our current event system.
     // Used a timer that reads location data at a specified interval.
-    double intervalInMilliseconds = [self getUpdateIntervalFromRate:[interval intValue]];
-    NSTimeInterval updateInterval = intervalInMilliseconds / SECOND;
-    compassManagerTimer =  [NSTimer scheduledTimerWithTimeInterval:updateInterval
-                                                             target:self
-                                                           selector:@selector(readCompassData:)
-                                                           userInfo:nil
-                                                            repeats:YES];
-    [[NSRunLoop currentRunLoop] addTimer:compassManagerTimer forMode:NSDefaultRunLoopMode];
-    [[NSRunLoop currentRunLoop] run];
-    [compassManagerTimer release];
-    //[pool release];
+    int intervalInMilliseconds = [self getUpdateIntervalFromRate:interval];
+    int repeatTime = intervalInMilliseconds * NSEC_PER_MSEC;
+    dispatch_source_set_timer(compassManagerTimer,
+                              dispatch_time(DISPATCH_TIME_NOW, repeatTime),
+                              repeatTime,
+                              0);
+    dispatch_source_set_event_handler(compassManagerTimer, ^{
+        CLHeading* heading = [locationManager heading];
+        if (heading)
+        {
+            MAEvent event;
+            event.type = EVENT_TYPE_SENSOR;
+            event.sensor.type = SENSOR_TYPE_COMPASS;
+            event.sensor.values[0] = heading.magneticHeading;
+            Base::gEventQueue.putSafe(event);
+        }
+    });
+
+    [locationManager startUpdatingHeading];
+    isCompassRunning = TRUE;
+    dispatch_resume(compassManagerTimer);
+
+	return SENSOR_ERROR_NONE;
 }
 
 /**
@@ -435,14 +472,12 @@
 {
 	if(isCompassRunning)
     {
-		[compassManagerTimer invalidate];
-        [compassManagerTimer release];
-        compassManagerTimer = nil;
+        isCompassRunning = FALSE;
+        dispatch_suspend(compassManagerTimer);
         if(!isMagnetometerSensorRunning)
         {
             [locationManager stopUpdatingHeading];
         }
-		isCompassRunning = FALSE;
 	}
     else
     {
@@ -465,7 +500,8 @@
 -(int) getUpdateIntervalFromRate:(const int) rate
 {
     int returnValue = 0;
-	switch (rate) {
+	switch (rate)
+    {
 		case SENSOR_RATE_FASTEST:
 			returnValue = SENSOR_RATE_FASTEST_IOS;
 			break;
@@ -490,7 +526,8 @@
  * @param accelerometer The application's accelerometer object.
  * @param acceleration The most recent acceleration data.
  */
-- (void) accelerometer:(UIAccelerometer *)accelerometer didAccelerate:(UIAcceleration *)acceleration {
+- (void) accelerometer:(UIAccelerometer *)accelerometer didAccelerate:(UIAcceleration *)acceleration
+{
 	MAEvent event;
 	event.type = EVENT_TYPE_SENSOR;
 	event.sensor.type = SENSOR_TYPE_ACCELEROMETER;
@@ -499,40 +536,23 @@
 	event.sensor.values[1] = acceleration.y;
 	event.sensor.values[2] = acceleration.z;
 
-	Base::gEventQueue.put(event);
-}
-
-/**
- * This method is invoked at a specified interval.
- * Sends events with gyro data.
- * @param timer Timer used for this call.
- */
-- (void)readGyroData:(NSTimer*) timer
-{
-    CMGyroData* gyroData = [motionManager gyroData];
-    if (gyroData)
-    {
-        CMRotationRate rotate = gyroData.rotationRate;
-        MAEvent event;
-        event.type = EVENT_TYPE_SENSOR;
-        event.sensor.type = SENSOR_TYPE_GYROSCOPE;
-        event.sensor.values[0] = rotate.x;
-        event.sensor.values[1] = rotate.y;
-        event.sensor.values[2] = rotate.z;
-        Base::gEventQueue.put(event);
-    }
+	Base::gEventQueue.putSafe(event);
 }
 
 /**
  * Delivers the latest data from proximity sensor.
  */
--(void)proximityChanged {
+-(void)proximityChanged
+{
 	UIDevice *device = [UIDevice currentDevice];
 
 	float sensorValue;
-	if([device proximityState]) {
+	if([device proximityState])
+    {
 		sensorValue = SENSOR_PROXIMITY_VALUE_NEAR;
-	} else {
+	}
+    else
+    {
 		sensorValue = SENSOR_PROXIMITY_VALUE_FAR;
 	}
 
@@ -540,13 +560,14 @@
 	event.type = EVENT_TYPE_SENSOR;
 	event.sensor.type = SENSOR_TYPE_PROXIMITY;
 	event.sensor.values[0] = sensorValue;
-	Base::gEventQueue.put(event);
+	Base::gEventQueue.putSafe(event);
 }
 
 /**
  * Delivers the latest data from orientation sensor.
  */
--(void)orientationChanged {
+-(void)orientationChanged
+{
 	UIDevice *device = [UIDevice currentDevice];
 	float sensorValue = [device orientation];
 
@@ -554,51 +575,14 @@
 	event.type = EVENT_TYPE_SENSOR;
 	event.sensor.type = SENSOR_TYPE_ORIENTATION;
 	event.sensor.values[0] = sensorValue;
-	Base::gEventQueue.put(event);
-}
-
-/**
- * This method is invoked at a specified interval.
- * Sends events with magnetometer data.
- * @param timer Timer used for this call.
- */
- - (void)readMagnetometerData:(NSTimer*) timer
-{
-    CLHeading* heading = [locationManager heading];
-    if (heading)
-    {
-        MAEvent event;
-        event.type = EVENT_TYPE_SENSOR;
-        event.sensor.type = SENSOR_TYPE_MAGNETIC_FIELD;
-        event.sensor.values[0] = heading.x;
-        event.sensor.values[1] = heading.y;
-        event.sensor.values[2] = heading.z;
-        Base::gEventQueue.put(event);
-    }
-}
-
-/**
- * This method is invoked at a specified interval.
- * Sends events with compass data.
- * @param timer Timer used for this call.
- */
-- (void)readCompassData:(NSTimer*) timer
-{
-    CLHeading* heading = [locationManager heading];
-    if (heading)
-    {
-        MAEvent event;
-        event.type = EVENT_TYPE_SENSOR;
-        event.sensor.type = SENSOR_TYPE_COMPASS;
-        event.sensor.values[0] = heading.magneticHeading;
-        Base::gEventQueue.put(event);
-    }
+	Base::gEventQueue.putSafe(event);
 }
 
 /**
  * Release all the objects.
  */
-- (void) dealloc {
+- (void) dealloc
+{
 	// stop all sensors
 	[self stopAccelerometer];
 	[self stopGyroscope];
@@ -607,12 +591,17 @@
 	[self stopMagnetometer];
     [self stopCompass];
 
-	[accelerometer release];
 	[motionManager release];
-	[operationQueue release];
 	[locationManager release];
 
+    dispatch_source_cancel(motionManagerTimer);
+    dispatch_source_cancel(locationManagerTimer);
+    dispatch_source_cancel(compassManagerTimer);
+    dispatch_release(motionManagerTimer);
+    dispatch_release(locationManagerTimer);
+    dispatch_release(compassManagerTimer);
+
 	[super dealloc];
- }
+}
 
 @end

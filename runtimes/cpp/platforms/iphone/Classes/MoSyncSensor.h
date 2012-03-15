@@ -36,12 +36,7 @@
     /**
      * Used a timer for reading gyro data at a given time interval.
      */
-    NSTimer* motionManagerTimer;
-
-    /**
-     * Used by the gyroscope sensor to process data.
-     */
-    NSOperationQueue *operationQueue;
+    dispatch_source_t motionManagerTimer;
 
     /**
      * Used to acces data from the magnetometer(compass) sensor.
@@ -53,14 +48,14 @@
      * Used a timer for reading location data at a given time interval.
      * This timer is used for the magnetic field sensor
      */
-    NSTimer* locationManagerTimer;
+    dispatch_source_t locationManagerTimer;
 
     /**
      * CLLocationManager does not offer a way of setting an update interval.
      * Used a timer for reading location data at a given time interval.
      * This timer is used for the compass sensor
      */
-    NSTimer* compassManagerTimer;
+    dispatch_source_t compassManagerTimer;
 
     /**
      * The flag is set is the proximity sensor is started.
@@ -190,12 +185,5 @@
  * if it's not one of the above constants.
  */
 -(int) getUpdateIntervalFromRate:(const int) rate;
-
-/**
- * Delivers the latest acceleration data.
- * @param accelerometer The application's accelerometer object.
- * @param acceleration The most recent acceleration data.
- */
-- (void) accelerometer:(UIAccelerometer *)accelerometer didAccelerate:(UIAcceleration *)acceleration;
 
 @end

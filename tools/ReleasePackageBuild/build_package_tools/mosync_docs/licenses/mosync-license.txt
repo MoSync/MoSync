@@ -10,7 +10,7 @@ Licenses for third party libraries and applications included in the software are
 
 apache-license-1.1.txt covers part of makesis-4.
 
-apache-license-2.0.txt covers the AMR decoder, gsm_amr, aapt, adb, AdbWinApi.dll, android-3.jar, android-4.jar, android-7.jar apkbuilder.jar, dx.jar, and Apache Commons Compress.
+apache-license-2.0.txt covers the AMR decoder, gsm_amr, aapt, adb, AdbWinApi.dll, android-3.jar, android-4.jar, android-7.jar apkbuilder.jar, dx.jar, PhoneGap, and Apache Commons Compress.
 
 expat-license.txt covers Expat.
 
@@ -44,3 +44,7 @@ iphonesim.txt covers iphoneSim from Jeff Haynie (jhaynie@appcelerator.com)
 
 iphone-apns was originally written by Oliver Pahl, who has given permission to use and modify the code:
 http://blog.toshsoft.de/index.php?/archives/3-Sending-Apple-Push-Notifications-APN-in-C-Updated-Using-CA-Cert.html
+
+microsoft-public-license.txt covers the WritableBitmapEx library and the silverlight toolkit
+
+The MoSync Advertising API makes use of Google AdMob code to load ads. For its terms of use, see: http://www.admob.com/home/terms.

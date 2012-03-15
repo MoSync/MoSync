@@ -113,6 +113,58 @@ namespace NativeUI
 	}
 
 	/**
+	 * Called just before the screen begins rotating.
+	 * Subclasses may override this method to perform additional actions
+	 * immediately prior to the rotation.
+	 */
+	void Screen::orientationWillChange()
+	{
+		// No implementation required.
+	}
+
+	/**
+	 * Called after the screen has finished rotating.
+	 * Subclasses may override this method to perform additional actions
+	 * after the rotation.
+	 */
+	 void Screen::orientationDidChange()
+	 {
+		// No implementation required
+	 }
+
+    /**
+     * This method is called when there is an event for this widget.
+     * It passes on the event to all widget's listeners.
+     * @param widgetEventData The data for the widget event.
+     */
+    void Screen::handleWidgetEvent(MAWidgetEventData* widgetEventData)
+    {
+        if (widgetEventData->eventType == MAW_EVENT_SCREEN_ORIENTATION_WILL_CHANGE)
+        {
+            this->orientationWillChange();
+        }
+		else if (widgetEventData->eventType == MAW_EVENT_SCREEN_ORIENTATION_DID_CHANGE)
+		{
+			this->orientationDidChange();
+		}
+		else if ( MAW_EVENT_OPTIONS_MENU_ITEM_SELECTED == widgetEventData->eventType )
+		{
+			for (int i=0; i < mScreenListeners.size(); i++)
+			{
+				mScreenListeners[i]->optionsMenuItemSelected(
+						this, widgetEventData->optionsMenuItem);
+			}
+		}
+		else if( MAW_EVENT_OPTIONS_MENU_CLOSED == widgetEventData->eventType )
+		{
+			for (int i=0; i < mScreenListeners.size(); i++)
+			{
+				mScreenListeners[i]->optionsMenuClosed(this);
+			}
+		}
+    }
+
+	/**
 	 * Add a new menu item to the Options Menu associated to this screen.
 	 * Option Menus are Android specific concept, so this function is
 	 * available only on this platform. The Options Menu is launched by
@@ -134,7 +186,8 @@ namespace NativeUI
 	 */
 	int Screen::addOptionsMenuItem(const MAUtil::String title, int iconId, bool iconPredefined)
 	{
-		return maWidgetScreenAddOptionsMenuItem(getWidgetHandle(), title.c_str(), iconId, (iconPredefined ? 1 : 0) );
+		return maWidgetScreenAddOptionsMenuItem(
+				getWidgetHandle(), title.c_str(), iconId, (iconPredefined ? 1 : 0) );
 	}
 
 	/**
@@ -165,29 +218,6 @@ namespace NativeUI
 		removeListenerFromVector(mScreenListeners, listener);
     }
 
-    /**
-     * This method is called when there is an event for this widget.
-     * It passes on the event to all widget's listeners.
-     * @param widgetEventData The data for the widget event.
-     */
-    void Screen::handleWidgetEvent(MAWidgetEventData* widgetEventData)
-    {
-		Widget::handleWidgetEvent(widgetEventData);
 
-		if ( MAW_EVENT_OPTIONS_MENU_ITEM_SELECTED == widgetEventData->eventType )
-		{
-			for (int i=0; i < mScreenListeners.size(); i++)
-			{
-				mScreenListeners[i]->optionsMenuItemSelected(this, widgetEventData->optionsMenuItem);
-			}
-		}
-		else if( MAW_EVENT_OPTIONS_MENU_CLOSED == widgetEventData->eventType )
-		{
-			for (int i=0; i < mScreenListeners.size(); i++)
-			{
-				mScreenListeners[i]->optionsMenuClosed(this);
-			}
-		}
-    }
 
 } // namespace NativeUI

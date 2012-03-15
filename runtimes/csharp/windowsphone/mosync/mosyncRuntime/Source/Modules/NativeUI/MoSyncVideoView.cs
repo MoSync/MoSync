@@ -16,7 +16,7 @@ MA 02110-1301, USA.
 */
 /**
  * @file MoSyncVideoView.cs
- * @author ovidel
+ * @author ovidel and Spiridon Alexandru
  *
  * @brief VideoView Widget implementation for the NativeUI
  *        component on Windows Phone 7, language C#
@@ -39,8 +39,9 @@ namespace MoSync
     {
 
         /**
-        * VideoView class defines the attributes and behavior of a "video player"
-        */
+         * VideoView class defines the attributes and behavior of a "video player" without any default
+         * visual interface.
+         */
         public class VideoView : WidgetBaseWindowsPhone
         {
             private MediaElement mMediaElement;
@@ -59,84 +60,104 @@ namespace MoSync
                  */
 
                 // MAW_VIDEO_VIEW_STATE_FINISHED
+                // called when the movie has finished the playback
                 mMediaElement.MediaEnded += new RoutedEventHandler(
                     delegate(object from, RoutedEventArgs args)
                     {
                         // post the event to MoSync runtime
-                        Memory eventData = new Memory(8);
-                        const int MAWidgetEventData_eventType = 0;
+                        Memory eventData = new Memory(12);
+                        // set the main event type: MAW_EVENT_VIDEO_STATE_CHANGED
+                        const int MAWidgetEventData_widgetEventType = 0;
                         const int MAWidgetEventData_widgetHandle = 4;
-                        eventData.WriteInt32(MAWidgetEventData_eventType, MoSync.Constants.MAW_VIDEO_VIEW_STATE_FINISHED);
+                        // set the banner event type: MAW_VIDEO_VIEW_STATE_FINISHED
+                        const int MAWidgetEventData_eventType = 8;
+                        eventData.WriteInt32(MAWidgetEventData_widgetEventType, MoSync.Constants.MAW_EVENT_VIDEO_STATE_CHANGED);
                         eventData.WriteInt32(MAWidgetEventData_widgetHandle, mHandle);
+                        eventData.WriteInt32(MAWidgetEventData_eventType, MoSync.Constants.MAW_VIDEO_VIEW_STATE_FINISHED);
                         mRuntime.PostCustomEvent(MoSync.Constants.EVENT_TYPE_WIDGET, eventData);
                     }
                 ); // end of mMediaElement.MediaEnded
 
-                 // MAW_VIDEO_VIEW_STATE_SOURCE_READY
-                 mMediaElement.MediaOpened += new RoutedEventHandler(
-                    delegate(object from, RoutedEventArgs args)
-                    {
-                        // post the event to MoSync runtime
-                        Memory eventData = new Memory(8);
-                        const int MAWidgetEventData_eventType = 0;
-                        const int MAWidgetEventData_widgetHandle = 4;
-                        eventData.WriteInt32(MAWidgetEventData_eventType, MoSync.Constants.MAW_VIDEO_VIEW_STATE_SOURCE_READY);
-                        eventData.WriteInt32(MAWidgetEventData_widgetHandle, mHandle);
-                        mRuntime.PostCustomEvent(MoSync.Constants.EVENT_TYPE_WIDGET, eventData);
-                    }
-                ); // end of mMediaElement.MediaOpened
+                // MAW_VIDEO_VIEW_STATE_SOURCE_READY
+                // called when the media stream has been validated and opened, and the file headers have been read
+                mMediaElement.MediaOpened += new RoutedEventHandler(
+                   delegate(object from, RoutedEventArgs args)
+                   {
+                       Memory eventData = new Memory(12);
+                       // set the main event type: MAW_EVENT_VIDEO_STATE_CHANGED
+                       const int MAWidgetEventData_widgetEventType = 0;
+                       const int MAWidgetEventData_widgetHandle = 4;
+                       // set the banner event type: MAW_VIDEO_VIEW_STATE_SOURCE_READY
+                       const int MAWidgetEventData_eventType = 8;
+                       eventData.WriteInt32(MAWidgetEventData_widgetEventType, MoSync.Constants.MAW_EVENT_VIDEO_STATE_CHANGED);
+                       eventData.WriteInt32(MAWidgetEventData_widgetHandle, mHandle);
+                       eventData.WriteInt32(MAWidgetEventData_eventType, MoSync.Constants.MAW_VIDEO_VIEW_STATE_SOURCE_READY);
+                       mRuntime.PostCustomEvent(MoSync.Constants.EVENT_TYPE_WIDGET, eventData);
+                   }
+               ); // end of mMediaElement.MediaOpened
 
-                 // MAW_VIDEO_VIEW_STATE_INTERRUPTED
-                 mMediaElement.MediaFailed += new EventHandler<ExceptionRoutedEventArgs>(
-                    delegate(object from, ExceptionRoutedEventArgs args)
-                    {
-                        // post the event to MoSync runtime
-                        Memory eventData = new Memory(8);
-                        const int MAWidgetEventData_eventType = 0;
-                        const int MAWidgetEventData_widgetHandle = 4;
-                        eventData.WriteInt32(MAWidgetEventData_eventType, MoSync.Constants.MAW_VIDEO_VIEW_STATE_INTERRUPTED);
-                        eventData.WriteInt32(MAWidgetEventData_widgetHandle, mHandle);
-                        mRuntime.PostCustomEvent(MoSync.Constants.EVENT_TYPE_WIDGET, eventData);
-                    }
-                ); // end of mMediaElement.MediaFailed
+                // MAW_VIDEO_VIEW_STATE_INTERRUPTED
+                // called when there is an error associated with the media source.
+                mMediaElement.MediaFailed += new EventHandler<ExceptionRoutedEventArgs>(
+                   delegate(object from, ExceptionRoutedEventArgs args)
+                   {
+                       // post the event to MoSync runtime
+                       Memory eventData = new Memory(12);
+                       // set the main event type: MAW_EVENT_VIDEO_STATE_CHANGED
+                       const int MAWidgetEventData_widgetEventType = 0;
+                       const int MAWidgetEventData_widgetHandle = 4;
+                       // set the banner event type: MAW_VIDEO_VIEW_STATE_INTERRUPTED
+                       const int MAWidgetEventData_eventType = 8;
+                       eventData.WriteInt32(MAWidgetEventData_widgetEventType, MoSync.Constants.MAW_EVENT_VIDEO_STATE_CHANGED);
+                       eventData.WriteInt32(MAWidgetEventData_widgetHandle, mHandle);
+                       eventData.WriteInt32(MAWidgetEventData_eventType, MoSync.Constants.MAW_VIDEO_VIEW_STATE_INTERRUPTED);
+                       mRuntime.PostCustomEvent(MoSync.Constants.EVENT_TYPE_WIDGET, eventData);
+                   }
+               ); // end of mMediaElement.MediaFailed
             }
-
-
-            /**
-             * Property for setting the url to a video file.
-             * set: a String containing the url to the video file.
-             */
-            [MoSyncWidgetProperty(MoSync.Constants.MAW_VIDEO_VIEW_URL)]
-            public String url
-            {
-                set
-                {
-                    setURI(value);
-                }
-            }
-
 
             /**
              * Property for setting the path to a local video file.
              * set: a String containing the path to the video file.
              */
             [MoSyncWidgetProperty(MoSync.Constants.MAW_VIDEO_VIEW_PATH)]
-            public String path
+            public String Path
             {
                 set
                 {
-                    setURI(value);
+                    Uri mediaUri;
+                    // we try to create the uri from the string passed to the setter
+                    if (Uri.TryCreate(value, UriKind.Relative, out mediaUri))
+                    {
+                        mMediaElement.Source = mediaUri;
+                    }
                 }
             }
 
-
+            /**
+             * Property for setting the url to a video file.
+             * set: a String containing the url to the video file.
+             */
+            [MoSyncWidgetProperty(MoSync.Constants.MAW_VIDEO_VIEW_URL)]
+            public String Url
+            {
+                set
+                {
+                    Uri mediaUri;
+                    // we try to create the uri from the string passed to the setter
+                    if (Uri.TryCreate(value, UriKind.Absolute, out mediaUri))
+                    {
+                        mMediaElement.Source = mediaUri;
+                    }
+                }
+            }
 
             /**
              * Property for controlling the playback of a video file.
              * set: an int describing the action to be taken.
              */
             [MoSyncWidgetProperty(MoSync.Constants.MAW_VIDEO_VIEW_ACTION)]
-            public int action
+            public int Action
             {
                 set
                 {
@@ -158,56 +179,72 @@ namespace MoSync
 
             /**
              * Property for moving the playing head.
-             * set: an int representing the milliseconds from the beggining of the video.
+             * set: an int representing the milliseconds from the beginning of the video.
              */
             [MoSyncWidgetProperty(MoSync.Constants.MAW_VIDEO_VIEW_SEEK_TO)]
-            public int seekTo
+            public int SeekTo
             {
                 set
                 {
-                    // go to desired position
+                    // go to desired position if seeking is possible and if
+                    // the current position to be set is valid (is not greater than the duration of the media)
+                    if (mMediaElement.CanSeek && value < mMediaElement.NaturalDuration.TimeSpan.TotalMilliseconds)
+                    {
+                        mMediaElement.Position = TimeSpan.FromMilliseconds(value);
+                    }
                 }
             }
 
-
             /**
              * Property for getting the duration of the current video
-             * get: an int representing video's duration in seconds
+             * get: an int representing video's duration in milliseconds
              */
             [MoSyncWidgetProperty(MoSync.Constants.MAW_VIDEO_VIEW_DURATION)]
-            public int duration
+            public int Duration
             {
                 get
                 {
                     int myDuration = 0;
                     if (null != mMediaElement.Source)
                     {
-                        // get duration
+                        // get duration and then transform it into milliseconds
+                        Duration currentMediaDuration = mMediaElement.NaturalDuration;
+                        myDuration = (int)currentMediaDuration.TimeSpan.TotalMilliseconds;
                     }
 
                     return myDuration;
                 }
             }
 
-
             /**
-             * Property for setting the action type to be appliede .
-             * set: a String containing the path to the video file.
+             * Property for getting the buffer percentage of the current video
+             * get: an int representing video's buffered percentage
              */
-            [MoSyncWidgetProperty(MoSync.Constants.MAW_VIDEO_VIEW_PATH)]
-            public String Path
+            [MoSyncWidgetProperty(MoSync.Constants.MAW_VIDEO_VIEW_BUFFER_PERCENTAGE)]
+            public int BufferPercentage
             {
-                set
+                get
                 {
-                    setURI(value);
+                    // the BufferingProgress returns a double value from the interval [0,1]
+                    // by multiplying this value with 100 we get the buffered percentage
+                    int bufferPercentage = (int)(mMediaElement.BufferingProgress * 100);
+                    return bufferPercentage;
                 }
             }
 
-
-            // helper method for setting the video's URI
-            private void setURI(String myURI)
+            /**
+             * Property for getting the current position in time of the current video
+             * get: an int representing video's current position in time (measured in seconds)
+             */
+            [MoSyncWidgetProperty(MoSync.Constants.MAW_VIDEO_VIEW_CURRENT_POSITION)]
+            public int CurrentPosition
             {
-                // set video here
+                get
+                {
+                    // get the current position in seconds
+                    int seconds = (int)mMediaElement.Position.TotalSeconds;
+                    return seconds;
+                }
             }
 
             // play the video and MAW_VIDEO_VIEW_STATE_PLAYING
@@ -216,28 +253,39 @@ namespace MoSync
                 // play it
                 mMediaElement.Play();
 
-                // post the playing event
-                Memory eventData = new Memory(8);
-                const int MAWidgetEventData_eventType = 0;
+                // post the event to MoSync runtime
+                Memory eventData = new Memory(12);
+                // set the main event type: MAW_EVENT_VIDEO_STATE_CHANGED
+                const int MAWidgetEventData_widgetEventType = 0;
                 const int MAWidgetEventData_widgetHandle = 4;
-                eventData.WriteInt32(MAWidgetEventData_eventType, MoSync.Constants.MAW_VIDEO_VIEW_STATE_PLAYING);
+                // set the banner event type: MAW_VIDEO_VIEW_STATE_PLAYING
+                const int MAWidgetEventData_eventType = 8;
+                eventData.WriteInt32(MAWidgetEventData_widgetEventType, MoSync.Constants.MAW_EVENT_VIDEO_STATE_CHANGED);
                 eventData.WriteInt32(MAWidgetEventData_widgetHandle, mHandle);
+                eventData.WriteInt32(MAWidgetEventData_eventType, MoSync.Constants.MAW_VIDEO_VIEW_STATE_PLAYING);
                 mRuntime.PostCustomEvent(MoSync.Constants.EVENT_TYPE_WIDGET, eventData);
             }
 
             // pause the video and MAW_VIDEO_VIEW_STATE_PAUSED
             private void pauseVideo()
             {
-                // tea break
-                mMediaElement.Pause();
+                if (mMediaElement.CanPause)
+                {
+                    // tea break
+                    mMediaElement.Pause();
 
-                // announce the event
-                Memory eventData = new Memory(8);
-                const int MAWidgetEventData_eventType = 0;
-                const int MAWidgetEventData_widgetHandle = 4;
-                eventData.WriteInt32(MAWidgetEventData_eventType, MoSync.Constants.MAW_VIDEO_VIEW_STATE_PAUSED);
-                eventData.WriteInt32(MAWidgetEventData_widgetHandle, mHandle);
-                mRuntime.PostCustomEvent(MoSync.Constants.EVENT_TYPE_WIDGET, eventData);
+                    // post the event to MoSync runtime
+                    Memory eventData = new Memory(12);
+                    // set the main event type: MAW_EVENT_VIDEO_STATE_CHANGED
+                    const int MAWidgetEventData_widgetEventType = 0;
+                    const int MAWidgetEventData_widgetHandle = 4;
+                    // set the banner event type: MAW_VIDEO_VIEW_STATE_PAUSED
+                    const int MAWidgetEventData_eventType = 8;
+                    eventData.WriteInt32(MAWidgetEventData_widgetEventType, MoSync.Constants.MAW_EVENT_VIDEO_STATE_CHANGED);
+                    eventData.WriteInt32(MAWidgetEventData_widgetHandle, mHandle);
+                    eventData.WriteInt32(MAWidgetEventData_eventType, MoSync.Constants.MAW_VIDEO_VIEW_STATE_PAUSED);
+                    mRuntime.PostCustomEvent(MoSync.Constants.EVENT_TYPE_WIDGET, eventData);
+                }
             }
 
             // stop the video and MAW_VIDEO_VIEW_STATE_STOPPED
@@ -246,12 +294,16 @@ namespace MoSync
                 // stop it
                 mMediaElement.Stop();
 
-                // announce the event
-                Memory eventData = new Memory(8);
-                const int MAWidgetEventData_eventType = 0;
+                // post the event to MoSync runtime
+                Memory eventData = new Memory(12);
+                // set the main event type: MAW_EVENT_VIDEO_STATE_CHANGED
+                const int MAWidgetEventData_widgetEventType = 0;
                 const int MAWidgetEventData_widgetHandle = 4;
-                eventData.WriteInt32(MAWidgetEventData_eventType, MoSync.Constants.MAW_VIDEO_VIEW_STATE_STOPPED);
+                // set the banner event type: MAW_VIDEO_VIEW_STATE_STOPPED
+                const int MAWidgetEventData_eventType = 8;
+                eventData.WriteInt32(MAWidgetEventData_widgetEventType, MoSync.Constants.MAW_EVENT_VIDEO_STATE_CHANGED);
                 eventData.WriteInt32(MAWidgetEventData_widgetHandle, mHandle);
+                eventData.WriteInt32(MAWidgetEventData_eventType, MoSync.Constants.MAW_VIDEO_VIEW_STATE_STOPPED);
                 mRuntime.PostCustomEvent(MoSync.Constants.EVENT_TYPE_WIDGET, eventData);
             }
 
@@ -269,9 +321,7 @@ namespace MoSync
                 }
             }
 
-
             // Utility
-
             public event PropertyChangedEventHandler PropertyChanged;
 
             private void NotifyPropertyChanged(String info)

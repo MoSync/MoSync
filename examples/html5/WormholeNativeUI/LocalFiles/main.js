@@ -103,9 +103,16 @@ function toggleGeolocation()
 		var options = {};
 		options.frequency = 1000;
 		geolocationWatch = navigator.geolocation.watchPosition(
-			updateGeolocation, function(ex) {
-				alert("geolocation fail (" + ex.name + ": " + ex.message + ")");
-			}, options);
+			// Success function.
+			updateGeolocation,
+			// Error function.
+			function(ex) {
+				var data = document.getNativeElementById("LocLat");
+				data.setProperty("text" , "Latitude: n/a");
+				data = document.getNativeElementById("LocLong");
+				data.setProperty("text" , "Longtitude: n/a");
+			},
+			options);
 	}
 }
 
@@ -113,8 +120,7 @@ function updateGeolocation(a)
 {
 	var data = document.getNativeElementById("LocLat");
 	data.setProperty("text" , "Latitude: " + a.coords.latitude);
-
-	var data = document.getNativeElementById("LocLong");
+	data = document.getNativeElementById("LocLong");
 	data.setProperty("text" , "Longtitude: " + a.coords.longitude);
 }
 
@@ -134,14 +140,21 @@ function toggleCompass()
 		var options = {};
 		options.frequency = 1000;
 		compassWatch = navigator.compass.watchHeading(
-			updateCompass, function(ex) {
-				alert("compass fail (" + ex.name + ": " + ex.message + ")");
-			}, options);
+			// Success function.
+			updateCompass,
+			// Error function.
+			function(ex) {
+				var data = document.getNativeElementById("CompassLabel");
+				data.setProperty(
+					"text",
+					"Compass error: " + ex.name + ": " + ex.message);
+			},
+			options);
 	}
 }
 
 function updateCompass(a)
 {
 	var data = document.getNativeElementById("CompassLabel");
-	data.setProperty("text" , "Compass Heading: " +  a.magneticHeading);
+	data.setProperty("text", "Compass Heading: " +  a.magneticHeading);
 }
