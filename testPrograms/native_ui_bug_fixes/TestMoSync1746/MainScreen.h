@@ -17,14 +17,15 @@ MA 02110-1301, USA.
 */
 
 /**
- * @file MainScreen.h.
- * @author Bogdan Iusco.
+ * @file ScreenContacts.h
+ * @author emma.
  */
 
 #ifndef MAINSCREEN_H_
 #define MAINSCREEN_H_
 
 #include <maapi.h>
+
 #include <MAUtil/util.h>
 
 // Include all the wrappers.
@@ -32,9 +33,11 @@ MA 02110-1301, USA.
 
 using namespace NativeUI;
 
+/**
+ * Class that creates a screen that displays all the contacts.
+ */
 class MainScreen:
-	public Screen,
-	public GLViewListener
+	public Screen
 {
 
 public:
@@ -55,20 +58,14 @@ private:
 	 */
 	void createMainLayout();
 
-    /**
-     * This method is called when the GL view has been initialized
-     * and is ready for setup.
-     * @param glView The GL view object that generated the event.
-     */
-    virtual void glViewReady(GLView* glView);
-
 private:
 	/**
 	 * Main layout.
 	 */
 	VerticalLayout* mMainLayout;
+	VerticalLayout* mLayout;
 
-	GLView* mGLView;
+	Label* mLabel;
 };
 
 

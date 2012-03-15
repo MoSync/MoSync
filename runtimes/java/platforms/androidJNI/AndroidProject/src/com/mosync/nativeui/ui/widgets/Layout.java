@@ -31,7 +31,7 @@ import com.mosync.nativeui.util.properties.PropertyConversionException;
 /**
  * This subclass of Widget represents the behavior of a Widget
  * that can layout other widgets.
- * 
+ *
  * @author fmattias
  */
 public class Layout extends Widget
@@ -44,11 +44,11 @@ public class Layout extends Widget
 	List<Widget> m_children = new ArrayList<Widget>( );
 	ScrollView m_scrollview = null;
 	boolean m_scrollable = false;
-	
+
 
 	/**
 	 * Constructor.
-	 * 
+	 *
 	 * @param handle handle Integer handle corresponding to this instance.
 	 * @param view A layout wrapped by this widget.
 	 */
@@ -56,18 +56,18 @@ public class Layout extends Widget
 	{
 		super( handle, view );
 	}
-	
-	public void setIsScrollable(boolean s) 
+
+	public void setIsScrollable(boolean s)
 	{
 		if(m_scrollable == s) return;
-		
+
 		m_scrollable = s;
-		
-		if(s == true) 
-		{	
+
+		if(s == true)
+		{
 			m_scrollview = new ScrollView( getView( ).getContext() );
 			Widget w = getParent();
-			if(w != null) 
+			if(w != null)
 			{
 				ViewGroup g = (ViewGroup) w.getView( );
 
@@ -82,18 +82,18 @@ public class Layout extends Widget
 					}
 				}
 			}
-			
-			m_scrollview.addView( getView( ) );	
-		} 
+
+			m_scrollview.addView( getView( ) );
+		}
 		else
 		{
 			m_scrollview.removeView( getView( ) );
-			
+
 			Widget w = getParent();
-			if(w != null) 
+			if(w != null)
 			{
 				ViewGroup g = (ViewGroup) w.getView( );
-				
+
 				for(int i = 0; i < g.getChildCount( ); i++)
 				{
 					View v = g.getChildAt( i );
@@ -102,15 +102,24 @@ public class Layout extends Widget
 						g.addView( getView( ) , i );
 						break;
 					}
-				}		
+				}
 			}
 		}
 	}
-	
+
+	/**
+	 * Check if the current layout is scrollable.
+	 * @return True if scrollable.
+	 */
+	public boolean isScrollable()
+	{
+		return m_scrollable;
+	}
+
 	/**
 	 * Adds a child to this layout at the given position. By
 	 * default the view will be added to the wrapped ViewGroup.
-	 * 
+	 *
 	 * @param child The child to be added.
 	 * @param index The index where to add the child. The child will have
 	 *        this index after it has been added, the index starts at 0. If
@@ -146,22 +155,22 @@ public class Layout extends Widget
 
 	/**
 	 * Returns the children of this layout.
-	 * 
+	 *
 	 * Note: Modifications to the returned list of children will
 	 * not affect the layout.
-	 * 
+	 *
 	 * @return a list of children for this layout.
 	 */
 	public List<Widget> getChildren()
 	{
 		return new ArrayList<Widget>( m_children );
 	}
-	
+
 	/**
 	 * Updates the Android layout params for the given child, according
 	 * to the parameters specified in the child. Only the parameters that
 	 * are supported for the layout will be taken into consideration.
-	 * 
+	 *
 	 * @param child The child for which to update the layout params.
 	 */
 	public void updateLayoutParamsForChild(Widget child)
@@ -169,25 +178,34 @@ public class Layout extends Widget
 		// Set layout params for the child
 		ViewGroup.LayoutParams nativeLayoutParams = createNativeLayoutParams( child.getLayoutParams( ) );
 		LayoutParamsSetter.setPossibleParams( child.getLayoutParams( ), nativeLayoutParams );
-		
+
 		View childView = child.getView();
-		
-		childView.setLayoutParams( nativeLayoutParams );
-		
+
 		View rootView = child.getRootView();
 		if( childView != rootView )
 		{
-			rootView.setLayoutParams( new ViewGroup.LayoutParams( nativeLayoutParams.width, nativeLayoutParams.height ) );
+			if ( child instanceof Layout )
+			{
+				if ( !((Layout) child).isScrollable() )
+				{
+					rootView.setLayoutParams(
+							new ViewGroup.LayoutParams( nativeLayoutParams.width, nativeLayoutParams.height ) );
+				}
+			}
+		}
+		else
+		{
+			childView.setLayoutParams( nativeLayoutParams );
 		}
 	}
-	
+
 	/**
 	 * Removes a child form this layout, by default
 	 * the view of the child is removed from the wrapped
 	 * ViewGroup.
-	 * 
+	 *
 	 * The child's parent will be set to null.
-	 * 
+	 *
 	 * @param child
 	 */
 	public void removeChild(Widget child)
@@ -197,18 +215,18 @@ public class Layout extends Widget
 		ViewGroup layout = getView( );
 		layout.removeView( child.getRootView( ) );
 	}
-	
+
 	/**
 	 * Updates the layout params for the given child
 	 * to those suitable for this layout.
-	 * 
+	 *
 	 * @param mosyncLayoutParams The mosync layout params to create a specific layout params for.
 	 */
 	public ViewGroup.LayoutParams createNativeLayoutParams(LayoutParams mosyncLayoutParams)
 	{
 		return new ViewGroup.LayoutParams( mosyncLayoutParams.getWidth( ), mosyncLayoutParams.getHeight( ) );
 	}
-	
+
 	/**
 	 * @see Widget.isLayout.
 	 */
@@ -216,7 +234,7 @@ public class Layout extends Widget
 	{
 		return true;
 	}
-	
+
 	/**
 	 * @see Widget.getView.
 	 */
@@ -226,24 +244,24 @@ public class Layout extends Widget
 		// ViewGroup is a covariant return type to View
 		return (ViewGroup) super.getView( );
 	}
-	
+
 	/**
 	 * @see Widget.getView.
 	 */
-	@Override	 
+	@Override
 	public ViewGroup getRootView()
 	{
-		if(m_scrollable == true) 
+		if(m_scrollable == true)
 		{
 			// ViewGroup is a covariant return type to View
 			return (ViewGroup) m_scrollview;
-		} 
-		else 
+		}
+		else
 		{
-			return (ViewGroup) super.getView( );			
+			return (ViewGroup) super.getView( );
 		}
 	}
-	
+
 	@Override
 	public boolean setProperty(String property, String value)
 			throws PropertyConversionException, InvalidPropertyValueException
@@ -252,8 +270,8 @@ public class Layout extends Widget
 		{
 			return true;
 		}
-		
-		if( property.equals( "isScrollable" ) ) 
+
+		if( property.equals( "isScrollable" ) )
 		{
 			this.setIsScrollable( value.equals( "true" ) );
 		}
@@ -261,7 +279,7 @@ public class Layout extends Widget
 		{
 			return false;
 		}
-		
+
 		return true;
 	}
 }
