@@ -6164,7 +6164,7 @@ group WidgetAPI "Widget API" {
 		*
 		* @par Example
 		* \code
-		*	maWidgetSetProperty(verticalLayoutHandle, MAW_VERTICA_LAYOUT_SCROLLABLE, "true");
+		*	maWidgetSetProperty(verticalLayoutHandle, MAW_VERTICAL_LAYOUT_SCROLLABLE, "true");
 		* \endcode
 		*/
 		SCROLLABLE = "scrollable";
@@ -6270,7 +6270,7 @@ group WidgetAPI "Widget API" {
 		*
 		* @par Example
 		* \code
-		*	maWidgetSetProperty(verticalLayoutHandle, MAW_VERTICA_LAYOUT_SCROLLABLE, "true");
+		*	maWidgetSetProperty(verticalLayoutHandle, MAW_VERTICAL_LAYOUT_SCROLLABLE, "true");
 		* \endcode
 		*/
 		SCROLLABLE = "scrollable";
