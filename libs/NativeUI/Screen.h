@@ -68,7 +68,7 @@ namespace NativeUI
 		 * tab indicator.
 		 * @param title The screen title.
 		 */
-		virtual void setTitle(const MAUtil::String& title);
+		void setTitle(const MAUtil::String& title);
 
 		/**
 		 * Set the icon of the screen. The icon is displayed
@@ -77,7 +77,7 @@ namespace NativeUI
 		 * @param imageHandle Handle to an image with the icon.
 		 * @return The result code.
 		 */
-		virtual int setIcon(const MAHandle imageHandle);
+		int setIcon(const MAHandle imageHandle);
 
 		/**
 		 * Set the main widget of the screen.
@@ -93,7 +93,7 @@ namespace NativeUI
 		 * - #MAW_RES_INVALID_LAYOUT if the widget was added to a non-layout.
 		 * - #MAW_RES_ERROR if it could not be added for some other reason.
 		 */
-		virtual int setMainWidget(Widget* widget);
+		int setMainWidget(Widget* widget);
 
 		/**
 		 * Show a screen. Only one screen at a time is visible.
@@ -102,7 +102,7 @@ namespace NativeUI
 		 */
 		virtual void show();
 
-		/**
+		/**		 * Called just before the screen begins rotating.		 * Subclasses may override this method to perform additional actions		 * immediately prior to the rotation.		 */		virtual void orientationWillChange();		/**		 * Called after the screen has finished rotating.		 * Subclasses may override this method to perform additional actions		 * after the rotation.		 */		virtual void orientationDidChange();		/**
 		 * Add a new menu item to the Options Menu associated to this screen.
 		 * Option Menus are Android specific concept, so this function is
 		 * available only on this platform. The Options Menu is launched by

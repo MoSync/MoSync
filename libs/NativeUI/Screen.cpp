@@ -112,7 +112,7 @@ namespace NativeUI
 		maWidgetScreenShow(getWidgetHandle());
 	}
 
-	/**
+	/**	 * Called just before the screen begins rotating.	 * Subclasses may override this method to perform additional actions	 * immediately prior to the rotation.	 */	void Screen::orientationWillChange()	{		// No implementation required.	}	/**
 	 * Add a new menu item to the Options Menu associated to this screen.
 	 * Option Menus are Android specific concept, so this function is
 	 * available only on this platform. The Options Menu is launched by

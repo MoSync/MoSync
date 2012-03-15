@@ -160,11 +160,17 @@ private:
 	Button* mPlay;
 	Button* mPause;
 	Button* mStop;
+	Button *mSeek;
 
 	/**
 	 * Label that displays video total duration.
 	 */
 	Label* mDuration;
+
+	/**
+	 * Label that displays debug information
+	 */
+	Label* mDebugInfo;
 
 	/**
 	 *  Edit box for setting the uri or local path.

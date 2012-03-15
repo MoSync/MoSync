@@ -65,23 +65,25 @@ namespace MoSync
                 mSlider.ValueChanged += new RoutedPropertyChangedEventHandler<double>(
                     delegate(Object from, RoutedPropertyChangedEventArgs<double> arg)
                     {
-                        ////click event needs a memory chunk of 12 bytes
-                        Memory eventData = new Memory(12);
+                        mProgressValue = (Int32)arg.NewValue;
+                        if (mProgressValue != (Int32)arg.OldValue)
+                        {
+                            ////click event needs a memory chunk of 12 bytes
+                            Memory eventData = new Memory(12);
 
-                        //starting with the 0 Byte we write the eventType
-                        const int MAWidgetEventData_eventType = 0;
-                        //starting with the 4 Byte we write the sliderValue
-                        const int MAWidgetEventData_sliderValue = 4;
-                        //starting with the 8 Byte we write the widgetHandle
-                        const int MAWidgetEventData_widgetHandle = 8;
+                            //starting with the 0 Byte we write the eventType
+                            const int MAWidgetEventData_eventType = 0;
+                            //starting with the 4 Byte we write the widgetHandle
+                            const int MAWidgetEventData_widgetHandle = 4;
+                            //starting with the 8 Byte we write the sliderValue
+                            const int MAWidgetEventData_sliderValue = 8;
 
-                        mProgressValue = ((Int32)arg.NewValue);
-
-                        eventData.WriteInt32(MAWidgetEventData_eventType, MoSync.Constants.MAW_EVENT_SLIDER_VALUE_CHANGED);
-                        eventData.WriteInt32(MAWidgetEventData_sliderValue, mProgressValue);
-                        eventData.WriteInt32(MAWidgetEventData_widgetHandle, mHandle);
-                        //posting a CustomEvent
-                        mRuntime.PostCustomEvent(MoSync.Constants.EVENT_TYPE_WIDGET, eventData);
+                            eventData.WriteInt32(MAWidgetEventData_eventType, MoSync.Constants.MAW_EVENT_SLIDER_VALUE_CHANGED);
+                            eventData.WriteInt32(MAWidgetEventData_widgetHandle, mHandle);
+                            eventData.WriteInt32(MAWidgetEventData_sliderValue, mProgressValue);
+                            //posting a CustomEvent
+                            mRuntime.PostCustomEvent(MoSync.Constants.EVENT_TYPE_WIDGET, eventData);
+                        }
                     });
             }
 

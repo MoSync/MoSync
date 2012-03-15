@@ -26,6 +26,11 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include <jni.h>
 #include <GLES/gl.h>
+
+// we only expose the GL_OES_FRAMEBUFFER_OBJECT extension for now.
+#define GL_GLEXT_PROTOTYPES
+#include <GLES/glext.h>
+
 #ifndef _android_1
 #include <GLES2/gl2.h>
 #endif
@@ -34,7 +39,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "helpers/CPP_IX_OPENGL_ES.h"
 #include "helpers/CPP_IX_GL1.h"
 #include "helpers/CPP_IX_GL2.h"
-//#include "helpers/CPP_IX_GL_OES_FRAMEBUFFER_OBJECT.h"
+#include "helpers/CPP_IX_GL_OES_FRAMEBUFFER_OBJECT.h"
 #include "helpers/CPP_IX_PIM.h"
 #include "helpers/CPP_IX_CELLID.h"
 
@@ -1323,7 +1328,7 @@ namespace Base
 #ifndef _android_1
 		maIOCtl_IX_GL2_caselist
 #endif
-	//	maIOCtl_IX_GL_OES_FRAMEBUFFER_OBJECT_caselist
+		maIOCtl_IX_GL_OES_FRAMEBUFFER_OBJECT_caselist
 
 		case maIOCtl_maWriteLog:
 			SYSLOG("maIOCtl_maWriteLog");

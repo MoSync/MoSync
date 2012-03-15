@@ -124,7 +124,7 @@ MAKE_UIWRAPPER_LAYOUTING_IMPLEMENTATION(MoSync, HLayoutView)
 			int viewHeight = childView.frame.size.height; 
 
 			if([child getAutoSizeParamX] == FILL_PARENT) {
-				viewWidth = view.frame.size.width - totalHorizontalMargin;
+				viewWidth = view.bounds.size.width - totalHorizontalMargin;
 			}
 			else if([child getAutoSizeParamX] == WRAP_CONTENT) {
 				viewWidth = [childView sizeThatFits:CGSizeZero].width;
@@ -169,7 +169,7 @@ MAKE_UIWRAPPER_LAYOUTING_IMPLEMENTATION(MoSync, HLayoutView)
 			int viewWidth = childView.frame.size.width; 
 			
 			if([child getAutoSizeParamY] == FILL_PARENT) {
-				viewHeight = view.frame.size.height - totalVerticalMargin;
+				viewHeight = view.bounds.size.height - totalVerticalMargin;
 			}
 			else if([child getAutoSizeParamY] == WRAP_CONTENT) {
 				viewHeight = [childView sizeThatFits:CGSizeZero].height;

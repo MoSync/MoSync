@@ -165,13 +165,13 @@ void SettingsScreen::createMainLayout()
 void SettingsScreen::setDefaultHomepage()
 {
 	// Default urls depending on the platform.
-	if ( isAndroid() )
+	if (isAndroid())
 	{
 		mHomeUrl->setText(HOME_URL_ANDROID);
 	}
 	else
 	{
-		mHomeUrl->setText(HOME_URL_IOS);
+		mHomeUrl->setText(HOME_URL_WINDOWSPHONE);
 	}
 }
 
