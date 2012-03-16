@@ -655,7 +655,7 @@ class GL : GLConstants
 		mCurrentMatrix = GLMatrixMode.MODELVIEW;
 		 */
 		mCurrentVertexPointer.clientStateEnabled = false;
-		mCurrentNormalPointer.clientStateEnabled = false;		
+		mCurrentNormalPointer.clientStateEnabled = false;
 		for (int i = 0; i < GL.GL_MAX_TEXTURE_UNITS; i++)
 			mCurrentTexCoordPointer[0].clientStateEnabled = false;
 		mCurrentColorPointer.clientStateEnabled = false;
@@ -2293,7 +2293,7 @@ class GL : GLConstants
 			}
 
 			Texture2D t = (Texture2D)mTextures[mCurrentBoundTexture];
-	
+
 			int bytesPerPixel;
 			SurfaceFormat surfaceFormat;
 
