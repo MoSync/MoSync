@@ -113,6 +113,9 @@ public class EventQueue
 	 */
 	public void postWidgetTabChangedEvent(int tabScreen, int newTabIndex)
 	{
+		// Save the current tab screen.
+		sMoSyncThread.setCurrentScreen(tabScreen);
+
 		postWidgetEvent(
 			IX_WIDGET.MAW_EVENT_TAB_CHANGED,
 			tabScreen,
@@ -231,6 +234,90 @@ public class EventQueue
 		event[1] = IX_WIDGET.MAW_EVENT_VIDEO_STATE_CHANGED;
 		event[2] = widgetHandle;
 		event[3] = state;
+
+		sMoSyncThread.postEvent(event);
+	}
+	/**
+	 * Sends the rating set by a user in a Rating Bar view.
+	 * @param widgetHandle The rating bar that sends the event.
+	 * @param rating The number of stars filled.
+	 * @param fromUser The author of the change event.
+	 */
+	public void postRatingBarChanged(int widgetHandle, float rating, int fromUser)
+	{
+		int event[] = new int[5];
+
+		event[0] = EVENT_TYPE_WIDGET;
+		event[1] = IX_WIDGET.MAW_EVENT_RATING_BAR_VALUE_CHANGED;
+		event[2] = widgetHandle;
+		event[3] = Float.floatToIntBits(rating);
+		event[4] = fromUser;
+
+		sMoSyncThread.postEvent(event);
+	}
+
+	/**
+	 * Sends the radio button handle when a selection is made.
+	 * @param widgethandle The radio group.
+	 * @param itemHandle The radio button.
+	 */
+	public void postRadioGroupItemSelected(int widgetHandle, int itemHandle)
+	{
+		int event[] = new int[4];
+
+		event[0] = EVENT_TYPE_WIDGET;
+		event[1] = IX_WIDGET.MAW_EVENT_RADIO_GROUP_ITEM_SELECTED;
+		event[2] = widgetHandle;
+		event[3] = itemHandle;
+
+		sMoSyncThread.postEvent(event);
+	}
+
+	/**
+	 * Sends the radio button state.
+	 * @param widgethandle The radio button that sends the event.
+	 * @param checked The new state of the button.
+	 */
+	public void postRadioButtonStateChanged(int widgetHandle, boolean checked)
+	{
+		int event[] = new int[4];
+
+		event[0] = EVENT_TYPE_WIDGET;
+		event[1] = IX_WIDGET.MAW_EVENT_RADIO_BUTTON_STATE_CHANGED;
+		event[2] = widgetHandle;
+		event[3] = checked ? 1 : 0;
+
+		sMoSyncThread.postEvent(event);
+	}
+
+	/**
+	 * Sends the Option Menu item selected event.
+	 * @param widgetHandle The screen widget handle.
+	 * @param index The menu item index.
+	 */
+	public void postOptionsMenuItemSelected(int widgetHandle, int index)
+	{
+		int event[] = new int[4];
+
+		event[0] = EVENT_TYPE_WIDGET;
+		event[1] = IX_WIDGET.MAW_EVENT_OPTIONS_MENU_ITEM_SELECTED;
+		event[2] = widgetHandle;
+		event[3] = index;
+
+		sMoSyncThread.postEvent(event);
+	}
+
+	/**
+	 * Sends the Option menu closed event.
+	 * @param widgetHandle The screen widget handle.
+	 */
+	public void postOptionsMenuClosed(int widgetHandle)
+	{
+		int event[] = new int[3];
+
+		event[0] = EVENT_TYPE_WIDGET;
+		event[1] = IX_WIDGET.MAW_EVENT_OPTIONS_MENU_CLOSED;
+		event[2] = widgetHandle;
 
 		sMoSyncThread.postEvent(event);
 	}

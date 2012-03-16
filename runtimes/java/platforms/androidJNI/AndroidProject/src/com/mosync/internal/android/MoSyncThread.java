@@ -100,6 +100,7 @@ import android.os.Vibrator;
 import android.telephony.TelephonyManager;
 import android.telephony.gsm.GsmCellLocation;
 import android.util.Log;
+import android.view.View;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.FrameLayout;
@@ -116,6 +117,8 @@ import com.mosync.java.android.MoSyncPanicDialog;
 import com.mosync.java.android.MoSyncService;
 import com.mosync.java.android.TextBox;
 import com.mosync.nativeui.ui.widgets.MoSyncCameraPreview;
+import com.mosync.nativeui.ui.widgets.ScreenWidget;
+import com.mosync.nativeui.ui.widgets.Widget;
 import com.mosync.nativeui.util.AsyncWait;
 
 /**
@@ -3904,6 +3907,40 @@ public class MoSyncThread extends Thread
 			widgetHandle, key, memBuffer, memBufferSize);
 	}
 
+	/**
+	 * Add an item to the Options Menu associated to a screen.
+	 * @param widgetHandle The screen handle.
+	 * @param title The title associated for the new item. Can be left null.
+	 * @param iconHandle MoSync handle to an uncompressed image resource,or:
+	 * a predefined Android icon.
+	 * @param iconPredefined Specifies if the icon is a project resource, or one of
+	 * the predefined Android icons. By default it's value is 0.
+	 * @return The index on which the menu item was added in the options menu,
+	 * or an error code otherwise.
+	 */
+	public int maWidgetScreenAddOptionsMenuItem(
+			final int widgetHandle,
+			final String title,
+			final int iconHandle,
+			final int iconPredefined)
+	{
+		return mMoSyncNativeUI.maWidgetScreenAddOptionsMenuItem(
+				widgetHandle, title, iconHandle, iconPredefined);
+	}
+
+	/**
+	 * Get the focused  screen.
+	 * @return The screen widget handle.
+	 */
+	public ScreenWidget getCurrentScreen()
+	{
+		return mMoSyncNativeUI.getCurrentScreen();
+	}
+
+	public void setCurrentScreen(int handle)
+	{
+		mMoSyncNativeUI.setCurrentScreen(handle);
+	}
 	/**
 	 * Internal wrapper for maWidgetStackScreenPush that runs
 	 * the call in the UI thread.

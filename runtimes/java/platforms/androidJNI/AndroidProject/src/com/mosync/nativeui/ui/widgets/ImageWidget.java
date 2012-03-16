@@ -19,7 +19,6 @@ package com.mosync.nativeui.ui.widgets;
 
 import android.graphics.Bitmap;
 import android.widget.ImageView;
-import android.widget.VideoView;
 
 import com.mosync.internal.generated.IX_WIDGET;
 import com.mosync.nativeui.core.NativeUI;

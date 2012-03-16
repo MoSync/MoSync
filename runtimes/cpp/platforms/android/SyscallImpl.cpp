@@ -1801,6 +1801,13 @@ namespace Base
 			return _maWidgetGetProperty((int)gCore->mem_ds, _widget, _property, _valueBuffer, _valueBufferSize, mJNIEnv, mJThis);
 		}
 
+		case maIOCtl_maWidgetScreenAddOptionsMenuItem:
+		{
+			SYSLOG("maIOCtl_maWidgetScreenAddOptionsMenuItem");
+			int _iconPredefined = SYSCALL_THIS->GetValidatedStackValue(0);
+			return _maWidgetScreenAddOptionsMenuItem(a, SYSCALL_THIS->GetValidatedStr(b), c, _iconPredefined, mJNIEnv, mJThis);
+		}
+
 		case maIOCtl_maWidgetScreenShow:
 			SYSLOG("maIOCtl_maWidgetScreenShow");
 			return _maWidgetScreenShow(a, mJNIEnv, mJThis);

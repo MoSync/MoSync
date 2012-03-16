@@ -120,8 +120,10 @@ private:
 	Button* mPause;
 	Button* mStop;
 	Button* mGetDuration;
+	Label* mDuration;
 	Button* mSeekTo;
 	Button* mCurrentTime;
+	Label*  mTime;
 
 	/**
 	 * Show/hide video control.
