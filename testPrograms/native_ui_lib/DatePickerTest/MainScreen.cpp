@@ -55,6 +55,13 @@ MainScreen::MainScreen() :
 	mGetMaxDate->addButtonListener(this);
 	mSetMinDate->addButtonListener(this);
 	mGetMinDate->addButtonListener(this);
+
+	mYearValueMaxDate->addEditBoxListener(this);
+	mMonthValueMaxDate->addEditBoxListener(this);
+	mDayValueMaxDate->addEditBoxListener(this);
+	mYearValueMinDate->addEditBoxListener(this);
+	mMonthValueMinDate->addEditBoxListener(this);
+	mDayValueMinDate->addEditBoxListener(this);
 }
 
 /**
@@ -68,6 +75,13 @@ MainScreen::~MainScreen()
     mGetMaxDate->removeButtonListener(this);
     mSetMinDate->removeButtonListener(this);
     mGetMinDate->removeButtonListener(this);
+
+	mYearValueMaxDate->removeEditBoxListener(this);
+	mMonthValueMaxDate->removeEditBoxListener(this);
+	mDayValueMaxDate->removeEditBoxListener(this);
+	mYearValueMinDate->removeEditBoxListener(this);
+	mMonthValueMinDate->removeEditBoxListener(this);
+	mDayValueMinDate->removeEditBoxListener(this);
 }
 
 /**
@@ -75,9 +89,11 @@ MainScreen::~MainScreen()
  */
 void MainScreen::createMainLayout() {
 	setTitle("Date Picker Test");
+
 	// Create and add the main layout to the screen.
-	mList = new ListView();
-	Screen::setMainWidget(mList);
+	mList = new VerticalLayout();
+	mPropertiesLayout = new RelativeLayout();
+	mPropertiesLayout->setScrollable(true);
 
 	mDatePicker = new DatePicker();
 	mDatePicker->fillSpaceHorizontally();
@@ -97,13 +113,18 @@ void MainScreen::createMainLayout() {
 	CreateMaxDateLayout();
 	CreateMinDateLayout();
 
-	mList->addChild(mMaxDateLayout);
-	mList->addChild(mMinDateLayout);
+	mPropertiesLayout->addChild(mMaxDateLayout);
+	mPropertiesLayout->addChild(mMinDateLayout);
+	mList->addChild(mPropertiesLayout);
+
+	Screen::setMainWidget(mList);
 }
 
 void MainScreen::CreateMaxDateLayout()
 {
 	mMaxDateLayout = new VerticalLayout();
+	mMaxDateLayout->setTopPosition(0);
+	mMaxDateLayout->setHeight(500);
 
 	mYearLabelMaxDate = new Label();
 	mYearLabelMaxDate->setText("MaxDate year:");
@@ -139,8 +160,6 @@ void MainScreen::CreateMaxDateLayout()
 	mGetMaxDateValue->setText("MaxDate:");
 	mGetMaxDateValue->fillSpaceHorizontally();
 
-	mMaxDateLayout->fillSpaceHorizontally();
-
 	mMaxDateLayout->addChild(mYearLabelMaxDate);
 	mMaxDateLayout->addChild(mYearValueMaxDate);
 	mMaxDateLayout->addChild(mMonthLabelMaxDate);
@@ -155,6 +174,8 @@ void MainScreen::CreateMaxDateLayout()
 void MainScreen::CreateMinDateLayout()
 {
 	mMinDateLayout = new VerticalLayout();
+	mMinDateLayout->setTopPosition(500);
+	mMinDateLayout->setHeight(500);
 
 	mYearLabelMinDate = new Label();
 	mYearLabelMinDate->setText("MinDate year:");
@@ -189,8 +210,6 @@ void MainScreen::CreateMinDateLayout()
     mGetMinDateValue = new Label();
     mGetMinDateValue->setText("MinDate:");
     mGetMinDateValue->fillSpaceHorizontally();
-
-	mMaxDateLayout->fillSpaceHorizontally();
 
 	mMinDateLayout->addChild(mYearLabelMinDate);
 	mMinDateLayout->addChild(mYearValueMinDate);
@@ -254,7 +273,6 @@ void MainScreen::buttonClicked(Widget* button)
 			date.year = atoi(mYearValueMaxDate->getText().c_str());
 			date.month = atoi(mMonthValueMaxDate->getText().c_str());
 			date.day = atoi(mDayValueMaxDate->getText().c_str());
-
 			mDatePicker->setMaxDate(date);
 		}
 		else
@@ -295,4 +313,15 @@ void MainScreen::buttonClicked(Widget* button)
 		MAUtil::integerToString(theDate.month) + "-" + MAUtil::integerToString(theDate.year));
         printf("get min date : %d-%d-%d", theDate.day, theDate.month, theDate.year);
     }
+}
+
+/**
+ * This method is called when the return button was pressed.
+ * On iphone platform the virtual keyboard is not hidden after
+ * receiving this event.
+ * @param editBox The edit box object that generated the event.
+ */
+void MainScreen::editBoxReturn(EditBox* editBox)
+{
+	editBox->hideKeyboard();
 }

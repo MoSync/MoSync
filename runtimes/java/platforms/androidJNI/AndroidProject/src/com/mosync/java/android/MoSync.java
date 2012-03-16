@@ -62,6 +62,7 @@ import android.view.Window;
 import com.mosync.internal.android.EventQueue;
 import com.mosync.internal.android.Mediator;
 import com.mosync.internal.android.MoSyncCapture;
+import com.mosync.internal.android.MoSyncImagePicker;
 import com.mosync.internal.android.MoSyncMultiTouchHandler;
 import com.mosync.internal.android.MoSyncSingleTouchHandler;
 import com.mosync.internal.android.MoSyncThread;
@@ -81,6 +82,18 @@ import com.mosync.nativeui.ui.widgets.ScreenWidget;
  */
 public class MoSync extends Activity
 {
+	/**
+	 * Activity request codes for Camera intent.
+	 */
+	public static final int CAPTURE_MODE_RECORD_VIDEO_REQUEST = 0;
+	public static final int CAPTURE_MODE_STOP_RECORDING_REQUEST = 1;
+	public static final int CAPTURE_MODE_TAKE_PICTURE_REQUEST = 2;
+
+	/**
+	 * Activity request code for Gallery intent.
+	 */
+	public static final int PICK_IMAGE_REQUEST = 3;
+
 	private MoSyncThread mMoSyncThread;
 	private MoSyncView mMoSyncView;
 	//private Intent mMoSyncServiceIntent;
@@ -382,7 +395,7 @@ public class MoSync extends Activity
 	/**
 	 * This method is called when we get a result from a sub-activity.
 	 * Specifically, it is used to get the result of a Bluetooth enable dialog,
-	 * or to get the results for capture API.
+	 * the capture API, or from the imagePicker.
 	 */
 	@Override
 	protected void onActivityResult(
@@ -396,24 +409,35 @@ public class MoSync extends Activity
 			Mediator.getInstance().postBluetoothDialogClosedMessage();
 		}
 		else if ( resultCode == RESULT_OK &&
-				requestCode == MoSyncCapture.CAPTURE_MODE_RECORD_VIDEO_REQUEST )
+				requestCode == CAPTURE_MODE_RECORD_VIDEO_REQUEST )
 		{
 			Log.e("@@MoSync","Capture ready, control returned to MoSync activity.");
 			// A video was recorded.
 			MoSyncCapture.handleVideo(data);
 		}
 		else if ( resultCode == RESULT_OK &&
-				requestCode == MoSyncCapture.CAPTURE_MODE_TAKE_PICTURE_REQUEST )
+				requestCode == CAPTURE_MODE_TAKE_PICTURE_REQUEST )
 		{
 			Log.e("@@MoSync","Capture ready, control returned to MoSync activity.");
 			// A picture was taken.
 			MoSyncCapture.handlePicture(data);
 		}
-		else if ( resultCode == RESULT_CANCELED )
+		else if ( resultCode == RESULT_CANCELED &&
+				(requestCode == CAPTURE_MODE_TAKE_PICTURE_REQUEST || requestCode == CAPTURE_MODE_RECORD_VIDEO_REQUEST) )
 		{
 			Log.e("@@MoSync","Capture canceled, control returned to MoSync activity.");
 			// Send MoSync event: the capture was canceled by the user.
 			MoSyncCapture.handleCaptureCanceled();
+		}
+		else if ( resultCode == RESULT_OK &&
+				requestCode == PICK_IMAGE_REQUEST )
+		{
+			MoSyncImagePicker.handleSelectedPicture(data);
+		}
+		else if ( resultCode == RESULT_CANCELED &&
+				requestCode == PICK_IMAGE_REQUEST )
+		{
+			MoSyncImagePicker.handleCancelSelectPicture();
 		}
 	}
 

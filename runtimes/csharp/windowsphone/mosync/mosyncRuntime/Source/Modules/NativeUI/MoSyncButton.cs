@@ -117,22 +117,17 @@ namespace MoSync
                         mTextHorizontalAlignment = HorizontalAlignment.Left;
                         mButton.HorizontalContentAlignment = mTextHorizontalAlignment;
                     }
-                    else
+                    else if (value.Equals(MoSync.Constants.MAW_ALIGNMENT_RIGHT))
                     {
-                        if (value.Equals(MoSync.Constants.MAW_ALIGNMENT_RIGHT))
-                        {
-                            mTextHorizontalAlignment = HorizontalAlignment.Right;
-                            mButton.HorizontalContentAlignment = mTextHorizontalAlignment;
-                        }
-                        else
-                        {
-                            if (value.Equals(MoSync.Constants.MAW_ALIGNMENT_CENTER))
-                            {
-                                mTextHorizontalAlignment = HorizontalAlignment.Center;
-                                mButton.HorizontalContentAlignment = mTextHorizontalAlignment;
-                            }
-                        }
+                        mTextHorizontalAlignment = HorizontalAlignment.Right;
+                        mButton.HorizontalContentAlignment = mTextHorizontalAlignment;
                     }
+                    else if (value.Equals(MoSync.Constants.MAW_ALIGNMENT_CENTER))
+                    {
+                        mTextHorizontalAlignment = HorizontalAlignment.Center;
+                        mButton.HorizontalContentAlignment = mTextHorizontalAlignment;
+                    }
+                    else throw new InvalidPropertyValueException();
                 }
             }
 
@@ -149,22 +144,17 @@ namespace MoSync
                         mTextVerticalAlignment = VerticalAlignment.Top;
                         mButton.VerticalContentAlignment = mTextVerticalAlignment;
                     }
-                    else
+                    else if (value.Equals(MoSync.Constants.MAW_ALIGNMENT_BOTTOM))
                     {
-                        if (value.Equals(MoSync.Constants.MAW_ALIGNMENT_BOTTOM))
-                        {
-                            mTextVerticalAlignment = VerticalAlignment.Bottom;
-                            mButton.VerticalContentAlignment = mTextVerticalAlignment;
-                        }
-                        else
-                        {
-                            if (value.Equals(MoSync.Constants.MAW_ALIGNMENT_CENTER))
-                            {
-                                mTextVerticalAlignment = VerticalAlignment.Center;
-                                mButton.VerticalContentAlignment = mTextVerticalAlignment;
-                            }
-                        }
+                        mTextVerticalAlignment = VerticalAlignment.Bottom;
+                        mButton.VerticalContentAlignment = mTextVerticalAlignment;
                     }
+                    else if (value.Equals(MoSync.Constants.MAW_ALIGNMENT_CENTER))
+                    {
+                        mTextVerticalAlignment = VerticalAlignment.Center;
+                        mButton.VerticalContentAlignment = mTextVerticalAlignment;
+                    }
+                    else throw new InvalidPropertyValueException();
                 }
             }
 
@@ -186,15 +176,11 @@ namespace MoSync
              * MAW_BUTTON_FONT_SIZE property implementation
              */
             [MoSyncWidgetProperty(MoSync.Constants.MAW_BUTTON_FONT_SIZE)]
-            public String FontSize
+            public double FontSize
             {
                 set
                 {
-                    double size;
-                    if (double.TryParse(value, out size))
-                    {
-                        mButton.FontSize = size;
-                    }
+                    mButton.FontSize = value;
                 }
             }
         }
