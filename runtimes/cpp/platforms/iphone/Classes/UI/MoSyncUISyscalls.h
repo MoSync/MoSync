@@ -34,6 +34,8 @@ MoSyncUI* getMoSyncUI();
 
 MAWidgetHandle maWidgetCreate(const char *widgetType);
 
+int maWidgetScreenAddOptionsMenuItem(MAWidgetHandle widget, const char * title, int iconHandle, int iconPredefined);
+
 int maWidgetSetProperty(MAWidgetHandle handle, const char *property, const char* value);
 
 int maWidgetGetProperty(MAWidgetHandle handle, const char *property, char *value, int maxSize);
