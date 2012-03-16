@@ -35,12 +35,15 @@ MA 02110-1301, USA.
 #include <NativeUI/Widgets.h>
 
 using namespace NativeUI;
+using namespace MAUtil;
 
 class VideoScreen:
 	public Screen,
 	public VideoViewListener,
 	public EditBoxListener,
-	public ButtonListener
+	public ButtonListener,
+	public TimerListener,
+	public SliderListener
 {
 
 public:
@@ -132,6 +135,23 @@ private:
      * @param editBox The edit box object that generated the event.
      */
     virtual void editBoxReturn(EditBox* editBox);
+
+    /**
+     * Method called when the timer ticks.
+     */
+    virtual void runTimerEvent();
+
+    /**
+	 * This method is called when the value of the slider was modified by
+	 * the user.
+	 * @param slider The slider object that generated the event.
+	 * @param sliderValue The new slider's value.
+	 */
+	virtual void sliderValueChanged(
+		Slider* slider,
+		const int sliderValue);
+
+	void resetSlider();
 private:
 	/**
 	 * Main layout.
@@ -160,7 +180,6 @@ private:
 	Button* mPlay;
 	Button* mPause;
 	Button* mStop;
-	Button *mSeek;
 
 	/**
 	 * Label that displays video total duration.
@@ -168,9 +187,9 @@ private:
 	Label* mDuration;
 
 	/**
-	 * Label that displays debug information
+	 * Label that displays the buffering progress.
 	 */
-	Label* mDebugInfo;
+	Label* mBufferingProgress;
 
 	/**
 	 *  Edit box for setting the uri or local path.
@@ -186,6 +205,12 @@ private:
 
 	VerticalLayout* mMiddleSpacerLayout;
 	VerticalLayout* mSpacerBottomLayout;
+
+	/**
+	 * The slider is used to select the second number that will be used by the
+	 * VideoView seek method.
+	 */
+	Slider* mSeekSlider;
 };
 
 #endif /* NATIVESCREEN_H_ */

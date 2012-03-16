@@ -72,6 +72,18 @@ int getScreenHeight();
 bool isAndroid();
 
 /**
+ * Detects if the current platform is iOS.
+ * @return true if the platform is iOS, false otherwise.
+ */
+bool isIOS();
+
+/**
+ * Detects if the current platform is Windows Phone.
+ * @return true if the platform is Windows Phone, false otherwise.
+ */
+bool isWindowsPhone();
+
+/**
  * Converts milliseconds value into a more readable output.
  * @param milliseconds An int.
  * @return A string in the form: HH::MM::SS.

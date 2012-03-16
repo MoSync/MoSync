@@ -169,9 +169,13 @@ void SettingsScreen::setDefaultHomepage()
 	{
 		mHomeUrl->setText(HOME_URL_ANDROID);
 	}
-	else
+	else if (isWindowsPhone())
 	{
 		mHomeUrl->setText(HOME_URL_WINDOWSPHONE);
+	}
+	else if (isIOS())
+	{
+		mHomeUrl->setText(HOME_URL_IOS);
 	}
 }
 
