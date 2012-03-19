@@ -180,7 +180,16 @@
 
 - (NSString*)getPropertyWithKey: (NSString*)key {
 	if([key isEqualToString:@MAW_EDIT_BOX_TEXT]) {
-		return [textField.text retain];
+        NSString* text;
+        if (textField.text)
+        {
+            text = [[NSString alloc] initWithString:textField.text];
+        }
+        else
+        {
+            text = [[NSString alloc] initWithString:@""];
+        }
+		return text;
 	}
     else if ([key isEqualToString:@MAW_EDIT_BOX_MAX_LENGTH])
     {

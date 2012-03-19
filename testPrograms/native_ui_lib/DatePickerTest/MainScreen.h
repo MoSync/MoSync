@@ -36,6 +36,7 @@ using namespace NativeUI;
 class MainScreen:
 	public Screen,
 	public DatePickerListener,
+	public EditBoxListener,
 	private ButtonListener
 {
 
@@ -89,6 +90,14 @@ private:
      */
     virtual void buttonClicked(Widget* button);
 
+    /**
+     * This method is called when the return button was pressed.
+     * On iphone platform the virtual keyboard is not hidden after
+     * receiving this event.
+     * @param editBox The edit box object that generated the event.
+     */
+    virtual void editBoxReturn(EditBox* editBox);
+
 private:
 	/**
 	 * Main layout.
@@ -97,6 +106,7 @@ private:
 
     VerticalLayout* mMaxDateLayout;
     VerticalLayout* mMinDateLayout;
+    RelativeLayout* mPropertiesLayout;
 
 	Button* mSetDate;
 	Button* mGetDate;
