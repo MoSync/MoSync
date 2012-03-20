@@ -63,6 +63,7 @@ void MainScreen::createMainLayout() {
 
 	mSearchBar = new SearchBar();
 	mSearchBar->fillSpaceHorizontally();
+	mSearchBar->setPlaceholder("search");
 	mMainLayout->addChild(mSearchBar);
 }
 
