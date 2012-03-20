@@ -40,6 +40,8 @@ namespace MoSync
     {
         /**
          * The SearchBar class defines the attributes and behavior of a Search bar widget.
+         * A search bar allows the user to input text and is used for filtering (a list for example)
+         * while the user types (no search/cancel buttons are present on this widget).
          */
         public class SearchBar : WidgetBaseWindowsPhone
         {
@@ -60,8 +62,8 @@ namespace MoSync
             protected bool mFirstChar;
 
             /**
-              * save the "normal" brush when working with the watermark
-              */
+             * save the "normal" brush when working with the watermark
+             */
             protected Brush mForegroundColor;
 
             /**
@@ -95,7 +97,6 @@ namespace MoSync
                 /**
                  * @brief Sent from the Search bar when it gains focus(the user selects the widget).
                  * The virtual keyboard is shown.
-                 *        MAW_EVENT_EDIT_BOX_EDITING_DID_BEGIN
                  */
                 mSearchBar.GotFocus += new RoutedEventHandler(
                     delegate(object from, RoutedEventArgs args)
@@ -103,6 +104,7 @@ namespace MoSync
                         /**
                           * simulating the placeholder/watermark
                           */
+
                         // if watermark present and no user char has been entered
                         if (mIsWatermarkMode && mFirstChar)
                         {
@@ -114,16 +116,16 @@ namespace MoSync
 
 
                 /**
-                  * @brief Sent from the Edit box when it loses focus.
-                  * The virtual keyboard is hidden.
-                  *        MAW_EVENT_EDIT_BOX_EDITING_DID_END
-                  */
+                 * @brief Sent from the Search bar when it loses focus.
+                 * The virtual keyboard is hidden.
+                 */
                 mSearchBar.LostFocus += new RoutedEventHandler(
                     delegate(object from, RoutedEventArgs args)
                     {
                         /**
                          * simulating the placeholder/watermark
                          */
+
                         // if no text has been entered by the user than leave the watermark text
                         if (mSearchBar.Text.Equals(""))
                         {
@@ -134,8 +136,11 @@ namespace MoSync
 
 
                 /**
-                  * @brief Sent from the Edit box when the text was changed.
-                  *        MAW_EVENT_EDIT_BOX_TEXT_CHANGED
+                  * @brief Sent from the Search bar when the text was changed.
+                  * As the search bar allows searching while the user types, this is
+                  * the place where we send the search event (the MAW_EVENT_CLICKED with
+                  * the search button click 0 (0 = OK, 1 = CANCEL).
+                  * The cancel search is not handled on the windows phone platform.
                   */
                 mFirstChar = true;
                 mSearchBar.TextInputStart += new TextCompositionEventHandler(
@@ -151,6 +156,7 @@ namespace MoSync
 
                         /**
                          * post the event to MoSync runtime
+                         * MAW_EVENT_CLICKED + search button clicked = 0 (0 = OK, 1 = CANCEL)
                          */
                         Memory eventData = new Memory(12);
                         const int MAWidgetEventData_eventType = 0;
@@ -166,7 +172,7 @@ namespace MoSync
 
 
             /**
-             * Property for setting and getting the text that the search bar contains.
+             * Property for setting and getting the text that the Search bar contains.
              */
             [MoSyncWidgetProperty(MoSync.Constants.MAW_SEARCH_BAR_TEXT)]
             public String Text
@@ -178,17 +184,14 @@ namespace MoSync
                     if (mIsWatermarkMode)
                     {
                         setWatermarkMode(false);
-                        mSearchBar.Text = value;
                     }
-                    else
-                    {
-                        mSearchBar.Text = value;
-                    }
+                    mSearchBar.Text = value;
                 }
                 get
                 {
                     if (mIsWatermarkMode)
                     {
+                        // if we're in watermark mode, the Search bar contains no text
                         return "";
                     }
                     return mSearchBar.Text;
@@ -197,11 +200,11 @@ namespace MoSync
 
 
             /**
-            * Property for setting the default text that the search bar will contain when first displayed.
-            *
-            * Since the Watermark is not yet implemented we use the solution suggested by MS
-            * (http://msdn.microsoft.com/en-us/library/system.windows.controls.textbox(v=vs.95).aspx)
-            */
+             * Property for setting the default text that the search bar will contain when first displayed.
+             *
+             * Since the Watermark is not yet implemented we use the solution suggested by MS
+             * (http://msdn.microsoft.com/en-us/library/system.windows.controls.textbox(v=vs.95).aspx)
+             */
             [MoSyncWidgetProperty(MoSync.Constants.MAW_SEARCH_BAR_PLACEHOLDER)]
             public String Placeholder
             {
@@ -220,9 +223,9 @@ namespace MoSync
              * Property for showing/hidding the keyboard
              * set: accepts a String containg the values "true" and "false"
              *
-             * Windows Phone 7 doesn't have a way to hide the keyboard
-             * other than setting focus to another control that doesn't accept input, thus hiding the keyboard;
-             **/
+             * Windows Phone 7 doesn't have a way to hide the keyboard other than setting focus to
+             * another control that doesn't accept input, thus hiding the keyboard.
+             */
             [MoSyncWidgetProperty(MoSync.Constants.MAW_SEARCH_BAR_SHOW_KEYBOARD)]
             public String ShowKeyboard
             {
