@@ -1,4 +1,4 @@
-﻿/* Copyright (C) 2011 MoSync AB
+﻿/* Copyright (C) 2012 MoSync AB
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License,
@@ -15,9 +15,10 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301, USA.
 */
 /**
- * @file EditBox.cs
+ * @file MoSyncEditBox.cs
  * @author Rata Gabriela
  *         ovidiu
+ *         Spiridon Alexandru
  *
  * @brief This represents the EditBox Widget implementation for the NativeUI
  *        component on Windows Phone 7, language C#
