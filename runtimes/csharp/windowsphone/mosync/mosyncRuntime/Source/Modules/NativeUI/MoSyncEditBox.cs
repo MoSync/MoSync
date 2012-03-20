@@ -384,6 +384,7 @@ namespace MoSync
                         {
                         }
                     }
+                    else throw new InvalidPropertyValueException();
                 }
             }
 
@@ -431,6 +432,8 @@ namespace MoSync
                             mEditBox.AcceptsReturn = false;
                             mEditBox.TextWrapping = TextWrapping.NoWrap;
                             break;
+                        default:
+                            throw new InvalidPropertyValueException();
                     }
                 }
             }
@@ -476,6 +479,8 @@ namespace MoSync
                         case 4:             //MAW_EDIT_BOX_FLAG_INITIAL_CAPS_ALL_CHARACTERS
                             setInputMode(System.Windows.Input.InputScopeNameValue.PersonalFullName);
                             break;
+                        default:
+                            throw new InvalidPropertyValueException();
                     }
                 }
             }
@@ -510,6 +515,7 @@ namespace MoSync
                         mPasswordBox.MaxLength = value;
                         mEditBox.MaxLength = value;
                     }
+                    else throw new InvalidPropertyValueException();
                 }
                 get
                 {

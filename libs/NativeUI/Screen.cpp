@@ -25,6 +25,7 @@ MA 02110-1301, USA.
  */
 
 #include "Screen.h"
+#include "ScreenListener.h"
 
 namespace NativeUI
 {
@@ -52,6 +53,7 @@ namespace NativeUI
 	 */
 	Screen::~Screen()
 	{
+		mScreenListeners.clear();
 	}
 
 	/**
@@ -145,5 +147,75 @@ namespace NativeUI
 		{
 			this->orientationDidChange();
 		}
+		else if ( MAW_EVENT_OPTIONS_MENU_ITEM_SELECTED == widgetEventData->eventType )
+		{
+			for (int i=0; i < mScreenListeners.size(); i++)
+			{
+				mScreenListeners[i]->optionsMenuItemSelected(
+						this, widgetEventData->optionsMenuItem);
+			}
+		}
+		else if( MAW_EVENT_OPTIONS_MENU_CLOSED == widgetEventData->eventType )
+		{
+			for (int i=0; i < mScreenListeners.size(); i++)
+			{
+				mScreenListeners[i]->optionsMenuClosed(this);
+			}
+		}
     }
+
+	/**
+	 * Add a new menu item to the Options Menu associated to this screen.
+	 * Option Menus are Android specific concept, so this function is
+	 * available only on this platform. The Options Menu is launched by
+	 * pressing the Menu key. The options menu is where you should include
+	 * actions and other options that are relevant to the current activity
+	 * context, such as "Search," "Compose email," or "Settings".
+	 * When opened, the first visible portion is the icon menu, which holds
+	 * up to six menu items. If your menu includes more than six items, Android
+	 * places the sixth item and the rest into the overflow menu, which the user
+	 * can open by selecting More. Those items do not display icons.
+	 * @param title The title associated for the new item. Can be left null.
+	 * @param iconId The resource ID of the icon which will be used to lazily
+	 * get the Drawable when this item is being shown. Can be set to -1 if
+	 * no icon needed.
+	 * @param iconPredefined Specifies if the icon is a project resource, or one
+	 * of the predefined Android icons. It is false by default.
+	 * @return The index on which the menu item was added in the options menu,
+	 * an error code otherwise.
+	 */
+	int Screen::addOptionsMenuItem(const MAUtil::String title, int iconId, bool iconPredefined)
+	{
+		return maWidgetScreenAddOptionsMenuItem(
+				getWidgetHandle(), title.c_str(), iconId, (iconPredefined ? 1 : 0) );
+	}
+
+	/**
+	 * Remove the options menu from this screen.
+	 * @return True if success, false otherwise ( for instance the options
+	 * menu has no content.
+	 */
+	void Screen::removeOptionsMenu()
+	{
+		setProperty(MAW_SCREEN_REMOVE_OPTIONS_MENU,"");
+	}
+
+    /**
+     * Add a screen event listener.
+     * @param listener The listener that will receive screen events.
+     */
+    void Screen::addScreenListener(ScreenListener* listener)
+    {
+		addListenerToVector(mScreenListeners, listener);
+    }
+
+    /**
+     * Remove the screen event listener.
+     * @param listener The listener that receives screen events.
+     */
+    void Screen::removeScreenListener(ScreenListener* listener)
+    {
+		removeListenerFromVector(mScreenListeners, listener);
+    }
+
 } // namespace NativeUI

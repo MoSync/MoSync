@@ -18,7 +18,7 @@ MA 02110-1301, USA.
 
 /**
  * @file MainScreen.h.
- * @author Bogdan Iusco.
+ * @author emma
  */
 
 #ifndef MAINSCREEN_H_
@@ -30,46 +30,50 @@ MA 02110-1301, USA.
 // Include all the wrappers.
 #include <NativeUI/Widgets.h>
 
+#include "FirstScreen.h"
+#include "SecondScreen.h"
+#include "ThirdScreen.h"
+
 using namespace NativeUI;
 
 class MainScreen:
-	public Screen,
-	public GLViewListener
+	public TabScreen,
+	public TabScreenListener
 {
 
 public:
 	/**
 	 * Constructor.
 	 */
-		MainScreen();
+	MainScreen();
 
 	/**
 	 * Destructor.
 	 */
 	~MainScreen();
 
-private:
+    /**
+     * This method is called when a tab screen has changed to a new tab.
+     * @param tabScreen The tab screen object that generated the event.
+     * @param tabScreenIndex The index of the new tab.
+     */
+    virtual void tabScreenTabChanged(
+        TabScreen* tabScreen,
+        const int tabScreenIndex);
 
 	/**
-	 * Creates and adds main layout to the screen.
+	 * Handle keypresses.
 	 */
-	void createMainLayout();
-
-    /**
-     * This method is called when the GL view has been initialized
-     * and is ready for setup.
-     * @param glView The GL view object that generated the event.
-     */
-    virtual void glViewReady(GLView* glView);
-
+	void handleKeyPress(int keyCode);
 private:
 	/**
 	 * Main layout.
 	 */
 	VerticalLayout* mMainLayout;
-
-	GLView* mGLView;
+	FirstScreen* mFirstScreen;
+	SecondScreen* mSecondScreen;
+	ThirdScreen* mThirdScreen;
+	int mCurrentTabIndex;
 };
-
 
 #endif /* MAINSCREEN_H_ */

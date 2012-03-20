@@ -96,15 +96,14 @@ namespace MoSync
                 set
                 {
                     bool checkedVal;
-                    
+
                     if (bool.TryParse(value, out checkedVal))
                     {
                         mToggleButton.IsChecked = checkedVal;
                     }
+                    else throw new InvalidPropertyValueException();
                 }
             }
-
-
         }
     }
 }

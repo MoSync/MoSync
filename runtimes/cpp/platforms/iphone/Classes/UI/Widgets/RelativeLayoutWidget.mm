@@ -65,7 +65,7 @@ MAKE_UIWRAPPER_LAYOUTING_IMPLEMENTATION(MoSync, UIScrollView)
 }
 
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value {
-	if([key isEqualToString:@"isScrollable"]) {
+	if([key isEqualToString:@MAW_RELATIVE_LAYOUT_SCROLLABLE]) {
 		MoSyncTouchEnabledScrollView* sv = (MoSyncTouchEnabledScrollView*)view;
         BOOL enabled =  [value boolValue];
 		sv.scrollEnabled = enabled;

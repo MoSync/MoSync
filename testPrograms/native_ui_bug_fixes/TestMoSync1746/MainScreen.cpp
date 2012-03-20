@@ -18,7 +18,7 @@
 
 /**
  * @file MainScreen.cpp
- * @author Bogdan Iusco.
+ * @author emma
  */
 
 #include <conprint.h>
@@ -36,11 +36,11 @@
 MainScreen::MainScreen() :
 	Screen(),
 	mMainLayout(NULL),
-	mGLView(NULL)
+	mLayout(NULL),
+	mLabel(NULL)
 {
 	createMainLayout();
 
-	mGLView->addGLViewListener(this);
 }
 
 /**
@@ -48,7 +48,6 @@ MainScreen::MainScreen() :
  */
 MainScreen::~MainScreen()
 {
-    mGLView->removeGLViewListener(this);
 }
 
 /**
@@ -57,23 +56,27 @@ MainScreen::~MainScreen()
 void MainScreen::createMainLayout() {
 	// Create and add the main layout to the screen.
 	mMainLayout = new VerticalLayout();
-	mMainLayout->setBackgroundColor(0xFF0000);
+	mMainLayout->setBackgroundColor(0x0000FF);
 	Screen::setMainWidget(mMainLayout);
 
-	mGLView = new GLView(MAW_GL_VIEW);
-	mGLView->fillSpaceHorizontally();
-	mGLView->fillSpaceVertically();
-	mMainLayout->addChild(mGLView);
-}
-/**
- * This method is called when the GL view has been initialized
- * and is ready for setup.
- * @param glView The GL view object that generated the event.
- */
-void MainScreen::glViewReady(GLView* glView)
-{
-    if (glView == mGLView)
-    {
-        printf("mGLView is initialized");
-    }
+	mLabel = new Label();
+	mLabel->setText("MainLayout is blue");
+	mMainLayout->addChild(mLabel);
+
+	mLayout = new VerticalLayout();
+	mLayout->setBackgroundColor(0xEE0000);
+
+	Label* info = new Label();
+	info->setText("The child layout is scrollable with multiple labels.");
+	mLayout->addChild(info);
+	for (int i=0; i < 30; i++)
+	{
+		Label* label = new Label();
+		label->setText("Label " + MAUtil::integerToString(i));
+		mLayout->addChild(label);
+	}
+
+	mLayout->setScrollable(true);
+	mMainLayout->addChild(mLayout);
+//	mLayout->setScrollable(true);
 }

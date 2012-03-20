@@ -17,10 +17,12 @@ MA 02110-1301, USA.
 
 package com.mosync.nativeui.ui.widgets;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.util.Log;
 import android.view.ViewGroup;
 
 import com.mosync.internal.generated.IX_WIDGET;
@@ -62,6 +64,12 @@ public class ScreenWidget extends Layout
 	private IconChangedListener m_iconChangedListener = null;
 
 	/**
+	 * The options menu items. Keep them, and when the menu button
+	 * is pressed check the current focused screen and get this array.
+	 */
+	private List<OptionsMenuItem> m_optionsItems = new ArrayList<OptionsMenuItem>();
+
+	/**
 	 * Constructor
 	 *
 	 * @param handle handle Integer handle corresponding to this instance.
@@ -70,6 +78,37 @@ public class ScreenWidget extends Layout
 	public ScreenWidget(int handle, ViewGroup view)
 	{
 		super( handle, view );
+	}
+
+	/**
+	 * Add an options menu item.
+	 * @param title The title for this item.
+	 * @param icon The icon drawable.
+	 * @return The new item index.
+	 */
+	public int addMenuItem(final String title, Drawable icon)
+	{
+		OptionsMenuItem item = new OptionsMenuItem(m_optionsItems.size(), title, icon);
+		m_optionsItems.add(item);
+		return m_optionsItems.size()-1;
+	}
+
+	/**
+	 * Add an options menu item.
+	 * @param title The title for this item.
+	 * @param icon The icon resource id.
+	 * @return The new item index.
+	 */
+	public int addMenuItem(final String title, int iconId)
+	{
+		OptionsMenuItem item = new OptionsMenuItem(m_optionsItems.size(), title, iconId);
+		m_optionsItems.add(item);
+		return m_optionsItems.size()-1;
+	}
+
+	public List<OptionsMenuItem> getMenuItems()
+	{
+		return m_optionsItems;
 	}
 
 	@Override
@@ -105,6 +144,10 @@ public class ScreenWidget extends Layout
 			{
 				throw new InvalidPropertyValueException( value, property );
 			}
+		}
+		else if( property.equals( IX_WIDGET.MAW_SCREEN_REMOVE_OPTIONS_MENU ) )
+		{
+			m_optionsItems.clear();
 		}
 		else
 		{

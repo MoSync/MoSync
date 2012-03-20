@@ -250,9 +250,13 @@ namespace MoSync
                     Type objType = mView.GetType();
                     if (objType.GetProperty("IsEnabled") != null)
                     {
-                        bool val = Boolean.Parse(value);
-                        var property = objType.GetProperty("IsEnabled");
-                        property.SetValue(mView, val, null);
+                        bool val;
+                        if (Boolean.TryParse(value, out val))
+                        {
+                            var property = objType.GetProperty("IsEnabled");
+                            property.SetValue(mView, val, null);
+                        }
+                        else throw new InvalidPropertyValueException();
                     }
                 }
                 get
@@ -275,21 +279,25 @@ namespace MoSync
             {
                 set
                 {
-                    bool val = Boolean.Parse(value);
-                    if(false == val)
-					{
-						mView.IsHitTestVisible = false;
-						mView.Opacity = 0.0;
-					}
-					else
-					{
-						mView.IsHitTestVisible = true;
-						mView.Opacity = 1.0;
-					}
+                    bool val;
+                    if (Boolean.TryParse(value, out val))
+                    {
+                        if (false == val)
+                        {
+                            mView.IsHitTestVisible = false;
+                            mView.Opacity = 0.0;
+                        }
+                        else
+                        {
+                            mView.IsHitTestVisible = true;
+                            mView.Opacity = 1.0;
+                        }
+                    }
+                    else throw new InvalidPropertyValueException();
 				}
 				get
 				{
-				if (false == mView.IsHitTestVisible)
+				    if (false == mView.IsHitTestVisible)
                     {
                         return "false";
                     }

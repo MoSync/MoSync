@@ -6,7 +6,7 @@ the Free Software Foundation.
 
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+or FITNESS FOR A PARTICULAR PURPOSE.  ee the GNU General Public License
 for more details.
 
 You should have received a copy of the GNU General Public License
@@ -2774,6 +2774,9 @@ interface MAAPI {
 		/**
 		* Values for the status field in the #EVENT_TYPE_SMS event.
 		* This event is sent on Android and iOS.
+		* Note: On iOS platforms the MA_SMS_RESULT_DELIVERED message corresponds
+		* To the SMS being successfully queued by the system. There is no way to
+		* know if it was actually delivered.
 		*/
 		constset int MA_SMS_RESULT_ {
 			/// The SMS was sent.
@@ -4295,6 +4298,35 @@ group WidgetAPI "Widget API" {
 			* Send by the OptionDialog view when a #EVENT_TYPE_OPTIONS_BOX_BUTTON_CLICKED event is received.
 			*/
 			int optionDialogButtonIndex;
+
+			struct {
+					/**
+					* The rating bar new value, when a #MAW_EVENT_RATING_BAR_VALUE_CHANGED event is received.
+					*/
+					float value;
+
+					/**
+					* The author that issued the event: the user, or programatically, when a
+					* #MAW_EVENT_RATING_BAR_VALUE_CHANGED event is received.
+					*/
+					int fromUser;
+			} ratingBarValueInfo;
+
+			/**
+			* The selected radio button from a radio group, when a #MAW_EVENT_RADIO_GROUP_ITEM_SELECTED event
+			* is received.
+			*/
+			int radioGroupItemHandle;
+
+			/**
+			* The new state of a radio button, when a #MAW_EVENT_RADIO_BUTTON_STATE_CHANGED event is received.
+			*/
+			int radioButtonState;
+
+			/**
+			*  The selected menu item handle, when a #MAW_EVENT_OPTIONS_MENU_ITEM_SELECTED event is received.
+			*/
+			int optionsMenuItem;
 		}
 	}
 
@@ -4455,6 +4487,32 @@ group WidgetAPI "Widget API" {
 		* Sent only from the Windows Phone 7.1 platform.
 		*/
 		SCREEN_ORIENTATION_DID_CHANGE = 24;
+
+		/**
+		* @brief Send when the value in a Rating Bar.
+		*/
+		RATING_BAR_VALUE_CHANGED = 25;
+
+		/**
+		* @brief Send when one of the radio buttons in a radio group is selected.
+		*/
+		RADIO_GROUP_ITEM_SELECTED = 26;
+
+		/**
+		* @brief Send when  the radio button state is changed.
+		*/
+		RADIO_BUTTON_STATE_CHANGED = 27;
+
+		/**
+		* @brief Send when the Options Menu is being closed (either by the user canceling
+		* the menu with the back/menu button, or when an item is selected).
+		*/
+		OPTIONS_MENU_CLOSED = 28;
+
+		/**
+		* @brief Send when an item in your options menu is selected.
+		*/
+		OPTIONS_MENU_ITEM_SELECTED = 29;
 	}
 
 	} // end of WidgetEventTypes
@@ -4819,7 +4877,7 @@ group WidgetAPI "Widget API" {
 		VERTICAL_LAYOUT = "VerticalLayout";
 
 		/**
-		 * @brief A relative layout is a layout that layouts widgets relative to its coordinate system.
+		 * @brief A relative layout is a layout that layouts widgets relative to its coordinate system. See \ref WidgetRelativeLayoutProperties "Relative layout properties" for the properties available.
 		 */
 		RELATIVE_LAYOUT = "RelativeLayout";
 
@@ -4937,9 +4995,86 @@ group WidgetAPI "Widget API" {
 		* See \ref WidgetPanoramaViewProperties "Panorama View properties" for the properties available
 		*/
 		PANORAMA_VIEW = "PanoramaView";
+
+		/**
+		* @brief A radio button available only on Android. A radio button can only have a #RADIO_GROUP parent.
+		* Checking one radio button that belongs to a radio group unchecks any previously checked radio button within the same group.
+		* Initially, all of the radio buttons are unchecked.
+		* While it is not possible to uncheck a particular radio button, the radio group can be cleared to remove the checked state.
+		* See \ref WidgetRadioButtonProperties "Radio Button properties" for the properties available.
+		*/
+		RADIO_BUTTON = "RadioButton";
+
+		/**
+		* \brief A radio group is available only on Android.
+		* This class is used to create a multiple-exclusion scope for a set of the \link #MAW_RADIO_BUTTON RADIO_BUTTONS \endlink .
+		* See \ref WidgetRadioGroupProperties "Radio Group properties" for the properties available.
+		*/
+		RADIO_GROUP = "RadioGroup";
+
+		/**
+		* @brief A RatingBar is an extension of Slider and ProgressBar that shows a rating in stars.
+		* The user can touch/drag or use arrow keys to set the rating when using the default size RatingBar.
+		* When using a RatingBar that supports user interaction, placing widgets to the left or right of the
+		* RatingBar is discouraged.
+		* See \ref WidgetRatingBarProperties "Rating Bar properties" for the properties available.
+		*/
+		RATING_BAR = "RatingBar";
+
 	}
 	} // end of WidgetTypes
 
+	/**
+	* The available constants for the Android predefined drawables used in OptionsMenu.
+	* The drawables can be set via #maWidgetScreenAddOptionsMenuItem syscall.
+	* The icons can be found here: http://androiddrawables.com/menu.html .
+	*/
+	group OptionsMenuIconConstants "Options menu icon constants" {
+	constset int MAW_OPTIONS_MENU_ICON_CONSTANT_ {
+		ADD = 17301555 ;
+		AGENDA = 17301556 ;
+		ALWAYS_LANDSCAPE_PORTRAIT = 17301557 ;
+		CALL = 17301558 ;
+		CAMERA = 17301559 ;
+		CLOSE_CLEAR_CANCEL = 17301560 ;
+		COMPASS = 17301561;
+		CROP = 17301562 ;
+		DAY =  17301563 ;
+		DELETE = 17301564 ;
+		DIRECTIONS = 17301565 ;
+		EDIT = 17301566 ;
+		GALLERY = 17301567 ;
+		HELP = 17301568 ;
+		INFO_DETAILS = 17301569 ;
+		MANAGE = 17301570 ;
+		MAPMODE = 17301571 ;
+		MONTH = 17301572 ;
+		MORE = 17301573 ;
+		MY_CALENDAR = 17301574 ;
+		MYLOCATION = 17301575 ;
+		MYPLACES = 17301576 ;
+		PREFERENCES = 17301577 ;
+		RECENT_HISTORY = 17301578 ;
+		REPORT_IMAGE = 17301579 ;
+		REVERT = 17301580 ;
+		ROTATE = 17301581 ;
+		SAVE = 17301582 ;
+		SEARCH = 17301583 ;
+		SEND = 17301584 ;
+		SET_AS = 17301585 ;
+		SHARE = 17301586 ;
+		SLIDESHOW = 17301587 ;
+		SORT_ALPHABETICALLY = 17301660 ;
+		SORT_BY_SIZE = 17301661 ;
+		TODAY = 17301588 ;
+		UPLOAD = 17301589 ;
+		UPLOAD_YOU_TUBE = 17301590 ;
+		VIEW = 17301591 ;
+		WEEK = 17301592 ;
+		ZOOM = 17301593 ;
+
+	}
+	} // end of OptionsMenuIconConstants
 
 	/**
 	* All widgets have a set of properties that can be set. In order to set them, use maWidgetSetProperty(). These properties may change
@@ -5109,7 +5244,7 @@ group WidgetAPI "Widget API" {
 		/**
 		* @brief Sets an icon for a screen. The icon is used by a tab screen to display an icon on the tab indicator.
 		*
-		* @validvalue MoSync handle to an uncompressed image resource. The size of the image should be small enough to fit in a tab indicatior.
+		* @validvalue MoSync handle to an uncompressed image resource. The size of the image should be small enough to fit in a tab indicator.
 		*
 		* @setonly
 		*
@@ -5119,6 +5254,21 @@ group WidgetAPI "Widget API" {
 		* \endcode
 		*/
 		ICON = "icon";
+
+		/**
+		* @brief Remove the options menu from this screen.
+		* The options menu can be added by calling #maWidgetScreenAddOptionsMenuItem for each item.
+		*
+		* @validvalue No value needed.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(screenHandle, MAW_SCREEN_REMOVE_OPTIONS_MENU, "");
+		* \endcode
+		*/
+		REMOVE_OPTIONS_MENU = "removeoptionsmenu";
 	}
 	} // end of WidgetScreenProperties
 
@@ -6160,6 +6310,24 @@ group WidgetAPI "Widget API" {
 	}
 	} // end of WidgetHorizontalLayoutProperties
 
+	group WidgetRelativeLayoutProperties "Relative layout properties" {
+	constset MAString MAW_RELATIVE_LAYOUT_{
+		/**
+		* @brief Sets the isScrollable boolean
+		*
+		* @validvalue "true" or "false", for "true" the layout will become scrollable otherwise it will become unscrollable
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(verticalLayoutHandle, MAW_RELATIVE_LAYOUT_SCROLLABLE, "true");
+		* \endcode
+		*/
+		SCROLLABLE = "scrollable";
+	}
+	}
+
 	/**
 	* The available widget properties for a #MAW_VERTICAL_LAYOUT. See \ref WidgetProperties "Widget properties" for more properties.
 	*/
@@ -6249,6 +6417,20 @@ group WidgetAPI "Widget API" {
 		* \endcode
 		*/
 		PADDING_BOTTOM = "paddingBottom";
+
+		/**
+		* @brief Sets the isScrollable boolean
+		*
+		* @validvalue "true" or "false", for "true" the layout will become scrollable otherwise it will become unscrollable
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(verticalLayoutHandle, MAW_VERTICAL_LAYOUT_SCROLLABLE, "true");
+		* \endcode
+		*/
+		SCROLLABLE = "scrollable";
 	}
 	} // end of WidgetVerticalLayoutProperties
 
@@ -6757,9 +6939,9 @@ group WidgetAPI "Widget API" {
 		MAX_DATE = "maxDate";
 
 		/**
-		* @brief Sets or gets the year of the maximal date supported by this DatePicker
-		* Note: On Android the default maximal date year  is 2100
-		* Note: On Windows Phone 7 the default maximal date year is 9999
+		* @brief Sets or gets the year of the maximal date supported by this DatePicker.
+		* Note: On Android the default maximal date year is 2100.
+		* Note: On Windows Phone 7 and iOS the default maximal date year is 9999.
 		* @validvalue An int that specifies the value of the year of the maximal date
 		* for this date picker.
 		*
@@ -6773,9 +6955,9 @@ group WidgetAPI "Widget API" {
 		MAX_DATE_YEAR = "maxdateyear";
 
 		/**
-		* @brief Sets or gets the month of the maximal date supported by this DatePicker
+		* @brief Sets or gets the month of the maximal date supported by this DatePicker.
 		* @validvalue An int that specifies the value of the month of the maximal date for
-		* this date picker. The value must be a number between 1 and 12
+		* this date picker. The value must be a number between 1 and 12.
 		*
 		* @setandget
 		*
@@ -6787,7 +6969,7 @@ group WidgetAPI "Widget API" {
 		MAX_DATE_MONTH = "maxdatemonth";
 
 		/**
-		* @brief Sets or gets the day of the maximal date supported by this DatePicker
+		* @brief Sets or gets the day of the maximal date supported by this DatePicker.
 		* @validvalue An int that specifies the value of the day of the maximal date for
 		* this date picker. This number must be a valid day of the month specified with
 		* the MAX_DATE_MONTH property.
@@ -6801,12 +6983,10 @@ group WidgetAPI "Widget API" {
 		*/
 		MAX_DATE_DAY = "maxdateday";
 
-
 		/**
 		* @deprecated use MIN_DATE_YEAR, MIN_DATE_MONTH and MIN_DATE_DAY instead
 		* @brief Sets or gets  minimal date supported by this DatePicker in seconds since January 1, 1970 00:00:00
 		* Note: On Android the default minimal date is 01/01/1900.
-		* NOTE: The property can be set on iOS only.
 		* @validvalue A long int that specifies the minimal supported date.
 		*
 		* @setandget
@@ -6820,9 +7000,9 @@ group WidgetAPI "Widget API" {
 		MIN_DATE = "minDate";
 
 		/**
-		* @brief Sets or gets the year of the minimal date supported by this DatePicker
-		* Note: On Android the default minimal date year  is 1900
-		* Note: On Windows Phone 7 the default minimal date year is 1
+		* @brief Sets or gets the year of the minimal date supported by this DatePicker.
+		* Note: On Android the default minimal date year  is 1900.
+		* Note: On Windows Phone 7 and iOS the default minimal date year is 1.
 		* @validvalue An int that specifies the value of the year of the minimal date
 		* for this date picker.
 		*
@@ -6836,9 +7016,9 @@ group WidgetAPI "Widget API" {
 		MIN_DATE_YEAR = "mindateyear";
 
 		/**
-		* @brief Sets or gets the month of the minimal date supported by this DatePicker
+		* @brief Sets or gets the month of the minimal date supported by this DatePicker.
 		* @validvalue An int that specifies the value of the month of the minimal date for
-		* this date picker. The value must be a number between 1 and 12
+		* this date picker. The value must be a number between 1 and 12.
 		*
 		* @setandget
 		*
@@ -6850,7 +7030,7 @@ group WidgetAPI "Widget API" {
 		MIN_DATE_MONTH = "mindatemonth";
 
 		/**
-		* @brief Sets or gets the day of the minimal date supported by this DatePicker
+		* @brief Sets or gets the day of the minimal date supported by this DatePicker.
 		* @validvalue An int that specifies the value of the day of the minimal date for
 		* this date picker. This number must be a valid day of the month specified with
 		* the MIN_DATE_MONTH property.
@@ -7302,6 +7482,177 @@ group WidgetAPI "Widget API" {
 
 	}
 	} // end of WidgetmodalDialogProperties
+
+	/**
+	* The available widget properties for a #MAW_RADIO_BUTTON. See \ref WidgetProperties "Widget properties" for more properties.
+	*/
+	group WidgetRadioButtonProperties "Radio Button properties" {
+	constset MAString MAW_RADIO_BUTTON_ {
+		/**
+		* @brief Get the checked state of the radio button.
+		*
+		* @validvalue A boolean string 'true' or 'false'.
+		*
+		* @getonly
+		*
+		* @par Example
+		* \code
+		* 	char state[BUFFER_SIZE];
+		*   maWidgetGetProperty(radioButtonHandle, MAW_RADIO_BUTTON_CHECKED, state, BUFFER_SIZE);
+		* \endcode
+		*/
+		CHECKED = "checked";
+
+		/**
+		* @brief Change the checked state of the view to the inverse of its current state.
+		* If the radio button is already checked, this method will not toggle the radio button.
+		*
+		* @validvalue No neccessary value needed.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*   maWidgetSetProperty(radioButtonHandle, MAW_RADIO_BUTTON_TOGGLE, "");
+		* \endcode
+		*/
+		TOGGLE = "toggle";
+
+		/**
+		* @brief Set or get the text to display.
+		*
+		* @validvalue A null-terminated string.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+		*   maWidgetSetProperty(radioButtonHandle, MAW_RADIO_BUTTON_TEXT, "Option A");
+		* \endcode
+		*/
+		TEXT = "text";
+
+		/**
+		* @brief Specifies the text color of the radio button.
+		*
+		* @validvalue A hexadecimal value 0xRRGGBB, where R, G and B are the red, green and blue components respectively.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(widgetHandle, MAW_RADIO_BUTTON_TEXT_COLOR, "0xff0000"); // Red
+		* \endcode
+		*/
+		TEXT_COLOR = "textcolor";
+	}
+	} // end of WidgetRadioButtonProperties
+
+	/**
+	* The available widget properties for a #MAW_RADIO_GROUP. See \ref WidgetProperties "Widget properties" for more properties.
+	*/
+	group WidgetRadioGroupProperties "Radio Button properties" {
+	constset MAString MAW_RADIO_GROUP_ {
+		/**
+		* @brief Add the radio buttons grouped in this widget.
+		* This is the only widget type that accepts Radio Buttons as children.
+		*
+		* @validvalue An int specifying the radio button handle.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*   // Attach two radio buttons to this group.
+		*   maWidgetSetProperty(radioGroupHandle, MAW_RADIO_GROUP_ADD_VIEW, "3");
+		*   maWidgetSetProperty(radioGroupHandle, MAW_RADIO_GROUP_ADD_VIEW, "4");
+		* \endcode
+		*/
+		ADD_VIEW = "addview";
+
+		/**
+		* @brief Clear the selection.
+		* When the selection is cleared, no radio button in this group is selected and
+		* #MAW_RADIO_GROUP_SELECTED returns -1.
+		*
+		* @validvalue No neccessary value needed.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*   maWidgetSetProperty(radioGroupHandle, MAW_RADIO_GROUP_CLEAR_CHECK, "");
+		* \endcode
+		*/
+		CLEAR_CHECK = "clearcheck";
+
+		/**
+		* @brief Set or get the selected radio button in this group.
+		* Upon empty selection, get property returns -1.
+		* Setting -1 as the selection identifier clears the selection; such an operation
+		* is equivalent to invoking #MAW_RADIO_GROUP_CLEAR_CHECK.
+		*
+		* @validvalue A valid radio button handle.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+		*   char buttonHandle[BUF_SIZE];
+		*   maWidgetGetProperty(radioGroupHandle, MAW_RADIO_GROUP_SELECTED, buttonHandle, BUF_SIZE);
+		* \endcode
+		*/
+		SELECTED = "selected";
+	}
+	} // end of WidgetRadioGroupProperties
+
+	/**
+	* The available widget properties for a #MAW_RATING_BAR. See \ref WidgetProperties "Widget properties" for more properties.
+	*/
+	group WidgetRatingBarProperties "Rating Bar properties" {
+	constset MAString MAW_RATING_BAR_ {
+		/**
+		* @brief Set or get the number of stars to show.
+		* Usually, the default stars number is 5.
+		* @validvalue An int that specifies the number of stars to show.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+		*   maWidgetSetProperty(ratingBarHandle, MAW_RATING_BAR_NUM_STAR, "4");
+		* \endcode
+		*/
+		NUM_STAR = "numstar";
+
+		/*
+		* @brief Set or get the current rating (number of stars filled).
+		*
+		* @validvalue A float that specifies the number of stars filled.
+		*
+		* @setandget
+		* @par Example
+		* \code
+		*   maWidgetSetProperty(ratingBarHandle, MAW_RATING_BAR_RATING, "3.0");
+		* \endcode
+		*/
+		RATING = "rating";
+
+		/**
+		* @brief Set or get the step size (granularity) of this rating bar.
+		* By default the granularity is 0.5.
+		* @validvalue A float that specifies the step size.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+		*   maWidgetSetProperty(ratingBarHandle, MAW_RATING_BAR_GRANULARITY, "1.0");
+		* \endcode
+		*/
+		GRANULARITY = "granularity";
+	}
+	} // end of WidgetRatingBarProperties
 	} // end of WidgetProperties
 
 	typedef int MAWidgetHandle;
@@ -7490,6 +7841,28 @@ group WidgetAPI "Widget API" {
 	* - #MAW_RES_ERROR otherwise.
 	*/
 	int maWidgetGetProperty(in MAWidgetHandle widget, in MAString property, out MAString value range("bufSize"), in int bufSize);
+
+	/**
+	* Add an item to the Options Menu associated to a screen.
+	* Available on Android only.
+	* The options menu is where you should include actions and other options that are relevant to the current activity
+	* context, such as "Search," "Compose email," or "Settings".
+	* When opened, the first visible portion is the icon menu, which holds up to six menu items.
+	* If your menu includes more than six items, Android places the sixth item and the rest into the overflow menu,
+	* which the user can open by selecting More. Those items do not display icons.
+	* \param widget Handle to the screen widget.
+	* \param title The title associated for the new item. Can be left null.
+	* \iconHandle MoSync handle to an uncompressed image resource, or :
+	* a predefined Android icon, one of the \link #MAW_OPTIONS_MENU_ICON_CONSTANT \endlink constants.
+	* Can be left null.
+	* \iconPredefined Specifies if the icon is a project resource, or one of the predefined Android icons.
+	* By default it's value is 0.
+	*
+	* \returns The the item index on success, or any of the following result codes:
+	* - #MAW_RES_INVALID_HANDLE if the screen handle was invalid.
+	* - #MAW_RES_ERROR otherwise.
+	*/
+	int maWidgetScreenAddOptionsMenuItem(in MAWidgetHandle widget, in MAString title, in int iconHandle, in int iconPredefined);
 
 	} // end of group WidgetAPIFunctions
 
@@ -8702,7 +9075,7 @@ group NFCAPI "NFC API" {
 		}
 	}//end of NFC API
 
-	group DBAPI "DB API" {
+	group DBAPI "Database API" {
 		struct MADBBlob {
 			MAAddress data;
 			int size;
@@ -8908,7 +9281,7 @@ group NFCAPI "NFC API" {
 			 */
 			NULL = -4;
 		}
-	} // End of DB API
+	} // End of Database API
 
 	group AudioAPI "Audio API" {
 		typedef int MAAudioData;

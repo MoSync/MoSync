@@ -124,6 +124,12 @@ public class TabScreenWidget extends ScreenWidget
 		if( property.equals( IX_WIDGET.MAW_TAB_SCREEN_CURRENT_TAB ) )
 		{
 			int currentTabIndex = IntConverter.convert( value );
+			if ( currentTabIndex >= m_tabIndexToScreen.size()
+					||
+				 currentTabIndex < 0 )
+			{
+				throw new InvalidPropertyValueException(property, value);
+			}
 			tabHost.setCurrentTab( currentTabIndex );
 		}
 
@@ -142,6 +148,26 @@ public class TabScreenWidget extends ScreenWidget
 		{
 			return super.getProperty( property );
 		}
+	}
+
+	/**
+	 * Get the currently shown tab.
+	 * Used when launching the OptionsMenu.
+	 * @return The currently active tab screen.
+	 */
+	public ScreenWidget getCurrentTabScreen()
+	{
+		TabHost tabHost = (TabHost) getView();
+		int index = tabHost.getCurrentTab();
+
+		for( Entry<ScreenWidget, Integer> entry : m_tabIndexToScreen.entrySet( ) )
+		{
+			if( entry.getValue( ) == index )
+			{
+				return entry.getKey();
+			}
+		}
+		return null;
 	}
 
 	/**

@@ -178,6 +178,7 @@ namespace MoSync
                     {
                         mWebBrowser.InvokeScript("eval", "history.go(1)");
                     }
+                    else throw new InvalidPropertyValueException();
                 }
             }
 
