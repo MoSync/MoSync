@@ -1811,7 +1811,7 @@ public class MoSyncThread extends Thread
 		//mMemDataSection.position(dst);
 		//IntBuffer intBuffer = mMemDataSection.asIntBuffer();
 
-		IntBuffer intBuffer = getMemorySlice(dst, -1).asIntBuffer();
+		IntBuffer intBuffer = getMemorySlice(dst, -1).order(null).asIntBuffer();
 
 		try {
 
