@@ -1763,6 +1763,8 @@ public class MoSyncThread extends Thread
 		// TODO: Remove variable bitmapSize, it is not used.
 		//int bitmapSize = scanLength * srcHeight;
 
+		//Log.i("@@@@@@", "_maGetImageData >>> handle: " + image + " hasAlpha: " + imageResource.mBitmap.hasAlpha());
+
 		if ((srcTop + srcHeight) > imageResource.mBitmap.getHeight())
 		{
 			maPanic(
@@ -1784,7 +1786,76 @@ public class MoSyncThread extends Thread
 				" > " +
 				imageResource.mBitmap.getWidth() );
 		}
+/*
+		_maGetImageDataForImageWithAlpha(
+			image,
+			imageResource,
+			dst,
+			srcLeft,
+			srcTop,
+			srcWidth,
+			srcHeight,
+			scanLength);
+*/
+		_maGetImageDataForImageWithoutAlpha(
+			image,
+			imageResource,
+			dst,
+			srcLeft,
+			srcTop,
+			srcWidth,
+			srcHeight,
+			scanLength);
+	}
 
+	@SuppressWarnings("unused")
+	private void _maGetImageDataForImageWithoutAlpha(
+		int image,
+		ImageCache imageResource,
+		int dst,
+		int srcLeft,
+		int srcTop,
+		int srcWidth,
+		int srcHeight,
+		int scanLength)
+	{
+		int pixels[] = new int[srcWidth * srcHeight];
+
+		IntBuffer intBuffer = getMemorySlice(dst, -1).asIntBuffer();
+
+		try
+		{
+			imageResource.mBitmap.getPixels(
+				pixels,
+				0,
+				scanLength,
+				srcLeft,
+				srcTop,
+				srcWidth,
+				srcHeight);
+
+			intBuffer.put(pixels);
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+			//Log.i("_maGetImageData", "("+image+", "+srcLeft+","+srcTop+", "+srcWidth+"x"+srcHeight+"): "+
+			//	imageResource.mBitmap.getWidth()+"x"+imageResource.mBitmap.getHeight()+"\n");
+			maPanic(-1, "maGetImageData");
+		}
+	}
+
+	@SuppressWarnings("unused")
+	private void _maGetImageDataForImageWithAlpha(
+		int image,
+		ImageCache imageResource,
+		int dst,
+		int srcLeft,
+		int srcTop,
+		int srcWidth,
+		int srcHeight,
+		int scanLength)
+	{
 		int pixels[] = new int[srcWidth];
 		int colors[] = new int[srcWidth];
 		int alpha[] = new int[srcWidth];
@@ -1800,6 +1871,13 @@ public class MoSyncThread extends Thread
 			and the result is stored in the given memory location.
 		*/
 
+		/*
+		 * API level 12 added a method setHasAlpha() which you
+		 * can use instead of having to copy the image to get the alpha channel.
+		 *
+		 * Bitmap.hasAlpha()
+		 */
+
 		Bitmap temporaryBitmap = createBitmap(srcWidth, srcHeight);
 
 		Canvas temporaryCanvas = new Canvas(temporaryBitmap);
@@ -1813,38 +1891,40 @@ public class MoSyncThread extends Thread
 
 		IntBuffer intBuffer = getMemorySlice(dst, -1).asIntBuffer();
 
-		try {
-
-		for (int y = 0; y < srcHeight; y++)
+		try
 		{
-			intBuffer.position(y*scanLength);
-
-			imageResource.mBitmap.getPixels(
-				alpha,
-				0,
-				srcWidth,
-				srcLeft,
-				srcTop+y,
-				srcWidth,
-				1);
-
-			temporaryBitmap.getPixels(
-				colors,
-				0,
-				srcWidth,
-				0,
-				y,
-				srcWidth,
-				1);
-
-			for( int i = 0; i < srcWidth; i++)
+			for (int y = 0; y < srcHeight; y++)
 			{
-				pixels[i] = (alpha[i]&0xff000000) + (colors[i]&0x00ffffff);
-			}
+				intBuffer.position(y*scanLength);
 
-			intBuffer.put(pixels);
+				imageResource.mBitmap.getPixels(
+					alpha,
+					0,
+					srcWidth,
+					srcLeft,
+					srcTop+y,
+					srcWidth,
+					1);
+
+				temporaryBitmap.getPixels(
+					colors,
+					0,
+					srcWidth,
+					0,
+					y,
+					srcWidth,
+					1);
+
+				for( int i = 0; i < srcWidth; i++)
+				{
+					pixels[i] = (alpha[i]&0xff000000) + (colors[i]&0x00ffffff);
+				}
+
+				intBuffer.put(pixels);
+			}
 		}
-		} catch(Exception e) {
+		catch(Exception e)
+		{
 			e.printStackTrace();
 			//Log.i("_maGetImageData", "("+image+", "+srcLeft+","+srcTop+", "+srcWidth+"x"+srcHeight+"): "+
 			//	imageResource.mBitmap.getWidth()+"x"+imageResource.mBitmap.getHeight()+"\n");
