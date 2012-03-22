@@ -137,6 +137,7 @@ public class MoSyncSensor implements SensorEventListener {
 			mSensorManager = (SensorManager)getActivity().getSystemService(Context.SENSOR_SERVICE);
 		} catch (Exception ex)
 		{
+			Log.e("@@MoSync", "MoSyncSensor manager initialize error!");
 		}
 
 		// Set up conversion table
