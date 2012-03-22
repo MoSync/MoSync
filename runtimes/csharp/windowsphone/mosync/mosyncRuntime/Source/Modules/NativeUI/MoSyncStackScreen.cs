@@ -177,7 +177,7 @@ namespace MoSync
             {
                 set
                 {
-                    Boolean.TryParse(value, out mBackButtonEnabled);
+                    if (!Boolean.TryParse(value, out mBackButtonEnabled)) throw new InvalidPropertyValueException();
                 }
             }
 

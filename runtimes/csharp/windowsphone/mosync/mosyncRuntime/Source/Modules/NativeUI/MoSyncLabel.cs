@@ -74,24 +74,26 @@ namespace MoSync
 			[MoSyncWidgetProperty(MoSync.Constants.MAW_LABEL_TEXT_VERTICAL_ALIGNMENT)]
 			public String textVerticalAlignment
 			{
-			set
-			{
-				switch (value)
-					{
-						case MoSync.Constants.MAW_ALIGNMENT_TOP:
-							mLabel.VerticalAlignment = VerticalAlignment.Top;
-							break;
-						case MoSync.Constants.MAW_ALIGNMENT_CENTER:
-							mLabel.VerticalAlignment = VerticalAlignment.Center;
-							break;
-						case MoSync.Constants.MAW_ALIGNMENT_BOTTOM:
-							mLabel.VerticalAlignment = VerticalAlignment.Bottom;
-							break;
-					}
-			}
+			    set
+			    {
+				    switch (value)
+					    {
+						    case MoSync.Constants.MAW_ALIGNMENT_TOP:
+							    mLabel.VerticalAlignment = VerticalAlignment.Top;
+							    break;
+						    case MoSync.Constants.MAW_ALIGNMENT_CENTER:
+							    mLabel.VerticalAlignment = VerticalAlignment.Center;
+							    break;
+						    case MoSync.Constants.MAW_ALIGNMENT_BOTTOM:
+							    mLabel.VerticalAlignment = VerticalAlignment.Bottom;
+							    break;
+                            default:
+                                throw new InvalidPropertyValueException();
+					    }
+			    }
 				get
 				{
-					return mLabel.Text;
+					return mLabel.VerticalAlignment.ToString();
 				}
 			}
 
@@ -159,24 +161,19 @@ namespace MoSync
             /**
              * Implementation of the maxNumberOfLines property
              * set: sets if the label is single or multiline.
-             * Accepts two values: 1 (meaning single line) and 1
+             * Accepts two values: 1 (meaning single line) and 0
              */
 			[MoSyncWidgetProperty(MoSync.Constants.MAW_LABEL_MAX_NUMBER_OF_LINES)]
-			public String maxNumberOfLines
+			public int maxNumberOfLines
 			{
 				set
 				{
-					int val = -1;
-					if (!int.TryParse(value, out val))
-					{
-						return;
-					}
-					if ( 0 == val )
+					if ( 0 == value )
 					{
 						mMaxNumberOfLines = 0;
 						mLabel.TextWrapping = TextWrapping.NoWrap;
 					}
-					else if ( 1 == val )
+                    else if (1 == value)
 					{
 						mMaxNumberOfLines = 1;
 						mLabel.TextWrapping = TextWrapping.Wrap;

@@ -50,7 +50,6 @@ namespace MoSync
 
                 mMaxDate = DateTime.MaxValue;
                 mMinDate = DateTime.MinValue;
-
                 mDatePicker.ValueChanged += new EventHandler<DateTimeValueChangedEventArgs>(
                     delegate(object from, DateTimeValueChangedEventArgs args)
                     {
@@ -80,7 +79,7 @@ namespace MoSync
                     {
                         mMaxDate = mMaxDate.AddYears(-1 * (mMaxDate.Year - value));
                     }
-                    catch (Exception e)
+                    catch
                     {
                         throw new InvalidPropertyValueException();
                     }
@@ -135,7 +134,7 @@ namespace MoSync
                     {
                         mMinDate = mMinDate.AddYears(-1 * (mMinDate.Year - value));
                     }
-                    catch (Exception e)
+                    catch
                     {
                         throw new InvalidPropertyValueException();
                     }

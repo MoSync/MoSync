@@ -31,7 +31,6 @@ import com.mosync.nativeui.core.NativeUI.RootViewReplacedListener;
 import com.mosync.nativeui.ui.widgets.ScreenWidget;
 import com.mosync.nativeui.ui.widgets.Widget;
 import com.mosync.nativeui.util.AsyncWait;
-import com.mosync.nativeui.ui.custom.MoSyncImagePicker;
 import com.mosync.nativeui.ui.custom.MoSyncOptionsDialog;
 
 /**
