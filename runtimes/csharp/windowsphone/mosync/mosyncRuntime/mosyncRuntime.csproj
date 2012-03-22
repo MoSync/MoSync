@@ -63,12 +63,12 @@
     <Reference Include="Microsoft.Phone.Controls">
       <HintPath>Libraries\Microsoft.Phone.Controls\Microsoft.Phone.Controls.dll</HintPath>
     </Reference>
-	<Reference Include="Microsoft.Advertising.Mobile, Version=5.2.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-		<HintPath>Libraries\Microsoft.Advertising.Mobile\Microsoft.Advertising.Mobile.dll</HintPath>
-	</Reference>
+    <Reference Include="Microsoft.Advertising.Mobile, Version=5.2.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>Libraries\Microsoft.Advertising.Mobile\Microsoft.Advertising.Mobile.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.Advertising.Mobile.UI, Version=5.2.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-		<HintPath>Libraries\Microsoft.Advertising.Mobile.UI\Microsoft.Advertising.Mobile.UI.dll</HintPath>
-	</Reference>
+      <HintPath>Libraries\Microsoft.Advertising.Mobile.UI\Microsoft.Advertising.Mobile.UI.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -95,6 +95,7 @@
     <Compile Include="Source\Modules\NativeUI\MoSyncAd.cs" />
     <Compile Include="Source\Modules\NativeUI\MoSyncCameraPreview.cs" />
     <Compile Include="Source\Modules\NativeUI\MoSyncPanoramaView.cs" />
+    <Compile Include="Source\Modules\NativeUI\MoSyncSearchBar.cs" />
     <Compile Include="Source\Modules\NativeUI\MoSyncStackScreen.cs" />
     <Compile Include="Source\Modules\NativeUI\MoSyncDatePicker.cs" />
     <Compile Include="Source\Modules\NativeUI\MoSyncTabScreen.cs" />

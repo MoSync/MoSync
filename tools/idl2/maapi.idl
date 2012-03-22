@@ -4183,7 +4183,7 @@ group WidgetAPI "Widget API" {
 			* @brief The type of button that was clicked when a #MAW_EVENT_CLICKED event is receieved for a searchbar.
 			* The type of searchbar button clicked:
 			* - 0 means 'search'
-			* - 1 means 'cancel'
+			* - 1 means 'cancel' (not implemented on Windows Phone platform, because the search bar doesn't contain any buttons)
 			*/
 			int searchBarButton;
 
