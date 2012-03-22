@@ -586,64 +586,10 @@ public class NativeUI
 
 		boolean result;
 
-		// Send the typeface to the label, button widget or list view item.
-		if ( key.compareTo( IX_WIDGET.MAW_LABEL_FONT_HANDLE ) == 0 )
+		// Set font, if available on the current widget.
+		if ( key.equals( IX_WIDGET.MAW_LABEL_FONT_HANDLE ) )
 		{
-			MoSyncFontHandle currentFont = null;
-
-			// Search the fondle in the list of fonts.
-			try
-			{
-				currentFont = mMoSyncThread.getMoSyncFont(IntConverter.convert(value));
-			} catch(PropertyConversionException pce)
-			{
-				Log.e( "MoSync", "Error while getting font handle with value '" + value + "Invalid property value");
-				return IX_WIDGET.MAW_RES_INVALID_PROPERTY_VALUE;
-			}
-
-			if ( currentFont == null )
-			{
-				Log.e( "MoSync", "Error while getting font handle with value '" + value + " The handle was not found");
-				return IX_WIDGET.MAW_RES_INVALID_PROPERTY_VALUE;
-			}
-			else
-			{
-				Log.e("MoSync", "Set font typeface to native ui widget");
-				if ( widget instanceof LabelWidget )
-				{
-					LabelWidget labelWidget = (LabelWidget) widget;
-					labelWidget.setFontTypeface(
-							currentFont.getTypeface(),
-							currentFont.getFontSize());
-				}
-				else if ( widget instanceof ButtonWidget )
-				{
-					ButtonWidget buttonWidget = (ButtonWidget) widget;
-					buttonWidget.setFontTypeface(
-							currentFont.getTypeface(),
-							currentFont.getFontSize());
-				}
-				else if ( widget instanceof ListItemWidget )
-				{
-					ListItemWidget listItemWidget = (ListItemWidget) widget;
-					listItemWidget.setFontTypeface(
-							currentFont.getTypeface(),
-							currentFont.getFontSize());
-				}
-				else if ( widget instanceof NavigationBarWidget )
-				{
-					NavigationBarWidget navBar = (NavigationBarWidget) widget;
-					navBar.setTitleFontTypeface(
-							currentFont.getTypeface(),
-							currentFont.getFontSize());
-				}
-				else
-				{
-					Log.e( "MoSync", "Error while setting property '" + key );
-					return IX_WIDGET.MAW_RES_INVALID_PROPERTY_NAME;
-				}
-				return IX_WIDGET.MAW_RES_OK;
-			}
+			return setWidgetFont(widget, key, value);
 		}
 
 		try
@@ -899,4 +845,46 @@ public class NativeUI
 		return (Widget) m_widgetTable.get( handle );
 	}
 
+	/**
+	 * Set the font property to the
+	 *
+	 * @param property The property name.
+	 * @param value The property value.
+	 * @return error code or MAW_RES_OK.
+	 */
+	public int setWidgetFont(Widget widget, final String property,
+			final String value)
+	{
+		// Set the typeface to the label, button widget, edit Box or list view item.
+		MoSyncFontHandle currentFont = null;
+
+		// Search the handle in the list of fonts.
+		try {
+			currentFont = mMoSyncThread.getMoSyncFont(IntConverter .convert(value));
+		} catch (PropertyConversionException pce)
+		{
+			Log.e("MoSync", "Error while getting font handle with value '"
+					+ value + "Invalid property value");
+			return IX_WIDGET.MAW_RES_INVALID_PROPERTY_VALUE;
+		}
+
+		if (currentFont == null)
+		{
+			Log.e("MoSync", "Error while getting font handle with value '"
+					+ value + " The handle was not found");
+			return IX_WIDGET.MAW_RES_INVALID_PROPERTY_VALUE;
+		}
+		else
+		{
+			Log.e("@@MoSync", "Set font typeface to native ui widget");
+			boolean fontWasSet = widget.setFontTypeface(
+					currentFont.getTypeface(), currentFont.getFontSize());
+			if (!fontWasSet)
+			{
+				Log.e("MoSync", "Error while setting property '" + property);
+				return IX_WIDGET.MAW_RES_INVALID_PROPERTY_NAME;
+			}
+			return IX_WIDGET.MAW_RES_OK;
+		}
+	}
 }
