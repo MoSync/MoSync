@@ -37,10 +37,11 @@ using namespace NativeUI;
  * Class that creates a screen that displays all the contacts.
  */
 class MainScreen:
-	public Screen,
 	public ButtonListener,
 	public EditBoxListener,
-	public ListViewListener
+	public ListViewListener,
+	public TabScreen,
+	public TabScreenListener
 {
 
 public:
@@ -130,13 +131,13 @@ private:
 	 * Creates the input mode list view
 	 * @param mainLayout Widgets will be added to it.
 	 */
-	void createInputModeListView(ListView* mainListView);
+	void createInputModeListView(VerticalLayout* aVerticalLayout);
 
 	/**
 	 * Creates the input flag list view
 	 * @param mainLayout Widgets will be added to it.
 	 */
-	void createInputFlagListView(ListView* mainListView);
+	void createInputFlagListView(VerticalLayout* aVerticalLayout);
 
 	/**
 	 * Creates a horizontal layout, adds it to the main layout, initializes the
@@ -145,14 +146,7 @@ private:
 	 * @param mainLayout Widgets will be added to it.
 	 * @param text The text that will fill the label.
 	 */
-	void createDecimalEditBoxView(EditBox* &editBox, ListView* mainListView, MAUtil::String text);
-
-	/**
-	 * Gets the index of a string. Returns -1 if the string is not inside the array
-	 * @param array The String array in which to search
-	 * @param text The list view item text
-	 */
-	int getIndexForString(const MAUtil::String* array, MAUtil::String text);
+	void createDecimalEditBoxView(EditBox* &editBox, VerticalLayout* aVerticalLayout, MAUtil::String text);
 
 	/**
 	 * Set the input mode of the edit box
@@ -166,11 +160,17 @@ private:
 	 */
 	void setInputFlag(int flag);
 
+	/**
+	 * This method is called when a tab screen has changed to a new tab.
+	 * @param tabScreen The tab screen object that generated the event.
+	 * @param tabScreenIndex The index of the new tab.
+	 */
+	virtual void tabScreenTabChanged(TabScreen* tabScreen, const int tabScreenIndex);
+
 private:
 	/**
 	 * Main layout.
 	 */
-	ListView* mMainListView;
 	VerticalLayout* mMainLayout;
 	EditBox* mEditBox;
 
