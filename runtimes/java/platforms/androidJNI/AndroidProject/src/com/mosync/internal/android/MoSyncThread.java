@@ -1786,30 +1786,57 @@ public class MoSyncThread extends Thread
 				" > " +
 				imageResource.mBitmap.getWidth() );
 		}
-/*
-		_maGetImageDataForImageWithAlpha(
-			image,
-			imageResource,
-			dst,
-			srcLeft,
-			srcTop,
-			srcWidth,
-			srcHeight,
-			scanLength);
-*/
-		_maGetImageDataForImageWithoutAlpha(
-			image,
-			imageResource,
-			dst,
-			srcLeft,
-			srcTop,
-			srcWidth,
-			srcHeight,
-			scanLength);
+
+		if (android.os.Build.VERSION.SDK_INT <= android.os.Build.VERSION_CODES.DONUT)
+		{
+			// In 1.6 and below we use the version that includes the bug fix.
+			_maGetImageDataAlphaBugFix(
+				image,
+				imageResource,
+				dst,
+				srcLeft,
+				srcTop,
+				srcWidth,
+				srcHeight,
+				scanLength);
+		}
+		else
+		{
+			// Above 1.6 we can use the faster version. This is about 2-5 times
+			// faster depending on the device/platform.
+			_maGetImageDataFast(
+				image,
+				imageResource,
+				dst,
+				srcLeft,
+				srcTop,
+				srcWidth,
+				srcHeight,
+				scanLength);
+		}
+
+		/*
+		 * For what it is worth, this might be interesting to investigate,
+		 * found this comment on a forum:
+		 *
+		 * API level 12 added a method setHasAlpha() which you
+		 * can use instead of having to copy the image to get the alpha channel.
+		 */
 	}
 
-	@SuppressWarnings("unused")
-	private void _maGetImageDataForImageWithoutAlpha(
+	/**
+	 * Plain way of getting the image pixel data.
+	 *
+	 * @param image
+	 * @param imageResource
+	 * @param dst
+	 * @param srcLeft
+	 * @param srcTop
+	 * @param srcWidth
+	 * @param srcHeight
+	 * @param scanLength
+	 */
+	private void _maGetImageDataFast(
 		int image,
 		ImageCache imageResource,
 		int dst,
@@ -1819,12 +1846,12 @@ public class MoSyncThread extends Thread
 		int srcHeight,
 		int scanLength)
 	{
-		int pixels[] = new int[srcWidth * srcHeight];
-
-		IntBuffer intBuffer = getMemorySlice(dst, -1).asIntBuffer();
-
 		try
 		{
+			int pixels[] = new int[srcWidth * srcHeight];
+
+			IntBuffer intBuffer = getMemorySlice(dst, -1).asIntBuffer();
+
 			imageResource.mBitmap.getPixels(
 				pixels,
 				0,
@@ -1836,17 +1863,30 @@ public class MoSyncThread extends Thread
 
 			intBuffer.put(pixels);
 		}
-		catch(Exception e)
+		catch (Exception e)
 		{
 			e.printStackTrace();
-			//Log.i("_maGetImageData", "("+image+", "+srcLeft+","+srcTop+", "+srcWidth+"x"+srcHeight+"): "+
-			//	imageResource.mBitmap.getWidth()+"x"+imageResource.mBitmap.getHeight()+"\n");
-			maPanic(-1, "maGetImageData");
+			maPanic(
+				-1,
+				"Exception in _maGetImageDataFast - " +
+				"check stack trace in logcat: " +
+				e.toString());
 		}
 	}
 
-	@SuppressWarnings("unused")
-	private void _maGetImageDataForImageWithAlpha(
+	/**
+	 * Get image pixel data using a bug fix for the alpha channel.
+	 *
+	 * @param image
+	 * @param imageResource
+	 * @param dst
+	 * @param srcLeft
+	 * @param srcTop
+	 * @param srcWidth
+	 * @param srcHeight
+	 * @param scanLength
+	 */
+	private void _maGetImageDataAlphaBugFix(
 		int image,
 		ImageCache imageResource,
 		int dst,
@@ -1870,13 +1910,6 @@ public class MoSyncThread extends Thread
 			image and the result are added with the alpha values
 			and the result is stored in the given memory location.
 		*/
-
-		/*
-		 * API level 12 added a method setHasAlpha() which you
-		 * can use instead of having to copy the image to get the alpha channel.
-		 *
-		 * Bitmap.hasAlpha()
-		 */
 
 		Bitmap temporaryBitmap = createBitmap(srcWidth, srcHeight);
 
@@ -1925,10 +1958,14 @@ public class MoSyncThread extends Thread
 		}
 		catch(Exception e)
 		{
-			e.printStackTrace();
 			//Log.i("_maGetImageData", "("+image+", "+srcLeft+","+srcTop+", "+srcWidth+"x"+srcHeight+"): "+
 			//	imageResource.mBitmap.getWidth()+"x"+imageResource.mBitmap.getHeight()+"\n");
-			maPanic(-1, "maGetImageData");
+			e.printStackTrace();
+			maPanic(
+				-1,
+				"Exception in _maGetImageDataAlphaBugFix - " +
+				"check stack trace in logcat: " +
+				e.toString());
 		}
 	}
 
