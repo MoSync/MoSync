@@ -18,6 +18,7 @@ MA 02110-1301, USA.
 package com.mosync.nativeui.ui.widgets;
 
 import android.graphics.Bitmap;
+import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
@@ -398,5 +399,18 @@ public class Widget
 		// Needed so that the view can be refreshed, if this
 		// property is set dynamically, after the view is drawn.
 		getView( ).invalidateDrawable(background);
+	}
+
+	/**
+	 * Sets the font typeface from mosync nativeUI.
+	 * It is called from the setProperty method,
+	 *
+	 * @param aTypeface The typeface of MoSyncFontHandle
+	 * @param aSize The size of MoSyncFontHandle
+	 * @return True if the widget supports font setting, false otherwise.
+	 */
+	public boolean setFontTypeface(Typeface aTypeface, float aSize)
+	{
+		return false;
 	}
 }
