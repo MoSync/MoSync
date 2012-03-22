@@ -84,6 +84,7 @@ import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.PorterDuff.Mode;
@@ -1814,7 +1815,7 @@ public class MoSyncThread extends Thread
 		//mMemDataSection.position(dst);
 		//IntBuffer intBuffer = mMemDataSection.asIntBuffer();
 
-		IntBuffer intBuffer = getMemorySlice(dst, -1).asIntBuffer();
+		IntBuffer intBuffer = getMemorySlice(dst, -1).order(null).asIntBuffer();
 
 		try {
 
@@ -1842,7 +1843,10 @@ public class MoSyncThread extends Thread
 
 			for( int i = 0; i < srcWidth; i++)
 			{
-				pixels[i] = (alpha[i]&0xff000000) + (colors[i]&0x00ffffff);
+				pixels[i] = Color.argb(Color.alpha(alpha[i]),
+						Color.red(colors[i]), Color.green(colors[i]),
+						Color.blue(colors[i]));
+				//pixels[i] = (alpha[i]&0xff000000) + (colors[i]&0x00ffffff);
 			}
 
 			intBuffer.put(pixels);
