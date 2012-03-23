@@ -18,6 +18,7 @@ MA 02110-1301, USA.
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading;
 
 namespace MoSync
 {
@@ -35,8 +36,52 @@ namespace MoSync
 		List<IAudioData> mAudioData = new List<IAudioData>();
 		List<IAudioInstance> mAudioInstances = new List<IAudioInstance>();
 
+#if false
+		AudioInstanceUpdater mAudioInstanceUpdater = null;
+		public class AudioInstanceUpdater
+		{
+			private bool mRunning = true;
+
+			List<IAudioInstance> mAudioInstances = null;
+
+			public AudioInstanceUpdater(List<IAudioInstance> audioInstances)
+			{
+				this.mAudioInstances = audioInstances;
+			}
+
+
+			public void SetIsRunning(bool r)
+			{
+				mRunning = r;
+			}
+
+			public void Loop()
+			{
+				while (mRunning == true)
+				{
+					lock (mAudioInstances)
+					{
+						for (int i = 0; i < mAudioInstances.Count; i++)
+						{
+							mAudioInstances[i].Update();
+						}
+					}
+
+					Thread.Sleep(1);
+				}
+			}
+		}
+#endif
+
+
         public void Init(Ioctls ioctls, Core core, Runtime runtime)
         {
+
+#if false
+			mAudioInstanceUpdater = new AudioInstanceUpdater(mAudioInstances);
+			Thread thread = new Thread(new ThreadStart(mAudioInstanceUpdater.Loop));
+			thread.Start();
+#endif
 			ioctls.maAudioDataCreateFromURL = delegate(int _mime, int _url, int _flags)
 			{
 				int ret = MoSync.Constants.MA_AUDIO_ERR_GENERIC;
@@ -45,8 +90,11 @@ namespace MoSync
 				{
 					String url = core.GetDataMemory().ReadStringAtAddress(_url);
 					IAudioData ad = Audio.FromUrlOrFilePath(url, (_flags & MoSync.Constants.MA_AUDIO_DATA_STREAM) != 0);
-					mAudioData.Add(ad);
-					ret = mAudioData.Count - 1;
+					lock (mAudioData)
+					{
+						mAudioData.Add(ad);
+						ret = mAudioData.Count - 1;
+					}
 				}
 				catch (MoSync.Util.ReturnValueException rve)
 				{
@@ -68,8 +116,11 @@ namespace MoSync
 					Resource audiores = runtime.GetResource(MoSync.Constants.RT_BINARY, _data);
 					BoundedStream s = new BoundedStream((Stream)audiores.GetInternalObject(), _offset, _length);
 					IAudioData ad = Audio.FromStream(s, (_flags & MoSync.Constants.MA_AUDIO_DATA_STREAM) != 0);
-					mAudioData.Add(ad);
-					ret =  mAudioData.Count - 1;
+					lock (mAudioData)
+					{
+						mAudioData.Add(ad);
+						ret = mAudioData.Count - 1;
+					}
 				}
 				catch (MoSync.Util.ReturnValueException rve)
 				{
@@ -87,9 +138,12 @@ namespace MoSync
             {
 				try
 				{
-					IAudioData ad = mAudioData[_audioData];
-					ad.Dispose();
-					mAudioData[_audioData] = null;
+					lock (mAudioData)
+					{
+						IAudioData ad = mAudioData[_audioData];
+						ad.Dispose();
+						mAudioData[_audioData] = null;
+					}
 				}
 				catch (MoSync.Util.ReturnValueException rve)
 				{
@@ -107,24 +161,27 @@ namespace MoSync
 			{
 				try
 				{
-					IAudioInstance ad = mAudioInstances[_audioInstance];
-					if (async == 0)
+					lock (mAudioInstances)
 					{
-						ad.Prepare(null);
+
+						IAudioInstance ad = mAudioInstances[_audioInstance];
+						if (async == 0)
+						{
+							ad.Prepare(null);
+						}
+						else
+						{
+							ad.Prepare(() =>
+								{
+									// Send initialized event.
+									MoSync.Memory eventData = new MoSync.Memory(8);
+									eventData.WriteInt32(MoSync.Struct.MAEvent.type, MoSync.Constants.EVENT_TYPE_AUDIO_PREPARED);
+									eventData.WriteInt32(MoSync.Struct.MAEvent.audioInstance, _audioInstance);
+									runtime.PostEvent(new Event(eventData));
+								}
+							);
+						}
 					}
-					else
-					{
-						ad.Prepare(() =>
-							{
-								// Send initialized event.
-								MoSync.Memory eventData = new MoSync.Memory(8);
-								eventData.WriteInt32(MoSync.Struct.MAEvent.type, MoSync.Constants.EVENT_TYPE_AUDIO_PREPARED);
-								eventData.WriteInt32(MoSync.Struct.MAEvent.audioInstance, _audioInstance);
-								runtime.PostEvent(new Event(eventData));
-							}
-						);
-					}
-					mAudioData[_audioInstance] = null;
 				}
 				catch (MoSync.Util.ReturnValueException rve)
 				{
@@ -144,10 +201,14 @@ namespace MoSync
 				int ret = MoSync.Constants.MA_AUDIO_ERR_GENERIC;
 				try
 				{
-					IAudioData ad = mAudioData[_audioData];
-					mAudioInstances.Add(ad.CreateInstance());
-					ret = mAudioInstances.Count - 1;
+					lock (mAudioInstances)
+					{
+						IAudioData ad = mAudioData[_audioData];
+						mAudioInstances.Add(ad.CreateInstance());
+						ret = mAudioInstances.Count - 1;
+					}
 				}
+
 				catch (MoSync.Util.ReturnValueException rve)
 				{
 					return rve.result;
@@ -160,13 +221,95 @@ namespace MoSync
 				return ret;
             };
 
+			ioctls.maAudioInstanceCreateDynamic = delegate(int _sampleRate, int _numChannels, int _bufferSize)
+			{
+				int ret = MoSync.Constants.MA_AUDIO_ERR_GENERIC;
+				try
+				{
+					lock (mAudioInstances)
+					{
+						AudioInstanceDynamic aid = Audio.CreateDynamic(_sampleRate, _numChannels, _bufferSize);
+						mAudioInstances.Add(aid);
+						ret = mAudioInstances.Count - 1;
+
+						aid.SetOnBufferNeededCallback(() =>
+							{
+								// Send initialized event.
+								MoSync.Memory eventData = new MoSync.Memory(8);
+								eventData.WriteInt32(MoSync.Struct.MAEvent.type, MoSync.Constants.EVENT_TYPE_AUDIO_COMPLETED);
+								eventData.WriteInt32(MoSync.Struct.MAEvent.audioInstance, ret);
+								runtime.PostEvent(new Event(eventData));
+							});
+					}
+				}
+
+				catch (MoSync.Util.ReturnValueException rve)
+				{
+					return rve.result;
+				}
+				catch (Exception)
+				{
+					return MoSync.Constants.MA_AUDIO_ERR_GENERIC;
+				}
+
+				return ret;
+			};
+
+			ioctls.maAudioGetPendingBufferCount = delegate(int _instance)
+			{
+				int ret = MoSync.Constants.MA_AUDIO_ERR_GENERIC;
+				try
+				{
+					lock (mAudioInstances)
+					{
+						AudioInstanceDynamic ai = (AudioInstanceDynamic)mAudioInstances[_instance];
+						ret = ai.GetPendingBufferCount();
+					}
+				}
+				catch (MoSync.Util.ReturnValueException rve)
+				{
+					return rve.result;
+				}
+				catch (Exception)
+				{
+					return MoSync.Constants.MA_AUDIO_ERR_GENERIC;
+				}
+
+				return ret;
+			};
+
+			ioctls.maAudioSubmitBuffer = delegate(int _instance, int _pointer, int _numBytes)
+			{
+				try
+				{
+					lock (mAudioInstances)
+					{
+						AudioInstanceDynamic ai = (AudioInstanceDynamic)mAudioInstances[_instance];
+						ai.SubmitBuffer(core.GetDataMemory().GetData(), _pointer, _numBytes);
+					}
+				}
+				catch (MoSync.Util.ReturnValueException rve)
+				{
+					return rve.result;
+				}
+				catch (Exception)
+				{
+					return MoSync.Constants.MA_AUDIO_ERR_GENERIC;
+				}
+
+				return MoSync.Constants.MA_AUDIO_ERR_OK;
+			};
+
             ioctls.maAudioInstanceDestroy = delegate(int _audioInstance)
             {
 				try
 				{
-					IAudioInstance ai = mAudioInstances[_audioInstance];
-					ai.Dispose();
-					mAudioInstances[_audioInstance] = null;
+					lock (mAudioInstances)
+					{
+						IAudioInstance ai = mAudioInstances[_audioInstance];
+						ai.Dispose();
+						mAudioInstances[_audioInstance] = null;
+					}
 				}
 				catch (MoSync.Util.ReturnValueException rve)
 				{
@@ -184,8 +327,11 @@ namespace MoSync
             {
 				try
 				{
-					IAudioInstance ai = mAudioInstances[_audioInstance];
-					ai.Play();
+					lock (mAudioInstances)
+					{
+						IAudioInstance ai = mAudioInstances[_audioInstance];
+						ai.Play();
+					}
 				}
 				catch (MoSync.Util.ReturnValueException rve)
 				{
@@ -204,8 +350,11 @@ namespace MoSync
 			{
 				try
 				{
-					IAudioInstance ai = mAudioInstances[_audioInstance];
-					ai.Stop();
+					lock (mAudioInstances)
+					{
+						IAudioInstance ai = mAudioInstances[_audioInstance];
+						ai.Stop();
+					}
 				}
 				catch (MoSync.Util.ReturnValueException rve)
 				{
@@ -223,8 +372,11 @@ namespace MoSync
 			{
 				try
 				{
-					IAudioInstance ai = mAudioInstances[_audioInstance];
-					ai.Pause();
+					lock (mAudioInstances)
+					{
+						IAudioInstance ai = mAudioInstances[_audioInstance];
+						ai.Pause();
+					}
 				}
 				catch (MoSync.Util.ReturnValueException rve)
 				{
@@ -242,8 +394,11 @@ namespace MoSync
 			{
 				try
 				{
-					IAudioInstance ai = mAudioInstances[_audioInstance];
-					ai.SetNumberOfLoops(loops);
+					lock (mAudioInstances)
+					{
+						IAudioInstance ai = mAudioInstances[_audioInstance];
+						ai.SetNumberOfLoops(loops);
+					}
 				}
 				catch (MoSync.Util.ReturnValueException rve)
 				{
@@ -267,8 +422,11 @@ namespace MoSync
 			{
 				try
 				{
-					IAudioInstance ai = mAudioInstances[_audioInstance];
-					ai.SetPosition(_milliseconds);
+					lock (mAudioInstances)
+					{
+						IAudioInstance ai = mAudioInstances[_audioInstance];
+						ai.SetPosition(_milliseconds);
+					}
 				}
 				catch (MoSync.Util.ReturnValueException rve)
 				{
@@ -291,8 +449,11 @@ namespace MoSync
 				int ret = MoSync.Constants.MA_AUDIO_ERR_OK;
 				try
 				{
-					IAudioInstance ai = mAudioInstances[_audioInstance];
-					ret = ai.GetPosition();
+					lock (mAudioInstances)
+					{
+						IAudioInstance ai = mAudioInstances[_audioInstance];
+						ret = ai.GetPosition();
+					}
 				}
 				catch (MoSync.Util.ReturnValueException rve)
 				{
@@ -311,8 +472,11 @@ namespace MoSync
 				int ret = MoSync.Constants.MA_AUDIO_ERR_OK;
 				try
 				{
-					IAudioInstance ai = mAudioInstances[_audioInstance];
-					ret = ai.GetLength();
+					lock (mAudioInstances)
+					{
+						IAudioInstance ai = mAudioInstances[_audioInstance];
+						ret = ai.GetLength();
+					}
 				}
 				catch (MoSync.Util.ReturnValueException rve)
 				{
@@ -330,8 +494,11 @@ namespace MoSync
 			{
 				try
 				{
-					IAudioInstance ai = mAudioInstances[_audioInstance];
-					ai.SetVolume(volume);
+					lock (mAudioInstances)
+					{
+						IAudioInstance ai = mAudioInstances[_audioInstance];
+						ai.SetVolume(volume);
+					}
 				}
 				catch (MoSync.Util.ReturnValueException rve)
 				{

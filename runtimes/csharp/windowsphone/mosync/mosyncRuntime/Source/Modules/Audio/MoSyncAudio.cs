@@ -25,7 +25,8 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Shapes;
-using System;
+using System.Windows.Threading;
+using System.Threading;
 using System.IO;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Media;
@@ -57,29 +58,107 @@ namespace MoSync
 		}
 	}
 
+	// this class is used to create a one shot timer that
+	// is triggered the last time a sound loops in order to turn off looping then
+	// and allow a fixed amount of loops
+	class LoopHelper
+	{
+		private int mNumLoops = 0;
+		private DispatcherTimer mNumLoopsTimer = null;
+		private IAudioInstance mAudioInstance = null;
+		private Action mCallback = null;
+
+		public LoopHelper(IAudioInstance audioInstance, Action callback)
+		{
+			mAudioInstance = audioInstance;
+			mCallback = callback;
+		}
+
+		public void SetNumLoops(int loops)
+		{
+			mNumLoops = loops;
+		}
+
+		void StopLooping(object o, EventArgs a)
+		{
+			mCallback();
+			mNumLoopsTimer.Stop();
+		}
+
+		public void Start()
+		{
+			if (mNumLoopsTimer == null && mNumLoops > 0)
+			{
+				mNumLoopsTimer = new DispatcherTimer();
+				mNumLoopsTimer.Tick += new EventHandler(StopLooping);
+				int len = mAudioInstance.GetLength();
+				mNumLoopsTimer.Interval = TimeSpan.FromMilliseconds(mNumLoops * len - len / 2);
+				mNumLoopsTimer.Start();
+			}
+
+			if (mNumLoopsTimer != null)
+				mNumLoopsTimer.Start();
+		}
+
+		public void Stop()
+		{
+			if (mNumLoopsTimer != null)
+			{
+				mNumLoopsTimer.Stop();
+				mNumLoopsTimer = null;
+			}
+		}
+
+		public void Pause()
+		{
+			if (mNumLoopsTimer != null)
+			{
+				mNumLoopsTimer.Stop();
+			}
+		}
+	}
+
 	class AudioInstanceSoundEffect : IAudioInstance
 	{
 		private SoundEffectInstance mSoundEffectInstance = null;
 		private SoundEffect mSoundEffect = null;
+		private int mNumLoops = 0;
+		private LoopHelper mLoopHelper = null;
 
 		public AudioInstanceSoundEffect(SoundEffect soundEffect)
 		{
 			this.mSoundEffect = soundEffect;
 			this.mSoundEffectInstance = soundEffect.CreateInstance();
+
+			mLoopHelper = new LoopHelper(this, () =>
+				{
+					this.mSoundEffectInstance.IsLooped = false;
+				});
 		}
 
 		public void Play()
 		{
+			if (mNumLoops != 0)
+			{
+				mSoundEffectInstance.IsLooped = true;
+			}
+			else
+			{
+				mSoundEffectInstance.IsLooped = false;
+			}
+			mLoopHelper.Start();
 			mSoundEffectInstance.Play();
 		}
 
 		public void Stop()
 		{
+			mLoopHelper.Stop();
 			mSoundEffectInstance.Stop();
 		}
 
 		public void Pause()
 		{
+			mLoopHelper.Pause();
 			mSoundEffectInstance.Pause();
 		}
 
@@ -117,7 +196,8 @@ namespace MoSync
 
 		public void SetNumberOfLoops(int numLoops)
 		{
-			throw new MoSync.Util.ReturnValueException(MoSync.Constants.MA_AUDIO_ERR_GENERIC);
+			mNumLoops = numLoops;
+			mLoopHelper.SetNumLoops(numLoops);
 		}
 
 		public void Dispose()
@@ -136,6 +216,10 @@ namespace MoSync
 			{
 				async();
 			}
+		}
+
+		public void Update()
+		{
 		}
 	}
 
@@ -168,6 +252,7 @@ namespace MoSync
 	{
 		private Uri mUri = null;
 		private Song mSong = null;
+		private int mNumLoops = 0;
 
 		public AudioInstanceMediaPlayer(Uri uri)
 		{
@@ -248,7 +333,7 @@ namespace MoSync
 
 		public void SetNumberOfLoops(int numLoops)
 		{
-			throw new MoSync.Util.ReturnValueException(MoSync.Constants.MA_AUDIO_ERR_GENERIC);
+			mNumLoops = numLoops;
 		}
 
 		public void Dispose()
@@ -273,7 +358,127 @@ namespace MoSync
 				async();
 			}
 		}
+
+		public void Update()
+		{
+		}
 	}
+
+
+	public class AudioInstanceDynamic : IAudioInstance
+	{
+		private DynamicSoundEffectInstance mSoundEffectInstance = null;
+		private Action mOnBufferNeededCallback = null;
+
+		private byte[] mBuffer = null;
+
+		private void BufferNeeded(object sender, EventArgs a)
+		{
+			if (mOnBufferNeededCallback != null)
+				mOnBufferNeededCallback();
+		}
+
+		public AudioInstanceDynamic(int sampleRate, int numChannels, int bufferSize)
+		{
+			AudioChannels ac = AudioChannels.Stereo;
+			if (numChannels == 1)
+			{
+				ac = AudioChannels.Mono;
+			}
+			else if (numChannels != 2)
+			{
+				throw new MoSync.Util.ReturnValueException(MoSync.Constants.MA_AUDIO_ERR_INVALID_SOUND_FORMAT);
+			}
+
+			this.mSoundEffectInstance = new DynamicSoundEffectInstance(sampleRate, ac);
+			this.mSoundEffectInstance.BufferNeeded += new EventHandler<EventArgs>(BufferNeeded);
+
+			mBuffer = new byte[bufferSize * sizeof(short)];
+		}
+
+		public void Play()
+		{
+			mSoundEffectInstance.Play();
+		}
+
+		public void Stop()
+		{
+			mSoundEffectInstance.Stop();
+		}
+
+		public void Pause()
+		{
+			mSoundEffectInstance.Pause();
+		}
+
+		public void SetPosition(int _millis)
+		{
+			throw new MoSync.Util.ReturnValueException(MoSync.Constants.MA_AUDIO_ERR_GENERIC);
+		}
+
+		public int GetPosition()
+		{
+			throw new MoSync.Util.ReturnValueException(MoSync.Constants.MA_AUDIO_ERR_GENERIC);
+		}
+
+		public int GetLength()
+		{
+			throw new MoSync.Util.ReturnValueException(MoSync.Constants.MA_AUDIO_ERR_GENERIC);
+		}
+
+		public void SetVolume(float vol)
+		{
+			mSoundEffectInstance.Volume = vol;
+		}
+
+		public void SetNumberOfLoops(int numLoops)
+		{
+			throw new MoSync.Util.ReturnValueException(MoSync.Constants.MA_AUDIO_ERR_GENERIC);
+		}
+
+		public void Dispose()
+		{
+			if (mSoundEffectInstance != null)
+			{
+				mSoundEffectInstance.Dispose();
+			}
+
+			mOnBufferNeededCallback = null;
+			mSoundEffectInstance = null;
+		}
+
+		public void Prepare(Action async)
+		{
+			if (async != null)
+			{
+				async();
+			}
+		}
+
+		public int GetPendingBufferCount()
+		{
+			return mSoundEffectInstance.PendingBufferCount;
+		}
+
+		public void SetOnBufferNeededCallback(Action a)
+		{
+			mOnBufferNeededCallback = a;
+		}
+
+		public void Update()
+		{
+		}
+
+		public void SubmitBuffer(byte[] buf, int offset, int length)
+		{
+			System.Buffer.BlockCopy(buf, offset, mBuffer, 0, length);
+
+			int halfLen = length/2;
+			mSoundEffectInstance.SubmitBuffer(mBuffer, 0, halfLen);
+			mSoundEffectInstance.SubmitBuffer(mBuffer, halfLen, halfLen);
+		}
+	}
+
 
 	public class Audio
 	{
@@ -289,11 +494,12 @@ namespace MoSync
 					uriKind = UriKind.Relative;
 				}
 
-				return new AudioDataMediaPlayer(new Uri(url, uriKind));
+				Uri uri = new Uri(url, uriKind);
+				return new AudioDataMediaPlayer(uri);
 			}
 			else
 			{
-				if (url.StartsWith("file://") == true)
+				if (url.StartsWith("file://") == true || url.Contains("://") == false)
 				{
 					String filepath = url.Replace("file://", "");
 					FileModule.File file = new FileModule.File(filepath, FileAccess.Read);
@@ -305,6 +511,12 @@ namespace MoSync
 					IAudioData ret = FromStream(file.FileStream, false);
 					file.Close();
 					return ret;
+				}
+				else
+				{
+					// maybe create a better error code for this..
+					// we don't support anything else than loading from files directly to memory.
+					throw new MoSync.Util.ReturnValueException(MoSync.Constants.MA_AUDIO_ERR_INVALID_FILENAME);
 				}
 			}
 
@@ -319,9 +531,29 @@ namespace MoSync
 			}
 			else
 			{
-				SoundEffect se = SoundEffect.FromStream(stream);
-				return new AudioDataSoundEffect(se);
+				try
+				{
+					SoundEffect se = SoundEffect.FromStream(stream);
+					return new AudioDataSoundEffect(se);
+				}
+				catch (Exception e)
+				{
+					throw new MoSync.Util.ReturnValueException(MoSync.Constants.MA_AUDIO_ERR_INVALID_DATA);
+				}
 			}
+		}
+
+		public static AudioInstanceDynamic CreateDynamic(int _sampleRate, int _numChannels, int _bufferSize)
+		{
+			try
+			{
+				return new AudioInstanceDynamic(_sampleRate, _numChannels, _bufferSize);
+			}
+			catch (Exception e)
+			{
+				throw new MoSync.Util.ReturnValueException(MoSync.Constants.MA_AUDIO_ERR_INVALID_SOUND_FORMAT);
+			}
+
 		}
 	}
 }

@@ -36,5 +36,8 @@ namespace MoSync
 		int GetLength();
 		void SetVolume(float vol);
 		void SetNumberOfLoops(int numLoops);
+
+		// A seperate thread is started for the audio instances to be able to poll the state
+		void Update();
 	}
 }
