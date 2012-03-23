@@ -60,6 +60,39 @@ namespace NativeUI
 		 */
 		virtual ~SegmentedListViewItem();
 
+		/**
+		 * Set the editable state.
+		 * If a cell is editable it means that the user can insert or delete a cell.
+		 * In order to have those options the segmented list must be in edit mode.
+		 * Platform: iOS.
+		 * @param editable true if you want to allow the cell to be edited,
+		 * false otherwise.
+		 */
+		void setEditable(bool editable);
+
+		/**
+		 * Get the editable state.
+		 * Platform: iOS.
+		 * @return true if the cell can be edit, false otherwise.
+		 */
+		bool isEditable();
+
+		/**
+		 * Allow the user to move the cell.
+		 * The segmented list must be in edit mode in order for the cells to
+		 * be moved.
+		 * Platform: iOS.
+		 * @param canMove true if you want to allow the cell to be moved,
+		 * false otherwise.
+		 */
+		void setCanMove(bool canMove);
+
+		/**
+		 * Check if cell can be moved by the user.
+		 * Platform: iOS.
+		 * @return true if cell can be moved, false otherwise.
+		 */
+		bool canMove();
 	};
 
 } // namespace NativeUI

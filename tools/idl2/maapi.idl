@@ -7298,6 +7298,48 @@ group WidgetAPI "Widget API" {
 	}
 	} // end of WidgetSegmentedListViewSectionProperties
 
+	group WidgetSegmentedListViewItemProperties "Segmented List View Item properties" {
+	constset MAString MAW_SEGMENTED_LIST_VIEW_ITEM_ {
+		/**
+		* @brief Set or get the edit value.
+		* If an item is editable it means that the user can insert or delete a cell.
+		* In order to have those options the segmented list must be in edit mode.
+		*
+		* Platform: iOS.
+		*
+		* @validvalue "false" or "true" string values.
+		* Default value is "true".
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+		*   maWidgetSetProperty(listItemHandle, MAW_SEGMENTED_LIST_ITEM_EDIT, "true");
+		* \endcode
+		*/
+		EDIT = "edit";
+
+		/**
+		* @brief Allow the user to move the cell.
+		* If you want to allow the user to move the cell set this value to true.
+		* The segmented list must be in edit mode in order for the cells to be moved.
+		*
+		* Platform: iOS.
+		*
+		* @validvalue "false" or "true" string values.
+		* Default value is "true".
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+		*   maWidgetSetProperty(listItemHandle, MAW_SEGMENTED_LIST_ITEM_MOVE, "true");
+		* \endcode
+		*/
+		MOVE = "move";
+	}
+	} // end of WidgetSegmentedListViewItemProperties
+
 	} // end of WidgetProperties
 
 	typedef int MAWidgetHandle;

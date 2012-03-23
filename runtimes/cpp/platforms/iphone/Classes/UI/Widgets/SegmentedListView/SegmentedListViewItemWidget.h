@@ -45,10 +45,22 @@
      * Cell's height.
      */
     CGFloat _height;
+
+    /**
+     * Flag for cell editing property.
+     */
+    BOOL _canEdit;
+
+    /**
+     * If set the user is allowed to move the cell.
+     */
+    BOOL _canMove;
 }
 
 @property(nonatomic, readonly) UITableViewCell* cell;
 @property(nonatomic, assign) CGFloat height;
+@property(nonatomic, assign) BOOL editable;
+@property(nonatomic, assign) BOOL canMove;
 
 /**
  * Init function.

@@ -56,4 +56,57 @@ namespace NativeUI
 
 	}
 
+	/**
+	 * Set the editable state.
+	 * If a cell is editable it means that the user can insert or delete a cell.
+	 * In order to have those options the segmented list must be in edit mode.
+	 * Platform: iOS.
+	 * @param editable true if you want to allow the cell to be edited,
+	 * false otherwise.
+	 */
+	void SegmentedListViewItem::setEditable(bool editable)
+	{
+		const char* value = editable ? "true" : "false";
+		this->setProperty(MAW_SEGMENTED_LIST_VIEW_ITEM_EDIT, value);
+	}
+
+	/**
+	 * Get the editable state.
+	 * Platform: iOS.
+	 * @return true if the cell can be edit, false otherwise.
+	 */
+	bool SegmentedListViewItem::isEditable()
+	{
+		MAUtil::String value = this->getPropertyString(
+			MAW_SEGMENTED_LIST_VIEW_ITEM_EDIT);
+		bool returnValue = (strcmp(value.c_str(), "true")) ? false : true;
+		return returnValue;
+	}
+
+	/**
+	 * Allow the user to move the cell.
+	 * The segmented list must be in edit mode in order for the cells to
+	 * be moved.
+	 * Platform: iOS.
+	 * @param canMove true if you want to allow the cell to be moved,
+	 * false otherwise.
+	 */
+	void SegmentedListViewItem::setCanMove(bool canMove)
+	{
+		const char* value = canMove ? "true" : "false";
+		this->setProperty(MAW_SEGMENTED_LIST_VIEW_ITEM_MOVE, value);
+	}
+
+	/**
+	 * Check if cell can be moved by the user.
+	 * Platform: iOS.
+	 * @return true if cell can be moved, false otherwise.
+	 */
+	bool SegmentedListViewItem::canMove()
+	{
+		MAUtil::String value = this->getPropertyString(
+			MAW_SEGMENTED_LIST_VIEW_ITEM_MOVE);
+		bool returnValue = (strcmp(value.c_str(), "true")) ? false : true;
+		return returnValue;
+	}
 }

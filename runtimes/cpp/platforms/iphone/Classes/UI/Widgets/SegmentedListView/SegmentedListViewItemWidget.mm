@@ -29,10 +29,45 @@
 
 #import "SegmentedListViewItemWidget.h"
 
+/**
+ * Private methods for SegmentedListViewItemWidget.
+ */
+@interface SegmentedListViewItemWidget(hidden)
+
+/**
+ * Set cell editable property value.
+ * @param value "true" or "false" values.
+ * @return MAW_RES_OK if value param is valid, or MAW_RES_INVALID_PROEPRTY_VALUE otherwise.
+ */
+-(int) setEditableProperty:(NSString*) value;
+
+/**
+ * Check if cell is editable.
+ * @return "true" is cell is editable, "false" otherwise.
+ */
+-(NSString*) isEditableProperty;
+
+/**
+ * Enable / disable moving the cell.
+ * @param value "true" or "false" values.
+ * @return MAW_RES_OK if value param is valid, or MAW_RES_INVALID_PROEPRTY_VALUE otherwise.
+ */
+-(int) setCanMoveProperty:(NSString*) value;
+
+/**
+ * Check if cell can be moved.
+ * @return "true" if cell can be moved, "false" otherwise.
+ */
+-(NSString*) canMoveProperty;
+
+@end
+
 @implementation SegmentedListViewItemWidget
 
 @synthesize cell = _cell;
 @synthesize height = _height;
+@synthesize editable = _canEdit;
+@synthesize canMove = _canMove;
 
 static NSString* kReuseIdentifier = @"Cell";
 
@@ -48,6 +83,9 @@ static NSString* kReuseIdentifier = @"Cell";
                                        reuseIdentifier:kReuseIdentifier];
         _height = _cell.bounds.size.height;
         view = _cell;
+
+        _canEdit = YES;
+        _canMove = YES;
     }
 
     return self;
@@ -61,7 +99,18 @@ static NSString* kReuseIdentifier = @"Cell";
  */
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value
 {
-    return [super setPropertyWithKey:key toValue:value];
+    if ([key isEqualToString:@MAW_SEGMENTED_LIST_VIEW_ITEM_EDIT])
+    {
+        return [self setEditableProperty:value];
+    }
+    else if ([key isEqualToString:@MAW_SEGMENTED_LIST_VIEW_ITEM_MOVE])
+    {
+        return [self setCanMoveProperty:value];
+    }
+    else
+    {
+        return [super setPropertyWithKey:key toValue:value];
+    }
 }
 
 /**
@@ -71,7 +120,18 @@ static NSString* kReuseIdentifier = @"Cell";
  */
 - (NSString*)getPropertyWithKey: (NSString*)key
 {
-    return [super getPropertyWithKey:key];
+    if ([key isEqualToString:@MAW_SEGMENTED_LIST_VIEW_ITEM_EDIT])
+    {
+        return [[self isEditableProperty] retain];
+    }
+    else if ([key isEqualToString:@MAW_SEGMENTED_LIST_VIEW_ITEM_MOVE])
+    {
+        return [[self canMoveProperty] retain];
+    }
+    else
+    {
+        return [super getPropertyWithKey:key];
+    }
 }
 
 /**
@@ -82,6 +142,64 @@ static NSString* kReuseIdentifier = @"Cell";
     // Do NOT release _cell object here. It will be released by the super class.
 
     [super dealloc];
+}
+
+@end
+
+@implementation SegmentedListViewItemWidget(hidden)
+
+/**
+ * Set cell editable property value.
+ * @param value "true" or "false" values.
+ * @return MAW_RES_OK if value param is valid, or MAW_RES_INVALID_PROEPRTY_VALUE otherwise.
+ */
+-(int) setEditableProperty:(NSString*) value
+{
+    if (![value isEqualToString:@"false"] &&
+        ![value isEqualToString:@"true"])
+    {
+        return MAW_RES_INVALID_PROPERTY_VALUE;
+    }
+
+    self.editable = [value boolValue];
+    return MAW_RES_OK;
+}
+
+/**
+ * Check if cell is editable.
+ * @return "true" if cell is editable, "false" otherwise.
+ */
+-(NSString*) isEditableProperty
+{
+    NSString* returnValue = self.editable ? @"true" : @"false";
+    return returnValue;
+}
+
+/**
+ * Enable / disable moving the cell.
+ * @param value "true" or "false" values.
+ * @return MAW_RES_OK if value param is valid, or MAW_RES_INVALID_PROEPRTY_VALUE otherwise.
+ */
+-(int) setCanMoveProperty:(NSString*) value
+{
+    if (![value isEqualToString:@"false"] &&
+        ![value isEqualToString:@"true"])
+    {
+        return MAW_RES_INVALID_PROPERTY_VALUE;
+    }
+
+    self.canMove = [value boolValue];
+    return MAW_RES_OK;
+}
+
+/**
+ * Check if cell can be moved.
+ * @return "true" if cell can be moved, "false" otherwise.
+ */
+-(NSString*) canMoveProperty
+{
+    NSString* returnValue = self.canMove ? @"true" : @"false";
+    return returnValue;
 }
 
 @end
