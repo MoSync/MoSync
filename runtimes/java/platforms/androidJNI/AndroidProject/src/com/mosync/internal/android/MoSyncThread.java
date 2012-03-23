@@ -1851,7 +1851,7 @@ public class MoSyncThread extends Thread
 		{
 			int pixels[] = new int[srcWidth * srcHeight];
 
-			IntBuffer intBuffer = getMemorySlice(dst, -1).asIntBuffer();
+			IntBuffer intBuffer = getMemorySlice(dst, -1).order(null).asIntBuffer();
 
 			imageResource.mBitmap.getPixels(
 				pixels,
