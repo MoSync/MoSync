@@ -153,7 +153,7 @@ public class LocalNotificationObject {
 	 * @return result code.
 	 */
 	public int setProperty(String name, String value)
-		throws PropertyConversionException
+		throws PropertyConversionException, InvalidPropertyValueException
 	{
 		if ( name.equals(MA_NOTIFICATION_LOCAL_TICKER_TEXT) )
 		{
