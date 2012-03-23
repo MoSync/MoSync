@@ -112,7 +112,7 @@ mosync.nativeui.maWidgetCreate = function(
  *            mosync.nativeui.getElementById for getting handles
  * @private
  */
-mosync.nativeui.maWidgetDestroy = function(widgetID, successCallBack,
+mosync.nativeui.maWidgetDestroy = function(widgetID, successCallback,
 		errorCallback, processedCallback) {
 	callbackID = "destroy" + widgetID;
 	var mosyncWidgetHandle = mosync.nativeui.widgetIDList[widgetID];
@@ -1231,14 +1231,15 @@ mosync.nativeui.getElementById = function(elementID) {
  * @private
  */
 mosync.nativeui.getNativeAttrName = function(attributeName) {
-	switch (String(attributeName).toLowerCase()) {
+	var correctAttrName = String(attributeName).split("data-").join("");
+	switch ((correctAttrName).toLowerCase()) {
 	case "fontsize":
 		return "fontSize";
 		break;
 	case "fontcolor":
 		return "fontColor";
 		break;
-	case "backgrouncolor":
+	case "backgroundcolor":
 		return "backgroundColor";
 		break;
 	case "backgroundgradient":
@@ -1351,7 +1352,7 @@ mosync.nativeui.getNativeAttrName = function(attributeName) {
 		break;
 
 	default:
-		return attributeName;
+		return correctAttrName;
 	}
 };
 
@@ -1379,6 +1380,10 @@ mosync.nativeui.createWidget = function(widget, parent) {
 	var widgetID = widget.id;
 	var imageResources = null;
 	var widgetType = widgetNode.getAttribute("widgetType");
+	if(widgetType == null)
+	{
+		widgetType = widgetNode.getAttribute("data-widgetType");
+	}
 	mosync.nativeui.numWidgetsRequested++;
 	var attributeList = widgetNode.attributes;
 	var propertyList = {};
