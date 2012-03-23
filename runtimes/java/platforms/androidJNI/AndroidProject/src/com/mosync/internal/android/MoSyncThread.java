@@ -1958,6 +1958,7 @@ public class MoSyncThread extends Thread
 				}
 
 				intBuffer.put(pixels);
+			}
 		}
 		catch(Exception e)
 		{
