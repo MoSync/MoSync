@@ -224,7 +224,7 @@ static void injectIcons(const SETTINGS& s, const RuntimeInfo& ri) {
 			directories.push_back("/res/drawable-hdpi");*/
 		}
 
-		if (ri.androidVersion >= 7) {
+		if (ri.androidVersion >= 8) {
 			//96x96 for extra high-density (xhdpi)
 			sizes.push_back("96x96");
 			directories.push_back("/res/drawable-xhdpi");
