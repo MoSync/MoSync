@@ -17,14 +17,15 @@ MA 02110-1301, USA.
 */
 
 /**
- * @file MainScreen.h.
- * @author Bogdan Iusco.
+ * @file MainScreen.h
+ * @author emma
  */
 
 #ifndef MAINSCREEN_H_
 #define MAINSCREEN_H_
 
 #include <maapi.h>
+
 #include <MAUtil/util.h>
 
 // Include all the wrappers.
@@ -34,14 +35,14 @@ using namespace NativeUI;
 
 class MainScreen:
 	public Screen,
-	public GLViewListener
+	public ButtonListener
 {
 
 public:
 	/**
 	 * Constructor.
 	 */
-		MainScreen();
+	MainScreen();
 
 	/**
 	 * Destructor.
@@ -50,17 +51,17 @@ public:
 
 private:
 
+    /**
+     * This method is called if the touch-up event was inside the
+     * bounds of the button.
+     * @param button The button object that generated the event.
+     */
+    virtual void buttonClicked(Widget* button);
+
 	/**
 	 * Creates and adds main layout to the screen.
 	 */
 	void createMainLayout();
-
-    /**
-     * This method is called when the GL view has been initialized
-     * and is ready for setup.
-     * @param glView The GL view object that generated the event.
-     */
-    virtual void glViewReady(GLView* glView);
 
 private:
 	/**
@@ -68,7 +69,14 @@ private:
 	 */
 	VerticalLayout* mMainLayout;
 
-	GLView* mGLView;
+	VerticalLayout* mLayout;
+	Button* mRemoveLabel;
+	Label* mLabel;
+
+	HorizontalLayout* mTestLayout;
+	Button* mRemoveLayout;
+	Button* one;
+	Button* two;
 };
 
 

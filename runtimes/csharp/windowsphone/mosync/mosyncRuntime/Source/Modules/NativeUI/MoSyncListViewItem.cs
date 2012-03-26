@@ -20,7 +20,7 @@ MA 02110-1301, USA.
  *
  * @brief This represents the ListViewItem implementation for the NativeUI
  *        component on Windows Phone 7, language C#
- *
+ * Note: The "AccessoryType" property is not available on WP7.
  * @platform WP 7.1
  **/
 
@@ -148,42 +148,31 @@ namespace MoSync
 				set
 				{
 					int val = 0;
-					if(int.TryParse(value, out val))
-					{
-						Resource res = mRuntime.GetResource(MoSync.Constants.RT_IMAGE, val);
-						if (null != res && res.GetInternalObject() != null)
-						{
-							mIcon.Width = mText.Height;
-							mIcon.Height = mText.Height;
-							mIcon.Margin = new Thickness(mText.Margin.Left, mText.Margin.Top, 0, mText.Margin.Bottom);
-							mStretch = System.Windows.Media.Stretch.Fill;
-							mIcon.Stretch = mStretch;
+                    if (int.TryParse(value, out val))
+                    {
+                        Resource res = mRuntime.GetResource(MoSync.Constants.RT_IMAGE, val);
+                        if (null != res && res.GetInternalObject() != null)
+                        {
+                            mIcon.Width = mText.Height;
+                            mIcon.Height = mText.Height;
+                            mIcon.Margin = new Thickness(mText.Margin.Left, mText.Margin.Top, 0, mText.Margin.Bottom);
+                            mStretch = System.Windows.Media.Stretch.Fill;
+                            mIcon.Stretch = mStretch;
 
-							System.Windows.Media.Imaging.BitmapSource bmpSource =
-							(System.Windows.Media.Imaging.BitmapSource)(res.GetInternalObject());
+                            System.Windows.Media.Imaging.BitmapSource bmpSource =
+                            (System.Windows.Media.Imaging.BitmapSource)(res.GetInternalObject());
 
-							mIcon.Source = bmpSource;
-						}
-					}
-				}
-			}
-
-            /**
-             * The "AccessoryType" property.
-             * Has no effect. Available only on iOS.
-             */
-			[MoSyncWidgetProperty(MoSync.Constants.MAW_LIST_VIEW_ITEM_ACCESSORY_TYPE)]
-			public String AccessoryType
-			{
-				set
-				{
-					//not available for Windows Phone
+                            mIcon.Source = bmpSource;
+                        }
+                        else throw new InvalidPropertyValueException();
+                    }
+                    else throw new InvalidPropertyValueException();
 				}
 			}
 
             /**
              * The implementation of the "FontColor" property.
-             * Sets the font color of the item's text
+             * Sets the font color of the item's text.
              */
 			[MoSyncWidgetProperty(MoSync.Constants.MAW_LIST_VIEW_ITEM_FONT_COLOR)]
 			public String FontColor
@@ -201,16 +190,12 @@ namespace MoSync
              * Sets the font size of the item's text
              */
 			[MoSyncWidgetProperty(MoSync.Constants.MAW_LIST_VIEW_ITEM_FONT_SIZE)]
-			public String FontSize
+			public double FontSize
 			{
-				set
-				{
-					double size = 0;
-					if (double.TryParse(value, out size))
-					{
-						mText.FontSize = size;
-					}
-				}
+                set
+                {
+                    mText.FontSize = value;
+                }
 			}
 
             /**

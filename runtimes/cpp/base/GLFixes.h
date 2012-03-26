@@ -116,7 +116,7 @@ return 0; \
 	{
 		GLint ret;
 		glGetIntegerv(GL_ARRAY_BUFFER_BINDING, &ret);
-		if(ret != 0)
+		if(ret != 0 && glGetError()==GL_NO_ERROR)
 		{
 			if(pointer != NULL)
 				pointer = (const void*)SYSCALL_THIS->TranslateNativePointerToMoSyncPointer((void*)pointer);
@@ -148,7 +148,7 @@ return 0; \
 	void wrap_glDrawElements(GLenum mode, GLsizei count, GLenum type, const void* indecies) {
 		GLint ret;
 		glGetIntegerv(GL_ELEMENT_ARRAY_BUFFER_BINDING, &ret);
-		if(ret != 0)
+		if(ret != 0 && glGetError()==GL_NO_ERROR)
 		{
 			if(indecies != NULL)
 				indecies = (const void*)SYSCALL_THIS->TranslateNativePointerToMoSyncPointer((void*)indecies);

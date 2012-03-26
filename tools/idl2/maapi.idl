@@ -2774,6 +2774,9 @@ interface MAAPI {
 		/**
 		* Values for the status field in the #EVENT_TYPE_SMS event.
 		* This event is sent on Android and iOS.
+		* Note: On iOS platforms the MA_SMS_RESULT_DELIVERED message corresponds
+		* To the SMS being successfully queued by the system. There is no way to
+		* know if it was actually delivered.
 		*/
 		constset int MA_SMS_RESULT_ {
 			/// The SMS was sent.
@@ -4809,7 +4812,7 @@ group WidgetAPI "Widget API" {
 		VERTICAL_LAYOUT = "VerticalLayout";
 
 		/**
-		 * @brief A relative layout is a layout that layouts widgets relative to its coordinate system.
+		 * @brief A relative layout is a layout that layouts widgets relative to its coordinate system. See \ref WidgetRelativeLayoutProperties "Relative layout properties" for the properties available.
 		 */
 		RELATIVE_LAYOUT = "RelativeLayout";
 
@@ -5705,15 +5708,19 @@ group WidgetAPI "Widget API" {
 			/**
 			* This flag is a hint to the implementation that during text editing,
 			* the initial letter of each word should be capitalized.
+			* Not available on Windows Phone 7.1.
 			*/
 			INITIAL_CAPS_WORD = 2;
 			/**
 			* This flag is a hint to the implementation that during text editing,
 			* the initial letter of each sentence should be capitalized.
+			* Input flag not available on Windows Phone 7.1 but the edit box
+			* type 'ANY' does this by default.
 			*/
 			INITIAL_CAPS_SENTENCE = 3;
 			/**
 			* Capitalize all characters automatically.
+			* Not available on Windows Phone 7.1.
 			*/
 			INITIAL_CAPS_ALL_CHARACTERS = 4;
 	    }
@@ -6150,6 +6157,24 @@ group WidgetAPI "Widget API" {
 	}
 	} // end of WidgetHorizontalLayoutProperties
 
+	group WidgetRelativeLayoutProperties "Relative layout properties" {
+	constset MAString MAW_RELATIVE_LAYOUT_{
+		/**
+		* @brief Sets the isScrollable boolean
+		*
+		* @validvalue "true" or "false", for "true" the layout will become scrollable otherwise it will become unscrollable
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(verticalLayoutHandle, MAW_RELATIVE_LAYOUT_SCROLLABLE, "true");
+		* \endcode
+		*/
+		SCROLLABLE = "scrollable";
+	}
+	}
+
 	/**
 	* The available widget properties for a #MAW_VERTICAL_LAYOUT. See \ref WidgetProperties "Widget properties" for more properties.
 	*/
@@ -6239,6 +6264,20 @@ group WidgetAPI "Widget API" {
 		* \endcode
 		*/
 		PADDING_BOTTOM = "paddingBottom";
+
+		/**
+		* @brief Sets the isScrollable boolean
+		*
+		* @validvalue "true" or "false", for "true" the layout will become scrollable otherwise it will become unscrollable
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(verticalLayoutHandle, MAW_VERTICAL_LAYOUT_SCROLLABLE, "true");
+		* \endcode
+		*/
+		SCROLLABLE = "scrollable";
 	}
 	} // end of WidgetVerticalLayoutProperties
 
@@ -6747,9 +6786,9 @@ group WidgetAPI "Widget API" {
 		MAX_DATE = "maxDate";
 
 		/**
-		* @brief Sets or gets the year of the maximal date supported by this DatePicker
-		* Note: On Android the default maximal date year  is 2100
-		* Note: On Windows Phone 7 the default maximal date year is 9999
+		* @brief Sets or gets the year of the maximal date supported by this DatePicker.
+		* Note: On Android the default maximal date year is 2100.
+		* Note: On Windows Phone 7 and iOS the default maximal date year is 9999.
 		* @validvalue An int that specifies the value of the year of the maximal date
 		* for this date picker.
 		*
@@ -6763,9 +6802,9 @@ group WidgetAPI "Widget API" {
 		MAX_DATE_YEAR = "maxdateyear";
 
 		/**
-		* @brief Sets or gets the month of the maximal date supported by this DatePicker
+		* @brief Sets or gets the month of the maximal date supported by this DatePicker.
 		* @validvalue An int that specifies the value of the month of the maximal date for
-		* this date picker. The value must be a number between 1 and 12
+		* this date picker. The value must be a number between 1 and 12.
 		*
 		* @setandget
 		*
@@ -6777,7 +6816,7 @@ group WidgetAPI "Widget API" {
 		MAX_DATE_MONTH = "maxdatemonth";
 
 		/**
-		* @brief Sets or gets the day of the maximal date supported by this DatePicker
+		* @brief Sets or gets the day of the maximal date supported by this DatePicker.
 		* @validvalue An int that specifies the value of the day of the maximal date for
 		* this date picker. This number must be a valid day of the month specified with
 		* the MAX_DATE_MONTH property.
@@ -6791,12 +6830,10 @@ group WidgetAPI "Widget API" {
 		*/
 		MAX_DATE_DAY = "maxdateday";
 
-
 		/**
 		* @deprecated use MIN_DATE_YEAR, MIN_DATE_MONTH and MIN_DATE_DAY instead
 		* @brief Sets or gets  minimal date supported by this DatePicker in seconds since January 1, 1970 00:00:00
 		* Note: On Android the default minimal date is 01/01/1900.
-		* NOTE: The property can be set on iOS only.
 		* @validvalue A long int that specifies the minimal supported date.
 		*
 		* @setandget
@@ -6810,9 +6847,9 @@ group WidgetAPI "Widget API" {
 		MIN_DATE = "minDate";
 
 		/**
-		* @brief Sets or gets the year of the minimal date supported by this DatePicker
-		* Note: On Android the default minimal date year  is 1900
-		* Note: On Windows Phone 7 the default minimal date year is 1
+		* @brief Sets or gets the year of the minimal date supported by this DatePicker.
+		* Note: On Android the default minimal date year  is 1900.
+		* Note: On Windows Phone 7 and iOS the default minimal date year is 1.
 		* @validvalue An int that specifies the value of the year of the minimal date
 		* for this date picker.
 		*
@@ -6826,9 +6863,9 @@ group WidgetAPI "Widget API" {
 		MIN_DATE_YEAR = "mindateyear";
 
 		/**
-		* @brief Sets or gets the month of the minimal date supported by this DatePicker
+		* @brief Sets or gets the month of the minimal date supported by this DatePicker.
 		* @validvalue An int that specifies the value of the month of the minimal date for
-		* this date picker. The value must be a number between 1 and 12
+		* this date picker. The value must be a number between 1 and 12.
 		*
 		* @setandget
 		*
@@ -6840,7 +6877,7 @@ group WidgetAPI "Widget API" {
 		MIN_DATE_MONTH = "mindatemonth";
 
 		/**
-		* @brief Sets or gets the day of the minimal date supported by this DatePicker
+		* @brief Sets or gets the day of the minimal date supported by this DatePicker.
 		* @validvalue An int that specifies the value of the day of the minimal date for
 		* this date picker. This number must be a valid day of the month specified with
 		* the MIN_DATE_MONTH property.
@@ -8638,7 +8675,7 @@ group NFCAPI "NFC API" {
 		}
 	}//end of NFC API
 
-	group DBAPI "DB API" {
+	group DBAPI "Database API" {
 		struct MADBBlob {
 			MAAddress data;
 			int size;
@@ -8844,7 +8881,7 @@ group NFCAPI "NFC API" {
 			 */
 			NULL = -4;
 		}
-	} // End of DB API
+	} // End of Database API
 
 	group AudioAPI "Audio API" {
 		typedef int MAAudioData;
