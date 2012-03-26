@@ -474,6 +474,14 @@ void HomeScreen::customEvent(const MAEvent& event)
 		// Set the current value of the slider.
 		mSliderValue = widgetEventData->sliderValue;
 	}
+	else if(widgetEventData->eventType == MAW_EVENT_EDIT_BOX_RETURN)
+	{
+		// Hide the keyboard.
+		maWidgetSetProperty(
+			widgetEventData->widgetHandle,
+			MAW_EDIT_BOX_SHOW_KEYBOARD,
+			"false");
+	}
 	return;
 }
 
