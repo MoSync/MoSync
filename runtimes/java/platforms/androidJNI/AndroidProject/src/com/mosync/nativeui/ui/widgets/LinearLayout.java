@@ -29,7 +29,7 @@ import com.mosync.nativeui.util.properties.VerticalAlignment;
 /**
  * A class for a linear layout that is either horizontal
  * or vertical.
- * 
+ *
  * @author fmattias
  */
 public class LinearLayout extends Layout
@@ -37,7 +37,7 @@ public class LinearLayout extends Layout
 
 	/**
 	 * Constructor.
-	 * 
+	 *
 	 * @param handle Integer handle corresponding to this instance.
 	 * @param linearLayout A linear layout wrapped by this widget.
 	 */
@@ -54,7 +54,7 @@ public class LinearLayout extends Layout
 	{
 		return new android.widget.LinearLayout.LayoutParams( mosyncLayoutParams.getWidth( ) , mosyncLayoutParams.getHeight( ) );
 	}
-	
+
 	/**
 	 * @see updateLayoutParamsForChild.
 	 */
@@ -63,6 +63,10 @@ public class LinearLayout extends Layout
 	{
 		android.widget.LinearLayout linearLayout = (android.widget.LinearLayout) getView( );
 
+		/**
+		 * Widgets automatically fill the remaining space when set to FILL_PARENT(-1),
+		 * or share equally the parent space.
+		 */
 		LayoutParams childLayoutParams = child.getLayoutParams( );
 		if( linearLayout.getOrientation( ) == android.widget.LinearLayout.VERTICAL )
 		{
@@ -71,7 +75,7 @@ public class LinearLayout extends Layout
 				childLayoutParams.height = 0;
 				childLayoutParams.weight = 1.0f;
 			}
-			else
+			else if ( childLayoutParams.getHeight( ) != 0 )
 			{
 				childLayoutParams.weight = 0.0f;
 			}
@@ -83,12 +87,12 @@ public class LinearLayout extends Layout
 				childLayoutParams.width = 0;
 				childLayoutParams.weight = 1.0f;
 			}
-			else
+			else if ( childLayoutParams.getWidth( ) != 0 )
 			{
 				childLayoutParams.weight = 0.0f;
 			}
 		}
-		
+
 		super.updateLayoutParamsForChild( child );
 	}
 

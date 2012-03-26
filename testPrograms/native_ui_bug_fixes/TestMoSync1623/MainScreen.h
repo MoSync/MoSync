@@ -18,13 +18,14 @@ MA 02110-1301, USA.
 
 /**
  * @file MainScreen.h
- * @author Bogdan Iusco.
+ * @author emma
  */
 
 #ifndef MAINSCREEN_H_
 #define MAINSCREEN_H_
 
 #include <maapi.h>
+
 #include <MAUtil/util.h>
 
 // Include all the wrappers.
@@ -32,20 +33,16 @@ MA 02110-1301, USA.
 
 using namespace NativeUI;
 
-/**
- * Class that creates a screen that displays all the contacts.
- */
 class MainScreen:
 	public Screen,
-	public ButtonListener,
-	public EditBoxListener
+	public ButtonListener
 {
 
 public:
 	/**
 	 * Constructor.
 	 */
-		MainScreen();
+	MainScreen();
 
 	/**
 	 * Destructor.
@@ -53,22 +50,6 @@ public:
 	~MainScreen();
 
 private:
-
-    /**
-     * This method is called when there is an touch-down event for
-     * a button.
-     * Only for iphone platform.
-     * @param button The button object that generated the event.
-     */
-    virtual void buttonPressed(Widget* button) {};
-
-    /**
-     * This method is called when there is an touch-up event for
-     * a button.
-     * Only for iphone platform.
-     * @param button The button object that generated the event.
-     */
-    virtual void buttonReleased(Widget* button) {};
 
     /**
      * This method is called if the touch-up event was inside the
@@ -82,27 +63,20 @@ private:
 	 */
 	void createMainLayout();
 
-    /**
-     * This method is called when the return button was pressed.
-     * On iphone platform the virtual keyboard is not hidden after
-     * receiving this event.
-     * @param editBox The edit box object that generated the event.
-     */
-    virtual void editBoxReturn(EditBox* editBox);
-
 private:
 	/**
 	 * Main layout.
 	 */
 	VerticalLayout* mMainLayout;
 
-	ProgressBar* mProgressBar;
-	Label* mProgressBarValue;
-	EditBox* mEditBox;
+	VerticalLayout* mLayout;
+	Button* mRemoveLabel;
+	Label* mLabel;
 
-	Button* mSetProgressValueButton;
-	Button* mSetMaximumValueButton;
-	Button* mIncreaseValueButton;
+	HorizontalLayout* mTestLayout;
+	Button* mRemoveLayout;
+	Button* one;
+	Button* two;
 };
 
 

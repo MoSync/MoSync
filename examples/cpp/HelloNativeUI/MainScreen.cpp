@@ -143,6 +143,9 @@ MA 02110-1301, USA.
     void MainScreen::editBoxReturn(EditBox* editBox)
     {
 		submitEditBoxContent();
+
+		// Hide the keyboard.
+		mPasswordBox->hideKeyboard();
     }
 
 	/**

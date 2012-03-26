@@ -24,6 +24,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ScrollView;
 
+import com.mosync.internal.generated.IX_WIDGET;
 import com.mosync.nativeui.util.LayoutParamsSetter;
 import com.mosync.nativeui.util.properties.InvalidPropertyValueException;
 import com.mosync.nativeui.util.properties.PropertyConversionException;
@@ -271,7 +272,7 @@ public class Layout extends Widget
 			return true;
 		}
 
-		if( property.equals( "isScrollable" ) )
+		if( property.equals( IX_WIDGET.MAW_VERTICAL_LAYOUT_SCROLLABLE ) )
 		{
 			this.setIsScrollable( value.equals( "true" ) );
 		}
