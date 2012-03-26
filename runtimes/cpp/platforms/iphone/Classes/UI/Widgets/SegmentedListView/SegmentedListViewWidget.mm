@@ -208,7 +208,10 @@
     NSMutableArray* array = [[[NSMutableArray alloc] init] autorelease];
     for (SegmentedListViewSectionWidget* section in _sections)
     {
-        [array addObject:section.title];
+        if (section.title)
+        {
+            [array addObject:section.title];
+        }
     }
 
     return array;

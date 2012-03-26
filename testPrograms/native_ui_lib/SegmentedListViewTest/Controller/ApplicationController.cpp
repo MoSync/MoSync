@@ -28,6 +28,7 @@
 
 #include "ApplicationController.h"
 #include "../View/IndexedListScreen.h"
+#include "../View/SettingsScreen.h"
 #include "../Model/DataSource.h"
 
 using namespace MAUtil;
@@ -38,6 +39,7 @@ using namespace MAUtil;
  */
 ApplicationController::ApplicationController():
 	mTabScreen(NULL),
+	mSettingsScreen(NULL),
 	mIndexedListViewScreen(NULL),
 	mDataSource(NULL)
 {
@@ -63,5 +65,8 @@ ApplicationController::~ApplicationController()
 void ApplicationController::createScreens()
 {
 	mIndexedListViewScreen = new IndexedListScreen(*mDataSource);
+	mSettingsScreen = new SettingsScreen();
+
 	mTabScreen->addTab(mIndexedListViewScreen);
+	mTabScreen->addTab(mSettingsScreen);
 }

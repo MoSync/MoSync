@@ -82,13 +82,33 @@ static NSString* kReuseIdentifier = @"Cell";
         _cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault
                                        reuseIdentifier:kReuseIdentifier];
         _height = _cell.bounds.size.height;
-        view = _cell;
+        view = [_cell.contentView retain];
 
         _canEdit = YES;
         _canMove = YES;
+        autoSizeParamX = FILL_PARENT;
+        autoSizeParamY = FILL_PARENT;
     }
 
     return self;
+}
+
+/**
+ * Add a child to list item.
+ */
+- (void)addChild: (IWidget*) child
+{
+    LOGIN;
+    UIView* childView = [child getView];
+	[child setParent:self];
+	[children addObject:child];
+
+    [_cell.contentView addSubview:childView];
+
+    NSLog(@"_cell.contentView = %f", _cell.contentView.bounds.size.width);
+
+    [self layoutSubviews:view];
+//	[child layout];
 }
 
 /**

@@ -68,6 +68,11 @@
 - (id)init;
 
 /**
+ * Add a child to list item.
+ */
+- (void)addChild: (IWidget*) child;
+
+/**
  * Sets a property.
  * @param key The property of the widget that should be set.
  * @param value The value of the property.

@@ -31,6 +31,8 @@
 
 // Forward declarations.
 class IndexedListScreen;
+class SettingsScreen;
+
 class DataSource;
 
 using namespace NativeUI;
@@ -65,6 +67,12 @@ private:
 	 * Shows an alphabetical list.
 	 */
 	IndexedListScreen* mIndexedListViewScreen;
+
+	/**
+	 * 2nd tab screen.
+	 * Shows settings for alphabetical list.
+	 */
+	SettingsScreen* mSettingsScreen;
 
 	/**
 	 * Application data.
