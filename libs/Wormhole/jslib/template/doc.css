@@ -324,6 +324,7 @@ hr:before {
 }
 #index ul li {
 	list-style: none;
+	overflow:hidden;
 }
 
 /* pretty printing */
