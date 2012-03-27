@@ -7240,6 +7240,23 @@ group WidgetAPI "Widget API" {
 		*/
 		GROUPED = 1;
 	}
+
+	constset int MAW_SEGMENTED_LIST_VIEW_MODE_ {
+		/**
+		* @brief List items cannot be edited.
+		* Platform: iOS.
+		* Default value for segmented list view.
+		*/
+		DISPLAY = 0;
+
+		/**
+		* @brief List items can be edited.
+		* For more information see \link #WidgetSegmentedListViewItemProperties
+		* Segmented List View Item Properties \endlink.
+		* Platform: iOS.
+		*/
+		EDIT = 1;
+	}
 	} // end of WidgetSegmentedListViewConstants
 
 	group WidgetSegmentedListViewProperties "Segmented List View properties" {
@@ -7263,6 +7280,26 @@ group WidgetAPI "Widget API" {
 		* \endcode
 		*/
 		TYPE= "type";
+
+		/**
+		* @brief Set the list mode.
+		* Platform: iOS.
+		*
+		* @validvalue One of the \link #MAW_SEGMENTED_LIST_VIEW_MODE_DISPLAY
+		* MAW_SEGMENTED_LIST_VIEW_MODE \endlink constants.
+		* Default value is \link #MAW_SEGMENTED_LIST_VIEW_MODE_DISPLAY MAW_SEGMENTED_LIST_VIEW_MODE_DISPLAY \endlink.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+		*   // Reload list view data.
+		*	char buffer[124];
+		*	sprintf(buffer, "%d", MAW_SEGMENTED_LIST_VIEW_MODE_EDIT);
+		*   maWidgetSetProperty(listHandle, MAW_SEGMENTED_LIST_VIEW_MODE, buffer);
+		* \endcode
+		*/
+		MODE= "mode";
 
 		/**
 		* @brief Reloads data for a given section.

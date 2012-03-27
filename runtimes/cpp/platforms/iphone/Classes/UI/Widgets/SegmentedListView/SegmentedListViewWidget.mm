@@ -54,6 +54,25 @@
  */
 -(NSString*) listType;
 
+/**
+ * Set the list mode.
+ * @param listMode Must be one of the next constants:
+ * - MAW_SEGMENTED_LIST_VIEW_MODE_DISPLAY
+ * - MAW_SEGMENTED_LIST_VIEW_MODE_EDIT
+ * @return One of the next constants:
+ * - MAW_RES_OK if no error occured.
+ * - MAW_RES_INVALID_PROEPRTY_VALUE if listMode is not valid.
+ */
+-(int) setListMode:(NSString*) listMode;
+
+/**
+ * Get the list mode.
+ * @return One of the next values:
+ * - MAW_SEGMENTED_LIST_VIEW_MODE_DISPLAY
+ * - MAW_SEGMENTED_LIST_VIEW_MODE_EDIT
+ */
+-(NSString*) listMode;
+
 @end
 
 @implementation SegmentedListViewWidget
@@ -90,6 +109,10 @@
     {
         resultCode = [self setListType:value];
     }
+    else if([key isEqualToString:@MAW_SEGMENTED_LIST_VIEW_MODE])
+    {
+        resultCode = [self setListMode:value];
+    }
     else if ([key isEqualToString:@MAW_SEGMENTED_LIST_VIEW_RELOAD_DATA])
     {
         [_tableView reloadData];
@@ -111,6 +134,10 @@
     if ([key isEqualToString:@MAW_SEGMENTED_LIST_VIEW_TYPE])
     {
         return [[self listType] retain];
+    }
+    else if([key isEqualToString:@MAW_SEGMENTED_LIST_VIEW_MODE])
+    {
+        return [[self listMode] retain];
     }
 
     return [super getPropertyWithKey:key];
@@ -349,6 +376,63 @@
     }
 
     return [NSString stringWithFormat:@"%d", listType];
+}
+
+/**
+ * Set the list mode.
+ * @param listMode Must be one of the next constants:
+ * - MAW_SEGMENTED_LIST_VIEW_MODE_DISPLAY
+ * - MAW_SEGMENTED_LIST_VIEW_MODE_EDIT
+ * @return One of the next constants:
+ * - MAW_RES_OK if no error occured.
+ * - MAW_RES_INVALID_PROEPRTY_VALUE if listMode is not valid.
+ */
+-(int) setListMode:(NSString*) listMode
+{
+    if (![listMode  canParseNumber])
+    {
+        return MAW_RES_INVALID_PROPERTY_VALUE;
+    }
+
+    int listModeValue = [listMode intValue];
+    BOOL editMode;
+    if (listModeValue == MAW_SEGMENTED_LIST_VIEW_MODE_DISPLAY)
+    {
+        editMode = NO;
+    }
+    else if (listModeValue == MAW_SEGMENTED_LIST_VIEW_MODE_EDIT)
+    {
+        editMode = YES;
+    }
+    else
+    {
+        return MAW_RES_INVALID_PROPERTY_VALUE;
+    }
+
+    [_tableView setEditing:editMode animated:YES];
+    return MAW_RES_OK;
+}
+
+/**
+ * Get the list mode.
+ * @return One of the next values:
+ * - MAW_SEGMENTED_LIST_VIEW_MODE_DISPLAY
+ * - MAW_SEGMENTED_LIST_VIEW_MODE_EDIT
+ */
+-(NSString*) listMode
+{
+    BOOL editMode = _tableView.editing;
+    int listMode;
+    if (editMode)
+    {
+        listMode = MAW_SEGMENTED_LIST_VIEW_MODE_EDIT;
+    }
+    else
+    {
+        listMode = MAW_SEGMENTED_LIST_VIEW_MODE_DISPLAY;
+    }
+
+    return [NSString stringWithFormat:@"%d", listMode];
 }
 
 @end

@@ -60,6 +60,23 @@ namespace NativeUI
 		SegmentedListViewTypeGrouped
 	};
 
+	/**
+	 * @brief Segmented list view modes.
+	 * Available on iOS platform.
+	 */
+	enum SegmentedListViewMode
+	{
+		/**
+		 * @brief List items cannot be edited.
+		 */
+		SegmentedListViewModeDisplay = 0,
+
+		/**
+		 * @brief List items can be edited.
+		 */
+		SegmentedListViewModeEdit
+	};
+
 	// Forward declaration
 	class SegmentedListViewSection;
 
@@ -89,6 +106,18 @@ namespace NativeUI
 		 * @return One of the SegmentedListViewType values.
 		 */
 		SegmentedListViewType getType();
+
+		/**
+		 * Set the list mode.
+		 * @param listMode Mode to set.
+		 */
+		void setMode(SegmentedListViewMode listMode);
+
+		/**
+		 * Get the list mode.
+		 * @return One of the SegmentedListViewMode values.
+		 */
+		SegmentedListViewMode getMode();
 
 		/**
 		 * Add a section to this list.

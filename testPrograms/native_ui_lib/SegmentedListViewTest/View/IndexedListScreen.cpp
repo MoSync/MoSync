@@ -79,7 +79,6 @@ void IndexedListScreen::populateList()
 	for (int i = 0; i < countSections; i++)
 	{
 		const ListSection* section = mDataSource.getSection(i);
-		const String& sectionTitle = section->getTitle();
 		this->addSectionDataToList(*section);
 	}
 }
@@ -93,6 +92,7 @@ void IndexedListScreen::addSectionDataToList(const ListSection& section)
 	SegmentedListViewSection* segmentedListViewSection =
 		new SegmentedListViewSection();
 	segmentedListViewSection->setTitle(section.getTitle());
+	segmentedListViewSection->setHeaderText(section.getTitle());
 
 	int countCells = section.getCellCount();
 	for (int i = 0; i < countCells; i++)

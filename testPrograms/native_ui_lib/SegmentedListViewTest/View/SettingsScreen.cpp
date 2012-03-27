@@ -36,6 +36,8 @@
 #define EDIT_LABEL_TEXT "Allow editing"
 #define MOVE_LABEL_TEXT "Allow moving"
 
+#define FIRST_SECTION_HEADING_TEXT "Options allowed in edit mode"
+
 #include <NativeUI/RelativeLayout.h>
 #include <NativeUI/VerticalLayout.h>
 #include <NativeUI/Label.h>
@@ -89,6 +91,7 @@ void SettingsScreen::createUI()
 void SettingsScreen::createListSection(SegmentedListView& list)
 {
 	SegmentedListViewSection* section = new SegmentedListViewSection();
+	section->setHeaderText(FIRST_SECTION_HEADING_TEXT);
 	list.addSection(section);
 
 	this->createEditOptionRow(*section);

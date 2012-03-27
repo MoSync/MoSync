@@ -79,6 +79,45 @@ namespace NativeUI
 	}
 
 	/**
+	 * Set the list mode.
+	 * @param listMode Mode to set.
+	 */
+	void SegmentedListView::setMode(SegmentedListViewMode listMode)
+	{
+		int listModeValue;
+		if (listMode == SegmentedListViewModeDisplay)
+		{
+			listModeValue = MAW_SEGMENTED_LIST_VIEW_MODE_DISPLAY;
+		}
+		else if (listMode == SegmentedListViewModeEdit)
+		{
+			listModeValue = MAW_SEGMENTED_LIST_VIEW_MODE_EDIT;
+		}
+
+		this->setPropertyInt(MAW_SEGMENTED_LIST_VIEW_MODE, listModeValue);
+	}
+
+	/**
+	 * Get the list mode.
+	 * @return One of the SegmentedListViewMode values.
+	 */
+	SegmentedListViewMode SegmentedListView::getMode()
+	{
+		int listModeValue = this->getPropertyInt(MAW_SEGMENTED_LIST_VIEW_MODE);
+		SegmentedListViewMode listMode;
+		if (listModeValue == MAW_SEGMENTED_LIST_VIEW_MODE_DISPLAY)
+		{
+			listMode = SegmentedListViewModeDisplay;
+		}
+		else if (listModeValue == MAW_SEGMENTED_LIST_VIEW_MODE_EDIT)
+		{
+			listMode = SegmentedListViewModeEdit;
+		}
+
+		return listMode;
+	}
+
+	/**
 	 * Reload list view data.
 	 * Call this method after each modification done to list view data.
 	 * Platform: iOS.
