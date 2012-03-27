@@ -89,6 +89,9 @@ public:
 		char buffer[256];
 		maCameraGetProperty(MA_CAMERA_MAX_ZOOM, buffer, 256);
 		maxZoom = atoi(buffer);
+
+		maScreenSetOrientation(SCREEN_ORIENTATION_LANDSCAPE);
+
 		mStackScreen = new StackScreen();
 		mStackScreen->addStackScreenListener(this);
 		createSettingsScreen();
@@ -144,15 +147,21 @@ public:
 		createCameraWidget();
 
 		//Camera Control buttons are created here
-		createCameraControlButtons();
+		//createCameraControlButtons();
 
+		mAutoFocusButton = new Button();
+		mAutoFocusButton->setText("Auto Focus");
+		mAutoFocusButton->fillSpaceHorizontally();
+		mAutoFocusButton->addButtonListener(this);
 
+		mMainLayoutWidget->addChild(mAutoFocusButton);
 	}
 
 	/**
 	 * A Wrapper function for creating the camera control buttons
 	 * and the layout that holds them
 	 */
+/*
 	void createCameraControlButtons()
 	{
 
@@ -225,7 +234,7 @@ public:
 		mMainLayoutWidget->addChild(mCaptureButton);
 
 	}
-
+*/
 	/**
 	 * A Wrapper function that creates the camera widget
 	 * and binds it to the default camera, The binding
@@ -245,14 +254,20 @@ public:
 
 	void initCameraPreviewEvents()
 	{
-		int height = mCameraPreview->getHeight();
-		int width = mCameraPreview->getWidth();
 
+		MAExtent size = maCameraPreviewSize();
+
+		int height = EXTENT_Y(size);
+		int width = EXTENT_X(size);
+
+		lprintfln("Returned values width:%u height:%u\n", width, height);
 
 		int pHeight = 60;
 		int pWidth = width;
 		int pTop = height/2+pHeight/2;
 		int pLeft = 0;
+
+		lprintfln("left:%u top:%u width:%u height:%u\n", pLeft, pTop, pWidth, pHeight);
 
 		mCameraPreviewWidth = pWidth;
 		mCameraPreviewHeight = pHeight;
@@ -262,7 +277,9 @@ public:
 
 		MARect previewRect = {pLeft,pTop,pWidth,pHeight};
 
-		maCameraPreviewEventEnable(MA_CAMERA_PREVIEW_FRAME, mCameraPreviewBuffer, &previewRect);
+		int e = maCameraPreviewEventEnable(MA_CAMERA_PREVIEW_FRAME, mCameraPreviewBuffer, &previewRect);
+		if(e<0)
+			maPanic(e, "NO!");
 
 		mBarcodeScanner = new BarcodeScanner();
 		mBarcodeScanner->initiate();
@@ -278,6 +295,17 @@ public:
 		mStackScreen->push(mScreen);
 		mStackScreen->show();
 		maCameraStart();
+
+		int res = maCameraSetProperty(MA_CAMERA_FOCUS_MODE, MA_CAMERA_FOCUS_MACRO );
+		if(res < 0)
+		{
+			lprintfln("NO! WE HAVE NO MACRO FOCUS!");
+			res = maCameraSetProperty(MA_CAMERA_FOCUS_MODE, MA_CAMERA_FOCUS_AUTO );
+			if(res < 0)
+			{
+				lprintfln("NO! WE HAVE NO AUTO FOCUS!");
+			}
+		}
 
 		initCameraPreviewEvents();
 	}
@@ -295,13 +323,22 @@ public:
 			MA_CAMERA_FLASH_MODE,
 			mSettingsScreen->getFLashMode()
 			);
-
-		maCameraSetProperty(MA_CAMERA_FOCUS_MODE, MA_CAMERA_FOCUS_MACRO );
-
+/*
+		int res = maCameraSetProperty(MA_CAMERA_FOCUS_MODE, MA_CAMERA_FOCUS_MACRO );
+		if(res < 0)
+		{
+			lprintfln("NO! WE HAVE NO MACRO FOCUS!");
+			res = maCameraSetProperty(MA_CAMERA_FOCUS_MODE, MA_CAMERA_FOCUS_AUTO );
+			if(res < 0)
+			{
+				lprintfln("NO! WE HAVE NO AUTO FOCUS!");
+			}
+		}
+*/
 		char buffer[256];
 		maCameraGetProperty(MA_CAMERA_MAX_ZOOM, buffer, 256);
 		maxZoom = atoi(buffer);
-
+/*
 		//Disable the zoom buttons if zoom is not supported
 		if(maxZoom == 0)
 		{
@@ -319,7 +356,7 @@ public:
 			mZoomOutButton->setEnabled(true);
 			mZoomOutButton->setFontColor(0x000000);
 		}
-
+*/
 	}
 
 
@@ -336,6 +373,15 @@ public:
 	 */
 	virtual void buttonClicked(Widget* button)
 	{
+		if(mAutoFocusButton == button)
+		{
+			int res = maCameraSetProperty(MA_CAMERA_FOCUS_MODE, MA_CAMERA_FOCUS_MACRO );
+			if(res < 0)
+			{
+				res = maCameraSetProperty(MA_CAMERA_FOCUS_MODE, MA_CAMERA_FOCUS_AUTO );
+			}
+		}
+/*
 		if (mCaptureButton == button)
 		{
 			captureButtonClicked();
@@ -374,6 +420,7 @@ public:
 			maCameraSetProperty(MA_CAMERA_ZOOM, buffer);
 
 		}
+*/
 	}
 
 	/**
@@ -480,25 +527,27 @@ private:
 	VerticalLayout *mMainLayoutWidget;
 
 	/** The main layout that holds the other widgets. */
-	HorizontalLayout *mSecondLayoutWidget;
+//	HorizontalLayout *mSecondLayoutWidget;
 
 	/** Text editor box for user input. */
 	CameraPreview *mCameraPreview;
 
+	Button *mAutoFocusButton;
+
 	/** The Settings button. */
-	Button *mSettingsButton;
+//	Button *mSettingsButton;
 
 	/** The Show Image button. */
-	Button *mShowLastImageButton;
+//	Button *mShowLastImageButton;
 
 	/** The Capture button. */
-	Button *mCaptureButton;
+//	Button *mCaptureButton;
 
 	/** The Zoom In button. */
-	Button *mZoomInButton;
+//	Button *mZoomInButton;
 
 	/** The Zoom Out button. */
-	Button *mZoomOutButton;
+//	Button *mZoomOutButton;
 
 	/* index of the current zoom level*/
 	int mCurrentZoomIndex;

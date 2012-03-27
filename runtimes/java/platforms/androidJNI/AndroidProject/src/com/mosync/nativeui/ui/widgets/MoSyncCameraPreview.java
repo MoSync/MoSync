@@ -107,6 +107,12 @@ public class MoSyncCameraPreview extends SurfaceView implements SurfaceHolder.Ca
 			}
 			mCamera.setPreviewDisplay(mHolder);
 
+			// If we use the default preview size things seams to be more stable
+			Camera.Parameters param = mCamera.getParameters();
+			mPreviewSize = param.getPreviewSize();
+
+			mCamera.setParameters(param);
+
 		}
 		catch (Exception e)
 		{
@@ -147,32 +153,7 @@ public class MoSyncCameraPreview extends SurfaceView implements SurfaceHolder.Ca
 				 mCamera.setDisplayOrientation(0);
 			 }
 			 mCamera.setParameters(parameters);
-/*
-			Camera.CameraInfo info = new Camera.CameraInfo();
-			Camera.getCameraInfo(mCameraIndex, info);
-			int rotation = mActivity.getWindowManager().getDefaultDisplay()
-				.getRotation();
-			int degrees = 0;
-			switch (rotation)
-			{
-				case Surface.ROTATION_0: degrees = 0; break;
-				case Surface.ROTATION_90: degrees = 90; break;
-				case Surface.ROTATION_180: degrees = 180; break;
-				case Surface.ROTATION_270: degrees = 270; break;
-			}
 
-			int result;
-			if (info.facing == Camera.CameraInfo.CAMERA_FACING_FRONT)
-			{
-				result = (info.orientation + degrees) % 360;
-				result = (360 - result) % 360;  // compensate the mirror
-			}
-			else
-			{  // back-facing
-				result = (info.orientation - degrees + 360) % 360;
-			}
-			mCamera.setDisplayOrientation(result);
-*/
 		 }
 		 catch (NoSuchMethodException nsme)
 		 {
@@ -255,33 +236,6 @@ public class MoSyncCameraPreview extends SurfaceView implements SurfaceHolder.Ca
 		mPreviewSize = param.getPreviewSize();
 
 		mCamera.setParameters(param);
-
-		/*
-		try
-		{
-			Camera.Parameters param = mCamera.getParameters();
-			Camera.Size optimalPreviewSize = getOptimalSize(
-			param.getSupportedPreviewSizes(),
-			w,
-			h);
-
-			mPreviewSize = optimalPreviewSize;
-
-			Log.i("@@@@@@@@@@MOSYNC@@@","preview size w:" +
-			mPreviewSize.width + " h:" + mPreviewSize.height);
-
-			param.setPreviewSize(
-			optimalPreviewSize.width,
-			optimalPreviewSize.height);
-
-			mCamera.setParameters(param);
-
-		}
-		catch (Exception e)
-		{
-			SYSLOG("Failed to set the preview size");
-		}
-		*/
 	}
 
 	 /**

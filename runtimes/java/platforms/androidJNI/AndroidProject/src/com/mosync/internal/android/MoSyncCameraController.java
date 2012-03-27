@@ -1,6 +1,6 @@
 package com.mosync.internal.android;
 
-
+import static com.mosync.internal.android.MoSyncHelpers.EXTENT;
 import static com.mosync.internal.android.MoSyncHelpers.SYSLOG;
 
 import java.lang.reflect.Method;
@@ -11,6 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
+
+import java.lang.System;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -46,12 +48,16 @@ public class MoSyncCameraController {
 
 	private Camera mCamera;
 
+	private byte[] mCallbackBuffer = null;
+	private byte[] mImageBuffer = null;
+
 
 
 	/**
 	 * Static Attributes used for reflection of some functions in the API
 	 */
 	private static Method mGetNumberofCameras;
+	private static Method mSetPreviewCallbackWithBuffer;
 	private static Camera tempCamera;
 
 	/**
@@ -112,6 +118,8 @@ public class MoSyncCameraController {
 	private int mPreviewEventBufferBottom;
 
 	private boolean mSendEvent = true;
+
+	private boolean mIsUsingPreviewCallbackBuffer = false;
 
 	/**
 	 * Constructor.
@@ -264,7 +272,44 @@ public class MoSyncCameraController {
 			mPreview.mCamera = mCamera;
 			mPreview.initiateCamera();
 			mPreview.mCameraIndex = mCurrentCameraIndex;
+
+			setPreviewCallback();
+
+			Camera.Parameters parameters = getCurrentParameters();
+			Camera.Size size = parameters.getPreviewSize();
+
+			mImageBuffer = new byte[size.width * size.height * 4];
+		}
+	}
+
+	private void setPreviewCallback()
+	{
+		try
+		{
+			//We have to use and static instance of the camera in the reflection here
+			mSetPreviewCallbackWithBuffer = mCamera.getClass().getMethod(
+			"setPreviewCallbackWithBuffer", Camera.PreviewCallback.class);
+
+			Camera.Parameters parameters = getCurrentParameters();
+			Camera.Size size = parameters.getPreviewSize();
+
+			mCallbackBuffer = new byte[size.width * size.height * 4];
+
+			mCamera.addCallbackBuffer(mCallbackBuffer);
+
+			mIsUsingPreviewCallbackBuffer = true;
+
+			mCamera.setPreviewCallbackWithBuffer(previewCallback);
+
+
+
+		}
+		catch (NoSuchMethodException nsme)
+		{
+			mIsUsingPreviewCallbackBuffer = false;
+
 			mCamera.setPreviewCallback(previewCallback);
+
 		}
 	}
 
@@ -333,7 +378,7 @@ public class MoSyncCameraController {
 				mPreview.mCamera = mCamera;
 				mPreview.initiateCamera();
 				mPreview.mCameraIndex = mCurrentCameraIndex;
-				mCamera.setPreviewCallback(previewCallback);
+				setPreviewCallback();
 			}
 
 			mCamera.startPreview();
@@ -608,7 +653,9 @@ public class MoSyncCameraController {
 
 		int width = ((size.width&0x0000ffff)<<16);
 		int height = (size.height&0x0000ffff);
-		return (width&height);
+		int extent = EXTENT(size.width, size.height);
+
+		return extent;
 	}
 
 
@@ -665,62 +712,68 @@ public class MoSyncCameraController {
 			}
 		}
 	};
-/*
-	private class PreviewProceesTask extends AsyncTask
-	{
-		protected void doInBackground(byte[] data)
-		{
-			YUV420toRGB8888(data);
-			return;
-		}
 
-		protected void onPostExecute()
-		{
-			int[] event = new int[1];
-			event[0] = MAAPI_consts.EVENT_TYPE_CAMERA_PREVIEW;
-			mMoSyncThread.postEvent(event);
-		}
-	}
-*/
+	/**
+	 * Handles the preview callbacks, which is fired everytime the camera has a new preview
+	 * Returns directly unless the user has enabled preview events.
+	 *
+	 */
 	Camera.PreviewCallback previewCallback = new Camera.PreviewCallback()
 	{
 		@Override
 		public void onPreviewFrame(byte[] data, Camera camera)
 		{
+
+
 			if(!mMoSyncPreviewFrameEventEnabled)
 			{
 				if(!mMoSyncPreviewAutoFocusEventEnabled)
+				{
+					// Return the buffer if in use
+					if(mIsUsingPreviewCallbackBuffer)
+						camera.addCallbackBuffer(data);
+
 					return;
+				}
 
 				if(!mMoSyncPreviewHasFocus)
+				{
+					// Return the buffer if in use
+					if(mIsUsingPreviewCallbackBuffer)
+						camera.addCallbackBuffer(data);
+
 					return;
+				}
 
 				// Restore the flag for the next auto focus event
 				mMoSyncPreviewHasFocus = false;
 			}
 
 			if(!mSendEvent)
+			{
+				// Return the buffer if in use
+				if(mIsUsingPreviewCallbackBuffer)
+					camera.addCallbackBuffer(data);
+
 				return;
+			}
 
 			lock.lock();
 
 			try
 			{
-
 				if(data != null)
 				{
 					mSendEvent = false;
 
-					final byte[] tdata = Arrays.copyOf(data, data.length);
-					//final byte[] tdata = new byte[data.length];
-					//for(int i = 0; i < data.length; i++)
-					//	tdata[i] = data[i];
+					System.arraycopy(data, 0, mImageBuffer, 0, data.length);
 
+					// To the time consuming task in a new thread
 					new Thread(new Runnable()
 					{
 						public void run()
 						{
-							YUV420toRGB8888(tdata);
+							YUV420toRGB8888();
 
 							int[] event = new int[1];
 							event[0] = MAAPI_consts.EVENT_TYPE_CAMERA_PREVIEW;
@@ -738,6 +791,10 @@ public class MoSyncCameraController {
 			finally
 			{
 				lock.unlock();
+
+				// Return the buffer if in use
+				if(mIsUsingPreviewCallbackBuffer)
+					camera.addCallbackBuffer(data);
 			}
 		}
 	};
@@ -760,7 +817,7 @@ public class MoSyncCameraController {
 	* Source code for conversion found at:
 	* https://groups.google.com/forum/?hl=fr&fromgroups#!topic/android-developers/yF6CmrIJzuo
 	*/
-	public void YUV420toRGB8888(byte[] inBuffer)
+	public void YUV420toRGB8888()
 	{
 		Camera.Size previewSize = mPreview.mPreviewSize;
 
@@ -779,18 +836,18 @@ public class MoSyncCameraController {
 			final int jDiv2 = j >> 1;
 			for(i = mPreviewEventBufferLeft; i < mPreviewEventBufferRight; i++)
 			{
-				Y = inBuffer[pixPtr++];
+				Y = mImageBuffer[pixPtr++];
 				if(Y < 0)
 					Y += 255;
 				if((i & 0x1) != 1)
 				{
 					final int cOff = size + jDiv2 * width + (i >> 1) * 2;
-					Cb = inBuffer[cOff];
+					Cb = mImageBuffer[cOff];
 					if(Cb < 0)
 						Cb += 127;
 					else
 						Cb -= 128;
-					Cr = inBuffer[cOff + 1];
+					Cr = mImageBuffer[cOff + 1];
 					if(Cr < 0)
 						Cr += 127;
 					else
@@ -839,6 +896,7 @@ public class MoSyncCameraController {
 			int width,
 			int height)
 	{
+
 		if(mMoSyncPreviewEventEnabled)
 			return MAAPI_consts.MA_CAMERA_RES_EVENTS_ALREADY_ENABLED;
 
@@ -861,8 +919,6 @@ public class MoSyncCameraController {
 
 		}
 		else return MAAPI_consts.MA_CAMERA_RES_FAILED;
-
-		mMoSyncPreviewEventEnabled = true;
 
 		// Get the size of the preview and make sure the rect
 		// ins't too big!
@@ -889,6 +945,8 @@ public class MoSyncCameraController {
 		mPreviewEventBufferTop = top;
 		mPreviewEventBufferRight = left + width;
 		mPreviewEventBufferBottom = top + height;
+
+		mMoSyncPreviewEventEnabled = true;
 
 		return MAAPI_consts.MA_CAMERA_RES_OK;
 	}
