@@ -157,9 +157,11 @@ void PrintConsole(const wchar_t *str)
 #else
 			char* buf8 = (char*)malloc(length * MB_LEN_MAX);
 #endif
+			int len8;
 			//maWriteLog(str, length*sizeof(wchar_t));
 			//convert to utf-8
-			int len8 = wcstombs(buf8, str, length * MB_LEN_MAX);
+			memset(buf8, 0, length * MB_LEN_MAX);
+			len8 = wcstombs(buf8, str, length * MB_LEN_MAX);
 			maWriteLog(buf8, len8);
 			if (str[length - 1] != '\n')
 				maWriteLog("\n", 1);

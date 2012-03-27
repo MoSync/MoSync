@@ -29,7 +29,7 @@ MA 02110-1301, USA.
  * @file WidgetUtil.h
  * @author Bogdan Iusco
  *
- * Utilities for widgets(e.g. common constants, macros, functions etc).
+ * @brief Utilities for widgets(e.g. common constants, macros, functions etc).
  */
 
 #ifndef WIDGET_UTIL_H_

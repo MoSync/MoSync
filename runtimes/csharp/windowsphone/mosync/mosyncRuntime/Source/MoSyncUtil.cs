@@ -181,15 +181,28 @@ namespace MoSync
 			}
 		};
 
+		public static void ShowMessage(String text, bool log=true, String caption="")
+		{
+			if(log)
+				Log(text);
+
+			if(caption == "")
+				Deployment.Current.Dispatcher.BeginInvoke(() => MessageBox.Show(text));
+			else
+				Deployment.Current.Dispatcher.BeginInvoke(() => MessageBox.Show(text, caption, MessageBoxButton.OK));
+		}
+
 		public static void CriticalError(String text)
 		{
 			Log(text);
-			//System.Environment.Exit(1);
-			//MessageBox.Show(text);
+
+// Enable this if you want the debugger to automatically break here.
+#if false
 			if (System.Diagnostics.Debugger.IsAttached)
 			{
 				System.Diagnostics.Debugger.Break();
 			}
+#endif
 			Deployment.Current.Dispatcher.BeginInvoke(() => MessageBox.Show(text));
 			throw new ExitException(-1);
 		}
@@ -229,6 +242,19 @@ namespace MoSync
 			RunActionOnMainThread(action, true);
 		}
 
+
+		static Action sPreRunOnMainThreadAction = null;
+		public static void SetPreRunOnMainThreadAction(Action action)
+		{
+			sPreRunOnMainThreadAction = action;
+		}
+
+		static Action sPostRunOnMainThreadAction = null;
+		public static void SetPostRunOnMainThreadAction(Action action)
+		{
+			sPostRunOnMainThreadAction = action;
+		}
+
 		public static void RunActionOnMainThread(Action action, bool sync)
 		{
 			if (Thread.CurrentThread == sStartupThread)
@@ -239,6 +265,9 @@ namespace MoSync
 
 			if (sync)
 			{
+				if (sPreRunOnMainThreadAction != null)
+					sPreRunOnMainThreadAction();
+
 				using (AutoResetEvent are = new AutoResetEvent(false))
 				{
 					Deployment.Current.Dispatcher.BeginInvoke(() =>
@@ -248,6 +277,9 @@ namespace MoSync
 					});
 					are.WaitOne();
 				}
+
+				if (sPostRunOnMainThreadAction != null)
+					sPostRunOnMainThreadAction();
 			}
 			else
 			{
@@ -291,24 +323,38 @@ namespace MoSync
 		public static void convertStringToColor(string value, out System.Windows.Media.SolidColorBrush brush)
 		{
 			brush = null;
-			if (value.Length == 8 && value[0].Equals('0') && value[1].Equals('x'))
-			{
-				//converting the string from value into RGB bytes
-				byte R = Byte.Parse(value.Substring(2, 2), System.Globalization.NumberStyles.HexNumber);
-				byte G = Byte.Parse(value.Substring(4, 2), System.Globalization.NumberStyles.HexNumber);
-				byte B = Byte.Parse(value.Substring(6, 2), System.Globalization.NumberStyles.HexNumber);
-				byte A = 255;
-				brush = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(A, R, G, B));
-			}
-			else if (value.Length == 7 && value[0].Equals('#'))
-			{
-				//converting the string from value into RGB bytes
-				byte R = Byte.Parse(value.Substring(1, 2), System.Globalization.NumberStyles.HexNumber);
-				byte G = Byte.Parse(value.Substring(3, 2), System.Globalization.NumberStyles.HexNumber);
-				byte B = Byte.Parse(value.Substring(5, 2), System.Globalization.NumberStyles.HexNumber);
-				byte A = 255;
-				brush = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(A, R, G, B));
-			}
+
+            // value starts with "0x"
+            if (value.Length == 8 && value[0].Equals('0') && value[1].Equals('x'))
+            {
+                //converting the string from value into RGB bytes
+                byte R = Byte.Parse(value.Substring(2, 2), System.Globalization.NumberStyles.HexNumber);
+                byte G = Byte.Parse(value.Substring(4, 2), System.Globalization.NumberStyles.HexNumber);
+                byte B = Byte.Parse(value.Substring(6, 2), System.Globalization.NumberStyles.HexNumber);
+                byte A = 255;
+                brush = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(A, R, G, B));
+            }
+            // value starts with "#"
+            else if (value.Length == 7 && value[0].Equals('#'))
+            {
+                //converting the string from value into RGB bytes
+                byte R = Byte.Parse(value.Substring(1, 2), System.Globalization.NumberStyles.HexNumber);
+                byte G = Byte.Parse(value.Substring(3, 2), System.Globalization.NumberStyles.HexNumber);
+                byte B = Byte.Parse(value.Substring(5, 2), System.Globalization.NumberStyles.HexNumber);
+                byte A = 255;
+                brush = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(A, R, G, B));
+            }
+            // value doesn't have the normal hex sign
+            else if (value.Length == 6)
+            {
+                //converting the string from value into RGB bytes
+                byte R = Byte.Parse(value.Substring(0, 2), System.Globalization.NumberStyles.HexNumber);
+                byte G = Byte.Parse(value.Substring(2, 2), System.Globalization.NumberStyles.HexNumber);
+                byte B = Byte.Parse(value.Substring(4, 2), System.Globalization.NumberStyles.HexNumber);
+                byte A = 255;
+                brush = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(A, R, G, B));
+            }
+            else throw new InvalidPropertyValueException();
 		}
 
 		public static WriteableBitmap CreateWriteableBitmapFromStream(Stream stream)
@@ -323,8 +369,9 @@ namespace MoSync
 					im.SetSource(stream);
 					wb = new WriteableBitmap(im);
 				}
-				catch (Exception)
+				catch (Exception e)
 				{
+					Util.Log(e.StackTrace);
 					wb = null;
 				}
 			});

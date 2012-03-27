@@ -16,6 +16,15 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301, USA.
 */
 
+/*! \addtogroup NotificationLib
+ *  @{
+ */
+
+/**
+ *  @defgroup NotificationLib Notification Library
+ *  @{
+ */
+
 /**
  * @file LocalNotification.h
  * @author Emma Tresanszki and Bogdan Iusco
@@ -23,6 +32,7 @@ MA 02110-1301, USA.
  *
  * @brief Local notifications are used for displaying alerts, playing sounds
  * and for badging application icon.
+ *
  * The operating system is responsible for delivering the notification at the
  * proper time; the application does not have to be running for this to happen.
  * When you create a local notification, you must specify when the system
@@ -35,31 +45,43 @@ MA 02110-1301, USA.
 
 #include <MAUtil/String.h>
 
+/**
+* \brief MoSync Notification API classes.
+*/
 namespace Notification
 {
 
 	/**
-	 * Constants indicating the notification flags.
+	 * \brief Constants indicating the notification flags.
 	 * Platform: Android only.
 	 */
 	enum NotificationFlag
 	{
-		// Indicates that the audio will be repeated until the notification is
-		// canceled or the notification window is opened.
+		/**
+		 * @brief Indicates that the audio will be repeated until the notification
+		 * is canceled or the notification window is opened.
+		 */
 		NOTIFICATION_FLAG_INSISTENT = 4,
-		// Indicates that the notification should not be canceled when the user clicks the
-		// Clear all button.
+		/**
+		 * @brief Indicates that the notification should not be canceled when
+		 * the user clicks the Clear all button.
+		 */
 		NOTIFICATION_FLAG_NO_CLEAR = 32,
-		// Indicates that this notification represents a high-priority event that may be
-		// shown to the user even if notifications are otherwise unavailable (that is, when
-		// the status bar is hidden).
+		/**
+		 * @brief Indicates that this notification represents a high-priority
+		 * event that may be shown to the user even if notifications are
+		 * otherwise unavailable (that is, when the status bar is hidden).
+		 */
 		NOTIFICATION_FLAG_HIGH_PRIORITY = 128,
-		// Indicates that the notification should be canceled when it is clicked by the user.
+		/**
+		 * @brief Indicates that the notification should be canceled when it is
+		 * clicked by the user.
+		 */
 		NOTIFICATION_FLAG_AUTO_CANCEL = 16
 	};
 
 	/**
-	 * Constants used for setting the required state of the application
+	 * @brief Constants used for setting the required state of the application
 	 * for a notification to be displayed.
 	 * Note that regardless of this setting, the didReceiveLocalNotification
 	 * callback will be made for each incoming notification.
@@ -67,32 +89,43 @@ namespace Notification
 	 */
 	enum NotificationDisplayFlag
 	{
-		// For local notifications:by setting this, the incoming notifications
-		// will be displayed to the user only if the application is in background.
-		// For push notifications: by setting this, the incoming notifications
-		// will be displayed to the user only if the application is not in use.
-		// This setting is enabled by default.
+		/**
+		 * @brief For local notifications:by setting this, the incoming
+		 * notifications will be displayed to the user only if the application
+		 * is in background.
+		 * For push notifications: by setting this, the incoming notifications
+		 * will be displayed to the user only if the application is not in use.
+		 * This setting is enabled by default.
+		 */
 		NOTIFICATION_DISPLAY_DEFAULT = 0,
-		// By setting this, the incoming notifications will be displayed to
-		// the user regardless of the application's focus state.
-		// So, even when in foreground, the notifications will be shown to
-		// the user.
+		/**
+		 * @brief By setting this, the incoming notifications will be displayed
+		 * to the user regardless of the application's focus state.
+		 * So, even when in foreground, the notifications will be shown to
+		 * the user.
+		 */
 		NOTIFICATION_DISPLAY_ANYTIME = 1
 	};
 
 	/**
-	 * Flashing LED lights.
+	 * \brief Flashing LED lights.
 	 * Define color and pattern.
 	 * Platform: Android only.
 	 */
 	struct NotificationFlashLights{
 		int ledARGB;
-		// Length of time, in seconds, to keep the light on.
+		/**
+		 * @brief Length of time, in seconds, to keep the light on.
+		 */
 		int ledOnMS;
-		// Length of time, in seconds, to keep the light off.
+		/**
+		 * @brief Length of time, in seconds, to keep the light off.
+		 */
 		int ledOffMS;
+
 		NotificationFlashLights(int color, int on, int off):
 			ledARGB(color), ledOnMS(on), ledOffMS(off){};
+
 		NotificationFlashLights(){};
 	};
 
@@ -308,7 +341,7 @@ namespace Notification
          * Set the display flags applied to the local notification.
          * Note that regardless of this setting, the didReceiveLocalNotification
          * callback will be made for each incoming notification.
-         * #NOTIFICATION_DISPLAY_ONLY_IF_IN_BACKGROUND is enabled by default.
+         * #NOTIFICATION_DISPLAY_DEFAULT is enabled by default.
          * Platform: Android.
          * @param displayFlag  is the required state of the application for
          * a notification to be displayed. One of the constants:
@@ -364,6 +397,9 @@ namespace Notification
         /**
          * Set the sound to play when an alert is displayed.
          * Could be ignored if using setPlaySound(false).
+         * The sound file should be saved in a notifications folder under sdcard storage.
+         * Note that some devices can only play notification sounds stored in the
+         * internal storage, in the \system\media\audio\notifications folder.
          * Platform: Android.
          * @param path A valid path to an audio file.
          * @return Any of the following result codes:
@@ -454,7 +490,7 @@ namespace Notification
 
         /**
          * Set the date and time when the system should deliver the notification.
-         * @param tm A date and time struct that specifies when the system
+         * @param time A date and time struct that specifies when the system
          * should deliver the notification.
          * @return Any of the following result codes:
          * - #MA_NOTIFICATION_RES_OK if the property could be set.
@@ -479,3 +515,5 @@ namespace Notification
 } // namespace Notification
 
 #endif /* NOTIFICATION_LOCAL_NOTIFICATION_H_ */
+
+/*! @} */

@@ -97,12 +97,25 @@ namespace Wormhole
 			}
 		}
 		// Compass request from PhoneGap
-		else if ((message.getParam("service") == "Compass") &&
-				(message.getParam("action") == "getHeading"))
+		else if (message.getParam("service") == "Compass")
 		{
-			processCompassRequest(
-				message.getParam("PhoneGapCallBackId"),
-				false); //stop Sensor after the first run
+			if(message.getParam("action") == "getHeading")
+			{
+				processCompassRequest(
+					message.getParam("PhoneGapCallBackId"),
+					false); //stop Sensor after the first run
+			}
+			else if (message.getParam("action") == "startWatch")
+			{
+				processCompassRequest(
+					message.getParam("PhoneGapCallBackId"),
+					true); // Keep the Compass running
+			}
+			else if (message.getParam("action") == "stopWatch")
+			{
+				maSensorStop(SENSOR_TYPE_COMPASS);
+				mAccelerometerWatchStarted = false;
+			}
 		}
 	}
 
@@ -170,9 +183,17 @@ namespace Wormhole
 
 	void PhoneGapSensors::sendCompassData(MASensor sensorData)
 	{
-		sendCompassData(mCompassWatchCallBack, sensorData);
-		// Stop the sensor since it was a one time call.
-		maSensorStop(SENSOR_TYPE_ORIENTATION);
+		if (true == mCompassWatchStarted)
+		{
+			// We are sending the event continuously.
+			sendCompassData(mCompassWatchCallBack, sensorData);
+		}
+		else
+		{
+			sendCompassData(mCompassWatchCallBack, sensorData);
+			// Stop the sensor since it was a one time call.
+			maSensorStop(SENSOR_TYPE_COMPASS);
+		}
 	}
 
 	/**
@@ -230,16 +251,29 @@ namespace Wormhole
 			MASensor sensorData)
 	{
 		char result[1024];
+		bool keepCallBack;
+
+		// This is used to prevent PhoneGap from deleting the callback after
+		// receiving the first result.
+		if (mCompassWatchStarted)
+		{
+			keepCallBack = true;
+		}
+		else
+		{
+			keepCallBack = false;
+		}
 		//Call the Phonegap function, Can call the commandResult function too
 		sprintf(
 				result,
-				"{\"magneticHeading\":%f }",
-				sensorData.values[1] // only x is considered as compass heading in PhoneGap
+				"\\'{\"magneticHeading\":%f }\\'",
+				sensorData.values[0] // only x is considered as compass heading in PhoneGap
 				);
 		mMessageHandler->callSuccess(
 			callbackID,
 			PHONEGAP_CALLBACK_STATUS_OK,
-			result);
+			result,
+			keepCallBack);
 	}
 
 	/**
@@ -291,8 +325,8 @@ namespace Wormhole
 			MAUtil::String callbackID,
 			bool isWatched)
 	{
-		// In PhoneGap, compass is actually the orientation sensor.
-		int res = maSensorStart(SENSOR_TYPE_ORIENTATION, SENSOR_RATE_NORMAL);
+		int res = maSensorStart(SENSOR_TYPE_COMPASS, SENSOR_RATE_NORMAL);
+		printf("result:%d",res);
 		if (res < 0)
 		{
 			mMessageHandler->callError(
@@ -301,7 +335,7 @@ namespace Wormhole
 				"MoSync: Failed to Start Compass");
 			return;
 		}
-
+		mCompassWatchStarted = isWatched;
 		mCompassWatchCallBack = callbackID;
 	}
 } // namespace

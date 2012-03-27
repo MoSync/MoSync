@@ -357,7 +357,7 @@ namespace MoSync
 		}
 
 		public static void DrawImageRegion(WriteableBitmap dst, int left, int top,
-				Rect srcRect, WriteableBitmap img, int transformMode)
+				Rect srcRect, WriteableBitmap img, int transformMode, Rect clipRect)
 		{
 			int width = (int)srcRect.Width,
 				height = (int)srcRect.Height,
@@ -374,10 +374,10 @@ namespace MoSync
 				transWidth,
 				transHeight;
 
-			/*int dirHorizontalX = 0,
+			int dirHorizontalX = 0,
 				dirHorizontalY = 0,
 				dirVerticalX = 0,
-				dirVerticalY = 0;*/
+				dirVerticalY = 0;
 
 			switch (transformMode)
 			{
@@ -390,8 +390,8 @@ namespace MoSync
 					transBottomRightY = v + height - 1;
 					transWidth = width;
 					transHeight = height;
-					//dirHorizontalX = 1;
-					//dirVerticalY = 1;
+					dirHorizontalX = 1;
+					dirVerticalY = 1;
 					break;
 				case MoSync.Constants.TRANS_ROT90:
 					srcPitchX = -img.PixelWidth;
@@ -402,8 +402,8 @@ namespace MoSync
 					transBottomRightY = v;
 					transWidth = height;
 					transHeight = width;
-					//dirHorizontalY = -1;
-					//dirVerticalX = 1;
+					dirHorizontalY = -1;
+					dirVerticalX = 1;
 					break;
 				case MoSync.Constants.TRANS_ROT180:
 					srcPitchX = -bpp;
@@ -414,8 +414,8 @@ namespace MoSync
 					transBottomRightY = v;
 					transWidth = width;
 					transHeight = height;
-					//dirHorizontalX = -1;
-					//dirVerticalY = -1;
+					dirHorizontalX = -1;
+					dirVerticalY = -1;
 					break;
 				case MoSync.Constants.TRANS_ROT270:
 					srcPitchX = img.PixelWidth;
@@ -426,8 +426,8 @@ namespace MoSync
 					transBottomRightY = v + height - 1;
 					transWidth = height;
 					transHeight = width;
-					//dirHorizontalY = 1;
-					//dirVerticalX = -1;
+					dirHorizontalY = 1;
+					dirVerticalX = -1;
 					break;
 				case MoSync.Constants.TRANS_MIRROR:
 					srcPitchX = -bpp;
@@ -438,8 +438,8 @@ namespace MoSync
 					transBottomRightY = v + height - 1;
 					transWidth = width;
 					transHeight = height;
-					//dirHorizontalX = -1;
-					//dirVerticalY = 1;
+					dirHorizontalX = -1;
+					dirVerticalY = 1;
 					break;
 				case MoSync.Constants.TRANS_MIRROR_ROT90:
 					srcPitchX = -img.PixelWidth;
@@ -450,8 +450,8 @@ namespace MoSync
 					transBottomRightY = v;
 					transWidth = height;
 					transHeight = width;
-					//dirHorizontalY = -1;
-					//dirVerticalX = -1;
+					dirHorizontalY = -1;
+					dirVerticalX = -1;
 					break;
 				case MoSync.Constants.TRANS_MIRROR_ROT180:
 					srcPitchX = bpp;
@@ -462,8 +462,8 @@ namespace MoSync
 					transBottomRightY = v;
 					transWidth = width;
 					transHeight = height;
-					//dirHorizontalX = 1;
-					//dirVerticalY = -1;
+					dirHorizontalX = 1;
+					dirVerticalY = -1;
 					break;
 				case MoSync.Constants.TRANS_MIRROR_ROT270:
 					srcPitchX = img.PixelWidth;
@@ -474,8 +474,8 @@ namespace MoSync
 					transBottomRightY = v + height - 1;
 					transWidth = height;
 					transHeight = width;
-					//dirHorizontalY = 1;
-					//dirVerticalX = 1;
+					dirHorizontalY = 1;
+					dirVerticalX = 1;
 					break;
 				default:
 					MoSync.Util.CriticalError("Invalid transform!");
@@ -496,32 +496,30 @@ namespace MoSync
 			if (transWidth <= 0 || transHeight <= 0) return;
 
 			// TODO: Port clipping section.
-			/*
-			if (left >= clipRect.x + clipRect.width)
+			if (left >= clipRect.X + clipRect.Width)
 				return;
-			else if(left < clipRect.x) {
-				transTopLeftX += (clipRect.x - left)*dirHorizontalX;
-				transTopLeftY += (clipRect.x - left)*dirHorizontalY;
-				transWidth -= clipRect.x - left;
-				left = clipRect.x;
+			else if(left < clipRect.X) {
+				transTopLeftX += ((int)clipRect.X - left)*dirHorizontalX;
+				transTopLeftY += ((int)clipRect.X - left) * dirHorizontalY;
+				transWidth -= (int)clipRect.X - left;
+				left = (int)clipRect.X;
 			}
-			if (top >= clipRect.y + clipRect.height)
+			if (top >= clipRect.Y + clipRect.Height)
 				return;
-			else if(top < clipRect.y) {
-				transTopLeftX += (clipRect.y - top)*dirVerticalX;
-				transTopLeftY += (clipRect.y - top)*dirVerticalY;
-				transHeight -= clipRect.y - top;
-				top = clipRect.y;
+			else if(top < clipRect.Y) {
+				transTopLeftX += ((int)clipRect.Y - top) * dirVerticalX;
+				transTopLeftY += ((int)clipRect.Y - top) * dirVerticalY;
+				transHeight -= (int)clipRect.Y - top;
+				top = (int)clipRect.Y;
 			}
-			if(left + transWidth < clipRect.x)
+			if(left + transWidth < clipRect.X)
 				return;
-			else if(left + transWidth >= clipRect.x + clipRect.width)
-				transWidth -= (left + transWidth) - (clipRect.x + clipRect.width);
-			if(top + height < clipRect.y)
+			else if(left + transWidth >= clipRect.X + clipRect.Width)
+				transWidth -= (left + transWidth) - (int)(clipRect.X + clipRect.Width);
+			if(top + height < clipRect.Y)
 				return;
-			else if(top + transHeight >= clipRect.y + clipRect.height)
-				transHeight -= (top + transHeight) - (clipRect.y + clipRect.height);
-			*/
+			else if(top + transHeight >= clipRect.Y + clipRect.Height)
+				transHeight -= (top + transHeight) - (int)(clipRect.Y + clipRect.Height);
 
 			if (transWidth <= 0 || transHeight <= 0) return;
 
@@ -550,7 +548,7 @@ namespace MoSync
 					}
 					else if (sa == 0)
 					{
-						//dst.Pixels[dstScan] = (int)dstCol;
+						dst.Pixels[dstScan] = (int)dstCol;
 					}
 					else
 					{
@@ -562,10 +560,10 @@ namespace MoSync
 						uint dg = (((dstCol) & 0x0000ff00) >> 8);
 						uint db = (((dstCol) & 0x000000ff) >> 0);
 
-						dst.Pixels[dstScan] = (int)(
-									(((dr + (((sr - dr) * (sa)) >> 8)) << 16) & 0x00ff0000) |
-									(((dg + (((sg - dg) * (sa)) >> 8)) << 8) & 0x0000ff00) |
-									(((db + (((sb - db) * (sa)) >> 8)) << 0) & 0x000000ff));
+						dst.Pixels[dstScan] = (int)(0xff000000 |
+									(((dr + (((sr - dr) * (sa)) / 255)) << 16) & 0x00ff0000) |
+									(((dg + (((sg - dg) * (sa)) / 255)) << 8) & 0x0000ff00) |
+									(((db + (((sb - db) * (sa)) / 255)) << 0) & 0x000000ff));
 					}
 
 					srcScan += srcPitchX;

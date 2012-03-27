@@ -36,12 +36,7 @@
     /**
      * Used a timer for reading gyro data at a given time interval.
      */
-    NSTimer* motionManagerTimer;
-
-    /**
-     * Used by the gyroscope sensor to process data.
-     */
-    NSOperationQueue *operationQueue;
+    dispatch_source_t motionManagerTimer;
 
     /**
      * Used to acces data from the magnetometer(compass) sensor.
@@ -51,8 +46,16 @@
     /**
      * CLLocationManager does not offer a way of setting an update interval.
      * Used a timer for reading location data at a given time interval.
+     * This timer is used for the magnetic field sensor
      */
-    NSTimer* locationManagerTimer;
+    dispatch_source_t locationManagerTimer;
+
+    /**
+     * CLLocationManager does not offer a way of setting an update interval.
+     * Used a timer for reading location data at a given time interval.
+     * This timer is used for the compass sensor
+     */
+    dispatch_source_t compassManagerTimer;
 
     /**
      * The flag is set is the proximity sensor is started.
@@ -68,6 +71,11 @@
      * The flag is set is the magnetometer sensor is started.
      */
     BOOL isMagnetometerSensorRunning;
+
+    /**
+     * The flag is set is the heading sensor is started.
+     */
+    BOOL isCompassRunning;
 }
 
 /**
@@ -154,6 +162,19 @@
 -(int) stopMagnetometer;
 
 /**
+ * Start the heading sensor.
+ * @param interval How fast to read data(time interval in milliseconds).
+ * @return SENSOR_ERROR_NONE if the sensor has been started, or a code error otherwise.
+ */
+-(int)startCompass:(const int)interval;
+
+/**
+ * Stop the compass.
+ * @return SENSOR_ERROR_NONE if the sensor has been stopped, or a code error otherwise.
+ */
+-(int) stopCompass;
+
+/**
  * Get the update interval associated with a rate constant.
  * @param rate One of the next constants:
  * - SENSOR_RATE_FASTEST
@@ -164,12 +185,5 @@
  * if it's not one of the above constants.
  */
 -(int) getUpdateIntervalFromRate:(const int) rate;
-
-/**
- * Delivers the latest acceleration data.
- * @param accelerometer The application's accelerometer object.
- * @param acceleration The most recent acceleration data.
- */
-- (void) accelerometer:(UIAccelerometer *)accelerometer didAccelerate:(UIAcceleration *)acceleration;
 
 @end

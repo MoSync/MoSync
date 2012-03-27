@@ -16,6 +16,15 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301, USA.
 */
 
+/*! \addtogroup NotificationLib
+ *  @{
+ */
+
+/**
+ *  @defgroup NotificationLib Notification Library
+ *  @{
+ */
+
 /**
  * @file NotificationManager.h
  * @author Emma Tresanszki and Bogdan Iusco
@@ -35,22 +44,32 @@ MA 02110-1301, USA.
 
 #include "LocalNotification.h"
 
+/**
+* \brief MoSync Notification API classes.
+*/
 namespace Notification
 {
 
     /**
-     * Constants indicating the types of push notifications the application
-     * accepts.
+     * @brief Constants indicating the types of push notifications
+     * the application accepts.
      * Specific to iOS.
      * On Android PUSH_NOTIFICATION_TYPE_ALERT is set by default.
      */
     enum PushNotificationType
     {
-        // The application accepts notifications that badge the application icon.
+        /**
+         * @brief The application accepts notifications that badge the
+         * application icon.
+         */
         PUSH_NOTIFICATION_TYPE_BADGE = 0x01,
-        // The application accepts alert sounds as notifications.
+        /**
+         * @brief The application accepts alert sounds as notifications.
+         */
         PUSH_NOTIFICATION_TYPE_SOUND = 0x02,
-        // The application accepts alert messages as notifications.
+        /**
+         * @brief The application accepts alert messages as notifications.
+         */
         PUSH_NOTIFICATION_TYPE_ALERT = 0x04
     };
 
@@ -60,8 +79,8 @@ namespace Notification
      * Platform: Android only.
      */
     /**
-     * Indicates that the device can't read the response, or there was a 500/503
-     * from the server that can be retried later.
+     * @brief Indicates that the device can't read the response, or there was
+     * a 500/503 from the server that can be retried later.
      * The application should use exponential back off and retry.
      * Platform: Android only.
      */
@@ -69,7 +88,7 @@ namespace Notification
         "SERVICE_NOT_AVAILABLE";
 
     /**
-     * Indicates that there is no Google account on the phone.
+     * @brief Indicates that there is no Google account on the phone.
      * The application should ask the user to open the account manager and add
      * a Google account.
      * Platform: Android only.
@@ -78,7 +97,7 @@ namespace Notification
         "ACCOUNT_MISSING";
 
     /**
-     * Indicates that the Google password was bad.
+     * @brief Indicates that the Google password was bad.
      * The application should ask the user to enter his/her password, and let
      * user retry manually later.
      * Platform: Android only.
@@ -87,7 +106,7 @@ namespace Notification
         "AUTHENTICATION_FAILED";
 
     /**
-     * Indicates that the user has too many applications registered.
+     * @brief Indicates that the user has too many applications registered.
      * The application should tell the user to uninstall some other applications,
      * let user retry manually.
      * Platform: Android only.
@@ -96,7 +115,7 @@ namespace Notification
         "TOO_MANY_REGISTRATIONS";
 
     /**
-     * Indicates that the sender account is not recognized.
+     * @brief Indicates that the sender account is not recognized.
      * Platform: Android only.
      */
     const MAUtil::String NOTIFICATIONS_REGISTRATION_ERR_INVALID_SENDER =
@@ -377,3 +396,5 @@ namespace Notification
 } // namespace Notification
 
 #endif /* NOTIFICATION_NOTIFICATION_MANAGER_H_ */
+
+/*! @} */

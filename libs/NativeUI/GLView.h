@@ -46,6 +46,7 @@ namespace NativeUI
 	/**
 	 * \brief A GL view is a widget that is used to display graphics rendered
 	 * by the GPU using OpenGL calls.
+	 * Note: This widget is not available on Windows Phone 7.
 	 */
 	class GLView : public Widget
 	{

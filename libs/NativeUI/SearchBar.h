@@ -30,6 +30,7 @@ MA 02110-1301, USA.
  * @author Emma Tresanszki
  *
  * \brief Class for a special kind of edit box that is used for searching.
+ * Note: This is not available on Windows Phone 7.
  */
 
 #ifndef NATIVEUI_SEARCH_BAR_H_
@@ -45,6 +46,7 @@ namespace NativeUI
     /**
      * \brief A search bar is a special kind of edit box that is used for
      * searching.
+	 * Note: This is not available on Windows Phone 7.
      */
     class SearchBar : public Widget
     {

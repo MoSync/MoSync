@@ -102,6 +102,7 @@ var FileSys = function()
 		{
 			return function(result)
 			{
+				PrintObject(result);
 				var message = "FileSys.error: " + result.code;
 				if (id)
 				{
@@ -152,7 +153,7 @@ var FileSys = function()
 									}
 									else
 									{
-										error(fun);
+										error(fun)();
 									}
 								});
 						}
@@ -163,15 +164,13 @@ var FileSys = function()
 					}
 					else
 					{
-						error(fun);
+						error(fun)();
 					}
 				});
 		};
 
 		/**
 		 * Write at the specified position (offset) in the file.
-		 * TODO: This does not seem to work. Seek seems to be broken
-		 * in PhoneGap. Truncates the file.
 		 */
 		fileSys.writeTextAtPosition = function(path, data, position, fun)
 		{
@@ -180,17 +179,21 @@ var FileSys = function()
 				{ create: true, exclusive: false },
 				function(fileEntry)
 				{
-					var writer = new FileWriter(fileEntry);
-					writer.onwrite = function(obj)
-					{
-						fun(true);
-					};
-					writer.onerror = function(obj)
-					{
-						error(fun);
-					};
-					writer.seek(position);
-					writer.write(data);
+					fileEntry.createWriter(
+						function(writer)
+						{
+							writer.onwrite = function(obj)
+							{
+								fun(true);
+							};
+							writer.onerror = function(obj)
+							{
+								error(fun)();
+							};
+							writer.seek(position);
+							writer.write(data);
+						},
+						error(fun));
 				},
 				error(fun));
 		};
@@ -202,16 +205,21 @@ var FileSys = function()
 				{ create: false, exclusive: false },
 				function(fileEntry)
 				{
-					var reader = new FileReader();
-					reader.onload = function(obj)
-					{
-						fun(true, obj.target.result);
-					};
-					reader.onerror = function(obj)
-					{
-						 fun(false, null);
-					};
-					reader.readAsText(fileEntry);
+					fileEntry.file(
+						function(file)
+						{
+							var reader = new FileReader();
+							reader.onload = function(obj)
+							{
+								fun(true, obj.target.result);
+							};
+							reader.onerror = function(obj)
+							{
+								 fun(false, null);
+							};
+							reader.readAsText(file);
+						},
+						error(fun));
 				},
 				error(fun));
 		};
@@ -223,16 +231,21 @@ var FileSys = function()
 				{ create: false, exclusive: false },
 				function(fileEntry)
 				{
-					var reader = new FileReader();
-					reader.onload = function(obj)
-					{
-						fun(true, obj.target.result);
-					};
-					reader.onerror = function(obj)
-					{
-						 fun(false, null);
-					};
-					reader.readAsDataURL(fileEntry);
+					fileEntry.file(
+						function(file)
+						{
+							var reader = new FileReader();
+							reader.onload = function(obj)
+							{
+								fun(true, obj.target.result);
+							};
+							reader.onerror = function(obj)
+							{
+								error(fun);
+							};
+							reader.readAsDataURL(file);
+						},
+						error(fun));
 				},
 				error(fun));
 		};
@@ -244,16 +257,20 @@ var FileSys = function()
 				{ create: false, exclusive: false },
 				function(fileEntry)
 				{
-					var writer = new FileWriter(fileEntry);
-					writer.onwrite = function()
-					{
-						fun(true);
-					};
-					writer.onerror = function()
-					{
-						error(fun);
-					};
-					writer.truncate(size);
+					fileEntry.createWriter(
+						function(writer)
+						{
+							writer.onwrite = function()
+							{
+								fun(true);
+							};
+							writer.onerror = function()
+							{
+								error(fun)();
+							};
+							writer.truncate(size);
+						},
+						error(fun));
 				},
 				error(fun));
 		};
@@ -310,7 +327,7 @@ var FileSys = function()
 					else
 					{
 						// Path name is invalid.
-						error(fun);
+						error(fun)();
 					}
 
 					// Find destination directory name.
@@ -506,10 +523,19 @@ function testFileSystem()
 			0);
 	}
 
+	function logProgress(mark)
+	{
+		return function(success)
+		{
+			mosync.notification.HTMLToast(mark, 3000);
+			runNextTest(success);
+		};
+	}
+
 	// Create the test suite.
 	tests = [
-	    function(success) { alert("Running File tests"); runNextTest(success); },
-	    // Set up initial file structure.
+		logProgress("Running File tests..."),
+		// Set up initial file structure.
 		createFiles,
 		// Do tests on directories.
 		readDirectory("foa", checkDirectoryContents),
@@ -521,7 +547,6 @@ function testFileSystem()
 		readFile("foo/hello1.txt", "Hello World"),
 		readFile("foo/bar/hello2.txt", "Hello World"),
 		readFile("foo/bar/hello3.txt", "Hello World"),
-		// Write new file.
 		writeFile("foc/bar/test.txt", "Hello World"),
 		readFile("foc/bar/test.txt", "Hello World"),
 		// Overwrite existing file.
@@ -537,6 +562,9 @@ function testFileSystem()
 		readFile("foc/bar/test3.txt", "Hello"),
 		deleteFile("foc/bar/test3.txt"),
 		fileShouldNotExist("foc/bar/test3.txt"),
+		// Test seek.
+		writeFileAtPosition("foc/bar/test.txt", "X", 1),
+		readFile("foc/bar/test.txt", "HXllo"),
 		// Delete directories.
 		deleteFiles,
 		fileShouldNotExist("foo/hello1.txt"),
@@ -568,7 +596,7 @@ function testFileSystem()
 		}
 		else
 		{
-			fail("createFiles fail");
+			fileTestFail("createFiles fail");
 		}
 	}
 
@@ -576,7 +604,7 @@ function testFileSystem()
 	{
 		if (!success)
 		{
-			fail("createFiles fail");
+			fileTestFail("createFiles fail");
 		}
 	}
 
@@ -588,7 +616,7 @@ function testFileSystem()
 		}
 		else
 		{
-			fail("createFilesDone fail");
+			fileTestFail("createFilesDone fail");
 		}
 	}
 
@@ -608,7 +636,7 @@ function testFileSystem()
 		}
 		else
 		{
-			fail("createFiles fail");
+			fileTestFail("createFiles fail");
 		}
 	}
 
@@ -616,7 +644,7 @@ function testFileSystem()
 	{
 		if (!success)
 		{
-			fail("deleteFiles fail");
+			fileTestFail("deleteFiles fail");
 		}
 	}
 
@@ -628,7 +656,7 @@ function testFileSystem()
 		}
 		else
 		{
-			fail("deleteFilesDone fail");
+			fileTestFail("deleteFilesDone fail");
 		}
 	}
 
@@ -644,7 +672,7 @@ function testFileSystem()
 			}
 			else
 			{
-				fail("readDirectory failed " + path);
+				fileTestFail("readDirectory failed " + path);
 			}
 		};
 	}
@@ -662,7 +690,7 @@ function testFileSystem()
 			}
 			else
 			{
-				fail("readDirectoryDone failed: " + path);
+				fileTestFail("readDirectoryDone failed: " + path);
 			}
 		};
 	}
@@ -680,7 +708,7 @@ function testFileSystem()
 			}
 			else
 			{
-				fail("testCopyDirectory failed: " +
+				fileTestFail("testCopyDirectory failed: " +
 					sourcePath + " " + destPath);
 			}
 		};
@@ -696,7 +724,7 @@ function testFileSystem()
 			}
 			else
 			{
-				fail("copyDirectoryDone failed " + destPath);
+				fileTestFail("copyDirectoryDone failed " + destPath);
 			}
 		};
 	}
@@ -714,7 +742,7 @@ function testFileSystem()
 			}
 			else
 			{
-				fail("moveDirectory failed: " +
+				fileTestFail("moveDirectory failed: " +
 					sourcePath + " " + destPath);
 			}
 		};
@@ -730,7 +758,7 @@ function testFileSystem()
 			}
 			else
 			{
-				fail("moveDirectoryDone failed " + destPath);
+				fileTestFail("moveDirectoryDone failed " + destPath);
 			}
 		};
 	}
@@ -745,10 +773,26 @@ function testFileSystem()
 			}
 			else
 			{
-				fail("writeFile failed " + path);
+				fileTestFail("writeFile failed " + path);
 			}
 		};
 	}
+
+	function writeFileAtPosition(path, data, position)
+	{
+		return function(success)
+		{
+			if (success)
+			{
+				fileSys.writeTextAtPosition(path, data, 1, runNextTest);
+			}
+			else
+			{
+				fileTestFail("writeFileAtPosition failed " + path);
+			}
+		};
+	}
+
 
 	function readFile(path, expectedData)
 	{
@@ -760,7 +804,7 @@ function testFileSystem()
 			}
 			else
 			{
-				fail("readFile failed " + path);
+				fileTestFail("readFile failed " + path);
 			}
 		};
 	}
@@ -776,9 +820,11 @@ function testFileSystem()
 					runNextTest(success);
 					return;
 				}
+				fileTestFail("readFileDone expectedData " +
+					expectedData + " data: " + data);
 			}
 
-			fail("readFileDone fail");
+			fileTestFail("readFileDone fail");
 		};
 	}
 
@@ -792,7 +838,7 @@ function testFileSystem()
 			}
 			else
 			{
-				fail("readFileAsDataURL failed " + path);
+				fileTestFail("readFileAsDataURL failed " + path);
 			}
 		};
 	}
@@ -806,16 +852,15 @@ function testFileSystem()
 				// Get data part of the url.
 				var i = url.indexOf(",");
 				var data = url.substring(i + 1);
-				var decodedData = atob(data);
-
-				if (decodedData == expectedData)
+				// atob is not implemented on WP7, compare raw data instead.
+				if (data == "SGVsbG8gV29ybGQgMg==")
 				{
 					runNextTest(success);
 					return;
 				}
 			}
 
-			fail("readFileAsDataURLDone fail");
+			fileTestFail("readFileAsDataURLDone fail");
 		};
 	}
 
@@ -829,7 +874,7 @@ function testFileSystem()
 			}
 			else
 			{
-				fail("truncateFile failed " + path);
+				fileTestFail("truncateFile failed " + path);
 			}
 		};
 	}
@@ -845,7 +890,7 @@ function testFileSystem()
 			}
 			else
 			{
-				fail("truncateFileDone failed " + path);
+				fileTestFail("truncateFileDone failed " + path);
 			}
 		};
 	}
@@ -860,7 +905,7 @@ function testFileSystem()
 			}
 			else
 			{
-				fail("copyFile failed " + sourcePath);
+				fileTestFail("copyFile failed " + sourcePath);
 			}
 		};
 	}
@@ -873,7 +918,7 @@ function testFileSystem()
 		}
 		else
 		{
-			fail("copyFileDone fail");
+			fileTestFail("copyFileDone fail");
 		}
 	}
 
@@ -887,7 +932,7 @@ function testFileSystem()
 			}
 			else
 			{
-				fail("moveFile failed " + sourcePath);
+				fileTestFail("moveFile failed " + sourcePath);
 			}
 		};
 	}
@@ -900,7 +945,7 @@ function testFileSystem()
 		}
 		else
 		{
-			fail("moveFileDone fail");
+			fileTestFail("moveFileDone fail");
 		}
 	}
 
@@ -914,7 +959,7 @@ function testFileSystem()
 			}
 			else
 			{
-				fail("deleteFile failed " + path);
+				fileTestFail("deleteFile failed " + path);
 			}
 		};
 	}
@@ -927,7 +972,7 @@ function testFileSystem()
 		}
 		else
 		{
-			fail("deleteFileDone fail");
+			fileTestFail("deleteFileDone fail");
 		}
 	}
 
@@ -942,7 +987,7 @@ function testFileSystem()
 			}
 			else
 			{
-				fail("fileShouldNotExist failed " + path);
+				fileTestFail("fileShouldNotExist failed " + path);
 			}
 		};
 	}
@@ -957,7 +1002,7 @@ function testFileSystem()
 		}
 		else
 		{
-			fail("fileShouldNotExistDone fail");
+			fileTestFail("fileShouldNotExistDone fail");
 		}
 	}
 
@@ -993,7 +1038,7 @@ function testFileSystem()
 		return (passed == 2);
 	}
 
-	function fail(message)
+	function fileTestFail(message)
 	{
 		console.log("FileSystem test failed: " + message);
 		alert("FileSystem test failed: " + message);

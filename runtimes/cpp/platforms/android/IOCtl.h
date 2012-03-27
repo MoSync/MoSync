@@ -258,6 +258,10 @@ namespace Base
 								int memBuffer, int memBufferSize,
 								JNIEnv* jNIEnv, jobject jThis);
 
+	int _maWidgetScreenAddOptionsMenuItem(int widget, const char* title,
+											int iconHandle, int iconPredefined,
+											JNIEnv* jNIEnv, jobject jThis);
+
 	int _maWidgetScreenShow(int screenWidget, JNIEnv* jNIEnv, jobject jThis);
 	int _maWidgetStackScreenPush(int stackScreenWidget, int newScreen, JNIEnv* jNIEnv, jobject jThis);
 	int _maWidgetStackScreenPop(int stackScreenWidget, JNIEnv* jNIEnv, jobject jThis);
@@ -759,7 +763,7 @@ namespace Base
 
 	int _maCameraFormatNumber(JNIEnv* jNIEnv, jobject jThis);
 
-	int _maCameraFormat(int index, int width, int height, JNIEnv* jNIEnv, jobject jThis);
+	int _maCameraFormat(int index, int sizeInfoBuffer, JNIEnv* jNIEnv, jobject jThis);
 
 	int _maCameraSetProperty(const char *property, const char* value,
 							JNIEnv* jNIEnv, jobject jThis);

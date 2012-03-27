@@ -27,9 +27,11 @@
 #include <maassert.h>
 #include <mawstring.h>
 #include <mastdlib.h>
-#include <maprofile.h>
+#include <mastring.h>		// C string functions
 
 #include "MainScreen.h"
+
+#define BUF_MAX 256
 
 // Text for video control button.
 #define SHOW_VIDEO_CONTROL_BUTTON_TEXT "Show video control"
@@ -48,8 +50,10 @@ MainScreen::MainScreen() :
 	mPause(NULL),
 	mStop(NULL),
 	mGetDuration(NULL),
+	mDuration(NULL),
 	mSeekTo(NULL),
 	mCurrentTime(NULL),
+	mTime(NULL),
 	mVideoControl(NULL)
 {
 	createMainLayout();
@@ -106,40 +110,55 @@ void MainScreen::createMainLayout() {
 
 	mMainLayout->addChild(mSetUrl);
 
+	HorizontalLayout* controlsLayout = new HorizontalLayout();
+	mMainLayout->addChild(controlsLayout);
     mPlay = new Button();
     mPlay->setText("Play");
-    mMainLayout->addChild(mPlay);
+    mPlay->fillSpaceHorizontally();
+    controlsLayout->addChild(mPlay);
 
 	mPause = new Button();
 	mPause->setText("Pause");
-	mMainLayout->addChild(mPause);
+	mPause->fillSpaceHorizontally();
+	controlsLayout->addChild(mPause);
 
     mStop = new Button();
     mStop->setText("Stop");
-    mMainLayout->addChild(mStop);
+    mStop->fillSpaceHorizontally();
+    controlsLayout->addChild(mStop);
 
+    mSeekTo = new Button();
+    mSeekTo->setText("Seek to 1000");
+    mMainLayout->addChild(mSeekTo);
+
+    HorizontalLayout* durationlayout = new HorizontalLayout();
+    mMainLayout->addChild(durationlayout);
     mGetDuration = new Button();
     mGetDuration->setText("Get Duration");
-    mMainLayout->addChild(mGetDuration);
+    durationlayout->addChild(mGetDuration);
+
+    mDuration = new Label();
+    mDuration->setText("The duration");
+    durationlayout->addChild(mDuration);
 
     mVideoControl = new Button();
     mVideoControl->setText(HIDE_VIDEO_CONTROL_BUTTON_TEXT);
     mMainLayout->addChild(mVideoControl);
 
-    HorizontalLayout* layout = new HorizontalLayout();
-    mMainLayout->addChild(layout);
-
-    mSeekTo = new Button();
-    mSeekTo->setText("Seek to 1000");
-    layout->addChild(mSeekTo);
+    HorizontalLayout* timeLayout = new HorizontalLayout();
+    mMainLayout->addChild(timeLayout);
 
     mCurrentTime = new Button();
     mCurrentTime->setText("Current time");
-    layout->addChild(mCurrentTime);
+    timeLayout->addChild(mCurrentTime);
+
+    mTime = new Label();
+    mTime->setText("Current Time");
+    timeLayout->addChild(mTime);
 
     if (isAndroid())
     {
-        mEditBox->setText("http://www.mosync.com/files/videos/heineken.3gp");
+        mEditBox->setText("http://www.mosync.com/files/videos/Video.3gp");
     }
     else
     {
@@ -176,7 +195,7 @@ void MainScreen::buttonClicked(Widget* button)
         int duration = mVideoView->getDuration();
         char buf[256];
         itoa(duration, buf, 10);
-        mEditBox->setText(buf);
+        mDuration->setText(buf);
     }
     else if (button == mSeekTo)
     {
@@ -186,6 +205,7 @@ void MainScreen::buttonClicked(Widget* button)
     else if (button == mCurrentTime)
     {
         int result = mVideoView->currentPlaybackTime();
+        mTime->setText(MAUtil::integerToString(result));
         printf("result currentPlaybackTime = %d", result);
     }
     else if (button == mVideoControl)
@@ -249,7 +269,10 @@ void MainScreen::videoViewStateChanged(
  */
 bool MainScreen::isAndroid()
 {
-	if (NULL != strstr(MA_PROF_STRING_PLATFORM, "android"))
+	char platform[BUF_MAX];
+	maGetSystemProperty("mosync.device.OS", platform, BUF_MAX);
+
+	if(strcmp(platform, "Android") == 0)
 	{
 		return true;
 	}

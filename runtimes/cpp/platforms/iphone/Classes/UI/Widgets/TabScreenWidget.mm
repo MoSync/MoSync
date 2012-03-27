@@ -114,9 +114,16 @@
 
 - (void)layout {
 	UITabBarController* tabBarController = (UITabBarController*)controller;
-	int tabBarHeight = tabBarController.tabBar.bounds.size.height;
-	int viewWidth = view.frame.size.width;
-	int viewHeight = view.frame.size.height - tabBarHeight;
+	float tabBarHeight = tabBarController.tabBar.bounds.size.height;
+	float viewWidth = view.frame.size.width;
+	float viewHeight = view.frame.size.height - tabBarHeight;
+
+    CGRect tabBarRect = CGRectMake(view.frame.origin.x,
+                                   viewHeight,
+                                   viewWidth,
+                                   tabBarHeight);
+    tabBarController.tabBar.frame = tabBarRect;
+
 	[view setNeedsLayout];
 
 	for (IWidget *child in children)
@@ -125,7 +132,6 @@
 		[childView setFrame:CGRectMake(0, 0, viewWidth, viewHeight)];
 
 		[child layout];
-
 	}
 }
 

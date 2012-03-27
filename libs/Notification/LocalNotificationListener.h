@@ -16,6 +16,15 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301, USA.
 */
 
+/*! \addtogroup NotificationLib
+ *  @{
+ */
+
+/**
+ *  @defgroup NotificationLib Notification Library
+ *  @{
+ */
+
 /**
  * @file LocalNotificationListener.h
  * @author Emma Tresanszki and Bogdan Iusco
@@ -28,6 +37,9 @@ MA 02110-1301, USA.
 #ifndef NOTIFICATION_LOCAL_NOTIFICATION_LISTENER_H_
 #define NOTIFICATION_LOCAL_NOTIFICATION_LISTENER_H_
 
+/**
+* \brief MoSync Notification API classes.
+*/
 namespace Notification
 {
     // Forward declaration.
@@ -50,3 +62,5 @@ namespace Notification
 } // namespace Notification
 
 #endif /* NOTIFICATION_LOCAL_NOTIFICATION_LISTENER_H_ */
+
+/*! @} */

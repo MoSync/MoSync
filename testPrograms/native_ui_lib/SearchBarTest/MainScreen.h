@@ -74,6 +74,11 @@ private:
 	VerticalLayout* mMainLayout;
 
 	SearchBar* mSearchBar;
+
+	/*
+	 * Label used to observe the events received by the search bar
+	 */
+	Label *mDebugLabel;
 };
 
 #endif /* MAINSCREEN_H_ */

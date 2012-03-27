@@ -37,6 +37,7 @@ void packageWindowsPhone(const SETTINGS& s, const RuntimeInfo& ri) {
 	testName(s);
 	testVendor(s);
 	testVersion(s);
+	testVsBuildPath(s);
 
 	std::ostringstream generateCmd;
 	std::ostringstream buildCmd;
@@ -53,6 +54,10 @@ void packageWindowsPhone(const SETTINGS& s, const RuntimeInfo& ri) {
 
 	string csprojOutput = dst + "/project";
 	string outputType = s.outputType ? string(s.outputType) : string("interpreted");
+	if(s.csOutputDir)
+	{
+		outputType = "rebuilt";
+	}
 
 	_mkdir(csprojOutput.c_str());
 	copyFilesRecursively(templateLocation.c_str(), csprojOutput.c_str());
@@ -72,6 +77,11 @@ void packageWindowsPhone(const SETTINGS& s, const RuntimeInfo& ri) {
 		generateCmd << " -guid " << s.WPguid;
 	}
 
+	if(!s.resource)
+	{
+		generateCmd << " -exclude-resource-file";
+	}
+
 	sh(generateCmd.str().c_str(), s.silent);
 
 	// Copy program files to xcode template
@@ -88,8 +98,8 @@ void packageWindowsPhone(const SETTINGS& s, const RuntimeInfo& ri) {
 	if(s.resource) {
 		copyFile(resourceFileCopy.c_str(), s.resource);
 	} else {
-		ofstream empty(resourceFileCopy.c_str());
-		empty.close();
+		//ofstream empty(resourceFileCopy.c_str());
+		//empty.close();
 	}
 
 	// Icons!
@@ -101,7 +111,7 @@ void packageWindowsPhone(const SETTINGS& s, const RuntimeInfo& ri) {
 			std::ostringstream iconInjectCmd;
 			string size = sizes[i];
 			string outputIcon = csprojOutput + "/" + filenames[i];
-			injectIcon("WP7", size.c_str(), s.icon, outputIcon.c_str(), s.silent);
+			injectIcon("Windows Phone", size.c_str(), s.icon, outputIcon.c_str(), s.silent);
 		}
 	}
 
@@ -110,12 +120,12 @@ void packageWindowsPhone(const SETTINGS& s, const RuntimeInfo& ri) {
 		//testIOSSdk(s);
 
 		// todo: find this programatically...
-		std::string msBuildPath =
-			"/Windows/Microsoft.NET/Framework/v4.0.30319/MSBuild.exe";
+		//std::string vsBuildPath =
+		//	"/Windows/Microsoft.NET/Framework/v4.0.30319/MSBuild.exe";
 
 		_chdir(csprojOutput.c_str());
 
-		buildCmd << msBuildPath << " mosync.csproj";
+		buildCmd << s.WPvsBuildPath << " mosync.csproj";
 
 		// Set our configuration.
 		buildCmd << " /p:Configuration=" << s.WPconfig;

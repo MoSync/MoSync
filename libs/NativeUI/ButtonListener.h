@@ -66,7 +66,7 @@ namespace NativeUI
         /**
          * This method is called if the touch-up event was inside the
          * bounds of the button.
-         * Platform: iOS and Android.
+         * Platform: iOS, Android, Windows Phone.
          * @param button The button object that generated the event.
          */
         virtual void buttonClicked(Widget* button) = 0;

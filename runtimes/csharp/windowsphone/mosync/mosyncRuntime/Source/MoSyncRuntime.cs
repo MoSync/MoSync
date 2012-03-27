@@ -192,6 +192,11 @@ namespace MoSync
 			mainPage.MouseMove += this.MouseMove;
 			mainPage.MouseLeftButtonUp += MouseLeftButtonUp;
 
+			// clear the list of system property providers
+			// We clear it before we initialize all the modules, because
+			// different modules might register system property providers.
+			SystemPropertyManager.ClearSystemPropertyProviders();
+
 			RegisterCleaner(() =>
 			{
 				Util.RunActionOnMainThreadSync(() =>
@@ -252,12 +257,15 @@ namespace MoSync
 			{
 				Resource res = mResources[_handle];
 				BoundedStream stream = res.GetFileStream();
+				Resource placeholder = mResources[_placeholder];
 				if(stream == null)
 					return 0;
-				if(res.GetInternalObject() != null)
+				if (placeholder.GetInternalObject() != null)
 					return 0;
+
 				stream.Seek(0, SeekOrigin.Begin);
-				LoadResource(stream, (byte)res.GetResourceType(), (uint)stream.Length, res);
+				LoadResource(stream, (byte)res.GetResourceType(), (uint)stream.Length, placeholder);
+
 				return 1;
 			};
 

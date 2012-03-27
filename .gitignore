@@ -42,6 +42,8 @@ rebuild.build.cpp
 
 config_platform.h
 
+wormhole.js
+
 /*.bat
 
 /ipch/*
@@ -98,6 +100,8 @@ config_platform.h
 /libs/MTXml/entities.c
 /libs/newlib/libc/sys/mosync/maapi.h
 /libs/newlib/libc/sys/mosync/maapi_defs.h
+
+/libs/Wormhole/jslib/html5
 
 /testPrograms/_masterdump.s
 /testPrograms/temp.s

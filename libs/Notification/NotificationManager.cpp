@@ -132,7 +132,7 @@ namespace Notification
                 {
                     PushNotificationListener* listener =
                         mPushNotificationListeners[i];
-                    listener->didFaildToRegister(message);
+                    listener->didFailedToRegister(message);
                 }
             }
         }

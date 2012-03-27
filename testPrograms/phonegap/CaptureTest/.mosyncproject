@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project supports-build-configs="true" version="1.2">
+<project supports-build-configs="true" version="1.4">
 <build.cfg id="Debug" types="Debug"/>
 <build.cfg id="Release" types="Release"/>
 <properties>
 <property key="build.prefs:additional.include.paths/Debug" value=""/>
 <property key="build.prefs:additional.include.paths/Release" value=""/>
 <property key="build.prefs:additional.libraries" value="MAUtil.lib,nativeui.lib"/>
-<property key="build.prefs:additional.libraries/Debug" value="MAUtilD.lib,nativeui.lib, rescompiler.lib"/>
+<property key="build.prefs:additional.libraries/Debug" value="MAUtilD.lib,nativeui.lib"/>
 <property key="build.prefs:additional.libraries/Release" value="MAUtil.lib,NativeUI.lib"/>
 <property key="build.prefs:additional.library.paths/Debug" value=""/>
 <property key="build.prefs:additional.library.paths/Release" value=""/>
-<property key="build.prefs:app.permissions" value="Camera File\ Storage Internet\ Access Vibrate"/>
+<property key="build.prefs:app.permissions" value="Camera File\ Storage Internet\ Access Vibration"/>
 <property key="build.prefs:extra.link.sw/Debug" value=""/>
 <property key="build.prefs:extra.link.sw/Release" value=""/>
 <property key="build.prefs:extra.res.sw/Debug" value=""/>

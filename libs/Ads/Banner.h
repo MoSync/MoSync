@@ -16,12 +16,22 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301, USA.
 */
 
+/*! \addtogroup AdvertisingLib
+ *  @{
+ */
+
+/**
+ *  @defgroup AdvertisingLib Advertising Library
+ *  @{
+ */
+
 /**
  * @file Banner.h
  * @author Emma Tresanszki and Bogdan Iusco
  * @date 1 Nov 2011
  *
  * @brief Provides a widget that displays advertisement to the user.
+ *
  * When the user taps a banner, it triggers an action programmed into
  * the advertisement.
  * Your application is notified when an action starts or stops.
@@ -35,6 +45,9 @@ MA 02110-1301, USA.
 #include <MAUtil/String.h>
 #include <MAUtil/Vector.h>
 
+/**
+ * \brief MoSync Advertising API.
+ */
 namespace Ads
 {
 
@@ -43,32 +56,50 @@ namespace Ads
 	class BannerListener;
 
     /**
-     * Size constants for a banner.
+     * @brief Size constants for a banner.
      */
     enum BannerSize
     {
-        // Default banner of size 320 * 50.
-        // Available on iOS and Android platforms.
+        /**
+         * @brief Default banner of size 320 * 50.
+         * Available on iOS and Android platforms.
+         */
         BANNER_SIZE_DEFAULT = 0,
-        // Standard medium of size 300 * 250.
-        // Available only on Android platform.
+        /**
+         * @brief Standard medium of size 300 * 250.
+         * Available only on Android platform.
+         */
         BANNER_SIZE_RECT,
-        // Full size banner of size 468 * 60.
-        // Available only on Android platform.
+        /**
+         * @brief Full size banner of size 468 * 60.
+         * Available only on Android platform.
+         */
         BANNER_SIZE_IAB,
-        // Size 728 * 90.
-        // Available only on Android platform.
-        BANNER_SIZE_LEADERBOARD
+        /**
+         * @brief Size 728 * 90.
+         * Available only on Android platform.
+         */
+        BANNER_SIZE_LEADERBOARD,
+		/**
+		 * @brief Size 300 * 50 - X-Large Banner
+		 * Available only on Windows Phone 7.1.
+		 */
+		BANNER_SIZE_WP7_XLARGE,
+		/**
+		  * @brief Size 480 * 80
+		  * Available only on Windows Phone 7.1
+		  */
+		BANNER_SIZE_WP7_XXLARGE
     };
 
 	/**
-	* This string specifies the emulator as a device that will receive
-	* test ads.
-	*/
+	 * @brief This string specifies the emulator as a device that will receive
+	 * test ads.
+	 */
     const MAUtil::String TEST_EMULATOR = "TEST_EMULATOR";
 
     /**
-	 * \brief Provides a widget that displays advertisement to the user.
+	 * @brief Provides a widget that displays advertisement to the user.
 	 * When the user taps a banner, it triggers an action programmed into
 	 * the advertisement.
 	 * Your application is notified when an action starts or stops.
@@ -360,3 +391,5 @@ namespace Ads
 } // namespace Ads
 
 #endif /* ADS_BANNER_H_ */
+
+/*! @} */

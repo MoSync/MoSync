@@ -69,7 +69,16 @@ namespace MoSync
                         Uri uri;
                         if (value.StartsWith("http://") || value.StartsWith("www."))
                         {
-                            uri = new Uri(value, UriKind.Absolute);
+                            if (value.StartsWith("http://") == false)
+                            {
+                                string newUri = "http://" + value;
+                                uri = new Uri(newUri, UriKind.Absolute);
+                            }
+                            else
+                            {
+                                uri = new Uri(value, UriKind.Absolute);
+                            }
+
                         }
                         else
                         {
@@ -169,6 +178,7 @@ namespace MoSync
                     {
                         mWebBrowser.InvokeScript("eval", "history.go(1)");
                     }
+                    else throw new InvalidPropertyValueException();
                 }
             }
 
@@ -199,14 +209,15 @@ namespace MoSync
                         const int MAWidgetEventData_urlData = 12;
 
                         //constructing the urlData
-                        Memory urlData = new Memory(str.Length + 1);
-                        urlData.WriteStringAtAddress(0, str, str.Length + 1);
+                        System.IO.MemoryStream urlData = new System.IO.MemoryStream(str.Length + 1);
+						byte[] strBytes = System.Text.UTF8Encoding.UTF8.GetBytes(str);
+						urlData.Write(strBytes, 0, strBytes.Length);
 
                         eventData.WriteInt32(MAWidgetEventData_eventType, MoSync.Constants.MAW_EVENT_WEB_VIEW_HOOK_INVOKED);
                         eventData.WriteInt32(MAWidgetEventData_widgetHandle, mHandle);
                         eventData.WriteInt32(MAWidgetEventData_hookType, hookType);
                         eventData.WriteInt32(MAWidgetEventData_urlData, mRuntime.AddResource(
-                            new Resource(urlData, MoSync.Constants.RT_BINARY)));
+                            new Resource(urlData, MoSync.Constants.RT_BINARY, true)));
                         mRuntime.PostCustomEvent(MoSync.Constants.EVENT_TYPE_WIDGET, eventData);
                     });
 

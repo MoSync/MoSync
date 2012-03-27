@@ -1,3 +1,11 @@
+/**
+ * Display a message.
+ */
+function showMessage(message)
+{
+	document.getElementById("info").innerHTML = "<h4>" + message + "</h4>";
+}
+
 var deviceInfo = function() {
 	document.getElementById("platform").innerHTML = device.platform;
 	document.getElementById("version").innerHTML = device.version;
@@ -64,8 +72,9 @@ var toggleMagnetic = function() {
 	}
 };
 
-var orientation = new SensorConnection('Orientation');
-orientation.addEventListener("onsensordata", function(event)
+var orientationSensor = new SensorConnection('Orientation');
+
+orientationSensor.addEventListener("onsensordata", function(event)
 		{
 			updateOrientation(event.data);
 		});
@@ -77,15 +86,15 @@ function updateOrientation(a) {
 }
 
 var toggleOrientation = function() {
-	if (orientation.status == "watching") {
-		orientation.endWatch();
+	if (orientationSensor.status == "watching") {
+		orientationSensor.endWatch();
 		updateOrientation({
 			x : "",
 			y : "",
 			z : ""
 		});
 	} else {
-		orientation.startWatch({interval:1000});
+		orientationSensor.startWatch({interval:1000});
 	}
 };
 
@@ -140,7 +149,7 @@ var toggleGyroscope = function() {
 };
 
 function fail(msg) {
-	alert(msg);
+	showMessage(msg);
 }
 
 function check_network() {
@@ -166,15 +175,16 @@ function find_sensors() {
 		for(var i = 0; i < results.result.length; i++)
 		{
 			sensorList += results.result[i].type + "<br/>";
-			//alert("name:" + results.result[i].name + " type:" + results.result[i].type);
+			//showMessage("name:" + results.result[i].name + " type:" + results.result[i].type);
 		}
-		alert(sensorList);
+		showMessage(sensorList);
 		document.getElementByID("sensorList").innerHTML = sensorList;
 	};
 }
 
 function captureTest() {
-	Capture.prototype.captureImage(function(mediaFiles){alert(mediaFiles[0].fullPath + "  " + mediaFiles[0].name);}, function(){}, {duration:10});
+	Capture.prototype.captureImage(function(mediaFiles){
+		showMessage(mediaFiles[0].fullPath + "  " + mediaFiles[0].name);}, function(){}, {duration:10});
 }
 
 function init() {
