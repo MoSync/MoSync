@@ -151,10 +151,13 @@ static int readFile(std::string name) {
 	fseek(file, 0, SEEK_SET);
 	int res = fread(&gFileData[gFileDataPtr], 1, len, file);
 	if(res != len) {
-		printf("failure reading '%s'\n", name.c_str());
+		fclose(file);
+		printf("failure reading '%s' (res != len)\n", name.c_str());
 		exit(1);
 	}
 	gFileDataPtr+=len;
+	
+	fclose(file);
 	return len;
 }
 
