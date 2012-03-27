@@ -105,10 +105,8 @@ static NSString* kReuseIdentifier = @"Cell";
 
     [_cell.contentView addSubview:childView];
 
-    NSLog(@"_cell.contentView = %f", _cell.contentView.bounds.size.width);
-
     [self layoutSubviews:view];
-//	[child layout];
+	[child layout];
 }
 
 /**

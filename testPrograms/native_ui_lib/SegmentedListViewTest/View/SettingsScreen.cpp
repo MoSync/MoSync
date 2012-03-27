@@ -72,7 +72,7 @@ SettingsScreen::~SettingsScreen()
  */
 void SettingsScreen::createUI()
 {
-	SegmentedListView* list = new SegmentedListView();
+	SegmentedListView* list = new SegmentedListView(SegmentedListViewTypeGrouped);
 	list->fillSpaceHorizontally();
 	list->fillSpaceVertically();
 	this->setMainWidget(list);

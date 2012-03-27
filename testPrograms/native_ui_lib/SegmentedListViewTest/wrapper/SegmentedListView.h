@@ -42,6 +42,24 @@ MA 02110-1301, USA.
 namespace NativeUI
 {
 
+	/**
+	 * @brief Segmented list view types.
+	 * Available on iOS platform.
+	 */
+	enum SegmentedListViewType
+	{
+		/**
+		 * @brief Any section headers or footers are displayed as inline separators
+		 * and float when the table view is scrolled.
+		 */
+		SegmentedListViewTypePlain = 0,
+		/**
+		 * @brief A table view whose sections present distinct groups of rows.
+		 * The section headers and footers do not float.
+		 */
+		SegmentedListViewTypeGrouped
+	};
+
 	// Forward declaration
 	class SegmentedListViewSection;
 
@@ -56,13 +74,21 @@ namespace NativeUI
 	public:
 		/**
 		 * Constructor.
+		 * @param listType Type of the list.
 		 */
-		SegmentedListView();
+		SegmentedListView(
+			SegmentedListViewType listType = SegmentedListViewTypePlain);
 
 		/**
 		 * Destructor.
 		 */
 		virtual ~SegmentedListView();
+
+		/**
+		 * Get the list type.
+		 * @return One of the SegmentedListViewType values.
+		 */
+		SegmentedListViewType getType();
 
 		/**
 		 * Add a section to this list.

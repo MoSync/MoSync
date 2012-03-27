@@ -28,6 +28,33 @@
 #import "SegmentedListViewWidget.h"
 #import "SegmentedListViewSectionWidget.h"
 #import "SegmentedListViewItemWidget.h"
+#import "NSStringExpanded.h"
+
+/**
+ * Private methods for SegmentedListViewWidget.
+ */
+@interface SegmentedListViewWidget(hidden)
+
+/**
+ * Set the list type.
+ * @param listType Must be one of the next constants:
+ * - MAW_SEGMENTED_LIST_VIEW_TYPE_PLAIN
+ * - MAW_SEGMENTED_LIST_VIEW_TYPE_GROUPED
+ * @return One of the next constants:
+ * - MAW_RES_OK if no error occured.
+ * - MAW_RES_INVALID_PROEPRTY_VALUE if listType is not valid.
+ */
+-(int) setListType:(NSString*) listType;
+
+/**
+ * Get the list type.
+ * @return One of the next values:
+ * - MAW_SEGMENTED_LIST_VIEW_TYPE_PLAIN
+ * - MAW_SEGMENTED_LIST_VIEW_TYPE_GROUPED
+ */
+-(NSString*) listType;
+
+@end
 
 @implementation SegmentedListViewWidget
 
@@ -59,7 +86,11 @@
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value
 {
     int resultCode = MAW_RES_OK;
-    if ([key isEqualToString:@MAW_SEGMENTED_LIST_VIEW_RELOAD_DATA])
+    if ([key isEqualToString:@MAW_SEGMENTED_LIST_VIEW_TYPE])
+    {
+        resultCode = [self setListType:value];
+    }
+    else if ([key isEqualToString:@MAW_SEGMENTED_LIST_VIEW_RELOAD_DATA])
     {
         [_tableView reloadData];
     }
@@ -77,6 +108,11 @@
  */
 - (NSString*)getPropertyWithKey: (NSString*)key
 {
+    if ([key isEqualToString:@MAW_SEGMENTED_LIST_VIEW_TYPE])
+    {
+        return [[self listType] retain];
+    }
+
     return [super getPropertyWithKey:key];
 }
 
@@ -245,6 +281,74 @@
     [_sections release];
 
     [super dealloc];
+}
+
+@end
+
+@implementation SegmentedListViewWidget(hidden)
+
+
+/**
+ * Set the list type.
+ * @param listType Must be one of the next constants:
+ * - MAW_SEGMENTED_LIST_VIEW_TYPE_PLAIN
+ * - MAW_SEGMENTED_LIST_VIEW_TYPE_GROUPED
+ * @return One of the next constants:
+ * - MAW_RES_OK if no error occured.
+ * - MAW_RES_INVALID_PROEPRTY_VALUE if listType is not valid.
+ */
+-(int) setListType:(NSString*) listType
+{
+    if (![listType  canParseNumber])
+    {
+        return MAW_RES_INVALID_PROPERTY_VALUE;
+    }
+
+    int listTypeValue = [listType intValue];
+    UITableViewStyle listStyle;
+    if (listTypeValue == MAW_SEGMENTED_LIST_VIEW_TYPE_PLAIN)
+    {
+        listStyle = UITableViewStylePlain;
+    }
+    else if (listTypeValue == MAW_SEGMENTED_LIST_VIEW_TYPE_GROUPED)
+    {
+        listStyle = UITableViewStyleGrouped;
+    }
+    else
+    {
+        return MAW_RES_INVALID_PROPERTY_VALUE;
+    }
+
+    CGRect rect = _tableView.bounds;
+    [_tableView release];
+    _tableView = [[UITableView alloc] initWithFrame:rect style:listStyle];
+    _tableView.delegate = self;
+    _tableView.dataSource = self;
+    view = _tableView;
+
+    return MAW_RES_OK;
+}
+
+/**
+ * Get the list type.
+ * @return One of the next values:
+ * - MAW_SEGMENTED_LIST_VIEW_TYPE_PLAIN
+ * - MAW_SEGMENTED_LIST_VIEW_TYPE_GROUPED
+ */
+-(NSString*) listType
+{
+    UITableViewStyle listStyle = _tableView.style;
+    int listType;
+    if (listStyle == UITableViewStylePlain)
+    {
+        listType = MAW_SEGMENTED_LIST_VIEW_TYPE_PLAIN;
+    }
+    else if(listStyle == UITableViewStyleGrouped)
+    {
+        listType = MAW_SEGMENTED_LIST_VIEW_TYPE_GROUPED;
+    }
+
+    return [NSString stringWithFormat:@"%d", listType];
 }
 
 @end

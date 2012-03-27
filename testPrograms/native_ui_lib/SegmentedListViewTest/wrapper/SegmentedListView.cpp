@@ -32,11 +32,22 @@ namespace NativeUI
 {
 	/**
 	 * Constructor.
+	 * @param listType Type of the list.
 	 */
-	SegmentedListView::SegmentedListView() :
+	SegmentedListView::SegmentedListView(SegmentedListViewType listType) :
 		Widget(MAW_SEGMENTED_LIST_VIEW)
 	{
+		int listTypeValue;
+		if (listType == SegmentedListViewTypePlain)
+		{
+			listTypeValue = MAW_SEGMENTED_LIST_VIEW_TYPE_PLAIN;
+		}
+		else if (listType == SegmentedListViewTypeGrouped)
+		{
+			listTypeValue = MAW_SEGMENTED_LIST_VIEW_TYPE_GROUPED;
+		}
 
+		this->setPropertyInt(MAW_SEGMENTED_LIST_VIEW_TYPE, listTypeValue);
 	}
 
 	/**
@@ -45,6 +56,26 @@ namespace NativeUI
 	SegmentedListView::~SegmentedListView()
 	{
 
+	}
+
+	/**
+	 * Get the list type.
+	 * @return One of the SegmentedListViewType values.
+	 */
+	SegmentedListViewType SegmentedListView::getType()
+	{
+		int listTypeValue = this->getPropertyInt(MAW_SEGMENTED_LIST_VIEW_TYPE);
+		SegmentedListViewType listType;
+		if (listTypeValue == MAW_SEGMENTED_LIST_VIEW_TYPE_PLAIN)
+		{
+			listType = SegmentedListViewTypePlain;
+		}
+		else if (listTypeValue == MAW_SEGMENTED_LIST_VIEW_TYPE_GROUPED)
+		{
+			listType = SegmentedListViewTypeGrouped;
+		}
+
+		return listType;
 	}
 
 	/**

@@ -7222,8 +7222,48 @@ group WidgetAPI "Widget API" {
 	}
 	} // end of WidgetmodalDialogProperties
 
+	group WidgetSegmentedListViewConstants "Segmented List View Constants" {
+	constset int MAW_SEGMENTED_LIST_VIEW_TYPE_ {
+		/**
+		* @brief A plain table view.
+		* Any section headers or footers are displayed as inline separators and float when
+		* the table view is scrolled.
+		* Platform: iOS.
+		* Default value for segmented list view.
+		*/
+		PLAIN = 0;
+
+		/**
+		* @brief A table view whose sections present distinct groups of rows.
+		* The section headers and footers do not float.
+		* Platform: iOS.
+		*/
+		GROUPED = 1;
+	}
+	} // end of WidgetSegmentedListViewConstants
+
 	group WidgetSegmentedListViewProperties "Segmented List View properties" {
 	constset MAString MAW_SEGMENTED_LIST_VIEW_ {
+		/**
+		* @brief Set the list type.
+		* Set this property before adding the list to the screen/layout.
+		* Platform: iOS.
+		*
+		* @validvalue One of the \link #MAW_SEGMENTED_LIST_VIEW_TYPE_ MAW_SEGMENTED_LIST_VIEW_TYPE \endlink constants.
+		* Default value is \link #MAW_SEGMENTED_LIST_VIEW_TYPE_PLAIN MAW_SEGMENTED_LIST_VIEW_TYPE_PLAIN \endlink.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+		*   // Reload list view data.
+		*	char buffer[124];
+		*	sprintf(buffer, "%d", MAW_SEGMENTED_LIST_VIEW_TYPE_GROUPED);
+		*   maWidgetSetProperty(listHandle, MAW_SEGMENTED_LIST_VIEW_TYPE, buffer);
+		* \endcode
+		*/
+		TYPE= "type";
+
 		/**
 		* @brief Reloads data for a given section.
 		* Platform: iOS.
