@@ -3816,6 +3816,89 @@ namespace Base
 		return (int)result;
 	}
 
+	int _maAudioInstanceCreateDynamic(
+		int sampleRate,
+		int numChannels,
+		int bufferSize,
+		JNIEnv* jNIEnv,
+		jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+
+		jmethodID methodID = jNIEnv->GetMethodID(
+			cls,
+			"maAudioInstanceCreateDynamic",
+			"(II)I");
+
+		if (methodID == 0)
+			return -1;
+
+		jint result = jNIEnv->CallIntMethod(
+			jThis,
+			methodID,
+			sampleRate,
+			numChannels,
+			bufferSize);
+
+		jNIEnv->DeleteLocalRef(cls);
+
+		return (int)result;
+	}
+
+	int _maAudioSubmitBuffer(
+		int audioInstance,
+		int buffer,
+		int bufferSize,
+		int memStart,
+		JNIEnv* jNIEnv,
+		jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+
+		jmethodID methodID = jNIEnv->GetMethodID(
+			cls,
+			"maAudioSubmitBuffer",
+			"(III)I");
+
+		if (methodID == 0)
+			return -1;
+
+		jint result = jNIEnv->CallIntMethod(
+			jThis,
+			methodID,
+			audioInstance,
+			buffer - memStart,
+			bufferSize);
+
+		jNIEnv->DeleteLocalRef(cls);
+
+		return (int)result;
+	}
+
+	int _maAudioGetPendingBufferCount(
+		int audioInstance,
+		JNIEnv* jNIEnv,
+		jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+
+		jmethodID methodID = jNIEnv->GetMethodID(
+			cls,
+			"maAudioGetPendingBufferCount",
+			"(I)I");
+
+		if (methodID == 0)
+			return -1;
+
+		jint result = jNIEnv->CallIntMethod(
+			jThis,
+			methodID,
+			audioInstance);
+
+		jNIEnv->DeleteLocalRef(cls);
+	}
+
+
 	int _maAudioInstanceDestroy(
 		int audioInstance,
 		JNIEnv* jNIEnv,

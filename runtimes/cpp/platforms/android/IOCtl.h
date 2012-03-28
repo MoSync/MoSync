@@ -1076,6 +1076,26 @@ namespace Base
 		JNIEnv* jNIEnv,
 		jobject jThis);
 
+	int _maAudioInstanceCreateDynamic(
+		int sampleRate,
+		int numChannels,
+		int bufferSize,
+		JNIEnv* jNIEnv,
+		jobject jThis);
+
+	int _maAudioSubmitBuffer(
+		int audioInstance,
+		int buffer,
+		int bufferSize,
+		int memStart,
+		JNIEnv* jNIEnv,
+		jobject jThis);
+
+	int _maAudioGetPendingBufferCount(
+		int audioInstance,
+		JNIEnv* jNIEnv,
+		jobject jThis);
+
 	//int maAudioInstanceDestroy(in MAAudioInstance audioInstance);
 	int _maAudioInstanceDestroy(
 		int audioInstance,

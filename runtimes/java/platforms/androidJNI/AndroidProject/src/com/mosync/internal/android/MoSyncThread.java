@@ -3810,6 +3810,21 @@ public class MoSyncThread extends Thread
 		return mMoSyncAudio.maAudioInstanceCreate(audioData);
 	}
 
+	int maAudioInstanceCreateDynamic(int sampleRate, int numChannels, int bufferSize)
+	{
+		return mMoSyncAudio.maAudioInstanceCreateDynamic(sampleRate, numChannels, bufferSize);
+	}
+
+	int maAudioSubmitBuffer(int audioInstance, int mem, int memSize)
+	{
+		return mMoSyncAudio.maAudioSubmitBuffer(audioInstance, mem, memSize);
+	}
+
+	int maAudioGetPendingBufferCount(int audioInstance)
+	{
+		return mMoSyncAudio.maAudioGetPendingBufferCount(audioInstance);
+	}
+
 	int maAudioInstanceDestroy(int audioInstance)
 	{
 		return mMoSyncAudio.maAudioInstanceDestroy(audioInstance);

@@ -1562,6 +1562,38 @@ namespace Base
 			return _maAudioInstanceCreate(audioData, mJNIEnv, mJThis);
 		}
 
+		//MAAudioInstance maAudioInstanceCreateDynamic(in int sampleRate, in int numChannels, in int bufferSize);
+		case maIOCtl_maAudioInstanceCreateDynamic:
+		{
+			SYSLOG("maIOCtl_maAudioInstanceCreateDynamic");
+			int sampleRate = a;
+			int numChannels = b;
+			int bufferSize = c;
+
+			return _maAudioInstanceCreateDynamic(sampleRate, numChannels, bufferSize,
+												mJNIEnv, mJThis);
+		}
+
+		//int maAudioSubmitBuffer(in MAAudioInstance instance, in MAAddress buffer, in int numBytes);
+		case maIOCtl_maAudioSubmitBuffer:
+		{
+			SYSLOG("maAudioSubmitBuffer");
+			int audioInstance = a;
+			int buffer = (int)SYSCALL_THIS->GetValidatedMemRange(b, c);
+			int bufferSize = c;
+
+			return _maAudioSubmitBuffer(audioInstance, buffer, bufferSize, (int)gCore->mem_ds,
+										mJNIEnv, mJThis);
+		}
+
+		case maIOCtl_maAudioGetPendingBufferCount:
+		{
+			SYSLOG("maAudioGetPendingBufferCount");
+			int audioInstance = a;
+
+			return _maAudioGetPendingBufferCount(audioInstance, mJNIEnv, mJThis);
+		}
+
 		case maIOCtl_maAudioInstanceDestroy:
 		{
 			SYSLOG("maIOCtl_maAudioInstanceDestroy");
