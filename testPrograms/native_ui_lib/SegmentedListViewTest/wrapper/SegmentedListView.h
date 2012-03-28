@@ -137,6 +137,23 @@ namespace NativeUI
 		void reloadData();
 
 		/**
+		 * Enable/disable item selection.
+		 * If you don't want to allow the user to select any item set this
+		 * property to false.
+		 * Platform: iOS.
+		 * @param allowSelection Flag to set.
+		 */
+		void setAllowSelection(bool allowSelection);
+
+		/**
+		 * Get the allow selection flag.
+		 * Platform: iOS.
+		 * @return true if segmented list items can be selected by the user,
+		 * false otherwise.
+		 */
+		bool getAllowSelection();
+
+		/**
 		 * Add an segmented list view event listener.
 		 * @param listener The listener that will receive segmented list view
 		 * events.

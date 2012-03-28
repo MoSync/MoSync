@@ -132,6 +132,41 @@ namespace NativeUI
 	}
 
 	/**
+	 * Enable/disable item selection.
+	 * If you don't want to allow the user to select any item set this
+	 * property to false.
+	 * Platform: iOS.
+	 * @param allowSelection Flag to set.
+	 */
+	void SegmentedListView::setAllowSelection(bool allowSelection)
+	{
+		const char* value = allowSelection ? "true" : "false";
+		this->setProperty(
+			MAW_SEGMENTED_LIST_VIEW_ALLOW_SELECTION,
+			value);
+	}
+
+	/**
+	 * Get the allow selection flag.
+	 * Platform: iOS.
+	 * @return true if segmented list items can be selected by the user,
+	 * false otherwise.
+	 */
+	bool SegmentedListView::getAllowSelection()
+	{
+		MAUtil::String value = this->getPropertyString(
+			MAW_SEGMENTED_LIST_VIEW_ALLOW_SELECTION);
+		if (strcmp(value.c_str(), "true") == 0)
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+
+	/**
 	 * Add a section to this list.
 	 * @param section The section that will be added.
 	 * The ownership of the section object is passed to this method.

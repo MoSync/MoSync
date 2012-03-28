@@ -61,7 +61,7 @@
  * - MAW_SEGMENTED_LIST_VIEW_MODE_EDIT
  * @return One of the next constants:
  * - MAW_RES_OK if no error occured.
- * - MAW_RES_INVALID_PROEPRTY_VALUE if listMode is not valid.
+ * - MAW_RES_INVALID_PROPERTY_VALUE if listMode is not valid.
  */
 -(int) setListMode:(NSString*) listMode;
 
@@ -72,6 +72,21 @@
  * - MAW_SEGMENTED_LIST_VIEW_MODE_EDIT
  */
 -(NSString*) listMode;
+
+/**
+ * Set the allow selection flag.
+ * @param listMode "true" or "false".
+ * @return One of the next constants:
+ * - MAW_RES_OK if no error occured.
+ * - MAW_RES_INVALID_PROPERTY_VALUE if allowSelection is not valid.
+ */
+-(int) setAllowSelection:(NSString*) allowSelection;
+
+/**
+ * Get the allow selection value.
+ * @return "true" or "false".
+ */
+-(NSString*) allowSelection;
 
 @end
 
@@ -117,6 +132,10 @@
     {
         [_tableView reloadData];
     }
+    else if ([key isEqualToString:@MAW_SEGMENTED_LIST_VIEW_ALLOW_SELECTION])
+    {
+        resultCode = [self setAllowSelection:value];
+    }
     else
     {
         resultCode = [super setPropertyWithKey:key toValue:value];
@@ -138,6 +157,10 @@
     else if([key isEqualToString:@MAW_SEGMENTED_LIST_VIEW_MODE])
     {
         return [[self listMode] retain];
+    }
+    else if([key isEqualToString:@MAW_SEGMENTED_LIST_VIEW_ALLOW_SELECTION])
+    {
+        return [[self allowSelection] retain];
     }
 
     return [super getPropertyWithKey:key];
@@ -472,6 +495,42 @@
     }
 
     return [NSString stringWithFormat:@"%d", listMode];
+}
+
+/**
+ * Set the allow selection flag.
+ * @param listMode "true" or "false".
+ * @return One of the next constants:
+ * - MAW_RES_OK if no error occured.
+ * - MAW_RES_INVALID_PROPERTY_VALUE if allowSelection is not valid.
+ */
+-(int) setAllowSelection:(NSString*) allowSelection
+{
+    BOOL allowSelectionFlag;
+    if ([allowSelection isEqualToString:@"true"])
+    {
+        allowSelectionFlag = YES;
+    }
+    else if ([allowSelection isEqualToString:@"false"])
+    {
+        allowSelectionFlag = NO;
+    }
+    else
+    {
+        return MAW_RES_INVALID_PROPERTY_VALUE;
+    }
+
+    _tableView.allowsSelection = allowSelectionFlag;
+    return MAW_RES_OK;
+}
+
+/**
+ * Get the allow selection value.
+ * @return "true" or "false".
+ */
+-(NSString*) allowSelection
+{
+    return _tableView.allowsSelection ? @"true" : @"false";
 }
 
 @end
