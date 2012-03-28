@@ -1891,6 +1891,10 @@ namespace Base
 			// 0 = events off
 			return _maScreenStateEventsOnOff(0, mJNIEnv, mJThis);
 
+		case maIOCtl_maWakeLock:
+			SYSLOG("maIOCtl_maWakeLock");
+			return _maWakeLock(a, mJNIEnv, mJThis);
+
 		case maIOCtl_maMessageBox:
 			SYSLOG("maIOCtl_maMessageBox");
 			return _maMessageBox(
