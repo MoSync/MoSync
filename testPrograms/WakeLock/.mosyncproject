@@ -12,5 +12,6 @@
 <property key="build.prefs:additional.libraries/Debug" value="MAUtilD.lib"/>
 <property key="profile.mgr.type" value="0"/>
 <property key="template.id" value="project.moblet"/>
+<property key="winmobilecs:guid" value="7d8b60a0-5afa-102f-80c7-8b10f57efc89"/>
 </properties>
 </project>

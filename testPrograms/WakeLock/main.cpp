@@ -24,7 +24,6 @@ public:
 
 	void pointerReleaseEvent(MAPoint2d point)
 	{
-		printf("pointerReleaseEvent\n");
 		if (mWakeLockOn)
 		{
 			maWakeLock(MA_WAKE_LOCK_OFF);
@@ -36,7 +35,6 @@ public:
 			printf("Wake lock is ON\n");
 		}
 		mWakeLockOn = !mWakeLockOn;
-
 	}
 
 	bool mWakeLockOn;
