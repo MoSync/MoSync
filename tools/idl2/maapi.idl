@@ -8451,6 +8451,21 @@ group CameraFunctions "Camera Functions" {
 		 */
 		int maScreenStateEventsOff();
 
+		/**
+		 * Lock device to be "awake". This means that the device
+		 * won't go to sleep while the app is running.
+		 * @param flag MA_WAKE_LOCK_ON or MA_WAKE_LOCK_OFF
+		 * @return \>0 on success, \< 0 on error (-1 if not available).
+		 */
+		int maWakeLock(in int flag);
+
+		constset int MA_WAKE_LOCK_ {
+			/// Application will run with screen on (consumes power).
+			ON = 1;
+			/// Turn off the wake lock.
+			OFF = 2;
+		}
+
 group OpenGLES "OpenGLES" {
 #include "opengl_non_generated.idl"
 #include "opengl_generated.idl"
