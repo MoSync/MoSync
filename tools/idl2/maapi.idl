@@ -4172,7 +4172,8 @@ group WidgetAPI "Widget API" {
 
 		union {
 			/**
-			* @brief The index when a #MAW_EVENT_CLICKED event is receieved for a list view.
+			* @brief The index when a #MAW_EVENT_CLICKED, #MAW_EVENT_SEGMENTED_ITEM_WILL_SELECT or
+			* #MAW_EVENT_SEGMENTED_ITEM_SELCTED event is receieved for a simple list view or a segmented list view.
 			*/
 			int listItemIndex;
 
@@ -4445,6 +4446,21 @@ group WidgetAPI "Widget API" {
 		*/
 		DIALOG_DISMISSED = 22;
 
+		/**
+		* Send by a SegmenetedListView when an item is about to be selected.
+		* The listItemIndex member from MAWidgetEventData struct will contain the item index
+		* that is about to be selected.
+		* Available only on iOS.
+		*/
+		SEGMENTED_ITEM_WILL_SELECT = 23;
+
+		/**
+		* Send by a SegmenetedListView when an item was selected.
+		* The listItemIndex member from MAWidgetEventData struct will contain the item index
+		* that was selected.
+		* Available only on iOS.
+		*/
+		SEGMENTED_ITEM_SELECTED = 24;
 	}
 
 	} // end of WidgetEventTypes

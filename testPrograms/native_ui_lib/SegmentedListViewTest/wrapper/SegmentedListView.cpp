@@ -25,8 +25,12 @@ MA 02110-1301, USA.
  * Available on iOS platform.
  */
 
+#include <NativeUI/WidgetUtil.h>
+
 #include "SegmentedListView.h"
 #include "SegmentedListViewSection.h"
+#include "SegmentedListViewItem.h"
+#include "SegmentedListViewListener.h"
 
 namespace NativeUI
 {
@@ -55,7 +59,7 @@ namespace NativeUI
 	 */
 	SegmentedListView::~SegmentedListView()
 	{
-
+		mSegmentedListViewListeners.clear();
 	}
 
 	/**
@@ -138,6 +142,27 @@ namespace NativeUI
 	}
 
 	/**
+	 * Add an segmented list view event listener.
+	 * @param listener The listener that will receive segmented list view
+	 * events.
+	 */
+	void SegmentedListView::addSegmentedListViewListener(
+		SegmentedListViewListener* listener)
+	{
+		addListenerToVector(mSegmentedListViewListeners, listener);
+	}
+
+	/**
+	 * Remove the segmented list view listener.
+	 * @param listener The listener that receives segmented list view events.
+	 */
+	void SegmentedListView::removeSegmentedListViewListener(
+		SegmentedListViewListener* listener)
+	{
+		removeListenerFromVector(mSegmentedListViewListeners, listener);
+	}
+
+	/**
 	 * Add a widget as a child of this widget.
 	 * @param widget The widget that will be added.
 	 * The ownership of the widget is passed to this function.
@@ -186,5 +211,104 @@ namespace NativeUI
 	int SegmentedListView::removeChild(Widget* widget)
 	{
 		return Widget::removeChild(widget);
+	}
+
+	/**
+	 * This method is called when there is an event for this widget.
+	 * It passes on the event to all widget's listeners.
+	 * @param widgetEventData The data for the widget event.
+	 */
+   void SegmentedListView::handleWidgetEvent(MAWidgetEventData* widgetEventData)
+   {
+		Widget::handleWidgetEvent(widgetEventData);
+		if (MAW_EVENT_SEGMENTED_ITEM_WILL_SELECT == widgetEventData->eventType)
+		{
+			this->itemWillSelect(widgetEventData->listItemIndex);
+		}
+		else if (MAW_EVENT_SEGMENTED_ITEM_SELECTED == widgetEventData->eventType)
+		{
+			this->itemSelected(widgetEventData->listItemIndex);
+		}
+   }
+
+	/**
+	 * Get a segmented list item object at a given index.
+	 * @param listItemIndex Item index.
+	 * @return The item object at the given index, or NULL if the index
+	 * is invalid.
+	 * The ownership of the result is not passed to the caller.
+	 */
+	SegmentedListViewItem* SegmentedListView::getItemAtIndex(
+		const int listItemIndex)
+	{
+		int countSections = this->countChildWidgets();
+		int countItems = listItemIndex;
+		SegmentedListViewItem* selectedItem = NULL;
+		for (int i = 0; i < countSections; i++)
+		{
+			Widget* section = this->getChild(i);
+			int tempCountItems = countItems - section->countChildWidgets();
+			if (tempCountItems < 0)
+			{
+				selectedItem = (SegmentedListViewItem*) section->getChild(
+					countItems);
+				break;
+			}
+			else
+			{
+				countItems = tempCountItems;
+			}
+		}
+
+		return selectedItem;
+	}
+
+	/**
+	 * Notify observers that an segmented list view item is about to be
+	 * selected.
+	 * @param segmentedListItemIndex Item index that is about to be selected.
+	 */
+	void SegmentedListView::itemWillSelect(const int segmentedListItemIndex)
+	{
+		printf("SegmentedListView::itemWillSelect");
+		SegmentedListViewItem* selectedItem =
+			this->getItemAtIndex(segmentedListItemIndex);
+		if (!selectedItem)
+		{
+			printf("NULL item");
+			return;
+		}
+
+		for (int i = 0; i < mSegmentedListViewListeners.size(); i++)
+		{
+			mSegmentedListViewListeners[i]->segmentedListViewItemWillSelect(
+				this,
+				selectedItem,
+				segmentedListItemIndex);
+		}
+	}
+
+	/**
+	 * Notify observers that an segmented list view item was selected.
+	 * @param segmentedListItemIndex Item index that was selected.
+	 */
+	void SegmentedListView::itemSelected(const int segmentedListItemIndex)
+	{
+		printf("SegmentedListView::itemSelected");
+		SegmentedListViewItem* selectedItem =
+			this->getItemAtIndex(segmentedListItemIndex);
+		if (!selectedItem)
+		{
+			printf("NULL item");
+			return;
+		}
+
+		for (int i = 0; i < mSegmentedListViewListeners.size(); i++)
+		{
+			mSegmentedListViewListeners[i]->segmentedListViewItemSelected(
+				this,
+				selectedItem,
+				segmentedListItemIndex);
+		}
 	}
 }

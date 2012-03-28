@@ -300,6 +300,45 @@
 }
 
 /**
+ * A specified row is about to be selected.
+ * @param tableView A table-view object informing the delegate about the impending selection.
+ * @param indexPath An index path locating the row in tableView.
+ * @return An index-path object that confirms or alters the selected row.
+ */
+- (NSIndexPath *)tableView:(UITableView *)tableView willSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    LOGIN;
+	MAEvent event;
+	event.type = EVENT_TYPE_WIDGET;
+	MAWidgetEventData *eventData = new MAWidgetEventData;
+	eventData->eventType = MAW_EVENT_SEGMENTED_ITEM_WILL_SELECT;
+	eventData->widgetHandle = handle;
+	eventData->listItemIndex = [indexPath row];
+	event.data = (int)eventData;
+	Base::gEventQueue.put(event);
+
+    return indexPath;
+}
+
+/**
+ * Called when a specified row is now selected.
+ * @param tableView A table-view object informing the delegate about the new row selection.
+ * @param indexPath An index path locating the row in tableView.
+ */
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    LOGIN;
+	MAEvent event;
+	event.type = EVENT_TYPE_WIDGET;
+	MAWidgetEventData *eventData = new MAWidgetEventData;
+	eventData->eventType = MAW_EVENT_SEGMENTED_ITEM_SELECTED;
+	eventData->widgetHandle = handle;
+	eventData->listItemIndex = [indexPath row];
+	event.data = (int)eventData;
+	Base::gEventQueue.put(event);
+}
+
+/**
  * Release all member data.
  */
 -(void) dealloc

@@ -34,12 +34,15 @@
 
 #include "../wrapper/SegmentedListView.h"
 #include "../wrapper/SegmentedListViewSection.h"
+#include "../wrapper/SegmentedListViewItem.h"
+#include "../wrapper/SegmentedListViewListener.h"
 
 using namespace NativeUI;
 
 class SettingsScreen :
 	public Screen,
-	public CheckBoxListener
+	public CheckBoxListener,
+	public SegmentedListViewListener
 {
 public:
 	/**
@@ -65,6 +68,13 @@ private:
 	void createListSection(SegmentedListView& list);
 
 	/**
+	 * Create and add a list section to segmented list.
+	 * The new section will allow the user to set the list mode.
+	 * @param list A  segmented list where to add the section.
+	 */
+	void createListSectionForListMode(SegmentedListView& list);
+
+	/**
 	 * Create and add a list row containing a check box for enabling/disabling
 	 * list edit option.
 	 * @param section List section where to add the list item/row.
@@ -78,16 +88,48 @@ private:
 	 */
 	void createMoveOptionRow(SegmentedListViewSection& section);
 
-    /**
-     * This method is called when the state of the check box was changed
-     * by the user.
-     * @param checkBox The check box object that generated the event.
-     * @param state True if the check box is checked, false otherwise.
-     */
-    virtual void checkBoxStateChanged(
-        CheckBox* checkBox,
-        bool state);
+	/**
+	 * Create and add a list rows for setting the list mode.
+	 * @param section List section where to add the list items/rows.
+	 */
+	void createModeOptionRows(SegmentedListViewSection& section);
 
+	/**
+	 * This method is called when the state of the check box was changed
+	 * by the user.
+	 * @param checkBox The check box object that generated the event.
+	 * @param state True if the check box is checked, false otherwise.
+	 */
+	virtual void checkBoxStateChanged(
+		CheckBox* checkBox,
+		bool state);
+
+	/**
+	 * Called when a segmented list view item is about to be selected.
+	 * Platform: iOS.
+	 * @param segmentedListView The segmented list view item that
+	 * generated the event.
+	 * @param segmentedListViewItem List item that will be selected.
+	 * @param segmentedListViewItemIndex List item index that will be
+	 * selected.
+	 */
+	virtual void segmentedListViewItemWillSelect(
+		SegmentedListView* segmentedListView,
+		SegmentedListViewItem* segmentedListViewItem,
+		const int segmentedListViewItemIndex);
+
+	/**
+	 * Called after a segmented list view item is selected.
+	 * Platform: iOS.
+	 * @param segmentedListView The segmented list view item that
+	 * generated the event.
+	 * @param segmentedListViewItem List item that was selected.
+	 * @param segmentedListViewItemIndex List item index that was selected.
+	 */
+	virtual void segmentedListViewItemSelected(
+		SegmentedListView* segmentedListView,
+		SegmentedListViewItem* segmentedListViewItem,
+		const int segmentedListViewItemIndex);
 private:
 	/**
 	 * Allow cells to be edited.
@@ -98,6 +140,16 @@ private:
 	 * Allow cells to be moved.
 	 */
 	CheckBox* mAllowMoving;
+
+	/**
+	 * Used to set the list mode to display.
+	 */
+	SegmentedListViewItem* mDisplayMode;
+
+	/**
+	 * Used to set the list mode to edit.
+	 */
+	SegmentedListViewItem* mEditMode;
 };
 
 #endif /* SETTINGSSCREEN_H_ */

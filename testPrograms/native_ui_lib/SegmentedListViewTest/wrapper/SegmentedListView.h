@@ -38,6 +38,7 @@ MA 02110-1301, USA.
 #define NATIVEUI_SEGMENTED_LIST_VIEW_H_
 
 #include <NativeUI/Widget.h>
+#include <MAUtil/Vector.h>
 
 namespace NativeUI
 {
@@ -79,6 +80,8 @@ namespace NativeUI
 
 	// Forward declaration
 	class SegmentedListViewSection;
+	class SegmentedListViewItem;
+	class SegmentedListViewListener;
 
 	/**
 	 * @brief A SegmentedListView widget is used to present an indexed/grouped
@@ -133,6 +136,19 @@ namespace NativeUI
 		 */
 		void reloadData();
 
+		/**
+		 * Add an segmented list view event listener.
+		 * @param listener The listener that will receive segmented list view
+		 * events.
+		 */
+		void addSegmentedListViewListener(SegmentedListViewListener* listener);
+
+		/**
+		 * Remove the segmented list view listener.
+		 * @param listener The listener that receives segmented list view events.
+		 */
+		void removeSegmentedListViewListener(SegmentedListViewListener* listener);
+
 private:
 		/**
 		 * Add a widget as a child of this widget.
@@ -175,6 +191,41 @@ private:
 		 * - #MAW_RES_ERROR otherwise.
 		 */
 		int removeChild(Widget* widget);
+
+		 /**
+		  * This method is called when there is an event for this widget.
+		  * It passes on the event to all widget's listeners.
+		  * @param widgetEventData The data for the widget event.
+		  */
+		virtual void handleWidgetEvent(MAWidgetEventData* widgetEventData);
+
+		/**
+		 * Get a segmented list item object at a given index.
+		 * @param listItemIndex Item index.
+		 * @return The item object at the given index, or NULL if the index
+		 * is invalid.
+		 * The ownership of the result is not passed to the caller.
+		 */
+		SegmentedListViewItem* getItemAtIndex(const int listItemIndex);
+
+		/**
+		 * Notify observers that an segmented list view item is about to be
+		 * selected.
+		 * @param segmentedListItemIndex Item index that is about to be selected.
+		 */
+		void itemWillSelect(const int segmentedListItemIndex);
+
+		/**
+		 * Notify observers that an segmented list view item was selected.
+		 * @param segmentedListItemIndex Item index that was selected.
+		 */
+		void itemSelected(const int segmentedListItemIndex);
+
+	private:
+		/**
+		 * Array with list view listeners.
+		 */
+		MAUtil::Vector<SegmentedListViewListener*> mSegmentedListViewListeners;
 	};
 
 } // namespace NativeUI
