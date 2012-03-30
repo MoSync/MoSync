@@ -50,12 +50,14 @@ import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_ALERT;
 import static com.mosync.internal.generated.MAAPI_consts.MA_RESOURCE_OPEN;
 import static com.mosync.internal.generated.MAAPI_consts.MA_RESOURCE_CLOSE;
 
+import static com.mosync.internal.generated.MAAPI_consts.MA_WAKE_LOCK_ON;
+import static com.mosync.internal.generated.MAAPI_consts.MA_WAKE_LOCK_OFF;
+
 import java.io.File;
 import java.io.FileDescriptor;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
@@ -100,7 +102,7 @@ import android.os.Vibrator;
 import android.telephony.TelephonyManager;
 import android.telephony.gsm.GsmCellLocation;
 import android.util.Log;
-import android.view.View;
+import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.FrameLayout;
@@ -118,7 +120,6 @@ import com.mosync.java.android.MoSyncService;
 import com.mosync.java.android.TextBox;
 import com.mosync.nativeui.ui.widgets.MoSyncCameraPreview;
 import com.mosync.nativeui.ui.widgets.ScreenWidget;
-import com.mosync.nativeui.ui.widgets.Widget;
 import com.mosync.nativeui.util.AsyncWait;
 
 /**
@@ -3916,6 +3917,43 @@ public class MoSyncThread extends Thread
 	int maHomeScreenEventsOnOff(int eventsOn)
 	{
 		return mMoSyncHomeScreen.maHomeScreenEventsOnOff(eventsOn);
+	}
+
+	/**
+	 * Activate/deactivate wake lock.
+	 * @param flag
+	 */
+	int maWakeLock(final int flag)
+	{
+		getActivity().runOnUiThread(new Runnable()
+		{
+			public void run()
+			{
+				try
+				{
+					if (MA_WAKE_LOCK_ON == flag)
+					{
+						Window w = mContext.getWindow();
+						w.setFlags(
+							WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON,
+							WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+					}
+					else
+					{
+						Window w = mContext.getWindow();
+						w.setFlags(
+							0,
+							WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+					}
+				}
+				catch(Exception ex)
+				{
+					Log.i("MoSync", "maWakeLock: Could not set wake lock.");
+					ex.printStackTrace();
+				}
+			}
+		});
+		return 1;
 	}
 
 	/**
