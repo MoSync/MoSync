@@ -1788,33 +1788,22 @@ public class MoSyncThread extends Thread
 				imageResource.mBitmap.getWidth() );
 		}
 
-		if (android.os.Build.VERSION.SDK_INT <= android.os.Build.VERSION_CODES.DONUT)
-		{
-			// In 1.6 and below we use the version that includes the bug fix.
-			_maGetImageDataAlphaBugFix(
-				image,
-				imageResource,
-				dst,
-				srcLeft,
-				srcTop,
-				srcWidth,
-				srcHeight,
-				scanLength);
-		}
-		else
-		{
-			// Above 1.6 we can use the faster version. This is about 2-5 times
-			// faster depending on the device/platform.
-			_maGetImageDataFast(
-				image,
-				imageResource,
-				dst,
-				srcLeft,
-				srcTop,
-				srcWidth,
-				srcHeight,
-				scanLength);
-		}
+		// TODO: removed the "fast" version because of a bug, visual output
+		// looks bad, run TestApp to test, fix this in 3.1. We use the "slow"
+		// version for now. Try approach to see if .hasAlpha() can be used.
+
+		// if (android.os.Build.VERSION.SDK_INT <= android.os.Build.VERSION_CODES.DONUT)
+
+		// In 1.6 and below we use the version that includes the bug fix.
+		_maGetImageDataAlphaBugFix(
+			image,
+			imageResource,
+			dst,
+			srcLeft,
+			srcTop,
+			srcWidth,
+			srcHeight,
+			scanLength);
 
 		/*
 		 * For what it is worth, this might be interesting to investigate,
@@ -1826,6 +1815,9 @@ public class MoSyncThread extends Thread
 	}
 
 	/**
+	 * TODO: Not used, results look bad on tansparent pixels,
+	 * test to enable in 3.1. Call from maGetImageData.
+	 *
 	 * Plain way of getting the image pixel data.
 	 *
 	 * @param image
@@ -1837,6 +1829,7 @@ public class MoSyncThread extends Thread
 	 * @param srcHeight
 	 * @param scanLength
 	 */
+	@SuppressWarnings("unused")
 	private void _maGetImageDataFast(
 		int image,
 		ImageCache imageResource,
