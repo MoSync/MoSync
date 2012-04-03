@@ -50,12 +50,14 @@ import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_ALERT;
 import static com.mosync.internal.generated.MAAPI_consts.MA_RESOURCE_OPEN;
 import static com.mosync.internal.generated.MAAPI_consts.MA_RESOURCE_CLOSE;
 
+import static com.mosync.internal.generated.MAAPI_consts.MA_WAKE_LOCK_ON;
+import static com.mosync.internal.generated.MAAPI_consts.MA_WAKE_LOCK_OFF;
+
 import java.io.File;
 import java.io.FileDescriptor;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
@@ -100,7 +102,7 @@ import android.os.Vibrator;
 import android.telephony.TelephonyManager;
 import android.telephony.gsm.GsmCellLocation;
 import android.util.Log;
-import android.view.View;
+import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.FrameLayout;
@@ -118,7 +120,6 @@ import com.mosync.java.android.MoSyncService;
 import com.mosync.java.android.TextBox;
 import com.mosync.nativeui.ui.widgets.MoSyncCameraPreview;
 import com.mosync.nativeui.ui.widgets.ScreenWidget;
-import com.mosync.nativeui.ui.widgets.Widget;
 import com.mosync.nativeui.util.AsyncWait;
 
 /**
@@ -1766,6 +1767,8 @@ public class MoSyncThread extends Thread
 		// TODO: Remove variable bitmapSize, it is not used.
 		//int bitmapSize = scanLength * srcHeight;
 
+		//Log.i("@@@@@@", "_maGetImageData >>> handle: " + image + " hasAlpha: " + imageResource.mBitmap.hasAlpha());
+
 		if ((srcTop + srcHeight) > imageResource.mBitmap.getHeight())
 		{
 			maPanic(
@@ -1788,6 +1791,115 @@ public class MoSyncThread extends Thread
 				imageResource.mBitmap.getWidth() );
 		}
 
+		if (android.os.Build.VERSION.SDK_INT <= android.os.Build.VERSION_CODES.DONUT)
+		{
+			// In 1.6 and below we use the version that includes the bug fix.
+			_maGetImageDataAlphaBugFix(
+				image,
+				imageResource,
+				dst,
+				srcLeft,
+				srcTop,
+				srcWidth,
+				srcHeight,
+				scanLength);
+		}
+		else
+		{
+			// Above 1.6 we can use the faster version. This is about 2-5 times
+			// faster depending on the device/platform.
+			_maGetImageDataFast(
+				image,
+				imageResource,
+				dst,
+				srcLeft,
+				srcTop,
+				srcWidth,
+				srcHeight,
+				scanLength);
+		}
+
+		/*
+		 * For what it is worth, this might be interesting to investigate,
+		 * found this comment on a forum:
+		 *
+		 * API level 12 added a method setHasAlpha() which you
+		 * can use instead of having to copy the image to get the alpha channel.
+		 */
+	}
+
+	/**
+	 * Plain way of getting the image pixel data.
+	 *
+	 * @param image
+	 * @param imageResource
+	 * @param dst
+	 * @param srcLeft
+	 * @param srcTop
+	 * @param srcWidth
+	 * @param srcHeight
+	 * @param scanLength
+	 */
+	private void _maGetImageDataFast(
+		int image,
+		ImageCache imageResource,
+		int dst,
+		int srcLeft,
+		int srcTop,
+		int srcWidth,
+		int srcHeight,
+		int scanLength)
+	{
+		try
+		{
+			int pixels[] = new int[srcWidth * srcHeight];
+
+			IntBuffer intBuffer = getMemorySlice(dst, -1).asIntBuffer();
+
+			imageResource.mBitmap.getPixels(
+				pixels,
+				0,
+				scanLength,
+				srcLeft,
+				srcTop,
+				srcWidth,
+				srcHeight);
+
+			intBuffer.put(pixels);
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+			maPanic(
+				-1,
+				"Exception in _maGetImageDataFast - " +
+				"check stack trace in logcat: " +
+				e.toString());
+		}
+	}
+
+	/**
+	 * Get image pixel data using a bug fix for the alpha channel.
+	 *
+	 * @param image
+	 * @param imageResource
+	 * @param dst
+	 * @param srcLeft
+	 * @param srcTop
+	 * @param srcWidth
+	 * @param srcHeight
+	 * @param scanLength
+	 */
+	private void _maGetImageDataAlphaBugFix(
+		int image,
+		ImageCache imageResource,
+		int dst,
+		int srcLeft,
+		int srcTop,
+		int srcWidth,
+		int srcHeight,
+		int scanLength)
+	{
 		int pixels[] = new int[srcWidth];
 		int colors[] = new int[srcWidth];
 		int alpha[] = new int[srcWidth];
@@ -1816,42 +1928,48 @@ public class MoSyncThread extends Thread
 
 		IntBuffer intBuffer = getMemorySlice(dst, -1).asIntBuffer();
 
-		try {
-
-		for (int y = 0; y < srcHeight; y++)
+		try
 		{
-			intBuffer.position(y*scanLength);
-
-			imageResource.mBitmap.getPixels(
-				alpha,
-				0,
-				srcWidth,
-				srcLeft,
-				srcTop+y,
-				srcWidth,
-				1);
-
-			temporaryBitmap.getPixels(
-				colors,
-				0,
-				srcWidth,
-				0,
-				y,
-				srcWidth,
-				1);
-
-			for( int i = 0; i < srcWidth; i++)
+			for (int y = 0; y < srcHeight; y++)
 			{
-				pixels[i] = (alpha[i]&0xff000000) + (colors[i]&0x00ffffff);
-			}
+				intBuffer.position(y*scanLength);
 
-			intBuffer.put(pixels);
+				imageResource.mBitmap.getPixels(
+					alpha,
+					0,
+					srcWidth,
+					srcLeft,
+					srcTop+y,
+					srcWidth,
+					1);
+
+				temporaryBitmap.getPixels(
+					colors,
+					0,
+					srcWidth,
+					0,
+					y,
+					srcWidth,
+					1);
+
+				for( int i = 0; i < srcWidth; i++)
+				{
+					pixels[i] = (alpha[i]&0xff000000) + (colors[i]&0x00ffffff);
+				}
+
+				intBuffer.put(pixels);
+			}
 		}
-		} catch(Exception e) {
-			e.printStackTrace();
+		catch(Exception e)
+		{
 			//Log.i("_maGetImageData", "("+image+", "+srcLeft+","+srcTop+", "+srcWidth+"x"+srcHeight+"): "+
 			//	imageResource.mBitmap.getWidth()+"x"+imageResource.mBitmap.getHeight()+"\n");
-			maPanic(-1, "maGetImageData");
+			e.printStackTrace();
+			maPanic(
+				-1,
+				"Exception in _maGetImageDataAlphaBugFix - " +
+				"check stack trace in logcat: " +
+				e.toString());
 		}
 	}
 
@@ -3799,6 +3917,43 @@ public class MoSyncThread extends Thread
 	int maHomeScreenEventsOnOff(int eventsOn)
 	{
 		return mMoSyncHomeScreen.maHomeScreenEventsOnOff(eventsOn);
+	}
+
+	/**
+	 * Activate/deactivate wake lock.
+	 * @param flag
+	 */
+	int maWakeLock(final int flag)
+	{
+		getActivity().runOnUiThread(new Runnable()
+		{
+			public void run()
+			{
+				try
+				{
+					if (MA_WAKE_LOCK_ON == flag)
+					{
+						Window w = mContext.getWindow();
+						w.setFlags(
+							WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON,
+							WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+					}
+					else
+					{
+						Window w = mContext.getWindow();
+						w.setFlags(
+							0,
+							WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+					}
+				}
+				catch(Exception ex)
+				{
+					Log.i("MoSync", "maWakeLock: Could not set wake lock.");
+					ex.printStackTrace();
+				}
+			}
+		});
+		return 1;
 	}
 
 	/**

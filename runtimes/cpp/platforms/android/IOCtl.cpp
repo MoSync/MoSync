@@ -743,6 +743,20 @@ namespace Base
 		return (int)result;
 	}
 
+	int _maWakeLock(int flag, JNIEnv* jNIEnv, jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(
+			cls,
+			"maWakeLock",
+			"(I)I");
+		if (methodID == 0) return -2;
+		jint result = jNIEnv->CallIntMethod(jThis, methodID, flag);
+		jNIEnv->DeleteLocalRef(cls);
+
+		return (int)result;
+	}
+
 	int _maWidgetCreate(const char *widgetType, JNIEnv* jNIEnv, jobject jThis)
 	{
 		// Get the Java method

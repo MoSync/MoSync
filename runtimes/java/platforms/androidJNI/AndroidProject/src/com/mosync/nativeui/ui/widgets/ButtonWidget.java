@@ -29,14 +29,14 @@ import com.mosync.nativeui.util.properties.PropertyConversionException;
 /**
  * Wraps the behavior of a Button view. Some properties and event handling
  * are extensions of Widget.
- * 
+ *
  * @author fmattias
  */
 public class ButtonWidget extends LabelWidget
 {
 	/**
 	 * Constructor.
-	 * 
+	 *
 	 * @param handle Integer handle corresponding to this instance.
 	 * @param button A button wrapped by this widget.
 	 */
@@ -44,7 +44,7 @@ public class ButtonWidget extends LabelWidget
 	{
 		super( handle, button );
 	}
-	
+
 	/**
 	 * @see Widget.setProperty.
 	 */
@@ -57,7 +57,7 @@ public class ButtonWidget extends LabelWidget
 		{
 			// Make sure bad values get caught, so that the API is consistent.
 			ColorConverter.convert( value );
-			
+
 			// Ignore the background color of a button, since Android
 			// buttons do not have anything behind the button foreground.
 		}
@@ -89,17 +89,4 @@ public class ButtonWidget extends LabelWidget
 		}
 	}
 
-	/**
-	 * Sets the font typeface from mosync nativeUI.
-	 * It is called instead of the setProperty method,
-	 * as two params are needed.
-	 * @param aTypeface The typeface of MoSyncFontHandle
-	 * @param aSize The size of MoSyncFontHandle
-	 */
-	public void setFontTypeface(Typeface aTypeface, float aSize)
-	{
-		Button btn = (Button) getView( );
-		btn.setTypeface(aTypeface);
-		btn.setTextSize(aSize);
-	}
 }

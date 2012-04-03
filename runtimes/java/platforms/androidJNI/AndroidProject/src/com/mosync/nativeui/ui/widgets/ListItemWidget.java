@@ -115,14 +115,19 @@ public class ListItemWidget extends Layout
 
 	/**
 	 * Sets the font typeface from mosync nativeUI.
-	 * It is called instead of the setProperty method,
-	 * as two params are needed.
+	 * It is called from the setProperty method,
+	 *
 	 * @param aTypeface The typeface of MoSyncFontHandle
 	 * @param aSize The size of MoSyncFontHandle
+	 * @return True if the widget supports font setting, false otherwise.
 	 */
-	public void setFontTypeface(Typeface aTypeface, float aSize)
+	@Override
+	public boolean setFontTypeface(Typeface aTypeface, float aSize)
 	{
 		m_label.setTypeface(aTypeface);
 		m_label.setTextSize(aSize);
+
+		return true;
 	}
+
 }
