@@ -221,6 +221,8 @@ namespace Base
 	*/
 	int _maScreenStateEventsOnOff(int eventsOn, JNIEnv* jNIEnv, jobject jThis);
 
+	int _maWakeLock(int flag, JNIEnv* jNIEnv, jobject jThis);
+
 	int _maTextBox(const wchar* title, const wchar* inText, int outText,
 					int maxSize, int constraints, int memStart,
 					JNIEnv* jNIEnv, jobject jThis);
