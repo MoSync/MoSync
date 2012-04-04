@@ -1548,13 +1548,21 @@ interface MAAPI {
 	* \brief An puchase event struct.
 	*/
 	struct MAPurchaseEventData {
-		//
+		// Type of the purchase event.
+		// One of the \link MA_PURCHASE_EVENT_REQUEST_STATE_CHANGED MA_PURCHASE_EVENT \endlink constants.
+		int type;
+
+		// State of the purchase.
+		// One of the \link MA_PURCHASE_STATE_FAILED MA_PURCHASE_STATE \endlink constants.
+		// Valid only if type is #MA_PURCHASE_EVENT_REQUEST_STATE_CHANGED.
 		int state;
 
-		//
+		// Handle to the product that sent the event.
 		MAHandle productHandle;
 
-		//
+		// Reason why the puchase failed.
+		// Valid only if type is #MA_PURCHASE_EVENT_REQUEST_STATE_CHANGED and
+		// state is #MA_PURCHASE_STATE_FAILED.
 		int errorCode;
 	}
 
@@ -11087,6 +11095,12 @@ group PurchaseAPI "Purchase API" {
 			REFUNDED = 1;
 			//
 			RESTORED = 2;
+			// Notifies that a product is valid in the store.
+			// Sent after calling maPurchaseCreate() syscall.
+			PRODUCT_VALID = 3;
+			// Notifies that a product is not valid in the store.
+			// Sent after calling maPurchaseCreate() syscall.
+			PRODUCT_INVALID = 4;
 		}
 	} // end of Purchase Event Types
 
@@ -11161,9 +11175,9 @@ group PurchaseAPI "Purchase API" {
 		void maPurchaseRestoreTransactions();
 
 		/**
-		*
-		*
-		*
+		* Destroy a product object.
+		* @param productHandle Handle to the product to destroy.
+		* If the given handle is invalid the method does nothing.
 		*/
 		void maPurchaseDestroy(in MAHandle productHandle);
 

@@ -32,7 +32,7 @@
 /**
  * @brief MoSync product class.
  */
-@interface PurchaseProduct: NSObject
+@interface PurchaseProduct: NSObject<SKProductsRequestDelegate>
 {
     /**
      * Local handle.
@@ -43,6 +43,11 @@
      * Product identifier.
      */
     NSString* _productID;
+
+    /**
+     * Used to verify if the product is available in the Apple App Store.
+     */
+    SKProductsRequest* _productRequest;
 }
 
 /**
