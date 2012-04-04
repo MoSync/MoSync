@@ -106,6 +106,22 @@ static PurchaseManager *sharedInstance = nil;
 }
 
 /**
+ * Destroy a product object.
+ * @param productHandle Handle to the product to destroy.
+ * If the given handle is invalid the method does nothing.
+ */
+-(void) destroyProduct:(MAHandle) productHandle
+{
+    NSNumber* key = [NSNumber numberWithInt:productHandle];
+    PurchaseProduct* product = [_productsDictionary objectForKey:key];
+    if (product)
+    {
+        [_productsDictionary removeObjectForKey:key];
+        [product release];
+    }
+}
+
+/**
  * Release all contained objects.
  */
 -(void) dealloc

@@ -80,4 +80,11 @@
  */
 -(MAHandle) createProduct:(const char*) productID;
 
+/**
+ * Destroy a product object.
+ * @param productHandle Handle to the product to destroy.
+ * If the given handle is invalid the method does nothing.
+ */
+-(void) destroyProduct:(MAHandle) productHandle;
+
 @end
