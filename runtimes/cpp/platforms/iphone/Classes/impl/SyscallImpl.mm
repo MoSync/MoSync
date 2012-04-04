@@ -51,6 +51,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #import "Capture.h"
 #include "netImpl.h"
 #import "Reachability.h"
+#import "PurchaseManager.h"
 
 #define NETWORKING_H
 #include "networking.h"
@@ -1974,6 +1975,16 @@ namespace Base {
 
 	}
 
+    SYSCALL(int, maPurchaseSupported())
+	{
+        return [[PurchaseManager getInstance] isPurchaseSupported];
+	}
+
+    SYSCALL(MAHandle, maPurchaseCreate(const char* productID))
+	{
+        return [[PurchaseManager getInstance] createProduct:productID];
+	}
+
 	SYSCALL(longlong, maIOCtl(int function, int a, int b, int c))
 	{
 		switch(function) {
@@ -2118,6 +2129,8 @@ namespace Base {
 		maIOCtl_case(maAudioPause);
 		maIOCtl_case(maExtensionModuleLoad);
         maIOCtl_case(maExtensionFunctionLoad);
+        maIOCtl_case(maPurchaseSupported);
+        maIOCtl_case(maPurchaseCreate);
 		}
 
 		return IOCTL_UNAVAILABLE;

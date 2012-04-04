@@ -11026,7 +11026,7 @@ group PurchaseAPI "Purchase API" {
 
 	group PurchaseResultCodes "Purchase Result Codes" {
 		constset int MA_PURCHASE_RES_ {
-			//
+			// No error occured.
 			OK = 0;
 			//
 			UNAVAILABLE = -1;
@@ -11048,11 +11048,13 @@ group PurchaseAPI "Purchase API" {
 			ITEM_ALREADY_PURCHASED = -9;
 			//
 			CLIENT_INVALID = -10;
-			//
+			// Returned by the maPurchaseCreate() syscall if the productID string is empty.
+			// Platform: Android and iOS.
 			INVALID = -11;
 			//
 			NOT_ALLOWED = -12;
-			//
+			// Returned by the maPurchaseSupported() syscall if purchase is not allowed on the device.
+			// Platform: iOS.
 			DISABLED = -13;
 		}
 	} // end of Purchase Result Codes
@@ -11094,14 +11096,17 @@ group PurchaseAPI "Purchase API" {
 		* \brief Check if in app purchase is supported/enabled on a device.
 		*
 		* \returns One of the next result codes:
-		* - #MA_ADS_RES_OK if no error occurred.
+		* - #MA_PURCHASE_RES_OK if purchase is supported/allowed on the device.
+		* - #MA_PURCHASE_RES_DISABLED if purchase is not allowed/enabled.
 		*/
 		int maPurchaseSupported();
 
 		/**
+		* \brief Create a product object.
+		* \param productID String that identifies the product.
 		*
-		*
-		*
+		* \return \link #MA_PURCHASE_RES_INVALID MA_PURCHASE_RES_INVALID \endlink if productID
+		* string is empty, otherwise a handle to the product object.
 		*/
 		MAHandle maPurchaseCreate(in MAString productID);
 
