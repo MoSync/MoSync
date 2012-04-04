@@ -100,7 +100,7 @@ public:
 		mLayout->setProperty("topMargin", padding);
 		mLayout->setProperty("bottomMargin", padding);
 		mLayout->setProperty("spacing", "5");
-		mLayout->setProperty("isScrollable", "true");
+		mLayout->setProperty(MAW_VERTICAL_LAYOUT_SCROLLABLE, "true");
 
 		mLayout->addChild(mLabel);
 		setMainWidget(mLayout);

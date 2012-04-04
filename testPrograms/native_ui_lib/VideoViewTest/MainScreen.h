@@ -35,7 +35,8 @@ using namespace NativeUI;
 class MainScreen:
 	public Screen,
 	public ButtonListener,
-	public VideoViewListener
+	public VideoViewListener,
+	public EditBoxListener
 {
 
 public:
@@ -105,6 +106,14 @@ private:
 	 * Show/hide the video control and change button's text.
 	 */
 	void handleVideoControlButtonClicked();
+
+    /**
+     * This method is called when the return button was pressed.
+     * On iphone platform the virtual keyboard is not hidden after
+     * receiving this event.
+     * @param editBox The edit box object that generated the event.
+     */
+    virtual void editBoxReturn(EditBox* editBox);
 
 private:
 	/**

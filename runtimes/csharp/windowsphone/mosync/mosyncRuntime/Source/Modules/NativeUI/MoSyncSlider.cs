@@ -121,7 +121,7 @@ namespace MoSync
             {
                 set
                 {
-                    if (value < 0)
+                    if (0 <= value)
                     {
                         if (value <= mMaxValue && value >= mMinValue)
                         {

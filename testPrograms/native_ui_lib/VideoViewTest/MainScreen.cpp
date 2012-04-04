@@ -68,6 +68,7 @@ MainScreen::MainScreen() :
 	mVideoControl->addButtonListener(this);
 
 	mVideoView->addVideoViewListener(this);
+	mEditBox->addEditBoxListener(this);
 }
 
 /**
@@ -85,6 +86,7 @@ MainScreen::~MainScreen()
     mVideoControl->removeButtonListener(this);
 
     mVideoView->removeVideoViewListener(this);
+    mEditBox->removeEditBoxListener(this);
 }
 
 /**
@@ -302,4 +304,15 @@ void MainScreen::handleVideoControlButtonClicked()
 	bool value = mVideoView->isControlVisible();
 	printf("MainScreen::handleVideoControlButtonClicked - control visible = %d",
 		value);
+}
+
+/**
+ * This method is called when the return button was pressed.
+ * On iphone platform the virtual keyboard is not hidden after
+ * receiving this event.
+ * @param editBox The edit box object that generated the event.
+ */
+void MainScreen::editBoxReturn(EditBox* editBox)
+{
+	editBox->hideKeyboard();
 }
