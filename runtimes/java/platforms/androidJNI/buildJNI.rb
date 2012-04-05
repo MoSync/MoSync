@@ -198,7 +198,8 @@ packages = ["src/com/mosync/java/android/*.java",
             "src/com/mosync/internal/android/nfc/ops/*.java",
 	        "src/com/mosync/nativeui/ui/ads/*.java",
 			"src/com/google/android/c2dm/*.java",
-			"src/com/mosync/internal/android/notifications/*.java"
+			"src/com/mosync/internal/android/notifications/*.java",
+			"src/com/mosync/internal/android/billing/*.java"
             ]
 
 # Concatenate each list element with package_root, and flatten the list to a string

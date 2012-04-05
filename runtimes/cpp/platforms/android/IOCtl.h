@@ -914,6 +914,10 @@ namespace Base
 
 	int _maCaptureDestroyData(MAHandle handle, JNIEnv* jNIEnv, jobject jThis);
 
+	// ********** In-APP Purchase API **********
+
+	int _maPurchaseSupported(JNIEnv* jNIEnv, jobject jThis);
+
 	// ********** Database API **********
 
 	/**

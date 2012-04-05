@@ -11028,13 +11028,32 @@ group PurchaseAPI "Purchase API" {
 		constset int MA_PURCHASE_RES_ {
 			//
 			OK = 0;
-			//
+			/**
+			* @brief Indicates that in app-purchase is not available because the
+			* API version is not recognized or the user is not eligible to make
+			* in-app purchases (for example, the user resides in a country that
+			* prohibits in-app purchases).
+			* Platform: Android only.
+			*/
 			UNAVAILABLE = -1;
-			//
+
+			/**
+			* @brief Indicates that there was an error connecting with the Google Play
+			* application, or the iTunes.
+			*/
 			ERROR = -2;
-			//
+
+			/*
+			* @brief Indicates that an application is not properly signed, or a request
+			* was malformed.
+			* Platform: Android only.
+			*/
 			DEVELOPER_ERROR = -3;
-			//
+
+			/*
+			* Indicates that the Google Play application is out of date and needs to be updated.
+			* Platform: Android only.
+			*/
 			OUT_OF_DATE = -4;
 			//
 			DISABLED = -5;
@@ -11092,15 +11111,21 @@ group PurchaseAPI "Purchase API" {
 
 		/**
 		* \brief Check if in app purchase is supported/enabled on a device.
+		* On Android, it checks if Google Play application supports in-app
+		* purchase. This request is useful if you want to enable or disable
+		* certain UI features that are relevant only to in-app billing.
 		*
 		* \returns One of the next result codes:
-		* - #MA_ADS_RES_OK if no error occurred.
+		* - #MA_PURCHASE_RES_OK if in-app purchase is supported.
+		* - #MA_PURCHASE_RES_UNAVAILABLE
+		* - #MA_PURCHASE_RES_ERROR
+		* - #MA_PURCHASE_RES_DEVELOPER_ERROR
+		* - #MA_PURCHASE_RES_OUT_OF_DATE
+		* - #MA_PURCHASE_RES_DISABLED
 		*/
 		int maPurchaseSupported();
 
 		/**
-		*
-		*
 		*
 		*/
 		MAHandle maPurchaseCreate(in MAString productID);

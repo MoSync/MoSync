@@ -2887,6 +2887,11 @@ namespace Base
 		case maIOCtl_maCaptureDestroyData:
 			return _maCaptureDestroyData(a, mJNIEnv, mJThis);
 
+		// ********** In-app Purchase API **********
+
+		case maIOCtl_maPurchaseSupported:
+			return _maPurchaseSupported(mJNIEnv, mJThis);
+
 		// ********** Panics **********
 
 		case maIOCtl_maSyscallPanicsEnable:

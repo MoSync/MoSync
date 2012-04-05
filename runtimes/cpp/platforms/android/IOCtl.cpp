@@ -3369,6 +3369,22 @@ namespace Base
 		return result;
 	}
 
+	int _maPurchaseSupported(JNIEnv* jNIEnv, jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maPurchaseSupported", "()I");
+		if (methodID == 0)
+		{
+			return 0;
+		}
+
+		int result = jNIEnv->CallIntMethod(jThis, methodID);
+
+		jNIEnv->DeleteLocalRef(cls);
+
+		return result;
+	}
+
 	int _maSyscallPanicsEnable(JNIEnv* jNIEnv, jobject jThis)
 	{
 		jclass cls = jNIEnv->GetObjectClass(jThis);

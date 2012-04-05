@@ -181,6 +181,7 @@ public class MoSyncThread extends Thread
 	MoSyncAds mMoSyncAds;
 	MoSyncNotifications mMoSyncNotifications;
 	MoSyncCapture mMoSyncCapture;
+	MoSyncPurchase mMoSyncPurchase;
 	MoSyncDB mMoSyncDB;
 
 	/**
@@ -420,6 +421,8 @@ public class MoSyncThread extends Thread
 		mMoSyncNotifications = new MoSyncNotifications(this);
 
 		mMoSyncCapture = new MoSyncCapture(this, mImageResources);
+
+		mMoSyncPurchase = new MoSyncPurchase(this);
 
 		mMoSyncDB = new MoSyncDB();
 
@@ -3530,6 +3533,14 @@ public class MoSyncThread extends Thread
 	int maCaptureDestroyData(int handle)
 	{
 		return mMoSyncCapture.maCaptureDestroyData(handle);
+	}
+
+	/**
+	 *
+	 */
+	int maPurchaseSupported();
+	{
+
 	}
 
 	/**
