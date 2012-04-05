@@ -48,6 +48,17 @@
      * Used to verify if the product is available in the Apple App Store.
      */
     SKProductsRequest* _productRequest;
+
+    /**
+     * Product received from Apple App Store.
+     * If nil than the product is invalid.
+     */
+    SKProduct* _product;
+
+    /**
+     * Payment that will be send to the Apple App Store.
+     */
+    SKMutablePayment* _payment;
 }
 
 /**
@@ -58,6 +69,12 @@
  */
 -(id) initWithHandle:(MAHandle) productHandle
            productID:(NSString*) productID;
+
+/**
+ * Get a payment object for the product.
+ * @return A payment that can be send to the Apple App Store.
+ */
+-(SKPayment*) payment;
 
 @property(nonatomic, readonly) MAHandle handle;
 

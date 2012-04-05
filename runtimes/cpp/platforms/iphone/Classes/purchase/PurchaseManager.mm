@@ -64,6 +64,7 @@ static PurchaseManager *sharedInstance = nil;
     if (self)
     {
         _paymentQueue = [SKPaymentQueue defaultQueue];
+        [_paymentQueue addTransactionObserver:self];
         _countProducts = 0;
         _productsDictionary = [[NSMutableDictionary alloc] init];
     }
@@ -119,6 +120,37 @@ static PurchaseManager *sharedInstance = nil;
         [_productsDictionary removeObjectForKey:key];
         [product release];
     }
+}
+
+/**
+ * Add a given product to the payment queue.
+ * @param productHandle Handle to the product to be added.
+ */
+-(void) requestProduct:(MAHandle) productHandle
+{
+
+}
+
+#pragma mark SKPaymentTransactionObserver methods
+
+/**
+ * Called when one or more transactions have been updated.
+ * @param queue The payment queue that updated the transactions.
+ * @param transactions An array of the transactions that were updated.
+ */
+- (void)paymentQueue:(SKPaymentQueue *)queue updatedTransactions:(NSArray *)transactions
+{
+    NSLog(@"updatedTransactions");
+}
+
+/**
+ * Called when an error occurred while restoring transactions.
+ * @param queue The payment queue that was restoring transactions.
+ * @param error The error that occurred.
+ */
+- (void)paymentQueue:(SKPaymentQueue *)queue restoreCompletedTransactionsFailedWithError:(NSError *)error
+{
+    NSLog(@"restoreCompletedTransactionsFailedWithError");
 }
 
 /**

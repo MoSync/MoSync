@@ -54,6 +54,20 @@
     return self;
 }
 
+/**
+ * Get a payment object for the product.
+ * @return A payment that can be send to the Apple App Store.
+ */
+-(SKPayment*) payment
+{
+    if (!_payment)
+    {
+        _payment = [SKMutablePayment paymentWithProduct:_product];
+    }
+
+    return _payment;
+}
+
 #pragma mark SKProductsRequestDelegate method
 /**
  * Called when the Apple App Store responds to the product request.
@@ -76,6 +90,12 @@
 
     event.purchaseData = purchaseData;
     Base::gEventQueue.put(event);
+
+    // Store the product(if valid)
+    if (isValid)
+    {
+        _product = [response.products objectAtIndex:0];
+    }
 }
 
 /**

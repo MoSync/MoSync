@@ -35,7 +35,7 @@
  * Manager for the purchase module.
  * Contains purchase related syscall implementation.
  */
-@interface PurchaseManager : NSObject
+@interface PurchaseManager : NSObject<SKPaymentTransactionObserver>
 {
     /**
      * Used to send payment transactions to Apple App Store.
@@ -86,5 +86,11 @@
  * If the given handle is invalid the method does nothing.
  */
 -(void) destroyProduct:(MAHandle) productHandle;
+
+/**
+ * Add a given product to the payment queue.
+ * @param productHandle Handle to the product to be added.
+ */
+-(void) requestProduct:(MAHandle) productHandle;
 
 @end
