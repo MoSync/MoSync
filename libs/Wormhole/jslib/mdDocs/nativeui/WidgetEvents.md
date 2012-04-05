@@ -54,10 +54,7 @@ EditBoxTextChanged
 >Sent from the Edit box when the text was changed.
 EditBoxReturn
 --------------
->Sent from the Edit box when the return button was pressed. On iphone platform the virtual keyboard is not closed after receiving this event. The virtual keyboard can be hided by setting the MAW_EDIT_BOX_SHOW_KEYBOARD to "false". Not available on Windows Phone 7.1.
-WebViewContentLoading
-----------------------
->A WebView widget reports status of loading page content. Event parameter status is set to one of the following values: MAW_CONSTANT_STARTED MAW_CONSTANT_DONE MAW_CONSTANT_STOPPED MAW_CONSTANT_ERROR.
+>Sent from the Edit box when the return button was pressed. On iphone platform the virtual keyboard is not closed after receiving this event. The virtual keyboard can be hided by setting the "showKeyboard" to "false". Not available on Windows Phone 7.1.
 WebViewHookInvoked
 -------------------
 >A web view hook has captured a url.

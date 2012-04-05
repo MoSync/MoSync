@@ -86,6 +86,7 @@ import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.PorterDuff.Mode;
@@ -1791,33 +1792,22 @@ public class MoSyncThread extends Thread
 				imageResource.mBitmap.getWidth() );
 		}
 
-		if (android.os.Build.VERSION.SDK_INT <= android.os.Build.VERSION_CODES.DONUT)
-		{
-			// In 1.6 and below we use the version that includes the bug fix.
-			_maGetImageDataAlphaBugFix(
-				image,
-				imageResource,
-				dst,
-				srcLeft,
-				srcTop,
-				srcWidth,
-				srcHeight,
-				scanLength);
-		}
-		else
-		{
-			// Above 1.6 we can use the faster version. This is about 2-5 times
-			// faster depending on the device/platform.
-			_maGetImageDataFast(
-				image,
-				imageResource,
-				dst,
-				srcLeft,
-				srcTop,
-				srcWidth,
-				srcHeight,
-				scanLength);
-		}
+		// TODO: removed the "fast" version because of a bug, visual output
+		// looks bad, run TestApp to test, fix this in 3.1. We use the "slow"
+		// version for now. Try approach to see if .hasAlpha() can be used.
+
+		// if (android.os.Build.VERSION.SDK_INT <= android.os.Build.VERSION_CODES.DONUT)
+
+		// In 1.6 and below we use the version that includes the bug fix.
+		_maGetImageDataAlphaBugFix(
+			image,
+			imageResource,
+			dst,
+			srcLeft,
+			srcTop,
+			srcWidth,
+			srcHeight,
+			scanLength);
 
 		/*
 		 * For what it is worth, this might be interesting to investigate,
@@ -1829,6 +1819,9 @@ public class MoSyncThread extends Thread
 	}
 
 	/**
+	 * TODO: Not used, results look bad on tansparent pixels,
+	 * test to enable in 3.1. Call from maGetImageData.
+	 *
 	 * Plain way of getting the image pixel data.
 	 *
 	 * @param image
@@ -1840,6 +1833,7 @@ public class MoSyncThread extends Thread
 	 * @param srcHeight
 	 * @param scanLength
 	 */
+	@SuppressWarnings("unused")
 	private void _maGetImageDataFast(
 		int image,
 		ImageCache imageResource,
@@ -1854,7 +1848,7 @@ public class MoSyncThread extends Thread
 		{
 			int pixels[] = new int[srcWidth * srcHeight];
 
-			IntBuffer intBuffer = getMemorySlice(dst, -1).asIntBuffer();
+			IntBuffer intBuffer = getMemorySlice(dst, -1).order(null).asIntBuffer();
 
 			imageResource.mBitmap.getPixels(
 				pixels,
@@ -1926,7 +1920,7 @@ public class MoSyncThread extends Thread
 		//mMemDataSection.position(dst);
 		//IntBuffer intBuffer = mMemDataSection.asIntBuffer();
 
-		IntBuffer intBuffer = getMemorySlice(dst, -1).asIntBuffer();
+		IntBuffer intBuffer = getMemorySlice(dst, -1).order(null).asIntBuffer();
 
 		try
 		{
@@ -1954,7 +1948,10 @@ public class MoSyncThread extends Thread
 
 				for( int i = 0; i < srcWidth; i++)
 				{
-					pixels[i] = (alpha[i]&0xff000000) + (colors[i]&0x00ffffff);
+					pixels[i] = Color.argb(Color.alpha(alpha[i]),
+							Color.red(colors[i]), Color.green(colors[i]),
+							Color.blue(colors[i]));
+					//pixels[i] = (alpha[i]&0xff000000) + (colors[i]&0x00ffffff);
 				}
 
 				intBuffer.put(pixels);

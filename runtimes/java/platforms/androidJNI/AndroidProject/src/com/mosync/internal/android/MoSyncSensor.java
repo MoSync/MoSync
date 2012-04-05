@@ -135,19 +135,20 @@ public class MoSyncSensor implements SensorEventListener {
 		try
 		{
 			mSensorManager = (SensorManager)getActivity().getSystemService(Context.SENSOR_SERVICE);
-		} catch (Exception ex)
+			// Set up conversion table
+			mSensorConversion.put(SENSOR_TYPE_ACCELEROMETER, Sensor.TYPE_ACCELEROMETER);
+			mSensorConversion.put(SENSOR_TYPE_COMPASS, Sensor.TYPE_ORIENTATION);
+			mSensorConversion.put(SENSOR_TYPE_GYROSCOPE, Sensor.TYPE_GYROSCOPE);
+			mSensorConversion.put(SENSOR_TYPE_MAGNETIC_FIELD, Sensor.TYPE_MAGNETIC_FIELD);
+			mSensorConversion.put(SENSOR_TYPE_ORIENTATION,Sensor.TYPE_ORIENTATION);
+			mSensorConversion.put(SENSOR_TYPE_PROXIMITY, Sensor.TYPE_PROXIMITY);
+
+		} catch (Throwable ex)
 		{
 			Log.e("@@MoSync", "MoSyncSensor manager initialize error!");
 		}
 
-		// Set up conversion table
-		mSensorConversion.put(SENSOR_TYPE_ACCELEROMETER, Sensor.TYPE_ACCELEROMETER);
-		mSensorConversion.put(SENSOR_TYPE_COMPASS, Sensor.TYPE_ORIENTATION);
-		mSensorConversion.put(SENSOR_TYPE_GYROSCOPE, Sensor.TYPE_GYROSCOPE);
-		mSensorConversion.put(SENSOR_TYPE_MAGNETIC_FIELD, Sensor.TYPE_MAGNETIC_FIELD);
-		mSensorConversion.put(SENSOR_TYPE_ORIENTATION,Sensor.TYPE_ORIENTATION);
-		mSensorConversion.put(SENSOR_TYPE_PROXIMITY, Sensor.TYPE_PROXIMITY);
-	}
+		}
 
 	/**
 	 * @brief Called when the accuracy of a sensor has changed.

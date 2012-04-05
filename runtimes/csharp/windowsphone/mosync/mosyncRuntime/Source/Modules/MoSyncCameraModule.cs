@@ -10,10 +10,35 @@ namespace MoSync
 {
     public class CameraModule : IIoctlModule
     {
-		/*
+		/**
+         * The camera object.
+         */
 		private PhotoCamera mCamera = null;
+
+        /**
+         * The view finder, in this case a video brush.
+         */
 		private VideoBrush mVideoBrush = null;
+
+        /**
+         * Event handler declaration for the camera snapshot.
+         */
 		private EventHandler<ContentReadyEventArgs> mCameraSnapshotDelegate = null;
+
+        /**
+         * The native ui widget used for drawing the camera image.
+         */
+        private NativeUI.CameraPreview mCameraPrev = null;
+
+        /**
+         * The camera type.
+         */
+        private CameraType mCameraType = CameraType.Primary;
+
+        /**
+         * The flash mode used.
+         */
+        private FlashMode mFlashMode = FlashMode.Off;
 
 		bool GetCameraFormat(int index, out System.Windows.Size dim)
 		{
@@ -33,16 +58,15 @@ namespace MoSync
 			dim = resolutions.Current;
 			return true;
 		}
-		*/
 
+        /**
+         * Initializing the ioctls.
+         */
 		public void Init(Ioctls ioctls, Core core, Runtime runtime)
 		{
-			// Fix later :)
-			/*
-			mCamera = new PhotoCamera(CameraType.Primary);
+            mCamera = new PhotoCamera(mCameraType);
 			mVideoBrush = new VideoBrush();
-			mVideoBrush.SetSource(mCamera);
-			mVideoBrush.Stretch = Stretch.Uniform;
+            mVideoBrush.SetSource(mCamera);
 
 			runtime.RegisterCleaner(delegate()
 			{
@@ -52,13 +76,20 @@ namespace MoSync
 
 			// this should be set according to the orientation of
 			// the device I guess.
-			mVideoBrush.RelativeTransform = new CompositeTransform()
-			{
-				CenterX = 0.5,
-				CenterY = 0.5,
-				Rotation = 90
-			};
+            mVideoBrush.RelativeTransform = new CompositeTransform()
+            {
+                CenterX = 0.5,
+                CenterY = 0.5,
+                Rotation = 90
+            };
 
+            /**
+             * Stores an output format in fmm parameter.
+             * @param _index int the index of the required format.
+             * @param _fmt int the momory address at which to write the output format dimensions.
+             *
+             * Note: the _index should be greater than 0 and smaller than the number of camera formats.
+             */
 			ioctls.maCameraFormat = delegate(int _index, int _fmt)
 			{
 				System.Windows.Size dim;
@@ -73,6 +104,9 @@ namespace MoSync
 				return MoSync.Constants.MA_CAMERA_RES_OK;
 			};
 
+            /**
+             * Returns the number of camera output formats avalable.
+             */
 			ioctls.maCameraFormatNumber = delegate()
 			{
 				IEnumerable<System.Windows.Size> res = mCamera.AvailableResolutions;
@@ -83,69 +117,75 @@ namespace MoSync
 				while (resolutions.Current != null)
 				{
 					number++;
+                    resolutions.MoveNext();
+                    if (resolutions.Current == new System.Windows.Size(0, 0))
+                        break;
 				}
 				return number;
 			};
 
+            /**
+             * Starts the viewfinder and the camera
+             */
 			ioctls.maCameraStart = delegate()
 			{
+                initCamera();
+
+                MoSync.Util.RunActionOnMainThreadSync(() =>
+                {
+                    mCameraPrev.StartViewFinder();
+                });
+
 				return 0;
 			};
 
+            /**
+             * stops the view finder and the camera.
+             */
 			ioctls.maCameraStop = delegate()
 			{
+                MoSync.Util.RunActionOnMainThreadSync(() =>
+                {
+                    mCameraPrev.StopViewFinder();
+                });
+
 				return 0;
 			};
 
+            /**
+             * Adds a previewWidget to the camera controller in devices that support native UI.
+             */
 			ioctls.maCameraSetPreview = delegate(int _widgetHandle)
 			{
-				// something like
-				// videoBrush = ((CameraViewFinder)runtime.GetModule<MoSyncNativeUIModule>.GetWidget(_widgetHandle)).GetBrush();
-				// videoBrush.SetSource(mCamera)
 				IWidget w = runtime.GetModule<NativeUIModule>().GetWidget(_widgetHandle);
 				if (w.GetType() != typeof(MoSync.NativeUI.CameraPreview))
 				{
 					return MoSync.Constants.MA_CAMERA_RES_FAILED;
 				}
-				NativeUI.CameraPreview prev = (NativeUI.CameraPreview)w;
-				System.Windows.Controls.Canvas canvas = prev.GetViewFinderCanvas();
-				MoSync.Util.RunActionOnMainThreadSync(() =>
-				{
-					canvas.Background = mVideoBrush;
-				});
+				mCameraPrev = (NativeUI.CameraPreview)w;
+                mCameraPrev.SetViewFinderContent(mVideoBrush);
 
-				return 0;
+                return MoSync.Constants.MA_CAMERA_RES_OK;
 			};
 
-			ioctls.maCameraSelect = delegate(int _cameraNumber)
-			{
-				CameraType cameraType = CameraType.Primary;
-				if(_cameraNumber == MoSync.Constants.MA_CAMERA_CONST_BACK_CAMERA)
-				{
-					cameraType = CameraType.Primary;
-				}
-				else if(_cameraNumber == MoSync.Constants.MA_CAMERA_CONST_FRONT_CAMERA)
-				{
-					cameraType = CameraType.FrontFacing;
-				}
-
-				if(mCamera==null || mCamera.CameraType != cameraType)
-				{
-					mCamera = new PhotoCamera(cameraType);
-					if(mVideoBrush == null)
-						mVideoBrush = new VideoBrush();
-					mVideoBrush.SetSource(mCamera);
-				}
-
-				return 0;
-			};
-
+            /**
+             * Returns the number of available Camera on the device.
+             */
 			ioctls.maCameraNumber = delegate()
 			{
-				// front facing and back facing is the standard I believe.
-				return 2;
+                if (PhotoCamera.IsCameraTypeSupported(CameraType.FrontFacing) && PhotoCamera.IsCameraTypeSupported(CameraType.Primary))
+                    return 2;
+                else if (PhotoCamera.IsCameraTypeSupported(CameraType.FrontFacing) || PhotoCamera.IsCameraTypeSupported(CameraType.Primary))
+                    return 1;
+                return 0;
 			};
 
+            /**
+             * Captures an image and stores it as a new data object in the
+             * supplied placeholder.
+             * @param _formatIndex int the required format.
+             * @param _placeHolder int the placeholder used for storing the image.
+             */
 			ioctls.maCameraSnapshot = delegate(int _formatIndex, int _placeHolder)
 			{
 				AutoResetEvent are = new AutoResetEvent(false);
@@ -179,37 +219,154 @@ namespace MoSync
 				return 0;
 			};
 
-			ioctls.maCameraSetProperty = delegate(int _property, int _value)
+            /**
+             * Sets the property represented by the string situated at the
+             * _property address with the value situated at the _value address.
+             * @param _property int the property name address
+             * @param _value int the value address
+             *
+             * Note: the fallowing properties are not available on windows phone
+             *      MA_CAMERA_FOCUS_MODE, MA_CAMERA_IMAGE_FORMAT, MA_CAMERA_ZOOM,
+             *      MA_CAMERA_MAX_ZOOM.
+             */
+            ioctls.maCameraSetProperty = delegate(int _property, int _value)
 			{
-				return 0;
+                String property = core.GetDataMemory().ReadStringAtAddress(_property);
+                String value = core.GetDataMemory().ReadStringAtAddress(_value);
+
+                if (property.Equals(MoSync.Constants.MA_CAMERA_FLASH_MODE))
+                {
+                    if (value.Equals(MoSync.Constants.MA_CAMERA_FLASH_ON))
+                    {
+                        mCamera.FlashMode = FlashMode.On;
+                        mFlashMode = FlashMode.On;
+                    }
+                    else if (value.Equals(MoSync.Constants.MA_CAMERA_FLASH_OFF))
+                    {
+                        mCamera.FlashMode = FlashMode.Off;
+                        mFlashMode = FlashMode.Off;
+                    }
+                    else if (value.Equals(MoSync.Constants.MA_CAMERA_FLASH_AUTO))
+                    {
+                        mCamera.FlashMode = FlashMode.Auto;
+                        mFlashMode = FlashMode.Auto;
+                    }
+                    else return MoSync.Constants.MA_CAMERA_RES_INVALID_PROPERTY_VALUE;
+
+                    return MoSync.Constants.MA_CAMERA_RES_OK;
+                }
+                else if (property.Equals(MoSync.Constants.MA_CAMERA_FOCUS_MODE))
+                {
+                    return MoSync.Constants.MA_CAMERA_RES_PROPERTY_NOTSUPPORTED;
+                }
+                else if (property.Equals(MoSync.Constants.MA_CAMERA_IMAGE_FORMAT))
+                {
+                    return MoSync.Constants.MA_CAMERA_RES_PROPERTY_NOTSUPPORTED;
+                }
+                else if (property.Equals(MoSync.Constants.MA_CAMERA_ZOOM))
+                {
+                    return MoSync.Constants.MA_CAMERA_RES_PROPERTY_NOTSUPPORTED;
+                }
+                else if (property.Equals(MoSync.Constants.MA_CAMERA_MAX_ZOOM))
+                {
+                    return MoSync.Constants.MA_CAMERA_RES_PROPERTY_NOTSUPPORTED;
+                }
+                else return MoSync.Constants.MA_CAMERA_RES_PROPERTY_NOTSUPPORTED;
 			};
+
+            /**
+             * Selects a camera from the avalable ones;
+             * in this eigther the back or the front camera is
+             * chosen
+             */
 
 			ioctls.maCameraSelect = delegate(int _camera)
 			{
-				return 0;
+                if ( MoSync.Constants.MA_CAMERA_CONST_BACK_CAMERA == _camera)
+                {
+                    if (mCamera.CameraType != CameraType.Primary)
+                    {
+                        mCameraType = CameraType.Primary;
+                        initCamera();
+                    }
+                }
+                else if (MoSync.Constants.MA_CAMERA_CONST_FRONT_CAMERA == _camera)
+                {
+                    if (mCamera.CameraType != CameraType.FrontFacing)
+                    {
+                        mCameraType = CameraType.FrontFacing;
+                        initCamera();
+                    }
+                }
+                else return MoSync.Constants.MA_CAMERA_RES_FAILED;
+
+                return MoSync.Constants.MA_CAMERA_RES_OK;
 			};
 
+            /**
+             * Retrieves the specified property value in the given buffer.
+             * @param _property int the address for the property string
+             * @param _value int the address for the property value string (the buffer)
+             * @param _bufSize int the buffer size
+             */
 			ioctls.maCameraGetProperty = delegate(int _property, int _value, int _bufSize)
 			{
 				String property = core.GetDataMemory().ReadStringAtAddress(_property);
 
-				if (property.Equals(MoSync.Constants.MA_CAMERA_MAX_ZOOM))
-				{
-					core.GetDataMemory().WriteStringAtAddress(
-						_value,
-						"0",
-						_bufSize);
-				}
-
+                if (property.Equals(MoSync.Constants.MA_CAMERA_MAX_ZOOM))
+                {
+                    core.GetDataMemory().WriteStringAtAddress(
+                        _value,
+                        "0",
+                        _bufSize);
+                }
+                else if (property.Equals(MoSync.Constants.MA_CAMERA_ZOOM_SUPPORTED))
+                {
+                    core.GetDataMemory().WriteStringAtAddress(
+                        _value,
+                        "false",
+                        _bufSize);
+                }
+                else if (property.Equals(MoSync.Constants.MA_CAMERA_FLASH_SUPPORTED))
+                {
+                    core.GetDataMemory().WriteStringAtAddress(
+                        _value,
+                        "true",
+                        _bufSize);
+                }
+                else return MoSync.Constants.MA_CAMERA_RES_PROPERTY_NOTSUPPORTED;
 				return 0;
 			};
 
 			ioctls.maCameraRecord = delegate(int _stopStartFlag)
 			{
-				return 0;
+                return MoSync.Constants.MA_CAMERA_RES_FAILED;
 			};
-
-			*/
 		}
+
+        private void initCamera()
+        {
+            mCamera.Dispose();
+            mCamera = null;
+            mCamera = new PhotoCamera(mCameraType);
+
+            mCamera.Initialized += new EventHandler<CameraOperationCompletedEventArgs>(
+                delegate(object o, CameraOperationCompletedEventArgs args)
+                {
+                    try
+                    {
+                        mCamera.FlashMode = mFlashMode;
+                    }
+                    catch { }
+                });
+
+            if (null == mVideoBrush)
+                mVideoBrush = new VideoBrush();
+
+            MoSync.Util.RunActionOnMainThreadSync(() =>
+            {
+                mVideoBrush.SetSource(mCamera);
+            });
+        }
 	} // end class CameraModule
 } // end namespace MoSync

@@ -1,4 +1,4 @@
->Editbox properties
+>Edit box properties
 >===================
 >
 text
@@ -33,7 +33,7 @@ minLines
 >Makes the edit box at least this many lines tall. Setting this value overrides any other (minimum) height setting. Available on Android only.
 maxLength
 ---------
->Sets or gets the maximum input lenght of the edit box. Setting this value enables multiline input mode by default. Available on Android only.
+>Sets or gets the maximum input length of the edit box. Setting this value enables multiline input mode by default. Available on Android only.
 placeholderFontColor
 --------------------
 >Sets the font color of the placeholder text when an edit box is empty.

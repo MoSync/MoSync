@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project supports-build-configs="true" version="1.2">
+<project supports-build-configs="true" version="1.4">
 <build.cfg id="Debug" types="Debug"/>
 <build.cfg id="Release" types="Release"/>
 <properties>
@@ -11,7 +11,7 @@
 <property key="build.prefs:additional.library.paths" value="%mosync-home%/lib/pipe"/>
 <property key="build.prefs:additional.library.paths/Debug" value="%mosync-home%/lib/pipe"/>
 <property key="build.prefs:additional.library.paths/Release" value="%mosync-home%/lib/pipe"/>
-<property key="build.prefs:app.permissions" value="Bluetooth Calendar Calendar/Read Calendar/Write Camera Contacts Contacts/Read Contacts/Write File\ Storage File\ Storage/Read File\ Storage/Write Internet\ Access Location Location/Coarse Location/Fine Power\ Management SMS SMS/Read SMS/Receive SMS/Send Vibrate"/>
+<property key="build.prefs:app.permissions" value="Bluetooth Calendar Calendar/Read Calendar/Write Camera Contacts Contacts/Read Contacts/Write File\ Storage File\ Storage/Read File\ Storage/Write Internet\ Access Location Location/Coarse Location/Fine Power\ Management SMS SMS/Read SMS/Receive SMS/Send Vibration"/>
 <property key="build.prefs:app.vendor" value="MoSync"/>
 <property key="build.prefs:extra.link.sw" value="-xerr"/>
 <property key="build.prefs:extra.res.sw" value=""/>
@@ -23,6 +23,8 @@
 <property key="build.prefs:ignore.default.include.paths/Debug" value="true"/>
 <property key="build.prefs:ignore.default.include.paths/Release" value="true"/>
 <property key="build.prefs:ignore.default.libraries" value="true"/>
+<property key="build.prefs:ignore.default.libraries/Debug" value="true"/>
+<property key="build.prefs:ignore.default.libraries/Release" value="true"/>
 <property key="build.prefs:ignore.default.library.paths" value="true"/>
 <property key="build.prefs:ignore.default.library.paths/Debug" value="true"/>
 <property key="build.prefs:ignore.default.library.paths/Release" value="true"/>
