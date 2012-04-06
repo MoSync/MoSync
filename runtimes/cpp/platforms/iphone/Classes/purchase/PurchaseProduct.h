@@ -76,6 +76,12 @@
  */
 -(SKPayment*) payment;
 
+/**
+ * Called when the transaction that contains this product has been updated.
+ * @param trasaction Tracsaction that has been updated.
+ */
+-(void) updatedTransaction:(SKPaymentTransaction*) transaction;
+
 @property(nonatomic, readonly) MAHandle handle;
 
 @end

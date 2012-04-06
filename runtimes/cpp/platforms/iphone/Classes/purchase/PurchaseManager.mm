@@ -28,6 +28,37 @@
 
 #import "PurchaseManager.h"
 #import "PurchaseProduct.h"
+#import "Platform.h"
+
+/**
+ * Hidden methods for PurchaseManager.
+ */
+@interface PurchaseManager (hidden)
+
+/**
+ * Send a purchase event.
+ * @param type Type of the purchase event.
+ *             Must be one of the MA_PURCHASE_EVENT constants.
+ * @param state State of the purchase.
+ * @param productHandle Product handle that sends the event.
+ * @param errorCode Reason why the purchase failed.
+ *                  Valid if type is MA_PURCHASE_EVENT_REQUEST_STATE_CHANGED
+ *                  and state is MA_PURCHASE_STATE_FAILED.
+ */
+-(void) sendPurchaseEvent:(const int) type
+                    state:(const int) state
+            productHandle:(MAHandle) productHandle
+                errorCode:(const int) errorCode;
+
+/**
+ * Get the purchase product that contains a given payment.
+ * @param payment The given payment send to Apple App Store.
+ * @return The product containg the payment if found, otherwise nil.
+ */
+-(PurchaseProduct*) productUsingPayment:(SKPayment*) payment;
+
+@end
+
 
 @implementation PurchaseManager
 
@@ -128,7 +159,19 @@ static PurchaseManager *sharedInstance = nil;
  */
 -(void) requestProduct:(MAHandle) productHandle
 {
+    NSNumber* key = [NSNumber numberWithInt:productHandle];
+    PurchaseProduct* product = [_productsDictionary objectForKey:key];
+    if (!product)
+    {
+        [self sendPurchaseEvent:MA_PURCHASE_EVENT_REQUEST_STATE_CHANGED
+                          state:MA_PURCHASE_STATE_FAILED
+                  productHandle:productHandle
+                      errorCode:MA_PURCHASE_ERROR_INVALID_HANDLE];
+        return;
+    }
 
+    SKPayment* payment = [product payment];
+    [_paymentQueue addPayment:payment];
 }
 
 #pragma mark SKPaymentTransactionObserver methods
@@ -141,6 +184,14 @@ static PurchaseManager *sharedInstance = nil;
 - (void)paymentQueue:(SKPaymentQueue *)queue updatedTransactions:(NSArray *)transactions
 {
     NSLog(@"updatedTransactions");
+    for (SKPaymentTransaction *transaction in transactions)
+    {
+        PurchaseProduct* product = [self productUsingPayment:transaction.payment];
+        if (product)
+        {
+            [product updatedTransaction:transaction];
+        }
+    }
 }
 
 /**
@@ -161,6 +212,58 @@ static PurchaseManager *sharedInstance = nil;
     [_productsDictionary release];
 
     [super dealloc];
+}
+
+@end
+
+@implementation PurchaseManager (hidden)
+
+/**
+ * Send a purchase event.
+ * @param type Type of the purchase event.
+ *             Must be one of the MA_PURCHASE_EVENT constants.
+ * @param state State of the purchase.
+ * @param productHandle Product handle that sends the event.
+ * @param errorCode Reason why the purchase failed.
+ *                  Valid if type is MA_PURCHASE_EVENT_REQUEST_STATE_CHANGED
+ *                  and state is MA_PURCHASE_STATE_FAILED.
+ */
+-(void) sendPurchaseEvent:(const int) type
+                    state:(const int) state
+            productHandle:(MAHandle) productHandle
+                errorCode:(const int) errorCode
+{
+    MAEvent event;
+	event.type = EVENT_TYPE_PURCHASE;
+
+    MAPurchaseEventData purchaseData;
+    purchaseData.type = type;
+    purchaseData.state = state;
+    purchaseData.productHandle = productHandle;
+    purchaseData.errorCode = errorCode;
+
+    event.purchaseData = purchaseData;
+    Base::gEventQueue.put(event);
+}
+
+/**
+ * Get the purchase product that contains a given payment.
+ * @param payment The given payment send to Apple App Store.
+ * @return The product containg the payment if found, otherwise nil.
+ */
+-(PurchaseProduct*) productUsingPayment:(SKPayment*) payment
+{
+    NSLog(@"productUsingPayment");
+    for (PurchaseProduct* product in [_productsDictionary allValues])
+    {
+        SKPayment* productPayment = [product payment];
+        if ([payment isEqual:productPayment])
+        {
+            return product;
+        }
+    }
+
+    return nil;
 }
 
 @end

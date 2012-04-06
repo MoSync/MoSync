@@ -1989,6 +1989,10 @@ namespace Base {
 	{
         [[PurchaseManager getInstance] destroyProduct:productHandle];
 	}
+    SYSCALL(void, maPurchaseRequest(MAHandle productHandle))
+	{
+        [[PurchaseManager getInstance] requestProduct:productHandle];
+	}
 
 	SYSCALL(longlong, maIOCtl(int function, int a, int b, int c))
 	{
@@ -2137,6 +2141,7 @@ namespace Base {
         maIOCtl_case(maPurchaseSupported);
         maIOCtl_case(maPurchaseCreate);
         maIOCtl_case(maPurchaseDestroy);
+        maIOCtl_case(maPurchaseRequest);
 		}
 
 		return IOCTL_UNAVAILABLE;

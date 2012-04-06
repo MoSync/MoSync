@@ -27,6 +27,50 @@
 #import "PurchaseProduct.h"
 #import "Platform.h"
 
+/**
+ * Hidden methods for PurchaseProduct class.
+ */
+@interface PurchaseProduct (hidden)
+
+/**
+ * Send a purchase event.
+ * @param type Type of the purchase event.
+ *             Must be one of the MA_PURCHASE_EVENT constants.
+ * @param state State of the purchase.
+ * @param errorCode Reason why the purchase failed.
+ *                  Valid if type is MA_PURCHASE_EVENT_REQUEST_STATE_CHANGED
+ *                  and state is MA_PURCHASE_STATE_FAILED.
+ */
+-(void) sendPurchaseEvent:(const int) type
+                    state:(const int) state
+                errorCode:(const int) errorCode;
+
+/**
+ * Handle a purchasing state for this product.
+ * @param transaction Payment transaction received from the Apple App Store.
+ */
+-(void) handleTransactionStatePurchasing:(SKPaymentTransaction*) transaction;
+
+/**
+ * Handle a purchased state for this product.
+ * @param transaction Payment transaction received from the Apple App Store.
+ */
+-(void) handleTransactionStatePurchased:(SKPaymentTransaction*) transaction;
+
+/**
+ * Handle a failed transaction.
+ * @param transaction Payment transaction received from the Apple App Store.
+ */
+-(void) handleTransactionStateFailed:(SKPaymentTransaction*) transaction;
+
+/**
+ * Handle a restored transaction.
+ * @param transaction Payment transaction received from the Apple App Store.
+ */
+-(void) handleTransactionStateRestored:(SKPaymentTransaction*) transaction;
+
+@end
+
 @implementation PurchaseProduct
 
 @synthesize handle = _handle;
@@ -49,6 +93,7 @@
         _productRequest = [[SKProductsRequest alloc] initWithProductIdentifiers:productSet];
         _productRequest.delegate = self;
         [_productRequest start];
+        _payment = nil;
     }
 
     return self;
@@ -62,7 +107,8 @@
 {
     if (!_payment)
     {
-        _payment = [SKMutablePayment paymentWithProduct:_product];
+        _payment = [[SKMutablePayment paymentWithProduct:_product] retain];
+        _payment.quantity = 1;
     }
 
     return _payment;
@@ -94,7 +140,34 @@
     // Store the product(if valid)
     if (isValid)
     {
-        _product = [response.products objectAtIndex:0];
+        _product = [[response.products objectAtIndex:0] retain];
+    }
+}
+
+/**
+ * Called when the transaction that contains this product has been updated.
+ * @param trasaction Tracsaction that has been updated.
+ */
+-(void) updatedTransaction:(SKPaymentTransaction*) transaction
+{
+    NSLog(@"updatedTransaction for %@", _productID);
+    switch (transaction.transactionState)
+    {
+        case SKPaymentTransactionStatePurchasing:
+            [self handleTransactionStatePurchasing:transaction];
+            break;
+        case SKPaymentTransactionStatePurchased:
+            [self handleTransactionStatePurchased:transaction];
+            break;
+        case SKPaymentTransactionStateFailed:
+            [self handleTransactionStateFailed:transaction];
+            break;
+        case SKPaymentTransactionStateRestored:
+            [self handleTransactionStateRestored:transaction];
+            break;
+        default:
+            NSLog(@"unhandled transaction.");
+            break;
     }
 }
 
@@ -105,8 +178,84 @@
 {
     [_productID release];
     [_productRequest release];
+    [_product release];
+    [_payment release];
 
     [super dealloc];
+}
+
+@end
+
+@implementation PurchaseProduct (hidden)
+
+/**
+ * Send a purchase event.
+ * @param type Type of the purchase event.
+ *             Must be one of the MA_PURCHASE_EVENT constants.
+ * @param state State of the purchase.
+ * @param errorCode Reason why the purchase failed.
+ *                  Valid if type is MA_PURCHASE_EVENT_REQUEST_STATE_CHANGED
+ *                  and state is MA_PURCHASE_STATE_FAILED.
+ */
+-(void) sendPurchaseEvent:(const int) type
+                    state:(const int) state
+                errorCode:(const int) errorCode
+{
+    MAEvent event;
+	event.type = EVENT_TYPE_PURCHASE;
+
+    MAPurchaseEventData purchaseData;
+    purchaseData.type = type;
+    purchaseData.state = state;
+    purchaseData.productHandle = _handle;
+    purchaseData.errorCode = errorCode;
+
+    event.purchaseData = purchaseData;
+    Base::gEventQueue.put(event);
+}
+
+/**
+ * Handle a purchasing state for this product.
+ * @param transaction Payment transaction received from the Apple App Store.
+ */
+-(void) handleTransactionStatePurchasing:(SKPaymentTransaction*) transaction
+{
+    [self sendPurchaseEvent:MA_PURCHASE_EVENT_REQUEST_STATE_CHANGED
+                      state:MA_PURCHASE_STATE_IN_PROGRESS
+                  errorCode:0];
+}
+
+/**
+ * Handle a purchased state for this product.
+ * @param transaction Payment transaction received from the Apple App Store.
+ */
+-(void) handleTransactionStatePurchased:(SKPaymentTransaction*) transaction
+{
+    [self sendPurchaseEvent:MA_PURCHASE_EVENT_REQUEST_STATE_CHANGED
+                      state:MA_PURCHASE_STATE_COMPLETED
+                  errorCode:0];
+}
+
+/**
+ * Handle a failed transaction.
+ * @param transaction Payment transaction received from the Apple App Store.
+ */
+-(void) handleTransactionStateFailed:(SKPaymentTransaction*) transaction
+{
+    [self sendPurchaseEvent:MA_PURCHASE_EVENT_REQUEST_STATE_CHANGED
+                      state:MA_PURCHASE_STATE_FAILED
+                  errorCode:0];
+}
+
+/**
+ * Handle a restored transaction.
+ * @param transaction Payment transaction received from the Apple App Store.
+ */
+-(void) handleTransactionStateRestored:(SKPaymentTransaction*) transaction
+{
+    [self sendPurchaseEvent:MA_PURCHASE_EVENT_RESTORED
+                      state:MA_PURCHASE_STATE_COMPLETED
+                  errorCode:0];
 }
 
 @end

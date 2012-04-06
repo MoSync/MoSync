@@ -11069,11 +11069,14 @@ group PurchaseAPI "Purchase API" {
 
 	group PurchaseStateCodes "Purchase State Codes" {
 		constset int MA_PURCHASE_STATE_ {
-			//
+			// Send by the maPurchaseRequest syscall if the operation failed.
+			// Check the errorCode variable from event's purchaseData struct for more info.
 			FAILED = 0;
-			//
+			// Send by the maPurchaseRequest syscall when the transaction has been received by the
+			// Apple App Store/Google Play.
 			IN_PROGRESS = 1;
-			//
+			// Send by the maPurchaseRequest syscall when the transaction has been successfully
+			// processed. Your application should provide the content the user purchased.
 			COMPLETED = 2;
 			//
 			RESTORED = 3;
@@ -11082,18 +11085,21 @@ group PurchaseAPI "Purchase API" {
 
 	group PurchaseErrorCodes "Purchase Error Codes" {
 		constset int MA_PURCHASE_ERROR_ {
-			//
+			// Send by the maPurchaseRequest syscall if the given product handle is invalid.
 			INVALID_HANDLE = -1;
 		}
 	} // end of Purchase Error Codes
 
 	group PurchaseEventTypes "Purchase Event Types" {
 		constset int MA_PURCHASE_EVENT_ {
-			//
+			// Send by the maPurchaseRequest syscall after an operation step has been completed
+			// or if the operation has failed. Check event's purchaseData struct variable
+			// for more information.
 			REQUEST_STATE_CHANGED = 0;
 			//
 			REFUNDED = 1;
-			//
+			// Send after a new product has been created or by the maPurchaseRequest syscall.
+			// Platform: iOS.
 			RESTORED = 2;
 			// Notifies that a product is valid in the store.
 			// Sent after calling maPurchaseCreate() syscall.
