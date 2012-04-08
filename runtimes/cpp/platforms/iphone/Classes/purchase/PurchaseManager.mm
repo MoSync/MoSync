@@ -198,6 +198,16 @@ static PurchaseManager *sharedInstance = nil;
     return [product productName:buffer bufferSize:bufferSize];
 }
 
+/**
+ * Set the store url used for verifing the receipe.
+ * @param url Store url.
+ */
+-(void) setStoreURL:(const char*) url
+{
+    [_storeURL release];
+    _storeURL = [[NSString alloc] initWithUTF8String:url];
+}
+
 #pragma mark SKPaymentTransactionObserver methods
 
 /**
@@ -234,6 +244,7 @@ static PurchaseManager *sharedInstance = nil;
 -(void) dealloc
 {
     [_productsDictionary release];
+    [_storeURL release];
 
     [super dealloc];
 }

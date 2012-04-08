@@ -11064,6 +11064,11 @@ group PurchaseAPI "Purchase API" {
 			// Returned by the maPurchaseSupported() syscall if purchase is not allowed on the device.
 			// Platform: iOS.
 			DISABLED = -13;
+			// Returned by the maPurchaseGetName() syscall if the productHandle is invalid.
+			INVALID_HANDLE = -14;
+			// Returned by the maPurchaseGetName() syscall if the the given buffer is too small.
+			BUFFER_TOO_SMALL = -15;
+
 		}
 	} // end of Purchase Result Codes
 
@@ -11160,16 +11165,23 @@ group PurchaseAPI "Purchase API" {
 							   out MAString buffer range("bufferSize"), in int bufferSize);
 
 		/**
-		*
-		*
-		*
+		* Set the store url used for verifing the receipe on iOS platform.
+		* Pltform: iOS.
+		* @param url Store url.
 		*/
 		void maPurchaseSetStoreURL(in MAString url);
 
 		/**
-		*
-		*
-		*
+		* Get product id using a product handle.
+		* @param productHandle Handle to the given product.
+		* @param buffer Will contain the product id.
+		* @param bufferSize Maximum size of the buffer.
+		* @return In case of error:
+		* - \link MA_PURCHASE_RES_INVALID_HANDLE MA_PURCHASE_RES_INVALID_HANDLE \endlink if
+		* productHandle is invalid.
+		* - \link MA_PURCHASE_RES_BUFFER_TOO_SMALL MA_PURCHASE_RES_BUFFER_TOO_SMALL \endlink if
+		* the given handle is too small.
+		* In case of success returns the number of written bytes.
 		*/
 		int maPurchaseGetName(in MAHandle productHandle, out MAString buffer range("bufferSize"), in int bufferSize);
 

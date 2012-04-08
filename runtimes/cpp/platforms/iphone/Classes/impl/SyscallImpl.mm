@@ -1999,6 +1999,10 @@ namespace Base {
                                                    buffer:buffer
                                                bufferSize:bufferSize];
 	}
+    SYSCALL(void, maPurchaseSetStoreURL(const char* url))
+	{
+        [[PurchaseManager getInstance] setStoreURL:url];
+	}
 
 	SYSCALL(longlong, maIOCtl(int function, int a, int b, int c))
 	{
@@ -2149,6 +2153,7 @@ namespace Base {
         maIOCtl_case(maPurchaseDestroy);
         maIOCtl_case(maPurchaseRequest);
         maIOCtl_case(maPurchaseGetName);
+        maIOCtl_case(maPurchaseSetStoreURL);
 		}
 
 		return IOCTL_UNAVAILABLE;

@@ -51,6 +51,11 @@
      * Store the local products.
      */
     NSMutableDictionary* _productsDictionary;
+
+    /**
+     * Apple App Store url.
+     */
+    NSString* _storeURL;
 }
 
 /**
@@ -106,4 +111,11 @@
 -(int) productName:(MAHandle) productHandle
             buffer:(char*) buffer
         bufferSize:(const int) bufferSize;
+
+/**
+ * Set the store url used for verifing the receipe.
+ * @param url Store url.
+ */
+-(void) setStoreURL:(const char*) url;
+
 @end
