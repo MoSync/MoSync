@@ -93,4 +93,17 @@
  */
 -(void) requestProduct:(MAHandle) productHandle;
 
+/**
+ * Get the product id for a given product.
+ * @param productHandle Handle to a product.
+ * @param buffer Will contain the product name.
+ * @param bufferSize Maximum size of the buffer.
+ * @return The number of written bytes in case of success, or
+ * one of the next result codes:
+ * - MA_PURCHASE_RES_INVALID_HANDLE if the productHandle is invalid.
+ * - MA_PURCHASE_RES_BUFFER_TOO_SMALL if the buffer is too small.
+ */
+-(int) productName:(MAHandle) productHandle
+            buffer:(char*) buffer
+        bufferSize:(const int) bufferSize;
 @end

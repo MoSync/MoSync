@@ -1993,6 +1993,12 @@ namespace Base {
 	{
         [[PurchaseManager getInstance] requestProduct:productHandle];
 	}
+    SYSCALL(int, maPurchaseGetName(MAHandle productHandle, char* buffer, const int bufferSize))
+	{
+        return [[PurchaseManager getInstance] productName:productHandle
+                                                   buffer:buffer
+                                               bufferSize:bufferSize];
+	}
 
 	SYSCALL(longlong, maIOCtl(int function, int a, int b, int c))
 	{
@@ -2142,6 +2148,7 @@ namespace Base {
         maIOCtl_case(maPurchaseCreate);
         maIOCtl_case(maPurchaseDestroy);
         maIOCtl_case(maPurchaseRequest);
+        maIOCtl_case(maPurchaseGetName);
 		}
 
 		return IOCTL_UNAVAILABLE;

@@ -82,6 +82,16 @@
  */
 -(void) updatedTransaction:(SKPaymentTransaction*) transaction;
 
+/**
+ * Get the product id.
+ * @param buffer Will contain the product name.
+ * @param bufferSize Maximum size of the buffer.
+ * @return The number of written bytes in case of success, or
+ * MA_PURCHASE_RES_BUFFER_TOO_SMALL if the buffer is too small.
+ */
+-(int) productName:(char*) buffer
+        bufferSize:(const int) bufferSize;
+
 @property(nonatomic, readonly) MAHandle handle;
 
 @end

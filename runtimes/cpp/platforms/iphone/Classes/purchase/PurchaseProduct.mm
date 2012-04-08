@@ -172,6 +172,25 @@
 }
 
 /**
+ * Get the product id.
+ * @param buffer Will contain the product name.
+ * @param bufferSize Maximum size of the buffer.
+ * @return The number of written bytes in case of success, or
+ * MA_PURCHASE_RES_BUFFER_TOO_SMALL if the buffer is too small.
+ */
+-(int) productName:(char*) buffer
+        bufferSize:(const int) bufferSize
+{
+    if ([_productID length] > bufferSize)
+    {
+        return MA_PURCHASE_RES_BUFFER_TOO_SMALL;
+    }
+
+    [_productID getCString:buffer maxLength:bufferSize encoding:NSASCIIStringEncoding];
+    return [_productID length];
+}
+
+/**
  * Release all contained objects.
  */
 -(void) dealloc
