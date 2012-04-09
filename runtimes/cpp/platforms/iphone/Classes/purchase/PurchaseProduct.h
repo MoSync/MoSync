@@ -59,6 +59,11 @@
      * Payment that will be send to the Apple App Store.
      */
     SKMutablePayment* _payment;
+
+    /**
+     * Valid only if the product has been purchased or restored.
+     */
+    SKPaymentTransaction* _transaction;
 }
 
 /**
@@ -91,6 +96,14 @@
  */
 -(int) productName:(char*) buffer
         bufferSize:(const int) bufferSize;
+
+/**
+ * Verify if the receipt came from App Store.
+ * @return One of the next constants:
+ * - MA_PURCHASE_RES_OK if the receipt was sent to the store for verifing.
+ * - MA_PURCHASE_RES_RECEIPT if the product has not been purchased.
+ */
+-(int) verifyReceipt;
 
 @property(nonatomic, readonly) MAHandle handle;
 

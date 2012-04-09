@@ -27,6 +27,12 @@
 #import "PurchaseProduct.h"
 #import "Platform.h"
 
+/*!
+ Request timeout interval , in seconds.
+ */
+NSTimeInterval const kTimeoutInterval = 60.0;
+NSString* const kRequestMethodTypePost = @"POST";
+
 /**
  * Hidden methods for PurchaseProduct class.
  */
@@ -191,6 +197,81 @@
 }
 
 /**
+ * Verify if the receipt came from App Store.
+ * @return One of the next constants:
+ * - MA_PURCHASE_RES_OK if the receipt was sent to the store for verifing.
+ * - MA_PURCHASE_RES_RECEIPT if the product has not been purchased.
+ */
+-(int) verifyReceipt
+{
+    NSLog(@"%s", __FUNCTION__);
+    if (!_transaction)
+    {
+        return MA_PURCHASE_RES_RECEIPT;
+    }
+
+    NSLog(@"_transaction.transactionReceipt = %@", [_transaction.transactionReceipt description]);
+    NSDictionary* dict = [NSDictionary dictionaryWithObject:_transaction.transactionReceipt
+                                                     forKey:@"receipt-data"];
+    NSLog(@"dict = %@", dict);
+    NSError *writeError = nil;
+    NSData *jsonData = [NSJSONSerialization dataWithJSONObject:dict
+                                                       options:NSJSONReadingMutableLeaves
+                                                         error:&writeError];
+
+	NSMutableURLRequest *request =
+    [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@"https://sandbox.itunes.apple.com/verifyReceipt"]
+                            cachePolicy:NSURLRequestUseProtocolCachePolicy
+                        timeoutInterval:kTimeoutInterval];
+
+    [request setHTTPMethod:kRequestMethodTypePost];
+    [request setHTTPBody: jsonData];
+
+    // this also initiates the sending the request to server
+	NSURLConnection* urlConnection = [[NSURLConnection alloc] initWithRequest:request delegate:self];
+    [urlConnection release];
+
+    return MA_PURCHASE_RES_OK;
+}
+
+#pragma mark NSURLConnectionDelegate methods
+
+/*!
+ Sent when a connection must authenticate a challenge in order to download its request.
+ @param connection The connection sending the message.
+ @param challenge The challenge that connection must authenticate in order to download its request.
+ */
+- (void)connection:(NSURLConnection *)connection didReceiveAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge
+{
+    NSLog(@"IN %s", __FUNCTION__);
+}
+
+/*!
+ Sent as a connection loads data incrementally.
+ @param connection The connection sending the message.
+ @param data The newly available data.
+ */
+- (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data
+{
+    NSLog(@"IN %s", __FUNCTION__);
+    NSString* text = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+    NSLog(@"text recieved: %@", text);
+    [text release];
+}
+
+/*!
+ Sent when a connection fails to load its request successfully.
+ @param connection The connection sending the message.
+ @param error An error object containing details of why the connection failed to load the request successfully.
+ */
+- (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error
+{
+    NSLog(@"Connection failed! Error - %@ %@",
+         [error localizedDescription],
+         [[error userInfo] objectForKey:NSURLErrorFailingURLStringErrorKey]);
+}
+
+/**
  * Release all contained objects.
  */
 -(void) dealloc
@@ -199,6 +280,7 @@
     [_productRequest release];
     [_product release];
     [_payment release];
+    [_transaction release];
 
     [super dealloc];
 }
@@ -250,6 +332,7 @@
  */
 -(void) handleTransactionStatePurchased:(SKPaymentTransaction*) transaction
 {
+    _transaction = [transaction retain];
     [self sendPurchaseEvent:MA_PURCHASE_EVENT_REQUEST_STATE_CHANGED
                       state:MA_PURCHASE_STATE_COMPLETED
                   errorCode:0];

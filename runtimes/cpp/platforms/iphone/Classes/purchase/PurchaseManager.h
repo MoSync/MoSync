@@ -113,6 +113,16 @@
         bufferSize:(const int) bufferSize;
 
 /**
+ * Verify if the receipt came from App Store.
+ * @param productHandle Handle to the product you want to verify its receipt.
+ * @return One of the next constants:
+ * - MA_PURCHASE_RES_OK if the receipt was sent to the store for verifing.
+ * - MA_PURCHASE_RES_INVALID_HANDLE if productHandle is invalid.
+ * - MA_PURCHASE_RES_RECEIPT if the product has not been purchased.
+ */
+-(int) verifyReceipt:(MAHandle) productHandle;
+
+/**
  * Set the store url used for verifing the receipe.
  * @param url Store url.
  */

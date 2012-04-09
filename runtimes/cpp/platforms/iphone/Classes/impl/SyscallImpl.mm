@@ -2003,6 +2003,10 @@ namespace Base {
 	{
         [[PurchaseManager getInstance] setStoreURL:url];
 	}
+    SYSCALL(int, maPurchaseVerifyReceipt(MAHandle productHandle))
+	{
+        return [[PurchaseManager getInstance] verifyReceipt:productHandle];
+	}
 
 	SYSCALL(longlong, maIOCtl(int function, int a, int b, int c))
 	{
@@ -2154,6 +2158,7 @@ namespace Base {
         maIOCtl_case(maPurchaseRequest);
         maIOCtl_case(maPurchaseGetName);
         maIOCtl_case(maPurchaseSetStoreURL);
+        maIOCtl_case(maPurchaseVerifyReceipt);
 		}
 
 		return IOCTL_UNAVAILABLE;
