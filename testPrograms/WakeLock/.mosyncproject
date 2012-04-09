@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project supports-build-configs="true" version="1.4">
+<build.cfg id="Debug" types="Debug"/>
+<build.cfg id="Release" types="Release"/>
+<criteria>
+<filter type="com.mobilesorcery.sdk.capabilities.devices.elementfactory">
+<capabilities optional="" required=""/>
+</filter>
+</criteria>
+<properties>
+<property key="build.prefs:additional.libraries" value="MAUtil.lib"/>
+<property key="build.prefs:additional.libraries/Debug" value="MAUtilD.lib"/>
+<property key="profile.mgr.type" value="0"/>
+<property key="template.id" value="project.moblet"/>
+<property key="winmobilecs:guid" value="7d8b60a0-5afa-102f-80c7-8b10f57efc89"/>
+</properties>
+</project>

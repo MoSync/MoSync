@@ -47,16 +47,21 @@ VideoScreen::VideoScreen() :
 	mPause(NULL),
 	mStop(NULL),
 	mDuration(NULL),
+	mBufferingProgress(NULL),
 	mEditBox(NULL),
 	mLoadLayout(NULL),
 	mSetUrl(NULL),
 	mSetPath(NULL),
 	mMiddleSpacerLayout(NULL),
-	mSpacerBottomLayout(NULL)
+	mSpacerBottomLayout(NULL),
+	mSeekSlider(NULL)
 {
 	// Initialize the UI and set the listeners.
-
 	setTitle("Video");
+
+	// a timer is added in order to watch the buffering progress and
+	// update the buffering label
+	MAUtil::Environment::getEnvironment().addTimer(this,100,0);
 
 	createMainLayout();
 
@@ -71,6 +76,7 @@ VideoScreen::VideoScreen() :
 	mPlay->addButtonListener(this);
 	mPause->addButtonListener(this);
 	mStop->addButtonListener(this);
+	mSeekSlider->addSliderListener(this);
 	mSetUrl->addButtonListener(this);
 	mSetPath->addButtonListener(this);
 }
@@ -88,6 +94,8 @@ VideoScreen::~VideoScreen()
     mStop->removeButtonListener(this);
     mSetUrl->removeButtonListener(this);
     mSetPath->removeButtonListener(this);
+    mSeekSlider->removeSliderListener(this);
+    MAUtil::Environment::getEnvironment().removeTimer(this);
 }
 
 /**
@@ -105,15 +113,13 @@ void VideoScreen::createMainLayout()
 
 	addVideoWidgets();
 
-	mMiddleSpacerLayout = new VerticalLayout();
-	mMiddleSpacerLayout->setBackgroundColor(SEA_GREEN);
-	mMainLayout->addChild(mMiddleSpacerLayout);
+	// add the slider
+	mSeekSlider = new Slider();
+	mSeekSlider->setMaximumValue(100);
+	mSeekSlider->fillSpaceHorizontally();
+	mSeekSlider->setWidth(getScreenWidth());
 
-	// Add another spacer before the bottom area.
-	mSpacerBottomLayout = new VerticalLayout();
-	mSpacerBottomLayout->setBackgroundColor(INTENSE_BLUE);
-	mSpacerBottomLayout->setHeight(10);
-	mMainLayout->addChild(mSpacerBottomLayout);
+	mMainLayout->addChild(mSeekSlider);
 }
 
 /**
@@ -240,6 +246,12 @@ void VideoScreen::addVideoWidgets()
 	mDuration->setText("Video Duration");
 	mMainLayout->addChild(mDuration);
 
+	// Add buffering percentage label.
+	mBufferingProgress = new Label();
+	mBufferingProgress->setFontColor(INTENSE_BLUE);
+	mBufferingProgress->setText("Buffering information");
+	mMainLayout->addChild(mBufferingProgress);
+
 	// Add a spacer of 10px before the buttons.
 	mTopSpacerLayout = new VerticalLayout();
 	mTopSpacerLayout->setBackgroundColor(INTENSE_BLUE);
@@ -292,6 +304,8 @@ void VideoScreen::buttonClicked(Widget* button)
     {
 		mDuration->setText("Video Duration");
         mVideoView->setURL(mEditBox->getText());
+        MAUtil::Environment::getEnvironment().removeTimer(this);
+        MAUtil::Environment::getEnvironment().addTimer(this,100,0);
     }
     else if (button == mSetPath)
     {
@@ -335,9 +349,10 @@ void VideoScreen::videoViewStateChanged(
                 // can be retrieved.
                 if ( mVideoView->getDuration() > 0 )
                 {
-                mDuration->setText(
-					"Duration " +
-					getFormatedDuration( mVideoView->getDuration() ) );                }
+					mDuration->setText(
+						"Duration " +
+						getFormatedDuration(mVideoView->getDuration()));
+                }
                 break;
             case MAW_VIDEO_VIEW_STATE_PAUSED:
                 text = SOURCE_PAUSED;
@@ -358,6 +373,10 @@ void VideoScreen::videoViewStateChanged(
 					"Duration " +
 					getFormatedDuration( mVideoView->getDuration() ) );
                 }
+
+                resetSlider();
+                // we need to set the maximum slider value as the duration of the media in seconds
+                mSeekSlider->setMaximumValue(mVideoView->getDuration()/1000);
                 break;
             case MAW_VIDEO_VIEW_STATE_FINISHED:
                 text = SOURCE_FINISHED;
@@ -386,4 +405,46 @@ void VideoScreen::editBoxReturn(EditBox* editBox)
 {
 	// Make sure the virtual keyboard is closed when we hit return.
 	mEditBox->hideKeyboard();
+}
+
+/**
+ * Method called when the timer ticks.
+ */
+void VideoScreen::runTimerEvent()
+{
+	// if the buffering has finished, we remove the timer
+	if (mVideoView->getBufferPercentage() == 100)
+	{
+		MAUtil::Environment::getEnvironment().removeTimer(this);
+	}
+
+	mBufferingProgress->setText("Buffering percentage: " + integerToString(mVideoView->getBufferPercentage()));
+}
+
+/**
+ * This method is called when the value of the slider was modified by
+ * the user.
+ * @param slider The slider object that generated the event.
+ * @param sliderValue The new slider's value.
+ */
+void VideoScreen::sliderValueChanged(
+    Slider* slider,
+    const int sliderValue)
+{
+    if (slider == mSeekSlider)
+    {
+		if (sliderValue*1000 <= mVideoView->getDuration())
+		{
+			// because seekTo() method takes as a parameter milliseconds, we need
+			// to convert sliderValue
+			mVideoView->seekTo(sliderValue*1000);
+		}
+    }
+}
+
+void VideoScreen::resetSlider()
+{
+	// reset the slider
+	mSeekSlider->setMaximumValue(100);
+	mSeekSlider->setValue(0);
 }

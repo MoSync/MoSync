@@ -19,6 +19,8 @@ package com.mosync.java.android;
 
 import static com.mosync.internal.android.MoSyncHelpers.SYSLOG;
 
+import java.util.List;
+
 import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_CLOSE;
 import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_FOCUS_GAINED;
 import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_FOCUS_LOST;
@@ -51,12 +53,16 @@ import android.os.Handler;
 import android.util.Log;
 import android.view.KeyCharacterMap;
 import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
 
+import com.mosync.internal.android.EventQueue;
 import com.mosync.internal.android.Mediator;
 import com.mosync.internal.android.MoSyncCapture;
+import com.mosync.internal.android.MoSyncImagePicker;
 import com.mosync.internal.android.MoSyncMultiTouchHandler;
 import com.mosync.internal.android.MoSyncSingleTouchHandler;
 import com.mosync.internal.android.MoSyncThread;
@@ -66,6 +72,8 @@ import com.mosync.internal.android.nfc.MoSyncNFCForegroundUtil;
 import com.mosync.internal.android.nfc.MoSyncNFCService;
 import com.mosync.internal.android.notifications.LocalNotificationsManager;
 import com.mosync.internal.android.notifications.PushNotificationsManager;
+import com.mosync.nativeui.ui.widgets.OptionsMenuItem;
+import com.mosync.nativeui.ui.widgets.ScreenWidget;
 
 /**
  * Main MoSync activity
@@ -74,6 +82,18 @@ import com.mosync.internal.android.notifications.PushNotificationsManager;
  */
 public class MoSync extends Activity
 {
+	/**
+	 * Activity request codes for Camera intent.
+	 */
+	public static final int CAPTURE_MODE_RECORD_VIDEO_REQUEST = 0;
+	public static final int CAPTURE_MODE_STOP_RECORDING_REQUEST = 1;
+	public static final int CAPTURE_MODE_TAKE_PICTURE_REQUEST = 2;
+
+	/**
+	 * Activity request code for Gallery intent.
+	 */
+	public static final int PICK_IMAGE_REQUEST = 3;
+
 	private MoSyncThread mMoSyncThread;
 	private MoSyncView mMoSyncView;
 	//private Intent mMoSyncServiceIntent;
@@ -298,10 +318,84 @@ public class MoSync extends Activity
 		sendCloseEvent();
     }
 
+	@Override
+	/**
+	 * Initialize the content of the Options menu each
+	 * time Menu is pressed, based on the current screen.
+	 */
+	public boolean onPrepareOptionsMenu(Menu menu)
+	{
+		super.onPrepareOptionsMenu(menu);
+
+		// Remove all the items from the menu.
+		menu.clear();
+
+		// Get the focused screen widget.
+		ScreenWidget currentScreen = mMoSyncThread.getCurrentScreen();
+		if ( currentScreen != null )
+		{
+			// Get the menu items for that screen.
+			List<OptionsMenuItem> items = currentScreen.getMenuItems();
+			// Add each menu item to the options menu.
+			for (int i=0; i < items.size(); i++)
+			{
+				MenuItem item = menu.add ( 0, items.get(i).getId(), 0, items.get(i).getTitle() );
+				if ( items.get(i).hasIconFromResources() )
+				{
+					item.setIcon( items.get(i).getIconResId() );
+				}
+				else
+				{
+					item.setIcon( items.get(i).getIcon() );
+				}
+			}
+			return true;
+		}
+
+		return false;
+	}
+
+	@Override
+	/**
+	 * Event received when an Options menu item is selected.
+	 */
+	public boolean onOptionsItemSelected(MenuItem item)
+	{
+		super.onOptionsItemSelected(item);
+
+		// Get the focused screen widget.
+		ScreenWidget currentScreen = mMoSyncThread.getCurrentScreen();
+		if ( currentScreen != null )
+		{
+			EventQueue.getDefault().postOptionsMenuItemSelected(
+					currentScreen.getHandle(),
+					item.getItemId());
+			return true;
+		}
+
+		return false;
+	}
+
+	@Override
+	/**
+	 * Event received when the Options menu is closed.
+	 */
+	public void onOptionsMenuClosed(Menu menu)
+	{
+		super.onOptionsMenuClosed(menu);
+
+		// Get the focused screen widget.
+		ScreenWidget currentScreen = mMoSyncThread.getCurrentScreen();
+		if ( currentScreen != null )
+		{
+			EventQueue.getDefault().postOptionsMenuClosed(currentScreen.getHandle());
+		}
+	}
+
 	/**
 	 * This method is called when we get a result from a sub-activity.
 	 * Specifically, it is used to get the result of a Bluetooth enable dialog,
-	 * or to get the results for capture API.
+	 * the capture API, or from the imagePicker.
 	 */
 	@Override
 	protected void onActivityResult(
@@ -315,24 +409,35 @@ public class MoSync extends Activity
 			Mediator.getInstance().postBluetoothDialogClosedMessage();
 		}
 		else if ( resultCode == RESULT_OK &&
-				requestCode == MoSyncCapture.CAPTURE_MODE_RECORD_VIDEO_REQUEST )
+				requestCode == CAPTURE_MODE_RECORD_VIDEO_REQUEST )
 		{
 			Log.e("@@MoSync","Capture ready, control returned to MoSync activity.");
 			// A video was recorded.
 			MoSyncCapture.handleVideo(data);
 		}
 		else if ( resultCode == RESULT_OK &&
-				requestCode == MoSyncCapture.CAPTURE_MODE_TAKE_PICTURE_REQUEST )
+				requestCode == CAPTURE_MODE_TAKE_PICTURE_REQUEST )
 		{
 			Log.e("@@MoSync","Capture ready, control returned to MoSync activity.");
 			// A picture was taken.
 			MoSyncCapture.handlePicture(data);
 		}
-		else if ( resultCode == RESULT_CANCELED )
+		else if ( resultCode == RESULT_CANCELED &&
+				(requestCode == CAPTURE_MODE_TAKE_PICTURE_REQUEST || requestCode == CAPTURE_MODE_RECORD_VIDEO_REQUEST) )
 		{
 			Log.e("@@MoSync","Capture canceled, control returned to MoSync activity.");
 			// Send MoSync event: the capture was canceled by the user.
 			MoSyncCapture.handleCaptureCanceled();
+		}
+		else if ( resultCode == RESULT_OK &&
+				requestCode == PICK_IMAGE_REQUEST )
+		{
+			MoSyncImagePicker.handleSelectedPicture(data);
+		}
+		else if ( resultCode == RESULT_CANCELED &&
+				requestCode == PICK_IMAGE_REQUEST )
+		{
+			MoSyncImagePicker.handleCancelSelectPicture();
 		}
 	}
 

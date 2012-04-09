@@ -28,9 +28,9 @@ import com.mosync.internal.generated.IX_WIDGET;
 import com.mosync.java.android.MoSync;
 import com.mosync.nativeui.core.NativeUI;
 import com.mosync.nativeui.core.NativeUI.RootViewReplacedListener;
+import com.mosync.nativeui.ui.widgets.ScreenWidget;
 import com.mosync.nativeui.ui.widgets.Widget;
 import com.mosync.nativeui.util.AsyncWait;
-import com.mosync.nativeui.ui.custom.MoSyncImagePicker;
 import com.mosync.nativeui.ui.custom.MoSyncOptionsDialog;
 
 /**
@@ -52,7 +52,7 @@ public class MoSyncNativeUI implements RootViewReplacedListener
 	 * @param thread The MoSync thread.
 	 */
 	public MoSyncNativeUI(
-		MoSyncThread thread, 
+		MoSyncThread thread,
 		Hashtable<Integer, ImageCache> imageResources)
 	{
 		mMoSyncThread = thread;
@@ -68,18 +68,18 @@ public class MoSyncNativeUI implements RootViewReplacedListener
 	{
 		return mMoSyncThread.getActivity();
 	}
-	
+
 	/**
 	 * Sets the default MoSync canvas view, so that it is possible
 	 * to switch back to it from native UI.
-	 * 
+	 *
 	 * @param mosyncScreen The MoSync canvas view.
 	 */
 	public void setMoSyncScreen(MoSyncView moSyncView)
 	{
 		mNativeUI.setMoSyncScreen( moSyncView );
 	}
-	
+
 	/**
 	 * Internal wrapper for maWidgetCreate that runs
 	 * the call in the UI thread.
@@ -89,7 +89,7 @@ public class MoSyncNativeUI implements RootViewReplacedListener
 		try
 		{
 			final AsyncWait<Integer> waiter = new AsyncWait<Integer>();
-			getActivity().runOnUiThread(new Runnable() 
+			getActivity().runOnUiThread(new Runnable()
 			{
 				public void run()
 				{
@@ -105,7 +105,7 @@ public class MoSyncNativeUI implements RootViewReplacedListener
 			return -1;
 		}
 	}
-	
+
 	/**
 	 * Internal wrapper for maWidgetDestroy that runs
 	 * the call in the UI thread.
@@ -115,7 +115,7 @@ public class MoSyncNativeUI implements RootViewReplacedListener
 		try
 		{
 			final AsyncWait<Integer> waiter = new AsyncWait<Integer>();
-			getActivity().runOnUiThread(new Runnable() 
+			getActivity().runOnUiThread(new Runnable()
 			{
 				public void run()
 				{
@@ -130,19 +130,19 @@ public class MoSyncNativeUI implements RootViewReplacedListener
 			return -1;
 		}
 	}
-	
+
 	/**
 	 * Internal wrapper for maWidgetAddChild that runs
 	 * the call in the UI thread.
 	 */
 	public int maWidgetAddChild(
-		final int parentHandle, 
+		final int parentHandle,
 		final int childHandle)
 	{
 		try
 		{
 			final AsyncWait<Integer> waiter = new AsyncWait<Integer>();
-			getActivity().runOnUiThread(new Runnable() 
+			getActivity().runOnUiThread(new Runnable()
 			{
 				public void run()
 				{
@@ -158,20 +158,20 @@ public class MoSyncNativeUI implements RootViewReplacedListener
 			return -1;
 		}
 	}
-	
+
 	/**
 	 * Internal wrapper for maWidgetInsertChild that runs
 	 * the call in the UI thread.
 	 */
 	public int maWidgetInsertChild(
-		final int parentHandle, 
+		final int parentHandle,
 		final int childHandle,
 		final int index)
 	{
 		try
 		{
 			final AsyncWait<Integer> waiter = new AsyncWait<Integer>();
-			getActivity().runOnUiThread(new Runnable() 
+			getActivity().runOnUiThread(new Runnable()
 			{
 				public void run()
 				{
@@ -187,18 +187,18 @@ public class MoSyncNativeUI implements RootViewReplacedListener
 			return -1;
 		}
 	}
-	
+
 	/**
 	 * Internal wrapper for maWidgetRemoveChild that runs
 	 * the call in the UI thread.
 	 */
-	public int maWidgetRemoveChild( 
+	public int maWidgetRemoveChild(
 		final int childHandle)
 	{
 		try
 		{
 			final AsyncWait<Integer> waiter = new AsyncWait<Integer>();
-			getActivity().runOnUiThread(new Runnable() 
+			getActivity().runOnUiThread(new Runnable()
 			{
 				public void run()
 				{
@@ -273,7 +273,7 @@ public class MoSyncNativeUI implements RootViewReplacedListener
 		try
 		{
 			final AsyncWait<Integer> waiter = new AsyncWait<Integer>();
-			getActivity().runOnUiThread(new Runnable() 
+			getActivity().runOnUiThread(new Runnable()
 			{
 				public void run()
 				{
@@ -288,19 +288,19 @@ public class MoSyncNativeUI implements RootViewReplacedListener
 			return -1;
 		}
 	}
-	
+
 	/**
 	 * Internal wrapper for maWidgetStackScreenPush that runs
 	 * the call in the UI thread.
 	 */
 	public int maWidgetStackScreenPush(
-		final int stackScreenHandle, 
+		final int stackScreenHandle,
 		final int newScreenHandle)
 	{
 		try
 		{
 			final AsyncWait<Integer> waiter = new AsyncWait<Integer>();
-			getActivity().runOnUiThread(new Runnable() 
+			getActivity().runOnUiThread(new Runnable()
 			{
 				public void run()
 				{
@@ -316,18 +316,18 @@ public class MoSyncNativeUI implements RootViewReplacedListener
 			return -1;
 		}
 	}
-	
+
 	/**
 	 * Internal wrapper for maWidgetStackScreenPop that runs
 	 * the call in the UI thread.
 	 */
-	public int maWidgetStackScreenPop( 
+	public int maWidgetStackScreenPop(
 		final int stackScreenWidget)
 	{
 		try
 		{
 			final AsyncWait<Integer> waiter = new AsyncWait<Integer>();
-			getActivity().runOnUiThread(new Runnable() 
+			getActivity().runOnUiThread(new Runnable()
 			{
 				public void run()
 				{
@@ -342,15 +342,15 @@ public class MoSyncNativeUI implements RootViewReplacedListener
 			return -1;
 		}
 	}
-	
-	
+
+
 	/**
 	 * Internal wrapper for maWidgetSetProperty that runs
 	 * the call in the UI thread.
 	 */
 	public int maWidgetSetProperty(
-		final int widgetHandle, 
-		final String key, 
+		final int widgetHandle,
+		final String key,
 		final String value)
 	{
 		// Bind and invalidate must be called on the main mosync thread,
@@ -359,11 +359,11 @@ public class MoSyncNativeUI implements RootViewReplacedListener
 		{
 			return mNativeUI.maWidgetSetProperty(widgetHandle, key, value);
 		}
-		
+
 		try
 		{
 			final AsyncWait<Integer> waiter = new AsyncWait<Integer>();
-			getActivity().runOnUiThread(new Runnable() 
+			getActivity().runOnUiThread(new Runnable()
 			{
 				public void run()
 				{
@@ -379,13 +379,13 @@ public class MoSyncNativeUI implements RootViewReplacedListener
 			return -1;
 		}
 	}
-	
+
 	/**
 	 * Internal wrapper for maWidgetGetProperty that runs
 	 * the call in the UI thread.
 	 */
 	public int maWidgetGetProperty(
-		final int widgetHandle, 
+		final int widgetHandle,
 		final String key,
 		final int memBuffer,
 		final int memBufferSize)
@@ -406,6 +406,45 @@ public class MoSyncNativeUI implements RootViewReplacedListener
 		{
 			return -1;
 		}
+	}
+
+	/**
+	 * Internal wrapper for maWidgetScreenAddOptionsMenuItem that
+	 * runs the call in the UI thread.
+	 */
+	public int maWidgetScreenAddOptionsMenuItem(
+			final int widgetHandle,
+			final String title,
+			final int iconHandle,
+			final int iconPredefined)
+	{
+		try
+		{
+			final AsyncWait<Integer> waiter = new AsyncWait<Integer>();
+			getActivity().runOnUiThread(new Runnable() {
+				public void run()
+				{
+					int result = mNativeUI.maWidgetScreenAddOptionsMenuItem(
+							widgetHandle, title, iconHandle,iconPredefined);
+					waiter.setResult(result);
+				}
+			});
+			return waiter.getResult();
+		}
+		catch(InterruptedException ie)
+		{
+			return -1;
+		}
+	}
+
+	public ScreenWidget getCurrentScreen()
+	{
+		return mNativeUI.getCurrentScreen();
+	}
+
+	public void setCurrentScreen(int handle)
+	{
+		mNativeUI.setCurrentScreen(handle);
 	}
 
 	/**
@@ -471,7 +510,7 @@ public class MoSyncNativeUI implements RootViewReplacedListener
 	{
 		((MoSync) getActivity()).setRootView( newRoot );
 	}
-	
+
 	public Widget getCameraPreview(final int handle)
 	{
 		return mNativeUI.getCameraView(handle);

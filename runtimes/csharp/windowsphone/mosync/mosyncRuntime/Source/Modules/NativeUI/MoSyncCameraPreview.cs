@@ -41,21 +41,43 @@ namespace MoSync
         {
             //Standard WP Image control
 			protected System.Windows.Controls.Canvas mViewFinder;
-
-			public System.Windows.Controls.Canvas GetViewFinderCanvas()
-			{
-				return mViewFinder;
-			}
+            protected System.Windows.Controls.Grid mLayout;
 
             /**
              * The constructor
              */
 			public CameraPreview()
             {
-				mViewFinder = new System.Windows.Controls.Canvas();
-				mViewFinder.HorizontalAlignment = HorizontalAlignment.Left;
-				mViewFinder.VerticalAlignment = VerticalAlignment.Top;
-				View = mViewFinder;
+                mLayout = new Grid();
+                mLayout.RowDefinitions.Add(new RowDefinition());
+                mLayout.RowDefinitions[0].Height = new GridLength(1, GridUnitType.Star);
+
+                mViewFinder = new System.Windows.Controls.Canvas();
+                mViewFinder.Opacity = 0.0;
+
+                Grid.SetRow(mViewFinder, 0);
+
+                mLayout.Children.Add(mViewFinder);
+
+                View = mLayout;
+            }
+
+            public void StopViewFinder()
+            {
+                mViewFinder.Opacity = 0.0;
+            }
+
+            public void StartViewFinder()
+            {
+                mViewFinder.Opacity = 1.0;
+            }
+
+            public void SetViewFinderContent(System.Windows.Media.Brush content)
+            {
+                MoSync.Util.RunActionOnMainThreadSync(() =>
+                {
+                    mViewFinder.Background = content;
+                });
             }
         }
     }

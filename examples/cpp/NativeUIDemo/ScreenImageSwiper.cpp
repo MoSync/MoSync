@@ -90,10 +90,30 @@ void ScreenImageSwiper::createUI()
 	// Set the screen title.
 	setTitle(TXT_SCREEN_TITLE);
 
+	// Get the screen size.
+	getScreenSize();
+
 	if (getPlatform() == ANDROID)
 	{
 		// Set screen icon for Android.
 		setIcon(RES_TAB_ICON_IMAGE_SWIPER_ANDROID);
+
+		// Create ads banner.
+		if ( mScreenWidth > 50 )
+		{
+			if ( mScreenWidth > 60 )
+			{
+				mAdsBanner = new Ads::Banner(ADS_PUBLISHER_ID, Ads::BANNER_SIZE_LEADERBOARD);
+			}
+			else
+			{
+				mAdsBanner = new Ads::Banner(ADS_PUBLISHER_ID, Ads::BANNER_SIZE_IAB);
+			}
+		}
+		else
+		{
+			mAdsBanner = new Ads::Banner(ADS_PUBLISHER_ID);
+		}
 	}
 	else if(getPlatform() == IOS)
 	{
@@ -113,17 +133,15 @@ void ScreenImageSwiper::createUI()
 
 		// Set screen icon for iOS.
 		setIcon(RES_TAB_ICON_IMAGE_SWIPER);
+
+		// Create ads banner.
+		mAdsBanner = new Ads::Banner(ADS_PUBLISHER_ID);
 	}
 
-	// Create ads banner.
-	mAdsBanner = new Ads::Banner(ADS_PUBLISHER_ID);
 	mAdsBanner->requestContent(true);
 
 	// Add banner to layout.
 	mMainLayout->addBanner(mAdsBanner);
-
-	// Get the screen size.
-	getScreenSize();
 
 	// Create a RelativeLayout as container for images.
 	mImagesLayout = new RelativeLayout();
