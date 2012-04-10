@@ -88,6 +88,9 @@
 		432B98C91431FE5F00BDB926 /* MoSyncPanic.mm in Sources */ = {isa = PBXBuildFile; fileRef = 432B98C71431FE5F00BDB926 /* MoSyncPanic.mm */; };
 		432B98CA1431FE5F00BDB926 /* MoSyncPanic.mm in Sources */ = {isa = PBXBuildFile; fileRef = 432B98C71431FE5F00BDB926 /* MoSyncPanic.mm */; };
 		432B98CC1432040B00BDB926 /* PimError.h in Headers */ = {isa = PBXBuildFile; fileRef = 432B98CB1432040B00BDB926 /* PimError.h */; };
+		433134B9153459DA005DDAD8 /* NSDataExpanded.h in Headers */ = {isa = PBXBuildFile; fileRef = 433134B7153459DA005DDAD8 /* NSDataExpanded.h */; };
+		433134BA153459DA005DDAD8 /* NSDataExpanded.mm in Sources */ = {isa = PBXBuildFile; fileRef = 433134B8153459DA005DDAD8 /* NSDataExpanded.mm */; };
+		433134BB153459DA005DDAD8 /* NSDataExpanded.mm in Sources */ = {isa = PBXBuildFile; fileRef = 433134B8153459DA005DDAD8 /* NSDataExpanded.mm */; };
 		438DBD401475388500980239 /* AudioSyscall.mm in Sources */ = {isa = PBXBuildFile; fileRef = E4D36EA71459AC5B00477B1E /* AudioSyscall.mm */; };
 		438DBD451475393800980239 /* AudioInstance.mm in Sources */ = {isa = PBXBuildFile; fileRef = E4D36EAB1459B5B600477B1E /* AudioInstance.mm */; };
 		438DBD461475393800980239 /* AudioData.mm in Sources */ = {isa = PBXBuildFile; fileRef = E4D36EA51459AC5B00477B1E /* AudioData.mm */; };
@@ -394,6 +397,8 @@
 		432B98C61431FE5F00BDB926 /* MoSyncPanic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MoSyncPanic.h; sourceTree = "<group>"; };
 		432B98C71431FE5F00BDB926 /* MoSyncPanic.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MoSyncPanic.mm; sourceTree = "<group>"; };
 		432B98CB1432040B00BDB926 /* PimError.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PimError.h; sourceTree = "<group>"; };
+		433134B7153459DA005DDAD8 /* NSDataExpanded.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NSDataExpanded.h; path = utils/NSDataExpanded.h; sourceTree = "<group>"; };
+		433134B8153459DA005DDAD8 /* NSDataExpanded.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = NSDataExpanded.mm; path = utils/NSDataExpanded.mm; sourceTree = "<group>"; };
 		43A7684E1400F6BA009608A4 /* ImagePickerController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ImagePickerController.h; sourceTree = "<group>"; };
 		43A7684F1400F6BA009608A4 /* ImagePickerController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ImagePickerController.mm; sourceTree = "<group>"; };
 		43B16FE8147BF9FC00B6BB8A /* NSStringExpanded.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NSStringExpanded.h; path = utils/NSStringExpanded.h; sourceTree = "<group>"; };
@@ -831,6 +836,8 @@
 		43B16FE6147BF9AA00B6BB8A /* utils */ = {
 			isa = PBXGroup;
 			children = (
+				433134B7153459DA005DDAD8 /* NSDataExpanded.h */,
+				433134B8153459DA005DDAD8 /* NSDataExpanded.mm */,
 				43B16FE8147BF9FC00B6BB8A /* NSStringExpanded.h */,
 				43B16FE9147BF9FC00B6BB8A /* NSStringExpanded.mm */,
 			);
@@ -1227,6 +1234,7 @@
 				417495FD14C4CB1300D04A32 /* Capture.h in Headers */,
 				4300E3E3152C5F1000B40FA2 /* PurchaseManager.h in Headers */,
 				4300E3F0152C6EBB00B40FA2 /* PurchaseProduct.h in Headers */,
+				433134B9153459DA005DDAD8 /* NSDataExpanded.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1443,6 +1451,7 @@
 				417495FA14C4CB0E00D04A32 /* Capture.mm in Sources */,
 				4300E3E4152C5F1000B40FA2 /* PurchaseManager.mm in Sources */,
 				4300E3F1152C6EBB00B40FA2 /* PurchaseProduct.mm in Sources */,
+				433134BA153459DA005DDAD8 /* NSDataExpanded.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1549,6 +1558,7 @@
 				417495FC14C4CB0F00D04A32 /* Capture.mm in Sources */,
 				4300E3E5152C5F1000B40FA2 /* PurchaseManager.mm in Sources */,
 				4300E3F2152C6EBB00B40FA2 /* PurchaseProduct.mm in Sources */,
+				433134BB153459DA005DDAD8 /* NSDataExpanded.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
