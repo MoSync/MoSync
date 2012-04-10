@@ -265,7 +265,6 @@ public class MoSyncCameraController {
 	 */
 	public void setPreview(MoSyncCameraPreview preview)
 	{
-
 		mPreview = preview;
 		if(mPreview.mCamera == null)
 		{
@@ -665,7 +664,6 @@ public class MoSyncCameraController {
 	PictureCallback rawCallback = new PictureCallback() {
 		@Override
 		public void onPictureTaken(byte[] data, Camera camera) {
-
 			if(rawMode == true)
 			{
 				lock.lock();
@@ -692,7 +690,6 @@ public class MoSyncCameraController {
 	PictureCallback jpegCallback = new PictureCallback() {
 		@Override
 		public void onPictureTaken(byte[] data, Camera camera) {
-
 			if(rawMode == false)
 			{
 				lock.lock();
@@ -723,8 +720,6 @@ public class MoSyncCameraController {
 		@Override
 		public void onPreviewFrame(byte[] data, Camera camera)
 		{
-
-
 			if(!mMoSyncPreviewFrameEventEnabled)
 			{
 				if(!mMoSyncPreviewAutoFocusEventEnabled)
@@ -896,7 +891,6 @@ public class MoSyncCameraController {
 			int width,
 			int height)
 	{
-
 		if(mMoSyncPreviewEventEnabled)
 			return MAAPI_consts.MA_CAMERA_RES_EVENTS_ALREADY_ENABLED;
 

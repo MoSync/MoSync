@@ -70,6 +70,7 @@ public class MoSyncCameraPreview extends SurfaceView implements SurfaceHolder.Ca
      */
     public MoSyncCameraPreview(Context context) {
         super(context);
+
         // Install a SurfaceHolder.Callback so we get notified when the
         // underlying surface is created and destroyed.
         mHolder = getHolder();
@@ -192,12 +193,10 @@ public class MoSyncCameraPreview extends SurfaceView implements SurfaceHolder.Ca
 	 @Override
 	public void surfaceDestroyed(SurfaceHolder holder)
 	 {
-
 	        try
 	        {
 				if(mCamera != null)
 				{
-					mCamera.release();
 					mCamera = null;
 				}
 	        }
@@ -220,9 +219,7 @@ public class MoSyncCameraPreview extends SurfaceView implements SurfaceHolder.Ca
 		try
 		{
 			if(mHolder == null)
-			{
 				return;
-			}
 
 			mCamera.setPreviewDisplay(mHolder);
 		}
