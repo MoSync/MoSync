@@ -77,7 +77,7 @@ namespace MAUtil {
 				switch(event.type) {
 					case EVENT_TYPE_CLOSE:
 						moblet->fireCloseEvent();
-						close();
+						moblet->exit();
 						break;
 					case EVENT_TYPE_FOCUS_GAINED:
 						moblet->fireFocusGainedEvent();
@@ -135,7 +135,8 @@ namespace MAUtil {
 			moblet->runIdleListeners();
 #endif
 
-			if(moblet->mIdleListeners.size() == 0) {
+			if ((moblet->mIdleListeners.size() == 0) && (moblet->mRun)) {
+
 				int ttnt = moblet->timeToNextTimer();
 				// if ttnt == 0, we shouldn't do maWait(0), since that
 				// doesn't mean waiting no time....
@@ -154,4 +155,7 @@ namespace MAUtil {
 		maExit(0);
 	}
 
+	void Moblet::exit() {
+		mRun = false;
+	}
 }
