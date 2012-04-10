@@ -8,6 +8,7 @@ namespace MoSync
     {
         private UIManager mNativeUI;
         private List<IWidget> mWidgets = new List<IWidget>();
+        private int mApplicationBarItemsIndex;
 
 		public IWidget GetWidget(int handle)
 		{
@@ -167,6 +168,95 @@ namespace MoSync
                 IScreen screen = (IScreen)mWidgets[_screenHandle];
                 screen.Show();
                 return MoSync.Constants.MAW_RES_OK;
+            };
+
+            ioctls.maWidgetScreenAddOptionsMenuItem = delegate(int _widget, int _title, int _iconPath, int _iconPredefined)
+            {
+                String applicationBarIconsFolder = "/AppBar.Icons/";
+                if (_widget < 0 || _widget >= mWidgets.Count)
+                    return MoSync.Constants.MAW_RES_INVALID_HANDLE;
+                IScreen screen = (IScreen)mWidgets[_widget];
+
+                if (_iconPath > 0 && 0 == _iconPredefined) //it is a Application Bar Button
+                {
+                    string iconPath = core.GetDataMemory().ReadStringAtAddress(_iconPath); //read the path
+                    string buttonText = core.GetDataMemory().ReadStringAtAddress(_title); //read the text
+
+                    Microsoft.Phone.Shell.ApplicationBarIconButton btn = new Microsoft.Phone.Shell.ApplicationBarIconButton();
+                    btn.IconUri = new Uri(applicationBarIconsFolder + iconPath, UriKind.RelativeOrAbsolute);
+                    btn.Text = buttonText;
+                    mApplicationBarItemsIndex++;
+
+                    btn.Click += new EventHandler(
+                        delegate(object from, EventArgs target)
+                        {
+                            Memory eventData = new Memory(12);
+                            const int MAWidgetEventData_eventType = 0;
+                            const int MAWidgetEventData_widgetHandle = 4;
+                            const int MAWidgetEventData_itemIndex = 12;
+                            eventData.WriteInt32(MAWidgetEventData_eventType, MoSync.Constants.MAW_EVENT_OPTIONS_MENU_ITEM_SELECTED);
+                            eventData.WriteInt32(MAWidgetEventData_widgetHandle, _widget);
+                            eventData.WriteInt32(MAWidgetEventData_itemIndex, mApplicationBarItemsIndex);
+                            //Posting a CustomEvent
+                            runtime.PostCustomEvent(MoSync.Constants.EVENT_TYPE_WIDGET, eventData);
+                        });
+
+                    screen.GetApplicationBar().Buttons.Add(btn);
+                    screen.EnableApplicationBar();
+                }
+                else if (_iconPredefined > 0 && _iconPath > 0)
+                {
+                    string buttonText = core.GetDataMemory().ReadStringAtAddress(_title); //read the text
+                    string iconPath = core.GetDataMemory().ReadStringAtAddress(_iconPath); //read the path
+
+                    Microsoft.Phone.Shell.ApplicationBarIconButton btn = new Microsoft.Phone.Shell.ApplicationBarIconButton();
+                    btn.IconUri = new Uri(applicationBarIconsFolder + iconPath + ".png", UriKind.RelativeOrAbsolute);
+                    btn.Text = buttonText;
+                    mApplicationBarItemsIndex++;
+
+                    btn.Click += new EventHandler(
+                        delegate(object from, EventArgs target)
+                        {
+                            Memory eventData = new Memory(12);
+                            const int MAWidgetEventData_eventType = 0;
+                            const int MAWidgetEventData_widgetHandle = 4;
+                            const int MAWidgetEventData_itemIndex = 12;
+                            eventData.WriteInt32(MAWidgetEventData_eventType, MoSync.Constants.MAW_EVENT_OPTIONS_MENU_ITEM_SELECTED);
+                            eventData.WriteInt32(MAWidgetEventData_widgetHandle, _widget);
+                            eventData.WriteInt32(MAWidgetEventData_itemIndex, mApplicationBarItemsIndex);
+                            //Posting a CustomEvent
+                            runtime.PostCustomEvent(MoSync.Constants.EVENT_TYPE_WIDGET, eventData);
+                        });
+
+                    screen.GetApplicationBar().Buttons.Add(btn);
+                    screen.EnableApplicationBar();
+                }
+                else
+                {
+                    string menuItemText = core.GetDataMemory().ReadStringAtAddress(_title); //read the text
+                    Microsoft.Phone.Shell.ApplicationBarMenuItem menuItem = new Microsoft.Phone.Shell.ApplicationBarMenuItem();
+                    menuItem.Text = menuItemText;
+                    mApplicationBarItemsIndex++;
+
+                    menuItem.Click += new EventHandler(
+                        delegate(object from, EventArgs target)
+                        {
+                            Memory eventData = new Memory(12);
+                            const int MAWidgetEventData_eventType = 0;
+                            const int MAWidgetEventData_widgetHandle = 4;
+                            const int MAWidgetEventData_itemIndex = 12;
+                            eventData.WriteInt32(MAWidgetEventData_eventType, MoSync.Constants.MAW_EVENT_OPTIONS_MENU_ITEM_SELECTED);
+                            eventData.WriteInt32(MAWidgetEventData_widgetHandle, _widget);
+                            eventData.WriteInt32(MAWidgetEventData_itemIndex, mApplicationBarItemsIndex);
+                            //Posting a CustomEvent
+                            runtime.PostCustomEvent(MoSync.Constants.EVENT_TYPE_WIDGET, eventData);
+                        });
+
+                    screen.GetApplicationBar().Buttons.Add(menuItem);
+                    screen.EnableApplicationBar();
+                }
+
+                return mApplicationBarItemsIndex;
             };
         }
     }

@@ -184,10 +184,10 @@ namespace NativeUI
 	 * @return The index on which the menu item was added in the options menu,
 	 * an error code otherwise.
 	 */
-	int Screen::addOptionsMenuItem(const MAUtil::String title, int iconId, bool iconPredefined)
+	int Screen::addOptionsMenuItem(const MAUtil::String title, const MAUtil::String iconPath, bool iconPredefined)
 	{
 		return maWidgetScreenAddOptionsMenuItem(
-				getWidgetHandle(), title.c_str(), iconId, (iconPredefined ? 1 : 0) );
+				getWidgetHandle(), title.c_str(), iconPath.c_str(), (iconPredefined ? 1 : 0) );
 	}
 
 	/**

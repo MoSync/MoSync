@@ -137,7 +137,7 @@ namespace NativeUI
 		 * an error code otherwise.
 		 */
 		virtual int addOptionsMenuItem(
-				const MAUtil::String title="", int iconId=-1, bool iconPredefined=false);
+				const MAUtil::String title="", const MAUtil::String iconId="", bool iconPredefined=false);
 
 		/**
 		 * Remove the options menu from this screen.

@@ -133,6 +133,20 @@
     <Content Include="program">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="AppBar.Icons\17301555.png" />
+    <Content Include="AppBar.Icons\17301559.png" />
+    <Content Include="AppBar.Icons\17301560.png" />
+    <Content Include="AppBar.Icons\17301564.png" />
+    <Content Include="AppBar.Icons\17301566.png" />
+    <Content Include="AppBar.Icons\17301567.png" />
+    <Content Include="AppBar.Icons\17301568.png" />
+    <Content Include="AppBar.Icons\17301573.png" />
+    <Content Include="AppBar.Icons\17301577.png" />
+    <Content Include="AppBar.Icons\17301582.png" />
+    <Content Include="AppBar.Icons\17301583.png" />
+    <Content Include="AppBar.Icons\17301586.png" />
+    <Content Include="AppBar.Icons\17301589.png" />
+    <Content Include="AppBar.Icons\17301590.png" />
     <Content Include="Toolkit.Content\ApplicationBar.Cancel.png" />
     <Content Include="Toolkit.Content\ApplicationBar.Check.png" />
     <None Include="Properties\AppManifest.xml" />

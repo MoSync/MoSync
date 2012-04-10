@@ -27,6 +27,10 @@ namespace MoSync
         public interface IScreen
         {
             void Show();
+            Microsoft.Phone.Shell.ApplicationBar GetApplicationBar();
+            void EnableApplicationBar();
+            bool GetApplicationBarVisibility();
+            void SetApplicationBarVisibility(bool value);
         }
 
         public class MoSyncWidgetPropertyAttribute : Attribute

@@ -40,14 +40,20 @@ namespace MoSync
         {
             protected Grid mPage;
             private string mTitle;
+            protected Microsoft.Phone.Shell.ApplicationBar mApplicationBar;
+            protected bool ApplicationBarVisible = false;
 
             //The constructor
             public Screen()
             {
                 mPage = new Grid();
                 mPage.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
-                mPage.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) });
+                mPage.RowDefinitions.Add(new RowDefinition { Height = new GridLength( 1, GridUnitType.Star) });
                 mView = mPage;
+
+                mApplicationBar = new Microsoft.Phone.Shell.ApplicationBar();
+                mApplicationBar.IsVisible = false;
+                ApplicationBarVisible = false;
 
                 /**
                  * This will add a BackKeyPress event handler to the Application.Current.RootVisual, this is application wide
@@ -57,7 +63,6 @@ namespace MoSync
                  * This will add a BackKeyPress event handler to the Application.Current.RootVisual, this is application wide
                  */
                 (Application.Current.RootVisual as Microsoft.Phone.Controls.PhoneApplicationFrame).OrientationChanged += new EventHandler<Microsoft.Phone.Controls.OrientationChangedEventArgs>(OrientationChangedHandler);
-
             }
 
             /**
@@ -210,6 +215,10 @@ namespace MoSync
                 MoSync.Util.RunActionOnMainThreadSync(() =>
                 {
                     PhoneApplicationFrame frame = (PhoneApplicationFrame)Application.Current.RootVisual;
+                    if (mApplicationBar.IsVisible)
+                    {
+                        (frame.Content as PhoneApplicationPage).ApplicationBar = mApplicationBar;
+                    }
                     (frame.Content as PhoneApplicationPage).Content = mPage;
                 });
             }
@@ -232,6 +241,29 @@ namespace MoSync
                 {
                     return mTitle;
                 }
+            }
+
+            public Microsoft.Phone.Shell.ApplicationBar GetApplicationBar()
+            {
+                return mApplicationBar;
+            }
+
+            public void EnableApplicationBar()
+            {
+                MoSync.Util.RunActionOnMainThreadSync(() =>
+                    {
+                        mPage.RowDefinitions.Add(new RowDefinition { Height = new GridLength(40, GridUnitType.Pixel) });
+                        SetApplicationBarVisibility(true);
+                    });
+            }
+            public void SetApplicationBarVisibility(bool value)
+            {
+                ApplicationBarVisible = value;
+            }
+
+            public bool GetApplicationBarVisibility()
+            {
+                return ApplicationBarVisible;
             }
         }
     }
