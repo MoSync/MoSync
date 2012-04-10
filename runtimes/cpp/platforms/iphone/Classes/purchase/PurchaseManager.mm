@@ -215,7 +215,7 @@ static PurchaseManager *sharedInstance = nil;
         return MA_PURCHASE_RES_INVALID_HANDLE;
     }
 
-    return [product verifyReceipt];
+    return [product verifyReceipt:_storeURL];
 }
 
 /**

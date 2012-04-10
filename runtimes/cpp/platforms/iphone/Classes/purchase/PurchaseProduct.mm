@@ -26,12 +26,16 @@
 
 #import "PurchaseProduct.h"
 #import "Platform.h"
+#import "NSDataExpanded.h"
 
-/*!
- Request timeout interval , in seconds.
- */
-NSTimeInterval const kTimeoutInterval = 60.0;
+// Request timeout interval, in seconds.
+NSTimeInterval const kTimeoutInterval = 6.0;
+
+// POST method request.
 NSString* const kRequestMethodTypePost = @"POST";
+
+// JSON template used for verifying a receipt.
+NSString* const kReceiptTemplateJSON = @"{ \"receipt-data\" : \"%@\" }";
 
 /**
  * Hidden methods for PurchaseProduct class.
@@ -198,53 +202,41 @@ NSString* const kRequestMethodTypePost = @"POST";
 
 /**
  * Verify if the receipt came from App Store.
+ * @param storeURL App Store url where to send the receipt for verification.
  * @return One of the next constants:
  * - MA_PURCHASE_RES_OK if the receipt was sent to the store for verifing.
  * - MA_PURCHASE_RES_RECEIPT if the product has not been purchased.
  */
--(int) verifyReceipt
+-(int) verifyReceipt:(NSString*) storeURL
 {
-    NSLog(@"%s", __FUNCTION__);
+    NSLog(@"%s for %@", __FUNCTION__, _transaction.payment.productIdentifier);
     if (!_transaction)
     {
         return MA_PURCHASE_RES_RECEIPT;
     }
 
-    NSLog(@"_transaction.transactionReceipt = %@", [_transaction.transactionReceipt description]);
-    NSDictionary* dict = [NSDictionary dictionaryWithObject:_transaction.transactionReceipt
-                                                     forKey:@"receipt-data"];
-    NSLog(@"dict = %@", dict);
-    NSError *writeError = nil;
-    NSData *jsonData = [NSJSONSerialization dataWithJSONObject:dict
-                                                       options:NSJSONReadingMutableLeaves
-                                                         error:&writeError];
+    // The connection needs to be done on the main thread.
+    dispatch_queue_t mainQueue = dispatch_get_main_queue();
+    dispatch_async(mainQueue,^{
+        NSString* base64String = [_transaction.transactionReceipt base64Encode];
+        NSString* json = [NSString stringWithFormat:kReceiptTemplateJSON, base64String];
 
-	NSMutableURLRequest *request =
-    [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@"https://sandbox.itunes.apple.com/verifyReceipt"]
-                            cachePolicy:NSURLRequestUseProtocolCachePolicy
-                        timeoutInterval:kTimeoutInterval];
+        NSMutableURLRequest *request =
+        [NSMutableURLRequest requestWithURL:[NSURL URLWithString:storeURL]
+                                cachePolicy:NSURLRequestReloadIgnoringLocalCacheData
+                            timeoutInterval:kTimeoutInterval];
 
-    [request setHTTPMethod:kRequestMethodTypePost];
-    [request setHTTPBody: jsonData];
+        [request setHTTPMethod:kRequestMethodTypePost];
+        [request setHTTPBody: [json dataUsingEncoding:NSUTF8StringEncoding]];
 
-    // this also initiates the sending the request to server
-	NSURLConnection* urlConnection = [[NSURLConnection alloc] initWithRequest:request delegate:self];
-    [urlConnection release];
+        NSURLConnection* urlConnection = [[NSURLConnection alloc] initWithRequest:request delegate:self];
+        [urlConnection release];
+    });
 
     return MA_PURCHASE_RES_OK;
 }
 
 #pragma mark NSURLConnectionDelegate methods
-
-/*!
- Sent when a connection must authenticate a challenge in order to download its request.
- @param connection The connection sending the message.
- @param challenge The challenge that connection must authenticate in order to download its request.
- */
-- (void)connection:(NSURLConnection *)connection didReceiveAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge
-{
-    NSLog(@"IN %s", __FUNCTION__);
-}
 
 /*!
  Sent as a connection loads data incrementally.
@@ -255,7 +247,7 @@ NSString* const kRequestMethodTypePost = @"POST";
 {
     NSLog(@"IN %s", __FUNCTION__);
     NSString* text = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-    NSLog(@"text recieved: %@", text);
+    NSLog(@"text received: %@", text);
     [text release];
 }
 

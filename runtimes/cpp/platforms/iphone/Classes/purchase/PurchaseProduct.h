@@ -32,7 +32,7 @@
 /**
  * @brief MoSync product class.
  */
-@interface PurchaseProduct: NSObject<SKProductsRequestDelegate>
+@interface PurchaseProduct: NSObject<SKProductsRequestDelegate, NSURLConnectionDelegate>
 {
     /**
      * Local handle.
@@ -99,11 +99,12 @@
 
 /**
  * Verify if the receipt came from App Store.
+ * @param storeURL App Store url where to send the receipt for verification.
  * @return One of the next constants:
  * - MA_PURCHASE_RES_OK if the receipt was sent to the store for verifing.
  * - MA_PURCHASE_RES_RECEIPT if the product has not been purchased.
  */
--(int) verifyReceipt;
+-(int) verifyReceipt:(NSString*) storeURL;
 
 @property(nonatomic, readonly) MAHandle handle;
 

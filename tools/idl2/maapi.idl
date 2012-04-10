@@ -11064,11 +11064,13 @@ group PurchaseAPI "Purchase API" {
 			// Returned by the maPurchaseSupported() syscall if purchase is not allowed on the device.
 			// Platform: iOS.
 			DISABLED = -13;
-			// Returned by the maPurchaseGetName() syscall if the productHandle is invalid.
+			// Returned by the maPurchaseGetName() or  maPurchaseVerifyReceipt syscalls if the
+			// productHandle is invalid.
 			INVALID_HANDLE = -14;
 			// Returned by the maPurchaseGetName() syscall if the the given buffer is too small.
 			BUFFER_TOO_SMALL = -15;
-
+			// Returned by the maPurchaseVerifyReceipt() syscall if the product has not been purchased.
+			RECEIPT = -16;
 		}
 	} // end of Purchase Result Codes
 
@@ -11150,9 +11152,13 @@ group PurchaseAPI "Purchase API" {
 		void maPurchaseRequest(in MAHandle productHandle);
 
 		/**
-		*
-		*
-		*
+		* Verify if the receipt came from Apple App Store / Google Play.
+		* Make sure that the product is purchased before calling this syscall.
+		* @param productHandle Handle to the product that has been purchased.
+		* @return One of the next syscalls:
+		* - MA_PURCHASE_RES_OK if the request has been send to the store for verifying.
+		* - MA_PURCHASE_RES_INVALID_HANDLE if the productHandle is invalid.
+		* - MA_PURCHASE_RES_RECEIPT if the product has not been purchased.
 		*/
 		int maPurchaseVerifyReceipt(in MAHandle productHandle);
 
