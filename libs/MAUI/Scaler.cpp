@@ -169,19 +169,27 @@ namespace MAUI {
 	Scaler::Scaler(MAHandle image, const MARect *srcRect, double minScale, double maxScale, int levels, eScaleType scaleType) :
 	levels(levels)
 	{
-		MARect tempRect;
+		int imageWidth = 0;
+		int imageHeight = 0;
 
-		MAExtent imageDims = maGetImageSize(image);
-		int imageWidth = EXTENT_X(imageDims);
-		int imageHeight = EXTENT_Y(imageDims);
-		int *imageData = new int[(imageWidth+1)*(imageHeight+1)];
-
+		// default dimensions in case of null user rect
 		if(!srcRect) {
+			MAExtent imageDims = maGetImageSize(image);
+			imageWidth = EXTENT_X(imageDims);
+			imageHeight = EXTENT_Y(imageDims);
+
+			MARect tempRect;
 			tempRect.left = tempRect.top = 0;
 			tempRect.width = imageWidth;
 			tempRect.height = imageHeight;
 			srcRect = &tempRect;
 		}
+
+		// user rect not null here - update the new dimensions
+		imageWidth  = srcRect->width;
+		imageHeight = srcRect->height;
+
+		int *imageData = new int[(imageWidth+1)*(imageHeight+1)];
 		maGetImageData(image, imageData, srcRect, imageWidth+1);
 
 		if(scaleType == ST_BILINEAR) {
@@ -198,10 +206,11 @@ namespace MAUI {
 		int scaleDelta = (int)(((maxScale - minScale)*65536.0)/(double)levels);
 		int scale = (int)(minScale*65536.0);
 
-		for(int i = 0; i < levels; i++) {
-			MAHandle p = maCreatePlaceholder();
-			if(i == 0) placeholderStart = p;
+		// initialisations
+		placeholderStart = maCreatePlaceholder();
+		MAHandle p = placeholderStart;
 
+		for(int i = 0; i < levels; i++) {
 			int scaledImageWidth = ((imageWidth*scale)>>16);
 			int scaledImageHeight = ((imageHeight*scale)>>16);		
 			int *scaledImageData = new int[scaledImageWidth*scaledImageHeight];
@@ -215,8 +224,13 @@ namespace MAUI {
 			}
 
 			maCreateImageRaw(p, scaledImageData, EXTENT(scaledImageWidth, scaledImageHeight), 1);
+
+			// clean up
 			delete scaledImageData;
+
+			// prepare for next iteration
 			scale += scaleDelta;
+			p = maCreatePlaceholder();
 		}
 		delete imageData;
 	}
