@@ -46,6 +46,17 @@ namespace MoSync
                 mLabel = new System.Windows.Controls.TextBlock();
 				mLabel.TextWrapping = TextWrapping.Wrap;
 
+                /*
+                 * We need to set some default values on the text block. For this, we use
+                 * a predefined style.
+                 * PhoneTextNormalStyle description:
+                 * FontFamily: PhoneFontFamilyNormal
+                 * FontSize: PhoneFontSizeNormal
+                 * Foreground: PhoneForegroundBrush
+                 * Margin: PhoneHorizontalMargin
+                 */
+                mLabel.Style = (Style)Application.Current.Resources["PhoneTextNormalStyle"];
+
                 mView = mLabel;
 			}
 
@@ -182,7 +193,7 @@ namespace MoSync
 			}
 
             /**
-             * The implementation of the "FontHandle" property. 
+             * The implementation of the "FontHandle" property.
              * Sets the font handle used to display the item's text
              */
             [MoSyncWidgetProperty(MoSync.Constants.MAW_LABEL_FONT_HANDLE)]

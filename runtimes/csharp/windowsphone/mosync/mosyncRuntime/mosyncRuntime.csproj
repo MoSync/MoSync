@@ -87,6 +87,7 @@
     <Compile Include="Source\Modules\MoSyncMathModule.cs" />
     <Compile Include="Source\Modules\MoSyncMemoryModule.cs" />
     <Compile Include="Source\Modules\MoSyncMiscModule.cs" />
+    <Compile Include="Source\Modules\MoSyncModalDialogModule.cs" />
     <Compile Include="Source\Modules\MoSyncNativeUIModule.cs" />
     <Compile Include="Source\Modules\MoSyncOpenGLESModule.cs" />
     <Compile Include="Source\Modules\MoSyncScreenOrientationModule.cs" />
@@ -94,6 +95,7 @@
     <Compile Include="Source\Modules\NativeUI\MoSyncActivityIndicator.cs" />
     <Compile Include="Source\Modules\NativeUI\MoSyncAd.cs" />
     <Compile Include="Source\Modules\NativeUI\MoSyncCameraPreview.cs" />
+    <Compile Include="Source\Modules\NativeUI\MoSyncDialogView.cs" />
     <Compile Include="Source\Modules\NativeUI\MoSyncPanoramaView.cs" />
     <Compile Include="Source\Modules\NativeUI\MoSyncSearchBar.cs" />
     <Compile Include="Source\Modules\NativeUI\MoSyncStackScreen.cs" />
