@@ -8,7 +8,18 @@ namespace MoSync
     {
         private UIManager mNativeUI;
         private List<IWidget> mWidgets = new List<IWidget>();
-        private int mApplicationBarItemsIndex;
+
+        //The application bar item indexes.
+        //When a new button or menu item is added it gets
+        //an index associated. That index is returned when the item is
+        //succesfuly added.
+        private Dictionary<Object, int> mApplicationBarItemsIndexes;
+
+        //The application bar item index seed.
+        //This is a counter that gives the first
+        //index value and it's incremented during
+        //item additions.
+        private int mApplicationBarItemsIndexSeed = 0;
 
 		public IWidget GetWidget(int handle)
 		{
@@ -32,6 +43,7 @@ namespace MoSync
         {
             mNativeUI = new NativeUI.NativeUIWindowsPhone();
             //mWidgets.Add(null); // why?
+            mApplicationBarItemsIndexes = new Dictionary<Object, int>();
 
             ioctls.maWidgetCreate = delegate(int _widgetType)
             {
@@ -170,22 +182,50 @@ namespace MoSync
                 return MoSync.Constants.MAW_RES_OK;
             };
 
+            /*
+             * Implementation for maWidgetScreenAddOptionsMenuItem
+             *
+             * @param _widget the widget handle
+             * @param _title the option menu item title
+             * @param _iconPath the option menu item path
+             *        Note: if the _iconPredefined param is 1 then the _iconPath
+             *              will store a code representing the name of the icon file,
+             *              without extension. Otherwise it should contain the name of the
+             *              file. (e.g. "applicationBarIcon1.png")
+             * @param _iconPredefined if the value is 1 it means that we expect a predefined icon
+             *        otherwise it will create the path using the _iconPath as it was previously
+             *        explained
+             */
             ioctls.maWidgetScreenAddOptionsMenuItem = delegate(int _widget, int _title, int _iconPath, int _iconPredefined)
             {
+                //This represents the hardcoded folder name for the application bar icons
                 String applicationBarIconsFolder = "/AppBar.Icons/";
+
+                //if _widget < 0 => no screen parent
                 if (_widget < 0 || _widget >= mWidgets.Count)
                     return MoSync.Constants.MAW_RES_INVALID_HANDLE;
+
                 IScreen screen = (IScreen)mWidgets[_widget];
 
-                if (_iconPath > 0 && 0 == _iconPredefined) //it is a Application Bar Button
-                {
-                    string iconPath = core.GetDataMemory().ReadStringAtAddress(_iconPath); //read the path
-                    string buttonText = core.GetDataMemory().ReadStringAtAddress(_title); //read the text
+                //Read the icon path
+                string iconPath = core.GetDataMemory().ReadStringAtAddress(_iconPath);
 
+                //If the iconPath is not empty and we don't have a predefined icon
+                //then we have an ApplicationBarButton object with a given icon and text.
+                if (!iconPath.Equals("") && 0 == _iconPredefined)
+                {
+                    //Read the text
+                    string buttonText = core.GetDataMemory().ReadStringAtAddress(_title);
+
+                    //Create the native object.
                     Microsoft.Phone.Shell.ApplicationBarIconButton btn = new Microsoft.Phone.Shell.ApplicationBarIconButton();
+
+                    //Create the icon path.
                     btn.IconUri = new Uri(applicationBarIconsFolder + iconPath, UriKind.RelativeOrAbsolute);
                     btn.Text = buttonText;
-                    mApplicationBarItemsIndex++;
+
+                    //Associate an index to the native object.
+                    mApplicationBarItemsIndexes.Add(btn, mApplicationBarItemsIndexSeed++);
 
                     btn.Click += new EventHandler(
                         delegate(object from, EventArgs target)
@@ -193,10 +233,10 @@ namespace MoSync
                             Memory eventData = new Memory(12);
                             const int MAWidgetEventData_eventType = 0;
                             const int MAWidgetEventData_widgetHandle = 4;
-                            const int MAWidgetEventData_itemIndex = 12;
+                            const int MAWidgetEventData_itemIndex = 8;
                             eventData.WriteInt32(MAWidgetEventData_eventType, MoSync.Constants.MAW_EVENT_OPTIONS_MENU_ITEM_SELECTED);
                             eventData.WriteInt32(MAWidgetEventData_widgetHandle, _widget);
-                            eventData.WriteInt32(MAWidgetEventData_itemIndex, mApplicationBarItemsIndex);
+                            eventData.WriteInt32(MAWidgetEventData_itemIndex, mApplicationBarItemsIndexes[btn]);
                             //Posting a CustomEvent
                             runtime.PostCustomEvent(MoSync.Constants.EVENT_TYPE_WIDGET, eventData);
                         });
@@ -204,15 +244,22 @@ namespace MoSync
                     screen.GetApplicationBar().Buttons.Add(btn);
                     screen.EnableApplicationBar();
                 }
-                else if (_iconPredefined > 0 && _iconPath > 0)
+                //If the iconPath is not empty and we have a predefined icon
+                //then we have an ApplicationBarButton object with a predefined icon and text.
+                else if (!iconPath.Equals("") && _iconPredefined > 0 )
                 {
-                    string buttonText = core.GetDataMemory().ReadStringAtAddress(_title); //read the text
-                    string iconPath = core.GetDataMemory().ReadStringAtAddress(_iconPath); //read the path
+                    //Read the text.
+                    string buttonText = core.GetDataMemory().ReadStringAtAddress(_title);
 
+                    //Create the native object.
                     Microsoft.Phone.Shell.ApplicationBarIconButton btn = new Microsoft.Phone.Shell.ApplicationBarIconButton();
+
+                    //Create the icon path.
                     btn.IconUri = new Uri(applicationBarIconsFolder + iconPath + ".png", UriKind.RelativeOrAbsolute);
                     btn.Text = buttonText;
-                    mApplicationBarItemsIndex++;
+
+                    //Associate an index to the native object.
+                    mApplicationBarItemsIndexes.Add(btn, mApplicationBarItemsIndexSeed++);
 
                     btn.Click += new EventHandler(
                         delegate(object from, EventArgs target)
@@ -220,10 +267,10 @@ namespace MoSync
                             Memory eventData = new Memory(12);
                             const int MAWidgetEventData_eventType = 0;
                             const int MAWidgetEventData_widgetHandle = 4;
-                            const int MAWidgetEventData_itemIndex = 12;
+                            const int MAWidgetEventData_itemIndex = 8;
                             eventData.WriteInt32(MAWidgetEventData_eventType, MoSync.Constants.MAW_EVENT_OPTIONS_MENU_ITEM_SELECTED);
                             eventData.WriteInt32(MAWidgetEventData_widgetHandle, _widget);
-                            eventData.WriteInt32(MAWidgetEventData_itemIndex, mApplicationBarItemsIndex);
+                            eventData.WriteInt32(MAWidgetEventData_itemIndex, mApplicationBarItemsIndexes[btn]);
                             //Posting a CustomEvent
                             runtime.PostCustomEvent(MoSync.Constants.EVENT_TYPE_WIDGET, eventData);
                         });
@@ -231,12 +278,18 @@ namespace MoSync
                     screen.GetApplicationBar().Buttons.Add(btn);
                     screen.EnableApplicationBar();
                 }
+                //If the iconPath is empty then we have an ApplicationBarMenuItem.
                 else
                 {
-                    string menuItemText = core.GetDataMemory().ReadStringAtAddress(_title); //read the text
+                    //Read the text.
+                    string menuItemText = core.GetDataMemory().ReadStringAtAddress(_title);
+
+                    //Create the native object.
                     Microsoft.Phone.Shell.ApplicationBarMenuItem menuItem = new Microsoft.Phone.Shell.ApplicationBarMenuItem();
                     menuItem.Text = menuItemText;
-                    mApplicationBarItemsIndex++;
+
+                    //Associate an index to the native object.
+                    mApplicationBarItemsIndexes.Add(menuItem, mApplicationBarItemsIndexSeed++);
 
                     menuItem.Click += new EventHandler(
                         delegate(object from, EventArgs target)
@@ -244,19 +297,20 @@ namespace MoSync
                             Memory eventData = new Memory(12);
                             const int MAWidgetEventData_eventType = 0;
                             const int MAWidgetEventData_widgetHandle = 4;
-                            const int MAWidgetEventData_itemIndex = 12;
+                            const int MAWidgetEventData_itemIndex = 8;
                             eventData.WriteInt32(MAWidgetEventData_eventType, MoSync.Constants.MAW_EVENT_OPTIONS_MENU_ITEM_SELECTED);
                             eventData.WriteInt32(MAWidgetEventData_widgetHandle, _widget);
-                            eventData.WriteInt32(MAWidgetEventData_itemIndex, mApplicationBarItemsIndex);
+                            eventData.WriteInt32(MAWidgetEventData_itemIndex, mApplicationBarItemsIndexes[menuItem]);
                             //Posting a CustomEvent
                             runtime.PostCustomEvent(MoSync.Constants.EVENT_TYPE_WIDGET, eventData);
                         });
 
-                    screen.GetApplicationBar().Buttons.Add(menuItem);
+                    screen.GetApplicationBar().MenuItems.Add(menuItem);
                     screen.EnableApplicationBar();
                 }
 
-                return mApplicationBarItemsIndex;
+                //Return the index associated to the item.
+                return (mApplicationBarItemsIndexSeed - 1);
             };
         }
     }

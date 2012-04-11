@@ -202,6 +202,10 @@ namespace MoSync
                 return mStack.Count;
             }
 
+            /*
+             * Toggles the application bar for the screen given as parameter.
+             * @param child the screen for which the application bar should be changed / updated.
+             */
             private void ToggleApplicationBar(Screen child)
             {
                 bool appBarVisible = child.GetApplicationBarVisibility();

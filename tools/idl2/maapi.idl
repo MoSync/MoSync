@@ -7873,9 +7873,10 @@ group WidgetAPI "Widget API" {
 	* \param widget Handle to the screen widget.
 	* \param title The title associated for the new item. Can be left null.
 	* \param iconPath The path to an image or  a predefined icon, one of the \link #MAW_OPTIONS_MENU_ICON_CONSTANT \endlink constants.
-	* Note that on in order to make this work on
-	* Windows phone 7 the option menu icons would have to be added under the following folder
-	* structure "/resources/OptionMenuItemIcons"
+	* Note that for Windows phone 7 the option menu icons must be added under the following folder
+	* structure "/ApplicationBarIcons/". The function is called with the name of the icon file.
+	* e.g. maWidgetScreenAddOptionsMenuItem(ScreenHandle, "test", "optionsMenuItemIcon.png", 0); where the
+	* file optionsMenuItemIcon.png is found in the folder "/ApplicationBarIcons".
 	* Can be left null. Note that on windows phone 7 a null option menu item icon means that the item
 	* will be a part of the extendable menu item list from the native Application Bar.
 	* \iconPredefined Specifies if the icon is a project resource, or one of the predefined Android icons.

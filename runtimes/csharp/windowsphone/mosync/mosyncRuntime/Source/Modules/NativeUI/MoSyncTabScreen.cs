@@ -53,6 +53,8 @@ namespace MoSync
             {
                 mPivot = new Microsoft.Phone.Controls.Pivot();
 
+                //The application bar is chanded at the SelectionChanged event occurence.
+                //This allows the user to have more that one application bar / tabScreen
                 mPivot.LoadedPivotItem += new EventHandler<Microsoft.Phone.Controls.PivotItemEventArgs>(
                     delegate(object from, Microsoft.Phone.Controls.PivotItemEventArgs target)
                     {
