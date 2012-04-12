@@ -48,9 +48,11 @@ namespace MoSync
         public class ModalDialog : WidgetBaseWindowsPhone
         {
             /*
-             * The Popup control used as a dialog view
+             * The canvas used as a background for the dialog view. It contains the
+             * stack panel that holds all the controls and behaves like a transparent overlay over the
+             * screen that presented the dialog view.
              */
-            protected Popup mDialogPopUp;
+            protected Canvas mDialogBackground;
 
             /*
              * The stack panel control that is used to encapsulate the dialog view
@@ -108,12 +110,14 @@ namespace MoSync
                 mDialogView.Children.Add(titleTextBlock);
 
                 // create the transparent background of the popup control
-                mDialogPopUp = new Popup();
-                mDialogPopUp.Child = new StackPanel(); ;
-                ((StackPanel)mDialogPopUp.Child).Children.Add(mDialogView);
-                ((StackPanel)mDialogPopUp.Child).Background = GetColorFromHexa(dialogViewOverlayColor);
+                mDialogBackground = new Canvas();
+                mDialogBackground.Background = GetColorFromHexa(dialogViewOverlayColor);
+                mDialogBackground.Children.Add(mDialogView);
 
-                mView = mDialogPopUp;
+                mView = mDialogBackground;
+
+                // we need to change the width and the height of the mDialogView manually when the orientation changes
+                (Application.Current.RootVisual as Microsoft.Phone.Controls.PhoneApplicationFrame).OrientationChanged += new EventHandler<Microsoft.Phone.Controls.OrientationChangedEventArgs>(OrientationChangedHandler);
             }
 
             // The AddChild implementation
@@ -149,7 +153,15 @@ namespace MoSync
              */
             public void ShowDialog(bool show)
             {
-                mDialogPopUp.IsOpen = show;
+                mDialogBackground.Visibility = (show ? Visibility.Visible : Visibility.Collapsed);
+                if (mDialogBackground.Visibility == Visibility.Visible)
+                {
+                    (((Application.Current.RootVisual as PhoneApplicationFrame).Content as PhoneApplicationPage).Content as Grid).Children.Add(mDialogBackground);
+                }
+                else
+                {
+                    (((Application.Current.RootVisual as PhoneApplicationFrame).Content as PhoneApplicationPage).Content as Grid).Children.Remove(mDialogBackground);
+                }
             }
 
             /**
@@ -165,6 +177,29 @@ namespace MoSync
                         Convert.ToByte(hexaColor.Substring(7, 2), 16)
                     )
                 );
+            }
+
+            /**
+             * The Orientation changed event handler
+             * Currently it contains the functionality for the orientation changed event.
+             * @param from Object the object that triggers the event
+             * @param args Microsoft.Phone.Controls.OrientationChangedEventArgs the event arguments
+             */
+            public void OrientationChangedHandler(object from, Microsoft.Phone.Controls.OrientationChangedEventArgs args)
+            {
+                // We dont need to change the background canvas width/height because they're automatically
+                // redimensioned when the mDialogView child changes it's shape.
+                if (args.Orientation == PageOrientation.Landscape || args.Orientation == PageOrientation.LandscapeLeft ||
+                    args.Orientation == PageOrientation.LandscapeRight)
+                {
+                    mDialogView.Width = Application.Current.Host.Content.ActualHeight - 2 * marginDistance;
+                    mDialogView.Height = Application.Current.Host.Content.ActualWidth - marginDistance;
+                }
+                else
+                {
+                    mDialogView.Width = Application.Current.Host.Content.ActualWidth - 2 * marginDistance;
+                    mDialogView.Height = Application.Current.Host.Content.ActualHeight - marginDistance;
+                }
             }
         }
     }
