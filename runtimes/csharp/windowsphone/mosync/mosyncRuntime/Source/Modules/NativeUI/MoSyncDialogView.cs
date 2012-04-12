@@ -109,14 +109,11 @@ namespace MoSync
 
                 // create the transparent background of the popup control
                 mDialogPopUp = new Popup();
-                mDialogPopUp.Child = new StackPanel();
-                ((StackPanel)mDialogPopUp.Child).Background = GetColorFromHexa(dialogViewOverlayColor);
+                mDialogPopUp.Child = new StackPanel(); ;
                 ((StackPanel)mDialogPopUp.Child).Children.Add(mDialogView);
+                ((StackPanel)mDialogPopUp.Child).Background = GetColorFromHexa(dialogViewOverlayColor);
 
                 mView = mDialogPopUp;
-
-                // because the popup is not added as a child to a widget, we need to change the orientation manually
-                (Application.Current.RootVisual as Microsoft.Phone.Controls.PhoneApplicationFrame).OrientationChanged += new EventHandler<Microsoft.Phone.Controls.OrientationChangedEventArgs>(OrientationChangedHandler);
             }
 
             // The AddChild implementation
@@ -168,57 +165,6 @@ namespace MoSync
                         Convert.ToByte(hexaColor.Substring(7, 2), 16)
                     )
                 );
-            }
-
-            /**
-             * The Orientation changed event handler
-             * Currently it contains the functionality for the orientation changed event.
-             * @param from Object the object that triggers the event
-             * @param args Microsoft.Phone.Controls.OrientationChangedEventArgs the event arguments
-             */
-            public void OrientationChangedHandler(object from, Microsoft.Phone.Controls.OrientationChangedEventArgs args)
-            {
-                // Because the popup is not inside the application visual tree, it's not automatically rotated. We
-                // need to do this manually.
-                RotateTransform transform = new RotateTransform();
-                transform.Angle = 0d;
-                double newWidth = 0, newHeight = 0;
-                double horizontalOffset = 0, verticalOffset = 0;
-
-                // Based on the new orientation, we decide the rotate angle, the new width/heigth and
-                // the new offsets (this one is needed because after a rotate, the popup might be outside
-                // the visible area).
-                switch (args.Orientation)
-                {
-                    case PageOrientation.LandscapeRight:
-                        newWidth = Application.Current.Host.Content.ActualHeight - marginDistance * 2;
-                        newHeight = Application.Current.Host.Content.ActualWidth - marginDistance;
-                        transform.Angle = -90d;
-                        horizontalOffset = -Application.Current.Host.Content.ActualHeight;
-                        verticalOffset = 0;
-                        break;
-                    case PageOrientation.LandscapeLeft:
-                        newWidth = Application.Current.Host.Content.ActualHeight - marginDistance * 2;
-                        newHeight = Application.Current.Host.Content.ActualWidth - marginDistance;
-                        transform.Angle = 90d;
-                        horizontalOffset = 0;
-                        verticalOffset = -Application.Current.Host.Content.ActualWidth;
-                        break;
-                    case PageOrientation.PortraitUp:
-                        newWidth = Application.Current.Host.Content.ActualWidth - marginDistance * 2;
-                        newHeight = Application.Current.Host.Content.ActualHeight - marginDistance;
-                        transform.Angle = 0;
-                        break;
-                }
-
-                // rotate the popup
-                mDialogPopUp.RenderTransform = transform;
-                // set the new width/heigth
-                mDialogView.Width = newWidth;
-                mDialogView.Height = newHeight;
-                // translate the popup along the x and y axis
-                mDialogPopUp.HorizontalOffset = horizontalOffset;
-                mDialogPopUp.VerticalOffset = verticalOffset;
             }
         }
     }
