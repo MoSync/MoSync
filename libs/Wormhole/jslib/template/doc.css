@@ -85,6 +85,13 @@ p {
 	text-shadow:#FFFFFF 0px 1px 1px;
 	
 }
+
+#sidebar a[href] {
+	white-space: nowrap;
+	text-decoration: none;
+	color:#0065A0;
+}
+
 #contents_div {
   bottom:0px;
   left:340px;
@@ -317,6 +324,7 @@ hr:before {
 }
 #index ul li {
 	list-style: none;
+	overflow:hidden;
 }
 
 /* pretty printing */

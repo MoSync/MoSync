@@ -1813,8 +1813,17 @@ namespace Base {
 		}
 	}
 
-
-
+	SYSCALL(int, maWakeLock(int flag))
+	{
+		if (MA_WAKE_LOCK_ON == flag)
+		{
+			[UIApplication sharedApplication].idleTimerDisabled = YES;
+		}
+		else
+		{
+			[UIApplication sharedApplication].idleTimerDisabled = NO;
+		}
+	}
 
     SYSCALL(int, maSensorStart(int sensor, int interval))
 	{
@@ -2040,6 +2049,7 @@ namespace Base {
 		maIOCtl_case(maCameraRecord);
 		maIOCtl_case(maCameraSetProperty);
 		maIOCtl_case(maCameraGetProperty);
+		maIOCtl_case(maWakeLock);
         maIOCtl_case(maSensorStart);
         maIOCtl_case(maSensorStop);
 		maIOCtl_case(maImagePickerOpen);

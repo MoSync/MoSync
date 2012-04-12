@@ -50,12 +50,14 @@ import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_ALERT;
 import static com.mosync.internal.generated.MAAPI_consts.MA_RESOURCE_OPEN;
 import static com.mosync.internal.generated.MAAPI_consts.MA_RESOURCE_CLOSE;
 
+import static com.mosync.internal.generated.MAAPI_consts.MA_WAKE_LOCK_ON;
+import static com.mosync.internal.generated.MAAPI_consts.MA_WAKE_LOCK_OFF;
+
 import java.io.File;
 import java.io.FileDescriptor;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
@@ -84,6 +86,7 @@ import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.PorterDuff.Mode;
@@ -100,7 +103,7 @@ import android.os.Vibrator;
 import android.telephony.TelephonyManager;
 import android.telephony.gsm.GsmCellLocation;
 import android.util.Log;
-import android.view.View;
+import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.FrameLayout;
@@ -118,7 +121,6 @@ import com.mosync.java.android.MoSyncService;
 import com.mosync.java.android.TextBox;
 import com.mosync.nativeui.ui.widgets.MoSyncCameraPreview;
 import com.mosync.nativeui.ui.widgets.ScreenWidget;
-import com.mosync.nativeui.ui.widgets.Widget;
 import com.mosync.nativeui.util.AsyncWait;
 
 /**
@@ -1790,33 +1792,22 @@ public class MoSyncThread extends Thread
 				imageResource.mBitmap.getWidth() );
 		}
 
-		if (android.os.Build.VERSION.SDK_INT <= android.os.Build.VERSION_CODES.DONUT)
-		{
-			// In 1.6 and below we use the version that includes the bug fix.
-			_maGetImageDataAlphaBugFix(
-				image,
-				imageResource,
-				dst,
-				srcLeft,
-				srcTop,
-				srcWidth,
-				srcHeight,
-				scanLength);
-		}
-		else
-		{
-			// Above 1.6 we can use the faster version. This is about 2-5 times
-			// faster depending on the device/platform.
-			_maGetImageDataFast(
-				image,
-				imageResource,
-				dst,
-				srcLeft,
-				srcTop,
-				srcWidth,
-				srcHeight,
-				scanLength);
-		}
+		// TODO: removed the "fast" version because of a bug, visual output
+		// looks bad, run TestApp to test, fix this in 3.1. We use the "slow"
+		// version for now. Try approach to see if .hasAlpha() can be used.
+
+		// if (android.os.Build.VERSION.SDK_INT <= android.os.Build.VERSION_CODES.DONUT)
+
+		// In 1.6 and below we use the version that includes the bug fix.
+		_maGetImageDataAlphaBugFix(
+			image,
+			imageResource,
+			dst,
+			srcLeft,
+			srcTop,
+			srcWidth,
+			srcHeight,
+			scanLength);
 
 		/*
 		 * For what it is worth, this might be interesting to investigate,
@@ -1828,6 +1819,9 @@ public class MoSyncThread extends Thread
 	}
 
 	/**
+	 * TODO: Not used, results look bad on tansparent pixels,
+	 * test to enable in 3.1. Call from maGetImageData.
+	 *
 	 * Plain way of getting the image pixel data.
 	 *
 	 * @param image
@@ -1839,6 +1833,7 @@ public class MoSyncThread extends Thread
 	 * @param srcHeight
 	 * @param scanLength
 	 */
+	@SuppressWarnings("unused")
 	private void _maGetImageDataFast(
 		int image,
 		ImageCache imageResource,
@@ -1853,7 +1848,7 @@ public class MoSyncThread extends Thread
 		{
 			int pixels[] = new int[srcWidth * srcHeight];
 
-			IntBuffer intBuffer = getMemorySlice(dst, -1).asIntBuffer();
+			IntBuffer intBuffer = getMemorySlice(dst, -1).order(null).asIntBuffer();
 
 			imageResource.mBitmap.getPixels(
 				pixels,
@@ -1925,7 +1920,7 @@ public class MoSyncThread extends Thread
 		//mMemDataSection.position(dst);
 		//IntBuffer intBuffer = mMemDataSection.asIntBuffer();
 
-		IntBuffer intBuffer = getMemorySlice(dst, -1).asIntBuffer();
+		IntBuffer intBuffer = getMemorySlice(dst, -1).order(null).asIntBuffer();
 
 		try
 		{
@@ -1953,7 +1948,10 @@ public class MoSyncThread extends Thread
 
 				for( int i = 0; i < srcWidth; i++)
 				{
-					pixels[i] = (alpha[i]&0xff000000) + (colors[i]&0x00ffffff);
+					pixels[i] = Color.argb(Color.alpha(alpha[i]),
+							Color.red(colors[i]), Color.green(colors[i]),
+							Color.blue(colors[i]));
+					//pixels[i] = (alpha[i]&0xff000000) + (colors[i]&0x00ffffff);
 				}
 
 				intBuffer.put(pixels);
@@ -3931,6 +3929,43 @@ public class MoSyncThread extends Thread
 	int maHomeScreenEventsOnOff(int eventsOn)
 	{
 		return mMoSyncHomeScreen.maHomeScreenEventsOnOff(eventsOn);
+	}
+
+	/**
+	 * Activate/deactivate wake lock.
+	 * @param flag
+	 */
+	int maWakeLock(final int flag)
+	{
+		getActivity().runOnUiThread(new Runnable()
+		{
+			public void run()
+			{
+				try
+				{
+					if (MA_WAKE_LOCK_ON == flag)
+					{
+						Window w = mContext.getWindow();
+						w.setFlags(
+							WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON,
+							WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+					}
+					else
+					{
+						Window w = mContext.getWindow();
+						w.setFlags(
+							0,
+							WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+					}
+				}
+				catch(Exception ex)
+				{
+					Log.i("MoSync", "maWakeLock: Could not set wake lock.");
+					ex.printStackTrace();
+				}
+			}
+		});
+		return 1;
 	}
 
 	/**
