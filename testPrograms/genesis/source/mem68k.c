@@ -563,8 +563,8 @@ unsigned int m68k_read_memory_16 (unsigned int address)
       }
 
     default:	/* ROM */
-			return *(uint16 *)(rom_readmap[offset] + (address & 0x7ffff));
-			//return *(uint16 *)(rom_readmap[offset] + (address & 0x7fffe));			
+			//return *(uint16 *)(rom_readmap[offset] + (address & 0x7ffff));
+			return *(uint16 *)(rom_readmap[offset] + (address & 0x7fffe));
   }
 }
 

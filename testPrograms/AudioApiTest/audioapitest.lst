@@ -1,0 +1,11 @@
+.res R_MP3
+.ubin
+.include "mobilesorcery2.mp3"
+
+.res R_WAV
+.bin
+.include "mobilesorcery2.wav"
+
+.res R_LOCAL_FILES
+.ubin
+.include "Resources/LocalFiles.bin"
