@@ -37,6 +37,13 @@ NSString* const kRequestMethodTypePost = @"POST";
 // JSON template used for verifying a receipt.
 NSString* const kReceiptTemplateJSON = @"{ \"receipt-data\" : \"%@\" }";
 
+// Tags for the confirmation receipt received from Apple App Store.
+NSString* const kReceiptResponseStatusKey = @"status";
+NSString* const kReceiptResponseReceiptKey = @"receipt";
+
+// Status code for a valid receipt.
+#define RECEIPT_STATUS_CODE_OK [NSNumber numberWithInt:1]
+
 /**
  * Hidden methods for PurchaseProduct class.
  */
@@ -79,6 +86,18 @@ NSString* const kReceiptTemplateJSON = @"{ \"receipt-data\" : \"%@\" }";
  */
 -(void) handleTransactionStateRestored:(SKPaymentTransaction*) transaction;
 
+/**
+ * Create JSON parser components.
+ */
+-(void) createParserComponents;
+
+/**
+ * The JSON receipt has been received and parsed.
+ * Notify the user about it.
+ * @param storeReceipt Response from the Apple App Store.
+ */
+-(void) handleReceiptResponse:(NSDictionary*) storeResponse;
+
 @end
 
 @implementation PurchaseProduct
@@ -104,6 +123,8 @@ NSString* const kReceiptTemplateJSON = @"{ \"receipt-data\" : \"%@\" }";
         _productRequest.delegate = self;
         [_productRequest start];
         _payment = nil;
+
+        [self createParserComponents];
     }
 
     return self;
@@ -236,6 +257,42 @@ NSString* const kReceiptTemplateJSON = @"{ \"receipt-data\" : \"%@\" }";
     return MA_PURCHASE_RES_OK;
 }
 
+/**
+ * Get a receipt field value.
+ * @param fieldName The given field.
+ * @param buffer Will contain the field value.
+ * @param bufferSize Maximum size of the buffer.
+ * @return The number of written bytes in case of success, or
+ * one of the next result codes:
+ * - MA_PURCHASE_RES_BUFFER_TOO_SMALL if the buffer is too small.
+ * - MA_PURCHASE_RES_RECEIPT_NOT_AVAILABLE if the receipt has not been received or if
+ * transaction is invalid.
+ */
+-(int) getReceiptField:(const char*) fieldName
+                buffer:(char*) buffer
+            bufferSize:(const int) bufferSize
+{
+    if (!_validationResponse)
+    {
+        return MA_PURCHASE_RES_RECEIPT_NOT_AVAILABLE;
+    }
+    NSString* key = [NSString stringWithUTF8String:fieldName];
+    NSString* fieldValue = [_validationResponse objectForKey:key];
+    if (!fieldValue)
+    {
+        return MA_PURCHASE_RES_INVALID_FIELD_NAME;
+    }
+
+    int fieldValueLength = [fieldValue length];
+    if (fieldValueLength < bufferSize)
+    {
+        return MA_PURCHASE_RES_BUFFER_TOO_SMALL;
+    }
+
+    [fieldValue getCString:buffer maxLength:bufferSize encoding:NSASCIIStringEncoding];
+    return fieldValueLength;
+}
+
 #pragma mark NSURLConnectionDelegate methods
 
 /*!
@@ -249,6 +306,9 @@ NSString* const kReceiptTemplateJSON = @"{ \"receipt-data\" : \"%@\" }";
     NSString* text = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
     NSLog(@"text received: %@", text);
     [text release];
+
+    // Parse the JSON.
+	[_streamParser parse:data];
 }
 
 /*!
@@ -258,9 +318,39 @@ NSString* const kReceiptTemplateJSON = @"{ \"receipt-data\" : \"%@\" }";
  */
 - (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error
 {
-    NSLog(@"Connection failed! Error - %@ %@",
+    NSLog(@"IN %s Connection failed! Error - %@ %@",
+          __FUNCTION__,
          [error localizedDescription],
          [[error userInfo] objectForKey:NSURLErrorFailingURLStringErrorKey]);
+    [self sendPurchaseEvent:MA_PURCHASE_EVENT_RECEIPT_ERROR
+                      state:0
+                  errorCode:MA_PURCHASE_ERROR_CONNECTION_FAILED];
+}
+
+#pragma mark SBJsonStreamParserAdapterDelegate methods
+
+/**
+ * Called when a JSON object is found.
+ * This method is called if a JSON object is found.
+ */
+- (void)parser:(SBJsonStreamParser*)parser foundObject:(NSDictionary*)dict
+{
+    NSLog(@"IN %s foundObject: %@", __FUNCTION__, [dict description]);
+
+    [self handleReceiptResponse:dict];
+}
+
+/**
+ * Called if a JSON array is found
+ * This method is called if a JSON array is found.
+ */
+- (void)parser:(SBJsonStreamParser*)parser foundArray:(NSArray*)array
+{
+    NSLog(@"IN %s", __FUNCTION__);
+    // The respone should contain an object and not an array.
+    [self sendPurchaseEvent:MA_PURCHASE_EVENT_RECEIPT_ERROR
+                      state:0
+                  errorCode:MA_PURCHASE_ERROR_CANNOT_PARSE_RECEIPT];
 }
 
 /**
@@ -273,6 +363,9 @@ NSString* const kReceiptTemplateJSON = @"{ \"receipt-data\" : \"%@\" }";
     [_product release];
     [_payment release];
     [_transaction release];
+    [_streamParser release];
+    [_parserAdapter release];
+    [_validationResponse release];
 
     [super dealloc];
 }
@@ -350,6 +443,64 @@ NSString* const kReceiptTemplateJSON = @"{ \"receipt-data\" : \"%@\" }";
     [self sendPurchaseEvent:MA_PURCHASE_EVENT_RESTORED
                       state:MA_PURCHASE_STATE_COMPLETED
                   errorCode:0];
+}
+
+/**
+ Create JSON parser components
+ */
+-(void) createParserComponents
+{
+    _parserAdapter = [[SBJsonStreamParserAdapter alloc] init];
+
+	// Set ourselves as the delegate, so we receive the messages
+	// from the adapter.
+	_parserAdapter.delegate = self;
+
+	// Create a new stream parser..
+	_streamParser = [[SBJsonStreamParser alloc] init];
+    _streamParser.delegate = _parserAdapter;
+
+    // Normally it's an error if JSON is followed by anything but
+	// whitespace. Setting this means that the parser will be
+	// expecting the stream to contain multiple whitespace-separated
+	// JSON documents.
+	_streamParser.supportMultipleDocuments = YES;
+}
+
+/**
+ * The JSON receipt has been received and parsed.
+ * Notify the user about it.
+ * @param storeReceipt Response from the Apple App Store.
+ */
+-(void) handleReceiptResponse:(NSDictionary*) storeResponse
+{
+    NSLog(@"IN %s validationResponse: %@", __FUNCTION__, storeResponse);
+    NSNumber* statusCode = [storeResponse objectForKey:kReceiptResponseStatusKey];
+    if (!statusCode)
+    {
+        [self sendPurchaseEvent:MA_PURCHASE_EVENT_RECEIPT_ERROR
+                          state:0
+                      errorCode:MA_PURCHASE_ERROR_CANNOT_PARSE_RECEIPT];
+        return;
+    }
+    if ([statusCode isEqualToNumber:RECEIPT_STATUS_CODE_OK])
+    {
+        [self sendPurchaseEvent:MA_PURCHASE_EVENT_RECEIPT_VALID
+                          state:0
+                      errorCode:0];
+        [_validationResponse release];
+        NSDictionary* receiptDict = [storeResponse objectForKey:receiptDict];
+        if (receiptDict)
+        {
+            _validationResponse = [receiptDict retain];
+        }
+    }
+    else
+    {
+        [self sendPurchaseEvent:MA_PURCHASE_EVENT_RECEIPT_INVALID
+                          state:0
+                      errorCode:0];
+    }
 }
 
 @end

@@ -28,11 +28,14 @@
 #import <StoreKit/StoreKit.h>
 
 #import "helpers/cpp_defs.h"
+#import "SBJson.h"
 
 /**
  * @brief MoSync product class.
  */
-@interface PurchaseProduct: NSObject<SKProductsRequestDelegate, NSURLConnectionDelegate>
+@interface PurchaseProduct: NSObject<SKProductsRequestDelegate,
+                                     NSURLConnectionDelegate,
+                                     SBJsonStreamParserAdapterDelegate>
 {
     /**
      * Local handle.
@@ -64,6 +67,21 @@
      * Valid only if the product has been purchased or restored.
      */
     SKPaymentTransaction* _transaction;
+
+    /**
+     * Used for parsing JSON documents.
+     */
+    SBJsonStreamParser* _streamParser;
+
+    /**
+     * Used for receiving messages through SBJsonStreamParserAdapterDelegate.
+     */
+    SBJsonStreamParserAdapter* _parserAdapter;
+
+    /**
+     * Validation response received from Apple App Store.
+     */
+    NSDictionary* _validationResponse;
 }
 
 /**
@@ -105,6 +123,21 @@
  * - MA_PURCHASE_RES_RECEIPT if the product has not been purchased.
  */
 -(int) verifyReceipt:(NSString*) storeURL;
+
+/**
+ * Get a receipt field value.
+ * @param fieldName The given field.
+ * @param buffer Will contain the field value.
+ * @param bufferSize Maximum size of the buffer.
+ * @return The number of written bytes in case of success, or
+ * one of the next result codes:
+ * - MA_PURCHASE_RES_BUFFER_TOO_SMALL if the buffer is too small.
+ * - MA_PURCHASE_RES_RECEIPT_NOT_AVAILABLE if the receipt has not been received or if
+ * transaction is invalid.
+ */
+-(int) getReceiptField:(const char*) fieldName
+                buffer:(char*) buffer
+            bufferSize:(const int) bufferSize;
 
 @property(nonatomic, readonly) MAHandle handle;
 

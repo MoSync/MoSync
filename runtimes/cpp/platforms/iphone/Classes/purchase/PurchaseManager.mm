@@ -171,6 +171,10 @@ static PurchaseManager *sharedInstance = nil;
     }
 
     SKPayment* payment = [product payment];
+    if (!payment)
+    {
+        NSLog(@"error in %s. Reason is %@", __FUNCTION__, @"payment is nil - invalid product id");
+    }
     [_paymentQueue addPayment:payment];
 }
 
@@ -216,6 +220,36 @@ static PurchaseManager *sharedInstance = nil;
     }
 
     return [product verifyReceipt:_storeURL];
+}
+
+/**
+ * Get a receipt field value.
+ * @param productHandle Handle to the product containing the receipt.
+ * @param fieldName The given field.
+ * @param buffer Will contain the field value.
+ * @param bufferSize Maximum size of the buffer.
+ * @return The number of written bytes in case of success, or
+ * one of the next result codes:
+ * - MA_PURCHASE_RES_INVALID_HANDLE if the productHandle is invalid.
+ * - MA_PURCHASE_RES_BUFFER_TOO_SMALL if the buffer is too small.
+ * - MA_PURCHASE_RES_RECEIPT_NOT_AVAILABLE if the receipt has not been received or if
+ * transaction is invalid.
+ */
+-(int) getReceiptField:(MAHandle) productHandle
+             fieldName:(const char*) fieldName
+                buffer:(char*) buffer
+            bufferSize:(const int) bufferSize
+{
+    NSNumber* key = [NSNumber numberWithInt:productHandle];
+    PurchaseProduct* product = [_productsDictionary objectForKey:key];
+    if (!product)
+    {
+        return MA_PURCHASE_RES_INVALID_HANDLE;
+    }
+
+    return [product getReceiptField:fieldName
+                             buffer:buffer
+                         bufferSize:bufferSize];
 }
 
 /**

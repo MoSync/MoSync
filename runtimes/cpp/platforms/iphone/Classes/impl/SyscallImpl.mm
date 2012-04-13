@@ -2007,6 +2007,14 @@ namespace Base {
 	{
         return [[PurchaseManager getInstance] verifyReceipt:productHandle];
 	}
+    SYSCALL(int, maPurchaseGetField(MAHandle productHandle, const char* fieldName,
+                                    char* buffer, const int bufferSize))
+	{
+        return [[PurchaseManager getInstance] getReceiptField:productHandle
+                                                    fieldName:fieldName
+                                                       buffer:buffer
+                                                   bufferSize:bufferSize];
+	}
 
 	SYSCALL(longlong, maIOCtl(int function, int a, int b, int c))
 	{
@@ -2159,6 +2167,7 @@ namespace Base {
         maIOCtl_case(maPurchaseGetName);
         maIOCtl_case(maPurchaseSetStoreURL);
         maIOCtl_case(maPurchaseVerifyReceipt);
+        maIOCtl_case(maPurchaseGetField);
 		}
 
 		return IOCTL_UNAVAILABLE;
