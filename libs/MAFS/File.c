@@ -37,6 +37,18 @@ int sprintf(char *buf, const char *fmt, ...);
 
 #define LOG(x, ...) //lprintfln
 
+// For debugging.
+#if(0)
+// Problems with newlib prevent use of lprintfln in this file.
+// Here are macros to make maWriteLog easier to use.
+#define MYLOG(message) maWriteLog(message, strlen(message))
+// Print a message and an int value.
+static char sLogBuf[1024];
+#define MYLOGN(message, intValue) if(1){\
+sprintf(sLogBuf, "%s%d", message, intValue);\
+maWriteLog(sLogBuf, strlen(sLogBuf));}
+#endif
+
 // ---------------------------------------------------------------------------------------
 // Virtual file system
 // Use Bundle tool to build a file system and load it as a resource
@@ -420,8 +432,11 @@ static int extractRecursively(VolumeEntry* vol, const char* basePath, int isRoot
 	int i;
 
 	// If we have no children this is a file.
-	if (0 == vol->numChildren)
+	// Ooops, it can be an empty directory,
+	// added check for type of file (VOL_TYPE_FILE).
+	if (VOL_TYPE_FILE == vol->type && 0 == vol->numChildren)
 	{
+		// Open file.
 		sprintf(path, "%s%s", basePath, vol->name);
 		file = openFileForWriting(path);
 		if (-1 == file) { return -1; }

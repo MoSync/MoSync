@@ -272,12 +272,17 @@ namespace Wormhole
 		// This function has been called.
 		mFileSystemIsExtracted = true;
 
-		// Display splash screen if this is the first time launch
-		// or if the checksum has changed.
+		// You can display splash screen if this is the
+		// first time launch or if the checksum has changed.
+		// TODO: Add library support for this? At least
+		// document how to do it yourself.
 		if (checksumHasChanged())
 		{
 			// Extract bundled files to the local file system.
 			mFileUtil->extractLocalFiles();
+
+			// Write the current checksum.
+			writeChecksum();
 		}
 	}
 
@@ -293,6 +298,8 @@ namespace Wormhole
 		// Read existing checksum value and check it.
 		MAUtil::String filePath = getFileUtil()->getLocalPath();
 		filePath += "MoSyncFileBundleChecksum";
+
+		// Get checksum of the file system bundle.
 		int checksum = getFileUtil()->getFileSystemChecksum(1);
 
 		MAUtil::String data;
@@ -302,10 +309,21 @@ namespace Wormhole
 			hasChanged = checksum != existingChecksum;
 		}
 
-		// Save checksum value if it has changed.
-		if (hasChanged && checksum != 0)
+		return hasChanged;
+	}
+
+	/**
+	 * Write the current checksum to file.
+	 */
+	void WebAppMoblet::writeChecksum()
+	{
+		// Get checksum of the file system bundle.
+		int checksum = getFileUtil()->getFileSystemChecksum(1);
+
+		// Save checksum value.
+		if (checksum != 0)
 		{
-			char checksumBuf[16];
+			char checksumBuf[32];
 			sprintf(checksumBuf, "%d", checksum);
 			getFileUtil()->writeTextToFile(filePath, checksumBuf);
 		}
