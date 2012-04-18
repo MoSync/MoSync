@@ -42,7 +42,7 @@ NSString* const kReceiptResponseStatusKey = @"status";
 NSString* const kReceiptResponseReceiptKey = @"receipt";
 
 // Status code for a valid receipt.
-#define RECEIPT_STATUS_CODE_OK [NSNumber numberWithInt:1]
+#define RECEIPT_STATUS_CODE_OK [NSNumber numberWithInt:0]
 
 /**
  * Hidden methods for PurchaseProduct class.
@@ -284,7 +284,7 @@ NSString* const kReceiptResponseReceiptKey = @"receipt";
     }
 
     int fieldValueLength = [fieldValue length];
-    if (fieldValueLength < bufferSize)
+    if (fieldValueLength > bufferSize)
     {
         return MA_PURCHASE_RES_BUFFER_TOO_SMALL;
     }
@@ -295,10 +295,10 @@ NSString* const kReceiptResponseReceiptKey = @"receipt";
 
 #pragma mark NSURLConnectionDelegate methods
 
-/*!
- Sent as a connection loads data incrementally.
- @param connection The connection sending the message.
- @param data The newly available data.
+/**
+ * Sent as a connection loads data incrementally.
+ * @param connection The connection sending the message.
+ * @param data The newly available data.
  */
 - (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data
 {
@@ -311,10 +311,10 @@ NSString* const kReceiptResponseReceiptKey = @"receipt";
 	[_streamParser parse:data];
 }
 
-/*!
- Sent when a connection fails to load its request successfully.
- @param connection The connection sending the message.
- @param error An error object containing details of why the connection failed to load the request successfully.
+/**
+ * Sent when a connection fails to load its request successfully.
+ * @param connection The connection sending the message.
+ * @param error An error object containing details of why the connection failed to load the request successfully.
  */
 - (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error
 {
@@ -489,7 +489,7 @@ NSString* const kReceiptResponseReceiptKey = @"receipt";
                           state:0
                       errorCode:0];
         [_validationResponse release];
-        NSDictionary* receiptDict = [storeResponse objectForKey:receiptDict];
+        NSDictionary* receiptDict = [storeResponse objectForKey:kReceiptResponseReceiptKey];
         if (receiptDict)
         {
             _validationResponse = [receiptDict retain];
