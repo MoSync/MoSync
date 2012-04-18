@@ -18,8 +18,10 @@ MA 02110-1301, USA.
 package com.mosync.nativeui.ui.widgets;
 
 import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnDismissListener;
 import android.view.ViewGroup;
-
+import com.mosync.internal.android.EventQueue;
 import com.mosync.internal.generated.IX_WIDGET;
 import com.mosync.nativeui.core.Types;
 import com.mosync.nativeui.util.properties.InvalidPropertyValueException;
@@ -57,12 +59,22 @@ public class DialogWidget extends Layout
 	 * @param handle handle Integer handle corresponding to this instance.
 	 * @param view A screen wrapped by this widget.
 	 */
-	public DialogWidget(int handle,AlertDialog.Builder builder, ViewGroup view)
+	public DialogWidget(int handle, AlertDialog.Builder builder, ViewGroup view)
 	{
 		super( handle, view );
 		m_dialogBuilder = builder;
 		m_dialog = m_dialogBuilder.create();
-		m_dialog.setCancelable(false);
+		m_dialog.setOnDismissListener(new OnDismissListener() {
+			@Override
+			public void onDismiss(DialogInterface dialog) {
+				EventQueue.getDefault( ).postWidgetEvent(
+						IX_WIDGET.MAW_EVENT_DIALOG_DISMISSED,
+						getHandle(),
+						0,
+						0);
+			}
+		});
+
 		m_container = view;
 	}
 
