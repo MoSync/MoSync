@@ -35,14 +35,13 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 // broken header files in linux/native
 int sprintf(char *buf, const char *fmt, ...);
 
+// Macros for or debugging.
 #define LOG(x, ...) //lprintfln
-
-// For debugging.
-#if(0)
 // Problems with newlib prevent use of lprintfln in this file.
 // Here are macros to make maWriteLog easier to use.
 #define MYLOG(message) maWriteLog(message, strlen(message))
 // Print a message and an int value.
+#if(0)
 static char sLogBuf[1024];
 #define MYLOGN(message, intValue) if(1){\
 sprintf(sLogBuf, "%s%d", message, intValue);\
@@ -438,6 +437,8 @@ static int extractRecursively(VolumeEntry* vol, const char* basePath, int isRoot
 	{
 		// Open file.
 		sprintf(path, "%s%s", basePath, vol->name);
+		//MYLOG("@@@EXTRACTING:");
+		//MYLOG(path);
 		file = openFileForWriting(path);
 		if (-1 == file) { return -1; }
 

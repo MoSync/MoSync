@@ -295,16 +295,18 @@ namespace Wormhole
 		// Assume checksum has changed (or does not exist).
 		bool hasChanged = true;
 
-		// Read existing checksum value and check it.
+		// Checksum file path.
 		MAUtil::String filePath = getFileUtil()->getLocalPath();
 		filePath += "MoSyncFileBundleChecksum";
 
-		// Get checksum of the file system bundle.
+		// Read checksum of the file system bundle.
 		int checksum = getFileUtil()->getFileSystemChecksum(1);
 
+		// REad checksum from file and compare.
 		MAUtil::String data;
 		if (getFileUtil()->readTextFromFile(filePath, data))
 		{
+			// Read from file succeeded. Compate values.
 			int existingChecksum = (int)strtol(data.c_str(), NULL, 10);
 			hasChanged = checksum != existingChecksum;
 		}
@@ -320,15 +322,17 @@ namespace Wormhole
 		// Get checksum of the file system bundle.
 		int checksum = getFileUtil()->getFileSystemChecksum(1);
 
+		// Checksum file path.
+		MAUtil::String filePath = getFileUtil()->getLocalPath();
+		filePath += "MoSyncFileBundleChecksum";
+
 		// Save checksum value.
 		if (checksum != 0)
 		{
-			char checksumBuf[32];
+			char checksumBuf[128];
 			sprintf(checksumBuf, "%d", checksum);
 			getFileUtil()->writeTextToFile(filePath, checksumBuf);
 		}
-
-		return hasChanged;
 	}
 
 } // namespace
