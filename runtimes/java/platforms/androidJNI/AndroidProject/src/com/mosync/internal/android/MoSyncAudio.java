@@ -41,6 +41,7 @@ import java.io.File;
 import java.io.FileDescriptor;
 import java.io.FileOutputStream;
 import java.nio.ByteBuffer;
+import java.nio.ShortBuffer;
 import java.nio.channels.FileChannel;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -52,6 +53,8 @@ import android.app.Activity;
 import android.content.Context;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.media.AudioTrack;
+import android.media.AudioFormat;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.media.MediaPlayer.OnErrorListener;
 import android.media.MediaPlayer.OnPreparedListener;
@@ -201,7 +204,7 @@ public class MoSyncAudio implements OnCompletionListener, OnPreparedListener, On
 
 		public AudioInstance(int sampleRate, int channels, int bufferSize)
 		{
-			mDynamic = true:
+			mDynamic = true;
 			mSampleRate = sampleRate;
 			mChannels = channels;
 			mBufferSize = bufferSize;
@@ -491,7 +494,7 @@ public class MoSyncAudio implements OnCompletionListener, OnPreparedListener, On
 
 	int maAudioInstanceCreateDynamic(int sampleRate, int numChannels, int bufferSize)
 	{
-		if(channelConfig<1 || channelConfig>2)
+		if(numChannels<1 || numChannels>2)
 			return -100;
 
 		int channelConfig = AudioFormat.CHANNEL_OUT_MONO;
