@@ -150,6 +150,7 @@ namespace MoSync
 
             /*
              * Method used to show/dismiss the dialog view.
+             * @param show: if show is true, the dialog will be shown and hidden otherwise.
              */
             public void ShowDialog(bool show)
             {
