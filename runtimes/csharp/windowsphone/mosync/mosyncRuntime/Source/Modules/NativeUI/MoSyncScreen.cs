@@ -38,18 +38,26 @@ namespace MoSync
     {
         public class Screen : WidgetBaseWindowsPhone, IScreen
         {
-            protected PhoneApplicationPage mPage;
+            protected Grid mPage;
+            private string mTitle;
 
             //The constructor
             public Screen()
             {
-                mPage = new PhoneApplicationPage();
+                mPage = new Grid();
+                mPage.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+                mPage.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) });
                 mView = mPage;
 
                 /**
                  * This will add a BackKeyPress event handler to the Application.Current.RootVisual, this is application wide
                  */
                 (Application.Current.RootVisual as Microsoft.Phone.Controls.PhoneApplicationFrame).BackKeyPress += new EventHandler<System.ComponentModel.CancelEventArgs>(BackKeyPressHandler);
+                /**
+                 * This will add a BackKeyPress event handler to the Application.Current.RootVisual, this is application wide
+                 */
+                (Application.Current.RootVisual as Microsoft.Phone.Controls.PhoneApplicationFrame).OrientationChanged += new EventHandler<Microsoft.Phone.Controls.OrientationChangedEventArgs>(OrientationChangedHandler);
+
             }
 
             /**
@@ -75,7 +83,7 @@ namespace MoSync
                             if ((this.mChildren[pivot.SelectedIndex] as StackScreen).StackCount() > 1 && (this.mChildren[pivot.SelectedIndex] as StackScreen).GetBackButtonEnabled() == true)
                             {
                                 //Do a pop and cancel the event
-                                (this.mChildren[pivot.SelectedIndex] as StackScreen).Pop();
+                                (this.mChildren[pivot.SelectedIndex] as StackScreen).PopFromBackButtonPressed();
                                 args.Cancel = true;
                             }
                         }
@@ -92,18 +100,53 @@ namespace MoSync
                         {
                             if ((this.GetParent() as PanoramaView).getSelectedScreen().Equals(this) && (this as StackScreen).StackCount() > 1)
                             {
-                                (this as StackScreen).Pop();
+                                (this as StackScreen).PopFromBackButtonPressed();
                                 args.Cancel = true;
                             }
                         }
                         else if((this as StackScreen).StackCount() > 1 && (this as StackScreen).GetBackButtonEnabled() == true)
                         {
                             //Do a pop and cancel the event
-                            (this as StackScreen).Pop();
+                            (this as StackScreen).PopFromBackButtonPressed();
                             args.Cancel = true;
                         }
                     }
                 }
+            }
+
+            /**
+             * The Orientation changed event handler
+             * Currently it contains the functionality for the orientation changed event.
+             * @param from Object the object that triggers the event
+             * @param args Microsoft.Phone.Controls.OrientationChangedEventArgs the event arguments
+             */
+            public void OrientationChangedHandler(object from, Microsoft.Phone.Controls.OrientationChangedEventArgs args)
+            {
+                PhoneApplicationPage currentPage = (((PhoneApplicationFrame)Application.Current.RootVisual).Content as PhoneApplicationPage);
+
+                // change the current page in regard to the current orientaion
+                if (args.Orientation == PageOrientation.Landscape |
+                    args.Orientation == PageOrientation.LandscapeLeft |
+                    args.Orientation == PageOrientation.LandscapeRight)
+                {
+                    currentPage.Height = Application.Current.Host.Content.ActualWidth;
+                    currentPage.Width = Application.Current.Host.Content.ActualHeight;
+                }
+                else if (args.Orientation == PageOrientation.Portrait |
+                         args.Orientation == PageOrientation.PortraitDown |
+                         args.Orientation == PageOrientation.PortraitUp)
+                {
+                    currentPage.Height = Application.Current.Host.Content.ActualHeight;
+                    currentPage.Width = Application.Current.Host.Content.ActualWidth;
+                }
+
+                // send the event to the mosync runtime
+                Memory eventData = new Memory(8);
+                const int MAWidgetEventData_eventType = 0;
+                const int MAWidgetEventData_widgetHandle = 4;
+                eventData.WriteInt32(MAWidgetEventData_eventType, MoSync.Constants.MAW_EVENT_SCREEN_ORIENTATION_DID_CHANGE);
+                eventData.WriteInt32(MAWidgetEventData_widgetHandle, mHandle);
+                mRuntime.PostCustomEvent(MoSync.Constants.EVENT_TYPE_WIDGET, eventData);
             }
 
             //The AddChild implementation
@@ -114,7 +157,9 @@ namespace MoSync
                 WidgetBaseWindowsPhone w = (WidgetBaseWindowsPhone)child;
                 MoSync.Util.RunActionOnMainThreadSync(() =>
                 {
-                    mPage.Content = w.View;
+                    mPage.Children.Add(w.View);
+                    Grid.SetColumn((w.View as FrameworkElement), 0);
+                    Grid.SetRow((w.View as FrameworkElement), 0);
                 });
             }
 
@@ -127,10 +172,11 @@ namespace MoSync
                 base.RemoveChild(child);
                 MoSync.Util.RunActionOnMainThreadSync(() =>
                 {
-                    mPage.Content = null;
+                    mPage.Children.Remove((child as WidgetBaseWindowsPhone).View as FrameworkElement);
                     if (0 < mChildren.Count)
                     {
-                        mPage.Content = (mChildren[mChildren.Count - 1] as WidgetBaseWindowsPhone).View;
+                        Grid.SetColumn((mPage.Children[mPage.Children.Count - 1] as FrameworkElement), 0);
+                        Grid.SetRow((mPage.Children[mPage.Children.Count - 1] as FrameworkElement), 0);
                     }
                 });
             }
@@ -146,9 +192,11 @@ namespace MoSync
                     base.RemoveChild(index);
                     MoSync.Util.RunActionOnMainThreadSync(() =>
                     {
+                        mPage.Children.RemoveAt(index);
                         if (0 < mChildren.Count)
                         {
-                            mPage.Content = (mChildren[mChildren.Count - 1] as WidgetBaseWindowsPhone).View;
+                            Grid.SetColumn((mPage.Children[mPage.Children.Count - 1] as FrameworkElement), 0);
+                            Grid.SetRow((mPage.Children[mPage.Children.Count - 1] as FrameworkElement), 0);
                         }
                     });
                 }
@@ -162,7 +210,7 @@ namespace MoSync
                 MoSync.Util.RunActionOnMainThreadSync(() =>
                 {
                     PhoneApplicationFrame frame = (PhoneApplicationFrame)Application.Current.RootVisual;
-                    frame.Content = mPage;
+                    (frame.Content as PhoneApplicationPage).Content = mPage;
                 });
             }
 
@@ -174,7 +222,15 @@ namespace MoSync
             {
                 set
                 {
-                    mPage.Title = value;
+                   mTitle = value;
+                }
+            }
+
+            public string getScreenTitle
+            {
+                get
+                {
+                    return mTitle;
                 }
             }
         }

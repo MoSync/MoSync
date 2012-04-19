@@ -236,7 +236,7 @@ static void injectIcons(const SETTINGS& s, const RuntimeInfo& ri) {
 			string outputDir = string(s.dst) + directories.at(i);
 			_mkdir(outputDir.c_str());
 			string outputIcon = outputDir + "/icon.png";
-			injectIcon("android", size.c_str(), s.icon, file(outputIcon).c_str(), s.silent);
+			injectIcon("Android", size.c_str(), s.icon, file(outputIcon).c_str(), s.silent);
 		}
 	}
 }
@@ -293,6 +293,7 @@ static void writeManifest(const char* filename, const SETTINGS& s, const Runtime
 		<<"\t\t</activity>\n"
 		;
 	file <<"\t\t<service android:name=\"com.mosync.internal.android.notifications.LocalNotificationsService\" />\n";
+	file <<"\t\t<service android:name=\".MoSyncService\" />\n";
 
 	writeC2DMReceiver(file, packageName);
 

@@ -28,7 +28,12 @@ MA 02110-1301, USA.
  * @file WebViewMessage.h
  * @author Mikael Kindborg
  *
- * Class for parsing messages from a WebView.
+ * @brief Class for parsing messages from a WebView.
+ *
+ * @deprecated Use class MessageStream or MessageStreamJSON
+ * instead of this class. This class cannot be used with the
+ * the new version of the Wormhole JavaScrip library. It is
+ * included only for backwards compatibility.
  */
 
 #ifndef WORMHOLE_WEB_VIEW_MESSAGE_H_
@@ -43,7 +48,9 @@ namespace Wormhole
 {
 
 /**
- * Class that parses messages in the form of urls sent from a
+ * @brief Class that parses messages from the WebView.
+ *
+ * The messages are in the form of urls sent from a
  * WebView as MAW_EVENT_WEB_VIEW_HOOK_INVOKED events.
  *
  * Message (urls) used with this class has the format:

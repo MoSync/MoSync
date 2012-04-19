@@ -141,7 +141,7 @@ namespace Wormhole
 			{
 			case MA_CAPTURE_EVENT_TYPE_VIDEO:
 				//Videos are already stored, we need the filepath
-				maCaptureGetVideoPath(eventData.handle, pathBuffer, 512);
+				maCaptureGetVideoPath(eventData.handle, pathBuffer, 256);
 
 				sprintf(messageBuffer, "{\"message\":[{\"fullPath\":\"%s\",\"name\":\"%s\"}]}",
 						pathBuffer, FileNameFromPath(pathBuffer));

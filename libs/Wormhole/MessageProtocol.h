@@ -28,7 +28,7 @@ MA 02110-1301, USA.
  * @file MessageProtocol.h
  * @author Mikael Kindborg
  *
- * Class for reading the protocol of a message from a WebView.
+ * @brief Class for reading the protocol of a message from a WebView.
  */
 
 #ifndef WORMHOLE_MESSAGE_PROTOCOL_H_
@@ -41,6 +41,8 @@ namespace Wormhole
 {
 
 /**
+ * @brief Class that checks a Wormhole protocol.
+ *
  * This class checks the three character protocol specified
  * as part of a message sent from a WebView as a
  * MAW_EVENT_WEB_VIEW_HOOK_INVOKED event, using one of
@@ -50,9 +52,12 @@ namespace Wormhole
  *
  * Standard protocol prefixes are:
  *
- *   "ma:" MessageArrayJSON (sent with function mosync.bridge.sendJSON)
+ *   "ma:" MessageStreamJSON (sent with function mosync.bridge.sendJSON
  *
- *   "ms:" MessageStream (sent width function mosync.bridge.send)
+ *   "ms:" MessageStream (sent with function mosync.bridge.send)
+ *
+ * Note: "ma" is short for "message array", since JSON message
+ * objects are sent as an array.
  *
  * You can also use your own prefix and send the message string
  * using function mosync.bridge.sendRaw. The prefix must be two
@@ -73,7 +78,7 @@ public:
 
 	bool isMessageStream();
 
-	bool isMessageArrayJSON();
+	bool isMessageStreamJSON();
 
 private:
 	char mProtocol[3];

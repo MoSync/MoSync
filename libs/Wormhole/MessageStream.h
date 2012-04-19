@@ -28,7 +28,7 @@ MA 02110-1301, USA.
  * @file MessageStream.h
  * @author Mikael Kindborg
  *
- * Class for parsing a stream of messages from a WebView.
+ * @brief Class for parsing a stream of messages from a WebView.
  */
 
 #ifndef WORMHOLE_MESSAGE_STREAM_H_
@@ -41,7 +41,9 @@ namespace Wormhole
 {
 
 /**
- * Class that parses messages in the form of a message stream sent from a
+ * @brief Class that parses messages from the WebView.
+ *
+ * The messages are in the form of a message stream sent from a
  * WebView in a MAW_EVENT_WEB_VIEW_HOOK_INVOKED event.
  *
  * Messages used with this class has the format:

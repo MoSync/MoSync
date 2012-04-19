@@ -84,6 +84,11 @@ namespace test_mosync
         // This code will not execute when the application is reactivated
 		private MoSync.Machine machine = null;
 
+		public MoSync.Machine GetMachine()
+		{
+			return machine;
+		}
+
 		protected void InitExtensions(MoSync.Core core, MoSync.Runtime runtime)
 		{
 			try

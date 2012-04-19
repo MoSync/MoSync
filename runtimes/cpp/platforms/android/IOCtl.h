@@ -221,6 +221,8 @@ namespace Base
 	*/
 	int _maScreenStateEventsOnOff(int eventsOn, JNIEnv* jNIEnv, jobject jThis);
 
+	int _maWakeLock(int flag, JNIEnv* jNIEnv, jobject jThis);
+
 	int _maTextBox(const wchar* title, const wchar* inText, int outText,
 					int maxSize, int constraints, int memStart,
 					JNIEnv* jNIEnv, jobject jThis);
@@ -257,6 +259,10 @@ namespace Base
 	int _maWidgetGetProperty(int memStart, int widget, const char *property,
 								int memBuffer, int memBufferSize,
 								JNIEnv* jNIEnv, jobject jThis);
+
+	int _maWidgetScreenAddOptionsMenuItem(int widget, const char* title,
+											int iconHandle, int iconPredefined,
+											JNIEnv* jNIEnv, jobject jThis);
 
 	int _maWidgetScreenShow(int screenWidget, JNIEnv* jNIEnv, jobject jThis);
 	int _maWidgetStackScreenPush(int stackScreenWidget, int newScreen, JNIEnv* jNIEnv, jobject jThis);
@@ -759,7 +765,7 @@ namespace Base
 
 	int _maCameraFormatNumber(JNIEnv* jNIEnv, jobject jThis);
 
-	int _maCameraFormat(int index, int width, int height, JNIEnv* jNIEnv, jobject jThis);
+	int _maCameraFormat(int index, int sizeInfoBuffer, JNIEnv* jNIEnv, jobject jThis);
 
 	int _maCameraSetProperty(const char *property, const char* value,
 							JNIEnv* jNIEnv, jobject jThis);
@@ -1121,6 +1127,12 @@ namespace Base
 	int _maAudioSetVolume(
 		int audio,
 		float volume,
+		JNIEnv* jNIEnv,
+		jobject jThis);
+
+	//int maAudioPause(in MAAudioInstance audio);
+	int _maAudioPause(
+		int audio,
 		JNIEnv* jNIEnv,
 		jobject jThis);
 

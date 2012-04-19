@@ -16,6 +16,15 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301, USA.
 */
 
+/*! \addtogroup NotificationLib
+ *  @{
+ */
+
+/**
+ *  @defgroup NotificationLib Notification Library
+ *  @{
+ */
+
 /**
  * @file PushNotificationListener.h
  * @author Emma Tresanszki and Bogdan Iusco
@@ -28,6 +37,9 @@ MA 02110-1301, USA.
 #ifndef NOTIFICATION_PUSH_NOTIFICATION_LISTENER_H_
 #define NOTIFICATION_PUSH_NOTIFICATION_LISTENER_H_
 
+/**
+* \brief MoSync Notification API classes.
+*/
 namespace Notification
 {
 
@@ -61,10 +73,12 @@ namespace Notification
         /**
          * Called if the application did not registered for push notifications.
          */
-        virtual void didFaildToRegister(
+        virtual void didFailedToRegister(
             MAUtil::String& error){};
     };
 
 } // namespace Notification
 
 #endif /* NOTIFICATION_PUSH_NOTIFICATION_LISTENER_H_ */
+
+/*! @} */

@@ -110,12 +110,6 @@ namespace Wormhole
 		// Get string length and updated pointer.
 		int len = xtoi(p, &p);
 
-		if (len == 0)
-		{
-//			lprintfln("len == 0");
-			return NULL;
-		}
-
 		// Check boundary.
 		if (p - mData >= mDataSize)
 		{

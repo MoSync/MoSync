@@ -18,11 +18,15 @@ MA 02110-1301, USA.
 package com.mosync.nativeui.ui.factories;
 
 import android.app.Activity;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnKeyListener;
+import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.TextView.OnEditorActionListener;
 
 import com.mosync.internal.android.EventQueue;
 import com.mosync.internal.generated.IX_WIDGET;
@@ -42,6 +46,43 @@ public class EditBoxFactory implements AbstractViewFactory
 	public Widget create(Activity activity, final int handle)
 	{
 		final EditText editBox = new EditText( activity );
+
+		editBox.addTextChangedListener(new TextWatcher() {
+
+			@Override
+			public void onTextChanged(CharSequence s, int start, int before, int count) {
+				// TODO Auto-generated method stub
+				EventQueue.getDefault().postWidgetEvent(IX_WIDGET.MAW_EVENT_EDIT_BOX_TEXT_CHANGED, handle);
+			}
+
+			@Override
+			public void beforeTextChanged(CharSequence s, int start, int count,
+					int after) {
+				// TODO Auto-generated method stub
+			}
+
+			@Override
+			public void afterTextChanged(Editable s) {
+				// TODO Auto-generated method stub
+			}
+		});
+
+		editBox.setOnEditorActionListener( new OnEditorActionListener() {
+
+			@Override
+			public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+				if ( editBox == v )
+				{
+					if ( actionId == EditorInfo.IME_ACTION_DONE )
+					{
+						EventQueue.getDefault( ).postWidgetEvent( IX_WIDGET.MAW_EVENT_EDIT_BOX_RETURN, handle );
+						return true;
+					}
+				}
+				return false;
+			}
+		});
+
 		editBox.setOnKeyListener( new OnKeyListener( ) {
 			@Override
 			public boolean onKey(View v, int keyCode, KeyEvent event)

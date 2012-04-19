@@ -32,10 +32,10 @@
 }
 
 - (id)initWithFrame:(CGRect)rect;
-- (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event;
-- (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event;
-- (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event;
-- (void)touchesCancelled:(NSSet *)touches withEvent:(UIEvent *)event;
+- (void) handleTouchBegan:(UITouch *)touch;
+- (void) handleTouchMoved:(UITouch *)touch;
+- (void) handleTouchEnded:(UITouch *)touch;
+- (void) handleTouchCancelled:(UITouch *)touch;
 @end
 
 @implementation MoSyncUIWindow
@@ -54,57 +54,72 @@
     return scale;
 }
 
-- (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
+- (void) handleTouchBegan:(UITouch *)touch
+{
 	CGFloat screenScale = [self getScreenScale];
-
-    for (UITouch *touch in touches)
-	{
-		if(touch.phase ==  UITouchPhaseBegan) {
-			CGPoint point = [touch locationInView:self];
-			int touchId = [touchHelper addTouch: touch];
-			MoSync_AddTouchPressedEvent(point.x*screenScale, point.y*screenScale, touchId);
-		}
-	}
+    CGPoint point = [touch locationInView:self];
+    int touchId = [touchHelper addTouch: touch];
+    MoSync_AddTouchPressedEvent(point.x*screenScale, point.y*screenScale, touchId);
 }
 
-- (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event {
+- (void) handleTouchMoved:(UITouch *)touch
+{
 	CGFloat screenScale = [self getScreenScale];
-
-	for (UITouch *touch in touches)
-	{
-		if(touch.phase ==  UITouchPhaseMoved) {
-			CGPoint point = [touch locationInView:self];
-			int touchId = [touchHelper getTouchId: touch];
-			MoSync_AddTouchMovedEvent(point.x*screenScale, point.y*screenScale, touchId);
-		}
-	}
+    CGPoint point = [touch locationInView:self];
+    int touchId = [touchHelper getTouchId: touch];
+    MoSync_AddTouchMovedEvent(point.x*screenScale, point.y*screenScale, touchId);
 }
 
-- (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event {
+- (void) handleTouchEnded:(UITouch *)touch
+{
 	CGFloat screenScale = [self getScreenScale];
-
-    for (UITouch *touch in touches)
-	{
-		if(touch.phase ==  UITouchPhaseEnded) {
-			CGPoint point = [touch locationInView:self];
-			int touchId = [touchHelper getTouchId: touch];
-			MoSync_AddTouchReleasedEvent(point.x*screenScale, point.y*screenScale, touchId);
-			[touchHelper removeTouch: touch];
-		}
-	}
+    CGPoint point = [touch locationInView:self];
+    int touchId = [touchHelper getTouchId: touch];
+    MoSync_AddTouchReleasedEvent(point.x*screenScale, point.y*screenScale, touchId);
+    [touchHelper removeTouch: touch];
 }
 
-- (void)touchesCancelled:(NSSet *)touches withEvent:(UIEvent *)event {
-	for (UITouch *touch in touches)
-	{
-		if(touch.phase ==  UITouchPhaseCancelled) {
-			CGPoint point = [touch locationInView:self];
-			int touchId = [touchHelper getTouchId: touch];
-			MoSync_AddTouchReleasedEvent(point.x, point.y, touchId);
-			[touchHelper removeTouch: touch];
-		}
-	}
+- (void) handleTouchCancelled:(UITouch *)touch
+{
+    CGPoint point = [touch locationInView:self];
+    int touchId = [touchHelper getTouchId: touch];
+    MoSync_AddTouchReleasedEvent(point.x, point.y, touchId);
+    [touchHelper removeTouch: touch];
 }
+
+- (void)sendEvent:(UIEvent *)event
+{
+    [super sendEvent:event];
+
+    // Fix for MOSYNC-1593 Swipe Jesture doesn't work on images screen on NativeUIDemo.
+    // On iOS 5 touchesMoved, touchesEnded and touchesCancelled methods are not called.
+    // So we listen for all UIWindow related events, but handle only the touch related events.
+    UIEventType eventType = event.type;
+    if (eventType == UIEventTypeTouches)
+    {
+        NSSet* touches = [event allTouches];
+        for (UITouch* touch in [touches allObjects])
+        {
+            if(touch.phase ==  UITouchPhaseBegan)
+            {
+                [self handleTouchBegan:touch];
+            }
+            else if(touch.phase == UITouchPhaseMoved)
+            {
+                [self handleTouchMoved:touch];
+            }
+            else if(touch.phase == UITouchPhaseCancelled)
+            {
+                [self handleTouchCancelled:touch];
+            }
+            else if(touch.phase == UITouchPhaseEnded)
+            {
+                [self handleTouchEnded:touch];
+            }
+        }
+    }
+}
+
 @end
 
 

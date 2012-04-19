@@ -69,7 +69,7 @@
 		int viewHeight = childView.frame.size.height;
 
 		if([child getAutoSizeParamX] == FILL_PARENT) {
-			viewWidth = view.frame.size.width;
+			viewWidth = view.bounds.size.width;
 		}
 		else if([child getAutoSizeParamX] == WRAP_CONTENT) {
 			viewWidth = [childView sizeThatFits:CGSizeZero].width;
@@ -78,7 +78,7 @@
 		[childView setFrame:CGRectMake(childView.frame.origin.x, childView.frame.origin.y, viewWidth, viewHeight)];
 
 		if([child getAutoSizeParamY] == FILL_PARENT) {
-			viewHeight = view.frame.size.height;
+			viewHeight = view.bounds.size.height;
 		}
 		else if([child getAutoSizeParamY] == WRAP_CONTENT) {
 			viewHeight = [childView sizeThatFits:CGSizeZero].height;
@@ -213,7 +213,7 @@
 			autoSizeParamX = FIXED_SIZE;
 		}
 
-		[view setFrame:CGRectMake(view.frame.origin.x, view.frame.origin.y, width/getScreenScale(), view.frame.size.height)];
+		[view setFrame:CGRectMake(view.frame.origin.x, view.frame.origin.y, width/getScreenScale(), view.bounds.size.height)];
 		[self layout];
 	} else
 	if([key isEqualToString:@MAW_WIDGET_HEIGHT]) {
@@ -228,7 +228,7 @@
 			autoSizeParamY = FIXED_SIZE;
 		}
 
-		[view setFrame:CGRectMake(view.frame.origin.x, view.frame.origin.y, view.frame.size.width, height/getScreenScale())];
+		[view setFrame:CGRectMake(view.frame.origin.x, view.frame.origin.y, view.bounds.size.width, height/getScreenScale())];
 		[self layout];
 	} else
 	if([key isEqualToString:@MAW_WIDGET_BACKGROUND_COLOR]) {
@@ -283,10 +283,10 @@
 - (NSString*)getPropertyWithKey: (NSString*)key {
 
 	if([key isEqualToString:@MAW_WIDGET_WIDTH]) {
-		return [[[NSNumber numberWithInt: view.frame.size.width*getScreenScale()] stringValue] retain];
+		return [[[NSNumber numberWithInt: view.bounds.size.width*getScreenScale()] stringValue] retain];
 	}
 	else if([key isEqualToString:@MAW_WIDGET_HEIGHT]) {
-		return [[[NSNumber numberWithInt: view.frame.size.height*getScreenScale()] stringValue] retain];
+		return [[[NSNumber numberWithInt: view.bounds.size.height*getScreenScale()] stringValue] retain];
 	}
 	else if([key isEqualToString:@MAW_WIDGET_LEFT]) {
 		return [[[NSNumber numberWithInt: view.frame.origin.x*getScreenScale()] stringValue] retain];

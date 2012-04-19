@@ -5,14 +5,21 @@ using System.Windows;
 using System.Collections.Generic;
 using System.Net.NetworkInformation;
 using System.Globalization;
+using Microsoft.Xna.Framework.GamerServices;
 
 namespace MoSync
 {
     public class SystemPropertyManager
     {
         public delegate String SystemPropertyProvider(String key);
-        public static Dictionary<String, SystemPropertyProvider> mSystemPropertyProviders =
+        private static Dictionary<String, SystemPropertyProvider> mSystemPropertyProviders =
             new Dictionary<string, SystemPropertyProvider>();
+
+
+		public static void ClearSystemPropertyProviders()
+		{
+			mSystemPropertyProviders.Clear();
+		}
 
         public static void RegisterSystemPropertyProvider(String key, SystemPropertyProvider provider)
         {
@@ -33,6 +40,7 @@ namespace MoSync
     public class MiscModule : ISyscallModule, IIoctlModule
     {
 		private Microsoft.Devices.VibrateController mVibrateController = null;
+		private Runtime mRuntime = null;
 
         public void Init(Syscalls syscalls, Core core, Runtime runtime)
         {
@@ -96,6 +104,15 @@ namespace MoSync
                     return -1;
             };
 
+            /*
+             * PhoneApplicationService.Current.UserIdleDetectionMode
+             * Disabling this will stop the screen from timing out and locking.
+             * Discussion: this needs to be re-enabled for the backlight to work
+             *             so an maStartBacklight should be needed for WP7;
+             *             what about maToggleBacklight(bool)?
+             *
+             * We have maWakeLock instead on Windows Phone, Android, iOS.
+             */
             syscalls.maResetBacklight = delegate()
             {
             };
@@ -105,6 +122,10 @@ namespace MoSync
 				if (mVibrateController == null)
 					mVibrateController = Microsoft.Devices.VibrateController.Default;
 
+				// more than 5 seconds aren't allowed..
+				if (_ms > 5000)
+					_ms = 5000;
+
 				if (_ms < 0)
 					return _ms;
 				else if (_ms == 0)
@@ -112,7 +133,7 @@ namespace MoSync
 				else
 					mVibrateController.Start(TimeSpan.FromMilliseconds(_ms));
 
-				return 0;
+				return 1;
 			};
 
             syscalls.maLoadProgram = delegate(int _data, int _reload)
@@ -129,10 +150,22 @@ namespace MoSync
             };
         }
 
+		/*
+		private void OnAlertMessageBoxClosed(IAsyncResult ar)
+		{
+			int? buttonIndex = Guide.EndShowMessageBox(ar);
+
+			Memory eventData = new Memory(8);
+			eventData.WriteInt32(MoSync.Struct.MAEvent.type, MoSync.Constants.EVENT_TYPE_ALERT);
+			eventData.WriteInt32(MoSync.Struct.MAEvent.alertButtonIndex, (int)(buttonIndex + 1));
+
+			mRuntime.PostEvent(new Event(eventData));
+		}
+		*/
+
         public void Init(Ioctls ioctls, Core core, Runtime runtime)
         {
-            // add system property providers
-            SystemPropertyManager.mSystemPropertyProviders.Clear();
+			mRuntime = runtime;
 
             /**
              * Register system properties
@@ -157,6 +190,81 @@ namespace MoSync
                 return 0;
             };
 
+			ioctls.maMessageBox = delegate(int _caption, int _message)
+			{
+				String message = core.GetDataMemory().ReadStringAtAddress(_message);
+				String caption = core.GetDataMemory().ReadStringAtAddress(_caption);
+				MoSync.Util.ShowMessage(message, false, caption);
+				return 0;
+			};
+
+			ioctls.maTextBox = delegate(int _title, int _inText, int _outText, int _maxSize, int _constraints)
+			{
+				bool passwordMode = false;
+				if ((_constraints & MoSync.Constants.MA_TB_FLAG_PASSWORD) != 0)
+					passwordMode = true;
+
+				if ((_constraints & MoSync.Constants.MA_TB_TYPE_MASK) != MoSync.Constants.MA_TB_TYPE_ANY)
+					return MoSync.Constants.MA_TB_RES_TYPE_UNAVAILABLE;
+
+				try
+				{
+					Guide.BeginShowKeyboardInput(Microsoft.Xna.Framework.PlayerIndex.One,
+						core.GetDataMemory().ReadWStringAtAddress(_title), "",
+						core.GetDataMemory().ReadWStringAtAddress(_inText),
+						delegate(IAsyncResult result)
+						{
+							string text = Guide.EndShowKeyboardInput(result);
+
+							Memory eventData = new Memory(12);
+							eventData.WriteInt32(MoSync.Struct.MAEvent.type, MoSync.Constants.EVENT_TYPE_TEXTBOX);
+							int res = MoSync.Constants.MA_TB_RES_OK;
+							int len = 0;
+							if (text == null)
+							{
+								res = MoSync.Constants.MA_TB_RES_CANCEL;
+							}
+							else
+							{
+								len = text.Length;
+							}
+
+							eventData.WriteInt32(MoSync.Struct.MAEvent.textboxResult, res);
+							eventData.WriteInt32(MoSync.Struct.MAEvent.textboxLength, len);
+							core.GetDataMemory().WriteWStringAtAddress(_outText, text, _maxSize);
+							mRuntime.PostEvent(new Event(eventData));
+						},
+						null
+						, passwordMode);
+				}
+				catch (Exception)
+				{
+					return -1;
+				}
+
+				return 0;
+			};
+
+			/*
+			ioctls.maAlert = delegate(int _title, int _message, int _b1, int _b2, int _b3)
+			{
+				String title = core.GetDataMemory().ReadStringAtAddress(_title);
+				String message = core.GetDataMemory().ReadStringAtAddress(_message);
+				List<string> buttons = new List<string>();
+				if (_b1 != 0)
+					buttons.Add(core.GetDataMemory().ReadStringAtAddress(_b1));
+				if (_b2 != 0)
+					buttons.Add(core.GetDataMemory().ReadStringAtAddress(_b2));
+				if (_b3 != 0)
+					buttons.Add(core.GetDataMemory().ReadStringAtAddress(_b3));
+
+				Guide.BeginShowMessageBox(title, message,
+					buttons, 0, MessageBoxIcon.None, new AsyncCallback(OnAlertMessageBoxClosed), null);
+
+				return 0;
+			};
+			*/
+
             ioctls.maGetSystemProperty = delegate(int _key, int _buf, int _size)
             {
                 String key = core.GetDataMemory().ReadStringAtAddress(_key);
@@ -164,11 +272,53 @@ namespace MoSync
                 if (value == null)
                     return -2;
                 if (value.Length + 1 <= _size)
+                {
+                    if(key.Equals("mosync.network.type"))
+                    {
+                        /**
+                         * This code converts the result return by the GetSystemProperty
+                         * for the "mosync.network.type" key to be supported by the current
+                         * MoSync SDK 3.0
+                         */
+                        if (value.ToLower().Contains("wireless"))
+                        {
+                            value = "wifi";
+                        }
+                        else if(value.ToLower().Contains("ethernet"))
+                        {
+                            value = "ethernet";
+                        }
+                        else if(value.ToLower().Contains("mobilebroadbandgsm"))
+                        {
+                            value = "2g";
+                        }
+                        else if (value.ToLower().Contains("mobilebroadbandcdma"))
+                        {
+                            value = "3g";
+                        }
+                    }
                     core.GetDataMemory().WriteStringAtAddress(_buf, value, _size);
+                }
                 return value.Length + 1;
             };
-        }
 
+			ioctls.maWakeLock = delegate(int flag)
+			{
+				if (MoSync.Constants.MA_WAKE_LOCK_ON == flag)
+				{
+					Microsoft.Phone.Shell.PhoneApplicationService.Current.
+						UserIdleDetectionMode =
+							Microsoft.Phone.Shell.IdleDetectionMode.Enabled;
+				}
+				else
+				{
+					Microsoft.Phone.Shell.PhoneApplicationService.Current.
+						UserIdleDetectionMode =
+							Microsoft.Phone.Shell.IdleDetectionMode.Disabled;
+				}
+				return 1;
+			};
+        }
 
         /**
          * Retrieves the values of MoSync System Properties
@@ -188,7 +338,7 @@ namespace MoSync
                 }
             }
 
-            // imsi
+            // imsi - not available in WP7.1
             if (key.Equals("mosync.imsi"))
             {
                 //TODO
@@ -253,7 +403,7 @@ namespace MoSync
                 return Microsoft.Phone.Net.NetworkInformation.NetworkInterface.NetworkInterfaceType.ToString();
             }
 
-            // in case of no information return empty
+            // in case of no information
             return "not available";
         }
 

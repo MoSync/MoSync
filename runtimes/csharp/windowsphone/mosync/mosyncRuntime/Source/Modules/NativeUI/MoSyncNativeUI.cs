@@ -158,10 +158,10 @@ namespace MoSync
                 switch (pinfo.PropertyType.Name)
                 {
                     case "Double":
-                        pinfo.SetValue(this, Convert.ToDouble(stringValue), null);
+                        pinfo.SetValue(this, Convert.ToDouble(stringValue, System.Globalization.CultureInfo.InvariantCulture), null);
                         break;
                     case "Float":
-                        pinfo.SetValue(this, Convert.ToSingle(stringValue), null);
+						pinfo.SetValue(this, Convert.ToSingle(stringValue, System.Globalization.CultureInfo.InvariantCulture), null);
                         break;
                     case "Int32":
                         pinfo.SetValue(this, Convert.ToInt32(stringValue), null);
@@ -176,12 +176,25 @@ namespace MoSync
             {
                 PropertyInfo pinfo;
                 MoSyncWidgetPropertyAttribute pattr = GetPropertyAttribute(property, out pinfo);
+                Exception exception = null;
                 if (pinfo == null) throw new InvalidPropertyNameException();
                 if (pattr.ShouldExecuteOnMainThread)
+                {
                     MoSync.Util.RunActionOnMainThreadSync(() =>
                         {
-                            SetProperty(pinfo, stringValue);
+                            try
+                            {
+                                SetProperty(pinfo, stringValue);
+                            }
+                            catch (Exception e)
+                            {
+                                exception = e;
+                            }
                         });
+                    if (null != exception)
+                        if(exception.InnerException is InvalidPropertyValueException)
+                            throw new InvalidPropertyValueException();
+                }
                 else
                     SetProperty(pinfo, stringValue);
             }

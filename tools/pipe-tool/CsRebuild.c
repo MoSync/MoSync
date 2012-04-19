@@ -1173,7 +1173,7 @@ void RebuildCsFunc(SYMBOL *sym, int isproto)
 
 		if (ref)
 		{
-			if (ref->LabelType == label_Local)
+			if (ref->LabelType == label_Local || ref->LabelType == label_Function)
 			{
 #ifdef CS_DEBUG
 				RebuildEmit("// %s_%d:\n", ref->Name, ref->LocalScope);

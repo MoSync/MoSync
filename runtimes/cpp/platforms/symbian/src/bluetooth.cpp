@@ -126,7 +126,7 @@ void Syscall::InitBluetoothL() {
 	gBtAttrMatchList->AddL(TAttrRange(KSdpAttrIdBluetoothProfileDescriptorList));
 	gBtAttrMatchList->AddL(TAttrRange(KSdpAttrIdBasePrimaryLanguage +
 		KSdpAttrIdOffsetServiceName));
-	
+
 	LHEL(gBtSdp.Connect());
 	LHEL(gBtSdpDB.Open(gBtSdp));
 
@@ -151,7 +151,7 @@ void Syscall::CancelBluetoothConnections() {
 
 void Syscall::CloseBluetooth() {
 	LOGBT("CloseBluetooth\n");
-	
+
 	if(gBtState == eAvailable)
 		gBtResolver.Cancel();
 	gBtResolver.Close();
@@ -163,10 +163,10 @@ void Syscall::CloseBluetooth() {
 	SAFE_DELETE(gBtAttrMatchList);
 	SAFE_DELETE(gBtService);
 	gBtServiceArray.ResetAndDestroy();
-	
+
 	gBtSdpDB.Close();
 	gBtSdp.Close();
-	
+
 	gBtState = eTurnedOff;
 	LOGBT("CloseBluetooth complete\n");
 }
@@ -509,13 +509,13 @@ int Syscall::SBTmaBtGetNewDevice(MABtDeviceNative* dst) {
 		//copy device name
 		byte* nameDst = (byte*)dst->name;
 		const THostName& nameSrc(src().iName);
-		const int nameLen = MIN(dst->nameBufSize - 1, nameSrc.Length());
+		const int nameLen = MAX(0, MIN(dst->nameBufSize - 1, nameSrc.Length()));
 		TPtr8 nameDst8(nameDst, nameLen);
 		const TPtrC16 nameSrc16(nameSrc.Left(nameLen));
 
 		nameDst8.Copy(nameSrc16);
 		nameDst[nameLen] = 0;
-		
+
 		return nameSrc.Length();
 	} else {
 		return 1;
@@ -551,17 +551,17 @@ int Syscall::SBTmaBtGetNewService(MABtServiceNative* dst) {
 	MYASSERT(dst->nameBufSize >= 0, BTERR_NEGATIVE_BUFFER_SIZE);
 	const CBtService* serv = gBtServiceArray[gBtNextService++];
 	dst->port = serv->mPort;
-	
+
 	if(dst->nameBufSize > 0) {
 		if(serv->mName == NULL) {
 			dst->name[0] = 0;
 		} else {
-			int servNameLen = MIN(dst->nameBufSize - 1, serv->mName->Length());
+			int servNameLen = MAX(0, MIN(dst->nameBufSize - 1, serv->mName->Length()));
 			memcpy(dst->name, serv->mName->Ptr(), servNameLen);
 			dst->name[servNameLen] = 0;
 		}
 	}
-	
+
 	for(int i=0; i<serv->mUuids.Count(); i++) {
 		//dst->uuids[i] = serv->mUuids[i];
 		//memcpy(&dst->uuids[i], serv->mUuids[i].LongForm().Ptr(), 16);	//bad endian

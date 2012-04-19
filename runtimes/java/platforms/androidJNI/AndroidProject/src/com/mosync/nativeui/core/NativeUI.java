@@ -18,11 +18,10 @@ MA 02110-1301, USA.
 package com.mosync.nativeui.core;
 
 import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.List;
 
 import android.app.Activity;
 import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.util.Log;
 import android.view.View;
 
@@ -44,8 +43,11 @@ import com.mosync.nativeui.ui.widgets.Layout;
 import com.mosync.nativeui.ui.widgets.ListItemWidget;
 import com.mosync.nativeui.ui.widgets.MoSyncScreenWidget;
 import com.mosync.nativeui.ui.widgets.NavigationBarWidget;
+import com.mosync.nativeui.ui.widgets.RadioButtonWidget;
+import com.mosync.nativeui.ui.widgets.RadioGroupWidget;
 import com.mosync.nativeui.ui.widgets.ScreenWidget;
 import com.mosync.nativeui.ui.widgets.StackScreenWidget;
+import com.mosync.nativeui.ui.widgets.TabScreenWidget;
 import com.mosync.nativeui.ui.widgets.Widget;
 import com.mosync.nativeui.util.HandleTable;
 import com.mosync.nativeui.util.properties.FeatureNotAvailableException;
@@ -307,6 +309,12 @@ public class NativeUI
 			Log.e( "MoSync", "maWidgetInsertChild: Cannot add a dialog to a widget. " );
 			return IX_WIDGET.MAW_RES_CANNOT_INSERT_DIALOG;
 		}
+		if ( child instanceof RadioButtonWidget )
+		{
+			Log.e( "MoSync", "maWidgetInsertChild: Cannot add a radio button to a layout, only to Radio Groups." );
+			return IX_WIDGET.MAW_RES_INVALID_HANDLE;
+		}
+
 		if ( parent.isDialog() )
 		{
 			DialogWidget parentAsDialog = (DialogWidget) parent;
@@ -493,6 +501,9 @@ public class NativeUI
 
 		stackScreen.push( newScreen );
 
+		// This is the currently shown ScreenWidget.
+		m_currentScreen = stackScreen;
+
 		return IX_WIDGET.MAW_RES_OK;
 	}
 
@@ -524,6 +535,40 @@ public class NativeUI
 	}
 
 	/**
+	 * Set the current screen.
+	 * @param screenHandle The visible screen.
+	 */
+	public void setCurrentScreen(int screenHandle)
+	{
+		Widget widget = m_widgetTable.get( screenHandle );
+		ScreenWidget screen = (ScreenWidget) widget;
+		m_currentScreen = screen;
+	}
+
+	/**
+	 * Get the current visible screen.
+	 * @return the screen widget.
+	 */
+	public ScreenWidget getCurrentScreen()
+	{
+		if ( m_currentScreen instanceof StackScreenWidget )
+		{
+			return ((StackScreenWidget)  m_currentScreen).getCurrentScreen();
+		}
+		else if ( m_currentScreen instanceof TabScreenWidget )
+		{
+			ScreenWidget screen = ((TabScreenWidget) m_currentScreen).getCurrentTabScreen();
+			if ( screen instanceof StackScreenWidget )
+			{
+				return ((StackScreenWidget) screen).getCurrentScreen();
+			}
+			return screen;
+		}
+
+		return (ScreenWidget) m_currentScreen;
+	}
+
+	/**
 	 * Internal function for the maWidgetSetProperty system call.
 	 * Sets a property on the given widget, by accessing it from
 	 * the widget table and calling its setProperty method.
@@ -541,70 +586,58 @@ public class NativeUI
 
 		boolean result;
 
-		// Send the typeface to the label, button widget or list view item.
-		if ( key.compareTo( IX_WIDGET.MAW_LABEL_FONT_HANDLE ) == 0 )
+		// Set font, if available on the current widget.
+		if ( key.equals( IX_WIDGET.MAW_LABEL_FONT_HANDLE ) )
 		{
-			MoSyncFontHandle currentFont = null;
-
-			// Search the fondle in the list of fonts.
-			try
-			{
-				currentFont = mMoSyncThread.getMoSyncFont(IntConverter.convert(value));
-			} catch(PropertyConversionException pce)
-			{
-				Log.e( "MoSync", "Error while getting font handle with value '" + value + "Invalid property value");
-				return IX_WIDGET.MAW_RES_INVALID_PROPERTY_VALUE;
-			}
-
-			if ( currentFont == null )
-			{
-				Log.e( "MoSync", "Error while getting font handle with value '" + value + " The handle was not found");
-				return IX_WIDGET.MAW_RES_INVALID_PROPERTY_VALUE;
-			}
-			else
-			{
-				Log.e("MoSync", "Set font typeface to native ui widget");
-				if ( widget instanceof LabelWidget )
-				{
-					LabelWidget labelWidget = (LabelWidget) widget;
-					labelWidget.setFontTypeface(
-							currentFont.getTypeface(),
-							currentFont.getFontSize());
-				}
-				else if ( widget instanceof ButtonWidget )
-				{
-					ButtonWidget buttonWidget = (ButtonWidget) widget;
-					buttonWidget.setFontTypeface(
-							currentFont.getTypeface(),
-							currentFont.getFontSize());
-				}
-				else if ( widget instanceof ListItemWidget )
-				{
-					ListItemWidget listItemWidget = (ListItemWidget) widget;
-					listItemWidget.setFontTypeface(
-							currentFont.getTypeface(),
-							currentFont.getFontSize());
-				}
-				else if ( widget instanceof NavigationBarWidget )
-				{
-					NavigationBarWidget navBar = (NavigationBarWidget) widget;
-					navBar.setTitleFontTypeface(
-							currentFont.getTypeface(),
-							currentFont.getFontSize());
-				}
-				else
-				{
-					Log.e( "MoSync", "Error while setting property '" + key );
-					return IX_WIDGET.MAW_RES_INVALID_PROPERTY_NAME;
-				}
-				return IX_WIDGET.MAW_RES_OK;
-			}
+			return setWidgetFont(widget, key, value);
 		}
 
 		try
 		{
-			result =  widget.setProperty( key, value );
+			if ( widget instanceof RadioGroupWidget && key.equals(IX_WIDGET.MAW_RADIO_GROUP_ADD_VIEW) )
+			{
+				int radioButtonHandle = IntConverter.convert(value);
+				Widget child = m_widgetTable.get( radioButtonHandle );
+				if ( child != null && child instanceof RadioButtonWidget )
+				{
+					RadioButtonWidget radioButton = (RadioButtonWidget) child;
+					radioButton.setId(radioButtonHandle);
+					RadioGroupWidget radioGroup = (RadioGroupWidget) widget;
+					radioGroup.addButton( radioButton );
 
+					return IX_WIDGET.MAW_RES_OK;
+				}
+				else
+				{
+					Log.e( "MoSync", "Error while converting property value '" + value + ". Value needs to be a valid radio button handle" );
+					return IX_WIDGET.MAW_RES_INVALID_PROPERTY_VALUE;
+				}
+			}
+			if ( widget instanceof RadioGroupWidget && key.equals(IX_WIDGET.MAW_RADIO_GROUP_SELECTED) )
+			{
+				int radioButtonHandle = IntConverter.convert(value);
+				Widget child = m_widgetTable.get( radioButtonHandle );
+				RadioGroupWidget radioGroup = (RadioGroupWidget) widget;
+				if ( radioButtonHandle == -1 )
+				{
+					// Setting -1 as the selection identifier clears the selection.
+					radioGroup.checkRadioButton(-1);
+				}
+				else if ( child != null && child instanceof RadioButtonWidget )
+				{
+					RadioButtonWidget radioButton = (RadioButtonWidget) child;
+					radioGroup.checkRadioButton( radioButton.getId() );
+				}
+				else
+				{
+					Log.e( "MoSync", "Error while converting property value '" + value + ". Value needs to be a valid radio button handle" );
+					return IX_WIDGET.MAW_RES_INVALID_PROPERTY_VALUE;
+				}
+
+				return IX_WIDGET.MAW_RES_OK;
+			}
+
+			result =  widget.setProperty( key, value );
 		}
 		catch(PropertyConversionException pce)
 		{
@@ -655,7 +688,23 @@ public class NativeUI
 
 		String result;
 		try {
-			result = widget.getProperty( key );
+			if ( widget instanceof RadioGroupWidget && key.equals(IX_WIDGET.MAW_RADIO_GROUP_SELECTED) )
+			{
+				RadioGroupWidget radioGroup = (RadioGroupWidget) widget;
+				RadioButtonWidget selectedButton = radioGroup.getButton(radioGroup.getChecked());
+				if ( selectedButton == null )
+				{
+					result = "-1";
+				}
+				else
+				{
+					result = Integer.toString( selectedButton.getHandle() );
+				}
+			}
+			else
+			{
+				result = widget.getProperty( key );
+			}
 		}catch( FeatureNotAvailableException fnae)
 		{
 			Log.e("MoSync", "Feature not available exception: " + fnae.getMessage() );
@@ -687,6 +736,72 @@ public class NativeUI
 		return result.length( );
 	}
 
+	/**
+	 * Add an item to the Options Menu associated to a screen.
+	 * @param widgetHandle The screen handle.
+	 * @param title The title associated for the new item. Can be left null.
+	 * @param iconHandle MoSync handle to an uncompressed image resource,or:
+	 * a predefined Android icon.
+	 * @param iconPredefined Specifies if the icon is a project resource, or one of
+	 * the predefined Android icons. By default it's value is 0.
+	 * @return The index on which the menu item was added in the options menu,
+	 * or an error code otherwise.
+	 */
+	public int maWidgetScreenAddOptionsMenuItem(
+			final int widgetHandle,
+			final String title,
+			final int iconHandle,
+			final int iconPredefined)
+	{
+		Widget widget = m_widgetTable.get( widgetHandle );
+		if( widget == null || !(widget instanceof ScreenWidget) )
+		{
+			Log.e( "@@MoSync", "maWidgetScreenAddOptionsMenuItem: Invalid screen widget handle: " + widgetHandle );
+			return IX_WIDGET.MAW_RES_INVALID_HANDLE;
+		}
+
+		ScreenWidget screen = (ScreenWidget) widget;
+
+		switch(iconPredefined){
+		case 1:
+		{
+			if ( iconHandle >= IX_WIDGET.MAW_OPTIONS_MENU_ICON_CONSTANT_ADD &&
+					iconHandle <= IX_WIDGET.MAW_OPTIONS_MENU_ICON_CONSTANT_ZOOM )
+			return screen.addMenuItem(title, iconHandle);
+			else
+			{
+				Log.e("@@MoSync","maWidgetScreenAddOptionsMenuItem: Invalid icon resource ID: " + iconHandle);
+				return IX_WIDGET.MAW_RES_ERROR;
+			}
+		}
+		case 0:
+		{
+			if ( iconHandle >= 0 && m_imageTable.containsKey( iconHandle ) )
+			{
+				Bitmap icon = NativeUI.getBitmap( iconHandle );
+				if( icon != null )
+				{
+					// When adding a new menu item the id is returned.
+					return screen.addMenuItem(title, new BitmapDrawable(icon));
+				}
+				else
+				{
+					Log.e("@@MoSync","maWidgetScreenAddOptionsMenuItem: Invalid icon handle: " + iconHandle);
+					return IX_WIDGET.MAW_RES_ERROR;
+				}
+			}
+			else
+			{
+				return screen.addMenuItem(title, null);
+			}
+		}
+		default:
+		{
+			Log.e( "@@MoSync", "maWidgetScreenAddOptionsMenuItem: Invalid iconPredefined value: " + iconPredefined );
+			return IX_WIDGET.MAW_RES_ERROR;
+		}
+		}
+	}
 
 	/**
 	 * Called when the back button has been pressed.
@@ -730,4 +845,46 @@ public class NativeUI
 		return (Widget) m_widgetTable.get( handle );
 	}
 
+	/**
+	 * Set the font property to the
+	 *
+	 * @param property The property name.
+	 * @param value The property value.
+	 * @return error code or MAW_RES_OK.
+	 */
+	public int setWidgetFont(Widget widget, final String property,
+			final String value)
+	{
+		// Set the typeface to the label, button widget, edit Box or list view item.
+		MoSyncFontHandle currentFont = null;
+
+		// Search the handle in the list of fonts.
+		try {
+			currentFont = mMoSyncThread.getMoSyncFont(IntConverter .convert(value));
+		} catch (PropertyConversionException pce)
+		{
+			Log.e("MoSync", "Error while getting font handle with value '"
+					+ value + "Invalid property value");
+			return IX_WIDGET.MAW_RES_INVALID_PROPERTY_VALUE;
+		}
+
+		if (currentFont == null)
+		{
+			Log.e("MoSync", "Error while getting font handle with value '"
+					+ value + " The handle was not found");
+			return IX_WIDGET.MAW_RES_INVALID_PROPERTY_VALUE;
+		}
+		else
+		{
+			Log.e("@@MoSync", "Set font typeface to native ui widget");
+			boolean fontWasSet = widget.setFontTypeface(
+					currentFont.getTypeface(), currentFont.getFontSize());
+			if (!fontWasSet)
+			{
+				Log.e("MoSync", "Error while setting property '" + property);
+				return IX_WIDGET.MAW_RES_INVALID_PROPERTY_NAME;
+			}
+			return IX_WIDGET.MAW_RES_OK;
+		}
+	}
 }

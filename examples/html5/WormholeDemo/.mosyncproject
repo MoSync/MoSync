@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project supports-build-configs="true" version="1.4">
+<build.cfg id="Debug" types="Debug"/>
+<build.cfg id="Release" types="Release"/>
+<criteria>
+<filter mgr="0" profiles="" require="0" type="com.mobilesorcery.mosync.filters.profile" vendors="Android,BlackBerry,JavaME,Moblin,Symbian,Windows Mobile,Windows Phone,iOS"/>
+<filter type="com.mobilesorcery.sdk.capabilities.devices.elementfactory">
+<capabilities optional="" required="Accelerometer Orientation Camera Vibration Compass File\ Storage Proximity Location Internet\ Access HTML5 Gyroscope"/>
+</filter>
+</criteria>
+<properties>
+<property key="build.prefs:additional.include.paths/Debug" value=""/>
+<property key="build.prefs:additional.libraries" value="MAUtil.lib, NativeUI.lib, MAFS.lib, Wormhole.lib,  yajl.lib, Notification.lib"/>
+<property key="build.prefs:additional.libraries/Debug" value="MAUtilD.lib, NativeUID.lib, MAFSD.lib, WormholeD.lib,  yajlD.lib, NotificationD.lib"/>
+<property key="build.prefs:additional.library.paths/Debug" value=""/>
+<property key="build.prefs:app.permissions" value="Accelerometer Camera Compass File\ Storage Gyroscope Internet\ Access Location Location/Coarse Location/Fine Vibration"/>
+<property key="build.prefs:extra.link.sw/Debug" value=""/>
+<property key="build.prefs:extra.res.sw/Debug" value=""/>
+<property key="build.prefs:gcc.warnings/Debug" value="0"/>
+<property key="build.prefs:memory.data/Debug" value="4096"/>
+<property key="build.prefs:memory.data/Release" value="4096"/>
+<property key="build.prefs:memory.heap/Debug" value="3072"/>
+<property key="build.prefs:memory.heap/Release" value="3072"/>
+<property key="build.prefs:memory.stack/Debug" value="512"/>
+<property key="build.prefs:memory.stack/Release" value="512"/>
+<property key="build.prefs:project.type" value=""/>
+<property key="com.mobilesorcery.sdk.html5.support" value="true"/>
+<property key="dependency.strategy" value="0"/>
+<property key="excludes/Debug" value=""/>
+<property key="profile.mgr.type" value="0"/>
+<property key="template.id" value="project.wormhole.web"/>
+<property key="winmobilecs:guid" value="31b84570-32fb-102f-8027-5f4aeede1a9f"/>
+</properties>
+</project>

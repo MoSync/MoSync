@@ -695,8 +695,8 @@ enum
 
 // Absolute maximums
 
-#define MAX_CODE_MEM		(2048 * 1024)
-#define MAX_DATA_MEM		(2048 * 1024)
+#define MAX_CODE_MEM		(16 * 2048 * 1024)
+#define MAX_DATA_MEM		(16 * 2048 * 1024)
 
 /**
  * Marks the place to return from a longjmp. Updates

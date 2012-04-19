@@ -153,7 +153,7 @@ public class LocalNotificationObject {
 	 * @return result code.
 	 */
 	public int setProperty(String name, String value)
-		throws PropertyConversionException
+		throws PropertyConversionException, InvalidPropertyValueException
 	{
 		if ( name.equals(MA_NOTIFICATION_LOCAL_TICKER_TEXT) )
 		{
@@ -180,7 +180,6 @@ public class LocalNotificationObject {
 		{
 			Boolean playSound = BooleanConverter.convert(value);
 			mPlaySound = playSound;
-			mSoundDefault = true;
 			if ( playSound )
 			{
 				mSoundDefault = true;
@@ -190,6 +189,8 @@ public class LocalNotificationObject {
 		{
 			if ( value.length() == 0 )
 				throw new PropertyConversionException(value);
+			// Disable default sound.
+			mSoundDefault = false;
 			mNotification.sound = Uri.parse(value);
 		}
 		else if ( name.equals(MA_NOTIFICATION_LOCAL_FLAG) )

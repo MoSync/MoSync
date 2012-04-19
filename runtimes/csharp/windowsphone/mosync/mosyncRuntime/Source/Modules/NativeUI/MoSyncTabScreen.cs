@@ -55,7 +55,9 @@ namespace MoSync
 
                 //Setting the content of the View property of a Screen (which is a PhoneApplicationPage)
                 //as the Pivot control
-                (View as Microsoft.Phone.Controls.PhoneApplicationPage).Content = mPivot;
+                mPage.Children.Add(mPivot);
+                Grid.SetColumn(mPivot, 0);
+                Grid.SetRow(mPivot, 0);
             }
 
             /**
@@ -67,8 +69,11 @@ namespace MoSync
                 {
                     MoSync.Util.RunActionOnMainThreadSync(() =>
                         {
-                            mPivot.Items.Add(new Microsoft.Phone.Controls.PivotItem {
-                                Header = ((child as Screen).View as Microsoft.Phone.Controls.PhoneApplicationPage).Title,
+                            //pivotItem.Content = (child as Screen);
+
+                            mPivot.Items.Add(new Microsoft.Phone.Controls.PivotItem
+                            {
+                                Header = (child as Screen).getScreenTitle,
                                 Content = (child as Screen).View
                             });
                         }
@@ -131,22 +136,30 @@ namespace MoSync
              * MAW_TAB_SCREEN_CURRENT_TAB property implementation
              */
             [MoSyncWidgetProperty(MoSync.Constants.MAW_TAB_SCREEN_CURRENT_TAB)]
-            public String CurrentTab
+            public int CurrentTab
             {
                 set
                 {
-                    int val;
-                    if (Int32.TryParse(value, out val))
+                    if (value < mPivot.Items.Count)
                     {
-                        if (val < mPivot.Items.Count)
-                        {
-                            mPivot.SelectedIndex = val;
-                        }
+                        mPivot.SelectedIndex = value;
+
+                        //MAW_EVENT_TAB_CHANGED event needs a memory chunk of 12 bytes
+                        Memory eventData = new Memory(12);
+                        const int MAWidgetEventData_eventType = 0;
+                        const int MAWidgetEventData_widgetHandle = 4;
+                        const int MAWidgetEventData_currentTab = 8;
+                        eventData.WriteInt32(MAWidgetEventData_eventType, MoSync.Constants.MAW_EVENT_TAB_CHANGED);
+                        eventData.WriteInt32(MAWidgetEventData_widgetHandle, mHandle);
+                        eventData.WriteInt32(MAWidgetEventData_currentTab, mPivot.SelectedIndex);
+                        //Posting a CustomEvent
+                        mRuntime.PostCustomEvent(MoSync.Constants.EVENT_TYPE_WIDGET, eventData);
                     }
+                    else throw new InvalidPropertyValueException();
                 }
                 get
                 {
-                    return mPivot.SelectedIndex.ToString();
+                    return mPivot.SelectedIndex;
                 }
             }
         }

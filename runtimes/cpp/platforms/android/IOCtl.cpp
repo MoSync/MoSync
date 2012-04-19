@@ -743,6 +743,20 @@ namespace Base
 		return (int)result;
 	}
 
+	int _maWakeLock(int flag, JNIEnv* jNIEnv, jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(
+			cls,
+			"maWakeLock",
+			"(I)I");
+		if (methodID == 0) return -2;
+		jint result = jNIEnv->CallIntMethod(jThis, methodID, flag);
+		jNIEnv->DeleteLocalRef(cls);
+
+		return (int)result;
+	}
+
 	int _maWidgetCreate(const char *widgetType, JNIEnv* jNIEnv, jobject jThis)
 	{
 		// Get the Java method
@@ -922,6 +936,29 @@ namespace Base
 		// Delete allocated memory
 		jNIEnv->DeleteLocalRef(cls);
 		jNIEnv->DeleteLocalRef(jstrProperty);
+
+		return result;
+	}
+
+	int _maWidgetScreenAddOptionsMenuItem(int widget, const char* title, int iconHandle, int iconPredefined, JNIEnv* jNIEnv, jobject jThis)
+	{
+		// Convert to Java parameters
+		jstring jstrTitle = jNIEnv->NewStringUTF(title);
+
+		// Get the Java method
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maWidgetScreenAddOptionsMenuItem", "(ILjava/lang/String;II)I");
+		if (methodID == 0)
+		{
+			return 0;
+		}
+
+		// Call the java method
+		int result = jNIEnv->CallIntMethod(jThis, methodID, widget, jstrTitle, iconHandle, iconPredefined);
+
+		// Delete allocated memory
+		jNIEnv->DeleteLocalRef(cls);
+		jNIEnv->DeleteLocalRef(jstrTitle);
 
 		return result;
 	}
@@ -1629,18 +1666,18 @@ namespace Base
 		return result;
 	}
 
-	int _maCameraFormat(int index, int width, int height, JNIEnv* jNIEnv, jobject jThis)
+	int _maCameraFormat(int index, int sizeInfoBuffer, JNIEnv* jNIEnv, jobject jThis)
 	{
 		// Get the Java method
 		jclass cls = jNIEnv->GetObjectClass(jThis);
-		jmethodID methodID = jNIEnv->GetMethodID(cls, "maCameraFormat", "(III)I");
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maCameraFormat", "(II)I");
 		if (methodID == 0)
 		{
 			return 0;
 		}
 
 		// Call the Java method
-		int result = jNIEnv->CallIntMethod(jThis, methodID, index, width, height);
+		int result = jNIEnv->CallIntMethod(jThis, methodID, index, sizeInfoBuffer);
 
 		// Delete allocated memory
 
@@ -3995,6 +4032,31 @@ namespace Base
 			methodID,
 			audioInstance,
 			volume);
+
+		jNIEnv->DeleteLocalRef(cls);
+
+		return (int)result;
+	}
+
+	int _maAudioPause(
+		int audioInstance,
+		JNIEnv* jNIEnv,
+		jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+
+		jmethodID methodID = jNIEnv->GetMethodID(
+			cls,
+			"maAudioPause",
+			"(I)I");
+
+		if (methodID == 0)
+			return -1;
+
+		jint result = jNIEnv->CallIntMethod(
+			jThis,
+			methodID,
+			audioInstance);
 
 		jNIEnv->DeleteLocalRef(cls);
 

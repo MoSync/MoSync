@@ -64,10 +64,9 @@ void MainScreen::createMainLayout() {
 	mLabel = new Label();
 	mMainLayout->addChild(mLabel);
 
-	mLabel->setText("this is a label! 2 this is a label! 3 this is a label! 4 this is a label!");
+	mLabel->setText("this is a long label!this is a long label!this is a long label!this is a long label!this is a long label!this is a long label!this is a long label!this is a long label!this is a long label!this is a long label!");
 	mLabel->setFontColor(0xFF0000);
-	mLabel->setWidth(50);
-	mLabel->setMaxNumberOfLines(2);
+	mLabel->setMaxNumberOfLines(0);
 	int result = mLabel->getMaxNumberOfLines();
 	printf("result getMaxNumberOfLines = %d", result);
 

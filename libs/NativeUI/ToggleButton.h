@@ -30,7 +30,8 @@ MA 02110-1301, USA.
  * @author Emma Tresanszki
  *
  * \brief Class for a a special kind of check button.
- * It is available only on Android, and it's similar to the Check Box on iOS.
+ * It is available only on Android and Windows Phone 7.
+ * Note that this widget is similar to the Check Box on iOS.
  * For toggle button events see ToggleButtonListener
  */
 
@@ -45,7 +46,10 @@ namespace NativeUI
 	class ToggleButtonListener;
 
 	/**
-	 * \brief A Toggle Button is a widget that acts like a physical switch.
+	 * \brief Class for a a special kind of check button.
+	 * It is available only on Android and Windows Phone 7.
+	 * Note that this widget is similar to the Check Box on iOS.
+	 * For toggle button events see ToggleButtonListener
 	 *
 	 * Displays checked/unchecked states as a button with a "light" indicator
 	 * and by default accompanied with the text "ON" or "OFF".

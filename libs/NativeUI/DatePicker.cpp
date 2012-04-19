@@ -53,6 +53,13 @@ namespace NativeUI
 	DatePicker::~DatePicker()
 	{
         mDatePickerListeners.clear();
+
+        if(NULL != mMinDate)
+			delete mMinDate;
+        if(NULL != mMaxDate)
+			delete mMaxDate;
+        if(NULL != mDisplayedDate)
+			delete mDisplayedDate;
 	}
 
 	/**
@@ -65,23 +72,53 @@ namespace NativeUI
 	 */
 	int DatePicker::setDate(const struct Date date)
 	{
-		int resultYear = setYear(date.year);
-		if ( resultYear == MAW_RES_OK )
+		//Saving the date, in case of error this will be restored.
+		int year = getYear();
+		int month = getMonth();
+		int day = getDayOfMonth();
+
+		//Set the day on 1. Used to avoid errors when setting certain dates.
+		int errorCode = setDayOfMonth(1);
+
+		if(MAW_RES_OK != errorCode)
 		{
-			int resultMonth = setMonth(date.month);
-			if (resultMonth == MAW_RES_OK )
-			{
-				return (setDayOfMonth(date.day));
-			}
-			else
-			{
-				return resultMonth;
-			}
+			return errorCode;
 		}
 		else
 		{
-			return resultYear;
+			errorCode = setYear(date.year);
+			if(MAW_RES_OK != errorCode)
+			{
+				//reset the day.
+				setDayOfMonth(day);
+				return errorCode;
+			}
+			else
+			{
+				errorCode = setMonth(date.month);
+				if(MAW_RES_OK != errorCode)
+				{
+					//reset the year and the day.
+					setYear(year);
+					setDayOfMonth(day);
+					return errorCode;
+				}
+				else
+				{
+					errorCode = setDayOfMonth(date.day);
+					if(MAW_RES_OK != errorCode)
+					{
+						//reset year, month and day
+						setYear(year);
+						setMonth(month);
+						setDayOfMonth(day);
+
+						return errorCode;
+					}
+				}
+			}
 		}
+		return errorCode;
 	}
 
 	/**
@@ -90,12 +127,14 @@ namespace NativeUI
 	 */
 	Date DatePicker::getDate()
 	{
-		Date displayedDate;
-		displayedDate.year = this->getPropertyInt(MAW_DATE_PICKER_YEAR);
-		displayedDate.month = this->getPropertyInt(MAW_DATE_PICKER_MONTH);
-		displayedDate.day = this->getPropertyInt(MAW_DATE_PICKER_DAY_OF_MONTH);
+		if(NULL == mDisplayedDate)
+			mDisplayedDate = new Date();
 
-		return displayedDate;
+		mDisplayedDate->year = this->getPropertyInt(MAW_DATE_PICKER_YEAR);
+		mDisplayedDate->month = this->getPropertyInt(MAW_DATE_PICKER_MONTH);
+		mDisplayedDate->day = this->getPropertyInt(MAW_DATE_PICKER_DAY_OF_MONTH);
+
+		return *mDisplayedDate;
 	}
 
 	/**
@@ -177,10 +216,34 @@ namespace NativeUI
 	 */
 	int DatePicker::setMinDate( const struct Date minDate)
 	{
-		tm aDateStruct = this->getTmFromDateStruct(minDate);
+		//Saving the date, in case of error this will be restored.
+		int year = this->getPropertyInt(MAW_DATE_PICKER_MIN_DATE_YEAR);
+		int month = this->getPropertyInt(MAW_DATE_PICKER_MIN_DATE_MONTH);
 
-		int dateMillisec = mktime(&aDateStruct);
-		return this->setPropertyInt(MAW_DATE_PICKER_MIN_DATE, dateMillisec);
+		int errorCode = this->setPropertyInt(MAW_DATE_PICKER_MIN_DATE_YEAR, minDate.year);
+
+		if(MAW_RES_OK != errorCode)
+				return errorCode;
+
+		errorCode = this->setPropertyInt(MAW_DATE_PICKER_MIN_DATE_MONTH, minDate.month);
+		if(MAW_RES_OK != errorCode)
+		{
+			//reset the year
+			this->setPropertyInt(MAW_DATE_PICKER_MIN_DATE_YEAR, year);
+			return errorCode;
+		}
+
+		errorCode = this->setPropertyInt(MAW_DATE_PICKER_MIN_DATE_DAY, minDate.day);
+		if(MAW_RES_OK != errorCode)
+		{
+			//reset the year
+			this->setPropertyInt(MAW_DATE_PICKER_MIN_DATE_YEAR, year);
+			//reset the month
+			this->setPropertyInt(MAW_DATE_PICKER_MIN_DATE_MONTH, month);
+			return errorCode;
+		}
+
+		return errorCode;
 	}
 
 	/**
@@ -189,21 +252,24 @@ namespace NativeUI
 	 */
 	Date DatePicker::getMinDate()
 	{
-		int resCode;
-		this->getPropertyInt(MAW_DATE_PICKER_MIN_DATE,resCode);
-		if ( MAW_RES_FEATURE_NOT_AVAILABLE == resCode )
+		int resCodeY, resCodeM, resCodeD;
+
+		if(NULL != mMinDate)
+			delete mMinDate;
+
+		mMinDate->year = this->getPropertyInt(MAW_DATE_PICKER_MIN_DATE_YEAR,resCodeY);
+		mMinDate->month = this->getPropertyInt(MAW_DATE_PICKER_MIN_DATE_MONTH,resCodeM);
+		mMinDate->day = this->getPropertyInt(MAW_DATE_PICKER_MIN_DATE_DAY,resCodeD);
+
+		if ( MAW_RES_FEATURE_NOT_AVAILABLE == resCodeY ||
+			 MAW_RES_FEATURE_NOT_AVAILABLE == resCodeM ||
+			 MAW_RES_FEATURE_NOT_AVAILABLE == resCodeD )
 		{
-			struct Date defaultDate = Date(1,1,1900);
-			return defaultDate;
+			mMinDate = new Date(1,1,1900);
+			return *mMinDate;
 		}
 
-        int minDateMilliseconds =
-            this->getPropertyInt(MAW_DATE_PICKER_MIN_DATE);
-        tm *dateStruct = 0;
-        split_time(minDateMilliseconds, dateStruct);
-
-        Date date = this->getDateFromTmStruct(*dateStruct);
-        return date;
+		return *mMinDate;
 	}
 
 	/**
@@ -222,9 +288,34 @@ namespace NativeUI
 	 */
 	int DatePicker::setMaxDate( const struct Date maxDate)
 	{
-		tm aDateStruct = this->getTmFromDateStruct(maxDate);
-		int dateMillisec = mktime(&aDateStruct);
-		return this->setPropertyInt(MAW_DATE_PICKER_MAX_DATE, dateMillisec);
+		//Saving the date, in case of error this will be restored.
+		int year = this->getPropertyInt(MAW_DATE_PICKER_MAX_DATE_YEAR);
+		int month = this->getPropertyInt(MAW_DATE_PICKER_MAX_DATE_MONTH);
+
+		int errorCode = this->setPropertyInt(MAW_DATE_PICKER_MAX_DATE_YEAR, maxDate.year);
+
+		if(MAW_RES_OK != errorCode)
+				return errorCode;
+
+		errorCode = this->setPropertyInt(MAW_DATE_PICKER_MAX_DATE_MONTH, maxDate.month);
+		if(MAW_RES_OK != errorCode)
+		{
+			//reset the year
+			this->setPropertyInt(MAW_DATE_PICKER_MAX_DATE_YEAR, year);
+			return errorCode;
+		}
+
+		errorCode = this->setPropertyInt(MAW_DATE_PICKER_MAX_DATE_DAY, maxDate.day);
+		if(MAW_RES_OK != errorCode)
+		{
+			//reset the year
+			this->setPropertyInt(MAW_DATE_PICKER_MAX_DATE_YEAR, year);
+			//reset the month
+			this->setPropertyInt(MAW_DATE_PICKER_MAX_DATE_MONTH, month);
+			return errorCode;
+		}
+
+		return errorCode;
 	}
 
 	/**
@@ -233,21 +324,24 @@ namespace NativeUI
 	 */
 	struct Date DatePicker::getMaxDate()
 	{
-		int resCode;
-		this->getPropertyInt(MAW_DATE_PICKER_MAX_DATE, resCode);
-		if ( MAW_RES_FEATURE_NOT_AVAILABLE == resCode )
+		int resCodeY, resCodeM, resCodeD;
+
+		if(NULL != mMaxDate)
+			delete mMaxDate;
+
+		mMaxDate->year = this->getPropertyInt(MAW_DATE_PICKER_MAX_DATE_YEAR,resCodeY);
+		mMaxDate->month = this->getPropertyInt(MAW_DATE_PICKER_MAX_DATE_MONTH,resCodeM);
+		mMaxDate->day = this->getPropertyInt(MAW_DATE_PICKER_MAX_DATE_DAY,resCodeD);
+
+		if ( MAW_RES_FEATURE_NOT_AVAILABLE == resCodeY ||
+			 MAW_RES_FEATURE_NOT_AVAILABLE == resCodeM ||
+			 MAW_RES_FEATURE_NOT_AVAILABLE == resCodeD )
 		{
-			struct Date defaultDate = Date(12,31,2100);
-			return defaultDate;
+			mMaxDate = new Date(1,1,2100);
+			return *mMaxDate;
 		}
 
-	    int maxDateMilliseconds =
-	        this->getPropertyInt(MAW_DATE_PICKER_MAX_DATE);
-	    tm *dateStruct = 0;
-	    split_time(maxDateMilliseconds, dateStruct);
-
-	    Date date = this->getDateFromTmStruct(*dateStruct);
-	    return date;
+		return *mMaxDate;
 	}
 
     /**
@@ -292,33 +386,4 @@ namespace NativeUI
             }
         }
     }
-
-    /**
-     * Convert a tm struct to a Date struct.
-     * @param tmStruct The given tm type struct.
-     * @return The converted Date type struct.
-     */
-    Date DatePicker::getDateFromTmStruct(const tm tmStruct)
-    {
-        Date date;
-        date.day = tmStruct.tm_mday;
-        date.month = tmStruct.tm_mon + CONVERT_MONTHS_UNIT;
-        date.year = tmStruct.tm_year + CONVERT_YEARS_UNIT;
-        return date;
-    }
-
-    /**
-     * Convert a Date struct to a tm struct.
-     * @param date The given Date type struct.
-     * @return The converted tm type struct.
-     */
-    tm DatePicker::getTmFromDateStruct(const Date date)
-    {
-        tm tmStruct;
-        tmStruct.tm_mday = date.day;
-        tmStruct.tm_mon = date.month - CONVERT_MONTHS_UNIT;
-        tmStruct.tm_year = date.year - CONVERT_YEARS_UNIT;
-        return tmStruct;
-    }
-
 } // namespace NativeUI

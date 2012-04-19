@@ -50,6 +50,7 @@ namespace NativeUI
      * -on iOS it can have a back button on the left.
      * -on Android there's no extra button, the device's back button is used
      * instead.
+	 * Note: This widget is not available on Windows Phone 7.
      *
      */
     class NavigationBar : public Widget
@@ -122,7 +123,8 @@ namespace NativeUI
 
         /**
          * Set the font size in points of the title.
-         * @param size A float that specifies the number of points.
+         * @param size A float that specifies the number of pixels for Android
+         * and WP7, and number of points on iOS.
          * @return Any of the following result codes:
          * - #MAW_RES_OK if the property could be set.
          * - #MAW_RES_INVALID_PROPERTY_VALUE if the size value was invalid.
