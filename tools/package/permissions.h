@@ -48,6 +48,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define AUTOSTART_DEPRECATED "Auto Start"
 #define NFC "NFC"
 #define PUSH_NOTIFICATIONS "Push Notifications"
+#define PHONE_CALLS "Phone Calls"
 
 // Parse permissions
 void parsePermissions(std::set<std::string>& out, const char* permissions);
