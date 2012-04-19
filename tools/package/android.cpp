@@ -359,6 +359,7 @@ static void writePermissions(ostream& stream, const SETTINGS& s, const RuntimeIn
 	writePermission(stream, isPermissionSet(permissionSet, HOMESCREEN), "com.android.launcher.permission.UNINSTALL_SHORTCUT");
 	writePermission(stream, isPermissionSet(permissionSet, AUTOSTART), "android.permission.RECEIVE_BOOT_COMPLETED");
 	writePermission(stream, isPermissionSet(permissionSet, AUTOSTART_DEPRECATED), "android.permission.RECEIVE_BOOT_COMPLETED");
+	writePermission(stream, isPermissionSet(permissionSet, PHONE_CALLS), "android.permission.CALL_PHONE");
 
 	// Only add this for android 1.6 and higher.
 	if (ri.androidVersion >= 4)

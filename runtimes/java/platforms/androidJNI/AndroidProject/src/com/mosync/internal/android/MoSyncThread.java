@@ -298,7 +298,7 @@ public class MoSyncThread extends Thread
 	/**
 	 * Ascent of text in the default console font.
 	 */
-	int mTextConsoleAscent;
+	//int mTextConsoleAscent;
 
 	/**
 	 * Rectangle that is used to get the extent of a text string.
@@ -1084,8 +1084,7 @@ public class MoSyncThread extends Thread
 		Paint.FontMetricsInt fontMetrics =
 			new Paint.FontMetricsInt();
 		mPaint.getFontMetricsInt(fontMetrics);
-		mTextConsoleHeight = -1 * fontMetrics.ascent + fontMetrics.descent;
-		mTextConsoleAscent = -1 * fontMetrics.ascent;
+		mTextConsoleHeight = -1 * fontMetrics.ascent;
 	}
 
 	/**
@@ -1280,7 +1279,6 @@ public class MoSyncThread extends Thread
 		// Old code:
 		// return EXTENT(mTextSizeRect.width(), mTextSizeRect.height());
 
-		// The new implementation uses a constant text height.
 		return EXTENT(mTextSizeRect.width(), mTextConsoleHeight);
 	}
 
@@ -1336,7 +1334,15 @@ public class MoSyncThread extends Thread
 
 		SYSLOG("maFontSetCurrent");
 
-		return mMoSyncFont.maFontSetCurrent(fontHandle);
+		// change the current font and update the mPaint
+		int previousFontHandle = mMoSyncFont.maFontSetCurrent(fontHandle);
+
+		// update the font "metrics"
+		Paint.FontMetricsInt fontMetrics = new Paint.FontMetricsInt();
+		mPaint.getFontMetricsInt(fontMetrics);
+		mTextConsoleHeight = -1 * fontMetrics.ascent;
+
+		return previousFontHandle;
 	}
 
 	/**
@@ -1431,7 +1437,7 @@ public class MoSyncThread extends Thread
 	{
 		SYSLOG("maDrawText");
 
-		mCanvas.drawText( str, left, top+mTextConsoleHeight, mPaint);
+		mCanvas.drawText( str, left, top + mTextConsoleHeight, mPaint);
 	}
 
 	/**
@@ -1444,7 +1450,7 @@ public class MoSyncThread extends Thread
 	{
 	 	SYSLOG("maDrawTextW");
 
-		mCanvas.drawText(str, left, top+mTextConsoleHeight, mPaint);
+		mCanvas.drawText(str, left, top + mTextConsoleHeight, mPaint);
 	}
 
 	/**
@@ -2792,19 +2798,25 @@ public class MoSyncThread extends Thread
 
 			return 0;
 		}
-/*
+
 		else if(url.startsWith("tel://"))
 		{
-			if(!(mContext.getPackageManager().checkPermission("android.permission.NFC",
-					mContext.getPackageName()) == PackageManager.PERMISSION_GRANTED))
-			{
+			Log.i("maPlatformRequest","Starting a call - " + url);
 
+			// check to see if the proper permission is granted
+			if(!(mContext.getPackageManager().checkPermission("android.permission.CALL_PHONE",
+								mContext.getPackageName()) == PackageManager.PERMISSION_GRANTED))
+			{
+				Log.i("@MoSync", "Permission to make phone call not set!");
+				return -2;
 			}
 
 			Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse(url));
 			((Activity)mContext).startActivity(intent);
+
+			return 0;
 		}
-*/
+
 		return -1;
 	}
 
