@@ -2798,19 +2798,25 @@ public class MoSyncThread extends Thread
 
 			return 0;
 		}
-/*
+
 		else if(url.startsWith("tel://"))
 		{
-			if(!(mContext.getPackageManager().checkPermission("android.permission.NFC",
-					mContext.getPackageName()) == PackageManager.PERMISSION_GRANTED))
-			{
+			Log.i("maPlatformRequest","Starting a call - " + url);
 
+			// check to see if the proper permission is granted
+			if(!(mContext.getPackageManager().checkPermission("android.permission.CALL_PHONE",
+								mContext.getPackageName()) == PackageManager.PERMISSION_GRANTED))
+			{
+				Log.i("@MoSync", "Permission to make phone call not set!");
+				return -2;
 			}
 
 			Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse(url));
 			((Activity)mContext).startActivity(intent);
+
+			return 0;
 		}
-*/
+
 		return -1;
 	}
 
