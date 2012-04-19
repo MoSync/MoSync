@@ -3,4 +3,5 @@
   <capability name="NFC" state="REQUIRES_PERMISSION"/>
   <capability name="Push Notifications" state="REQUIRES_PERMISSION"/>
   <capability name="Home Screen" state="REQUIRES_PERMISSION"/>
+  <capability name="Phone Calls" state="REQUIRES_PERMISSION"/>
 </platform>
