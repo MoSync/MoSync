@@ -11090,7 +11090,7 @@ group PurchaseAPI "Purchase API" {
 			// Send by the maPurchaseRequest syscall when the transaction has been successfully
 			// processed. Your application should provide the content the user purchased.
 			COMPLETED = 2;
-			//
+			// Send by maPurchaseRestoreTransactions syscall.
 			RESTORED = 3;
 		}
 	} // end of Purchase State Codes

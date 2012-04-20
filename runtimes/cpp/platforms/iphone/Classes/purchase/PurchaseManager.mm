@@ -279,6 +279,13 @@ static PurchaseManager *sharedInstance = nil;
         {
             [product updatedTransaction:transaction];
         }
+
+        // Remove the transaction from the payment queue.
+        if (transaction.transactionState == SKPaymentTransactionStatePurchased ||
+            transaction.transactionState == SKPaymentTransactionStateRestored)
+        {
+            [_paymentQueue finishTransaction: transaction];
+        }
     }
 }
 
