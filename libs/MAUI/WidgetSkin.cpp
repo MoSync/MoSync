@@ -33,6 +33,8 @@ namespace MAUI {
 		endX(32),
 		startY(16),
 		endY(32),
+		imageWidth(endX),
+		imageHeight(endY),
 		selectedTransparent(true),
 		unselectedTransparent(true)
 		{
