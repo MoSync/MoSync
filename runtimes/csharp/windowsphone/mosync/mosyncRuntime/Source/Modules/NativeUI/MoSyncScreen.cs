@@ -117,7 +117,7 @@ namespace MoSync
             /**
              * The Orientation changed event handler
              * Currently it contains the functionality for the orientation changed event.
-             * @param from Object the object that triggers the event
+             * @param from The object that triggered the event
              * @param args Microsoft.Phone.Controls.OrientationChangedEventArgs the event arguments
              */
             public void OrientationChangedHandler(object from, Microsoft.Phone.Controls.OrientationChangedEventArgs args)
