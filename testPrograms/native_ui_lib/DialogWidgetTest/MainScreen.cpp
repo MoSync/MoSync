@@ -184,6 +184,10 @@ void MainScreen::createMainLayout()
 	mButtonForm->setText("Fill form");
 	mMainLayout->addChild(mButtonForm);
 
+	int mSupportedOrientations = MA_SCREEN_ORIENTATION_PORTRAIT | MA_SCREEN_ORIENTATION_LANDSCAPE_LEFT |
+			MA_SCREEN_ORIENTATION_LANDSCAPE_RIGHT;
+	int result = maScreenSetSupportedOrientations(mSupportedOrientations);
+
 }
 
 void MainScreen::createDialogMainLayout()

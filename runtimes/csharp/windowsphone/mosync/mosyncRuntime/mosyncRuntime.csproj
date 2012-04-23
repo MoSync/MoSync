@@ -84,6 +84,7 @@
     <Compile Include="Source\Modules\MoSyncFileModule.cs" />
     <Compile Include="Source\Modules\MoSyncFontModule.cs" />
     <Compile Include="Source\Modules\MoSyncGraphicsModule.cs" />
+    <Compile Include="Source\Modules\MoSyncImagePickerModule.cs" />
     <Compile Include="Source\Modules\MoSyncMathModule.cs" />
     <Compile Include="Source\Modules\MoSyncMemoryModule.cs" />
     <Compile Include="Source\Modules\MoSyncMiscModule.cs" />

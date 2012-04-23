@@ -48,9 +48,11 @@ namespace MoSync
         public class ModalDialog : WidgetBaseWindowsPhone
         {
             /*
-             * The Popup control used as a dialog view
+             * The canvas used as a background for the dialog view. It contains the
+             * stack panel that holds all the controls and behaves like a transparent overlay over the
+             * screen that presented the dialog view.
              */
-            protected Popup mDialogPopUp;
+            protected Canvas mDialogBackground;
 
             /*
              * The stack panel control that is used to encapsulate the dialog view
@@ -108,14 +110,13 @@ namespace MoSync
                 mDialogView.Children.Add(titleTextBlock);
 
                 // create the transparent background of the popup control
-                mDialogPopUp = new Popup();
-                mDialogPopUp.Child = new StackPanel();
-                ((StackPanel)mDialogPopUp.Child).Background = GetColorFromHexa(dialogViewOverlayColor);
-                ((StackPanel)mDialogPopUp.Child).Children.Add(mDialogView);
+                mDialogBackground = new Canvas();
+                mDialogBackground.Background = GetColorFromHexa(dialogViewOverlayColor);
+                mDialogBackground.Children.Add(mDialogView);
 
-                mView = mDialogPopUp;
+                mView = mDialogBackground;
 
-                // because the popup is not added as a child to a widget, we need to change the orientation manually
+                // we need to change the width and the height of the mDialogView manually when the orientation changes
                 (Application.Current.RootVisual as Microsoft.Phone.Controls.PhoneApplicationFrame).OrientationChanged += new EventHandler<Microsoft.Phone.Controls.OrientationChangedEventArgs>(OrientationChangedHandler);
             }
 
@@ -149,10 +150,19 @@ namespace MoSync
 
             /*
              * Method used to show/dismiss the dialog view.
+             * @param show: if show is true, the dialog will be shown and hidden otherwise.
              */
             public void ShowDialog(bool show)
             {
-                mDialogPopUp.IsOpen = show;
+                mDialogBackground.Visibility = (show ? Visibility.Visible : Visibility.Collapsed);
+                if (mDialogBackground.Visibility == Visibility.Visible)
+                {
+                    (((Application.Current.RootVisual as PhoneApplicationFrame).Content as PhoneApplicationPage).Content as Grid).Children.Add(mDialogBackground);
+                }
+                else
+                {
+                    (((Application.Current.RootVisual as PhoneApplicationFrame).Content as PhoneApplicationPage).Content as Grid).Children.Remove(mDialogBackground);
+                }
             }
 
             /**
@@ -178,47 +188,19 @@ namespace MoSync
              */
             public void OrientationChangedHandler(object from, Microsoft.Phone.Controls.OrientationChangedEventArgs args)
             {
-                // Because the popup is not inside the application visual tree, it's not automatically rotated. We
-                // need to do this manually.
-                RotateTransform transform = new RotateTransform();
-                transform.Angle = 0d;
-                double newWidth = 0, newHeight = 0;
-                double horizontalOffset = 0, verticalOffset = 0;
-
-                // Based on the new orientation, we decide the rotate angle, the new width/heigth and
-                // the new offsets (this one is needed because after a rotate, the popup might be outside
-                // the visible area).
-                switch (args.Orientation)
+                // We dont need to change the background canvas width/height because they're automatically
+                // redimensioned when the mDialogView child changes it's shape.
+                if (args.Orientation == PageOrientation.Landscape || args.Orientation == PageOrientation.LandscapeLeft ||
+                    args.Orientation == PageOrientation.LandscapeRight)
                 {
-                    case PageOrientation.LandscapeRight:
-                        newWidth = Application.Current.Host.Content.ActualHeight - marginDistance * 2;
-                        newHeight = Application.Current.Host.Content.ActualWidth - marginDistance;
-                        transform.Angle = -90d;
-                        horizontalOffset = -Application.Current.Host.Content.ActualHeight;
-                        verticalOffset = 0;
-                        break;
-                    case PageOrientation.LandscapeLeft:
-                        newWidth = Application.Current.Host.Content.ActualHeight - marginDistance * 2;
-                        newHeight = Application.Current.Host.Content.ActualWidth - marginDistance;
-                        transform.Angle = 90d;
-                        horizontalOffset = 0;
-                        verticalOffset = -Application.Current.Host.Content.ActualWidth;
-                        break;
-                    case PageOrientation.PortraitUp:
-                        newWidth = Application.Current.Host.Content.ActualWidth - marginDistance * 2;
-                        newHeight = Application.Current.Host.Content.ActualHeight - marginDistance;
-                        transform.Angle = 0;
-                        break;
+                    mDialogView.Width = Application.Current.Host.Content.ActualHeight - 2 * marginDistance;
+                    mDialogView.Height = Application.Current.Host.Content.ActualWidth - marginDistance;
                 }
-
-                // rotate the popup
-                mDialogPopUp.RenderTransform = transform;
-                // set the new width/heigth
-                mDialogView.Width = newWidth;
-                mDialogView.Height = newHeight;
-                // translate the popup along the x and y axis
-                mDialogPopUp.HorizontalOffset = horizontalOffset;
-                mDialogPopUp.VerticalOffset = verticalOffset;
+                else
+                {
+                    mDialogView.Width = Application.Current.Host.Content.ActualWidth - 2 * marginDistance;
+                    mDialogView.Height = Application.Current.Host.Content.ActualHeight - marginDistance;
+                }
             }
         }
     }
