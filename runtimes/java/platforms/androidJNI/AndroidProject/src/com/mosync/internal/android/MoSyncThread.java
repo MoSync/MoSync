@@ -293,7 +293,11 @@ public class MoSyncThread extends Thread
 
 	int mTextConsoleHeight;
 
+	/**
+	 * Variables used to synchronize event posting.
+	 */
 	private volatile boolean mIsSleeping;
+	private volatile boolean mIsEventPosted;
 
 	/**
 	 * Ascent of text in the default console font.
@@ -344,6 +348,7 @@ public class MoSyncThread extends Thread
 		mHasDied = false;
 
 		mIsSleeping = false;
+		mIsEventPosted = false;
 
 		mMoSyncNetwork = new MoSyncNetwork(this);
 		mMoSyncSound = new MoSyncSound(this);
@@ -786,6 +791,7 @@ public class MoSyncThread extends Thread
 	 * @param data The data to fill the new data object with.
 	 * @return The handle to the data if successful, <0 on error.
 	 * If a placeholder is supplied, that value is returned on success.
+	 *
 	 * TODO: This method needs improved error checking.
 	 */
 	public int createDataObject(int placeholder, byte[] data)
@@ -837,8 +843,14 @@ public class MoSyncThread extends Thread
 	 * @param	options	The bitmapFactory options
 	 *
 	 * @return	The created Bitmap, null if it failed
+	 *
+	 * TODO: There is no need for this method to be synchronized.
+	 * Find out why it was synchronized.
 	 */
-	synchronized Bitmap decodeImageFromData(final byte[] data, final BitmapFactory.Options options)
+	//synchronized
+	Bitmap decodeImageFromData(
+		final byte[] data,
+		final BitmapFactory.Options options)
 	{
 		try
 		{
@@ -847,17 +859,31 @@ public class MoSyncThread extends Thread
 			{
 				public void run()
 				{
-					Bitmap bitmap = BitmapFactory.decodeByteArray(
+					// Here we can get:
+					// java.lang.OutOfMemoryError: bitmap size exceeds VM budget
+					try
+					{
+						Bitmap bitmap = BitmapFactory.decodeByteArray(
 							data, 0, data.length, options);
-
-					waiter.setResult(bitmap);
+						waiter.setResult(bitmap);
+					}
+					catch (OutOfMemoryError e1)
+					{
+						//Log.i("@@@", "decodeImageFromData - " + "Out of memory error : " + e1);
+						waiter.setResult(null);
+					}
+					catch (Throwable e2)
+					{
+						//Log.i("@@@", "decodeImageFromData - " + "Error : " + e2);
+						waiter.setResult(null);
+					}
 				}
 			});
 			return waiter.getResult();
 		}
 		catch(InterruptedException ie)
 		{
-			Log.i("MoSync", "Couldn't decode image data.");
+			//Log.i("MoSync", "Couldn't decode image data.");
 			return null;
 		}
 	}
@@ -886,8 +912,15 @@ public class MoSyncThread extends Thread
 	 * @param	height	The width of the created Bitmap
 	 *
 	 * @return	The created Bitmap, null if it failed
+	 *
+	 * TODO: There is no need for this method to be synchronized.
+	 * Find out why it was synchronized.
+	 *
+	 * TODO: Look into eliminating code duplication between
+	 * createBitmap and createBitmapFromData.
 	 */
-	synchronized Bitmap createBitmap(final int width, final int height)
+	//synchronized
+	Bitmap createBitmap(final int width, final int height)
 	{
 		try
 		{
@@ -896,10 +929,25 @@ public class MoSyncThread extends Thread
 			{
 				public void run()
 				{
-					Bitmap bitmap = Bitmap.createBitmap(
+					// Here we can get:
+					// java.lang.OutOfMemoryError: bitmap size exceeds VM budget
+					try
+					{
+						Bitmap bitmap = Bitmap.createBitmap(
 							width, height, Bitmap.Config.ARGB_8888);
 
-					waiter.setResult(bitmap);
+						waiter.setResult(bitmap);
+					}
+					catch (OutOfMemoryError e1)
+					{
+						//Log.i("@@@", "createBitmapFromData - " + "Out of memory error : " + e1);
+						waiter.setResult(null);
+					}
+					catch (Throwable e2)
+					{
+						//Log.i("@@@", "createBitmapFromData - " + "Error : " + e2);
+						waiter.setResult(null);
+					}
 				}
 			});
 			return waiter.getResult();
@@ -919,8 +967,15 @@ public class MoSyncThread extends Thread
 	 * @param	pixels	The pixel data
 	 *
 	 * @return	The created Bitmap, null if it failed
+	 *
+	 * TODO: There is no need for this method to be synchronized.
+	 * Find out why it was synchronized.
 	 */
-	synchronized Bitmap createBitmapFromData(final int width, final int height, final int[] pixels)
+	//synchronized
+	Bitmap createBitmapFromData(
+		final int width,
+		final int height,
+		final int[] pixels)
 	{
 		try
 		{
@@ -929,17 +984,32 @@ public class MoSyncThread extends Thread
 			{
 				public void run()
 				{
-					Bitmap bitmap = Bitmap.createBitmap(
+					// Here we can get:
+					// java.lang.OutOfMemoryError: bitmap size exceeds VM budget
+					try
+					{
+						Bitmap bitmap = Bitmap.createBitmap(
 							pixels, width, height, Bitmap.Config.ARGB_8888);
 
-					waiter.setResult(bitmap);
+						waiter.setResult(bitmap);
+					}
+					catch (OutOfMemoryError e1)
+					{
+						//Log.i("@@@", "createBitmapFromData - " + "Out of memory error : " + e1);
+						waiter.setResult(null);
+					}
+					catch (Throwable e2)
+					{
+						//Log.i("@@@", "createBitmapFromData - " + "Error : " + e2);
+						waiter.setResult(null);
+					}
 				}
 			});
 			return waiter.getResult();
 		}
 		catch(InterruptedException ie)
 		{
-			Log.i("MoSync", "Couldn't create bitmap from pixel data.");
+			//Log.i("MoSync", "Couldn't create bitmap from pixel data.");
 			return null;
 		}
 	}
@@ -957,11 +1027,14 @@ public class MoSyncThread extends Thread
 	 */
 	public void postEvent(int[] event)
 	{
-		synchronized(mPostEventMonitor) {
+		synchronized(mPostEventMonitor)
+		{
 			// Add event to queue.
 			nativePostEvent(event);
-			// Wake up thread if sleeping.
-			if(mIsSleeping)
+
+			mIsEventPosted = true;
+
+			if (mIsSleeping)
 			{
 				interrupt();
 			}
@@ -2159,7 +2232,7 @@ public class MoSyncThread extends Thread
 
 		Bitmap bitmap = createBitmap(width, height);
 
-		if(null == bitmap)
+		if (null == bitmap)
 		{
 			maPanic(1, "Unable to create ");
 		}
@@ -2180,7 +2253,6 @@ public class MoSyncThread extends Thread
 		SYSLOG("maCreateDrawableImage");
 		try
 		{
-
 			Bitmap bitmap = createBitmap(width, height);
 
 			Canvas canvas = new Canvas(bitmap);
@@ -2455,7 +2527,17 @@ public class MoSyncThread extends Thread
 	{
 		SYSLOG("maWait");
 
-		mIsSleeping = true;
+		synchronized(mPostEventMonitor)
+		{
+			if (mIsEventPosted)
+			{
+				mIsEventPosted = false;
+				return;
+			}
+
+			mIsSleeping = true;
+		}
+
 		try
 		{
 	 		if (timeout<=0)
@@ -2874,14 +2956,20 @@ public class MoSyncThread extends Thread
 
 			Bitmap bitmap = decodeImageFromData(ra, null);
 
+			// TODO: Remove commencted out line.
 			//Bitmap bitmap = BitmapFactory.decodeByteArray(ra, 0, length);
-			if(bitmap != null)
+
+			if (bitmap != null)
 			{
 				SYSLOG("Bitmap was created!");
 				mImageResources.put(
 					resourceIndex, new ImageCache(null, bitmap));
+
+				// Return success.
 				return true;
 			}
+
+			// If we end up here an error occurred.
 			logError("loadImage - Bitmap wasn't created from Resource: "
 				+ resourceIndex);
 			return false;
