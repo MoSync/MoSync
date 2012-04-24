@@ -155,13 +155,20 @@ namespace MoSync
             public void ShowDialog(bool show)
             {
                 mDialogBackground.Visibility = (show ? Visibility.Visible : Visibility.Collapsed);
+                Grid mainScreenGrid = (((Application.Current.RootVisual as PhoneApplicationFrame).Content as PhoneApplicationPage).Content as Grid);
                 if (mDialogBackground.Visibility == Visibility.Visible)
                 {
-                    (((Application.Current.RootVisual as PhoneApplicationFrame).Content as PhoneApplicationPage).Content as Grid).Children.Add(mDialogBackground);
+                    if (!mainScreenGrid.Children.Contains(mDialogBackground))
+                    {
+                        mainScreenGrid.Children.Add(mDialogBackground);
+                    }
                 }
                 else
                 {
-                    (((Application.Current.RootVisual as PhoneApplicationFrame).Content as PhoneApplicationPage).Content as Grid).Children.Remove(mDialogBackground);
+                    if (mainScreenGrid.Children.Contains(mDialogBackground))
+                    {
+                        mainScreenGrid.Children.Remove(mDialogBackground);
+                    }
                 }
             }
 
