@@ -22,7 +22,7 @@ MA 02110-1301, USA.
  *
  * Implementation of Resource calls made from JavaScript.
  * Used for downloading images and loading local images as
- * resources for UI from JavaScript
+ * resources for UI from JavaScript.
  */
 
 #ifndef WORMHOLE_LIBS_JSNATIVEUI_RESOURCEMESSAGEHANDLER_H_
@@ -72,14 +72,34 @@ namespace Wormhole
 		void error(MAUtil::Downloader* downloader, int code);
 
 		/**
-		 * On successful download completion, send the event to the JavaScript side.
+		 * On successful download completion, send the
+		 * event to the JavaScript side.
 		 */
-		void finishedDownloading(MAUtil::Downloader* downloader, MAHandle data);
+		void finishedDownloading(
+			MAUtil::Downloader* downloader,
+			MAHandle data);
+
+		/**
+		 * Set the url to be used for remote log messages.
+		 * @param url The url to use for the remote logging service,
+		 * for example: "http://localhost:8282/log/"
+		 */
+		void setRemoteLogURL(const MAUtil::String& url);
+
+		/**
+		 * Send a log message to a server.
+		 * @param url The url to use for the remote logging service.
+		 * @param url The log message, for example: "Hello World".
+		 */
+		void sendRemoteLogMessage(
+			const MAUtil::String& url,
+			const MAUtil::String& message);
 
 	private:
 
 		/**
-		 * An instance of ImageDownloader that will be used for downloading image resources
+		 * An instance of ImageDownloader that will be used for
+		 * downloading image resources
 		 */
 		MAUtil::ImageDownloader* mImageDownloader;
 
@@ -89,11 +109,17 @@ namespace Wormhole
 		 * @param imagePath relative path to the image file.
 		 */
 		MAHandle loadImageResource(const char *imagePath);
+
 		/**
 		 * A Pointer to the main webview
 		 * Used for communicating with NativeUI
 		 */
 		NativeUI::WebView* mWebView;
+
+		/**
+		 * Address of url that will receive remote log messages.
+		 */
+		MAUtil::String mRemoteLogURL;
 	};
 } // namespace
 

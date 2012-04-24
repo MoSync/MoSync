@@ -20,11 +20,14 @@ MA 02110-1301, USA.
  * @file ResourceMessageHandler.cpp
  * @author Ali Sarrafi
  *
- * Implementation of PhoneGap calls made from JavaScript.
+ * Implementation of Resource calls made from JavaScript.
+ * Used for downloading images and loading local images as
+ * resources for UI from JavaScript.
  */
 
 #include <mastdlib.h> // C string conversion functions
-#include <conprint.h>
+#include <MAUtil/String.h>
+#include "../../EasyHttpConnection.h"
 #include "ResourceMessageHandler.h"
 
 // NameSpaces we want to access.
@@ -33,6 +36,32 @@ using namespace NativeUI; // WebView widget
 
 namespace Wormhole
 {
+	/**
+	 * Helper class for making a HTTP request for a remote log message.
+	 * This class is just used to send a request, it will not do anything
+	 * with the result sent back from teh server.
+	 */
+	class RemoteMessageHandler_RemoteLogConnection : public EasyHttpConnection
+	{
+	public:
+		RemoteMessageHandler_RemoteLogConnection()
+			: EasyHttpConnection()
+		{
+		}
+
+		void dataDownloaded(MAHandle data, int result)
+		{
+			// If we get data then delete it.
+			if (NULL != data)
+			{
+				maDestroyPlaceholder(data);
+			}
+
+			// Delete this instance.
+			delete this;
+		}
+	};
+
 	/**
 	 * Constructor.
 	 */
@@ -63,8 +92,10 @@ namespace Wormhole
 	{
 
 		char buffer[128];
+
 		const char * action = stream.getNext();
-		if(0 == strcmp("loadImage", action))
+
+		if (0 == strcmp("loadImage", action))
 		{
 			const char *imagePath = stream.getNext();
 			const char* imageID = stream.getNext();
@@ -78,7 +109,7 @@ namespace Wormhole
 					imageHandle);
 			mWebView->callJS(buffer);
 		}
-		else if(0 == strcmp("loadRemoteImage", action))
+		else if (0 == strcmp("loadRemoteImage", action))
 		{
 			const char* imageURL = stream.getNext();
 			const char* imageID = stream.getNext();
@@ -92,6 +123,25 @@ namespace Wormhole
 					imageHandle);
 			mWebView->callJS(buffer);
 		}
+		else if (0 == strcmp("sendRemoteLogMessage", action))
+		{
+			const char* url = stream.getNext();
+			const char* message = stream.getNext();
+
+			// If the url is set to "undefined", we should
+			// use the url set in C++.
+			if (0 == strcmp("undefined", url))
+			{
+				// If the url is not passed from JavaScript,
+				// use the one set in C++.
+				sendRemoteLogMessage(mRemoteLogURL, message);
+			}
+			else
+			{
+				// Use the url passed from JavaScript.
+				sendRemoteLogMessage(url, message);
+			}
+		}
 
 		return true;
 	}
@@ -103,7 +153,6 @@ namespace Wormhole
 	 */
 	MAHandle ResourceMessageHandler::loadImageResource(const char *imagePath)
 	{
-
 		int bufferSize = 1024;
 		char buffer[bufferSize];
 
@@ -141,10 +190,10 @@ namespace Wormhole
 				0,
 				maGetDataSize(fileData));
 		maDestroyObject(fileData);
-		//return the handle to the loaded image
+
+		// Return the handle to the loaded image.
 		return imageHandle;
 	}
-
 
 	/**
 	 * Is called if the downloads is canceled.
@@ -163,13 +212,41 @@ namespace Wormhole
 	}
 
 	/**
-	 * On successful download completion, send the event to the JavaScript side.
+	 * On successful download completion, send the
+	 * event to the JavaScript side.
 	 */
-	void ResourceMessageHandler::finishedDownloading(Downloader* downloader,
-			MAHandle data) {
+	void ResourceMessageHandler::finishedDownloading(
+		Downloader* downloader,
+		MAHandle data)
+	{
 		char buffer[256];
 		sprintf(buffer, "mosync.resource.imageDownloadFinished(%d)", data);
 		mWebView->callJS(buffer);
+	}
 
+	/**
+	 * Set the url to be used for remote log messages.
+	 * @param url The url to use for the remote logging service,
+	 * for example: "http://localhost:8282/log/"
+	 */
+	void ResourceMessageHandler::setRemoteLogURL(const MAUtil::String& url)
+	{
+		mRemoteLogURL = url;
+	}
+
+	/**
+	 * Send a log message to a server.
+	 * @param url The url to use for the remote logging service.
+	 * @param url The log message, for example: "Hello World".
+	 */
+	void ResourceMessageHandler::sendRemoteLogMessage(
+		const MAUtil::String& url,
+		const MAUtil::String& message)
+	{
+		// Send request.
+		MAUtil::String request = url + message;
+		RemoteMessageHandler_RemoteLogConnection* connection =
+			new RemoteMessageHandler_RemoteLogConnection();
+		connection->get(request.c_str());
 	}
 } // namespace
