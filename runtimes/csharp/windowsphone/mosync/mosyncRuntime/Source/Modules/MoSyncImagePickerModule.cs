@@ -43,6 +43,9 @@ namespace MoSync
     public class ImagePickerModule : IIoctlModule
     {
         PhotoChooserTask mTask;
+        // variable used to check if the photo chooser is open. If it is, we shouldn't call the
+        // "Show()" method again
+        bool photoTaskStarted = false;
         MoSync.Runtime runtimeReference;
 
         public void Init(Ioctls ioctls, Core core, Runtime runtime)
@@ -60,7 +63,11 @@ namespace MoSync
                 // by using the image picker afterwards)
                 mTask.ShowCamera = true;
                 mTask.Completed += PhotoChooserTaskCompleted;
-                mTask.Show();
+                if (!photoTaskStarted)
+                {
+                    mTask.Show();
+                }
+                photoTaskStarted = true;
 
                 // we need to keep a reference of the runtime in order to add image resources
                 // and send the ImagePicker event
@@ -77,6 +84,7 @@ namespace MoSync
          */
         private void PhotoChooserTaskCompleted(object sender, PhotoResult e)
         {
+            photoTaskStarted = false;
             Memory eventData = new Memory(12);
             const int MAWidgetEventData_eventType = 0;
             const int MAWidgetEventData_imagePickerState = 4;
