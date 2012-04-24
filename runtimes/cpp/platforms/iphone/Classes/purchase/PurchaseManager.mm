@@ -262,6 +262,14 @@ static PurchaseManager *sharedInstance = nil;
     _storeURL = [[NSString alloc] initWithUTF8String:url];
 }
 
+/**
+ * Restore transactions that were previously finished so that the user can process them again.
+ */
+-(void) restoreTransactions
+{
+    [_paymentQueue restoreCompletedTransactions];
+}
+
 #pragma mark SKPaymentTransactionObserver methods
 
 /**

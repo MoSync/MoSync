@@ -2015,6 +2015,10 @@ namespace Base {
                                                        buffer:buffer
                                                    bufferSize:bufferSize];
 	}
+    SYSCALL(void, maPurchaseRestoreTransactions())
+	{
+        [[PurchaseManager getInstance] restoreTransactions];
+	}
 
 	SYSCALL(longlong, maIOCtl(int function, int a, int b, int c))
 	{
@@ -2168,6 +2172,7 @@ namespace Base {
         maIOCtl_case(maPurchaseSetStoreURL);
         maIOCtl_case(maPurchaseVerifyReceipt);
         maIOCtl_case(maPurchaseGetField);
+        maIOCtl_case(maPurchaseRestoreTransactions);
 		}
 
 		return IOCTL_UNAVAILABLE;

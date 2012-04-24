@@ -146,4 +146,9 @@
  */
 -(void) setStoreURL:(const char*) url;
 
+/**
+ * Restore transactions that were previously finished so that the user can process them again.
+ */
+-(void) restoreTransactions;
+
 @end
