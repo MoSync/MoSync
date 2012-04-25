@@ -18,6 +18,9 @@
 #import <Foundation/Foundation.h>
 #import "IWidget.h"
 
+// String constant used to create UITableViewCell objects.
+extern NSString* const kTableCellReuseIdentifier;
+
 @interface ListViewItemWidget : IWidget {
 	
 }

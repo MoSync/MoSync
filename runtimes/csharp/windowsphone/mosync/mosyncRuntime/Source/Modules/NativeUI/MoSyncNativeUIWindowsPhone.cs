@@ -265,7 +265,7 @@ namespace MoSync
                     if (objType.GetProperty("IsEnabled") != null)
                     {
                         var property = objType.GetProperty("IsEnabled");
-                        return (string)(property.GetValue(mView, null));
+                        return (property.GetValue(mView, null)).ToString();
                     }
                     return null;
                 }
