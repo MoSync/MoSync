@@ -36,6 +36,14 @@ MA 02110-1301, USA.
 
 namespace Wormhole
 {
+	class LogMessageListener
+	{
+		public:
+			virtual void onLogMessage(
+				const char* message,
+				const char* url) = 0;
+	};
+
 	/**
 	 * Class that implements JavaScript calls.
 	 *
@@ -80,23 +88,26 @@ namespace Wormhole
 			MAHandle data);
 
 		/**
-		 * Set the url to be used for remote log messages.
-		 * @param url The url to use for the remote logging service,
-		 * for example: "http://localhost:8282/log/"
+		 * Set the object to get notified when log messages are sent.
+		 *
+		 * Note that the ResourceMessageHandler will take ownership of
+		 * the listener and delete it upon destruction. Also, when a new
+		 * listener is set, the old listener will be deleted.
+		 *
+		 * @param listener The log message listener.
 		 */
-		void setRemoteLogURL(const MAUtil::String& url);
+		void setLogMessageListener(LogMessageListener* listener);
 
 		/**
 		 * Send a log message to a server.
+		 * @param message The log message, for example: "Hello World".
 		 * @param url The url to use for the remote logging service.
-		 * @param url The log message, for example: "Hello World".
 		 */
 		void sendRemoteLogMessage(
-			const MAUtil::String& url,
-			const MAUtil::String& message);
+			const MAUtil::String& message,
+			const MAUtil::String& url);
 
 	private:
-
 		/**
 		 * An instance of ImageDownloader that will be used for
 		 * downloading image resources
@@ -117,9 +128,10 @@ namespace Wormhole
 		NativeUI::WebView* mWebView;
 
 		/**
-		 * Address of url that will receive remote log messages.
+		 * Listener that will be notified when log messages
+		 * are sent from JavaScript.
 		 */
-		MAUtil::String mRemoteLogURL;
+		LogMessageListener* mLogMessageListener;
 	};
 } // namespace
 

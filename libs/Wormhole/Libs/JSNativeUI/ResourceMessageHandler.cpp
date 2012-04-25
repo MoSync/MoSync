@@ -27,7 +27,6 @@ MA 02110-1301, USA.
 
 #include <mastdlib.h> // C string conversion functions
 #include <MAUtil/String.h>
-#include "../../EasyHttpConnection.h"
 #include "ResourceMessageHandler.h"
 
 // NameSpaces we want to access.
@@ -37,36 +36,11 @@ using namespace NativeUI; // WebView widget
 namespace Wormhole
 {
 	/**
-	 * Helper class for making a HTTP request for a remote log message.
-	 * This class is just used to send a request, it will not do anything
-	 * with the result sent back from teh server.
-	 */
-	class RemoteMessageHandler_RemoteLogConnection : public EasyHttpConnection
-	{
-	public:
-		RemoteMessageHandler_RemoteLogConnection()
-			: EasyHttpConnection()
-		{
-		}
-
-		void dataDownloaded(MAHandle data, int result)
-		{
-			// If we get data then delete it.
-			if (NULL != data)
-			{
-				maDestroyPlaceholder(data);
-			}
-
-			// Delete this instance.
-			delete this;
-		}
-	};
-
-	/**
 	 * Constructor.
 	 */
 	ResourceMessageHandler::ResourceMessageHandler(NativeUI::WebView* webView) :
-		mWebView(webView)
+		mWebView(webView),
+		mLogMessageListener(NULL)
 	{
 		// A new instance of ImageDownloader is created.
 		mImageDownloader = new ImageDownloader();
@@ -78,7 +52,10 @@ namespace Wormhole
 	 */
 	ResourceMessageHandler::~ResourceMessageHandler()
 	{
-		// Nothing needs to be explicitly destroyed.
+		if (NULL != mLogMessageListener)
+		{
+			delete mLogMessageListener;
+		}
 	}
 
 	/**
@@ -90,7 +67,6 @@ namespace Wormhole
 	 */
 	bool ResourceMessageHandler::handleMessage(Wormhole::MessageStream& stream)
 	{
-
 		char buffer[128];
 
 		const char * action = stream.getNext();
@@ -127,20 +103,7 @@ namespace Wormhole
 		{
 			const char* url = stream.getNext();
 			const char* message = stream.getNext();
-
-			// If the url is set to "undefined", we should
-			// use the url set in C++.
-			if (0 == strcmp("undefined", url))
-			{
-				// If the url is not passed from JavaScript,
-				// use the one set in C++.
-				sendRemoteLogMessage(mRemoteLogURL, message);
-			}
-			else
-			{
-				// Use the url passed from JavaScript.
-				sendRemoteLogMessage(url, message);
-			}
+			sendRemoteLogMessage(message, url);
 		}
 
 		return true;
@@ -225,28 +188,38 @@ namespace Wormhole
 	}
 
 	/**
-	 * Set the url to be used for remote log messages.
-	 * @param url The url to use for the remote logging service,
-	 * for example: "http://localhost:8282/log/"
+	 * Set the object to get notified when log messages are sent.
+	 *
+	 * Note that the ResourceMessageHandler will take ownership of
+	 * the listener and delete it upon destruction. Also, when a new
+	 * listener is set, the old listener will be deleted.
+	 *
+	 * @param listener The log message listener.
 	 */
-	void ResourceMessageHandler::setRemoteLogURL(const MAUtil::String& url)
+	void ResourceMessageHandler::setLogMessageListener(
+		LogMessageListener* listener)
 	{
-		mRemoteLogURL = url;
+		if (NULL == mLogMessageListener)
+		{
+			delete mLogMessageListener;
+			mLogMessageListener = NULL;
+		}
+
+		mLogMessageListener = listener;
 	}
 
 	/**
 	 * Send a log message to a server.
+	 * @param message The log message, for example: "Hello World".
 	 * @param url The url to use for the remote logging service.
-	 * @param url The log message, for example: "Hello World".
 	 */
 	void ResourceMessageHandler::sendRemoteLogMessage(
-		const MAUtil::String& url,
-		const MAUtil::String& message)
+		const MAUtil::String& message,
+		const MAUtil::String& url)
 	{
-		// Send request.
-		MAUtil::String request = url + message;
-		RemoteMessageHandler_RemoteLogConnection* connection =
-			new RemoteMessageHandler_RemoteLogConnection();
-		connection->get(request.c_str());
+		if (NULL != mLogMessageListener)
+		{
+			mLogMessageListener->onLogMessage(message.c_str(), url.c_str());
+		}
 	}
 } // namespace
