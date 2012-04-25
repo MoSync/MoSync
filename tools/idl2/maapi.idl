@@ -8355,12 +8355,11 @@ group CameraFunctions "Camera Functions" {
 
 		/**
 		 * Set the screen orientation.
-		 * Currently implemented only on Android.
+		 * Currently implemented only on Android and Windows Phone.
 		 * @param orientation One of the \link #SCREEN_ORIENTATION_LANDSCAPE
 		 * #SCREEN_ORIENTATION_PORTRAIT #SCREEN_ORIENTATION_DYNAMIC \endlink
 		 * constants.
 		 * @return \< 0 on error.
-		 * @deprecated use #maAlert instead.
 		 */
 		int maScreenSetOrientation(in int orientation);
 

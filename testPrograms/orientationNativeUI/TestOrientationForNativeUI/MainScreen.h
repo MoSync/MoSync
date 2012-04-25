@@ -36,7 +36,9 @@ using namespace NativeUI;
  */
 class MainScreen:
 	public Screen,
-	public CheckBoxListener
+	public CheckBoxListener,
+	public ButtonListener,
+	public ListViewListener
 {
 
 public:
@@ -57,6 +59,16 @@ private:
 	void createMainLayout();
 
 	/**
+	 * Creates the set orientation list view (it contains the orientation options)
+	 */
+	void createSetOrientationListView();
+
+	/**
+	 * Gets the current orientation as a string
+	 */
+	MAUtil::String getOrientationString();
+
+	/**
 	 * Create a new horizontal layout.
 	 * Will contain a label and a check box.
 	 * @param label The given label.
@@ -64,6 +76,14 @@ private:
 	 * @return The new created horizontal layout.
 	 */
 	HorizontalLayout* createRow(Label* label, CheckBox* checkBox);
+
+    /**
+     * This method is called when the user selects an item from
+     * the list view
+     * @param listView The list view object that generated the event
+     * @param listViewItem The ListViewItem object that was clicked.
+     */
+    virtual void listViewItemClicked(ListView* listView, ListViewItem* listViewItem);
 
 	/**
 	 * This method is called when the state of the check box was changed
@@ -74,6 +94,13 @@ private:
 	virtual void checkBoxStateChanged(
 		CheckBox* checkBox,
 		bool state);
+
+   /**
+	 * This method is called if the touch-up event was inside the
+	 * bounds of the button.
+	 * @param button The button object that generated the event.
+	 */
+	virtual void buttonClicked(Widget* button);
 
 	/**
 	 * Changes the screen orientation bit mask.
@@ -93,6 +120,10 @@ private:
 	 */
 	virtual void orientationWillChange();
 
+	/**
+	 * Called after the screen orientation has changed (available only on Windows Phone 7.1 platform
+	 */
+	virtual void orientationDidChange();
 private:
 	/**
 	 * Used for enabling/disabling portrait mode.
@@ -120,10 +151,34 @@ private:
 	Label* mOrientationLabel;
 
 	/**
+	 * Describes how to use the set orientation feature.
+	 */
+	Label*mSetOrientationDescriptionLabel;
+
+	/**
+	 * Contains the options for the set orientation function.
+	 */
+	ListView*mOrientationOptionsListView;
+
+	/**
+	 * Used to set the orientation.
+	 */
+	Button *mSetOrientationButton;
+
+	/**
 	 * A bit mask consisting of flags describing the supported screen orientations.
 	 *  The bit mask is created using MA_SCREEN_ORIENTATION values.
 	 */
 	int mSupportedOrientations;
+
+	/**
+	 * Represents the selected orientation from the mOrientationOptionsListView
+	 * Values:
+	 * 1 - SCREEN_ORIENTATION_LANDSCAPE
+	 * 2 - SCREEN_ORIENTATION_PORTRAIT
+	 * 3 - SCREEN_ORIENTATION_DYNAMIC
+	 */
+	int mSelectedOrientation;
 };
 
 #endif /* MAINSCREEN_H_ */
