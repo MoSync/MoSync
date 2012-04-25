@@ -23,81 +23,81 @@ group PurchaseResultCodes "Purchase Result Codes" {
         /**
         * \brief
         */
-		USER_CANCELED = -6;
+		USER_CANCELED = -5;
         /**
         * \brief
         */
-		SERVICE_UNAVAILABLE = -7;
+		SERVICE_UNAVAILABLE = -6;
         /**
         * \brief
         */
-		ITEM_UNAVAILABLE = -8;
+		ITEM_UNAVAILABLE = -7;
         /**
         * \brief
         */
-		ITEM_ALREADY_PURCHASED = -9;
+		ITEM_ALREADY_PURCHASED = -8;
         /**
         * \brief
         */
-		CLIENT_INVALID = -10;
+		CLIENT_INVALID = -9;
         /**
         * \brief Returned by the #maPurchaseCreate() syscall if the productID string is empty.
         * Platform: Android and iOS.
         */
-		INVALID = -11;
+		INVALID = -10;
         /**
         * \brief
         */
-		NOT_ALLOWED = -12;
+		NOT_ALLOWED = -11;
         /**
         * \brief Returned by the #maPurchaseSupported() syscall if purchase is not allowed on the device.
         * Platform: iOS.
         */
-		DISABLED = -13;
+		DISABLED = -12;
         /**
         * \brief Returned by the #maPurchaseGetName() or  maPurchaseVerifyReceipt syscalls if the
         * productHandle is invalid.
         */
-		INVALID_HANDLE = -14;
+		INVALID_HANDLE = -13;
         /**
         * \brief Returned by the #maPurchaseGetName() syscall if the the given buffer is too small.
         */
-		BUFFER_TOO_SMALL = -15;
+		BUFFER_TOO_SMALL = -14;
         /**
         * \brief Returned by the #maPurchaseVerifyReceipt() syscall if the product has not been purchased.
         */
-		RECEIPT = -16;
+		RECEIPT = -15;
         /**
         * \brief Returned by the #maPurchaseGetField() syscall if the receipt has not been received or
         * if the transaction is invalid.
         */
-		RECEIPT_NOT_AVAILABLE = -17;
+		RECEIPT_NOT_AVAILABLE = -16;
         /**
         * \brief Returned by the #maPurchaseGetField() syscall if the receipt does not contain the given field.
         */
-		INVALID_FIELD_NAME = -18;
+		INVALID_FIELD_NAME = -17;
 	}
 } // end of Purchase Result Codes
 
 group PurchaseStateCodes "Purchase State Codes" {
 	constset int MA_PURCHASE_STATE_ {
         /**
-        * \brief Send by the #maPurchaseRequest syscall if the operation failed.
+        * \brief Sent by the #maPurchaseRequest syscall if the operation failed.
         * Check the errorCode variable from event's purchaseData struct for more info.
         */
 		FAILED = 0;
         /**
-        * \brief Send by the #maPurchaseRequest syscall when the transaction has been received by the
+        * \brief Sent by the #maPurchaseRequest syscall when the transaction has been received by the
         * Apple App Store/Google Play.
         */
 		IN_PROGRESS = 1;
         /**
-        * \brief Send by the #maPurchaseRequest syscall when the transaction has been successfully
+        * \brief Sent by the #maPurchaseRequest syscall when the transaction has been successfully
         * processed. Your application should provide the content the user purchased.
         */
 		COMPLETED = 2;
         /**
-        * \brief Send by #maPurchaseRestoreTransactions syscall.
+        * \brief Sent by #maPurchaseRestoreTransactions syscall.
         */
 		RESTORED = 3;
 	}
@@ -126,27 +126,29 @@ group PurchaseErrorCodes "Purchase Error Codes" {
 group PurchaseEventTypes "Purchase Event Types" {
 	constset int MA_PURCHASE_EVENT_ {
         /**
-        * \brief Send by the #maPurchaseRequest syscall after an operation step has been completed
+        * \brief Sent by the #maPurchaseRequest syscall after an operation step has been completed
         * or if the operation has failed. Check event's purchaseData struct variable
         * for more information.
         */
 		REQUEST_STATE_CHANGED = 0;
         /**
-        * \brief
+        * \brief Platform: Android.
         */
 		REFUNDED = 1;
         /**
-        * \brief Send after a new product has been created or by the #maPurchaseRequest syscall.
+        * \brief Sent by the #maPurchaseRestoreTransactions() syscall.
+        * A new product has been restored. The productHandle member contains a handle to the
+        * purchased product.
         * Platform: iOS.
         */
 		RESTORED = 2;
         /**
-        * \brief Notifies that a product is valid in the store.
+        * \brief Notifies that a product is valid and available for purchasing.
         * Sent after calling #maPurchaseCreate() syscall.
         */
 		PRODUCT_VALID = 3;
         /**
-        * \brief Notifies that a product is not valid in the store.
+        * \brief Notifies that a product is not valid and not available for purchasing.
         * Sent after calling #maPurchaseCreate() syscall.
         */
 		PRODUCT_INVALID = 4;
@@ -173,27 +175,32 @@ group PurchaseReceiptFields "Purchase Receipt Fields" {
 	constset MAString MA_PURCHASE_RECEIPT_ {
         /**
         * \brief The number of items purchased.
+        * Example: "2".
         * Platform: iOS.
         */
 		QUANTITY = "quantity";
         /**
         * \brief The product identifier of the item that was purchased.
+        * Example: "com.yourapplication.productname".
         * Platform: iOS.
         */
 		PRODUCT_ID = "product_id";
         /**
         * \brief The transaction identifier of the item that was purchased.
+        * Example: "1000000045334267".
         * Platform: iOS.
         */
 		TRANSACTION_ID = "transaction_id";
         /**
         * \brief The date and time this transaction occurred.
+        * Example: "2012-04-25 12:24:12 Etc/GMT".
         * Platform: iOS.
         */
 		PURCHASE_DATE = "purchase_date";
         /**
-        * \brief For a transaction that restores a previoustransaction, this holdsthe original
+        * \brief For a transaction that restores a previous transaction, this holds the original
         * purchase date.
+        * Example: "2012-04-01 2:44:13 Etc/GMT".
         * Platform: iOS.
         */
 		ORIGINAL_TRANSACTION_ID = "original_transaction_id";
@@ -204,22 +211,26 @@ group PurchaseReceiptFields "Purchase Receipt Fields" {
         * Applications that are executing in the sandbox do not yet have an
         * app-item-id assigned to them,so this key is missing from receipts created
         * by the sandbox.
+        * Example: "34565328".
         * Platform: iOS.
         */
 		APP_ITEM_ID = "app_item_id";
         /**
         * \brief An arbitrary number that uniquely identifies a revision of your application.
         * This key is missing in receipts created by the sandbox.
+        * Example: "345627238".
         * Platform: iOS.
         */
 		VERSION_EXTERNAL_IDENTIFIER = "version_external_identifier";
         /**
         * \brief The bundle identifier for the application.
+        * Example: "com.yourcompany.yourapplication".
         * Platform: iOS.
         */
 		BID = "bid";
         /**
         * \brief A version number for the application.
+        * Example: "1.0".
         * Platform: iOS.
         */
 		BVRS = "bvrs";
@@ -238,42 +249,77 @@ group PurchaseFunctions "Purchase Functions" {
 
 	/**
 	* \brief Create a product object.
-	* \param productID String that identifies the product.
+	* A #EVENT_TYPE_PURCHASE will be sent after calling this syscall.
+	* The event will contain a MAPurchaseEventData struct object. The type member object
+	* contained by the struct can have one of the next values:
+	* - #MA_PURCHASE_EVENT_PRODUCT_VALID if the product was validated by the Apple Store / Google Play.
+	* The product is available for purchasing.
+	* - #MA_PURCHASE_EVENT_PRODUCT_INVALID if the product is invalid and it cannot be purchased
+	* by the user.
 	*
+	* \param productID String that identifies the product.
 	* \return #MA_PURCHASE_RES_INVALID if productID string is empty,
 	*  otherwise a handle to the product object.
 	*/
 	MAHandle maPurchaseCreate(in MAString productID);
 
 	/**
-	*
-	*
-	*
+	* \brief Platform: Android.
 	*/
 	void maPurchaseSetPublicKey(in MAString developerPublicKey);
 
 	/**
+	* Request the user to purchase a product.
+	* The system will handle the proccess of purchasing.
 	*
-	*
-	*
+	* A #EVENT_TYPE_PURCHASE will be sent after calling this syscall.
+	* The event will contain a MAPurchaseEventData struct object. The type member object
+	* contained by the struct is #MA_PURCHASE_EVENT_REQUEST_STATE_CHANGED. The state member
+	* object can have one of the following values:
+	* - #MA_PURCHASE_STATE_FAILED if the operation has failed. Check the errorCode member object
+	* for more information about the reason.
+	* - #MA_PURCHASE_STATE_IN_PROGRESS indicates that the transaction has been received by
+	* the App Store / Google Play.
+	* - #MA_PURCHASE_STATE_COMPLETED indicates that the transaction has been successfully processed.
 	*/
 	void maPurchaseRequest(in MAHandle productHandle);
 
 	/**
 	* Verify if the receipt came from Apple App Store / Google Play.
 	* Make sure that the product is purchased before calling this syscall.
-	* @param productHandle Handle to the product that has been purchased.
-	* @return One of the next syscalls:
-	* - #MA_PURCHASE_RES_OK if the request has been send to the store for verifying.
+	*
+	* A #EVENT_TYPE_PURCHASE will be sent after calling this syscall.
+	* The event will contain a MAPurchaseEventData struct object. The type member object
+	* contained by the struct can have one of the following values:
+	* - #MA_PURCHASE_EVENT_RECEIPT_VALID indicates that the transaction has been validated
+	* by the App Store / Google Play.
+	* - #MA_PURCHASE_EVENT_RECEIPT_INVALID indicates that the transaction is invalid.
+	* - #MA_PURCHASE_EVENT_RECEIPT_ERROR indicates that an error occurred while verifying the receipt.
+    * Check the errorCode member object for more information about the reason.
+    *
+	* \param productHandle Handle to the product that has been purchased.
+	* \return One of the follofwing values:
+	* - #MA_PURCHASE_RES_OK if the receipt has been send to the store for verifying.
 	* - #MA_PURCHASE_RES_INVALID_HANDLE if the productHandle is invalid.
 	* - #MA_PURCHASE_RES_RECEIPT if the product has not been purchased.
 	*/
 	int maPurchaseVerifyReceipt(in MAHandle productHandle);
 
 	/**
+	* Get a field value contained by the receipt.
+	* Make sure that the given product has a valid receipt.
+	* Call the maPurchaseVerifyReceipt() syscall and wait for a #MA_PURCHASE_EVENT_RECEIPT_VALID
+	* purchase event type.
 	*
-	*
-	*
+	* \param productHandle Handle to the product that has been purchased.
+	* \param property The name of the field.
+	* \param buffer Will be filled with the filed value.
+	* \param bufferSize The maximum size of the buffer, in bytes.
+	* \return The number of written bytes into buffer(a value greater than zero), or one
+	* of the following error codes(a value smaller that zero):
+	* - #MA_PURCHASE_RES_OK if the request has been send to the store for verifying.
+	* - #MA_PURCHASE_RES_INVALID_HANDLE if the productHandle is invalid.
+	* - #MA_PURCHASE_RES_RECEIPT if the product has not been purchased.
 	*/
 	int maPurchaseGetField(in MAHandle productHandle, in MAString property,
 					   out MAString buffer range("bufferSize"), in int bufferSize);
@@ -281,16 +327,17 @@ group PurchaseFunctions "Purchase Functions" {
 	/**
 	* Set the store url used for verifing the receipe on iOS platform.
 	* Pltform: iOS.
-	* @param url Store url.
+	* \param url Store url.
 	*/
 	void maPurchaseSetStoreURL(in MAString url);
 
 	/**
 	* Get product id using a product handle.
-	* @param productHandle Handle to the given product.
-	* @param buffer Will contain the product id.
-	* @param bufferSize Maximum size of the buffer.
-	* @return In case of error:
+	*
+	* \param productHandle Handle to the given product.
+	* \param buffer Will contain the product id.
+	* \param bufferSize Maximum size of the buffer.
+	* \return In case of error:
 	* - #MA_PURCHASE_RES_INVALID_HANDLE if productHandle is invalid.
 	* - #MA_PURCHASE_RES_BUFFER_TOO_SMALL if the given handle is too small.
 	* In case of success returns the number of written bytes.
@@ -298,15 +345,21 @@ group PurchaseFunctions "Purchase Functions" {
 	int maPurchaseGetName(in MAHandle productHandle, out MAString buffer range("bufferSize"), in int bufferSize);
 
 	/**
+	* Restore transactions that were previously finished so that you can process them again.
+	* For example, your application would use this to allow a user to unlock previously purchased
+	* content onto a new device.
 	*
-	*
-	*
+	* A #EVENT_TYPE_PURCHASE will be sent after calling this syscall.
+	* The event will contain a #MAPurchaseEventData struct object. The type member object
+	* contained by the struct will be #MA_PURCHASE_EVENT_RESTORE. The productHandle member object
+	* will contain a handle to the new product. Make sure you destroy the product after done
+	* working with it.
 	*/
 	void maPurchaseRestoreTransactions();
 
 	/**
 	* Destroy a product object.
-	* @param productHandle Handle to the product to destroy.
+	* \param productHandle Handle to the product to destroy.
 	* If the given handle is invalid the method does nothing.
 	*/
 	void maPurchaseDestroy(in MAHandle productHandle);
