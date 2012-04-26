@@ -2892,6 +2892,50 @@ namespace Base
 		case maIOCtl_maPurchaseSupported:
 			return _maPurchaseSupported(mJNIEnv, mJThis);
 
+		case maIOCtl_maPurchaseCreate:
+			return _maPurchaseCreate(
+				SYSCALL_THIS->GetValidatedStr(a),
+				mJNIEnv,
+				mJThis);
+
+		case maIOCtl_maPurchaseSetPublicKey:
+			return _maPurchaseSetPublicKey(
+				SYSCALL_THIS->GetValidatedStr(a),
+				mJNIEnv,
+				mJThis);
+
+		case maIOCtl_maPurchaseRequest:
+			_maPurchaseRequest(a, mJNIEnv, mJThis);
+
+		case maIOCtl_maPurchaseGetName:
+		{
+			int _handle = a;
+			int _valueBufferSize = c;
+			int _valueBuffer = (int) SYSCALL_THIS->GetValidatedMemRange(b, _valueBufferSize * sizeof(char));
+
+			return _maPurchaseGetName((int)gCore->mem_ds, _handle, _valueBuffer, _valueBufferSize, mJNIEnv, mJThis);
+		}
+
+		case maIOCtl_maPurchaseGetField:
+		{
+			int _handle = a;
+			const char *_property = SYSCALL_THIS->GetValidatedStr(b);
+			//Read the fourth parameter from the register
+			//(the first three can be read directly)
+			int _valueBufferSize = SYSCALL_THIS->GetValidatedStackValue(0);
+			int _valueBuffer = (int) SYSCALL_THIS->GetValidatedMemRange(
+				c,
+				_valueBufferSize * sizeof(char));
+
+			return _maPurchaseGetField((int)gCore->mem_ds, _handle, _property, _valueBuffer, _valueBufferSize, mJNIEnv, mJThis);
+		}
+
+		case maIOCtl_maPurchaseRestoreTransactions:
+			_maPurchaseRestoreTransactions(mJNIEnv, mJThis);
+
+		case maIOCtl_maPurchaseDestroy:
+			return _maPurchaseDestroy(a, mJNIEnv, mJThis);
+
 		// ********** Panics **********
 
 		case maIOCtl_maSyscallPanicsEnable:

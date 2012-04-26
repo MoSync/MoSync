@@ -322,6 +322,39 @@ public class EventQueue
 		sMoSyncThread.postEvent(event);
 	}
 
+	/**
+	 * TODO
+	 * @param purchaseHandle
+	 * @param state
+	 */
+	public void postPurchaseStateChanged(int purchaseHandle, int state)
+	{
+		int event[] = new int[3];
+
+//		event[0] = EVENT_TYPE_PURCHASE;
+		event[1] = purchaseHandle;
+		event[2] = state;
+
+		sMoSyncThread.postEvent(event);
+	}
+
+	/**
+	 * TODO
+	 * @param purchaseHandle
+	 */
+	public void postPurchaseRefunded(int purchaseHandle)
+	{
+
+	}
+
+	/**
+	 * TODO
+	 */
+	public void postPurchaseRestored(int purchaseHandle)
+	{
+
+	}
+
 	public static EventQueue getDefault()
 	{
 		return DEFAULT;

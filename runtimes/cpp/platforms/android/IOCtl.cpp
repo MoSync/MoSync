@@ -3385,6 +3385,129 @@ namespace Base
 		return result;
 	}
 
+	void _maPurchaseCreate(const char* productID, JNIEnv* jNIEnv, jobject jThis)
+	{
+		jstring jstrProduct = jNIEnv->NewStringUTF(productID);
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maPurchaseCreate", "(Ljava/lang/String;)I");
+		if (methodID == 0)
+		{
+			return;
+		}
+
+		jNIEnv->CallIntMethod(jThis, methodID, jstrProduct);
+
+		jNIEnv->DeleteLocalRef(cls);
+		jNIEnv->DeleteLocalRef(jstrProduct);
+	}
+
+	int _maPurchaseSetPublicKey(const char* developerKey, JNIEnv* jNIEnv, jobject jThis)
+	{
+		jstring jstrKey = jNIEnv->NewStringUTF(developerKey);
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maPurchaseSetPublicKey", "(Ljava/lang/String;)I");
+		if (methodID == 0)
+		{
+			return 0;
+		}
+
+		int result = jNIEnv->CallIntMethod(jThis, methodID, jstrKey);
+
+		jNIEnv->DeleteLocalRef(cls);
+		jNIEnv->DeleteLocalRef(jstrKey);
+
+		return result;
+	}
+
+	int _maPurchaseRequest(MAHandle productHandle, JNIEnv* jNIEnv, jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maPurchaseRequest", "(I)I");
+		if (methodID == 0)
+		{
+			return 0;
+		}
+
+		int result = jNIEnv->CallIntMethod(jThis, methodID, productHandle);
+
+		jNIEnv->DeleteLocalRef(cls);
+
+		return result;
+	}
+
+	int _maPurchaseGetName(
+			int memStart, MAHandle productHandle, int memBuffer, int bufferSize, JNIEnv* jNIEnv, jobject jThis)
+	{
+		// Get the Java method
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maPurchaseGetName", "(III)I");
+		if (methodID == 0)
+		{
+			return 0;
+		}
+
+		// Call the java method
+		int result = jNIEnv->CallIntMethod(jThis, methodID, productHandle, memBuffer - memStart, bufferSize);
+
+		// Delete allocated memory
+		jNIEnv->DeleteLocalRef(cls);
+
+		return result;
+	}
+
+	int _maPurchaseGetField(
+			int memStart, MAHandle productHandle, const char* property, int memBuffer, int bufferSize, JNIEnv* jNIEnv, jobject jThis)
+	{
+		jstring jstrProperty = jNIEnv->NewStringUTF(property);
+
+		// Get the Java method
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maPurchaseGetField", "(ILjava/lang/String;II)I");
+		if (methodID == 0)
+		{
+			return 0;
+		}
+
+		// Call the java method
+		int result = jNIEnv->CallIntMethod(jThis, methodID, productHandle, jstrProperty, memBuffer - memStart, bufferSize);
+
+		// Delete allocated memory
+		jNIEnv->DeleteLocalRef(cls);
+		jNIEnv->DeleteLocalRef(jstrProperty);
+
+		return result;
+	}
+
+	void _maPurchaseRestoreTransactions(JNIEnv* jNIEnv, jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maPurchaseRestoreTransactions", "()I");
+		if (methodID == 0)
+		{
+			return;
+		}
+
+		jNIEnv->CallIntMethod(jThis, methodID);
+
+		jNIEnv->DeleteLocalRef(cls);
+	}
+
+	int _maPurchaseDestroy(MAHandle handle, JNIEnv* jNIEnv, jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maPurchaseDestroy", "(I)I");
+		if (methodID == 0)
+		{
+			return 0;
+		}
+
+		int result = jNIEnv->CallIntMethod(jThis, methodID, handle);
+
+		jNIEnv->DeleteLocalRef(cls);
+
+		return result;
+	}
+
 	int _maSyscallPanicsEnable(JNIEnv* jNIEnv, jobject jThis)
 	{
 		jclass cls = jNIEnv->GetObjectClass(jThis);

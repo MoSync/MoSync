@@ -41,6 +41,7 @@ static void writePermission(ostream& stream, bool flag, const char* nativePerm);
 static void writeNFCDirectives(ostream& stream, const SETTINGS& s);
 static void writeNFCResource(ostream& stream, const SETTINGS& s);
 static void writeC2DMReceiver(ostream& stream, const string& packageName);
+static void writeBillingReceiver(ostream& stream);
 static string packageNameToByteCodeName(const string& packageName);
 
 void packageAndroid(const SETTINGS& s, const RuntimeInfo& ri) {

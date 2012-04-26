@@ -53,6 +53,7 @@ import static com.mosync.internal.generated.MAAPI_consts.MA_RESOURCE_CLOSE;
 import static com.mosync.internal.generated.MAAPI_consts.MA_WAKE_LOCK_ON;
 import static com.mosync.internal.generated.MAAPI_consts.MA_WAKE_LOCK_OFF;
 
+
 import java.io.File;
 import java.io.FileDescriptor;
 import java.io.FileInputStream;
@@ -110,6 +111,7 @@ import android.provider.Settings.Secure;
 import android.net.ConnectivityManager;
 
 import com.mosync.internal.android.MoSyncFont.MoSyncFontHandle;
+import com.mosync.internal.android.billing.PurchaseManager;
 import com.mosync.internal.android.nfc.MoSyncNFC;
 import com.mosync.internal.android.nfc.MoSyncNFCService;
 import com.mosync.internal.generated.IX_OPENGL_ES;
@@ -121,6 +123,8 @@ import com.mosync.java.android.TextBox;
 import com.mosync.nativeui.ui.widgets.MoSyncCameraPreview;
 import com.mosync.nativeui.ui.widgets.ScreenWidget;
 import com.mosync.nativeui.util.AsyncWait;
+import com.mosync.nativeui.util.properties.IntConverter;
+import com.mosync.nativeui.util.properties.PropertyConversionException;
 
 /**
  * Thread that runs the MoSync virtual machine and handles all syscalls.
@@ -472,6 +476,14 @@ public class MoSyncThread extends Thread
 		{
 			mMoSyncNetwork.killAllConnections();
 			mMoSyncNetwork = null;
+		}
+		if (null != mMoSyncPurchase)
+		{
+			/**
+			 * Unbind from the MarketBillingService.
+			 */
+			mMoSyncPurchase.unbindService();
+			mMoSyncPurchase = null;
 		}
 	}
 
@@ -3538,9 +3550,100 @@ public class MoSyncThread extends Thread
 	/**
 	 *
 	 */
-	int maPurchaseSupported();
+	int maPurchaseSupported()
 	{
+		return mMoSyncPurchase.maPurchaseSupported();
+	}
 
+	/**
+	 *
+	 * @param productID
+	 * @return
+	 */
+	int maPurchaseCreate(final String productID)
+	{
+		return mMoSyncPurchase.maPurchaseCreate(productID);
+	}
+
+	/**
+	 *
+	 * @param developerPublicKey
+	 * @return
+	 */
+	int maPurchaseSetPublicKey(final String developerPublicKey)
+	{
+		return mMoSyncPurchase.maPurchaseSetPublicKey(developerPublicKey);
+	}
+
+	/**
+	 *
+	 * @param MAHandle
+	 */
+	void maPurchaseRequest(final int productHandle)
+	{
+		mMoSyncPurchase.maPurchaseRequest(productHandle);
+	}
+
+	/**
+	 *
+	 * @param productHandle
+	 * @return
+	 */
+	int maPurchaseVerifyReceipt(final int productHandle)
+	{
+//		return mMoSyncPurchase.maPurchaseVerifyReceipt(productHandle);
+		return 0;
+	}
+
+	/**
+	 *
+	 * @param productHandle
+	 * @param buffer
+	 * @return
+	 */
+	int maPurchaseGetName(
+			final int productHandle,
+			final int memBuffer,
+			final int memSize)
+	{
+		return mMoSyncPurchase.maPurchaseGetName(productHandle, memBuffer, memSize);
+	}
+
+	/**
+	 *
+	 * @param productHandle
+	 * @param property
+	 * @param buffer
+	 * @param bufferSize
+	 * @return
+	 */
+	int maPurchaseGetField(
+			final int productHandle,
+			final String property,
+			final String buffer,
+			final int bufferSize)
+	{
+//		return mMoSyncPurchase.maPurchaseGetField(productHandle, property, buffer, bufferSize);
+		return 0;
+	}
+
+	/**
+	 *
+	 * @return
+	 */
+	void maPurchaseRestoreTransactions()
+	{
+		mMoSyncPurchase.maPurchaseRestoreTransactions();
+	}
+
+	/**
+	 *
+	 * @param handle
+	 * @return
+	 */
+	int maPurchaseDestroy(int handle)
+	{
+		return mMoSyncPurchase.maPurchaseDestroy(handle);
 	}
 
 	/**
