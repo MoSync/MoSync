@@ -13,6 +13,7 @@
 		43039F85148F939600254C4C /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 43039F84148F939600254C4C /* MobileCoreServices.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		431869BF13F691E50051D97A /* CoreMotion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 431869BE13F691E50051D97A /* CoreMotion.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		431869C913F69ECA0051D97A /* EventKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 431869C813F69ECA0051D97A /* EventKit.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
+		433CCCB8152DC7E90055828B /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 433CCCB7152DC7E90055828B /* StoreKit.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		4370369E13E9487D00F22783 /* AddressBook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4370369D13E9487D00F22783 /* AddressBook.framework */; };
 		43B44A0613F94480001F2492 /* MediaPlayer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 43B44A0513F94480001F2492 /* MediaPlayer.framework */; };
 		43CE0BFF1463EEA400F8FFC3 /* iAd.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 43CE0BFE1463EEA400F8FFC3 /* iAd.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
@@ -51,6 +52,7 @@
 		43039F84148F939600254C4C /* MobileCoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MobileCoreServices.framework; path = System/Library/Frameworks/MobileCoreServices.framework; sourceTree = SDKROOT; };
 		431869BE13F691E50051D97A /* CoreMotion.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMotion.framework; path = System/Library/Frameworks/CoreMotion.framework; sourceTree = SDKROOT; };
 		431869C813F69ECA0051D97A /* EventKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = EventKit.framework; path = System/Library/Frameworks/EventKit.framework; sourceTree = SDKROOT; };
+		433CCCB7152DC7E90055828B /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		4370369D13E9487D00F22783 /* AddressBook.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AddressBook.framework; path = System/Library/Frameworks/AddressBook.framework; sourceTree = SDKROOT; };
 		43B44A0513F94480001F2492 /* MediaPlayer.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MediaPlayer.framework; path = System/Library/Frameworks/MediaPlayer.framework; sourceTree = SDKROOT; };
 		43CE0BFE1463EEA400F8FFC3 /* iAd.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = iAd.framework; path = System/Library/Frameworks/iAd.framework; sourceTree = SDKROOT; };
@@ -78,6 +80,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				433CCCB8152DC7E90055828B /* StoreKit.framework in Frameworks */,
 				43039F85148F939600254C4C /* MobileCoreServices.framework in Frameworks */,
 				43CE0BFF1463EEA400F8FFC3 /* iAd.framework in Frameworks */,
 				43B44A0613F94480001F2492 /* MediaPlayer.framework in Frameworks */,
@@ -126,6 +129,7 @@
 		29B97314FDCFA39411CA2CEA /* CustomTemplate */ = {
 			isa = PBXGroup;
 			children = (
+				433CCCB7152DC7E90055828B /* StoreKit.framework */,
 				080E96DDFE201D6D7F000001 /* Classes */,
 				29B97315FDCFA39411CA2CEA /* Other Sources */,
 				29B97317FDCFA39411CA2CEA /* Resources */,

@@ -1546,15 +1546,34 @@ interface MAAPI {
 
 	/**
 	* \brief An puchase event struct.
+	* A MoSync event will contain an struct object of this type only if event type
+	* is #EVENT_TYPE_PURCHASE.
 	*/
 	struct MAPurchaseEventData {
-		//
+		/**
+		* \brief Type of the purchase event.
+		* One of the \link MA_PURCHASE_EVENT_REQUEST_STATE_CHANGED MA_PURCHASE_EVENT \endlink constants.
+		*/
+		int type;
+
+		/**
+		* \brief State of the purchase.
+		* One of the \link MA_PURCHASE_STATE_FAILED MA_PURCHASE_STATE \endlink constants.
+		* Valid only if type is #MA_PURCHASE_EVENT_REQUEST_STATE_CHANGED.
+		*/
 		int state;
 
-		//
+		/**
+		* \brief Handle to the product that sent the event.
+		*/
 		MAHandle productHandle;
 
-		//
+		/**
+		* \brief Reason why the puchase failed.
+		* Valid only if type is #MA_PURCHASE_EVENT_REQUEST_STATE_CHANGED and
+		* state is #MA_PURCHASE_STATE_FAILED.
+		* One of the \link MA_PURCHASE_ERROR_INVALID_HANDLE MA_PURCHASE_ERROR \endlink constants.
+		*/
 		int errorCode;
 	}
 
@@ -8495,6 +8514,7 @@ group OpenGLES "OpenGLES" {
 #include "opengl_non_generated.idl"
 #include "opengl_generated.idl"
 }
+
 		/**
 		 * Logs information about the state of all current resources.
 		 */
@@ -11023,8 +11043,7 @@ group CaptureAPI "Capture API" {
 } // End of Capture API
 
 group PurchaseAPI "Purchase API" {
-
-
+#include "purchase.idl"
 } // End of Purchase API
 
 }
