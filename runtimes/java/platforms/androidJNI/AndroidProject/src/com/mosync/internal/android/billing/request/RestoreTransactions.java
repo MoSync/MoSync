@@ -46,7 +46,7 @@ class RestoreTransactions extends BaseRequest
 	}
 
 	@Override
-	protected void run() throws RemoteException
+	public void run() throws RemoteException
 	{
 		mNonce = Security.generateNonce();
 

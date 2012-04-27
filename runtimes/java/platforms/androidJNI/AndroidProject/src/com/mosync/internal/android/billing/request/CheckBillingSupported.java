@@ -45,8 +45,11 @@ public class CheckBillingSupported extends BaseRequest
         super(-1, service);
     }
 
+    /**
+     * No need to send an event, as the method is synchronous.
+     */
     @Override
-    protected void run() throws RemoteException
+    public void run() throws RemoteException
     {
         Bundle response = mService.sendBillingRequest(
 				BillingService.createRequestBundle(Consts.METHOD_CHECK_BILLING_SUPOPRTED));
@@ -56,7 +59,6 @@ public class CheckBillingSupported extends BaseRequest
         mRequestId = Consts.BILLING_RESPONSE_INVALID_REQUEST_ID; // OR NOT necessary!
 
         Log.e("@@MoSync", "CheckBillingSupported response code: " + mResponseCode );
-        // No need to send an event, as the method is synchronous.
     }
 
     /**
@@ -66,7 +68,8 @@ public class CheckBillingSupported extends BaseRequest
      * @param e the exception
      */
     @Override
-    protected void onRemoteException(RemoteException e) {
+    protected void onRemoteException(RemoteException e)
+    {
         Log.e("@@MoSync", "CheckBillingSupported remote billing service crashed");
         super.onRemoteException(e);
     }

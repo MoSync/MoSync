@@ -30,7 +30,7 @@ import com.mosync.nativeui.util.properties.PropertyConversionException;
 import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_ERROR_INVALID_HANDLE;
 import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_RES_OK;
 import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_RES_UNAVAILABLE;
-import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_ERROR_INVALID_STRING_BUFFER_SIZE;
+import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_RES_BUFFER_TOO_SMALL;
 
 /**
  * Wrapper for In-app Purchase Syscalls to avoid cluttering the MoSyncSyscalls file.
@@ -169,8 +169,7 @@ public class MoSyncPurchase
 			{
 				Log.e( "@@MoSync", "maPurchaseGetName: Buffer size " + memBufSize +
 						" too short to hold buffer of size: " + result.length( ) + 1 );
-//				return -2;
-				return MA_PURCHASE_ERROR_INVALID_STRING_BUFFER_SIZE;
+				return MA_PURCHASE_RES_BUFFER_TOO_SMALL;
 			}
 
 			byte[] ba = result.getBytes();
@@ -180,8 +179,7 @@ public class MoSyncPurchase
 			mMoSyncThread.mMemDataSection.put( ba );
 			mMoSyncThread.mMemDataSection.put( (byte)0 );
 
-//			return result.length( );
-			return MA_PURCHASE_RES_OK;
+			return result.length( );
 		}
 		else
 		{

@@ -42,6 +42,9 @@ import com.mosync.internal.android.billing.request.Purchase;
 import com.mosync.internal.android.billing.Consts.PurchaseState;
 import com.mosync.internal.android.billing.Security.VerifiedPurchase;
 
+import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_RES_OUT_OF_DATE;
+import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_RES_CONNECTION_ERROR;
+
 /**
  * This class sends messages to Google Play on behalf of the application by
  * connecting (binding) to the MarketBillingService. The application
@@ -66,6 +69,7 @@ public class BillingService extends Service implements ServiceConnection
 	@Override
 	public void onCreate()
 	{
+		Log.e("@@MoSync","BillingService --------- onCreate() ");
 		//todo delete this method.
 		super.onCreate();
 
@@ -216,20 +220,25 @@ public class BillingService extends Service implements ServiceConnection
      */
     public int checkBillingSupported()
     {
-		CheckBillingSupported request = new CheckBillingSupported(mService);
-		if ( bindToMarketBillingService() )
+		if ( bindToMarketBillingService() )//&& !mPurchaseRequestInProgress )
 		{
-			if ( request.runRequest() )
-			{
+			CheckBillingSupported request = new CheckBillingSupported(mService);
+			try{
+				request.run();
 				return request.getResponseCode();
+			}catch(RemoteException e)
+			{
+				Log.e("@@MoSync","maPucrhaseSupported remote exception,out of date");
+				return MA_PURCHASE_RES_OUT_OF_DATE;
+//				mService = null;
 			}
 		}
 		else
 		{
 			// Add to pending requests.
-			mPendingRequests.add(request);
+			Log.e("@@MoSync","maPurchaseSupported cannot bind");
+			return MA_PURCHASE_RES_CONNECTION_ERROR;
 		}
-		return -1;//false; dev_error
     }
 
     /**
@@ -469,6 +478,7 @@ public class BillingService extends Service implements ServiceConnection
     /**
      * The list of requests that are pending while waiting for the active
      * request to be completed.
+     * CheckBillingSupported request cannot be pending, as it is synchronous.
      */
     private static LinkedList<BaseRequest> mPendingRequests = new LinkedList<BaseRequest>();
 //    private static Queue<BaseRequest> mR = new Queue<BaseRequest>();

@@ -3385,20 +3385,22 @@ namespace Base
 		return result;
 	}
 
-	void _maPurchaseCreate(const char* productID, JNIEnv* jNIEnv, jobject jThis)
+	int _maPurchaseCreate(const char* productID, JNIEnv* jNIEnv, jobject jThis)
 	{
 		jstring jstrProduct = jNIEnv->NewStringUTF(productID);
 		jclass cls = jNIEnv->GetObjectClass(jThis);
 		jmethodID methodID = jNIEnv->GetMethodID(cls, "maPurchaseCreate", "(Ljava/lang/String;)I");
 		if (methodID == 0)
 		{
-			return;
+			return 0;
 		}
 
-		jNIEnv->CallIntMethod(jThis, methodID, jstrProduct);
+		int result = jNIEnv->CallIntMethod(jThis, methodID, jstrProduct);
 
 		jNIEnv->DeleteLocalRef(cls);
 		jNIEnv->DeleteLocalRef(jstrProduct);
+
+		return result;
 	}
 
 	int _maPurchaseSetPublicKey(const char* developerKey, JNIEnv* jNIEnv, jobject jThis)

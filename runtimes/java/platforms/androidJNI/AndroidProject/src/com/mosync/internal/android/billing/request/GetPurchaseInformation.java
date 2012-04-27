@@ -50,7 +50,7 @@ public class GetPurchaseInformation extends BaseRequest
 	}
 
 	@Override
-	protected void run() throws RemoteException
+	public void run() throws RemoteException
 	{
 		/**
 		 * The REQUEST_NONCE key contains a cryptographically secure nonce (number used once) that you must generate.

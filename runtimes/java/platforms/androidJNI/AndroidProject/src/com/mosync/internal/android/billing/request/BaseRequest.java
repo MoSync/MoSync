@@ -139,7 +139,7 @@ public abstract class BaseRequest
      * The derived class must implement this method.
      * @throws RemoteException
      */
-    abstract protected void run() throws RemoteException;
+    abstract public void run() throws RemoteException;
 
     /**
      * This is called when Android Market sends a response code for a Purchase

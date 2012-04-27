@@ -5,77 +5,67 @@ group PurchaseResultCodes "Purchase Result Codes" {
         */
 		OK = 0;
         /**
-        * \brief
+        * \brief Indicates that in app-purchase is not available because the
+		* API version is not compatible or the user is not eligible to make
+		* in-app purchases (for example, the user resides in a country that
+		* prohibits in-app purchases).
+		* Platform: Android only.
         */
 		UNAVAILABLE = -1;
         /**
-        * \brief
+        * \brief Indicates that there was an error connecting with the Google Play application.
+		* Platform: Android.
         */
-		ERROR = -2;
+		CONNECTION_ERROR = -2;
+        /**
+        * \brief Indicates that the #maPurchaseSupported() call failed because the Google Play
+		* application is out of date and needs to be updated. In this case, you can provide users
+		* with an error message that contains a link to the Updating Google Play Help topic.
+		* Platform: Android.
+        */
+		OUT_OF_DATE = -3;
         /**
         * \brief
         */
-		DEVELOPER_ERROR = -3;
-        /**
-        * \brief
-        */
-		OUT_OF_DATE = -4;
-        /**
-        * \brief
-        */
-		USER_CANCELED = -5;
-        /**
-        * \brief
-        */
-		SERVICE_UNAVAILABLE = -6;
-        /**
-        * \brief
-        */
-		ITEM_UNAVAILABLE = -7;
-        /**
-        * \brief
-        */
-		ITEM_ALREADY_PURCHASED = -8;
-        /**
-        * \brief
-        */
-		CLIENT_INVALID = -9;
+		CLIENT_INVALID = -4;
         /**
         * \brief Returned by the #maPurchaseCreate() syscall if the productID string is empty.
         * Platform: Android and iOS.
         */
-		INVALID = -10;
+		INVALID = -5;
         /**
         * \brief
         */
-		NOT_ALLOWED = -11;
+		NOT_ALLOWED = -6;
         /**
         * \brief Returned by the #maPurchaseSupported() syscall if purchase is not allowed on the device.
         * Platform: iOS.
         */
-		DISABLED = -12;
+		DISABLED = -7;
         /**
         * \brief Returned by the #maPurchaseGetName() or  maPurchaseVerifyReceipt syscalls if the
         * productHandle is invalid.
+		* Platform: Android and iOS.
         */
-		INVALID_HANDLE = -13;
+		INVALID_HANDLE = -8;
         /**
         * \brief Returned by the #maPurchaseGetName() syscall if the the given buffer is too small.
+		* Platform: Android and iOS.
         */
-		BUFFER_TOO_SMALL = -14;
+		BUFFER_TOO_SMALL = -9;
         /**
         * \brief Returned by the #maPurchaseVerifyReceipt() syscall if the product has not been purchased.
         */
-		RECEIPT = -15;
+		RECEIPT = -10;
         /**
         * \brief Returned by the #maPurchaseGetField() syscall if the receipt has not been received or
         * if the transaction is invalid.
         */
-		RECEIPT_NOT_AVAILABLE = -16;
+		RECEIPT_NOT_AVAILABLE = -11;
         /**
         * \brief Returned by the #maPurchaseGetField() syscall if the receipt does not contain the given field.
         */
-		INVALID_FIELD_NAME = -17;
+		INVALID_FIELD_NAME = -12;
 	}
 } // end of Purchase Result Codes
 
@@ -120,6 +110,12 @@ group PurchaseErrorCodes "Purchase Error Codes" {
         * cannot be parsed.
         */
 		CANNOT_PARSE_RECEIPT = -3;
+		/**
+		* \brief Sent by the #maPurchaseRequest syscall if the user pressed the back button
+		* on the checkout page instead of buying the item.
+		* Platform: Android.
+		*/
+		USER_CANCELED = -4;
 	}
 } // end of Purchase Error Codes
 
@@ -149,7 +145,9 @@ group PurchaseEventTypes "Purchase Event Types" {
 		PRODUCT_VALID = 3;
         /**
         * \brief Notifies that a product is not valid and not available for purchasing.
-        * Sent after calling #maPurchaseCreate() syscall.
+        * Sent after calling #maPurchaseCreate() syscall on iOS.
+		* Sent after calling #maPurchaseRequest() syscall on Android. It can also indicate
+		* that the managed product was already purchased.
         */
 		PRODUCT_INVALID = 4;
         /**
@@ -240,10 +238,15 @@ group PurchaseReceiptFields "Purchase Receipt Fields" {
 group PurchaseFunctions "Purchase Functions" {
 	/**
 	* \brief Check if in app purchase is supported/enabled on a device.
+	* It does not trigger any asynchronous responses.
+	* Platform: Android and iOS.
 	*
 	* \returns One of the next result codes:
 	* - #MA_PURCHASE_RES_OK if purchase is supported/allowed on the device.
 	* - #MA_PURCHASE_RES_DISABLED if purchase is not allowed/enabled.
+	* - #MA_PURCHASE_RES_UNAVAILABLE if purchase is not supported on the device.
+	* - #MA_PURCHASE_RES_OUT_OF_DATE if GooglePlay applciation is out of date.
+	* - #MA_PURCHASE_RES_CONNECTION_ERROR if there was an error connecting with the GooglePlay application.
 	*/
 	int maPurchaseSupported();
 
@@ -264,13 +267,19 @@ group PurchaseFunctions "Purchase Functions" {
 	MAHandle maPurchaseCreate(in MAString productID);
 
 	/**
+	* Set your Google Play public key to the application. This enables the application
+	* to verify the signature of the transaction information that is returned from Google Play.
+	* Must be set before #maVerifyReceipt.
 	* \brief Platform: Android.
+	* \param developerKey Base64-encoded public key, that can be found on the Google
+	* Play publisher account page, under Licensing & In-app Billing panel in Edit Profile.
 	*/
 	void maPurchaseSetPublicKey(in MAString developerPublicKey);
 
 	/**
 	* Request the user to purchase a product.
 	* The system will handle the proccess of purchasing.
+	* Note: if there are another requests in progress, the requests will be queued.
 	*
 	* A #EVENT_TYPE_PURCHASE will be sent after calling this syscall.
 	* The event will contain a MAPurchaseEventData struct object. The type member object
@@ -302,6 +311,7 @@ group PurchaseFunctions "Purchase Functions" {
 	* - #MA_PURCHASE_RES_OK if the receipt has been send to the store for verifying.
 	* - #MA_PURCHASE_RES_INVALID_HANDLE if the productHandle is invalid.
 	* - #MA_PURCHASE_RES_RECEIPT if the product has not been purchased.
+	* - #MA_PURCHASE_RES_PUBLIC_KEY_NOT_SET.
 	*/
 	int maPurchaseVerifyReceipt(in MAHandle productHandle);
 
@@ -362,5 +372,5 @@ group PurchaseFunctions "Purchase Functions" {
 	* \param productHandle Handle to the product to destroy.
 	* If the given handle is invalid the method does nothing.
 	*/
-	void maPurchaseDestroy(in MAHandle productHandle);
+	int maPurchaseDestroy(in MAHandle productHandle);
 }

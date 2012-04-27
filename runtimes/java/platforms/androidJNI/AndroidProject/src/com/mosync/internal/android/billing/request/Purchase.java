@@ -66,7 +66,7 @@ public class Purchase extends BaseRequest
     }
 
 	@Override
-	protected void run() throws RemoteException
+	public void run() throws RemoteException
 	{
 		// ToDo check if we need responseCode
 		Bundle request = BillingService

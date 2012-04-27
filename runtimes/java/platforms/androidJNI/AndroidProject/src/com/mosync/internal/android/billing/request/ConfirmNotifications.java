@@ -50,7 +50,7 @@ public class ConfirmNotifications extends BaseRequest
 	}
 
 	@Override
-	protected void run() throws RemoteException {
+	public void run() throws RemoteException {
 
 	}
 

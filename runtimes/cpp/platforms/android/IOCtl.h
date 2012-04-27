@@ -918,7 +918,7 @@ namespace Base
 
 	int _maPurchaseSupported(JNIEnv* jNIEnv, jobject jThis);
 
-	void _maPurchaseCreate(const char* productID, JNIEnv* jNIEnv, jobject jThis);
+	int _maPurchaseCreate(const char* productID, JNIEnv* jNIEnv, jobject jThis);
 
 	int _maPurchaseSetPublicKey(const char* developerKey, JNIEnv* jNIEnv, jobject jThis);
 
