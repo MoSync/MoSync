@@ -29,7 +29,6 @@ group PurchaseResultCodes "Purchase Result Codes" {
         */
 		CLIENT_INVALID = -4;
         /**
-        /**
         * \brief
         */
 		NOT_ALLOWED = -5;

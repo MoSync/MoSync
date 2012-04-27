@@ -34,8 +34,6 @@ import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_ERROR_INVAL
 import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_RES_OK;
 import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_STATE_FAILED;
 import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_STATE_IN_PROGRESS;
-import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_STATE_COMPLETED;
-import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_STATE_RESTORED;
 
 /**
  * The purchase manager holds all purchase info of both user

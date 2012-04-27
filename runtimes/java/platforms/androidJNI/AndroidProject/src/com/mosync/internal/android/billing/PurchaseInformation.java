@@ -21,11 +21,6 @@ import java.util.Date;
 
 import com.mosync.internal.android.billing.request.BaseRequest;
 
-import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_STATE_FAILED;
-import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_STATE_IN_PROGRESS;
-import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_STATE_COMPLETED;
-import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_STATE_RESTORED;
-
 /**
  * Purchase class holds information about a purchase.
  * Available fields: prodID, quantity, time, price, state.
