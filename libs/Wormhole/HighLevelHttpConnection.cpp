@@ -17,7 +17,7 @@ MA 02110-1301, USA.
 */
 
 /**
- * @file EasyHttpConnection.cpp
+ * @file HighLevelHttpConnection.cpp
  * @author Mikael Kindborg
  *
  * @brief A high-level HTTP connection object.
@@ -27,7 +27,7 @@ MA 02110-1301, USA.
 #include <mastring.h>
 #include <mavsprintf.h>
 
-#include "EasyHttpConnection.h"
+#include "HighLevelHttpConnection.h"
 
 using namespace MAUtil;
 
@@ -57,29 +57,29 @@ static void DeallocateHandle(MAHandle handle)
 	maDestroyPlaceholder(handle);
 }
 
-// *************** Class EasyHttpConnection *************** //
+// *************** Class HighLevelHttpConnection *************** //
 
-EasyHttpConnection::EasyHttpConnection() :
+HighLevelHttpConnection::HighLevelHttpConnection() :
 	HttpConnection(this),
 	mReader(NULL)
 {
 }
 
-EasyHttpConnection::~EasyHttpConnection()
+HighLevelHttpConnection::~HighLevelHttpConnection()
 {
 	deallocateData();
 }
 
 /**
  * This is the starting point of a JSON request.
- * \return EASY_HTTP_SUCCESS if successful, EASY_HTTP_ERROR on error.
+ * \return WORMHOLE_HTTP_SUCCESS if successful, WORMHOLE_HTTP_ERROR on error.
  */
-int EasyHttpConnection::postJsonRequest(const char* url, const char* jsonData)
+int HighLevelHttpConnection::postJsonRequest(const char* url, const char* jsonData)
 {
 	int result = create(url, HTTP_POST);
 	if (result < 0)
 	{
-		return EASY_HTTP_ERROR;
+		return WORMHOLE_HTTP_ERROR;
 	}
 
 	char contentLength[16];
@@ -92,15 +92,15 @@ int EasyHttpConnection::postJsonRequest(const char* url, const char* jsonData)
 	// Write request data.
 	write(jsonData, strlen(jsonData));
 
-	// Next this that happens is that connWriteFinished is called.
+	// Next that happens is that connWriteFinished is called.
 
-	return EASY_HTTP_SUCCESS;
+	return WORMHOLE_HTTP_SUCCESS;
 }
 
 /**
  * This is the starting point of a GET request.
  */
-int EasyHttpConnection::get(const char* url)
+int HighLevelHttpConnection::get(const char* url)
 {
 	int result = create(url, HTTP_GET);
 	if (result > 0)
@@ -113,7 +113,7 @@ int EasyHttpConnection::get(const char* url)
 	return result;
 }
 
-void EasyHttpConnection::connWriteFinished(
+void HighLevelHttpConnection::connWriteFinished(
 	MAUtil::Connection* connection,
 	int result)
 {
@@ -137,7 +137,7 @@ void EasyHttpConnection::connWriteFinished(
  * Now all data is sent to the server and we can start reading
  * the reply and download data.
  */
-void EasyHttpConnection::httpFinished(
+void HighLevelHttpConnection::httpFinished(
 	MAUtil::HttpConnection* connection,
 	int result)
 {
@@ -151,13 +151,13 @@ void EasyHttpConnection::httpFinished(
 
 	// Start to read the result using a DownloadReader helper object.
 	deleteReader();
-	mReader = new EasyReaderThatReadsChunks(this);
+	mReader = new HighLevelReaderThatReadsChunks(this);
 	mReader->startRecvToData();
 
 	// Next this that happens is that connReadFinished is called.
 }
 
-void EasyHttpConnection::connRecvFinished(
+void HighLevelHttpConnection::connRecvFinished(
 	MAUtil::Connection* connection,
 	int result)
 {
@@ -165,21 +165,21 @@ void EasyHttpConnection::connRecvFinished(
 	mReader->connRecvFinished(result);
 }
 
-void EasyHttpConnection::connReadFinished(
+void HighLevelHttpConnection::connReadFinished(
 	MAUtil::Connection* connection,
 	int result)
 {
 	// TODO: Document why this should not happen.
 	maPanic(
 		1,
-		"EasyHttpConnection::connReadFinished: "
+		"HighLevelHttpConnection::connReadFinished: "
 		"This was not supposed to happen.");
 }
 
 /**
- * Called by an EasyReader when there is a download error.
+ * Called by an HighLevelReader when there is a download error.
  */
-void EasyHttpConnection::downloadError(int result)
+void HighLevelHttpConnection::downloadError(int result)
 {
 	close();
 	deleteReader();
@@ -188,9 +188,9 @@ void EasyHttpConnection::downloadError(int result)
 }
 
 /**
- * Called by an EasyReader when download is successfully finished.
+ * Called by an HighLevelReader when download is successfully finished.
  */
-void EasyHttpConnection::downloadSuccess(MAHandle handle)
+void HighLevelHttpConnection::downloadSuccess(MAHandle handle)
 {
 	close();
 	deleteReader();
@@ -198,11 +198,11 @@ void EasyHttpConnection::downloadSuccess(MAHandle handle)
 	dataDownloaded(handle, RES_OK);
 }
 
-void EasyHttpConnection::deallocateData()
+void HighLevelHttpConnection::deallocateData()
 {
 }
 
-void EasyHttpConnection::deleteReader()
+void HighLevelHttpConnection::deleteReader()
 {
 	if (mReader)
 	{
@@ -211,30 +211,30 @@ void EasyHttpConnection::deleteReader()
 	}
 }
 
-// *************** Class EasyReader *************** //
+// *************** Class HighLevelReader *************** //
 
 /**
  * Constructor.
  */
-EasyReader::EasyReader(EasyHttpConnection* connection)
+HighLevelReader::HighLevelReader(HighLevelHttpConnection* connection)
 : mConnection(connection),
   mContentLength(0)
 {
 }
 
-int EasyReader::getContentLength()
+int HighLevelReader::getContentLength()
 {
 	return mContentLength;
 }
 
-// *************** Class EasyReaderThatReadsChunks *************** //
+// *************** Class HighLevelReaderThatReadsChunks *************** //
 
 /**
  * Constructor.
  */
-EasyReaderThatReadsChunks::EasyReaderThatReadsChunks(
-		EasyHttpConnection* connection)
-: EasyReader(connection),
+HighLevelReaderThatReadsChunks::HighLevelReaderThatReadsChunks(
+		HighLevelHttpConnection* connection)
+: HighLevelReader(connection),
   mDataChunkSize(2048),
   mDataChunkOffset(0)
 {
@@ -243,7 +243,7 @@ EasyReaderThatReadsChunks::EasyReaderThatReadsChunks(
 /**
  * Destructor.
  */
-EasyReaderThatReadsChunks::~EasyReaderThatReadsChunks()
+HighLevelReaderThatReadsChunks::~HighLevelReaderThatReadsChunks()
 {
 	// Deallocate chunks.
 	while (0 < mDataChunks.size())
@@ -262,7 +262,7 @@ EasyReaderThatReadsChunks::~EasyReaderThatReadsChunks()
 /**
  * Start downloading data.
  */
-void EasyReaderThatReadsChunks::startRecvToData()
+void HighLevelReaderThatReadsChunks::startRecvToData()
 {
 	// Content length is unknown, read data in chunks until we get
 	// CONNERR_CLOSED.
@@ -276,7 +276,7 @@ void EasyReaderThatReadsChunks::startRecvToData()
 /**
  * Called when the new data is available.
  */
-void EasyReaderThatReadsChunks::connRecvFinished(int result)
+void HighLevelReaderThatReadsChunks::connRecvFinished(int result)
 {
 	// If the connection is closed we have completed reading the data.
 	if (CONNERR_CLOSED == result)
@@ -315,7 +315,7 @@ void EasyReaderThatReadsChunks::connRecvFinished(int result)
 	}
 }
 
-bool EasyReaderThatReadsChunks::readNextChunk()
+bool HighLevelReaderThatReadsChunks::readNextChunk()
 {
 	// Allocate new a chunk of data.
 	MAHandle chunk = AllocateHandle();
@@ -334,7 +334,7 @@ bool EasyReaderThatReadsChunks::readNextChunk()
 	}
 }
 
-void EasyReaderThatReadsChunks::finishedDownloadingChunkedData()
+void HighLevelReaderThatReadsChunks::finishedDownloadingChunkedData()
 {
 	// Allocate big handle and copy the chunks to it.
 	// mContentLength holds the accumulated size of read data.

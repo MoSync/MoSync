@@ -25,16 +25,16 @@ MA 02110-1301, USA.
  */
 
 /**
- * @file EasyTextDownloader.h
+ * @file HighLevelTextDownloader.h
  * @author Mikael Kindborg
  *
  * @brief A high-level object for downloading text files.
  */
 
-#ifndef WORMHOLE_EASY_TEXT_DOWNLOADER_H
-#define WORMHOLE_EASY_TEXT_DOWNLOADER_H
+#ifndef WORMHOLE_HIGH_LEVEL_TEXT_DOWNLOADER_H
+#define WORMHOLE_HIGH_LEVEL_TEXT_DOWNLOADER_H
 
-#include "EasyHttpConnection.h"
+#include "HighLevelHttpConnection.h"
 
 namespace Wormhole
 {
@@ -43,7 +43,7 @@ namespace Wormhole
  * I am an easy-to-use downloader for text data. Inherit me and
  * override onDownloadComplete.
  *
- * Call EasyTextDownloader::freeData() to free the downloaded data.
+ * Call HighLevelTextDownloader::freeData() to free the downloaded data.
  *
  * An instance of me will delete itself on dataDownloaded!
  * Use new to create instances of my subclasses. Do not use automatic
@@ -51,7 +51,7 @@ namespace Wormhole
  *
  * Example of use:
  *
- * class MyTextDownloader : public EasyTextDownloader
+ * class MyTextDownloader : public HighLevelTextDownloader
  * {
  *     void onDownloadComplete(char* text)
  *     {
@@ -62,25 +62,25 @@ namespace Wormhole
  * // Start download.
  * new MyTextDownloader().get("http://...");
  */
-class EasyTextDownloader : public EasyHttpConnection
+class HighLevelTextDownloader : public HighLevelHttpConnection
 {
 public:
 	/**
 	 * Constructor.
 	 */
-	EasyTextDownloader();
+	HighLevelTextDownloader();
 
 protected:
 	/**
 	 * Destructor.
 	 */
-	virtual ~EasyTextDownloader();
+	virtual ~HighLevelTextDownloader();
 
 public:
 	/**
 	 * Override to do something with the text that is downloaded.
 	 * If download fails, text is NULL.
-	 * Note that text must be deallocated using EasyTextDownloader::freeData().
+	 * Note that text must be deallocated using HighLevelTextDownloader::freeData().
 	 */
 	virtual void onDownloadComplete(char* text) = 0;
 
@@ -91,7 +91,7 @@ public:
 
 protected:
 	/**
-	 * Inherited from EasyHttpConnection.
+	 * Inherited from HighLevelHttpConnection.
 	 * Called when the HTTP connection has finished
 	 * downloading data.
 	 * Calls onDownloadComplete.

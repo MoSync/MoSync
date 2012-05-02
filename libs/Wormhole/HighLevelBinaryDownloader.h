@@ -25,68 +25,68 @@ MA 02110-1301, USA.
  */
 
 /**
- * @file EasyImageDownloader.h
+ * @file HighLevelBinaryDownloader.h
  * @author Mikael Kindborg
  *
- * @brief A high-level object for downloading image files.
+ * @brief A high-level object for downloading binary files.
  */
 
-#ifndef WORMHOLE_EASY_IMAGE_DOWNLOADER_H
-#define WORMHOLE_EASY_IMAGE_DOWNLOADER_H
+#ifndef WORMHOLE_HIGH_LEVEL_BINARY_DOWNLOADER_H
+#define WORMHOLE_HIGH_LEVEL_BINARY_DOWNLOADER_H
 
-#include "EasyHttpConnection.h"
+#include "HighLevelHttpConnection.h"
 
 namespace Wormhole
 {
 
 /**
- * I am an easy-to-use downloader for images. Inherit me and
- * override onImageDownloaded.
+ * I am an easy-to-use downloader for binary data. Inherit me and
+ * override onBinaryDownloaded.
  *
- * Call maDestroyObject to deallocate the downloaded image.
+ * Call maDestroyObject to deallocate the downloaded data.
  *
  * An instance of me will delete itself on dataDownloaded!
- * Use new to create instances of my subclasses. Do not use
- * automatic allocation.
+ * Use new to create instances of my subclasses. Do not use automatic
+ * allocation.
  *
  * Example of use:
  *
- * class MyImageDownloader : public EasyImageDownloader
+ * class MyBinaryDownloader : public HighLevelBinaryDownloader
  * {
- *     void onDownloadComplete(MAHandle image)
+ *     void onDownloadComplete(MAHandle data)
  *     {
- *         // Do something with the image.
+ *         // Do something with the data.
  *     }
  * };
  *
  * // Start download.
- * new MyDownloader().get("http://...");
+ * new MyBinaryDownloader().get("http://...");
  */
-class EasyImageDownloader : public EasyHttpConnection
+class HighLevelBinaryDownloader : public HighLevelHttpConnection
 {
 public:
+	// Public protocol.
+
 	/**
 	 * Constructor.
 	 */
-	EasyImageDownloader();
+	HighLevelBinaryDownloader();
 
-protected:
 	/**
 	 * Destructor.
 	 */
-	virtual ~EasyImageDownloader();
+	virtual ~HighLevelBinaryDownloader();
 
-public:
 	/**
-	 * Override to do something with the image that is downloaded.
-	 * If download fails, image is 0.
-	 * Note that image must be deallocated using maDestroyObject.
+	 * Override to do something with the data that is downloaded.
+	 * If download fails, data is NULL.
+	 * Note that data must be deallocated using maDestroyObject().
 	 */
-	virtual void onDownloadComplete(MAHandle image) = 0;
+	virtual void onDownloadComplete(MAHandle data) = 0;
 
 protected:
 	/**
-	 * Inherited from EasyHttpConnection.
+	 * Inherited from HighLevelHttpConnection.
 	 * Called when the HTTP connection has finished
 	 * downloading data.
 	 * Calls onDownloadComplete.

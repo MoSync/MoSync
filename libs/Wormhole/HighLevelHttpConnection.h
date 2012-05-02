@@ -25,14 +25,14 @@ MA 02110-1301, USA.
  */
 
 /**
- * @file EasyHttpConnection.h
+ * @file HighLevelHttpConnection.h
  * @author Mikael Kindborg
  *
  * @brief A high-level HTTP connection object.
  */
 
-#ifndef WORMHOLE_EASY_HTTP_CONNECTION_H
-#define WORMHOLE_EASY_HTTP_CONNECTION_H
+#ifndef WORMHOLE_HIGH_LEVEL_HTTP_CONNECTION_H
+#define WORMHOLE_HIGH_LEVEL_HTTP_CONNECTION_H
 
 #include <ma.h>
 #include <maheap.h>
@@ -42,23 +42,23 @@ namespace Wormhole
 {
 
 // Constants.
-#define EASY_HTTP_SUCCESS 1
-#define EASY_HTTP_ERROR -1
+#define WORMHOLE_HTTP_SUCCESS 1
+#define WORMHOLE_HTTP_ERROR -1
 
 // Forward declaration.
-class EasyHttpConnection;
+class HighLevelHttpConnection;
 
 /**
  * \brief Base class for helper classes that handle the download.
- * We have only one such class right now, EasyReaderThatReadsChunks.
+ * We have only one such class right now, HighLevelReaderThatReadsChunks.
  */
-class EasyReader
+class HighLevelReader
 {
 public:
 	/**
 	 * Constructor.
 	 */
-	EasyReader(EasyHttpConnection* connection);
+	HighLevelReader(HighLevelHttpConnection* connection);
 
 	/**
 	 * Start downloading data.
@@ -76,7 +76,7 @@ protected:
 	/**
 	 * The connection object served by this reader.
 	 */
-	EasyHttpConnection* mConnection;
+	HighLevelHttpConnection* mConnection;
 
 	/**
 	 * Total length of downloaded data (accumulated value).
@@ -89,18 +89,18 @@ protected:
  * is NOT known. Here we read in chunks until we get result
  * CONNERR_CLOSED in connRecvFinished.
  */
-class EasyReaderThatReadsChunks : public EasyReader
+class HighLevelReaderThatReadsChunks : public HighLevelReader
 {
 public:
 	/**
 	 * Constructor.
 	 */
-	EasyReaderThatReadsChunks(EasyHttpConnection* downloader);
+	HighLevelReaderThatReadsChunks(HighLevelHttpConnection* downloader);
 
 	/**
 	 * Destructor.
 	 */
-	virtual ~EasyReaderThatReadsChunks();
+	virtual ~HighLevelReaderThatReadsChunks();
 
 	/**
 	 * Start downloading data.
@@ -134,8 +134,8 @@ protected:
 };
 
 /**
- * A high-level HTTP connection object that is easier to use
- * than MAUTIL::HttpConnection. Has an integrated listener.
+ * An HTTP connection object that is more high-level compared
+ * to MAUTIL::HttpConnection. It has an integrated listener.
  * This class does not use the "content-length" HTTP header
  * and thus works also when this header is not set.
  *
@@ -143,17 +143,17 @@ protected:
  *
  *   virtual void dataDownloaded(MAHandle data, int result);
  */
-class EasyHttpConnection :
+class HighLevelHttpConnection :
 	public MAUtil::HttpConnection,
 	public MAUtil::HttpConnectionListener
 {
 public:
-	EasyHttpConnection();
-	virtual ~EasyHttpConnection();
+	HighLevelHttpConnection();
+	virtual ~HighLevelHttpConnection();
 
 	/**
 	 * This is the starting point of the JSON request.
-	 * \return EASY_HTTP_SUCCESS if successful, EASY_HTTP_ERROR on error.
+	 * \return WORMHOLE_HTTP_SUCCESS if successful, WORMHOLE_HTTP_ERROR on error.
 	 */
 	int postJsonRequest(const char* url, const char* jsonData);
 
@@ -163,12 +163,12 @@ public:
 	int get(const char* url);
 
 	/**
-	 * Called by an EasyReader when download is successfully finished.
+	 * Called by an HighLevelReader when download is successfully finished.
 	 */
 	void downloadSuccess(MAHandle handle);
 
 	/**
-	 * Called by an EasyReader when there is a download error.
+	 * Called by an HighLevelReader when there is a download error.
 	 */
 	void downloadError(int result);
 
@@ -208,7 +208,7 @@ private:
 	/**
 	 * Object that performs the actual download.
 	 */
-	EasyReader* mReader;
+	HighLevelReader* mReader;
 };
 
 } // namespace

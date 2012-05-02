@@ -17,13 +17,13 @@ MA 02110-1301, USA.
 */
 
 /**
- * @file EasyBinaryDownloader.cpp
+ * @file HighLevelTextDownloader.cpp
  * @author Mikael Kindborg
  *
- * @brief A high-level object for downloading binary files.
+ * @brief A high-level object for downloading text files.
  */
 
-#include "EasyBinaryDownloader.h"
+#include "HighLevelTextDownloader.h"
 
 using namespace MAUtil;
 
@@ -33,19 +33,30 @@ namespace Wormhole
 /**
  * Constructor.
  */
-EasyBinaryDownloader::EasyBinaryDownloader()
+HighLevelTextDownloader::HighLevelTextDownloader()
 {
 }
 
 /**
  * Destructor.
  */
-EasyBinaryDownloader::~EasyBinaryDownloader()
+HighLevelTextDownloader::~HighLevelTextDownloader()
 {
 }
 
 /**
- * Inherited from EasyHttpConnection.
+ * Use to free text string passed by onDownloadComplete.
+ */
+void HighLevelTextDownloader::freeData(char* text)
+{
+	if (NULL != text)
+	{
+		delete[] text;
+	}
+}
+
+/**
+ * Inherited from HighLevelHttpConnection.
  * Called when the HTTP connection has finished
  * downloading data.
  * Calls onDownloadComplete.
@@ -54,14 +65,32 @@ EasyBinaryDownloader::~EasyBinaryDownloader()
  * @param result Result code, RES_OK on success,
  * otherwise an HTTP error code.
  */
-void EasyBinaryDownloader::dataDownloaded(MAHandle data, int result)
+void HighLevelTextDownloader::dataDownloaded(MAHandle data, int result)
 {
-	// We just pass on the data handle, which will
-	// be zero (NULL) on error.
-	onDownloadComplete(data);
+	// The resulting text.
+	char* text = NULL;
+
+	// Do we have any data?
+	if (data)
+	{
+		// Copy data to string.
+		int size = maGetDataSize(data);
+		text = new char[size + 1];
+		if (text)
+		{
+			maReadData(data, text, 0, size);
+			text[size] = '\0'; // Zero terminate string
+		}
+
+		// Deallocate the data object, we are done with it.
+		maDestroyObject(data);
+	}
+
+	// Notify download complete.
+	onDownloadComplete(text);
 
 	// Delete myself!
 	delete this;
 }
 
-}
+} // namespace

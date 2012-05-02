@@ -17,13 +17,13 @@ MA 02110-1301, USA.
 */
 
 /**
- * @file EasyImageDownloader.cpp
+ * @file HighLevelBinaryDownloader.cpp
  * @author Mikael Kindborg
  *
- * @brief A high-level object for downloading image files.
+ * @brief A high-level object for downloading binary files.
  */
 
-#include "EasyImageDownloader.h"
+#include "HighLevelBinaryDownloader.h"
 
 using namespace MAUtil;
 
@@ -33,19 +33,19 @@ namespace Wormhole
 /**
  * Constructor.
  */
-EasyImageDownloader::EasyImageDownloader()
+HighLevelBinaryDownloader::HighLevelBinaryDownloader()
 {
 }
 
 /**
  * Destructor.
  */
-EasyImageDownloader::~EasyImageDownloader()
+HighLevelBinaryDownloader::~HighLevelBinaryDownloader()
 {
 }
 
 /**
- * Inherited from EasyHttpConnection.
+ * Inherited from HighLevelHttpConnection.
  * Called when the HTTP connection has finished
  * downloading data.
  * Calls onDownloadComplete.
@@ -54,38 +54,14 @@ EasyImageDownloader::~EasyImageDownloader()
  * @param result Result code, RES_OK on success,
  * otherwise an HTTP error code.
  */
-void EasyImageDownloader::dataDownloaded(MAHandle data, int result)
+void HighLevelBinaryDownloader::dataDownloaded(MAHandle data, int result)
 {
-	// The resulting image.
-	MAHandle image = 0;
-
-	// Do we have any data?
-	if (data)
-	{
-		// Convert data to image.
-		image = maCreatePlaceholder();
-		int res = maCreateImageFromData(
-			image,
-			data,
-			0,
-			maGetDataSize(data));
-
-		// Do we have an error?
-		if (RES_OUT_OF_MEMORY == res)
-		{
-			// The image could not be created, set data handle to zero.
-			image = 0;
-		}
-
-		// Deallocate the data object, we are done with it.
-		maDestroyObject(data);
-	}
-
-	// Notify download complete.
-	onDownloadComplete(image);
+	// We just pass on the data handle, which will
+	// be zero (NULL) on error.
+	onDownloadComplete(data);
 
 	// Delete myself!
 	delete this;
 }
 
-} // namespace
+}

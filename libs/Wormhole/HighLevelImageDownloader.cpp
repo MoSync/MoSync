@@ -17,13 +17,13 @@ MA 02110-1301, USA.
 */
 
 /**
- * @file EasyTextDownloader.cpp
+ * @file HighLevelImageDownloader.cpp
  * @author Mikael Kindborg
  *
- * @brief A high-level object for downloading text files.
+ * @brief A high-level object for downloading image files.
  */
 
-#include "EasyTextDownloader.h"
+#include "HighLevelImageDownloader.h"
 
 using namespace MAUtil;
 
@@ -33,30 +33,19 @@ namespace Wormhole
 /**
  * Constructor.
  */
-EasyTextDownloader::EasyTextDownloader()
+HighLevelImageDownloader::HighLevelImageDownloader()
 {
 }
 
 /**
  * Destructor.
  */
-EasyTextDownloader::~EasyTextDownloader()
+HighLevelImageDownloader::~HighLevelImageDownloader()
 {
 }
 
 /**
- * Use to free text string passed by onDownloadComplete.
- */
-void EasyTextDownloader::freeData(char* text)
-{
-	if (NULL != text)
-	{
-		delete[] text;
-	}
-}
-
-/**
- * Inherited from EasyHttpConnection.
+ * Inherited from HighLevelHttpConnection.
  * Called when the HTTP connection has finished
  * downloading data.
  * Calls onDownloadComplete.
@@ -65,21 +54,27 @@ void EasyTextDownloader::freeData(char* text)
  * @param result Result code, RES_OK on success,
  * otherwise an HTTP error code.
  */
-void EasyTextDownloader::dataDownloaded(MAHandle data, int result)
+void HighLevelImageDownloader::dataDownloaded(MAHandle data, int result)
 {
-	// The resulting text.
-	char* text = NULL;
+	// The resulting image.
+	MAHandle image = 0;
 
 	// Do we have any data?
 	if (data)
 	{
-		// Copy data to string.
-		int size = maGetDataSize(data);
-		text = new char[size + 1];
-		if (text)
+		// Convert data to image.
+		image = maCreatePlaceholder();
+		int res = maCreateImageFromData(
+			image,
+			data,
+			0,
+			maGetDataSize(data));
+
+		// Do we have an error?
+		if (RES_OUT_OF_MEMORY == res)
 		{
-			maReadData(data, text, 0, size);
-			text[size] = '\0'; // Zero terminate string
+			// The image could not be created, set data handle to zero.
+			image = 0;
 		}
 
 		// Deallocate the data object, we are done with it.
@@ -87,7 +82,7 @@ void EasyTextDownloader::dataDownloaded(MAHandle data, int result)
 	}
 
 	// Notify download complete.
-	onDownloadComplete(text);
+	onDownloadComplete(image);
 
 	// Delete myself!
 	delete this;
