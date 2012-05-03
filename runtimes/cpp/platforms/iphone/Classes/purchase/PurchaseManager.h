@@ -79,24 +79,28 @@
 
 /**
  * Create a product object.
+ * @param productHandle A valid handle that will be used to indetify the new product.
  * @param productID String that identifies the object.
- * @return MA_PURCHASE_RES_INVALID if the productID string is empty or a handle
- * to the product object.
  */
--(MAHandle) createProduct:(const char*) productID;
+-(void) createProduct:(MAHandle) productHandle
+            productID:(const char*) productID;
 
 /**
  * Destroy a product object.
  * @param productHandle Handle to the product to destroy.
- * If the given handle is invalid the method does nothing.
+ * @return One of the following values:
+ * - MA_PURCHASE_RES_OK if product has been detroyed.
+ * - MA_PURCHASE_RES_INVALID_HANDLE if the productHandle is invalid.
  */
--(void) destroyProduct:(MAHandle) productHandle;
+-(int) destroyProduct:(MAHandle) productHandle;
 
 /**
  * Add a given product to the payment queue.
  * @param productHandle Handle to the product to be added.
+ * @param quantity How many products to be purchased. Must be a value greater than zero.
  */
--(void) requestProduct:(MAHandle) productHandle;
+-(void) requestProduct:(MAHandle) productHandle
+              quantity:(const int) quantity;
 
 /**
  * Get the product id for a given product.
@@ -115,12 +119,8 @@
 /**
  * Verify if the receipt came from App Store.
  * @param productHandle Handle to the product you want to verify its receipt.
- * @return One of the next constants:
- * - MA_PURCHASE_RES_OK if the receipt was sent to the store for verifing.
- * - MA_PURCHASE_RES_INVALID_HANDLE if productHandle is invalid.
- * - MA_PURCHASE_RES_RECEIPT if the product has not been purchased.
  */
--(int) verifyReceipt:(MAHandle) productHandle;
+-(void) verifyReceipt:(MAHandle) productHandle;
 
 /**
  * Get a receipt field value.
@@ -130,6 +130,7 @@
  * @param bufferSize Maximum size of the buffer.
  * @return The number of written bytes in case of success, or
  * one of the next result codes:
+ * - MA_PURCHASE_RES_DISABLED if purchase is not allowed/enabled.
  * - MA_PURCHASE_RES_INVALID_HANDLE if the productHandle is invalid.
  * - MA_PURCHASE_RES_BUFFER_TOO_SMALL if the buffer is too small.
  * - MA_PURCHASE_RES_RECEIPT_NOT_AVAILABLE if the receipt has not been received or if

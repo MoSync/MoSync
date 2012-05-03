@@ -51,8 +51,8 @@ group PurchaseResultCodes "Purchase Result Codes" {
         */
 		DISABLED = -11;
         /**
-        * \brief Returned by the #maPurchaseGetName() or  maPurchaseVerifyReceipt syscalls
-        * if the productHandle is invalid.
+        * \brief Returned by the #maPurchaseGetName(), maPurchaseVerifyReceipt or
+        * maPurchaseDestroy syscalls if the productHandle is invalid.
         */
 		INVALID_HANDLE = -12;
         /**
@@ -95,37 +95,49 @@ group PurchaseErrorCodes "Purchase Error Codes" {
         */
 		CANNOT_PARSE_RECEIPT = -3;
 		/**
-		* \brief Possible error code for #MA_PURCHASE_EVENT_REQUEST_STATE_CHANGED.
+		* \brief Possible error code for #MA_PURCHASE_EVENT_REQUEST.
 		* Sent by the #maPurchaseRequest() syscall if the requested product is not valid
 		* on the App Store.
 		* Platform: iOS.
 		*/
 		INVALID_PRODUCT = -4;
         /**
-		* \brief Possible error code for #MA_PURCHASE_EVENT_REQUEST_STATE_CHANGED.
+		* \brief Possible error code for #MA_PURCHASE_EVENT_REQUEST.
 		* Sent by the #maPurchaseRequest() syscall if the client is not allowed to perform
 		* the attempted action.
 		* Platform: iOS.
 		*/
 		INVALID_CLIENT = -5;
         /**
-		* \brief Possible error code for #MA_PURCHASE_EVENT_REQUEST_STATE_CHANGED.
+		* \brief Possible error code for #MA_PURCHASE_EVENT_REQUEST.
 		* Sent by the #maPurchaseRequest() syscall if the user cancelled the payment request.
 		* Platform: iOS.
 		*/
 		CANCELLED = -6;
         /**
-		* \brief Possible error code for #MA_PURCHASE_EVENT_REQUEST_STATE_CHANGED.
+		* \brief Possible error code for #MA_PURCHASE_EVENT_REQUEST.
 		* Sent by the #maPurchaseRequest() syscall if the user is not allowed to authorize payments.
 		* Platform: iOS.
 		*/
 		NOT_ALLOWED = -7;
 		/**
-		* \brief Possible error code for #MA_PURCHASE_EVENT_REQUEST_STATE_CHANGED.
+		* \brief Possible error code for #MA_PURCHASE_EVENT_REQUEST.
 		* Sent by the #maPurchaseRequest() syscall if an unknown or unexpected error occurred.
 		* Platform: iOS.
 		*/
 		UNKNOWN = -8;
+		/**
+		* \brief Possible error code for #MA_PURCHASE_EVENT_REQUEST.
+		* Sent by the #maPurchaseRequest() syscall if the quantity is not greater than zero.
+		* Platform: Android and iOS.
+		*/
+		INVALID_QUANTITY = -9;
+		/**
+		* \brief Possible error code for #MA_PURCHASE_EVENT_VERIFY_RECEIPT.
+		* Sent by the #maPurchaseVerifyReceipt() syscall if the product has not been purchased.
+		* Platform: iOS.
+		*/
+		NO_RECEIPT = -10;
 	}
 } // end of Purchase Error Codes
 
@@ -158,7 +170,7 @@ group PurchaseEventTypes "Purchase Event Types" {
         * a handle to the purchased product.
         * Platform: iOS.
         */
-		RESTORED = 4;
+		RESTORE = 4;
 	}
 } // end of Purchase Event Types
 
@@ -424,8 +436,11 @@ group PurchaseFunctions "Purchase Functions" {
 
 	/**
 	* Destroy a product object.
+	*
 	* \param productHandle Handle to the product to destroy.
-	* If the given handle is invalid the method does nothing.
+	* \return One of the following values:
+	* - #MA_PURCHASE_RES_OK if product has been detroyed.
+	* - #MA_PURCHASE_RES_INVALID_HANDLE if the productHandle is invalid.
 	*/
 	int maPurchaseDestroy(in MAHandle productHandle);
 }
