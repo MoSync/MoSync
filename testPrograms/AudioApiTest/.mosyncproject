@@ -27,5 +27,6 @@
 <property key="excludes/Release" value=""/>
 <property key="profile.mgr.type" value="0"/>
 <property key="template.id" value="project.nativeuicpp"/>
+<property key="winmobilecs:guid" value="780f0b40-766b-102f-8073-1f457acae594"/>
 </properties>
 </project>
