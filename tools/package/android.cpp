@@ -461,7 +461,7 @@ static void writeC2DMReceiver(ostream& stream, const string& packageName) {
 }
 
 static void writeBillingReceiver(ostream& stream) {
-	stream << "\t\t<receiver android:name=\"com.mosync.internal.android.billing.BillingReceiver\"\n";
+	stream << "\t\t<receiver android:name=\"com.mosync.internal.android.billing.BillingReceiver\">\n";
 	stream << "\t\t\t<intent-filter>\n";
 	stream << "\t\t\t\t<action android:name=\"com.android.vending.billing.IN_APP_NOTIFY\" />\n";
 	stream << "\t\t\t\t<action android:name=\"com.android.vending.billing.RESPONSE_CODE\" />\n";

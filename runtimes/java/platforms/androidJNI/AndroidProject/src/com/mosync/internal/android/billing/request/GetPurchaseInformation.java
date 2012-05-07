@@ -70,8 +70,9 @@ public class GetPurchaseInformation extends BaseRequest
 				Consts.BILLING_RESPONSE_INVALID_REQUEST_ID);
 
 	    // todo set responseCode
-	    mResponseCode = response.getInt(Consts.BILLING_RESPONSE_INAPP_RESPONSE_CODE,
+	    int responseCode = response.getInt(Consts.BILLING_RESPONSE_INAPP_RESPONSE_CODE,
 				Consts.BILLING_RESPONSE_INVALID_RESPONSE_CODE);
+	    mResponseCode = Consts.responseCodeValue(responseCode);
 
 	    Log.e("@@MoSync", "GetPurchaseInformation response code: " + mResponseCode );
 	    Log.e("@@MoSync", "GetPurchaseInformation requestID: " + mRequestId );
@@ -85,8 +86,9 @@ public class GetPurchaseInformation extends BaseRequest
 	 * @param e the exception
 	 */
 	@Override
-	protected void onRemoteException(RemoteException e) {
-	//    Log.w(TAG, "remote billing service crashed");
+	protected void onRemoteException(RemoteException e)
+	{
+	    Log.e("@@MoSync", "remote billing service crashed");
 	    super.onRemoteException(e);
 	    Security.removeNonce(mNonce);
 	}

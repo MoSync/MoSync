@@ -3557,9 +3557,9 @@ public class MoSyncThread extends Thread
 	 * @param productID
 	 * @return
 	 */
-	int maPurchaseCreate(final String productID)
+	void maPurchaseCreate(final int productHandle, final String productID)
 	{
-		return mMoSyncPurchase.maPurchaseCreate(productID);
+		mMoSyncPurchase.maPurchaseCreate(productHandle, productID);
 	}
 
 	/**

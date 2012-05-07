@@ -6,9 +6,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.text.TextUtils;
-import android.util.Log;
-
 import java.security.InvalidKeyException;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
@@ -20,6 +17,11 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.ArrayList;
 import java.util.HashSet;
+
+import android.text.TextUtils;
+import android.util.Log;
+
+import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_STATE_COMPLETED;
 
 /**
  * Security-related methods. For a secure implementation, all of this code
@@ -52,13 +54,13 @@ public class Security
      * A class to hold the verified purchase information.
      */
     public static class VerifiedPurchase {
-        public Consts.PurchaseState purchaseState;
+        public int purchaseState;
         public String notificationId;
         public String productId;
         public String orderId;
         public long purchaseTime;
 
-        public VerifiedPurchase(Consts.PurchaseState purchaseState, String notificationId,
+        public VerifiedPurchase(int purchaseState, String notificationId,
                 String productId, String orderId, long purchaseTime)
         {
             this.purchaseState = purchaseState;
@@ -160,12 +162,17 @@ public class Security
             for (int i = 0; i < numTransactions; i++)
             {
                 JSONObject jElement = jTransactionsArray.getJSONObject(i);
+//                int response = jElement.getInt("purchaseState");
+//                PurchaseState purchaseState = PurchaseState.valueOf(response);
                 int response = jElement.getInt(Consts.TRANSACTION_PURCHASE_STATE);
-                Consts.PurchaseState purchaseState = Consts.PurchaseState.valueOf(response);
+                int purchaseState = Consts.purchaseStateValue(response);
                 String productId = jElement.getString("productId"); // or BILLING_REQUEST_ITEM_ID
                 String packageName = jElement.getString(Consts.TRANSACTION_PACKAGE_NAME);
                 long purchaseTime = jElement.getLong(Consts.TRANSACTION_PURCHASE_TIME);
+
                 String orderId = jElement.optString(Consts.TRANSACTION_ORDER_ID, "");
+                // TODO map orderID to requestID.
+
                 String notifyId = null;
                 if (jElement.has(Consts.TRANSACTION_NOTIFICATION_ID))
                 {
@@ -175,7 +182,7 @@ public class Security
 
                 // If the purchase state is PURCHASED, then we require a
                 // verified nonce.
-                if (purchaseState == Consts.PurchaseState.PURCHASED && !verified) {
+                if (purchaseState == MA_PURCHASE_STATE_COMPLETED && !verified) {
                     continue;
                 }
                 purchases.add(new VerifiedPurchase(purchaseState, notifyId,

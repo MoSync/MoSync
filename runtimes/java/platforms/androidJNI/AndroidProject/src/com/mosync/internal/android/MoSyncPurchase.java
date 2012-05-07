@@ -20,15 +20,12 @@ package com.mosync.internal.android;
 import android.os.Build;
 import android.util.Log;
 
+import com.mosync.internal.android.billing.BillingEvent;
 import com.mosync.internal.android.billing.PurchaseManager;
-import com.mosync.internal.generated.IX_WIDGET;
-import com.mosync.java.android.MoSync;
-
 import com.mosync.nativeui.util.properties.IntConverter;
 import com.mosync.nativeui.util.properties.PropertyConversionException;
 
 import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_ERROR_INVALID_HANDLE;
-import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_RES_OK;
 import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_RES_UNAVAILABLE;
 import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_RES_BUFFER_TOO_SMALL;
 
@@ -43,20 +40,26 @@ public class MoSyncPurchase
 	 * @param thread The underlying MoSync thread.
 	 */
 	public MoSyncPurchase(MoSyncThread thread)
-	{
+	{Log.e("@@MoSync","In MoSyncPurchase construct -------------");
 		mMoSyncThread = thread;
 		// In-app purchase is supported only from Android 1.6 and higher.
 		try{
 			int target = IntConverter.convert( Build.VERSION.SDK );
 			if ( target >= 4 )
 			{
-				mPurchaseManager = new PurchaseManager(thread);
+				Log.e("@@Emma","IN MoSyncPurchase construct ----- target > 4");
+				mPurchaseManager = new PurchaseManager(thread);Log.e("@@Emma","IN MoSyncPurchase construct ----- manager created");
 			}
 		}
 		catch(PropertyConversionException pce )
 		{
+			Log.e("@@Emma","MoSyncPurchase conv exception ---------------");
 			return;
 		}
+//		catch(Exception ex)
+//		{
+//			Log.e("Emma"," MoSyncPurchase exception  ------------------");
+//		}
 	}
 
 	public void unbindService()
@@ -73,7 +76,7 @@ public class MoSyncPurchase
 	 * Synchronous request to check if in-app billing can be used.
 	 */
 	public int maPurchaseSupported()
-	{
+	{Log.e("@@MoSync"," IN maPurchaseSupported ------------ ");
 		if ( mPurchaseManager != null)
 		{
 			return mPurchaseManager.checkPurchaseSupported();
@@ -88,16 +91,18 @@ public class MoSyncPurchase
 	 * @param productID
 	 * @return The purchase handle.
 	 */
-	public int maPurchaseCreate(String productID)
+	public void maPurchaseCreate(final int productHandle, final String productID)
 	{
 		if (mPurchaseManager != null)
 		{
-			return mPurchaseManager.createPurchase(productID);
+			int state = mPurchaseManager.createPurchase(productHandle, productID);
+			mMoSyncThread.postEvent(BillingEvent.onProductCreate(productHandle, state));
+
 		}
 		else
 		{
 			Log.e("@@MoSync","maPurchaseCreate error: not available");
-			return MA_PURCHASE_RES_UNAVAILABLE;
+			// post  MA_PURCHASE_RES_UNAVAILABLE;
 		}
 	}
 
@@ -131,16 +136,17 @@ public class MoSyncPurchase
 	 * @param handle
 	 * @return
 	 */
-	public int maPurchaseRequest(int handle)
+	public void maPurchaseRequest(int handle)
 	{
 		if ( mPurchaseManager != null )
 		{
-			return mPurchaseManager.requestPurchase(handle);
+			mPurchaseManager.requestPurchase(handle);
 		}
 		else
 		{
 			Log.e("@@MoSync","maPurchaseRequest error: not available");
-			return MA_PURCHASE_RES_UNAVAILABLE;
+//			return MA_PURCHASE_RES_UNAVAILABLE;
+			mMoSyncThread.postEvent(BillingEvent.onPurchaseStateChanged(handle, MA_PURCHASE_RES_UNAVAILABLE, 0));
 		}
 	}
 
@@ -159,7 +165,7 @@ public class MoSyncPurchase
 		{
 			String result = mPurchaseManager.getProductID(productHandle);
 
-			if (result.isEmpty() )
+			if (result.length() == 0 )
 			{
 				Log.e("@@MoSync", "maPurchaseGetName: Invalid product handle " + productHandle);
 				return MA_PURCHASE_ERROR_INVALID_HANDLE;
@@ -230,6 +236,6 @@ public class MoSyncPurchase
 	/**
 	 * The handle to the purchase manager.
 	 */
-	private PurchaseManager mPurchaseManager;
+	private PurchaseManager mPurchaseManager = null;
 	private MoSyncThread mMoSyncThread;
 }

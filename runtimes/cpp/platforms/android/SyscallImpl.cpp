@@ -2894,7 +2894,8 @@ namespace Base
 
 		case maIOCtl_maPurchaseCreate:
 			return _maPurchaseCreate(
-				SYSCALL_THIS->GetValidatedStr(a),
+				a,
+				SYSCALL_THIS->GetValidatedStr(b),
 				mJNIEnv,
 				mJThis);
 
@@ -2905,7 +2906,7 @@ namespace Base
 				mJThis);
 
 		case maIOCtl_maPurchaseRequest:
-			_maPurchaseRequest(a, mJNIEnv, mJThis);
+			return _maPurchaseRequest(a, b, mJNIEnv, mJThis);
 
 		case maIOCtl_maPurchaseGetName:
 		{
@@ -2931,7 +2932,7 @@ namespace Base
 		}
 
 		case maIOCtl_maPurchaseRestoreTransactions:
-			_maPurchaseRestoreTransactions(mJNIEnv, mJThis);
+			return _maPurchaseRestoreTransactions(mJNIEnv, mJThis);
 
 		case maIOCtl_maPurchaseDestroy:
 			return _maPurchaseDestroy(a, mJNIEnv, mJThis);

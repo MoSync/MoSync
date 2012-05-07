@@ -918,11 +918,11 @@ namespace Base
 
 	int _maPurchaseSupported(JNIEnv* jNIEnv, jobject jThis);
 
-	int _maPurchaseCreate(const char* productID, JNIEnv* jNIEnv, jobject jThis);
+	int _maPurchaseCreate(MAHandle handle, const char* productID, JNIEnv* jNIEnv, jobject jThis);
 
 	int _maPurchaseSetPublicKey(const char* developerKey, JNIEnv* jNIEnv, jobject jThis);
 
-	int _maPurchaseRequest(MAHandle productHandle, JNIEnv* jNIEnv, jobject jThis);
+	int _maPurchaseRequest(MAHandle productHandle, int quantity, JNIEnv* jNIEnv, jobject jThis);
 
 	int _maPurchaseGetField(int memStart, MAHandle productHandle, const char* property,
 							int buffer, int bufferSize,
@@ -932,7 +932,7 @@ namespace Base
 						  int buffer, int bufferSize,
 						  JNIEnv* jNIEnv, jobject jThis);
 
-	void _maPurchaseRestoreTransactions(JNIEnv* jNIEnv, jobject jThis);
+	int _maPurchaseRestoreTransactions(JNIEnv* jNIEnv, jobject jThis);
 
 	int _maPurchaseDestroy(MAHandle handle, JNIEnv* jNIEnv, jobject jThis);
 

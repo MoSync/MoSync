@@ -17,12 +17,7 @@ MA 02110-1301, USA.
 
 package com.mosync.internal.android.billing.request;
 
-
 import java.lang.reflect.Method;
-
-import com.android.vending.billing.IMarketBillingService;
-import com.mosync.internal.android.billing.BillingService;
-import com.mosync.internal.android.billing.Consts;
 
 import android.app.Activity;
 import android.app.PendingIntent;
@@ -33,13 +28,23 @@ import android.os.Bundle;
 import android.os.RemoteException;
 import android.util.Log;
 
-import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_RES_OK;
+import com.android.vending.billing.IMarketBillingService;
+import com.mosync.internal.android.billing.BillingService;
+import com.mosync.internal.android.billing.Consts;
 
 /**
  * Wrapper class for sending purchase requests to the Google Play server.
  * You send this request when a user indicates that he or she wants to purchase
  * an item in your application. Google Play then handles the financial transaction
  * by displaying the checkout user interface.
+ * Important: If a user purchases a managed item, you must prevent the user from
+ * purchasing the item again while the original transaction is pending. If a user
+ * attempts to purchase a managed item twice, and the first transaction is still pending,
+ * Google Play will display an error to the user; however, Google Play will not send an
+ * error to your application notifying you that the second purchase request was canceled.
+ * This might cause your application to get stuck in a pending state while it waits for
+ * an IN_APP_NOTIFY message for the second purchase request.
+ *
  * @author emma
  */
 public class Purchase extends BaseRequest
@@ -68,17 +73,16 @@ public class Purchase extends BaseRequest
 	@Override
 	public void run() throws RemoteException
 	{
-		// ToDo check if we need responseCode
 		Bundle request = BillingService
 				.createRequestBundle(Consts.METHOD_REQUEST_PURCHASE);
 		request.putString(Consts.BILLING_REQUEST_ITEM_ID, mProductID);
+		// Send the productID as the developer payload.
 		Bundle response = mService.sendBillingRequest(request);
 
 		PendingIntent pendingIntent = response.getParcelable(Consts.BILLING_RESPONSE_PURCHASE_INTENT);
 		if (pendingIntent == null)
 		{
 			Log.e("@@MoSync", "maPurchaseRequest Error  etc...............");
-			//return Consts.BILLING_RESPONSE_INVALID_REQUEST_ID;
 			mRequestId = Consts.BILLING_RESPONSE_INVALID_REQUEST_ID;
 			return;
 		}
@@ -87,7 +91,7 @@ public class Purchase extends BaseRequest
 				Consts.BILLING_RESPONSE_REQUEST_ID,
 				Consts.BILLING_RESPONSE_INVALID_REQUEST_ID);
 
-		// Get response code.
+		// Wait for RESPONSE_CODE broadcast intents.
 
 		// Launch the buy page activity.
 		Intent intent = new Intent();
@@ -133,6 +137,25 @@ public class Purchase extends BaseRequest
             }
         }
 	}
+
+//	@Override
+//	public void responseCodeReceived(int responseCode)
+//	{
+//		//TODO send event!!!
+//        if (responseCode == Consts.RESULT_OK)
+//        {
+//        	Log.e("@@MoSync","Billing Purchase was successfully sent to server");
+//
+//        }
+//        else if (responseCode == Consts.RESULT_USER_CANCELED)
+//        {
+//        	Log.e("@@MoSync","Billing Purchase canceled by user");
+//        }
+//        else
+//        {
+//        	Log.e("@@MoSync","Billing purchase failed, returned " + responseCode);
+//        }
+//	}
 	/************************ Class members ************************/
     private String mProductID = null;
 

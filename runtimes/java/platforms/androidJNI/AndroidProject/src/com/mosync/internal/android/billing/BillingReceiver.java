@@ -39,6 +39,7 @@ public class BillingReceiver extends BroadcastReceiver
     public void onReceive(Context context, Intent intent)
     {
         String action = intent.getAction();
+        Log.e("@@MoSync", "BillingReceiver onReceive - action             " + action);
         if (Consts.ACTION_STATE_CHANGED.equals(action))
         {
             String signedData = intent.getStringExtra(Consts.BILLING_RESPONSE_INAPP_SIGNED_DATA);
@@ -57,11 +58,11 @@ public class BillingReceiver extends BroadcastReceiver
                     //ResponseCode.RESULT_ERROR.ordinal());
             checkResponseCode(context, requestId, responseCodeIndex);
             //TODO
-            // if error code, send event to mosync. set mPending = false;
+            // if error code, send event to mosync. set mPending = false; set mCurrent req = null
         }
         else
         {
-            Log.e("@@MoSync", "unexpected action: " + action);
+            Log.e("@@MoSync", "BillingReceiver onReceive unexpected action: " + action);
         }
     }
 

@@ -25,8 +25,6 @@ import com.android.vending.billing.IMarketBillingService;
 import com.mosync.internal.android.billing.BillingService;
 import com.mosync.internal.android.billing.Consts;
 
-import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_RES_OK;
-
 /**
  * Wrapper class that checks if in-app billing is supported.
  * This request verifies that the Google Play application supports in-app billing.
@@ -54,11 +52,9 @@ public class CheckBillingSupported extends BaseRequest
         Bundle response = mService.sendBillingRequest(
 				BillingService.createRequestBundle(Consts.METHOD_CHECK_BILLING_SUPOPRTED));
 
-        mResponseCode = response.getInt(Consts.BILLING_RESPONSE_INAPP_RESPONSE_CODE);
-
-        mRequestId = Consts.BILLING_RESPONSE_INVALID_REQUEST_ID; // OR NOT necessary!
-
-        Log.e("@@MoSync", "CheckBillingSupported response code: " + mResponseCode );
+        // Get only the response code, requestId is not neccessary since it's synchronous.
+        int code = response.getInt(Consts.BILLING_RESPONSE_RESPONSE_CODE);
+        mResponseCode = Consts.responseCodeValue(code);
     }
 
     /**

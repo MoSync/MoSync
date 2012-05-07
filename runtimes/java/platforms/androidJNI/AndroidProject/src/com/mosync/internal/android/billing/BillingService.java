@@ -39,11 +39,12 @@ import com.mosync.internal.android.billing.request.GetPurchaseInformation;
 import com.mosync.internal.android.billing.request.CheckBillingSupported;
 import com.mosync.internal.android.billing.request.ConfirmNotifications;
 import com.mosync.internal.android.billing.request.Purchase;
-import com.mosync.internal.android.billing.Consts.PurchaseState;
 import com.mosync.internal.android.billing.Security.VerifiedPurchase;
 
 import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_RES_OUT_OF_DATE;
 import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_RES_CONNECTION_ERROR;
+import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_STATE_IN_PROGRESS;
+import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_STATE_FAILED;
 
 /**
  * This class sends messages to Google Play on behalf of the application by
@@ -62,16 +63,16 @@ public class BillingService extends Service implements ServiceConnection
 	 */
     public BillingService()
     {
-        super();
+        super();Log.e("@@Emma"," IN BillingService() ");
         //mThread = thread;
     }
 
 	@Override
 	public void onCreate()
 	{
-		Log.e("@@MoSync","BillingService --------- onCreate() ");
+		Log.e("@@MoSync","BillingService --------- onCreate()-------------------- ");
 		//todo delete this method.
-		super.onCreate();
+		super.onCreate();/*
 
 		try {
 			boolean bindResult = bindService(
@@ -90,7 +91,7 @@ public class BillingService extends Service implements ServiceConnection
 		} catch (SecurityException e){
 			Log.e("@@MoSync", "Market Billing Service could not be bound. SecurityException: " + e);
 			//TODO stop user continuing
-		}
+		}*/
 	}
 
 	public void setContext(Context context)
@@ -138,6 +139,7 @@ public class BillingService extends Service implements ServiceConnection
     public void handleCommand(Intent intent, int startId)
     {
         String action = intent.getAction();
+        Log.e("@@MoSync","BillingService handleCommand -------------" + action);
         // The event that will be sent to the MoSync queue.
         int[] event = null;
         if (Consts.METHOD_CONFIRM_NOTIFICATIONS.equals(action))
@@ -161,20 +163,58 @@ public class BillingService extends Service implements ServiceConnection
             onPurchaseStateChanged(startId, signedData, signature);
         }
         else if (Consts.ACTION_RESPONSE_CODE.equals(action))
-        {/*
+        {
             long requestId = intent.getLongExtra(Consts.BILLING_RESPONSE_INAPP_REQUEST_ID, -1);
-            int responseCodeIndex = intent.getIntExtra(Consts.BILLING_RESPONSE_INAPP_RESPONSE_CODE,
-                    Consts.ResponseCode.RESULT_ERROR.ordinal());
-            Consts.ResponseCode responseCode = Consts.ResponseCode.valueOf(responseCodeIndex);
-            checkResponseCode(requestId, responseCode);*/
+            int responseCode = intent.getIntExtra(Consts.BILLING_RESPONSE_INAPP_RESPONSE_CODE,
+                    Consts.RESULT_ERROR);
+            checkResponseCode(requestId, Consts.responseCodeValue(responseCode));
         }
 //        if (event != null)
 //        	mMoSyncThread.postEvent(event);
         else if(Consts.ACTION_NOTIFY.equals(action))
         {
 			String notifyId = intent.getStringExtra(Consts.BILLING_RESPONSE_NOTIFICATION_ID);
-			onPurchaseRequestCompeted(notifyId);
+			onPurchaseRequestCompleted(notifyId);
         }
+    }
+
+    /**
+     * Check the response code received for a request and send events.
+     * @param requestId The identifier of the request (as received from Google Play).
+     * @param responseCode The request response code.
+     */
+    private void checkResponseCode(long requestId, int responseCode)
+    {
+		Log.e("@@Emma","BillingService checkResponseCode --------- " + responseCode);
+		// Get the request object from the sent list.
+		BaseRequest request = mSentRequests.get(requestId);
+
+		if ( request != null )
+		{
+			if ( responseCode == Consts.RESULT_OK )
+			{
+				mThread.postEvent(BillingEvent.onPurchaseStateChanged(
+						0,//request.getHandle(),
+						MA_PURCHASE_STATE_IN_PROGRESS,
+						0));
+				// or completed.
+			}
+			else
+			{
+				mThread.postEvent(BillingEvent.onPurchaseStateChanged(
+						0,//request.getHandle(),
+						MA_PURCHASE_STATE_FAILED,
+						responseCode));
+			}
+		}
+		mSentRequests.remove(requestId);
+		// set state to in progress, not pending anymore.
+//    	else if ( request instanceof RestoreTransactions )
+//    	{
+//
+//    		mThread.postEvent(BillingEvent.onRestoreTransaction(responseCode, 0));
+//    	}
+//        mSentRequests.remove(requestId);
     }
 
     /**
@@ -183,7 +223,7 @@ public class BillingService extends Service implements ServiceConnection
      * Until onServiceConnected() gets called, mService is null.
      * @return true if the bind succeeded, false otherwise.
      */
-    private boolean bindToMarketBillingService()
+    boolean bindToMarketBillingService()
     {
 		Log.e("@@MoSync","bindToMarketBillingService");
 		if ( mService != null )
@@ -216,13 +256,16 @@ public class BillingService extends Service implements ServiceConnection
 
     /**
      * Checks if in-app billing is supported.
+     * It needs to be synchronous, therefore the service binding is done
+     * before this call (in manager's constructor) so that we don't need
+     * to wait for the onServiceConnected() callback.
      * @return MA_PURCHASE_RES_OK if supported, error code otherwise.
      */
     public int checkBillingSupported()
     {
-		if ( bindToMarketBillingService() )//&& !mPurchaseRequestInProgress )
+		CheckBillingSupported request = new CheckBillingSupported(mService);
+		if ( mService != null )
 		{
-			CheckBillingSupported request = new CheckBillingSupported(mService);
 			try{
 				request.run();
 				return request.getResponseCode();
@@ -232,11 +275,12 @@ public class BillingService extends Service implements ServiceConnection
 				return MA_PURCHASE_RES_OUT_OF_DATE;
 //				mService = null;
 			}
+
 		}
 		else
 		{
-			// Add to pending requests.
-			Log.e("@@MoSync","maPurchaseSupported cannot bind");
+			// No need to add to pending requests, service cannot bind.
+			Log.e("@@MoSync","maPurchaseSupported error: cannot bind to MarketBillingService");
 			return MA_PURCHASE_RES_CONNECTION_ERROR;
 		}
     }
@@ -248,21 +292,25 @@ public class BillingService extends Service implements ServiceConnection
     {
 		Purchase request = new Purchase(
 				mService, productID, mThread.getActivity());
-		if ( bindToMarketBillingService() && !mPurchaseRequestInProgress )
+
+		// check mPurchaseRequestInProgress.
+		request.runRequest();
+		// There is no active purchase request in progress.
+//		mPurchaseRequestInProgress = false;
+		if ( request.getRequestID() == Consts.BILLING_RESPONSE_INVALID_REQUEST_ID )
 		{
-			mPurchaseRequestInProgress = true;
-			//return request.runRequest();
-			if ( request.runRequest() )
-			{
-//    			// There is no active purchase request in progress.
-//    			mPurchaseRequestInProgress = false;
-				return request;
-			}
+			// TODO POST event purchase state changed: failed.
+			// error code = Consts.BILLING_RESPONSE_INVALID_REQUEST_ID;
+			return null;
 		}
+
+		//
+		Log.e("@@MoSync","BillingService requestPurchase request id = " + request.getRequestID());
 
         request.setPendingState(true);
         // Add to pending requests.
-        mPendingRequests.add(request);
+       // mPendingRequests.add(request);
+        mSentRequests.put(request.getRequestID(), request);
         return request;
     }
 
@@ -324,6 +372,7 @@ public class BillingService extends Service implements ServiceConnection
 //            ResponseHandler.purchaseResponse(this, vp.purchaseState, vp.productId,
 //                    vp.orderId, vp.purchaseTime, vp.developerPayload);
         }
+
         if (!notifyList.isEmpty()) {
             String[] notifyIds = notifyList.toArray(new String[notifyList.size()]);
 //            confirmNotifications(startId, notifyIds);
@@ -334,11 +383,11 @@ public class BillingService extends Service implements ServiceConnection
      *
      * @param notifyId
      */
-    private void onPurchaseRequestCompeted(String notifyId)
+    private void onPurchaseRequestCompleted(String notifyId)
     {
 		// There is no active purchase request in progress.
 		mPurchaseRequestInProgress = false;
-		mPurchaseManager.setPurchaseState(mCurrentPurchaseHandle, mPurchaseRequestInProgress);
+		//mPurchaseManager.setPurchaseState(mCurrentPurchaseHandle, mPurchaseRequestInProgress);
     }
 
     /**
@@ -423,6 +472,7 @@ public class BillingService extends Service implements ServiceConnection
         {
             if (request.runIfConnected())
             {
+				// TODO set mCurrentPurchase
                 // Remove the request
                 mPendingRequests.remove();
 
@@ -488,6 +538,6 @@ public class BillingService extends Service implements ServiceConnection
      * not yet received a response code. The HashMap is indexed by the
      * request Id that each request receives when it executes.
      */
-//    private static HashMap<Long, BaseRequest> mSentRequests =
-//        new HashMap<Long, BaseRequest>();
+    private static HashMap<Long, BaseRequest> mSentRequests =
+        new HashMap<Long, BaseRequest>();
 }

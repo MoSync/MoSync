@@ -17,15 +17,20 @@ MA 02110-1301, USA.
 
 package com.mosync.internal.android.billing;
 
-//import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_STATE_FAILED;
-//import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_STATE_IN_PROGRESS;
-//import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_STATE_COMPLETED;
-//import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_STATE_RESTORED;
+import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_RES_OK;
+import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_RES_UNAVAILABLE;
+import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_ERROR_UNKNOWN;
+import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_ERROR_INVALID_PRODUCT;
+import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_ERROR_CONNECTION_FAILED;
+import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_ERROR_CANCELLED;
+import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_STATE_COMPLETED;
+import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_STATE_FAILED;
+import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_EVENT_REFUNDED;
 
 /**
  * Utility class that holds constants required in billing requests.
+ * Values are received from Google Play,so do not attempt to change them.
  * @author emma
- *
  */
 public class Consts
 {
@@ -35,45 +40,62 @@ public class Consts
         "com.android.vending.billing.MarketBillingService.BIND";
 
     // The possible states of an in-app purchase, as defined by Android Market.
-    public enum PurchaseState {
-        // Responses to requestPurchase or restoreTransactions.
-        PURCHASED,   // User was charged for the order.
-        CANCELED,    // The charge failed on the server.
-        REFUNDED,    // User received a refund for the order.
-        IN_PROGRESS,
-        FAILED;
+    // User was charged for the order.
+    private static final int PURCHASE_STATE_PURCHASED = 0;
+    // The charge failed on the server.
+    private static final int PURCHASE_STATE_CANCELED = 1;
+    // User received a refund for the order.
+    private static final int PURCHASE_STATE_REFUNDED = 2;
 
-        // Converts from an ordinal value to the PurchaseState
-        public static PurchaseState valueOf(int index) {
-            PurchaseState[] values = PurchaseState.values();
-            if (index < 0 || index >= values.length) {
-                return CANCELED;
-            }
-            return values[index];
-        }
-    }
+	// Responses to requestPurchase or restoreTransactions.
+	// IN_PROGRESS,
+	// Matches a PurchaseState to a MoSync constant.
+	public static int purchaseStateValue(int purchaseState)
+	{
+		switch (purchaseState)
+		{
+		case PURCHASE_STATE_PURCHASED:
+			return MA_PURCHASE_STATE_COMPLETED;
+		case PURCHASE_STATE_CANCELED:
+			return MA_PURCHASE_STATE_FAILED;
+		case PURCHASE_STATE_REFUNDED:
+			return MA_PURCHASE_EVENT_REFUNDED;
+		default:
+			return MA_PURCHASE_STATE_FAILED;
+		}
+	}
 
     // The response codes for a request, defined by Android Market.
-    public enum ResponseCode {
-        RESULT_OK,
-        RESULT_USER_CANCELED,
-        RESULT_SERVICE_UNAVAILABLE,
-        RESULT_BILLING_UNAVAILABLE,
-        RESULT_ITEM_UNAVAILABLE,
-        RESULT_DEVELOPER_ERROR,
-        RESULT_ERROR;
-    }
-	/**
-	 * Purchase states
-	 */
-//	enum PURCHASE_STATE
-//	{
-//		failed = MA_PURCHASE_STATE_FAILED,
-//		MA_PURCHASE_STATE_IN_PROGRESS,
-//		MA_PURCHASE_STATE_COMPLETED,
-//		MA_PURCHASE_STATE_RESTORED,
-//		MA_PURCHASE_STATE_UNKNOWN
-//	};
+    public static final int RESULT_OK = 0;
+    public static final int RESULT_USER_CANCELED = 1;
+    public static final int RESULT_SERVICE_UNAVAILABLE = 2;
+    public static final int RESULT_BILLING_UNAVAILABLE = 3;
+    public static final int RESULT_ITEM_UNAVAILABLE = 4;
+    public static final int RESULT_DEVELOPER_ERROR = 5;
+    public static final int RESULT_ERROR = 6;
+
+	// Matches a response code to a MoSync constant.
+	public static int responseCodeValue(int responseCode)
+	{
+		switch (responseCode)
+		{
+		case RESULT_OK:
+			return MA_PURCHASE_RES_OK;
+		case RESULT_USER_CANCELED:
+			return MA_PURCHASE_ERROR_CANCELLED;
+		case RESULT_SERVICE_UNAVAILABLE:
+			return MA_PURCHASE_ERROR_CONNECTION_FAILED;
+		case RESULT_BILLING_UNAVAILABLE:
+			return MA_PURCHASE_RES_UNAVAILABLE;
+		case RESULT_ITEM_UNAVAILABLE:
+			return MA_PURCHASE_ERROR_INVALID_PRODUCT;
+		case RESULT_DEVELOPER_ERROR:
+		case RESULT_ERROR:
+		default:
+			return MA_PURCHASE_ERROR_UNKNOWN;
+		}
+	}
+
 	public final static int PURCHASE_STATE_ON_HOLD = -1;
 
     public static final int SERVICE_CANNOT_CONNECT = -10;
@@ -152,7 +174,4 @@ public class Consts
 	public final static String TRANSACTION_PURCHASE_TIME = "purchaseTime";
 	public final static String TRANSACTION_ORDER_ID = "orderId";
 	public final static String TRANSACTION_NOTIFICATION_ID = "notificationId";
-
-
-
 }

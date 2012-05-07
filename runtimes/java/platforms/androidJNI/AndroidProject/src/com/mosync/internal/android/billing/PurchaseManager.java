@@ -25,7 +25,6 @@ import java.security.spec.X509EncodedKeySpec;
 
 import android.util.Log;
 
-import com.mosync.internal.android.EventQueue;
 import com.mosync.internal.android.MoSyncThread;
 import com.mosync.internal.android.billing.request.BaseRequest;
 import com.mosync.nativeui.util.HandleTable;
@@ -34,6 +33,8 @@ import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_ERROR_INVAL
 import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_RES_OK;
 import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_STATE_FAILED;
 import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_STATE_IN_PROGRESS;
+import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_STATE_DUPLICATE_HANDLE;
+import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_STATE_PRODUCT_VALID;
 
 /**
  * The purchase manager holds all purchase info of both user
@@ -53,23 +54,24 @@ public class PurchaseManager
 		mMoSyncThread = thread;
 		mService = new BillingService();
 		mService.setContext(mMoSyncThread.getActivity());
-		mService.setManager(this);
+		mService.bindToMarketBillingService();
 	}
 
 	public int checkPurchaseSupported()
 	{
-		int result = mService.checkBillingSupported();
-		Log.e("@@MoSync","Billing maPurchaseSupported result = " + result);
-		return result;
-//		return mService.checkBillingSupported();
+		return mService.checkBillingSupported();
 	}
 
-	public int createPurchase(final String productID)
+	public int createPurchase(final int productHandle, final String productID)
 	{
 		PurchaseInformation newPurchase = new PurchaseInformation(productID);
-		newPurchase.setHandle( m_PurchaseTable.add(newPurchase) );
+		if ( m_PurchaseTable.add(productHandle, newPurchase) )
+		{
+			newPurchase.setHandle( productHandle );
+			return MA_PURCHASE_STATE_PRODUCT_VALID;
+		}
 
-		return newPurchase.getHandle();
+		return MA_PURCHASE_STATE_DUPLICATE_HANDLE;
 	}
 
 	/**
@@ -77,7 +79,7 @@ public class PurchaseManager
 	 * @param handle
 	 * @return
 	 */
-	public int requestPurchase(int handle)
+	public void requestPurchase(int handle)
 	{
 		PurchaseInformation purchase = m_PurchaseTable.get(handle);
 		// and BillingService.isPurchaseRequestInProgress() return new err code.
@@ -94,21 +96,32 @@ public class PurchaseManager
 
 				// Send event! + message the request was sent successfully to Google Play.
 				purchase.setState(MA_PURCHASE_STATE_IN_PROGRESS);
-
 				purchase.setRequest(requestObj);
-				return MA_PURCHASE_RES_OK;
+
+				mMoSyncThread.postEvent(BillingEvent.onPurchaseStateChanged(
+						handle,
+						MA_PURCHASE_STATE_IN_PROGRESS,
+						0));
 			}
 			else
 			{
 				purchase.setState(MA_PURCHASE_STATE_FAILED);
-				// Post the event to the MoSync queue.
-				EventQueue.getDefault().postPurchaseStateChanged(handle, MA_PURCHASE_STATE_FAILED);
-				return -1; //todo Service not connected! = no internet connection
+				//return MA_PURCHASE_STATE_FAILED; //todo Service not connected! = no internet connection
+				mMoSyncThread.postEvent(BillingEvent.onPurchaseStateChanged(
+						handle,
+						MA_PURCHASE_STATE_FAILED,
+						MA_PURCHASE_ERROR_INVALID_HANDLE));//todo change this!
 			}
 		}
-
-		Log.e("@@MoSync", "maPurchaseRequest: Invalid product handle " + handle);
-		return MA_PURCHASE_ERROR_INVALID_HANDLE;
+		else
+		{
+			Log.e("@@MoSync", "maPurchaseRequest: Invalid product handle " + handle);
+//			return MA_PURCHASE_ERROR_INVALID_HANDLE;
+			mMoSyncThread.postEvent(BillingEvent.onPurchaseStateChanged(
+					handle,
+					MA_PURCHASE_STATE_FAILED,
+					MA_PURCHASE_ERROR_INVALID_HANDLE));
+		}
 	}
 
 	/**

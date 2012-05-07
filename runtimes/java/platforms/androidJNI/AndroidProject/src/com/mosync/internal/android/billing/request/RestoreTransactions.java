@@ -33,7 +33,7 @@ import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_RES_OK;
 /**
  * Wrapper class that sends a RESTORE_TRANSACTIONS message to the server.
  */
-class RestoreTransactions extends BaseRequest
+public class RestoreTransactions extends BaseRequest
 {
 	long mNonce;
 
@@ -66,10 +66,4 @@ class RestoreTransactions extends BaseRequest
 		super.onRemoteException(e);
 		Security.removeNonce(mNonce);
 	}
-
-//	@Override
-//	protected void responseCodeReceived(ResponseCode responseCode) {
-//		ResponseHandler.responseCodeReceived(BillingService.this, this,
-//				responseCode);
-//	}
 }

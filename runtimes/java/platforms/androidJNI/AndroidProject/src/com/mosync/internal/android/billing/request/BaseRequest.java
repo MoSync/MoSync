@@ -21,7 +21,6 @@ import android.os.RemoteException;
 import android.util.Log;
 
 import com.android.vending.billing.IMarketBillingService;
-import com.mosync.internal.android.billing.Consts.ResponseCode;
 
 
 /**
@@ -91,6 +90,12 @@ public abstract class BaseRequest
         {
             return true;
         }
+        if ( mService != null )
+        {
+            // Add a pending request to run when the service is connected.
+//            mPendingRequests.add(this);
+            return true;
+        }
 
         return false;
     }
@@ -108,7 +113,7 @@ public abstract class BaseRequest
             try {
                 //mRequestId = run();
 				run();
-                Log.e("emma", " !!!!!!!!!!!!!!!!!!!!!request id: " + mRequestId);
+                Log.e("emma", " runIfConnected() !!!!!!!!!!!!!!!!!!!!!request id: " + mRequestId);
 
                 if (mRequestId >= 0)
                 {
@@ -146,10 +151,10 @@ public abstract class BaseRequest
      * or RestoreTransactions request.
      * @param responseCode the response code
      */
-    protected void responseCodeReceived(ResponseCode responseCode)
-    {
-//    	mResponseCode = (int)responseCode;
-    }
+//    public void responseCodeReceived(int responseCode)
+//    {
+////    	mResponseCode = (int)responseCode;
+//    }
     protected void stateChanged(int state)
     {
 
