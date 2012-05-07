@@ -2116,6 +2116,9 @@ namespace Base {
 		maIOCtl_case(maAudioSetVolume);
 		maIOCtl_case(maAudioStop);
 		maIOCtl_case(maAudioPause);
+		maIOCtl_case(maAudioInstanceCreateDynamic);
+		maIOCtl_case(maAudioGetPendingBufferCount);
+		maIOCtl_case(maAudioSubmitBuffer);
 		maIOCtl_case(maExtensionModuleLoad);
         maIOCtl_case(maExtensionFunctionLoad);
 		}

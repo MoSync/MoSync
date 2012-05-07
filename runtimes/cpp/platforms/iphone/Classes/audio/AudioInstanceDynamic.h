@@ -17,38 +17,24 @@
  */
 
 #import <Foundation/Foundation.h>
-#import <AVFoundation/AVFoundation.h>
-#include <AudioToolbox/AudioToolbox.h>
+#import <AudioToolbox/AudioToolbox.h>
 
-@class AudioData;
-
-@protocol AudioInstance
-	-(BOOL) isPrepared;
-	-(BOOL) isPreparing;
-	-(BOOL) prepare:(BOOL)async;
-	-(BOOL) play;
-	-(void) pause;
-	-(void) stop;
-	-(void) setPosition:(int)millis;
-	-(int) getPosition;
-	-(void) setNumberOfLoops:(int)numLoops;
-	-(void) setVolume:(float)volume;
-	-(int) getLength;
-	-(void) release;
-@end
-
-@interface AudioInstanceStatic :  NSObject <AVAudioPlayerDelegate, AudioInstance> {
-    AVAudioPlayer* mAudioPlayer;
-    AudioData* mAudioData;
-	int mHandle;
-	BOOL mPrepared;
-	BOOL mIsPreparing;
+#define NUM_AUDIO_QUEUE_BUFFERS 10
+@interface AudioInstanceDynamic : NSObject
+{
+    AudioStreamBasicDescription mDataFormat;
+    AudioQueueRef mQueue;
+	NSMutableArray* mBuffers;
+	NSMutableArray* mAvailableBuffers;
+	int mPendingBuffers;
+	int mBufferSize;
 }
+
 
 /**
  * Init function.
  */
--(id) initWithAudioData:(AudioData*)audioData andHandle:(int)handle error:(int*)error;
+-(id) initWithSampleRate:(int)sampleRate numChannels:(int)numChannels andBufferSize:(int)bufferSize error:(int*)error;
 
 -(BOOL) isPrepared;
 -(BOOL) isPreparing;
@@ -61,5 +47,13 @@
 -(void) setNumberOfLoops:(int)numLoops;
 -(void) setVolume:(float)volume;
 -(int) getLength;
+
+-(int) submitBufferData:(const void*)data ofNumBytes:(int) numBytes;
+-(int) getPendingBufferCount;
+
+-(void) tagBufferAsAvailable:(AudioQueueBufferRef)buf;
+-(AudioQueueBufferRef) createBuffer: (int) numBytes;
+
 - (void) dealloc;
+
 @end
