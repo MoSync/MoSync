@@ -55,64 +55,64 @@
 	<!-- All of the Native UI widgets should be wraped inside a tag with id="NativeUI" -->
 	<div id="NativeUI">
 		<!-- The element with id="mainScreen" is start screen. -->
-		<div widgetType="TabScreen" id="mainScreen">
+		<div data-widgetType="TabScreen" id="mainScreen">
 			<!-- Device Screen -->
-			<div widgetType="Screen" id="DeviceScreen" title="Device"
-				icon_android="img/Android_TabIconDevice.png"
-				icon_iOS="img/IOS_TabIconDevice.png">
-				<div widgetType="VerticalLayout" id="DeviceInfoLayout" width="100%" height="100%">
-					<div widgetType="Label" id="DeviceOSLabel" width="100%"
-						text="Platform:" fontSize="19" fontColor="0xEE3B3B"></div>
-					<div widgetType="Label" id="OSVersionLabel" width="100%"
-						text="OSVersion:" fontSize="19" fontColor="0xEE3B3B"></div>
-					<div widgetType="Label" id="UUIDLabel" width="100%"
-						text="UUID:" fontSize="19" fontColor="0xEE3B3B"></div>
-					<div widgetType="Label" id="DeviceNameLabel" width="100%"
-						text="Device Name:" fontSize="19" fontColor="0xEE3B3B"></div>
-					<div widgetType="Button" id="VibrateButton" width="100%"
-						text="Vibrate" onevent="navigator.notification.vibrate(1000);" ></div>
-					<div widgetType="Button" id="BeepButton" width="100%"
-						text="Beep" onevent="navigator.notification.beep(3);" ></div>
+			<div data-widgetType="Screen" id="DeviceScreen" data-title="Device"
+				data-icon_android="img/Android_TabIconDevice.png"
+				data-icon_iOS="img/IOS_TabIconDevice.png">
+				<div data-widgetType="VerticalLayout" id="DeviceInfoLayout" data-width="100%" data-height="100%">
+					<div widgetType="Label" id="DeviceOSLabel" data-width="100%"
+						data-text="Platform:" data-fontSize="19" data-fontColor="0xEE3B3B"></div>
+					<div data-widgetType="Label" id="OSVersionLabel" data-width="100%"
+						data-text="OSVersion:" data-fontSize="19" data-fontColor="0xEE3B3B"></div>
+					<div data-widgetType="Label" id="UUIDLabel" data-width="100%"
+						data-text="UUID:" data-fontSize="19" data-fontColor="0xEE3B3B"></div>
+					<div data-widgetType="Label" id="DeviceNameLabel" data-width="100%"
+						data-text="Device Name:" data-fontSize="19" data-fontColor="0xEE3B3B"></div>
+					<div widgetType="Button" id="VibrateButton" data-width="100%"
+						data-text="Vibrate" data-onevent="navigator.notification.vibrate(1000);" ></div>
+					<div data-widgetType="Button" id="BeepButton" data-width="100%"
+						data-text="Beep" data-onevent="navigator.notification.beep(3);" ></div>
 				</div>
 			</div>
 			<!-- Sensor Screen -->
-			<div widgetType="Screen" id="SensorScreen" title="Sensors"
-				icon_android="img/Android_TabIconSensor.png"
-				icon_iOS="img/IOS_TabIconSensor.png">
-				<div widgetType="VerticalLayout" id="SensorsLayout" width="100%">
-					<div widgetType="HorizontalLayout" id="AccelerometerLayout"
-						width="100%" height="-2">
-						<div widgetType="Label" id="AccelX" width="100%"
-							text="x: " fontSize="14"></div>
-						<div widgetType="Label" id="AccelY" width="100%"
-							text="y: " fontSize="14"></div>
-						<div widgetType="Label" id="AccelZ" width="100%"
-							text="z: " fontSize="14"></div>
+			<div data-widgetType="Screen" id="SensorScreen" data-title="Sensors"
+				data-icon_android="img/Android_TabIconSensor.png"
+				data-icon_iOS="img/IOS_TabIconSensor.png">
+				<div data-widgetType="VerticalLayout" id="SensorsLayout" data-width="100%">
+					<div data-widgetType="HorizontalLayout" id="AccelerometerLayout"
+						data-width="100%" data-height="-2">
+						<div data-widgetType="Label" id="AccelX" data-width="100%"
+							data-text="x: " data-fontSize="14"></div>
+						<div data-widgetType="Label" id="AccelY" data-width="100%"
+							data-text="y: " data-fontSize="14"></div>
+						<div data-widgetType="Label" id="AccelZ" data-width="100%"
+							data-text="z: " data-fontSize="14"></div>
 					</div>
-					<div widgetType="Button" id="ToggleAccelButton" width="100%"
-						text="Toggle Accelerometer" onevent="toggleAccelPhonegap()"></div>
-					<div widgetType="HorizontalLayout" id="LocationLayout" width="100%">
-						<div widgetType="Label" id="LocLat" width="100%"
-							text="Latitude" fontSize="14"></div>
-						<div widgetType="Label" id="LocLong" width="100%"
-							text="Longtitude" fontSize="14"></div>
+					<div data-widgetType="Button" id="ToggleAccelButton" data-width="100%"
+						data-text="Toggle Accelerometer" data-onevent="toggleAccelPhonegap()"></div>
+					<div data-widgetType="HorizontalLayout" id="LocationLayout" data-width="100%">
+						<div data-widgetType="Label" id="LocLat" data-width="100%"
+							data-text="Latitude" data-fontSize="14"></div>
+						<div data-widgetType="Label" id="LocLong" data-width="100%"
+							data-text="Longtitude" data-fontSize="14"></div>
 					</div>
-					<div widgetType="Button" id="ToggleLocButton" width="100%"
-						text="Toggle Location" onevent="toggleGeolocation()"></div>
-					<div widgetType="HorizontalLayout" id="CompassLayout" width="100%">
-						<div widgetType="Label" id="CompassLabel" width="100%"
-							text="Compass Heading:" fontSize="14"></div>
+					<div data-widgetType="Button" id="ToggleLocButton" data-width="100%"
+						data-text="Toggle Location" data-onevent="toggleGeolocation()"></div>
+					<div data-widgetType="HorizontalLayout" id="CompassLayout" data-width="100%">
+						<div data-widgetType="Label" id="CompassLabel" data-width="100%"
+							data-text="Compass Heading:" data-fontSize="14"></div>
 					</div>
-					<div widgetType="Button" id="ToggleCompassButton" width="100%"
-						text="Toggle Compass" onevent="toggleCompass()"></div>
+					<div data-widgetType="Button" id="ToggleCompassButton" data-width="100%"
+						data-text="Toggle Compass" data-onevent="toggleCompass()"></div>
 				</div>
 			</div>
 			<!-- Map Screen -->
-			<div widgetType="Screen" id="MapScreen" title="Map"
-				icon_android="img/Android_TabIconMap.png"
-				icon_iOS="img/IOS_TabIconMap.png">
-				<div widgetType="WebView" id="WebView" width="100%" height="100%"
-					url="http://maps.google.com"></div>
+			<div data-widgetType="Screen" id="MapScreen" data-title="Map"
+				data-icon_android="img/Android_TabIconMap.png"
+				data-icon_iOS="img/IOS_TabIconMap.png">
+				<div data-widgetType="WebView" id="WebView" data-width="100%" data-height="100%"
+					data-url="http://maps.google.com"></div>
 			</div>
 		</div>
 	</div>
