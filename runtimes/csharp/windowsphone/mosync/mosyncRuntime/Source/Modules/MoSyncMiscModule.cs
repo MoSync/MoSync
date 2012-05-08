@@ -265,6 +265,25 @@ namespace MoSync
 			};
 			*/
 
+            ioctls.maAlert = delegate(int _title, int _message, int _b1, int _b2, int _b3)
+            {
+                String title = core.GetDataMemory().ReadStringAtAddress(_title);
+                String message = core.GetDataMemory().ReadStringAtAddress(_message);
+                MoSync.Util.RunActionOnMainThreadSync(() =>
+                    {
+                        if (0 != _b1 && 0 != _b3)
+                        {
+                            MessageBox.Show(message, title, MessageBoxButton.OKCancel);
+                        }
+                        else if (0 != _b1 && 0 == _b3)
+                        {
+                            MessageBox.Show(message, title, MessageBoxButton.OK);
+                        }
+                    });
+
+                return 0;
+            };
+
             ioctls.maGetSystemProperty = delegate(int _key, int _buf, int _size)
             {
                 String key = core.GetDataMemory().ReadStringAtAddress(_key);
