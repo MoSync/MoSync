@@ -64,6 +64,7 @@ public:
 		rowBytes = CGImageGetBytesPerRow(image);
 		rect = CGRectMake(0, 0, width, height);
 		mOwnData = false;
+		orientation = 1;
 
 		bool noAlpha = false;
 		int bpp = CGImageGetBitsPerPixel(image);
@@ -129,6 +130,8 @@ public:
 		CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
 		this->width = width,
 		this->height = height;
+		orientation = 1;
+
 		if(rowBytes==-1)
 			this->rowBytes = rowBytes = width*4;
 		else

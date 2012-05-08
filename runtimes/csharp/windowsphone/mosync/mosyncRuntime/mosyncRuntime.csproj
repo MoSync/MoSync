@@ -78,6 +78,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Source\CustomPickerDataSources.cs" />
     <Compile Include="Source\maapi.cs" />
+    <Compile Include="Source\Modules\Audio\MoSyncAudio.cs" />
+    <Compile Include="Source\Modules\Audio\MoSyncAudioData.cs" />
+    <Compile Include="Source\Modules\Audio\MoSyncAudioInstance.cs" />
     <Compile Include="Source\Modules\GL\GL.cs" />
     <Compile Include="Source\Modules\GL\GLConstants.cs" />
     <Compile Include="Source\Modules\GL\GLTypes.cs" />
@@ -89,6 +92,7 @@
     <Compile Include="Source\Modules\MoSyncFileModule.cs" />
     <Compile Include="Source\Modules\MoSyncFontModule.cs" />
     <Compile Include="Source\Modules\MoSyncGraphicsModule.cs" />
+    <Compile Include="Source\Modules\MoSyncImagePickerModule.cs" />
     <Compile Include="Source\Modules\MoSyncMathModule.cs" />
     <Compile Include="Source\Modules\MoSyncMemoryModule.cs" />
     <Compile Include="Source\Modules\MoSyncMiscModule.cs" />

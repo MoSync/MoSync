@@ -8374,12 +8374,11 @@ group CameraFunctions "Camera Functions" {
 
 		/**
 		 * Set the screen orientation.
-		 * Currently implemented only on Android.
+		 * Currently implemented only on Android and Windows Phone.
 		 * @param orientation One of the \link #SCREEN_ORIENTATION_LANDSCAPE
 		 * #SCREEN_ORIENTATION_PORTRAIT #SCREEN_ORIENTATION_DYNAMIC \endlink
 		 * constants.
 		 * @return \< 0 on error.
-		 * @deprecated use #maAlert instead.
 		 */
 		int maScreenSetOrientation(in int orientation);
 
@@ -9373,6 +9372,7 @@ group NFCAPI "NFC API" {
 			* @param flags 	MA_AUDIO_DATA_STREAM means that the audio should be streamed
 			*				either from disk or over HTTP. This is only for music playback,
 			*				sound effects should have the flag set to 0.
+			* @attention 	Windows Phone only supports wave-files (see remarks here: http://msdn.microsoft.com/en-us/library/microsoft.xna.framework.audio.soundeffect.fromstream.aspx).
 			* @return A MAAudioData handle or <0 on error.
 			*/
 			MAAudioData maAudioDataCreateFromResource(in MAString mime, in MAHandle data, in int offset, in int length, in int flags);
@@ -9407,6 +9407,38 @@ group NFCAPI "NFC API" {
 			*
 			*/
 			MAAudioInstance maAudioInstanceCreate(in MAAudioData audioData);
+
+			/**
+			* @brief Creates an MAAudioInstance that can be fed samples dynamically.
+			*
+			* @param sampleRate  The samplerate of the audio instance.
+			* @param numChannels Number of channels for the audio instance (1 means mono, 2 means stereo).
+			* @param bufferSize  The size of the underlying sample buffer (in samples).
+			*
+			* @return 			A MAAudioInstance handle or <0 on error.
+			*
+			*/
+			MAAudioInstance maAudioInstanceCreateDynamic(in int sampleRate, in int numChannels, in int bufferSize);
+
+			/**
+			* @brief Submits a buffer of samples to a dynamic MAAudioInstance
+			*
+			* @param instance	The handle to the MAAudioInstance
+			* @param buffer		A pointer to the samples that should be submitted. Each sample must be a signed 16-bit short. When using more than one channel, the samples should be interleaved.
+			* @param numBytes	The number of bytes to read.
+			* @return 			<0 on error.
+			*
+			*/
+			int maAudioSubmitBuffer(in MAAudioInstance instance, in MAAddress buffer, in int numBytes);
+
+			/**
+			* @brief Gets the pending buffer count for the dynamic MAAudioInstance
+			*
+			* @param instance	The handle to the MAAudioInstance
+			* @return 			<0 on error, otherwise the pending buffer count.
+			*
+			*/
+			int maAudioGetPendingBufferCount(in MAAudioInstance instance);
 
 			/**
 			* @brief Destroys a MAAudioInstance handle releases used memory
