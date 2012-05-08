@@ -1,18 +1,19 @@
-/* Copyright (C) 2011 Mobile Sorcery AB
+/*
+ Copyright (C) 2012 MoSync AB
 
- This program is free software; you can redistribute it and/or modify it under
- the terms of the GNU General Public License, version 2, as published by
- the Free Software Foundation.
+ This program is free software; you can redistribute it and/or
+ modify it under the terms of the GNU General Public License,
+ version 2, as published by the Free Software Foundation.
 
  This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
- for more details.
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ GNU General Public License for more details.
 
  You should have received a copy of the GNU General Public License
- along with this program; see the file COPYING.  If not, write to the Free
- Software Foundation, 59 Temple Place - Suite 330, Boston, MA
- 02111-1307, USA.
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ MA 02110-1301, USA.
  */
 
 #import "AudioInstance.h"
@@ -20,7 +21,7 @@
 //#include <helpers/CPP_IX_AUDIO.h>
 #include "Platform.h"
 
-@implementation AudioInstance
+@implementation AudioInstanceStatic
 
 /**
  * Init function.
@@ -45,7 +46,7 @@
 		if(filename)
 		{
 			NSURL* url = nil;
-			if([filename hasPrefix:@"/"])
+			if([filename hasPrefix:@"/"] || [filename hasPrefix:@"file://"])
 			{
 				url = [[NSURL alloc] initFileURLWithPath:filename];
 			} else {
@@ -133,6 +134,7 @@
 {
 	mPrepared = false;
 	[mAudioPlayer stop];
+	[mAudioPlayer setCurrentTime:0.0];
 }
 
 -(void) setPosition:(int)millis

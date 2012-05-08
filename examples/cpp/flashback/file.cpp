@@ -18,7 +18,7 @@
 
 //#include "zlib.h"
 #include "file.h"
-#include <MAFS\File.h>
+#include <MAFS/File.h>
 
 struct File_impl {
 	bool _ioErr;

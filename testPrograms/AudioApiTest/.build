@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<buildSequence>
+<buildStep type="cmd">
+<cmd foe="false" name="Bundle resources" pf="false" pt="">%mosync-bin%/Bundle -in %current-project%/LocalFiles -out %current-project%/Resources/LocalFiles.bin -toLower</cmd>
+</buildStep>
+<buildStep type="resource"/>
+<buildStep type="compile"/>
+<buildStep type="link"/>
+<buildStep type="pack"/>
+<buildStep type="copy.build.results"/>
+</buildSequence>

@@ -73,6 +73,9 @@
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Source\maapi.cs" />
+    <Compile Include="Source\Modules\Audio\MoSyncAudio.cs" />
+    <Compile Include="Source\Modules\Audio\MoSyncAudioData.cs" />
+    <Compile Include="Source\Modules\Audio\MoSyncAudioInstance.cs" />
     <Compile Include="Source\Modules\GL\GL.cs" />
     <Compile Include="Source\Modules\GL\GLConstants.cs" />
     <Compile Include="Source\Modules\GL\GLTypes.cs" />

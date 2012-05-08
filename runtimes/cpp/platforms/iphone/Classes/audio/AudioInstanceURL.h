@@ -16,38 +16,18 @@
  MA 02110-1301, USA.
  */
 
-#import <Foundation/Foundation.h>
-#import <AVFoundation/AVFoundation.h>
-#include <AudioToolbox/AudioToolbox.h>
+#import "AudioInstance.h"
 
-@class AudioData;
-
-@protocol AudioInstance
-	-(BOOL) isPrepared;
-	-(BOOL) isPreparing;
-	-(BOOL) prepare:(BOOL)async;
-	-(BOOL) play;
-	-(void) pause;
-	-(void) stop;
-	-(void) setPosition:(int)millis;
-	-(int) getPosition;
-	-(void) setNumberOfLoops:(int)numLoops;
-	-(void) setVolume:(float)volume;
-	-(int) getLength;
-	-(void) release;
-@end
-
-@interface AudioInstanceStatic :  NSObject <AVAudioPlayerDelegate, AudioInstance> {
-    AVAudioPlayer* mAudioPlayer;
+@interface AudioInstanceURL :  NSObject <AudioInstance> {
+	AVPlayer* mPlayer;
     AudioData* mAudioData;
 	int mHandle;
 	BOOL mPrepared;
 	BOOL mIsPreparing;
+	int mNumLoops;
+	int mCurrentLoop;
 }
 
-/**
- * Init function.
- */
 -(id) initWithAudioData:(AudioData*)audioData andHandle:(int)handle error:(int*)error;
 
 -(BOOL) isPrepared;

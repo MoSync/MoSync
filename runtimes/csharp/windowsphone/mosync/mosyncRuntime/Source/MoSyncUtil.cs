@@ -181,6 +181,15 @@ namespace MoSync
 			}
 		};
 
+		public class ReturnValueException : Exception
+		{
+			public readonly int result;
+			public ReturnValueException(int res)
+			{
+				result = res;
+			}
+		}
+
 		public static void ShowMessage(String text, bool log=true, String caption="")
 		{
 			if(log)
