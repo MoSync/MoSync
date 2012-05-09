@@ -29,6 +29,7 @@
 #import "PurchaseManager.h"
 #import "PurchaseProduct.h"
 #import "Platform.h"
+#include "Syscall.h"
 
 /**
  * Hidden methods for PurchaseManager.
@@ -56,6 +57,24 @@
  * @return The product containg the payment if found, otherwise nil.
  */
 -(PurchaseProduct*) productUsingPayment:(SKPayment*) payment;
+
+/**
+ * Check if purchase is supported on the current device.
+ * If it's not a purchase event will be sent.
+ * @param purchaseEventType Purchase event type. Must be one of MA_PURCHASE_EVENT constants.
+ * @param productHandle Handle to the product that will send the event.
+ * @return YES if the puchase is supported(the event has not been send), otherwise NO
+ * (the event has been send).
+ */
+-(BOOL) checkPurchaseSupported:(const int) purchaseEventType
+                 productHandle:(MAHandle) productHandle;
+
+/**
+ * Restored a product that has been purchased by the user.
+ * Send purchase related event for the restored product.
+ * @param transaction The transaction for the purchased product.
+ */
+-(void) handleProductRestored:(SKPaymentTransaction*) transaction;
 
 @end
 
@@ -116,66 +135,120 @@ static PurchaseManager *sharedInstance = nil;
 
 /**
  * Create a product object.
+ * @param productHandle A valid handle that will be used to indetify the new product.
  * @param productID String that identifies the object.
- * @return MA_PURCHASE_RES_INVALID if the productID string is empty or a handle
- * to the product object.
  */
--(MAHandle) createProduct:(const char*) productID
+-(void) createProduct:(MAHandle) productHandle
+            productID:(const char*) productID
 {
+    // Check if purchase is supported.
+    BOOL isPurchaseSupported = [self checkPurchaseSupported:MA_PURCHASE_EVENT_PRODUCT_CREATE
+                                              productHandle:productHandle];
+    if (!isPurchaseSupported)
+    {
+        return;
+    }
+
+    // Check if productHandle is unique.
+    NSNumber* key = [NSNumber numberWithInt:productHandle];
+    PurchaseProduct* product = [_productsDictionary objectForKey:key];
+    if (product)
+    {
+        [self sendPurchaseEvent:MA_PURCHASE_EVENT_PRODUCT_CREATE
+                          state:MA_PURCHASE_STATE_DUPLICATE_HANDLE
+                  productHandle:productHandle
+                      errorCode:0];
+        return;
+    }
+
+    // Check if productID is not empty.
     NSString* productIDString = [NSString stringWithUTF8String:productID];
     if ([productIDString length] == 0)
     {
-        return MA_PURCHASE_RES_INVALID;
+        [self sendPurchaseEvent:MA_PURCHASE_EVENT_PRODUCT_CREATE
+                          state:MA_PURCHASE_STATE_PRODUCT_INVALID
+                  productHandle:productHandle
+                      errorCode:0];
+        return;
     }
 
-    NSNumber* key = [NSNumber numberWithInt:_countProducts];
-    PurchaseProduct* product = [[PurchaseProduct alloc] initWithHandle:[key intValue]
-                                                             productID:productIDString];
+    // Create the product.
+    product = [[PurchaseProduct alloc] initWithHandle:[key intValue]
+                                            productID:productIDString];
     [_productsDictionary setObject:product forKey:key];
-    _countProducts++;
-
-    return [key intValue];
 }
 
 /**
  * Destroy a product object.
  * @param productHandle Handle to the product to destroy.
- * If the given handle is invalid the method does nothing.
+ * @return One of the following values:
+ * - MA_PURCHASE_RES_OK if product has been detroyed.
+ * - MA_PURCHASE_RES_INVALID_HANDLE if the productHandle is invalid.
  */
--(void) destroyProduct:(MAHandle) productHandle
-{
-    NSNumber* key = [NSNumber numberWithInt:productHandle];
-    PurchaseProduct* product = [_productsDictionary objectForKey:key];
-    if (product)
-    {
-        [_productsDictionary removeObjectForKey:key];
-        [product release];
-    }
-}
-
-/**
- * Add a given product to the payment queue.
- * @param productHandle Handle to the product to be added.
- */
--(void) requestProduct:(MAHandle) productHandle
+-(int) destroyProduct:(MAHandle) productHandle
 {
     NSNumber* key = [NSNumber numberWithInt:productHandle];
     PurchaseProduct* product = [_productsDictionary objectForKey:key];
     if (!product)
     {
-        [self sendPurchaseEvent:MA_PURCHASE_EVENT_REQUEST_STATE_CHANGED
+        return MA_PURCHASE_RES_INVALID_HANDLE;
+    }
+
+    [_productsDictionary removeObjectForKey:key];
+    [product release];
+    return MA_PURCHASE_RES_OK;
+}
+
+/**
+ * Add a given product to the payment queue.
+ * @param productHandle Handle to the product to be added.
+ * @param quantity How many products to be purchased. Must be a value greater than zero.
+ */
+-(void) requestProduct:(MAHandle) productHandle
+              quantity:(const int) quantity
+{
+    // Check if purchase is supported.
+    BOOL isPurchaseSupported = [self checkPurchaseSupported:MA_PURCHASE_EVENT_REQUEST
+                                              productHandle:productHandle];
+    if (!isPurchaseSupported)
+    {
+        return;
+    }
+
+    NSNumber* key = [NSNumber numberWithInt:productHandle];
+    PurchaseProduct* product = [_productsDictionary objectForKey:key];
+    if (!product)
+    {
+        [self sendPurchaseEvent:MA_PURCHASE_EVENT_REQUEST
                           state:MA_PURCHASE_STATE_FAILED
                   productHandle:productHandle
                       errorCode:MA_PURCHASE_ERROR_INVALID_HANDLE];
         return;
     }
 
-    SKPayment* payment = [product payment];
+    // Check if quantity is valid.
+    if (quantity <= 0)
+    {
+        [self sendPurchaseEvent:MA_PURCHASE_EVENT_REQUEST
+                          state:MA_PURCHASE_STATE_FAILED
+                  productHandle:productHandle
+                      errorCode:MA_PURCHASE_ERROR_INVALID_QUANTITY];
+        return;
+    }
+    SKMutablePayment* payment = [product payment];
     if (!payment)
     {
         NSLog(@"error in %s. Reason is %@", __FUNCTION__, @"payment is nil - invalid product id");
+        [self sendPurchaseEvent:MA_PURCHASE_EVENT_REQUEST
+                          state:MA_PURCHASE_STATE_FAILED
+                  productHandle:productHandle
+                      errorCode:MA_PURCHASE_ERROR_INVALID_PRODUCT];
     }
-    [_paymentQueue addPayment:payment];
+    else
+    {
+        payment.quantity = quantity;
+        [_paymentQueue addPayment:payment];
+    }
 }
 
 /**
@@ -205,21 +278,28 @@ static PurchaseManager *sharedInstance = nil;
 /**
  * Verify if the receipt came from App Store.
  * @param productHandle Handle to the product you want to verify its receipt.
- * @return One of the next constants:
- * - MA_PURCHASE_RES_OK if the receipt was sent to the store for verifing.
- * - MA_PURCHASE_RES_INVALID_HANDLE if productHandle is invalid.
- * - MA_PURCHASE_RES_RECEIPT if the product has not been purchased.
  */
--(int) verifyReceipt:(MAHandle) productHandle
+-(void) verifyReceipt:(MAHandle) productHandle
 {
+    // Check if purchase is supported.
+    BOOL isPurchaseSupported = [self checkPurchaseSupported:MA_PURCHASE_EVENT_REQUEST
+                                              productHandle:productHandle];
+    if (!isPurchaseSupported)
+    {
+        return;
+    }
+
     NSNumber* key = [NSNumber numberWithInt:productHandle];
     PurchaseProduct* product = [_productsDictionary objectForKey:key];
     if (!product)
     {
-        return MA_PURCHASE_RES_INVALID_HANDLE;
+        [self sendPurchaseEvent:MA_PURCHASE_EVENT_VERIFY_RECEIPT
+                          state:MA_PURCHASE_STATE_RECEIPT_ERROR
+                  productHandle:productHandle
+                      errorCode:MA_PURCHASE_RES_INVALID_HANDLE];
     }
 
-    return [product verifyReceipt:_storeURL];
+    [product verifyReceipt:_storeURL];
 }
 
 /**
@@ -230,6 +310,7 @@ static PurchaseManager *sharedInstance = nil;
  * @param bufferSize Maximum size of the buffer.
  * @return The number of written bytes in case of success, or
  * one of the next result codes:
+ * - MA_PURCHASE_RES_DISABLED if purchase is not allowed/enabled.
  * - MA_PURCHASE_RES_INVALID_HANDLE if the productHandle is invalid.
  * - MA_PURCHASE_RES_BUFFER_TOO_SMALL if the buffer is too small.
  * - MA_PURCHASE_RES_RECEIPT_NOT_AVAILABLE if the receipt has not been received or if
@@ -240,6 +321,11 @@ static PurchaseManager *sharedInstance = nil;
                 buffer:(char*) buffer
             bufferSize:(const int) bufferSize
 {
+    if (![SKPaymentQueue canMakePayments])
+    {
+        return MA_PURCHASE_RES_DISABLED;
+    }
+
     NSNumber* key = [NSNumber numberWithInt:productHandle];
     PurchaseProduct* product = [_productsDictionary objectForKey:key];
     if (!product)
@@ -288,6 +374,10 @@ static PurchaseManager *sharedInstance = nil;
             [product updatedTransaction:transaction];
         }
 
+        if (transaction.transactionState == SKPaymentTransactionStateRestored)
+        {
+
+        }
         // Remove the transaction from the payment queue.
         if (transaction.transactionState == SKPaymentTransactionStatePurchased ||
             transaction.transactionState == SKPaymentTransactionStateRestored)
@@ -368,6 +458,48 @@ static PurchaseManager *sharedInstance = nil;
     }
 
     return nil;
+}
+
+/**
+ * Check if purchase is supported on the current device.
+ * If it's not a purchase event will be sent.
+ * @param purchaseEventType Purchase event type. Must be one of MA_PURCHASE_EVENT constants.
+ * @param productHandle Handle to the product that will send the event.
+ * @return YES if the puchase is supported(the event has not been send), otherwise NO
+ * (the event has been send).
+ */
+-(BOOL) checkPurchaseSupported:(const int) purchaseEventType
+                 productHandle:(MAHandle) productHandle
+{
+    if (![SKPaymentQueue canMakePayments])
+    {
+        [self sendPurchaseEvent:purchaseEventType
+                          state:MA_PURCHASE_STATE_DISABLED
+                  productHandle:productHandle
+                      errorCode:0];
+        return NO;
+    }
+    return YES;
+}
+
+/**
+ * Restored a product that has been purchased by the user.
+ * Send purchase related event for the restored product.
+ * @param transaction The transaction for the purchased product.
+ */
+-(void) handleProductRestored:(SKPaymentTransaction*) transaction
+{
+    MAHandle productHandle = maCreatePlaceholder();
+    NSNumber* key = [NSNumber numberWithInt:productHandle];
+    SKPayment* payment = transaction.payment;
+    NSString* productID = payment.productIdentifier;
+    PurchaseProduct* product = [[PurchaseProduct alloc] initWithHandle:productHandle
+                                                             productID:productID];
+    [_productsDictionary setObject:product forKey:key];
+    [self sendPurchaseEvent:MA_PURCHASE_EVENT_RESTORE
+                      state:0
+              productHandle:productHandle
+                  errorCode:0];
 }
 
 @end

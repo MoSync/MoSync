@@ -97,7 +97,7 @@
  * Get a payment object for the product.
  * @return A payment that can be send to the Apple App Store.
  */
--(SKPayment*) payment;
+-(SKMutablePayment*) payment;
 
 /**
  * Called when the transaction that contains this product has been updated.
@@ -118,11 +118,8 @@
 /**
  * Verify if the receipt came from App Store.
  * @param storeURL App Store url where to send the receipt for verification.
- * @return One of the next constants:
- * - MA_PURCHASE_RES_OK if the receipt was sent to the store for verifing.
- * - MA_PURCHASE_RES_RECEIPT if the product has not been purchased.
  */
--(int) verifyReceipt:(NSString*) storeURL;
+-(void) verifyReceipt:(NSString*) storeURL;
 
 /**
  * Get a receipt field value.

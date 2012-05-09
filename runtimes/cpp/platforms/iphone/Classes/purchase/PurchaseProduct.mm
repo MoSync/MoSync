@@ -134,9 +134,9 @@ NSString* const kReceiptResponseReceiptKey = @"receipt";
  * Get a payment object for the product.
  * @return A payment that can be send to the Apple App Store.
  */
--(SKPayment*) payment
+-(SKMutablePayment*) payment
 {
-    if (!_payment)
+    if (!_payment && _product)
     {
         _payment = [[SKMutablePayment paymentWithProduct:_product] retain];
         _payment.quantity = 1;
@@ -162,7 +162,8 @@ NSString* const kReceiptResponseReceiptKey = @"receipt";
 	event.type = EVENT_TYPE_PURCHASE;
 
     MAPurchaseEventData purchaseData;
-    purchaseData.type = isValid? MA_PURCHASE_EVENT_PRODUCT_VALID : MA_PURCHASE_EVENT_PRODUCT_INVALID;
+    purchaseData.type = MA_PURCHASE_EVENT_PRODUCT_CREATE;
+    purchaseData.state = isValid? MA_PURCHASE_STATE_PRODUCT_VALID : MA_PURCHASE_STATE_PRODUCT_INVALID;
     purchaseData.productHandle = _handle;
 
     event.purchaseData = purchaseData;
@@ -224,16 +225,15 @@ NSString* const kReceiptResponseReceiptKey = @"receipt";
 /**
  * Verify if the receipt came from App Store.
  * @param storeURL App Store url where to send the receipt for verification.
- * @return One of the next constants:
- * - MA_PURCHASE_RES_OK if the receipt was sent to the store for verifing.
- * - MA_PURCHASE_RES_RECEIPT if the product has not been purchased.
  */
--(int) verifyReceipt:(NSString*) storeURL
+-(void) verifyReceipt:(NSString*) storeURL
 {
     NSLog(@"%s for %@", __FUNCTION__, _transaction.payment.productIdentifier);
     if (!_transaction)
     {
-        return MA_PURCHASE_RES_RECEIPT;
+        [self sendPurchaseEvent:MA_PURCHASE_EVENT_VERIFY_RECEIPT
+                          state:MA_PURCHASE_STATE_RECEIPT_ERROR
+                      errorCode:MA_PURCHASE_ERROR_NO_RECEIPT];
     }
 
     // The connection needs to be done on the main thread.
@@ -253,8 +253,6 @@ NSString* const kReceiptResponseReceiptKey = @"receipt";
         NSURLConnection* urlConnection = [[NSURLConnection alloc] initWithRequest:request delegate:self];
         [urlConnection release];
     });
-
-    return MA_PURCHASE_RES_OK;
 }
 
 /**
@@ -322,8 +320,8 @@ NSString* const kReceiptResponseReceiptKey = @"receipt";
           __FUNCTION__,
          [error localizedDescription],
          [[error userInfo] objectForKey:NSURLErrorFailingURLStringErrorKey]);
-    [self sendPurchaseEvent:MA_PURCHASE_EVENT_RECEIPT_ERROR
-                      state:0
+    [self sendPurchaseEvent:MA_PURCHASE_EVENT_VERIFY_RECEIPT
+                      state:MA_PURCHASE_STATE_RECEIPT_ERROR
                   errorCode:MA_PURCHASE_ERROR_CONNECTION_FAILED];
 }
 
@@ -348,8 +346,8 @@ NSString* const kReceiptResponseReceiptKey = @"receipt";
 {
     NSLog(@"IN %s", __FUNCTION__);
     // The respone should contain an object and not an array.
-    [self sendPurchaseEvent:MA_PURCHASE_EVENT_RECEIPT_ERROR
-                      state:0
+    [self sendPurchaseEvent:MA_PURCHASE_EVENT_VERIFY_RECEIPT
+                      state:MA_PURCHASE_STATE_RECEIPT_ERROR
                   errorCode:MA_PURCHASE_ERROR_CANNOT_PARSE_RECEIPT];
 }
 
@@ -406,7 +404,7 @@ NSString* const kReceiptResponseReceiptKey = @"receipt";
  */
 -(void) handleTransactionStatePurchasing:(SKPaymentTransaction*) transaction
 {
-    [self sendPurchaseEvent:MA_PURCHASE_EVENT_REQUEST_STATE_CHANGED
+    [self sendPurchaseEvent:MA_PURCHASE_EVENT_REQUEST
                       state:MA_PURCHASE_STATE_IN_PROGRESS
                   errorCode:0];
 }
@@ -418,7 +416,7 @@ NSString* const kReceiptResponseReceiptKey = @"receipt";
 -(void) handleTransactionStatePurchased:(SKPaymentTransaction*) transaction
 {
     _transaction = [transaction retain];
-    [self sendPurchaseEvent:MA_PURCHASE_EVENT_REQUEST_STATE_CHANGED
+    [self sendPurchaseEvent:MA_PURCHASE_EVENT_REQUEST
                       state:MA_PURCHASE_STATE_COMPLETED
                   errorCode:0];
 }
@@ -429,9 +427,26 @@ NSString* const kReceiptResponseReceiptKey = @"receipt";
  */
 -(void) handleTransactionStateFailed:(SKPaymentTransaction*) transaction
 {
-    [self sendPurchaseEvent:MA_PURCHASE_EVENT_REQUEST_STATE_CHANGED
+    int errorCode;
+    switch (transaction.error.code)
+    {
+        case SKErrorClientInvalid:
+            errorCode = MA_PURCHASE_ERROR_INVALID_CLIENT;
+            break;
+        case SKErrorPaymentCancelled:
+            errorCode = MA_PURCHASE_ERROR_CANCELLED;
+            break;
+        case SKErrorPaymentNotAllowed:
+            errorCode = MA_PURCHASE_ERROR_NOT_ALLOWED;
+            break;
+        case SKErrorUnknown:
+        default:
+            errorCode = MA_PURCHASE_ERROR_UNKNOWN;
+            break;
+    }
+    [self sendPurchaseEvent:MA_PURCHASE_EVENT_REQUEST
                       state:MA_PURCHASE_STATE_FAILED
-                  errorCode:0];
+                  errorCode:errorCode];
 }
 
 /**
@@ -440,7 +455,7 @@ NSString* const kReceiptResponseReceiptKey = @"receipt";
  */
 -(void) handleTransactionStateRestored:(SKPaymentTransaction*) transaction
 {
-    [self sendPurchaseEvent:MA_PURCHASE_EVENT_RESTORED
+    [self sendPurchaseEvent:MA_PURCHASE_EVENT_RESTORE
                       state:MA_PURCHASE_STATE_COMPLETED
                   errorCode:0];
 }
@@ -478,15 +493,15 @@ NSString* const kReceiptResponseReceiptKey = @"receipt";
     NSNumber* statusCode = [storeResponse objectForKey:kReceiptResponseStatusKey];
     if (!statusCode)
     {
-        [self sendPurchaseEvent:MA_PURCHASE_EVENT_RECEIPT_ERROR
-                          state:0
+        [self sendPurchaseEvent:MA_PURCHASE_EVENT_VERIFY_RECEIPT
+                          state:MA_PURCHASE_STATE_RECEIPT_ERROR
                       errorCode:MA_PURCHASE_ERROR_CANNOT_PARSE_RECEIPT];
         return;
     }
     if ([statusCode isEqualToNumber:RECEIPT_STATUS_CODE_OK])
     {
-        [self sendPurchaseEvent:MA_PURCHASE_EVENT_RECEIPT_VALID
-                          state:0
+        [self sendPurchaseEvent:MA_PURCHASE_EVENT_VERIFY_RECEIPT
+                          state:MA_PURCHASE_STATE_RECEIPT_VALID
                       errorCode:0];
         [_validationResponse release];
         NSDictionary* receiptDict = [storeResponse objectForKey:kReceiptResponseReceiptKey];
@@ -497,8 +512,8 @@ NSString* const kReceiptResponseReceiptKey = @"receipt";
     }
     else
     {
-        [self sendPurchaseEvent:MA_PURCHASE_EVENT_RECEIPT_INVALID
-                          state:0
+        [self sendPurchaseEvent:MA_PURCHASE_EVENT_VERIFY_RECEIPT
+                          state:MA_PURCHASE_STATE_RECEIPT_INVALID
                       errorCode:0];
     }
 }

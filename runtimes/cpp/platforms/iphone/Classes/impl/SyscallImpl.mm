@@ -1980,18 +1980,18 @@ namespace Base {
         return [[PurchaseManager getInstance] isPurchaseSupported];
 	}
 
-    SYSCALL(MAHandle, maPurchaseCreate(const char* productID))
+    SYSCALL(void, maPurchaseCreate(MAHandle productHandle, const char* productID))
 	{
-        return [[PurchaseManager getInstance] createProduct:productID];
+        [[PurchaseManager getInstance] createProduct:productHandle productID:productID];
 	}
 
-    SYSCALL(void, maPurchaseDestroy(MAHandle productHandle))
+    SYSCALL(int, maPurchaseDestroy(MAHandle productHandle))
 	{
-        [[PurchaseManager getInstance] destroyProduct:productHandle];
+        return [[PurchaseManager getInstance] destroyProduct:productHandle];
 	}
-    SYSCALL(void, maPurchaseRequest(MAHandle productHandle))
+    SYSCALL(void, maPurchaseRequest(MAHandle productHandle, const int quantity))
 	{
-        [[PurchaseManager getInstance] requestProduct:productHandle];
+        [[PurchaseManager getInstance] requestProduct:productHandle quantity:quantity];
 	}
     SYSCALL(int, maPurchaseGetName(MAHandle productHandle, char* buffer, const int bufferSize))
 	{
@@ -2003,9 +2003,9 @@ namespace Base {
 	{
         [[PurchaseManager getInstance] setStoreURL:url];
 	}
-    SYSCALL(int, maPurchaseVerifyReceipt(MAHandle productHandle))
+    SYSCALL(void, maPurchaseVerifyReceipt(MAHandle productHandle))
 	{
-        return [[PurchaseManager getInstance] verifyReceipt:productHandle];
+        [[PurchaseManager getInstance] verifyReceipt:productHandle];
 	}
     SYSCALL(int, maPurchaseGetField(MAHandle productHandle, const char* fieldName,
                                     char* buffer, const int bufferSize))
