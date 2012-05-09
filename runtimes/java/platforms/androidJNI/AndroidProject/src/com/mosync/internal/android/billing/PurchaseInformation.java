@@ -17,9 +17,12 @@ MA 02110-1301, USA.
 
 package com.mosync.internal.android.billing;
 
-import java.util.Date;
+import android.text.TextUtils;
 
 import com.mosync.internal.android.billing.request.BaseRequest;
+import com.mosync.nativeui.util.properties.IntConverter;
+
+import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_STATE_IN_PROGRESS;
 
 /**
  * Purchase class holds information about a purchase.
@@ -37,6 +40,21 @@ public class PurchaseInformation
 		mProductID = productID;
 		mState = Consts.PURCHASE_STATE_ON_HOLD;
 	}
+
+    public PurchaseInformation(int purchaseState, String notificationId,
+            String productId, String orderId, long purchaseTime,
+            String packageName, String payload)
+    {
+        mState = purchaseState;
+        mNotificationID = notificationId;
+        mProductID = productId;
+        mOrderID = orderId;
+        mTime = purchaseTime;
+        mPackageName = packageName;
+        mPayload = payload;
+        if ( !TextUtils.isEmpty(payload) )
+			mHandle = IntConverter.convert(payload);
+    }
 
 	public void setHandle(int handle)
 	{
@@ -82,23 +100,12 @@ public class PurchaseInformation
 	{
 		return mNotificationID;
 	}
-
-//	+ add member Request !!!!!!!!!!!!!!!
-
 	/************************ Class members ************************/
-	/**
-	 * The MoSync thread object.
-	 */
-	//private MoSyncThread mMoSyncThread;
 
 	/**
 	 * The internal handle of the purchase.
 	 */
 	private int mHandle = -1;
-
-	/**
-	 *
-	 */
 	private BaseRequest mRequest = null;
 
 	/**
@@ -110,11 +117,12 @@ public class PurchaseInformation
 	 * The notification Id that Google Play is sending when a purchase
 	 * request was successfull. Used in GetPurchaseInformation requests.
 	 */
-	private String mNotificationID = null;
-
-	private int mPrice = 0;
-	private int mQuantity = 0;
-	private Date mTime;
+	public String mNotificationID = null;
+	public String mOrderID = null;
+	public String mPackageName = null;
+	public long mTime;
+	public int mPrice = 0;
+	public String mPayload = null;
 
 	/**
 	 * Purchase state is at first unknown.
@@ -122,6 +130,7 @@ public class PurchaseInformation
 	 * MA_PURCHASE_STATE_IN_PROGRESS.
 	 * After the purchase was made, the state becomes MA_PURCHASE_STATE_COMPLETED.
 	 * If the purchase request fails at any moment, the state becomes MA_PURCHASE_STATE_FAILED.
+	 * If the product is refundend, the state becomes MA_PURCHASE_STATE_REFUNDED.
 	 */
-	private int mState;//= Consts.PurchaseState.MA_PURCHASE_STATE_UNKNOWN;
+	public int mState = MA_PURCHASE_STATE_IN_PROGRESS;
 }

@@ -3407,18 +3407,18 @@ namespace Base
 	{
 		jstring jstrKey = jNIEnv->NewStringUTF(developerKey);
 		jclass cls = jNIEnv->GetObjectClass(jThis);
-		jmethodID methodID = jNIEnv->GetMethodID(cls, "maPurchaseSetPublicKey", "(Ljava/lang/String;)I");
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maPurchaseSetPublicKey", "(Ljava/lang/String;)V");
 		if (methodID == 0)
 		{
 			return 0;
 		}
 
-		int result = jNIEnv->CallIntMethod(jThis, methodID, jstrKey);
+		jNIEnv->CallVoidMethod(jThis, methodID, jstrKey);
 
 		jNIEnv->DeleteLocalRef(cls);
 		jNIEnv->DeleteLocalRef(jstrKey);
 
-		return result;
+		return 1;
 	}
 
 	int _maPurchaseRequest(MAHandle productHandle, int quantity, JNIEnv* jNIEnv, jobject jThis)
@@ -3488,6 +3488,21 @@ namespace Base
 		}
 
 		jNIEnv->CallVoidMethod(jThis, methodID);
+		jNIEnv->DeleteLocalRef(cls);
+
+		return 1;
+	}
+
+	int _maPurchaseVerifyReceipt(MAHandle handle, JNIEnv* jNIEnv, jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maPurchaseVerifyReceipt", "(I)V");
+		if (methodID == 0)
+		{
+			return 0;
+		}
+
+		jNIEnv->CallVoidMethod(jThis, methodID, handle);
 		jNIEnv->DeleteLocalRef(cls);
 
 		return 1;

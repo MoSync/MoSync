@@ -72,33 +72,38 @@ group PurchaseErrorCodes "Purchase Error Codes" {
         * if the given product handle is invalid.
         */
 		INVALID_HANDLE = -1;
+		/**
+		* \brief Possible error code for #MA_PURCHASE_EVENT_RECEIPT_ERROR.
+		* Sent by the #maPurchaseVerifyReceipt() syscall if the given product
+		* was not purchased, so there is no receipt for it.
+		*/
+		PRODUCT_NOT_PURCHASED = -2;
         /**
         * \brief Possible error code for #MA_PURCHASE_EVENT_RECEIPT_ERROR.
         * Indicates that the connection with the App Store / Google Play has failed.
         */
-		CONNECTION_FAILED = -2;
+		CONNECTION_FAILED = -3;
         /**
         * \brief Possible error code for #MA_PURCHASE_EVENT_RECEIPT_ERROR.
         * Indicates that response from App Store/ Google Play for verifying
 		* a receipt cannot be parsed.
-		* On Android the reason might be that #maPurchaseSetPublicKey was not previously called.
-		* Platform: iOS and Android.
+		* Platform: iOS.
         */
-		CANNOT_PARSE_RECEIPT = -3;
+		CANNOT_PARSE_RECEIPT = -4;
 		/**
 		* \brief Possible error code for #MA_PURCHASE_EVENT_REQUEST_STATE_CHANGED.
 		* Sent by the #maPurchaseRequest() syscall if the requested product is not valid
 		* on the App Store/ Google Play.
 		* Platform: iOS and Android.
 		*/
-		INVALID_PRODUCT = -4;
+		INVALID_PRODUCT = -5;
         /**
 		* \brief Possible error code for #MA_PURCHASE_EVENT_REQUEST_STATE_CHANGED.
 		* Sent by the #maPurchaseRequest() syscall if the client is not allowed to perform
 		* the attempted action.
 		* Platform: iOS.
 		*/
-		INVALID_CLIENT = -5;
+		INVALID_CLIENT = -6;
         /**
 		* \brief Possible error code for #MA_PURCHASE_EVENT_REQUEST_STATE_CHANGED.
 		* Sent by the #maPurchaseRequest() syscall if the user cancelled the payment request.
@@ -106,19 +111,25 @@ group PurchaseErrorCodes "Purchase Error Codes" {
 		* buying the item.
 		* Platform: iOS and Android.
 		*/
-		CANCELLED = -6;
+		CANCELLED = -7;
         /**
 		* \brief Possible error code for #MA_PURCHASE_EVENT_REQUEST_STATE_CHANGED.
 		* Sent by the #maPurchaseRequest() syscall if the user is not allowed to authorize payments.
 		* Platform: iOS.
 		*/
-		NOT_ALLOWED = -7;
+		NOT_ALLOWED = -8;
+		/**
+		* \brief Possible error code for #MA_PURCHASE_EVENT_REQUEST_STATE_CHANGED.
+		* Sent by the #maPurchaseRequest() syscall if the user did not previously call #maPurchaseSetPublicKey().
+		* Platform: Android.
+		*/
+		PUBLIC_KEY_NOT_SET = -9;
 		/**
 		* \brief Possible error code for #MA_PURCHASE_EVENT_REQUEST_STATE_CHANGED.
 		* Sent by the #maPurchaseRequest() syscall if an unknown or unexpected server error occurred.
 		* Platform: iOS and Android.
 		*/
-		UNKNOWN = -8;
+		UNKNOWN = -10;
 	}
 } // end of Purchase Error Codes
 
@@ -144,6 +155,9 @@ group PurchaseEventTypes "Purchase Event Types" {
 		*/
 		VERIFY_RECEIPT = 2;
         /**
+		* \brief Received when the Billing service triggers a refund for your purchase.
+		* A new product has been created, and the event's productHandle member contains
+		* a handle to the purchased product.
         * \brief Platform: Android.
         */
 		REFUNDED = 3;
@@ -235,7 +249,7 @@ group PurchaseReceiptFields "Purchase Receipt Fields" {
 	constset MAString MA_PURCHASE_RECEIPT_ {
         /**
         * \brief The number of items purchased.
-        * Platform: iOS and Android.
+        * Platform: iOS. On Android just one item can be bought at one time.
         */
 		QUANTITY = "quantity";
         /**
@@ -267,7 +281,7 @@ group PurchaseReceiptFields "Purchase Receipt Fields" {
         * Applications that are executing in the sandbox do not yet have an
         * app-item-id assigned to them,so this key is missing from receipts created
         * by the sandbox.
-        * Platform: iOS.
+        * Platform: iOS and Android.
         */
 		APP_ITEM_ID = "app_item_id";
         /**
@@ -287,6 +301,11 @@ group PurchaseReceiptFields "Purchase Receipt Fields" {
         * Platform: iOS.
         */
 		BVRS = "bvrs";
+		/**
+		* \brief The product price.
+		* Platform: Android.
+		*/
+		PRICE = "price";
 	}
 } // end of Purchase Receipt Fields
 
@@ -338,7 +357,7 @@ group PurchaseFunctions "Purchase Functions" {
 	* \param developerKey Base64-encoded public key, that can be found on the Google
 	* Play publisher account page, under Licensing & In-app Billing panel in Edit Profile.
 	*/
-	int maPurchaseSetPublicKey(in MAString developerPublicKey);
+	void maPurchaseSetPublicKey(in MAString developerPublicKey);
 
 	/**
 	* Request the user to purchase a product.
@@ -378,7 +397,7 @@ group PurchaseFunctions "Purchase Functions" {
 	* the receipt. Check the errorCode member object for more information about the reason.
     *
 	* \param productHandle Handle to the product that has been purchased.
-	* - #MA_PURCHASE_RES_PUBLIC_KEY_NOT_SET.
+	*
 	*/
 	void maPurchaseVerifyReceipt(in MAHandle productHandle);
 

@@ -38,24 +38,24 @@ import com.mosync.internal.android.billing.Security;
  */
 public class GetPurchaseInformation extends BaseRequest
 {
-	public GetPurchaseInformation(int startID, IMarketBillingService service, String[] notifyIds)
+	public GetPurchaseInformation
+		(int startID, IMarketBillingService service, String[] notifyIds)
 	{
 	    // This object is never created as a side effect of starting this
 	    // service so we pass -1 as the startId to indicate that we should
 	    // not stop this service after executing this request.
 	    super(startID, service);
 	    mNotifyIds = notifyIds;
-
-
 	}
 
 	@Override
 	public void run() throws RemoteException
 	{
 		/**
-		 * The REQUEST_NONCE key contains a cryptographically secure nonce (number used once) that you must generate.
-		 * Google Play returns this nonce with the PURCHASE_STATE_CHANGED broadcast intent so you can verify the
-		 * integrity of the transaction information.
+		 * The REQUEST_NONCE key contains a cryptographically secure nonce
+		 * (number used once) that you must generate.
+		 * Google Play returns this nonce with the PURCHASE_STATE_CHANGED broadcast
+		 * intent so you can verify the integrity of the transaction information.
 		 */
 		mNonce = Security.generateNonce();
 
@@ -69,7 +69,6 @@ public class GetPurchaseInformation extends BaseRequest
 	    mRequestId = response.getLong(Consts.BILLING_RESPONSE_REQUEST_ID,
 				Consts.BILLING_RESPONSE_INVALID_REQUEST_ID);
 
-	    // todo set responseCode
 	    int responseCode = response.getInt(Consts.BILLING_RESPONSE_INAPP_RESPONSE_CODE,
 				Consts.BILLING_RESPONSE_INVALID_RESPONSE_CODE);
 	    mResponseCode = Consts.responseCodeValue(responseCode);

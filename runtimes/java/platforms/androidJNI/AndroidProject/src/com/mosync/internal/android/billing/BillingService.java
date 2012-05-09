@@ -17,10 +17,10 @@ MA 02110-1301, USA.
 
 package com.mosync.internal.android.billing;
 
+import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.Queue;
 
 import android.app.Service;
 import android.content.ComponentName;
@@ -39,12 +39,13 @@ import com.mosync.internal.android.billing.request.GetPurchaseInformation;
 import com.mosync.internal.android.billing.request.CheckBillingSupported;
 import com.mosync.internal.android.billing.request.ConfirmNotifications;
 import com.mosync.internal.android.billing.request.Purchase;
-import com.mosync.internal.android.billing.Security.VerifiedPurchase;
+import com.mosync.internal.android.billing.request.RestoreTransactions;
 
 import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_RES_OUT_OF_DATE;
 import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_RES_CONNECTION_ERROR;
 import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_STATE_IN_PROGRESS;
 import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_STATE_FAILED;
+import static com.mosync.internal.android.MoSyncHelpers.SYSLOG;
 
 /**
  * This class sends messages to Google Play on behalf of the application by
@@ -53,7 +54,7 @@ import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_STATE_FAILE
  *
  * The {@link BillingReceiver} class starts this service to process commands
  * that it receives from Google Play.
- *
+ * @author emma
  */
 public class BillingService extends Service implements ServiceConnection
 {
@@ -63,36 +64,8 @@ public class BillingService extends Service implements ServiceConnection
 	 */
     public BillingService()
     {
-        super();Log.e("@@Emma"," IN BillingService() ");
-        //mThread = thread;
+        super();
     }
-
-	@Override
-	public void onCreate()
-	{
-		Log.e("@@MoSync","BillingService --------- onCreate()-------------------- ");
-		//todo delete this method.
-		super.onCreate();/*
-
-		try {
-			boolean bindResult = bindService(
-								new Intent(Consts.MARKET_BILLING_SERVICE_ACTION),
-								this,
-								Context.BIND_AUTO_CREATE);
-			if(bindResult)
-			{
-				Log.i("@@MoSync", "Market Billing Service Successfully bound");
-			}
-			else
-			{
-				Log.e("@@MoSync", "Market Billing Service could not be bound.");
-				//TODO stop user continuing
-			}
-		} catch (SecurityException e){
-			Log.e("@@MoSync", "Market Billing Service could not be bound. SecurityException: " + e);
-			//TODO stop user continuing
-		}*/
-	}
 
 	public void setContext(Context context)
 	{
@@ -100,13 +73,28 @@ public class BillingService extends Service implements ServiceConnection
         mAppContext = context;
     }
 
-	public void setManager(PurchaseManager manager)
+	public void setThread(MoSyncThread thread)
 	{
-		mPurchaseManager = manager;
+		mThread = thread;
+	}
+
+	/**
+	 * Compute your public key (that you got from the Android Market publisher site).
+	 * @param developerPublicKey the Base64 encoded key.
+	 */
+	public void setPublicKey(final String developerPublicKey)
+	{
+		try
+		{
+			mPublicKey = Security.generatePublicKey(developerPublicKey);
+		} catch (Exception ex)
+		{
+			SYSLOG("maPurchaseSetPublicKey: malformed developerPublicKey");
+			mPublicKey = null;
+		}
 	}
 
     /**
-     * We don't support binding to this service, only starting the service.
      * Once the service is bond, it will create a tunnel to talk with its
      * clients which is the IBinder Interface.
      * This is used by your AIDL Interface implementation and returns the IBinder.
@@ -125,9 +113,8 @@ public class BillingService extends Service implements ServiceConnection
     public void onDestroy()
     {
 		super.onDestroy();
-		Log.e("@@MoSync", "onDestroy is called!!!!!!!!!!!!!!!!");
-		// todo unregister receiver.
-		//todo what happens on MoSync.onDestroy().
+		mListener = null;
+		SYSLOG("@@MoSync BillingService onDestroy");
     }
 
     /**
@@ -139,15 +126,13 @@ public class BillingService extends Service implements ServiceConnection
     public void handleCommand(Intent intent, int startId)
     {
         String action = intent.getAction();
-        Log.e("@@MoSync","BillingService handleCommand -------------" + action);
-        // The event that will be sent to the MoSync queue.
-        int[] event = null;
+        //TODO delete log.
+        Log.e("@@MoSync","BillingService handleCommand: ---------- " + action);
+
         if (Consts.METHOD_CONFIRM_NOTIFICATIONS.equals(action))
         {
             String[] notifyIds = intent.getStringArrayExtra(Consts.BILLING_RESPONSE_NOTIFICATION_ID);
-//            confirmNotifications(startId, notifyIds);
-//            event = BillingEventHandler.onConfirmNotifications(1);
-
+            confirmNotifications(startId, notifyIds);
         }
         else if (Consts.ACTION_GET_PURCHASE_INFORMATION.equals(action))
         {
@@ -156,10 +141,9 @@ public class BillingService extends Service implements ServiceConnection
         }
         else if (Consts.ACTION_STATE_CHANGED.equals(action))
         {
+			// State changed is received after purchase information was retrieved.
             String signedData = intent.getStringExtra(Consts.BILLING_RESPONSE_INAPP_SIGNED_DATA);
             String signature = intent.getStringExtra(Consts.BILLING_RESPONSE_INAPP_SIGNATURE);
-//            purchaseStateChanged(startId, signedData, signature);
-
             onPurchaseStateChanged(startId, signedData, signature);
         }
         else if (Consts.ACTION_RESPONSE_CODE.equals(action))
@@ -169,52 +153,50 @@ public class BillingService extends Service implements ServiceConnection
                     Consts.RESULT_ERROR);
             checkResponseCode(requestId, Consts.responseCodeValue(responseCode));
         }
-//        if (event != null)
-//        	mMoSyncThread.postEvent(event);
-        else if(Consts.ACTION_NOTIFY.equals(action))
-        {
-			String notifyId = intent.getStringExtra(Consts.BILLING_RESPONSE_NOTIFICATION_ID);
-			onPurchaseRequestCompleted(notifyId);
-        }
     }
 
     /**
      * Check the response code received for a request and send events.
+     * If the received response code is for a purchase request, then send
+     * purchaseStateChanged events.
+     * If the server sends invalid response code for ConfirmNotifications type
+     * of request, ignore it for the moment, as the server will automatically
+     * retry to communicate with the app by sending IN_APP_NOTIFY messages.
+     * If the request type is RestoreTransactions, ignore the result code at this point,
+     * as the user will later receive MA_PURCHASE_EVENT_RESTORED events for each product.
+     * If the request type is getPurchaseInformation, the error code will be used later
+     * when sending an RECEIPT_ERROR event, after maPurchaseVerifyReceipt is called.
+     *
      * @param requestId The identifier of the request (as received from Google Play).
      * @param responseCode The request response code.
      */
     private void checkResponseCode(long requestId, int responseCode)
     {
-		Log.e("@@Emma","BillingService checkResponseCode --------- " + responseCode);
+		// TODO delete log
+		Log.e("@@MoSync","BillingService checkResponseCode --------- responseCode = " + responseCode);
+		Log.e("@@MoSync","BillingService checkResponseCode --------- requestID = " + requestId);
 		// Get the request object from the sent list.
 		BaseRequest request = mSentRequests.get(requestId);
 
-		if ( request != null )
+		if ( request != null && request instanceof Purchase )
 		{
 			if ( responseCode == Consts.RESULT_OK )
 			{
+				// TODO see if IN_PROGRESS (request received by the server) is really needed at this point.
 				mThread.postEvent(BillingEvent.onPurchaseStateChanged(
-						0,//request.getHandle(),
+						request.getHandle(),
 						MA_PURCHASE_STATE_IN_PROGRESS,
 						0));
-				// or completed.
 			}
 			else
 			{
 				mThread.postEvent(BillingEvent.onPurchaseStateChanged(
-						0,//request.getHandle(),
+						request.getHandle(),
 						MA_PURCHASE_STATE_FAILED,
 						responseCode));
 			}
+			mSentRequests.remove(requestId);
 		}
-		mSentRequests.remove(requestId);
-		// set state to in progress, not pending anymore.
-//    	else if ( request instanceof RestoreTransactions )
-//    	{
-//
-//    		mThread.postEvent(BillingEvent.onRestoreTransaction(responseCode, 0));
-//    	}
-//        mSentRequests.remove(requestId);
     }
 
     /**
@@ -225,10 +207,9 @@ public class BillingService extends Service implements ServiceConnection
      */
     boolean bindToMarketBillingService()
     {
-		Log.e("@@MoSync","bindToMarketBillingService");
 		if ( mService != null )
 		{
-			Log.e("@@MoSync","bindToMarketBillingService - already bind");
+			SYSLOG("@@MoSync BillingService error: bindToMarketBillingService already bind");
 			return true;
 		}
         try {
@@ -236,20 +217,20 @@ public class BillingService extends Service implements ServiceConnection
                     new Intent(Consts.MARKET_BILLING_SERVICE_ACTION),
                     this,  // ServiceConnection.
                     Context.BIND_AUTO_CREATE);
-            // compatibility:prior to icecream sandwich flags BIND_WAIVE_PRIORITY and BIND_ADJUST_WITH_ACTIVITY
+            // Compatibility: prior to icecream sandwich flags BIND_WAIVE_PRIORITY and BIND_ADJUST_WITH_ACTIVITY
 
             if (bindResult)
             {
-				Log.e("@@MoSync","bindToMarketBillingService TRUE");
+				SYSLOG("@@MoSync BillingService bindToMarketBillingService success");
                 return true;
             }
             else
             {
-                Log.e("@MoSync", "BillingService error: Could not bind to service.");
+                SYSLOG("@MoSync BillingService bindToMarketBillingService: Could not bind to service.");
             }
         } catch (SecurityException e)
         {
-            Log.e("@@MoSync", "BillingService error: Security exception: " + e);
+            SYSLOG("@@MoSync BillingService bindToMarketBillingService error: Security exception: " + e);
         }
         return false;
     }
@@ -271,47 +252,65 @@ public class BillingService extends Service implements ServiceConnection
 				return request.getResponseCode();
 			}catch(RemoteException e)
 			{
-				Log.e("@@MoSync","maPucrhaseSupported remote exception,out of date");
+				SYSLOG("@@MoSync maPurchaseSupported remote exception,out of date");
 				return MA_PURCHASE_RES_OUT_OF_DATE;
 //				mService = null;
 			}
-
 		}
 		else
 		{
 			// No need to add to pending requests, service cannot bind.
-			Log.e("@@MoSync","maPurchaseSupported error: cannot bind to MarketBillingService");
+			SYSLOG("@@MoSync maPurchaseSupported error: cannot bind to MarketBillingService");
 			return MA_PURCHASE_RES_CONNECTION_ERROR;
 		}
     }
 
     /**
-     *
+     * Send a purchase request to Google Play.
+     * Send the productHandle to GooglePlay as the developerPayload,
+     * so that the transaction can be later identified.
+     * @param productID The product identifier.
+     * @param handle The internal product handle.
+     * @return the request.
      */
-    public BaseRequest requestPurchase(final String productID)
+    public BaseRequest requestPurchase(final String productID, final int handle)
     {
 		Purchase request = new Purchase(
-				mService, productID, mThread.getActivity());
-
-		// check mPurchaseRequestInProgress.
+				mService, productID, handle, mThread.getActivity());
 		request.runRequest();
-		// There is no active purchase request in progress.
-//		mPurchaseRequestInProgress = false;
+
 		if ( request.getRequestID() == Consts.BILLING_RESPONSE_INVALID_REQUEST_ID )
 		{
-			// TODO POST event purchase state changed: failed.
-			// error code = Consts.BILLING_RESPONSE_INVALID_REQUEST_ID;
 			return null;
 		}
 
-		//
+		// TODO delete log.
 		Log.e("@@MoSync","BillingService requestPurchase request id = " + request.getRequestID());
 
         request.setPendingState(true);
-        // Add to pending requests.
-       // mPendingRequests.add(request);
         mSentRequests.put(request.getRequestID(), request);
         return request;
+    }
+
+    /**
+     * Check if the public key was set.
+     * @return
+     */
+    boolean isPublicKeySet()
+    {
+		if (mPublicKey != null)
+			return true;
+		return false;
+    }
+
+    /**
+     * Check if a connection to the billing server was made.
+     */
+    boolean isConnected()
+    {
+		if ( mService != null )
+			return true;
+		return false;
     }
 
     /**
@@ -320,14 +319,12 @@ public class BillingService extends Service implements ServiceConnection
      * our request. The server responds with the purchase information,
      * encoded as a JSON string, and sends that to the {@link BillingReceiver}
      * in an intent with the action {@link Consts#ACTION_PURCHASE_STATE_CHANGED}.
-     * Returns false if there was an error trying to connect to the MarketBillingService.
      *
      * @param startId an identifier for the invocation instance of this service
      * @param notifyIds a list of opaque identifiers associated with purchase
-     * state changes
-     * @return false if there was an error connecting to Google Play.
+     * state changes.
      */
-	private int getPurchaseInformation(int startId, String[] notifyIds)
+	private void getPurchaseInformation(int startId, String[] notifyIds)
 	{
 		GetPurchaseInformation request = new GetPurchaseInformation(
 				startId, mService, notifyIds);
@@ -335,59 +332,97 @@ public class BillingService extends Service implements ServiceConnection
 		{
 			if ( request.runRequest() )
 			{
-				return 1;
-
+				mSentRequests.put(request.getRequestID(), request);
+				return;
 			}
 		}
 		// Add to pending requests.
 		mPendingRequests.add(request);
-		return -1; // or request after else.
-//    		return false;
 	}
 
     /**
-     * Verifies that the data was signed with the given signature, and calls
-     * {@link ResponseHandler#purchaseResponse(Context, PurchaseState, String, String, long)}
-     * for each verified purchase.
-     * @param startId an identifier for the invocation instance of this service
-     * @param signedData the signed JSON string (signed, not encrypted)
-     * @param signature the signature for the data, signed with the private key
+     * Verifies that the data was signed with the given signature,
+     * for each purchase.
+     * @param startId an identifier for the invocation instance of this service.
+     * @param signedData the signed JSON string (signed, not encrypted).
+     * @param signature the signature for the data, signed with the private key.
      */
     private void onPurchaseStateChanged(int startId, String signedData, String signature)
     {
-        ArrayList<Security.VerifiedPurchase> purchases;
-        purchases = Security.verifyPurchase(signedData, signature);
+        ArrayList<PurchaseInformation> purchases;
+        purchases = Security.verifyPurchase(mPublicKey, signedData, signature);
         if (purchases == null)
         {
+			SYSLOG("@@MoSync maPurchaseRequest error in parsing the transaction details");
             return;
         }
 
         ArrayList<String> notifyList = new ArrayList<String>();
-        for (VerifiedPurchase vp : purchases)
+        for (PurchaseInformation purchaseObj : purchases)
         {
-            if (vp.notificationId != null)
+            if (purchaseObj.mNotificationID != null)
             {
-                notifyList.add(vp.notificationId);
+                notifyList.add(purchaseObj.mNotificationID);
             }
-//            ResponseHandler.purchaseResponse(this, vp.purchaseState, vp.productId,
-//                    vp.orderId, vp.purchaseTime, vp.developerPayload);
-        }
 
-        if (!notifyList.isEmpty()) {
-            String[] notifyIds = notifyList.toArray(new String[notifyList.size()]);
-//            confirmNotifications(startId, notifyIds);
+            // Check if the product was restored.
+            if ( purchaseObj.getState() == Consts.PURCHASE_STATE_REFUNDED ) // if (mRestoringTransactions)
+            {
+				mListener.onPurchaseRestored(purchaseObj);
+            }
+            else
+            {
+				mListener.onTransactionInformationReceived(purchaseObj);
+                // Notify the user with the transaction details, and only
+				// after that confirmNotifications.
+                if (!notifyList.isEmpty())
+                {
+                    String[] notifyIds = notifyList.toArray(new String[notifyList.size()]);
+                    confirmNotifications(startId, notifyIds);
+                }
+            }
         }
     }
 
     /**
-     *
-     * @param notifyId
+     * Confirms receipt of a purchase state change. Each {@code notifyId} is
+     * an opaque identifier that came from the server. This method sends those
+     * identifiers back to the MarketBillingService, which ACKs them to the
+     * server.
+     * At this moment, the request state is COMPLETED.
+     * @param startId an identifier for the invocation instance of this service
+     * @param notifyIds a list of opaque identifiers associated with purchase
+     * state changes.
      */
-    private void onPurchaseRequestCompleted(String notifyId)
+    private void confirmNotifications(int startId, String[] notifyIds)
     {
-		// There is no active purchase request in progress.
-		mPurchaseRequestInProgress = false;
-		//mPurchaseManager.setPurchaseState(mCurrentPurchaseHandle, mPurchaseRequestInProgress);
+		ConfirmNotifications request = new ConfirmNotifications(startId, mService, notifyIds);
+		request.runRequest();
+
+		if ( request.getRequestID() != Consts.BILLING_RESPONSE_INVALID_REQUEST_ID )
+		{
+			// TODO delete log.
+			Log.e("@@MoSync","BillingService confirmNotifications request id = " + request.getRequestID());
+		}
+		else
+		{
+			SYSLOG("@@MoSync maPurchaseRequest There was an error when confirming the transaction information");
+		}
+    }
+
+    public RestoreTransactions restoreTransactions()
+    {
+		RestoreTransactions request = new RestoreTransactions(mService);
+		request.runRequest();
+		if ( request.getRequestID() == Consts.BILLING_RESPONSE_INVALID_REQUEST_ID )
+		{
+			return null;
+		}
+		//TODO delete log.
+		Log.e("@@MoSync","BillingService restoreTransactions request id = " + request.getRequestID());
+//        request.setPendingState(true);
+        mSentRequests.put(request.getRequestID(), request);
+		return request;
     }
 
     /**
@@ -414,7 +449,7 @@ public class BillingService extends Service implements ServiceConnection
 	@Override
 	public void onServiceConnected(ComponentName name, IBinder service)
 	{
-		Log.e("@@MoSync", "BillingService - onServiceConnected ");
+		SYSLOG("@@MoSync BillingService - onServiceConnected ");
 		// Get the service interface.
         mService = IMarketBillingService.Stub.asInterface(service);
         runPendingRequests();
@@ -423,10 +458,8 @@ public class BillingService extends Service implements ServiceConnection
 	@Override
 	public void onServiceDisconnected(ComponentName name)
 	{
-        Log.e("@@MoSync", "BillingService - onServiceDisconnected");
+        SYSLOG("@@MoSync BillingService - onServiceDisconnected");
         mService = null;
-		// Post some MoSync error event to the queue.
-
 	}
 
     /**
@@ -442,7 +475,7 @@ public class BillingService extends Service implements ServiceConnection
         } catch (IllegalArgumentException e)
         {
             // This might happen if the service was disconnected.
-			Log.e("@@MoSync","BillingService - unbind exception");
+			SYSLOG("@@MoSync BillingService - unbind exception");
         }
     }
 
@@ -462,7 +495,7 @@ public class BillingService extends Service implements ServiceConnection
 
     /**
      * Runs any pending requests that are waiting for a connection to the
-     * service to be established.  This runs in the main UI thread.
+     * service to be established.
      */
     private void runPendingRequests()
     {
@@ -472,8 +505,7 @@ public class BillingService extends Service implements ServiceConnection
         {
             if (request.runIfConnected())
             {
-				// TODO set mCurrentPurchase
-                // Remove the request
+                // Remove the request.
                 mPendingRequests.remove();
 
                 // Remember the largest startId, which is the most recent
@@ -485,8 +517,7 @@ public class BillingService extends Service implements ServiceConnection
             }
             else
             {
-			//TODO send event.
-				Log.e("@@MoSync","runPendingRequests service crashed");
+				SYSLOG("@@MoSync BillingService runPendingRequests service crashed");
                 // The service crashed, so restart it. Note that this leaves
                 // the current request on the queue.
                 bindToMarketBillingService();
@@ -499,7 +530,7 @@ public class BillingService extends Service implements ServiceConnection
         // stop it now.
         if (maxStartId >= 0)
         {
-            Log.e("@@MoSync","runPendingRequests stopping service startId = " + maxStartId);
+            SYSLOG("@@MoSync runPendingRequests stopping service startId = " + maxStartId);
             stopSelf(maxStartId);
         }
     }
@@ -514,13 +545,12 @@ public class BillingService extends Service implements ServiceConnection
 	 * Application context.
 	 */
 	private static Context mAppContext;
-
 	private static MoSyncThread mThread;
 
 	/**
-	 * Reference to the manager, so that the requests handle table can be accesed.
+	 * The developer public key.
 	 */
-	private PurchaseManager mPurchaseManager;
+	private PublicKey mPublicKey = null;
 
 	private static boolean mPurchaseRequestInProgress = false;
 	public static int mCurrentPurchaseHandle = -1;
@@ -531,7 +561,6 @@ public class BillingService extends Service implements ServiceConnection
      * CheckBillingSupported request cannot be pending, as it is synchronous.
      */
     private static LinkedList<BaseRequest> mPendingRequests = new LinkedList<BaseRequest>();
-//    private static Queue<BaseRequest> mR = new Queue<BaseRequest>();
 
     /**
      * The list of requests that we have sent to Android Market but for which we have
@@ -540,4 +569,6 @@ public class BillingService extends Service implements ServiceConnection
      */
     private static HashMap<Long, BaseRequest> mSentRequests =
         new HashMap<Long, BaseRequest>();
+
+    private IBillingObserver mListener;
 }

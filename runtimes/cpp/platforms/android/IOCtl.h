@@ -932,6 +932,8 @@ namespace Base
 						  int buffer, int bufferSize,
 						  JNIEnv* jNIEnv, jobject jThis);
 
+	int _maPurchaseVerifyReceipt(MAHandle handle, JNIEnv* jNIEnv, jobject jThis);
+
 	int _maPurchaseRestoreTransactions(JNIEnv* jNIEnv, jobject jThis);
 
 	int _maPurchaseDestroy(MAHandle handle, JNIEnv* jNIEnv, jobject jThis);

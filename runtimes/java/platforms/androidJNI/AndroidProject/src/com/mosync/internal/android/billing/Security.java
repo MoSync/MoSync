@@ -6,13 +6,11 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.security.InvalidKeyException;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.security.Signature;
-import java.security.SignatureException;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.ArrayList;
@@ -50,39 +48,21 @@ public class Security
      */
     private static HashSet<Long> sKnownNonces = new HashSet<Long>();
 
-    /**
-     * A class to hold the verified purchase information.
-     */
-    public static class VerifiedPurchase {
-        public int purchaseState;
-        public String notificationId;
-        public String productId;
-        public String orderId;
-        public long purchaseTime;
-
-        public VerifiedPurchase(int purchaseState, String notificationId,
-                String productId, String orderId, long purchaseTime)
-        {
-            this.purchaseState = purchaseState;
-            this.notificationId = notificationId;
-            this.productId = productId;
-            this.orderId = orderId;
-            this.purchaseTime = purchaseTime;
-        }
-    }
-
     /** Generates a nonce (a random number used once). */
-    public static long generateNonce() {
+    public static long generateNonce()
+    {
         long nonce = RANDOM.nextLong();
         sKnownNonces.add(nonce);
         return nonce;
     }
 
-    public static void removeNonce(long nonce) {
+    public static void removeNonce(long nonce)
+    {
         sKnownNonces.remove(nonce);
     }
 
-    public static boolean isNonceKnown(long nonce) {
+    public static boolean isNonceKnown(long nonce)
+    {
         return sKnownNonces.contains(nonce);
     }
 
@@ -91,42 +71,29 @@ public class Security
      * the list of verified purchases. The data is in JSON format and contains
      * a nonce (number used once) that we generated and that was signed
      * (as part of the whole data string) with a private key. The data also
-     * contains the {@link PurchaseState} and product ID of the purchase.
+     * contains the purchaseState and product ID of the purchase.
      * In the general case, there can be an array of purchase transactions
      * because there may be delays in processing the purchase on the backend
      * and then several purchases can be batched together.
      * @param signedData the signed JSON string (signed, not encrypted)
      * @param signature the signature for the data, signed with the private key
      */
-    public static ArrayList<VerifiedPurchase> verifyPurchase(String signedData, String signature)
+    public static ArrayList<PurchaseInformation> verifyPurchase(
+			PublicKey key, String signedData, String signature)
     {
         if (signedData == null)
         {
-            Log.e("@@MoSync", "data is null!!");
+            Log.e("@@MoSync", "Purchase Information: data is null!!");
             return null;
         }
+
         boolean verified = false;
         if (!TextUtils.isEmpty(signature))
         {
-            /**
-             * Compute your public key (that you got from the Android Market publisher site).
-             *
-             * Instead of just storing the entire literal string here embedded in the
-             * program,  construct the key at runtime from pieces or
-             * use bit manipulation (for example, XOR with some other string) to hide
-             * the actual key.  The key itself is not secret information, but we don't
-             * want to make it easy for an adversary to replace the public key with one
-             * of their own and then fake messages from the server.
-             *
-             * Generally, encryption keys / passwords should only be kept in memory
-             * long enough to perform the operation they need to perform.
-             */
-            String base64EncodedPublicKey = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAkq5y2a2tbd9xjNfBwtxt1G/wKILzrHSWp3uAwQ/Iw2SkAF72cuoLUiliTkU6IXVhD95k1VsZRLQytKOIAmPOI/faGxbZovmfIq2u/F/Gd39AyUg2geLdhV+wMrgdFWwWiPwOXl+12zigOvJdAfsxNMLh0dhJW1RAK5OaT0TXkR5d26GiUYm6kt0SW4+FX1OSiavwE4NTPTtwqsjscWxBKXvICm0A+0OYtqv6wTC3uhVMDkTnrsVG9N4pTKSGmhz//dfqJIZKI56UD21I2hjsB+8XVxy0KV741x3NLBOruB5oGGlXbCQGHTu3ekY4g5jlusCxlD19327e7LxrooM9GQIDAQAB";
-            PublicKey key = Security.generatePublicKey(base64EncodedPublicKey);
             verified = Security.verify(key, signedData, signature);
             if (!verified)
             {
-                Log.e("@@MoSync", "signature does not match data.");
+                Log.e("@@MoSync", "Purchase Information: signature does not match data.");
                 return null;
             }
         }
@@ -148,6 +115,8 @@ public class Security
             }
         } catch (JSONException e)
         {
+			// Cannot parse receipt,but since the product is not known,
+			// there is no need to send an event.
             return null;
         }
 
@@ -157,39 +126,35 @@ public class Security
             return null;
         }
 
-        ArrayList<VerifiedPurchase> purchases = new ArrayList<VerifiedPurchase>();
+        ArrayList<PurchaseInformation> purchases = new ArrayList<PurchaseInformation>();
         try {
             for (int i = 0; i < numTransactions; i++)
             {
                 JSONObject jElement = jTransactionsArray.getJSONObject(i);
-//                int response = jElement.getInt("purchaseState");
-//                PurchaseState purchaseState = PurchaseState.valueOf(response);
                 int response = jElement.getInt(Consts.TRANSACTION_PURCHASE_STATE);
                 int purchaseState = Consts.purchaseStateValue(response);
-                String productId = jElement.getString("productId"); // or BILLING_REQUEST_ITEM_ID
+                String productId = jElement.getString(Consts.TRANSACTION_PRODUCT_ID);
                 String packageName = jElement.getString(Consts.TRANSACTION_PACKAGE_NAME);
                 long purchaseTime = jElement.getLong(Consts.TRANSACTION_PURCHASE_TIME);
-
                 String orderId = jElement.optString(Consts.TRANSACTION_ORDER_ID, "");
-                // TODO map orderID to requestID.
+                String payload = jElement.optString(Consts.TRANSACTION_DEVELOPER_PAYLOAD,"");
 
                 String notifyId = null;
                 if (jElement.has(Consts.TRANSACTION_NOTIFICATION_ID))
                 {
                     notifyId = jElement.getString(Consts.TRANSACTION_NOTIFICATION_ID);
                 }
-//                String developerPayload = jElement.optString("developerPayload", null);
 
-                // If the purchase state is PURCHASED, then we require a
-                // verified nonce.
+                // If the purchase state is PURCHASED, then we require a verified nonce.
                 if (purchaseState == MA_PURCHASE_STATE_COMPLETED && !verified) {
                     continue;
                 }
-                purchases.add(new VerifiedPurchase(purchaseState, notifyId,
-						productId, orderId, purchaseTime));
+                // For REFUNDED or RESTORED purchases, the payload will be left null.
+                purchases.add(new PurchaseInformation(purchaseState, notifyId,
+						productId, orderId, purchaseTime, packageName, payload));
             }
         } catch (JSONException e) {
-//            Log.e(TAG, "JSON exception: ", e);
+            Log.e("MoSync", "Purchase Information: JSON exception: ", e);
             return null;
         }
         removeNonce(nonce);
@@ -231,7 +196,6 @@ public class Security
      */
     public static boolean verify(PublicKey publicKey, String signedData, String signature)
     {
-
         Signature sig;
         try {
             sig = Signature.getInstance(SIGNATURE_ALGORITHM);
@@ -242,14 +206,7 @@ public class Security
                 return false;
             }
             return true;
-        } catch (NoSuchAlgorithmException e) {
-//            Log.e(TAG, "NoSuchAlgorithmException.");
-        } catch (InvalidKeyException e) {
-//            Log.e(TAG, "Invalid key specification.");
-        } catch (SignatureException e) {
-//            Log.e(TAG, "Signature exception.");
-        } catch (Base64DecoderException e) {
-//            Log.e(TAG, "Base64 decoding failed.");
+        } catch (Exception e) {
         }
         return false;
     }

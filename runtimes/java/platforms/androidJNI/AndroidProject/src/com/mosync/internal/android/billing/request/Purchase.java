@@ -26,11 +26,11 @@ import android.content.Intent;
 import android.content.IntentSender;
 import android.os.Bundle;
 import android.os.RemoteException;
-import android.util.Log;
 
 import com.android.vending.billing.IMarketBillingService;
 import com.mosync.internal.android.billing.BillingService;
 import com.mosync.internal.android.billing.Consts;
+import static com.mosync.internal.android.MoSyncHelpers.*;
 
 /**
  * Wrapper class for sending purchase requests to the Google Play server.
@@ -49,7 +49,7 @@ import com.mosync.internal.android.billing.Consts;
  */
 public class Purchase extends BaseRequest
 {
-    public Purchase(IMarketBillingService service, String productID, Activity appActivity)
+    public Purchase(IMarketBillingService service, String productID, int handle, Activity appActivity)
     {
         // This object is never created as a side effect of starting this
         // service so we pass -1 as the startId to indicate that we should
@@ -58,6 +58,7 @@ public class Purchase extends BaseRequest
 
         mProductID = productID;
         mActivity = appActivity;
+        mProductHandle = handle;
 
         // Check compatibility of startIntentSender method, available only from Android 2.0.
         try {
@@ -76,13 +77,14 @@ public class Purchase extends BaseRequest
 		Bundle request = BillingService
 				.createRequestBundle(Consts.METHOD_REQUEST_PURCHASE);
 		request.putString(Consts.BILLING_REQUEST_ITEM_ID, mProductID);
+		request.putInt(Consts.BILLING_REQUEST_DEVELOPER_PAYLOAD, mProductHandle);
 		// Send the productID as the developer payload.
 		Bundle response = mService.sendBillingRequest(request);
 
 		PendingIntent pendingIntent = response.getParcelable(Consts.BILLING_RESPONSE_PURCHASE_INTENT);
 		if (pendingIntent == null)
 		{
-			Log.e("@@MoSync", "maPurchaseRequest Error  etc...............");
+			SYSLOG("@@MoSync maPurchaseRequest Error sending request, bundle error");
 			mRequestId = Consts.BILLING_RESPONSE_INVALID_REQUEST_ID;
 			return;
 		}
@@ -91,9 +93,8 @@ public class Purchase extends BaseRequest
 				Consts.BILLING_RESPONSE_REQUEST_ID,
 				Consts.BILLING_RESPONSE_INVALID_REQUEST_ID);
 
-		// Wait for RESPONSE_CODE broadcast intents.
-
-		// Launch the buy page activity.
+		// Launch the buy page activity, and wait for RESPONSE_CODE
+		// broadcast intents (in BillingReceiver).
 		Intent intent = new Intent();
 		launchCheckoutUI(pendingIntent, intent);
 	}
@@ -124,7 +125,7 @@ public class Purchase extends BaseRequest
                 mStartIntentSenderArgs[4] = Integer.valueOf(0);
                 mStartIntentSender.invoke( mActivity, mStartIntentSenderArgs);
             } catch (Exception e) {
-                Log.e("@@MoSync", "error starting activity", e);
+                SYSLOG("@@MoSync maPurchaseRequest Error while starting activity " + e);
             }
         }
         else
@@ -133,34 +134,15 @@ public class Purchase extends BaseRequest
             try {
                 pendingIntent.send(mActivity, 0 /* code */, intent);
             } catch (CanceledException e) {
-                Log.e("@@MoSync", "error starting activity", e);
+                SYSLOG("@@MoSync maPurchaserequest Error while starting activity " + e);
             }
         }
 	}
 
-//	@Override
-//	public void responseCodeReceived(int responseCode)
-//	{
-//		//TODO send event!!!
-//        if (responseCode == Consts.RESULT_OK)
-//        {
-//        	Log.e("@@MoSync","Billing Purchase was successfully sent to server");
-//
-//        }
-//        else if (responseCode == Consts.RESULT_USER_CANCELED)
-//        {
-//        	Log.e("@@MoSync","Billing Purchase canceled by user");
-//        }
-//        else
-//        {
-//        	Log.e("@@MoSync","Billing purchase failed, returned " + responseCode);
-//        }
-//	}
 	/************************ Class members ************************/
     private String mProductID = null;
-
+    private int mProductHandle = -1;
     private Activity mActivity;
-
     private Method mStartIntentSender;
     private Object[] mStartIntentSenderArgs = new Object[5];
     private static final Class[] START_INTENT_SENDER_SIG = new Class[] {

@@ -17,18 +17,13 @@ MA 02110-1301, USA.
 
 package com.mosync.internal.android.billing.request;
 
+import android.os.Bundle;
+import android.os.RemoteException;
+
 import com.android.vending.billing.IMarketBillingService;
 import com.mosync.internal.android.billing.BillingService;
 import com.mosync.internal.android.billing.Consts;
 import com.mosync.internal.android.billing.Security;
-
-import android.app.PendingIntent;
-import android.content.Intent;
-import android.os.Bundle;
-import android.os.RemoteException;
-import android.util.Log;
-
-import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_RES_OK;
 
 /**
  * Wrapper class that sends a RESTORE_TRANSACTIONS message to the server.
@@ -53,8 +48,6 @@ public class RestoreTransactions extends BaseRequest
 		Bundle request = BillingService.createRequestBundle(Consts.METHOD_RESTORE_TRANSACTIONS);
 		request.putLong(Consts.BILLING_REQUEST_NONCE, mNonce);
 		Bundle response = mService.sendBillingRequest(request);
-
-//		logResponseCode("restoreTransactions", response);
 
 		mRequestId = response.getLong(Consts.BILLING_RESPONSE_REQUEST_ID,
 				Consts.BILLING_RESPONSE_INVALID_REQUEST_ID);

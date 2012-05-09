@@ -19,12 +19,12 @@ package com.mosync.internal.android.billing;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
+
+import static com.mosync.internal.android.MoSyncHelpers.SYSLOG;
 
 /**
- *
+ * The broadcast receiver for all asynchronous messages received from Google Play.
  * @author emma
- *
  */
 public class BillingReceiver extends BroadcastReceiver
 {
@@ -39,7 +39,7 @@ public class BillingReceiver extends BroadcastReceiver
     public void onReceive(Context context, Intent intent)
     {
         String action = intent.getAction();
-        Log.e("@@MoSync", "BillingReceiver onReceive - action             " + action);
+        SYSLOG("BillingReceiver onReceive action: " + action);
         if (Consts.ACTION_STATE_CHANGED.equals(action))
         {
             String signedData = intent.getStringExtra(Consts.BILLING_RESPONSE_INAPP_SIGNED_DATA);
@@ -54,15 +54,13 @@ public class BillingReceiver extends BroadcastReceiver
         else if (Consts.ACTION_RESPONSE_CODE.equals(action))
         {
             long requestId = intent.getLongExtra(Consts.BILLING_RESPONSE_INAPP_REQUEST_ID, -1);
-            int responseCodeIndex = intent.getIntExtra(Consts.BILLING_RESPONSE_INAPP_RESPONSE_CODE, -1);
-                    //ResponseCode.RESULT_ERROR.ordinal());
+            int responseCodeIndex = intent.getIntExtra(Consts.BILLING_RESPONSE_INAPP_RESPONSE_CODE,
+					Consts.BILLING_RESPONSE_INVALID_RESPONSE_CODE);
             checkResponseCode(context, requestId, responseCodeIndex);
-            //TODO
-            // if error code, send event to mosync. set mPending = false; set mCurrent req = null
         }
         else
         {
-            Log.e("@@MoSync", "BillingReceiver onReceive unexpected action: " + action);
+            SYSLOG("BillingReceiver onReceive unexpected action: " + action);
         }
     }
 
@@ -100,15 +98,10 @@ public class BillingReceiver extends BroadcastReceiver
     private void notify(Context context, String notifyId)
     {
 		// Notify the service that the request has completed.
-        Intent intent = new Intent(Consts.ACTION_NOTIFY);
+        Intent intent = new Intent(Consts.ACTION_GET_PURCHASE_INFORMATION);
         intent.setClass(context, BillingService.class);
         intent.putExtra(Consts.BILLING_RESPONSE_NOTIFICATION_ID, notifyId);
         context.startService(intent);
-
-		// Store the notification ID so we can later send a GET_PURCHASE_INFORMATION
-		// request to get transaction details.
-//    	String[] notifyIds = {notifyId};
-//    	PurchaseManager.setPurchaseNotificationId(notifyId); //notifyIds
     }
 
     /**

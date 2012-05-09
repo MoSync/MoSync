@@ -2931,6 +2931,9 @@ namespace Base
 			return _maPurchaseGetField((int)gCore->mem_ds, _handle, _property, _valueBuffer, _valueBufferSize, mJNIEnv, mJThis);
 		}
 
+		case maIOCtl_maPurchaseVerifyReceipt:
+			return _maPurchaseVerifyReceipt(a, mJNIEnv, mJThis);
+
 		case maIOCtl_maPurchaseRestoreTransactions:
 			return _maPurchaseRestoreTransactions(mJNIEnv, mJThis);
 

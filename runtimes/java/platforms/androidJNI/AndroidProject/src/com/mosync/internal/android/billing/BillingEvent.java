@@ -20,12 +20,9 @@ package com.mosync.internal.android.billing;
 import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_PURCHASE;
 import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_EVENT_PRODUCT_CREATE;
 import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_EVENT_REQUEST;
-import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_EVENT_REFUNDED;
 import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_EVENT_RESTORED;
 import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_EVENT_VERIFY_RECEIPT;
-import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_STATE_RECEIPT_INVALID;
 import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_STATE_RECEIPT_VALID;
-import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_STATE_RECEIPT_ERROR;
 
 /**
  * Utility class for creating MoSync events.
@@ -35,10 +32,10 @@ import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_STATE_RECEI
 public class BillingEvent
 {
 
-	public static int[] onProductCreate(int purchaseHandle, int state)
+	public static int[] onProductCreate(int purchaseHandle, int state, int errorCode)
 	{
 		return setPurchaseEventData(
-				MA_PURCHASE_EVENT_PRODUCT_CREATE, state, purchaseHandle, 0);
+				MA_PURCHASE_EVENT_PRODUCT_CREATE, state, purchaseHandle, errorCode);
 	}
 
 	public static int[] onPurchaseStateChanged(int purchaseHandle, int state, int errorCode)
@@ -47,7 +44,7 @@ public class BillingEvent
 				MA_PURCHASE_EVENT_REQUEST, state, purchaseHandle, errorCode);
 	}
 
-	public static int[] onTransactionInfo()
+	public static int[] onTransactionInfoParsed()
 	{
 		return setPurchaseEventData(
 				MA_PURCHASE_EVENT_VERIFY_RECEIPT, MA_PURCHASE_STATE_RECEIPT_VALID, 0, 0);
@@ -57,6 +54,15 @@ public class BillingEvent
 	{
 		return setPurchaseEventData(
 				MA_PURCHASE_EVENT_RESTORED, state, purchaseHandle, 0);
+	}
+
+	public static int[] onVerifyReceipt(int handle, int state, int errorCode)
+	{
+		return setPurchaseEventData(
+				MA_PURCHASE_EVENT_VERIFY_RECEIPT,
+				state,
+				handle,
+				errorCode);
 	}
 
 	private static int[] setPurchaseEventData(int type, int state, int purchaseHandle, int errorCode)
@@ -70,5 +76,4 @@ public class BillingEvent
 
 		return event;
 	}
-
 }

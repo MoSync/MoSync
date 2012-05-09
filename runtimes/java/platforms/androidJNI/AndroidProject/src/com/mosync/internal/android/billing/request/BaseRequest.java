@@ -22,7 +22,6 @@ import android.util.Log;
 
 import com.android.vending.billing.IMarketBillingService;
 
-
 /**
  * The base class for all requests that use the MarketBillingService.
  * Each derived class overrides the run() method to call the appropriate
@@ -92,8 +91,6 @@ public abstract class BaseRequest
         }
         if ( mService != null )
         {
-            // Add a pending request to run when the service is connected.
-//            mPendingRequests.add(this);
             return true;
         }
 
@@ -113,7 +110,7 @@ public abstract class BaseRequest
             try {
                 //mRequestId = run();
 				run();
-                Log.e("emma", " runIfConnected() !!!!!!!!!!!!!!!!!!!!!request id: " + mRequestId);
+                Log.e("@@MoSync", " runIfConnected() request id: " + mRequestId);
 
                 if (mRequestId >= 0)
                 {
@@ -125,7 +122,6 @@ public abstract class BaseRequest
             }
         }
         Log.e("@@MoSync","runIfConnected mService is NULL");
-//        return Consts.SERVICE_CANNOT_CONNECT;
         return false;
     }
 
@@ -146,24 +142,16 @@ public abstract class BaseRequest
      */
     abstract public void run() throws RemoteException;
 
-    /**
-     * This is called when Android Market sends a response code for a Purchase
-     * or RestoreTransactions request.
-     * @param responseCode the response code
-     */
-//    public void responseCodeReceived(int responseCode)
-//    {
-////    	mResponseCode = (int)responseCode;
-//    }
-    protected void stateChanged(int state)
+    public void setHandle(int handle)
     {
-
+		mHandle = handle;
+    }
+    public int getHandle()
+    {
+		return mHandle;
     }
 	/************************ Class members ************************/
 
-    /**
-     *
-     */
     private final int mStartId;
 
     /**
@@ -176,7 +164,7 @@ public abstract class BaseRequest
      * ReqID received from Google Play service.
      */
     protected long mRequestId;
-
     protected int mResponseCode;
     protected IMarketBillingService mService = null;
+    protected int mHandle = -1;
 }

@@ -29,7 +29,7 @@ import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_EVENT_REFUN
 
 /**
  * Utility class that holds constants required in billing requests.
- * Values are received from Google Play,so do not attempt to change them.
+ * Values are received from Google Play,so do NOT attempt to change them.
  * @author emma
  */
 public class Consts
@@ -39,17 +39,19 @@ public class Consts
     public static final String MARKET_BILLING_SERVICE_ACTION =
         "com.android.vending.billing.MarketBillingService.BIND";
 
-    // The possible states of an in-app purchase, as defined by Android Market.
+    /**
+     * The possible states of an in-app purchase, as defined by Android Market.
+     * The state change events are sent for requestPurchase or restoreTransactions
+     * request types.
+     */
     // User was charged for the order.
     private static final int PURCHASE_STATE_PURCHASED = 0;
     // The charge failed on the server.
     private static final int PURCHASE_STATE_CANCELED = 1;
     // User received a refund for the order.
-    private static final int PURCHASE_STATE_REFUNDED = 2;
+    static final int PURCHASE_STATE_REFUNDED = 2;
 
-	// Responses to requestPurchase or restoreTransactions.
-	// IN_PROGRESS,
-	// Matches a PurchaseState to a MoSync constant.
+	// Match a PurchaseState to a MoSync constant.
 	public static int purchaseStateValue(int purchaseState)
 	{
 		switch (purchaseState)
@@ -74,7 +76,7 @@ public class Consts
     public static final int RESULT_DEVELOPER_ERROR = 5;
     public static final int RESULT_ERROR = 6;
 
-	// Matches a response code to a MoSync constant.
+	// Match a response code to a MoSync constant.
 	public static int responseCodeValue(int responseCode)
 	{
 		switch (responseCode)
@@ -97,8 +99,6 @@ public class Consts
 	}
 
 	public final static int PURCHASE_STATE_ON_HOLD = -1;
-
-    public static final int SERVICE_CANNOT_CONNECT = -10;
 
 	/**
 	 * The request methods.
@@ -170,8 +170,10 @@ public class Consts
 	 * String constants used in verifying purchase signature.
 	 */
 	public final static String TRANSACTION_PURCHASE_STATE = "purchaseState";
+	public final static String TRANSACTION_PRODUCT_ID = "productId";
 	public final static String TRANSACTION_PACKAGE_NAME = "packageName";
 	public final static String TRANSACTION_PURCHASE_TIME = "purchaseTime";
 	public final static String TRANSACTION_ORDER_ID = "orderId";
 	public final static String TRANSACTION_NOTIFICATION_ID = "notificationId";
+	public final static String TRANSACTION_DEVELOPER_PAYLOAD = "developerPayload";
 }

@@ -17,9 +17,12 @@ MA 02110-1301, USA.
 
 package com.mosync.internal.android.billing.request;
 
+import android.os.Bundle;
 import android.os.RemoteException;
 
+import com.mosync.internal.android.billing.Consts;
 import com.android.vending.billing.IMarketBillingService;
+import com.mosync.internal.android.billing.BillingService;
 
 /**
  * This request acknowledges that your application received the details of a
@@ -43,16 +46,20 @@ public class ConfirmNotifications extends BaseRequest
 {
 
 	public ConfirmNotifications(int startId,
-			IMarketBillingService service)
+			IMarketBillingService service, String[] notifyIds)
 	{
 		super(-1, service);
-
+		mNotifyIds = notifyIds;
 	}
 
-	@Override
-	public void run() throws RemoteException {
+    @Override
+    public void run() throws RemoteException {
+        Bundle request = BillingService.createRequestBundle(Consts.METHOD_CONFIRM_NOTIFICATIONS);
+        request.putStringArray(Consts.BILLING_REQUEST_NOTIFY_IDS, mNotifyIds);
+        Bundle response = mService.sendBillingRequest(request);
+        mRequestId = response.getLong(Consts.BILLING_RESPONSE_REQUEST_ID,
+                Consts.BILLING_RESPONSE_INVALID_REQUEST_ID);
+    }
 
-	}
-
-	private String mNotificationID = null;
+    final String[] mNotifyIds;
 }

@@ -28,6 +28,13 @@ import com.mosync.nativeui.util.properties.PropertyConversionException;
 import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_ERROR_INVALID_HANDLE;
 import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_RES_UNAVAILABLE;
 import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_RES_BUFFER_TOO_SMALL;
+import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_STATE_DISABLED;
+import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_RECEIPT_PRODUCT_ID;
+import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_RECEIPT_PURCHASE_DATE;
+import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_RECEIPT_PRICE;
+import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_RES_INVALID_FIELD_NAME;
+
+import static com.mosync.internal.android.MoSyncHelpers.*;
 
 /**
  * Wrapper for In-app Purchase Syscalls to avoid cluttering the MoSyncSyscalls file.
@@ -40,26 +47,22 @@ public class MoSyncPurchase
 	 * @param thread The underlying MoSync thread.
 	 */
 	public MoSyncPurchase(MoSyncThread thread)
-	{Log.e("@@MoSync","In MoSyncPurchase construct -------------");
+	{
+		SyslogOn(true);
 		mMoSyncThread = thread;
 		// In-app purchase is supported only from Android 1.6 and higher.
 		try{
 			int target = IntConverter.convert( Build.VERSION.SDK );
 			if ( target >= 4 )
 			{
-				Log.e("@@Emma","IN MoSyncPurchase construct ----- target > 4");
-				mPurchaseManager = new PurchaseManager(thread);Log.e("@@Emma","IN MoSyncPurchase construct ----- manager created");
+				SYSLOG("PurchaseManager is available, android sdk version > 4");
+				mPurchaseManager = new PurchaseManager(thread);
 			}
 		}
 		catch(PropertyConversionException pce )
 		{
-			Log.e("@@Emma","MoSyncPurchase conv exception ---------------");
 			return;
 		}
-//		catch(Exception ex)
-//		{
-//			Log.e("Emma"," MoSyncPurchase exception  ------------------");
-//		}
 	}
 
 	public void unbindService()
@@ -76,7 +79,7 @@ public class MoSyncPurchase
 	 * Synchronous request to check if in-app billing can be used.
 	 */
 	public int maPurchaseSupported()
-	{Log.e("@@MoSync"," IN maPurchaseSupported ------------ ");
+	{
 		if ( mPurchaseManager != null)
 		{
 			return mPurchaseManager.checkPurchaseSupported();
@@ -95,14 +98,22 @@ public class MoSyncPurchase
 	{
 		if (mPurchaseManager != null)
 		{
-			int state = mPurchaseManager.createPurchase(productHandle, productID);
-			mMoSyncThread.postEvent(BillingEvent.onProductCreate(productHandle, state));
+			int createState = mPurchaseManager.createPurchase(productHandle, productID);
+			Log.e("@@MoSync","maPurchaseCreate handle = " + productHandle + " , state = " + createState);
+			mMoSyncThread.postEvent(BillingEvent.onProductCreate(
+					productHandle,
+					createState,
+					0));
 
 		}
 		else
 		{
-			Log.e("@@MoSync","maPurchaseCreate error: not available");
+			SYSLOG("maPurchaseCreate error: not available");
 			// post  MA_PURCHASE_RES_UNAVAILABLE;
+			mMoSyncThread.postEvent(BillingEvent.onProductCreate(
+					productHandle,
+					MA_PURCHASE_STATE_DISABLED,
+					MA_PURCHASE_RES_UNAVAILABLE));
 		}
 	}
 
@@ -110,22 +121,12 @@ public class MoSyncPurchase
 	 * Internal function for the maPurchaseSetPublicKey system call.
 	 *
 	 * @param developerPublicKey
-	 * @return
 	 */
-	public int maPurchaseSetPublicKey(String developerPublicKey)
+	public void maPurchaseSetPublicKey(String developerPublicKey)
 	{
-		if ( mPurchaseManager != null )
+		if ( mPurchaseManager != null && developerPublicKey.length() > 50 )
 		{
-//			if ( developerPublicKey.length() > 50 )
-//			{
-//				return -1;
-//			}
-			return mPurchaseManager.setKey(developerPublicKey);
-		}
-		else
-		{
-			Log.e("@@MoSync","maPurchaseSetPublicKey error: not available");
-			return MA_PURCHASE_RES_UNAVAILABLE;
+			mPurchaseManager.setKey(developerPublicKey);
 		}
 	}
 
@@ -145,8 +146,8 @@ public class MoSyncPurchase
 		else
 		{
 			Log.e("@@MoSync","maPurchaseRequest error: not available");
-//			return MA_PURCHASE_RES_UNAVAILABLE;
-			mMoSyncThread.postEvent(BillingEvent.onPurchaseStateChanged(handle, MA_PURCHASE_RES_UNAVAILABLE, 0));
+			mMoSyncThread.postEvent(BillingEvent.onPurchaseStateChanged(
+					handle, MA_PURCHASE_RES_UNAVAILABLE, 0));
 		}
 	}
 
@@ -157,7 +158,7 @@ public class MoSyncPurchase
 	 * @param productHandle
 	 * @param memBuffer
 	 * @param memBufSize
-	 * @return
+	 * @return The productID.
 	 */
 	public int maPurchaseGetName(int productHandle, int memBuffer, int memBufSize)
 	{
@@ -178,6 +179,56 @@ public class MoSyncPurchase
 				return MA_PURCHASE_RES_BUFFER_TOO_SMALL;
 			}
 
+			byte[] byteArray = result.getBytes();
+
+			// Write string to MoSync memory.
+			mMoSyncThread.mMemDataSection.position( memBuffer );
+			mMoSyncThread.mMemDataSection.put( byteArray );
+			mMoSyncThread.mMemDataSection.put( (byte)0 );
+
+			return result.length( );
+		}
+		else
+		{
+			Log.e("@@MoSync","maPurchaseGetName error: not available");
+			return MA_PURCHASE_RES_UNAVAILABLE;
+		}
+	}
+
+	/**
+	 *
+	 * @return
+	 */
+	public int maPurchaseGetField(
+			final int productHandle,
+			final String property,
+			final int memBuffer,
+			final int bufferSize)
+	{
+		if ( mPurchaseManager != null )
+		{
+//			if ( !property.equals(MA_PURCHASE_RECEIPT_PURCHASE_DATE)||
+//					!property.equals(MA_PURCHASE_RECEIPT_PRODUCT_ID) ||
+//					!property.equals(MA_PURCHASE_RECEIPT_PRICE) )
+//			{
+//				Log.e("@@MoSync", "maPurchaseGetField: Invalid field " + property);
+//				return MA_PURCHASE_RES_INVALID_FIELD_NAME;
+//			}
+			String result = mPurchaseManager.getField(productHandle, property);
+
+			if (result.length() == 0 )
+			{
+				Log.e("@@MoSync", "maPurchaseGetField: Invalid product handle " + productHandle);
+				return MA_PURCHASE_ERROR_INVALID_HANDLE;
+			}
+
+			if( result.length( ) + 1 > bufferSize )
+			{
+				Log.e( "@@MoSync", "maPurchaseGetField: Buffer size " + bufferSize +
+						" too short to hold buffer of size: " + result.length( ) + 1 );
+				return MA_PURCHASE_RES_BUFFER_TOO_SMALL;
+			}
+
 			byte[] ba = result.getBytes();
 
 			// Write string to MoSync memory.
@@ -189,7 +240,7 @@ public class MoSyncPurchase
 		}
 		else
 		{
-			Log.e("@@MoSync","maPurchaseGetName error: not available");
+			Log.e("@@MoSync","maPurchaseGetField error: not available");
 			return MA_PURCHASE_RES_UNAVAILABLE;
 		}
 	}
@@ -209,6 +260,23 @@ public class MoSyncPurchase
 		else
 		{
 			Log.e("@@MoSync","maPurchaseRequest error: not available");
+		}
+	}
+
+	/**
+	 * Internal fucntion for the maPurchaseVerifyReceipt system call.
+	 * Asynchronous request for getting receipt state.
+	 * @param handle
+	 */
+	public void maPurchaseVerifyReceipt(int handle)
+	{
+		if ( mPurchaseManager != null )
+		{
+			mPurchaseManager.verifyReceipt(handle);
+		}
+		else
+		{
+			Log.e("@@MoSync","maPurchaseVerifyReceipt error: not available");
 		}
 	}
 
