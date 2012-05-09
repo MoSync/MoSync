@@ -45,7 +45,7 @@ namespace Purchase
 {
 
 	// Forward declarations.
-	class Product;
+	class Purchase;
 	class PurchaseManagerListener;
 
 	/**
@@ -109,19 +109,19 @@ namespace Purchase
 		void customEvent(const MAEvent& event);
 
 		/**
-		 * Add a product to the map that holds products.
-		 * The product will receive custom events.
-		 * @param product The product that needs to be registered.
-		 * The ownership of the product is not passed to this method.
+		 * Add a purchase to the map that holds purchases.
+		 * The purchase will receive custom events.
+		 * @param purchase The purchase that needs to be registered.
+		 * The ownership of the purchase is not passed to this method.
 		 */
-		void registerProduct(Product* product);
+		void registerPurchase(Purchase* purchase);
 
 		/**
-		 * Remove a product from the map that holds products.
-		 * The product will not receive custom events.
-		 * @param product The product that needs to be unregistered.
+		 * Remove a purchase from the map that holds purchases.
+		 * The purchase will not receive custom events.
+		 * @param product The purchase that needs to be unregistered.
 		 */
-		void unregisterProduct(Product* product);
+		void unregisterPurchase(Purchase* purchase);
 
 		/**
 		 * Add an event listener for purchase.
@@ -168,7 +168,7 @@ namespace Purchase
 		/**
 		 * Dictionary of products identified by product handle.
 		 */
-		MAUtil::Map<MAHandle, Product*> mProductMap;
+		MAUtil::Map<MAHandle, Purchase*> mPurchaseMap;
 
 		/**
 		 * Array with listeners.
@@ -178,7 +178,7 @@ namespace Purchase
 		/**
 		 * Store restored and refunded products.
 		 */
-		MAUtil::Vector<Product*> mSpecialProducts;
+		MAUtil::Vector<Purchase*> mSpecialProducts;
 	};
 
 } // namespace Purchase

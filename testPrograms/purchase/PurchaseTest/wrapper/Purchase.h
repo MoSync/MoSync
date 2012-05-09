@@ -26,21 +26,21 @@
  */
 
 /**
- * @file Product.h
+ * @file Purchase.h
  * @author Bogdan Iusco
  * @date 3 May 2012
  *
  * @brief
  */
 
-#ifndef PURCHASE_PRODUCT_H_
-#define PURCHASE_PRODUCT_H_
+#ifndef PURCHASE_H_
+#define PURCHASE_H_
 
 #include <MAUtil/String.h>
 #include <MAUtil/Vector.h>
 #include <maapi.h>
 
-#include "ProductListener.h"
+#include "PurchaseListener.h"
 
 namespace Purchase
 {
@@ -48,7 +48,7 @@ namespace Purchase
 	// Forward declaration.
 	class PurchaseManager;
 
-	class Product
+	class Purchase
 	{
 	public:
 		/**
@@ -57,15 +57,15 @@ namespace Purchase
 		 * This string must be used by the App Store / Google Play to identify
 		 * the product.
 		 */
-		Product(const MAUtil::String& productID);
+		Purchase(const MAUtil::String& productID);
 
 		/**
 		 * Destructor.
 		 */
-		~Product();
+		~Purchase();
 
 		/**
-		 * @return The handle of the product.
+		 * @return The handle of the purchase.
 		 */
 		MAHandle getHandle() const;
 
@@ -77,26 +77,26 @@ namespace Purchase
 		void handlePurchaseEvent(const MAPurchaseEventData& purchaseData);
 
 		/**
-		 * Add an event listener for this product.
+		 * Add an event listener for this purchase.
 		 * @param listener The listener that will receive purchase events for
 		 * this product.
 		 */
-		void addProductListener(ProductListener* listener);
+		void addPurchaseListener(PurchaseListener* listener);
 
 		/**
-		 * Remove the event listener for this product.
+		 * Remove the event listener for this purchase.
 		 * @param listener The listener that receives purchase events
-		 * for this product.
+		 * for this purchase.
 		 */
-		void removeProductListener(ProductListener* listener);
+		void removePurchaseListener(PurchaseListener* listener);
 
 	private:
 		/**
-		 * Creates a product using a product handle.
+		 * Creates a purchase using a product handle.
 		 * Used to create restored or refunded products.
 		 * @param productHandle Handle to the product.
 		 */
-		Product(MAHandle productHandle);
+		Purchase(MAHandle productHandle);
 
 		/**
 		 * Handle MA_PURCHASE_EVENT_PRODUCT_CREATE.
@@ -133,13 +133,13 @@ namespace Purchase
 		/**
 		 * Array with product listeners.
 		 */
-		MAUtil::Vector<ProductListener*> mProductEventListeners;
+		MAUtil::Vector<PurchaseListener*> mPurchaseEventListeners;
 
-		// Let the PurchaseManager create Product objects using a product handle.
+		// Let the PurchaseManager create Purchase objects using a product handle.
 		friend class PurchaseManager;
 	};
 }
 
-#endif /* PURCHASE_PRODUCT_H_ */
+#endif /* PURCHASE_H_ */
 
 /*! @} */

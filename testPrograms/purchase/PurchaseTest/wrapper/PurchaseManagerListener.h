@@ -49,18 +49,18 @@ namespace Purchase
 	{
 	public:
 		/**
-		 * Notifies that a product has been restored.
+		 * Notifies that a purchase has been restored.
 		 * Platform: iOS.
-		 * @param product The product that has been restored.
+		 * @param purchase The purchase that has been restored.
 		 */
-		virtual void productRestored(Product& product) = 0;
+		virtual void purchaseRestored(Purchase& purchase) = 0;
 
 		/**
-		 * Notifies that a product has been refunded.
+		 * Notifies that a purchase has been refunded.
 		 * Platform: Android.
-		 * @param product The product that has been refunded.
+		 * @param purchase The purchase that has been refunded.
 		 */
-		virtual void productRefunded(Product& product) = 0;
+		virtual void purchaseRefunded(Purchase& purchase) = 0;
 	};
 }
 

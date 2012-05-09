@@ -17,14 +17,14 @@
  */
 
 /**
- * @file Product.cpp
+ * @file Purchase.cpp
  * @author Bogdan Iusco
  * @date 3 May 2012
  *
  * @brief
  */
 
-#include "Product.h"
+#include "Purchase.h"
 #include "Receipt.h"
 #include "PurchaseManager.h"
 
@@ -37,45 +37,45 @@ namespace Purchase
 	 * This string must be used by the App Store / Google Play to identify
 	 * the product.
 	 */
-	Product::Product(const MAUtil::String& productID):
+	Purchase::Purchase(const MAUtil::String& productID):
 		mHandle(-1),
 		mReceipt(NULL)
 	{
 		mHandle = maCreatePlaceholder();
 		maPurchaseCreate(mHandle, productID.c_str());
-		PurchaseManager::getInstance()->registerProduct(this);
+		PurchaseManager::getInstance()->registerPurchase(this);
 	}
 
 	/**
-	 * Creates a product using a product handle.
+	 * Creates a purchase using a product handle.
 	 * Used to create restored or refunded products.
 	 * @param productHandle Handle to the product.
 	 */
-	Product::Product(MAHandle productHandle):
+	Purchase::Purchase(MAHandle productHandle):
 		mHandle(productHandle),
 		mReceipt(NULL)
 
 	{
-		PurchaseManager::getInstance()->registerProduct(this);
+		PurchaseManager::getInstance()->registerPurchase(this);
 	}
 
 	/**
 	 * Destructor.
 	 */
-	Product::~Product()
+	Purchase::~Purchase()
 	{
-		PurchaseManager::getInstance()->unregisterProduct(this);
+		PurchaseManager::getInstance()->unregisterPurchase(this);
 		maPurchaseDestroy(mHandle);
 		maDestroyPlaceholder(mHandle);
-		mProductEventListeners.clear();
+		mPurchaseEventListeners.clear();
 
 		delete mReceipt;
 	}
 
 	/**
-	 * @return The handle of the product.
+	 * @return The handle of the purchase.
 	 */
-	MAHandle Product::getHandle() const
+	MAHandle Purchase::getHandle() const
 	{
 		return mHandle;
 	}
@@ -85,7 +85,7 @@ namespace Purchase
 	 * Observers will be notified regarding this event.
 	 * @param purchaseData Purchase event data.
 	 */
-	void Product::handlePurchaseEvent(const MAPurchaseEventData& purchaseData)
+	void Purchase::handlePurchaseEvent(const MAPurchaseEventData& purchaseData)
 	{
 		if (purchaseData.type == MA_PURCHASE_EVENT_PRODUCT_CREATE)
 		{
@@ -94,35 +94,35 @@ namespace Purchase
 	}
 
 	/**
-	 * Add an event listener for this product.
+	 * Add an event listener for this purchase.
 	 * @param listener The listener that will receive purchase events for
 	 * this product.
 	 */
-	void Product::addProductListener(ProductListener* listener)
+	void Purchase::addPurchaseListener(PurchaseListener* listener)
 	{
-		for (int i = 0; i < mProductEventListeners.size(); i++)
+		for (int i = 0; i < mPurchaseEventListeners.size(); i++)
 		{
-			if (listener == mProductEventListeners[i])
+			if (listener == mPurchaseEventListeners[i])
 			{
 				return;
 			}
 		}
 
-		mProductEventListeners.add(listener);
+		mPurchaseEventListeners.add(listener);
 	}
 
 	/**
-	 * Remove the event listener for this product.
+	 * Remove the event listener for this purchase.
 	 * @param listener The listener that receives purchase events
-	 * for this product.
+	 * for this purchase.
 	 */
-	void Product::removeProductListener(ProductListener* listener)
+	void Purchase::removePurchaseListener(PurchaseListener* listener)
 	{
-		for (int i = 0; i < mProductEventListeners.size(); i++)
+		for (int i = 0; i < mPurchaseEventListeners.size(); i++)
 		{
-			if (listener == mProductEventListeners[i])
+			if (listener == mPurchaseEventListeners[i])
 			{
-				mProductEventListeners.remove(i);
+				mPurchaseEventListeners.remove(i);
 				break;
 			}
 		}
@@ -133,19 +133,19 @@ namespace Purchase
 	 * Notifies listeners about the event.
 	 * @param purchaseData Event data.
 	 */
-	void Product::handleProductCreateEvent(
+	void Purchase::handleProductCreateEvent(
 		const MAPurchaseEventData& purchaseData)
 	{
 		// TODO optimize for loop.
-		for( int i = 0; i < mProductEventListeners.size(); i++)
+		for( int i = 0; i < mPurchaseEventListeners.size(); i++)
 		{
 			if (purchaseData.state == MA_PURCHASE_STATE_PRODUCT_VALID)
 			{
-				mProductEventListeners[i]->productValid(*this);
+				mPurchaseEventListeners[i]->productValid(*this);
 			}
 			else if (purchaseData.state == MA_PURCHASE_STATE_PRODUCT_INVALID)
 			{
-				mProductEventListeners[i]->productInvalid(*this);
+				mPurchaseEventListeners[i]->productInvalid(*this);
 			}
 		}
 	}
@@ -155,21 +155,21 @@ namespace Purchase
 	 * Notifies listeners about the event.
 	 * @param purchaseData Event data.
 	 */
-	void Product::handleRequestEvent(const MAPurchaseEventData& purchaseData)
+	void Purchase::handleRequestEvent(const MAPurchaseEventData& purchaseData)
 	{
 		// TODO optimize for loop.
-		for (int i = 0; i < mProductEventListeners.size(); i++) {
+		for (int i = 0; i < mPurchaseEventListeners.size(); i++) {
 			if (purchaseData.state == MA_PURCHASE_STATE_IN_PROGRESS)
 			{
-				mProductEventListeners[i]->requestInProgress(*this);
+				mPurchaseEventListeners[i]->requestInProgress(*this);
 			}
 			else if (purchaseData.state == MA_PURCHASE_STATE_COMPLETED)
 			{
-				mProductEventListeners[i]->requestCompleted(*this);
+				mPurchaseEventListeners[i]->requestCompleted(*this);
 			}
 			else if (purchaseData.state == MA_PURCHASE_STATE_FAILED)
 			{
-				mProductEventListeners[i]->requestFailed(
+				mPurchaseEventListeners[i]->requestFailed(
 					*this,
 					purchaseData.errorCode);
 			}
@@ -181,7 +181,7 @@ namespace Purchase
 	 * Notifies listeners about the event.
 	 * @param purchaseData Event data.
 	 */
-	void Product::handleReceiptEvent(const MAPurchaseEventData& purchaseData)
+	void Purchase::handleReceiptEvent(const MAPurchaseEventData& purchaseData)
 	{
 		delete mReceipt;
 		mReceipt = NULL;
@@ -191,20 +191,20 @@ namespace Purchase
 		}
 
 		// TODO optimize for loop.
-		for (int i = 0; i < mProductEventListeners.size(); i++)
+		for (int i = 0; i < mPurchaseEventListeners.size(); i++)
 		{
 			if (purchaseData.state == MA_PURCHASE_STATE_RECEIPT_VALID)
 			{
-				mProductEventListeners[i]->receiptValid(*this,
+				mPurchaseEventListeners[i]->receiptValid(*this,
 					*mReceipt);
 			}
 			else if (purchaseData.state == MA_PURCHASE_STATE_RECEIPT_INVALID)
 			{
-				mProductEventListeners[i]->receiptInvalid(*this);
+				mPurchaseEventListeners[i]->receiptInvalid(*this);
 			}
 			else if (purchaseData.state == MA_PURCHASE_STATE_RECEIPT_ERROR)
 			{
-				mProductEventListeners[i]->receiptError(
+				mPurchaseEventListeners[i]->receiptError(
 					*this,
 					purchaseData.errorCode);
 			}

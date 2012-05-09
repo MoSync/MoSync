@@ -26,98 +26,98 @@
  */
 
 /**
- * @file ProductListener.h
+ * @file PurchaseListener.h
  * @author Bogdan Iusco
  * @date 3 May 2012
  *
- * @brief The ProductListener can be used to listen for a product events.
+ * @brief The PurchaseListener can be used to listen for a purchase events.
  */
 
-#ifndef PURCHASE_PRODUCT_LISTENER_H_
-#define PURCHASE_PRODUCT_LISTENER_H_
+#ifndef PURCHASE_LISTENER_H_
+#define PURCHASE_LISTENER_H_
 
 namespace Purchase
 {
 	// Forward declarations.
-	class Product;
+	class Purchase;
 	class Receipt;
 
 	/**
-	 * @brief Listener for product related events.
+	 * @brief Listener for purchase related events.
 	 */
-	class ProductListener
+	class PurchaseListener
 	{
 	public:
 		/**
 		 * Notifies that the product has been validated by the App Store.
 		 * Platform: iOS.
-		 * @param product The object that sent the event.
+		 * @param purchase The object that sent the event.
 		 */
-		virtual void productValid(const Product& product) = 0;
+		virtual void productValid(const Purchase& purchase) = 0;
 
 		/**
 		 * Notifies that the product is not valid on the App Store.
 		 * Platform: iOS.
-		 * @param product The object that sent the event.
+		 * @param purchase The object that sent the event.
 		 */
-		virtual void productInvalid(const Product& product) {};
+		virtual void productInvalid(const Purchase& purchase) {};
 
 		/**
 		 * Notifies that the transaction has been received by the App Store/
 		 * Google Play.
 		 * Platform: Android and iOS.
-		 * @param product The object that sent the event.
+		 * @param purchase The object that sent the event.
 		 */
-		virtual void requestInProgress(const Product& product) {};
+		virtual void requestInProgress(const Purchase& purchase) {};
 
 		/**
 		 * Notifies that the transaction has been successfully processed.
 		 * The user should receive the purchased product.
 		 * Platform: Android and iOS.
-		 * @param product The object that sent the event.
+		 * @param purchase The object that sent the event.
 		 */
-		virtual void requestCompleted(const Product& product) = 0;
+		virtual void requestCompleted(const Purchase& purchase) = 0;
 
 		/**
 		 * Notifies that the transaction has failed.
 		 * Platform: Android and iOS.
-		 * @param product The object that sent the event.
+		 * @param purchase The object that sent the event.
 		 * @param errorCode The reason why it failed.
 		 */
-		virtual void requestFailed(const Product& product,
+		virtual void requestFailed(const Purchase& purchase,
 			const int errorCode) {};
 
 		/**
 		 * Notifies that the transaction has been validated by the App Store /
 		 * Google Play.
 		 * Platform: Android and iOS.
-		 * @param product The object that sent the event.
+		 * @param purchase The object that sent the event.
 		 * @param receipt Transaction receipt.
 		 */
 		virtual void receiptValid(
-			const Product& product,
+			const Purchase& purchase,
 			Receipt& receipt) {};
 
 		/**
 		 * Notifies that the transaction is not valid on the App Store /
 		 * Google Play.
 		 * Platform: Android and iOS.
-		 * @param product The object that sent the event.
+		 * @param purchase The object that sent the event.
 		 */
-		virtual void receiptInvalid(const Product& product) {};
+		virtual void receiptInvalid(const Purchase& purchase) {};
 
 		/**
 		 * Notifies that an error occurred while verifying the receipt.
 		 * Platform: Android and iOS.
-		 * @param product The object that sent the event.
+		 * @param purchase The object that sent the event.
 		 * @param errorCode The reason why it failed.
 		 */
-		virtual void receiptError(const Product& product,
+		virtual void receiptError(const Purchase& purchase,
 			const int errorCode) {};
 
 	};
 }
 
-#endif /* PURCHASE_PRODUCT_LISTENER_H_ */
+#endif /* PURCHASE_LISTENER_H_ */
 
 /*! @} */
