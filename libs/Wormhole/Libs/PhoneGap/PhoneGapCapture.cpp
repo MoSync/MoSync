@@ -17,7 +17,7 @@ MA 02110-1301, USA.
 */
 
 /**
- * @file PhoneGapSensors.h
+ * @file PhoneGapCapture.cpp
  * @author Iraklis Rossis
  *
  * Implementation of PhoneGap capture calls made from JavaScript.

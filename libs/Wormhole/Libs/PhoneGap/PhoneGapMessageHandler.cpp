@@ -44,6 +44,7 @@ namespace Wormhole
 		mPhoneGapSensorManager(this),
 		mPhoneGapFile(this),
 		mPhoneGapCapture(this),
+		mPhoneGapCamera(this),
 		mPushNotificationManager(this),
 		mBeepSound(0)
 	{
@@ -152,6 +153,10 @@ namespace Wormhole
 		else if (message.getParam("service") == "Capture")
 		{
 			mPhoneGapCapture.handleMessage(message);
+		}
+		else if (message.getParam("service") == "Camera")
+		{
+			mPhoneGapCamera.handleMessage(message);
 		}
 		else
 		{
