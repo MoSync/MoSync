@@ -163,7 +163,7 @@ public class BillingService extends Service implements ServiceConnection
      * of request, ignore it for the moment, as the server will automatically
      * retry to communicate with the app by sending IN_APP_NOTIFY messages.
      * If the request type is RestoreTransactions, ignore the result code at this point,
-     * as the user will later receive MA_PURCHASE_EVENT_RESTORED events for each product.
+     * as the user will later receive MA_PURCHASE_EVENT_RESTORE events for each product.
      * If the request type is getPurchaseInformation, the error code will be used later
      * when sending an RECEIPT_ERROR event, after maPurchaseVerifyReceipt is called.
      *

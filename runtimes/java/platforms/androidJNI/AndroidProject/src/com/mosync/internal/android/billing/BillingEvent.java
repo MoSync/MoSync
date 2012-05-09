@@ -20,7 +20,7 @@ package com.mosync.internal.android.billing;
 import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_PURCHASE;
 import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_EVENT_PRODUCT_CREATE;
 import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_EVENT_REQUEST;
-import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_EVENT_RESTORED;
+import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_EVENT_RESTORE;
 import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_EVENT_VERIFY_RECEIPT;
 import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_STATE_RECEIPT_VALID;
 
@@ -53,7 +53,7 @@ public class BillingEvent
 	public static int[] onRestoreTransaction(int state, int purchaseHandle)
 	{
 		return setPurchaseEventData(
-				MA_PURCHASE_EVENT_RESTORED, state, purchaseHandle, 0);
+				MA_PURCHASE_EVENT_RESTORE, state, purchaseHandle, 0);
 	}
 
 	public static int[] onVerifyReceipt(int handle, int state, int errorCode)
