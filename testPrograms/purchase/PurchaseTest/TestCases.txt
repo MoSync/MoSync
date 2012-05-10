@@ -1,0 +1,1 @@
+Test case 1: The user makes a valid purchase.

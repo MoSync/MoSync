@@ -27,7 +27,7 @@
 
 #include "PurchaseManager.h"
 #include "PurchaseManagerListener.h"
-#include "Product.h"
+#include "Purchase.h"
 
 namespace Purchase
 {
@@ -136,14 +136,14 @@ namespace Purchase
 			}
 			else
 			{
-				// Check if the product exists in the map.
-				if (mProductMap.end() != mProductMap.find(purchaseData.productHandle))
+				// Check if the purchase exists in the map.
+				if (mPurchaseMap.end() != mPurchaseMap.find(purchaseData.productHandle))
 				{
 					// Get the product object that wraps the product handle.
-					Product* product = mProductMap[purchaseData.productHandle];
+					Purchase* purchase = mPurchaseMap[purchaseData.productHandle];
 
-					// Call the banner's event handling method.
-					product->handlePurchaseEvent(event.purchaseData);
+					// Call the purchase's event handling method.
+					purchase->handlePurchaseEvent(event.purchaseData);
 				}
 
 			}
@@ -151,24 +151,24 @@ namespace Purchase
 	}
 
 	/**
-	 * Add a product to the map that holds products.
-	 * The product will receive custom events.
-	 * @param product The product that needs to be registered.
-	 * The ownership of the product is not passed to this method.
+	 * Add a purchase to the map that holds purchases.
+	 * The purchase will receive custom events.
+	 * @param purchase The purchase that needs to be registered.
+	 * The ownership of the purchase is not passed to this method.
 	 */
-	void PurchaseManager::registerProduct(Product* product)
+	void PurchaseManager::registerPurchase(Purchase* purchase)
 	{
-		mProductMap[product->getHandle()] = product;
+		mPurchaseMap[purchase->getHandle()] = purchase;
 	}
 
 	/**
-	 * Remove a product from the map that holds products.
-	 * The product will not receive custom events.
-	 * @param product The product that needs to be unregistered.
+	 * Remove a purchase from the map that holds purchases.
+	 * The purchase will not receive custom events.
+	 * @param product The purchase that needs to be unregistered.
 	 */
-	void PurchaseManager::unregisterProduct(Product* product)
+	void PurchaseManager::unregisterPurchase(Purchase* purchase)
 	{
-		mProductMap.erase(product->getHandle());
+		mPurchaseMap.erase(purchase->getHandle());
 	}
 
 	/**
@@ -212,12 +212,12 @@ namespace Purchase
 	 */
 	void PurchaseManager::createRestoredProduct(MAHandle productHandle)
 	{
-		Product* product = new Product(productHandle);
+		Purchase* purchase = new Purchase(productHandle);
 		for (int i = 0; i < mListeners.size(); i++)
 		{
-			mListeners[i]->productRestored(*product);
+			mListeners[i]->purchaseRestored(*purchase);
 		}
-		mSpecialProducts.add(product);
+		mSpecialProducts.add(purchase);
 	}
 
 	/**
@@ -226,11 +226,11 @@ namespace Purchase
 	 */
 	void PurchaseManager::createRefundedProduct(MAHandle productHandle)
 	{
-		Product* product = new Product(productHandle);
+		Purchase* purchase = new Purchase(productHandle);
 		for (int i = 0; i < mListeners.size(); i++)
 		{
-			mListeners[i]->productRefunded(*product);
+			mListeners[i]->purchaseRefunded(*purchase);
 		}
-		mSpecialProducts.add(product);
+		mSpecialProducts.add(purchase);
 	}
 }

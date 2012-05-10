@@ -97,11 +97,11 @@ namespace PurchaseTest
 
 	/**
 	 * Print log on the screen.
-	 * @param test Text to be printed.
+	 * @param text Text to be printed.
 	 */
-	void ApplicationController::log(MAUtil::String& test)
+	void ApplicationController::log(MAUtil::String& text)
 	{
-
+		mMainScreen->printText(text);
 	}
 
 	/**
