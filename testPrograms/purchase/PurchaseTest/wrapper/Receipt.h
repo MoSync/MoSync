@@ -33,13 +33,13 @@
  * @brief
  */
 
-#ifndef PURCHASE_RECEIPT_H_
-#define PURCHASE_RECEIPT_H_
+#ifndef IAP_PURCHASE_RECEIPT_H_
+#define IAP_PURCHASE_RECEIPT_H_
 
 #include <MAUtil/String.h>
 #include <maapi.h>
 
-namespace Purchase
+namespace IAP
 {
 
 	/**
@@ -132,8 +132,8 @@ namespace Purchase
 		MAHandle mHandle;
 	};
 
-} // namespace Purchase
+} // namespace IAP
 
-#endif /* PURCHASE_RECEIPT_H_ */
+#endif /* IAP_PURCHASE_RECEIPT_H_ */
 
 /*! @} */

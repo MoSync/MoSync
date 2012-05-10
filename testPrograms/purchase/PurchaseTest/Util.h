@@ -27,7 +27,28 @@ MA 02110-1301, USA.
 #define PURCHASE_UTIL_H_
 
 #include <mastring.h>		// C string functions
-#include "mavsprintf.h"
+#include <mavsprintf.h>
+#include <MAUtil/String.h>
+
+#define IOS_PRODUCT_TYPE_1 "com.mosync.purchase2.consumable"
+#define ANDROID_PRODUCT_TYPE_1 ""
+#define IOS_PRODUCT_TYPE_2 "com.mosync.purchase2.nonconsumable"
+#define ANDROID_PRODUCT_TYPE_2 ""
+
+
+/**
+ * On Android this is an managed product.
+ * On iOS this is a consumable product.
+ * This type of product can be purchased multiple times.
+ */
+static MAUtil::String* sProductType1 = NULL;
+
+/**
+ * On Android this is an unmanaged product.
+ * On iOS this is a non-consumable product.
+ * This type of product can be purchased only one time by a user.
+ */
+static MAUtil::String* sProductType2 = NULL;
 
 #define BUF_MAX 256
 
@@ -56,6 +77,38 @@ static int getPlatform()
 			return IOS;
 	}
 	return WINDOWSPHONE7;
+}
+
+/**
+ * Creates the product types.
+ * Call this method when the application starts.
+ */
+static void createProductTypes()
+{
+	delete sProductType1;
+	delete sProductType2;
+
+	int platform = getPlatform();
+	if (platform == ANDROID)
+	{
+		sProductType1 = new MAUtil::String(ANDROID_PRODUCT_TYPE_1);
+		sProductType2 = new MAUtil::String(ANDROID_PRODUCT_TYPE_2);
+	}
+	else if (platform == IOS)
+	{
+		sProductType1 = new MAUtil::String(IOS_PRODUCT_TYPE_1);
+		sProductType2 = new MAUtil::String(IOS_PRODUCT_TYPE_2);
+	}
+}
+
+/**
+ * Destroy the product type strings.
+ * Call this method when the app exits.
+ */
+static void destroyProductTypes()
+{
+	delete sProductType1;
+	delete sProductType2;
 }
 
 #endif /* PURCHASE_UTIL_H_ */

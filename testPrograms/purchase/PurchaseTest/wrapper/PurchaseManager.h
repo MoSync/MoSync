@@ -34,14 +34,14 @@
  * them to the target products.
  */
 
-#ifndef PURCHASE_MANAGER_H_
-#define PURCHASE_MANAGER_H_
+#ifndef IAP_PURCHASE_MANAGER_H_
+#define IAP_PURCHASE_MANAGER_H_
 
 #include <MAUtil/String.h>
 #include <MAUtil/Map.h>
 #include <MAUtil/Environment.h>
 
-namespace Purchase
+namespace IAP
 {
 
 	// Forward declarations.
@@ -187,8 +187,8 @@ namespace Purchase
 		MAUtil::Vector<Purchase*> mSpecialProducts;
 	};
 
-} // namespace Purchase
+} // namespace IAP
 
-#endif /* PURCHASE_MANAGER_H_ */
+#endif /* IAP_PURCHASE_MANAGER_H_ */
 
 /*! @} */

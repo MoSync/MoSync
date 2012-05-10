@@ -28,7 +28,7 @@
 #include "Receipt.h"
 #include "PurchaseManager.h"
 
-namespace Purchase
+namespace IAP
 {
 
 	/**
@@ -36,8 +36,10 @@ namespace Purchase
 	 * @param productID String that identifies the product.
 	 * This string must be used by the App Store / Google Play to identify
 	 * the product.
+	 * @param listener The listener that will receive purchase events.
 	 */
-	Purchase::Purchase(const MAUtil::String& productID):
+	Purchase::Purchase(const MAUtil::String& productID,
+	PurchaseListener* listener):
 		mHandle(-1),
 		mReceipt(NULL)
 	{
@@ -78,6 +80,28 @@ namespace Purchase
 	MAHandle Purchase::getHandle() const
 	{
 		return mHandle;
+	}
+
+	/**
+	 * Request the user to purchase a product.
+	 * The system will handle the proccess of purchasing.
+	 * Note: if there are another requests in progress, the requests will
+	 * be queued.
+	 * Listeners will be notified.
+	 */
+	void Purchase::requestPurchase()
+	{
+		maPurchaseRequest(mHandle, 1);
+	}
+
+	/**
+	 * Verify if the receipt came from Apple App Store / Google Play.
+	 * Make sure that the product is purchased before calling this method.
+	 * Listeners will be notified.
+	 */
+	void Purchase::verifyReceipt()
+	{
+		maPurchaseVerifyReceipt(mHandle);
 	}
 
 	/**
@@ -211,4 +235,4 @@ namespace Purchase
 		}
 	}
 
-} // namespace Purchase
+} // namespace IAP

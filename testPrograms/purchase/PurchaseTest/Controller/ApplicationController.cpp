@@ -31,6 +31,7 @@
 
 #include "../tests/ITest.h"
 #include "../tests/Test1.h"
+#include "../Util.h"
 
 namespace PurchaseTest
 {
@@ -42,10 +43,22 @@ namespace PurchaseTest
 		mMainScreen(NULL),
 		mCountSucceededTests(0)
 	{
-		this->createTests();
+		createProductTypes();
 
 		mMainScreen = new MainScreen();
 		mMainScreen->show();
+
+		int platform = getPlatform();
+		if (platform != IOS &&
+			platform != ANDROID)
+		{
+			maAlert("Error", "This program runs only on Android and iOS devices",
+				"OK", NULL, NULL);
+		}
+		else
+		{
+			this->createTests();
+		}
 	}
 
 	/**
@@ -70,6 +83,8 @@ namespace PurchaseTest
 			mFailedTests.remove(0);
 			delete testName;
 		}
+
+		destroyProductTypes();
 	}
 
 	/**

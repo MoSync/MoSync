@@ -30,14 +30,22 @@
 #include "ITest.h"
 #include "../Controller/IApplicationController.h"
 
+#include "../wrapper/PurchaseListener.h"
+
+using namespace IAP;
+
 namespace PurchaseTest
 {
+
+	class IAP::Purchase;
 
 	/**
 	 * @brief Test a valid purchase of an product.
 	 * Platform: Android and iOS.
 	 */
-	class Test1: public ITest
+	class Test1:
+		public ITest,
+		public PurchaseListener
 	{
 	public:
 		/**
@@ -63,17 +71,84 @@ namespace PurchaseTest
 		 */
 		virtual MAUtil::String getTestName() const;
 
+	private:
 		/**
-		 * Get the reason why the test failed.
-		 * @return Reason why it failed.
+		 * Notifies that the product has been validated by the App Store.
+		 * Platform: iOS.
+		 * @param purchase The object that sent the event.
 		 */
-		virtual MAUtil::String getReason();
+		virtual void productValid(const Purchase& purchase);
+
+		/**
+		 * Notifies that the product is not valid on the App Store.
+		 * Platform: iOS.
+		 * @param purchase The object that sent the event.
+		 */
+		virtual void productInvalid(const Purchase& purchase);
+
+		/**
+		 * Notifies that the transaction has been received by the App Store/
+		 * Google Play.
+		 * Platform: Android and iOS.
+		 * @param purchase The object that sent the event.
+		 */
+		virtual void requestInProgress(const Purchase& purchase);
+
+		/**
+		 * Notifies that the transaction has been successfully processed.
+		 * The user should receive the purchased product.
+		 * Platform: Android and iOS.
+		 * @param purchase The object that sent the event.
+		 */
+		virtual void requestCompleted(const Purchase& purchase);
+
+		/**
+		 * Notifies that the transaction has failed.
+		 * Platform: Android and iOS.
+		 * @param purchase The object that sent the event.
+		 * @param errorCode The reason why it failed.
+		 */
+		virtual void requestFailed(const Purchase& purchase,
+			const int errorCode);
+
+		/**
+		 * Notifies that the transaction has been validated by the App Store /
+		 * Google Play.
+		 * Platform: Android and iOS.
+		 * @param purchase The object that sent the event.
+		 * @param receipt Transaction receipt.
+		 */
+		virtual void receiptValid(
+			const Purchase& purchase,
+			Receipt& receipt);
+
+		/**
+		 * Notifies that the transaction is not valid on the App Store /
+		 * Google Play.
+		 * Platform: Android and iOS.
+		 * @param purchase The object that sent the event.
+		 */
+		virtual void receiptInvalid(const Purchase& purchase);
+
+		/**
+		 * Notifies that an error occurred while verifying the receipt.
+		 * Platform: Android and iOS.
+		 * @param purchase The object that sent the event.
+		 * @param errorCode The reason why it failed.
+		 */
+		virtual void receiptError(const Purchase& purchase,
+			const int errorCode);
 
 	private:
 		/**
 		 * Application controller.
 		 */
 		IApplicationController& mApplicationController;
+
+		/**
+		 * Tested object.
+		 */
+		Purchase* mPurchase;
 	};
 
 } // namespace PurchaseTest

@@ -33,10 +33,10 @@
  * @brief The PurchaseListener can be used to listen for a purchase events.
  */
 
-#ifndef PURCHASE_LISTENER_H_
-#define PURCHASE_LISTENER_H_
+#ifndef IAP_PURCHASE_LISTENER_H_
+#define IAP_PURCHASE_LISTENER_H_
 
-namespace Purchase
+namespace IAP
 {
 	// Forward declarations.
 	class Purchase;
@@ -123,8 +123,9 @@ namespace Purchase
 			const int errorCode) {};
 
 	};
-}
 
-#endif /* PURCHASE_LISTENER_H_ */
+} // namespace IAP
+
+#endif /* IAP_PURCHASE_LISTENER_H_ */
 
 /*! @} */
