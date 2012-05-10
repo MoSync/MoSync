@@ -63,6 +63,7 @@ MA 02110-1301, USA.
 #include <maheap.h>			// C memory allocation functions.
 #include <mastring.h>		// C String functions.
 #include <mavsprintf.h>		// sprintf etc.
+#include <conprint.h>		// lprintfln.
 #include <MAUtil/String.h>	// Class String.
 #include <IX_WIDGET.h>		// Widget API.
 #include "MAHeaders.h"		// Resource identifiers (not a physical file).
@@ -173,9 +174,8 @@ public:
 		maWidgetSetProperty(webView, "width", "-1");
 		maWidgetSetProperty(webView, "height", "-1");
 
-		// Disable zooming. This should make the page display
-		// in a readable zoom state.
-		maWidgetSetProperty(webView, "enableZoom", "false");
+		// Enable zooming.
+		maWidgetSetProperty(webView, "enableZoom", "true");
 
 		// Get the HTML for the page from a resource.
 		MAUtil::String html = Util::createTextFromHandle(INDEX_HTML);
@@ -199,28 +199,30 @@ public:
 		while (isRunning)
 		{
 			maWait(0);
-			maGetEvent(&event);
-			switch (event.type)
+			while (maGetEvent(&event))
 			{
-				case EVENT_TYPE_CLOSE:
-					isRunning = false;
-					break;
-
-				case EVENT_TYPE_KEY_PRESSED:
-					// Exit the app if the back key (on Android) is pressed.
-					if (event.key == MAK_BACK)
-					{
+				switch (event.type)
+				{
+					case EVENT_TYPE_CLOSE:
 						isRunning = false;
-					}
-					break;
+						break;
 
-				case EVENT_TYPE_WIDGET:
-					handleWidgetEvent((MAWidgetEventData*) event.data);
-					break;
+					case EVENT_TYPE_KEY_PRESSED:
+						// Exit the app if the back key (on Android) is pressed.
+						if (event.key == MAK_BACK)
+						{
+							isRunning = false;
+						}
+						break;
 
-				case EVENT_TYPE_LOCATION:
-					handleGeoLocationEvent((MALocation*) event.data);
-					break;
+					case EVENT_TYPE_WIDGET:
+						handleWidgetEvent((MAWidgetEventData*) event.data);
+						break;
+
+					case EVENT_TYPE_LOCATION:
+						handleGeoLocationEvent((MALocation*) event.data);
+						break;
+				}
 			}
 		}
 	}
