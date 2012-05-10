@@ -28,6 +28,7 @@
 #define PURCHASE_MAIN_SCREEN_H_
 
 #include <NativeUI/Widgets.h>
+#include <MAUtil/String.h>
 
 using namespace NativeUI;
 
@@ -36,7 +37,35 @@ namespace PurchaseTest
 
 	class MainScreen: public Screen
 	{
+	public:
+		/**
+		 * Constructor.
+		 */
+		MainScreen();
 
+		/**
+		 * Destructor.
+		 */
+		virtual ~MainScreen();
+
+		/**
+		 * Write text on the screen.
+		 * A new label containing the give text will be added to the screen.
+		 * @param text Text to print.
+		 */
+		void printText(const MAUtil::String& text);
+
+	private:
+		/**
+		 * Main layout.
+		 * All widgets will be added to it.
+		 */
+		RelativeLayout* mMainLayout;
+
+		/**
+		 * Y coordinate for the next label that will be added to layout.
+		 */
+		int mLabelCoordY;
 	};
 
 } // namespace PurchaseTest

@@ -24,9 +24,51 @@
  * @brief Screen used to display logs.
  */
 
+// Default size for labels
+#define LABEL_HEIGHT 20
+
 #include "MainScreen.h"
 
 namespace PurchaseTest
 {
 
+	/**
+	 * Constructor.
+	 */
+	MainScreen::MainScreen():
+		mMainLayout(NULL),
+		mLabelCoordY(0)
+	{
+		mMainLayout = new RelativeLayout();
+		mMainLayout->fillSpaceHorizontally();
+		mMainLayout->setScrollable(true);
+		this->setMainWidget(mMainLayout);
+	}
+
+	/**
+	 * Destructor.
+	 */
+	MainScreen::~MainScreen()
+	{
+
+	}
+
+	/**
+	 * Write text on the screen.
+	 * A new label containing the give text will be added to the screen.
+	 * @param text Text to print.
+	 */
+	void MainScreen::printText(const MAUtil::String& text)
+	{
+		Label* label = new Label();
+		label->setLeftPosition(0);
+		label->setTopPosition(mLabelCoordY);
+		label->setText(text);
+
+		// The label must be have a fix height.
+		label->setHeight(LABEL_HEIGHT);
+		mMainLayout->addChild(label);
+
+		mLabelCoordY += LABEL_HEIGHT;
+	}
 }
