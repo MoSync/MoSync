@@ -112,6 +112,12 @@ namespace Purchase
 		MAUtil::String getBVRS();
 
 		/**
+		 * Get the product price.
+		 * Platform: Android.
+		 */
+		int getPrice();
+
+		/**
 		 * Get a receipt field value.
 		 * Platform: Android and iOS.
 		 * @param field One of the MA_PURCHASE_RECEIPT constants.

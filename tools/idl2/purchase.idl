@@ -39,8 +39,8 @@ group PurchaseResultCodes "Purchase Result Codes" {
         */
 		DISABLED = -6;
         /**
-        * \brief Returned by the #maPurchaseGetName(), maPurchaseVerifyReceipt or
-        * maPurchaseDestroy syscalls if the productHandle is invalid.
+        * \brief Returned by the #maPurchaseGetName(), #maPurchaseVerifyReceipt(),
+		* #maPurchaseGetField() or #maPurchaseDestroy() syscalls if the productHandle is invalid.
 		* Platform: Android and iOS.
         */
 		INVALID_HANDLE = -7;
@@ -72,38 +72,32 @@ group PurchaseErrorCodes "Purchase Error Codes" {
         * if the given product handle is invalid.
         */
 		INVALID_HANDLE = -1;
-		/**
-		* \brief Possible error code for #MA_PURCHASE_EVENT_RECEIPT_ERROR.
-		* Sent by the #maPurchaseVerifyReceipt() syscall if the given product
-		* was not purchased, so there is no receipt for it.
-		*/
-		PRODUCT_NOT_PURCHASED = -2;
         /**
         * \brief Possible error code for #MA_PURCHASE_EVENT_RECEIPT_ERROR.
         * Indicates that the connection with the App Store / Google Play has failed.
         */
-		CONNECTION_FAILED = -3;
+		CONNECTION_FAILED = -2;
         /**
         * \brief Possible error code for #MA_PURCHASE_EVENT_RECEIPT_ERROR.
         * Indicates that response from App Store/ Google Play for verifying
 		* a receipt cannot be parsed.
 		* Platform: iOS.
         */
-		CANNOT_PARSE_RECEIPT = -4;
+		CANNOT_PARSE_RECEIPT = -3;
 		/**
 		* \brief Possible error code for #MA_PURCHASE_EVENT_REQUEST.
 		* Sent by the #maPurchaseRequest() syscall if the requested product is not valid
 		* on the App Store/ Google Play.
 		* Platform: iOS and Android.
 		*/
-		INVALID_PRODUCT = -5;
+		INVALID_PRODUCT = -4;
         /**
 		* \brief Possible error code for #MA_PURCHASE_EVENT_REQUEST.
 		* Sent by the #maPurchaseRequest() syscall if the client is not allowed to perform
 		* the attempted action.
 		* Platform: iOS.
 		*/
-		INVALID_CLIENT = -6;
+		INVALID_CLIENT = -5;
         /**
 		* \brief Possible error code for #MA_PURCHASE_EVENT_REQUEST.
 		* Sent by the #maPurchaseRequest() syscall if the user cancelled the payment request.
@@ -111,37 +105,37 @@ group PurchaseErrorCodes "Purchase Error Codes" {
 		* buying the item.
 		* Platform: iOS and Android.
 		*/
-		CANCELLED = -7;
+		CANCELLED = -6;
         /**
 		* \brief Possible error code for #MA_PURCHASE_EVENT_REQUEST.
 		* Sent by the #maPurchaseRequest() syscall if the user is not allowed to authorize payments.
 		* Platform: iOS.
 		*/
-		NOT_ALLOWED = -8;
+		NOT_ALLOWED = -7;
 		/**
 		* \brief Possible error code for #MA_PURCHASE_EVENT_REQUEST.
 		* Sent by the #maPurchaseRequest() syscall if the user did not previously call #maPurchaseSetPublicKey().
 		* Platform: Android.
 		*/
-		PUBLIC_KEY_NOT_SET = -9;
+		PUBLIC_KEY_NOT_SET = -8;
 		/**
 		* \brief Possible error code for #MA_PURCHASE_EVENT_REQUEST_STATE_CHANGED.
 		* Sent by the #maPurchaseRequest() syscall if an unknown or unexpected server error occurred.
 		* Platform: iOS and Android.
 		*/
-		UNKNOWN = -10;
+		UNKNOWN = -9;
 		/**
 		* \brief Possible error code for #MA_PURCHASE_EVENT_REQUEST.
 		* Sent by the #maPurchaseRequest() syscall if the quantity is not greater than zero.
 		* Platform: Android and iOS.
 		*/
-		INVALID_QUANTITY = -9;
+		INVALID_QUANTITY = -10;
 		/**
 		* \brief Possible error code for #MA_PURCHASE_EVENT_VERIFY_RECEIPT.
 		* Sent by the #maPurchaseVerifyReceipt() syscall if the product has not been purchased.
-		* Platform: iOS.
+		* Platform: iOS and Android.
 		*/
-		NO_RECEIPT = -10;
+		NO_RECEIPT = -11;
 	}
 } // end of Purchase Error Codes
 
@@ -363,7 +357,7 @@ group PurchaseFunctions "Purchase Functions" {
 	/**
 	* \brief Set your Google Play public key to the application. This enables the application
 	* to verify the signature of the transaction information that is returned from Google Play.
-	* Must be set before #maVerifyReceipt.
+	* Must be set in order to be able to request purchases.
 	* Platform: Android.
 	*
 	* \param developerKey Base64-encoded public key, that can be found on the Google
@@ -409,7 +403,6 @@ group PurchaseFunctions "Purchase Functions" {
 	* the receipt. Check the errorCode member object for more information about the reason.
     *
 	* \param productHandle Handle to the product that has been purchased.
-	*
 	*/
 	void maPurchaseVerifyReceipt(in MAHandle productHandle);
 
@@ -425,9 +418,8 @@ group PurchaseFunctions "Purchase Functions" {
 	* \param bufferSize The maximum size of the buffer, in bytes.
 	* \return The number of written bytes into buffer(a value greater than zero), or one
 	* of the following error codes(a value smaller that zero):
-	* - #MA_PURCHASE_RES_OK if the request has been send to the store for verifying.
 	* - #MA_PURCHASE_RES_INVALID_HANDLE if the productHandle is invalid.
-	* - #MA_PURCHASE_RES_RECEIPT if the product has not been purchased.
+	* - #MA_PURCHASE_RES_RECEIPT_NOT_AVAILABLE if the product has not been purchased.
 	* - #MA_PURCHASE_RES_DISABLED if purchase is not allowed/enabled.
 	*/
 	int maPurchaseGetField(in MAHandle productHandle, in MAString property,
