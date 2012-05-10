@@ -1,1 +1,7 @@
 Test case 1: The user makes a valid purchase.
+
+
+Test case2: The user tries to buy an unavailable product.  Expected result:
+	- MA_PURCHASE_RES_UNAVAILABLE on devices wiht no billing support.
+	- iOS: maPurchaseCreate fails with MA_PURCHASE_STATE_PRODUCT_INVALID.
+	- Android: maPurchaseRequest fails with event type MA_PURCHASE_STATE_FAILED and errorCode = MA_PURCHASE_ERROR_INVALID_PRODUCT.
