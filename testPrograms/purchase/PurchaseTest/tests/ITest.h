@@ -21,7 +21,7 @@
  * @author Bogdan Iusco
  * @date 8 May 2012
  *
- * @brief Interface for test classes.
+ * @brief Base class for test classes.
  */
 
 #ifndef PURCHASE_ITEST_H_
@@ -32,9 +32,18 @@
 namespace PurchaseTest
 {
 
+	/**
+	 * @brief Base class for test classes.
+	 */
 	class ITest
 	{
 	public:
+
+		/**
+		 * Constructor.
+		 */
+		ITest();
+
 		/**
 		 * Start the test.
 		 */
@@ -49,13 +58,23 @@ namespace PurchaseTest
 		/**
 		 * Get the reason why the test failed.
 		 * @return Reason why it failed.
+		 * If the test has not finished or if it succeeded the returned string
+		 * will be empty.
 		 */
-		virtual MAUtil::String getReason() = 0;
+		virtual MAUtil::String getReason();
 
 		/**
 		 * Destructor.
 		 */
-		virtual ~ITest() {};
+		virtual ~ITest();
+
+	private:
+		/**
+		 * In case the test fails this string will contain the reason.
+		 * If the test has not started or if it succeeded this string will be
+		 * NULL.
+		 */
+		MAUtil::String* mFailedReason;
 	};
 } // namespace PurchaseTest
 

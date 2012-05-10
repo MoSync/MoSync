@@ -34,10 +34,10 @@
  * refunded products.
  */
 
-#ifndef PURCHASE_MANAGER_LISTENER_H_
-#define PURCHASE_MANAGER_LISTENER_H_
+#ifndef IAP_PURCHASE_MANAGER_LISTENER_H_
+#define IAP_PURCHASE_MANAGER_LISTENER_H_
 
-namespace Purchase
+namespace IAP
 {
 	// Forward declaration.
 	class Product;
@@ -62,9 +62,9 @@ namespace Purchase
 		 */
 		virtual void purchaseRefunded(Purchase& purchase) = 0;
 	};
-}
 
+} // namespace IAP
 
-#endif /* PURCHASE_MANAGER_LISTENER_H_ */
+#endif /* IAP_PURCHASE_MANAGER_LISTENER_H_ */
 
 /*! @} */

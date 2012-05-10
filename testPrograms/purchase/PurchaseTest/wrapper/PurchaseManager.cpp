@@ -29,7 +29,7 @@
 #include "PurchaseManagerListener.h"
 #include "Purchase.h"
 
-namespace Purchase
+namespace IAP
 {
 	/**
 	 * Initialize the singleton variable to NULL.

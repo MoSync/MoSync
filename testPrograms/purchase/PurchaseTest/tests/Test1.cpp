@@ -24,10 +24,19 @@
  * @brief Test a valid purchase of an product.
  */
 
+#define TEST_NAME "Test 1"
+
+#define IOS_PRODUCT_ID "com.mosync.purchase2.consumable"
+#define ANDROID_PRODUCT_ID ""
+
 #include "Test1.h"
+#include "../Util.h"
+
+#include "../wrapper/Purchase.h"
 
 namespace PurchaseTest
 {
+
 	/**
 	 * Constructor.
 	 * @param applicationController Will be notified when test's status
@@ -61,16 +70,98 @@ namespace PurchaseTest
 	 */
 	MAUtil::String Test1::getTestName() const
 	{
-		return "";
+		return TEST_NAME;
 	}
 
 	/**
-	 * Get the reason why the test failed.
-	 * @return Reason why it failed.
+	 * Notifies that the product has been validated by the App Store.
+	 * Platform: iOS.
+	 * @param purchase The object that sent the event.
 	 */
-	MAUtil::String Test1::getReason()
+	void Test1::productValid(const Purchase& purchase)
 	{
-		return "";
+
+	}
+
+	/**
+	 * Notifies that the product is not valid on the App Store.
+	 * Platform: iOS.
+	 * @param purchase The object that sent the event.
+	 */
+	void Test1::productInvalid(const Purchase& purchase)
+	{
+
+	}
+
+	/**
+	 * Notifies that the transaction has been received by the App Store/
+	 * Google Play.
+	 * Platform: Android and iOS.
+	 * @param purchase The object that sent the event.
+	 */
+	void Test1::requestInProgress(const Purchase& purchase)
+	{
+
+	}
+
+	/**
+	 * Notifies that the transaction has been successfully processed.
+	 * The user should receive the purchased product.
+	 * Platform: Android and iOS.
+	 * @param purchase The object that sent the event.
+	 */
+	void Test1::requestCompleted(const Purchase& purchase)
+	{
+
+	}
+
+	/**
+	 * Notifies that the transaction has failed.
+	 * Platform: Android and iOS.
+	 * @param purchase The object that sent the event.
+	 * @param errorCode The reason why it failed.
+	 */
+	void Test1::requestFailed(const Purchase& purchase,
+		const int errorCode)
+		{
+
+		}
+
+	/**
+	 * Notifies that the transaction has been validated by the App Store /
+	 * Google Play.
+	 * Platform: Android and iOS.
+	 * @param purchase The object that sent the event.
+	 * @param receipt Transaction receipt.
+	 */
+	void Test1::receiptValid(
+		const Purchase& purchase,
+		Receipt& receipt)
+	{
+
+	}
+
+	/**
+	 * Notifies that the transaction is not valid on the App Store /
+	 * Google Play.
+	 * Platform: Android and iOS.
+	 * @param purchase The object that sent the event.
+	 */
+	void Test1::receiptInvalid(const Purchase& purchase)
+	{
+
+	}
+
+	/**
+	 * Notifies that an error occurred while verifying the receipt.
+	 * Platform: Android and iOS.
+	 * @param purchase The object that sent the event.
+	 * @param errorCode The reason why it failed.
+	 */
+	void Test1::receiptError(const Purchase& purchase,
+		const int errorCode)
+	{
+
 	}
 
 }

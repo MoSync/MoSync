@@ -33,8 +33,8 @@
  * @brief
  */
 
-#ifndef PURCHASE_H_
-#define PURCHASE_H_
+#ifndef IAP_PURCHASE_H_
+#define IAP_PURCHASE_H_
 
 #include <MAUtil/String.h>
 #include <MAUtil/Vector.h>
@@ -42,7 +42,7 @@
 
 #include "PurchaseListener.h"
 
-namespace Purchase
+namespace IAP
 {
 
 	// Forward declaration.
@@ -56,8 +56,10 @@ namespace Purchase
 		 * @param productID String that identifies the product.
 		 * This string must be used by the App Store / Google Play to identify
 		 * the product.
+		 * @param listener The listener that will receive purchase events.
 		 */
-		Purchase(const MAUtil::String& productID);
+		Purchase(const MAUtil::String& productID,
+			PurchaseListener* listener);
 
 		/**
 		 * Destructor.
@@ -68,6 +70,22 @@ namespace Purchase
 		 * @return The handle of the purchase.
 		 */
 		MAHandle getHandle() const;
+
+		/**
+		 * Request the user to purchase a product.
+		 * The system will handle the proccess of purchasing.
+		 * Note: if there are another requests in progress, the requests will
+		 * be queued.
+		 * Listeners will be notified.
+		 */
+		void requestPurchase();
+
+		/**
+		 * Verify if the receipt came from Apple App Store / Google Play.
+		 * Make sure that the product is purchased before calling this method.
+		 * Listeners will be notified.
+		 */
+		void verifyReceipt();
 
 		/**
 		 * Handles a purchase event.
@@ -140,6 +158,6 @@ namespace Purchase
 	};
 }
 
-#endif /* PURCHASE_H_ */
+#endif /* IAP_PURCHASE_H_ */
 
 /*! @} */

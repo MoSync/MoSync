@@ -28,7 +28,7 @@
 
 #include "Receipt.h"
 
-namespace Purchase
+namespace IAP
 {
 
 	// Usual size for a buffer.
@@ -165,4 +165,4 @@ namespace Purchase
 		return buffer;
 	}
 
-}
+} // namespace IAP
