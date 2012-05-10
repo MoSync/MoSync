@@ -21,18 +21,16 @@ import android.os.Build;
 import android.util.Log;
 
 import com.mosync.internal.android.billing.BillingEvent;
+import com.mosync.internal.android.billing.Consts;
 import com.mosync.internal.android.billing.PurchaseManager;
 import com.mosync.nativeui.util.properties.IntConverter;
 import com.mosync.nativeui.util.properties.PropertyConversionException;
 
-import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_ERROR_INVALID_HANDLE;
+import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_RES_INVALID_HANDLE;
 import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_RES_UNAVAILABLE;
 import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_RES_BUFFER_TOO_SMALL;
 import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_STATE_DISABLED;
-import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_RECEIPT_PRODUCT_ID;
-import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_RECEIPT_PURCHASE_DATE;
-import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_RECEIPT_PRICE;
-import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_RES_INVALID_FIELD_NAME;
+import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_RES_RECEIPT_NOT_AVAILABLE;
 
 import static com.mosync.internal.android.MoSyncHelpers.*;
 
@@ -169,7 +167,7 @@ public class MoSyncPurchase
 			if (result.length() == 0 )
 			{
 				Log.e("@@MoSync", "maPurchaseGetName: Invalid product handle " + productHandle);
-				return MA_PURCHASE_ERROR_INVALID_HANDLE;
+				return MA_PURCHASE_RES_INVALID_HANDLE;
 			}
 
 			if( result.length( ) + 1 > memBufSize )
@@ -219,7 +217,13 @@ public class MoSyncPurchase
 			if (result.length() == 0 )
 			{
 				Log.e("@@MoSync", "maPurchaseGetField: Invalid product handle " + productHandle);
-				return MA_PURCHASE_ERROR_INVALID_HANDLE;
+				return MA_PURCHASE_RES_INVALID_HANDLE;
+			}
+
+			if ( result.equals(Consts.RECEIPT_NOT_AVAILABLE) )
+			{
+				Log.e("@@MoSync", "maPurchaseGetField: The product has not been purchased " + productHandle);
+				return MA_PURCHASE_RES_RECEIPT_NOT_AVAILABLE;
 			}
 
 			if( result.length( ) + 1 > bufferSize )

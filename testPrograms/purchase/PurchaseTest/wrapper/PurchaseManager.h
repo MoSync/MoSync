@@ -88,8 +88,14 @@ namespace Purchase
 		static void destroyInstance();
 
 		/**
+		 * Set your Google Play public key to the application. This enables the
+		 * application to verify the signature of the transaction information
+		 * that is returned from Google Play.
+		 * This method is mandatory for being able to request for purchases.
 		 * Platform: Android.
-		 * @param developerPublicKey
+		 * @param developerPublicKey Base64-encoded public key, that can be found
+		 * on the Google Play publisher account page, under Licensing & In-app
+		 * Billing panel in Edit Profile.
 		 */
 		void setPublicKey(const MAUtil::String& developerPublicKey);
 

@@ -99,6 +99,7 @@ public class Consts
 	}
 
 	public final static int PURCHASE_STATE_ON_HOLD = -1;
+	public final static String RECEIPT_NOT_AVAILABLE = "Receipt not available";
 
 	/**
 	 * The request methods.

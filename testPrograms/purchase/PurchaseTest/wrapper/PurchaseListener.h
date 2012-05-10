@@ -50,8 +50,12 @@ namespace Purchase
 	public:
 		/**
 		 * Notifies that the product has been validated by the App Store.
-		 * Platform: iOS.
-		 * @param purchase The object that sent the event.
+		 * NOTE: On Android there is no validation done at this step, if the
+		 * product results to be unavailable, then the application will be later
+		 * notified via a requestFailed() callback. The errorCode will equal
+		 * #MA_PURCHASE_ERROR_INVALID_PRODUCT.
+		 * Platform: iOS and Android.
+		 * @param product The object that sent the event.
 		 */
 		virtual void productValid(const Purchase& purchase) = 0;
 
@@ -83,6 +87,9 @@ namespace Purchase
 		 * Platform: Android and iOS.
 		 * @param purchase The object that sent the event.
 		 * @param errorCode The reason why it failed.
+		 * Note that even if the request fails because it was canceled
+		 * (errorCode = MA_PURCHASE_ERROR_CANCELLED), you will still be
+		 * able to get a receipt for your purchase.
 		 */
 		virtual void requestFailed(const Purchase& purchase,
 			const int errorCode) {};

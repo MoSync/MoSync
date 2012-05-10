@@ -132,6 +132,20 @@ namespace Purchase
 	}
 
 	/**
+	 * Get the product price.
+	 * Platform: Android.
+	 */
+	int Receipt::getPrice()
+	{
+		char buffer[BUF_SIZE];
+		maPurchaseGetField(mHandle,
+			MA_PURCHASE_RECEIPT_PRICE,
+			buffer,
+			BUF_SIZE);
+		return MAUtil::stringToInteger(buffer);
+	}
+
+	/**
 	 * Get a receipt field value.
 	 * Platform: Android and iOS.
 	 * @param field One of the MA_PURCHASE_RECEIPT constants.

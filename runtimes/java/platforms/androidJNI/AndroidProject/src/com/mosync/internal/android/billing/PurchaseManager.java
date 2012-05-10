@@ -28,7 +28,7 @@ import com.mosync.internal.android.billing.request.RestoreTransactions;
 import com.mosync.nativeui.util.HandleTable;
 
 import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_ERROR_INVALID_HANDLE;
-import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_ERROR_PRODUCT_NOT_PURCHASED;
+import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_ERROR_NO_RECEIPT;
 import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_RES_OK;
 import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_STATE_FAILED;
 import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_STATE_IN_PROGRESS;
@@ -127,7 +127,6 @@ public class PurchaseManager extends IBillingObserver
 			{
 				mCurrentPurchaseHandle = handle;
 
-				// Send event! + message the request was sent successfully to Google Play.
 				purchase.setState(MA_PURCHASE_STATE_IN_PROGRESS);
 				purchase.setRequest(requestObj);
 
@@ -196,6 +195,11 @@ public class PurchaseManager extends IBillingObserver
 		PurchaseInformation purchase = m_PurchaseTable.get(handle);
 		if ( null != purchase )
 		{
+			if ( purchase.getState() != MA_PURCHASE_STATE_COMPLETED )
+			{
+//				MA_PURCHASE_RES_RECEIPT_NOT_AVAILABLE
+				return Consts.RECEIPT_NOT_AVAILABLE;
+			}
 			if ( field.equals(MA_PURCHASE_RECEIPT_PRODUCT_ID) )
 			{
 				return purchase.getProductID();
@@ -265,7 +269,7 @@ public class PurchaseManager extends IBillingObserver
 				mMoSyncThread.postEvent(BillingEvent.onVerifyReceipt(
 						handle,
 						MA_PURCHASE_STATE_RECEIPT_ERROR, // todo see if requires MA_PURCHASE_STATE_RECEIPT_INVALID
-						MA_PURCHASE_ERROR_PRODUCT_NOT_PURCHASED));
+						MA_PURCHASE_ERROR_NO_RECEIPT));
 			}
 		}
 		else
