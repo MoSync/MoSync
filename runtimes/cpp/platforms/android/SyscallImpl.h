@@ -47,9 +47,11 @@ public:
 	char* loadBinary(int resourceIndex, int size);
 	bool destroyBinaryResource(int resourceIndex);
 	void destroyResource(int resourceIndex);
-	void postEvent(MAEvent event);
-	void postEvent(MAEvent event, JNIEnv *jniEnv);
 	void setJNIEnvironment(JNIEnv* je, jobject jthis);
+	void postEvent(MAEvent event);
+	// TODO: This does not seem to be used. Delete it?
+	//void postEvent(MAEvent event, JNIEnv *jniEnv);
+	int getEventQueueSize();
 	void checkAndStoreAudioResource(int resourceIndex);
 
 	int getReloadHandle();
