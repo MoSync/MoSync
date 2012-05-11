@@ -73,6 +73,9 @@
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Source\maapi.cs" />
+    <Compile Include="Source\Modules\Audio\MoSyncAudio.cs" />
+    <Compile Include="Source\Modules\Audio\MoSyncAudioData.cs" />
+    <Compile Include="Source\Modules\Audio\MoSyncAudioInstance.cs" />
     <Compile Include="Source\Modules\GL\GL.cs" />
     <Compile Include="Source\Modules\GL\GLConstants.cs" />
     <Compile Include="Source\Modules\GL\GLTypes.cs" />
@@ -84,9 +87,11 @@
     <Compile Include="Source\Modules\MoSyncFileModule.cs" />
     <Compile Include="Source\Modules\MoSyncFontModule.cs" />
     <Compile Include="Source\Modules\MoSyncGraphicsModule.cs" />
+    <Compile Include="Source\Modules\MoSyncImagePickerModule.cs" />
     <Compile Include="Source\Modules\MoSyncMathModule.cs" />
     <Compile Include="Source\Modules\MoSyncMemoryModule.cs" />
     <Compile Include="Source\Modules\MoSyncMiscModule.cs" />
+    <Compile Include="Source\Modules\MoSyncModalDialogModule.cs" />
     <Compile Include="Source\Modules\MoSyncNativeUIModule.cs" />
     <Compile Include="Source\Modules\MoSyncOpenGLESModule.cs" />
     <Compile Include="Source\Modules\MoSyncScreenOrientationModule.cs" />
@@ -94,6 +99,7 @@
     <Compile Include="Source\Modules\NativeUI\MoSyncActivityIndicator.cs" />
     <Compile Include="Source\Modules\NativeUI\MoSyncAd.cs" />
     <Compile Include="Source\Modules\NativeUI\MoSyncCameraPreview.cs" />
+    <Compile Include="Source\Modules\NativeUI\MoSyncDialogView.cs" />
     <Compile Include="Source\Modules\NativeUI\MoSyncPanoramaView.cs" />
     <Compile Include="Source\Modules\NativeUI\MoSyncSearchBar.cs" />
     <Compile Include="Source\Modules\NativeUI\MoSyncStackScreen.cs" />

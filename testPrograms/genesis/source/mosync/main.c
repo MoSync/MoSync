@@ -39,6 +39,10 @@ md_ntsc_t md_ntsc;
 sms_ntsc_setup_t sms_setup;
 sms_ntsc_t sms_ntsc;
 
+void assert(int a)
+{
+}
+
 void my_malloc_handler(int size) {
 
 	//char temp[2048];
@@ -254,7 +258,7 @@ int MAMain()
 	/* initialize emulation */
   system_init();
   //audio_init(SOUND_FREQUENCY);
-sound_init(SOUND_FREQUENCY);
+  sound_init(SOUND_FREQUENCY);
 	
   /* initialize SDL audio */
 //  if (use_sound) use_sound = sdl_sound_init();

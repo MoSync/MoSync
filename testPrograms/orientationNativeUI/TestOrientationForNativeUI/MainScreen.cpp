@@ -33,11 +33,14 @@
 #define ORIENTATION_LANDSCAPE_LEFT "Landscape left"
 #define ORIENTATION_LANDSCAPE_RIGHT "Landscape right"
 
+#define SCREEN_ORIENTATION_LANDSCAPE_STRING "Landscape"
+#define SCREEN_ORIENTATION_PORTRAIT_STRING "Portrait"
+#define SCREEN_ORIENTATION_DYNAMIC_STRING "Dynamic (sensor based)"
+
 #include <conprint.h>
 #include <maapi.h>
 
 #include "MainScreen.h"
-#include "Util.h"
 
 /**
  * Constructor.
@@ -48,8 +51,13 @@ MainScreen::MainScreen() :
 	mPortraitUpsideDownCheckBox(NULL),
 	mLandscapeLeftCheckBox(NULL),
 	mLandscapeRightCheckBox(NULL),
-	mOrientationLabel(NULL)
+	mOrientationLabel(NULL),
+	mSetOrientationDescriptionLabel(NULL),
+	mSetOrientationButton(NULL),
+	mOrientationOptionsListView(NULL)
 {
+	mSelectedOrientation = -1;
+
 	createMainLayout();
 	mPortraitCheckBox->setState(true);
 
@@ -57,6 +65,8 @@ MainScreen::MainScreen() :
 	mPortraitUpsideDownCheckBox->addCheckBoxListener(this);
 	mLandscapeLeftCheckBox->addCheckBoxListener(this);
 	mLandscapeRightCheckBox->addCheckBoxListener(this);
+	mSetOrientationButton->addButtonListener(this);
+	mOrientationOptionsListView->addListViewListener(this);
 
 	mSupportedOrientations = MA_SCREEN_ORIENTATION_PORTRAIT;
 	mOrientationLabel->setText(ORIENTATION_PORTRAIT);
@@ -75,6 +85,8 @@ MainScreen::~MainScreen()
 	mPortraitUpsideDownCheckBox->removeCheckBoxListener(this);
 	mLandscapeLeftCheckBox->removeCheckBoxListener(this);
 	mLandscapeRightCheckBox->removeCheckBoxListener(this);
+	mSetOrientationButton->removeButtonListener(this);
+	mOrientationOptionsListView->removeListViewListener(this);
 }
 
 /**
@@ -142,6 +154,88 @@ void MainScreen::createMainLayout()
 	mOrientationLabel = new Label();
 	hLayout->addChild(mOrientationLabel);
 	mainLayout->addChild(hLayout);
+
+	// add widgets for changing the current orientation
+	mSetOrientationDescriptionLabel = new Label();
+	mSetOrientationDescriptionLabel->setText("Select a desired orientation from the list and press the set button");
+	mainLayout->addChild(mSetOrientationDescriptionLabel);
+
+	// create the list view containing the set orientation options
+	createSetOrientationListView();
+	mainLayout->addChild(mOrientationOptionsListView);
+
+	mSetOrientationButton = new Button();
+	mSetOrientationButton->fillSpaceHorizontally();
+	mSetOrientationButton->setText("Set selected orientation");
+	mainLayout->addChild(mSetOrientationButton);
+}
+
+void MainScreen::createSetOrientationListView()
+{
+	mOrientationOptionsListView = new ListView();
+
+	ListViewItem* item1 = new ListViewItem();
+	item1->setText(SCREEN_ORIENTATION_LANDSCAPE_STRING);
+	item1->setBackgroundColor(0xFFFFFF);
+	item1->setFontColor(0x000000);
+	item1->fillSpaceHorizontally();
+	mOrientationOptionsListView->addChild(item1);
+
+	ListViewItem* item2 = new ListViewItem();
+	item2->setText(SCREEN_ORIENTATION_PORTRAIT_STRING);
+	item2->setBackgroundColor(0xFFFFFF);
+	item2->setFontColor(0x000000);
+	item2->fillSpaceHorizontally();
+	mOrientationOptionsListView->addChild(item2);
+
+	ListViewItem* item3 = new ListViewItem();
+	item3->setText(SCREEN_ORIENTATION_DYNAMIC_STRING);
+	item3->setBackgroundColor(0xFFFFFF);
+	item3->setFontColor(0x000000);
+	item3->fillSpaceHorizontally();
+	mOrientationOptionsListView->addChild(item3);
+
+	mOrientationOptionsListView->fillSpaceHorizontally();
+}
+
+/**
+ * This method is called when a list view item is clicked.
+ * @param listView The list view object that generated the event.
+ * @param listViewItem The ListViewItem object that was clicked.
+ */
+void MainScreen::listViewItemClicked(ListView* listView, ListViewItem* listViewItem)
+{
+	if (listView == mOrientationOptionsListView)
+	{
+		// get the index of the selected list view item
+		int listViewItemIndex = -1;
+		for(int i = 0; i < listView->countChildWidgets(); i++)
+		{
+			ListViewItem* currentItem = (ListViewItem*)listView->getChild(i);
+			currentItem->setBackgroundColor(0xFFFFFF);
+
+			if (currentItem == listViewItem)
+			{
+				listViewItemIndex = i;
+			}
+		}
+
+		// change the background color of the selected list view item for highlighting
+		listViewItem->setBackgroundColor(0xFF0000);
+
+		if (listViewItemIndex == 0)
+		{
+			mSelectedOrientation = SCREEN_ORIENTATION_LANDSCAPE;
+		}
+		else if (listViewItemIndex == 1)
+		{
+			mSelectedOrientation = SCREEN_ORIENTATION_PORTRAIT;
+		}
+		else
+		{
+			mSelectedOrientation = SCREEN_ORIENTATION_DYNAMIC;
+		}
+	}
 }
 
 /**
@@ -151,8 +245,8 @@ void MainScreen::createMainLayout()
  * @param state True if the check box is checked, false otherwise.
  */
 void MainScreen::checkBoxStateChanged(
-    CheckBox* checkBox,
-    bool state)
+	CheckBox* checkBox,
+	bool state)
 {
 	bool isChecked;
 	if (checkBox == mPortraitCheckBox)
@@ -197,6 +291,20 @@ void MainScreen::checkBoxStateChanged(
 }
 
 /**
+ * This method is called if the touch-up event was inside the
+ * bounds of the button.
+ * @param button The button object that generated the event.
+ */
+void MainScreen::buttonClicked(Widget* button)
+{
+	if (button == mSetOrientationButton)
+	{
+		// set orientation
+		int result = maScreenSetOrientation(mSelectedOrientation);
+	}
+}
+
+/**
  * Changes the screen orientation bit mask.
  * @param cond If true, the orientation flag will be added to the screen
  * orientation bit mask, otherwise the flag is removed.
@@ -235,6 +343,22 @@ void MainScreen::orientationWillChange()
 	int screenWidth = this->getWidth();
 	printf("screenHeight = %d screenWidth = %d", screenHeight, screenWidth);
 
+	mOrientationLabel->setText(this->getOrientationString());
+}
+
+/**
+ * Called after the screen orientation has changed (available only on Windows Phone 7.1 platform
+ */
+void MainScreen::orientationDidChange()
+{
+	mOrientationLabel->setText(this->getOrientationString());
+}
+
+/**
+ * Gets the current orientation as a string
+ */
+MAUtil::String MainScreen::getOrientationString()
+{
 	int orientation = maScreenGetCurrentOrientation();
 	MAUtil::String orientationText;
 	switch (orientation)
@@ -252,5 +376,5 @@ void MainScreen::orientationWillChange()
 			orientationText = ORIENTATION_LANDSCAPE_RIGHT;
 			break;
 	}
-	mOrientationLabel->setText(orientationText);
+	return orientationText;
 }
