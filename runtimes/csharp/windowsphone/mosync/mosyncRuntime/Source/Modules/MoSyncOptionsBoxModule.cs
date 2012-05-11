@@ -120,7 +120,8 @@ namespace MoSync
             for (int i = 0; i < numberOfTitles; i++)
             {
                 String applicationMenuButtonTitle = _core.GetDataMemory().ReadWStringAtAddress(address);
-                address += applicationMenuButtonTitle.Length * 2 + 2;
+                // the encoding is UTF16 so the address of the next string is after all the characters and a null
+                address += applicationMenuButtonTitle.Length * sizeof(char) + sizeof(char);
 
                 ApplicationBarMenuItem applicationBarMenuItem = new ApplicationBarMenuItem();
                 applicationBarMenuItem.Text = applicationMenuButtonTitle;
