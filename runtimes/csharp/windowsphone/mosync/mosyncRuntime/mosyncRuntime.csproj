@@ -94,6 +94,7 @@
     <Compile Include="Source\Modules\MoSyncModalDialogModule.cs" />
     <Compile Include="Source\Modules\MoSyncNativeUIModule.cs" />
     <Compile Include="Source\Modules\MoSyncOpenGLESModule.cs" />
+    <Compile Include="Source\Modules\MoSyncOptionsBoxModule.cs" />
     <Compile Include="Source\Modules\MoSyncScreenOrientationModule.cs" />
     <Compile Include="Source\Modules\MoSyncSensorsModule.cs" />
     <Compile Include="Source\Modules\NativeUI\MoSyncActivityIndicator.cs" />
