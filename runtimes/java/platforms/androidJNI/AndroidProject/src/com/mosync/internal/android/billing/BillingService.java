@@ -124,7 +124,7 @@ public class BillingService extends Service implements ServiceConnection
      * @param startId an identifier for the invocation instance of this service
      */
     public void handleCommand(Intent intent, int startId)
-    {
+    {if (intent == null ) return;
         String action = intent.getAction();
         //TODO delete log.
         Log.e("@@MoSync","BillingService handleCommand: ---------- " + action);

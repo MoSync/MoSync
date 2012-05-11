@@ -36,6 +36,7 @@ namespace PurchaseTest
 	 * Constructor.
 	 */
 	MainScreen::MainScreen():
+		Screen(),
 		mMainLayout(NULL),
 		mLabelCoordY(0)
 	{

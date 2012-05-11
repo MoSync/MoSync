@@ -122,7 +122,7 @@ public class MoSyncPurchase
 	 */
 	public void maPurchaseSetPublicKey(String developerPublicKey)
 	{
-		if ( mPurchaseManager != null && developerPublicKey.length() > 50 )
+		if ( mPurchaseManager != null )//&& developerPublicKey.length() < 50 )
 		{
 			mPurchaseManager.setKey(developerPublicKey);
 		}
