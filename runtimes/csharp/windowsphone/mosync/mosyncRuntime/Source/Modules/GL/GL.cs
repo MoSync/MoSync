@@ -546,41 +546,6 @@ class GL : GLConstants
 		return true;
 	}
 
-	/*
-	private bool GetGLTypeInfo(int glType, out int sizeInBytes, out Type type)
-	{
-		switch (glType)
-		{
-			case GL_FLOAT:
-				sizeInBytes = sizeof(float);
-				type = typeof(float);
-				break;
-			case GL_BYTE:
-				sizeInBytes = sizeof(sbyte);
-				type = typeof(sbyte);
-				break;
-			case GL_UNSIGNED_BYTE:
-				sizeInBytes = sizeof(byte);
-				type = typeof(byte);
-				break;
-			case GL_SHORT:
-				sizeInBytes = sizeof(short);
-				type = typeof(short);
-				break;
-			case GL_UNSIGNED_SHORT:
-				sizeInBytes = sizeof(ushort);
-				type = typeof(ushort);
-				break;
-			default:
-				sizeInBytes = 0;
-				type = null;
-				return false;
-		}
-
-		return true;
-	}
-	*/
-
 	public CompareFunction GetCompareFunction(int glCompare)
 	{
 		switch (glCompare)
@@ -648,12 +613,6 @@ class GL : GLConstants
 		glMatrixMode(GL.GL_MODELVIEW);
 		glLoadIdentity();
 
-		/*
-		mMatrices[GLMatrixMode.MODELVIEW] = Matrix.Identity;
-		mMatrices[GLMatrixMode.PROJECTION] = Matrix.Identity;
-		mMatrices[GLMatrixMode.TEXTURE] = Matrix.Identity;
-		mCurrentMatrix = GLMatrixMode.MODELVIEW;
-		 */
 		mCurrentVertexPointer.clientStateEnabled = false;
 		mCurrentNormalPointer.clientStateEnabled = false;
 		for (int i = 0; i < GL.GL_MAX_TEXTURE_UNITS; i++)
@@ -683,7 +642,7 @@ class GL : GLConstants
 		mCurrentBlendFunc = BlendState.Opaque;
 
 		mDepthStencilState = DepthStencilState.None;
-
+		mGraphicsDevice.DepthStencilState = DepthStencilState.None;
 		glDepthFunc(GL.GL_LESS);
 
 		mNormalizeNormals = false;
@@ -718,9 +677,9 @@ class GL : GLConstants
 			case GL.GL_VENDOR:
 				return "MoSync";
 			case GL.GL_RENDERER:
-				return "XNA";
+				return "MoSync GLES2XNA";
 			case GL.GL_VERSION:
-				return "1.0";
+				return "OpenGL ES-CM 1.1";
 			case GL.GL_EXTENSIONS:
 				return "";
 			default:
@@ -784,9 +743,6 @@ class GL : GLConstants
 		{
 			case GL.GL_DEPTH_TEST:
 				mGraphicsDevice.DepthStencilState = DepthStencilState.None;
-				//mGraphicsDevice.DepthStencilState = DepthStencilState.None;
-				//if (mDepthStencilState != mGraphicsDevice.DepthStencilState)
-				//	mGraphicsDevice.DepthStencilState = mDepthStencilState;
 				break;
 			case GL.GL_DITHER:
 				break;
@@ -826,7 +782,6 @@ class GL : GLConstants
 	{
 		mBasicEffect.View = mMatrices[GLMatrixMode.MODELVIEW];
 		mBasicEffect.Projection = mMatrices[GLMatrixMode.PROJECTION];
-		//mBasicEffect.LightingEnabled = false;
 
 		if (mSmoothShadingEnabled && mCurrentColorPointer.clientStateEnabled)
 			mBasicEffect.VertexColorEnabled = true;
@@ -834,10 +789,10 @@ class GL : GLConstants
 		{
 			mBasicEffect.VertexColorEnabled = false;
 			mBasicEffect.DiffuseColor = mCurrentColor.ToVector3();
-			mBasicEffect.Alpha = 1.0f;
+			mBasicEffect.Alpha = 1.0f; // mCurrentClearColor.A;
 		}
 
-		mGraphicsDevice.BlendFactor = mCurrentColor;
+		//mGraphicsDevice.BlendFactor = mCurrentColor;
 		mGraphicsDevice.BlendState = mCurrentBlendFunc;
 
 		//if (mCurrentBoundTexture != -1)
@@ -2098,8 +2053,18 @@ class GL : GLConstants
 
 	bool SetConvertedPixels(SurfaceFormat surfaceFormat, int bytesPerPixel, int level, Texture2D texture, int format, int type, int xoffset, int yoffset, int width, int height, byte[] textureData, int textureDataOffset)
 	{
+		if (level != 0)
+		{
+			if (level >= texture.LevelCount)
+			{
+				// copy data to a new texture??
+
+			}
+		}
+
 		if (bytesPerPixel == 2)
 		{
+#if false
 			byte[] pixels = new byte[width * height * 2];
 			int pitch = width * 2;
 			for (int j = 0; j < height; j++)
@@ -2108,7 +2073,7 @@ class GL : GLConstants
 				{
 					int rgb565 = (int)(textureData[textureDataOffset + 1] << 8) | (int)textureData[textureDataOffset + 0];
 					int r = (rgb565 >> 11) & 31;
-					int g = (rgb565 >> 5) & 64;
+					int g = (rgb565 >> 5) & 63;
 					int b = rgb565 & 31;
 					int bgr565 = (b << 11) | (g << 5) | r;
 
@@ -2119,6 +2084,7 @@ class GL : GLConstants
 			}
 			textureDataOffset = 0;
 			textureData = pixels;
+#endif
 		}
 		else if (bytesPerPixel == 3)
 		{
@@ -2188,7 +2154,7 @@ class GL : GLConstants
 			}
 			else
 			{
-				//for (int j = height - 1; j >= 0; j--)
+#if false
 				for (int j = 0; j < height; j++)
 				{
 					for (int i = 0; i < pitch; i += 4)
@@ -2200,11 +2166,13 @@ class GL : GLConstants
 						textureDataOffset += 4;
 					}
 				}
-
+#endif
 			}
 
+#if false
 			textureDataOffset = 0;
 			textureData = pixels;
+#endif
 		}
 
 		texture.SetData<byte>(level, new Rectangle(xoffset, yoffset, width, height), textureData, textureDataOffset, width * height * bytesPerPixel);
@@ -2254,9 +2222,14 @@ class GL : GLConstants
 			return;
 		}
 
-		if (t == null)
+		if (level != 0) return;
+
+		if (t == null || t.Width < width || t.Height < height)
 		{
-			t = new Texture2D(mGraphicsDevice, width, height, true, surfaceFormat);
+			// how do we determine if mip mapping should be set? Should we always generate
+			// all the different mip map levels?
+			bool enableMipMapping = false;
+			t = new Texture2D(mGraphicsDevice, width, height, enableMipMapping, surfaceFormat);
 			mTextures[mCurrentBoundTexture] = t;
 		}
 
@@ -2291,6 +2264,8 @@ class GL : GLConstants
 				RaiseGLError(GL.GL_INVALID_OPERATION);
 				return;
 			}
+
+			if (level != 0) return;
 
 			Texture2D t = (Texture2D)mTextures[mCurrentBoundTexture];
 

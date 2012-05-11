@@ -136,6 +136,11 @@ namespace Wormhole
 		 */
 		virtual bool checksumHasChanged();
 
+		/**
+		 * Write the current checksum to file.
+		 */
+		virtual void writeChecksum();
+
 	protected:
 		/**
 		 * The screen widget that is the root of the UI.
