@@ -655,7 +655,9 @@ int jniRegisterNativeMethods(
 	return 0;
 }
 
-jint gNumJavaMethods = 9;
+// NOTE: Remember to update sNumJavaMethods when adding/removing
+// native methods!
+static jint sNumJavaMethods = 10;
 static JNINativeMethod sMethods[] =
 {
 	// name, signature, funcPtr
@@ -670,6 +672,7 @@ static JNINativeMethod sMethods[] =
 	{ "nativeCreateBinaryResource", "(II)I", (void*)nativeCreateBinaryResource },
 	{ "nativeCreatePlaceholder", "()I", (void*)nativeCreatePlaceholder },
 	{ "nativeExit", "()V", (void*)nativeExit }
+	// *** Update sNumJavaMethods when adding/removing a method! *** //
 };
 
 /**
@@ -695,7 +698,7 @@ jint JNI_OnLoad(JavaVM* vm, void* reserved)
 		env,
 		"com/mosync/internal/android/MoSyncThread",
 		sMethods,
-		gNumJavaMethods);
+		sNumJavaMethods);
 
 	return JNI_VERSION_1_4;
 }
