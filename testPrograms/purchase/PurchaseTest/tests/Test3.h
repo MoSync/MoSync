@@ -20,14 +20,18 @@
  * @file Test3.h
  * @author emma
  *
- * @brief  The user tries to buy a product, but does not set the public key.
+ * @brief The user tries to buy an unavailable product using the wrapper.
+ * ( The public key is set on Android, and checkBillingSupported was called).
  * Expected result:
- * - Android maPurchaseRequest fails with errorCode = MA_PURCHASE_ERROR_PUBLIC_KEY_NOT_SET.
- * - iOS: no need to run the test.
+ * - MA_PURCHASE_RES_UNAVAILABLE on devices with no billing support.
+ * - iOS: maPurchaseCreate fails with MA_PURCHASE_STATE_PRODUCT_INVALID.
+ * - Android: maPurchaseRequest fails with event type MA_PURCHASE_STATE_FAILED
+ * and errorCode = MA_PURCHASE_ERROR_INVALID_PRODUCT.
+ *
  */
 
-#ifndef PURCHASE_TEST2_H_
-#define PURCHASE_TEST2_H_
+#ifndef PURCHASE_TEST3_H_
+#define PURCHASE_TEST3_H_
 
 #include "ITest.h"
 #include "../Controller/IApplicationController.h"
@@ -36,16 +40,19 @@
 #include "../wrapper/Purchase.h"
 #include "../wrapper/PurchaseListener.h"
 
+#define IOS_UNAVAILABLE_PRODUCT_ID ""
+#define ANDROID_UNAVAILABLE_PRODUCT_ID "android.test.item_unavailable"
+
 using namespace IAP;
 
 namespace PurchaseTest
 {
 
 	/**
-	 * @brief Test a purchase without setting the public key.
-	 * Platform: Android.
+	 * @brief Test a purchase of an unavailable product.
+	 * Platform: Android and iOS.
 	 */
-	class Test2: public ITest,
+	class Test3: public ITest,
 		public IAP::PurchaseListener
 	{
 	public:
@@ -54,12 +61,12 @@ namespace PurchaseTest
 		 * @param applicationController Will be notified when test's status
 		 * changes.
 		 */
-		Test2(IApplicationController& applicationController);
+		Test3(IApplicationController& applicationController);
 
 		/**
 		 * Destructor.
 		 */
-		virtual ~Test2();
+		virtual ~Test3();
 
 		/**
 		 * Start the test.
@@ -134,4 +141,4 @@ namespace PurchaseTest
 
 } // namespace PurchaseTest
 
-#endif /* PURCHASE_TEST2_H_ */
+#endif /* PURCHASE_TEST3_H_ */

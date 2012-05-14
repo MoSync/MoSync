@@ -25,7 +25,7 @@
  */
 
 // Default size for labels
-#define LABEL_HEIGHT 20
+#define LABEL_HEIGHT 35
 
 #include "MainScreen.h"
 
@@ -41,7 +41,6 @@ namespace PurchaseTest
 		mLabelCoordY(0)
 	{
 		mMainLayout = new RelativeLayout();
-		mMainLayout->fillSpaceHorizontally();
 		mMainLayout->setScrollable(true);
 		this->setMainWidget(mMainLayout);
 	}

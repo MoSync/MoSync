@@ -32,6 +32,7 @@
 #include "../tests/ITest.h"
 #include "../tests/Test1.h"
 #include "../tests/Test2.h"
+#include "../tests/Test3.h"
 #include "../Util.h"
 
 namespace PurchaseTest
@@ -49,6 +50,8 @@ namespace PurchaseTest
 		mMainScreen = new MainScreen();
 		mMainScreen->show();
 
+		//TODO check platform version also.
+//		maGetSystemProperty("mosync.device.OS.version")
 		int platform = getPlatform();
 		if (platform != IOS &&
 			platform != ANDROID)
@@ -128,7 +131,12 @@ namespace PurchaseTest
 	{
 		//mTests.add(new Test1(*this));
 
-		mTests.add(new Test2(*this));
+		if ( getPlatform() == ANDROID )
+		{
+			mTests.add(new Test2(*this));
+		}
+		mTests.add(new Test3(*this));
+
 	}
 
 	/**

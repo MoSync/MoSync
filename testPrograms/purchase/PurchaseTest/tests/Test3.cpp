@@ -17,16 +17,20 @@
  */
 
 /**
- * @file Test2.cpp
+ * @file Test3.cpp
  * @author emma
  *
- * @brief  The user tries to buy a product, but does not set the public key.
+ * @brief The user tries to buy an unavailable product using the wrapper.
+ * ( The public key is set on Android, and checkBillingSupported was called).
  * Expected result:
- * - Android maPurchaseRequest fails with errorCode = MA_PURCHASE_ERROR_PUBLIC_KEY_NOT_SET.
- * - iOS: no need to run the test.
+ * - MA_PURCHASE_RES_UNAVAILABLE on devices with no billing support.
+ * - iOS: maPurchaseCreate fails with MA_PURCHASE_STATE_PRODUCT_INVALID.
+ * - Android: maPurchaseRequest fails with event type MA_PURCHASE_STATE_FAILED
+ * and errorCode = MA_PURCHASE_ERROR_INVALID_PRODUCT.
+ *
  */
 
-#include "Test2.h"
+#include "Test3.h"
 #include "../wrapper/PurchaseManager.h"
 
 namespace PurchaseTest
@@ -36,7 +40,7 @@ namespace PurchaseTest
 	 * @param applicationController Will be notified when test's status
 	 * changes.
 	 */
-	Test2::Test2(IApplicationController& applicationController):
+	Test3::Test3(IApplicationController& applicationController):
 		mApplicationController(applicationController)
 	{
 	}
@@ -44,7 +48,7 @@ namespace PurchaseTest
 	/**
 	 * Destructor.
 	 */
-	Test2::~Test2()
+	Test3::~Test3()
 	{
 		mPurchase->removePurchaseListener(this);
 	}
@@ -52,12 +56,17 @@ namespace PurchaseTest
 	/**
 	 * Start the test.
 	 */
-	void Test2::startTest()
+	void Test3::startTest()
 	{
+		PurchaseManager::getInstance()->setPublicKey("MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAkq5y2a2tbd9xjNfBwtxt1G/wKILzrHSWp3uAwQ/Iw2SkAF72cuoLUiliTkU6IXVhD95k1VsZRLQytKOIAmPOI/faGxbZovmfIq2u/F/Gd39AyUg2geLdhV+wMrgdFWwWiPwOXl+12zigOvJdAfsxNMLh0dhJW1RAK5OaT0TXkR5d26GiUYm6kt0SW4+FX1OSiavwE4NTPTtwqsjscWxBKXvICm0A+0OYtqv6wTC3uhVMDkTnrsVG9N4pTKSGmhz//dfqJIZKI56UD21I2hjsB+8XVxy0KV741x3NLBOruB5oGGlXbCQGHTu3ekY4g5jlusCxlD19327e7LxrooM9GQIDAQAB");
 		if ( getPlatform() == ANDROID )
 		{
-			mPurchase = new Purchase("android.test.purchased", this);
+			mPurchase = new Purchase(ANDROID_UNAVAILABLE_PRODUCT_ID, this);
 			mPurchase->addPurchaseListener(this);
+		}
+		else if ( getPlatform() == IOS )
+		{
+			mPurchase = new Purchase(IOS_UNAVAILABLE_PRODUCT_ID, this);
 		}
 	}
 
@@ -65,16 +74,16 @@ namespace PurchaseTest
 	 * Get the name of the test.
 	 * @return Test's name.
 	 */
-	MAUtil::String Test2::getTestName() const
+	MAUtil::String Test3::getTestName() const
 	{
-		return "Test a purchase without setting the public key.";
+		return "Test the purchase of an unavailable product";
 	}
 
 	/**
 	 * Get the reason why the test failed.
 	 * @return Reason why it failed.
 	 */
-	MAUtil::String Test2::getReason()
+	MAUtil::String Test3::getReason()
 	{
 		return "";
 	}
@@ -88,12 +97,18 @@ namespace PurchaseTest
 	 * Platform: iOS and Android.
 	 * @param purchase The object that sent the event.
 	 */
-	void Test2::productValid(const Purchase& purchase)
+	void Test3::productValid(const Purchase& purchase)
 	{
 		if ( purchase.getHandle() == mPurchase->getHandle()
 				&& getPlatform() == ANDROID)
 		{
 			mPurchase->requestPurchase();
+		}
+		else
+		{
+			mApplicationController.testFailed(*this);
+			MAUtil::String info = "Test3 failed on iOS, product handled as valid";
+			mApplicationController.log(info);
 		}
 	}
 
@@ -102,12 +117,20 @@ namespace PurchaseTest
 	 * Platform: iOS.
 	 * @param purchase The object that sent the event.
 	 */
-	void Test2::productInvalid(const Purchase& purchase)
+	void Test3::productInvalid(const Purchase& purchase)
 	{
-		if ( mPurchase->getHandle() == purchase.getHandle() )
+		//TODO to see if no event received, test failed, otherwise it hangs.
+		if ( purchase.getHandle() == mPurchase->getHandle()
+				&& getPlatform() == IOS)
+		{
+			mApplicationController.testSucceeded(*this);
+			MAUtil::String info = "Test3 succeeded";
+			mApplicationController.log(info);
+		}
+		else
 		{
 			mApplicationController.testFailed(*this);
-			MAUtil::String info = "Test2 failed, product invalid";
+			MAUtil::String info = "Test3 failed, product invalid";
 			mApplicationController.log(info);
 		}
 	}
@@ -118,14 +141,8 @@ namespace PurchaseTest
 	 * Platform: Android and iOS.
 	 * @param purchase The object that sent the event.
 	 */
-	void Test2::requestInProgress(const Purchase& purchase)
+	void Test3::requestInProgress(const Purchase& purchase)
 	{
-		if ( mPurchase->getHandle() == purchase.getHandle() )
-		{
-			mApplicationController.testFailed(*this);
-			MAUtil::String info = "Test2 failed, product is in progress";
-			mApplicationController.log(info);
-		}
 	}
 
 	/**
@@ -134,12 +151,12 @@ namespace PurchaseTest
 	 * Platform: Android and iOS.
 	 * @param purchase The object that sent the event.
 	 */
-	void Test2::requestCompleted(const Purchase& purchase)
+	void Test3::requestCompleted(const Purchase& purchase)
 	{
 		if ( mPurchase->getHandle() == purchase.getHandle() )
 		{
 			mApplicationController.testFailed(*this);
-			MAUtil::String info = "Test2 failed, product was purchased without public key";
+			MAUtil::String info = "Test3 failed, Unavailable product was purchased";
 			mApplicationController.log(info);
 		}
 	}
@@ -153,21 +170,21 @@ namespace PurchaseTest
 	 * (errorCode = MA_PURCHASE_ERROR_CANCELLED), you will still be
 	 * able to get a receipt for your purchase.
 	 */
-	void Test2::requestFailed(const Purchase& purchase,
+	void Test3::requestFailed(const Purchase& purchase,
 		const int errorCode)
 	{
 		if ( mPurchase->getHandle() == purchase.getHandle()
 				&& getPlatform() == ANDROID
-				&& errorCode == MA_PURCHASE_ERROR_PUBLIC_KEY_NOT_SET )
+				&& errorCode == MA_PURCHASE_ERROR_INVALID_PRODUCT )
 		{
 			mApplicationController.testSucceeded(*this);
-			MAUtil::String info = "Test2 succeeded";
+			MAUtil::String info = "Test3 succeeded";
 			mApplicationController.log(info);
 		}
 		else
 		{
 			mApplicationController.testFailed(*this);
-			MAUtil::String info = "Test2 failed, purchase failed for different reason";
+			MAUtil::String info = "Test3 failed, purchase failed for different reason";
 			mApplicationController.log(info);
 		}
 	}

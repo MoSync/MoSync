@@ -1,11 +1,13 @@
 Test case 1: The user makes a valid purchase.
 
+Test case 2: The user tries to buy a product, but does not set the public key. Expected result:
+	- Android maPurchaseRequest fails with errorCode = MA_PURCHASE_ERROR_PUBLIC_KEY_NOT_SET.
+	- iOS: do not run test.
+	NOTE Test2 must run before Test3 because the public key gets set in Test3.
 
-Test case2: The user tries to buy an unavailable product using the wrapper.  Expected result:
+Test case3: The user tries to buy an unavailable product using the wrapper.  Expected result:
 	- MA_PURCHASE_RES_UNAVAILABLE on devices with no billing support.
 	- iOS: maPurchaseCreate fails with MA_PURCHASE_STATE_PRODUCT_INVALID.
 	- Android: maPurchaseRequest fails with event type MA_PURCHASE_STATE_FAILED and errorCode = MA_PURCHASE_ERROR_INVALID_PRODUCT.
 
-Test case 3: The user tries to buy a product, but does not set the public key. Expected result:
-	- Android maPurchaseRequest fails with errorCode = MA_PURCHASE_ERROR_PUBLIC_KEY_NOT_SET.
-	- iOS: do not run test.
+Test case 4:
