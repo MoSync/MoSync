@@ -217,6 +217,8 @@ namespace MoSync
                 mView = mWebBrowser;
                 mWebBrowser.IsScriptEnabled = true;
 
+                mWebBrowser.IsGeolocationEnabled = true;
+
                 (Application.Current.RootVisual as Microsoft.Phone.Controls.PhoneApplicationFrame).BackKeyPress += new EventHandler<System.ComponentModel.CancelEventArgs>(BackKeyPressHandler);
 
                 mWebBrowser.GotFocus += new RoutedEventHandler(
