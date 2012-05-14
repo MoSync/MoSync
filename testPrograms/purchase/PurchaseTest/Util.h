@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2011 MoSync AB
+Copyright (C) 2012 MoSync AB
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License,
@@ -27,88 +27,98 @@ MA 02110-1301, USA.
 #define PURCHASE_UTIL_H_
 
 #include <mastring.h>		// C string functions
+#include <conprint.h>
 #include <mavsprintf.h>
 #include <MAUtil/String.h>
 
-#define IOS_PRODUCT_TYPE_1 "com.mosync.purchase2.consumable"
-#define ANDROID_PRODUCT_TYPE_1 ""
-#define IOS_PRODUCT_TYPE_2 "com.mosync.purchase2.nonconsumable"
-#define ANDROID_PRODUCT_TYPE_2 ""
-
-
-/**
- * On Android this is an managed product.
- * On iOS this is a consumable product.
- * This type of product can be purchased multiple times.
- */
-static MAUtil::String* sProductType1 = NULL;
-
-/**
- * On Android this is an unmanaged product.
- * On iOS this is a non-consumable product.
- * This type of product can be purchased only one time by a user.
- */
-static MAUtil::String* sProductType2 = NULL;
-
-#define BUF_MAX 256
-
-enum platform_code{
-	ANDROID = 0,
-	IOS = 1,
-	WINDOWSPHONE7 = 2
-};
-
-/**
- * Detects the current platform
- * @return platform_code specific for Android, iPhone OS or WindowsPhone
- */
-static int getPlatform()
+namespace PurchaseTest
 {
-	char platform[BUF_MAX];
-	maGetSystemProperty("mosync.device.OS", platform, BUF_MAX);
+	// Usual size for a buffer.
+	const int BUF_SIZE = 256;
 
-	if(strcmp(platform, "Android") == 0)
-	{
-		return ANDROID;
-	}
-	else
-	{
-		if(strcmp(platform, "iPhone OS") == 0)
-			return IOS;
-	}
-	return WINDOWSPHONE7;
-}
+	#define BUF_MAX 256
 
-/**
- * Creates the product types.
- * Call this method when the application starts.
- */
-static void createProductTypes()
-{
-	delete sProductType1;
-	delete sProductType2;
-
-	int platform = getPlatform();
-	if (platform == ANDROID)
+	enum platform_code
 	{
-		sProductType1 = new MAUtil::String(ANDROID_PRODUCT_TYPE_1);
-		sProductType2 = new MAUtil::String(ANDROID_PRODUCT_TYPE_2);
-	}
-	else if (platform == IOS)
-	{
-		sProductType1 = new MAUtil::String(IOS_PRODUCT_TYPE_1);
-		sProductType2 = new MAUtil::String(IOS_PRODUCT_TYPE_2);
-	}
-}
+		ANDROID = 0,
+		IOS = 1,
+		WINDOWSPHONE7 = 2
+	};
 
-/**
- * Destroy the product type strings.
- * Call this method when the app exits.
- */
-static void destroyProductTypes()
-{
-	delete sProductType1;
-	delete sProductType2;
-}
+	/**
+	 * Detects the current platform
+	 * @return platform_code specific for Android, iPhone OS or WindowsPhone
+	 */
+	extern int getPlatform();
+
+	/**
+	 * Store the products types used by the test classes.
+	 */
+	class ProductTypes
+	{
+	public:
+		/**
+		 * Return the instance to the singleton object.
+		 */
+		static ProductTypes& getInstance();
+
+		/**
+		 * Destroy the singleton object.
+		 */
+		static void destroyInstance();
+
+		/**
+		 * Get the first product type.
+		 * On Android this is an managed product.
+		 * On iOS this is a consumable product.
+		 * This type of product can be purchased multiple times.
+		 * @return The first product type.
+		 */
+		const MAUtil::String& getProductType1() const;
+
+		/**
+		 * Get the second product type.
+		 * On Android this is an unmanaged product.
+		 * On iOS this is a non-consumable product.
+		 * This type of product can be purchased only one time by a user.
+		 * @return The second product type.
+		 */
+		const MAUtil::String& getProductType2() const;
+
+	private:
+		/**
+		 * Constructor.
+		 */
+		ProductTypes();
+
+		/**
+		 * Destructor.
+		 */
+		~ProductTypes();
+
+	private:
+		/**
+		 * Class instance.
+		 */
+		static ProductTypes* mInstance;
+
+		/**
+		 * First product type.
+		 * On Android this is an managed product.
+		 * On iOS this is a consumable product.
+		 * This type of product can be purchased multiple times.
+		 */
+		MAUtil::String* mProductType1;
+
+		/**
+		 * Second product type.
+		 * On Android this is an unmanaged product.
+		 * On iOS this is a non-consumable product.
+		 * This type of product can be purchased only one time by a user.
+		 */
+		MAUtil::String* mProductType2;
+	};
+
+} // namespace PurchaseTest
 
 #endif /* PURCHASE_UTIL_H_ */

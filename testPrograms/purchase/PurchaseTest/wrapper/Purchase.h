@@ -72,6 +72,12 @@ namespace IAP
 		MAHandle getHandle() const;
 
 		/**
+		 * Get the product id of the purchase.
+		 * @return Purchase's product id.
+		 */
+		MAUtil::String getProductID();
+
+		/**
 		 * Request the user to purchase a product.
 		 * The system will handle the proccess of purchasing.
 		 * Note: if there are another requests in progress, the requests will

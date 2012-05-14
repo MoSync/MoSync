@@ -43,11 +43,10 @@ namespace PurchaseTest
 		mMainScreen(NULL),
 		mCountSucceededTests(0)
 	{
-		createProductTypes();
-
 		mMainScreen = new MainScreen();
 		mMainScreen->show();
 
+		this->log("Application started!");
 		int platform = getPlatform();
 		if (platform != IOS &&
 			platform != ANDROID)
@@ -57,7 +56,10 @@ namespace PurchaseTest
 		}
 		else
 		{
+			this->log("Creating tests...");
 			this->createTests();
+			this->log("Tests are created!");
+			this->runNextTest();
 		}
 	}
 
@@ -83,8 +85,6 @@ namespace PurchaseTest
 			mFailedTests.remove(0);
 			delete testName;
 		}
-
-		destroyProductTypes();
 	}
 
 	/**
@@ -93,6 +93,8 @@ namespace PurchaseTest
 	 */
 	void ApplicationController::testFailed(ITest& test)
 	{
+		this->log("Test failed!");
+		this->log("================================");
 		MAUtil::String* testName = new MAUtil::String(test.getTestName());
 		mFailedTests.add(testName);
 		mTests.remove(0);
@@ -105,6 +107,8 @@ namespace PurchaseTest
 	 */
 	void ApplicationController::testSucceeded(ITest& test)
 	{
+		this->log("Test succeeded!");
+		this->log("================================");
 		mCountSucceededTests++;
 		mTests.remove(0);
 		this->runNextTest();
@@ -114,7 +118,7 @@ namespace PurchaseTest
 	 * Print log on the screen.
 	 * @param text Text to be printed.
 	 */
-	void ApplicationController::log(MAUtil::String& text)
+	void ApplicationController::log(const MAUtil::String& text)
 	{
 		mMainScreen->printText(text);
 	}
@@ -137,7 +141,11 @@ namespace PurchaseTest
 			this->finishTesting();
 			return;
 		}
+		this->log("================================");
 		ITest* test = mTests[0];
+		char buffer[BUF_MAX];
+		sprintf(buffer, "Started test %s", test->getTestName().c_str());
+		this->log(buffer);
 		test->startTest();
 	}
 
@@ -147,7 +155,17 @@ namespace PurchaseTest
 	 */
 	void ApplicationController::finishTesting()
 	{
+		this->log("All tests have been completed!");
 
+		char buffer[512];
+		sprintf(buffer, "%d test succeeded!", mCountSucceededTests);
+		this->log(buffer);
+
+		this->log("The tests that failed are:");
+		for(int i = 0; i < mFailedTests.size(); i++)
+		{
+			this->log(*(mFailedTests[i]));
+		}
 	}
 
 } // namespace PurchaseTest

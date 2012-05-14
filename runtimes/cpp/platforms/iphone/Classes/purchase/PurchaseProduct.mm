@@ -116,13 +116,13 @@ NSString* const kReceiptResponseReceiptKey = @"receipt";
     self = [super init];
     if (self)
     {
+        _payment = nil;
         _handle = productHandle;
         _productID = [productID retain];
         NSSet* productSet = [NSSet setWithObject:_productID];
         _productRequest = [[SKProductsRequest alloc] initWithProductIdentifiers:productSet];
         _productRequest.delegate = self;
         [_productRequest start];
-        _payment = nil;
 
         [self createParserComponents];
     }
@@ -173,6 +173,8 @@ NSString* const kReceiptResponseReceiptKey = @"receipt";
     if (isValid)
     {
         _product = [[response.products objectAtIndex:0] retain];
+        _payment = [[SKMutablePayment paymentWithProduct:_product] retain];
+        _payment.quantity = 1;
     }
 }
 

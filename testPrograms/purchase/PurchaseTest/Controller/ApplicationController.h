@@ -72,7 +72,7 @@ namespace PurchaseTest
 		 * Print log on the screen.
 		 * @param text Text to be printed.
 		 */
-		virtual void log(MAUtil::String& text);
+		virtual void log(const MAUtil::String& text);
 
 	private:
 		/**

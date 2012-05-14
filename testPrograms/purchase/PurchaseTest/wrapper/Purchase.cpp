@@ -24,6 +24,11 @@
  * @brief
  */
 
+// Size of the buffer used to get product's id.
+#define PRODUCT_ID_BUFFER_SIZE 1024
+
+#include <conprint.h>
+
 #include "Purchase.h"
 #include "Receipt.h"
 #include "PurchaseManager.h"
@@ -39,13 +44,15 @@ namespace IAP
 	 * @param listener The listener that will receive purchase events.
 	 */
 	Purchase::Purchase(const MAUtil::String& productID,
-	PurchaseListener* listener):
+		PurchaseListener* listener):
 		mHandle(-1),
 		mReceipt(NULL)
 	{
+		this->addPurchaseListener(listener);
 		mHandle = maCreatePlaceholder();
-		maPurchaseCreate(mHandle, productID.c_str());
+		printf("create product productID.c_str() = %s", productID.c_str());
 		PurchaseManager::getInstance()->registerPurchase(this);
+		maPurchaseCreate(mHandle, productID.c_str());
 	}
 
 	/**
@@ -80,6 +87,17 @@ namespace IAP
 	MAHandle Purchase::getHandle() const
 	{
 		return mHandle;
+	}
+
+	/**
+	 * Get the product id of the purchase.
+	 * @return Purchase's product id.
+	 */
+	MAUtil::String Purchase::getProductID()
+	{
+		char buffer[PRODUCT_ID_BUFFER_SIZE];
+		maPurchaseGetName(mHandle, buffer, PRODUCT_ID_BUFFER_SIZE);
+		return buffer;
 	}
 
 	/**

@@ -451,6 +451,10 @@ static PurchaseManager *sharedInstance = nil;
     for (PurchaseProduct* product in [_productsDictionary allValues])
     {
         SKPayment* productPayment = [product payment];
+        if (!productPayment)
+        {
+            continue;
+        }
         if ([payment isEqual:productPayment])
         {
             return product;

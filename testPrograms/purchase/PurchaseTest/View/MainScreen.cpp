@@ -25,7 +25,7 @@
  */
 
 // Default size for labels
-#define LABEL_HEIGHT 20
+#define LABEL_HEIGHT 35
 
 #include "MainScreen.h"
 
