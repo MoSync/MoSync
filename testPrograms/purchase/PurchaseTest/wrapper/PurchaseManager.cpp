@@ -42,7 +42,7 @@ namespace IAP
 	* - MA_PURCHASE_RES_OK if purchase is supported/allowed on the device.
 	* - MA_PURCHASE_RES_DISABLED if purchase is not allowed/enabled.
 	*/
-	int checkPurchaseSupported()
+	int PurchaseManager::checkPurchaseSupported()
 	{
 		return maPurchaseSupported();
 	}
@@ -112,6 +112,14 @@ namespace IAP
 	void PurchaseManager::setStoreURL(const MAUtil::String& url)
 	{
 		maPurchaseSetStoreURL(url.c_str());
+	}
+
+	/**
+	 *
+	 */
+	void restoreTransactions()
+	{
+
 	}
 
 	/**

@@ -33,6 +33,10 @@
 #include "../tests/Test1.h"
 #include "../tests/Test2.h"
 #include "../tests/Test3.h"
+#include "../tests/Test4.h"
+#include "../tests/Test5.h"
+#include "../tests/Test6.h"
+#include "../tests/Test7.h"
 #include "../Util.h"
 
 namespace PurchaseTest
@@ -136,6 +140,10 @@ namespace PurchaseTest
 			mTests.add(new Test2(*this));
 		}
 		mTests.add(new Test3(*this));
+		mTests.add(new Test4(*this));
+		mTests.add(new Test5(*this));
+		mTests.add(new Test6(*this));
+		mTests.add(new Test7(*this));
 
 	}
 

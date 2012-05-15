@@ -62,12 +62,12 @@ namespace PurchaseTest
 		if ( getPlatform() == ANDROID )
 		{
 			mPurchase = new Purchase(ANDROID_UNAVAILABLE_PRODUCT_ID, this);
-			mPurchase->addPurchaseListener(this);
 		}
 		else if ( getPlatform() == IOS )
 		{
 			mPurchase = new Purchase(IOS_UNAVAILABLE_PRODUCT_ID, this);
 		}
+		mPurchase->addPurchaseListener(this);
 	}
 
 	/**

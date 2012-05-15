@@ -50,10 +50,10 @@ public class BillingEvent
 				MA_PURCHASE_EVENT_VERIFY_RECEIPT, MA_PURCHASE_STATE_RECEIPT_VALID, 0, 0);
 	}
 
-	public static int[] onRestoreTransaction(int state, int purchaseHandle)
+	public static int[] onRestoreTransaction(int state, int purchaseHandle, int errorCode)
 	{
 		return setPurchaseEventData(
-				MA_PURCHASE_EVENT_RESTORE, state, purchaseHandle, 0);
+				MA_PURCHASE_EVENT_RESTORE, state, purchaseHandle, errorCode);
 	}
 
 	public static int[] onVerifyReceipt(int handle, int state, int errorCode)
