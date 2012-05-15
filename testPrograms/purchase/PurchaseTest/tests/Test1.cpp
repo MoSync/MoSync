@@ -26,8 +26,7 @@
 
 #define TEST_NAME "Test 1"
 
-#define IOS_PRODUCT_ID "com.mosync.purchase2.consumable"
-#define ANDROID_PRODUCT_ID ""
+#include <conprint.h>
 
 #include "Test1.h"
 #include "../Util.h"
@@ -61,7 +60,9 @@ namespace PurchaseTest
 	 */
 	void Test1::startTest()
 	{
-
+		MAUtil::String productType = ProductTypes::getInstance().getProductType1();
+		printf("Test1::startTest sProductType1 = %s", productType.c_str());
+		mPurchase = new Purchase(productType, this);
 	}
 
 	/**
@@ -80,7 +81,12 @@ namespace PurchaseTest
 	 */
 	void Test1::productValid(const Purchase& purchase)
 	{
-
+		char buffer[BUF_SIZE];
+		sprintf(buffer, "%s product is valid.",
+				mPurchase->getProductId().c_str());
+		mApplicationController.log(buffer);
+		mApplicationController.log("Requesting purchase...");
+		mPurchase->requestPurchase();
 	}
 
 	/**
@@ -90,7 +96,12 @@ namespace PurchaseTest
 	 */
 	void Test1::productInvalid(const Purchase& purchase)
 	{
-
+		char buffer[BUF_SIZE];
+		sprintf(buffer, "%s product is invalid.",
+				mPurchase->getProductId().c_str());
+		mApplicationController.log(buffer);
+		this->setFailedReason(buffer);
+		mApplicationController.testFailed(*this);
 	}
 
 	/**
@@ -101,7 +112,7 @@ namespace PurchaseTest
 	 */
 	void Test1::requestInProgress(const Purchase& purchase)
 	{
-
+		mApplicationController.log("Request in progress...");
 	}
 
 	/**
@@ -112,7 +123,8 @@ namespace PurchaseTest
 	 */
 	void Test1::requestCompleted(const Purchase& purchase)
 	{
-
+		mApplicationController.log("Product purchased!");
+		mApplicationController.testSucceeded(*this);
 	}
 
 	/**

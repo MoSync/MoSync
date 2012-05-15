@@ -60,4 +60,14 @@ namespace PurchaseTest
 		}
 		return *mFailedReason;
 	}
+
+	/**
+	 * Set the reason why the test failed.
+	 * @param reason The reason why it failed.
+	 */
+	void ITest::setFailedReason(const MAUtil::String& reason)
+	{
+		delete mFailedReason;
+		mFailedReason = new MAUtil::String(reason);
+	}
 }

@@ -27,6 +27,7 @@
 #include <MAUtil/Moblet.h>
 
 #include "Controller/ApplicationController.h"
+#include "Util.h"
 
 namespace PurchaseTest
 {

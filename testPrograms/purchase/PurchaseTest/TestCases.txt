@@ -1,4 +1,4 @@
-NOTE: The In-app Purchase API does not work on Android emulator.
+NOTE: The In-app Purchase API does not work on Android emulator or iOS Simulator.
 
 Test case 1: The user makes a valid purchase.
 
@@ -35,3 +35,7 @@ Test case 7: Test checkPurchaseSupported. Expected result: call returns MA_PURCH
 Test case : RestoreTransactions with no public key set.  ( Move this before Test3 )
 	- IOS: do not run test.
 	- Android: restoreTransactions fails, expected event: purchaseRestoreError with errorCode = MA_PURCHASE_ERROR_PUBLIC_KEY_NOT_SET.
+
+Test case 8: Create two products using the same product handle.
+            Expected result: the second product should receive an purchase
+            event with MA_PURCHASE_STATE_DUPLICATE_HANDLE as state.

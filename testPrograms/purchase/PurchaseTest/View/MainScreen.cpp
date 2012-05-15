@@ -27,6 +27,8 @@
 // Default size for labels
 #define LABEL_HEIGHT 35
 
+#include <conprint.h>
+
 #include "MainScreen.h"
 
 namespace PurchaseTest
@@ -60,6 +62,7 @@ namespace PurchaseTest
 	 */
 	void MainScreen::printText(const MAUtil::String& text)
 	{
+		printf("LOG: %s", text.c_str());
 		Label* label = new Label();
 		label->setLeftPosition(0);
 		label->setTopPosition(mLabelCoordY);

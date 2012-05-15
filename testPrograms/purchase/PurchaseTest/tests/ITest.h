@@ -68,6 +68,13 @@ namespace PurchaseTest
 		 */
 		virtual ~ITest();
 
+	protected:
+		/**
+		 * Set the reason why the test failed.
+		 * @param reason The reason why it failed.
+		 */
+		void setFailedReason(const MAUtil::String& reason);
+
 	private:
 		/**
 		 * In case the test fails this string will contain the reason.

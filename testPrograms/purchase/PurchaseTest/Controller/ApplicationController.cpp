@@ -37,6 +37,7 @@
 #include "../tests/Test5.h"
 #include "../tests/Test6.h"
 #include "../tests/Test7.h"
+#include "../tests/Test8.h"
 #include "../Util.h"
 
 namespace PurchaseTest
@@ -49,10 +50,10 @@ namespace PurchaseTest
 		mMainScreen(NULL),
 		mCountSucceededTests(0)
 	{
-		createProductTypes();
-
 		mMainScreen = new MainScreen();
 		mMainScreen->show();
+
+		this->log("Application started!");
 
 		//TODO check platform version also.
 //		maGetSystemProperty("mosync.device.OS.version")
@@ -65,7 +66,9 @@ namespace PurchaseTest
 		}
 		else
 		{
+			this->log("Creating tests...");
 			this->createTests();
+			this->log("Tests are created!");
 			this->runNextTest();
 		}
 	}
@@ -92,8 +95,6 @@ namespace PurchaseTest
 			mFailedTests.remove(0);
 			delete testName;
 		}
-
-		destroyProductTypes();
 	}
 
 	/**
@@ -102,9 +103,15 @@ namespace PurchaseTest
 	 */
 	void ApplicationController::testFailed(ITest& test)
 	{
+		this->log("Test failed!");
+		this->log("================================");
 		MAUtil::String* testName = new MAUtil::String(test.getTestName());
 		mFailedTests.add(testName);
+
+		ITest* testAux = mTests[0];
 		mTests.remove(0);
+		delete testAux;
+
 		this->runNextTest();
 	}
 
@@ -114,8 +121,14 @@ namespace PurchaseTest
 	 */
 	void ApplicationController::testSucceeded(ITest& test)
 	{
+		this->log("Test succeeded!");
+		this->log("================================");
 		mCountSucceededTests++;
+
+		ITest* testAux = mTests[0];
 		mTests.remove(0);
+		delete testAux;
+
 		this->runNextTest();
 	}
 
@@ -123,7 +136,7 @@ namespace PurchaseTest
 	 * Print log on the screen.
 	 * @param text Text to be printed.
 	 */
-	void ApplicationController::log(MAUtil::String& text)
+	void ApplicationController::log(const MAUtil::String& text)
 	{
 		mMainScreen->printText(text);
 	}
@@ -133,7 +146,7 @@ namespace PurchaseTest
 	 */
 	void ApplicationController::createTests()
 	{
-		//mTests.add(new Test1(*this));
+//		mTests.add(new Test1(*this));
 		// Test2 will always succeed on iOS.
 		mTests.add(new Test2(*this));
 		mTests.add(new Test3(*this));
@@ -141,7 +154,7 @@ namespace PurchaseTest
 		mTests.add(new Test5(*this));
 		mTests.add(new Test6(*this));
 		mTests.add(new Test7(*this));
-
+		mTests.add(new Test8(*this));
 	}
 
 	/**
@@ -154,7 +167,11 @@ namespace PurchaseTest
 			this->finishTesting();
 			return;
 		}
+		this->log("================================");
 		ITest* test = mTests[0];
+		char buffer[BUF_MAX];
+		sprintf(buffer, "Started test %s", test->getTestName().c_str());
+		this->log(buffer);
 		test->startTest();
 	}
 
@@ -164,7 +181,17 @@ namespace PurchaseTest
 	 */
 	void ApplicationController::finishTesting()
 	{
+		this->log("All tests have been completed!");
 
+		char buffer[512];
+		sprintf(buffer, "%d test succeeded!", mCountSucceededTests);
+		this->log(buffer);
+
+		this->log("The tests that failed are:");
+		for(int i = 0; i < mFailedTests.size(); i++)
+		{
+			this->log(*(mFailedTests[i]));
+		}
 	}
 
 } // namespace PurchaseTest
