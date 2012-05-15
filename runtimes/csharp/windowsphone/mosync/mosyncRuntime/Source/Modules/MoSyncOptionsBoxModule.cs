@@ -145,7 +145,6 @@ namespace MoSync
              */
             postApplicationBarMenuEvent(mApplicationBarMenuItems.Count + 1);
 
-            // hide the application bar
             mApplicationBar.IsVisible = false;
         }
 
@@ -170,7 +169,6 @@ namespace MoSync
              */
             postApplicationBarMenuEvent(index);
 
-            // hide the application bar
             mApplicationBar.IsVisible = false;
         }
 
@@ -187,7 +185,6 @@ namespace MoSync
              */
             postApplicationBarMenuEvent(0);
 
-            // hide the application bar
             mApplicationBar.IsVisible = false;
         }
 
