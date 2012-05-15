@@ -58,7 +58,7 @@ public class Purchase extends BaseRequest
 
         mProductID = productID;
         mActivity = appActivity;
-        mProductHandle = handle;
+        mHandle = handle;
 
         // Check compatibility of startIntentSender method, available only from Android 2.0.
         try {
@@ -77,8 +77,8 @@ public class Purchase extends BaseRequest
 		Bundle request = BillingService
 				.createRequestBundle(Consts.METHOD_REQUEST_PURCHASE);
 		request.putString(Consts.BILLING_REQUEST_ITEM_ID, mProductID);
-		request.putInt(Consts.BILLING_REQUEST_DEVELOPER_PAYLOAD, mProductHandle);
-		// Send the productID as the developer payload.
+		// Send the productHandle as the developer payload.
+		request.putString(Consts.BILLING_REQUEST_DEVELOPER_PAYLOAD, Integer.toString(mHandle));
 		Bundle response = mService.sendBillingRequest(request);
 
 		PendingIntent pendingIntent = response.getParcelable(Consts.BILLING_RESPONSE_PURCHASE_INTENT);
@@ -141,7 +141,6 @@ public class Purchase extends BaseRequest
 
 	/************************ Class members ************************/
     private String mProductID = null;
-    private int mProductHandle = -1;
     private Activity mActivity;
     private Method mStartIntentSender;
     private Object[] mStartIntentSenderArgs = new Object[5];

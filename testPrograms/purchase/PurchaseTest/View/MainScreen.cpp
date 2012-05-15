@@ -36,11 +36,11 @@ namespace PurchaseTest
 	 * Constructor.
 	 */
 	MainScreen::MainScreen():
+		Screen(),
 		mMainLayout(NULL),
 		mLabelCoordY(0)
 	{
 		mMainLayout = new RelativeLayout();
-		mMainLayout->fillSpaceHorizontally();
 		mMainLayout->setScrollable(true);
 		this->setMainWidget(mMainLayout);
 	}

@@ -87,6 +87,7 @@ public class BillingService extends Service implements ServiceConnection
 		try
 		{
 			mPublicKey = Security.generatePublicKey(developerPublicKey);
+			mIsPublicKeySet = true;
 		} catch (Exception ex)
 		{
 			SYSLOG("maPurchaseSetPublicKey: malformed developerPublicKey");
@@ -124,7 +125,7 @@ public class BillingService extends Service implements ServiceConnection
      * @param startId an identifier for the invocation instance of this service
      */
     public void handleCommand(Intent intent, int startId)
-    {
+    {if (intent == null ) return;
         String action = intent.getAction();
         //TODO delete log.
         Log.e("@@MoSync","BillingService handleCommand: ---------- " + action);
@@ -296,11 +297,9 @@ public class BillingService extends Service implements ServiceConnection
      * Check if the public key was set.
      * @return
      */
-    boolean isPublicKeySet()
+    public boolean isPublicKeySet()
     {
-		if (mPublicKey != null)
-			return true;
-		return false;
+		return mIsPublicKeySet;
     }
 
     /**
@@ -550,7 +549,8 @@ public class BillingService extends Service implements ServiceConnection
 	/**
 	 * The developer public key.
 	 */
-	private PublicKey mPublicKey = null;
+	private static PublicKey mPublicKey = null;
+	private boolean mIsPublicKeySet = false;
 
 	private static boolean mPurchaseRequestInProgress = false;
 	public static int mCurrentPurchaseHandle = -1;

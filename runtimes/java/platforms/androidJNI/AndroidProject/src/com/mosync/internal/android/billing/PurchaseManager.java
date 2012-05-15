@@ -91,22 +91,21 @@ public class PurchaseManager extends IBillingObserver
 	 */
 	public void requestPurchase(int handle)
 	{
-		if ( !mService.isPublicKeySet() )
-		{
-			Log.e("@@MoSync","maPurchaseRequest error: public key not set");
-			mMoSyncThread.postEvent(BillingEvent.onPurchaseStateChanged(
-					handle,
-					MA_PURCHASE_STATE_FAILED,
-					MA_PURCHASE_ERROR_PUBLIC_KEY_NOT_SET));
-			return;
-		}
-
 		if ( !mService.isConnected() )
 		{
 			mMoSyncThread.postEvent(BillingEvent.onPurchaseStateChanged(
 					handle,
 					MA_PURCHASE_STATE_FAILED,
 					MA_PURCHASE_ERROR_CONNECTION_FAILED));
+			return;
+		}
+
+		if ( !mService.isPublicKeySet() )
+		{
+			mMoSyncThread.postEvent(BillingEvent.onPurchaseStateChanged(
+					handle,
+					MA_PURCHASE_STATE_FAILED,
+					MA_PURCHASE_ERROR_PUBLIC_KEY_NOT_SET));
 			return;
 		}
 

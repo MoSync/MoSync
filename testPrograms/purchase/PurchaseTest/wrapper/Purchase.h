@@ -79,7 +79,7 @@ namespace IAP
 
 		/**
 		 * Request the user to purchase a product.
-		 * The system will handle the proccess of purchasing.
+		 * The system will handle the process of purchasing.
 		 * Note: if there are another requests in progress, the requests will
 		 * be queued.
 		 * Listeners will be notified.
