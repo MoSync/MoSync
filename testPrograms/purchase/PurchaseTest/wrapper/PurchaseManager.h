@@ -107,7 +107,10 @@ namespace IAP
 		void setStoreURL(const MAUtil::String& url);
 
 		/**
-		 *
+		 * Restore transactions that were previously finished so that you can process
+		 * them again. For example, your application would use this to allow a user to
+		 * unlock previously purchased content onto a new device.
+		 * Listeners will be notified when a purchase is restored, or in the case of an error.
 		 */
 		void restoreTransactions();
 

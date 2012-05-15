@@ -115,11 +115,14 @@ namespace IAP
 	}
 
 	/**
-	 *
+	 * Restore transactions that were previously finished so that you can process
+	 * them again. For example, your application would use this to allow a user to
+	 * unlock previously purchased content onto a new device.
+	 * Listeners will be notified when a purchase is restored, or in the case of an error.
 	 */
-	void restoreTransactions()
+	void PurchaseManager::restoreTransactions()
 	{
-
+		maPurchaseRestoreTransactions();
 	}
 
 	/**
@@ -136,7 +139,17 @@ namespace IAP
 			MAPurchaseEventData purchaseData = event.purchaseData;
 			if (purchaseData.type == MA_PURCHASE_EVENT_RESTORE)
 			{
-				this->createRestoredProduct(purchaseData.productHandle);
+				if ( purchaseData.state == MA_PURCHASE_STATE_RESTORE_ERROR )
+				{
+					for (int i = 0; i < mListeners.size(); i++)
+					{
+						mListeners[i]->purchaseRestoreError(purchaseData.errorCode);
+					}
+				}
+				else
+				{
+					this->createRestoredProduct(purchaseData.productHandle);
+				}
 			}
 			else if (purchaseData.type == MA_PURCHASE_EVENT_REFUNDED)
 			{

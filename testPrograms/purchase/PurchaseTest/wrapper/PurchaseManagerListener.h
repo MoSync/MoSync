@@ -50,10 +50,17 @@ namespace IAP
 	public:
 		/**
 		 * Notifies that a purchase has been restored.
-		 * Platform: iOS.
+		 * Platform: iOS and Android.
 		 * @param purchase The purchase that has been restored.
 		 */
 		virtual void purchaseRestored(Purchase& purchase) = 0;
+
+		/**
+		 * Notifies that restoreTransactions() has failed.
+		 * @param errorCode The reason why it failed.
+		 * Platform: iOS and Android.
+		 */
+		virtual void purchaseRestoreError(int errorCode) = 0;
 
 		/**
 		 * Notifies that a purchase has been refunded.

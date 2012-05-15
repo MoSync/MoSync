@@ -55,6 +55,8 @@ namespace PurchaseTest
 	 */
 	void Test5::startTest()
 	{
+		MAUtil::String info = "Test5 in progress...";
+		mApplicationController.log(info);
 		if ( getPlatform() == ANDROID )
 		{
 			mPurchase = new Purchase(ANDROID_PRODUCT_ID, this);
@@ -72,7 +74,7 @@ namespace PurchaseTest
 	 */
 	MAUtil::String Test5::getTestName() const
 	{
-		return "Call verifyReceipt without previously buying the product.";
+		return "Test5";
 	}
 
 	/**
@@ -97,6 +99,8 @@ namespace PurchaseTest
 	{
 		if ( purchase.getHandle() == mPurchase->getHandle() )
 		{
+			MAUtil::String info = "Test5 in progress...";
+			mApplicationController.log(info);
 			mPurchase->verifyReceipt();
 		}
 	}
@@ -110,9 +114,9 @@ namespace PurchaseTest
 	{
 		if ( purchase.getHandle() == mPurchase->getHandle() )
 		{
-			mApplicationController.testFailed(*this);
 			MAUtil::String info = "Test5 failed, product invalid";
 			mApplicationController.log(info);
+			mApplicationController.testFailed(*this);
 		}
 	}
 
@@ -139,9 +143,9 @@ namespace PurchaseTest
 	{
 		if ( purchase.getHandle() == mPurchase->getHandle() )
 		{
-			mApplicationController.testFailed(*this);
 			MAUtil::String info = "Test5 failed, receipt is valid";
 			mApplicationController.log(info);
+			mApplicationController.testFailed(*this);
 		}
 	}
 
@@ -155,9 +159,9 @@ namespace PurchaseTest
 	{
 		if ( purchase.getHandle() == mPurchase->getHandle() )
 		{
-			mApplicationController.testFailed(*this);
 			MAUtil::String info = "Test5 failed,receipt was invalidated instead of returning an error";
 			mApplicationController.log(info);
+			mApplicationController.testFailed(*this);
 		}
 	}
 
@@ -174,15 +178,15 @@ namespace PurchaseTest
 		{
 			if (errorCode == MA_PURCHASE_ERROR_NO_RECEIPT )
 			{
-				mApplicationController.testSucceeded(*this);
 				MAUtil::String info = "Test5 succeeded";
 				mApplicationController.log(info);
+				mApplicationController.testSucceeded(*this);
 			}
 			else
 			{
-				mApplicationController.testFailed(*this);
 				MAUtil::String info = "Test5 failed,receipt failed with another code";
 				mApplicationController.log(info);
+				mApplicationController.testSucceeded(*this);
 			}
 		}
 	}

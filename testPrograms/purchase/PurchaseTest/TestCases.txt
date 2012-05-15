@@ -34,4 +34,4 @@ Test case 7: Test checkPurchaseSupported. Expected result: call returns MA_PURCH
 
 Test case : RestoreTransactions with no public key set.  ( Move this before Test3 )
 	- IOS: do not run test.
-	- Android: restoreTransactions fails, expected event: purchaseRestoreFailed with errorCode = MA_PURCHASE_ERROR_PUBLIC_KEY_NOT_SET.
+	- Android: restoreTransactions fails, expected event: purchaseRestoreError with errorCode = MA_PURCHASE_ERROR_PUBLIC_KEY_NOT_SET.

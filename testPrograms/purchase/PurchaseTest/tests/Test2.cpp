@@ -54,10 +54,18 @@ namespace PurchaseTest
 	 */
 	void Test2::startTest()
 	{
+		MAUtil::String info = "Test2 in progress...";
+		mApplicationController.log(info);
 		if ( getPlatform() == ANDROID )
 		{
 			mPurchase = new Purchase("android.test.purchased", this);
 			mPurchase->addPurchaseListener(this);
+		}
+		else
+		{
+			MAUtil::String info = "Test2 succeeded";
+			mApplicationController.log(info);
+			mApplicationController.testSucceeded(*this);
 		}
 	}
 
@@ -67,7 +75,7 @@ namespace PurchaseTest
 	 */
 	MAUtil::String Test2::getTestName() const
 	{
-		return "Test a purchase without setting the public key.";
+		return "Test2";
 	}
 
 	/**
@@ -106,9 +114,9 @@ namespace PurchaseTest
 	{
 		if ( mPurchase->getHandle() == purchase.getHandle() )
 		{
-			mApplicationController.testFailed(*this);
 			MAUtil::String info = "Test2 failed, product invalid";
 			mApplicationController.log(info);
+			mApplicationController.testFailed(*this);
 		}
 	}
 
@@ -122,9 +130,9 @@ namespace PurchaseTest
 	{
 		if ( mPurchase->getHandle() == purchase.getHandle() )
 		{
-			mApplicationController.testFailed(*this);
 			MAUtil::String info = "Test2 failed, product is in progress";
 			mApplicationController.log(info);
+			mApplicationController.testFailed(*this);
 		}
 	}
 
@@ -138,9 +146,9 @@ namespace PurchaseTest
 	{
 		if ( mPurchase->getHandle() == purchase.getHandle() )
 		{
-			mApplicationController.testFailed(*this);
 			MAUtil::String info = "Test2 failed, product was purchased without public key";
 			mApplicationController.log(info);
+			mApplicationController.testFailed(*this);
 		}
 	}
 
@@ -160,15 +168,15 @@ namespace PurchaseTest
 				&& getPlatform() == ANDROID
 				&& errorCode == MA_PURCHASE_ERROR_PUBLIC_KEY_NOT_SET )
 		{
-			mApplicationController.testSucceeded(*this);
 			MAUtil::String info = "Test2 succeeded";
 			mApplicationController.log(info);
+			mApplicationController.testSucceeded(*this);
 		}
 		else
 		{
-			mApplicationController.testFailed(*this);
 			MAUtil::String info = "Test2 failed, purchase failed for different reason";
 			mApplicationController.log(info);
+			mApplicationController.testFailed(*this);
 		}
 	}
 }

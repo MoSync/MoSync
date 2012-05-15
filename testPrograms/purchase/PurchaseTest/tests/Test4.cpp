@@ -52,6 +52,8 @@ namespace PurchaseTest
 	 */
 	void Test4::startTest()
 	{
+		MAUtil::String info = "Test4 in progress...";
+		mApplicationController.log(info);
 		if ( getPlatform() == ANDROID )
 		{
 			mPurchase = new Purchase(ANDROID_PRODUCT_ID, this);
@@ -69,7 +71,7 @@ namespace PurchaseTest
 	 */
 	MAUtil::String Test4::getTestName() const
 	{
-		return "Test get the product If of a purchase";
+		return "Test4";
 	}
 
 	/**
@@ -97,15 +99,15 @@ namespace PurchaseTest
 			if ( mPurchase->getProductId() == ANDROID_PRODUCT_ID ||
 				mPurchase->getProductId() == IOS_PRODUCT_ID )
 			{
-				mApplicationController.testSucceeded(*this);
 				MAUtil::String info = "Test4 succeeded";
 				mApplicationController.log(info);
+				mApplicationController.testSucceeded(*this);
 			}
 			else
 			{
-				mApplicationController.testFailed(*this);
 				MAUtil::String info = "Test4 failed, incorrect productId";
 				mApplicationController.log(info);
+				mApplicationController.testFailed(*this);
 			}
 		}
 	}
@@ -119,9 +121,9 @@ namespace PurchaseTest
 	{
 		if ( purchase.getHandle() == mPurchase->getHandle() )
 		{
-			mApplicationController.testFailed(*this);
 			MAUtil::String info = "Test4 failed, product invalid";
 			mApplicationController.log(info);
+			mApplicationController.testFailed(*this);
 		}
 	}
 

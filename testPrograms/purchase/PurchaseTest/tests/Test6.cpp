@@ -62,6 +62,8 @@ namespace PurchaseTest
 	 */
 	void Test6::startTest()
 	{
+		MAUtil::String info = "Test6 in progress...";
+		mApplicationController.log(info);
 		if ( getPlatform() == ANDROID )
 		{
 			mPurchase = new Purchase(ANDROID_UNAVAILABLE_PRODUCT_ID, this);
@@ -79,7 +81,7 @@ namespace PurchaseTest
 	 */
 	MAUtil::String Test6::getTestName() const
 	{
-		return "VerifyReceipt for an item that cannot be purchased.";
+		return "Test 6";
 	}
 
 	/**
@@ -110,9 +112,9 @@ namespace PurchaseTest
 			}
 			else
 			{
-				mApplicationController.testFailed(*this);
 				MAUtil::String info = "Test6 failed, product is validated on iOS";
 				mApplicationController.log(info);
+				mApplicationController.testFailed(*this);
 			}
 
 		}
@@ -133,9 +135,9 @@ namespace PurchaseTest
 			}
 			else
 			{
-				mApplicationController.testFailed(*this);
 				MAUtil::String info = "Test6 failed, product was invalidated on Android";
 				mApplicationController.log(info);
+				mApplicationController.testFailed(*this);
 			}
 
 		}
@@ -164,9 +166,9 @@ namespace PurchaseTest
 	{
 		if ( purchase.getHandle() == mPurchase->getHandle() )
 		{
-			mApplicationController.testFailed(*this);
 			MAUtil::String info = "Test6 failed, receipt is valid";
 			mApplicationController.log(info);
+			mApplicationController.testFailed(*this);
 		}
 	}
 
@@ -180,9 +182,9 @@ namespace PurchaseTest
 	{
 		if ( purchase.getHandle() == mPurchase->getHandle() )
 		{
-			mApplicationController.testFailed(*this);
 			MAUtil::String info = "Test6 failed,receipt was invalidated instead of returning an error";
 			mApplicationController.log(info);
+			mApplicationController.testFailed(*this);
 		}
 	}
 
@@ -199,15 +201,15 @@ namespace PurchaseTest
 		{
 			if (errorCode == MA_PURCHASE_ERROR_NO_RECEIPT )
 			{
-				mApplicationController.testSucceeded(*this);
 				MAUtil::String info = "Test6 succeeded";
 				mApplicationController.log(info);
+				mApplicationController.testSucceeded(*this);
 			}
 			else
 			{
-				mApplicationController.testFailed(*this);
 				MAUtil::String info = "Test6 failed,receipt failed with another code";
 				mApplicationController.log(info);
+				mApplicationController.testFailed(*this);
 			}
 		}
 	}

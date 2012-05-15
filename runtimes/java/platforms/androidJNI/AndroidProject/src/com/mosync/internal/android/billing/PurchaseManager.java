@@ -43,6 +43,7 @@ import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_RECEIPT_APP
 import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_ERROR_PUBLIC_KEY_NOT_SET;
 import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_ERROR_CONNECTION_FAILED;
 import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_ERROR_UNKNOWN;
+import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_STATE_RESTORE_ERROR;
 import static com.mosync.internal.android.MoSyncHelpers.*;
 
 /**
@@ -227,12 +228,12 @@ public class PurchaseManager extends IBillingObserver
 	 * the app waits for PURCHASE_STATE_CHANGE messages.
 	 */
 	public void restoreTransactions()
-	{/*
+	{
 		if ( !mService.isConnected() )
 		{
 			mMoSyncThread.postEvent(BillingEvent.onRestoreTransaction(
-					0, //replace with new error code.
-					0,
+					MA_PURCHASE_STATE_RESTORE_ERROR,
+					-1,
 					MA_PURCHASE_ERROR_CONNECTION_FAILED));
 			return;
 		}
@@ -240,11 +241,11 @@ public class PurchaseManager extends IBillingObserver
 		if ( !mService.isPublicKeySet() )
 		{
 			mMoSyncThread.postEvent(BillingEvent.onRestoreTransaction(
-					0,  //replace with new error code.
-					0,
+					MA_PURCHASE_STATE_RESTORE_ERROR,
+					-1,
 					MA_PURCHASE_ERROR_PUBLIC_KEY_NOT_SET));
 			return;
-		}*/
+		}
 
 		RestoreTransactions request = mService.restoreTransactions();
 		SYSLOG("@@MoSync maPurchaseRestoreTransactions requestID = " + request.getRequestID());

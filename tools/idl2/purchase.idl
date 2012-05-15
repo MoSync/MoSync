@@ -73,7 +73,8 @@ group PurchaseErrorCodes "Purchase Error Codes" {
         */
 		INVALID_HANDLE = -1;
         /**
-        * \brief Possible error code for #MA_PURCHASE_EVENT_RECEIPT_ERROR.
+        * \brief Possible error code for #MA_PURCHASE_EVENT_RECEIPT_ERROR,
+		* or #MA_PURCHASE_EVENT_RESTORE.
         * Indicates that the connection with the App Store / Google Play has failed.
         */
 		CONNECTION_FAILED = -2;
@@ -169,8 +170,8 @@ group PurchaseEventTypes "Purchase Event Types" {
 		REFUNDED = 3;
         /**
         * \brief Sent by the #maPurchaseRestoreTransactions() syscall.
-        * A new product has been restored. The event's productHandle member contains
-        * a handle to the purchased product.
+        * A new product has been restored, or the request has failed. The event's
+		* productHandle member contains a handle to the purchased product.
         * Platform: iOS and Android.
         */
 		RESTORE = 4;
@@ -248,6 +249,16 @@ group PurchaseStateCodes "Purchase State Codes" {
 		* Platform: Android and iOS.
 		*/
 		RECEIPT_ERROR = 6;
+		/**
+		* \brief Sent by the #maPurchaserestoreTransactions() syscall.
+		* Associated with #MA_PURCHASE_EVENT_RESTORE.
+		* Indicates that an error has occured while restoring transactions.
+		* The error can be one of the following: #MA_PURCHASE_ERROR_CONNECTION_FAILED,
+		* #MA_PURCHASE_ERROR_PUBLIC_KEY_NOT_SET.
+        * Check the event's errorCode member object for more information.
+		* Platform: Android and iOS.
+		*/
+		RESTORE_ERROR = -7;
 	}
 } // end of Purchase State Codes
 

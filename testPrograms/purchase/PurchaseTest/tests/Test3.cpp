@@ -58,6 +58,8 @@ namespace PurchaseTest
 	 */
 	void Test3::startTest()
 	{
+		MAUtil::String info = "Test3 in progress...";
+		mApplicationController.log(info);
 		PurchaseManager::getInstance()->setPublicKey("MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAkq5y2a2tbd9xjNfBwtxt1G/wKILzrHSWp3uAwQ/Iw2SkAF72cuoLUiliTkU6IXVhD95k1VsZRLQytKOIAmPOI/faGxbZovmfIq2u/F/Gd39AyUg2geLdhV+wMrgdFWwWiPwOXl+12zigOvJdAfsxNMLh0dhJW1RAK5OaT0TXkR5d26GiUYm6kt0SW4+FX1OSiavwE4NTPTtwqsjscWxBKXvICm0A+0OYtqv6wTC3uhVMDkTnrsVG9N4pTKSGmhz//dfqJIZKI56UD21I2hjsB+8XVxy0KV741x3NLBOruB5oGGlXbCQGHTu3ekY4g5jlusCxlD19327e7LxrooM9GQIDAQAB");
 		if ( getPlatform() == ANDROID )
 		{
@@ -76,7 +78,7 @@ namespace PurchaseTest
 	 */
 	MAUtil::String Test3::getTestName() const
 	{
-		return "Test the purchase of an unavailable product";
+		return "Test3";
 	}
 
 	/**
@@ -106,9 +108,9 @@ namespace PurchaseTest
 		}
 		else
 		{
-			mApplicationController.testFailed(*this);
 			MAUtil::String info = "Test3 failed on iOS, product handled as valid";
 			mApplicationController.log(info);
+			mApplicationController.testFailed(*this);
 		}
 	}
 
@@ -123,15 +125,15 @@ namespace PurchaseTest
 		if ( purchase.getHandle() == mPurchase->getHandle()
 				&& getPlatform() == IOS)
 		{
-			mApplicationController.testSucceeded(*this);
 			MAUtil::String info = "Test3 succeeded";
 			mApplicationController.log(info);
+			mApplicationController.testSucceeded(*this);
 		}
 		else
 		{
-			mApplicationController.testFailed(*this);
 			MAUtil::String info = "Test3 failed, product invalid";
 			mApplicationController.log(info);
+			mApplicationController.testFailed(*this);
 		}
 	}
 
@@ -155,9 +157,9 @@ namespace PurchaseTest
 	{
 		if ( mPurchase->getHandle() == purchase.getHandle() )
 		{
-			mApplicationController.testFailed(*this);
 			MAUtil::String info = "Test3 failed, Unavailable product was purchased";
 			mApplicationController.log(info);
+			mApplicationController.testFailed(*this);
 		}
 	}
 
@@ -177,15 +179,15 @@ namespace PurchaseTest
 				&& getPlatform() == ANDROID
 				&& errorCode == MA_PURCHASE_ERROR_INVALID_PRODUCT )
 		{
-			mApplicationController.testSucceeded(*this);
 			MAUtil::String info = "Test3 succeeded";
 			mApplicationController.log(info);
+			mApplicationController.testSucceeded(*this);
 		}
 		else
 		{
-			mApplicationController.testFailed(*this);
 			MAUtil::String info = "Test3 failed, purchase failed for different reason";
 			mApplicationController.log(info);
+			mApplicationController.testFailed(*this);
 		}
 	}
 }
