@@ -72,10 +72,12 @@ namespace IAP
 		MAHandle getHandle() const;
 
 		/**
-		 * Get the product id of the purchase.
-		 * @return Purchase's product id.
+		 * Get the productId that identifies the product.
+		 * Platform: Android and iOS.
+		 * @return The string that identifies the product, or an
+		 * empty string in case of error.
 		 */
-		MAUtil::String getProductID();
+		MAUtil::String getProductId();
 
 		/**
 		 * Request the user to purchase a product.

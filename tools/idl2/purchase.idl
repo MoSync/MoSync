@@ -309,7 +309,7 @@ group PurchaseReceiptFields "Purchase Receipt Fields" {
 		BVRS = "bvrs";
 		/**
 		* \brief The product price.
-		* Platform: Android.
+		* Platform: iOS.
 		*/
 		PRICE = "price";
 	}

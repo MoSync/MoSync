@@ -227,7 +227,25 @@ public class PurchaseManager extends IBillingObserver
 	 * the app waits for PURCHASE_STATE_CHANGE messages.
 	 */
 	public void restoreTransactions()
-	{
+	{/*
+		if ( !mService.isConnected() )
+		{
+			mMoSyncThread.postEvent(BillingEvent.onRestoreTransaction(
+					0, //replace with new error code.
+					0,
+					MA_PURCHASE_ERROR_CONNECTION_FAILED));
+			return;
+		}
+
+		if ( !mService.isPublicKeySet() )
+		{
+			mMoSyncThread.postEvent(BillingEvent.onRestoreTransaction(
+					0,  //replace with new error code.
+					0,
+					MA_PURCHASE_ERROR_PUBLIC_KEY_NOT_SET));
+			return;
+		}*/
+
 		RestoreTransactions request = mService.restoreTransactions();
 		SYSLOG("@@MoSync maPurchaseRestoreTransactions requestID = " + request.getRequestID());
 	}
@@ -330,7 +348,7 @@ public class PurchaseManager extends IBillingObserver
 		int handle = m_PurchaseTable.add(purchase);
 		m_PurchaseTable.get(handle).setHandle(handle);
 		// Post MoSync event (state is not required).
-		mMoSyncThread.postEvent(BillingEvent.onRestoreTransaction(0, handle));
+		mMoSyncThread.postEvent(BillingEvent.onRestoreTransaction(0, handle, 0));
 	}
 
 	@Override

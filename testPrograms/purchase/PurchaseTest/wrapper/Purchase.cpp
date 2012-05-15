@@ -35,6 +35,8 @@
 
 namespace IAP
 {
+	// Usual size for a buffer.
+	const int BUF_SIZE = 256;
 
 	/**
 	 * Constructor.
@@ -90,13 +92,21 @@ namespace IAP
 	}
 
 	/**
-	 * Get the product id of the purchase.
-	 * @return Purchase's product id.
+	 * Get the productId that identifies the product.
+	 * Platform: Android and iOS.
+	 * @return The string that identifies the product, or an
+	 * empty string in case of error.
 	 */
-	MAUtil::String Purchase::getProductID()
+	MAUtil::String Purchase::getProductId()
 	{
-		char buffer[PRODUCT_ID_BUFFER_SIZE];
-		maPurchaseGetName(mHandle, buffer, PRODUCT_ID_BUFFER_SIZE);
+		char buffer[BUF_SIZE];
+		int result = maPurchaseGetName(mHandle,
+			buffer,
+			BUF_SIZE);
+		if (result < 0)
+		{
+			return "";
+		}
 		return buffer;
 	}
 

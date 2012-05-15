@@ -133,7 +133,7 @@ namespace IAP
 
 	/**
 	 * Get the product price.
-	 * Platform: Android.
+	 * Platform: iOS.
 	 */
 	int Receipt::getPrice()
 	{
