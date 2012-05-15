@@ -26,9 +26,6 @@
 
 #define TEST_NAME "Test 1"
 
-#define IOS_PRODUCT_ID "com.mosync.purchase2.consumable"
-#define ANDROID_PRODUCT_ID ""
-
 #include <conprint.h>
 
 #include "Test1.h"
@@ -86,7 +83,7 @@ namespace PurchaseTest
 	{
 		char buffer[BUF_SIZE];
 		sprintf(buffer, "%s product is valid.",
-				mPurchase->getProductID().c_str());
+				mPurchase->getProductId().c_str());
 		mApplicationController.log(buffer);
 		mApplicationController.log("Requesting purchase...");
 		mPurchase->requestPurchase();
@@ -101,7 +98,7 @@ namespace PurchaseTest
 	{
 		char buffer[BUF_SIZE];
 		sprintf(buffer, "%s product is invalid.",
-				mPurchase->getProductID().c_str());
+				mPurchase->getProductId().c_str());
 		mApplicationController.log(buffer);
 		this->setFailedReason(buffer);
 		mApplicationController.testFailed(*this);

@@ -37,6 +37,7 @@
 #include "../tests/Test5.h"
 #include "../tests/Test6.h"
 #include "../tests/Test7.h"
+#include "../tests/Test8.h"
 #include "../Util.h"
 
 namespace PurchaseTest
@@ -106,7 +107,11 @@ namespace PurchaseTest
 		this->log("================================");
 		MAUtil::String* testName = new MAUtil::String(test.getTestName());
 		mFailedTests.add(testName);
+
+		ITest* testAux = mTests[0];
 		mTests.remove(0);
+		delete testAux;
+
 		this->runNextTest();
 	}
 
@@ -119,7 +124,11 @@ namespace PurchaseTest
 		this->log("Test succeeded!");
 		this->log("================================");
 		mCountSucceededTests++;
+
+		ITest* testAux = mTests[0];
 		mTests.remove(0);
+		delete testAux;
+
 		this->runNextTest();
 	}
 
@@ -137,7 +146,7 @@ namespace PurchaseTest
 	 */
 	void ApplicationController::createTests()
 	{
-		//mTests.add(new Test1(*this));
+//		mTests.add(new Test1(*this));
 
 		if ( getPlatform() == ANDROID )
 		{
@@ -148,7 +157,7 @@ namespace PurchaseTest
 		mTests.add(new Test5(*this));
 		mTests.add(new Test6(*this));
 		mTests.add(new Test7(*this));
-
+		mTests.add(new Test8(*this));
 	}
 
 	/**
