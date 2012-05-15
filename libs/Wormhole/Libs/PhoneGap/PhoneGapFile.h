@@ -26,7 +26,6 @@ MA 02110-1301, USA.
 #ifndef WORMHOLE_LIBS_PHONEGAP_PHONEGAPFILE_H_
 #define WORMHOLE_LIBS_PHONEGAP_PHONEGAPFILE_H_
 
-#include <Wormhole/WebViewMessage.h>
 #include <NativeUI/WebView.h>
 #include <MAUtil/String.h>
 

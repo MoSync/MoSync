@@ -28,8 +28,9 @@ MA 02110-1301, USA.
 #include <conprint.h>
 #include <MAUtil/String.h>
 #include <MAUtil/HashDict.h>
-#include "PhoneGapMessageHandler.h"
+#include "../../Encoder.h"
 #include "PhoneGapFile.h"
+#include "PhoneGapMessageHandler.h"
 
 // File error codes.
 #define FILEERROR_NOT_FOUND_ERR "1"
@@ -1300,7 +1301,7 @@ namespace Wormhole
 		// Send back the file content.
 		callSuccess(
 			callbackID,
-			JSONMessage::JSONStringify(content.c_str()));
+			Encoder::JSONStringify(content.c_str()));
 	}
 
 	void PhoneGapFile::actionReadAsDataURL(JSONMessage& message)
@@ -1320,7 +1321,7 @@ namespace Wormhole
 		String base64URL = "\"data:";
 		base64URL += FileGetMimeType(fullPath);
 		base64URL += ";base64,";
-		base64URL += JSONMessage::base64Encode(content.c_str());
+		base64URL += Encoder::base64Encode(content.c_str(), content.size());
 		base64URL += "\"";
 
 		// Send back the file content.
