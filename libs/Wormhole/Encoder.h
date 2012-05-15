@@ -77,12 +77,14 @@ public:
 	static MAUtil::String base64Encode(const void* data, int length);
 
 	/**
-	 * Decode Base64 encoded data.
-	 * @param data Pointer to zero-terminated string with encoded data.
-	 * @return Pointer to decoded data buffer. NOTE: Deallocate this
-	 * buffer using free().
+	 * Decode Base64 encoded data. NOTE: The data buffer returned in
+	 * the output parameter must be deallocated using free().
+	 * @param input Pointer to zero-terminated string with encoded data.
+	 * @param output Pointer to pointer that will point to the decoded data.
+	 * @param input Pointer int that will contain the length of the decoded data.
+	 * @return 1 on success, 0 on error.
 	 */
-	static void* base64Decode(const char* encodedData);
+	static int base64Decode(const char* input, void** output, int* outputLength);
 };
 
 } // namespace

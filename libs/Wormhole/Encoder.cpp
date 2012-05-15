@@ -168,10 +168,9 @@ namespace Wormhole
 	 * @param data Pointer to data to be encoded.
 	 * @param length Number of bytes to be encoded.
 	 * @return String object with encoded data.
-	 *
-	 * Implementation is based on:
-	 * http://en.wikibooks.org/wiki/Algorithm_Implementation/Miscellaneous/Base64#C.2B.2B
 	 */
+	// Implementation is based on:
+	// http://en.wikibooks.org/wiki/Algorithm_Implementation/Miscellaneous/Base64#C.2B.2B
 	String Encoder::base64Encode(const void* data, int length)
 	{
 		const char* encodeLookup =
@@ -197,7 +196,7 @@ namespace Wormhole
 			encodedString += encodeLookup[(temp & 0x00FC0000) >> 18];
 			encodedString += encodeLookup[(temp & 0x0003F000) >> 12];
 			encodedString += encodeLookup[(temp & 0x00000FC0) >> 6 ];
-			encodedString += encodeLookup[(temp & 0x0000003F)      ];
+			encodedString += encodeLookup[(temp & 0x0000003F)	  ];
 		}
 
 		switch (padCount)
@@ -230,46 +229,61 @@ namespace Wormhole
 	 * @return Pointer to decoded data buffer. NOTE: Deallocate this
 	 * buffer using free().
 	 *
-	 * Implementation is based on:
-	 * http://en.wikibooks.org/wiki/Algorithm_Implementation/Miscellaneous/Base64#C.2B.2B_2
+	 *
 	 */
-	void* Encoder::base64Decode(const char* encodedData)
+	/**
+	 * Decode Base64 encoded data. NOTE: The data buffer returned in
+	 * the output parameter must be deallocated using free().
+	 * @param input Pointer to zero-terminated string with encoded data.
+	 * @param output Pointer to pointer that will point to the decoded data.
+	 * @param input Pointer int that will contain the length of the decoded data.
+	 * @return 1 on success, 0 on error.
+	 */
+	// Implementation is based on:
+	// http://en.wikibooks.org/wiki/Algorithm_Implementation/Miscellaneous/Base64#C.2B.2B_2
+	int Encoder::base64Decode(const char* input, void** output, int* outputLength)
 	{
 		const char padCharacter = '=';
 
-		char* input = (char*) encodedData;
+		char* encodedBytes = (char*) input;
 
 		// Sanity checks.
-        if (NULL != input)
+		if (NULL == encodedBytes)
 		{
-           return NULL;
+			return 0; // Error
 		}
 
-		long inputLength = strlen(input);
+		long inputLength = strlen(encodedBytes);
 
-        if (0 == inputLength || inputLength % 4)
+		if (0 == inputLength || inputLength % 4)
 		{
-           return NULL;
+			return 0; // Error
 		}
 
-        long padding = 0;
-        if (input[inputLength - 1] == padCharacter) { padding++; }
-        if (input[inputLength - 2] == padCharacter) { padding++; }
+		long padding = 0;
+		if (encodedBytes[inputLength - 1] == padCharacter) { padding++; }
+		if (encodedBytes[inputLength - 2] == padCharacter) { padding++; }
 
-        // Allocate buffer to hold the result
-        char* decodedBytes = (char*) malloc(((inputLength / 4) * 3) - padding);
+		// Allocate buffer to hold the result
+		long decodedLength = ((inputLength / 4) * 3) - padding;
+		char* decodedBytes = (char*) malloc(decodedLength);
+
+		// Set output data.
+		*output = decodedBytes;
+		*outputLength = decodedLength;
+
+		// Loop variables.
 		long decodedIndex = 0;
-        long temp = 0; // Holds decoded quanta
-
+		long temp = 0; // Holds decoded quanta
 		int inputIndex = 0;
-        while (inputIndex < inputLength)
-        {
+		while (inputIndex < inputLength)
+		{
 			// Process data in one base 64 quanta
 			// (4 input bytes --> 3 output bytes).
 			for (long pos = 0; pos < 4; ++pos)
 			{
 				// Input data.
-				char ch = (char) input[inputIndex];
+				char ch = (char) encodedBytes[inputIndex];
 
 				temp <<= 6;
 
@@ -304,25 +318,25 @@ namespace Wormhole
 					{
 						decodedBytes[decodedIndex++] = (temp >> 16) & 0x000000FF;
 						decodedBytes[decodedIndex++] = (temp >> 8 ) & 0x000000FF;
-						return decodedBytes;
+						return 1; // Success
 					}
 					else if (2 == numberOfPadCharacters)
 					{
 						decodedBytes[decodedIndex++] = (temp >> 10) & 0x000000FF;
-						return decodedBytes;
+						return 1; // Success
 					}
 					else
 					{
 						// Invalid padding.
 						free(decodedBytes);
-						return NULL;
+						return 0; // Error
 					}
 				}
 				else
 				{
 					// Invalid Base64 character.
 					free(decodedBytes);
-					return NULL;
+					return 0; // Error
 				}
 
 				// Increment index in input data.
@@ -331,10 +345,10 @@ namespace Wormhole
 
 			decodedBytes[decodedIndex++] = (temp >> 16) & 0x000000FF;
 			decodedBytes[decodedIndex++] = (temp >> 8 ) & 0x000000FF;
-			decodedBytes[decodedIndex++] = (temp      ) & 0x000000FF;
-        } // while
+			decodedBytes[decodedIndex++] = (temp	  ) & 0x000000FF;
+		} // while
 
-        return decodedBytes;
+		return 1; // Success
 	}
 
 } // namespace
