@@ -64,6 +64,17 @@ namespace Wormhole
 
 			mCaptureCallBack = message.getParam("PhoneGapCallBackId");
 
+			//maImagePickerOpen() #EVENT_TYPE_IMAGE_PICKER
+
+			/*
+			struct {
+				// #EVENT_TYPE_IMAGE_PICKER events, this will be 0 if canceled or 1 if Ok was pressed.
+				int imagePickerState;
+				// #EVENT_TYPE_IMAGE_PICKER event, contains the new handle to the selected image.
+				MAHandle imagePickerItem;
+			} imagePicker;
+			*/
+
 			mMessageHandler->callSuccess(
 				mCaptureCallBack,
 				PHONEGAP_CALLBACK_STATUS_OK,
