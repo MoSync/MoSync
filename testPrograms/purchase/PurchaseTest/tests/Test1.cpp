@@ -32,6 +32,7 @@
 #include "../Util.h"
 
 #include "../wrapper/Purchase.h"
+#include "../wrapper/PurchaseManager.h"
 
 namespace PurchaseTest
 {
@@ -62,7 +63,9 @@ namespace PurchaseTest
 	{
 		MAUtil::String productType = ProductTypes::getInstance().getProductType1();
 		printf("Test1::startTest sProductType1 = %s", productType.c_str());
+		PurchaseManager::getInstance()->setPublicKey("MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAkq5y2a2tbd9xjNfBwtxt1G/wKILzrHSWp3uAwQ/Iw2SkAF72cuoLUiliTkU6IXVhD95k1VsZRLQytKOIAmPOI/faGxbZovmfIq2u/F/Gd39AyUg2geLdhV+wMrgdFWwWiPwOXl+12zigOvJdAfsxNMLh0dhJW1RAK5OaT0TXkR5d26GiUYm6kt0SW4+FX1OSiavwE4NTPTtwqsjscWxBKXvICm0A+0OYtqv6wTC3uhVMDkTnrsVG9N4pTKSGmhz//dfqJIZKI56UD21I2hjsB+8XVxy0KV741x3NLBOruB5oGGlXbCQGHTu3ekY4g5jlusCxlD19327e7LxrooM9GQIDAQAB");
 		mPurchase = new Purchase(productType, this);
+		mPurchase->addPurchaseListener(this);
 	}
 
 	/**
@@ -136,7 +139,12 @@ namespace PurchaseTest
 	void Test1::requestFailed(const Purchase& purchase,
 		const int errorCode)
 		{
-
+		char buffer[BUF_SIZE];
+		sprintf(buffer, "%s product was not purchased.",
+				mPurchase->getProductId().c_str());
+		mApplicationController.log(buffer);
+		this->setFailedReason(buffer);
+		mApplicationController.testFailed(*this);
 		}
 
 	/**
