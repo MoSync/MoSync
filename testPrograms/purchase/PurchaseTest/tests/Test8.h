@@ -96,6 +96,11 @@ namespace PurchaseTest
 		 * first one.
 		 */
 		MAHandle mSecondProduct;
+
+		/**
+		 * Flag to indicate if the first product was created.
+		 */
+		bool mIsFirstProductCreated;
 	};
 
 } // namespace PurchaseTest

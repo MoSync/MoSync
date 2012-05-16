@@ -45,7 +45,8 @@ namespace PurchaseTest
 	Test8::Test8(IApplicationController& applicationController):
 		mApplicationController(applicationController),
 		mFirstProduct(1),
-		mSecondProduct(mFirstProduct)
+		mSecondProduct(mFirstProduct),
+		mIsFirstProductCreated(false)
 	{
 
 	}
@@ -66,7 +67,6 @@ namespace PurchaseTest
 		String productType = ProductTypes::getInstance().getProductType1();
 		Environment::getEnvironment().addCustomEventListener(this);
 		maPurchaseCreate(mFirstProduct, productType.c_str());
-		maPurchaseCreate(mSecondProduct, productType.c_str());
 	}
 
 	/**
@@ -87,8 +87,14 @@ namespace PurchaseTest
 		if (event.type == EVENT_TYPE_PURCHASE)
 		{
 			MAPurchaseEventData purchaseData = event.purchaseData;
-			if (purchaseData.productHandle != mSecondProduct)
+
+			// Check if first product was created.
+			if (!mIsFirstProductCreated)
 			{
+				// Create second product.
+				mIsFirstProductCreated = true;
+				String productType = ProductTypes::getInstance().getProductType1();
+				maPurchaseCreate(mSecondProduct, productType.c_str());
 				return;
 			}
 
