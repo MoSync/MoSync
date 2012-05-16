@@ -154,10 +154,10 @@ namespace Wormhole
 		{
 			mPhoneGapCapture.handleMessage(message);
 		}
-		else if (message.getParam("service") == "Camera")
-		{
-			mPhoneGapCamera.handleMessage(message);
-		}
+//		else if (message.getParam("service") == "Camera")
+//		{
+//			mPhoneGapCamera.handleMessage(message);
+//		}
 		else
 		{
 			// Message was not handled.
