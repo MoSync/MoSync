@@ -37,7 +37,8 @@ namespace PurchaseTest
 	 * changes.
 	 */
 	Test2::Test2(IApplicationController& applicationController):
-		mApplicationController(applicationController)
+		mApplicationController(applicationController),
+		mPurchase(NULL)
 	{
 	}
 
@@ -46,7 +47,11 @@ namespace PurchaseTest
 	 */
 	Test2::~Test2()
 	{
-		mPurchase->removePurchaseListener(this);
+		if (mPurchase)
+		{
+			mPurchase->removePurchaseListener(this);
+			delete mPurchase;
+		}
 	}
 
 	/**
@@ -56,15 +61,14 @@ namespace PurchaseTest
 	{
 		MAUtil::String info = "Test2 in progress...";
 		mApplicationController.log(info);
-		if ( getPlatform() == ANDROID )
+		int platform = getPlatform();
+		if ( platform == ANDROID )
 		{
 			mPurchase = new Purchase("android.test.purchased", this);
 			mPurchase->addPurchaseListener(this);
 		}
-		else
+		else if (platform == IOS)
 		{
-			MAUtil::String info = "Test2 succeeded";
-			mApplicationController.log(info);
 			mApplicationController.testSucceeded(*this);
 		}
 	}
@@ -76,15 +80,6 @@ namespace PurchaseTest
 	MAUtil::String Test2::getTestName() const
 	{
 		return "Test2";
-	}
-
-	/**
-	 * Get the reason why the test failed.
-	 * @return Reason why it failed.
-	 */
-	MAUtil::String Test2::getReason()
-	{
-		return "";
 	}
 
 	/**
@@ -115,7 +110,7 @@ namespace PurchaseTest
 		if ( mPurchase->getHandle() == purchase.getHandle() )
 		{
 			MAUtil::String info = "Test2 failed, product invalid";
-			mApplicationController.log(info);
+			this->setFailedReason(info);
 			mApplicationController.testFailed(*this);
 		}
 	}
@@ -131,7 +126,7 @@ namespace PurchaseTest
 		if ( mPurchase->getHandle() == purchase.getHandle() )
 		{
 			MAUtil::String info = "Test2 failed, product is in progress";
-			mApplicationController.log(info);
+			this->setFailedReason(info);
 			mApplicationController.testFailed(*this);
 		}
 	}
@@ -147,7 +142,7 @@ namespace PurchaseTest
 		if ( mPurchase->getHandle() == purchase.getHandle() )
 		{
 			MAUtil::String info = "Test2 failed, product was purchased without public key";
-			mApplicationController.log(info);
+			this->setFailedReason(info);
 			mApplicationController.testFailed(*this);
 		}
 	}
@@ -168,14 +163,12 @@ namespace PurchaseTest
 				&& getPlatform() == ANDROID
 				&& errorCode == MA_PURCHASE_ERROR_PUBLIC_KEY_NOT_SET )
 		{
-			MAUtil::String info = "Test2 succeeded";
-			mApplicationController.log(info);
 			mApplicationController.testSucceeded(*this);
 		}
 		else
 		{
 			MAUtil::String info = "Test2 failed, purchase failed for different reason";
-			mApplicationController.log(info);
+			this->setFailedReason(info);
 			mApplicationController.testFailed(*this);
 		}
 	}

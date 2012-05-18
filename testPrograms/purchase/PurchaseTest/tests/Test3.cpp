@@ -41,7 +41,8 @@ namespace PurchaseTest
 	 * changes.
 	 */
 	Test3::Test3(IApplicationController& applicationController):
-		mApplicationController(applicationController)
+		mApplicationController(applicationController),
+		mPurchase(NULL)
 	{
 	}
 
@@ -51,6 +52,7 @@ namespace PurchaseTest
 	Test3::~Test3()
 	{
 		mPurchase->removePurchaseListener(this);
+		delete mPurchase;
 	}
 
 	/**
@@ -82,15 +84,6 @@ namespace PurchaseTest
 	}
 
 	/**
-	 * Get the reason why the test failed.
-	 * @return Reason why it failed.
-	 */
-	MAUtil::String Test3::getReason()
-	{
-		return "";
-	}
-
-	/**
 	 * Notifies that the product has been validated by the App Store.
 	 * NOTE: On Android there is no validation done at this step, if the
 	 * product results to be unavailable, then the application will be later
@@ -109,7 +102,7 @@ namespace PurchaseTest
 		else
 		{
 			MAUtil::String info = "Test3 failed on iOS, product handled as valid";
-			mApplicationController.log(info);
+			this->setFailedReason(info);
 			mApplicationController.testFailed(*this);
 		}
 	}
@@ -125,14 +118,12 @@ namespace PurchaseTest
 		if ( purchase.getHandle() == mPurchase->getHandle()
 				&& getPlatform() == IOS)
 		{
-			MAUtil::String info = "Test3 succeeded";
-			mApplicationController.log(info);
 			mApplicationController.testSucceeded(*this);
 		}
 		else
 		{
 			MAUtil::String info = "Test3 failed, product invalid";
-			mApplicationController.log(info);
+			this->setFailedReason(info);
 			mApplicationController.testFailed(*this);
 		}
 	}
@@ -158,7 +149,7 @@ namespace PurchaseTest
 		if ( mPurchase->getHandle() == purchase.getHandle() )
 		{
 			MAUtil::String info = "Test3 failed, Unavailable product was purchased";
-			mApplicationController.log(info);
+			this->setFailedReason(info);
 			mApplicationController.testFailed(*this);
 		}
 	}
@@ -179,14 +170,12 @@ namespace PurchaseTest
 				&& getPlatform() == ANDROID
 				&& errorCode == MA_PURCHASE_ERROR_INVALID_PRODUCT )
 		{
-			MAUtil::String info = "Test3 succeeded";
-			mApplicationController.log(info);
 			mApplicationController.testSucceeded(*this);
 		}
 		else
 		{
 			MAUtil::String info = "Test3 failed, purchase failed for different reason";
-			mApplicationController.log(info);
+			this->setFailedReason(info);
 			mApplicationController.testFailed(*this);
 		}
 	}
