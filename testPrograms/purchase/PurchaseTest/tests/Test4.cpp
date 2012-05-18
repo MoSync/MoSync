@@ -54,13 +54,14 @@ namespace PurchaseTest
 	 */
 	void Test4::startTest()
 	{
+		MAUtil::String productType = ProductTypes::getInstance().getProductType1();
 		if ( getPlatform() == ANDROID )
 		{
-			mPurchase = new Purchase(ANDROID_PRODUCT_ID, this);
+			mPurchase = new Purchase(productType, this);
 		}
 		else if ( getPlatform() == IOS )
 		{
-			mPurchase = new Purchase(IOS_PRODUCT_ID, this);
+			mPurchase = new Purchase(productType, this);
 		}
 	}
 
@@ -86,8 +87,7 @@ namespace PurchaseTest
 	{
 		if ( purchase.getHandle() == mPurchase->getHandle() )
 		{
-			if ( mPurchase->getProductId() == ANDROID_PRODUCT_ID ||
-				mPurchase->getProductId() == IOS_PRODUCT_ID )
+			if ( mPurchase->getProductId() == ProductTypes::getInstance().getProductType1() )
 			{
 				mApplicationController.testSucceeded(*this);
 			}

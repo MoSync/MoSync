@@ -85,6 +85,19 @@ namespace PurchaseTest
 		 */
 		const MAUtil::String& getProductType2() const;
 
+		/**
+		 * Get the unavailable product type.
+		 * This type of product cannot be purchased.
+		 * @return The unavailable product type.
+		 */
+		const MAUtil::String& getProductTypeUnavailable() const;
+
+		/**
+		 * Get the cancelled product type.
+		 * This type of product is used when testing a cancelled order.
+		 * @return The cancelled product type.
+		 */
+		const MAUtil::String& getProductTypeCancelled() const;
 	private:
 		/**
 		 * Constructor.
@@ -111,12 +124,25 @@ namespace PurchaseTest
 		MAUtil::String* mProductType1;
 
 		/**
+		 * Unavailable product type.
+		 * Android only.
+		 */
+		MAUtil::String* mProductTypeUnavailable;
+
+		/**
 		 * Second product type.
 		 * On Android this is an unmanaged product.
 		 * On iOS this is a non-consumable product.
 		 * This type of product can be purchased only one time by a user.
 		 */
 		MAUtil::String* mProductType2;
+
+		/**
+		 * Cancelled product type.
+		 * This type of product is used when testing the pruchase
+		 * of a cancelled order.
+		 */
+		MAUtil::String* mProductTypeCancelled;
 	};
 
 } // namespace PurchaseTest

@@ -33,9 +33,6 @@
 
 #include "../wrapper/Purchase.h"
 
-#define IOS_PRODUCT_ID ""
-#define ANDROID_PRODUCT_ID "android.test.purchased"
-
 using namespace IAP;
 
 namespace PurchaseTest

@@ -43,9 +43,6 @@
 
 #include "../wrapper/Purchase.h"
 
-#define IOS_UNAVAILABLE_PRODUCT_ID ""
-#define ANDROID_UNAVAILABLE_PRODUCT_ID "android.test.item_unavailable"
-
 using namespace IAP;
 
 namespace PurchaseTest

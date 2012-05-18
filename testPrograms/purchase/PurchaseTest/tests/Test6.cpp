@@ -62,13 +62,14 @@ namespace PurchaseTest
 	 */
 	void Test6::startTest()
 	{
+		MAUtil::String productType = ProductTypes::getInstance().getProductTypeUnavailable();
 		if ( getPlatform() == ANDROID )
 		{
-			mPurchase = new Purchase(ANDROID_UNAVAILABLE_PRODUCT_ID, this);
+			mPurchase = new Purchase(productType, this);
 		}
 		else if ( getPlatform() == IOS )
 		{
-			mPurchase = new Purchase(IOS_UNAVAILABLE_PRODUCT_ID, this);
+			mPurchase = new Purchase(productType, this);
 		}
 	}
 
