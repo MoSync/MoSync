@@ -18,25 +18,19 @@
 
 /**
  * @file Test1.cpp
- * @author Bogdan Iusco
- * @date 9 May 2012
+ * @author emma
  *
- * @brief Test a valid purchase of an product.
+ * @brief  The user tries to buy a product, but does not set the public key.
+ * Expected result:
+ * - Android: maPurchaseRequest fails with errorCode = MA_PURCHASE_ERROR_PUBLIC_KEY_NOT_SET.
+ * - iOS: always succeeds.
  */
-
-#define TEST_NAME "Test 1"
-
-#include <conprint.h>
-
+#include <MAUtil/util.h>
 #include "Test1.h"
-#include "../Util.h"
-
-#include "../wrapper/Purchase.h"
 #include "../wrapper/PurchaseManager.h"
 
 namespace PurchaseTest
 {
-
 	/**
 	 * Constructor.
 	 * @param applicationController Will be notified when test's status
@@ -45,7 +39,6 @@ namespace PurchaseTest
 	Test1::Test1(IApplicationController& applicationController):
 		mApplicationController(applicationController)
 	{
-
 	}
 
 	/**
@@ -53,7 +46,7 @@ namespace PurchaseTest
 	 */
 	Test1::~Test1()
 	{
-
+		mPurchase->removePurchaseListener(this);
 	}
 
 	/**
@@ -61,11 +54,14 @@ namespace PurchaseTest
 	 */
 	void Test1::startTest()
 	{
-		MAUtil::String productType = ProductTypes::getInstance().getProductType1();
-		printf("Test1::startTest sProductType1 = %s", productType.c_str());
-		PurchaseManager::getInstance()->setPublicKey("MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAkq5y2a2tbd9xjNfBwtxt1G/wKILzrHSWp3uAwQ/Iw2SkAF72cuoLUiliTkU6IXVhD95k1VsZRLQytKOIAmPOI/faGxbZovmfIq2u/F/Gd39AyUg2geLdhV+wMrgdFWwWiPwOXl+12zigOvJdAfsxNMLh0dhJW1RAK5OaT0TXkR5d26GiUYm6kt0SW4+FX1OSiavwE4NTPTtwqsjscWxBKXvICm0A+0OYtqv6wTC3uhVMDkTnrsVG9N4pTKSGmhz//dfqJIZKI56UD21I2hjsB+8XVxy0KV741x3NLBOruB5oGGlXbCQGHTu3ekY4g5jlusCxlD19327e7LxrooM9GQIDAQAB");
-		mPurchase = new Purchase(productType, this);
-		mPurchase->addPurchaseListener(this);
+		if ( getPlatform() == ANDROID )
+		{
+			mPurchase = new Purchase("android.test.purchased", this);
+		}
+		else
+		{
+			mApplicationController.testSucceeded(*this);
+		}
 	}
 
 	/**
@@ -74,22 +70,25 @@ namespace PurchaseTest
 	 */
 	MAUtil::String Test1::getTestName() const
 	{
-		return TEST_NAME;
+		return "Test 1";
 	}
 
 	/**
 	 * Notifies that the product has been validated by the App Store.
-	 * Platform: iOS.
+	 * NOTE: On Android there is no validation done at this step, if the
+	 * product results to be unavailable, then the application will be later
+	 * notified via a requestFailed() callback. The errorCode will equal
+	 * #MA_PURCHASE_ERROR_INVALID_PRODUCT.
+	 * Platform: iOS and Android.
 	 * @param purchase The object that sent the event.
 	 */
 	void Test1::productValid(const Purchase& purchase)
 	{
-		char buffer[BUF_SIZE];
-		sprintf(buffer, "%s product is valid.",
-				mPurchase->getProductId().c_str());
-		mApplicationController.log(buffer);
-		mApplicationController.log("Requesting purchase...");
-		mPurchase->requestPurchase();
+		if ( purchase.getHandle() == mPurchase->getHandle()
+				&& getPlatform() == ANDROID)
+		{
+			mPurchase->requestPurchase();
+		}
 	}
 
 	/**
@@ -99,12 +98,14 @@ namespace PurchaseTest
 	 */
 	void Test1::productInvalid(const Purchase& purchase)
 	{
-		char buffer[BUF_SIZE];
-		sprintf(buffer, "%s product is invalid.",
-				mPurchase->getProductId().c_str());
-		mApplicationController.log(buffer);
-		this->setFailedReason(buffer);
-		mApplicationController.testFailed(*this);
+		if ( mPurchase->getHandle() == purchase.getHandle() )
+		{
+			MAUtil::String info = "Product " +
+					MAUtil::integerToString(purchase.getHandle()) + " is invalid";
+			mApplicationController.log(info);
+			this->setFailedReason(info);
+			mApplicationController.testFailed(*this);
+		}
 	}
 
 	/**
@@ -115,7 +116,14 @@ namespace PurchaseTest
 	 */
 	void Test1::requestInProgress(const Purchase& purchase)
 	{
-		mApplicationController.log("Request in progress...");
+		if ( mPurchase->getHandle() == purchase.getHandle() )
+		{
+			MAUtil::String info = "Product " +
+					MAUtil::integerToString(purchase.getHandle()) + " failed, product is in progress";
+			mApplicationController.log(info);
+			this->setFailedReason(info);
+			mApplicationController.testFailed(*this);
+		}
 	}
 
 	/**
@@ -126,8 +134,14 @@ namespace PurchaseTest
 	 */
 	void Test1::requestCompleted(const Purchase& purchase)
 	{
-		mApplicationController.log("Product purchased!");
-		mApplicationController.testSucceeded(*this);
+		if ( mPurchase->getHandle() == purchase.getHandle() )
+		{
+			MAUtil::String info = "Product " +
+					MAUtil::integerToString(purchase.getHandle()) + "was purchased without public key";
+			mApplicationController.log(info);
+			this->setFailedReason(info);
+			mApplicationController.testFailed(*this);
+		}
 	}
 
 	/**
@@ -135,53 +149,25 @@ namespace PurchaseTest
 	 * Platform: Android and iOS.
 	 * @param purchase The object that sent the event.
 	 * @param errorCode The reason why it failed.
+	 * Note that even if the request fails because it was canceled
+	 * (errorCode = MA_PURCHASE_ERROR_CANCELLED), you will still be
+	 * able to get a receipt for your purchase.
 	 */
 	void Test1::requestFailed(const Purchase& purchase,
 		const int errorCode)
+	{
+		if ( mPurchase->getHandle() == purchase.getHandle()
+				&& getPlatform() == ANDROID
+				&& errorCode == MA_PURCHASE_ERROR_PUBLIC_KEY_NOT_SET )
 		{
-		char buffer[BUF_SIZE];
-		sprintf(buffer, "%s product was not purchased.",
-				mPurchase->getProductId().c_str());
-		mApplicationController.log(buffer);
-		this->setFailedReason(buffer);
-		mApplicationController.testFailed(*this);
+			mApplicationController.testSucceeded(*this);
 		}
-
-	/**
-	 * Notifies that the transaction has been validated by the App Store /
-	 * Google Play.
-	 * Platform: Android and iOS.
-	 * @param purchase The object that sent the event.
-	 * @param receipt Transaction receipt.
-	 */
-	void Test1::receiptValid(
-		const Purchase& purchase,
-		Receipt& receipt)
-	{
-
+		else
+		{
+			MAUtil::String info = "Purchase failed for different reason";
+			mApplicationController.log(info);
+			this->setFailedReason(info);
+			mApplicationController.testFailed(*this);
+		}
 	}
-
-	/**
-	 * Notifies that the transaction is not valid on the App Store /
-	 * Google Play.
-	 * Platform: Android and iOS.
-	 * @param purchase The object that sent the event.
-	 */
-	void Test1::receiptInvalid(const Purchase& purchase)
-	{
-
-	}
-
-	/**
-	 * Notifies that an error occurred while verifying the receipt.
-	 * Platform: Android and iOS.
-	 * @param purchase The object that sent the event.
-	 * @param errorCode The reason why it failed.
-	 */
-	void Test1::receiptError(const Purchase& purchase,
-		const int errorCode)
-	{
-
-	}
-
 }

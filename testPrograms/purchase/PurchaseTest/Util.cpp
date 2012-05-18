@@ -25,9 +25,11 @@ MA 02110-1301, USA.
 
 
 #define IOS_PRODUCT_TYPE_1 "com.mosync.purchase2.consumable"
-#define ANDROID_PRODUCT_TYPE_1 ""
+// This test app can be purchased multiple times.
+#define ANDROID_PRODUCT_TYPE_PURCHASED "android.test.purchased"
+#define ANDROID_PRODUCT_TYPE_CANCELLED "android.test.canceled"
+#define ANDROID_PRODUCT_TYPE_UNAVAILABLE "android.test.item_unavailable"
 #define IOS_PRODUCT_TYPE_2 "com.mosync.purchase2.nonconsumable"
-#define ANDROID_PRODUCT_TYPE_2 ""
 
 #include "Util.h"
 
@@ -67,8 +69,8 @@ namespace PurchaseTest
 		int platform = getPlatform();
 		if (platform == ANDROID)
 		{
-			mProductType1 = new MAUtil::String(ANDROID_PRODUCT_TYPE_1);
-			mProductType2 = new MAUtil::String(ANDROID_PRODUCT_TYPE_2);
+			mProductType1 = new MAUtil::String(ANDROID_PRODUCT_TYPE_PURCHASED);
+			//mProductType2 = new MAUtil::String(ANDROID_PRODUCT_TYPE_2);
 		}
 		else if (platform == IOS)
 		{

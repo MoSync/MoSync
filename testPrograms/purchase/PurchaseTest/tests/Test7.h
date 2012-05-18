@@ -68,12 +68,6 @@ namespace PurchaseTest
 		 * @return Test's name.
 		 */
 		virtual MAUtil::String getTestName() const;
-
-		/**
-		 * Get the reason why the test failed.
-		 * @return Reason why it failed.
-		 */
-		virtual MAUtil::String getReason();
 	private:
 		/**
 		 * Application controller.

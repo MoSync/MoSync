@@ -29,7 +29,7 @@
  * and errorCode = MA_PURCHASE_ERROR_INVALID_PRODUCT.
  *
  */
-
+#include <MAUtil/util.h>
 #include "Test3.h"
 #include "../wrapper/PurchaseManager.h"
 
@@ -58,9 +58,6 @@ namespace PurchaseTest
 	 */
 	void Test3::startTest()
 	{
-		MAUtil::String info = "Test3 in progress...";
-		mApplicationController.log(info);
-		PurchaseManager::getInstance()->setPublicKey("MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAkq5y2a2tbd9xjNfBwtxt1G/wKILzrHSWp3uAwQ/Iw2SkAF72cuoLUiliTkU6IXVhD95k1VsZRLQytKOIAmPOI/faGxbZovmfIq2u/F/Gd39AyUg2geLdhV+wMrgdFWwWiPwOXl+12zigOvJdAfsxNMLh0dhJW1RAK5OaT0TXkR5d26GiUYm6kt0SW4+FX1OSiavwE4NTPTtwqsjscWxBKXvICm0A+0OYtqv6wTC3uhVMDkTnrsVG9N4pTKSGmhz//dfqJIZKI56UD21I2hjsB+8XVxy0KV741x3NLBOruB5oGGlXbCQGHTu3ekY4g5jlusCxlD19327e7LxrooM9GQIDAQAB");
 		if ( getPlatform() == ANDROID )
 		{
 			mPurchase = new Purchase(ANDROID_UNAVAILABLE_PRODUCT_ID, this);
@@ -69,7 +66,6 @@ namespace PurchaseTest
 		{
 			mPurchase = new Purchase(IOS_UNAVAILABLE_PRODUCT_ID, this);
 		}
-		mPurchase->addPurchaseListener(this);
 	}
 
 	/**
@@ -79,15 +75,6 @@ namespace PurchaseTest
 	MAUtil::String Test3::getTestName() const
 	{
 		return "Test3";
-	}
-
-	/**
-	 * Get the reason why the test failed.
-	 * @return Reason why it failed.
-	 */
-	MAUtil::String Test3::getReason()
-	{
-		return "";
 	}
 
 	/**
@@ -108,8 +95,10 @@ namespace PurchaseTest
 		}
 		else
 		{
-			MAUtil::String info = "Test3 failed on iOS, product handled as valid";
+			MAUtil::String info = "Test failed on iOS, product "+
+					MAUtil::integerToString(purchase.getHandle()) + " handled as valid";
 			mApplicationController.log(info);
+			this->setFailedReason(info);
 			mApplicationController.testFailed(*this);
 		}
 	}
@@ -125,14 +114,14 @@ namespace PurchaseTest
 		if ( purchase.getHandle() == mPurchase->getHandle()
 				&& getPlatform() == IOS)
 		{
-			MAUtil::String info = "Test3 succeeded";
-			mApplicationController.log(info);
 			mApplicationController.testSucceeded(*this);
 		}
 		else
 		{
-			MAUtil::String info = "Test3 failed, product invalid";
+			MAUtil::String info = "Android product "+
+					MAUtil::integerToString(purchase.getHandle()) + " is invalid.";
 			mApplicationController.log(info);
+			this->setFailedReason(info);
 			mApplicationController.testFailed(*this);
 		}
 	}
@@ -157,8 +146,10 @@ namespace PurchaseTest
 	{
 		if ( mPurchase->getHandle() == purchase.getHandle() )
 		{
-			MAUtil::String info = "Test3 failed, Unavailable product was purchased";
+			MAUtil::String info = "Unavailable product " +
+					MAUtil::integerToString(purchase.getHandle()) + " was purchased";
 			mApplicationController.log(info);
+			this->setFailedReason(info);
 			mApplicationController.testFailed(*this);
 		}
 	}
@@ -179,14 +170,14 @@ namespace PurchaseTest
 				&& getPlatform() == ANDROID
 				&& errorCode == MA_PURCHASE_ERROR_INVALID_PRODUCT )
 		{
-			MAUtil::String info = "Test3 succeeded";
-			mApplicationController.log(info);
 			mApplicationController.testSucceeded(*this);
 		}
 		else
 		{
-			MAUtil::String info = "Test3 failed, purchase failed for different reason";
+			MAUtil::String info = "Purchase " +
+					MAUtil::integerToString(purchase.getHandle()) + "failed for different reason";
 			mApplicationController.log(info);
+			this-> setFailedReason(info);
 			mApplicationController.testFailed(*this);
 		}
 	}

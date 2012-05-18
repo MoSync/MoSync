@@ -51,19 +51,16 @@ namespace PurchaseTest
 	 */
 	void Test7::startTest()
 	{
-		MAUtil::String info = "Test7 in progress...";
-		mApplicationController.log(info);
 		int result = PurchaseManager::getInstance()->checkPurchaseSupported();
 		if ( result == MA_PURCHASE_RES_OK )
 		{
-			MAUtil::String info = "Test7 succeeded";
-			mApplicationController.log(info);
 			mApplicationController.testSucceeded(*this);
 		}
 		else
 		{
-			MAUtil::String info = "Test7 failed, billing is not supported.";
+			MAUtil::String info = "Billing is not supported.";
 			mApplicationController.log(info);
+			this->setFailedReason(info);
 			mApplicationController.testFailed(*this);
 		}
 	}
@@ -74,15 +71,7 @@ namespace PurchaseTest
 	 */
 	MAUtil::String Test7::getTestName() const
 	{
-		return "Test7";
+		return "Test 7";
 	}
 
-	/**
-	 * Get the reason why the test failed.
-	 * @return Reason why it failed.
-	 */
-	MAUtil::String Test7::getReason()
-	{
-		return "";
-	}
 }

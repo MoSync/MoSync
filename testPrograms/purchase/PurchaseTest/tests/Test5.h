@@ -74,12 +74,6 @@ namespace PurchaseTest
 		 */
 		virtual MAUtil::String getTestName() const;
 
-		/**
-		 * Get the reason why the test failed.
-		 * @return Reason why it failed.
-		 */
-		virtual MAUtil::String getReason();
-
 		// From PurchaseListener:
 		/**
 		 * Notifies that the product has been validated by the App Store.
