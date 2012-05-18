@@ -1,5 +1,30 @@
-﻿using System;
-using System.Collections.Generic;
+﻿/* Copyright (C) 2011 MoSync AB
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License,
+version 2, as published by the Free Software Foundation.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+MA 02110-1301, USA.
+*/
+/**
+ * @file MoSyncNumberPicker.cs
+ * @author Filipas Ciprian
+ *
+ * @brief This represents the partial implementation for the CustomNumberPickerPageClass.
+ *
+ * @platform WP 7.1
+ **/
+
+using System;
+using System.Collections;
 using System.Windows.Controls;
 using System.Globalization;
 
@@ -12,15 +37,15 @@ namespace mosyncRuntime.Views
     public partial class CustomDatePickerPage
     {
         // Default values for max and min year.
-        private const int _maxYear = 3000;
-        private const int _minYear = 1600;
+        private const int mMaxYear = 3000;
+        private const int mMinYear = 1600;
 
         // Min date and Max date refferences.
         private DateTime minDate, maxDate;
 
-        // The next value of the picker; this.value will be set on _nextDate when the done button
+        // The next value of the picker; this.value will be set on mNextDate when the done button
         // gets clicked.
-        private DateTime _nextDate;
+        private DateTime mNextDate;
 
         // Constructor.
         public CustomDatePickerPage()
@@ -43,7 +68,7 @@ namespace mosyncRuntime.Views
                 (this.ApplicationBar.Buttons[0] as Microsoft.Phone.Shell.ApplicationBarIconButton).Click += new EventHandler(
                     delegate(object sender, EventArgs e)
                     {
-                        this.Value = _nextDate;
+                        this.Value = mNextDate;
                     });
             }
 
@@ -74,8 +99,8 @@ namespace mosyncRuntime.Views
             // Else create them with the default values
             else
             {
-                maxDate = new DateTime(_maxYear, 12, 31);
-                minDate = new DateTime(_minYear, 1, 1);
+                maxDate = new DateTime(mMaxYear, 12, 31);
+                minDate = new DateTime(mMinYear, 1, 1);
             }
 
             // The LoopingSelectors need to be aware of the min and max dates
@@ -101,38 +126,38 @@ namespace mosyncRuntime.Views
             // Extract the DataSource.
             DataSource source = (DataSource)sender;
 
-            // If we have a value and it is valid the _nextDate is updated.
+            // If we have a value and it is valid the mNextDate is updated.
             if (source.SelectedItem != null && this.Value.HasValue)
             {
-                if (null != _nextDate)
+                if (null != mNextDate)
                 {
                     // Check if the currently set day remains valid after changing the year value otherwise update it.
                     // (e.g. 29 Feb 2012 during an year change to 2011 will generate the 28 Feb 2011 date).
-                    if (_nextDate.Day <= DateTime.DaysInMonth(((DateTimeWrapper)source.SelectedItem).DateTime.Year, _nextDate.Month))
-                        _nextDate = new DateTime(((DateTimeWrapper)source.SelectedItem).DateTime.Year, _nextDate.Month, _nextDate.Day);
+                    if (mNextDate.Day <= DateTime.DaysInMonth(((DateTimeWrapper)source.SelectedItem).DateTime.Year, mNextDate.Month))
+                        mNextDate = new DateTime(((DateTimeWrapper)source.SelectedItem).DateTime.Year, mNextDate.Month, mNextDate.Day);
                     else
-                        _nextDate = new DateTime(((DateTimeWrapper)source.SelectedItem).DateTime.Year, _nextDate.Month, DateTime.DaysInMonth(((DateTimeWrapper)source.SelectedItem).DateTime.Year, _nextDate.Month));
+                        mNextDate = new DateTime(((DateTimeWrapper)source.SelectedItem).DateTime.Year, mNextDate.Month, DateTime.DaysInMonth(((DateTimeWrapper)source.SelectedItem).DateTime.Year, mNextDate.Month));
                 }
-                else _nextDate = new DateTime(((DateTimeWrapper)source.SelectedItem).DateTime.Year, ((DateTimeWrapper)source.SelectedItem).DateTime.Month, ((DateTimeWrapper)source.SelectedItem).DateTime.Day);
+                else mNextDate = new DateTime(((DateTimeWrapper)source.SelectedItem).DateTime.Year, ((DateTimeWrapper)source.SelectedItem).DateTime.Month, ((DateTimeWrapper)source.SelectedItem).DateTime.Day);
             }
 
             // Update the year for the loopingSelectors.DataSource.SelectedItem if necesarly.
             if (null == this.PrimarySelector.DataSource.SelectedItem)
-                this.PrimarySelector.DataSource.SelectedItem = new DateTimeWrapper(_nextDate);
-            else if (!(this.PrimarySelector.DataSource.SelectedItem as DateTimeWrapper).DateTime.Equals(_nextDate))
-                this.PrimarySelector.DataSource.SelectedItem = new DateTimeWrapper(_nextDate);
+                this.PrimarySelector.DataSource.SelectedItem = new DateTimeWrapper(mNextDate);
+            else if (!(this.PrimarySelector.DataSource.SelectedItem as DateTimeWrapper).DateTime.Equals(mNextDate))
+                this.PrimarySelector.DataSource.SelectedItem = new DateTimeWrapper(mNextDate);
 
             if(null == this.SecondarySelector.DataSource.SelectedItem)
-                this.SecondarySelector.DataSource.SelectedItem = new DateTimeWrapper(_nextDate);
-            else if (!(this.SecondarySelector.DataSource.SelectedItem as DateTimeWrapper).DateTime.Equals(_nextDate) &&
-                    (this.SecondarySelector.DataSource.SelectedItem as DateTimeWrapper).DateTime.Year != _nextDate.Year)
-                this.SecondarySelector.DataSource.SelectedItem = new DateTimeWrapper(_nextDate);
+                this.SecondarySelector.DataSource.SelectedItem = new DateTimeWrapper(mNextDate);
+            else if (!(this.SecondarySelector.DataSource.SelectedItem as DateTimeWrapper).DateTime.Equals(mNextDate) &&
+                    (this.SecondarySelector.DataSource.SelectedItem as DateTimeWrapper).DateTime.Year != mNextDate.Year)
+                this.SecondarySelector.DataSource.SelectedItem = new DateTimeWrapper(mNextDate);
 
             if (null == this.TertiarySelector.DataSource.SelectedItem)
                 this.TertiarySelector.DataSource.SelectedItem = source.SelectedItem;
-            else if (!(this.TertiarySelector.DataSource.SelectedItem as DateTimeWrapper).DateTime.Equals(_nextDate) &&
-                     (this.TertiarySelector.DataSource.SelectedItem as DateTimeWrapper).DateTime.Year != (_nextDate.Year))
-                this.TertiarySelector.DataSource.SelectedItem = new DateTimeWrapper(_nextDate);
+            else if (!(this.TertiarySelector.DataSource.SelectedItem as DateTimeWrapper).DateTime.Equals(mNextDate) &&
+                     (this.TertiarySelector.DataSource.SelectedItem as DateTimeWrapper).DateTime.Year != (mNextDate.Year))
+                this.TertiarySelector.DataSource.SelectedItem = new DateTimeWrapper(mNextDate);
         }
 
         /**
@@ -146,38 +171,38 @@ namespace mosyncRuntime.Views
             // Extract the DataSource.
             DataSource source = (DataSource)sender;
 
-            // If we have a value and it is valid the _nextDate is updated.
+            // If we have a value and it is valid the mNextDate is updated.
             if (source.SelectedItem != null && this.Value.HasValue)
             {
-                if (null != _nextDate)
+                if (null != mNextDate)
                 {
                     // Check if the currently set day remains valid after changing the month value otherwise update it.
                     // (e.g. 31 May 2012 during an month change to Feb will generate the 29 Feb 2012 date).
-                    if( _nextDate.Day <= DateTime.DaysInMonth(_nextDate.Year, ((DateTimeWrapper)source.SelectedItem).DateTime.Month))
-                        _nextDate = new DateTime(_nextDate.Year, ((DateTimeWrapper)source.SelectedItem).DateTime.Month, _nextDate.Day);
+                    if( mNextDate.Day <= DateTime.DaysInMonth(mNextDate.Year, ((DateTimeWrapper)source.SelectedItem).DateTime.Month))
+                        mNextDate = new DateTime(mNextDate.Year, ((DateTimeWrapper)source.SelectedItem).DateTime.Month, mNextDate.Day);
                     else
-                        _nextDate = new DateTime(_nextDate.Year, ((DateTimeWrapper)source.SelectedItem).DateTime.Month, DateTime.DaysInMonth(_nextDate.Year, ((DateTimeWrapper)source.SelectedItem).DateTime.Month));
+                        mNextDate = new DateTime(mNextDate.Year, ((DateTimeWrapper)source.SelectedItem).DateTime.Month, DateTime.DaysInMonth(mNextDate.Year, ((DateTimeWrapper)source.SelectedItem).DateTime.Month));
                 }
-                else _nextDate = new DateTime(((DateTimeWrapper)source.SelectedItem).DateTime.Year, ((DateTimeWrapper)source.SelectedItem).DateTime.Month, ((DateTimeWrapper)source.SelectedItem).DateTime.Day);
+                else mNextDate = new DateTime(((DateTimeWrapper)source.SelectedItem).DateTime.Year, ((DateTimeWrapper)source.SelectedItem).DateTime.Month, ((DateTimeWrapper)source.SelectedItem).DateTime.Day);
             }
 
             // Update the month for the loopingSelectors.DataSource.SelectedItem if necesarly.
             if (null == this.PrimarySelector.DataSource.SelectedItem)
-                this.PrimarySelector.DataSource.SelectedItem = new DateTimeWrapper(_nextDate);
-            else if (!(this.PrimarySelector.DataSource.SelectedItem as DateTimeWrapper).DateTime.Equals(_nextDate))
-                this.PrimarySelector.DataSource.SelectedItem = new DateTimeWrapper(_nextDate);
+                this.PrimarySelector.DataSource.SelectedItem = new DateTimeWrapper(mNextDate);
+            else if (!(this.PrimarySelector.DataSource.SelectedItem as DateTimeWrapper).DateTime.Equals(mNextDate))
+                this.PrimarySelector.DataSource.SelectedItem = new DateTimeWrapper(mNextDate);
 
             if (null == this.SecondarySelector.DataSource.SelectedItem)
-                this.SecondarySelector.DataSource.SelectedItem = new DateTimeWrapper(_nextDate);
-            else if (!(this.SecondarySelector.DataSource.SelectedItem as DateTimeWrapper).DateTime.Equals(_nextDate) &&
-                    (this.SecondarySelector.DataSource.SelectedItem as DateTimeWrapper).DateTime.Month != _nextDate.Month)
-                this.SecondarySelector.DataSource.SelectedItem = new DateTimeWrapper(_nextDate);
+                this.SecondarySelector.DataSource.SelectedItem = new DateTimeWrapper(mNextDate);
+            else if (!(this.SecondarySelector.DataSource.SelectedItem as DateTimeWrapper).DateTime.Equals(mNextDate) &&
+                    (this.SecondarySelector.DataSource.SelectedItem as DateTimeWrapper).DateTime.Month != mNextDate.Month)
+                this.SecondarySelector.DataSource.SelectedItem = new DateTimeWrapper(mNextDate);
 
             if (null == this.TertiarySelector.DataSource.SelectedItem)
                 this.TertiarySelector.DataSource.SelectedItem = source.SelectedItem;
-            else if (!(this.TertiarySelector.DataSource.SelectedItem as DateTimeWrapper).DateTime.Equals(_nextDate) &&
-                     (this.TertiarySelector.DataSource.SelectedItem as DateTimeWrapper).DateTime.Month != (_nextDate.Month))
-                this.TertiarySelector.DataSource.SelectedItem = new DateTimeWrapper(_nextDate);
+            else if (!(this.TertiarySelector.DataSource.SelectedItem as DateTimeWrapper).DateTime.Equals(mNextDate) &&
+                     (this.TertiarySelector.DataSource.SelectedItem as DateTimeWrapper).DateTime.Month != (mNextDate.Month))
+                this.TertiarySelector.DataSource.SelectedItem = new DateTimeWrapper(mNextDate);
 
             // Create a DispatcherTimer that will Tick after 300 ms in order to update LoopingSelectors.
             // This is necesarly in order to avoid animation flickering and UI related bugs.
@@ -249,33 +274,33 @@ namespace mosyncRuntime.Views
             // Extract the DataSource.
             DataSource source = (DataSource)sender;
 
-            // If we have a value and it is valid the _nextDate is updated.
+            // If we have a value and it is valid the mNextDate is updated.
             if (source.SelectedItem != null && this.Value.HasValue)
             {
-                if (null != _nextDate)
+                if (null != mNextDate)
                 {
-                    _nextDate = new DateTime(_nextDate.Year, _nextDate.Month, ((DateTimeWrapper)source.SelectedItem).DateTime.Day);
+                    mNextDate = new DateTime(mNextDate.Year, mNextDate.Month, ((DateTimeWrapper)source.SelectedItem).DateTime.Day);
                 }
-                else _nextDate = new DateTime(((DateTimeWrapper)source.SelectedItem).DateTime.Year, ((DateTimeWrapper)source.SelectedItem).DateTime.Month, ((DateTimeWrapper)source.SelectedItem).DateTime.Day);
+                else mNextDate = new DateTime(((DateTimeWrapper)source.SelectedItem).DateTime.Year, ((DateTimeWrapper)source.SelectedItem).DateTime.Month, ((DateTimeWrapper)source.SelectedItem).DateTime.Day);
             }
 
             // Update the day for the loopingSelectors.DataSource.SelectedItem if necesarly.
             if (null == this.PrimarySelector.DataSource.SelectedItem)
-                this.PrimarySelector.DataSource.SelectedItem = new DateTimeWrapper(_nextDate);
-            else if (!(this.PrimarySelector.DataSource.SelectedItem as DateTimeWrapper).DateTime.Equals(_nextDate))
-                this.PrimarySelector.DataSource.SelectedItem = new DateTimeWrapper(_nextDate);
+                this.PrimarySelector.DataSource.SelectedItem = new DateTimeWrapper(mNextDate);
+            else if (!(this.PrimarySelector.DataSource.SelectedItem as DateTimeWrapper).DateTime.Equals(mNextDate))
+                this.PrimarySelector.DataSource.SelectedItem = new DateTimeWrapper(mNextDate);
 
             if (null == this.SecondarySelector.DataSource.SelectedItem)
-                this.SecondarySelector.DataSource.SelectedItem = new DateTimeWrapper(_nextDate);
-            else if (!(this.SecondarySelector.DataSource.SelectedItem as DateTimeWrapper).DateTime.Equals(_nextDate) &&
-                    (this.SecondarySelector.DataSource.SelectedItem as DateTimeWrapper).DateTime.Day != _nextDate.Day)
-                this.SecondarySelector.DataSource.SelectedItem = new DateTimeWrapper(_nextDate);
+                this.SecondarySelector.DataSource.SelectedItem = new DateTimeWrapper(mNextDate);
+            else if (!(this.SecondarySelector.DataSource.SelectedItem as DateTimeWrapper).DateTime.Equals(mNextDate) &&
+                    (this.SecondarySelector.DataSource.SelectedItem as DateTimeWrapper).DateTime.Day != mNextDate.Day)
+                this.SecondarySelector.DataSource.SelectedItem = new DateTimeWrapper(mNextDate);
 
             if (null == this.TertiarySelector.DataSource.SelectedItem)
                 this.TertiarySelector.DataSource.SelectedItem = source.SelectedItem;
-            else if (!(this.TertiarySelector.DataSource.SelectedItem as DateTimeWrapper).DateTime.Equals(_nextDate) &&
-                     (this.TertiarySelector.DataSource.SelectedItem as DateTimeWrapper).DateTime.Day != (_nextDate.Day))
-                this.TertiarySelector.DataSource.SelectedItem = new DateTimeWrapper(_nextDate);
+            else if (!(this.TertiarySelector.DataSource.SelectedItem as DateTimeWrapper).DateTime.Equals(mNextDate) &&
+                     (this.TertiarySelector.DataSource.SelectedItem as DateTimeWrapper).DateTime.Day != (mNextDate.Day))
+                this.TertiarySelector.DataSource.SelectedItem = new DateTimeWrapper(mNextDate);
         }
 
         /**
