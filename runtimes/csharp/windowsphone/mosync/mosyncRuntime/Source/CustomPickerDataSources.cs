@@ -223,4 +223,85 @@ namespace MoSync
             return new DateTime(currentYear, currentMonth, nextDay, relativeDate.Hour, relativeDate.Minute, relativeDate.Second);
         }
     }
+
+    /**
+    * @author: Filipas Ciprian
+    * @brief: This class is an extension for the ILoopingSelectorDataSource class. It represents
+    *         the data source for the number picker selector
+    */
+    public class BoundedNumberDataSource : Microsoft.Phone.Controls.Primitives.ILoopingSelectorDataSource
+    {
+        // The currently selected item
+        private int _selectedItem;
+
+        // Max
+        public int Max { set; get; }
+
+        // Min
+        public int Min  { set; get; }
+
+        // Constructor
+        public BoundedNumberDataSource() { }
+
+        /**
+         * @author Ciprian Filipas
+         * @brief SelectedItem property
+         */
+        public object SelectedItem
+        {
+            // Getter
+            get
+            {
+                return _selectedItem;
+            }
+            // Setter
+            set
+            {
+                int val = (int)value;
+                // If the value is different from the currenlty selected item
+                if (val != _selectedItem)
+                {
+                    // Save the previous
+                    int previousSelectedItem = _selectedItem;
+                    _selectedItem = (int)value;
+
+                    // Set the handler
+                    var handler = SelectionChanged;
+
+                    // If the handler exists call it
+                    if (null != handler)
+                    {
+                        handler(this, new SelectionChangedEventArgs(new object[] { previousSelectedItem }, new object[] { _selectedItem }));
+                    }
+                }
+            }
+        }
+
+        /**
+         * @author Ciprian Filipas
+         * @brief Gets the next value relative to the give one
+         * @param1 relativeTo int relative value required in the computations
+         */
+        public object GetNext(object relativeTo)
+        {
+            if (((int)relativeTo + 1) <= Max)
+                return ((int)relativeTo + 1);
+            return null;
+        }
+
+        /**
+         * @author Ciprian Filipas
+         * @brief Gets the previous value relative to the give one
+         * @param1 relativeTo int relative value required in the computations
+         */
+        public object GetPrevious(object relativeTo)
+        {
+            if (((int)relativeTo - 1) >= Min)
+                return ((int)relativeTo - 1);
+            return null;
+        }
+
+        // Event handler for the SelectionChanged event
+        public event EventHandler<SelectionChangedEventArgs> SelectionChanged;
+    }
 }
