@@ -33,9 +33,6 @@
 
 #include "../wrapper/Purchase.h"
 
-#define IOS_PRODUCT_ID ""
-#define ANDROID_PRODUCT_ID "android.test.purchased"
-
 using namespace IAP;
 
 namespace PurchaseTest
@@ -70,12 +67,6 @@ namespace PurchaseTest
 		 * @return Test's name.
 		 */
 		virtual MAUtil::String getTestName() const;
-
-		/**
-		 * Get the reason why the test failed.
-		 * @return Reason why it failed.
-		 */
-		virtual MAUtil::String getReason();
 
 		// From PurchaseListener:
 		/**

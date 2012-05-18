@@ -33,7 +33,7 @@
  * 	3. Call verifyReceipt and check the error event.
  * 	Expected event: receiptError, with errorCode = MA_PURCHASE_ERROR_NO_RECEIPT.
  */
-
+#include <MAUtil/util.h>
 #include "Test6.h"
 #include "../wrapper/PurchaseManager.h"
 
@@ -62,17 +62,15 @@ namespace PurchaseTest
 	 */
 	void Test6::startTest()
 	{
-		MAUtil::String info = "Test6 in progress...";
-		mApplicationController.log(info);
+		MAUtil::String productType = ProductTypes::getInstance().getProductTypeUnavailable();
 		if ( getPlatform() == ANDROID )
 		{
-			mPurchase = new Purchase(ANDROID_UNAVAILABLE_PRODUCT_ID, this);
+			mPurchase = new Purchase(productType, this);
 		}
 		else if ( getPlatform() == IOS )
 		{
-			mPurchase = new Purchase(IOS_UNAVAILABLE_PRODUCT_ID, this);
+			mPurchase = new Purchase(productType, this);
 		}
-		mPurchase->addPurchaseListener(this);
 	}
 
 	/**
@@ -82,15 +80,6 @@ namespace PurchaseTest
 	MAUtil::String Test6::getTestName() const
 	{
 		return "Test 6";
-	}
-
-	/**
-	 * Get the reason why the test failed.
-	 * @return Reason why it failed.
-	 */
-	MAUtil::String Test6::getReason()
-	{
-		return "";
 	}
 
 	/**
@@ -112,8 +101,10 @@ namespace PurchaseTest
 			}
 			else
 			{
-				MAUtil::String info = "Test6 failed, product is validated on iOS";
+				MAUtil::String info = "Product " +
+						MAUtil::integerToString(purchase.getHandle()) + " is validated on iOS";
 				mApplicationController.log(info);
+				this->setFailedReason(info);
 				mApplicationController.testFailed(*this);
 			}
 
@@ -135,8 +126,10 @@ namespace PurchaseTest
 			}
 			else
 			{
-				MAUtil::String info = "Test6 failed, product was invalidated on Android";
+				MAUtil::String info = "Product " +
+						MAUtil::integerToString(purchase.getHandle()) + " was invalidated on Android";
 				mApplicationController.log(info);
+				this->setFailedReason(info);
 				mApplicationController.testFailed(*this);
 			}
 
@@ -166,8 +159,9 @@ namespace PurchaseTest
 	{
 		if ( purchase.getHandle() == mPurchase->getHandle() )
 		{
-			MAUtil::String info = "Test6 failed, receipt is valid";
+			MAUtil::String info = "Receipt is valid";
 			mApplicationController.log(info);
+			this->setFailedReason(info);
 			mApplicationController.testFailed(*this);
 		}
 	}
@@ -182,8 +176,9 @@ namespace PurchaseTest
 	{
 		if ( purchase.getHandle() == mPurchase->getHandle() )
 		{
-			MAUtil::String info = "Test6 failed,receipt was invalidated instead of returning an error";
+			MAUtil::String info = "Receipt was invalidated instead of returning an error";
 			mApplicationController.log(info);
+			this->setFailedReason(info);
 			mApplicationController.testFailed(*this);
 		}
 	}
@@ -201,14 +196,13 @@ namespace PurchaseTest
 		{
 			if (errorCode == MA_PURCHASE_ERROR_NO_RECEIPT )
 			{
-				MAUtil::String info = "Test6 succeeded";
-				mApplicationController.log(info);
 				mApplicationController.testSucceeded(*this);
 			}
 			else
 			{
-				MAUtil::String info = "Test6 failed,receipt failed with another code";
+				MAUtil::String info = "Receipt failed with another code";
 				mApplicationController.log(info);
+				this->setFailedReason(info);
 				mApplicationController.testFailed(*this);
 			}
 		}

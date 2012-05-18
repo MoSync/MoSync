@@ -25,9 +25,12 @@ MA 02110-1301, USA.
 
 
 #define IOS_PRODUCT_TYPE_1 "com.mosync.purchase2.consumable"
-#define ANDROID_PRODUCT_TYPE_1 ""
+// This test app can be purchased multiple times.
+#define ANDROID_PRODUCT_TYPE_PURCHASED "android.test.purchased"
+#define ANDROID_PRODUCT_TYPE_CANCELLED "android.test.canceled"
+#define ANDROID_PRODUCT_TYPE_UNAVAILABLE "android.test.item_unavailable"
 #define IOS_PRODUCT_TYPE_2 "com.mosync.purchase2.nonconsumable"
-#define ANDROID_PRODUCT_TYPE_2 ""
+#define IOS_PRODUCT_TYPE_UNAVAILABLE "dotdot"
 
 #include "Util.h"
 
@@ -67,13 +70,17 @@ namespace PurchaseTest
 		int platform = getPlatform();
 		if (platform == ANDROID)
 		{
-			mProductType1 = new MAUtil::String(ANDROID_PRODUCT_TYPE_1);
-			mProductType2 = new MAUtil::String(ANDROID_PRODUCT_TYPE_2);
+			mProductType1 = new MAUtil::String(ANDROID_PRODUCT_TYPE_PURCHASED);
+			mProductType2 = new MAUtil::String(ANDROID_PRODUCT_TYPE_PURCHASED);
+			mProductTypeUnavailable = new MAUtil::String(ANDROID_PRODUCT_TYPE_UNAVAILABLE);
+			mProductTypeCancelled = new MAUtil::String(ANDROID_PRODUCT_TYPE_CANCELLED);
 		}
 		else if (platform == IOS)
 		{
 			mProductType1 = new MAUtil::String(IOS_PRODUCT_TYPE_1);
 			mProductType2 = new MAUtil::String(IOS_PRODUCT_TYPE_2);
+			mProductTypeUnavailable = new MAUtil::String(IOS_PRODUCT_TYPE_UNAVAILABLE);
+			mProductTypeCancelled = new MAUtil::String(IOS_PRODUCT_TYPE_1);
 		}
 	}
 
@@ -130,4 +137,23 @@ namespace PurchaseTest
 		return *mProductType2;
 	}
 
+	/**
+	 * Get the unavailable product type.
+	 * This type of product cannot be purchased.
+	 * @return The unavailable product type.
+	 */
+	const MAUtil::String& ProductTypes::getProductTypeUnavailable() const
+	{
+		return *mProductTypeUnavailable;
+	}
+
+	/**
+	 * Get the cancelled product type.
+	 * This type of product is used when testing a cancelled order.
+	 * @return The cancelled product type.
+	 */
+	const MAUtil::String& ProductTypes::getProductTypeCancelled() const
+	{
+		return *mProductTypeCancelled;
+	}
 } // namespace Purchase

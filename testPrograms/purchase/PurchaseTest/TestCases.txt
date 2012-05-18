@@ -1,11 +1,11 @@
 NOTE: The In-app Purchase API does not work on Android emulator or iOS Simulator.
 
-Test case 1: The user makes a valid purchase.
+Test case 2: The user makes a valid purchase. ( public key is set starting from this point)
 
-Test case 2: The user tries to buy a product, but does not set the public key. Expected result:
+Test case 1: The user tries to buy a product, but does not set the public key. Expected result:
 	- Android maPurchaseRequest fails with errorCode = MA_PURCHASE_ERROR_PUBLIC_KEY_NOT_SET.
 	- iOS: do not run test.
-	NOTE Test2 must run before Test3 because the public key gets set in Test3.
+	NOTE Test1 must run before Test3 because the public key gets set in Test2.
 
 Test case3: The user tries to buy an unavailable product using the wrapper.  Expected result:
 	- event MA_PURCHASE_RES_UNAVAILABLE on devices with no billing support.

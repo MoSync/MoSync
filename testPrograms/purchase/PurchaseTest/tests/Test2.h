@@ -17,13 +17,11 @@
  */
 
 /**
- * @file Test3.h
- * @author emma
+ * @file Test2.h
+ * @author Bogdan Iusco
+ * @date 9 May 2012
  *
- * @brief  The user tries to buy a product, but does not set the public key.
- * Expected result:
- * - Android maPurchaseRequest fails with errorCode = MA_PURCHASE_ERROR_PUBLIC_KEY_NOT_SET.
- * - iOS: no need to run the test.
+ * @brief Test a valid purchase of an product.
  */
 
 #ifndef PURCHASE_TEST2_H_
@@ -31,9 +29,7 @@
 
 #include "ITest.h"
 #include "../Controller/IApplicationController.h"
-#include "../Util.h"
 
-#include "../wrapper/Purchase.h"
 #include "../wrapper/PurchaseListener.h"
 
 using namespace IAP;
@@ -41,12 +37,15 @@ using namespace IAP;
 namespace PurchaseTest
 {
 
+	class IAP::Purchase;
+
 	/**
-	 * @brief Test a purchase without setting the public key.
-	 * Platform: Android.
+	 * @brief Test a valid purchase of an product.
+	 * Platform: Android and iOS.
 	 */
-	class Test2: public ITest,
-		public IAP::PurchaseListener
+	class Test2:
+		public ITest,
+		public PurchaseListener
 	{
 	public:
 		/**
@@ -72,14 +71,10 @@ namespace PurchaseTest
 		 */
 		virtual MAUtil::String getTestName() const;
 
-		// From PurchaseListener:
+	private:
 		/**
 		 * Notifies that the product has been validated by the App Store.
-		 * NOTE: On Android there is no validation done at this step, if the
-		 * product results to be unavailable, then the application will be later
-		 * notified via a requestFailed() callback. The errorCode will equal
-		 * #MA_PURCHASE_ERROR_INVALID_PRODUCT.
-		 * Platform: iOS and Android.
+		 * Platform: iOS.
 		 * @param purchase The object that sent the event.
 		 */
 		virtual void productValid(const Purchase& purchase);
@@ -112,17 +107,47 @@ namespace PurchaseTest
 		 * Platform: Android and iOS.
 		 * @param purchase The object that sent the event.
 		 * @param errorCode The reason why it failed.
-		 * Note that even if the request fails because it was canceled
-		 * (errorCode = MA_PURCHASE_ERROR_CANCELLED), you will still be
-		 * able to get a receipt for your purchase.
 		 */
 		virtual void requestFailed(const Purchase& purchase,
 			const int errorCode);
+
+		/**
+		 * Notifies that the transaction has been validated by the App Store /
+		 * Google Play.
+		 * Platform: Android and iOS.
+		 * @param purchase The object that sent the event.
+		 * @param receipt Transaction receipt.
+		 */
+		virtual void receiptValid(
+			const Purchase& purchase,
+			Receipt& receipt);
+
+		/**
+		 * Notifies that the transaction is not valid on the App Store /
+		 * Google Play.
+		 * Platform: Android and iOS.
+		 * @param purchase The object that sent the event.
+		 */
+		virtual void receiptInvalid(const Purchase& purchase);
+
+		/**
+		 * Notifies that an error occurred while verifying the receipt.
+		 * Platform: Android and iOS.
+		 * @param purchase The object that sent the event.
+		 * @param errorCode The reason why it failed.
+		 */
+		virtual void receiptError(const Purchase& purchase,
+			const int errorCode);
+
 	private:
 		/**
 		 * Application controller.
 		 */
 		IApplicationController& mApplicationController;
+
+		/**
+		 * Tested object.
+		 */
 		Purchase* mPurchase;
 	};
 

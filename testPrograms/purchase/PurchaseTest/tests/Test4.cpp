@@ -24,6 +24,8 @@
  *
  */
 
+#include <MAUtil/util.h>
+
 #include "Test4.h"
 #include "../wrapper/PurchaseManager.h"
 
@@ -52,17 +54,15 @@ namespace PurchaseTest
 	 */
 	void Test4::startTest()
 	{
-		MAUtil::String info = "Test4 in progress...";
-		mApplicationController.log(info);
+		MAUtil::String productType = ProductTypes::getInstance().getProductType1();
 		if ( getPlatform() == ANDROID )
 		{
-			mPurchase = new Purchase(ANDROID_PRODUCT_ID, this);
+			mPurchase = new Purchase(productType, this);
 		}
 		else if ( getPlatform() == IOS )
 		{
-			mPurchase = new Purchase(IOS_PRODUCT_ID, this);
+			mPurchase = new Purchase(productType, this);
 		}
-		mPurchase->addPurchaseListener(this);
 	}
 
 	/**
@@ -71,16 +71,7 @@ namespace PurchaseTest
 	 */
 	MAUtil::String Test4::getTestName() const
 	{
-		return "Test4";
-	}
-
-	/**
-	 * Get the reason why the test failed.
-	 * @return Reason why it failed.
-	 */
-	MAUtil::String Test4::getReason()
-	{
-		return "";
+		return "Test 4";
 	}
 
 	/**
@@ -96,17 +87,16 @@ namespace PurchaseTest
 	{
 		if ( purchase.getHandle() == mPurchase->getHandle() )
 		{
-			if ( mPurchase->getProductId() == ANDROID_PRODUCT_ID ||
-				mPurchase->getProductId() == IOS_PRODUCT_ID )
+			if ( mPurchase->getProductId() == ProductTypes::getInstance().getProductType1() )
 			{
-				MAUtil::String info = "Test4 succeeded";
-				mApplicationController.log(info);
 				mApplicationController.testSucceeded(*this);
 			}
 			else
 			{
-				MAUtil::String info = "Test4 failed, incorrect productId";
+				MAUtil::String info = "Incorrect productId for product " +
+						MAUtil::integerToString(purchase.getHandle());
 				mApplicationController.log(info);
+				this->setFailedReason(info);
 				mApplicationController.testFailed(*this);
 			}
 		}
@@ -121,8 +111,10 @@ namespace PurchaseTest
 	{
 		if ( purchase.getHandle() == mPurchase->getHandle() )
 		{
-			MAUtil::String info = "Test4 failed, product invalid";
+			MAUtil::String info = "Product " +
+					MAUtil::integerToString(purchase.getHandle()) + " invalid";
 			mApplicationController.log(info);
+			this->setFailedReason(info);
 			mApplicationController.testFailed(*this);
 		}
 	}
