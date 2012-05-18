@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project supports-build-configs="true" version="1.4">
+<build.cfg id="Debug" types="Debug"/>
+<build.cfg id="Release" types="Release"/>
+<criteria>
+<filter type="com.mobilesorcery.sdk.capabilities.devices.elementfactory">
+<capabilities optional="" required="NativeUI"/>
+</filter>
+</criteria>
+<properties>
+<property key="build.prefs:additional.libraries" value="MAUtil.lib,nativeui.lib"/>
+<property key="build.prefs:additional.libraries/Debug" value="MAUtilD.lib,nativeuiD.lib"/>
+<property key="build.prefs:memory.data/Debug" value="4096"/>
+<property key="build.prefs:memory.data/Release" value="4096"/>
+<property key="build.prefs:memory.heap/Debug" value="3072"/>
+<property key="build.prefs:memory.heap/Release" value="3072"/>
+<property key="build.prefs:memory.stack/Debug" value="512"/>
+<property key="build.prefs:memory.stack/Release" value="512"/>
+<property key="profile.mgr.type" value="0"/>
+<property key="template.id" value="project.nativeuicpp"/>
+<property key="winmobilecs:guid" value="ae9010e0-5705-102f-802c-2bf9ca26e140"/>
+</properties>
+</project>

@@ -63,12 +63,12 @@ void packageWindowsPhone(const SETTINGS& s, const RuntimeInfo& ri) {
 	copyFilesRecursively(templateLocation.c_str(), csprojOutput.c_str());
 
 	generateCmd << getBinary("winphone-builder") <<
-		" -version " << s.version <<
-		" -company-name " << s.vendor <<
+		" -version " << arg(s.version) <<
+		" -company-name " << arg(s.vendor) <<
 		" -input-app-manifest-file " << file(appManifestInputFile) <<
 		" -output-app-manifest-file " << file(appManifestOutputFile) <<
-		" -project-name " << s.name <<
-		" -output-type " << outputType <<
+		" -project-name " << arg(s.name) <<
+		" -output-type " << arg(outputType) <<
 		" -input-file " << file(templateFileLocation) <<
 		" -output-file " << file(csprojOutputFile);
 
