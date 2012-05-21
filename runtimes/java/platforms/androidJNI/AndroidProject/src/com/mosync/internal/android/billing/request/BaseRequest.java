@@ -38,6 +38,7 @@ import com.android.vending.billing.IMarketBillingService;
  * failed or a purchase was billed successfully.
  *  - ConfirmNotifications confirms that a GetPurchaseInformation request was sent
  * and the app received the purchase info for the notification.
+ * @author emma
  */
 public abstract class BaseRequest
 {
@@ -84,7 +85,6 @@ public abstract class BaseRequest
      */
     public boolean runRequest()
     {
-		Log.e("@@MoSync","IN runRequest");
         if (runIfConnected())
         {
             return true;
@@ -97,6 +97,12 @@ public abstract class BaseRequest
         return false;
     }
 
+    public void setService(IMarketBillingService service)
+    {
+		if ( mService == null )
+			mService = service;
+    }
+
     /**
      * Try running the request directly if the service is already connected.
      * @return true if the request ran successfully; false if the service
@@ -104,24 +110,16 @@ public abstract class BaseRequest
      */
     public boolean runIfConnected()
     {
-		Log.e("@@MoSync","IN runIfConnected");
         if (mService != null)
         {
             try {
-                //mRequestId = run();
 				run();
-                Log.e("@@MoSync", " runIfConnected() request id: " + mRequestId);
-
-                if (mRequestId >= 0)
-                {
-//                    mSentRequests.put(mRequestId, this);
-                }
                 return true;
             } catch (RemoteException e) {
                 onRemoteException(e);
             }
         }
-        Log.e("@@MoSync","runIfConnected mService is NULL");
+        Log.e("@@MoSync", "BillingService runIfConnected mService is NULL");
         return false;
     }
 
@@ -153,12 +151,6 @@ public abstract class BaseRequest
 	/************************ Class members ************************/
 
     private final int mStartId;
-
-    /**
-     * Used to identify requests while handling messages.
-     */
-    //private String mDeveloperPayload;
-
     private boolean mPending = false;
     /**
      * ReqID received from Google Play service.

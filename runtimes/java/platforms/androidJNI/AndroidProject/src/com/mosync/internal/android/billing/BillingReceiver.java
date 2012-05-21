@@ -39,7 +39,7 @@ public class BillingReceiver extends BroadcastReceiver
     public void onReceive(Context context, Intent intent)
     {
         String action = intent.getAction();
-        SYSLOG("BillingReceiver onReceive action: " + action);
+        SYSLOG("MoSync BillingReceiver onReceive action: " + action);
         if (Consts.ACTION_STATE_CHANGED.equals(action))
         {
             String signedData = intent.getStringExtra(Consts.BILLING_RESPONSE_INAPP_SIGNED_DATA);

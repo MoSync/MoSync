@@ -38,6 +38,7 @@ import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_RECEIPT_PRO
 import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_RECEIPT_PURCHASE_DATE;
 import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_STATE_COMPLETED;
 import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_STATE_RECEIPT_ERROR;
+import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_STATE_RECEIPT_VALID;
 import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_RECEIPT_PRICE;
 import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_RECEIPT_APP_ITEM_ID;
 import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_ERROR_PUBLIC_KEY_NOT_SET;
@@ -53,7 +54,7 @@ import static com.mosync.internal.android.MoSyncHelpers.*;
  * @author emma
  *
  */
-public class PurchaseManager extends IBillingObserver
+public class PurchaseManager extends BillingListener
 {
 
 	/**
@@ -68,6 +69,10 @@ public class PurchaseManager extends IBillingObserver
 		mService.bindToMarketBillingService();
 	}
 
+	public void restoreService()
+	{
+		mService.bindToMarketBillingService();
+	}
 	public int checkPurchaseSupported()
 	{
 		return mService.checkBillingSupported();
@@ -94,24 +99,26 @@ public class PurchaseManager extends IBillingObserver
 	{
 		if ( !mService.isConnected() )
 		{
-			mMoSyncThread.postEvent(BillingEvent.onPurchaseStateChanged(
-					handle,
+			onPurchaseStateChanged(
 					MA_PURCHASE_STATE_FAILED,
-					MA_PURCHASE_ERROR_CONNECTION_FAILED));
+					handle,
+					MA_PURCHASE_ERROR_CONNECTION_FAILED);
 			return;
 		}
 
 		if ( !mService.isPublicKeySet() )
 		{
-			mMoSyncThread.postEvent(BillingEvent.onPurchaseStateChanged(
-					handle,
+			onPurchaseStateChanged(
 					MA_PURCHASE_STATE_FAILED,
-					MA_PURCHASE_ERROR_PUBLIC_KEY_NOT_SET));
+					handle,
+					MA_PURCHASE_ERROR_PUBLIC_KEY_NOT_SET);
 			return;
 		}
 
 		PurchaseInformation purchase = m_PurchaseTable.get(handle);
-		// Check if required: if BillingService.isPurchaseRequestInProgress(), place it on queue.
+		// If there is another request in progress, this oen will be placed
+		// on the queue.
+
 		if ( null != purchase )
 		{
 			// Remove pending receipt event if there is one.
@@ -119,12 +126,18 @@ public class PurchaseManager extends IBillingObserver
 
 			// Send the request to the service.
 			BaseRequest requestObj = mService.requestPurchase(purchase.getProductID(), handle);
-			SYSLOG("@@MoSync maPurchaseRequest: requestID = " +  requestObj.getRequestID() );
+			if ( requestObj.isPending() )
+			{
+				SYSLOG("@@MoSync Request was placed on a queue");
+				return;
+			}
 
 			// If request was sent to the server send IN_PROGRESS event, but
 			// keep in mind that RESPONSE_CODE intents can later signal errors on the server side.
-			if ( requestObj.getRequestID() != Consts.BILLING_RESPONSE_INVALID_REQUEST_ID )
+			if ( requestObj != null &&
+					requestObj.getRequestID() != Consts.BILLING_RESPONSE_INVALID_REQUEST_ID )
 			{
+				SYSLOG("@@MoSync maPurchaseRequest: requestID = " +  requestObj.getRequestID() );
 				mCurrentPurchaseHandle = handle;
 
 				purchase.setState(MA_PURCHASE_STATE_IN_PROGRESS);
@@ -142,6 +155,7 @@ public class PurchaseManager extends IBillingObserver
 						MA_PURCHASE_STATE_FAILED,
 						MA_PURCHASE_ERROR_UNKNOWN)); // Though, it's more like DEVELOPER_ERROR.
 			}
+			SYSLOG("@@MoSync maPurchaseRequest: requestID = " +  requestObj.getRequestID() );
 		}
 		else
 		{
@@ -167,15 +181,6 @@ public class PurchaseManager extends IBillingObserver
 			{
 				purchase.setNotificationID(notificationID);
 			}
-		}
-	}
-
-	public void setPurchaseState(int handle, boolean pending)
-	{
-		PurchaseInformation purchase = m_PurchaseTable.get(handle);
-		if ( purchase != null )
-		{
-			purchase.getRequest().setPendingState(pending);
 		}
 	}
 
@@ -332,18 +337,28 @@ public class PurchaseManager extends IBillingObserver
 			mService.unbind();
 	}
 
-	@Override
-	public void onTransactionInformationReceived(PurchaseInformation purchase)
+	/**
+	 * Manager is notified through this method when a purchase was completed.
+	 * At this point transaction details(the receipt) are available to the
+	 * user, after he calls verifyReceipt.
+	 * @param purchase The purchase.
+	 */
+	public static void onTransactionInformationReceived(PurchaseInformation purchase)
 	{
-		// Get the productHandle, based on productID.
-		mMoSyncThread.postEvent(BillingEvent.onPurchaseStateChanged(
-				purchase.getHandle(),
-				MA_PURCHASE_STATE_COMPLETED,
-				0));
+		// Keep MA_PURCHASE_EVENT_RECEIPT_VALID event for this purchase.
+		// The event will be sent after verifyreceipt is called.
+		PurchaseManager.onReceiptEvent(BillingEvent.onVerifyReceipt(
+				mCurrentPurchaseHandle, MA_PURCHASE_STATE_RECEIPT_VALID, 0), mCurrentPurchaseHandle);
+
+		// Notify app that request is now completed.
+		onPurchaseStateChanged(MA_PURCHASE_STATE_COMPLETED, mCurrentPurchaseHandle, 0);
 	}
 
-	@Override
-	public void onPurchaseRestored(PurchaseInformation purchase)
+	/**
+	 * Manager is notified through this method when a purchase is restored
+	 * @param purchase The new purchase object.
+	 */
+	public static void onPurchaseRestored(PurchaseInformation purchase)
 	{
 		// Create new product handle.
 		int handle = m_PurchaseTable.add(purchase);
@@ -352,43 +367,38 @@ public class PurchaseManager extends IBillingObserver
 		mMoSyncThread.postEvent(BillingEvent.onRestoreTransaction(0, handle, 0));
 	}
 
-	@Override
-    public void onPurchaseStateChanged(int state, int handle, int error)
-    {
+	/**
+	 * Manager is notified through this method when a purchase changes state.
+	 * @param state The new state.
+	 * @param handle The purchase handle.
+	 * @param error ErrorCode if necessary.
+	 */
+	public static void onPurchaseStateChanged(int state, int handle, int error)
+	{
+		if ( state != MA_PURCHASE_STATE_COMPLETED )
+		{
+			BillingService.setPurchaseRequestInProgress(false);
+		}
 		mMoSyncThread.postEvent(BillingEvent.onPurchaseStateChanged(handle, state, error));
-    }
-
-	@Override
-    public void onReceiptEvent(int[] event, int handle)
-    {
-		m_PendingEvents.add(handle, event);
-    }
+	}
 
 	/**
-	 * Search a product, based on productID.
-	 * @param productID The product id.
-	 * @return the product handle.
-	 *
-	public int searchProduct(String productID)
-	{
-		Iterator it = m_PurchaseTable.getIterator();
-		while(it.hasNext())
-		{
-			Entry<Integer, PurchaseInformation> entry = (Entry) it.next();
-			PurchaseInformation info = entry.getValue();
-			if ( info.getProductID().equals(productID) )
-			{
-				return entry.getKey();
-			}
-		}
-		return -1;
-	}*/
+	 * Manager is notified through this method for receipt events.
+	 * Receipt events will be kept in memory until an explicit verifyReceipt
+	 * call.
+	 * @param event The receipt event.
+	 * @param handle Teh purchase handle.
+	 */
+    public static void onReceiptEvent(int[] event, int handle)
+    {
+		m_PendingEvents.add(handle,event);
+    }
 	/************************ Class members ************************/
 
 	/**
 	 * The MoSync thread object.
 	 */
-	private MoSyncThread mMoSyncThread;
+	private static MoSyncThread mMoSyncThread;
 	private BillingService mService;
 
 	/**
@@ -406,5 +416,5 @@ public class PurchaseManager extends IBillingObserver
      * Pending events for each product. The events are related to the receipt validation,
      * as they will be sent to the application only after maPurchaseVerifyReceipt is called.
      */
-	private HandleTable<int[]> m_PendingEvents = new HandleTable<int[]>();
+	private static HandleTable<int[]> m_PendingEvents = new HandleTable<int[]>();
 }

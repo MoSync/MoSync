@@ -61,6 +61,7 @@ namespace PurchaseTest
 		 * All widgets will be added to it.
 		 */
 		RelativeLayout* mMainLayout;
+		ListView* mListView;
 
 		/**
 		 * Y coordinate for the next label that will be added to layout.
