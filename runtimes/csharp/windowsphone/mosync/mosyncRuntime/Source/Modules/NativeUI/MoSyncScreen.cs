@@ -87,12 +87,6 @@ namespace MoSync
                                 args.Cancel = true;
                             }
                         }
-                        //If the selected tab is not a StackScreen the application should exit
-                        else
-                        {
-                            //Remove the event handler from the TabScreen
-                            (Application.Current.RootVisual as Microsoft.Phone.Controls.PhoneApplicationFrame).BackKeyPress -= BackKeyPressHandler;
-                        }
                     }
                     else if(this is StackScreen && !(this.GetParent() is TabScreen))
                     {
