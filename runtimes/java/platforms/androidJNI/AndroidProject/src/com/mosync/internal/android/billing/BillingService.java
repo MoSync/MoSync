@@ -30,6 +30,7 @@ import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.RemoteException;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.android.vending.billing.IMarketBillingService;
@@ -45,6 +46,9 @@ import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_RES_OUT_OF_
 import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_RES_CONNECTION_ERROR;
 import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_STATE_IN_PROGRESS;
 import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_STATE_FAILED;
+import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_EVENT_REFUNDED;
+import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_STATE_COMPLETED;
+import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_ERROR_INVALID_HANDLE;
 import static com.mosync.internal.android.MoSyncHelpers.SYSLOG;
 
 /**
@@ -69,8 +73,11 @@ public class BillingService extends Service implements ServiceConnection
 
 	public void setContext(Context context)
 	{
-        attachBaseContext(context);
-        mAppContext = context;
+		if ( getBaseContext() == null )
+		{
+	        attachBaseContext(context);
+	        mAppContext = context;
+		}
     }
 
 	public void setThread(MoSyncThread thread)
@@ -114,7 +121,6 @@ public class BillingService extends Service implements ServiceConnection
     public void onDestroy()
     {
 		super.onDestroy();
-		mListener = null;
 		SYSLOG("@@MoSync BillingService onDestroy");
     }
 
@@ -127,8 +133,6 @@ public class BillingService extends Service implements ServiceConnection
     public void handleCommand(Intent intent, int startId)
     {if (intent == null ) return;
         String action = intent.getAction();
-        //TODO delete log.
-        Log.e("@@MoSync","BillingService handleCommand: ---------- " + action);
 
         if (Consts.METHOD_CONFIRM_NOTIFICATIONS.equals(action))
         {
@@ -142,7 +146,7 @@ public class BillingService extends Service implements ServiceConnection
         }
         else if (Consts.ACTION_STATE_CHANGED.equals(action))
         {
-			// State changed is received after purchase information was retrieved.
+			// State changed is received only after purchase information was retrieved.
             String signedData = intent.getStringExtra(Consts.BILLING_RESPONSE_INAPP_SIGNED_DATA);
             String signature = intent.getStringExtra(Consts.BILLING_RESPONSE_INAPP_SIGNATURE);
             onPurchaseStateChanged(startId, signedData, signature);
@@ -183,18 +187,13 @@ public class BillingService extends Service implements ServiceConnection
 		{
 			if ( responseCode == Consts.RESULT_OK )
 			{
-				// TODO see if IN_PROGRESS (request received by the server) is really needed at this point.
-				mThread.postEvent(BillingEvent.onPurchaseStateChanged(
-						request.getHandle(),
-						MA_PURCHASE_STATE_IN_PROGRESS,
-						0));
+				PurchaseManager.onPurchaseStateChanged(
+						MA_PURCHASE_STATE_IN_PROGRESS, request.getHandle(), 0);
 			}
 			else
 			{
-				mThread.postEvent(BillingEvent.onPurchaseStateChanged(
-						request.getHandle(),
-						MA_PURCHASE_STATE_FAILED,
-						responseCode));
+				PurchaseManager.onPurchaseStateChanged(
+						MA_PURCHASE_STATE_FAILED, request.getHandle(), responseCode);
 			}
 			mSentRequests.remove(requestId);
 		}
@@ -210,7 +209,7 @@ public class BillingService extends Service implements ServiceConnection
     {
 		if ( mService != null )
 		{
-			SYSLOG("@@MoSync BillingService error: bindToMarketBillingService already bind");
+			SYSLOG("@@MoSync BillingService: bindToMarketBillingService already bind");
 			return true;
 		}
         try {
@@ -270,6 +269,7 @@ public class BillingService extends Service implements ServiceConnection
      * Send a purchase request to Google Play.
      * Send the productHandle to GooglePlay as the developerPayload,
      * so that the transaction can be later identified.
+     * There can only be one request at a time.
      * @param productID The product identifier.
      * @param handle The internal product handle.
      * @return the request.
@@ -278,6 +278,13 @@ public class BillingService extends Service implements ServiceConnection
     {
 		Purchase request = new Purchase(
 				mService, productID, handle, mThread.getActivity());
+		if ( mPurchaseRequestInProgress )
+		{
+			SYSLOG("MoSync BillingRequest placed on the queue.");
+			request.setPendingState(true);
+			mPendingRequests.add(request);
+			return request;
+		}
 		request.runRequest();
 
 		if ( request.getRequestID() == Consts.BILLING_RESPONSE_INVALID_REQUEST_ID )
@@ -285,10 +292,8 @@ public class BillingService extends Service implements ServiceConnection
 			return null;
 		}
 
-		// TODO delete log.
-		Log.e("@@MoSync","BillingService requestPurchase request id = " + request.getRequestID());
-
-        request.setPendingState(true);
+		mPurchaseRequestInProgress = true;
+        request.setPendingState(false);
         mSentRequests.put(request.getRequestID(), request);
         return request;
     }
@@ -327,6 +332,7 @@ public class BillingService extends Service implements ServiceConnection
 	{
 		GetPurchaseInformation request = new GetPurchaseInformation(
 				startId, mService, notifyIds);
+
 		if ( bindToMarketBillingService() )
 		{
 			if ( request.runRequest() )
@@ -350,34 +356,36 @@ public class BillingService extends Service implements ServiceConnection
     {
         ArrayList<PurchaseInformation> purchases;
         purchases = Security.verifyPurchase(mPublicKey, signedData, signature);
-        if (purchases == null)
+        if ( purchases != null )
         {
-			SYSLOG("@@MoSync maPurchaseRequest error in parsing the transaction details");
-            return;
-        }
-
-        ArrayList<String> notifyList = new ArrayList<String>();
-        for (PurchaseInformation purchaseObj : purchases)
-        {
-            if (purchaseObj.mNotificationID != null)
+			// TODO delete log
+            Log.e("@@MoSync","onPurchaseStateChange verified " + purchases.size() + " purchases!!");
+            ArrayList<String> notifyList = new ArrayList<String>();
+            for (PurchaseInformation purchaseObj : purchases)
             {
-                notifyList.add(purchaseObj.mNotificationID);
-            }
-
-            // Check if the product was restored.
-            if ( purchaseObj.getState() == Consts.PURCHASE_STATE_REFUNDED ) // if (mRestoringTransactions)
-            {
-				mListener.onPurchaseRestored(purchaseObj);
-            }
-            else
-            {
-				mListener.onTransactionInformationReceived(purchaseObj);
-                // Notify the user with the transaction details, and only
-				// after that confirmNotifications.
-                if (!notifyList.isEmpty())
+                if (purchaseObj.mNotificationID != null)
                 {
-                    String[] notifyIds = notifyList.toArray(new String[notifyList.size()]);
-                    confirmNotifications(startId, notifyIds);
+                    notifyList.add(purchaseObj.mNotificationID);
+                }
+
+                if ( purchaseObj.getState() == MA_PURCHASE_STATE_COMPLETED ||
+						purchaseObj.getHandle() != MA_PURCHASE_ERROR_INVALID_HANDLE )
+                {
+					PurchaseManager.onTransactionInformationReceived(purchaseObj);
+
+                    // Notify the user with the transaction details, and only
+					// after that confirmNotifications.
+                    if (!notifyList.isEmpty())
+                    {
+                        String[] notifyIds = notifyList.toArray(new String[notifyList.size()]);
+                        confirmNotifications(startId, notifyIds);
+                    }
+                    mPurchaseRequestInProgress = false;
+                }
+                // Check if the product was restored.
+                else if ( purchaseObj.getState() == MA_PURCHASE_EVENT_REFUNDED ) // if (mRestoringTransactions)
+                {
+					PurchaseManager.onPurchaseRestored(purchaseObj);
                 }
             }
         }
@@ -398,12 +406,7 @@ public class BillingService extends Service implements ServiceConnection
 		ConfirmNotifications request = new ConfirmNotifications(startId, mService, notifyIds);
 		request.runRequest();
 
-		if ( request.getRequestID() != Consts.BILLING_RESPONSE_INVALID_REQUEST_ID )
-		{
-			// TODO delete log.
-			Log.e("@@MoSync","BillingService confirmNotifications request id = " + request.getRequestID());
-		}
-		else
+		if ( request.getRequestID() == Consts.BILLING_RESPONSE_INVALID_REQUEST_ID )
 		{
 			SYSLOG("@@MoSync maPurchaseRequest There was an error when confirming the transaction information");
 		}
@@ -417,9 +420,7 @@ public class BillingService extends Service implements ServiceConnection
 		{
 			return null;
 		}
-		//TODO delete log.
-		Log.e("@@MoSync","BillingService restoreTransactions request id = " + request.getRequestID());
-//        request.setPendingState(true);
+
         mSentRequests.put(request.getRequestID(), request);
 		return request;
     }
@@ -448,7 +449,7 @@ public class BillingService extends Service implements ServiceConnection
 	@Override
 	public void onServiceConnected(ComponentName name, IBinder service)
 	{
-		SYSLOG("@@MoSync BillingService - onServiceConnected ");
+		SYSLOG("@@MoSync BillingService - onServiceConnected !");
 		// Get the service interface.
         mService = IMarketBillingService.Stub.asInterface(service);
         runPendingRequests();
@@ -457,7 +458,7 @@ public class BillingService extends Service implements ServiceConnection
 	@Override
 	public void onServiceDisconnected(ComponentName name)
 	{
-        SYSLOG("@@MoSync BillingService - onServiceDisconnected");
+        SYSLOG("@@MoSync BillingService - onServiceDisconnected !");
         mService = null;
 	}
 
@@ -493,6 +494,15 @@ public class BillingService extends Service implements ServiceConnection
     }
 
     /**
+     * Set the state of the current running request.
+     * @param stateInProgress
+     */
+    public static void setPurchaseRequestInProgress(boolean stateInProgress)
+    {
+		mPurchaseRequestInProgress = stateInProgress;
+    }
+
+    /**
      * Runs any pending requests that are waiting for a connection to the
      * service to be established.
      */
@@ -502,6 +512,7 @@ public class BillingService extends Service implements ServiceConnection
         BaseRequest request;
         while ((request = mPendingRequests.peek()) != null)
         {
+			request.setService(mService);
             if (request.runIfConnected())
             {
                 // Remove the request.
@@ -538,7 +549,7 @@ public class BillingService extends Service implements ServiceConnection
     /**
      * The service connection to the remote MarketBillingService.
      */
-	private IMarketBillingService mService = null;
+	private static IMarketBillingService mService = null;
 
 	/**
 	 * Application context.
@@ -549,8 +560,8 @@ public class BillingService extends Service implements ServiceConnection
 	/**
 	 * The developer public key.
 	 */
-	private static PublicKey mPublicKey = null;
-	private boolean mIsPublicKeySet = false;
+	private static PublicKey mPublicKey;
+	private static boolean mIsPublicKeySet = false;
 
 	private static boolean mPurchaseRequestInProgress = false;
 	public static int mCurrentPurchaseHandle = -1;
@@ -569,6 +580,4 @@ public class BillingService extends Service implements ServiceConnection
      */
     private static HashMap<Long, BaseRequest> mSentRequests =
         new HashMap<Long, BaseRequest>();
-
-    private IBillingObserver mListener;
 }

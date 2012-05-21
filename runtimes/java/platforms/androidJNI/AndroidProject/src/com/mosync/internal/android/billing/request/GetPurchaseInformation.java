@@ -33,8 +33,8 @@ import com.mosync.internal.android.billing.Security;
  * It can also occur when a previous purchase is refunded.
  * Google Play notifies your application when a purchase changes state,
  * so you only need to send this request when there is transaction information to retrieve.
- * @author emma
  *
+ * @author emma
  */
 public class GetPurchaseInformation extends BaseRequest
 {
@@ -59,9 +59,7 @@ public class GetPurchaseInformation extends BaseRequest
 		 */
 		mNonce = Security.generateNonce();
 
-	    Bundle request = mService.sendBillingRequest(
-				BillingService.createRequestBundle(Consts.METHOD_GET_PURCHASE_INFO));
-
+	    Bundle request = BillingService.createRequestBundle(Consts.METHOD_GET_PURCHASE_INFO);
 	    request.putLong(Consts.BILLING_REQUEST_NONCE, mNonce);
 	    request.putStringArray(Consts.BILLING_REQUEST_NOTIFY_IDS, mNotifyIds);
 	    Bundle response = mService.sendBillingRequest(request);
@@ -73,9 +71,9 @@ public class GetPurchaseInformation extends BaseRequest
 				Consts.BILLING_RESPONSE_INVALID_RESPONSE_CODE);
 	    mResponseCode = Consts.responseCodeValue(responseCode);
 
+	    //Todo delete log.
 	    Log.e("@@MoSync", "GetPurchaseInformation response code: " + mResponseCode );
 	    Log.e("@@MoSync", "GetPurchaseInformation requestID: " + mRequestId );
-	    // TODO send event.
 	}
 
 	/**
@@ -87,7 +85,7 @@ public class GetPurchaseInformation extends BaseRequest
 	@Override
 	protected void onRemoteException(RemoteException e)
 	{
-	    Log.e("@@MoSync", "remote billing service crashed");
+	    Log.e("@@MoSync", "Remote billing service crashed");
 	    super.onRemoteException(e);
 	    Security.removeNonce(mNonce);
 	}

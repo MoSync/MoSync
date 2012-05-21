@@ -26,6 +26,7 @@ import android.content.Intent;
 import android.content.IntentSender;
 import android.os.Bundle;
 import android.os.RemoteException;
+import android.util.Log;
 
 import com.android.vending.billing.IMarketBillingService;
 import com.mosync.internal.android.billing.BillingService;

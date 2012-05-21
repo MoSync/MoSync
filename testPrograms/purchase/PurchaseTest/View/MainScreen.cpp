@@ -43,7 +43,9 @@ namespace PurchaseTest
 		mLabelCoordY(0)
 	{
 		mMainLayout = new RelativeLayout();
-		mMainLayout->setScrollable(true);
+		//mMainLayout->setScrollable(true);
+		mListView = new ListView();
+		mMainLayout->addChild(mListView);
 		this->setMainWidget(mMainLayout);
 	}
 
@@ -64,13 +66,14 @@ namespace PurchaseTest
 	{
 		printf("LOG: %s", text.c_str());
 		Label* label = new Label();
-		label->setLeftPosition(0);
-		label->setTopPosition(mLabelCoordY);
+		//label->setLeftPosition(0);
+		//label->setTopPosition(mLabelCoordY);
 		label->setText(text);
 
 		// The label must be have a fix height.
-		label->setHeight(LABEL_HEIGHT);
-		mMainLayout->addChild(label);
+//		label->setHeight(LABEL_HEIGHT);
+		//mMainLayout->addChild(label);
+		mListView->addChild(label);
 
 		mLabelCoordY += LABEL_HEIGHT;
 

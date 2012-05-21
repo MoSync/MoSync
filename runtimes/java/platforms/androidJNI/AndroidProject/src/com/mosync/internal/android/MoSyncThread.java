@@ -453,6 +453,7 @@ public class MoSyncThread extends Thread
 
 		// Turn on sensors.
 		mMoSyncSensor.onResume();
+		mMoSyncPurchase.restoreService();
 	}
 
 	public void onPause()

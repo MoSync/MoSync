@@ -63,6 +63,13 @@ public class MoSyncPurchase
 		}
 	}
 
+	public void restoreService()
+	{
+		if (mPurchaseManager != null)
+		{
+			mPurchaseManager.restoreService();
+		}
+	}
 	public void unbindService()
 	{
 		if (mPurchaseManager != null)
@@ -144,8 +151,10 @@ public class MoSyncPurchase
 		else
 		{
 			Log.e("@@MoSync","maPurchaseRequest error: not available");
-			mMoSyncThread.postEvent(BillingEvent.onPurchaseStateChanged(
-					handle, MA_PURCHASE_RES_UNAVAILABLE, 0));
+			PurchaseManager.onPurchaseStateChanged(
+					MA_PURCHASE_RES_UNAVAILABLE,
+					handle,
+					0);
 		}
 	}
 

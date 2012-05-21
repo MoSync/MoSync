@@ -20,15 +20,12 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_STATE_COMPLETED;
+import static com.mosync.internal.android.MoSyncHelpers.SYSLOG;
 
 /**
- * Security-related methods. For a secure implementation, all of this code
- * should be implemented on a server that communicates with the
- * application on the device. For the sake of simplicity and clarity of this
- * example, this code is included here and is executed on the device. If you
- * must verify the purchases on the phone, you should obfuscate this code to
- * make it harder for an attacker to replace the code with stubs that treat all
- * purchases as verified.
+ * Security-related methods for verifying the receipts.
+ *
+ * @author emma
  */
 public class Security
 {
@@ -83,7 +80,7 @@ public class Security
     {
         if (signedData == null)
         {
-            Log.e("@@MoSync", "Purchase Information: data is null!!");
+            Log.e("@@MoSync", "Billing Information: data is null!!");
             return null;
         }
 
@@ -93,9 +90,12 @@ public class Security
             verified = Security.verify(key, signedData, signature);
             if (!verified)
             {
-                Log.e("@@MoSync", "Purchase Information: signature does not match data.");
+                Log.e("@@MoSync", "Billing Information: signature does not match data.");
                 return null;
             }
+        }else
+        {
+			Log.e("@@MoSync","Billing Information not signed, no signature received!");
         }
 
         JSONObject jObject;
@@ -112,6 +112,7 @@ public class Security
             if (jTransactionsArray != null)
             {
                 numTransactions = jTransactionsArray.length();
+                Log.e("@@MoSync","BillingService received " + numTransactions + " transactions !");
             }
         } catch (JSONException e)
         {
@@ -122,7 +123,7 @@ public class Security
 
         if (!Security.isNonceKnown(nonce))
         {
-            Log.w("@@MoSync", "Nonce not found: " + nonce);
+            Log.w("@@MoSync", "Billing Information: Nonce not found: " + nonce);
             return null;
         }
 
@@ -132,21 +133,27 @@ public class Security
             {
                 JSONObject jElement = jTransactionsArray.getJSONObject(i);
                 int response = jElement.getInt(Consts.TRANSACTION_PURCHASE_STATE);
+                SYSLOG("@@MoSync Purchase field response - " + response);
                 int purchaseState = Consts.purchaseStateValue(response);
                 String productId = jElement.getString(Consts.TRANSACTION_PRODUCT_ID);
+                SYSLOG("MoSync Purchase field productId - " + productId);
                 String packageName = jElement.getString(Consts.TRANSACTION_PACKAGE_NAME);
+                SYSLOG("MoSync Purchase field packageName - " + packageName);
                 long purchaseTime = jElement.getLong(Consts.TRANSACTION_PURCHASE_TIME);
+                SYSLOG("MoSync Purchase field purchaseTime - " + purchaseTime);
                 String orderId = jElement.optString(Consts.TRANSACTION_ORDER_ID, "");
+                SYSLOG("MoSync Purchase field orderId - " + orderId);
                 String payload = jElement.optString(Consts.TRANSACTION_DEVELOPER_PAYLOAD,"");
+                SYSLOG("MoSync Purchase field payload - " + payload);
 
                 String notifyId = null;
                 if (jElement.has(Consts.TRANSACTION_NOTIFICATION_ID))
                 {
                     notifyId = jElement.getString(Consts.TRANSACTION_NOTIFICATION_ID);
+                    SYSLOG("MoSync Purchase field notifyId - " + notifyId);
                 }
-
                 // If the purchase state is PURCHASED, then we require a verified nonce.
-                if (purchaseState == MA_PURCHASE_STATE_COMPLETED && !verified) {
+                if ( purchaseState == MA_PURCHASE_STATE_COMPLETED && !verified) {
                     continue;
                 }
                 // For REFUNDED or RESTORED purchases, the payload will be left null.
@@ -154,7 +161,7 @@ public class Security
 						productId, orderId, purchaseTime, packageName, payload));
             }
         } catch (JSONException e) {
-            Log.e("MoSync", "Purchase Information: JSON exception: ", e);
+            SYSLOG("MoSync Purchase Information: JSON exception: " + e.toString());
             return null;
         }
         removeNonce(nonce);
@@ -177,10 +184,8 @@ public class Security
         } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException(e);
         } catch (InvalidKeySpecException e) {
-//            Log.e(TAG, "Invalid key specification.");
             throw new IllegalArgumentException(e);
         } catch (Base64DecoderException e) {
-//            Log.e(TAG, "Base64 decoding failed.");
             throw new IllegalArgumentException(e);
         }
     }
@@ -202,7 +207,6 @@ public class Security
             sig.initVerify(publicKey);
             sig.update(signedData.getBytes());
             if (!sig.verify(Base64.decode(signature))) {
-//                Log.e(TAG, "Signature verification failed.");
                 return false;
             }
             return true;

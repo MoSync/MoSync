@@ -27,6 +27,8 @@ import com.mosync.internal.android.billing.Security;
 
 /**
  * Wrapper class that sends a RESTORE_TRANSACTIONS message to the server.
+ *
+ * @author emma
  */
 public class RestoreTransactions extends BaseRequest
 {

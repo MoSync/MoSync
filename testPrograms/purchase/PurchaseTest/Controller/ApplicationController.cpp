@@ -28,6 +28,7 @@
 
 #include "ApplicationController.h"
 #include "../View/MainScreen.h"
+#include "../wrapper/PurchaseManager.h"
 
 #include "../tests/ITest.h"
 #include "../tests/Test1.h"
@@ -55,13 +56,16 @@ namespace PurchaseTest
 
 		this->log("Application started!");
 
-		//TODO check platform version also.
-//		maGetSystemProperty("mosync.device.OS.version")
 		int platform = getPlatform();
 		if (platform != IOS &&
 			platform != ANDROID)
 		{
 			maAlert("Error", "This program runs only on Android and iOS devices",
+				"OK", NULL, NULL);
+		}
+		else if ( PurchaseManager::getInstance()->checkPurchaseSupported() != MA_PURCHASE_RES_OK )
+		{
+			maAlert("Error", "Billing is not supported on this device",
 				"OK", NULL, NULL);
 		}
 		else
