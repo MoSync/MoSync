@@ -36,7 +36,8 @@ using namespace NativeUI;
  * Class that creates a screen that displays an ListView.
  */
 class MainScreen:
-	public Screen
+	public Screen,
+	public MapListener
 {
 public:
 	/**
@@ -55,12 +56,27 @@ private:
 	 */
 	void createMainLayout();
 
+    /**
+	 * This method is called when the zoom level of the map changes (at a double tap
+	 * on the google maps for example).
+     * @param map The map object that generated the event.
+     */
+    virtual void mapZoomLevelChanged(Map* map);
+
+    /**
+	 * This method is called when the visible region on the map is changed (on a drag/scroll
+	 * for example).
+	 * @param map The map object that generated the event.
+	 */
+    virtual void mapRegionChanged(Map* map);
+
 private:
 	/**
 	 * Main layout.
 	 */
 	VerticalLayout* mMainLayout;
 	Label* mTitleLabel;
+	Map* mMap;
 };
 
 

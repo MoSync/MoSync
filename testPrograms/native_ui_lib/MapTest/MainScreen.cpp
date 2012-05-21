@@ -20,8 +20,6 @@
  * @file MainScreen.cpp
  * @author Spiridon Alexandru
  */
-
-
 #include "MainScreen.h"
 
 /**
@@ -29,9 +27,12 @@
  */
 MainScreen::MainScreen() :
 	Screen(),
-	mMainLayout(NULL)
+	mMainLayout(NULL),
+	mMap(NULL)
 {
 	createMainLayout();
+
+	mMap->addMapListener(this);
 }
 
 /**
@@ -39,7 +40,7 @@ MainScreen::MainScreen() :
  */
 MainScreen::~MainScreen()
 {
-
+	mMap->removeMapListener(this);
 }
 
 /**
@@ -58,4 +59,37 @@ void MainScreen::createMainLayout() {
 	mTitleLabel->fillSpaceHorizontally();
 	mTitleLabel->setTextHorizontalAlignment("center");
 	mMainLayout->addChild(mTitleLabel);
+
+	mMap = new Map();
+	mMap->fillSpaceHorizontally();
+	mMap->fillSpaceVertically();
+
+	// set the map type to satellite (by default it's set to MAP_TYPE_ROAD)
+	mMap->setMapType(MAP_TYPE_ROAD);
+	printf("Map type: %d", mMap->getMapType());
+
+	mMap->setZoomLevel(3);
+	printf("Map zoom level: %d", mMap->getZoomLevel());
+
+	mMainLayout->addChild(mMap);
+}
+
+/**
+ * This method is called when the zoom level of the map changes (at a double tap
+ * on the google maps for example).
+ * @param map The map object that generated the event.
+ */
+void MainScreen::mapZoomLevelChanged(Map* map)
+{
+	printf("%s","Zoom level changed!");
+}
+
+/**
+ * This method is called when the visible region on the map is changed (on a drag/scroll
+ * for example).
+ * @param map The map object that generated the event.
+ */
+void MainScreen::mapRegionChanged(Map* map)
+{
+	printf("%s","Region level changed!");
 }

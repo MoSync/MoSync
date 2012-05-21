@@ -4514,8 +4514,17 @@ group WidgetAPI "Widget API" {
 		* @brief Send when an item in your options menu is selected.
 		*/
 		OPTIONS_MENU_ITEM_SELECTED = 29;
-	}
 
+		/*
+		* @brief Sent when the zoom level of a map widget has changed (if the user zoomed in or out).
+		*/
+		MAP_ZOOM_LEVEL_CHANGED = 30;
+
+		/*
+		* @brief Sent when the visible region on the map has changed (if the user scrolled/draged the map).
+		*/
+		MAP_REGION_CHANGED = 31;
+	}
 	} // end of WidgetEventTypes
 
 	} // end of WidgetEvents
@@ -5023,6 +5032,12 @@ group WidgetAPI "Widget API" {
 		*/
 		RATING_BAR = "RatingBar";
 
+		/**
+		* @brief The map widget will contain the google map (on iOS and Android) and the bing map (on Windows Phone)
+		* controls and will allow the user to interract with the map.
+		* See \ref WidgetMapProperties "Map properties" for the properties available.
+		*/
+		MAP = "Map";
 	}
 	} // end of WidgetTypes
 
@@ -7659,6 +7674,50 @@ group WidgetAPI "Widget API" {
 		GRANULARITY = "granularity";
 	}
 	} // end of WidgetRatingBarProperties
+
+	/**
+	* Constants of the map widget.
+	*/
+	group WidgetMapConstants "Map constants" {
+	    constset int MAW_MAP_TYPE_ {
+	        /**
+			* Road map type.
+			*/
+			ROAD = 0;
+			/**
+			* Sattelite map type.
+			*/
+			SATELLITE = 1;
+		}
+	} // end of WidgetMapConstants
+
+	/**
+	* The available widget properties for a #MAW_MAP. See \ref WidgetProperties "Widget properties" for more properties.
+	*/
+	group WidgetMapProperties "Map properties" {
+	constset MAString MAW_MAP_ {
+		/**
+		* @brief Set the map type: satellite (MAW_MAP_TYPE_SATELLITE) or road (MAW_MAP_TYPE_ROAD).
+		*/
+		TYPE = "type";
+
+		/**
+		* @brief Set the center of the map.
+		*/
+		CENTER = "center";
+
+		/**
+		* @brief Disables/enables the interraction between the user and the map.
+		*/
+		INTERRACTION_ENABLED = "interraction_enabled";
+
+		/**
+		* @brief Set the zoom level
+		*/
+		ZOOM_LEVEL = "zoom_level";
+	}
+	} // end of WidgetMapProperties
+
 	} // end of WidgetProperties
 
 	typedef int MAWidgetHandle;
