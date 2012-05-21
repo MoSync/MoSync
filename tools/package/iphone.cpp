@@ -46,10 +46,13 @@ void packageIOS(const SETTINGS& s, const RuntimeInfo& ri) {
 	string src = s.cppOutputDir;
 	string templateLocation = string(ri.path) + "/template";
 	string xcodeprojOutput = dst + "/xcode-proj";
+	// If no bundle identifier, use the default one (used until 3.0.2) that is RFC1034-"ish"
+	string bundleIdArg = s.iOSBundleId ? s.iOSBundleId : (string("com.") + s.vendor + "." + s.name);
 
 	generateCmd << getBinary("iphone-builder") << " generate -project-name " <<
 		arg(s.name) << " -version " << s.version << " -company-name " <<
-		arg(s.vendor) << " -cert " << arg(s.iOSCert) << " -input " << file(templateLocation) <<
+		arg(s.vendor) << " -bundle-identifier " << arg(bundleIdArg) <<
+		" -cert " << arg(s.iOSCert) << " -input " << file(templateLocation) <<
 		" -output " << file(xcodeprojOutput);
 
 	sh(generateCmd.str().c_str(), s.silent);
