@@ -47,6 +47,7 @@ namespace PurchaseTest
 	Test4::~Test4()
 	{
 		mPurchase->removePurchaseListener(this);
+		delete mPurchase;
 	}
 
 	/**
@@ -55,14 +56,7 @@ namespace PurchaseTest
 	void Test4::startTest()
 	{
 		MAUtil::String productType = ProductTypes::getInstance().getProductType1();
-		if ( getPlatform() == ANDROID )
-		{
-			mPurchase = new Purchase(productType, this);
-		}
-		else if ( getPlatform() == IOS )
-		{
-			mPurchase = new Purchase(productType, this);
-		}
+		mPurchase = new Purchase(productType, this);
 	}
 
 	/**

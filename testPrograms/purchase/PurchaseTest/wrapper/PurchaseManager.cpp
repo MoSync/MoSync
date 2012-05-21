@@ -25,6 +25,8 @@
  * them to the target products.
  */
 
+#include <conprint.h>
+
 #include "PurchaseManager.h"
 #include "PurchaseManagerListener.h"
 #include "Purchase.h"
@@ -141,7 +143,8 @@ namespace IAP
 			{
 				if ( purchaseData.state == MA_PURCHASE_STATE_RESTORE_ERROR )
 				{
-					for (int i = 0; i < mListeners.size(); i++)
+					int countListeners = mListeners.size();
+					for (int i = 0; i < countListeners; i++)
 					{
 						mListeners[i]->purchaseRestoreError(purchaseData.errorCode);
 					}
@@ -162,7 +165,6 @@ namespace IAP
 				{
 					// Get the product object that wraps the product handle.
 					Purchase* purchase = mPurchaseMap[purchaseData.productHandle];
-
 					// Call the purchase's event handling method.
 					purchase->handlePurchaseEvent(event.purchaseData);
 				}
@@ -199,7 +201,8 @@ namespace IAP
 	 */
 	void PurchaseManager::addPurchaseListener(PurchaseManagerListener* listener)
 	{
-		for (int i = 0; i < mListeners.size(); i++)
+		int countListeners = mListeners.size();
+		for (int i = 0; i < countListeners; i++)
 		{
 			if (listener == mListeners[i])
 			{
@@ -217,7 +220,8 @@ namespace IAP
 	 */
 	void PurchaseManager::removePurchaseListener(PurchaseManagerListener* listener)
 	{
-		for (int i = 0; i < mListeners.size(); i++)
+		int countListeners = mListeners.size();
+		for (int i = 0; i < countListeners; i++)
 		{
 			if (listener == mListeners[i])
 			{
@@ -234,7 +238,8 @@ namespace IAP
 	void PurchaseManager::createRestoredProduct(MAHandle productHandle)
 	{
 		Purchase* purchase = new Purchase(productHandle);
-		for (int i = 0; i < mListeners.size(); i++)
+		int countListeners = mListeners.size();
+		for (int i = 0; i < countListeners; i++)
 		{
 			mListeners[i]->purchaseRestored(*purchase);
 		}
@@ -248,7 +253,8 @@ namespace IAP
 	void PurchaseManager::createRefundedProduct(MAHandle productHandle)
 	{
 		Purchase* purchase = new Purchase(productHandle);
-		for (int i = 0; i < mListeners.size(); i++)
+		int countListeners = mListeners.size();
+		for (int i = 0; i < countListeners; i++)
 		{
 			mListeners[i]->purchaseRefunded(*purchase);
 		}

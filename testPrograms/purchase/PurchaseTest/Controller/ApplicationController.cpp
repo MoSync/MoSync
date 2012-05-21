@@ -146,7 +146,7 @@ namespace PurchaseTest
 	 */
 	void ApplicationController::createTests()
 	{
-//		mTests.add(new Test1(*this));
+		mTests.add(new Test1(*this));
 		// Test2 will always succeed on iOS.
 		mTests.add(new Test2(*this));
 		mTests.add(new Test3(*this));

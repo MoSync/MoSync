@@ -52,7 +52,6 @@ namespace IAP
 	{
 		this->addPurchaseListener(listener);
 		mHandle = maCreatePlaceholder();
-		printf("create product productID.c_str() = %s", productID.c_str());
 		PurchaseManager::getInstance()->registerPurchase(this);
 		maPurchaseCreate(mHandle, productID.c_str());
 	}
@@ -160,7 +159,8 @@ namespace IAP
 	 */
 	void Purchase::addPurchaseListener(PurchaseListener* listener)
 	{
-		for (int i = 0; i < mPurchaseEventListeners.size(); i++)
+		int countListeners = mPurchaseEventListeners.size();
+		for (int i = 0; i < countListeners; i++)
 		{
 			if (listener == mPurchaseEventListeners[i])
 			{
@@ -178,7 +178,8 @@ namespace IAP
 	 */
 	void Purchase::removePurchaseListener(PurchaseListener* listener)
 	{
-		for (int i = 0; i < mPurchaseEventListeners.size(); i++)
+		int countListeners = mPurchaseEventListeners.size();
+		for (int i = 0; i < countListeners; i++)
 		{
 			if (listener == mPurchaseEventListeners[i])
 			{
@@ -196,8 +197,8 @@ namespace IAP
 	void Purchase::handleProductCreateEvent(
 		const MAPurchaseEventData& purchaseData)
 	{
-		// TODO optimize for loop.
-		for( int i = 0; i < mPurchaseEventListeners.size(); i++)
+		int countListeners = mPurchaseEventListeners.size();
+		for (int i = 0; i < countListeners; i++)
 		{
 			if (purchaseData.state == MA_PURCHASE_STATE_PRODUCT_VALID)
 			{
@@ -251,7 +252,8 @@ namespace IAP
 		}
 
 		// TODO optimize for loop.
-		for (int i = 0; i < mPurchaseEventListeners.size(); i++)
+		int countListeners = mPurchaseEventListeners.size();
+		for (int i = 0; i < countListeners; i++)
 		{
 			if (purchaseData.state == MA_PURCHASE_STATE_RECEIPT_VALID)
 			{
