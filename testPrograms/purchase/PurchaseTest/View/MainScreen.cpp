@@ -73,5 +73,15 @@ namespace PurchaseTest
 		mMainLayout->addChild(label);
 
 		mLabelCoordY += LABEL_HEIGHT;
+
+		int scrollToY = mLabelCoordY - this->getHeight();
+		if (scrollToY > 0)
+		{
+			printf("scroll to y: %d", scrollToY);
+			mMainLayout->setContentOffset(0,scrollToY);
+			printf("layout content offset (x,y) = (%d, %d)",
+				mMainLayout->getContentOffsetCoordX(),
+				mMainLayout->getContentOffsetCoordY());
+		}
 	}
 }
