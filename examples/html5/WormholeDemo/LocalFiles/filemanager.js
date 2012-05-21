@@ -48,13 +48,13 @@ function initFileManager()
 				},
 				function(error)
 				{
-					alert(error);
+					alert("initFileManager1 error: " + error);
 				});
 		},
 		// Error callback.
 		function(error)
 		{
-			alert("fs error");
+			alert("initFileManager2 error: " + error);
 		});
 }
 
@@ -89,7 +89,7 @@ function refreshFiles()
 	},
 	function(error)
 	{
-		alert("error");
+		alert("refreshFiles error: " + error);
 	});
 }
 
@@ -154,13 +154,13 @@ function createFile()
 				},
 				function()
 				{
-					alert("error");
+					alert("createFile error: " + error);
 				});
 		},
 		// Error callback.
 		function(error)
 		{
-			alert("error");
+			alert("createFile error: " + error);
 		});
 }
 
@@ -193,7 +193,7 @@ function saveCurrentFile()
 			writer.write(text);
 		},
 		function(error){
-			alert("Cannot save file");
+			alert("saveCurrentFile1 error: " + error);
 		});
 	// Need to truncate to remove old file data
 	// in case file is shorter after write.
@@ -202,7 +202,7 @@ function saveCurrentFile()
 			writer.truncate(text.length);
 		},
 		function(error){
-			alert("Cannot save file");
+			alert("saveCurrentFile2 error: " + error);
 		});
 }
 
@@ -224,13 +224,13 @@ function renameCurrentFile()
 							currentFile = file;
 							refreshFiles();
 						},
-						function()
+						function(error)
 						{
-							alert("error");
+							alert("renameCurrentFile1 error: " + error);
 						});
 			},
-			function(){
-				alert("error");
+			function(error){
+				alert("renameCurrentFile2 error: " + error);
 			});
 	}
 }
