@@ -596,6 +596,14 @@ static void nativePostEvent(JNIEnv* env, jobject jthis, jintArray eventBuffer)
 }
 
 /**
+* @brief nativeGetEventQueueSize
+*/
+static int nativeGetEventQueueSize(JNIEnv* env, jobject jthis)
+{
+	return Base::gSyscall->getEventQueueSize();
+}
+
+/**
  * This function now uses the JavaVM object to get the current thread.
  * Please see the links below and file SyscallImpl.cpp:
  * http://www.netmite.com/android/mydroid/1.6/dalvik/docs/jni-tips.html
@@ -665,7 +673,9 @@ int jniRegisterNativeMethods(
 	return 0;
 }
 
-jint gNumJavaMethods = 9;
+// NOTE: Remember to update sNumJavaMethods when adding/removing
+// native methods!
+static jint sNumJavaMethods = 10;
 static JNINativeMethod sMethods[] =
 {
 	// name, signature, funcPtr
@@ -676,9 +686,11 @@ static JNINativeMethod sMethods[] =
 	{ "nativeLoadCombined", "(Ljava/nio/ByteBuffer;)Ljava/nio/ByteBuffer;", (void*)nativeLoadCombined },
 	{ "nativeRun", "()V", (void*)nativeRun },
 	{ "nativePostEvent", "([I)V", (void*)nativePostEvent },
+	{ "nativeGetEventQueueSize", "()I", (void*)nativeGetEventQueueSize },
 	{ "nativeCreateBinaryResource", "(II)I", (void*)nativeCreateBinaryResource },
 	{ "nativeCreatePlaceholder", "()I", (void*)nativeCreatePlaceholder },
 	{ "nativeExit", "()V", (void*)nativeExit }
+	// *** Update sNumJavaMethods when adding/removing a method! *** //
 };
 
 /**
@@ -704,7 +716,7 @@ jint JNI_OnLoad(JavaVM* vm, void* reserved)
 		env,
 		"com/mosync/internal/android/MoSyncThread",
 		sMethods,
-		gNumJavaMethods);
+		sNumJavaMethods);
 
 	return JNI_VERSION_1_4;
 }

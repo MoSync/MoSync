@@ -25,13 +25,11 @@ MA 02110-1301, USA.
  * NativeUI library.
  */
 
-
 /**
- * The Resource handler submodule of the bridge module.
+ * The Resource handler submodule.
  * @private
  */
 mosync.resource = {};
-
 
 /**
  * A Hash containing all registered callback functions for
@@ -152,7 +150,41 @@ mosync.resource.imageDownloadFinished = function(imageHandle)
 	if (mosync.resource.imageDownloadQueue.length > 0)
 	{
 		mosync.bridge.send(
-				mosync.resource.imageDownloadQueue[0],
-				null);
+			mosync.resource.imageDownloadQueue[0],
+			null);
 	}
 };
+
+/**
+ * Send a log message to a remote server. This is a useful way
+ * to display debug info when developing/testing on a device.
+ *
+ * @param message The message to be sent, for example "Hello World".
+ * @param url Optional parameter the specifies the remove server
+ * to handle the log request, for example: "http://localhost:8282/log/".
+ * If this parameter is not supplied or set to null, "undefined" will
+ * be passed to the C++ message handler, and the url set in C++
+ * code will be used.
+ */
+mosync.resource.sendRemoteLogMessage = function(message, url)
+{
+	var urlParam = url;
+	if (!urlParam)
+	{
+		urlParam = "undefined";
+	}
+	mosync.bridge.send([
+		"Resource",
+		"sendRemoteLogMessage",
+		urlParam,
+		message
+	]);
+};
+
+/**
+ * Short alias for mosync.resource.sendRemoteLogMessage.
+ * Set the url of the logging service in C++ code, then
+ * just use mosync.rlog("Hello World") in your JS code.
+ * "rlog" is short for "remote log".
+ */
+mosync.rlog = mosync.resource.sendRemoteLogMessage;
