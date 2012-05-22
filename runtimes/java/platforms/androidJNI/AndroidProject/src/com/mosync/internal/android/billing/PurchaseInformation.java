@@ -71,14 +71,49 @@ public class PurchaseInformation
 		return mProductID;
 	}
 
+	public String getPackageName()
+	{
+		return mPackageName;
+	}
+
+	public long getTime()
+	{
+		return mTime;
+	}
+
+	public void setPackageName(final String pck)
+	{
+		mPackageName = pck;
+	}
+
+	public void setDeveloperPayload(final String devPayload)
+	{
+		mPayload = devPayload;
+	}
+
+	public void setOrderId(final String id)
+	{
+		mOrderID = id;
+	}
+
 	public void setState(final int state)
 	{
 		mState = state;
 	}
 
+	public void setTime(long time)
+	{
+		mTime = time;
+	}
+
 	public int getState()
 	{
 		return mState;
+	}
+
+	public String getOrderId()
+	{
+		return mOrderID;
 	}
 
 	public void setRequest(final BaseRequest reqObject)
@@ -106,23 +141,22 @@ public class PurchaseInformation
 	 * The internal handle of the purchase.
 	 */
 	private int mHandle = -1;
-	private BaseRequest mRequest = null;
+	private BaseRequest mRequest;
 
 	/**
 	 * The product id.
 	 */
-	private String mProductID = null;
+	private String mProductID;
 
 	/**
 	 * The notification Id that Google Play is sending when a purchase
 	 * request was successfull. Used in GetPurchaseInformation requests.
 	 */
-	public String mNotificationID = null;
-	public String mOrderID = null;
-	public String mPackageName = null;
-	public long mTime;
-	public int mPrice = 0;
-	public String mPayload = null;
+	public String mNotificationID;
+	public String mOrderID;
+	public String mPackageName;
+	private long mTime;
+	public String mPayload;
 
 	/**
 	 * Purchase state is at first unknown.

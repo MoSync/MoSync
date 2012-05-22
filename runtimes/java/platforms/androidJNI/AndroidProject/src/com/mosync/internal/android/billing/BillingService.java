@@ -185,12 +185,7 @@ public class BillingService extends Service implements ServiceConnection
 
 		if ( request != null && request instanceof Purchase )
 		{
-			if ( responseCode == Consts.RESULT_OK )
-			{
-				PurchaseManager.onPurchaseStateChanged(
-						MA_PURCHASE_STATE_IN_PROGRESS, request.getHandle(), 0);
-			}
-			else
+			if ( responseCode != Consts.RESULT_OK )
 			{
 				PurchaseManager.onPurchaseStateChanged(
 						MA_PURCHASE_STATE_FAILED, request.getHandle(), responseCode);
@@ -368,8 +363,8 @@ public class BillingService extends Service implements ServiceConnection
                     notifyList.add(purchaseObj.mNotificationID);
                 }
 
-                if ( purchaseObj.getState() == MA_PURCHASE_STATE_COMPLETED ||
-						purchaseObj.getHandle() != MA_PURCHASE_ERROR_INVALID_HANDLE )
+                if ( purchaseObj.getState() == MA_PURCHASE_STATE_COMPLETED )
+						//purchaseObj.getHandle() != MA_PURCHASE_ERROR_INVALID_HANDLE )
                 {
 					PurchaseManager.onTransactionInformationReceived(purchaseObj);
 
@@ -513,6 +508,7 @@ public class BillingService extends Service implements ServiceConnection
         while ((request = mPendingRequests.peek()) != null)
         {
 			request.setService(mService);
+			mCurrentPurchaseHandle = request.getHandle();
             if (request.runIfConnected())
             {
                 // Remove the request.
