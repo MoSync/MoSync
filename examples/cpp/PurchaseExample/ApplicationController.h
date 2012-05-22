@@ -30,11 +30,11 @@
 // Include all the wrappers.
 #include <NativeUI/Widgets.h>
 
-#include "wrapper/Purchase.h"
-#include "wrapper/PurchaseListener.h"
-#include "wrapper/PurchaseManager.h"
-#include "wrapper/PurchaseManagerListener.h"
-#include "wrapper/Receipt.h"
+#include <Purchase/Purchase.h>
+#include <Purchase/PurchaseListener.h>
+#include <Purchase/PurchaseManager.h>
+#include <Purchase/PurchaseManagerListener.h>
+#include <Purchase/Receipt.h>
 
 using namespace NativeUI;
 using namespace IAP;

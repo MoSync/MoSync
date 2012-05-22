@@ -17,6 +17,7 @@ MA 02110-1301, USA.
 
 package com.mosync.internal.android;
 
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.text.TextUtils;
 import android.util.Log;
@@ -77,6 +78,28 @@ public class MoSyncPurchase
 			mPurchaseManager.unbindService();
 		}
 	}
+	/**
+	 * Check if Billing permission is set, and if not call maPanic().
+	 */
+	boolean isBillingPermissionSet()
+	{
+		return
+			PackageManager.PERMISSION_GRANTED ==
+				mMoSyncThread.getActivity().checkCallingOrSelfPermission(
+						"com.android.vending.BILLING");
+	}
+
+	/**
+	 * Check if Billing permission is set, and if not call maPanic().
+	 */
+	void panicIfBillingPermissionIsNotSet()
+	{
+		if (!isBillingPermissionSet())
+		{
+			mMoSyncThread.maPanic(1,
+				"Billing permission is not set in the MoSync project");
+		}
+	}
 	/************************ Syscalls ************************/
 
 	/**
@@ -85,6 +108,7 @@ public class MoSyncPurchase
 	 */
 	public int maPurchaseSupported()
 	{
+//		panicIfBillingPermissionIsNotSet();
 		if ( mPurchaseManager != null)
 		{
 			return mPurchaseManager.checkPurchaseSupported();
@@ -101,6 +125,7 @@ public class MoSyncPurchase
 	 */
 	public void maPurchaseCreate(final int productHandle, final String productID)
 	{
+//		panicIfBillingPermissionIsNotSet();
 		if (mPurchaseManager != null)
 		{
 			int createState = mPurchaseManager.createPurchase(productHandle, productID);
@@ -129,6 +154,7 @@ public class MoSyncPurchase
 	 */
 	public void maPurchaseSetPublicKey(String developerPublicKey)
 	{
+//		panicIfBillingPermissionIsNotSet();
 		if ( mPurchaseManager != null )
 		{
 			mPurchaseManager.setKey(developerPublicKey);
@@ -144,6 +170,7 @@ public class MoSyncPurchase
 	 */
 	public void maPurchaseRequest(int handle)
 	{
+//		panicIfBillingPermissionIsNotSet();
 		if ( mPurchaseManager != null )
 		{
 			mPurchaseManager.requestPurchase(handle);
@@ -169,6 +196,7 @@ public class MoSyncPurchase
 	 */
 	public int maPurchaseGetName(int productHandle, int memBuffer, int memBufSize)
 	{
+//		panicIfBillingPermissionIsNotSet();
 		if ( mPurchaseManager != null )
 		{
 			String result = mPurchaseManager.getProductID(productHandle);
@@ -212,6 +240,7 @@ public class MoSyncPurchase
 			final int memBuffer,
 			final int bufferSize)
 	{
+//		panicIfBillingPermissionIsNotSet();
 		if ( mPurchaseManager != null )
 		{
 			String result = mPurchaseManager.getField(productHandle, property);
@@ -266,6 +295,7 @@ public class MoSyncPurchase
 	 */
 	public void maPurchaseRestoreTransactions()
 	{
+//		panicIfBillingPermissionIsNotSet();
 		if ( mPurchaseManager != null )
 		{
 			mPurchaseManager.restoreTransactions();
@@ -283,6 +313,7 @@ public class MoSyncPurchase
 	 */
 	public void maPurchaseVerifyReceipt(int handle)
 	{
+//		panicIfBillingPermissionIsNotSet();
 		if ( mPurchaseManager != null )
 		{
 			mPurchaseManager.verifyReceipt(handle);
@@ -301,6 +332,7 @@ public class MoSyncPurchase
 	 */
 	public int maPurchaseDestroy(int handle)
 	{
+//		panicIfBillingPermissionIsNotSet();
 		if (mPurchaseManager != null)
 		{
 			return mPurchaseManager.destroyPurchase(handle);

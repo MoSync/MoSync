@@ -137,17 +137,14 @@ void MainScreen::fillReceiptDialog(MAUtil::String appID, MAUtil::String productI
 				MAUtil::integerToString(transaction.tm_min) + ":" +
 				MAUtil::integerToString(transaction.tm_sec) );
 	}
-	if ( transactionId.length() == 0 )
-		transactionId = "-";
-	if( versionExternalId.length() == 0 )
-		versionExternalId = "-";
-	if ( BID.length() == 0 )
-		BID = "-";
 	mReceiptProductId->setText(productID);
 	mReceiptAppId->setText(appID);
-	mReceiptTransactionId->setText(transactionId);
-	mReceiptVersionExternalId->setText(versionExternalId);
-	mReceiptBid->setText(BID);
+	if ( getPlatform() == IOS )
+	{
+		mReceiptTransactionId->setText(transactionId);
+		mReceiptVersionExternalId->setText(versionExternalId);
+		mReceiptBid->setText(BID);
+	}
 
 	mReceiptDialog->show();
 }
@@ -273,18 +270,6 @@ void MainScreen::createReceiptDialog()
 	Label* receiptTransactionDate = new Label("Transaction date");
 	receiptTransactionDate->setFontColor(RECEIPT_FIELD_COLOR);
 	mReceiptTransactionDate = new Label();
-	Label* receiptTransactionId = new Label("Transaction ID");
-	receiptTransactionId->setFontColor(RECEIPT_FIELD_COLOR);
-	mReceiptTransactionId = new Label();
-	Label* receiptVersionExternalId = new Label("Version external ID");
-	receiptVersionExternalId->setFontColor(RECEIPT_FIELD_COLOR);
-	mReceiptVersionExternalId = new Label();
-	Label* receiptBid = new Label("BID");
-	receiptBid->setFontColor(RECEIPT_FIELD_COLOR);
-	mReceiptBid = new Label();
-
-	mReceiptOkButton = new Button();
-	mReceiptOkButton->setText("Ok");
 
 	dialogLayout->addChild(receiptProductIdInfo);
 	dialogLayout->addChild(mReceiptProductId);
@@ -292,12 +277,28 @@ void MainScreen::createReceiptDialog()
 	dialogLayout->addChild(mReceiptAppId);
 	dialogLayout->addChild(receiptTransactionDate);
 	dialogLayout->addChild(mReceiptTransactionDate);
-	dialogLayout->addChild(receiptTransactionId);
-	dialogLayout->addChild(mReceiptTransactionId);
-	dialogLayout->addChild(receiptVersionExternalId);
-	dialogLayout->addChild(mReceiptVersionExternalId);
-	dialogLayout->addChild(receiptBid);
-	dialogLayout->addChild(mReceiptBid);
+
+	if ( getPlatform() == IOS )
+	{
+		Label* receiptTransactionId = new Label("Transaction ID");
+		receiptTransactionId->setFontColor(RECEIPT_FIELD_COLOR);
+		mReceiptTransactionId = new Label();
+		Label* receiptVersionExternalId = new Label("Version external ID");
+		receiptVersionExternalId->setFontColor(RECEIPT_FIELD_COLOR);
+		mReceiptVersionExternalId = new Label();
+		Label* receiptBid = new Label("BID");
+		receiptBid->setFontColor(RECEIPT_FIELD_COLOR);
+		mReceiptBid = new Label();
+		dialogLayout->addChild(receiptTransactionId);
+		dialogLayout->addChild(mReceiptTransactionId);
+		dialogLayout->addChild(receiptVersionExternalId);
+		dialogLayout->addChild(mReceiptVersionExternalId);
+		dialogLayout->addChild(receiptBid);
+		dialogLayout->addChild(mReceiptBid);
+	}
+
+	mReceiptOkButton = new Button();
+	mReceiptOkButton->setText("Ok");
 
 	dialogLayout->addChild(mReceiptOkButton);
 }

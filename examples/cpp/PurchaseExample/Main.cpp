@@ -33,9 +33,9 @@ MA 02110-1301, USA.
 
 #include <NativeUI/Widget.h>
 #include <NativeUI/Widgets.h>// Include all widgets
+#include <Purchase/PurchaseManager.h>
 
 #include "Util.h"
-#include "wrapper/PurchaseManager.h"
 #include "ApplicationController.h"
 
 using namespace MAUtil;

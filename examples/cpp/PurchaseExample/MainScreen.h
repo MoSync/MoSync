@@ -35,8 +35,7 @@ MA 02110-1301, USA.
 
 // Include all the wrappers.
 #include <NativeUI/Widgets.h>
-
-#include "wrapper/PurchaseManager.h"
+#include <Purchase/PurchaseManager.h>
 
 using namespace NativeUI;
 using namespace IAP;
