@@ -319,10 +319,20 @@ group PurchaseReceiptFields "Purchase Receipt Fields" {
         */
 		BVRS = "bvrs";
 		/**
-		* \brief The product price.
+		* \brief The cost of the product in the local currency.
 		* Platform: iOS.
 		*/
 		PRICE = "price";
+		/**
+		* \brief The localized product title.
+		* Platform: iOS.
+		*/
+		TITLE = "title";
+		/**
+		* \brief The localized product description.
+		* Platform: iOS.
+		*/
+		DESCRIPTION = "description";
 	}
 } // end of Purchase Receipt Fields
 

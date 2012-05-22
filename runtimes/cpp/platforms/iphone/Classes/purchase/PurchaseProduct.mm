@@ -98,6 +98,16 @@ NSString* const kReceiptResponseReceiptKey = @"receipt";
  */
 -(void) handleReceiptResponse:(NSDictionary*) storeResponse;
 
+/**
+ * Get a field value from the product.
+ * @param fieldName One of the following values:
+ * - MA_PURCHASE_RECEIPT_PRICE
+ * - MA_PURCHASE_RECEIPT_TITLE
+ * - MA_PURCHASE_RECEIPT_DESCRIPTION
+ * @return The field value or nil in case of any error.
+ */
+-(NSString*) getProductField:(NSString*) fieldName;
+
 @end
 
 @implementation PurchaseProduct
@@ -272,12 +282,17 @@ NSString* const kReceiptResponseReceiptKey = @"receipt";
                 buffer:(char*) buffer
             bufferSize:(const int) bufferSize
 {
-    if (!_validationResponse)
+    if (!_validationResponse || !_product)
     {
         return MA_PURCHASE_RES_RECEIPT_NOT_AVAILABLE;
     }
     NSString* key = [NSString stringWithUTF8String:fieldName];
-    NSString* fieldValue = [_validationResponse objectForKey:key];
+    NSString* fieldValue = [self getProductField:key];
+    if (!fieldValue)
+    {
+        fieldValue = [_validationResponse objectForKey:key];
+    }
+
     if (!fieldValue)
     {
         return MA_PURCHASE_RES_INVALID_FIELD_NAME;
@@ -518,6 +533,35 @@ NSString* const kReceiptResponseReceiptKey = @"receipt";
                           state:MA_PURCHASE_STATE_RECEIPT_INVALID
                       errorCode:0];
     }
+}
+
+/**
+ * Get a field value from the product.
+ * @param fieldName One of the following values:
+ * - MA_PURCHASE_RECEIPT_PRICE
+ * - MA_PURCHASE_RECEIPT_TITLE
+ * - MA_PURCHASE_RECEIPT_DESCRIPTION
+ * @return The field value or nil in case of any error.
+ */
+-(NSString*) getProductField:(NSString*) fieldName
+{
+    if (!_product)
+    {
+        return nil;
+    }
+    if ([fieldName isEqualToString:@MA_PURCHASE_RECEIPT_PRICE])
+    {
+        return [NSString stringWithFormat:@"%d",_product.price];
+    }
+    else if ([fieldName isEqualToString:@MA_PURCHASE_RECEIPT_TITLE])
+    {
+        return _product.localizedTitle;
+    }
+    else if ([fieldName isEqualToString:@MA_PURCHASE_RECEIPT_DESCRIPTION])
+    {
+        return _product.localizedDescription;
+    }
+    return nil;
 }
 
 @end
