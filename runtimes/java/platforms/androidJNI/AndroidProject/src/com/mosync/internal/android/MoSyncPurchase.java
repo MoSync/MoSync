@@ -18,6 +18,7 @@ MA 02110-1301, USA.
 package com.mosync.internal.android;
 
 import android.os.Build;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.mosync.internal.android.billing.BillingEvent;
@@ -31,7 +32,7 @@ import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_RES_UNAVAIL
 import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_RES_BUFFER_TOO_SMALL;
 import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_STATE_DISABLED;
 import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_RES_RECEIPT_NOT_AVAILABLE;
-
+import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_RES_INVALID_FIELD_NAME;
 import static com.mosync.internal.android.MoSyncHelpers.*;
 
 /**
@@ -46,7 +47,6 @@ public class MoSyncPurchase
 	 */
 	public MoSyncPurchase(MoSyncThread thread)
 	{
-		SyslogOn(true);
 		mMoSyncThread = thread;
 		// In-app purchase is supported only from Android 1.6 and higher.
 		try{
@@ -214,16 +214,16 @@ public class MoSyncPurchase
 	{
 		if ( mPurchaseManager != null )
 		{
-//			if ( !property.equals(MA_PURCHASE_RECEIPT_PURCHASE_DATE)||
-//					!property.equals(MA_PURCHASE_RECEIPT_PRODUCT_ID) ||
-//					!property.equals(MA_PURCHASE_RECEIPT_PRICE) )
-//			{
-//				Log.e("@@MoSync", "maPurchaseGetField: Invalid field " + property);
-//				return MA_PURCHASE_RES_INVALID_FIELD_NAME;
-//			}
 			String result = mPurchaseManager.getField(productHandle, property);
 
-			if (result.length() == 0 )
+			if ( TextUtils.isEmpty(result) ||
+					result.equals(Consts.RECEIPT_FIELD_NOT_AVAILABLE) )
+			{
+				Log.e("@@MoSync", "maPurchaseGetField: The receipt field is not available " + property);
+				return MA_PURCHASE_RES_INVALID_FIELD_NAME;
+			}
+
+			if (result.equals(Consts.RECEIPT_INVALID_HANDLE) )
 			{
 				Log.e("@@MoSync", "maPurchaseGetField: Invalid product handle " + productHandle);
 				return MA_PURCHASE_RES_INVALID_HANDLE;
