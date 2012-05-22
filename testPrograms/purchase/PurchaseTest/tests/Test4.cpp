@@ -24,10 +24,10 @@
  *
  */
 
+#include <Purchase/PurchaseManager.h>
 #include <MAUtil/util.h>
 
 #include "Test4.h"
-#include "../wrapper/PurchaseManager.h"
 
 namespace PurchaseTest
 {

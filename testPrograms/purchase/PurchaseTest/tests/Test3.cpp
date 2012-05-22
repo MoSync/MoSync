@@ -29,9 +29,10 @@
  * and errorCode = MA_PURCHASE_ERROR_INVALID_PRODUCT.
  *
  */
+#include <Purchase/PurchaseManager.h>
 #include <MAUtil/util.h>
+
 #include "Test3.h"
-#include "../wrapper/PurchaseManager.h"
 
 namespace PurchaseTest
 {

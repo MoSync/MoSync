@@ -25,8 +25,6 @@
  * them to the target products.
  */
 
-#include <conprint.h>
-
 #include "PurchaseManager.h"
 #include "PurchaseManagerListener.h"
 #include "Purchase.h"

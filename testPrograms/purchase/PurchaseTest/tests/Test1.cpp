@@ -25,9 +25,11 @@
  * - Android: maPurchaseRequest fails with errorCode = MA_PURCHASE_ERROR_PUBLIC_KEY_NOT_SET.
  * - iOS: always succeeds.
  */
+
 #include <MAUtil/util.h>
+#include <Purchase/PurchaseManager.h>
+
 #include "Test1.h"
-#include "../wrapper/PurchaseManager.h"
 
 namespace PurchaseTest
 {

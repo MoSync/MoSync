@@ -30,11 +30,11 @@
 #ifndef PURCHASE_TEST5_H_
 #define PURCHASE_TEST5_H_
 
+#include <Purchase/Purchase.h>
+
 #include "ITest.h"
 #include "../Controller/IApplicationController.h"
 #include "../Util.h"
-
-#include "../wrapper/Purchase.h"
 
 using namespace IAP;
 

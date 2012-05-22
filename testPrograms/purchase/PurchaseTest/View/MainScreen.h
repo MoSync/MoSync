@@ -50,10 +50,25 @@ namespace PurchaseTest
 
 		/**
 		 * Write text on the screen.
-		 * A new label containing the give text will be added to the screen.
+		 * A new label containing the given text will be added to the screen.
 		 * @param text Text to print.
 		 */
 		void printText(const MAUtil::String& text);
+
+	private:
+		/**
+		 * Write text on the screen for iOS platform.
+		 * A new label containing the given text will be added to the screen.
+		 * @param text Text to print.
+		 */
+		void printTextiOS(const MAUtil::String& text);
+
+		/**
+		 * Write text on the screen for Android platform.
+		 * A new list item containing the given text will be added to the list.
+		 * @param text Text to print.
+		 */
+		void printTextAndroid(const MAUtil::String& text);
 
 	private:
 		/**

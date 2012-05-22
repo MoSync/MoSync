@@ -25,10 +25,10 @@
  */
 
 #include <maapi.h>
+#include <Purchase/PurchaseManager.h>
 
 #include "ApplicationController.h"
 #include "../View/MainScreen.h"
-#include "../wrapper/PurchaseManager.h"
 
 #include "../tests/ITest.h"
 #include "../tests/Test1.h"
@@ -107,6 +107,7 @@ namespace PurchaseTest
 	 */
 	void ApplicationController::testFailed(ITest& test)
 	{
+		this->log(test.getReason());
 		this->log("Test failed!");
 		this->log("================================");
 		MAUtil::String* testName = new MAUtil::String(test.getTestName());

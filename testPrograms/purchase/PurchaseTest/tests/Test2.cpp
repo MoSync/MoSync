@@ -26,13 +26,13 @@
 
 #define TEST_NAME "Test 2"
 
+
+#include <Purchase/Purchase.h>
+#include <Purchase/PurchaseManager.h>
 #include <conprint.h>
 
 #include "Test2.h"
 #include "../Util.h"
-
-#include "../wrapper/Purchase.h"
-#include "../wrapper/PurchaseManager.h"
 
 namespace PurchaseTest
 {
@@ -146,9 +146,8 @@ namespace PurchaseTest
 		const int errorCode)
 		{
 		char buffer[BUF_SIZE];
-		sprintf(buffer, "%s product was not purchased.",
-				mPurchase->getProductId().c_str());
-		mApplicationController.log(buffer);
+		sprintf(buffer, "%s product was not purchased. Error code: %d",
+				mPurchase->getProductId().c_str(), errorCode);
 		this->setFailedReason(buffer);
 		mApplicationController.testFailed(*this);
 		}

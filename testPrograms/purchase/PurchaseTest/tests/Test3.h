@@ -33,12 +33,12 @@
 #ifndef PURCHASE_TEST3_H_
 #define PURCHASE_TEST3_H_
 
+#include <Purchase/Purchase.h>
+#include <Purchase/PurchaseListener.h>
+
 #include "ITest.h"
 #include "../Controller/IApplicationController.h"
 #include "../Util.h"
-
-#include "../wrapper/Purchase.h"
-#include "../wrapper/PurchaseListener.h"
 
 using namespace IAP;
 

@@ -26,9 +26,10 @@
  *	- event receiptError, errorCode = MA_PURCHASE_ERROR_NO_RECEIPT.
  *
  */
+#include <Purchase/PurchaseManager.h>
 #include <MAUtil/util.h>
+
 #include "Test5.h"
-#include "../wrapper/PurchaseManager.h"
 
 namespace PurchaseTest
 {

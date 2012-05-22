@@ -33,9 +33,12 @@
  * 	3. Call verifyReceipt and check the error event.
  * 	Expected event: receiptError, with errorCode = MA_PURCHASE_ERROR_NO_RECEIPT.
  */
+
+#include <Purchase/PurchaseManager.h>
 #include <MAUtil/util.h>
+
 #include "Test6.h"
-#include "../wrapper/PurchaseManager.h"
+
 
 namespace PurchaseTest
 {

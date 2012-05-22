@@ -27,10 +27,10 @@
 #ifndef PURCHASE_TEST2_H_
 #define PURCHASE_TEST2_H_
 
+#include <Purchase/PurchaseListener.h>
+
 #include "ITest.h"
 #include "../Controller/IApplicationController.h"
-
-#include "../wrapper/PurchaseListener.h"
 
 using namespace IAP;
 

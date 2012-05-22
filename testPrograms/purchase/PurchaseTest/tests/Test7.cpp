@@ -24,8 +24,9 @@
  * Expected result: call returns MA_PURCHASE_RES_OK.
  */
 
+#include <Purchase/PurchaseManager.h>
+
 #include "Test7.h"
-#include "../wrapper/PurchaseManager.h"
 
 namespace PurchaseTest
 {

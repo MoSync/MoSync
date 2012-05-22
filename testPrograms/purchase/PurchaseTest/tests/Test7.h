@@ -27,12 +27,11 @@
 #ifndef PURCHASE_TEST7_H_
 #define PURCHASE_TEST7_H_
 
+#include <Purchase/Purchase.h>
+
 #include "ITest.h"
 #include "../Controller/IApplicationController.h"
 #include "../Util.h"
-
-#include "../wrapper/Purchase.h"
-
 
 using namespace IAP;
 

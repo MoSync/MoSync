@@ -27,8 +27,6 @@
 // Size of the buffer used to get product's id.
 #define PRODUCT_ID_BUFFER_SIZE 1024
 
-#include <conprint.h>
-
 #include "Purchase.h"
 #include "Receipt.h"
 #include "PurchaseManager.h"
@@ -218,8 +216,9 @@ namespace IAP
 	 */
 	void Purchase::handleRequestEvent(const MAPurchaseEventData& purchaseData)
 	{
-		// TODO optimize for loop.
-		for (int i = 0; i < mPurchaseEventListeners.size(); i++) {
+		int countListeners = mPurchaseEventListeners.size();
+		for (int i = 0; i < countListeners; i++)
+		{
 			if (purchaseData.state == MA_PURCHASE_STATE_IN_PROGRESS)
 			{
 				mPurchaseEventListeners[i]->requestInProgress(*this);
