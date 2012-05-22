@@ -5028,6 +5028,7 @@ group WidgetAPI "Widget API" {
 		* A Dialog gets visible only after calling maWidgetModalDialogShow().
 		* On Android it is a modal alert dialog.
 		* On iPad it is a PopoverController, and on iPhone it is a modal view.
+		* On Windows Phone, it's a Popup having inside a StackPanel which contains all the controls added to the dialog view.
 		* When a Dialog widget is created it is empty, it has no content. Any type of widget can be added inside it via #maWidgetAddChild syscalls.
 		* To show a Dialog call #maWidgetModalDialogShow(), to dismiss it call: #maWidgetModalDialogHide(), and to delete it call #maWidgetDestroy.
 		* See \ref WidgetModalDialogProperties "Modal Dialog properties" for the properties available.
