@@ -1,6 +1,7 @@
 NOTE: The In-app Purchase API does not work on Android emulator or iOS Simulator.
 
 Test case 2: The user makes a valid purchase. ( public key is set starting from this point)
+Receipt's fields are also verified.
 
 Test case 1: The user tries to buy a product, but does not set the public key. Expected result:
 	- Android maPurchaseRequest fails with errorCode = MA_PURCHASE_ERROR_PUBLIC_KEY_NOT_SET.
@@ -39,3 +40,6 @@ Test case : RestoreTransactions with no public key set.  ( Move this before Test
 Test case 8: Create two products using the same product handle.
             Expected result: the second product should receive an purchase
             event with MA_PURCHASE_STATE_DUPLICATE_HANDLE as state.
+
+Test case 9 Test maPurchaseGetName() syscall with a small buffer size.
+            MA_PURCHASE_RES_BUFFER_TOO_SMALL error should be returned.

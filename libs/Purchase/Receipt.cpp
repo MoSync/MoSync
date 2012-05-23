@@ -21,7 +21,7 @@
  * @author Bogdan Iusco
  * @date 7 May 2012
  *
- * @brief
+ * @brief A Receipt wraps the details of a purchase.
  */
 
 #include <MAUtil/util.h>
@@ -132,17 +132,35 @@ namespace IAP
 	}
 
 	/**
-	 * Get the product price.
+	 * The cost of the product in the local currency.
 	 * Platform: iOS.
 	 */
-	int Receipt::getPrice()
+	double Receipt::getPrice()
 	{
 		char buffer[BUF_SIZE];
 		maPurchaseGetField(mHandle,
 			MA_PURCHASE_RECEIPT_PRICE,
 			buffer,
 			BUF_SIZE);
-		return MAUtil::stringToInteger(buffer);
+		return MAUtil::stringToDouble(buffer);
+	}
+
+	/**
+	 * Get the localized product title.
+	 * Platform: iOS.
+	 */
+	MAUtil::String Receipt::getTitle()
+	{
+		return this->getFieldValue(MA_PURCHASE_RECEIPT_TITLE);
+	}
+
+	/**
+	 * Get the localized product description.
+	 * Platform: iOS.
+	 */
+	MAUtil::String Receipt::getDescription()
+	{
+		return this->getFieldValue(MA_PURCHASE_RECEIPT_DESCRIPTION);
 	}
 
 	/**

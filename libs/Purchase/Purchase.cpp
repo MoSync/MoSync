@@ -21,7 +21,8 @@
  * @author Bogdan Iusco
  * @date 3 May 2012
  *
- * @brief
+ * @brief The Purchase class wraps a product that can be buyed and also all
+ * the details of the transaction(such as the receipt).
  */
 
 // Size of the buffer used to get product's id.
@@ -113,10 +114,14 @@ namespace IAP
 	 * Note: if there are another requests in progress, the requests will
 	 * be queued.
 	 * Listeners will be notified.
+	 * @param quantity How many products to purchase. This value must be
+	 * greater than zero. This param is used only by the iOS platform.
+	 * On Android platform it will be ignored(only one product will be
+	 * purchased).
 	 */
-	void Purchase::requestPurchase()
+	void Purchase::requestPurchase(int quantity)
 	{
-		maPurchaseRequest(mHandle, 1);
+		maPurchaseRequest(mHandle, quantity);
 	}
 
 	/**
@@ -250,7 +255,6 @@ namespace IAP
 			mReceipt = new Receipt(mHandle);
 		}
 
-		// TODO optimize for loop.
 		int countListeners = mPurchaseEventListeners.size();
 		for (int i = 0; i < countListeners; i++)
 		{

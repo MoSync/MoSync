@@ -235,10 +235,11 @@ static PurchaseManager *sharedInstance = nil;
                       errorCode:MA_PURCHASE_ERROR_INVALID_QUANTITY];
         return;
     }
+
     SKMutablePayment* payment = [product payment];
+    // If the product is valid it should contain a payment.
     if (!payment)
     {
-        NSLog(@"error in %s. Reason is %@", __FUNCTION__, @"payment is nil - invalid product id");
         [self sendPurchaseEvent:MA_PURCHASE_EVENT_REQUEST
                           state:MA_PURCHASE_STATE_FAILED
                   productHandle:productHandle
@@ -365,7 +366,6 @@ static PurchaseManager *sharedInstance = nil;
  */
 - (void)paymentQueue:(SKPaymentQueue *)queue updatedTransactions:(NSArray *)transactions
 {
-    NSLog(@"updatedTransactions");
     for (SKPaymentTransaction *transaction in transactions)
     {
         PurchaseProduct* product = [self productUsingPayment:transaction.payment];
@@ -379,8 +379,7 @@ static PurchaseManager *sharedInstance = nil;
 
         }
         // Remove the transaction from the payment queue.
-        if (transaction.transactionState == SKPaymentTransactionStatePurchased ||
-            transaction.transactionState == SKPaymentTransactionStateRestored)
+        if (transaction.transactionState != SKPaymentTransactionStatePurchasing)
         {
             [_paymentQueue finishTransaction: transaction];
         }

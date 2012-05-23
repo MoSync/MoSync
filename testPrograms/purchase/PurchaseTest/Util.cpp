@@ -24,12 +24,12 @@ MA 02110-1301, USA.
  */
 
 
-#define IOS_PRODUCT_TYPE_1 "com.mosync.purchase2.consumable"
+#define IOS_PRODUCT_TYPE_1 "com.mosync.purchase2.consumable2"
 // This test app can be purchased multiple times.
 #define ANDROID_PRODUCT_TYPE_PURCHASED "android.test.purchased"
 #define ANDROID_PRODUCT_TYPE_CANCELLED "android.test.canceled"
 #define ANDROID_PRODUCT_TYPE_UNAVAILABLE "android.test.item_unavailable"
-#define IOS_PRODUCT_TYPE_2 "com.mosync.purchase2.consumable"
+#define IOS_PRODUCT_TYPE_2 "com.mosync.purchase2.consumable2"
 #define IOS_PRODUCT_TYPE_UNAVAILABLE "invalid_product"
 
 #include "Util.h"
