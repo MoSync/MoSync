@@ -87,12 +87,6 @@ namespace MoSync
                                 args.Cancel = true;
                             }
                         }
-                        //If the selected tab is not a StackScreen the application should exit
-                        else
-                        {
-                            //Remove the event handler from the TabScreen
-                            (Application.Current.RootVisual as Microsoft.Phone.Controls.PhoneApplicationFrame).BackKeyPress -= BackKeyPressHandler;
-                        }
                     }
                     else if(this is StackScreen && !(this.GetParent() is TabScreen))
                     {
@@ -117,7 +111,7 @@ namespace MoSync
             /**
              * The Orientation changed event handler
              * Currently it contains the functionality for the orientation changed event.
-             * @param from Object the object that triggers the event
+             * @param from The object that triggered the event
              * @param args Microsoft.Phone.Controls.OrientationChangedEventArgs the event arguments
              */
             public void OrientationChangedHandler(object from, Microsoft.Phone.Controls.OrientationChangedEventArgs args)

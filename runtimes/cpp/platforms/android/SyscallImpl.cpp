@@ -298,6 +298,12 @@ namespace Base
 		gEventFifo.put(event);
 	}
 
+	int Syscall::getEventQueueSize()
+	{
+		SYSLOG("getEventQueueSize");
+		return gEventFifo.count();
+	}
+
 	SYSCALL(int,  maSetColor(int rgb))
 	{
 		SYSLOG("maSetColor");

@@ -112,6 +112,48 @@ namespace MoSync
             };
 
             /**
+		     * Set the screen orientation.
+		     * Currently implemented only on Android.
+		     * @param orientation One of the \link #SCREEN_ORIENTATION_LANDSCAPE
+		     * #SCREEN_ORIENTATION_PORTRAIT #SCREEN_ORIENTATION_DYNAMIC \endlink
+		     * constants.
+		     * @return \< 0 on error.
+		     */
+            ioctls.maScreenSetOrientation = delegate(int orientation)
+            {
+                // there are only three options: SCREEN_ORIENTATION_LANDSCAPE(1), SCREEN_ORIENTATION_PORTRAIT(2),
+                // SCREEN_ORIENTATION_DYNAMIC(3)
+                if (orientation < 1 || orientation > 3)
+                {
+                    // error - not a valid input
+                    return -1;
+                }
+
+                MoSync.Util.RunActionOnMainThreadSync(() =>
+                {
+                    // the orientation will be set on the current page
+                    PhoneApplicationPage currentPage = (((PhoneApplicationFrame)Application.Current.RootVisual).Content as PhoneApplicationPage);
+
+                    switch (orientation)
+                    {
+                        case MoSync.Constants.SCREEN_ORIENTATION_PORTRAIT:
+                            currentPage.SupportedOrientations = SupportedPageOrientation.Portrait;
+                            break;
+                        case MoSync.Constants.SCREEN_ORIENTATION_LANDSCAPE:
+                            currentPage.SupportedOrientations = SupportedPageOrientation.Landscape;
+                            break;
+                        default:
+                            // we consider the default case as being MoSync.Constants.SCREEN_ORIENTATION_DYNAMIC
+                            // based on the device sensor
+                            currentPage.SupportedOrientations = SupportedPageOrientation.PortraitOrLandscape;
+                            break;
+                    }
+                });
+
+                return MoSync.Constants.MAW_RES_OK;
+            };
+
+            /**
 		     * Get supported screen orientations.
 		     * Currently implemented on iOS and WindowsPhone 7.1.
 		     * @return A bitmask consisting of flags describing the supported screen orientations.

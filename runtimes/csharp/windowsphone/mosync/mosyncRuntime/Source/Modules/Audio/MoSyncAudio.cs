@@ -30,6 +30,7 @@ using System.Threading;
 using System.IO;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Media;
+using Microsoft.Phone.Controls;
 
 namespace MoSync
 {
@@ -365,6 +366,166 @@ namespace MoSync
 	}
 
 
+	class AudioDataMediaElement : IAudioData
+	{
+		private Uri mPathToMedia = null;
+		private Stream mStream = null;
+
+		public AudioDataMediaElement(Uri pathToMedia)
+		{
+			this.mPathToMedia = pathToMedia;
+		}
+
+		public AudioDataMediaElement(Stream stream)
+		{
+			this.mStream = stream;
+		}
+
+
+		public IAudioInstance CreateInstance()
+		{
+			if (mPathToMedia == null && mStream == null)
+			{
+				throw new MoSync.Util.ReturnValueException(MoSync.Constants.MA_AUDIO_ERR_INVALID_DATA);
+			}
+
+			if (mPathToMedia != null)
+				return new AudioInstanceMediaElement(mPathToMedia);
+			else
+				return new AudioInstanceMediaElement(mStream);
+		}
+
+		public void Dispose()
+		{
+			mPathToMedia = null;
+		}
+	}
+
+	class AudioInstanceMediaElement : IAudioInstance
+	{
+		private Uri mUri = null;
+		private Stream mStream = null;
+		private MediaElement mMediaElement = null;
+		private int mNumLoops = 0;
+
+		public AudioInstanceMediaElement(Uri uri)
+		{
+			this.mUri = uri;
+			CreateMediaElement();
+		}
+
+		public AudioInstanceMediaElement(Stream stream)
+		{
+			this.mStream = stream;
+			CreateMediaElement();
+		}
+
+		private void CreateMediaElement()
+		{
+			MoSync.Util.RunActionOnMainThreadSync(() =>
+			{
+				this.mMediaElement = new MediaElement();
+				this.mMediaElement.AutoPlay = false;
+				if (mUri != null)
+					this.mMediaElement.Source = mUri;
+				else if (mStream != null)
+					this.mMediaElement.SetSource(mStream);
+			});
+		}
+
+		public void Play()
+		{
+			if (mMediaElement == null)
+			{
+				CreateMediaElement();
+			}
+
+			MoSync.Util.RunActionOnMainThreadSync(() =>
+			{
+				mMediaElement.Play();
+			});
+		}
+
+		public void Stop()
+		{
+			MoSync.Util.RunActionOnMainThreadSync(() =>
+			{
+				mMediaElement.Stop();
+			});
+		}
+
+		public void Pause()
+		{
+			MoSync.Util.RunActionOnMainThreadSync(() =>
+			{
+				mMediaElement.Pause();
+			});
+		}
+
+		public void SetPosition(int _millis)
+		{
+			MoSync.Util.RunActionOnMainThreadSync(() =>
+			{
+				mMediaElement.Position = TimeSpan.FromMilliseconds((double)_millis);
+			});
+		}
+
+		public int GetPosition()
+		{
+			int pos = 0;
+			MoSync.Util.RunActionOnMainThreadSync(() =>
+			{
+				pos = (int)mMediaElement.Position.TotalMilliseconds;
+			});
+			return pos;
+		}
+
+		public int GetLength()
+		{
+			int len = 0;
+			MoSync.Util.RunActionOnMainThreadSync(() =>
+			{
+				len = (int)mMediaElement.NaturalDuration.TimeSpan.TotalMilliseconds;
+			});
+			return len;
+		}
+
+		public void SetVolume(float vol)
+		{
+			MoSync.Util.RunActionOnMainThreadSync(() =>
+			{
+				mMediaElement.Volume = vol;
+			});
+		}
+
+		public void SetNumberOfLoops(int numLoops)
+		{
+			mNumLoops = numLoops;
+		}
+
+		public void Dispose()
+		{
+			mMediaElement = null;
+		}
+
+		public void Prepare(Action async)
+		{
+			if (mMediaElement == null)
+			{
+				CreateMediaElement();
+			}
+
+			if (async != null)
+			{
+				async();
+			}
+		}
+
+		public void Update()
+		{
+		}
+	}
+
 	public class AudioInstanceDynamic : IAudioInstance
 	{
 		private DynamicSoundEffectInstance mSoundEffectInstance = null;
@@ -488,10 +649,14 @@ namespace MoSync
 			{
 				UriKind uriKind = UriKind.Absolute;
 
-				if (url.StartsWith("file://") == true)
+				if (url.StartsWith("file://") == true || url.Contains("://") == false)
 				{
+					// gaaah need to use media element here.....
+					// Media player doesn't seem to be able to stream from isostore..
 					url = url.Replace("file://", "");
+					//url = url.Insert(0, "isostore:");
 					uriKind = UriKind.Relative;
+					return new AudioDataMediaElement(new Uri(url, uriKind));
 				}
 
 				Uri uri = new Uri(url, uriKind);

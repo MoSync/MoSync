@@ -677,7 +677,7 @@ class GL : GLConstants
 			case GL.GL_VENDOR:
 				return "MoSync";
 			case GL.GL_RENDERER:
-				return "MoSync GL2XNA";
+				return "MoSync GLES2XNA";
 			case GL.GL_VERSION:
 				return "OpenGL ES-CM 1.1";
 			case GL.GL_EXTENSIONS:

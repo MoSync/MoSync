@@ -24,14 +24,15 @@
 
 MAKE_UIWRAPPER_LAYOUTING_IMPLEMENTATION(MoSync, UITableViewCell)
 
+// String constant used to create UITableViewCell objects.
+NSString* const kTableCellReuseIdentifier = @"SimpleTableIdentifier";
+
 @implementation ListViewItemWidget
 
 - (id)init {
-
-	static NSString *SimpleTableIdentifier = @"SimpleTableIdentifier";
 	MoSyncUITableViewCell *cell = nil;
 	cell = [[MoSyncUITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault
-							   reuseIdentifier:SimpleTableIdentifier];
+							   reuseIdentifier:kTableCellReuseIdentifier];
 	[cell setWidget:self];
 	cell.selectionStyle =  UITableViewCellSelectionStyleNone;
 	view = cell;

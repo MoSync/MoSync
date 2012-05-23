@@ -311,6 +311,13 @@
 		85F25A3711AD614700EB47EE /* MoSyncAppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1D3623250D0F684500981E51 /* MoSyncAppDelegate.mm */; };
 		E413FAB814C0604D00BF1E3D /* ResourceArray.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E413FAB714C0604D00BF1E3D /* ResourceArray.cpp */; };
 		E413FABA14C0606A00BF1E3D /* ResourceArray.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E413FAB714C0604D00BF1E3D /* ResourceArray.cpp */; };
+		E438DF4E1535CCB4008B5005 /* AudioInstanceURL.mm in Sources */ = {isa = PBXBuildFile; fileRef = E438DF4D1535CCB4008B5005 /* AudioInstanceURL.mm */; };
+		E438DF501535D35D008B5005 /* CoreMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E438DF4F1535D35C008B5005 /* CoreMedia.framework */; };
+		E438DF511535D368008B5005 /* CoreMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E438DF4F1535D35C008B5005 /* CoreMedia.framework */; };
+		E438DF521535E020008B5005 /* AudioInstanceURL.mm in Sources */ = {isa = PBXBuildFile; fileRef = E438DF4D1535CCB4008B5005 /* AudioInstanceURL.mm */; };
+		E45110B01520C70000A7467E /* AudioInstanceDynamic.h in Headers */ = {isa = PBXBuildFile; fileRef = E45110AE1520C70000A7467E /* AudioInstanceDynamic.h */; };
+		E45110B11520C70000A7467E /* AudioInstanceDynamic.mm in Sources */ = {isa = PBXBuildFile; fileRef = E45110AF1520C70000A7467E /* AudioInstanceDynamic.mm */; };
+		E45110B21520C70000A7467E /* AudioInstanceDynamic.mm in Sources */ = {isa = PBXBuildFile; fileRef = E45110AF1520C70000A7467E /* AudioInstanceDynamic.mm */; };
 		E4B3144E14B483FF009F88B4 /* MoSync.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85407550149F9E62001B14C0 /* MoSync.mm */; };
 		E4B3145014B48404009F88B4 /* MoSyncExtension.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85407552149F9E62001B14C0 /* MoSyncExtension.mm */; };
 		E4D36EA81459AC5B00477B1E /* AudioData.mm in Sources */ = {isa = PBXBuildFile; fileRef = E4D36EA51459AC5B00477B1E /* AudioData.mm */; };
@@ -573,6 +580,11 @@
 		85F2558911AC155D00EB47EE /* MoSyncWithLib-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "MoSyncWithLib-Info.plist"; sourceTree = "<group>"; };
 		8D1107310486CEB800E47090 /* MoSync-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "MoSync-Info.plist"; plistStructureDefinitionIdentifier = "com.apple.xcode.plist.structure-definition.iphone.info-plist"; sourceTree = "<group>"; };
 		E413FAB714C0604D00BF1E3D /* ResourceArray.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ResourceArray.cpp; path = ../../../base/ResourceArray.cpp; sourceTree = "<group>"; };
+		E438DF4C1535CCB4008B5005 /* AudioInstanceURL.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AudioInstanceURL.h; sourceTree = "<group>"; };
+		E438DF4D1535CCB4008B5005 /* AudioInstanceURL.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = AudioInstanceURL.mm; sourceTree = "<group>"; };
+		E438DF4F1535D35C008B5005 /* CoreMedia.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMedia.framework; path = System/Library/Frameworks/CoreMedia.framework; sourceTree = SDKROOT; };
+		E45110AE1520C70000A7467E /* AudioInstanceDynamic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AudioInstanceDynamic.h; sourceTree = "<group>"; };
+		E45110AF1520C70000A7467E /* AudioInstanceDynamic.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = AudioInstanceDynamic.mm; sourceTree = "<group>"; };
 		E4D36EA41459AC5B00477B1E /* AudioData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AudioData.h; sourceTree = "<group>"; };
 		E4D36EA51459AC5B00477B1E /* AudioData.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = AudioData.mm; sourceTree = "<group>"; };
 		E4D36EA61459AC5B00477B1E /* AudioSyscall.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AudioSyscall.h; sourceTree = "<group>"; };
@@ -586,6 +598,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E438DF511535D368008B5005 /* CoreMedia.framework in Frameworks */,
 				43CE0BF61463EE5F00F8FFC3 /* iAd.framework in Frameworks */,
 				43F9CBBB14C4198400DE2285 /* MobileCoreServices.framework in Frameworks */,
 				431869B313F691A30051D97A /* CoreMotion.framework in Frameworks */,
@@ -610,6 +623,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E438DF501535D35D008B5005 /* CoreMedia.framework in Frameworks */,
 				431869A913F68E660051D97A /* AddressBook.framework in Frameworks */,
 				85F2551311AC12A700EB47EE /* AVFoundation.framework in Frameworks */,
 				85F2551411AC12A700EB47EE /* AudioToolbox.framework in Frameworks */,
@@ -709,7 +723,6 @@
 				29B97323FDCFA39411CA2CEA /* Frameworks */,
 				19C28FACFE9D520D11CA2CBB /* Products */,
 				41EB03E3146A69BF0088E3A4 /* libsqlite3.dylib */,
-				41804801147E91050048FB95 /* SystemConfiguration.framework */,
 			);
 			name = CustomTemplate;
 			sourceTree = "<group>";
@@ -738,6 +751,8 @@
 		29B97323FDCFA39411CA2CEA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				E438DF4F1535D35C008B5005 /* CoreMedia.framework */,
+				41804801147E91050048FB95 /* SystemConfiguration.framework */,
 				43F9CBB914C4197400DE2285 /* MobileCoreServices.framework */,
 				43CE0BF51463EE5F00F8FFC3 /* iAd.framework */,
 				431869B213F691A30051D97A /* CoreMotion.framework */,
@@ -1121,6 +1136,10 @@
 				E4D36EA51459AC5B00477B1E /* AudioData.mm */,
 				E4D36EA61459AC5B00477B1E /* AudioSyscall.h */,
 				E4D36EA71459AC5B00477B1E /* AudioSyscall.mm */,
+				E45110AE1520C70000A7467E /* AudioInstanceDynamic.h */,
+				E45110AF1520C70000A7467E /* AudioInstanceDynamic.mm */,
+				E438DF4C1535CCB4008B5005 /* AudioInstanceURL.h */,
+				E438DF4D1535CCB4008B5005 /* AudioInstanceURL.mm */,
 			);
 			path = audio;
 			sourceTree = "<group>";
@@ -1197,6 +1216,7 @@
 				43B16FEA147BF9FC00B6BB8A /* NSStringExpanded.h in Headers */,
 				4140734414C34EB80006D18C /* ResourceArray.h in Headers */,
 				417495FD14C4CB1300D04A32 /* Capture.h in Headers */,
+				E45110B01520C70000A7467E /* AudioInstanceDynamic.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1411,6 +1431,8 @@
 				85407554149F9E62001B14C0 /* MoSyncExtension.mm in Sources */,
 				E413FAB814C0604D00BF1E3D /* ResourceArray.cpp in Sources */,
 				417495FA14C4CB0E00D04A32 /* Capture.mm in Sources */,
+				E45110B11520C70000A7467E /* AudioInstanceDynamic.mm in Sources */,
+				E438DF4E1535CCB4008B5005 /* AudioInstanceURL.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1418,6 +1440,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E438DF521535E020008B5005 /* AudioInstanceURL.mm in Sources */,
 				438DBD451475393800980239 /* AudioInstance.mm in Sources */,
 				438DBD461475393800980239 /* AudioData.mm in Sources */,
 				438DBD401475388500980239 /* AudioSyscall.mm in Sources */,
@@ -1515,6 +1538,7 @@
 				418047B8147E8B6A0048FB95 /* Reachability.m in Sources */,
 				43B16FEC147BF9FC00B6BB8A /* NSStringExpanded.mm in Sources */,
 				417495FC14C4CB0F00D04A32 /* Capture.mm in Sources */,
+				E45110B21520C70000A7467E /* AudioInstanceDynamic.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
