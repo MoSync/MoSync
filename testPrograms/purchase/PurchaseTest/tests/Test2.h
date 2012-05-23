@@ -22,6 +22,7 @@
  * @date 9 May 2012
  *
  * @brief Test a valid purchase of an product.
+ * Receipt's fields are also verified.
  */
 
 #ifndef PURCHASE_TEST2_H_
@@ -37,7 +38,9 @@ using namespace IAP;
 namespace PurchaseTest
 {
 
+	// Forward declarations.
 	class IAP::Purchase;
+	class IAP::Receipt;
 
 	/**
 	 * @brief Test a valid purchase of an product.
@@ -138,6 +141,27 @@ namespace PurchaseTest
 		 */
 		virtual void receiptError(const Purchase& purchase,
 			const int errorCode);
+
+		/**
+		 * Print the receipt's field values.
+		 * @param receipt The given receipt.
+		 */
+		void printReceiptFieldValues(Receipt& receipt);
+
+		/**
+		 * Print a receipt field name and value.
+		 * @param fieldName Field's name.
+		 * @param fieldValue Field's value.
+		 */
+		void printFieldNameAndValue(
+			const MAUtil::String& fieldName,
+			const MAUtil::String& fieldValue);
+
+		/**
+		 * Print transaction date of the product.
+		 * @param receipt Purchase's receipt.
+		 */
+		void printTransactionDate(Receipt& receipt);
 
 	private:
 		/**

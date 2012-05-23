@@ -30,7 +30,7 @@
  * @author Bogdan Iusco
  * @date 7 May 2012
  *
- * @brief
+ * @brief A Receipt wraps the details of a purchase.
  */
 
 #ifndef IAP_PURCHASE_RECEIPT_H_
@@ -43,7 +43,7 @@ namespace IAP
 {
 
 	/**
-	 * @brief
+	 * @brief A Receipt wraps the details of a purchase.
 	 */
 	class Receipt
 	{
@@ -59,6 +59,9 @@ namespace IAP
 		 */
 		Receipt(const Receipt& receipt);
 
+		/**
+		 * Destructor.
+		 */
 		virtual ~Receipt() {};
 
 		/**
@@ -112,10 +115,22 @@ namespace IAP
 		MAUtil::String getBVRS();
 
 		/**
-		 * Get the product price.
+		 * The cost of the product in the local currency.
 		 * Platform: iOS.
 		 */
-		int getPrice();
+		double getPrice();
+
+		/**
+		 * Get the localized product title.
+		 * Platform: iOS.
+		 */
+		MAUtil::String getTitle();
+
+		/**
+		 * Get the localized product description.
+		 * Platform: iOS.
+		 */
+		MAUtil::String getDescription();
 
 		/**
 		 * Get a receipt field value.

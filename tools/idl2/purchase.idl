@@ -282,6 +282,7 @@ group PurchaseReceiptFields "Purchase Receipt Fields" {
 		TRANSACTION_ID = "transaction_id";
         /**
         * \brief The date and time this transaction occurred.
+        * The date represents the number of seconds that elapsed since 1970-01-01T00:00:00.
         * Platform: iOS and Android.
         */
 		PURCHASE_DATE = "purchase_date";

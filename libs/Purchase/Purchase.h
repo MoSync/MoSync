@@ -30,7 +30,8 @@
  * @author Bogdan Iusco
  * @date 3 May 2012
  *
- * @brief
+ * @brief The Purchase class wraps a product that can be buyed and also all
+ * the details of the transaction(such as the receipt).
  */
 
 #ifndef IAP_PURCHASE_H_
@@ -48,6 +49,10 @@ namespace IAP
 	// Forward declaration.
 	class PurchaseManager;
 
+	/**
+	 *\brief The Purchase class wraps a product that can be buyed and also all
+	 * the details of the transaction(such as the receipt).
+	 */
 	class Purchase
 	{
 	public:
@@ -85,8 +90,12 @@ namespace IAP
 		 * Note: if there are another requests in progress, the requests will
 		 * be queued.
 		 * Listeners will be notified.
+		 * @param quantity How many products to purchase. This value must be
+		 * greater than zero. This param is used only by the iOS platform.
+		 * On Android platform it will be ignored(only one product will be
+		 * purchased).
 		 */
-		void requestPurchase();
+		void requestPurchase(int quantity = 1);
 
 		/**
 		 * Verify if the receipt came from Apple App Store / Google Play.

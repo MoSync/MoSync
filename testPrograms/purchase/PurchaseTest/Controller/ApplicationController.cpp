@@ -39,6 +39,7 @@
 #include "../tests/Test6.h"
 #include "../tests/Test7.h"
 #include "../tests/Test8.h"
+#include "../tests/Test9.h"
 #include "../Util.h"
 
 namespace PurchaseTest
@@ -160,6 +161,7 @@ namespace PurchaseTest
 		mTests.add(new Test6(*this));
 		mTests.add(new Test7(*this));
 		mTests.add(new Test8(*this));
+		mTests.add(new Test9(*this));
 	}
 
 	/**
@@ -175,7 +177,7 @@ namespace PurchaseTest
 		this->log("================================");
 		ITest* test = mTests[0];
 		char buffer[BUF_MAX];
-		sprintf(buffer, "Started test %s", test->getTestName().c_str());
+		sprintf(buffer, "Started %s", test->getTestName().c_str());
 		this->log(buffer);
 		test->startTest();
 	}
@@ -189,13 +191,17 @@ namespace PurchaseTest
 		this->log("All tests have been completed!");
 
 		char buffer[512];
-		sprintf(buffer, "%d test succeeded!", mCountSucceededTests);
+		sprintf(buffer, "%d test(s) succeeded!", mCountSucceededTests);
 		this->log(buffer);
 
-		this->log("The tests that failed are:");
-		for(int i = 0; i < mFailedTests.size(); i++)
+		int countFailedTests = mFailedTests.size();
+		if (countFailedTests > 0)
 		{
-			this->log(*(mFailedTests[i]));
+			this->log("The tests that failed are:");
+			for(int i = 0; i < countFailedTests; i++)
+			{
+				this->log(*(mFailedTests[i]));
+			}
 		}
 	}
 

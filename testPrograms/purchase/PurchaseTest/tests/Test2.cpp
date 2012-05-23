@@ -22,6 +22,7 @@
  * @date 9 May 2012
  *
  * @brief Test a valid purchase of an product.
+ * Receipt's fields are also verified.
  */
 
 #define TEST_NAME "Test 2"
@@ -29,7 +30,11 @@
 
 #include <Purchase/Purchase.h>
 #include <Purchase/PurchaseManager.h>
+#include <Purchase/Receipt.h>
+
+#include <MAUtil/util.h>
 #include <conprint.h>
+#include <matime.h>
 
 #include "Test2.h"
 #include "../Util.h"
@@ -133,7 +138,9 @@ namespace PurchaseTest
 	void Test2::requestCompleted(const Purchase& purchase)
 	{
 		mApplicationController.log("Product purchased!");
-		mApplicationController.testSucceeded(*this);
+		PurchaseManager::getInstance()->setStoreURL(sAppStoreSandboxURL);
+		mPurchase->verifyReceipt();
+		mApplicationController.log("Verifying receipt!");
 	}
 
 	/**
@@ -144,13 +151,13 @@ namespace PurchaseTest
 	 */
 	void Test2::requestFailed(const Purchase& purchase,
 		const int errorCode)
-		{
+	{
 		char buffer[BUF_SIZE];
 		sprintf(buffer, "%s product was not purchased. Error code: %d",
 				mPurchase->getProductId().c_str(), errorCode);
 		this->setFailedReason(buffer);
 		mApplicationController.testFailed(*this);
-		}
+	}
 
 	/**
 	 * Notifies that the transaction has been validated by the App Store /
@@ -163,7 +170,9 @@ namespace PurchaseTest
 		const Purchase& purchase,
 		Receipt& receipt)
 	{
-
+		mApplicationController.log("Receipt is valid.");
+		this->printReceiptFieldValues(receipt);
+		mApplicationController.testSucceeded(*this);
 	}
 
 	/**
@@ -174,7 +183,8 @@ namespace PurchaseTest
 	 */
 	void Test2::receiptInvalid(const Purchase& purchase)
 	{
-
+		this->setFailedReason("Receipt is invalid!");
+		mApplicationController.testFailed(*this);
 	}
 
 	/**
@@ -186,7 +196,74 @@ namespace PurchaseTest
 	void Test2::receiptError(const Purchase& purchase,
 		const int errorCode)
 	{
-
+		this->setFailedReason("An error has occurred while verifying receipt!");
+		mApplicationController.testFailed(*this);
 	}
 
-}
+	/**
+	 * Print the receipt's field values.
+	 * @param receipt The given receipt.
+	 */
+	void Test2::printReceiptFieldValues(Receipt& receipt)
+	{
+		this->printFieldNameAndValue("Product ID",
+			receipt.getProductID());
+		this->printTransactionDate(receipt);
+
+		int platform = getPlatform();
+		if (platform == IOS)
+		{
+			this->printFieldNameAndValue("Transaction ID",
+				receipt.getTransactionID());
+			this->printFieldNameAndValue("Bundle ID",
+				receipt.getBID());
+			this->printFieldNameAndValue("Version number",
+				receipt.getBVRS());
+			MAUtil::String price = MAUtil::doubleToString(
+				receipt.getPrice());
+			this->printFieldNameAndValue("Price",
+				price);
+			this->printFieldNameAndValue("Title",
+				receipt.getTitle());
+			this->printFieldNameAndValue("Description",
+				receipt.getDescription());
+		}
+	}
+
+	/**
+	 * Print a receipt field name and value.
+	 * @param fieldName Field's name.
+	 * @param fieldValue Field's value.
+	 */
+	void Test2::printFieldNameAndValue(
+		const MAUtil::String& fieldName,
+		const MAUtil::String& fieldValue)
+	{
+		MAUtil::String text = fieldName + " : " + fieldValue;
+		mApplicationController.log(text);
+	}
+
+	/**
+	 * Print transaction date of the product.
+	 * @param receipt Purchase's receipt.
+	 */
+	void Test2::printTransactionDate(Receipt& receipt)
+	{
+		int timeInSeconds = receipt.getTransactionDate();
+		printf("timeInSeconds = %d", timeInSeconds);
+		struct tm *date = new tm;
+		split_time(timeInSeconds, date);
+		char buffer[BUF_MAX];
+		sprintf(buffer,
+			"Transaction system date: %d/%d/%d %d:%d:%d",
+			date->tm_mday,
+			date->tm_mon,
+			1900 + date->tm_year,
+			date->tm_hour,
+			date->tm_min,
+			date->tm_sec);
+		mApplicationController.log(buffer);
+		delete date;
+	}
+
+} // namespace PurchaseTest

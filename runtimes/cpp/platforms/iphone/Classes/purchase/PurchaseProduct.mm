@@ -41,6 +41,9 @@ NSString* const kReceiptTemplateJSON = @"{ \"receipt-data\" : \"%@\" }";
 NSString* const kReceiptResponseStatusKey = @"status";
 NSString* const kReceiptResponseReceiptKey = @"receipt";
 
+// Get the date of the purchase in milliseconds.
+NSString* const kReceiptDateMsKey = @"original_purchase_date_ms";
+
 // Status code for a valid receipt.
 #define RECEIPT_STATUS_CODE_OK [NSNumber numberWithInt:0]
 
@@ -79,12 +82,6 @@ NSString* const kReceiptResponseReceiptKey = @"receipt";
  * @param transaction Payment transaction received from the Apple App Store.
  */
 -(void) handleTransactionStateFailed:(SKPaymentTransaction*) transaction;
-
-/**
- * Handle a restored transaction.
- * @param transaction Payment transaction received from the Apple App Store.
- */
--(void) handleTransactionStateRestored:(SKPaymentTransaction*) transaction;
 
 /**
  * Create JSON parser components.
@@ -156,6 +153,7 @@ NSString* const kReceiptResponseReceiptKey = @"receipt";
 }
 
 #pragma mark SKProductsRequestDelegate method
+
 /**
  * Called when the Apple App Store responds to the product request.
  * @param request The product request sent to the Apple App Store.
@@ -163,7 +161,6 @@ NSString* const kReceiptResponseReceiptKey = @"receipt";
  */
 - (void)productsRequest:(SKProductsRequest *)request didReceiveResponse:(SKProductsResponse *)response
 {
-    NSLog(@"productsRequest-didReceiveResponse");
     int validProductsCount = [response.products count];
     int invalidProductsCount = [response.invalidProductIdentifiers count];
     BOOL isValid = (validProductsCount > invalidProductsCount) ? YES : NO;
@@ -194,7 +191,6 @@ NSString* const kReceiptResponseReceiptKey = @"receipt";
  */
 -(void) updatedTransaction:(SKPaymentTransaction*) transaction
 {
-    NSLog(@"updatedTransaction for %@", _productID);
     switch (transaction.transactionState)
     {
         case SKPaymentTransactionStatePurchasing:
@@ -205,12 +201,6 @@ NSString* const kReceiptResponseReceiptKey = @"receipt";
             break;
         case SKPaymentTransactionStateFailed:
             [self handleTransactionStateFailed:transaction];
-            break;
-        case SKPaymentTransactionStateRestored:
-            [self handleTransactionStateRestored:transaction];
-            break;
-        default:
-            NSLog(@"unhandled transaction.");
             break;
     }
 }
@@ -240,7 +230,6 @@ NSString* const kReceiptResponseReceiptKey = @"receipt";
  */
 -(void) verifyReceipt:(NSString*) storeURL
 {
-    NSLog(@"%s for %@", __FUNCTION__, _transaction.payment.productIdentifier);
     if (!_transaction)
     {
         [self sendPurchaseEvent:MA_PURCHASE_EVENT_VERIFY_RECEIPT
@@ -291,6 +280,15 @@ NSString* const kReceiptResponseReceiptKey = @"receipt";
     if (!fieldValue)
     {
         fieldValue = [_validationResponse objectForKey:key];
+        // If the required field is the date will use the milliseconds field value
+        // and transform it to seconds.
+        if ([key isEqualToString:@MA_PURCHASE_RECEIPT_PURCHASE_DATE])
+        {
+            fieldValue = [_validationResponse objectForKey:kReceiptDateMsKey];
+            // Convert date from milliseconds to seconds.
+            int substringLength = fieldValue.length - 3;
+            fieldValue = [fieldValue substringToIndex:substringLength];
+        }
     }
 
     if (!fieldValue)
@@ -317,11 +315,6 @@ NSString* const kReceiptResponseReceiptKey = @"receipt";
  */
 - (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data
 {
-    NSLog(@"IN %s", __FUNCTION__);
-    NSString* text = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-    NSLog(@"text received: %@", text);
-    [text release];
-
     // Parse the JSON.
 	[_streamParser parse:data];
 }
@@ -350,8 +343,6 @@ NSString* const kReceiptResponseReceiptKey = @"receipt";
  */
 - (void)parser:(SBJsonStreamParser*)parser foundObject:(NSDictionary*)dict
 {
-    NSLog(@"IN %s foundObject: %@", __FUNCTION__, [dict description]);
-
     [self handleReceiptResponse:dict];
 }
 
@@ -361,7 +352,6 @@ NSString* const kReceiptResponseReceiptKey = @"receipt";
  */
 - (void)parser:(SBJsonStreamParser*)parser foundArray:(NSArray*)array
 {
-    NSLog(@"IN %s", __FUNCTION__);
     // The respone should contain an object and not an array.
     [self sendPurchaseEvent:MA_PURCHASE_EVENT_VERIFY_RECEIPT
                       state:MA_PURCHASE_STATE_RECEIPT_ERROR
@@ -467,17 +457,6 @@ NSString* const kReceiptResponseReceiptKey = @"receipt";
 }
 
 /**
- * Handle a restored transaction.
- * @param transaction Payment transaction received from the Apple App Store.
- */
--(void) handleTransactionStateRestored:(SKPaymentTransaction*) transaction
-{
-    [self sendPurchaseEvent:MA_PURCHASE_EVENT_RESTORE
-                      state:MA_PURCHASE_STATE_COMPLETED
-                  errorCode:0];
-}
-
-/**
  Create JSON parser components
  */
 -(void) createParserComponents
@@ -506,7 +485,6 @@ NSString* const kReceiptResponseReceiptKey = @"receipt";
  */
 -(void) handleReceiptResponse:(NSDictionary*) storeResponse
 {
-    NSLog(@"IN %s validationResponse: %@", __FUNCTION__, storeResponse);
     NSNumber* statusCode = [storeResponse objectForKey:kReceiptResponseStatusKey];
     if (!statusCode)
     {
@@ -551,7 +529,7 @@ NSString* const kReceiptResponseReceiptKey = @"receipt";
     }
     if ([fieldName isEqualToString:@MA_PURCHASE_RECEIPT_PRICE])
     {
-        return [NSString stringWithFormat:@"%d",_product.price];
+        return [NSString stringWithFormat:@"%@",_product.price];
     }
     else if ([fieldName isEqualToString:@MA_PURCHASE_RECEIPT_TITLE])
     {
