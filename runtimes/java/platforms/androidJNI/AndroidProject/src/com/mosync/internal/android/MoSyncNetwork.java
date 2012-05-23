@@ -72,6 +72,7 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothServerSocket;
 import android.bluetooth.BluetoothSocket;
 import android.net.SSLCertificateSocketFactory;
+import android.os.Build;
 import android.os.Looper;
 import android.util.Log;
 
@@ -1128,8 +1129,14 @@ public class MoSyncNetwork
 			mUrlConnection = new URL(url).openConnection();
 
 			mUrlConnection.setAllowUserInteraction(true);
-			mUrlConnection.setDoInput(true);
-			mUrlConnection.setDoOutput(true);
+			// The number is hardcoded here for ICS but we have to change it to
+			// its actual constant after upgrading the our Android SDK
+			if(Build.VERSION.SDK_INT < 14)
+			{
+				mUrlConnection.setDoInput(true);
+				mUrlConnection.setDoOutput(true);
+			}
+
 			mUrlConnection.setUseCaches(false);
 
 			return this;
@@ -1146,8 +1153,13 @@ public class MoSyncNetwork
 			mUrlConnection = new URL(url).openConnection();
 
 			mUrlConnection.setAllowUserInteraction(true);
-			mUrlConnection.setDoInput(true);
-			mUrlConnection.setDoOutput(true);
+			// The number is hardcoded here for ICS but we have to change it to
+			// its actual constant after upgrading the our Android SDK
+			if(Build.VERSION.SDK_INT < 14)
+			{
+				mUrlConnection.setDoInput(true);
+				mUrlConnection.setDoOutput(true);
+			}
 			mUrlConnection.setUseCaches(false);
 
 			HttpURLConnection httpConnection =
