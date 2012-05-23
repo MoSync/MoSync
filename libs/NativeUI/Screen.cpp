@@ -165,29 +165,39 @@ namespace NativeUI
     }
 
 	/**
-	 * Add a new menu item to the Options Menu associated to this screen.
-	 * Option Menus are Android specific concept, so this function is
-	 * available only on this platform. The Options Menu is launched by
-	 * pressing the Menu key. The options menu is where you should include
-	 * actions and other options that are relevant to the current activity
-	 * context, such as "Search," "Compose email," or "Settings".
-	 * When opened, the first visible portion is the icon menu, which holds
-	 * up to six menu items. If your menu includes more than six items, Android
-	 * places the sixth item and the rest into the overflow menu, which the user
-	 * can open by selecting More. Those items do not display icons.
-	 * @param title The title associated for the new item. Can be left null.
-	 * @param iconId The resource ID of the icon which will be used to lazily
-	 * get the Drawable when this item is being shown. Can be set to -1 if
-	 * no icon needed.
-	 * @param iconPredefined Specifies if the icon is a project resource, or one
-	 * of the predefined Android icons. It is false by default.
-	 * @return The index on which the menu item was added in the options menu,
-	 * an error code otherwise.
-	 */
-	int Screen::addOptionsMenuItem(const MAUtil::String title, int iconId, bool iconPredefined)
+	* Add a new menu item to the Options Menu associated to this screen.
+	* Option Menus are Android specific concept. The Options Menu is launched by
+	* pressing the Menu key. The options menu is where you should include
+	* actions and other options that are relevant to the current activity
+	* context, such as "Search," "Compose email," or "Settings".
+	* When opened, the first visible portion is the icon menu, which holds
+	* up to six menu items. If your menu includes more than six items, Android
+	* places the sixth item and the rest into the overflow menu, which the user
+	* can open by selecting More. Those items do not display icons.
+	*
+	* @param title The title associated for the new item. Can be left null.
+	* @param iconPath The resource ID of the icon which will be used to lazily
+	* get the Drawable when this item is being shown or a path to a custom icon.
+	* In order to work for Windows phone 7 the custom icons need to be placed under
+	* the "ApplicationBarIcons" folder in the project location. The path reaquired in this
+	* case consists in the name of the file (e.g. "applicationBarIcon.png").
+	* Can be set to -1 if no icon needed.
+	* @param iconPredefined Specifies if the icon is a project resource, or one
+	* of the predefined Android icons. It is false by default.
+	*
+	* Note: On Windows phone 7, by using this function you will obtain an
+	* application bar. Note that the behavior is slightly different from Android.
+	* If there is an icon provided (by path or by resource ID) the output will be an
+	* application bar button (only 4 buttons are visible on an application bar),
+	* otherwise the output will be an application bar menu item.
+	*
+	* @return The index on which the menu item was added in the options menu,
+	* an error code otherwise.
+	*/
+	int Screen::addOptionsMenuItem(const MAUtil::String title, const MAUtil::String iconPath, bool iconPredefined)
 	{
 		return maWidgetScreenAddOptionsMenuItem(
-				getWidgetHandle(), title.c_str(), iconId, (iconPredefined ? 1 : 0) );
+				getWidgetHandle(), title.c_str(), iconPath.c_str(), (iconPredefined ? 1 : 0) );
 	}
 
 	/**
