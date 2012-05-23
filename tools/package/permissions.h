@@ -49,6 +49,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define NFC "NFC"
 #define PUSH_NOTIFICATIONS "Push Notifications"
 #define PHONE_CALLS "Phone Calls"
+#define PURCHASE "In-App Purchase"
 
 // Parse permissions
 void parsePermissions(std::set<std::string>& out, const char* permissions);

@@ -100,6 +100,8 @@ public class Consts
 
 	public final static int PURCHASE_STATE_ON_HOLD = -1;
 	public final static String RECEIPT_NOT_AVAILABLE = "Receipt not available";
+	public final static String RECEIPT_FIELD_NOT_AVAILABLE = "Receipt Field not available";
+	public final static String RECEIPT_INVALID_HANDLE = "Invalid handle";
 
 	/**
 	 * The request methods.

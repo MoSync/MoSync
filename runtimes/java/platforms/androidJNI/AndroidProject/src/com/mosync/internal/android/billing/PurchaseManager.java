@@ -27,8 +27,10 @@ import com.mosync.internal.android.billing.request.BaseRequest;
 import com.mosync.internal.android.billing.request.RestoreTransactions;
 import com.mosync.nativeui.util.HandleTable;
 
+import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_PURCHASE;
 import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_ERROR_INVALID_HANDLE;
 import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_ERROR_NO_RECEIPT;
+import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_EVENT_VERIFY_RECEIPT;
 import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_RES_OK;
 import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_STATE_FAILED;
 import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_STATE_IN_PROGRESS;
@@ -184,6 +186,11 @@ public class PurchaseManager extends BillingListener
 		}
 	}
 
+	/**
+	 * Get the product ID for the given handle.
+	 * @param handle The product handle.
+	 * @return The product ID.
+	 */
 	public String getProductID(int handle)
 	{
 		PurchaseInformation purchase = m_PurchaseTable.get(handle);
@@ -195,14 +202,19 @@ public class PurchaseManager extends BillingListener
 		return "";
 	}
 
+	/**
+	 * Get the receipt field for a given purchase.
+	 * @param handle The product handle.
+	 * @param field The receipt field.
+	 * @return The receipt field value.
+	 */
 	public String getField(int handle, String field)
-	{
+	{Log.e("@@MoSync"," IN getField -----------------" + field);
 		PurchaseInformation purchase = m_PurchaseTable.get(handle);
 		if ( null != purchase )
 		{
 			if ( purchase.getState() != MA_PURCHASE_STATE_COMPLETED )
 			{
-//				MA_PURCHASE_RES_RECEIPT_NOT_AVAILABLE
 				return Consts.RECEIPT_NOT_AVAILABLE;
 			}
 			if ( field.equals(MA_PURCHASE_RECEIPT_PRODUCT_ID) )
@@ -211,19 +223,15 @@ public class PurchaseManager extends BillingListener
 			}
 			if ( field.equals(MA_PURCHASE_RECEIPT_PURCHASE_DATE) )
 			{
-				return Long.toString(purchase.mTime);
-			}
-			if ( field.equals(MA_PURCHASE_RECEIPT_PRICE) )
-			{
-				return Integer.toString(purchase.mPrice);
+				return String.valueOf(purchase.getTime());
 			}
 			if ( field.equals(MA_PURCHASE_RECEIPT_APP_ITEM_ID) )
 			{
-				return purchase.mPackageName;
+				return purchase.getPackageName();
 			}
-			return "Not available";
+			return Consts.RECEIPT_FIELD_NOT_AVAILABLE;
 		}
-		return "";
+		return Consts.RECEIPT_INVALID_HANDLE;
 	}
 
 	/**
@@ -277,8 +285,9 @@ public class PurchaseManager extends BillingListener
 				int[] event = m_PendingEvents.get(handle);
 				if ( null != event )
 				{
-					mMoSyncThread.postEvent(BillingEvent.onVerifyReceipt(
-												event[2],event[3],event[4]));
+					mMoSyncThread.postEvent(
+							BillingEvent.onVerifyReceipt(
+												event[3],event[2],event[4]));
 				}
 			}
 			else if ( purchase.getState() == Consts.PURCHASE_STATE_REFUNDED )
@@ -291,7 +300,7 @@ public class PurchaseManager extends BillingListener
 				Log.e("@@MoSync","maPurchaseVerifyReceipt product was not purchased " + handle);
 				mMoSyncThread.postEvent(BillingEvent.onVerifyReceipt(
 						handle,
-						MA_PURCHASE_STATE_RECEIPT_ERROR, // todo see if requires MA_PURCHASE_STATE_RECEIPT_INVALID
+						MA_PURCHASE_STATE_RECEIPT_ERROR,
 						MA_PURCHASE_ERROR_NO_RECEIPT));
 			}
 		}
@@ -339,6 +348,7 @@ public class PurchaseManager extends BillingListener
 
 	/**
 	 * Manager is notified through this method when a purchase was completed.
+	 * Set all the purchase information to the current purchase object.
 	 * At this point transaction details(the receipt) are available to the
 	 * user, after he calls verifyReceipt.
 	 * @param purchase The purchase.
@@ -350,8 +360,25 @@ public class PurchaseManager extends BillingListener
 		PurchaseManager.onReceiptEvent(BillingEvent.onVerifyReceipt(
 				mCurrentPurchaseHandle, MA_PURCHASE_STATE_RECEIPT_VALID, 0), mCurrentPurchaseHandle);
 
+		setCurrentPurchaseInformation(purchase);
+
 		// Notify app that request is now completed.
 		onPurchaseStateChanged(MA_PURCHASE_STATE_COMPLETED, mCurrentPurchaseHandle, 0);
+	}
+
+	/**
+	 * Set all the purchase information to the current purchase object.
+	 * @param purchase The purchase object that was created while parsing the
+	 * received JSON.
+	 */
+	public static void setCurrentPurchaseInformation(PurchaseInformation purchase)
+	{
+		PurchaseInformation currentPurchase = m_PurchaseTable.get(mCurrentPurchaseHandle);
+		currentPurchase.setNotificationID(purchase.getNotificationId());
+		currentPurchase.setState(purchase.getState());
+		currentPurchase.setOrderId(purchase.getOrderId());
+		currentPurchase.setTime(purchase.getTime());
+		currentPurchase.setPackageName(purchase.getPackageName());
 	}
 
 	/**

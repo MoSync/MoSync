@@ -82,7 +82,7 @@ namespace IAP
 		 * @return The string that identifies the product, or an
 		 * empty string in case of error.
 		 */
-		MAUtil::String getProductId();
+		MAUtil::String getProductId() const;
 
 		/**
 		 * Request the user to purchase a product.

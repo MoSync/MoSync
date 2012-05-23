@@ -95,7 +95,7 @@ namespace IAP
 	 * @return The string that identifies the product, or an
 	 * empty string in case of error.
 	 */
-	MAUtil::String Purchase::getProductId()
+	MAUtil::String Purchase::getProductId() const
 	{
 		char buffer[BUF_SIZE];
 		int result = maPurchaseGetName(mHandle,

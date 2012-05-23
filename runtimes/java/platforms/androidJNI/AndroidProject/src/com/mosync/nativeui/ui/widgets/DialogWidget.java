@@ -86,7 +86,7 @@ public class DialogWidget extends Layout
 	public void hide()
 	{
 		if ( m_dialog.isShowing() )
-			m_dialog.hide();
+			m_dialog.dismiss();
 	}
 
 	/**
@@ -194,7 +194,7 @@ public class DialogWidget extends Layout
 		}
 		else if ( property.equals( IX_WIDGET.MAW_WIDGET_VISIBLE ) )
 		{
-			return Boolean.toString( m_dialog.isShowing() );
+			return String.valueOf( m_dialog.isShowing() );
 		}
 		else
 		{
