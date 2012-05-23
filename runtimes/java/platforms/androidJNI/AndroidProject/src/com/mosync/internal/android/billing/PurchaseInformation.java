@@ -76,9 +76,9 @@ public class PurchaseInformation
 		return mPackageName;
 	}
 
-	public long getTime()
+	public int getTimeInSeconds()
 	{
-		return mTime;
+		return (int)mTime/1000;
 	}
 
 	public void setPackageName(final String pck)
@@ -155,6 +155,10 @@ public class PurchaseInformation
 	public String mNotificationID;
 	public String mOrderID;
 	public String mPackageName;
+	/**
+	 * The time the product was purchased, in milliseconds since the epoch (Jan 1, 1970).
+	 * Send it to MoSync in seconds.
+	 */
 	private long mTime;
 	public String mPayload;
 
