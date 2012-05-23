@@ -50,12 +50,12 @@ SecondScreen::SecondScreen() :
 	mEventsList->fillSpaceVertically();
 	mMainLayout->addChild(mEventsList);
 
-	Screen::addOptionsMenuItem("Second screen menu item 0", -1, false);
-	Screen::addOptionsMenuItem("Second screen menu item 1", -1, false);
-	Screen::addOptionsMenuItem("Second screen menu item 2", -1, false);
-	Screen::addOptionsMenuItem("Second screen menu item 3", -1, false);
-	Screen::addOptionsMenuItem("Second screen menu item 4", -1, false);
-	Screen::addOptionsMenuItem("Second screen menu item 5", -1, false);
+	Screen::addOptionsMenuItem("Second screen menu item 0", "", false);
+	Screen::addOptionsMenuItem("Second screen menu item 1", "", false);
+	Screen::addOptionsMenuItem("Second screen menu item 2", "", false);
+	Screen::addOptionsMenuItem("Second screen menu item 3", "", false);
+	Screen::addOptionsMenuItem("Second screen menu item 4", "", false);
+	Screen::addOptionsMenuItem("Second screen menu item 5", "", false);
 	this->addScreenListener(this);
 }
 

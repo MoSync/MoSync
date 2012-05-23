@@ -21,7 +21,9 @@ import java.util.Hashtable;
 
 import android.app.Activity;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 
@@ -740,8 +742,7 @@ public class NativeUI
 	 * Add an item to the Options Menu associated to a screen.
 	 * @param widgetHandle The screen handle.
 	 * @param title The title associated for the new item. Can be left null.
-	 * @param iconHandle MoSync handle to an uncompressed image resource,or:
-	 * a predefined Android icon.
+	 * @param iconPath The local path to an icon, or a predefined drawable.
 	 * @param iconPredefined Specifies if the icon is a project resource, or one of
 	 * the predefined Android icons. By default it's value is 0.
 	 * @return The index on which the menu item was added in the options menu,
@@ -750,7 +751,7 @@ public class NativeUI
 	public int maWidgetScreenAddOptionsMenuItem(
 			final int widgetHandle,
 			final String title,
-			final int iconHandle,
+			final String iconPath,
 			final int iconPredefined)
 	{
 		Widget widget = m_widgetTable.get( widgetHandle );
@@ -765,35 +766,63 @@ public class NativeUI
 		switch(iconPredefined){
 		case 1:
 		{
-			if ( iconHandle >= IX_WIDGET.MAW_OPTIONS_MENU_ICON_CONSTANT_ADD &&
-					iconHandle <= IX_WIDGET.MAW_OPTIONS_MENU_ICON_CONSTANT_ZOOM )
-			return screen.addMenuItem(title, iconHandle);
-			else
+			// If the icon is predefined, match the iconPath to one of the
+			// OptionsMenuIconConstants constants.
+			try{
+				int iconID = Integer.parseInt( iconPath );
+				if ( iconID >= Integer.parseInt(IX_WIDGET.MAW_OPTIONS_MENU_ICON_CONSTANT_ADD) &&
+						iconID <= Integer.parseInt(IX_WIDGET.MAW_OPTIONS_MENU_ICON_CONSTANT_ZOOM) )
+				return screen.addMenuItem(title, iconID);
+				else
+					throw new NumberFormatException();
+			}catch ( NumberFormatException nfe)
 			{
-				Log.e("@@MoSync","maWidgetScreenAddOptionsMenuItem: Invalid icon resource ID: " + iconHandle);
+				Log.e("@@MoSync","maWidgetScreenAddOptionsMenuItem: Invalid icon predefined ID: " + iconPath);
 				return IX_WIDGET.MAW_RES_ERROR;
 			}
 		}
 		case 0:
 		{
-			if ( iconHandle >= 0 && m_imageTable.containsKey( iconHandle ) )
-			{
-				Bitmap icon = NativeUI.getBitmap( iconHandle );
-				if( icon != null )
-				{
-					// When adding a new menu item the id is returned.
-					return screen.addMenuItem(title, new BitmapDrawable(icon));
-				}
-				else
-				{
-					Log.e("@@MoSync","maWidgetScreenAddOptionsMenuItem: Invalid icon handle: " + iconHandle);
-					return IX_WIDGET.MAW_RES_ERROR;
-				}
-			}
-			else
+			// Create a menu item with no icon if path is left null.
+			if ( TextUtils.isEmpty(iconPath) )
 			{
 				return screen.addMenuItem(title, null);
 			}
+			//  Get the bitmap from an image located at iconPath.
+			/**
+			 * Decoding options used for bitmaps. First get the image
+			 * dimensions. Based on the image size perform a scaling.
+			 */
+			BitmapFactory.Options bfo = new BitmapFactory.Options();
+			bfo.inJustDecodeBounds = true;
+			bfo.inDither = false;
+			bfo.inPreferredConfig = Bitmap.Config.RGB_565;
+
+			BitmapFactory.decodeFile(iconPath, bfo);
+			// Calculate sample size to keep image under maxFileSize.
+			int maxFileSize = 1572864; // in bytes
+			int sampleSize = 1;
+			long fileSize = 2 * (bfo.outWidth / sampleSize) * (bfo.outHeight / sampleSize);
+			while (fileSize > maxFileSize)
+			{
+				sampleSize++;
+				fileSize = 2 * (bfo.outWidth / sampleSize)* (bfo.outHeight / sampleSize);
+			}
+
+			/**
+			 * Decode to a smaller image to save memory and run faster.
+			 * Decode image using calculated sample size.
+			 */
+			bfo.inSampleSize = sampleSize;
+			bfo.inJustDecodeBounds = false;
+			Bitmap iconBitmap = BitmapFactory.decodeFile(iconPath, bfo);
+			if ( iconBitmap != null )
+			{
+				// When adding a new menu item the id is returned.
+				return screen.addMenuItem(title, new BitmapDrawable(iconBitmap));
+			}
+			Log.e("@@MoSync","maWidgetScreenAddOptionsMenuItem: Invalid icon path: " + iconPath);
+			return IX_WIDGET.MAW_RES_ERROR;
 		}
 		default:
 		{

@@ -63,8 +63,8 @@ ThirdScreen::ThirdScreen():
 	// Push the top screen.
 	push(mScreen);
 
-	mScreen->addOptionsMenuItem("Third screen item 0", -1,false);
-	mScreen->addOptionsMenuItem("Third screen item 1", -1, false);
+	mScreen->addOptionsMenuItem("Third screen item 0", "",false);
+	mScreen->addOptionsMenuItem("Third screen item 1", "", false);
 	mScreen->addScreenListener(this);
 
 	// Set event listener.

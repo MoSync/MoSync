@@ -261,7 +261,7 @@ namespace Base
 								JNIEnv* jNIEnv, jobject jThis);
 
 	int _maWidgetScreenAddOptionsMenuItem(int widget, const char* title,
-											int iconHandle, int iconPredefined,
+											const char* iconPath, int iconPredefined,
 											JNIEnv* jNIEnv, jobject jThis);
 
 	int _maWidgetScreenShow(int screenWidget, JNIEnv* jNIEnv, jobject jThis);

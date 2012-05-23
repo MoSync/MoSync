@@ -64,7 +64,7 @@ namespace NativeUI
          */
         virtual void listViewItemClicked(
             ListView* listView,
-            int index);
+            int index){};
     };
 
 } // namespace NativeUI

@@ -1811,7 +1811,7 @@ namespace Base
 		{
 			SYSLOG("maIOCtl_maWidgetScreenAddOptionsMenuItem");
 			int _iconPredefined = SYSCALL_THIS->GetValidatedStackValue(0);
-			return _maWidgetScreenAddOptionsMenuItem(a, SYSCALL_THIS->GetValidatedStr(b), c, _iconPredefined, mJNIEnv, mJThis);
+			return _maWidgetScreenAddOptionsMenuItem(a, SYSCALL_THIS->GetValidatedStr(b), SYSCALL_THIS->GetValidatedStr(c), _iconPredefined, mJNIEnv, mJThis);
 		}
 
 		case maIOCtl_maWidgetScreenShow:

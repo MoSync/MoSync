@@ -4373,8 +4373,7 @@ public class MoSyncThread extends Thread
 	 * Add an item to the Options Menu associated to a screen.
 	 * @param widgetHandle The screen handle.
 	 * @param title The title associated for the new item. Can be left null.
-	 * @param iconHandle MoSync handle to an uncompressed image resource,or:
-	 * a predefined Android icon.
+	 * @param iconPath The local path of the icon.
 	 * @param iconPredefined Specifies if the icon is a project resource, or one of
 	 * the predefined Android icons. By default it's value is 0.
 	 * @return The index on which the menu item was added in the options menu,
@@ -4383,11 +4382,11 @@ public class MoSyncThread extends Thread
 	public int maWidgetScreenAddOptionsMenuItem(
 			final int widgetHandle,
 			final String title,
-			final int iconHandle,
+			final String iconPath,
 			final int iconPredefined)
 	{
 		return mMoSyncNativeUI.maWidgetScreenAddOptionsMenuItem(
-				widgetHandle, title, iconHandle, iconPredefined);
+				widgetHandle, title, iconPath, iconPredefined);
 	}
 
 	/**

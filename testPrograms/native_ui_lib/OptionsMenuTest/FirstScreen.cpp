@@ -59,6 +59,7 @@ FirstScreen::FirstScreen() :
 
 	Screen::addOptionsMenuItem("First screen menu item 0", MAW_OPTIONS_MENU_ICON_CONSTANT_SAVE,true);
 	Screen::addOptionsMenuItem("First screen menu item 1", MAW_OPTIONS_MENU_ICON_CONSTANT_SEARCH, true);
+	Screen::addOptionsMenuItem("First screen menu item 2", "/sdcard/icon.jpg", false);
 	this->addScreenListener(this);
 	mClearOptions->addButtonListener(this);
 }

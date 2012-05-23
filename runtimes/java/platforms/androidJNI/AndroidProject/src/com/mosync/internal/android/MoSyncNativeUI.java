@@ -415,7 +415,7 @@ public class MoSyncNativeUI implements RootViewReplacedListener
 	public int maWidgetScreenAddOptionsMenuItem(
 			final int widgetHandle,
 			final String title,
-			final int iconHandle,
+			final String iconPath,
 			final int iconPredefined)
 	{
 		try
@@ -425,7 +425,7 @@ public class MoSyncNativeUI implements RootViewReplacedListener
 				public void run()
 				{
 					int result = mNativeUI.maWidgetScreenAddOptionsMenuItem(
-							widgetHandle, title, iconHandle,iconPredefined);
+							widgetHandle, title, iconPath,iconPredefined);
 					waiter.setResult(result);
 				}
 			});
