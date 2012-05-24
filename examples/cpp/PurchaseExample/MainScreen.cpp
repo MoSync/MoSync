@@ -123,7 +123,7 @@ void MainScreen::fillReceiptDialog(MAUtil::String appID, MAUtil::String productI
 		appID = "-";
 	if ( productID.length() == 0 )
 		productID = "-";
-	if ( transactionDate <= 0 )
+	if ( transactionDate == 0 )
 		mReceiptTransactionDate->setText("-");
 	else
 	{
@@ -131,11 +131,11 @@ void MainScreen::fillReceiptDialog(MAUtil::String appID, MAUtil::String productI
 		split_time(transactionDate, &transaction);
 		mReceiptTransactionDate->setText(
 				MAUtil::integerToString(transaction.tm_mday) + "." +
-				MAUtil::integerToString(transaction.tm_mon) + "." +
-				MAUtil::integerToString(transaction.tm_year) + " / " +
-				MAUtil::integerToString(transaction.tm_hour) + ":" +
-				MAUtil::integerToString(transaction.tm_min) + ":" +
-				MAUtil::integerToString(transaction.tm_sec) );
+				MAUtil::integerToString(transaction.tm_mon +1) + "." +
+				MAUtil::integerToString(transaction.tm_year +1900) + " / " +
+				MAUtil::integerToString(transaction.tm_hour +1) + ":" +
+				MAUtil::integerToString(transaction.tm_min +1) + ":" +
+				MAUtil::integerToString(transaction.tm_sec +1) );
 	}
 	mReceiptProductId->setText(productID);
 	mReceiptAppId->setText(appID);

@@ -257,11 +257,11 @@ namespace PurchaseTest
 		sprintf(buffer,
 			"Transaction system date: %d/%d/%d %d:%d:%d",
 			date->tm_mday,
-			date->tm_mon,
+			date->tm_mon+1,
 			1900 + date->tm_year,
-			date->tm_hour,
-			date->tm_min,
-			date->tm_sec);
+			date->tm_hour+1,
+			date->tm_min+1,
+			date->tm_sec+1);
 		mApplicationController.log(buffer);
 		delete date;
 	}
