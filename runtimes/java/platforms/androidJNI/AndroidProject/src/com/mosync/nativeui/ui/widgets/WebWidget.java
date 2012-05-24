@@ -24,6 +24,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.webkit.JsPromptResult;
 import android.webkit.JsResult;
@@ -329,6 +330,13 @@ public class WebWidget extends Widget
 		else if ( property.equals(IX_WIDGET.MAW_WEB_VIEW_VERTICAL_SCROLL_BAR_ENABLED ))
 		{
 			webView.setVerticalScrollBarEnabled(BooleanConverter.convert(value));
+		}
+		else if (property.equals("cache"))
+		{
+			if (value.equals("clearall"))
+			{
+				webView.clearCache(true);
+			}
 		}
 
 		return true;

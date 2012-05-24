@@ -156,6 +156,7 @@ public class MoSyncThread extends Thread
 	public native ByteBuffer nativeLoadCombined(ByteBuffer combined);
 	public native void nativeRun();
 	public native void nativePostEvent(int[] eventBuffer);
+	public native int nativeGetEventQueueSize();
 	public native int nativeCreateBinaryResource(
 		int resourceIndex,
 		int length);
@@ -294,10 +295,9 @@ public class MoSyncThread extends Thread
 	int mTextConsoleHeight;
 
 	/**
-	 * Variables used to synchronize event posting.
+	 * Flag used to signal if the thread is sleeping.
 	 */
 	private volatile boolean mIsSleeping;
-	private volatile boolean mIsEventPosted;
 
 	/**
 	 * Ascent of text in the default console font.
@@ -348,7 +348,6 @@ public class MoSyncThread extends Thread
 		mHasDied = false;
 
 		mIsSleeping = false;
-		mIsEventPosted = false;
 
 		mMoSyncNetwork = new MoSyncNetwork(this);
 		mMoSyncSound = new MoSyncSound(this);
@@ -633,6 +632,8 @@ public class MoSyncThread extends Thread
 		//new Exception("STACKTRACE: threadPanic").printStackTrace();
 
 		mHasDied = true;
+
+		// TODO: Run on UI thread?
 
 		// Launch panic dialog.
 		MoSyncPanicDialog.sPanicMessage = message;
@@ -1020,25 +1021,6 @@ public class MoSyncThread extends Thread
 	public void updateScreen()
 	{
 		maUpdateScreen();
-	}
-
-	/**
-	 * Post a event to the MoSync event queue.
-	 */
-	public void postEvent(int[] event)
-	{
-		synchronized(mPostEventMonitor)
-		{
-			// Add event to queue.
-			nativePostEvent(event);
-
-			mIsEventPosted = true;
-
-			if (mIsSleeping)
-			{
-				interrupt();
-			}
-		}
 	}
 
 	/**
@@ -2521,45 +2503,80 @@ public class MoSyncThread extends Thread
 	}
 
 	/**
+	 * Post a event to the MoSync event queue.
+	 */
+	public void postEvent(int[] event)
+	{
+		synchronized (mPostEventMonitor)
+		{
+			// Add event to queue.
+			nativePostEvent(event);
+
+			// Wake up the MoSync thread if it is sleeping.
+			if (mIsSleeping)
+			{
+				mPostEventMonitor.notifyAll();
+			}
+		}
+	}
+
+	/**
 	 * maWait
+	 *
+	 * Now using wait/notifyAll for maWait/postEvent. This synchronises blocks
+	 * much more safely than sleep/interrupt. For further details, see e.g.
+	 * http://stackoverflow.com/questions/2779484/why-wait-should-always-be-in-synchronized-block
 	 */
 	void maWait(int timeout)
 	{
 		SYSLOG("maWait");
 
-		synchronized(mPostEventMonitor)
+		// If there are NO events in the queue, we wait.
+		synchronized (mPostEventMonitor)
 		{
-			if (mIsEventPosted)
+			int size = nativeGetEventQueueSize();
+			if (size > 0)
 			{
-				mIsEventPosted = false;
+				// There are events in the queue, just return.
+				//Log.i("@@@ MoSync", "maWait: direct return, size: " + size);
 				return;
 			}
 
 			mIsSleeping = true;
-		}
 
-		try
-		{
-	 		if (timeout<=0)
+			long timeStamp;
+
+			if (timeout > 0)
 			{
-				Thread.sleep(Long.MAX_VALUE);
+				timeStamp = System.currentTimeMillis() + timeout;
 			}
 			else
 			{
-				Thread.sleep(timeout);
+				timeStamp = Long.MAX_VALUE;
 			}
-		}
-		catch (InterruptedException ie)
-		{
-			SYSLOG("Sleeping thread interrupted (this is normal behaviour)");
-		}
-		// TODO: This exception is never thrown! Remove it.
-		catch (Exception e)
-		{
-			logError("Thread sleep failed : " + e.toString(), e);
-		}
 
-		mIsSleeping = false;
+			try
+			{
+				while ((nativeGetEventQueueSize() < 1)
+					&& (System.currentTimeMillis() < timeStamp))
+				{
+					// Note that wait gives up lock on this synchronised block.
+					mPostEventMonitor.wait(timeStamp - System.currentTimeMillis());
+				}
+			}
+			catch (InterruptedException ie)
+			{
+				SYSLOG("maWait interrupted (this is normal behaviour)");
+				ie.printStackTrace();
+			}
+			catch (Exception e)
+			{
+				logError("maWait exception : " + e.toString(), e);
+				e.printStackTrace();
+			}
+
+			mIsSleeping = false;
+		}
 
 		SYSLOG("maWait returned");
 	}
@@ -2690,7 +2707,7 @@ public class MoSyncThread extends Thread
 	}
 
 	/**
-	 * Implemation of the maWriteLog syscall which only
+	 * Implementation of the maWriteLog syscall which only
 	 * sends the log message to the Android Logcat.
 	 * @param str The string to send to logcat.
 	 * @param size The number of characters in the string.
