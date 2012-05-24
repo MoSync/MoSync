@@ -7865,7 +7865,7 @@ group WidgetAPI "Widget API" {
 
 	/**
 	* Add an item to the Options Menu associated to a screen.
-	* Available on Android only.
+	* Available on Android and WP7.
 	* The options menu is where you should include actions and other options that are relevant to the current activity
 	* context, such as "Search," "Compose email," or "Settings".
 	* When opened, the first visible portion is the icon menu, which holds up to six menu items.
@@ -7878,7 +7878,7 @@ group WidgetAPI "Widget API" {
 	* structure "/ApplicationBarIcons/". The function is called with the name of the icon file.
 	* e.g. maWidgetScreenAddOptionsMenuItem(ScreenHandle, "test", "optionsMenuItemIcon.png", 0); where the
 	* file optionsMenuItemIcon.png is found in the folder "/ApplicationBarIcons".
-	* Can be left null. Note that on windows phone 7 a null option menu item icon means that the item
+	* Can be left null. On windows phone 7 a null icon means that the item
 	* will be a part of the extendable menu item list from the native Application Bar.
 	* \iconPredefined Specifies if the icon is a project resource, or one of the predefined Android icons.
 	* By default it's value is 0.

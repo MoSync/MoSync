@@ -321,6 +321,7 @@ namespace MoSync
             public void SetApplicationBarVisibility(bool value)
             {
                 mApplicationBarVisible = value;
+                mApplicationBar.IsVisible = value;
             }
 
             /*
