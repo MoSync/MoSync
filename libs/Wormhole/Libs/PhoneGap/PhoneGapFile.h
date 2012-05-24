@@ -84,15 +84,26 @@ namespace Wormhole
 			);
 
 		/**
-		 * Implementation of File API exposed to JavaScript.
+		 * Implementation of the File API.
+		 * @return true if message was handled, false if not.
 		 */
-		void handleMessage(JSONMessage& message);
+		void handleFileMessage(JSONMessage& message);
 
 		/**
-		 * Return a FileSystem object.
+		 * Implementation of the FileTransfer API.
+		 * @return true if message was handled, false if not.
+		 */
+		void handleFileTransferMessage(JSONMessage& message);
+
+		/**
+		 * Return a FileSystem object for the application's
+		 * local file system.
 		 */
 		void actionRequestFileSystem(JSONMessage& message);
 
+		/**
+		 * Return a FileSystem object for the given file URL.
+		 */
 		void actionResolveLocalFileSystemURI(JSONMessage& message);
 
 		/**
@@ -141,6 +152,8 @@ namespace Wormhole
 		 * we talking about? Unsupported for now.
 		 */
 		void actionGetFreeDiskSpace(JSONMessage& message);
+
+		void actionUploadFile(JSONMessage& message);
 
 	private:
 		PhoneGapMessageHandler* mMessageHandler;

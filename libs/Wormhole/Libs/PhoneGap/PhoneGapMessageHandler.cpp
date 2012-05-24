@@ -144,7 +144,11 @@ namespace Wormhole
 		}
 		else if (message.getParam("service") == "File")
 		{
-			mPhoneGapFile.handleMessage(message);
+			mPhoneGapFile.handleFileMessage(message);
+		}
+		else if (message.getParam("service") == "FileTransfer")
+		{
+			mPhoneGapFile.handleFileTransferMessage(message);
 		}
 		else if (message.getParam("service") == "PushNotification")
 		{

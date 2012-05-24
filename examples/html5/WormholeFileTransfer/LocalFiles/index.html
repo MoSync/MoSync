@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<!--
+* @file index.html
+* @author Mikael Kindborg
+-->
+<html>
+	<head>
+		<meta name="viewport" content="width=320, user-scalable=no">
+		<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+		<title>Wormhole Template App</title>
+		<link rel="stylesheet" href="style.css" type="text/css" media="screen" title="no title" charset="utf-8">
+		<script type="text/javascript" charset="utf-8" src="js/wormhole.js"></script>
+		<script type="text/javascript">
+			/**
+			 * Initialization.
+			 */
+			function initialize()
+			{
+				document.addEventListener("deviceready", displayDeviceInfo, true);
+				document.addEventListener("backbutton", close, true);
+			}
+
+			/**
+			 * Handle the backbutton event.
+			 */
+			function close()
+			{
+				// Close the application if the back key is pressed.
+				mosync.bridge.send(["close"]);
+			}
+
+			/**
+			 * Take a picture and display it.
+			 */
+			function getPictureData()
+			{
+				navigator.camera.getPicture(
+					onPictureDataSuccess,
+					onFail,
+					{
+						quality: 50,
+						destinationType: navigator.camera.DestinationType.DATA_URL
+					});
+			}
+
+			/**
+			 * Take a picture and display it.
+			 */
+			function getPictureFile()
+			{
+				navigator.camera.getPicture(
+					onPictureFileSuccess,
+					onFail,
+					{
+						quality: 50,
+						destinationType: navigator.camera.DestinationType.FILE_URI
+					});
+			}
+
+			function onPictureDataSuccess(imageData)
+			{
+				// Uncomment to view the base64 encoded image data
+				// console.log(imageData);
+
+				console.log("onPictureDataSuccess imageData: " + imageData);
+
+				// Get image handle
+				//
+				//var smallImage = document.getElementById('smallImage');
+
+				// Unhide image elements
+				//
+				//smallImage.style.display = 'block';
+
+				// Show the captured photo
+				// The inline CSS rules are used to resize the image
+				//
+				//smallImage.src = "data:image/jpeg;base64," + imageData;
+			}
+
+			function onPictureFileSuccess(imageURI)
+			{
+				console.log("onPictureFileSuccess imageURI: " + imageURI);
+			}
+
+			function onFail(message)
+			{
+				alert('Failed because: ' + message);
+			}
+
+			function makeFailFun(message)
+			{
+				return function()
+				{
+					console.log("@@@ Error: " + message);
+				};
+			}
+
+			function writeFile()
+			{
+				function writeFile(fileEntry)
+				{
+					fileEntry.createWriter(
+						function(writer)
+						{
+								writer.onwrite = function(e)
+							{
+								console.log("write success");
+							};
+							writer.write("HELLO");
+						},
+						makeFailFun("createWriter failed")
+						);
+				}
+
+				window.requestFileSystem(
+					LocalFileSystem.PERSISTENT,
+					0,
+					function (fileSystem)
+					{
+						fileSystem.root.getFile(
+							"testfile.txt",
+							{ create: true, exclusive: false },
+							writeFile,
+							makeFailFun("getFile failed"));
+					},
+					makeFailFun("requestFileSystem failed"));
+			}
+
+			function uploadFile()
+			{
+				var fileURL;
+
+				// Get a file URI.
+				function getFileURL()
+				{
+					window.requestFileSystem(
+						LocalFileSystem.PERSISTENT,
+						0,
+						function (fileSystem)
+						{
+							var root = fileSystem.root;
+							console.log("@@ root.name = " + root.name);
+							console.log("@@ root.fullPath = " + root.fullPath);
+							var fileURL = "file://" + root.fullPath + "/testfile.txt";
+							doUpload(fileURL);
+						},
+						makeFailFun("requestFileSystem error"));
+				}
+
+				function doUpload(fileURL)
+				{
+					var options = new FileUploadOptions();
+					options.fileKey = "file";
+					options.fileName = fileURL.substr(fileURL.lastIndexOf('/') + 1);
+					options.mimeType = "text/plain";
+
+					var params = new Object();
+					params.param1 = "value1";
+					params.param2 = "value2";
+
+					options.params = params;
+
+					var transfer = new FileTransfer();
+
+					transfer.upload(
+						fileURL,
+						"http://192.168.0.145:4042/",
+						function (r)
+						{
+							console.log("Code = " + r.responseCode);
+							console.log("Response = " + r.response);
+							console.log("Sent = " + r.bytesSent);
+						},
+						function (error)
+						{
+							alert("An error has occurred: Code = " + error.code);
+						},
+						options);
+				}
+
+				getFileURL();
+			}
+		</script>
+	</head>
+	<body onload="initialize();">
+		<div id="screen">
+			<div class="pane" id="heading">PhoneGap FileTransfer Demo</div>
+			<div class="pane button" onclick="writeFile();">Write File</div>
+			<div class="pane button" onclick="uploadFile();">Upload File</div>
+			<!--
+			<div class="pane button" onclick="getPictureData();">Get Picture Data</div>
+			<div class="pane button" onclick="getPictureFile();">Get Picture File</div>
+			<div><img id="picture"/>
+			-->
+			</div>
+		</div>
+	</body>
+</html>

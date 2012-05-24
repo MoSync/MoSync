@@ -29,6 +29,7 @@ MA 02110-1301, USA.
 #include <MAUtil/String.h>
 #include <MAUtil/HashDict.h>
 #include "../../Encoder.h"
+#include "../../HighLevelHttpConnection.h"
 #include "PhoneGapFile.h"
 #include "PhoneGapMessageHandler.h"
 
@@ -61,6 +62,41 @@ using namespace MAUtil;
 
 namespace Wormhole
 {
+	/**
+	 * HTTP connection class used for file uploading.
+	 */
+	class PhoneGapFileUploadConnection : public HighLevelHttpConnection
+	{
+	public:
+		// TODO: Add param for callbackID.
+		PhoneGapFileUploadConnection(PhoneGapFile* objPtr)
+			: HighLevelHttpConnection()
+		{
+			mPhoneGapFile = objPtr;
+		}
+
+		/**
+		 * Called when the HTTP connection has finished downloading data.
+		 * \param data Handle to the data, will be 0 on error, > 0 on success.
+		 * \param result Result code, RES_OK on success, otherwise an HTTP error code.
+		 */
+		void dataDownloaded(MAHandle data, int result)
+		{
+			// Inform the PhoneGap file object that the upload
+			// is complete and pass the result/error code.
+			// We ignore the data sent back from the server.
+			// TODO: Implement method uploadComplete, pass more
+			// params, like callbackID.
+			//mPhoneGapFile->uploadComplete(result);
+
+			// Delete upload connection.
+			delete this;
+		}
+
+	private:
+		PhoneGapFile* mPhoneGapFile;
+	};
+
 	// For unknown type it is recommended to use 'application/octet-stream'.
 	// http://stackoverflow.com/questions/1176022/unknown-file-type-mime
 	static String MimeTypeDefault = "application/octet-stream";
@@ -907,10 +943,10 @@ namespace Wormhole
 	}
 
 	/**
-	 * Implementation of File API exposed to JavaScript.
+	 * Implementation of the File API.
 	 * @return true if message was handled, false if not.
 	 */
-	void PhoneGapFile::handleMessage(JSONMessage& message)
+	void PhoneGapFile::handleFileMessage(JSONMessage& message)
 	{
 		String action = message.getParam("action");
 
@@ -989,7 +1025,22 @@ namespace Wormhole
 	}
 
 	/**
-	 * Return a FileSystem object.
+	 * Implementation of the FileTransfer API.
+	 * @return true if message was handled, false if not.
+	 */
+	void PhoneGapFile::handleFileTransferMessage(JSONMessage& message)
+	{
+		String action = message.getParam("action");
+
+		if (action == "upload")
+		{
+			actionUploadFile(message);
+		}
+	}
+
+	/**
+	 * Return a FileSystem object for the application's
+	 * local file system.
 	 */
 	void PhoneGapFile::actionRequestFileSystem(JSONMessage& message)
 	{
@@ -1038,6 +1089,9 @@ namespace Wormhole
 			"window.localFileSystem._castFS");
 	}
 
+	/**
+	 * Return a FileSystem object for the given file URL.
+	 */
 	void PhoneGapFile::actionResolveLocalFileSystemURI(JSONMessage& message)
 	{
 		String callbackID = message.getParam("PhoneGapCallBackId");
@@ -1614,4 +1668,190 @@ namespace Wormhole
 			callbackID,
 			"-1");
 	}
+
+	/**
+	 * Helper function for actionUploadFile.
+	 */
+	static void actionUploadFileGetAdditionalParams(
+		JSONMessage& message,
+		Vector<String>& additionalParams)
+	{
+		YAJLDom::Value* args = message.getParamNode("args");
+		if (NULL != args && YAJLDom::Value::MAP == args->getType())
+		{
+			YAJLDom::Value* params = args->getValueForKey("params");
+			if (NULL != params && YAJLDom::Value::ARRAY == params->getType())
+			{
+				for (int i = 0; i < params->getNumChildValues(); ++i)
+				{
+					YAJLDom::Value* param = params->getValueByIndex(i);
+					if (NULL != param && YAJLDom::Value::MAP == param->getType())
+					{
+						String key = "";
+						String value = "";
+
+						YAJLDom::Value* keyNode = param->getValueForKey("Key");
+						if (NULL != keyNode && YAJLDom::Value::STRING == keyNode->getType())
+						{
+							key = keyNode->toString();
+						}
+
+						YAJLDom::Value* valueNode = param->getValueForKey("Value");
+						if (NULL != valueNode && YAJLDom::Value::STRING == valueNode->getType())
+						{
+							value = valueNode->toString();
+						}
+
+						if (key.size() > 0 && value.size() > 0)
+						{
+							additionalParams.add(key);
+							additionalParams.add(value);
+						}
+					}
+				}
+			}
+		}
+	}
+
+/*
+Android PhoneGap 1.2 sample file upload:
+
+C:\tmp>node upload.js
+Upload server started
+Server address: 192.168.0.145:4042
+Socket connected
+server data:
+POST / HTTP/1.1
+Connection: Keep-Alive
+Content-Type: multipart/form-data;boundary=*****
+User-Agent: Dalvik/1.4.0 (Linux; U; Android 2.3.6; Nexus One Build/GRK39F)
+Host: 192.168.0.145:4042
+Transfer-Encoding: chunked
+Accept-Encoding: gzip
+
+
+server data:
+fb
+--*****
+Content-Disposition: form-data; name="value1";
+
+v1
+--*****
+Content-Disposition: form-data; name="value2";
+
+v2
+--*****
+Content-Disposition: form-data; name="file"; filename="testfile.txt"
+Content-Type: text/plain
+
+HELLO
+--*****--
+
+0
+*/
+
+	/**
+	 * Upload a file to a server.
+	 *
+	 * Example message:
+	 *   [{
+	 *     "messageName":"PhoneGap",
+	 *     "service":"FileTransfer",
+	 *     "action":"upload",
+	 *     "args":{
+	 *       "fileKey":"file",
+	 *       "fileName":"fileToUpload.txt",
+	 *       "mimeType":"text/plain",
+	 *       "params":[
+	 *         {"Key":"value1","Value":"test"},
+	 *         {"Key":"value2","Value":"param"}
+	 *        ],
+	 *        "file:///data/data/com.mosync.app_ReloadClient/files/fileToUpload.txt",
+	 *        "server":"http://some.server.com/upload.php"},
+	 *        "PhoneGapCallBackId":"FileTransfer3"
+	 *   }]
+	 *
+	 * FileUploadOptions:
+	 *   Options to customize the HTTP request used to upload files.
+	 *   @constructor
+	 *   @param fileKey {String}   Name of file request parameter. Defaults to "file".
+	 *   @param fileName {String}  Filename to be used by the server. Defaults to "image.jpg".
+	 *   @param mimeType {String}  Mimetype of the uploaded file. Defaults to "image/jpeg".
+	 *   @param params {Object}    Object with key: value params to send to the server.
+	 */
+	void PhoneGapFile::actionUploadFile(JSONMessage& message)
+	{
+		String callbackID = message.getParam("PhoneGapCallBackId");
+
+		// This is the form name of the post request.
+		String fileKey = message.getArgsField("fileKey");
+		if (0 == fileKey.size())
+		{
+			fileKey = "file";
+		}
+
+		// Name of uploaded file on the server.
+		String fileName = message.getArgsField("fileName");
+		if (0 == fileName.size())
+		{
+			fileName = "image.jpg";
+		}
+
+		// Mime type.
+		String mimeType = message.getArgsField("mimeType");
+		if (0 == mimeType.size())
+		{
+			mimeType = "image/jpeg";
+		}
+
+		// Server URL.
+		String serverURL = message.getArgsField("server");
+
+		// HTTP params.
+		Vector<String> httpParams;
+
+		// http://www.w3.org/Protocols/rfc1341/7_2_Multipart.html
+		// http://en.wikipedia.org/wiki/Multipart/form-data#Form_Data
+		// http://en.wikipedia.org/wiki/File_select
+
+		// Create boundary string.
+		int ms = maGetMilliSecondCount();
+		char boundary[1024];
+		sprintf(boundary, "==========================%d", ms);
+
+		// HTTP params.
+		String contentType = "multipart/form-data;boundary=";
+		contentType += boundary;
+		httpParams.add("Content-Type");
+		httpParams.add(contentType);
+
+		httpParams.add("Connection");
+		httpParams.add("Keep-Alive");
+
+		// Get additional HTTP params to be sent with the request.
+		actionUploadFileGetAdditionalParams(message, httpParams);
+
+		// TODO: Add parameters to the connection object, like callbackID.
+		PhoneGapFileUploadConnection* connection =
+			new PhoneGapFileUploadConnection(this);
+		int result = connection->postRequest(
+			serverURL.c_str(),
+			httpParams,
+			(const void*)"HELLO", // Test data. // TODO: Pass file content, add bondary string, content type etc.
+			5);
+		if (WORMHOLE_HTTP_ERROR == result)
+		{
+			// Error.
+			callSuccess(
+				callbackID,
+				"-1");
+		}
+
+		// Return -1 as the result to PhoneGap.
+		// TODO: Return result in downloader callback.
+		callSuccess(
+			callbackID,
+			"-1");
+	}
+
 } // namespace
