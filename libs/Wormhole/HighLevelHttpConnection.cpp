@@ -186,7 +186,7 @@ void HighLevelHttpConnection::httpFinished(
 	int result)
 {
 	// Known success status codes are 200 and 201.
-	if ( ! (200 == result || 201 == result) )
+	if (200 != result && 201 != result)
 	{
 		// There was an error.
 		dataDownloaded(0, result);

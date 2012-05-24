@@ -83,6 +83,20 @@ namespace Wormhole
 			const MAUtil::String& errorCode
 			);
 
+		void callFileTransferError(
+			const MAUtil::String& callbackID,
+			const MAUtil::String& errorCode,
+			const MAUtil::String& sourceURI,
+			const MAUtil::String& targetURI
+			);
+
+		void callFileUploadResult(
+			const MAUtil::String& callbackID,
+			const MAUtil::String& responseCode, // long
+			const MAUtil::String& bytesSent, // long (unused)
+			const MAUtil::String& response // DOMString (unused)
+			);
+
 		/**
 		 * Implementation of the File API.
 		 * @return true if message was handled, false if not.

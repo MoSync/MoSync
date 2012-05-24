@@ -15,11 +15,17 @@ var server = net.createServer(function(socket)
 	socket.on('data', function(data)
 	{
 		console.log('server data:\n' + data.toString());
-		socket.write('HTTP/1.1 200 OK\r\n');
-		socket.write('Content-Type: text/plain\r\n');
-		socket.write('\r\n');
-		socket.write('Hello World');
-		socket.end();
+
+		// socket.write('HTTP/1.1 200 OK\r\n');
+		// socket.write('Content-Type: text/plain\r\n');
+		// socket.write('\r\n');
+		// socket.write('Hello World');
+		// socket.end();
+	});
+
+	socket.on('error', function (error)
+	{
+		console.log('Socket error: ' + error.code);
 	});
 });
 
