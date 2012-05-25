@@ -37,10 +37,13 @@ MA 02110-1301, USA.
 #define NATIVEUI_MAP_H_
 
 #include "Widget.h"
+#include "MapLocation.h"
+#include "MapPin.h"
+#include "MapPinListener.h"
+#include <MAUtil/Vector.h>
 
 namespace NativeUI
 {
-
     // Forward declaration.
     class MapListener;
 
@@ -66,7 +69,8 @@ namespace NativeUI
 	 * the registered listeners and offers the possibility to add an overlay (a annotation/pin
 	 * for example).
      */
-    class Map : public Widget
+    class Map : public Widget,
+				public MapPinListener
     {
     public:
         /**
@@ -74,21 +78,53 @@ namespace NativeUI
          */
         Map();
 
+		/**
+		 * Constructor with the api key as a parameter (on the iOS platform the api key is not required but the
+		 * developer must provide a google api key for Android and a bing key for the Windows Phone platform).
+		 * @param apiKey The api key.
+		 */
+		Map(const MAUtil::String& apiKey);
+
         /**
          * Destructor.
          */
-        virtual ~Map();
+        ~Map();
+
+		/**
+         * Add a map pin as a view on the map.
+         * @param pin The map pin that will be added.
+         * The ownership of the map pin is passed to this function.
+         * When the parent map will be destroyed, all child map pins
+         * will be deleted.
+         * @return Any of the following result codes:
+         * - #MAW_RES_OK if the map pin could be added to the parent.
+         * - #MAW_RES_INVALID_HANDLE if any of the handles were invalid.
+         * - #MAW_RES_ERROR if it could not be added for some other reason.
+         */
+        int addMapPin(MapPin* pin);
+
+		/**
+         * Remove a map pin from its parent map (but does not destroy it).
+         * When the parent map will be destroyed, the child map pin will not
+         * be deleted.
+         * @param pin The map pin to be removed.
+         * @return Any of the following result codes:
+         * - #MAW_RES_OK if the map pin could be removed from the parent map.
+         * - #MAW_RES_INVALID_HANDLE if the handle was invalid.
+         * - #MAW_RES_ERROR otherwise.
+         */
+        int removeMapPin(MapPin* pin);
 
 		/**
 		 * Set the map type: road (only road, railway etc. structure visible) or satellite (terrain visible).
 		 * @param mapType One of the MapType constants (MAP_TYPE_ROAD or MAP_TYPE_SATELLITE).
 		 */
-		virtual void setMapType(MapType mapType);
+		void setMapType(MapType mapType);
 
 		/**
 		 * Gets the current map type (MAP_TYPE_ROAD or MAP_TYPE_SATELLITE).
 		 */
-		virtual MapType getMapType();
+		MapType getMapType();
 
 		/**
 		 * Sets the zoom level of the map.
@@ -96,36 +132,64 @@ namespace NativeUI
 		 * google maps min/max zoom levels - the values for bing maps are between 1 and 21 so by setting the
 		 * value 0 or 1 is equivalent on the windows phone platform).
 		 */
-		virtual void setZoomLevel(int zoomLevel);
+		void setZoomLevel(int zoomLevel);
 
 		/**
 		 * Gets the zoom level of the map (an integer between MAP_MIN_ZOOM_LEVEL - 0 and MAP_MAX_ZOOM_LEVEL - 21).
 		 */
-		virtual int getZoomLevel();
+		int getZoomLevel();
 
-		/** TODO - decide the structure of a map point/map region.
+		/**
 		 * Sets the center of the map.
-		 * @param center A MapPoint that contains the center information (latitude, longitude).
+		 * @param center A MapLocation that contains the center information (latitude, longitude and zoom level).
 		 */
-		 //virtual void setCenter(MapPoint center);
+		void setCenter(const MapLocation& center);
 
 		/**
 		 * Sets the interraction enabled property for the map.
 		 * @param interractionEnabled If true, the map can be scrolled/zoomed.
 		 */
-		virtual void setInterractionEnabled(bool interractionEnabled);
+		void setInterractionEnabled(bool interractionEnabled);
+
+		/**
+		 * Centers the map around the map center.
+		 */
+		void centerMap();
+
+		/**
+		 * Scrolls and zooms the map on the area provided.
+		 * @param upperLeftCornerLatitude The upper left corner latitude of the area.
+		 * @param upperLeftCornerLongitude The upper left corner longitude of the area.
+		 * @param lowerRightCornerLatitude The lower right corner latitude of the area.
+		 * @param lowerRightCornerLongitude The lower right corner longitude of the area.
+		 */
+		void setVisibleArea(double upperLeftCornerLatitude, double upperLeftCornerLongitude,
+							double lowerRightCornerLatitude, double lowerRightCornerLongitude);
+
+		/**
+		 * Gets the current map visible area.
+		 * @return A vector containing two location points: the upper left corner and the lower right corner if
+		 * the value from the runtime is corrent and NULL otherwise.
+		 */
+		MAUtil::Vector<Location> getVisibleArea();
 
         /**
          * Add a map event listener.
          * @param listener The listener that will receive map events.
          */
-        virtual void addMapListener(MapListener* listener);
+        void addMapListener(MapListener* listener);
 
         /**
          * Remove a map event listener.
          * @param listener The listener that receives map events.
          */
-        virtual void removeMapListener(MapListener* listener);
+        void removeMapListener(MapListener* listener);
+
+		/**
+		 * This method is called when the user clicks on a map pin.
+         * @param mapPin The map pin object that generated the event.
+         */
+		virtual void mapPinClicked(MapPin* mapPin);
 
     protected:
         /**

@@ -25,6 +25,9 @@ MA 02110-1301, USA.
 
 #include "Map.h"
 #include "MapListener.h"
+#include <maapi.h>
+
+using namespace std;
 
 namespace NativeUI
 {
@@ -35,6 +38,16 @@ namespace NativeUI
     {
     }
 
+	/**
+	 * Constructor with the api key as a parameter (on the iOS platform the api key is not required but the
+	 * developer must provide a google api key for Android and a bing key for the Windows Phone platform).
+	 * @param apiKey The api key.
+	 */
+	Map::Map(const MAUtil::String& apiKey) : Widget(MAW_MAP)
+	{
+		this->setProperty(MAW_MAP_API_KEY, apiKey);
+	}
+
     /**
      * Destructor.
      */
@@ -42,6 +55,39 @@ namespace NativeUI
     {
         mMapListeners.clear();
     }
+
+	/**
+	 * Add a map pin as a view on the map.
+	 * @param pin The map pin that will be added.
+	 * The ownership of the map pin is passed to this function.
+	 * When the parent map will be destroyed, all child map pins
+	 * will be deleted.
+	 * @return Any of the following result codes:
+	 * - #MAW_RES_OK if the map pin could be added to the parent.
+	 * - #MAW_RES_INVALID_HANDLE if any of the handles were invalid.
+	 * - #MAW_RES_ERROR if it could not be added for some other reason.
+	 */
+	int Map::addMapPin(MapPin* pin)
+	{
+		pin->addMapPinListener(this);
+		return Widget::addChild(pin);
+	}
+
+	/**
+	 * Remove a map pin from its parent map (but does not destroy it).
+	 * When the parent map will be destroyed, the child map pin will not
+	 * be deleted.
+	 * @param pin The map pin to be removed.
+	 * @return Any of the following result codes:
+	 * - #MAW_RES_OK if the map pin could be removed from the parent map.
+	 * - #MAW_RES_INVALID_HANDLE if the handle was invalid.
+	 * - #MAW_RES_ERROR otherwise.
+	 */
+	int Map::removeMapPin(MapPin* pin)
+	{
+		pin->removeMapPinListener(this);
+		return Widget::removeChild(pin);
+	}
 
 	/**
 	 * Set the map type: road (only road, railway etc. structure visible) or satellite (terrain visible).
@@ -90,11 +136,17 @@ namespace NativeUI
 		return this->getPropertyInt(MAW_MAP_ZOOM_LEVEL);
 	}
 
-	/** TODO - decide the structure of a map point/map region.
+	/**
 	 * Sets the center of the map.
-	 * @param center A MapPoint that contains the center information (latitude, longitude).
+	 * @param center A MapLocation that contains the center information (latitude, longitude and zoom level).
 	 */
-	 //void Map::setCenter(MapPoint center);
+	 void Map::setCenter(const MapLocation& center)
+	 {
+		// set the latitude, longitude and zoom level properties of the map center
+		this->setProperty(MAW_MAP_CENTER_LATITUDE, MAUtil::doubleToString(center.getLatitude()));
+		this->setProperty(MAW_MAP_CENTER_LONGITUDE, MAUtil::doubleToString(center.getLongitude()));
+		this->setProperty(MAW_MAP_CENTER_ZOOM_LEVEL, MAUtil::integerToString(center.getZoomLevel()));
+	 }
 
 	/**
 	 * Sets the interraction enabled property for the map.
@@ -110,6 +162,59 @@ namespace NativeUI
 		{
 			this->setProperty(MAW_MAP_INTERRACTION_ENABLED, "false");
 		}
+	}
+
+	/**
+	 * Centers the map around the map center.
+	 */
+	void Map::centerMap()
+	{
+		this->setProperty(MAW_MAP_CENTERED, "true");
+	}
+
+	/**
+	 * Scrolls and zooms the map on the area provided.
+	 * @param upperLeftCornerLatitude The upper left corner latitude of the area.
+	 * @param upperLeftCornerLongitude The upper left corner longitude of the area.
+	 * @param lowerRightCornerLatitude The lower right corner latitude of the area.
+	 * @param lowerRightCornerLongitude The lower right corner longitude of the area.
+	 */
+	void Map::setVisibleArea(double upperLeftCornerLatitude, double upperLeftCornerLongitude,
+						double lowerRightCornerLatitude, double lowerRightCornerLongitude)
+	{
+		// set the visible area coordinates (upper left corner and lower left corner coordinates)
+		this->setProperty(MAW_MAP_VISIBLE_AREA_UPPER_LEFT_CORNER_LATITUDE, MAUtil::doubleToString(upperLeftCornerLatitude,6));
+		this->setProperty(MAW_MAP_VISIBLE_AREA_UPPER_LEFT_CORNER_LONGITUDE, MAUtil::doubleToString(upperLeftCornerLongitude,6));
+		this->setProperty(MAW_MAP_VISIBLE_AREA_LOWER_RIGHT_CORNER_LATITUDE, MAUtil::doubleToString(lowerRightCornerLatitude,6));
+		this->setProperty(MAW_MAP_VISIBLE_AREA_LOWER_RIGHT_CORNER_LONGITUDE, MAUtil::doubleToString(lowerRightCornerLongitude,6));
+		// center the map on the visible area
+		this->setProperty(MAW_MAP_CENTERED_ON_VISIBLE_AREA, "true");
+	}
+
+	/**
+	 * Gets the current map visible area.
+	 * @return A vector containing two location points: the upper left corner and the lower right corner if
+	 * the value from the runtime is corrent and NULL otherwise.
+	 */
+	MAUtil::Vector<Location> Map::getVisibleArea()
+	{
+		MAUtil::Vector<Location> corners;
+
+		MAUtil::String upperLeftCornerLatitude = this->getPropertyString(MAW_MAP_VISIBLE_AREA_UPPER_LEFT_CORNER_LATITUDE);
+		MAUtil::String upperLeftCornerLongitude = this->getPropertyString(MAW_MAP_VISIBLE_AREA_UPPER_LEFT_CORNER_LONGITUDE);
+		MAUtil::String lowerRightCornerLatitude = this->getPropertyString(MAW_MAP_VISIBLE_AREA_LOWER_RIGHT_CORNER_LATITUDE);
+		MAUtil::String lowerRightCornerLongitude = this->getPropertyString(MAW_MAP_VISIBLE_AREA_LOWER_RIGHT_CORNER_LONGITUDE);
+
+		Location upperLeftCorner, lowerRightCorner;
+
+		upperLeftCorner.setLatitude(MAUtil::stringToDouble(upperLeftCornerLatitude));
+		upperLeftCorner.setLongitude(MAUtil::stringToDouble(upperLeftCornerLongitude));
+		lowerRightCorner.setLatitude(MAUtil::stringToDouble(lowerRightCornerLatitude));
+		lowerRightCorner.setLongitude(MAUtil::stringToDouble(lowerRightCornerLongitude));
+		corners.add(upperLeftCorner);
+		corners.add(lowerRightCorner);
+
+		return corners;
 	}
 
     /**
@@ -154,5 +259,17 @@ namespace NativeUI
             }
         }
     }
+
+	/**
+	 * This method is called when the user clicks on a map pin.
+	 * @param mapPin The map pin object that generated the event.
+	 */
+	void Map::mapPinClicked(MapPin* mapPin)
+	{
+		for (int i = 0; i < mMapListeners.size(); i++)
+		{
+			mMapListeners[i]->mapPinClicked(mapPin);
+		}
+	}
 
 } // namespace NativeUI

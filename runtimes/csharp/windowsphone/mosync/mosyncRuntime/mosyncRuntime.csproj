@@ -103,6 +103,7 @@
     <Compile Include="Source\Modules\NativeUI\MoSyncCameraPreview.cs" />
     <Compile Include="Source\Modules\NativeUI\MoSyncDialogView.cs" />
     <Compile Include="Source\Modules\NativeUI\MoSyncMap.cs" />
+    <Compile Include="Source\Modules\NativeUI\MoSyncMapPin.cs" />
     <Compile Include="Source\Modules\NativeUI\MoSyncPanoramaView.cs" />
     <Compile Include="Source\Modules\NativeUI\MoSyncSearchBar.cs" />
     <Compile Include="Source\Modules\NativeUI\MoSyncStackScreen.cs" />

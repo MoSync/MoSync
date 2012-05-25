@@ -36,6 +36,8 @@ using System.Windows.Media.Animation;
 using System.Windows.Shapes;
 using Microsoft.Phone.Controls;
 using Microsoft.Phone.Controls.Maps;
+using System.Collections.Generic;
+using Microsoft.Phone.Controls.Maps.Platform;
 
 namespace MoSync
 {
@@ -48,12 +50,25 @@ namespace MoSync
         {
             Microsoft.Phone.Controls.Maps.Map mBingMap;
 
+            // we need to keep the zoom level of the map center in order
+            // to correctly center the map
+            int mCenterZoomLevel = 0;
+
+            // used to center the map on an area described by the upper left corner and the lower right corner
+            System.Device.Location.GeoCoordinate mVisibleAreaUpperLeftCorner;
+
+            // used to center the map on an area described by the upper left corner and the lower right corner
+            System.Device.Location.GeoCoordinate mVisibleAreaLowerRightCorner;
+
             /**
              * Constructor
              */
             public Map()
             {
                 mBingMap = new Microsoft.Phone.Controls.Maps.Map();
+
+                mVisibleAreaUpperLeftCorner = new System.Device.Location.GeoCoordinate();
+                mVisibleAreaLowerRightCorner = new System.Device.Location.GeoCoordinate();
 
                 mView = mBingMap;
 
@@ -91,6 +106,48 @@ namespace MoSync
             }
 
             /**
+             * Adds a pushpin on the map.
+             */
+            public override void AddChild(IWidget child)
+            {
+                if (child is MapPin)
+                {
+                    MoSync.Util.RunActionOnMainThreadSync(() =>
+                    {
+                        MapPin pin = (MapPin)child;
+                        mBingMap.Children.Add(pin.Pushpin);
+                    });
+                }
+            }
+
+            /**
+             * Removes a pushpin from the map.
+             */
+            public override void RemoveChild(IWidget child)
+            {
+                if (child is MapPin)
+                {
+                    MoSync.Util.RunActionOnMainThreadSync(() =>
+                    {
+                        MapPin pin = (MapPin)child;
+                        mBingMap.Children.Remove(pin.Pushpin);
+                    });
+                }
+            }
+
+            /**
+             * Property for setting the map credentials (api key).
+             */
+            [MoSyncWidgetProperty(MoSync.Constants.MAW_MAP_API_KEY)]
+            public string ApiKey
+            {
+                set
+                {
+                    mBingMap.CredentialsProvider = new ApplicationIdCredentialsProvider(value);
+                }
+            }
+
+            /**
              * Property for setting and getting the map type (the two types are MAW_MAP_TYPE_ROAD
              * and MAW_MAP_TYPE_SATELLITE).
              */
@@ -103,9 +160,13 @@ namespace MoSync
                     {
                         mBingMap.Mode = new RoadMode();
                     }
-                    else
+                    else if (MoSync.Constants.MAW_MAP_TYPE_SATELLITE == value)
                     {
                         mBingMap.Mode = new AerialMode();
+                    }
+                    else
+                    {
+                        throw new InvalidPropertyValueException();
                     }
                 }
                 get
@@ -131,9 +192,24 @@ namespace MoSync
                     {
                         mBingMap.IsHitTestVisible = true;
                     }
-                    else
+                    else if (value.Equals("false"))
                     {
                         mBingMap.IsHitTestVisible = false;
+                    }
+                    else
+                    {
+                        throw new InvalidPropertyValueException();
+                    }
+                }
+                get
+                {
+                    if (mBingMap.IsHitTestVisible)
+                    {
+                        return "true";
+                    }
+                    else
+                    {
+                        return "false";
                     }
                 }
             }
@@ -151,6 +227,215 @@ namespace MoSync
                 get
                 {
                     return (int)mBingMap.ZoomLevel;
+                }
+            }
+
+            /**
+             * Property for setting the map center latitude coordinate.
+             */
+            [MoSyncWidgetProperty(MoSync.Constants.MAW_MAP_CENTER_LATITUDE)]
+            public string CenterLatitude
+            {
+                set
+                {
+                    double latitude;
+                    if (Double.TryParse(value, out latitude))
+                    {
+                        mBingMap.Center.Latitude = latitude;
+                    }
+                    else
+                    {
+                        throw new InvalidPropertyValueException();
+                    }
+                }
+            }
+
+            /**
+             * Property for setting the map center longitude coordinate.
+             */
+            [MoSyncWidgetProperty(MoSync.Constants.MAW_MAP_CENTER_LONGITUDE)]
+            public string CenterLongitude
+            {
+                set
+                {
+                    double longitude;
+                    if (Double.TryParse(value, out longitude))
+                    {
+                        mBingMap.Center.Longitude = longitude;
+                    }
+                    else
+                    {
+                        throw new InvalidPropertyValueException();
+                    }
+                }
+            }
+
+            /**
+              * Property for setting the map center zoom level.
+              */
+            [MoSyncWidgetProperty(MoSync.Constants.MAW_MAP_CENTER_ZOOM_LEVEL)]
+            public string CenterZoomLevel
+            {
+                set
+                {
+                    int zoomLevel;
+                    if (Int32.TryParse(value, out zoomLevel))
+                    {
+                        mCenterZoomLevel = zoomLevel;
+                    }
+                    else
+                    {
+                        throw new InvalidPropertyValueException();
+                    }
+                }
+            }
+
+
+            /**
+             * Property for centering the map.
+             */
+            [MoSyncWidgetProperty(MoSync.Constants.MAW_MAP_CENTERED)]
+            public String Centered
+            {
+                set
+                {
+                    if (value.Equals("true"))
+                    {
+                        List<System.Device.Location.GeoCoordinate> points = new List<System.Device.Location.GeoCoordinate>();
+                        points.Add(mBingMap.Center);
+                        mBingMap.SetView(LocationRect.CreateLocationRect(points));
+                        mBingMap.ZoomLevel = mCenterZoomLevel;
+                    }
+                    else if (value.Equals("false"))
+                    {
+                        // do nothing
+                    }
+                    else
+                    {
+                        throw new InvalidPropertyValueException();
+                    }
+                }
+            }
+
+            /**
+             * Property for setting the upper left corner latitude of the visible area.
+             */
+            [MoSyncWidgetProperty(MoSync.Constants.MAW_MAP_VISIBLE_AREA_UPPER_LEFT_CORNER_LATITUDE)]
+            public String VisibleAreaUpperLeftCornerLatitude
+            {
+                set
+                {
+                    double latitude;
+                    if (Double.TryParse(value, out latitude))
+                    {
+                        mVisibleAreaUpperLeftCorner.Latitude = latitude;
+                    }
+                    else
+                    {
+                        throw new InvalidPropertyValueException();
+                    }
+                }
+                get
+                {
+                    return mVisibleAreaUpperLeftCorner.Latitude.ToString();
+                }
+            }
+
+            /**
+             * Property for setting the upper left corner longitude of the visible area.
+             */
+            [MoSyncWidgetProperty(MoSync.Constants.MAW_MAP_VISIBLE_AREA_UPPER_LEFT_CORNER_LONGITUDE)]
+            public String VisibleAreaUpperLeftCornerLongitude
+            {
+                set
+                {
+                    double longitude;
+                    if (Double.TryParse(value, out longitude))
+                    {
+                        mVisibleAreaUpperLeftCorner.Longitude = longitude;
+                    }
+                    else
+                    {
+                        throw new InvalidPropertyValueException();
+                    }
+                }
+                get
+                {
+                    return mVisibleAreaUpperLeftCorner.Longitude.ToString();
+                }
+            }
+
+            /**
+             * Property for setting the lower right corner latitude of the visible area.
+             */
+            [MoSyncWidgetProperty(MoSync.Constants.MAW_MAP_VISIBLE_AREA_LOWER_RIGHT_CORNER_LATITUDE)]
+            public String VisibleAreaLowerRightCornerLatitude
+            {
+                set
+                {
+                    double latitude;
+                    if (Double.TryParse(value, out latitude))
+                    {
+                        mVisibleAreaLowerRightCorner.Latitude = latitude;
+                    }
+                    else
+                    {
+                        throw new InvalidPropertyValueException();
+                    }
+                }
+                get
+                {
+                    return mVisibleAreaLowerRightCorner.Latitude.ToString();
+                }
+            }
+
+            /**
+             * Property for setting the lower right corner longitude of the visible area.
+             */
+            [MoSyncWidgetProperty(MoSync.Constants.MAW_MAP_VISIBLE_AREA_LOWER_RIGHT_CORNER_LONGITUDE)]
+            public String VisibleAreaLowerRightCornerLongitude
+            {
+                set
+                {
+                    double longitude;
+                    if (Double.TryParse(value, out longitude))
+                    {
+                        mVisibleAreaLowerRightCorner.Longitude = longitude;
+                    }
+                    else
+                    {
+                        throw new InvalidPropertyValueException();
+                    }
+                }
+                get
+                {
+                    return mVisibleAreaLowerRightCorner.Longitude.ToString();
+                }
+            }
+
+            /**
+             * Property for centering the map on a previously set visible area.
+             */
+            [MoSyncWidgetProperty(MoSync.Constants.MAW_MAP_CENTERED_ON_VISIBLE_AREA)]
+            public String CenteredOnVisibleArea
+            {
+                set
+                {
+                    if (value.Equals("true"))
+                    {
+                        List<System.Device.Location.GeoCoordinate> points = new List<System.Device.Location.GeoCoordinate>();
+                        points.Add(mVisibleAreaUpperLeftCorner);
+                        points.Add(mVisibleAreaLowerRightCorner);
+                        mBingMap.SetView(LocationRect.CreateLocationRect(points));
+                    }
+                    else if (value.Equals("false"))
+                    {
+                        // do nothing
+                    }
+                    else
+                    {
+                        throw new InvalidPropertyValueException();
+                    }
                 }
             }
         } // end of Map class

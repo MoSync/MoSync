@@ -32,45 +32,29 @@ MA 02110-1301, USA.
  * \brief Listener for Map events.
  */
 
-#include "MapPin.h"
-
-#ifndef NATIVEUI_MAP_LISTENER_H_
-#define NATIVEUI_MAP_LISTENER_H_
+#ifndef NATIVEUI_MAP_PIN_LISTENER_H_
+#define NATIVEUI_MAP_PIN_LISTENER_H_
 
 namespace NativeUI
 {
     // Forward declaration.
-    class Map;
+    class MapPin;
 
     /**
-     * \brief Listener for Map events.
+     * \brief Listener for Map pin events.
      */
-    class MapListener
+    class MapPinListener
     {
     public:
         /**
-		 * This method is called when the zoom level of the map changes (at a double tap
-		 * on the google maps for example).
-         * @param map The map object that generated the event.
-         */
-        virtual void mapZoomLevelChanged(Map* map) {};
-
-        /**
-         * This method is called when the visible region on the map is changed (on a drag/scroll
-		 * for example).
-         * @param map The map object that generated the event.
-         */
-        virtual void mapRegionChanged(Map* map) {};
-
-		/**
 		 * This method is called when the user clicks on a map pin.
-		 * @param mapPin The map pin object that generated the event.
-		 */
-		virtual void mapPinClicked(MapPin* mapPin) {};
+         * @param mapPin The map pin object that generated the event.
+         */
+        virtual void mapPinClicked(MapPin* mapPin) {};
     };
 
 } // namespace NativeUI
 
-#endif /* NATIVEUI_MAP_LISTENER_H_ */
+#endif /* NATIVEUI_MAP_PIN_LISTENER_H_ */
 
 /*! @} */
