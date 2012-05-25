@@ -118,6 +118,7 @@ namespace NativeUI
 
 		/**
 		* Add a new menu item to the Options Menu associated to this screen.
+		* Platform: Android and WP7.
 		* Option Menus are Android specific concept. The Options Menu is launched by
 		* pressing the Menu key. The options menu is where you should include
 		* actions and other options that are relevant to the current activity
@@ -139,9 +140,8 @@ namespace NativeUI
 		int Screen::addOptionsMenuItem(const MAUtil::String title);
 
 		/**
-		* This function will generate propper output only for Android.
-		*
 		* Add a new menu item to the Options Menu associated to this screen.
+		* Platform: Android.
 		* Option Menus are Android specific concept. The Options Menu is launched by
 		* pressing the Menu key. The options menu is where you should include
 		* actions and other options that are relevant to the current activity
@@ -162,6 +162,7 @@ namespace NativeUI
 
 		/**
 		* Add a new menu item to the Options Menu associated to this screen.
+		* Platform: Android and WP7.
 		* Option Menus are Android specific concept. The Options Menu is launched by
 		* pressing the Menu key. The options menu is where you should include
 		* actions and other options that are relevant to the current activity
@@ -173,9 +174,11 @@ namespace NativeUI
 		* Phone 7 the control used is the application bar.
 		*
 		* @param title The title associated for the new item. Can be left null.
-		* @param icon The id of an icon from the Android and WP7
-		* predefined icon set, these can be found under the OptionsMenuIconConstants
-		* group, or the name of the icon file (works only for WP7)
+		* @param icon The id of an icon from the Android and WP7 predefined icon set,
+		* these can be found under the OptionsMenuIconConstants group, or the name of
+		* the icon file (works only for WP7).
+		* @param isPath If true, indicates that the icon is based on the path, otherwise
+		* it is one of the predefined icon constants.
 		*
 		* Note: For Windows phone 7 the option menu icons must be added under the following folder
 		* structure "/ApplicationBarIcons/". By using this function you will obtain an
@@ -186,7 +189,8 @@ namespace NativeUI
 		* @return The index on which the menu item was added in the options menu,
 		* an error code otherwise.
 		*/
-		int Screen::addOptionsMenuItem(const MAUtil::String title, const MAUtil::String icon, bool isPath);
+		int Screen::addOptionsMenuItem(
+				const MAUtil::String title, const MAUtil::String icon, bool isPath);
 
 		/**
 		 * Remove the options menu from this screen.

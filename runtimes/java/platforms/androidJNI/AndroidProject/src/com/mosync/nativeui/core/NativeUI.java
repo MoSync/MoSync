@@ -742,7 +742,8 @@ public class NativeUI
 	 * Add an item to the Options Menu associated to a screen.
 	 * @param widgetHandle The screen handle.
 	 * @param title The title associated for the new item. Can be left null.
-	 * @param iconPath The local path to an icon, or a predefined drawable.
+	 * @param iconHandle MoSync handle to an uncompressed image resource,or:
+	 * a predefined Android icon.
 	 * @param iconPredefined Specifies if the icon is a project resource, or one of
 	 * the predefined Android icons. By default it's value is 0.
 	 * @return The index on which the menu item was added in the options menu,
@@ -751,83 +752,73 @@ public class NativeUI
 	public int maWidgetScreenAddOptionsMenuItem(
 			final int widgetHandle,
 			final String title,
-			final String iconPath,
+			final String iconHandle,
 			final int iconPredefined)
 	{
 		Widget widget = m_widgetTable.get( widgetHandle );
 		if( widget == null || !(widget instanceof ScreenWidget) )
 		{
-			Log.e( "@@MoSync", "maWidgetScreenAddOptionsMenuItem: Invalid screen widget handle: " + widgetHandle );
+			Log.e( "@@MoSync", "maWidgetScreenAddOptionsMenuItem: Invalid screen widget handle: "
+						+ widgetHandle );
 			return IX_WIDGET.MAW_RES_INVALID_HANDLE;
 		}
 
 		ScreenWidget screen = (ScreenWidget) widget;
 
-		switch(iconPredefined){
-		case 1:
+		// Create a menu item with no icon if iconHandle is left null.
+		if ( TextUtils.isEmpty(iconHandle) )
 		{
+			return screen.addMenuItem(title, null);
+		}
+
+		// Parse iconHandle to get the iconPredefinedId, or iconId.
+		int iconID = 0;
+		try{
+			iconID = Integer.parseInt( iconHandle );
+		}catch ( NumberFormatException nfe)
+		{
+			Log.e("@@MoSync",
+					"maWidgetScreenAddOptionsMenuItem: Error while converting property value: "
+						+ iconHandle);
+			return IX_WIDGET.MAW_RES_INVALID_PROPERTY_VALUE;
+		}
+
+		switch (iconPredefined) {
+		case 1: {
 			// If the icon is predefined, match the iconPath to one of the
 			// OptionsMenuIconConstants constants.
-			try{
-				int iconID = Integer.parseInt( iconPath );
-				if ( iconID >= Integer.parseInt(IX_WIDGET.MAW_OPTIONS_MENU_ICON_CONSTANT_ADD) &&
-						iconID <= Integer.parseInt(IX_WIDGET.MAW_OPTIONS_MENU_ICON_CONSTANT_ZOOM) )
+			if (iconID >= Integer
+					.parseInt(IX_WIDGET.MAW_OPTIONS_MENU_ICON_CONSTANT_ADD)
+					&& iconID <= Integer
+							.parseInt(IX_WIDGET.MAW_OPTIONS_MENU_ICON_CONSTANT_ZOOM))
 				return screen.addMenuItem(title, iconID);
-				else
-					throw new NumberFormatException();
-			}catch ( NumberFormatException nfe)
+			else
 			{
-				Log.e("@@MoSync","maWidgetScreenAddOptionsMenuItem: Invalid icon predefined ID: " + iconPath);
-				return IX_WIDGET.MAW_RES_ERROR;
+				Log.e("@@MoSync",
+						"maWidgetScreenAddOptionsMenuItem: Error while converting property value: "
+								+ iconHandle);
+				return IX_WIDGET.MAW_RES_INVALID_PROPERTY_VALUE;
 			}
 		}
 		case 0:
 		{
-			// Create a menu item with no icon if path is left null.
-			if ( TextUtils.isEmpty(iconPath) )
+			if ( iconID >= 0 && m_imageTable.containsKey( iconID ) )
 			{
-				return screen.addMenuItem(title, null);
+				Bitmap icon = NativeUI.getBitmap( iconID );
+				if( icon != null )
+				{
+					// When adding a new menu item the id is returned.
+					return screen.addMenuItem(title, new BitmapDrawable(icon));
+				}
 			}
-			//  Get the bitmap from an image located at iconPath.
-			/**
-			 * Decoding options used for bitmaps. First get the image
-			 * dimensions. Based on the image size perform a scaling.
-			 */
-			BitmapFactory.Options bfo = new BitmapFactory.Options();
-			bfo.inJustDecodeBounds = true;
-			bfo.inDither = false;
-			bfo.inPreferredConfig = Bitmap.Config.RGB_565;
-
-			BitmapFactory.decodeFile(iconPath, bfo);
-			// Calculate sample size to keep image under maxFileSize.
-			int maxFileSize = 1572864; // in bytes
-			int sampleSize = 1;
-			long fileSize = 2 * (bfo.outWidth / sampleSize) * (bfo.outHeight / sampleSize);
-			while (fileSize > maxFileSize)
-			{
-				sampleSize++;
-				fileSize = 2 * (bfo.outWidth / sampleSize)* (bfo.outHeight / sampleSize);
-			}
-
-			/**
-			 * Decode to a smaller image to save memory and run faster.
-			 * Decode image using calculated sample size.
-			 */
-			bfo.inSampleSize = sampleSize;
-			bfo.inJustDecodeBounds = false;
-			Bitmap iconBitmap = BitmapFactory.decodeFile(iconPath, bfo);
-			if ( iconBitmap != null )
-			{
-				// When adding a new menu item the id is returned.
-				return screen.addMenuItem(title, new BitmapDrawable(iconBitmap));
-			}
-			Log.e("@@MoSync","maWidgetScreenAddOptionsMenuItem: Invalid icon path: " + iconPath);
-			return IX_WIDGET.MAW_RES_ERROR;
+			Log.e("@@MoSync","maWidgetScreenAddOptionsMenuItem: Invalid icon handle: " + iconHandle);
+			return IX_WIDGET.MAW_RES_INVALID_PROPERTY_VALUE;
 		}
 		default:
 		{
-			Log.e( "@@MoSync", "maWidgetScreenAddOptionsMenuItem: Invalid iconPredefined value: " + iconPredefined );
-			return IX_WIDGET.MAW_RES_ERROR;
+			Log.e( "@@MoSync", "maWidgetScreenAddOptionsMenuItem: Invalid iconPredefined value: "
+						+ iconPredefined );
+			return IX_WIDGET.MAW_RES_INVALID_PROPERTY_VALUE;
 		}
 		}
 	}

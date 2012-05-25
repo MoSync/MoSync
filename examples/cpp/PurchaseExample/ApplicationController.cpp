@@ -64,7 +64,8 @@ void ApplicationController::buttonClicked(Widget* button)
 {
 	if ( mMainScreen->getSelectedAvailableProduct() != "")
 	{
-		Purchase* purchaseObj = new Purchase(mMainScreen->getSelectedAvailableProduct(), this);
+		Purchase* purchaseObj = new Purchase(
+				mMainScreen->getSelectedAvailableProduct(), this);
 		mPurchases.add(purchaseObj);
 		mCurrentPurchase = mPurchases.size()-1;
 	}
@@ -106,7 +107,8 @@ void ApplicationController::productValid(const Purchase& purchase)
  */
 void ApplicationController::productInvalid(const Purchase& purchase)
 {
-	MAUtil::String errorMessage = "Product " + purchase.getProductId() + " is invalid!";
+	MAUtil::String errorMessage = "Product " + purchase.getProductId()
+			+ " is invalid!";
 	mMainScreen->productError(errorMessage);
 }
 
@@ -134,7 +136,8 @@ void ApplicationController::requestCompleted(const Purchase& purchase)
 void ApplicationController::requestFailed(const Purchase& purchase,
 	const int errorCode)
 {
-	mMainScreen->productError("Purchase failed for product " + purchase.getProductId() );
+	mMainScreen->productError("Purchase failed for product "
+			+ purchase.getProductId() );
 }
 
 /**
@@ -166,7 +169,8 @@ void ApplicationController::receiptValid(
  */
 void ApplicationController::receiptInvalid(const Purchase& purchase)
 {
-	mMainScreen->productError("Product " + purchase.getProductId() + " has an invalid receipt!");
+	mMainScreen->productError("Product " + purchase.getProductId()
+			+ " has an invalid receipt!");
 }
 
 /**
@@ -178,5 +182,6 @@ void ApplicationController::receiptInvalid(const Purchase& purchase)
 void ApplicationController::receiptError(const Purchase& purchase,
 	const int errorCode)
 {
-	mMainScreen->productError("Product " + purchase.getProductId() + " does not have a receipt!");
+	mMainScreen->productError("Product " + purchase.getProductId()
+			+ " does not have a receipt!");
 }

@@ -66,7 +66,6 @@ MainScreen::MainScreen() :
 	createReceiptDialog();
 	mBuyButton->addButtonListener(this);
 	mReceiptOkButton->addButtonListener(this);
-//	mPurchasedItemsList->addListViewListener(this);
 	for (int i=0; i < mItemsCheckBoxes.size(); i++)
 	{
 		mItemsCheckBoxes[i]->addCheckBoxListener(this);
@@ -80,7 +79,6 @@ MainScreen::~MainScreen()
 {
 	mBuyButton->removeButtonListener(this);
 	mReceiptOkButton->removeButtonListener(this);
-	//mPurchasedItemsList->removeListViewListener(this);
 	for (int i=0; i < mItemsCheckBoxes.size(); i++)
 	{
 		mItemsCheckBoxes[i]->removeCheckBoxListener(this);
@@ -95,16 +93,6 @@ MainScreen::~MainScreen()
  */
 void MainScreen::buttonClicked(Widget* button)
 {
-//	if ( mBuyButton == button )
-//	{
-//		// Check which check box was selected, and purchase the corresponding item.
-//
-//		// If no check box is selected, display a warning message
-//		maAlert("Purchase","You need to select an item first!","OK","","");
-//
-//		// Until the purchase is completed, Disable buy button.
-//
-//	}
 	if ( mReceiptOkButton == button )
 	{
 		dismissReceiptDialog();
