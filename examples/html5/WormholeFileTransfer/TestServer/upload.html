@@ -1,10 +1,27 @@
 <html>
 <body>
-<form action="http://localhost:4042/form-handler.php" method="post" enctype="multipart/form-data">
-<div>
-<input id="myfile" name="myfile" type="file">
-<input value="Upload" type="submit">
-</div>
+
+<form
+	action="http://localhost:4042/upload.php"
+	method="post"
+	enctype="multipart/form-data">
+	<div>
+	Upload to local nodejs test server:
+	<input id="file" name="file" type="file">
+	<input value="Upload" type="submit">
+	</div>
 </form>
+
+<form
+	action="http://dev.mosync.com/mobilelua/upload.php"
+	method="post"
+	enctype="multipart/form-data">
+	<div>
+	Upload to MoSync server:
+	<input id="file" name="file" type="file">
+	<input value="Upload" type="submit">
+	</div>
+</form>
+
 </body>
 </html>

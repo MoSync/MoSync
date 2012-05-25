@@ -26,7 +26,6 @@ MA 02110-1301, USA.
 #include <maapi.h>
 #include <mastdlib.h> // C string conversion functions
 #include <conprint.h>
-#include <Wormhole/FileUtil.h>
 #include "PhoneGapMessageHandler.h"
 
 namespace Wormhole
@@ -178,8 +177,10 @@ namespace Wormhole
 	 */
 	void PhoneGapMessageHandler::processKeyEvent(int keyCode, int nativeKeyCode)
 	{
+		lprintfln("PhoneGapMessageHandler::processKeyEvent");
 		if (MAK_BACK == keyCode)
 		{
+		lprintfln("PhoneGapMessageHandler::processKeyEvent MAK_BACK");
 			callJS("PhoneGapCommandResult('backbutton');");
 		}
 	}

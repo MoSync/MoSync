@@ -16,8 +16,21 @@
 			 */
 			function initialize()
 			{
-				document.addEventListener("deviceready", displayDeviceInfo, true);
+				console.log("@@@ JS initialize");
+
+				//document.addEventListener("deviceready", displayDeviceInfo, true);
 				document.addEventListener("backbutton", close, true);
+
+				document.addEventListener(
+					"micke",
+					function() {
+						console.log("document.addEventListener(micke)") },
+					true);
+
+
+			    var eventObj = document.createEvent('MouseEvents');
+			    eventObj.initEvent("micke", true, false );
+			    document.dispatchEvent( eventObj );
 			}
 
 			/**
@@ -26,6 +39,7 @@
 			function close()
 			{
 				// Close the application if the back key is pressed.
+				console.log("@@@ JS close");
 				mosync.bridge.send(["close"]);
 			}
 
@@ -165,7 +179,8 @@
 
 					transfer.upload(
 						fileURL,
-						"http://192.168.0.145:4042/",
+						//"http://192.168.0.145:4042/",
+						"http://dev.mosync.com/mobilelua/upload.php",
 						function (r)
 						{
 							console.log("Code = " + r.responseCode);
@@ -183,14 +198,14 @@
 			}
 		</script>
 	</head>
-	<body onload="initialize();">
+	<body onload="initialize()">
 		<div id="screen">
 			<div class="pane" id="heading">PhoneGap FileTransfer Demo</div>
-			<div class="pane button" onclick="writeFile();">Write File</div>
-			<div class="pane button" onclick="uploadFile();">Upload File</div>
+			<div class="pane button" onclick="writeFile()">Write File</div>
+			<div class="pane button" onclick="uploadFile()">Upload File</div>
 			<!--
-			<div class="pane button" onclick="getPictureData();">Get Picture Data</div>
-			<div class="pane button" onclick="getPictureFile();">Get Picture File</div>
+			<div class="pane button" onclick="getPictureData()">Get Picture Data</div>
+			<div class="pane button" onclick="getPictureFile()">Get Picture File</div>
 			<div><img id="picture"/>
 			-->
 			</div>

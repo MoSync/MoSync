@@ -30,6 +30,7 @@ MA 02110-1301, USA.
 #include <MAUtil/HashDict.h>
 #include "../../Encoder.h"
 #include "../../HighLevelHttpConnection.h"
+#include "../../FileUtil.h"
 #include "PhoneGapFile.h"
 #include "PhoneGapMessageHandler.h"
 #include "MimeTypes.h"
@@ -916,13 +917,15 @@ namespace Wormhole
 	void PhoneGapFile::callFileUploadResult(
 		const String& callbackID,
 		const String& responseCode, // long
-		const String& bytesSent, // long (unused)
-		const String& response // DOMString (unused)
+		const String& bytesSent, // long
+		const String& response // DOMString
 		)
 	{
 		// Construct FileUploadResult object.
 		String args =
-			"{\"responseCode\":" + responseCode + "}";
+			"{\"bytesSent\":" + bytesSent + "," +
+			 "\"responseCode\":" + responseCode + "," +
+			 "\"response\":" + Encoder::JSONStringify(response.c_str()) + "}";
 
 		callSuccess(callbackID, args);
 	}
@@ -1665,7 +1668,8 @@ namespace Wormhole
 			String callbackID,
 			String sourceURI,
 			String targetURI,
-			String* requestBody
+			String* requestBody,
+			int bytesSent
 			)
 			: HighLevelHttpConnection()
 		{
@@ -1674,12 +1678,13 @@ namespace Wormhole
 			mSourceURI = sourceURI;
 			mTargetURI = targetURI;
 			mRequestBody = requestBody;
+			mBytesSent = bytesSent;
 		}
 
 		/**
 		 * Called when the HTTP connection has finished downloading data.
-		 * \param data Handle to the data, will be 0 on error, > 0 on success.
-		 * \param result Result code, RES_OK on success, otherwise an HTTP error code.
+		 * @param data Handle to the data, will be 0 on error, > 0 on success.
+		 * @param result Result code, RES_OK on success, otherwise an HTTP error code.
 		 */
 		void dataDownloaded(MAHandle data, int result)
 		{
@@ -1687,7 +1692,14 @@ namespace Wormhole
 			// is complete and pass the result/error code.
 			// We ignore the data sent back from the server.
 
-			if (RES_OK != result)
+			if (NULL != data)
+			{
+				lprintfln(
+					"@@@ dataDownloaded data size: %i",
+					maGetDataSize(data));
+			}
+
+			if (RES_OK != result || NULL == data)
 			{
 				mPhoneGapFile->callFileTransferError(
 					mCallbackID,
@@ -1697,11 +1709,17 @@ namespace Wormhole
 			}
 			else
 			{
+				char bytesSent[64];
+				sprintf(bytesSent, "%u", mBytesSent);
+
+				FileUtil fileUtil;
+				String response = fileUtil.createTextFromHandle(data);
+
 				mPhoneGapFile->callFileUploadResult(
 					mCallbackID,
 					"200", // We always send response code 200.
-					"", // Unused
-					""  // Unused
+					bytesSent,
+					response
 					);
 			}
 
@@ -1718,6 +1736,7 @@ namespace Wormhole
 		String mSourceURI;
 		String mTargetURI;
 		String* mRequestBody;
+		int mBytesSent;
 	};
 
 	/**
@@ -1971,7 +1990,8 @@ I/maWriteLog(12821): ma:[{
 		*requestBody += fileKey + "\"; filename=\"";
 		*requestBody += fileName + "\"" + crnl;
 		*requestBody += "Content-Type: " + fileMimeType + crnl + crnl;
-		*requestBody += (char*) fileData;
+		// File data may contain null bytes, use append.
+		requestBody->append((const char*) fileData, fileSize);
 		*requestBody += crnl + doubleDash + boundary + doubleDash;
 
 		// Now we can free the fileData buffer.
@@ -1981,10 +2001,11 @@ I/maWriteLog(12821): ma:[{
 		PhoneGapFileUploadConnection* connection =
 			new PhoneGapFileUploadConnection(
 				this,
-				callbackID, // PhoneGap callback id.
+				callbackID,  // PhoneGap callback id.
 				sourceFilePath, // For error message.
-				serverURL,  // For error message.
-				requestBody // Deallocated when connection is completed.
+				serverURL,   // For error message.
+				requestBody, // Deallocated when connection is completed.
+				fileSize     // We assume all bytes are sent upon success.
 				);
 
 		// Initiate the request. The callback method of the
