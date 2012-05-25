@@ -84,8 +84,6 @@ namespace mosyncRuntime.Views
          */
         private void OnDataSourceSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            BoundedNumberDataSource dataSource = (BoundedNumberDataSource)sender;
-
             // Extract the DataSource.
             BoundedNumberDataSource source = (BoundedNumberDataSource)sender;
 
