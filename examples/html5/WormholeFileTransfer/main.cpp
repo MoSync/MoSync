@@ -87,7 +87,6 @@ public:
 	 */
 	void keyPressEvent(int keyCode, int nativeCode)
 	{
-		lprintfln("@@@ keyPressEvent");
 		// Forward to PhoneGap MessageHandler.
 		mPhoneGapMessageHandler.processKeyEvent(keyCode, nativeCode);
 	}
@@ -185,7 +184,6 @@ public:
 			}
 			else if (0 == strcmp(p, "close"))
 			{
-				lprintfln("@@@ closing");
 				// Close the application (calls method in class Moblet).
 				close();
 			}
