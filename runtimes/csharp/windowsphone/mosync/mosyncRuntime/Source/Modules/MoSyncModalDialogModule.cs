@@ -60,8 +60,15 @@ namespace MoSync
 
                 MoSync.Util.RunActionOnMainThreadSync(() =>
                 {
-                    // show the dialog
-                    ((ModalDialog)runtime.GetModule<NativeUIModule>().GetWidget(_dialogHandle)).ShowDialog(true);
+                    ModalDialog modalDialog = ((ModalDialog)runtime.GetModule<NativeUIModule>().GetWidget(_dialogHandle));
+                    if (modalDialog.Visible.Equals("false"))
+                    {
+                        // show the dialog
+                        modalDialog.ShowDialog(true);
+
+                        // set the dialog visibility
+                        modalDialog.Visible = "true";
+                    }
                 });
 
                 return MoSync.Constants.MAW_RES_OK;
@@ -85,8 +92,15 @@ namespace MoSync
 
                 MoSync.Util.RunActionOnMainThreadSync(() =>
                 {
-                    // hide the dialog
-                    ((ModalDialog)runtime.GetModule<NativeUIModule>().GetWidget(_dialogHandle)).ShowDialog(false);
+                    ModalDialog modalDialog = ((ModalDialog)runtime.GetModule<NativeUIModule>().GetWidget(_dialogHandle));
+                    if (modalDialog.Visible.Equals("true"))
+                    {
+                        // hide the dialog
+                        modalDialog.ShowDialog(false);
+
+                        // set the dialog visibility
+                        modalDialog.Visible = "false";
+                    }
                 });
 
                 return MoSync.Constants.MAW_RES_OK;
