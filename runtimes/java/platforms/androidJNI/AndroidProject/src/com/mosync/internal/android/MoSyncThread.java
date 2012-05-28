@@ -628,6 +628,8 @@ public class MoSyncThread extends Thread
 
 		mHasDied = true;
 
+		// TODO: Run on UI thread?
+
 		// Launch panic dialog.
 		MoSyncPanicDialog.sPanicMessage = message;
 		Intent myIntent = new Intent(
@@ -2525,25 +2527,36 @@ public class MoSyncThread extends Thread
 			if (size > 0)
 			{
 				// There are events in the queue, just return.
-				Log.i("@@@ MoSync", "maWait: direct return, size: " + size);
+				//Log.i("@@@ MoSync", "maWait: direct return, size: " + size);
 				return;
 			}
 
 			mIsSleeping = true;
 
+			long timeStamp;
+
+			if (timeout > 0)
+			{
+				timeStamp = System.currentTimeMillis() + timeout;
+			}
+			else
+			{
+				timeStamp = Long.MAX_VALUE;
+			}
+
 			try
 			{
-				// We sleep for very long if timeout is zero (or negative).
-				long sleepTime = timeout > 0 ? timeout : Long.MAX_VALUE;
-
-				// Note that wait gives up lock on this synchronised block.
-				mPostEventMonitor.wait(sleepTime);
+				while ((nativeGetEventQueueSize() < 1)
+					&& (System.currentTimeMillis() < timeStamp))
+				{
+					// Note that wait gives up lock on this synchronised block.
+					mPostEventMonitor.wait(timeStamp - System.currentTimeMillis());
+				}
 			}
 			catch (InterruptedException ie)
 			{
-				// Note: We don't bother with calling wait in a loop, if we
-				// get interrupted, we just return from maWait.
 				SYSLOG("maWait interrupted (this is normal behaviour)");
+				ie.printStackTrace();
 			}
 			catch (Exception e)
 			{
