@@ -1692,13 +1692,6 @@ namespace Wormhole
 			// is complete and pass the result/error code.
 			// We ignore the data sent back from the server.
 
-			if (NULL != data)
-			{
-				lprintfln(
-					"@@@ dataDownloaded data size: %i",
-					maGetDataSize(data));
-			}
-
 			if (RES_OK != result || NULL == data)
 			{
 				mPhoneGapFile->callFileTransferError(

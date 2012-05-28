@@ -177,10 +177,8 @@ namespace Wormhole
 	 */
 	void PhoneGapMessageHandler::processKeyEvent(int keyCode, int nativeKeyCode)
 	{
-		lprintfln("PhoneGapMessageHandler::processKeyEvent");
 		if (MAK_BACK == keyCode)
 		{
-		lprintfln("PhoneGapMessageHandler::processKeyEvent MAK_BACK");
 			callJS("PhoneGapCommandResult('backbutton');");
 		}
 	}
