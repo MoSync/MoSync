@@ -141,9 +141,12 @@ int main() {
 		outputCoreConsts();
 
 		// Generate headefile suitable for use with the tolua binding library.
-		// See comment in output-bindings.h for notes on how to use thsi file
+		// See comment in output-bindings.h for notes on how to use this file
 		// with tolua.
 		lua_outputHeaderFile(maapi, ixs, "Output/lua_maapi.h");
+
+		// Generate bindings for JavaScript.
+		js_outputBindingFile(maapi, ixs, "../../libs/Wormhole/jslib/mosync-constants.js");
 
 		// Create directory for include files.
 		// TODO: Document how this directory is used.
