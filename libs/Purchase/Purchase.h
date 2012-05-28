@@ -170,6 +170,11 @@ namespace IAP
 		 */
 		MAUtil::Vector<PurchaseListener*> mPurchaseEventListeners;
 
+		/**
+		 * Flag to indicate if the product was restored.
+		 */
+		bool mIsRestored;
+
 		// Let the PurchaseManager create Purchase objects using a product handle.
 		friend class PurchaseManager;
 	};

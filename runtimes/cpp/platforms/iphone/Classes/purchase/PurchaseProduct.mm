@@ -25,8 +25,10 @@
  */
 
 #import "PurchaseProduct.h"
-#import "Platform.h"
+#import "PurchaseManager.h"
 #import "NSDataExpanded.h"
+#import "Platform.h"
+#include "Syscall.h"
 
 // Request timeout interval, in seconds.
 NSTimeInterval const kTimeoutInterval = 6.0;
@@ -124,6 +126,7 @@ NSString* const kReceiptDateMsKey = @"original_purchase_date_ms";
     if (self)
     {
         _payment = nil;
+        _restoredPayment = nil;
         _handle = productHandle;
         _productID = [productID retain];
         NSSet* productSet = [NSSet setWithObject:_productID];
@@ -132,6 +135,29 @@ NSString* const kReceiptDateMsKey = @"original_purchase_date_ms";
         [_productRequest start];
 
         [self createParserComponents];
+    }
+
+    return self;
+}
+
+/**
+ * Create a product product using a payment transaction.
+ * Used for restored products.
+ * @param transaction The transaction.
+ * @param productHandle Handle for the new product.
+ * @return A product object.
+ */
+-(id) initWithTransaction:(SKPaymentTransaction*) transaction
+            productHandle:(MAHandle) productHandle
+{
+    self = [super init];
+    if (self)
+    {
+        _handle = productHandle;
+        _restoredPayment = [transaction.payment retain];
+        _productID = [_restoredPayment.productIdentifier retain];
+        _transaction = [transaction retain];
+        _product = nil;
     }
 
     return self;
@@ -363,6 +389,12 @@ NSString* const kReceiptDateMsKey = @"original_purchase_date_ms";
  */
 -(void) dealloc
 {
+    // If the product was restored destroy the placeholder.
+    if (_restoredPayment)
+    {
+        maDestroyPlaceholder(_handle);
+    }
+
     [_productID release];
     [_productRequest release];
     [_product release];
@@ -371,6 +403,7 @@ NSString* const kReceiptDateMsKey = @"original_purchase_date_ms";
     [_streamParser release];
     [_parserAdapter release];
     [_validationResponse release];
+    [_restoredPayment release];
 
     [super dealloc];
 }
@@ -434,23 +467,8 @@ NSString* const kReceiptDateMsKey = @"original_purchase_date_ms";
  */
 -(void) handleTransactionStateFailed:(SKPaymentTransaction*) transaction
 {
-    int errorCode;
-    switch (transaction.error.code)
-    {
-        case SKErrorClientInvalid:
-            errorCode = MA_PURCHASE_ERROR_INVALID_CLIENT;
-            break;
-        case SKErrorPaymentCancelled:
-            errorCode = MA_PURCHASE_ERROR_CANCELLED;
-            break;
-        case SKErrorPaymentNotAllowed:
-            errorCode = MA_PURCHASE_ERROR_NOT_ALLOWED;
-            break;
-        case SKErrorUnknown:
-        default:
-            errorCode = MA_PURCHASE_ERROR_UNKNOWN;
-            break;
-    }
+    PurchaseManager* manager = [PurchaseManager getInstance];
+    int errorCode = [manager purchaseErrorCode:transaction.error];
     [self sendPurchaseEvent:MA_PURCHASE_EVENT_REQUEST
                       state:MA_PURCHASE_STATE_FAILED
                   errorCode:errorCode];

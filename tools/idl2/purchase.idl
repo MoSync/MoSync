@@ -250,7 +250,7 @@ group PurchaseStateCodes "Purchase State Codes" {
 		*/
 		RECEIPT_ERROR = 6;
 		/**
-		* \brief Sent by the #maPurchaserestoreTransactions() syscall.
+		* \brief Sent by the #maPurchaseRestoreTransactions() syscall.
 		* Associated with #MA_PURCHASE_EVENT_RESTORE.
 		* Indicates that an error has occured while restoring transactions.
 		* The error can be one of the following: #MA_PURCHASE_ERROR_CONNECTION_FAILED,
@@ -259,6 +259,14 @@ group PurchaseStateCodes "Purchase State Codes" {
 		* Platform: Android and iOS.
 		*/
 		RESTORE_ERROR = -7;
+
+		/**
+		* \brief Sent by the #maPurchaserestoreTransactions() syscall.
+		* Associated with #MA_PURCHASE_EVENT_RESTORE.
+		* Indicates that a product has been restored.
+		* Platform: Android and iOS.
+		*/
+		PRODUCT_RESTORED = -8;
 	}
 } // end of Purchase State Codes
 
@@ -391,6 +399,7 @@ group PurchaseFunctions "Purchase Functions" {
 	* Request the user to purchase a product.
 	* The system will handle the proccess of purchasing.
 	* Note: if there are another requests in progress, the requests will be queued.
+	* If the product is restored on iOS platform it cannot be purchased again.
 	*
 	* A #EVENT_TYPE_PURCHASE will be sent after calling this syscall.
 	* The event will contain a MAPurchaseEventData struct object. The type member object
@@ -475,9 +484,13 @@ group PurchaseFunctions "Purchase Functions" {
 	*
 	* A #EVENT_TYPE_PURCHASE will be sent after calling this syscall.
 	* The event will contain a #MAPurchaseEventData struct object. The type member object
-	* contained by the struct will be #MA_PURCHASE_EVENT_RESTORE. The productHandle member object
-	* will contain a handle to the new product. Make sure you destroy the product after done
-	* working with it.
+	* contained by the struct will be #MA_PURCHASE_EVENT_RESTORE. The state member object
+	* can have one of the following values:
+    * - #MA_PURCHASE_STATE_RESTORE_ERROR indicates that an error ocurred while restoring the
+    * products. Check the struct errorCode member object to see why it failed.
+	* - #MA_PURCHASE_STATE_PRODUCT_RESTORED indicates that a product has been restored.
+	* The productHandle member object will contain a handle to the new product.
+	* Make sure you destroy the product and after done working with it.
 	*/
 	void maPurchaseRestoreTransactions();
 

@@ -357,6 +357,43 @@ static PurchaseManager *sharedInstance = nil;
     [_paymentQueue restoreCompletedTransactions];
 }
 
+/**
+ * Get the puchase error code from a NSError object.
+ * @param error The native error object.
+ * @return One of the following error codes:
+ * - MA_PURCHASE_ERROR_UNKNOWN
+ * - MA_PURCHASE_ERROR_NOT_ALLOWED
+ * - MA_PURCHASE_ERROR_CANCELLED
+ * - MA_PURCHASE_ERROR_INVALID_CLIENT
+ */
+-(int) purchaseErrorCode:(NSError*) error
+{
+    if (!error)
+    {
+        return MA_PURCHASE_ERROR_UNKNOWN;
+    }
+
+    int errorCode;
+    switch (error.code)
+    {
+        case SKErrorClientInvalid:
+            errorCode = MA_PURCHASE_ERROR_INVALID_CLIENT;
+            break;
+        case SKErrorPaymentCancelled:
+            errorCode = MA_PURCHASE_ERROR_CANCELLED;
+            break;
+        case SKErrorPaymentNotAllowed:
+            errorCode = MA_PURCHASE_ERROR_NOT_ALLOWED;
+            break;
+        case SKErrorUnknown:
+        default:
+            errorCode = MA_PURCHASE_ERROR_UNKNOWN;
+            break;
+    }
+
+    return errorCode;
+}
+
 #pragma mark SKPaymentTransactionObserver methods
 
 /**
@@ -376,8 +413,9 @@ static PurchaseManager *sharedInstance = nil;
 
         if (transaction.transactionState == SKPaymentTransactionStateRestored)
         {
-
+            [self handleProductRestored:transaction];
         }
+
         // Remove the transaction from the payment queue.
         if (transaction.transactionState != SKPaymentTransactionStatePurchasing)
         {
@@ -393,7 +431,11 @@ static PurchaseManager *sharedInstance = nil;
  */
 - (void)paymentQueue:(SKPaymentQueue *)queue restoreCompletedTransactionsFailedWithError:(NSError *)error
 {
-    NSLog(@"restoreCompletedTransactionsFailedWithError");
+    int errorCode = [self purchaseErrorCode:error];
+    [self sendPurchaseEvent:MA_PURCHASE_EVENT_RESTORE
+                      state:MA_PURCHASE_STATE_RESTORE_ERROR
+              productHandle:MA_PURCHASE_ERROR_INVALID_HANDLE
+                  errorCode:errorCode];
 }
 
 /**
@@ -446,7 +488,6 @@ static PurchaseManager *sharedInstance = nil;
  */
 -(PurchaseProduct*) productUsingPayment:(SKPayment*) payment
 {
-    NSLog(@"productUsingPayment");
     for (PurchaseProduct* product in [_productsDictionary allValues])
     {
         SKPayment* productPayment = [product payment];
@@ -494,13 +535,11 @@ static PurchaseManager *sharedInstance = nil;
 {
     MAHandle productHandle = maCreatePlaceholder();
     NSNumber* key = [NSNumber numberWithInt:productHandle];
-    SKPayment* payment = transaction.payment;
-    NSString* productID = payment.productIdentifier;
-    PurchaseProduct* product = [[PurchaseProduct alloc] initWithHandle:productHandle
-                                                             productID:productID];
+    PurchaseProduct* product = [[PurchaseProduct alloc] initWithTransaction:transaction
+                                                          productHandle:productHandle];
     [_productsDictionary setObject:product forKey:key];
     [self sendPurchaseEvent:MA_PURCHASE_EVENT_RESTORE
-                      state:0
+                      state:MA_PURCHASE_STATE_PRODUCT_RESTORED
               productHandle:productHandle
                   errorCode:0];
 }

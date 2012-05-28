@@ -29,6 +29,8 @@
 
 #include "ApplicationController.h"
 #include "../View/MainScreen.h"
+#include "../Database/DatabaseManager.h"
+#include "../Database/DatabaseProduct.h"
 
 #include "../tests/ITest.h"
 #include "../tests/Test1.h"
@@ -40,6 +42,8 @@
 #include "../tests/Test7.h"
 #include "../tests/Test8.h"
 #include "../tests/Test9.h"
+#include "../tests/Test10.h"
+
 #include "../Util.h"
 
 namespace PurchaseTest
@@ -50,12 +54,16 @@ namespace PurchaseTest
 	 */
 	ApplicationController::ApplicationController() :
 		mMainScreen(NULL),
+		mDatabase(NULL),
 		mCountSucceededTests(0)
 	{
 		mMainScreen = new MainScreen();
 		mMainScreen->show();
 
 		this->log("Application started!");
+
+		mDatabase = new DatabaseManager();
+		DatabaseProduct* dbProduct = new DatabaseProduct();
 
 		int platform = getPlatform();
 		if (platform != IOS &&
@@ -84,6 +92,7 @@ namespace PurchaseTest
 	ApplicationController::~ApplicationController()
 	{
 		delete mMainScreen;
+		delete mDatabase;
 
 		// Delete any remaining tests.
 		while (mTests.size() > 0)
@@ -148,6 +157,15 @@ namespace PurchaseTest
 	}
 
 	/**
+	 * Get the interface to database.
+	 * @return The database's interface.
+	 */
+	IDatabaseManager& ApplicationController::getDatabase() const
+	{
+		return *mDatabase;
+	}
+
+	/**
 	 * Creates test objects and stores them into an array.
 	 */
 	void ApplicationController::createTests()
@@ -162,6 +180,7 @@ namespace PurchaseTest
 		mTests.add(new Test7(*this));
 		mTests.add(new Test8(*this));
 		mTests.add(new Test9(*this));
+		mTests.add(new Test10(*this));
 	}
 
 	/**

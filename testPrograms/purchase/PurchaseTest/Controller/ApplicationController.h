@@ -38,6 +38,7 @@ namespace PurchaseTest
 	// Forward declarations
 	class MainScreen;
 	class ITest;
+	class DatabaseManager;
 
 	/**
 	 * @brief Create main screen and tests.
@@ -74,6 +75,12 @@ namespace PurchaseTest
 		 */
 		virtual void log(const MAUtil::String& text);
 
+		/**
+		 * Get the interface to database.
+		 * @return The database's interface.
+		 */
+		virtual IDatabaseManager& getDatabase() const;
+
 	private:
 		/**
 		 * Creates test objects and stores them into an array.
@@ -97,6 +104,11 @@ namespace PurchaseTest
 		 * Displays logs.
 		 */
 		MainScreen* mMainScreen;
+
+		/**
+		 * Database manager.
+		 */
+		DatabaseManager* mDatabase;
 
 		/**
 		 * Stores test objects.

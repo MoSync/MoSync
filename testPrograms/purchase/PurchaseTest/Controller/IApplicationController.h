@@ -34,6 +34,7 @@ namespace PurchaseTest
 
 	// Forward declaration
 	class ITest;
+	class IDatabaseManager;
 
 	/**
 	 * Interface for controller.
@@ -58,6 +59,12 @@ namespace PurchaseTest
 		 * @param test Text to be printed.
 		 */
 		virtual void log(const MAUtil::String& test) = 0;
+
+		/**
+		 * Get the interface to database.
+		 * @return The database's interface.
+		 */
+		virtual IDatabaseManager& getDatabase() const = 0;
 
 	};
 
