@@ -20,9 +20,17 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <stdlib.h>
 #include <string.h>
 #include <string>
-#include <windows.h>
 #include <vector>
+
 #include "helpers/attribute.h"
+
+
+#ifdef __unix__
+	#include <sys\types.h>
+	#include <direct.h>
+#else
+	#include <windows.h>
+#endif
 
 using namespace std;
 
@@ -338,7 +346,27 @@ int main(int argc, char **argv) {
 	command.append("project\\AppBar.Icons\"");
 
 	system(command.c_str());
+#ifdef __unix__
+	struct dirent* de = NULL;
+	DIR* d = NULL;
 
+	d.opendir(dirPath.c_str());
+	if(NULL != d)
+	{
+		while(de = readdir(d))
+		{
+			applicationBarIconReferences.push_back( ApplicationBarIconReference( de->d_name ) );
+			std::string copyCmd;
+			copyCmd.append("cp ");
+			copyCmd.append(dirPath.substr(0, strlen(dirPath.c_str()) - 3));
+			copyCmd.append( de->d_name );
+			copyCmd.append(" \"");
+			copyCmd.append(outputDirPath);
+			system(copyCmd.c_str());
+		}
+	}
+	closedir(d);
+#else
 	WIN32_FIND_DATA data;
 
 	HANDLE fileHandle = FindFirstFile(dirPath.c_str(), &data);
@@ -360,6 +388,7 @@ int main(int argc, char **argv) {
 			}
 		}while( FindNextFile(fileHandle, &data) != 0);
 	}
+#endif
 
 	pugi::xml_node mosyncApplicationBarIcons = project.append_child("ItemGroup");
 	while(applicationBarIconReferences.empty() == false)
