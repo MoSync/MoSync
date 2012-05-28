@@ -48,6 +48,7 @@ MainScreen::MainScreen() :
 	mSetProgressValueButton->addButtonListener(this);
 	mSetMaximumValueButton->addButtonListener(this);
 	mIncreaseValueButton->addButtonListener(this);
+	mEditBox->addEditBoxListener(this);
 }
 
 /**
@@ -58,6 +59,7 @@ MainScreen::~MainScreen()
     mSetProgressValueButton->removeButtonListener(this);
     mIncreaseValueButton->removeButtonListener(this);
     mSetMaximumValueButton->removeButtonListener(this);
+    mEditBox->removeEditBoxListener(this);
 }
 
 /**
@@ -143,4 +145,15 @@ void MainScreen::createMainLayout() {
 	mIncreaseValueButton = new Button();
 	mIncreaseValueButton->setText("increase value with 10");
 	mMainLayout->addChild(mIncreaseValueButton);
+}
+
+/**
+ * This method is called when the return button was pressed.
+ * On iphone platform the virtual keyboard is not hidden after
+ * receiving this event.
+ * @param editBox The edit box object that generated the event.
+ */
+void MainScreen::editBoxReturn(EditBox* editBox)
+{
+	editBox->hideKeyboard();
 }

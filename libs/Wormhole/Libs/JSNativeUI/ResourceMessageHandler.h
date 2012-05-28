@@ -22,7 +22,7 @@ MA 02110-1301, USA.
  *
  * Implementation of Resource calls made from JavaScript.
  * Used for downloading images and loading local images as
- * resources for UI from JavaScript
+ * resources for UI from JavaScript.
  */
 
 #ifndef WORMHOLE_LIBS_JSNATIVEUI_RESOURCEMESSAGEHANDLER_H_
@@ -36,6 +36,14 @@ MA 02110-1301, USA.
 
 namespace Wormhole
 {
+	class LogMessageListener
+	{
+		public:
+			virtual void onLogMessage(
+				const char* message,
+				const char* url) = 0;
+	};
+
 	/**
 	 * Class that implements JavaScript calls.
 	 *
@@ -72,14 +80,37 @@ namespace Wormhole
 		void error(MAUtil::Downloader* downloader, int code);
 
 		/**
-		 * On successful download completion, send the event to the JavaScript side.
+		 * On successful download completion, send the
+		 * event to the JavaScript side.
 		 */
-		void finishedDownloading(MAUtil::Downloader* downloader, MAHandle data);
-
-	private:
+		void finishedDownloading(
+			MAUtil::Downloader* downloader,
+			MAHandle data);
 
 		/**
-		 * An instance of ImageDownloader that will be used for downloading image resources
+		 * Set the object to get notified when log messages are sent.
+		 *
+		 * Note that the ResourceMessageHandler will take ownership of
+		 * the listener and delete it upon destruction. Also, when a new
+		 * listener is set, the old listener will be deleted.
+		 *
+		 * @param listener The log message listener.
+		 */
+		void setLogMessageListener(LogMessageListener* listener);
+
+		/**
+		 * Send a log message to a server.
+		 * @param message The log message, for example: "Hello World".
+		 * @param url The url to use for the remote logging service.
+		 */
+		void sendRemoteLogMessage(
+			const MAUtil::String& message,
+			const MAUtil::String& url);
+
+	private:
+		/**
+		 * An instance of ImageDownloader that will be used for
+		 * downloading image resources
 		 */
 		MAUtil::ImageDownloader* mImageDownloader;
 
@@ -89,11 +120,18 @@ namespace Wormhole
 		 * @param imagePath relative path to the image file.
 		 */
 		MAHandle loadImageResource(const char *imagePath);
+
 		/**
 		 * A Pointer to the main webview
 		 * Used for communicating with NativeUI
 		 */
 		NativeUI::WebView* mWebView;
+
+		/**
+		 * Listener that will be notified when log messages
+		 * are sent from JavaScript.
+		 */
+		LogMessageListener* mLogMessageListener;
 	};
 } // namespace
 

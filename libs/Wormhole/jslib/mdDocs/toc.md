@@ -1,3 +1,4 @@
+[Home](./index.html)
 
 Wormhole
 -------------------

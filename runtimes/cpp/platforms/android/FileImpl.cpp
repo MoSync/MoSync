@@ -129,7 +129,7 @@ namespace Base {
 	LimitedFileStream::LimitedFileStream(const char* filename, int offset, int len, JNIEnv* jNIEnv, jobject jThis)
 		: FileStream(filename) , mStartPos(offset), mEndPos(offset + len)
 	{
-		__android_log_write(ANDROID_LOG_INFO, "LimitedFileStream constructor", "1");
+		//__android_log_write(ANDROID_LOG_INFO, "LimitedFileStream constructor", "1");
 		
 		mJNIEnv = jNIEnv;
 		mJThis = jThis;
@@ -165,12 +165,12 @@ namespace Base {
 		}
 		
 		if(!_open()) {
-			__android_log_write(ANDROID_LOG_INFO, "LimitedFileStream constructor", "2");
+			//__android_log_write(ANDROID_LOG_INFO, "LimitedFileStream constructor", "2");
 			close(mFd);
-			__android_log_write(ANDROID_LOG_INFO, "LimitedFileStream constructor", "3");
+			//__android_log_write(ANDROID_LOG_INFO, "LimitedFileStream constructor", "3");
 			mFd = -1;
 		}	
-		__android_log_write(ANDROID_LOG_INFO, "LimitedFileStream constructor", "4");
+		//__android_log_write(ANDROID_LOG_INFO, "LimitedFileStream constructor", "4");
 	}
 #if 0
 	//******************************************************************************

@@ -55,7 +55,6 @@ import java.io.FileDescriptor;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
@@ -84,6 +83,7 @@ import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.PorterDuff.Mode;
@@ -151,6 +151,7 @@ public class MoSyncThread extends Thread
 	public native ByteBuffer nativeLoadCombined(ByteBuffer combined);
 	public native void nativeRun();
 	public native void nativePostEvent(int[] eventBuffer);
+	public native int nativeGetEventQueueSize();
 	public native int nativeCreateBinaryResource(
 		int resourceIndex,
 		int length);
@@ -288,6 +289,9 @@ public class MoSyncThread extends Thread
 
 	int mTextConsoleHeight;
 
+	/**
+	 * Flag used to signal if the thread is sleeping.
+	 */
 	private volatile boolean mIsSleeping;
 
 	/**
@@ -781,6 +785,7 @@ public class MoSyncThread extends Thread
 	 * @param data The data to fill the new data object with.
 	 * @return The handle to the data if successful, <0 on error.
 	 * If a placeholder is supplied, that value is returned on success.
+	 *
 	 * TODO: This method needs improved error checking.
 	 */
 	public int createDataObject(int placeholder, byte[] data)
@@ -832,8 +837,14 @@ public class MoSyncThread extends Thread
 	 * @param	options	The bitmapFactory options
 	 *
 	 * @return	The created Bitmap, null if it failed
+	 *
+	 * TODO: There is no need for this method to be synchronized.
+	 * Find out why it was synchronized.
 	 */
-	synchronized Bitmap decodeImageFromData(final byte[] data, final BitmapFactory.Options options)
+	//synchronized
+	Bitmap decodeImageFromData(
+		final byte[] data,
+		final BitmapFactory.Options options)
 	{
 		try
 		{
@@ -842,17 +853,31 @@ public class MoSyncThread extends Thread
 			{
 				public void run()
 				{
-					Bitmap bitmap = BitmapFactory.decodeByteArray(
+					// Here we can get:
+					// java.lang.OutOfMemoryError: bitmap size exceeds VM budget
+					try
+					{
+						Bitmap bitmap = BitmapFactory.decodeByteArray(
 							data, 0, data.length, options);
-
-					waiter.setResult(bitmap);
+						waiter.setResult(bitmap);
+					}
+					catch (OutOfMemoryError e1)
+					{
+						//Log.i("@@@", "decodeImageFromData - " + "Out of memory error : " + e1);
+						waiter.setResult(null);
+					}
+					catch (Throwable e2)
+					{
+						//Log.i("@@@", "decodeImageFromData - " + "Error : " + e2);
+						waiter.setResult(null);
+					}
 				}
 			});
 			return waiter.getResult();
 		}
 		catch(InterruptedException ie)
 		{
-			Log.i("MoSync", "Couldn't decode image data.");
+			//Log.i("MoSync", "Couldn't decode image data.");
 			return null;
 		}
 	}
@@ -881,8 +906,15 @@ public class MoSyncThread extends Thread
 	 * @param	height	The width of the created Bitmap
 	 *
 	 * @return	The created Bitmap, null if it failed
+	 *
+	 * TODO: There is no need for this method to be synchronized.
+	 * Find out why it was synchronized.
+	 *
+	 * TODO: Look into eliminating code duplication between
+	 * createBitmap and createBitmapFromData.
 	 */
-	synchronized Bitmap createBitmap(final int width, final int height)
+	//synchronized
+	Bitmap createBitmap(final int width, final int height)
 	{
 		try
 		{
@@ -891,10 +923,25 @@ public class MoSyncThread extends Thread
 			{
 				public void run()
 				{
-					Bitmap bitmap = Bitmap.createBitmap(
+					// Here we can get:
+					// java.lang.OutOfMemoryError: bitmap size exceeds VM budget
+					try
+					{
+						Bitmap bitmap = Bitmap.createBitmap(
 							width, height, Bitmap.Config.ARGB_8888);
 
-					waiter.setResult(bitmap);
+						waiter.setResult(bitmap);
+					}
+					catch (OutOfMemoryError e1)
+					{
+						//Log.i("@@@", "createBitmapFromData - " + "Out of memory error : " + e1);
+						waiter.setResult(null);
+					}
+					catch (Throwable e2)
+					{
+						//Log.i("@@@", "createBitmapFromData - " + "Error : " + e2);
+						waiter.setResult(null);
+					}
 				}
 			});
 			return waiter.getResult();
@@ -914,8 +961,15 @@ public class MoSyncThread extends Thread
 	 * @param	pixels	The pixel data
 	 *
 	 * @return	The created Bitmap, null if it failed
+	 *
+	 * TODO: There is no need for this method to be synchronized.
+	 * Find out why it was synchronized.
 	 */
-	synchronized Bitmap createBitmapFromData(final int width, final int height, final int[] pixels)
+	//synchronized
+	Bitmap createBitmapFromData(
+		final int width,
+		final int height,
+		final int[] pixels)
 	{
 		try
 		{
@@ -924,17 +978,32 @@ public class MoSyncThread extends Thread
 			{
 				public void run()
 				{
-					Bitmap bitmap = Bitmap.createBitmap(
+					// Here we can get:
+					// java.lang.OutOfMemoryError: bitmap size exceeds VM budget
+					try
+					{
+						Bitmap bitmap = Bitmap.createBitmap(
 							pixels, width, height, Bitmap.Config.ARGB_8888);
 
-					waiter.setResult(bitmap);
+						waiter.setResult(bitmap);
+					}
+					catch (OutOfMemoryError e1)
+					{
+						//Log.i("@@@", "createBitmapFromData - " + "Out of memory error : " + e1);
+						waiter.setResult(null);
+					}
+					catch (Throwable e2)
+					{
+						//Log.i("@@@", "createBitmapFromData - " + "Error : " + e2);
+						waiter.setResult(null);
+					}
 				}
 			});
 			return waiter.getResult();
 		}
 		catch(InterruptedException ie)
 		{
-			Log.i("MoSync", "Couldn't create bitmap from pixel data.");
+			//Log.i("MoSync", "Couldn't create bitmap from pixel data.");
 			return null;
 		}
 	}
@@ -945,22 +1014,6 @@ public class MoSyncThread extends Thread
 	public void updateScreen()
 	{
 		maUpdateScreen();
-	}
-
-	/**
-	 * Post a event to the MoSync event queue.
-	 */
-	public void postEvent(int[] event)
-	{
-		synchronized(mPostEventMonitor) {
-			// Add event to queue.
-			nativePostEvent(event);
-			// Wake up thread if sleeping.
-			if(mIsSleeping)
-			{
-				interrupt();
-			}
-		}
 	}
 
 	/**
@@ -1763,6 +1816,8 @@ public class MoSyncThread extends Thread
 		// TODO: Remove variable bitmapSize, it is not used.
 		//int bitmapSize = scanLength * srcHeight;
 
+		//Log.i("@@@@@@", "_maGetImageData >>> handle: " + image + " hasAlpha: " + imageResource.mBitmap.hasAlpha());
+
 		if ((srcTop + srcHeight) > imageResource.mBitmap.getHeight())
 		{
 			maPanic(
@@ -1785,6 +1840,108 @@ public class MoSyncThread extends Thread
 				imageResource.mBitmap.getWidth() );
 		}
 
+		// TODO: removed the "fast" version because of a bug, visual output
+		// looks bad, run TestApp to test, fix this in 3.1. We use the "slow"
+		// version for now. Try approach to see if .hasAlpha() can be used.
+
+		// if (android.os.Build.VERSION.SDK_INT <= android.os.Build.VERSION_CODES.DONUT)
+
+		// In 1.6 and below we use the version that includes the bug fix.
+		_maGetImageDataAlphaBugFix(
+			image,
+			imageResource,
+			dst,
+			srcLeft,
+			srcTop,
+			srcWidth,
+			srcHeight,
+			scanLength);
+
+		/*
+		 * For what it is worth, this might be interesting to investigate,
+		 * found this comment on a forum:
+		 *
+		 * API level 12 added a method setHasAlpha() which you
+		 * can use instead of having to copy the image to get the alpha channel.
+		 */
+	}
+
+	/**
+	 * TODO: Not used, results look bad on tansparent pixels,
+	 * test to enable in 3.1. Call from maGetImageData.
+	 *
+	 * Plain way of getting the image pixel data.
+	 *
+	 * @param image
+	 * @param imageResource
+	 * @param dst
+	 * @param srcLeft
+	 * @param srcTop
+	 * @param srcWidth
+	 * @param srcHeight
+	 * @param scanLength
+	 */
+	@SuppressWarnings("unused")
+	private void _maGetImageDataFast(
+		int image,
+		ImageCache imageResource,
+		int dst,
+		int srcLeft,
+		int srcTop,
+		int srcWidth,
+		int srcHeight,
+		int scanLength)
+	{
+		try
+		{
+			int pixels[] = new int[srcWidth * srcHeight];
+
+			IntBuffer intBuffer = getMemorySlice(dst, -1).order(null).asIntBuffer();
+
+			imageResource.mBitmap.getPixels(
+				pixels,
+				0,
+				scanLength,
+				srcLeft,
+				srcTop,
+				srcWidth,
+				srcHeight);
+
+			intBuffer.put(pixels);
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+			maPanic(
+				-1,
+				"Exception in _maGetImageDataFast - " +
+				"check stack trace in logcat: " +
+				e.toString());
+		}
+	}
+
+	/**
+	 * Get image pixel data using a bug fix for the alpha channel.
+	 *
+	 * @param image
+	 * @param imageResource
+	 * @param dst
+	 * @param srcLeft
+	 * @param srcTop
+	 * @param srcWidth
+	 * @param srcHeight
+	 * @param scanLength
+	 */
+	private void _maGetImageDataAlphaBugFix(
+		int image,
+		ImageCache imageResource,
+		int dst,
+		int srcLeft,
+		int srcTop,
+		int srcWidth,
+		int srcHeight,
+		int scanLength)
+	{
 		int pixels[] = new int[srcWidth];
 		int colors[] = new int[srcWidth];
 		int alpha[] = new int[srcWidth];
@@ -1811,44 +1968,53 @@ public class MoSyncThread extends Thread
 		//mMemDataSection.position(dst);
 		//IntBuffer intBuffer = mMemDataSection.asIntBuffer();
 
-		IntBuffer intBuffer = getMemorySlice(dst, -1).asIntBuffer();
+		IntBuffer intBuffer = getMemorySlice(dst, -1).order(null).asIntBuffer();
 
-		try {
-
-		for (int y = 0; y < srcHeight; y++)
+		try
 		{
-			intBuffer.position(y*scanLength);
-
-			imageResource.mBitmap.getPixels(
-				alpha,
-				0,
-				srcWidth,
-				srcLeft,
-				srcTop+y,
-				srcWidth,
-				1);
-
-			temporaryBitmap.getPixels(
-				colors,
-				0,
-				srcWidth,
-				0,
-				y,
-				srcWidth,
-				1);
-
-			for( int i = 0; i < srcWidth; i++)
+			for (int y = 0; y < srcHeight; y++)
 			{
-				pixels[i] = (alpha[i]&0xff000000) + (colors[i]&0x00ffffff);
-			}
+				intBuffer.position(y*scanLength);
 
-			intBuffer.put(pixels);
+				imageResource.mBitmap.getPixels(
+					alpha,
+					0,
+					srcWidth,
+					srcLeft,
+					srcTop+y,
+					srcWidth,
+					1);
+
+				temporaryBitmap.getPixels(
+					colors,
+					0,
+					srcWidth,
+					0,
+					y,
+					srcWidth,
+					1);
+
+				for( int i = 0; i < srcWidth; i++)
+				{
+					pixels[i] = Color.argb(Color.alpha(alpha[i]),
+							Color.red(colors[i]), Color.green(colors[i]),
+							Color.blue(colors[i]));
+					//pixels[i] = (alpha[i]&0xff000000) + (colors[i]&0x00ffffff);
+				}
+
+				intBuffer.put(pixels);
+			}
 		}
-		} catch(Exception e) {
-			e.printStackTrace();
+		catch(Exception e)
+		{
 			//Log.i("_maGetImageData", "("+image+", "+srcLeft+","+srcTop+", "+srcWidth+"x"+srcHeight+"): "+
 			//	imageResource.mBitmap.getWidth()+"x"+imageResource.mBitmap.getHeight()+"\n");
-			maPanic(-1, "maGetImageData");
+			e.printStackTrace();
+			maPanic(
+				-1,
+				"Exception in _maGetImageDataAlphaBugFix - " +
+				"check stack trace in logcat: " +
+				e.toString());
 		}
 	}
 
@@ -2035,7 +2201,7 @@ public class MoSyncThread extends Thread
 
 		Bitmap bitmap = createBitmap(width, height);
 
-		if(null == bitmap)
+		if (null == bitmap)
 		{
 			maPanic(1, "Unable to create ");
 		}
@@ -2056,7 +2222,6 @@ public class MoSyncThread extends Thread
 		SYSLOG("maCreateDrawableImage");
 		try
 		{
-
 			Bitmap bitmap = createBitmap(width, height);
 
 			Canvas canvas = new Canvas(bitmap);
@@ -2325,35 +2490,69 @@ public class MoSyncThread extends Thread
 	}
 
 	/**
+	 * Post a event to the MoSync event queue.
+	 */
+	public void postEvent(int[] event)
+	{
+		synchronized (mPostEventMonitor)
+		{
+			// Add event to queue.
+			nativePostEvent(event);
+
+			// Wake up the MoSync thread if it is sleeping.
+			if (mIsSleeping)
+			{
+				mPostEventMonitor.notifyAll();
+			}
+		}
+	}
+
+	/**
 	 * maWait
+	 *
+	 * Now using wait/notifyAll for maWait/postEvent. This synchronises blocks
+	 * much more safely than sleep/interrupt. For further details, see e.g.
+	 * http://stackoverflow.com/questions/2779484/why-wait-should-always-be-in-synchronized-block
 	 */
 	void maWait(int timeout)
 	{
 		SYSLOG("maWait");
 
-		mIsSleeping = true;
-		try
+		// If there are NO events in the queue, we wait.
+		synchronized (mPostEventMonitor)
 		{
-	 		if (timeout<=0)
+			int size = nativeGetEventQueueSize();
+			if (size > 0)
 			{
-				Thread.sleep(Long.MAX_VALUE);
+				// There are events in the queue, just return.
+				Log.i("@@@ MoSync", "maWait: direct return, size: " + size);
+				return;
 			}
-			else
-			{
-				Thread.sleep(timeout);
-			}
-		}
-		catch (InterruptedException ie)
-		{
-			SYSLOG("Sleeping thread interrupted (this is normal behaviour)");
-		}
-		// TODO: This exception is never thrown! Remove it.
-		catch (Exception e)
-		{
-			logError("Thread sleep failed : " + e.toString(), e);
-		}
 
-		mIsSleeping = false;
+			mIsSleeping = true;
+
+			try
+			{
+				// We sleep for very long if timeout is zero (or negative).
+				long sleepTime = timeout > 0 ? timeout : Long.MAX_VALUE;
+
+				// Note that wait gives up lock on this synchronised block.
+				mPostEventMonitor.wait(sleepTime);
+			}
+			catch (InterruptedException ie)
+			{
+				// Note: We don't bother with calling wait in a loop, if we
+				// get interrupted, we just return from maWait.
+				SYSLOG("maWait interrupted (this is normal behaviour)");
+			}
+			catch (Exception e)
+			{
+				logError("maWait exception : " + e.toString(), e);
+				e.printStackTrace();
+			}
+
+			mIsSleeping = false;
+		}
 
 		SYSLOG("maWait returned");
 	}
@@ -2484,7 +2683,7 @@ public class MoSyncThread extends Thread
 	}
 
 	/**
-	 * Implemation of the maWriteLog syscall which only
+	 * Implementation of the maWriteLog syscall which only
 	 * sends the log message to the Android Logcat.
 	 * @param str The string to send to logcat.
 	 * @param size The number of characters in the string.
@@ -2744,14 +2943,20 @@ public class MoSyncThread extends Thread
 
 			Bitmap bitmap = decodeImageFromData(ra, null);
 
+			// TODO: Remove commencted out line.
 			//Bitmap bitmap = BitmapFactory.decodeByteArray(ra, 0, length);
-			if(bitmap != null)
+
+			if (bitmap != null)
 			{
 				SYSLOG("Bitmap was created!");
 				mImageResources.put(
 					resourceIndex, new ImageCache(null, bitmap));
+
+				// Return success.
 				return true;
 			}
+
+			// If we end up here an error occurred.
 			logError("loadImage - Bitmap wasn't created from Resource: "
 				+ resourceIndex);
 			return false;

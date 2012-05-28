@@ -30,6 +30,7 @@ import android.util.Log;
 import com.mosync.internal.android.MoSyncThread;
 import com.mosync.internal.generated.IX_WIDGET;
 import com.mosync.nativeui.util.HandleTable;
+import com.mosync.nativeui.util.properties.InvalidPropertyValueException;
 import com.mosync.nativeui.util.properties.PropertyConversionException;
 
 import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_LOCAL_NOTIFICATION;
@@ -131,20 +132,21 @@ public class LocalNotificationsManager
 		LocalNotificationObject notification = m_NotificationTable.get(handle);
 		if (  null != notification )
 		{
+			if ( notification.getScheduled() )
+			{
+				Log.e("@@MoSync", "maNotificationLocalSetProperty cannot be called after scheduling the notification.");
+				return MA_NOTIFICATION_RES_ALREADY_SCHEDULED;
+			}
+
 			try{
-				if ( notification.getScheduled() )
-				{
-					Log.e("@@MoSync", "maNotificationLocalSetProperty cannot be called after scheduling the notification.");
-					return MA_NOTIFICATION_RES_ALREADY_SCHEDULED;
-				}
-				if ( property.equals(MA_NOTIFICATION_LOCAL_FLASH_LIGHTS)
-						 &&
-					  mMoSyncThread.getActivity().getApplicationContext().getPackageManager().
-						 hasSystemFeature(PackageManager.FEATURE_CAMERA_FLASH) )
-					 return MA_NOTIFICATION_RES_ERROR;
 				return notification.setProperty(property, value);
 			}catch (PropertyConversionException pce){
-				Log.e("@@MoSync", "maNotificationLocalSetProperty: Error while converting property value " + value + ":" + pce.getMessage());
+				Log.e("@@MoSync",
+						"maNotificationLocalSetProperty: Error while converting property value " + value + ":" + pce.getMessage( ) );
+				return MA_NOTIFICATION_RES_INVALID_PROPERTY_VALUE;
+			}catch (InvalidPropertyValueException ipve){
+				Log.e("@@MoSync",
+						"maNotificationLocalSetProperty: Error while setting property: " + ipve.getMessage( ) );
 				return MA_NOTIFICATION_RES_INVALID_PROPERTY_VALUE;
 			}
 		}

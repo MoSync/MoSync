@@ -582,6 +582,14 @@ static void nativePostEvent(JNIEnv* env, jobject jthis, jintArray eventBuffer)
 }
 
 /**
+* @brief nativeGetEventQueueSize
+*/
+static int nativeGetEventQueueSize(JNIEnv* env, jobject jthis)
+{
+	return Base::gSyscall->getEventQueueSize();
+}
+
+/**
  * This function now uses the JavaVM object to get the current thread.
  * Please see the links below and file SyscallImpl.cpp:
  * http://www.netmite.com/android/mydroid/1.6/dalvik/docs/jni-tips.html
@@ -662,6 +670,7 @@ static JNINativeMethod sMethods[] =
 	{ "nativeLoadCombined", "(Ljava/nio/ByteBuffer;)Ljava/nio/ByteBuffer;", (void*)nativeLoadCombined },
 	{ "nativeRun", "()V", (void*)nativeRun },
 	{ "nativePostEvent", "([I)V", (void*)nativePostEvent },
+	{ "nativeGetEventQueueSize", "()I", (void*)nativeGetEventQueueSize },
 	{ "nativeCreateBinaryResource", "(II)I", (void*)nativeCreateBinaryResource },
 	{ "nativeCreatePlaceholder", "()I", (void*)nativeCreatePlaceholder },
 	{ "nativeExit", "()V", (void*)nativeExit }
