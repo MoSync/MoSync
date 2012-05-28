@@ -78,6 +78,9 @@ namespace MoSync
             // the background overlay color (the background color that's behind the dialog view)
             private static String dialogViewOverlayColor = "#7F000000";
 
+            // keeps track of the visible state of the dialog view
+            private static bool visible;
+
             /**
              * Constructor
              */
@@ -114,11 +117,15 @@ namespace MoSync
                 mDialogBackground.Background = GetColorFromHexa(dialogViewOverlayColor);
                 mDialogBackground.Children.Add(mDialogView);
 
+                // the dialog is not visible at creation
+                visible = false;
+
                 mView = mDialogBackground;
 
                 // we need to change the width and the height of the mDialogView manually when the orientation changes
                 (Application.Current.RootVisual as Microsoft.Phone.Controls.PhoneApplicationFrame).OrientationChanged += new EventHandler<Microsoft.Phone.Controls.OrientationChangedEventArgs>(OrientationChangedHandler);
             }
+
 
             // The AddChild implementation
             public override void AddChild(IWidget child)
@@ -207,6 +214,52 @@ namespace MoSync
                 {
                     mDialogView.Width = Application.Current.Host.Content.ActualWidth - 2 * marginDistance;
                     mDialogView.Height = Application.Current.Host.Content.ActualHeight - marginDistance;
+                }
+            }
+
+            /**
+             * Dialog view visible property.
+             */
+            [MoSyncWidgetProperty(MoSync.Constants.MAW_WIDGET_VISIBLE)]
+            public new string Visible
+            {
+                get
+                {
+                    return visible.ToString().ToLower();
+                }
+                set
+                {
+                    bool boolValue;
+                    if (Boolean.TryParse(value, out boolValue))
+                    {
+                        visible = boolValue;
+                    }
+                }
+            }
+
+            /**
+             * Dialog view Width property implementation.Because this widget is presented
+             * fullscreen, this property is read-only.
+             */
+            [MoSyncWidgetProperty(MoSync.Constants.MAW_WIDGET_WIDTH)]
+            public new double Width
+            {
+                get
+                {
+                    return mDialogView.Width;
+                }
+            }
+
+            /**
+             * Dialog view Height property implementation. Because this widget is presented
+             * fullscreen, this property is read-only.
+             */
+            [MoSyncWidgetProperty(MoSync.Constants.MAW_WIDGET_HEIGHT)]
+            public new double Height
+            {
+                get
+                {
+                    return mDialogView.Height;
                 }
             }
         }
