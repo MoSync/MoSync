@@ -162,6 +162,10 @@ void MainScreen::createMainLayout() {
     {
         mEditBox->setText("http://www.mosync.com/files/videos/Video.3gp");
     }
+    else if (isWindowsPhone())
+    {
+        mEditBox->setText("http://www.educationalquestions.com/video/ELL_PART_5_768k.wmv");
+    }
     else
     {
         mEditBox->setText("http://qthttp.apple.com.edgesuite.net/1010qwoeiuryfg/sl.m3u8");
@@ -266,25 +270,6 @@ void MainScreen::videoViewStateChanged(
 }
 
 /**
- * Detects if the current platform is Android.
- * @return true if the platform is Android, false otherwise.
- */
-bool MainScreen::isAndroid()
-{
-	char platform[BUF_MAX];
-	maGetSystemProperty("mosync.device.OS", platform, BUF_MAX);
-
-	if(strcmp(platform, "Android") == 0)
-	{
-		return true;
-	}
-	else
-	{
-		return false;
-	}
-}
-
-/**
  * Handle the click event for video control button.
  * Show/hide the video control and change button's text.
  */
@@ -315,4 +300,44 @@ void MainScreen::handleVideoControlButtonClicked()
 void MainScreen::editBoxReturn(EditBox* editBox)
 {
 	editBox->hideKeyboard();
+}
+
+/**
+ * Detects if the current platform is Android.
+ * @return true if the platform is Android, false otherwise.
+ */
+bool MainScreen::isAndroid()
+{
+	char platform[BUF_MAX];
+	maGetSystemProperty("mosync.device.OS", platform, BUF_MAX);
+
+	if(strcmp(platform, "Android") == 0)
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
+/**
+ * Handle the click event for video control button.
+ * Show/hide the video control and change button's text.
+ */
+bool MainScreen::isWindowsPhone()
+{
+	char platform[BUF_MAX];
+	maGetSystemProperty("mosync.device.OS", platform, BUF_MAX);
+	for (unsigned int i = 0; i < strlen(platform); i++)
+	{
+		platform[i] = tolower(platform[i]);
+	}
+	if (strstr(platform,"microsoft") != NULL &&
+		strstr(platform,"windows") != NULL)
+	{
+		return true;
+	}
+
+	return false;
 }
