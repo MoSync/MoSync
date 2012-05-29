@@ -29,7 +29,7 @@ MA 02110-1301, USA.
 #define ANDROID_PRODUCT_TYPE_PURCHASED "android.test.purchased"
 #define ANDROID_PRODUCT_TYPE_CANCELLED "android.test.canceled"
 #define ANDROID_PRODUCT_TYPE_UNAVAILABLE "android.test.item_unavailable"
-#define IOS_PRODUCT_TYPE_2 "com.mosync.purchase2.consumable2"
+#define IOS_PRODUCT_TYPE_2 "com.mosync.purchase2.nonconsumable"
 #define IOS_PRODUCT_TYPE_UNAVAILABLE "invalid_product"
 
 #include "Util.h"

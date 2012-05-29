@@ -47,7 +47,8 @@ namespace IAP
 	Purchase::Purchase(const MAUtil::String& productID,
 		PurchaseListener* listener):
 		mHandle(-1),
-		mReceipt(NULL)
+		mReceipt(NULL),
+		mIsRestored(false)
 	{
 		this->addPurchaseListener(listener);
 		mHandle = maCreatePlaceholder();
@@ -62,7 +63,8 @@ namespace IAP
 	 */
 	Purchase::Purchase(MAHandle productHandle):
 		mHandle(productHandle),
-		mReceipt(NULL)
+		mReceipt(NULL),
+		mIsRestored(true)
 
 	{
 		PurchaseManager::getInstance()->registerPurchase(this);
@@ -75,7 +77,11 @@ namespace IAP
 	{
 		PurchaseManager::getInstance()->unregisterPurchase(this);
 		maPurchaseDestroy(mHandle);
-		maDestroyPlaceholder(mHandle);
+		// If the purchase is restored do not destroy placeholder.
+		if (!mIsRestored)
+		{
+			maDestroyPlaceholder(mHandle);
+		}
 		mPurchaseEventListeners.clear();
 
 		delete mReceipt;

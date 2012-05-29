@@ -26,6 +26,8 @@
 #include "TouchHelper.h"
 #include "MoSyncMain.h"
 #include "MoSyncViewController.h"
+#import "ScreenOrientation.h"
+#import "MoSyncUISyscalls.h"
 
 @interface MoSyncUIWindow : UIWindow {
 	TouchHelper* touchHelper;
@@ -36,6 +38,7 @@
 - (void) handleTouchMoved:(UITouch *)touch;
 - (void) handleTouchEnded:(UITouch *)touch;
 - (void) handleTouchCancelled:(UITouch *)touch;
+- (CGPoint) pointUsingOrientation:(CGPoint) originalPoint;
 @end
 
 @implementation MoSyncUIWindow
@@ -58,6 +61,7 @@
 {
 	CGFloat screenScale = [self getScreenScale];
     CGPoint point = [touch locationInView:self];
+    point = [self pointUsingOrientation:point];
     int touchId = [touchHelper addTouch: touch];
     MoSync_AddTouchPressedEvent(point.x*screenScale, point.y*screenScale, touchId);
 }
@@ -66,6 +70,7 @@
 {
 	CGFloat screenScale = [self getScreenScale];
     CGPoint point = [touch locationInView:self];
+    point = [self pointUsingOrientation:point];
     int touchId = [touchHelper getTouchId: touch];
     MoSync_AddTouchMovedEvent(point.x*screenScale, point.y*screenScale, touchId);
 }
@@ -75,6 +80,7 @@
 	CGFloat screenScale = [self getScreenScale];
     CGPoint point = [touch locationInView:self];
     int touchId = [touchHelper getTouchId: touch];
+    point = [self pointUsingOrientation:point];
     MoSync_AddTouchReleasedEvent(point.x*screenScale, point.y*screenScale, touchId);
     [touchHelper removeTouch: touch];
 }
@@ -82,6 +88,7 @@
 - (void) handleTouchCancelled:(UITouch *)touch
 {
     CGPoint point = [touch locationInView:self];
+    point = [self pointUsingOrientation:point];
     int touchId = [touchHelper getTouchId: touch];
     MoSync_AddTouchReleasedEvent(point.x, point.y, touchId);
     [touchHelper removeTouch: touch];
@@ -118,6 +125,37 @@
             }
         }
     }
+}
+
+- (CGPoint) pointUsingOrientation:(CGPoint) originalPoint
+{
+    CGPoint returnedPoint = CGPointMake(0, 0);
+    int orientation = [[ScreenOrientation getInstance] getCurrentScreenOrientation];
+    MoSyncUI* mosyncUI = getMoSyncUI();
+    IWidget* currentScreen = [mosyncUI getCurrentlyShownScreen];
+    int height = [[currentScreen getView] frame].size.height;
+    int width = [[currentScreen getView] frame].size.width;
+    switch (orientation)
+    {
+        case MA_SCREEN_ORIENTATION_PORTRAIT_UPSIDE_DOWN:
+            returnedPoint.x = width - originalPoint.x;
+            returnedPoint.y = height - originalPoint.y;
+            break;
+        case MA_SCREEN_ORIENTATION_LANDSCAPE_RIGHT:
+            returnedPoint.x = originalPoint.y;
+            returnedPoint.y = width - originalPoint.x;
+            break;
+        case MA_SCREEN_ORIENTATION_LANDSCAPE_LEFT:
+            returnedPoint.x = height - originalPoint.y;
+            returnedPoint.y = originalPoint.x;
+            break;
+        case MA_SCREEN_ORIENTATION_PORTRAIT:
+        default:
+            returnedPoint.x = originalPoint.x;
+            returnedPoint.y = originalPoint.y;
+            break;
+    }
+    return returnedPoint;
 }
 
 @end

@@ -152,4 +152,15 @@
  */
 -(void) restoreTransactions;
 
+/**
+ * Get the puchase error code from a NSError object.
+ * @param error The native error object.
+ * @return One of the following error codes:
+ * - MA_PURCHASE_ERROR_UNKNOWN
+ * - MA_PURCHASE_ERROR_NOT_ALLOWED
+ * - MA_PURCHASE_ERROR_CANCELLED
+ * - MA_PURCHASE_ERROR_INVALID_CLIENT
+ */
+-(int) purchaseErrorCode:(NSError*) error;
+
 @end

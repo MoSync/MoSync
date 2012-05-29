@@ -64,6 +64,11 @@
     SKMutablePayment* _payment;
 
     /**
+     * Payment for a restored product.
+     */
+    SKPayment* _restoredPayment;
+
+    /**
      * Valid only if the product has been purchased or restored.
      */
     SKPaymentTransaction* _transaction;
@@ -92,6 +97,16 @@
  */
 -(id) initWithHandle:(MAHandle) productHandle
            productID:(NSString*) productID;
+
+/**
+ * Create a product product using a payment transaction.
+ * Used for restored products.
+ * @param transaction The transaction.
+ * @param productHandle Handle for the new product.
+ * @return A product object.
+ */
+-(id) initWithTransaction:(SKPaymentTransaction*) transaction
+        productHandle:(MAHandle) productHandle;
 
 /**
  * Get a payment object for the product.
