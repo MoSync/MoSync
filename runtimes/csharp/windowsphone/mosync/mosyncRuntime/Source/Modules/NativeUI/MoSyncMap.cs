@@ -138,7 +138,7 @@ namespace MoSync
             /**
              * Property for setting the map credentials (api key).
              */
-            [MoSyncWidgetProperty(MoSync.Constants.MAW_MAP_API_KEY)]
+            [MoSyncWidgetProperty(MoSync.Constants.MAW_MAP_API_KEY_BING)]
             public string ApiKey
             {
                 set
