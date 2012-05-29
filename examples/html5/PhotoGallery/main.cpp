@@ -34,17 +34,9 @@ MA 02110-1301, USA.
  */
 
 #include <Wormhole/WebAppMoblet.h>
-//#include <Wormhole/MessageProtocol.h>
 #include <Wormhole/MessageStream.h>
-//#include <Wormhole/Libs/JSONMessage.h>
-//#include <Wormhole/Encoder.h>
 #include "MyMessageHandler.h"
 #include "MAHeaders.h"
-
-// Namespaces we want to access.
-//using namespace MAUtil; // Class Moblet
-//using namespace NativeUI; // WebView widget.
-//using namespace Wormhole; // Wormhole library.
 
 /**
  * The application class.
@@ -73,7 +65,7 @@ public:
 		mMyMessageHandler.init(BEEP_WAV, this);
 
 		MyMessageHandlerFun fun = (MyMessageHandlerFun)&MyMoblet::foo;
-		mMyMessageHandler.addMessageFun("DownloadLatestPhotoURLs", fun);
+		mMyMessageHandler.addMessageFun("DownloadPhotoList", fun);
 	}
 
 	virtual ~MyMoblet()
