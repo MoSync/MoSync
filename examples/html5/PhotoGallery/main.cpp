@@ -1,5 +1,24 @@
+/*
+Copyright (C) 2012 MoSync AB
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License,
+version 2, as published by the Free Software Foundation.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+MA 02110-1301, USA.
+*/
+
 /**
  * @file main.cpp
+ * @author Mikael Kindborg
  *
  * This file contains the support code at the C++ level for an HTML5/JS
  * application that can access device services from JavaScript.
@@ -15,31 +34,26 @@
  */
 
 #include <Wormhole/WebAppMoblet.h>
-#include <Wormhole/MessageProtocol.h>
+//#include <Wormhole/MessageProtocol.h>
 #include <Wormhole/MessageStream.h>
-#include <Wormhole/Libs/JSONMessage.h>
-#include <Wormhole/Libs/PhoneGap/PhoneGapMessageHandler.h>
-#include <Wormhole/Libs/JSNativeUI/NativeUIMessageHandler.h>
-#include <Wormhole/Libs/JSNativeUI/ResourceMessageHandler.h>
+//#include <Wormhole/Libs/JSONMessage.h>
+//#include <Wormhole/Encoder.h>
+#include "MyMessageHandler.h"
 #include "MAHeaders.h"
 
-#include <Wormhole/Encoder.h>
-
 // Namespaces we want to access.
-using namespace MAUtil; // Class Moblet
-using namespace NativeUI; // WebView widget.
-using namespace Wormhole; // Wormhole library.
+//using namespace MAUtil; // Class Moblet
+//using namespace NativeUI; // WebView widget.
+//using namespace Wormhole; // Wormhole library.
 
 /**
  * The application class.
  */
-class MyMoblet : public WebAppMoblet
+class MyMoblet : public Wormhole::WebAppMoblet
 {
 public:
 	MyMoblet() :
-		mPhoneGapMessageHandler(getWebView()),
-		mNativeUIMessageHandler(getWebView()),
-		mResourceMessageHandler(getWebView())
+		mMyMessageHandler(getWebView())
 	{
 		// Extract files in LocalFiles folder to the device.
 		extractFileSystem();
@@ -55,25 +69,11 @@ public:
 		// show when the application starts.
 		showPage("index.html");
 
-		// Send the Device Screen size to JavaScript.
-		MAExtent scrSize = maGetScrSize();
-		int width = EXTENT_X(scrSize);
-		int height = EXTENT_Y(scrSize);
-		char buf[512];
-		sprintf(
-			buf,
-			"{mosyncScreenWidth=%d; mosyncScreenHeight = %d;}",
-			width,
-			height);
-		callJS(buf);
+		// The beep sound is defined in file "Resources/Resources.lst".
+		mMyMessageHandler.init(BEEP_WAV, this);
 
-		// Set the beep sound. This is defined in the
-		// Resources/Resources.lst file. You can change
-		// this by changing the sound file in that folder.
-		mPhoneGapMessageHandler.setBeepSound(BEEP_WAV);
-
-		// Initialize PhoneGap.
-		mPhoneGapMessageHandler.initializePhoneGap();
+		MyMessageHandlerFun fun = (MyMessageHandlerFun)&MyMoblet::foo;
+		mMyMessageHandler.addMessageFun("DownloadLatestPhotoURLs", fun);
 	}
 
 	virtual ~MyMoblet()
@@ -87,9 +87,13 @@ public:
 	 */
 	void keyPressEvent(int keyCode, int nativeCode)
 	{
-		lprintfln("@@@ keyPressEvent");
-		// Forward to PhoneGap MessageHandler.
-		mPhoneGapMessageHandler.processKeyEvent(keyCode, nativeCode);
+		// Forward to MyMessageHandler.
+		mMyMessageHandler.keyPressEvent(keyCode, nativeCode);
+	}
+
+	void foo(const Wormhole::MessageStream& stream)
+	{
+		lprintfln("@@@ foo!!!!");
 	}
 
 	/**
@@ -102,97 +106,16 @@ public:
 	 * @param webView The WebView that sent the message.
 	 * @param urlData Data object that holds message content.
 	 */
-	void handleWebViewMessage(WebView* webView, MAHandle data)
+	void handleWebViewMessage(NativeUI::WebView* webView, MAHandle data)
 	{
 		// Uncomment to print message data for debugging.
 		// You need to build the project in debug mode for
 		// the log output to be displayed.
 		printMessage(data);
 
-		// Check the message protocol.
-		MessageProtocol protocol(data);
-		if (protocol.isMessageStreamJSON())
-		{
-			handleMessageStreamJSON(webView, data);
-		}
-		else if (protocol.isMessageStream())
-		{
-			handleMessageStream(webView, data);
-		}
-		else
-		{
-			lprintfln("@@@ MOSYNC: Undefined message protocol");
-		}
+		mMyMessageHandler.handleWebViewMessage(webView, data, this);
 	}
 
-	/**
-	 * Handles JSON messages. This is used by PhoneGap.
-	 *
-	 * You can send your own messages from JavaScript and handle them here.
-	 *
-	 * @param webView A pointer to the web view posting this message.
-	 * @param data The raw encoded JSON message array.
-	 */
-	void handleMessageStreamJSON(WebView* webView, MAHandle data)
-	{
-		// Create the message object. This parses the message data.
-		// The message object contains one or more messages.
-		JSONMessage message(webView, data);
-
-		// Loop through messages.
-		while (message.next())
-		{
-			// This detects the PhoneGap protocol.
-			if (message.is("PhoneGap"))
-			{
-				mPhoneGapMessageHandler.handlePhoneGapMessage(message);
-			}
-
-			// Here you can add your own message handing as needed.
-		}
-	}
-
-	/**
-	 * Handles string stream messages (generally faster than JSON messages).
-	 * This is used by the JavaScript NativeUI system.
-	 *
-	 * You can send your own messages from JavaScript and handle them here.
-	 *
-	 * @param webView A pointer to the web view posting this message.
-	 * @param data The raw encoded stream of string messages.
-	 */
-	void handleMessageStream(WebView* webView, MAHandle data)
-	{
-		// Create a message stream object. This parses the message data.
-		// The message object contains one or more strings.
-		MessageStream stream(webView, data);
-
-		// Pointer to a string in the message stream.
-		const char* p;
-
-		// Process messages while there are strings left in the stream.
-		while (p = stream.getNext())
-		{
-			if (0 == strcmp(p, "NativeUI"))
-			{
-				//Forward NativeUI messages to the respective message handler
-				mNativeUIMessageHandler.handleMessage(stream);
-			}
-			else if (0 == strcmp(p, "Resource"))
-			{
-				//Forward Resource messages to the respective message handler
-				mResourceMessageHandler.handleMessage(stream);
-			}
-			else if (0 == strcmp(p, "close"))
-			{
-				lprintfln("@@@ closing");
-				// Close the application (calls method in class Moblet).
-				close();
-			}
-
-			// Here you can add your own message handing as needed.
-		}
-	}
 
 	/**
 	 * For debugging.
@@ -219,20 +142,7 @@ public:
 	}
 
 private:
-	/**
-	 * Handler for PhoneGap messages.
-	 */
-	PhoneGapMessageHandler mPhoneGapMessageHandler;
-
-	/**
-	 * Handler for NativeUI messages
-	 */
-	NativeUIMessageHandler mNativeUIMessageHandler;
-
-	/**
-	 * Handler for resource messages used for NativeUI
-	 */
-	ResourceMessageHandler mResourceMessageHandler;
+	MyMessageHandler mMyMessageHandler;
 };
 
 /**
@@ -242,26 +152,7 @@ private:
  */
 extern "C" int MAMain()
 {
-	Moblet::run(new MyMoblet());
-/*
-	String a = "123";
-	String b = Encoder::base64Encode(a.c_str(), a.size());
-	maWriteLog(b.c_str(), b.size());
-
-	char* output;
-	int outputLength;
-	int success = Encoder::base64Decode(b.c_str(), (void**) &output, &outputLength);
-	if (success)
-	{
-		maWriteLog(output, outputLength);
-	}
-	else
-	{
-		maWriteLog("ERROR", 5);
-	}
-
-	//char* c = (char*) Encoder::base64Encode(a.c_str(), a.size());
-*/
+	MAUtil::Moblet::run(new MyMoblet());
 
 	return 0;
 }

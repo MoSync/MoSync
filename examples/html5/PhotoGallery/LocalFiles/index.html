@@ -218,6 +218,11 @@
 						alert("Error " + error.code);
 					});
 			}
+
+			function callFoo()
+			{
+				mosync.bridge.send(["Custom", "DownloadLatestPhotoURLs"]);
+			}
 		</script>
 	</head>
 	<body onload="initialize()">
@@ -225,6 +230,7 @@
 			<div class="pane" id="heading">PhoneGap FileTransfer Demo</div>
 			<div class="pane button" onclick="writeFile()">Write File</div>
 			<div class="pane button" onclick="uploadFile()">Upload File</div>
+			<div class="pane button" onclick="callFoo()">Call Foo</div>
 			<!--
 			<div class="pane button" onclick="getPictureData()">Get Picture Data</div>
 			<div class="pane button" onclick="getPictureFile()">Get Picture File</div>
