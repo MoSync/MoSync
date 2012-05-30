@@ -8167,33 +8167,6 @@ group WidgetAPI "Widget API" {
 	* - #MAW_RES_ERROR otherwise.
 	*/
 	int maWidgetScreenAddOptionsMenuItem(in MAWidgetHandle widget, in MAString title, in int iconHandle, in int iconPredefined);
-
-	/**
-	 * \returns The pin index on success, or any of the following result codes:
-	 * - #MAW_RES_INVALID_HANDLE if the map handle was invalid.
-	 * - #MAW_RES_ERROR otherwise.
-	 */
-	int maWidgetMapAddPin(in MAWidgetHandle widget, in double latitude, in double longitude);
-
-	/**
-	 * \returns MAW_RES_OK if the pin has been removed, or any of the following result codes:
-	 * - #MAW_RES_INVALID_HANDLE if the map handle was invalid.
-	 * - #MAW_RES_ERROR otherwise.
-	 */
-	int maWidgetMapRemovePin(in MAWidgetHandle widget, in int pinIndex);
-
-	/**
-	 * \returns MAW_RES_OK if the map has been scrolled/zoomed to the specified region,
-	 * or any of the following result codes:
-	 * - #MAW_RES_INVALID_HANDLE if the map handle was invalid.
-	 * - #MAW_RES_ERROR otherwise.
-	 */
-	int maWidgetMapSetVisibleRegion(in MAWidgetHandle widget,
-		in double upperLeftCornerLatitude,
-		in double upperLeftCornerLongitude,
-		in double lowerRightCornerLatitude,
-		in double lowerRightCornerLongitude);
-
 	} // end of group WidgetAPIFunctions
 
 } // end of group WidgetAPI
