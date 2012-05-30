@@ -53,14 +53,15 @@ namespace Wormhole
  *
  * class MyBinaryDownloader : public HighLevelBinaryDownloader
  * {
+ *   public:
  *     void onDownloadComplete(MAHandle data)
  *     {
- *         // Do something with the data.
+ *       // Do something with the data.
  *     }
  * };
  *
  * // Start download.
- * new MyBinaryDownloader().get("http://...");
+ * (new MyBinaryDownloader()).get("http://...");
  */
 class HighLevelBinaryDownloader : public HighLevelHttpConnection
 {
