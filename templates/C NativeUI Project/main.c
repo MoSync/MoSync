@@ -127,24 +127,26 @@ void eventLoop()
 	while (isRunning)
 	{
 		maWait(0);
-		maGetEvent(&event);
-		switch (event.type)
+		while (maGetEvent(&event))
 		{
-			case EVENT_TYPE_CLOSE:
+			if (EVENT_TYPE_CLOSE == event.type)
+			{
 				isRunning = FALSE;
 				break;
-
-			case EVENT_TYPE_KEY_PRESSED:
+			}
+			else if (EVENT_TYPE_KEY_PRESSED == event.type)
+			{
 				// Exit the app if the back key (on Android) is pressed.
 				if (event.key == MAK_BACK)
 				{
 					isRunning = FALSE;
+					break;
 				}
-				break;
-
-			case EVENT_TYPE_WIDGET:
+			}
+			else if (EVENT_TYPE_WIDGET == event.type)
+			{
 				handleWidgetEvent((MAWidgetEventData*) event.data);
-				break;
+			}
 		}
 	}
 }
@@ -156,6 +158,5 @@ int MAMain()
 {
 	createUI();
 	eventLoop();
-
 	return 0;
 }
