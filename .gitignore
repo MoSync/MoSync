@@ -234,3 +234,8 @@ wormhole.js
 /runtimes/csharp/windowsphone/mosync/mosync/Bin
 /tools/winphone-builder/pugixml-1.0/scripts
 /tools/winphone-builder/pugixml-1.0/docs
+
+/runtimes/csharp/windowsphone/mosync/mosyncRuntime/Libraries/Microsoft.Advertising.Mobile
+/runtimes/csharp/windowsphone/mosync/mosyncRuntime/Libraries/Microsoft.Advertising.Mobile.UI
+/runtimes/csharp/windowsphone/mosync/mosyncRuntime/Libraries/Microsoft.Phone.Controls
+/runtimes/csharp/windowsphone/mosync/mosyncRuntime/Libraries/Microsoft.Phone.Controls.Maps
