@@ -24,7 +24,8 @@ DirectoriesToCopyWormholeJSTo = [
   "../../../examples/html5/WormholeDemo/LocalFiles/js/",
   "../../../examples/html5/WormholeNativeUI/LocalFiles/js/",
   "../../../testPrograms/PhoneGapMoSync/LocalFiles/js/",
-  "../../../testPrograms/phonegap/WormholePushNotificationTest/LocalFiles/js/"
+  "../../../testPrograms/phonegap/WormholePushNotificationTest/LocalFiles/js/",
+  "../../../testPrograms/JSNativeUICloneTest/LocalFiles/js/"
 ]
 
 # Specify directories to copy mosync-bridge.js to.
