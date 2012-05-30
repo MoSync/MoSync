@@ -4328,6 +4328,11 @@ group WidgetAPI "Widget API" {
 			*  The selected menu item handle, when a #MAW_EVENT_OPTIONS_MENU_ITEM_SELECTED event is received.
 			*/
 			int optionsMenuItem;
+
+			/**
+			 * The clicked map pin index, when a #MAW_EVENT_MAP_PIN_CLICKED event is received.
+			 */
+			int mapPinIndex;
 		}
 	}
 
@@ -4514,8 +4519,22 @@ group WidgetAPI "Widget API" {
 		* @brief Send when an item in your options menu is selected.
 		*/
 		OPTIONS_MENU_ITEM_SELECTED = 29;
-	}
 
+		/*
+		* @brief Sent when the zoom level of a map widget has changed (if the user zoomed in or out).
+		*/
+		MAP_ZOOM_LEVEL_CHANGED = 30;
+
+		/*
+		* @brief Sent when the visible region on the map has changed (if the user scrolled/draged the map).
+		*/
+		MAP_REGION_CHANGED = 31;
+
+		/*
+		 * @brief Sent when a map pin is clicked by the user.
+		 */
+		MAP_PIN_CLICKED = 32;
+	}
 	} // end of WidgetEventTypes
 
 	} // end of WidgetEvents
@@ -5023,6 +5042,18 @@ group WidgetAPI "Widget API" {
 		*/
 		RATING_BAR = "RatingBar";
 
+		/**
+		* @brief The map widget will contain the google map (on iOS and Android) and the bing map (on Windows Phone)
+		* controls and will allow the user to interract with the map.
+		* See \ref WidgetMapProperties "Map properties" for the properties available.
+		*/
+		MAP = "Map";
+
+		/**
+		 * @brief A map pin can pe placend on the map at a given set of coordinates and responds to click events.
+		 * See \ref WidgetMapPinProperties "Map pin properties" for the properties available.
+		 */
+		MAP_PIN = "MapPin";
 	}
 	} // end of WidgetTypes
 
@@ -7674,6 +7705,260 @@ group WidgetAPI "Widget API" {
 		GRANULARITY = "granularity";
 	}
 	} // end of WidgetRatingBarProperties
+
+	/**
+	* Constants of the map widget.
+	*/
+	group WidgetMapConstants "Map constants" {
+	    constset int MAW_MAP_TYPE_ {
+	        /**
+			* Road map type (landforms not visible).
+			*/
+			ROAD = 0;
+			/**
+			* Sattelite map type (landforms visible).
+			*/
+			SATELLITE = 1;
+		}
+	} // end of WidgetMapConstants
+
+	/**
+	* The available widget properties for a #MAW_MAP. See \ref WidgetProperties "Widget properties" for more properties.
+	*/
+	group WidgetMapProperties "Map properties" {
+	constset MAString MAW_MAP_ {
+	    /*
+		* @brief The api key used to access the full features of the map (a google maps api key for Android
+		* and a bing maps api key for Windows Phone). The iOS platform doesn't require a key.
+		*
+		* @validvalue The format of the key differs from platform to platform. For further details on how to
+		* obtain these keys go to "https://developers.google.com/maps/documentation/android/mapkey" for google
+		* maps and to "http://msdn.microsoft.com/en-us/library/ff428642.aspx" for bing maps.
+		*
+		* @setonly
+		* @par Example
+		* \code
+		*   maWidgetSetProperty(mapHandle, MAW_MAP_API_KEY, "a_valid_key");
+		* \endcode
+		*/
+		API_KEY = "api_key";
+
+		/*
+		* @brief Set or get the map type.
+		*
+		* @validvalue One of the two values: MAW_MAP_TYPE_SATELLITE or MAW_MAP_TYPE_ROAD.
+		*
+		* @setandget
+		* @par Example
+		* \code
+		*   maWidgetSetProperty(mapHandle, MAW_MAP_TYPE, MAW_MAP_TYPE_SATELLITE);
+		*   char mapType[BUF_SIZE];
+		*   maWidgetGetProperty(mapHandle, MAW_MAP_TYPE, mapType, BUF_SIZE);
+		* \endcode
+		*/
+		TYPE = "type";
+
+		/*
+		* @brief Sets and gets the zoom level of the map.
+		*
+		* @validvalue A integer value between 0 and 21.
+		*
+		* @setandget
+		* @par Example
+		* \code
+		*   maWidgetSetProperty(mapHandle, MAW_MAP_ZOOM_LEVEL, "4");
+		*   maWidgetSetProperty(mapHandle, MAW_MAP_ZOOM_LEVEL);
+		*   char zoomLevel[BUF_SIZE];
+		*   maWidgetGetProperty(mapHandle, MAW_MAP_ZOOM_LEVEL, zoomLevel, BUF_SIZE);
+		* \endcode
+		*/
+		ZOOM_LEVEL = "zoom_level";
+
+		/*
+		* @brief Disables/enables the interraction between the user and the map.
+		*
+		* @validvalue A boolean string 'true' or 'false'.
+		*
+		* @setandget
+		* @par Example
+		* \code
+		*   maWidgetSetProperty(mapHandle, MAW_MAP_INTERRACTION_ENABLED, "true");
+		*   char interractionEnabled[BUF_SIZE];
+		*   maWidgetGetProperty(mapHandle, MAW_MAP_INTERRACTION_ENABLED, interractionEnabled, BUF_SIZE);
+		* \endcode
+		*/
+		INTERRACTION_ENABLED = "interraction_enabled";
+
+		/*
+		* @brief Set the map center latitude coordinate.
+		*
+		* @validvalue A double value between -90.0 and 90.0.
+		*
+		* @setonly
+		* @par Example
+		* \code
+		*   maWidgetSetProperty(mapHandle, MAW_MAP_CENTER_LATITUDE, "43.232544");
+		*   maWidgetSetProperty(mapHandle, MAW_MAP_CENTER_LATITUDE, "-12.42324");
+		* \endcode
+		*/
+		CENTER_LATITUDE = "center_latitude";
+
+		/*
+		* @brief Set the map center longitude coordinate.
+		*
+		* @validvalue A double value between -180.0 and 180.0.
+		*
+		* @setonly
+		* @par Example
+		* \code
+		*   maWidgetSetProperty(mapHandle, MAW_MAP_CENTER_LONGITUDE, "80.43352");
+		*   maWidgetSetProperty(mapHandle, MAW_MAP_CENTER_LONGITUDE, "-54.56442");
+		* \endcode
+		*/
+		CENTER_LONGITUDE = "center_longitude";
+
+		/*
+		* @brief Set the map zoom level value.
+		*
+		* @validvalue A double value between 0 and 21.
+		*
+		* @setonly
+		* @par Example
+		* \code
+		*   maWidgetSetProperty(mapHandle, MAW_MAP_CENTER_ZOOM_LEVEL, "12");
+		*   maWidgetSetProperty(mapHandle, MAW_MAP_CENTER_ZOOM_LEVEL, "3");
+		* \endcode
+		*/
+		CENTER_ZOOM_LEVEL = "center_zoom_level";
+
+		/**
+		 * @brief Property used to center the map.
+		 *
+		 * @validvalue A boolean string: "true" or "false".
+		 *
+		 * @setonly
+		 * @par Example
+		 * \code
+		 *   maWidgetSetProperty(mapHandle, MAW_MAP_CENTERED, "true"); // centers the map on the already set map center
+		 * \endcode
+		 */
+		CENTERED = "centered";
+
+		/**
+		 * @brief Property used specify the upper left corner latitude of the visible area.
+		 *
+		 * @validvalue A double value between -90.0 and 90.0.
+		 *
+		 * @setandget
+		 * @par Example
+		 * \code
+		 *   maWidgetSetProperty(mapHandle, MAW_MAP_VISIBLE_AREA_UPPER_LEFT_CORNER_LATITUDE, "-34.34234");
+		 * \code
+		 */
+		VISIBLE_AREA_UPPER_LEFT_CORNER_LATITUDE = "visible_area_upper_left_corner_latitude";
+
+		/**
+		 * @brief Property used specify the upper left corner longitude of the visible area.
+		 *
+		 * @validvalue A double value between -180.0 and 180.0.
+		 *
+		 * @setandget
+		 * @par Example
+		 * \code
+		 *   maWidgetSetProperty(mapHandle, MAW_MAP_VISIBLE_AREA_UPPER_LEFT_CORNER_LONGITUDE, "134.312");
+		 * \code
+		 */
+		VISIBLE_AREA_UPPER_LEFT_CORNER_LONGITUDE = "visible_area_upper_left_corner_longitude";
+
+		/**
+		 * @brief Property used specify the lower right corner latitude of the visible area.
+		 *
+		 * @validvalue A double value between -90.0 and 90.0.
+		 *
+		 * @setandget
+		 * @par Example
+		 * \code
+		 *   maWidgetSetProperty(mapHandle, MAW_MAP_VISIBLE_AREA_LOWER_RIGHT_CORNER_LATITUDE, "43.2322");
+		 * \code
+		 */
+		VISIBLE_AREA_LOWER_RIGHT_CORNER_LATITUDE = "visible_area_lower_right_corner_latitude";
+
+		/**
+		 * @brief Property used specify the lower right corner longitude of the visible area.
+		 *
+		 * @validvalue A double value between -180.0 and 180.0.
+		 *
+		 * @setandget
+		 * @par Example
+		 * \code
+		 *   maWidgetSetProperty(mapHandle, MAW_MAP_VISIBLE_AREA_LOWER_RIGHT_CORNER_LONGITUDE, "-100.2324");
+		 * \code
+		 */
+		VISIBLE_AREA_LOWER_RIGHT_CORNER_LONGITUDE = "visible_area_lower_right_corner_longitude";
+
+		/*
+		* @brief Used to center the map on a previously set visible area.
+		*
+		* @validvalue A boolean string 'true' or 'false'.
+		*
+		* @setonly
+		* @par Example
+		* \code
+		*   maWidgetSetProperty(mapHandle, MAP_CENTERED_ON_VISIBLE_AREA, "true");
+		* \endcode
+		*/
+		CENTERED_ON_VISIBLE_AREA = "centered_on_visible_area";
+	}
+	} // end of WidgetMapProperties
+
+	/**
+	* The available widget properties for a #MAW_MAP_PIN. See \ref WidgetProperties "Widget properties" for more properties.
+	*/
+	group WidgetMapPinProperties "Map pin properties" {
+	constset MAString MAW_MAP_PIN_ {
+		/*
+		* @brief Set the map pin latitude coordinate.
+		*
+		* @validvalue A double value between -90.0 and 90.0.
+		*
+		* @setonly
+		* @par Example
+		* \code
+		*   maWidgetSetProperty(mapHandle, MAW_MAP_PIN_LATITUDE, "43.232544");
+		*   maWidgetSetProperty(mapHandle, MAW_MAP_PIN_LATITUDE, "-12.42324");
+		* \endcode
+		*/
+		LATITUDE = "latitude";
+
+		/*
+		* @brief Set the map pin longitude coordinate.
+		*
+		* @validvalue A double value between -180.0 and 180.0.
+		*
+		* @setonly
+		* @par Example
+		* \code
+		*   maWidgetSetProperty(mapHandle, MAW_MAP_PIN_LONGITUDE, "80.43352");
+		*   maWidgetSetProperty(mapHandle, MAW_MAP_PIN_LONGITUDE, "-124.56442");
+		* \endcode
+		*/
+		LONGITUDE = "longitude";
+
+		/*
+		* @brief Set the map pin text.
+		*
+		* @validvalue A string value.
+		*
+		* @setandget
+		* @par Example
+		* \code
+		*   maWidgetSetProperty(mapHandle, MAW_MAP_PIN_TEXT, "Cluj");
+		* \endcode
+		*/
+		TEXT = "text";
+	}
+	} // end of WidgetMapPinProperties
+
 	} // end of WidgetProperties
 
 	typedef int MAWidgetHandle;
@@ -7888,6 +8173,32 @@ group WidgetAPI "Widget API" {
 	* - #MAW_RES_INVALID_HANDLE
 	*/
 	int maWidgetScreenAddOptionsMenuItem(in MAWidgetHandle widget, in MAString title, in MAString iconPath, in int iconPredefined);
+
+	/**
+	 * \returns The pin index on success, or any of the following result codes:
+	 * - #MAW_RES_INVALID_HANDLE if the map handle was invalid.
+	 * - #MAW_RES_ERROR otherwise.
+	 */
+	int maWidgetMapAddPin(in MAWidgetHandle widget, in double latitude, in double longitude);
+
+	/**
+	 * \returns MAW_RES_OK if the pin has been removed, or any of the following result codes:
+	 * - #MAW_RES_INVALID_HANDLE if the map handle was invalid.
+	 * - #MAW_RES_ERROR otherwise.
+	 */
+	int maWidgetMapRemovePin(in MAWidgetHandle widget, in int pinIndex);
+
+	/**
+	 * \returns MAW_RES_OK if the map has been scrolled/zoomed to the specified region,
+	 * or any of the following result codes:
+	 * - #MAW_RES_INVALID_HANDLE if the map handle was invalid.
+	 * - #MAW_RES_ERROR otherwise.
+	 */
+	int maWidgetMapSetVisibleRegion(in MAWidgetHandle widget,
+		in double upperLeftCornerLatitude,
+		in double upperLeftCornerLongitude,
+		in double lowerRightCornerLatitude,
+		in double lowerRightCornerLongitude);
 
 	} // end of group WidgetAPIFunctions
 

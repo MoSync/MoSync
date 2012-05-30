@@ -306,32 +306,6 @@ namespace MoSync
                 eventData.WriteInt32(MAWidgetEventData_eventType, MoSync.Constants.MAW_VIDEO_VIEW_STATE_STOPPED);
                 mRuntime.PostCustomEvent(MoSync.Constants.EVENT_TYPE_WIDGET, eventData);
             }
-
-            private Uri _SelectedVideoProperty;
-            public Uri SelectedVideoProperty
-            {
-                get
-                {
-                    return this._SelectedVideoProperty;
-                }
-                set
-                {
-                    this._SelectedVideoProperty = value;
-                    this.NotifyPropertyChanged("SelectedVideoProperty");
-                }
-            }
-
-            // Utility
-            public event PropertyChangedEventHandler PropertyChanged;
-
-            private void NotifyPropertyChanged(String info)
-            {
-                if (PropertyChanged != null)
-                {
-                    PropertyChanged(this, new PropertyChangedEventArgs(info));
-                }
-            }
-
         } // end of class VideoView
     } // end of namespace NativeUI
 } // end of namespace MoSync
