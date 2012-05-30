@@ -40,6 +40,7 @@ MA 02110-1301, USA.
 #include "PhoneGapSensors.h"
 #include "PhoneGapFile.h"
 #include "PhoneGapCapture.h"
+#include "PhoneGapCamera.h"
 #include "../W3C/SensorManager.h"
 #include "../Notification/PushNotificationManager.h"
 
@@ -224,6 +225,11 @@ namespace Wormhole
 		 * PhoneGap Capture API message handler.
 		 */
 		PhoneGapCapture mPhoneGapCapture;
+
+		/**
+		 * PhoneGap Camera API message handler.
+		 */
+		PhoneGapCamera mPhoneGapCamera;
 
 		/**
 		 * Notification API message handler.

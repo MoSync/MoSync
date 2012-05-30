@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2011 MoSync AB
+Copyright (C) 2012 MoSync AB
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License,
@@ -17,17 +17,20 @@ MA 02110-1301, USA.
 */
 
 /**
- * @file PhoneGapCapture.cpp
- * @author Iraklis Rossis
+ * @file PhoneGapCamera.h
+ * @author Mikael Kindborg
  *
- * Implementation of PhoneGap capture calls made from JavaScript.
+ * Implementation of PhoneGap Camera API.
  */
 
 #include <conprint.h>
 #include <MAUtil/String.h>
+#include <mastring.h>
 #include <maxtoa.h>
 #include "PhoneGapMessageHandler.h"
-#include "PhoneGapCapture.h"
+#include "PhoneGapCamera.h"
+
+#define MYLOG(s) maWriteLog(s, strlen(s))
 
 using namespace MAUtil;
 
@@ -36,7 +39,7 @@ namespace Wormhole
 	/**
 	 * Constructor.
 	 */
-	PhoneGapCapture::PhoneGapCapture(PhoneGapMessageHandler* messageHandler)
+	PhoneGapCamera::PhoneGapCamera(PhoneGapMessageHandler* messageHandler)
 		: mMessageHandler(messageHandler)
 	{
 		MAUtil::Environment::getEnvironment().addCustomEventListener(this);
@@ -45,7 +48,7 @@ namespace Wormhole
 	/**
 	 * Destructor.
 	 */
-	PhoneGapCapture::~PhoneGapCapture()
+	PhoneGapCamera::~PhoneGapCamera()
 	{
 	}
 
@@ -53,11 +56,32 @@ namespace Wormhole
 	 * Implementation of capture API:s exposed to JavaScript.
 	 * @return true if message was handled, false if not.
 	 */
-	void PhoneGapCapture::handleMessage(JSONMessage& message)
+	void PhoneGapCamera::handleMessage(JSONMessage& message)
 	{
-		if(message.getParam("action") == "captureVideo")
+		if (message.getParam("action") == "getPicture")
 		{
-			int duration = message.getArgsFieldInt("duration");
+			MYLOG("PhoneGapCamera::handleMessage getPicture");
+
+			mCaptureCallBack = message.getParam("PhoneGapCallBackId");
+
+			//maImagePickerOpen() #EVENT_TYPE_IMAGE_PICKER
+
+			/*
+			struct {
+				// #EVENT_TYPE_IMAGE_PICKER events, this will be 0 if canceled or 1 if Ok was pressed.
+				int imagePickerState;
+				// #EVENT_TYPE_IMAGE_PICKER event, contains the new handle to the selected image.
+				MAHandle imagePickerItem;
+			} imagePicker;
+			*/
+
+			mMessageHandler->callSuccess(
+				mCaptureCallBack,
+				PHONEGAP_CALLBACK_STATUS_OK,
+				"{\"message\":\"Hello\"}",
+				false);
+
+			/*int duration = message.getArgsFieldInt("duration");
 			if(duration > 0)
 			{
 				char durationString[16];
@@ -86,40 +110,7 @@ namespace Wormhole
 					"{\"code\":\"CAPTURE_NOT_SUPPORTED\"}",
 					false);
 			}
-		}
-		else if(message.getParam("action") == "captureImage")
-		{
-			mCaptureCallBack = message.getParam("PhoneGapCallBackId");
-
-			int result = maCaptureAction(MA_CAPTURE_ACTION_TAKE_PICTURE);
-
-			if(result == MA_CAPTURE_RES_CAMERA_NOT_AVAILABLE)
-			{
-				//Camera was busy by another app
-				mMessageHandler->callError(
-					mCaptureCallBack,
-					PHONEGAP_CALLBACK_STATUS_ERROR,
-					"{\"code\":\"CAPTURE_APPLICATION_BUSY\"}",
-					false);
-			}
-			if(result == MA_CAPTURE_RES_PICTURE_NOT_SUPPORTED)
-			{
-				//No camera
-				mMessageHandler->callError(
-					mCaptureCallBack,
-					PHONEGAP_CALLBACK_STATUS_ERROR,
-					"{\"code\":\"CAPTURE_NOT_SUPPORTED\"}",
-					false);
-			}
-		}
-		else if(message.getParam("action") == "captureAudio")
-		{
-			//MoSync does not support audio capture
-			mMessageHandler->callError(
-				mCaptureCallBack,
-				PHONEGAP_CALLBACK_STATUS_ERROR,
-				"{\"code\":\"CAPTURE_NOT_SUPPORTED\"}",
-				false);
+			*/
 		}
 	}
 
@@ -127,8 +118,9 @@ namespace Wormhole
 	 * Event handler for capture events
 	 * @param event the event struct.
 	 */
-	void PhoneGapCapture::customEvent(const MAEvent &event)
+	void PhoneGapCamera::customEvent(const MAEvent &event)
 	{
+		/*
 		char pathBuffer[256];
 		char messageBuffer[512];
 
@@ -162,13 +154,11 @@ namespace Wormhole
 						"mosync.device.OS",
 						deviceOS,
 						16);
-
-				// TODO: Check that this really works.
 				if(strcmp(deviceOS, "iPhone OS") == 0)
 				{
 					extension = "png";
 				}
-				else if(strcmp(deviceOS, "Android") == 0)
+				else if(strcmp(deviceOS, "Android OS") == 0)
 				{
 					extension = "jpg";
 				}
@@ -189,7 +179,6 @@ namespace Wormhole
 				sprintf(messageBuffer,
 					"{\"message\":[{\"fullPath\":\"%s\",\"name\":\"%s\"}]}",
 					pathBuffer, FileNameFromPath(pathBuffer));
-
 				if(result == MA_CAPTURE_RES_OK)
 				{
 					mMessageHandler->callSuccess(
@@ -218,5 +207,6 @@ namespace Wormhole
 				break;
 			}
 		}
+		*/
 	}
 } // namespace
