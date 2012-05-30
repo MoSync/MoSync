@@ -21,16 +21,10 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <string.h>
 #include <string>
 #include <vector>
+#include <sys/types.h>
+#include <dirent.h>
 
 #include "helpers/attribute.h"
-
-
-#ifdef __unix__
-	#include <sys\types.h>
-	#include <direct.h>
-#else
-	#include <windows.h>
-#endif
 
 using namespace std;
 
@@ -327,11 +321,9 @@ int main(int argc, char **argv) {
 				dirPath = outputFile.substr(0, position);
 			}
 		}
-
-		dirPath.append("ApplicationBarIcons\\*.*");
+		//create the output dir string for the icons "\ApplicationBarIcons\".
+		dirPath.append("ApplicationBarIcons\\");
 	}
-
-	printf("%s\n", dirPath.c_str());
 
 	//create directory
 	int position = outputFile.find("project");
@@ -346,51 +338,38 @@ int main(int argc, char **argv) {
 	command.append("project\\AppBar.Icons\"");
 
 	system(command.c_str());
-#ifdef __unix__
+
 	struct dirent* de = NULL;
 	DIR* d = NULL;
 
-	d.opendir(dirPath.c_str());
+	// Open the application bar icons directory and create an ApplicationBarIconReference obj for each.
+	d = opendir(dirPath.c_str());
 	if(NULL != d)
 	{
-		while(de = readdir(d))
-		{
-			applicationBarIconReferences.push_back( ApplicationBarIconReference( de->d_name ) );
-			std::string copyCmd;
-			copyCmd.append("cp ");
-			copyCmd.append(dirPath.substr(0, strlen(dirPath.c_str()) - 3));
-			copyCmd.append( de->d_name );
-			copyCmd.append(" \"");
-			copyCmd.append(outputDirPath);
-			system(copyCmd.c_str());
-		}
-	}
-	closedir(d);
-#else
-	WIN32_FIND_DATA data;
+        de = readdir(d);
 
-	HANDLE fileHandle = FindFirstFile(dirPath.c_str(), &data);
-
-	if(fileHandle != INVALID_HANDLE_VALUE)
-	{
-		do
+		while(de)
 		{
-			if( !(data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) )
+			// Ignore the . and .. entries
+			if(strcmp(de->d_name, ".") != 0 && strcmp(de->d_name, "..") != 0)
 			{
-				applicationBarIconReferences.push_back( ApplicationBarIconReference( data.cFileName ) );
+				applicationBarIconReferences.push_back( ApplicationBarIconReference( de->d_name ) );
 				std::string copyCmd;
 				copyCmd.append("cp ");
-				copyCmd.append(dirPath.substr(0, strlen(dirPath.c_str()) - 3));
-				copyCmd.append(data.cFileName);
+				copyCmd.append(dirPath.c_str());
+				copyCmd.append( de->d_name );
 				copyCmd.append(" \"");
 				copyCmd.append(outputDirPath);
 				system(copyCmd.c_str());
 			}
-		}while( FindNextFile(fileHandle, &data) != 0);
+            de = readdir(d);
+		}
 	}
-#endif
+	closedir(d);
 
+	// Write the changes to the csproj file.
 	pugi::xml_node mosyncApplicationBarIcons = project.append_child("ItemGroup");
+
 	while(applicationBarIconReferences.empty() == false)
 	{
 		pugi::xml_node contentChild = mosyncApplicationBarIcons.append_child("Content");
