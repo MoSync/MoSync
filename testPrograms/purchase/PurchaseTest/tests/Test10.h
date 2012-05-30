@@ -147,6 +147,34 @@ namespace PurchaseTest
 		virtual void requestFailed(const Purchase& purchase,
 			const int errorCode);
 
+		/**
+		 * Notifies that the transaction has been validated by the App Store /
+		 * Google Play.
+		 * Platform: Android and iOS.
+		 * @param purchase The object that sent the event.
+		 * @param receipt Transaction receipt.
+		 */
+		virtual void receiptValid(
+			const Purchase& purchase,
+			Receipt& receipt);
+
+		/**
+		 * Notifies that the transaction is not valid on the App Store /
+		 * Google Play.
+		 * Platform: Android and iOS.
+		 * @param purchase The object that sent the event.
+		 */
+		virtual void receiptInvalid(const Purchase& purchase);
+
+		/**
+		 * Notifies that an error occurred while verifying the receipt.
+		 * Platform: Android and iOS.
+		 * @param purchase The object that sent the event.
+		 * @param errorCode The reason why it failed.
+		 */
+		virtual void receiptError(const Purchase& purchase,
+			const int errorCode);
+
 	private:
 		/**
 		 * Application controller.

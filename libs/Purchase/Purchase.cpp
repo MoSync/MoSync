@@ -71,6 +71,17 @@ namespace IAP
 	}
 
 	/**
+	 * Copy constructor.
+	 */
+	Purchase::Purchase(const IAP::Purchase &purchase):
+		mHandle(purchase.mHandle),
+		mReceipt(NULL),
+		mIsRestored(true)
+	{
+		PurchaseManager::getInstance()->registerPurchase(this);
+	}
+
+	/**
 	 * Destructor.
 	 */
 	Purchase::~Purchase()

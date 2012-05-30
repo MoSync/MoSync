@@ -31,6 +31,7 @@
 
 #include <Purchase/Purchase.h>
 #include <Purchase/PurchaseManager.h>
+#include <Purchase/Receipt.h>
 #include <conprint.h>
 
 #include "Test10.h"
@@ -114,7 +115,11 @@ namespace PurchaseTest
 		char buffer[BUF_MAX];
 		sprintf(buffer, "Product %s was restored", purchase.getProductId().c_str());
 		mApplicationController.log(buffer);
-		mApplicationController.testSucceeded(*this);
+		printf("creating a copy of purchase");
+		mPurchase = new Purchase(purchase);
+		mPurchase->addPurchaseListener(this);
+		mApplicationController.log("Verifying receipt...");
+		mPurchase->verifyReceipt();
 	}
 
 	/**
@@ -222,6 +227,49 @@ namespace PurchaseTest
 		char buffer[BUF_SIZE];
 		sprintf(buffer, "Purchase failed with error code %d.",
 			errorCode);
+		this->setFailedReason(buffer);
+		mApplicationController.testFailed(*this);
+	}
+
+	/**
+	 * Notifies that the transaction has been validated by the App Store /
+	 * Google Play.
+	 * Platform: Android and iOS.
+	 * @param purchase The object that sent the event.
+	 * @param receipt Transaction receipt.
+	 */
+	void Test10::receiptValid(
+		const Purchase& purchase,
+		Receipt& receipt)
+	{
+		char buffer[BUF_SIZE];
+		sprintf(buffer, "Receipt valid for %s.", receipt.getProductID().c_str());
+		mApplicationController.testSucceeded(*this);
+	}
+
+	/**
+	 * Notifies that the transaction is not valid on the App Store /
+	 * Google Play.
+	 * Platform: Android and iOS.
+	 * @param purchase The object that sent the event.
+	 */
+	void Test10::receiptInvalid(const Purchase& purchase)
+	{
+		this->setFailedReason("Invalid receipt");
+		mApplicationController.testFailed(*this);
+	}
+
+	/**
+	 * Notifies that an error occurred while verifying the receipt.
+	 * Platform: Android and iOS.
+	 * @param purchase The object that sent the event.
+	 * @param errorCode The reason why it failed.
+	 */
+	void Test10::receiptError(const Purchase& purchase,
+		const int errorCode)
+	{
+		char buffer[BUF_SIZE];
+		sprintf(buffer, "Receipt error %d.", errorCode);
 		this->setFailedReason(buffer);
 		mApplicationController.testFailed(*this);
 	}

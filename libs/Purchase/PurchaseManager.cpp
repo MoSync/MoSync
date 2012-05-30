@@ -236,6 +236,7 @@ namespace IAP
 	void PurchaseManager::createRestoredProduct(MAHandle productHandle)
 	{
 		Purchase* purchase = new Purchase(productHandle);
+		this->unregisterPurchase(purchase);
 		int countListeners = mListeners.size();
 		for (int i = 0; i < countListeners; i++)
 		{
@@ -251,6 +252,7 @@ namespace IAP
 	void PurchaseManager::createRefundedProduct(MAHandle productHandle)
 	{
 		Purchase* purchase = new Purchase(productHandle);
+		this->unregisterPurchase(purchase);
 		int countListeners = mListeners.size();
 		for (int i = 0; i < countListeners; i++)
 		{
