@@ -31,6 +31,7 @@ namespace MoSync
             void EnableApplicationBar();
             bool GetApplicationBarVisibility();
             void SetApplicationBarVisibility(bool value);
+            int AddApplicationBarItemIndex(Object item);
         }
 
         public class MoSyncWidgetPropertyAttribute : Attribute

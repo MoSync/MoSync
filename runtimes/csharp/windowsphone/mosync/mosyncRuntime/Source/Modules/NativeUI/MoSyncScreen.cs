@@ -31,6 +31,7 @@ using System.Windows.Navigation;
 using System;
 using System.Text.RegularExpressions;
 using System.Reflection;
+using System.Collections.Generic;
 
 namespace MoSync
 {
@@ -48,7 +49,23 @@ namespace MoSync
             protected Microsoft.Phone.Shell.ApplicationBar mApplicationBar;
 
             //The application bar visibility flag.
-            protected bool mApplicationBarVisible = false;
+            protected bool ApplicationBarVisible
+            {
+                set;
+                get;
+            }
+
+            //The application bar item indexes.
+            //When a new button or menu item is added it gets
+            //an index associated. That index is returned when the item is
+            //succesfuly added.
+            protected Dictionary<Object, int> mApplicationBarItemsIndexes;
+
+            //The application bar item index seed.
+            //This is a counter that gives the first
+            //index value and it's incremented during
+            //item additions.
+            protected int mApplicationBarItemsIndexSeed = 0;
 
             //The constructor.
             public Screen()
@@ -63,7 +80,9 @@ namespace MoSync
                 //Initialize the application bar and set its visibility to false.
                 mApplicationBar = new Microsoft.Phone.Shell.ApplicationBar();
                 mApplicationBar.IsVisible = false;
-                mApplicationBarVisible = false;
+                ApplicationBarVisible = false;
+
+                mApplicationBarItemsIndexes = new Dictionary<Object, int>();
 
                 /**
                  * This will add a BackKeyPress event handler to the Application.Current.RootVisual, this is application wide.
@@ -264,12 +283,24 @@ namespace MoSync
             {
                 set
                 {
+
+                    mApplicationBar = new Microsoft.Phone.Shell.ApplicationBar();
+
+                    PhoneApplicationFrame frame = (PhoneApplicationFrame)Application.Current.RootVisual;
+                    (frame.Content as PhoneApplicationPage).ApplicationBar = mApplicationBar;
+
                     //Sets the application bar visibility to false.
                     mApplicationBar.IsVisible = false;
+
                     //Sets the application bar visibility custom flag to false.
-                    mApplicationBarVisible = false;
+                    ApplicationBarVisible = false;
+
                     //removing the row definition that keeps the space for the application bar (78px).
                     mPage.RowDefinitions.RemoveAt(1);
+
+                    //remove the button indexes and reset the seed
+                    mApplicationBarItemsIndexSeed = 0;
+                    mApplicationBarItemsIndexes.Clear();
                 }
             }
 
@@ -320,8 +351,14 @@ namespace MoSync
              */
             public void SetApplicationBarVisibility(bool value)
             {
-                mApplicationBarVisible = value;
-                mApplicationBar.IsVisible = value;
+                if (value != ApplicationBarVisible)
+                {
+                    ApplicationBarVisible = value;
+                    mApplicationBar.IsVisible = value;
+
+                    if (this.GetParent() is StackScreen)
+                        (this.GetParent() as StackScreen).ToggleApplicationBar(this);
+                }
             }
 
             /*
@@ -329,7 +366,21 @@ namespace MoSync
              */
             public bool GetApplicationBarVisibility()
             {
-                return mApplicationBarVisible;
+                return ApplicationBarVisible;
+            }
+
+            /*
+             * @brief: adds a application bar item to the dictionary member that keeps track
+             *         of what it's added.
+             * @param item Object the item
+             *
+             * @return int the asociated index
+             */
+            public int AddApplicationBarItemIndex(Object item)
+            {
+                //Associate an index to the native object.
+                mApplicationBarItemsIndexes.Add(item, mApplicationBarItemsIndexSeed++);
+                return (mApplicationBarItemsIndexSeed - 1);
             }
         }
     }

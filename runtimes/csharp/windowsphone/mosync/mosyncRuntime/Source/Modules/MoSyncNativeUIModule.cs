@@ -9,18 +9,6 @@ namespace MoSync
         private UIManager mNativeUI;
         private List<IWidget> mWidgets = new List<IWidget>();
 
-        //The application bar item indexes.
-        //When a new button or menu item is added it gets
-        //an index associated. That index is returned when the item is
-        //succesfuly added.
-        private Dictionary<Object, int> mApplicationBarItemsIndexes;
-
-        //The application bar item index seed.
-        //This is a counter that gives the first
-        //index value and it's incremented during
-        //item additions.
-        private int mApplicationBarItemsIndexSeed = 0;
-
 		public IWidget GetWidget(int handle)
 		{
 			if (handle < 0 || handle >= mWidgets.Count)
@@ -43,7 +31,6 @@ namespace MoSync
         {
             mNativeUI = new NativeUI.NativeUIWindowsPhone();
             //mWidgets.Add(null); // why?
-            mApplicationBarItemsIndexes = new Dictionary<Object, int>();
 
             ioctls.maWidgetCreate = delegate(int _widgetType)
             {
@@ -212,7 +199,7 @@ namespace MoSync
 
                 //If the iconPath is not empty and we don't have a predefined icon
                 //then we have an ApplicationBarButton object with a given icon and text.
-                if (!iconPath.Equals("") && 0 == _iconPredefined)
+                if (!iconPath.Equals("") && 0 == _iconPredefined && screen.GetApplicationBar().Buttons.Count < 5)
                 {
                     //Read the text
                     string buttonText = core.GetDataMemory().ReadStringAtAddress(_title);
@@ -225,7 +212,7 @@ namespace MoSync
                     btn.Text = buttonText;
 
                     //Associate an index to the native object.
-                    mApplicationBarItemsIndexes.Add(btn, mApplicationBarItemsIndexSeed++);
+                    int btnIndex = screen.AddApplicationBarItemIndex(btn);
 
                     btn.Click += new EventHandler(
                         delegate(object from, EventArgs target)
@@ -236,17 +223,18 @@ namespace MoSync
                             const int MAWidgetEventData_itemIndex = 8;
                             eventData.WriteInt32(MAWidgetEventData_eventType, MoSync.Constants.MAW_EVENT_OPTIONS_MENU_ITEM_SELECTED);
                             eventData.WriteInt32(MAWidgetEventData_widgetHandle, _widget);
-                            eventData.WriteInt32(MAWidgetEventData_itemIndex, mApplicationBarItemsIndexes[btn]);
+                            eventData.WriteInt32(MAWidgetEventData_itemIndex, btnIndex);
                             //Posting a CustomEvent
                             runtime.PostCustomEvent(MoSync.Constants.EVENT_TYPE_WIDGET, eventData);
                         });
 
                     screen.GetApplicationBar().Buttons.Add(btn);
                     screen.EnableApplicationBar();
+                    return btnIndex;
                 }
                 //If the iconPath is not empty and we have a predefined icon
                 //then we have an ApplicationBarButton object with a predefined icon and text.
-                else if (!iconPath.Equals("") && _iconPredefined > 0 )
+                else if (!iconPath.Equals("") && _iconPredefined > 0 && screen.GetApplicationBar().Buttons.Count < 5)
                 {
                     //Read the text.
                     string buttonText = core.GetDataMemory().ReadStringAtAddress(_title);
@@ -259,7 +247,7 @@ namespace MoSync
                     btn.Text = buttonText;
 
                     //Associate an index to the native object.
-                    mApplicationBarItemsIndexes.Add(btn, mApplicationBarItemsIndexSeed++);
+                    int btnIndex = screen.AddApplicationBarItemIndex(btn);
 
                     btn.Click += new EventHandler(
                         delegate(object from, EventArgs target)
@@ -270,13 +258,16 @@ namespace MoSync
                             const int MAWidgetEventData_itemIndex = 8;
                             eventData.WriteInt32(MAWidgetEventData_eventType, MoSync.Constants.MAW_EVENT_OPTIONS_MENU_ITEM_SELECTED);
                             eventData.WriteInt32(MAWidgetEventData_widgetHandle, _widget);
-                            eventData.WriteInt32(MAWidgetEventData_itemIndex, mApplicationBarItemsIndexes[btn]);
+                            eventData.WriteInt32(MAWidgetEventData_itemIndex, btnIndex);
                             //Posting a CustomEvent
                             runtime.PostCustomEvent(MoSync.Constants.EVENT_TYPE_WIDGET, eventData);
                         });
 
                     screen.GetApplicationBar().Buttons.Add(btn);
                     screen.EnableApplicationBar();
+
+                    //Return the index associated to the item.
+                    return btnIndex;
                 }
                 //If the iconPath is empty then we have an ApplicationBarMenuItem.
                 else
@@ -289,7 +280,7 @@ namespace MoSync
                     menuItem.Text = menuItemText;
 
                     //Associate an index to the native object.
-                    mApplicationBarItemsIndexes.Add(menuItem, mApplicationBarItemsIndexSeed++);
+                    int menuIndex = screen.AddApplicationBarItemIndex(menuItem);
 
                     menuItem.Click += new EventHandler(
                         delegate(object from, EventArgs target)
@@ -300,17 +291,17 @@ namespace MoSync
                             const int MAWidgetEventData_itemIndex = 8;
                             eventData.WriteInt32(MAWidgetEventData_eventType, MoSync.Constants.MAW_EVENT_OPTIONS_MENU_ITEM_SELECTED);
                             eventData.WriteInt32(MAWidgetEventData_widgetHandle, _widget);
-                            eventData.WriteInt32(MAWidgetEventData_itemIndex, mApplicationBarItemsIndexes[menuItem]);
+                            eventData.WriteInt32(MAWidgetEventData_itemIndex, menuIndex);
                             //Posting a CustomEvent
                             runtime.PostCustomEvent(MoSync.Constants.EVENT_TYPE_WIDGET, eventData);
                         });
 
                     screen.GetApplicationBar().MenuItems.Add(menuItem);
                     screen.EnableApplicationBar();
-                }
 
-                //Return the index associated to the item.
-                return (mApplicationBarItemsIndexSeed - 1);
+                    //Return the index associated to the item.
+                    return menuIndex;
+                }
             };
         }
     }

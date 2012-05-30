@@ -34,6 +34,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Shapes;
+using System.Collections.Generic;
 
 namespace MoSync
 {
@@ -52,6 +53,8 @@ namespace MoSync
             public TabScreen() : base()
             {
                 mPivot = new Microsoft.Phone.Controls.Pivot();
+
+                mApplicationBarItemsIndexes = new Dictionary<Object, int>();
 
                 //The application bar is chanded at the SelectionChanged event occurence.
                 //This allows the user to have more that one application bar / tabScreen
