@@ -18,17 +18,23 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 /**
  * File: output-bindings.cpp
  * Author: Mikael Kindborg
- * Summary: Generation of bindings for dynamic languages.
+ *
+ * Summary: Generation of bindings for dynamic languages: Lua and
+ * JavaScript.
+ *
+ * Lua info
+ * --------
+ * Output file is saved in: tools/idl2/Output/lua_maapi.h
+ * See further info in LuaLib project for how this file is used
+ * (you need to copy it manually to the appropriate directory).
+ *
  * Currently generation of Lua bindings in tolua headerfile format.
  * We could also output XML or whatever format that would help
  * dynamic language developers to make bindings to MoSync syscalls.
  *
- * Instructions for Lua:
- *  Output file is in: "tools/idl2/Output/lua_maapi.pkg"
- *  Install tolua: http://www.tecgraf.puc-rio.br/~celes/tolua/
- *  Copy lua_maapi.pkg to the bin folder in the tolua install
- *  Run command: tolua -o lua_maapi.c lua_maapi.pkg
- *  Copy maapi.c to the MobileLua project
+ * JavaScript info
+ * ---------------
+ * Generated file is saved in: libs/Wormhole/jslib/mosync-constants.js
  */
 
 #include "output-bindings.h"
@@ -47,7 +53,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 using namespace std;
 
-// ****************** Lua header file generation starts here ******************
+// ****************** Lua header file generation ******************
 
 static void lua_streamHeaderFile(
 	ostream& stream,
@@ -116,7 +122,6 @@ void lua_outputHeaderFile(
 
 	//lua_streamHelperApi(luaHeaderFile);
 }
-
 
 /**
  * Stream to a header file in a format that tolua understands.
@@ -438,4 +443,89 @@ static void lua_streamConstants(
 	{
 		stream << "//End of defines.\n";
 	}
+}
+
+// ****************** JavaScript file generation ******************
+
+static void js_streamBindingFile(
+	ostream& stream,
+	const Interface& inf,
+	int ix);
+static void js_streamConstants(
+	ostream& stream,
+	const vector<ConstSet>& constSets,
+	int ix);
+
+/**
+ * Generate file with bindings for JavaScript declarations.
+ */
+void js_outputBindingFile(
+	const Interface& maapi,
+	const vector<string>& ixs,
+	const char* destinationFile)
+{
+	ofstream stream(destinationFile);
+
+	// File header.
+	stream << "// File: mosync-constants.js.\n";
+	stream << "// This is a generated file, do not edit.\n";
+	stream << "\n";
+
+	// Do not output all constants, only the ones in IX_WIDGET.
+	//js_streamBindingFile(stream, maapi, MAIN_INTERFACE);
+
+	// Include selected extensions.
+	for (size_t i=0; i<ixs.size(); i++)
+	{
+		// This is where to include an extension.
+		// We want to include NativeUI for now.
+		string s = ixs[i];
+		if (s == "IX_WIDGET"
+			// || s == "IX_OPENGL_ES"
+			)
+		{
+			js_streamBindingFile(stream, maapi, i);
+		}
+	}
+}
+
+/**
+ * Stream definitions in JavaScript format.
+ */
+static void js_streamBindingFile(
+	ostream& stream,
+	const Interface& inf,
+	int ix)
+{
+	// We only generate constants.
+	js_streamConstants(stream, inf.constSets, ix);
+}
+
+/**
+ * Generate constants for use in JavaScript.
+ */
+static void js_streamConstants(
+	ostream& stream,
+	const vector<ConstSet>& constSets,
+	int ix)
+{
+	stream << "// Start of JavaScript constants.\n\n";
+
+	for (size_t i=0; i<constSets.size(); i++)
+	{
+		const ConstSet& cs(constSets[i]);
+		for (size_t j=0; j<cs.constants.size(); j++)
+		{
+			const Constant& c(cs.constants[j]);
+			if (c.ix == ix)
+			{
+				stream <<
+					c.comment <<
+					"mosync." << cs.name << c.name <<
+					" = " << c.value << ";\n\n";
+			}
+		}
+	}
+
+	stream << "// End of JavaScript constants.\n";
 }

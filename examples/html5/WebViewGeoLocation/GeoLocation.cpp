@@ -199,7 +199,7 @@ public:
 		while (isRunning)
 		{
 			maWait(0);
-			while (maGetEvent(&event))
+			while (maGetEvent(&event) && isRunning)
 			{
 				switch (event.type)
 				{
