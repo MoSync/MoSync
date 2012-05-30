@@ -26,7 +26,6 @@ MA 02110-1301, USA.
 #include <maapi.h>
 #include <mastdlib.h> // C string conversion functions
 #include <conprint.h>
-#include <Wormhole/FileUtil.h>
 #include "PhoneGapMessageHandler.h"
 
 namespace Wormhole
@@ -44,6 +43,7 @@ namespace Wormhole
 		mPhoneGapSensorManager(this),
 		mPhoneGapFile(this),
 		mPhoneGapCapture(this),
+		mPhoneGapCamera(this),
 		mPushNotificationManager(this),
 		mBeepSound(0)
 	{
@@ -143,7 +143,11 @@ namespace Wormhole
 		}
 		else if (message.getParam("service") == "File")
 		{
-			mPhoneGapFile.handleMessage(message);
+			mPhoneGapFile.handleFileMessage(message);
+		}
+		else if (message.getParam("service") == "FileTransfer")
+		{
+			mPhoneGapFile.handleFileTransferMessage(message);
 		}
 		else if (message.getParam("service") == "PushNotification")
 		{
@@ -153,6 +157,10 @@ namespace Wormhole
 		{
 			mPhoneGapCapture.handleMessage(message);
 		}
+//		else if (message.getParam("service") == "Camera")
+//		{
+//			mPhoneGapCamera.handleMessage(message);
+//		}
 		else
 		{
 			// Message was not handled.
