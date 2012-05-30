@@ -36,7 +36,6 @@ namespace MoSync
         {
             /**
 		     * Set supported screen orientations.
-		     * Currently implemented on iOS and WindowsPhone 7.1.
 		     * @param orientations A bitmask consisting of flags describing the supported screen orientations.
 		     * The bitmask can be created using \link #MA_SCREEN_ORIENTATION_ MA_SCREEN_ORIENTATION \endlink
 		     * values.
@@ -47,7 +46,7 @@ namespace MoSync
 		     */
             ioctls.maScreenSetSupportedOrientations = delegate(int orientations)
             {
-                // the bitmask contains the flags if the following order:
+                // the bitmask contains the flags in the following order:
                 // PORTRAIT, PORTRAIT_UPSIDE_DOWN, LANDSCAPE_LEFT and LANDSCAPE_RIGHT
                 bool isPortrait = false;
                 bool isLandscape = false;
@@ -67,26 +66,32 @@ namespace MoSync
                 // 00001000
                 // --------
                 // 00001000 != 0 -> the bit at position 4 is 1
-                UInt32 o = UInt32.Parse(orientations.ToString());
-                if ((o & 1) != 0)
+
+                UInt32 o = 0;
+
+                // check if the in param is valid
+                if(!UInt32.TryParse(orientations.ToString(), out o))
+                {
+                    return MoSync.Constants.MA_SCREEN_ORIENTATION_RES_INVALID_VALUE;
+                }
+
+                // check the first and second bits
+                if(((o & 1) != 0) | ((o & (1 << 1)) != 0))
                 {
                     isPortrait = true;
                 }
-                // check the second bit (PORTRAIT_UPSIDE_DOWN)
-                if ((o & (1 << 1)) != 0)
-                {
-                    isPortrait = true;
-                }
-                // check the third bit (LANDSCAPE_LEFT)
+
+                // check the third bit (LANDSCAPE_LEFT) and the forth bit (LANDSCAPE_RIGHT)
                 // we only need to check the Landscape
-                if ((o & (1 << 2)) != 0)
+                if( ((o & (1 << 2)) != 0) | ((o & (1 << 3)) != 0) )
                 {
                     isLandscape = true;
                 }
-                // check the forth bit (LANDSCAPE_RIGHT)
-                if ((o & (1 << 3)) != 0)
+
+                //check if we have an orientation
+                if(!isPortrait && !isLandscape)
                 {
-                    isLandscape = true;
+                    return  MoSync.Constants.MA_SCREEN_ORIENTATION_RES_NOT_SUPPORTED;
                 }
 
                 // after checking the portrait and landscape modes, it's time to set
@@ -111,9 +116,9 @@ namespace MoSync
                 return MoSync.Constants.MA_SCREEN_ORIENTATION_RES_OK;
             };
 
+
             /**
 		     * Set the screen orientation.
-		     * Currently implemented only on Android.
 		     * @param orientation One of the \link #SCREEN_ORIENTATION_LANDSCAPE
 		     * #SCREEN_ORIENTATION_PORTRAIT #SCREEN_ORIENTATION_DYNAMIC \endlink
 		     * constants.
@@ -126,7 +131,7 @@ namespace MoSync
                 if (orientation < 1 || orientation > 3)
                 {
                     // error - not a valid input
-                    return -1;
+                    return MoSync.Constants.MA_SCREEN_ORIENTATION_RES_INVALID_VALUE;
                 }
 
                 MoSync.Util.RunActionOnMainThreadSync(() =>
@@ -155,7 +160,6 @@ namespace MoSync
 
             /**
 		     * Get supported screen orientations.
-		     * Currently implemented on iOS and WindowsPhone 7.1.
 		     * @return A bitmask consisting of flags describing the supported screen orientations.
 		     * The bitmask is created using \link #MA_SCREEN_ORIENTATION_ MA_SCREEN_ORIENTATION \endlink
 		     * values.
@@ -166,6 +170,7 @@ namespace MoSync
                 MoSync.Util.RunActionOnMainThreadSync(() =>
                 {
                     PhoneApplicationPage currentPage = (((PhoneApplicationFrame)Application.Current.RootVisual).Content as PhoneApplicationPage);
+
                     // based on the SupportedOrientations property, we create
                     // a bitmask containing the suported orientations. The bitmask will contain
                     // the orientations in the following order:
@@ -199,7 +204,6 @@ namespace MoSync
 
             /**
 		     * Get current screen orientation.
-		     * Currently implemented on iOS and WindowsPhone 7.1.
 		     * @return One of the \link #MA_SCREEN_ORIENTATION_ MA_SCREEN_ORIENTATION \endlink constants.
 		     */
             ioctls.maScreenGetCurrentOrientation = delegate()
