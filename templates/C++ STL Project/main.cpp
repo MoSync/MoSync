@@ -48,29 +48,31 @@ extern "C" int MAMain()
 	printf("Press zero or back to exit\n");
 	printf("Press key or touch screen\nto add number to vector\n");
 
-	while (TRUE)
+	BOOL isRunning = TRUE;
+	while (isRunning)
 	{
 		maWait(0);
-		maGetEvent(&event);
-
-		if (EVENT_TYPE_CLOSE == event.type)
+		while (maGetEvent(&event))
 		{
-			// Exit while loop.
-			break;
-		}
-		else if (EVENT_TYPE_KEY_PRESSED == event.type)
-		{
-			if (MAK_BACK == event.key || MAK_0 == event.key)
+			if (EVENT_TYPE_CLOSE == event.type)
 			{
-				// Exit while loop.
+				isRunning = FALSE;
 				break;
 			}
+			else if (EVENT_TYPE_KEY_PRESSED == event.type)
+			{
+				if (MAK_BACK == event.key || MAK_0 == event.key)
+				{
+					isRunning = FALSE;
+					break;
+				}
 
-			addAndPrint(v, event.key);
-		}
-		else if (EVENT_TYPE_POINTER_PRESSED == event.type)
-		{
-			addAndPrint(v, event.point.y);
+				addAndPrint(v, event.key);
+			}
+			else if (EVENT_TYPE_POINTER_PRESSED == event.type)
+			{
+				addAndPrint(v, event.point.y);
+			}
 		}
 	}
 
