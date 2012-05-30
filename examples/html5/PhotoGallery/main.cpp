@@ -20,23 +20,83 @@ MA 02110-1301, USA.
  * @file main.cpp
  * @author Mikael Kindborg
  *
- * This file contains the support code at the C++ level for an HTML5/JS
- * application that can access device services from JavaScript.
+ * The PhotoGallery application lets you take pictures using
+ * the device camera and upload them to a server. It also lets
+ * you view the most recent pictures uploaded to the server.
  *
- * You don't need to change anything in this code file unless you
- * wish to add support for functions not available out-of-the box
- * in wormhole.js.
+ * The main purpose is to demonstrate file upload, but the
+ * program illustrates several other programming techniques.
  *
- * When reading the code below, it is good to know that there are
- * two message formats: JSON and string streams. String streams are
- * generally faster. See comments in the code below for further details.
- * PhoneGap uses JSON messages, NativeUI uses string streams.
+ * This application demonstrates the following functionality:
+ *
+ * - Take pictures using the JavaScript Capture API
+ * - Upload of files using the FileTransfer.upload() JavaScript API
+ * - Saving uploaded files on a web server using a PHP script.
+ * - Downloading data from a server, using a custom function added
+ *   to JavaScript.
+ * - A simplified way of adding custom JavaScript message handling
+ *   functions in C++, implemented by the MyMessageHandler class
+ *   (this may be added to the MoSync Wormhole library in an
+ *   upcoming release of MoSync).
+ *
+ * The folder "Server" contains the server side code. Note that this
+ * code is not part of the actual mobile app, but is intended to run
+ * on a web server.
  */
 
 #include <Wormhole/WebAppMoblet.h>
 #include <Wormhole/MessageStream.h>
 #include "MyMessageHandler.h"
 #include "MAHeaders.h"
+
+/**
+ * Forward declaration.
+ */
+class MyMoblet;
+
+/**
+ * Helper class for downloading a list of photos from a server.
+ * This downloader will delete itself upon completion.
+ */
+class MyPhotoListDownloader : public HighLevelTextDownloader
+{
+public:
+	MyMoblet* mMoblet;
+
+	MyPhotoListDownloader(MyMoblet* moblet)
+	{
+		mMoblet = moblet;
+	}
+
+	virtual ~MyPhotoListDownloader()
+	{
+	}
+
+	/**
+	 * Called when download is complete.
+	 * @param text Contains JSON with list of image urls, NULL on error.
+	 */
+	void onDownloadComplete(char* text)
+	{
+		if (NULL != text)
+		{
+			// Download success, call JavaScript with the result.
+			MAUtil::String js = "app.setPhotoList('";
+			js += text;
+			js += "')";
+			mMoblet->callJS(js);
+
+			// We need to free downloaded data explicitly, but the
+			// downloader itself will be deleted automatically.
+			HighLevelTextDownloader::freeData(text);
+		}
+		else
+		{
+			// Download error.
+			mMoblet->callJS("app.setPhotoList(null)");
+		}
+	}
+};
 
 /**
  * The application class.
@@ -64,8 +124,11 @@ public:
 		// The beep sound is defined in file "Resources/Resources.lst".
 		mMyMessageHandler.init(BEEP_WAV, this);
 
-		MyMessageHandlerFun fun = (MyMessageHandlerFun)&MyMoblet::foo;
-		mMyMessageHandler.addMessageFun("DownloadPhotoList", fun);
+		// Register a custom function to handle "DownloadPhotoList"
+		// messages send from JavaScript.
+		mMyMessageHandler.addMessageFun(
+			"DownloadPhotoList",
+			(MyMessageHandlerFun)&MyMoblet::downloadPhotoList);
 	}
 
 	virtual ~MyMoblet()
@@ -83,9 +146,13 @@ public:
 		mMyMessageHandler.keyPressEvent(keyCode, nativeCode);
 	}
 
-	void foo(const Wormhole::MessageStream& stream)
+	void downloadPhotoList(const Wormhole::MessageStream& stream)
 	{
-		lprintfln("@@@ foo!!!!");
+		lprintfln("@@@ downloadPhotoList");
+
+		// Start download.
+		(new MyPhotoListDownloader(this)).get(
+			"http://dev.mosync.com/mobilelua/upload.php");
 	}
 
 	/**
@@ -107,7 +174,6 @@ public:
 
 		mMyMessageHandler.handleWebViewMessage(webView, data, this);
 	}
-
 
 	/**
 	 * For debugging.

@@ -57,10 +57,11 @@ function getPhotoURLs()
 {
 	$urls = getLast100PhotoURLs();
 
+	/*// For debugging.
 	foreach ($urls as $url)
 	{
 		echo "<a href='$url'>$url</a><br/>\n";
-	}
+	}*/
 
 	echo getPhotoURLsAsJSON();
 }
@@ -118,6 +119,8 @@ function getLast100PhotoURLs()
 	return $urls;
 }
 
+// If file data is posted then upload the file,
+// else get the list of image urls.
 if (isset($_FILES["file"]))
 {
 	uploadPhoto();

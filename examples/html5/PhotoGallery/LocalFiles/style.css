@@ -53,10 +53,16 @@ html, body {
 	text-align: center;
 	background: #15D2FF;
 	color: #222222;
-	font-size: 1.4em;
+	font-size: 1.3em;
 	font-weight: bold;
 	-webkit-border-radius: 8px;
 	border-radius: 8px;
-	padding: 15px 10px 15px 10px;
+	padding: 10px 10px 10px 10px;
 	cursor: pointer;
+}
+
+.view {
+	border: 1px solid #222222;
+	/*background: #15D266;*/
+	background: #FFFFFF;
 }

@@ -7,7 +7,7 @@
 	<head>
 		<meta name="viewport" content="width=320, user-scalable=no">
 		<meta http-equiv="Content-type" content="text/html; charset=utf-8">
-		<title>Wormhole Template App</title>
+		<title>Photo Gallery</title>
 		<link rel="stylesheet" href="style.css" type="text/css" media="screen" title="no title" charset="utf-8">
 		<script type="text/javascript" charset="utf-8" src="js/wormhole.js"></script>
 		<script type="text/javascript">
@@ -31,6 +31,11 @@
 			app.uploadPhoto = function()
 			{
 				var fileURL = gFileURL;
+				if (null == fileURL)
+				{
+					alert("First snap a photo");
+					return;
+				}
 
 				var options = new FileUploadOptions();
 				options.fileKey = "file";
@@ -53,8 +58,8 @@
 					},
 					function(error)
 					{
-						alert("Could not uploadi photo - error: " + error.code);
-						console.log("@@Could not uploadi photo - error: " + error.code);
+						alert("Could not upload photo - error: " + error.code);
+						console.log("@@Could not upload photo - error: " + error.code);
 					},
 					options);
 			}
@@ -83,7 +88,7 @@
 						console.log("@@@ gFileURL: " + gFileURL);
 						console.log("@@@ mediaFiles.length: " + mediaFiles.length);
 						var imageElement = document.getElementById('photo');
-						imageElement.setAttribute("src", gFileURL);
+						imageElement.src = gFileURL;
 					},
 					function(error)
 					{
@@ -91,9 +96,46 @@
 					});
 			};
 
+			/**
+			 * Initiate download of list of photos.
+			 * Will call setPhotoList when complete.
+			 */
 			app.downloadPhotoList = function()
 			{
 				mosync.bridge.send(["Custom", "DownloadPhotoList"]);
+			};
+
+			app.downloadPhotoListDebug = function()
+			{
+				app.setPhotoList('["http:\/\/dev.mosync.com\/mobilelua\/PhotoGallery\/photos\/2010-02-07 15.05.13.jpg","http:\/\/dev.mosync.com\/mobilelua\/PhotoGallery\/photos\/testimg.jpg"]');
+			};
+
+			/**
+			 * Called when download of list of photos is
+			 * complete.
+			 * @param json Array of urls (strings) to images.
+			 */
+			app.setPhotoList = function(json)
+			{
+				// Delete existing DOM list of images.
+				var list = document.getElementById("photolist");
+				while(list.hasChildNodes())
+				{
+					list.removeChild(list.firstChild);
+				}
+
+				// Build new list (populate DOM).
+				var urls = JSON.parse(json);
+				var limit = Math.min(20, urls.length);
+				for (var i = 0; i < urls.length; ++i)
+				{
+					var image = document.createElement('img');
+					image.src = urls[i];
+					image.style.width = "100%";
+					// TODO: Add more properties to the image object as needed.
+
+					list.appendChild(image);
+				}
 			};
 
 			return app;
@@ -104,10 +146,14 @@
 		<div id="screen">
 			<div class="pane" id="heading">Photo Gallery</div>
 			<div class="pane button" onclick="app.snapPhoto()">Snap Photo</div>
-			<div class="pane button">
+			<div class="pane view">
 				<img id="photo" src="MoSyncLogo.png" style="width:100%"/>
 			</div>
 			<div class="pane button" onclick="app.uploadPhoto()">Upload Photo</div>
+			<div class="pane button" onclick="app.downloadPhotoList()">Show Uploaded Photos</div>
+			<div class="pane view" id="photolist">
+				<!-- Images are dynamically added here. -->
+			</div>
 		</div>
 	</body>
 </html>
