@@ -20,9 +20,9 @@
 #import "IWidget.h"
 
 /**
- * Displays a map to the user.
+ * Displays a map pin to the user.
  */
-@interface MapWidget: IWidget {
+@interface MapPinWidget: IWidget {
 }
 
 /**
@@ -31,16 +31,16 @@
 - (id)init;
 
 /**
- * Sets a map property.
- * @param key The property of the map widget that should be set.
+ * Sets a map pin property.
+ * @param key The property of the map pin widget that should be set.
  * @param value The value of the property.
  * @return MAW_RES_OK if the property was set, or an error code otherwise.
  */
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value;
 
 /**
- * Returns a property value of the map widget.
- * @param key The property of the map widget.
+ * Returns a property value of the map pin widget.
+ * @param key The property of the map pin widget.
  * @return The value for the given property.
  */
 - (NSString*)getPropertyWithKey: (NSString*)key;
