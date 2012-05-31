@@ -17,12 +17,32 @@
 
 #import <Foundation/Foundation.h>
 #import <MapKit/MKMapView.h>
+#import <MapKit/MapKit.h>
 #import "IWidget.h"
 
 /**
  * Displays a map to the user.
  */
 @interface MapWidget: IWidget {
+	/**
+	 * Contains the center zoom level.
+	 */
+	int centerZoomLevel;
+
+	/**
+	 * Contains the center coordinates of the map.
+	 */
+	CLLocationCoordinate2D centerCoordinates;
+
+	/**
+	 * Contains the upper left corner coordinates of the visible area.
+	 */
+	CLLocationCoordinate2D upperLeftPointCoordinate;
+
+	/**
+	 * Contains the lower right corner coordinates of the visible area.
+	 */
+	CLLocationCoordinate2D lowerRightPointCoordinate;
 }
 
 /**
