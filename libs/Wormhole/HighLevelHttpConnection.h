@@ -37,6 +37,8 @@ MA 02110-1301, USA.
 #include <ma.h>
 #include <maheap.h>
 #include <MAUtil/Connection.h>
+#include <MAUtil/String.h>
+#include <MAUtil/Vector.h>
 
 namespace Wormhole
 {
@@ -150,6 +152,25 @@ class HighLevelHttpConnection :
 public:
 	HighLevelHttpConnection();
 	virtual ~HighLevelHttpConnection();
+
+	/**
+	 * Post an HTTP request.
+	 *
+	 * The HTTP header parameters must be a vector (possibly empty)
+	 * of strings, ordered as key/value pairs.
+	 *
+	 * @param url The url of the POST request.
+	 * @param httpParams HTTP header parameters.
+	 * @param requestBody Data written to the request body.
+	 * @param requestLength Length of the request body.
+	 *
+	 * @return WORMHOLE_HTTP_SUCCESS if successful, WORMHOLE_HTTP_ERROR on error.
+	 */
+	int postRequest(
+		const char* url,
+		MAUtil::Vector<MAUtil::String>& httpParams,
+		const void* requestBody,
+		int requestLength);
 
 	/**
 	 * This is the starting point of the JSON request.

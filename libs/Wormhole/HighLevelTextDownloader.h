@@ -53,14 +53,15 @@ namespace Wormhole
  *
  * class MyTextDownloader : public HighLevelTextDownloader
  * {
+ *   public:
  *     void onDownloadComplete(char* text)
  *     {
- *         // Do something with the text.
+ *       // Do something with the text.
  *     }
  * };
  *
  * // Start download.
- * new MyTextDownloader().get("http://...");
+ * (new MyTextDownloader()).get("http://...");
  */
 class HighLevelTextDownloader : public HighLevelHttpConnection
 {
