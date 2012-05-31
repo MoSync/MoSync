@@ -51,6 +51,7 @@ struct SETTINGS {
 	const char* iOSCert;
 	const char* iOSSdk;
 	const char* iOSXcodeTarget;
+	const char* iOSBundleId;
 	bool iOSgenerateOnly;
 
 	// Windows Phone specific settings
