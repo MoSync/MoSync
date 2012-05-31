@@ -43,7 +43,7 @@ MA 02110-1301, USA.
  * Message handling function type.
  */
 typedef void (Wormhole::WebAppMoblet::*MyMessageHandlerFun)
-	(const Wormhole::MessageStream& stream);
+	(Wormhole::MessageStream& stream);
 
 /**
  * Handler for Wormhole messages of type "Custom".
@@ -65,7 +65,7 @@ public:
 
 	void callMessageFun(
 		const char* command,
-		const Wormhole::MessageStream& stream,
+		Wormhole::MessageStream& stream,
 		Wormhole::WebAppMoblet* moblet);
 
 	void keyPressEvent(int keyCode, int nativeCode);

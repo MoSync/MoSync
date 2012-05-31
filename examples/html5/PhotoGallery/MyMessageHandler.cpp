@@ -68,7 +68,7 @@ void MyMessageHandler::addMessageFun(
 
 void MyMessageHandler::callMessageFun(
 	const char* command,
-	const Wormhole::MessageStream& stream,
+	Wormhole::MessageStream& stream,
 	Wormhole::WebAppMoblet* moblet)
 {
 	MyMessageHandlerFun fun = mFunMap[command];

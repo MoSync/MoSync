@@ -46,24 +46,20 @@ MA 02110-1301, USA.
 
 #include <Wormhole/WebAppMoblet.h>
 #include <Wormhole/MessageStream.h>
+#include <Wormhole/HighLevelTextDownloader.h>
 #include "MyMessageHandler.h"
 #include "MAHeaders.h"
-
-/**
- * Forward declaration.
- */
-class MyMoblet;
 
 /**
  * Helper class for downloading a list of photos from a server.
  * This downloader will delete itself upon completion.
  */
-class MyPhotoListDownloader : public HighLevelTextDownloader
+class MyPhotoListDownloader : public Wormhole::HighLevelTextDownloader
 {
 public:
-	MyMoblet* mMoblet;
+	Wormhole::WebAppMoblet* mMoblet;
 
-	MyPhotoListDownloader(MyMoblet* moblet)
+	MyPhotoListDownloader(Wormhole::WebAppMoblet* moblet)
 	{
 		mMoblet = moblet;
 	}
@@ -78,12 +74,14 @@ public:
 	 */
 	void onDownloadComplete(char* text)
 	{
+		lprintfln("onDownloadComplete");
 		if (NULL != text)
 		{
 			// Download success, call JavaScript with the result.
 			MAUtil::String js = "app.setPhotoList('";
 			js += text;
 			js += "')";
+			lprintfln("js: %s", js.c_str());
 			mMoblet->callJS(js);
 
 			// We need to free downloaded data explicitly, but the
@@ -117,6 +115,8 @@ public:
 		// and the JavaScript code.
 		getWebView()->setVisible(true);
 
+		getWebView()->enableZoom();
+
 		// The page in the "LocalFiles" folder to
 		// show when the application starts.
 		showPage("index.html");
@@ -146,13 +146,17 @@ public:
 		mMyMessageHandler.keyPressEvent(keyCode, nativeCode);
 	}
 
-	void downloadPhotoList(const Wormhole::MessageStream& stream)
+	void downloadPhotoList(Wormhole::MessageStream& stream)
 	{
 		lprintfln("@@@ downloadPhotoList");
 
+		// Get url.
+		const char* url = stream.getNext();
+
+		lprintfln("@@@ url: %s", url);
+
 		// Start download.
-		(new MyPhotoListDownloader(this)).get(
-			"http://dev.mosync.com/mobilelua/upload.php");
+		(new MyPhotoListDownloader(this))->get(url);
 	}
 
 	/**

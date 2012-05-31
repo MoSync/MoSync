@@ -5,7 +5,7 @@
 -->
 <html>
 	<head>
-		<meta name="viewport" content="width=320, user-scalable=no">
+		<meta name="viewport" content="width=320, user-scalable=yes">
 		<meta http-equiv="Content-type" content="text/html; charset=utf-8">
 		<title>Photo Gallery</title>
 		<link rel="stylesheet" href="style.css" type="text/css" media="screen" title="no title" charset="utf-8">
@@ -47,8 +47,7 @@
 
 				transfer.upload(
 					fileURL,
-					//"http://192.168.0.145:4042/",
-					"http://dev.mosync.com/mobilelua/upload.php",
+					"http://dev.mosync.com/mobilelua/PhotoGallery/upload.php",
 					function(result)
 					{
 						alert("Photo uploaded - response: " + result.response);
@@ -102,7 +101,10 @@
 			 */
 			app.downloadPhotoList = function()
 			{
-				mosync.bridge.send(["Custom", "DownloadPhotoList"]);
+				mosync.bridge.send([
+					"Custom",
+					"DownloadPhotoList",
+					"http://dev.mosync.com/mobilelua/PhotoGallery/upload.php"]);
 			};
 
 			app.downloadPhotoListDebug = function()
