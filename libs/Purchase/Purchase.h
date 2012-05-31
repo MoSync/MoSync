@@ -153,11 +153,27 @@ namespace IAP
 		void handleRequestEvent(const MAPurchaseEventData& purchaseData);
 
 		/**
+		 * Notifies one listener about a MA_PURCHASE_EVENT_REQUEST event.
+		 * @param purchaseData Event data.
+		 * @param listener Listener that will be notified.
+		 */
+		void notifyListenerRequestEvent(const MAPurchaseEventData& purchaseData,
+			PurchaseListener* listener);
+
+		/**
 		 * Handle MA_PURCHASE_EVENT_RECEIPT.
 		 * Notifies listeners about the event.
 		 * @param purchaseData Event data.
 		 */
 		void handleReceiptEvent(const MAPurchaseEventData& purchaseData);
+
+		/**
+		 * Notifies one listener about a MA_PURCHASE_EVENT_RECEIPT event.
+		 * @param purchaseData Event data.
+		 * @param listener Listener that will be notified.
+		 */
+		void notifyListenerReceiptEvent(const MAPurchaseEventData& purchaseData,
+			PurchaseListener* listener);
 
 	private:
 		/**

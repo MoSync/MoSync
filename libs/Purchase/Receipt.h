@@ -62,7 +62,7 @@ namespace IAP
 		/**
 		 * Destructor.
 		 */
-		virtual ~Receipt() {};
+		~Receipt() {};
 
 		/**
 		 * Get the product id of the item that was purchased.

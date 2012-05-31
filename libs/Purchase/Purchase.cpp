@@ -158,17 +158,17 @@ namespace IAP
 	 */
 	void Purchase::handlePurchaseEvent(const MAPurchaseEventData& purchaseData)
 	{
-		if (purchaseData.type == MA_PURCHASE_EVENT_PRODUCT_CREATE)
+		switch (purchaseData.type)
 		{
-			this->handleProductCreateEvent(purchaseData);
-		}
-		else if (purchaseData.type == MA_PURCHASE_EVENT_REQUEST)
-		{
-			this->handleRequestEvent(purchaseData);
-		}
-		else if(purchaseData.type == MA_PURCHASE_EVENT_VERIFY_RECEIPT)
-		{
-			this->handleReceiptEvent(purchaseData);
+			case MA_PURCHASE_EVENT_PRODUCT_CREATE:
+				this->handleProductCreateEvent(purchaseData);
+				break;
+			case MA_PURCHASE_EVENT_REQUEST:
+				this->handleRequestEvent(purchaseData);
+				break;
+			case MA_PURCHASE_EVENT_VERIFY_RECEIPT:
+				this->handleReceiptEvent(purchaseData);
+				break;
 		}
 	}
 
@@ -241,20 +241,32 @@ namespace IAP
 		int countListeners = mPurchaseEventListeners.size();
 		for (int i = 0; i < countListeners; i++)
 		{
-			if (purchaseData.state == MA_PURCHASE_STATE_IN_PROGRESS)
-			{
-				mPurchaseEventListeners[i]->requestInProgress(*this);
-			}
-			else if (purchaseData.state == MA_PURCHASE_STATE_COMPLETED)
-			{
-				mPurchaseEventListeners[i]->requestCompleted(*this);
-			}
-			else if (purchaseData.state == MA_PURCHASE_STATE_FAILED)
-			{
-				mPurchaseEventListeners[i]->requestFailed(
-					*this,
-					purchaseData.errorCode);
-			}
+			this->notifyListenerRequestEvent(
+				purchaseData,
+				mPurchaseEventListeners[i]);
+		}
+	}
+
+	/**
+	 * Notifies one listener about a MA_PURCHASE_EVENT_REQUEST event.
+	 * @param purchaseData Event data.
+	 * @param listener Listener that will be notified.
+	 */
+	void Purchase::notifyListenerRequestEvent(
+		const MAPurchaseEventData& purchaseData,
+		PurchaseListener* listener)
+	{
+		switch (purchaseData.state)
+		{
+			case MA_PURCHASE_STATE_IN_PROGRESS:
+				listener->requestInProgress(*this);
+				break;
+			case MA_PURCHASE_STATE_COMPLETED:
+				listener->requestCompleted(*this);
+				break;
+			case MA_PURCHASE_STATE_FAILED:
+				listener->requestFailed(*this, purchaseData.errorCode);
+				break;
 		}
 	}
 
@@ -275,21 +287,32 @@ namespace IAP
 		int countListeners = mPurchaseEventListeners.size();
 		for (int i = 0; i < countListeners; i++)
 		{
-			if (purchaseData.state == MA_PURCHASE_STATE_RECEIPT_VALID)
-			{
-				mPurchaseEventListeners[i]->receiptValid(*this,
-					*mReceipt);
-			}
-			else if (purchaseData.state == MA_PURCHASE_STATE_RECEIPT_INVALID)
-			{
-				mPurchaseEventListeners[i]->receiptInvalid(*this);
-			}
-			else if (purchaseData.state == MA_PURCHASE_STATE_RECEIPT_ERROR)
-			{
-				mPurchaseEventListeners[i]->receiptError(
-					*this,
-					purchaseData.errorCode);
-			}
+			this->notifyListenerReceiptEvent(
+				purchaseData,
+				mPurchaseEventListeners[i]);
+		}
+	}
+
+	/**
+	 * Notifies one listener about a MA_PURCHASE_EVENT_RECEIPT event.
+	 * @param purchaseData Event data.
+	 * @param listener Listener that will be notified.
+	 */
+	void Purchase::notifyListenerReceiptEvent(
+		const MAPurchaseEventData& purchaseData,
+		PurchaseListener* listener)
+	{
+		switch (purchaseData.state)
+		{
+			case MA_PURCHASE_STATE_RECEIPT_VALID:
+				listener->receiptValid(*this, *mReceipt);
+				break;
+			case MA_PURCHASE_STATE_RECEIPT_INVALID:
+				listener->receiptInvalid(*this);
+				break;
+			case MA_PURCHASE_STATE_RECEIPT_ERROR:
+				listener->receiptError(*this, purchaseData.errorCode);
+				break;
 		}
 	}
 

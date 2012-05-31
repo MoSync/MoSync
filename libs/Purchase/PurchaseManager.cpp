@@ -64,7 +64,16 @@ namespace IAP
 		// Remove me as a custom event listener.
 		MAUtil::Environment::getEnvironment().removeCustomEventListener(this);
 		mListeners.clear();
+		mPurchaseMap.clear();
 		mSpecialProducts.clear();
+	}
+
+	/**
+	 * Copy constructor.
+	 */
+	PurchaseManager::PurchaseManager(const PurchaseManager& purchaseManager):
+		MAUtil::CustomEventListener()
+	{
 	}
 
 	/**
@@ -72,7 +81,7 @@ namespace IAP
 	 */
 	PurchaseManager* PurchaseManager::getInstance()
 	{
-		if (NULL == PurchaseManager::sInstance)
+		if (PurchaseManager::sInstance == NULL)
 		{
 			PurchaseManager::sInstance = new PurchaseManager();
 		}
@@ -133,41 +142,23 @@ namespace IAP
 	 */
 	void PurchaseManager::customEvent(const MAEvent& event)
 	{
-		// Check if this is a purchase event.
-		if (EVENT_TYPE_PURCHASE == event.type)
+		if (event.type != EVENT_TYPE_PURCHASE)
 		{
-			MAPurchaseEventData purchaseData = event.purchaseData;
-			if (purchaseData.type == MA_PURCHASE_EVENT_RESTORE)
-			{
-				if ( purchaseData.state == MA_PURCHASE_STATE_RESTORE_ERROR )
-				{
-					int countListeners = mListeners.size();
-					for (int i = 0; i < countListeners; i++)
-					{
-						mListeners[i]->purchaseRestoreError(purchaseData.errorCode);
-					}
-				}
-				else
-				{
-					this->createRestoredProduct(purchaseData.productHandle);
-				}
-			}
-			else if (purchaseData.type == MA_PURCHASE_EVENT_REFUNDED)
-			{
-				this->createRefundedProduct(purchaseData.productHandle);
-			}
-			else
-			{
-				// Check if the purchase exists in the map.
-				if (mPurchaseMap.end() != mPurchaseMap.find(purchaseData.productHandle))
-				{
-					// Get the product object that wraps the product handle.
-					Purchase* purchase = mPurchaseMap[purchaseData.productHandle];
-					// Call the purchase's event handling method.
-					purchase->handlePurchaseEvent(event.purchaseData);
-				}
+			return;
+		}
 
-			}
+		MAPurchaseEventData purchaseData = event.purchaseData;
+		switch (purchaseData.type )
+		{
+			case MA_PURCHASE_EVENT_RESTORE:
+				this->handleProductRestoreEvent(purchaseData);
+				break;
+			case MA_PURCHASE_EVENT_REFUNDED:
+				this->createRefundedProduct(purchaseData.productHandle);
+				break;
+			default:
+				this->notifyListener(purchaseData);
+				break;
 		}
 	}
 
@@ -259,5 +250,44 @@ namespace IAP
 			mListeners[i]->purchaseRefunded(*purchase);
 		}
 		mSpecialProducts.add(purchase);
+	}
+
+	/**
+	 * Handle a MA_PURCHASE_EVENT_RESTORE event.
+	 * Notifies listeners about the event.
+	 * @param purchaseData Event data.
+	 */
+	void PurchaseManager::handleProductRestoreEvent(
+		const MAPurchaseEventData& purchaseData)
+	{
+		if (purchaseData.state == MA_PURCHASE_STATE_RESTORE_ERROR)
+		{
+			int countListeners = mListeners.size();
+			for (int i = 0; i < countListeners; i++)
+			{
+				mListeners[i]->purchaseRestoreError(purchaseData.errorCode);
+			}
+		}
+		else
+		{
+			this->createRestoredProduct(purchaseData.productHandle);
+		}
+	}
+
+	/**
+	 * Forwards an event to its purchase object.
+	 * @param purchaseData purchaseData Event data.
+	 */
+	void PurchaseManager::notifyListener(
+		const MAPurchaseEventData& purchaseData)
+	{
+		// Check if the purchase exists in the map.
+		if (mPurchaseMap.end() != mPurchaseMap.find(purchaseData.productHandle))
+		{
+			// Get the product object that wraps the product handle.
+			Purchase* purchase = mPurchaseMap[purchaseData.productHandle];
+			// Call the purchase's event handling method.
+			purchase->handlePurchaseEvent(purchaseData);
+		}
 	}
 }
