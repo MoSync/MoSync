@@ -43,7 +43,10 @@ namespace NativeUI
 	 * Constructor.
 	 */
 	DatePicker::DatePicker() :
-		Widget(MAW_DATE_PICKER)
+		Widget(MAW_DATE_PICKER),
+		mMaxDate(NULL),
+		mMinDate(NULL),
+		mDisplayedDate(NULL)
 	{
 	}
 
@@ -53,13 +56,13 @@ namespace NativeUI
 	DatePicker::~DatePicker()
 	{
         mDatePickerListeners.clear();
-
-        if(NULL != mMinDate)
-			delete mMinDate;
-        if(NULL != mMaxDate)
-			delete mMaxDate;
-        if(NULL != mDisplayedDate)
-			delete mDisplayedDate;
+//
+//        if(NULL != mMinDate)
+//			delete mMinDate;
+//        if(NULL != mMaxDate)
+//			delete mMaxDate;
+//        if(NULL != mDisplayedDate)
+//			delete mDisplayedDate;
 	}
 
 	/**
