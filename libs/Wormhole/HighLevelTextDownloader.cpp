@@ -88,9 +88,6 @@ void HighLevelTextDownloader::dataDownloaded(MAHandle data, int result)
 
 	// Notify download complete.
 	onDownloadComplete(text);
-
-	// Delete myself!
-	delete this;
 }
 
 } // namespace

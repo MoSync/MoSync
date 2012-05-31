@@ -83,9 +83,6 @@ void HighLevelImageDownloader::dataDownloaded(MAHandle data, int result)
 
 	// Notify download complete.
 	onDownloadComplete(image);
-
-	// Delete myself!
-	delete this;
 }
 
 } // namespace
