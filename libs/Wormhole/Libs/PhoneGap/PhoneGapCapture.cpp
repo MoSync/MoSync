@@ -17,7 +17,7 @@ MA 02110-1301, USA.
 */
 
 /**
- * @file PhoneGapSensors.h
+ * @file PhoneGapCapture.cpp
  * @author Iraklis Rossis
  *
  * Implementation of PhoneGap capture calls made from JavaScript.
@@ -162,11 +162,13 @@ namespace Wormhole
 						"mosync.device.OS",
 						deviceOS,
 						16);
+
+				// TODO: Check that this really works.
 				if(strcmp(deviceOS, "iPhone OS") == 0)
 				{
 					extension = "png";
 				}
-				else if(strcmp(deviceOS, "Android OS") == 0)
+				else if(strcmp(deviceOS, "Android") == 0)
 				{
 					extension = "jpg";
 				}
@@ -187,6 +189,7 @@ namespace Wormhole
 				sprintf(messageBuffer,
 					"{\"message\":[{\"fullPath\":\"%s\",\"name\":\"%s\"}]}",
 					pathBuffer, FileNameFromPath(pathBuffer));
+
 				if(result == MA_CAPTURE_RES_OK)
 				{
 					mMessageHandler->callSuccess(

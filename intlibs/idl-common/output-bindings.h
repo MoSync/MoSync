@@ -18,17 +18,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 /**
  * File: output-bindings.h
  * Author: Mikael Kindborg
- * Summary: Generation of bindings for dynamic languages.
- * Currently generation of Lua bindings in tolua headerfile format.
- * We could also output XML or whatever format that would help
- * dynamic language developers to make bindings to MoSync syscalls.
- *
- * Instructions for Lua:
- *  Output file is in: "tools/idl2/Output/lua_maapi.pkg"
- *  Install tolua: http://www.tecgraf.puc-rio.br/~celes/tolua/
- *  Copy lua_maapi.pkg to the bin folder in the tolua install
- *  Run command: tolua -o lua_maapi.c lua_maapi.pkg
- *  Copy maapi.c to the MobileLua project
+ * See implementation file for further details.
  */
 
 #ifndef OUTPUT_BINDINGS_H
@@ -38,6 +28,11 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 void lua_outputHeaderFile(
 	const Interface& maapi, 
+	const vector<string>& ixs,
+	const char* destinationFile);
+
+void js_outputBindingFile(
+	const Interface& maapi,
 	const vector<string>& ixs,
 	const char* destinationFile);
 

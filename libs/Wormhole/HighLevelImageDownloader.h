@@ -53,14 +53,15 @@ namespace Wormhole
  *
  * class MyImageDownloader : public HighLevelImageDownloader
  * {
+ *   public:
  *     void onDownloadComplete(MAHandle image)
  *     {
- *         // Do something with the image.
+ *       // Do something with the image.
  *     }
  * };
  *
  * // Start download.
- * new MyDownloader().get("http://...");
+ * (new MyDownloader()).get("http://...");
  */
 class HighLevelImageDownloader : public HighLevelHttpConnection
 {
