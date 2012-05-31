@@ -26,9 +26,16 @@ mod.class_eval do
 		copyHeaders
 	end
 
+	def copyResCompilerHeaders()
+		@INSTALL_INCDIR = "ResCompiler"
+		@HEADER_DIRS = ["../ResCompiler"]
+		@IGNORED_HEADERS = ["ByteArrayStream.h", "rescomp.h", "rescompdefines.h", "ResourceSetLookup.h", "VariantResourceLookup.h"]
+		copyHeaders
+	end
+
 	def setup_pipe
 		setup_base
-		@SOURCES = [".", "../libsupc++", "libgcc"]
+		@SOURCES = [".", "../libsupc++", "libgcc", "../ResCompiler"]
 		@EXTRA_INCLUDES = []
 		@IGNORED_FILES = ["new_handler.cc"]
 		@SPECIFIC_CFLAGS = @pipe_specific_cflags
@@ -90,6 +97,7 @@ mod.class_eval do
 
 		copyGlHeaders()
 		copyGl2Headers()
+		copyResCompilerHeaders()
 
 		@HEADER_DIRS = ["."]
 		@INSTALL_INCDIR = "."
