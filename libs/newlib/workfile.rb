@@ -27,11 +27,18 @@ work.instance_eval do
 		copyHeaders
 	end
 
+	def copyResCompilerHeaders()
+		@INSTALL_INCDIR = "ResCompiler"
+		@HEADER_DIRS = ["../ResCompiler"]
+		@IGNORED_HEADERS = ["ByteArrayStream.h", "rescomp.h", "rescompdefines.h", "ResourceSetLookup.h", "VariantResourceLookup.h"]
+		copyHeaders
+	end
+
 	def setup_pipe
 		@SOURCES = ["libc/sys/mosync", "libc/sys/mosync/libgcc", "../libsupc++", "libc/sys/mosync/quad",
 			"libc/misc", "libc/unix", "libc/posix", "libc/locale", "libc/reent", "libc/stdio",
 			"libc/search", "libc/stdlib", "libc/string", "libc/time", "libc/ctype", "libc/errno",
-			"libm/math", "libm/common"]
+			"libm/math", "libm/common", "../ResCompiler"]
 		@EXTRA_INCLUDES = ["libc/include", "libc/sys/mosync", "libm/common"]
 
 		@EXTRA_CFLAGS = " -DUSE_EXOTIC_MATH -Wno-float-equal -Wno-unreachable-code -Wno-sign-compare -Wno-old-style-definition"
@@ -91,6 +98,7 @@ work.instance_eval do
 		copyHeaderDir("machine")
 		copyGlHeaders()
 		copyGl2Headers()
+		copyResCompilerHeaders()
 
 		@prerequisites << CopyFileTask.new(self, mosync_include + '/new',
 			FileTask.new(self, '../libsupc++/new'))
