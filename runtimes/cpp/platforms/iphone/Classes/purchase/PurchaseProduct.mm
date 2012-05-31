@@ -158,6 +158,8 @@ NSString* const kReceiptDateMsKey = @"original_purchase_date_ms";
         _productID = [_restoredPayment.productIdentifier retain];
         _transaction = [transaction retain];
         _product = nil;
+
+        [self createParserComponents];
     }
 
     return self;

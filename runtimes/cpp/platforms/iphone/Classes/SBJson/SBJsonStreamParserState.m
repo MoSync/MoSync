@@ -62,10 +62,6 @@
 	return @"<aaiie!>";
 }
 
-- (BOOL)isError {
-    return NO;
-}
-
 @end
 
 #pragma mark -
@@ -138,10 +134,6 @@ SINGLETON
 
 - (SBJsonStreamParserStatus)parserShouldReturn:(SBJsonStreamParser*)parser {
 	return SBJsonStreamParserError;
-}
-
-- (BOOL)isError {
-    return YES;
 }
 
 @end

@@ -34,7 +34,6 @@
  * @brief MoSync product class.
  */
 @interface PurchaseProduct: NSObject<SKProductsRequestDelegate,
-                                     NSURLConnectionDelegate,
                                      SBJsonStreamParserAdapterDelegate>
 {
     /**

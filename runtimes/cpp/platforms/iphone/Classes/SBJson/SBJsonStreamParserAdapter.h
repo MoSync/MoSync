@@ -70,9 +70,8 @@ typedef enum {
  most likely find it much more convenient to use an instance of this class and
  implement the SBJsonStreamParserAdapterDelegate protocol instead.
 
- The default behaviour is that the delegate only receives one call from
- either the -parser:foundArray: or -parser:foundObject: method when the
- document is fully parsed. However, if your inputs contains multiple JSON
+ Normally you would only get one call from either the -parser:foundArray: or
+ -parser:foundObject: method. However, if your inputs contains multiple JSON
  documents and you set the parser's -supportMultipleDocuments property to YES
  you will get one call for each full method.
 
@@ -118,9 +117,10 @@ typedef enum {
 */
 @interface SBJsonStreamParserAdapter : NSObject <SBJsonStreamParserDelegate> {
 @private
-	NSUInteger depth;
-    NSMutableArray *array;
-	NSMutableDictionary *dict;
+	id<SBJsonStreamParserAdapterDelegate> delegate;
+	NSUInteger levelsToSkip, depth;
+	__weak NSMutableArray *array;
+	__weak NSMutableDictionary *dict;
 	NSMutableArray *keyStack;
 	NSMutableArray *stack;
 
@@ -143,6 +143,6 @@ typedef enum {
  @brief Your delegate object
  Set this to the object you want to receive the SBJsonStreamParserAdapterDelegate messages.
  */
-@property (unsafe_unretained) id<SBJsonStreamParserAdapterDelegate> delegate;
+@property (assign) id<SBJsonStreamParserAdapterDelegate> delegate;
 
 @end

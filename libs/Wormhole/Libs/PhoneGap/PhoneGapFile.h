@@ -26,7 +26,6 @@ MA 02110-1301, USA.
 #ifndef WORMHOLE_LIBS_PHONEGAP_PHONEGAPFILE_H_
 #define WORMHOLE_LIBS_PHONEGAP_PHONEGAPFILE_H_
 
-#include <Wormhole/WebViewMessage.h>
 #include <NativeUI/WebView.h>
 #include <MAUtil/String.h>
 
@@ -84,16 +83,41 @@ namespace Wormhole
 			const MAUtil::String& errorCode
 			);
 
-		/**
-		 * Implementation of File API exposed to JavaScript.
-		 */
-		void handleMessage(JSONMessage& message);
+		void callFileTransferError(
+			const MAUtil::String& callbackID,
+			const MAUtil::String& errorCode,
+			const MAUtil::String& sourceURI,
+			const MAUtil::String& targetURI
+			);
+
+		void callFileUploadResult(
+			const MAUtil::String& callbackID,
+			const MAUtil::String& responseCode, // long
+			const MAUtil::String& bytesSent, // long (unused)
+			const MAUtil::String& response // DOMString (unused)
+			);
 
 		/**
-		 * Return a FileSystem object.
+		 * Implementation of the File API.
+		 * @return true if message was handled, false if not.
+		 */
+		void handleFileMessage(JSONMessage& message);
+
+		/**
+		 * Implementation of the FileTransfer API.
+		 * @return true if message was handled, false if not.
+		 */
+		void handleFileTransferMessage(JSONMessage& message);
+
+		/**
+		 * Return a FileSystem object for the application's
+		 * local file system.
 		 */
 		void actionRequestFileSystem(JSONMessage& message);
 
+		/**
+		 * Return a FileSystem object for the given file URL.
+		 */
 		void actionResolveLocalFileSystemURI(JSONMessage& message);
 
 		/**
@@ -142,6 +166,8 @@ namespace Wormhole
 		 * we talking about? Unsupported for now.
 		 */
 		void actionGetFreeDiskSpace(JSONMessage& message);
+
+		void actionUploadFile(JSONMessage& message);
 
 	private:
 		PhoneGapMessageHandler* mMessageHandler;

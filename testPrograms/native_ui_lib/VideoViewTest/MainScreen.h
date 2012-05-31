@@ -102,6 +102,12 @@ private:
 	bool isAndroid();
 
 	/**
+	 * Detects if the current platform is Windows Phone.
+	 * @return true if the platform is Windows Phone, false otherwise.
+	 */
+	bool isWindowsPhone();
+
+	/**
 	 * Handle the click event for video control button.
 	 * Show/hide the video control and change button's text.
 	 */

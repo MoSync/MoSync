@@ -67,6 +67,11 @@ namespace IAP
 			PurchaseListener* listener);
 
 		/**
+		 * Copy constructor.
+		 */
+		Purchase(const IAP::Purchase &purchase);
+
+		/**
 		 * Destructor.
 		 */
 		~Purchase();

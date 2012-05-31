@@ -39,7 +39,8 @@ namespace PurchaseTest
 	 * changes.
 	 */
 	Test1::Test1(IApplicationController& applicationController):
-		mApplicationController(applicationController)
+		mApplicationController(applicationController),
+		mPurchase(NULL)
 	{
 	}
 
@@ -51,6 +52,7 @@ namespace PurchaseTest
 		if ( mPurchase )
 		{
 			mPurchase->removePurchaseListener(this);
+			delete mPurchase;
 		}
 	}
 
