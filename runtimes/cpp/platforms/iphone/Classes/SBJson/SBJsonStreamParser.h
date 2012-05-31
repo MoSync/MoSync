@@ -99,11 +99,17 @@ typedef enum {
  */
 @interface SBJsonStreamParser : NSObject {
 @private
+	BOOL supportMultipleDocuments;
+	id<SBJsonStreamParserDelegate> delegate;
 	SBJsonTokeniser *tokeniser;
+    NSMutableArray *stateStack;
+	__weak SBJsonStreamParserState *state;
+	NSUInteger maxDepth;
+	NSString *error;
 }
 
-@property (nonatomic, unsafe_unretained) SBJsonStreamParserState *state; // Private
-@property (nonatomic, readonly, strong) NSMutableArray *stateStack; // Private
+@property (nonatomic, assign) __weak SBJsonStreamParserState *state; // Private
+@property (nonatomic, readonly, retain) NSMutableArray *stateStack; // Private
 
 /**
  @brief Expect multiple documents separated by whitespace
@@ -129,7 +135,7 @@ typedef enum {
  Usually this should be an instance of SBJsonStreamParserAdapter, but you can
  substitute your own implementation of the SBJsonStreamParserDelegate protocol if you need to.
  */
-@property (unsafe_unretained) id<SBJsonStreamParserDelegate> delegate;
+@property (assign) id<SBJsonStreamParserDelegate> delegate;
 
 /**
  @brief The max parse depth

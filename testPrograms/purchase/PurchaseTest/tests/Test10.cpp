@@ -112,10 +112,10 @@ namespace PurchaseTest
 	 */
 	void Test10::purchaseRestored(Purchase& purchase)
 	{
+		PurchaseManager::getInstance()->setStoreURL(sAppStoreSandboxURL);
 		char buffer[BUF_MAX];
 		sprintf(buffer, "Product %s was restored", purchase.getProductId().c_str());
 		mApplicationController.log(buffer);
-		printf("creating a copy of purchase");
 		mPurchase = new Purchase(purchase);
 		mPurchase->addPurchaseListener(this);
 		mApplicationController.log("Verifying receipt...");
@@ -203,7 +203,6 @@ namespace PurchaseTest
 		DatabaseProduct* dbProduct = new DatabaseProduct();
 		dbProduct->setProductID(mPurchase->getProductId());
 		int date = maLocalTime();
-		printf("Purchase date(in seconds) = %d", date);
 		dbProduct->setDate(date);
 		database.addRow(*dbProduct);
 		delete dbProduct;

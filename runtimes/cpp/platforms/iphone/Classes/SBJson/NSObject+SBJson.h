@@ -63,17 +63,3 @@
 - (id)JSONValue;
 
 @end
-
-/// Adds JSON parsing methods to NSData
-@interface NSData (NSData_SBJsonParsing)
-
-/**
- @brief Decodes the receiver's JSON data
-
- @return the NSDictionary or NSArray represented by the receiver, or nil on error.
-
- @see @ref json2objc
- */
-- (id)JSONValue;
-
-@end
