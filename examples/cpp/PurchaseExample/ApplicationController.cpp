@@ -26,6 +26,7 @@
 
 #include <maapi.h>
 
+#include "Config.h"
 #include "MainScreen.h"
 #include "ApplicationController.h"
 
@@ -41,7 +42,7 @@ mMainScreen(NULL)
 	mMainScreen->getPurchasedItemList()->addListViewListener(this);
 
 	// Set Android public key.
-	PurchaseManager::getInstance()->setPublicKey("MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAwWroqlfCTQN0m1r9O4G5La2BKOsZCdnHo//QwnUbwW2S3KXjn5NC5VKmsw1/MHUp/9Z9PCWGhc3JWto2dDlIIz+/KKeyjIXEw9tNuu9S+RfB1w+qRa4w8fSFMEJpwGHF/GOBzZ8Hojd64IZ03t0NtEuWQQptAg2HxtLy97E+pHOogKc/BGRoZUzrIaASSrkdTXBcdP/JdObQw4P9gRz/FRUeuaFLEhk+F0aOafmwqYh2aOlYMXju75xav/Q/yK31kwoY4i5NyeBEGqnbnPAVKSzhlxnsffe1qlrFfnaE/UvG0OgWFStwiCHoEMkpdjT0/7WRiT+9p5mHIWx2m7w0VQIDAQAB");
+	PurchaseManager::getInstance()->setPublicKey(DEVELOPER_PUBLIC_KEY);
 }
 
 /**

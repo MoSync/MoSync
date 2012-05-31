@@ -78,7 +78,7 @@ public:
 	/**
 	 * Destructor.
 	 */
-	~MainScreen();
+	virtual ~MainScreen();
 
 	Button* getBuyButton(){ return mBuyButton;}
 	ListView* getPurchasedItemList(){ return mPurchasedItemsList;}
