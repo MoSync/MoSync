@@ -182,13 +182,6 @@
 		43F9CBBB14C4198400DE2285 /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 43F9CBB914C4197400DE2285 /* MobileCoreServices.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		43FBCABF1433627400301E39 /* PimContactItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B46B3B1407FAA5009491A6 /* PimContactItem.m */; };
 		43FBCAC01433627400301E39 /* PimContactsList.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B46B3C1407FAA5009491A6 /* PimContactsList.m */; };
-		5D047B011576926C0063EDC0 /* MapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5D047B001576926C0063EDC0 /* MapKit.framework */; };
-		5D047B39157692D30063EDC0 /* MapWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5D047B38157692D30063EDC0 /* MapWidget.mm */; };
-		5D047B3A157692D30063EDC0 /* MapWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 5D047B37157692D30063EDC0 /* MapWidget.h */; };
-		5D047B3B157692D30063EDC0 /* MapWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5D047B38157692D30063EDC0 /* MapWidget.mm */; };
-		5D047B781576A77E0063EDC0 /* MapPinWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5D047B771576A77E0063EDC0 /* MapPinWidget.mm */; };
-		5D047B791576A77E0063EDC0 /* MapPinWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 5D047B761576A77E0063EDC0 /* MapPinWidget.h */; };
-		5D047B7A1576A77E0063EDC0 /* MapPinWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5D047B771576A77E0063EDC0 /* MapPinWidget.mm */; };
 		85037840133A2275009251E2 /* StackScreenWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8503783F133A2275009251E2 /* StackScreenWidget.mm */; };
 		85037841133A2275009251E2 /* StackScreenWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 8503783E133A2275009251E2 /* StackScreenWidget.h */; };
 		85037842133A2275009251E2 /* StackScreenWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8503783F133A2275009251E2 /* StackScreenWidget.mm */; };
@@ -507,11 +500,6 @@
 		43DFEBFF148620B800757143 /* ScreenOrientation.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ScreenOrientation.mm; sourceTree = "<group>"; };
 		43DFEC4314868FA400757143 /* ScreenWidgetController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ScreenWidgetController.mm; sourceTree = "<group>"; };
 		43F9CBB914C4197400DE2285 /* MobileCoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MobileCoreServices.framework; path = System/Library/Frameworks/MobileCoreServices.framework; sourceTree = SDKROOT; };
-		5D047B001576926C0063EDC0 /* MapKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MapKit.framework; path = System/Library/Frameworks/MapKit.framework; sourceTree = SDKROOT; };
-		5D047B37157692D30063EDC0 /* MapWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MapWidget.h; sourceTree = "<group>"; };
-		5D047B38157692D30063EDC0 /* MapWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MapWidget.mm; sourceTree = "<group>"; };
-		5D047B761576A77E0063EDC0 /* MapPinWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MapPinWidget.h; sourceTree = "<group>"; };
-		5D047B771576A77E0063EDC0 /* MapPinWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MapPinWidget.mm; sourceTree = "<group>"; };
 		8503783E133A2275009251E2 /* StackScreenWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StackScreenWidget.h; sourceTree = "<group>"; };
 		8503783F133A2275009251E2 /* StackScreenWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = StackScreenWidget.mm; sourceTree = "<group>"; };
 		850943291185AF87004A3B2D /* SyscallImpl.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = SyscallImpl.mm; path = impl/SyscallImpl.mm; sourceTree = "<group>"; };
@@ -709,7 +697,6 @@
 				0B10E8D214064DDB00B6DA6B /* MessageUI.framework in Frameworks */,
 				41EB03E4146A69BF0088E3A4 /* libsqlite3.dylib in Frameworks */,
 				41804802147E91050048FB95 /* SystemConfiguration.framework in Frameworks */,
-				5D047B011576926C0063EDC0 /* MapKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -866,7 +853,6 @@
 				850943881185B35D004A3B2D /* AVFoundation.framework */,
 				857B025512C62F5600DEA306 /* QuartzCore.framework */,
 				0B10E8D114064DDB00B6DA6B /* MessageUI.framework */,
-				5D047B001576926C0063EDC0 /* MapKit.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -1123,10 +1109,6 @@
 				85A1591E12F80E520044BBE1 /* WebViewWidget.mm */,
 				0B9095BD13E053C900A91170 /* CameraPreviewWidget.h */,
 				0B9095BE13E053C900A91170 /* CameraPreviewWidget.mm */,
-				5D047B37157692D30063EDC0 /* MapWidget.h */,
-				5D047B38157692D30063EDC0 /* MapWidget.mm */,
-				5D047B761576A77E0063EDC0 /* MapPinWidget.h */,
-				5D047B771576A77E0063EDC0 /* MapPinWidget.mm */,
 			);
 			path = Widgets;
 			sourceTree = "<group>";
@@ -1381,8 +1363,6 @@
 				433134F615345A73005DDAD8 /* SBJsonUTF8Stream.h in Headers */,
 				433134F915345A73005DDAD8 /* SBJsonWriter.h in Headers */,
 				E45110B01520C70000A7467E /* AudioInstanceDynamic.h in Headers */,
-				5D047B3A157692D30063EDC0 /* MapWidget.h in Headers */,
-				5D047B791576A77E0063EDC0 /* MapPinWidget.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1614,8 +1594,6 @@
 				433134FA15345A73005DDAD8 /* SBJsonWriter.m in Sources */,
 				E45110B11520C70000A7467E /* AudioInstanceDynamic.mm in Sources */,
 				E438DF4E1535CCB4008B5005 /* AudioInstanceURL.mm in Sources */,
-				5D047B39157692D30063EDC0 /* MapWidget.mm in Sources */,
-				5D047B781576A77E0063EDC0 /* MapPinWidget.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1737,8 +1715,6 @@
 				433134F815345A73005DDAD8 /* SBJsonUTF8Stream.m in Sources */,
 				433134FB15345A73005DDAD8 /* SBJsonWriter.m in Sources */,
 				E45110B21520C70000A7467E /* AudioInstanceDynamic.mm in Sources */,
-				5D047B3B157692D30063EDC0 /* MapWidget.mm in Sources */,
-				5D047B7A1576A77E0063EDC0 /* MapPinWidget.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

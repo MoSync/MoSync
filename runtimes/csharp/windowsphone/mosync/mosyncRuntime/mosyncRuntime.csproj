@@ -41,9 +41,20 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.Advertising.Mobile, Version=5.2.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+		 <HintPath>Libraries\Microsoft.Advertising.Mobile\Microsoft.Advertising.Mobile.dll</HintPath>
+	</Reference>
+    <Reference Include="Microsoft.Advertising.Mobile.UI, Version=5.2.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+		<HintPath>Libraries\Microsoft.Advertising.Mobile.UI\Microsoft.Advertising.Mobile.UI.dll</HintPath>
+	</Reference>
     <Reference Include="Microsoft.Devices.Sensors" />
     <Reference Include="Microsoft.Phone" />
-    <Reference Include="Microsoft.Phone.Controls.Maps, Version=7.0.0.0, Culture=neutral, PublicKeyToken=24eec0d8c86cda1e, processorArchitecture=MSIL" />
+    <Reference Include="Microsoft.Phone.Controls, Version=7.0.0.0, Culture=neutral, PublicKeyToken=24eec0d8c86cda1e, processorArchitecture=MSIL">
+		<HintPath>Libraries\Microsoft.Phone.Controls\Microsoft.Phone.Controls.dll</HintPath>
+	</Reference>
+    <Reference Include="Microsoft.Phone.Controls.Maps, Version=7.0.0.0, Culture=neutral, PublicKeyToken=24eec0d8c86cda1e, processorArchitecture=MSIL">
+		<HintPath>Libraries\Microsoft.Phone.Controls.Maps\Microsoft.Phone.Controls.Maps.dll</HintPath>
+	</Reference>
     <Reference Include="Microsoft.Xna.Framework" />
     <Reference Include="Microsoft.Xna.Framework.GamerServices" />
     <Reference Include="Microsoft.Xna.Framework.Graphics" />
@@ -60,15 +71,6 @@
     </Reference>
     <Reference Include="Microsoft.Phone.Controls.Toolkit">
       <HintPath>Libraries\Microsoft.Phone.Controls.Toolkit\Oct11\Bin\Microsoft.Phone.Controls.Toolkit.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Phone.Controls">
-      <HintPath>Libraries\Microsoft.Phone.Controls\Microsoft.Phone.Controls.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Advertising.Mobile, Version=5.2.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>Libraries\Microsoft.Advertising.Mobile\Microsoft.Advertising.Mobile.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Advertising.Mobile.UI, Version=5.2.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>Libraries\Microsoft.Advertising.Mobile.UI\Microsoft.Advertising.Mobile.UI.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
