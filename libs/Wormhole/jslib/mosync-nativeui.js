@@ -520,7 +520,11 @@ mosync.nativeui.NativeWidgetElement = function(widgetType, widgetID, params,
 
 	self.eventQueue = [];
 
-	var type = widgetType;
+	self.childList = [];
+
+	//var type = widgetType;
+
+	self.type = widgetType;
 	/**
 	 * Internal function used for synchronizing the widget operations. It makes
 	 * sure that the widget is created before calling any other functions.
@@ -550,11 +554,11 @@ mosync.nativeui.NativeWidgetElement = function(widgetType, widgetID, params,
 	};
 
 	// Detect to see if the current widget is a screen
-	this.isScreen = ((type == "Screen") || (type == "TabScreen") || (type == "StackScreen")) ? true
+	this.isScreen = ((self.type == "Screen") || (self.type == "TabScreen") || (self.type == "StackScreen")) ? true
 			: false;
 
 	// Detect to see if the current widget is a dialog
-	this.isDialog = (type == "ModalDialog") ? true : false;
+	this.isDialog = (self.type == "ModalDialog") ? true : false;
 
 	/*
 	 * if the widgetID is not defined by the user, we will generate one
@@ -590,9 +594,11 @@ mosync.nativeui.NativeWidgetElement = function(widgetType, widgetID, params,
 	 *
 	 * @private
 	 */
-	this.onError = function(errorCode) {
+	this.onError = function(errorCode)
+	{
 		self.latestError = errorCode;
-		if (errorCallback) {
+		if (errorCallback)
+		{
 			errorCallback.apply(null, [ errorCode ]);
 		}
 
@@ -619,11 +625,17 @@ mosync.nativeui.NativeWidgetElement = function(widgetType, widgetID, params,
 	 * 		myWidget.setProperty("width", "100%")
 	 * \endcode
 	 */
-	this.setProperty = function(property, value, successCallback, errorCallback) {
-		if (self.created) {
+	this.setProperty = function(property, value, successCallback, errorCallback)
+	{
+		if (self.created)
+		{
+			self.params[property] = value;
+
 			mosync.nativeui.maWidgetSetProperty(self.id, property, value,
 					successCallback, errorCallback, self.processedMessage);
-		} else {
+		}
+		else
+		{
 			self.commandQueue.push({
 				func : self.setProperty,
 				args : [ property, value, successCallback, errorCallback ]
@@ -642,11 +654,15 @@ mosync.nativeui.NativeWidgetElement = function(widgetType, widgetID, params,
 	 * @param errorCallback
 	 *            a function that will be called if an error occurs
 	 */
-	this.getProperty = function(property, successCallback, errorCallback) {
-		if (self.created) {
+	this.getProperty = function(property, successCallback, errorCallback)
+	{
+		if (self.created)
+		{
 			mosync.nativeui.maWidgetGetProperty(self.id, property,
 					successCallback, errorCallback, self.processedMessage);
-		} else {
+		}
+		else
+		{
 			self.commandQueue.push({
 				func : self.getProperty,
 				args : [ property, successCallback, errorCallback ]
@@ -679,11 +695,15 @@ mosync.nativeui.NativeWidgetElement = function(widgetType, widgetID, params,
 	 *	\endcode
 	 *
 	 */
-	this.addEventListener = function(eventType, listenerFunction) {
-		if (self.created) {
+	this.addEventListener = function(eventType, listenerFunction)
+	{
+		if (self.created)
+		{
 			mosync.nativeui.registerEventListener(self.id, eventType,
 					listenerFunction);
-		} else {
+		}
+		else
+		{
 			self.eventQueue.push({
 				event : eventType,
 				callback : listenerFunction
@@ -723,16 +743,27 @@ mosync.nativeui.NativeWidgetElement = function(widgetType, widgetID, params,
 	 * \endcode
 	 *
 	 */
-	this.addChild = function(childID, successCallback, errorCallback) {
-
-		if ((self.created) && (childID != undefined)) {
-			mosync.nativeui.maWidgetAddChild(self.id, childID, successCallback,
-					errorCallback, self.processedMessage);
-		} else {
-			self.commandQueue.push({
-				func : self.addChild,
-				args : [ childID, successCallback, errorCallback ]
-			});
+	this.addChild = function(childID, successCallback, errorCallback)
+	{
+		if(childID != undefined)
+		{
+			self.childList.push(childID);
+			if ((self.created))
+			{
+				mosync.nativeui.maWidgetAddChild(self.id, childID, successCallback,
+						errorCallback, self.processedMessage);
+			}
+			else
+			{
+				self.commandQueue.push({
+					func : self.addChild,
+					args : [ childID, successCallback, errorCallback ]
+				});
+			}
+		}
+		else
+		{
+			errorCallback.apply(null, "invalid Child Id");
 		}
 	};
 
@@ -768,15 +799,25 @@ mosync.nativeui.NativeWidgetElement = function(widgetType, widgetID, params,
 	 *  myScreen.insertChild(0, "myButton")
 	 * \endcode
 	 */
-	this.insertChild = function(childID, index, successCallback, errorCallback) {
-		if ((self.created) && (childID != undefined)) {
-			mosync.nativeui.maWidgetInsertChild(self.id, childID, index,
-					successCallback, errorCallback, self.processedMessage);
-		} else {
-			self.commandQueue.push({
-				func : self.insertChild,
-				args : [ childID, index, successCallback, errorCallback ]
-			});
+	this.insertChild = function(childID, index, successCallback, errorCallback)
+	{
+		if(childID != undefined)
+		{
+			self.childList.splice(index, 0, childID);
+			if (self.created)
+			{
+				mosync.nativeui.maWidgetInsertChild(self.id, childID, index,
+						successCallback, errorCallback, self.processedMessage);
+			} else {
+				self.commandQueue.push({
+					func : self.insertChild,
+					args : [ childID, index, successCallback, errorCallback ]
+				});
+			}
+		}
+		else
+		{
+			errorCallback.apply(null, "invalid Child Id");
 		}
 	};
 
@@ -813,15 +854,34 @@ mosync.nativeui.NativeWidgetElement = function(widgetType, widgetID, params,
 	 *  myScreen.removeChild("myButton")
 	 * \endcode
 	 */
-	this.removeChild = function(childID, successCallback, errorCallback) {
-		if ((self.created) && (childID != undefined)) {
-			mosync.nativeui.maWidgetRemoveChild(childID, successCallback,
-					errorCallback, self.processedMessage);
-		} else {
-			self.commandQueue.push({
-				func : self.removeChild,
-				args : [ childID, successCallback, errorCallback ]
-			});
+	this.removeChild = function(childID, successCallback, errorCallback)
+	{
+		if(childID != undefined)
+		{
+			if (self.created)
+			{
+				//remove the child ID from the list
+				for(var index in self.childList)
+				{
+					if(self.childList[index] ==  childID)
+					{
+						self.childList.splic(index,1);
+					}
+				}
+				mosync.nativeui.maWidgetRemoveChild(childID, successCallback,
+						errorCallback, self.processedMessage);
+			}
+			else
+			{
+				self.commandQueue.push({
+					func : self.removeChild,
+					args : [ childID, successCallback, errorCallback ]
+				});
+			}
+		}
+		else
+		{
+			errorCallback.apply(null, "invalid Child Id");
 		}
 	};
 
@@ -855,13 +915,20 @@ mosync.nativeui.NativeWidgetElement = function(widgetType, widgetID, params,
 	 *	});
 	 *	\endcode
 	 */
-	this.addTo = function(parentId, successCallback, errorCallback) {
+	this.addTo = function(parentId, successCallback, errorCallback)
+	{
 		var parent = document.getNativeElementById(parentId);
-		if ((self.created) && (parent != undefined) && (parent.created)
-				&& (self.created != undefined)) {
-			mosync.nativeui.maWidgetAddChild(parentId, self.id,
-					successCallback, errorCallback, self.processedMessage);
-		} else {
+		if (
+				(self.created) &&
+				(parent != undefined) &&
+				(parent.created) &&
+				(self.created != undefined)
+			)
+		{
+			parent.addChild(self.id, successCallback, errorCallback);
+		}
+		else
+		{
 			self.commandQueue.push({
 				func : self.addTo,
 				args : [ parentId, successCallback, errorCallback ]
@@ -889,7 +956,16 @@ mosync.nativeui.NativeWidgetElement = function(widgetType, widgetID, params,
 	 *	\endcode
 	 */
 	this.clone = function(newID) {
-		return mosync.nativeui.create(type, newID, self.params);
+		var widgetClone = mosync.nativeui.create(self.type, newID, self.params);
+		for (var index in self.childList)
+		{
+			var currentChild = document.getNativeElementById(self.childList[index]);
+			var newChildID = newID + "child" + index;
+			console.log("cloning " + currentChild.id + "into " + newChildID);
+			var clonedChild = currentChild.clone(newChildID);
+			clonedChild.addTo(newID);
+		}
+		return widgetClone;
 	};
 
 

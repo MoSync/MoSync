@@ -37,6 +37,7 @@ namespace Wormhole
 	 * Take a string that is "percent encoded" and decode it.
 	 * @param str Encoded string.
 	 * @return The decoded string.
+	 * @deprecated Use method unescape in class Encoder.
 	 */
 	MAUtil::String WebViewMessage::unescape(const MAUtil::String& str)
 	{
@@ -74,6 +75,7 @@ namespace Wormhole
 	 * Take a string and "percent encode" it.
 	 * @param str String to be encoded.
 	 * @return The encoded string.
+	 * @deprecated Use method escape in class Encoder.
 	 */
 	MAUtil::String WebViewMessage::escape(const MAUtil::String& str)
 	{

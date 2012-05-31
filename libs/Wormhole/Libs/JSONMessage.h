@@ -50,13 +50,6 @@ namespace Wormhole
 	{
 	public:
 		/**
-		 * Make a JSON stringified string.
-		 */
-		static MAUtil::String JSONMessage::JSONStringify(const char* str);
-
-		static MAUtil::String JSONMessage::base64Encode(const char* input);
-
-		/**
 		 * Constructor.
 		 */
 		JSONMessage(NativeUI::WebView* webView, MAHandle dataHandle);

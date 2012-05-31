@@ -71,6 +71,48 @@ HighLevelHttpConnection::~HighLevelHttpConnection()
 }
 
 /**
+ * Post an HTTP request.
+ *
+ * The HTTP header parameters must be a vector (possibly empty)
+ * of strings, ordered as key/value pairs.
+ *
+ * @param url The url of the POST request.
+ * @param httpParams HTTP header parameters.
+ * @param requestBody Data written to the request body.
+ * @param requestLength Length of the request body.
+ *
+ * @return WORMHOLE_HTTP_SUCCESS if successful, WORMHOLE_HTTP_ERROR on error.
+ */
+int HighLevelHttpConnection::postRequest(
+	const char* url,
+	MAUtil::Vector<MAUtil::String>& httpParams,
+	const void* requestBody,
+	int requestLength)
+{
+	// Create request.
+	int result = create(url, HTTP_POST);
+	if (result < 0)
+	{
+		return WORMHOLE_HTTP_ERROR;
+	}
+
+	// Write headers.
+	for (int i = 0; i < httpParams.size(); i = i + 2)
+	{
+		setRequestHeader(
+			httpParams[i].c_str(),
+			httpParams[i + 1].c_str());
+	}
+
+	// Write request data.
+	write(requestBody, requestLength);
+
+	// Next that happens is that connWriteFinished is called.
+
+	return WORMHOLE_HTTP_SUCCESS;
+}
+
+/**
  * This is the starting point of a JSON request.
  * \return WORMHOLE_HTTP_SUCCESS if successful, WORMHOLE_HTTP_ERROR on error.
  */
@@ -82,9 +124,11 @@ int HighLevelHttpConnection::postJsonRequest(const char* url, const char* jsonDa
 		return WORMHOLE_HTTP_ERROR;
 	}
 
+	// Get length of content (request body).
 	char contentLength[16];
 	sprintf(contentLength, "%i", (int) strlen(jsonData));
 
+	// Set request headers.
 	setRequestHeader("Content-type", "application/json");
 	setRequestHeader("Charset", "UTF-8");
 	setRequestHeader("Content-Length", contentLength);
@@ -142,7 +186,7 @@ void HighLevelHttpConnection::httpFinished(
 	int result)
 {
 	// Known success status codes are 200 and 201.
-	if ( ! (200 == result || 201 == result) )
+	if (200 != result && 201 != result)
 	{
 		// There was an error.
 		dataDownloaded(0, result);
