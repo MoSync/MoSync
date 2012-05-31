@@ -415,7 +415,7 @@ public class MoSyncNativeUI implements RootViewReplacedListener
 	public int maWidgetScreenAddOptionsMenuItem(
 			final int widgetHandle,
 			final String title,
-			final int iconHandle,
+			final String iconHandle,
 			final int iconPredefined)
 	{
 		try

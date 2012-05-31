@@ -245,25 +245,78 @@ namespace MoSync
 				return 0;
 			};
 
-			/*
-			ioctls.maAlert = delegate(int _title, int _message, int _b1, int _b2, int _b3)
-			{
-				String title = core.GetDataMemory().ReadStringAtAddress(_title);
-				String message = core.GetDataMemory().ReadStringAtAddress(_message);
-				List<string> buttons = new List<string>();
-				if (_b1 != 0)
-					buttons.Add(core.GetDataMemory().ReadStringAtAddress(_b1));
-				if (_b2 != 0)
-					buttons.Add(core.GetDataMemory().ReadStringAtAddress(_b2));
-				if (_b3 != 0)
-					buttons.Add(core.GetDataMemory().ReadStringAtAddress(_b3));
+            /**
+             * @author: Ciprian Filipas
+             * @brief: The maAlert ioctl implementation.
+             * @note: On WP7 only 2 buttons are available, OK and CANCEL. Also if the buttons get null values from
+             *        MoSync WP7 platform will automatically add the OK button. Regarding these facts the _b2 button will
+             *        be ignored in the current implementation.
+             */
+            ioctls.maAlert = delegate(int _title, int _message, int _b1, int _b2, int _b3)
+            {
+                String title = "", message = "";
 
-				Guide.BeginShowMessageBox(title, message,
-					buttons, 0, MessageBoxIcon.None, new AsyncCallback(OnAlertMessageBoxClosed), null);
+                if( 0 != _title )
+                    title = core.GetDataMemory().ReadStringAtAddress(_title);
+                if( 0 != _message )
+                    message = core.GetDataMemory().ReadStringAtAddress(_message);
 
-				return 0;
-			};
-			*/
+                if (0 != _b3)
+                {
+                    MoSync.Util.RunActionOnMainThreadSync(() =>
+                        {
+                            MessageBoxResult result = MessageBox.Show(message, title, MessageBoxButton.OKCancel);
+                            if (result == MessageBoxResult.OK)
+                            {
+                                Memory eventData = new Memory(8);
+                                const int MAWidgetEventData_eventType = 0;
+                                const int MAWidgetEventData_eventArgumentValue = 4;
+
+                                //write 1 down since the buttone clicked is the first one
+                                eventData.WriteInt32(MAWidgetEventData_eventType, MoSync.Constants.EVENT_TYPE_ALERT);
+                                eventData.WriteInt32(MAWidgetEventData_eventArgumentValue, 1);
+                                //Posting a CustomEvent
+                                mRuntime.PostEvent(new Event(eventData));
+                            }
+                            else if (result == MessageBoxResult.Cancel)
+                            {
+                                Memory eventData = new Memory(8);
+                                const int MAWidgetEventData_eventType = 0;
+                                const int MAWidgetEventData_eventArgumentValue = 4;
+
+                                //write 1 down since the buttone clicked is the first one
+                                eventData.WriteInt32(MAWidgetEventData_eventType, MoSync.Constants.EVENT_TYPE_ALERT);
+                                eventData.WriteInt32(MAWidgetEventData_eventArgumentValue, 3);
+                                //Posting a CustomEvent
+                                mRuntime.PostEvent(new Event(eventData));
+                            }
+                        }
+                    );
+                }
+                else
+                {
+                    MoSync.Util.RunActionOnMainThreadSync(() =>
+                        {
+                            MessageBox.Show(message, title, MessageBoxButton.OK);
+
+                            // Since the only way to exit the messageBox is by pressing OK there is no
+                            // need for a result object.
+
+                            Memory eventData = new Memory(8);
+                            const int MAWidgetEventData_eventType = 0;
+                            const int MAWidgetEventData_eventArgumentValue = 4;
+
+                            //write 1 down since the buttone clicked is the first one
+                            eventData.WriteInt32(MAWidgetEventData_eventType, MoSync.Constants.EVENT_TYPE_ALERT);
+                            eventData.WriteInt32(MAWidgetEventData_eventArgumentValue, 1);
+                            //Posting a CustomEvent
+                            mRuntime.PostEvent(new Event(eventData));
+                        }
+                    );
+                }
+
+                return 0;
+            };
 
             ioctls.maGetSystemProperty = delegate(int _key, int _buf, int _size)
             {

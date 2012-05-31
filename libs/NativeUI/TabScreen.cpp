@@ -108,7 +108,7 @@ namespace NativeUI
      */
     void TabScreen::handleWidgetEvent(MAWidgetEventData* widgetEventData)
     {
-        Widget::handleWidgetEvent(widgetEventData);
+        Screen::handleWidgetEvent(widgetEventData);
 
         if (MAW_EVENT_TAB_CHANGED == widgetEventData->eventType)
         {

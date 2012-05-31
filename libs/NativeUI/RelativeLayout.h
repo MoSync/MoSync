@@ -56,6 +56,35 @@ namespace NativeUI
 		 * Destructor.
 		 */
 		virtual ~RelativeLayout();
+
+		/**
+		 * Sets the content offset.
+		 * The layout will be scrolled to the given coordinate so its
+		 * left-top visible corner will match the content offset point.
+		 *
+		 * Platform: iOS
+		 * @param xCoord The left coordinate of the content offset point.
+		 * @param yCoord The top coordinate of the content offset point.
+		 */
+		void setContentOffset(const int xCoord, const int yCoord);
+
+		/**
+		 * Get the x coordinate of the content offset point.
+		 * The content offset point repesents the visible top-left point
+		 * of a layout.
+		 * Platform: iOS.
+		 * @return The left coordinate.
+		 */
+		int getContentOffsetCoordX();
+
+		/**
+		 * Get the y coordinate of the content offset point.
+		 * The content offset point repesents the visible top-left point
+		 * of a layout.
+		 * Platform: iOS.
+		 * @return The top coordinate.
+		 */
+		int getContentOffsetCoordY();
 	};
 
 } // namespace NativeUI

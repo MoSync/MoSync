@@ -21,7 +21,9 @@ import java.util.Hashtable;
 
 import android.app.Activity;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 
@@ -750,55 +752,73 @@ public class NativeUI
 	public int maWidgetScreenAddOptionsMenuItem(
 			final int widgetHandle,
 			final String title,
-			final int iconHandle,
+			final String iconHandle,
 			final int iconPredefined)
 	{
 		Widget widget = m_widgetTable.get( widgetHandle );
 		if( widget == null || !(widget instanceof ScreenWidget) )
 		{
-			Log.e( "@@MoSync", "maWidgetScreenAddOptionsMenuItem: Invalid screen widget handle: " + widgetHandle );
+			Log.e( "@@MoSync", "maWidgetScreenAddOptionsMenuItem: Invalid screen widget handle: "
+						+ widgetHandle );
 			return IX_WIDGET.MAW_RES_INVALID_HANDLE;
 		}
 
 		ScreenWidget screen = (ScreenWidget) widget;
 
-		switch(iconPredefined){
-		case 1:
+		// Create a menu item with no icon if iconHandle is left null.
+		if ( TextUtils.isEmpty(iconHandle) )
 		{
-			if ( iconHandle >= IX_WIDGET.MAW_OPTIONS_MENU_ICON_CONSTANT_ADD &&
-					iconHandle <= IX_WIDGET.MAW_OPTIONS_MENU_ICON_CONSTANT_ZOOM )
-			return screen.addMenuItem(title, iconHandle);
+			return screen.addMenuItem(title, null);
+		}
+
+		// Parse iconHandle to get the iconPredefinedId, or iconId.
+		int iconID = 0;
+		try{
+			iconID = Integer.parseInt( iconHandle );
+		}catch ( NumberFormatException nfe)
+		{
+			Log.e("@@MoSync",
+					"maWidgetScreenAddOptionsMenuItem: Error while converting property value: "
+						+ iconHandle);
+			return IX_WIDGET.MAW_RES_INVALID_PROPERTY_VALUE;
+		}
+
+		switch (iconPredefined) {
+		case 1: {
+			// If the icon is predefined, match the iconPath to one of the
+			// OptionsMenuIconConstants constants.
+			if (iconID >= Integer
+					.parseInt(IX_WIDGET.MAW_OPTIONS_MENU_ICON_CONSTANT_ADD)
+					&& iconID <= Integer
+							.parseInt(IX_WIDGET.MAW_OPTIONS_MENU_ICON_CONSTANT_ZOOM))
+				return screen.addMenuItem(title, iconID);
 			else
 			{
-				Log.e("@@MoSync","maWidgetScreenAddOptionsMenuItem: Invalid icon resource ID: " + iconHandle);
-				return IX_WIDGET.MAW_RES_ERROR;
+				Log.e("@@MoSync",
+						"maWidgetScreenAddOptionsMenuItem: Error while converting property value: "
+								+ iconHandle);
+				return IX_WIDGET.MAW_RES_INVALID_PROPERTY_VALUE;
 			}
 		}
 		case 0:
 		{
-			if ( iconHandle >= 0 && m_imageTable.containsKey( iconHandle ) )
+			if ( iconID >= 0 && m_imageTable.containsKey( iconID ) )
 			{
-				Bitmap icon = NativeUI.getBitmap( iconHandle );
+				Bitmap icon = NativeUI.getBitmap( iconID );
 				if( icon != null )
 				{
 					// When adding a new menu item the id is returned.
 					return screen.addMenuItem(title, new BitmapDrawable(icon));
 				}
-				else
-				{
-					Log.e("@@MoSync","maWidgetScreenAddOptionsMenuItem: Invalid icon handle: " + iconHandle);
-					return IX_WIDGET.MAW_RES_ERROR;
-				}
 			}
-			else
-			{
-				return screen.addMenuItem(title, null);
-			}
+			Log.e("@@MoSync","maWidgetScreenAddOptionsMenuItem: Invalid icon handle: " + iconHandle);
+			return IX_WIDGET.MAW_RES_INVALID_PROPERTY_VALUE;
 		}
 		default:
 		{
-			Log.e( "@@MoSync", "maWidgetScreenAddOptionsMenuItem: Invalid iconPredefined value: " + iconPredefined );
-			return IX_WIDGET.MAW_RES_ERROR;
+			Log.e( "@@MoSync", "maWidgetScreenAddOptionsMenuItem: Invalid iconPredefined value: "
+						+ iconPredefined );
+			return IX_WIDGET.MAW_RES_INVALID_PROPERTY_VALUE;
 		}
 		}
 	}

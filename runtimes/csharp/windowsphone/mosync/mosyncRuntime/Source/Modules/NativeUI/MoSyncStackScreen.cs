@@ -68,6 +68,8 @@ namespace MoSync
                             mPage.Children.Add((child as Screen).View);
                             Grid.SetColumn(mPage.Children[mPage.Children.Count - 1] as Grid, 0);
                             Grid.SetRow(mPage.Children[mPage.Children.Count - 1] as Grid, 0);
+
+                            ToggleApplicationBar((child as Screen));
                         });
                 }
                 /**
@@ -112,6 +114,8 @@ namespace MoSync
                         mPage.Children.Add((mStack.Peek() as Screen).View);
                         Grid.SetColumn(mPage.Children[mPage.Children.Count - 1] as Grid, 0);
                         Grid.SetRow(mPage.Children[mPage.Children.Count - 1] as Grid, 0);
+
+                        ToggleApplicationBar((mStack.Peek() as Screen));
 					});
                 }
             }
@@ -134,6 +138,7 @@ namespace MoSync
                     mPage.Children.Add((mStack.Peek() as Screen).View);
                     Grid.SetColumn(mPage.Children[mPage.Children.Count - 1] as Grid, 0);
                     Grid.SetRow(mPage.Children[mPage.Children.Count - 1] as Grid, 0);
+                    ToggleApplicationBar((mStack.Peek() as Screen));
                 }
             }
 
@@ -195,6 +200,33 @@ namespace MoSync
             public int StackCount()
             {
                 return mStack.Count;
+            }
+
+            /*
+             * Toggles the application bar for the screen given as parameter.
+             * @param child the screen for which the application bar should be changed / updated.
+             */
+            private void ToggleApplicationBar(Screen child)
+            {
+                bool appBarVisible = child.GetApplicationBarVisibility();
+                if (appBarVisible)
+                {
+                    mApplicationBar = child.GetApplicationBar();
+                    mApplicationBar.IsVisible = true;
+                    this.SetApplicationBarVisibility(true);
+                    ((Application.Current.RootVisual as Microsoft.Phone.Controls.PhoneApplicationFrame).Content as
+                        Microsoft.Phone.Controls.PhoneApplicationPage).ApplicationBar = mApplicationBar;
+                }
+                else
+                {
+                    this.SetApplicationBarVisibility(false);
+                    if (((Application.Current.RootVisual as Microsoft.Phone.Controls.PhoneApplicationFrame).Content as
+                        Microsoft.Phone.Controls.PhoneApplicationPage).ApplicationBar != null)
+                    {
+                        ((Application.Current.RootVisual as Microsoft.Phone.Controls.PhoneApplicationFrame).Content as
+                        Microsoft.Phone.Controls.PhoneApplicationPage).ApplicationBar.IsVisible = false;
+                    }
+                }
             }
         }
     }

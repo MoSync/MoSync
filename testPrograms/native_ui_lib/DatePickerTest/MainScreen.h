@@ -134,6 +134,8 @@ private:
 
 	DatePicker* mDatePicker;
 
+	int mScreenY, mScreenX;
+
 	void CreateMaxDateLayout();
 	void CreateMinDateLayout();
 };

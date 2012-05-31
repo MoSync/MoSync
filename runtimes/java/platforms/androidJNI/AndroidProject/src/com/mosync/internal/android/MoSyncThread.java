@@ -53,6 +53,7 @@ import static com.mosync.internal.generated.MAAPI_consts.MA_RESOURCE_CLOSE;
 import static com.mosync.internal.generated.MAAPI_consts.MA_WAKE_LOCK_ON;
 import static com.mosync.internal.generated.MAAPI_consts.MA_WAKE_LOCK_OFF;
 
+
 import java.io.File;
 import java.io.FileDescriptor;
 import java.io.FileInputStream;
@@ -111,6 +112,7 @@ import android.provider.Settings.Secure;
 import android.net.ConnectivityManager;
 
 import com.mosync.internal.android.MoSyncFont.MoSyncFontHandle;
+import com.mosync.internal.android.billing.PurchaseManager;
 import com.mosync.internal.android.nfc.MoSyncNFC;
 import com.mosync.internal.android.nfc.MoSyncNFCService;
 import com.mosync.internal.generated.IX_OPENGL_ES;
@@ -122,6 +124,8 @@ import com.mosync.java.android.TextBox;
 import com.mosync.nativeui.ui.widgets.MoSyncCameraPreview;
 import com.mosync.nativeui.ui.widgets.ScreenWidget;
 import com.mosync.nativeui.util.AsyncWait;
+import com.mosync.nativeui.util.properties.IntConverter;
+import com.mosync.nativeui.util.properties.PropertyConversionException;
 
 /**
  * Thread that runs the MoSync virtual machine and handles all syscalls.
@@ -183,6 +187,7 @@ public class MoSyncThread extends Thread
 	MoSyncAds mMoSyncAds;
 	MoSyncNotifications mMoSyncNotifications;
 	MoSyncCapture mMoSyncCapture;
+	MoSyncPurchase mMoSyncPurchase;
 	MoSyncDB mMoSyncDB;
 
 	/**
@@ -426,6 +431,8 @@ public class MoSyncThread extends Thread
 
 		mMoSyncCapture = new MoSyncCapture(this, mImageResources);
 
+		mMoSyncPurchase = new MoSyncPurchase(this);
+
 		mMoSyncDB = new MoSyncDB();
 
 		mConnectivityManager = (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -445,6 +452,7 @@ public class MoSyncThread extends Thread
 
 		// Turn on sensors.
 		mMoSyncSensor.onResume();
+		mMoSyncPurchase.restoreService();
 	}
 
 	public void onPause()
@@ -474,6 +482,14 @@ public class MoSyncThread extends Thread
 		{
 			mMoSyncNetwork.killAllConnections();
 			mMoSyncNetwork = null;
+		}
+		if (null != mMoSyncPurchase)
+		{
+			/**
+			 * Unbind from the MarketBillingService.
+			 */
+			mMoSyncPurchase.unbindService();
+			mMoSyncPurchase = null;
 		}
 	}
 
@@ -3647,6 +3663,183 @@ public class MoSyncThread extends Thread
 	}
 
 	/**
+	* \brief Check if in app purchase is supported/enabled on a device.
+	* It does not trigger any asynchronous responses.
+	* Platform: Android and iOS.
+	*
+	* \returns One of the next result codes:
+	* - #MA_PURCHASE_RES_OK if purchase is supported/allowed on the device.
+	* - #MA_PURCHASE_RES_DISABLED if purchase is not allowed/enabled.
+	* - #MA_PURCHASE_RES_UNAVAILABLE if purchase is not supported on the device.
+	* - #MA_PURCHASE_RES_OUT_OF_DATE if GooglePlay application is out of date.
+	* - #MA_PURCHASE_RES_CONNECTION_ERROR if there was an error connecting with the GooglePlay application.
+	*/
+	int maPurchaseSupported()
+	{
+		return mMoSyncPurchase.maPurchaseSupported();
+	}
+
+	/**
+	* \brief Create a product object asynchronously.
+	* The product is validated only on iOS. On the other hand, on Android the validation
+	* will be done during a maPurchaseRequest.
+	*
+	* A #EVENT_TYPE_PURCHASE will be sent after calling this syscall.
+	* The event will contain a MAPurchaseEventData struct object. The type member object
+	* contained by the struct will be #MA_PURCHASE_EVENT_PRODUCT_CREATE. The state member
+	* object can have one of the following values:
+	* - #MA_PURCHASE_STATE_PRODUCT_VALID
+	*				- on iOS if the product was validated by the App Store,
+	*				- on Android if the product was internally allocated.
+    * - #MA_PURCHASE_STATE_PRODUCT_INVALID the product is not valid in the App Store.
+    * - #MA_PURCHASE_STATE_DISABLED purchase is not supported/disabled on the device.
+    * - #MA_PURCHASE_STATE_DUPLICATE_HANDLE the given productHandle already exists.
+	* Use #maCreatePlaceholder() to generate a new one.
+	*
+	* \param productHandle A valid handle that will be used to indetify the new product.
+	* It must be unique. It is highly recommended to create it using #maCreatePlaceholder().
+	* \param productID String that identifies the product. This string must be used by the
+	* App Store / Google Play to identify the product.
+	*/
+	void maPurchaseCreate(final int productHandle, final String productID)
+	{
+		mMoSyncPurchase.maPurchaseCreate(productHandle, productID);
+	}
+
+	/**
+	* \brief Set your Google Play public key to the application. This enables the application
+	* to verify the signature of the transaction information that is returned from Google Play.
+	* Must be set before #maVerifyReceipt.
+	* Platform: Android.
+	*
+	* \param developerKey Base64-encoded public key, that can be found on the Google
+	* Play publisher account page, under Licensing & In-app Billing panel in Edit Profile.
+	*/
+	void maPurchaseSetPublicKey(final String developerPublicKey)
+	{
+		mMoSyncPurchase.maPurchaseSetPublicKey(developerPublicKey);
+	}
+
+	/**
+	* Request the user to purchase a product.
+	* The system will handle the proccess of purchasing.
+	* Note: if there are another requests in progress, the requests will be queued.
+	*
+	* A #EVENT_TYPE_PURCHASE will be sent after calling this syscall.
+	* The event will contain a MAPurchaseEventData struct object. The type member object
+	* contained by the struct is #MA_PURCHASE_EVENT_REQUEST. The state member object can
+	* have one of the following values:
+    * - #MA_PURCHASE_STATE_DISABLED purchase is not supported/disabled on the device.
+	* - #MA_PURCHASE_STATE_FAILED if the operation has failed. Check the errorCode member object
+	* for more information about the reason.
+	* - #MA_PURCHASE_STATE_IN_PROGRESS indicates that the transaction has been received by
+	* the App Store / Google Play.
+	* - #MA_PURCHASE_STATE_COMPLETED indicates that the transaction has been successfully processed.
+	*
+	* \param productHandle Handle to the product to be purchased.
+	* \param quantity How many products to be purchased. Must be a value greater than zero.
+	* This param is ignored on Android, as any purchase request can handle only one item.
+	*/
+	void maPurchaseRequest(final int productHandle)
+	{
+		mMoSyncPurchase.maPurchaseRequest(productHandle);
+	}
+
+	/**
+	* Verify if the receipt came from Apple App Store / Google Play.
+	* Make sure that the product is purchased before calling this syscall.
+	*
+	* A #EVENT_TYPE_PURCHASE will be sent after calling this syscall.
+	* The event will contain a MAPurchaseEventData struct object. The type member object
+	* contained by the struct is #MA_PURCHASE_EVENT_VERIFY_RECEIPT.The state member object
+	* can have one of the following values:
+    * - #MA_PURCHASE_STATE_DISABLED purchase is not supported/disabled on the device.
+	* - #MA_PURCHASE_STATE_RECEIPT_VALID indicates that the transaction has been validated
+	* by the App Store / Google Play.
+	* - #MA_PURCHASE_STATE_RECEIPT_INVALID indicates that the transaction is invalid.
+	* - #MA_PURCHASE_STATE_RECEIPT_ERROR indicates that an error occurred while verifying
+	* the receipt. Check the errorCode member object for more information about the reason.
+    *
+	* \param productHandle Handle to the product that has been purchased.
+	* - #MA_PURCHASE_RES_PUBLIC_KEY_NOT_SET.
+	*/
+	void maPurchaseVerifyReceipt(final int productHandle)
+	{
+		mMoSyncPurchase.maPurchaseVerifyReceipt(productHandle);
+	}
+
+	/**
+	* Get product id using a product handle.
+	*
+	* \param productHandle Handle to the given product.
+	* \param buffer Will contain the product id.
+	* \param bufferSize Maximum size of the buffer.
+	* \return In case of error:
+	* - #MA_PURCHASE_RES_INVALID_HANDLE if productHandle is invalid.
+	* - #MA_PURCHASE_RES_BUFFER_TOO_SMALL if the given handle is too small.
+	* In case of success returns the number of written bytes.
+	*/
+	int maPurchaseGetName(
+			final int productHandle,
+			final int memBuffer,
+			final int memSize)
+	{
+		return mMoSyncPurchase.maPurchaseGetName(productHandle, memBuffer, memSize);
+	}
+
+	/**
+	* Get a field value contained by the receipt.
+	* Make sure that the given product has a valid receipt.
+	* Call the maPurchaseVerifyReceipt() syscall and wait for a #MA_PURCHASE_EVENT_RECEIPT_VALID
+	* purchase event type.
+	*
+	* \param productHandle Handle to the product that has been purchased.
+	* \param property The name of the field.
+	* \param buffer Will be filled with the filed value.
+	* \param bufferSize The maximum size of the buffer, in bytes.
+	* \return The number of written bytes into buffer(a value greater than zero), or one
+	* of the following error codes(a value smaller that zero):
+	* - #MA_PURCHASE_RES_OK if the request has been send to the store for verifying.
+	* - #MA_PURCHASE_RES_INVALID_HANDLE if the productHandle is invalid.
+	* - #MA_PURCHASE_RES_RECEIPT if the product has not been purchased.
+	* - #MA_PURCHASE_RES_DISABLED if purchase is not allowed/enabled.
+	*/
+	int maPurchaseGetField(
+			final int productHandle,
+			final String property,
+			final int memBuffer,
+			final int bufferSize)
+	{
+		return mMoSyncPurchase.maPurchaseGetField(productHandle, property, memBuffer, bufferSize);
+	}
+
+	/**
+	* Restore transactions that were previously finished so that you can process them again.
+	* For example, your application would use this to allow a user to unlock previously purchased
+	* content onto a new device.
+	*
+	* A #EVENT_TYPE_PURCHASE will be sent after calling this syscall.
+	* The event will contain a #MAPurchaseEventData struct object. The type member object
+	* contained by the struct will be #MA_PURCHASE_EVENT_RESTORE. The productHandle member object
+	* will contain a handle to the new product. Make sure you destroy the product after done
+	* working with it.
+	*/
+	void maPurchaseRestoreTransactions()
+	{
+		mMoSyncPurchase.maPurchaseRestoreTransactions();
+	}
+
+	/**
+	* Destroy a product object.
+	* \param productHandle Handle to the product to destroy.
+	* If the given handle is invalid the method does nothing.
+	*/
+	int maPurchaseDestroy(int handle)
+	{
+		return mMoSyncPurchase.maPurchaseDestroy(handle);
+	}
+
+	/**
 	 * Send the application to background.
 	 * @return
 	 */
@@ -4190,7 +4383,7 @@ public class MoSyncThread extends Thread
 	public int maWidgetScreenAddOptionsMenuItem(
 			final int widgetHandle,
 			final String title,
-			final int iconHandle,
+			final String iconHandle,
 			final int iconPredefined)
 	{
 		return mMoSyncNativeUI.maWidgetScreenAddOptionsMenuItem(
