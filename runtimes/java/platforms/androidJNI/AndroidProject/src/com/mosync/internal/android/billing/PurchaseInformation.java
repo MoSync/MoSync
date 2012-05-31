@@ -49,7 +49,7 @@ public class PurchaseInformation
         mNotificationID = notificationId;
         mProductID = productId;
         mOrderID = orderId;
-        mTime = purchaseTime;
+        mTime = purchaseTime/1000;
         mPackageName = packageName;
         mPayload = payload;
         if ( !TextUtils.isEmpty(payload) )
@@ -76,11 +76,6 @@ public class PurchaseInformation
 		return mPackageName;
 	}
 
-	public long getTime()
-	{
-		return mTime;
-	}
-
 	public void setPackageName(final String pck)
 	{
 		mPackageName = pck;
@@ -99,11 +94,6 @@ public class PurchaseInformation
 	public void setState(final int state)
 	{
 		mState = state;
-	}
-
-	public void setTime(long time)
-	{
-		mTime = time;
 	}
 
 	public int getState()
@@ -155,7 +145,11 @@ public class PurchaseInformation
 	public String mNotificationID;
 	public String mOrderID;
 	public String mPackageName;
-	private long mTime;
+	/**
+	 * The time the product was purchased, in milliseconds since the epoch (Jan 1, 1970).
+	 * Send it to MoSync in seconds.
+	 */
+	public long mTime;
 	public String mPayload;
 
 	/**

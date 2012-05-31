@@ -27,6 +27,7 @@ MA 02110-1301, USA.
 #include <mawstring.h>
 #include <mastdlib.h>
 
+#include "MAHeaders.h"
 #include "FirstScreen.h"
 
 #define CLEAR_MENU "Clear Menu"
@@ -45,7 +46,7 @@ FirstScreen::FirstScreen() :
 	this->setTitle("First");
 
 	Label* info = new Label();
-	info->setText("First screen.2 Menu items with icons:save and search");
+	info->setText("First screen.2 Menu items with icons:save and search, one item with title only, and one item with custom image.");
 	mMainLayout->addChild(info);
 
 	mClearOptions = new Button();
@@ -57,8 +58,10 @@ FirstScreen::FirstScreen() :
 	mEventsList->fillSpaceVertically();
 	mMainLayout->addChild(mEventsList);
 
-	Screen::addOptionsMenuItem("First screen menu item 0", MAW_OPTIONS_MENU_ICON_CONSTANT_SAVE,true);
-	Screen::addOptionsMenuItem("First screen menu item 1", MAW_OPTIONS_MENU_ICON_CONSTANT_SEARCH, true);
+	Screen::addOptionsMenuItem("First screen menu item 0", MAW_OPTIONS_MENU_ICON_CONSTANT_SAVE, false);
+	Screen::addOptionsMenuItem("First screen menu item 1", MAW_OPTIONS_MENU_ICON_CONSTANT_SEARCH, false);
+	Screen::addOptionsMenuItem("First screen menu item 2");
+	Screen::addOptionsMenuItem("First screen menu item 3", RES_IMAGE);
 	this->addScreenListener(this);
 	mClearOptions->addButtonListener(this);
 }
@@ -113,8 +116,10 @@ void FirstScreen::buttonClicked(Widget* button)
 		}
 		else
 		{
-			Screen::addOptionsMenuItem("First screen menu item 0", MAW_OPTIONS_MENU_ICON_CONSTANT_SAVE,true);
-			Screen::addOptionsMenuItem("First screen menu item 1", MAW_OPTIONS_MENU_ICON_CONSTANT_SEARCH, true);
+			Screen::addOptionsMenuItem("First screen menu item 0", MAW_OPTIONS_MENU_ICON_CONSTANT_SAVE,false);
+			Screen::addOptionsMenuItem("First screen menu item 1", MAW_OPTIONS_MENU_ICON_CONSTANT_SEARCH, false);
+			Screen::addOptionsMenuItem("First screen menu item 2");
+			Screen::addOptionsMenuItem("First screen menu item 3", RES_IMAGE);
 			mClearOptions->setText(CLEAR_MENU);
 		}
 	}

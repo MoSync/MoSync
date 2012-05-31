@@ -8234,7 +8234,7 @@ group WidgetAPI "Widget API" {
 	* which the user can open by selecting More. Those items do not display icons.
 	* \param widget Handle to the screen widget.
 	* \param title The title associated for the new item. Can be left null.
-	* \param iconPath The path to an image or  a predefined icon, one of the \link #MAW_OPTIONS_MENU_ICON_CONSTANT \endlink constants.
+	* \param iconPath The path to an image or  a predefined icon, one of the \link #MAW_OPTIONS_MENU_ICON_CONSTANT_ADD \endlink constants.
 	* Note that for Windows phone 7 the option menu icons must be added under the following folder
 	* structure "/ApplicationBarIcons/". The function is called with the name of the icon file.
 	* e.g. maWidgetScreenAddOptionsMenuItem(ScreenHandle, "test", "optionsMenuItemIcon.png", 0); where the

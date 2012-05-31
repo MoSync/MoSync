@@ -45,6 +45,7 @@
 #include "../tests/Test10.h"
 
 #include "../Util.h"
+#include "Config.h"
 
 namespace PurchaseTest
 {
@@ -79,10 +80,19 @@ namespace PurchaseTest
 		}
 		else
 		{
-			this->log("Creating tests...");
-			this->createTests();
-			this->log("Tests are created!");
-			this->runNextTest();
+			MAUtil::String developerKey = DEVELOPER_PUBLIC_KEY;
+			if ( developerKey.size() == 0 )
+			{
+				maAlert("Error", "You need to set developer key in Config.h ",
+					"OK", NULL, NULL);
+			}
+			else
+			{
+				this->log("Creating tests...");
+				this->createTests();
+				this->log("Tests are created!");
+				this->runNextTest();
+			}
 		}
 	}
 
@@ -171,6 +181,7 @@ namespace PurchaseTest
 	void ApplicationController::createTests()
 	{
 		mTests.add(new Test1(*this));
+		// Test2 will always succeed on iOS.
 		mTests.add(new Test2(*this));
 		mTests.add(new Test3(*this));
 		mTests.add(new Test4(*this));

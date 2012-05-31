@@ -209,7 +209,7 @@ public class PurchaseManager extends BillingListener
 	 * @return The receipt field value.
 	 */
 	public String getField(int handle, String field)
-	{Log.e("@@MoSync"," IN getField -----------------" + field);
+	{
 		PurchaseInformation purchase = m_PurchaseTable.get(handle);
 		if ( null != purchase )
 		{
@@ -223,7 +223,7 @@ public class PurchaseManager extends BillingListener
 			}
 			if ( field.equals(MA_PURCHASE_RECEIPT_PURCHASE_DATE) )
 			{
-				return String.valueOf(purchase.getTime());
+				return String.valueOf(purchase.mTime);
 			}
 			if ( field.equals(MA_PURCHASE_RECEIPT_APP_ITEM_ID) )
 			{
@@ -377,7 +377,7 @@ public class PurchaseManager extends BillingListener
 		currentPurchase.setNotificationID(purchase.getNotificationId());
 		currentPurchase.setState(purchase.getState());
 		currentPurchase.setOrderId(purchase.getOrderId());
-		currentPurchase.setTime(purchase.getTime());
+		currentPurchase.mTime = purchase.mTime;
 		currentPurchase.setPackageName(purchase.getPackageName());
 	}
 

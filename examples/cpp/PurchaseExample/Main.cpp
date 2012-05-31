@@ -37,6 +37,7 @@ MA 02110-1301, USA.
 
 #include "Util.h"
 #include "ApplicationController.h"
+#include "Config.h"
 
 using namespace MAUtil;
 using namespace NativeUI;
@@ -70,7 +71,16 @@ public:
 		}
 		else
 		{
-			mController = new ApplicationController();
+			MAUtil::String developerKey = DEVELOPER_PUBLIC_KEY;
+			if ( developerKey.size() == 0 )
+			{
+				maAlert("Error", "You need to set developer key in Config.h ",
+					"OK", NULL, NULL);
+			}
+			else
+			{
+				mController = new ApplicationController();
+			}
 		}
 	}
 
@@ -79,7 +89,8 @@ public:
 	 */
 	virtual ~NativeUIMoblet()
 	{
-		delete mController;
+		if (mController)
+			delete mController;
 	}
 	/**
 	 * This method is called when the application is closed.

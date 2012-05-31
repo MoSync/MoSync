@@ -26,6 +26,7 @@
 
 #include <maapi.h>
 
+#include "Config.h"
 #include "MainScreen.h"
 #include "ApplicationController.h"
 
@@ -41,7 +42,7 @@ mMainScreen(NULL)
 	mMainScreen->getPurchasedItemList()->addListViewListener(this);
 
 	// Set Android public key.
-	PurchaseManager::getInstance()->setPublicKey("MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAwWroqlfCTQN0m1r9O4G5La2BKOsZCdnHo//QwnUbwW2S3KXjn5NC5VKmsw1/MHUp/9Z9PCWGhc3JWto2dDlIIz+/KKeyjIXEw9tNuu9S+RfB1w+qRa4w8fSFMEJpwGHF/GOBzZ8Hojd64IZ03t0NtEuWQQptAg2HxtLy97E+pHOogKc/BGRoZUzrIaASSrkdTXBcdP/JdObQw4P9gRz/FRUeuaFLEhk+F0aOafmwqYh2aOlYMXju75xav/Q/yK31kwoY4i5NyeBEGqnbnPAVKSzhlxnsffe1qlrFfnaE/UvG0OgWFStwiCHoEMkpdjT0/7WRiT+9p5mHIWx2m7w0VQIDAQAB");
+	PurchaseManager::getInstance()->setPublicKey(DEVELOPER_PUBLIC_KEY);
 }
 
 /**
@@ -64,7 +65,8 @@ void ApplicationController::buttonClicked(Widget* button)
 {
 	if ( mMainScreen->getSelectedAvailableProduct() != "")
 	{
-		Purchase* purchaseObj = new Purchase(mMainScreen->getSelectedAvailableProduct(), this);
+		Purchase* purchaseObj = new Purchase(
+				mMainScreen->getSelectedAvailableProduct(), this);
 		mPurchases.add(purchaseObj);
 		mCurrentPurchase = mPurchases.size()-1;
 	}
@@ -106,7 +108,8 @@ void ApplicationController::productValid(const Purchase& purchase)
  */
 void ApplicationController::productInvalid(const Purchase& purchase)
 {
-	MAUtil::String errorMessage = "Product " + purchase.getProductId() + " is invalid!";
+	MAUtil::String errorMessage = "Product " + purchase.getProductId()
+			+ " is invalid!";
 	mMainScreen->productError(errorMessage);
 }
 
@@ -134,7 +137,8 @@ void ApplicationController::requestCompleted(const Purchase& purchase)
 void ApplicationController::requestFailed(const Purchase& purchase,
 	const int errorCode)
 {
-	mMainScreen->productError("Purchase failed for product " + purchase.getProductId() );
+	mMainScreen->productError("Purchase failed for product "
+			+ purchase.getProductId() );
 }
 
 /**
@@ -166,7 +170,8 @@ void ApplicationController::receiptValid(
  */
 void ApplicationController::receiptInvalid(const Purchase& purchase)
 {
-	mMainScreen->productError("Product " + purchase.getProductId() + " has an invalid receipt!");
+	mMainScreen->productError("Product " + purchase.getProductId()
+			+ " has an invalid receipt!");
 }
 
 /**
@@ -178,5 +183,6 @@ void ApplicationController::receiptInvalid(const Purchase& purchase)
 void ApplicationController::receiptError(const Purchase& purchase,
 	const int errorCode)
 {
-	mMainScreen->productError("Product " + purchase.getProductId() + " does not have a receipt!");
+	mMainScreen->productError("Product " + purchase.getProductId()
+			+ " does not have a receipt!");
 }

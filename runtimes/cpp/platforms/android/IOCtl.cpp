@@ -940,24 +940,26 @@ namespace Base
 		return result;
 	}
 
-	int _maWidgetScreenAddOptionsMenuItem(int widget, const char* title, int iconHandle, int iconPredefined, JNIEnv* jNIEnv, jobject jThis)
+	int _maWidgetScreenAddOptionsMenuItem(int widget, const char* title, const char* iconPath, int iconPredefined, JNIEnv* jNIEnv, jobject jThis)
 	{
 		// Convert to Java parameters
 		jstring jstrTitle = jNIEnv->NewStringUTF(title);
+		jstring jstrPath = jNIEnv->NewStringUTF(iconPath);
 
 		// Get the Java method
 		jclass cls = jNIEnv->GetObjectClass(jThis);
-		jmethodID methodID = jNIEnv->GetMethodID(cls, "maWidgetScreenAddOptionsMenuItem", "(ILjava/lang/String;II)I");
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maWidgetScreenAddOptionsMenuItem", "(ILjava/lang/String;Ljava/lang/String;I)I");
 		if (methodID == 0)
 		{
 			return 0;
 		}
 
 		// Call the java method
-		int result = jNIEnv->CallIntMethod(jThis, methodID, widget, jstrTitle, iconHandle, iconPredefined);
+		int result = jNIEnv->CallIntMethod(jThis, methodID, widget, jstrTitle, jstrPath, iconPredefined);
 
 		// Delete allocated memory
 		jNIEnv->DeleteLocalRef(cls);
+		jNIEnv->DeleteLocalRef(jstrPath);
 		jNIEnv->DeleteLocalRef(jstrTitle);
 
 		return result;

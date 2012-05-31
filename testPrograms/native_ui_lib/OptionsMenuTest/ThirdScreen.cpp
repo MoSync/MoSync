@@ -63,8 +63,8 @@ ThirdScreen::ThirdScreen():
 	// Push the top screen.
 	push(mScreen);
 
-	mScreen->addOptionsMenuItem("Third screen item 0", -1,false);
-	mScreen->addOptionsMenuItem("Third screen item 1", -1, false);
+	mScreen->addOptionsMenuItem("Third screen item 0");
+	mScreen->addOptionsMenuItem("Third screen item 1");
 	mScreen->addScreenListener(this);
 
 	// Set event listener.
@@ -106,8 +106,8 @@ void ThirdScreen::openNextScreen(int listItemIndex)
 		scr1->setMainWidget(widget);
 		this->push(scr1);
 		scr1->addScreenListener(this);
-		scr1->addOptionsMenuItem("Menu item 0", MAW_OPTIONS_MENU_ICON_CONSTANT_DELETE,true);
-		scr1->addOptionsMenuItem("Menu item 1", MAW_OPTIONS_MENU_ICON_CONSTANT_SAVE,true);
+		scr1->addOptionsMenuItem("Menu item 0", MAW_OPTIONS_MENU_ICON_CONSTANT_DELETE,false);
+		scr1->addOptionsMenuItem("Menu item 1", MAW_OPTIONS_MENU_ICON_CONSTANT_SAVE,false);
 
 	}
 	else
@@ -125,8 +125,8 @@ void ThirdScreen::openNextScreen(int listItemIndex)
 		scr2->setMainWidget(widget);
 		this->push(scr2);
 		scr2->addScreenListener(this);
-		scr2->addOptionsMenuItem("Menu item 0", MAW_OPTIONS_MENU_ICON_CONSTANT_EDIT,true);
-		scr2->addOptionsMenuItem("Menu item 1", MAW_OPTIONS_MENU_ICON_CONSTANT_ADD,true);
+		scr2->addOptionsMenuItem("Menu item 0", MAW_OPTIONS_MENU_ICON_CONSTANT_EDIT,false);
+		scr2->addOptionsMenuItem("Menu item 1", MAW_OPTIONS_MENU_ICON_CONSTANT_ADD,false);
 	}
 }
 
