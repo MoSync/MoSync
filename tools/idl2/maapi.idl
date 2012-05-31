@@ -7713,20 +7713,33 @@ group WidgetAPI "Widget API" {
 	group WidgetMapProperties "Map properties" {
 	constset MAString MAW_MAP_ {
 	    /*
-		* @brief The api key used to access the full features of the map (a google maps api key for Android
-		* and a bing maps api key for Windows Phone). The iOS platform doesn't require a key.
+		* @brief The api key used to access the full features of the google map (on Android platform).
+		* The iOS platform doesn't require a key.
 		*
-		* @validvalue The format of the key differs from platform to platform. For further details on how to
-		* obtain these keys go to "https://developers.google.com/maps/documentation/android/mapkey" for google
-		* maps and to "http://msdn.microsoft.com/en-us/library/ff428642.aspx" for bing maps.
+		* @validvalue A string containing a google maps key. For further details on how to
+		* obtain these key go to "https://developers.google.com/maps/documentation/android/mapkey".
 		*
 		* @setonly
 		* @par Example
 		* \code
-		*   maWidgetSetProperty(mapHandle, MAW_MAP_API_KEY, "a_valid_key");
+		*   maWidgetSetProperty(mapHandle, MAW_MAP_API_KEY_GOOGLE, "a_valid_google_key");
 		* \endcode
 		*/
-		API_KEY = "api_key";
+		API_KEY_GOOGLE = "api_key_google";
+
+		/*
+		* @brief The api key used to access the full features of the bing map (on windows phone platform).
+		*
+		* @validvalue A string containing a bing maps key. For further details on how to
+		* obtain these key go to "http://msdn.microsoft.com/en-us/library/ff428642.aspx".
+		*
+		* @setonly
+		* @par Example
+		* \code
+		*   maWidgetSetProperty(mapHandle, MAW_MAP_API_KEY_BING, "a_valid_bing_key");
+		* \endcode
+		*/
+		API_KEY_BING = "api_key_bing";
 
 		/*
 		* @brief Set or get the map type.
@@ -8154,33 +8167,6 @@ group WidgetAPI "Widget API" {
 	* - #MAW_RES_ERROR otherwise.
 	*/
 	int maWidgetScreenAddOptionsMenuItem(in MAWidgetHandle widget, in MAString title, in int iconHandle, in int iconPredefined);
-
-	/**
-	 * \returns The pin index on success, or any of the following result codes:
-	 * - #MAW_RES_INVALID_HANDLE if the map handle was invalid.
-	 * - #MAW_RES_ERROR otherwise.
-	 */
-	int maWidgetMapAddPin(in MAWidgetHandle widget, in double latitude, in double longitude);
-
-	/**
-	 * \returns MAW_RES_OK if the pin has been removed, or any of the following result codes:
-	 * - #MAW_RES_INVALID_HANDLE if the map handle was invalid.
-	 * - #MAW_RES_ERROR otherwise.
-	 */
-	int maWidgetMapRemovePin(in MAWidgetHandle widget, in int pinIndex);
-
-	/**
-	 * \returns MAW_RES_OK if the map has been scrolled/zoomed to the specified region,
-	 * or any of the following result codes:
-	 * - #MAW_RES_INVALID_HANDLE if the map handle was invalid.
-	 * - #MAW_RES_ERROR otherwise.
-	 */
-	int maWidgetMapSetVisibleRegion(in MAWidgetHandle widget,
-		in double upperLeftCornerLatitude,
-		in double upperLeftCornerLongitude,
-		in double lowerRightCornerLatitude,
-		in double lowerRightCornerLongitude);
-
 	} // end of group WidgetAPIFunctions
 
 } // end of group WidgetAPI
