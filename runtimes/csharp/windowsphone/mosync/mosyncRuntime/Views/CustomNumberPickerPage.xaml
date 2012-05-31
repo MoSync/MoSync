@@ -1,0 +1,84 @@
+﻿<phone:PhoneApplicationPage
+    x:Class="mosyncRuntime.Views.CustomNumberPickerPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:phone="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone"
+    xmlns:shell="clr-namespace:Microsoft.Phone.Shell;assembly=Microsoft.Phone"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:Primitives="clr-namespace:Microsoft.Phone.Controls.Primitives;assembly=Microsoft.Phone.Controls.Toolkit"
+    xmlns:Controls="cls-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone.Controls.Toolkit"
+    FontFamily="{StaticResource PhoneFontFamilyNormal}"
+    FontSize="{StaticResource PhoneFontSizeNormal}"
+    Foreground="{StaticResource PhoneForegroundBrush}"
+    SupportedOrientations="PortraitOrLandscape" Orientation="Portrait"
+    mc:Ignorable="d" d:DesignHeight="696" d:DesignWidth="480"
+    shell:SystemTray.IsVisible="True">
+
+    <Grid Background="{StaticResource PhoneChromeBrush}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition />
+        </Grid.RowDefinitions>
+
+        <!-- SystemTray placeholder -->
+        <Rectangle
+            Grid.Row="0"
+            Height="32"/>
+
+        <StackPanel Grid.Row="1" x:Name="TitlePanel" Margin="0,17,0,28">
+            <TextBlock x:Name="ApplicationTitle" Text="CHOOSE A NUMBER" Style="{StaticResource PhoneTextNormalStyle}"/>
+        </StackPanel>
+
+        <!-- LoopingSelectors -->
+        <Grid
+            Grid.Row="2"
+            HorizontalAlignment="Center">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <Primitives:LoopingSelector
+                x:Name="PrimarySelector"
+                Grid.Column="0"
+                Width="148"
+                ItemSize="148,148"
+                ItemMargin="6">
+                <Primitives:LoopingSelector.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel
+                            HorizontalAlignment="Left"
+                            VerticalAlignment="Bottom"
+                            Margin="6">
+                            <TextBlock
+                                Text="{Binding BindsDirectlyToSource=True}"
+                                FontSize="54"
+                                FontFamily="{StaticResource PhoneFontFamilySemiBold}"
+                                Margin="0,-8"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </Primitives:LoopingSelector.ItemTemplate>
+            </Primitives:LoopingSelector>
+        </Grid>
+    </Grid>
+
+    <phone:PhoneApplicationPage.ApplicationBar>
+        <!--
+        Due to platform restrictions, ApplicationBarIconButton.IconUri content can not come from the
+        Microsoft.Phone.Controls.Toolkit assembly, so it is up to the application developer to ensure
+        these resources are placed in the right location and marked as Build Action=Content. For
+        convenience, platform-consistent images are included with the Toolkit installer.
+
+        Note: ApplicationBarIconButton.Text automatically comes from the Microsoft.Phone.Controls.Toolkit
+        resources (where it can be localized).
+        -->
+        <shell:ApplicationBar IsVisible="True" IsMenuEnabled="True">
+            <shell:ApplicationBarIconButton
+                IconUri="/Toolkit.Content/ApplicationBar.Check.png"
+                Text="DONE"/>
+            <shell:ApplicationBarIconButton
+                IconUri="/Toolkit.Content/ApplicationBar.Cancel.png"
+                Text="CANCEL"/>
+        </shell:ApplicationBar>
+    </phone:PhoneApplicationPage.ApplicationBar>
+</phone:PhoneApplicationPage>

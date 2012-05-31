@@ -46,6 +46,10 @@ MainScreen::MainScreen() :
 	mGetMinDate(NULL),
 	mDatePicker(NULL)
 {
+	MAExtent size = maGetScrSize();
+	mScreenY = EXTENT_Y(size);
+	mScreenX = EXTENT_X(size);
+
 	createMainLayout();
 
 	mDatePicker->addDatePickerListener(this);
@@ -93,7 +97,7 @@ void MainScreen::createMainLayout() {
 	// Create and add the main layout to the screen.
 	mList = new VerticalLayout();
 	mPropertiesLayout = new RelativeLayout();
-	mPropertiesLayout->setScrollable(true);
+	mPropertiesLayout->setBackgroundColor(12345);
 
 	mDatePicker = new DatePicker();
 	mDatePicker->fillSpaceHorizontally();
@@ -115,6 +119,9 @@ void MainScreen::createMainLayout() {
 
 	mPropertiesLayout->addChild(mMaxDateLayout);
 	mPropertiesLayout->addChild(mMinDateLayout);
+
+	mPropertiesLayout->setScrollable(true);
+
 	mList->addChild(mPropertiesLayout);
 
 	Screen::setMainWidget(mList);
@@ -123,32 +130,33 @@ void MainScreen::createMainLayout() {
 void MainScreen::CreateMaxDateLayout()
 {
 	mMaxDateLayout = new VerticalLayout();
+	mMaxDateLayout->setWidth(mScreenX);
 	mMaxDateLayout->setTopPosition(0);
 	mMaxDateLayout->setHeight(500);
 
 	mYearLabelMaxDate = new Label();
 	mYearLabelMaxDate->setText("MaxDate year:");
-	mYearLabelMaxDate->fillSpaceHorizontally();
+	mYearLabelMaxDate->setWidth(mScreenX);
 
 	mMonthLabelMaxDate = new Label();
 	mMonthLabelMaxDate->setText("MaxDate Month:");
-	mMonthLabelMaxDate->fillSpaceHorizontally();
+	mMonthLabelMaxDate->setWidth(mScreenX);
 
 	mDayLabelMaxDate = new Label();
 	mDayLabelMaxDate->setText("MaxDate Day:");
-	mDayLabelMaxDate->fillSpaceHorizontally();
+	mDayLabelMaxDate->setWidth(mScreenX);
 
 	mYearValueMaxDate = new EditBox();
 	mYearValueMaxDate->setInputMode(EDIT_BOX_INPUT_MODE_NUMERIC);
-	mYearValueMaxDate->fillSpaceHorizontally();
+	mYearValueMaxDate->setWidth(mScreenX);
 
 	mMonthValueMaxDate = new EditBox();
 	mMonthValueMaxDate->setInputMode(EDIT_BOX_INPUT_MODE_NUMERIC);
-	mMonthValueMaxDate->fillSpaceHorizontally();
+	mMonthValueMaxDate->setWidth(mScreenX);
 
 	mDayValueMaxDate = new EditBox();
 	mDayValueMaxDate->setInputMode(EDIT_BOX_INPUT_MODE_NUMERIC);
-	mDayValueMaxDate->fillSpaceHorizontally();
+	mDayValueMaxDate->setWidth(mScreenX);
 
 	mSetMaxDate = new Button();
 	mSetMaxDate->setText("Set MaxDate");
@@ -158,7 +166,7 @@ void MainScreen::CreateMaxDateLayout()
 
 	mGetMaxDateValue = new Label();
 	mGetMaxDateValue->setText("MaxDate:");
-	mGetMaxDateValue->fillSpaceHorizontally();
+	mGetMaxDateValue->setWidth(mScreenX);
 
 	mMaxDateLayout->addChild(mYearLabelMaxDate);
 	mMaxDateLayout->addChild(mYearValueMaxDate);
@@ -174,32 +182,33 @@ void MainScreen::CreateMaxDateLayout()
 void MainScreen::CreateMinDateLayout()
 {
 	mMinDateLayout = new VerticalLayout();
+	mMinDateLayout->setWidth(mScreenX);
 	mMinDateLayout->setTopPosition(500);
 	mMinDateLayout->setHeight(500);
 
 	mYearLabelMinDate = new Label();
 	mYearLabelMinDate->setText("MinDate year:");
-	mYearLabelMinDate->fillSpaceHorizontally();
+	mYearLabelMinDate->setWidth(mScreenX);
 
 	mMonthLabelMinDate = new Label();
 	mMonthLabelMinDate->setText("MinDate Month:");
-	mMonthLabelMinDate->fillSpaceHorizontally();
+	mMonthLabelMinDate->setWidth(mScreenX);
 
 	mDayLabelMinDate = new Label();
 	mDayLabelMinDate->setText("MinDate Day:");
-	mDayLabelMinDate->fillSpaceHorizontally();
+	mDayLabelMinDate->setWidth(mScreenX);
 
 	mYearValueMinDate = new EditBox();
 	mYearValueMinDate->setInputMode(EDIT_BOX_INPUT_MODE_NUMERIC);
-	mYearValueMinDate->fillSpaceHorizontally();
+	mYearValueMinDate->setWidth(mScreenX);
 
 	mMonthValueMinDate = new EditBox();
 	mMonthValueMinDate->setInputMode(EDIT_BOX_INPUT_MODE_NUMERIC);
-	mMonthValueMinDate->fillSpaceHorizontally();
+	mMonthValueMinDate->setWidth(mScreenX);
 
 	mDayValueMinDate = new EditBox();
 	mDayValueMinDate->setInputMode(EDIT_BOX_INPUT_MODE_NUMERIC);
-	mDayValueMinDate->fillSpaceHorizontally();
+	mDayValueMinDate->setWidth(mScreenX);
 
 	mSetMinDate = new Button();
 	mSetMinDate->setText("Set MinDate");
@@ -209,7 +218,7 @@ void MainScreen::CreateMinDateLayout()
 
     mGetMinDateValue = new Label();
     mGetMinDateValue->setText("MinDate:");
-    mGetMinDateValue->fillSpaceHorizontally();
+    mGetMinDateValue->setWidth(mScreenX);
 
 	mMinDateLayout->addChild(mYearLabelMinDate);
 	mMinDateLayout->addChild(mYearValueMinDate);
