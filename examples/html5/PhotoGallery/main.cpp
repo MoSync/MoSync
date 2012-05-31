@@ -93,6 +93,9 @@ public:
 			// Download error.
 			mMoblet->callJS("app.setPhotoList(null)");
 		}
+
+		// Delete myself!
+		delete this;
 	}
 };
 
