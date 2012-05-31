@@ -5061,50 +5061,65 @@ group WidgetAPI "Widget API" {
 	* The available constants for the Android predefined drawables used in OptionsMenu.
 	* The drawables can be set via #maWidgetScreenAddOptionsMenuItem syscall.
 	* The icons can be found here: http://androiddrawables.com/menu.html .
+	* Note that only these are supported on WP7:
+	*	- ADD
+	*	- CAMERA
+	*	- CLOSE_CLEAR_CANCEL
+	*	- DELETE
+	*	- EDIT
+	*	- GALLERY
+	*	- HELP
+	*	- MORE
+	*	- PREFERENCES
+	*	- SAVE
+	*	- SEARCH
+	*	- SHARE
+	*	- UPLOAD
+	*	- UPLOAD_YOU_TUBE
 	*/
 	group OptionsMenuIconConstants "Options menu icon constants" {
-	constset int MAW_OPTIONS_MENU_ICON_CONSTANT_ {
-		ADD = 17301555 ;
-		AGENDA = 17301556 ;
-		ALWAYS_LANDSCAPE_PORTRAIT = 17301557 ;
-		CALL = 17301558 ;
-		CAMERA = 17301559 ;
-		CLOSE_CLEAR_CANCEL = 17301560 ;
-		COMPASS = 17301561;
-		CROP = 17301562 ;
-		DAY =  17301563 ;
-		DELETE = 17301564 ;
-		DIRECTIONS = 17301565 ;
-		EDIT = 17301566 ;
-		GALLERY = 17301567 ;
-		HELP = 17301568 ;
-		INFO_DETAILS = 17301569 ;
-		MANAGE = 17301570 ;
-		MAPMODE = 17301571 ;
-		MONTH = 17301572 ;
-		MORE = 17301573 ;
-		MY_CALENDAR = 17301574 ;
-		MYLOCATION = 17301575 ;
-		MYPLACES = 17301576 ;
-		PREFERENCES = 17301577 ;
-		RECENT_HISTORY = 17301578 ;
-		REPORT_IMAGE = 17301579 ;
-		REVERT = 17301580 ;
-		ROTATE = 17301581 ;
-		SAVE = 17301582 ;
-		SEARCH = 17301583 ;
-		SEND = 17301584 ;
-		SET_AS = 17301585 ;
-		SHARE = 17301586 ;
-		SLIDESHOW = 17301587 ;
-		SORT_ALPHABETICALLY = 17301660 ;
-		SORT_BY_SIZE = 17301661 ;
-		TODAY = 17301588 ;
-		UPLOAD = 17301589 ;
-		UPLOAD_YOU_TUBE = 17301590 ;
-		VIEW = 17301591 ;
-		WEEK = 17301592 ;
-		ZOOM = 17301593 ;
+	constset MAString MAW_OPTIONS_MENU_ICON_CONSTANT_ {
+		ADD = "17301555" ;
+		AGENDA = "17301556" ;
+		ALWAYS_LANDSCAPE_PORTRAIT = "17301557" ;
+		CALL = "17301558" ;
+		CAMERA = "17301559" ;
+		CLOSE_CLEAR_CANCEL = "17301560" ;
+		COMPASS = "17301561" ;
+		CROP = "17301562" ;
+		DAY =  "17301563" ;
+		DELETE = "17301564" ;
+		DIRECTIONS = "17301565" ;
+		EDIT = "17301566" ;
+		GALLERY = "17301567" ;
+		HELP = "17301568" ;
+		INFO_DETAILS = "17301569" ;
+		MANAGE = "17301570" ;
+		MAPMODE = "17301571" ;
+		MONTH = "17301572" ;
+		MORE = "17301573" ;
+		MY_CALENDAR = "17301574" ;
+		MYLOCATION = "17301575" ;
+		MYPLACES = "17301576" ;
+		PREFERENCES = "17301577" ;
+		RECENT_HISTORY = "17301578" ;
+		REPORT_IMAGE = "17301579" ;
+		REVERT = "17301580" ;
+		ROTATE = "17301581" ;
+		SAVE = "17301582" ;
+		SEARCH = "17301583" ;
+		SEND = "17301584" ;
+		SET_AS = "17301585" ;
+		SHARE = "17301586" ;
+		SLIDESHOW = "17301587" ;
+		SORT_ALPHABETICALLY = "17301660" ;
+		SORT_BY_SIZE = "17301661" ;
+		TODAY = "17301588" ;
+		UPLOAD = "17301589" ;
+		UPLOAD_YOU_TUBE = "17301590" ;
+		VIEW = "17301591" ;
+		WEEK = "17301592" ;
+		ZOOM = "17301593" ;
 
 	}
 	} // end of OptionsMenuIconConstants
@@ -8135,7 +8150,7 @@ group WidgetAPI "Widget API" {
 
 	/**
 	* Add an item to the Options Menu associated to a screen.
-	* Available on Android only.
+	* Available on Android and WP7.
 	* The options menu is where you should include actions and other options that are relevant to the current activity
 	* context, such as "Search," "Compose email," or "Settings".
 	* When opened, the first visible portion is the icon menu, which holds up to six menu items.
@@ -8143,17 +8158,21 @@ group WidgetAPI "Widget API" {
 	* which the user can open by selecting More. Those items do not display icons.
 	* \param widget Handle to the screen widget.
 	* \param title The title associated for the new item. Can be left null.
-	* \iconHandle MoSync handle to an uncompressed image resource, or :
-	* a predefined Android icon, one of the \link #MAW_OPTIONS_MENU_ICON_CONSTANT \endlink constants.
-	* Can be left null.
+	* \param iconPath The path to an image or  a predefined icon, one of the \link #MAW_OPTIONS_MENU_ICON_CONSTANT \endlink constants.
+	* Note that for Windows phone 7 the option menu icons must be added under the following folder
+	* structure "/ApplicationBarIcons/". The function is called with the name of the icon file.
+	* e.g. maWidgetScreenAddOptionsMenuItem(ScreenHandle, "test", "optionsMenuItemIcon.png", 0); where the
+	* file optionsMenuItemIcon.png is found in the folder "/ApplicationBarIcons".
+	* Can be left null. On windows phone 7 a null icon means that the item
+	* will be a part of the extendable menu item list from the native Application Bar.
 	* \iconPredefined Specifies if the icon is a project resource, or one of the predefined Android icons.
 	* By default it's value is 0.
 	*
 	* \returns The the item index on success, or any of the following result codes:
-	* - #MAW_RES_INVALID_HANDLE if the screen handle was invalid.
-	* - #MAW_RES_ERROR otherwise.
+	* - #MAW_RES_ERROR
+	* - #MAW_RES_INVALID_HANDLE
 	*/
-	int maWidgetScreenAddOptionsMenuItem(in MAWidgetHandle widget, in MAString title, in int iconHandle, in int iconPredefined);
+	int maWidgetScreenAddOptionsMenuItem(in MAWidgetHandle widget, in MAString title, in MAString iconPath, in int iconPredefined);
 
 	/**
 	 * \returns The pin index on success, or any of the following result codes:
