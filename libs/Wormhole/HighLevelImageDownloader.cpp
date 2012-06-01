@@ -78,7 +78,7 @@ void HighLevelImageDownloader::dataDownloaded(MAHandle data, int result)
 		}
 
 		// Deallocate the data object, we are done with it.
-		maDestroyObject(data);
+		maDestroyPlaceholder(data);
 	}
 
 	// Notify download complete.

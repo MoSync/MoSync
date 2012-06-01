@@ -10,15 +10,18 @@
 		<title>Photo Gallery</title>
 		<link rel="stylesheet" href="style.css" type="text/css" media="screen" title="no title" charset="utf-8">
 		<script type="text/javascript" charset="utf-8" src="js/wormhole.js"></script>
+		<script type="text/javascript" charset="utf-8" src="mosync-extensions.js"></script>
 		<script type="text/javascript">
 		var app = (function()
 		{
 			var app = {};
 
-			var gFileURL = null;
-
+			/**
+			 * Initialize the JavaScript part of the application.
+			 */
 			app.init = function()
 			{
+				// Exit app on back button (on Android).
 				document.addEventListener(
 					"backbutton",
 					function()
@@ -26,6 +29,19 @@
 						mosync.bridge.send(["close"]);
 					},
 					true);
+
+				// Called when the UI is ready to be shown. Show the main screen here.
+				mosync.nativeui.UIReady = function()
+				{
+					// First get the screen we want to show.
+					var mainScreen = document.getNativeElementById("mainScreen");
+
+					// Show the screen.
+					mainScreen.show();
+				};
+
+				// Remember to call this to initialise the NativeUI system.
+				mosync.nativeui.initUI();
 			};
 
 			/**
@@ -34,17 +50,20 @@
 			app.snapPhoto = function()
 			{
 				navigator.device.capture.captureImage(
-					/**
-					 * Callback that returns the image that was captured.
-					 * @param mediaFiles Array with images.
-					 */
+					// Callback that gets the image that was captured.
 					function(mediaFiles)
 					{
-						gFileURL = "file://" + mediaFiles[0].fullPath;
-						console.log("@@@ gFileURL: " + gFileURL);
+						// Construct the file URL.
+						var fileURL = "file://" + mediaFiles[0].fullPath;
+						console.log("@@@ fileURL: " + fileURL);
 						console.log("@@@ mediaFiles.length: " + mediaFiles.length);
-						var imageElement = document.getElementById('photo');
-						imageElement.src = gFileURL;
+
+						// Pass the URL of the captured image to the camera page.
+						var cameraWebViewHandle =
+							mosync.nativeui.getWidgetHandleById("cameraWebView");
+						mosync.bridge.callJS(
+							cameraWebViewHandle,
+							"camera.setPhotoURL('" + fileURL + "')");
 					},
 					function(error)
 					{
@@ -52,15 +71,11 @@
 					});
 			};
 
-			app.uploadPhoto = function()
+			/**
+			 * Upload an image to the server.
+			 */
+			app.uploadPhoto = function(fileURL)
 			{
-				var fileURL = gFileURL;
-				if (null == fileURL)
-				{
-					alert("First snap a photo");
-					return;
-				}
-
 				var options = new FileUploadOptions();
 				options.fileKey = "file";
 				options.fileName = fileURL.substr(fileURL.lastIndexOf('/') + 1);
@@ -74,7 +89,7 @@
 					"http://dev.mosync.com/mobilelua/PhotoGallery/upload.php",
 					function(result)
 					{
-						alert("Photo uploaded - response: " + result.response);
+						alert("Photo uploaded");
 						console.log("@@Code = " + result.responseCode);
 						console.log("@@Response = " + result.response);
 						console.log("@@Sent = " + result.bytesSent);
@@ -87,6 +102,9 @@
 					options);
 			}
 
+			/**
+			 * Helper function to get the Mime-Type of an image.
+			 */
 			app.getMimeType = function(fileName)
 			{
 				if (/\.jpg$/.test(fileName)) return "image/jpeg";
@@ -101,50 +119,13 @@
 			 */
 			app.downloadPhotoList = function()
 			{
-				// Delete existing DOM list of images.
-				var list = document.getElementById("photolist");
-				while(list.hasChildNodes())
-				{
-					list.removeChild(list.firstChild);
-				}
-
+				var galleryWebViewHandle =
+					mosync.nativeui.getWidgetHandleById("galleryWebView");
 				mosync.bridge.send([
 					"Custom",
 					"DownloadPhotoList",
+					"" + galleryWebViewHandle,
 					"http://dev.mosync.com/mobilelua/PhotoGallery/upload.php"]);
-			};
-
-			app.downloadPhotoListDebug = function()
-			{
-				app.setPhotoList('["http:\/\/dev.mosync.com\/mobilelua\/PhotoGallery\/photos\/2010-02-07 15.05.13.jpg","http:\/\/dev.mosync.com\/mobilelua\/PhotoGallery\/photos\/testimg.jpg"]');
-			};
-
-			/**
-			 * Called when download of list of photos is
-			 * complete.
-			 * @param json Array of urls (strings) to images.
-			 */
-			app.setPhotoList = function(json)
-			{
-				// Delete existing DOM list of images.
-				var list = document.getElementById("photolist");
-				while(list.hasChildNodes())
-				{
-					list.removeChild(list.firstChild);
-				}
-
-				// Build new list (populate DOM).
-				var urls = JSON.parse(json);
-				var limit = Math.min(20, urls.length);
-				for (var i = 0; i < urls.length; ++i)
-				{
-					var image = document.createElement('img');
-					image.src = urls[i];
-					image.style.width = "100%";
-					// TODO: Add more properties to the image object as needed.
-
-					list.appendChild(image);
-				}
 			};
 
 			return app;
@@ -152,17 +133,27 @@
 		</script>
 	</head>
 	<body onload="app.init()">
-		<div id="screen">
-			<div class="pane" id="heading">Photo Gallery</div>
-			<div class="pane button" onclick="app.snapPhoto()">Snap Photo</div>
-			<div class="pane view">
-				<img id="photo" src="MoSyncLogo.png" style="width:100%"/>
+	<!--  Here the NativeUI components are declared. -->
+	<div id="NativeUI">
+		<!-- The element with id="mainScreen" has two tabs with screens -->
+		<div data-widgetType="TabScreen" id="mainScreen">
+			<!-- First Screen -->
+			<div data-widgetType="Screen" id="cameraScreen" data-title="Camera"
+				data-icon_android="img/Android_TabIconDevice.png"
+				data-icon_iOS="img/IOS_TabIconDevice.png">
+				<div data-widgetType="WebView" id="cameraWebView"
+					data-width="100%" data-height="100%" data-url="page-camera.html">
+				</div>
 			</div>
-			<div class="pane button" onclick="app.uploadPhoto()">Upload Photo</div>
-			<div class="pane button" onclick="app.downloadPhotoList()">Show Uploaded Photos</div>
-			<div class="pane view" id="photolist">
-				<!-- Images are dynamically added here. -->
+			<!-- Second Screen -->
+			<div data-widgetType="Screen" data-id="galleryScreen" data-title="Gallery"
+				data-icon_android="img/Android_TabIconWebView.png"
+				data-icon_iOS="img/IOS_TabIconWebView.png">
+				<div data-widgetType="WebView" id="galleryWebView"
+					data-width="100%" data-height="100%" data-url="page-gallery.html">
+				</div>
 			</div>
 		</div>
-	</body>
+	</div>
+</body>
 </html>

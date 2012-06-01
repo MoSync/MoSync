@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<!--
+* @file page-gallery.html
+* @author Mikael Kindborg
+-->
+<html>
+	<head>
+		<meta name="viewport" content="width=320, user-scalable=yes">
+		<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+		<title>Photo Gallery</title>
+		<link rel="stylesheet" href="style.css" type="text/css" media="screen" title="no title" charset="utf-8">
+		<script type="text/javascript" charset="utf-8" src="js/wormhole.js"></script>
+		<script type="text/javascript" charset="utf-8" src="mosync-extensions.js"></script>
+		<script type="text/javascript">
+		var gallery = (function()
+		{
+			var gallery = {};
+
+			/**
+			 * Initiate download of list of photos.
+			 */
+			gallery.downloadPhotoList = function()
+			{
+				// Delete existing DOM list of images.
+				var list = document.getElementById("photolist");
+				while(list.hasChildNodes())
+				{
+					list.removeChild(list.firstChild);
+				}
+
+				// Ask the main WebView to download the photo list.
+				// When download is complete setPhotoList is called.
+				mosync.bridge.callJS(
+					mosync.nativeui.MAIN_WEBVIEW,
+					"app.downloadPhotoList()");
+			};
+
+			// TODO: Used this for debugging. Can be removed.
+			gallery.downloadPhotoListDebug = function()
+			{
+				gallery.setPhotoList(
+					'["http:\/\/dev.mosync.com\/mobilelua\/PhotoGallery\/photos\/2010-02-07 15.05.13.jpg",'
+					+ '"http:\/\/dev.mosync.com\/mobilelua\/PhotoGallery\/photos\/testimg.jpg"]');
+			};
+
+			/**
+			 * Called when download of list of photos is
+			 * complete.
+			 * @param json Array of urls (strings) to images.
+			 */
+			gallery.setPhotoList = function(json)
+			{
+				// Delete existing DOM list of images.
+				var list = document.getElementById("photolist");
+				while(list.hasChildNodes())
+				{
+					list.removeChild(list.firstChild);
+				}
+
+				// Build new list (populate DOM).
+				var urls = JSON.parse(json);
+				var limit = Math.min(20, urls.length);
+				for (var i = 0; i < urls.length; ++i)
+				{
+					var image = document.createElement('img');
+					image.src = urls[i];
+					image.style.width = "100%";
+					// TODO: Add more properties to the image object as needed.
+
+					list.appendChild(image);
+				}
+			};
+
+			return gallery;
+		})();
+		</script>
+	</head>
+	<body>
+		<div id="screen">
+			<div id="heading">Gallery</div>
+			<div class="pane button" onclick="gallery.downloadPhotoList()">Show Uploaded Photos</div>
+			<div class="pane view" id="photolist">
+				<!-- Images are dynamically added here. -->
+			</div>
+		</div>
+	</body>
+</html>
