@@ -37,6 +37,7 @@ using namespace NativeUI;
  */
 class MainScreen:
 	public Screen,
+	public ButtonListener,
 	public MapListener
 {
 public:
@@ -56,6 +57,21 @@ private:
 	 */
 	void createMainLayout();
 
+	/**
+	 * Creates and adds the visible area get/set layout to the screen.
+	 */
+	void createVisibleAreaLayout();
+
+	/**
+	 * Creates and adds the map pin add/remove layout to the screen.
+	 */
+	void createMapPinLayout();
+
+	/**
+	 * Creates and adds the zoom level layout to the screen.
+	 */
+	void createZoomLevelLayout();
+
     /**
 	 * This method is called when the zoom level of the map changes (at a double tap
 	 * on the google maps for example).
@@ -70,13 +86,96 @@ private:
 	 */
     virtual void mapRegionChanged(Map* map);
 
+    /**
+	 * This method is called when the user clicks on a map pin.
+	 * @param mapPin The map pin object that generated the event.
+	 */
+	virtual void mapPinClicked(MapPin* mapPin);
+
+    /**
+     * This method is called if the touch-up event was inside the
+     * bounds of the button.
+     * @param button The button object that generated the event.
+     */
+    virtual void buttonClicked(Widget* button);
+
 private:
 	/**
 	 * Main layout.
 	 */
 	VerticalLayout* mMainLayout;
+
+	/**
+	 * Horizontal layout that contains the set/get visible area buttons.
+	 */
+	HorizontalLayout* mVisibleAreaLayout;
+
+	/**
+	 * Horizontal layout that contains the zoom level title and edit box.
+	 */
+	HorizontalLayout* mZoomLevelLayout;
+
+	/**
+	 * Horizontal layout that contains the add/remove pin buttons.
+	 */
+	HorizontalLayout* mPinsLayout;
+
+	/**
+	 * The application title label
+	 */
 	Label* mTitleLabel;
+
+	/**
+	 * Label used to view the visible area coordinates on the map.
+	 */
+	Label* mVisibleAreaCoordinatesLabel;
+
+	/**
+	 * Button used to add a pin on the map.
+	 */
+	Button* mAddPinToMap;
+
+	/**
+	 * Button used to remove a pin from the map.
+	 */
+	Button* mRemovePinFromMap;
+
+	/**
+	 * Button used to get the visible area coordinates of the map and
+	 * show the to the user.
+	 */
+	Button* mGetVisibleAreaButton;
+
+	/**
+	 * Button used to set the visible area on the map (the map will zoom and scroll
+	 * when the button is clicked).
+	 */
+	Button* mSetVisibleAreaButton;
+
+	/**
+	 * Button used to set the zoom level of the map.
+	 */
+	Button *mSetZoomLevel;
+
+	/**
+	 * Button used to center the map.
+	 */
+	Button *mSetCenterButton;
+
+	/**
+	 * EditBox used to set the map zoom level.
+	 */
+	EditBox* mZoomLevelEditBox;
+
+	/**
+	 * The map on which all the operations will take place.
+	 */
 	Map* mMap;
+
+	/**
+	 * A example map pin to be added on the map.
+	 */
+	MapPin* mMapPin;
 };
 
 

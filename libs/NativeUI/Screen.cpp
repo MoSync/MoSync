@@ -27,6 +27,8 @@ MA 02110-1301, USA.
 #include "Screen.h"
 #include "ScreenListener.h"
 
+#define BUF_MAX 256
+
 namespace NativeUI
 {
 
@@ -165,29 +167,106 @@ namespace NativeUI
     }
 
 	/**
-	 * Add a new menu item to the Options Menu associated to this screen.
-	 * Option Menus are Android specific concept, so this function is
-	 * available only on this platform. The Options Menu is launched by
-	 * pressing the Menu key. The options menu is where you should include
-	 * actions and other options that are relevant to the current activity
-	 * context, such as "Search," "Compose email," or "Settings".
-	 * When opened, the first visible portion is the icon menu, which holds
-	 * up to six menu items. If your menu includes more than six items, Android
-	 * places the sixth item and the rest into the overflow menu, which the user
-	 * can open by selecting More. Those items do not display icons.
-	 * @param title The title associated for the new item. Can be left null.
-	 * @param iconId The resource ID of the icon which will be used to lazily
-	 * get the Drawable when this item is being shown. Can be set to -1 if
-	 * no icon needed.
-	 * @param iconPredefined Specifies if the icon is a project resource, or one
-	 * of the predefined Android icons. It is false by default.
-	 * @return The index on which the menu item was added in the options menu,
-	 * an error code otherwise.
-	 */
-	int Screen::addOptionsMenuItem(const MAUtil::String title, int iconId, bool iconPredefined)
+	* Add a new menu item to the Options Menu associated to this screen.
+	* Platform: Android and WP7.
+	* Option Menus are Android specific concept. The Options Menu is launched by
+	* pressing the Menu key. The options menu is where you should include
+	* actions and other options that are relevant to the current activity
+	* context, such as "Search," "Compose email," or "Settings".
+	* When opened, the first visible portion is the icon menu, which holds
+	* up to six menu items. If your menu includes more than six items, Android
+	* places the sixth item and the rest into the overflow menu, which the user
+	* can open by selecting More. Those items do not display icons. On Windows
+	* Phone 7 the control used is the application bar.
+	*
+	* @param title The title associated for the new item.
+	*
+	* Note: On Windows phone 7, by using this function you will obtain an
+	* application bar menu item (text only)
+	*
+	* @return The index on which the menu item was added in the options menu,
+	* an error code otherwise.
+	*/
+	int Screen::addOptionsMenuItem(const MAUtil::String title)
 	{
 		return maWidgetScreenAddOptionsMenuItem(
-				getWidgetHandle(), title.c_str(), iconId, (iconPredefined ? 1 : 0) );
+				getWidgetHandle(), title.c_str(), "", 0 );
+	}
+
+	/**
+	* Add a new menu item to the Options Menu associated to this screen.
+	* Platform: Android.
+	* Option Menus are Android specific concept. The Options Menu is launched by
+	* pressing the Menu key. The options menu is where you should include
+	* actions and other options that are relevant to the current activity
+	* context, such as "Search," "Compose email," or "Settings".
+	* When opened, the first visible portion is the icon menu, which holds
+	* up to six menu items. If your menu includes more than six items, Android
+	* places the sixth item and the rest into the overflow menu, which the user
+	* can open by selecting More. Those items do not display icons. On Windows
+	* Phone 7 the control used is the application bar.
+	*
+	* @param title The title associated for the new item. Can be left null.
+	* @param resourceIconID The resource id of an icon loaded into resources.
+	*
+	* @return The index on which the menu item was added in the options menu,
+	* an error code otherwise.
+	*/
+	int Screen::addOptionsMenuItem(const MAUtil::String title, int resourceIconID)
+	{
+		char buf[BUF_MAX];
+		sprintf(buf, "%d", resourceIconID);
+		return maWidgetScreenAddOptionsMenuItem(
+				getWidgetHandle(), title.c_str(), buf, 0 );
+	}
+
+	/**
+	* Add a new menu item to the Options Menu associated to this screen.
+	* Platform: Android and WP7.
+	* Option Menus are Android specific concept. The Options Menu is launched by
+	* pressing the Menu key. The options menu is where you should include
+	* actions and other options that are relevant to the current activity
+	* context, such as "Search," "Compose email," or "Settings".
+	* When opened, the first visible portion is the icon menu, which holds
+	* up to six menu items. If your menu includes more than six items, Android
+	* places the sixth item and the rest into the overflow menu, which the user
+	* can open by selecting More. Those items do not display icons. On Windows
+	* Phone 7 the control used is the application bar.
+	*
+	* @param title The title associated for the new item. Can be left null.
+	* @param icon The id of an icon from the Android and WP7 predefined icon set,
+	* these can be found under the OptionsMenuIconConstants group, or the name of
+	* the icon file (works only for WP7).
+	* @param isPath If true, indicates that the icon is based on the path, otherwise
+	* it is one of the predefined icon constants.
+	*
+	* Note: For Windows phone 7 the option menu icons must be added under the following folder
+	* structure "/ApplicationBarIcons/". By using this function you will obtain an
+	* application bar icon button (text + icon). Note that only 4 buttons are
+	* visible on an application bar. If you exceed this limit the option menu
+	* items will be added as application bar menu items on WP7.
+	*
+	* @return The index on which the menu item was added in the options menu,
+	* an error code otherwise.
+	*/
+	int Screen::addOptionsMenuItem(
+			const MAUtil::String title, const MAUtil::String icon, bool isPath)
+	{
+		if(isPath)
+		{
+			char platform[BUF_MAX];
+			maGetSystemProperty("mosync.device.OS", platform, BUF_MAX);
+
+			if(strcmp(platform, "Android") == 0)
+				return MAW_RES_ERROR;
+			else
+			{
+				return maWidgetScreenAddOptionsMenuItem(
+				getWidgetHandle(), title.c_str(), icon.c_str(), 0 );
+			}
+		}
+		else return maWidgetScreenAddOptionsMenuItem(
+				getWidgetHandle(), title.c_str(), icon.c_str(), 1 );
 	}
 
 	/**

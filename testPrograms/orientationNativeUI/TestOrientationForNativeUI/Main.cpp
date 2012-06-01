@@ -27,10 +27,10 @@ MA 02110-1301, USA.
 #include <MAUtil/String.h>		// C++ String class
 #include <MAUtil/Moblet.h>		// Moblet class
 
-#include "MainScreen.h"			// Main UI screen
+#include "AppTabScreen.h"
 
 using namespace MAUtil;
-using namespace NativeUI;
+using namespace OrientationTest;
 
 /**
  * Moblet for the  application.
@@ -44,10 +44,10 @@ public:
 	NativeUIMoblet()
 	{
 		// Create the main user interface screen.
-		mMainScreen = new MainScreen();
+		mTabScreen = new AppTabScreen();
 
 		// Show the screen.
-		mMainScreen->show();
+		mTabScreen->show();
 	}
 
 	/**
@@ -55,7 +55,7 @@ public:
 	 */
 	virtual ~NativeUIMoblet()
 	{
-		delete mMainScreen;
+		delete mTabScreen;
 	}
 
 	/**
@@ -64,8 +64,8 @@ public:
 	void NativeUIMoblet::closeEvent()
 	{
 		// Deallocate the main screen.
-		delete mMainScreen;
-		mMainScreen = NULL;
+		delete mTabScreen;
+		mTabScreen = NULL;
 
 		// Exit the app.
 		close();
@@ -84,7 +84,7 @@ public:
 	}
 
 private:
-	MainScreen* mMainScreen;
+	AppTabScreen* mTabScreen;
 };
 
 /**

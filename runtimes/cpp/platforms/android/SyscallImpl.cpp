@@ -1568,6 +1568,38 @@ namespace Base
 			return _maAudioInstanceCreate(audioData, mJNIEnv, mJThis);
 		}
 
+		//MAAudioInstance maAudioInstanceCreateDynamic(in int sampleRate, in int numChannels, in int bufferSize);
+		case maIOCtl_maAudioInstanceCreateDynamic:
+		{
+			SYSLOG("maIOCtl_maAudioInstanceCreateDynamic");
+			int sampleRate = a;
+			int numChannels = b;
+			int bufferSize = c;
+
+			return _maAudioInstanceCreateDynamic(sampleRate, numChannels, bufferSize,
+												mJNIEnv, mJThis);
+		}
+
+		//int maAudioSubmitBuffer(in MAAudioInstance instance, in MAAddress buffer, in int numBytes);
+		case maIOCtl_maAudioSubmitBuffer:
+		{
+			SYSLOG("maAudioSubmitBuffer");
+			int audioInstance = a;
+			int buffer = (int)SYSCALL_THIS->GetValidatedMemRange(b, c);
+			int bufferSize = c;
+
+			return _maAudioSubmitBuffer(audioInstance, buffer, bufferSize, (int)gCore->mem_ds,
+										mJNIEnv, mJThis);
+		}
+
+		case maIOCtl_maAudioGetPendingBufferCount:
+		{
+			SYSLOG("maAudioGetPendingBufferCount");
+			int audioInstance = a;
+
+			return _maAudioGetPendingBufferCount(audioInstance, mJNIEnv, mJThis);
+		}
+
 		case maIOCtl_maAudioInstanceDestroy:
 		{
 			SYSLOG("maIOCtl_maAudioInstanceDestroy");
@@ -1811,7 +1843,7 @@ namespace Base
 		{
 			SYSLOG("maIOCtl_maWidgetScreenAddOptionsMenuItem");
 			int _iconPredefined = SYSCALL_THIS->GetValidatedStackValue(0);
-			return _maWidgetScreenAddOptionsMenuItem(a, SYSCALL_THIS->GetValidatedStr(b), c, _iconPredefined, mJNIEnv, mJThis);
+			return _maWidgetScreenAddOptionsMenuItem(a, SYSCALL_THIS->GetValidatedStr(b), SYSCALL_THIS->GetValidatedStr(c), _iconPredefined, mJNIEnv, mJThis);
 		}
 
 		case maIOCtl_maWidgetScreenShow:
@@ -2892,6 +2924,59 @@ namespace Base
 
 		case maIOCtl_maCaptureDestroyData:
 			return _maCaptureDestroyData(a, mJNIEnv, mJThis);
+
+		// ********** In-app Purchase API **********
+
+		case maIOCtl_maPurchaseSupported:
+			return _maPurchaseSupported(mJNIEnv, mJThis);
+
+		case maIOCtl_maPurchaseCreate:
+			return _maPurchaseCreate(
+				a,
+				SYSCALL_THIS->GetValidatedStr(b),
+				mJNIEnv,
+				mJThis);
+
+		case maIOCtl_maPurchaseSetPublicKey:
+			return _maPurchaseSetPublicKey(
+				SYSCALL_THIS->GetValidatedStr(a),
+				mJNIEnv,
+				mJThis);
+
+		case maIOCtl_maPurchaseRequest:
+			return _maPurchaseRequest(a, b, mJNIEnv, mJThis);
+
+		case maIOCtl_maPurchaseGetName:
+		{
+			int _handle = a;
+			int _valueBufferSize = c;
+			int _valueBuffer = (int) SYSCALL_THIS->GetValidatedMemRange(b, _valueBufferSize * sizeof(char));
+
+			return _maPurchaseGetName((int)gCore->mem_ds, _handle, _valueBuffer, _valueBufferSize, mJNIEnv, mJThis);
+		}
+
+		case maIOCtl_maPurchaseGetField:
+		{
+			int _handle = a;
+			const char *_property = SYSCALL_THIS->GetValidatedStr(b);
+			//Read the fourth parameter from the register
+			//(the first three can be read directly)
+			int _valueBufferSize = SYSCALL_THIS->GetValidatedStackValue(0);
+			int _valueBuffer = (int) SYSCALL_THIS->GetValidatedMemRange(
+				c,
+				_valueBufferSize * sizeof(char));
+
+			return _maPurchaseGetField((int)gCore->mem_ds, _handle, _property, _valueBuffer, _valueBufferSize, mJNIEnv, mJThis);
+		}
+
+		case maIOCtl_maPurchaseVerifyReceipt:
+			return _maPurchaseVerifyReceipt(a, mJNIEnv, mJThis);
+
+		case maIOCtl_maPurchaseRestoreTransactions:
+			return _maPurchaseRestoreTransactions(mJNIEnv, mJThis);
+
+		case maIOCtl_maPurchaseDestroy:
+			return _maPurchaseDestroy(a, mJNIEnv, mJThis);
 
 		// ********** Panics **********
 
