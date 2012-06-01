@@ -29,6 +29,7 @@ MA 02110-1301, USA.
 #define ANDROID_PRODUCT_TYPE_PURCHASED "android.test.purchased"
 #define ANDROID_PRODUCT_TYPE_CANCELLED "android.test.canceled"
 #define ANDROID_PRODUCT_TYPE_UNAVAILABLE "android.test.item_unavailable"
+#define ANDROID_PRODUCT_TYPE_REFUNDED "android.test.refunded"
 #define IOS_PRODUCT_TYPE_2 "com.mosync.purchase2.nonconsumable"
 #define IOS_PRODUCT_TYPE_UNAVAILABLE "invalid_product"
 
@@ -74,6 +75,7 @@ namespace PurchaseTest
 			mProductType2 = new MAUtil::String(ANDROID_PRODUCT_TYPE_PURCHASED);
 			mProductTypeUnavailable = new MAUtil::String(ANDROID_PRODUCT_TYPE_UNAVAILABLE);
 			mProductTypeCancelled = new MAUtil::String(ANDROID_PRODUCT_TYPE_CANCELLED);
+			mProductTypeRefunded = new MAUtil::String(ANDROID_PRODUCT_TYPE_REFUNDED);
 		}
 		else if (platform == IOS)
 		{
@@ -93,6 +95,7 @@ namespace PurchaseTest
 		delete mProductType2;
 		delete mProductTypeCancelled;
 		delete mProductTypeUnavailable;
+		delete mProductTypeRefunded;
 	}
 
 	/**
@@ -157,5 +160,13 @@ namespace PurchaseTest
 	const MAUtil::String& ProductTypes::getProductTypeCancelled() const
 	{
 		return *mProductTypeCancelled;
+	}
+
+	/**
+	 * Get the refunded product type.
+	 */
+	const MAUtil::String& ProductTypes::getProductTypeRefunded() const
+	{
+		return *mProductTypeRefunded;
 	}
 } // namespace Purchase

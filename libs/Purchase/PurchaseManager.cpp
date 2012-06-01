@@ -165,8 +165,21 @@ namespace IAP
 					Purchase* purchase = mPurchaseMap[purchaseData.productHandle];
 					// Call the purchase's event handling method.
 					purchase->handlePurchaseEvent(event.purchaseData);
+					return;
 				}
-
+				// Check if the purchase exists in mSpecialProducts, and handle receipt
+				// events for refunded or restored products.
+				if ( purchaseData.type == MA_PURCHASE_EVENT_VERIFY_RECEIPT )
+				{
+					for (int i=0; i < mSpecialProducts.size(); i++)
+					{
+						if ( mSpecialProducts[i]->getHandle() == purchaseData.productHandle )
+						{
+							mSpecialProducts[i]->handlePurchaseEvent(event.purchaseData);
+							break;
+						}
+					}
+				}
 			}
 		}
 	}

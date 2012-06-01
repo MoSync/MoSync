@@ -49,19 +49,23 @@ public class MoSyncPurchase
 	public MoSyncPurchase(MoSyncThread thread)
 	{
 		mMoSyncThread = thread;
-		// In-app purchase is supported only from Android 1.6 and higher.
-		try{
-			int target = IntConverter.convert( Build.VERSION.SDK );
-			if ( target >= 4 )
-			{
-				SYSLOG("PurchaseManager is available, android sdk version > 4");
-				mPurchaseManager = new PurchaseManager(thread);
+		// Create the manager and bind service only if permission is set.
+//		if ( isBillingPermissionSet() )
+//		{
+			// In-app purchase is supported only from Android 1.6 and higher.
+			try{
+				int target = IntConverter.convert( Build.VERSION.SDK );
+				if ( target >= 4 )
+				{
+					SYSLOG("PurchaseManager is available, android sdk version > 4");
+					mPurchaseManager = new PurchaseManager(thread);
+				}
 			}
-		}
-		catch(PropertyConversionException pce )
-		{
-			return;
-		}
+			catch(PropertyConversionException pce )
+			{
+				return;
+			}
+//		}
 	}
 
 	public void restoreService()
@@ -81,7 +85,7 @@ public class MoSyncPurchase
 	/**
 	 * Check if Billing permission is set, and if not call maPanic().
 	 */
-	boolean isBillingPermissionSet()
+	public boolean isBillingPermissionSet()
 	{
 		return
 			PackageManager.PERMISSION_GRANTED ==
@@ -139,7 +143,6 @@ public class MoSyncPurchase
 		else
 		{
 			SYSLOG("maPurchaseCreate error: not available");
-			// post  MA_PURCHASE_RES_UNAVAILABLE;
 			mMoSyncThread.postEvent(BillingEvent.onProductCreate(
 					productHandle,
 					MA_PURCHASE_STATE_DISABLED,
@@ -231,8 +234,9 @@ public class MoSyncPurchase
 	}
 
 	/**
+	 * Internal function for the maPurchaseGetField system call.
 	 *
-	 * @return
+	 * @return The field value.
 	 */
 	public int maPurchaseGetField(
 			final int productHandle,

@@ -55,6 +55,7 @@ public:
 	NativeUIMoblet():
 		mController(NULL)
 	{
+		MAUtil::String developerKey = DEVELOPER_PUBLIC_KEY;
 		int platform = getPlatform();
 		int result = IAP::PurchaseManager::getInstance()->checkPurchaseSupported();
 		if (platform != IOS &&
@@ -71,8 +72,8 @@ public:
 		}
 		else
 		{
-			MAUtil::String developerKey = DEVELOPER_PUBLIC_KEY;
-			if ( developerKey.size() == 0 )
+
+			if ( platform == ANDROID && developerKey.size() == 0 )
 			{
 				maAlert("Error", "You need to set developer key in Config.h ",
 					"OK", NULL, NULL);

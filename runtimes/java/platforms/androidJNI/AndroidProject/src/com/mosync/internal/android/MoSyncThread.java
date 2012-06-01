@@ -407,6 +407,7 @@ public class MoSyncThread extends Thread
 		}
 
 		//nativeInitRuntime();
+		mMoSyncPurchase = new MoSyncPurchase(this);
 
 		mMoSyncSensor = new MoSyncSensor(this);
 
@@ -430,8 +431,6 @@ public class MoSyncThread extends Thread
 		mMoSyncNotifications = new MoSyncNotifications(this);
 
 		mMoSyncCapture = new MoSyncCapture(this, mImageResources);
-
-		mMoSyncPurchase = new MoSyncPurchase(this);
 
 		mMoSyncDB = new MoSyncDB();
 
