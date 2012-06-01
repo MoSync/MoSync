@@ -79,6 +79,8 @@ void MainScreen::numberPickerValueChanged(
 {
     if (numberPicker == mNumberPicker)
     {
-        printf("mNumberPicker value changed : %d", numberPickerValue);
+        char buf[50];
+        sprintf(buf, "The new picker value is %d", numberPicker->getValue());
+        maAlert("Alert", buf, "Ok", NULL, NULL);
     }
 }

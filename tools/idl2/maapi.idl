@@ -1477,6 +1477,12 @@ interface MAAPI {
 		* This event will contain a MACaptureEventData struct.
 		*/
 		CAPTURE = 47;
+
+		/**
+		* \brief Send by the Purchase API.
+		* This event will contain a MAPurchaseEventData struct.
+		*/
+		PURCHASE = 48;
 		}
 
 	/**
@@ -1536,6 +1542,39 @@ interface MAAPI {
 		/// Handle to a video/image data object.
 		/// This value is set only if the event type is MA_CAPTURE_EVENT_TYPE_IMAGE or MA_CAPTURE_EVENT_TYPE_VIDEO.
 		MAHandle handle;
+	}
+
+	/**
+	* \brief An puchase event struct.
+	* A MoSync event will contain an struct object of this type only if event type
+	* is #EVENT_TYPE_PURCHASE.
+	*/
+	struct MAPurchaseEventData {
+		/**
+		* \brief Type of the purchase event.
+		* One of the \link MA_PURCHASE_EVENT_REQUEST_STATE_CHANGED MA_PURCHASE_EVENT \endlink constants.
+		*/
+		int type;
+
+		/**
+		* \brief State of the purchase.
+		* One of the \link MA_PURCHASE_STATE_FAILED MA_PURCHASE_STATE \endlink constants.
+		* Valid only if type is #MA_PURCHASE_EVENT_REQUEST_STATE_CHANGED.
+		*/
+		int state;
+
+		/**
+		* \brief Handle to the product that sent the event.
+		*/
+		MAHandle productHandle;
+
+		/**
+		* \brief Reason why the puchase failed.
+		* Valid only if type is #MA_PURCHASE_EVENT_REQUEST_STATE_CHANGED and
+		* state is #MA_PURCHASE_STATE_FAILED.
+		* One of the \link MA_PURCHASE_ERROR_INVALID_HANDLE MA_PURCHASE_ERROR \endlink constants.
+		*/
+		int errorCode;
 	}
 
 	/**
@@ -1674,7 +1713,12 @@ interface MAAPI {
 			*/
 			MAAudioInstance audioInstance;
 
-		}
+			/**
+			* Contains purchase related data.
+			* Valid only if the event type is \link #EVENT_TYPE_PURCHASE PURCHASE \endlink.
+			*/
+			MAPurchaseEventData purchaseData;
+			}
 	}
 
 	/**
@@ -5061,50 +5105,65 @@ group WidgetAPI "Widget API" {
 	* The available constants for the Android predefined drawables used in OptionsMenu.
 	* The drawables can be set via #maWidgetScreenAddOptionsMenuItem syscall.
 	* The icons can be found here: http://androiddrawables.com/menu.html .
+	* Note that only these are supported on WP7:
+	*	- ADD
+	*	- CAMERA
+	*	- CLOSE_CLEAR_CANCEL
+	*	- DELETE
+	*	- EDIT
+	*	- GALLERY
+	*	- HELP
+	*	- MORE
+	*	- PREFERENCES
+	*	- SAVE
+	*	- SEARCH
+	*	- SHARE
+	*	- UPLOAD
+	*	- UPLOAD_YOU_TUBE
 	*/
 	group OptionsMenuIconConstants "Options menu icon constants" {
-	constset int MAW_OPTIONS_MENU_ICON_CONSTANT_ {
-		ADD = 17301555 ;
-		AGENDA = 17301556 ;
-		ALWAYS_LANDSCAPE_PORTRAIT = 17301557 ;
-		CALL = 17301558 ;
-		CAMERA = 17301559 ;
-		CLOSE_CLEAR_CANCEL = 17301560 ;
-		COMPASS = 17301561;
-		CROP = 17301562 ;
-		DAY =  17301563 ;
-		DELETE = 17301564 ;
-		DIRECTIONS = 17301565 ;
-		EDIT = 17301566 ;
-		GALLERY = 17301567 ;
-		HELP = 17301568 ;
-		INFO_DETAILS = 17301569 ;
-		MANAGE = 17301570 ;
-		MAPMODE = 17301571 ;
-		MONTH = 17301572 ;
-		MORE = 17301573 ;
-		MY_CALENDAR = 17301574 ;
-		MYLOCATION = 17301575 ;
-		MYPLACES = 17301576 ;
-		PREFERENCES = 17301577 ;
-		RECENT_HISTORY = 17301578 ;
-		REPORT_IMAGE = 17301579 ;
-		REVERT = 17301580 ;
-		ROTATE = 17301581 ;
-		SAVE = 17301582 ;
-		SEARCH = 17301583 ;
-		SEND = 17301584 ;
-		SET_AS = 17301585 ;
-		SHARE = 17301586 ;
-		SLIDESHOW = 17301587 ;
-		SORT_ALPHABETICALLY = 17301660 ;
-		SORT_BY_SIZE = 17301661 ;
-		TODAY = 17301588 ;
-		UPLOAD = 17301589 ;
-		UPLOAD_YOU_TUBE = 17301590 ;
-		VIEW = 17301591 ;
-		WEEK = 17301592 ;
-		ZOOM = 17301593 ;
+	constset MAString MAW_OPTIONS_MENU_ICON_CONSTANT_ {
+		ADD = "17301555" ;
+		AGENDA = "17301556" ;
+		ALWAYS_LANDSCAPE_PORTRAIT = "17301557" ;
+		CALL = "17301558" ;
+		CAMERA = "17301559" ;
+		CLOSE_CLEAR_CANCEL = "17301560" ;
+		COMPASS = "17301561" ;
+		CROP = "17301562" ;
+		DAY =  "17301563" ;
+		DELETE = "17301564" ;
+		DIRECTIONS = "17301565" ;
+		EDIT = "17301566" ;
+		GALLERY = "17301567" ;
+		HELP = "17301568" ;
+		INFO_DETAILS = "17301569" ;
+		MANAGE = "17301570" ;
+		MAPMODE = "17301571" ;
+		MONTH = "17301572" ;
+		MORE = "17301573" ;
+		MY_CALENDAR = "17301574" ;
+		MYLOCATION = "17301575" ;
+		MYPLACES = "17301576" ;
+		PREFERENCES = "17301577" ;
+		RECENT_HISTORY = "17301578" ;
+		REPORT_IMAGE = "17301579" ;
+		REVERT = "17301580" ;
+		ROTATE = "17301581" ;
+		SAVE = "17301582" ;
+		SEARCH = "17301583" ;
+		SEND = "17301584" ;
+		SET_AS = "17301585" ;
+		SHARE = "17301586" ;
+		SLIDESHOW = "17301587" ;
+		SORT_ALPHABETICALLY = "17301660" ;
+		SORT_BY_SIZE = "17301661" ;
+		TODAY = "17301588" ;
+		UPLOAD = "17301589" ;
+		UPLOAD_YOU_TUBE = "17301590" ;
+		VIEW = "17301591" ;
+		WEEK = "17301592" ;
+		ZOOM = "17301593" ;
 
 	}
 	} // end of OptionsMenuIconConstants
@@ -6362,6 +6421,25 @@ group WidgetAPI "Widget API" {
 		* \endcode
 		*/
 		SCROLLABLE = "scrollable";
+
+		/**
+		* @brief Sets the content offset. The layout will be scrolled to the given coordinate.
+		* Platform: iOS.
+		*
+		* @validvalue Two int values separated by dash "-". The first int value represents the x coord and
+		* the second value represents the y coord.
+		* If the value is not as described the content offset will not be set and syscall will return
+		* #MAW_RES_INVALID_PROPERTY_VALUE.
+		* The default value is (0,0).
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(verticalLayoutHandle, MAW_RELATIVE_LAYOUT_SCROLLABLE, "30-30");
+		* \endcode
+		*/
+		CONTENT_OFFSET = "contentOffset";
 	}
 	}
 
@@ -7713,20 +7791,33 @@ group WidgetAPI "Widget API" {
 	group WidgetMapProperties "Map properties" {
 	constset MAString MAW_MAP_ {
 	    /*
-		* @brief The api key used to access the full features of the map (a google maps api key for Android
-		* and a bing maps api key for Windows Phone). The iOS platform doesn't require a key.
+		* @brief The api key used to access the full features of the google map (on Android platform).
+		* The iOS platform doesn't require a key.
 		*
-		* @validvalue The format of the key differs from platform to platform. For further details on how to
-		* obtain these keys go to "https://developers.google.com/maps/documentation/android/mapkey" for google
-		* maps and to "http://msdn.microsoft.com/en-us/library/ff428642.aspx" for bing maps.
+		* @validvalue A string containing a google maps key. For further details on how to
+		* obtain these key go to "https://developers.google.com/maps/documentation/android/mapkey".
 		*
 		* @setonly
 		* @par Example
 		* \code
-		*   maWidgetSetProperty(mapHandle, MAW_MAP_API_KEY, "a_valid_key");
+		*   maWidgetSetProperty(mapHandle, MAW_MAP_API_KEY_GOOGLE, "a_valid_google_key");
 		* \endcode
 		*/
-		API_KEY = "api_key";
+		API_KEY_GOOGLE = "api_key_google";
+
+		/*
+		* @brief The api key used to access the full features of the bing map (on windows phone platform).
+		*
+		* @validvalue A string containing a bing maps key. For further details on how to
+		* obtain these key go to "http://msdn.microsoft.com/en-us/library/ff428642.aspx".
+		*
+		* @setonly
+		* @par Example
+		* \code
+		*   maWidgetSetProperty(mapHandle, MAW_MAP_API_KEY_BING, "a_valid_bing_key");
+		* \endcode
+		*/
+		API_KEY_BING = "api_key_bing";
 
 		/*
 		* @brief Set or get the map type.
@@ -8135,7 +8226,7 @@ group WidgetAPI "Widget API" {
 
 	/**
 	* Add an item to the Options Menu associated to a screen.
-	* Available on Android only.
+	* Available on Android and WP7.
 	* The options menu is where you should include actions and other options that are relevant to the current activity
 	* context, such as "Search," "Compose email," or "Settings".
 	* When opened, the first visible portion is the icon menu, which holds up to six menu items.
@@ -8143,43 +8234,21 @@ group WidgetAPI "Widget API" {
 	* which the user can open by selecting More. Those items do not display icons.
 	* \param widget Handle to the screen widget.
 	* \param title The title associated for the new item. Can be left null.
-	* \iconHandle MoSync handle to an uncompressed image resource, or :
-	* a predefined Android icon, one of the \link #MAW_OPTIONS_MENU_ICON_CONSTANT \endlink constants.
-	* Can be left null.
+	* \param iconPath The path to an image or  a predefined icon, one of the \link #MAW_OPTIONS_MENU_ICON_CONSTANT_ADD \endlink constants.
+	* Note that for Windows phone 7 the option menu icons must be added under the following folder
+	* structure "/ApplicationBarIcons/". The function is called with the name of the icon file.
+	* e.g. maWidgetScreenAddOptionsMenuItem(ScreenHandle, "test", "optionsMenuItemIcon.png", 0); where the
+	* file optionsMenuItemIcon.png is found in the folder "/ApplicationBarIcons".
+	* Can be left null. On windows phone 7 a null icon means that the item
+	* will be a part of the extendable menu item list from the native Application Bar.
 	* \iconPredefined Specifies if the icon is a project resource, or one of the predefined Android icons.
 	* By default it's value is 0.
 	*
 	* \returns The the item index on success, or any of the following result codes:
-	* - #MAW_RES_INVALID_HANDLE if the screen handle was invalid.
-	* - #MAW_RES_ERROR otherwise.
+	* - #MAW_RES_ERROR
+	* - #MAW_RES_INVALID_HANDLE
 	*/
-	int maWidgetScreenAddOptionsMenuItem(in MAWidgetHandle widget, in MAString title, in int iconHandle, in int iconPredefined);
-
-	/**
-	 * \returns The pin index on success, or any of the following result codes:
-	 * - #MAW_RES_INVALID_HANDLE if the map handle was invalid.
-	 * - #MAW_RES_ERROR otherwise.
-	 */
-	int maWidgetMapAddPin(in MAWidgetHandle widget, in double latitude, in double longitude);
-
-	/**
-	 * \returns MAW_RES_OK if the pin has been removed, or any of the following result codes:
-	 * - #MAW_RES_INVALID_HANDLE if the map handle was invalid.
-	 * - #MAW_RES_ERROR otherwise.
-	 */
-	int maWidgetMapRemovePin(in MAWidgetHandle widget, in int pinIndex);
-
-	/**
-	 * \returns MAW_RES_OK if the map has been scrolled/zoomed to the specified region,
-	 * or any of the following result codes:
-	 * - #MAW_RES_INVALID_HANDLE if the map handle was invalid.
-	 * - #MAW_RES_ERROR otherwise.
-	 */
-	int maWidgetMapSetVisibleRegion(in MAWidgetHandle widget,
-		in double upperLeftCornerLatitude,
-		in double upperLeftCornerLongitude,
-		in double lowerRightCornerLatitude,
-		in double lowerRightCornerLongitude);
+	int maWidgetScreenAddOptionsMenuItem(in MAWidgetHandle widget, in MAString title, in MAString iconPath, in int iconPredefined);
 
 	} // end of group WidgetAPIFunctions
 
@@ -8781,6 +8850,7 @@ group OpenGLES "OpenGLES" {
 #include "opengl_non_generated.idl"
 #include "opengl_generated.idl"
 }
+
 		/**
 		 * Logs information about the state of all current resources.
 		 */
@@ -11340,6 +11410,10 @@ group CaptureAPI "Capture API" {
 	}//End of Capture Functions
 
 } // End of Capture API
+
+group PurchaseAPI "Purchase API" {
+#include "purchase.idl"
+} // End of Purchase API
 
 }
 	constset int IOCTL_ {

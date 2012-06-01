@@ -59,6 +59,8 @@ static const char sInfo[] =
 "   -plist-template specifies the input plist template.\n"
 "   -project-name   the name of the project.\n"
 "   -company-name   the name of the company.\n"
+"   -bundle-identifier\n"
+"                   the bundle identifier\n"
 "   -version        the version (used for knowing when to update on the app store).\n"
 "   -cert           the name of the certificate to use for signing the app.\n"
 "   -output         specifies the output folder of the xcode project (the project name will be used as the name for the files).\n"
@@ -277,6 +279,7 @@ void generate() {
 	replaceTemplateDefine(pbxTemplateFile, "iPhone Developer", validateArgument("cert"));
 	replaceTemplateDefine(plistTemplateFile, "__VERSION__", validateArgument("version"));
 	replaceTemplateDefine(plistTemplateFile, "__COMPANY_NAME__", filterWhiteSpace(validateArgument("company-name")));
+	replaceTemplateDefine(plistTemplateFile, "__BUNDLE_IDENTIFIER__", filterWhiteSpace(validateArgument("bundle-identifier")));
 
 	writeMemIntoFile(pbxOutput.c_str(), pbxTemplateFile.c_str(), pbxTemplateFile.length());
 	writeMemIntoFile(plistOutput.c_str(), plistTemplateFile.c_str(), plistTemplateFile.length());

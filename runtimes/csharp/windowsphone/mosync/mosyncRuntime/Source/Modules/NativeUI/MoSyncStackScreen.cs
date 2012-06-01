@@ -34,6 +34,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Shapes;
+using System.Collections.Generic;
 
 namespace MoSync
 {
@@ -50,6 +51,7 @@ namespace MoSync
             public StackScreen() : base()
             {
                 mStack = new System.Collections.Generic.Stack<IScreen>();
+                mApplicationBarItemsIndexes = new Dictionary<Object, int>();
             }
 
             /**
@@ -68,12 +70,16 @@ namespace MoSync
                             mPage.Children.Add((child as Screen).View);
                             Grid.SetColumn(mPage.Children[mPage.Children.Count - 1] as Grid, 0);
                             Grid.SetRow(mPage.Children[mPage.Children.Count - 1] as Grid, 0);
+
+                            ToggleApplicationBar((child as Screen));
                         });
+
+                    /**
+                     * Manualy add the child to the children array
+                     */
+                    mChildren.Add(child);
+                    (child as Screen).SetParent(this);
                 }
-                /**
-                 * Manualy add the child to the children array
-                 */
-                mChildren.Add(child);
             }
 
             /**
@@ -112,6 +118,8 @@ namespace MoSync
                         mPage.Children.Add((mStack.Peek() as Screen).View);
                         Grid.SetColumn(mPage.Children[mPage.Children.Count - 1] as Grid, 0);
                         Grid.SetRow(mPage.Children[mPage.Children.Count - 1] as Grid, 0);
+
+                        ToggleApplicationBar((mStack.Peek() as Screen));
 					});
                 }
             }
@@ -134,6 +142,7 @@ namespace MoSync
                     mPage.Children.Add((mStack.Peek() as Screen).View);
                     Grid.SetColumn(mPage.Children[mPage.Children.Count - 1] as Grid, 0);
                     Grid.SetRow(mPage.Children[mPage.Children.Count - 1] as Grid, 0);
+                    ToggleApplicationBar((mStack.Peek() as Screen));
                 }
             }
 
@@ -195,6 +204,35 @@ namespace MoSync
             public int StackCount()
             {
                 return mStack.Count;
+            }
+
+            /*
+             * Toggles the application bar for the screen given as parameter.
+             * @param child the screen for which the application bar should be changed / updated.
+             */
+            public void ToggleApplicationBar(Screen child)
+            {
+                bool appBarVisible = child.GetApplicationBarVisibility();
+                if (appBarVisible)
+                {
+                    mApplicationBar = child.GetApplicationBar();
+                    mApplicationBar.IsVisible = true;
+                    ApplicationBarVisible = true;
+                    ((Application.Current.RootVisual as Microsoft.Phone.Controls.PhoneApplicationFrame).Content as
+                        Microsoft.Phone.Controls.PhoneApplicationPage).ApplicationBar = mApplicationBar;
+                }
+                else
+                {
+                    mApplicationBar = child.GetApplicationBar();
+                    mApplicationBar.IsVisible = false;
+                    ApplicationBarVisible = false;
+                    if (((Application.Current.RootVisual as Microsoft.Phone.Controls.PhoneApplicationFrame).Content as
+                        Microsoft.Phone.Controls.PhoneApplicationPage).ApplicationBar != null)
+                    {
+                        ((Application.Current.RootVisual as Microsoft.Phone.Controls.PhoneApplicationFrame).Content as
+                        Microsoft.Phone.Controls.PhoneApplicationPage).ApplicationBar.IsVisible = false;
+                    }
+                }
             }
         }
     }

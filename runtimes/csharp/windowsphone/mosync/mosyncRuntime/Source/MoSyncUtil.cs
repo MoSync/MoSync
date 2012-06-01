@@ -363,6 +363,11 @@ namespace MoSync
                 byte A = 255;
                 brush = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(A, R, G, B));
             }
+            // special case for 0
+            else if (value.Length == 1 && value[0].Equals('0'))
+            {
+                brush = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(255, 0, 0, 0));
+            }
             else throw new InvalidPropertyValueException();
 		}
 

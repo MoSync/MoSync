@@ -24,6 +24,7 @@
 
 - (id)init;
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value;
+- (NSString*)getPropertyWithKey: (NSString*)key;
 - (void)layoutSubviews:(UIView*)_view;
 
 @end

@@ -198,13 +198,20 @@ packages = ["src/com/mosync/java/android/*.java",
             "src/com/mosync/internal/android/nfc/ops/*.java",
 	        "src/com/mosync/nativeui/ui/ads/*.java",
 			"src/com/google/android/c2dm/*.java",
-			"src/com/mosync/internal/android/notifications/*.java"
+			"src/com/mosync/internal/android/notifications/*.java",
+			"src/com/mosync/internal/android/billing/*.java",
+			"src/com/mosync/internal/android/billing/request/*.java",
+			"gen/com/android/vending/billing/IMarketBillingService.java"
             ]
 
 # Concatenate each list element with package_root, and flatten the list to a string
 java_files = packages.map { |package| File.join(package_root, package) }.join(" ")
 
-
+#puts "Compiling aidl files\n\n"
+# Compile the aidl file into java class, the output will be generated in gen folder.
+#sh( "#{File.join(androidSDKTools, "/aidl")} -I " + "\"#{File.join(androidSDKPath, "android.jar")}\" " + " -o " +
+#	"#{File.join("#{package_root}src/com/android/vending/billing/", "IMarketBillingService.aidl")} " );
+#	"#{File.join("#{package_root}gen/com/android/vending/billing/", "IMarketBillingService.java")} ");
 
 # Compile all the java files into class files
 if ENV['OS'] == "Windows_NT"
@@ -219,10 +226,11 @@ else
 		"\"#{File.join(androidSDKPath, "android.jar")}:#{File.join("#{package_root}libs/", "GoogleAdMobAdsSdk.jar")}\" " + java_files);
 end
 
-puts "Copy Generated Library File\n\n"
-
+puts "Copy Generated Library File\n"
 # copy the library file
 FileUtils.copy_file( "#{File.join(cpath, "AndroidProject/libs/armeabi/libmosync.so")}", "temp/libmosync.so")
+
+puts "Copy external Library Files\n\n"
 FileUtils.copy_file( "#{File.join(cpath, "AndroidProject/libs/GoogleAdMobAdsSdk.jar")}", "temp/GoogleAdMobAdsSdk.jar")
 
 puts "Build Zip Package\n\n"
