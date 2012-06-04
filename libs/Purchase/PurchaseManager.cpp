@@ -298,7 +298,7 @@ namespace IAP
 			{
 				if ( mSpecialProducts[i]->getHandle() == purchaseData.productHandle )
 				{
-					mSpecialProducts[i]->handlePurchaseEvent(event.purchaseData);
+					mSpecialProducts[i]->handlePurchaseEvent(purchaseData);
 					break;
 				}
 			}
