@@ -292,7 +292,7 @@ group PurchaseReceiptFields "Purchase Receipt Fields" {
 		PRODUCT_ID = "product_id";
         /**
         * \brief The transaction identifier of the item that was purchased.
-        * Platform: iOS.
+        * Platform: iOS and Android.
         */
 		TRANSACTION_ID = "transaction_id";
         /**

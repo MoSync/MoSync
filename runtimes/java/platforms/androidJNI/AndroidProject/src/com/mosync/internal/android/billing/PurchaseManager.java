@@ -33,6 +33,7 @@ import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_STATE_DUPLI
 import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_STATE_PRODUCT_VALID;
 import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_RECEIPT_PRODUCT_ID;
 import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_RECEIPT_PURCHASE_DATE;
+import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_RECEIPT_TRANSACTION_ID;
 import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_STATE_COMPLETED;
 import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_STATE_RECEIPT_ERROR;
 import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_STATE_RECEIPT_VALID;
@@ -225,6 +226,10 @@ public class PurchaseManager extends BillingListener
 			if ( field.equals(MA_PURCHASE_RECEIPT_APP_ITEM_ID) )
 			{
 				return purchase.getPackageName();
+			}
+			if ( field.equals(MA_PURCHASE_RECEIPT_TRANSACTION_ID) )
+			{
+				return purchase.getOrderId();
 			}
 			return Consts.RECEIPT_FIELD_NOT_AVAILABLE;
 		}
