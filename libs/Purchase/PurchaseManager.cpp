@@ -176,7 +176,7 @@ namespace IAP
 	/**
 	 * Remove a purchase from the map that holds purchases.
 	 * The purchase will not receive custom events.
-	 * @param product The purchase that needs to be unregistered.
+	 * @param purchase The purchase that needs to be unregistered.
 	 */
 	void PurchaseManager::unregisterPurchase(Purchase* purchase)
 	{
