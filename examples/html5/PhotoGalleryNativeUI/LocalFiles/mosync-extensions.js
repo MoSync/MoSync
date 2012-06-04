@@ -11,7 +11,8 @@
 mosync.nativeui.MAIN_WEBVIEW = 0;
 
 /**
- * Evaluate JavaScript code in another WebView.
+ * Evaluate JavaScript code in another WebView. This provides a
+ * way to pass messages and communicate between WebViews.
  *
  * @param webViewHandle The MoSync handle of the WebView widget.
  * Use mosync.nativeui.MAIN_WEBVIEW to refer to the main WebView

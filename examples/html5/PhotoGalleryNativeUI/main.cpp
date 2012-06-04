@@ -38,6 +38,7 @@ MA 02110-1301, USA.
  *   functions in C++, implemented by the MyMessageHandler class
  *   (this may be added to the MoSync Wormhole library in an
  *   upcoming release of MoSync).
+ * - How to send messages between WebViews (via C++).
  *
  * The folder "Server" contains the server side code. Note that this
  * code is not part of the actual mobile app, but is intended to run
@@ -102,6 +103,9 @@ public:
 			mGalleryWebViewHandle,
 			MAW_WEB_VIEW_URL,
 			url.c_str());
+
+		// Delete me!
+		delete this;
 	}
 };
 
@@ -112,15 +116,8 @@ class MyMoblet : public Wormhole::WebAppMoblet
 {
 public:
 	MyMoblet() :
-		mMyMessageHandler(getWebView()),
-		mPhotoListDownloader(NULL)
+		mMyMessageHandler(getWebView())
 	{
-		for (int i = 0; i < 100; ++i)
-		{
-			MyPhotoListDownloader* d = new MyPhotoListDownloader(1);
-			delete d;
-		}
-
 		// Extract files in LocalFiles folder to the device.
 		extractFileSystem();
 
@@ -146,24 +143,15 @@ public:
 		mMyMessageHandler.addMessageFun(
 			"CallJS",
 			(MyMessageHandlerFun)&MyMoblet::callJSInWebView);
-
-		// We need to handle HOOK_INVOKED events manually in the code
-		// To be able to catch messages from all WebViews in the app.
-		//Environment::getEnvironment().addCustomEventListener(this);
 	}
 
 	virtual ~MyMoblet()
 	{
-		if (NULL != mPhotoListDownloader)
-		{
-			delete mPhotoListDownloader;
-			mPhotoListDownloader = NULL;
-		}
 	}
 
 	/**
 	 * Here we handle HOOK_INVOKED events for WebViews in the app.
-	 * This enables all WebViews to pass messages to the main WebView.
+	 * This code enables WebViews to send messages to each other.
 	 */
 	void customEvent(const MAEvent& event)
 	{
@@ -180,17 +168,21 @@ public:
 			}
 
 			// Process HOOK_INVOKED messages. This makes CallJS messages work.
-	        if (MAW_EVENT_WEB_VIEW_HOOK_INVOKED == widgetEventData->eventType)
-	        {
+			if (MAW_EVENT_WEB_VIEW_HOOK_INVOKED == widgetEventData->eventType)
+			{
 				//int hookType = widgetEventData->hookType;
 				MAHandle data = widgetEventData->urlData;
 
-				//handleWebViewMessage(getWebView(), data);
+				// Works with NULL as first param as long as the the only
+				// thing we do is passing messages to other WebViews.
+				// This is done by custom function callJSInWebView,
+				// which is invoked via handleWebViewMessage.
 				handleWebViewMessage(NULL, data);
+				//handleWebViewMessage(getWebView(), data); // Alternative.
 
 				// Free data.
-	            maDestroyPlaceholder(data);
-	        }
+				maDestroyPlaceholder(data);
+			}
 		}
 	}
 
@@ -209,22 +201,6 @@ public:
 	 */
 	void downloadPhotoList(Wormhole::MessageStream& stream)
 	{
-		if (NULL != mPhotoListDownloader)
-		{
-			// Check that download is not in progress.
-			if (mPhotoListDownloader->isOpen())
-			{
-				return;
-			}
-
-			// Make sure connection is closed.
-			mPhotoListDownloader->close();
-
-			// Delete it.
-			//delete mPhotoListDownloader;
-			mPhotoListDownloader = NULL;
-		}
-
 		// Get the Gallery WebView widget handle.
 		int webViewHandle = MAUtil::stringToInteger(stream.getNext());
 
@@ -232,8 +208,7 @@ public:
 		const char* url = stream.getNext();
 
 		// Initiate download.
-		mPhotoListDownloader = new MyPhotoListDownloader(webViewHandle);
-		mPhotoListDownloader->get(url);
+		(new MyPhotoListDownloader(webViewHandle))->get(url);
 	}
 
 	/**
@@ -314,7 +289,6 @@ public:
 
 private:
 	MyMessageHandler mMyMessageHandler;
-	MyPhotoListDownloader* mPhotoListDownloader;
 };
 
 /**

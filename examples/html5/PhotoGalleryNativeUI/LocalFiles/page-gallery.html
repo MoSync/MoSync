@@ -2,6 +2,11 @@
 <!--
 * @file page-gallery.html
 * @author Mikael Kindborg
+*
+* This file contains the UI for displaying images in the gallery.
+*
+* Actual download of image urls is done by the main application
+* object called "app", which is defined in file index.html.
 -->
 <html>
 	<head>
@@ -35,7 +40,8 @@
 					"app.downloadPhotoList()");
 			};
 
-			// TODO: Used this for debugging. Can be removed.
+			// Not called. Use this for debugging. Shows the format
+			// of the JSON data that contains image urls.
 			gallery.downloadPhotoListDebug = function()
 			{
 				gallery.setPhotoList(
@@ -65,7 +71,7 @@
 					var image = document.createElement('img');
 					image.src = urls[i];
 					image.style.width = "100%";
-					// TODO: Add more properties to the image object as needed.
+					// TODO: Add more properties to the image object if needed.
 
 					list.appendChild(image);
 				}
