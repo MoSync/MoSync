@@ -98,6 +98,11 @@ namespace PurchaseTest
 		 * @return The cancelled product type.
 		 */
 		const MAUtil::String& getProductTypeCancelled() const;
+
+		/**
+		 * Get the refunded product type.
+		 */
+		const MAUtil::String& getProductTypeRefunded() const;
 	private:
 		/**
 		 * Constructor.
@@ -143,6 +148,12 @@ namespace PurchaseTest
 		 * of a cancelled order.
 		 */
 		MAUtil::String* mProductTypeCancelled;
+
+		/**
+		 * Refunded product type.
+		 * Available only on Android.
+		 */
+		MAUtil::String* mProductTypeRefunded;
 	};
 
 } // namespace PurchaseTest

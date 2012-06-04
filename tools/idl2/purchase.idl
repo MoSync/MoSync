@@ -267,6 +267,14 @@ group PurchaseStateCodes "Purchase State Codes" {
 		* Platform: Android and iOS.
 		*/
 		PRODUCT_RESTORED = -8;
+
+		/**
+		* \brief Received after a refund was initiated on the server.
+		* Associated with #MA_PURCHASE_EVENT_REFUNDED.
+		* Indicates that a product has been refunded.
+		* Platform: Android.
+		*/
+		PRODUCT_REFUNDED = -9;
 	}
 } // end of Purchase State Codes
 
