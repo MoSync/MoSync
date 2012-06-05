@@ -43,6 +43,7 @@
 #include "../tests/Test8.h"
 #include "../tests/Test9.h"
 #include "../tests/Test10.h"
+#include "../tests/Test11.h"
 
 #include "../Util.h"
 #include "Config.h"
@@ -191,6 +192,7 @@ namespace PurchaseTest
 		mTests.add(new Test8(*this));
 		mTests.add(new Test9(*this));
 		mTests.add(new Test10(*this));
+		mTests.add(new Test11(*this));
 	}
 
 	/**

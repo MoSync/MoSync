@@ -76,7 +76,6 @@ public class EditBoxFactory implements AbstractViewFactory
 					if ( actionId == EditorInfo.IME_ACTION_DONE )
 					{
 						EventQueue.getDefault( ).postWidgetEvent( IX_WIDGET.MAW_EVENT_EDIT_BOX_RETURN, handle );
-						return true;
 					}
 				}
 				return false;
@@ -87,18 +86,12 @@ public class EditBoxFactory implements AbstractViewFactory
 			@Override
 			public boolean onKey(View v, int keyCode, KeyEvent event)
 			{
-				EventQueue.getDefault().postWidgetEvent(IX_WIDGET.MAW_EVENT_EDIT_BOX_TEXT_CHANGED, handle);
-
 				if( (event.getAction( ) == KeyEvent.ACTION_DOWN)
 						&& (keyCode == KeyEvent.KEYCODE_ENTER) )
 				{
 					EventQueue.getDefault( ).postWidgetEvent( IX_WIDGET.MAW_EVENT_EDIT_BOX_RETURN, handle );
-					return true;
 				}
-				else
-				{
-					return false;
-				}
+				return false;
 			}
 		});
 
