@@ -400,7 +400,7 @@ static void writePermissions(ostream& stream, const SETTINGS& s, const RuntimeIn
 	// Add in-app billing only for android 1.6 and higher.
 	if (ri.androidVersion >= 4)
 	{
-		writePermission(stream, true, "com.android.vending.BILLING");
+		writePermission(stream, isPermissionSet(permissionSet, PURCHASE), "com.android.vending.BILLING");
 	}
 }
 static void writePermission(ostream& stream, bool flag, const char* nativePerm) {

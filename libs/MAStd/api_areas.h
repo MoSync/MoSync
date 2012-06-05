@@ -371,7 +371,7 @@ maDBCursorGetColumnDouble()<br>
 <td>
 <strong>In-App Purchases</strong>
 </td>
-<td>Purchase products from within you application.<br>
+<td>Purchase products from within your application.<br>
 </td>
 <td>maPurchaseSupported(), maPurchaseCreate(), maPurchaseSetPublicKey(), maPurchaseRequest(), maPurchaseVerifyReceipt(), maPurchaseGetField(), maPurchaseSetStoreURL(), maPurchaseGetName(), maPurchaseRestoreTransactions(), maPurchaseDestroy()<br>
 </td>
