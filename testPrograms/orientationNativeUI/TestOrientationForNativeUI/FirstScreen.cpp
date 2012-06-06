@@ -23,7 +23,7 @@
  * @brief Screen used for setting supported screen orientations.
  */
 
-#define SCREEN_TITLE "First screen"
+#define SCREEN_TITLE "Set orientation"
 
 #define PORTRAIT_LABEL_TEXT "Portrait"
 #define PORTRAIT_UPSIDE_DOWN_LABEL_TEXT "Portrait upside down"
@@ -43,6 +43,7 @@
 #include <maapi.h>
 
 #include "FirstScreen.h"
+#include "Util.h"
 
 namespace OrientationTest
 {
@@ -65,22 +66,26 @@ namespace OrientationTest
 		mSelectedOrientation = -1;
 
 		createMainLayout();
-		mPortraitCheckBox->setState(true);
+		int platform = getPlatform();
+		if (platform == WINDOWSPHONE7 ||
+			platform == IOS)
+		{
+			mPortraitCheckBox->setState(true);
+			mPortraitCheckBox->addCheckBoxListener(this);
+			mPortraitUpsideDownCheckBox->addCheckBoxListener(this);
+			mLandscapeLeftCheckBox->addCheckBoxListener(this);
+			mLandscapeRightCheckBox->addCheckBoxListener(this);
 
-		mPortraitCheckBox->addCheckBoxListener(this);
-		mPortraitUpsideDownCheckBox->addCheckBoxListener(this);
-		mLandscapeLeftCheckBox->addCheckBoxListener(this);
-		mLandscapeRightCheckBox->addCheckBoxListener(this);
-		mSetOrientationButton->addButtonListener(this);
-		mOrientationOptionsListView->addListViewListener(this);
+			mSupportedOrientations = MA_SCREEN_ORIENTATION_PORTRAIT;
+			maScreenSetSupportedOrientations(mSupportedOrientations);
+		}
+		else if (platform == ANDROID)
+		{
+			mSetOrientationButton->addButtonListener(this);
+			mOrientationOptionsListView->addListViewListener(this);
+		}
 
-		mSupportedOrientations = MA_SCREEN_ORIENTATION_PORTRAIT |
-				MA_SCREEN_ORIENTATION_LANDSCAPE_RIGHT;
 		mOrientationLabel->setText(ORIENTATION_PORTRAIT);
-
-		int result = maScreenSetSupportedOrientations(mSupportedOrientations);
-		printf("FirstScreen::FirstScreen result maScreenSetSupportedOrientations = %d",
-			result);
 	}
 
 	/**
@@ -88,12 +93,20 @@ namespace OrientationTest
 	 */
 	FirstScreen::~FirstScreen()
 	{
-		mPortraitCheckBox->removeCheckBoxListener(this);
-		mPortraitUpsideDownCheckBox->removeCheckBoxListener(this);
-		mLandscapeLeftCheckBox->removeCheckBoxListener(this);
-		mLandscapeRightCheckBox->removeCheckBoxListener(this);
-		mSetOrientationButton->removeButtonListener(this);
-		mOrientationOptionsListView->removeListViewListener(this);
+		int platform = getPlatform();
+		if (platform == WINDOWSPHONE7 ||
+			platform == IOS)
+		{
+			mPortraitCheckBox->removeCheckBoxListener(this);
+			mPortraitUpsideDownCheckBox->removeCheckBoxListener(this);
+			mLandscapeLeftCheckBox->removeCheckBoxListener(this);
+			mLandscapeRightCheckBox->removeCheckBoxListener(this);
+		}
+		else if (platform == ANDROID)
+		{
+			mSetOrientationButton->removeButtonListener(this);
+			mOrientationOptionsListView->removeListViewListener(this);
+		}
 	}
 
 	/**
@@ -127,54 +140,60 @@ namespace OrientationTest
 		VerticalLayout* mainLayout = new VerticalLayout();
 		Screen::setMainWidget(mainLayout);
 
-		Label* label;
-
-		// Add widgets for enabling/disabling portrait mode.
-		label = new Label();
-		label->setText(PORTRAIT_LABEL_TEXT);
-		mPortraitCheckBox = new CheckBox();
-		mainLayout->addChild(this->createRow(label, mPortraitCheckBox));
-
-		// Add widgets for enabling/disabling portrait upside down mode.
-		label = new Label();
-		label->setText(PORTRAIT_UPSIDE_DOWN_LABEL_TEXT);
-		mPortraitUpsideDownCheckBox = new CheckBox();
-		mainLayout->addChild(this->createRow(label, mPortraitUpsideDownCheckBox));
-
-		// Add widgets for enabling/disabling landscape left mode.
-		label = new Label();
-		label->setText(LANDSCAPE_LEFT_LABEL_TEXT);
-		mLandscapeLeftCheckBox = new CheckBox();
-		mainLayout->addChild(this->createRow(label, mLandscapeLeftCheckBox));
-
-		// Add widgets for enabling/disabling landscape right mode.
-		label = new Label();
-		label->setText(LANDSCAPE_RIGHT_LABEL_TEXT);
-		mLandscapeRightCheckBox = new CheckBox();
-		mainLayout->addChild(this->createRow(label, mLandscapeRightCheckBox));
-
 		// Add widgets for displaying the current orientation.
 		HorizontalLayout* hLayout = new HorizontalLayout();
-		label = new Label();
+		hLayout->wrapContentVertically();
+		Label* label = new Label();
 		label->setText(ORIENTATION_LABEL);
 		hLayout->addChild(label);
 		mOrientationLabel = new Label();
 		hLayout->addChild(mOrientationLabel);
 		mainLayout->addChild(hLayout);
 
-		// add widgets for changing the current orientation
-		mSetOrientationDescriptionLabel = new Label();
-		mSetOrientationDescriptionLabel->setText("Select a desired orientation from the list and press the set button");
-		mainLayout->addChild(mSetOrientationDescriptionLabel);
+		int platform = getPlatform();
+		if (platform == WINDOWSPHONE7 ||
+			platform == IOS)
+		{
+			// Add widgets for enabling/disabling portrait mode.
+			label = new Label();
+			label->setText(PORTRAIT_LABEL_TEXT);
+			mPortraitCheckBox = new CheckBox();
+			mainLayout->addChild(this->createRow(label, mPortraitCheckBox));
 
-		// create the list view containing the set orientation options
-		createSetOrientationListView();
-		mainLayout->addChild(mOrientationOptionsListView);
+			// Add widgets for enabling/disabling portrait upside down mode.
+			label = new Label();
+			label->setText(PORTRAIT_UPSIDE_DOWN_LABEL_TEXT);
+			mPortraitUpsideDownCheckBox = new CheckBox();
+			mainLayout->addChild(this->createRow(label, mPortraitUpsideDownCheckBox));
 
-		mSetOrientationButton = new Button();
-		mSetOrientationButton->fillSpaceHorizontally();
-		mSetOrientationButton->setText("Set selected orientation");
-		mainLayout->addChild(mSetOrientationButton);
+			// Add widgets for enabling/disabling landscape left mode.
+			label = new Label();
+			label->setText(LANDSCAPE_LEFT_LABEL_TEXT);
+			mLandscapeLeftCheckBox = new CheckBox();
+			mainLayout->addChild(this->createRow(label, mLandscapeLeftCheckBox));
+
+			// Add widgets for enabling/disabling landscape right mode.
+			label = new Label();
+			label->setText(LANDSCAPE_RIGHT_LABEL_TEXT);
+			mLandscapeRightCheckBox = new CheckBox();
+			mainLayout->addChild(this->createRow(label, mLandscapeRightCheckBox));
+		}
+		else if (platform == ANDROID)
+		{
+			// add widgets for changing the current orientation
+			mSetOrientationDescriptionLabel = new Label();
+			mSetOrientationDescriptionLabel->setText("Select a desired orientation from the list and press the set button");
+			mainLayout->addChild(mSetOrientationDescriptionLabel);
+
+			// create the list view containing the set orientation options
+			createSetOrientationListView();
+			mainLayout->addChild(mOrientationOptionsListView);
+
+			mSetOrientationButton = new Button();
+			mSetOrientationButton->fillSpaceHorizontally();
+			mSetOrientationButton->setText("Set selected orientation");
+			mainLayout->addChild(mSetOrientationButton);
+		}
 	}
 
 	void FirstScreen::createSetOrientationListView()
@@ -345,15 +364,12 @@ namespace OrientationTest
 	 */
 	void FirstScreen::orientationWillChange()
 	{
-		int screenHeight = this->getHeight();
-		int screenWidth = this->getWidth();
-		printf("screenHeight = %d screenWidth = %d", screenHeight, screenWidth);
-
 		mOrientationLabel->setText(this->getOrientationString());
 	}
 
 	/**
-	 * Called after the screen orientation has changed (available only on Windows Phone 7.1 platform
+	 * Called after the screen orientation has changed.
+	 * Available only on iOS and Windows Phone 7.1 platforms.
 	 */
 	void FirstScreen::orientationDidChange()
 	{
