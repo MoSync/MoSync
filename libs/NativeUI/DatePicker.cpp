@@ -56,13 +56,13 @@ namespace NativeUI
 	DatePicker::~DatePicker()
 	{
         mDatePickerListeners.clear();
-//
-//        if(NULL != mMinDate)
-//			delete mMinDate;
-//        if(NULL != mMaxDate)
-//			delete mMaxDate;
-//        if(NULL != mDisplayedDate)
-//			delete mDisplayedDate;
+
+        if(NULL != mMinDate)
+			delete mMinDate;
+        if(NULL != mMaxDate)
+			delete mMaxDate;
+        if(NULL != mDisplayedDate)
+			delete mDisplayedDate;
 	}
 
 	/**

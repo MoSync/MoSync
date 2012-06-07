@@ -32,8 +32,13 @@
 <property key="dependency.strategy" value="0"/>
 <property key="excludes/Debug" value=""/>
 <property key="excludes/Release" value=""/>
+<property key="iphone:bundle.id" value="com.mosync.purchase2"/>
 <property key="iphone:certproj.spec" value="true"/>
+<property key="iphone:provisioning.file" value="./iOS/In_app_purchase_2.mobileprovision"/>
 <property key="profile.mgr.type" value="0"/>
+<property key="symbian.uids:uid.s60v2uid" value="0x0efdf3dd"/>
+<property key="symbian.uids:uid.s60v3uid" value="0xe6e7210a"/>
 <property key="template.id" value="project.nativeuicpp"/>
+<property key="winmobilecs:guid" value="b99d3400-92a0-102f-80fa-59c061a2f645"/>
 </properties>
 </project>
