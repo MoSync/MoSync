@@ -23,11 +23,12 @@ MA 02110-1301, USA.
  * @brief Screen used for test coordinate system after changing orientation.
  */
 
-#define SCREEN_TITLE "Second screen"
+#define SCREEN_TITLE "Coordinate system"
 
-#define LABEL_WIDTH 50
-#define LABEL_HEIGHT 50
+#define LABEL_WIDTH 80
+#define LABEL_HEIGHT 80
 #define LABEL_BG_COLOR 0x123456
+#define LAYOUT_BG_COLOR 0xC0C0C0
 
 #include <conprint.h>
 
@@ -49,11 +50,10 @@ namespace OrientationTest
 		mMainLayout = new RelativeLayout();
 		mMainLayout->fillSpaceHorizontally();
 		mMainLayout->fillSpaceVertically();
+		mMainLayout->setBackgroundColor(LAYOUT_BG_COLOR);
 		this->setMainWidget(mMainLayout);
 
 		mLabel = new Label();
-		mLabel->setTopPosition(100);
-		mLabel->setLeftPosition(100);
 		mLabel->setWidth(LABEL_WIDTH);
 		mLabel->setHeight(LABEL_HEIGHT);
 		mLabel->setBackgroundColor(LABEL_BG_COLOR);
@@ -103,5 +103,14 @@ namespace OrientationTest
 	 */
 	void SecondScreen::orientationWillChange()
 	{
+	}
+
+	/**
+	 * Called after the screen orientation has changed.
+	 * Available only on iOS and Windows Phone 7.1 platforms.
+	 */
+	void SecondScreen::orientationDidChange()
+	{
+
 	}
 } // namespace OrientationTest

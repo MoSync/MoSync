@@ -176,7 +176,7 @@ namespace IAP
 	/**
 	 * Remove a purchase from the map that holds purchases.
 	 * The purchase will not receive custom events.
-	 * @param product The purchase that needs to be unregistered.
+	 * @param purchase The purchase that needs to be unregistered.
 	 */
 	void PurchaseManager::unregisterPurchase(Purchase* purchase)
 	{
@@ -288,6 +288,20 @@ namespace IAP
 			Purchase* purchase = mPurchaseMap[purchaseData.productHandle];
 			// Call the purchase's event handling method.
 			purchase->handlePurchaseEvent(purchaseData);
+			return;
+		}
+		// Check if the purchase exists in mSpecialProducts, and handle receipt
+		// events for refunded or restored products.
+		if ( purchaseData.type == MA_PURCHASE_EVENT_VERIFY_RECEIPT )
+		{
+			for (int i=0; i < mSpecialProducts.size(); i++)
+			{
+				if ( mSpecialProducts[i]->getHandle() == purchaseData.productHandle )
+				{
+					mSpecialProducts[i]->handlePurchaseEvent(purchaseData);
+					break;
+				}
+			}
 		}
 	}
 }

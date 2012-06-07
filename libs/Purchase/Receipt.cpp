@@ -65,7 +65,7 @@ namespace IAP
 
 	/**
 	 * Get the transaction identifier of the item that has been purchased.
-	 * Platform: iOS.
+	 * Platform: iOS and Android.
 	 */
 	MAUtil::String Receipt::getTransactionID()
 	{
@@ -88,13 +88,14 @@ namespace IAP
 	}
 
 	/**
-	 * Get a string that the App Store uses to uniquely identify the application that
-	 * created the payment transaction. If your server supports multiple
-	 * applications, you can use this value to differentiate between them.
+	 * Get a string that the App Store/Google Play uses to uniquely identify
+	 * the application that created the payment transaction. If your server
+	 * supports multipl applications, you can use this value to differentiate
+	 * between them.
 	 * Applications that are executing in the sandbox do not yet have an
 	 * app-item-id assigned to them,so this key is missing from receipts created
 	 * by the sandbox.
-	 * Platform: iOS.
+	 * Platform: iOS and Android.
 	 */
 	MAUtil::String Receipt::getAppID()
 	{

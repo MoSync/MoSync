@@ -25,7 +25,7 @@ import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_ERROR_CONNE
 import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_ERROR_CANCELLED;
 import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_STATE_COMPLETED;
 import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_STATE_FAILED;
-import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_EVENT_REFUNDED;
+import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_STATE_PRODUCT_REFUNDED;
 
 /**
  * Utility class that holds constants required in billing requests.
@@ -61,7 +61,7 @@ public class Consts
 		case PURCHASE_STATE_CANCELED:
 			return MA_PURCHASE_STATE_FAILED;
 		case PURCHASE_STATE_REFUNDED:
-			return MA_PURCHASE_EVENT_REFUNDED;
+			return MA_PURCHASE_STATE_PRODUCT_REFUNDED;
 		default:
 			return MA_PURCHASE_STATE_FAILED;
 		}

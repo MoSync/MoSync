@@ -37,7 +37,8 @@ namespace OrientationTest
 	AppTabScreen::AppTabScreen():
 		TabScreen(),
 		mFirstScreen(NULL),
-		mSecondScreen(NULL)
+		mSecondScreen(NULL),
+		mVisibleTabScreen(TAB_SCREEN_ONE)
 	{
 		mFirstScreen = new FirstScreen();
 		mSecondScreen = new SecondScreen();
@@ -64,7 +65,14 @@ namespace OrientationTest
 		TabScreen* tabScreen,
 		const int tabScreenIndex)
 	{
-
+		if (tabScreenIndex == 0)
+		{
+			mVisibleTabScreen = TAB_SCREEN_ONE;
+		}
+		else if (tabScreenIndex == 1)
+		{
+			mVisibleTabScreen = TAB_SCREEN_TWO;
+		}
 	}
 
 	/**
@@ -72,16 +80,30 @@ namespace OrientationTest
 	 */
 	void AppTabScreen::orientationWillChange()
 	{
-		mFirstScreen->orientationWillChange();
-		mSecondScreen->orientationWillChange();
+		if (mVisibleTabScreen == TAB_SCREEN_ONE)
+		{
+			mFirstScreen->orientationWillChange();
+		}
+		else if (mVisibleTabScreen == TAB_SCREEN_TWO)
+		{
+			mSecondScreen->orientationWillChange();
+		}
 	}
 
 	/**
-	 * Called after the screen orientation has changed (available only on Windows Phone 7.1 platform
+	 * Called after the screen orientation has changed.
+	 * Available only on iOS and Windows Phone 7.1 platforms.
 	 */
 	void AppTabScreen::orientationDidChange()
 	{
-
+		if (mVisibleTabScreen == TAB_SCREEN_ONE)
+		{
+			mFirstScreen->orientationDidChange();
+		}
+		else if (mVisibleTabScreen == TAB_SCREEN_TWO)
+		{
+			mSecondScreen->orientationDidChange();
+		}
 	}
 
 } //namespace OrientationTest

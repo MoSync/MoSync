@@ -23,6 +23,7 @@ import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_EVENT_REQUE
 import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_EVENT_RESTORE;
 import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_EVENT_VERIFY_RECEIPT;
 import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_STATE_RECEIPT_VALID;
+import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_EVENT_REFUNDED;
 
 /**
  * Utility class for creating MoSync events.
@@ -54,6 +55,12 @@ public class BillingEvent
 	{
 		return setPurchaseEventData(
 				MA_PURCHASE_EVENT_RESTORE, state, purchaseHandle, errorCode);
+	}
+
+	public static int[] onProductRefund(int state, int purchaseHandle, int errorCode)
+	{
+		return setPurchaseEventData(
+				MA_PURCHASE_EVENT_REFUNDED, state, purchaseHandle, errorCode);
 	}
 
 	public static int[] onVerifyReceipt(int handle, int state, int errorCode)
