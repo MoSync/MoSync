@@ -31,6 +31,13 @@ MA 02110-1301, USA.
 
 namespace OrientationTest
 {
+
+	typedef enum
+	{
+		TAB_SCREEN_ONE = 0,
+		TAB_SCREEN_TWO
+	} VisibleTabScreen;
+
 	using namespace NativeUI;
 
 	// Forward declarations.
@@ -58,7 +65,8 @@ namespace OrientationTest
 		virtual void orientationWillChange();
 
 		/**
-		 * Called after the screen orientation has changed (available only on Windows Phone 7.1 platform
+		 * Called after the screen orientation has changed.
+		 * Available only on iOS and Windows Phone 7.1 platforms.
 		 */
 		virtual void orientationDidChange();
 
@@ -82,6 +90,11 @@ namespace OrientationTest
 		 * Second tab screen.
 		 */
 		SecondScreen* mSecondScreen;
+
+		/**
+		 * Store the visible screen index.
+		 */
+		VisibleTabScreen mVisibleTabScreen;
 	};
 
 } // namespace OrientationTest

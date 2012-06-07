@@ -81,7 +81,8 @@ namespace PurchaseTest
 		else
 		{
 			MAUtil::String developerKey = DEVELOPER_PUBLIC_KEY;
-			if ( developerKey.size() == 0 )
+			if ( developerKey.size() == 0 &&
+				 platform == ANDROID )
 			{
 				maAlert("Error", "You need to set developer key in Config.h ",
 					"OK", NULL, NULL);

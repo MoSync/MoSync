@@ -4529,12 +4529,13 @@ group WidgetAPI "Widget API" {
 
 		/**
 		* Send by current screen just before it begins rotating.
+		* Platform: iOS and Windows Phone 7.1
 		*/
 		SCREEN_ORIENTATION_WILL_CHANGE = 23;
 
 		/**
 		* Send by current screen after it finishes rotating.
-		* Sent only from the Windows Phone 7.1 platform.
+		* Platform: iOS and Windows Phone 7.1
 		*/
 		SCREEN_ORIENTATION_DID_CHANGE = 24;
 
