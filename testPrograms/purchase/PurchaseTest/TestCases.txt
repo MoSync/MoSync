@@ -45,3 +45,6 @@ Test case 8: Create two products using the same product handle.
 
 Test case 9 Test maPurchaseGetName() syscall with a small buffer size.
             MA_PURCHASE_RES_BUFFER_TOO_SMALL error should be returned.
+
+Test case 11:
+	 - Refunded product, only on Android.

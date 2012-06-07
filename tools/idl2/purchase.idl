@@ -66,20 +66,19 @@ group PurchaseResultCodes "Purchase Result Codes" {
 group PurchaseErrorCodes "Purchase Error Codes" {
 	constset int MA_PURCHASE_ERROR_ {
         /**
-        * \brief Possible error code for #MA_PURCHASE_EVENT_RECEIPT_ERROR,
-        * #MA_PURCHASE_EVENT_RECEIPT_ERROR.
+        * \brief Possible error code for #MA_PURCHASE_EVENT_REQUEST ,
+        * #MA_PURCHASE_EVENT_VERIFY_RECEIPT event types.
         * Sent by the #maPurchaseRequest() and #maPurchaseVerifyReceipt() syscalls
         * if the given product handle is invalid.
         */
 		INVALID_HANDLE = -1;
         /**
-        * \brief Possible error code for #MA_PURCHASE_EVENT_RECEIPT_ERROR,
-		* or #MA_PURCHASE_EVENT_RESTORE.
+        * \brief Possible error code for any of the requests.
         * Indicates that the connection with the App Store / Google Play has failed.
         */
 		CONNECTION_FAILED = -2;
         /**
-        * \brief Possible error code for #MA_PURCHASE_EVENT_RECEIPT_ERROR.
+        * \brief Possible error code for #MA_PURCHASE_STATE_RECEIPT_ERROR.
         * Indicates that response from App Store/ Google Play for verifying
 		* a receipt cannot be parsed.
 		* Platform: iOS.
@@ -120,7 +119,7 @@ group PurchaseErrorCodes "Purchase Error Codes" {
 		*/
 		PUBLIC_KEY_NOT_SET = -8;
 		/**
-		* \brief Possible error code for #MA_PURCHASE_EVENT_REQUEST_STATE_CHANGED.
+		* \brief Possible error code for #MA_PURCHASE_EVENT_REQUEST.
 		* Sent by the #maPurchaseRequest() syscall if an unknown or unexpected server error occurred.
 		* Platform: iOS and Android.
 		*/
@@ -261,12 +260,20 @@ group PurchaseStateCodes "Purchase State Codes" {
 		RESTORE_ERROR = -7;
 
 		/**
-		* \brief Sent by the #maPurchaserestoreTransactions() syscall.
+		* \brief Sent by the #maPurchaseRestoreTransactions() syscall.
 		* Associated with #MA_PURCHASE_EVENT_RESTORE.
 		* Indicates that a product has been restored.
 		* Platform: Android and iOS.
 		*/
 		PRODUCT_RESTORED = -8;
+
+		/**
+		* \brief Received after a refund was initiated on the server.
+		* Associated with #MA_PURCHASE_EVENT_REFUNDED.
+		* Indicates that a product has been refunded.
+		* Platform: Android.
+		*/
+		PRODUCT_REFUNDED = -9;
 	}
 } // end of Purchase State Codes
 
@@ -285,7 +292,7 @@ group PurchaseReceiptFields "Purchase Receipt Fields" {
 		PRODUCT_ID = "product_id";
         /**
         * \brief The transaction identifier of the item that was purchased.
-        * Platform: iOS.
+        * Platform: iOS and Android.
         */
 		TRANSACTION_ID = "transaction_id";
         /**
@@ -385,12 +392,12 @@ group PurchaseFunctions "Purchase Functions" {
 	void maPurchaseCreate(in MAHandle productHandle, in MAString productID);
 
 	/**
-	* \brief Set your Google Play public key to the application. This enables the application
+	* Set your Google Play public key to the application. This enables the application
 	* to verify the signature of the transaction information that is returned from Google Play.
 	* Must be set in order to be able to request purchases.
 	* Platform: Android.
 	*
-	* \param developerKey Base64-encoded public key, that can be found on the Google
+	* \param developerPublicKey Base64-encoded public key, that can be found on the Google
 	* Play publisher account page, under Licensing & In-app Billing panel in Edit Profile.
 	*/
 	void maPurchaseSetPublicKey(in MAString developerPublicKey);
@@ -424,7 +431,7 @@ group PurchaseFunctions "Purchase Functions" {
 	*
 	* A #EVENT_TYPE_PURCHASE will be sent after calling this syscall.
 	* The event will contain a MAPurchaseEventData struct object. The type member object
-	* contained by the struct is #MA_PURCHASE_EVENT_VERIFY_RECEIPT.The state member object
+	* contained by the struct is #MA_PURCHASE_EVENT_VERIFY_RECEIPT .The state member object
 	* can have one of the following values:
     * - #MA_PURCHASE_STATE_DISABLED purchase is not supported/disabled on the device.
 	* - #MA_PURCHASE_STATE_RECEIPT_VALID indicates that the transaction has been validated
@@ -440,8 +447,8 @@ group PurchaseFunctions "Purchase Functions" {
 	/**
 	* Get a field value contained by the receipt.
 	* Make sure that the given product has a valid receipt.
-	* Call the maPurchaseVerifyReceipt() syscall and wait for a #MA_PURCHASE_EVENT_RECEIPT_VALID
-	* purchase event type.
+	* Call the maPurchaseVerifyReceipt() syscall and wait for a #MA_PURCHASE_STATE_RECEIPT_VALID
+	* purchase state.
 	*
 	* \param productHandle Handle to the product that has been purchased.
 	* \param property The name of the field.

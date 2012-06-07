@@ -18,12 +18,10 @@ MA 02110-1301, USA.
 
 /**
  * @file Main.cpp
+ * @author Mikael Kindborg
  *
  * This is the main entry point for the example application
- * that demonstrates Purchase API on MoSync. (Available on Android and iOS)
- *
- * It is a basic example that demonstrates how to purchase
- * a product and how to get the receipt for it.
+ * that demonstrates NativeUI on MoSync.
  */
 
 #include <ma.h> 				// Syscalls
@@ -33,11 +31,8 @@ MA 02110-1301, USA.
 
 #include <NativeUI/Widget.h>
 #include <NativeUI/Widgets.h>// Include all widgets
-#include <Purchase/PurchaseManager.h>
 
-#include "Util.h"
-#include "ApplicationController.h"
-#include "Config.h"
+#include "MainScreen.h"			// Main UI screen
 
 using namespace MAUtil;
 using namespace NativeUI;
@@ -50,39 +45,14 @@ class NativeUIMoblet : public Moblet
 public:
 	/**
 	 * Constructor that creates the UI.
-	 * If billing is not supported, no screen is shown.
 	 */
-	NativeUIMoblet():
-		mController(NULL)
+	NativeUIMoblet()
 	{
-		MAUtil::String developerKey = DEVELOPER_PUBLIC_KEY;
-		int platform = getPlatform();
-		int result = IAP::PurchaseManager::getInstance()->checkPurchaseSupported();
-		if (platform != IOS &&
-			platform != ANDROID)
-		{
-			maAlert("Error", "This program runs only on Android and iOS devices",
-				"OK", NULL, NULL);
-		}
-		else if ( result != MA_PURCHASE_RES_OK )
-		{
-			MAUtil::String errorMessage = "Billing is not supported on this device, because of error "
-					+ MAUtil::integerToString(result);
-			maAlert("Error", errorMessage.c_str(), "OK", NULL, NULL);
-		}
-		else
-		{
+		// Create the main user interface screen.
+		mMainScreen = new MainScreen();
 
-			if ( platform == ANDROID && developerKey.size() == 0 )
-			{
-				maAlert("Error", "You need to set developer key in Config.h ",
-					"OK", NULL, NULL);
-			}
-			else
-			{
-				mController = new ApplicationController();
-			}
-		}
+		// Show the screen.
+		mMainScreen->show();
 	}
 
 	/**
@@ -90,14 +60,16 @@ public:
 	 */
 	virtual ~NativeUIMoblet()
 	{
-		if (mController)
-			delete mController;
+		delete mMainScreen;
 	}
 	/**
 	 * This method is called when the application is closed.
 	 */
 	void NativeUIMoblet::closeEvent()
 	{
+		// Deallocate the main screen.
+		delete mMainScreen;
+		mMainScreen = NULL;
 
 		// Exit the app.
 		close();
@@ -116,10 +88,7 @@ public:
 	}
 
 private:
-	/**
-	 * App's controller.
-	 */
-	ApplicationController* mController;
+	MainScreen* mMainScreen;
 };
 
 /**
