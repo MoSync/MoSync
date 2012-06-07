@@ -1396,7 +1396,7 @@ interface MAAPI {
 		SENSOR = 33;
 
 		/**
-		* \bried The maAlert message box was dismissed by one of the available buttons.
+		* \brief The maAlert message box was dismissed by one of the available buttons.
 		* See #EVENT_TYPE_ALERT for the event.
 		*/
 		ALERT = 34;
@@ -1552,14 +1552,13 @@ interface MAAPI {
 	struct MAPurchaseEventData {
 		/**
 		* \brief Type of the purchase event.
-		* One of the \link MA_PURCHASE_EVENT_REQUEST_STATE_CHANGED MA_PURCHASE_EVENT \endlink constants.
+		* One of the \link MA_PURCHASE_EVENT_REQUEST MA_PURCHASE_EVENT \endlink constants.
 		*/
 		int type;
 
 		/**
 		* \brief State of the purchase.
 		* One of the \link MA_PURCHASE_STATE_FAILED MA_PURCHASE_STATE \endlink constants.
-		* Valid only if type is #MA_PURCHASE_EVENT_REQUEST_STATE_CHANGED.
 		*/
 		int state;
 
@@ -1570,8 +1569,8 @@ interface MAAPI {
 
 		/**
 		* \brief Reason why the puchase failed.
-		* Valid only if type is #MA_PURCHASE_EVENT_REQUEST_STATE_CHANGED and
-		* state is #MA_PURCHASE_STATE_FAILED.
+		* Valid only if the state is #MA_PURCHASE_STATE_FAILED, #MA_PURCHASE_STATE_RECEIPT_INVALID,
+		* #MA_PURCHASE_STATE_RECEIPT_ERROR or #MA_PURCHASE_STATE_RESTORE_ERROR.
 		* One of the \link MA_PURCHASE_ERROR_INVALID_HANDLE MA_PURCHASE_ERROR \endlink constants.
 		*/
 		int errorCode;
@@ -5063,7 +5062,7 @@ group WidgetAPI "Widget API" {
 		PANORAMA_VIEW = "PanoramaView";
 
 		/**
-		* @brief A radio button available only on Android. A radio button can only have a #RADIO_GROUP parent.
+		* @brief A radio button available only on Android. A radio button can only have a \ref MAW_RADIO_GROUP parent.
 		* Checking one radio button that belongs to a radio group unchecks any previously checked radio button within the same group.
 		* Initially, all of the radio buttons are unchecked.
 		* While it is not possible to uncheck a particular radio button, the radio group can be cleared to remove the checked state.
@@ -5104,7 +5103,7 @@ group WidgetAPI "Widget API" {
 
 	/**
 	* The available constants for the Android predefined drawables used in OptionsMenu.
-	* The drawables can be set via #maWidgetScreenAddOptionsMenuItem syscall.
+	* The drawables can be set via \ref maWidgetScreenAddOptionsMenuItem syscall.
 	* The icons can be found here: http://androiddrawables.com/menu.html .
 	* Note that only these are supported on WP7:
 	*	- ADD
@@ -5350,7 +5349,7 @@ group WidgetAPI "Widget API" {
 
 		/**
 		* @brief Remove the options menu from this screen.
-		* The options menu can be added by calling #maWidgetScreenAddOptionsMenuItem for each item.
+		* The options menu can be added by calling \ref maWidgetScreenAddOptionsMenuItem for each item.
 		*
 		* @validvalue No value needed.
 		*
