@@ -154,14 +154,17 @@ public class MoSyncPurchase
 	 * Internal function for the maPurchaseSetPublicKey system call.
 	 *
 	 * @param developerPublicKey
+	 * @return MA_PURCHASE_RES_MALFORMED_PUBLIC_KEY or MA_PURCHASE_RES_OK.
 	 */
-	public void maPurchaseSetPublicKey(String developerPublicKey)
+	public int maPurchaseSetPublicKey(String developerPublicKey)
 	{
 		panicIfBillingPermissionIsNotSet();
 		if ( mPurchaseManager != null )
 		{
-			mPurchaseManager.setKey(developerPublicKey);
+			return mPurchaseManager.setKey(developerPublicKey);
 		}
+		Log.e("@@MoSync","maPurchaseSetPublicKey error: not available");
+		return MA_PURCHASE_RES_UNAVAILABLE;
 	}
 
 	/**
@@ -226,11 +229,8 @@ public class MoSyncPurchase
 
 			return result.length( );
 		}
-		else
-		{
-			Log.e("@@MoSync","maPurchaseGetName error: not available");
-			return MA_PURCHASE_RES_UNAVAILABLE;
-		}
+		Log.e("@@MoSync","maPurchaseGetName error: not available");
+		return MA_PURCHASE_RES_UNAVAILABLE;
 	}
 
 	/**
@@ -284,11 +284,8 @@ public class MoSyncPurchase
 
 			return result.length( );
 		}
-		else
-		{
-			Log.e("@@MoSync","maPurchaseGetField error: not available");
-			return MA_PURCHASE_RES_UNAVAILABLE;
-		}
+		Log.e("@@MoSync","maPurchaseGetField error: not available");
+		return MA_PURCHASE_RES_UNAVAILABLE;
 	}
 
 	/**
@@ -336,17 +333,13 @@ public class MoSyncPurchase
 	 */
 	public int maPurchaseDestroy(int handle)
 	{
-//		panicIfBillingPermissionIsNotSet();
+		panicIfBillingPermissionIsNotSet();
 		if (mPurchaseManager != null)
 		{
 			return mPurchaseManager.destroyPurchase(handle);
-
 		}
-		else
-		{
-			Log.e("@@MoSync","maPurchaseDestroy error: not available");
-			return MA_PURCHASE_RES_UNAVAILABLE;
-		}
+		Log.e("@@MoSync","maPurchaseDestroy error: not available");
+		return MA_PURCHASE_RES_UNAVAILABLE;
 	}
 	/************************ Class members ************************/
 
