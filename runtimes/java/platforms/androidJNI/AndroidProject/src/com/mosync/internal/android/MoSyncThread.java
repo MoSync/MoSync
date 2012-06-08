@@ -3714,9 +3714,9 @@ public class MoSyncThread extends Thread
 	* \param developerKey Base64-encoded public key, that can be found on the Google
 	* Play publisher account page, under Licensing & In-app Billing panel in Edit Profile.
 	*/
-	void maPurchaseSetPublicKey(final String developerPublicKey)
+	int maPurchaseSetPublicKey(final String developerPublicKey)
 	{
-		mMoSyncPurchase.maPurchaseSetPublicKey(developerPublicKey);
+		return mMoSyncPurchase.maPurchaseSetPublicKey(developerPublicKey);
 	}
 
 	/**

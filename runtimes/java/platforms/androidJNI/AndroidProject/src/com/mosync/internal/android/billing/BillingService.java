@@ -46,6 +46,8 @@ import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_RES_CONNECT
 import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_STATE_FAILED;
 import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_STATE_COMPLETED;
 import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_STATE_PRODUCT_REFUNDED;
+import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_RES_MALFORMED_PUBLIC_KEY;
+import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_RES_OK;
 import static com.mosync.internal.android.MoSyncHelpers.SYSLOG;
 
 /**
@@ -85,17 +87,20 @@ public class BillingService extends Service implements ServiceConnection
 	/**
 	 * Compute your public key (that you got from the Android Market publisher site).
 	 * @param developerPublicKey the Base64 encoded key.
+	 * @return MA_PURCHASE_RES_MALFORMED_PUBLIC_KEY or MA_PURCHASE_RES_OK.
 	 */
-	public void setPublicKey(final String developerPublicKey)
+	public int setPublicKey(final String developerPublicKey)
 	{
 		try
 		{
 			mPublicKey = Security.generatePublicKey(developerPublicKey);
 			mIsPublicKeySet = true;
+			return MA_PURCHASE_RES_OK;
 		} catch (Exception ex)
 		{
 			SYSLOG("maPurchaseSetPublicKey: malformed developerPublicKey");
 			mPublicKey = null;
+			return MA_PURCHASE_RES_MALFORMED_PUBLIC_KEY;
 		}
 	}
 
