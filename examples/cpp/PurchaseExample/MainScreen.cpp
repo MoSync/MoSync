@@ -23,7 +23,8 @@
  *  - "Buy" section with a buy button and a list of available items for sale.
  *  - "History" section with a list of purchased items.
  *  For each purchased item there is a Receipt button.
- *  When the Receipt button is pressed a dialog/new screen shows the receipt details.
+ *  When the Receipt button is pressed a dialog shows the receipt details.
+ *  @author Emma Tresanszki
  */
 
 #include <conprint.h>
@@ -34,11 +35,12 @@
 #include <mastdlib.h>
 #include <matime.h>
 
+#include <Purchase/Purchase.h>
+
 #include "Util.h"
 #include "MainScreen.h"
 
 #define BREAKLINE_HEIGHT 10
-#define ANDROID_PRODUCT_TYPE_PURCHASED "android.test.purchased"
 #define IOS_PRODUCT_TYPE_1 "com.mosync.purchase2.consumable"
 #define IOS_PRODUCT_TYPE_2 "com.mosync.purchase2.nonconsumable"
 
@@ -303,7 +305,7 @@ void MainScreen::createProductIdList()
 		 * If you want to run the example for your own product ids,
 		 * add them to the mProductIdList list.
 		 */
-		mProductIdList.add(ANDROID_PRODUCT_TYPE_PURCHASED);
+		mProductIdList.add(sGooglePlayPurchasedProductId);
 	}
 	else
 	{
