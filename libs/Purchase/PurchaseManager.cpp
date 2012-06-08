@@ -107,10 +107,13 @@ namespace IAP
 	 * @param developerPublicKey Base64-encoded public key, that can be found
 	 * on the Google Play publisher account page, under Licensing & In-app
 	 * Billing panel in Edit Profile.
-	 */
-	void PurchaseManager::setPublicKey(const MAUtil::String& developerPublicKey)
+	* @return One of the next result codes:
+	* - MA_PURCHASE_RES_OK if the key was set.
+	* - MA_PURCHASE_RES_MALFORMED_PUBLIC_KEY if the key is invalid.
+	*/
+	int PurchaseManager::setPublicKey(const MAUtil::String& developerPublicKey)
 	{
-		maPurchaseSetPublicKey(developerPublicKey.c_str());
+		return maPurchaseSetPublicKey(developerPublicKey.c_str());
 	}
 
 	/**

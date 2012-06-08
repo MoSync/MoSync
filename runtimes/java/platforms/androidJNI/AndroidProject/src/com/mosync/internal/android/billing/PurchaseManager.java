@@ -318,9 +318,9 @@ public class PurchaseManager extends BillingListener
 	 * Generate a PublicKey instance from a string containing the
 	 * Base64-encoded public key.
 	 */
-	public void setKey(final String developerPublicKey)
+	public int setKey(final String developerPublicKey)
 	{
-		mService.setPublicKey(developerPublicKey);
+		return mService.setPublicKey(developerPublicKey);
 	}
 
 	public int destroyPurchase(int handle)

@@ -23,7 +23,8 @@
  *  - "Buy" section with a buy button and a list of available items for sale.
  *  - "History" section with a list of purchased items.
  *  For each purchased item there is a Receipt button.
- *  When the Receipt button is pressed a dialog/new screen shows the receipt details.
+ *  When the Receipt button is pressed a dialog shows the receipt details.
+ *  @author Emma Tresanszki
  */
 
 #include <conprint.h>
@@ -34,11 +35,12 @@
 #include <mastdlib.h>
 #include <matime.h>
 
+#include <Purchase/Purchase.h>
+
 #include "Util.h"
 #include "MainScreen.h"
 
 #define BREAKLINE_HEIGHT 10
-#define ANDROID_PRODUCT_TYPE_PURCHASED "android.test.purchased"
 #define IOS_PRODUCT_TYPE_1 "com.mosync.purchase2.consumable"
 #define IOS_PRODUCT_TYPE_2 "com.mosync.purchase2.nonconsumable"
 
@@ -189,9 +191,19 @@ void MainScreen::productPurchased(MAUtil::String productId)
 	mBuyButton->setEnabled(true);
 
 	ListViewItem* item = new ListViewItem();
-	item->setText(productId);
 	item->setFontColor(ITEMS_COLOR);
 	mPurchasedItemsList->addChild(item);
+
+	// Search the productId among the product list,
+	// and only display the product name.
+	for (int i=0; i < mProductIdList.size(); i++)
+	{
+		if ( strcmp(mProductIdList[i].c_str(), productId.c_str()) == 0 )
+		{
+			item->setText(mProductNamesList[i]);
+			break;
+		}
+	}
 }
 
 /**
@@ -303,12 +315,15 @@ void MainScreen::createProductIdList()
 		 * If you want to run the example for your own product ids,
 		 * add them to the mProductIdList list.
 		 */
-		mProductIdList.add(ANDROID_PRODUCT_TYPE_PURCHASED);
+		mProductIdList.add(sGooglePlayPurchasedProductId);
+		mProductNamesList.add("Test product");
 	}
 	else
 	{
 		mProductIdList.add(IOS_PRODUCT_TYPE_1);
+		mProductNamesList.add("Consumable product");
 		mProductIdList.add(IOS_PRODUCT_TYPE_2);
+		mProductNamesList.add("Non-consumable product");
 	}
 }
 
@@ -332,7 +347,7 @@ void MainScreen::createMainLayout()
 	buyLayout->addChild(info);
 
 	// Add the list of available items for sale along with check boxes.
-	for (int i=0; i < mProductIdList.size(); i++)
+	for (int i=0; i < mProductNamesList.size(); i++)
 	{
 		HorizontalLayout* itemLayout = new HorizontalLayout();
 		itemLayout->wrapContentVertically();
@@ -340,7 +355,7 @@ void MainScreen::createMainLayout()
 		itemLayout->addChild(itemCheckBox);
 		mItemsCheckBoxes.add(itemCheckBox);
 		Label* itemId = new Label();
-		itemId->setText(mProductIdList[i]);
+		itemId->setText(mProductNamesList[i]);
 		itemId->setFontColor(ITEMS_COLOR);
 		itemLayout->addChild(itemId);
 		buyLayout->addChild(itemLayout);
