@@ -29,6 +29,8 @@
 
 #include "MainScreen.h"
 
+#define HORIZONTAL_LAYOUT_HEIGHT 80
+
 /**
  * Constructor.
  */
@@ -42,6 +44,8 @@ MainScreen::MainScreen() :
 	mButton->addEventListener(this);
 	mButton->addButtonListener(this);
 	mTestFontLabel->addButtonListener(this);
+	mTestEnabledButton->addButtonListener(this);
+	mCheckEnabledButton->addButtonListener(this);
 }
 
 /**
@@ -52,6 +56,8 @@ MainScreen::~MainScreen()
 	mButton->removeEventListener(this);
 	mButton->removeButtonListener(this);
 	mTestFontLabel->removeButtonListener(this);
+	mTestEnabledButton->removeButtonListener(this);
+	mCheckEnabledButton->removeButtonListener(this);
 }
 
 /**
@@ -118,6 +124,23 @@ void MainScreen::createMainLayout() {
 	mTestFontLabel->setFont(fontHandle);
 	mMainLayout->addChild(mTestFontLabel);
 
+	// Create and add the 'isEnabled' test widgets
+	mHorizontalLayout = new HorizontalLayout();
+	mHorizontalLayout->fillSpaceHorizontally();
+	mHorizontalLayout->setHeight(HORIZONTAL_LAYOUT_HEIGHT);
+
+	mTestEnabledButton = new Button();
+	mTestEnabledButton->fillSpaceHorizontally();
+	mTestEnabledButton->setText("Enabled");
+	mHorizontalLayout->addChild(mTestEnabledButton);
+
+	mCheckEnabledButton = new Button();
+	mCheckEnabledButton->fillSpaceHorizontally();
+	mCheckEnabledButton->setText("<- Disable");
+	mHorizontalLayout->addChild(mCheckEnabledButton);
+
+	mMainLayout->addChild(mHorizontalLayout);
+
 	mEvents = new ListView();
 	mEvents->fillSpaceHorizontally();
 	mEvents->fillSpaceVertically();
@@ -132,12 +155,12 @@ void MainScreen::createMainLayout() {
  */
 void MainScreen::buttonPressed(Widget* button)
 {
+	Label* event = new Label();
     if (button == mButton)
     {
         printf("mButton pointerPressedEvent");
+        event->setText("buttonPressed");
     }
-    Label* event = new Label();
-    event->setText("buttonPressed");
     mEvents->addChild(event);
 }
 
@@ -166,11 +189,28 @@ void MainScreen::buttonReleased(Widget* button)
  */
 void MainScreen::buttonClicked(Widget* button)
 {
-    if (button == mButton)
-    {
-        printf("mButton buttonClickedEvent");
-    }
-    Label* event = new Label();
-    event->setText("buttonClicked");
-    mEvents->addChild(event);
+	Label* event = new Label();
+	if (button == mButton)
+	{
+		printf("mButton buttonClickedEvent");
+		event->setText("buttonClicked");
+	}
+	else if (button == mCheckEnabledButton)
+	{
+		if (mTestEnabledButton->isEnabled())
+		{
+			mTestEnabledButton->setEnabled(false);
+			mTestEnabledButton->setText("Disabled");
+			mCheckEnabledButton->setText("<- Enable");
+			event->setText("Button was enabled -> button is now disabled");
+		}
+		else
+		{
+			mTestEnabledButton->setEnabled(true);
+			mTestEnabledButton->setText("Enabled");
+			mCheckEnabledButton->setText("<- Disable");
+			event->setText("Button was disabled -> button is now enabled");
+		}
+	}
+	mEvents->addChild(event);
 }
