@@ -146,6 +146,9 @@ MA 02110-1301, USA.
 *- \b ListViewItem \n
 *	A widget that can be put in a ListView. It has a default layout for placing a text and a icon. But any view can be added to it in order to create a custom appearance.
 *
+*- \b Map \n
+*	A widget that contains a google map (for Android and iOS) or a bing map (for Windows Phone).
+*
 *- \b NavBar \n
 *	A toolbar-like view that can have a back button and a title. A NavBar will automatically appear if you're using a StackScreen. It is only available on iOS for now.
 *

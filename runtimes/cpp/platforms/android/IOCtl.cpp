@@ -3409,18 +3409,18 @@ namespace Base
 	{
 		jstring jstrKey = jNIEnv->NewStringUTF(developerKey);
 		jclass cls = jNIEnv->GetObjectClass(jThis);
-		jmethodID methodID = jNIEnv->GetMethodID(cls, "maPurchaseSetPublicKey", "(Ljava/lang/String;)V");
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maPurchaseSetPublicKey", "(Ljava/lang/String;)I");
 		if (methodID == 0)
 		{
 			return 0;
 		}
 
-		jNIEnv->CallVoidMethod(jThis, methodID, jstrKey);
+		int result = jNIEnv->CallIntMethod(jThis, methodID, jstrKey);
 
 		jNIEnv->DeleteLocalRef(cls);
 		jNIEnv->DeleteLocalRef(jstrKey);
 
-		return 1;
+		return result;
 	}
 
 	int _maPurchaseRequest(MAHandle productHandle, int quantity, JNIEnv* jNIEnv, jobject jThis)
