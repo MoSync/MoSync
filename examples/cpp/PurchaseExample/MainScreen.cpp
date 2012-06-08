@@ -191,9 +191,19 @@ void MainScreen::productPurchased(MAUtil::String productId)
 	mBuyButton->setEnabled(true);
 
 	ListViewItem* item = new ListViewItem();
-	item->setText(productId);
 	item->setFontColor(ITEMS_COLOR);
 	mPurchasedItemsList->addChild(item);
+
+	// Search the productId among the product list,
+	// and only display the product name.
+	for (int i=0; i < mProductIdList.size(); i++)
+	{
+		if ( strcmp(mProductIdList[i].c_str(), productId.c_str()) == 0 )
+		{
+			item->setText(mProductNamesList[i]);
+			break;
+		}
+	}
 }
 
 /**
@@ -306,11 +316,14 @@ void MainScreen::createProductIdList()
 		 * add them to the mProductIdList list.
 		 */
 		mProductIdList.add(sGooglePlayPurchasedProductId);
+		mProductNamesList.add("Test product");
 	}
 	else
 	{
 		mProductIdList.add(IOS_PRODUCT_TYPE_1);
+		mProductNamesList.add("Consumable product");
 		mProductIdList.add(IOS_PRODUCT_TYPE_2);
+		mProductNamesList.add("Non-consumable product");
 	}
 }
 
@@ -334,7 +347,7 @@ void MainScreen::createMainLayout()
 	buyLayout->addChild(info);
 
 	// Add the list of available items for sale along with check boxes.
-	for (int i=0; i < mProductIdList.size(); i++)
+	for (int i=0; i < mProductNamesList.size(); i++)
 	{
 		HorizontalLayout* itemLayout = new HorizontalLayout();
 		itemLayout->wrapContentVertically();
@@ -342,7 +355,7 @@ void MainScreen::createMainLayout()
 		itemLayout->addChild(itemCheckBox);
 		mItemsCheckBoxes.add(itemCheckBox);
 		Label* itemId = new Label();
-		itemId->setText(mProductIdList[i]);
+		itemId->setText(mProductNamesList[i]);
 		itemId->setFontColor(ITEMS_COLOR);
 		itemLayout->addChild(itemId);
 		buyLayout->addChild(itemLayout);

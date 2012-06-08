@@ -24,12 +24,12 @@ MA 02110-1301, USA.
  *
  * It is a basic example that demonstrates how to purchase
  * a product and how to get the receipt for it.
+ * @author Emma Tresanszki
  */
 
 #include <ma.h> 				// Syscalls
 #include <MAUtil/String.h>		// C++ String class
 #include <MAUtil/Moblet.h>		// Moblet class
-#include <conprint.h>			// lprintfln for logging
 
 #include <NativeUI/Widget.h>
 #include <NativeUI/Widgets.h>// Include all widgets
