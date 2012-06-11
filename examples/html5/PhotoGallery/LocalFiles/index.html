@@ -66,8 +66,6 @@
 					{
 						// Construct the file URL.
 						var fileURL = "file://" + mediaFiles[0].fullPath;
-						console.log("@@@ fileURL: " + fileURL);
-						console.log("@@@ mediaFiles.length: " + mediaFiles.length);
 
 						// Pass the URL of the captured image to the camera page.
 						var cameraWebViewHandle =
@@ -101,9 +99,6 @@
 					function(result)
 					{
 						alert("Photo uploaded");
-						console.log("@@Code = " + result.responseCode);
-						console.log("@@Response = " + result.response);
-						console.log("@@Sent = " + result.bytesSent);
 					},
 					function(error)
 					{
