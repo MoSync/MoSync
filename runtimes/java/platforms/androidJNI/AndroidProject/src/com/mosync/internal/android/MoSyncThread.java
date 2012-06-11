@@ -3228,7 +3228,6 @@ public class MoSyncThread extends Thread
 				}
 				if ( buttonNegative.length() > 0 )
 				{
-					builder.setCancelable(true);
 					builder.setNegativeButton(buttonNegative, new DialogInterface.OnClickListener() {
 
 						@Override
@@ -3236,10 +3235,6 @@ public class MoSyncThread extends Thread
 							postAlertEvent(3);
 						}
 					});
-				}
-				else
-				{
-					builder.setCancelable(false);
 				}
 
 				AlertDialog alertDialog = builder.create();
