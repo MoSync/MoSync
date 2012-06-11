@@ -1,0 +1,180 @@
+﻿<Primitives:DateTimePickerPageBase
+    x:Class="mosyncRuntime.Views.CustomDatePickerPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:shell="clr-namespace:Microsoft.Phone.Shell;assembly=Microsoft.Phone"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:Primitives="clr-namespace:Microsoft.Phone.Controls.Primitives;assembly=Microsoft.Phone.Controls.Toolkit"
+    xmlns:Controls="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone.Controls.Toolkit"
+    FontFamily="{StaticResource PhoneFontFamilyNormal}"
+    FontSize="{StaticResource PhoneFontSizeNormal}"
+    Foreground="{StaticResource PhoneForegroundBrush}"
+    SupportedOrientations="PortraitOrLandscape" Orientation="Portrait"
+    mc:Ignorable="d" d:DesignHeight="768" d:DesignWidth="480">
+
+    <Primitives:DateTimePickerPageBase.Resources>
+        <Controls:DateTimePickerResources x:Key="DateTimePickerResources"/>
+        <ExponentialEase x:Key="Ease" EasingMode="EaseIn"/>
+    </Primitives:DateTimePickerPageBase.Resources>
+
+    <Grid Background="{StaticResource PhoneChromeBrush}">
+        <VisualStateManager.VisualStateGroups>
+            <VisualStateGroup x:Name="VisibilityStates">
+                <VisualState x:Name="Open">
+                    <Storyboard>
+                        <DoubleAnimation
+                            Storyboard.TargetName="PlaneProjection"
+                            Storyboard.TargetProperty="RotationX"
+                            From="-50"
+                            To="0"
+                            Duration="0:0:0.2"/>
+                    </Storyboard>
+                </VisualState>
+                <VisualState x:Name="Close">
+                    <Storyboard>
+                        <DoubleAnimation
+                            Storyboard.TargetName="PlaneProjection"
+                            Storyboard.TargetProperty="RotationX"
+                            To="90"
+                            Duration="0:0:0.2"
+                            EasingFunction="{StaticResource Ease}" />
+                    </Storyboard>
+                </VisualState>
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>
+        <Grid.Projection>
+            <PlaneProjection x:Name="PlaneProjection"/>
+        </Grid.Projection>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition />
+        </Grid.RowDefinitions>
+
+        <!-- SystemTray placeholder -->
+        <Rectangle
+            Grid.Row="0"
+            Height="32"/>
+        <!-- Title -->
+        <TextBlock
+            Grid.Row="1"
+            Text="{Binding DatePickerTitle, Source={StaticResource DateTimePickerResources}}"
+            FontFamily="{StaticResource PhoneFontFamilySemiBold}"
+            FontSize="{StaticResource PhoneFontSizeMedium}"
+            Foreground="{StaticResource PhoneForegroundBrush}"
+            Margin="24,16,12,24"/>
+        <!-- LoopingSelectors -->
+        <Grid
+            Grid.Row="2"
+            HorizontalAlignment="Center">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <Primitives:LoopingSelector
+                x:Name="SecondarySelector"
+                Grid.Column="0"
+                Width="148"
+                ItemSize="148,148"
+                ItemMargin="6">
+                <Primitives:LoopingSelector.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel
+                            HorizontalAlignment="Left"
+                            VerticalAlignment="Bottom"
+                            Margin="6">
+                            <TextBlock
+                                Text="{Binding MonthNumber}"
+                                FontSize="54"
+                                FontFamily="{StaticResource PhoneFontFamilySemiBold}"
+                                Margin="0,-8"/>
+                            <TextBlock
+                                Text="{Binding MonthName}"
+                                FontSize="20"
+                                FontFamily="{StaticResource PhoneFontFamilyNormal}"
+                                Foreground="{StaticResource PhoneSubtleBrush}"
+                                Margin="0,-2"/>
+                        </StackPanel>
+                    </DataTemplate>
+                    </Primitives:LoopingSelector.ItemTemplate>
+                </Primitives:LoopingSelector>
+            <Primitives:LoopingSelector
+                x:Name="TertiarySelector"
+                Grid.Column="1"
+                Width="148"
+                ItemSize="148,148"
+                ItemMargin="6">
+                <Primitives:LoopingSelector.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel
+                            HorizontalAlignment="Left"
+                            VerticalAlignment="Bottom"
+                            Margin="6">
+                            <TextBlock
+                                Text="{Binding DayNumber}"
+                                FontSize="54"
+                                FontFamily="{StaticResource PhoneFontFamilySemiBold}"
+                                Margin="0,-8"/>
+                            <TextBlock
+                                Text="{Binding DayName}"
+                                FontSize="20"
+                                FontFamily="{StaticResource PhoneFontFamilyNormal}"
+                                Foreground="{StaticResource PhoneSubtleBrush}"
+                                Margin="0,-2"/>
+                        </StackPanel>
+                    </DataTemplate>
+                    </Primitives:LoopingSelector.ItemTemplate>
+            </Primitives:LoopingSelector>
+            <Primitives:LoopingSelector
+                Grid.Column="2"
+                x:Name="PrimarySelector"
+                Width="148"
+                ItemSize="148,148"
+                ItemMargin="6">
+                <Primitives:LoopingSelector.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel
+                            HorizontalAlignment="Left"
+                            VerticalAlignment="Bottom"
+                            Margin="6">
+                            <TextBlock
+                                Text="{Binding YearNumber}"
+                                FontSize="54"
+                                FontFamily="{StaticResource PhoneFontFamilySemiBold}"
+                                Margin="0,-8"/>
+                            <TextBlock
+                                Text=" "
+                                FontSize="20"
+                                FontFamily="{StaticResource PhoneFontFamilyNormal}"
+                                Foreground="{StaticResource PhoneSubtleBrush}"
+                                Margin="0,-2"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </Primitives:LoopingSelector.ItemTemplate>
+            </Primitives:LoopingSelector>
+        </Grid>
+    </Grid>
+
+    <Primitives:DateTimePickerPageBase.ApplicationBar>
+        <shell:ApplicationBar IsVisible="True">
+            <!--
+            Due to platform restrictions, ApplicationBarIconButton.IconUri content can not come from the
+            Microsoft.Phone.Controls.Toolkit assembly, so it is up to the application developer to ensure
+            these resources are placed in the right location and marked as Build Action=Content. For
+            convenience, platform-consistent images are included with the Toolkit installer.
+
+            Note: ApplicationBarIconButton.Text automatically comes from the Microsoft.Phone.Controls.Toolkit
+            resources (where it can be localized).
+            -->
+            <shell:ApplicationBarIconButton
+                IconUri="/Toolkit.Content/ApplicationBar.Check.png"
+                Text="DONE"/>
+            <shell:ApplicationBarIconButton
+                IconUri="/Toolkit.Content/ApplicationBar.Cancel.png"
+                Text="CANCEL"/>
+        </shell:ApplicationBar>
+    </Primitives:DateTimePickerPageBase.ApplicationBar>
+
+</Primitives:DateTimePickerPageBase>

@@ -84,6 +84,9 @@ namespace NativeUI
                 mListViewListeners[i]->listViewItemClicked(
                     this,
                     listViewItem);
+                mListViewListeners[i]->listViewItemClicked(
+                    this,
+                    itemClickedIndex);
             }
         }
     }

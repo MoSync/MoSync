@@ -54,7 +54,7 @@ namespace NativeUI
          * This method is called when the OptionsMenu is being closed
          * (either by the user canceling the menu with the back/menu
          * button, or when an item is selected.
-         * @param Screen The screen that generated the event.
+         * @param screen The screen that generated the event.
          */
         virtual void optionsMenuClosed(Screen* screen);
 
@@ -62,7 +62,7 @@ namespace NativeUI
          * This method is called when an options menu item is selected.
          * @param index The index on which the item is placed into the
          * OptionsMenu.
-         *  @param Screen The screen that generated the event.
+         * @param screen The screen that generated the event.
          */
         virtual void optionsMenuItemSelected(Screen* screen, int index);
 

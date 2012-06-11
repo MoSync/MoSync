@@ -940,24 +940,26 @@ namespace Base
 		return result;
 	}
 
-	int _maWidgetScreenAddOptionsMenuItem(int widget, const char* title, int iconHandle, int iconPredefined, JNIEnv* jNIEnv, jobject jThis)
+	int _maWidgetScreenAddOptionsMenuItem(int widget, const char* title, const char* iconPath, int iconPredefined, JNIEnv* jNIEnv, jobject jThis)
 	{
 		// Convert to Java parameters
 		jstring jstrTitle = jNIEnv->NewStringUTF(title);
+		jstring jstrPath = jNIEnv->NewStringUTF(iconPath);
 
 		// Get the Java method
 		jclass cls = jNIEnv->GetObjectClass(jThis);
-		jmethodID methodID = jNIEnv->GetMethodID(cls, "maWidgetScreenAddOptionsMenuItem", "(ILjava/lang/String;II)I");
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maWidgetScreenAddOptionsMenuItem", "(ILjava/lang/String;Ljava/lang/String;I)I");
 		if (methodID == 0)
 		{
 			return 0;
 		}
 
 		// Call the java method
-		int result = jNIEnv->CallIntMethod(jThis, methodID, widget, jstrTitle, iconHandle, iconPredefined);
+		int result = jNIEnv->CallIntMethod(jThis, methodID, widget, jstrTitle, jstrPath, iconPredefined);
 
 		// Delete allocated memory
 		jNIEnv->DeleteLocalRef(cls);
+		jNIEnv->DeleteLocalRef(jstrPath);
 		jNIEnv->DeleteLocalRef(jstrTitle);
 
 		return result;
@@ -3369,6 +3371,161 @@ namespace Base
 		return result;
 	}
 
+	int _maPurchaseSupported(JNIEnv* jNIEnv, jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maPurchaseSupported", "()I");
+		if (methodID == 0)
+		{
+			return 0;
+		}
+
+		int result = jNIEnv->CallIntMethod(jThis, methodID);
+
+		jNIEnv->DeleteLocalRef(cls);
+
+		return result;
+	}
+
+	int _maPurchaseCreate(MAHandle handle, const char* productID, JNIEnv* jNIEnv, jobject jThis)
+	{
+		jstring jstrProduct = jNIEnv->NewStringUTF(productID);
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maPurchaseCreate", "(ILjava/lang/String;)V");
+		if (methodID == 0)
+		{
+			return 0;
+		}
+
+		jNIEnv->CallVoidMethod(jThis, methodID, handle, jstrProduct);
+
+		jNIEnv->DeleteLocalRef(cls);
+		jNIEnv->DeleteLocalRef(jstrProduct);
+
+		return 1;
+	}
+
+	int _maPurchaseSetPublicKey(const char* developerKey, JNIEnv* jNIEnv, jobject jThis)
+	{
+		jstring jstrKey = jNIEnv->NewStringUTF(developerKey);
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maPurchaseSetPublicKey", "(Ljava/lang/String;)I");
+		if (methodID == 0)
+		{
+			return 0;
+		}
+
+		int result = jNIEnv->CallIntMethod(jThis, methodID, jstrKey);
+
+		jNIEnv->DeleteLocalRef(cls);
+		jNIEnv->DeleteLocalRef(jstrKey);
+
+		return result;
+	}
+
+	int _maPurchaseRequest(MAHandle productHandle, int quantity, JNIEnv* jNIEnv, jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maPurchaseRequest", "(I)V");
+		if (methodID == 0)
+		{
+			return 0;
+		}
+
+		jNIEnv->CallVoidMethod(jThis, methodID, productHandle);
+
+		jNIEnv->DeleteLocalRef(cls);
+
+		return 1;
+	}
+
+	int _maPurchaseGetName(
+			int memStart, MAHandle productHandle, int memBuffer, int bufferSize, JNIEnv* jNIEnv, jobject jThis)
+	{
+		// Get the Java method
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maPurchaseGetName", "(III)I");
+		if (methodID == 0)
+		{
+			return 0;
+		}
+
+		// Call the java method
+		int result = jNIEnv->CallIntMethod(jThis, methodID, productHandle, memBuffer - memStart, bufferSize);
+
+		jNIEnv->DeleteLocalRef(cls);
+
+		return result;
+	}
+
+	int _maPurchaseGetField(
+			int memStart, MAHandle productHandle, const char* property, int memBuffer, int bufferSize, JNIEnv* jNIEnv, jobject jThis)
+	{
+		jstring jstrProperty = jNIEnv->NewStringUTF(property);
+
+		// Get the Java method
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maPurchaseGetField", "(ILjava/lang/String;II)I");
+		if (methodID == 0)
+		{
+			return 0;
+		}
+
+		// Call the java method
+		int result = jNIEnv->CallIntMethod(jThis, methodID, productHandle, jstrProperty, memBuffer - memStart, bufferSize);
+
+		jNIEnv->DeleteLocalRef(cls);
+		jNIEnv->DeleteLocalRef(jstrProperty);
+
+		return result;
+	}
+
+	int _maPurchaseRestoreTransactions(JNIEnv* jNIEnv, jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maPurchaseRestoreTransactions", "()V");
+		if (methodID == 0)
+		{
+			return 0;
+		}
+
+		jNIEnv->CallVoidMethod(jThis, methodID);
+		jNIEnv->DeleteLocalRef(cls);
+
+		return 1;
+	}
+
+	int _maPurchaseVerifyReceipt(MAHandle handle, JNIEnv* jNIEnv, jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maPurchaseVerifyReceipt", "(I)V");
+		if (methodID == 0)
+		{
+			return 0;
+		}
+
+		jNIEnv->CallVoidMethod(jThis, methodID, handle);
+		jNIEnv->DeleteLocalRef(cls);
+
+		return 1;
+	}
+
+	int _maPurchaseDestroy(MAHandle handle, JNIEnv* jNIEnv, jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maPurchaseDestroy", "(I)I");
+		if (methodID == 0)
+		{
+			return 0;
+		}
+
+		int result = jNIEnv->CallIntMethod(jThis, methodID, handle);
+
+		jNIEnv->DeleteLocalRef(cls);
+
+		return result;
+	}
+
 	int _maSyscallPanicsEnable(JNIEnv* jNIEnv, jobject jThis)
 	{
 		jclass cls = jNIEnv->GetObjectClass(jThis);
@@ -3829,6 +3986,89 @@ namespace Base
 
 		return (int)result;
 	}
+
+	int _maAudioInstanceCreateDynamic(
+		int sampleRate,
+		int numChannels,
+		int bufferSize,
+		JNIEnv* jNIEnv,
+		jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+
+		jmethodID methodID = jNIEnv->GetMethodID(
+			cls,
+			"maAudioInstanceCreateDynamic",
+			"(II)I");
+
+		if (methodID == 0)
+			return -1;
+
+		jint result = jNIEnv->CallIntMethod(
+			jThis,
+			methodID,
+			sampleRate,
+			numChannels,
+			bufferSize);
+
+		jNIEnv->DeleteLocalRef(cls);
+
+		return (int)result;
+	}
+
+	int _maAudioSubmitBuffer(
+		int audioInstance,
+		int buffer,
+		int bufferSize,
+		int memStart,
+		JNIEnv* jNIEnv,
+		jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+
+		jmethodID methodID = jNIEnv->GetMethodID(
+			cls,
+			"maAudioSubmitBuffer",
+			"(III)I");
+
+		if (methodID == 0)
+			return -1;
+
+		jint result = jNIEnv->CallIntMethod(
+			jThis,
+			methodID,
+			audioInstance,
+			buffer - memStart,
+			bufferSize);
+
+		jNIEnv->DeleteLocalRef(cls);
+
+		return (int)result;
+	}
+
+	int _maAudioGetPendingBufferCount(
+		int audioInstance,
+		JNIEnv* jNIEnv,
+		jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+
+		jmethodID methodID = jNIEnv->GetMethodID(
+			cls,
+			"maAudioGetPendingBufferCount",
+			"(I)I");
+
+		if (methodID == 0)
+			return -1;
+
+		jint result = jNIEnv->CallIntMethod(
+			jThis,
+			methodID,
+			audioInstance);
+
+		jNIEnv->DeleteLocalRef(cls);
+	}
+
 
 	int _maAudioInstanceDestroy(
 		int audioInstance,

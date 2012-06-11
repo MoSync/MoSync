@@ -424,6 +424,13 @@ static void nativePostEvent(JNIEnv* env, jobject jthis, jintArray eventBuffer)
 		event.captureData.type = intArray[1];
 		event.captureData.handle = intArray[2];
 	}
+	else if (event.type == EVENT_TYPE_PURCHASE)
+	{
+		event.purchaseData.type = intArray[1];
+		event.purchaseData.state = intArray[2];
+		event.purchaseData.productHandle = intArray[3];
+		event.purchaseData.errorCode = intArray[4];
+	}
 	else if (event.type == EVENT_TYPE_WIDGET)
 	{
 		/*

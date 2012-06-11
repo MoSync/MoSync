@@ -15,6 +15,7 @@ using System.Windows.Navigation;
 using System;
 using System.Text.RegularExpressions;
 using System.Reflection;
+using System.Windows.Media;
 
 namespace MoSync
 {
@@ -59,6 +60,38 @@ namespace MoSync
 
                 mView = mLabel;
 			}
+
+            /**
+             * Implementation of the Left property of the Label widget.
+             */
+            [MoSyncWidgetProperty(MoSync.Constants.MAW_WIDGET_LEFT)]
+            public new double Left
+            {
+                get { return mLabel.Margin.Left; }
+                set
+                {
+                    mLabel.Margin = new Thickness(value,
+                        mLabel.Margin.Top,
+                        mLabel.Margin.Right,
+                        mLabel.Margin.Bottom);
+                }
+            }
+
+            /**
+             * Implementation of the Top property of the Label widget.
+             */
+            [MoSyncWidgetProperty(MoSync.Constants.MAW_WIDGET_TOP)]
+            public new double Top
+            {
+                get { return mLabel.Margin.Top; }
+                set
+                {
+                    mLabel.Margin = new Thickness(mLabel.Margin.Left,
+                        value,
+                        mLabel.Margin.Right,
+                        mLabel.Margin.Bottom);
+                }
+            }
 
             /**
              * Implementation of the Text property

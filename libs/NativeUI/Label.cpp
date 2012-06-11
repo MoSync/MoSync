@@ -37,6 +37,16 @@ namespace NativeUI
     }
 
     /**
+     * Constructor.
+     * @param text The given text.
+     */
+    Label::Label(const MAUtil::String text):
+			TextWidget(MAW_LABEL)
+    {
+		this->setText(text);
+    }
+
+    /**
      * Destructor.
      */
     Label::~Label()

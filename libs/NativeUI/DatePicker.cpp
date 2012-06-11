@@ -43,7 +43,10 @@ namespace NativeUI
 	 * Constructor.
 	 */
 	DatePicker::DatePicker() :
-		Widget(MAW_DATE_PICKER)
+		Widget(MAW_DATE_PICKER),
+		mMaxDate(NULL),
+		mMinDate(NULL),
+		mDisplayedDate(NULL)
 	{
 	}
 

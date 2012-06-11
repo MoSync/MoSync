@@ -115,8 +115,8 @@
 - (void)layout {
 	UITabBarController* tabBarController = (UITabBarController*)controller;
 	float tabBarHeight = tabBarController.tabBar.bounds.size.height;
-	float viewWidth = view.frame.size.width;
-	float viewHeight = view.frame.size.height - tabBarHeight;
+	float viewWidth = view.bounds.size.width;
+	float viewHeight = view.bounds.size.height - tabBarHeight;
 
     CGRect tabBarRect = CGRectMake(view.frame.origin.x,
                                    viewHeight,
