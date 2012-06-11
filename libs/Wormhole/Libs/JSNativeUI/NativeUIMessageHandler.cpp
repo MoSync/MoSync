@@ -398,6 +398,9 @@ namespace Wormhole
 					eventType = "DialogDismissed";
 					break;
 			}
+			// TODO: Micke says: Here we could add a string parameter for
+			// "WebViewHookInvoked" events to be able to pass data to
+			// the main (hidden) WebView using mosync.bridge.sendRaw.
 			sprintf(buffer,
 				"mosync.nativeui.event(%d, \"%s\", %d, %d, %d)",
 				widget,

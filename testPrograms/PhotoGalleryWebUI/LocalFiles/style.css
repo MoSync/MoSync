@@ -29,16 +29,12 @@ html, body {
 }
 
 #heading {
-	display: block;
-	margin: 0px auto 0px auto;
-	padding: 10px 10px 10px 10px;
 	background: #FF7F00; /*#FF7744;*/
 	color: #EEEEEE;
 	font-size: 1.6em;
 	font-weight: bold;
 	text-align: center;
-	clear: both;
-	width: 300px;
+	margin-top: 15px;
 }
 
 #info {

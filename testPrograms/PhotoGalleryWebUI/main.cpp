@@ -38,7 +38,6 @@ MA 02110-1301, USA.
  *   functions in C++, implemented by the MyMessageHandler class
  *   (this may be added to the MoSync Wormhole library in an
  *   upcoming release of MoSync).
- * - How to send messages between WebViews (via C++).
  *
  * The folder "Server" contains the server side code. Note that this
  * code is not part of the actual mobile app, but is intended to run
@@ -58,11 +57,11 @@ MA 02110-1301, USA.
 class MyPhotoListDownloader : public Wormhole::HighLevelTextDownloader
 {
 public:
-	MAWidgetHandle mGalleryWebViewHandle;
+	Wormhole::WebAppMoblet* mMoblet;
 
-	MyPhotoListDownloader(MAWidgetHandle galleryWebViewHandle) :
-		mGalleryWebViewHandle(galleryWebViewHandle)
+	MyPhotoListDownloader(Wormhole::WebAppMoblet* moblet)
 	{
+		mMoblet = moblet;
 	}
 
 	virtual ~MyPhotoListDownloader()
@@ -73,38 +72,29 @@ public:
 	 * Called when download is complete.
 	 * @param text Contains JSON with list of image urls, NULL on error.
 	 */
-	virtual void onDownloadComplete(char* text)
+	void onDownloadComplete(char* text)
 	{
-		// URL array.
-		MAUtil::String result;
-
+		lprintfln("onDownloadComplete");
 		if (NULL != text)
 		{
-			// Download success, set result string (text contains a JSON array).
-			result = "'";
-			result += text;
-			result += "'";
+			// Download success, call JavaScript with the result.
+			MAUtil::String js = "app.setPhotoList('";
+			js += text;
+			js += "')";
+			lprintfln("js: %s", js.c_str());
+			mMoblet->callJS(js);
 
-			// We need to free downloaded data.
+			// We need to free downloaded data explicitly, but the
+			// downloader itself will be deleted automatically.
 			HighLevelTextDownloader::freeData(text);
 		}
 		else
 		{
 			// Download error.
-			result = "null";
+			mMoblet->callJS("app.setPhotoList(null)");
 		}
 
-		// Call JavaScript with the result.
-		MAUtil::String url = "javascript:gallery.setPhotoList(";
-		url += result;
-		url += ")";
-
-		maWidgetSetProperty(
-			mGalleryWebViewHandle,
-			MAW_WEB_VIEW_URL,
-			url.c_str());
-
-		// Delete me!
+		// Delete myself!
 		delete this;
 	}
 };
@@ -124,66 +114,29 @@ public:
 		// Enable message sending from JavaScript to C++.
 		enableWebViewMessages();
 
-		// Hide the main WebView (we will use NativeUI to display
-		// widgets and use this hidden WebView to handle application
-		// logic written in JavaScript).
-		getWebView()->setVisible(false);
+		// Show the WebView that contains the HTML/CSS UI
+		// and the JavaScript code.
+		getWebView()->setVisible(true);
 
-		// Load page in the "LocalFiles" folder into the hidden WebView.
-		//getWebView()->openURL("index.html");
+		getWebView()->enableZoom();
+
+		// The page in the "LocalFiles" folder to
+		// show when the application starts.
 		showPage("index.html");
 
 		// The beep sound is defined in file "Resources/Resources.lst".
 		mMyMessageHandler.init(BEEP_WAV, this);
 
-		// Register functions to handle custom messages sent from JavaScript.
+		// Register a custom function to handle "DownloadPhotoList"
+		// messages send from JavaScript.
 		mMyMessageHandler.addMessageFun(
 			"DownloadPhotoList",
 			(MyMessageHandlerFun)&MyMoblet::downloadPhotoList);
-		mMyMessageHandler.addMessageFun(
-			"CallJS",
-			(MyMessageHandlerFun)&MyMoblet::callJSInWebView);
 	}
 
 	virtual ~MyMoblet()
 	{
-	}
-
-	/**
-	 * Here we handle HOOK_INVOKED events for WebViews in the app.
-	 * This code enables WebViews to send messages to each other.
-	 */
-	void customEvent(const MAEvent& event)
-	{
-		if (EVENT_TYPE_WIDGET == event.type)
-		{
-			MAWidgetEventData* widgetEventData = (MAWidgetEventData*)event.data;
-			MAWidgetHandle widgetHandle = widgetEventData->widgetHandle;
-
-			// If target object is the main WebView, then we just return
-			// because this is handled by the NativeUI library event processing.
-			if (getWebView()->getWidgetHandle() == widgetHandle)
-			{
-				return;
-			}
-
-			// Process HOOK_INVOKED messages. This makes CallJS messages work.
-			if (MAW_EVENT_WEB_VIEW_HOOK_INVOKED == widgetEventData->eventType)
-			{
-				//int hookType = widgetEventData->hookType;
-				MAHandle data = widgetEventData->urlData;
-
-				// Works with NULL as first param as long as the the only
-				// thing we do is passing messages to other WebViews.
-				// This is done by custom function callJSInWebView,
-				// which is invoked via handleWebViewMessage.
-				handleWebViewMessage(NULL, data);
-				//handleWebViewMessage(getWebView(), data); // Alternative.
-
-				// Free data.
-				maDestroyPlaceholder(data);
-			}
-		}
+		// Add cleanup code as needed.
 	}
 
 	/**
@@ -196,51 +149,17 @@ public:
 		mMyMessageHandler.keyPressEvent(keyCode, nativeCode);
 	}
 
-	/**
-	 * Called from JavaScript to download a list of photos.
-	 */
 	void downloadPhotoList(Wormhole::MessageStream& stream)
 	{
-		// Get the Gallery WebView widget handle.
-		int webViewHandle = MAUtil::stringToInteger(stream.getNext());
+		lprintfln("@@@ downloadPhotoList");
 
-		// Get download url.
+		// Get url.
 		const char* url = stream.getNext();
 
-		// Initiate download.
-		(new MyPhotoListDownloader(webViewHandle))->get(url);
-	}
+		lprintfln("@@@ url: %s", url);
 
-	/**
-	 * Called from JavaScript to evaluate a JS script in a WebView.
-	 */
-	void callJSInWebView(Wormhole::MessageStream& stream)
-	{
-		// Get the native MoSync widget handle for the WebView
-		// this call should be forwarded to.
-		int webViewHandle = MAUtil::stringToInteger(stream.getNext());
-		if (0 == webViewHandle)
-		{
-			// When the handle is zero, we should use the main
-			// WebView (hidden in this app).
-			webViewHandle = getWebView()->getWidgetHandle();
-		}
-
-		// Evaluate the JavaScript code in the WebView.
-		callJS(webViewHandle, stream.getNext());
-	}
-
-	/**
-	 * Evaluate JavaScript code in the given WebView.
-	 */
-	void callJS(MAWidgetHandle webViewHandle, const MAUtil::String& script)
-	{
-		// Call the JavaScript code on the WebView.
-		MAUtil::String url = "javascript:" + script;
-		maWidgetSetProperty(
-			webViewHandle,
-			MAW_WEB_VIEW_URL,
-			url.c_str());
+		// Start download.
+		(new MyPhotoListDownloader(this))->get(url);
 	}
 
 	/**
@@ -258,7 +177,7 @@ public:
 		// Uncomment to print message data for debugging.
 		// You need to build the project in debug mode for
 		// the log output to be displayed.
-		//printMessage(data);
+		printMessage(data);
 
 		mMyMessageHandler.handleWebViewMessage(webView, data, this);
 	}
