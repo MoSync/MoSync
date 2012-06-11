@@ -1,7 +1,7 @@
 File
 ==========
 
-> An API to read, write and navigate file system hierarchies. 
+> API to navigate the file system, read, write and upload files. 
 
 Objects
 -------
@@ -13,14 +13,11 @@ Objects
 - FileError
 - FileReader
 - FileSystem
-- FileWriter
-- Flags
-- LocalFileSystem
-- Metadata
-
-<!--
 - FileTransfer
 - FileTransferError
 - FileUploadOptions
 - FileUploadResult
--->
+- FileWriter
+- Flags
+- LocalFileSystem
+- Metadata

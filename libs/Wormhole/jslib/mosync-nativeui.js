@@ -96,6 +96,7 @@ mosync.nativeui.maWidgetCreate = function(
 	}
 
 	mosync.bridge.send(message, processedCallback);
+	// TODO: Micke says: Should we move this code to before send?
 	mosync.nativeui.callBackTable[callbackID] = {
 		success : successCallback,
 		error : errorCallback
@@ -1241,9 +1242,9 @@ mosync.nativeui.create = function(widgetType, widgetID, params,
  */
 mosync.nativeui.destroyAll = function()
 {
-	for(var widget in mosync.nativeui.widgetIDList)
+	for (var widget in mosync.nativeui.widgetIDList)
 	{
-		//Destroy all widgets and do not wait for anything
+		// Destroy all widgets and do not wait for anything.
 		mosync.nativeui.maWidgetDestroy(widget, null, null, null);
 	}
 };
@@ -1271,14 +1272,20 @@ mosync.nativeui.numWidgetsCreated = 0;
 mosync.nativeui.showInterval;
 
 /**
- * List of WidetIDs and handles. Used for accessign widgets through their IDs
+ * List of WidetIDs and handles. Used for accessing MoSync widget handles through their IDs.
  * @private
  */
 mosync.nativeui.widgetIDList = {};
 
 /**
- * Provides access to C++ handles through IDs. It is accessible though document object as well.
+ * TODO: Micke says: The comment "It is accessible though document object as well."
+ * seems misleading, because that returns a DOM object, not a widget handle.
+ * Is this the case? Then we should update the comment. And why is this private?
+ * This is useful to have in applications. And should we rename the function,
+ * to not confuse it with document.getElementsById ? Why not call it
+ * "getWidgetHandleById" ??
  *
+ * Provides access to C++ handles through IDs. It is accessible though document object as well.
  *
  * @param elementID
  *            ID of the widget in question
@@ -1287,13 +1294,17 @@ mosync.nativeui.widgetIDList = {};
  * Example
  * -------
  * \code
+ * TODO: Micke says: Is this code example relevant for this function?
+ * The example shows something else. And should "getElementsById"
+ * not be "getElementById"?
  *
  *   var myButton = document.getElementsById("MyButton");
  *   myButton.addTo("myLayout");
  * \endcode
  * @private
  */
-mosync.nativeui.getElementById = function(elementID) {
+mosync.nativeui.getElementById = function(elementID)
+{
 	return mosync.nativeui.widgetIDList[elementID];
 };
 
