@@ -60,6 +60,11 @@ group PurchaseResultCodes "Purchase Result Codes" {
         * contain the given field.
         */
 		INVALID_FIELD_NAME = -10;
+		/**
+		* \bried returned by the #maPurchaseSetPublicKey() syscall if the encoded public key
+		* is invalid.
+		*/
+		MALFORMED_PUBLIC_KEY = -11;
 	}
 } // end of Purchase Result Codes
 
@@ -399,8 +404,12 @@ group PurchaseFunctions "Purchase Functions" {
 	*
 	* \param developerPublicKey Base64-encoded public key, that can be found on the Google
 	* Play publisher account page, under Licensing & In-app Billing panel in Edit Profile.
+	*
+	* \returns One of the next result codes:
+	* - #MA_PURCHASE_RES_OK if the key was set.
+	* - #MA_PURCHASE_RES_MALFORMED_PUBLIC_KEY if the key is invalid.
 	*/
-	void maPurchaseSetPublicKey(in MAString developerPublicKey);
+	int maPurchaseSetPublicKey(in MAString developerPublicKey);
 
 	/**
 	* Request the user to purchase a product.

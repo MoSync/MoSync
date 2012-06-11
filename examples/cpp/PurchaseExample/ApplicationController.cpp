@@ -22,6 +22,7 @@
  * @brief  The controller that handles all purchase related
  * The controller is responsible for updating the UI with all
  * purchase events.
+ * @author Emma Tresanszki
  */
 
 #include <maapi.h>
@@ -43,6 +44,7 @@ mMainScreen(NULL)
 
 	// Set Android public key.
 	PurchaseManager::getInstance()->setPublicKey(DEVELOPER_PUBLIC_KEY);
+	PurchaseManager::getInstance()->setStoreURL(sAppStoreSandboxURL);
 }
 
 /**
