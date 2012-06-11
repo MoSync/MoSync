@@ -37,7 +37,7 @@ using namespace NativeUI;
  * Class that creates a screen that displays all the contacts.
  */
 class MainScreen:
-	public Screen
+	public Screen, public ButtonListener
 {
 
 public:
@@ -50,6 +50,8 @@ public:
 	 * Destructor.
 	 */
 	~MainScreen();
+
+	void buttonClicked(Widget* button);
 
 private:
 
@@ -68,6 +70,8 @@ private:
 	Label* nrFontsLabel;
 	Label* fontLoadedName;
 	Label* testFontLabel;
+
+	Button* mButton;
 };
 
 
