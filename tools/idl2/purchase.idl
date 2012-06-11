@@ -414,7 +414,7 @@ group PurchaseFunctions "Purchase Functions" {
 	/**
 	* Request the user to purchase a product.
 	* The system will handle the proccess of purchasing.
-	* Note: if there are another requests in progress, the requests will be queued.
+	* Note: if there are other requests in progress, the requests will be queued.
 	* If the product is restored on iOS platform it cannot be purchased again.
 	*
 	* A #EVENT_TYPE_PURCHASE will be sent after calling this syscall.
