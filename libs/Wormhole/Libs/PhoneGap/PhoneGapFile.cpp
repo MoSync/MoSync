@@ -886,11 +886,9 @@ namespace Wormhole
 		const String& errorCode
 		)
 	{
-		String args = "{\"code\":" + errorCode + "}";
-
 		mMessageHandler->callError(
 			callbackID,
-			args);
+			errorCode);
 	}
 
 	void PhoneGapFile::callFileTransferError(
@@ -1089,22 +1087,19 @@ namespace Wormhole
 		// Get path.
 		const char* pURL = uri.c_str();
 		const char* pPath = strstr(pURL, "file://");
-		if (NULL == pPath)
+
+		// URL must start with "file://"
+		if ((NULL == pPath) || (pURL != pPath))
 		{
-			callFileError(callbackID, FILEERROR_SYNTAX_ERR);
-			return;
-		}
-		if (pURL != pPath)
-		{
-			callFileError(callbackID, FILEERROR_SYNTAX_ERR);
+			callFileError(callbackID, FILEERROR_ENCODING_ERR);
 			return;
 		}
 
 		// Move to after "file://"
 		pPath += 7;
 
-		// Check that this is an existing directory.
-		if (!FileIsDirectory(pPath))
+		// Check that this is an existing file.
+		if (!FileExists(pPath))
 		{
 			callFileError(callbackID, FILEERROR_NOT_FOUND_ERR);
 			return;
@@ -1401,9 +1396,6 @@ namespace Wormhole
 		actionCopyMoveHelper(message, true);
 	}
 
-	//I/maWriteLog(20616): @@@ URL: mosync://PhoneGap?service=File&action=moveTo&args={"fullPath":"/mnt/sdcard/hello2.txt","pa
-	//rent":{"isFile":false,"isDirectory":true,"name":"sdcard","fullPath":"/mnt/sdcard","filesystem":null},"newName":"hello3.t
-	//xt"}&PhoneGapCallBackId=File19
 	void PhoneGapFile::actionCopyMoveHelper(JSONMessage& message, bool move)
 	{
 		String callbackID = message.getParam("PhoneGapCallBackId");
@@ -1412,7 +1404,7 @@ namespace Wormhole
 
 		String destinationName = message.getArgsField("newName");
 
-		// Get the destination path from the JSON tree.
+		// Get destination path from JSON data (from DirectoryEntry object).
 		String destinationPath;
 		bool success = message.getJSONParamParentFullPath(destinationPath);
 		if (!success)
