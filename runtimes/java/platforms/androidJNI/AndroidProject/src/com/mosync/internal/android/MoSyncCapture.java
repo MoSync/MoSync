@@ -22,6 +22,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Date;
 import java.util.Hashtable;
 
 import com.mosync.internal.android.MoSyncThread.ImageCache;
@@ -70,15 +71,19 @@ import static com.mosync.internal.generated.MAAPI_consts.MA_CAPTURE_RES_FILE_ALR
 /**
  * Class that implements Capture API.
  * @author emma tresanszki
+ *
+ * TODO: Consider making this class non-static (move class members
+ * to be instance members).
  */
 public class MoSyncCapture
 {
-
 	/**
-	 * Store the type of the capture.
+	 * Type of capture.
 	 */
-	enum CaptureType {
-		IMAGE, VIDEO
+	enum CaptureType
+	{
+		IMAGE,
+		VIDEO
 	}
 
 	// The value for HIGH and LOW video quality.
@@ -96,6 +101,81 @@ public class MoSyncCapture
 
 	// The temporary file name for the IMAGE capture.
 	public static final String CAPTURE_TEMP_DEFAULT_NAME = "MoSyncTempFile";
+
+	/************************ Class members ************************/
+
+	/**
+	 * The MoSync thread object.
+	 */
+	private static MoSyncThread sMoSyncThread;
+
+	/**
+	 * The Content Resolver instance.
+	 */
+	private static ContentResolver sContentResolver;
+
+	/**
+	 * It has access to the image resource table.
+	 */
+	private static Hashtable<Integer, ImageCache> sImageTable;
+
+	/**
+	 * A table that contains mapping between a handle and a capture object.
+	 * The capture object represents a captured image or recorded video.
+	 * The key is the handle of the image or video.
+	 */
+	private static Hashtable<Integer,MoSyncCaptureObject> sCaptureObjects =
+		new Hashtable<Integer,MoSyncCaptureObject>();
+
+	/**
+	 * The current image.
+	 */
+	private static Uri sImageUri;
+
+	/**
+	 * The current video.
+	 */
+	private static Uri sVideoUri;
+
+	/**
+	 * Time stamp used to determine when an image was taken.
+	 */
+	private static long sImageCaptureStarted;
+
+	/**
+	 * Store the state of the last capture action.
+	 * Modify if when a picture is taken.
+	 */
+	// TODO: Not used, can be deleted?
+	//private static boolean sPhotoTaken = false;
+
+	/**
+	 * Capture properties: storeToGallery, videoDurationLimit, videoQuality.
+	 * These properties are set before captures are taken, and are applied
+	 * for each new image/video.
+	 */
+
+	/**
+	 * Indicates if the captured image should be stored in Gallery.
+	 * By default a captured image is stored in Gallery album.
+	 * If the value is set to false then a temporary file will be used
+	 * instead, and no file will be generated after the image capture.
+	 */
+	// TODO: Remove if not used.
+	//private static boolean mStoreToGallery = true;
+
+	/**
+	 * Indicates the duration limit for the video recording.
+	 * Value is in seconds.
+	 */
+	private int mVideoDurationLimit = CAPTURE_DEFAULT_PROPERTY_VALUE;
+
+	/**
+	 * Indicates the video quality of the next recordings.
+	 * Note: some devices the default camera either does not support low-res video capture,
+	 * or it doesn't understand/process the MediaStore.EXTRA_SIZE_LIMIT correctly.
+	 */
+	private int mVideoQuality = CAPTURE_DEFAULT_PROPERTY_VALUE;
 
 	/**
 	 * Constructor Capture API.
@@ -376,36 +456,6 @@ public class MoSyncCapture
 	}
 
 	/**
-	 * Construct a file from a specified Uri.
-	 * @param imageUri The uri.
-	 * @param activity Underlying activity.
-	 * @return The file.
-	 */
-	private static File convertImageUriToFile (Uri imageUri, Activity activity)
-	{
-		Cursor cursor = null;
-		try {
-			String [] proj={ MediaColumns.DATA };
-			cursor = activity.managedQuery( imageUri,
-					proj,  // Which columns to return
-					null,  // WHERE clause; which rows to return (all rows)
-					null,  // WHERE clause selection arguments (none)
-					null); // Order-by clause (ascending by name)
-			if ( cursor == null )
-				return null;
-			int file_ColumnIndex = cursor.getColumnIndexOrThrow(MediaColumns.DATA);
-			if (cursor.moveToFirst()) {
-				return new File(cursor.getString(file_ColumnIndex));
-			}
-			return null;
-		} finally {
-			if (cursor != null) {
-				cursor.close();
-			}
-		}
-	}
-
-	/**
 	* Get full path to a recorded video.
 	* @param handle Handle to a video data object.
 	* @param buffer Will contain the full path to the video file.
@@ -495,6 +545,12 @@ public class MoSyncCapture
 		{
 			Log.e("@@MoSync","maCaptureDestroyData: Invalid handle");
 			return MA_CAPTURE_RES_INVALID_HANDLE;
+		}
+
+		// Explicitly mark bitmap as deleted if not null.
+		if (null != capture.mBitmap)
+		{
+			recycleBitmap(capture.mBitmap);
 		}
 
 		sCaptureObjects.remove(capture);
@@ -615,75 +671,12 @@ public class MoSyncCapture
 		postEventNotificationReceived(MA_CAPTURE_EVENT_TYPE_CANCEL, -1);
 	}
 
-	/**
-	 * Handle the result after a picture was taken( the control went back to MoSync).
-	 * @param intent
-	 */
-	public static void unused_original_version_of_handlePicture(Intent data)
-	{
-		File imageFile = null;
-		Bitmap photo = null;
-
-		/**
-		 * Get the path of the latest saved image in MediaStore.
-		 * Some versions of Android save to the MediaStore as well.
-		 * We don't know what name Android will give either, so we
-		 * search for this manually.
-		 */
-		imageFile = getLatestFile();
-		// Second option:
-		// imageFile = convertImageUriToFile(mImageUri, mMoSyncThread.getActivity());
-
-		if ( imageFile == null )
-		{
-			Log.e("@@MoSync", "Capture error. The captured file does not exist anymore");
-			return;
-		}
-
-		String filePath = imageFile.getAbsolutePath();
-		Log.e("@@MoSync", "Capture: The file path of the capture is "+ filePath);
-		sImageUri = Uri.fromFile(imageFile);
-
-		// Get the bitmap.
-		BitmapFactory.Options mDecodingOptions = new BitmapFactory.Options() ;
-		// Return a smaller image to save memory and avoid memory issues.
-		mDecodingOptions.inSampleSize = 4;
-		photo = BitmapFactory.decodeFile(filePath, mDecodingOptions);
-
-		if ( photo == null )
-		{
-			// Try to get a small thumbnail if an error occurred.
-			photo = (Bitmap) data.getExtras().get("data");
-		}
-
-		// Create new handle.
-		int dataHandle = sMoSyncThread.nativeCreatePlaceholder();
-		// Store the image in the NativeUI image table.
-		sImageTable.put(dataHandle, new ImageCache(null, photo));
-		NativeUI.setImageTable(sImageTable);
-
-		// Create and store a new CaptureObject.
-		MoSyncCaptureObject capture = new MoSyncCaptureObject(CaptureType.IMAGE);
-		capture.setData(sImageUri);
-		capture.mBitmap = photo;
-		capture.mPath = filePath;
-		sCaptureObjects.put(dataHandle, capture);
-
-		// Free objects.
-		photo = null;
-		imageFile = null;
-		capture = null;
-
-		// Post MoSync event.
-		postEventNotificationReceived(MA_CAPTURE_EVENT_TYPE_IMAGE, dataHandle);
-	}
-
 	/*
 	 * @brief Recycles the bitmap
 	 *
 	 * @param	bitmap	The bitmap which is being recycled
 	 */
-	public static void recycleImageData(final Bitmap bitmap)
+	private static void recycleBitmap(final Bitmap bitmap)
 	{
 		sMoSyncThread.getActivity().runOnUiThread(new Runnable()
 		{
@@ -701,50 +694,44 @@ public class MoSyncCapture
 	 */
 	private static File getLatestFile()
 	{
-		File file = null;
-		// Get the latest uri added to MediaStore.
-		final String[] imageColumns = { MediaStore.Images.Media.DATA };
-		final String imageOrderBy = MediaStore.Images.Media._ID + " DESC";
+		// Get the latest camera shot from the MediaStore.
+		final String[] imageColumns =
+		{
+			MediaStore.Images.Media.DATA,
+			MediaStore.Images.Media.DATE_TAKEN
+		};
 		final String imageWhere = null;
 		final String[] imageArguments = null;
+		final String imageOrderBy = MediaStore.Images.Media.DATE_TAKEN + " DESC";
 		Cursor imageCursor = sMoSyncThread.getActivity().managedQuery(
-				MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-				imageColumns,
-				imageWhere,
-				imageArguments,
-				imageOrderBy);
-		if(imageCursor.moveToFirst()){
-			String path = imageCursor.getString(imageCursor.getColumnIndex(MediaStore.Images.Media.DATA));
-			file = new File(path);
-			imageCursor.close();
-		}else{
-			return null;
-		}
+			MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+			imageColumns,
+			imageWhere,
+			imageArguments,
+			imageOrderBy);
 
-		return file;
-	}
-
-	/*
-	 * @brief Function that creates a Bitmap from uri.
-	 * With this method we cannot obtain a bitmap in sample size.
-	 * @param	uri The image uri.
-	 * @return	The created Bitmap, null if it failed.
-	 */
-	private static Bitmap grabImage(Uri imageUri)
-	{
-		Bitmap bitmap = null;
-		try
+		// Move to the first element (latest camera shot).
+		if (imageCursor.moveToFirst())
 		{
-			bitmap = MediaStore.Images.Media.getBitmap(
-					sContentResolver, imageUri);
-		} catch (FileNotFoundException e) {
-			Log.e("@@MoSync","Capture error: failed to load capture.");
-		  e.printStackTrace();
-		} catch (IOException e) {
-			Log.e("@@MoSync","Capture error: failed to load capture.");
-			e.printStackTrace();
+			// Check that it is newer than the time stamp
+			// taken when launching the camera activity.
+			long dateTaken = imageCursor.getLong(
+				imageCursor.getColumnIndex(
+					MediaStore.Images.Media.DATE_TAKEN));
+			if (dateTaken > sImageCaptureStarted)
+			{
+				// It is newer. Get the path and return a file object.
+				String path = imageCursor.getString(
+					imageCursor.getColumnIndex(
+						MediaStore.Images.Media.DATA));
+				File file = new File(path);
+				// We should not call close on a managed cursor.
+				//imageCursor.close();
+				return file;
+			}
 		}
-		return bitmap;
+
+		return null;
 	}
 
 	/**
@@ -895,6 +882,8 @@ public class MoSyncCapture
 
 		Log.i("@@@@@@@@ ", "@@@@@@ takePicture");
 
+		sImageCaptureStarted = new Date().getTime();
+
 		// Launch the camera application.
 		getActivity().startActivityForResult(
 			cameraIntent,
@@ -907,36 +896,12 @@ public class MoSyncCapture
 	 * delete it if necessary.
 	 * @return The image Uri.
 	 */
-	public static Uri unused_original_version_of_getTempImageUri()
-	{
-		try
-		{
-			// Place where to store captured image.
-			File photo = createTemporaryFile(CAPTURE_TEMP_DEFAULT_NAME, ".jpg");
-			// The absolute path of the temp file will have this format:
-			// /mnt/sdcard/.temp/MoSyncTempFile-358002145.jpg
-			Uri imgUri = Uri.fromFile(photo);
-			return imgUri;
-		}
-		catch (Exception e)
-		{
-			Log.e("@@MoSync", "Capture: Can't create file to take picture!");
-			return null;
-		}
-	}
-
-	/**
-	 * Create a temporary file to store the image. This way the Gallery should not be used.
-	 * On some phones this has no effect, that's why we check the output file path, and we
-	 * delete it if necessary.
-	 * @return The image Uri.
-	 */
-	public static Uri getTempImageUri()
+	private static Uri getTempImageUri()
 	{
 		try
 		{
 			File storageDir = Environment.getExternalStorageDirectory();
-			File tempDir = new File(storageDir.getAbsolutePath() + "/.temp/");
+			File tempDir = new File(storageDir.getAbsolutePath() + "/tmp/");
 			if (!tempDir.exists())
 			{
 				tempDir.mkdir();
@@ -958,12 +923,112 @@ public class MoSyncCapture
 		}
 	}
 
+	// TODO: Method is not used, delete commented out code when not needed.
+	/**
+	 * Handle the result after a picture was taken( the control went back to MoSync).
+	 * @param intent
+	 */
+	/*
+	public static void original_version_of_handlePicture(Intent data)
+	{
+		File imageFile = null;
+		Bitmap photo = null;
+
+		// Get the path of the latest saved image in MediaStore.
+		// Some versions of Android save to the MediaStore as well.
+		// We don't know what name Android will give either, so we
+		// search for this manually.
+
+		imageFile = getLatestFile();
+		// Second option:
+		// imageFile = convertImageUriToFile(mImageUri, mMoSyncThread.getActivity());
+
+		if ( imageFile == null )
+		{
+			Log.e("@@MoSync", "Capture error. The captured file does not exist anymore");
+			return;
+		}
+
+		String filePath = imageFile.getAbsolutePath();
+		Log.e("@@MoSync", "Capture: The file path of the capture is "+ filePath);
+		sImageUri = Uri.fromFile(imageFile);
+
+		// Get the bitmap.
+		BitmapFactory.Options mDecodingOptions = new BitmapFactory.Options() ;
+		// Return a smaller image to save memory and avoid memory issues.
+		mDecodingOptions.inSampleSize = 4;
+		photo = BitmapFactory.decodeFile(filePath, mDecodingOptions);
+
+		if ( photo == null )
+		{
+			// Try to get a small thumbnail if an error occurred.
+			photo = (Bitmap) data.getExtras().get("data");
+		}
+
+		// Create new handle.
+		int dataHandle = sMoSyncThread.nativeCreatePlaceholder();
+		// Store the image in the NativeUI image table.
+		sImageTable.put(dataHandle, new ImageCache(null, photo));
+		NativeUI.setImageTable(sImageTable);
+
+		// Create and store a new CaptureObject.
+		MoSyncCaptureObject capture = new MoSyncCaptureObject(CaptureType.IMAGE);
+		capture.setData(sImageUri);
+		capture.mBitmap = photo;
+		capture.mPath = filePath;
+		sCaptureObjects.put(dataHandle, capture);
+
+		// Free objects.
+		photo = null;
+		imageFile = null;
+		capture = null;
+
+		// Post MoSync event.
+		postEventNotificationReceived(MA_CAPTURE_EVENT_TYPE_IMAGE, dataHandle);
+	}
+	*/
+
+	// TODO: Method is not used, delete commented out code when not needed.
+	/**
+	 * Construct a file from a specified Uri.
+	 * @param imageUri The uri.
+	 * @param activity Underlying activity.
+	 * @return The file.
+	 */
+	/*
+	private static File convertImageUriToFile (Uri imageUri, Activity activity)
+	{
+		Cursor cursor = null;
+		try {
+			String [] proj={ MediaColumns.DATA };
+			cursor = activity.managedQuery( imageUri,
+					proj,  // Which columns to return
+					null,  // WHERE clause; which rows to return (all rows)
+					null,  // WHERE clause selection arguments (none)
+					null); // Order-by clause (ascending by name)
+			if ( cursor == null )
+				return null;
+			int file_ColumnIndex = cursor.getColumnIndexOrThrow(MediaColumns.DATA);
+			if (cursor.moveToFirst()) {
+				return new File(cursor.getString(file_ColumnIndex));
+			}
+			return null;
+		} finally {
+			if (cursor != null) {
+				cursor.close();
+			}
+		}
+	}
+	*/
+
+	// TODO: Method is not used, delete commented out code when not needed.
 	/**
 	 * Create a temporary file and return it.
 	 * @param part The file name.
 	 * @param ext The file extension.
 	 * @return the temporary file.
 	 */
+	/*
 	private static File createTemporaryFile(String part, String ext) throws Exception
 	{
 		File tempDir = Environment.getExternalStorageDirectory();
@@ -975,73 +1040,58 @@ public class MoSyncCapture
 		}
 		return File.createTempFile(part, ext, tempDir);
 	}
+	*/
 
-	/************************ Class members ************************/
-
+	// TODO: Method is not used, delete commented out code when not needed.
 	/**
-	 * The MoSync thread object.
+	 * Create a temporary file to store the image. This way the Gallery should not be used.
+	 * On some phones this has no effect, that's why we check the output file path, and we
+	 * delete it if necessary.
+	 * @return The image Uri.
 	 */
-	private static MoSyncThread sMoSyncThread;
+	/*
+	public static Uri original_version_of_getTempImageUri()
+	{
+		try
+		{
+			// Place where to store captured image.
+			File photo = createTemporaryFile(CAPTURE_TEMP_DEFAULT_NAME, ".jpg");
+			// The absolute path of the temp file will have this format:
+			// /mnt/sdcard/.temp/MoSyncTempFile-358002145.jpg
+			Uri imgUri = Uri.fromFile(photo);
+			return imgUri;
+		}
+		catch (Exception e)
+		{
+			Log.e("@@MoSync", "Capture: Can't create file to take picture!");
+			return null;
+		}
+	}
+	*/
 
-	/**
-	 * The Content Resolver instance.
+	// TODO: Method is not used, delete commented out code when not needed.
+	/*
+	 * @brief Function that creates a Bitmap from uri.
+	 * With this method we cannot obtain a bitmap in sample size.
+	 * @param	uri The image uri.
+	 * @return	The created Bitmap, null if it failed.
 	 */
-	private static ContentResolver sContentResolver;
-
-	/**
-	 * It has access to the image resource table.
-	 */
-	private static Hashtable<Integer, ImageCache> sImageTable;
-
-	/**
-	 * A table that contains mapping between a handle and a capture object.
-	 * The capture object represents a captured image or recorded video.
-	 * The key is the handle of the image or video.
-	 */
-	private static Hashtable<Integer,MoSyncCaptureObject> sCaptureObjects =
-		new Hashtable<Integer,MoSyncCaptureObject>();
-
-	/**
-	 * The current image.
-	 */
-	private static Uri sImageUri;
-
-	/**
-	 * The current video.
-	 */
-	private static Uri sVideoUri;
-
-	/**
-	 * Store the state of the last capture action.
-	 * Modify if when a picture is taken.
-	 */
-	// TODO: Not used, can be deleted?
-	//private static boolean sPhotoTaken = false;
-
-	/**
-	 * Capture properties: storeToGallery, videoDurationLimit, videoQuality.
-	 * These properties are set before captures are taken, and are applied
-	 * for each new image/video.
-	 */
-
-	/**
-	 * Indicates if the captured image should be stored in Gallery.
-	 * By default a captured image is stored in Gallery album.
-	 * If the value is set to false then a temporary file will be used
-	 * instead, and no file will be generated after the image capture.
-	 */
-	//private static boolean mStoreToGallery = true;
-
-	/**
-	 * Indicates the duration limit for the video recording.
-	 * Value is in seconds.
-	 */
-	private int mVideoDurationLimit = CAPTURE_DEFAULT_PROPERTY_VALUE;
-
-	/**
-	 * Indicates the video quality of the next recordings.
-	 * Note: some devices the default camera either does not support low-res video capture,
-	 * or it doesn't understand/process the MediaStore.EXTRA_SIZE_LIMIT correctly.
-	 */
-	private int mVideoQuality = CAPTURE_DEFAULT_PROPERTY_VALUE;
+	/*
+	private static Bitmap grabImage(Uri imageUri)
+	{
+		Bitmap bitmap = null;
+		try
+		{
+			bitmap = MediaStore.Images.Media.getBitmap(
+					sContentResolver, imageUri);
+		} catch (FileNotFoundException e) {
+			Log.e("@@MoSync","Capture error: failed to load capture.");
+		  e.printStackTrace();
+		} catch (IOException e) {
+			Log.e("@@MoSync","Capture error: failed to load capture.");
+			e.printStackTrace();
+		}
+		return bitmap;
+	}
+	*/
 }
