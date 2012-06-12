@@ -266,6 +266,13 @@ HighLevelReader::HighLevelReader(HighLevelHttpConnection* connection)
 {
 }
 
+/**
+ * Destructor.
+ */
+HighLevelReader::~HighLevelReader()
+{
+}
+
 int HighLevelReader::getContentLength()
 {
 	return mContentLength;

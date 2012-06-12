@@ -5275,48 +5275,89 @@ public class MoSyncThread extends Thread
 		return mMoSyncNFC == null ? IOCTL_UNAVAILABLE : mMoSyncNFC.maNFCIsReadOnly(tagHandle);
 	}
 
+	/**
+	 * Fill in an MACellInfo.
+	 * @param cellinfo Pointer to an MACellInfo struct in MoSync memory.
+	 * @return 0 on success, <0 on error.
+	 * TODO: Should there be constants for error codes? Now they are
+	 * undocumented (no documentation in maapi.idl).
+	 */
 	int maGetCellInfo(int cellinfo)
 	{
 		// Check that the Coarse Location permission is set,
-		//  otherwise the CellID request will freeze the device
-		if(!(mContext.getPackageManager().checkPermission("android.permission.ACCESS_COARSE_LOCATION",
-				mContext.getPackageName()) == PackageManager.PERMISSION_GRANTED))
+		// otherwise the CellID request will freeze the device.
+		int permission = mContext.getPackageManager().checkPermission(
+			"android.permission.ACCESS_COARSE_LOCATION",
+			mContext.getPackageName());
+		if (permission != PackageManager.PERMISSION_GRANTED)
 		{
-			return -3;
+			return -3; // Error (Permission not set).
 		}
 
 		TelephonyManager manager = (TelephonyManager)
 				mContext.getSystemService(Context.TELEPHONY_SERVICE);
-
-		// Only works with GSM type phone, no CDMA
-		if(manager.getPhoneType() != TelephonyManager.PHONE_TYPE_GSM)
+		if (null == manager)
+		{
 			return -2;
+		}
+
+		// Only works with GSM type phone, not with CDMA.
+		if (manager.getPhoneType() != TelephonyManager.PHONE_TYPE_GSM)
+		{
+			return -2;
+		}
 
 		// Get the Cell information
-		GsmCellLocation gsmcell = (GsmCellLocation) manager.getCellLocation();
-
-		if(gsmcell == null)
+		GsmCellLocation gsmCell = (GsmCellLocation) manager.getCellLocation();
+		if (null == gsmCell)
+		{
 			return -2;
+		}
 
-		int cell = gsmcell.getCid();
-		int lac = gsmcell.getLac();
+		// Get cell id and lac.
+		int cellId = gsmCell.getCid();
+		int lac = gsmCell.getLac();
 
-		// Get the mcc and mnc strings
-		String mcc_mnc = manager.getNetworkOperator();
-		if (mcc_mnc == null)
+		// Get MCC and NMC.
+		// MCC and NMC is concatenated in networkOperator.
+		// First 3 chars are MCC, remaining chars are MNC.
+		String mcc = "";
+		String mnc = "";
+		String networkOperator = manager.getNetworkOperator();
+		if (null == networkOperator)
+		{
 			return -2;
+		}
 
-		byte[] mcc = mcc_mnc.substring(0, 3).getBytes();
-		byte[] mnc = mcc_mnc.substring(3).getBytes();
+		if (networkOperator.length() > 4)
+		{
+			// Extract values.
+			mcc = networkOperator.substring(0, 3);
+			mnc = networkOperator.substring(3);
 
-		// Store everything in the correct memory location
-		ByteBuffer mem = getMemorySlice(cellinfo, 64);
-		mem.put(mcc);
+			// Guard against overflow.
+			if (mnc.length() > 7)
+			{
+				mnc = mnc.substring(0, 8);
+			}
+		}
+
+		// Store everything in the correct memory location.
+		// Size of MACellInfo is 20 bytes.
+		ByteBuffer mem;
+		// Store MCC (max 4 bytes including terminator char).
+		mem = getMemorySlice(cellinfo, 4);
+		mem.put(mcc.getBytes());
 		mem.put((byte)0);
-		mem.put(mnc);
+		// Store MNC (max 8 bytes including terminator char).
+		mem = getMemorySlice(cellinfo + 4, 8);
+		mem.put(mnc.getBytes());
 		mem.put((byte)0);
+
+		// Put lac and cellid, these are two 4 byte ints.
+		mem = getMemorySlice(cellinfo + 4 + 8, 8);
 		mem.putInt(lac);
-		mem.putInt(cell);
+		mem.putInt(cellId);
 
 		return 0;
 	}

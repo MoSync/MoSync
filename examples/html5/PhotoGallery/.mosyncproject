@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project supports-build-configs="true" version="1.4">
+<project supports-build-configs="true" version="1.5">
 <build.cfg id="Debug" types="Debug"/>
 <build.cfg id="Release" types="Release"/>
 <criteria>

@@ -60,7 +60,8 @@ namespace OrientationTest
 		virtual void orientationWillChange();
 
 		/**
-		 * Called after the screen orientation has changed (available only on Windows Phone 7.1 platform
+		 * Called after the screen orientation has changed.
+		 * Available only on iOS and Windows Phone 7.1 platforms.
 		 */
 		virtual void orientationDidChange();
 
