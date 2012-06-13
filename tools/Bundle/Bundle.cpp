@@ -156,7 +156,7 @@ static int readFile(std::string name) {
 		exit(1);
 	}
 	gFileDataPtr+=len;
-	
+
 	fclose(file);
 	return len;
 }

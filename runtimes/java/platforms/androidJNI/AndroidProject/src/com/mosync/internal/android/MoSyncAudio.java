@@ -41,6 +41,7 @@ import java.io.File;
 import java.io.FileDescriptor;
 import java.io.FileOutputStream;
 import java.nio.ByteBuffer;
+import java.nio.ShortBuffer;
 import java.nio.channels.FileChannel;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -52,6 +53,8 @@ import android.app.Activity;
 import android.content.Context;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.media.AudioTrack;
+import android.media.AudioFormat;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.media.MediaPlayer.OnErrorListener;
 import android.media.MediaPlayer.OnPreparedListener;
@@ -72,6 +75,8 @@ public class MoSyncAudio implements OnCompletionListener, OnPreparedListener, On
 
 	private MediaPlayer mMediaPlayer = null;
 	int mStreamingAudioInstance = 0;
+
+	private AudioTrack mAudioTrack = null;
 
 	int mNumAudioData = 1;
 	int mNumAudioInstance = 1;
@@ -185,10 +190,29 @@ public class MoSyncAudio implements OnCompletionListener, OnPreparedListener, On
 		private boolean mPlaying;
 		private boolean mPaused;
 		private int mStreamID;
+		private boolean mDynamic;
+		private int mSampleRate;
+		private int mChannels;
+		private int mBufferSize;
 
 		public AudioInstance(AudioData audioData)
 		{
 			mAudioData = audioData;
+			mDynamic = false;
+			init();
+		}
+
+		public AudioInstance(int sampleRate, int channels, int bufferSize)
+		{
+			mDynamic = true;
+			mSampleRate = sampleRate;
+			mChannels = channels;
+			mBufferSize = bufferSize;
+			init();
+		}
+
+		private void init()
+		{
 			mVolume = 1.0f;
 			mLooping = 0;
 			mLoopsLeft = 1;
@@ -268,6 +292,11 @@ public class MoSyncAudio implements OnCompletionListener, OnPreparedListener, On
 		int getStreamID()
 		{
 			return mStreamID;
+		}
+
+		boolean isDynamic()
+		{
+			return mDynamic;
 		}
 	}
 
@@ -463,6 +492,63 @@ public class MoSyncAudio implements OnCompletionListener, OnPreparedListener, On
 		return mNumAudioInstance-1;
 	}
 
+	int maAudioInstanceCreateDynamic(int sampleRate, int numChannels, int bufferSize)
+	{
+		if(numChannels<1 || numChannels>2)
+			return -100;
+
+		int channelConfig = AudioFormat.CHANNEL_OUT_MONO;
+		if(numChannels == 2)
+			channelConfig = AudioFormat.CHANNEL_OUT_STEREO;
+
+		int minSize =AudioTrack.getMinBufferSize( sampleRate, channelConfig, AudioFormat.ENCODING_PCM_16BIT );
+
+		if(minSize > bufferSize)
+			return -100;
+
+		mAudioTrack = new AudioTrack(AudioManager.STREAM_MUSIC,
+									sampleRate,
+									channelConfig,
+									AudioFormat.ENCODING_PCM_16BIT,
+									bufferSize,
+									AudioTrack.MODE_STREAM);
+
+		if(mAudioTrack == null)
+			return -100;
+
+		AudioInstance instance = new AudioInstance(sampleRate, numChannels, bufferSize);
+
+		mAudioInstance.put(mNumAudioInstance, instance);
+
+		mNumAudioInstance++;
+		return mNumAudioInstance-1;
+	}
+
+	int maAudioSubmitBuffer(int audioInstance, int mem, int memSize)
+	{
+		if(!mAudioInstance.contains(audioInstance))
+			return MA_AUDIO_ERR_INVALID_INSTANCE;
+
+		ByteBuffer slice = mMoSyncThread.getMemorySlice(mem, memSize);
+		ShortBuffer shortSlice = slice.asShortBuffer();
+		short[] array = shortSlice.array();
+
+		if(array == null)
+			return -100;
+
+		mAudioTrack.write(array, 0, memSize);
+
+		return MA_AUDIO_ERR_OK;
+	}
+
+	int maAudioGetPendingBufferCount(int audioInstance)
+	{
+		if(!mAudioInstance.contains(audioInstance))
+			return MA_AUDIO_ERR_INVALID_INSTANCE;
+
+		return MA_AUDIO_ERR_OK;
+	}
+
 	int maAudioInstanceDestroy(int audioInstance)
 	{
 		if(!mAudioInstance.contains(audioInstance))
@@ -632,60 +718,67 @@ public class MoSyncAudio implements OnCompletionListener, OnPreparedListener, On
 		if(null == instance)
 			return MA_AUDIO_ERR_INVALID_INSTANCE;
 
-		AudioData data = instance.getAudioData();
-
-		if(instance.isPaused())
+		if(instance.isDynamic())
 		{
-			instance.setPaused(false);
-
-			if(MA_AUDIO_DATA_STREAM == data.getFlags())
-			{
-				mMediaPlayer.start();
-			}
-			else
-			{
-				mSoundPool.resume(instance.getStreamID());
-			}
-			return MA_AUDIO_ERR_OK;
-		}
-
-		if(MA_AUDIO_DATA_STREAM == data.getFlags())
-		{
-			try
-			{
-				int pstate = data.getPreparedState();
-
-				if(AUDIO_PREPARING == pstate ||
-					AUDIO_PREPARE_ERROR == pstate)
-					return -100;
-
-				if(AUDIO_NOT_PREPARED == pstate)
-				{
-					if(!prepareMediaPlayer(audio))
-						return -100;
-
-					mMediaPlayer.prepare();
-					data.setPreparedState(AUDIO_PREPARED);
-				}
-
-				mMediaPlayer.setVolume(instance.getVolume(), instance.getVolume());
-				mMediaPlayer.start();
-
-				mActiveStreamingAudio = audio;
-			}
-			catch (Exception e)
-			{
-				Log.e("maAudioPlay","Couldn't play STREAM " + audio);
-				return -100;
-			}
 
 		}
 		else
 		{
-			int streamID = mSoundPool.play(data.getAudioID(), instance.getVolume(),
-					instance.getVolume(), 1, instance.getLooping(), 1.0f);
+			AudioData data = instance.getAudioData();
 
-			instance.setStreamID(streamID);
+			if(instance.isPaused())
+			{
+				instance.setPaused(false);
+
+				if(MA_AUDIO_DATA_STREAM == data.getFlags())
+				{
+					mMediaPlayer.start();
+				}
+				else
+				{
+					mSoundPool.resume(instance.getStreamID());
+				}
+				return MA_AUDIO_ERR_OK;
+			}
+
+			if(MA_AUDIO_DATA_STREAM == data.getFlags())
+			{
+				try
+				{
+					int pstate = data.getPreparedState();
+
+					if(AUDIO_PREPARING == pstate ||
+						AUDIO_PREPARE_ERROR == pstate)
+						return -100;
+
+					if(AUDIO_NOT_PREPARED == pstate)
+					{
+						if(!prepareMediaPlayer(audio))
+							return -100;
+
+						mMediaPlayer.prepare();
+						data.setPreparedState(AUDIO_PREPARED);
+					}
+
+					mMediaPlayer.setVolume(instance.getVolume(), instance.getVolume());
+					mMediaPlayer.start();
+
+					mActiveStreamingAudio = audio;
+				}
+				catch (Exception e)
+				{
+					Log.e("maAudioPlay","Couldn't play STREAM " + audio);
+					return -100;
+				}
+
+			}
+			else
+			{
+				int streamID = mSoundPool.play(data.getAudioID(), instance.getVolume(),
+						instance.getVolume(), 1, instance.getLooping(), 1.0f);
+
+				instance.setStreamID(streamID);
+			}
 		}
 
 		instance.setPlaying(true);
@@ -765,22 +858,29 @@ public class MoSyncAudio implements OnCompletionListener, OnPreparedListener, On
 		if(null == instance)
 			return MA_AUDIO_ERR_INVALID_INSTANCE;
 
-		AudioData data = instance.getAudioData();
-
-		//if((false == instance.isPlaying()) || (true == instance.isPaused()))
-		if(true == instance.isPaused())
-			return MA_AUDIO_ERR_OK;
-
-		if(MA_AUDIO_DATA_STREAM == data.getFlags())
+		if(instance.isDynamic())
 		{
-			if(null != mMediaPlayer)
-				mMediaPlayer.pause();
+
 		}
 		else
 		{
-			int streamID = instance.getStreamID();
-			if(streamID != -1)
-				mSoundPool.pause(streamID);
+			AudioData data = instance.getAudioData();
+
+			//if((false == instance.isPlaying()) || (true == instance.isPaused()))
+			if(true == instance.isPaused())
+				return MA_AUDIO_ERR_OK;
+
+			if(MA_AUDIO_DATA_STREAM == data.getFlags())
+			{
+				if(null != mMediaPlayer)
+					mMediaPlayer.pause();
+			}
+			else
+			{
+				int streamID = instance.getStreamID();
+				if(streamID != -1)
+					mSoundPool.pause(streamID);
+			}
 		}
 
 		instance.setPaused(true);
@@ -794,26 +894,33 @@ public class MoSyncAudio implements OnCompletionListener, OnPreparedListener, On
 		if(null == instance)
 			return MA_AUDIO_ERR_INVALID_INSTANCE;
 
-		AudioData data = instance.getAudioData();
-
-		if((true == instance.isPlaying()) || (true == instance.isPaused()))
-			return MA_AUDIO_ERR_OK;
-
-		if((MA_AUDIO_DATA_STREAM == data.getFlags())
-				&& (null != mMediaPlayer))
+		if(instance.isDynamic())
 		{
-			mMediaPlayer.stop();
-			mMediaPlayer.reset();
 
-			mActiveStreamingAudio = 0;
 		}
 		else
 		{
-			int streamID = instance.getStreamID();
-			if(streamID == -1)
-				return -100;
+			AudioData data = instance.getAudioData();
 
-			mSoundPool.stop(streamID);
+			if((true == instance.isPlaying()) || (true == instance.isPaused()))
+				return MA_AUDIO_ERR_OK;
+
+			if((MA_AUDIO_DATA_STREAM == data.getFlags())
+					&& (null != mMediaPlayer))
+			{
+				mMediaPlayer.stop();
+				mMediaPlayer.reset();
+
+				mActiveStreamingAudio = 0;
+			}
+			else
+			{
+				int streamID = instance.getStreamID();
+				if(streamID == -1)
+					return -100;
+
+				mSoundPool.stop(streamID);
+			}
 		}
 
 		instance.setPlaying(false);

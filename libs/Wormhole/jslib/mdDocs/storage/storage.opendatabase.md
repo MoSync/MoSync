@@ -29,11 +29,11 @@ Full Example
         <script type="text/javascript" charset="utf-8" src="js/wormhole.js"></script>
         <script type="text/javascript" charset="utf-8">
 
-        // Wait for PhoneGap to load
+        // Wait for system to load
         //
         document.addEventListener("deviceready", onDeviceReady, false);
 
-        // PhoneGap is ready
+        // System is ready
         //
         function onDeviceReady() {
 			var db = window.openDatabase("test", "1.0", "Test DB", 1000000);

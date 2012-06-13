@@ -50,12 +50,12 @@ SecondScreen::SecondScreen() :
 	mEventsList->fillSpaceVertically();
 	mMainLayout->addChild(mEventsList);
 
-	Screen::addOptionsMenuItem("Second screen menu item 0", -1, false);
-	Screen::addOptionsMenuItem("Second screen menu item 1", -1, false);
-	Screen::addOptionsMenuItem("Second screen menu item 2", -1, false);
-	Screen::addOptionsMenuItem("Second screen menu item 3", -1, false);
-	Screen::addOptionsMenuItem("Second screen menu item 4", -1, false);
-	Screen::addOptionsMenuItem("Second screen menu item 5", -1, false);
+	Screen::addOptionsMenuItem("Second screen menu item 0");
+	Screen::addOptionsMenuItem("Second screen menu item 1");
+	Screen::addOptionsMenuItem("Second screen menu item 2");
+	Screen::addOptionsMenuItem("Second screen menu item 3");
+	Screen::addOptionsMenuItem("Second screen menu item 4");
+	Screen::addOptionsMenuItem("Second screen menu item 5");
 	this->addScreenListener(this);
 }
 
@@ -87,6 +87,7 @@ void SecondScreen::optionsMenuClosed(Screen* screen) {
  */
 void SecondScreen::optionsMenuItemSelected(Screen* screen, int index) {
 	ListViewItem* item = new ListViewItem();
-	item->setText("Second Screen event: Menu Item selected: index " + MAUtil::integerToString(index));
+	item->setText("Second Screen event: Menu Item selected: index " +
+			MAUtil::integerToString(index));
 	mEventsList->addChild(item);
 }

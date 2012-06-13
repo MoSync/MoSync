@@ -59,9 +59,6 @@ void HighLevelBinaryDownloader::dataDownloaded(MAHandle data, int result)
 	// We just pass on the data handle, which will
 	// be zero (NULL) on error.
 	onDownloadComplete(data);
-
-	// Delete myself!
-	delete this;
 }
 
 }

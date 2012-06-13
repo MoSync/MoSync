@@ -88,9 +88,12 @@ int maWidgetDestroy(MAWidgetHandle handle) {
 	return returnValue;
 }
 /* dummy function for the build to work*/
-int maWidgetScreenAddOptionsMenuItem(MAWidgetHandle widget, const char * title, int iconHandle, int iconPredefined) {
-    return -1;
+int maWidgetScreenAddOptionsMenuItem(MAWidgetHandle widget, const char * title,
+                                     const char* iconHandle, int iconPredefined)
+{
+    return IOCTL_UNAVAILABLE;
 }
+
 int maWidgetSetProperty(MAWidgetHandle handle, const char *property, const char* value) {
 	IWidget* widget = [mosyncUI getWidget:handle];
 	if(widget == NULL) return MAW_RES_INVALID_HANDLE;
