@@ -42,8 +42,6 @@ mMainScreen(NULL)
 	mMainScreen->getBuyButton()->addButtonListener(this);
 	mMainScreen->getPurchasedItemList()->addListViewListener(this);
 
-	// Set Android public key.
-	PurchaseManager::getInstance()->setPublicKey(DEVELOPER_PUBLIC_KEY);
 	PurchaseManager::getInstance()->setStoreURL(sAppStoreSandboxURL);
 }
 
