@@ -17,24 +17,37 @@ MA 02110-1301, USA.
 
 package com.mosync.internal.android;
 
+import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_CAPTURE;
+import static com.mosync.internal.generated.MAAPI_consts.MA_CAPTURE_ACTION_RECORD_VIDEO;
+import static com.mosync.internal.generated.MAAPI_consts.MA_CAPTURE_ACTION_TAKE_PICTURE;
+import static com.mosync.internal.generated.MAAPI_consts.MA_CAPTURE_EVENT_TYPE_CANCEL;
+import static com.mosync.internal.generated.MAAPI_consts.MA_CAPTURE_EVENT_TYPE_IMAGE;
+import static com.mosync.internal.generated.MAAPI_consts.MA_CAPTURE_EVENT_TYPE_VIDEO;
+import static com.mosync.internal.generated.MAAPI_consts.MA_CAPTURE_MAX_DURATION;
+import static com.mosync.internal.generated.MAAPI_consts.MA_CAPTURE_RES_FILE_ALREADY_EXISTS;
+import static com.mosync.internal.generated.MAAPI_consts.MA_CAPTURE_RES_FILE_INVALID_NAME;
+import static com.mosync.internal.generated.MAAPI_consts.MA_CAPTURE_RES_INVALID_ACTION;
+import static com.mosync.internal.generated.MAAPI_consts.MA_CAPTURE_RES_INVALID_HANDLE;
+import static com.mosync.internal.generated.MAAPI_consts.MA_CAPTURE_RES_INVALID_PROPERTY;
+import static com.mosync.internal.generated.MAAPI_consts.MA_CAPTURE_RES_INVALID_PROPERTY_VALUE;
+import static com.mosync.internal.generated.MAAPI_consts.MA_CAPTURE_RES_INVALID_STRING_BUFFER_SIZE;
+import static com.mosync.internal.generated.MAAPI_consts.MA_CAPTURE_RES_MAX_DURATION_NOT_SUPPORTED;
+import static com.mosync.internal.generated.MAAPI_consts.MA_CAPTURE_RES_OK;
+import static com.mosync.internal.generated.MAAPI_consts.MA_CAPTURE_RES_PROPERTY_VALUE_UNDEFINED;
+import static com.mosync.internal.generated.MAAPI_consts.MA_CAPTURE_VIDEO_QUALITY;
+import static com.mosync.internal.generated.MAAPI_consts.MA_CAPTURE_VIDEO_QUALITY_HIGH;
+import static com.mosync.internal.generated.MAAPI_consts.MA_CAPTURE_VIDEO_QUALITY_LOW;
+
 import java.io.File;
-import java.io.FileNotFoundException;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.channels.FileChannel;
 import java.util.Date;
 import java.util.Hashtable;
 
-import com.mosync.internal.android.MoSyncThread.ImageCache;
-import com.mosync.java.android.MoSync;
-import com.mosync.nativeui.core.NativeUI;
-import com.mosync.nativeui.util.properties.IntConverter;
-import com.mosync.nativeui.util.properties.InvalidPropertyValueException;
-
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
-import android.content.ContentResolver;
-import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -47,26 +60,11 @@ import android.provider.MediaStore;
 import android.provider.MediaStore.MediaColumns;
 import android.util.Log;
 
-import static com.mosync.internal.generated.MAAPI_consts.MA_CAPTURE_ACTION_RECORD_VIDEO;
-import static com.mosync.internal.generated.MAAPI_consts.MA_CAPTURE_ACTION_TAKE_PICTURE;
-import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_CAPTURE;
-import static com.mosync.internal.generated.MAAPI_consts.MA_CAPTURE_EVENT_TYPE_IMAGE;
-import static com.mosync.internal.generated.MAAPI_consts.MA_CAPTURE_EVENT_TYPE_VIDEO;
-import static com.mosync.internal.generated.MAAPI_consts.MA_CAPTURE_EVENT_TYPE_CANCEL;
-import static com.mosync.internal.generated.MAAPI_consts.MA_CAPTURE_MAX_DURATION;
-import static com.mosync.internal.generated.MAAPI_consts.MA_CAPTURE_VIDEO_QUALITY;
-import static com.mosync.internal.generated.MAAPI_consts.MA_CAPTURE_VIDEO_QUALITY_LOW;
-import static com.mosync.internal.generated.MAAPI_consts.MA_CAPTURE_VIDEO_QUALITY_HIGH;
-import static com.mosync.internal.generated.MAAPI_consts.MA_CAPTURE_RES_OK;
-import static com.mosync.internal.generated.MAAPI_consts.MA_CAPTURE_RES_INVALID_HANDLE;
-import static com.mosync.internal.generated.MAAPI_consts.MA_CAPTURE_RES_INVALID_PROPERTY;
-import static com.mosync.internal.generated.MAAPI_consts.MA_CAPTURE_RES_INVALID_PROPERTY_VALUE;
-import static com.mosync.internal.generated.MAAPI_consts.MA_CAPTURE_RES_PROPERTY_VALUE_UNDEFINED;
-import static com.mosync.internal.generated.MAAPI_consts.MA_CAPTURE_RES_MAX_DURATION_NOT_SUPPORTED;
-import static com.mosync.internal.generated.MAAPI_consts.MA_CAPTURE_RES_INVALID_ACTION;
-import static com.mosync.internal.generated.MAAPI_consts.MA_CAPTURE_RES_INVALID_STRING_BUFFER_SIZE;
-import static com.mosync.internal.generated.MAAPI_consts.MA_CAPTURE_RES_FILE_INVALID_NAME;
-import static com.mosync.internal.generated.MAAPI_consts.MA_CAPTURE_RES_FILE_ALREADY_EXISTS;
+import com.mosync.internal.android.MoSyncThread.ImageCache;
+import com.mosync.java.android.MoSync;
+import com.mosync.nativeui.core.NativeUI;
+import com.mosync.nativeui.util.properties.IntConverter;
+import com.mosync.nativeui.util.properties.InvalidPropertyValueException;
 
 /**
  * Class that implements Capture API.
@@ -100,24 +98,26 @@ public class MoSyncCapture
 	public static final String EXTRA_DURATION_LIMIT = "android.intent.extra.durationLimit";
 
 	// The temporary file name for the IMAGE capture.
-	public static final String CAPTURE_TEMP_DEFAULT_NAME = "MoSyncTempFile";
+	public static final String CAPTURE_TEMP_DEFAULT_NAME = "MoSyncImageCaptureFile";
 
-	/************************ Class members ************************/
+	private static int sHandleCounter = 0;
 
 	/**
 	 * The MoSync thread object.
 	 */
 	private static MoSyncThread sMoSyncThread;
 
+	// TODO: Not used delete.
 	/**
 	 * The Content Resolver instance.
 	 */
-	private static ContentResolver sContentResolver;
+	//private static ContentResolver sContentResolver;
 
+	// TODO: Not used delete.
 	/**
 	 * It has access to the image resource table.
 	 */
-	private static Hashtable<Integer, ImageCache> sImageTable;
+	//private static Hashtable<Integer, ImageCache> sImageTable;
 
 	/**
 	 * A table that contains mapping between a handle and a capture object.
@@ -184,8 +184,10 @@ public class MoSyncCapture
 	public MoSyncCapture(MoSyncThread thread, Hashtable<Integer, ImageCache> imageTable)
 	{
 		sMoSyncThread = thread;
-		sImageTable = imageTable;
-		sContentResolver = sMoSyncThread.getActivity().getContentResolver();
+
+		// TODO: Not used delete.
+//		sImageTable = imageTable;
+//		sContentResolver = sMoSyncThread.getActivity().getContentResolver();
 	}
 
 	/**
@@ -374,7 +376,6 @@ public class MoSyncCapture
 
 	/**
 	* Save a image data object to a file.
-	* Make it available through MediaStore also.
 	* @param handle Handle to a image data object.
 	* @param fullPath A buffer containing the a full path where the file will be created.
 	* @param fullPathBufSize The size of the fullPath buffer.
@@ -386,69 +387,50 @@ public class MoSyncCapture
 	*/
 	int maCaptureWriteImage(int handle, String fullPathBuffer, int fullPathBufSize)
 	{
-		Log.e("@@MoSync", "maCaptureWriteImage");
-
-		MoSyncCaptureObject capture = sCaptureObjects.get(handle);
-		if ( null == capture ||  capture.getType() != CaptureType.IMAGE )
-		{
-			Log.e("@@MoSync", "maCaptureWriteImage: Invalid image handle: "+ handle);
-			return MA_CAPTURE_RES_INVALID_HANDLE;
-		}
-
-		OutputStream fOut = null;
-		File file = new File(fullPathBuffer);
-
-		// Check if filePathBuffer already exists.
-		if ( file.exists() )
-		{
-			Log.e("@@MoSync","maCaptureWriteImage File already exists.");
-			return MA_CAPTURE_RES_FILE_ALREADY_EXISTS;
-		}
-
-		if ( !file.isAbsolute() )
-		{
-			Log.e("@@MoSync","maCaptureWriteImage Invalid path.");
-			return MA_CAPTURE_RES_FILE_INVALID_NAME;
-		}
+		Log.i("@@MoSync", "maCaptureWriteImage");
 
 		try
 		{
-			fOut = new FileOutputStream(file);
-		}
-		catch (FileNotFoundException e)
-		{
-			e.printStackTrace();
-			return MA_CAPTURE_RES_FILE_INVALID_NAME;
-		}
+			MoSyncCaptureObject capture = sCaptureObjects.get(handle);
+			if (null == capture || capture.getType() != CaptureType.IMAGE)
+			{
+				Log.e("@@MoSync", "maCaptureWriteImage: Invalid image handle: "+ handle);
+				return MA_CAPTURE_RES_INVALID_HANDLE;
+			}
 
-		Bitmap bitmap = capture.mBitmap;
-		if ( bitmap != null )
-		{
-			try
+			File sourceFile = new File(capture.getPath());
+			File destFile = new File(fullPathBuffer);
+
+			if (!sourceFile.exists())
 			{
-				// Write a compressed version of the bitmap to the specified output stream.
-				bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fOut);
-				// Create a thumbnail for the image.
-				Uri.parse(MediaStore.Images.Media.insertImage(sContentResolver,
-						file.getAbsolutePath(), null, null));
-				fOut.flush();
-				fOut.close();
+				Log.e("@@MoSync","maCaptureWriteImage File already exists.");
+				return MA_CAPTURE_RES_INVALID_HANDLE;
 			}
-			catch(FileNotFoundException e1)
+
+			// Check if filePathBuffer already exists.
+			// TODO: Should this really be an error?
+			if (destFile.exists())
 			{
-				e1.printStackTrace();
+				Log.e("@@MoSync","maCaptureWriteImage File already exists.");
+				return MA_CAPTURE_RES_FILE_ALREADY_EXISTS;
+			}
+
+			if (!destFile.isAbsolute())
+			{
+				Log.e("@@MoSync","maCaptureWriteImage Invalid path.");
 				return MA_CAPTURE_RES_FILE_INVALID_NAME;
 			}
-			catch(IOException e2)
+
+			// Write image by copying the image file to the destination.
+			boolean success = copyFile(sourceFile, destFile);
+			if (!success)
 			{
-				e2.printStackTrace();
-				Log.e("@@MoSync","maCaptureWriteImage Error while creating file.");
 				return MA_CAPTURE_RES_FILE_INVALID_NAME;
 			}
+
 		}
-		else
+		catch (Exception ex)
 		{
-			Log.e("@@MoSync","maCaptureWriteImage Error while creating file.");
 			return MA_CAPTURE_RES_FILE_INVALID_NAME;
 		}
 
@@ -474,7 +456,7 @@ public class MoSyncCapture
 			return MA_CAPTURE_RES_INVALID_HANDLE;
 		}
 
-		String result = capture.mPath;
+		String result = capture.getPath();
 
 		if( result.length( ) + 1 > bufferSize )
 		{
@@ -512,7 +494,7 @@ public class MoSyncCapture
 			return MA_CAPTURE_RES_INVALID_HANDLE;
 		}
 
-		String result = capture.mPath;
+		String result = capture.getPath();
 
 		if( result.length( ) + 1 > bufferSize )
 		{
@@ -547,12 +529,20 @@ public class MoSyncCapture
 			return MA_CAPTURE_RES_INVALID_HANDLE;
 		}
 
-		// Explicitly mark bitmap as deleted if not null.
-		if (null != capture.mBitmap)
+		// TODO: Delete code not used.
+//		// Explicitly mark bitmap as deleted if not null.
+//		if (null != capture.mBitmap)
+//		{
+//			recycleBitmap(capture.mBitmap);
+//		}
+
+		// Delete temporary file if this is an image.
+		if (CaptureType.IMAGE == capture.getType())
 		{
-			recycleBitmap(capture.mBitmap);
+			new File(capture.getPath()).delete();
 		}
 
+		// Remove capture entry from table.
 		sCaptureObjects.remove(capture);
 
 		return MA_CAPTURE_RES_OK;
@@ -560,149 +550,209 @@ public class MoSyncCapture
 
 	/************************ Implementation Support ************************/
 
+
 	/**
 	 * Handle the result after a picture was taken( the control went back to MoSync).
 	 * @param intent
 	 */
 	public static void handlePicture(Intent intent)
 	{
-		Log.i("@@@@@@@@@@@@@ ", "@@@@@@@@@@@@ handlePicture");
+		Log.i("@@@@@@@@@@@@@ ", "@@@ handlePicture 1");
+
+		MoSyncCaptureObject capture = null;
+
+		// Try to save the image uri that was passed to the Camera Activity.
+		capture = saveImageUsingURI(sImageUri, true);
+		Log.i("*****", "@@@@2 sImageUri: " + sImageUri);
+
+		// Try to use the image referred to by the intent.
+		if (null == capture && null != intent)
+		{
+			Log.i("@@@@@@@@@@@@@ ", "@@@ handlePicture 2");
+			Uri imageUri = intent.getData();
+			// We assume this file should not be deleted
+			// and pass false.
+			capture = saveImageUsingURI(imageUri, false);
+			Log.i("*****", "@@@@1 imageUri: " + imageUri);
+		}
+
+		// Try getting the last saved image in the gallery (MediaStore).
+		if (null == capture)
+		{
+			Log.i("@@@@@@@@@@@@@ ", "@@@ handlePicture 3");
+			Uri imageUri = getLatestFileFromMediaStore();
+			capture = saveImageUsingURI(imageUri, false);
+			Log.i("*****", "@@@@2 sImageUri: " + sImageUri);
+		}
+
+		// Try using the small bitmap that comes with the intent.
+		if (null == capture && null != intent)
+		{
+			Log.i("@@@@@@@@@@@@@ ", "@@@ handlePicture 4");
+			// Get the small bitmap.
+			Bundle bundle = intent.getExtras();
+			if (null != bundle)
+			{
+				Bitmap bitmap = (Bitmap) bundle.get("data");
+				if (null != bitmap)
+				{
+					capture = saveBitmapAndCreateCaptureObject(bitmap);
+				}
+			}
+		}
+
+		Log.i("@@@@@@@@@@@@@ ", "@@@ handlePicture 5");
+		if (null != capture)
+		{
+
+			Log.i("@@@@@@@@@@@@@ ", "@@@ handlePicture 6");
+			// Create new handle for the capture object.
+			//int captureHandle = sMoSyncThread.nativeCreatePlaceholder();
+
+			// TODO: We use a local handle counter for now, to avoid
+			// using up the placeholder handle space unnecessarily.
+			// It is tricky to release a handle created with
+			// nativeCreatePlaceholder as the code stands now.
+			// Look into this further.
+			int captureHandle = (++ sHandleCounter);
+			sCaptureObjects.put(captureHandle, capture);
+
+			// TODO: If we wish to add the bitmap to the image table,
+			// here is the old code for doing that. I this case we
+			// need to also look at what happens when an image is
+			// destroyed, and remove the image when maCaptureDestroyData
+			// is called.
+
+//			// Store the image in the NativeUI image table.
+//			sImageTable.put(dataHandle, new ImageCache(null, photo));
+//			NativeUI.setImageTable(sImageTable);
+
+			// Post MoSync event.
+			postEventNotificationReceived(
+				MA_CAPTURE_EVENT_TYPE_IMAGE,
+				captureHandle);
+
+			Log.i("*****", "@@@@5 success ");
+		}
+		else
+		{
+			// Post error result (using MA_CAPTURE_EVENT_TYPE_CANCEL for this).
+			// TODO: Should there be an MA_CAPTURE_EVENT_TYPE_ERROR event?
+			postEventNotificationReceived(MA_CAPTURE_EVENT_TYPE_CANCEL, -1);
+
+			Log.i("*****", "@@@@5 failed");
+		}
+	}
+
+	private static MoSyncCaptureObject saveImageUsingURI(
+		Uri imageUri,
+		boolean isTemporary)
+	{
+		if (null == imageUri) { return null; }
+
 		try
 		{
-			Uri imageUri = null;
-			Bitmap bitmap = null;
-			String imageFilePath = "";
+			File imageFile = new File(imageUri.getPath());
+			Log.i("*****", "@@@@ saveImageUsingURI imageFile: " + imageFile);
 
-			// Check if we have an image uri in the intent data.
-			if (null != intent)
+			if (null == imageFile || imageFile.length() < 1)
 			{
-				imageUri = intent.getData();
-				Log.i("*****", "@@@@1 imageUri: " + imageUri);
+				Log.i("*****", "@@@@ saveImageUsingURI fail 1");
+				return null;
 			}
 
-			// If there was no uri in the intent, then try the uri
-			// we passed when starting the camera activity.
-			if (null == imageUri)
+			Log.i("*****", "@@@@ saveImageUsingURI imageFile.length(): " + imageFile.length());
+			Log.i("*****", "@@@@ saveImageUsingURI imageFile.getCanonicalPath(): " + imageFile.getCanonicalPath());
+
+			// Get the bitmap and create a down-sized smaller version
+			// to save memory and avoid memory issues.
+			BitmapFactory.Options mDecodingOptions =
+				new BitmapFactory.Options();
+			mDecodingOptions.inSampleSize = 4;
+			Bitmap bitmap = BitmapFactory.decodeFile(
+				imageFile.getAbsolutePath(),
+				mDecodingOptions);
+			if (null == bitmap)
 			{
-				imageUri = sImageUri;
-				Log.i("*****", "@@@@2 imageUri: " + imageUri);
+				Log.i("*****", "@@@@ saveImageUsingURI fail 2");
+				return null;
 			}
 
-			Log.i("*****", "@@@@3 imageUri: " + imageUri);
+			// Save bitmap, creates a capture object (or returns null).
+			MoSyncCaptureObject capture = saveBitmapAndCreateCaptureObject(bitmap);
 
-			// If we have a uri, open the file.
-			if (null != imageUri)
+			// Release the bitmap.
+			recycleBitmap(bitmap);
+
+			// Delete original image file if temporary.
+			if (isTemporary)
 			{
-				File imageFile = new File(imageUri.getPath());
-				Log.i("*****", "@@@@ 31 imageFile: " + imageFile);
-
-				if (null != imageFile && imageFile.length() > 0)
-				{
-					Log.i("*****", "@@@@ 31 imageFile.length(): " + imageFile.length());
-					Log.i("*****", "@@@@ 31 imageFile.getCanonicalPath(): " + imageFile.getCanonicalPath());
-					// Save file path.
-					imageFilePath = imageFile.getCanonicalPath();
-
-					// Get the bitmap.
-					BitmapFactory.Options mDecodingOptions =
-						new BitmapFactory.Options();
-					// Create a smaller image to save memory and
-					// avoid memory issues.
-					mDecodingOptions.inSampleSize = 4;
-					bitmap = BitmapFactory.decodeFile(
-						imageFile.getAbsolutePath(),
-						mDecodingOptions);
-				}
+				imageFile.delete();
 			}
 
-			Log.i("*****", "@@@@4 bitmap: " + bitmap);
-
-			// TODO: Search for new image in the media gallery as next step
-			// (before using small image).
-
-			// If no bitmap was created, try using the small one.
-			if (null == bitmap && null != intent)
-			{
-				// As last method, get the small bitmap.
-				Bundle bundle = intent.getExtras();
-				if (null != bundle)
-				{
-					bitmap = (Bitmap) bundle.get("data");
-				}
-			}
-
-			// If we have a bitmap we have success.
-			if (null != bitmap)
-			{
-				// Create new handle.
-				int dataHandle = sMoSyncThread.nativeCreatePlaceholder();
-
-				// Store the image in the NativeUI image table.
-				sImageTable.put(dataHandle, new ImageCache(null, bitmap));
-				NativeUI.setImageTable(sImageTable);
-
-				// Create and store a new CaptureObject.
-				MoSyncCaptureObject capture =
-					new MoSyncCaptureObject(CaptureType.IMAGE);
-				capture.setData(sImageUri);
-				capture.mBitmap = bitmap;
-				capture.mPath = imageFilePath;
-				sCaptureObjects.put(dataHandle, capture);
-
-				// Post MoSync event.
-				postEventNotificationReceived(
-					MA_CAPTURE_EVENT_TYPE_IMAGE,
-					dataHandle);
-
-				// Success result posted. Return now.
-				return;
-			}
+			return capture;
 		}
 		catch (Exception ex)
 		{
-			Log.e("@@MoSync", "handlePicture exception: " + ex);
 			ex.printStackTrace();
+			return null;
 		}
-
-		Log.i("*****", "@@@@5 failed");
-
-		// Post error result (using MA_CAPTURE_EVENT_TYPE_CANCEL for this).
-		// TODO: Should there be an MA_CAPTURE_EVENT_TYPE_ERROR event?
-		postEventNotificationReceived(MA_CAPTURE_EVENT_TYPE_CANCEL, -1);
 	}
 
-	/*
-	 * @brief Recycles the bitmap
-	 *
-	 * @param	bitmap	The bitmap which is being recycled
-	 */
-	private static void recycleBitmap(final Bitmap bitmap)
+	private static MoSyncCaptureObject saveBitmapAndCreateCaptureObject(Bitmap bitmap)
 	{
-		sMoSyncThread.getActivity().runOnUiThread(new Runnable()
+		if (null == bitmap) { return null; }
+
+		// Save bitmap.
+		String imageFilePath = getTempImageUri().getPath();
+		boolean success = saveBitmapToFile(bitmap, imageFilePath);
+		if (!success) { return null; }
+
+		// Create a capture object with the path.
+		MoSyncCaptureObject capture =
+			new MoSyncCaptureObject(CaptureType.IMAGE);
+		capture.setPath(imageFilePath);
+
+		return capture;
+	}
+
+	private static boolean saveBitmapToFile(Bitmap bitmap, String path)
+	{
+		if (null == bitmap) { return false; }
+
+		Log.i("*****", "@@@@ saveBitmapToFile path " + path);
+
+		try
 		{
-			public void run()
-			{
-				bitmap.recycle();
-			}
-		});
-		return;
+			File file = new File(path);
+			OutputStream out = new FileOutputStream(file);
+			boolean success = bitmap.compress(Bitmap.CompressFormat.JPEG, 90, out);
+			out.flush();
+			out.close();
+
+			return success;
+		}
+		catch (Exception ex)
+		{
+			ex.printStackTrace();
+			return false;
+		}
 	}
 
 	/**
-	 * Get the latest File added to MediaStore.
-	 * @return The file.
+	 * Get the path to the latest file added to MediaStore.
+	 * @return The file path.
 	 */
-	private static File getLatestFile()
+	private static Uri getLatestFileFromMediaStore()
 	{
 		// Get the latest camera shot from the MediaStore.
-		final String[] imageColumns =
-		{
+		final String[] imageColumns = {
 			MediaStore.Images.Media.DATA,
-			MediaStore.Images.Media.DATE_TAKEN
-		};
+			MediaStore.Images.Media.DATE_TAKEN };
 		final String imageWhere = null;
 		final String[] imageArguments = null;
 		final String imageOrderBy = MediaStore.Images.Media.DATE_TAKEN + " DESC";
+
 		Cursor imageCursor = sMoSyncThread.getActivity().managedQuery(
 			MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
 			imageColumns,
@@ -724,10 +774,10 @@ public class MoSyncCapture
 				String path = imageCursor.getString(
 					imageCursor.getColumnIndex(
 						MediaStore.Images.Media.DATA));
-				File file = new File(path);
 				// We should not call close on a managed cursor.
 				//imageCursor.close();
-				return file;
+				Log.i("@@@@@", "@@@@@ getLatestFileFromMediaStore path: " + path);
+				return Uri.parse("file://" + path);
 			}
 		}
 
@@ -772,12 +822,19 @@ public class MoSyncCapture
 		}
 
 		// Create handle.
-		int dataHandle = sMoSyncThread.nativeCreatePlaceholder();
+		//int dataHandle = sMoSyncThread.nativeCreatePlaceholder();
+		// TODO: We use a local handle counter for now, to avoid
+		// using up the placeholder handle space unnecessarily.
+		// It is tricky to release a handle created with
+		// nativeCreatePlaceholder as the code stands now.
+		// Look into this further.
+		int dataHandle = (++ sHandleCounter);
 
 		// Create and store a new CaptureObject.
 		MoSyncCaptureObject capture = new MoSyncCaptureObject(CaptureType.VIDEO);
-		capture.setData(sVideoUri);
-		capture.mPath = videoPath;
+		// TODO: Not used. Delete this line.
+		//capture.setData(sVideoUri);
+		capture.setPath(videoPath);
 		sCaptureObjects.put(dataHandle, capture);
 
 		// Post MoSync event.
@@ -907,9 +964,11 @@ public class MoSyncCapture
 				tempDir.mkdir();
 			}
 
-			File tempFile = new File(
-				tempDir.getAbsolutePath()
-				+ "/MoSyncCaptureImageFile.jpg");
+//			File tempFile = new File(
+//				tempDir.getAbsolutePath() + "/" + CAPTURE_TEMP_DEFAULT_NAME + ".jpg");
+
+			File tempFile = File.createTempFile(
+				CAPTURE_TEMP_DEFAULT_NAME, "jpg", tempDir);
 
 			Log.i("@@MoSync", "getTempImageUri: " + tempFile.getCanonicalPath());
 
@@ -922,6 +981,136 @@ public class MoSyncCapture
 			return null;
 		}
 	}
+
+	private static boolean copyFile(File sourceFile, File destFile)
+	{
+		try
+		{
+			FileChannel source = null;
+			FileChannel destination = null;
+
+			if (!destFile.exists())
+			{
+				destFile.createNewFile();
+			}
+
+			source = new FileInputStream(sourceFile).getChannel();
+			destination = new FileOutputStream(destFile).getChannel();
+			destination.transferFrom(source, 0, source.size());
+
+			if (source != null) { source.close(); }
+			if (destination != null) { destination.close(); }
+		}
+		catch (Exception ex)
+		{
+			return false;
+		}
+
+		return true;
+	}
+
+	/*
+	 * @brief Recycles the bitmap
+	 *
+	 * @param	bitmap	The bitmap which is being recycled
+	 */
+	private static void recycleBitmap(final Bitmap bitmap)
+	{
+		sMoSyncThread.getActivity().runOnUiThread(new Runnable()
+		{
+			public void run()
+			{
+				bitmap.recycle();
+			}
+		});
+		return;
+	}
+
+	// TODO: Code is not used, delete commented out code when not needed.
+	/**
+	* Save a image data object to a file.
+	* Make it available through MediaStore also.
+	* @param handle Handle to a image data object.
+	* @param fullPath A buffer containing the a full path where the file will be created.
+	* @param fullPathBufSize The size of the fullPath buffer.
+	* @return One of the next constants:
+	*  - #MA_CAPTURE_RES_OK if no error occurred.
+	*  - #MA_CAPTURE_RES_INVALID_HANDLE if the given handle was invalid.
+	*  - #MA_CAPTURE_RES_FILE_INVALID_NAME if the fullPath param is invalid.
+	*  - #MA_CAPTURE_RES_FILE_ALREADY_EXISTS if the file already exists.
+	*/
+	/*
+	int maCaptureWriteImage(int handle, String fullPathBuffer, int fullPathBufSize)
+	{
+		Log.e("@@MoSync", "maCaptureWriteImage");
+
+		MoSyncCaptureObject capture = sCaptureObjects.get(handle);
+		if ( null == capture ||  capture.getType() != CaptureType.IMAGE )
+		{
+			Log.e("@@MoSync", "maCaptureWriteImage: Invalid image handle: "+ handle);
+			return MA_CAPTURE_RES_INVALID_HANDLE;
+		}
+
+		OutputStream fOut = null;
+		File file = new File(fullPathBuffer);
+
+		// Check if filePathBuffer already exists.
+		if ( file.exists() )
+		{
+			Log.e("@@MoSync","maCaptureWriteImage File already exists.");
+			return MA_CAPTURE_RES_FILE_ALREADY_EXISTS;
+		}
+
+		if ( !file.isAbsolute() )
+		{
+			Log.e("@@MoSync","maCaptureWriteImage Invalid path.");
+			return MA_CAPTURE_RES_FILE_INVALID_NAME;
+		}
+
+		try
+		{
+			fOut = new FileOutputStream(file);
+		}
+		catch (FileNotFoundException e)
+		{
+			e.printStackTrace();
+			return MA_CAPTURE_RES_FILE_INVALID_NAME;
+		}
+
+		Bitmap bitmap = capture.mBitmap;
+		if ( bitmap != null )
+		{
+			try
+			{
+				// Write a compressed version of the bitmap to the specified output stream.
+				bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fOut);
+				// Create a thumbnail for the image.
+				Uri.parse(MediaStore.Images.Media.insertImage(sContentResolver,
+						file.getAbsolutePath(), null, null));
+				fOut.flush();
+				fOut.close();
+			}
+			catch(FileNotFoundException e1)
+			{
+				e1.printStackTrace();
+				return MA_CAPTURE_RES_FILE_INVALID_NAME;
+			}
+			catch(IOException e2)
+			{
+				e2.printStackTrace();
+				Log.e("@@MoSync","maCaptureWriteImage Error while creating file.");
+				return MA_CAPTURE_RES_FILE_INVALID_NAME;
+			}
+		}
+		else
+		{
+			Log.e("@@MoSync","maCaptureWriteImage Error while creating file.");
+			return MA_CAPTURE_RES_FILE_INVALID_NAME;
+		}
+
+		return MA_CAPTURE_RES_OK;
+	}
+	*/
 
 	// TODO: Method is not used, delete commented out code when not needed.
 	/**
