@@ -411,21 +411,21 @@ public class MoSync extends Activity
 		else if ( resultCode == RESULT_OK &&
 				requestCode == CAPTURE_MODE_RECORD_VIDEO_REQUEST )
 		{
-			Log.e("@@MoSync","Capture ready, control returned to MoSync activity.");
+			Log.i("@@MoSync","Capture ready, control returned to MoSync activity.");
 			// A video was recorded.
 			MoSyncCapture.handleVideo(data);
 		}
 		else if ( resultCode == RESULT_OK &&
 				requestCode == CAPTURE_MODE_TAKE_PICTURE_REQUEST )
 		{
-			Log.e("@@MoSync","Capture ready, control returned to MoSync activity.");
+			Log.i("@@MoSync","Capture ready, control returned to MoSync activity.");
 			// A picture was taken.
 			MoSyncCapture.handlePicture(data);
 		}
 		else if ( resultCode == RESULT_CANCELED &&
 				(requestCode == CAPTURE_MODE_TAKE_PICTURE_REQUEST || requestCode == CAPTURE_MODE_RECORD_VIDEO_REQUEST) )
 		{
-			Log.e("@@MoSync","Capture canceled, control returned to MoSync activity.");
+			Log.i("@@MoSync","Capture canceled, control returned to MoSync activity.");
 			// Send MoSync event: the capture was canceled by the user.
 			MoSyncCapture.handleCaptureCanceled();
 		}
