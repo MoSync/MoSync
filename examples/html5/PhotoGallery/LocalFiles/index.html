@@ -64,8 +64,8 @@
 					// Callback that gets the image that was captured.
 					function(mediaFiles)
 					{
-						// Construct the file URL.
-						var fileURL = "file://" + mediaFiles[0].fullPath;
+						var filePath = mediaFiles[0].fullPath;
+						var fileURL = "file://" + filePath;
 
 						// Pass the URL of the captured image to the camera page.
 						var cameraWebViewHandle =
@@ -73,10 +73,116 @@
 						mosync.bridge.callJS(
 							cameraWebViewHandle,
 							"camera.setPhotoURL('" + fileURL + "')");
+
+						// TODO: Make sure to delete old capture files!
+						// Debug code below to make it work.
+						/* app.removeAllImageFilesButThisOne(
+							filePath,
+							function()
+							{
+								// Pass the URL of the captured image to the camera page.
+								var cameraWebViewHandle =
+									mosync.nativeui.getWidgetHandleById("cameraWebView");
+								mosync.bridge.callJS(
+									cameraWebViewHandle,
+									"camera.setPhotoURL('" + fileURL + "')");
+							},
+							function(errorMessage)
+							{
+								alert(errorMessage);
+							}); */
 					},
 					function(error)
 					{
-						alert("Could not take picture - error: " + error.code);
+						alert("Could not take picture. Error code: " + error.code);
+					});
+			};
+
+			/**
+			 * Helper function.
+			 */
+			app.removeAllImageFilesButThisOne = function(filePath, successFun, errorFun)
+			{
+				var parentPath = filePath.substr(0, filePath.lastIndexOf("/"));
+				window.requestFileSystem(
+					LocalFileSystem.PERSISTENT,
+					0,
+					function (fileSystem)
+					{
+						fileSystem.root.getDirectory(
+							parentPath,
+							{ create: false, exclusive: false },
+							function(directory)
+							{
+								var directoryReader = directory.createReader();
+								directoryReader.readEntries(
+									function(entries)
+									{
+										console.log("@@@ entries: " + JSON.stringify(entries));
+										successFun();
+									},
+									function ()
+									{
+										errorFun("Could not read directory");
+									});
+							},
+							function ()
+							{
+								errorFun("Could not open directory");
+							});
+					},
+					function ()
+					{
+						errorFun("Could not open file system");
+					});
+			};
+
+			/**
+			 * Helper function.
+			 */
+			app.moveImageFile = function(fileURL, successFun, errorFun)
+			{
+				// Delete the previous image and copy the new file to it.
+				// Otherwise disk image will be filled up.
+				window.resolveLocalFileSystemURI(
+					fileURL,
+					function(fileEntry)
+					{
+						console.log("@@@ name: " + fileEntry.name);
+						console.log("@@@ fullPath: " + fileEntry.fullPath);
+
+						// Create parent directory object.
+						var parentPath = fileEntry.fullPath.substr(
+							0,
+							fileEntry.fullPath.lastIndexOf("/"));
+						var parentDirectory = new DirectoryEntry();
+						parentDirectory.fullPath = parentPath;
+
+						// Get file extension.
+						var extension = fileEntry.name.substr(
+							fileEntry.name.lastIndexOf("."));
+
+						console.log(
+								"@@@@ parentPath: " + parentPath +
+								" ext: " + extension);
+
+						fileEntry.moveTo(
+							parentDirectory,
+							"CapturedImage" + extension,
+							function(newFileEntry)
+							{
+								console.log("@@@ newFileEntry: " + JSON.stringify(newFileEntry));
+								successFun("file://" + newFileEntry.fullPath);
+
+							},
+							function(error)
+							{
+								errorFun("Could not copy image.")
+							});
+					},
+					function(error)
+					{
+						errorFun("Could not find image file.")
 					});
 			};
 
