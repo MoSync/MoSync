@@ -64,29 +64,76 @@
 					// Callback that gets the image that was captured.
 					function(mediaFiles)
 					{
-						// Construct the file URL.
-						var fileURL = "file://" + mediaFiles[0].fullPath;
+						var filePath = mediaFiles[0].fullPath;
+						var fileURL = "file://" + filePath;
 
-						app.moveImageFile(
-							fileURL,
-							function(newFileURL)
+						// Pass the URL of the captured image to the camera page.
+						var cameraWebViewHandle =
+							mosync.nativeui.getWidgetHandleById("cameraWebView");
+						mosync.bridge.callJS(
+							cameraWebViewHandle,
+							"camera.setPhotoURL('" + fileURL + "')");
+
+						// TODO: Make sure to delete old capture files!
+						// Debug code below to make it work.
+						/* app.removeAllImageFilesButThisOne(
+							filePath,
+							function()
 							{
 								// Pass the URL of the captured image to the camera page.
 								var cameraWebViewHandle =
 									mosync.nativeui.getWidgetHandleById("cameraWebView");
 								mosync.bridge.callJS(
 									cameraWebViewHandle,
-									"camera.setPhotoURL('" + newFileURL + "')");
+									"camera.setPhotoURL('" + fileURL + "')");
 							},
 							function(errorMessage)
 							{
 								alert(errorMessage);
-							});
-
+							}); */
 					},
 					function(error)
 					{
 						alert("Could not take picture. Error code: " + error.code);
+					});
+			};
+
+			/**
+			 * Helper function.
+			 */
+			app.removeAllImageFilesButThisOne = function(filePath, successFun, errorFun)
+			{
+				var parentPath = filePath.substr(0, filePath.lastIndexOf("/"));
+				window.requestFileSystem(
+					LocalFileSystem.PERSISTENT,
+					0,
+					function (fileSystem)
+					{
+						fileSystem.root.getDirectory(
+							parentPath,
+							{ create: false, exclusive: false },
+							function(directory)
+							{
+								var directoryReader = directory.createReader();
+								directoryReader.readEntries(
+									function(entries)
+									{
+										console.log("@@@ entries: " + JSON.stringify(entries));
+										successFun();
+									},
+									function ()
+									{
+										errorFun("Could not read directory");
+									});
+							},
+							function ()
+							{
+								errorFun("Could not open directory");
+							});
+					},
+					function ()
+					{
+						errorFun("Could not open file system");
 					});
 			};
 
