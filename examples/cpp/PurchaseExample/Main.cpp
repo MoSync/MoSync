@@ -72,23 +72,21 @@ public:
 		}
 		else
 		{
-			if ( platform == ANDROID )
+			if ( platform == ANDROID && developerKey.size() == 0 )
 			{
-				if (developerKey.size() == 0 )
-				{
-					maAlert("Error", "You need to set developer key in Config.h ",
-						"OK", NULL, NULL);
-				}
-				else if ( PurchaseManager::getInstance()->setPublicKey(DEVELOPER_PUBLIC_KEY)
+				maAlert("Error", "You need to set developer key in Config.h ",
+					"OK", NULL, NULL);
+			}
+			else if ( platform == ANDROID &&
+					PurchaseManager::getInstance()->setPublicKey(DEVELOPER_PUBLIC_KEY)
 						== MA_PURCHASE_RES_MALFORMED_PUBLIC_KEY )
-				{
-					maAlert("Error", "Malformed developer key in Config.h ",
-						"OK", NULL, NULL);
-				}
-				else
-				{
-					mController = new ApplicationController();
-				}
+			{
+				maAlert("Error", "Malformed developer key in Config.h ",
+					"OK", NULL, NULL);
+			}
+			else
+			{
+				mController = new ApplicationController();
 			}
 		}
 	}
