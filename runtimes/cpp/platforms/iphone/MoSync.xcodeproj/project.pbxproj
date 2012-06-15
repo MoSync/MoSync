@@ -182,6 +182,17 @@
 		43F9CBBB14C4198400DE2285 /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 43F9CBB914C4197400DE2285 /* MobileCoreServices.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		43FBCABF1433627400301E39 /* PimContactItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B46B3B1407FAA5009491A6 /* PimContactItem.m */; };
 		43FBCAC01433627400301E39 /* PimContactsList.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B46B3C1407FAA5009491A6 /* PimContactsList.m */; };
+		5D376C7A15886FE500CEF01D /* MapPinWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5D376C7715886FE500CEF01D /* MapPinWidget.mm */; };
+		5D376C7B15886FE500CEF01D /* MapWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5D376C7915886FE500CEF01D /* MapWidget.mm */; };
+		5D376C7C15886FE500CEF01D /* MapPinWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 5D376C7615886FE500CEF01D /* MapPinWidget.h */; };
+		5D376C7D15886FE500CEF01D /* MapPinWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5D376C7715886FE500CEF01D /* MapPinWidget.mm */; };
+		5D376C7E15886FE500CEF01D /* MapWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 5D376C7815886FE500CEF01D /* MapWidget.h */; };
+		5D376C7F15886FE500CEF01D /* MapWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5D376C7915886FE500CEF01D /* MapWidget.mm */; };
+		5D60BC0B158889BB0037063C /* MapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5D60BC0A158889BB0037063C /* MapKit.framework */; };
+		5D60BC0C158889C70037063C /* MapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5D60BC0A158889BB0037063C /* MapKit.framework */; };
+		5DF94FB81588933100B0D4E6 /* MapAnnotation.h in Headers */ = {isa = PBXBuildFile; fileRef = 5DF94FB61588933100B0D4E6 /* MapAnnotation.h */; };
+		5DF94FB91588933100B0D4E6 /* MapAnnotation.m in Sources */ = {isa = PBXBuildFile; fileRef = 5DF94FB71588933100B0D4E6 /* MapAnnotation.m */; };
+		5DF94FBA1588933100B0D4E6 /* MapAnnotation.m in Sources */ = {isa = PBXBuildFile; fileRef = 5DF94FB71588933100B0D4E6 /* MapAnnotation.m */; };
 		85037840133A2275009251E2 /* StackScreenWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8503783F133A2275009251E2 /* StackScreenWidget.mm */; };
 		85037841133A2275009251E2 /* StackScreenWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 8503783E133A2275009251E2 /* StackScreenWidget.h */; };
 		85037842133A2275009251E2 /* StackScreenWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8503783F133A2275009251E2 /* StackScreenWidget.mm */; };
@@ -500,6 +511,13 @@
 		43DFEBFF148620B800757143 /* ScreenOrientation.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ScreenOrientation.mm; sourceTree = "<group>"; };
 		43DFEC4314868FA400757143 /* ScreenWidgetController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ScreenWidgetController.mm; sourceTree = "<group>"; };
 		43F9CBB914C4197400DE2285 /* MobileCoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MobileCoreServices.framework; path = System/Library/Frameworks/MobileCoreServices.framework; sourceTree = SDKROOT; };
+		5D376C7615886FE500CEF01D /* MapPinWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MapPinWidget.h; sourceTree = "<group>"; };
+		5D376C7715886FE500CEF01D /* MapPinWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MapPinWidget.mm; sourceTree = "<group>"; };
+		5D376C7815886FE500CEF01D /* MapWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MapWidget.h; sourceTree = "<group>"; };
+		5D376C7915886FE500CEF01D /* MapWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MapWidget.mm; sourceTree = "<group>"; };
+		5D60BC0A158889BB0037063C /* MapKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MapKit.framework; path = System/Library/Frameworks/MapKit.framework; sourceTree = SDKROOT; };
+		5DF94FB61588933100B0D4E6 /* MapAnnotation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MapAnnotation.h; sourceTree = "<group>"; };
+		5DF94FB71588933100B0D4E6 /* MapAnnotation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MapAnnotation.m; sourceTree = "<group>"; };
 		8503783E133A2275009251E2 /* StackScreenWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StackScreenWidget.h; sourceTree = "<group>"; };
 		8503783F133A2275009251E2 /* StackScreenWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = StackScreenWidget.mm; sourceTree = "<group>"; };
 		850943291185AF87004A3B2D /* SyscallImpl.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = SyscallImpl.mm; path = impl/SyscallImpl.mm; sourceTree = "<group>"; };
@@ -678,6 +696,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5D60BC0B158889BB0037063C /* MapKit.framework in Frameworks */,
 				E438DF511535D368008B5005 /* CoreMedia.framework in Frameworks */,
 				43CE0BF61463EE5F00F8FFC3 /* iAd.framework in Frameworks */,
 				4300E3E8152C611100B40FA2 /* StoreKit.framework in Frameworks */,
@@ -704,6 +723,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5D60BC0C158889C70037063C /* MapKit.framework in Frameworks */,
 				E438DF501535D35D008B5005 /* CoreMedia.framework in Frameworks */,
 				431869A913F68E660051D97A /* AddressBook.framework in Frameworks */,
 				4300E3E9152C611900B40FA2 /* StoreKit.framework in Frameworks */,
@@ -835,6 +855,7 @@
 		29B97323FDCFA39411CA2CEA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				5D60BC0A158889BB0037063C /* MapKit.framework */,
 				4300E3E6152C60FA00B40FA2 /* StoreKit.framework */,
 				E438DF4F1535D35C008B5005 /* CoreMedia.framework */,
 				41804801147E91050048FB95 /* SystemConfiguration.framework */,
@@ -1053,6 +1074,12 @@
 		85A158FA12F80E520044BBE1 /* Widgets */ = {
 			isa = PBXGroup;
 			children = (
+				5D376C7615886FE500CEF01D /* MapPinWidget.h */,
+				5D376C7715886FE500CEF01D /* MapPinWidget.mm */,
+				5DF94FB61588933100B0D4E6 /* MapAnnotation.h */,
+				5DF94FB71588933100B0D4E6 /* MapAnnotation.m */,
+				5D376C7815886FE500CEF01D /* MapWidget.h */,
+				5D376C7915886FE500CEF01D /* MapWidget.mm */,
 				0B436B9D14308D5400E69AB2 /* ModalDialogWidget.h */,
 				0B436B9E14308D5400E69AB2 /* ModalDialogWidget.mm */,
 				43D8045E13EFBCB200183387 /* ActivityIndicatorWidget.h */,
@@ -1363,6 +1390,9 @@
 				433134F615345A73005DDAD8 /* SBJsonUTF8Stream.h in Headers */,
 				433134F915345A73005DDAD8 /* SBJsonWriter.h in Headers */,
 				E45110B01520C70000A7467E /* AudioInstanceDynamic.h in Headers */,
+				5D376C7C15886FE500CEF01D /* MapPinWidget.h in Headers */,
+				5D376C7E15886FE500CEF01D /* MapWidget.h in Headers */,
+				5DF94FB81588933100B0D4E6 /* MapAnnotation.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1594,6 +1624,9 @@
 				433134FA15345A73005DDAD8 /* SBJsonWriter.m in Sources */,
 				E45110B11520C70000A7467E /* AudioInstanceDynamic.mm in Sources */,
 				E438DF4E1535CCB4008B5005 /* AudioInstanceURL.mm in Sources */,
+				5D376C7A15886FE500CEF01D /* MapPinWidget.mm in Sources */,
+				5D376C7B15886FE500CEF01D /* MapWidget.mm in Sources */,
+				5DF94FB91588933100B0D4E6 /* MapAnnotation.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1715,6 +1748,9 @@
 				433134F815345A73005DDAD8 /* SBJsonUTF8Stream.m in Sources */,
 				433134FB15345A73005DDAD8 /* SBJsonWriter.m in Sources */,
 				E45110B21520C70000A7467E /* AudioInstanceDynamic.mm in Sources */,
+				5D376C7D15886FE500CEF01D /* MapPinWidget.mm in Sources */,
+				5D376C7F15886FE500CEF01D /* MapWidget.mm in Sources */,
+				5DF94FBA1588933100B0D4E6 /* MapAnnotation.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

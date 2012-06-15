@@ -27,6 +27,7 @@
 #import "ListViewWidget.h"
 #import "GLViewWidget.h"
 #import "OptionsDialogView.h"
+#import "MapWidget.h"
 
 MoSyncUI* mosyncUI;
 
@@ -196,6 +197,7 @@ int maWidgetAddChild(MAWidgetHandle parentHandle, MAHandle childHandle) {
 	   !([parent class] == [ListViewWidget class]) &&
 	   !([parent class] == [ListViewItemWidget class]) &&
 	   !([parent class] == [ScreenWidget class]) &&
+       !([parent class] == [MapWidget class]) &&
 	   !([parent superclass] == [ScreenWidget class])
 	   ) {
 		return MAW_RES_INVALID_LAYOUT;
