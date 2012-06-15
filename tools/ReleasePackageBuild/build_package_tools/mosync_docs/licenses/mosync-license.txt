@@ -48,3 +48,5 @@ http://blog.toshsoft.de/index.php?/archives/3-Sending-Apple-Push-Notifications-A
 microsoft-public-license.txt covers the WritableBitmapEx library and the silverlight toolkit
 
 The MoSync Advertising API makes use of Google AdMob code to load ads. For its terms of use, see: http://www.admob.com/home/terms.
+
+bsd-license.txt covers the SBJson framework.
