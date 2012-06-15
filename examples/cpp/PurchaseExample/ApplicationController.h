@@ -19,7 +19,7 @@
 /**
  * @file ApplicationController.h
  *
- * @brief  The controller that handles all purchase related
+ * @brief  The controller that handles all purchase related events.
  * The controller is responsible for updating the UI with all
  * purchase events.
  * @author Emma Tresanszki
