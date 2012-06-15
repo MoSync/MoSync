@@ -62,7 +62,6 @@ import android.util.Log;
 
 import com.mosync.internal.android.MoSyncThread.ImageCache;
 import com.mosync.java.android.MoSync;
-import com.mosync.nativeui.core.NativeUI;
 import com.mosync.nativeui.util.properties.IntConverter;
 import com.mosync.nativeui.util.properties.InvalidPropertyValueException;
 
@@ -190,13 +189,6 @@ public class MoSyncCapture
 //		sContentResolver = sMoSyncThread.getActivity().getContentResolver();
 	}
 
-	/**
-	 * @return The Activity object.
-	 */
-	private Activity getActivity() {
-		return sMoSyncThread.getActivity();
-	}
-
 	/************************ Syscalls ************************/
 
 	/**
@@ -211,8 +203,6 @@ public class MoSyncCapture
 	 */
 	int maCaptureSetProperty(String property, String value)
 	{
-		Log.e("@@MoSync","maCaptureSetProperty");
-
 		try
 		{
 			if ( property.equals(MA_CAPTURE_MAX_DURATION) )
@@ -227,7 +217,7 @@ public class MoSyncCapture
 				else
 				{
 					Log.e("@@MoSync","maCaptureSetProperty property " + property +
-							" is not supported on current platform.");
+						" is not supported on current platform.");
 					return MA_CAPTURE_RES_MAX_DURATION_NOT_SUPPORTED;
 				}
 			}
@@ -276,8 +266,6 @@ public class MoSyncCapture
 	 */
 	int maCaptureGetProperty(String property, int valueBuffer, int valueSize)
 	{
-		Log.e("@@MoSync","maCaptureGetProperty");
-
 		String result = null;
 		if ( property.equals(MA_CAPTURE_MAX_DURATION) )
 		{
@@ -294,14 +282,14 @@ public class MoSyncCapture
 				else
 				{
 					Log.e("@@MoSync", "maCaptureGetProperty property " + property +
-							" was not set. ");
+						" was not set. ");
 					return MA_CAPTURE_RES_PROPERTY_VALUE_UNDEFINED;
 				}
 			}
 			else
 			{
 				Log.e("@@MoSync","maCaptureGetProperty property " + property +
-						" is not supported on current platform.");
+					" is not supported on current platform.");
 				return MA_CAPTURE_RES_MAX_DURATION_NOT_SUPPORTED;
 			}
 		}
@@ -314,7 +302,7 @@ public class MoSyncCapture
 			else
 			{
 				Log.e("@@MoSync", "maCaptureGetProperty property " + property +
-						" was not set. ");
+					" was not set. ");
 				return MA_CAPTURE_RES_PROPERTY_VALUE_UNDEFINED;
 			}
 		}
@@ -327,7 +315,7 @@ public class MoSyncCapture
 		if( result.length( ) + 1 > valueSize )
 		{
 			Log.e( "@@MoSync", "maCaptureGetProperty: Buffer size " + valueSize +
-					" too short to hold buffer of size: " + result.length( ) + 1 );
+				" too short to hold buffer of size: " + result.length( ) + 1 );
 			return MA_CAPTURE_RES_INVALID_STRING_BUFFER_SIZE;
 		}
 
@@ -387,8 +375,6 @@ public class MoSyncCapture
 	*/
 	int maCaptureWriteImage(int handle, String fullPathBuffer, int fullPathBufSize)
 	{
-		Log.i("@@MoSync", "maCaptureWriteImage");
-
 		try
 		{
 			MoSyncCaptureObject capture = sCaptureObjects.get(handle);
@@ -431,6 +417,7 @@ public class MoSyncCapture
 		}
 		catch (Exception ex)
 		{
+			ex.printStackTrace();
 			return MA_CAPTURE_RES_FILE_INVALID_NAME;
 		}
 
@@ -461,7 +448,7 @@ public class MoSyncCapture
 		if( result.length( ) + 1 > bufferSize )
 		{
 			Log.e( "MoSync", "maCaptureGetVideoPath: Buffer size " + bufferSize +
-					" too short to hold buffer of size: " + result.length( ) + 1 );
+				" too short to hold buffer of size: " + result.length( ) + 1 );
 			return MA_CAPTURE_RES_INVALID_STRING_BUFFER_SIZE;
 		}
 
@@ -499,7 +486,7 @@ public class MoSyncCapture
 		if( result.length( ) + 1 > bufferSize )
 		{
 			Log.e( "MoSync", "maCaptureGetImagePath: Buffer size " + bufferSize +
-					" too short to hold buffer of size: " + result.length( ) + 1 );
+				" too short to hold buffer of size: " + result.length( ) + 1 );
 			return MA_CAPTURE_RES_INVALID_STRING_BUFFER_SIZE;
 		}
 
@@ -550,45 +537,64 @@ public class MoSyncCapture
 
 	/************************ Implementation Support ************************/
 
+	/**
+	 * @return The Activity object.
+	 */
+	private Activity getActivity() {
+		return sMoSyncThread.getActivity();
+	}
 
 	/**
-	 * Handle the result after a picture was taken( the control went back to MoSync).
+	 * Handle the result after a picture was taken (the control went back to MoSync).
 	 * @param intent
 	 */
 	public static void handlePicture(Intent intent)
 	{
-		Log.i("@@@@@@@@@@@@@ ", "@@@ handlePicture 1");
+		// There are four alternative ways used to obtain the captured image:
+		//
+		// 1) Access the image using the uri passed to the camera intent.
+		// 2) Access the image using the uri passed with the intent.
+		// 3) Get the last image stored in the media store (image gallery).
+		// 4) Use the "small bitmap" passed with the intent.
+		//
+		// The reason for trying all these ways is that different devices
+		// work differently and have different quirks.
 
 		MoSyncCaptureObject capture = null;
 
 		// Try to save the image uri that was passed to the Camera Activity.
 		capture = saveImageUsingURI(sImageUri, true);
-		Log.i("*****", "@@@@2 sImageUri: " + sImageUri);
 
 		// Try to use the image referred to by the intent.
 		if (null == capture && null != intent)
 		{
-			Log.i("@@@@@@@@@@@@@ ", "@@@ handlePicture 2");
-			Uri imageUri = intent.getData();
-			// We assume this file should not be deleted
-			// and pass false.
-			capture = saveImageUsingURI(imageUri, false);
-			Log.i("*****", "@@@@1 imageUri: " + imageUri);
+			try
+			{
+				Uri imageUri = intent.getData();
+				Bitmap bitmap = MediaStore.Images.Media.getBitmap(
+					sMoSyncThread.getActivity().getContentResolver(),
+					imageUri);
+				if (null != bitmap)
+				{
+					capture = saveBitmapAndCreateCaptureObject(bitmap);
+				}
+			}
+			catch (Exception ex)
+			{
+				ex.printStackTrace();
+			}
 		}
 
 		// Try getting the last saved image in the gallery (MediaStore).
 		if (null == capture)
 		{
-			Log.i("@@@@@@@@@@@@@ ", "@@@ handlePicture 3");
 			Uri imageUri = getLatestFileFromMediaStore();
 			capture = saveImageUsingURI(imageUri, false);
-			Log.i("*****", "@@@@2 sImageUri: " + sImageUri);
 		}
 
 		// Try using the small bitmap that comes with the intent.
 		if (null == capture && null != intent)
 		{
-			Log.i("@@@@@@@@@@@@@ ", "@@@ handlePicture 4");
 			// Get the small bitmap.
 			Bundle bundle = intent.getExtras();
 			if (null != bundle)
@@ -601,11 +607,8 @@ public class MoSyncCapture
 			}
 		}
 
-		Log.i("@@@@@@@@@@@@@ ", "@@@ handlePicture 5");
 		if (null != capture)
 		{
-
-			Log.i("@@@@@@@@@@@@@ ", "@@@ handlePicture 6");
 			// Create new handle for the capture object.
 			//int captureHandle = sMoSyncThread.nativeCreatePlaceholder();
 
@@ -631,16 +634,12 @@ public class MoSyncCapture
 			postEventNotificationReceived(
 				MA_CAPTURE_EVENT_TYPE_IMAGE,
 				captureHandle);
-
-			Log.i("*****", "@@@@5 success ");
 		}
 		else
 		{
 			// Post error result (using MA_CAPTURE_EVENT_TYPE_CANCEL for this).
 			// TODO: Should there be an MA_CAPTURE_EVENT_TYPE_ERROR event?
 			postEventNotificationReceived(MA_CAPTURE_EVENT_TYPE_CANCEL, -1);
-
-			Log.i("*****", "@@@@5 failed");
 		}
 	}
 
@@ -653,16 +652,10 @@ public class MoSyncCapture
 		try
 		{
 			File imageFile = new File(imageUri.getPath());
-			Log.i("*****", "@@@@ saveImageUsingURI imageFile: " + imageFile);
-
 			if (null == imageFile || imageFile.length() < 1)
 			{
-				Log.i("*****", "@@@@ saveImageUsingURI fail 1");
 				return null;
 			}
-
-			Log.i("*****", "@@@@ saveImageUsingURI imageFile.length(): " + imageFile.length());
-			Log.i("*****", "@@@@ saveImageUsingURI imageFile.getCanonicalPath(): " + imageFile.getCanonicalPath());
 
 			// Get the bitmap and create a down-sized smaller version
 			// to save memory and avoid memory issues.
@@ -674,7 +667,6 @@ public class MoSyncCapture
 				mDecodingOptions);
 			if (null == bitmap)
 			{
-				Log.i("*****", "@@@@ saveImageUsingURI fail 2");
 				return null;
 			}
 
@@ -719,8 +711,6 @@ public class MoSyncCapture
 	private static boolean saveBitmapToFile(Bitmap bitmap, String path)
 	{
 		if (null == bitmap) { return false; }
-
-		Log.i("*****", "@@@@ saveBitmapToFile path " + path);
 
 		try
 		{
@@ -776,7 +766,6 @@ public class MoSyncCapture
 						MediaStore.Images.Media.DATA));
 				// We should not call close on a managed cursor.
 				//imageCursor.close();
-				Log.i("@@@@@", "@@@@@ getLatestFileFromMediaStore path: " + path);
 				return Uri.parse("file://" + path);
 			}
 		}
@@ -818,7 +807,6 @@ public class MoSyncCapture
 		if ( cursor.moveToFirst() )
 		{
 			videoPath = cursor.getString(column_index);
-			Log.e("@@MoSync", "Capture: video stored at " + videoPath);
 		}
 
 		// Create handle.
@@ -832,8 +820,6 @@ public class MoSyncCapture
 
 		// Create and store a new CaptureObject.
 		MoSyncCaptureObject capture = new MoSyncCaptureObject(CaptureType.VIDEO);
-		// TODO: Not used. Delete this line.
-		//capture.setData(sVideoUri);
 		capture.setPath(videoPath);
 		sCaptureObjects.put(dataHandle, capture);
 
@@ -847,8 +833,6 @@ public class MoSyncCapture
 	 */
 	public static void handleCaptureCanceled()
 	{
-		Log.e("@@MoSync", "Capture: capture was canceled by the user.");
-
 		// Clear out the image uri.
 		sImageUri = null;
 
@@ -880,7 +864,7 @@ public class MoSyncCapture
 	 */
 	private void recordVideo()
 	{
-		Log.e("@@MoSync","maCaptureAction: Video recording started");
+		Log.i("@@MoSync","maCaptureAction: Video recording started");
 		// Hack on Motorola: the activity is called com.motorola.Camera.Camcorder.
 		Intent videoIntent = new Intent(android.provider.MediaStore.ACTION_VIDEO_CAPTURE);
 
@@ -915,7 +899,7 @@ public class MoSyncCapture
 		Intent cameraIntent = new Intent(
 			android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
 
-		/**
+		/*
 		 * On 1.5 documentation: "If the EXTRA_OUTPUT is not present, then a small
 		 * sized image is returned as a Bitmap object in the extra field.
 		 * If the EXTRA_OUTPUT is present, then the full-sized image will be written to
@@ -926,19 +910,17 @@ public class MoSyncCapture
 		 * - Some devices save a full sized image to the Gallery, and only save a
 		 * thumbnail to this location (some HTC devices).
 		 */
-		/**
+		/*
 		 * Try to save image to specified file, although some devices
 		 * might ignore this setting.
 		 */
 		sImageUri = getTempImageUri();
 		if (null != sImageUri)
 		{
-			Log.i("@@@@@@@@ ", "@@@@@@ setting sImageUri: " + sImageUri.getPath());
 			cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, sImageUri);
 		}
 
-		Log.i("@@@@@@@@ ", "@@@@@@ takePicture");
-
+		// Used if we need to get the image from the media store.
 		sImageCaptureStarted = new Date().getTime();
 
 		// Launch the camera application.
@@ -964,13 +946,8 @@ public class MoSyncCapture
 				tempDir.mkdir();
 			}
 
-//			File tempFile = new File(
-//				tempDir.getAbsolutePath() + "/" + CAPTURE_TEMP_DEFAULT_NAME + ".jpg");
-
 			File tempFile = File.createTempFile(
-				CAPTURE_TEMP_DEFAULT_NAME, "jpg", tempDir);
-
-			Log.i("@@MoSync", "getTempImageUri: " + tempFile.getCanonicalPath());
+				CAPTURE_TEMP_DEFAULT_NAME, ".jpg", tempDir);
 
 			return Uri.fromFile(tempFile);
 		}
