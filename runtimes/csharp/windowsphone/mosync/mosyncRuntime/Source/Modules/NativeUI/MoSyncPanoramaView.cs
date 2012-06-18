@@ -92,7 +92,9 @@ namespace MoSync
                         mPanorama.Items.Add(new Microsoft.Phone.Controls.PanoramaItem
                         {
                             Header = (child as Screen).getScreenTitle,
-                            Content = (child as Screen).View
+                            Content = (child as Screen).View,
+                            Orientation = System.Windows.Controls.Orientation.Horizontal,
+                            Width = ((child as Screen).View as Grid).Width
                         });
                     });
                 }
@@ -164,6 +166,7 @@ namespace MoSync
 
                             //The ImageBrush standard object gets that as a source
                             System.Windows.Media.ImageBrush imgBrush = new System.Windows.Media.ImageBrush();
+
                             imgBrush.ImageSource = bmpSource;
 
                             //The panorama gets the brush as a background
@@ -171,7 +174,7 @@ namespace MoSync
                         }
                         else throw new InvalidPropertyValueException();
                     }
-                    throw new InvalidPropertyValueException();
+                    else throw new InvalidPropertyValueException();
                 }
             }
 

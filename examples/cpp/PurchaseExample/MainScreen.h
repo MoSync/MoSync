@@ -95,7 +95,7 @@ public:
 	 */
 	void fillReceiptDialog(MAUtil::String appID, MAUtil::String productID,
 			int transactionDate, MAUtil::String transactionId,
-			MAUtil::String versionExternalId, MAUtil::String BID);
+			MAUtil::String BID);
 
 	/**
 	 * Dismiss receipt dialog when Ok button is pressed.
@@ -178,7 +178,6 @@ private:
 	Label* mReceiptAppId;
 	Label* mReceiptTransactionDate;
 	Label* mReceiptTransactionId;
-	Label* mReceiptVersionExternalId;
 	Label* mReceiptBid;
 	Button* mReceiptOkButton;
 };
