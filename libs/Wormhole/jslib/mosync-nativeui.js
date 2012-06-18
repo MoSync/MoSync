@@ -650,10 +650,11 @@ mosync.nativeui.NativeWidgetElement = function(widgetType, widgetID, params,
 	 * @param property
 	 *            name of the property
 	 * @param successCallback
-	 *            a function that will be called if the operation is successful.
-	 *            The value and wigetID will be passed to this function
+	 *            a function that will be called if the operation is successful,
+	 *            called with two parameters, property name and property value, for example:
+	 *            function(prop, value) { ... }
 	 * @param errorCallback
-	 *            a function that will be called if an error occurs
+	 *            a function that will be called if an error occurs, takes no parameters
 	 */
 	this.getProperty = function(property, successCallback, errorCallback)
 	{
