@@ -1,0 +1,13 @@
+Author: Mikael Kindborg
+Date: 2012-06-14
+
+CaptureTest currently does not work on Android, because
+the feature of creating an image handle using the capture
+handle has been removed on Android.
+
+On iOS this should still work, but plans are to redesign
+and update the Capture API, and then this feature may work
+in a different way.
+
+Solution is to rewrite CaptureTest to read image from
+the captured file, and then display it.

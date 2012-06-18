@@ -44,6 +44,11 @@ namespace NativeUI
 	/**
 	 * \brief Class that represents a visible panorama view. Note that
 	 * this is available only on Windows Phone 7.
+	 * A panorama control is a Windows Phone 7 specific control. The paroramaView is a screen container
+	 * which may contain more then one screen. A screen can spann over the hardware screen width.
+	 * In order to enable this you will have to set the width property of a screen to a certain value.
+	 * For more information regarding this control please check the following link:
+	 * http://msdn.microsoft.com/en-us/library/ff941104(v=vs.92).aspx
 	 */
 	class PanoramaView : public Screen
 	{

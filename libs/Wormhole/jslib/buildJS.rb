@@ -23,6 +23,7 @@ DirectoriesToCopyWormholeJSTo = [
   "../../../templates/HTML5 JS WebUI Project/",
   "../../../examples/html5/WormholeDemo/LocalFiles/js/",
   "../../../examples/html5/WormholeNativeUI/LocalFiles/js/",
+  "../../../examples/html5/PhotoGallery/LocalFiles/js/",
   "../../../testPrograms/PhoneGapMoSync/LocalFiles/js/",
   "../../../testPrograms/phonegap/WormholePushNotificationTest/LocalFiles/js/",
   "../../../testPrograms/JSNativeUICloneTest/LocalFiles/js/"
