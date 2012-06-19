@@ -11276,13 +11276,13 @@ group CaptureAPI "Capture API" {
 
 	group CaptureAction "Capture Action" {
 		constset int MA_CAPTURE_ACTION_ {
-			/// Start the picker with video mode and stores the result in a data object.
+			/// Starts video capture.
 			/// Platform: Android and iOS.
 			RECORD_VIDEO = 0;
-			/// Stops the recording.
+			/// Stops recording.
 			/// Platform: iOS only.
 			STOP_RECORDING = 1;
-			/// Starts the picker with picture mode and  stores the picture in a data object.
+			/// Starts image capture (takes photo).
 			/// Platform: Android and iOS.
 			TAKE_PICTURE = 2;
 		}
@@ -11290,13 +11290,13 @@ group CaptureAPI "Capture API" {
 
 	group CaptureEventType "Capture Event type" {
 		constset int MA_CAPTURE_EVENT_TYPE_ {
-			/// Send after a image has been taken.
+			/// Sent after a image has been taken.
 			/// Platform: Android and iOS.
 			IMAGE = 0;
-			/// Send after a video has been taken.
+			/// Sent after a video has been taken.
 			/// Platform: Android and iOS.
 			VIDEO = 1;
-			/// Send if the user cancels taking image/video.
+			/// Sent if the user cancels taking image/video.
 			/// Platform: iOS and Android.
 			CANCEL = 2;
 		}
@@ -11350,7 +11350,23 @@ group CaptureAPI "Capture API" {
 		int maCaptureGetProperty(in MAString property, out MAString value range("bufSize"), in int bufSize);
 
 		/**
-		* \brief Perform an action on the image picker.
+		* \brief Performs a capture action.
+		*
+		* The specified action is performed and the result is delivered
+		* asynchronously in an \link #EVENT_TYPE_CAPTURE event. The content
+		* of the event is an #MACaptureEventData data structure. The type
+		* field contains the type of capture event (#MA_CAPTURE_EVENT_TYPE_IMAGE,
+		* #MA_CAPTURE_EVENT_TYPE_VIDEO, #MA_CAPTURE_EVENT_TYPE_CANCEL), and the
+		* handle field contains a handle to the capture object. Save a
+		* captured image using function #maCaptureWriteImage. Access a
+		* captured video using function #maCaptureGetVideoPath. Free the capture
+		* object using function #maCaptureDestroyData.
+		*
+		* Note: The image format for #MA_CAPTURE_EVENT_TYPE_IMAGE is JPEG on Android
+		* and PNG on iOS.
+		*
+		* Platforms: Android an iOS.
+		*
 		* \param action One of the \link #MA_CAPTURE_ACTION_TAKE_PICTURE MA_CAPTURE_ACTION \endlink constants.
 		*
 		* \returns One of the next constants:
