@@ -408,6 +408,21 @@ maDBCursorGetColumnDouble()<br>
 <td><br>
 </td>
 </tr>
+
+<tr style="background-color: rgb(207, 226, 243);">
+<td>
+<strong>Sensor</strong>
+</td>
+<td>Read device sensors data.<br>
+</td>
+<td>maSensorStart(), maSensorStop()<br>
+</td>
+<td><br>
+</td>
+<td>\ref SensorAPI<br>
+</td>
+</tr>
+
 <tr style="background-color: rgb(118, 29, 88);">
 <td colspan="2"><strong><span style="color: rgb(255, 255, 255);">User Interface APIs</span></strong><strong><br>
 </strong></td>

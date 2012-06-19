@@ -16,7 +16,7 @@
 -->
 <html>
 	<head>
-		<meta name="viewport" content="width=320, user-scalable=yes">
+		<meta name="viewport" content="width=device-width">
 		<meta http-equiv="Content-type" content="text/html; charset=utf-8">
 		<title>Photo Gallery</title>
 		<link rel="stylesheet" href="style.css" type="text/css" media="screen" title="no title" charset="utf-8">
@@ -60,6 +60,51 @@
 			 */
 			app.snapPhoto = function()
 			{
+				// Helper function that iterates over all files in the
+				// application's root directory and removes old capture
+				// files. This prevents the app from consuming storage.
+				function removeAllImageFilesExcept(filePath, successFun, errorFun)
+				{
+					window.requestFileSystem(
+						LocalFileSystem.PERSISTENT,
+						0,
+						function (fileSystem)
+						{
+							var directoryReader = fileSystem.root.createReader();
+							directoryReader.readEntries(
+								function(entries)
+								{
+									for (var i = 0; i < entries.length; ++i)
+									{
+										removeImageFileExcept(entries[i], filePath);
+									}
+									successFun();
+								},
+								function ()
+								{
+									errorFun("Could not read directory");
+								});
+						},
+						function ()
+						{
+							errorFun("Could not open file system");
+						});
+				};
+
+				// Helper function that removes old capture files.
+				// The name format for captured image files is:
+				// "img<timestamp>.jpg|png"
+				function removeImageFileExcept(entry, filePath)
+				{
+					if (!entry.isFile) { return; }
+					if (entry.fullPath == filePath) { return; }
+					if (/.*\/img.*((\.jpg)|(\.png))$/.test(entry.fullPath))
+					{
+						entry.remove(function() {}, function() {});
+					}
+				}
+
+				// Do actual capture.
 				navigator.device.capture.captureImage(
 					// Callback that gets the image that was captured.
 					function(mediaFiles)
@@ -67,16 +112,7 @@
 						var filePath = mediaFiles[0].fullPath;
 						var fileURL = "file://" + filePath;
 
-						// Pass the URL of the captured image to the camera page.
-						var cameraWebViewHandle =
-							mosync.nativeui.getWidgetHandleById("cameraWebView");
-						mosync.bridge.callJS(
-							cameraWebViewHandle,
-							"camera.setPhotoURL('" + fileURL + "')");
-
-						// TODO: Make sure to delete old capture files!
-						// Debug code below to make it work.
-						/* app.removeAllImageFilesButThisOne(
+						removeAllImageFilesExcept(
 							filePath,
 							function()
 							{
@@ -90,99 +126,11 @@
 							function(errorMessage)
 							{
 								alert(errorMessage);
-							}); */
+							});
 					},
 					function(error)
 					{
 						alert("Could not take picture. Error code: " + error.code);
-					});
-			};
-
-			/**
-			 * Helper function.
-			 */
-			app.removeAllImageFilesButThisOne = function(filePath, successFun, errorFun)
-			{
-				var parentPath = filePath.substr(0, filePath.lastIndexOf("/"));
-				window.requestFileSystem(
-					LocalFileSystem.PERSISTENT,
-					0,
-					function (fileSystem)
-					{
-						fileSystem.root.getDirectory(
-							parentPath,
-							{ create: false, exclusive: false },
-							function(directory)
-							{
-								var directoryReader = directory.createReader();
-								directoryReader.readEntries(
-									function(entries)
-									{
-										console.log("@@@ entries: " + JSON.stringify(entries));
-										successFun();
-									},
-									function ()
-									{
-										errorFun("Could not read directory");
-									});
-							},
-							function ()
-							{
-								errorFun("Could not open directory");
-							});
-					},
-					function ()
-					{
-						errorFun("Could not open file system");
-					});
-			};
-
-			/**
-			 * Helper function.
-			 */
-			app.moveImageFile = function(fileURL, successFun, errorFun)
-			{
-				// Delete the previous image and copy the new file to it.
-				// Otherwise disk image will be filled up.
-				window.resolveLocalFileSystemURI(
-					fileURL,
-					function(fileEntry)
-					{
-						console.log("@@@ name: " + fileEntry.name);
-						console.log("@@@ fullPath: " + fileEntry.fullPath);
-
-						// Create parent directory object.
-						var parentPath = fileEntry.fullPath.substr(
-							0,
-							fileEntry.fullPath.lastIndexOf("/"));
-						var parentDirectory = new DirectoryEntry();
-						parentDirectory.fullPath = parentPath;
-
-						// Get file extension.
-						var extension = fileEntry.name.substr(
-							fileEntry.name.lastIndexOf("."));
-
-						console.log(
-								"@@@@ parentPath: " + parentPath +
-								" ext: " + extension);
-
-						fileEntry.moveTo(
-							parentDirectory,
-							"CapturedImage" + extension,
-							function(newFileEntry)
-							{
-								console.log("@@@ newFileEntry: " + JSON.stringify(newFileEntry));
-								successFun("file://" + newFileEntry.fullPath);
-
-							},
-							function(error)
-							{
-								errorFun("Could not copy image.")
-							});
-					},
-					function(error)
-					{
-						errorFun("Could not find image file.")
 					});
 			};
 
@@ -209,7 +157,6 @@
 					function(error)
 					{
 						alert("Could not upload photo - error: " + error.code);
-						console.log("@@Could not upload photo - error: " + error.code);
 					},
 					options);
 			}
@@ -251,7 +198,7 @@
 		<div data-widgetType="TabScreen" id="mainScreen">
 			<!-- First Screen -->
 			<div data-widgetType="Screen" id="cameraScreen" data-title="Camera"
-				data-icon_android="img/168-upload-photo-2-big.png"
+				data-icon_android="img/86-camera-big.png"
 				data-icon_iOS="img/168-upload-photo-2.png">
 				<div data-widgetType="WebView" id="cameraWebView"
 					data-width="100%" data-height="100%" data-url="page-camera.html">
