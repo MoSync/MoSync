@@ -94,6 +94,11 @@ namespace NativeUI
          * @param listener The listener that receives map pin events.
          */
         void removeMapPinListener(MapPinListener* listener);
+
+		/**
+		 * Equality operator.
+		 */
+		bool operator==(const MapPin &b) const;
 	protected:
         /**
          * This method is called when there is an event for this widget.

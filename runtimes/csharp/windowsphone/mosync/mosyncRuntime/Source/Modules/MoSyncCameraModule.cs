@@ -3,8 +3,10 @@ using System.IO;
 using System.Collections.Generic;
 using Microsoft.Devices;
 using System.Threading;
+using System.Windows;
 using System.Windows.Media.Imaging;
 using System.Windows.Media;
+using Microsoft.Phone.Controls;
 
 namespace MoSync
 {
@@ -40,9 +42,21 @@ namespace MoSync
          */
         private FlashMode mFlashMode = FlashMode.Off;
 
+        /**
+         * Used to check if the camera is initialized or not.
+         */
+        bool isCameraInitialized = false;
+
 		bool GetCameraFormat(int index, out System.Windows.Size dim)
 		{
 			dim = new System.Windows.Size();
+
+            // if the camera is not initialized, we cannot access any of its properties
+            if (!isCameraInitialized)
+            {
+                return false;
+            }
+
 			IEnumerable<System.Windows.Size> res = mCamera.AvailableResolutions;
 			if (res == null) return false;
 			IEnumerator<System.Windows.Size> resolutions = res.GetEnumerator();
@@ -65,23 +79,61 @@ namespace MoSync
 		public void Init(Ioctls ioctls, Core core, Runtime runtime)
 		{
             mCamera = new PhotoCamera(mCameraType);
-			mVideoBrush = new VideoBrush();
-            mVideoBrush.SetSource(mCamera);
+            mVideoBrush = new VideoBrush();
 
 			runtime.RegisterCleaner(delegate()
 			{
-				mCamera.Dispose();
-				mCamera = null;
+                if (null != mCamera)
+                {
+                    mCamera.Dispose();
+                    mCamera = null;
+                }
 			});
 
 			// this should be set according to the orientation of
 			// the device I guess.
+
+            // we need to handle the camera orientation by hand
+            PhoneApplicationPage currentPage = (((PhoneApplicationFrame)Application.Current.RootVisual).Content as PhoneApplicationPage);
+
+            // we need to handle the initial page orientation
+            double rotation = mCamera.Orientation;
+            if (currentPage.Orientation == PageOrientation.LandscapeLeft)
+            {
+                rotation -= 90;
+            }
+            else if (currentPage.Orientation == PageOrientation.LandscapeRight)
+            {
+                rotation += 90;
+            }
             mVideoBrush.RelativeTransform = new CompositeTransform()
             {
                 CenterX = 0.5,
                 CenterY = 0.5,
-                Rotation = 90
+                Rotation = rotation
             };
+
+            // on orientation changed, we need to rotate the video brush
+            currentPage.OrientationChanged += new System.EventHandler<OrientationChangedEventArgs>(
+                delegate(object o, OrientationChangedEventArgs args)
+                {
+                    rotation = mCamera.Orientation;
+                    if (args.Orientation == PageOrientation.LandscapeLeft)
+                    {
+                        rotation -= 90;
+                    }
+                    else if (args.Orientation == PageOrientation.LandscapeRight)
+                    {
+                        rotation += 90;
+                    }
+
+                    mVideoBrush.RelativeTransform = new CompositeTransform()
+                    {
+                        CenterX = 0.5,
+                        CenterY = 0.5,
+                        Rotation = rotation
+                    };
+                });
 
             /**
              * Stores an output format in fmm parameter.
@@ -105,10 +157,19 @@ namespace MoSync
 			};
 
             /**
-             * Returns the number of camera output formats avalable.
-             */
+		    * Returns the number of different output formats supported by the current device's camera.
+		    * \< 0 if there is no camera support.
+		    * 0 if there is camera support, but the format is unknown.
+		    */
 			ioctls.maCameraFormatNumber = delegate()
 			{
+                // if the camera is not initialized, we cannot access any of its properties
+                if (!isCameraInitialized)
+                {
+                    // because the cammera is supported but not initialized, we return 0
+                    return 0;
+                }
+
 				IEnumerable<System.Windows.Size> res = mCamera.AvailableResolutions;
 				if (res == null) return 0;
 				IEnumerator<System.Windows.Size> resolutions = res.GetEnumerator();
@@ -157,6 +218,13 @@ namespace MoSync
              */
 			ioctls.maCameraSetPreview = delegate(int _widgetHandle)
 			{
+                // if the camera is not initialized, we need to initialize it before
+                // setting the preview
+                if (!isCameraInitialized)
+                {
+                    initCamera();
+                }
+
 				IWidget w = runtime.GetModule<NativeUIModule>().GetWidget(_widgetHandle);
 				if (w.GetType() != typeof(MoSync.NativeUI.CameraPreview))
 				{
@@ -231,6 +299,12 @@ namespace MoSync
              */
             ioctls.maCameraSetProperty = delegate(int _property, int _value)
 			{
+                // if the camera is not initialized, we cannot access any of its properties
+                if (!isCameraInitialized)
+                {
+                    return MoSync.Constants.MA_CAMERA_RES_PROPERTY_NOTSUPPORTED;
+                }
+
                 String property = core.GetDataMemory().ReadStringAtAddress(_property);
                 String value = core.GetDataMemory().ReadStringAtAddress(_value);
 
@@ -282,6 +356,12 @@ namespace MoSync
 
 			ioctls.maCameraSelect = delegate(int _camera)
 			{
+                // if the camera is not initialized, we cannot access any of its properties
+                if (!isCameraInitialized)
+                {
+                    return MoSync.Constants.MA_CAMERA_RES_FAILED;
+                }
+
                 if ( MoSync.Constants.MA_CAMERA_CONST_BACK_CAMERA == _camera)
                 {
                     if (mCamera.CameraType != CameraType.Primary)
@@ -350,23 +430,28 @@ namespace MoSync
             mCamera = null;
             mCamera = new PhotoCamera(mCameraType);
 
+            isCameraInitialized = false;
+
+            AutoResetEvent are = new AutoResetEvent(false);
             mCamera.Initialized += new EventHandler<CameraOperationCompletedEventArgs>(
                 delegate(object o, CameraOperationCompletedEventArgs args)
                 {
                     try
                     {
                         mCamera.FlashMode = mFlashMode;
+                        isCameraInitialized = true;
+                        are.Set();
                     }
                     catch { }
                 });
-
-            if (null == mVideoBrush)
-                mVideoBrush = new VideoBrush();
 
             MoSync.Util.RunActionOnMainThreadSync(() =>
             {
                 mVideoBrush.SetSource(mCamera);
             });
+            // we need to wait until the camere is initialized before doing other operations
+            // with it or getting/setting its properties
+            are.WaitOne();
         }
 	} // end class CameraModule
 } // end namespace MoSync

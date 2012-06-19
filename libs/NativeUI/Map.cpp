@@ -71,8 +71,12 @@ namespace NativeUI
 	 */
 	int Map::addMapPin(MapPin* pin)
 	{
-		pin->addMapPinListener(this);
-		return Widget::addChild(pin);
+		if (!containsPin(pin))
+		{
+			pin->addMapPinListener(this);
+			return Widget::addChild(pin);
+		}
+		return MAW_RES_ERROR;
 	}
 
 	/**
@@ -87,8 +91,28 @@ namespace NativeUI
 	 */
 	int Map::removeMapPin(MapPin* pin)
 	{
-		pin->removeMapPinListener(this);
-		return Widget::removeChild(pin);
+		if (containsPin(pin))
+		{
+			pin->removeMapPinListener(this);
+			return Widget::removeChild(pin);
+		}
+		return MAW_RES_ERROR;
+	}
+
+	/**
+	 * Checks if a pin is already on the map.
+	 */
+	bool Map::containsPin(MapPin* mapPin)
+	{
+		for (int i = 0; i < countChildWidgets(); i++)
+		{
+			MapPin* currentMapPin = (MapPin*)getChild(i);
+			if (*currentMapPin == *mapPin)
+			{
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/**
