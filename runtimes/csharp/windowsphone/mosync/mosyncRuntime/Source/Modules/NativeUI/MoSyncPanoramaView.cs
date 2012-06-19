@@ -52,30 +52,18 @@ namespace MoSync
                 Grid.SetColumn(mPanorama, 0);
                 Grid.SetRow(mPanorama, 0);
 
+                mPanorama.Loaded += new RoutedEventHandler(
+                    delegate(object from, RoutedEventArgs args)
+                    {
+                        SetApplicationBarVisibility(0);
+                    });
+
                 //The application bar is chanded at the SelectionChanged event occurence.
                 //This allows the user to have more that one application bar / panorama view
                 mPanorama.SelectionChanged += new EventHandler<SelectionChangedEventArgs>(
                     delegate(object from, SelectionChangedEventArgs target)
                     {
-                        bool appBarVisible = (this.mChildren[(from as Microsoft.Phone.Controls.Panorama).SelectedIndex] as Screen).GetApplicationBarVisibility();
-                        if (appBarVisible)
-                        {
-                            mApplicationBar = (this.mChildren[(from as Microsoft.Phone.Controls.Panorama).SelectedIndex] as Screen).GetApplicationBar();
-                            mApplicationBar.IsVisible = true;
-                            ((Application.Current.RootVisual as Microsoft.Phone.Controls.PhoneApplicationFrame).Content as
-                                Microsoft.Phone.Controls.PhoneApplicationPage).ApplicationBar = mApplicationBar;
-                            this.SetApplicationBarVisibility(true);
-                        }
-                        else
-                        {
-                            this.SetApplicationBarVisibility(false);
-                            if (((Application.Current.RootVisual as Microsoft.Phone.Controls.PhoneApplicationFrame).Content as
-                                Microsoft.Phone.Controls.PhoneApplicationPage).ApplicationBar != null)
-                            {
-                                ((Application.Current.RootVisual as Microsoft.Phone.Controls.PhoneApplicationFrame).Content as
-                                Microsoft.Phone.Controls.PhoneApplicationPage).ApplicationBar.IsVisible = false;
-                            }
-                        }
+                        SetApplicationBarVisibility((from as Microsoft.Phone.Controls.Panorama).SelectedIndex);
                     });
             }
 
@@ -216,6 +204,29 @@ namespace MoSync
             public IScreen getSelectedScreen()
             {
                 return mChildren[mPanorama.SelectedIndex] as IScreen;
+            }
+
+            private void SetApplicationBarVisibility(int screenIndex)
+            {
+                bool appBarVisible = (this.mChildren[screenIndex] as Screen).GetApplicationBarVisibility();
+                if (appBarVisible)
+                {
+                    mApplicationBar = (this.mChildren[screenIndex] as Screen).GetApplicationBar();
+                    mApplicationBar.IsVisible = true;
+                    ((Application.Current.RootVisual as Microsoft.Phone.Controls.PhoneApplicationFrame).Content as
+                        Microsoft.Phone.Controls.PhoneApplicationPage).ApplicationBar = mApplicationBar;
+                    this.SetApplicationBarVisibility(true);
+                }
+                else
+                {
+                    this.SetApplicationBarVisibility(false);
+                    if (((Application.Current.RootVisual as Microsoft.Phone.Controls.PhoneApplicationFrame).Content as
+                        Microsoft.Phone.Controls.PhoneApplicationPage).ApplicationBar != null)
+                    {
+                        ((Application.Current.RootVisual as Microsoft.Phone.Controls.PhoneApplicationFrame).Content as
+                        Microsoft.Phone.Controls.PhoneApplicationPage).ApplicationBar.IsVisible = false;
+                    }
+                }
             }
         }
     }
