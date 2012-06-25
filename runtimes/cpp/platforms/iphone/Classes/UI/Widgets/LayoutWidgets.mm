@@ -124,7 +124,7 @@ MAKE_UIWRAPPER_LAYOUTING_IMPLEMENTATION(MoSync, HLayoutView)
 			int viewHeight = childView.frame.size.height; 
 
 			if([child getAutoSizeParamX] == FILL_PARENT) {
-				viewWidth = view.frame.size.width - totalHorizontalMargin;
+				viewWidth = view.bounds.size.width - totalHorizontalMargin;
 			}
 			else if([child getAutoSizeParamX] == WRAP_CONTENT) {
 				viewWidth = [childView sizeThatFits:CGSizeZero].width;
@@ -169,7 +169,7 @@ MAKE_UIWRAPPER_LAYOUTING_IMPLEMENTATION(MoSync, HLayoutView)
 			int viewWidth = childView.frame.size.width; 
 			
 			if([child getAutoSizeParamY] == FILL_PARENT) {
-				viewHeight = view.frame.size.height - totalVerticalMargin;
+				viewHeight = view.bounds.size.height - totalVerticalMargin;
 			}
 			else if([child getAutoSizeParamY] == WRAP_CONTENT) {
 				viewHeight = [childView sizeThatFits:CGSizeZero].height;
@@ -245,7 +245,7 @@ MAKE_UIWRAPPER_LAYOUTING_IMPLEMENTATION(MoSync, HLayoutView)
 		AbstractLayoutView* alv = (AbstractLayoutView*)view;
 		[alv setSpacing:[value intValue]];
 	}
-	else if([key isEqualToString:@"isScrollable"]) {
+	else if([key isEqualToString:@MAW_VERTICAL_LAYOUT_SCROLLABLE]) {
 		AbstractLayoutView* alv = (AbstractLayoutView*)view;
 		alv.scrollEnabled = [value boolValue];
 	}

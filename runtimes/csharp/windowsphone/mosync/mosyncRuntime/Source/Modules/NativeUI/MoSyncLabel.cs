@@ -15,6 +15,7 @@ using System.Windows.Navigation;
 using System;
 using System.Text.RegularExpressions;
 using System.Reflection;
+using System.Windows.Media;
 
 namespace MoSync
 {
@@ -46,8 +47,51 @@ namespace MoSync
                 mLabel = new System.Windows.Controls.TextBlock();
 				mLabel.TextWrapping = TextWrapping.Wrap;
 
+                /*
+                 * We need to set some default values on the text block. For this, we use
+                 * a predefined style.
+                 * PhoneTextNormalStyle description:
+                 * FontFamily: PhoneFontFamilyNormal
+                 * FontSize: PhoneFontSizeNormal
+                 * Foreground: PhoneForegroundBrush
+                 * Margin: PhoneHorizontalMargin
+                 */
+                mLabel.Style = (Style)Application.Current.Resources["PhoneTextNormalStyle"];
+
                 mView = mLabel;
 			}
+
+            /**
+             * Implementation of the Left property of the Label widget.
+             */
+            [MoSyncWidgetProperty(MoSync.Constants.MAW_WIDGET_LEFT)]
+            public new double Left
+            {
+                get { return mLabel.Margin.Left; }
+                set
+                {
+                    mLabel.Margin = new Thickness(value,
+                        mLabel.Margin.Top,
+                        mLabel.Margin.Right,
+                        mLabel.Margin.Bottom);
+                }
+            }
+
+            /**
+             * Implementation of the Top property of the Label widget.
+             */
+            [MoSyncWidgetProperty(MoSync.Constants.MAW_WIDGET_TOP)]
+            public new double Top
+            {
+                get { return mLabel.Margin.Top; }
+                set
+                {
+                    mLabel.Margin = new Thickness(mLabel.Margin.Left,
+                        value,
+                        mLabel.Margin.Right,
+                        mLabel.Margin.Bottom);
+                }
+            }
 
             /**
              * Implementation of the Text property
@@ -74,24 +118,26 @@ namespace MoSync
 			[MoSyncWidgetProperty(MoSync.Constants.MAW_LABEL_TEXT_VERTICAL_ALIGNMENT)]
 			public String textVerticalAlignment
 			{
-			set
-			{
-				switch (value)
-					{
-						case MoSync.Constants.MAW_ALIGNMENT_TOP:
-							mLabel.VerticalAlignment = VerticalAlignment.Top;
-							break;
-						case MoSync.Constants.MAW_ALIGNMENT_CENTER:
-							mLabel.VerticalAlignment = VerticalAlignment.Center;
-							break;
-						case MoSync.Constants.MAW_ALIGNMENT_BOTTOM:
-							mLabel.VerticalAlignment = VerticalAlignment.Bottom;
-							break;
-					}
-			}
+			    set
+			    {
+				    switch (value)
+					    {
+						    case MoSync.Constants.MAW_ALIGNMENT_TOP:
+							    mLabel.VerticalAlignment = VerticalAlignment.Top;
+							    break;
+						    case MoSync.Constants.MAW_ALIGNMENT_CENTER:
+							    mLabel.VerticalAlignment = VerticalAlignment.Center;
+							    break;
+						    case MoSync.Constants.MAW_ALIGNMENT_BOTTOM:
+							    mLabel.VerticalAlignment = VerticalAlignment.Bottom;
+							    break;
+                            default:
+                                throw new InvalidPropertyValueException();
+					    }
+			    }
 				get
 				{
-					return mLabel.Text;
+					return mLabel.VerticalAlignment.ToString();
 				}
 			}
 
@@ -159,24 +205,19 @@ namespace MoSync
             /**
              * Implementation of the maxNumberOfLines property
              * set: sets if the label is single or multiline.
-             * Accepts two values: 1 (meaning single line) and 1
+             * Accepts two values: 1 (meaning single line) and 0
              */
 			[MoSyncWidgetProperty(MoSync.Constants.MAW_LABEL_MAX_NUMBER_OF_LINES)]
-			public String maxNumberOfLines
+			public int maxNumberOfLines
 			{
 				set
 				{
-					int val = -1;
-					if (!int.TryParse(value, out val))
-					{
-						return;
-					}
-					if ( 0 == val )
+					if ( 0 == value )
 					{
 						mMaxNumberOfLines = 0;
 						mLabel.TextWrapping = TextWrapping.NoWrap;
 					}
-					else if ( 1 == val )
+                    else if (1 == value)
 					{
 						mMaxNumberOfLines = 1;
 						mLabel.TextWrapping = TextWrapping.Wrap;
@@ -185,7 +226,7 @@ namespace MoSync
 			}
 
             /**
-             * The implementation of the "FontHandle" property. 
+             * The implementation of the "FontHandle" property.
              * Sets the font handle used to display the item's text
              */
             [MoSyncWidgetProperty(MoSync.Constants.MAW_LABEL_FONT_HANDLE)]

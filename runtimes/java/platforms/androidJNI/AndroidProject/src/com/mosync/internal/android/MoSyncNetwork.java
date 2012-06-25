@@ -72,6 +72,7 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothServerSocket;
 import android.bluetooth.BluetoothSocket;
 import android.net.SSLCertificateSocketFactory;
+import android.os.Build;
 import android.os.Looper;
 import android.util.Log;
 
@@ -114,6 +115,13 @@ public class MoSyncNetwork
 	public MoSyncNetwork(MoSyncThread thread)
 	{
 		mMoSyncThread = thread;
+
+		// This fixes a bug in HttpURLConnection on Android versions < 2.3.
+		// For more info, see:
+		// http://jira.mosync.com/browse/MOSYNC-2050
+		// http://stackoverflow.com/questions/1440957/httpurlconnection-getresponsecode-returns-1-on-second-invocation
+		// http://code.google.com/p/android/issues/detail?id=7786
+		System.setProperty("http.keepAlive", "false");
 	}
 
 	/**
@@ -178,10 +186,10 @@ public class MoSyncNetwork
 			}
 			catch(Exception e)
 			{
-				Log.i("Internal Connection Handler",e.toString());
+				Log.i("MOSYNC: Exception in killAllConnections", e.toString());
+				e.printStackTrace();
 			}
 		}
-
 	}
 
 	/**
@@ -727,12 +735,15 @@ public class MoSyncNetwork
 	 */
 	static abstract class ConnectionObject
 	{
+		// Values that are changed/read when communicating with
+		// threads are marked volatile to prevent thread caching
+		// of values.
 		protected int mHandle;
-		protected boolean mCancelled;
-		protected int mState;
+		volatile protected boolean mCancelled;
+		volatile protected int mState;
 		protected MoSyncNetwork mMoSyncNetwork;
-		private OutputStream mOutputStream;
-		private InputStream mInputStream;
+		volatile private OutputStream mOutputStream;
+		volatile private InputStream mInputStream;
 
 		public ConnectionObject(MoSyncNetwork network)
 		{
@@ -755,13 +766,6 @@ public class MoSyncNetwork
 		 */
 		public synchronized void postResultEvent(int opType, int result)
 		{
-			//Log.i("ConnectionObject.postResultEvent",
-			//	"mHandle: " + mHandle +
-			//	" mState: " + mState +
-			//	" opType: " + opType +
-			//	" result: " + result +
-			//	" connobj (this): " + this);
-
 			// Check that state is ongoing.
 			MYASSERT((mState & opType) != 0);
 
@@ -774,8 +778,6 @@ public class MoSyncNetwork
 			event[2] = opType;
 			event[3] = result;
 
-			//Log.i("ConnectionObject.postResultEvent",
-			//	"Calling nativePostEvent");
 			mMoSyncNetwork.postEvent(event);
 		}
 
@@ -792,15 +794,11 @@ public class MoSyncNetwork
 
 			if (getInputStream() != null)
 			{
-				//Log.i("@@ConnectionObject", "closing input stream");
 				getInputStream().close();
-				//Log.i("@@ConnectionObject", "closing input stream done");
 			}
 			if (getOutputStream() != null)
 			{
-				//Log.i("@@ConnectionObject", "closing output stream");
 				getOutputStream().close();
-				//Log.i("@@ConnectionObject", "closing output stream done");
 			}
 		}
 
@@ -855,8 +853,6 @@ public class MoSyncNetwork
 						}
 						else
 						{
-							//Log.i("@@ConnectionObject", "ConnRead error "
-							//	+ result);
 							postResultEvent(opType, CONNERR_INTERNAL);
 						}
 					}
@@ -950,8 +946,6 @@ public class MoSyncNetwork
 						}
 						else
 						{
-							//Log.i("ConnectionReaderWriter",
-							//	"ConnRead error " + result);
 							postResultEvent(opType, CONNERR_INTERNAL);
 						}
 					}
@@ -1102,7 +1096,7 @@ public class MoSyncNetwork
 			checkAndSetState(CONNOP_ACCEPT);
 		}
 
-		private void checkAndSetState(int opType)
+		private synchronized void checkAndSetState(int opType)
 		{
 			// There must not be an ongoing operation.
 			MYASSERT(0 == (mState & opType));
@@ -1135,8 +1129,14 @@ public class MoSyncNetwork
 			mUrlConnection = new URL(url).openConnection();
 
 			mUrlConnection.setAllowUserInteraction(true);
-			mUrlConnection.setDoInput(true);
-			mUrlConnection.setDoOutput(true);
+			// The number is hardcoded here for ICS but we have to change it to
+			// its actual constant after upgrading the our Android SDK
+			if(Build.VERSION.SDK_INT < 14)
+			{
+				mUrlConnection.setDoInput(true);
+				mUrlConnection.setDoOutput(true);
+			}
+
 			mUrlConnection.setUseCaches(false);
 
 			return this;
@@ -1153,8 +1153,13 @@ public class MoSyncNetwork
 			mUrlConnection = new URL(url).openConnection();
 
 			mUrlConnection.setAllowUserInteraction(true);
-			mUrlConnection.setDoInput(true);
-			mUrlConnection.setDoOutput(true);
+			// The number is hardcoded here for ICS but we have to change it to
+			// its actual constant after upgrading the our Android SDK
+			if(Build.VERSION.SDK_INT < 14)
+			{
+				mUrlConnection.setDoInput(true);
+				mUrlConnection.setDoOutput(true);
+			}
 			mUrlConnection.setUseCaches(false);
 
 			HttpURLConnection httpConnection =
@@ -1396,11 +1401,10 @@ public class MoSyncNetwork
 
 				int result = http.getResponseCode();
 
-				// TODO: Should this be < 0 ??
-				if (result <= 0)
+				if (result < 0)
 				{
 					DebugPrint("UrlConnectionObject.doConnect: "
-						+ "http.getResponseCode() <= 0 result was: " + result);
+						+ "http.getResponseCode() < 0 result was: " + result);
 					postResultEvent(CONNOP_CONNECT, CONNERR_PROTOCOL);
 					return;
 				}
@@ -1429,7 +1433,6 @@ public class MoSyncNetwork
 				{
 					if (mCancelled)
 					{
-						//Log.i("UrlConnectionObject", "connection canceled");
 						postResultEvent(CONNOP_CONNECT, CONNERR_CANCELED);
 						return;
 					}
@@ -1441,11 +1444,9 @@ public class MoSyncNetwork
 			{
 				ex.printStackTrace();
 				postResultEvent(CONNOP_CONNECT, CONNERR_CANCELED);
-				return;
 			}
 			catch (UnknownHostException ex)
 			{
-				//Log.i("@@@ MoSync", "UnknownHostException");
 				ex.printStackTrace();
 				postResultEvent(CONNOP_FINISH, CONNERR_DNS);
 			}
@@ -1488,13 +1489,11 @@ public class MoSyncNetwork
 
 				int result = httpConn.getResponseCode();
 
-				// TODO: Should be < 0 ??
-				if (result <= 0)
+				if (result < 0)
 				{
 					DebugPrint("UrlConnectionObject.doHttpConnectionFinish: "
-						+ "http.getResponseCode() <= 0 result was: " + result);
-					result = CONNERR_PROTOCOL; // TODO: Is this needed?
-					postResultEvent(CONNOP_FINISH, CONNERR_PROTOCOL);
+						+ "http.getResponseCode() < 0 result was: " + result);
+					result = CONNERR_PROTOCOL;
 				}
 
 				if (DebugIsOn())
@@ -1525,7 +1524,6 @@ public class MoSyncNetwork
 			}
 			catch (UnknownHostException ex)
 			{
-				//Log.i("@@@ MoSync", "UnknownHostException");
 				ex.printStackTrace();
 				postResultEvent(CONNOP_FINISH, CONNERR_DNS);
 			}
@@ -1685,8 +1683,6 @@ public class MoSyncNetwork
 				{
 					if (mCancelled)
 					{
-						//Log.i("SocketConnectionObject",
-						//	"connection was canceled");
 						postResultEvent(CONNOP_CONNECT, CONNERR_CANCELED);
 						return;
 					}

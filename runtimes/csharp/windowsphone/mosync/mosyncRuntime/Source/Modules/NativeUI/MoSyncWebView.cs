@@ -51,6 +51,15 @@ namespace MoSync
             //this is used when loading relative paths
             protected String mBaseURL = "";
 
+            //navigation counter helper value
+            private int mBackCounter = 0;
+
+            //navigation boolean, set on true while back is handled
+            private bool mFromHistory = false;
+
+            //boolean set on true if the web browser gains focus
+            private bool mFocused = false;
+
             //MAW_WEB_VIEW_URL property implementation
             [MoSyncWidgetProperty(MoSync.Constants.MAW_WEB_VIEW_URL)]
             public String Url
@@ -178,6 +187,26 @@ namespace MoSync
                     {
                         mWebBrowser.InvokeScript("eval", "history.go(1)");
                     }
+                    else throw new InvalidPropertyValueException();
+                }
+            }
+
+            public void BackKeyPressHandler(object from, System.ComponentModel.CancelEventArgs args)
+            {
+                try
+                {
+                    //mBackCounter is firstly increased when the webview navigates to the source page
+                    if (mBackCounter > 1 && mFocused)
+                    {
+                        mBackCounter--;
+                        mFromHistory = true;
+                        Navigate = "back";
+                        args.Cancel = true;
+                    }
+                }
+                catch
+                {
+                    //supress the error
                 }
             }
 
@@ -187,6 +216,22 @@ namespace MoSync
                 mWebBrowser = new Microsoft.Phone.Controls.WebBrowser();
                 mView = mWebBrowser;
                 mWebBrowser.IsScriptEnabled = true;
+
+                mWebBrowser.IsGeolocationEnabled = true;
+
+                (Application.Current.RootVisual as Microsoft.Phone.Controls.PhoneApplicationFrame).BackKeyPress += new EventHandler<System.ComponentModel.CancelEventArgs>(BackKeyPressHandler);
+
+                mWebBrowser.GotFocus += new RoutedEventHandler(
+                    delegate(object from, RoutedEventArgs args)
+                    {
+                        mFocused = true;
+                    });
+
+                mWebBrowser.LostFocus += new RoutedEventHandler(
+                    delegate(object from, RoutedEventArgs args)
+                    {
+                        mFocused = false;
+                    });
 
                 fillSpaceHorizontalyEnabled = false;
                 fillSpaceVerticalyEnabled = false;
@@ -263,6 +308,8 @@ namespace MoSync
                         eventData.WriteInt32(MAWidgetEventData_status, MoSync.Constants.MAW_CONSTANT_STARTED);
 
                         mRuntime.PostCustomEvent(MoSync.Constants.EVENT_TYPE_WIDGET, eventData);
+
+                        if (!mFromHistory && (args.NavigationMode == NavigationMode.Forward || args.NavigationMode == NavigationMode.New)) mBackCounter++;
                     });
             }
         }

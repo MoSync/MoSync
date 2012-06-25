@@ -51,6 +51,32 @@ namespace MoSync
                 mPage.Children.Add(mPanorama);
                 Grid.SetColumn(mPanorama, 0);
                 Grid.SetRow(mPanorama, 0);
+
+                //The application bar is chanded at the SelectionChanged event occurence.
+                //This allows the user to have more that one application bar / panorama view
+                mPanorama.SelectionChanged += new EventHandler<SelectionChangedEventArgs>(
+                    delegate(object from, SelectionChangedEventArgs target)
+                    {
+                        bool appBarVisible = (this.mChildren[(from as Microsoft.Phone.Controls.Panorama).SelectedIndex] as Screen).GetApplicationBarVisibility();
+                        if (appBarVisible)
+                        {
+                            mApplicationBar = (this.mChildren[(from as Microsoft.Phone.Controls.Panorama).SelectedIndex] as Screen).GetApplicationBar();
+                            mApplicationBar.IsVisible = true;
+                            ((Application.Current.RootVisual as Microsoft.Phone.Controls.PhoneApplicationFrame).Content as
+                                Microsoft.Phone.Controls.PhoneApplicationPage).ApplicationBar = mApplicationBar;
+                            this.SetApplicationBarVisibility(true);
+                        }
+                        else
+                        {
+                            this.SetApplicationBarVisibility(false);
+                            if (((Application.Current.RootVisual as Microsoft.Phone.Controls.PhoneApplicationFrame).Content as
+                                Microsoft.Phone.Controls.PhoneApplicationPage).ApplicationBar != null)
+                            {
+                                ((Application.Current.RootVisual as Microsoft.Phone.Controls.PhoneApplicationFrame).Content as
+                                Microsoft.Phone.Controls.PhoneApplicationPage).ApplicationBar.IsVisible = false;
+                            }
+                        }
+                    });
             }
 
             /**
@@ -143,7 +169,9 @@ namespace MoSync
                             //The panorama gets the brush as a background
                             mPanorama.Background = imgBrush;
                         }
+                        else throw new InvalidPropertyValueException();
                     }
+                    throw new InvalidPropertyValueException();
                 }
             }
 
@@ -165,23 +193,23 @@ namespace MoSync
              * MAW_PANORAMA_VIEW_CURRENT_SCREEN property implementation
              */
             [MoSyncWidgetProperty(MoSync.Constants.MAW_PANORAMA_VIEW_CURRENT_SCREEN)]
-            public String CurrentScreen
+            public int CurrentScreen
             {
                 set
                 {
-                    int val = 0;
-                    if (Int32.TryParse(value, out val))
-                    {
-                        if(-1 < val && mPanorama.Items.Count > val)
-                            mPanorama.DefaultItem = mPanorama.Items[val];
-                    }
+                    if (-1 < value && mPanorama.Items.Count > value)
+                        mPanorama.DefaultItem = mPanorama.Items[value];
+                    else throw new InvalidPropertyValueException();
                 }
                 get
                 {
-                    return mPanorama.SelectedIndex.ToString();
+                    return mPanorama.SelectedIndex;
                 }
             }
 
+            /*
+             * Getter for the currently selected screen.
+             */
             public IScreen getSelectedScreen()
             {
                 return mChildren[mPanorama.SelectedIndex] as IScreen;

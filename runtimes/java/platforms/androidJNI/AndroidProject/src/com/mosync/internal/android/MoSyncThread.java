@@ -50,12 +50,15 @@ import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_ALERT;
 import static com.mosync.internal.generated.MAAPI_consts.MA_RESOURCE_OPEN;
 import static com.mosync.internal.generated.MAAPI_consts.MA_RESOURCE_CLOSE;
 
+import static com.mosync.internal.generated.MAAPI_consts.MA_WAKE_LOCK_ON;
+import static com.mosync.internal.generated.MAAPI_consts.MA_WAKE_LOCK_OFF;
+
+
 import java.io.File;
 import java.io.FileDescriptor;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
@@ -84,6 +87,7 @@ import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.PorterDuff.Mode;
@@ -100,6 +104,7 @@ import android.os.Vibrator;
 import android.telephony.TelephonyManager;
 import android.telephony.gsm.GsmCellLocation;
 import android.util.Log;
+import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.FrameLayout;
@@ -107,6 +112,7 @@ import android.provider.Settings.Secure;
 import android.net.ConnectivityManager;
 
 import com.mosync.internal.android.MoSyncFont.MoSyncFontHandle;
+import com.mosync.internal.android.billing.PurchaseManager;
 import com.mosync.internal.android.nfc.MoSyncNFC;
 import com.mosync.internal.android.nfc.MoSyncNFCService;
 import com.mosync.internal.generated.IX_OPENGL_ES;
@@ -116,7 +122,10 @@ import com.mosync.java.android.MoSyncPanicDialog;
 import com.mosync.java.android.MoSyncService;
 import com.mosync.java.android.TextBox;
 import com.mosync.nativeui.ui.widgets.MoSyncCameraPreview;
+import com.mosync.nativeui.ui.widgets.ScreenWidget;
 import com.mosync.nativeui.util.AsyncWait;
+import com.mosync.nativeui.util.properties.IntConverter;
+import com.mosync.nativeui.util.properties.PropertyConversionException;
 
 /**
  * Thread that runs the MoSync virtual machine and handles all syscalls.
@@ -151,6 +160,7 @@ public class MoSyncThread extends Thread
 	public native ByteBuffer nativeLoadCombined(ByteBuffer combined);
 	public native void nativeRun();
 	public native void nativePostEvent(int[] eventBuffer);
+	public native int nativeGetEventQueueSize();
 	public native int nativeCreateBinaryResource(
 		int resourceIndex,
 		int length);
@@ -177,6 +187,7 @@ public class MoSyncThread extends Thread
 	MoSyncAds mMoSyncAds;
 	MoSyncNotifications mMoSyncNotifications;
 	MoSyncCapture mMoSyncCapture;
+	MoSyncPurchase mMoSyncPurchase;
 	MoSyncDB mMoSyncDB;
 
 	/**
@@ -288,12 +299,15 @@ public class MoSyncThread extends Thread
 
 	int mTextConsoleHeight;
 
+	/**
+	 * Flag used to signal if the thread is sleeping.
+	 */
 	private volatile boolean mIsSleeping;
 
 	/**
 	 * Ascent of text in the default console font.
 	 */
-	int mTextConsoleAscent;
+	//int mTextConsoleAscent;
 
 	/**
 	 * Rectangle that is used to get the extent of a text string.
@@ -393,6 +407,7 @@ public class MoSyncThread extends Thread
 		}
 
 		//nativeInitRuntime();
+		mMoSyncPurchase = new MoSyncPurchase(this);
 
 		mMoSyncSensor = new MoSyncSensor(this);
 
@@ -436,6 +451,7 @@ public class MoSyncThread extends Thread
 
 		// Turn on sensors.
 		mMoSyncSensor.onResume();
+		mMoSyncPurchase.restoreService();
 	}
 
 	public void onPause()
@@ -465,6 +481,14 @@ public class MoSyncThread extends Thread
 		{
 			mMoSyncNetwork.killAllConnections();
 			mMoSyncNetwork = null;
+		}
+		if (null != mMoSyncPurchase)
+		{
+			/**
+			 * Unbind from the MarketBillingService.
+			 */
+			mMoSyncPurchase.unbindService();
+			mMoSyncPurchase = null;
 		}
 	}
 
@@ -624,6 +648,8 @@ public class MoSyncThread extends Thread
 
 		mHasDied = true;
 
+		// TODO: Run on UI thread?
+
 		// Launch panic dialog.
 		MoSyncPanicDialog.sPanicMessage = message;
 		Intent myIntent = new Intent(
@@ -781,6 +807,7 @@ public class MoSyncThread extends Thread
 	 * @param data The data to fill the new data object with.
 	 * @return The handle to the data if successful, <0 on error.
 	 * If a placeholder is supplied, that value is returned on success.
+	 *
 	 * TODO: This method needs improved error checking.
 	 */
 	public int createDataObject(int placeholder, byte[] data)
@@ -832,8 +859,14 @@ public class MoSyncThread extends Thread
 	 * @param	options	The bitmapFactory options
 	 *
 	 * @return	The created Bitmap, null if it failed
+	 *
+	 * TODO: There is no need for this method to be synchronized.
+	 * Find out why it was synchronized.
 	 */
-	synchronized Bitmap decodeImageFromData(final byte[] data, final BitmapFactory.Options options)
+	//synchronized
+	Bitmap decodeImageFromData(
+		final byte[] data,
+		final BitmapFactory.Options options)
 	{
 		try
 		{
@@ -842,17 +875,31 @@ public class MoSyncThread extends Thread
 			{
 				public void run()
 				{
-					Bitmap bitmap = BitmapFactory.decodeByteArray(
+					// Here we can get:
+					// java.lang.OutOfMemoryError: bitmap size exceeds VM budget
+					try
+					{
+						Bitmap bitmap = BitmapFactory.decodeByteArray(
 							data, 0, data.length, options);
-
-					waiter.setResult(bitmap);
+						waiter.setResult(bitmap);
+					}
+					catch (OutOfMemoryError e1)
+					{
+						//Log.i("@@@", "decodeImageFromData - " + "Out of memory error : " + e1);
+						waiter.setResult(null);
+					}
+					catch (Throwable e2)
+					{
+						//Log.i("@@@", "decodeImageFromData - " + "Error : " + e2);
+						waiter.setResult(null);
+					}
 				}
 			});
 			return waiter.getResult();
 		}
 		catch(InterruptedException ie)
 		{
-			Log.i("MoSync", "Couldn't decode image data.");
+			//Log.i("MoSync", "Couldn't decode image data.");
 			return null;
 		}
 	}
@@ -881,8 +928,15 @@ public class MoSyncThread extends Thread
 	 * @param	height	The width of the created Bitmap
 	 *
 	 * @return	The created Bitmap, null if it failed
+	 *
+	 * TODO: There is no need for this method to be synchronized.
+	 * Find out why it was synchronized.
+	 *
+	 * TODO: Look into eliminating code duplication between
+	 * createBitmap and createBitmapFromData.
 	 */
-	synchronized Bitmap createBitmap(final int width, final int height)
+	//synchronized
+	Bitmap createBitmap(final int width, final int height)
 	{
 		try
 		{
@@ -891,10 +945,25 @@ public class MoSyncThread extends Thread
 			{
 				public void run()
 				{
-					Bitmap bitmap = Bitmap.createBitmap(
+					// Here we can get:
+					// java.lang.OutOfMemoryError: bitmap size exceeds VM budget
+					try
+					{
+						Bitmap bitmap = Bitmap.createBitmap(
 							width, height, Bitmap.Config.ARGB_8888);
 
-					waiter.setResult(bitmap);
+						waiter.setResult(bitmap);
+					}
+					catch (OutOfMemoryError e1)
+					{
+						//Log.i("@@@", "createBitmapFromData - " + "Out of memory error : " + e1);
+						waiter.setResult(null);
+					}
+					catch (Throwable e2)
+					{
+						//Log.i("@@@", "createBitmapFromData - " + "Error : " + e2);
+						waiter.setResult(null);
+					}
 				}
 			});
 			return waiter.getResult();
@@ -914,8 +983,15 @@ public class MoSyncThread extends Thread
 	 * @param	pixels	The pixel data
 	 *
 	 * @return	The created Bitmap, null if it failed
+	 *
+	 * TODO: There is no need for this method to be synchronized.
+	 * Find out why it was synchronized.
 	 */
-	synchronized Bitmap createBitmapFromData(final int width, final int height, final int[] pixels)
+	//synchronized
+	Bitmap createBitmapFromData(
+		final int width,
+		final int height,
+		final int[] pixels)
 	{
 		try
 		{
@@ -924,17 +1000,32 @@ public class MoSyncThread extends Thread
 			{
 				public void run()
 				{
-					Bitmap bitmap = Bitmap.createBitmap(
+					// Here we can get:
+					// java.lang.OutOfMemoryError: bitmap size exceeds VM budget
+					try
+					{
+						Bitmap bitmap = Bitmap.createBitmap(
 							pixels, width, height, Bitmap.Config.ARGB_8888);
 
-					waiter.setResult(bitmap);
+						waiter.setResult(bitmap);
+					}
+					catch (OutOfMemoryError e1)
+					{
+						//Log.i("@@@", "createBitmapFromData - " + "Out of memory error : " + e1);
+						waiter.setResult(null);
+					}
+					catch (Throwable e2)
+					{
+						//Log.i("@@@", "createBitmapFromData - " + "Error : " + e2);
+						waiter.setResult(null);
+					}
 				}
 			});
 			return waiter.getResult();
 		}
 		catch(InterruptedException ie)
 		{
-			Log.i("MoSync", "Couldn't create bitmap from pixel data.");
+			//Log.i("MoSync", "Couldn't create bitmap from pixel data.");
 			return null;
 		}
 	}
@@ -945,22 +1036,6 @@ public class MoSyncThread extends Thread
 	public void updateScreen()
 	{
 		maUpdateScreen();
-	}
-
-	/**
-	 * Post a event to the MoSync event queue.
-	 */
-	public void postEvent(int[] event)
-	{
-		synchronized(mPostEventMonitor) {
-			// Add event to queue.
-			nativePostEvent(event);
-			// Wake up thread if sleeping.
-			if(mIsSleeping)
-			{
-				interrupt();
-			}
-		}
 	}
 
 	/**
@@ -1079,8 +1154,7 @@ public class MoSyncThread extends Thread
 		Paint.FontMetricsInt fontMetrics =
 			new Paint.FontMetricsInt();
 		mPaint.getFontMetricsInt(fontMetrics);
-		mTextConsoleHeight = -1 * fontMetrics.ascent + fontMetrics.descent;
-		mTextConsoleAscent = -1 * fontMetrics.ascent;
+		mTextConsoleHeight = -1 * fontMetrics.ascent;
 	}
 
 	/**
@@ -1275,7 +1349,6 @@ public class MoSyncThread extends Thread
 		// Old code:
 		// return EXTENT(mTextSizeRect.width(), mTextSizeRect.height());
 
-		// The new implementation uses a constant text height.
 		return EXTENT(mTextSizeRect.width(), mTextConsoleHeight);
 	}
 
@@ -1331,7 +1404,15 @@ public class MoSyncThread extends Thread
 
 		SYSLOG("maFontSetCurrent");
 
-		return mMoSyncFont.maFontSetCurrent(fontHandle);
+		// change the current font and update the mPaint
+		int previousFontHandle = mMoSyncFont.maFontSetCurrent(fontHandle);
+
+		// update the font "metrics"
+		Paint.FontMetricsInt fontMetrics = new Paint.FontMetricsInt();
+		mPaint.getFontMetricsInt(fontMetrics);
+		mTextConsoleHeight = -1 * fontMetrics.ascent;
+
+		return previousFontHandle;
 	}
 
 	/**
@@ -1426,7 +1507,7 @@ public class MoSyncThread extends Thread
 	{
 		SYSLOG("maDrawText");
 
-		mCanvas.drawText( str, left, top+mTextConsoleHeight, mPaint);
+		mCanvas.drawText( str, left, top + mTextConsoleHeight, mPaint);
 	}
 
 	/**
@@ -1439,7 +1520,7 @@ public class MoSyncThread extends Thread
 	{
 	 	SYSLOG("maDrawTextW");
 
-		mCanvas.drawText(str, left, top+mTextConsoleHeight, mPaint);
+		mCanvas.drawText(str, left, top + mTextConsoleHeight, mPaint);
 	}
 
 	/**
@@ -1763,6 +1844,8 @@ public class MoSyncThread extends Thread
 		// TODO: Remove variable bitmapSize, it is not used.
 		//int bitmapSize = scanLength * srcHeight;
 
+		//Log.i("@@@@@@", "_maGetImageData >>> handle: " + image + " hasAlpha: " + imageResource.mBitmap.hasAlpha());
+
 		if ((srcTop + srcHeight) > imageResource.mBitmap.getHeight())
 		{
 			maPanic(
@@ -1785,6 +1868,108 @@ public class MoSyncThread extends Thread
 				imageResource.mBitmap.getWidth() );
 		}
 
+		// TODO: removed the "fast" version because of a bug, visual output
+		// looks bad, run TestApp to test, fix this in 3.1. We use the "slow"
+		// version for now. Try approach to see if .hasAlpha() can be used.
+
+		// if (android.os.Build.VERSION.SDK_INT <= android.os.Build.VERSION_CODES.DONUT)
+
+		// In 1.6 and below we use the version that includes the bug fix.
+		_maGetImageDataAlphaBugFix(
+			image,
+			imageResource,
+			dst,
+			srcLeft,
+			srcTop,
+			srcWidth,
+			srcHeight,
+			scanLength);
+
+		/*
+		 * For what it is worth, this might be interesting to investigate,
+		 * found this comment on a forum:
+		 *
+		 * API level 12 added a method setHasAlpha() which you
+		 * can use instead of having to copy the image to get the alpha channel.
+		 */
+	}
+
+	/**
+	 * TODO: Not used, results look bad on tansparent pixels,
+	 * test to enable in 3.1. Call from maGetImageData.
+	 *
+	 * Plain way of getting the image pixel data.
+	 *
+	 * @param image
+	 * @param imageResource
+	 * @param dst
+	 * @param srcLeft
+	 * @param srcTop
+	 * @param srcWidth
+	 * @param srcHeight
+	 * @param scanLength
+	 */
+	@SuppressWarnings("unused")
+	private void _maGetImageDataFast(
+		int image,
+		ImageCache imageResource,
+		int dst,
+		int srcLeft,
+		int srcTop,
+		int srcWidth,
+		int srcHeight,
+		int scanLength)
+	{
+		try
+		{
+			int pixels[] = new int[srcWidth * srcHeight];
+
+			IntBuffer intBuffer = getMemorySlice(dst, -1).order(null).asIntBuffer();
+
+			imageResource.mBitmap.getPixels(
+				pixels,
+				0,
+				scanLength,
+				srcLeft,
+				srcTop,
+				srcWidth,
+				srcHeight);
+
+			intBuffer.put(pixels);
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+			maPanic(
+				-1,
+				"Exception in _maGetImageDataFast - " +
+				"check stack trace in logcat: " +
+				e.toString());
+		}
+	}
+
+	/**
+	 * Get image pixel data using a bug fix for the alpha channel.
+	 *
+	 * @param image
+	 * @param imageResource
+	 * @param dst
+	 * @param srcLeft
+	 * @param srcTop
+	 * @param srcWidth
+	 * @param srcHeight
+	 * @param scanLength
+	 */
+	private void _maGetImageDataAlphaBugFix(
+		int image,
+		ImageCache imageResource,
+		int dst,
+		int srcLeft,
+		int srcTop,
+		int srcWidth,
+		int srcHeight,
+		int scanLength)
+	{
 		int pixels[] = new int[srcWidth];
 		int colors[] = new int[srcWidth];
 		int alpha[] = new int[srcWidth];
@@ -1811,44 +1996,53 @@ public class MoSyncThread extends Thread
 		//mMemDataSection.position(dst);
 		//IntBuffer intBuffer = mMemDataSection.asIntBuffer();
 
-		IntBuffer intBuffer = getMemorySlice(dst, -1).asIntBuffer();
+		IntBuffer intBuffer = getMemorySlice(dst, -1).order(null).asIntBuffer();
 
-		try {
-
-		for (int y = 0; y < srcHeight; y++)
+		try
 		{
-			intBuffer.position(y*scanLength);
-
-			imageResource.mBitmap.getPixels(
-				alpha,
-				0,
-				srcWidth,
-				srcLeft,
-				srcTop+y,
-				srcWidth,
-				1);
-
-			temporaryBitmap.getPixels(
-				colors,
-				0,
-				srcWidth,
-				0,
-				y,
-				srcWidth,
-				1);
-
-			for( int i = 0; i < srcWidth; i++)
+			for (int y = 0; y < srcHeight; y++)
 			{
-				pixels[i] = (alpha[i]&0xff000000) + (colors[i]&0x00ffffff);
-			}
+				intBuffer.position(y*scanLength);
 
-			intBuffer.put(pixels);
+				imageResource.mBitmap.getPixels(
+					alpha,
+					0,
+					srcWidth,
+					srcLeft,
+					srcTop+y,
+					srcWidth,
+					1);
+
+				temporaryBitmap.getPixels(
+					colors,
+					0,
+					srcWidth,
+					0,
+					y,
+					srcWidth,
+					1);
+
+				for( int i = 0; i < srcWidth; i++)
+				{
+					pixels[i] = Color.argb(Color.alpha(alpha[i]),
+							Color.red(colors[i]), Color.green(colors[i]),
+							Color.blue(colors[i]));
+					//pixels[i] = (alpha[i]&0xff000000) + (colors[i]&0x00ffffff);
+				}
+
+				intBuffer.put(pixels);
+			}
 		}
-		} catch(Exception e) {
-			e.printStackTrace();
+		catch(Exception e)
+		{
 			//Log.i("_maGetImageData", "("+image+", "+srcLeft+","+srcTop+", "+srcWidth+"x"+srcHeight+"): "+
 			//	imageResource.mBitmap.getWidth()+"x"+imageResource.mBitmap.getHeight()+"\n");
-			maPanic(-1, "maGetImageData");
+			e.printStackTrace();
+			maPanic(
+				-1,
+				"Exception in _maGetImageDataAlphaBugFix - " +
+				"check stack trace in logcat: " +
+				e.toString());
 		}
 	}
 
@@ -2035,7 +2229,7 @@ public class MoSyncThread extends Thread
 
 		Bitmap bitmap = createBitmap(width, height);
 
-		if(null == bitmap)
+		if (null == bitmap)
 		{
 			maPanic(1, "Unable to create ");
 		}
@@ -2056,7 +2250,6 @@ public class MoSyncThread extends Thread
 		SYSLOG("maCreateDrawableImage");
 		try
 		{
-
 			Bitmap bitmap = createBitmap(width, height);
 
 			Canvas canvas = new Canvas(bitmap);
@@ -2325,35 +2518,80 @@ public class MoSyncThread extends Thread
 	}
 
 	/**
+	 * Post a event to the MoSync event queue.
+	 */
+	public void postEvent(int[] event)
+	{
+		synchronized (mPostEventMonitor)
+		{
+			// Add event to queue.
+			nativePostEvent(event);
+
+			// Wake up the MoSync thread if it is sleeping.
+			if (mIsSleeping)
+			{
+				mPostEventMonitor.notifyAll();
+			}
+		}
+	}
+
+	/**
 	 * maWait
+	 *
+	 * Now using wait/notifyAll for maWait/postEvent. This synchronises blocks
+	 * much more safely than sleep/interrupt. For further details, see e.g.
+	 * http://stackoverflow.com/questions/2779484/why-wait-should-always-be-in-synchronized-block
 	 */
 	void maWait(int timeout)
 	{
 		SYSLOG("maWait");
 
-		mIsSleeping = true;
-		try
+		// If there are NO events in the queue, we wait.
+		synchronized (mPostEventMonitor)
 		{
-	 		if (timeout<=0)
+			int size = nativeGetEventQueueSize();
+			if (size > 0)
 			{
-				Thread.sleep(Long.MAX_VALUE);
+				// There are events in the queue, just return.
+				//Log.i("@@@ MoSync", "maWait: direct return, size: " + size);
+				return;
+			}
+
+			mIsSleeping = true;
+
+			long timeStamp;
+
+			if (timeout > 0)
+			{
+				timeStamp = System.currentTimeMillis() + timeout;
 			}
 			else
 			{
-				Thread.sleep(timeout);
+				timeStamp = Long.MAX_VALUE;
 			}
-		}
-		catch (InterruptedException ie)
-		{
-			SYSLOG("Sleeping thread interrupted (this is normal behaviour)");
-		}
-		// TODO: This exception is never thrown! Remove it.
-		catch (Exception e)
-		{
-			logError("Thread sleep failed : " + e.toString(), e);
-		}
 
-		mIsSleeping = false;
+			try
+			{
+				while ((nativeGetEventQueueSize() < 1)
+					&& (System.currentTimeMillis() < timeStamp))
+				{
+					// Note that wait gives up lock on this synchronised block.
+					mPostEventMonitor.wait(timeStamp - System.currentTimeMillis());
+				}
+			}
+			catch (InterruptedException ie)
+			{
+				SYSLOG("maWait interrupted (this is normal behaviour)");
+				ie.printStackTrace();
+			}
+			catch (Exception e)
+			{
+				logError("maWait exception : " + e.toString(), e);
+				e.printStackTrace();
+			}
+
+			mIsSleeping = false;
+		}
 
 		SYSLOG("maWait returned");
 	}
@@ -2484,7 +2722,7 @@ public class MoSyncThread extends Thread
 	}
 
 	/**
-	 * Implemation of the maWriteLog syscall which only
+	 * Implementation of the maWriteLog syscall which only
 	 * sends the log message to the Android Logcat.
 	 * @param str The string to send to logcat.
 	 * @param size The number of characters in the string.
@@ -2674,19 +2912,25 @@ public class MoSyncThread extends Thread
 
 			return 0;
 		}
-/*
+
 		else if(url.startsWith("tel://"))
 		{
-			if(!(mContext.getPackageManager().checkPermission("android.permission.NFC",
-					mContext.getPackageName()) == PackageManager.PERMISSION_GRANTED))
-			{
+			Log.i("maPlatformRequest","Starting a call - " + url);
 
+			// check to see if the proper permission is granted
+			if(!(mContext.getPackageManager().checkPermission("android.permission.CALL_PHONE",
+								mContext.getPackageName()) == PackageManager.PERMISSION_GRANTED))
+			{
+				Log.i("@MoSync", "Permission to make phone call not set!");
+				return -2;
 			}
 
 			Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse(url));
 			((Activity)mContext).startActivity(intent);
+
+			return 0;
 		}
-*/
+
 		return -1;
 	}
 
@@ -2744,14 +2988,20 @@ public class MoSyncThread extends Thread
 
 			Bitmap bitmap = decodeImageFromData(ra, null);
 
+			// TODO: Remove commencted out line.
 			//Bitmap bitmap = BitmapFactory.decodeByteArray(ra, 0, length);
-			if(bitmap != null)
+
+			if (bitmap != null)
 			{
 				SYSLOG("Bitmap was created!");
 				mImageResources.put(
 					resourceIndex, new ImageCache(null, bitmap));
+
+				// Return success.
 				return true;
 			}
+
+			// If we end up here an error occurred.
 			logError("loadImage - Bitmap wasn't created from Resource: "
 				+ resourceIndex);
 			return false;
@@ -3412,6 +3662,183 @@ public class MoSyncThread extends Thread
 	}
 
 	/**
+	* \brief Check if in app purchase is supported/enabled on a device.
+	* It does not trigger any asynchronous responses.
+	* Platform: Android and iOS.
+	*
+	* \returns One of the next result codes:
+	* - #MA_PURCHASE_RES_OK if purchase is supported/allowed on the device.
+	* - #MA_PURCHASE_RES_DISABLED if purchase is not allowed/enabled.
+	* - #MA_PURCHASE_RES_UNAVAILABLE if purchase is not supported on the device.
+	* - #MA_PURCHASE_RES_OUT_OF_DATE if GooglePlay application is out of date.
+	* - #MA_PURCHASE_RES_CONNECTION_ERROR if there was an error connecting with the GooglePlay application.
+	*/
+	int maPurchaseSupported()
+	{
+		return mMoSyncPurchase.maPurchaseSupported();
+	}
+
+	/**
+	* \brief Create a product object asynchronously.
+	* The product is validated only on iOS. On the other hand, on Android the validation
+	* will be done during a maPurchaseRequest.
+	*
+	* A #EVENT_TYPE_PURCHASE will be sent after calling this syscall.
+	* The event will contain a MAPurchaseEventData struct object. The type member object
+	* contained by the struct will be #MA_PURCHASE_EVENT_PRODUCT_CREATE. The state member
+	* object can have one of the following values:
+	* - #MA_PURCHASE_STATE_PRODUCT_VALID
+	*				- on iOS if the product was validated by the App Store,
+	*				- on Android if the product was internally allocated.
+    * - #MA_PURCHASE_STATE_PRODUCT_INVALID the product is not valid in the App Store.
+    * - #MA_PURCHASE_STATE_DISABLED purchase is not supported/disabled on the device.
+    * - #MA_PURCHASE_STATE_DUPLICATE_HANDLE the given productHandle already exists.
+	* Use #maCreatePlaceholder() to generate a new one.
+	*
+	* \param productHandle A valid handle that will be used to indetify the new product.
+	* It must be unique. It is highly recommended to create it using #maCreatePlaceholder().
+	* \param productID String that identifies the product. This string must be used by the
+	* App Store / Google Play to identify the product.
+	*/
+	void maPurchaseCreate(final int productHandle, final String productID)
+	{
+		mMoSyncPurchase.maPurchaseCreate(productHandle, productID);
+	}
+
+	/**
+	* \brief Set your Google Play public key to the application. This enables the application
+	* to verify the signature of the transaction information that is returned from Google Play.
+	* Must be set before #maVerifyReceipt.
+	* Platform: Android.
+	*
+	* \param developerKey Base64-encoded public key, that can be found on the Google
+	* Play publisher account page, under Licensing & In-app Billing panel in Edit Profile.
+	*/
+	int maPurchaseSetPublicKey(final String developerPublicKey)
+	{
+		return mMoSyncPurchase.maPurchaseSetPublicKey(developerPublicKey);
+	}
+
+	/**
+	* Request the user to purchase a product.
+	* The system will handle the proccess of purchasing.
+	* Note: if there are another requests in progress, the requests will be queued.
+	*
+	* A #EVENT_TYPE_PURCHASE will be sent after calling this syscall.
+	* The event will contain a MAPurchaseEventData struct object. The type member object
+	* contained by the struct is #MA_PURCHASE_EVENT_REQUEST. The state member object can
+	* have one of the following values:
+    * - #MA_PURCHASE_STATE_DISABLED purchase is not supported/disabled on the device.
+	* - #MA_PURCHASE_STATE_FAILED if the operation has failed. Check the errorCode member object
+	* for more information about the reason.
+	* - #MA_PURCHASE_STATE_IN_PROGRESS indicates that the transaction has been received by
+	* the App Store / Google Play.
+	* - #MA_PURCHASE_STATE_COMPLETED indicates that the transaction has been successfully processed.
+	*
+	* \param productHandle Handle to the product to be purchased.
+	* \param quantity How many products to be purchased. Must be a value greater than zero.
+	* This param is ignored on Android, as any purchase request can handle only one item.
+	*/
+	void maPurchaseRequest(final int productHandle)
+	{
+		mMoSyncPurchase.maPurchaseRequest(productHandle);
+	}
+
+	/**
+	* Verify if the receipt came from Apple App Store / Google Play.
+	* Make sure that the product is purchased before calling this syscall.
+	*
+	* A #EVENT_TYPE_PURCHASE will be sent after calling this syscall.
+	* The event will contain a MAPurchaseEventData struct object. The type member object
+	* contained by the struct is #MA_PURCHASE_EVENT_VERIFY_RECEIPT.The state member object
+	* can have one of the following values:
+    * - #MA_PURCHASE_STATE_DISABLED purchase is not supported/disabled on the device.
+	* - #MA_PURCHASE_STATE_RECEIPT_VALID indicates that the transaction has been validated
+	* by the App Store / Google Play.
+	* - #MA_PURCHASE_STATE_RECEIPT_INVALID indicates that the transaction is invalid.
+	* - #MA_PURCHASE_STATE_RECEIPT_ERROR indicates that an error occurred while verifying
+	* the receipt. Check the errorCode member object for more information about the reason.
+    *
+	* \param productHandle Handle to the product that has been purchased.
+	* - #MA_PURCHASE_RES_PUBLIC_KEY_NOT_SET.
+	*/
+	void maPurchaseVerifyReceipt(final int productHandle)
+	{
+		mMoSyncPurchase.maPurchaseVerifyReceipt(productHandle);
+	}
+
+	/**
+	* Get product id using a product handle.
+	*
+	* \param productHandle Handle to the given product.
+	* \param buffer Will contain the product id.
+	* \param bufferSize Maximum size of the buffer.
+	* \return In case of error:
+	* - #MA_PURCHASE_RES_INVALID_HANDLE if productHandle is invalid.
+	* - #MA_PURCHASE_RES_BUFFER_TOO_SMALL if the given handle is too small.
+	* In case of success returns the number of written bytes.
+	*/
+	int maPurchaseGetName(
+			final int productHandle,
+			final int memBuffer,
+			final int memSize)
+	{
+		return mMoSyncPurchase.maPurchaseGetName(productHandle, memBuffer, memSize);
+	}
+
+	/**
+	* Get a field value contained by the receipt.
+	* Make sure that the given product has a valid receipt.
+	* Call the maPurchaseVerifyReceipt() syscall and wait for a #MA_PURCHASE_EVENT_RECEIPT_VALID
+	* purchase event type.
+	*
+	* \param productHandle Handle to the product that has been purchased.
+	* \param property The name of the field.
+	* \param buffer Will be filled with the filed value.
+	* \param bufferSize The maximum size of the buffer, in bytes.
+	* \return The number of written bytes into buffer(a value greater than zero), or one
+	* of the following error codes(a value smaller that zero):
+	* - #MA_PURCHASE_RES_OK if the request has been send to the store for verifying.
+	* - #MA_PURCHASE_RES_INVALID_HANDLE if the productHandle is invalid.
+	* - #MA_PURCHASE_RES_RECEIPT if the product has not been purchased.
+	* - #MA_PURCHASE_RES_DISABLED if purchase is not allowed/enabled.
+	*/
+	int maPurchaseGetField(
+			final int productHandle,
+			final String property,
+			final int memBuffer,
+			final int bufferSize)
+	{
+		return mMoSyncPurchase.maPurchaseGetField(productHandle, property, memBuffer, bufferSize);
+	}
+
+	/**
+	* Restore transactions that were previously finished so that you can process them again.
+	* For example, your application would use this to allow a user to unlock previously purchased
+	* content onto a new device.
+	*
+	* A #EVENT_TYPE_PURCHASE will be sent after calling this syscall.
+	* The event will contain a #MAPurchaseEventData struct object. The type member object
+	* contained by the struct will be #MA_PURCHASE_EVENT_RESTORE. The productHandle member object
+	* will contain a handle to the new product. Make sure you destroy the product after done
+	* working with it.
+	*/
+	void maPurchaseRestoreTransactions()
+	{
+		mMoSyncPurchase.maPurchaseRestoreTransactions();
+	}
+
+	/**
+	* Destroy a product object.
+	* \param productHandle Handle to the product to destroy.
+	* If the given handle is invalid the method does nothing.
+	*/
+	int maPurchaseDestroy(int handle)
+	{
+		return mMoSyncPurchase.maPurchaseDestroy(handle);
+	}
+
+	/**
 	 * Send the application to background.
 	 * @return
 	 */
@@ -3690,6 +4117,21 @@ public class MoSyncThread extends Thread
 		return mMoSyncAudio.maAudioInstanceCreate(audioData);
 	}
 
+	int maAudioInstanceCreateDynamic(int sampleRate, int numChannels, int bufferSize)
+	{
+		return mMoSyncAudio.maAudioInstanceCreateDynamic(sampleRate, numChannels, bufferSize);
+	}
+
+	int maAudioSubmitBuffer(int audioInstance, int mem, int memSize)
+	{
+		return mMoSyncAudio.maAudioSubmitBuffer(audioInstance, mem, memSize);
+	}
+
+	int maAudioGetPendingBufferCount(int audioInstance)
+	{
+		return mMoSyncAudio.maAudioGetPendingBufferCount(audioInstance);
+	}
+
 	int maAudioInstanceDestroy(int audioInstance)
 	{
 		return mMoSyncAudio.maAudioInstanceDestroy(audioInstance);
@@ -3799,6 +4241,43 @@ public class MoSyncThread extends Thread
 	}
 
 	/**
+	 * Activate/deactivate wake lock.
+	 * @param flag
+	 */
+	int maWakeLock(final int flag)
+	{
+		getActivity().runOnUiThread(new Runnable()
+		{
+			public void run()
+			{
+				try
+				{
+					if (MA_WAKE_LOCK_ON == flag)
+					{
+						Window w = mContext.getWindow();
+						w.setFlags(
+							WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON,
+							WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+					}
+					else
+					{
+						Window w = mContext.getWindow();
+						w.setFlags(
+							0,
+							WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+					}
+				}
+				catch(Exception ex)
+				{
+					Log.i("MoSync", "maWakeLock: Could not set wake lock.");
+					ex.printStackTrace();
+				}
+			}
+		});
+		return 1;
+	}
+
+	/**
 	 * Internal wrapper for maWidgetCreate that runs
 	 * the call in the UI thread.
 	 */
@@ -3904,6 +4383,40 @@ public class MoSyncThread extends Thread
 			widgetHandle, key, memBuffer, memBufferSize);
 	}
 
+	/**
+	 * Add an item to the Options Menu associated to a screen.
+	 * @param widgetHandle The screen handle.
+	 * @param title The title associated for the new item. Can be left null.
+	 * @param iconHandle MoSync handle to an uncompressed image resource,or:
+	 * a predefined Android icon.
+	 * @param iconPredefined Specifies if the icon is a project resource, or one of
+	 * the predefined Android icons. By default it's value is 0.
+	 * @return The index on which the menu item was added in the options menu,
+	 * or an error code otherwise.
+	 */
+	public int maWidgetScreenAddOptionsMenuItem(
+			final int widgetHandle,
+			final String title,
+			final String iconHandle,
+			final int iconPredefined)
+	{
+		return mMoSyncNativeUI.maWidgetScreenAddOptionsMenuItem(
+				widgetHandle, title, iconHandle, iconPredefined);
+	}
+
+	/**
+	 * Get the focused  screen.
+	 * @return The screen widget handle.
+	 */
+	public ScreenWidget getCurrentScreen()
+	{
+		return mMoSyncNativeUI.getCurrentScreen();
+	}
+
+	public void setCurrentScreen(int handle)
+	{
+		mMoSyncNativeUI.setCurrentScreen(handle);
+	}
 	/**
 	 * Internal wrapper for maWidgetStackScreenPush that runs
 	 * the call in the UI thread.
@@ -4767,48 +5280,89 @@ public class MoSyncThread extends Thread
 		return mMoSyncNFC == null ? IOCTL_UNAVAILABLE : mMoSyncNFC.maNFCIsReadOnly(tagHandle);
 	}
 
+	/**
+	 * Fill in an MACellInfo.
+	 * @param cellinfo Pointer to an MACellInfo struct in MoSync memory.
+	 * @return 0 on success, <0 on error.
+	 * TODO: Should there be constants for error codes? Now they are
+	 * undocumented (no documentation in maapi.idl).
+	 */
 	int maGetCellInfo(int cellinfo)
 	{
 		// Check that the Coarse Location permission is set,
-		//  otherwise the CellID request will freeze the device
-		if(!(mContext.getPackageManager().checkPermission("android.permission.ACCESS_COARSE_LOCATION",
-				mContext.getPackageName()) == PackageManager.PERMISSION_GRANTED))
+		// otherwise the CellID request will freeze the device.
+		int permission = mContext.getPackageManager().checkPermission(
+			"android.permission.ACCESS_COARSE_LOCATION",
+			mContext.getPackageName());
+		if (permission != PackageManager.PERMISSION_GRANTED)
 		{
-			return -3;
+			return -3; // Error (Permission not set).
 		}
 
 		TelephonyManager manager = (TelephonyManager)
 				mContext.getSystemService(Context.TELEPHONY_SERVICE);
-
-		// Only works with GSM type phone, no CDMA
-		if(manager.getPhoneType() != TelephonyManager.PHONE_TYPE_GSM)
+		if (null == manager)
+		{
 			return -2;
+		}
+
+		// Only works with GSM type phone, not with CDMA.
+		if (manager.getPhoneType() != TelephonyManager.PHONE_TYPE_GSM)
+		{
+			return -2;
+		}
 
 		// Get the Cell information
-		GsmCellLocation gsmcell = (GsmCellLocation) manager.getCellLocation();
-
-		if(gsmcell == null)
+		GsmCellLocation gsmCell = (GsmCellLocation) manager.getCellLocation();
+		if (null == gsmCell)
+		{
 			return -2;
+		}
 
-		int cell = gsmcell.getCid();
-		int lac = gsmcell.getLac();
+		// Get cell id and lac.
+		int cellId = gsmCell.getCid();
+		int lac = gsmCell.getLac();
 
-		// Get the mcc and mnc strings
-		String mcc_mnc = manager.getNetworkOperator();
-		if (mcc_mnc == null)
+		// Get MCC and NMC.
+		// MCC and NMC is concatenated in networkOperator.
+		// First 3 chars are MCC, remaining chars are MNC.
+		String mcc = "";
+		String mnc = "";
+		String networkOperator = manager.getNetworkOperator();
+		if (null == networkOperator)
+		{
 			return -2;
+		}
 
-		byte[] mcc = mcc_mnc.substring(0, 3).getBytes();
-		byte[] mnc = mcc_mnc.substring(3).getBytes();
+		if (networkOperator.length() > 4)
+		{
+			// Extract values.
+			mcc = networkOperator.substring(0, 3);
+			mnc = networkOperator.substring(3);
 
-		// Store everything in the correct memory location
-		ByteBuffer mem = getMemorySlice(cellinfo, 64);
-		mem.put(mcc);
+			// Guard against overflow.
+			if (mnc.length() > 7)
+			{
+				mnc = mnc.substring(0, 8);
+			}
+		}
+
+		// Store everything in the correct memory location.
+		// Size of MACellInfo is 20 bytes.
+		ByteBuffer mem;
+		// Store MCC (max 4 bytes including terminator char).
+		mem = getMemorySlice(cellinfo, 4);
+		mem.put(mcc.getBytes());
 		mem.put((byte)0);
-		mem.put(mnc);
+		// Store MNC (max 8 bytes including terminator char).
+		mem = getMemorySlice(cellinfo + 4, 8);
+		mem.put(mnc.getBytes());
 		mem.put((byte)0);
+
+		// Put lac and cellid, these are two 4 byte ints.
+		mem = getMemorySlice(cellinfo + 4 + 8, 8);
 		mem.putInt(lac);
-		mem.putInt(cell);
+		mem.putInt(cellId);
 
 		return 0;
 	}

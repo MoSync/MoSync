@@ -152,20 +152,6 @@ MAUtil::DataHandler
 
 <tr style="background-color: rgb(207, 226, 243);">
 <td>
-<strong>Permanent storage</strong>
-</td>
-<td>Store settings, values, downloaded data and programs.<br>
-</td>
-<td>maOpenStore(), maWriteStore(), maReadStore(), maCloseStore()<br>
-</td>
-<td><br>
-</td>
-<td><a href="#res" class="el">Resource management</a><br>
-</td>
-</tr>
-
-<tr style="background-color: rgb(207, 226, 243);">
-<td>
 <strong>Graphics</strong>
 </td>
 <td>Draw pixels, lines, rectangles, triangles and images to either the screen or to a drawable image. Create new images, either empty or from compressed or uncompressed data. Use a clipping rectange to control drawing.<br>
@@ -275,6 +261,21 @@ MAUtil::DataHandler
 <td><a href="#event" class="el">Event handling</a><br>
 </td>
 </tr>
+
+<tr style="background-color: rgb(207, 226, 243);">
+<td>
+<strong>Permanent storage</strong>
+</td>
+<td>Store settings, values, downloaded data and programs.<br>
+</td>
+<td>maOpenStore(), maWriteStore(), maReadStore(), maCloseStore()<br>
+</td>
+<td><br>
+</td>
+<td><a href="#res" class="el">Resource management</a><br>
+</td>
+</tr>
+
 <tr style="background-color: rgb(207, 226, 243);">
 <td><strong>Filesystem</strong><br>
 </td>
@@ -284,9 +285,33 @@ MAUtil::DataHandler
 </td>
 <td><br>
 </td>
-<td><br>
+<td><a href="#res" class="el">Resource management</a><br>
 </td>
 </tr>
+
+<tr style="background-color: rgb(207, 226, 243);">
+<td>
+<strong>Database API</strong>
+</td>
+<td>Functions for accessing SQLite databases. Note that maDBExecSQLParams() currently is available on iOS and MoRE (not on Android).<br>
+</td>
+<td>maDBOpen(),
+maDBClose(),
+maDBExecSQL(),
+maDBExecSQLParams(),
+maDBCursorDestroy(),
+maDBCursorNext(),
+maDBCursorGetColumnData(),
+maDBCursorGetColumnText(),
+maDBCursorGetColumnInt(),
+maDBCursorGetColumnDouble()<br>
+</td>
+<td><br>
+</td>
+<td><a href="#res" class="el">Resource management</a><br>
+</td>
+</tr>
+
 <tr style="background-color: rgb(207, 226, 243);">
 <td><strong>Camera</strong><br>
 </td>
@@ -344,6 +369,20 @@ MAUtil::DataHandler
 
 <tr style="background-color: rgb(207, 226, 243);">
 <td>
+<strong>In-App Purchases</strong>
+</td>
+<td>Purchase products from within your application.<br>
+</td>
+<td>maPurchaseSupported(), maPurchaseCreate(), maPurchaseSetPublicKey(), maPurchaseRequest(), maPurchaseVerifyReceipt(), maPurchaseGetField(), maPurchaseSetStoreURL(), maPurchaseGetName(), maPurchaseRestoreTransactions(), maPurchaseDestroy()<br>
+</td>
+<td>\ref IAP<br>
+</td>
+<td>\ref PurchaseAPI<br>
+</td>
+</tr>
+
+<tr style="background-color: rgb(207, 226, 243);">
+<td>
 <strong>Device fonts</strong>
 </td>
 <td>Set device fonts for maDrawText(), maDrawTextW(), and for NativeUI widgets.<br>
@@ -386,7 +425,7 @@ MAUtil::DataHandler
 </td>
 <td>Access to device specific UI system. Currently only available for Android, iOS and Windows Phone 7.<br>
 </td>
-<td>maWidgetCreate(), maWidgetDestroy(), maWidgetAddChild(), maWidgetInsertChild(), maWidgetRemoveChild(), maWidgetScreenShow(), maWidgetStackScreenPush(), maWidgetStackScreenPop(), maWidgetSetProperty(), maWidgetGetProperty()<br>
+<td>maWidgetCreate(), maWidgetDestroy(), maWidgetAddChild(), maWidgetInsertChild(), maWidgetRemoveChild(), maWidgetScreenShow(), maWidgetStackScreenPush(), maWidgetStackScreenPop(), maWidgetSetProperty(), maWidgetGetProperty(), maWidgetModalDialogShow(), maWidgetModalDialogHide(), maWidgetScreenAddOptionsMenuItem()<br>
 </td>
 <td>IX_WIDGET.h<br> NativeUI <br>
 </td>

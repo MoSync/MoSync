@@ -146,6 +146,9 @@ MA 02110-1301, USA.
 *- \b ListViewItem \n
 *	A widget that can be put in a ListView. It has a default layout for placing a text and a icon. But any view can be added to it in order to create a custom appearance.
 *
+*- \b Map \n
+*	A widget that contains a google map (for Android and iOS) or a bing map (for Windows Phone).
+*
 *- \b NavBar \n
 *	A toolbar-like view that can have a back button and a title. A NavBar will automatically appear if you're using a StackScreen. It is only available on iOS for now.
 *
@@ -154,6 +157,15 @@ MA 02110-1301, USA.
 *
 *- \b ProgressBar \n
 *	Used to display the progress of a task over time.
+*
+*- \b RadioButton \n
+*	Used for single item selection. It is only available on Android for now.
+*
+*- \b RadioGroup \n
+*	Used for grouping RadioButtons. It is only available on Android for now.
+*
+*- \b RatingBar \n
+*	Used to display a rating in stars. It is only available on Android for now.
 *
 *- \b SearchBar \n
 *	Like an editbox on a toolbar with a default look and feel and a button for performing the search.

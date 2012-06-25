@@ -424,6 +424,13 @@ static void nativePostEvent(JNIEnv* env, jobject jthis, jintArray eventBuffer)
 		event.captureData.type = intArray[1];
 		event.captureData.handle = intArray[2];
 	}
+	else if (event.type == EVENT_TYPE_PURCHASE)
+	{
+		event.purchaseData.type = intArray[1];
+		event.purchaseData.state = intArray[2];
+		event.purchaseData.productHandle = intArray[3];
+		event.purchaseData.errorCode = intArray[4];
+	}
 	else if (event.type == EVENT_TYPE_WIDGET)
 	{
 		/*
@@ -485,6 +492,7 @@ static void nativePostEvent(JNIEnv* env, jobject jthis, jintArray eventBuffer)
 		 * intArray[3] - Hook type.
 		 * intArray[4] - Handle to url data.
 		 *
+		 * WIDGET_EVENT_RATING_STAR_VALUE_CHANGED
 		 */
 
 		// Allocate the widget event data structure.
@@ -546,6 +554,23 @@ static void nativePostEvent(JNIEnv* env, jobject jthis, jintArray eventBuffer)
 			widgetEvent->hookType = intArray[3];
 			widgetEvent->urlData = intArray[4];
 		}
+		else if (widgetEventType == MAW_EVENT_RATING_BAR_VALUE_CHANGED)
+		{
+			memcpy( &widgetEvent->value, intArray + 3, sizeof(jint) );
+			widgetEvent->fromUser = intArray[4];
+		}
+		else if (widgetEventType == MAW_EVENT_RADIO_GROUP_ITEM_SELECTED)
+		{
+			widgetEvent->radioGroupItemHandle = intArray[3];
+		}
+		else if (widgetEventType == MAW_EVENT_RADIO_BUTTON_STATE_CHANGED)
+		{
+			widgetEvent->radioButtonState = intArray[3];
+		}
+		else if (widgetEventType == MAW_EVENT_OPTIONS_MENU_ITEM_SELECTED)
+		{
+			widgetEvent->optionsMenuItem = intArray[3];
+		}
 
 		event.data = (int)widgetEvent;
 	}
@@ -575,6 +600,14 @@ static void nativePostEvent(JNIEnv* env, jobject jthis, jintArray eventBuffer)
 	env->ReleaseIntArrayElements(eventBuffer, intArray, 0);
 
 	Base::gSyscall->postEvent(event);
+}
+
+/**
+* @brief nativeGetEventQueueSize
+*/
+static int nativeGetEventQueueSize(JNIEnv* env, jobject jthis)
+{
+	return Base::gSyscall->getEventQueueSize();
 }
 
 /**
@@ -647,7 +680,9 @@ int jniRegisterNativeMethods(
 	return 0;
 }
 
-jint gNumJavaMethods = 9;
+// NOTE: Remember to update sNumJavaMethods when adding/removing
+// native methods!
+static jint sNumJavaMethods = 10;
 static JNINativeMethod sMethods[] =
 {
 	// name, signature, funcPtr
@@ -658,9 +693,11 @@ static JNINativeMethod sMethods[] =
 	{ "nativeLoadCombined", "(Ljava/nio/ByteBuffer;)Ljava/nio/ByteBuffer;", (void*)nativeLoadCombined },
 	{ "nativeRun", "()V", (void*)nativeRun },
 	{ "nativePostEvent", "([I)V", (void*)nativePostEvent },
+	{ "nativeGetEventQueueSize", "()I", (void*)nativeGetEventQueueSize },
 	{ "nativeCreateBinaryResource", "(II)I", (void*)nativeCreateBinaryResource },
 	{ "nativeCreatePlaceholder", "()I", (void*)nativeCreatePlaceholder },
 	{ "nativeExit", "()V", (void*)nativeExit }
+	// *** Update sNumJavaMethods when adding/removing a method! *** //
 };
 
 /**
@@ -686,7 +723,7 @@ jint JNI_OnLoad(JavaVM* vm, void* reserved)
 		env,
 		"com/mosync/internal/android/MoSyncThread",
 		sMethods,
-		gNumJavaMethods);
+		sNumJavaMethods);
 
 	return JNI_VERSION_1_4;
 }

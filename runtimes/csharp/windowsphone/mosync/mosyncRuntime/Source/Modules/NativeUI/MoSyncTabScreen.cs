@@ -34,6 +34,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Shapes;
+using System.Collections.Generic;
 
 namespace MoSync
 {
@@ -53,6 +54,34 @@ namespace MoSync
             {
                 mPivot = new Microsoft.Phone.Controls.Pivot();
 
+                mApplicationBarItemsIndexes = new Dictionary<Object, int>();
+
+                //The application bar is chanded at the SelectionChanged event occurence.
+                //This allows the user to have more that one application bar / tabScreen
+                mPivot.LoadedPivotItem += new EventHandler<Microsoft.Phone.Controls.PivotItemEventArgs>(
+                    delegate(object from, Microsoft.Phone.Controls.PivotItemEventArgs target)
+                    {
+                        bool appBarVisible = (this.mChildren[(from as Microsoft.Phone.Controls.Pivot).SelectedIndex] as Screen).GetApplicationBarVisibility();
+                        if (appBarVisible)
+                        {
+                            mApplicationBar = (this.mChildren[(from as Microsoft.Phone.Controls.Pivot).SelectedIndex] as Screen).GetApplicationBar();
+                            mApplicationBar.IsVisible = true;
+                            ((Application.Current.RootVisual as Microsoft.Phone.Controls.PhoneApplicationFrame).Content as
+                                Microsoft.Phone.Controls.PhoneApplicationPage).ApplicationBar = mApplicationBar;
+                            this.SetApplicationBarVisibility(true);
+                        }
+                        else
+                        {
+                            this.SetApplicationBarVisibility(false);
+                            if (((Application.Current.RootVisual as Microsoft.Phone.Controls.PhoneApplicationFrame).Content as
+                                Microsoft.Phone.Controls.PhoneApplicationPage).ApplicationBar != null)
+                            {
+                                ((Application.Current.RootVisual as Microsoft.Phone.Controls.PhoneApplicationFrame).Content as
+                                Microsoft.Phone.Controls.PhoneApplicationPage).ApplicationBar.IsVisible = false;
+                            }
+                        }
+                    });
+
                 //Setting the content of the View property of a Screen (which is a PhoneApplicationPage)
                 //as the Pivot control
                 mPage.Children.Add(mPivot);
@@ -70,7 +99,6 @@ namespace MoSync
                     MoSync.Util.RunActionOnMainThreadSync(() =>
                         {
                             //pivotItem.Content = (child as Screen);
-
                             mPivot.Items.Add(new Microsoft.Phone.Controls.PivotItem
                             {
                                 Header = (child as Screen).getScreenTitle,
@@ -136,22 +164,30 @@ namespace MoSync
              * MAW_TAB_SCREEN_CURRENT_TAB property implementation
              */
             [MoSyncWidgetProperty(MoSync.Constants.MAW_TAB_SCREEN_CURRENT_TAB)]
-            public String CurrentTab
+            public int CurrentTab
             {
                 set
                 {
-                    int val;
-                    if (Int32.TryParse(value, out val))
+                    if (value < mPivot.Items.Count)
                     {
-                        if (val < mPivot.Items.Count)
-                        {
-                            mPivot.SelectedIndex = val;
-                        }
+                        mPivot.SelectedIndex = value;
+
+                        //MAW_EVENT_TAB_CHANGED event needs a memory chunk of 12 bytes
+                        Memory eventData = new Memory(12);
+                        const int MAWidgetEventData_eventType = 0;
+                        const int MAWidgetEventData_widgetHandle = 4;
+                        const int MAWidgetEventData_currentTab = 8;
+                        eventData.WriteInt32(MAWidgetEventData_eventType, MoSync.Constants.MAW_EVENT_TAB_CHANGED);
+                        eventData.WriteInt32(MAWidgetEventData_widgetHandle, mHandle);
+                        eventData.WriteInt32(MAWidgetEventData_currentTab, mPivot.SelectedIndex);
+                        //Posting a CustomEvent
+                        mRuntime.PostCustomEvent(MoSync.Constants.EVENT_TYPE_WIDGET, eventData);
                     }
+                    else throw new InvalidPropertyValueException();
                 }
                 get
                 {
-                    return mPivot.SelectedIndex.ToString();
+                    return mPivot.SelectedIndex;
                 }
             }
         }

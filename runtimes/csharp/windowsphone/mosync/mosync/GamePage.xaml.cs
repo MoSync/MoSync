@@ -1,4 +1,6 @@
-﻿using System;
+﻿#define USE_THREAD_LOCKED_VERSION
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -21,7 +23,12 @@ namespace test_mosync
     {
         ContentManager contentManager;
         GameTimer timer;
-        SpriteBatch spriteBatch;
+
+		bool mShouldDrawFrame = false;
+		MoSync.Machine mMachine;
+		MoSync.Runtime mRuntime;
+		MoSync.OpenGLESModule mOpenGLESModule;
+		bool mOnDrawInitialized = false;
 
         public GamePage()
         {
@@ -32,25 +39,77 @@ namespace test_mosync
 
             // Create a timer for this page
             timer = new GameTimer();
-            timer.UpdateInterval = TimeSpan.FromTicks(333333);
-            timer.Update += OnUpdate;
-            timer.Draw += OnDraw;
+			timer.UpdateInterval = TimeSpan.FromTicks(166667);
+			timer.Update += OnUpdate;
+#if USE_THREAD_LOCKED_VERSION
+			timer.FrameAction += PreDraw;
+#else
+#endif
         }
+
+		ManualResetEvent DrawCompleteEvent = new ManualResetEvent(true);
+		AutoResetEvent DrawRequiredEvent = new AutoResetEvent(false);
+
+		GraphicsDevice MoSyncGraphicsDevice;
+
+		//RenderTarget2D mBackBuffer;
+		//SpriteBatch SpriteBatch;
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             // Set the sharing mode of the graphics device to turn on XNA rendering
             SharedGraphicsDeviceManager.Current.GraphicsDevice.SetSharingMode(true);
 
-            // Create a new SpriteBatch, which can be used to draw textures.
-            spriteBatch = new SpriteBatch(SharedGraphicsDeviceManager.Current.GraphicsDevice);
+			mMachine = ((App)Application.Current).GetMachine();
+			mRuntime = mMachine.GetRuntime();
+			mOpenGLESModule = mRuntime.GetModule<MoSync.OpenGLESModule>();
+			//mOpenGLESModule.InitWithGraphicsDevice(SharedGraphicsDeviceManager.Current.GraphicsDevice);
+			MoSyncGraphicsDevice = SharedGraphicsDeviceManager.Current.GraphicsDevice;
+			MoSyncGraphicsDevice.PresentationParameters.IsFullScreen = true;
+			SharedGraphicsDeviceManager.Current.SynchronizeWithVerticalRetrace = false;
+			mOpenGLESModule.InitWithGraphicsDevice(MoSyncGraphicsDevice);
 
             // TODO: use this.content to load your game content here
+//			mBackBuffer = new RenderTarget2D(MoSyncGraphicsDevice, SharedGraphicsDeviceManager.DefaultBackBufferWidth, SharedGraphicsDeviceManager.DefaultBackBufferHeight);
+//			SpriteBatch = new SpriteBatch(SharedGraphicsDeviceManager.Current.GraphicsDevice);
+//			MoSyncGraphicsDevice.SetRenderTarget(mBackBuffer);
 
-            // Start the timer
-            timer.Start();
+#if USE_THREAD_LOCKED_VERSION
+			mOpenGLESModule.SetOnUpdateScreenAction(() =>
+			{
+				mShouldDrawFrame = true;
+				if (!mOnDrawInitialized)
+					timer.Draw += OnDraw;
+				mOnDrawInitialized = true;
+				DrawRequiredEvent.Set();
+				DrawCompleteEvent.WaitOne();
+				mShouldDrawFrame = false;
+			});
 
-            base.OnNavigatedTo(e);
+			MoSync.Util.SetPreRunOnMainThreadAction(() =>
+			{
+				mShouldDrawFrame = false;
+				timer.FrameAction -= PreDraw;
+				DrawRequiredEvent.Set();
+			});
+
+			MoSync.Util.SetPostRunOnMainThreadAction(() =>
+			{
+				mShouldDrawFrame = false;
+				timer.FrameAction += PreDraw;
+				DrawRequiredEvent.Set();
+			});
+#else
+			mOpenGLESModule.SetOnUpdateScreenAction(() =>
+			{
+				timer.Draw += OnDraw;
+			});
+#endif
+
+			base.OnNavigatedTo(e);
+
+			// Start the timer
+			timer.Start();
         }
 
         protected override void OnNavigatedFrom(NavigationEventArgs e)
@@ -60,27 +119,41 @@ namespace test_mosync
 
             // Set the sharing mode of the graphics device to turn off XNA rendering
             SharedGraphicsDeviceManager.Current.GraphicsDevice.SetSharingMode(false);
-
             base.OnNavigatedFrom(e);
         }
 
-        /// <summary>
-        /// Allows the page to run logic such as updating the world,
-        /// checking for collisions, gathering input, and playing audio.
-        /// </summary>
-        private void OnUpdate(object sender, GameTimerEventArgs e)
-        {
-            // TODO: Add your update logic here
-        }
+		private void OnUpdate(object sender, GameTimerEventArgs e)
+		{
+		}
+
+
+#if USE_THREAD_LOCKED_VERSION
+		private void PreDraw(object sender, EventArgs e)
+		{
+			DrawCompleteEvent.Set();
+			DrawCompleteEvent.Reset();
+
+			if (!DrawRequiredEvent.WaitOne(100))
+			{
+				mShouldDrawFrame = false;
+			}
+
+			if(!mShouldDrawFrame)
+				GameTimer.SuppressFrame();
+		}
 
         /// <summary>
         /// Allows the page to draw itself.
         /// </summary>
         private void OnDraw(object sender, GameTimerEventArgs e)
         {
-            SharedGraphicsDeviceManager.Current.GraphicsDevice.Clear(Color.CornflowerBlue);
-
-            // TODO: Add your drawing code here
+			// content will be presented right after we return from this function
         }
-    }
+#else
+        private void OnDraw(object sender, GameTimerEventArgs e)
+        {
+			timer.Draw -= OnDraw;
+        }
+#endif
+	}
 }

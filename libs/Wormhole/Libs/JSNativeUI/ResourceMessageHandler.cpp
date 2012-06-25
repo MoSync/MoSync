@@ -20,11 +20,13 @@ MA 02110-1301, USA.
  * @file ResourceMessageHandler.cpp
  * @author Ali Sarrafi
  *
- * Implementation of PhoneGap calls made from JavaScript.
+ * Implementation of Resource calls made from JavaScript.
+ * Used for downloading images and loading local images as
+ * resources for UI from JavaScript.
  */
 
 #include <mastdlib.h> // C string conversion functions
-#include <conprint.h>
+#include <MAUtil/String.h>
 #include "ResourceMessageHandler.h"
 
 // NameSpaces we want to access.
@@ -37,7 +39,8 @@ namespace Wormhole
 	 * Constructor.
 	 */
 	ResourceMessageHandler::ResourceMessageHandler(NativeUI::WebView* webView) :
-		mWebView(webView)
+		mWebView(webView),
+		mLogMessageListener(NULL)
 	{
 		// A new instance of ImageDownloader is created.
 		mImageDownloader = new ImageDownloader();
@@ -49,7 +52,10 @@ namespace Wormhole
 	 */
 	ResourceMessageHandler::~ResourceMessageHandler()
 	{
-		// Nothing needs to be explicitly destroyed.
+		if (NULL != mLogMessageListener)
+		{
+			delete mLogMessageListener;
+		}
 	}
 
 	/**
@@ -61,10 +67,11 @@ namespace Wormhole
 	 */
 	bool ResourceMessageHandler::handleMessage(Wormhole::MessageStream& stream)
 	{
-
 		char buffer[128];
+
 		const char * action = stream.getNext();
-		if(0 == strcmp("loadImage", action))
+
+		if (0 == strcmp("loadImage", action))
 		{
 			const char *imagePath = stream.getNext();
 			const char* imageID = stream.getNext();
@@ -78,7 +85,7 @@ namespace Wormhole
 					imageHandle);
 			mWebView->callJS(buffer);
 		}
-		else if(0 == strcmp("loadRemoteImage", action))
+		else if (0 == strcmp("loadRemoteImage", action))
 		{
 			const char* imageURL = stream.getNext();
 			const char* imageID = stream.getNext();
@@ -92,6 +99,12 @@ namespace Wormhole
 					imageHandle);
 			mWebView->callJS(buffer);
 		}
+		else if (0 == strcmp("sendRemoteLogMessage", action))
+		{
+			const char* url = stream.getNext();
+			const char* message = stream.getNext();
+			sendRemoteLogMessage(message, url);
+		}
 
 		return true;
 	}
@@ -103,7 +116,6 @@ namespace Wormhole
 	 */
 	MAHandle ResourceMessageHandler::loadImageResource(const char *imagePath)
 	{
-
 		int bufferSize = 1024;
 		char buffer[bufferSize];
 
@@ -141,10 +153,10 @@ namespace Wormhole
 				0,
 				maGetDataSize(fileData));
 		maDestroyObject(fileData);
-		//return the handle to the loaded image
+
+		// Return the handle to the loaded image.
 		return imageHandle;
 	}
-
 
 	/**
 	 * Is called if the downloads is canceled.
@@ -163,13 +175,51 @@ namespace Wormhole
 	}
 
 	/**
-	 * On successful download completion, send the event to the JavaScript side.
+	 * On successful download completion, send the
+	 * event to the JavaScript side.
 	 */
-	void ResourceMessageHandler::finishedDownloading(Downloader* downloader,
-			MAHandle data) {
+	void ResourceMessageHandler::finishedDownloading(
+		Downloader* downloader,
+		MAHandle data)
+	{
 		char buffer[256];
 		sprintf(buffer, "mosync.resource.imageDownloadFinished(%d)", data);
 		mWebView->callJS(buffer);
+	}
 
+	/**
+	 * Set the object to get notified when log messages are sent.
+	 *
+	 * Note that the ResourceMessageHandler will take ownership of
+	 * the listener and delete it upon destruction. Also, when a new
+	 * listener is set, the old listener will be deleted.
+	 *
+	 * @param listener The log message listener.
+	 */
+	void ResourceMessageHandler::setLogMessageListener(
+		LogMessageListener* listener)
+	{
+		if (NULL == mLogMessageListener)
+		{
+			delete mLogMessageListener;
+			mLogMessageListener = NULL;
+		}
+
+		mLogMessageListener = listener;
+	}
+
+	/**
+	 * Send a log message to a server.
+	 * @param message The log message, for example: "Hello World".
+	 * @param url The url to use for the remote logging service.
+	 */
+	void ResourceMessageHandler::sendRemoteLogMessage(
+		const MAUtil::String& message,
+		const MAUtil::String& url)
+	{
+		if (NULL != mLogMessageListener)
+		{
+			mLogMessageListener->onLogMessage(message.c_str(), url.c_str());
+		}
 	}
 } // namespace

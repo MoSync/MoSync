@@ -45,7 +45,7 @@ std::vector<std::string> gInFiles;
 // Is there error checking for this?
 // 65 MB may be a lot on mobile devices today,
 // but perhaps not in the future ;)
-#define MAX_DATA_SIZE 65536*1024
+#define MAX_DATA_SIZE 65536*1024*16
 
 // Global memory buffer that contains all the file data.
 unsigned char gFileData[MAX_DATA_SIZE];
@@ -151,10 +151,13 @@ static int readFile(std::string name) {
 	fseek(file, 0, SEEK_SET);
 	int res = fread(&gFileData[gFileDataPtr], 1, len, file);
 	if(res != len) {
-		printf("failure reading '%s'\n", name.c_str());
+		fclose(file);
+		printf("failure reading '%s' (res != len)\n", name.c_str());
 		exit(1);
 	}
 	gFileDataPtr+=len;
+
+	fclose(file);
 	return len;
 }
 

@@ -53,6 +53,7 @@ namespace NativeUI
 	 */
 	Dialog::~Dialog()
 	{
+		mDialogListeners.clear();
 	}
 
 	/**

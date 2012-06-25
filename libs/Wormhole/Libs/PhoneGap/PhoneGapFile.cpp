@@ -28,8 +28,12 @@ MA 02110-1301, USA.
 #include <conprint.h>
 #include <MAUtil/String.h>
 #include <MAUtil/HashDict.h>
-#include "PhoneGapMessageHandler.h"
+#include "../../Encoder.h"
+#include "../../HighLevelHttpConnection.h"
+#include "../../FileUtil.h"
 #include "PhoneGapFile.h"
+#include "PhoneGapMessageHandler.h"
+#include "MimeTypes.h"
 
 // File error codes.
 #define FILEERROR_NOT_FOUND_ERR "1"
@@ -60,51 +64,9 @@ using namespace MAUtil;
 
 namespace Wormhole
 {
-	// For unknown type it is recommended to use 'application/octet-stream'.
-	// http://stackoverflow.com/questions/1176022/unknown-file-type-mime
-	static String MimeTypeDefault = "application/octet-stream";
-
-	/// Stores mime type for all necessary extension
-	static const char* MimeTypeDictionary[][2] =
-	{
-		{"avi", "video/x-msvideo"},
-		{"bmp", "image/bmp"},
-		{"gif", "image/gif"},
-		{"jpe", "image/jpeg"},
-		{"jpeg", "image/jpeg"},
-		{"jpg", "image/jpeg"},
-		{"mov", "video/quicktime"},
-		{"mp2", "audio/mpeg"},
-		{"mp3", "audio/mpeg"},
-		{"mp4", "video/mp4"},
-		{"mpe", "video/mpeg"},
-		{"mpeg", "video/mpeg"},
-		{"mpg", "video/mpeg"},
-		{"mpga", "audio/mpeg"},
-		{"pbm", "image/x-portable-bitmap"},
-		{"pcm", "audio/x-pcm"},
-		{"pct", "image/pict"},
-		{"pgm", "image/x-portable-graymap"},
-		{"pic", "image/pict"},
-		{"pict", "image/pict"},
-		{"png", "image/png"},
-		{"pnm", "image/x-portable-anymap"},
-		{"pnt", "image/x-macpaint"},
-		{"pntg", "image/x-macpaint"},
-		{"ppm", "image/x-portable-pixmap"},
-		{"qt", "video/quicktime"},
-		{"ra", "audio/x-pn-realaudio"},
-		{"ram", "audio/x-pn-realaudio"},
-		{"ras", "image/x-cmu-raster"},
-		{"rgb", "image/x-rgb"},
-		{"snd", "audio/basic"},
-		{"txt", "text/plain"},
-		{"tif", "image/tiff"},
-		{"tiff", "image/tiff"},
-		{"wav", "audio/x-wav"},
-		{"wbmp", "image/vnd.wap.wbmp"}
-	};
-
+	/**
+	 * List of mime-types is in MimeTypes.h.
+	 */
 	static String FileGetMimeType(const String& filePath)
 	{
 		// Get the file name extension.
@@ -112,7 +74,7 @@ namespace Wormhole
 		if (pos == String::npos)
 		{
 			// Extension not found.
-			return MimeTypeDefault;
+			return sMimeTypeDefault;
 		}
 
 		// Move to position after the '.'
@@ -122,7 +84,7 @@ namespace Wormhole
 		if (extensionLength > 7)
 		{
 			// Something is wrong, we do not support that long extensions.
-			return MimeTypeDefault;
+			return sMimeTypeDefault;
 		}
 
 		// Extract extension.
@@ -132,17 +94,17 @@ namespace Wormhole
 
 		// Do linear search in MIME type table.
 		// TODO: Optimize, use hash table.
-		int size = sizeof(MimeTypeDictionary) / (sizeof(char*) * 2);
+		int size = sizeof(sMimeTypeDictionary) / (sizeof(char*) * 2);
 		for (int i = 0; i < size; ++i)
 		{
-			const char* ext2 = MimeTypeDictionary[i][0];
+			const char* ext2 = sMimeTypeDictionary[i][0];
 			if (0 == stricmp(ext, ext2))
 			{
-				return MimeTypeDictionary[i][1];
+				return sMimeTypeDictionary[i][1];
 			}
 		}
 
-		return MimeTypeDefault;
+		return sMimeTypeDefault;
 	}
 
 	static String FileGetLocalPath()
@@ -462,7 +424,10 @@ namespace Wormhole
 	/**
 	 * @return >0 on success, <0 on error.
 	 */
-	static int FileRead(const String& path, String& data)
+	static int FileReadBinary(
+		const String& path,
+		void** outParamFileData,
+		int* outParamFileSize)
 	{
 		MAHandle file = maFileOpen(path.c_str(), MA_ACCESS_READ_WRITE);
 		if (file < 0)
@@ -484,7 +449,9 @@ namespace Wormhole
 			return -1;
 		}
 
-		char* buf = (char*) malloc(size + 1);
+		// Alloc one extra byte in case the caller
+		// wish to zero-terminate the buffer.
+		void* buf = (void*) malloc(size + 1);
 		if (NULL == buf)
 		{
 			maFileClose(file);
@@ -501,11 +468,32 @@ namespace Wormhole
 			return -1;
 		}
 
-		buf[size] = 0;
+		*outParamFileData = buf;
+		*outParamFileSize = size;
 
-		data = buf;
+		return 1;
+	}
 
-		free(buf);
+	/**
+	 * @return >0 on success, <0 on error.
+	 */
+	static int FileRead(const String& path, String& outParamFileDataString)
+	{
+		char* fileData;
+		int fileSize;
+
+		int result = FileReadBinary(path, (void**)&fileData, &fileSize);
+		if (result < 0)
+		{
+			return -1;
+		}
+
+		// Zero-terminate buffer.
+		fileData[fileSize] = 0;
+
+		outParamFileDataString = fileData;
+
+		free(fileData);
 
 		return 1;
 	}
@@ -905,11 +893,48 @@ namespace Wormhole
 			args);
 	}
 
+	void PhoneGapFile::callFileTransferError(
+		const String& callbackID,
+		const String& errorCode,
+		const String& sourceURI,
+		const String& targetURI
+		)
+	{
+		// Construct FileTransferError object.
+		String args =
+			"{\"code\":" + errorCode +
+			",\"source\":\"" + sourceURI + "\"" +
+			",\"target\":\"" + targetURI + "\"}";
+
+		mMessageHandler->callCallback(
+			"PhoneGap.CallbackError",
+			callbackID,
+			PHONEGAP_CALLBACK_STATUS_ERROR,
+			args,
+			false); // Don't keep callback.
+	}
+
+	void PhoneGapFile::callFileUploadResult(
+		const String& callbackID,
+		const String& responseCode, // long
+		const String& bytesSent, // long
+		const String& response // DOMString
+		)
+	{
+		// Construct FileUploadResult object.
+		String args =
+			"{\"bytesSent\":" + bytesSent + "," +
+			 "\"responseCode\":" + responseCode + "," +
+			 "\"response\":" + Encoder::JSONStringify(response.c_str()) + "}";
+
+		callSuccess(callbackID, args);
+	}
+
 	/**
-	 * Implementation of File API exposed to JavaScript.
+	 * Implementation of the File API.
 	 * @return true if message was handled, false if not.
 	 */
-	void PhoneGapFile::handleMessage(JSONMessage& message)
+	void PhoneGapFile::handleFileMessage(JSONMessage& message)
 	{
 		String action = message.getParam("action");
 
@@ -988,7 +1013,22 @@ namespace Wormhole
 	}
 
 	/**
-	 * Return a FileSystem object.
+	 * Implementation of the FileTransfer API.
+	 * @return true if message was handled, false if not.
+	 */
+	void PhoneGapFile::handleFileTransferMessage(JSONMessage& message)
+	{
+		String action = message.getParam("action");
+
+		if (action == "upload")
+		{
+			actionUploadFile(message);
+		}
+	}
+
+	/**
+	 * Return a FileSystem object for the application's
+	 * local file system.
 	 */
 	void PhoneGapFile::actionRequestFileSystem(JSONMessage& message)
 	{
@@ -1037,6 +1077,9 @@ namespace Wormhole
 			"window.localFileSystem._castFS");
 	}
 
+	/**
+	 * Return a FileSystem object for the given file URL.
+	 */
 	void PhoneGapFile::actionResolveLocalFileSystemURI(JSONMessage& message)
 	{
 		String callbackID = message.getParam("PhoneGapCallBackId");
@@ -1300,7 +1343,7 @@ namespace Wormhole
 		// Send back the file content.
 		callSuccess(
 			callbackID,
-			JSONMessage::JSONStringify(content.c_str()));
+			Encoder::JSONStringify(content.c_str()));
 	}
 
 	void PhoneGapFile::actionReadAsDataURL(JSONMessage& message)
@@ -1320,7 +1363,7 @@ namespace Wormhole
 		String base64URL = "\"data:";
 		base64URL += FileGetMimeType(fullPath);
 		base64URL += ";base64,";
-		base64URL += JSONMessage::base64Encode(content.c_str());
+		base64URL += Encoder::base64Encode(content.c_str(), content.size());
 		base64URL += "\"";
 
 		// Send back the file content.
@@ -1613,4 +1656,374 @@ namespace Wormhole
 			callbackID,
 			"-1");
 	}
+
+	/**
+	 * HTTP connection class used for file uploading.
+	 */
+	class PhoneGapFileUploadConnection : public HighLevelHttpConnection
+	{
+	public:
+		PhoneGapFileUploadConnection(
+			PhoneGapFile* fileHandler,
+			String callbackID,
+			String sourceURI,
+			String targetURI,
+			String* requestBody,
+			int bytesSent
+			)
+			: HighLevelHttpConnection()
+		{
+			mPhoneGapFile = fileHandler;
+			mCallbackID = callbackID,
+			mSourceURI = sourceURI;
+			mTargetURI = targetURI;
+			mRequestBody = requestBody;
+			mBytesSent = bytesSent;
+		}
+
+		/**
+		 * Called when the HTTP connection has finished downloading data.
+		 * @param data Handle to the data, will be 0 on error, > 0 on success.
+		 * @param result Result code, RES_OK on success, otherwise an HTTP error code.
+		 */
+		void dataDownloaded(MAHandle data, int result)
+		{
+			// Inform the PhoneGap file object that the upload
+			// is complete and pass the result/error code.
+			// We ignore the data sent back from the server.
+
+			if (RES_OK != result || NULL == data)
+			{
+				mPhoneGapFile->callFileTransferError(
+					mCallbackID,
+					FILETRANSERERROR_CONNECTION_ERR,
+					mSourceURI,
+					mTargetURI);
+			}
+			else
+			{
+				char bytesSent[64];
+				sprintf(bytesSent, "%u", mBytesSent);
+
+				FileUtil fileUtil;
+				String response = fileUtil.createTextFromHandle(data);
+
+				mPhoneGapFile->callFileUploadResult(
+					mCallbackID,
+					"200", // We always send response code 200.
+					bytesSent,
+					response
+					);
+			}
+
+			// Delete the body of the request.
+			delete mRequestBody;
+
+			// Delete upload connection.
+			delete this;
+		}
+
+	private:
+		PhoneGapFile* mPhoneGapFile;
+		String mCallbackID;
+		String mSourceURI;
+		String mTargetURI;
+		String* mRequestBody;
+		int mBytesSent;
+	};
+
+	/**
+	 * Helper function for actionUploadFile.
+	 */
+	static void actionUploadFileGetAdditionalParams(
+		JSONMessage& message,
+		Vector<String>& additionalParams)
+	{
+		YAJLDom::Value* args = message.getParamNode("args");
+		if (NULL != args && YAJLDom::Value::MAP == args->getType())
+		{
+			YAJLDom::Value* params = args->getValueForKey("params");
+			if (NULL != params && YAJLDom::Value::ARRAY == params->getType())
+			{
+				for (int i = 0; i < params->getNumChildValues(); ++i)
+				{
+					YAJLDom::Value* param = params->getValueByIndex(i);
+					if (NULL != param && YAJLDom::Value::MAP == param->getType())
+					{
+						String key = "";
+						String value = "";
+
+						YAJLDom::Value* keyNode = param->getValueForKey("Key");
+						if (NULL != keyNode && YAJLDom::Value::STRING == keyNode->getType())
+						{
+							key = keyNode->toString();
+						}
+
+						YAJLDom::Value* valueNode = param->getValueForKey("Value");
+						if (NULL != valueNode && YAJLDom::Value::STRING == valueNode->getType())
+						{
+							value = valueNode->toString();
+						}
+
+						if (key.size() > 0 && value.size() > 0)
+						{
+							additionalParams.add(key);
+							additionalParams.add(value);
+						}
+					}
+				}
+			}
+		}
+	}
+
+/*
+Android PhoneGap 1.2 sample file upload:
+
+C:\tmp>node upload.js
+Upload server started
+Server address: 192.168.0.145:4042
+Socket connected
+server data:
+POST / HTTP/1.1
+Connection: Keep-Alive
+Content-Type: multipart/form-data;boundary=*****
+User-Agent: Dalvik/1.4.0 (Linux; U; Android 2.3.6; Nexus One Build/GRK39F)
+Host: 192.168.0.145:4042
+Transfer-Encoding: chunked
+Accept-Encoding: gzip
+
+
+server data:
+fb
+--*****
+Content-Disposition: form-data; name="value1";
+
+v1
+--*****
+Content-Disposition: form-data; name="value2";
+
+v2
+--*****
+Content-Disposition: form-data; name="file"; filename="testfile.txt"
+Content-Type: text/plain
+
+HELLO
+--*****--
+
+0
+*/
+
+/*
+Sample MoSync upload:
+Socket connected
+server data:
+POST / HTTP/1.1
+Content-Type: multipart/form-data;boundary===========================2231600360
+Connection: Keep-Alive
+User-Agent: Dalvik/1.4.0 (Linux; U; Android 2.3.6; Nexus One Build/GRK39F)
+Host: 192.168.0.145:4042
+Content-Length: 381
+Accept-Encoding: gzip
+
+
+server data:
+--==========================2231600360
+Content-Disposition: form-data; name="param1";
+
+value1
+--==========================2231600360
+Content-Disposition: form-data; name="param2";
+
+value2
+--==========================2231600360
+Content-Disposition: form-data; name="file"; filename="testfile.txt"
+Content-Type: text/plain
+
+HELLO
+--==========================2231600360--
+*/
+
+// http://www.w3.org/Protocols/rfc1341/7_2_Multipart.html
+// http://en.wikipedia.org/wiki/Multipart/form-data#Form_Data
+// http://en.wikipedia.org/wiki/File_select
+
+/*
+I/maWriteLog(12821): ma:[{
+"messageName":"PhoneGap",
+"service":"FileTransfer",
+"action":"upload",
+"args":{"fileKey":"file",
+"fileName":"testfile.txt",
+"mimeType":"text/plain","params":[
+{"Key":"param1","Value":"value1"},
+{"Key":"param2","Value":"value2"}],
+"filePath":"file:///data/data/com.mosync.app_WormholeFileTransfer/files/testfile.txt",
+"server":"http://192.168.0.145:4042/"},
+"PhoneGapCallBackId":"FileTransfer7"}]
+*/
+
+	/**
+	 * Upload a file to a server.
+	 *
+	 * FileUploadOptions:
+	 *   Options to customize the HTTP request used to upload files.
+	 *   @constructor
+	 *   @param fileKey {String}   Name of file request parameter. Defaults to "file".
+	 *   @param fileName {String}  Filename to be used by the server. Defaults to "image.jpg".
+	 *   @param mimeType {String}  Mimetype of the uploaded file. Defaults to "image/jpeg".
+	 *   @param params {Object}    Object with key: value params to send to the server.
+	 */
+	void PhoneGapFile::actionUploadFile(JSONMessage& message)
+	{
+		String callbackID = message.getParam("PhoneGapCallBackId");
+
+		// This is the form name of the post request.
+		String fileKey = message.getArgsField("fileKey");
+		if (0 == fileKey.size())
+		{
+			fileKey = "file";
+		}
+
+		// Name of uploaded file on the server.
+		String fileName = message.getArgsField("fileName");
+		if (0 == fileName.size())
+		{
+			fileName = "image.jpg";
+		}
+
+		// Mime type.
+		String mimeType = message.getArgsField("mimeType");
+		if (0 == mimeType.size())
+		{
+			mimeType = "image/jpeg";
+		}
+
+		// Server URL.
+		String serverURL = message.getArgsField("server");
+
+		// Source path of file to upload.
+		String sourceFilePath = message.getArgsField("filePath");
+
+		// Check that source file URI is valid.
+		if (0 != sourceFilePath.find("file://"))
+		{
+			callFileTransferError(
+				callbackID,
+				FILETRANSERERROR_FILE_NOT_FOUND_ERR,
+				sourceFilePath,
+				serverURL);
+			return;
+		}
+
+		// Read source file.
+		void* fileData;
+		int fileSize;
+		int result = FileReadBinary(
+			sourceFilePath.substr(7), // Strip off "file://"
+			&fileData,
+			&fileSize);
+		if (result < 0)
+		{
+			callFileTransferError(
+				callbackID,
+				FILETRANSERERROR_FILE_NOT_FOUND_ERR,
+				sourceFilePath,
+				serverURL);
+			return;
+		}
+
+		// HTTP params.
+		Vector<String> httpParams;
+
+		// Create boundary string.
+		int ms = maGetMilliSecondCount();
+		char boundary[1024];
+		sprintf(boundary, "==========================%u", ms);
+
+		// Set HTTP params.
+		String contentType = "multipart/form-data;boundary=";
+		contentType += boundary;
+		httpParams.add("Content-Type");
+		httpParams.add(contentType);
+
+		httpParams.add("Connection");
+		httpParams.add("Keep-Alive");
+
+		// Build request body. The reason we dynamically
+		// allocate the request data is that this buffer
+		// needs to live during the processing of the
+		// connection, and cannot be deallocated until
+		// the connection is completed.
+		String* requestBody = new String();
+		*requestBody = "";
+
+		// Common strings.
+		String doubleDash = "--";
+		String crnl = "\r\n";
+
+		// Get additional request params.
+		Vector<String> requestParams;
+		actionUploadFileGetAdditionalParams(message, requestParams);
+
+		// Write additional request params.
+		for (int i = 0; i < requestParams.size(); i = i + 2)
+		{
+			*requestBody += doubleDash + boundary + crnl;
+			*requestBody += "Content-Disposition: form-data; name=\"";
+			*requestBody += requestParams[i] + "\";" + crnl + crnl;
+			*requestBody += requestParams[i + 1] + crnl;
+		}
+
+		// Get file mime type.
+		String fileMimeType = FileGetMimeType(sourceFilePath);
+
+		// Write file data part.
+		*requestBody += doubleDash + boundary + crnl;
+		*requestBody += "Content-Disposition: form-data; name=\"";
+		*requestBody += fileKey + "\"; filename=\"";
+		*requestBody += fileName + "\"" + crnl;
+		*requestBody += "Content-Type: " + fileMimeType + crnl + crnl;
+		// File data may contain null bytes, use append.
+		requestBody->append((const char*) fileData, fileSize);
+		*requestBody += crnl + doubleDash + boundary + doubleDash;
+
+		// Now we can free the fileData buffer.
+		free(fileData);
+
+		// Create the connection.
+		PhoneGapFileUploadConnection* connection =
+			new PhoneGapFileUploadConnection(
+				this,
+				callbackID,  // PhoneGap callback id.
+				sourceFilePath, // For error message.
+				serverURL,   // For error message.
+				requestBody, // Deallocated when connection is completed.
+				fileSize     // We assume all bytes are sent upon success.
+				);
+
+		// Initiate the request. The callback method of the
+		// connection object will be called upon completion.
+		result = connection->postRequest(
+			serverURL.c_str(),
+			httpParams,
+			(const void*) requestBody->pointer(),
+			requestBody->size()
+			);
+
+		if (WORMHOLE_HTTP_ERROR == result)
+		{
+			// Must be deallocated.
+			delete requestBody;
+
+			callFileTransferError(
+				callbackID,
+				FILETRANSERERROR_CONNECTION_ERR,
+				sourceFilePath,
+				serverURL);
+		}
+
+		// The result of the request is returned to PhoneGap
+		// in the callback of the connection object.
+	}
+
 } // namespace

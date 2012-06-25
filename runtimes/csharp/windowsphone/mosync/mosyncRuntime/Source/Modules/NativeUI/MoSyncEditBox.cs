@@ -1,4 +1,4 @@
-﻿/* Copyright (C) 2011 MoSync AB
+﻿/* Copyright (C) 2012 MoSync AB
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License,
@@ -15,9 +15,10 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301, USA.
 */
 /**
- * @file EditBox.cs
+ * @file MoSyncEditBox.cs
  * @author Rata Gabriela
  *         ovidiu
+ *         Spiridon Alexandru
  *
  * @brief This represents the EditBox Widget implementation for the NativeUI
  *        component on Windows Phone 7, language C#
@@ -383,6 +384,7 @@ namespace MoSync
                         {
                         }
                     }
+                    else throw new InvalidPropertyValueException();
                 }
             }
 
@@ -430,6 +432,8 @@ namespace MoSync
                             mEditBox.AcceptsReturn = false;
                             mEditBox.TextWrapping = TextWrapping.NoWrap;
                             break;
+                        default:
+                            throw new InvalidPropertyValueException();
                     }
                 }
             }
@@ -475,6 +479,8 @@ namespace MoSync
                         case 4:             //MAW_EDIT_BOX_FLAG_INITIAL_CAPS_ALL_CHARACTERS
                             setInputMode(System.Windows.Input.InputScopeNameValue.PersonalFullName);
                             break;
+                        default:
+                            throw new InvalidPropertyValueException();
                     }
                 }
             }
@@ -509,6 +515,7 @@ namespace MoSync
                         mPasswordBox.MaxLength = value;
                         mEditBox.MaxLength = value;
                     }
+                    else throw new InvalidPropertyValueException();
                 }
                 get
                 {

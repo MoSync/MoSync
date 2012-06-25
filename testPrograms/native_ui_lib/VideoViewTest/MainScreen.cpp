@@ -50,8 +50,10 @@ MainScreen::MainScreen() :
 	mPause(NULL),
 	mStop(NULL),
 	mGetDuration(NULL),
+	mDuration(NULL),
 	mSeekTo(NULL),
 	mCurrentTime(NULL),
+	mTime(NULL),
 	mVideoControl(NULL)
 {
 	createMainLayout();
@@ -66,6 +68,7 @@ MainScreen::MainScreen() :
 	mVideoControl->addButtonListener(this);
 
 	mVideoView->addVideoViewListener(this);
+	mEditBox->addEditBoxListener(this);
 }
 
 /**
@@ -83,6 +86,7 @@ MainScreen::~MainScreen()
     mVideoControl->removeButtonListener(this);
 
     mVideoView->removeVideoViewListener(this);
+    mEditBox->removeEditBoxListener(this);
 }
 
 /**
@@ -108,40 +112,59 @@ void MainScreen::createMainLayout() {
 
 	mMainLayout->addChild(mSetUrl);
 
+	HorizontalLayout* controlsLayout = new HorizontalLayout();
+	mMainLayout->addChild(controlsLayout);
     mPlay = new Button();
     mPlay->setText("Play");
-    mMainLayout->addChild(mPlay);
+    mPlay->fillSpaceHorizontally();
+    controlsLayout->addChild(mPlay);
 
 	mPause = new Button();
 	mPause->setText("Pause");
-	mMainLayout->addChild(mPause);
+	mPause->fillSpaceHorizontally();
+	controlsLayout->addChild(mPause);
 
     mStop = new Button();
     mStop->setText("Stop");
-    mMainLayout->addChild(mStop);
+    mStop->fillSpaceHorizontally();
+    controlsLayout->addChild(mStop);
 
+    mSeekTo = new Button();
+    mSeekTo->setText("Seek to 1000");
+    mMainLayout->addChild(mSeekTo);
+
+    HorizontalLayout* durationlayout = new HorizontalLayout();
+    mMainLayout->addChild(durationlayout);
     mGetDuration = new Button();
     mGetDuration->setText("Get Duration");
-    mMainLayout->addChild(mGetDuration);
+    durationlayout->addChild(mGetDuration);
+
+    mDuration = new Label();
+    mDuration->setText("The duration");
+    durationlayout->addChild(mDuration);
 
     mVideoControl = new Button();
     mVideoControl->setText(HIDE_VIDEO_CONTROL_BUTTON_TEXT);
     mMainLayout->addChild(mVideoControl);
 
-    HorizontalLayout* layout = new HorizontalLayout();
-    mMainLayout->addChild(layout);
-
-    mSeekTo = new Button();
-    mSeekTo->setText("Seek to 1000");
-    layout->addChild(mSeekTo);
+    HorizontalLayout* timeLayout = new HorizontalLayout();
+    mMainLayout->addChild(timeLayout);
 
     mCurrentTime = new Button();
     mCurrentTime->setText("Current time");
-    layout->addChild(mCurrentTime);
+    timeLayout->addChild(mCurrentTime);
+
+    mTime = new Label();
+    mTime->setText("Current Time");
+    timeLayout->addChild(mTime);
 
     if (isAndroid())
     {
         mEditBox->setText("http://www.mosync.com/files/videos/Video.3gp");
+    }
+    else if (isWindowsPhone())
+    {
+        mEditBox->setText("http://www.educationalquestions.com/video/ELL_PART_5_768k.wmv");
     }
     else
     {
@@ -178,7 +201,7 @@ void MainScreen::buttonClicked(Widget* button)
         int duration = mVideoView->getDuration();
         char buf[256];
         itoa(duration, buf, 10);
-        mEditBox->setText(buf);
+        mDuration->setText(buf);
     }
     else if (button == mSeekTo)
     {
@@ -188,6 +211,7 @@ void MainScreen::buttonClicked(Widget* button)
     else if (button == mCurrentTime)
     {
         int result = mVideoView->currentPlaybackTime();
+        mTime->setText(MAUtil::integerToString(result));
         printf("result currentPlaybackTime = %d", result);
     }
     else if (button == mVideoControl)
@@ -246,6 +270,39 @@ void MainScreen::videoViewStateChanged(
 }
 
 /**
+ * Handle the click event for video control button.
+ * Show/hide the video control and change button's text.
+ */
+void MainScreen::handleVideoControlButtonClicked()
+{
+	if (strcmp(mVideoControl->getText().c_str(), HIDE_VIDEO_CONTROL_BUTTON_TEXT) == 0)
+	{
+		mVideoView->hideControl();
+		mVideoControl->setText(SHOW_VIDEO_CONTROL_BUTTON_TEXT);
+	}
+	else
+	{
+		mVideoView->showControl();
+		mVideoControl->setText(HIDE_VIDEO_CONTROL_BUTTON_TEXT);
+	}
+
+	bool value = mVideoView->isControlVisible();
+	printf("MainScreen::handleVideoControlButtonClicked - control visible = %d",
+		value);
+}
+
+/**
+ * This method is called when the return button was pressed.
+ * On iphone platform the virtual keyboard is not hidden after
+ * receiving this event.
+ * @param editBox The edit box object that generated the event.
+ */
+void MainScreen::editBoxReturn(EditBox* editBox)
+{
+	editBox->hideKeyboard();
+}
+
+/**
  * Detects if the current platform is Android.
  * @return true if the platform is Android, false otherwise.
  */
@@ -268,20 +325,19 @@ bool MainScreen::isAndroid()
  * Handle the click event for video control button.
  * Show/hide the video control and change button's text.
  */
-void MainScreen::handleVideoControlButtonClicked()
+bool MainScreen::isWindowsPhone()
 {
-	if (strcmp(mVideoControl->getText().c_str(), HIDE_VIDEO_CONTROL_BUTTON_TEXT) == 0)
+	char platform[BUF_MAX];
+	maGetSystemProperty("mosync.device.OS", platform, BUF_MAX);
+	for (unsigned int i = 0; i < strlen(platform); i++)
 	{
-		mVideoView->hideControl();
-		mVideoControl->setText(SHOW_VIDEO_CONTROL_BUTTON_TEXT);
+		platform[i] = tolower(platform[i]);
 	}
-	else
+	if (strstr(platform,"microsoft") != NULL &&
+		strstr(platform,"windows") != NULL)
 	{
-		mVideoView->showControl();
-		mVideoControl->setText(HIDE_VIDEO_CONTROL_BUTTON_TEXT);
+		return true;
 	}
 
-	bool value = mVideoView->isControlVisible();
-	printf("MainScreen::handleVideoControlButtonClicked - control visible = %d",
-		value);
+	return false;
 }

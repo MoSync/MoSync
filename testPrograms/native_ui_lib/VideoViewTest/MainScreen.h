@@ -35,7 +35,8 @@ using namespace NativeUI;
 class MainScreen:
 	public Screen,
 	public ButtonListener,
-	public VideoViewListener
+	public VideoViewListener,
+	public EditBoxListener
 {
 
 public:
@@ -101,10 +102,24 @@ private:
 	bool isAndroid();
 
 	/**
+	 * Detects if the current platform is Windows Phone.
+	 * @return true if the platform is Windows Phone, false otherwise.
+	 */
+	bool isWindowsPhone();
+
+	/**
 	 * Handle the click event for video control button.
 	 * Show/hide the video control and change button's text.
 	 */
 	void handleVideoControlButtonClicked();
+
+    /**
+     * This method is called when the return button was pressed.
+     * On iphone platform the virtual keyboard is not hidden after
+     * receiving this event.
+     * @param editBox The edit box object that generated the event.
+     */
+    virtual void editBoxReturn(EditBox* editBox);
 
 private:
 	/**
@@ -120,8 +135,10 @@ private:
 	Button* mPause;
 	Button* mStop;
 	Button* mGetDuration;
+	Label* mDuration;
 	Button* mSeekTo;
 	Button* mCurrentTime;
+	Label*  mTime;
 
 	/**
 	 * Show/hide video control.

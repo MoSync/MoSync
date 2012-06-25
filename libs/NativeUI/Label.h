@@ -56,6 +56,12 @@ namespace NativeUI
         Label();
 
         /**
+         * Constructor.
+         * @param text The given text.
+         */
+        Label(const MAUtil::String text);
+
+        /**
          * Destructor.
          */
         virtual ~Label();

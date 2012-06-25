@@ -91,6 +91,7 @@ namespace MoSync
 					{
 						mCheckBox.IsChecked = val;
 					}
+                    else throw new InvalidPropertyValueException();
 				}
 			}
 		}

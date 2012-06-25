@@ -181,6 +181,15 @@ namespace MoSync
 			}
 		};
 
+		public class ReturnValueException : Exception
+		{
+			public readonly int result;
+			public ReturnValueException(int res)
+			{
+				result = res;
+			}
+		}
+
 		public static void ShowMessage(String text, bool log=true, String caption="")
 		{
 			if(log)
@@ -242,6 +251,19 @@ namespace MoSync
 			RunActionOnMainThread(action, true);
 		}
 
+
+		static Action sPreRunOnMainThreadAction = null;
+		public static void SetPreRunOnMainThreadAction(Action action)
+		{
+			sPreRunOnMainThreadAction = action;
+		}
+
+		static Action sPostRunOnMainThreadAction = null;
+		public static void SetPostRunOnMainThreadAction(Action action)
+		{
+			sPostRunOnMainThreadAction = action;
+		}
+
 		public static void RunActionOnMainThread(Action action, bool sync)
 		{
 			if (Thread.CurrentThread == sStartupThread)
@@ -252,6 +274,9 @@ namespace MoSync
 
 			if (sync)
 			{
+				if (sPreRunOnMainThreadAction != null)
+					sPreRunOnMainThreadAction();
+
 				using (AutoResetEvent are = new AutoResetEvent(false))
 				{
 					Deployment.Current.Dispatcher.BeginInvoke(() =>
@@ -261,6 +286,9 @@ namespace MoSync
 					});
 					are.WaitOne();
 				}
+
+				if (sPostRunOnMainThreadAction != null)
+					sPostRunOnMainThreadAction();
 			}
 			else
 			{
@@ -306,25 +334,25 @@ namespace MoSync
 			brush = null;
 
             // value starts with "0x"
-			if (value.Length == 8 && value[0].Equals('0') && value[1].Equals('x'))
-			{
-				//converting the string from value into RGB bytes
-				byte R = Byte.Parse(value.Substring(2, 2), System.Globalization.NumberStyles.HexNumber);
-				byte G = Byte.Parse(value.Substring(4, 2), System.Globalization.NumberStyles.HexNumber);
-				byte B = Byte.Parse(value.Substring(6, 2), System.Globalization.NumberStyles.HexNumber);
-				byte A = 255;
-				brush = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(A, R, G, B));
-			}
+            if (value.Length == 8 && value[0].Equals('0') && value[1].Equals('x'))
+            {
+                //converting the string from value into RGB bytes
+                byte R = Byte.Parse(value.Substring(2, 2), System.Globalization.NumberStyles.HexNumber);
+                byte G = Byte.Parse(value.Substring(4, 2), System.Globalization.NumberStyles.HexNumber);
+                byte B = Byte.Parse(value.Substring(6, 2), System.Globalization.NumberStyles.HexNumber);
+                byte A = 255;
+                brush = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(A, R, G, B));
+            }
             // value starts with "#"
-			else if (value.Length == 7 && value[0].Equals('#'))
-			{
-				//converting the string from value into RGB bytes
-				byte R = Byte.Parse(value.Substring(1, 2), System.Globalization.NumberStyles.HexNumber);
-				byte G = Byte.Parse(value.Substring(3, 2), System.Globalization.NumberStyles.HexNumber);
-				byte B = Byte.Parse(value.Substring(5, 2), System.Globalization.NumberStyles.HexNumber);
-				byte A = 255;
-				brush = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(A, R, G, B));
-			}
+            else if (value.Length == 7 && value[0].Equals('#'))
+            {
+                //converting the string from value into RGB bytes
+                byte R = Byte.Parse(value.Substring(1, 2), System.Globalization.NumberStyles.HexNumber);
+                byte G = Byte.Parse(value.Substring(3, 2), System.Globalization.NumberStyles.HexNumber);
+                byte B = Byte.Parse(value.Substring(5, 2), System.Globalization.NumberStyles.HexNumber);
+                byte A = 255;
+                brush = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(A, R, G, B));
+            }
             // value doesn't have the normal hex sign
             else if (value.Length == 6)
             {
@@ -335,6 +363,12 @@ namespace MoSync
                 byte A = 255;
                 brush = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(A, R, G, B));
             }
+            // special case for 0
+            else if (value.Length == 1 && value[0].Equals('0'))
+            {
+                brush = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(255, 0, 0, 0));
+            }
+            else throw new InvalidPropertyValueException();
 		}
 
 		public static WriteableBitmap CreateWriteableBitmapFromStream(Stream stream)

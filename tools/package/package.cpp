@@ -62,6 +62,8 @@ static const char* sUsage =
 "     --s60pass <password>     Password to the Symbian private key.\n"
 "     --ios-cert <name>        Output: name of an iOS developer certificate.\n"
 "     --ios-sdk <path>         Output: path to an iOS SDK. Only useful on OSX.\n"
+"     --ios-bundle-id <bundle id>\n"
+"                              Output: the iOS bundle identifier.\n"
 "     --ios-project-only       Output: don't compile the generated iOS project.\n"
 "                              Required on non-OSX hosts.\n"
 "     --android-package <pkg>  Android package name\n"
@@ -172,6 +174,8 @@ int main(int argc, const char** argv) {
 			setString(i, argc, argv, s.iOSSdk);
 		} else if(streq(argv[i], "--ios-xcode-target")) { // iOS specific
 			setString(i, argc, argv, s.iOSXcodeTarget);
+		} else if (streq(argv[i], "--ios-bundle-id")) { // iOS specific
+			setString(i, argc, argv, s.iOSBundleId);
 		} else if(streq(argv[i], "--ios-project-only")) { // iOS specific
 			s.iOSgenerateOnly = true;
 		} else if(streq(argv[i], "--wp-config")) { // Windows Phone specific

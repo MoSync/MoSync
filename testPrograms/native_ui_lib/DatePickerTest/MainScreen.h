@@ -18,7 +18,7 @@ MA 02110-1301, USA.
 
 /**
  * @file MainScreen.h
- * @author Bogdan Iusco
+ * @author Bogdan Iusco, Cipri Filipas
  */
 
 #ifndef MAINSCREEN_H_
@@ -36,6 +36,7 @@ using namespace NativeUI;
 class MainScreen:
 	public Screen,
 	public DatePickerListener,
+	public EditBoxListener,
 	private ButtonListener
 {
 
@@ -89,25 +90,54 @@ private:
      */
     virtual void buttonClicked(Widget* button);
 
+    /**
+     * This method is called when the return button was pressed.
+     * On iphone platform the virtual keyboard is not hidden after
+     * receiving this event.
+     * @param editBox The edit box object that generated the event.
+     */
+    virtual void editBoxReturn(EditBox* editBox);
+
 private:
 	/**
 	 * Main layout.
 	 */
-	VerticalLayout* mMainLayout;
+    VerticalLayout* mList;
+
+    VerticalLayout* mMaxDateLayout;
+    VerticalLayout* mMinDateLayout;
+    RelativeLayout* mPropertiesLayout;
+
 	Button* mSetDate;
 	Button* mGetDate;
-	Label*  mDisplayedDate;
-	HorizontalLayout* layout1;
 	Button* mSetMaxDate;
 	Button* mGetMaxDate;
-	HorizontalLayout* layout2;
-	Label*  mGetMaxDateValue;
-	Label*  mGetMinDateValue;
-	HorizontalLayout* layout3;
 	Button* mSetMinDate;
 	Button* mGetMinDate;
 
+	EditBox* mYearValueMaxDate;
+	EditBox* mMonthValueMaxDate;
+	EditBox* mDayValueMaxDate;
+	EditBox* mYearValueMinDate;
+	EditBox* mMonthValueMinDate;
+	EditBox* mDayValueMinDate;
+
+	Label* mYearLabelMaxDate;
+	Label* mMonthLabelMaxDate;
+	Label* mDayLabelMaxDate;
+	Label* mYearLabelMinDate;
+	Label* mMonthLabelMinDate;
+	Label* mDayLabelMinDate;
+	Label* mDisplayedDate;
+	Label* mGetMaxDateValue;
+	Label* mGetMinDateValue;
+
 	DatePicker* mDatePicker;
+
+	int mScreenY, mScreenX;
+
+	void CreateMaxDateLayout();
+	void CreateMinDateLayout();
 };
 
 

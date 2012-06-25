@@ -42,12 +42,25 @@ namespace MoSync
             //Canvas is the content in which the children are aranged relatively to the parent
             protected System.Windows.Controls.Canvas mPanel;
 
+            //The scrollable view used for the scrollable property
+            protected System.Windows.Controls.ScrollViewer mScrollViewer;
+
+            //The content height
+            protected double mContentHeight;
+
+            //The content width
+            protected double mContentWidth;
+
             /**
              * The constructor
              */
             public RelativeLayout()
             {
                 mPanel = new System.Windows.Controls.Canvas();
+
+                mContentHeight = 0;
+                mContentWidth = 0;
+
                 mView = mPanel;
             }
 
@@ -63,6 +76,8 @@ namespace MoSync
                     WidgetBaseWindowsPhone widget = (child as WidgetBaseWindowsPhone);
 
                     mPanel.Children.Add(widget.View);
+                    mContentHeight += widget.Height;
+                    mContentWidth += widget.Width;
                 });
             }
 
@@ -95,6 +110,41 @@ namespace MoSync
                     mPanel.Children.Remove((child as WidgetBaseWindowsPhone).View);
                 });
                 base.RemoveChild(child);
+            }
+
+            /**
+             * MAW_VERTICAL_LAYOUT_SCROLLABLE implementation
+             */
+            [MoSyncWidgetProperty(MoSync.Constants.MAW_RELATIVE_LAYOUT_SCROLLABLE)]
+            public string Scrollable
+            {
+                set
+                {
+                    bool val;
+                    if (Boolean.TryParse(value, out val))
+                    {
+                        if (true == val)
+                        {
+                            mScrollViewer = new System.Windows.Controls.ScrollViewer();
+                            mPanel.Height = mContentHeight;
+                            mPanel.Width = mContentWidth;
+                            mScrollViewer.Content = mPanel;
+
+                            mView = mScrollViewer;
+
+                            //the property needs to be recalled since the mView has changed.
+                            Height = this.Height;
+                        }
+                        else
+                        {
+                            if (null != mScrollViewer)
+                            {
+                                mView = mPanel;
+                            }
+                        }
+                    }
+                    else throw new InvalidPropertyValueException();
+                }
             }
         }
     }

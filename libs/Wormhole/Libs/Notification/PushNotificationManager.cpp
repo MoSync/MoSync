@@ -34,6 +34,7 @@ MA 02110-1301, USA.
 
 #include <Notification/NotificationManager.h>
 #include <Notification/PushNotification.h>
+#include "../../Encoder.h"
 #include "../PhoneGap/PhoneGapMessageHandler.h"
 #include "PushNotificationManager.h"
 
@@ -163,7 +164,7 @@ namespace Wormhole
 	 */
 	void PushNotificationManager::didApplicationRegistered(MAUtil::String& token)
 	{
-		String tokenJSONString = JSONMessage::JSONStringify(token.c_str());
+		String tokenJSONString = Encoder::JSONStringify(token.c_str());
 		mMessageHandler->callSuccess(
 			mRegistrationCallBack,
 			PHONEGAP_CALLBACK_STATUS_OK,
@@ -191,7 +192,7 @@ namespace Wormhole
 	void PushNotificationManager::didFailedToRegister(
 		MAUtil::String& error)
 	{
-		String errorJSONString = JSONMessage::JSONStringify(error.c_str());
+		String errorJSONString = Encoder::JSONStringify(error.c_str());
 		if (errorJSONString.length() > 1)
 		{
 			errorJSONString.remove(0, 1);

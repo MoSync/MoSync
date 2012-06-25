@@ -20,7 +20,7 @@ require "../../../rules/util.rb"
 require "../../../rules/mosync_util.rb"
 require "FileUtils"
 
-msbuildpath = "/Windows/Microsoft.NET/Framework64/v4.0.30319/MSBuild.exe"
+msbuildpath = "/Windows/Microsoft.NET/Framework/v4.0.30319/MSBuild.exe"
 
 # build everything
 sh "#{msbuildpath} mosync/mosyncRuntime/mosyncRuntime.csproj"

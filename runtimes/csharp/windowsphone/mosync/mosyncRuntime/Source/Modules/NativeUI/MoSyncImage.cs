@@ -39,6 +39,8 @@ namespace MoSync
         //The Image class implementation
         public class Image : WidgetBaseWindowsPhone
         {
+            private System.Windows.Controls.Grid mParentCanvas;
+
             //Standard WP Image control
             protected System.Windows.Controls.Image mImage;
 
@@ -53,35 +55,35 @@ namespace MoSync
                 mImage = new System.Windows.Controls.Image();
                 mStretch = new System.Windows.Media.Stretch();
 
+                mParentCanvas = new Grid();
+
                 mImage.HorizontalAlignment = HorizontalAlignment.Left;
                 mImage.VerticalAlignment = VerticalAlignment.Top;
 
                 mStretch = System.Windows.Media.Stretch.None;
                 mImage.Stretch = mStretch;
 
-                View = mImage;
+                mParentCanvas.Children.Add(mImage);
+                View = mParentCanvas;
             }
 
             //MAW_IMAGE_IMAGE property implementation
             [MoSyncWidgetProperty(MoSync.Constants.MAW_IMAGE_IMAGE)]
-            public string ImageProperty
+            public int ImageProperty
             {
                 set
                 {
-                    int val;
-                    if (Int32.TryParse(value, out val))
+                    //Get the resource with the specified handle
+                    Resource res = mRuntime.GetResource(MoSync.Constants.RT_IMAGE, value);
+                    if (null != res)
                     {
-                        //Get the resource with the specified handle
-                        Resource res = mRuntime.GetResource(MoSync.Constants.RT_IMAGE, val);
-                        if (null != res)
-                        {
-                            //Create a BitmapSource object from the internal object of the resource loaded
-                            System.Windows.Media.Imaging.BitmapSource bmpSource = (System.Windows.Media.Imaging.BitmapSource)(res.GetInternalObject());
+                        //Create a BitmapSource object from the internal object of the resource loaded
+                        System.Windows.Media.Imaging.BitmapSource bmpSource = (System.Windows.Media.Imaging.BitmapSource)(res.GetInternalObject());
 
-                            //The image standard object gets that as a source
-                            mImage.Source = bmpSource;
-                        }
+                        //The image standard object gets that as a source
+                        mImage.Source = bmpSource;
                     }
+                    else throw new InvalidPropertyValueException();
                 }
             }
 
@@ -106,6 +108,7 @@ namespace MoSync
                         mStretch = System.Windows.Media.Stretch.UniformToFill;
                         mImage.Stretch = mStretch;
                     }
+                    else throw new InvalidPropertyValueException();
                 }
             }
         }

@@ -1034,7 +1034,7 @@ void EnumerateFunctionLabels(SYMBOL *sym)
 
 		if (ref)
 		{
-			if (ref->LabelType == label_Local)
+			if (ref->LabelType == label_Local || ref->LabelType == label_Function)
 			{
 				// Set the enumerator for this label
 

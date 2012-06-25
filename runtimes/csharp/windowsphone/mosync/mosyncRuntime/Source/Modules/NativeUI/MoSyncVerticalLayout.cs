@@ -42,6 +42,8 @@ namespace MoSync
             //The Grid that will be used as the VerticalLayout
             protected System.Windows.Controls.Grid mGrid;
 
+            protected System.Windows.Controls.ScrollViewer mScrollViewer;
+
             //Padding information
             protected double mPaddingBottom;
             protected double mPaddingTop;
@@ -240,6 +242,7 @@ namespace MoSync
                         mSpacerRight.Width = new GridLength(1, GridUnitType.Auto);
                         mSpacerLeft.Width = new GridLength(1, GridUnitType.Auto);
                     }
+                    else throw new InvalidPropertyValueException();
                 }
             }
 
@@ -275,6 +278,7 @@ namespace MoSync
 
                         mPaddingSetByUser = true;
                     }
+                    else throw new InvalidPropertyValueException();
                 }
             }
 
@@ -282,18 +286,12 @@ namespace MoSync
              * MAW_VERTICAL_LAYOUT_PADDING_BOTTOM implementation
              */
             [MoSyncWidgetProperty(MoSync.Constants.MAW_VERTICAL_LAYOUT_PADDING_BOTTOM)]
-            public String PaddingBottom
+            public double PaddingBottom
             {
                 set
                 {
-                    double val;
-                    if (Double.TryParse(value, out val))
-                    {
-                        mPaddingBottom = val;
-                        mSpacerDown.Height = new GridLength(mPaddingBottom);
-
-                        mPaddingSetByUser = true;
-                    }
+                    mSpacerDown.Height = new GridLength(value);
+                    mPaddingSetByUser = true;
                 }
             }
 
@@ -301,18 +299,12 @@ namespace MoSync
              * MAW_VERTICAL_LAYOUT_PADDING_TOP implementation
              */
             [MoSyncWidgetProperty(MoSync.Constants.MAW_VERTICAL_LAYOUT_PADDING_TOP)]
-            public String PaddingTop
+            public double PaddingTop
             {
                 set
                 {
-                    double val;
-                    if (Double.TryParse(value, out val))
-                    {
-                        mPaddingTop = val;
-                        mSpacerUp.Height = new GridLength(mPaddingTop);
-
-                        mPaddingSetByUser = true;
-                    }
+                    mSpacerUp.Height = new GridLength(value);
+                    mPaddingSetByUser = true;
                 }
             }
 
@@ -320,16 +312,11 @@ namespace MoSync
              * MAW_VERTICAL_LAYOUT_PADDING_LEFT implementation
              */
             [MoSyncWidgetProperty(MoSync.Constants.MAW_VERTICAL_LAYOUT_PADDING_LEFT)]
-            public String PaddingLeft
+            public double PaddingLeft
             {
                 set
                 {
-                    double val;
-                    if (Double.TryParse(value, out val))
-                    {
-                        mPaddingLeft = val;
-                        mSpacerLeft.Width = new GridLength(mPaddingLeft);
-                    }
+                    mSpacerLeft.Width = new GridLength(value);
                 }
             }
 
@@ -337,16 +324,40 @@ namespace MoSync
              * MAW_VERTICAL_LAYOUT_PADDING_RIGHT implementation
              */
             [MoSyncWidgetProperty(MoSync.Constants.MAW_VERTICAL_LAYOUT_PADDING_RIGHT)]
-            public String PaddingRight
+            public double PaddingRight
             {
                 set
                 {
-                    double val;
-                    if (Double.TryParse(value, out val))
+                    mSpacerRight.Width = new GridLength(value);
+                }
+            }
+
+            /**
+             * MAW_VERTICAL_LAYOUT_SCROLLABLE implementation
+             */
+            [MoSyncWidgetProperty(MoSync.Constants.MAW_VERTICAL_LAYOUT_SCROLLABLE)]
+            public string Scrollable
+            {
+                set
+                {
+                    bool val;
+                    if (Boolean.TryParse(value, out val))
                     {
-                        mPaddingRight = val;
-                        mSpacerRight.Width = new GridLength(mPaddingRight);
+                        if (true == val)
+                        {
+                            mScrollViewer = new System.Windows.Controls.ScrollViewer();
+                            mScrollViewer.Content = mGrid;
+                            mView = mScrollViewer;
+                        }
+                        else
+                        {
+                            if (null != mScrollViewer)
+                            {
+                                mView = mGrid;
+                            }
+                        }
                     }
+                    else throw new InvalidPropertyValueException();
                 }
             }
 

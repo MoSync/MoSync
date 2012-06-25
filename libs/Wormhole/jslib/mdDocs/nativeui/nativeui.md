@@ -10,29 +10,32 @@ here is an example of a code that creates a Native User Interface on the device:
 
 		<div id="NativeUI">
 			<!-- the element with id="mainScreen" is loaded to the device screen  by default -->
-			<div widgetType="TabScreen" id="mainScreen">
-				<div widgetType="Screen" id="firstScreen" title="Web Screen" icon_iOS="img/TabIconWebView.png" >
-					<div widgetType="WebView" width="100%" height="100%" url="http://www.google.com"></div>
+			<div data-widgetType="TabScreen" id="mainScreen">
+				<div data-widgetType="Screen" id="firstScreen" data-title="Web Screen" data-icon_iOS="img/TabIconWebView.png" >
+					<div data-widgetType="WebView" data-width="100%" data-height="100%" data-url="http://www.google.com"></div>
 				</div>
-				<div widgetType="Screen" id="SecondScreen" title="Widget Screen">
-					<div widgetType="VerticalLayout" id="mainLayout" width="-1" height="-1">
-						<div widgetType="Label" id="myLabel" width="100%" text="Here is a Label" fontSize="19"></div>
-						<div widgetType="Button" id="myButton" width="100%" text="Click !" onevent="alert('cliekct')"></div>
+				<div data-widgetType="Screen" id="SecondScreen" data-title="Widget Screen">
+					<div data-widgetType="VerticalLayout" id="mainLayout" data-width="100%" data-height="100%">
+						<div data-widgetType="Label" id="myLabel" data-width="100%" data-text="Here is a Label" data-fontSize="19"></div>
+						<div data-widgetType="Button" id="myButton" data-width="100%" data-text="Click !" data-onevent="alert('cliekct')"></div>
 					</div>
 				</div>
 			</div>
 		</div>
 
-All of the Native UI widgets should be wrapped inside a div tag with id "NativeUI". The system picks everything inside that tag and creates Native widgets for each corresponding tag. You can specify the type of the Native widget with the attribute "widgetType" and also use other attributes to set the properties of the widgets. For more information on the available widget types, properties,  and valid values please see Widget Types, Widget Events, and Widget Properties.
+All of the Native UI widgets should be wrapped inside a div tag with id "NativeUI". The system picks everything inside that tag and creates Native widgets for each corresponding tag. You can specify the type of the Native widget with the attribute "data-widgetType" and also use other attributes to set the properties of the widgets. For more information on the available widget types, properties,  and valid values please see Widget Types, Widget Events, and Widget Properties.
+
+**Note:**: You can skip the prefix "data-" in the attributes, the system supports both versions. When using a property in the JavaScript code, you should only use the properthy name without the "data-" prefix.
 
 **Note:** Using HTML markup on Windows Phone 7 is not recommended due to performance issues. 
+
 Icons
 -----
-To use icons for your tabviews you can use special attributes to assign icons to the tabs. Valid attribute types for the icons are <strong>"icon_android"</strong>, <strong>"icon_iOS"</strong>, and <strong>"icon"</strong>.
+To use icons for your tabviews you can use special attributes to assign icons to the tabs. Valid attribute types for the icons are <strong>"data-icon\_android"</strong>, <strong>"data-icon\_iOS"</strong>, and <strong>"data-icon"</strong>.
 
 Events
 ------
-Currently we only support binding click events through HTML markup. In order to bind a function to the click event of your widget use the "onevent" attribute.
+Currently we only support binding click events through HTML markup. In order to bind a function to the click event of your widget use the "data-onevent" attribute.
 
 Accessing Widgets From JavaScript
 --------------------------------

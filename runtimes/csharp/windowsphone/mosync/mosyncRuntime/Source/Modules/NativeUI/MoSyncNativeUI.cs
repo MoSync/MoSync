@@ -27,6 +27,11 @@ namespace MoSync
         public interface IScreen
         {
             void Show();
+            Microsoft.Phone.Shell.ApplicationBar GetApplicationBar();
+            void EnableApplicationBar();
+            bool GetApplicationBarVisibility();
+            void SetApplicationBarVisibility(bool value);
+            int AddApplicationBarItemIndex(Object item);
         }
 
         public class MoSyncWidgetPropertyAttribute : Attribute
@@ -176,12 +181,25 @@ namespace MoSync
             {
                 PropertyInfo pinfo;
                 MoSyncWidgetPropertyAttribute pattr = GetPropertyAttribute(property, out pinfo);
+                Exception exception = null;
                 if (pinfo == null) throw new InvalidPropertyNameException();
                 if (pattr.ShouldExecuteOnMainThread)
+                {
                     MoSync.Util.RunActionOnMainThreadSync(() =>
                         {
-                            SetProperty(pinfo, stringValue);
+                            try
+                            {
+                                SetProperty(pinfo, stringValue);
+                            }
+                            catch (Exception e)
+                            {
+                                exception = e;
+                            }
                         });
+                    if (null != exception)
+                        if(exception.InnerException is InvalidPropertyValueException)
+                            throw new InvalidPropertyValueException();
+                }
                 else
                     SetProperty(pinfo, stringValue);
             }

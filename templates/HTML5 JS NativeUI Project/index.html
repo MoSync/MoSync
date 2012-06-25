@@ -96,32 +96,32 @@
 		tag with id="NativeUI" -->
 	<div id="NativeUI">
 		<!-- The element with id="mainScreen" has two tabs with screens -->
-		<div widgetType="TabScreen" id="mainScreen">
+		<div data-widgetType="TabScreen" id="mainScreen">
 			<!-- First Screen -->
-			<div widgetType="Screen" id="widgetScreen" title="Widgets"
-				icon_android="img/Android_TabIconDevice.png"
-				icon_iOS="img/IOS_TabIconDevice.png">
-				<div widgetType="VerticalLayout" id="mainLayout"
-					width="-1" height="-1">
-					<div widgetType="Label" id="textLabel" width="100%"
-						text="Native UI in JavaScript"
-						fontSize="26" fontColor="0xFFFFFF">
+			<div data-widgetType="Screen" id="widgetScreen" data-title="Widgets"
+				data-icon_android="img/Android_TabIconDevice.png"
+				data-icon_iOS="img/IOS_TabIconDevice.png">
+				<div data-widgetType="VerticalLayout" id="mainLayout"
+					data-width="-1" data-height="-1">
+					<div widgetType="Label" id="textLabel" data-width="100%"
+						data-text="Native UI in JavaScript"
+						data-fontSize="26" data-fontColor="0xFFFFFF">
 					</div>
-					<div widgetType="Button" id="counterButton"
-						width="100%" text="Click Me!" fontSize="20"
-						onevent="counterButtonClicked()">
+					<div data-widgetType="Button" id="counterButton"
+						data-width="100%" data-text="Click Me!" data-fontSize="20"
+						data-onevent="counterButtonClicked()">
 					</div>
-					<div widgetType="Button" id="vibrateButton"
-						width="100%" text="Vibrate"  fontSize="20">
+					<div data-widgetType="Button" id="vibrateButton"
+						data-width="100%" data-text="Vibrate"  data-fontSize="20">
 					</div>
 				</div>
 			</div>
 			<!-- Second Screen -->
-			<div widgetType="Screen" id="webScreen" title="Web"
-				icon_android="img/Android_TabIconWebView.png"
-				icon_iOS="img/IOS_TabIconWebView.png">
-				<div widgetType="WebView" id="webBrowser"
-					width="100%" height="100%" url="http://www.google.com">
+			<div data-widgetType="Screen" data-id="webScreen" data-title="Web"
+				data-icon_android="img/Android_TabIconWebView.png"
+				data-icon_iOS="img/IOS_TabIconWebView.png">
+				<div data-widgetType="WebView" id="webBrowser"
+					data-width="100%" data-height="100%" data-url="http://www.google.com">
 				</div>
 			</div>
 		</div>
