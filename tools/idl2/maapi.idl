@@ -4527,6 +4527,7 @@ group WidgetAPI "Widget API" {
 		*/
 		DIALOG_DISMISSED = 22;
 
+		/**
 		* Send by current screen just before it begins rotating.
 		* Platform: iOS and Windows Phone 7.1
 		*/
@@ -4580,7 +4581,7 @@ group WidgetAPI "Widget API" {
 		MAP_PIN_CLICKED = 32;
 
 		/**
-		* Send by a SegmenetedListView when an item is about to be selected.
+		* @brief Send by a SegmenetedListView when an item is about to be selected.
 		* The listItemIndex member from MAWidgetEventData struct will contain the item index
 		* that is about to be selected.
 		* Available only on iOS.
@@ -4588,13 +4589,12 @@ group WidgetAPI "Widget API" {
 		SEGMENTED_ITEM_WILL_SELECT = 33;
 
 		/**
-		* Send by a SegmenetedListView when an item was selected.
+		* @brief Send by a SegmenetedListView when an item was selected.
 		* The listItemIndex member from MAWidgetEventData struct will contain the item index
 		* that was selected.
 		* Available only on iOS.
 		*/
 		SEGMENTED_ITEM_SELECTED = 34;
-
 	}
 	} // end of WidgetEventTypes
 
@@ -7824,7 +7824,7 @@ group WidgetAPI "Widget API" {
 		*
 		* @par Example
 		* \code
-		*   maWidgetSetProperty(listItemHandle, MAW_SEGMENTED_LIST_ITEM_EDIT, "true");
+		*   maWidgetSetProperty(listItemHandle, MAW_SEGMENTED_LIST_VIEW_ITEM_EDIT, "true");
 		* \endcode
 		*/
 		EDIT = "edit";
@@ -7843,16 +7843,32 @@ group WidgetAPI "Widget API" {
 		*
 		* @par Example
 		* \code
-		*   maWidgetSetProperty(listItemHandle, MAW_SEGMENTED_LIST_ITEM_MOVE, "true");
+		*   maWidgetSetProperty(listItemHandle, MAW_SEGMENTED_LIST_VIEW_ITEM_MOVE, "true");
 		* \endcode
 		*/
 		MOVE = "move";
+
+		/**
+		* @brief Set the title of the delete-confirmation button.
+		* The table view displays the "Delete" button when the user attempts to delete a row,
+		* either by swiping the row or tapping the red minus icon in editing mode.
+		*
+		* Platform: iOS.
+		*
+		* @validvalue A string.
+		* Default value is "Delete".
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+		*   maWidgetSetProperty(listItemHandle, MAW_SEGMENTED_LIST_VIEW_ITEM_DELETE_BUTTON_TITLE, "Remove");
+		* \endcode
+		*/
+		DELETE_BUTTON_TITLE = "deleteButtonTitle";
+
 	}
 	} // end of WidgetSegmentedListViewItemProperties
-
-	} // end of WidgetProperties
-
-	typedef int MAWidgetHandle;
 
 	/**
 	* The available widget properties for a #MAW_RADIO_BUTTON. See \ref WidgetProperties "Widget properties" for more properties.

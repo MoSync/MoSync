@@ -51,9 +51,11 @@
 
 /**
  * Constructor.
+ * @param listener Listener for list settings.
  */
-SettingsScreen::SettingsScreen() :
+SettingsScreen::SettingsScreen(ISettingsScreen& listener):
 	Screen(),
+	mListener(listener),
 	mAllowEditing(NULL),
 	mAllowMoving(NULL),
 	mDisplayMode(NULL),
@@ -217,7 +219,14 @@ void SettingsScreen::checkBoxStateChanged(
 	CheckBox* checkBox,
 	bool state)
 {
-
+	if (checkBox == mAllowEditing)
+	{
+		mListener.allowEditing(mAllowEditing->isChecked());
+	}
+	else if (checkBox == mAllowMoving)
+	{
+		mListener.allowMoving(mAllowMoving->isChecked());
+	}
 }
 
 /**
@@ -251,4 +260,16 @@ void SettingsScreen::segmentedListViewItemSelected(
 	const int segmentedListViewItemIndex)
 {
 	printf("SettingsScreen::segmentedListViewItemSelected");
+	SegmentedListViewMode listMode;
+	if (segmentedListViewItemIndex == 0)
+	{
+		listMode = SegmentedListViewModeDisplay;
+	}
+	else if (segmentedListViewItemIndex == 1)
+	{
+		listMode = SegmentedListViewModeEdit;
+	}
+	printf("listMode = %d segmentedListViewItemIndex = %d",
+		listMode, segmentedListViewItemIndex);
+	mListener.listModeChanged(listMode);
 }

@@ -276,6 +276,7 @@ namespace NativeUI
 	SegmentedListViewItem* SegmentedListView::getItemAtIndex(
 		const int listItemIndex)
 	{
+		// TODO bug fix. Wrong item returned.
 		int countSections = this->countChildWidgets();
 		int countItems = listItemIndex;
 		SegmentedListViewItem* selectedItem = NULL;

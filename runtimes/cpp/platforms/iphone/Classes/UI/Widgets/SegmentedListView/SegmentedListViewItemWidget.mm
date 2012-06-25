@@ -65,6 +65,7 @@
 @implementation SegmentedListViewItemWidget
 
 @synthesize cell = _cell;
+@synthesize deleteButtonTitle = _deleteButtonTitle;
 @synthesize height = _height;
 @synthesize editable = _canEdit;
 @synthesize canMove = _canMove;
@@ -125,10 +126,16 @@ static NSString* kReuseIdentifier = @"Cell";
     {
         return [self setCanMoveProperty:value];
     }
+    else if ([key isEqualToString:@MAW_SEGMENTED_LIST_VIEW_ITEM_DELETE_BUTTON_TITLE])
+    {
+        self.deleteButtonTitle = value;
+    }
     else
     {
         return [super setPropertyWithKey:key toValue:value];
     }
+
+    return MAW_RES_OK;
 }
 
 /**
@@ -146,6 +153,10 @@ static NSString* kReuseIdentifier = @"Cell";
     {
         return [[self canMoveProperty] retain];
     }
+    else if ([key isEqualToString:@MAW_SEGMENTED_LIST_VIEW_ITEM_DELETE_BUTTON_TITLE])
+    {
+        return [[NSString alloc] initWithString:self.deleteButtonTitle];
+    }
     else
     {
         return [super getPropertyWithKey:key];
@@ -158,7 +169,7 @@ static NSString* kReuseIdentifier = @"Cell";
 -(void) dealloc
 {
     // Do NOT release _cell object here. It will be released by the super class.
-
+    [_deleteButtonTitle release];
     [super dealloc];
 }
 

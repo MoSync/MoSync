@@ -25,6 +25,11 @@
  * A SegmentedListView widget is used to present an indexed/grouped list of items.
  */
 
+/**
+ * Default title for the delete-confirmation button, which appears on the right side of the cell.
+ */
+#define DEFAULT_DELETE_BUTTON_TITLE "Delete";
+
 #import "SegmentedListViewWidget.h"
 #import "SegmentedListViewSectionWidget.h"
 #import "SegmentedListViewItemWidget.h"
@@ -359,6 +364,23 @@
 	eventData->listItemIndex = [indexPath row];
 	event.data = (int)eventData;
 	Base::gEventQueue.put(event);
+}
+
+/**
+ * Changes the default title of the delete-confirmation button.
+ * @param tableView The table-view object requesting this information.
+ * @param indexPath An index-path object locating the row in its section.
+ * @return A localized string to used as the title of the delete-confirmation button.
+ */
+- (NSString *)tableView:(UITableView *)tableView titleForDeleteConfirmationButtonForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    SegmentedListViewSectionWidget* section = [_sections objectAtIndex:indexPath.section];
+    if (!section)
+    {
+        return @DEFAULT_DELETE_BUTTON_TITLE;
+    }
+    SegmentedListViewItemWidget* cellWidget = [section cellWidgetAtIndex:indexPath.row];
+    return cellWidget.deleteButtonTitle;
 }
 
 /**

@@ -32,13 +32,16 @@
 
 #include "../wrapper/SegmentedListView.h"
 #include "../Model/IDataSource.h"
+#include "ISettingsScreen.h"
 
 using namespace NativeUI;
 
 // Forward declaration.
 class ListSection;
 
-class IndexedListScreen: public Screen
+class IndexedListScreen:
+	public Screen,
+	public ISettingsScreen
 {
 public:
 	/**
@@ -68,6 +71,24 @@ private:
 	 * @param section Section to add.
 	 */
 	void addSectionDataToList(const ListSection& section);
+
+	/**
+	 * Allow editing value has changed.
+	 * @param state True if allowed, false otherwise.
+	 */
+	virtual void allowEditing(bool state);
+
+	/**
+	 * Allow moving list items value has changed.
+	 * @param state True if allowed, false otherwise.
+	 */
+	virtual void allowMoving(bool state);
+
+	/**
+	 * List mode has changed.
+	 * @param listMode The new list mode.
+	 */
+	virtual void listModeChanged(SegmentedListViewMode listMode);
 
 private:
 	/**

@@ -42,6 +42,13 @@
     UITableViewCell* _cell;
 
     /**
+     * The title of the delete-confirmation button.
+     * The table view displays a button with this text when the user attempts to delete a row,
+     * either by swiping the row or tapping the red minus icon in editing mode.
+     */
+    NSString* _deleteButtonTitle;
+
+    /**
      * Cell's height.
      */
     CGFloat _height;
@@ -58,6 +65,7 @@
 }
 
 @property(nonatomic, readonly) UITableViewCell* cell;
+@property(nonatomic, retain) NSString* deleteButtonTitle;
 @property(nonatomic, assign) CGFloat height;
 @property(nonatomic, assign) BOOL editable;
 @property(nonatomic, assign) BOOL canMove;

@@ -32,6 +32,8 @@
 #include <NativeUI/CheckBox.h>
 #include <NativeUI/CheckBoxListener.h>
 
+#include "ISettingsScreen.h"
+
 #include "../wrapper/SegmentedListView.h"
 #include "../wrapper/SegmentedListViewSection.h"
 #include "../wrapper/SegmentedListViewItem.h"
@@ -47,8 +49,9 @@ class SettingsScreen :
 public:
 	/**
 	 * Constructor.
+	 * @param listener Listener for list settings.
 	 */
-	SettingsScreen();
+	SettingsScreen(ISettingsScreen& listener);
 
 	/**
 	 * Destructor.
@@ -130,7 +133,13 @@ private:
 		SegmentedListView* segmentedListView,
 		SegmentedListViewItem* segmentedListViewItem,
 		const int segmentedListViewItemIndex);
+
 private:
+	/**
+	 * Listener for list settings.
+	 */
+	ISettingsScreen& mListener;
+
 	/**
 	 * Allow cells to be edited.
 	 */

@@ -106,3 +106,30 @@ void IndexedListScreen::addSectionDataToList(const ListSection& section)
 
 	mSegmentedListView->addSection(segmentedListViewSection);
 }
+
+/**
+ * Allow editing value has changed.
+ * @param state True if allowed, false otherwise.
+ */
+void IndexedListScreen::allowEditing(bool state)
+{
+
+}
+
+/**
+ * Allow moving list items value has changed.
+ * @param state True if allowed, false otherwise.
+ */
+void IndexedListScreen::allowMoving(bool state)
+{
+
+}
+
+/**
+ * List mode has changed.
+ * @param listMode The new list mode.
+ */
+void IndexedListScreen::listModeChanged(SegmentedListViewMode listMode)
+{
+	mSegmentedListView->setMode(listMode);
+}
