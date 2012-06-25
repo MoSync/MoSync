@@ -17,7 +17,7 @@ here is an example of a code that creates a Native User Interface on the device:
 				<div data-widgetType="Screen" id="SecondScreen" data-title="Widget Screen">
 					<div data-widgetType="VerticalLayout" id="mainLayout" data-width="100%" data-height="100%">
 						<div data-widgetType="Label" id="myLabel" data-width="100%" data-text="Here is a Label" data-fontSize="19"></div>
-						<div data-widgetType="Button" id="myButton" data-width="100%" data-text="Click !" data-onevent="alert('cliekct')"></div>
+						<div data-widgetType="Button" id="myButton" data-width="100%" data-text="Click !" data-onevent="alert('Clicked!')"></div>
 					</div>
 				</div>
 			</div>
@@ -41,9 +41,9 @@ Accessing Widgets From JavaScript
 --------------------------------
 To access the widgets created in HTML markup you can use document.getNativeElementById to get a object of Type mosync.nativeui.NativeWidgetElement. Here is an example of accessing one of the widgets defined above.
 
-		//Get an instacne of the button created in the markup
+		// Get an instacne of the button created in the markup.
 		var myButton = document.getNativeElementById("myButton");
-		//add an event listener to it
+		// Add an event listener to it.
 		myButton.addEventListener("Clicked", changeLabel);
 
 Links

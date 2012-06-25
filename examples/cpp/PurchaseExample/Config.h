@@ -22,4 +22,7 @@
 
 #define DEVELOPER_PUBLIC_KEY ""
 
+#define IOS_PRODUCT_TYPE_1 "yourConsumableProductID"
+#define IOS_PRODUCT_TYPE_2 "yourNonconsumableProductID"
+
 #endif /* CONFIG_H_ */

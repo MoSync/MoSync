@@ -26,6 +26,12 @@ namespace MoSync
          */
 		public class Label : WidgetBaseWindowsPhone
 		{
+            /**
+             * The parent container of the native label.
+             * This is used for the vertical alignement.
+             */
+            private System.Windows.Controls.Grid mParentLayout;
+
 			/**
             * The TextBlock widget, that will contain the text.
             */
@@ -43,6 +49,18 @@ namespace MoSync
 			public Label()
 			{
 				mMaxNumberOfLines = 0;
+                mParentLayout = new System.Windows.Controls.Grid();
+
+                RowDefinition _rowDef = new RowDefinition();
+                _rowDef.Height = new GridLength(1, GridUnitType.Auto);
+                RowDefinition _spacerUp = new RowDefinition();
+                _rowDef.Height = new GridLength(1, GridUnitType.Auto);
+                RowDefinition _spacerDown = new RowDefinition();
+                _rowDef.Height = new GridLength(1, GridUnitType.Auto);
+
+                mParentLayout.RowDefinitions.Add(_spacerUp);
+                mParentLayout.RowDefinitions.Add(_rowDef);
+                mParentLayout.RowDefinitions.Add(_spacerDown);
 
                 mLabel = new System.Windows.Controls.TextBlock();
 				mLabel.TextWrapping = TextWrapping.Wrap;
@@ -58,7 +76,11 @@ namespace MoSync
                  */
                 mLabel.Style = (Style)Application.Current.Resources["PhoneTextNormalStyle"];
 
-                mView = mLabel;
+                mParentLayout.Children.Add(mLabel);
+
+                Grid.SetRow(mLabel, 1);
+
+                mView = mParentLayout;
 			}
 
             /**
@@ -123,13 +145,19 @@ namespace MoSync
 				    switch (value)
 					    {
 						    case MoSync.Constants.MAW_ALIGNMENT_TOP:
-							    mLabel.VerticalAlignment = VerticalAlignment.Top;
+                                mParentLayout.RowDefinitions[0].Height = new GridLength(0);
+                                mParentLayout.RowDefinitions[2].Height = new GridLength(1, GridUnitType.Star);
+                                mLabel.VerticalAlignment = VerticalAlignment.Top;
 							    break;
 						    case MoSync.Constants.MAW_ALIGNMENT_CENTER:
-							    mLabel.VerticalAlignment = VerticalAlignment.Center;
+                                mParentLayout.RowDefinitions[0].Height = new GridLength(1, GridUnitType.Star);
+                                mParentLayout.RowDefinitions[2].Height = new GridLength(1, GridUnitType.Star);
+                                mLabel.VerticalAlignment = VerticalAlignment.Center;
 							    break;
 						    case MoSync.Constants.MAW_ALIGNMENT_BOTTOM:
-							    mLabel.VerticalAlignment = VerticalAlignment.Bottom;
+                                mParentLayout.RowDefinitions[0].Height = new GridLength(1, GridUnitType.Star);
+                                mParentLayout.RowDefinitions[2].Height = new GridLength(0);
+                                mLabel.VerticalAlignment = VerticalAlignment.Bottom;
 							    break;
                             default:
                                 throw new InvalidPropertyValueException();

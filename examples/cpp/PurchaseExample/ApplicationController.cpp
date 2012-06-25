@@ -42,8 +42,6 @@ mMainScreen(NULL)
 	mMainScreen->getBuyButton()->addButtonListener(this);
 	mMainScreen->getPurchasedItemList()->addListViewListener(this);
 
-	// Set Android public key.
-	PurchaseManager::getInstance()->setPublicKey(DEVELOPER_PUBLIC_KEY);
 	PurchaseManager::getInstance()->setStoreURL(sAppStoreSandboxURL);
 }
 
@@ -159,7 +157,7 @@ void ApplicationController::receiptValid(
 		// Display the dialog containing the receipt information.
 		mMainScreen->fillReceiptDialog(receipt.getAppID(), receipt.getProductID(),
 				receipt.getTransactionDate(), receipt.getTransactionID(),
-				receipt.getVersionExternalID(), receipt.getBID());
+				receipt.getBID());
 	}
 
 }

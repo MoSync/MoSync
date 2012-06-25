@@ -191,6 +191,11 @@ namespace NativeUI
          * @param mapPin The map pin object that generated the event.
          */
 		virtual void mapPinClicked(MapPin* mapPin);
+	private:
+		/**
+		 * Checks if a pin is already on the map.
+		 */
+		bool containsPin(MapPin* mapPin);
 
     protected:
         /**

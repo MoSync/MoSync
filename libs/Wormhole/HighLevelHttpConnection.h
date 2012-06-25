@@ -63,6 +63,11 @@ public:
 	HighLevelReader(HighLevelHttpConnection* connection);
 
 	/**
+	 * Destructor.
+	 */
+	virtual ~HighLevelReader();
+
+	/**
 	 * Start downloading data.
 	 */
 	virtual void startRecvToData() = 0;

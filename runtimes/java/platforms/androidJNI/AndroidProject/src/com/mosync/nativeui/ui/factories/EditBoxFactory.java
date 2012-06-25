@@ -53,7 +53,11 @@ public class EditBoxFactory implements AbstractViewFactory
 
 			@Override
 			public void onTextChanged(CharSequence s, int start, int before, int count) {
-				if ( count > 0 )
+				// Do not send event when edit box receives focus and text is empty.
+				if ( count == 0 && before == 0 )
+				{
+					return;
+				}
 				EventQueue.getDefault().postWidgetEvent(
 						IX_WIDGET.MAW_EVENT_EDIT_BOX_TEXT_CHANGED, handle);
 			}
