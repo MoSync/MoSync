@@ -268,9 +268,12 @@ public class MoSyncAudio implements OnCompletionListener, OnPreparedListener, On
 		 *
 		 * @param playing
 		 */
-		void setPlaying(boolean playing)
+		void setPlaying(boolean playing, boolean looping)
 		{
-			mLoopsLeft = mLooping+1;
+			if (!looping)
+			{
+				mLoopsLeft = mLooping+1;
+			}
 			mPlaying = playing;
 		}
 
@@ -454,7 +457,7 @@ public class MoSyncAudio implements OnCompletionListener, OnPreparedListener, On
 		if(null == d)
 			return -100;
 
-		d.release(mAudioInstance);
+//		d.release(mAudioInstance);
 
 /*
 		String name = d.getFileName();
@@ -470,8 +473,11 @@ public class MoSyncAudio implements OnCompletionListener, OnPreparedListener, On
 		{
 			// if all sounds has been deleted
 			// it's safe to delete the sound pool.
-			mSoundPool.release();
-			mSoundPool = null;
+			if (d.getFlags() != MA_AUDIO_DATA_STREAM)
+			{
+				mSoundPool.release();
+				mSoundPool = null;
+			}
 		}
 
 		return MA_AUDIO_ERR_OK;
@@ -559,8 +565,8 @@ public class MoSyncAudio implements OnCompletionListener, OnPreparedListener, On
 		if(instance.isPlaying())
 			maAudioStop(audioInstance);
 
-		AudioData data = instance.getAudioData();
-		data.removeInstance(audioInstance);
+//		AudioData data = instance.getAudioData();
+//		data.removeInstance(audioInstance);
 
 		mAudioInstance.remove(audioInstance);
 
@@ -604,10 +610,10 @@ public class MoSyncAudio implements OnCompletionListener, OnPreparedListener, On
 			else if(loops == 0)
 				mMediaPlayer.setLooping(false);
 		}
-		else
-		{
-			instance.setLooping(loops);
-		}
+//		else
+//		{
+//			instance.setLooping(loops);
+//		}
 
 		return MA_AUDIO_ERR_OK;
 	}
@@ -619,10 +625,18 @@ public class MoSyncAudio implements OnCompletionListener, OnPreparedListener, On
 
 		AudioInstance instance = getAudioInstance(audio);
 		if(null == instance)
-			return 0;
+		{
+			return MA_AUDIO_ERR_INVALID_INSTANCE;
+		}
 
 		if(instance.isPaused())
-			return 0;
+		{
+			if (1 == async)
+			{
+				postAudioEvent(EVENT_TYPE_AUDIO_PREPARED, audio);
+			}
+			return MA_AUDIO_ERR_OK;
+		}
 
 		AudioData data = instance.getAudioData();
 
@@ -632,6 +646,10 @@ public class MoSyncAudio implements OnCompletionListener, OnPreparedListener, On
 		if(MA_AUDIO_DATA_STREAM != data.getFlags())
 		{
 			data.setPreparedState(AUDIO_PREPARED);
+			if (1 == async)
+			{
+				postAudioEvent(EVENT_TYPE_AUDIO_PREPARED, audio);
+			}
 			return MA_AUDIO_ERR_OK;
 		}
 
@@ -714,6 +732,11 @@ public class MoSyncAudio implements OnCompletionListener, OnPreparedListener, On
 
 	int maAudioPlay(int audio)
 	{
+		return maAudioPlay(audio, false);
+	}
+
+	int maAudioPlay(int audio, boolean looping)
+	{
 		AudioInstance instance = getAudioInstance(audio);
 		if(null == instance)
 			return MA_AUDIO_ERR_INVALID_INSTANCE;
@@ -781,7 +804,7 @@ public class MoSyncAudio implements OnCompletionListener, OnPreparedListener, On
 			}
 		}
 
-		instance.setPlaying(true);
+		instance.setPlaying(true, looping);
 
 		return MA_AUDIO_ERR_OK;
 	}
@@ -923,7 +946,7 @@ public class MoSyncAudio implements OnCompletionListener, OnPreparedListener, On
 			}
 		}
 
-		instance.setPlaying(false);
+		instance.setPlaying(false, false);
 
 		return MA_AUDIO_ERR_OK;
 	}
@@ -953,19 +976,15 @@ public class MoSyncAudio implements OnCompletionListener, OnPreparedListener, On
 
 			if(audio.shouldLoop())
 			{
-				if( MA_AUDIO_ERR_OK == maAudioPlay(mActiveStreamingAudio))
-				return;
+				if( MA_AUDIO_ERR_OK == maAudioPlay(mActiveStreamingAudio, true))
+					return;
 
 				// oops.. we got an error during playback
 				mActiveStreamingAudio = 0;
 			}
 		}
 
-		int[] event = new int[2];
-		event[0] = EVENT_TYPE_AUDIO_COMPLETED;
-		event[1] = mActiveStreamingAudio;
-		mMoSyncThread.postEvent(event);
-
+		postAudioEvent(EVENT_TYPE_AUDIO_COMPLETED, mActiveStreamingAudio);
 	}
 
 	public void onPrepared(MediaPlayer mp)
@@ -978,12 +997,17 @@ public class MoSyncAudio implements OnCompletionListener, OnPreparedListener, On
 		else
 			mPreparingAudioData = -1;
 
-		int[] event = new int[2];
-		event[0] = EVENT_TYPE_AUDIO_PREPARED;
-		event[1] = mPreparingAudioData;
-		mMoSyncThread.postEvent(event);
+		postAudioEvent(EVENT_TYPE_AUDIO_PREPARED, mPreparingAudioData);
 
 		mPreparingAudioData = 0;
+	}
+
+	private void postAudioEvent(int type, int data)
+	{
+		int[] event = new int[2];
+		event[0] = type;
+		event[1] = data;
+		mMoSyncThread.postEvent(event);
 	}
 
 	public boolean onError(MediaPlayer mp, int what, int extra)
@@ -993,10 +1017,7 @@ public class MoSyncAudio implements OnCompletionListener, OnPreparedListener, On
 		audioData.setPreparedState(AUDIO_PREPARE_ERROR);
 		mPreparingAudioData = 0;
 
-		int[] event = new int[2];
-		event[0] = EVENT_TYPE_AUDIO_PREPARED;
-		event[1] = -1;
-		mMoSyncThread.postEvent(event);
+		postAudioEvent(EVENT_TYPE_AUDIO_PREPARED, -1);
 
 		return true;
 	}
