@@ -54,6 +54,11 @@
     CGFloat _height;
 
     /**
+     * Cell's editing style.
+     */
+    UITableViewCellEditingStyle _editingStyle;
+
+    /**
      * Flag for cell editing property.
      */
     BOOL _canEdit;
@@ -67,6 +72,7 @@
 @property(nonatomic, readonly) UITableViewCell* cell;
 @property(nonatomic, retain) NSString* deleteButtonTitle;
 @property(nonatomic, assign) CGFloat height;
+@property(nonatomic, assign) UITableViewCellEditingStyle editingStyle;
 @property(nonatomic, assign) BOOL editable;
 @property(nonatomic, assign) BOOL canMove;
 

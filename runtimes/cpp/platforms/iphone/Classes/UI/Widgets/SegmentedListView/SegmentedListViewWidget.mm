@@ -207,19 +207,23 @@
  */
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    SegmentedListViewSectionWidget* section = [_sections objectAtIndex:indexPath.section];
-    if (!section)
+    UITableViewCell *cell = [_tableView dequeueReusableCellWithIdentifier:@"Cell"];
+    if (cell == nil)
     {
-        return nil;
-    }
+        SegmentedListViewSectionWidget* section = [_sections objectAtIndex:indexPath.section];
+        if (!section)
+        {
+            return nil;
+        }
 
-    SegmentedListViewItemWidget *cellWidget = [section cellWidgetAtIndex:indexPath.row];
-    if (!cellWidget)
-    {
-        return nil;
+        SegmentedListViewItemWidget *cellWidget = [section cellWidgetAtIndex:indexPath.row];
+        if (!cellWidget)
+        {
+            return nil;
+        }
+        cell = cellWidget.cell;
     }
-
-    return cellWidget.cell;
+    return cell;
 }
 
 /**
@@ -381,6 +385,27 @@
     }
     SegmentedListViewItemWidget* cellWidget = [section cellWidgetAtIndex:indexPath.row];
     return cellWidget.deleteButtonTitle;
+}
+
+/**
+ * Get the editing style of a row at a particular location in a table view.
+ * @param tableView The table-view object requesting this information.
+ * @param indexPath An index path locating a row in tableView.
+ * @return The editing style of the cell for the row identified by indexPath.
+ */
+- (UITableViewCellEditingStyle)tableView:(UITableView *)tableView editingStyleForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    SegmentedListViewSectionWidget* section = [_sections objectAtIndex:indexPath.section];
+    if (!section)
+    {
+        return UITableViewCellEditingStyleNone;
+    }
+    SegmentedListViewItemWidget* cellWidget = [section cellWidgetAtIndex:indexPath.row];
+    if (!cellWidget)
+    {
+        return UITableViewCellEditingStyleNone;
+    }
+    return cellWidget.editingStyle;
 }
 
 /**

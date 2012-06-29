@@ -38,9 +38,60 @@ MA 02110-1301, USA.
 #define NATIVEUI_SEGMENTED_LIST_VIEW_ITEM_H_
 
 #include <NativeUI/Widget.h>
+#include <MAUtil/String.h>
 
 namespace NativeUI
 {
+
+	typedef enum
+	{
+		/**
+		 * @brief The item does not have any accessory type.
+		 * This is the default value.
+		 * Platform: iOS.
+		 */
+		SegmentedListViewItemAccessoryNone = 0,
+		/**
+		 * @brief The item has an accessory control shaped like a regular chevron.
+		 * It is intended as a disclosure indicator.
+		 * Platform: iOS.
+		 */
+		SegmentedListViewItemAccessoryDisclosure,
+		/**
+		 * @brief The item has an accessory control that is a blue button with
+		 * a chevron image as content.
+		 * It is intended for configuration purposes.
+		 * Platform: iOS.
+		 */
+		SegmentedListViewItemAccessoryDetail,
+		/**
+		 * @brief The cell has a check mark on its right side.
+		 * Platform: iOS.
+		 */
+		SegmentedListViewItemAccessoryCheckmark
+	} SegmentedListViewItemAccessoryType;
+
+	typedef enum
+	{
+		/**
+		 * @brief The item has no editing control.
+		 * This is the default value.
+		 * Platform: iOS.
+		 */
+		SegmentedListViewItemEditStyleNone = 0,
+		/**
+		 * @brief The item has the delete editing control.
+		 * This control is a red circle enclosing a minus sign.
+		 * Platform: iOS.
+		 */
+		SegmentedListViewItemEditStyleDelete,
+		/**
+		 * @brief The item has the insert editing control.
+		 * This control is a green circle enclosing a plus sign.
+		 * Platform: iOS.
+		 */
+		SegmentedListViewItemEditStyleInsert
+	} SegmentedListViewItemEditStyle;
 
 	/**
 	 * @brief A SegmentedListViewItem widget is used to define the attributes
@@ -93,6 +144,139 @@ namespace NativeUI
 		 * @return true if cell can be moved, false otherwise.
 		 */
 		bool canMove();
+
+		/**
+		 * Set the title of the delete-confirmation button.
+		 * The table view displays the "Delete" button when the user attempts
+		 * to delete a row, either by swiping the row or tapping the red minus
+		 * icon in editing mode.
+		 * Platform: iOS.
+		 * @param title Title to set.
+		 */
+		void setDeleteButtonTitle(const MAUtil::String& title);
+
+		/**
+		 * Get the title of the delete-confirmation button.
+		 * The table view displays the "Delete" button when the user attempts
+		 * to delete a row, either by swiping the row or tapping the red minus
+		 * icon in editing mode.
+		 * Platform: iOS.
+		 * @return The title.
+		 */
+		MAUtil::String getDeleteButtonTitle();
+
+		/**
+		 * Check if the item is currently showing the delete-confirmation button.
+		 * When users tap the deletion control (the red circle to the left of
+		 * the cell), the cell displays a "Delete" button on the right side of
+		 * the cell.
+		 * Platform: iOS.
+		 * @return True if it's showing the delete confirmation button, false
+		 * otherwise.
+		 */
+		bool isShowingDeleteConfirmation();
+
+		/**
+		 * Set the selected state of the item.
+		 * @param state If true the item will be selected, otherwise it will
+		 * be unselected.
+		 * @param animate If true will animate the transition between selected
+		 * states, false to make the transition immediate.
+		 * Platform: iOS.
+		 */
+		void setSelected(bool state = true, bool animate = true);
+
+		/**
+		 * Check if the item is selected.
+		 * Platform: iOS.
+		 * @return True if selected, false otherwise.
+		 */
+		bool isSelected();
+
+		/**
+		 * Set the highlighted state of the item.
+		 * @param state If true the item will be highlighted, otherwise it will
+		 * be unhighlighted.
+		 * @param animate If true will animate the transition between highlighted
+		 * states, false to make the transition immediate.
+		 * Platform: iOS.
+		 */
+		void setHighlighted(bool state = true, bool animate = true);
+
+		/**
+		 * Check if the item is highlighted.
+		 * Platform: iOS.
+		 * @return True if highlighted, false otherwise.
+		 */
+		bool isHighlighted();
+
+		/**
+		 * Set the type of standard accessory used by the item.
+		 * The accessory view appears in the right side of the cell in the
+		 * table view’s normal state.
+		 * Platform: iOS.
+		 * @param type Accessory type to set.
+		 */
+		void setAccessoryType(SegmentedListViewItemAccessoryType type);
+
+		/**
+		 * Get the type of standard accessory used by the item.
+		 * @return The accessory type.
+		 */
+		SegmentedListViewItemAccessoryType getAccessoryType();
+
+		/**
+		 * Set the type of standard accessory used by the item in editing state.
+		 * The accessory view appears in the right side of the cell in the
+		 * table view’s editing state.
+		 * Platform: iOS.
+		 * @param type Accessory type to set.
+		 */
+		void setAccessoryTypeEditingState(
+			SegmentedListViewItemAccessoryType type);
+
+		/**
+		 * Get the type of standard accessory used by the item in editing state.
+		 * @return The accessory type.
+		 */
+		SegmentedListViewItemAccessoryType getAccessoryTypeEditingState();
+
+		/**
+		 * Set the editing style of an item.
+		 * This applies only for the editing state.
+		 * Platform: iOS.
+		 * @param editStyle Style to set.
+		 */
+		void setEditStyle(SegmentedListViewItemEditStyle editStyle);
+
+		/**
+		 * Get the editing style.
+		 * Platform: iOS.
+		 * @return The editing style used.
+		 */
+		SegmentedListViewItemEditStyle getEditStyle();
+
+	private:
+		/**
+		 * Convert enum to one of the
+		 * \link MAW_SEGMENTED_LIST_VIEW_ITEM_ACCESSORY_TYPE
+		 * MAW_SEGMENTED_LIST_VIEW_ITEM_ACCESSORY_TYPE_NONE \endlink values.
+		 * @param type Enum to convert.
+		 * @return The converted value.
+		 */
+		MAUtil::String getAccessoryTypeFromEnum(
+			SegmentedListViewItemAccessoryType type);
+
+		/**
+		 * Convert a string value to one of the SegmentedListViewItemAccessoryType
+		 * values.
+		 * @param accessoryTypeString One of the
+		 * \link MAW_SEGMENTED_LIST_VIEW_ITEM_ACCESSORY_TYPE
+		 * MAW_SEGMENTED_LIST_VIEW_ITEM_ACCESSORY_TYPE_NONE \endlink values.
+		 * @return The converted value.
+		 */
+		SegmentedListViewItemAccessoryType getAccessoryTypeFromString(
+			MAUtil::String& accessoryTypeString);
 	};
 
 } // namespace NativeUI

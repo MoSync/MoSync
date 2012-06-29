@@ -207,6 +207,7 @@ void SettingsScreen::createModeOptionRows(SegmentedListViewSection& section)
 	label->setTopPosition(LABEL_PADDING_TOP);
 	label->setLeftPosition(LABEL_PADDING_LEFT);
 	layout->addChild(label);
+
 }
 
 /**
@@ -222,9 +223,11 @@ void SettingsScreen::checkBoxStateChanged(
 	if (checkBox == mAllowEditing)
 	{
 		mListener.allowEditing(mAllowEditing->isChecked());
+		mEditMode->setAccessoryType(SegmentedListViewItemAccessoryCheckmark);
 	}
 	else if (checkBox == mAllowMoving)
 	{
+		mEditMode->setAccessoryType(SegmentedListViewItemAccessoryDisclosure);
 		mListener.allowMoving(mAllowMoving->isChecked());
 	}
 }

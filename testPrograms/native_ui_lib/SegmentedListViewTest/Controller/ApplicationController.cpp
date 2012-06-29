@@ -67,6 +67,6 @@ void ApplicationController::createScreens()
 	mIndexedListViewScreen = new IndexedListScreen(*mDataSource);
 	mSettingsScreen = new SettingsScreen(*mIndexedListViewScreen);
 
-	mTabScreen->addTab(mIndexedListViewScreen);
 	mTabScreen->addTab(mSettingsScreen);
+	mTabScreen->addTab(mIndexedListViewScreen);
 }
