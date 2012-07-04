@@ -204,19 +204,19 @@ void MoSync_ShowMessageBox(const char *title, const char *msg, bool kill) {
 void MoSync_ShowAlert(const char* title, const char* message, const char* button1, const char* button2, const char* button3)
 {
 	NSString* nsTitle = nil;
-	if(title != nil)
+	if(title != nil && (strlen(title) != 0))
 		nsTitle = [[NSString alloc] initWithBytes:title length:strlen(title) encoding:NSUTF8StringEncoding];
 
 	NSString* nsButton1 = nil;
-	if(button1 != nil)
+	if(button1 != nil && (strlen(button1) != 0))
 		nsButton1 = [[NSString alloc] initWithBytes:button1 length:strlen(button1) encoding:NSUTF8StringEncoding];
 
 	NSString* nsButton2 = nil;
-	if(button2 != nil)
+	if(button2 != nil && (strlen(button2) != 0))
 		nsButton2 = [[NSString alloc] initWithBytes:button2 length:strlen(button2) encoding:NSUTF8StringEncoding];
 
 	NSString* nsButton3 = nil;
-	if(button3 != nil)
+	if(button3 != nil && (strlen(button3) != 0))
 		nsButton3 = [[NSString alloc] initWithBytes:button3 length:strlen(button3) encoding:NSUTF8StringEncoding];
 
 	[sMoSyncView showAlert:[[NSString alloc] initWithBytes:message length:strlen(message) encoding:NSUTF8StringEncoding]
