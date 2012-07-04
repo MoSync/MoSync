@@ -91,6 +91,19 @@ void SettingsScreen::createUI()
 	this->createListSection(*list);
 	this->createListSectionForListMode(*list);
 	list->reloadData();
+
+	list->setMode(SegmentedListViewModeEdit);
+	mEditMode->showReorderControl();
+	bool isShown = mEditMode->isReorderControlShown();
+	if (isShown)
+	{
+		printf("YES");
+	}
+	else
+	{
+		printf("NO");
+	}
+	list->reloadData();
 }
 
 /**

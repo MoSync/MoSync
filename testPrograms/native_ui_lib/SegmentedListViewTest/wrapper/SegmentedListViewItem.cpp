@@ -323,6 +323,37 @@ namespace NativeUI
 	}
 
 	/**
+	 * Show/hide the reorder control.
+	 * The reordering control is gray, multiple horizontal bar control
+	 * on the right side of the cell. Users can drag this control to reorder
+	 * the cell within the table.
+	 * The list must be in edit mode.
+	 * Platform: iOS.
+	 * @param show If true shows the reorder control, false hides it.
+	 */
+	void SegmentedListViewItem::showReorderControl(bool show)
+	{
+		const char* value = show ? "true" : "false";
+		this->setProperty(MAW_SEGMENTED_LIST_VIEW_ITEM_SHOW_REORDER_CONTROL,
+			value);
+	}
+
+	/**
+	 * Check if the reorder control is shown.
+	 * The reordering control is gray, multiple horizontal bar control
+	 * on the right side of the cell.
+	 * Platform: iOS.
+	 * @return true if it's shown, false otherwise.
+	 */
+	bool SegmentedListViewItem::isReorderControlShown()
+	{
+		MAUtil::String value = this->getPropertyString(
+			MAW_SEGMENTED_LIST_VIEW_ITEM_SHOW_REORDER_CONTROL);
+		bool returnValue = (strcmp(value.c_str(), "true")) ? false : true;
+		return returnValue;
+	}
+
+	/**
 	 * Convert enum to one of the
 	 * \link MAW_SEGMENTED_LIST_VIEW_ITEM_ACCESSORY_TYPE
 	 * MAW_SEGMENTED_LIST_VIEW_ITEM_ACCESSORY_TYPE_NONE \endlink values.

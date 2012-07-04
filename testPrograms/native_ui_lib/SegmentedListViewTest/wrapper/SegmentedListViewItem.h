@@ -256,6 +256,26 @@ namespace NativeUI
 		 */
 		SegmentedListViewItemEditStyle getEditStyle();
 
+		/**
+		 * Show/hide the reorder control.
+		 * The reordering control is gray, multiple horizontal bar control
+		 * on the right side of the cell. Users can drag this control to reorder
+		 * the cell within the table.
+		 * The list must be in edit mode.
+		 * Platform: iOS.
+		 * @param show If true shows the reorder control, false hides it.
+		 */
+		void showReorderControl(bool show = true);
+
+		/**
+		 * Check if the reorder control is shown.
+		 * The reordering control is gray, multiple horizontal bar control
+		 * on the right side of the cell.
+		 * Platform: iOS.
+		 * @return true if it's shown, false otherwise.
+		 */
+		bool isReorderControlShown();
+
 	private:
 		/**
 		 * Convert enum to one of the

@@ -8107,6 +8107,27 @@ group WidgetAPI "Widget API" {
 		* \endcode
 		*/
 		EDITING_STYLE = "editingStyle";
+
+		/**
+		* @brief Show/hide the reorder control.
+		* The reordering control is gray, multiple horizontal bar control on the right
+		* side of the cell. Users can drag this control to reorder the cell within the table.
+		* The list must be in edit mode.
+		*
+		* Platform: iOS.
+		*
+		* @validvalue "true" or "false".
+		* The default value is "false".
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+		*   maWidgetSetProperty(listItemHandle,
+		*                      MAW_SEGMENTED_LIST_VIEW_ITEM_SHOW_REORDER_CONTROL, "true");
+		* \endcode
+		*/
+		SHOW_REORDER_CONTROL = "showReorderControl";
 	}
 	} // end of WidgetSegmentedListViewItemProperties
 

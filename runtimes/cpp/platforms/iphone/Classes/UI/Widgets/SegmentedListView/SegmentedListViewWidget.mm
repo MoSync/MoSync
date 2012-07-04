@@ -312,6 +312,17 @@
     return array;
 }
 
+/**
+ * Move a row at a specific location in the table view to another location.
+ * @param tableView The table-view object requesting this action.
+ * @param fromIndexPath An index path locating the row to be moved in tableView.
+ * @param toIndexPath An index path locating the row in tableView that is the destination of the move.
+ */
+- (void)tableView:(UITableView *)tableView moveRowAtIndexPath:(NSIndexPath *)fromIndexPath toIndexPath:(NSIndexPath *)toIndexPath
+{
+    NSLog(@"IN %s", __FUNCTION__);
+}
+
 #pragma mark UITableViewDelegate
 
 /**

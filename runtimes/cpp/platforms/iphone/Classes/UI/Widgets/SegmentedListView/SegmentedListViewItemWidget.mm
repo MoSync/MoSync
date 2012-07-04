@@ -127,6 +127,13 @@
  */
 -(NSString*) getEditingStyleProperty;
 
+/**
+ * Set the reorder control flag.
+ * @param value "true" or "false" string.
+ * @return MAW_RES_OK if the value param is valid, otherwise MAW_RES_INVALID_PROPERTY_VALUE.
+ */
+-(int) setShowReorderControlProperty:(NSString*) value;
+
 @end
 
 @implementation SegmentedListViewItemWidget
@@ -222,6 +229,10 @@ static NSString* kReuseIdentifier = @"Cell";
     {
         return [self setAccessoryType:value normalState:NO];
     }
+    else if ([key isEqualToString:@MAW_SEGMENTED_LIST_VIEW_ITEM_SHOW_REORDER_CONTROL])
+    {
+        return [self setShowReorderControlProperty:value];
+    }
     else
     {
         return [super setPropertyWithKey:key toValue:value];
@@ -252,22 +263,27 @@ static NSString* kReuseIdentifier = @"Cell";
     else if ([key isEqualToString:@MAW_SEGMENTED_LIST_VIEW_ITEM_IS_SHOWING_DELETE_CONFIRMATION])
     {
         const char* value = _cell.showingDeleteConfirmation ? "true" : "false";
-        return [[NSString alloc] initWithFormat:@"%s",value];
+        return [[NSString alloc] initWithFormat:@"%s", value];
     }
     else if ([key isEqualToString:@MAW_SEGMENTED_LIST_VIEW_ITEM_IS_SELECTED])
     {
         const char* value = _cell.isSelected ? "true" : "false";
-        return [[NSString alloc] initWithFormat:@"%s",value];
+        return [[NSString alloc] initWithFormat:@"%s", value];
     }
     else if ([key isEqualToString:@MAW_SEGMENTED_LIST_VIEW_ITEM_IS_HIGHLIGHTED])
     {
         const char* value = _cell.isHighlighted ? "true" : "false";
-        return [[NSString alloc] initWithFormat:@"%s",value];
+        return [[NSString alloc] initWithFormat:@"%s", value];
     }
     else if ([key isEqualToString:@MAW_SEGMENTED_LIST_VIEW_ITEM_ACCESSORY_TYPE])
     {
         NSString* type = [self getAccessoryType:_cell.accessoryType];
         return [type retain];
+    }
+    else if ([key isEqualToString:@MAW_SEGMENTED_LIST_VIEW_ITEM_SHOW_REORDER_CONTROL])
+    {
+        const char* value = _cell.showsReorderControl ? "true" : "false";
+        return [[NSString alloc] initWithFormat:@"%s", value];
     }
     else
     {
@@ -555,6 +571,23 @@ static NSString* kReuseIdentifier = @"Cell";
             break;
     }
     return [NSString stringWithFormat:@"%d", style];
+}
+
+/**
+ * Set the reorder control flag.
+ * @param value "true" or "false" string.
+ * @return MAW_RES_OK if the value param is valid, otherwise MAW_RES_INVALID_PROPERTY_VALUE.
+ */
+-(int) setShowReorderControlProperty:(NSString*) value
+{
+    if (![value isEqualToString:@"false"] &&
+        ![value isEqualToString:@"true"])
+    {
+        return MAW_RES_INVALID_PROPERTY_VALUE;
+    }
+
+    _cell.showsReorderControl = YES;
+    return MAW_RES_OK;
 }
 
 @end
