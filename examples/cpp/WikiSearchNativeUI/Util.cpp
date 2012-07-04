@@ -41,6 +41,9 @@ MA 02110-1301, USA.
 namespace WikiNativeUI
 {
 
+// Usual size for a buffer.
+const int BUF_SIZE = 256;
+
 /**
  * Utility function to create a label.
  * The height of the label is computed automatically.
@@ -492,6 +495,27 @@ char* strReplace(char* str, const char* what, const char* to)
     while ((p=strReplaceFirst(p,what,to)) != 0)
         ;
     return str;
+}
+
+/**
+ * Detects the current platform
+ * @return platform_code specific for Android, iPhone OS or WindowsPhone
+ */
+int getPlatform()
+{
+	char platform[BUF_SIZE];
+	maGetSystemProperty("mosync.device.OS", platform, BUF_SIZE);
+
+	if(strcmp(platform, "Android") == 0)
+	{
+		return ANDROID;
+	}
+	else
+	{
+		if(strcmp(platform, "iPhone OS") == 0)
+			return IOS;
+	}
+	return WINDOWSPHONE7;
 }
 
 } // namespace WikiNativeUI
