@@ -25,46 +25,38 @@ group PurchaseResultCodes "Purchase Result Codes" {
         */
 		OUT_OF_DATE = -3;
         /**
-        * \brief
-        */
-		CLIENT_INVALID = -4;
-        /**
-        * \brief
-        */
-		NOT_ALLOWED = -5;
-        /**
         * \brief Returned by the #maPurchaseSupported()  and #maPurchaseGetField()
         * syscalls if purchase is not allowed on the device.
         * Platform: Android and iOS.
         */
-		DISABLED = -6;
+		DISABLED = -4;
         /**
         * \brief Returned by the #maPurchaseGetName(), #maPurchaseVerifyReceipt(),
 		* #maPurchaseGetField() or #maPurchaseDestroy() syscalls if the productHandle is invalid.
 		* Platform: Android and iOS.
         */
-		INVALID_HANDLE = -7;
+		INVALID_HANDLE = -5;
         /**
         * \brief Returned by the #maPurchaseGetName() syscall if the the given buffer is
         * too small.
 		* Platform: Android and iOS.
         */
-		BUFFER_TOO_SMALL = -8;
+		BUFFER_TOO_SMALL = -6;
         /**
         * \brief Returned by the #maPurchaseGetField() syscall if the receipt has not been
         * received or if the transaction is invalid.
         */
-		RECEIPT_NOT_AVAILABLE = -9;
+		RECEIPT_NOT_AVAILABLE = -7;
         /**
         * \brief Returned by the #maPurchaseGetField() syscall if the receipt does not
         * contain the given field.
         */
-		INVALID_FIELD_NAME = -10;
+		INVALID_FIELD_NAME = -8;
 		/**
 		* \bried returned by the #maPurchaseSetPublicKey() syscall if the encoded public key
 		* is invalid.
 		*/
-		MALFORMED_PUBLIC_KEY = -11;
+		MALFORMED_PUBLIC_KEY = -9;
 	}
 } // end of Purchase Result Codes
 
