@@ -355,10 +355,10 @@ int main(int argc, char **argv) {
 			{
 				applicationBarIconReferences.push_back( ApplicationBarIconReference( de->d_name ) );
 				std::string copyCmd;
-				copyCmd.append("cp ");
+				copyCmd.append("cp \"");
 				copyCmd.append(dirPath.c_str());
 				copyCmd.append( de->d_name );
-				copyCmd.append(" \"");
+				copyCmd.append("\" \"");
 				copyCmd.append(outputDirPath);
 				system(copyCmd.c_str());
 			}
