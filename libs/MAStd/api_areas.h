@@ -469,7 +469,7 @@ maDBCursorGetColumnDouble()<br>
 </td>
 <td>Image, animated image, edit box, list box, screens, widgets, widget skins, input managers, etc.<br>
 </td>
-<td>maTextBox()<br>
+<td>maTextBox(), maAlert()<br>
 </td>
 <td>MAUI::EditBox, MAUI::Engine, MAUI::Font, MAUI::Image, MAUI::Label, MAUI::Layout, MAUI::ListBox, MAUI::Screen, MAUI::Widget<br>
 </td>

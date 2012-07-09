@@ -31,8 +31,8 @@ MoSketch
 MoSound
 MoTris
 OtaLoad
-GLMoblet_OpenGLES1 = OpenGLES/GLMoblet_OpenGLES1
-GLMoblet_OpenGLES2 = OpenGLES/GLMoblet_OpenGLES2
+GLMobletOpenGLES1 = OpenGLES/GLMobletOpenGLES1
+GLMobletOpenGLES2 = OpenGLES/GLMobletOpenGLES2
 AccelerometerOpenGLES = OpenGLES/AccelerometerOpenGLES
 ScreenOrientation
 QuakeMDL
@@ -53,4 +53,3 @@ WebViewTwitter
 WormholeDemo
 WormholeNativeUI
 NFCExample
-PhotoGallery

@@ -322,7 +322,11 @@ int main(int argc, char **argv) {
 			}
 		}
 		//create the output dir string for the icons "\ApplicationBarIcons\".
+#ifdef WIN32
 		dirPath.append("ApplicationBarIcons\\");
+#else
+		dirPath.append("ApplicationBarIcons/");
+#endif
 	}
 
 	//create directory
@@ -334,8 +338,13 @@ int main(int argc, char **argv) {
 	outputDirPath.append(outputFile.substr(0, position));
 	command.append(outputFile.substr(0, position));
 
+#ifdef WIN32
 	outputDirPath.append("project\\AppBar.Icons\"");
 	command.append("project\\AppBar.Icons\"");
+#else
+	outputDirPath.append("project/AppBar.Icons\"");
+	command.append("project/AppBar.Icons\"");
+#endif
 
 	system(command.c_str());
 
@@ -355,17 +364,17 @@ int main(int argc, char **argv) {
 			{
 				applicationBarIconReferences.push_back( ApplicationBarIconReference( de->d_name ) );
 				std::string copyCmd;
-				copyCmd.append("cp ");
+				copyCmd.append("cp \"");
 				copyCmd.append(dirPath.c_str());
 				copyCmd.append( de->d_name );
-				copyCmd.append(" \"");
+				copyCmd.append("\" \"");
 				copyCmd.append(outputDirPath);
 				system(copyCmd.c_str());
 			}
             de = readdir(d);
 		}
+		closedir(d);
 	}
-	closedir(d);
 
 	// Write the changes to the csproj file.
 	pugi::xml_node mosyncApplicationBarIcons = project.append_child("ItemGroup");
