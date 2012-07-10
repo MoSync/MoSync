@@ -42,6 +42,7 @@ using namespace Notification;
 class DisplayNotificationScreen;
 class SettingsScreen;
 class TCPConnection;
+class HTTPConnection;
 
 /**
  * @brief Application's main screen(tab screen).
@@ -51,6 +52,7 @@ class MainScreen:
 	public TabScreen,
 	public PushNotificationListener,
 	public TCPListener,
+	public HTTPListener,
 	public SettingsScreenListener
 {
 
@@ -114,6 +116,11 @@ private:
 	virtual void connectionEstablished();
 
 	/**
+	 * Called when the server has received the authorization key.
+	 */
+	virtual void messageSent();
+
+	/**
 	 * Called when connect button is pressed.
 	 * @param ipAddress Server's ip address written by the user.
 	 * @param port Server's port written by the user.
@@ -136,6 +143,7 @@ private:
 	 * Used to establish connection to server.
 	 */
 	TCPConnection* mTCPConnection;
+	HTTPConnection* mHttpConnection;
 
 	/**
 	 * Token received after registering to APNs / Google service.
