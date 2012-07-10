@@ -55,4 +55,16 @@ public:
 	virtual void connectionEstablished() = 0;
 };
 
+/**
+ * @brief Listener for HTTP Connection.
+ */
+class HTTPListener
+{
+public:
+	/**
+	 * Called when the server has received the authorization key.
+	 */
+	virtual void messageSent() = 0;
+};
+
 #endif /* SCREENLISTENERS_H_ */

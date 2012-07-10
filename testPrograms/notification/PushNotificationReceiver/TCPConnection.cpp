@@ -22,6 +22,7 @@ MA 02110-1301, USA.
  * @date 10 Nov 2011
  *
  * @brief Send package to a server application using tcp socket.
+ * Used by iOS devices.
  */
 
 #define CONNECTION_ERROR_TITLE "Error"
@@ -30,7 +31,6 @@ MA 02110-1301, USA.
 
 // The address of the server that will send push notifications.
 #define SERVER_ADDRESS_iOS "socket://188.27.128.230:4567"
-#define SERVER_ADDRESS_ANDROID "socket://192.168.1.111:6789"
 
 // Default size for buffers.
 #define BUF_SIZE 256
