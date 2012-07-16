@@ -67,6 +67,11 @@ public:
 	void pushRegistrationDone(bool registrationStatus);
 
 	/**
+	 * This screen is notified that the registration was already completed.
+	 */
+	void pushRegistrationAlreadyCompleted();
+
+	/**
 	 * Displays notification's content on the screen.
 	 */
 	void pushNotificationReceived(

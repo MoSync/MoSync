@@ -23,12 +23,12 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 
-import com.mosync.java.android.C2DMReceiver;
+import com.mosync.java.android.GCMIntentService;
 import com.mosync.java.android.MoSync;
 
 /**
  * An instance of a push notification.
- * A push notification is created when C2DMBaseReceiver is processing a new message.
+ * A push notification is created when GCMBaseIntentService is processing a new message.
  * Holds required information like: content body, content title, icon, ticker text.
  * The content body can consist of the message payload, or a user defined string.
  * @author emma tresanszki
@@ -50,7 +50,7 @@ public class PushNotificationObject
 	}
 
 	/**
-	 * Triggers a notification for the message received from C2DM.
+	 * Triggers a notification for the message received from GCM/C2DM.
 	 * Apply the ticker text, message payload and title.
 	 * @param context Application's context.
 	 */
@@ -64,10 +64,10 @@ public class PushNotificationObject
 		notification.flags |= Notification.FLAG_AUTO_CANCEL;
 
 		Intent intent = new Intent(context, MoSync.class);
-		intent.putExtra(C2DMReceiver.MOSYNC_INTENT_EXTRA_MESSAGE, mMessage);
-		intent.putExtra(C2DMReceiver.MOSYNC_INTENT_EXTRA_NOTIFICATION, true);
+		intent.putExtra(PushNotificationsUtil.MOSYNC_INTENT_EXTRA_MESSAGE, mMessage);
+		intent.putExtra(PushNotificationsUtil.MOSYNC_INTENT_EXTRA_NOTIFICATION, true);
 		// Send also the notification handle so it can later be used at posting events.
-		intent.putExtra(C2DMReceiver.MOSYNC_INTENT_EXTRA_NOTIFICATION_HANDLE, id);
+		intent.putExtra(PushNotificationsUtil.MOSYNC_INTENT_EXTRA_NOTIFICATION_HANDLE, id);
 		PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
 		notification.setLatestEventInfo(context, mMessageTitle, mMessage, pendingIntent);
 		notificationManager.notify(0, notification);
