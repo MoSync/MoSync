@@ -289,3 +289,7 @@ void toBackSlashes(std::string& str) {
 		str[i] = (str[i] == '/' ? '\\' : str[i]);
 	}
 }
+
+bool streq(const char* a, const char* b) {
+	return strcmp(a, b) == 0;
+}

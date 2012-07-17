@@ -22,7 +22,9 @@ IX_*.h
 
 MAHeaders.h
 program
+program.comb
 resources
+resources.deps
 log.txt
 panic.report
 Stabs.tab
@@ -33,10 +35,14 @@ stabs.tab
 fp.xml
 profile.txt
 .DS_Store
-.settings
-xcuserdata
+_masterdump.s
+data_section.bin
+rebuild.build.cs
+rebuild.build.cpp
 
 config_platform.h
+
+wormhole.js
 
 /*.bat
 
@@ -95,9 +101,12 @@ config_platform.h
 /libs/newlib/libc/sys/mosync/maapi.h
 /libs/newlib/libc/sys/mosync/maapi_defs.h
 
+/libs/Wormhole/jslib/html5
+
 /testPrograms/_masterdump.s
 /testPrograms/temp.s
 /testPrograms/copyfiles.bat
+/testPrograms/filesystem/
 
 /runtimes/cpp/generated
 
@@ -110,9 +119,6 @@ config_platform.h
 /runtimes/cpp/platforms/iphone/Classes/helpers/maapi_defs.h
 /runtimes/cpp/platforms/iphone/Classes/syscall_static_cpp.h
 
-/runtimes/cpp/platforms/iphone/Classes/data_section.bin
-/runtimes/cpp/platforms/iphone/Classes/rebuild.build.cpp
-/runtimes/cpp/platforms/iphone/data_section.bin
 /runtimes/cpp/platforms/iphone/template/
 
 /runtimes/cpp/platforms/winmobile/winmobile.sln
@@ -247,6 +253,15 @@ config_platform.h
 /runtimes/csharp/windowsphone/mosync/mosyncLib/bin
 /runtimes/csharp/windowsphone/mosync/mosyncLibContent/bin
 /runtimes/csharp/windowsphone/mosync/mosyncLibContent/obj
+/runtimes/csharp/windowsphone/mosync/mosyncRuntime/obj/
 /runtimes/csharp/windowsphone/mosync/mosyncRuntime/Source/maapi.cs
 
 /rules/local_config.rb
+
+/runtimes/csharp/windowsphone/template
+/runtimes/csharp/windowsphone/mosync/mosyncExtensionTemplate/Bin
+/runtimes/csharp/windowsphone/mosync/mosyncExtensionTemplate/obj
+/runtimes/csharp/windowsphone/mosync/mosync/Service References
+/runtimes/csharp/windowsphone/mosync/mosync/Bin
+/tools/winphone-builder/pugixml-1.0/scripts
+/tools/winphone-builder/pugixml-1.0/docs

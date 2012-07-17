@@ -35,8 +35,8 @@ MA 02110-1301, USA.
  * @file Widget.h
  * @author Mikael Kindborg, Emma Tresanszki and Bogdan Iusco.
  *
- * \brief Widget is the base class of all widgets. This class is
- * used to wrap native widget handles and provides common
+ * \brief Widget is the base class of all widgets.
+ * This class is used to wrap native widget handles and provides common
  * methods for widgets and event support.
  */
 
@@ -55,6 +55,9 @@ MA 02110-1301, USA.
 #include <IX_WIDGET.h>
 #include "WidgetUtil.h"
 
+/**
+ * @brief A collection of widgets for designing native user interfaces
+ */
 namespace NativeUI
 {
 	/**
@@ -429,6 +432,21 @@ namespace NativeUI
          * @return True if enabled, false otherwise.
          */
         virtual bool isEnabled();
+
+        /**
+         * Set widget's alpha value.
+         * @value Floating-point number in the range 0.0 to 1.0, where 0.0
+         * represents totally transparent and 1.0 represents totally opaque.
+         * If the value is out of this range the alpha value is not set.
+         */
+        void setAlpha(const float value);
+
+        /**
+         * Get widget's alpha value.
+         * @return Floating-point number in the range 0.0 to 1.0, where 0.0
+         * represents totally transparent and 1.0 represents totally opaque.
+         */
+        float getAlpha();
 
         /**
          * Add an event listener for this widget.

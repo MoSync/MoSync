@@ -1,4 +1,4 @@
-/* Copyright (C) 2011 MoSync AB
+/* Copyright (C) 2012 MoSync AB
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License,
@@ -23,8 +23,6 @@ import java.util.concurrent.ArrayBlockingQueue;
  * A utility class that simplifies the waiting for asynchronous
  * events. This class is only intended to be used for sharing
  * a single result between two threads.
- * 
- * @author fmattias
  *
  * @param <T> The result type.
  */
@@ -34,38 +32,59 @@ public class AsyncWait<T>
 	 * A semaphore that is used to wait for the result being
 	 * posted.
 	 */
-	private ArrayBlockingQueue<T> m_result = new ArrayBlockingQueue<T>( 1 );
-	
+	private ArrayBlockingQueue<T> mResult = new ArrayBlockingQueue<T>( 1 );
+
+	/**
+	 * Since the ArrayBlockingQueue can't handle null input we need
+	 * another mechanism to help us handle that
+	 */
+	private boolean mActive = true;
+
 	/**
 	 * Set the result, marking the object ready for result.
-	 * 
+	 *
 	 * @param result The result to set.
 	 */
 	public void setResult(T result)
 	{
-		m_result.add( result );
+		try
+		{
+			mResult.add( result );
+		}
+		catch(NullPointerException npe)
+		{
+			mActive = false;
+		}
 	}
-	
+
 	/**
 	 * Waits for the result and returns it.
-	 * 
+	 * Since the result might be null it will
+	 * wait until either there is an item added
+	 * to the result array, or when the setter
+	 * function sets the mActive flag to false.
+	 *
 	 * TODO: Add timeout
-	 * 
+	 *
 	 * @return The result that has been set.
 	 * @throws InterruptedException
 	 */
 	public T getResult() throws InterruptedException
 	{
-		while(true)
+		while(mActive)
 		{
 			try
 			{
-				return m_result.take( );
+				if(null != mResult.peek())
+				{
+					return mResult.take( );
+				}
 			}
 			catch(InterruptedException ie)
 			{
-				
+
 			}
 		}
+		return null;
 	}
 }

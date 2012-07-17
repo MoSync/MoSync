@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 45;
+	objectVersion = 46;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -24,8 +24,26 @@
 		288765A50DF7441C002DB57D /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 288765A40DF7441C002DB57D /* CoreGraphics.framework */; };
 		29B46B3D1407FAA5009491A6 /* PimContactItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B46B3B1407FAA5009491A6 /* PimContactItem.m */; };
 		29B46B3E1407FAA5009491A6 /* PimContactsList.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B46B3C1407FAA5009491A6 /* PimContactsList.m */; };
+		4140734414C34EB80006D18C /* ResourceArray.h in Headers */ = {isa = PBXBuildFile; fileRef = 85BF2B551134052300BB0201 /* ResourceArray.h */; };
+		4142402614766C03006977A1 /* MoSyncDB.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4142402414766C03006977A1 /* MoSyncDB.cpp */; };
+		4142402714766C03006977A1 /* MoSyncDB.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4142402414766C03006977A1 /* MoSyncDB.cpp */; };
+		4142402814766C03006977A1 /* MoSyncDB.h in Headers */ = {isa = PBXBuildFile; fileRef = 4142402514766C03006977A1 /* MoSyncDB.h */; };
+		417495FA14C4CB0E00D04A32 /* Capture.mm in Sources */ = {isa = PBXBuildFile; fileRef = 41B4F2B114C34EF000D087F1 /* Capture.mm */; };
+		417495FC14C4CB0F00D04A32 /* Capture.mm in Sources */ = {isa = PBXBuildFile; fileRef = 41B4F2B114C34EF000D087F1 /* Capture.mm */; };
+		417495FD14C4CB1300D04A32 /* Capture.h in Headers */ = {isa = PBXBuildFile; fileRef = 41B4F2B014C34EF000D087F1 /* Capture.h */; };
+		418047B6147E8B6A0048FB95 /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = 418047B5147E8B6A0048FB95 /* Reachability.m */; };
+		418047B7147E8B6A0048FB95 /* Reachability.h in Headers */ = {isa = PBXBuildFile; fileRef = 418047B4147E8B6A0048FB95 /* Reachability.h */; };
+		418047B8147E8B6A0048FB95 /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = 418047B5147E8B6A0048FB95 /* Reachability.m */; };
+		41804802147E91050048FB95 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 41804801147E91050048FB95 /* SystemConfiguration.framework */; };
 		4192E7B813F5801900C10302 /* CameraConfirgurator.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4192E7B713F5801900C10302 /* CameraConfirgurator.mm */; };
+		41BD2ED114768C40005ADEB9 /* AudioSyscall.mm in Sources */ = {isa = PBXBuildFile; fileRef = E4D36EA71459AC5B00477B1E /* AudioSyscall.mm */; };
+		41BD2ED214768C47005ADEB9 /* AudioSyscall.h in Headers */ = {isa = PBXBuildFile; fileRef = E4D36EA61459AC5B00477B1E /* AudioSyscall.h */; };
+		41BD2ED314768C4D005ADEB9 /* AudioData.mm in Sources */ = {isa = PBXBuildFile; fileRef = E4D36EA51459AC5B00477B1E /* AudioData.mm */; };
+		41BD2ED414768C55005ADEB9 /* AudioData.h in Headers */ = {isa = PBXBuildFile; fileRef = E4D36EA41459AC5B00477B1E /* AudioData.h */; };
+		41BD2ED514768C5D005ADEB9 /* AudioInstance.h in Headers */ = {isa = PBXBuildFile; fileRef = E4D36EAC1459B5B600477B1E /* AudioInstance.h */; };
+		41BD2ED614768C63005ADEB9 /* AudioInstance.mm in Sources */ = {isa = PBXBuildFile; fileRef = E4D36EAB1459B5B600477B1E /* AudioInstance.mm */; };
 		41D54E11140523F700552E66 /* CameraConfirgurator.h in Headers */ = {isa = PBXBuildFile; fileRef = 4192E7B613F5801900C10302 /* CameraConfirgurator.h */; };
+		41EB03E4146A69BF0088E3A4 /* libsqlite3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 41EB03E3146A69BF0088E3A4 /* libsqlite3.dylib */; };
 		4318698513F68D410051D97A /* PimContactItem.h in Headers */ = {isa = PBXBuildFile; fileRef = 4318696E13F68D410051D97A /* PimContactItem.h */; };
 		4318698813F68D410051D97A /* PimContactsList.h in Headers */ = {isa = PBXBuildFile; fileRef = 4318697013F68D410051D97A /* PimContactsList.h */; };
 		4318699113F68D410051D97A /* PimDatabase.h in Headers */ = {isa = PBXBuildFile; fileRef = 4318697713F68D410051D97A /* PimDatabase.h */; };
@@ -62,32 +80,53 @@
 		432B98C91431FE5F00BDB926 /* MoSyncPanic.mm in Sources */ = {isa = PBXBuildFile; fileRef = 432B98C71431FE5F00BDB926 /* MoSyncPanic.mm */; };
 		432B98CA1431FE5F00BDB926 /* MoSyncPanic.mm in Sources */ = {isa = PBXBuildFile; fileRef = 432B98C71431FE5F00BDB926 /* MoSyncPanic.mm */; };
 		432B98CC1432040B00BDB926 /* PimError.h in Headers */ = {isa = PBXBuildFile; fileRef = 432B98CB1432040B00BDB926 /* PimError.h */; };
+		438DBD401475388500980239 /* AudioSyscall.mm in Sources */ = {isa = PBXBuildFile; fileRef = E4D36EA71459AC5B00477B1E /* AudioSyscall.mm */; };
+		438DBD451475393800980239 /* AudioInstance.mm in Sources */ = {isa = PBXBuildFile; fileRef = E4D36EAB1459B5B600477B1E /* AudioInstance.mm */; };
+		438DBD461475393800980239 /* AudioData.mm in Sources */ = {isa = PBXBuildFile; fileRef = E4D36EA51459AC5B00477B1E /* AudioData.mm */; };
 		43A768501400F6BA009608A4 /* ImagePickerController.h in Headers */ = {isa = PBXBuildFile; fileRef = 43A7684E1400F6BA009608A4 /* ImagePickerController.h */; };
 		43A768511400F6BA009608A4 /* ImagePickerController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43A7684F1400F6BA009608A4 /* ImagePickerController.mm */; };
 		43A768521400F6BA009608A4 /* ImagePickerController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43A7684F1400F6BA009608A4 /* ImagePickerController.mm */; };
+		43B16FEA147BF9FC00B6BB8A /* NSStringExpanded.h in Headers */ = {isa = PBXBuildFile; fileRef = 43B16FE8147BF9FC00B6BB8A /* NSStringExpanded.h */; };
+		43B16FEB147BF9FC00B6BB8A /* NSStringExpanded.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43B16FE9147BF9FC00B6BB8A /* NSStringExpanded.mm */; };
+		43B16FEC147BF9FC00B6BB8A /* NSStringExpanded.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43B16FE9147BF9FC00B6BB8A /* NSStringExpanded.mm */; };
+		43C3F4811469794600E02C41 /* PushNotification.h in Headers */ = {isa = PBXBuildFile; fileRef = 43C3F47F1469794600E02C41 /* PushNotification.h */; };
+		43C3F4821469794600E02C41 /* PushNotification.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43C3F4801469794600E02C41 /* PushNotification.mm */; };
+		43C3F4831469794600E02C41 /* PushNotification.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43C3F4801469794600E02C41 /* PushNotification.mm */; };
+		43CE0BE51463E9B800F8FFC3 /* Ads.h in Headers */ = {isa = PBXBuildFile; fileRef = 43CE0BE11463E9B800F8FFC3 /* Ads.h */; };
+		43CE0BE61463E9B800F8FFC3 /* Ads.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43CE0BE21463E9B800F8FFC3 /* Ads.mm */; };
+		43CE0BE71463E9B800F8FFC3 /* Ads.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43CE0BE21463E9B800F8FFC3 /* Ads.mm */; };
+		43CE0BE81463E9B800F8FFC3 /* BannerWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 43CE0BE31463E9B800F8FFC3 /* BannerWidget.h */; };
+		43CE0BE91463E9B800F8FFC3 /* BannerWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43CE0BE41463E9B800F8FFC3 /* BannerWidget.mm */; };
+		43CE0BEA1463E9B800F8FFC3 /* BannerWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43CE0BE41463E9B800F8FFC3 /* BannerWidget.mm */; };
+		43CE0BED1463E9C600F8FFC3 /* NotificationManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 43CE0BEB1463E9C600F8FFC3 /* NotificationManager.h */; };
+		43CE0BEE1463E9C600F8FFC3 /* NotificationManager.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43CE0BEC1463E9C600F8FFC3 /* NotificationManager.mm */; };
+		43CE0BEF1463E9C600F8FFC3 /* NotificationManager.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43CE0BEC1463E9C600F8FFC3 /* NotificationManager.mm */; };
+		43CE0BF61463EE5F00F8FFC3 /* iAd.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 43CE0BF51463EE5F00F8FFC3 /* iAd.framework */; };
+		43CE0BF91463EE7600F8FFC3 /* iAd.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 43CE0BF51463EE5F00F8FFC3 /* iAd.framework */; };
+		43CE0C101464065400F8FFC3 /* NumberPickerWIdget.h in Headers */ = {isa = PBXBuildFile; fileRef = 43D8046213EFBCB200183387 /* NumberPickerWIdget.h */; };
+		43CE0C111464065400F8FFC3 /* ActivityIndicatorWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 43D8045E13EFBCB200183387 /* ActivityIndicatorWidget.h */; };
+		43CE0C121464065400F8FFC3 /* DatePickerWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 43D8046013EFBCB200183387 /* DatePickerWidget.h */; };
+		43CE0C131464065400F8FFC3 /* TimePickerWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 43D8046813EFBCB200183387 /* TimePickerWidget.h */; };
+		43CE0C141464065400F8FFC3 /* SliderWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 43D8046613EFBCB200183387 /* SliderWidget.h */; };
+		43CE0C151464065400F8FFC3 /* VideoViewWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 43D8046A13EFBCB200183387 /* VideoViewWidget.h */; };
+		43CE0C161464065400F8FFC3 /* ProgressBarWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 43D8046413EFBCB200183387 /* ProgressBarWidget.h */; };
 		43D3B01613FFC82E00B3DE23 /* CameraConfirgurator.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4192E7B713F5801900C10302 /* CameraConfirgurator.mm */; };
-		43D8046C13EFBCB200183387 /* ActivityIndicatorWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 43D8045E13EFBCB200183387 /* ActivityIndicatorWidget.h */; };
 		43D8046D13EFBCB200183387 /* ActivityIndicatorWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43D8045F13EFBCB200183387 /* ActivityIndicatorWidget.mm */; };
 		43D8046E13EFBCB200183387 /* ActivityIndicatorWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43D8045F13EFBCB200183387 /* ActivityIndicatorWidget.mm */; };
-		43D8046F13EFBCB200183387 /* DatePickerWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 43D8046013EFBCB200183387 /* DatePickerWidget.h */; };
 		43D8047013EFBCB200183387 /* DatePickerWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43D8046113EFBCB200183387 /* DatePickerWidget.mm */; };
 		43D8047113EFBCB200183387 /* DatePickerWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43D8046113EFBCB200183387 /* DatePickerWidget.mm */; };
-		43D8047213EFBCB200183387 /* NumberPickerWIdget.h in Headers */ = {isa = PBXBuildFile; fileRef = 43D8046213EFBCB200183387 /* NumberPickerWIdget.h */; };
 		43D8047313EFBCB200183387 /* NumberPickerWIdget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43D8046313EFBCB200183387 /* NumberPickerWIdget.mm */; };
 		43D8047413EFBCB200183387 /* NumberPickerWIdget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43D8046313EFBCB200183387 /* NumberPickerWIdget.mm */; };
-		43D8047513EFBCB200183387 /* ProgressBarWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 43D8046413EFBCB200183387 /* ProgressBarWidget.h */; };
 		43D8047613EFBCB200183387 /* ProgressBarWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43D8046513EFBCB200183387 /* ProgressBarWidget.mm */; };
 		43D8047713EFBCB200183387 /* ProgressBarWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43D8046513EFBCB200183387 /* ProgressBarWidget.mm */; };
-		43D8047813EFBCB200183387 /* SliderWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 43D8046613EFBCB200183387 /* SliderWidget.h */; };
 		43D8047913EFBCB200183387 /* SliderWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43D8046713EFBCB200183387 /* SliderWidget.mm */; };
 		43D8047A13EFBCB200183387 /* SliderWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43D8046713EFBCB200183387 /* SliderWidget.mm */; };
-		43D8047B13EFBCB200183387 /* TimePickerWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 43D8046813EFBCB200183387 /* TimePickerWidget.h */; };
 		43D8047C13EFBCB200183387 /* TimePickerWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43D8046913EFBCB200183387 /* TimePickerWidget.mm */; };
 		43D8047D13EFBCB200183387 /* TimePickerWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43D8046913EFBCB200183387 /* TimePickerWidget.mm */; };
-		43D8047E13EFBCB200183387 /* VideoViewWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 43D8046A13EFBCB200183387 /* VideoViewWidget.h */; };
 		43D8047F13EFBCB200183387 /* VideoViewWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43D8046B13EFBCB200183387 /* VideoViewWidget.mm */; };
 		43D8048013EFBCB200183387 /* VideoViewWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43D8046B13EFBCB200183387 /* VideoViewWidget.mm */; };
 		43D8048413EFBEEE00183387 /* MediaPlayer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 43D8048213EFBCC700183387 /* MediaPlayer.framework */; };
+		43F9CBBB14C4198400DE2285 /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 43F9CBB914C4197400DE2285 /* MobileCoreServices.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		43FBCABF1433627400301E39 /* PimContactItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B46B3B1407FAA5009491A6 /* PimContactItem.m */; };
 		43FBCAC01433627400301E39 /* PimContactsList.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B46B3C1407FAA5009491A6 /* PimContactsList.m */; };
 		85037840133A2275009251E2 /* StackScreenWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8503783F133A2275009251E2 /* StackScreenWidget.mm */; };
@@ -102,6 +141,8 @@
 		8527D52B1302E34000535CCA /* ImageButtonWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8527D5281302E34000535CCA /* ImageButtonWidget.mm */; };
 		853983AB116CADEF000521C0 /* hashmap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 853983A9116CADEF000521C0 /* hashmap.cpp */; };
 		853985DB116CF423000521C0 /* CMGlyphDrawing.mm in Sources */ = {isa = PBXBuildFile; fileRef = 853985DA116CF423000521C0 /* CMGlyphDrawing.mm */; };
+		85407553149F9E62001B14C0 /* MoSync.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85407550149F9E62001B14C0 /* MoSync.mm */; };
+		85407554149F9E62001B14C0 /* MoSyncExtension.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85407552149F9E62001B14C0 /* MoSyncExtension.mm */; };
 		85581E6012EA323E009C6204 /* TouchHelper.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85581E5F12EA323E009C6204 /* TouchHelper.mm */; };
 		85581E6112EA323E009C6204 /* TouchHelper.h in Headers */ = {isa = PBXBuildFile; fileRef = 85581E5E12EA323E009C6204 /* TouchHelper.h */; };
 		85581E6212EA323E009C6204 /* TouchHelper.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85581E5F12EA323E009C6204 /* TouchHelper.mm */; };
@@ -210,7 +251,7 @@
 		85BF2B5F1134052300BB0201 /* FileStream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B4A1134052300BB0201 /* FileStream.cpp */; };
 		85BF2B611134052300BB0201 /* Image.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B4E1134052300BB0201 /* Image.cpp */; };
 		85BF2B621134052300BB0201 /* MemStream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B501134052300BB0201 /* MemStream.cpp */; };
-		85BF2B631134052300BB0201 /* networking.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B521134052300BB0201 /* networking.cpp */; };
+		85BF2B631134052300BB0201 /* networking.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B521134052300BB0201 /* networking.cpp */; settings = {COMPILER_FLAGS = "-x objective-c++"; }; };
 		85BF2B641134052300BB0201 /* Stream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B561134052300BB0201 /* Stream.cpp */; };
 		85BF2B651134052300BB0201 /* Syscall.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B591134052300BB0201 /* Syscall.cpp */; };
 		85BF2B661134052300BB0201 /* ThreadPool.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B5C1134052300BB0201 /* ThreadPool.cpp */; };
@@ -239,7 +280,7 @@
 		85F2552411AC12DE00EB47EE /* FileStream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B4A1134052300BB0201 /* FileStream.cpp */; };
 		85F2552611AC12DE00EB47EE /* Image.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B4E1134052300BB0201 /* Image.cpp */; };
 		85F2552711AC12DE00EB47EE /* MemStream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B501134052300BB0201 /* MemStream.cpp */; };
-		85F2552811AC12DE00EB47EE /* networking.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B521134052300BB0201 /* networking.cpp */; };
+		85F2552811AC12DE00EB47EE /* networking.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B521134052300BB0201 /* networking.cpp */; settings = {COMPILER_FLAGS = "-x objective-c++"; }; };
 		85F2552911AC12DE00EB47EE /* Stream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B561134052300BB0201 /* Stream.cpp */; };
 		85F2552A11AC12DE00EB47EE /* Syscall.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B591134052300BB0201 /* Syscall.cpp */; };
 		85F2552B11AC12DE00EB47EE /* ThreadPool.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B5C1134052300BB0201 /* ThreadPool.cpp */; };
@@ -265,6 +306,10 @@
 		85F2559711AC162700EB47EE /* libMoSyncLib.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 85F2550D11AC125400EB47EE /* libMoSyncLib.a */; };
 		85F25A3611AD614700EB47EE /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; };
 		85F25A3711AD614700EB47EE /* MoSyncAppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1D3623250D0F684500981E51 /* MoSyncAppDelegate.mm */; };
+		E413FAB814C0604D00BF1E3D /* ResourceArray.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E413FAB714C0604D00BF1E3D /* ResourceArray.cpp */; };
+		E413FABA14C0606A00BF1E3D /* ResourceArray.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E413FAB714C0604D00BF1E3D /* ResourceArray.cpp */; };
+		E4B3144E14B483FF009F88B4 /* MoSync.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85407550149F9E62001B14C0 /* MoSync.mm */; };
+		E4B3145014B48404009F88B4 /* MoSyncExtension.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85407552149F9E62001B14C0 /* MoSyncExtension.mm */; };
 		E4D36EA81459AC5B00477B1E /* AudioData.mm in Sources */ = {isa = PBXBuildFile; fileRef = E4D36EA51459AC5B00477B1E /* AudioData.mm */; };
 		E4D36EA91459AC5B00477B1E /* AudioSyscall.mm in Sources */ = {isa = PBXBuildFile; fileRef = E4D36EA71459AC5B00477B1E /* AudioSyscall.mm */; };
 		E4D36EAD1459B5B600477B1E /* AudioInstance.mm in Sources */ = {isa = PBXBuildFile; fileRef = E4D36EAB1459B5B600477B1E /* AudioInstance.mm */; };
@@ -299,8 +344,16 @@
 		29B46B3C1407FAA5009491A6 /* PimContactsList.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PimContactsList.m; sourceTree = "<group>"; };
 		29B97316FDCFA39411CA2CEA /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		32CA4F630368D1EE00C91783 /* MoSync_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MoSync_Prefix.pch; sourceTree = "<group>"; };
+		4142402414766C03006977A1 /* MoSyncDB.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MoSyncDB.cpp; path = ../../base/MoSyncDB.cpp; sourceTree = SOURCE_ROOT; };
+		4142402514766C03006977A1 /* MoSyncDB.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MoSyncDB.h; path = ../../base/MoSyncDB.h; sourceTree = SOURCE_ROOT; };
+		418047B4147E8B6A0048FB95 /* Reachability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Reachability.h; sourceTree = "<group>"; };
+		418047B5147E8B6A0048FB95 /* Reachability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Reachability.m; sourceTree = "<group>"; };
+		41804801147E91050048FB95 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		4192E7B613F5801900C10302 /* CameraConfirgurator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CameraConfirgurator.h; sourceTree = "<group>"; };
 		4192E7B713F5801900C10302 /* CameraConfirgurator.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = CameraConfirgurator.mm; sourceTree = "<group>"; };
+		41B4F2B014C34EF000D087F1 /* Capture.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Capture.h; sourceTree = "<group>"; };
+		41B4F2B114C34EF000D087F1 /* Capture.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = Capture.mm; sourceTree = "<group>"; };
+		41EB03E3146A69BF0088E3A4 /* libsqlite3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsqlite3.dylib; path = /usr/lib/libsqlite3.dylib; sourceTree = "<absolute>"; };
 		4318696E13F68D410051D97A /* PimContactItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PimContactItem.h; sourceTree = "<group>"; };
 		4318697013F68D410051D97A /* PimContactsList.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PimContactsList.h; sourceTree = "<group>"; };
 		4318697713F68D410051D97A /* PimDatabase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PimDatabase.h; sourceTree = "<group>"; };
@@ -327,6 +380,17 @@
 		432B98CB1432040B00BDB926 /* PimError.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PimError.h; sourceTree = "<group>"; };
 		43A7684E1400F6BA009608A4 /* ImagePickerController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ImagePickerController.h; sourceTree = "<group>"; };
 		43A7684F1400F6BA009608A4 /* ImagePickerController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ImagePickerController.mm; sourceTree = "<group>"; };
+		43B16FE8147BF9FC00B6BB8A /* NSStringExpanded.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NSStringExpanded.h; path = utils/NSStringExpanded.h; sourceTree = "<group>"; };
+		43B16FE9147BF9FC00B6BB8A /* NSStringExpanded.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = NSStringExpanded.mm; path = utils/NSStringExpanded.mm; sourceTree = "<group>"; };
+		43C3F47F1469794600E02C41 /* PushNotification.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PushNotification.h; path = notifications/PushNotification.h; sourceTree = "<group>"; };
+		43C3F4801469794600E02C41 /* PushNotification.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = PushNotification.mm; path = notifications/PushNotification.mm; sourceTree = "<group>"; };
+		43CE0BE11463E9B800F8FFC3 /* Ads.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Ads.h; path = ads/Ads.h; sourceTree = "<group>"; };
+		43CE0BE21463E9B800F8FFC3 /* Ads.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = Ads.mm; path = ads/Ads.mm; sourceTree = "<group>"; };
+		43CE0BE31463E9B800F8FFC3 /* BannerWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BannerWidget.h; path = ads/BannerWidget.h; sourceTree = "<group>"; };
+		43CE0BE41463E9B800F8FFC3 /* BannerWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = BannerWidget.mm; path = ads/BannerWidget.mm; sourceTree = "<group>"; };
+		43CE0BEB1463E9C600F8FFC3 /* NotificationManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NotificationManager.h; path = notifications/NotificationManager.h; sourceTree = "<group>"; };
+		43CE0BEC1463E9C600F8FFC3 /* NotificationManager.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = NotificationManager.mm; path = notifications/NotificationManager.mm; sourceTree = "<group>"; };
+		43CE0BF51463EE5F00F8FFC3 /* iAd.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = iAd.framework; path = System/Library/Frameworks/iAd.framework; sourceTree = SDKROOT; };
 		43D8045E13EFBCB200183387 /* ActivityIndicatorWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ActivityIndicatorWidget.h; sourceTree = "<group>"; };
 		43D8045F13EFBCB200183387 /* ActivityIndicatorWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ActivityIndicatorWidget.mm; sourceTree = "<group>"; };
 		43D8046013EFBCB200183387 /* DatePickerWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DatePickerWidget.h; sourceTree = "<group>"; };
@@ -342,6 +406,7 @@
 		43D8046A13EFBCB200183387 /* VideoViewWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VideoViewWidget.h; sourceTree = "<group>"; };
 		43D8046B13EFBCB200183387 /* VideoViewWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = VideoViewWidget.mm; sourceTree = "<group>"; };
 		43D8048213EFBCC700183387 /* MediaPlayer.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MediaPlayer.framework; path = System/Library/Frameworks/MediaPlayer.framework; sourceTree = SDKROOT; };
+		43F9CBB914C4197400DE2285 /* MobileCoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MobileCoreServices.framework; path = System/Library/Frameworks/MobileCoreServices.framework; sourceTree = SDKROOT; };
 		8503783E133A2275009251E2 /* StackScreenWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StackScreenWidget.h; sourceTree = "<group>"; };
 		8503783F133A2275009251E2 /* StackScreenWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = StackScreenWidget.mm; sourceTree = "<group>"; };
 		850943291185AF87004A3B2D /* SyscallImpl.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = SyscallImpl.mm; path = impl/SyscallImpl.mm; sourceTree = "<group>"; };
@@ -355,6 +420,10 @@
 		853983AA116CADEF000521C0 /* hashmap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = hashmap.h; path = ../../../../intlibs/hashmap/hashmap.h; sourceTree = SOURCE_ROOT; };
 		853985D9116CF423000521C0 /* CMGlyphDrawing.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CMGlyphDrawing.h; sourceTree = "<group>"; };
 		853985DA116CF423000521C0 /* CMGlyphDrawing.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = CMGlyphDrawing.mm; sourceTree = "<group>"; };
+		8540754F149F9E62001B14C0 /* MoSync.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MoSync.h; path = Extensions/MoSync.h; sourceTree = "<group>"; };
+		85407550149F9E62001B14C0 /* MoSync.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = MoSync.mm; path = Extensions/MoSync.mm; sourceTree = "<group>"; };
+		85407551149F9E62001B14C0 /* MoSyncExtension.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MoSyncExtension.h; path = Extensions/MoSyncExtension.h; sourceTree = "<group>"; };
+		85407552149F9E62001B14C0 /* MoSyncExtension.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = MoSyncExtension.mm; path = Extensions/MoSyncExtension.mm; sourceTree = "<group>"; };
 		85581E5E12EA323E009C6204 /* TouchHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TouchHelper.h; sourceTree = "<group>"; };
 		85581E5F12EA323E009C6204 /* TouchHelper.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = TouchHelper.mm; sourceTree = "<group>"; };
 		8558307D11C79B030008FDC1 /* MoSyncCLController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MoSyncCLController.mm; sourceTree = "<group>"; };
@@ -498,6 +567,7 @@
 		85F2558711AC155D00EB47EE /* MoSync.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MoSync.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		85F2558911AC155D00EB47EE /* MoSyncWithLib-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "MoSyncWithLib-Info.plist"; sourceTree = "<group>"; };
 		8D1107310486CEB800E47090 /* MoSync-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "MoSync-Info.plist"; plistStructureDefinitionIdentifier = "com.apple.xcode.plist.structure-definition.iphone.info-plist"; sourceTree = "<group>"; };
+		E413FAB714C0604D00BF1E3D /* ResourceArray.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ResourceArray.cpp; path = ../../../base/ResourceArray.cpp; sourceTree = "<group>"; };
 		E4D36EA41459AC5B00477B1E /* AudioData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AudioData.h; sourceTree = "<group>"; };
 		E4D36EA51459AC5B00477B1E /* AudioData.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = AudioData.mm; sourceTree = "<group>"; };
 		E4D36EA61459AC5B00477B1E /* AudioSyscall.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AudioSyscall.h; sourceTree = "<group>"; };
@@ -511,6 +581,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				43CE0BF61463EE5F00F8FFC3 /* iAd.framework in Frameworks */,
+				43F9CBBB14C4198400DE2285 /* MobileCoreServices.framework in Frameworks */,
 				431869B313F691A30051D97A /* CoreMotion.framework in Frameworks */,
 				431869AB13F68E8A0051D97A /* EventKit.framework in Frameworks */,
 				431869A813F68E560051D97A /* AddressBook.framework in Frameworks */,
@@ -524,6 +596,8 @@
 				857B020212C627C200DEA306 /* OpenGLES.framework in Frameworks */,
 				857B025612C62F5600DEA306 /* QuartzCore.framework in Frameworks */,
 				0B10E8D214064DDB00B6DA6B /* MessageUI.framework in Frameworks */,
+				41EB03E4146A69BF0088E3A4 /* libsqlite3.dylib in Frameworks */,
+				41804802147E91050048FB95 /* SystemConfiguration.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -537,6 +611,7 @@
 				85F2551511AC12A700EB47EE /* CoreGraphics.framework in Frameworks */,
 				431869B413F691B70051D97A /* CoreMotion.framework in Frameworks */,
 				431869AC13F68E940051D97A /* EventKit.framework in Frameworks */,
+				43CE0BF91463EE7600F8FFC3 /* iAd.framework in Frameworks */,
 				85F2551611AC12A700EB47EE /* Foundation.framework in Frameworks */,
 				85F2551711AC12A700EB47EE /* UIKit.framework in Frameworks */,
 				858B404012E680460058DBFC /* QuartzCore.framework in Frameworks */,
@@ -567,6 +642,9 @@
 		080E96DDFE201D6D7F000001 /* Classes */ = {
 			isa = PBXGroup;
 			children = (
+				8540754E149F9E55001B14C0 /* Extensions */,
+				43CE0BE01463E98F00F8FFC3 /* notifications */,
+				43CE0BDE1463E98700F8FFC3 /* ads */,
 				E4D36EA31459AC5B00477B1E /* audio */,
 				4318696C13F68D410051D97A /* pim */,
 				85A158E312F80E520044BBE1 /* UI */,
@@ -574,7 +652,9 @@
 				85BF2B171134038600BB0201 /* Base */,
 				85BF2B0D1134037600BB0201 /* intlibs */,
 				85BF2B0C1134036D00BB0201 /* impl */,
+				43B16FE6147BF9AA00B6BB8A /* utils */,
 				1D3623240D0F684500981E51 /* MoSyncAppDelegate.h */,
+				41B4F2AF14C34EF000D087F1 /* capture */,
 				1D3623250D0F684500981E51 /* MoSyncAppDelegate.mm */,
 				28D7ACF60DDB3853001CB0EB /* MoSyncViewController.h */,
 				8558307E11C79B030008FDC1 /* MoSyncViewController.mm */,
@@ -597,6 +677,8 @@
 				4192E7B713F5801900C10302 /* CameraConfirgurator.mm */,
 				43A7684E1400F6BA009608A4 /* ImagePickerController.h */,
 				43A7684F1400F6BA009608A4 /* ImagePickerController.mm */,
+				418047B4147E8B6A0048FB95 /* Reachability.h */,
+				418047B5147E8B6A0048FB95 /* Reachability.m */,
 				432B98C61431FE5F00BDB926 /* MoSyncPanic.h */,
 				432B98C71431FE5F00BDB926 /* MoSyncPanic.mm */,
 			);
@@ -621,6 +703,8 @@
 				29B97317FDCFA39411CA2CEA /* Resources */,
 				29B97323FDCFA39411CA2CEA /* Frameworks */,
 				19C28FACFE9D520D11CA2CBB /* Products */,
+				41EB03E3146A69BF0088E3A4 /* libsqlite3.dylib */,
+				41804801147E91050048FB95 /* SystemConfiguration.framework */,
 			);
 			name = CustomTemplate;
 			sourceTree = "<group>";
@@ -649,6 +733,8 @@
 		29B97323FDCFA39411CA2CEA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				43F9CBB914C4197400DE2285 /* MobileCoreServices.framework */,
+				43CE0BF51463EE5F00F8FFC3 /* iAd.framework */,
 				431869B213F691A30051D97A /* CoreMotion.framework */,
 				431869AA13F68E8A0051D97A /* EventKit.framework */,
 				431869A713F68E560051D97A /* AddressBook.framework */,
@@ -664,6 +750,15 @@
 				0B10E8D114064DDB00B6DA6B /* MessageUI.framework */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		41B4F2AF14C34EF000D087F1 /* capture */ = {
+			isa = PBXGroup;
+			children = (
+				41B4F2B014C34EF000D087F1 /* Capture.h */,
+				41B4F2B114C34EF000D087F1 /* Capture.mm */,
+			);
+			path = capture;
 			sourceTree = "<group>";
 		};
 		4318696C13F68D410051D97A /* pim */ = {
@@ -700,6 +795,37 @@
 			path = contacts;
 			sourceTree = "<group>";
 		};
+		43B16FE6147BF9AA00B6BB8A /* utils */ = {
+			isa = PBXGroup;
+			children = (
+				43B16FE8147BF9FC00B6BB8A /* NSStringExpanded.h */,
+				43B16FE9147BF9FC00B6BB8A /* NSStringExpanded.mm */,
+			);
+			name = utils;
+			sourceTree = "<group>";
+		};
+		43CE0BDE1463E98700F8FFC3 /* ads */ = {
+			isa = PBXGroup;
+			children = (
+				43CE0BE11463E9B800F8FFC3 /* Ads.h */,
+				43CE0BE21463E9B800F8FFC3 /* Ads.mm */,
+				43CE0BE31463E9B800F8FFC3 /* BannerWidget.h */,
+				43CE0BE41463E9B800F8FFC3 /* BannerWidget.mm */,
+			);
+			name = ads;
+			sourceTree = "<group>";
+		};
+		43CE0BE01463E98F00F8FFC3 /* notifications */ = {
+			isa = PBXGroup;
+			children = (
+				43C3F47F1469794600E02C41 /* PushNotification.h */,
+				43C3F4801469794600E02C41 /* PushNotification.mm */,
+				43CE0BEB1463E9C600F8FFC3 /* NotificationManager.h */,
+				43CE0BEC1463E9C600F8FFC3 /* NotificationManager.mm */,
+			);
+			name = notifications;
+			sourceTree = "<group>";
+		};
 		8500CD3E132E506D0003A01E /* External */ = {
 			isa = PBXGroup;
 			children = (
@@ -717,6 +843,17 @@
 				853983AA116CADEF000521C0 /* hashmap.h */,
 			);
 			name = hashmap;
+			sourceTree = "<group>";
+		};
+		8540754E149F9E55001B14C0 /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				8540754F149F9E62001B14C0 /* MoSync.h */,
+				85407550149F9E62001B14C0 /* MoSync.mm */,
+				85407551149F9E62001B14C0 /* MoSyncExtension.h */,
+				85407552149F9E62001B14C0 /* MoSyncExtension.mm */,
+			);
+			name = Extensions;
 			sourceTree = "<group>";
 		};
 		85923F23114539D4004875E4 /* filelist */ = {
@@ -862,6 +999,8 @@
 		85BF2B171134038600BB0201 /* Base */ = {
 			isa = PBXGroup;
 			children = (
+				4142402414766C03006977A1 /* MoSyncDB.cpp */,
+				4142402514766C03006977A1 /* MoSyncDB.h */,
 				85BF2B671134052700BB0201 /* thread */,
 				85BF2B481134052300BB0201 /* base_errors.cpp */,
 				85BF2B491134052300BB0201 /* base_errors.h */,
@@ -875,6 +1014,7 @@
 				85BF2B521134052300BB0201 /* networking.cpp */,
 				85BF2B541134052300BB0201 /* NotSupportedException.h */,
 				85BF2B551134052300BB0201 /* ResourceArray.h */,
+				E413FAB714C0604D00BF1E3D /* ResourceArray.cpp */,
 				85BF2B561134052300BB0201 /* Stream.cpp */,
 				85BF2B571134052300BB0201 /* Stream.h */,
 				85BF2B581134052300BB0201 /* StreamHelpers.h */,
@@ -1014,13 +1154,13 @@
 				8594B8A013258A970059D79B /* LayoutWidgets.h in Headers */,
 				85037841133A2275009251E2 /* StackScreenWidget.h in Headers */,
 				0B90962D13E05C1B00A91170 /* CameraPreviewWidget.h in Headers */,
-				43D8046C13EFBCB200183387 /* ActivityIndicatorWidget.h in Headers */,
-				43D8046F13EFBCB200183387 /* DatePickerWidget.h in Headers */,
-				43D8047213EFBCB200183387 /* NumberPickerWIdget.h in Headers */,
-				43D8047513EFBCB200183387 /* ProgressBarWidget.h in Headers */,
-				43D8047813EFBCB200183387 /* SliderWidget.h in Headers */,
-				43D8047B13EFBCB200183387 /* TimePickerWidget.h in Headers */,
-				43D8047E13EFBCB200183387 /* VideoViewWidget.h in Headers */,
+				43CE0C111464065400F8FFC3 /* ActivityIndicatorWidget.h in Headers */,
+				43CE0C121464065400F8FFC3 /* DatePickerWidget.h in Headers */,
+				43CE0C101464065400F8FFC3 /* NumberPickerWIdget.h in Headers */,
+				43CE0C161464065400F8FFC3 /* ProgressBarWidget.h in Headers */,
+				43CE0C141464065400F8FFC3 /* SliderWidget.h in Headers */,
+				43CE0C131464065400F8FFC3 /* TimePickerWidget.h in Headers */,
+				43CE0C151464065400F8FFC3 /* VideoViewWidget.h in Headers */,
 				4318698513F68D410051D97A /* PimContactItem.h in Headers */,
 				4318698813F68D410051D97A /* PimContactsList.h in Headers */,
 				4318699113F68D410051D97A /* PimDatabase.h in Headers */,
@@ -1031,19 +1171,24 @@
 				431869A013F68D410051D97A /* PimSyscall.h in Headers */,
 				431869A313F68D410051D97A /* PimUtil.h in Headers */,
 				431869AF13F690C90051D97A /* MoSyncSensor.h in Headers */,
-				43D8046C13EFBCB200183387 /* ActivityIndicatorWidget.h in Headers */,
-				43D8046F13EFBCB200183387 /* DatePickerWidget.h in Headers */,
-				43D8047213EFBCB200183387 /* NumberPickerWIdget.h in Headers */,
-				43D8047513EFBCB200183387 /* ProgressBarWidget.h in Headers */,
-				43D8047813EFBCB200183387 /* SliderWidget.h in Headers */,
-				43D8047B13EFBCB200183387 /* TimePickerWidget.h in Headers */,
-				43D8047E13EFBCB200183387 /* VideoViewWidget.h in Headers */,
 				43A768501400F6BA009608A4 /* ImagePickerController.h in Headers */,
 				41D54E11140523F700552E66 /* CameraConfirgurator.h in Headers */,
 				0B436B8B143089BD00E69AB2 /* OptionsDialogView.h in Headers */,
 				0B436BA014308D5400E69AB2 /* ModalDialogWidget.h in Headers */,
 				432B98C81431FE5F00BDB926 /* MoSyncPanic.h in Headers */,
 				432B98CC1432040B00BDB926 /* PimError.h in Headers */,
+				43CE0BE51463E9B800F8FFC3 /* Ads.h in Headers */,
+				43CE0BE81463E9B800F8FFC3 /* BannerWidget.h in Headers */,
+				43CE0BED1463E9C600F8FFC3 /* NotificationManager.h in Headers */,
+				43C3F4811469794600E02C41 /* PushNotification.h in Headers */,
+				4142402814766C03006977A1 /* MoSyncDB.h in Headers */,
+				41BD2ED214768C47005ADEB9 /* AudioSyscall.h in Headers */,
+				41BD2ED414768C55005ADEB9 /* AudioData.h in Headers */,
+				41BD2ED514768C5D005ADEB9 /* AudioInstance.h in Headers */,
+				418047B7147E8B6A0048FB95 /* Reachability.h in Headers */,
+				43B16FEA147BF9FC00B6BB8A /* NSStringExpanded.h in Headers */,
+				4140734414C34EB80006D18C /* ResourceArray.h in Headers */,
+				417495FD14C4CB1300D04A32 /* Capture.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1107,8 +1252,11 @@
 /* Begin PBXProject section */
 		29B97313FDCFA39411CA2CEA /* Project object */ = {
 			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0420;
+			};
 			buildConfigurationList = C01FCF4E08A954540054247B /* Build configuration list for PBXProject "MoSync" */;
-			compatibilityVersion = "Xcode 3.1";
+			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 1;
 			knownRegions = (
@@ -1240,9 +1388,20 @@
 				432B98C91431FE5F00BDB926 /* MoSyncPanic.mm in Sources */,
 				29B46B3D1407FAA5009491A6 /* PimContactItem.m in Sources */,
 				29B46B3E1407FAA5009491A6 /* PimContactsList.m in Sources */,
+				43CE0BE61463E9B800F8FFC3 /* Ads.mm in Sources */,
+				43CE0BE91463E9B800F8FFC3 /* BannerWidget.mm in Sources */,
+				43CE0BEE1463E9C600F8FFC3 /* NotificationManager.mm in Sources */,
+				43C3F4821469794600E02C41 /* PushNotification.mm in Sources */,
 				E4D36EA81459AC5B00477B1E /* AudioData.mm in Sources */,
 				E4D36EA91459AC5B00477B1E /* AudioSyscall.mm in Sources */,
 				E4D36EAD1459B5B600477B1E /* AudioInstance.mm in Sources */,
+				4142402614766C03006977A1 /* MoSyncDB.cpp in Sources */,
+				418047B6147E8B6A0048FB95 /* Reachability.m in Sources */,
+				43B16FEB147BF9FC00B6BB8A /* NSStringExpanded.mm in Sources */,
+				85407553149F9E62001B14C0 /* MoSync.mm in Sources */,
+				85407554149F9E62001B14C0 /* MoSyncExtension.mm in Sources */,
+				E413FAB814C0604D00BF1E3D /* ResourceArray.cpp in Sources */,
+				417495FA14C4CB0E00D04A32 /* Capture.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1250,11 +1409,16 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				438DBD451475393800980239 /* AudioInstance.mm in Sources */,
+				438DBD461475393800980239 /* AudioData.mm in Sources */,
+				438DBD401475388500980239 /* AudioSyscall.mm in Sources */,
 				43D3B01613FFC82E00B3DE23 /* CameraConfirgurator.mm in Sources */,
 				858B44BB12E7B1060058DBFC /* log.cpp in Sources */,
+				E4B3144E14B483FF009F88B4 /* MoSync.mm in Sources */,
 				858B3FEC12E67D090058DBFC /* NSObjectExpanded.m in Sources */,
 				858B3FF312E67D090058DBFC /* MoSyncGLView.mm in Sources */,
 				8558308111C79B210008FDC1 /* MoSyncCLController.mm in Sources */,
+				E4B3145014B48404009F88B4 /* MoSyncExtension.mm in Sources */,
 				85F2553011AC12DE00EB47EE /* MoSyncView.mm in Sources */,
 				85F2551B11AC12DE00EB47EE /* connection.cpp in Sources */,
 				85F2551C11AC12DE00EB47EE /* discovery.cpp in Sources */,
@@ -1269,6 +1433,7 @@
 				85F2552711AC12DE00EB47EE /* MemStream.cpp in Sources */,
 				85F2552811AC12DE00EB47EE /* networking.cpp in Sources */,
 				85F2552911AC12DE00EB47EE /* Stream.cpp in Sources */,
+				E413FABA14C0606A00BF1E3D /* ResourceArray.cpp in Sources */,
 				85F2552A11AC12DE00EB47EE /* Syscall.cpp in Sources */,
 				85F2552B11AC12DE00EB47EE /* ThreadPool.cpp in Sources */,
 				85F2552C11AC12DE00EB47EE /* FileImpl.cpp in Sources */,
@@ -1329,6 +1494,17 @@
 				0B436B8C143089BD00E69AB2 /* OptionsDialogView.mm in Sources */,
 				0B436BA114308D5400E69AB2 /* ModalDialogWidget.mm in Sources */,
 				432B98CA1431FE5F00BDB926 /* MoSyncPanic.mm in Sources */,
+				43CE0BE71463E9B800F8FFC3 /* Ads.mm in Sources */,
+				43CE0BEA1463E9B800F8FFC3 /* BannerWidget.mm in Sources */,
+				43CE0BEF1463E9C600F8FFC3 /* NotificationManager.mm in Sources */,
+				43C3F4831469794600E02C41 /* PushNotification.mm in Sources */,
+				4142402714766C03006977A1 /* MoSyncDB.cpp in Sources */,
+				41BD2ED114768C40005ADEB9 /* AudioSyscall.mm in Sources */,
+				41BD2ED314768C4D005ADEB9 /* AudioData.mm in Sources */,
+				41BD2ED614768C63005ADEB9 /* AudioInstance.mm in Sources */,
+				418047B8147E8B6A0048FB95 /* Reachability.m in Sources */,
+				43B16FEC147BF9FC00B6BB8A /* NSStringExpanded.mm in Sources */,
+				417495FC14C4CB0F00D04A32 /* Capture.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1368,6 +1544,7 @@
 				GCC_PREPROCESSOR_DEFINITIONS = "";
 				GCC_THUMB_SUPPORT = NO;
 				INFOPLIST_FILE = "MoSync-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 3.0;
 				PRODUCT_NAME = MoSync;
 				PROVISIONING_PROFILE = "";
 				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
@@ -1386,6 +1563,7 @@
 				GCC_PREPROCESSOR_DEFINITIONS = "";
 				GCC_THUMB_SUPPORT = NO;
 				INFOPLIST_FILE = "MoSync-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 3.0;
 				PRODUCT_NAME = MoSync;
 				PROVISIONING_PROFILE = "";
 				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";

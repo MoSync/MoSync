@@ -759,7 +759,7 @@ namespace Base
 
 	int _maCameraFormatNumber(JNIEnv* jNIEnv, jobject jThis);
 
-	int _maCameraFormat(int index, int width, int height, JNIEnv* jNIEnv, jobject jThis);
+	int _maCameraFormat(int index, int sizeInfoBuffer, JNIEnv* jNIEnv, jobject jThis);
 
 	int _maCameraSetProperty(const char *property, const char* value,
 							JNIEnv* jNIEnv, jobject jThis);
@@ -767,6 +767,17 @@ namespace Base
 	int _maCameraGetProperty(int memStart, const char *property,
 								int memBuffer, int memBufferSize,
 								JNIEnv* jNIEnv, jobject jThis);
+
+	int _maCameraPreviewSize(JNIEnv* jNIEnv, jobject jThis);
+
+	int _maCameraPreviewEventEnable(int memStart, int previewEventType,
+									int previewBuffer,
+									MARect* previewArea,
+									JNIEnv* jNIEnv, jobject jThis);
+
+	int _maCameraPreviewEventDisable(JNIEnv* jNIEnv, jobject jThis);
+
+	int _maCameraPreviewEventConsumed(JNIEnv* jNIEnv, jobject jThis);
 
 	int _maNFCStart(JNIEnv* jNIEnv, jobject jThis);
 
@@ -842,10 +853,297 @@ namespace Base
 
 	int _maNFCIsReadOnly(MAHandle tag, JNIEnv* jNIEnv, jobject jThis);
 
+	// ********** ADS API **********
+
+	int _maAdsBannerCreate(int bannerSize, const char* publisherID, JNIEnv* jNIEnv, jobject jThis);
+
+	int _maAdsAddBannerToLayout(MAHandle bannerHandle, MAHandle layoutHandle, JNIEnv* jNIEnv, jobject jThis);
+
+	int _maAdsRemoveBannerFromLayout(MAHandle bannerHandle, MAHandle layoutHandle, JNIEnv* jNIEnv, jobject jThis);
+
+	int _maAdsBannerDestroy(MAHandle bannerHandle, JNIEnv* jNIEnv, jobject jThis);
+
+	int _maAdsBannerSetProperty(MAHandle bannerHandle, const char* property, const char* value, JNIEnv* jNIEnv, jobject jThis);
+
+	int _maAdsBannerGetProperty(int memStart, MAHandle bannerHandle, const char* property, int memBuffer, int bufSize, JNIEnv* jNIEnv, jobject jThis);
+
+	// ********** Notifications API **********
+
+	int _maNotificationLocalCreate(JNIEnv* jNIEnv, jobject jThis);
+
+	int _maNotificationLocalDestroy(MAHandle notificationHandle, JNIEnv* jNIEnv, jobject jThis);
+
+	int _maNotificationLocalSetProperty(MAHandle notificationHandle, const char* property, const char* value, JNIEnv* jNIEnv, jobject jThis);
+
+	int _maNotificationLocalGetProperty(int memStart, MAHandle notificationHandle, const char* property, int memBuffer, int bufSize, JNIEnv* jNIEnv, jobject jThis);
+
+	int _maNotificationLocalSchedule(MAHandle notificationHandle, JNIEnv* jNIEnv, jobject jThis);
+
+	int _maNotificationLocalUnschedule(MAHandle notificationHandle, JNIEnv* jNIEnv, jobject jThis);
+
+	int _maNotificationPushRegister(MAHandle pushNotificationTypes, const char* accountID, JNIEnv* jNIEnv, jobject jThis);
+
+	int _maNotificationPushGetRegistration(int memStart, int messagePointer, int messageSize, JNIEnv* jNIEnv, jobject jThis);
+
+	int _maNotificationPushUnregister(JNIEnv* jNIEnv, jobject jThis);
+
+	int _maNotificationPushGetData(MAHandle pushNotificationHandle, int memStart, int buffer, int messageSize, JNIEnv* jNIEnv, jobject jThis);
+
+	int _maNotificationPushDestroy(MAHandle pushNotificationHandle, JNIEnv* jNIEnv, jobject jThis);
+
+	int _maNotificationPushSetTickerText(const char* text, JNIEnv* jNIEnv, jobject jThis);
+
+	int _maNotificationPushSetMessageTitle(const char* text, JNIEnv* jNIEnv, jobject jThis);
+
+	int _maNotificationPushSetDisplayFlag(int flag, JNIEnv* jNIEnv, jobject jThis);
+
 	int _maSyscallPanicsEnable(JNIEnv* jNIEnv, jobject jThis);
 
 	int _maSyscallPanicsDisable(JNIEnv* jNIEnv, jobject jThis);
 
 	int _maGetCellInfo(MAHandle mem, int memStart, JNIEnv* jNIEnv, jobject jThis);
 
+	// ********** Capture API  **********
+
+	int _maCaptureSetProperty(const char* property, const char* value, JNIEnv* jNIEnv, jobject jThis);
+
+	int _maCaptureGetProperty(int memStart, const char* property, int memBuffer, int bufSize, JNIEnv* jNIEnv, jobject jThis);
+
+	int _maCaptureAction(int action, JNIEnv* jNIEnv, jobject jThis);
+
+	int _maCaptureWriteImage(MAHandle handle, const char* fullPathBuffer, int fullPathBufSize, JNIEnv* jNIEnv, jobject jThis);
+
+	int _maCaptureGetImagePath(int memStart, MAHandle handle, int buffer, int bufferSize, JNIEnv* jNIEnv, jobject jThis);
+
+	int _maCaptureGetVideoPath(int memStart, MAHandle handle, int buffer, int bufferSize, JNIEnv* jNIEnv, jobject jThis);
+
+	int _maCaptureDestroyData(MAHandle handle, JNIEnv* jNIEnv, jobject jThis);
+
+	// ********** Database API **********
+
+	/**
+	 * Open a database, the database is created if it does not exist.
+	 * @param path Full path to database file name.
+	 * @return Handle to the database >0 on success, #MA_DB_ERROR on error.
+	 */
+	int _maDBOpen(const char* path, JNIEnv* jNIEnv, jobject jThis);
+
+	/**
+	 * Close a database.
+	 * @param databaseHandle Handle to the database.
+	 * @return #MA_DB_OK on success, #MA_DB_ERROR on error.
+	 */
+	int _maDBClose(MAHandle databaseHandle, JNIEnv* jNIEnv, jobject jThis);
+
+	/**
+	 * Executes an SQL statement. If the statement returns a
+	 * query result, a cursor handle is returned.
+	 * @param databaseHandle Handle to the database.
+	 * @param sql The SQL statement.
+	 * @return #MA_DB_ERROR on error, #MA_DB_OK on success,
+	 * > 0 if there is a cursor to a query result, in this
+	 * case the return value is the cursor handle.
+	 */
+	int _maDBExecSQL(
+		MAHandle databaseHandle,
+		const char* sql,
+		JNIEnv* jNIEnv,
+		jobject jThis);
+
+	/**
+	 * Destroys a cursor. You must call this function
+	 * when you are done with the cursor to release
+	 * its resources.
+	 * @param cursorHandle Handle to the cursor.
+	 */
+	int _maDBCursorDestroy(
+		MAHandle cursorHandle,
+		JNIEnv* jNIEnv,
+		jobject jThis);
+
+	/**
+	 * Move the cursor to the next row in the result set.
+	 * Note that you must call this function before retrieving
+	 * column data. The initial position of the cursor is
+	 * before the first row in the result set. If the result
+	 * set is empty, this function will return a value != MA_DB_OK.
+	 * @param cursorHandle Handle to the cursor.
+	 * @return #MA_DB_OK if successfully moved to next row,
+	 * #MA_DB_NO_ROW if there are no more rows in the result set,
+	 * #MA_DB_ERROR on error.
+	 */
+	int _maDBCursorNext(
+		MAHandle cursorHandle,
+		JNIEnv* jNIEnv,
+		jobject jThis);
+
+	/**
+	 * Get the column value at the current row pointed to
+	 * by the cursor as a data object. Use this function for
+	 * blob data or text data.
+	 * @param cursorHandle Handle to the cursor.
+	 * @param columnIndex Index of the column to retrieve value from.
+	 * First column has index zero.
+	 * @param placeholder Handle created with maCreatePlaceholder.
+	 * A data object will be created with the column data, and the handle
+	 * will refer to that data.
+	 * @return #MA_DB_OK on success, #MA_DB_ERROR on error.
+	 */
+	int _maDBCursorGetColumnData(
+		MAHandle cursorHandle,
+		int columnIndex,
+		MAHandle placeholder,
+		JNIEnv* jNIEnv,
+		jobject jThis);
+
+	/**
+	 * Get the column value at the current row pointed to
+	 * by the cursor as a text data buffer. Use this function for
+	 * text data.
+	 * @param cursorHandle Handle to the cursor.
+	 * @param columnIndex Index of the column to retrieve value from.
+	 * First column has index zero.
+	 * @param bufferAddress Address to buffer to receive the data.
+	 * The result is NOT zero terminated.
+	 * @param bufferSize Max size of the buffer.
+	 * @return The actual length of the data, if the actual length
+	 * returned is > bufferSize, data was not copied (buffer too small),
+	 * returns #MA_DB_ERROR on other errors.
+	 */
+	int _maDBCursorGetColumnText(
+		MAHandle cursorHandle,
+		int columnIndex,
+		int bufferAddress,
+		int bufferSize,
+		JNIEnv* jNIEnv,
+		jobject jThis);
+
+	/**
+	 * Get the column value at the current row pointed to
+	 * by the cursor as an int value.
+	 * @param cursorHandle Handle to the cursor.
+	 * @param columnIndex Index of the column to retrieve value from.
+	 * First column has index zero.
+	 * @param intValueAddress Address to int to receive the value.
+	 * @return #MA_DB_OK on success, #MA_DB_ERROR on error.
+	 */
+	int _maDBCursorGetColumnInt(
+		MAHandle cursorHandle,
+		int columnIndex,
+		int intValueAddress,
+		JNIEnv* jNIEnv,
+		jobject jThis);
+
+	/**
+	 * Get the column value at the current row pointed to
+	 * by the cursor as a double value.
+	 * @param cursorHandle Handle to the cursor.
+	 * @param columnIndex Index of the column to retrieve value from.
+	 * First column has index zero.
+	 * @param doubleValueAddress Address to double to receive the value.
+	 * @return #MA_DB_OK on success, #MA_DB_ERROR on error.
+	 */
+	int _maDBCursorGetColumnDouble(
+		MAHandle cursorHandle,
+		int columnIndex,
+		int doubleValueAddress,
+		JNIEnv* jNIEnv,
+		jobject jThis);
+
+
+	// AUDIO API
+
+	//MAAudioData maAudioDataCreateFromResource(in MAString mime, in MAHandle data, in int offset, in int length, in int flags);
+	int _maAudioDataCreateFromResource(
+		const char* mime,
+		int data,
+		int offset,
+		int length,
+		int flags,
+		JNIEnv* jNIEnv,
+		jobject jThis);
+
+	//MAAudioData maAudioDataCreateFromURL(in MAString mime, in MAString url, in int flags);
+	int _maAudioDataCreateFromURL(
+		const char* mime,
+		const char* url,
+		int flags,
+		JNIEnv* jNIEnv,
+		jobject jThis);
+
+	//int maAudioDataDestroy(in MAAudioData audioData);
+	int _maAudioDataDestroy(
+		int audioData,
+		JNIEnv* jNIEnv,
+		jobject jThis);
+
+	//MAAudioInstance maAudioInstanceCreate(in MAAudioData audioData);
+	int _maAudioInstanceCreate(
+		int audioData,
+		JNIEnv* jNIEnv,
+		jobject jThis);
+
+	//int maAudioInstanceDestroy(in MAAudioInstance audioInstance);
+	int _maAudioInstanceDestroy(
+		int audioInstance,
+		JNIEnv* jNIEnv,
+		jobject jThis);
+
+	//int maAudioGetLength(in MAAudioInstance audio);
+	int _maAudioGetLength(
+		int audio,
+		JNIEnv* jNIEnv,
+		jobject jThis);
+
+	//int maAudioSetNumberOfLoops(in MAAudioInstance audio, in int loops);
+	int _maAudioSetNumberOfLoops(
+		int audio,
+		int loops,
+		JNIEnv* jNIEnv,
+		jobject jThis);
+
+	//int maAudioPrepare(in MAAudioInstance audio, in int async);
+	int _maAudioPrepare(
+		int audio,
+		int async,
+		JNIEnv* jNIEnv,
+		jobject jThis);
+
+	//int maAudioPlay(in MAAudioInstance audio);
+	int _maAudioPlay(
+		int audio,
+		JNIEnv* jNIEnv,
+		jobject jThis);
+
+	//int maAudioSetPosition(in MAAudioInstance audio, in int milliseconds);
+	int _maAudioSetPosition(
+		int audio,
+		int milliseconds,
+		JNIEnv* jNIEnv,
+		jobject jThis);
+
+	//int maAudioGetPosition(in MAAudioInstance audio);
+	int _maAudioGetPosition(
+		int audio,
+		JNIEnv* jNIEnv,
+		jobject jThis);
+
+	//int maAudioSetVolume(in MAAudioInstance audio, in float volume);
+	int _maAudioSetVolume(
+		int audio,
+		float volume,
+		JNIEnv* jNIEnv,
+		jobject jThis);
+
+	//int maAudioPause(in MAAudioInstance audio);
+	int _maAudioPause(
+		int audio,
+		JNIEnv* jNIEnv,
+		jobject jThis);
+
+	//int maAudioStop(in MAAudioInstance audio);
+	int _maAudioStop(
+		int audio,
+		JNIEnv* jNIEnv,
+		jobject jThis);
 }

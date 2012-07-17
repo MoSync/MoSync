@@ -28,7 +28,7 @@ MA 02110-1301, USA.
  * @file FileUtil.h
  * @author Mikael Kindborg
  *
- * High-level utility functions for working with files.
+ * #brief High-level utility functions for working with files.
  */
 
 #ifndef WORMHOLE_FILE_UTIL_H_
@@ -40,7 +40,8 @@ MA 02110-1301, USA.
 namespace Wormhole
 {
 /**
- * Class that contains utility methods.
+ * @brief Class that contains utility methods.
+ *
  * TODO: Add copy constructor and assignment operator.
  */
 class FileUtil
@@ -89,6 +90,15 @@ class FileUtil
 		virtual bool extractLocalFiles();
 
 		/**
+		 * Get the checksum of a file bundle.
+		 * @param handle The resource handle of the bundled
+		 * file system. Bundles are created with the Bundle tool
+		 * that comes with MoSync.
+		 * @return A 32-bit checksum.
+		 */
+		virtual int getFileSystemChecksum(MAHandle handle);
+
+		/**
 		 * Open a file for writing.
 		 * Create the file if it does not exist.
 		 * Note: Will truncate the file if it exists.
@@ -101,6 +111,7 @@ class FileUtil
 		 * @return Handle to the open file, <0 on error.
 		 */
 		virtual MAHandle openFileForReading(const MAUtil::String& filePath);
+
 		/**
 		 * Write a data object to a file.
 		 * @return true on success, false on error.

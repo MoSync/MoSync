@@ -1,0 +1,5 @@
+id = project.empty
+name = Empty Project
+description = A project template with standard settings but no files, roll your own.
+
+[Settings]

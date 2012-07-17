@@ -18,6 +18,7 @@
 
 require "#{File.dirname(__FILE__)}/pipe.rb"
 require "#{File.dirname(__FILE__)}/mosync_util.rb"
+require "#{File.dirname(__FILE__)}/mosync_resources.rb"
 require "#{File.dirname(__FILE__)}/targets.rb"
 
 module PipeElimTask
@@ -145,13 +146,20 @@ class PipeExeWork < PipeGccWork
 	end
 	def setup3(all_objects, have_cppfiles)
 		# resource compilation
-		if(!defined?(@LSTFILES))
+		if(!@LSTFILES)
 			if(@SOURCES[0])
 				@LSTFILES = Dir[@SOURCES[0] + "/*.lst"]
 			else
 				@LSTFILES = []
 			end
 		end
+
+		# rescomp support
+		if(@LSTX)
+			lstxTask = RescompTask.new(self, @BUILDDIR_BASE, @LSTX, @RES_PLATFORM)
+			@resourceTask = PipeResourceTask.new(self, 'build/resources', [lstxTask])
+		end
+
 		if(@resourceTask)
 			@prerequisites << @resourceTask
 		elsif(@LSTFILES.size > 0)
@@ -160,9 +168,9 @@ class PipeExeWork < PipeGccWork
 			@prerequisites << @resourceTask
 		end
 		if(USE_NEWLIB)
-			default(:DEFAULT_LIBS, ["newlib"])
+			default(:DEFAULT_LIBS, ["newlib","rescompiler"])
 		else
-			default(:DEFAULT_LIBS, ["mastd"])
+			default(:DEFAULT_LIBS, ["mastd","rescompiler"])
 		end
 
 		# libs

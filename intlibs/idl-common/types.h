@@ -31,4 +31,7 @@ bool isDirectPointerType(const Interface& inf, const string& type);
 string jType(const Interface& inf, const string& type);
 string getSJType(const Interface& inf, const string& type, bool argIn);	//Static Java
 
+size_t cTypeSize(const Interface& inf, const string& type);
+bool isArray(const Interface& inf, const string& name, int& count, string& baseName);
+
 #endif	//TYPES_H

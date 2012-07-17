@@ -54,7 +54,7 @@ MA 02110-1301, USA.
 #include <MAUtil/Map.h>
 #include <mavsprintf.h>
 
-#include "../JSON_lib/YAJLDom.h"
+#include <yajl/YAJLDom.h>
 #include "Facebook.h"
 #include "HttpQueryDownloader.h"
 #include "HttpResponse.h"

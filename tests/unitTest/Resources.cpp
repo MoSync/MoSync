@@ -173,10 +173,34 @@ public:
 			}
 		}
 		assert("Placeholder test", !failed);
+	}
 
+	void testCreateImageFromDataBug()
+	{
+		MAHandle hData, hImage;
+		int iRet;
+		char buf[32]={0};
+		int cbData=sizeof(buf);
+
+		hData = maCreatePlaceholder();
+		if (maCreateData(hData, cbData) != RES_OK)
+		{
+			assert("maCreateData", false);
+			return;
+		}
+		maWriteData (hData, buf, 0, cbData);
+		hImage = maCreatePlaceholder();
+		if ((iRet = maCreateImageFromData (hImage, hData, 0, cbData)) == RES_BAD_INPUT)
+		{
+			printf ("Image creation failed, as expected.\n");
+			return;
+		}
+		printf ("Incorrect return value: %i\n", iRet);
+		assert("testCreateImageFromDataBug", false);
 	}
 
 	void start() {
+		testCreateImageFromDataBug();
 		testDrawableImages();
 		testGetImageData();
 		testImageRawData();

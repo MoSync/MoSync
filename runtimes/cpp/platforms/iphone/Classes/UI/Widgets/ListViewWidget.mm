@@ -31,6 +31,14 @@
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
 	NSUInteger row = [indexPath row];
+    if (row >= [children count])
+    {
+        UITableViewCell* cell =
+            [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault
+                                    reuseIdentifier:kTableCellReuseIdentifier] autorelease];
+        return cell;
+    }
+
 	IWidget* widget = [children objectAtIndex:row];
 	UITableViewCell* cell = (UITableViewCell*)[widget getView];
 	[cell setFrame:CGRectMake(cell.frame.origin.x, cell.frame.origin.y, cell.frame.size.width,  tableView.rowHeight)];

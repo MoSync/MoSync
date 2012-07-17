@@ -47,11 +47,25 @@ namespace Base {
 #include "SyscallImpl.h"
 
 	public:
+		bool loadResourcesFromBuffer(Stream& file, const char* aFilename);
 		bool loadResources(Stream& file, const char* aFilename);
+		bool loadResource(Stream& file, MAHandle originalHandle, MAHandle destHandle);
+		int countResources();
 
 		void init();
 		virtual ~Syscall();
 		void platformDestruct();
+
+#ifdef SYMBIAN
+		int resourcesCount;
+		char* resourcesFilename;
+		int *resourceOffset;
+		int *resourceSize;
+		int *resourceType;
+
+		FileStream* resource;
+#endif
+
 /*
 #ifdef _android
 		JNIEnv* mJNIEnv;
@@ -142,7 +156,7 @@ namespace Base {
 		const char* GetValidatedStr(int address);
 		const wchar* GetValidatedWStr(int address);
 
-        int TranslateNativePointerToMoSyncPointer(void *nativePointer);
+		int TranslateNativePointerToMoSyncPointer(void *nativePointer);
 
 #ifndef VSV_ARGPTR_DECL
 #define VSV_ARGPTR_DECL
@@ -160,6 +174,7 @@ namespace Base {
 #ifdef EMULATOR
 		bool mAllowDivZero;
 #endif
+		bool mPanicOnProgrammerError;
 
 		void VM_Yield();
 

@@ -17,6 +17,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include <Core.h>
 #include <base/Syscall.h>
+#include <base/FileStream.h>
 
 #include <string.h>
 #include <stdio.h>
@@ -174,16 +175,63 @@ static jboolean nativeLoad(
 
 /**
 * @brief nativeLoadResource
-* TODO: This method is unfinished!
 */
-static jboolean nativeLoadResource(JNIEnv* env, jobject jthis, jobject resource)
+static jboolean nativeLoadResource(
+	JNIEnv* env,
+	jobject jthis,
+	jobject resource,
+	jlong resourceOffset,
+	MAHandle handle,
+	MAHandle placeholder)
 {
 	SYSLOG("load resource");
 
-	char* resourceBuffer = (char*)env->GetDirectBufferAddress(resource);
+	int resFd = -1;
 
-	// TODO: Now what?
+	if (resourceOffset != 0)
+	{
+		SYSLOG("MoSyncBridge.cpp: nativeLoad: Get resource file descriptor");
+		jclass fdClass2 = env->FindClass("java/io/FileDescriptor");
+		if (fdClass2 != NULL)
+		{
+			jclass fdResClassRef = (jclass) env->NewGlobalRef(fdClass2);
+			jfieldID fdClassDescriptorFieldID =
+				env->GetFieldID(fdResClassRef, "descriptor", "I");
+
+			if (fdClassDescriptorFieldID != NULL && resource != NULL)
+			{
+				jint fd = env->GetIntField(
+					resource,
+					fdClassDescriptorFieldID);
+				resFd = dup(fd);
+				lseek(resFd, resourceOffset, SEEK_SET);
+			}
+			else if (resource == NULL)
+			{
+				resFd = -1;
+			}
+		}
+	}
+
+	if (resFd > 0)
+	{
+		Base::FileStream res(resFd);
+		Base::gSyscall->loadResource(res, handle, placeholder);
+	}
 }
+
+/**
+* @brief nativeLoadResource
+* TODO: This method is unfinished!
+*/
+//static jboolean nativeLoadResource(JNIEnv* env, jobject jthis, jobject resource)
+//{
+//	SYSLOG("load resource");
+//
+//	char* resourceBuffer = (char*)env->GetDirectBufferAddress(resource);
+//
+//	// TODO: Now what?
+//}
 
 /**
  * @return The newly created Data Section as a Direct ByteBuffer object
@@ -348,6 +396,34 @@ static void nativePostEvent(JNIEnv* env, jobject jthis, jintArray eventBuffer)
 	{
 		event.optionsBoxButtonIndex = intArray[1];
 	}
+	else if (event.type == EVENT_TYPE_ADS_BANNER)
+	{
+		event.adsData.bannerEventType = intArray[1];
+		event.adsData.bannerHandle = intArray[2];
+		event.adsData.bannerErrorCode = intArray[3];
+	}
+	else if (event.type == EVENT_TYPE_LOCAL_NOTIFICATION)
+	{
+		event.localNotificationHandle = intArray[1];
+	}
+	else if (event.type == EVENT_TYPE_PUSH_NOTIFICATION_REGISTRATION)
+	{
+		// Just signals that we have a result to the request,
+		// and the result can be taken with maNotificationPushGetRegistration.
+	}
+	else if (event.type == EVENT_TYPE_PUSH_NOTIFICATION_UNREGISTRATION)
+	{
+		// Just signals that we've unregistered. No data needed.
+	}
+	else if (event.type == EVENT_TYPE_PUSH_NOTIFICATION)
+	{
+		event.pushNotificationHandle = intArray[1];
+	}
+	else if (event.type == EVENT_TYPE_CAPTURE)
+	{
+		event.captureData.type = intArray[1];
+		event.captureData.handle = intArray[2];
+	}
 	else if (event.type == EVENT_TYPE_WIDGET)
 	{
 		/*
@@ -489,11 +565,28 @@ static void nativePostEvent(JNIEnv* env, jobject jthis, jintArray eventBuffer)
 		event.nfc.result = intArray[2];
 		event.nfc.dstId = intArray[3];
 	}
+	else if (event.type == EVENT_TYPE_AUDIO_PREPARED ||
+			event.type == EVENT_TYPE_AUDIO_COMPLETED)
+	{
+		event.audioInstance = intArray[1];
+	}
+	else if (event.type == EVENT_TYPE_CAMERA_PREVIEW)
+	{
+		__android_log_write(ANDROID_LOG_INFO, "@@@@@@@@ MoSync JNI", "Camera event sent");
+	}
 
 	// Release the memory used for the int array.
 	env->ReleaseIntArrayElements(eventBuffer, intArray, 0);
 
 	Base::gSyscall->postEvent(event);
+}
+
+/**
+* @brief nativeGetEventQueueSize
+*/
+static int nativeGetEventQueueSize(JNIEnv* env, jobject jthis)
+{
+	return Base::gSyscall->getEventQueueSize();
 }
 
 /**
@@ -522,6 +615,17 @@ static int nativeCreatePlaceholder( JNIEnv* env, jobject jthis )
 	int result = maCreatePlaceholder();
 
 	return result;
+}
+
+/**
+ * @brief Exits the application
+ * This function uses the native exit() function to kill the application.
+ * All the threads and processes being started by the applicaton will be killed
+ */
+static void nativeExit( JNIEnv* env, jobject jthis )
+{
+	exit(1);
+	return;
 }
 
 /**
@@ -555,18 +659,24 @@ int jniRegisterNativeMethods(
 	return 0;
 }
 
-jint gNumJavaMethods = 8;
+// NOTE: Remember to update sNumJavaMethods when adding/removing
+// native methods!
+static jint sNumJavaMethods = 10;
 static JNINativeMethod sMethods[] =
 {
 	// name, signature, funcPtr
 	{ "nativeInitRuntime", "()Z", (void*)nativeInitRuntime },
 	{ "nativeLoad", "(Ljava/io/FileDescriptor;JLjava/io/FileDescriptor;J)Z", (void*)nativeLoad },
-	{ "nativeLoadResource", "(Ljava/nio/ByteBuffer;)Z", (void*)nativeLoadResource },
+	{ "nativeLoadResource", "(Ljava/io/FileDescriptor;JII)Z", (void*)nativeLoadResource },
+	//{ "nativeLoadResource", "(Ljava/nio/ByteBuffer;)Z", (void*)nativeLoadResource },
 	{ "nativeLoadCombined", "(Ljava/nio/ByteBuffer;)Ljava/nio/ByteBuffer;", (void*)nativeLoadCombined },
 	{ "nativeRun", "()V", (void*)nativeRun },
 	{ "nativePostEvent", "([I)V", (void*)nativePostEvent },
+	{ "nativeGetEventQueueSize", "()I", (void*)nativeGetEventQueueSize },
 	{ "nativeCreateBinaryResource", "(II)I", (void*)nativeCreateBinaryResource },
-	{ "nativeCreatePlaceholder", "()I", (void*)nativeCreatePlaceholder }
+	{ "nativeCreatePlaceholder", "()I", (void*)nativeCreatePlaceholder },
+	{ "nativeExit", "()V", (void*)nativeExit }
+	// *** Update sNumJavaMethods when adding/removing a method! *** //
 };
 
 /**
@@ -592,7 +702,7 @@ jint JNI_OnLoad(JavaVM* vm, void* reserved)
 		env,
 		"com/mosync/internal/android/MoSyncThread",
 		sMethods,
-		gNumJavaMethods);
+		sNumJavaMethods);
 
 	return JNI_VERSION_1_4;
 }

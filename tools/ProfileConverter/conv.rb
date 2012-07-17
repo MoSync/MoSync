@@ -52,6 +52,7 @@ OUTPUT_ROOT = output_root
 BUILD_ROOT = build_root
 VENDOR_DIR = "#{OUTPUT_ROOT}vendors"
 RUNTIME_DIR = "#{OUTPUT_ROOT}runtimes"
+PLATFORMS_DIR = "#{OUTPUT_ROOT}platforms"
 
 
 # data types
@@ -113,6 +114,115 @@ class Runtime
 	end
 end
 
+# JavaME is the only platform
+# we 'compute' capabilities for,
+# since it's marvelously fragmented
+class JavaMEPlatform
+    attr_accessor :runtime
+    def initialize(runtime)
+        @runtime = runtime
+    end
+
+    def write_profile_xml(output_dir, family, variant, runtimeDir, inherit, write_caps, is_abstract)
+        # Unfortunately, all these JavaME APIs may
+        # require operator certs.
+        FileUtils.mkdir_p output_dir
+        File.open("#{output_dir}/profile.xml", 'w') do |profile_xml|
+            profile_xml.puts(self.to_xml(@runtime, family, variant, runtimeDir, inherit, write_caps, is_abstract))
+        end
+    end
+
+    def write_runtime_txt(output_dir, runtime_dir)
+        FileUtils.mkdir_p output_dir
+        clean_runtime = "profiles\\runtimes\\"
+        clean_runtime << runtime_dir.to_s.gsub('/', '\\')
+        File.open("#{output_dir}/runtime.txt", 'w') do |runtime_txt|
+            runtime_txt.puts(clean_runtime)
+        end
+    end
+
+    def create_capability_tag(name, value, state, fragmentation, type)
+        result = ""
+        result << "  <capability name=\"" << name << "\""
+        if (value.length > 0)
+            result << " value=\"" << value << "\"";
+        end
+        result << " state=\"" << state << "\" fragmentation=\"" << fragmentation << "\" type=\"" << type << "\"/>\n"
+        return result
+    end
+
+    def to_capability_xml(runtime, capability)
+        result = ""
+        if (runtime && runtime.caps.has_key?(capability))
+            names = self.map_capability_name capability
+            names.each do |name|
+                result << self.create_capability_tag(name, "", "REQUIRES_PRIVILEGED_PERMISSION", "buildtime", "");
+            end
+        end
+        return result
+    end
+
+    def to_icon_size_xml(runtime)
+        result = ""
+        if (runtime && runtime.caps.has_key?("MA_PROF_CONST_ICONSIZE_Y") && runtime.caps.has_key?("MA_PROF_CONST_ICONSIZE_X"))
+            sizeStr = runtime.caps["MA_PROF_CONST_ICONSIZE_X"] + "x" + runtime.caps["MA_PROF_CONST_ICONSIZE_X"]
+            result << self.create_capability_tag("IconSize", sizeStr, "SUPPORTED", "buildtime", "property");
+        end
+        return result;
+    end
+
+    def to_cldc_xml(runtime)
+        version = "1.1"
+        if (runtime && runtime.caps.has_key?("MA_PROF_SUPPORT_CLDC_10"))
+            version = "1.0"
+        end
+        return self.create_capability_tag("CLDC", version, "SUPPORTED", "buildtime", "property");
+    end
+
+    def to_xml(runtime, family, variant, runtimeDir, inherit, write_caps, is_abstract)
+        xml = "<platform family=\"" << family
+        xml << "\" variant=\"" << variant.to_s << "\" "
+        xml << "runtime=\"" << runtimeDir << "\" "
+        xml << "inherit=\"" << inherit << "\""
+        if (is_abstract)
+            xml << " abstract=\"true\""
+        end
+        xml << ">\n"
+        if (runtime && runtime.caps.has_key?("MA_PROF_BLACKBERRY_VERSION"))
+            #    xml << "<!-- BlackBerry version: " << runtime.caps["MA_PROF_BLACKBERRY_VERSION"]
+            #xml << "." << runtime.caps["MA_PROF_BLACKBERRY_VERSION_MINOR"]
+            #xml << "-->\n"
+        end
+        if (write_caps)
+            xml << self.to_capability_xml(runtime, "MA_PROF_SUPPORT_JAVAPACKAGE_BLUETOOTH");
+            xml << self.to_capability_xml(runtime, "MA_PROF_SUPPORT_JAVAPACKAGE_LOCATIONAPI");
+            xml << self.to_capability_xml(runtime, "MA_PROF_SUPPORT_JAVAPACKAGE_WMAPI");
+            xml << self.to_capability_xml(runtime, "MA_PROF_SUPPORT_CAMERA");
+            xml << self.to_capability_xml(runtime, "MA_PROF_SUPPORT_JAVAPACKAGE_FILECONNECTION");
+            xml << self.to_capability_xml(runtime, "MA_PROF_SUPPORT_JAVAPACKAGE_PIMAPI");
+            xml << self.to_icon_size_xml(runtime);
+            xml << self.to_cldc_xml(runtime);
+        end
+        xml << "</platform>\n"
+        return xml
+    end
+
+    def create_token(isBlackBerry)
+        # For BlackBerry, we don't use capabilities for the token, only the version numbers
+        return to_xml(@runtime, "JavaME", 0, "", "JavaME/Default", !isBlackBerry, false)
+    end
+
+    def map_capability_name runtime_cap
+        return ["Bluetooth"] if(runtime_cap == "MA_PROF_SUPPORT_JAVAPACKAGE_BLUETOOTH")
+        return ["Location"] if (runtime_cap == "MA_PROF_SUPPORT_JAVAPACKAGE_LOCATIONAPI")
+        return ["SMS"] if (runtime_cap == "MA_PROF_SUPPORT_JAVAPACKAGE_WMAPI")
+        return ["Camera"] if (runtime_cap == "MA_PROF_SUPPORT_CAMERA")
+        return ["File Storage"] if (runtime_cap == "MA_PROF_SUPPORT_JAVAPACKAGE_FILECONNECTION")
+        return ["Contacts", "Calendar"] if (runtime_cap == "MA_PROF_SUPPORT_JAVAPACKAGE_PIMAPI")
+        # MMAPI?
+        return []
+    end
+end
 
 # const data
 RELEVANT_CAPS = [
@@ -155,6 +265,8 @@ RELEVANT_DEFINES = {
 		'MA_PROF_BUG_NO_SIZECHANGED',
 		'MA_PROF_BLACKBERRY_VERSION',
 		'MA_PROF_BLACKBERRY_VERSION_MINOR',
+        'MA_PROF_CONST_ICONSIZE_Y',
+        'MA_PROF_CONST_ICONSIZE_X',
 	],
 
 	:s60v2 => ['MA_PROF_SUPPORT_FRAMEBUFFER_32BIT'],
@@ -168,7 +280,9 @@ RELEVANT_DEFINES = {
 	:android_3 => [],
 	:android_4 => [],
 	:android_7 => [],
+	:android_7x => [],
 	:iphoneos => [],
+	:winphone => [],
 }
 
 CAP_TYPES = {
@@ -207,7 +321,9 @@ runtimes = {
 	:android_3 => [],
 	:android_4 => [],
 	:android_7 => [],
+	:android_7x => [],
 	:iphoneos => [],
+	:winphone => [],
 }
 
 
@@ -356,6 +472,7 @@ puts "Generating all capability permutations!"
 
 FileUtils.mkdir_p VENDOR_DIR
 FileUtils.mkdir_p RUNTIME_DIR
+FileUtils.mkdir_p PLATFORMS_DIR
 definitions = {}
 
 def skipVendor?(vendor)
@@ -579,10 +696,21 @@ runtimes.each do |platform, devs|
 	puts "#{platform} has #{devs.size} devices!"
 end
 
+# Ok, copy all 'hand-made' profile.xml files into the proper place
+FileUtils.cp_r("../../platforms/.", PLATFORMS_DIR, :verbose => true)
+
+# Java ME: special case!
+javame_profile_tokens={}
+javame_default_profile=JavaMEPlatform.new(nil)
+javame_default_profile_token=javame_default_profile.create_token(false)
+javame_default_runtime = 0
+javame_last_non_abstract_runtime = "JavaME/Default"
+
 runtimes.each do |platform_name, platform|
 	id = 1
 	platform.each do |runtime|
-		runtime_dir = "#{platform_name}/#{id}/"
+        runtime_name = "#{platform_name}/#{id}"
+        runtime_dir = "#{runtime_name}/"
 		FileUtils.mkdir_p "#{RUNTIME_DIR}/#{runtime_dir}"
 		File.open("#{RUNTIME_DIR}/#{runtime_dir}/devices.txt", 'w') do |devices|
 			runtime.devices.each do |device|
@@ -596,7 +724,7 @@ runtimes.each do |platform_name, platform|
 		end
 
 		release_defines = ['PHONE_RELEASE', 'MOSYNC_COMMERCIAL']
-		if(platform_name == :sp2003 || platform_name == :wm5 || platform_name == :wm6 || platform_name == :wm6pro || platform_name == :s60v3 || platform_name == :s60v5)
+		if(platform_name == :sp2003 || platform_name == :wm5 || platform_name == :wm6 || platform_name == :wm6pro || platform_name == :s60v3 || platform_name == :s60v5 || platform_name == :android_7x )
 			release_defines << "USE_ARM_RECOMPILER"
 		end
 		if(platform_name == :s60v3)
@@ -607,29 +735,88 @@ runtimes.each do |platform_name, platform|
 		debug_defines = release_defines + ['PUBLIC_DEBUG', 'LOGGING_ENABLED']
 		write_config_h(runtime, "#{RUNTIME_DIR}/#{runtime_dir}/configD.h", RELEVANT_DEFINES[platform_name.to_sym], debug_defines)
 
-		cwd = Dir.pwd
-		Dir.chdir "../RuntimeBuilder/"
-
 		puts "platform dir : #{BUILD_ROOT}#{RUNTIME_DIR}/#{runtime_dir}"
 
 		rbp = platform_name
 		if(platform_name == :JavaME)
 			rbp = 'JavaMEcldc10' if(runtime.caps.has_key? "MA_PROF_SUPPORT_CLDC_10")
 			bbMajor = runtime.caps['MA_PROF_BLACKBERRY_VERSION']
+            bbMinor = 0
 			if(bbMajor == 4)
-				minor = runtime.caps['MA_PROF_BLACKBERRY_VERSION_MINOR']
+				bbMinor = runtime.caps['MA_PROF_BLACKBERRY_VERSION_MINOR']
 				rbp = 'bb40'
-				rbp = 'bb42' if(minor >= 2)
+				rbp = 'bb42' if(bbMinor >= 2)
 
 				# 4.4 and above are equivalent to 4.7
-				rbp = 'bb47' if(minor >= 4)
+				rbp = 'bb47' if(bbMinor >= 4)
 			end
 			rbp = 'bb500' if(bbMajor && bbMajor >= 5)
+
+            # This section is there to map between the 'old' device-based profile database
+            # and the 'new' platform-based profile database.
+            # Basically, we produce XML files based on the 'old' database that can be
+            # consumed by the 'new' database.
+            #
+            # JavaME     - we produce profiles with the same name & (similar) capabilities as
+            #              per the device-based profile database
+            # BlackBerry - we produce profiles with the name BlackBerry/x.y, where x.y
+            #              is the BlackBerry version
+            #
+            # To accomplish this, various hacks are implemented below...
+
+            profile = JavaMEPlatform.new(runtime)
+
+            # Produce a string that represents some 'equality' between
+            # profiles -- whenever there is time, refactor!
+            family = platform_name.to_s
+            variant = id.to_s
+            profile_token = profile.create_token(bbMajor)
+            if (bbMajor)
+                family = "BlackBerry"
+                variant = "#{bbMajor}.#{bbMinor}"
+                profile_token << variant
+            end
+
+            inherit = javame_profile_tokens[profile_token]
+
+            fullPlatform = "#{family}/#{variant}"
+            profileXmlDir = "#{PLATFORMS_DIR}/#{fullPlatform}"
+
+            if (!inherit)
+                javame_profile_tokens[profile_token] = fullPlatform
+                profile.write_runtime_txt(profileXmlDir, runtime_name)
+            end
+
+            if (!bbMajor)
+                if (javame_default_runtime == 0 && javame_default_profile_token == profile_token)
+                    javame_default_runtime = id
+                end
+                if (inherit)
+                    profile.write_profile_xml(profileXmlDir, family, variant, runtime_name, inherit, false, true)
+                else
+                    profile.write_profile_xml(profileXmlDir, family, variant, runtime_name, javame_last_non_abstract_runtime, true, false)
+                    javame_last_non_abstract_runtime = "JavaME/#{id}"
+                end
+            else
+                puts "BB RUNTIME (#{id}); #{inherit}; #{fullPlatform}"
+                # For this to work, every BlackBerry version must have a corresponding
+                # profile not created by this tool with the name "BlackBerry/x.y" that
+                # this automatically created profile can inherit from.
+                if (inherit)
+                    profile.write_profile_xml("#{profileXmlDir}_L#{id}", family, "#{variant}_L#{id}", runtime_name, inherit, false, true)
+                else
+                    profile.write_profile_xml(profileXmlDir, family, variant, runtime_name, "#{fullPlatform}_Base", false, false)
+                end
+            end
 		end
+
+        cwd = Dir.pwd
+		Dir.chdir "../RuntimeBuilder/"
 
 		cmd = "ruby RuntimeBuilder.rb ./Settings.rb #{rbp} #{BUILD_ROOT}#{RUNTIME_DIR}/#{runtime_dir}"
 
-		puts(cmd)
+        # Do not remove the puts statement below; the build script uses it!
+        puts(cmd)
 		if(gBuildRuntimes)
 			success = system(cmd)
 		else
@@ -646,4 +833,9 @@ runtimes.each do |platform_name, platform|
 		id = id + 1
 	end
 end
+
+# Write the default JavaME profile
+javame_default_profile.write_profile_xml("#{PLATFORMS_DIR}/JavaME/Default", "JavaME", "Default", "JavaME/#{javame_default_runtime}", "JavaME/Base", true, false)
+javame_default_profile.write_runtime_txt("#{PLATFORMS_DIR}/JavaME/Default", "JavaME/#{javame_default_runtime}")
+
 exit(0)

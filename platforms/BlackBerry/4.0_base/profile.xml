@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<platform family="BlackBerry" variant="4.0_base" abstract="true">
+  <capability name="Power Management" state="REQUIRES_PERMISSION" fragmentation="runtime"/>
+  <capability name="Vibration" state="SUPPORTED" fragmentation="runtime"/>
+  <capability name="Internet Access" state="REQUIRES_PERMISSION">
+  <capability name="HTTPS" state="REQUIRES_PERMISSION"/>
+  </capability>
+  <capability name="File Storage" state="REQUIRES_PERMISSION" fragmentation="runtime"/>
+  <capability name="SMS" state="REQUIRES_PERMISSION" fragmentation="runtime"/>
+  <capability name="Contacts" state="REQUIRES_PERMISSION" fragmentation="runtime"/>
+  <capability name="Calendar" state="REQUIRES_PERMISSION" fragmentation="runtime"/>
+  <capability name="Version/Major" value="4"/>
+  <capability name="Version/Minor" value="0"/>
+</platform>

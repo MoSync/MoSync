@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<platform family="BlackBerry" variant="4.3_base" inherit="BlackBerry/4.2" abstract="true">
+  <capability name="Bluetooth" state="REQUIRES_PERMISSION" fragmentation="runtime"/>
+  <capability name="Location" state="REQUIRES_PERMISSION" fragmentation="runtime"/>
+  <capability name="Version/Minor" value="3"/>
+</platform>

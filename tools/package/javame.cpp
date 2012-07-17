@@ -78,7 +78,8 @@ void packageJavaME(const SETTINGS& s, const RuntimeInfo& ri) {
 	testVendor(s);
 	testJavaMESigning(s);
 
-	string dstPath = ri.isBlackberry ? "" : s.dst;
+	//string dstPath = ri.isBlackberry ? "" : s.dst;
+	string dstPath = s.dst;
 	string program, resource;
 	program = fullpathString(s.program);
 	if(s.resource)
@@ -124,7 +125,7 @@ void packageJavaME(const SETTINGS& s, const RuntimeInfo& ri) {
 	string outputIcon = dstPath + "/icon.png";
 	if (ri.iconSize.size() != 0 && s.icon) {
 		// For java me, the -dst is the JAR!
-		injectIcon("j2me", ri.iconSize.c_str(), s.icon, appJarName.c_str(), s.silent);
+		injectIcon("JavaME", ri.iconSize.c_str(), s.icon, appJarName.c_str(), s.silent);
 	}
 
 	// write JAD

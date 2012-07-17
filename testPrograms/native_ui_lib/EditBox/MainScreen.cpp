@@ -26,29 +26,118 @@
 #include <maassert.h>
 #include <mawstring.h>
 #include <mastdlib.h>
+#include <mastring.h>
+#include <MAUtil/String.h>
 
 #include "MainScreen.h"
 
+using namespace MAUtil;
+
+#define MAX_TEXT_LENGTH_LABEL_TEXT "Max text length"
+#define MAX_LINES_LABEL_TEXT "Max lines"
+#define MIN_LINES_LABEL_TEXT "Min lines"
+#define PLACEHOLDER_COLOR_LABEL_TEXT "Placeholder color"
+#define LINES_NUMBER_LABEL_TEXT "Lines number"
+#define INPUT_MODES_COUNT 7
+#define INPUT_FLAGS_COUNT 5
+
+const String inputModes[] = {
+		"ANY",
+		"EMAILADDR",
+		"NUMERIC",
+		"PHONENUMBER",
+		"URL",
+		"DECIMAL",
+		"SINGLELINE"
+};
+
+const String inputFlags[] = {
+		"FLAG_PASSWORD",
+		"FLAG_SENSITIVE",
+		"FLAG_INITIAL_CAPS_ALL_CHARACTERS",
+		"FLAG_INITIAL_CAPS_WORD",
+		"FLAG_INITIAL_CAPS_SENTENCE"
+};
+
+enum InputModeType {
+	ANY,
+	EMAILADDR,
+	NUMERIC,
+	PHONENUMBER,
+	URL,
+	DECIMAL,
+	SINGLELINE
+};
+
+enum InputFlagType {
+	PASSWORD,
+	SENSITIVE,
+	CAPS_ALL_CHARACTERS,
+	CAPS_WORD,
+	CAPS_SENTENCE
+};
+
+enum FontSize {
+	FONT_SMALL        = 12 ,
+	FONT_LARGE        = 15 ,
+	FONT_EXTRA_LARGE  = 25 ,
+};
 
 /**
  * Constructor.
  */
 MainScreen::MainScreen() :
-	Screen(),
-	mMainLayout(NULL),
+	TabScreen(),
 	mEditBox(NULL),
 	mSetTextButton(NULL),
 	mGetTextButton(NULL),
 	mGetTextLabel(NULL),
 	mKeyboardButton(NULL),
+	mMaxTextLengthEditBox(NULL),
+	mInputFlagListView(NULL),
+	mInputModeListView(NULL),
+	mMaxLinesEditBox(NULL),
+	mMaxLinesLabel(NULL),
+	mMinLinesEditBox(NULL),
+	mMinLinesLabel(NULL),
+	mPlaceholderColorEditBox(NULL),
+	mPlaceholderColorLabel(NULL),
+	mLinesNumberEditBox(NULL),
+	mLinesNumberLabel(NULL),
 	mKeyboard(false)
 {
+	// Set the screen size, available for each screen.
+	MAExtent screenSize = maGetScrSize();
+	mScreenWidth = EXTENT_X(screenSize);
+	mScreenHeight = EXTENT_Y(screenSize);
+
+	// For small screens, use small fonts and padding.
+	if ( mScreenHeight < 600 )
+	{
+		mFontSize = FONT_SMALL;
+	}
+	else if( mScreenHeight < 800 )
+	{
+		mFontSize = FONT_LARGE;
+	}
+	else
+	{
+		mFontSize = FONT_EXTRA_LARGE;
+	}
+
 	createMainLayout();
 
 	mSetTextButton->addButtonListener(this);
 	mGetTextButton->addButtonListener(this);
 	mKeyboardButton->addButtonListener(this);
+	mMaxTextLengthEditBox->addEditBoxListener(this);
 	mEditBox->addEditBoxListener(this);
+	mInputModeListView->addListViewListener(this);
+	mInputFlagListView->addListViewListener(this);
+	mMaxLinesEditBox->addEditBoxListener(this);
+	mMinLinesEditBox->addEditBoxListener(this);
+	mPlaceholderColorEditBox->addEditBoxListener(this);
+	mLinesNumberEditBox->addEditBoxListener(this);
 }
 
 /**
@@ -56,10 +145,106 @@ MainScreen::MainScreen() :
  */
 MainScreen::~MainScreen()
 {
-    mSetTextButton->removeButtonListener(this);
-    mGetTextButton->removeButtonListener(this);
-    mKeyboardButton->removeButtonListener(this);
-    mEditBox->removeEditBoxListener(this);
+	mSetTextButton->removeButtonListener(this);
+	mGetTextButton->removeButtonListener(this);
+	mKeyboardButton->removeButtonListener(this);
+	mEditBox->removeEditBoxListener(this);
+	mMaxTextLengthEditBox->removeEditBoxListener(this);
+	mInputModeListView->removeListViewListener(this);
+	mInputFlagListView->removeListViewListener(this);
+	mMaxLinesEditBox->removeEditBoxListener(this);
+	mMinLinesEditBox->removeEditBoxListener(this);
+	mPlaceholderColorEditBox->removeEditBoxListener(this);
+	mLinesNumberEditBox->removeEditBoxListener(this);
+}
+
+/**
+ * Creates and adds main layout to the screen.
+ */
+void MainScreen::createMainLayout()
+{
+	// create the first screen
+	Screen* firstScreen = new Screen();
+    firstScreen->setTitle("Edit box");
+
+    // create the vertical layout that will contain all the
+    // elements from the first screen
+    VerticalLayout* firstScreenVerticalLayout = new VerticalLayout();
+
+    // edit box creation
+	mEditBox = new EditBox();
+	mEditBox->setPlaceholder("Enter text...");
+	mEditBox->setHeight((mScreenHeight/12)*2);
+	mEditBox->fillSpaceHorizontally();
+	firstScreenVerticalLayout->addChild(mEditBox);
+
+	// create the horizontal layout that will contain the
+	// set text button (resets the text to 'DEFAULT') and the
+	// get text button
+	HorizontalLayout* layout = new HorizontalLayout();
+	layout->setHeight(mScreenHeight/12);
+	firstScreenVerticalLayout->addChild(layout);
+
+	mSetTextButton = new Button();
+	mSetTextButton->setText("Reset text to DEFAULT ");
+	layout->addChild(mSetTextButton);
+
+	mGetTextButton = new Button();
+	mGetTextButton->setText("Get text");
+	layout->addChild(mGetTextButton);
+
+	mGetTextLabel = new Label();
+	firstScreenVerticalLayout->addChild(mGetTextLabel);
+
+	// create and add the show/hide keyboard button
+	mKeyboardButton = new Button();
+	mKeyboardButton->setText("Show/hide keyboard");
+	mKeyboardButton->setHeight(mScreenHeight/12);
+	mKeyboardButton->fillSpaceHorizontally();
+	firstScreenVerticalLayout->addChild(mKeyboardButton);
+
+	// Create layout for widgets.
+	this->createDecimalEditBoxView(mMaxTextLengthEditBox, firstScreenVerticalLayout, MAX_TEXT_LENGTH_LABEL_TEXT);
+	this->createDecimalEditBoxView(mMaxLinesEditBox, firstScreenVerticalLayout, MAX_LINES_LABEL_TEXT);
+	this->createDecimalEditBoxView(mMinLinesEditBox, firstScreenVerticalLayout, MIN_LINES_LABEL_TEXT);
+	this->createDecimalEditBoxView(mLinesNumberEditBox, firstScreenVerticalLayout, LINES_NUMBER_LABEL_TEXT);
+	this->createDecimalEditBoxView(mPlaceholderColorEditBox, firstScreenVerticalLayout, PLACEHOLDER_COLOR_LABEL_TEXT);
+
+	// set the main widget for the first screen and
+	// then add it as a application tab
+	firstScreen->setMainWidget(firstScreenVerticalLayout);
+	this->addTab(firstScreen);
+
+	// create the second screen and the horizontal
+	// layout that will contain the input modes and flags lists
+	Screen* secondScreen = new Screen();
+	secondScreen->setTitle("Modes/flags");
+	VerticalLayout* secondScreenVerticalLayout = new VerticalLayout();
+
+	this->createInputModeListView(secondScreenVerticalLayout);
+
+	// create a black separator between the lists
+	HorizontalLayout* separatorLayout = new HorizontalLayout();
+	separatorLayout->setBackgroundColor(0x000000);
+	separatorLayout->setHeight(mScreenHeight/12);
+	secondScreenVerticalLayout->addChild(separatorLayout);
+
+	this->createInputFlagListView(secondScreenVerticalLayout);
+
+	// set the main widget for the second screen and
+	// then add it as a application tab
+	secondScreen->setMainWidget(secondScreenVerticalLayout);
+	this->addTab(secondScreen);
+
+	maSetColor(0x8A2BE2);
+}
+
+
+void MainScreen::tabScreenTabChanged(
+    TabScreen* tabScreen,
+    const int tabScreenIndex)
+{
+
 }
 
 /**
@@ -69,85 +254,221 @@ MainScreen::~MainScreen()
  */
 void MainScreen::buttonClicked(Widget* button)
 {
-    if (button == mSetTextButton)
-    {
-        mEditBox->setText("DEFAULT");
-    }
-    else if (button == mGetTextButton)
-    {
+	if (button == mSetTextButton)
+	{
+		mEditBox->setText("DEFAULT");
+	}
+	else if (button == mGetTextButton)
+	{
 		mGetTextLabel->setText(mEditBox->getText());
 
-        MAUtil::String text = mEditBox->getText();
-        printf("get text = %s", text.c_str());
-    }
-    else if (button == mKeyboardButton)
-    {
-        mKeyboard = !mKeyboard;
-        if (mKeyboard)
-        {
-            mEditBox->showKeyboard();
-        }
-        else
-        {
-            mEditBox->hideKeyboard();
-        }
-    }
+		MAUtil::String text = mEditBox->getText();
+		printf("get text = %s", text.c_str());
+	}
+	else if (button == mKeyboardButton)
+	{
+		mKeyboard = !mKeyboard;
+		if (mKeyboard)
+		{
+			mEditBox->showKeyboard();
+		}
+		else
+		{
+			mEditBox->hideKeyboard();
+		}
+	}
 }
 
 /**
- * Creates and adds main layout to the screen.
+ * This method is called when the user selects an item from
+ * the list view
+ * @param listView The list view object that generated the event
+ * @param listViewItem The ListViewItem object that was clicked.
  */
-void MainScreen::createMainLayout() {
-	// Create and add the main layout to the screen.
-	mMainLayout = new VerticalLayout();
-//	mMainLayout->setBackgroundColor(0xFF0000);
-	Screen::setMainWidget(mMainLayout);
+void MainScreen::listViewItemClicked(ListView* listView, ListViewItem* listViewItem)
+{
+	int listViewItemIndex = -1;
+	for(int i = 0; i < listView->countChildWidgets(); i++)
+	{
+		ListViewItem* currentItem = (ListViewItem*)listView->getChild(i);
+		currentItem->setBackgroundColor(0xFFFFFF);
 
-	Label* info1 = new Label();
-	info1->setText("First edit box with Capitalize all characters");
-	mMainLayout->addChild(info1);
+		if (currentItem == listViewItem)
+		{
+			listViewItemIndex = i;
+		}
+	}
 
-	mEditBox = new EditBox();
-	mEditBox->setPlaceholder("Enter text...");
-	mEditBox->setInputFlag(EDIT_BOX_INPUT_GLAG_INITIAL_CAPS_ALL_CHARACTERS);
-	mEditBox->fillSpaceHorizontally();
-	mMainLayout->addChild(mEditBox);
+	if (listView == mInputModeListView)
+	{
+		listViewItem->setBackgroundColor(0xFF0000);
 
-	mSetTextButton = new Button();
-	mSetTextButton->setText("Reset text to DEFAULT ");
-	mMainLayout->addChild(mSetTextButton);
+		if (listViewItemIndex >= 0)
+		{
+			this->setInputMode(listViewItemIndex);
+		}
+	}
+	else if (listView == mInputFlagListView)
+	{
+		listViewItem->setBackgroundColor(0xFF0000);
 
-	mGetTextButton = new Button();
-	mGetTextButton->setText("Get text");
-	mMainLayout->addChild(mGetTextButton);
+		if (listViewItemIndex >= 0)
+		{
+			this->setInputFlag(listViewItemIndex);
+		}
+	}
+}
 
-	mGetTextLabel = new Label();
-//	mGetTextLabel->setText("No text, just placeholder");
-	mMainLayout->addChild(mGetTextLabel);
+/**
+ * Creates a horizontal layout, adds it to the main layout, initializes the
+ * edit box and adds it to the horizontal layout.
+ * @param editBox The editbox to be created and added on the screen.
+ * @param mainLayout Widgets will be added to it.
+ */
+void MainScreen::createDecimalEditBoxView(EditBox* &editBox, VerticalLayout* aVerticalLayout, String text)
+{
+	// Create layout for widgets.
+	HorizontalLayout* layout = new HorizontalLayout();
+	layout->setHeight(mScreenHeight/12);
 
-	mKeyboardButton = new Button();
-	mKeyboardButton->setText("Show/hide keyboard");
-	mMainLayout->addChild(mKeyboardButton);
+	aVerticalLayout->addChild(layout);
 
-	mEditBoxEmail = new EditBox();
-	mEditBoxEmail->setPlaceholder("Enter email address...");
-	mEditBoxEmail->setInputMode(EDIT_BOX_INPUT_MODE_EMAILADDR);
-	mEditBoxEmail->fillSpaceHorizontally();
-	mMainLayout->addChild(mEditBoxEmail);
+	// Add label with info.
+	Label* label = new Label();
+	label->setText(text);
+	layout->addChild(label);
 
-	mEditBoxDecimal = new EditBox();
-	mEditBoxDecimal->setPlaceholder("Enter a real number...");
-	mEditBoxDecimal->setInputMode(EDIT_BOX_INPUT_MODE_DECIMAL);
-	mEditBoxDecimal->fillSpaceHorizontally();
-	mMainLayout->addChild(mEditBoxDecimal);
+	// Create the edit box.
+	editBox = new EditBox();
+	editBox->setInputMode(EDIT_BOX_INPUT_MODE_DECIMAL);
+	editBox->fillSpaceHorizontally();
+	layout->addChild(editBox);
+}
 
-	mEditBoxUrl = new EditBox();
-	mEditBoxUrl->setPlaceholder("Enter an URL ..");
-	mEditBoxUrl->setInputMode(EDIT_BOX_INPUT_MODE_URL);
-	mEditBoxUrl->fillSpaceHorizontally();
-	mMainLayout->addChild(mEditBoxUrl);
+/**
+ * Creates the input mode list view
+ * @param mainLayout Widgets will be added to it.
+ */
+void MainScreen::createInputModeListView(VerticalLayout* aVerticalLayout)
+{
+	mInputModeListView = new ListView();
+	mInputModeListView->setHeight(mScreenHeight/3);
+	mInputModeListView->setBackgroundColor(0xFFFFFF);
 
-	maSetColor(0x8A2BE2);
+	for(int i = 0; i < INPUT_MODES_COUNT; i++)
+	{
+		ListViewItem* inputModeItem = new ListViewItem();
+		inputModeItem->setText(inputModes[i]);
+		inputModeItem->setBackgroundColor(0xFFFFFF);
+		inputModeItem->setFontColor(0x000000);
+		inputModeItem->fillSpaceHorizontally();
+		mInputModeListView->addChild(inputModeItem);
+	}
+
+	mInputModeListView->fillSpaceHorizontally();
+	aVerticalLayout->addChild(mInputModeListView);
+}
+
+/**
+ * Creates the input flag list view
+ * @param mainLayout Widgets will be added to it.
+ */
+void MainScreen::createInputFlagListView(VerticalLayout* aVerticalLayout)
+{
+	mInputFlagListView = new ListView();
+	mInputFlagListView->setHeight(mScreenHeight/3);
+	mInputFlagListView->setBackgroundColor(0xFFFFFF);
+
+	for(int i = 0; i < INPUT_FLAGS_COUNT; i++)
+	{
+		ListViewItem* inputFlagItem = new ListViewItem();
+		inputFlagItem->setText(inputFlags[i]);
+		inputFlagItem->setBackgroundColor(0xFFFFFF);
+		inputFlagItem->setFontColor(0x000000);
+		inputFlagItem->fillSpaceHorizontally();
+		mInputFlagListView->addChild(inputFlagItem);
+	}
+
+	mInputFlagListView->fillSpaceHorizontally();
+	aVerticalLayout->addChild(mInputFlagListView);
+}
+
+/**
+ * Set the input mode of the edit box
+ * @param mode The input mode code
+ */
+void MainScreen::setInputMode(int mode)
+{
+	mEditBox->setText("");
+	switch(mode)
+	{
+		case ANY:
+			mGetTextLabel->setText("ANY");
+			mEditBox->setInputMode(EDIT_BOX_INPUT_MODE_ANY);
+			break;
+		case EMAILADDR:
+			mGetTextLabel->setText("EMAIL");
+			mEditBox->setInputMode(EDIT_BOX_INPUT_MODE_EMAILADDR);
+			break;
+		case NUMERIC:
+			mGetTextLabel->setText("NUMERIC");
+			mEditBox->setInputMode(EDIT_BOX_INPUT_MODE_NUMERIC);
+			break;
+		case PHONENUMBER:
+			mGetTextLabel->setText("PHONENUMBER");
+			mEditBox->setInputMode(EDIT_BOX_INPUT_MODE_PHONENUMBER);
+			break;
+		case URL:
+			mGetTextLabel->setText("URL");
+			mEditBox->setInputMode(EDIT_BOX_INPUT_MODE_URL);
+			break;
+		case DECIMAL:
+			mGetTextLabel->setText("DECIMAL");
+			mEditBox->setInputMode(EDIT_BOX_INPUT_MODE_DECIMAL);
+			break;
+		case SINGLELINE:
+			mGetTextLabel->setText("SINGLELINE");
+			mEditBox->setInputMode(EDIT_BOX_INPUT_MODE_SINGLE_LINE);
+			break;
+		default:
+			mGetTextLabel->setText("Not a valid mode selection");
+			break;
+	}
+}
+
+/**
+ * Set the input flag of the edit box
+ * @param flag The input flag code
+ */
+void MainScreen::setInputFlag(int flag)
+{
+	mEditBox->setText("");
+	switch(flag)
+	{
+		case PASSWORD:
+			mGetTextLabel->setText("PASSWORD");
+			mEditBox->setInputFlag(EDIT_BOX_INPUT_FLAG_PASSWORD);
+			break;
+		case SENSITIVE:
+			mGetTextLabel->setText("SENSITIVE");
+			mEditBox->setInputFlag(EDIT_BOX_INPUT_FLAG_SENSITIVE);
+			break;
+		case CAPS_ALL_CHARACTERS:
+			mGetTextLabel->setText("CAPS_ALL_CHARACTERS");
+			mEditBox->setInputFlag(EDIT_BOX_INPUT_GLAG_INITIAL_CAPS_ALL_CHARACTERS);
+			break;
+		case CAPS_WORD:
+			mGetTextLabel->setText("CAPS_WORD");
+			mEditBox->setInputFlag(EDIT_BOX_INPUT_FLAG_INITIAL_CAPS_WORD);
+			break;
+		case CAPS_SENTENCE:
+			mGetTextLabel->setText("CAPS_SENTENCE");
+			mEditBox->setInputFlag(EDIT_BOX_INPUT_FLAG_INITIAL_CAPS_SENTENCE);
+			break;
+		default:
+			mGetTextLabel->setText("Not a valid flag selection!");
+			break;
+	}
 }
 
 /**
@@ -158,10 +479,10 @@ void MainScreen::createMainLayout() {
  */
 void MainScreen::editBoxEditingDidBegin(EditBox* editBox)
 {
-    if (editBox == mEditBox)
-    {
-        printf("editBoxEditingDidBegin for mEditBox");
-    }
+	if (editBox == mEditBox)
+	{
+		printf("editBoxEditingDidBegin for mEditBox");
+	}
 }
 
 /**
@@ -172,11 +493,11 @@ void MainScreen::editBoxEditingDidBegin(EditBox* editBox)
  */
 void MainScreen::editBoxEditingDidEnd(EditBox* editBox)
 {
-    if (editBox == mEditBox)
-    {
-        printf("editBoxEditingDidEnd for mEditBox");
-        mEditBox->hideKeyboard();
-    }
+	if (editBox == mEditBox)
+	{
+		printf("editBoxEditingDidEnd for mEditBox");
+		mEditBox->hideKeyboard();
+	}
 }
 
 /**
@@ -186,13 +507,51 @@ void MainScreen::editBoxEditingDidEnd(EditBox* editBox)
  * @param text The new text.
  */
 void MainScreen::editBoxTextChanged(
-    EditBox* editBox,
-    const MAUtil::String& text)
+	EditBox* editBox,
+	const MAUtil::String& text)
 {
-    if (editBox == mEditBox)
-    {
-        printf("editBoxTextChanged for mEditBox text = %s", text.c_str());
-    }
+	if (editBox == mEditBox)
+	{
+		printf("editBoxTextChanged for mEditBox text = %s", text.c_str());
+	}
+	else if (editBox == mMaxTextLengthEditBox)
+	{
+		int maxTextLength = MAUtil::stringToInteger(
+			mMaxTextLengthEditBox->getText());
+		if (maxTextLength != 0)
+		{
+			mEditBox->setMaxLength(maxTextLength);
+			mGetTextLabel->setText("Max text length changed!");
+		}
+	}
+	else if (editBox == mMaxLinesEditBox)
+	{
+		int maxLines = MAUtil::stringToInteger(
+			mMaxLinesEditBox->getText());
+		mEditBox->setMaxLines(maxLines);
+		mGetTextLabel->setText("Max lines changed!");
+	}
+	else if (editBox == mMinLinesEditBox)
+	{
+		int minLines = MAUtil::stringToInteger(
+			mMinLinesEditBox->getText());
+		mEditBox->setMinLines(minLines);
+		mGetTextLabel->setText("Min lines changed!");
+	}
+	else if (editBox == mPlaceholderColorEditBox)
+	{
+		int placeHolderColor = MAUtil::stringToInteger(
+			mPlaceholderColorEditBox->getText());
+		mEditBox->setPlaceholderFontColor(placeHolderColor);
+		mGetTextLabel->setText("Placeholder color changed!");
+	}
+	else if (editBox == mLinesNumberEditBox)
+	{
+		int linesNumber = MAUtil::stringToInteger(
+				mLinesNumberEditBox->getText());
+		mEditBox->setLinesNumber(linesNumber);
+		mGetTextLabel->setText("Lines number changed!");
+	}
 }
 
 /**
@@ -204,9 +563,5 @@ void MainScreen::editBoxTextChanged(
  */
 void MainScreen::editBoxReturn(EditBox* editBox)
 {
-    if (editBox == mEditBox)
-    {
-        printf("editBoxReturn for mEditBox");
-        mEditBox->hideKeyboard();
-    }
+	 mEditBox->hideKeyboard();
 }

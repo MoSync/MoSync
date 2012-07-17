@@ -244,6 +244,9 @@ IMPLEMENTS MoSync
 	int mFrameBufferAddr;
 
 	Object mFlux = new Object();
+	Object mDestroyedPlaceholder = new Object();
+	int[] mDestroyedPlaceholders = new int[32];	// arbitrary starting size
+	int mDPP = 0;
 
 	//***************************************************************************
 	//Destructor
@@ -453,6 +456,195 @@ IMPLEMENTS MoSync
 			BIG_PHAT_ERROR;
 		}*/
 		DEBUG_RES("ResLoad complete, "+(mResourceArray.length-1)+" objects\n");
+	}
+
+	int mResourcesCount = -1;
+	String mResourcesFilename;
+	int[] mResourceOffset;
+	int[] mResourceSize;
+	int[] mResourceType;
+
+	public final void LoadResources(LittleEndianDataInputStream file,
+		final String filename) throws Exception
+	{
+		//try {
+			if(file == null) {
+				mResourceArray = new Object[1];
+				return;
+			}
+
+			if(((char)file.read()) != 'M') { BIG_PHAT_ERROR; }
+			if(((char)file.read()) != 'A') { BIG_PHAT_ERROR; }
+			if(((char)file.read()) != 'R') { BIG_PHAT_ERROR; }
+			if(((char)file.read()) != 'S') { BIG_PHAT_ERROR; }
+
+			int nResources = file.readVarUnsignedInt();
+			DUMP(nResources);
+#ifndef PHONE_RELEASE
+			int rSize =
+#endif
+				file.readVarUnsignedInt();  //ignored for now
+			DUMP(rSize);
+			int ral = nResources+1;	//ResArrLength
+			if(mResourceArray != null) {
+				ral = MAX(ral, mResourceArray.length);
+			}
+			Object[] resourceArray = new Object[ral];
+			if(mResourceArray != null) {
+				System.arraycopy(mResourceArray, 1, resourceArray, 1, mResourceArray.length - 1);
+			}
+
+			mResourcesCount = nResources;
+			mResourceOffset = new int[nResources];
+			mResourceSize = new int[nResources];
+			mResourceType = new int[nResources];
+			mResourcesFilename = filename;
+
+			int rI = 1;
+
+#define DECLARE_AND_READ(type, name) type name = file.CAP_##type(read)()
+#define DAR_USHORT(name) int name = file.readUnsignedShort()
+#define DAR_UBYTE(name) int name = file.readUnsignedByte()
+#define DAR_UVINT(name) int name = file.readVarUnsignedInt()
+#define DAR_SVINT(name) int name = file.readVarSignedInt()
+#define DAR_UNUSED(type, name) file.CAP_##type(read)()
+
+			while(true) {
+				int type = file.readUnsignedByte();
+				if(type == 0)
+					break;
+				DEBUG_RES("Type "+type+"\n");
+				int size = file.readVarUnsignedInt();
+				DEBUG_RES("Size "+size+"\n");
+
+				if(type != RT_SKIP) {
+					MYASSERT(resourceArray[rI] != mFlux);
+				}
+
+				int index = rI - 1;
+
+				mResourceOffset[index] = file.tell();
+				mResourceSize[index] = size;
+				mResourceType[index] = type;
+
+				switch(type) {
+				case RT_PLACEHOLDER:
+					MYASSERT(size == 0);
+					resourceArray[rI] = null;
+					break;
+				case RT_SKIP:
+					MYASSERT(size == 0);
+					break;
+#ifndef PHONE_RELEASE
+				case 99:  //testtype
+					DEBUG_ALWAYS("u "+file.readVarUnsignedInt()+"\n");
+					DEBUG_ALWAYS("u "+file.readVarUnsignedInt()+"\n");
+					DEBUG_ALWAYS("u "+file.readVarUnsignedInt()+"\n");
+					DEBUG_ALWAYS("s "+file.readVarSignedInt()+"\n");
+					DEBUG_ALWAYS("s "+file.readVarSignedInt()+"\n");
+					DEBUG_ALWAYS("s "+file.readVarSignedInt()+"\n");
+					DEBUG_ALWAYS("s "+file.readVarSignedInt()+"\n");
+					DEBUG_ALWAYS("s "+file.readVarSignedInt()+"\n");
+					DEBUG_ALWAYS("s "+file.readVarSignedInt()+"\n");
+					break;
+#endif	//PHONE_RELEASE
+				case RT_LABEL:
+					byte tempLabel[] = new byte[size-1];
+					file.readFully(tempLabel);
+					MYASSERT(file.read() == 0);	// read null terminator
+					resourceArray[rI] = new String(tempLabel);
+					break;
+				case RT_UBIN:
+					if(filename != null) {
+						resourceArray[rI] = new UBin(filename, file.tell(), size);
+					} else {
+						BIG_PHAT_ERROR;
+					}
+					//fallthrough is intentional
+				default:
+					if(file.skip(size) != size) {
+						BIG_PHAT_ERROR;
+					}
+				}
+				DEBUG_RES("Done\n");
+				rI++;
+			}
+			if(rI != nResources+1) {
+				DEBUG_ALWAYS("rI "+rI+" nR "+nResources+"\n");
+				BIG_PHAT_ERROR;
+			}
+			mResourceArray = resourceArray;
+		/*} catch(Throwable e) {
+			PRINT_STACK_TRACE;
+			BIG_PHAT_ERROR;
+		}*/
+		DEBUG_RES("ResLoad complete, "+(mResourceArray.length-1)+" objects\n");
+	}
+
+	public final boolean LoadResource(LittleEndianDataInputStream file,
+		MAHandle originalHandle, MAHandle destHandle) throws Exception
+	{
+		//try {
+			if(file == null) {
+				return false;
+			}
+
+			if ((mResourceType == null) || (mResourceSize == null) || (mResourceOffset == null))
+			{
+				return false;
+			}
+
+			int type = mResourceType[originalHandle - 1];
+			int size = mResourceSize[originalHandle - 1];
+			int offset = mResourceOffset[originalHandle - 1];
+			int rI = destHandle;
+
+			if (mResourceArray[rI] != null)
+			{
+				return true;
+			}
+
+			file.skipBytes(offset);
+
+			switch(type) {
+			case RT_IMAGE:
+				{
+					byte[] b = new byte[size];
+					file.readFully(b);
+					mResourceArray[rI] = new ImageCache(Image.createImage(b, 0, b.length));
+				}
+				break;
+			case RT_SPRITE:
+				{
+					int indexSource = file.readUnsignedShort();
+					int left = file.readUnsignedShort();
+					int top = file.readUnsignedShort();
+					int width = file.readUnsignedShort();
+					int height = file.readUnsignedShort();
+					DAR_UNUSED(short, cx);
+					DAR_UNUSED(short, cy);
+					mResourceArray[rI] = new ImageCache(Image.createImage(
+						((ImageCache)mResourceArray[indexSource]).i,
+						left, top, width, height, TRANS_NONE));
+				}
+				break;
+			case RT_BINARY:
+				{
+					byte[] b = new byte[size];
+					file.readFully(b);
+					mResourceArray[rI] = new Binary(b);
+				}
+				break;
+			}
+		/*} catch(Throwable e) {
+			PRINT_STACK_TRACE;
+			BIG_PHAT_ERROR;
+		}*/
+		return true;
+	}
+
+	public final int countResources() {
+		return mResourcesCount;
 	}
 
 	//***************************************************************************
@@ -1466,6 +1658,16 @@ public
 			mDynamicResArray = new Object[1];
 			mDynamicSize = 0;
 		}
+
+		// check the mDestroyedPlaceholders array first.
+		if(mDPP != 0) {
+			mDPP--;
+			int index = mDestroyedPlaceholders[mDPP];
+			mDynamicResArray[index] = null;
+			return index | DYNARES_BIT;
+		}
+
+		// if no mDestroyedPlaceholders remain, allocate a new one.
 		if(mDynamicSize == mDynamicResArray.length) {
 			Object[] oldDynRes = mDynamicResArray;
 			mDynamicResArray = new Object[mDynamicResArray.length * 2];
@@ -1474,9 +1676,28 @@ public
 		return (mDynamicSize++) | DYNARES_BIT;
 	}
 
+	SYSCALL(void) maDestroyPlaceholder(MAHandle handle) {
+		MYASSERT((handle & DYNARES_BIT) != 0);
+		int index = handle & ~DYNARES_BIT;
+		MYASSERT(mDynamicResArray[index] != mFlux);
+		MYASSERT(mDynamicResArray[index] != mDestroyedPlaceholder);
+		mDynamicResArray[index] = mDestroyedPlaceholder;
+
+		// add index into array.
+		// double array length if needed.
+		if(mDestroyedPlaceholders.length == mDPP) {
+			int[] newDP = new int[mDPP * 2];
+			System.arraycopy(mDestroyedPlaceholders, 0, newDP, 0, mDPP);
+			mDestroyedPlaceholders = newDP;
+		}
+		mDestroyedPlaceholders[mDPP] = index;
+		mDPP++;
+	}
+
 	SYSCALL(void) maDestroyObject(MAHandle handle) {
 		if(getResource(handle) != null) {
 			MYASSERT(getResource(handle) != mFlux);
+			MYASSERT(getResource(handle) != mDestroyedPlaceholder);
 			setResource(handle, null);
 		}
 	}
@@ -1662,6 +1883,65 @@ public
 			PRINT_STACK_TRACE;
 			return 0;
 		}
+	}
+
+	InputStream mResources = null;
+	LittleEndianDataInputStream ledis = null;
+
+	SYSCALL(int) maLoadResource(final MAHandle handle, final MAHandle placeholder, final int flag) {
+		try {
+			//if (((flag & MA_RESOURCE_OPEN) != 0) && (ledis == null))
+			if ((ledis == null) || ((flag & MA_RESOURCE_OPEN) != 0))
+			{
+				mResources = GET_RESOURCE(mResourcesFilename);
+				if(mResources == null) {
+					return 0;
+				}
+
+				ledis = new LittleEndianDataInputStream(mResources);
+			}
+
+			if (ledis == null) {
+				return 0;
+			}
+
+#define LEDIS_MARK 0
+#if LEDIS_MARK
+			if ( ledis.markSupported() )
+			{
+				ledis.mark(ledis.available());
+			}
+#endif
+
+			int ret = (LoadResource(ledis, handle, placeholder)?1:0);
+#if LEDIS_MARK
+			if ( ledis.markSupported() )
+			{
+				ledis.reset();
+			}
+
+			if (!ledis.markSupported() || ((flag & MA_RESOURCE_CLOSE) != 0))
+#endif
+			{
+				if (ledis != null) {
+					ledis.close();
+					ledis = null;
+				}
+				if (mResources != null) {
+					mResources.close();
+					mResources = null;
+				}
+			}
+
+			return ret;
+		} catch(Exception e) {
+			PRINT_STACK_TRACE;
+			return 0;
+		}
+	}
+
+	SYSCALL(int) maCountResources() {
+		return countResources();
 	}
 
 	SYSCALL(void) maLoadProgram(final MAHandle data, final int reload) throws Exception {
@@ -2592,7 +2872,7 @@ public
 #endif	//0
 #endif	//MA_PROF_SUPPORT_JAVAPACKAGE_LOCATIONAPI
 
-	SYSCALL(int) maInvokeExtension(int function, int a, int b, int c) {
+	SYSCALL(int) maExtensionFunctionInvoke(int function, int a, int b, int c) {
 #ifdef MOSYNC_SUPPORT_EXTENSIONS
 		return mExt.invoke(function, a, b, c);
 #else

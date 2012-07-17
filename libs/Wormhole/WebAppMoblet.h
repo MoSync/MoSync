@@ -26,7 +26,7 @@ MA 02110-1301, USA.
 
 /**
  * @file WebAppMoblet.h
- * @author Mikael KIndborg
+ * @author Mikael Kindborg
  *
  * @brief High-level moblet that has a WebView and supports
  * communication between a JavaScript and C++.
@@ -42,6 +42,9 @@ MA 02110-1301, USA.
 #include "WebViewMessage.h"
 #include "FileUtil.h"
 
+/**
+ * @brief Classes for communication with JavaScript code
+ */
 namespace Wormhole
 {
 	// Forward declaration.
@@ -93,6 +96,11 @@ namespace Wormhole
 		virtual void showPage(const MAUtil::String& url);
 
 		/**
+		 * Display the WebView.
+		 */
+		virtual void showWebView();
+
+		/**
 		 * Run JavaScript code in the WebView.
 		 */
 		virtual void callJS(const MAUtil::String& script);
@@ -117,18 +125,21 @@ namespace Wormhole
 		 */
 		virtual void keyPressEvent(int keyCode, int nativeCode);
 
-	protected:
 		/**
 		 * Extract HTML/CSS/JS/Media files to the local file system.
 		 */
 		virtual void extractFileSystem();
 
 		/**
-		 * Create the user interface of the application.
-		 * This creates a full screen WebView and configures
-		 * it to receive messages from JavaScript.
+		 * @return true if the checksum has changed (or if the old
+		 * value did not exist, such as on first time load).
 		 */
-		virtual void createUI();
+		virtual bool checksumHasChanged();
+
+		/**
+		 * Write the current checksum to file.
+		 */
+		virtual void writeChecksum();
 
 	protected:
 		/**
@@ -150,6 +161,11 @@ namespace Wormhole
 		 * File utility object.
 		 */
 		FileUtil* mFileUtil;
+
+		/**
+		 * Has extractFileSystem() been called?
+		 */
+		bool mFileSystemIsExtracted;
 	};
 } // namespace
 

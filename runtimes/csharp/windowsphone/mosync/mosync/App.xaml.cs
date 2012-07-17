@@ -82,19 +82,51 @@ namespace test_mosync
 
         // Code to execute when the application is launching (eg, from Start)
         // This code will not execute when the application is reactivated
-        private void Application_Launching(object sender, LaunchingEventArgs e)
+		private MoSync.Machine machine = null;
+
+		protected void InitExtensions(MoSync.Core core, MoSync.Runtime runtime)
+		{
+			try
+			{
+				MoSync.ExtensionsLoader.Load();
+			}
+			catch (Exception e)
+			{
+				MoSync.Util.CriticalError("Couldn't load extension: " + e.ToString());
+			}
+
+			MoSync.ExtensionModule extMod = runtime.GetModule<MoSync.ExtensionModule>();
+			System.Reflection.Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
+			foreach (System.Reflection.Assembly a in assemblies)
+			foreach (Type t in a.GetTypes())
+				{
+					IExtensionModule extensionGroupInstance = null;
+					if (t.GetInterface("MoSync.IExtensionModule", false) != null)
+					{
+						extensionGroupInstance = Activator.CreateInstance(t) as IExtensionModule;
+						extMod.AddModule(extensionGroupInstance);
+						extensionGroupInstance.Init(core, runtime);
+					}
+				}
+		}
+
+		private void Application_Launching(object sender, LaunchingEventArgs e)
         {
 
             //RootFrame.Navigated += delegate(object _sender, NavigationEventArgs _e)
             RootFrame.Loaded += delegate(object _sender, RoutedEventArgs _e)
             {
-                MoSync.Machine machine = null;
+				if (machine == null)
+				{
 #if !REBUILD
-                machine = MoSync.Machine.CreateInterpretedMachine("program", "resources");
+					machine = MoSync.Machine.CreateInterpretedMachine("program", "resources");
+
 #else
-                machine = MoSync.Program.CreateNativeMachine(new CoreNativeProgram(), "resources");
+	                machine = MoSync.Machine.CreateNativeMachine(new CoreNativeProgram(), "resources");
 #endif
-                machine.Run();
+					InitExtensions(machine.GetCore(), machine.GetRuntime());
+					machine.Run();
+				}
             };
         }
 

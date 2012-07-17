@@ -1,6 +1,6 @@
 id = project.c.newlib
-name = MoSync C Newlib Project
-description = MoSync C project configured to use the Newlib standard C library.
+name = C Newlib Project
+description = A standard ANSI C application template using the Newlib C library.
 
 [Files]
 main.c

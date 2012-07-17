@@ -26,10 +26,27 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <string.h>
 #endif
 
+// Magic numbers used in the Bubdle file header.
+// The version 2 Bundle format has an Adler32 checksum
+// in the file header.
+#define MAGIC1 0x12345678 // Bundle version 1 (has no checksum)
+#define MAGIC2 0x22345678 // Bundle version 2 (has Adler32 checksum)
+
 // broken header files in linux/native
 int sprintf(char *buf, const char *fmt, ...);
 
+// Macros for or debugging.
 #define LOG(x, ...) //lprintfln
+// Problems with newlib prevent use of lprintfln in this file.
+// Here are macros to make maWriteLog easier to use.
+#define MYLOG(message) maWriteLog(message, strlen(message))
+// Print a message and an int value.
+#if(0)
+static char sLogBuf[1024];
+#define MYLOGN(message, intValue) if(1){\
+sprintf(sLogBuf, "%s%d", message, intValue);\
+maWriteLog(sLogBuf, strlen(sLogBuf));}
+#endif
 
 // ---------------------------------------------------------------------------------------
 // Virtual file system
@@ -97,6 +114,7 @@ typedef struct {
 	int magic;
 	int startOfVolumes;
 	int startOfData;
+	int checksum;
 } BundleHeader;
 
 static MAHandle sCurrentFileSystem = 0;
@@ -262,24 +280,45 @@ static void readVolumeEntriesRecursively(MAHandle fileSystem, int *offset, Volum
 	}
 }
 
-static void buildDirectoryTree(MAHandle fileSystem) {
-	int offset;
-
+/**
+* Read the header into global variable sHeader.
+* Also set endianess.
+*/
+static void readHeader(MAHandle fileSystem)
+{
 	maReadData(fileSystem, &sHeader, 0, sizeof(BundleHeader));
 
 	LOG("0x%08x", sHeader.magic);
-	if(sHeader.magic != 0x12345678) {
-		// wrong endian, needs flipping;
+	if (sHeader.magic != MAGIC1 && sHeader.magic != MAGIC2)
+	{
+		// Wrong endian, needs flipping.
 		sWrongEndian = 1;
 		LOG("endian flip!");
-	} else {
+	}
+	else
+	{
 		sWrongEndian = 0;
 	}
 
 	FLIP_TO_ENDIAN_INT(sHeader.startOfVolumes);
 	FLIP_TO_ENDIAN_INT(sHeader.startOfData);
-	offset = sHeader.startOfVolumes;
+	FLIP_TO_ENDIAN_INT(sHeader.magic);
+	// We won't flip the checksum, no need for that,
+	// and it would break the old file format.
 
+	if (sHeader.magic != MAGIC1 && sHeader.magic != MAGIC2)
+	{
+		maPanic(0, "sHeader.magic invalid");
+	}
+}
+
+static void buildDirectoryTree(MAHandle fileSystem) {
+	int offset;
+
+	// Read the header into sHeader.
+	readHeader(fileSystem);
+
+	offset = sHeader.startOfVolumes;
 	sRoot = (VolumeEntry*)malloc(sizeof(VolumeEntry));
 	readVolumeEntriesRecursively(fileSystem, &offset, sRoot);
 
@@ -298,6 +337,20 @@ void setCurrentFileSystem(MAHandle fileSystem, int caseSensitive) {
 	buildDirectoryTree(fileSystem);
 	sCurrentFileSystem = fileSystem;
 	sCaseSensitive = caseSensitive;
+}
+
+int MAFS_getFileSystemChecksum(MAHandle fileSystem)
+{
+	readHeader(fileSystem);
+
+	if (MAGIC2 == sHeader.magic)
+	{
+		return sHeader.checksum;
+	}
+	else
+	{
+		return 0;
+	}
 }
 
 /**
@@ -378,9 +431,14 @@ static int extractRecursively(VolumeEntry* vol, const char* basePath, int isRoot
 	int i;
 
 	// If we have no children this is a file.
-	if (0 == vol->numChildren)
+	// Ooops, it can be an empty directory,
+	// added check for type of file (VOL_TYPE_FILE).
+	if (VOL_TYPE_FILE == vol->type && 0 == vol->numChildren)
 	{
+		// Open file.
 		sprintf(path, "%s%s", basePath, vol->name);
+		//MYLOG("@@@EXTRACTING:");
+		//MYLOG(path);
 		file = openFileForWriting(path);
 		if (-1 == file) { return -1; }
 
@@ -432,7 +490,7 @@ static int extractRecursively(VolumeEntry* vol, const char* basePath, int isRoot
 *
 * \return 1 on success, -1 on error.
 */
-int extractCurrentFileSystem(const char* destPath)
+int MAFS_extractCurrentFileSystem(const char* destPath)
 {
 	if (NULL == sRoot) { return -1; }
 	if (NULL == destPath) { return -1; }

@@ -143,7 +143,7 @@ int stricmp(const char *s1, const char *s2)
 {
 	char f, l;
 
-	do 
+	do
 	{
 		f = ((*s1 <= 'Z') && (*s1 >= 'A')) ? *s1 + 'a' - 'A' : *s1;
 		l = ((*s2 <= 'Z') && (*s2 >= 'A')) ? *s2 + 'a' - 'A' : *s2;
@@ -158,7 +158,7 @@ int strnicmp(const char *s1, const char *s2, size_t count)
 {
 	int f, l;
 
-	do 
+	do
 	{
 		if (((f = (unsigned char)(*(s1++))) >= 'A') && (f <= 'Z')) f -= 'A' - 'a';
 		if (((l = (unsigned char)(*(s2++))) >= 'A') && (l <= 'Z')) l -= 'A' - 'a';
@@ -300,20 +300,15 @@ void *memmove(void *dst, const void *src, size_t count)
 {
 	void * ret = dst;
 
-	if (dst <= src || (char *) dst >= ((char *) src + count)) 
+	if (dst <= src || (char *) dst >= ((char *) src + count))
 	{
 		//
 		// Non-Overlapping Buffers
-		// copy from lower addresses to higher addresses
+		// use memcpy
 		//
-		while (count--) 
-		{
-			*(char *) dst = *(char *) src;
-			dst = (char *) dst + 1;
-			src = (char *) src + 1;
-		}
+		return memcpy(dst, src, count);
 	}
-	else 
+	else
 	{
 		//
 		// Overlapping Buffers
@@ -322,7 +317,7 @@ void *memmove(void *dst, const void *src, size_t count)
 		dst = (char *) dst + count - 1;
 		src = (char *) src + count - 1;
 
-		while (count--) 
+		while (count--)
 		{
 			*(char *) dst = *(char *) src;
 			dst = (char *) dst - 1;
@@ -335,7 +330,7 @@ void *memmove(void *dst, const void *src, size_t count)
 
 void *memchr(const void *buf, int ch, size_t count)
 {
-	while (count && (*(unsigned char *) buf != (unsigned char) ch)) 
+	while (count && (*(unsigned char *) buf != (unsigned char) ch))
 	{
 		buf = (unsigned char *) buf + 1;
 		count--;
@@ -476,7 +471,7 @@ char *strtok_r(char *string, const char *control, char **lasts)
 
 char *strtok(char *string, const char *control)
 {
-	char* dummy;
+	static char* dummy;
 	return strtok_r(string, control, &dummy);
 }
 

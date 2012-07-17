@@ -18,6 +18,7 @@ MA 02110-1301, USA.
 package com.mosync.nativeui.ui.widgets;
 
 import android.graphics.Typeface;
+import android.util.TypedValue;
 import android.widget.TextView;
 
 import com.mosync.internal.android.MoSyncFont;
@@ -35,7 +36,7 @@ import com.mosync.nativeui.util.properties.VerticalAlignment;
 /**
  * This class represents a static text label, i.e.
  * not interactive.
- * 
+ *
  * @author fmattias
  */
 public class LabelWidget extends Widget
@@ -48,7 +49,7 @@ public class LabelWidget extends Widget
 
 	/**
 	 * Constructor.
-	 * 
+	 *
 	 * @param handle handle Integer handle corresponding to this instance.
 	 * @param view A text view wrapped by this widget.
 	 */
@@ -68,7 +69,7 @@ public class LabelWidget extends Widget
 		{
 			return true;
 		}
-		
+
 		TextView textView = (TextView) getView( );
 		if( property.equals( IX_WIDGET.MAW_LABEL_TEXT ) )
 		{
@@ -84,7 +85,7 @@ public class LabelWidget extends Widget
 		}
 		else if( property.equals( IX_WIDGET.MAW_LABEL_FONT_SIZE ) )
 		{
-			textView.setTextSize( FloatConverter.convert( value ) );
+			textView.setTextSize( TypedValue.COMPLEX_UNIT_PX, FloatConverter.convert( value ) );
 		}
 		else if( property.equals( Types.WIDGET_PROPERTY_TEXT_HORIZONTAL_ALIGNMENT ) )
 		{
@@ -98,23 +99,31 @@ public class LabelWidget extends Widget
 		}
 		else if( property.equals(IX_WIDGET.MAW_LABEL_MAX_NUMBER_OF_LINES ) )
 		{
-			if ( IntConverter.convert(value) <= 0 )
+			if ( IntConverter.convert(value) < 0 )
 			{
 				throw new InvalidPropertyValueException(property, value);
 			}
 			// This overrides any height setting.
 			// Makes the TextView be at most this many lines tall.
 			m_maxNrLines = IntConverter.convert(value);
-			textView.setMaxLines( m_maxNrLines );
+			if ( m_maxNrLines == 0 )
+			{
+				textView.setMaxLines(Integer.MAX_VALUE);
+
+			}
+			else
+			{
+				textView.setMaxLines( m_maxNrLines );
+			}
 		}
 		else
 		{
 			return false;
 		}
-		
+
 		return true;
 	}
-	
+
 	/**
 	 * @see Widget.getProperty.
 	 */

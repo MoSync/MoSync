@@ -31,6 +31,13 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "pim.h"
 #include "helpers/CPP_IX_PIM.h"
 
+#ifdef EMULATOR
+#define FILESYSTEM_CHROOT 1
+#define FILESYSTEM_DIR "filesystem"
+#else
+#define FILESYSTEM_CHROOT 0
+#endif	//EMULATOR
+
 namespace Core {
 	class VMCore;
 }

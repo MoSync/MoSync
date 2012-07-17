@@ -41,7 +41,6 @@ class Video;
 /**
  * \brief Class used for all the permissions that we can ask from Facebook
  */
-
 class GetPermissions
 {
 public:
@@ -286,6 +285,9 @@ public:
 		permissions.insert("publish_stream");
 	}
 
+	/*
+	 * \brief Permissions needed for publishing events
+	 */
 	struct Publish
 	{
 
@@ -627,12 +629,15 @@ public:
 		permissions.insert("publish_actions");
 	}
 
+	/*
+	 * \brief Permissions needed for retrieving user's fileds and connections
+	 */
 	struct Retrieve
 	{
 		/**
 		 * Adds to the "permissions" set all permissions needed to retrieve the
 		 * fields of a User object.
-	 */
+	     */
 		static void onlyFields(MAUtil::Set<MAUtil::String> &permissions)
 		{
 			permissions.insert("user_likes");
@@ -684,6 +689,9 @@ public:
 			permissions.insert("friends_photo_video_tags");
 		}
 
+		/*
+	     * \brief Permissions needed for working with user's fileds
+	     */
 		struct Field
 		{
 			/**
@@ -826,6 +834,9 @@ public:
 
 		};
 
+		/*
+		 * \brief Permissions needed for working with user's connections
+		 */
 		struct Connection
 		{
 			/**
@@ -1042,6 +1053,9 @@ public:
 		};
 	};
 
+	/*
+	 * \brief Permissions needed for publishing
+	 */
 	struct Publish
 	{
 		/**
