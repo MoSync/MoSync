@@ -181,6 +181,15 @@ namespace MoSync
 			}
 		};
 
+		public class ReturnValueException : Exception
+		{
+			public readonly int result;
+			public ReturnValueException(int res)
+			{
+				result = res;
+			}
+		}
+
 		public static void ShowMessage(String text, bool log=true, String caption="")
 		{
 			if(log)
@@ -242,6 +251,19 @@ namespace MoSync
 			RunActionOnMainThread(action, true);
 		}
 
+
+		static Action sPreRunOnMainThreadAction = null;
+		public static void SetPreRunOnMainThreadAction(Action action)
+		{
+			sPreRunOnMainThreadAction = action;
+		}
+
+		static Action sPostRunOnMainThreadAction = null;
+		public static void SetPostRunOnMainThreadAction(Action action)
+		{
+			sPostRunOnMainThreadAction = action;
+		}
+
 		public static void RunActionOnMainThread(Action action, bool sync)
 		{
 			if (Thread.CurrentThread == sStartupThread)
@@ -252,6 +274,9 @@ namespace MoSync
 
 			if (sync)
 			{
+				if (sPreRunOnMainThreadAction != null)
+					sPreRunOnMainThreadAction();
+
 				using (AutoResetEvent are = new AutoResetEvent(false))
 				{
 					Deployment.Current.Dispatcher.BeginInvoke(() =>
@@ -261,6 +286,9 @@ namespace MoSync
 					});
 					are.WaitOne();
 				}
+
+				if (sPostRunOnMainThreadAction != null)
+					sPostRunOnMainThreadAction();
 			}
 			else
 			{
@@ -334,6 +362,11 @@ namespace MoSync
                 byte B = Byte.Parse(value.Substring(4, 2), System.Globalization.NumberStyles.HexNumber);
                 byte A = 255;
                 brush = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(A, R, G, B));
+            }
+            // special case for 0
+            else if (value.Length == 1 && value[0].Equals('0'))
+            {
+                brush = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(255, 0, 0, 0));
             }
             else throw new InvalidPropertyValueException();
 		}

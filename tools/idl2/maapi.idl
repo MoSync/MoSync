@@ -1,18 +1,19 @@
-/* Copyright (C) 2009 Mobile Sorcery AB
+/*
+Copyright (C) 2009 MoSync AB
 
-This program is free software; you can redistribute it and/or modify it under
-the terms of the GNU General Public License, version 2, as published by
-the Free Software Foundation.
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License,
+version 2, as published by the Free Software Foundation.
 
 This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-for more details.
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with this program; see the file COPYING.  If not, write to the Free
-Software Foundation, 59 Temple Place - Suite 330, Boston, MA
-02111-1307, USA.
+along with this program; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+MA 02110-1301, USA.
 */
 
 /** \file maapi.h
@@ -1395,7 +1396,7 @@ interface MAAPI {
 		SENSOR = 33;
 
 		/**
-		* \bried The maAlert message box was dismissed by one of the available buttons.
+		* \brief The maAlert message box was dismissed by one of the available buttons.
 		* See #EVENT_TYPE_ALERT for the event.
 		*/
 		ALERT = 34;
@@ -1478,9 +1479,15 @@ interface MAAPI {
 		CAPTURE = 47;
 
 		/**
+		* \brief Send by the Purchase API.
+		* This event will contain a MAPurchaseEventData struct.
+		*/
+		PURCHASE = 48;
+
+		/**
 		* \brief A camera event fired when you get any of the camera preview events
 		*/
-		CAMERA_PREVIEW = 48;
+		CAMERA_PREVIEW = 49;
 		}
 
 	/**
@@ -1540,6 +1547,38 @@ interface MAAPI {
 		/// Handle to a video/image data object.
 		/// This value is set only if the event type is MA_CAPTURE_EVENT_TYPE_IMAGE or MA_CAPTURE_EVENT_TYPE_VIDEO.
 		MAHandle handle;
+	}
+
+	/**
+	* \brief An puchase event struct.
+	* A MoSync event will contain an struct object of this type only if event type
+	* is #EVENT_TYPE_PURCHASE.
+	*/
+	struct MAPurchaseEventData {
+		/**
+		* \brief Type of the purchase event.
+		* One of the \link MA_PURCHASE_EVENT_REQUEST MA_PURCHASE_EVENT \endlink constants.
+		*/
+		int type;
+
+		/**
+		* \brief State of the purchase.
+		* One of the \link MA_PURCHASE_STATE_FAILED MA_PURCHASE_STATE \endlink constants.
+		*/
+		int state;
+
+		/**
+		* \brief Handle to the product that sent the event.
+		*/
+		MAHandle productHandle;
+
+		/**
+		* \brief Reason why the puchase failed.
+		* Valid only if the state is #MA_PURCHASE_STATE_FAILED, #MA_PURCHASE_STATE_RECEIPT_INVALID,
+		* #MA_PURCHASE_STATE_RECEIPT_ERROR or #MA_PURCHASE_STATE_RESTORE_ERROR.
+		* One of the \link MA_PURCHASE_ERROR_INVALID_HANDLE MA_PURCHASE_ERROR \endlink constants.
+		*/
+		int errorCode;
 	}
 
 	/**
@@ -1678,7 +1717,12 @@ interface MAAPI {
 			*/
 			MAAudioInstance audioInstance;
 
-		}
+			/**
+			* Contains purchase related data.
+			* Valid only if the event type is \link #EVENT_TYPE_PURCHASE PURCHASE \endlink.
+			*/
+			MAPurchaseEventData purchaseData;
+			}
 	}
 
 	/**
@@ -4188,7 +4232,7 @@ group WidgetAPI "Widget API" {
 			* @brief The type of button that was clicked when a #MAW_EVENT_CLICKED event is receieved for a searchbar.
 			* The type of searchbar button clicked:
 			* - 0 means 'search'
-			* - 1 means 'cancel'
+			* - 1 means 'cancel' (not implemented on Windows Phone platform, because the search bar doesn't contain any buttons)
 			*/
 			int searchBarButton;
 
@@ -4303,6 +4347,40 @@ group WidgetAPI "Widget API" {
 			* Send by the OptionDialog view when a #EVENT_TYPE_OPTIONS_BOX_BUTTON_CLICKED event is received.
 			*/
 			int optionDialogButtonIndex;
+
+			struct {
+					/**
+					* The rating bar new value, when a #MAW_EVENT_RATING_BAR_VALUE_CHANGED event is received.
+					*/
+					float value;
+
+					/**
+					* The author that issued the event: the user, or programatically, when a
+					* #MAW_EVENT_RATING_BAR_VALUE_CHANGED event is received.
+					*/
+					int fromUser;
+			} ratingBarValueInfo;
+
+			/**
+			* The selected radio button from a radio group, when a #MAW_EVENT_RADIO_GROUP_ITEM_SELECTED event
+			* is received.
+			*/
+			int radioGroupItemHandle;
+
+			/**
+			* The new state of a radio button, when a #MAW_EVENT_RADIO_BUTTON_STATE_CHANGED event is received.
+			*/
+			int radioButtonState;
+
+			/**
+			*  The selected menu item handle, when a #MAW_EVENT_OPTIONS_MENU_ITEM_SELECTED event is received.
+			*/
+			int optionsMenuItem;
+
+			/**
+			 * The clicked map pin index, when a #MAW_EVENT_MAP_PIN_CLICKED event is received.
+			 */
+			int mapPinIndex;
 		}
 	}
 
@@ -4453,8 +4531,59 @@ group WidgetAPI "Widget API" {
 		*/
 		DIALOG_DISMISSED = 22;
 
-	}
+		/**
+		* Send by current screen just before it begins rotating.
+		* Platform: iOS and Windows Phone 7.1
+		*/
+		SCREEN_ORIENTATION_WILL_CHANGE = 23;
 
+		/**
+		* Send by current screen after it finishes rotating.
+		* Platform: iOS and Windows Phone 7.1
+		*/
+		SCREEN_ORIENTATION_DID_CHANGE = 24;
+
+		/**
+		* @brief Send when the value in a Rating Bar.
+		*/
+		RATING_BAR_VALUE_CHANGED = 25;
+
+		/**
+		* @brief Send when one of the radio buttons in a radio group is selected.
+		*/
+		RADIO_GROUP_ITEM_SELECTED = 26;
+
+		/**
+		* @brief Send when  the radio button state is changed.
+		*/
+		RADIO_BUTTON_STATE_CHANGED = 27;
+
+		/**
+		* @brief Send when the Options Menu is being closed (either by the user canceling
+		* the menu with the back/menu button, or when an item is selected).
+		*/
+		OPTIONS_MENU_CLOSED = 28;
+
+		/**
+		* @brief Send when an item in your options menu is selected.
+		*/
+		OPTIONS_MENU_ITEM_SELECTED = 29;
+
+		/**
+		* @brief Sent when the zoom level of a map widget has changed (if the user zoomed in or out).
+		*/
+		MAP_ZOOM_LEVEL_CHANGED = 30;
+
+		/**
+		* @brief Sent when the visible region on the map has changed (if the user scrolled/draged the map).
+		*/
+		MAP_REGION_CHANGED = 31;
+
+		/**
+		 * @brief Sent when a map pin is clicked by the user.
+		 */
+		MAP_PIN_CLICKED = 32;
+	}
 	} // end of WidgetEventTypes
 
 	} // end of WidgetEvents
@@ -4923,6 +5052,7 @@ group WidgetAPI "Widget API" {
 		* A Dialog gets visible only after calling maWidgetModalDialogShow().
 		* On Android it is a modal alert dialog.
 		* On iPad it is a PopoverController, and on iPhone it is a modal view.
+		* On Windows Phone, it's a Popup having inside a StackPanel which contains all the controls added to the dialog view.
 		* When a Dialog widget is created it is empty, it has no content. Any type of widget can be added inside it via #maWidgetAddChild syscalls.
 		* To show a Dialog call #maWidgetModalDialogShow(), to dismiss it call: #maWidgetModalDialogHide(), and to delete it call #maWidgetDestroy.
 		* See \ref WidgetModalDialogProperties "Modal Dialog properties" for the properties available.
@@ -4930,14 +5060,123 @@ group WidgetAPI "Widget API" {
 		MODAL_DIALOG = "ModalDialog";
 
 		/**
-		* @brief A panorama control is a Windows Phone 7 specific control
+		* @brief A panorama control is a Windows Phone 7 specific control. The paroramaView is a screen container
+		*		 which may contain more then one screen. A screen can spann over the hardware screen width.
+		*		 In order to enable this you will have to set the width property of a screen to a certain value.
+		*		 For more information regarding this control please check the following link:
+		*		 http://msdn.microsoft.com/en-us/library/ff941104(v=vs.92).aspx
+		*
 		* Available only on Windows Phone 7
 		* See \ref WidgetPanoramaViewProperties "Panorama View properties" for the properties available
 		*/
 		PANORAMA_VIEW = "PanoramaView";
+
+		/**
+		* @brief A radio button available only on Android. A radio button can only have a \ref MAW_RADIO_GROUP parent.
+		* Checking one radio button that belongs to a radio group unchecks any previously checked radio button within the same group.
+		* Initially, all of the radio buttons are unchecked.
+		* While it is not possible to uncheck a particular radio button, the radio group can be cleared to remove the checked state.
+		* See \ref WidgetRadioButtonProperties "Radio Button properties" for the properties available.
+		*/
+		RADIO_BUTTON = "RadioButton";
+
+		/**
+		* \brief A radio group is available only on Android.
+		* This class is used to create a multiple-exclusion scope for a set of the \link #MAW_RADIO_BUTTON RADIO_BUTTONS \endlink .
+		* See \ref WidgetRadioGroupProperties "Radio Group properties" for the properties available.
+		*/
+		RADIO_GROUP = "RadioGroup";
+
+		/**
+		* @brief A RatingBar is an extension of Slider and ProgressBar that shows a rating in stars.
+		* The user can touch/drag or use arrow keys to set the rating when using the default size RatingBar.
+		* When using a RatingBar that supports user interaction, placing widgets to the left or right of the
+		* RatingBar is discouraged.
+		* See \ref WidgetRatingBarProperties "Rating Bar properties" for the properties available.
+		*/
+		RATING_BAR = "RatingBar";
+
+		/**
+		* @brief The map widget will contain the google map (on iOS and Android) and the bing map (on Windows Phone)
+		* controls and will allow the user to interract with the map.
+		* See \ref WidgetMapProperties "Map properties" for the properties available.
+		*/
+		MAP = "Map";
+
+		/**
+		 * @brief A map pin can pe placend on the map at a given set of coordinates and responds to click events.
+		 * See \ref WidgetMapPinProperties "Map pin properties" for the properties available.
+		 */
+		MAP_PIN = "MapPin";
 	}
 	} // end of WidgetTypes
 
+	/**
+	* The available constants for the Android predefined drawables used in OptionsMenu.
+	* The drawables can be set via \ref maWidgetScreenAddOptionsMenuItem syscall.
+	* The icons can be found here: http://androiddrawables.com/menu.html .
+	* Note that only these are supported on WP7:
+	*	- ADD
+	*	- CAMERA
+	*	- CLOSE_CLEAR_CANCEL
+	*	- DELETE
+	*	- EDIT
+	*	- GALLERY
+	*	- HELP
+	*	- MORE
+	*	- PREFERENCES
+	*	- SAVE
+	*	- SEARCH
+	*	- SHARE
+	*	- UPLOAD
+	*	- UPLOAD_YOU_TUBE
+	*/
+	group OptionsMenuIconConstants "Options menu icon constants" {
+	constset MAString MAW_OPTIONS_MENU_ICON_CONSTANT_ {
+		ADD = "17301555" ;
+		AGENDA = "17301556" ;
+		ALWAYS_LANDSCAPE_PORTRAIT = "17301557" ;
+		CALL = "17301558" ;
+		CAMERA = "17301559" ;
+		CLOSE_CLEAR_CANCEL = "17301560" ;
+		COMPASS = "17301561" ;
+		CROP = "17301562" ;
+		DAY =  "17301563" ;
+		DELETE = "17301564" ;
+		DIRECTIONS = "17301565" ;
+		EDIT = "17301566" ;
+		GALLERY = "17301567" ;
+		HELP = "17301568" ;
+		INFO_DETAILS = "17301569" ;
+		MANAGE = "17301570" ;
+		MAPMODE = "17301571" ;
+		MONTH = "17301572" ;
+		MORE = "17301573" ;
+		MY_CALENDAR = "17301574" ;
+		MYLOCATION = "17301575" ;
+		MYPLACES = "17301576" ;
+		PREFERENCES = "17301577" ;
+		RECENT_HISTORY = "17301578" ;
+		REPORT_IMAGE = "17301579" ;
+		REVERT = "17301580" ;
+		ROTATE = "17301581" ;
+		SAVE = "17301582" ;
+		SEARCH = "17301583" ;
+		SEND = "17301584" ;
+		SET_AS = "17301585" ;
+		SHARE = "17301586" ;
+		SLIDESHOW = "17301587" ;
+		SORT_ALPHABETICALLY = "17301660" ;
+		SORT_BY_SIZE = "17301661" ;
+		TODAY = "17301588" ;
+		UPLOAD = "17301589" ;
+		UPLOAD_YOU_TUBE = "17301590" ;
+		VIEW = "17301591" ;
+		WEEK = "17301592" ;
+		ZOOM = "17301593" ;
+
+	}
+	} // end of OptionsMenuIconConstants
 
 	/**
 	* All widgets have a set of properties that can be set. In order to set them, use maWidgetSetProperty(). These properties may change
@@ -5107,7 +5346,7 @@ group WidgetAPI "Widget API" {
 		/**
 		* @brief Sets an icon for a screen. The icon is used by a tab screen to display an icon on the tab indicator.
 		*
-		* @validvalue MoSync handle to an uncompressed image resource. The size of the image should be small enough to fit in a tab indicatior.
+		* @validvalue MoSync handle to an uncompressed image resource. The size of the image should be small enough to fit in a tab indicator.
 		*
 		* @setonly
 		*
@@ -5117,6 +5356,21 @@ group WidgetAPI "Widget API" {
 		* \endcode
 		*/
 		ICON = "icon";
+
+		/**
+		* @brief Remove the options menu from this screen.
+		* The options menu can be added by calling \ref maWidgetScreenAddOptionsMenuItem for each item.
+		*
+		* @validvalue No value needed.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(screenHandle, MAW_SCREEN_REMOVE_OPTIONS_MENU, "");
+		* \endcode
+		*/
+		REMOVE_OPTIONS_MENU = "removeoptionsmenu";
 	}
 	} // end of WidgetScreenProperties
 
@@ -6177,6 +6431,25 @@ group WidgetAPI "Widget API" {
 		* \endcode
 		*/
 		SCROLLABLE = "scrollable";
+
+		/**
+		* @brief Sets the content offset. The layout will be scrolled to the given coordinate.
+		* Platform: iOS.
+		*
+		* @validvalue Two int values separated by dash "-". The first int value represents the x coord and
+		* the second value represents the y coord.
+		* If the value is not as described the content offset will not be set and syscall will return
+		* #MAW_RES_INVALID_PROPERTY_VALUE.
+		* The default value is (0,0).
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(verticalLayoutHandle, MAW_RELATIVE_LAYOUT_SCROLLABLE, "30-30");
+		* \endcode
+		*/
+		CONTENT_OFFSET = "contentOffset";
 	}
 	}
 
@@ -7051,7 +7324,7 @@ group WidgetAPI "Widget API" {
 	constset MAString MAW_VIDEO_VIEW_ {
 		/**
 		* @brief Sets the video path.
-		* Note: available only for Android.
+		* Note: available on Android and Windows Phone.
 		* @validvalue Any valid path.
 		*
 		* @setonly
@@ -7113,7 +7386,7 @@ group WidgetAPI "Widget API" {
 		*
 		* NOTE: On Android this value can be retrieved after MAW_VIDEO_VIEW_STATE_SOURCE_READY is received.
 		*       On iOS this value can be retrieved after MAW_VIDEO_STATE_PLAYING is received.
-		* @validvalue An int.
+		* @validvalue An integer representing the total media duration in milliseconds.
 		*
 		* @getonly
 		*
@@ -7145,7 +7418,7 @@ group WidgetAPI "Widget API" {
 		/**
 		* @brief Gets the current position in the video file.
 		*
-		* @validvalue An int.
+		* @validvalue An integer representing the current media position in seconds.
 		*
 		* @getonly
 		*
@@ -7334,6 +7607,444 @@ group WidgetAPI "Widget API" {
 
 	}
 	} // end of WidgetmodalDialogProperties
+
+	/**
+	* The available widget properties for a #MAW_RADIO_BUTTON. See \ref WidgetProperties "Widget properties" for more properties.
+	*/
+	group WidgetRadioButtonProperties "Radio Button properties" {
+	constset MAString MAW_RADIO_BUTTON_ {
+		/**
+		* @brief Get the checked state of the radio button.
+		*
+		* @validvalue A boolean string 'true' or 'false'.
+		*
+		* @getonly
+		*
+		* @par Example
+		* \code
+		* 	char state[BUFFER_SIZE];
+		*   maWidgetGetProperty(radioButtonHandle, MAW_RADIO_BUTTON_CHECKED, state, BUFFER_SIZE);
+		* \endcode
+		*/
+		CHECKED = "checked";
+
+		/**
+		* @brief Change the checked state of the view to the inverse of its current state.
+		* If the radio button is already checked, this method will not toggle the radio button.
+		*
+		* @validvalue No neccessary value needed.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*   maWidgetSetProperty(radioButtonHandle, MAW_RADIO_BUTTON_TOGGLE, "");
+		* \endcode
+		*/
+		TOGGLE = "toggle";
+
+		/**
+		* @brief Set or get the text to display.
+		*
+		* @validvalue A null-terminated string.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+		*   maWidgetSetProperty(radioButtonHandle, MAW_RADIO_BUTTON_TEXT, "Option A");
+		* \endcode
+		*/
+		TEXT = "text";
+
+		/**
+		* @brief Specifies the text color of the radio button.
+		*
+		* @validvalue A hexadecimal value 0xRRGGBB, where R, G and B are the red, green and blue components respectively.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(widgetHandle, MAW_RADIO_BUTTON_TEXT_COLOR, "0xff0000"); // Red
+		* \endcode
+		*/
+		TEXT_COLOR = "textcolor";
+	}
+	} // end of WidgetRadioButtonProperties
+
+	/**
+	* The available widget properties for a #MAW_RADIO_GROUP. See \ref WidgetProperties "Widget properties" for more properties.
+	*/
+	group WidgetRadioGroupProperties "Radio Button properties" {
+	constset MAString MAW_RADIO_GROUP_ {
+		/**
+		* @brief Add the radio buttons grouped in this widget.
+		* This is the only widget type that accepts Radio Buttons as children.
+		*
+		* @validvalue An int specifying the radio button handle.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*   // Attach two radio buttons to this group.
+		*   maWidgetSetProperty(radioGroupHandle, MAW_RADIO_GROUP_ADD_VIEW, "3");
+		*   maWidgetSetProperty(radioGroupHandle, MAW_RADIO_GROUP_ADD_VIEW, "4");
+		* \endcode
+		*/
+		ADD_VIEW = "addview";
+
+		/**
+		* @brief Clear the selection.
+		* When the selection is cleared, no radio button in this group is selected and
+		* #MAW_RADIO_GROUP_SELECTED returns -1.
+		*
+		* @validvalue No neccessary value needed.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*   maWidgetSetProperty(radioGroupHandle, MAW_RADIO_GROUP_CLEAR_CHECK, "");
+		* \endcode
+		*/
+		CLEAR_CHECK = "clearcheck";
+
+		/**
+		* @brief Set or get the selected radio button in this group.
+		* Upon empty selection, get property returns -1.
+		* Setting -1 as the selection identifier clears the selection; such an operation
+		* is equivalent to invoking #MAW_RADIO_GROUP_CLEAR_CHECK.
+		*
+		* @validvalue A valid radio button handle.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+		*   char buttonHandle[BUF_SIZE];
+		*   maWidgetGetProperty(radioGroupHandle, MAW_RADIO_GROUP_SELECTED, buttonHandle, BUF_SIZE);
+		* \endcode
+		*/
+		SELECTED = "selected";
+	}
+	} // end of WidgetRadioGroupProperties
+
+	/**
+	* The available widget properties for a #MAW_RATING_BAR. See \ref WidgetProperties "Widget properties" for more properties.
+	*/
+	group WidgetRatingBarProperties "Rating Bar properties" {
+	constset MAString MAW_RATING_BAR_ {
+		/**
+		* @brief Set or get the number of stars to show.
+		* Usually, the default stars number is 5.
+		* @validvalue An int that specifies the number of stars to show.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+		*   maWidgetSetProperty(ratingBarHandle, MAW_RATING_BAR_NUM_STAR, "4");
+		* \endcode
+		*/
+		NUM_STAR = "numstar";
+
+		/**
+		* @brief Set or get the current rating (number of stars filled).
+		*
+		* @validvalue A float that specifies the number of stars filled.
+		*
+		* @setandget
+		* @par Example
+		* \code
+		*   maWidgetSetProperty(ratingBarHandle, MAW_RATING_BAR_RATING, "3.0");
+		* \endcode
+		*/
+		RATING = "rating";
+
+		/**
+		* @brief Set or get the step size (granularity) of this rating bar.
+		* By default the granularity is 0.5.
+		* @validvalue A float that specifies the step size.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+		*   maWidgetSetProperty(ratingBarHandle, MAW_RATING_BAR_GRANULARITY, "1.0");
+		* \endcode
+		*/
+		GRANULARITY = "granularity";
+	}
+	} // end of WidgetRatingBarProperties
+
+	/**
+	* Constants of the map widget.
+	*/
+	group WidgetMapConstants "Map constants" {
+	    constset int MAW_MAP_TYPE_ {
+	        /**
+			* Road map type (landforms not visible).
+			*/
+			ROAD = 0;
+			/**
+			* Sattelite map type (landforms visible).
+			*/
+			SATELLITE = 1;
+		}
+	} // end of WidgetMapConstants
+
+	/**
+	* The available widget properties for a #MAW_MAP. See \ref WidgetProperties "Widget properties" for more properties.
+	*/
+	group WidgetMapProperties "Map properties" {
+	constset MAString MAW_MAP_ {
+	    /**
+		* @brief The api key used to access the full features of the google map (on Android platform).
+		* The iOS platform doesn't require a key.
+		*
+		* @validvalue A string containing a google maps key. For further details on how to
+		* obtain these key go to "https://developers.google.com/maps/documentation/android/mapkey".
+		*
+		* @setonly
+		* @par Example
+		* \code
+		*   maWidgetSetProperty(mapHandle, MAW_MAP_API_KEY_GOOGLE, "a_valid_google_key");
+		* \endcode
+		*/
+		API_KEY_GOOGLE = "api_key_google";
+
+		/**
+		* @brief The api key used to access the full features of the bing map (on windows phone platform).
+		*
+		* @validvalue A string containing a bing maps key. For further details on how to
+		* obtain these key go to "http://msdn.microsoft.com/en-us/library/ff428642.aspx".
+		*
+		* @setonly
+		* @par Example
+		* \code
+		*   maWidgetSetProperty(mapHandle, MAW_MAP_API_KEY_BING, "a_valid_bing_key");
+		* \endcode
+		*/
+		API_KEY_BING = "api_key_bing";
+
+		/**
+		* @brief Set or get the map type.
+		*
+		* @validvalue One of the two values: MAW_MAP_TYPE_SATELLITE or MAW_MAP_TYPE_ROAD.
+		*
+		* @setandget
+		* @par Example
+		* \code
+		*   maWidgetSetProperty(mapHandle, MAW_MAP_TYPE, MAW_MAP_TYPE_SATELLITE);
+		*   char mapType[BUF_SIZE];
+		*   maWidgetGetProperty(mapHandle, MAW_MAP_TYPE, mapType, BUF_SIZE);
+		* \endcode
+		*/
+		TYPE = "type";
+
+		/**
+		* @brief Sets and gets the zoom level of the map.
+		*
+		* @validvalue A integer value between 0 and 21.
+		*
+		* @setandget
+		* @par Example
+		* \code
+		*   maWidgetSetProperty(mapHandle, MAW_MAP_ZOOM_LEVEL, "4");
+		*   maWidgetSetProperty(mapHandle, MAW_MAP_ZOOM_LEVEL);
+		*   char zoomLevel[BUF_SIZE];
+		*   maWidgetGetProperty(mapHandle, MAW_MAP_ZOOM_LEVEL, zoomLevel, BUF_SIZE);
+		* \endcode
+		*/
+		ZOOM_LEVEL = "zoom_level";
+
+		/**
+		* @brief Disables/enables the interraction between the user and the map.
+		*
+		* @validvalue A boolean string 'true' or 'false'.
+		*
+		* @setandget
+		* @par Example
+		* \code
+		*   maWidgetSetProperty(mapHandle, MAW_MAP_INTERRACTION_ENABLED, "true");
+		*   char interractionEnabled[BUF_SIZE];
+		*   maWidgetGetProperty(mapHandle, MAW_MAP_INTERRACTION_ENABLED, interractionEnabled, BUF_SIZE);
+		* \endcode
+		*/
+		INTERRACTION_ENABLED = "interraction_enabled";
+
+		/**
+		* @brief Set the map center latitude coordinate.
+		*
+		* @validvalue A double value between -90.0 and 90.0.
+		*
+		* @setonly
+		* @par Example
+		* \code
+		*   maWidgetSetProperty(mapHandle, MAW_MAP_CENTER_LATITUDE, "43.232544");
+		*   maWidgetSetProperty(mapHandle, MAW_MAP_CENTER_LATITUDE, "-12.42324");
+		* \endcode
+		*/
+		CENTER_LATITUDE = "center_latitude";
+
+		/**
+		* @brief Set the map center longitude coordinate.
+		*
+		* @validvalue A double value between -180.0 and 180.0.
+		*
+		* @setonly
+		* @par Example
+		* \code
+		*   maWidgetSetProperty(mapHandle, MAW_MAP_CENTER_LONGITUDE, "80.43352");
+		*   maWidgetSetProperty(mapHandle, MAW_MAP_CENTER_LONGITUDE, "-54.56442");
+		* \endcode
+		*/
+		CENTER_LONGITUDE = "center_longitude";
+
+		/**
+		* @brief Set the map zoom level value.
+		*
+		* @validvalue A double value between 0 and 21.
+		*
+		* @setonly
+		* @par Example
+		* \code
+		*   maWidgetSetProperty(mapHandle, MAW_MAP_CENTER_ZOOM_LEVEL, "12");
+		*   maWidgetSetProperty(mapHandle, MAW_MAP_CENTER_ZOOM_LEVEL, "3");
+		* \endcode
+		*/
+		CENTER_ZOOM_LEVEL = "center_zoom_level";
+
+		/**
+		 * @brief Property used to center the map.
+		 *
+		 * @validvalue A boolean string: "true" or "false".
+		 *
+		 * @setonly
+		 * @par Example
+		 * \code
+		 *   maWidgetSetProperty(mapHandle, MAW_MAP_CENTERED, "true"); // centers the map on the already set map center
+		 * \endcode
+		 */
+		CENTERED = "centered";
+
+		/**
+		 * @brief Property used specify the upper left corner latitude of the visible area.
+		 *
+		 * @validvalue A double value between -90.0 and 90.0.
+		 *
+		 * @setandget
+		 * @par Example
+		 * \code
+		 *   maWidgetSetProperty(mapHandle, MAW_MAP_VISIBLE_AREA_UPPER_LEFT_CORNER_LATITUDE, "-34.34234");
+		 * \endcode
+		 */
+		VISIBLE_AREA_UPPER_LEFT_CORNER_LATITUDE = "visible_area_upper_left_corner_latitude";
+
+		/**
+		 * @brief Property used specify the upper left corner longitude of the visible area.
+		 *
+		 * @validvalue A double value between -180.0 and 180.0.
+		 *
+		 * @setandget
+		 * @par Example
+		 * \code
+		 *   maWidgetSetProperty(mapHandle, MAW_MAP_VISIBLE_AREA_UPPER_LEFT_CORNER_LONGITUDE, "134.312");
+		 * \endcode
+		 */
+		VISIBLE_AREA_UPPER_LEFT_CORNER_LONGITUDE = "visible_area_upper_left_corner_longitude";
+
+		/**
+		 * @brief Property used specify the lower right corner latitude of the visible area.
+		 *
+		 * @validvalue A double value between -90.0 and 90.0.
+		 *
+		 * @setandget
+		 * @par Example
+		 * \code
+		 *   maWidgetSetProperty(mapHandle, MAW_MAP_VISIBLE_AREA_LOWER_RIGHT_CORNER_LATITUDE, "43.2322");
+		 * \endcode
+		 */
+		VISIBLE_AREA_LOWER_RIGHT_CORNER_LATITUDE = "visible_area_lower_right_corner_latitude";
+
+		/**
+		 * @brief Property used specify the lower right corner longitude of the visible area.
+		 *
+		 * @validvalue A double value between -180.0 and 180.0.
+		 *
+		 * @setandget
+		 * @par Example
+		 * \code
+		 *   maWidgetSetProperty(mapHandle, MAW_MAP_VISIBLE_AREA_LOWER_RIGHT_CORNER_LONGITUDE, "-100.2324");
+		 * \endcode
+		 */
+		VISIBLE_AREA_LOWER_RIGHT_CORNER_LONGITUDE = "visible_area_lower_right_corner_longitude";
+
+		/**
+		* @brief Used to center the map on a previously set visible area.
+		*
+		* @validvalue A boolean string 'true' or 'false'.
+		*
+		* @setonly
+		* @par Example
+		* \code
+		*   maWidgetSetProperty(mapHandle, MAP_CENTERED_ON_VISIBLE_AREA, "true");
+		* \endcode
+		*/
+		CENTERED_ON_VISIBLE_AREA = "centered_on_visible_area";
+	}
+	} // end of WidgetMapProperties
+
+	/**
+	* The available widget properties for a #MAW_MAP_PIN. See \ref WidgetProperties "Widget properties" for more properties.
+	*/
+	group WidgetMapPinProperties "Map pin properties" {
+	constset MAString MAW_MAP_PIN_ {
+		/**
+		* @brief Set the map pin latitude coordinate.
+		*
+		* @validvalue A double value between -90.0 and 90.0.
+		*
+		* @setonly
+		* @par Example
+		* \code
+		*   maWidgetSetProperty(mapHandle, MAW_MAP_PIN_LATITUDE, "43.232544");
+		*   maWidgetSetProperty(mapHandle, MAW_MAP_PIN_LATITUDE, "-12.42324");
+		* \endcode
+		*/
+		LATITUDE = "latitude";
+
+		/**
+		* @brief Set the map pin longitude coordinate.
+		*
+		* @validvalue A double value between -180.0 and 180.0.
+		*
+		* @setonly
+		* @par Example
+		* \code
+		*   maWidgetSetProperty(mapHandle, MAW_MAP_PIN_LONGITUDE, "80.43352");
+		*   maWidgetSetProperty(mapHandle, MAW_MAP_PIN_LONGITUDE, "-124.56442");
+		* \endcode
+		*/
+		LONGITUDE = "longitude";
+
+		/**
+		* @brief Set the map pin text.
+		*
+		* @validvalue A string value.
+		*
+		* @setandget
+		* @par Example
+		* \code
+		*   maWidgetSetProperty(mapHandle, MAW_MAP_PIN_TEXT, "Cluj");
+		* \endcode
+		*/
+		TEXT = "text";
+	}
+	} // end of WidgetMapPinProperties
+
 	} // end of WidgetProperties
 
 	typedef int MAWidgetHandle;
@@ -7522,6 +8233,32 @@ group WidgetAPI "Widget API" {
 	* - #MAW_RES_ERROR otherwise.
 	*/
 	int maWidgetGetProperty(in MAWidgetHandle widget, in MAString property, out MAString value range("bufSize"), in int bufSize);
+
+	/**
+	* Add an item to the Options Menu associated to a screen.
+	* Available on Android and WP7.
+	* The options menu is where you should include actions and other options that are relevant to the current activity
+	* context, such as "Search," "Compose email," or "Settings".
+	* When opened, the first visible portion is the icon menu, which holds up to six menu items.
+	* If your menu includes more than six items, Android places the sixth item and the rest into the overflow menu,
+	* which the user can open by selecting More. Those items do not display icons.
+	* \param widget Handle to the screen widget.
+	* \param title The title associated for the new item. Can be left null.
+	* \param iconPath The path to an image or  a predefined icon, one of the \link #MAW_OPTIONS_MENU_ICON_CONSTANT_ADD \endlink constants.
+	* Note that for Windows phone 7 the option menu icons must be added under the following folder
+	* structure "/ApplicationBarIcons/". The function is called with the name of the icon file.
+	* e.g. maWidgetScreenAddOptionsMenuItem(ScreenHandle, "test", "optionsMenuItemIcon.png", 0); where the
+	* file optionsMenuItemIcon.png is found in the folder "/ApplicationBarIcons".
+	* Can be left null. On windows phone 7 a null icon means that the item
+	* will be a part of the extendable menu item list from the native Application Bar.
+	* \iconPredefined Specifies if the icon is a project resource, or one of the predefined Android icons.
+	* By default it's value is 0.
+	*
+	* \returns The the item index on success, or any of the following result codes:
+	* - #MAW_RES_ERROR
+	* - #MAW_RES_INVALID_HANDLE
+	*/
+	int maWidgetScreenAddOptionsMenuItem(in MAWidgetHandle widget, in MAString title, in MAString iconPath, in int iconPredefined);
 
 	} // end of group WidgetAPIFunctions
 
@@ -8064,7 +8801,7 @@ group CameraFunctions "Camera Functions" {
 
 		/**
 		 * Set the screen orientation.
-		 * Currently implemented only on Android.
+		 * Currently implemented only on Android and Windows Phone.
 		 * @param orientation One of the \link #SCREEN_ORIENTATION_LANDSCAPE
 		 * #SCREEN_ORIENTATION_PORTRAIT #SCREEN_ORIENTATION_DYNAMIC \endlink
 		 * constants.
@@ -8090,6 +8827,59 @@ group CameraFunctions "Camera Functions" {
 		int maScreenSetFullscreen(in int fullscreen);
 
 		/**
+		* Set supported screen orientations.
+		* Currently implemented on iOS and WindowsPhone 7.1.
+		* @param orientations A bitmask consisting of flags describing the supported screen orientations.
+		* The bitmask can be created using \link #MA_SCREEN_ORIENTATION_ MA_SCREEN_ORIENTATION \endlink
+		* values.
+		* @return One of the next constants:
+		* - #MA_SCREEN_ORIENTATION_RES_OK
+		* - #MA_SCREEN_ORIENTATION_RES_NOT_SUPPORTED
+		* - #MA_SCREEN_ORIENTATION_RES_INVALID_VALUE
+		*/
+		int maScreenSetSupportedOrientations(in int orientations);
+
+		/**
+		* Get supported screen orientations.
+		* Currently implemented on iOS and WindowsPhone 7.1.
+		* @return A bitmask consisting of flags describing the supported screen orientations.
+		* The bitmask is created using \link #MA_SCREEN_ORIENTATION_ MA_SCREEN_ORIENTATION \endlink
+		* values.
+		*/
+		int maScreenGetSupportedOrientations();
+
+		/**
+		* Get current screen orientation.
+		* Currently implemented on iOS and WindowsPhone 7.1.
+		* @return One of the \link #MA_SCREEN_ORIENTATION_ MA_SCREEN_ORIENTATION \endlink constants.
+		*/
+		int maScreenGetCurrentOrientation();
+
+		constset int MA_SCREEN_ORIENTATION_ {
+			/// The device is in portrait mode, with the device held upright and the home button on
+			/// the bottom.
+			PORTRAIT = 0x000001;
+			/// The device is in portrait mode but upside down, with the device held upright and the
+			/// home button at the top.
+			PORTRAIT_UPSIDE_DOWN = 0x000002;
+			/// The device is in landscape mode, with the device held upright and the home button on
+			/// the left side.
+			LANDSCAPE_LEFT = 0x000004;
+			/// The device is in landscape mode, with the device held upright and the home button on
+			/// the right side.
+			LANDSCAPE_RIGHT = 0x000008;
+		}
+
+		constset int MA_SCREEN_ORIENTATION_RES_ {
+			///
+			OK = 0;
+			///
+			NOT_SUPPORTED = -1;
+			///
+			INVALID_VALUE = -2;
+		}
+
+		/**
 		 * Turn on sending of screen state events. Off by default.
 		 * Currently implemented only on Android.
 		 * @return \< 0 on error.
@@ -8106,10 +8896,26 @@ group CameraFunctions "Camera Functions" {
 		 */
 		int maScreenStateEventsOff();
 
+		/**
+		 * Lock device to be "awake". This means that the device
+		 * won't go to sleep while the app is running.
+		 * @param flag MA_WAKE_LOCK_ON or MA_WAKE_LOCK_OFF
+		 * @return \>0 on success, \< 0 on error (-1 if not available).
+		 */
+		int maWakeLock(in int flag);
+
+		constset int MA_WAKE_LOCK_ {
+			/// Application will run with screen on (consumes power).
+			ON = 1;
+			/// Turn off the wake lock.
+			OFF = 2;
+		}
+
 group OpenGLES "OpenGLES" {
 #include "opengl_non_generated.idl"
 #include "opengl_generated.idl"
 }
+
 		/**
 		 * Logs information about the state of all current resources.
 		 */
@@ -8994,6 +9800,7 @@ group NFCAPI "NFC API" {
 			* @param flags 	MA_AUDIO_DATA_STREAM means that the audio should be streamed
 			*				either from disk or over HTTP. This is only for music playback,
 			*				sound effects should have the flag set to 0.
+			* @attention 	Windows Phone only supports wave-files (see remarks here: http://msdn.microsoft.com/en-us/library/microsoft.xna.framework.audio.soundeffect.fromstream.aspx).
 			* @return A MAAudioData handle or <0 on error.
 			*/
 			MAAudioData maAudioDataCreateFromResource(in MAString mime, in MAHandle data, in int offset, in int length, in int flags);
@@ -9028,6 +9835,38 @@ group NFCAPI "NFC API" {
 			*
 			*/
 			MAAudioInstance maAudioInstanceCreate(in MAAudioData audioData);
+
+			/**
+			* @brief Creates an MAAudioInstance that can be fed samples dynamically.
+			*
+			* @param sampleRate  The samplerate of the audio instance.
+			* @param numChannels Number of channels for the audio instance (1 means mono, 2 means stereo).
+			* @param bufferSize  The size of the underlying sample buffer (in samples).
+			*
+			* @return 			A MAAudioInstance handle or <0 on error.
+			*
+			*/
+			MAAudioInstance maAudioInstanceCreateDynamic(in int sampleRate, in int numChannels, in int bufferSize);
+
+			/**
+			* @brief Submits a buffer of samples to a dynamic MAAudioInstance
+			*
+			* @param instance	The handle to the MAAudioInstance
+			* @param buffer		A pointer to the samples that should be submitted. Each sample must be a signed 16-bit short. When using more than one channel, the samples should be interleaved.
+			* @param numBytes	The number of bytes to read.
+			* @return 			<0 on error.
+			*
+			*/
+			int maAudioSubmitBuffer(in MAAudioInstance instance, in MAAddress buffer, in int numBytes);
+
+			/**
+			* @brief Gets the pending buffer count for the dynamic MAAudioInstance
+			*
+			* @param instance	The handle to the MAAudioInstance
+			* @return 			<0 on error, otherwise the pending buffer count.
+			*
+			*/
+			int maAudioGetPendingBufferCount(in MAAudioInstance instance);
 
 			/**
 			* @brief Destroys a MAAudioInstance handle releases used memory
@@ -9213,13 +10052,13 @@ group AdsAPI "Advertising API" {
 
 			/**
 			* @brief Indicates that the connection to the advertisements server failed.
-			* Platform: Android and iOS.
+			* Platform: Android, iOS and Windows Phone 7.1.
 			*/
 			NETWORK = -3;
 
 			/**
 			* @brief Indicates that no ad was returned due to lack of ad inventory.
-			* Platform: Android and iOS.
+			* Platform: Android, iOS and Windows Phone 7.1.
 			*/
 			NO_FILL = -4;
 
@@ -9461,6 +10300,13 @@ group AdsAPI "Advertising API" {
 			// Of size 728*90.
 			// Availabe only on Android.
 			LEADERBOARD = 3;
+			// Of size 300*50 - X-Large Banner
+			// Available only on Windows Phone 7.1.
+			WP7_XLARGE = 4;
+			// Of size 480*80 - XX-Large Banner
+			// Available only on Windows Phone 7.1
+			WP7_XXLARGE = 5;
+
 		}
 	} // end of Ads Constants
 
@@ -9472,6 +10318,7 @@ group AdsAPI "Advertising API" {
 			LOADED = 1;
 			// This event is send after a banner view finishes executing an action that
 			// covered your application's user interface.
+			// Event not available on windows phone 7.1 on the AdControl
 			ON_DISMISS = 2;
 			// This event is send when the user taps the banner view.
 			// The application is moved to background after this event is send.
@@ -9482,8 +10329,8 @@ group AdsAPI "Advertising API" {
 	group AdsFunctions "Advertising Functions" {
 		/**
 		* \brief Creates a new banner.
-		* \param bannerSize One of the MA_ADS_SIZE_ constants. Only for Android platform.
-		* \param publisherID Only for Android platform.
+		* \param bannerSize One of the MA_ADS_SIZE_ constants. Only for Android and WP7.1 platforms.
+		* \param publisherID Only for Android and WP 7.1 platforms.
 		* This param is ignored on iOS platform.
 		*
 		* \note A banner is a widget type object.
@@ -10489,13 +11336,13 @@ group CaptureAPI "Capture API" {
 
 	group CaptureAction "Capture Action" {
 		constset int MA_CAPTURE_ACTION_ {
-			/// Start the picker with video mode and stores the result in a data object.
+			/// Starts video capture.
 			/// Platform: Android and iOS.
 			RECORD_VIDEO = 0;
-			/// Stops the recording.
+			/// Stops recording.
 			/// Platform: iOS only.
 			STOP_RECORDING = 1;
-			/// Starts the picker with picture mode and  stores the picture in a data object.
+			/// Starts image capture (takes photo).
 			/// Platform: Android and iOS.
 			TAKE_PICTURE = 2;
 		}
@@ -10503,13 +11350,13 @@ group CaptureAPI "Capture API" {
 
 	group CaptureEventType "Capture Event type" {
 		constset int MA_CAPTURE_EVENT_TYPE_ {
-			/// Send after a image has been taken.
+			/// Sent after a image has been taken.
 			/// Platform: Android and iOS.
 			IMAGE = 0;
-			/// Send after a video has been taken.
+			/// Sent after a video has been taken.
 			/// Platform: Android and iOS.
 			VIDEO = 1;
-			/// Send if the user cancels taking image/video.
+			/// Sent if the user cancels taking image/video.
 			/// Platform: iOS and Android.
 			CANCEL = 2;
 		}
@@ -10563,7 +11410,23 @@ group CaptureAPI "Capture API" {
 		int maCaptureGetProperty(in MAString property, out MAString value range("bufSize"), in int bufSize);
 
 		/**
-		* \brief Perform an action on the image picker.
+		* \brief Performs a capture action.
+		*
+		* The specified action is performed and the result is delivered
+		* asynchronously in an \link #EVENT_TYPE_CAPTURE event. The content
+		* of the event is an #MACaptureEventData data structure. The type
+		* field contains the type of capture event (#MA_CAPTURE_EVENT_TYPE_IMAGE,
+		* #MA_CAPTURE_EVENT_TYPE_VIDEO, #MA_CAPTURE_EVENT_TYPE_CANCEL), and the
+		* handle field contains a handle to the capture object. Save a
+		* captured image using function #maCaptureWriteImage. Access a
+		* captured video using function #maCaptureGetVideoPath. Free the capture
+		* object using function #maCaptureDestroyData.
+		*
+		* Note: The image format for #MA_CAPTURE_EVENT_TYPE_IMAGE is JPEG on Android
+		* and PNG on iOS.
+		*
+		* Platforms: Android an iOS.
+		*
 		* \param action One of the \link #MA_CAPTURE_ACTION_TAKE_PICTURE MA_CAPTURE_ACTION \endlink constants.
 		*
 		* \returns One of the next constants:
@@ -10628,6 +11491,10 @@ group CaptureAPI "Capture API" {
 	}//End of Capture Functions
 
 } // End of Capture API
+
+group PurchaseAPI "Purchase API" {
+#include "purchase.idl"
+} // End of Purchase API
 
 }
 	constset int IOCTL_ {

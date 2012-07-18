@@ -1,0 +1,71 @@
+html, body {
+	margin: 0;
+	padding: 0;
+	width: 100%;
+	/* height: 100%; */
+	background-color: #FFFFFF;
+	font-family: sans-serif;
+	text-decoration: none;
+
+	/* Disable text selection. */
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	-o-user-select: none;
+	user-select: none;
+}
+
+.pane {
+	display: block;
+	width: 85%;
+	margin: 10px auto 10px auto;
+	padding: 10px 15px 10px 15px;
+	border: 0px solid #EEEEEE;
+	-webkit-border-radius: 5px;
+	border-radius: 5px;
+	clear: both;
+}
+
+.button {
+	border: 1px solid #222222;
+	-webkit-border-radius: 8px;
+	border-radius: 8px;
+	text-align: center;
+	background: #15D2FF;
+	color: #222222;
+	font-size: 1.3em;
+	font-weight: bold;
+	cursor: pointer;
+}
+
+#heading {
+	display: block;
+	width: 100%;
+	margin: 0px auto 0px auto;
+	padding: 10px 0px 10px 0px;
+	background: #FF7F00; /*#FF7744;*/
+	color: #EEEEEE;
+	font-size: 1.6em;
+	font-weight: bold;
+	text-align: center;
+	clear: both;
+}
+
+#info {
+	background: #222222;
+	line-height: 1.5em;
+}
+
+.infoItem {
+	font-size: 0.9em;
+	font-weight: bold;
+	color: #EEEEEE;
+}
+
+.view {
+	border: 1px solid #222222;
+	/*background: #15D266;*/
+	background: #FFFFFF;
+}

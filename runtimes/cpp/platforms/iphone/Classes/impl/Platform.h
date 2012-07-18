@@ -54,7 +54,7 @@ extern bool gRunning;
 class Surface {
 public:
 
-	Surface(CGImageRef image) : image(image), context(NULL), data(NULL), mOwnData(false) {
+	Surface(CGImageRef image) : image(image), context(NULL), data(NULL), mOwnData(false), orientation(1) {
 		CGDataProviderRef dpr = CGImageGetDataProvider(image);
 		mDataRef = CGDataProviderCopyData(dpr);
 		
@@ -64,6 +64,7 @@ public:
 		rowBytes = CGImageGetBytesPerRow(image);
 		rect = CGRectMake(0, 0, width, height);
 		mOwnData = false;
+		orientation = 1;
 
 		bool noAlpha = false;
 		int bpp = CGImageGetBitsPerPixel(image);
@@ -125,10 +126,12 @@ public:
 		CGContextSetTextMatrix(context, xform);	
 	}
 
-	Surface(int width, int height, char *data=NULL, CGBitmapInfo bitmapInfo=kCGImageAlphaNoneSkipLast, int rowBytes=-1) : mDataRef(NULL) {
+	Surface(int width, int height, char *data=NULL, CGBitmapInfo bitmapInfo=kCGImageAlphaNoneSkipLast, int rowBytes=-1) : mDataRef(NULL), orientation(1) {
 		CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
 		this->width = width,
 		this->height = height;
+		orientation = 1;
+
 		if(rowBytes==-1)
 			this->rowBytes = rowBytes = width*4;
 		else

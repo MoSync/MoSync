@@ -50,6 +50,10 @@ import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_ALERT;
 import static com.mosync.internal.generated.MAAPI_consts.MA_RESOURCE_OPEN;
 import static com.mosync.internal.generated.MAAPI_consts.MA_RESOURCE_CLOSE;
 
+import static com.mosync.internal.generated.MAAPI_consts.MA_WAKE_LOCK_ON;
+import static com.mosync.internal.generated.MAAPI_consts.MA_WAKE_LOCK_OFF;
+
+
 import java.io.File;
 import java.io.FileDescriptor;
 import java.io.FileInputStream;
@@ -100,6 +104,7 @@ import android.os.Vibrator;
 import android.telephony.TelephonyManager;
 import android.telephony.gsm.GsmCellLocation;
 import android.util.Log;
+import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.FrameLayout;
@@ -107,6 +112,7 @@ import android.provider.Settings.Secure;
 import android.net.ConnectivityManager;
 
 import com.mosync.internal.android.MoSyncFont.MoSyncFontHandle;
+import com.mosync.internal.android.billing.PurchaseManager;
 import com.mosync.internal.android.nfc.MoSyncNFC;
 import com.mosync.internal.android.nfc.MoSyncNFCService;
 import com.mosync.internal.generated.IX_OPENGL_ES;
@@ -116,7 +122,10 @@ import com.mosync.java.android.MoSyncPanicDialog;
 import com.mosync.java.android.MoSyncService;
 import com.mosync.java.android.TextBox;
 import com.mosync.nativeui.ui.widgets.MoSyncCameraPreview;
+import com.mosync.nativeui.ui.widgets.ScreenWidget;
 import com.mosync.nativeui.util.AsyncWait;
+import com.mosync.nativeui.util.properties.IntConverter;
+import com.mosync.nativeui.util.properties.PropertyConversionException;
 
 /**
  * Thread that runs the MoSync virtual machine and handles all syscalls.
@@ -178,6 +187,7 @@ public class MoSyncThread extends Thread
 	MoSyncAds mMoSyncAds;
 	MoSyncNotifications mMoSyncNotifications;
 	MoSyncCapture mMoSyncCapture;
+	MoSyncPurchase mMoSyncPurchase;
 	MoSyncDB mMoSyncDB;
 
 	/**
@@ -297,7 +307,7 @@ public class MoSyncThread extends Thread
 	/**
 	 * Ascent of text in the default console font.
 	 */
-	int mTextConsoleAscent;
+	//int mTextConsoleAscent;
 
 	/**
 	 * Rectangle that is used to get the extent of a text string.
@@ -397,6 +407,7 @@ public class MoSyncThread extends Thread
 		}
 
 		//nativeInitRuntime();
+		mMoSyncPurchase = new MoSyncPurchase(this);
 
 		mMoSyncSensor = new MoSyncSensor(this);
 
@@ -440,6 +451,7 @@ public class MoSyncThread extends Thread
 
 		// Turn on sensors.
 		mMoSyncSensor.onResume();
+		mMoSyncPurchase.restoreService();
 	}
 
 	public void onPause()
@@ -469,6 +481,14 @@ public class MoSyncThread extends Thread
 		{
 			mMoSyncNetwork.killAllConnections();
 			mMoSyncNetwork = null;
+		}
+		if (null != mMoSyncPurchase)
+		{
+			/**
+			 * Unbind from the MarketBillingService.
+			 */
+			mMoSyncPurchase.unbindService();
+			mMoSyncPurchase = null;
 		}
 	}
 
@@ -1134,8 +1154,7 @@ public class MoSyncThread extends Thread
 		Paint.FontMetricsInt fontMetrics =
 			new Paint.FontMetricsInt();
 		mPaint.getFontMetricsInt(fontMetrics);
-		mTextConsoleHeight = -1 * fontMetrics.ascent + fontMetrics.descent;
-		mTextConsoleAscent = -1 * fontMetrics.ascent;
+		mTextConsoleHeight = -1 * fontMetrics.ascent;
 	}
 
 	/**
@@ -1330,7 +1349,6 @@ public class MoSyncThread extends Thread
 		// Old code:
 		// return EXTENT(mTextSizeRect.width(), mTextSizeRect.height());
 
-		// The new implementation uses a constant text height.
 		return EXTENT(mTextSizeRect.width(), mTextConsoleHeight);
 	}
 
@@ -1386,7 +1404,15 @@ public class MoSyncThread extends Thread
 
 		SYSLOG("maFontSetCurrent");
 
-		return mMoSyncFont.maFontSetCurrent(fontHandle);
+		// change the current font and update the mPaint
+		int previousFontHandle = mMoSyncFont.maFontSetCurrent(fontHandle);
+
+		// update the font "metrics"
+		Paint.FontMetricsInt fontMetrics = new Paint.FontMetricsInt();
+		mPaint.getFontMetricsInt(fontMetrics);
+		mTextConsoleHeight = -1 * fontMetrics.ascent;
+
+		return previousFontHandle;
 	}
 
 	/**
@@ -1481,7 +1507,7 @@ public class MoSyncThread extends Thread
 	{
 		SYSLOG("maDrawText");
 
-		mCanvas.drawText( str, left, top+mTextConsoleHeight, mPaint);
+		mCanvas.drawText( str, left, top + mTextConsoleHeight, mPaint);
 	}
 
 	/**
@@ -1494,7 +1520,7 @@ public class MoSyncThread extends Thread
 	{
 	 	SYSLOG("maDrawTextW");
 
-		mCanvas.drawText(str, left, top+mTextConsoleHeight, mPaint);
+		mCanvas.drawText(str, left, top + mTextConsoleHeight, mPaint);
 	}
 
 	/**
@@ -2886,19 +2912,25 @@ public class MoSyncThread extends Thread
 
 			return 0;
 		}
-/*
+
 		else if(url.startsWith("tel://"))
 		{
-			if(!(mContext.getPackageManager().checkPermission("android.permission.NFC",
-					mContext.getPackageName()) == PackageManager.PERMISSION_GRANTED))
-			{
+			Log.i("maPlatformRequest","Starting a call - " + url);
 
+			// check to see if the proper permission is granted
+			if(!(mContext.getPackageManager().checkPermission("android.permission.CALL_PHONE",
+								mContext.getPackageName()) == PackageManager.PERMISSION_GRANTED))
+			{
+				Log.i("@MoSync", "Permission to make phone call not set!");
+				return -2;
 			}
 
 			Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse(url));
 			((Activity)mContext).startActivity(intent);
+
+			return 0;
 		}
-*/
+
 		return -1;
 	}
 
@@ -3196,7 +3228,6 @@ public class MoSyncThread extends Thread
 				}
 				if ( buttonNegative.length() > 0 )
 				{
-					builder.setCancelable(true);
 					builder.setNegativeButton(buttonNegative, new DialogInterface.OnClickListener() {
 
 						@Override
@@ -3204,10 +3235,6 @@ public class MoSyncThread extends Thread
 							postAlertEvent(3);
 						}
 					});
-				}
-				else
-				{
-					builder.setCancelable(false);
 				}
 
 				AlertDialog alertDialog = builder.create();
@@ -3630,6 +3657,183 @@ public class MoSyncThread extends Thread
 	}
 
 	/**
+	* \brief Check if in app purchase is supported/enabled on a device.
+	* It does not trigger any asynchronous responses.
+	* Platform: Android and iOS.
+	*
+	* \returns One of the next result codes:
+	* - #MA_PURCHASE_RES_OK if purchase is supported/allowed on the device.
+	* - #MA_PURCHASE_RES_DISABLED if purchase is not allowed/enabled.
+	* - #MA_PURCHASE_RES_UNAVAILABLE if purchase is not supported on the device.
+	* - #MA_PURCHASE_RES_OUT_OF_DATE if GooglePlay application is out of date.
+	* - #MA_PURCHASE_RES_CONNECTION_ERROR if there was an error connecting with the GooglePlay application.
+	*/
+	int maPurchaseSupported()
+	{
+		return mMoSyncPurchase.maPurchaseSupported();
+	}
+
+	/**
+	* \brief Create a product object asynchronously.
+	* The product is validated only on iOS. On the other hand, on Android the validation
+	* will be done during a maPurchaseRequest.
+	*
+	* A #EVENT_TYPE_PURCHASE will be sent after calling this syscall.
+	* The event will contain a MAPurchaseEventData struct object. The type member object
+	* contained by the struct will be #MA_PURCHASE_EVENT_PRODUCT_CREATE. The state member
+	* object can have one of the following values:
+	* - #MA_PURCHASE_STATE_PRODUCT_VALID
+	*				- on iOS if the product was validated by the App Store,
+	*				- on Android if the product was internally allocated.
+    * - #MA_PURCHASE_STATE_PRODUCT_INVALID the product is not valid in the App Store.
+    * - #MA_PURCHASE_STATE_DISABLED purchase is not supported/disabled on the device.
+    * - #MA_PURCHASE_STATE_DUPLICATE_HANDLE the given productHandle already exists.
+	* Use #maCreatePlaceholder() to generate a new one.
+	*
+	* \param productHandle A valid handle that will be used to indetify the new product.
+	* It must be unique. It is highly recommended to create it using #maCreatePlaceholder().
+	* \param productID String that identifies the product. This string must be used by the
+	* App Store / Google Play to identify the product.
+	*/
+	void maPurchaseCreate(final int productHandle, final String productID)
+	{
+		mMoSyncPurchase.maPurchaseCreate(productHandle, productID);
+	}
+
+	/**
+	* \brief Set your Google Play public key to the application. This enables the application
+	* to verify the signature of the transaction information that is returned from Google Play.
+	* Must be set before #maVerifyReceipt.
+	* Platform: Android.
+	*
+	* \param developerKey Base64-encoded public key, that can be found on the Google
+	* Play publisher account page, under Licensing & In-app Billing panel in Edit Profile.
+	*/
+	int maPurchaseSetPublicKey(final String developerPublicKey)
+	{
+		return mMoSyncPurchase.maPurchaseSetPublicKey(developerPublicKey);
+	}
+
+	/**
+	* Request the user to purchase a product.
+	* The system will handle the proccess of purchasing.
+	* Note: if there are another requests in progress, the requests will be queued.
+	*
+	* A #EVENT_TYPE_PURCHASE will be sent after calling this syscall.
+	* The event will contain a MAPurchaseEventData struct object. The type member object
+	* contained by the struct is #MA_PURCHASE_EVENT_REQUEST. The state member object can
+	* have one of the following values:
+    * - #MA_PURCHASE_STATE_DISABLED purchase is not supported/disabled on the device.
+	* - #MA_PURCHASE_STATE_FAILED if the operation has failed. Check the errorCode member object
+	* for more information about the reason.
+	* - #MA_PURCHASE_STATE_IN_PROGRESS indicates that the transaction has been received by
+	* the App Store / Google Play.
+	* - #MA_PURCHASE_STATE_COMPLETED indicates that the transaction has been successfully processed.
+	*
+	* \param productHandle Handle to the product to be purchased.
+	* \param quantity How many products to be purchased. Must be a value greater than zero.
+	* This param is ignored on Android, as any purchase request can handle only one item.
+	*/
+	void maPurchaseRequest(final int productHandle)
+	{
+		mMoSyncPurchase.maPurchaseRequest(productHandle);
+	}
+
+	/**
+	* Verify if the receipt came from Apple App Store / Google Play.
+	* Make sure that the product is purchased before calling this syscall.
+	*
+	* A #EVENT_TYPE_PURCHASE will be sent after calling this syscall.
+	* The event will contain a MAPurchaseEventData struct object. The type member object
+	* contained by the struct is #MA_PURCHASE_EVENT_VERIFY_RECEIPT.The state member object
+	* can have one of the following values:
+    * - #MA_PURCHASE_STATE_DISABLED purchase is not supported/disabled on the device.
+	* - #MA_PURCHASE_STATE_RECEIPT_VALID indicates that the transaction has been validated
+	* by the App Store / Google Play.
+	* - #MA_PURCHASE_STATE_RECEIPT_INVALID indicates that the transaction is invalid.
+	* - #MA_PURCHASE_STATE_RECEIPT_ERROR indicates that an error occurred while verifying
+	* the receipt. Check the errorCode member object for more information about the reason.
+    *
+	* \param productHandle Handle to the product that has been purchased.
+	* - #MA_PURCHASE_RES_PUBLIC_KEY_NOT_SET.
+	*/
+	void maPurchaseVerifyReceipt(final int productHandle)
+	{
+		mMoSyncPurchase.maPurchaseVerifyReceipt(productHandle);
+	}
+
+	/**
+	* Get product id using a product handle.
+	*
+	* \param productHandle Handle to the given product.
+	* \param buffer Will contain the product id.
+	* \param bufferSize Maximum size of the buffer.
+	* \return In case of error:
+	* - #MA_PURCHASE_RES_INVALID_HANDLE if productHandle is invalid.
+	* - #MA_PURCHASE_RES_BUFFER_TOO_SMALL if the given handle is too small.
+	* In case of success returns the number of written bytes.
+	*/
+	int maPurchaseGetName(
+			final int productHandle,
+			final int memBuffer,
+			final int memSize)
+	{
+		return mMoSyncPurchase.maPurchaseGetName(productHandle, memBuffer, memSize);
+	}
+
+	/**
+	* Get a field value contained by the receipt.
+	* Make sure that the given product has a valid receipt.
+	* Call the maPurchaseVerifyReceipt() syscall and wait for a #MA_PURCHASE_EVENT_RECEIPT_VALID
+	* purchase event type.
+	*
+	* \param productHandle Handle to the product that has been purchased.
+	* \param property The name of the field.
+	* \param buffer Will be filled with the filed value.
+	* \param bufferSize The maximum size of the buffer, in bytes.
+	* \return The number of written bytes into buffer(a value greater than zero), or one
+	* of the following error codes(a value smaller that zero):
+	* - #MA_PURCHASE_RES_OK if the request has been send to the store for verifying.
+	* - #MA_PURCHASE_RES_INVALID_HANDLE if the productHandle is invalid.
+	* - #MA_PURCHASE_RES_RECEIPT if the product has not been purchased.
+	* - #MA_PURCHASE_RES_DISABLED if purchase is not allowed/enabled.
+	*/
+	int maPurchaseGetField(
+			final int productHandle,
+			final String property,
+			final int memBuffer,
+			final int bufferSize)
+	{
+		return mMoSyncPurchase.maPurchaseGetField(productHandle, property, memBuffer, bufferSize);
+	}
+
+	/**
+	* Restore transactions that were previously finished so that you can process them again.
+	* For example, your application would use this to allow a user to unlock previously purchased
+	* content onto a new device.
+	*
+	* A #EVENT_TYPE_PURCHASE will be sent after calling this syscall.
+	* The event will contain a #MAPurchaseEventData struct object. The type member object
+	* contained by the struct will be #MA_PURCHASE_EVENT_RESTORE. The productHandle member object
+	* will contain a handle to the new product. Make sure you destroy the product after done
+	* working with it.
+	*/
+	void maPurchaseRestoreTransactions()
+	{
+		mMoSyncPurchase.maPurchaseRestoreTransactions();
+	}
+
+	/**
+	* Destroy a product object.
+	* \param productHandle Handle to the product to destroy.
+	* If the given handle is invalid the method does nothing.
+	*/
+	int maPurchaseDestroy(int handle)
+	{
+		return mMoSyncPurchase.maPurchaseDestroy(handle);
+	}
+
+	/**
 	 * Send the application to background.
 	 * @return
 	 */
@@ -3908,6 +4112,21 @@ public class MoSyncThread extends Thread
 		return mMoSyncAudio.maAudioInstanceCreate(audioData);
 	}
 
+	int maAudioInstanceCreateDynamic(int sampleRate, int numChannels, int bufferSize)
+	{
+		return mMoSyncAudio.maAudioInstanceCreateDynamic(sampleRate, numChannels, bufferSize);
+	}
+
+	int maAudioSubmitBuffer(int audioInstance, int mem, int memSize)
+	{
+		return mMoSyncAudio.maAudioSubmitBuffer(audioInstance, mem, memSize);
+	}
+
+	int maAudioGetPendingBufferCount(int audioInstance)
+	{
+		return mMoSyncAudio.maAudioGetPendingBufferCount(audioInstance);
+	}
+
 	int maAudioInstanceDestroy(int audioInstance)
 	{
 		return mMoSyncAudio.maAudioInstanceDestroy(audioInstance);
@@ -4017,6 +4236,43 @@ public class MoSyncThread extends Thread
 	}
 
 	/**
+	 * Activate/deactivate wake lock.
+	 * @param flag
+	 */
+	int maWakeLock(final int flag)
+	{
+		getActivity().runOnUiThread(new Runnable()
+		{
+			public void run()
+			{
+				try
+				{
+					if (MA_WAKE_LOCK_ON == flag)
+					{
+						Window w = mContext.getWindow();
+						w.setFlags(
+							WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON,
+							WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+					}
+					else
+					{
+						Window w = mContext.getWindow();
+						w.setFlags(
+							0,
+							WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+					}
+				}
+				catch(Exception ex)
+				{
+					Log.i("MoSync", "maWakeLock: Could not set wake lock.");
+					ex.printStackTrace();
+				}
+			}
+		});
+		return 1;
+	}
+
+	/**
 	 * Internal wrapper for maWidgetCreate that runs
 	 * the call in the UI thread.
 	 */
@@ -4122,6 +4378,40 @@ public class MoSyncThread extends Thread
 			widgetHandle, key, memBuffer, memBufferSize);
 	}
 
+	/**
+	 * Add an item to the Options Menu associated to a screen.
+	 * @param widgetHandle The screen handle.
+	 * @param title The title associated for the new item. Can be left null.
+	 * @param iconHandle MoSync handle to an uncompressed image resource,or:
+	 * a predefined Android icon.
+	 * @param iconPredefined Specifies if the icon is a project resource, or one of
+	 * the predefined Android icons. By default it's value is 0.
+	 * @return The index on which the menu item was added in the options menu,
+	 * or an error code otherwise.
+	 */
+	public int maWidgetScreenAddOptionsMenuItem(
+			final int widgetHandle,
+			final String title,
+			final String iconHandle,
+			final int iconPredefined)
+	{
+		return mMoSyncNativeUI.maWidgetScreenAddOptionsMenuItem(
+				widgetHandle, title, iconHandle, iconPredefined);
+	}
+
+	/**
+	 * Get the focused  screen.
+	 * @return The screen widget handle.
+	 */
+	public ScreenWidget getCurrentScreen()
+	{
+		return mMoSyncNativeUI.getCurrentScreen();
+	}
+
+	public void setCurrentScreen(int handle)
+	{
+		mMoSyncNativeUI.setCurrentScreen(handle);
+	}
 	/**
 	 * Internal wrapper for maWidgetStackScreenPush that runs
 	 * the call in the UI thread.
@@ -5035,48 +5325,89 @@ public class MoSyncThread extends Thread
 		return mMoSyncNFC == null ? IOCTL_UNAVAILABLE : mMoSyncNFC.maNFCIsReadOnly(tagHandle);
 	}
 
+	/**
+	 * Fill in an MACellInfo.
+	 * @param cellinfo Pointer to an MACellInfo struct in MoSync memory.
+	 * @return 0 on success, <0 on error.
+	 * TODO: Should there be constants for error codes? Now they are
+	 * undocumented (no documentation in maapi.idl).
+	 */
 	int maGetCellInfo(int cellinfo)
 	{
 		// Check that the Coarse Location permission is set,
-		//  otherwise the CellID request will freeze the device
-		if(!(mContext.getPackageManager().checkPermission("android.permission.ACCESS_COARSE_LOCATION",
-				mContext.getPackageName()) == PackageManager.PERMISSION_GRANTED))
+		// otherwise the CellID request will freeze the device.
+		int permission = mContext.getPackageManager().checkPermission(
+			"android.permission.ACCESS_COARSE_LOCATION",
+			mContext.getPackageName());
+		if (permission != PackageManager.PERMISSION_GRANTED)
 		{
-			return -3;
+			return -3; // Error (Permission not set).
 		}
 
 		TelephonyManager manager = (TelephonyManager)
 				mContext.getSystemService(Context.TELEPHONY_SERVICE);
-
-		// Only works with GSM type phone, no CDMA
-		if(manager.getPhoneType() != TelephonyManager.PHONE_TYPE_GSM)
+		if (null == manager)
+		{
 			return -2;
+		}
+
+		// Only works with GSM type phone, not with CDMA.
+		if (manager.getPhoneType() != TelephonyManager.PHONE_TYPE_GSM)
+		{
+			return -2;
+		}
 
 		// Get the Cell information
-		GsmCellLocation gsmcell = (GsmCellLocation) manager.getCellLocation();
-
-		if(gsmcell == null)
+		GsmCellLocation gsmCell = (GsmCellLocation) manager.getCellLocation();
+		if (null == gsmCell)
+		{
 			return -2;
+		}
 
-		int cell = gsmcell.getCid();
-		int lac = gsmcell.getLac();
+		// Get cell id and lac.
+		int cellId = gsmCell.getCid();
+		int lac = gsmCell.getLac();
 
-		// Get the mcc and mnc strings
-		String mcc_mnc = manager.getNetworkOperator();
-		if (mcc_mnc == null)
+		// Get MCC and NMC.
+		// MCC and NMC is concatenated in networkOperator.
+		// First 3 chars are MCC, remaining chars are MNC.
+		String mcc = "";
+		String mnc = "";
+		String networkOperator = manager.getNetworkOperator();
+		if (null == networkOperator)
+		{
 			return -2;
+		}
 
-		byte[] mcc = mcc_mnc.substring(0, 3).getBytes();
-		byte[] mnc = mcc_mnc.substring(3).getBytes();
+		if (networkOperator.length() > 4)
+		{
+			// Extract values.
+			mcc = networkOperator.substring(0, 3);
+			mnc = networkOperator.substring(3);
 
-		// Store everything in the correct memory location
-		ByteBuffer mem = getMemorySlice(cellinfo, 64);
-		mem.put(mcc);
+			// Guard against overflow.
+			if (mnc.length() > 7)
+			{
+				mnc = mnc.substring(0, 8);
+			}
+		}
+
+		// Store everything in the correct memory location.
+		// Size of MACellInfo is 20 bytes.
+		ByteBuffer mem;
+		// Store MCC (max 4 bytes including terminator char).
+		mem = getMemorySlice(cellinfo, 4);
+		mem.put(mcc.getBytes());
 		mem.put((byte)0);
-		mem.put(mnc);
+		// Store MNC (max 8 bytes including terminator char).
+		mem = getMemorySlice(cellinfo + 4, 8);
+		mem.put(mnc.getBytes());
 		mem.put((byte)0);
+
+		// Put lac and cellid, these are two 4 byte ints.
+		mem = getMemorySlice(cellinfo + 4 + 8, 8);
 		mem.putInt(lac);
-		mem.putInt(cell);
+		mem.putInt(cellId);
 
 		return 0;
 	}

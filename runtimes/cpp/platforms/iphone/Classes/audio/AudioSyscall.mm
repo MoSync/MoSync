@@ -1,23 +1,26 @@
-/* Copyright (C) 2011 Mobile Sorcery AB
+/*
+ Copyright (C) 2012 MoSync AB
 
- This program is free software; you can redistribute it and/or modify it under
- the terms of the GNU General Public License, version 2, as published by
- the Free Software Foundation.
+ This program is free software; you can redistribute it and/or
+ modify it under the terms of the GNU General Public License,
+ version 2, as published by the Free Software Foundation.
 
  This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
- for more details.
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ GNU General Public License for more details.
 
  You should have received a copy of the GNU General Public License
- along with this program; see the file COPYING.  If not, write to the Free
- Software Foundation, 59 Temple Place - Suite 330, Boston, MA
- 02111-1307, USA.
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ MA 02110-1301, USA.
  */
 
 #include "config_platform.h"
 #import "AudioSyscall.h"
 #import "AudioInstance.h"
+#import "AudioInstanceURL.h"
+#import "AudioInstanceDynamic.h"
 #import "AudioData.h"
 #import "iphone_helpers.h"
 
@@ -94,6 +97,13 @@ MAAudioData maAudioDataCreateFromURL(const char* mime, const char* path, int fla
 
 int maAudioDataDestroy(MAAudioData audioData)
 {
+	AudioData* data = (AudioData*) [sAudioData objectAtIndex:audioData];
+    if(!data)
+        return MA_AUDIO_ERR_INVALID_DATA;
+
+	[data release];
+	[sAudioData replaceObjectAtIndex:audioData withObject:[NSNull null]];
+
     return MA_AUDIO_ERR_OK;
 }
 
@@ -110,7 +120,25 @@ MAAudioInstance maAudioInstanceCreate(MAAudioData audioData)
 
 	MAAudioInstance handle = [sAudioInstances count];
 
-    AudioInstance* audioInstance = [[AudioInstance alloc] initWithAudioData:data andHandle:handle error:&error];
+    id<AudioInstance> audioInstance = nil;
+
+
+	NSString* filename = [data getFilename];
+	if(filename!=nil && ([filename hasPrefix:@"/"] || [filename hasPrefix:@"file://"]))
+	{
+		audioInstance = [[AudioInstanceStatic alloc] initWithAudioData:data andHandle:handle error:&error];
+	}
+	else
+	{
+		if(filename != nil)
+		{
+			audioInstance = [[AudioInstanceURL alloc] initWithAudioData:data andHandle:handle error:&error];
+		}
+		else
+		{
+			audioInstance = [[AudioInstanceStatic alloc] initWithAudioData:data andHandle:handle error:&error];
+		}
+	}
 
     if(error != MA_AUDIO_ERR_OK)
         return error;
@@ -123,7 +151,7 @@ MAAudioInstance maAudioInstanceCreate(MAAudioData audioData)
     return handle;
 }
 
-static AudioInstance* getAudioInstance(int audio)
+static id<AudioInstance> getAudioInstance(int audio)
 {
     if(audio < 0 || audio >= [sAudioInstances count])
         return nil;
@@ -133,19 +161,20 @@ static AudioInstance* getAudioInstance(int audio)
 
 int maAudioInstanceDestroy(MAAudioInstance audio)
 {
-    AudioInstance* instance = getAudioInstance(audio);
+    id<AudioInstance> instance = getAudioInstance(audio);
     if(!instance)
         return MA_AUDIO_ERR_INVALID_INSTANCE;
 
     [instance stop];
     [instance release];
+    [sAudioInstances replaceObjectAtIndex:audio withObject:[NSNull null]];
 
     return MA_AUDIO_ERR_OK;
 }
 
 int maAudioGetLength(MAAudioInstance audio)
 {
-    AudioInstance* instance = getAudioInstance(audio);
+    id<AudioInstance> instance = getAudioInstance(audio);
     if(!instance)
         return MA_AUDIO_ERR_INVALID_INSTANCE;
 
@@ -154,7 +183,7 @@ int maAudioGetLength(MAAudioInstance audio)
 
 int maAudioSetNumberOfLoops(MAAudioInstance audio, int numLoops)
 {
-    AudioInstance* instance = getAudioInstance(audio);
+    id<AudioInstance> instance = getAudioInstance(audio);
     if(!instance)
         return MA_AUDIO_ERR_INVALID_INSTANCE;
 
@@ -165,7 +194,7 @@ int maAudioSetNumberOfLoops(MAAudioInstance audio, int numLoops)
 
 int maAudioPlay(MAAudioInstance audio)
 {
-    AudioInstance* instance = getAudioInstance(audio);
+    id<AudioInstance> instance = getAudioInstance(audio);
     if(!instance)
         return MA_AUDIO_ERR_INVALID_INSTANCE;
 
@@ -177,7 +206,7 @@ int maAudioPlay(MAAudioInstance audio)
 
 int maAudioPrepare(MAAudioInstance audio, int async)
 {
-    AudioInstance* instance = getAudioInstance(audio);
+    id<AudioInstance> instance = getAudioInstance(audio);
     if(!instance)
         return MA_AUDIO_ERR_INVALID_INSTANCE;
 	if([instance isPreparing] || [instance isPrepared])
@@ -191,7 +220,7 @@ int maAudioPrepare(MAAudioInstance audio, int async)
 
 int maAudioSetPosition(MAAudioInstance audio, int milliseconds)
 {
-    AudioInstance* instance = getAudioInstance(audio);
+    id<AudioInstance> instance = getAudioInstance(audio);
     if(!instance)
         return MA_AUDIO_ERR_INVALID_INSTANCE;
 
@@ -202,7 +231,7 @@ int maAudioSetPosition(MAAudioInstance audio, int milliseconds)
 
 int maAudioGetPosition(MAAudioInstance audio)
 {
-    AudioInstance* instance = getAudioInstance(audio);
+    id<AudioInstance> instance = getAudioInstance(audio);
     if(!instance)
         return MA_AUDIO_ERR_INVALID_INSTANCE;
 
@@ -211,7 +240,7 @@ int maAudioGetPosition(MAAudioInstance audio)
 
 int maAudioSetVolume(MAAudioInstance audio, float volume)
 {
-    AudioInstance* instance = getAudioInstance(audio);
+    id<AudioInstance> instance = getAudioInstance(audio);
     if(!instance)
         return MA_AUDIO_ERR_INVALID_INSTANCE;
 
@@ -222,7 +251,7 @@ int maAudioSetVolume(MAAudioInstance audio, float volume)
 
 int maAudioStop(MAAudioInstance audio)
 {
-    AudioInstance* instance = getAudioInstance(audio);
+    id<AudioInstance> instance = getAudioInstance(audio);
     if(!instance)
         return MA_AUDIO_ERR_INVALID_INSTANCE;
 
@@ -233,11 +262,54 @@ int maAudioStop(MAAudioInstance audio)
 
 int maAudioPause(MAAudioInstance audio)
 {
-    AudioInstance* instance = getAudioInstance(audio);
+    id<AudioInstance> instance = getAudioInstance(audio);
     if(!instance)
         return MA_AUDIO_ERR_INVALID_INSTANCE;
 
     [instance pause];
 
     return MA_AUDIO_ERR_OK;
+}
+
+MAAudioInstance maAudioInstanceCreateDynamic(int sampleRate, int numChannels, int bufferSize)
+{
+    int error = MA_AUDIO_ERR_OK;
+
+	MAAudioInstance handle = [sAudioInstances count];
+
+    AudioInstanceDynamic* audioInstance = [[AudioInstanceDynamic alloc] initWithSampleRate:sampleRate numChannels:numChannels andBufferSize:bufferSize error:&error];
+
+    if(error != MA_AUDIO_ERR_OK)
+        return error;
+
+    if(audioInstance == nil)
+        return MA_AUDIO_ERR_GENERIC;
+
+    [sAudioInstances addObject:audioInstance];
+
+    return handle;
+}
+
+int maAudioGetPendingBufferCount(MAAudioInstance instance)
+{
+    id<AudioInstance> ainstance = getAudioInstance(instance);
+    if(!ainstance)
+        return MA_AUDIO_ERR_INVALID_INSTANCE;
+	if([ainstance class] != [AudioInstanceDynamic class])
+		return MA_AUDIO_ERR_INVALID_INSTANCE;
+	AudioInstanceDynamic* aid = (AudioInstanceDynamic*)ainstance;
+
+	return [aid getPendingBufferCount];
+}
+
+int maAudioSubmitBuffer(MAAudioInstance instance, const void* ptr, int numBytes)
+{
+    id<AudioInstance> ainstance = getAudioInstance(instance);
+    if(!ainstance)
+        return MA_AUDIO_ERR_INVALID_INSTANCE;
+	if([ainstance class] != [AudioInstanceDynamic class])
+        return MA_AUDIO_ERR_INVALID_INSTANCE;
+	AudioInstanceDynamic* aid = (AudioInstanceDynamic*)ainstance;
+
+	return [aid submitBufferData:ptr ofNumBytes:numBytes];
 }

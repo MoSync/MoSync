@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<!--
+* @file index.html
+*
+* Template application that provides Native UI functionality in
+* HTML5 and JavaScript.
+-->
+<html>
+<head>
+	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+	<script type="text/javascript" charset="utf-8" src="js/wormhole.js"></script>
+	<script type="text/javascript">
+		/**
+		 * Initialization.
+		 */
+		function initialize()
+		{
+			document.addEventListener("backbutton", close, true);
+			mosync.nativeui.initUI();
+		}
+
+		/**
+		 * Handle the backbutton event.
+		 */
+		function close()
+		{
+			// Close the application if the back key is pressed.
+			mosync.bridge.send(["close"]);
+		}
+
+		/**
+		 * Called by the NativeUI library when the UI is ready to
+		 * be shown. Show the main screen here.
+		 *
+		 * Here we illustrate how to add events to widgets and how to
+		 * create widgets from JavaScript code.
+		 */
+		mosync.nativeui.UIReady = function()
+		{
+			// First get the screen we want to show.
+			var mainScreen = document.getNativeElementById("mainScreen");
+			mainScreen.addEventListener("TabChanged", function(){
+
+			});
+
+			// Get an instacne of the vibrate button created in the markup.
+			var mainList = document.getNativeElementById("mainList");
+			var textLabel33 = document.getNativeElementById("textLabel33");
+			//textLabel33.setProperty("width", mosync.nativeui.screenWidth - 150);
+
+			var listViewTemplate = document.getNativeElementById("listViewTemplate");
+			for(var i= 0; i < 8;i++)
+			{
+				var newItem = listViewTemplate.clone("item" + i);
+
+				newItem.addTo("mainList", function(){
+					// Show the screen.
+					mainScreen.show();
+				});
+			}
+
+		}
+
+		/**
+		 * Number of clicks on counterButton.
+		 */
+		var clickCounter = 0;
+
+		/**
+		 * Called when counterButton is clicked.
+		 */
+		function counterButtonClicked()
+		{
+			var label = document.getNativeElementById("textLabel");
+			++clickCounter;
+			label.setProperty("text", "No. of clicks: " + clickCounter);
+		}
+	</script>
+</head>
+
+<body onload="initialize()">
+	<!-- All of the mosync.nativeui widgets should be wraped inside a
+		tag with id="NativeUI" -->
+	<div id="NativeUI">
+		<!-- The element with id="mainScreen" has two tabs with screens -->
+		<div data-widgetType="TabScreen" id="mainScreen">
+			<!-- First Screen -->
+			<div data-widgetType="Screen" id="widgetScreen" data-title="Widgets"
+				data-icon_android="img/Android_TabIconDevice.png"
+				data-icon_iOS="img/IOS_TabIconDevice.png">
+				<div data-widgetType="VerticalLayout" id="mainLayout" data-width="-1" data-height="-1">
+					<div data-widgetType="ListView" id="mainList" data-width="-1" data-height="-1">
+					</div>
+				</div>
+			</div>
+			<!-- Second Screen -->
+			<div data-widgetType="Screen" data-id="webScreen" data-title="Web"
+				data-icon_android="img/Android_TabIconWebView.png"
+				data-icon_iOS="img/IOS_TabIconWebView.png">
+				<div data-widgetType="WebView" id="webBrowser"
+					data-width="100%" data-height="100%" data-url="http://www.google.com">
+				</div>
+			</div>
+		</div>
+		<div data-widgetType="ListViewItem" id="listViewTemplate">
+			<div data-widgetType="VerticalLayout" id="mainListLayout" data-width="100%" data-height="100%">
+					<div data-widgetType="HorizontalLayout" id="listLayout1" data-width="100%" data-height="60">
+						<div widgetType="Button" id="MyButton"data-text="ClickMe" data-width="150"></div>
+						<div widgetType="Label" id="spacer1" data-text=" " data-width="20" data-fontSize="26" data-fontColor="0xFFFFFF"></div>
+						<div widgetType="Label" id="textLabel22" data-text="JavaScript" data-fontSize="26" data-fontColor="0xFFFFFF"></div>
+					</div>
+					<div data-widgetType="HorizontalLayout" id="listLayout2" data-width="100%" data-height="150">
+						<div widgetType="Label" id="textLabel11" data-text="  " data-width="150" data-fontSize="26" data-fontColor="0xFFFFFF"></div>
+						<div widgetType="Label" id="textLabel33" data-width="250" data-height="-2" data-fontSize="15" data-text=" Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin quis arcu odio. Nullam condimentum velit id nisl tempor quis vestibulum risus cursus. Aliquam vel elementum metus." data-fontColor="0xFFFFFF"></div>
+					</div>
+				</div>
+		</div>
+
+	</div>
+</body>
+</html>

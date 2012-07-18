@@ -45,22 +45,19 @@ namespace Wormhole
  *
  * Call maDestroyObject to deallocate the downloaded image.
  *
- * An instance of me will delete itself on dataDownloaded!
- * Use new to create instances of my subclasses. Do not use
- * automatic allocation.
- *
  * Example of use:
  *
  * class MyImageDownloader : public HighLevelImageDownloader
  * {
+ *   public:
  *     void onDownloadComplete(MAHandle image)
  *     {
- *         // Do something with the image.
+ *       // Do something with the image.
  *     }
  * };
  *
  * // Start download.
- * new MyDownloader().get("http://...");
+ * (new MyDownloader())->get("http://...");
  */
 class HighLevelImageDownloader : public HighLevelHttpConnection
 {

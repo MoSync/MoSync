@@ -51,6 +51,24 @@ MAKE_UIWRAPPER_LAYOUTING_IMPLEMENTATION(MoSync, UIScrollView)
 }
 @end
 
+@interface RelativeLayoutWidget (hidden)
+
+/**
+ * Set the content offset.
+ * @param value Coordinate left-top as following: "coordX-coordY".
+ * @return MAW_RES_OK in case of success, or MAW_RES_INVALID_PROPERTY_VALUE if value
+ * string does not have the desired format.
+ */
+-(int) setContentOffset:(NSString*) value;
+
+/**
+ * Get the content offset.
+ * @return Content offset as following: "coordX-coordY".
+ */
+-(NSString*) getContentOffset;
+
+@end
+
 @implementation RelativeLayoutWidget
 
 - (id)init {
@@ -70,10 +88,25 @@ MAKE_UIWRAPPER_LAYOUTING_IMPLEMENTATION(MoSync, UIScrollView)
         BOOL enabled =  [value boolValue];
 		sv.scrollEnabled = enabled;
 	}
+    else if ([key isEqualToString:@MAW_RELATIVE_LAYOUT_CONTENT_OFFSET])
+    {
+        return [self setContentOffset:value];
+    }
 	else {
 		return [super setPropertyWithKey:key toValue:value];
 	}
 	return MAW_RES_OK;
+}
+
+- (NSString*)getPropertyWithKey: (NSString*)key
+{
+    if ([key isEqualToString:@MAW_RELATIVE_LAYOUT_CONTENT_OFFSET])
+    {
+        return [[self getContentOffset] retain];
+    }
+    else {
+        return [super getPropertyWithKey:key];
+    }
 }
 
 - (void)layoutSubviews:(UIView*)_view {
@@ -94,16 +127,56 @@ MAKE_UIWRAPPER_LAYOUTING_IMPLEMENTATION(MoSync, UIScrollView)
 		if(childView.frame.origin.y < minY)
 			minY = childView.frame.origin.y;
 
-		if(childView.frame.origin.x + childView.frame.size.width > maxX)
-			maxX = childView.frame.origin.x+childView.frame.size.width;
+		if(childView.frame.origin.x + childView.bounds.size.width > maxX)
+			maxX = childView.frame.origin.x+childView.bounds.size.width;
 
-		if(childView.frame.origin.y + childView.frame.size.height > maxY)
-			maxY = childView.frame.origin.y+childView.frame.size.height;
+		if(childView.frame.origin.y + childView.bounds.size.height > maxY)
+			maxY = childView.frame.origin.y+childView.bounds.size.height;
 	}
 
 	MoSyncTouchEnabledScrollView* sv = (MoSyncTouchEnabledScrollView*)view;
 	//sv.contentSize = CGSizeMake(maxX-minX, maxY-minY);
 	sv.contentSize = CGSizeMake(maxX, maxY); // negative values aren't supported.
+}
+
+@end
+
+
+@implementation RelativeLayoutWidget (hidden)
+
+/**
+ * Set the content offset.
+ * @param value Coordinate left-top as following: "coordX-coordY".
+ * @return MAW_RES_OK in case of success, or MAW_RES_INVALID_PROPERTY_VALUE if value
+ * string does not have the desired format.
+ */
+-(int) setContentOffset:(NSString*) value
+{
+    NSArray* components = [value componentsSeparatedByString:@"-"];
+    if ([components count] != 2)
+    {
+        return MAW_RES_INVALID_PROPERTY_VALUE;
+    }
+    CGFloat xCoord = [[components objectAtIndex:0] floatValue];
+    CGFloat yCoord = [[components objectAtIndex:1] floatValue];
+    CGPoint contentOffset = CGPointMake(xCoord / getScreenScale(), yCoord / getScreenScale());
+    MoSyncTouchEnabledScrollView* scrollView = (MoSyncTouchEnabledScrollView*) view;
+    [scrollView setContentOffset:contentOffset];
+    return MAW_RES_OK;
+}
+
+/**
+ * Get the content offset.
+ * @return Content offset as following: "coordX-coordY".
+ */
+-(NSString*) getContentOffset
+{
+    MoSyncTouchEnabledScrollView* scrollView = (MoSyncTouchEnabledScrollView*) view;
+    CGPoint contentOffset = scrollView.contentOffset;
+    NSString* returnValue = [NSString stringWithFormat:@"%f-%f",
+                             contentOffset.x * getScreenScale(),
+                             contentOffset.y * getScreenScale()];
+    return returnValue;
 }
 
 @end

@@ -28,6 +28,7 @@ import com.mosync.internal.generated.IX_WIDGET;
 import com.mosync.java.android.MoSync;
 import com.mosync.nativeui.core.NativeUI;
 import com.mosync.nativeui.core.NativeUI.RootViewReplacedListener;
+import com.mosync.nativeui.ui.widgets.ScreenWidget;
 import com.mosync.nativeui.ui.widgets.Widget;
 import com.mosync.nativeui.util.AsyncWait;
 import com.mosync.nativeui.ui.custom.MoSyncOptionsDialog;
@@ -405,6 +406,45 @@ public class MoSyncNativeUI implements RootViewReplacedListener
 		{
 			return -1;
 		}
+	}
+
+	/**
+	 * Internal wrapper for maWidgetScreenAddOptionsMenuItem that
+	 * runs the call in the UI thread.
+	 */
+	public int maWidgetScreenAddOptionsMenuItem(
+			final int widgetHandle,
+			final String title,
+			final String iconHandle,
+			final int iconPredefined)
+	{
+		try
+		{
+			final AsyncWait<Integer> waiter = new AsyncWait<Integer>();
+			getActivity().runOnUiThread(new Runnable() {
+				public void run()
+				{
+					int result = mNativeUI.maWidgetScreenAddOptionsMenuItem(
+							widgetHandle, title, iconHandle,iconPredefined);
+					waiter.setResult(result);
+				}
+			});
+			return waiter.getResult();
+		}
+		catch(InterruptedException ie)
+		{
+			return -1;
+		}
+	}
+
+	public ScreenWidget getCurrentScreen()
+	{
+		return mNativeUI.getCurrentScreen();
+	}
+
+	public void setCurrentScreen(int handle)
+	{
+		mNativeUI.setCurrentScreen(handle);
 	}
 
 	/**

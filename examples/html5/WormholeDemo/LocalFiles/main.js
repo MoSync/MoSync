@@ -67,7 +67,7 @@ function captureVideo()
 }
 
 /**
- * Open the native Video Capture interface to record a single movie
+ * Open the native Capture interface to record a single image.
  */
 function captureImage()
 {

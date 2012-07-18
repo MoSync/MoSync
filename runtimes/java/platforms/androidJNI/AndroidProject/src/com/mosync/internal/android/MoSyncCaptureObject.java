@@ -1,9 +1,5 @@
 package com.mosync.internal.android;
 
-
-import android.graphics.Bitmap;
-import android.net.Uri;
-
 import com.mosync.internal.android.MoSyncCapture.CaptureType;
 
 /**
@@ -17,6 +13,22 @@ import com.mosync.internal.android.MoSyncCapture.CaptureType;
  */
 public class MoSyncCaptureObject
 {
+	/**
+	 * Capture type.
+	 */
+	private CaptureType mCaptureType;
+
+	/**
+	 * Path to captured file.
+	 */
+	private String mPath = null;
+
+	// TODO: Not used. Delete.
+	// The image uri.
+	//private Uri mUri = null;
+
+	// The image bitmap. Only for IMAGE type.
+	//public Bitmap mBitmap = null;
 
 	/**
 	 * Constructor.
@@ -37,32 +49,36 @@ public class MoSyncCaptureObject
 	}
 
 	/**
-	 * Set image Uri.
-	 * @param uri
+	 * Get the path to the captured object.
 	 */
-	public void setData(Uri uri)
+	public String getPath()
 	{
-		mUri = uri;
+		return mPath;
 	}
 
 	/**
-	 * Returns the data of this object.
+	 * Set the path to the captured object.
 	 */
-	public Uri getData()
+	public void setPath(String path)
 	{
-		return mUri;
+		mPath = path;
 	}
 
-	/************************ Class members ************************/
-	// The capture type.
-	public CaptureType mCaptureType;
-
-	// Store the path also so we won't need to query MediaSource each time.
-	public String mPath = null;
-
-	// The image uri.
-	private Uri mUri = null;
-
-	// The image bitmap. Only for IMAGE type.
-	public Bitmap mBitmap = null;
+	// TODO: Not used. Delete.
+//	/**
+//	 * Set image Uri.
+//	 * @param uri
+//	 */
+//	private void setData(Uri uri)
+//	{
+//		mUri = uri;
+//	}
+//
+//	/**
+//	 * Returns the data of this object.
+//	 */
+//	private Uri getData()
+//	{
+//		return mUri;
+//	}
 }

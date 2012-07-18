@@ -42,6 +42,7 @@ static void writeFeature(ostream& stream, bool flag, const char* feature);
 static void writeNFCDirectives(ostream& stream, const SETTINGS& s);
 static void writeNFCResource(ostream& stream, const SETTINGS& s);
 static void writeC2DMReceiver(ostream& stream, const string& packageName);
+static void writeBillingReceiver(ostream& stream);
 static string packageNameToByteCodeName(const string& packageName);
 
 void packageAndroid(const SETTINGS& s, const RuntimeInfo& ri) {
@@ -298,6 +299,9 @@ static void writeManifest(const char* filename, const SETTINGS& s, const Runtime
 
 	writeC2DMReceiver(file, packageName);
 
+	file << "\t\t<service android:name=\"com.mosync.internal.android.billing.BillingService\" />\n";
+	writeBillingReceiver(file);
+
 	file <<"\t</application>\n"
 		<<"\t<uses-sdk android:minSdkVersion=\""<<ri.androidVersion<<"\" />\n"
 		;
@@ -362,6 +366,7 @@ static void writePermissions(ostream& stream, const SETTINGS& s, const RuntimeIn
 	writePermission(stream, isPermissionSet(permissionSet, HOMESCREEN), "com.android.launcher.permission.UNINSTALL_SHORTCUT");
 	writePermission(stream, isPermissionSet(permissionSet, AUTOSTART), "android.permission.RECEIVE_BOOT_COMPLETED");
 	writePermission(stream, isPermissionSet(permissionSet, AUTOSTART_DEPRECATED), "android.permission.RECEIVE_BOOT_COMPLETED");
+	writePermission(stream, isPermissionSet(permissionSet, PHONE_CALLS), "android.permission.CALL_PHONE");
 
 	// Only add this for android 1.6 and higher.
 	if (ri.androidVersion >= 4)
@@ -394,6 +399,12 @@ static void writePermissions(ostream& stream, const SETTINGS& s, const RuntimeIn
 	string permMessage = packageName + ".permission.C2D_MESSAGE";
 	writePermission(stream, isPermissionSet(permissionSet, PUSH_NOTIFICATIONS), permMessage.c_str());
 	writePermission(stream, isPermissionSet(permissionSet, PUSH_NOTIFICATIONS), "com.google.android.c2dm.permission.RECEIVE");
+
+	// Add in-app billing only for android 1.6 and higher.
+	if (ri.androidVersion >= 4)
+	{
+		writePermission(stream, isPermissionSet(permissionSet, PURCHASE), "com.android.vending.BILLING");
+	}
 }
 static void writePermission(ostream& stream, bool flag, const char* nativePerm) {
 	if (flag) {
@@ -460,7 +471,17 @@ static void writeC2DMReceiver(ostream& stream, const string& packageName) {
 	stream << "\t\t\t</intent-filter>\n";
 	stream << "\t\t</receiver>\n";
 }
-//<<"\tpackage=\"" << packageName << "\"\n"
+
+static void writeBillingReceiver(ostream& stream) {
+	stream << "\t\t<receiver android:name=\"com.mosync.internal.android.billing.BillingReceiver\">\n";
+	stream << "\t\t\t<intent-filter>\n";
+	stream << "\t\t\t\t<action android:name=\"com.android.vending.billing.IN_APP_NOTIFY\" />\n";
+	stream << "\t\t\t\t<action android:name=\"com.android.vending.billing.RESPONSE_CODE\" />\n";
+	stream << "\t\t\t\t<action android:name=\"com.android.vending.billing.PURCHASE_STATE_CHANGED\" />\n";
+	stream << "\t\t\t</intent-filter>\n";
+	stream << "\t\t</receiver>\n";
+}
+
 static void writeMain(const char* filename, const SETTINGS& s, const RuntimeInfo& ri) {
 	ofstream file(filename, ios::binary);
 	file <<"<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"

@@ -36,7 +36,8 @@
 MainScreen::MainScreen() :
 	Screen(),
 	mMainLayout(NULL),
-	mSearchBar(NULL)
+	mSearchBar(NULL),
+	mDebugLabel(NULL)
 {
 	createMainLayout();
 
@@ -63,7 +64,13 @@ void MainScreen::createMainLayout() {
 
 	mSearchBar = new SearchBar();
 	mSearchBar->fillSpaceHorizontally();
+	mSearchBar->setPlaceholder("search");
 	mMainLayout->addChild(mSearchBar);
+
+    mDebugLabel = new Label();
+    mDebugLabel->setText("Listening to events...");
+    mDebugLabel->fillSpaceHorizontally();
+    mMainLayout->addChild(mDebugLabel);
 }
 
 /**
@@ -75,6 +82,7 @@ void MainScreen::searchBarSearchButtonClicked(SearchBar* searchBar)
     if (searchBar == mSearchBar)
     {
         printf("search bar - search button clicked");
+        mDebugLabel->setText("Search button click event received");
         mSearchBar->hideKeyboard();
     }
 }
@@ -88,6 +96,7 @@ void MainScreen::searchBarCancelButtonClicked(SearchBar* searchBar)
     if (searchBar == mSearchBar)
     {
         printf("search bar - cancel button clicked");
+        mDebugLabel->setText("Cancel button click event received");
         mSearchBar->hideKeyboard();
     }
 }

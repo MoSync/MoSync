@@ -45,22 +45,19 @@ namespace Wormhole
  *
  * Call HighLevelTextDownloader::freeData() to free the downloaded data.
  *
- * An instance of me will delete itself on dataDownloaded!
- * Use new to create instances of my subclasses. Do not use automatic
- * allocation.
- *
  * Example of use:
  *
  * class MyTextDownloader : public HighLevelTextDownloader
  * {
+ *   public:
  *     void onDownloadComplete(char* text)
  *     {
- *         // Do something with the text.
+ *       // Do something with the text.
  *     }
  * };
  *
  * // Start download.
- * new MyTextDownloader().get("http://...");
+ * (new MyTextDownloader())->get("http://...");
  */
 class HighLevelTextDownloader : public HighLevelHttpConnection
 {

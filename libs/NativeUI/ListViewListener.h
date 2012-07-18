@@ -56,6 +56,15 @@ namespace NativeUI
         virtual void listViewItemClicked(
             ListView* listView,
             ListViewItem* listViewItem) = 0;
+
+        /**
+         * This method is called when a list view item is clicked.
+         * @param listView The list view object that generated the event.
+         * @param index The index on which the list view item is positioned.
+         */
+        virtual void listViewItemClicked(
+            ListView* listView,
+            int index){};
     };
 
 } // namespace NativeUI

@@ -221,6 +221,8 @@ namespace Base
 	*/
 	int _maScreenStateEventsOnOff(int eventsOn, JNIEnv* jNIEnv, jobject jThis);
 
+	int _maWakeLock(int flag, JNIEnv* jNIEnv, jobject jThis);
+
 	int _maTextBox(const wchar* title, const wchar* inText, int outText,
 					int maxSize, int constraints, int memStart,
 					JNIEnv* jNIEnv, jobject jThis);
@@ -257,6 +259,10 @@ namespace Base
 	int _maWidgetGetProperty(int memStart, int widget, const char *property,
 								int memBuffer, int memBufferSize,
 								JNIEnv* jNIEnv, jobject jThis);
+
+	int _maWidgetScreenAddOptionsMenuItem(int widget, const char* title,
+											const char* iconPath, int iconPredefined,
+											JNIEnv* jNIEnv, jobject jThis);
 
 	int _maWidgetScreenShow(int screenWidget, JNIEnv* jNIEnv, jobject jThis);
 	int _maWidgetStackScreenPush(int stackScreenWidget, int newScreen, JNIEnv* jNIEnv, jobject jThis);
@@ -919,6 +925,30 @@ namespace Base
 
 	int _maCaptureDestroyData(MAHandle handle, JNIEnv* jNIEnv, jobject jThis);
 
+	// ********** In-APP Purchase API **********
+
+	int _maPurchaseSupported(JNIEnv* jNIEnv, jobject jThis);
+
+	int _maPurchaseCreate(MAHandle handle, const char* productID, JNIEnv* jNIEnv, jobject jThis);
+
+	int _maPurchaseSetPublicKey(const char* developerKey, JNIEnv* jNIEnv, jobject jThis);
+
+	int _maPurchaseRequest(MAHandle productHandle, int quantity, JNIEnv* jNIEnv, jobject jThis);
+
+	int _maPurchaseGetField(int memStart, MAHandle productHandle, const char* property,
+							int buffer, int bufferSize,
+							JNIEnv* jNIEnv, jobject jThis);
+
+	int _maPurchaseGetName(int memStart, MAHandle productHandle,
+						  int buffer, int bufferSize,
+						  JNIEnv* jNIEnv, jobject jThis);
+
+	int _maPurchaseVerifyReceipt(MAHandle handle, JNIEnv* jNIEnv, jobject jThis);
+
+	int _maPurchaseRestoreTransactions(JNIEnv* jNIEnv, jobject jThis);
+
+	int _maPurchaseDestroy(MAHandle handle, JNIEnv* jNIEnv, jobject jThis);
+
 	// ********** Database API **********
 
 	/**
@@ -1080,6 +1110,26 @@ namespace Base
 	//MAAudioInstance maAudioInstanceCreate(in MAAudioData audioData);
 	int _maAudioInstanceCreate(
 		int audioData,
+		JNIEnv* jNIEnv,
+		jobject jThis);
+
+	int _maAudioInstanceCreateDynamic(
+		int sampleRate,
+		int numChannels,
+		int bufferSize,
+		JNIEnv* jNIEnv,
+		jobject jThis);
+
+	int _maAudioSubmitBuffer(
+		int audioInstance,
+		int buffer,
+		int bufferSize,
+		int memStart,
+		JNIEnv* jNIEnv,
+		jobject jThis);
+
+	int _maAudioGetPendingBufferCount(
+		int audioInstance,
 		JNIEnv* jNIEnv,
 		jobject jThis);
 

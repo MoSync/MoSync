@@ -45,22 +45,19 @@ namespace Wormhole
  *
  * Call maDestroyObject to deallocate the downloaded data.
  *
- * An instance of me will delete itself on dataDownloaded!
- * Use new to create instances of my subclasses. Do not use automatic
- * allocation.
- *
  * Example of use:
  *
  * class MyBinaryDownloader : public HighLevelBinaryDownloader
  * {
+ *   public:
  *     void onDownloadComplete(MAHandle data)
  *     {
- *         // Do something with the data.
+ *       // Do something with the data.
  *     }
  * };
  *
  * // Start download.
- * new MyBinaryDownloader().get("http://...");
+ * (new MyBinaryDownloader())->get("http://...");
  */
 class HighLevelBinaryDownloader : public HighLevelHttpConnection
 {

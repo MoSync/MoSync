@@ -84,6 +84,11 @@ namespace test_mosync
         // This code will not execute when the application is reactivated
 		private MoSync.Machine machine = null;
 
+		public MoSync.Machine GetMachine()
+		{
+			return machine;
+		}
+
 		protected void InitExtensions(MoSync.Core core, MoSync.Runtime runtime)
 		{
 			try
@@ -97,17 +102,23 @@ namespace test_mosync
 
 			MoSync.ExtensionModule extMod = runtime.GetModule<MoSync.ExtensionModule>();
 			System.Reflection.Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
-			foreach (System.Reflection.Assembly a in assemblies)
-			foreach (Type t in a.GetTypes())
-				{
-					IExtensionModule extensionGroupInstance = null;
-					if (t.GetInterface("MoSync.IExtensionModule", false) != null)
-					{
-						extensionGroupInstance = Activator.CreateInstance(t) as IExtensionModule;
-						extMod.AddModule(extensionGroupInstance);
-						extensionGroupInstance.Init(core, runtime);
-					}
-				}
+            foreach (System.Reflection.Assembly a in assemblies)
+            {
+                try
+                {
+                    foreach (Type t in a.GetTypes())
+                    {
+                        IExtensionModule extensionGroupInstance = null;
+                        if (t.GetInterface("MoSync.IExtensionModule", false) != null)
+                        {
+                            extensionGroupInstance = Activator.CreateInstance(t) as IExtensionModule;
+                            extMod.AddModule(extensionGroupInstance);
+                            extensionGroupInstance.Init(core, runtime);
+                        }
+                    }
+                }
+                catch { }
+            }
 		}
 
 		private void Application_Launching(object sender, LaunchingEventArgs e)

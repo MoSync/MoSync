@@ -34,6 +34,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Shapes;
+using System.Collections.Generic;
 
 namespace MoSync
 {
@@ -53,6 +54,34 @@ namespace MoSync
             {
                 mPivot = new Microsoft.Phone.Controls.Pivot();
 
+                mApplicationBarItemsIndexes = new Dictionary<Object, int>();
+
+                //The application bar is chanded at the SelectionChanged event occurence.
+                //This allows the user to have more that one application bar / tabScreen
+                mPivot.LoadedPivotItem += new EventHandler<Microsoft.Phone.Controls.PivotItemEventArgs>(
+                    delegate(object from, Microsoft.Phone.Controls.PivotItemEventArgs target)
+                    {
+                        bool appBarVisible = (this.mChildren[(from as Microsoft.Phone.Controls.Pivot).SelectedIndex] as Screen).GetApplicationBarVisibility();
+                        if (appBarVisible)
+                        {
+                            mApplicationBar = (this.mChildren[(from as Microsoft.Phone.Controls.Pivot).SelectedIndex] as Screen).GetApplicationBar();
+                            mApplicationBar.IsVisible = true;
+                            ((Application.Current.RootVisual as Microsoft.Phone.Controls.PhoneApplicationFrame).Content as
+                                Microsoft.Phone.Controls.PhoneApplicationPage).ApplicationBar = mApplicationBar;
+                            this.SetApplicationBarVisibility(true);
+                        }
+                        else
+                        {
+                            this.SetApplicationBarVisibility(false);
+                            if (((Application.Current.RootVisual as Microsoft.Phone.Controls.PhoneApplicationFrame).Content as
+                                Microsoft.Phone.Controls.PhoneApplicationPage).ApplicationBar != null)
+                            {
+                                ((Application.Current.RootVisual as Microsoft.Phone.Controls.PhoneApplicationFrame).Content as
+                                Microsoft.Phone.Controls.PhoneApplicationPage).ApplicationBar.IsVisible = false;
+                            }
+                        }
+                    });
+
                 //Setting the content of the View property of a Screen (which is a PhoneApplicationPage)
                 //as the Pivot control
                 mPage.Children.Add(mPivot);
@@ -70,7 +99,6 @@ namespace MoSync
                     MoSync.Util.RunActionOnMainThreadSync(() =>
                         {
                             //pivotItem.Content = (child as Screen);
-
                             mPivot.Items.Add(new Microsoft.Phone.Controls.PivotItem
                             {
                                 Header = (child as Screen).getScreenTitle,

@@ -26,16 +26,19 @@
 #include "TouchHelper.h"
 #include "MoSyncMain.h"
 #include "MoSyncViewController.h"
+#import "ScreenOrientation.h"
+#import "MoSyncUISyscalls.h"
 
 @interface MoSyncUIWindow : UIWindow {
 	TouchHelper* touchHelper;
 }
 
 - (id)initWithFrame:(CGRect)rect;
-- (void) handleTouchesBegan:(NSSet *)touches;
-- (void) handleTouchesMoved:(NSSet *)touches;
-- (void) handleTouchesEnded:(NSSet *)touches;
-- (void) handleTouchesCancelled:(NSSet *)touches;
+- (void) handleTouchBegan:(UITouch *)touch;
+- (void) handleTouchMoved:(UITouch *)touch;
+- (void) handleTouchEnded:(UITouch *)touch;
+- (void) handleTouchCancelled:(UITouch *)touch;
+- (CGPoint) pointUsingOrientation:(CGPoint) originalPoint;
 @end
 
 @implementation MoSyncUIWindow
@@ -54,60 +57,41 @@
     return scale;
 }
 
-- (void) handleTouchesBegan:(NSSet *)touches
+- (void) handleTouchBegan:(UITouch *)touch
 {
 	CGFloat screenScale = [self getScreenScale];
-
-    for (UITouch *touch in touches)
-	{
-		if(touch.phase ==  UITouchPhaseBegan) {
-			CGPoint point = [touch locationInView:self];
-			int touchId = [touchHelper addTouch: touch];
-			MoSync_AddTouchPressedEvent(point.x*screenScale, point.y*screenScale, touchId);
-		}
-	}
+    CGPoint point = [touch locationInView:self];
+    point = [self pointUsingOrientation:point];
+    int touchId = [touchHelper addTouch: touch];
+    MoSync_AddTouchPressedEvent(point.x*screenScale, point.y*screenScale, touchId);
 }
 
-- (void) handleTouchesMoved:(NSSet *)touches
+- (void) handleTouchMoved:(UITouch *)touch
 {
 	CGFloat screenScale = [self getScreenScale];
-
-	for (UITouch *touch in touches)
-	{
-		if(touch.phase ==  UITouchPhaseMoved) {
-			CGPoint point = [touch locationInView:self];
-			int touchId = [touchHelper getTouchId: touch];
-			MoSync_AddTouchMovedEvent(point.x*screenScale, point.y*screenScale, touchId);
-		}
-	}
+    CGPoint point = [touch locationInView:self];
+    point = [self pointUsingOrientation:point];
+    int touchId = [touchHelper getTouchId: touch];
+    MoSync_AddTouchMovedEvent(point.x*screenScale, point.y*screenScale, touchId);
 }
 
-- (void) handleTouchesEnded:(NSSet *)touches
+- (void) handleTouchEnded:(UITouch *)touch
 {
 	CGFloat screenScale = [self getScreenScale];
-
-    for (UITouch *touch in touches)
-	{
-		if(touch.phase ==  UITouchPhaseEnded) {
-			CGPoint point = [touch locationInView:self];
-			int touchId = [touchHelper getTouchId: touch];
-			MoSync_AddTouchReleasedEvent(point.x*screenScale, point.y*screenScale, touchId);
-			[touchHelper removeTouch: touch];
-		}
-	}
+    CGPoint point = [touch locationInView:self];
+    int touchId = [touchHelper getTouchId: touch];
+    point = [self pointUsingOrientation:point];
+    MoSync_AddTouchReleasedEvent(point.x*screenScale, point.y*screenScale, touchId);
+    [touchHelper removeTouch: touch];
 }
 
-- (void) handleTouchesCancelled:(NSSet *)touches
+- (void) handleTouchCancelled:(UITouch *)touch
 {
-	for (UITouch *touch in touches)
-	{
-		if(touch.phase ==  UITouchPhaseCancelled) {
-			CGPoint point = [touch locationInView:self];
-			int touchId = [touchHelper getTouchId: touch];
-			MoSync_AddTouchReleasedEvent(point.x, point.y, touchId);
-			[touchHelper removeTouch: touch];
-		}
-	}
+    CGPoint point = [touch locationInView:self];
+    point = [self pointUsingOrientation:point];
+    int touchId = [touchHelper getTouchId: touch];
+    MoSync_AddTouchReleasedEvent(point.x, point.y, touchId);
+    [touchHelper removeTouch: touch];
 }
 
 - (void)sendEvent:(UIEvent *)event
@@ -121,30 +105,59 @@
     if (eventType == UIEventTypeTouches)
     {
         NSSet* touches = [event allTouches];
-        if ([touches count] == 0)
+        for (UITouch* touch in [touches allObjects])
         {
-            return;
-        }
-
-        UITouch *touch = [[touches allObjects] objectAtIndex:0];
-        if(touch.phase ==  UITouchPhaseBegan)
-        {
-            [self handleTouchesBegan:touches];
-        }
-        else if(touch.phase == UITouchPhaseMoved)
-        {
-            [self handleTouchesMoved:touches];
-        }
-        else if(touch.phase == UITouchPhaseCancelled)
-        {
-            [self handleTouchesCancelled:touches];
-        }
-        else if(touch.phase == UITouchPhaseEnded)
-        {
-            [self handleTouchesEnded:touches];
+            if(touch.phase ==  UITouchPhaseBegan)
+            {
+                [self handleTouchBegan:touch];
+            }
+            else if(touch.phase == UITouchPhaseMoved)
+            {
+                [self handleTouchMoved:touch];
+            }
+            else if(touch.phase == UITouchPhaseCancelled)
+            {
+                [self handleTouchCancelled:touch];
+            }
+            else if(touch.phase == UITouchPhaseEnded)
+            {
+                [self handleTouchEnded:touch];
+            }
         }
     }
 }
+
+- (CGPoint) pointUsingOrientation:(CGPoint) originalPoint
+{
+    CGPoint returnedPoint = CGPointMake(0, 0);
+    int orientation = [[ScreenOrientation getInstance] getCurrentScreenOrientation];
+    MoSyncUI* mosyncUI = getMoSyncUI();
+    IWidget* currentScreen = [mosyncUI getCurrentlyShownScreen];
+    int height = [[currentScreen getView] frame].size.height;
+    int width = [[currentScreen getView] frame].size.width;
+    switch (orientation)
+    {
+        case MA_SCREEN_ORIENTATION_PORTRAIT_UPSIDE_DOWN:
+            returnedPoint.x = width - originalPoint.x;
+            returnedPoint.y = height - originalPoint.y;
+            break;
+        case MA_SCREEN_ORIENTATION_LANDSCAPE_RIGHT:
+            returnedPoint.x = originalPoint.y;
+            returnedPoint.y = width - originalPoint.x;
+            break;
+        case MA_SCREEN_ORIENTATION_LANDSCAPE_LEFT:
+            returnedPoint.x = height - originalPoint.y;
+            returnedPoint.y = originalPoint.x;
+            break;
+        case MA_SCREEN_ORIENTATION_PORTRAIT:
+        default:
+            returnedPoint.x = originalPoint.x;
+            returnedPoint.y = originalPoint.y;
+            break;
+    }
+    return returnedPoint;
+}
+
 @end
 
 

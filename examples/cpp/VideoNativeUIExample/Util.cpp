@@ -64,10 +64,49 @@ bool isAndroid()
 	{
 		return true;
 	}
-	else
+
+	return false;
+}
+
+/**
+ * Detects if the current platform is iOS.
+ * @return true if the platform is iOS, false otherwise.
+ */
+bool isIOS()
+{
+	char platform[BUF_MAX];
+	maGetSystemProperty("mosync.device.OS", platform, BUF_MAX);
+	for (unsigned int i = 0; i < strlen(platform); i++)
 	{
-		return false;
+		platform[i] = tolower(platform[i]);
 	}
+	if (strstr(platform,"iphone") != NULL)
+	{
+		return true;
+	}
+
+	return false;
+}
+
+/**
+ * Detects if the current platform is Windows Phone.
+ * @return true if the platform is Windows Phone, false otherwise.
+ */
+bool isWindowsPhone()
+{
+	char platform[BUF_MAX];
+	maGetSystemProperty("mosync.device.OS", platform, BUF_MAX);
+	for (unsigned int i = 0; i < strlen(platform); i++)
+	{
+		platform[i] = tolower(platform[i]);
+	}
+	if (strstr(platform,"microsoft") != NULL &&
+		strstr(platform,"windows") != NULL)
+	{
+		return true;
+	}
+
+	return false;
 }
 
 /**

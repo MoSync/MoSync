@@ -424,6 +424,13 @@ static void nativePostEvent(JNIEnv* env, jobject jthis, jintArray eventBuffer)
 		event.captureData.type = intArray[1];
 		event.captureData.handle = intArray[2];
 	}
+	else if (event.type == EVENT_TYPE_PURCHASE)
+	{
+		event.purchaseData.type = intArray[1];
+		event.purchaseData.state = intArray[2];
+		event.purchaseData.productHandle = intArray[3];
+		event.purchaseData.errorCode = intArray[4];
+	}
 	else if (event.type == EVENT_TYPE_WIDGET)
 	{
 		/*
@@ -485,6 +492,7 @@ static void nativePostEvent(JNIEnv* env, jobject jthis, jintArray eventBuffer)
 		 * intArray[3] - Hook type.
 		 * intArray[4] - Handle to url data.
 		 *
+		 * WIDGET_EVENT_RATING_STAR_VALUE_CHANGED
 		 */
 
 		// Allocate the widget event data structure.
@@ -545,6 +553,23 @@ static void nativePostEvent(JNIEnv* env, jobject jthis, jintArray eventBuffer)
 		{
 			widgetEvent->hookType = intArray[3];
 			widgetEvent->urlData = intArray[4];
+		}
+		else if (widgetEventType == MAW_EVENT_RATING_BAR_VALUE_CHANGED)
+		{
+			memcpy( &widgetEvent->value, intArray + 3, sizeof(jint) );
+			widgetEvent->fromUser = intArray[4];
+		}
+		else if (widgetEventType == MAW_EVENT_RADIO_GROUP_ITEM_SELECTED)
+		{
+			widgetEvent->radioGroupItemHandle = intArray[3];
+		}
+		else if (widgetEventType == MAW_EVENT_RADIO_BUTTON_STATE_CHANGED)
+		{
+			widgetEvent->radioButtonState = intArray[3];
+		}
+		else if (widgetEventType == MAW_EVENT_OPTIONS_MENU_ITEM_SELECTED)
+		{
+			widgetEvent->optionsMenuItem = intArray[3];
 		}
 
 		event.data = (int)widgetEvent;

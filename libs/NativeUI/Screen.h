@@ -31,6 +31,7 @@ MA 02110-1301, USA.
  *
  * \brief Class that represents a visible screen. Only one screen
  * is visible at a time.
+ * For screen events see ScreenListener.
  */
 
 #ifndef NATIVEUI_SCREEN_H_
@@ -41,8 +42,12 @@ MA 02110-1301, USA.
 namespace NativeUI
 {
 
+	// Forward declaration.
+	class ScreenListener;
+
 	/**
 	 * \brief Class that represents a visible screen.
+	 * For screen events see ScreenListener.
 	 */
 	class Screen : public Widget
 	{
@@ -63,7 +68,7 @@ namespace NativeUI
 		 * tab indicator.
 		 * @param title The screen title.
 		 */
-		virtual void setTitle(const MAUtil::String& title);
+		void setTitle(const MAUtil::String& title);
 
 		/**
 		 * Set the icon of the screen. The icon is displayed
@@ -72,7 +77,7 @@ namespace NativeUI
 		 * @param imageHandle Handle to an image with the icon.
 		 * @return The result code.
 		 */
-		virtual int setIcon(const MAHandle imageHandle);
+		int setIcon(const MAHandle imageHandle);
 
 		/**
 		 * Set the main widget of the screen.
@@ -88,7 +93,7 @@ namespace NativeUI
 		 * - #MAW_RES_INVALID_LAYOUT if the widget was added to a non-layout.
 		 * - #MAW_RES_ERROR if it could not be added for some other reason.
 		 */
-		virtual int setMainWidget(Widget* widget);
+		int setMainWidget(Widget* widget);
 
 		/**
 		 * Show a screen. Only one screen at a time is visible.
@@ -97,6 +102,112 @@ namespace NativeUI
 		 */
 		virtual void show();
 
+		/**
+		 * Called just before the screen begins rotating.
+		 * Subclasses may override this method to perform additional actions
+		 * immediately prior to the rotation.
+		 */
+		virtual void orientationWillChange();
+
+		/**
+		 * Called after the screen has finished rotating.
+		 * Subclasses may override this method to perform additional actions
+		 * after the rotation.
+		 */
+		virtual void orientationDidChange();
+
+		/**
+		* Add a new menu item to the Options Menu associated to this screen.
+		* Platform: Android and WP7.
+		* Option Menus are Android specific concept. The Options Menu is launched by
+		* pressing the Menu key. The options menu is where you should include
+		* actions and other options that are relevant to the current activity
+		* context, such as "Search," "Compose email," or "Settings".
+		* When opened, the first visible portion is the icon menu, which holds
+		* up to six menu items. If your menu includes more than six items, Android
+		* places the sixth item and the rest into the overflow menu, which the user
+		* can open by selecting More. Those items do not display icons. On Windows
+		* Phone 7 the control used is the application bar.
+		*
+		* @param title The title associated for the new item.
+		*
+		* Note: On Windows phone 7, by using this function you will obtain an
+		* application bar menu item (text only)
+		*
+		* @return The index on which the menu item was added in the options menu,
+		* an error code otherwise.
+		*/
+		int Screen::addOptionsMenuItem(const MAUtil::String title);
+
+		/**
+		* Add a new menu item to the Options Menu associated to this screen.
+		* Platform: Android.
+		* Option Menus are Android specific concept. The Options Menu is launched by
+		* pressing the Menu key. The options menu is where you should include
+		* actions and other options that are relevant to the current activity
+		* context, such as "Search," "Compose email," or "Settings".
+		* When opened, the first visible portion is the icon menu, which holds
+		* up to six menu items. If your menu includes more than six items, Android
+		* places the sixth item and the rest into the overflow menu, which the user
+		* can open by selecting More. Those items do not display icons. On Windows
+		* Phone 7 the control used is the application bar.
+		*
+		* @param title The title associated for the new item. Can be left null.
+		* @param resourceIconID The resource id of an icon loaded into resources
+		*
+		* @return The index on which the menu item was added in the options menu,
+		* an error code otherwise.
+		*/
+		int Screen::addOptionsMenuItem(const MAUtil::String title, int resourceIconID);
+
+		/**
+		* Add a new menu item to the Options Menu associated to this screen.
+		* Platform: Android and WP7.
+		* Option Menus are Android specific concept. The Options Menu is launched by
+		* pressing the Menu key. The options menu is where you should include
+		* actions and other options that are relevant to the current activity
+		* context, such as "Search," "Compose email," or "Settings".
+		* When opened, the first visible portion is the icon menu, which holds
+		* up to six menu items. If your menu includes more than six items, Android
+		* places the sixth item and the rest into the overflow menu, which the user
+		* can open by selecting More. Those items do not display icons. On Windows
+		* Phone 7 the control used is the application bar.
+		*
+		* @param title The title associated for the new item. Can be left null.
+		* @param icon The id of an icon from the Android and WP7 predefined icon set,
+		* these can be found under the OptionsMenuIconConstants group, or the name of
+		* the icon file (works only for WP7).
+		* @param isPath If true, indicates that the icon is based on the path, otherwise
+		* it is one of the predefined icon constants.
+		*
+		* Note: For Windows phone 7 the option menu icons must be added under the following folder
+		* structure "/ApplicationBarIcons/". By using this function you will obtain an
+		* application bar icon button (text + icon). Note that only 4 buttons are
+		* visible on an application bar. If you exceed this limit the option menu
+		* items will be added as application bar menu items on WP7.
+		*
+		* @return The index on which the menu item was added in the options menu,
+		* an error code otherwise.
+		*/
+		int Screen::addOptionsMenuItem(
+				const MAUtil::String title, const MAUtil::String icon, bool isPath);
+
+		/**
+		 * Remove the options menu from this screen.
+		 */
+		virtual void removeOptionsMenu();
+
+        /**
+         * Add a screen event listener.
+         * @param listener The listener that will receive screen events.
+         */
+        virtual void addScreenListener(ScreenListener* listener);
+
+        /**
+         * Remove the screen event listener.
+         * @param listener The listener that receives screen events.
+         */
+        virtual void removeScreenListener(ScreenListener* listener);
 	protected:
 		/**
 		 * Protected because only subclasses should use this constructor.
@@ -104,6 +215,18 @@ namespace NativeUI
 		 * (one of the MAW_ constants).
 		 */
 		Screen(const MAUtil::String& widgetType);
+
+        /**
+         * This method is called when there is an event for this widget.
+         * It passes on the event to all widget's listeners.
+         * @param widgetEventData The data for the widget event.
+         */
+        virtual void handleWidgetEvent(MAWidgetEventData* widgetEventData);
+    private:
+        /**
+         * Array with screen listeners.
+         */
+        MAUtil::Vector<ScreenListener*> mScreenListeners;
 	};
 
 } // namespace NativeUI

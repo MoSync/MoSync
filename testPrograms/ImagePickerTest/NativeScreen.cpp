@@ -90,6 +90,10 @@ void NativeScreen::customEvent(const MAEvent& event)
 
 			setLabelText(mLabel, "Preview is available");
 		}
+		else
+		{
+			setLabelText(mLabel, "The user canceled the image selection");
+		}
 	}
 
 	// Check that the event was a click (touch) event.

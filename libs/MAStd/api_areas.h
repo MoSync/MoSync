@@ -3,10 +3,11 @@
 * \author Fredrik Eldh
 */
 
-/** \mainpage MoSync API Reference
-<center>The essential guide to MoSync syscalls and libraries</center>
+/** \mainpage MoSync C/C++ API Reference
+<center>The essential guide to MoSync C++ libraries and C functions.</center>
 <br>
-
+<center>(We also publish many useful <a href="http://www.mosync.com/documentation">user guides and tutorials</a> at our website.)</center>
+<br>
 
 
 <table style="border-color: lightgrey;">
@@ -41,19 +42,19 @@ Wormhole::WebAppMoblet, Wormhole::WebViewMessage, Wormhole::FileUtil
 \ref 	WormHoleGroup
 </td>
 <td>
-<a href="http://www.mosync.com/content/html5-javascript-wormhole"  target="_blank">User guides and online resources</a>
+<a href="http://www.mosync.com/content/html5-javascript-wormhole"  target="_blank"><strong>User guides and online resources</strong></a>
 </td>
 </tr>
 
 <tr style="background-color: rgb(53, 28, 117);">
 <td colspan="2">
-<span style="color: rgb(255, 255, 255);"><strong>MoSync-Specific Functions</strong></span>
+<span style="color: rgb(255, 255, 255);"><strong>MoSync Core Functions</strong></span>
 
 
 </td>
 
 <td>
-<span style="color: rgb(255, 255, 255);"><strong>Syscalls (maapi.h)</strong></span>
+<span style="color: rgb(255, 255, 255);"><strong>Syscalls and IOCTLs (maapi.h)</strong></span>
 </td>
 <td>
 <span style="color: rgb(255, 255, 255);"><strong>Libraries</strong></span>
@@ -133,13 +134,13 @@ MAUtil::DataHandler
 </tr>
 <tr style="background-color: rgb(11, 147, 148);">
 <td colspan="2">
-<span style="color: rgb(255, 255, 255);"><strong>Functions with MoSync interfaces</strong></span>
+<span style="color: rgb(255, 255, 255);"><strong>MoSync Device Feature APIs</strong></span>
 
 
 </td>
 
 <td>
-<span style="color: rgb(255, 255, 255);"><strong>Syscalls (maapi.h)</strong></span>
+<span style="color: rgb(255, 255, 255);"><strong>Syscalls and IOCTLs (maapi.h)</strong></span>
 </td>
 <td>
 <span style="color: rgb(255, 255, 255);"><strong>Libraries</strong></span>
@@ -369,6 +370,20 @@ maDBCursorGetColumnDouble()<br>
 
 <tr style="background-color: rgb(207, 226, 243);">
 <td>
+<strong>In-App Purchases</strong>
+</td>
+<td>Purchase products from within your application.<br>
+</td>
+<td>maPurchaseSupported(), maPurchaseCreate(), maPurchaseSetPublicKey(), maPurchaseRequest(), maPurchaseVerifyReceipt(), maPurchaseGetField(), maPurchaseSetStoreURL(), maPurchaseGetName(), maPurchaseRestoreTransactions(), maPurchaseDestroy()<br>
+</td>
+<td>\ref IAP<br>
+</td>
+<td>\ref PurchaseAPI<br>
+</td>
+</tr>
+
+<tr style="background-color: rgb(207, 226, 243);">
+<td>
 <strong>Device fonts</strong>
 </td>
 <td>Set device fonts for maDrawText(), maDrawTextW(), and for NativeUI widgets.<br>
@@ -394,11 +409,26 @@ maDBCursorGetColumnDouble()<br>
 <td><br>
 </td>
 </tr>
+
+<tr style="background-color: rgb(207, 226, 243);">
+<td>
+<strong>Sensor</strong>
+</td>
+<td>Read device sensors data.<br>
+</td>
+<td>maSensorStart(), maSensorStop()<br>
+</td>
+<td><br>
+</td>
+<td>\ref SensorAPI<br>
+</td>
+</tr>
+
 <tr style="background-color: rgb(118, 29, 88);">
-<td colspan="2"><strong><span style="color: rgb(255, 255, 255);">User Interface APIs</span></strong><strong><br>
+<td colspan="2"><strong><span style="color: rgb(255, 255, 255);">MoSync User Interface APIs</span></strong><strong><br>
 </strong></td>
 
-<td><strong><span style="color: rgb(255, 255, 255); a:link { color: white; }">Syscalls (maapi.h)</span><br>
+<td><strong><span style="color: rgb(255, 255, 255); a:link { color: white; }">Syscalls and IOCTLs (maapi.h)</span><br>
 </strong></td>
 <td><strong><span style="color: rgb(255, 255, 255);">Libraries</span><br>
 </strong></td>
@@ -411,7 +441,7 @@ maDBCursorGetColumnDouble()<br>
 </td>
 <td>Access to device specific UI system. Currently only available for Android, iOS and Windows Phone 7.<br>
 </td>
-<td>maWidgetCreate(), maWidgetDestroy(), maWidgetAddChild(), maWidgetInsertChild(), maWidgetRemoveChild(), maWidgetScreenShow(), maWidgetStackScreenPush(), maWidgetStackScreenPop(), maWidgetSetProperty(), maWidgetGetProperty()<br>
+<td>maWidgetCreate(), maWidgetDestroy(), maWidgetAddChild(), maWidgetInsertChild(), maWidgetRemoveChild(), maWidgetScreenShow(), maWidgetStackScreenPush(), maWidgetStackScreenPop(), maWidgetSetProperty(), maWidgetGetProperty(), maWidgetModalDialogShow(), maWidgetModalDialogHide(), maWidgetScreenAddOptionsMenuItem()<br>
 </td>
 <td>IX_WIDGET.h<br> NativeUI <br>
 </td>
@@ -439,7 +469,7 @@ maDBCursorGetColumnDouble()<br>
 </td>
 <td>Image, animated image, edit box, list box, screens, widgets, widget skins, input managers, etc.<br>
 </td>
-<td>maTextBox()<br>
+<td>maTextBox(), maAlert()<br>
 </td>
 <td>MAUI::EditBox, MAUI::Engine, MAUI::Font, MAUI::Image, MAUI::Label, MAUI::Layout, MAUI::ListBox, MAUI::Screen, MAUI::Widget<br>
 </td>
@@ -450,7 +480,7 @@ maDBCursorGetColumnDouble()<br>
 <td colspan="2"><strong><span style="color: rgb(255, 255, 255);">Standard C Functions</span></strong><strong><br>
 </strong></td>
 
-<td><strong><span style="color: rgb(255, 255, 255);">Syscalls (maapi.h)</span><br>
+<td><strong><span style="color: rgb(255, 255, 255);">Syscalls and IOCTLs (maapi.h)</span><br>
 </strong></td>
 <td><strong><span style="color: rgb(255, 255, 255);">Libraries</span><br>
 </strong></td>
@@ -554,7 +584,7 @@ maDBCursorGetColumnDouble()<br>
 <td colspan="2"><strong><span style="color: rgb(255, 255, 255);">Miscellaneous libraries</span></strong><strong><br>
 </strong></td>
 
-<td><strong><span style="color: rgb(255, 255, 255);">Syscalls (maapi.h)</span><br>
+<td><strong><span style="color: rgb(255, 255, 255);">Syscalls and IOCTLs (maapi.h)</span><br>
 </strong></td>
 <td><strong><span style="color: rgb(255, 255, 255);">Libraries</span><br>
 </strong></td>
