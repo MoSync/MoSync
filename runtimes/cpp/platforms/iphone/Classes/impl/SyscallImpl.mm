@@ -1782,7 +1782,7 @@ namespace Base {
 		}
 	}
 
-	SYSCALL(int, maCameraGetProperty(const char *property, char *value, int maxSize))
+	SYSCALL(int, maCameraGetProperty(const char *property, char *value, int maxSize)) //@property the property to get (string), @value will contain the value of the property when the func returns, @maxSize the size of the value buffer
 	{
 		@try {
 			NSString *propertyString = [NSString stringWithUTF8String:property];
@@ -1798,7 +1798,7 @@ namespace Base {
 				return -2;
 			}
 
-			[retval getCString:value maxLength:length encoding:NSASCIIStringEncoding];
+			[retval getCString:value maxLength:length encoding:NSASCIIStringEncoding]; //stores the cstring value of retval in value
 			[retval release];
 			[propertyString release];
 			[configurator release];
@@ -1810,8 +1810,25 @@ namespace Base {
 		}
 	}
 
+    SYSCALL(int, maCameraPreviewSize()) //should really be named maCameraGetPreviewSize since it will be a getter
+    {
+        @try {
+            CameraInfo *info = getCurrentCameraInfo(); //get the info struct belonging to the currently active camera
+            AVCaptureVideoPreviewLayer *previewLayer = info->previewLayer; //get the preview layer of the camera
+            CGRect frame = previewLayer.frame; //get the preview layer dimensions
+            //LOG("%f %f", frame.size.width, frame.size.height); //log the previewLayer.frame (find out its type)
+            int size = EXTENT((int) frame.size.width, (int) frame.size.height);
+            return size; //should return the preview size as an EXTENT
+        }
+        @catch (NSException *exception) {
+            return -1;
+        }
+    }
 
-
+    SYSCALL(int, maCameraPreviewEventConsumed())
+    {
+        return -1; //not implemented
+    }
 
     SYSCALL(int, maSensorStart(int sensor, int interval))
 	{
@@ -2024,6 +2041,8 @@ namespace Base {
 		maIOCtl_case(maCameraRecord);
 		maIOCtl_case(maCameraSetProperty);
 		maIOCtl_case(maCameraGetProperty);
+        maIOCtl_case(maCameraPreviewSize);
+        maIOCtl_case(maCameraPreviewEventConsumed);
         maIOCtl_case(maSensorStart);
         maIOCtl_case(maSensorStop);
 		maIOCtl_case(maImagePickerOpen);
