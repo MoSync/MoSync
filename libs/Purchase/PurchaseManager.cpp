@@ -107,10 +107,13 @@ namespace IAP
 	 * @param developerPublicKey Base64-encoded public key, that can be found
 	 * on the Google Play publisher account page, under Licensing & In-app
 	 * Billing panel in Edit Profile.
-	 */
-	void PurchaseManager::setPublicKey(const MAUtil::String& developerPublicKey)
+	* @return One of the next result codes:
+	* - MA_PURCHASE_RES_OK if the key was set.
+	* - MA_PURCHASE_RES_MALFORMED_PUBLIC_KEY if the key is invalid.
+	*/
+	int PurchaseManager::setPublicKey(const MAUtil::String& developerPublicKey)
 	{
-		maPurchaseSetPublicKey(developerPublicKey.c_str());
+		return maPurchaseSetPublicKey(developerPublicKey.c_str());
 	}
 
 	/**
@@ -176,7 +179,7 @@ namespace IAP
 	/**
 	 * Remove a purchase from the map that holds purchases.
 	 * The purchase will not receive custom events.
-	 * @param product The purchase that needs to be unregistered.
+	 * @param purchase The purchase that needs to be unregistered.
 	 */
 	void PurchaseManager::unregisterPurchase(Purchase* purchase)
 	{
@@ -288,6 +291,20 @@ namespace IAP
 			Purchase* purchase = mPurchaseMap[purchaseData.productHandle];
 			// Call the purchase's event handling method.
 			purchase->handlePurchaseEvent(purchaseData);
+			return;
+		}
+		// Check if the purchase exists in mSpecialProducts, and handle receipt
+		// events for refunded or restored products.
+		if ( purchaseData.type == MA_PURCHASE_EVENT_VERIFY_RECEIPT )
+		{
+			for (int i=0; i < mSpecialProducts.size(); i++)
+			{
+				if ( mSpecialProducts[i]->getHandle() == purchaseData.productHandle )
+				{
+					mSpecialProducts[i]->handlePurchaseEvent(purchaseData);
+					break;
+				}
+			}
 		}
 	}
 }

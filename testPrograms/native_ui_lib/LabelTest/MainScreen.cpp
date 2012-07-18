@@ -30,6 +30,8 @@
 
 #include "MainScreen.h"
 
+int count_clicks;
+
 /**
  * Constructor.
  */
@@ -56,6 +58,8 @@ MainScreen::~MainScreen()
  * Creates and adds main layout to the screen.
  */
 void MainScreen::createMainLayout() {
+	count_clicks = 0;
+
 	// Create and add the main layout to the screen.
 	mMainLayout = new VerticalLayout();
 	mMainLayout->setBackgroundColor(0x9BCD9B);
@@ -66,9 +70,21 @@ void MainScreen::createMainLayout() {
 
 	mLabel->setText("this is a long label!this is a long label!this is a long label!this is a long label!this is a long label!this is a long label!this is a long label!this is a long label!this is a long label!this is a long label!");
 	mLabel->setFontColor(0xFF0000);
-	mLabel->setMaxNumberOfLines(0);
+	mLabel->setMaxNumberOfLines(10);
+	mLabel->fillSpaceHorizontally();
+
+	mLabel->setHeight(200);
+	mLabel->setTextVerticalAlignment(MAW_ALIGNMENT_TOP);
+
 	int result = mLabel->getMaxNumberOfLines();
 	printf("result getMaxNumberOfLines = %d", result);
+
+	mButton = new Button();
+	mButton->setText("Vertical alignment: Top");
+	mButton->fillSpaceHorizontally();
+	mButton->addButtonListener(this);
+	mMainLayout->addChild(mButton);
+
 
 	// Print number of available fonts.
 	int fontsCount = maFontGetCount();
@@ -96,5 +112,30 @@ void MainScreen::createMainLayout() {
 	testFontLabel->setFontColor(0xFF0000);
 	testFontLabel->setFont(fontHandle);
 	mMainLayout->addChild(testFontLabel);
+}
 
+void MainScreen::buttonClicked(Widget* button)
+{
+	if(button == mButton)
+	{
+		switch(count_clicks % 3)
+		{
+		case 0:
+			mLabel->setTextVerticalAlignment(MAW_ALIGNMENT_BOTTOM);
+			mButton->setText("Vertical alignment: Bottom");
+			count_clicks = count_clicks % 3;
+			break;
+		case 1:
+			mLabel->setTextVerticalAlignment(MAW_ALIGNMENT_CENTER);
+			mButton->setText("Vertical alignment: Center");
+			count_clicks = count_clicks % 3;
+			break;
+		case 2:
+			mLabel->setTextVerticalAlignment(MAW_ALIGNMENT_TOP);
+			mButton->setText("Vertical alignment: Top");
+			count_clicks = count_clicks % 3;
+			break;
+		}
+		count_clicks++;
+	}
 }

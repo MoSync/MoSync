@@ -96,8 +96,11 @@ namespace IAP
 		 * @param developerPublicKey Base64-encoded public key, that can be found
 		 * on the Google Play publisher account page, under Licensing & In-app
 		 * Billing panel in Edit Profile.
-		 */
-		void setPublicKey(const MAUtil::String& developerPublicKey);
+		* @return One of the next result codes:
+		* - MA_PURCHASE_RES_OK if the key was set.
+		* - MA_PURCHASE_RES_MALFORMED_PUBLIC_KEY if the key is invalid.
+		*/
+		int setPublicKey(const MAUtil::String& developerPublicKey);
 
 		/**
 		 * Set the store URL used for verifying the receipt on iOS platform.
@@ -133,7 +136,7 @@ namespace IAP
 		/**
 		 * Remove a purchase from the map that holds purchases.
 		 * The purchase will not receive custom events.
-		 * @param product The purchase that needs to be unregistered.
+		 * @param purchase The purchase that needs to be unregistered.
 		 */
 		void unregisterPurchase(Purchase* purchase);
 

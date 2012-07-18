@@ -29,10 +29,15 @@
 }
 
 - (id)initWithController:(UIViewController*)_controller {
-	controller = _controller;
-	controller.title = @"";
-	view = [controller.view retain];
-	return [super init];
+    controller = _controller;
+    view = [controller.view retain];
+    self = [super init];
+    if (self)
+    {
+        controller.title = @"";
+        view.autoresizesSubviews = YES;
+    }
+	return self;
 }
 
 - (void)dealloc {

@@ -24,12 +24,12 @@ MA 02110-1301, USA.
  *
  * It is a basic example that demonstrates how to purchase
  * a product and how to get the receipt for it.
+ * @author Emma Tresanszki
  */
 
 #include <ma.h> 				// Syscalls
 #include <MAUtil/String.h>		// C++ String class
 #include <MAUtil/Moblet.h>		// Moblet class
-#include <conprint.h>			// lprintfln for logging
 
 #include <NativeUI/Widget.h>
 #include <NativeUI/Widgets.h>// Include all widgets
@@ -55,6 +55,7 @@ public:
 	NativeUIMoblet():
 		mController(NULL)
 	{
+		MAUtil::String developerKey = DEVELOPER_PUBLIC_KEY;
 		int platform = getPlatform();
 		int result = IAP::PurchaseManager::getInstance()->checkPurchaseSupported();
 		if (platform != IOS &&
@@ -71,10 +72,16 @@ public:
 		}
 		else
 		{
-			MAUtil::String developerKey = DEVELOPER_PUBLIC_KEY;
-			if ( developerKey.size() == 0 )
+			if ( platform == ANDROID && developerKey.size() == 0 )
 			{
 				maAlert("Error", "You need to set developer key in Config.h ",
+					"OK", NULL, NULL);
+			}
+			else if ( platform == ANDROID &&
+					PurchaseManager::getInstance()->setPublicKey(DEVELOPER_PUBLIC_KEY)
+						== MA_PURCHASE_RES_MALFORMED_PUBLIC_KEY )
+			{
+				maAlert("Error", "Malformed developer key in Config.h ",
 					"OK", NULL, NULL);
 			}
 			else

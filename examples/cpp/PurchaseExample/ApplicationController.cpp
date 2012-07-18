@@ -22,6 +22,7 @@
  * @brief  The controller that handles all purchase related
  * The controller is responsible for updating the UI with all
  * purchase events.
+ * @author Emma Tresanszki
  */
 
 #include <maapi.h>
@@ -41,8 +42,7 @@ mMainScreen(NULL)
 	mMainScreen->getBuyButton()->addButtonListener(this);
 	mMainScreen->getPurchasedItemList()->addListViewListener(this);
 
-	// Set Android public key.
-	PurchaseManager::getInstance()->setPublicKey(DEVELOPER_PUBLIC_KEY);
+	PurchaseManager::getInstance()->setStoreURL(sAppStoreSandboxURL);
 }
 
 /**
@@ -139,6 +139,18 @@ void ApplicationController::requestFailed(const Purchase& purchase,
 {
 	mMainScreen->productError("Purchase failed for product "
 			+ purchase.getProductId() );
+	for (int i = 0; i < mPurchases.size(); i++)
+	{
+		Purchase* purchaseObj = mPurchases[i];
+		if (purchase.getHandle() == purchaseObj->getHandle())
+		{
+			mPurchases.remove(i);
+			delete purchaseObj;
+			purchaseObj = NULL;
+			break;
+		}
+	}
+
 }
 
 /**
@@ -157,7 +169,7 @@ void ApplicationController::receiptValid(
 		// Display the dialog containing the receipt information.
 		mMainScreen->fillReceiptDialog(receipt.getAppID(), receipt.getProductID(),
 				receipt.getTransactionDate(), receipt.getTransactionID(),
-				receipt.getVersionExternalID(), receipt.getBID());
+				receipt.getBID());
 	}
 
 }

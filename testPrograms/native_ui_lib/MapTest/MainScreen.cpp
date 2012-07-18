@@ -109,6 +109,10 @@ void MainScreen::createMainLayout() {
 	printf("Map zoom level: %d", mMap->getZoomLevel());
 
 	mMainLayout->addChild(mMap);
+
+	// create the map pin
+	mMapPin = new MapPin(Location(32.3, 32.2));
+	mMapPin->setText("test");
 }
 
 /**
@@ -214,14 +218,11 @@ void MainScreen::buttonClicked(Widget* button)
 	}
 	else if (button == mAddPinToMap)
 	{
-		mMapPin = new MapPin(Location(32.3, 32.2));
-		mMapPin->setText("test");
 		mMap->addMapPin(mMapPin);
 	}
 	else if (button == mRemovePinFromMap)
 	{
 		mMap->removeMapPin(mMapPin);
-		delete mMapPin;
 	}
 	else if (button == mSetCenterButton)
 	{

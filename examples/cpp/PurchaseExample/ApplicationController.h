@@ -19,9 +19,10 @@
 /**
  * @file ApplicationController.h
  *
- * @brief  The controller that handles all purchase related
+ * @brief  The controller that handles all purchase related events.
  * The controller is responsible for updating the UI with all
  * purchase events.
+ * @author Emma Tresanszki
  */
 
 #ifndef APPLICATIONCONTROLLER_H_
@@ -33,7 +34,6 @@
 #include <Purchase/Purchase.h>
 #include <Purchase/PurchaseListener.h>
 #include <Purchase/PurchaseManager.h>
-#include <Purchase/PurchaseManagerListener.h>
 #include <Purchase/Receipt.h>
 
 using namespace NativeUI;

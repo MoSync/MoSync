@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<!--
+* @file page-camera.html
+* @author Mikael Kindborg
+*
+* This file contains the UI for the image capture and upload
+* functionality of the application.
+*
+* Actual capture/upload is done by the main application
+* object called "app", which is defined in file index.html.
+-->
+<html>
+	<head>
+		<meta name="viewport" content="width=device-width">
+		<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+		<title>Camera</title>
+		<link rel="stylesheet" href="style.css" type="text/css" media="screen" title="no title" charset="utf-8">
+		<script type="text/javascript" charset="utf-8" src="js/wormhole.js"></script>
+		<script type="text/javascript" charset="utf-8" src="mosync-extensions.js"></script>
+		<script type="text/javascript">
+		var camera = (function()
+		{
+			var camera = {};
+
+			var mFileURL = null;
+
+			/**
+			 * Open the camera ui to take a picture.
+			 */
+			camera.snapPhoto = function()
+			{
+				mosync.bridge.callJS(
+					mosync.nativeui.MAIN_WEBVIEW,
+					"app.snapPhoto()");
+			}
+
+			/**
+			 * Called wen photo is snapped.
+			 */
+			camera.setPhotoURL = function(fileURL)
+			{
+				mFileURL = fileURL;
+				var imageElement = document.getElementById('photo');
+				imageElement.src = mFileURL;
+			}
+
+			camera.uploadPhoto = function()
+			{
+				if (null == mFileURL)
+				{
+					alert("First snap a photo");
+					return;
+				}
+
+				mosync.bridge.callJS(
+					mosync.nativeui.MAIN_WEBVIEW,
+					"app.uploadPhoto('" + mFileURL + "')");
+			}
+
+			return camera;
+		})();
+		</script>
+	</head>
+	<body>
+		<div id="screen">
+			<div id="heading">Camera</div>
+			<div class="pane button" onclick="camera.snapPhoto()">Snap Photo</div>
+			<div class="pane view">
+				<img id="photo" src="img/MoSyncLogo.png" style="width:100%"/>
+			</div>
+			<div class="pane button" onclick="camera.uploadPhoto()">Upload Photo</div>
+		</div>
+	</body>
+</html>

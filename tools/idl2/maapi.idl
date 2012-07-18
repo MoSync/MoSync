@@ -1396,7 +1396,7 @@ interface MAAPI {
 		SENSOR = 33;
 
 		/**
-		* \bried The maAlert message box was dismissed by one of the available buttons.
+		* \brief The maAlert message box was dismissed by one of the available buttons.
 		* See #EVENT_TYPE_ALERT for the event.
 		*/
 		ALERT = 34;
@@ -1552,14 +1552,13 @@ interface MAAPI {
 	struct MAPurchaseEventData {
 		/**
 		* \brief Type of the purchase event.
-		* One of the \link MA_PURCHASE_EVENT_REQUEST_STATE_CHANGED MA_PURCHASE_EVENT \endlink constants.
+		* One of the \link MA_PURCHASE_EVENT_REQUEST MA_PURCHASE_EVENT \endlink constants.
 		*/
 		int type;
 
 		/**
 		* \brief State of the purchase.
 		* One of the \link MA_PURCHASE_STATE_FAILED MA_PURCHASE_STATE \endlink constants.
-		* Valid only if type is #MA_PURCHASE_EVENT_REQUEST_STATE_CHANGED.
 		*/
 		int state;
 
@@ -1570,8 +1569,8 @@ interface MAAPI {
 
 		/**
 		* \brief Reason why the puchase failed.
-		* Valid only if type is #MA_PURCHASE_EVENT_REQUEST_STATE_CHANGED and
-		* state is #MA_PURCHASE_STATE_FAILED.
+		* Valid only if the state is #MA_PURCHASE_STATE_FAILED, #MA_PURCHASE_STATE_RECEIPT_INVALID,
+		* #MA_PURCHASE_STATE_RECEIPT_ERROR or #MA_PURCHASE_STATE_RESTORE_ERROR.
 		* One of the \link MA_PURCHASE_ERROR_INVALID_HANDLE MA_PURCHASE_ERROR \endlink constants.
 		*/
 		int errorCode;
@@ -4529,12 +4528,13 @@ group WidgetAPI "Widget API" {
 
 		/**
 		* Send by current screen just before it begins rotating.
+		* Platform: iOS and Windows Phone 7.1
 		*/
 		SCREEN_ORIENTATION_WILL_CHANGE = 23;
 
 		/**
 		* Send by current screen after it finishes rotating.
-		* Sent only from the Windows Phone 7.1 platform.
+		* Platform: iOS and Windows Phone 7.1
 		*/
 		SCREEN_ORIENTATION_DID_CHANGE = 24;
 
@@ -4564,17 +4564,17 @@ group WidgetAPI "Widget API" {
 		*/
 		OPTIONS_MENU_ITEM_SELECTED = 29;
 
-		/*
+		/**
 		* @brief Sent when the zoom level of a map widget has changed (if the user zoomed in or out).
 		*/
 		MAP_ZOOM_LEVEL_CHANGED = 30;
 
-		/*
+		/**
 		* @brief Sent when the visible region on the map has changed (if the user scrolled/draged the map).
 		*/
 		MAP_REGION_CHANGED = 31;
 
-		/*
+		/**
 		 * @brief Sent when a map pin is clicked by the user.
 		 */
 		MAP_PIN_CLICKED = 32;
@@ -5055,14 +5055,19 @@ group WidgetAPI "Widget API" {
 		MODAL_DIALOG = "ModalDialog";
 
 		/**
-		* @brief A panorama control is a Windows Phone 7 specific control
+		* @brief A panorama control is a Windows Phone 7 specific control. The paroramaView is a screen container
+		*		 which may contain more then one screen. A screen can spann over the hardware screen width.
+		*		 In order to enable this you will have to set the width property of a screen to a certain value.
+		*		 For more information regarding this control please check the following link:
+		*		 http://msdn.microsoft.com/en-us/library/ff941104(v=vs.92).aspx
+		*
 		* Available only on Windows Phone 7
 		* See \ref WidgetPanoramaViewProperties "Panorama View properties" for the properties available
 		*/
 		PANORAMA_VIEW = "PanoramaView";
 
 		/**
-		* @brief A radio button available only on Android. A radio button can only have a #RADIO_GROUP parent.
+		* @brief A radio button available only on Android. A radio button can only have a \ref MAW_RADIO_GROUP parent.
 		* Checking one radio button that belongs to a radio group unchecks any previously checked radio button within the same group.
 		* Initially, all of the radio buttons are unchecked.
 		* While it is not possible to uncheck a particular radio button, the radio group can be cleared to remove the checked state.
@@ -5103,7 +5108,7 @@ group WidgetAPI "Widget API" {
 
 	/**
 	* The available constants for the Android predefined drawables used in OptionsMenu.
-	* The drawables can be set via #maWidgetScreenAddOptionsMenuItem syscall.
+	* The drawables can be set via \ref maWidgetScreenAddOptionsMenuItem syscall.
 	* The icons can be found here: http://androiddrawables.com/menu.html .
 	* Note that only these are supported on WP7:
 	*	- ADD
@@ -5349,7 +5354,7 @@ group WidgetAPI "Widget API" {
 
 		/**
 		* @brief Remove the options menu from this screen.
-		* The options menu can be added by calling #maWidgetScreenAddOptionsMenuItem for each item.
+		* The options menu can be added by calling \ref maWidgetScreenAddOptionsMenuItem for each item.
 		*
 		* @validvalue No value needed.
 		*
@@ -7740,7 +7745,7 @@ group WidgetAPI "Widget API" {
 		*/
 		NUM_STAR = "numstar";
 
-		/*
+		/**
 		* @brief Set or get the current rating (number of stars filled).
 		*
 		* @validvalue A float that specifies the number of stars filled.
@@ -7790,7 +7795,7 @@ group WidgetAPI "Widget API" {
 	*/
 	group WidgetMapProperties "Map properties" {
 	constset MAString MAW_MAP_ {
-	    /*
+	    /**
 		* @brief The api key used to access the full features of the google map (on Android platform).
 		* The iOS platform doesn't require a key.
 		*
@@ -7805,7 +7810,7 @@ group WidgetAPI "Widget API" {
 		*/
 		API_KEY_GOOGLE = "api_key_google";
 
-		/*
+		/**
 		* @brief The api key used to access the full features of the bing map (on windows phone platform).
 		*
 		* @validvalue A string containing a bing maps key. For further details on how to
@@ -7819,7 +7824,7 @@ group WidgetAPI "Widget API" {
 		*/
 		API_KEY_BING = "api_key_bing";
 
-		/*
+		/**
 		* @brief Set or get the map type.
 		*
 		* @validvalue One of the two values: MAW_MAP_TYPE_SATELLITE or MAW_MAP_TYPE_ROAD.
@@ -7834,7 +7839,7 @@ group WidgetAPI "Widget API" {
 		*/
 		TYPE = "type";
 
-		/*
+		/**
 		* @brief Sets and gets the zoom level of the map.
 		*
 		* @validvalue A integer value between 0 and 21.
@@ -7850,7 +7855,7 @@ group WidgetAPI "Widget API" {
 		*/
 		ZOOM_LEVEL = "zoom_level";
 
-		/*
+		/**
 		* @brief Disables/enables the interraction between the user and the map.
 		*
 		* @validvalue A boolean string 'true' or 'false'.
@@ -7865,7 +7870,7 @@ group WidgetAPI "Widget API" {
 		*/
 		INTERRACTION_ENABLED = "interraction_enabled";
 
-		/*
+		/**
 		* @brief Set the map center latitude coordinate.
 		*
 		* @validvalue A double value between -90.0 and 90.0.
@@ -7879,7 +7884,7 @@ group WidgetAPI "Widget API" {
 		*/
 		CENTER_LATITUDE = "center_latitude";
 
-		/*
+		/**
 		* @brief Set the map center longitude coordinate.
 		*
 		* @validvalue A double value between -180.0 and 180.0.
@@ -7893,7 +7898,7 @@ group WidgetAPI "Widget API" {
 		*/
 		CENTER_LONGITUDE = "center_longitude";
 
-		/*
+		/**
 		* @brief Set the map zoom level value.
 		*
 		* @validvalue A double value between 0 and 21.
@@ -7929,7 +7934,7 @@ group WidgetAPI "Widget API" {
 		 * @par Example
 		 * \code
 		 *   maWidgetSetProperty(mapHandle, MAW_MAP_VISIBLE_AREA_UPPER_LEFT_CORNER_LATITUDE, "-34.34234");
-		 * \code
+		 * \endcode
 		 */
 		VISIBLE_AREA_UPPER_LEFT_CORNER_LATITUDE = "visible_area_upper_left_corner_latitude";
 
@@ -7942,7 +7947,7 @@ group WidgetAPI "Widget API" {
 		 * @par Example
 		 * \code
 		 *   maWidgetSetProperty(mapHandle, MAW_MAP_VISIBLE_AREA_UPPER_LEFT_CORNER_LONGITUDE, "134.312");
-		 * \code
+		 * \endcode
 		 */
 		VISIBLE_AREA_UPPER_LEFT_CORNER_LONGITUDE = "visible_area_upper_left_corner_longitude";
 
@@ -7955,7 +7960,7 @@ group WidgetAPI "Widget API" {
 		 * @par Example
 		 * \code
 		 *   maWidgetSetProperty(mapHandle, MAW_MAP_VISIBLE_AREA_LOWER_RIGHT_CORNER_LATITUDE, "43.2322");
-		 * \code
+		 * \endcode
 		 */
 		VISIBLE_AREA_LOWER_RIGHT_CORNER_LATITUDE = "visible_area_lower_right_corner_latitude";
 
@@ -7968,11 +7973,11 @@ group WidgetAPI "Widget API" {
 		 * @par Example
 		 * \code
 		 *   maWidgetSetProperty(mapHandle, MAW_MAP_VISIBLE_AREA_LOWER_RIGHT_CORNER_LONGITUDE, "-100.2324");
-		 * \code
+		 * \endcode
 		 */
 		VISIBLE_AREA_LOWER_RIGHT_CORNER_LONGITUDE = "visible_area_lower_right_corner_longitude";
 
-		/*
+		/**
 		* @brief Used to center the map on a previously set visible area.
 		*
 		* @validvalue A boolean string 'true' or 'false'.
@@ -7992,7 +7997,7 @@ group WidgetAPI "Widget API" {
 	*/
 	group WidgetMapPinProperties "Map pin properties" {
 	constset MAString MAW_MAP_PIN_ {
-		/*
+		/**
 		* @brief Set the map pin latitude coordinate.
 		*
 		* @validvalue A double value between -90.0 and 90.0.
@@ -8006,7 +8011,7 @@ group WidgetAPI "Widget API" {
 		*/
 		LATITUDE = "latitude";
 
-		/*
+		/**
 		* @brief Set the map pin longitude coordinate.
 		*
 		* @validvalue A double value between -180.0 and 180.0.
@@ -8020,7 +8025,7 @@ group WidgetAPI "Widget API" {
 		*/
 		LONGITUDE = "longitude";
 
-		/*
+		/**
 		* @brief Set the map pin text.
 		*
 		* @validvalue A string value.
@@ -11271,13 +11276,13 @@ group CaptureAPI "Capture API" {
 
 	group CaptureAction "Capture Action" {
 		constset int MA_CAPTURE_ACTION_ {
-			/// Start the picker with video mode and stores the result in a data object.
+			/// Starts video capture.
 			/// Platform: Android and iOS.
 			RECORD_VIDEO = 0;
-			/// Stops the recording.
+			/// Stops recording.
 			/// Platform: iOS only.
 			STOP_RECORDING = 1;
-			/// Starts the picker with picture mode and  stores the picture in a data object.
+			/// Starts image capture (takes photo).
 			/// Platform: Android and iOS.
 			TAKE_PICTURE = 2;
 		}
@@ -11285,13 +11290,13 @@ group CaptureAPI "Capture API" {
 
 	group CaptureEventType "Capture Event type" {
 		constset int MA_CAPTURE_EVENT_TYPE_ {
-			/// Send after a image has been taken.
+			/// Sent after a image has been taken.
 			/// Platform: Android and iOS.
 			IMAGE = 0;
-			/// Send after a video has been taken.
+			/// Sent after a video has been taken.
 			/// Platform: Android and iOS.
 			VIDEO = 1;
-			/// Send if the user cancels taking image/video.
+			/// Sent if the user cancels taking image/video.
 			/// Platform: iOS and Android.
 			CANCEL = 2;
 		}
@@ -11345,7 +11350,23 @@ group CaptureAPI "Capture API" {
 		int maCaptureGetProperty(in MAString property, out MAString value range("bufSize"), in int bufSize);
 
 		/**
-		* \brief Perform an action on the image picker.
+		* \brief Performs a capture action.
+		*
+		* The specified action is performed and the result is delivered
+		* asynchronously in an \link #EVENT_TYPE_CAPTURE event. The content
+		* of the event is an #MACaptureEventData data structure. The type
+		* field contains the type of capture event (#MA_CAPTURE_EVENT_TYPE_IMAGE,
+		* #MA_CAPTURE_EVENT_TYPE_VIDEO, #MA_CAPTURE_EVENT_TYPE_CANCEL), and the
+		* handle field contains a handle to the capture object. Save a
+		* captured image using function #maCaptureWriteImage. Access a
+		* captured video using function #maCaptureGetVideoPath. Free the capture
+		* object using function #maCaptureDestroyData.
+		*
+		* Note: The image format for #MA_CAPTURE_EVENT_TYPE_IMAGE is JPEG on Android
+		* and PNG on iOS.
+		*
+		* Platforms: Android an iOS.
+		*
 		* \param action One of the \link #MA_CAPTURE_ACTION_TAKE_PICTURE MA_CAPTURE_ACTION \endlink constants.
 		*
 		* \returns One of the next constants:

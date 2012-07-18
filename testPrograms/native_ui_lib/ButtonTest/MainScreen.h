@@ -99,6 +99,17 @@ private:
 	Button* mButton;
 	Button* mTestFontLabel;
 	ListView* mEvents;
+
+	/**
+	 * Buttons used to test the 'isEnabled()' functionality of a button.
+	 */
+	Button* mTestEnabledButton;
+	Button* mCheckEnabledButton;
+
+	/**
+	 * Horizontal layout that contains the above buttons.
+	 */
+	HorizontalLayout* mHorizontalLayout;
 };
 
 

@@ -50,7 +50,42 @@ namespace IAP
 	class PurchaseManager;
 
 	/**
-	 *\brief The Purchase class wraps a product that can be buyed and also all
+	 *  GooglePlay reserved productID for testing static in-app billing response
+	 *  as if a purchase was made.
+	 * (testing purpose).
+	 */
+	const MAUtil::String sGooglePlayPurchasedProductId = "android.test.purchased";
+
+	/**
+	 *  GooglePlay reserved productID for testing static in-app billing response
+	 *  as if a refund was received.
+	 *  When you make an in-app billing request with this product ID, Google Play
+	 *  responds as though the purchase was refunded.
+	 * (testing purpose).
+	 */
+	const MAUtil::String sGooglePlayRefundedProductId = "android.test.refunded";
+
+	/**
+	 *  GooglePlay reserved productID for testing static in-app billing response
+	 *  as if an unavailable product tried to be purchased.
+	 *  When you make an in-app billing request with this product ID, Google Play
+	 *  responds as though the item being purchased was not listed in your
+	 *  application's product list.
+	 * (testing purpose).
+	 */
+	const MAUtil::String sGooglePlayItemUnavailableProductId = "android.test.item_unavailable";
+
+	/**
+	 *  GooglePlay reserved productID for testing static in-app billing response
+	 *  as if a purchase was canceled.
+	 *  When you make an in-app billing request with this product ID Google Play
+	 *  responds as though the purchase was canceled.
+	 * (testing purpose).
+	 */
+	const MAUtil::String sGooglePlayCanceledPurchaseProductId = "android.test.canceled";
+
+	/**
+	 *\brief The Purchase class wraps a product that can be bought and also all
 	 * the details of the transaction(such as the receipt).
 	 */
 	class Purchase

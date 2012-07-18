@@ -23,6 +23,7 @@ DirectoriesToCopyWormholeJSTo = [
   "../../../templates/HTML5 JS WebUI Project/",
   "../../../examples/html5/WormholeDemo/LocalFiles/js/",
   "../../../examples/html5/WormholeNativeUI/LocalFiles/js/",
+  "../../../examples/html5/PhotoGallery/LocalFiles/js/",
   "../../../testPrograms/PhoneGapMoSync/LocalFiles/js/",
   "../../../testPrograms/phonegap/WormholePushNotificationTest/LocalFiles/js/",
   "../../../testPrograms/JSNativeUICloneTest/LocalFiles/js/"
@@ -74,11 +75,30 @@ def copyJSFilesToMoSync
   }
 end
 
+def getMosyncVersion
+  version = "//===============================================\n"
+  version += "//This wormhole.js is compatible with\n// MoSync "
+  index = 0
+  #read the version file
+  File.readlines("../../../tools/ReleasePackageBuild/major_minor_revision.txt").each do |line|
+    if(index == 0)
+      version = version + line.strip
+      index += 1
+    elsif (index == 1)
+      version = version + "." + line.strip
+    else
+      version = version + " " + line.strip
+    end
+  end
+  version += "\n//===============================================\n"
+  return version
+end
+
 def buildWormholeJS
   fileList = FilesIncludedInWormholeJS
 
   # Create wormhole.js by concatenating all files.
-  wormholejs = ""
+  wormholejs = getMosyncVersion
   fileList.each do |fileName|
     File.open(fileName, "r") do |sourceFile|
       fileContent = sourceFile.read

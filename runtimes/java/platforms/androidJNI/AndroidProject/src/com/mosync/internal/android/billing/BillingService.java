@@ -30,7 +30,6 @@ import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.RemoteException;
-import android.text.TextUtils;
 import android.util.Log;
 
 import com.android.vending.billing.IMarketBillingService;
@@ -44,11 +43,11 @@ import com.mosync.internal.android.billing.request.RestoreTransactions;
 
 import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_RES_OUT_OF_DATE;
 import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_RES_CONNECTION_ERROR;
-import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_STATE_IN_PROGRESS;
 import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_STATE_FAILED;
-import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_EVENT_REFUNDED;
 import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_STATE_COMPLETED;
-import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_ERROR_INVALID_HANDLE;
+import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_STATE_PRODUCT_REFUNDED;
+import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_RES_MALFORMED_PUBLIC_KEY;
+import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_RES_OK;
 import static com.mosync.internal.android.MoSyncHelpers.SYSLOG;
 
 /**
@@ -88,17 +87,20 @@ public class BillingService extends Service implements ServiceConnection
 	/**
 	 * Compute your public key (that you got from the Android Market publisher site).
 	 * @param developerPublicKey the Base64 encoded key.
+	 * @return MA_PURCHASE_RES_MALFORMED_PUBLIC_KEY or MA_PURCHASE_RES_OK.
 	 */
-	public void setPublicKey(final String developerPublicKey)
+	public int setPublicKey(final String developerPublicKey)
 	{
 		try
 		{
 			mPublicKey = Security.generatePublicKey(developerPublicKey);
 			mIsPublicKeySet = true;
+			return MA_PURCHASE_RES_OK;
 		} catch (Exception ex)
 		{
 			SYSLOG("maPurchaseSetPublicKey: malformed developerPublicKey");
 			mPublicKey = null;
+			return MA_PURCHASE_RES_MALFORMED_PUBLIC_KEY;
 		}
 	}
 
@@ -177,9 +179,6 @@ public class BillingService extends Service implements ServiceConnection
      */
     private void checkResponseCode(long requestId, int responseCode)
     {
-		// TODO delete log
-		Log.e("@@MoSync","BillingService checkResponseCode --------- responseCode = " + responseCode);
-		Log.e("@@MoSync","BillingService checkResponseCode --------- requestID = " + requestId);
 		// Get the request object from the sent list.
 		BaseRequest request = mSentRequests.get(requestId);
 
@@ -353,8 +352,6 @@ public class BillingService extends Service implements ServiceConnection
         purchases = Security.verifyPurchase(mPublicKey, signedData, signature);
         if ( purchases != null )
         {
-			// TODO delete log
-            Log.e("@@MoSync","onPurchaseStateChange verified " + purchases.size() + " purchases!!");
             ArrayList<String> notifyList = new ArrayList<String>();
             for (PurchaseInformation purchaseObj : purchases)
             {
@@ -363,24 +360,26 @@ public class BillingService extends Service implements ServiceConnection
                     notifyList.add(purchaseObj.mNotificationID);
                 }
 
-                if ( purchaseObj.getState() == MA_PURCHASE_STATE_COMPLETED )
-						//purchaseObj.getHandle() != MA_PURCHASE_ERROR_INVALID_HANDLE )
-                {
-					PurchaseManager.onTransactionInformationReceived(purchaseObj);
-
-                    // Notify the user with the transaction details, and only
-					// after that confirmNotifications.
-                    if (!notifyList.isEmpty())
-                    {
-                        String[] notifyIds = notifyList.toArray(new String[notifyList.size()]);
-                        confirmNotifications(startId, notifyIds);
-                    }
-                    mPurchaseRequestInProgress = false;
-                }
-                // Check if the product was restored.
-                else if ( purchaseObj.getState() == MA_PURCHASE_EVENT_REFUNDED ) // if (mRestoringTransactions)
+                // Check if the product was restored, or refunded.
+                if ( mRestoringTransactions )
                 {
 					PurchaseManager.onPurchaseRestored(purchaseObj);
+					mRestoringTransactions = false;
+                }
+                else if ( purchaseObj.getState() == MA_PURCHASE_STATE_PRODUCT_REFUNDED )
+                {
+					PurchaseManager.onPurchaseRefunded(purchaseObj);
+                }
+                else if ( purchaseObj.getState() == MA_PURCHASE_STATE_COMPLETED )
+                {
+					PurchaseManager.onTransactionInformationReceived(purchaseObj);
+                }
+                // Notify the user with the transaction details, and only
+				// after that confirmNotifications.
+                if (!notifyList.isEmpty())
+                {
+                    String[] notifyIds = notifyList.toArray(new String[notifyList.size()]);
+                    confirmNotifications(startId, notifyIds);
                 }
             }
         }
@@ -410,9 +409,11 @@ public class BillingService extends Service implements ServiceConnection
     public RestoreTransactions restoreTransactions()
     {
 		RestoreTransactions request = new RestoreTransactions(mService);
+		mRestoringTransactions = true;
 		request.runRequest();
 		if ( request.getRequestID() == Consts.BILLING_RESPONSE_INVALID_REQUEST_ID )
 		{
+			mRestoringTransactions = false;
 			return null;
 		}
 
@@ -576,4 +577,9 @@ public class BillingService extends Service implements ServiceConnection
      */
     private static HashMap<Long, BaseRequest> mSentRequests =
         new HashMap<Long, BaseRequest>();
+
+    /**
+     * Keeps track of restoreTransaction requests that are in progress.
+     */
+    private boolean mRestoringTransactions = false;
 }
