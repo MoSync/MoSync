@@ -79,16 +79,15 @@
                                         screenSize.size.width,
                                         screenSize.size.height - NAVIGATION_BAR_HEIGHT)];
         [bigView addSubview:smallView];
-        view = smallView;
+        self.view = smallView;
         [bigView release];
 
 	}
 	else {//The Popover code for iPad
 		//First, replace the default vanilla view with MoSyncPopoverView
-		[view release];
-		view = [[MoSyncPopoverView alloc] initWithFrame:CGRectMake(0, 0, 10, 10)];
-		controller.view = view;
-		[(MoSyncPopoverView*)view setWidget:self];
+		self.view = [[[MoSyncPopoverView alloc] initWithFrame:CGRectMake(0, 0, 10, 10)] autorelease];
+		controller.view = self.view;
+		[(MoSyncPopoverView*)self.view setWidget:self];
 		//Default position is on the top left corner
 		top = 0;
 		left = 0;
@@ -98,9 +97,9 @@
 		[self setPropertyWithKey:@MAW_WIDGET_HEIGHT toValue:@"450"];
 		dismissable = YES;
 		direction = UIPopoverArrowDirectionAny;
-		autoSizeParamX = FIXED_SIZE;
-		autoSizeParamY = FIXED_SIZE;
-		view.backgroundColor = [UIColor whiteColor];
+        self.autoSizeWidth = WidgetAutoSizeFixed;
+        self.autoSizeHeight = WidgetAutoSizeFixed;
+		self.view.backgroundColor = [UIColor whiteColor];
 		//The navigation controller is needed for the title bar to appear
 		container = [[UINavigationController alloc] initWithRootViewController:controller];
 		popoverController = [[UIPopoverController alloc] initWithContentViewController:container];
@@ -115,18 +114,18 @@
 
 - (int)show {
 	if (UIUserInterfaceIdiomPhone == UI_USER_INTERFACE_IDIOM()) {//Show a Modal View for iPhone
-		int viewWidth = view.frame.size.width;
-        int viewHeight = view.frame.size.height;
+		int viewWidth = self.view.frame.size.width;
+        int viewHeight = self.view.frame.size.height;
 
-        for (IWidget *child in children)
+        for (IWidget *child in _children)
         {
-            UIView* childView = [child getView];
+            UIView* childView = [child view];
             [childView setFrame:CGRectMake(0, 0, viewWidth, viewHeight)];
 
             [child layout];
         }
 
-        [view setNeedsLayout];
+        [self.view setNeedsLayout];
 
         MoSyncUI* mosyncUI = getMoSyncUI();
         [mosyncUI showModal:(UINavigationController*)mModalViewController];
@@ -137,43 +136,43 @@
 		//if the popover should wrap to the content, try to find the correct size
 		int newWidth = 0;
 		int newHeight = 0;
-		for (IWidget *child in children)
+		for (IWidget *child in _children)
 		{
 			[child show];
-			if ([self getAutoSizeParamX] == WRAP_CONTENT) {
-				int childWidth = [child getView].frame.origin.x + [child getView].frame.size.width;
+			if (self.autoSizeWidth == WidgetAutoSizeWrapContent) {
+				int childWidth = [child view].frame.origin.x + [child view].frame.size.width;
 				if(childWidth > newWidth){
 					newWidth = childWidth;
 				}
 			}
-			if ([self getAutoSizeParamY] == WRAP_CONTENT) {
-				int childHeight = [child getView].frame.origin.y + [child getView].frame.size.height;
+			if (self.autoSizeWidth == WidgetAutoSizeWrapContent) {
+				int childHeight = [child view].frame.origin.y + [child view].frame.size.height;
 				if(childHeight > newHeight){
 					newHeight = childHeight;
 				}
 			}
 		}
 
-		int viewHeight = view.frame.size.height;
-		int viewWidth = view.frame.size.width;
+		int viewHeight = self.view.frame.size.height;
+		int viewWidth = self.view.frame.size.width;
 
-		if([self getAutoSizeParamX] == WRAP_CONTENT) {
+		if(self.autoSizeWidth == WidgetAutoSizeWrapContent) {
 			viewWidth = newWidth;
 		}
-		if([self getAutoSizeParamY] == WRAP_CONTENT) {
+		if(self.autoSizeHeight == WidgetAutoSizeWrapContent) {
 			viewHeight = newHeight;
 		}
 
-		[view setFrame:CGRectMake(view.frame.origin.x, view.frame.origin.y, viewWidth, viewHeight)];
+		[self.view setFrame:CGRectMake(self.view.frame.origin.x, self.view.frame.origin.y, viewWidth, viewHeight)];
 		//At this point it should have the correct size
-		controller.contentSizeForViewInPopover = view.frame.size;
+		controller.contentSizeForViewInPopover = self.view.frame.size;
 
 		//The screen that was active when the popover was shown
 		IWidget* shownScreen = [getMoSyncUI() getCurrentlyShownScreen];
 
 		//Show the popover
 		[popoverController presentPopoverFromRect:CGRectMake(left,top,0,0)
-										   inView:[shownScreen getView]
+										   inView:[shownScreen view]
 						 permittedArrowDirections:direction
 										 animated:YES];
 	}
@@ -247,7 +246,7 @@
 			if ([key isEqualToString:@MAW_WIDGET_WIDTH] || [key isEqualToString:@MAW_WIDGET_HEIGHT]) {
 				//If the user changed the height, we need to change the popover again,
 				//because it might already be shown on screen
-				[popoverController setPopoverContentSize:view.frame.size animated:YES];
+				[popoverController setPopoverContentSize:self.view.frame.size animated:YES];
 			}
 		}
 	}

@@ -15,86 +15,93 @@
  02111-1307, USA.
  */
 
-// If the value is negative it returns MAW_RES_INVALID_PROPERTY_VALUE constant.
-#define TEST_FOR_NEGATIVE_VALUE(value) if (0 > value)\
-                                       {\
-                                            return  MAW_RES_INVALID_PROPERTY_VALUE; \
-                                       }
-
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
+
 #import "AbstractLayoutView.h"
 #import "Syscall.h"
+#include "WidgetUtils.h"
 
 namespace Base {
     UIFont* getUIFontObject(MAHandle fontHandle);
 };
 
-typedef enum {
-	FIXED_SIZE,
-	FILL_PARENT,
-	WRAP_CONTENT
-} AutoSizeParam;
+@interface IWidget : NSObject
+{
+    @protected
+    /**
+     * Contains view's subviews.
+     */
+	NSMutableArray* _children;
 
-@interface IWidget : NSObject {
-	UIView* view;
-	int handle;
+    @private
+    /**
+     * Widget's represention on iOS platform.
+     */
+    UIView* _view;
 
-	IWidget* parent;
-	NSMutableArray* children;
+    /**
+     * Widget's parent.
+     * If the widget doesn't have an parent this value will be nil.
+     * A widget can have only one parent.
+     */
+    IWidget* _parent;
 
-	AutoSizeParam autoSizeParamX;
-	AutoSizeParam autoSizeParamY;
+    /**
+     * Widget's handle.
+     * It must be set after creating the widget.
+     * After that its value should not be modified.
+     */
+    MAHandle _handle;
 
+    /**
+     * Auto size enum for width.
+     */
+    WidgetAutoSizeType _autoSizeWidth;
+
+    /**
+     * Auto size enum for height.
+     */
+    WidgetAutoSizeType _autoSizeHeight;
 }
 
-// this generates a wrapper that routes the layoutSubviews and sizeThatFits commands to an IWidget
-// make sure not to call the IWidget::view.layoutSubviews or IWidget::view.sizeThatFits from the function  but the super* functions..
-#define MAKE_UIWRAPPER_LAYOUTING_IMPLEMENTATION(MoSyncName, UIViewName) \
-@interface MoSyncName ## UIViewName : UIViewName {\
-IWidget* mWidget;\
-}\
-- (void)setWidget:(IWidget*)widget;\
-- (void)layoutSubviews;\
-- (void)superLayoutSubviews;\
-- (CGSize)sizeThatFits:(CGSize)size;\
-@end\
-@implementation MoSync##UIViewName \
-- (void)setWidget:(IWidget*)widget { \
-	mWidget = widget; \
-}\
-- (void)layoutSubviews {\
-	[mWidget layoutSubviews:self];\
-}\
-- (CGSize)sizeThatFits:(CGSize)size {\
-	return [mWidget sizeThatFitsFor:(UIView*)self withSize:size];\
-}\
-- (void)superLayoutSubviews {\
-	[super layoutSubviews];\
-}\
-- (CGSize)superSizeThatFits:(CGSize)size {\
-	return [super sizeThatFits:size];\
-}\
-@end\
+@property(nonatomic, retain) UIView* view;
+@property(nonatomic, retain) IWidget* parent;
+@property(nonatomic, assign) MAHandle handle;
+@property(nonatomic, setter = setWidth:, getter = width) CGFloat width;
+@property(nonatomic, setter = setHeight:, getter = height) CGFloat height;
+@property(nonatomic, setter = setSize:, getter = size) CGSize size;
+@property(nonatomic, assign) WidgetAutoSizeType autoSizeWidth;
+@property(nonatomic, assign) WidgetAutoSizeType autoSizeHeight;
+@property(nonatomic, setter = setOriginX:, getter = originX) CGFloat originX;
+@property(nonatomic, setter = setOriginY:, getter = originY) CGFloat originY;
 
-- (void)setAutoSizeParamX:(AutoSizeParam)x andY:(AutoSizeParam)y;
-- (AutoSizeParam)getAutoSizeParamX;
-- (AutoSizeParam)getAutoSizeParamY;
+/**
+ * Set widget's auto size width and height values.
+ * @param autoSizeWidth Width auto size value to set.
+ * @param autoSizeHeight Height auto size value to set.
+ */
+-(void) setAutoSizeWidth:(WidgetAutoSizeType)autoSizeWidth
+                  height:(WidgetAutoSizeType)autoSizeHeight;
 
-// override this if you want a special behaviour...
-- (void)layoutSubviews:(UIView*)view;
-- (CGSize)sizeThatFitsFor:(UIView*)view withSize:(CGSize)size;
+/**
+ * Adds an widget to the end of the children list.
+ * Override this method to provide functionality.
+ * The overrided method should verify if the widget can have children or not.
+ * @param child Widget to be added.
+ * @return MAW_RES_INVALID_LAYOUT.
+ */
+- (int)addChild:(IWidget*)child;
 
-- (void)setParent:(IWidget*) parent;
-- (IWidget*)getParent;
-- (void)setWidgetHandle:(int) handle;
-- (int)getWidgetHandle;
-- (void)dealloc;
-- (id)init;
-- (UIView*)getView;
+/**
+ * Adds an widget to the end of the children list.
+ * It does not check if the widget can have children.
+ * @param child Widget to be added.
+ * @param toSubview If true child's view will be added as subview, otherwise
+ * it only be added to a list.
+ */
+- (void)addChild: (IWidget*)child toSubview:(BOOL)toSubview;
 
-- (void)addChild: (IWidget*)child;
-- (void)addChild: (IWidget*)child toSubview:(bool)toSubview;
 - (int)insertChild: (IWidget*)child atIndex:(NSNumber*)index toSubview:(bool)addSubview;
 - (int)insertChild: (IWidget*)child atIndex:(NSNumber*)index;
 
@@ -109,7 +116,27 @@ IWidget* mWidget;\
 // if you implement this make sure you pass ownership to the caller.
 - (NSString*)getPropertyWithKey: (NSString*)key;
 
+/**
+ * Recalculate its and children size.
+ * If needed and possible the parent will be resized too.
+ */
 - (void)layout;
+
+/**
+ * Layout its children size.
+ * This method should be called by the class generated by widget layouting macro.
+ * @param view The view that requested the operation.
+ */
+-(void) layoutSubviews:(UIView*) view;
+
+/**
+ * Asks the widget to calculate and return the size that best fits its subviews.
+ * An IWidget object should not have children so the returned value will be the size
+ * that fits itself.
+ * Override this method if your widget can have children and calculate their size.
+ * @return The size that best fits itself.
+ */
+- (CGSize)sizeThatFitsForWidget;
 
 /**
  * Send a widget event type.
@@ -119,5 +146,21 @@ IWidget* mWidget;\
 
 // when a root screen is shown, this will be called recursively for all widgets.
 - (void)show;
+
+/**
+ * Setter for MAW_WIDGET_WIDTH.
+ * @param value MAW_CONSTANT_FILL_AVAILABLE_SPACE, MAW_CONSTANT_WRAP_CONTENT or
+ * an int value greater or equal to zero.
+ * @return MAW_RES_OK if the width was set, otherwise MAW_RES_INVALID_PROPERTY_VALUE.
+ */
+-(int) setWidthProperty:(NSString*) value;
+
+/**
+ * Setter for MAW_WIDGET_HEIGHT.
+ * @param value MAW_CONSTANT_FILL_AVAILABLE_SPACE, MAW_CONSTANT_WRAP_CONTENT or
+ * an int value greater or equal to zero.
+ * @return MAW_RES_OK if the height was set, otherwise MAW_RES_INVALID_PROPERTY_VALUE.
+ */
+-(int) setHeightProperty:(NSString*) value;
 
 @end

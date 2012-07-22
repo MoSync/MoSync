@@ -28,10 +28,11 @@
  */
 - (id)init
 {
-    if (!view)
+    self = [super init];
+    if (self)
     {
         UIPickerView* numberPicker = [[UIPickerView alloc] init];
-        view = numberPicker;
+        self.view = numberPicker;
 
         [numberPicker setDelegate:self];
         [numberPicker setDataSource:self];
@@ -39,9 +40,11 @@
 
         mMaxValue = 0;
         mMinValue = 0;
+        [numberPicker release];
+        numberPicker = NULL;
     }
 
-    return [super init];
+    return self;
 }
 
 /**
@@ -52,7 +55,7 @@
  */
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value
 {
-    UIPickerView* numberPicker = (UIPickerView*) view;
+    UIPickerView* numberPicker = (UIPickerView*) self.view;
     int paramValue = [value intValue];
 
     if ([key isEqualToString:@MAW_NUMBER_PICKER_MIN_VALUE])
@@ -101,7 +104,7 @@
  */
 - (NSString*)getPropertyWithKey: (NSString*)key
 {
-    UIPickerView* numberPicker = (UIPickerView*) view;
+    UIPickerView* numberPicker = (UIPickerView*) self.view;
 
     if([key isEqualToString:@MAW_NUMBER_PICKER_MIN_VALUE])
     {
@@ -162,7 +165,7 @@
 	MAWidgetEventData *eventData = new MAWidgetEventData;
 	eventData->eventType = MAW_EVENT_NUMBER_PICKER_VALUE_CHANGED;
     eventData->numberPickerValue = (mMinValue + row);
-	eventData->widgetHandle = handle;
+	eventData->widgetHandle = self.handle;
 
     event.data = (int)eventData;
     Base::gEventQueue.put(event);

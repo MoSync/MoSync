@@ -35,7 +35,8 @@
  */
 - (id)init
 {
-    if (!view)
+    self = [super init];
+    if (self)
     {
         mMoviePlayerController = [[MPMoviePlayerController alloc] init];
 
@@ -43,8 +44,8 @@
         UIView* smallView = [[UIView alloc] initWithFrame:viewRect];
 
         [mMoviePlayerController.view setFrame: smallView.bounds];
-        view = smallView;
-        [view addSubview:mMoviePlayerController.view];
+        self.view = smallView;
+        [self.view addSubview:mMoviePlayerController.view];
         [mMoviePlayerController setScalingMode:MPMovieScalingModeAspectFit];
 
         [[NSNotificationCenter defaultCenter] addObserver:self
@@ -61,7 +62,7 @@
                                                    object:mMoviePlayerController];
     }
 
-    return [super init];
+    return self;
 }
 
 /**
@@ -116,7 +117,7 @@
              [key isEqualToString:@MAW_WIDGET_HEIGHT])
     {
         [super setPropertyWithKey:key toValue:value];
-        [mMoviePlayerController.view setFrame: view.bounds];
+        [mMoviePlayerController.view setFrame: self.view.bounds];
     }
     else if ([key isEqualToString:@MAW_VIDEO_VIEW_SEEK_TO])
     {
@@ -220,7 +221,7 @@
         MAWidgetEventData *eventData = new MAWidgetEventData;
         eventData->eventType = MAW_EVENT_VIDEO_STATE_CHANGED;
         eventData->videoViewState = MAW_VIDEO_VIEW_STATE_FINISHED;
-        eventData->widgetHandle = handle;
+        eventData->widgetHandle = self.handle;
 
         event.data = (int)eventData;
         Base::gEventQueue.put(event);
@@ -273,7 +274,7 @@
 
             MAWidgetEventData *eventData = new MAWidgetEventData;
             eventData->eventType = MAW_EVENT_VIDEO_STATE_CHANGED;
-            eventData->widgetHandle = handle;
+            eventData->widgetHandle = self.handle;
             eventData->videoViewState = playbackStateEvent;
 
             event.data = (int)eventData;
@@ -300,7 +301,7 @@
             MAWidgetEventData *eventData = new MAWidgetEventData;
             eventData->eventType = MAW_EVENT_VIDEO_STATE_CHANGED;
             eventData->videoViewState = MAW_VIDEO_VIEW_STATE_SOURCE_READY;
-            eventData->widgetHandle = handle;
+            eventData->widgetHandle = self.handle;
 
             event.data = (int)eventData;
             Base::gEventQueue.put(event);

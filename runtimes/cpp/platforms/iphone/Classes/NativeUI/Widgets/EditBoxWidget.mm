@@ -32,13 +32,14 @@
         textField = [[UITextField alloc] initWithFrame:CGRectMake(0, 10, 100, 30)];
         textField.borderStyle = UITextBorderStyleRoundedRect;
 
-        view = textField;
-        [view setUserInteractionEnabled:YES];
-        view.contentMode = UIViewContentModeRedraw;
-        view.autoresizesSubviews = NO;
+        self.view = textField;
+        [self.view setUserInteractionEnabled:YES];
+        self.view.contentMode = UIViewContentModeRedraw;
+        self.view.autoresizesSubviews = NO;
         [textField setOpaque:NO];
 
-        [self setAutoSizeParamX:WRAP_CONTENT andY:WRAP_CONTENT];
+        self.autoSizeWidth = WidgetAutoSizeWrapContent;
+        self.autoSizeHeight = WidgetAutoSizeWrapContent;
         textField.delegate = self;
         [textField addTarget:self action:@selector(textChanged) forControlEvents:UIControlEventEditingChanged];
         mMaxTextLength = INT_MAX;

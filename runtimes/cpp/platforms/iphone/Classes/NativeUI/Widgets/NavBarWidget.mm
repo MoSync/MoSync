@@ -25,17 +25,23 @@
 @implementation NavBarWidget
 
 - (id)init {
-	UINavigationBar* navbar = [[UINavigationBar alloc] initWithFrame:CGRectMake(0, 0, 100, 44)];
-	navbar.delegate = self;
-	prevNavitem = [[UINavigationItem alloc] init];
-	currNavitem = [[UINavigationItem alloc] init];
-	[navbar pushNavigationItem:prevNavitem animated:false];
-	[navbar pushNavigationItem:currNavitem animated:false];
-	view = navbar;
+    self = [super init];
+    if (self)
+    {
+        UINavigationBar* navbar = [[UINavigationBar alloc] initWithFrame:CGRectMake(0, 0, 100, 44)];
+        navbar.delegate = self;
+        prevNavitem = [[UINavigationItem alloc] init];
+        currNavitem = [[UINavigationItem alloc] init];
+        [navbar pushNavigationItem:prevNavitem animated:false];
+        [navbar pushNavigationItem:currNavitem animated:false];
+        self.view = navbar;
 
-	id ret = [super init];
-	[self setAutoSizeParamX:FILL_PARENT andY:WRAP_CONTENT];
-	return ret;
+        self.autoSizeWidth = WidgetAutoSizeWrapContent;
+        self.autoSizeHeight = WidgetAutoSizeWrapContent;
+        [navbar release];
+        navbar = NULL;
+    }
+	return self;
 }
 
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value {
@@ -54,7 +60,7 @@
         // The background color property must be handled different.
         // For the rest of the widgets the property is handled by
         // the super class(IWidget).
-        UINavigationBar* navBar = (UINavigationBar*) view;
+        UINavigationBar* navBar = (UINavigationBar*) self.view;
         UIColor* color = [UIColor colorWithHexString:value];
 		if (!color)
         {
@@ -84,7 +90,7 @@
 	event.type = EVENT_TYPE_WIDGET;
 	MAWidgetEventData *eventData = new MAWidgetEventData;
 	eventData->eventType = MAW_EVENT_CLICKED;
-	eventData->widgetHandle = handle;
+	eventData->widgetHandle = self.handle;
 	event.data = (int)eventData;
 	Base::gEventQueue.put(event);
 	return false;

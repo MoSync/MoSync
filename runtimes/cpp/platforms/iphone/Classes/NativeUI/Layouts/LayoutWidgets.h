@@ -35,23 +35,68 @@ typedef enum {
 } LinearLayoutOrientation;
 
 @interface LinearLayoutBase : IWidget {
-	LinearLayoutOrientation orientation;
+    /**
+     * Layout's orientation.
+     */
+	LinearLayoutOrientation _orientation;
 
 }
 
-- (id)init:(LinearLayoutOrientation)ori;
-- (void)layoutSubviews:(UIView*)_view;
+/**
+ * Init function.
+ * @param orientation Layout's orientation.
+ */
+-(id)init:(LinearLayoutOrientation)orientation;
+
+/**
+ * Adds an widget to the end of the children list.
+ * @param child Widget to be added.
+ * @return MAW_RES_OK.
+ */
+-(int)addChild:(IWidget*)child;
+
+/**
+ * Layout its subviews.
+ * Called from view's layoutSubview method.
+ * @param view UIView object that triggered the layout event.
+ */
+-(void)layoutSubviews:(UIView*)view;
+
+/**
+ * Layout subviews for horizontal layout widget.
+ */
+-(void)horizontalLayout;
+
+/**
+ * Layout subviews for vertical layout widget.
+ */
+-(void)verticalLayout;
+
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value;
-- (NSString*)getPropertyWithKey: (NSString*)key;
 
 @end
 
 @interface HorizontalLayoutWidget : LinearLayoutBase {
 }
 - (id)init;
+
+/**
+ * Asks the layout to calculate and return the size that best fits its subviews.
+ * @return The size that best fits its subviews.
+ */
+- (CGSize)sizeThatFitsForWidget;
+
 @end
 
 @interface VerticalLayoutWidget : LinearLayoutBase {
 }
+
 - (id)init;
+
+/**
+ * Asks the layout to calculate and return the size that best fits its subviews.
+ * @return The size that best fits its subviews.
+ */
+- (CGSize)sizeThatFitsForWidget;
+
 @end

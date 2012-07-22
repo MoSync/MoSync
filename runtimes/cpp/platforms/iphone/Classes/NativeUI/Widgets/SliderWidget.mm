@@ -34,17 +34,20 @@
  */
 - (id)init
 {
-    if(!view)
+    self = [super init];
+    if(self)
     {
         UISlider* slider = [[UISlider alloc] init];
-        view = slider;
+        self.view = slider;
         [slider addTarget:self action:@selector(valueChanged:) forControlEvents:UIControlEventTouchDragInside];
+        [slider release];
+        slider = NULL;
     }
 
     mMaxValue = DEFAULT_MAXIMUM_VALUE;
     mProgressValue = DEFAULT_MINIMUM_VALUE;
 
-    return [super init];
+    return self;
 }
 
 /**
@@ -55,7 +58,7 @@
  */
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value
 {
-    UISlider* slider = (UISlider*) view;
+    UISlider* slider = (UISlider*) self.view;
     float paramValue = [value floatValue];
 
     if([key isEqualToString:@MAW_SLIDER_MAX])
@@ -153,7 +156,7 @@
  */
 -(void) valueChanged:(id) sender
 {
-    UISlider* slider = (UISlider*) view;
+    UISlider* slider = (UISlider*) self.view;
     mProgressValue = [slider value];
 
     MAEvent event;
@@ -162,7 +165,7 @@
 	MAWidgetEventData *eventData = new MAWidgetEventData;
 	eventData->eventType = MAW_EVENT_SLIDER_VALUE_CHANGED;
     eventData->sliderValue = (int) mProgressValue;
-	eventData->widgetHandle = handle;
+	eventData->widgetHandle = self.handle;
 
     event.data = (int)eventData;
     Base::gEventQueue.put(event);

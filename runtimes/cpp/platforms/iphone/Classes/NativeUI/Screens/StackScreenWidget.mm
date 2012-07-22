@@ -63,7 +63,7 @@
 	event.type = EVENT_TYPE_WIDGET;
 	MAWidgetEventData *eventData = new MAWidgetEventData;
 	eventData->eventType = MAW_EVENT_STACK_SCREEN_POPPED;
-	eventData->widgetHandle = handle;
+	eventData->widgetHandle = self.handle;
 	if(fromViewController != NULL)
 		eventData->fromScreen = (MAWidgetHandle)fromViewController.view.tag;
 	else
@@ -101,9 +101,9 @@
 	[navigationController pushViewController:[screen getController] animated:YES];
 	[stack addObject:child];
 	int navBarHeight = navigationController.toolbar.bounds.size.height;
-    int viewWidth = view.frame.size.width;
-	int viewHeight = view.frame.size.height - navBarHeight;
-	UIView* childView = [screen getView];
+    int viewWidth = self.view.frame.size.width;
+	int viewHeight = self.view.frame.size.height - navBarHeight;
+	UIView* childView = [screen view];
 	[childView setFrame:CGRectMake(0, 0, viewWidth, viewHeight)];
 	[child show];
 }
@@ -140,12 +140,12 @@
 - (void)layout {
 	UINavigationController* navigationController = (UINavigationController*)controller;
 	int navBarHeight = navigationController.toolbar.bounds.size.height;
-    int viewWidth = view.frame.size.width;
-	int viewHeight = view.frame.size.height - navBarHeight;
-	[view setNeedsLayout];
+    int viewWidth = self.view.frame.size.width;
+	int viewHeight = self.view.frame.size.height - navBarHeight;
+	[self.view setNeedsLayout];
 	for (IWidget *child in stack)
     {
-		UIView* childView = [child getView];
+		UIView* childView = [child view];
 		[childView setFrame:CGRectMake(0, 0, viewWidth, viewHeight)];
         [child layout];
 	}

@@ -87,19 +87,23 @@ typedef enum VerticalAlignment {
 @implementation LabelWidget
 
 - (id)init {
-	UILabel* label = [[UILabelWithVerticalAlignment alloc] initWithFrame:CGRectMake(0, 0, 200, 60)];
-	label.opaque = NO;
-	view = label;
-	//label.numberOfLines = 0;
-	id ret = [super init];
-	[self setAutoSizeParamX:WRAP_CONTENT andY:WRAP_CONTENT];
-    isWidthWrapContent = true;
-	return ret;
+    self = [super init];
+    if (self)
+    {
+        UILabel* label = [[UILabelWithVerticalAlignment alloc] initWithFrame:CGRectMake(0, 0, 200, 60)];
+        label.opaque = NO;
+        self.view = label;
+
+        self.autoSizeWidth = WidgetAutoSizeWrapContent;
+        self.autoSizeHeight = WidgetAutoSizeWrapContent;
+        isWidthWrapContent = true;
+    }
+	return self;
 }
 
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value {
 	if([key isEqualToString:@MAW_LABEL_TEXT]) {
-		UILabel* label = (UILabel*) view;
+		UILabel* label = (UILabel*) self.view;
 		[label setText: value];
 		if (isWidthWrapContent)
 		{
@@ -113,12 +117,12 @@ typedef enum VerticalAlignment {
 	}
 	else if([key isEqualToString:@MAW_LABEL_MAX_NUMBER_OF_LINES]) {
         TEST_FOR_NEGATIVE_VALUE([value intValue]);
-		UILabel* label = (UILabel*) view;
+		UILabel* label = (UILabel*) self.view;
 		label.numberOfLines = [value intValue];
 		[self layout];
 	}
 	else if([key isEqualToString:@MAW_LABEL_TEXT_HORIZONTAL_ALIGNMENT]) {
-		UILabel* label = (UILabel*) view;
+		UILabel* label = (UILabel*) self.view;
 		if([value isEqualToString:@"left"]) {
 			label.textAlignment = UITextAlignmentLeft;
 		}
@@ -133,7 +137,7 @@ typedef enum VerticalAlignment {
         }
 	}
 	else if([key isEqualToString:@MAW_LABEL_TEXT_VERTICAL_ALIGNMENT]) {
-		UILabelWithVerticalAlignment* label = (UILabelWithVerticalAlignment*) view;
+		UILabelWithVerticalAlignment* label = (UILabelWithVerticalAlignment*) self.view;
 		if([value isEqualToString:@"top"]) {
 			[label setVerticalAlignment:VerticalAlignmentTop];
 		}
@@ -148,13 +152,13 @@ typedef enum VerticalAlignment {
         }
 	}
 	else if([key isEqualToString:@MAW_LABEL_FONT_COLOR]) {
-		UILabel* label = (UILabel*) view;
+		UILabel* label = (UILabel*) self.view;
 		UIColor* color = [UIColor colorWithHexString:value];
 		if(!color) return MAW_RES_INVALID_PROPERTY_VALUE;
 		label.textColor = color;
 	}
 	else if([key isEqualToString:@MAW_LABEL_FONT_SIZE]) {
-		UILabel* label = (UILabel*) view;
+		UILabel* label = (UILabel*) self.view;
 		float fontSize = [value floatValue];
         UIFont* currentFont = label.font;
         NSString* currentFontName = [currentFont fontName];
@@ -164,7 +168,7 @@ typedef enum VerticalAlignment {
 	}
     else if([key isEqualToString:@MAW_LABEL_FONT_HANDLE])
     {
-		UILabel* label = (UILabel*) view;
+		UILabel* label = (UILabel*) self.view;
 		UIFont* font = Base::getUIFontObject([value intValue]);
         if (!font)
         {
@@ -196,10 +200,10 @@ typedef enum VerticalAlignment {
 
 - (NSString*)getPropertyWithKey: (NSString*)key {
 	if([key isEqualToString:@MAW_LABEL_TEXT]) {
-		UILabel* label = (UILabel*) view;
+		UILabel* label = (UILabel*) self.view;
 		return [label.text retain];
 	} else if([key isEqualToString:@MAW_LABEL_MAX_NUMBER_OF_LINES]) {
-		UILabel* label = (UILabel*) view;
+		UILabel* label = (UILabel*) self.view;
         return [[[NSNumber numberWithInt: label.numberOfLines] stringValue] retain];
 	} else {
 		return [super getPropertyWithKey:key];

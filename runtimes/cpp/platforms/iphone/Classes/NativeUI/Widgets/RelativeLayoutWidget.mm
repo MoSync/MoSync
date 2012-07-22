@@ -19,9 +19,7 @@
 #include <helpers/cpp_defs.h>
 #include <helpers/CPP_IX_WIDGET.h>
 
-MAKE_UIWRAPPER_LAYOUTING_IMPLEMENTATION(MoSync, UIScrollView)
-
-@interface MoSyncTouchEnabledScrollView : MoSyncUIScrollView {
+@interface MoSyncTouchEnabledScrollView : UIScrollView {
 @private
 }
 @end
@@ -72,19 +70,22 @@ MAKE_UIWRAPPER_LAYOUTING_IMPLEMENTATION(MoSync, UIScrollView)
 @implementation RelativeLayoutWidget
 
 - (id)init {
-    MoSyncTouchEnabledScrollView* scrollView = [[MoSyncTouchEnabledScrollView alloc] initWithFrame:CGRectMake(0, 0, 100, 60)];
-	view = scrollView;
-    scrollView.scrollEnabled = NO;
-    scrollView.userInteractionEnabled = YES;
-	[scrollView setWidget:self];
-	id ret = [super init];
-
-    return ret;
+    self = [super init];
+    if (self)
+    {
+        MoSyncTouchEnabledScrollView* scrollView = [[MoSyncTouchEnabledScrollView alloc] initWithFrame:CGRectMake(0, 0, 100, 60)];
+        self.view = scrollView;
+        scrollView.scrollEnabled = NO;
+        scrollView.userInteractionEnabled = YES;
+        [scrollView release];
+        scrollView = NULL;
+    }
+    return self;
 }
 
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value {
 	if([key isEqualToString:@MAW_RELATIVE_LAYOUT_SCROLLABLE]) {
-		MoSyncTouchEnabledScrollView* sv = (MoSyncTouchEnabledScrollView*)view;
+		MoSyncTouchEnabledScrollView* sv = (MoSyncTouchEnabledScrollView*) self.view;
         BOOL enabled =  [value boolValue];
 		sv.scrollEnabled = enabled;
 	}
@@ -115,11 +116,10 @@ MAKE_UIWRAPPER_LAYOUTING_IMPLEMENTATION(MoSync, UIScrollView)
 	int minY = 0xffffff;
 	int maxY =  -0xffffff;
 
-	[super layoutSubviews:_view];
 
-	for (IWidget *child in children)
+	for (IWidget *child in _children)
     {
-		UIView* childView = [child getView];
+		UIView* childView = [child view];
 
 		if(childView.frame.origin.x < minX)
 			minX = childView.frame.origin.x;
@@ -134,7 +134,7 @@ MAKE_UIWRAPPER_LAYOUTING_IMPLEMENTATION(MoSync, UIScrollView)
 			maxY = childView.frame.origin.y+childView.bounds.size.height;
 	}
 
-	MoSyncTouchEnabledScrollView* sv = (MoSyncTouchEnabledScrollView*)view;
+	MoSyncTouchEnabledScrollView* sv = (MoSyncTouchEnabledScrollView*)self.view;
 	//sv.contentSize = CGSizeMake(maxX-minX, maxY-minY);
 	sv.contentSize = CGSizeMake(maxX, maxY); // negative values aren't supported.
 }
@@ -160,7 +160,7 @@ MAKE_UIWRAPPER_LAYOUTING_IMPLEMENTATION(MoSync, UIScrollView)
     CGFloat xCoord = [[components objectAtIndex:0] floatValue];
     CGFloat yCoord = [[components objectAtIndex:1] floatValue];
     CGPoint contentOffset = CGPointMake(xCoord / getScreenScale(), yCoord / getScreenScale());
-    MoSyncTouchEnabledScrollView* scrollView = (MoSyncTouchEnabledScrollView*) view;
+    UIScrollView* scrollView = (UIScrollView*) self.view;
     [scrollView setContentOffset:contentOffset];
     return MAW_RES_OK;
 }
@@ -171,7 +171,7 @@ MAKE_UIWRAPPER_LAYOUTING_IMPLEMENTATION(MoSync, UIScrollView)
  */
 -(NSString*) getContentOffset
 {
-    MoSyncTouchEnabledScrollView* scrollView = (MoSyncTouchEnabledScrollView*) view;
+    UIScrollView* scrollView = (UIScrollView*) self.view;
     CGPoint contentOffset = scrollView.contentOffset;
     NSString* returnValue = [NSString stringWithFormat:@"%f-%f",
                              contentOffset.x * getScreenScale(),

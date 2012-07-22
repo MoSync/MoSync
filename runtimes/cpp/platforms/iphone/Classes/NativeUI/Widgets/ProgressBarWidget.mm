@@ -32,10 +32,10 @@
  */
 - (id)init
 {
-    if(!view)
+    self = [super init];
+    if(self)
     {
-        //UIProgressView* progressView = [[UIProgressView alloc] init];
-        view = [[UIProgressView alloc] initWithProgressViewStyle: UIProgressViewStyleBar];
+        self.view = [[[UIProgressView alloc] initWithProgressViewStyle: UIProgressViewStyleBar] autorelease];
     }
 
     mMaxValue = DEFAULT_MAXIMUM_VALUE;
@@ -52,7 +52,7 @@
  */
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value
 {
-    UIProgressView* progressView = (UIProgressView*) view;
+    UIProgressView* progressView = (UIProgressView*) self.view;
     float paramValue = [value floatValue];
 
     if([key isEqualToString:@MAW_PROGRESS_BAR_MAX])

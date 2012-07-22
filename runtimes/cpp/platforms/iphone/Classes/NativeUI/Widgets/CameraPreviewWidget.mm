@@ -28,14 +28,18 @@
 
 @synthesize previewLayer;
 
-- (id)init {
-
-	view=[[UIPreview alloc] initWithCameraWidget:self];
-
+- (id)init
+{
+    self = [super init];
+    if (self)
+    {
+        self.view = [[[UIPreview alloc] initWithCameraWidget:self] autorelease];
+    }
 	return [super init];
 }
 
-- (void)dealloc {
+- (void)dealloc
+{
     [super dealloc];
 }
 
@@ -59,7 +63,7 @@
 
 - (void)showViewAgain{
 	//Give the UI system some time to hide the view before wee show it again
-	[view performSelector:@selector(showAgain) withObject:nil afterDelay:0.1];
+	[self.view performSelector:@selector(showAgain) withObject:nil afterDelay:0.1];
 }
 
 

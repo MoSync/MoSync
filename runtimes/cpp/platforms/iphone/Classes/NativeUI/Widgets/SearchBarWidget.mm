@@ -29,7 +29,7 @@
 	event.type = EVENT_TYPE_WIDGET;
 	MAWidgetEventData *eventData = new MAWidgetEventData;
 	eventData->eventType = MAW_EVENT_CLICKED;
-	eventData->widgetHandle = handle;
+	eventData->widgetHandle = self.handle;
 	eventData->searchBarButton = 0;
 	event.data = (int)eventData;
 	Base::gEventQueue.put(event);
@@ -41,7 +41,7 @@
 	event.type = EVENT_TYPE_WIDGET;
 	MAWidgetEventData *eventData = new MAWidgetEventData;
 	eventData->eventType = MAW_EVENT_CLICKED;
-	eventData->widgetHandle = handle;
+	eventData->widgetHandle = self.handle;
 	eventData->searchBarButton = 1;
 	event.data = (int)eventData;
 	Base::gEventQueue.put(event);
@@ -49,18 +49,20 @@
 
 
 - (id)init {
-	searchBar = [[UISearchBar alloc] initWithFrame:CGRectMake(0, 10, 100, 30)];
-	searchBar.placeholder = @"Search";
+    self = [super init];
+    if (self)
+    {
+        searchBar = [[UISearchBar alloc] initWithFrame:CGRectMake(0, 10, 100, 30)];
+        searchBar.placeholder = @"Search";
 
+        self.view = searchBar;
 
-	view = searchBar;
-	id ret = [super init];
-	[searchBar setAutoresizingMask:UIViewAutoresizingFlexibleWidth|UIViewAutoresizingFlexibleHeight];
-	view.autoresizesSubviews = YES;
-	searchBar.showsCancelButton = YES;
-	searchBar.delegate = self;
-
-	return ret;
+        [searchBar setAutoresizingMask:UIViewAutoresizingFlexibleWidth|UIViewAutoresizingFlexibleHeight];
+        self.view.autoresizesSubviews = YES;
+        searchBar.showsCancelButton = YES;
+        searchBar.delegate = self;
+    }
+	return self;
 }
 
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value {
@@ -91,4 +93,9 @@
 	return [super getPropertyWithKey:key];
 }
 
+-(void) dealloc
+{
+    [searchBar release];
+    [super dealloc];
+}
 @end

@@ -22,41 +22,43 @@
 #include <helpers/CPP_IX_WIDGET.h>
 #include <base/Syscall.h>
 
-MAKE_UIWRAPPER_LAYOUTING_IMPLEMENTATION(MoSync, UITableViewCell)
-
 // String constant used to create UITableViewCell objects.
 NSString* const kTableCellReuseIdentifier = @"SimpleTableIdentifier";
 
 @implementation ListViewItemWidget
 
 - (id)init {
-	MoSyncUITableViewCell *cell = nil;
-	cell = [[MoSyncUITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault
-							   reuseIdentifier:kTableCellReuseIdentifier];
-	[cell setWidget:self];
-	cell.selectionStyle =  UITableViewCellSelectionStyleNone;
-	view = cell;
-	[self setPropertyWithKey:@"backgroundColor" toValue:@"00000000"];
-	return [super init];
+    self = [super init];
+    if (self)
+    {
+        UITableViewCell *cell = nil;
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault
+                                            reuseIdentifier:kTableCellReuseIdentifier];
+        cell.selectionStyle =  UITableViewCellSelectionStyleNone;
+        self.view = cell;
+        [cell release];
+        cell = NULL;
+    }
+	return self;
 }
 
 - (void)addChild: (IWidget*)child {
 //	[super addChild:child];
-	UITableViewCell *cell = (UITableViewCell*)view;
-	[cell.contentView addSubview: [child getView]];
+	UITableViewCell *cell = (UITableViewCell*)self.view;
+	[cell.contentView addSubview: [child view]];
 	[super addChild:child toSubview:NO];
 }
 
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value {
 	if([key isEqualToString:@MAW_LIST_VIEW_ITEM_TEXT]) {
-		UITableViewCell* cell = (UITableViewCell*) view;
+		UITableViewCell* cell = (UITableViewCell*) self.view;
 		UILabel* label = cell.textLabel;
 		label.text = value;
 		[self layout];
 	}
     else if ([key isEqualToString:@MAW_LIST_VIEW_ITEM_FONT_HANDLE])
     {
-        UITableViewCell* cell = (UITableViewCell*) view;
+        UITableViewCell* cell = (UITableViewCell*) self.view;
 		UILabel* label = cell.textLabel;
         UIFont* font = Base::getUIFontObject([value intValue]);
         if (!font)
@@ -69,13 +71,13 @@ NSString* const kTableCellReuseIdentifier = @"SimpleTableIdentifier";
 	else if([key isEqualToString:@MAW_LIST_VIEW_ITEM_ICON]) {
 		int imageHandle = [value intValue];
 		if(imageHandle<=0) return MAW_RES_INVALID_HANDLE;
-		UITableViewCell* cell = (UITableViewCell*) view;
+		UITableViewCell* cell = (UITableViewCell*) self.view;
 		UIImageView* imageView = cell.imageView;
 		Surface* imageResource = Base::gSyscall->resources.get_RT_IMAGE(imageHandle);
 		imageView.image = [UIImage imageWithCGImage:imageResource->image];
 	}
 	else if([key isEqualToString:@MAW_WIDGET_BACKGROUND_COLOR]) {
-		UITableViewCell *cell = (UITableViewCell*)view;
+		UITableViewCell *cell = (UITableViewCell*)self.view;
 		UIColor* color = [UIColor colorWithHexString:value];
 		if(!color) return MAW_RES_INVALID_PROPERTY_VALUE;
 
@@ -84,7 +86,7 @@ NSString* const kTableCellReuseIdentifier = @"SimpleTableIdentifier";
 		cell.accessoryView.backgroundColor = color;
 	}
     else if([key isEqualToString:@MAW_LIST_VIEW_ITEM_ACCESSORY_TYPE]) {
-		UITableViewCell *cell = (UITableViewCell*)view;
+		UITableViewCell *cell = (UITableViewCell*) self.view;
 
 		if([value isEqualToString:@"hasChildren"]) {
 			cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
@@ -104,7 +106,7 @@ NSString* const kTableCellReuseIdentifier = @"SimpleTableIdentifier";
 	}
     else if([key isEqualToString:@MAW_LIST_VIEW_ITEM_FONT_COLOR])
     {
-        UITableViewCell* cell = (UITableViewCell*) view;
+        UITableViewCell* cell = (UITableViewCell*) self.view;
 		UILabel* label = cell.textLabel;
         UIColor* color = [UIColor colorWithHexString:value];
 		if(!color)
@@ -115,7 +117,7 @@ NSString* const kTableCellReuseIdentifier = @"SimpleTableIdentifier";
     }
     else if([key isEqualToString:@MAW_LIST_VIEW_ITEM_FONT_SIZE])
     {
-        UITableViewCell* cell = (UITableViewCell*) view;
+        UITableViewCell* cell = (UITableViewCell*) self.view;
 		UILabel* label = cell.textLabel;
 		float fontSize = [value floatValue];
         UIFont* currentFont = label.font;

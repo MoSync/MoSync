@@ -30,8 +30,8 @@
 	for (UIViewController *child in tabBarController.viewControllers)
     {
 		if(child == viewController) {
-			if(index >= [children count]) return;
-			controllerHandle = [[children objectAtIndex:index] getWidgetHandle];
+			if(index >= [_children count]) return;
+			controllerHandle = [[_children objectAtIndex:index] handle];
 			break;
 		}
 		index++;
@@ -41,7 +41,7 @@
 	event.type = EVENT_TYPE_WIDGET;
 	MAWidgetEventData *eventData = new MAWidgetEventData;
 	eventData->eventType = MAW_EVENT_TAB_CHANGED;
-	eventData->widgetHandle = handle;
+	eventData->widgetHandle = self.handle;
 	eventData->tabIndex = index;
 	event.data = (int)eventData;
 	Base::gEventQueue.put(event);
@@ -115,20 +115,20 @@
 - (void)layout {
 	UITabBarController* tabBarController = (UITabBarController*)controller;
 	float tabBarHeight = tabBarController.tabBar.bounds.size.height;
-	float viewWidth = view.bounds.size.width;
-	float viewHeight = view.bounds.size.height - tabBarHeight;
+	float viewWidth = self.view.bounds.size.width;
+	float viewHeight = self.view.bounds.size.height - tabBarHeight;
 
-    CGRect tabBarRect = CGRectMake(view.frame.origin.x,
+    CGRect tabBarRect = CGRectMake(self.view.frame.origin.x,
                                    viewHeight,
                                    viewWidth,
                                    tabBarHeight);
     tabBarController.tabBar.frame = tabBarRect;
 
-	[view setNeedsLayout];
+	[self.view setNeedsLayout];
 
-	for (IWidget *child in children)
+	for (IWidget *child in _children)
     {
-		UIView* childView = [child getView];
+		UIView* childView = [child view];
 		[childView setFrame:CGRectMake(0, 0, viewWidth, viewHeight)];
 
 		[child layout];

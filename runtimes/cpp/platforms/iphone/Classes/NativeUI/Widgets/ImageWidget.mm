@@ -23,14 +23,20 @@
 
 @implementation ImageWidget
 
-- (id)init {
-	view = imageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 100, 60)];
-	leftCapWidth = 0;
-	topCapHeight = 0;
-	id ret = [super init];
-	[self setAutoSizeParamX:WRAP_CONTENT andY:WRAP_CONTENT];
-	view.contentMode = UIViewContentModeCenter;
-	return ret;
+- (id)init
+{
+    self = [super init];
+    if (self)
+    {
+        imageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 100, 60)];
+        self.view = imageView;
+        leftCapWidth = 0;
+        topCapHeight = 0;
+        self.autoSizeWidth = WidgetAutoSizeWrapContent;
+        self.autoSizeHeight = WidgetAutoSizeWrapContent;
+        self.view.contentMode = UIViewContentModeCenter;
+    }
+	return self;
 }
 
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value {
@@ -101,9 +107,9 @@
         // scaleX
         // scaleY
 
-        if([value isEqualToString:@"none"]) view.contentMode = UIViewContentModeCenter;
-        else if([value isEqualToString:@"scaleXY"]) view.contentMode = UIViewContentModeScaleToFill;
-        else if([value isEqualToString:@"scalePreserveAspect"]) view.contentMode = UIViewContentModeScaleAspectFit;
+        if([value isEqualToString:@"none"]) self.view.contentMode = UIViewContentModeCenter;
+        else if([value isEqualToString:@"scaleXY"]) self.view.contentMode = UIViewContentModeScaleToFill;
+        else if([value isEqualToString:@"scalePreserveAspect"]) self.view.contentMode = UIViewContentModeScaleAspectFit;
     }
 	else {
 		return [super setPropertyWithKey:key toValue:value];
@@ -114,6 +120,12 @@
 - (NSString*)getPropertyWithKey: (NSString*)key {
 
 	return [super getPropertyWithKey:key];
+}
+
+-(void) dealloc
+{
+    [imageView release];
+    [super dealloc];
 }
 
 @end

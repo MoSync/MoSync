@@ -24,18 +24,19 @@
 @implementation ScreenWidget
 
 - (id)init {
+    INNativeUILog;
 	UIViewController* c = [[ScreenWidgetController alloc] init];
 	return [self initWithController:c];
 }
 
 - (id)initWithController:(UIViewController*)_controller {
     controller = _controller;
-    view = [controller.view retain];
+    self.view = [controller.view retain];
     self = [super init];
     if (self)
     {
         controller.title = @"";
-        view.autoresizesSubviews = YES;
+        self.view.autoresizesSubviews = YES;
     }
 	return self;
 }
@@ -45,8 +46,23 @@
     [super dealloc];
 }
 
-- (void)addChild: (IWidget*)child {
-	[super addChild:child];
+/**
+ * Adds an widget to the end of the children list.
+ * A ScreenWidget can have only one child.
+ * @param child Widget to be added.
+ * @return MAW_RES_OK for success, MAW_RES_ERROR if the screen already has an child.
+ */
+- (int)addChild:(IWidget*)child
+{
+    INNativeUILog;
+    if ([_children count] > 0)
+    {
+        return MAW_RES_ERROR;
+    }
+
+	[super addChild:child toSubview:YES];
+    OUTNativeUILog;
+    return MAW_RES_OK;
 }
 
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value {
@@ -75,22 +91,21 @@
 	return controller;
 }
 
-- (void)layout {
-	int viewWidth = view.bounds.size.width;
-	int viewHeight = view.bounds.size.height;
-
-//	if(!parent)
-//		view.frame = [[UIScreen mainScreen] bounds];
-
-	for (IWidget *child in children)
+/**
+ * Set child's size.
+ */
+-(void) layout
+{
+    INNativeUILog;
+    // Check if the screen has child.
+    if ([_children count] == 0)
     {
-		UIView* childView = [child getView];
-		[childView setFrame:CGRectMake(view.frame.origin.x, view.frame.origin.y, viewWidth, viewHeight)];
+        return;
+    }
 
-		[child layout];
-	}
-
-	[view setNeedsLayout];
+    IWidget* child = [_children objectAtIndex:0];
+    child.size = self.size;
+    OUTNativeUILog;
 }
 
 @end

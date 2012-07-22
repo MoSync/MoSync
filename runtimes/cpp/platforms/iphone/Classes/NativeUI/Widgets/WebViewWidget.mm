@@ -25,23 +25,29 @@
 
 @implementation WebViewWidget
 
-- (id)init {
-	UIWebView* webView = [[UIWebView alloc] initWithFrame:CGRectMake(0, 0, 100, 100)];
-	view = webView;
-	webView.delegate = self;
-	newurl = @"";
-    softHookPattern = @"";
-	hardHookPattern = @"";
-    javaScriptIdentifier = @"javascript:";
-	cantNavigate = @"";
-	canNavigateForward = @"forward";
-	canNavigateBack = @"back";
-	canNavigateEither = [[canNavigateBack stringByAppendingString:canNavigateForward] retain];
-	baseUrl = [[self getDefaultBaseURL] retain];
-    urlsToNotHook=[[NSMutableDictionary alloc] init];
-	id ret = [super init];
-    [self setAutoSizeParamX:FILL_PARENT andY:FILL_PARENT];
-    return ret;
+- (id)init
+{
+    self = [super init];
+    if (self)
+    {
+        UIWebView* webView = [[UIWebView alloc] initWithFrame:CGRectMake(0, 0, 100, 100)];
+        self.view = webView;
+        webView.delegate = self;
+        newurl = @"";
+        softHookPattern = @"";
+        hardHookPattern = @"";
+        javaScriptIdentifier = @"javascript:";
+        cantNavigate = @"";
+        canNavigateForward = @"forward";
+        canNavigateBack = @"back";
+        canNavigateEither = [[canNavigateBack stringByAppendingString:canNavigateForward] retain];
+        baseUrl = [[self getDefaultBaseURL] retain];
+        urlsToNotHook=[[NSMutableDictionary alloc] init];
+
+        self.autoSizeWidth = WidgetAutoSizeFillParent;
+        self.autoSizeHeight = WidgetAutoSizeFillParent;
+    }
+    return self;
 }
 
 - (void)dealloc {
@@ -53,7 +59,7 @@
 	//Set a new URL
 	if([key isEqualToString:@MAW_WEB_VIEW_URL]) {
 
-		UIWebView* webView = (UIWebView*)view;
+		UIWebView* webView = (UIWebView*)self.view;
 		//Check whether the user tries to send some javascript
         NSRange identifierLocation = [value rangeOfString:javaScriptIdentifier];
 		NSRange schemaLocation = [value rangeOfString:@"://"];
@@ -112,10 +118,10 @@
         hardHookPattern = [value retain];
 
     } else if([key isEqualToString:@MAW_WEB_VIEW_HTML]) {
-		UIWebView* webView = (UIWebView*)view;
+		UIWebView* webView = (UIWebView*)self.view;
         [webView loadHTMLString:value baseURL:[NSURL URLWithString:baseUrl]];
     } else if([key isEqualToString:@MAW_WEB_VIEW_ENABLE_ZOOM]) {
-		UIWebView* webView = (UIWebView*)view;
+		UIWebView* webView = (UIWebView*)self.view;
         if([value isEqualToString:@"true"])
         {
             webView.scalesPageToFit = YES;
@@ -126,7 +132,7 @@
         }
 
     } else if([key isEqualToString:@MAW_WEB_VIEW_NAVIGATE]) {
-		UIWebView* webView = (UIWebView*)view;
+		UIWebView* webView = (UIWebView*)self.view;
         if([value isEqualToString:@"back"])
         {
             [webView goBack];
@@ -148,7 +154,7 @@
 
 - (NSString*)getPropertyWithKey: (NSString*)key {
 	if([key isEqualToString:@MAW_WEB_VIEW_URL]) {
-		UIWebView* webView = (UIWebView*)view;
+		UIWebView* webView = (UIWebView*)self.view;
 		return [webView.request.URL.absoluteString retain];
 
 	} else if([key isEqualToString:@MAW_WEB_VIEW_NEW_URL]) {
@@ -163,7 +169,7 @@
     } else if ([key isEqualToString:@MAW_WEB_VIEW_BASE_URL]) {
 		return [baseUrl retain];
 	} else if ([key isEqualToString:@MAW_WEB_VIEW_NAVIGATE]) {
-		UIWebView* webView = (UIWebView*)view;
+		UIWebView* webView = (UIWebView*)self.view;
 		if(webView.canGoBack && webView.canGoForward){
 			return [canNavigateEither retain];
 		}
@@ -188,7 +194,7 @@
     event.type = EVENT_TYPE_WIDGET;
     MAWidgetEventData *eventData = new MAWidgetEventData;
     eventData->eventType = MAW_EVENT_WEB_VIEW_CONTENT_LOADING;
-    eventData->widgetHandle = handle;
+    eventData->widgetHandle = self.handle;
 	eventData->status = MAW_CONSTANT_STARTED;
     event.data = (MAAddress)eventData;
     Base::gEventQueue.put(event);
@@ -201,7 +207,7 @@
     event.type = EVENT_TYPE_WIDGET;
     MAWidgetEventData *eventData = new MAWidgetEventData;
     eventData->eventType = MAW_EVENT_WEB_VIEW_CONTENT_LOADING;
-    eventData->widgetHandle = handle;
+    eventData->widgetHandle = self.handle;
 	eventData->status = MAW_CONSTANT_DONE;
     event.data = (MAAddress)eventData;
     Base::gEventQueue.put(event);
@@ -214,7 +220,7 @@
     event.type = EVENT_TYPE_WIDGET;
     MAWidgetEventData *eventData = new MAWidgetEventData;
     eventData->eventType = MAW_EVENT_WEB_VIEW_CONTENT_LOADING;
-    eventData->widgetHandle = handle;
+    eventData->widgetHandle = self.handle;
 	eventData->status = MAW_CONSTANT_ERROR;
     event.data = (MAAddress)eventData;
     Base::gEventQueue.put(event);
@@ -270,7 +276,7 @@
             event.type = EVENT_TYPE_WIDGET;
             MAWidgetEventData *eventData = new MAWidgetEventData;
             eventData->eventType = MAW_EVENT_WEB_VIEW_HOOK_INVOKED;
-            eventData->widgetHandle = handle;
+            eventData->widgetHandle = self.handle;
 
             //We create a placeholder resource that holds the message string
             MAHandle messageHandle = (MAHandle) Base::gSyscall->resources.create_RT_PLACEHOLDER();
@@ -309,7 +315,7 @@
         event.type = EVENT_TYPE_WIDGET;
         MAWidgetEventData *eventData = new MAWidgetEventData;
         eventData->eventType = MAW_EVENT_WEB_VIEW_HOOK_INVOKED;
-        eventData->widgetHandle = handle;
+        eventData->widgetHandle = self.handle;
 		bool loadUrl;
 
 		//The hard hook takes precedence in the case that both were matched
@@ -349,7 +355,7 @@
 	event.type = EVENT_TYPE_WIDGET;
 	MAWidgetEventData *eventData = new MAWidgetEventData;
 	eventData->eventType = MAW_EVENT_WEB_VIEW_URL_CHANGED;
-	eventData->widgetHandle = handle;
+	eventData->widgetHandle = self.handle;
 	event.data = (MAAddress)eventData;
 	Base::gEventQueue.put(event);
 	return YES;

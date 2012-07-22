@@ -34,7 +34,8 @@
  */
 - (id)init
 {
-    if (!view)
+    self = [super init];
+    if (self)
     {
         UIDatePicker* datePicker = [[UIDatePicker alloc] initWithFrame:CGRectMake(0,
                                                                                   0,
@@ -49,10 +50,12 @@
         NSLocale* locale = [[NSLocale alloc] initWithLocaleIdentifier:@"en_UK"];;
         [datePicker setLocale:locale];
 
-        view = datePicker;
+        self.view = datePicker;
+        [datePicker release];
+        datePicker = NULL;
     }
 
-    return [super init];
+    return self;
 }
 
 /**
@@ -63,7 +66,7 @@
  */
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value
 {
-    UIDatePicker* timePicker = (UIDatePicker*) view;
+    UIDatePicker* timePicker = (UIDatePicker*) self.view;
     int paramValue = [value intValue];
 
     if ([key isEqualToString:@MAW_TIME_PICKER_CURRENT_HOUR] ||
@@ -114,7 +117,7 @@
  */
 - (NSString*)getPropertyWithKey: (NSString*)key
 {
-    UIDatePicker* timePicker = (UIDatePicker*) view;
+    UIDatePicker* timePicker = (UIDatePicker*) self.view;
 
     if([key isEqualToString:@MAW_TIME_PICKER_CURRENT_HOUR])
     {
@@ -145,7 +148,7 @@
  */
 -(void) valueChanged:(id) sender
 {
-    UIDatePicker* timePicker = (UIDatePicker*) view;
+    UIDatePicker* timePicker = (UIDatePicker*) self.view;
     NSDate* date = [timePicker date];
     NSDateComponents *components = [[NSCalendar currentCalendar]
                                     components:kCFCalendarUnitHour|kCFCalendarUnitMinute
@@ -160,7 +163,7 @@
 	eventData->eventType = MAW_EVENT_TIME_PICKER_VALUE_CHANGED;
     eventData->hour = hour;
     eventData->minute = minute;
-	eventData->widgetHandle = handle;
+	eventData->widgetHandle = self.handle;
 
     event.data = (int)eventData;
     Base::gEventQueue.put(event);

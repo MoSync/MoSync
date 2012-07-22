@@ -15,154 +15,205 @@
  02111-1307, USA.
  */
 
-#import "IWidget.h"
-#import "UIColorExpanded.h"
 #import <objc/runtime.h>
 #include <helpers/cpp_defs.h>
 #include <helpers/CPP_IX_WIDGET.h>
 #include <helpers/cpp_defs.h>
+
+#import "IWidget.h"
+#import "UIColorExpanded.h"
+#import "NSStringExpanded.h"
 #include "Platform.h"
-
-#if 0
-#import <QuartzCore/QuartzCore.h>
-#endif
-
-@interface UIView (UIViewExpanded)
-- (void)superLayoutSubviews;
-- (CGSize)superSizeThatFits:(CGSize)size;
-@end
-
-@implementation UIView (UIViewExpanded)
-
-- (void)superLayoutSubviews {
-}
-
-- (CGSize)superSizeThatFits:(CGSize)size {
-	return CGSizeMake(0, 0);
-}
-
-@end
 
 @implementation IWidget
 
+@synthesize view = _view;
+@synthesize parent = _parent;
+@synthesize handle = _handle;
+@synthesize autoSizeWidth = _autoSizeWidth;
+@synthesize autoSizeHeight = _autoSizeHeight;
 
-- (void)setAutoSizeParamX:(AutoSizeParam)x andY:(AutoSizeParam)y {
-	autoSizeParamX = x;
-	autoSizeParamY = y;
-}
 
-- (AutoSizeParam)getAutoSizeParamX {
-	return autoSizeParamX;
-}
-
-- (AutoSizeParam)getAutoSizeParamY {
-	return autoSizeParamY;
-}
-
-- (void)layoutSubviews:(UIView*)_view {
-//- (void)layoutSubviews {
-	for (IWidget *child in children)
-	{
-		UIView* childView = [child getView];
-
-		int viewWidth = childView.frame.size.width;
-		int viewHeight = childView.frame.size.height;
-
-		if([child getAutoSizeParamX] == FILL_PARENT) {
-			viewWidth = view.bounds.size.width;
-		}
-		else if([child getAutoSizeParamX] == WRAP_CONTENT) {
-			viewWidth = [childView sizeThatFits:CGSizeZero].width;
-		}
-
-		[childView setFrame:CGRectMake(childView.frame.origin.x, childView.frame.origin.y, viewWidth, viewHeight)];
-
-		if([child getAutoSizeParamY] == FILL_PARENT) {
-			viewHeight = view.bounds.size.height;
-		}
-		else if([child getAutoSizeParamY] == WRAP_CONTENT) {
-			viewHeight = [childView sizeThatFits:CGSizeZero].height;
-		}
-
-		[childView setFrame:CGRectMake(childView.frame.origin.x, childView.frame.origin.y, viewWidth, viewHeight)];
-	}
-
-	[_view superLayoutSubviews];
-}
-
-- (CGSize)sizeThatFitsFor:(UIView*)_view withSize:(CGSize)size {
-	CGSize ret = [_view superSizeThatFits:size];
-	return ret;
-}
-
-- (id)init {
-	[super init];
-
-	parent = nil;
-	children = [[NSMutableArray alloc] init];
-	[self setAutoSizeParamX:FIXED_SIZE andY:FIXED_SIZE];
-
-	if(view) {
-		[view setUserInteractionEnabled:YES];
-		view.contentMode = UIViewContentModeRedraw;
-		view.autoresizesSubviews = NO;
-		//view.autoresizesSubviews = YES;
-		view.backgroundColor = [UIColor colorWithHexString:@"00000000"];
-		//view.backgroundColor = [UIColor redColor];
-
-		//[[view layer] setBorderWidth:1.0];
-		//[[view layer] setBorderColor:[UIColor redColor].CGColor];
-	}
-
+/**
+ * Init function.
+ */
+- (id) init
+{
+	self = [super init];
+    if (self)
+    {
+        _parent = nil;
+        _children = [[NSMutableArray alloc] init];
+        self.autoSizeHeight = WidgetAutoSizeFixed;
+        self.autoSizeWidth = WidgetAutoSizeFixed;
+    }
 	return self;
 }
 
-- (UIView*)getView {
-	return view;
+/**
+ * Set widget's width.
+ * @param width Width to set.
+ */
+-(void) setWidth:(CGFloat)width
+{
+    CGRect rect = CGRectMake(self.originX,
+                             self.originY,
+                             width,
+                             self.height);
+    _view.frame = rect;
+    [self layout];
 }
 
-- (void)setWidgetHandle:(int) toHandle {
-	handle = toHandle;
-	view.tag = handle;
+/**
+ * Get widget's width.
+ * @return Widget's width.
+ */
+-(CGFloat) width
+{
+    return _view.bounds.size.width;
 }
 
-- (int)getWidgetHandle {
-	return handle;
+/**
+ * Set widgets height.
+ * @param height Height to set.
+ */
+-(void) setHeight:(CGFloat)height
+{
+    CGRect rect = CGRectMake(self.originX,
+                             self.originY,
+                             self.width,
+                             height);
+    _view.frame = rect;
+    [self layout];
 }
 
-- (void)setParent:(IWidget*) toParent {
-	parent = toParent;
+/**
+ * Get widget's height.
+ */
+-(CGFloat) height
+{
+    return _view.bounds.size.height;
 }
 
-- (IWidget*)getParent {
-	return parent;
+/**
+ * Set widget's size.
+ * @param size Size to set.
+ */
+-(void) setSize:(CGSize)size
+{
+    CGRect rect = CGRectMake(self.originX,
+                             self.originY,
+                             size.width,
+                             size.height);
+    _view.frame = rect;
+    [self layout];
 }
 
-- (void)addChild: (IWidget*)child toSubview:(bool)addSubview {
-	UIView* childView = [child getView];
+/**
+ * Get widget's size.
+ */
+-(CGSize) size
+{
+    return _view.bounds.size;
+}
+
+/**
+ * Set widget's left coordinate(or view's x coordinate).
+ */
+-(void) setOriginX:(CGFloat)originX
+{
+    CGRect rect = CGRectMake(originX,
+                             _view.frame.origin.y,
+                             _view.frame.size.width,
+                             _view.frame.size.height);
+    _view.frame = rect;
+}
+
+/**
+ * Get widget's left coordinate(or view's x coordinate).
+ */
+-(CGFloat) originX
+{
+    return _view.frame.origin.x;
+}
+
+/**
+ * Set widget's top coordinate(or view's y coordinate).
+ */
+-(void) setOriginY:(CGFloat)originY
+{
+    CGRect rect = CGRectMake(_view.frame.origin.x,
+                             originY,
+                             _view.frame.size.width,
+                             _view.frame.size.height);
+    _view.frame = rect;
+}
+
+/**
+ * Get widget's top coordinate(or view's y coordinate).
+ */
+-(CGFloat) originY
+{
+    return _view.frame.origin.y;
+}
+
+/**
+ * Set widget's auto size width and height values.
+ * @param autoSizeWidth Width auto size value to set.
+ * @param autoSizeHeight Height auto size value to set.
+ */
+-(void) setAutoSizeWidth:(WidgetAutoSizeType)autoSizeWidth
+                  height:(WidgetAutoSizeType)autoSizeHeight
+{
+    self.autoSizeWidth = autoSizeWidth;
+    self.autoSizeHeight = autoSizeHeight;
+    [self layout];
+}
+
+/**
+ * Adds an widget to the end of the children list.
+ * Override this method to provide functionality.
+ * The overrided method should verify if the widget can have children or not.
+ * @param child Widget to be added.
+ * @return MAW_RES_INVALID_LAYOUT.
+ */
+- (int)addChild:(IWidget*)child
+{
+    return MAW_RES_INVALID_LAYOUT;
+}
+
+/**
+ * Adds an widget to the end of the children list.
+ * It does not check if the widget can have children.
+ * @param child Widget to be added.
+ * @param toSubview If true child's view will be added as subview, otherwise
+ * it only be added to a list.
+ */
+- (void)addChild: (IWidget*)child toSubview:(BOOL)addSubview
+{
+    INNativeUILog;
+	UIView* childView = child.view;
 	[child setParent:self];
-	[children addObject:child];
-	if(addSubview) {
-		[view addSubview:childView];
+	[_children addObject:child];
+	if(addSubview)
+    {
+		[_view addSubview:childView];
 	}
-	//[self layout];
-	[child layout];
-}
 
-- (void)addChild: (IWidget*)child {
-	[self addChild:child toSubview:YES];
+	[child layout];
+    OUTNativeUILog;
 }
 
 - (int)insertChild: (IWidget*)child atIndex:(NSNumber*)index toSubview:(bool)addSubview {
 	int indexValue = [index intValue];
-	if(indexValue<0 || indexValue>[children count]) return MAW_RES_INVALID_INDEX;
+	if(indexValue<0 || indexValue>[_children count]) return MAW_RES_INVALID_INDEX;
 
-	UIView* childView = [child getView];
+	UIView* childView = [child view];
 	[child setParent:self];
 
-	[children insertObject:child atIndex:indexValue];
+	[_children insertObject:child atIndex:indexValue];
 	if(addSubview) {
-		[view insertSubview:childView atIndex:indexValue];
+		[_view insertSubview:childView atIndex:indexValue];
 	}
 	//[self layout];
 	[child layout];
@@ -179,98 +230,55 @@
 }
 
 - (void)removeChild: (IWidget*)child fromSuperview:(bool)removeFromSuperview {
-	[children removeObjectIdenticalTo:child];
+	[_children removeObjectIdenticalTo:child];
 	[child setParent:nil];
 	if(removeFromSuperview)
-		[[child getView] removeFromSuperview];
+		[[child view] removeFromSuperview];
 	[self layout];
 }
 
 - (int)remove {
 	//if(!parent) return MAW_RES_REMOVED_ROOT;
-	[parent removeChild: self];
+	[_parent removeChild: self];
 	return MAW_RES_OK;
 }
 
 - (int)setPropertyWithKey: (NSString*)key toValue:(NSString*)value {
-	if([key isEqualToString:@MAW_WIDGET_LEFT]) {
-		[view setFrame:CGRectMake([value floatValue]/getScreenScale(), view.frame.origin.y, view.frame.size.width, view.frame.size.height)];
-		[self layout];
-	} else
-	if([key isEqualToString:@MAW_WIDGET_TOP]) {
-		[view setFrame:CGRectMake(view.frame.origin.x, [value floatValue]/getScreenScale(), view.frame.size.width, view.frame.size.height)];
-		[self layout];
-	} else
-	if([key isEqualToString:@MAW_WIDGET_WIDTH]) {
-		float width = [value floatValue];
-
-		if(width == -2 || width == -1) {
-			autoSizeParamX = width==-2?WRAP_CONTENT:FILL_PARENT;
-			[self layout];
-			return MAW_RES_OK;
-
-		} else {
-			autoSizeParamX = FIXED_SIZE;
-		}
-
-		[view setFrame:CGRectMake(view.frame.origin.x, view.frame.origin.y, width/getScreenScale(), view.bounds.size.height)];
-		[self layout];
-	} else
-	if([key isEqualToString:@MAW_WIDGET_HEIGHT]) {
-		float height = [value floatValue];
-
-		if(height == -2 || height == -1) {
-			autoSizeParamY = height==-2?WRAP_CONTENT:FILL_PARENT;
-			[self layout];
-			return MAW_RES_OK;
-
-		} else {
-			autoSizeParamY = FIXED_SIZE;
-		}
-
-		[view setFrame:CGRectMake(view.frame.origin.x, view.frame.origin.y, view.bounds.size.width, height/getScreenScale())];
-		[self layout];
+	if([key isEqualToString:@MAW_WIDGET_LEFT])
+    {
+        self.originX = [value floatValue]/getScreenScale();
+	}
+    else if([key isEqualToString:@MAW_WIDGET_TOP])
+    {
+		self.originY = [value floatValue]/getScreenScale();
+	}
+    else if([key isEqualToString:@MAW_WIDGET_WIDTH])
+    {
+        return [self setWidthProperty:value];
+	}
+    else if([key isEqualToString:@MAW_WIDGET_HEIGHT])
+    {
+        return [self setHeightProperty:value];
 	} else
 	if([key isEqualToString:@MAW_WIDGET_BACKGROUND_COLOR]) {
 		UIColor* color = [UIColor colorWithHexString:value];
 		if(!color) return MAW_RES_INVALID_PROPERTY_VALUE;
-		view.backgroundColor = color;
+		_view.backgroundColor = color;
 	}
-	/*else
-	if([key isEqualToString:@"backgroundGradient"]) {
-		NSArray *colors = [value componentsSeparatedByString: @","];
-		UIColor *col1 = [UIColor colorWithHexString: [[colors objectAtIndex:0] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]]];
-		UIColor *col2 = [UIColor colorWithHexString:[[colors objectAtIndex:1] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]]];
-
-		if(!col1) return MAW_RES_INVALID_PROPERTY_VALUE;
-		if(!col2) return MAW_RES_INVALID_PROPERTY_VALUE;
-
-		CAGradientLayer *gradient = [CAGradientLayer layer];
-		gradient.frame = CGRectMake(0, 0, 320, 480); //view.bounds;
-		gradient.colors = [NSArray arrayWithObjects:(id)col1.CGColor, (id)col2.CGColor, nil];
-		gradient.startPoint = CGPointMake(0.5f, 0.0f);
-		gradient.endPoint = CGPointMake(0.5f, 1.0f);
-		gradient.masksToBounds = YES;
-		[view.layer insertSublayer:gradient atIndex:0];
-
-		// todo: Fix this. Make a setFrame function in IWidget that sets the frame of both the gradient layer (if available) and the
-		// view and call that wherever the frame of an IWidget is set (instead of view.frame = x).
-	}
-	*/
 	else
 	if([key isEqualToString:@MAW_WIDGET_ALPHA]) {
 		float alpha = [value floatValue];
 		if(alpha<0.0 || alpha>1.0) return MAW_RES_INVALID_PROPERTY_VALUE;
-		view.alpha = [value floatValue];
+		_view.alpha = [value floatValue];
 	} else
 	if([key isEqualToString:@"opaque"]){
-		view.opaque = [value boolValue];
+		_view.opaque = [value boolValue];
 	} else
 	if([key isEqualToString:@MAW_WIDGET_VISIBLE]){
-		view.hidden = not [value boolValue];
+		_view.hidden = not [value boolValue];
 	} else
 	if([key isEqualToString:@MAW_WIDGET_ENABLED]){
-		UIControl* controller = (UIControl*) view;
+		UIControl* controller = (UIControl*) _view;
 		controller.enabled = [value boolValue];
 	}
 	else {
@@ -283,34 +291,36 @@
 - (NSString*)getPropertyWithKey: (NSString*)key {
 
 	if([key isEqualToString:@MAW_WIDGET_WIDTH]) {
-		return [[[NSNumber numberWithInt: view.bounds.size.width*getScreenScale()] stringValue] retain];
+		return [[[NSNumber numberWithInt: _view.bounds.size.width*getScreenScale()] stringValue] retain];
 	}
 	else if([key isEqualToString:@MAW_WIDGET_HEIGHT]) {
-		return [[[NSNumber numberWithInt: view.bounds.size.height*getScreenScale()] stringValue] retain];
+		return [[[NSNumber numberWithInt: _view.bounds.size.height*getScreenScale()] stringValue] retain];
 	}
 	else if([key isEqualToString:@MAW_WIDGET_LEFT]) {
-		return [[[NSNumber numberWithInt: view.frame.origin.x*getScreenScale()] stringValue] retain];
+		return [[[NSNumber numberWithInt: _view.frame.origin.x*getScreenScale()] stringValue] retain];
 	}
 	else if([key isEqualToString:@MAW_WIDGET_TOP]) {
-		return [[[NSNumber numberWithInt: view.frame.origin.y*getScreenScale()] stringValue] retain];
+		return [[[NSNumber numberWithInt: _view.frame.origin.y*getScreenScale()] stringValue] retain];
 	}
 	else if([key isEqualToString:@MAW_WIDGET_VISIBLE]) {
-        return view.hidden ? @"false" : @"true";
+        return _view.hidden ? @"false" : @"true";
     }
     else if([key isEqualToString:@MAW_WIDGET_ENABLED]) {
-        UIControl* controller = (UIControl*) view; // TODO: is this correct?
+        UIControl* controller = (UIControl*) _view; // TODO: is this correct?
         return controller.enabled ? @"true" : @"false";
     }
     else if ([key isEqualToString:@MAW_WIDGET_ALPHA])
     {
-        return [[[NSNumber numberWithFloat: view.alpha] stringValue] retain];
+        return [[[NSNumber numberWithFloat: _view.alpha] stringValue] retain];
     }
 	return nil;
 }
 
 - (void)dealloc {
-	[view release];
-	[children release];
+	[_view release];
+    [_parent release];
+	[_children release];
+
 	[super dealloc];
 }
 
@@ -324,18 +334,49 @@
     }
 }
 
-- (void)layout {
-	// the layouts should take care of the fill parent / wrap content layouting process..
-    // this should not be suboptimal, it will trigger a layout
-    // that runs once before draw..
-    [view setNeedsLayout];
-
-    if(view.superview)
+/**
+ * Recalculate its and children size.
+ * If needed and possible the parent will be resized too.
+ */
+- (void)layout
+{
+    INNativeUILog;
+    [self layoutSubviews:_view];
+    // If the widget has parent and if at least one of its auto size params is wrap content,
+    // then ask the parent to layout itself.
+    if (_parent &&
+        (_parent.autoSizeWidth == WidgetAutoSizeWrapContent ||
+         _parent.autoSizeHeight == WidgetAutoSizeWrapContent))
     {
-        [view.superview setNeedsLayout];
+        [_parent layout];
     }
+    OUTNativeUILog;
+}
 
-	[view layoutIfNeeded];
+/**
+ * Layout its children.
+ * This method should be called by the class generated by widget layouting macro.
+ * @param view The view that requested the operation.
+ */
+-(void) layoutSubviews:(UIView*) view
+{
+}
+
+/**
+ * Asks the widget to calculate and return the size that best fits its subviews.
+ * Override this method to provide functionality.
+ * @return CGSizeZero.
+ */
+- (CGSize)sizeThatFitsForWidget
+{
+    if (!_view)
+    {
+        return CGSizeZero;
+    }
+    else
+    {
+        return [_view sizeThatFits:CGSizeZero];
+    }
 }
 
 /**
@@ -348,17 +389,95 @@
 	event.type = EVENT_TYPE_WIDGET;
 	MAWidgetEventData *eventData = new MAWidgetEventData;
 	eventData->eventType = eventDataType;
-	eventData->widgetHandle = handle;
+	eventData->widgetHandle = _handle;
 	event.data = (int)eventData;
 	Base::gEventQueue.put(event);
 }
 
 - (void)show {
-	[self layout];
-	for (IWidget *child in children)
-	{
-		[child show];
-	}
+//    INNativeUILog;
+//	[self layout];
+//	for (IWidget *child in children)
+//	{
+//		[child show];
+//	}
+//    OUTNativeUILog;
+}
+
+/**
+ * Setter for MAW_WIDGET_WIDTH.
+ * @param value MAW_CONSTANT_FILL_AVAILABLE_SPACE, MAW_CONSTANT_WRAP_CONTENT or
+ * an int value greater or equal to zero.
+ * @return MAW_RES_OK if the width was set, otherwise MAW_RES_INVALID_PROPERTY_VALUE.
+ */
+-(int) setWidthProperty:(NSString*) value
+{
+    // Verify if the value param is valid.
+    if (![value canParseNumber] )
+    {
+        return MAW_RES_INVALID_PROPERTY_VALUE;
+    }
+    int width = [value intValue];
+    if (width < 0 &&
+        width != MAW_CONSTANT_FILL_AVAILABLE_SPACE &&
+        width != MAW_CONSTANT_WRAP_CONTENT)
+    {
+        return MAW_RES_INVALID_PROPERTY_VALUE;
+    }
+
+    // width value is valid.
+    switch (width)
+    {
+        case MAW_CONSTANT_FILL_AVAILABLE_SPACE:
+            self.autoSizeWidth = WidgetAutoSizeFillParent;
+            break;
+        case MAW_CONSTANT_WRAP_CONTENT:
+            self.autoSizeWidth = WidgetAutoSizeWrapContent;
+            break;
+        default:
+            self.autoSizeWidth = WidgetAutoSizeFixed;
+            self.width = (CGFloat)width / getScreenScale();
+            break;
+    }
+    return MAW_RES_OK;
+}
+
+/**
+ * Setter for MAW_WIDGET_HEIGHT.
+ * @param value MAW_CONSTANT_FILL_AVAILABLE_SPACE, MAW_CONSTANT_WRAP_CONTENT or
+ * an int value greater or equal to zero.
+ * @return MAW_RES_OK if the height was set, otherwise MAW_RES_INVALID_PROPERTY_VALUE.
+ */
+-(int) setHeightProperty:(NSString*) value
+{
+    // Verify if the value param is valid.
+    if (![value canParseNumber] )
+    {
+        return MAW_RES_INVALID_PROPERTY_VALUE;
+    }
+    int height = [value intValue];
+    if (height < 0 &&
+        height != MAW_CONSTANT_FILL_AVAILABLE_SPACE &&
+        height != MAW_CONSTANT_WRAP_CONTENT)
+    {
+        return MAW_RES_INVALID_PROPERTY_VALUE;
+    }
+
+    // height value is valid.
+    switch (height)
+    {
+        case MAW_CONSTANT_FILL_AVAILABLE_SPACE:
+            self.autoSizeHeight = WidgetAutoSizeFillParent;
+            break;
+        case MAW_CONSTANT_WRAP_CONTENT:
+            self.autoSizeHeight = WidgetAutoSizeWrapContent;
+            break;
+        default:
+            self.autoSizeHeight = WidgetAutoSizeFixed;
+            self.height = (CGFloat)height / getScreenScale();
+            break;
+    }
+    return MAW_RES_OK;
 }
 
 @end

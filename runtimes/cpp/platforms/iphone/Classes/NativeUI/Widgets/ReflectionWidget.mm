@@ -22,20 +22,27 @@
 
 @implementation ReflectionWidget
 
-- (id)initWithName:(NSString*)name {
-	widgetClass = NSClassFromString(name);
-	if(widgetClass == nil) {
-		[self dealloc];
-		return nil;
-	}
+- (id)initWithName:(NSString*)name
+{
+    self = [super init];
+    if (self)
+    {
+        widgetClass = NSClassFromString(name);
+        if(widgetClass == nil) {
+            [self dealloc];
+            return nil;
+        }
 
-	view = [[widgetClass alloc] init];
-
-	return [super init];
+        id object = [[widgetClass alloc] init];
+        self.view = object;
+        [object release];
+        object = NULL;
+    }
+	return self;
 }
 
 - (void)addChild: (IWidget*)child {
-	[super addChild:child];
+	[super addChild:child toSubview:YES];
 }
 
 - (void)removeChild: (IWidget*)child {

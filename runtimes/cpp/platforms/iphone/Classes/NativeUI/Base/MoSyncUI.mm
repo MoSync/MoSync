@@ -133,8 +133,8 @@
     int orientation = [[ScreenOrientation getInstance] getCurrentScreenOrientation];
     MoSyncUI* mosyncUI = getMoSyncUI();
     IWidget* currentScreen = [mosyncUI getCurrentlyShownScreen];
-    int height = [[currentScreen getView] frame].size.height;
-    int width = [[currentScreen getView] frame].size.width;
+    int height = [[currentScreen view] frame].size.height;
+    int width = [[currentScreen view] frame].size.width;
     switch (orientation)
     {
         case MA_SCREEN_ORIENTATION_PORTRAIT_UPSIDE_DOWN:
@@ -206,7 +206,7 @@ static IWidget* sOldScreen = nil;
 
 	ScreenWidget* mosyncScreen = [[ScreenWidget alloc] initWithController:mainController];
 	[widgetArray addObject:mosyncScreen];
-	[mosyncScreen setWidgetHandle:0]; // MAW_CONSTANT_MOSYNC_SCREEN_HANDLE
+	[mosyncScreen setHandle:0]; // MAW_CONSTANT_MOSYNC_SCREEN_HANDLE
 
 	sOldScreen = nil; // show will set this after the screen is shown.
 	[self show: mosyncScreen];
@@ -254,19 +254,19 @@ static IWidget* sOldScreen = nil;
 		ret = [widgetArray count]-1;
 	}
 
-	[created setWidgetHandle:ret];
+	[created setHandle:ret];
     [created release];
-
+    NSLog(@"Created widget with handle = %d", ret);
 	return ret;
 }
 
 - (int) destroyWidgetInstance:(IWidget*)widget {
-	int handle = [widget getWidgetHandle];
+	int handle = widget.handle;
 
     [widgetArray replaceObjectAtIndex:handle withObject:[NSNull null]];
 
     if(widget == sOldScreen) {
-        UIView* actualView = [sOldScreen getView];
+        UIView* actualView = [sOldScreen view];
 		[actualView removeFromSuperview];
         sOldScreen = nil;
     }
@@ -296,11 +296,11 @@ static IWidget* sOldScreen = nil;
         return MAW_RES_OK;
 
 	if(sOldScreen != nil) {
-		UIView* actualView = [sOldScreen getView];
+		UIView* actualView = [sOldScreen view];
 		[actualView removeFromSuperview];
 	}
 
-	[mainWindow insertSubview:[widget getView] atIndex:0];
+	[mainWindow insertSubview:[widget view] atIndex:0];
 
 	[widget layout];
 	[widget show];
@@ -329,7 +329,7 @@ static IWidget* sOldScreen = nil;
 		}
 		popOverController.contentViewController = controller;
 		popOverController.delegate = (NSObject*) controller.delegate;
-		[popOverController presentPopoverFromRect:[sOldScreen getView].frame inView:[sOldScreen getView] permittedArrowDirections:UIPopoverArrowDirectionAny animated:YES];
+		[popOverController presentPopoverFromRect:[sOldScreen view].frame inView:[sOldScreen view] permittedArrowDirections:UIPopoverArrowDirectionAny animated:YES];
 	}
 
 	[[UIApplication sharedApplication] setStatusBarHidden:YES

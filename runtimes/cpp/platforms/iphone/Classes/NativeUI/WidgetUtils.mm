@@ -1,5 +1,5 @@
 /*
- Copyright (C) 2011 MoSync AB
+ Copyright (C) 2012 MoSync AB
 
  This program is free software; you can redistribute it and/or
  modify it under the terms of the GNU General Public License,
@@ -17,39 +17,18 @@
  */
 
 /**
- * @file PushNotification.mm
+ * @file WidgetUtils.mm
  * @author Bogdan Iusco
- * @date 1 Nov 2011
+ * @date 17 July 2012
  *
- * @brief Store the push notification JSON data received from APNS.
+ * @brief Utility for NativeUI module.
  */
 
-#import "PushNotification.h"
 
-@implementation PushNotification
-
-@synthesize alertMessage = mAlertMessage;
-@synthesize soundFileName = mSoundFileName;
-@synthesize badgeIcon = mBadgeIcon;
+#import "WidgetUtils.h"
 
 /**
- * Init function.
+ * "true" and "false" string constants used by Native UI widgets.
  */
-- (id)init
-{
-    return [super init];
-}
-
-/**
- * Deallocate member objects.
- */
--(void) dealloc
-{
-    [mAlertMessage release];
-    [mSoundFileName release];
-    [mBadgeIcon release];
-
-    [super dealloc];
-}
-
-@end
+NSString* const kWidgetTrueValue = @"true";
+NSString* const kWidgetFalseValue = @"false";

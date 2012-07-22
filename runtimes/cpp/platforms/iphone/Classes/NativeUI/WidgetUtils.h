@@ -1,5 +1,5 @@
 /*
- Copyright (C) 2011 MoSync AB
+ Copyright (C) 2012 MoSync AB
 
  This program is free software; you can redistribute it and/or
  modify it under the terms of the GNU General Public License,
@@ -17,39 +17,34 @@
  */
 
 /**
- * @file PushNotification.mm
+ * @file WidgetUtils.h
  * @author Bogdan Iusco
- * @date 1 Nov 2011
+ * @date 17 July 2012
  *
- * @brief Store the push notification JSON data received from APNS.
+ * @brief Utility for NativeUI module.
  */
-
-#import "PushNotification.h"
-
-@implementation PushNotification
-
-@synthesize alertMessage = mAlertMessage;
-@synthesize soundFileName = mSoundFileName;
-@synthesize badgeIcon = mBadgeIcon;
 
 /**
- * Init function.
+ * If the value is negative it returns MAW_RES_INVALID_PROPERTY_VALUE constant.
  */
-- (id)init
-{
-    return [super init];
+#define TEST_FOR_NEGATIVE_VALUE(value) if (0 > value)\
+{\
+return  MAW_RES_INVALID_PROPERTY_VALUE; \
 }
 
 /**
- * Deallocate member objects.
+ * Enums for widget size. Since iOS views are using only fixed sizes, the wrap and fill properties
+ * are custom.
  */
--(void) dealloc
-{
-    [mAlertMessage release];
-    [mSoundFileName release];
-    [mBadgeIcon release];
+typedef enum {
+	WidgetAutoSizeFixed,
+	WidgetAutoSizeFillParent,
+	WidgetAutoSizeWrapContent
+} WidgetAutoSizeType;
 
-    [super dealloc];
-}
 
-@end
+/**
+ * "true" and "false" string constants used by Native UI widgets.
+ */
+extern NSString* const kWidgetTrueValue;
+extern NSString* const kWidgetFalseValue;

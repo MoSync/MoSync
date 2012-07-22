@@ -25,11 +25,9 @@
 @implementation ButtonWidget
 
 - (id)init {
-    // this gives me an autoreleased object. We don't own the object until we retain it.
-	if(!view)
-		view = [[UIButton buttonWithType:UIButtonTypeRoundedRect] retain];
-
-	UIButton* button = (UIButton*) view;
+	id ret = [super init];
+    self.view = [[UIButton buttonWithType:UIButtonTypeRoundedRect] retain];
+	UIButton* button = (UIButton*) self.view;
     button.contentEdgeInsets = UIEdgeInsetsMake(1.0, 1.0, 1.0, 1.0);
 	[button addTarget:self action:@selector(touchDownEvent) forControlEvents:UIControlEventTouchDown];
     [button addTarget:self action:@selector(touchUpInsideEvent) forControlEvents:UIControlEventTouchUpInside];
@@ -40,8 +38,8 @@
 	button.titleLabel.numberOfLines = 0;
     [button setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
 
-	id ret = [super init];
-	[self setAutoSizeParamX:WRAP_CONTENT andY:WRAP_CONTENT];
+    self.autoSizeWidth = WidgetAutoSizeWrapContent;
+    self.autoSizeHeight = WidgetAutoSizeWrapContent;
     button.imageView.contentMode = UIViewContentModeCenter;
 
     return ret;
@@ -65,13 +63,13 @@
 
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value {
 	if([key isEqualToString:@MAW_BUTTON_TEXT]) {
-		UIButton* button = (UIButton*) view;
+		UIButton* button = (UIButton*) self.view;
 		[button setTitle:value forState:UIControlStateNormal];
 		[self layout];
 	} else
 	if([key isEqualToString:@MAW_BUTTON_FONT_SIZE]) {
         TEST_FOR_NEGATIVE_VALUE([value floatValue]);
-		UIButton* button = (UIButton*) view;
+		UIButton* button = (UIButton*) self.view;
         UILabel* label = button.titleLabel;
 		float fontSize = [value floatValue];
         UIFont* currentFont = label.font;
@@ -81,7 +79,7 @@
 		[self layout];
 	} else
     if([key isEqualToString:@MAW_BUTTON_FONT_HANDLE]) {
-        UIButton* button = (UIButton*) view;
+        UIButton* button = (UIButton*) self.view;
         UILabel* label = button.titleLabel;
         UIFont* font = Base::getUIFontObject([value intValue]);
         if (!font)
@@ -92,7 +90,7 @@
         [self layout];
     } else
 	if([key isEqualToString:@MAW_BUTTON_FONT_COLOR]) {
-		UIButton* button = (UIButton*) view;
+		UIButton* button = (UIButton*) self.view;
 		UIColor* color = [UIColor colorWithHexString:value];
 		if(!color) return MAW_RES_INVALID_PROPERTY_VALUE;
 		[button setTitleColor:color forState:UIControlStateNormal];
@@ -100,7 +98,7 @@
 	if([key isEqualToString:@MAW_IMAGE_BUTTON_BACKGROUND_IMAGE]) {
 		int imageHandle = [value intValue];
 		if(imageHandle<=0) return MAW_RES_INVALID_PROPERTY_VALUE;
-		UIButton* button = (UIButton*) view;
+		UIButton* button = (UIButton*) self.view;
 		Surface* imageResource = Base::gSyscall->resources.get_RT_IMAGE(imageHandle);
 		image = [UIImage imageWithCGImage:imageResource->image];
 		[button setBackgroundImage:image forState:UIControlStateNormal];
@@ -109,7 +107,7 @@
     if([key isEqualToString:@MAW_IMAGE_BUTTON_IMAGE]) {
         int imageHandle = [value intValue];
         if(imageHandle<=0) return MAW_RES_INVALID_PROPERTY_VALUE;
-        UIButton* button = (UIButton*) view;
+        UIButton* button = (UIButton*) self.view;
         Surface* imageResource = Base::gSyscall->resources.get_RT_IMAGE(imageHandle);
         image = [UIImage imageWithCGImage:imageResource->image];
         [button setImage:image forState:UIControlStateNormal];
@@ -136,7 +134,7 @@
 	else if([key isEqualToString:@"leftCapWidth"]) {
 		int newLeftCapWidth = [value intValue];
 		if(image != nil) {
-			UIButton* button = (UIButton*) view;
+			UIButton* button = (UIButton*) self.view;
 			UIImage* newImage = [image stretchableImageWithLeftCapWidth:newLeftCapWidth topCapHeight:topCapHeight];
 			[button setBackgroundImage:newImage forState:UIControlStateNormal];
 			image = newImage;
@@ -146,7 +144,7 @@
 	else if ([key isEqualToString:@"topCapHeight"]) {
 		int newTopCapHeight = [value intValue];
 		if(image != nil) {
-			UIButton* button = (UIButton*) view;
+			UIButton* button = (UIButton*) self.view;
 			UIImage* newImage = [image stretchableImageWithLeftCapWidth:leftCapWidth topCapHeight:newTopCapHeight];
 			[button setBackgroundImage:newImage forState:UIControlStateNormal];
 			image = newImage;
@@ -154,7 +152,7 @@
 		topCapHeight = newTopCapHeight;
 	}
 	else if([key isEqualToString:@MAW_BUTTON_TEXT_HORIZONTAL_ALIGNMENT]) {
-		UIButton* button = (UIButton*) view;
+		UIButton* button = (UIButton*) self.view;
         if([value isEqualToString:@"left"]) {
 			[button setContentHorizontalAlignment:UIControlContentHorizontalAlignmentLeft];
 		}
@@ -169,7 +167,7 @@
         }
 	}
     else if([key isEqualToString:@MAW_BUTTON_TEXT_VERTICAL_ALIGNMENT]) {
-		UIButton* button = (UIButton*) view;
+		UIButton* button = (UIButton*) self.view;
 		if([value isEqualToString:@"top"]) {
 			[button setContentVerticalAlignment:UIControlContentVerticalAlignmentTop];
 		}
@@ -190,7 +188,7 @@
 
 - (NSString*)getPropertyWithKey: (NSString*)key {
 	if([key isEqualToString:@MAW_BUTTON_TEXT]) {
-		UIButton* button = (UIButton*) view;
+		UIButton* button = (UIButton*) self.view;
 		return [button.titleLabel.text retain];
 	} else {
 		return [super getPropertyWithKey:key];

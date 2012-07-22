@@ -25,7 +25,7 @@
 
 - (id)init;
 - (id)initWithApi:(EAGLRenderingAPI)api;
-- (void)setWidgetHandle:(int)handle;
+- (void)setHandle:(int)handle;
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value;
 - (NSString*)getPropertyWithKey: (NSString*)key;
 - (void)show;

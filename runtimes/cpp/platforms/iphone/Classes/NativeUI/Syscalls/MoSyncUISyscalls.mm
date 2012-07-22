@@ -186,7 +186,7 @@ int maWidgetAddChild(MAWidgetHandle parentHandle, MAHandle childHandle) {
 	if(!child) return MAW_RES_INVALID_HANDLE;
 	if(parent == child) return MAW_RES_ERROR;
 
-	if([child getParent] != NULL) return MAW_RES_ERROR;
+	if(child.parent) return MAW_RES_ERROR;
 
 	// ugly.
 	if(
@@ -219,7 +219,7 @@ int maWidgetInsertChild(MAWidgetHandle parentHandle, MAWidgetHandle childHandle,
 	if(!child) return MAW_RES_INVALID_HANDLE;
 	if(parent == child) return MAW_RES_ERROR;
 
-	if([child getParent] != NULL) return MAW_RES_ERROR;
+	if(child.parent != NULL) return MAW_RES_ERROR;
 
 	// ugly.
 	if(

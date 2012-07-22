@@ -25,13 +25,13 @@
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-	return [children count];
+	return [_children count];
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
 	NSUInteger row = [indexPath row];
-    if (row >= [children count])
+    if (row >= [_children count])
     {
         UITableViewCell* cell =
             [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault
@@ -39,8 +39,8 @@
         return cell;
     }
 
-	IWidget* widget = [children objectAtIndex:row];
-	UITableViewCell* cell = (UITableViewCell*)[widget getView];
+	IWidget* widget = [_children objectAtIndex:row];
+	UITableViewCell* cell = (UITableViewCell*)[widget view];
 	[cell setFrame:CGRectMake(cell.frame.origin.x, cell.frame.origin.y, cell.frame.size.width,  tableView.rowHeight)];
 	return cell;
 }
@@ -60,20 +60,22 @@
 	event.type = EVENT_TYPE_WIDGET;
 	MAWidgetEventData *eventData = new MAWidgetEventData;
 	eventData->eventType = MAW_EVENT_ITEM_CLICKED;
-	eventData->widgetHandle = handle;
+	eventData->widgetHandle = self.handle;
 	eventData->listItemIndex = index;
 	event.data = (int)eventData;
 	Base::gEventQueue.put(event);
 }
 
 - (id)init {
-	tableViewController = [[UITableViewController alloc] init];
-	view = [tableViewController.tableView retain];
-	tableViewController.tableView.delegate = self;
-	tableViewController.tableView.dataSource = self;
-	id obj = [super init];
-
-	return obj;
+    self = [super init];
+    if (self)
+    {
+        tableViewController = [[UITableViewController alloc] init];
+        self.view = tableViewController.tableView;
+        tableViewController.tableView.delegate = self;
+        tableViewController.tableView.dataSource = self;
+    }
+	return self;
 }
 
 - (void)dealloc {
@@ -89,7 +91,7 @@
 	}
 
 	[super addChild:child toSubview:NO];
-	[((UITableView*)view) reloadData];
+	[((UITableView*)self.view) reloadData];
 }
 
 - (int)insertChild: (IWidget*)child atIndex:(NSNumber*)index toSubview:(bool)addSubview {
@@ -100,19 +102,19 @@
 	}
 
 	int ret = [super insertChild:child atIndex:index toSubview:NO];
-	[((UITableView*)view) reloadData];
+	[((UITableView*)self.view) reloadData];
 	return ret;
 }
 
 - (void)removeChild: (IWidget*)child fromSuperview:(bool)removeFromSuperview {
 	[super removeChild:child fromSuperview:removeFromSuperview];
-	[((UITableView*)view) reloadData];
+	[((UITableView*)self.view) reloadData];
 }
 
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value {
     if([key isEqualToString:@"rowHeight"]) {
 		float rowHeight = [value floatValue];
-		UITableView* tableView = (UITableView*)view;
+		UITableView* tableView = (UITableView*)self.view;
 		tableView.rowHeight = rowHeight;
 		[tableView reloadData];
 	}

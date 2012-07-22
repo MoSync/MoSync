@@ -34,17 +34,23 @@
     return [self initWithApi:kEAGLRenderingAPIOpenGLES1];
 }
 
-- (id)initWithApi:(EAGLRenderingAPI)api {
-	view = [[MoSyncGLView alloc] initWithFrame:CGRectMake(0, 0, 100, 100)
-                                         andApi:api];
-    if(view == nil) return nil;
-	id ret = [super init];
-	view.backgroundColor = [UIColor colorWithHexString:@"000000ff"];
-    return ret;
+- (id)initWithApi:(EAGLRenderingAPI)api
+{
+    self = [super init];
+    if (self)
+    {
+        self.view = [[[MoSyncGLView alloc] initWithFrame:CGRectMake(0, 0, 100, 100) andApi:api] autorelease];
+        if(self.view == nil)
+        {
+            return nil;
+        }
+        self.view.backgroundColor = [UIColor colorWithHexString:@"000000ff"];
+    }
+    return self;
 }
 
-- (void)setWidgetHandle:(int)_handle {
-	[super setWidgetHandle:_handle];
+- (void)setHandle:(int)_handle {
+	[super setHandle:_handle];
 	MAEvent event;
 	event.type = EVENT_TYPE_WIDGET;
 	MAWidgetEventData *eventData = new MAWidgetEventData;
@@ -56,11 +62,11 @@
 
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value {
 	if([key isEqualToString:@MAW_GL_VIEW_BIND]) {
-		MoSyncGLView* glView = (MoSyncGLView*) view;
+		MoSyncGLView* glView = (MoSyncGLView*) self.view;
 		[glView bindContext];
 	}
 	else if([key isEqualToString:@MAW_GL_VIEW_INVALIDATE]) {
-		MoSyncGLView* glView = (MoSyncGLView*) view;
+		MoSyncGLView* glView = (MoSyncGLView*) self.view;
 		[glView renderContext];
 	}
 	else {

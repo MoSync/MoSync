@@ -43,7 +43,7 @@
     // Get current screen handle.
     MoSyncUI* mosyncUI = getMoSyncUI();
     IWidget* currentScreen = [mosyncUI getCurrentlyShownScreen];
-    int screenHandle = [currentScreen getWidgetHandle];
+    int screenHandle = [currentScreen handle];
 
     // Set size and coordinate values for each child widget of the current screen
     // according with the new orientation.
@@ -68,7 +68,7 @@
     // Get current screen handle.
     MoSyncUI* mosyncUI = getMoSyncUI();
     IWidget* currentScreen = [mosyncUI getCurrentlyShownScreen];
-    int screenHandle = [currentScreen getWidgetHandle];
+    int screenHandle = [currentScreen handle];
 
     // Send MoSync Widget event notifying that the screen changed its orientation.
     MAEvent event;

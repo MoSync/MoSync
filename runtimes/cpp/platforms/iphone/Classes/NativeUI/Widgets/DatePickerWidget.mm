@@ -189,7 +189,8 @@
  */
 - (id)init
 {
-    if(!view)
+    self = [super init];
+    if(self)
     {
         UIDatePicker* datePicker = [[UIDatePicker alloc] initWithFrame:CGRectMake(0,
                                                                                   0,
@@ -200,10 +201,12 @@
         datePicker.maximumDate = [self maximumDate];
         datePicker.minimumDate = [self minimumDate];
 
-        view = datePicker;
+        self.view = datePicker;
+        [datePicker release];
+        datePicker = NULL;
     }
 
-    return [super init];
+    return self;
 }
 
 /**
@@ -269,7 +272,7 @@
  */
 - (NSString*)getPropertyWithKey: (NSString*)key
 {
-    UIDatePicker* datePicker = (UIDatePicker*) view;
+    UIDatePicker* datePicker = (UIDatePicker*) self.view;
 	if([key isEqualToString:@MAW_DATE_PICKER_MAX_DATE])
     {
         // return the maximum date for the date picker.
@@ -346,7 +349,7 @@
  */
 -(void) valueChanged:(id) sender
 {
-    UIDatePicker* datePicker = (UIDatePicker*) view;
+    UIDatePicker* datePicker = (UIDatePicker*) self.view;
     NSDate* date = [datePicker date];
     NSDateComponents *components = [[NSCalendar currentCalendar]
                                     components:kCFCalendarUnitDay|kCFCalendarUnitMonth|kCFCalendarUnitYear
@@ -363,7 +366,7 @@
     eventData->dayOfMonth = day;
     eventData->month = month;
     eventData->year = year;
-	eventData->widgetHandle = handle;
+	eventData->widgetHandle = self.handle;
 
     event.data = (int)eventData;
     Base::gEventQueue.put(event);
@@ -440,7 +443,7 @@
         return MAW_RES_INVALID_PROPERTY_VALUE;
     }
 
-    UIDatePicker* datePicker = (UIDatePicker*) view;
+    UIDatePicker* datePicker = (UIDatePicker*) self.view;
     NSDate* currentMaxDate = datePicker.maximumDate;
 
     // Set the max year value.
@@ -457,7 +460,7 @@
  */
 -(NSString*) maxDateYear
 {
-    UIDatePicker* datePicker = (UIDatePicker*) view;
+    UIDatePicker* datePicker = (UIDatePicker*) self.view;
     NSDate* date = datePicker.maximumDate;
     NSDateComponents *components = [[NSCalendar currentCalendar] components:NSYearCalendarUnit fromDate:date];
     NSInteger year = [components year];
@@ -485,7 +488,7 @@
         return MAW_RES_INVALID_PROPERTY_VALUE;
     }
 
-    UIDatePicker* datePicker = (UIDatePicker*) view;
+    UIDatePicker* datePicker = (UIDatePicker*) self.view;
     NSDate* currentMaxDate = datePicker.maximumDate;
 
     // Set the max month value.
@@ -502,7 +505,7 @@
  */
 -(NSString*) maxDateMonth
 {
-    UIDatePicker* datePicker = (UIDatePicker*) view;
+    UIDatePicker* datePicker = (UIDatePicker*) self.view;
     NSDate* date = datePicker.maximumDate;
     NSDateComponents *components = [[NSCalendar currentCalendar] components:NSMonthCalendarUnit fromDate:date];
     NSInteger month = [components month];
@@ -524,7 +527,7 @@
     }
 
     NSInteger day = [dayString intValue];
-    UIDatePicker* datePicker = (UIDatePicker*) view;
+    UIDatePicker* datePicker = (UIDatePicker*) self.view;
     NSDate* currentMaxDate = datePicker.maximumDate;
     // If max date value is not set(the value is nil) set the default value.
     if (!currentMaxDate)
@@ -560,7 +563,7 @@
  */
 -(NSString*) maxDateDay
 {
-    UIDatePicker* datePicker = (UIDatePicker*) view;
+    UIDatePicker* datePicker = (UIDatePicker*) self.view;
     NSDate* date = datePicker.maximumDate;
     NSDateComponents *components = [[NSCalendar currentCalendar] components:NSDayCalendarUnit fromDate:date];
     NSInteger day = [components day];
@@ -588,7 +591,7 @@
         return MAW_RES_INVALID_PROPERTY_VALUE;
     }
 
-    UIDatePicker* datePicker = (UIDatePicker*) view;
+    UIDatePicker* datePicker = (UIDatePicker*) self.view;
     NSDate* currentMinDate = datePicker.minimumDate;
 
     // Set the min year value.
@@ -605,7 +608,7 @@
  */
 -(NSString*) minDateYear
 {
-    UIDatePicker* datePicker = (UIDatePicker*) view;
+    UIDatePicker* datePicker = (UIDatePicker*) self.view;
     NSDate* date = datePicker.minimumDate;
     NSDateComponents *components = [[NSCalendar currentCalendar] components:NSYearCalendarUnit fromDate:date];
     NSInteger year = [components year];
@@ -633,7 +636,7 @@
         return MAW_RES_INVALID_PROPERTY_VALUE;
     }
 
-    UIDatePicker* datePicker = (UIDatePicker*) view;
+    UIDatePicker* datePicker = (UIDatePicker*) self.view;
     NSDate* currentMinDate = datePicker.minimumDate;
 
     // Set the min month value.
@@ -650,7 +653,7 @@
  */
 -(NSString*) minDateMonth
 {
-    UIDatePicker* datePicker = (UIDatePicker*) view;
+    UIDatePicker* datePicker = (UIDatePicker*) self.view;
     NSDate* date = datePicker.minimumDate;
     NSDateComponents *components = [[NSCalendar currentCalendar] components:NSMonthCalendarUnit fromDate:date];
     NSInteger month = [components month];
@@ -672,7 +675,7 @@
     }
 
     NSInteger day = [dayString intValue];
-    UIDatePicker* datePicker = (UIDatePicker*) view;
+    UIDatePicker* datePicker = (UIDatePicker*) self.view;
     NSDate* currentMinDate = datePicker.minimumDate;
     NSDateComponents* dateComponents = [self dateComponentsFromDate:currentMinDate];
 
@@ -702,7 +705,7 @@
  */
 -(NSString*) minDateDay
 {
-    UIDatePicker* datePicker = (UIDatePicker*) view;
+    UIDatePicker* datePicker = (UIDatePicker*) self.view;
     NSDate* date = datePicker.minimumDate;
     NSDateComponents *components = [[NSCalendar currentCalendar] components:NSDayCalendarUnit fromDate:date];
     NSInteger day = [components day];
@@ -720,7 +723,7 @@
  */
 -(int) setCurrentDateUnit:(NSString*) key value:(NSString*) value
 {
-    UIDatePicker* datePicker = (UIDatePicker*) view;
+    UIDatePicker* datePicker = (UIDatePicker*) self.view;
     double paramValue = [value doubleValue];
     TEST_FOR_NEGATIVE_VALUE(paramValue);
 
@@ -756,7 +759,7 @@
  */
 -(int) setMaxDateUsingTimeInterval:(double) interval
 {
-    UIDatePicker* datePicker = (UIDatePicker*) view;
+    UIDatePicker* datePicker = (UIDatePicker*) self.view;
     NSDate* maxDate = [NSDate dateWithTimeIntervalSince1970:interval];
     NSDate* minDate = [datePicker minimumDate];
 
@@ -781,7 +784,7 @@
  */
 -(int) setMinDateUsingTimeInterval:(double) interval
 {
-    UIDatePicker* datePicker = (UIDatePicker*) view;
+    UIDatePicker* datePicker = (UIDatePicker*) self.view;
     NSDate* minDate = [NSDate dateWithTimeIntervalSince1970:interval];
     NSDate* maxDate = [datePicker maximumDate];
 

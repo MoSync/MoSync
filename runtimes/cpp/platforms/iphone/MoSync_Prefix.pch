@@ -6,3 +6,6 @@
     #import <Foundation/Foundation.h>
     #import <UIKit/UIKit.h>
 #endif
+
+#define INNativeUILog    NSLog(@"IN %s for handle = %d", __FUNCTION__, self.handle);
+#define OUTNativeUILog    NSLog(@"OUT %s for handle = %d", __FUNCTION__, self.handle);

@@ -32,16 +32,18 @@ NSString *const kFalseValueString = @"false";
  */
 - (id)init
 {
-    if (!view)
+    self = [super init];
+    if (self)
     {
         UIActivityIndicatorView* activityIndicatorView = [[UIActivityIndicatorView alloc]
-            initWithActivityIndicatorStyle: UIActivityIndicatorViewStyleGray];
+                                                          initWithActivityIndicatorStyle: UIActivityIndicatorViewStyleGray];
 
-        view = activityIndicatorView;
+        self.view = activityIndicatorView;
         [activityIndicatorView startAnimating];
+        [activityIndicatorView release];
+        activityIndicatorView = NULL;
     }
-
-    return [super init];
+    return self;
 }
 
 /**
@@ -53,7 +55,7 @@ NSString *const kFalseValueString = @"false";
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value
 {
     if([key isEqualToString:@MAW_ACTIVITY_INDICATOR_IN_PROGRESS]) {
-        UIActivityIndicatorView* activityIndicatorView = (UIActivityIndicatorView*) view;
+        UIActivityIndicatorView* activityIndicatorView = (UIActivityIndicatorView*) self.view;
 
         if([value isEqualToString: kTrueValueString])
         {
