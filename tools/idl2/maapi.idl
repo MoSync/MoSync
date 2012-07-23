@@ -8596,7 +8596,7 @@ group CameraFunctions "Camera Functions" {
 		*
 		* \return 1 on success and <0 on failure
 		*/
-		int maCameraPreviewEventEnable( in int previewEventType, in MAAddress previewBuffer, in MARect previewArea);
+		int maCameraPreviewEventEnable( in int previewEventType, out MAAddress previewBuffer, in MARect previewArea);
 
 		/**
 		* Turns off the current preview event
