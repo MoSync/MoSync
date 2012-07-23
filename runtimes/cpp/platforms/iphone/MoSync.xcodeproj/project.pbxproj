@@ -504,7 +504,7 @@
 		6019003715B84618008F2D0E /* CoreVideo.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreVideo.framework; path = System/Library/Frameworks/CoreVideo.framework; sourceTree = SDKROOT; };
 		8503783E133A2275009251E2 /* StackScreenWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StackScreenWidget.h; sourceTree = "<group>"; };
 		8503783F133A2275009251E2 /* StackScreenWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = StackScreenWidget.mm; sourceTree = "<group>"; };
-		850943291185AF87004A3B2D /* SyscallImpl.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = SyscallImpl.mm; path = impl/SyscallImpl.mm; sourceTree = "<group>"; };
+		850943291185AF87004A3B2D /* SyscallImpl.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = SyscallImpl.mm; path = impl/SyscallImpl.mm; sourceTree = "<group>"; usesTabs = 0; wrapsLines = 0; };
 		850943881185B35D004A3B2D /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		850943FF1185C41F004A3B2D /* MoSyncCLController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MoSyncCLController.h; sourceTree = "<group>"; };
 		850944001185C440004A3B2D /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = System/Library/Frameworks/CoreLocation.framework; sourceTree = SDKROOT; };

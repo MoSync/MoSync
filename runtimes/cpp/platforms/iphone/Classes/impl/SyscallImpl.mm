@@ -130,8 +130,10 @@ extern ThreadPool gThreadPool;
 }
 @end
 
+
+
 //This delegate is needed for capturing video frame data from the camera, when using the maCameraPreview* syscalls
-@interface SampleBufferDelegate:NSObject<AVCaptureVideoDataOutputSampleBufferDelegate> {
+@interface CameraPreviewEventHandler:NSObject<AVCaptureVideoDataOutputSampleBufferDelegate> {
     @public
     void* mPreviewBuf; //buffer for storing the sub section of the frame
     MARect mPreviewArea;
@@ -142,6 +144,9 @@ extern ThreadPool gThreadPool;
 - (id)init;
 - (void)captureOutput:(AVCaptureOutput *)captureOutput didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer fromConnection:(AVCaptureConnection *)connection;
 - (void)image2Buf:(CMSampleBufferRef)sampleBuf;
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object
+                        change:(NSDictionary *)change
+                       context:(void *)context;
 - (dispatch_queue_t)getQueue;
 - (void*)previewBuf;
 - (void)setPreviewBuf:(void*)previewBuf;
@@ -155,7 +160,7 @@ extern ThreadPool gThreadPool;
 
 @end
 
-@implementation SampleBufferDelegate
+@implementation CameraPreviewEventHandler
 - (id)init{
     if((self = [super init]))
     {
@@ -189,6 +194,18 @@ extern ThreadPool gThreadPool;
         memcpy((char*)mPreviewBuf+((i-rowOffset)*bytesPerPixel*mPreviewArea.width), (char*)srcBuf+bufOffset, mPreviewArea.width*bytesPerPixel); //move 3 steps in dest buf and 4 steps in source buf (RBGA->RGB)
     }
     CVPixelBufferUnlockBaseAddress(imageBuffer, 0);
+}
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object
+                        change:(NSDictionary *)change
+                       context:(void *)context
+{
+    if ([keyPath isEqualToString:@"adjustingFocus"] )
+    {
+        MAEvent event;
+        event.type = EVENT_TYPE_CAMERA_PREVIEW;
+        event.status = MA_CAMERA_PREVIEW_AUTO_FOCUS;
+        Base::gEventQueue.put(event);
+    }
 }
 - (dispatch_queue_t)getQueue{
     return mSerialQueue;
@@ -224,7 +241,7 @@ namespace Base {
 	static void MAUpdateScreen();
 
 	Syscall* gSyscall;
-    SampleBufferDelegate* gSampleBufferDelegate = NULL;
+    CameraPreviewEventHandler* gCameraPreviewEventHandler = NULL;
 
 	uint realColor;
 	uint currentColor;
@@ -1918,10 +1935,8 @@ namespace Base {
             AVCaptureInputPort *port = [input.ports objectAtIndex:0];
             CMFormatDescriptionRef formatDescription = port.formatDescription;
             CMVideoDimensions dimensions = CMVideoFormatDescriptionGetDimensions(formatDescription);
-            //CGRect frame = previewLayer.frame; //get the preview layer dimensions
-            //LOG("%f %f", frame.size.width, frame.size.height); //log the previewLayer.frame (find out its type)
             int size = EXTENT((int) dimensions.width, (int) dimensions.height);
-            return size; //should return the preview size as an EXTENT
+            return size;
         }
         @catch (NSException *exception) {
             return -1;
@@ -1931,30 +1946,35 @@ namespace Base {
     SYSCALL(int, maCameraPreviewEventEnable(int previewEventType, void* previewBuffer, const MARect* previewArea))
     {
         //2 events, MA_CAMERA_PREVIEW_FRAME and MA_CAMERA_PREVIEW_AUTO_FOCUS
-        //bare this in mind; performSelectorOnMainThread, if something weird happens, mosync have one exec loop and one event loop
-        //TODO: use bool to only init gSampleBufferDelegate if not created
-        //HAVE TO COPY THE previewArea and previewBuffer because they may point at stack mem!
-        //printf("previewBuffer: %p\n", previewBuffer);
         @try {
-            CameraInfo *info = getCurrentCameraInfo();
-            gSampleBufferDelegate = [[SampleBufferDelegate alloc] init];
-            gSampleBufferDelegate->mPreviewArea = *previewArea;
-            gSampleBufferDelegate->mPreviewBuf = previewBuffer;
-            [info->videoDataOutput setSampleBufferDelegate:gSampleBufferDelegate queue:[gSampleBufferDelegate getQueue]];
-            if ([info->captureSession canAddOutput:info->videoDataOutput]) {
-                [info->captureSession addOutput:info->videoDataOutput]; //add the video data output to the capture session
+            if(previewEventType == MA_CAMERA_PREVIEW_FRAME)
+            {
+                if(!gCameraPreviewEventHandler) //no delegate set up for handling preview frames
+                {
+                    CameraInfo *info = getCurrentCameraInfo();
+                    gCameraPreviewEventHandler = [[CameraPreviewEventHandler alloc] init];
+                    gCameraPreviewEventHandler->mPreviewArea = *previewArea;
+                    gCameraPreviewEventHandler->mPreviewBuf = previewBuffer;
+                    [info->videoDataOutput setSampleBufferDelegate:gCameraPreviewEventHandler queue:[gCameraPreviewEventHandler getQueue]];
+                    if ([info->captureSession canAddOutput:info->videoDataOutput]) {
+                        [info->captureSession addOutput:info->videoDataOutput]; //add the video data output to the capture session
+                    }
+                }
+                return 1;
             }
-
-            switch (previewEventType) {
-                case MA_CAMERA_PREVIEW_FRAME:
-                    return 1;
-                    break;
-                case MA_CAMERA_PREVIEW_AUTO_FOCUS:
-                    return 1;
-                    break;
-
-                default:
-                    return -2; //unsupported previewEventType
+            else if(previewEventType == MA_CAMERA_PREVIEW_AUTO_FOCUS)
+            {
+                if(!gCameraPreviewEventHandler)
+                {
+                    gCameraPreviewEventHandler = [[CameraPreviewEventHandler alloc] init];
+                }
+                CameraInfo *info = getCurrentCameraInfo();
+                [info->device addObserver:gCameraPreviewEventHandler forKeyPath:@"adjustingFocus" options:NSKeyValueObservingOptionNew context:nil]; //nil is not recommended, but which context should be set?
+                return 1;
+            }
+            else //unsupported event type
+            {
+                return -2;
             }
 
         }
@@ -1966,7 +1986,8 @@ namespace Base {
     SYSCALL(int, maCameraPreviewEventDisable())
     {
         @try {
-            [gSampleBufferDelegate release];
+            [gCameraPreviewEventHandler release];
+            gCameraPreviewEventHandler = NULL; //so that next maCameraPreviewEventEnable call can init it again
         }
         @catch (NSException *exception) {
             return -1;
@@ -1976,10 +1997,9 @@ namespace Base {
 
     SYSCALL(int, maCameraPreviewEventConsumed())
     {
-        if(gSampleBufferDelegate)
+        if(gCameraPreviewEventHandler)
         {
-            gSampleBufferDelegate.captureOutput = true; //event consumed, capture output again
-            NSLog(@"event consumed");
+            gCameraPreviewEventHandler.captureOutput = true; //event consumed, capture output again
             return 1;
         }
         else
