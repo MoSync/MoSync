@@ -291,7 +291,6 @@
             colors[4*i+2] = 0.0f;
             colors[4*i+3] = 1.0f;
         }else if(i%2){
-            printf("OWL\n");
             colors[4*i+0] = 0.0f;
             colors[4*i+1] = 1.0f;
             colors[4*i+2] = 0.0f;

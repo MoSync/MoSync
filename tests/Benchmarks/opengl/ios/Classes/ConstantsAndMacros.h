@@ -1,7 +1,6 @@
 //
 //  ConstantsAndMacros.h
 //  Particles
-//
 
 // How many times a second to refresh the screen
 #if TARGET_OS_IPHONE && !TARGET_IPHONE_SIMULATOR
