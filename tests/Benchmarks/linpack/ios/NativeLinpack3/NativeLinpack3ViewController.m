@@ -25,6 +25,13 @@ void run(void);
     flopsString = [[NSString alloc] initWithFormat:@"%f",mflops];
     txtFlops.text = flopsString;
     
+    //send result to database
+    mBr.benchmark = "linpack";
+    mBr.mflops = mflops;
+
+    BenchDBConnector * bdbc = [[BenchDBConnector alloc] init];
+    [bdbc submit:mBr];
+
     [flopsString release];
 }
 

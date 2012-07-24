@@ -7,9 +7,12 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "BenchDB.h"
 
 @interface NativeLinpack3ViewController : UIViewController {
     IBOutlet UITextField *txtFlops;
+
+    struct BenchResult mBr; //bench result struct
 }
 
 @property(nonatomic,retain) IBOutlet UITextField *txtFlops;

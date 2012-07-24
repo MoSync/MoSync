@@ -119,7 +119,7 @@ void run(void)
         printf("----------------------------------------------------\n");
         nreps=1;
 		//linpack(nreps,arsize); //ONLY CALL IT ONCE WHEN WE PRINT EVERYTHING
-        while (linpack(nreps,arsize)<10.)
+        while (linpack(nreps,arsize)<4.)
             nreps*=2;
         free(mempool);
         printf("\n");
@@ -191,7 +191,9 @@ static REAL linpack(long nreps,int arsize)
            nreps,totalt,100.*tdgefa/totalt,
            100.*tdgesl/totalt,100.*toverhead/totalt,
            kflops/1000.0);
-    call_objc_obj(kflops/1000.0);
+    if(totalt >= 4.0)
+           call_objc_obj(kflops/1000.0);
+
 	//printA(a,lda,arsize); //TODO ADDED BY ME FOR TESTING PURPOSES
     return(totalt);
 }
