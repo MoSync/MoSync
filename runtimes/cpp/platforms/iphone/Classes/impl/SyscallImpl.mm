@@ -133,15 +133,17 @@ extern ThreadPool gThreadPool;
 
 
 //This delegate is needed for capturing video frame data from the camera, when using the maCameraPreview* syscalls
+//It is also used as an observer for the "adjustingFocus"-property of the camera.
 @interface CameraPreviewEventHandler:NSObject<AVCaptureVideoDataOutputSampleBufferDelegate> {
     @public
     void* mPreviewBuf; //buffer for storing the sub section of the frame
-    MARect mPreviewArea;
+    MARect mPreviewArea; //the sub area captured from the frame
     @private
     dispatch_queue_t mSerialQueue;
     bool mCaptureOutput; //only want to capture one frame and then wait for maCameraPreviewEventConsumed is called, this bool is used for that
 }
 - (id)init;
+- (void)dealloc;
 - (void)captureOutput:(AVCaptureOutput *)captureOutput didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer fromConnection:(AVCaptureConnection *)connection;
 - (void)image2Buf:(CMSampleBufferRef)sampleBuf;
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object
@@ -169,6 +171,10 @@ extern ThreadPool gThreadPool;
     }
     return self;
 }
+- (void)dealloc{
+    dispatch_release(mSerialQueue); //release dispatch queue
+    //[super dealloc]; //this hung the application
+}
 - (void)captureOutput:(AVCaptureOutput *)captureOutput didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer fromConnection:(AVCaptureConnection *)connection{
     if(mCaptureOutput){//only capture one frame at a time
         [self image2Buf:sampleBuffer];//copy the image data within previewArea from sampleBuffer to mPreviewBuf
@@ -176,7 +182,7 @@ extern ThreadPool gThreadPool;
         event.type = EVENT_TYPE_CAMERA_PREVIEW;
         event.status = MA_CAMERA_PREVIEW_FRAME;
         Base::gEventQueue.put(event);
-        mCaptureOutput = false;//stop capturing output
+        mCaptureOutput = false;//stop capturing output until maCameraPreviewEventConsumed is called
     }
 }
 - (void)image2Buf:(CMSampleBufferRef)sampleBuf{//process and store image data in mPreviewBuf, mosync wants the image data in RGB888 format, but here we get it in BGRA8888
@@ -1949,12 +1955,13 @@ namespace Base {
         @try {
             if(previewEventType == MA_CAMERA_PREVIEW_FRAME)
             {
-                if(!gCameraPreviewEventHandler) //no delegate set up for handling preview frames
+                if(!gCameraPreviewEventHandler) //no delegate, set one up for handling preview frames
                 {
                     CameraInfo *info = getCurrentCameraInfo();
                     gCameraPreviewEventHandler = [[CameraPreviewEventHandler alloc] init];
                     gCameraPreviewEventHandler->mPreviewArea = *previewArea;
                     gCameraPreviewEventHandler->mPreviewBuf = previewBuffer;
+                    //set the gCameraPreviewEventHandler as delegate and set its dispatch queue as the queue for handling frames
                     [info->videoDataOutput setSampleBufferDelegate:gCameraPreviewEventHandler queue:[gCameraPreviewEventHandler getQueue]];
                     if ([info->captureSession canAddOutput:info->videoDataOutput]) {
                         [info->captureSession addOutput:info->videoDataOutput]; //add the video data output to the capture session
@@ -1968,6 +1975,8 @@ namespace Base {
                 {
                     gCameraPreviewEventHandler = [[CameraPreviewEventHandler alloc] init];
                 }
+                //set the gCameraPreviewEventHandler as an observer for the adjustingFocus
+                //property of the current camera device
                 CameraInfo *info = getCurrentCameraInfo();
                 [info->device addObserver:gCameraPreviewEventHandler forKeyPath:@"adjustingFocus" options:NSKeyValueObservingOptionNew context:nil]; //nil is not recommended, but which context should be set?
                 return 1;
@@ -1983,11 +1992,14 @@ namespace Base {
         }
     }
 
-    SYSCALL(int, maCameraPreviewEventDisable())
+    SYSCALL(int, maCameraPreviewEventDisable()) //wouldn't it be neater to be able to disable a specific preview event?
     {
         @try {
-            [gCameraPreviewEventHandler release];
-            gCameraPreviewEventHandler = NULL; //so that next maCameraPreviewEventEnable call can init it again
+            if(gCameraPreviewEventHandler)
+            {
+                [gCameraPreviewEventHandler release];
+                gCameraPreviewEventHandler = NULL; //so that next maCameraPreviewEventEnable call can init it again
+            }
         }
         @catch (NSException *exception) {
             return -1;
@@ -2004,7 +2016,7 @@ namespace Base {
         }
         else
         {
-            return -1;
+            return -1;//no cameraPreviewEventHandler present.
         }
     }
 
