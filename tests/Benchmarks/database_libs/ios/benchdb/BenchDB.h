@@ -4,10 +4,12 @@
 //
 //  Created by Alex on 1/5/12.
 //  Copyright 2012 __MyCompanyName__. All rights reserved.
+//
 
 #import <Foundation/Foundation.h>
 #import <Foundation/NSURLRequest.h>
 #import <Foundation/NSURLConnection.h>
+#import <UIKit/UIkit.h>
 
 #define M_URL "http://modev.mine.nu:8070/benchmark/publish_result.php?" //Change this to change the target URL of all result uploads
 

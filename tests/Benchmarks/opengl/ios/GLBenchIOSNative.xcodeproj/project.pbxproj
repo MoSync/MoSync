@@ -20,7 +20,7 @@
 		28FD14FE0DC6FC130079059D /* GLView.m in Sources */ = {isa = PBXBuildFile; fileRef = 28FD14FD0DC6FC130079059D /* GLView.m */; };
 		28FD15000DC6FC520079059D /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 28FD14FF0DC6FC520079059D /* OpenGLES.framework */; };
 		28FD15080DC6FC5B0079059D /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 28FD15070DC6FC5B0079059D /* QuartzCore.framework */; };
-		603D300515BE9BF700E05CA4 /* libbenchdb.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 603D300415BE9BF700E05CA4 /* libbenchdb.a */; };
+		602B59C015BEC3F600429FD7 /* libbenchdb.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 602B59BF15BEC3F600429FD7 /* libbenchdb.a */; };
 		FA9FCA3814B5F71B0031C169 /* Box.png in Resources */ = {isa = PBXBuildFile; fileRef = FA9FCA3714B5F71B0031C169 /* Box.png */; };
 /* End PBXBuildFile section */
 
@@ -47,8 +47,8 @@
 		28FD15070DC6FC5B0079059D /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		29B97316FDCFA39411CA2CEA /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		32CA4F630368D1EE00C91783 /* ___PROJECTNAMEASIDENTIFIER____Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "___PROJECTNAMEASIDENTIFIER____Prefix.pch"; sourceTree = "<group>"; };
+		602B59BF15BEC3F600429FD7 /* libbenchdb.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libbenchdb.a; sourceTree = "<group>"; };
 		603D300215BE9B5D00E05CA4 /* BenchDB.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BenchDB.h; path = ../../../database_libs/ios/benchdb/BenchDB.h; sourceTree = "<group>"; };
-		603D300415BE9BF700E05CA4 /* libbenchdb.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libbenchdb.a; sourceTree = "<group>"; };
 		8D1107310486CEB800E47090 /* ___PROJECTNAMEASIDENTIFIER___-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "___PROJECTNAMEASIDENTIFIER___-Info.plist"; plistStructureDefinitionIdentifier = "com.apple.xcode.plist.structure-definition.iphone.info-plist"; sourceTree = "<group>"; };
 		FA9FCA3714B5F71B0031C169 /* Box.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Box.png; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -63,7 +63,7 @@
 				28FD15000DC6FC520079059D /* OpenGLES.framework in Frameworks */,
 				28FD15080DC6FC5B0079059D /* QuartzCore.framework in Frameworks */,
 				1FF404F30FF2AC4B00D17C20 /* CoreGraphics.framework in Frameworks */,
-				603D300515BE9BF700E05CA4 /* libbenchdb.a in Frameworks */,
+				602B59C015BEC3F600429FD7 /* libbenchdb.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -141,7 +141,7 @@
 		29B97323FDCFA39411CA2CEA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				603D300415BE9BF700E05CA4 /* libbenchdb.a */,
+				602B59BF15BEC3F600429FD7 /* libbenchdb.a */,
 				28FD15070DC6FC5B0079059D /* QuartzCore.framework */,
 				28FD14FF0DC6FC520079059D /* OpenGLES.framework */,
 				1DF5F4DF0D08C38300B7A737 /* UIKit.framework */,

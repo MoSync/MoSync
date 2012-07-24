@@ -4,6 +4,7 @@
 //
 //  Created by Alex on 1/5/12.
 //  Copyright 2012 __MyCompanyName__. All rights reserved.
+//
 
 #import "BenchDB.h"
 
@@ -13,10 +14,12 @@
 - (int) submit:(struct BenchResult)br {
     
     br.revision = "0";
-    br.runtime = "iOS";
-    br.git_hash = "1";
-    br.phone = "iOSSimulator";
-    br.nativeSdkVer = "xcode123";
+    br.runtime = [[[[UIDevice currentDevice] systemName] stringByAddingPercentEscapesUsingEncoding: NSASCIIStringEncoding ] cStringUsingEncoding:NSUTF8StringEncoding];
+    br.git_hash = "0";
+    br.phone = [[[[UIDevice currentDevice] name] stringByAddingPercentEscapesUsingEncoding: NSASCIIStringEncoding ] cStringUsingEncoding:NSUTF8StringEncoding];
+;//[[[UIDevice currentDevice] model] cStringUsingEncoding:NSUTF8StringEncoding];
+    printf("__VERSION__ %s\n", __VERSION__);
+    br.nativeSdkVer = [[[NSString stringWithUTF8String: __VERSION__] stringByAddingPercentEscapesUsingEncoding: NSASCIIStringEncoding ] cStringUsingEncoding:NSUTF8StringEncoding];
     
     //build url-string
     NSString *url = [NSString stringWithCString:M_URL encoding:NSUTF8StringEncoding];

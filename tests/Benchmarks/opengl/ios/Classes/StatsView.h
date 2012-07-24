@@ -9,7 +9,7 @@
 
 @protocol StatsViewDelegate
 - (void)drawView:(UIView *)theView;
-- (void)setupView:(UIView *)theView;
+//- (void)setupView:(UIView *)theView;
 @end
 
 @interface StatsView : UIView 
@@ -21,5 +21,5 @@
     
 }
 @property (assign) /* weak ref */ id <StatsViewDelegate> delegate;
-- (void)drawView;
+//- (void)drawView;
 @end
