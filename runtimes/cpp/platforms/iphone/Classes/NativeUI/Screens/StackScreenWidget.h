@@ -18,21 +18,43 @@
 #import <Foundation/Foundation.h>
 #import "ScreenWidget.h"
 
-@interface StackScreenWidget : ScreenWidget <UINavigationControllerDelegate> {
+@interface StackScreenWidget : ScreenWidget <UINavigationControllerDelegate>
+{
     NSMutableArray* stack;
 }
 
-- (id)init;
-- (void)dealloc;
-//- (void)addChild: (IWidget*)child;
-//- (int)insertChild: (IWidget*)child atIndex:(NSNumber*)index;
-//- (void)removeChild: (IWidget*)child;
+/**
+ * Pop the top view controller from the navigation stack.
+ * Called by the UINavigationController object.
+ * For more info see UINavigationControllerExpanded file.
+ */
+- (void)viewControllerWillBePoped;
 
-- (void)push: (IWidget*)child;
+/**
+ * Push a view controller on the navigation stack.
+ * @param child Widget containing a view controller(e.g. ScreenWidget).
+ */
+- (void)push:(IWidget*)child;
+
+/**
+ * Pop the top screen from the stack.
+ */
 - (void)pop;
 
-- (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value;
-- (NSString*)getPropertyWithKey: (NSString*)key;
-- (UIViewController*) getController;
+/**
+ * Recalculate its and children size.
+ */
+- (void)layout;
+
+/**
+ * Set a widget property value.
+ * @param key Widget's property name that should be set.
+ * @param value Widget's proeprty value that should be set.
+ * @return One of the following values:
+ * - MAW_RES_OK if the property was set.
+ * - MAW_RES_INVALID_PROPERTY_NAME if the property name was invalid.
+ * - MAW_RES_INVALID_PROPERTY_VALUE if the property value was invalid.
+ */
+- (int)setPropertyWithKey: (NSString*)key toValue:(NSString*)value;
 
 @end

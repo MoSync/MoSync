@@ -21,10 +21,10 @@
 #define DEFAULT_TIME_PICKER_HEIGHT 180
 #define DEFAULT_TIME_PICKER_WIDTH 200
 
-#import "TimePickerWidget.h"
 #include <helpers/cpp_defs.h>
 #include <helpers/CPP_IX_WIDGET.h>
 
+#import "TimePickerWidget.h"
 #include "Platform.h"
 
 @implementation TimePickerWidget
@@ -64,7 +64,7 @@
  * @param value The value of the property.
  * @return MAW_RES_OK if the property was set, or an error code otherwise.
  */
-- (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value
+- (int)setPropertyWithKey:(NSString*)key toValue:(NSString*)value
 {
     UIDatePicker* timePicker = (UIDatePicker*) self.view;
     int paramValue = [value intValue];
@@ -115,11 +115,11 @@
  * @param key The property of the time picker widget.
  * @return The value for the given property.
  */
-- (NSString*)getPropertyWithKey: (NSString*)key
+- (NSString*)getPropertyWithKey:(NSString*)key
 {
     UIDatePicker* timePicker = (UIDatePicker*) self.view;
 
-    if([key isEqualToString:@MAW_TIME_PICKER_CURRENT_HOUR])
+    if ([key isEqualToString:@MAW_TIME_PICKER_CURRENT_HOUR])
     {
         // Return the selected month from the date picker.
         NSDate* date = [timePicker date];
@@ -127,7 +127,7 @@
         NSInteger hour = [components hour];
         return[[NSString alloc] initWithFormat:@"%d", hour];
 	}
-    else if([key isEqualToString:@MAW_TIME_PICKER_CURRENT_MINUTE])
+    else if ([key isEqualToString:@MAW_TIME_PICKER_CURRENT_MINUTE])
     {
         // Return the selected day from the date picker.
         NSDate* date = [timePicker date];

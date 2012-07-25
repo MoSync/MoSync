@@ -21,7 +21,6 @@
 #import "LayoutWidgets.h"
 #import "LayoutManagers.h"
 #import "WidgetUtils.h"
-#import "WidgetLayoutingMacro.h"
 
 @implementation AbstractLayoutView (AbstractLayoutViewExpanded)
 
@@ -138,142 +137,17 @@ MAKE_UIWRAPPER_LAYOUTING_IMPLEMENTATION(MoSync, HLayoutView)
 }
 
 /**
- * Layout its subviews.
- * Called from view's layoutSubview method.
- * @param view UIView object that triggered the layout event.
+ * Set a widget property value.
+ * @param key Widget's property name that should be set.
+ * @param value Widget's proeprty value that should be set.
+ * @return One of the following values:
+ * - MAW_RES_OK if the property was set.
+ * - MAW_RES_INVALID_PROPERTY_NAME if the property name was invalid.
+ * - MAW_RES_INVALID_PROPERTY_VALUE if the property value was invalid.
+ * - #MAW_RES_ERROR otherwise.
  */
--(void)layoutSubviews:(UIView*)view
+- (int)setPropertyWithKey:(NSString*)key toValue:(NSString*)value
 {
-    INNativeUILog;
-	if (_orientation == OrientationVertical)
-    {
-        [self verticalLayout];
-	}
-    else if (_orientation == OrientationHorizontal)
-    {
-        [self horizontalLayout];
-	}
-}
-
-/**
- * Layout subviews for horizontal layout widget.
- */
--(void)horizontalLayout
-{
-    INNativeUILog;
-    AbstractLayoutView* alv = (AbstractLayoutView*)self.view;
-	float totalHorizontalMargin = ([alv getLeftMargin] + [alv getRightMargin]);
-	float totalVerticalMargin = ([alv getTopMargin] + [alv getBottomMargin]);
-    NSMutableArray* fillParentWidgets = [[NSMutableArray alloc] initWithCapacity:[_children count]];
-    float countWidth = 0;
-    for (IWidget *child in _children)
-    {
-        float viewHeight = child.height;
-        float viewWidth = child.width;
-
-        if(child.autoSizeHeight == WidgetAutoSizeFillParent)
-        {
-            viewHeight = self.height - totalVerticalMargin;
-        }
-        else if(child.autoSizeHeight == WidgetAutoSizeWrapContent)
-        {
-            viewHeight = [child sizeThatFitsForWidget].height;
-        }
-
-        if (child.autoSizeWidth == WidgetAutoSizeFillParent)
-        {
-            [fillParentWidgets addObject:child];
-        }
-        else if (child.autoSizeWidth == WidgetAutoSizeWrapContent)
-        {
-            viewWidth = [child sizeThatFitsForWidget].width;
-            countWidth += viewWidth;
-        }
-        else if (child.autoSizeWidth == WidgetAutoSizeFixed)
-        {
-            countWidth += viewWidth;
-        }
-
-        child.size = CGSizeMake(viewWidth, viewHeight);
-    }
-
-    if ([fillParentWidgets count] != 0)
-    {
-        float fillParentWidth = (self.width - countWidth - totalHorizontalMargin - [alv getSpacing] * ([_children count] - 1))/[fillParentWidgets count];
-        NSLog(@"float = %f", fillParentWidth);
-        for (IWidget *child in fillParentWidgets)
-        {
-            child.size = CGSizeMake(fillParentWidth, child.height);
-        }
-    }
-    [fillParentWidgets release];
-    fillParentWidgets = nil;
-    [((MoSyncHLayoutView*) self.view) superLayoutSubviews];
-    OUTNativeUILog;
-}
-
-/**
- * Layout subviews for vertical layout widget.
- */
--(void)verticalLayout
-{
-    INNativeUILog;
-    AbstractLayoutView* alv = (AbstractLayoutView*)self.view;
-	float totalHorizontalMargin = ([alv getLeftMargin] + [alv getRightMargin]);
-	float totalVerticalMargin = ([alv getTopMargin] + [alv getBottomMargin]);
-
-    NSMutableArray* fillParentWidgets = [[NSMutableArray alloc] initWithCapacity:[_children count]];
-    float countHeight = 0;
-    for (IWidget *child in _children)
-    {
-        float viewWidth = child.width;
-        float viewHeight = child.height;
-
-        if(child.autoSizeWidth == WidgetAutoSizeFillParent)
-        {
-            viewWidth = self.width - totalHorizontalMargin;
-        }
-        else if(child.autoSizeWidth == WidgetAutoSizeWrapContent)
-        {
-            viewWidth = [child sizeThatFitsForWidget].width;
-        }
-
-        if(child.autoSizeHeight == WidgetAutoSizeFillParent)
-        {
-            [fillParentWidgets addObject:child];
-        }
-        else if(child.autoSizeHeight == WidgetAutoSizeWrapContent)
-        {
-            viewHeight = [child sizeThatFitsForWidget].height;
-            countHeight += viewHeight;
-        }
-        else if(child.autoSizeHeight == WidgetAutoSizeFixed)
-        {
-            countHeight += viewHeight;
-        }
-
-        child.size = CGSizeMake(viewWidth, viewHeight);
-    }
-
-    if ([fillParentWidgets count] != 0)
-    {
-        float fillParentHeight = (self.height - countHeight - totalVerticalMargin -
-                                [alv getSpacing] *  ([_children count] - 1)) / [fillParentWidgets count];
-        NSLog(@"fillParentHeight = %f", fillParentHeight);
-        for (IWidget *child in _children)
-        {
-            child.size = CGSizeMake(child.width, fillParentHeight);
-        }
-    }
-    [fillParentWidgets release];
-    fillParentWidgets = nil;
-    [((MoSyncVLayoutView*)self.view) superLayoutSubviews];
-    OUTNativeUILog;
-}
-
-- (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value {
-	// maybe set scroll indicator style..
-
 	if([key isEqualToString:@MAW_VERTICAL_LAYOUT_CHILD_VERTICAL_ALIGNMENT]) {
 		AbstractLayoutView* alv = (AbstractLayoutView*)self.view;
 		if([value isEqualToString:@"top"])
@@ -320,56 +194,16 @@ MAKE_UIWRAPPER_LAYOUTING_IMPLEMENTATION(MoSync, HLayoutView)
 	return MAW_RES_OK;
 }
 
-@end
-
-
-
-@implementation HorizontalLayoutWidget
-- (id)init {
-	return [super init:OrientationHorizontal];
-}
-
-/**
- * Asks the layout to calculate and return the size that best fits its subviews.
- * @return The size that best fits its subviews.
- */
-- (CGSize)sizeThatFitsForWidget
+- (void)superLayoutSubviews
 {
-    INNativeUILog;
-    float countWidth = 0.0;
-    float maxHeight = self.height;
-    for (IWidget* child in _children)
+    if (_orientation == OrientationVertical)
     {
-        countWidth += child.width;
-        maxHeight = MAX(maxHeight, child.height);
+        [((MoSyncHLayoutView*)self.view) superLayoutSubviews];
     }
-    OUTNativeUILog;
-    return CGSizeMake(countWidth, maxHeight);
-}
-
-@end
-
-@implementation VerticalLayoutWidget
-- (id)init {
-	return [super init:OrientationVertical];
-}
-
-/**
- * Asks the layout to calculate and return the size that best fits its subviews.
- * @return The size that best fits its subviews.
- */
-- (CGSize)sizeThatFitsForWidget
-{
-    INNativeUILog;
-    float maxWidth = self.width;
-    float countHeight = 0.0;
-    for (IWidget* child in _children)
+    else if (_orientation == OrientationHorizontal)
     {
-        countHeight += child.height;
-        maxWidth = MAX(maxWidth, child.width);
+        [((MoSyncVLayoutView*)self.view) superLayoutSubviews];
     }
-    OUTNativeUILog;
-    return CGSizeMake(maxWidth, countHeight);
 }
 
 @end

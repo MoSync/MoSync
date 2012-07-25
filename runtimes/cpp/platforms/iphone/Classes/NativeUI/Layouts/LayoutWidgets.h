@@ -16,7 +16,10 @@
  */
 
 #import <Foundation/Foundation.h>
+
 #import "IWidget.h"
+#import "AbstractLayoutView.h"
+#import "WidgetLayoutingMacro.h"
 
 @interface AbstractLayoutView (AbstractLayoutViewExpanded)
 - (void) setVerticalAlignment: (UIControlContentVerticalAlignment) va;
@@ -26,6 +29,12 @@
 - (void) setRightMargin:(int)_margin;
 - (void) setTopMargin:(int)_margin;
 - (void) setBottomMargin:(int)_margin;
+
+- (int)getLeftMargin;
+- (int)getRightMargin;
+- (int)getTopMargin;
+- (int)getBottomMargin;
+- (int)getSpacing;
 @end
 
 
@@ -34,12 +43,12 @@ typedef enum {
 	OrientationHorizontal
 } LinearLayoutOrientation;
 
-@interface LinearLayoutBase : IWidget {
+@interface LinearLayoutBase : IWidget
+{
     /**
      * Layout's orientation.
      */
 	LinearLayoutOrientation _orientation;
-
 }
 
 /**
@@ -56,47 +65,17 @@ typedef enum {
 -(int)addChild:(IWidget*)child;
 
 /**
- * Layout its subviews.
- * Called from view's layoutSubview method.
- * @param view UIView object that triggered the layout event.
+ * Set a widget property value.
+ * @param key Widget's property name that should be set.
+ * @param value Widget's proeprty value that should be set.
+ * @return One of the following values:
+ * - MAW_RES_OK if the property was set.
+ * - MAW_RES_INVALID_PROPERTY_NAME if the property name was invalid.
+ * - MAW_RES_INVALID_PROPERTY_VALUE if the property value was invalid.
+ * - #MAW_RES_ERROR otherwise.
  */
--(void)layoutSubviews:(UIView*)view;
+- (int)setPropertyWithKey:(NSString*)key toValue:(NSString*)value;
 
-/**
- * Layout subviews for horizontal layout widget.
- */
--(void)horizontalLayout;
-
-/**
- * Layout subviews for vertical layout widget.
- */
--(void)verticalLayout;
-
-- (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value;
-
-@end
-
-@interface HorizontalLayoutWidget : LinearLayoutBase {
-}
-- (id)init;
-
-/**
- * Asks the layout to calculate and return the size that best fits its subviews.
- * @return The size that best fits its subviews.
- */
-- (CGSize)sizeThatFitsForWidget;
-
-@end
-
-@interface VerticalLayoutWidget : LinearLayoutBase {
-}
-
-- (id)init;
-
-/**
- * Asks the layout to calculate and return the size that best fits its subviews.
- * @return The size that best fits its subviews.
- */
-- (CGSize)sizeThatFitsForWidget;
+- (void)superLayoutSubviews;
 
 @end

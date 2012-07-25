@@ -22,18 +22,13 @@
 /**
  * Displays a video player to the user.
  */
-@interface VideoViewWidget : IWidget {
-
+@interface VideoViewWidget : IWidget
+{
     /**
      * Controller for the media player.
      */
-    MPMoviePlayerController *mMoviePlayerController;
+    MPMoviePlayerController* _moviePlayerController;
 }
-
-/**
- * Init function.
- */
-- (id)init;
 
 /**
  * Sets a video widget property.
@@ -41,19 +36,19 @@
  * @param value The value of the property.
  * @return MAW_RES_OK if the property was set, or an error code otherwise.
  */
-- (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value;
+- (int)setPropertyWithKey:(NSString*)key toValue:(NSString*)value;
 
 /**
  * Returns a property value of the video widget.
  * @param key The property of the video widget.
  * @return The value for the given property.
  */
-- (NSString*)getPropertyWithKey: (NSString*)key;
+- (NSString*)getPropertyWithKey:(NSString*)key;
 
 /**
  * Handles an video widget action(play, pause or stop).
  * @param One of the MAW_VIDEO_WIDGET_STATE constants.
  */
--(void)handleAction:(NSString*) value;
+-(void)handleAction:(NSString*)value;
 
 @end

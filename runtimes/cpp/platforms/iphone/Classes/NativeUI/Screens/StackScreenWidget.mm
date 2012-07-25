@@ -15,43 +15,40 @@
  02111-1307, USA.
  */
 
-#import "StackScreenWidget.h"
-#include "Platform.h"
 #include <helpers/cpp_defs.h>
 #include <helpers/CPP_IX_WIDGET.h>
 #include <base/Syscall.h>
 
-@interface UINavigationController (UINavigationController_Expanded)
-
-- (UIViewController *)popViewControllerAnimated:(BOOL)animated;
-
-@end
-
-@implementation UINavigationController (UINavigationController_Expanded)
-
-- (UIViewController *)popViewControllerAnimated:(BOOL)animated{
-	NSArray *vcs = self.viewControllers;
-	int count = [vcs count];
-	UIViewController *newViewController = count>=2?[vcs objectAtIndex:count-2]:nil;
-	UIViewController *oldViewController = count>=1?[vcs objectAtIndex:count-1]:nil;
-	if(newViewController && oldViewController) {
-
-		if ([self.delegate respondsToSelector:@selector(viewControllerWillBePoped)]) {
-			[self.delegate performSelector:@selector(viewControllerWillBePoped)];
-		}
-
-		[self popToViewController:newViewController animated:YES];
-	}
-	return oldViewController;
-}
-
-@end
-
+#include "Platform.h"
+#import "StackScreenWidget.h"
+#import "UINavigationControllerExpanded.h"
 
 @implementation StackScreenWidget
 
-- (void)viewControllerWillBePoped {
-	UINavigationController* navigationController = (UINavigationController*)controller;
+/**
+ * Init function.
+ */
+- (id)init
+{
+	UINavigationController* navigationController = [[[UINavigationController alloc] init] autorelease];
+    self = [super initWithController:navigationController];
+    if (self)
+    {
+        stack = [[NSMutableArray alloc] init];
+        navigationController.viewControllers = [NSArray array];
+        navigationController.delegate = self;
+    }
+	return self;
+}
+
+/**
+ * Pop the top view controller from the navigation stack.
+ * Called by the UINavigationController object.
+ * For more info see UINavigationControllerExpanded file.
+ */
+- (void)viewControllerWillBePoped
+{
+	UINavigationController* navigationController = (UINavigationController*)_controller;
 
 	NSArray *vcs = navigationController.viewControllers;
 
@@ -78,25 +75,13 @@
 	Base::gEventQueue.put(event);
 }
 
-- (id)init {
-	UINavigationController* navigationController = [[UINavigationController alloc] init];
-	stack = [[NSMutableArray alloc] init];
-	navigationController.viewControllers = [NSArray array];
-	navigationController.delegate = self;
-	return [super initWithController:navigationController];
-}
-
-- (void)dealloc {
-    [stack release];
-    [super dealloc];
-}
-
-- (void)addChild: (IWidget*)child {
-
-}
-
-- (void)push: (IWidget*)child {
-	UINavigationController* navigationController = (UINavigationController*)controller;
+/**
+ * Push a view controller on the navigation stack.
+ * @param child Widget containing a view controller(e.g. ScreenWidget).
+ */
+- (void)push:(IWidget*)child
+{
+	UINavigationController* navigationController = (UINavigationController*)_controller;
 	ScreenWidget* screen = (ScreenWidget*)child;
 	[navigationController pushViewController:[screen getController] animated:YES];
 	[stack addObject:child];
@@ -108,40 +93,24 @@
 	[child show];
 }
 
-- (void)pop {
-	UINavigationController* navigationController = (UINavigationController*)controller;
+/**
+ * Pop the top screen from the stack.
+ */
+- (void)pop
+{
+	UINavigationController* navigationController = (UINavigationController*)_controller;
 	[navigationController popViewControllerAnimated:YES];
 }
 
-
-- (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value {
-	if([key isEqualToString:@MAW_SCREEN_TITLE]) {
-		controller.title = value;
-	}
-	else if([key isEqualToString:@MAW_STACK_SCREEN_BACK_BUTTON_ENABLED]) {
-		UINavigationController* navigationController = (UINavigationController*)controller;
-		navigationController.navigationBar.backItem.hidesBackButton = [value boolValue];
-	}
-	else {
-		return [super setPropertyWithKey:key toValue:value];
-	}
-	return MAW_RES_OK;
-}
-
-- (NSString*)getPropertyWithKey: (NSString*)key {
-
-	return [super getPropertyWithKey:key];
-}
-
-- (UIViewController*) getController {
-	return controller;
-}
-
-- (void)layout {
-	UINavigationController* navigationController = (UINavigationController*)controller;
+/**
+ * Recalculate its and children size.
+ */
+- (void)layout
+{
+	UINavigationController* navigationController = (UINavigationController*)_controller;
 	int navBarHeight = navigationController.toolbar.bounds.size.height;
-    int viewWidth = self.view.frame.size.width;
-	int viewHeight = self.view.frame.size.height - navBarHeight;
+    int viewWidth = self.width;
+	int viewHeight = self.height - navBarHeight;
 	[self.view setNeedsLayout];
 	for (IWidget *child in stack)
     {
@@ -149,6 +118,42 @@
 		[childView setFrame:CGRectMake(0, 0, viewWidth, viewHeight)];
         [child layout];
 	}
+}
+
+/**
+ * Set a widget property value.
+ * @param key Widget's property name that should be set.
+ * @param value Widget's proeprty value that should be set.
+ * @return One of the following values:
+ * - MAW_RES_OK if the property was set.
+ * - MAW_RES_INVALID_PROPERTY_NAME if the property name was invalid.
+ * - MAW_RES_INVALID_PROPERTY_VALUE if the property value was invalid.
+ */
+- (int)setPropertyWithKey: (NSString*)key toValue:(NSString*)value
+{
+	if([key isEqualToString:@MAW_SCREEN_TITLE])
+    {
+		_controller.title = value;
+	}
+	else if([key isEqualToString:@MAW_STACK_SCREEN_BACK_BUTTON_ENABLED])
+    {
+		UINavigationController* navigationController = (UINavigationController*)_controller;
+		navigationController.navigationBar.backItem.hidesBackButton = [value boolValue];
+	}
+	else
+    {
+		return [super setPropertyWithKey:key toValue:value];
+	}
+	return MAW_RES_OK;
+}
+
+/**
+ * Dealloc method.
+ */
+- (void)dealloc
+{
+    [stack release];
+    [super dealloc];
 }
 
 @end

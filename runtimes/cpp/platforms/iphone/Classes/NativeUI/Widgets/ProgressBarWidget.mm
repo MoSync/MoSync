@@ -21,9 +21,10 @@
 // Default progress value for the progress bar.
 #define DEFAULT_PROGRESS_VALUE 0
 
-#import "ProgressBarWidget.h"
 #include <helpers/cpp_defs.h>
 #include <helpers/CPP_IX_WIDGET.h>
+
+#import "ProgressBarWidget.h"
 
 @implementation ProgressBarWidget
 
@@ -38,10 +39,10 @@
         self.view = [[[UIProgressView alloc] initWithProgressViewStyle: UIProgressViewStyleBar] autorelease];
     }
 
-    mMaxValue = DEFAULT_MAXIMUM_VALUE;
-    mProgressValue = DEFAULT_PROGRESS_VALUE;
+    _maxValue = DEFAULT_MAXIMUM_VALUE;
+    _progressValue = DEFAULT_PROGRESS_VALUE;
 
-    return [super init];
+    return self;
 }
 
 /**
@@ -50,7 +51,7 @@
  * @param value The value of the property.
  * @return MAW_RES_OK if the property was set, or an error code otherwise.
  */
-- (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value
+- (int)setPropertyWithKey:(NSString*)key toValue:(NSString*)value
 {
     UIProgressView* progressView = (UIProgressView*) self.view;
     float paramValue = [value floatValue];
@@ -58,51 +59,51 @@
     if([key isEqualToString:@MAW_PROGRESS_BAR_MAX])
     {
         TEST_FOR_NEGATIVE_VALUE(paramValue);
-        mMaxValue = paramValue;
+        _maxValue = paramValue;
 
         // Check if progress bar's value is bigger then the new maximum upper range.
-        if(mProgressValue > mMaxValue)
+        if (_progressValue > _maxValue)
         {
-            mProgressValue = mMaxValue;
+            _progressValue = _maxValue;
         }
 
         // Set the new value for the progress bar.
-        float currentPercentage = mProgressValue / mMaxValue;
+        float currentPercentage = _progressValue / _maxValue;
         [progressView setProgress:currentPercentage];
     }
     else if([key isEqualToString:@MAW_PROGRESS_BAR_PROGRESS])
     {
         TEST_FOR_NEGATIVE_VALUE(paramValue);
-        mProgressValue = [value floatValue];
+        _progressValue = [value floatValue];
 
         // Check if the new progress value is bigger then the maximum upper range.
-        if (mProgressValue > mMaxValue)
+        if (_progressValue > _maxValue)
         {
-            mProgressValue = mMaxValue;
+            _progressValue = _maxValue;
         }
 
         // Set the new progress value for the progress bar.
-        if (0 != mMaxValue)
+        if (0 != _maxValue)
         {
-            float currentPercent = mProgressValue / mMaxValue;
+            float currentPercent = _progressValue / _maxValue;
             [progressView setProgress:currentPercent];
         }
     }
     else if([key isEqualToString:@MAW_PROGRESS_BAR_INCREMENT_PROGRESS])
     {
         TEST_FOR_NEGATIVE_VALUE(paramValue);
-        mProgressValue += [value floatValue];
+        _progressValue += [value floatValue];
 
         // Check if the new progress value is bigger then the maximum upper range.
-        if (mProgressValue > mMaxValue)
+        if (_progressValue > _maxValue)
         {
-            mProgressValue = mMaxValue;
+            _progressValue = _maxValue;
         }
 
         // Increment the progress value for the progress bar.
-        if (0 != mMaxValue)
+        if (0 != _maxValue)
         {
-            float currentPercent = mProgressValue / mMaxValue;
+            float currentPercent = _progressValue / _maxValue;
             [progressView setProgress:currentPercent];
         }
     }
@@ -119,17 +120,17 @@
  * @param key The property of the progress bar widget.
  * @return The value for the given property.
  */
-- (NSString*)getPropertyWithKey: (NSString*)key
+- (NSString*)getPropertyWithKey:(NSString*)key
 {
 	if([key isEqualToString:@MAW_PROGRESS_BAR_MAX])
     {
         // Return the maximum value for the progress bar.
-		return [[NSString alloc] initWithFormat:@"%d", (int)mMaxValue];
+		return [[NSString alloc] initWithFormat:@"%d", (int)_maxValue];
 	}
     else if([key isEqualToString:@MAW_PROGRESS_BAR_PROGRESS])
     {
         // Return the progress value of the progress bar.
-        return [[NSString alloc] initWithFormat:@"%d", (int)mProgressValue];
+        return [[NSString alloc] initWithFormat:@"%d", (int)_progressValue];
 	}
     else
     {

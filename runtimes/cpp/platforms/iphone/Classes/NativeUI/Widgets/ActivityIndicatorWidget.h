@@ -21,9 +21,7 @@
 /**
  * Displays an activity indicator to the user.
  */
-@interface ActivityIndicatorWidget : IWidget {
-
-}
+@interface ActivityIndicatorWidget : IWidget
 
 /**
  * Init function.
@@ -37,12 +35,5 @@
  * @return MAW_RES_OK if the property was set, or an error code otherwise.
  */
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value;
-
-/**
- * Returns a activity indicator of the activity indicator widget.
- * @param key The property of the activity indicator widget.
- * @return The value for the given property.
- */
-- (NSString*)getPropertyWithKey: (NSString*)key;
 
 @end

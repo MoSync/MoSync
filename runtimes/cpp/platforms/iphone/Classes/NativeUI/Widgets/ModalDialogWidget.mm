@@ -86,7 +86,7 @@
 	else {//The Popover code for iPad
 		//First, replace the default vanilla view with MoSyncPopoverView
 		self.view = [[[MoSyncPopoverView alloc] initWithFrame:CGRectMake(0, 0, 10, 10)] autorelease];
-		controller.view = self.view;
+		_controller.view = self.view;
 		[(MoSyncPopoverView*)self.view setWidget:self];
 		//Default position is on the top left corner
 		top = 0;
@@ -101,7 +101,7 @@
         self.autoSizeHeight = WidgetAutoSizeFixed;
 		self.view.backgroundColor = [UIColor whiteColor];
 		//The navigation controller is needed for the title bar to appear
-		container = [[UINavigationController alloc] initWithRootViewController:controller];
+		container = [[UINavigationController alloc] initWithRootViewController:_controller];
 		popoverController = [[UIPopoverController alloc] initWithContentViewController:container];
 		popoverController.delegate = self;
 
@@ -165,7 +165,7 @@
 
 		[self.view setFrame:CGRectMake(self.view.frame.origin.x, self.view.frame.origin.y, viewWidth, viewHeight)];
 		//At this point it should have the correct size
-		controller.contentSizeForViewInPopover = self.view.frame.size;
+		_controller.contentSizeForViewInPopover = self.view.frame.size;
 
 		//The screen that was active when the popover was shown
 		IWidget* shownScreen = [getMoSyncUI() getCurrentlyShownScreen];
@@ -201,10 +201,10 @@
             mNavigationItem.title = value;
 		}
 		else {
-			[controller.title release];
-			controller.title = value;
+			[_controller.title release];
+			_controller.title = value;
 			//Hide or show the title based ont he string
-			if ([controller.title isEqualToString:@""]){
+			if ([_controller.title isEqualToString:@""]){
 				container.navigationBarHidden = YES;
 			}
 			else {
@@ -266,7 +266,7 @@
 			return [mNavigationItem.title retain];
 		}
 		else {
-			return [controller.title retain];
+			return [_controller.title retain];
 		}
 
     }

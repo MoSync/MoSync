@@ -21,22 +21,18 @@
 /**
  * Displays a number picker to the user.
  */
-@interface NumberPickerWidget : IWidget<UIPickerViewDataSource, UIPickerViewDelegate> {
+@interface NumberPickerWidget : IWidget<UIPickerViewDataSource, UIPickerViewDelegate>
+{
     /**
      * The minimum value that can be selected by user.
      */
-    int mMinValue;
+    int _minValue;
 
     /**
      * The maximum value that can be selected by user.
      */
-    int mMaxValue;
+    int _maxValue;
 }
-
-/**
- * Init function.
- */
-- (id)init;
 
 /**
  * Sets a number picker property.
@@ -44,7 +40,7 @@
  * @param value The value of the property.
  * @return MAW_RES_OK if the property was set, or an error code otherwise.
  */
-- (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value;
+- (int)setPropertyWithKey:(NSString*)key toValue:(NSString*)value;
 
 /**
  * Returns a property value of the number picker widget.

@@ -15,10 +15,10 @@
  02111-1307, USA.
  */
 
-#import "NumberPickerWidget.h"
 #include <helpers/cpp_defs.h>
 #include <helpers/CPP_IX_WIDGET.h>
 
+#import "NumberPickerWidget.h"
 #include "Platform.h"
 
 @implementation NumberPickerWidget
@@ -38,8 +38,8 @@
         [numberPicker setDataSource:self];
         [numberPicker setShowsSelectionIndicator:true];
 
-        mMaxValue = 0;
-        mMinValue = 0;
+        _maxValue = 0;
+        _minValue = 0;
         [numberPicker release];
         numberPicker = NULL;
     }
@@ -53,7 +53,7 @@
  * @param value The value of the property.
  * @return MAW_RES_OK if the property was set, or an error code otherwise.
  */
-- (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value
+- (int)setPropertyWithKey:(NSString*)key toValue:(NSString*)value
 {
     UIPickerView* numberPicker = (UIPickerView*) self.view;
     int paramValue = [value intValue];
@@ -61,32 +61,33 @@
     if ([key isEqualToString:@MAW_NUMBER_PICKER_MIN_VALUE])
     {
         // Check if the param is valid.
-        if (paramValue > mMaxValue) {
+        if (paramValue > _maxValue)
+        {
             return MAW_RES_INVALID_PROPERTY_VALUE;
         }
 
-        mMinValue = paramValue;
+        _minValue = paramValue;
         [numberPicker reloadComponent:0];
     }
     else if ([key isEqualToString:@MAW_NUMBER_PICKER_MAX_VALUE])
     {
         // Check if the param is valid.
-        if (paramValue < mMinValue) {
+        if (paramValue < _minValue) {
             return MAW_RES_INVALID_PROPERTY_VALUE;
         }
 
-        mMaxValue = paramValue;
+        _maxValue = paramValue;
         [numberPicker reloadComponent:0];
     }
     else if ([key isEqualToString:@MAW_NUMBER_PICKER_VALUE])
     {
         // Check if the param is valid.
-        if (mMinValue > paramValue ||  paramValue > mMaxValue)
+        if (_minValue > paramValue ||  paramValue > _maxValue)
         {
             return MAW_RES_INVALID_PROPERTY_VALUE;
         }
 
-        int selectRowIndex = abs(mMinValue - paramValue);
+        int selectRowIndex = abs(_minValue - paramValue);
         [numberPicker selectRow:selectRowIndex inComponent:0 animated:false];
     }
     else
@@ -102,17 +103,17 @@
  * @param key The property of the number picker widget.
  * @return The value for the given property.
  */
-- (NSString*)getPropertyWithKey: (NSString*)key
+- (NSString*)getPropertyWithKey:(NSString*)key
 {
     UIPickerView* numberPicker = (UIPickerView*) self.view;
 
     if([key isEqualToString:@MAW_NUMBER_PICKER_MIN_VALUE])
     {
-        return [[NSString alloc] initWithFormat:@"%d",mMinValue];
+        return [[NSString alloc] initWithFormat:@"%d",_minValue];
 	}
     else if([key isEqualToString:@MAW_NUMBER_PICKER_MAX_VALUE])
     {
-        return [[NSString alloc] initWithFormat:@"%d",mMaxValue];
+        return [[NSString alloc] initWithFormat:@"%d",_maxValue];
 	}
     else if([key isEqualToString:@MAW_NUMBER_PICKER_VALUE])
     {
@@ -137,7 +138,7 @@
  */
 - (NSInteger)pickerView:(UIPickerView *)thePickerView numberOfRowsInComponent:(NSInteger)component
 {
-    return (mMaxValue - mMinValue + 1);
+    return (_maxValue - _minValue + 1);
 }
 
 /**
@@ -148,7 +149,7 @@
  */
 - (NSString *)pickerView:(UIPickerView *)thePickerView titleForRow:(NSInteger)row forComponent:(NSInteger)component
 {
-    return [[NSString alloc] initWithFormat:@"%d", (mMinValue + row)];
+    return [NSString stringWithFormat:@"%d", (_minValue + row)];
 }
 
 /**
@@ -157,14 +158,15 @@
  * @param row A zero-indexed number identifying a row of component.
  * @param component A zero-indexed number identifying a component of pickerView.
  */
-- (void)pickerView:(UIPickerView *)thePickerView didSelectRow:(NSInteger)row inComponent:(NSInteger)component {
+- (void)pickerView:(UIPickerView *)thePickerView didSelectRow:(NSInteger)row inComponent:(NSInteger)component
+{
 
     MAEvent event;
 	event.type = EVENT_TYPE_WIDGET;
 
 	MAWidgetEventData *eventData = new MAWidgetEventData;
 	eventData->eventType = MAW_EVENT_NUMBER_PICKER_VALUE_CHANGED;
-    eventData->numberPickerValue = (mMinValue + row);
+    eventData->numberPickerValue = (_minValue + row);
 	eventData->widgetHandle = self.handle;
 
     event.data = (int)eventData;

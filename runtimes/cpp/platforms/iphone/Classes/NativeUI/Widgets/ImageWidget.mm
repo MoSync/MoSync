@@ -28,10 +28,10 @@
     self = [super init];
     if (self)
     {
-        imageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 100, 60)];
-        self.view = imageView;
-        leftCapWidth = 0;
-        topCapHeight = 0;
+        _imageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 100, 60)];
+        self.view = _imageView;
+        _leftCapWidth = 0;
+        _topCapHeight = 0;
         self.autoSizeWidth = WidgetAutoSizeWrapContent;
         self.autoSizeHeight = WidgetAutoSizeWrapContent;
         self.view.contentMode = UIViewContentModeCenter;
@@ -39,15 +39,25 @@
 	return self;
 }
 
-- (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value {
-
-    if([key isEqualToString:@MAW_IMAGE_IMAGE]) {
+/**
+ * Set a widget property value.
+ * @param key Widget's property name that should be set.
+ * @param value Widget's proeprty value that should be set.
+ * @return One of the following values:
+ * - MAW_RES_OK if the property was set.
+ * - MAW_RES_INVALID_PROPERTY_NAME if the property name was invalid.
+ * - MAW_RES_INVALID_PROPERTY_VALUE if the property value was invalid.
+ */
+- (int)setPropertyWithKey:(NSString*)key toValue:(NSString*)value
+{
+    if([key isEqualToString:@MAW_IMAGE_IMAGE])
+    {
 		int imageHandle = [value intValue];
 		if(imageHandle<=0) return MAW_RES_INVALID_PROPERTY_VALUE;
 		Surface* imageResource = Base::gSyscall->resources.get_RT_IMAGE(imageHandle);
 		UIImageOrientation orientation = UIImageOrientationUp;
-		NSLog(@"Surface orientation %d",imageResource->orientation);
-		switch (imageResource->orientation) {
+		switch (imageResource->orientation)
+        {
 			case 1:
 				orientation = UIImageOrientationUp;
 				break;
@@ -76,29 +86,37 @@
 				break;
 		}
 		UIImage* image = [UIImage imageWithCGImage:imageResource->image scale:1.0 orientation:orientation];
-		if(leftCapWidth != 0 || topCapHeight != 0) {
-			image = [image stretchableImageWithLeftCapWidth:leftCapWidth topCapHeight:topCapHeight];
+		if (_leftCapWidth != 0 || _topCapHeight != 0)
+        {
+			image = [image stretchableImageWithLeftCapWidth:_leftCapWidth topCapHeight:_topCapHeight];
 		}
-        imageView.image = image;
+        _imageView.image = image;
 		[self layout];
 	}
-	else if([key isEqualToString:@"leftCapWidth"]) {
+	else if([key isEqualToString:@"leftCapWidth"])
+    {
 		int newLeftCapWidth = [value intValue];
-		if(imageView != nil) {
-			UIImage* image = [imageView.image stretchableImageWithLeftCapWidth:newLeftCapWidth topCapHeight:topCapHeight];
-			imageView.image = image;
+		if (_imageView != nil)
+        {
+			UIImage* image = [_imageView.image stretchableImageWithLeftCapWidth:newLeftCapWidth
+                                                                   topCapHeight:_topCapHeight];
+			_imageView.image = image;
 		}
-		leftCapWidth = newLeftCapWidth;
+		_leftCapWidth = newLeftCapWidth;
 	}
-	else if ([key isEqualToString:@"topCapHeight"]) {
+	else if ([key isEqualToString:@"topCapHeight"])
+    {
 		int newTopCapHeight = [value intValue];
-		if(imageView != nil) {
-			UIImage* image = [imageView.image stretchableImageWithLeftCapWidth:leftCapWidth topCapHeight:newTopCapHeight];
-			imageView.image = image;
+		if (_imageView != nil)
+        {
+			UIImage* image = [_imageView.image stretchableImageWithLeftCapWidth:_leftCapWidth
+                                                                   topCapHeight:newTopCapHeight];
+			_imageView.image = image;
 		}
-		topCapHeight = newTopCapHeight;
+		_topCapHeight = newTopCapHeight;
 	}
-    else if ([key isEqualToString:@MAW_IMAGE_SCALE_MODE]) {
+    else if ([key isEqualToString:@MAW_IMAGE_SCALE_MODE])
+    {
         // none
         // scaleXY
         // scalePreserveAspect
@@ -111,20 +129,19 @@
         else if([value isEqualToString:@"scaleXY"]) self.view.contentMode = UIViewContentModeScaleToFill;
         else if([value isEqualToString:@"scalePreserveAspect"]) self.view.contentMode = UIViewContentModeScaleAspectFit;
     }
-	else {
+	else
+    {
 		return [super setPropertyWithKey:key toValue:value];
 	}
 	return MAW_RES_OK;
 }
 
-- (NSString*)getPropertyWithKey: (NSString*)key {
-
-	return [super getPropertyWithKey:key];
-}
-
+/**
+ * Dealloc method
+ */
 -(void) dealloc
 {
-    [imageView release];
+    [_imageView release];
     [super dealloc];
 }
 

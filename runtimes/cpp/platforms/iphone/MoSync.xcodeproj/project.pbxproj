@@ -64,6 +64,9 @@
 		433134F915345A73005DDAD8 /* SBJsonWriter.h in Headers */ = {isa = PBXBuildFile; fileRef = 433134D515345A73005DDAD8 /* SBJsonWriter.h */; };
 		433134FA15345A73005DDAD8 /* SBJsonWriter.m in Sources */ = {isa = PBXBuildFile; fileRef = 433134D615345A73005DDAD8 /* SBJsonWriter.m */; };
 		433134FB15345A73005DDAD8 /* SBJsonWriter.m in Sources */ = {isa = PBXBuildFile; fileRef = 433134D615345A73005DDAD8 /* SBJsonWriter.m */; };
+		4332FB4815BD3B8D00E6E048 /* UINavigationControllerExpanded.h in Headers */ = {isa = PBXBuildFile; fileRef = 4332FB4615BD3B8D00E6E048 /* UINavigationControllerExpanded.h */; };
+		4332FB4915BD3B8D00E6E048 /* UINavigationControllerExpanded.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4332FB4715BD3B8D00E6E048 /* UINavigationControllerExpanded.mm */; };
+		4332FB4A15BD3B8D00E6E048 /* UINavigationControllerExpanded.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4332FB4715BD3B8D00E6E048 /* UINavigationControllerExpanded.mm */; };
 		433F53DB15B6F61500CF34A6 /* WidgetUtils.h in Headers */ = {isa = PBXBuildFile; fileRef = 433F53D915B6F61500CF34A6 /* WidgetUtils.h */; };
 		433F53DC15B6F61500CF34A6 /* WidgetUtils.mm in Sources */ = {isa = PBXBuildFile; fileRef = 433F53DA15B6F61500CF34A6 /* WidgetUtils.mm */; };
 		433F53DD15B6F61500CF34A6 /* WidgetUtils.mm in Sources */ = {isa = PBXBuildFile; fileRef = 433F53DA15B6F61500CF34A6 /* WidgetUtils.mm */; };
@@ -71,6 +74,12 @@
 		438DBD451475393800980239 /* AudioInstance.mm in Sources */ = {isa = PBXBuildFile; fileRef = E4D36EAB1459B5B600477B1E /* AudioInstance.mm */; };
 		438DBD461475393800980239 /* AudioData.mm in Sources */ = {isa = PBXBuildFile; fileRef = E4D36EA51459AC5B00477B1E /* AudioData.mm */; };
 		4392606A15B478F400B53B88 /* LICENSE.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4392606915B478F400B53B88 /* LICENSE.txt */; };
+		43B322D715BC4168009634BC /* HorizontalLayoutWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 43B322D515BC4168009634BC /* HorizontalLayoutWidget.h */; };
+		43B322D815BC4168009634BC /* HorizontalLayoutWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43B322D615BC4168009634BC /* HorizontalLayoutWidget.mm */; };
+		43B322D915BC4168009634BC /* HorizontalLayoutWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43B322D615BC4168009634BC /* HorizontalLayoutWidget.mm */; };
+		43B322DD15BC421E009634BC /* VerticalLayoutWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 43B322DB15BC421E009634BC /* VerticalLayoutWidget.h */; };
+		43B322DE15BC421E009634BC /* VerticalLayoutWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43B322DC15BC421E009634BC /* VerticalLayoutWidget.mm */; };
+		43B322DF15BC421E009634BC /* VerticalLayoutWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43B322DC15BC421E009634BC /* VerticalLayoutWidget.mm */; };
 		43B39B3E15B98B1100E9032F /* WidgetLayoutingMacro.h in Headers */ = {isa = PBXBuildFile; fileRef = 43B39B3D15B98B1100E9032F /* WidgetLayoutingMacro.h */; };
 		43CE0BF61463EE5F00F8FFC3 /* iAd.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 43CE0BF51463EE5F00F8FFC3 /* iAd.framework */; };
 		43CE0BF91463EE7600F8FFC3 /* iAd.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 43CE0BF51463EE5F00F8FFC3 /* iAd.framework */; };
@@ -438,9 +447,15 @@
 		433134D415345A73005DDAD8 /* SBJsonUTF8Stream.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SBJsonUTF8Stream.m; path = SBJson/SBJsonUTF8Stream.m; sourceTree = "<group>"; };
 		433134D515345A73005DDAD8 /* SBJsonWriter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SBJsonWriter.h; path = SBJson/SBJsonWriter.h; sourceTree = "<group>"; };
 		433134D615345A73005DDAD8 /* SBJsonWriter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SBJsonWriter.m; path = SBJson/SBJsonWriter.m; sourceTree = "<group>"; };
+		4332FB4615BD3B8D00E6E048 /* UINavigationControllerExpanded.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UINavigationControllerExpanded.h; path = Expanded/UINavigationControllerExpanded.h; sourceTree = "<group>"; };
+		4332FB4715BD3B8D00E6E048 /* UINavigationControllerExpanded.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = UINavigationControllerExpanded.mm; path = Expanded/UINavigationControllerExpanded.mm; sourceTree = "<group>"; };
 		433F53D915B6F61500CF34A6 /* WidgetUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = WidgetUtils.h; path = Classes/NativeUI/WidgetUtils.h; sourceTree = SOURCE_ROOT; };
 		433F53DA15B6F61500CF34A6 /* WidgetUtils.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = WidgetUtils.mm; path = Classes/NativeUI/WidgetUtils.mm; sourceTree = SOURCE_ROOT; };
 		4392606915B478F400B53B88 /* LICENSE.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = LICENSE.txt; path = SBJson/LICENSE.txt; sourceTree = "<group>"; };
+		43B322D515BC4168009634BC /* HorizontalLayoutWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = HorizontalLayoutWidget.h; path = NativeUI/Layouts/HorizontalLayoutWidget.h; sourceTree = "<group>"; };
+		43B322D615BC4168009634BC /* HorizontalLayoutWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = HorizontalLayoutWidget.mm; path = NativeUI/Layouts/HorizontalLayoutWidget.mm; sourceTree = "<group>"; };
+		43B322DB15BC421E009634BC /* VerticalLayoutWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VerticalLayoutWidget.h; path = NativeUI/Layouts/VerticalLayoutWidget.h; sourceTree = "<group>"; };
+		43B322DC15BC421E009634BC /* VerticalLayoutWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = VerticalLayoutWidget.mm; path = NativeUI/Layouts/VerticalLayoutWidget.mm; sourceTree = "<group>"; };
 		43B39B3D15B98B1100E9032F /* WidgetLayoutingMacro.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = WidgetLayoutingMacro.h; path = NativeUI/Base/WidgetLayoutingMacro.h; sourceTree = "<group>"; };
 		43CE0BF51463EE5F00F8FFC3 /* iAd.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = iAd.framework; path = System/Library/Frameworks/iAd.framework; sourceTree = SDKROOT; };
 		43D8048213EFBCC700183387 /* MediaPlayer.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MediaPlayer.framework; path = System/Library/Frameworks/MediaPlayer.framework; sourceTree = SDKROOT; };
@@ -930,6 +945,10 @@
 			children = (
 				43F36F0115B45C7E0095B3C6 /* LayoutWidgets.h */,
 				43F36F0215B45C7E0095B3C6 /* LayoutWidgets.mm */,
+				43B322D515BC4168009634BC /* HorizontalLayoutWidget.h */,
+				43B322D615BC4168009634BC /* HorizontalLayoutWidget.mm */,
+				43B322DB15BC421E009634BC /* VerticalLayoutWidget.h */,
+				43B322DC15BC421E009634BC /* VerticalLayoutWidget.mm */,
 				43F36EEB15B45C5D0095B3C6 /* LayoutManagers */,
 			);
 			name = Layouts;
@@ -1055,6 +1074,8 @@
 				43F36FA715B464D50095B3C6 /* NSStringExpanded.mm */,
 				43F36FA815B464D50095B3C6 /* UIColorExpanded.h */,
 				43F36FA915B464D50095B3C6 /* UIColorExpanded.mm */,
+				4332FB4615BD3B8D00E6E048 /* UINavigationControllerExpanded.h */,
+				4332FB4715BD3B8D00E6E048 /* UINavigationControllerExpanded.mm */,
 			);
 			name = Expanded;
 			sourceTree = "<group>";
@@ -1507,6 +1528,9 @@
 				43F3706515B476940095B3C6 /* TouchHelper.h in Headers */,
 				433F53DB15B6F61500CF34A6 /* WidgetUtils.h in Headers */,
 				43B39B3E15B98B1100E9032F /* WidgetLayoutingMacro.h in Headers */,
+				43B322D715BC4168009634BC /* HorizontalLayoutWidget.h in Headers */,
+				43B322DD15BC421E009634BC /* VerticalLayoutWidget.h in Headers */,
+				4332FB4815BD3B8D00E6E048 /* UINavigationControllerExpanded.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1740,6 +1764,9 @@
 				43F3706115B476300095B3C6 /* ScreenWidgetController.mm in Sources */,
 				43F3706615B476940095B3C6 /* TouchHelper.mm in Sources */,
 				433F53DC15B6F61500CF34A6 /* WidgetUtils.mm in Sources */,
+				43B322D815BC4168009634BC /* HorizontalLayoutWidget.mm in Sources */,
+				43B322DE15BC421E009634BC /* VerticalLayoutWidget.mm in Sources */,
+				4332FB4915BD3B8D00E6E048 /* UINavigationControllerExpanded.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1862,6 +1889,9 @@
 				43F3706215B476300095B3C6 /* ScreenWidgetController.mm in Sources */,
 				43F3706715B476940095B3C6 /* TouchHelper.mm in Sources */,
 				433F53DD15B6F61500CF34A6 /* WidgetUtils.mm in Sources */,
+				43B322D915BC4168009634BC /* HorizontalLayoutWidget.mm in Sources */,
+				43B322DF15BC421E009634BC /* VerticalLayoutWidget.mm in Sources */,
+				4332FB4A15BD3B8D00E6E048 /* UINavigationControllerExpanded.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

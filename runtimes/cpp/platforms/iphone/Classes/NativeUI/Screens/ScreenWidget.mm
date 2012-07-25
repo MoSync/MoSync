@@ -23,27 +23,31 @@
 
 @implementation ScreenWidget
 
-- (id)init {
-    INNativeUILog;
-	UIViewController* c = [[ScreenWidgetController alloc] init];
-	return [self initWithController:c];
+/**
+ * Init function.
+ * A view controller will be created for you.
+ */
+- (id)init
+{
+	UIViewController* controller = [[[ScreenWidgetController alloc] init] autorelease];
+	return [self initWithController:controller];
 }
 
-- (id)initWithController:(UIViewController*)_controller {
-    controller = _controller;
-    self.view = [controller.view retain];
+/**
+ * Init function.
+ * @param controller Controller for the view.
+ */
+- (id)initWithController:(UIViewController*)controller
+{
     self = [super init];
     if (self)
     {
+        _controller = [controller retain];
+        self.view = _controller.view;
         controller.title = @"";
         self.view.autoresizesSubviews = YES;
     }
 	return self;
-}
-
-- (void)dealloc {
-    [controller release];
-    [super dealloc];
 }
 
 /**
@@ -65,30 +69,22 @@
     return MAW_RES_OK;
 }
 
-- (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value {
-
-	if([key isEqualToString:@MAW_SCREEN_TITLE]) {
-		controller.title = value;
-	}
-	else if([key isEqualToString:@MAW_SCREEN_ICON]) {
-		int imageHandle = [value intValue];
-		if(imageHandle<=0) return MAW_RES_INVALID_PROPERTY_VALUE;
-		Surface* imageResource = Base::gSyscall->resources.get_RT_IMAGE(imageHandle);
-		[controller.tabBarItem setImage:[UIImage imageWithCGImage:imageResource->image]];
-	}
-	else {
-		return [super setPropertyWithKey:key toValue:value];
-	}
-	return MAW_RES_OK;
-}
-
-- (NSString*)getPropertyWithKey: (NSString*)key {
-
-	return [super getPropertyWithKey:key];
-}
-
-- (UIViewController*) getController {
-	return controller;
+/**
+ * Insert a widget to a given index.
+ * @param child Widget to be added.
+ * @param index Screen widget can have only one child, so this value must be zero.
+ * @return One of the following values:
+ * - MAW_RES_OK if the child could be added to the parent.
+ * - MAW_RES_INVALID_INDEX if the index param is not zero.
+ */
+- (int)insertChild: (IWidget*)child atIndex:(NSNumber*)index
+{
+    if (index != 0)
+    {
+        return MAW_RES_INVALID_INDEX;
+    }
+    [self addChild:child];
+    return MAW_RES_OK;
 }
 
 /**
@@ -106,6 +102,54 @@
     IWidget* child = [_children objectAtIndex:0];
     child.size = self.size;
     OUTNativeUILog;
+}
+
+/**
+ * Get view's controller.
+ * @return View's controller.
+ */
+- (UIViewController*) getController
+{
+    return _controller;
+}
+
+/**
+ * Set a widget property value.
+ * @param key Widget's property name that should be set.
+ * @param value Widget's proeprty value that should be set.
+ * @return One of the following values:
+ * - MAW_RES_OK if the property was set.
+ * - MAW_RES_INVALID_PROPERTY_NAME if the property name was invalid.
+ * - MAW_RES_INVALID_PROPERTY_VALUE if the property value was invalid.
+ */
+- (int)setPropertyWithKey:(NSString*)key toValue:(NSString*)value
+{
+
+	if([key isEqualToString:@MAW_SCREEN_TITLE])
+    {
+		_controller.title = value;
+	}
+	else if([key isEqualToString:@MAW_SCREEN_ICON])
+    {
+		int imageHandle = [value intValue];
+		if(imageHandle<=0) return MAW_RES_INVALID_PROPERTY_VALUE;
+		Surface* imageResource = Base::gSyscall->resources.get_RT_IMAGE(imageHandle);
+		[_controller.tabBarItem setImage:[UIImage imageWithCGImage:imageResource->image]];
+	}
+	else
+    {
+		return [super setPropertyWithKey:key toValue:value];
+	}
+	return MAW_RES_OK;
+}
+
+/**
+ * Dealloc method.
+ */
+- (void)dealloc
+{
+    [_controller release];
+    [super dealloc];
 }
 
 @end

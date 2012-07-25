@@ -21,22 +21,18 @@
 /**
  * Displays a slider to the user.
  */
-@interface SliderWidget : IWidget {
+@interface SliderWidget : IWidget
+{
     /**
      * The maximum value of the slider.
      */
-    float mMaxValue;
+    float _maxValue;
 
     /**
      * The progress value.
      */
-    float mProgressValue;
+    float _progressValue;
 }
-
-/**
- * Init function.
- */
-- (id)init;
 
 /**
  * Sets a slider property.
@@ -44,13 +40,13 @@
  * @param value The value of the property.
  * @return MAW_RES_OK if the property was set, or an error code otherwise.
  */
-- (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value;
+- (int)setPropertyWithKey:(NSString*)key toValue:(NSString*)value;
 
 /**
  * Returns a property value of the slider widget.
  * @param key The property of the slider widget.
  * @return The value for the given property.
  */
-- (NSString*)getPropertyWithKey: (NSString*)key;
+- (NSString*)getPropertyWithKey:(NSString*)key;
 
 @end

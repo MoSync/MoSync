@@ -15,14 +15,16 @@
  02111-1307, USA.
  */
 
-#import "LabelWidget.h"
-#include "Platform.h"
 #include <helpers/cpp_defs.h>
 #include <helpers/CPP_IX_WIDGET.h>
 #include <base/Syscall.h>
-#include "UIColorExpanded.h"
 
-typedef enum VerticalAlignment {
+#import "LabelWidget.h"
+#import "UIColorExpanded.h"
+#include "Platform.h"
+
+typedef enum VerticalAlignment
+{
     VerticalAlignmentTop,
     VerticalAlignmentMiddle,
     VerticalAlignmentBottom,
@@ -86,26 +88,40 @@ typedef enum VerticalAlignment {
 
 @implementation LabelWidget
 
-- (id)init {
+/**
+ * Init function.
+ */
+- (id)init
+{
     self = [super init];
     if (self)
     {
-        UILabel* label = [[UILabelWithVerticalAlignment alloc] initWithFrame:CGRectMake(0, 0, 200, 60)];
+        UILabel* label = [[[UILabelWithVerticalAlignment alloc] initWithFrame:CGRectMake(0, 0, 200, 60)] autorelease];
         label.opaque = NO;
         self.view = label;
 
         self.autoSizeWidth = WidgetAutoSizeWrapContent;
         self.autoSizeHeight = WidgetAutoSizeWrapContent;
-        isWidthWrapContent = true;
     }
 	return self;
 }
 
-- (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value {
-	if([key isEqualToString:@MAW_LABEL_TEXT]) {
+/**
+ * Set a widget property value.
+ * @param key Widget's property name that should be set.
+ * @param value Widget's proeprty value that should be set.
+ * @return One of the following values:
+ * - MAW_RES_OK if the property was set.
+ * - MAW_RES_INVALID_PROPERTY_NAME if the property name was invalid.
+ * - MAW_RES_INVALID_PROPERTY_VALUE if the property value was invalid.
+ */
+- (int)setPropertyWithKey:(NSString*)key toValue:(NSString*)value
+{
+	if([key isEqualToString:@MAW_LABEL_TEXT])
+    {
 		UILabel* label = (UILabel*) self.view;
 		[label setText: value];
-		if (isWidthWrapContent)
+		if (self.autoSizeWidth == WidgetAutoSizeWrapContent)
 		{
 			CGSize textSize = [label.text sizeWithFont:label.font];
 			CGRect rect = label.frame;
@@ -113,15 +129,16 @@ typedef enum VerticalAlignment {
 			label.frame = rect;
 		}
 		[self layout];
-		//[label sizeToFit];
 	}
-	else if([key isEqualToString:@MAW_LABEL_MAX_NUMBER_OF_LINES]) {
+	else if([key isEqualToString:@MAW_LABEL_MAX_NUMBER_OF_LINES])
+    {
         TEST_FOR_NEGATIVE_VALUE([value intValue]);
 		UILabel* label = (UILabel*) self.view;
 		label.numberOfLines = [value intValue];
 		[self layout];
 	}
-	else if([key isEqualToString:@MAW_LABEL_TEXT_HORIZONTAL_ALIGNMENT]) {
+	else if([key isEqualToString:@MAW_LABEL_TEXT_HORIZONTAL_ALIGNMENT])
+    {
 		UILabel* label = (UILabel*) self.view;
 		if([value isEqualToString:@"left"]) {
 			label.textAlignment = UITextAlignmentLeft;
@@ -136,7 +153,8 @@ typedef enum VerticalAlignment {
             return MAW_RES_INVALID_PROPERTY_VALUE;
         }
 	}
-	else if([key isEqualToString:@MAW_LABEL_TEXT_VERTICAL_ALIGNMENT]) {
+	else if([key isEqualToString:@MAW_LABEL_TEXT_VERTICAL_ALIGNMENT])
+    {
 		UILabelWithVerticalAlignment* label = (UILabelWithVerticalAlignment*) self.view;
 		if([value isEqualToString:@"top"]) {
 			[label setVerticalAlignment:VerticalAlignmentTop];
@@ -151,13 +169,15 @@ typedef enum VerticalAlignment {
             return MAW_RES_INVALID_PROPERTY_VALUE;
         }
 	}
-	else if([key isEqualToString:@MAW_LABEL_FONT_COLOR]) {
+	else if([key isEqualToString:@MAW_LABEL_FONT_COLOR])
+    {
 		UILabel* label = (UILabel*) self.view;
 		UIColor* color = [UIColor colorWithHexString:value];
 		if(!color) return MAW_RES_INVALID_PROPERTY_VALUE;
 		label.textColor = color;
 	}
-	else if([key isEqualToString:@MAW_LABEL_FONT_SIZE]) {
+	else if([key isEqualToString:@MAW_LABEL_FONT_SIZE])
+    {
 		UILabel* label = (UILabel*) self.view;
 		float fontSize = [value floatValue];
         UIFont* currentFont = label.font;
@@ -178,34 +198,33 @@ typedef enum VerticalAlignment {
         [label setFont:font];
         [self layout];
 	}
-    else if([key isEqualToString:@MAW_WIDGET_WIDTH])
+	else
     {
-        // If the width of the label is MAW_CONSTANT_WRAP_CONTENT
-        // the label is not resized correctly so it will be set manually.
-        if ([value intValue] == MAW_CONSTANT_WRAP_CONTENT)
-        {
-            isWidthWrapContent = true;
-        }
-        else
-        {
-            isWidthWrapContent = false;
-        }
-        [super setPropertyWithKey:key toValue:value];
-    }
-	else {
 		return [super setPropertyWithKey:key toValue:value];
 	}
 	return MAW_RES_OK;
 }
 
-- (NSString*)getPropertyWithKey: (NSString*)key {
-	if([key isEqualToString:@MAW_LABEL_TEXT]) {
+/**
+ * Get a widget property value.
+ * @param key Widget's property name.
+ * @return The property value, or nil if the property name is invalid.
+ * The returned value should not be autoreleased. The caller will release the returned value.
+ */
+- (NSString*)getPropertyWithKey:(NSString*)key
+{
+	if([key isEqualToString:@MAW_LABEL_TEXT])
+    {
 		UILabel* label = (UILabel*) self.view;
 		return [label.text retain];
-	} else if([key isEqualToString:@MAW_LABEL_MAX_NUMBER_OF_LINES]) {
+	}
+    else if([key isEqualToString:@MAW_LABEL_MAX_NUMBER_OF_LINES])
+    {
 		UILabel* label = (UILabel*) self.view;
         return [[[NSNumber numberWithInt: label.numberOfLines] stringValue] retain];
-	} else {
+	}
+    else
+    {
 		return [super getPropertyWithKey:key];
 	}
 }

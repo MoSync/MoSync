@@ -24,6 +24,8 @@
  * @brief Utility for NativeUI module.
  */
 
+#include "Syscall.h"
+
 /**
  * If the value is negative it returns MAW_RES_INVALID_PROPERTY_VALUE constant.
  */
@@ -48,3 +50,8 @@ typedef enum {
  */
 extern NSString* const kWidgetTrueValue;
 extern NSString* const kWidgetFalseValue;
+
+namespace Base
+{
+    UIFont* getUIFontObject(MAHandle fontHandle);
+};

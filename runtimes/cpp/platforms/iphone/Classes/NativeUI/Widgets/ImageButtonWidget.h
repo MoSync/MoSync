@@ -18,9 +18,6 @@
 #import <Foundation/Foundation.h>
 #import "ButtonWidget.h"
 
-@interface ImageButtonWidget : ButtonWidget {
-}
-
-- (id)init;
+@interface ImageButtonWidget : ButtonWidget
 
 @end

@@ -15,53 +15,55 @@
  02111-1307, USA.
  */
 
-#import "ButtonWidget.h"
-#include "Platform.h"
 #include <helpers/cpp_defs.h>
 #include <helpers/CPP_IX_WIDGET.h>
 #include <base/Syscall.h>
-#include "UIColorExpanded.h"
+
+#import "ButtonWidget.h"
+#import "UIColorExpanded.h"
+#include "Platform.h"
 
 @implementation ButtonWidget
 
-- (id)init {
-	id ret = [super init];
-    self.view = [[UIButton buttonWithType:UIButtonTypeRoundedRect] retain];
-	UIButton* button = (UIButton*) self.view;
-    button.contentEdgeInsets = UIEdgeInsetsMake(1.0, 1.0, 1.0, 1.0);
-	[button addTarget:self action:@selector(touchDownEvent) forControlEvents:UIControlEventTouchDown];
-    [button addTarget:self action:@selector(touchUpInsideEvent) forControlEvents:UIControlEventTouchUpInside];
-    [button addTarget:self action:@selector(touchUpOutsideEvent) forControlEvents:UIControlEventTouchUpOutside];
-	image = nil;
-	leftCapWidth = 0;
-	topCapHeight = 0;
-	button.titleLabel.numberOfLines = 0;
-    [button setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
-
-    self.autoSizeWidth = WidgetAutoSizeWrapContent;
-    self.autoSizeHeight = WidgetAutoSizeWrapContent;
-    button.imageView.contentMode = UIViewContentModeCenter;
-
-    return ret;
-}
-
--(void) touchDownEvent
+/**
+ * Init function.
+ */
+- (id)init
 {
-    [super sendEvent:MAW_EVENT_POINTER_PRESSED];
+	self = [super init];
+    if (self)
+    {
+        self.view = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+        UIButton* button = (UIButton*) self.view;
+        button.contentEdgeInsets = UIEdgeInsetsMake(1.0, 1.0, 1.0, 1.0);
+        [button addTarget:self action:@selector(touchDownEvent) forControlEvents:UIControlEventTouchDown];
+        [button addTarget:self action:@selector(touchUpInsideEvent) forControlEvents:UIControlEventTouchUpInside];
+        [button addTarget:self action:@selector(touchUpOutsideEvent) forControlEvents:UIControlEventTouchUpOutside];
+
+        image = nil;
+        leftCapWidth = 0;
+        topCapHeight = 0;
+        button.titleLabel.numberOfLines = 0;
+        [button setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
+
+        self.autoSizeWidth = WidgetAutoSizeWrapContent;
+        self.autoSizeHeight = WidgetAutoSizeWrapContent;
+        button.imageView.contentMode = UIViewContentModeCenter;
+    }
+    return self;
 }
 
--(void)touchUpInsideEvent
+/**
+ * Set a widget property value.
+ * @param key Widget's property name that should be set.
+ * @param value Widget's proeprty value that should be set.
+ * @return One of the following values:
+ * - MAW_RES_OK if the property was set.
+ * - MAW_RES_INVALID_PROPERTY_NAME if the property name was invalid.
+ * - MAW_RES_INVALID_PROPERTY_VALUE if the property value was invalid.
+ */
+- (int)setPropertyWithKey:(NSString*)key toValue:(NSString*)value
 {
-    [super sendEvent:MAW_EVENT_POINTER_RELEASED];
-    [super sendEvent:MAW_EVENT_CLICKED];
-}
-
--(void) touchUpOutsideEvent
-{
-    [super sendEvent:MAW_EVENT_POINTER_RELEASED];
-}
-
-- (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value {
 	if([key isEqualToString:@MAW_BUTTON_TEXT]) {
 		UIButton* button = (UIButton*) self.view;
 		[button setTitle:value forState:UIControlStateNormal];
@@ -112,25 +114,6 @@
         image = [UIImage imageWithCGImage:imageResource->image];
         [button setImage:image forState:UIControlStateNormal];
     }
-    /* // doesn't work on iphone....
-    else if ([key isEqualToString:@"scaleMode"]) {
-        UIButton* button = (UIButton*)view;
-
-        UIViewContentMode contentMode;
-
-        if([value isEqualToString:@"none"])
-            contentMode = UIViewContentModeCenter;
-        else if([value isEqualToString:@"scaleXY"])
-            contentMode = UIViewContentModeScaleToFill;
-        else if([value isEqualToString:@"scalePreserveAspect"])
-            contentMode = UIViewContentModeScaleAspectFit;
-        else
-            return MAW_RES_INVALID_PROPERTY_NAME;
-
-        [button setContentMode:contentMode];
-        button.imageView.contentMode = contentMode;
-    }
-    */
 	else if([key isEqualToString:@"leftCapWidth"]) {
 		int newLeftCapWidth = [value intValue];
 		if(image != nil) {
@@ -186,13 +169,48 @@
 	return MAW_RES_OK;
 }
 
-- (NSString*)getPropertyWithKey: (NSString*)key {
-	if([key isEqualToString:@MAW_BUTTON_TEXT]) {
+/**
+ * Get a widget property value.
+ * @param key Widget's property name.
+ * @return The property value, or nil if the property name is invalid.
+ * The returned value should not be autoreleased. The caller will release the returned value.
+ */
+- (NSString*)getPropertyWithKey:(NSString*)key
+{
+	if([key isEqualToString:@MAW_BUTTON_TEXT])
+    {
 		UIButton* button = (UIButton*) self.view;
 		return [button.titleLabel.text retain];
-	} else {
+	}
+    else
+    {
 		return [super getPropertyWithKey:key];
 	}
+}
+
+/**
+ * Called for a touch down event in the control.
+ */
+-(void) touchDownEvent
+{
+    [super sendEvent:MAW_EVENT_POINTER_PRESSED];
+}
+
+/**
+ * Called for a touch-up event in the control where the finger is inside the bounds of the control.
+ */
+-(void)touchUpInsideEvent
+{
+    [super sendEvent:MAW_EVENT_POINTER_RELEASED];
+    [super sendEvent:MAW_EVENT_CLICKED];
+}
+
+/**
+ * Called for a touch-up event in the control where the finger is outside the bounds of the control.
+ */
+-(void) touchUpOutsideEvent
+{
+    [super sendEvent:MAW_EVENT_POINTER_RELEASED];
 }
 
 @end

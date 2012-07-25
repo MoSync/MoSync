@@ -28,7 +28,8 @@
     if (self)
     {
         widgetClass = NSClassFromString(name);
-        if(widgetClass == nil) {
+        if(widgetClass == nil)
+        {
             [self dealloc];
             return nil;
         }
@@ -41,27 +42,24 @@
 	return self;
 }
 
-- (void)addChild: (IWidget*)child {
+- (void)addChild: (IWidget*)child
+{
 	[super addChild:child toSubview:YES];
 }
 
-- (void)removeChild: (IWidget*)child {
-}
-
-- (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value {
+- (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value
+{
 	Ivar nameVar = class_getInstanceVariable(widgetClass, [key UTF8String]);
-	if(nameVar != nil) {
+	if(nameVar != nil)
+    {
 		object_setIvar(widgetClass, nameVar, value);
-	} else {
+	}
+    else
+    {
 		return MAW_RES_ERROR;
 	}
 
 	return MAW_RES_OK;
-}
-
-- (NSString*)getPropertyWithKey: (NSString*)key {
-
-	return [super getPropertyWithKey:key];
 }
 
 @end

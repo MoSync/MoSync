@@ -21,9 +21,7 @@
 /**
  * Displays a date picker to the user.
  */
-@interface DatePickerWidget : IWidget {
-
-}
+@interface DatePickerWidget : IWidget
 
 /**
  * Init function.

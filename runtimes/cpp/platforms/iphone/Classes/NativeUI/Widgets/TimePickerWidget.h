@@ -21,14 +21,7 @@
 /**
  * Displays a date picker to the user.
  */
-@interface TimePickerWidget : IWidget {
-
-}
-
-/**
- * Init function.
- */
-- (id)init;
+@interface TimePickerWidget : IWidget
 
 /**
  * Sets a time picker property.
@@ -36,13 +29,13 @@
  * @param value The value of the property.
  * @return MAW_RES_OK if the property was set, or an error code otherwise.
  */
-- (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value;
+- (int)setPropertyWithKey:(NSString*)key toValue:(NSString*)value;
 
 /**
  * Returns a property value of the time picker widget.
  * @param key The property of the time picker widget.
  * @return The value for the given property.
  */
-- (NSString*)getPropertyWithKey: (NSString*)key;
+- (NSString*)getPropertyWithKey:(NSString*)key;
 
 @end

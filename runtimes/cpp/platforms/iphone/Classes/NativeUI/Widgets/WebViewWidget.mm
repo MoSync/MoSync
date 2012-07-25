@@ -46,6 +46,8 @@
 
         self.autoSizeWidth = WidgetAutoSizeFillParent;
         self.autoSizeHeight = WidgetAutoSizeFillParent;
+        [webView release];
+        webView = nil;
     }
     return self;
 }

@@ -21,23 +21,18 @@
 /**
  * Displays a progress bar to the user.
  */
-@interface ProgressBarWidget: IWidget {
-
+@interface ProgressBarWidget: IWidget
+{
     /**
      * The maximum value of the progress bar.
      */
-    float mMaxValue;
+    float _maxValue;
 
     /**
      * The progress value(how much of the task has been completed).
      */
-    float mProgressValue;
+    float _progressValue;
 }
-
-/**
- * Init function.
- */
-- (id)init;
 
 /**
  * Sets a progress bar property.
@@ -45,13 +40,13 @@
  * @param value The value of the property.
  * @return MAW_RES_OK if the property was set, or an error code otherwise.
  */
-- (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value;
+- (int)setPropertyWithKey:(NSString*)key toValue:(NSString*)value;
 
 /**
  * Returns a property value of the progress bar widget.
  * @param key The property of the progress bar widget.
  * @return The value for the given property.
  */
-- (NSString*)getPropertyWithKey: (NSString*)key;
+- (NSString*)getPropertyWithKey:(NSString*)key;
 
 @end

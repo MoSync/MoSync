@@ -23,6 +23,9 @@
 
 @implementation CheckBoxWidget
 
+/**
+ * Init function.
+ */
 - (id)init
 {
     self = [super init];
@@ -32,12 +35,59 @@
         self.view = checkBox;
         [checkBox addTarget:self action:@selector(checkBoxPressed) forControlEvents:UIControlEventTouchUpInside];
         [checkBox release];
+        checkBox = nil;
     }
 	return self;
 }
 
--(void)checkBoxPressed {
-	NSLog(@"CheckBox pressed!");
+/**
+ * Set a widget property value.
+ * @param key Widget's property name that should be set.
+ * @param value Widget's proeprty value that should be set.
+ * @return One of the following values:
+ * - MAW_RES_OK if the property was set.
+ * - MAW_RES_INVALID_PROPERTY_NAME if the property name was invalid.
+ * - MAW_RES_INVALID_PROPERTY_VALUE if the property value was invalid.
+ */
+- (int)setPropertyWithKey:(NSString*)key toValue:(NSString*)value
+{
+	if([key isEqualToString:@MAW_CHECK_BOX_CHECKED])
+    {
+		bool checked = [value boolValue];
+		UISwitch* checkBox = (UISwitch*) self.view;
+		checkBox.on = checked;
+	}
+    else
+    {
+		return [super setPropertyWithKey:key toValue:value];
+	}
+	return MAW_RES_OK;
+}
+
+/**
+ * Get a widget property value.
+ * @param key Widget's property name.
+ * @return The property value, or nil if the property name is invalid.
+ * The returned value should not be autoreleased. The caller will release the returned value.
+ */
+- (NSString*)getPropertyWithKey:(NSString*)key
+{
+	if([key isEqualToString:@MAW_CHECK_BOX_CHECKED])
+    {
+		UISwitch* checkBox = (UISwitch*) self.view;
+		return [[NSString alloc] initWithString:(checkBox.on?kWidgetTrueValue:kWidgetFalseValue)];
+	}
+    else
+    {
+		return [super getPropertyWithKey:key];
+	}
+}
+
+/**
+ * Called for a touch-up event in the control where the finger is inside the bounds of the control.
+ */
+-(void)checkBoxPressed
+{
 	UISwitch *checkBox = (UISwitch*) self.view;
 	MAEvent event;
 	event.type = EVENT_TYPE_WIDGET;
@@ -47,26 +97,6 @@
 	eventData->checked = checkBox.on;
 	event.data = (int)eventData;
 	Base::gEventQueue.put(event);
-}
-
-- (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value {
-	if([key isEqualToString:@MAW_CHECK_BOX_CHECKED]) {
-		bool checked = [value boolValue];
-		UISwitch* checkBox = (UISwitch*) self.view;
-		checkBox.on = checked;
-	} else {
-		return [super setPropertyWithKey:key toValue:value];
-	}
-	return MAW_RES_OK;
-}
-
-- (NSString*)getPropertyWithKey: (NSString*)key {
-	if([key isEqualToString:@MAW_CHECK_BOX_CHECKED]) {
-		UISwitch* checkBox = (UISwitch*) self.view;
-		return [[NSString alloc] initWithString:(checkBox.on?@"true":@"false")];
-	} else {
-		return [super getPropertyWithKey:key];
-	}
 }
 
 @end

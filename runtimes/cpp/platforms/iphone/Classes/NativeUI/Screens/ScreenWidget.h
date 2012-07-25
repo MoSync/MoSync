@@ -19,13 +19,25 @@
 #import "IWidget.h"
 #import "ScreenWidgetController.h"
 
-@interface ScreenWidget : IWidget {
-	UIViewController* controller;
+@interface ScreenWidget : IWidget
+{
+    /**
+     * View's controller.
+     */
+	UIViewController* _controller;
 }
 
+/**
+ * Init function.
+ * A view controller will be created for you.
+ */
 - (id)init;
+
+/**
+ * Init function.
+ * @param controller Controller for the view.
+ */
 - (id)initWithController:(UIViewController*)controller;
-- (void)dealloc;
 
 /**
  * Adds an widget to the end of the children list.
@@ -36,12 +48,35 @@
 - (int)addChild:(IWidget*)child;
 
 /**
+ * Insert a widget to a given index.
+ * @param child Widget to be added.
+ * @param index Screen widget can have only one child, so this value must be zero.
+ * @return One of the following values:
+ * - MAW_RES_OK if the child could be added to the parent.
+ * - MAW_RES_INVALID_INDEX if the index param is not zero.
+ */
+- (int)insertChild: (IWidget*)child atIndex:(NSNumber*)index;
+
+/**
  * Set child's size.
  */
 -(void) layout;
 
-- (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value;
-- (NSString*)getPropertyWithKey: (NSString*)key;
+/**
+ * Get view's controller.
+ * @return View's controller.
+ */
 - (UIViewController*) getController;
+
+/**
+ * Set a widget property value.
+ * @param key Widget's property name that should be set.
+ * @param value Widget's proeprty value that should be set.
+ * @return One of the following values:
+ * - MAW_RES_OK if the property was set.
+ * - MAW_RES_INVALID_PROPERTY_NAME if the property name was invalid.
+ * - MAW_RES_INVALID_PROPERTY_VALUE if the property value was invalid.
+ */
+- (int)setPropertyWithKey:(NSString*)key toValue:(NSString*)value;
 
 @end

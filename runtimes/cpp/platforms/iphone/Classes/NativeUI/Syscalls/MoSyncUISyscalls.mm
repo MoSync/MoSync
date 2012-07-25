@@ -21,12 +21,13 @@
 #import "ScreenWidget.h"
 #import "StackScreenWidget.h"
 #import "ModalDialogWidget.h"
-#import "LayoutWidgets.h"
 #import "RelativeLayoutWidget.h"
 #import "ListViewItemWidget.h"
 #import "ListViewWidget.h"
 #import "GLViewWidget.h"
 #import "OptionsDialogView.h"
+#import "VerticalLayoutWidget.h"
+#import "HorizontalLayoutWidget.h"
 
 MoSyncUI* mosyncUI;
 

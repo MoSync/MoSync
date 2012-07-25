@@ -21,11 +21,10 @@
 #define DEFAULT_RECT_WIDTH  100
 #define DEFAULT_RECT_HEIGHT 100
 
-#import "VideoViewWidget.h"
-
 #include <helpers/cpp_defs.h>
 #include <helpers/CPP_IX_WIDGET.h>
 
+#import "VideoViewWidget.h"
 #include "Platform.h"
 
 @implementation VideoViewWidget
@@ -38,50 +37,33 @@
     self = [super init];
     if (self)
     {
-        mMoviePlayerController = [[MPMoviePlayerController alloc] init];
+        _moviePlayerController = [[MPMoviePlayerController alloc] init];
 
         CGRect viewRect = CGRectMake(DEFAULT_RECT_X, DEFAULT_RECT_Y, DEFAULT_RECT_WIDTH, DEFAULT_RECT_HEIGHT);
         UIView* smallView = [[UIView alloc] initWithFrame:viewRect];
 
-        [mMoviePlayerController.view setFrame: smallView.bounds];
+        [_moviePlayerController.view setFrame: smallView.bounds];
         self.view = smallView;
-        [self.view addSubview:mMoviePlayerController.view];
-        [mMoviePlayerController setScalingMode:MPMovieScalingModeAspectFit];
+        [self.view addSubview:_moviePlayerController.view];
+        [_moviePlayerController setScalingMode:MPMovieScalingModeAspectFit];
 
         [[NSNotificationCenter defaultCenter] addObserver:self
                                                  selector:@selector(moviePlaybackComplete:)
                                                      name:MPMoviePlayerPlaybackDidFinishNotification
-                                                   object:mMoviePlayerController];
+                                                   object:_moviePlayerController];
         [[NSNotificationCenter defaultCenter] addObserver:self
                                                  selector:@selector(moviePlaybackStateChanged:)
                                                      name:MPMoviePlayerPlaybackStateDidChangeNotification
-                                                   object:mMoviePlayerController];
+                                                   object:_moviePlayerController];
         [[NSNotificationCenter defaultCenter] addObserver:self
                                                  selector:@selector(sourceReady:)
                                                      name:MPMoviePlayerLoadStateDidChangeNotification
-                                                   object:mMoviePlayerController];
+                                                   object:_moviePlayerController];
+        [smallView release];
+        smallView = nil;
     }
 
     return self;
-}
-
-/**
- * Release the objects and remove the observers.
- */
-- (void)dealloc
-{
-    [[NSNotificationCenter defaultCenter] removeObserver:self
-                                                    name:MPMoviePlayerPlaybackDidFinishNotification
-                                                  object:mMoviePlayerController];
-    [[NSNotificationCenter defaultCenter] removeObserver:self
-                                                    name:MPMoviePlayerPlaybackStateDidChangeNotification
-                                                  object:mMoviePlayerController];
-    [[NSNotificationCenter defaultCenter] removeObserver:self
-                                                    name:MPMoviePlayerLoadStateDidChangeNotification
-                                                  object:mMoviePlayerController];
-
-    [mMoviePlayerController release];
-    [super dealloc];
 }
 
 /**
@@ -90,14 +72,14 @@
  * @param value The value of the property.
  * @return MAW_RES_OK if the property was set, or an error code otherwise.
  */
-- (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value
+- (int)setPropertyWithKey:(NSString*)key toValue:(NSString*)value
 {
     if ([key isEqualToString:@MAW_VIDEO_VIEW_PATH])
     {
         NSURL *fileURL = [NSURL fileURLWithPath:value];
         if (fileURL)
         {
-            [mMoviePlayerController setContentURL:fileURL];
+            [_moviePlayerController setContentURL:fileURL];
         }
         else
         {
@@ -107,7 +89,7 @@
     else if ([key isEqualToString:@MAW_VIDEO_VIEW_URL])
     {
         NSURL *webURL = [NSURL URLWithString:value];
-        [mMoviePlayerController setContentURL:webURL];
+        [_moviePlayerController setContentURL:webURL];
     }
     else if ([key isEqualToString:@MAW_VIDEO_VIEW_ACTION])
     {
@@ -117,22 +99,22 @@
              [key isEqualToString:@MAW_WIDGET_HEIGHT])
     {
         [super setPropertyWithKey:key toValue:value];
-        [mMoviePlayerController.view setFrame: self.view.bounds];
+        [_moviePlayerController.view setFrame: self.view.bounds];
     }
     else if ([key isEqualToString:@MAW_VIDEO_VIEW_SEEK_TO])
     {
         TEST_FOR_NEGATIVE_VALUE([value floatValue]);
-        [mMoviePlayerController setCurrentPlaybackTime:[value floatValue]];
+        [_moviePlayerController setCurrentPlaybackTime:[value floatValue]];
     }
     else if ([key isEqualToString:@MAW_VIDEO_VIEW_CONTROL])
     {
-        if ([value isEqualToString:@"true"])
+        if ([value isEqualToString:kWidgetTrueValue])
         {
-            [mMoviePlayerController setControlStyle:MPMovieControlStyleEmbedded];
+            [_moviePlayerController setControlStyle:MPMovieControlStyleEmbedded];
         }
-        else if ([value isEqualToString:@"false"])
+        else if ([value isEqualToString:kWidgetFalseValue])
         {
-            [mMoviePlayerController setControlStyle:MPMovieControlStyleNone];
+            [_moviePlayerController setControlStyle:MPMovieControlStyleNone];
         }
         else
         {
@@ -157,23 +139,23 @@
 	if([key isEqualToString:@MAW_VIDEO_VIEW_DURATION])
     {
         // Convert from seconds to milliseconds.
-        int duration = [mMoviePlayerController duration] * 1000;
+        int duration = [_moviePlayerController duration] * 1000;
         return[[NSString alloc] initWithFormat:@"%d", duration];
 	}
     if([key isEqualToString:@MAW_VIDEO_VIEW_CURRENT_POSITION])
     {
-        return[[NSString alloc] initWithFormat:@"%f", [mMoviePlayerController currentPlaybackTime]];
+        return[[NSString alloc] initWithFormat:@"%f", [_moviePlayerController currentPlaybackTime]];
 	}
     else if ([key isEqualToString:@MAW_VIDEO_VIEW_CONTROL])
     {
-        MPMovieControlStyle controlStyle = mMoviePlayerController.controlStyle;
+        MPMovieControlStyle controlStyle = _moviePlayerController.controlStyle;
         if (controlStyle == MPMovieControlStyleEmbedded)
         {
-            return [[NSString alloc] initWithString:@"true"];
+            return [[NSString alloc] initWithString:kWidgetTrueValue];
         }
         else
         {
-            return [[NSString alloc] initWithString:@"false"];
+            return [[NSString alloc] initWithString:kWidgetFalseValue];
         }
     }
     else
@@ -192,13 +174,13 @@
     switch (newStateValue)
     {
         case MAW_VIDEO_VIEW_ACTION_PLAY:
-            [mMoviePlayerController play];
+            [_moviePlayerController play];
             break;
         case MAW_VIDEO_VIEW_ACTION_PAUSE:
-            [mMoviePlayerController pause];
+            [_moviePlayerController pause];
             break;
         case MAW_VIDEO_VIEW_ACTION_STOP:
-            [mMoviePlayerController stop];
+            [_moviePlayerController stop];
             break;
         default:
             break;
@@ -244,7 +226,7 @@
     {
         int playbackStateEvent = 0;
         BOOL sendEvent = TRUE;
-        MPMoviePlaybackState playbackState = [mMoviePlayerController playbackState];
+        MPMoviePlaybackState playbackState = [_moviePlayerController playbackState];
 
         // Check the type of the event.
         switch (playbackState)
@@ -293,7 +275,7 @@
     NSError *error = [[notification userInfo] objectForKey:@"error"];
     if (!error)
     {
-        if (MPMovieLoadStatePlayable == [mMoviePlayerController loadState])
+        if (MPMovieLoadStatePlayable == [_moviePlayerController loadState])
         {
             MAEvent event;
             event.type = EVENT_TYPE_WIDGET;
@@ -307,6 +289,25 @@
             Base::gEventQueue.put(event);
         }
     }
+}
+
+/**
+ * Release the objects and remove the observers.
+ */
+- (void)dealloc
+{
+    [[NSNotificationCenter defaultCenter] removeObserver:self
+                                                    name:MPMoviePlayerPlaybackDidFinishNotification
+                                                  object:_moviePlayerController];
+    [[NSNotificationCenter defaultCenter] removeObserver:self
+                                                    name:MPMoviePlayerPlaybackStateDidChangeNotification
+                                                  object:_moviePlayerController];
+    [[NSNotificationCenter defaultCenter] removeObserver:self
+                                                    name:MPMoviePlayerLoadStateDidChangeNotification
+                                                  object:_moviePlayerController];
+
+    [_moviePlayerController release];
+    [super dealloc];
 }
 
 @end

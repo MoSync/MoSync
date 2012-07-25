@@ -24,7 +24,11 @@
 
 @implementation NavBarWidget
 
-- (id)init {
+/**
+ * Init function.
+ */
+- (id)init
+{
     self = [super init];
     if (self)
     {
@@ -44,15 +48,23 @@
 	return self;
 }
 
-- (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value {
+/**
+ * Set a widget property value.
+ * @param key Widget's property name that should be set.
+ * @param value Widget's proeprty value that should be set.
+ * @return One of the following values:
+ * - MAW_RES_OK if the property was set.
+ * - MAW_RES_INVALID_PROPERTY_NAME if the property name was invalid.
+ * - MAW_RES_INVALID_PROPERTY_VALUE if the property value was invalid.
+ */
+- (int)setPropertyWithKey:(NSString*)key toValue:(NSString*)value
+{
 	if([key isEqualToString:@MAW_NAV_BAR_TITLE])
     {
 		currNavitem.title = value;
 	}
 	else if([key isEqualToString:@MAW_NAV_BAR_BACK_BTN])
     {
-		//navitem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:value style:UIBarButtonItemStylePlain target:nil action:nil];
-		//navitem.hidesBackButton = YES;
 		prevNavitem.title = value;
 	}
     else if([key isEqualToString:@MAW_WIDGET_BACKGROUND_COLOR])
@@ -75,17 +87,16 @@
 	return MAW_RES_OK;
 }
 
-- (NSString*)getPropertyWithKey: (NSString*)key {
-	return [super getPropertyWithKey:key];
+- (void)navigationBar:(UINavigationBar *)navigationBar didPopItem:(UINavigationItem *)item
+{
 }
 
-- (void)navigationBar:(UINavigationBar *)navigationBar didPopItem:(UINavigationItem *)item {
+- (void)navigationBar:(UINavigationBar *)navigationBar didPushItem:(UINavigationItem *)item
+{
 }
 
-- (void)navigationBar:(UINavigationBar *)navigationBar didPushItem:(UINavigationItem *)item {
-}
-
-- (BOOL)navigationBar:(UINavigationBar *)navigationBar shouldPopItem:(UINavigationItem *)item {
+- (BOOL)navigationBar:(UINavigationBar *)navigationBar shouldPopItem:(UINavigationItem *)item
+{
 	MAEvent event;
 	event.type = EVENT_TYPE_WIDGET;
 	MAWidgetEventData *eventData = new MAWidgetEventData;
@@ -96,8 +107,9 @@
 	return false;
 }
 
-- (BOOL)navigationBar:(UINavigationBar *)navigationBar shouldPushItem:(UINavigationItem *)item {
-	return true;
+- (BOOL)navigationBar:(UINavigationBar *)navigationBar shouldPushItem:(UINavigationItem *)item
+{
+	return YES;
 }
 
 @end

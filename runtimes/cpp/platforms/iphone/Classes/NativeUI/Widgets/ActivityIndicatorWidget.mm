@@ -15,15 +15,11 @@
  02111-1307, USA.
  */
 
-#import "ActivityIndicatorWidget.h"
 #include <helpers/cpp_defs.h>
 #include <helpers/CPP_IX_WIDGET.h>
 
-/**
- * True and false string constants.
- */
-NSString *const kTrueValueString = @"true";
-NSString *const kFalseValueString = @"false";
+#import "ActivityIndicatorWidget.h"
+#import "WidgetUtils.h"
 
 @implementation ActivityIndicatorWidget
 
@@ -35,8 +31,8 @@ NSString *const kFalseValueString = @"false";
     self = [super init];
     if (self)
     {
-        UIActivityIndicatorView* activityIndicatorView = [[UIActivityIndicatorView alloc]
-                                                          initWithActivityIndicatorStyle: UIActivityIndicatorViewStyleGray];
+        UIActivityIndicatorView* activityIndicatorView =
+            [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle: UIActivityIndicatorViewStyleGray];
 
         self.view = activityIndicatorView;
         [activityIndicatorView startAnimating];
@@ -54,14 +50,15 @@ NSString *const kFalseValueString = @"false";
  */
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value
 {
-    if([key isEqualToString:@MAW_ACTIVITY_INDICATOR_IN_PROGRESS]) {
+    if([key isEqualToString:@MAW_ACTIVITY_INDICATOR_IN_PROGRESS])
+    {
         UIActivityIndicatorView* activityIndicatorView = (UIActivityIndicatorView*) self.view;
 
-        if([value isEqualToString: kTrueValueString])
+        if([value isEqualToString: kWidgetTrueValue])
         {
             [activityIndicatorView startAnimating];
         }
-        else if([value isEqualToString: kFalseValueString])
+        else if([value isEqualToString: kWidgetFalseValue])
         {
             [activityIndicatorView stopAnimating];
         }
@@ -69,22 +66,13 @@ NSString *const kFalseValueString = @"false";
         {
             return MAW_RES_INVALID_PROPERTY_VALUE;
         }
-
-    } else {
+    }
+    else
+    {
         return [super setPropertyWithKey:key toValue:value];
     }
 
 	return MAW_RES_OK;
-}
-
-/**
- * Returns a property value of the activity indicator widget.
- * @param key The property of the activity indicator widget.
- * @return The value for the given property.
- */
-- (NSString*)getPropertyWithKey: (NSString*)key {
-
-	return [super getPropertyWithKey:key];
 }
 
 @end

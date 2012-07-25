@@ -18,6 +18,7 @@
 #import "GLViewWidget.h"
 #import "MoSyncGLView.h"
 #include "Platform.h"
+#import "UIColorExpanded.h"
 #include <helpers/cpp_defs.h>
 #include <helpers/CPP_IX_WIDGET.h>
 #include <base/Syscall.h>
@@ -73,17 +74,6 @@
 		return [super setPropertyWithKey:key toValue:value];
 	}
 	return MAW_RES_OK;
-}
-
-- (NSString*)getPropertyWithKey: (NSString*)key {
-
-	return [super getPropertyWithKey:key];
-}
-
-- (void)show {
-	[super show];
-	//MoSyncGLView* glView = (MoSyncGLView*) view;
-	//[glView viewAppeared];
 }
 
 @end
