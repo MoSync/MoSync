@@ -14,6 +14,7 @@ Wormhole
 - File
 - Geolocation
 - Storage
+- Resource
 
 [Keyword Index](./_index.html)
 

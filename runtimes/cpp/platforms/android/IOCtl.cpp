@@ -4130,7 +4130,7 @@ namespace Base
 
 		jmethodID methodID = jNIEnv->GetMethodID(
 			cls,
-			"maAudioSetNUmberOfLoops",
+			"maAudioSetNumberOfLoops",
 			"(II)I");
 
 		if (methodID == 0)

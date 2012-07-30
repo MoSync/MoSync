@@ -86,6 +86,11 @@
      * Validation response received from Apple App Store.
      */
     NSDictionary* _validationResponse;
+
+    /**
+     * Flag to indicate if the product is purchased.
+     */
+    BOOL _isPurchased;
 }
 
 /**
@@ -151,5 +156,6 @@
             bufferSize:(const int) bufferSize;
 
 @property(nonatomic, readonly) MAHandle handle;
+@property(nonatomic, readonly) BOOL isPurchased;
 
 @end

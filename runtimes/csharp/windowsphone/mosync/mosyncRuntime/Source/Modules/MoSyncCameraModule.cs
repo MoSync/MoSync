@@ -7,6 +7,7 @@ using System.Windows;
 using System.Windows.Media.Imaging;
 using System.Windows.Media;
 using Microsoft.Phone.Controls;
+using System.Windows.Controls;
 
 namespace MoSync
 {
@@ -271,7 +272,30 @@ namespace MoSync
 					MoSync.Util.RunActionOnMainThreadSync(() =>
 					{
 						Resource res = runtime.GetResource(MoSync.Constants.RT_PLACEHOLDER, _placeHolder);
-						Stream data = args.ImageStream;
+
+                        Stream data = null;
+                        try
+                        {
+                            // as the camera always takes a snapshot in landscape left orientation,
+                            // we need to rotate the resulting image 90 degrees for a current PortraitUp orientation
+                            // and 180 degrees for a current LandscapeRight orientation
+                            int rotateAngle = 0;
+                            if (currentPage.Orientation == PageOrientation.PortraitUp)
+                            {
+                                rotateAngle = 90;
+                            }
+                            else if (currentPage.Orientation == PageOrientation.LandscapeRight)
+                            {
+                                rotateAngle = 180;
+                            }
+                            // if the current page is in a LandscapeLeft orientation, the orientation angle will be 0
+                            data = RotateImage(args.ImageStream, rotateAngle);
+                        }
+                        catch
+                        {
+                            // the orientation angle was not a multiple of 90 - we keep the original image
+                            data = args.ImageStream;
+                        }
 						MemoryStream dataMem = new MemoryStream((int)data.Length);
 						MoSync.Util.CopySeekableStreams(data, 0, dataMem, 0, (int)data.Length);
 						res.SetInternalObject(dataMem);
@@ -353,7 +377,6 @@ namespace MoSync
              * in this eigther the back or the front camera is
              * chosen
              */
-
 			ioctls.maCameraSelect = delegate(int _camera)
 			{
                 // if the camera is not initialized, we cannot access any of its properties
@@ -424,6 +447,10 @@ namespace MoSync
 			};
 		}
 
+        /**
+         * Reinitializes the camera: creates a new one, and adds it as a source for the
+         * video brush.
+         */
         private void initCamera()
         {
             mCamera.Dispose();
@@ -453,5 +480,62 @@ namespace MoSync
             // with it or getting/setting its properties
             are.WaitOne();
         }
+
+        /**
+         * Because the camera captured image is always in landscape mode, we
+         * need to rotate it. This is done by creating a writable bitmap from the image
+         * stream and then translating it pixel by pixel into a new bitmap and then
+         * into a new stream.
+         * @param imageStream The image to be rotated as a data stream.
+         * @param angle The angle of rotation (needs to be a multiple of 90).
+         */
+        private Stream RotateImage(Stream imageStream, int angle)
+        {
+            imageStream.Position = 0;
+            // the angle must be a multiple of 90 degrees
+            if (angle % 90 != 0 || angle < 0) throw new ArgumentException();
+            if (angle % 360 == 0) return imageStream;
+
+            BitmapImage bitmap = new BitmapImage();
+            bitmap.SetSource(imageStream);
+            WriteableBitmap wbSource = new WriteableBitmap(bitmap);
+
+            // the target bitmap will contain the rotated image
+            WriteableBitmap wbTarget = null;
+            if (angle % 180 == 0)
+            {
+                // if the image is rotated 180 degrees, the width and height remain the same
+                wbTarget = new WriteableBitmap(wbSource.PixelWidth, wbSource.PixelHeight);
+            }
+            else
+            {
+                wbTarget = new WriteableBitmap(wbSource.PixelHeight, wbSource.PixelWidth);
+            }
+
+            for (int x = 0; x < wbSource.PixelWidth; x++)
+            {
+                for (int y = 0; y < wbSource.PixelHeight; y++)
+                {
+                    switch (angle % 360)
+                    {
+                        case 90:
+                            wbTarget.Pixels[(wbSource.PixelHeight - y - 1) + x * wbTarget.PixelWidth] = wbSource.Pixels[x + y * wbSource.PixelWidth];
+                            break;
+                        case 180:
+                            wbTarget.Pixels[(wbSource.PixelWidth - x - 1) + (wbSource.PixelHeight - y - 1) * wbSource.PixelWidth] = wbSource.Pixels[x + y * wbSource.PixelWidth];
+                            break;
+                        case 270:
+                            wbTarget.Pixels[y + (wbSource.PixelWidth - x - 1) * wbTarget.PixelWidth] = wbSource.Pixels[x + y * wbSource.PixelWidth];
+                            break;
+                    }
+                }
+            }
+
+            // transform the rotated bitmap into a stream
+            MemoryStream targetStream = new MemoryStream();
+            wbTarget.SaveJpeg(targetStream, wbTarget.PixelWidth, wbTarget.PixelHeight, 0, 100);
+            return targetStream;
+        }
+
 	} // end class CameraModule
 } // end namespace MoSync
