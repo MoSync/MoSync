@@ -195,13 +195,189 @@ int maWidgetInsertChild(MAWidgetHandle parentHandle, MAWidgetHandle childHandle,
 	return returnValue;
 }
 
-/* dummy function for the build to work*/
-int maWidgetScreenAddOptionsMenuItem(MAWidgetHandle widget, const char * title,
-                                     const char* iconHandle, int iconPredefined)
+/**
+ * Removes a child widget from its parent (but does not destroy it).
+ * Removing a currently visible top-level widget causes the MoSync view to become visible.
+ * @return Any of the following result codes:
+ * - MAW_RES_OK if the child could be removed from the parent.
+ * - MAW_RES_INVALID_HANDLE if the handle was invalid.
+ */
+int maWidgetRemoveChild(MAWidgetHandle childHandle)
 {
-    return IOCTL_UNAVAILABLE;
+	int returnValue;
+	IWidget* child = [mosyncUI getWidget:childHandle];
+	if(!child) return MAW_RES_INVALID_HANDLE;
+    NSArray* arguments = [[NSArray alloc] initWithObjects:  nil];
+	[NSObject performSelectorOnMainThread:@selector(remove)
+							   withTarget:child
+							  withObjects:arguments
+							waitUntilDone:YES
+						   andReturnValue:&returnValue];
+	[arguments release];
+	return returnValue;
 }
 
+/**
+ * Shows a dialog widget.
+ * @param dialogHandle The handle of the dialog that will be shown.
+ * @return Any of the following result codes:
+ * - MAW_RES_OK if the child could be removed from the parent.
+ * - MAW_RES_INVALID_HANDLE if the handle was invalid.
+ */
+int maWidgetModalDialogShow(MAWidgetHandle dialogHandle)
+{
+	IWidget* dialog = [mosyncUI getWidget:dialogHandle];
+	if(!dialog) return MAW_RES_INVALID_HANDLE;
+
+	if(!([dialog class] == [ModalDialogWidget class])) {
+		return MAW_RES_INVALID_HANDLE;
+	}
+
+	int returnValue;
+    NSArray* arguments = [[NSArray alloc] initWithObjects:nil];
+	[NSObject performSelectorOnMainThread:@selector(show)
+							   withTarget:dialog
+							  withObjects:arguments
+							waitUntilDone:YES
+						   andReturnValue:&returnValue];
+    [arguments release];
+	return returnValue;
+}
+
+/**
+ * Hides/Dismisses a currently displayed dialog.
+ * @param dialogHandle The handle of the dialog that will be hidden.
+ * @return Any of the following result codes:
+ * - MAW_RES_OK if the child could be removed from the parent.
+ * - MAW_RES_INVALID_HANDLE if the handle was invalid.
+ */
+int maWidgetModalDialogHide(MAWidgetHandle dialogHandle) {
+	IWidget* dialog = [mosyncUI getWidget:dialogHandle];
+	if(!dialog) return MAW_RES_INVALID_HANDLE;
+
+	if(!([dialog class] == [ModalDialogWidget class])) {
+		return MAW_RES_INVALID_HANDLE;
+	}
+
+	int returnValue;
+    NSArray* arguments = [[NSArray alloc] initWithObjects:nil];
+	[NSObject performSelectorOnMainThread:@selector(hide)
+							   withTarget:dialog
+							  withObjects:arguments
+							waitUntilDone:YES
+						   andReturnValue:&returnValue];
+    [arguments release];
+	return returnValue;
+}
+
+/**
+ * Shows a screen. If native UI hasn't been initialized, it is also initialized
+ * and disables regular MoSync drawing.
+ * @param screenHandle The handle to the screen.
+ * @return Any of the following result codes:
+ * - MAW_RES_OK if the screen could be shown.
+ * - MAW_RES_INVALID_SCREEN if the screenHandle is not a handle to a screen.
+ */
+int maWidgetScreenShow(MAWidgetHandle screenHandle) {
+	IWidget* screen = [mosyncUI getWidget:screenHandle];
+	if(!screen) return MAW_RES_INVALID_SCREEN;
+
+	if(!([screen class] == [ScreenWidget class]) && !([screen superclass] == [ScreenWidget class])) {
+		return MAW_RES_INVALID_SCREEN;
+	}
+
+	sNativeUIEnabled = screenHandle==MAW_CONSTANT_MOSYNC_SCREEN_HANDLE?false:true;
+
+	int returnValue;
+    NSArray* arguments = [[NSArray alloc] initWithObjects:screen, nil];
+	[NSObject performSelectorOnMainThread:@selector(show:)
+                               withTarget:mosyncUI
+							  withObjects:arguments
+							waitUntilDone:YES
+						   andReturnValue:&returnValue];
+    [arguments release];
+	return returnValue;
+}
+
+/**
+ * Pushes a screen to the given screen stack, hides the current screen and
+ * shows the pushed screen it. Pushing it to the stack will make it
+ * automatically go back to the previous screen when popped.
+ * @param stackScreen A handle to a MAW_STACK_SCREEN.
+ * @param newScreen A handle to either a MAW_SCREEN or a MAW_TAB_SCREEN.
+ * The handle cannot exist in the stack already.
+ * @return Any of the following result codes:
+ * - MAW_RES_OK if the given screen could be pushed.
+ * - MAW_RES_INVALID_HANDLE if either the screenStack or newScreen handle was invalid.
+ * - MAW_RES_INVALID_SCREEN if the screen handle is not a handle to a screen.
+ * - MAW_RES_ERROR if something else than a screen stack was passed, or if
+ * the handle already exists in the stack.
+ */
+int maWidgetStackScreenPush(MAWidgetHandle stackScreenHandle, MAWidgetHandle screenHandle) {
+	IWidget* stackScreen = [mosyncUI getWidget:stackScreenHandle];
+	if(!stackScreen) return MAW_RES_INVALID_HANDLE;
+
+	IWidget* screen = [mosyncUI getWidget:screenHandle];
+	if(!screen) return MAW_RES_INVALID_HANDLE;
+
+	if(!([screen class] == [ScreenWidget class]) && !([screen superclass] == [ScreenWidget class])) {
+		return MAW_RES_INVALID_SCREEN;
+	}
+
+	if(!([stackScreen class] == [StackScreenWidget class])) {
+		return MAW_RES_INVALID_SCREEN;
+	}
+
+    NSArray* arguments = [[NSArray alloc] initWithObjects:screen, nil];
+	[NSObject performSelectorOnMainThread:@selector(push:)
+							   withTarget:stackScreen
+							  withObjects:arguments
+							waitUntilDone:YES
+						   andReturnValue:nil];
+    [arguments release];
+	return MAW_RES_OK;
+}
+
+/**
+ * Pops a screen from a screen stack, hides the current screen and shows
+ * the popped screen before the If there is no previous screen in the screen
+ * stack, an empty screen will be shown.
+ * @param stackScreen A handle to a MAW_STACK_SCREEN to pop from.
+ * @return Any of the following result codes:
+ * - MAW_RES_OK if the given screen could be popped.
+ * - MAW_RES_INVALID_HANDLE if the screen stack does not exist.
+ * - MAW_RES_ERROR if something else than a screen stack was passed.
+ */
+int maWidgetStackScreenPop(MAWidgetHandle stackScreenHandle) {
+	IWidget* stackScreen = [mosyncUI getWidget:stackScreenHandle];
+	if(!stackScreen) return MAW_RES_INVALID_HANDLE;
+
+	if(!([stackScreen class] == [StackScreenWidget class])) {
+		return MAW_RES_ERROR;
+	}
+
+    NSArray* arguments = [[NSArray alloc] initWithObjects:nil];
+	[NSObject performSelectorOnMainThread:@selector(pop)
+							   withTarget:stackScreen
+							  withObjects:arguments
+							waitUntilDone:YES
+						   andReturnValue:nil];
+    [arguments release];
+	return MAW_RES_OK;
+}
+
+/**
+ * Sets a specified property on the given widget.
+ * @param widget Handle to the widget.
+ * @param property A string representing which property to set.
+ * @param value The value which will be assigned to the property.
+ * @return Any of the following result codes:
+ * - MAW_RES_OK if the property could be set.
+ * - MAW_RES_INVALID_HANDLE if the handle was invalid.
+ * - MAW_RES_INVALID_PROPERTY_NAME if the property name was invalid.
+ * - MAW_RES_INVALID_PROPERTY_VALUE if the property value was invalid.
+ * - MAW_RES_ERROR otherwise.
+ */
 int maWidgetSetProperty(MAWidgetHandle handle, const char *property, const char* value) {
 	IWidget* widget = [mosyncUI getWidget:handle];
 	if(widget == NULL) return MAW_RES_INVALID_HANDLE;
@@ -243,7 +419,19 @@ int maWidgetSetProperty(MAWidgetHandle handle, const char *property, const char*
 	return returnValue;
 }
 
-// if maWidgetGetProperty returns <0 maxSize equals the size needed.
+/**
+ * Retrieves a specified property from the given widget.
+ * @param widget Handle to the widget.
+ * @param property A string representing which property to set.
+ * @param value A buffer that will hold the value of the property, represented as a string.
+ * @param bufSize Size of the buffer.
+ * @return The number of bytes copied on success, or any of the following result codes:
+ * - MAW_RES_INVALID_HANDLE if the handle was invalid.
+ * - MAW_RES_INVALID_PROPERTY_NAME if the property name was invalid.
+ * - MAW_RES_INVALID_PROPERTY_VALUE if the property value was invalid.
+ * - MAW_RES_INVALID_STRING_BUFFER_SIZE if the buffer size was to small.
+ * - MAW_RES_ERROR otherwise.
+ */
 int maWidgetGetProperty(MAWidgetHandle handle, const char *property, char *value, int maxSize) {
 	IWidget* widget = [mosyncUI getWidget:handle];
 	if(!widget) return MAW_RES_INVALID_HANDLE;
@@ -253,7 +441,6 @@ int maWidgetGetProperty(MAWidgetHandle handle, const char *property, char *value
 
     if(value == NULL)
         return MAW_RES_INVALID_PROPERTY_VALUE;
-
 
 	NSString* propertyString = stringFromChar(property);
 	NSString* retval;
@@ -281,118 +468,13 @@ int maWidgetGetProperty(MAWidgetHandle handle, const char *property, char *value
 	return realLength;
 }
 
-int maWidgetRemoveChild(MAWidgetHandle childHandle) {
-	int returnValue;
-	IWidget* child = [mosyncUI getWidget:childHandle];
-	if(!child) return MAW_RES_INVALID_HANDLE;
-    NSArray* arguments = [[NSArray alloc] initWithObjects:  nil];
-	[NSObject performSelectorOnMainThread:@selector(remove)
-							   withTarget:child
-							  withObjects:arguments
-							waitUntilDone:YES
-						   andReturnValue:&returnValue];
-	[arguments release];
-	return returnValue;
-}
-
-int maWidgetStackScreenPush(MAWidgetHandle stackScreenHandle, MAWidgetHandle screenHandle) {
-	IWidget* stackScreen = [mosyncUI getWidget:stackScreenHandle];
-	if(!stackScreen) return MAW_RES_INVALID_HANDLE;
-
-	IWidget* screen = [mosyncUI getWidget:screenHandle];
-	if(!screen) return MAW_RES_INVALID_HANDLE;
-
-	if(!([screen class] == [ScreenWidget class]) && !([screen superclass] == [ScreenWidget class])) {
-		return MAW_RES_INVALID_SCREEN;
-	}
-
-	if(!([stackScreen class] == [StackScreenWidget class])) {
-		return MAW_RES_INVALID_SCREEN;
-	}
-
-    NSArray* arguments = [[NSArray alloc] initWithObjects:screen, nil];
-	[NSObject performSelectorOnMainThread:@selector(push:)
-							   withTarget:stackScreen
-							  withObjects:arguments
-							waitUntilDone:YES
-						   andReturnValue:nil];
-    [arguments release];
-	return MAW_RES_OK;
-}
-
-int maWidgetStackScreenPop(MAWidgetHandle stackScreenHandle) {
-	IWidget* stackScreen = [mosyncUI getWidget:stackScreenHandle];
-	if(!stackScreen) return MAW_RES_INVALID_HANDLE;
-
-	if(!([stackScreen class] == [StackScreenWidget class])) {
-		return MAW_RES_INVALID_SCREEN;
-	}
-
-    NSArray* arguments = [[NSArray alloc] initWithObjects:nil];
-	[NSObject performSelectorOnMainThread:@selector(pop)
-							   withTarget:stackScreen
-							  withObjects:arguments
-							waitUntilDone:YES
-						   andReturnValue:nil];
-    [arguments release];
-	return MAW_RES_OK;
-}
-
-int maWidgetScreenShow(MAWidgetHandle screenHandle) {
-	IWidget* screen = [mosyncUI getWidget:screenHandle];
-	if(!screen) return MAW_RES_INVALID_HANDLE;
-
-	if(!([screen class] == [ScreenWidget class]) && !([screen superclass] == [ScreenWidget class])) {
-		return MAW_RES_INVALID_SCREEN;
-	}
-
-	sNativeUIEnabled = screenHandle==MAW_CONSTANT_MOSYNC_SCREEN_HANDLE?false:true;
-
-	int returnValue;
-    NSArray* arguments = [[NSArray alloc] initWithObjects:screen, nil];
-	[NSObject performSelectorOnMainThread:@selector(show:)
-								withTarget:mosyncUI
-							  withObjects:arguments
-							waitUntilDone:YES
-						   andReturnValue:&returnValue];
-    [arguments release];
-	return returnValue;
-}
-
-int maWidgetModalDialogShow(MAWidgetHandle dialogHandle) {
-	IWidget* dialog = [mosyncUI getWidget:dialogHandle];
-	if(!dialog) return MAW_RES_INVALID_HANDLE;
-
-	if(!([dialog class] == [ModalDialogWidget class])) {
-		return MAW_RES_INVALID_HANDLE;
-	}
-
-	int returnValue;
-    NSArray* arguments = [[NSArray alloc] initWithObjects:nil];
-	[NSObject performSelectorOnMainThread:@selector(show)
-							   withTarget:dialog
-							  withObjects:arguments
-							waitUntilDone:YES
-						   andReturnValue:&returnValue];
-    [arguments release];
-	return returnValue;
-}
-
-int maWidgetModalDialogHide(MAWidgetHandle dialogHandle) {
-	IWidget* dialog = [mosyncUI getWidget:dialogHandle];
-	if(!dialog) return MAW_RES_INVALID_HANDLE;
-
-	if(!([dialog class] == [ModalDialogWidget class])) {
-		return MAW_RES_INVALID_HANDLE;
-	}
-
-	int returnValue;
-    NSArray* arguments = [[NSArray alloc] initWithObjects:nil];
-	[NSObject performSelectorOnMainThread:@selector(hide)
-							   withTarget:dialog
-							  withObjects:arguments
-							waitUntilDone:YES
-						   andReturnValue:&returnValue];
-    [arguments release];
-	return returnValue;
+/**
+ * Functionality not available on iOS runtime.
+ * Added to make the build system work.
+ * @return IOCTL_UNAVAILABLE
+ */
+int maWidgetScreenAddOptionsMenuItem(MAWidgetHandle widget, const char * title,
+                                     const char* iconHandle, int iconPredefined)
+{
+    return IOCTL_UNAVAILABLE;
 }
