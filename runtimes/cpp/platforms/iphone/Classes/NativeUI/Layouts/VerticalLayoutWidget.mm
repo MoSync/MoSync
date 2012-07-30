@@ -77,7 +77,7 @@
         float fillParentHeight = self.height - countHeight - totalVerticalMargin;
         fillParentHeight -= [alv getSpacing] *  ([_children count] - 1);
         fillParentHeight /= [fillParentWidgets count];
-        for (IWidget *child in _children)
+        for (IWidget *child in fillParentWidgets)
         {
             child.size = CGSizeMake(child.width, fillParentHeight);
         }

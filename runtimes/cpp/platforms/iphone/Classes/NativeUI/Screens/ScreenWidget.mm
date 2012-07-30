@@ -58,14 +58,12 @@
  */
 - (int)addChild:(IWidget*)child
 {
-    INNativeUILog;
     if ([_children count] > 0)
     {
         return MAW_RES_ERROR;
     }
 
 	[super addChild:child toSubview:YES];
-    OUTNativeUILog;
     return MAW_RES_OK;
 }
 

@@ -131,7 +131,6 @@ MAKE_UIWRAPPER_LAYOUTING_IMPLEMENTATION(MoSync, HLayoutView)
  */
 - (int)addChild:(IWidget*)child
 {
-    INNativeUILog;
     [super addChild:child toSubview:YES];
     return MAW_RES_OK;
 }

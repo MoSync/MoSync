@@ -40,10 +40,10 @@
         [navbar pushNavigationItem:currNavitem animated:false];
         self.view = navbar;
 
-        self.autoSizeWidth = WidgetAutoSizeWrapContent;
+        self.autoSizeWidth = WidgetAutoSizeFillParent;
         self.autoSizeHeight = WidgetAutoSizeWrapContent;
         [navbar release];
-        navbar = NULL;
+        navbar = nil;
     }
 	return self;
 }
@@ -110,6 +110,16 @@
 - (BOOL)navigationBar:(UINavigationBar *)navigationBar shouldPushItem:(UINavigationItem *)item
 {
 	return YES;
+}
+
+/**
+ * Dealloc method.
+ */
+-(void) dealloc
+{
+    [currNavitem release];
+    [prevNavitem release];
+    [super dealloc];
 }
 
 @end

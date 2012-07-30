@@ -191,9 +191,8 @@
 
 	for (IWidget *child in _children)
     {
-		UIView* childView = [child view];
-		[childView setFrame:CGRectMake(0, 0, viewWidth, viewHeight)];
-		[child layout];
+        CGSize size = CGSizeMake(viewWidth, viewHeight);
+        child.size = size;
 	}
 }
 
