@@ -23,6 +23,7 @@
 #import "IWidget.h"
 #import "UIColorExpanded.h"
 #import "NSStringExpanded.h"
+#import "MoSyncUISyscalls.h"
 #include "Platform.h"
 
 @implementation IWidget
@@ -393,7 +394,6 @@
  */
 - (void)layout
 {
-    INNativeUILog;
     [self layoutSubviews:_view];
     // If the widget has parent and if at least one of its auto size params is wrap content,
     // then ask the parent to layout itself.
@@ -403,7 +403,6 @@
     {
         [_parent layout];
     }
-    OUTNativeUILog;
 }
 
 /**
@@ -550,8 +549,13 @@
  */
 - (void)dealloc
 {
+    // Destroy its children.
+    for (IWidget* child in _children)
+    {
+        maWidgetDestroy(child.handle);
+    }
+
 	[_view release];
-    [_parent release];
 	[_children release];
 
 	[super dealloc];

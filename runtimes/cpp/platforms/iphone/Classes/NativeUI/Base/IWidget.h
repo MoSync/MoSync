@@ -70,7 +70,7 @@
 /**
  * Setter and getter for widget's parent.
  */
-@property(nonatomic, retain) IWidget* parent;
+@property(nonatomic, assign) IWidget* parent;
 
 /**
  * Setter and getter for widget's handle.

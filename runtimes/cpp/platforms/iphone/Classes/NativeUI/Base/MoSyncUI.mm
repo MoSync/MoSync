@@ -256,14 +256,11 @@ static IWidget* sOldScreen = nil;
 
 	[created setHandle:ret];
     [created release];
-    NSLog(@"Created widget with handle = %d", ret);
 	return ret;
 }
 
 - (int) destroyWidgetInstance:(IWidget*)widget {
 	int handle = widget.handle;
-
-    [widgetArray replaceObjectAtIndex:handle withObject:[NSNull null]];
 
     if(widget == sOldScreen) {
         UIView* actualView = [sOldScreen view];
@@ -278,7 +275,9 @@ static IWidget* sOldScreen = nil;
 	else
 		ret = MAW_RES_OK;
 
-	//[widget dealloc];
+    // The array will release the widget.
+    [widgetArray replaceObjectAtIndex:handle withObject:[NSNull null]];
+
     NSNumber* numHandle = [[NSNumber alloc] initWithInt:handle];
     [unusedWidgetHandles addObject:numHandle];
     [numHandle release];

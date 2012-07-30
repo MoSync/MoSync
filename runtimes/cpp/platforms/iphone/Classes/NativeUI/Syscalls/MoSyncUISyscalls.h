@@ -32,21 +32,62 @@ bool isNativeUIEnabled();
 
 MoSyncUI* getMoSyncUI();
 
+/**
+ * Creates a new widget of the specified type.
+ * @param widgetType A String representing the type of the widget to create.
+ * @return A handle to the widget, or any of the following result codes:
+ * - MAW_RES_ERROR if the widget could not be created.
+ * - MAW_RES_INVALID_TYPE_NAME if the widget type was not available.
+ */
 MAWidgetHandle maWidgetCreate(const char *widgetType);
+
+/**
+ * Frees the memory and resources held by the given widget. Destryoing a widget
+ * with children will also cause its children to be destroyed. Once a handle has
+ * been destroyed it cannot be referenced by the maWidget* functions.
+ * If the given widget has a parent, the widget will be removed from its parent.
+ * @param widget A handle to the widget to be destroyed.
+ * @return Any of the following result codes:
+ * - MAW_RES_OK if the widget was destroyed.
+ * - MAW_RES_INVALID_HANDLE if the handle was invalid.
+ */
+int maWidgetDestroy(MAWidgetHandle handle);
+
+/**
+ * Adds a widget to the given parent as a child. Letting the
+ * parent widget layout the child.
+ * @param parent The widget layout to which the child will be added.
+ * @param child The widget that will be added to the parent.
+ * @return Any of the following result codes:
+ * - MAW_RES_OK if the child could be added to the parent.
+ * - MAW_RES_INVALID_HANDLE if any of the handles were invalid.
+ * - MAW_RES_INVALID_LAYOUT if the widget was added to a non-layout.
+ * - MAW_RES_CANNOT_INSERT_DIALOG if the child is a modal dialog.
+ * - MAW_RES_ERROR if it could not be added for some other reason.
+ */
+int maWidgetAddChild(MAWidgetHandle parentHandle, MAHandle childHandle);
+
+/**
+ * Inserts a widget to the given parent as a child at an index. Letting the
+ * parent widget layout the child.
+ * @param parent The widget layout in which the child will be inserted.
+ * @param child The widget that will be added to the parent.
+ * @param index The index where the widget should be inserted.
+ * @return Any of the following result codes:
+ * - MAW_RES_OK if the child could be added to the parent.
+ * - MAW_RES_INVALID_HANDLE if any of the handles were invalid.
+ * - MAW_RES_INVALID_INDEX if the index was out of bounds.
+ * - MAW_RES_INVALID_LAYOUT if the widget was added to a non-layout.
+ * - MAW_RES_CANNOT_INSERT_DIALOG if the child is a modal dialog.
+ * - MAW_RES_ERROR if it could not be added for some other reason.
+ */
+int maWidgetInsertChild(MAWidgetHandle parentHandle, MAWidgetHandle childHandle, int index);
 
 int maWidgetScreenAddOptionsMenuItem(MAWidgetHandle widget, const char * title, const char* iconPath, int iconPredefined);
 
 int maWidgetSetProperty(MAWidgetHandle handle, const char *property, const char* value);
 
 int maWidgetGetProperty(MAWidgetHandle handle, const char *property, char *value, int maxSize);
-
-int maWidgetPerformAction(MAWidgetHandle widget, const char *action, const char *param);
-
-int maWidgetAddChild(MAWidgetHandle parentHandle, MAHandle childHandle);
-
-int maWidgetInsertChild(MAWidgetHandle parentHandle, MAWidgetHandle childHandle, int index);
-
-int maWidgetDestroy(MAWidgetHandle handle) ;
 
 int maWidgetRemoveChild(MAWidgetHandle child);
 

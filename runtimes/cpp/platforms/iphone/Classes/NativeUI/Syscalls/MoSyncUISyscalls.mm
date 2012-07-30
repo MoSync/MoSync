@@ -44,13 +44,25 @@ void initMoSyncUISyscalls(UIWindow* window, UIViewController* viewController) {
 	mosyncUI = [[MoSyncUI alloc] initWithWindow:window andController:viewController];
 }
 
+/**
+ * Create an NSString object using a C array of UTF8-encoded bytes.
+ * The caller must release the returned object.
+ * @param str The C array. Must not be NULL.
+ */
 NSString* stringFromChar(const char* str) {
 	return [[NSString alloc] initWithUTF8String:str];
 }
 
+/**
+ * Creates a new widget of the specified type.
+ * @param widgetType A String representing the type of the widget to create.
+ * @return A handle to the widget, or any of the following result codes:
+ * - MAW_RES_ERROR if the widget could not be created.
+ * - MAW_RES_INVALID_TYPE_NAME if the widget type was not available.
+ */
 MAWidgetHandle maWidgetCreate(const char *widgetType) {
 	int returnValue;
-    if(widgetType == NULL)
+    if (widgetType == NULL)
         return MAW_RES_INVALID_TYPE_NAME;
 	NSString* widgetTypeString = stringFromChar(widgetType);
     NSArray *arguments = [[NSArray alloc] initWithObjects: widgetTypeString, nil];
@@ -65,6 +77,16 @@ MAWidgetHandle maWidgetCreate(const char *widgetType) {
 	return returnValue;
 }
 
+/**
+ * Frees the memory and resources held by the given widget. Destryoing a widget
+ * with children will also cause its children to be destroyed. Once a handle has
+ * been destroyed it cannot be referenced by the maWidget* functions.
+ * If the given widget has a parent, the widget will be removed from its parent.
+ * @param widget A handle to the widget to be destroyed.
+ * @return Any of the following result codes:
+ * - MAW_RES_OK if the widget was destroyed.
+ * - MAW_RES_INVALID_HANDLE if the handle was invalid.
+ */
 int maWidgetDestroy(MAWidgetHandle handle) {
 	int returnValue;
 
@@ -88,6 +110,47 @@ int maWidgetDestroy(MAWidgetHandle handle) {
 
 	return returnValue;
 }
+
+/**
+ * Adds a widget to the given parent as a child. Letting the
+ * parent widget layout the child.
+ * @param parent The widget layout to which the child will be added.
+ * @param child The widget that will be added to the parent.
+ * @return Any of the following result codes:
+ * - MAW_RES_OK if the child could be added to the parent.
+ * - MAW_RES_INVALID_HANDLE if any of the handles were invalid.
+ * - MAW_RES_INVALID_LAYOUT if the widget was added to a non-layout.
+ * - MAW_RES_CANNOT_INSERT_DIALOG if the child is a modal dialog.
+ * - MAW_RES_ERROR if it could not be added for some other reason.
+ */
+int maWidgetAddChild(MAWidgetHandle parentHandle, MAHandle childHandle)
+{
+	IWidget* parent = [mosyncUI getWidget:parentHandle];
+	IWidget* child = [mosyncUI getWidget:childHandle];
+
+    // Check if the handles are valid.
+	if (!parent || !child)
+    {
+        return MAW_RES_INVALID_HANDLE;
+    }
+
+    // Check if the widgets are the same or if the child already has a parent.
+	if (parent == child || child.parent)
+    {
+        return MAW_RES_ERROR;
+    }
+
+    int returnValue;
+    NSArray* arguments = [[NSArray alloc] initWithObjects: child, nil];
+	[NSObject performSelectorOnMainThread:@selector(addChild:)
+                               withTarget:parent
+                              withObjects:arguments
+                            waitUntilDone:YES
+                           andReturnValue:&returnValue];
+    [arguments release];
+	return returnValue;
+}
+
 /* dummy function for the build to work*/
 int maWidgetScreenAddOptionsMenuItem(MAWidgetHandle widget, const char * title,
                                      const char* iconHandle, int iconPredefined)
@@ -172,45 +235,6 @@ int maWidgetGetProperty(MAWidgetHandle handle, const char *property, char *value
     [propertyString release];
 
 	return realLength;
-}
-
-int maWidgetPerformAction(MAWidgetHandle widget, const char *action, const char *param){
-	int returnValue=1;
-
-	return returnValue;
-}
-
-int maWidgetAddChild(MAWidgetHandle parentHandle, MAHandle childHandle) {
-	IWidget* parent = [mosyncUI getWidget:parentHandle];
-	IWidget* child = [mosyncUI getWidget:childHandle];
-	if(!parent) return MAW_RES_INVALID_HANDLE;
-	if(!child) return MAW_RES_INVALID_HANDLE;
-	if(parent == child) return MAW_RES_ERROR;
-
-	if(child.parent) return MAW_RES_ERROR;
-
-	// ugly.
-	if(
-	   !([parent class] == [HorizontalLayoutWidget class]) &&
-	   !([parent class] == [VerticalLayoutWidget class]) &&
-	   !([parent class] == [RelativeLayoutWidget class]) &&
-	   !([parent class] == [ListViewWidget class]) &&
-	   !([parent class] == [ListViewItemWidget class]) &&
-	   !([parent class] == [ScreenWidget class]) &&
-	   !([parent superclass] == [ScreenWidget class])
-	   ) {
-		return MAW_RES_INVALID_LAYOUT;
-	}
-
-    NSArray* arguments = [[NSArray alloc] initWithObjects: child, nil];
-	[NSObject performSelectorOnMainThread:@selector(addChild:)
-							 withTarget:parent
-							withObjects:arguments
-						  waitUntilDone:YES
-						 andReturnValue:nil];
-    [arguments release];
-
-	return MAW_RES_OK;
 }
 
 int maWidgetInsertChild(MAWidgetHandle parentHandle, MAWidgetHandle childHandle, int index) {
