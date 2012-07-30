@@ -65,6 +65,15 @@ typedef enum {
 -(int)addChild:(IWidget*)child;
 
 /**
+ * Insert a widget to a given index.
+ * @param child Widget to be added.
+ * @param index The index where the child should be inserted.
+ * @return MAW_RES_OK if the child was added, MAW_RES_INVALID_INDEX if the index param
+ * was invalid.
+ */
+- (int)insertChild:(IWidget*)child atIndex:(NSNumber*)index;
+
+/**
  * Set a widget property value.
  * @param key Widget's property name that should be set.
  * @param value Widget's proeprty value that should be set.

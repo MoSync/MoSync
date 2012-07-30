@@ -112,7 +112,6 @@
 	tabBarController.viewControllers = newItems;
 
 	return MAW_RES_OK;
-
 }
 
 /**

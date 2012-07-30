@@ -151,6 +151,50 @@ int maWidgetAddChild(MAWidgetHandle parentHandle, MAHandle childHandle)
 	return returnValue;
 }
 
+/**
+ * Inserts a widget to the given parent as a child at an index. Letting the
+ * parent widget layout the child.
+ * @param parent The widget layout in which the child will be inserted.
+ * @param child The widget that will be added to the parent.
+ * @param index The index where the widget should be inserted.
+ * @return Any of the following result codes:
+ * - MAW_RES_OK if the child could be added to the parent.
+ * - MAW_RES_INVALID_HANDLE if any of the handles were invalid.
+ * - MAW_RES_INVALID_INDEX if the index was out of bounds.
+ * - MAW_RES_INVALID_LAYOUT if the widget was added to a non-layout.
+ * - MAW_RES_CANNOT_INSERT_DIALOG if the child is a modal dialog.
+ * - MAW_RES_ERROR if it could not be added for some other reason.
+ */
+int maWidgetInsertChild(MAWidgetHandle parentHandle, MAWidgetHandle childHandle, int index)
+{
+	IWidget* parent = [mosyncUI getWidget:parentHandle];
+	IWidget* child = [mosyncUI getWidget:childHandle];
+
+    // Check if the handles are valid.
+	if (!parent || !child)
+    {
+        return MAW_RES_INVALID_HANDLE;
+    }
+
+    // Check if the widgets are the same or if the child already has a parent.
+	if (parent == child || child.parent)
+    {
+        return MAW_RES_ERROR;
+    }
+
+	int returnValue;
+    NSNumber* indexNumber = [[NSNumber alloc] initWithInt:index];
+    NSArray* arguments = [[NSArray alloc] initWithObjects: child, indexNumber, nil];
+	[NSObject performSelectorOnMainThread:@selector(insertChild:atIndex:)
+							   withTarget:parent
+							  withObjects:arguments
+							waitUntilDone:YES
+						   andReturnValue:&returnValue];
+    [indexNumber release];
+	[arguments release];
+	return returnValue;
+}
+
 /* dummy function for the build to work*/
 int maWidgetScreenAddOptionsMenuItem(MAWidgetHandle widget, const char * title,
                                      const char* iconHandle, int iconPredefined)
@@ -235,40 +279,6 @@ int maWidgetGetProperty(MAWidgetHandle handle, const char *property, char *value
     [propertyString release];
 
 	return realLength;
-}
-
-int maWidgetInsertChild(MAWidgetHandle parentHandle, MAWidgetHandle childHandle, int index) {
-	IWidget* parent = [mosyncUI getWidget:parentHandle];
-	IWidget* child = [mosyncUI getWidget:childHandle];
-	if(!parent) return MAW_RES_INVALID_HANDLE;
-	if(!child) return MAW_RES_INVALID_HANDLE;
-	if(parent == child) return MAW_RES_ERROR;
-
-	if(child.parent != NULL) return MAW_RES_ERROR;
-
-	// ugly.
-	if(
-	   !([parent class] == [HorizontalLayoutWidget class]) &&
-	   !([parent class] == [VerticalLayoutWidget class]) &&
-	   !([parent class] == [RelativeLayoutWidget class]) &&
-	   !([parent class] == [ListViewWidget class]) &&
-	   !([parent class] == [ListViewItemWidget class]) &&
-	   !([parent class] == [ScreenWidget class]) &&
-	   !([parent superclass] == [ScreenWidget class])
-	   ) {
-		return MAW_RES_INVALID_LAYOUT;
-	}
-
-
-	int returnValue;
-    NSArray* arguments = [[NSArray alloc] initWithObjects: child, [[NSNumber alloc] initWithInt:index], nil];
-	[NSObject performSelectorOnMainThread:@selector(insertChild:atIndex:)
-							   withTarget:parent
-							  withObjects:arguments
-							waitUntilDone:YES
-						   andReturnValue:&returnValue];
-	[arguments release];
-	return returnValue;
 }
 
 int maWidgetRemoveChild(MAWidgetHandle childHandle) {
