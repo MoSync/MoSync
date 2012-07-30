@@ -34,23 +34,32 @@
     if (self)
     {
         self.view = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-        UIButton* button = (UIButton*) self.view;
-        button.contentEdgeInsets = UIEdgeInsetsMake(1.0, 1.0, 1.0, 1.0);
-        [button addTarget:self action:@selector(touchDownEvent) forControlEvents:UIControlEventTouchDown];
-        [button addTarget:self action:@selector(touchUpInsideEvent) forControlEvents:UIControlEventTouchUpInside];
-        [button addTarget:self action:@selector(touchUpOutsideEvent) forControlEvents:UIControlEventTouchUpOutside];
-
-        image = nil;
-        leftCapWidth = 0;
-        topCapHeight = 0;
-        button.titleLabel.numberOfLines = 0;
-        [button setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
-
-        self.autoSizeWidth = WidgetAutoSizeWrapContent;
-        self.autoSizeHeight = WidgetAutoSizeWrapContent;
-        button.imageView.contentMode = UIViewContentModeCenter;
+        [self setupWidget];
     }
     return self;
+}
+
+/**
+ * Setup the view.
+ * If you inherit this class, call this method after initialization.
+ */
+-(void) setupWidget
+{
+    UIButton* button = (UIButton*) self.view;
+    button.contentEdgeInsets = UIEdgeInsetsMake(1.0, 1.0, 1.0, 1.0);
+    [button addTarget:self action:@selector(touchDownEvent) forControlEvents:UIControlEventTouchDown];
+    [button addTarget:self action:@selector(touchUpInsideEvent) forControlEvents:UIControlEventTouchUpInside];
+    [button addTarget:self action:@selector(touchUpOutsideEvent) forControlEvents:UIControlEventTouchUpOutside];
+
+    image = nil;
+    leftCapWidth = 0;
+    topCapHeight = 0;
+    button.titleLabel.numberOfLines = 0;
+    [button setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
+
+    self.autoSizeWidth = WidgetAutoSizeWrapContent;
+    self.autoSizeHeight = WidgetAutoSizeWrapContent;
+    button.imageView.contentMode = UIViewContentModeCenter;
 }
 
 /**

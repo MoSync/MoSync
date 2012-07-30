@@ -32,6 +32,7 @@
     if (self)
     {
         self.view = [UIButton buttonWithType:UIButtonTypeCustom];
+        [self setupWidget];
     }
     return self;
 }

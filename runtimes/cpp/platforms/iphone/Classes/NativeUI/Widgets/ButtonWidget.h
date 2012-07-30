@@ -25,6 +25,11 @@
 	int topCapHeight;
 }
 
+/**
+ * Setup the view.
+ * If you inherit this class, call this method after initialization.
+ */
+-(void) setupWidget;
 
 /**
  * Set a widget property value.
