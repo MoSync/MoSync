@@ -32,6 +32,8 @@ struct BenchResult {
     //strops results
     
     //membench results
+    float alloc_str_10, alloc_str_100, alloc_void_1, alloc_void_100, alloc_void_1000, alloc_dummy, alloc_dummy_struct, alloc_dummy_mix,
+    access_array, access_dummy, access_vector, add_vector, access_dummy_struct, access_dummy_mix;
     
 };
 

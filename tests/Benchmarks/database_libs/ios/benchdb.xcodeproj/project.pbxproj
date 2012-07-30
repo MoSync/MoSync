@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		FA9FC8C814B5EF9F0031C169 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FA9FC8C714B5EF9F0031C169 /* Foundation.framework */; };
+		FA9FC8C814B5EF9F0031C169 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FA9FC8C714B5EF9F0031C169 /* Foundation.framework */; settings = {ATTRIBUTES = (Required, ); }; };
 		FA9FC8D314B5EF9F0031C169 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FA9FC8D214B5EF9F0031C169 /* UIKit.framework */; };
 		FA9FC8D414B5EF9F0031C169 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FA9FC8C714B5EF9F0031C169 /* Foundation.framework */; };
 		FA9FC8D614B5EF9F0031C169 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FA9FC8D514B5EF9F0031C169 /* CoreGraphics.framework */; };

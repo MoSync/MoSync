@@ -17,6 +17,7 @@
 		10C8A66613CEF3E900820315 /* MemBenchNativeIOSViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 10C8A66513CEF3E900820315 /* MemBenchNativeIOSViewController.mm */; };
 		10C8A66913CEF3E900820315 /* MemBenchNativeIOSViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 10C8A66713CEF3E900820315 /* MemBenchNativeIOSViewController.xib */; };
 		10C8A68413CEF96900820315 /* membench.mm in Sources */ = {isa = PBXBuildFile; fileRef = 10C8A68313CEF96900820315 /* membench.mm */; };
+		60FD3D5315C6C96E0005DC9D /* libbenchdb.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 60FD3D5215C6C96E0005DC9D /* libbenchdb.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -34,8 +35,10 @@
 		10C8A66413CEF3E900820315 /* MemBenchNativeIOSViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MemBenchNativeIOSViewController.h; sourceTree = "<group>"; };
 		10C8A66513CEF3E900820315 /* MemBenchNativeIOSViewController.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = MemBenchNativeIOSViewController.mm; sourceTree = "<group>"; };
 		10C8A66813CEF3E900820315 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/MemBenchNativeIOSViewController.xib; sourceTree = "<group>"; };
-		10C8A68213CEF8B000820315 /* membench.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = membench.h; sourceTree = "<group>"; };
+		10C8A68213CEF8B000820315 /* membench.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 4; path = membench.h; sourceTree = "<group>"; };
 		10C8A68313CEF96900820315 /* membench.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = membench.mm; sourceTree = "<group>"; };
+		602B59EB15BED4AD00429FD7 /* BenchDB.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BenchDB.h; sourceTree = "<group>"; };
+		60FD3D5215C6C96E0005DC9D /* libbenchdb.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libbenchdb.a; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -46,6 +49,7 @@
 				10C8A65013CEF3E900820315 /* UIKit.framework in Frameworks */,
 				10C8A65213CEF3E900820315 /* Foundation.framework in Frameworks */,
 				10C8A65413CEF3E900820315 /* CoreGraphics.framework in Frameworks */,
+				60FD3D5315C6C96E0005DC9D /* libbenchdb.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -72,6 +76,7 @@
 		10C8A64E13CEF3E900820315 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				60FD3D5215C6C96E0005DC9D /* libbenchdb.a */,
 				10C8A64F13CEF3E900820315 /* UIKit.framework */,
 				10C8A65113CEF3E900820315 /* Foundation.framework */,
 				10C8A65313CEF3E900820315 /* CoreGraphics.framework */,
@@ -82,6 +87,7 @@
 		10C8A65513CEF3E900820315 /* MemBenchNativeIOS */ = {
 			isa = PBXGroup;
 			children = (
+				602B59EB15BED4AD00429FD7 /* BenchDB.h */,
 				10C8A68313CEF96900820315 /* membench.mm */,
 				10C8A68213CEF8B000820315 /* membench.h */,
 				10C8A65E13CEF3E900820315 /* MemBenchNativeIOSAppDelegate.h */,
@@ -244,6 +250,10 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "MemBenchNativeIOS/MemBenchNativeIOS-Prefix.pch";
 				INFOPLIST_FILE = "MemBenchNativeIOS/MemBenchNativeIOS-Info.plist";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)\"",
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
 			};
@@ -257,6 +267,10 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "MemBenchNativeIOS/MemBenchNativeIOS-Prefix.pch";
 				INFOPLIST_FILE = "MemBenchNativeIOS/MemBenchNativeIOS-Info.plist";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)\"",
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				VALIDATE_PRODUCT = YES;
 				WRAPPER_EXTENSION = app;
@@ -282,6 +296,7 @@
 				10C8A66E13CEF3E900820315 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

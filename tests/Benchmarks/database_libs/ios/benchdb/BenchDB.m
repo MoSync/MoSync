@@ -11,6 +11,14 @@
 
 @implementation BenchDBConnector
 
+- (id) init{
+    if((self = [super init]))
+    {
+
+    }
+    return self;
+}
+/* Submits the benchmark results to the benchmark server using HTTP GET. Returns 0 if the GET request succeeds and -1 if it fails. */
 - (int) submit:(struct BenchResult)br {
     
     br.revision = "0";
@@ -37,26 +45,48 @@
         url = [url stringByAppendingFormat:@"&test4=%d", br.test4];
     }else if(strcmp(br.benchmark, "linpack") == 0){ //linpack benchmark result
         url = [url stringByAppendingFormat:@"&mflops=%.3f", br.mflops];
-    } //other benchmarks here
+    }else if(strcmp(br.benchmark, "membench") == 0){
+        url = [url stringByAppendingFormat:@"&alloc_str_10=%.3f", br.alloc_str_10];
+        url = [url stringByAppendingFormat:@"&alloc_str_100=%.3f", br.alloc_str_100];
+        url = [url stringByAppendingFormat:@"&alloc_void_1=%.3f", br.alloc_void_1];
+        url = [url stringByAppendingFormat:@"&alloc_void_100=%.3f", br.alloc_void_100];
+        url = [url stringByAppendingFormat:@"&alloc_void_1000=%.3f", br.alloc_void_1000];
+        url = [url stringByAppendingFormat:@"&alloc_dummy=%.3f", br.alloc_dummy];
+        url = [url stringByAppendingFormat:@"&alloc_dummy_struct=%.3f", br.alloc_dummy_struct];
+        url = [url stringByAppendingFormat:@"&alloc_dummy_mix=%.3f", br.alloc_dummy_mix];
+        url = [url stringByAppendingFormat:@"&access_array=%.3f", br.access_array];
+        url = [url stringByAppendingFormat:@"&access_vector=%.3f", br.access_vector];
+        url = [url stringByAppendingFormat:@"&add_vector=%.3f", br.add_vector];
+        url = [url stringByAppendingFormat:@"&access_dummy=%.3f", br.access_dummy];
+        url = [url stringByAppendingFormat:@"&access_dummy_struct=%.3f", br.access_dummy_struct];
+        url = [url stringByAppendingFormat:@"&access_dummy_mix=%.3f", br.access_dummy_mix];
+    }
     
+    NSLog(@"benchdblib: url: %@\n", url);
     NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:url]
                                cachePolicy:NSURLRequestUseProtocolCachePolicy
                            timeoutInterval:60.0];
+    NSHTTPURLResponse *response = nil;
+    NSError *error;
+    NSData *responseData;
     
-    //TODO identify benchmark type, build url-string, make library :)
-    
-    NSURLConnection *connection = [[NSURLConnection alloc] initWithRequest:request delegate:self];
-    if (connection) {
+    //NSURLConnection *connection = [[NSURLConnection alloc] initWithRequest:request delegate:self];
+    responseData = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
+    if (response != nil) {
         // Create the NSMutableData to hold the received data.
         // receivedData is an instance variable declared elsewhere.
-        mReceivedData = [[NSMutableData data] retain];
+        //mReceivedData = [[NSMutableData data] retain];
+        return 0; //connection went fine
     } else {
         // Inform the user that the connection failed.
+        NSLog(@"connection failed with HTTP status code: %d", [response statusCode]);
+        NSString *responseString = [[NSString alloc] initWithData:responseData encoding:NSUTF8StringEncoding];
+        NSLog(@"response: %@", responseString);
+        return -1;
     }
     
-    
-    
-    return 0; //TODO return the result code of the URLConnection object
 }
+
+
 
 @end

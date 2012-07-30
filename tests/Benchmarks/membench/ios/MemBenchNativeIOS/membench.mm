@@ -33,6 +33,7 @@ MemBench::~MemBench() {
 void MemBench::bench() {
 
 	float time;
+    float kmemops;
 	int i;
 	char buf[120];
 
@@ -43,89 +44,114 @@ void MemBench::bench() {
 	for(i = 1; (time = this->heapBench(i, 10, MAUTIL_STRING)) < RUNNING_TIME; i*=2);
 	sprintf(buf, "allocating/freeing %d std::strings of capacity 10 ", ALOT*i);
 	call_objc_obj(buf);
-	sprintf(buf, "Time: %1.2f seconds, %1.2f KMEMOPS.\n", time, (float) (ALOT*i*0.001f)/(float) time);
+	sprintf(buf, "Time: %1.2f seconds, %1.2f KMEMOPS.\n", time, (kmemops = (float) (ALOT*i*0.001f)/(float) time));
 	call_objc_obj(buf);
+    mBr.alloc_str_10 = kmemops;
 
 	for(i = 1; (time = this->heapBench(i, 100, MAUTIL_STRING)) < RUNNING_TIME; i*=2);
 	sprintf(buf, "allocating/freeing %d std::strings of capacity: 100 ", ALOT*i);
 	call_objc_obj(buf);
-	sprintf(buf, "Time: %1.2f seconds, %1.2f KMEMOPS.\n", time, (float) (ALOT*i*0.001f)/(float) time);
+	sprintf(buf, "Time: %1.2f seconds, %1.2f KMEMOPS.\n", time, (kmemops = (float) (ALOT*i*0.001f)/(float) time));
 	call_objc_obj(buf);
+    mBr.alloc_str_100 = kmemops;
 
 	for(i = 1; (time = this->heapBench(i, 1, MALLOC)) < RUNNING_TIME; i*=2);
 	sprintf(buf, "allocating/freeing %d heap blocks of size 1 using malloc() ", ALOT*i);
 	call_objc_obj(buf);
-	sprintf(buf, "Time: %1.2f seconds, %1.2f KMEMOPS.\n", time, (float) (ALOT*i*0.001f)/(float) time);
+	sprintf(buf, "Time: %1.2f seconds, %1.2f KMEMOPS.\n", time, (kmemops = (float) (ALOT*i*0.001f)/(float) time));
 	call_objc_obj(buf);
+    mBr.alloc_void_1 = kmemops;
 
 	for(i = 1; (time = this->heapBench(i, 100, MALLOC)) < RUNNING_TIME; i*=2);
 	sprintf(buf, "allocating/freeing %d heap blocks of size 100 using malloc() ", ALOT*i);
 	call_objc_obj(buf);
-	sprintf(buf, "Time: %1.2f seconds, %1.2f KMEMOPS.\n", time, (float) (ALOT*i*0.001f)/(float) time);
+	sprintf(buf, "Time: %1.2f seconds, %1.2f KMEMOPS.\n", time, (kmemops = (float) (ALOT*i*0.001f)/(float) time));
 	call_objc_obj(buf);
+    mBr.alloc_void_100 = kmemops;
 
 	for(i = 1; (time = this->heapBench(i, 1000, MALLOC)) < RUNNING_TIME; i*=2);
 	sprintf(buf, "allocating/freeing %d heap blocks of size 1000 using malloc() ", ALOT*i);
 	call_objc_obj(buf);
-	sprintf(buf, "Time: %1.2f seconds, %1.2f KMEMOPS.\n", time, (float) (ALOT*i*0.001f)/(float) time);
+	sprintf(buf, "Time: %1.2f seconds, %1.2f KMEMOPS.\n", time, (kmemops = (float) (ALOT*i*0.001f)/(float) time));
 	call_objc_obj(buf);
+    mBr.alloc_void_1000 = kmemops;
 
 	for(i = 1; (time = this->heapBench(i, 100, DUMMY)) < RUNNING_TIME; i*=2);
 	sprintf(buf, "allocating/freeing %d dummy objects ", ALOT*i);
 	call_objc_obj(buf);
-	sprintf(buf, "Time: %1.2f seconds, %1.2f KMEMOPS.\n", time, (float) (ALOT*i*0.001f)/(float) time);
+	sprintf(buf, "Time: %1.2f seconds, %1.2f KMEMOPS.\n", time, (kmemops = (float) (ALOT*i*0.001f)/(float) time));
 	call_objc_obj(buf);
+    mBr.alloc_dummy = kmemops;
 
 	for(i = 1; (time = this->heapBench(i, 100, DUMMY_STRUCT)) < RUNNING_TIME; i*=2);
 	sprintf(buf, "allocating/freeing %d dummy structs ", ALOT*i);
 	call_objc_obj(buf);
-	sprintf(buf, "Time: %1.2f seconds, %1.2f KMEMOPS.\n", time, (float) (ALOT*i*0.001f)/(float) time);
+	sprintf(buf, "Time: %1.2f seconds, %1.2f KMEMOPS.\n", time, (float) (kmemops = (float) (ALOT*i*0.001f)/(float) time));
 	call_objc_obj(buf);
+    mBr.alloc_dummy_struct = kmemops;
 
 	for(i = 1; (time = this->heapBench(i, 100, DUMMY_MIX)) < RUNNING_TIME; i*=2);
 	sprintf(buf, "allocating/freeing %d larger dummy objects ", ALOT*i);
 	call_objc_obj(buf);
-	sprintf(buf, "Time: %1.2f seconds, %1.2f KMEMOPS.\n", time, (float) (ALOT*i*0.001f)/(float) time);
+	sprintf(buf, "Time: %1.2f seconds, %1.2f KMEMOPS.\n", time, (kmemops = (float) (ALOT*i*0.001f)/(float) time));
 	call_objc_obj(buf);
+    mBr.alloc_dummy_mix = kmemops;
 
 
 	mArray = (char*) malloc(100 * sizeof(char));
 	for(i = 1; (time = this->memAccess(i, 100, ARRAY)) < RUNNING_TIME; i*=2);
 	sprintf(buf, "accessing each element in a char array %d times ", ALOT*i);
 	call_objc_obj(buf);
-	sprintf(buf, "Time: %1.2f seconds, %1.2f KMEMOPS.\n", time, (float) (ALOT*i*100*0.001f)/(float) time);
+	sprintf(buf, "Time: %1.2f seconds, %1.2f KMEMOPS.\n", time, (kmemops = (float) (ALOT*i*100*0.001f)/(float) time));
 	call_objc_obj(buf);
-	free(mArray);
+    free(mArray);
+    mBr.access_array = kmemops;
+
 
 	for(i = 1; (time = this->memAccess(i, 100, VECTOR_ADD)) < RUNNING_TIME; i*=2);
 	sprintf(buf, "adding 100 int:s to a std::vector<int> %d times ", ALOT*i);
 	call_objc_obj(buf);
-	sprintf(buf, "Time: %1.2f seconds, %1.2f KMEMOPS.\n", time, (float) (ALOT*i*100*0.001f)/(float) time);
+	sprintf(buf, "Time: %1.2f seconds, %1.2f KMEMOPS.\n", time, (kmemops = (float) (ALOT*i*100*0.001f)/(float) time));
 	call_objc_obj(buf);
+    mBr.add_vector = kmemops;
 
 	for(i = 1; (time = this->memAccess(i, 100, VECTOR_ACCESS)) < RUNNING_TIME; i*=2);
 	sprintf(buf, "accessing 100 int:s in a std::vector<int> %d times ", ALOT*i);
 	call_objc_obj(buf);
-	sprintf(buf, "Time: %1.2f seconds, %1.2f KMEMOPS.\n", time, (float) (ALOT*i*100*0.001f)/(float) time);
+	sprintf(buf, "Time: %1.2f seconds, %1.2f KMEMOPS.\n", time, (kmemops = (float) (ALOT*i*100*0.001f)/(float) time));
 	call_objc_obj(buf);
+    mBr.access_vector = kmemops;
 
 	for(i = 1; (time = this->memAccess(i, 1, DUMMY_ACCESS)) < RUNNING_TIME; i*=2);
 	sprintf(buf, "DUMMY_ACCESS %d times ", ALOT*i);
 	call_objc_obj(buf);
-	sprintf(buf, "Time: %1.2f seconds, %1.2f KMEMOPS.\n", time, (float) (ALOT*i*0.001f)/(float) time);
+	sprintf(buf, "Time: %1.2f seconds, %1.2f KMEMOPS.\n", time, (kmemops = (float) (ALOT*i*0.001f)/(float) time));
 	call_objc_obj(buf);
+    mBr.access_dummy = kmemops;
 
 	for(i = 1; (time = this->memAccess(i, 1, DUMMY_STRUCT_ACCESS)) < RUNNING_TIME; i*=2);
 	sprintf(buf, "DUMMY_STRUCT_ACCESS %d times ", ALOT*i);
 	call_objc_obj(buf);
-	sprintf(buf, "Time: %1.2f seconds, %1.2f KMEMOPS.\n", time, (float) (ALOT*i*0.001f)/(float) time);
+	sprintf(buf, "Time: %1.2f seconds, %1.2f KMEMOPS.\n", time, (kmemops = (float) (ALOT*i*0.001f)/(float) time));
 	call_objc_obj(buf);
+    mBr.access_dummy_struct = kmemops;
 
 	for(i = 1; (time = this->memAccess(i, 1, DUMMY_MIX_ACCESS)) < RUNNING_TIME; i*=2);
 	sprintf(buf, "DUMMY_MIX_ACCESS %d times ", ALOT*i);
 	call_objc_obj(buf);
-	sprintf(buf, "Time: %1.2f seconds, %1.2f KMEMOPS.\n", time, (float) (ALOT*i*0.001f)/(float) time);
+	sprintf(buf, "Time: %1.2f seconds, %1.2f KMEMOPS.\n", time, (kmemops = (float) (ALOT*i*0.001f)/(float) time));
 	call_objc_obj(buf);
+    mBr.access_dummy_mix = kmemops;
+
+    //finished, upload results
+    mBr.benchmark = "membench";
+    BenchDBConnector * bdbc = [[BenchDBConnector alloc] init];
+    if([bdbc submit:mBr] < 0){
+        //submission to benchmark server failed!
+        call_objc_obj("!!!ERROR: Failed to send data to the benchmark server, check your connection.");
+    }else{
+        call_objc_obj("Done! Data successfully sent to the benchmark server.");
+    }
 
 }
 
@@ -209,7 +235,7 @@ float MemBench::memAccess(int numRuns, int size, int testType) {
 					mArray[k] = mArray[k+1];
 				}
 			}
-			printf("mArray[k]: %d", mArray[0]);
+			//printf("mArray[k]: %d", mArray[0]);
 		}
 		break;
 
@@ -233,7 +259,7 @@ float MemBench::memAccess(int numRuns, int size, int testType) {
 					mVector[k] = mVector[k+1];
 				}
 			}
-			printf("mVector[k]: %d", mVector[0]);
+			//printf("mVector[k]: %d", mVector[0]);
 		}
 		break;
 

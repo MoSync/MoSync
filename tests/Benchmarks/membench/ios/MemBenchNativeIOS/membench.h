@@ -16,6 +16,8 @@
 //IOS headers
 #include <objc/message.h>
 #include <objc/runtime.h>
+//benchmark publishing
+#include "BenchDB.h"
 
 #define ALOT 1024 //used as number of iterations when we want to do a lot of operations
 #define	RUNNING_TIME 1.0f //running time per test in msecs
@@ -102,6 +104,7 @@ private:
 	DummyObjectMix mDom;
 	DummyStruct mDs;
 
+    BenchResult mBr;
 };
 
 
