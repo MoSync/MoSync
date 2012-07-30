@@ -15,14 +15,17 @@
  02111-1307, USA.
  */
 
-#import "RelativeLayoutWidget.h"
 #include <helpers/cpp_defs.h>
 #include <helpers/CPP_IX_WIDGET.h>
 
-@interface MoSyncTouchEnabledScrollView : UIScrollView {
-@private
-}
+#import "RelativeLayoutWidget.h"
+#import "WidgetLayoutingMacro.h"
+
+MAKE_UIWRAPPER_LAYOUTING_IMPLEMENTATION(MoSync, UIScrollView)
+
+@interface MoSyncTouchEnabledScrollView : MoSyncUIScrollView
 @end
+
 @implementation MoSyncTouchEnabledScrollView
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
 {
@@ -65,11 +68,20 @@
  */
 -(NSString*) getContentOffset;
 
+/**
+ * Recalculate scroll view's content size.
+ */
+-(void)resizeContent;
+
 @end
 
 @implementation RelativeLayoutWidget
 
-- (id)init {
+/**
+ * Init function.
+ */
+- (id)init
+{
     self = [super init];
     if (self)
     {
@@ -77,14 +89,38 @@
         self.view = scrollView;
         scrollView.scrollEnabled = NO;
         scrollView.userInteractionEnabled = YES;
+
+        [scrollView setWidget:self];
         [scrollView release];
-        scrollView = NULL;
+        scrollView = nil;
     }
     return self;
 }
 
-- (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value {
-	if([key isEqualToString:@MAW_RELATIVE_LAYOUT_SCROLLABLE]) {
+/**
+ * Adds an widget to the end of the children list.
+ * @param child Widget to be added.
+ * @return MAW_RES_OK.
+ */
+-(int)addChild:(IWidget*)child
+{
+    [super addChild:child toSubview:YES];
+    return MAW_RES_OK;
+}
+
+/**
+ * Set a widget property value.
+ * @param key Widget's property name that should be set.
+ * @param value Widget's proeprty value that should be set.
+ * @return One of the following values:
+ * - MAW_RES_OK if the property was set.
+ * - MAW_RES_INVALID_PROPERTY_NAME if the property name was invalid.
+ * - MAW_RES_INVALID_PROPERTY_VALUE if the property value was invalid.
+ */
+- (int)setPropertyWithKey:(NSString*)key toValue:(NSString*)value
+{
+	if([key isEqualToString:@MAW_RELATIVE_LAYOUT_SCROLLABLE])
+    {
 		MoSyncTouchEnabledScrollView* sv = (MoSyncTouchEnabledScrollView*) self.view;
         BOOL enabled =  [value boolValue];
 		sv.scrollEnabled = enabled;
@@ -99,7 +135,13 @@
 	return MAW_RES_OK;
 }
 
-- (NSString*)getPropertyWithKey: (NSString*)key
+/**
+ * Get a widget property value.
+ * @param key Widget's property name.
+ * @return The property value, or nil if the property name is invalid.
+ * The returned value should not be autoreleased. The caller will release the returned value.
+ */
+- (NSString*)getPropertyWithKey:(NSString*)key
 {
     if ([key isEqualToString:@MAW_RELATIVE_LAYOUT_CONTENT_OFFSET])
     {
@@ -110,33 +152,40 @@
     }
 }
 
-- (void)layoutSubviews:(UIView*)_view {
-	int minX = 0xffffff;
-	int maxX =  -0xffffff;
-	int minY = 0xffffff;
-	int maxY =  -0xffffff;
+/**
+ * Layout its subviews.
+ * Called from view's layoutSubview method.
+ * @param view UIView object that triggered the layout event.
+ */
+- (void)layoutSubviews:(UIView*)view
+{
+    for (IWidget *child in _children)
+	{
+		int viewWidth = child.width;
+		int viewHeight = child.height;
 
+		if (child.autoSizeWidth == WidgetAutoSizeFillParent)
+        {
+			viewWidth = self.width;
+		}
+		else if (child.autoSizeWidth == WidgetAutoSizeWrapContent)
+        {
+			viewWidth = [child sizeThatFitsForWidget].width;
+		}
 
-	for (IWidget *child in _children)
-    {
-		UIView* childView = [child view];
+		if (child.autoSizeHeight == WidgetAutoSizeFillParent)
+        {
+			viewHeight = self.height;
+		}
+		else if (child.autoSizeHeight == WidgetAutoSizeWrapContent)
+        {
+			viewHeight = [child sizeThatFitsForWidget].height;
+		}
 
-		if(childView.frame.origin.x < minX)
-			minX = childView.frame.origin.x;
-
-		if(childView.frame.origin.y < minY)
-			minY = childView.frame.origin.y;
-
-		if(childView.frame.origin.x + childView.bounds.size.width > maxX)
-			maxX = childView.frame.origin.x+childView.bounds.size.width;
-
-		if(childView.frame.origin.y + childView.bounds.size.height > maxY)
-			maxY = childView.frame.origin.y+childView.bounds.size.height;
+		child.size = CGSizeMake(viewWidth, viewHeight);
 	}
 
-	MoSyncTouchEnabledScrollView* sv = (MoSyncTouchEnabledScrollView*)self.view;
-	//sv.contentSize = CGSizeMake(maxX-minX, maxY-minY);
-	sv.contentSize = CGSizeMake(maxX, maxY); // negative values aren't supported.
+    [self resizeContent];
 }
 
 @end
@@ -177,6 +226,35 @@
                              contentOffset.x * getScreenScale(),
                              contentOffset.y * getScreenScale()];
     return returnValue;
+}
+
+/**
+ * Recalculate scroll view's content size.
+ */
+-(void)resizeContent
+{
+	int minX = 0xffffff;
+	int maxX =  -0xffffff;
+	int minY = 0xffffff;
+	int maxY =  -0xffffff;
+
+	for (IWidget *child in _children)
+    {
+		if(child.originX < minX)
+			minX = child.originX;
+
+		if(child.originY < minY)
+			minY = child.originY;
+
+		if(child.originX + child.width > maxX)
+			maxX = child.originX + child.width;
+
+		if(child.originY + child.height > maxY)
+			maxY = child.originY + child.height;
+	}
+
+	MoSyncTouchEnabledScrollView* scrollView = (MoSyncTouchEnabledScrollView*)self.view;
+	scrollView.contentSize = CGSizeMake(maxX, maxY);
 }
 
 @end

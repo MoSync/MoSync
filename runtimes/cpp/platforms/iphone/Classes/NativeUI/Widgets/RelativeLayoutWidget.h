@@ -18,13 +18,39 @@
 #import <Foundation/Foundation.h>
 #import "IWidget.h"
 
-@interface RelativeLayoutWidget : IWidget {
+@interface RelativeLayoutWidget : IWidget
 
-}
+/**
+ * Adds an widget to the end of the children list.
+ * @param child Widget to be added.
+ * @return MAW_RES_OK.
+ */
+-(int)addChild:(IWidget*)child;
 
-- (id)init;
-- (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value;
-- (NSString*)getPropertyWithKey: (NSString*)key;
-- (void)layoutSubviews:(UIView*)_view;
+/**
+ * Set a widget property value.
+ * @param key Widget's property name that should be set.
+ * @param value Widget's proeprty value that should be set.
+ * @return One of the following values:
+ * - MAW_RES_OK if the property was set.
+ * - MAW_RES_INVALID_PROPERTY_NAME if the property name was invalid.
+ * - MAW_RES_INVALID_PROPERTY_VALUE if the property value was invalid.
+ */
+- (int)setPropertyWithKey:(NSString*)key toValue:(NSString*)value;
+
+/**
+ * Get a widget property value.
+ * @param key Widget's property name.
+ * @return The property value, or nil if the property name is invalid.
+ * The returned value should not be autoreleased. The caller will release the returned value.
+ */
+- (NSString*)getPropertyWithKey:(NSString*)key;
+
+/**
+ * Layout its subviews.
+ * Called from view's layoutSubview method.
+ * @param view UIView object that triggered the layout event.
+ */
+- (void)layoutSubviews:(UIView*)view;
 
 @end
