@@ -14,6 +14,7 @@ void run(void);
 @implementation NativeLinpack3ViewController
 
 @synthesize txtFlops;
+@synthesize activityIndicator;
 
 - (IBAction)bench:(id)sender {
     reg_objc_obj(self);
@@ -31,8 +32,11 @@ void run(void);
 
     BenchDBConnector * bdbc = [[BenchDBConnector alloc] init];
     [bdbc submit:mBr];
+    //[activityIndicator stopAnimating]; //stop the activityIndicator from spinning
 
     [flopsString release];
+    sleep(2);
+    exit(0); //force exit
 }
 
 - (void)dealloc

@@ -70,5 +70,6 @@
 - (void)showStats;
 - (double)currTime;
 - (void)createTexture;
+- (void)runNextBench;
 
 @end

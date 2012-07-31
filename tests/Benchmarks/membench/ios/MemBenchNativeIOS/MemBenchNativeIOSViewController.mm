@@ -42,6 +42,20 @@
 
 }
 
+-(void)runNextBench:(char*)msg{
+    UIApplication *ourApplication = [UIApplication sharedApplication];
+    NSString *ourPath = @"linpack://";
+    NSURL *ourURL = [NSURL URLWithString:ourPath];
+    if ([ourApplication canOpenURL:ourURL]) {
+        [ourApplication openURL:ourURL];
+    }
+    else {
+        //Display error
+        UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"NativeLinpackiOS Not Found" message:@"It must be installed to perform the next benchmark." delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
+        [alertView show];
+        [alertView release];
+    }
+}
 
 - (void)dealloc
 {

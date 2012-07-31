@@ -19,5 +19,6 @@
 
 - (IBAction)startBench:(id)sender;
 - (void)postResult:(char *)res;
+- (void)runNextBench:(char*)msg;
 
 @end

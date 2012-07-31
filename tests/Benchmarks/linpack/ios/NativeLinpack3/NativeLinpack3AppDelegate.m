@@ -24,6 +24,9 @@
     //self.window.rootViewController = self.viewController;
     [self.window addSubview:self.viewController.view];
     [self.window makeKeyAndVisible];
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        [_viewController bench:self]; //start the benchmark
+    });
     return YES;
 }
 

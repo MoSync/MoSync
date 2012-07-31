@@ -11,11 +11,12 @@
 
 @interface NativeLinpack3ViewController : UIViewController {
     IBOutlet UITextField *txtFlops;
-
+    IBOutlet UIActivityIndicatorView *activityIndicator;
     struct BenchResult mBr; //bench result struct
 }
 
 @property(nonatomic,retain) IBOutlet UITextField *txtFlops;
+@property(nonatomic,retain) IBOutlet UIActivityIndicatorView *activityIndicator;
 
 - (IBAction) bench:(id) sender;
 - (void)updateFlops:(double)mflops;

@@ -162,6 +162,9 @@
                 
                 BenchDBConnector * bdbc = [[BenchDBConnector alloc] init];
                 [bdbc submit:mBr];
+                //try to start the membench app to perform the next benchmark
+                sleep(5);
+                [self runNextBench];
                 
                 //set the label's text
                 mTextView.text = [mTextView.text stringByAppendingString:@"Tests completed!"];
@@ -172,6 +175,7 @@
                 
                 //release the label
                 [mTextView release];
+                exit(0);
                 
                 
             }
@@ -185,6 +189,22 @@
     
     
 }
+
+-(void)runNextBench{
+    UIApplication *ourApplication = [UIApplication sharedApplication];
+    NSString *ourPath = @"membench://";
+    NSURL *ourURL = [NSURL URLWithString:ourPath];
+    if ([ourApplication canOpenURL:ourURL]) {
+        [ourApplication openURL:ourURL];
+    }
+    else {
+        //Display error
+        UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"MemBenchNativeiOS Not Found" message:@"It must be installed to perform the next benchmark." delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
+        [alertView show];
+        [alertView release];
+    }
+}
+
 -(void)setupView:(GLView*)view
 {
     

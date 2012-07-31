@@ -18,7 +18,7 @@
 		10FE4AA013AF8BE500F40190 /* NativeLinpack3ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 10FE4A9F13AF8BE500F40190 /* NativeLinpack3ViewController.m */; };
 		10FE4AA313AF8BE500F40190 /* NativeLinpack3ViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 10FE4AA113AF8BE500F40190 /* NativeLinpack3ViewController.xib */; };
 		10FE4AAC13AFA2E700F40190 /* linpack.c in Sources */ = {isa = PBXBuildFile; fileRef = 10FE4AAB13AFA2E700F40190 /* linpack.c */; };
-		602B59CC15BEC68000429FD7 /* libbenchdb.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 602B59CB15BEC68000429FD7 /* libbenchdb.a */; };
+		60FD3D8515C7EC680005DC9D /* libbenchdb.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 60FD3D8415C7EC680005DC9D /* libbenchdb.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -39,7 +39,7 @@
 		10FE4AA213AF8BE500F40190 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/NativeLinpack3ViewController.xib; sourceTree = "<group>"; };
 		10FE4AAB13AFA2E700F40190 /* linpack.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = linpack.c; sourceTree = "<group>"; };
 		602B59CA15BEC66400429FD7 /* BenchDB.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BenchDB.h; sourceTree = "<group>"; };
-		602B59CB15BEC68000429FD7 /* libbenchdb.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libbenchdb.a; sourceTree = "<group>"; };
+		60FD3D8415C7EC680005DC9D /* libbenchdb.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libbenchdb.a; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -50,7 +50,7 @@
 				10FE4A8A13AF8BE500F40190 /* UIKit.framework in Frameworks */,
 				10FE4A8C13AF8BE500F40190 /* Foundation.framework in Frameworks */,
 				10FE4A8E13AF8BE500F40190 /* CoreGraphics.framework in Frameworks */,
-				602B59CC15BEC68000429FD7 /* libbenchdb.a in Frameworks */,
+				60FD3D8515C7EC680005DC9D /* libbenchdb.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -85,7 +85,7 @@
 		10FE4A8813AF8BE500F40190 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				602B59CB15BEC68000429FD7 /* libbenchdb.a */,
+				60FD3D8415C7EC680005DC9D /* libbenchdb.a */,
 				10FE4A8913AF8BE500F40190 /* UIKit.framework */,
 				10FE4A8B13AF8BE500F40190 /* Foundation.framework */,
 				10FE4A8D13AF8BE500F40190 /* CoreGraphics.framework */,

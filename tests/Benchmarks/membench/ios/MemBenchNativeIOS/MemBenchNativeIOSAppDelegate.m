@@ -23,6 +23,7 @@
      
     self.window.rootViewController = self.viewController;
     [self.window makeKeyAndVisible];
+    [_viewController startBench:self];
     return YES;
 }
 

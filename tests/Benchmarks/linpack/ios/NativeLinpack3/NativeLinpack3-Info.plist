@@ -36,5 +36,16 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>com.mosync.benchmark</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>linpack</string>
+			</array>
+		</dict>
+	</array>
 </dict>
 </plist>
