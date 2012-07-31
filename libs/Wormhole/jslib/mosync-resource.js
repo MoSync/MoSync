@@ -156,15 +156,26 @@ mosync.resource.imageDownloadFinished = function(imageHandle)
 };
 
 /**
- * Send a log message to a remote server. This is a useful way
- * to display debug info when developing/testing on a device.
+ * Send a log message to a remote server. This is useful for
+ * displaying debug info when developing/testing on a device.
+ *
+ * When using Reload, the Reload Client is set up to send log
+ * messages to the Reload Server. Nothing needs to be written
+ * or configured in C++ in this case.
+ *
+ * If you wish to implement your own logging handler, you do this
+ * in C++ by creating a subclass of class Wormhole::LogMessageListener,
+ * implementing method onLogMessage, and then setting the listener
+ * using Wormhole::ResourceMessageHandler::setLogMessageListener().
+ * See the implementation of the Reload Client for an example of this.
  *
  * @param message The message to be sent, for example "Hello World".
- * @param url Optional parameter the specifies the remove server
- * to handle the log request, for example: "http://localhost:8282/log/".
+ *
+ * @param url Optional string parameter that specifies url of the
+ * remote server that should handle the log request, for example:
+ * "http://localhost:8282/remoteLogMessage/"
  * If this parameter is not supplied or set to null, "undefined" will
- * be passed to the C++ message handler, and the url set in C++
- * code will be used.
+ * be passed to the C++ log message handler.
  */
 mosync.resource.sendRemoteLogMessage = function(message, url)
 {
@@ -182,9 +193,10 @@ mosync.resource.sendRemoteLogMessage = function(message, url)
 };
 
 /**
- * Short alias for mosync.resource.sendRemoteLogMessage.
- * Set the url of the logging service in C++ code, then
- * just use mosync.rlog("Hello World") in your JS code.
- * "rlog" is short for "remote log".
+ * Short alias for mosync.resource.sendRemoteLogMessage
+ * ("rlog" is short for "remote log").
+ * If you use Reload, you can call mosync.rlog like this:
+ * mosync.rlog("Hello World");
+ * The log message will show up in the Reload user interface.
  */
 mosync.rlog = mosync.resource.sendRemoteLogMessage;
