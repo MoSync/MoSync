@@ -122,10 +122,16 @@ namespace MoSync
                     if (args.Orientation == PageOrientation.LandscapeLeft)
                     {
                         rotation -= 90;
+                        mVideoBrush.Stretch = Stretch.Uniform;
                     }
                     else if (args.Orientation == PageOrientation.LandscapeRight)
                     {
                         rotation += 90;
+                        mVideoBrush.Stretch = Stretch.Uniform;
+                    }
+                    else
+                    {
+                        mVideoBrush.Stretch = Stretch.Fill;
                     }
 
                     mVideoBrush.RelativeTransform = new CompositeTransform()
