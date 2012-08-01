@@ -87,6 +87,7 @@ public:
 
 private:
 
+    void runNextBench();
 	float heapBench(int numRuns, int size, int testType);
 	float memAccess(int numRuns, int size, int testType);
 

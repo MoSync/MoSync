@@ -1,16 +1,16 @@
 //
-//  NativeLinpack3AppDelegate.m
-//  NativeLinpack3
+//  BenchmarkSuiteAppDelegate.m
+//  BenchmarkSuite
 //
-//  Created by QA on 6/20/11.
-//  Copyright 2011 __MyCompanyName__. All rights reserved.
+//  Created by Alexander Samuelsson on 8/1/12.
+//  Copyright 2012 __MyCompanyName__. All rights reserved.
 //
 
-#import "NativeLinpack3AppDelegate.h"
+#import "BenchmarkSuiteAppDelegate.h"
 
-#import "NativeLinpack3ViewController.h"
+#import "BenchmarkSuiteViewController.h"
 
-@implementation NativeLinpack3AppDelegate
+@implementation BenchmarkSuiteAppDelegate
 
 
 @synthesize window=_window;
@@ -20,13 +20,10 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
     // Override point for customization after application launch.
-     
-    //self.window.rootViewController = self.viewController;
-    [self.window addSubview:self.viewController.view];
+
+    self.window.rootViewController = self.viewController;
     [self.window makeKeyAndVisible];
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        [_viewController bench:self]; //start the benchmark
-    });
+    [_viewController runNextBench];
     return YES;
 }
 
@@ -41,7 +38,7 @@
 - (void)applicationDidEnterBackground:(UIApplication *)application
 {
     /*
-     Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later. 
+     Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later.
      If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
      */
 }
@@ -58,9 +55,6 @@
     /*
      Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
      */
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        [_viewController bench:self]; //restart the benchmark
-    });
 }
 
 - (void)applicationWillTerminate:(UIApplication *)application

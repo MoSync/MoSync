@@ -15,20 +15,24 @@ MemBench::MemBench() {
 MemBench::~MemBench() {
 
 }
-    
-    /*
-     * Called from obj-C @ runtime to set a pointer for us to do callbacks to update the GUI
-     */
-    void MemBench::reg_objc_obj(id obj) {
-        mObjcPtr = obj;
-    }
-    
-    /*
-     * Callback to objective-C runtime to print results to the GUI
-     */ 
-    void MemBench::call_objc_obj(char *msg) {
-        objc_msgSend(mObjcPtr, sel_getUid("postResult:"), msg);	
-    }
+
+/*
+ * Called from obj-C @ runtime to set a pointer for us to do callbacks to update the GUI
+ */
+void MemBench::reg_objc_obj(id obj) {
+    mObjcPtr = obj;
+}
+
+/*
+ * Callback to objective-C runtime to print results to the GUI
+ */
+void MemBench::call_objc_obj(char *msg) {
+    objc_msgSend(mObjcPtr, sel_getUid("postResult:"), msg);
+}
+
+void MemBench::runNextBench() { //run the next benchmark app in the benchmark suite
+    objc_msgSend(mObjcPtr, sel_getUid("runNextBench:"), NULL);
+}
 
 void MemBench::bench() {
 
@@ -152,6 +156,9 @@ void MemBench::bench() {
     }else{
         call_objc_obj("Done! Data successfully sent to the benchmark server.");
     }
+    sleep(5); //sleep so that the data can be sent to server before the next benchmark starts
+    runNextBench(); //start the next benchmark app in the benchmark suite.
+
 
 }
 
@@ -161,60 +168,59 @@ float MemBench::heapBench(int numRuns, int size, int testType) {
 
 	switch(testType){
 
-	case MAUTIL_STRING:
-		std::string *str;
+        case MAUTIL_STRING:
+            std::string *str;
 
-		for(int i = 0; i < numRuns; ++i){
-			for(int j = 0; j < ALOT; ++j){
-				str = new std::string(size, 'a');
-				delete str;
-			}
-		}
-		break;
+            for(int i = 0; i < numRuns; ++i){
+                for(int j = 0; j < ALOT; ++j){
+                    str = new std::string(size, 'a');
+                    delete str;
+                }
+            }
+            break;
 
-	case DUMMY:
-		DummyObject* dummy;
+        case DUMMY:
+            DummyObject* dummy;
 
-		for(int i = 0; i < numRuns; ++i){
-			for(int j = 0; j < ALOT; ++j){
-				dummy = new DummyObject();
-				delete dummy;
-			}
-		}
-		break;
+            for(int i = 0; i < numRuns; ++i){
+                for(int j = 0; j < ALOT; ++j){
+                    dummy = new DummyObject();
+                    delete dummy;
+                }
+            }
+            break;
 
-	case DUMMY_MIX:
-		DummyObjectMix* dummyMix;
+        case DUMMY_MIX:
+            DummyObjectMix* dummyMix;
 
-		for(int i = 0; i < numRuns; ++i){
-			for(int j = 0; j < ALOT; ++j){
-				dummyMix = new DummyObjectMix();
-				delete dummyMix;
-			}
-		}
-		break;
+            for(int i = 0; i < numRuns; ++i){
+                for(int j = 0; j < ALOT; ++j){
+                    dummyMix = new DummyObjectMix();
+                    delete dummyMix;
+                }
+            }
+            break;
 
-	case DUMMY_STRUCT:
-		DummyStruct* dummyStruct;
+        case DUMMY_STRUCT:
+            DummyStruct* dummyStruct;
 
-		for(int i = 0; i < numRuns; ++i){
-			for(int j = 0; j < ALOT; ++j){
-				dummyStruct = new DummyStruct();
-				delete dummyStruct;
-			}
-		}
-		break;
+            for(int i = 0; i < numRuns; ++i){
+                for(int j = 0; j < ALOT; ++j){
+                    dummyStruct = new DummyStruct();
+                    delete dummyStruct;
+                }
+            }
+            break;
 
-	case MALLOC:
-		void *mem;
-
-		for(int i = 0; i < numRuns; ++i){
-			for(int j = 0; j < ALOT; ++j){
-				mem = malloc(size);
-				free(mem);
-			}
-		}
-		break;
+        case MALLOC:
+            void *mem;
+            for(int i = 0; i < numRuns; ++i){
+                for(int j = 0; j < ALOT; ++j){
+                    mem = malloc(size); //this gets optimized away on -OX flags :(
+                    free(mem);
+                }
+            }
+            break;
 
 	}
 	return currTime() - startTime;
@@ -227,81 +233,81 @@ float MemBench::memAccess(int numRuns, int size, int testType) {
 
 	switch(testType){
 
-	case ARRAY:
+        case ARRAY:
 
-		for(int i = 0; i < numRuns; ++i){
-			for(int j = 0; j < ALOT; ++j){
-				for(int k = 0; k < size-1; ++k){
-					mArray[k] = mArray[k+1];
-				}
-			}
-			//printf("mArray[k]: %d", mArray[0]);
-		}
-		break;
+            for(int i = 0; i < numRuns; ++i){
+                for(int j = 0; j < ALOT; ++j){
+                    for(int k = 0; k < size-1; ++k){
+                        mArray[k] = mArray[k+1];
+                    }
+                }
+                //printf("mArray[k]: %d", mArray[0]);
+            }
+            break;
 
-	case VECTOR_ADD:
+        case VECTOR_ADD:
 
-		for(int i = 0; i < numRuns; ++i){
-			for(int j = 0; j < ALOT; ++j){
-				mVector.clear();
-				for(int k = 0; k < size; ++k){
-					mVector.push_back(k);
-				}
-			}
-		}
-		break;
+            for(int i = 0; i < numRuns; ++i){
+                for(int j = 0; j < ALOT; ++j){
+                    mVector.clear();
+                    for(int k = 0; k < size; ++k){
+                        mVector.push_back(k);
+                    }
+                }
+            }
+            break;
 
-	case VECTOR_ACCESS:
+        case VECTOR_ACCESS:
 
-		for(int i = 0; i < numRuns; ++i){
-			for(int j = 0; j < ALOT; ++j){
-				for(int k = 0; k < mVector.size()-1; ++k){
-					mVector[k] = mVector[k+1];
-				}
-			}
-			//printf("mVector[k]: %d", mVector[0]);
-		}
-		break;
+            for(int i = 0; i < numRuns; ++i){
+                for(int j = 0; j < ALOT; ++j){
+                    for(int k = 0; k < mVector.size()-1; ++k){
+                        mVector[k] = mVector[k+1];
+                    }
+                }
+                //printf("mVector[k]: %d", mVector[0]);
+            }
+            break;
 
-	case DUMMY_ACCESS:
-		for(int i = 0; i < numRuns; ++i){
-			for(int j = 0; j < ALOT; ++j){
-				mDo.a = j;
-				mDo.b = mDo.c;
-				mDo.c = i;
-			}
-		}
-		break;
+        case DUMMY_ACCESS:
+            for(int i = 0; i < numRuns; ++i){
+                for(int j = 0; j < ALOT; ++j){
+                    mDo.a = j;
+                    mDo.b = mDo.c;
+                    mDo.c = i;
+                }
+            }
+            break;
 
-	case DUMMY_STRUCT_ACCESS:
-		for(int i = 0; i < numRuns; ++i){
-			for(int j = 0; j < ALOT; ++j){
-				mDs.a = j;
-				mDs.b = mDs.c;
-				mDs.c = i;
-			}
-		}
-		break;
+        case DUMMY_STRUCT_ACCESS:
+            for(int i = 0; i < numRuns; ++i){
+                for(int j = 0; j < ALOT; ++j){
+                    mDs.a = j;
+                    mDs.b = mDs.c;
+                    mDs.c = i;
+                }
+            }
+            break;
 
-	case DUMMY_MIX_ACCESS:
-		int tmp;
-		float ftmp;
-		std::string tmpStr;
-		std::vector<std::string> tmpStrVec;
-		mDom.str_vec = std::vector<std::string>();
-		for(int i = 0; i < numRuns; ++i){
-			mDom.a = rand(); mDom.b = rand(); mDom.c = rand(); mDom.d = rand(); mDom.e = rand(); mDom.f = rand(); mDom.g = rand();
-			mDom.str = std::string("kebab");
-			for(int j = 0; j < ALOT; ++j){
-				mDom.str_vec.push_back("owlbowl");
-				tmp = mDom.getA() + mDom.getB() + mDom.getC();
-				ftmp = mDom.getD() + mDom.getE() + mDom.getF() + mDom.getG();
-				tmpStr = mDom.getStr();
-				tmpStrVec = mDom.getStrVec();
-			}
-			mDom.str_vec.clear();
-		}
-		break;
+        case DUMMY_MIX_ACCESS:
+            int tmp;
+            float ftmp;
+            std::string tmpStr;
+            std::vector<std::string> tmpStrVec;
+            mDom.str_vec = std::vector<std::string>();
+            for(int i = 0; i < numRuns; ++i){
+                mDom.a = rand(); mDom.b = rand(); mDom.c = rand(); mDom.d = rand(); mDom.e = rand(); mDom.f = rand(); mDom.g = rand();
+                mDom.str = std::string("kebab");
+                for(int j = 0; j < ALOT; ++j){
+                    mDom.str_vec.push_back("owlbowl");
+                    tmp = mDom.getA() + mDom.getB() + mDom.getC();
+                    ftmp = mDom.getD() + mDom.getE() + mDom.getF() + mDom.getG();
+                    tmpStr = mDom.getStr();
+                    tmpStrVec = mDom.getStrVec();
+                }
+                mDom.str_vec.clear();
+            }
+            break;
 
 	}
 	return currTime() - startTime;

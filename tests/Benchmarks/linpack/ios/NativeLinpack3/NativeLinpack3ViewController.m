@@ -36,7 +36,6 @@ void run(void);
 
     [flopsString release];
     sleep(2);
-    exit(0); //force exit
 }
 
 - (void)dealloc
