@@ -186,6 +186,9 @@ namespace MoSync
 			mIoctls = new Ioctls();
 			mIoctlInvoker = new IoctlInvoker(mCore, mIoctls);
 
+            mCurrentResourceHandle = 1;
+            mStaticResourceCount = 0;
+
 			PhoneApplicationFrame mainPage = (PhoneApplicationFrame)Application.Current.RootVisual;
 
 			mainPage.MouseLeftButtonDown += MouseLeftButtonDown;
