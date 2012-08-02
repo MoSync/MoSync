@@ -99,7 +99,7 @@ void MainScreen::createMainLayout() {
 	mMainLayout->addChild(mSetCenterButton);
 
 	// create the main map and add it to the main layout
-	mMap = new Map("google test credentials", "bing test credentials");
+	mMap = new Map("google test credentials", "AsIe6nHOHjIuf9MQS4fW7up92BO6HuCwspKJqYwffZiqUJsgXuLIXeBdCf9EM4yz");
 	mMap->fillSpaceHorizontally();
 	mMap->fillSpaceVertically();
 
