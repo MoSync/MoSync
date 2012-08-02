@@ -1,0 +1,97 @@
+/**
+* The available widget properties for a #MAW_LIST_VIEW_ITEM. See \ref WidgetProperties "Widget properties" for more properties.
+*/
+group WidgetListViewItemProperties "List view item" {
+	constset MAString MAW_LIST_VIEW_ITEM_ {
+		/**
+		* @brief Sets the text part of the list view item. If there is an icon the text will be placed to the right of it, otherwise near the left edge.
+		*
+		* @validvalue A null-terminated string.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(listViewItemHandle, MAW_LIST_VIEW_ITEM_TEXT, "My label");
+		* \endcode
+		*/
+		TEXT = "text";
+
+		/**
+		* @brief Sets an icon of the list view item that is placed to the left of the text.
+		*
+		* @validvalue MoSync handle to an uncompressed image resource.
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(listViewItemHandle, MAW_LIST_VIEW_ITEM_ICON, toString(R_MY_ICON));
+		* \endcode
+		*/
+		ICON = "icon";
+
+		/**
+		* @brief Sets the type of list item displayed. Provides the corresponding icon in the right side of the list view.
+		*
+		* @note Only available for iOS.
+		*
+		* @validvalue One of "none", "hasChildren", "hasDetails" or "isChecked".
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(listViewItemHandle, MAW_LIST_VIEW_ITEM_ACCESSORY_TYPE, "hasChildren");
+		* \endcode
+		*/
+		ACCESSORY_TYPE = "accessoryType";
+
+		/**
+		* @brief Sets the font color of the text part.
+		*
+		* @validvalue  A hexadecimal value 0xRRGGBB, where R, G and B are the red, green and blue components respectively.
+		*
+		* @setonly
+		*
+		* @par Example set the font color to red.
+		* \code
+		*	maWidgetSetProperty(listViewItemHandle, MAW_LIST_VIEW_ITEM_FONT_COLOR, "0xFF0000");
+		* \endcode
+		*/
+		FONT_COLOR = "fontColor";
+
+		/**
+		* @brief Sets the font size in points of the text part.
+		*
+		* @validvalue A float that specifies the number of pixels on Android
+		* and WP7, and number of points on iOS.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(listViewItemHandle, MAW_LIST_VIEW_ITEM_FONT_SIZE, "13.0");
+		* \endcode
+		*/
+		FONT_SIZE = "fontSize";
+
+		/**
+		* @brief Sets the typeface and style in which the text should be displayed.
+		*
+		* @validvalue A font handle received from loading fonts using
+		* #maFontGetName and #maFontLoadWithName syscalls.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	int nrFonts = maFontGetCount();
+		*	 char buf[256];
+		*	 // Get first font name.
+		*	 maFontGetName(1, buf, 256);
+		*	 // Load that font for size 10.
+		*	 int fontHandle = maFontLoadWithName(buf, 10);
+		*	 // Set that font to the list view item.
+		*	maWidgetSetProperty(listViewItemHandle, MAW_LIST_VIEW_ITEM_FONT_HANDLE, toString(fontHandle));
+		* \endcode
+		*/
+		FONT_HANDLE = "fontHandle";
+	}
+} // end of WidgetListViewItemProperties

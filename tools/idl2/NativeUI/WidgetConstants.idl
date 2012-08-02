@@ -1,0 +1,96 @@
+/**
+* The available constants for the widget api.
+*/
+group WidgetConstants "Widget constants" {
+	constset int MAW_CONSTANT_ {
+		/**
+		* @brief A handle to the MoSync canvas screen. Use maWidgetScreenShow with this handle to show the initial mosync canvas.
+		*/
+		MOSYNC_SCREEN_HANDLE = 0;
+
+		/**
+		* @brief If set to the width or height of a widget and the parent is either a vertical or horizontal layout it tries to fill the available space in that dimension. If there are multiple widgets specified with this constant, the space will then be shared equally. If the parent isn't a horizontal or vertical layout it just resizes the child to the size of its parent.
+		*/
+		FILL_AVAILABLE_SPACE = -1;
+
+		/**
+		* @brief If set to the width or height of a widget it will be as big as its content in that dimension.
+		*/
+		WRAP_CONTENT = -2;
+
+		/**
+		* @brief Loading a page has started. Used in
+		* #MAW_EVENT_WEB_VIEW_CONTENT_LOADED.
+		*/
+		STARTED = 1;
+
+		/**
+		* @brief Loading a page is done. Used in
+		* #MAW_EVENT_WEB_VIEW_CONTENT_LOADED.
+		*/
+		DONE = 2;
+
+		/**
+		* @brief Loading a page has stopped (aborted). Used in
+		* #MAW_EVENT_WEB_VIEW_CONTENT_LOADED.
+		*/
+		STOPPED = 3;
+
+		/**
+		* @brief Loading a page has failed. Used in
+		* #MAW_EVENT_WEB_VIEW_CONTENT_LOADED.
+		*/
+		ERROR = -1;
+
+		/**
+		* @brief The hook type is a soft hook. Used in
+		* #MAW_EVENT_WEB_VIEW_HOOK_INVOKED.
+		*/
+		SOFT = 5;
+
+		/**
+		* @brief The hook type is a hard hook. Used in
+		* #MAW_EVENT_WEB_VIEW_HOOK_INVOKED.
+		*/
+		HARD = 6;
+
+		/**
+		* @brief The hook type is a message sendt from JavaScript.
+		* Used in #MAW_EVENT_WEB_VIEW_HOOK_INVOKED.
+		* This type of hook does not use any hook pattern, it is
+		* always sent from the browser, using a platform specific
+		* method (which is abstracted away in the libraries).
+		*/
+		MESSAGE = 7;
+
+		/**
+		* @brief The popover arrow should point up. Used in
+		* #MAW_MODAL_DIALOG_ARROW_POSITION.
+		*/
+		ARROW_UP = 1;
+
+		/**
+		* @brief The popover arrow should point down. Used in
+		* #MAW_MODAL_DIALOG_ARROW_POSITION.
+		*/
+		ARROW_DOWN = 2;
+
+		/**
+		* @brief The popover arrow should point left. Used in
+		* #MAW_MODAL_DIALOG_ARROW_POSITION.
+		*/
+		ARROW_LEFT = 4;
+
+		/**
+		* @brief The popover arrow should point right. Used in
+		* #MAW_MODAL_DIALOG_ARROW_POSITION.
+		*/
+		ARROW_RIGHT = 8;
+
+		/**
+		* @brief The popover arrow can point anywhere. Used in
+		* #MAW_MODAL_DIALOG_ARROW_POSITION.
+		*/
+		ARROW_ANY = 15;
+	}
+}
