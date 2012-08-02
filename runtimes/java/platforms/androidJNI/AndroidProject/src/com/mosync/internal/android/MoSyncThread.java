@@ -1129,7 +1129,9 @@ public class MoSyncThread extends Thread
 		mClipWidth = mWidth;
 		mClipHeight = mHeight;
 
-		// Reset cliprect
+		// Set original clip rect.
+		// First we save the clip state.
+		mCanvas.save();
 		mCanvas.clipRect(mClipLeft, mClipTop, mClipWidth, mClipHeight, Region.Op.REPLACE);
 
 		mPaint.setStyle(Paint.Style.FILL);
@@ -1182,6 +1184,10 @@ public class MoSyncThread extends Thread
 		mClipWidth = width;
 		mClipHeight = height;
 
+		// Restore clip state and save before setting the clip rect.
+		// Note that we do an initial save of the clip state in initSyscalls.
+		mCanvas.restore();
+		mCanvas.save();
 		mCanvas.clipRect(left, top, left+width, top+height, Region.Op.REPLACE);
 	}
 
