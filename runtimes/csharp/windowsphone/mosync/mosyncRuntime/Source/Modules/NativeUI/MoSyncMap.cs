@@ -115,7 +115,10 @@ namespace MoSync
                     MoSync.Util.RunActionOnMainThreadSync(() =>
                     {
                         MapPin pin = (MapPin)child;
-                        mBingMap.Children.Add(pin.Pushpin);
+                        if (!mBingMap.Children.Contains(pin.Pushpin))
+                        {
+                            mBingMap.Children.Add(pin.Pushpin);
+                        }
                     });
                 }
             }

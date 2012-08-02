@@ -25,6 +25,7 @@
 #include <NativeUI/MapRegion.h>
 #include <NativeUI/MapPin.h>
 #include <NativeUI/MapLocation.h>
+#include <mastdlib.h>
 
 #define HORIZONTAL_LAYOUT_HEIGHT 80
 
@@ -58,6 +59,8 @@ MainScreen::MainScreen() :
  */
 MainScreen::~MainScreen()
 {
+	mMapPins.clear();
+
 	mMap->removeMapListener(this);
 	mGetVisibleAreaButton->removeButtonListener(this);
 	mSetVisibleAreaButton->removeButtonListener(this);
@@ -214,14 +217,29 @@ void MainScreen::buttonClicked(Widget* button)
 	}
 	else if (button == mAddPinToMap)
 	{
-		mMapPin = new MapPin(Location(32.3, 32.2));
-		mMapPin->setText("test");
-		mMap->addMapPin(mMapPin);
+		// then, we add 5 new pins
+		for (int i = 0; i < 5; i++)
+		{
+			// generate random values for the coordinates
+			// latitude is between 0 an 90
+			double latitude = (double)(rand() % 90);
+			// longitude is between -180 and 180
+			double longitude = (double)(rand() & 180);
+			int sign = rand()%2;
+			if (sign == 0)
+				longitude *= (-1);
+
+			MapPin *newPin = new MapPin(Location(latitude, longitude));
+			mMapPins.add(newPin);
+			mMap->addMapPin(newPin);
+		}
 	}
 	else if (button == mRemovePinFromMap)
 	{
-		mMap->removeMapPin(mMapPin);
-		delete mMapPin;
+		for (int i = 0; i < mMapPins.size(); i++)
+		{
+			mMap->removeMapPin(mMapPins[i]);
+		}
 	}
 	else if (button == mSetCenterButton)
 	{
