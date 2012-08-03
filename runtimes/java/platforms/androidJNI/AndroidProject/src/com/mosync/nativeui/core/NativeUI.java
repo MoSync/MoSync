@@ -48,6 +48,8 @@ import com.mosync.nativeui.ui.widgets.NavigationBarWidget;
 import com.mosync.nativeui.ui.widgets.RadioButtonWidget;
 import com.mosync.nativeui.ui.widgets.RadioGroupWidget;
 import com.mosync.nativeui.ui.widgets.ScreenWidget;
+import com.mosync.nativeui.ui.widgets.SegmentedListLayout;
+import com.mosync.nativeui.ui.widgets.SegmentedListViewSection;
 import com.mosync.nativeui.ui.widgets.StackScreenWidget;
 import com.mosync.nativeui.ui.widgets.TabScreenWidget;
 import com.mosync.nativeui.ui.widgets.Widget;
@@ -306,33 +308,8 @@ public class NativeUI
 			Log.e( "MoSync", "maWidgetInsertChild: Invalid index: " + index );
 			return IX_WIDGET.MAW_RES_INVALID_INDEX;
 		}
-		if ( child.isDialog() )
-		{
-			Log.e( "MoSync", "maWidgetInsertChild: Cannot add a dialog to a widget. " );
-			return IX_WIDGET.MAW_RES_CANNOT_INSERT_DIALOG;
-		}
-		if ( child instanceof RadioButtonWidget )
-		{
-			Log.e( "MoSync", "maWidgetInsertChild: Cannot add a radio button to a layout, only to Radio Groups." );
-			return IX_WIDGET.MAW_RES_INVALID_HANDLE;
-		}
 
-		if ( parent.isDialog() )
-		{
-			DialogWidget parentAsDialog = (DialogWidget) parent;
-			parentAsDialog.addChildAt(child, index);
-		}
-		else if ( parent.isLayout() )
-		{
-			Layout parentAsLayout = (Layout) parent;
-			parentAsLayout.addChildAt( child, index );
-		}
-		else
-		{
-			Log.e( "MoSync", "maWidgetInsertChild: Parent " + parentHandle + " is not a layout or a dialog." );
-			return IX_WIDGET.MAW_RES_INVALID_LAYOUT;
-		}
-		return IX_WIDGET.MAW_RES_OK;
+		return parent.addChildAt(child, index);
 	}
 
 	/**
@@ -358,23 +335,7 @@ public class NativeUI
 			return IX_WIDGET.MAW_RES_INVALID_HANDLE;
 		}
 
-		if ( parent.isDialog() )
-		{
-			DialogWidget parentAsDialog = (DialogWidget) parent;
-			parentAsDialog.removeChild(child);
-		}
-		else if ( parent.isLayout() )
-		{
-			Layout parentAsLayout = (Layout) parent;
-			parentAsLayout.removeChild( child );
-		}
-		else
-		{
-			Log.e( "MoSync", "maWidgetRemove: Parent for " + childHandle + " is not a layout or a dialog." );
-			return IX_WIDGET.MAW_RES_INVALID_LAYOUT;
-		}
-
-		return IX_WIDGET.MAW_RES_OK;
+		return parent.removeChild( child );
 	}
 
 	/**
@@ -588,57 +549,8 @@ public class NativeUI
 
 		boolean result;
 
-		// Set font, if available on the current widget.
-		if ( key.equals( IX_WIDGET.MAW_LABEL_FONT_HANDLE ) )
-		{
-			return setWidgetFont(widget, key, value);
-		}
-
 		try
 		{
-			if ( widget instanceof RadioGroupWidget && key.equals(IX_WIDGET.MAW_RADIO_GROUP_ADD_VIEW) )
-			{
-				int radioButtonHandle = IntConverter.convert(value);
-				Widget child = m_widgetTable.get( radioButtonHandle );
-				if ( child != null && child instanceof RadioButtonWidget )
-				{
-					RadioButtonWidget radioButton = (RadioButtonWidget) child;
-					radioButton.setId(radioButtonHandle);
-					RadioGroupWidget radioGroup = (RadioGroupWidget) widget;
-					radioGroup.addButton( radioButton );
-
-					return IX_WIDGET.MAW_RES_OK;
-				}
-				else
-				{
-					Log.e( "MoSync", "Error while converting property value '" + value + ". Value needs to be a valid radio button handle" );
-					return IX_WIDGET.MAW_RES_INVALID_PROPERTY_VALUE;
-				}
-			}
-			if ( widget instanceof RadioGroupWidget && key.equals(IX_WIDGET.MAW_RADIO_GROUP_SELECTED) )
-			{
-				int radioButtonHandle = IntConverter.convert(value);
-				Widget child = m_widgetTable.get( radioButtonHandle );
-				RadioGroupWidget radioGroup = (RadioGroupWidget) widget;
-				if ( radioButtonHandle == -1 )
-				{
-					// Setting -1 as the selection identifier clears the selection.
-					radioGroup.checkRadioButton(-1);
-				}
-				else if ( child != null && child instanceof RadioButtonWidget )
-				{
-					RadioButtonWidget radioButton = (RadioButtonWidget) child;
-					radioGroup.checkRadioButton( radioButton.getId() );
-				}
-				else
-				{
-					Log.e( "MoSync", "Error while converting property value '" + value + ". Value needs to be a valid radio button handle" );
-					return IX_WIDGET.MAW_RES_INVALID_PROPERTY_VALUE;
-				}
-
-				return IX_WIDGET.MAW_RES_OK;
-			}
-
 			result =  widget.setProperty( key, value );
 		}
 		catch(PropertyConversionException pce)
@@ -690,23 +602,7 @@ public class NativeUI
 
 		String result;
 		try {
-			if ( widget instanceof RadioGroupWidget && key.equals(IX_WIDGET.MAW_RADIO_GROUP_SELECTED) )
-			{
-				RadioGroupWidget radioGroup = (RadioGroupWidget) widget;
-				RadioButtonWidget selectedButton = radioGroup.getButton(radioGroup.getChecked());
-				if ( selectedButton == null )
-				{
-					result = "-1";
-				}
-				else
-				{
-					result = Integer.toString( selectedButton.getHandle() );
-				}
-			}
-			else
-			{
-				result = widget.getProperty( key );
-			}
+			result = widget.getProperty( key );
 		}catch( FeatureNotAvailableException fnae)
 		{
 			Log.e("MoSync", "Feature not available exception: " + fnae.getMessage() );
@@ -865,46 +761,4 @@ public class NativeUI
 		return (Widget) m_widgetTable.get( handle );
 	}
 
-	/**
-	 * Set the font property to the
-	 *
-	 * @param property The property name.
-	 * @param value The property value.
-	 * @return error code or MAW_RES_OK.
-	 */
-	public int setWidgetFont(Widget widget, final String property,
-			final String value)
-	{
-		// Set the typeface to the label, button widget, edit Box or list view item.
-		MoSyncFontHandle currentFont = null;
-
-		// Search the handle in the list of fonts.
-		try {
-			currentFont = mMoSyncThread.getMoSyncFont(IntConverter .convert(value));
-		} catch (PropertyConversionException pce)
-		{
-			Log.e("MoSync", "Error while getting font handle with value '"
-					+ value + "Invalid property value");
-			return IX_WIDGET.MAW_RES_INVALID_PROPERTY_VALUE;
-		}
-
-		if (currentFont == null)
-		{
-			Log.e("MoSync", "Error while getting font handle with value '"
-					+ value + " The handle was not found");
-			return IX_WIDGET.MAW_RES_INVALID_PROPERTY_VALUE;
-		}
-		else
-		{
-			Log.e("@@MoSync", "Set font typeface to native ui widget");
-			boolean fontWasSet = widget.setFontTypeface(
-					currentFont.getTypeface(), currentFont.getFontSize());
-			if (!fontWasSet)
-			{
-				Log.e("MoSync", "Error while setting property '" + property);
-				return IX_WIDGET.MAW_RES_INVALID_PROPERTY_NAME;
-			}
-			return IX_WIDGET.MAW_RES_OK;
-		}
-	}
 }

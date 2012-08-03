@@ -28,6 +28,7 @@ import android.widget.ListView;
 import android.widget.AdapterView.OnItemClickListener;
 
 import com.mosync.internal.android.EventQueue;
+import com.mosync.internal.generated.IX_WIDGET;
 import com.mosync.nativeui.core.Types;
 import com.mosync.nativeui.ui.widgets.SegmentedListViewSection.AdapterChangedListener;
 import com.mosync.nativeui.util.properties.InvalidPropertyValueException;
@@ -119,14 +120,17 @@ public class SegmentedListLayout extends ListLayout
 	 * the list view itself.
 	 */
 	@Override
-	public void addChildAt(Widget child, int index)
+	public int addChildAt(Widget child, int index)
 	{
 		if ( !(child instanceof SegmentedListViewSection) )
-			return;
+		{
+			Log.e( "MoSync",
+					"maWidgetInsertChild: SegmentedListLayout can only contain SegmentedListViewSections.");
+			return IX_WIDGET.MAW_RES_INVALID_HANDLE;
+		}
 
 		SegmentedListViewSection section = (SegmentedListViewSection) child;
 		section.setParent(this);
-		m_children.add(section);
 		mSections.add(section);
 
 		int listIndex = index;
@@ -141,14 +145,13 @@ public class SegmentedListLayout extends ListLayout
 			ListItemWidget item = section.getItem(i);
 			m_viewAdapter.addAt(item.getRootView(), listIndex + i);
 
-			updateLayoutParamsForChild(item);
-
-			ViewGroup layout = getView( );
-			layout.addView( item.getRootView( ), listIndex+i );
+//			updateLayoutParamsForChild(item);
 		}
 
 		// Set adapter listeners for each section.
 		section.setAdapterListener(this);
+
+		return IX_WIDGET.MAW_RES_OK;
 	}
 
 	@Override
@@ -167,32 +170,27 @@ public class SegmentedListLayout extends ListLayout
 		// Based on index inside the section, compute the position in list.
 		int itemPos = getItemPosition(mSections.indexOf(section), index);
 		m_viewAdapter.addAt(item.getRootView(), itemPos);
-		updateLayoutParamsForChild(item);
-		ViewGroup layout = getView( );
-		layout.addView( item.getRootView( ), itemPos );
+//		updateLayoutParamsForChild(item);
 	}
 
 	@Override
-	public void removeChild(Widget child)
+	public int removeChild(Widget child)
 	{
 		// Do not call super.removeChild because section is not a widget.
-
 		SegmentedListViewSection section = (SegmentedListViewSection) child;
 		for (int i=0; i < section.itemsCount(); i++)
 		{
 			// Section is removed from list, it's items removed from adapter.
 			m_viewAdapter.remove(section.getItem(i).getRootView());
-//			ViewGroup layout = getView();
-//			layout.removeView(section.getItem(i).getRootView());
 		}
 		// Nullify adapter listener.
 		section.setAdapterListener(null);
 
-		m_children.remove(child);
 		section.setParent(null);
-
 		mSections.remove(section);
 		m_viewAdapter.notifyDataSetChanged();
+
+		return IX_WIDGET.MAW_RES_OK;
 	}
 
 	@Override

@@ -101,15 +101,17 @@ public class ListItemWidget extends Layout
 		}
 		else if( property.equals(IX_WIDGET.MAW_LIST_VIEW_ITEM_FONT_HANDLE) )
 		{
-//			MoSyncFontHandle currentFont = null;
-//
-//			// Search the handle in the list of fonts.
-//			currentFont = MoSyncThread.getMoSyncFont(IntConverter .convert(value));
-//
-//			if ( currentFont != null )
-//			{
-//				setFontTypeface(currentFont.getTypeface(), currentFont.getFontSize());
-//			}
+			MoSyncFontHandle currentFont = null;
+
+			// Search the handle in the list of fonts.
+			currentFont = MoSyncThread.getMoSyncFont(IntConverter .convert(value));
+
+			if ( currentFont != null )
+			{
+				setFontTypeface(currentFont.getTypeface(), currentFont.getFontSize());
+			}
+			else
+				throw new InvalidPropertyValueException(property, value);
 		}
 		else
 		{
@@ -146,11 +148,10 @@ public class ListItemWidget extends Layout
 	 * @return True if the widget supports font setting, false otherwise.
 	 */
 	@Override
-	public boolean setFontTypeface(Typeface aTypeface, float aSize)
+	public void setFontTypeface(Typeface aTypeface, float aSize)
 	{
 		m_label.setTypeface(aTypeface);
 		m_label.setTextSize(aSize);
-		return true;
 	}
 
 	/**

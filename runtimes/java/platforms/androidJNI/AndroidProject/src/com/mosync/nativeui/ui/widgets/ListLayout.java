@@ -27,7 +27,9 @@ import android.widget.AbsListView;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
 
+import com.mosync.internal.generated.IX_WIDGET;
 import com.mosync.nativeui.core.Types;
+import com.mosync.nativeui.util.LayoutParamsSetter;
 import com.mosync.nativeui.util.properties.BooleanConverter;
 import com.mosync.nativeui.util.properties.InvalidPropertyValueException;
 import com.mosync.nativeui.util.properties.PropertyConversionException;
@@ -37,19 +39,19 @@ import com.mosync.nativeui.util.properties.PropertyConversionException;
  * The intention of this class is display views that all
  * has the same structure, otherwise a linear layout
  * may be preferred.
- * 
+ *
  * @author fmattias
  */
-public class ListLayout extends Layout
+public class ListLayout extends Widget
 {
 	/**
 	 * Feeds the list with views.
 	 */
 	ViewAdapter m_viewAdapter = new ViewAdapter( );
-	
+
 	/**
 	 * Constructor.
-	 * 
+	 *
 	 * @param handle Integer handle corresponding to this instance.
 	 * @param listView A list wrapped by this widget.
 	 */
@@ -58,45 +60,81 @@ public class ListLayout extends Layout
 		super( handle, listView );
 		listView.setAdapter( m_viewAdapter );
 	}
-	
+
 	@Override
-	public void addChildAt(Widget child, int index)
+	public int addChildAt(Widget child, int index)
 	{
-		super.addChildAt( child, index );
-		
+		child.setParent(this);
+		updateLayoutParamsForChild(child);
+
 		int listIndex = index;
 		if( index == -1 )
 		{
 			listIndex = m_viewAdapter.getCount( );
 		}
-		
-		child.getView( ).setFocusable( false );
+
 		m_viewAdapter.addAt( child.getRootView( ), listIndex );
+
+		return IX_WIDGET.MAW_RES_OK;
 	}
 
 	/**
 	 * Add the child to the view adapter rather to
 	 * the list view itself.
-	 * 
+	 *
 	 * @see Layout.addChild.
 	 */
 	@Override
-	public void removeChild(Widget child)
+	public int removeChild(Widget child)
 	{
-		super.removeChild( child );
+		child.setParent(null);
 
 		m_viewAdapter.remove( child.getRootView( ) );
+
+		return IX_WIDGET.MAW_RES_OK;
 	}
-	
+
 	/**
 	 * @see Layout.updateLayoutParams.
 	 */
-	@Override
 	public ViewGroup.LayoutParams createNativeLayoutParams(LayoutParams mosyncLayoutParams)
 	{
 		return new AbsListView.LayoutParams( mosyncLayoutParams.getWidth( ) , mosyncLayoutParams.getHeight( ) );
 	}
-	
+
+	/**
+	 * Updates the Android layout params for the given child, according
+	 * to the parameters specified in the child. Only the parameters that
+	 * are supported for the layout will be taken into consideration.
+	 *
+	 * @param child The child for which to update the layout params.
+	 */
+	public void updateLayoutParamsForChild(Widget child)
+	{
+		// Set layout params for the child
+		ViewGroup.LayoutParams nativeLayoutParams = createNativeLayoutParams( child.getLayoutParams( ) );
+		LayoutParamsSetter.setPossibleParams( child.getLayoutParams( ), nativeLayoutParams );
+
+		View childView = child.getView();
+
+		View rootView = child.getRootView();
+		if( childView != rootView )
+		{
+			if ( child instanceof Layout )
+			{
+				if ( !((Layout) child).isScrollable() )
+				{
+					rootView.setLayoutParams(
+							new ViewGroup.LayoutParams( nativeLayoutParams.width, nativeLayoutParams.height ) );
+				}
+			}
+		}
+		else
+		{
+			childView.setLayoutParams( nativeLayoutParams );
+		}
+	}
+
 	@Override
 	public boolean setProperty(String property, String value)
 			throws PropertyConversionException, InvalidPropertyValueException
@@ -105,7 +143,7 @@ public class ListLayout extends Layout
 		{
 			return true;
 		}
-		
+
 		if( property.equals( Types.WIDGET_PROPERTY_REVERSED ) )
 		{
 			m_viewAdapter.setReversed( BooleanConverter.convert( value ) );
@@ -114,13 +152,13 @@ public class ListLayout extends Layout
 		{
 			return false;
 		}
-		
+
 		return true;
 	}
-	
+
 	/**
 	 * An adapter that feeds the list view with views.
-	 * 
+	 *
 	 * @author fmattias
 	 */
 	class ViewAdapter extends BaseAdapter
@@ -129,22 +167,22 @@ public class ListLayout extends Layout
 		 * The list of views contained in this adapter.
 		 */
 		List<View> m_views = new ArrayList<View>();
-		
+
 		/**
 		 * Determines if the list items should be displayed in the
 		 * reversed order or not.
 		 */
 		private boolean m_reversed = false;
-		
+
 		public ViewAdapter()
 		{
-			
+
 		}
-		
+
 		/**
 		 * Adds a view to the adapter at the specific index and notifies
 		 * the listeners.
-		 * 
+		 *
 		 * @param view The view to add.
 		 * @param index The index to add the element at.
 		 */
@@ -156,10 +194,10 @@ public class ListLayout extends Layout
 				notifyDataSetChanged( );
 			}
 		}
-		
+
 		/**
 		 * Removes a view from the adapter and notifies the listeners.
-		 * 
+		 *
 		 * @param view The view to remove.
 		 */
 		public void remove(View view)
@@ -170,10 +208,10 @@ public class ListLayout extends Layout
 				notifyDataSetChanged( );
 			}
 		}
-		
+
 		/**
 		 * Sets if the list items should be displayed in reversed order.
-		 * 
+		 *
 		 * @param reversed true means that the elements in the list will be in the
 		 *                 reverse order, false means that they will be in the
 		 *                 default order.
@@ -183,9 +221,9 @@ public class ListLayout extends Layout
 			m_reversed = reversed;
 			notifyDataSetChanged( );
 		}
-		
+
 		/**
-		 * @see BaseAdapter.getCount. 
+		 * @see BaseAdapter.getCount.
 		 */
 		@Override
 		public int getCount()
@@ -194,7 +232,7 @@ public class ListLayout extends Layout
 		}
 
 		/**
-		 * @see BaseAdapter.getItem. 
+		 * @see BaseAdapter.getItem.
 		 */
 		@Override
 		public Object getItem(int position)
@@ -205,7 +243,7 @@ public class ListLayout extends Layout
 		}
 
 		/**
-		 * @see BaseAdapter.getItemId. 
+		 * @see BaseAdapter.getItemId.
 		 */
 		@Override
 		public long getItemId(int position)
@@ -214,7 +252,7 @@ public class ListLayout extends Layout
 		}
 
 		/**
-		 * @see BaseAdapter.getView. 
+		 * @see BaseAdapter.getView.
 		 */
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent)

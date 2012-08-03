@@ -45,7 +45,7 @@ import static com.mosync.nativeui.ui.widgets.SegmentedListLayout.ITEM_VIEW_TYPE_
  *
  * @author emma
  */
-public class SegmentedListViewSection extends Layout
+public class SegmentedListViewSection extends Layout //todo extends Widget
 {
 	// Default header and footer appearance.
 	static final String HEADER_DEFAULT_BACKGROUND_COLOR = "838B83";
@@ -112,10 +112,15 @@ public class SegmentedListViewSection extends Layout
 		m_children.add( 1, footerItem );
 	}
 
-	public void addChildAt(Widget child, int index)
+	@Override
+	public int addChildAt(Widget child, int index)
 	{
 		if (!(child instanceof ListItemWidget))
-				return;
+		{
+			Log.e( "MoSync",
+					"maWidgetInsertChild: SegmentedListViewSection can only contain ListItemWidgets." );
+			return IX_WIDGET.MAW_RES_INVALID_HANDLE;
+		}
 
 		int listIndex = index;
 		if( index == -1 )
@@ -131,10 +136,12 @@ public class SegmentedListViewSection extends Layout
 		// Notify parent Segmented list of new item.
 		if (mAdapterListener != null)
 			mAdapterListener.itemAdded((ListItemWidget)child, this, listIndex);
+
+		return IX_WIDGET.MAW_RES_OK;
 	}
 
 	@Override
-	public void removeChild(Widget child)
+	public int removeChild(Widget child)
 	{
 		child.setParent(null);
 		m_children.remove(child);
@@ -143,6 +150,8 @@ public class SegmentedListViewSection extends Layout
 		// Notify Segmented list's adapter.
 		if (mAdapterListener != null)
 			mAdapterListener.itemRemoved((ListItemWidget)child);
+
+		return IX_WIDGET.MAW_RES_OK;
 	}
 
 	/**
@@ -228,15 +237,14 @@ public class SegmentedListViewSection extends Layout
 			MoSyncFontHandle currentFont = null;
 
 			// Search the handle in the list of fonts.
-//			try {
-//				currentFont = MoSyncThread.getMoSyncFont(IntConverter .convert(value));
-//			} catch (PropertyConversionException pce)
-//			{
-//				Log.e("MoSync", "Error while getting font handle with value '"
-//						+ value + "Invalid property value");
-//				return false;
-//			}
-//			mItems.get(0).setFontTypeface( currentFont.getTypeface(), currentFont.getFontSize() );
+			currentFont = MoSyncThread.getMoSyncFont(IntConverter .convert(value));
+
+			if ( currentFont != null )
+			{
+				mItems.get(0).setFontTypeface( currentFont.getTypeface(), currentFont.getFontSize() );
+			}
+			else
+				throw new InvalidPropertyValueException(property, value);
 		}
 		else if( property.equals("headerAlignment") )
 		{
