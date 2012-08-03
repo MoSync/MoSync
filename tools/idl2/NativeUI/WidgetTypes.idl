@@ -246,5 +246,14 @@ group WidgetTypes "Widget types" {
 		 * See \ref WidgetMapPinProperties "Map pin properties" for the properties available.
 		 */
 		MAP_PIN = "MapPin";
+
+		/**
+		* @brief A list section widget is used to group one or more #MAW_LIST_VIEW_ITEM widgets.
+		* Only #MAW_LIST_VIEW_ITEM objects can be added to this list widget.
+		* None of the widget's properties applies to this widget.
+		* See \ref WidgetListViewSectionProperties for the available properties.
+		* Platform: iOS.
+		*/
+		LIST_VIEW_SECTION = "ListViewSection";
 	}
 } // end of WidgetTypes

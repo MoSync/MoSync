@@ -22,7 +22,8 @@ group WidgetEvent "Widget event" {
 
 		union {
 			/**
-			* @brief The index when a #MAW_EVENT_CLICKED event is receieved for a list view.
+			* @brief The index when a #MAW_EVENT_CLICKED or a #MAW_EVENT_ITEM_WILL_SELECT
+			* event is received for a #MAW_LIST_VIEW.
 			*/
 			int listItemIndex;
 
@@ -381,6 +382,14 @@ group WidgetEvent "Widget event" {
 			 * @brief Sent when a map pin is clicked by the user.
 			 */
 			MAP_PIN_CLICKED = 32;
+
+			/**
+			* @brief Send by a ListView when an item is about to be selected.
+			* The listItemIndex member from MAWidgetEventData struct will contain the item index
+			* that is about to be selected.
+			* Available only on iOS.
+			*/
+			ITEM_WILL_SELECT = 33;
 		}
 	} // end of WidgetEventTypes
 } // end of WidgetEvent
