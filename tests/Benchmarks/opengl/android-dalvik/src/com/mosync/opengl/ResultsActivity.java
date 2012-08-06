@@ -1,4 +1,6 @@
-package com.mosync;
+package com.mosync.opengl;
+
+import com.mosync.R;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -10,14 +12,14 @@ public class ResultsActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.results); //show the results screen! :)
-        
+
         mData = Data.getInstance(this.getBaseContext());
-        
+
         TextView tv = (TextView) findViewById(R.id.tv);
         tv.setText(mData.getResults());
-        
+
     }
-    
+
     Data mData;
 
 }

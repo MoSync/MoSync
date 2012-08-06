@@ -1,4 +1,4 @@
-package com.mosync;
+package com.mosync.opengl;
 
 import android.content.Context;
 
@@ -6,32 +6,32 @@ import android.content.Context;
  * Singleton class for sharing the result string between Activities
  */
 final class Data {
-	
+
 	private static Context context = null;
 	String resultString;
-	
+
 	private Data() {
 		resultString = new String();
 	}
-	
+
 	/*
 	 * Return the result string
 	 */
 	public String getResults() {
 		return resultString;
 	}
-	
+
 	/*
 	 * Append to the result string
 	 */
 	public void addResult(String str) {
 		resultString = resultString.concat(str);
 	}
-	
+
 	private static class Singleton {
         private static final Data INSTANCE = new Data();
     }
-	
+
 	/**
      *  a singleton - do not use new(), use getInstance().
      */
@@ -39,6 +39,6 @@ final class Data {
         if (context == null) context = c.getApplicationContext(); //singleton for this application
         return Singleton.INSTANCE;
     }
-	
-	
+
+
 }

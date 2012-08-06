@@ -1,5 +1,4 @@
-package com.mosync;
-
+package com.mosync.opengl;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -8,6 +7,11 @@ import java.nio.FloatBuffer;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
+import com.mosync.R;
+
+import mosync.benchmarks.BenchDB;
+import mosync.benchmarks.BenchResult;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -28,6 +32,8 @@ public class GLBenchRenderer implements GLSurfaceView.Renderer {
 		mCurrTest = 1; //the test to start with
 		mStartTime = currTime(); //set the starting time
 		mData = Data.getInstance(mContext);
+		mRes1 = mRes2 = mRes3 = mRes4 = 0; //init test result vars
+		mDone = false; //we are not done with the tests yet
 	}
 
 	/*
@@ -115,6 +121,27 @@ public class GLBenchRenderer implements GLSurfaceView.Renderer {
 		//draw the current test here
 		if(mCurrTest != -1){ //if not all tests are finished
 			doTest(mCurrTest, gl);
+		}else if(mDone){ //result published do nothing
+			//do nothing
+		}else{ //all tests are done, publish result
+			mDone = true;
+			try {
+				BenchResult br = new BenchResult();
+				br.benchmark = "opengl";
+				br.runtime = "Android%20Dalvik"; //this is a Java-benchmark that is run in Dalvik
+				br.test1 = mRes1;
+				br.test2 = mRes2;
+				br.test3 = mRes3;
+				br.test4 = mRes4;
+				new BenchDB(br);
+			} catch (Exception e) { //handle connection problems
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			//start the next benchmark
+			Intent intent = new Intent(Intent.ACTION_MAIN);
+			intent.setComponent(new ComponentName("com.mosync.membench", "com.mosync.membench.MemBenchNativeAndroidActivity"));
+			mActivity.startActivity(intent);
 		}
 
 
@@ -153,7 +180,8 @@ public class GLBenchRenderer implements GLSurfaceView.Renderer {
 				mData.addResult("Test #1: Fillrate (No texture)\n");
 				showStats();
 				mData.addResult("#planes (fill rate tests): " + mNumPlanes);
-				mData.addResult("\n#planes x FPS: " + mNumPlanes*(mFrameCounter * 1000.0f / mTimeSlot) + "\n");
+				mRes1 = (int) (mNumPlanes*(mFrameCounter * 1000.0f / mTimeSlot));
+				mData.addResult("\n#planes x FPS: " + mRes1 + "\n");
 				mCurrTest = 2; //do next test
 				mStartTime = currTime(); //reset the timer for the next test
 				mTimeSlot = 0; //reset timer
@@ -185,11 +213,12 @@ public class GLBenchRenderer implements GLSurfaceView.Renderer {
 				mYRotation += 0.6f/1000.0f * (currTime() - (mTimeSlot + mStartTime)); //if the test time is 20sec we rotate a total of 0.6*20 units
 			if((mTimeSlot = currTime() - mStartTime) > 20000) {
 				mData.addResult("-----------------------------\n");
-				mData.addResult("Test #1: Fillrate (No texture)\n");
+				mData.addResult("Test #2: Fillrate (with texture)\n");
 				showStats();
 				mData.addResult("#planes (fill rate tests): " + mNumPlanes);
-				mData.addResult("\n#planes x FPS: " + mNumPlanes*(mFrameCounter * 1000.0f / mTimeSlot) + "\n");
-				mCurrTest = 2; //do next test
+				mRes2 = (int) (mNumPlanes*(mFrameCounter * 1000.0f / mTimeSlot));
+				mData.addResult("\n#planes x FPS: " + mRes2 + "\n");
+				mCurrTest = 3; //do next test
 				mStartTime = currTime(); //reset the timer for the next test
 				mTimeSlot = 0; //reset timer
 				mFrameCounter = 0; //reset the FPS counter for the next test
@@ -201,8 +230,8 @@ public class GLBenchRenderer implements GLSurfaceView.Renderer {
 		case 3:
 			//Dynamic Object test
 			gl.glDisable(GL10.GL_TEXTURE_2D);
-			gl.glDisable(GL10.GL_BLEND);	
-			this.drawDOTest(gl);	
+			gl.glDisable(GL10.GL_BLEND);
+			this.drawDOTest(gl);
 			mFrameCounter += 1;
 			if(((float) mFrameCounter * 1000 / (float) mTimeSlot) > 30.0f){ //if FPS > 30
 				mNumPolygons += 100; //increase the number of vertices
@@ -215,7 +244,8 @@ public class GLBenchRenderer implements GLSurfaceView.Renderer {
 				mData.addResult("-----------------------------\n");
 				mData.addResult("Test #3: Dynamic Object test\n");
 				showStats();
-				mData.addResult("#Vertices (dynamic object test): " + mNumPolygons);
+				mRes3 = mNumPolygons;
+				mData.addResult("#Vertices (dynamic object test): " + mRes3);
 				mData.addResult("\ndrawing time (msecs): " + mGLTimeSlot + "\nobject coordinates calc time (msecs): " + mMoTimeSlot);
 				mData.addResult("\ndrawing time/object coord calc time ratio: " + (float) mGLTimeSlot/ (float) mMoTimeSlot + "\n");
 				mCurrTest = 4; //do next test
@@ -228,15 +258,16 @@ public class GLBenchRenderer implements GLSurfaceView.Renderer {
 			gl.glEnable(GL10.GL_TEXTURE_2D);
 			gl.glDisable(GL10.GL_BLEND);
 			gl.glColor4f(1.0f, 1.0f, 1.0f, 1.0f); //reset the color to white so that the texture don't get colored
-			draw(gl); 
+			draw(gl);
 			mFrameCounter += 1;
 			// Update rotation parameters.
 			mXRotation += 1.0f;
 			mYRotation += 0.8f;
 			mZRotation += 0.6f;
-			if((mTimeSlot = currTime() - mStartTime) > 20000) {  
+			if((mTimeSlot = currTime() - mStartTime) > 20000) {
 				mData.addResult("-----------------------------\n");
 				mData.addResult("Test #4: Rotating textured box\n");
+				mRes4 = (int) (mFrameCounter * 1000 / mTimeSlot);
 				showStats();
 
 				//when all tests have finished we want to show the results screen
@@ -245,7 +276,7 @@ public class GLBenchRenderer implements GLSurfaceView.Renderer {
 				mCurrTest = -1;
 			}
 			break;
-		default: 
+		default:
 			break;
 		}
 
@@ -266,7 +297,7 @@ public class GLBenchRenderer implements GLSurfaceView.Renderer {
 		vcoords.order(ByteOrder.nativeOrder());
 		tcoords.order(ByteOrder.nativeOrder());
 		colors.order(ByteOrder.nativeOrder());
-		//convert to float buffers 
+		//convert to float buffers
 		mVCoords = vcoords.asFloatBuffer();
 		mTCoords = tcoords.asFloatBuffer();
 		mColors = colors.asFloatBuffer();
@@ -320,7 +351,7 @@ public class GLBenchRenderer implements GLSurfaceView.Renderer {
 		gl.glColorPointer(4, GL10.GL_FLOAT, 0, mColors); //COLORS MUST BE DEFINED WITH RGBA IN THIS GL-IMPLEMENTATION HENCE THE 4.
 		gl.glTexCoordPointer(2, GL10.GL_FLOAT, 0, mTCoords);
 
-		// Enable vertex coord arrays. 
+		// Enable vertex coord arrays.
 		gl.glEnableClientState(GL10.GL_VERTEX_ARRAY);
 		gl.glEnableClientState(GL10.GL_COLOR_ARRAY);
 		gl.glEnableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
@@ -379,7 +410,7 @@ public class GLBenchRenderer implements GLSurfaceView.Renderer {
 		//Multi-byte data types need to have native byte order (floats, int, short etc.)
 		vcoords.order(ByteOrder.nativeOrder());
 		colors.order(ByteOrder.nativeOrder());
-		//convert to float buffers 
+		//convert to float buffers
 		mVCoords = vcoords.asFloatBuffer();
 		mColors = colors.asFloatBuffer();
 		mColors.position(0);
@@ -497,7 +528,7 @@ public class GLBenchRenderer implements GLSurfaceView.Renderer {
 		vcoords.order(ByteOrder.nativeOrder());
 		tcoords.order(ByteOrder.nativeOrder());
 		indices.order(ByteOrder.nativeOrder());
-		//convert to float buffers 
+		//convert to float buffers
 		mVCoords = vcoords.asFloatBuffer();
 		mTCoords = tcoords.asFloatBuffer();
 		indices.position(0);
@@ -652,7 +683,7 @@ public class GLBenchRenderer implements GLSurfaceView.Renderer {
 	/*
 	 * Do OpenGL initialization
 	 */
-	private void initGL(GL10 gl) { 
+	private void initGL(GL10 gl) {
 		//create and bind texture
 		this.createTexture(gl);
 
@@ -679,8 +710,8 @@ public class GLBenchRenderer implements GLSurfaceView.Renderer {
 		gl.glHint(GL10.GL_PERSPECTIVE_CORRECTION_HINT, GL10.GL_NICEST);
 	}
 
-	/* 
-	 * Returns the elapsed time (in msecs) since boot 
+	/*
+	 * Returns the elapsed time (in msecs) since boot
 	 */
 	private long currTime() {
 		return SystemClock.elapsedRealtime();
@@ -717,7 +748,14 @@ public class GLBenchRenderer implements GLSurfaceView.Renderer {
 	//The current test
 	int mCurrTest;
 
+	//test results
+	int mRes1, mRes2, mRes3, mRes4;
+
+	BenchDB mBdb;
+
 	//String to hold the test reults
 	String mResultString = new String();
+
+	boolean mDone;
 
 }

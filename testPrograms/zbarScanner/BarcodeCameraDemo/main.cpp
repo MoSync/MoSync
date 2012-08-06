@@ -644,7 +644,7 @@ public:
 		{
 			maCameraPreviewEventConsumed();
 		}
-/*
+
 		if(e.type == EVENT_TYPE_KEY_PRESSED)
 		{
 			if(e.key == MAK_BACK)
@@ -652,7 +652,7 @@ public:
 				close();
 			}
 		}
-*/
+
 	}
 
 private:

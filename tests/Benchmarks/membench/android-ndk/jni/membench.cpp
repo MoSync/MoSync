@@ -9,6 +9,17 @@
 
 extern "C" {
 
+/*
+ *
+ * REBUILD THE NATIVE .SO	REBUILD THE NATIVE .SO	REBUILD THE NATIVE .SO
+ * REBUILD THE NATIVE .SO	REBUILD THE NATIVE .SO	REBUILD THE NATIVE .SO
+ * REBUILD THE NATIVE .SO	REBUILD THE NATIVE .SO	REBUILD THE NATIVE .SO
+ * REBUILD THE NATIVE .SO	REBUILD THE NATIVE .SO	REBUILD THE NATIVE .SO
+ * REBUILD THE NATIVE .SO	REBUILD THE NATIVE .SO	REBUILD THE NATIVE .SO
+ * REBUILD THE NATIVE .SO	REBUILD THE NATIVE .SO	REBUILD THE NATIVE .SO
+ *
+ */
+
 /* Calls a java function to print a message stored in buf */
 void pass_jni_msg(char *buf) {
 	/* Callback to Java to print buf */
@@ -21,8 +32,20 @@ void pass_jni_msg(char *buf) {
 	(*glob_env).CallVoidMethod(*glob_obj, mid, msg2java);
 }
 
+void pass_result(char *property, float value) {
+	/* Callback to Java to print buf */
+	jstring prop = ((*glob_env).NewStringUTF(property));
+	jfloat val = value;
+	jclass cls = ((*glob_env).GetObjectClass(*glob_obj));
+	jmethodID mid = (*glob_env).GetMethodID(cls, "setBenchResProperty", "(Ljava/lang/String;F)V");
+	if(mid == 0) /* Could not find the method */
+		return;
+	//    (*glob_env)->ExceptionClear();
+	(*glob_env).CallVoidMethod(*glob_obj, mid, prop, val);
+}
+
 /* entry point callable from the Dalvik VM */
-JNIEXPORT jstring JNICALL Java_com_mosync_MemBenchNativeAndroidActivity_invokeNativeFunction(JNIEnv* env, jobject javaThis) {
+JNIEXPORT jstring JNICALL Java_com_mosync_membench_MemBenchNativeAndroidActivity_invokeNativeFunction(JNIEnv* env, jobject javaThis) {
 	glob_env = env; //save the java environment
 	glob_obj = &javaThis; //save the object that called us!
 	MemBench * mb = new MemBench();
@@ -42,7 +65,7 @@ MemBench::~MemBench() {
 void MemBench::bench() {
 
 	float time;
-	int i;
+	unsigned int i;
 	char buf[120];
 
 	sprintf(buf, "Memory Benchmark started!\n");
@@ -52,89 +75,103 @@ void MemBench::bench() {
 	for(i = 1; (time = this->heapBench(i, 10, MAUTIL_STRING)) < RUNNING_TIME; i*=2);
 	sprintf(buf, "allocating/freeing %d std::strings of capacity 10 ", ALOT*i);
 	pass_jni_msg(buf);
-	sprintf(buf, "Time: %1.2f msecs, %1.2f KMEMOPS.\n", time, (float) (ALOT*i)/(float) time);
+	sprintf(buf, "Time: %1.2f seconds, %1.2f KMEMOPS.\n", time, (float) (ALOT*i*0.001f)/(float) time);
 	pass_jni_msg(buf);
+	pass_result("alloc_str_10", (float) (ALOT*i*0.001f)/(float) time);
 
 	for(i = 1; (time = this->heapBench(i, 100, MAUTIL_STRING)) < RUNNING_TIME; i*=2);
 	sprintf(buf, "allocating/freeing %d std::strings of capacity: 100 ", ALOT*i);
 	pass_jni_msg(buf);
-	sprintf(buf, "Time: %1.2f msecs, %1.2f KMEMOPS.\n", time, (float) (ALOT*i)/(float) time);
+	sprintf(buf, "Time: %1.2f seconds, %1.2f KMEMOPS.\n", time, (float) (ALOT*i*0.001f)/(float) time);
 	pass_jni_msg(buf);
+	pass_result("alloc_str_100", (float) (ALOT*i*0.001f)/(float) time);
 
 	for(i = 1; (time = this->heapBench(i, 1, MALLOC)) < RUNNING_TIME; i*=2);
 	sprintf(buf, "allocating/freeing %d heap blocks of size 1 using malloc() ", ALOT*i);
 	pass_jni_msg(buf);
-	sprintf(buf, "Time: %1.2f msecs, %1.2f KMEMOPS.\n", time, (float) (ALOT*i)/(float) time);
+	sprintf(buf, "Time: %1.2f seconds, %1.2f KMEMOPS.\n", time, (float) (ALOT*i*0.001f)/(float) time);
 	pass_jni_msg(buf);
+	pass_result("alloc_void_1", (float) (ALOT*i*0.001f)/(float) time);
 
 	for(i = 1; (time = this->heapBench(i, 100, MALLOC)) < RUNNING_TIME; i*=2);
 	sprintf(buf, "allocating/freeing %d heap blocks of size 100 using malloc() ", ALOT*i);
 	pass_jni_msg(buf);
-	sprintf(buf, "Time: %1.2f msecs, %1.2f KMEMOPS.\n", time, (float) (ALOT*i)/(float) time);
+	sprintf(buf, "Time: %1.2f seconds, %1.2f KMEMOPS.\n", time, (float) (ALOT*i*0.001f)/(float) time);
 	pass_jni_msg(buf);
+	pass_result("alloc_void_100", (float) (ALOT*i*0.001f)/(float) time);
 
 	for(i = 1; (time = this->heapBench(i, 1000, MALLOC)) < RUNNING_TIME; i*=2);
 	sprintf(buf, "allocating/freeing %d heap blocks of size 1000 using malloc() ", ALOT*i);
 	pass_jni_msg(buf);
-	sprintf(buf, "Time: %1.2f msecs, %1.2f KMEMOPS.\n", time, (float) (ALOT*i)/(float) time);
+	sprintf(buf, "Time: %1.2f seconds, %1.2f KMEMOPS.\n", time, (float) (ALOT*i*0.001f)/(float) time);
 	pass_jni_msg(buf);
+	pass_result("alloc_void_1000", (float) (ALOT*i*0.001f)/(float) time);
 
 	for(i = 1; (time = this->heapBench(i, 100, DUMMY)) < RUNNING_TIME; i*=2);
 	sprintf(buf, "allocating/freeing %d dummy objects ", ALOT*i);
 	pass_jni_msg(buf);
-	sprintf(buf, "Time: %1.2f msecs, %1.2f KMEMOPS.\n", time, (float) (ALOT*i)/(float) time);
+	sprintf(buf, "Time: %1.2f seconds, %1.2f KMEMOPS.\n", time, (float) (ALOT*i*0.001f)/(float) time);
 	pass_jni_msg(buf);
+	pass_result("alloc_dummy", (float) (ALOT*i*0.001f)/(float) time);
 
 	for(i = 1; (time = this->heapBench(i, 100, DUMMY_STRUCT)) < RUNNING_TIME; i*=2);
 	sprintf(buf, "allocating/freeing %d dummy structs ", ALOT*i);
 	pass_jni_msg(buf);
-	sprintf(buf, "Time: %1.2f msecs, %1.2f KMEMOPS.\n", time, (float) (ALOT*i)/(float) time);
+	sprintf(buf, "Time: %1.2f seconds, %1.2f KMEMOPS.\n", time, (float) (ALOT*i*0.001f)/(float) time);
 	pass_jni_msg(buf);
+	pass_result("alloc_dummy_struct", (float) (ALOT*i*0.001f)/(float) time);
 
 	for(i = 1; (time = this->heapBench(i, 100, DUMMY_MIX)) < RUNNING_TIME; i*=2);
 	sprintf(buf, "allocating/freeing %d larger dummy objects ", ALOT*i);
 	pass_jni_msg(buf);
-	sprintf(buf, "Time: %1.2f msecs, %1.2f KMEMOPS.\n", time, (float) (ALOT*i)/(float) time);
+	sprintf(buf, "Time: %1.2f seconds, %1.2f KMEMOPS.\n", time, (float) (ALOT*i*0.001f)/(float) time);
 	pass_jni_msg(buf);
+	pass_result("alloc_dummy_mix", (float) (ALOT*i*0.001f)/(float) time);
 
 
 	mArray = (char*) malloc(100 * sizeof(char));
 	for(i = 1; (time = this->memAccess(i, 100, ARRAY)) < RUNNING_TIME; i*=2);
-	sprintf(buf, "accessing each element in a char array %d times ", ALOT*i);
+	sprintf(buf, "accessing each element in a char array[100] %d times ", ALOT*i);
 	pass_jni_msg(buf);
-	sprintf(buf, "Time: %1.2f msecs, %1.2f KMEMOPS.\n", time, (float) (ALOT*i*100)/(float) time);
+	sprintf(buf, "Time: %1.2f seconds, %.2f KMEMOPS.\n", time, (float) (ALOT*i*0.001f)/(float) time);
 	pass_jni_msg(buf);
 	free(mArray);
+	pass_result("access_array", (float) (ALOT*i*0.001f)/(float) time);
 
 	for(i = 1; (time = this->memAccess(i, 100, VECTOR_ADD)) < RUNNING_TIME; i*=2);
-	sprintf(buf, "adding 100 int:s to a MAUtil::vector<int> %d times ", ALOT*i);
+	sprintf(buf, "adding 100 int:s to a std::vector<int> %d times ", ALOT*i);
 	pass_jni_msg(buf);
-	sprintf(buf, "Time: %1.2f msecs, %1.2f KMEMOPS.\n", time, (float) (ALOT*i*100)/(float) time);
+	sprintf(buf, "Time: %1.2f seconds, %1.2f KMEMOPS.\n", time, (float) (ALOT*i*0.001f)/(float) time);
 	pass_jni_msg(buf);
+	pass_result("add_vector", (float) (ALOT*i*0.001f)/(float) time);
 
 	for(i = 1; (time = this->memAccess(i, 100, VECTOR_ACCESS)) < RUNNING_TIME; i*=2);
-	sprintf(buf, "accessing 100 int:s in a MAUtil::vector<int> %d times ", ALOT*i);
+	sprintf(buf, "accessing 100 int:s in a std::vector<int> %d times ", ALOT*i);
 	pass_jni_msg(buf);
-	sprintf(buf, "Time: %1.2f msecs, %1.2f KMEMOPS.\n", time, (float) (ALOT*i*100)/(float) time);
+	sprintf(buf, "Time: %1.2f seconds, %1.2f KMEMOPS.\n", time, (float) (ALOT*i*0.001f)/(float) time);
 	pass_jni_msg(buf);
+	pass_result("access_vector", (float) (ALOT*i*0.001f)/(float) time);
 
 	for(i = 1; (time = this->memAccess(i, 1, DUMMY_ACCESS)) < RUNNING_TIME; i*=2);
 	sprintf(buf, "DUMMY_ACCESS %d times ", ALOT*i);
 	pass_jni_msg(buf);
-	sprintf(buf, "Time: %1.2f msecs, %1.2f KMEMOPS.\n", time, (float) (ALOT*i)/(float) time);
+	sprintf(buf, "Time: %1.2f seconds, %1.2f KMEMOPS.\n", time, (float) (ALOT*i*0.001f)/(float) time);
 	pass_jni_msg(buf);
+	pass_result("access_dummy", (float) (ALOT*i*0.001f)/(float) time);
 
 	for(i = 1; (time = this->memAccess(i, 1, DUMMY_STRUCT_ACCESS)) < RUNNING_TIME; i*=2);
 	sprintf(buf, "DUMMY_STRUCT_ACCESS %d times ", ALOT*i);
 	pass_jni_msg(buf);
-	sprintf(buf, "Time: %1.2f msecs, %1.2f KMEMOPS.\n", time, (float) (ALOT*i)/(float) time);
+	sprintf(buf, "Time: %1.2f seconds, %1.2f KMEMOPS.\n", time, (float) (ALOT*i*0.001f)/(float) time);
 	pass_jni_msg(buf);
+	pass_result("access_dummy_struct", (float) (ALOT*i*0.001f)/(float) time);
 
 	for(i = 1; (time = this->memAccess(i, 1, DUMMY_MIX_ACCESS)) < RUNNING_TIME; i*=2);
 	sprintf(buf, "DUMMY_MIX_ACCESS %d times ", ALOT*i);
 	pass_jni_msg(buf);
-	sprintf(buf, "Time: %1.2f msecs, %1.2f KMEMOPS.\n", time, (float) (ALOT*i)/(float) time);
+	sprintf(buf, "Time: %1.2f seconds, %1.2f KMEMOPS.\n", time, (float) (ALOT*i*0.001f)/(float) time);
 	pass_jni_msg(buf);
+	pass_result("access_dummy_mix", (float) (ALOT*i*0.001f)/(float) time);
 
 }
 

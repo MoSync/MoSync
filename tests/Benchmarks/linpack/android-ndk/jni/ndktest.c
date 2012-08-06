@@ -46,7 +46,7 @@ static JNIEnv  *glob_env;
 static jobject *glob_obj;
 
 /* Callable from Java */
-Java_com_mosync_ndktest_NDKTestActivity_invokeNativeFunction(JNIEnv* env, jobject javaThis) {
+Java_com_mosync_NDKLinpack_NDKLinpackActivity_invokeNativeFunction(JNIEnv* env, jobject javaThis) {
 	glob_env = env; //save the java environment
 	glob_obj = &javaThis; //save the object that called us!
 	run();
@@ -120,6 +120,18 @@ void pass_jni_msg(char *buf) {
     (*glob_env)->CallVoidMethod(glob_env, *glob_obj, mid, msg2java);
 }
 
+void pass_result(char *property, float value) {
+	/* Callback to Java to print buf */
+	jstring prop = ((*glob_env)->NewStringUTF(glob_env, property));
+	jfloat val = value;
+	jclass cls = ((*glob_env)->GetObjectClass(glob_env, *glob_obj));
+	jmethodID mid = (*glob_env)->GetMethodID(glob_env, cls, "setBenchResProperty", "(Ljava/lang/String;F)V");
+	if(mid == 0) /* Could not find the method */
+		return;
+	//    (*glob_env)->ExceptionClear();
+	(*glob_env)->CallVoidMethod(glob_env, *glob_obj, mid, prop, val);
+}
+
 
 static REAL linpack(long nreps,int arsize)
 
@@ -179,6 +191,7 @@ static REAL linpack(long nreps,int arsize)
 
     /* Callback to Java to print buf */
     pass_jni_msg(buf);
+    pass_result("mflops", (float) (kflops/1000.0));
 
     return(totalt);
     }
