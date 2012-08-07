@@ -20,14 +20,14 @@ group WidgetListView "List View" {
 			* Platform: iOS.
 			* Default value for list view.
 			*/
-			ALPHABETICAL = 0;
+			ALPHABETICAL = 1;
 
 			/**
 			* @brief A table view whose sections present distinct groups of rows.
 			* The section headers and footers do not float.
 			* Platform: iOS.
 			*/
-			SEGMENTED = 1;
+			SEGMENTED = 2;
 		}
 	} // end of WidgetListViewType
 
@@ -99,11 +99,10 @@ group WidgetListView "List View" {
 			MODE= "mode";
 
 			/**
-			* @brief Reload data for a given section.
+			* @brief Reload all its items.
 			* Platform: iOS.
 			*
-			* @validvalue Section's handle that will be reloaded.
-			* If this value is an empty string all sections will be reloaded.
+			* @validvalue Empty string.
 			*
 			* @setonly
 			*
