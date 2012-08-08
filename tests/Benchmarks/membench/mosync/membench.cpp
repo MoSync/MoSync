@@ -17,10 +17,12 @@
  */
 
 #include "membench.h"
-#include <benchdb/benchdb.h>
+#include "buildinfo.h"
+#include <MAUtil/String.h>
+#include <benchdb.h>
 
 MemBench::MemBench() {
-
+	this->bench();
 }
 
 MemBench::~MemBench() {
@@ -84,17 +86,17 @@ void MemBench::bench() {
 	printf("Time: %d msecs, %1.2f KMEMOPS.\n", time, (allocVoid1000 = (float)(ALOT*i)/(float) time));
 	mallocFlops += (float)(ALOT*i)/(float) time;
 
-	for(i = 1; (time = this->heapBench(i, 100, DUMMY)) < RUNNING_TIME; i*=2);
+	for(i = 1; (time = this->heapBench(i, -1, DUMMY)) < RUNNING_TIME; i*=2);
 	printf("allocating/freeing %d dummy objects ", ALOT*i);
 	printf("Time: %d msecs, %1.2f KMEMOPS.\n", time, (allocDummy = (float)(ALOT*i)/(float) time));
 	mallocFlops += (float)(ALOT*i)/(float) time;
 
-	for(i = 1; (time = this->heapBench(i, 100, DUMMY_STRUCT)) < RUNNING_TIME; i*=2);
+	for(i = 1; (time = this->heapBench(i, -1, DUMMY_STRUCT)) < RUNNING_TIME; i*=2);
 	printf("allocating/freeing %d dummy structs ", ALOT*i);
 	printf("Time: %d msecs, %1.2f KMEMOPS.\n", time, (allocDummyStruct = (float)(ALOT*i)/(float) time));
 	mallocFlops += (float)(ALOT*i)/(float) time;
 
-	for(i = 1; (time = this->heapBench(i, 100, DUMMY_MIX)) < RUNNING_TIME; i*=2);
+	for(i = 1; (time = this->heapBench(i, -1, DUMMY_MIX)) < RUNNING_TIME; i*=2);
 	printf("allocating/freeing %d larger dummy objects ", ALOT*i);
 	printf("Time: %d msecs, %1.2f KMEMOPS.\n", time, (allocDummyMix = (float)(ALOT*i)/(float) time));
 	mallocFlops += (float)(ALOT*i)/(float) time;
@@ -113,7 +115,7 @@ void MemBench::bench() {
 
 	for(i = 1; (time = this->memAccess(i, 100, VECTOR_ADD)) < RUNNING_TIME; i*=2);
 	printf("adding 100 int:s to a MAUtil::vector<int> %d times ", ALOT*i);
-	printf("Time: %d msecs, %1.2f KMEMOPS.\n", time, (addVector = (float)(ALOT*i*100)/(float) time));
+	printf("Time: %d msecs, %1.2f KMEMOPS.\n", time, (addVector = (float)(ALOT*i)/(float) time));
 	accessFlops += (float)(ALOT*i)/(float) time;
 
 	for(i = 1; (time = this->memAccess(i, 1, DUMMY_ACCESS)) < RUNNING_TIME; i*=2);
@@ -137,12 +139,38 @@ void MemBench::bench() {
 	printf("Total: %1.2f KMEMOPS.\n", strFlops + mallocFlops + accessFlops);
 
 	/* Send result to the benchmark database here */
-	publish_membench_result("http://127.0.0.1/benchmarks/publish_result.php", "1337", "MoSync", "987123ab", "HTC%20Wildfire",
+	/*publish_membench_result("http://127.0.0.1/benchmarks/publish_result.php", "1337", "MoSync", "987123ab", "HTC%20Wildfire",
 	"2", allocStr10, allocStr100, allocVoid1, allocVoid100, allocVoid1000, allocDummy, allocDummyStruct, allocDummyMix,
-	accessArray, accessVector, addVector, accessDummy, accessDummyStruct, accessDummyMix);
+	accessArray, accessVector, addVector, accessDummy, accessDummyStruct, accessDummyMix);*/
 
+	BenchResult br;
 
-	FREEZE;
+	//str_alloc_100, alloc_void_1, alloc_void_100, alloc_void_1000, alloc_dummy, alloc_dummy_struct, alloc_dummy_mix,
+	//access_array, access_dummy, access_vector, add_vector, access_dummy_struct, access_dummy_mix;
+
+	br.benchmark = "membench";
+	br.str_alloc_10 = allocStr10;
+	br.str_alloc_100 = allocStr100;
+	br.alloc_dummy = allocDummy;
+	br.alloc_dummy_struct = allocDummyStruct;
+	br.alloc_dummy_mix = allocDummyMix;
+	br.access_array = accessArray;
+	br.access_dummy = accessDummy;
+	br.access_dummy_mix = accessDummyMix;
+	br.access_dummy_struct = accessDummyStruct;
+	br.access_vector = accessVector;
+	br.add_vector = addVector;
+	br.alloc_void_1 = allocVoid1;
+	br.alloc_void_100 = allocVoid100;
+	br.alloc_void_1000 = allocVoid1000;
+
+	br.git_hash = BUILDVAR2;
+	br.revision = BUILDVAR1;
+
+	BenchDBConnector * bdbc = new BenchDBConnector(br);
+	printf("bdbc: %p\n", bdbc);
+
+	//FREEZE;
 
 }
 

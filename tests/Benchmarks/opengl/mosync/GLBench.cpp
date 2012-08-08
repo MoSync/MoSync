@@ -52,7 +52,7 @@ MA 02110-1301, USA.
 
 #include <conprint.h>
 #include <maassert.h>
-#include <benchdb/benchdb.h>
+#include <benchdb.h>
 
 /**
  * A Moblet is the main object of MoSync application. In the Moblet
@@ -76,17 +76,16 @@ public:
 		mXRotation(0.0f),
 		mYRotation(0.0f),
 		mZRotation(0.0f),
-		mFrameCounter(0),
-		mTimeSlot(0),
-		mStartTime(0)
+		mFrameCounter(0)
 	{
-
+		mTimeSlot = mStartTime = 0;
 		mRes1 = mRes2 = mRes3 = mRes4 = 0;
 
 		mT = 0; //starting time
 
 		// Create a screen widget that will hold the OpenGL view.
 		mScreen = maWidgetCreate(MAW_SCREEN);
+		maScreenSetFullscreen(1);
 
 		// Check if NativeUI is supported by the runtime platform.
 		// For example, MoRE does not support NativeUI at the time
@@ -144,7 +143,7 @@ public:
 	{
 		printf("Resolution: %d x %d\n", mViewWidth, mViewHeight);
 		printf("frames: %lu\n", mFrameCounter);
-		printf("msecs: %lu\n", mTimeSlot);
+		printf("msecs: %d\n", mTimeSlot);
 		printf("FPS: %lu\n", mFrameCounter * 1000 / mTimeSlot);
 	}
 
@@ -200,6 +199,7 @@ public:
 				br.test3 = mRes3;
 				br.test4 = mRes4;
 				BenchDBConnector * bdbc = new BenchDBConnector(br); //create the bench database connector and pass it the results
+				printf("bdbc: %p\n", bdbc);
 
 			}
 		}
@@ -239,8 +239,8 @@ public:
 					printf("Test #1: Fillrate (No texture)\n");
 					showStats();
 					printf("#planes (fill rate tests): %d", mNumPlanes);
-					mRes1 = (int) mNumPlanes*((float) mFrameCounter / (float) mTimeSlot*1000.0f);
-					printf("#planes x FPS: %f\n", mRes1);
+					mRes1 = (int) (mNumPlanes*((float) mFrameCounter / (float) mTimeSlot*1000.0f));
+					printf("#planes x FPS: %d\n", mRes1);
 
 					mNumPlanes = 2; //reset the number of planes for the next fill rate test
 					mTimeSlot = 0; //reset timer
@@ -328,8 +328,8 @@ public:
 					printf("Test #2: Fillrate (With texture)\n");
 					showStats();
 					printf("#planes (fill rate tests): %d", mNumPlanes);
-					mRes2 = (int) mNumPlanes*((float) mFrameCounter / (float) mTimeSlot*1000.0f);
-					printf("#planes x FPS: %f\n", mRes2);
+					mRes2 = (int) (mNumPlanes*((float) mFrameCounter / (float) mTimeSlot*1000.0f));
+					printf("#planes x FPS: %d\n", mRes2);
 					mNumPlanes = 2; //reset the number of planes for the next fill rate test
 					mTimeSlot = 0; //reset timer
 					return;

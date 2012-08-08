@@ -9,11 +9,13 @@
  *
  */
 
-#include <benchdb/benchdb.h>
+#include "include/benchdb.h"
 
-BenchDBConnector::BenchDBConnector(BenchResult& br) : mHttp(this) //constructor, taking the complete url of the publish_script as an arg
+BenchDBConnector::BenchDBConnector(BenchResult & br) : mHttp(this) //constructor, taking the complete url of the publish_script as an arg
 , mIsConnected(false)
 {
+
+	mDone = false;
 
 	char devProperties[200];
 	char devPropertiesUrlEnc[200];
@@ -38,16 +40,24 @@ BenchDBConnector::BenchDBConnector(BenchResult& br) : mHttp(this) //constructor,
 	}
 
 	br.runtime = "MoSync"; //this is of course always going to be the MoSync revision
-
+	printf("publishing benchmark: %s", br.benchmark);
 	printf("Publishing result via url:");
 
 	//build url according to benchmark
-	if(strcmp(br.benchmark, "linpack") == 0)
+	if(strcmp(br.benchmark, "linpack") == 0){
+		mBenchmark = LINPACK;
 		sprintf(completeUrl, "%s%s%s%s%s%s%s%s%s%s%s%s%.3f", M_URL, "?benchmark=linpack&revision=", br.revision, "&runtime=", br.runtime, "&git_hash=", br.git_hash, "&phone=", br.phone, "&native_sdk_ver=", br.nativeSdkVer, "&mflops=", br.mflops);
-	else if(strcmp(br.benchmark, "opengl") == 0)
+	}else if(strcmp(br.benchmark, "opengl") == 0){
+		mBenchmark = OPENGL;
 		sprintf(completeUrl, "%s%s%s%s%s%s%s%s%s%s%s%s%d%s%d%s%d%s%d", M_URL, "?benchmark=opengl&revision=", br.revision, "&runtime=", br.runtime, "&git_hash=", br.git_hash, "&phone=", br.phone, "&native_sdk_ver=", br.nativeSdkVer, "&test1=", br.test1, "&test2=", br.test2, "&test3=", br.test3, "&test4=", br.test4);
+	}else if(strcmp(br.benchmark, "membench") == 0){
+		mBenchmark = MEMBENCH;
+		sprintf(completeUrl, "%s%s%s%s%s%s%s%s%s%s%s%s%f%s%f%s%f%s%f%s%f%s%f%s%f%s%f%s%f%s%f%s%f%s%f%s%f%s%f", M_URL, "?benchmark=membench&revision=", br.revision, "&runtime=", br.runtime, "&git_hash=", br.git_hash, "&phone=", br.phone, "&native_sdk_ver=", "0", "&alloc_str_10=", br.str_alloc_10,
+					"&alloc_str_100=", br.str_alloc_100, "&alloc_void_1=", br.alloc_void_1, "&alloc_void_100=", br.alloc_void_100, "&alloc_void_1000=", br.alloc_void_1000, "&alloc_dummy=", br.alloc_dummy, "&alloc_dummy_struct=", br.alloc_dummy_struct, "&alloc_dummy_mix=", br.alloc_dummy_mix, "&access_array=", br.access_array,
+					"&access_vector=", br.access_vector, "&add_vector=", br.add_vector, "&access_dummy=", br.access_dummy, "&access_dummy_struct=", br.access_dummy_struct, "&access_dummy_mix=", br.access_dummy_mix);
+	}
 	printf(completeUrl);
-	initiateConnection(completeUrl); //connect to the url, publishing the results via HTTP GET
+	initiateConnection(completeUrl); //connect to the url, publishing the results via HTTP GET OR POST
 }
 // connect to the given url if not other connection is active
 void BenchDBConnector::initiateConnection(const char* url) {
@@ -57,7 +67,24 @@ void BenchDBConnector::initiateConnection(const char* url) {
 	}
 	printf("\nconnecting to %s", url);
 
-	int res = mHttp.create(url, HTTP_GET); //we publish using HTTP GET
+	int res;
+	if(true){ //TODO fix
+		printf("using GET\n");
+		res = mHttp.create(url, HTTP_GET); //we publish using HTTP GET
+	}else{ //the membench benchmark sends to much data for HTTP GET, so use HTTP POST
+		MAHandle myData = maCreatePlaceholder();
+		if(maCreateData(myData, strlen(url)) == RES_OK)
+		{
+			printf("RES_OK\n");
+		    maWriteData(myData, url, 0, strlen(url));
+		}
+
+		printf("using POST\n");
+		res = mHttp.create(M_URL, HTTP_POST); //we publish using HTTP POST
+		printf("got past create()!\n");
+		mHttp.writeFromData(myData, 0, maGetDataSize(myData));
+		printf("got past writeFromData()!\n");
+	}
 	if(res < 0) {
 		printf("unable to connect - %i\n", res);
 	} else {
@@ -83,6 +110,7 @@ void BenchDBConnector::httpFinished(MAUtil::HttpConnection* http, int result) {
 	} else {
 		mBuffer[contentLength] = 0;
 		mHttp.read(mBuffer, contentLength);
+		printf("response: %s\n", mBuffer);
 	}
 
 }
@@ -108,8 +136,13 @@ void BenchDBConnector::connRecvFinished(MAUtil::Connection * conn, int result){
 	}
 	mHttp.close();
 	mIsConnected = false;
+	mDone = true; //nothing more to do
+	maExit(0);//quit here
 }
 
+BenchDBConnector::~BenchDBConnector() {
+
+}
 /*
  * Publish a linpack result to the URL defined at the top of this file
  * revision = mosync revision

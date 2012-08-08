@@ -9,6 +9,7 @@
 #define MEMBENCH_H_
 
 #include <MAUtil/String.h>
+#include <MAUtil/Moblet.h>
 #include <ma.h>
 #include <conprint.h>
 #include <maassert.h> //give access to FREEZE macro
@@ -69,7 +70,7 @@ public:
 
 };
 
-class MemBench {
+class MemBench : public MAUtil::Moblet {
 public:
 	MemBench();
 	~MemBench();

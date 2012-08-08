@@ -1,5 +1,5 @@
 .res R_BUILDINFO
-.string "Version 2.7 Pyramid" 
-.string "111020-1533" 
-.string "8b61cfb83c4f2dc3fb300f8cdf921775995da0ac" 
-.string "06a60ec772d99af7e325b0ad64ba82a11d56bae6" 
+.string "Nightly Build"
+.string "120625-1112"
+.string "/usr/local/bin/git rev-parse HEAD081101737963bcbff99e1f1ae5a0055d2398fb73"
+.string "/usr/local/bin/git rev-parse HEAD24debf6dfa8aa7219260f7caa222613ea71c9a05"

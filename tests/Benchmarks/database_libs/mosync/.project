@@ -11,7 +11,7 @@
 			<arguments>
 				<dictionary>
 					<key>LaunchConfigHandle</key>
-					<value>&lt;project&gt;/.externalToolBuilders/BuildInfo.launch</value>
+					<value>&lt;project&gt;/.externalToolBuilders/New_Builder.launch</value>
 				</dictionary>
 			</arguments>
 		</buildCommand>

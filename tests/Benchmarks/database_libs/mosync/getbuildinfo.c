@@ -14,7 +14,7 @@ char * PATH = "../../bin/version.dat";
 int main(int argc, char ** argv) {
 
 	FILE *rfp, *wfp; //file pointers to read from and write to.
-	rfp = fopen(PATH , "r");
+	rfp = fopen(argv[1] , "r"); //get file name to version.dat from command line
 	wfp = fopen("./resources.lst", "w");
 	char buf[100];
 	if (rfp == NULL || wfp == NULL)

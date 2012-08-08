@@ -30,7 +30,7 @@
 #include <conprint.h>
 #include <limits.h>
 #include <maassert.h>
-#include <benchdb/benchdb.h>
+#include <benchdb.h>
 #include "buildinfo.h"
 
 #define SP
@@ -65,7 +65,7 @@ static REAL ddot_ur  (int n,REAL *dx,int incx,REAL *dy,int incy);
 static void dscal_ur (int n,REAL da,REAL *dx,int incx);
 static int  idamax   (int n,REAL *dx,int incx);
 static REAL second   (void);
-static void print_matrix(float *mat, int i_dim, int j_dim);
+//static void print_matrix(float *mat, int i_dim, int j_dim);
 
 static void *mempool;
 
@@ -94,6 +94,9 @@ public:
 		br.revision = BUILDVAR1;
 
 		BenchDBConnector * bdbc = new BenchDBConnector(br);
+		printf("bdbc: %p\n", bdbc);
+		//this->mRun = false; //make the Moblet::run() func return so that the benchmark can quit without user interaction
+		//this->exit();
 	}
 
 };
@@ -104,7 +107,7 @@ int MAMain ( void )
 
 
 
-    char    buf[80];
+    //char    buf[80];
     int     arsize;
     long    arsize2d,memreq,nreps;
     size_t  malloc_arg;
@@ -134,11 +137,12 @@ int MAMain ( void )
         memreq=arsize2d*sizeof(REAL)+(long)arsize*sizeof(REAL)+(long)arsize*sizeof(int);
         printf("Memory required:  %ldK.\n",(memreq+512L)>>10);
         malloc_arg=(size_t)memreq;
-        if (malloc_arg!=memreq || (mempool=malloc(malloc_arg))==NULL)
+        /*if (malloc_arg!=memreq || (mempool=malloc(malloc_arg))==NULL)
             {
             printf("Not enough memory available for given array size.\n\n");
             //continue;
-            }
+            }*/
+        mempool=malloc(malloc_arg);
         printf("\n\nLINPACK benchmark, %s precision.\n",PREC);
         //printf("Machine precision:  %d digits.\n",BASE10DIG);
         printf("Array size %d X %d.\n",arsize,arsize);
@@ -147,13 +151,14 @@ int MAMain ( void )
         printf("----------------------------------------------------\n");
         nreps=4;
 //        linpack(nreps, arsize);
-        while (linpack(nreps,arsize)<2.)
+        while (linpack(nreps,arsize)<10.)
             nreps*=2;
         free(mempool);
         printf("Finished!\n");
         }
 
-        FREEZE;
+        //FREEZE;
+        return 0;
     }
 
 
@@ -210,13 +215,15 @@ static REAL linpack(long nreps,int arsize)
             nreps,totalt,100.*tdgefa/totalt,
             100.*tdgesl/totalt,100.*toverhead/totalt,
             kflops/1000.0);
-    if(totalt > 2.){ //publish the result in the benchmark database when we get a run that lasts for more than 10 seconds
+    if(totalt > 10.){ //publish the result in the benchmark database when we get a run that lasts for more than 10 seconds
     	BenchResult br;
 
     	br.benchmark = "linpack"; //specify the name of this benchmark
     	br.mflops = kflops/1000.0; //the result to pass
 
+
     	MAUtil::Moblet::run(new DBMoblet(br));
+
     }
     return(totalt);
     }
@@ -328,7 +335,7 @@ static void dgefa(REAL *a,int lda,int n,int *ipvt,int *info,int roll)
                 /* zero pivot implies this column already
                    triangularized */
 
-                if (a[lda*k+l] != ZERO)
+                if ((int) a[lda*k+l] != (int)ZERO)
                     {
 
                     /* interchange if necessary */
@@ -362,7 +369,7 @@ static void dgefa(REAL *a,int lda,int n,int *ipvt,int *info,int roll)
                     (*info) = k;
                 }
         ipvt[n-1] = n-1;
-        if (a[lda*(n-1)+(n-1)] == ZERO)
+        if ((int)a[lda*(n-1)+(n-1)] == (int)ZERO)
             (*info) = n-1;
         }
     else
@@ -382,7 +389,7 @@ static void dgefa(REAL *a,int lda,int n,int *ipvt,int *info,int roll)
                 /* zero pivot implies this column already
                    triangularized */
 
-                if (a[lda*k+l] != ZERO)
+                if ((int)a[lda*k+l] != (int)ZERO)
                     {
 
                     /* interchange if necessary */
@@ -416,7 +423,7 @@ static void dgefa(REAL *a,int lda,int n,int *ipvt,int *info,int roll)
                     (*info) = k;
                 }
         ipvt[n-1] = n-1;
-        if (a[lda*(n-1)+(n-1)] == ZERO)
+        if ((int)a[lda*(n-1)+(n-1)] == (int)ZERO)
             (*info) = n-1;
         }
     }
@@ -627,7 +634,7 @@ static void daxpy_r(int n,REAL da,REAL *dx,int incx,REAL *dy,int incy)
 
     if (n <= 0)
         return;
-    if (da == ZERO)
+    if ((int)da == (int)ZERO)
         return;
 
     if (incx != 1 || incy != 1)
@@ -739,7 +746,7 @@ static void daxpy_ur(int n,REAL da,REAL *dx,int incx,REAL *dy,int incy)
 
     if (n <= 0)
         return;
-    if (da == ZERO)
+    if ((int)da == (int)ZERO)
         return;
 
     if (incx != 1 || incy != 1)
@@ -887,6 +894,7 @@ static int idamax(int n,REAL *dx,int incx)
     {
     REAL dmax;
     int i, ix, itemp;
+    itemp = 0;
 
     if (n < 1)
         return(-1);
@@ -932,12 +940,12 @@ static int idamax(int n,REAL *dx,int incx)
  * TODO added by me
  * prints the matrix
  */
-static void print_matrix(float *a, int i_dim, int j_dim) {
+/*static void print_matrix(float *a, int i_dim, int j_dim) {
 	int i;
 	for(i = 0; i < 10; ++i){
 		printf("%f ", a[i]);
 	}
-}
+}*/
 
 static REAL second(void)
 {

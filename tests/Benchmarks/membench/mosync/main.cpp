@@ -11,9 +11,11 @@
 extern "C" int MAMain()
 {
 
-	MemBench *mb = new MemBench();
+	/*MemBench *mb = new MemBench();
 	mb->bench();
-	delete mb;
+	delete mb;*/
+
+	MAUtil::Moblet::run(new MemBench);
 
 //	MAEvent event;
 //
