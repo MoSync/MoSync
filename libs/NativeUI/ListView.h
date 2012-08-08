@@ -95,7 +95,7 @@ namespace NativeUI
 		 * Constructor.
 		 * @param type List view's type.
 		 */
-		ListView(ListViewType type);
+		ListView(ListViewType type = LIST_VIEW_TYPE_DEFAULT);
 
 		/**
 		 * Destructor.
