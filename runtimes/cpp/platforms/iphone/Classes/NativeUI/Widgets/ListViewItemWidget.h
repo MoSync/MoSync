@@ -15,19 +15,120 @@
  02111-1307, USA.
  */
 
+/**
+ * @file ListViewItemWidget.h
+ * @author Bogdan Iusco
+ *
+ * @brief ListViewItemWidget widget interface file.
+ * A ListViewItemWidget object is used to define the attributes and behaviour of the
+ * cells/items that appear in ListViewWidget objects.
+ */
+
 #import <Foundation/Foundation.h>
+
 #import "IWidget.h"
 
-// String constant used to create UITableViewCell objects.
-extern NSString* const kTableCellReuseIdentifier;
+/**
+ * @brief ListViewItemWidget widget interface file.
+ * A ListViewItemWidget object is used to define the attributes and behaviour of the
+ * cells/items that appear in ListViewWidget objects.
+ */
+@interface ListViewItemWidget : IWidget
+{
+    /**
+     * The title of the delete-confirmation button.
+     * The table view displays a button with this text when the user attempts to delete a row,
+     * either by swiping the row or tapping the red minus icon in editing mode.
+     */
+    NSString* _deleteButtonTitle;
 
-@interface ListViewItemWidget : IWidget {
+    /**
+     * Cell's editing style.
+     */
+    UITableViewCellEditingStyle _editingStyle;
 
+    /**
+     * Flag for cell editing property.
+     */
+    BOOL _canEdit;
+
+    /**
+     * If set the user is allowed to move the cell.
+     */
+    BOOL _canMove;
 }
 
-- (id)init;
-- (void)addChild: (IWidget*)child;
-- (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value;
-- (NSString*)getPropertyWithKey: (NSString*)key;
+/**
+ * Get item's cell.
+ */
+@property(nonatomic, readonly, getter = cell) UITableViewCell* cell;
+
+/**
+ * Getter and setter for the title of the delete-confirmation button.
+ * The table view displays a button with this text when the user attempts to delete a row,
+ * either by swiping the row or tapping the red minus icon in editing mode.
+ */
+@property(nonatomic, retain) NSString* deleteButtonTitle;
+
+/**
+ * Getter and setter for cell's editing style.
+ */
+@property(nonatomic, assign) UITableViewCellEditingStyle editingStyle;
+
+/**
+ * Getter and setter for editable property.
+ */
+@property(nonatomic, assign) BOOL editable;
+
+/**
+ * Getter and setter for the move property.
+ */
+@property(nonatomic, assign) BOOL canMove;
+
+/**
+ * Adds an widget to the end of the children list.
+ * @param child Widget to be added.
+ * @return One of the following constants:
+ * - MAW_RES_OK if the child was added.
+ * - MAW_RES_INVALID_LAYOUT if child's type is not an layout.
+ */
+- (int)addChild:(IWidget*)child;
+
+/**
+ * Insert a widget to a given index.
+ * @param child Widget to be added.
+ * @param index The index where the child should be inserted.
+ * @return One of the following constants:
+ * - MAW_RES_OK if the child was added.
+ * - MAW_RES_INVALID_LAYOUT if the child's type is not an layout.
+ * - MAW_RES_INVALID_INDEX if the index was out of bounds.
+ */
+- (int)insertChild:(IWidget*)child atIndex:(NSNumber*)index;
+
+/**
+ * Remove a child from the widget.
+ * The child's view will be removed its superview.
+ * @param child Widget to remove.
+ */
+- (void)removeChild: (IWidget*)child;
+
+/**
+ * Set a widget property value.
+ * @param key Widget's property name that should be set.
+ * @param value Widget's proeprty value that should be set.
+ * @return One of the following values:
+ * - MAW_RES_OK if the property was set.
+ * - MAW_RES_INVALID_PROPERTY_NAME if the property name was invalid.
+ * - MAW_RES_INVALID_PROPERTY_VALUE if the property value was invalid.
+ */
+- (int)setPropertyWithKey:(NSString*)key toValue:(NSString*)value;
+
+/**
+ * Get a widget property value.
+ * @param key Widget's property name.
+ * @return The property value, or nil if the property name is invalid.
+ * The returned value should not be autoreleased. The caller will release the returned value.
+ */
+- (NSString*)getPropertyWithKey:(NSString*)key;
 
 @end

@@ -15,42 +15,130 @@
  02111-1307, USA.
  */
 
+/**
+ * @file ListViewItemWidget.mm
+ * @author Bogdan Iusco
+ *
+ * @brief ListViewItemWidget widget implementation file.
+ * A ListViewItemWidget object is used to define the attributes and behaviour of the
+ * cells/items that appear in ListViewWidget objects.
+ */
+
+//#include "Platform.h"
+//#include <helpers/cpp_defs.h>
+//#include <helpers/CPP_IX_WIDGET.h>
+//#include <base/Syscall.h>
+
 #import "ListViewItemWidget.h"
 #import "UIColorExpanded.h"
-#include "Platform.h"
-#include <helpers/cpp_defs.h>
-#include <helpers/CPP_IX_WIDGET.h>
-#include <base/Syscall.h>
-
-// String constant used to create UITableViewCell objects.
-NSString* const kTableCellReuseIdentifier = @"SimpleTableIdentifier";
+#import "HorizontalLayoutWidget.h"
+#import "VerticalLayoutWidget.h"
+#import "RelativeLayoutWidget.h"
 
 @implementation ListViewItemWidget
 
-- (id)init {
+static NSString* kReuseIdentifier = @"Cell";
+
+@synthesize deleteButtonTitle = _deleteButtonTitle;
+@synthesize editingStyle = _editingStyle;
+@synthesize editable = _canEdit;
+@synthesize canMove = _canMove;
+
+/**
+ * Init function.
+ */
+- (id)init
+{
     self = [super init];
     if (self)
     {
-        UITableViewCell *cell = nil;
-        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault
-                                            reuseIdentifier:kTableCellReuseIdentifier];
-        cell.selectionStyle =  UITableViewCellSelectionStyleNone;
+        UITableViewCell* cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault
+                                       reuseIdentifier:kReuseIdentifier];
         self.view = cell;
         [cell release];
-        cell = NULL;
+        cell = nil;
     }
-	return self;
+
+    return self;
 }
 
-- (void)addChild: (IWidget*)child {
-//	[super addChild:child];
-	UITableViewCell *cell = (UITableViewCell*)self.view;
-	[cell.contentView addSubview: [child view]];
-	[super addChild:child toSubview:NO];
+/**
+ * Get item's cell.
+ */
+-(UITableViewCell*)cell
+{
+    UITableViewCell* cell = (UITableViewCell*) self.view;
+    return cell;
 }
 
-- (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value {
-	if([key isEqualToString:@MAW_LIST_VIEW_ITEM_TEXT]) {
+/**
+ * Adds an widget to the end of the children list.
+ * @param child Widget to be added.
+ * @return One of the following constants:
+ * - MAW_RES_OK if the child was added.
+ * - MAW_RES_INVALID_LAYOUT if child's type is not an layout.
+ */
+- (int)addChild:(IWidget*)child
+{
+    if ([child class] != [HorizontalLayoutWidget class] &&
+        [child class] != [VerticalLayoutWidget class] &&
+        [child class] != [RelativeLayoutWidget class] &&
+        [child superclass] != [HorizontalLayoutWidget class] &&
+        [child superclass] != [VerticalLayoutWidget class] &&
+        [child superclass] != [RelativeLayoutWidget class])
+    {
+        return MAW_RES_INVALID_LAYOUT;
+    }
+    [super addChild:child toSubview:YES];
+    return MAW_RES_OK;
+}
+
+/**
+ * Insert a widget to a given index.
+ * @param child Widget to be added.
+ * @param index The index where the child should be inserted.
+ * @return One of the following constants:
+ * - MAW_RES_OK if the child was added.
+ * - MAW_RES_INVALID_LAYOUT if the child's type is not an layout.
+ * - MAW_RES_INVALID_INDEX if the index was out of bounds.
+ */
+- (int)insertChild:(IWidget*)child atIndex:(NSNumber*)index
+{
+    if ([child class] != [HorizontalLayoutWidget class] &&
+        [child class] != [VerticalLayoutWidget class] &&
+        [child class] != [RelativeLayoutWidget class] &&
+        [child superclass] != [HorizontalLayoutWidget class] &&
+        [child superclass] != [VerticalLayoutWidget class] &&
+        [child superclass] != [RelativeLayoutWidget class])
+    {
+        return MAW_RES_INVALID_LAYOUT;
+    }
+
+    return [super insertChild:child atIndex:index toSubview:YES];
+}
+
+/**
+ * Remove a child from the widget.
+ * The child's view will be removed its superview.
+ * @param child Widget to remove.
+ */
+- (void)removeChild: (IWidget*)child
+{
+    [super removeChild:child fromSuperview:YES];
+}
+
+/**
+ * Set a widget property value.
+ * @param key Widget's property name that should be set.
+ * @param value Widget's proeprty value that should be set.
+ * @return One of the following values:
+ * - MAW_RES_OK if the property was set.
+ * - MAW_RES_INVALID_PROPERTY_NAME if the property name was invalid.
+ * - MAW_RES_INVALID_PROPERTY_VALUE if the property value was invalid.
+ */
+- (int)setPropertyWithKey:(NSString*)key toValue:(NSString*)value
+{
+    if([key isEqualToString:@MAW_LIST_VIEW_ITEM_TEXT]) {
 		UITableViewCell* cell = (UITableViewCell*) self.view;
 		UILabel* label = cell.textLabel;
 		label.text = value;
@@ -86,7 +174,7 @@ NSString* const kTableCellReuseIdentifier = @"SimpleTableIdentifier";
 		cell.accessoryView.backgroundColor = color;
 	}
     else if([key isEqualToString:@MAW_LIST_VIEW_ITEM_ACCESSORY_TYPE]) {
-		UITableViewCell *cell = (UITableViewCell*) self.view;
+		UITableViewCell *cell = (UITableViewCell*)self.view;
 
 		if([value isEqualToString:@"hasChildren"]) {
 			cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
@@ -131,11 +219,28 @@ NSString* const kTableCellReuseIdentifier = @"SimpleTableIdentifier";
 	}
 
 	return MAW_RES_OK;
+
 }
 
-- (NSString*)getPropertyWithKey: (NSString*)key {
+/**
+ * Get a widget property value.
+ * @param key Widget's property name.
+ * @return The property value, or nil if the property name is invalid.
+ * The returned value should not be autoreleased. The caller will release the returned value.
+ */
+- (NSString*)getPropertyWithKey:(NSString*)key
+{
+    return [super getPropertyWithKey:key];
+}
 
-	return [super getPropertyWithKey:key];
+/**
+ * Dealloc method.
+ */
+-(void) dealloc
+{
+    [_deleteButtonTitle release];
+
+    [super dealloc];
 }
 
 @end
