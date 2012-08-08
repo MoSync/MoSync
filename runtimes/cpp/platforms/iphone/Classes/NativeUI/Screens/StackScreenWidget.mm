@@ -85,11 +85,9 @@
 	ScreenWidget* screen = (ScreenWidget*)child;
 	[navigationController pushViewController:[screen getController] animated:YES];
 	[stack addObject:child];
-	int navBarHeight = navigationController.toolbar.bounds.size.height;
-    int viewWidth = self.view.frame.size.width;
-	int viewHeight = self.view.frame.size.height - navBarHeight;
-	UIView* childView = [screen view];
-	[childView setFrame:CGRectMake(0, 0, viewWidth, viewHeight)];
+	float navBarHeight = navigationController.toolbar.bounds.size.height;
+	float viewHeight = self.height - navBarHeight;
+    child.size = CGSizeMake(self.width, viewHeight);
 	[child show];
 }
 
@@ -108,14 +106,13 @@
 - (void)layout
 {
 	UINavigationController* navigationController = (UINavigationController*)_controller;
-	int navBarHeight = navigationController.toolbar.bounds.size.height;
-    int viewWidth = self.width;
-	int viewHeight = self.height - navBarHeight;
+	float navBarHeight = navigationController.toolbar.bounds.size.height;
+    float viewWidth = self.width;
+	float viewHeight = self.height - navBarHeight;
 	[self.view setNeedsLayout];
 	for (IWidget *child in stack)
     {
-		UIView* childView = [child view];
-		[childView setFrame:CGRectMake(0, 0, viewWidth, viewHeight)];
+        child.size = CGSizeMake(viewWidth, viewHeight);
         [child layout];
 	}
 }

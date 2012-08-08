@@ -64,6 +64,7 @@
     }
 
 	[super addChild:child toSubview:YES];
+    [self layout];
     return MAW_RES_OK;
 }
 

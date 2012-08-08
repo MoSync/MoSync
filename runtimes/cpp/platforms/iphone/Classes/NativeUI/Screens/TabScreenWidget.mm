@@ -190,8 +190,8 @@
 
 	for (IWidget *child in _children)
     {
-        CGSize size = CGSizeMake(viewWidth, viewHeight);
-        child.size = size;
+        child.size = CGSizeMake(viewWidth, viewHeight);
+        [child layout];
 	}
 }
 

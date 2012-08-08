@@ -107,7 +107,6 @@
                              size.width,
                              size.height);
     _view.frame = rect;
-//    [self layout];
 }
 
 /**
