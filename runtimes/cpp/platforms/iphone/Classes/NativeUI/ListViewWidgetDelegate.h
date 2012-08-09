@@ -40,4 +40,10 @@
  * @param indexPath List item index where to be inserted.
  */
 -(void)insertItemAtIndexPath:(NSIndexPath*) indexPath;
+
+/**
+ * Reload an list view item. Its size has changed so it needs to be reloaded.
+ * @param indexPath List item index that needs to be reloaded.
+ */
+-(void)reloadItemAtIndexPath:(NSIndexPath*) indexPath;
 @end

@@ -258,7 +258,7 @@
     {
         return 0;
     }
-    NSLog(@"IN %s tableSection countCells = %d", __FUNCTION__, [tableSection countCells]);
+
     return [tableSection countCells];
 }
 
@@ -492,7 +492,7 @@
 {
     INNativeUILog;
     [self.tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath]
-                          withRowAnimation:UITableViewRowAnimationAutomatic];
+                          withRowAnimation:UITableViewRowAnimationNone];
 }
 
 /**
@@ -502,7 +502,17 @@
 -(void)insertItemAtIndexPath:(NSIndexPath*) indexPath
 {
     [self.tableView insertRowsAtIndexPaths:[NSArray arrayWithObject:indexPath]
-                          withRowAnimation:UITableViewRowAnimationAutomatic];
+                          withRowAnimation:UITableViewRowAnimationNone];
+}
+
+/**
+ * Reload an list view item. Its size has changed so it needs to be reloaded.
+ * @param indexPath List item index that needs to be reloaded.
+ */
+-(void)reloadItemAtIndexPath:(NSIndexPath*) indexPath
+{
+    [self.tableView reloadRowsAtIndexPaths:[NSArray arrayWithObject:indexPath]
+                          withRowAnimation:UITableViewRowAnimationNone];
 }
 
 /**

@@ -30,6 +30,7 @@
 
 #import "IWidget.h"
 #import "ListViewWidgetDelegate.h"
+#import "ListViewSectionWidgetDelegate.h"
 
 // Forward declaration.
 @class ListViewItemWidget;
@@ -38,7 +39,7 @@
  * @brief A ListViewSection object wraps one or more ListViewItemWidget
  * objects and their characteristics(such as header and footer text).
  */
-@interface ListViewSectionWidget : IWidget
+@interface ListViewSectionWidget : IWidget<ListViewSectionWidgetDelegate>
 {
     /**
      * Delegate to the list that has this section.
