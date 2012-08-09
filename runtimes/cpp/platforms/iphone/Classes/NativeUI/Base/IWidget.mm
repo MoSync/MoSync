@@ -202,7 +202,7 @@
 		[_view addSubview:childView];
 	}
 
-	[child layout];
+	[self layout];
     OUTNativeUILog;
 }
 
@@ -393,7 +393,27 @@
  */
 - (void)layout
 {
+    CGSize previousSize = self.size;
     [self layoutSubviews:_view];
+    CGSize currentSize = self.size;
+
+    CGSize sizeThatFits = [self sizeThatFitsForWidget];
+    float width = self.width;
+    float height = self.height;
+    if (_autoSizeWidth == WidgetAutoSizeWrapContent)
+    {
+        width = sizeThatFits.width;
+    }
+    if (_autoSizeHeight == WidgetAutoSizeWrapContent)
+    {
+        height = sizeThatFits.height;
+    }
+    self.size = CGSizeMake(width, height);
+    if (CGSizeEqualToSize(previousSize, currentSize))
+    {
+        return;
+    }
+
     // If the widget has parent and if at least one of its auto size params is wrap content,
     // then ask the parent to layout itself.
     if (_parent &&
