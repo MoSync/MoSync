@@ -157,7 +157,7 @@ void MemBench::bench() {
         call_objc_obj("Done! Data successfully sent to the benchmark server.");
     }
     sleep(5); //sleep so that the data can be sent to server before the next benchmark starts
-    runNextBench(); //start the next benchmark app in the benchmark suite.
+    //runNextBench(); //start the next benchmark app in the benchmark suite.
 
 
 }

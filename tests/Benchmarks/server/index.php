@@ -4,7 +4,7 @@
 	*/
 
 	require_once('db_priv_conn.php'); //set up the connection to the database
-	
+
 	/* GET membench results
 	SELECT a.runtime_id, a.phone_id, runtime_id, (alloc_str_10 + alloc_str_100)/2 AS alloc_str, (alloc_void_1 + alloc_void_100 + alloc_void_1000)/3 AS alloc_void, (alloc_dummy + alloc_dummy_struct)/2 AS alloc_small_objects, alloc_dummy_mix AS alloc_big_objects, (access_array + access_vector)/2 AS access_array_vector, add_vector, (access_dummy + access_dummy_struct)/2 AS access_small_objects, access_dummy_mix AS access_big_objects FROM membench_testruns;
 	*/
@@ -13,60 +13,60 @@
 	$device = mysql_real_escape_string($_GET['device']); 				//the device we want extra information about
 	$runtime_id = mysql_real_escape_string($_GET['run_id']); 				//the runtime we want extra information about
 	$gl_test = 'test'.mysql_real_escape_string($_GET['gl_test']); //the gl test that we want history of (1,2,3 or 4)
-	
+
 	/* this SQL statement returns the latest testruns of the linpack benchmark, the latest per distinct runtime */
 	$result_latest_runs = mysql_query("SELECT
     phone_name, runtime_name, mflops, id
 	FROM
     linpack_testruns a
-    inner join 
+    inner join
         (SELECT runtime_name, max(id) as maxid FROM linpack_testruns, runtimes WHERE linpack_testruns.runtime_id = runtimes.runtime_id group by runtime_name) as b on
         a.id = b.maxid JOIN phones ON a.phone_id=phones.phone_id");
 	$num_rows = mysql_num_rows($result_latest_runs);
 	$i = 0;
-	
+
 
 	/* This SQL statement get the latest runs of the membench benchmark, the latest of each runtime */
 	$result_latest_membench = mysql_query("SELECT phones.*, b.* FROM membench_testruns a inner join  (SELECT runtime_name, id, (alloc_str_10 + alloc_str_100)/2 AS alloc_str, (alloc_void_1 + alloc_void_100 + alloc_void_1000)/3 AS alloc_void, (alloc_dummy + alloc_dummy_struct)/2 AS alloc_small_objects, alloc_dummy_mix AS alloc_big_objects, (access_array + access_vector)/2 AS access_array_vector, add_vector, (access_dummy + access_dummy_struct)/2 AS access_small_objects, access_dummy_mix AS access_big_objects, max(id) as maxid FROM membench_testruns, runtimes WHERE membench_testruns.runtime_id = runtimes.runtime_id group by runtime_name, id ORDER BY id DESC) as b on  a.id = b.maxid JOIN phones ON a.phone_id=phones.phone_id GROUP BY runtime_name;");
 	/*mysql_query("SELECT  *
 	FROM
     membench_testruns a
-    inner join 
+    inner join
         (SELECT runtime_name, max(id) as maxid FROM membench_testruns, runtimes WHERE membench_testruns.runtime_id = runtimes.runtime_id group by runtime_name) as b on
         a.id = b.maxid JOIN phones ON a.phone_id=phones.phone_id");*/
 
 	$result_average_membench = mysql_query("SELECT runtime_name, AVG((alloc_str_10 + alloc_str_100)/2) AS alloc_str, AVG((alloc_void_1 + alloc_void_100 + alloc_void_1000)/3) AS alloc_void, AVG((alloc_dummy + alloc_dummy_struct)/2) AS alloc_small_objects, AVG(alloc_dummy_mix) AS alloc_big_objects, AVG((access_array + access_vector)/2) AS access_array_vector, AVG(add_vector) AS add_vector, AVG((access_dummy + access_dummy_struct)/2) AS access_small_objects, AVG(access_dummy_mix) AS access_big_objects FROM membench_testruns, runtimes  WHERE runtimes.runtime_id = membench_testruns.runtime_id  AND DATEDIFF( NOW( ) , TIMESTAMP ) <30  GROUP BY runtime_name;");
 
-	
+
 	// get the average LINPACK result of each runtime last month
 	$result_average_runtime = mysql_query("SELECT runtime_name, AVG( mflops ) AS avgmflops
-	FROM linpack_testruns, runtimes 
-	WHERE runtimes.runtime_id = linpack_testruns.runtime_id 
-	AND DATEDIFF( NOW( ) , TIMESTAMP ) <30 
+	FROM linpack_testruns, runtimes
+	WHERE runtimes.runtime_id = linpack_testruns.runtime_id
+	AND DATEDIFF( NOW( ) , TIMESTAMP ) <30
 	GROUP BY runtime_name ORDER BY avgmflops DESC");
-		
-	// get historical result for a specific device 
-	$result_hist = mysql_query("SELECT runtime_name, runtimes.runtime_id as run_id, avg(mflops) as avgmflops, DATEDIFF(now(), timestamp) AS datediff 
-	FROM linpack_testruns, runtimes 
-	WHERE runtimes.runtime_id = linpack_testruns.runtime_id AND phone_id = '$device' 
+
+	// get historical result for a specific device
+	$result_hist = mysql_query("SELECT runtime_name, runtimes.runtime_id as run_id, avg(mflops) as avgmflops, DATEDIFF(now(), timestamp) AS datediff
+	FROM linpack_testruns, runtimes
+	WHERE runtimes.runtime_id = linpack_testruns.runtime_id AND phone_id = '$device'
 	GROUP BY datediff, runtimes.runtime_id ORDER BY datediff DESC");
-	
+
 	//get the performance trend on the LINPACK benchmark on all runtimes
 	$result_trend = mysql_query("");
-	
-	$result_latest_opengl = mysql_query("SELECT phone_name, runtime_name, test1, test2, test3, test4, id FROM opengl_testruns a     
-	inner join (SELECT runtime_name, max(id) as maxid FROM opengl_testruns, runtimes WHERE opengl_testruns.runtime_id = runtimes.runtime_id group by runtime_name) 
-	as b on 
+
+	$result_latest_opengl = mysql_query("SELECT phone_name, runtime_name, test1, test2, test3, test4, id FROM opengl_testruns a
+	inner join (SELECT runtime_name, max(id) as maxid FROM opengl_testruns, runtimes WHERE opengl_testruns.runtime_id = runtimes.runtime_id group by runtime_name)
+	as b on
 	a.id = b.maxid JOIN phones ON a.phone_id=phones.phone_id;");
-		
-	$result_average_opengl = mysql_query("SELECT runtime_name, avg(test1) AS test1, avg(test2) AS test2, avg(test3) AS test3, avg(test4) AS test4 
+
+	$result_average_opengl = mysql_query("SELECT runtime_name, avg(test1) AS test1, avg(test2) AS test2, avg(test3) AS test3, avg(test4) AS test4
 	FROM opengl_testruns, runtimes  WHERE runtimes.runtime_id = opengl_testruns.runtime_id AND DATEDIFF( NOW( ) , timestamp ) <30
-	GROUP BY runtime_name;"); 	
-	
-	$result_hist_opengl = mysql_query("SELECT runtime_name, runtimes.runtime_id as run_id, avg($gl_test) as test, DATEDIFF(now(), timestamp) AS datediff  
+	GROUP BY runtime_name;");
+
+	$result_hist_opengl = mysql_query("SELECT runtime_name, runtimes.runtime_id as run_id, avg($gl_test) as test, DATEDIFF(now(), timestamp) AS datediff
 	FROM opengl_testruns, runtimes  WHERE runtimes.runtime_id = opengl_testruns.runtime_id AND runtimes.runtime_id = '$runtime_id' AND phone_id = '$device'
 	GROUP BY datediff, runtimes.runtime_id ORDER BY datediff DESC;");
-	
+
 	$result_hist_opengl_all_tests = mysql_query("SELECT runtime_name, runtimes.runtime_id as run_id, avg(test1) as test1, avg(test2) as test2, avg(test3) as test3, avg(test4) as test4, DATEDIFF(now(), timestamp) AS datediff   FROM opengl_testruns, runtimes  WHERE runtimes.runtime_id = opengl_testruns.runtime_id AND phone_id = '$device' AND runtimes.runtime_id = '$runtime_id'   GROUP BY datediff, runtimes.runtime_id ORDER BY datediff DESC;
 ");
 
@@ -85,7 +85,7 @@
 
 <html>
 	<head>
-	
+
 	<link rel="stylesheet" href="style.css" type="tezt/css" />
 	<!--Load the AJAX API-->
 	<script type="text/javascript" src="https://www.google.com/jsapi"></script>
@@ -103,14 +103,14 @@
 		xmlhttp.send();
 		document.getElementByTagName('html').innerHTML = xmlhttp.responseText;
 	}
-    
+
 	// Load the Visualization API and the piechart package.
 	google.load('visualization', '1.0', {'packages':['corechart']});
-      
+
 	// Set a callback to run when the Google Visualization API is loaded.
 	google.setOnLoadCallback(drawChart);
-      
-	// Callback that creates and populates a data table, 
+
+	// Callback that creates and populates a data table,
 	// instantiates the pie chart, passes in the data and
 	// draws it.
 	function drawChart() {
@@ -131,10 +131,10 @@
 		else
 			echo "['".$runtime." (".$phone.")', $mflops]";
 		}
-		
+
 	?>
       ]);
-	  
+
 	  // Create the data table.
 	var data2 = new google.visualization.DataTable();
 	data2.addColumn('string', 'Runtime');
@@ -142,6 +142,7 @@
 	data2.addRows([
 	<?php
 	$i = 0;
+	$num_rows = mysql_num_rows($result_average_runtime);
 	while ($row = mysql_fetch_assoc($result_average_runtime)) {
 		$runtime = $row['runtime_name'];
 		$avgmflops = $row['avgmflops'];
@@ -151,10 +152,10 @@
 		else
 			echo "['".$runtime."', $avgmflops]";
 		}
-		
+
 	?>
       ]);
-	  
+
 	var data4 = new google.visualization.DataTable();
         data4.addColumn('string', 'Runtime');
         data4.addColumn('number', 'Fill rate (no texture): planes X FPS');
@@ -180,7 +181,7 @@
 		}
 		?>
     ]);
-	
+
 	var data5 = new google.visualization.DataTable();
         data5.addColumn('string', 'Runtime');
         data5.addColumn('number', 'Fill rate (no texture): planes X FPS');
@@ -206,7 +207,7 @@
 		}
 		?>
     ]);
-	  
+
 	var hist_data = new google.visualization.DataTable();
 	<?php
 		echo "hist_data.addColumn('string', 'Days ago');\n";
@@ -221,7 +222,7 @@
 		//echo "hist_data.addColumn('number', 'MFLOPS');\n";
 		$num_rows = mysql_num_rows($result_runtimes);
 		echo "hist_data.addRows($num_rows);\n";
-		
+
 		$row_num = 0;
 		$col_num = 0;
 		while($row = mysql_fetch_assoc($result_hist)) {
@@ -238,7 +239,7 @@
 			$datediff = $row['datediff'];
 		}
     ?>
-	
+
 	var data6 = new google.visualization.DataTable();
 
 
@@ -256,6 +257,7 @@
 		$row_num = 0;
 		$col_num = 0;
 		$datediff = 0; //reset
+		$num_rows = mysql_num_rows($result_hist_opengl_all_tests);
 		while($row = mysql_fetch_assoc($result_hist_opengl_all_tests)) {
 			$test1 = $row['test1'];
 			$test2 = $row['test2'];
@@ -377,30 +379,30 @@
 		}
 		?>
 		]);
-	
+
     // Set chart options
     var options = {'title':'Latest LINPACK results',
                      'width':600,
                      'height':400};
-					 
+
 	var options2 = {'title':'Average LINPACK results over the last 30 days',
                      'width':600,
                      'height':400};
-					 
+
 	var options3 = {'title':'LINPACK history of chosen device, on different runtimes',
 					 'width':600,
                      'height':400,
 			vAxis: {title: 'MFLOPS'},
 			hAxis: {title: 'Days ago'}};
-					 
+
 	var options4 = {
           width: 600, height: 400,
           title: 'Latest OpenGLES results'};
-		
+
 	var options5 = {
           width: 600, height: 400,
           title: 'Average OpenGLES results over the last 30 days'};
-		  
+
 	var options6 = {'title':'OpenGLES history of chosen device and runtime',
 					 width:600,
                      height:400
@@ -432,7 +434,7 @@
 	  var chart2 = new google.visualization.BarChart(document.getElementById('chart_div2'));
 	  var chart3 = new google.visualization.LineChart(document.getElementById('chart_div3'));
 	  var chart4 = new google.visualization.ColumnChart(document.getElementById('chart_div4'));
-	  var chart5 = new google.visualization.ColumnChart(document.getElementById('chart_div5')); 
+	  var chart5 = new google.visualization.ColumnChart(document.getElementById('chart_div5'));
 	  var chart6 = new google.visualization.LineChart(document.getElementById('chart_div6'));
 	  var chart7 = new google.visualization.BarChart(document.getElementById('chart_div7'));
 	  var chart8 = new google.visualization.BarChart(document.getElementById('chart_div8'));
@@ -446,14 +448,14 @@
 	  chart7.draw(data7, options7);
 	  chart8.draw(data8, options8);
 	  chart9.draw(data9, options9);
-	
+
     }
-	
+
     </script>
   </head>
 
   <body>
-  
+
 	<!--Div that will hold the header-->
     <div id="header_div"><h2>MoSync Benchmarks</h2>
 	<h3>runtime:
@@ -467,6 +469,16 @@
 	?>
 	</h3></div>
 
+	<?php
+	$res = mysql_query("SELECT * FROM automatic_runs WHERE result='FAIL'");
+	for($i = 0; $row = mysql_fetch_assoc($res); $i++){
+		if($i == 0){
+			echo '<div id="bench_failed"><p>One or more of the last 10 automatic benchmark suite runs failed, check android_result.out and result.out on the build server for more info.<br />';
+		}
+		echo 'Run ended at '.$row['timestamp'].' failed!<br />';
+	}
+	?>
+	<p></div>
 		<form>
 		<select name="run_id">
 		<?php
@@ -492,7 +504,7 @@
 		</select>
 		<input type="submit" value="Update charts" onClick="send_form()">
 	</form>
-  
+
     <!--Div that will hold the pie chart-->
     <div id="chart_div" class="chart"></div>
 	<div id="chart_div2" class="chart"></div>
@@ -504,7 +516,7 @@
 	<div id="chart_div8" class="chart"></div>
 	<div id="chart_div9" class="chart"></div>
 
-	
+
   </body>
 </html>
 
