@@ -9,7 +9,7 @@
  *
  */
 
-#include "include/benchdb.h"
+#include <benchdb/benchdb.h>
 
 BenchDBConnector::BenchDBConnector(BenchResult & br) : mHttp(this) //constructor, taking the complete url of the publish_script as an arg
 , mIsConnected(false)
@@ -28,7 +28,7 @@ BenchDBConnector::BenchDBConnector(BenchResult & br) : mHttp(this) //constructor
 	if(ret < 0){
 		br.phone = "unknownDevice";
 	}else{
-		for(int i = 0, j = 0; i < strlen(devProperties) && i < 20; ++i){
+		for(unsigned int i = 0, j = 0; i < strlen(devProperties) && i < 20; ++i){
 			if(devProperties[i] == ' '){
 				//do nothing
 			}else{
@@ -68,10 +68,10 @@ void BenchDBConnector::initiateConnection(const char* url) {
 	printf("\nconnecting to %s", url);
 
 	int res;
-	if(true){ //TODO fix
+	//if(true){ //TODO fix
 		printf("using GET\n");
 		res = mHttp.create(url, HTTP_GET); //we publish using HTTP GET
-	}else{ //the membench benchmark sends to much data for HTTP GET, so use HTTP POST
+	/*}else{ //the membench benchmark sends to much data for HTTP GET, so use HTTP POST
 		MAHandle myData = maCreatePlaceholder();
 		if(maCreateData(myData, strlen(url)) == RES_OK)
 		{
@@ -84,7 +84,7 @@ void BenchDBConnector::initiateConnection(const char* url) {
 		printf("got past create()!\n");
 		mHttp.writeFromData(myData, 0, maGetDataSize(myData));
 		printf("got past writeFromData()!\n");
-	}
+	}*/
 	if(res < 0) {
 		printf("unable to connect - %i\n", res);
 	} else {
@@ -94,6 +94,9 @@ void BenchDBConnector::initiateConnection(const char* url) {
 }
 void BenchDBConnector::httpFinished(MAUtil::HttpConnection* http, int result) {
 	printf("HTTP %i\n", result);
+	if(result == 200){//everything went fine
+		lprintfln("MoSync benchmark DONE!");
+	}
 
 	MAUtil::String contentLengthStr;
 	int responseBytes = mHttp.getResponseHeader("content-length", &contentLengthStr);

@@ -191,7 +191,8 @@ static REAL linpack(long nreps,int arsize)
 
     /* Callback to Java to print buf */
     pass_jni_msg(buf);
-    pass_result("mflops", (float) (kflops/1000.0));
+    if(totalt > 10.)//only send data to server when bench is done
+        pass_result("mflops", (float) (kflops/1000.0));
 
     return(totalt);
     }

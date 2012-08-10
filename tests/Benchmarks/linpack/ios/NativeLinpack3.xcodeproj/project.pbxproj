@@ -38,7 +38,7 @@
 		10FE4A9F13AF8BE500F40190 /* NativeLinpack3ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = NativeLinpack3ViewController.m; sourceTree = "<group>"; };
 		10FE4AA213AF8BE500F40190 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/NativeLinpack3ViewController.xib; sourceTree = "<group>"; };
 		10FE4AAB13AFA2E700F40190 /* linpack.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = linpack.c; sourceTree = "<group>"; };
-		602B59CA15BEC66400429FD7 /* BenchDB.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BenchDB.h; sourceTree = "<group>"; };
+		606F3CA815D3924F00AE238C /* BenchDB.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BenchDB.h; path = ../../../database_libs/ios/benchdb/BenchDB.h; sourceTree = "<group>"; };
 		60FD3D8415C7EC680005DC9D /* libbenchdb.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libbenchdb.a; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -100,8 +100,8 @@
 				10FE4A9913AF8BE500F40190 /* NativeLinpack3AppDelegate.m */,
 				10FE4A9813AF8BE500F40190 /* NativeLinpack3AppDelegate.h */,
 				10FE4A9B13AF8BE500F40190 /* MainWindow.xib */,
-				602B59CA15BEC66400429FD7 /* BenchDB.h */,
 				10FE4AAB13AFA2E700F40190 /* linpack.c */,
+				606F3CA815D3924F00AE238C /* BenchDB.h */,
 				10FE4A9E13AF8BE500F40190 /* NativeLinpack3ViewController.h */,
 				10FE4A9F13AF8BE500F40190 /* NativeLinpack3ViewController.m */,
 				10FE4AA113AF8BE500F40190 /* NativeLinpack3ViewController.xib */,

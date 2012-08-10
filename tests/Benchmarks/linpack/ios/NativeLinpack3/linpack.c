@@ -119,7 +119,7 @@ void run(void)
         printf("----------------------------------------------------\n");
         nreps=1;
 		//linpack(nreps,arsize); //ONLY CALL IT ONCE WHEN WE PRINT EVERYTHING
-        while (linpack(nreps,arsize)<4.)
+        while (linpack(nreps,arsize)<10.)
             nreps*=2;
         free(mempool);
         printf("\n");

@@ -19,7 +19,7 @@
 #include "membench.h"
 #include "buildinfo.h"
 #include <MAUtil/String.h>
-#include <benchdb.h>
+#include <benchdb/benchdb.h>
 
 MemBench::MemBench() {
 	this->bench();

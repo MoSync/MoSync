@@ -65,6 +65,7 @@ public class BenchDB {
 		}
 		System.err.println("URI: " + request.getURI());
 		System.err.println("Response: " + responseBody);
+		System.err.println("Android benchmark DONE!\n");
 	}
 
 	/* these functions are not used */

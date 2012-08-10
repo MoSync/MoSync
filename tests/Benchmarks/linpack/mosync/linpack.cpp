@@ -30,7 +30,7 @@
 #include <conprint.h>
 #include <limits.h>
 #include <maassert.h>
-#include <benchdb.h>
+#include <benchdb/benchdb.h>
 #include "buildinfo.h"
 
 #define SP

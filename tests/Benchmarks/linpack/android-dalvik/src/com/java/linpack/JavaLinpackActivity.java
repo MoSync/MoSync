@@ -18,7 +18,7 @@ public class JavaLinpackActivity extends Activity {
 		Linpack lp = new Linpack(this);
 		tv.setText(lp.bench());
 
-		System.out.println("DONE!");
+		//System.out.println("DONE!");
 		new AlertDialog.Builder(this).setMessage("DONE!").show();
 	}
 

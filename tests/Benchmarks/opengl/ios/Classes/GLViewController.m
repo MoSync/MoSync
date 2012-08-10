@@ -164,7 +164,7 @@
                 [bdbc submit:mBr];
                 //try to start the membench app to perform the next benchmark
                 sleep(5);
-                [self runNextBench];
+                //[self runNextBench];
                 
                 //set the label's text
                 mTextView.text = [mTextView.text stringByAppendingString:@"Tests completed!"];

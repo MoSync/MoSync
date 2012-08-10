@@ -76,7 +76,9 @@
         // Create the NSMutableData to hold the received data.
         // receivedData is an instance variable declared elsewhere.
         //mReceivedData = [[NSMutableData data] retain];
-        return 0; //connection went fine
+        NSLog(@"iOS Benchmark DONE!");
+        exit(0); //connection went fine
+        //return 0; //connection went fine
     } else {
         // Inform the user that the connection failed.
         NSLog(@"connection failed with HTTP status code: %d", [response statusCode]);

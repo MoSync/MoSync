@@ -52,7 +52,7 @@ MA 02110-1301, USA.
 
 #include <conprint.h>
 #include <maassert.h>
-#include <benchdb.h>
+#include <benchdb/benchdb.h>
 
 /**
  * A Moblet is the main object of MoSync application. In the Moblet
