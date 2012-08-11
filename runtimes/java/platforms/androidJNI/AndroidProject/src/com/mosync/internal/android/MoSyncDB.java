@@ -95,6 +95,115 @@ public class MoSyncDB
 	 */
 	public int maDBExecSQL(int databaseHandle, String sql)
 	{
+		return execSQLHelper(databaseHandle, sql, null);
+	}
+
+	/**
+	 * Executes an SQL statement with parameters.
+	 * @param databaseHandle Handle to the database.
+	 * @param sql The SQL statement.
+	 * @param paramsAddress Address of first MADBValue struct.
+	 * @param paramCount Number of MADBValue structs passed.
+	 * @return MA_DB_ERROR on error, MA_DB_OK on success,
+	 * > 0 if there is a cursor to a query result, in this
+	 * case the return value is the cursor handle.
+	 */
+	public int maDBExecSQLParams(
+		int databaseHandle,
+		String sql,
+		int paramsAddress,
+		int paramCount,
+		MoSyncThread mosync)
+	{
+		// Create params array.
+		String[] params = new String[paramCount];
+
+		// TODO: Check that his is the correct value!
+		int sizeofMADBValue = 64 + 32; // sizeof(MADBValue)
+
+		// Get parameter array.
+		ByteBuffer buffer = mosync.getMemorySlice(
+			paramsAddress,
+			paramCount * sizeofMADBValue
+			);
+
+		// Set parameter values.
+		// http://stackoverflow.com/questions/9558657/binding-ints-longs-and-blobs-byte-to-android-sql
+		for (int i = 0; i < paramCount; ++i)
+		{
+			// Get param type.
+			buffer.position((i * sizeofMADBValue) + 64);
+			int type = buffer.getInt();
+
+			if (MA_DB_TYPE_INT == type)
+			{
+				buffer.position(i * sizeofMADBValue);
+				int value = buffer.getInt();
+				params[i] = Integer.toString(value);
+			}
+			else
+			if (MA_DB_TYPE_INT64 == type)
+			{
+				buffer.position(i * sizeofMADBValue);
+				long value = buffer.getLong();
+				// TODO: Find out how to get the INT64 value.
+				// Is this correct?
+				params[i] = Long.toString(value);
+			}
+			else
+			if (MA_DB_TYPE_DOUBLE == type)
+			{
+				buffer.position(i * sizeofMADBValue);
+				double value = buffer.getDouble();
+				params[i] = Double.toString(value);
+			}
+			else
+			if (MA_DB_TYPE_NULL == type)
+			{
+				// TODO: Would this work?
+				params[i] = null;
+			}
+			else
+			if (MA_DB_TYPE_DATA == type)
+			{
+				// TODO: Implement.
+				params[i] = null;
+			}
+			else
+			if (MA_DB_TYPE_TEXT == type)
+			{
+				// TODO: Implement.
+				params[i] = null;
+			}
+			else
+			if (MA_DB_TYPE_BLOB == type)
+			{
+				// TODO: Implement.
+				params[i] = null;
+			}
+			else
+			{
+				// TODO: ERROR
+			}
+		}
+
+		// Execute query.
+		return execSQLHelper(databaseHandle, sql, params);
+	}
+
+	/**
+	 * Helper function for making SQL queries, used both for
+	 * parameterized and non-parameterized queries.
+	 * @param databaseHandle
+	 * @param sql
+	 * @param params
+	 * @return Success or error code.
+	 */
+	protected int execSQLHelper(
+		int databaseHandle,
+		String sql,
+		String[] params)
+	{
 		if (!hasDatabase(databaseHandle))
 		{
 			return MA_DB_ERROR;
@@ -104,12 +213,13 @@ public class MoSyncDB
 
 		try
 		{
-			// SELECT statements return values and are handled differently than
-			// other statements.
-			// See: http://developer.android.com/reference/android/database/sqlite/SQLiteDatabase.html#execSQL(java.lang.String)
-			if (sql.toLowerCase().contains("select"))
+			MoCursor cursor = database.execQuery(sql, params);
+
+			// If we have a SELECT statement we store and return the cursor.
+			// TODO: Change this if needed, to return cursor for more
+			// statements.
+			if (sql.trim().toUpperCase().startsWith("SELECT"))
 			{
-				MoCursor cursor = database.execQuery(sql);
 				if (null != cursor)
 				{
 					++mCursorCounter;
@@ -123,7 +233,6 @@ public class MoSyncDB
 			}
 			else
 			{
-				database.execSQL(sql);
 				return MA_DB_OK;
 			}
 		}
@@ -495,18 +604,18 @@ public class MoSyncDB
 			}
 		}
 
-		public MoCursor execQuery(String sql)
+		public MoCursor execQuery(String sql, String[] params)
 			throws SQLException
 		{
-			Cursor cursor = mDB.rawQuery(sql, null);
-			// TODO: Check null return value?
-			return new MoCursor(cursor);
-		}
-
-		public void execSQL(String sql)
-			throws SQLException
-		{
-			mDB.execSQL(sql);
+			Cursor cursor = mDB.rawQuery(sql, params);
+			if (null == cursor)
+			{
+				return null;
+			}
+			else
+			{
+				return new MoCursor(cursor);
+			}
 		}
 	}
 
