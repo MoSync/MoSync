@@ -181,25 +181,6 @@ group WidgetListViewItem "List View Item" {
 			EDIT = "edit";
 
 			/**
-			* @brief Allow the user to move the cell.
-			* If you want to allow the user to move the cell set this value to true.
-			* The segmented list must be in edit mode in order for the cells to be moved.
-			*
-			* Platform: iOS.
-			*
-			* @validvalue "false" or "true" string values.
-			* Default value is "true".
-			*
-			* @setandget
-			*
-			* @par Example
-			* \code
-			*	maWidgetSetProperty(listItemHandle, MAW_LIST_VIEW_ITEM_MOVE, "true");
-			* \endcode
-			*/
-			MOVE = "move";
-
-			/**
 			* @brief Set the title of the delete-confirmation button.
 			* The table view displays the "Delete" button when the user attempts to delete a row,
 			* either by swiping the row or tapping the red minus icon in editing mode.
@@ -404,27 +385,6 @@ group WidgetListViewItem "List View Item" {
 			* \endcode
 			*/
 			EDITING_STYLE = "editingStyle";
-
-			/**
-			* @brief Show/hide the reorder control.
-			* The reordering control is gray, multiple horizontal bar control on the right
-			* side of the cell. Users can drag this control to reorder the cell within the table.
-			* The list must be in edit mode.
-			*
-			* Platform: iOS.
-			*
-			* @validvalue "true" or "false".
-			* The default value is "false".
-			*
-			* @setandget
-			*
-			* @par Example
-			* \code
-			*	maWidgetSetProperty(listItemHandle,
-			*					   MAW_LIST_VIEW_ITEM_SHOW_REORDER_CONTROL, "true");
-			* \endcode
-			*/
-			SHOW_REORDER_CONTROL = "showReorderControl";
 		}
 	} // end of WidgetListViewItemProperties
 }// end of WidgetListViewItem
