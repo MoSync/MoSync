@@ -8,6 +8,8 @@ import android.database.CursorIndexOutOfBoundsException;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
+import android.database.sqlite.SQLiteStatement;
+import android.util.Log;
 import static com.mosync.internal.generated.MAAPI_consts.*;
 
 /**
@@ -115,11 +117,23 @@ public class MoSyncDB
 		int paramCount,
 		MoSyncThread mosync)
 	{
-		// Create params array.
-		String[] params = new String[paramCount];
+		// Execute query.
+		Object[] params = extractExecParams(
+			paramsAddress,
+			paramCount,
+			mosync);
+		return execSQLHelper(databaseHandle, sql, params);
+	}
 
-		// TODO: Check that his is the correct value!
-		int sizeofMADBValue = 64 + 32; // sizeof(MADBValue)
+	Object[] extractExecParams(
+		int paramsAddress,
+		int paramCount,
+		MoSyncThread mosync)
+	{
+		Object[] params = new Object[paramCount];
+
+		// sizeof(MADBValue) is 12 bytes, 8 byte data, 4 byte type.
+		int sizeofMADBValue = 8 + 4;
 
 		// Get parameter array.
 		ByteBuffer buffer = mosync.getMemorySlice(
@@ -132,63 +146,88 @@ public class MoSyncDB
 		for (int i = 0; i < paramCount; ++i)
 		{
 			// Get param type.
-			buffer.position((i * sizeofMADBValue) + 64);
+			buffer.position((i * sizeofMADBValue) + 8);
 			int type = buffer.getInt();
+
+			// Move to start of data in current MADBValue struct.
+			buffer.position(i * sizeofMADBValue);
 
 			if (MA_DB_TYPE_INT == type)
 			{
-				buffer.position(i * sizeofMADBValue);
 				int value = buffer.getInt();
-				params[i] = Integer.toString(value);
+				params[i] = new Integer(value);
+				Log.i("@@@@@", "MA_DB_TYPE_INT params[i]: " + params[i]);
 			}
 			else
 			if (MA_DB_TYPE_INT64 == type)
 			{
-				buffer.position(i * sizeofMADBValue);
 				long value = buffer.getLong();
 				// TODO: Find out how to get the INT64 value.
 				// Is this correct?
-				params[i] = Long.toString(value);
+				params[i] = new Long(value);
+				Log.i("@@@@@", "MA_DB_TYPE_INT64 params[i]: " + params[i]);
 			}
 			else
 			if (MA_DB_TYPE_DOUBLE == type)
 			{
-				buffer.position(i * sizeofMADBValue);
 				double value = buffer.getDouble();
-				params[i] = Double.toString(value);
+				params[i] = new Double(value);
+				Log.i("@@@@@", "MA_DB_TYPE_DOUBLE params[i]: " + params[i]);
 			}
 			else
 			if (MA_DB_TYPE_NULL == type)
 			{
-				// TODO: Would this work?
 				params[i] = null;
 			}
 			else
 			if (MA_DB_TYPE_DATA == type)
 			{
-				// TODO: Implement.
-				params[i] = null;
+				// Read data from handle.
+				int handle = buffer.getInt();
+				ByteBuffer buf = mosync.getBinaryResource(handle);
+				byte[] bytes = new byte[buf.capacity()];
+				buf.get(bytes, 0, buf.capacity());
+				params[i] = ByteBuffer.wrap(bytes);
+				Log.i("@@@@@", "MA_DB_TYPE_DATA params[i]: " + new String(bytes));
 			}
 			else
 			if (MA_DB_TYPE_TEXT == type)
 			{
-				// TODO: Implement.
-				params[i] = null;
+				// Read data from struct MADBText.
+				int dataAddress = buffer.getInt();
+				int dataSize = buffer.getInt();
+				ByteBuffer dataBuffer = mosync.getMemorySlice(
+					dataAddress,
+					dataSize
+					);
+				byte[] bytes = new byte[dataSize];
+				dataBuffer.get(bytes, 0, dataSize);
+				params[i] = new String(bytes); // TODO: Add charset.
+				Log.i("@@@@@", "MA_DB_TYPE_TEXT params[i]: " + params[i]);
 			}
 			else
 			if (MA_DB_TYPE_BLOB == type)
 			{
-				// TODO: Implement.
-				params[i] = null;
+				// Read data from struct MADBBlob.
+				int dataAddress = buffer.getInt();
+				int dataSize = buffer.getInt();
+				ByteBuffer dataBuffer = mosync.getMemorySlice(
+					dataAddress,
+					dataSize
+					);
+				byte[] bytes = new byte[dataSize];
+				dataBuffer.get(bytes, 0, dataSize);
+				params[i] = ByteBuffer.wrap(bytes);
+				Log.i("@@@@@", "MA_DB_TYPE_BLOB params[i]: " + new String(bytes));
 			}
 			else
 			{
-				// TODO: ERROR
+				// TODO: ERROR handling?
+				Log.e("@@@@@@@", "maDBExecSQLParams - unknown data type: " + type);
 			}
 		}
 
-		// Execute query.
-		return execSQLHelper(databaseHandle, sql, params);
+		return params;
 	}
 
 	/**
@@ -202,7 +241,7 @@ public class MoSyncDB
 	protected int execSQLHelper(
 		int databaseHandle,
 		String sql,
-		String[] params)
+		Object[] params)
 	{
 		if (!hasDatabase(databaseHandle))
 		{
@@ -213,23 +252,13 @@ public class MoSyncDB
 
 		try
 		{
+			Log.i("@@@@@", "execSQLHelper: " + sql + " " + params);
 			MoCursor cursor = database.execQuery(sql, params);
-
-			// If we have a SELECT statement we store and return the cursor.
-			// TODO: Change this if needed, to return cursor for more
-			// statements.
-			if (sql.trim().toUpperCase().startsWith("SELECT"))
+			if (null != cursor)
 			{
-				if (null != cursor)
-				{
-					++mCursorCounter;
-					addCursor(mCursorCounter, cursor);
-					return mCursorCounter;
-				}
-				else
-				{
-					return MA_DB_ERROR;
-				}
+				++mCursorCounter;
+				addCursor(mCursorCounter, cursor);
+				return mCursorCounter;
 			}
 			else
 			{
@@ -238,6 +267,9 @@ public class MoSyncDB
 		}
 		catch (SQLiteException ex)
 		{
+			Log.e("@@@@@", "execSQLHelper exception: " + ex);
+			ex.printStackTrace();
+
 			logStackTrace(ex);
 			return MA_DB_ERROR;
 		}
@@ -604,10 +636,91 @@ public class MoSyncDB
 			}
 		}
 
-		public MoCursor execQuery(String sql, String[] params)
+		public MoCursor execQuery(String sql, Object[] params)
 			throws SQLException
 		{
-			Cursor cursor = mDB.rawQuery(sql, params);
+			Cursor cursor = null;
+
+			String trimmedSQL = sql.trim().toUpperCase();
+
+			if (trimmedSQL.startsWith("SELECT"))
+			{
+				// For rawQuery we need to have the params as Strings.
+				String[] stringParams = null;
+				if (null != params)
+				{
+					stringParams = new String[params.length];
+					for (int i = 0; i < params.length; ++i)
+					{
+						stringParams[i] = null == params[i] ? null : params[i].toString();
+					}
+				}
+				cursor = mDB.rawQuery(sql, stringParams);
+			}
+			else if (
+				trimmedSQL.startsWith("INSERT") ||
+				trimmedSQL.startsWith("UPDATE") ||
+				trimmedSQL.startsWith("DELETE"))
+			{
+				SQLiteStatement query = mDB.compileStatement(sql);
+				if (null != params)
+				{
+					for (int i = 0; i < params.length; ++i)
+					{
+						if (null == params[i])
+						{
+							query.bindNull(i + 1);
+						}
+						else if (params[i] instanceof Integer)
+						{
+							query.bindLong(i + 1, ((Integer)params[i]).longValue());
+						}
+						else if (params[i] instanceof Long)
+						{
+							query.bindLong(i + 1, ((Long)params[i]).longValue());
+						}
+						else if (params[i] instanceof Double)
+						{
+							query.bindDouble(i + 1, ((Double)params[i]).doubleValue());
+						}
+						else if (params[i] instanceof String)
+						{
+							query.bindString(i + 1, (String)params[i]);
+						}
+						else if (params[i] instanceof ByteBuffer)
+						{
+							ByteBuffer buf = (ByteBuffer) params[i];
+							if (buf.hasArray())
+							{
+								query.bindBlob(i + 1, buf.array());
+							}
+							else
+							{
+								query.bindString(i + 1, "ByteBuffer ERROR in column " + i);
+							}
+						}
+						else
+						{
+							query.bindString(i + 1, "ERROR in column " + i
+								+ " " + params[i].getClass().getName());
+						}
+					}
+				}
+				query.executeInsert();
+				query.releaseReference();
+				query.close();
+			}
+			else
+			{
+				SQLiteStatement query = mDB.compileStatement(sql);
+				query.execute();
+				query.releaseReference();
+				query.close();
+				//mDB.execSQL(sql);
+			}
+
+			// If we got a cursor, we return it wrapped in a MoSync
+			// cursor object.
 			if (null == cursor)
 			{
 				return null;
