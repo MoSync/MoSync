@@ -3031,8 +3031,9 @@ namespace Base
 				// SQL string
 				SYSCALL_THIS->GetValidatedStr(b),
 				// Params address
-				(int)SYSCALL_THIS->GetValidatedMemRange(c, sizeof(MADBValue) * d)
-					- (int)gCore->mem_ds,
+				//(int)SYSCALL_THIS->GetValidatedMemRange(c, sizeof(MADBValue) * d)
+				//	- (int)gCore->mem_ds,
+				c,
 				// Param count.
 				d,
 				mJNIEnv,
