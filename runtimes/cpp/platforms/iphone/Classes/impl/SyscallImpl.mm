@@ -138,9 +138,10 @@ extern ThreadPool gThreadPool;
     @public
     void* mPreviewBuf; //buffer for storing the sub section of the frame
     MARect mPreviewArea; //the sub area captured from the frame
+    int mEventStatus; //MA_CAMERA_PREVIEW_FRAME/AUTO_FOCUS
+    bool mCaptureOutput; //only want to capture one frame and then wait for maCameraPreviewEventConsumed is called, this bool is used for that
     @private
     dispatch_queue_t mSerialQueue;
-    bool mCaptureOutput; //only want to capture one frame and then wait for maCameraPreviewEventConsumed is called, this bool is used for that
 }
 - (id)init;
 - (void)dealloc;
@@ -154,11 +155,8 @@ extern ThreadPool gThreadPool;
 - (void)setPreviewBuf:(void*)previewBuf;
 - (MARect)previewArea;
 - (void)setPreviewArea:(MARect)previewArea;
-- (bool)captureOutput;
-- (void)setCaptureOutput:(bool)val;
 @property void* previewBuf;
 @property MARect previewArea;
-@property bool captureOutput;
 
 @end
 
@@ -166,7 +164,9 @@ extern ThreadPool gThreadPool;
 - (id)init{
     if((self = [super init]))
     {
-        mCaptureOutput = true;
+        NSLog(@"CameraPreviewEventHandler: init");
+        mEventStatus = -1; //neither FRAME nor AUTO_FOCUS
+        mCaptureOutput = false;
         mSerialQueue = dispatch_queue_create("com.mosync.cameraPreviewQueue", NULL); //need a serial queue to get preview frames in order
     }
     return self;
@@ -177,10 +177,11 @@ extern ThreadPool gThreadPool;
 }
 - (void)captureOutput:(AVCaptureOutput *)captureOutput didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer fromConnection:(AVCaptureConnection *)connection{
     if(mCaptureOutput){//only capture one frame at a time
+        NSLog(@"CameraPreviewEventHandler: captureOutput %d", mCaptureOutput);
         [self image2Buf:sampleBuffer];//copy the image data within previewArea from sampleBuffer to mPreviewBuf
         MAEvent event;
         event.type = EVENT_TYPE_CAMERA_PREVIEW;
-        event.status = MA_CAMERA_PREVIEW_FRAME;
+        event.status = mEventStatus;
         Base::gEventQueue.put(event);
         mCaptureOutput = false;//stop capturing output until maCameraPreviewEventConsumed is called
     }
@@ -205,12 +206,13 @@ extern ThreadPool gThreadPool;
                         change:(NSDictionary *)change
                        context:(void *)context
 {
+    if(mEventStatus != MA_CAMERA_PREVIEW_AUTO_FOCUS){
+        return;//don't capture auto focus events if they're not enabled
+    }
     if ([keyPath isEqualToString:@"adjustingFocus"] )
     {
-        MAEvent event;
-        event.type = EVENT_TYPE_CAMERA_PREVIEW;
-        event.status = MA_CAMERA_PREVIEW_AUTO_FOCUS;
-        Base::gEventQueue.put(event);
+        NSLog(@"[!!] captured adjustingFocus kvp");
+        mCaptureOutput = true;
     }
 }
 - (dispatch_queue_t)getQueue{
@@ -227,12 +229,6 @@ extern ThreadPool gThreadPool;
 }
 - (void)setPreviewArea:(MARect)previewArea{
     mPreviewArea = previewArea;
-}
-- (bool)captureOutput{
-    return mCaptureOutput;
-}
-- (void)setCaptureOutput:(bool)val{
-    mCaptureOutput = val;
 }
 
 @end
@@ -1935,6 +1931,7 @@ namespace Base {
 
     SYSCALL(int, maCameraPreviewSize()) //should really be named maCameraGetPreviewSize since it will be a getter
     {
+        NSLog(@"maCameraPreviewSize");
         @try {
             CameraInfo *info = getCurrentCameraInfo(); //get the info struct belonging to the currently active camera
             AVCaptureInput *input = [info->captureSession.inputs objectAtIndex:0];
@@ -1951,34 +1948,38 @@ namespace Base {
 
     SYSCALL(int, maCameraPreviewEventEnable(int previewEventType, void* previewBuffer, const MARect* previewArea))
     {
+        NSLog(@"maCameraPreviewEventEnable");
         //2 events, MA_CAMERA_PREVIEW_FRAME and MA_CAMERA_PREVIEW_AUTO_FOCUS
         @try {
+
+            if(!gCameraPreviewEventHandler) //no delegate, set one up for handling preview frames
+            {
+                CameraInfo *info = getCurrentCameraInfo();
+                gCameraPreviewEventHandler = [[CameraPreviewEventHandler alloc] init];
+                gCameraPreviewEventHandler->mPreviewArea = *previewArea;
+                gCameraPreviewEventHandler->mPreviewBuf = previewBuffer;
+                //set the gCameraPreviewEventHandler as delegate and set its dispatch queue as the queue for handling frames
+                [info->videoDataOutput setSampleBufferDelegate:gCameraPreviewEventHandler queue:[gCameraPreviewEventHandler getQueue]];
+                if ([info->captureSession canAddOutput:info->videoDataOutput]) {
+                    [info->captureSession addOutput:info->videoDataOutput]; //add the video data output to the capture session
+                }
+            }
             if(previewEventType == MA_CAMERA_PREVIEW_FRAME)
             {
-                if(!gCameraPreviewEventHandler) //no delegate, set one up for handling preview frames
-                {
-                    CameraInfo *info = getCurrentCameraInfo();
-                    gCameraPreviewEventHandler = [[CameraPreviewEventHandler alloc] init];
-                    gCameraPreviewEventHandler->mPreviewArea = *previewArea;
-                    gCameraPreviewEventHandler->mPreviewBuf = previewBuffer;
-                    //set the gCameraPreviewEventHandler as delegate and set its dispatch queue as the queue for handling frames
-                    [info->videoDataOutput setSampleBufferDelegate:gCameraPreviewEventHandler queue:[gCameraPreviewEventHandler getQueue]];
-                    if ([info->captureSession canAddOutput:info->videoDataOutput]) {
-                        [info->captureSession addOutput:info->videoDataOutput]; //add the video data output to the capture session
-                    }
-                }
+                NSLog(@"enable PREVIEW_FRAME, mCaptureOutput = true");
+                gCameraPreviewEventHandler->mEventStatus = previewEventType;
+                gCameraPreviewEventHandler->mCaptureOutput = true; //start capturing output right away
                 return 1;
             }
             else if(previewEventType == MA_CAMERA_PREVIEW_AUTO_FOCUS)
             {
-                if(!gCameraPreviewEventHandler)
-                {
-                    gCameraPreviewEventHandler = [[CameraPreviewEventHandler alloc] init];
-                }
+                NSLog(@"enable PREVIEW_AUTO_FOCUS, mCaptureOutput = false");
                 //set the gCameraPreviewEventHandler as an observer for the adjustingFocus
                 //property of the current camera device
                 CameraInfo *info = getCurrentCameraInfo();
                 [info->device addObserver:gCameraPreviewEventHandler forKeyPath:@"adjustingFocus" options:NSKeyValueObservingOptionNew context:nil]; //nil is not recommended, but which context should be set?
+                gCameraPreviewEventHandler->mEventStatus = previewEventType;
+                gCameraPreviewEventHandler->mCaptureOutput = false; //don't capture until we got adjustingFocus event in the previewEventHandler
                 return 1;
             }
             else //unsupported event type
@@ -1994,6 +1995,7 @@ namespace Base {
 
     SYSCALL(int, maCameraPreviewEventDisable()) //wouldn't it be neater to be able to disable a specific preview event?
     {
+        NSLog(@"maCameraPreviewEventDisable");
         @try {
             if(gCameraPreviewEventHandler)
             {
@@ -2009,10 +2011,19 @@ namespace Base {
 
     SYSCALL(int, maCameraPreviewEventConsumed())
     {
+        NSLog(@"maCameraPreviewEventConsumed");
         if(gCameraPreviewEventHandler)
         {
-            gCameraPreviewEventHandler.captureOutput = true; //event consumed, capture output again
-            return 1;
+            if(gCameraPreviewEventHandler->mEventStatus == MA_CAMERA_PREVIEW_FRAME)
+            {
+                gCameraPreviewEventHandler->mCaptureOutput = true; //frame event consumed, capture output again
+                return 1;
+            }
+            if(gCameraPreviewEventHandler->mEventStatus == MA_CAMERA_PREVIEW_AUTO_FOCUS)
+            {
+                return 1;
+            }
+            return -1;
         }
         else
         {
