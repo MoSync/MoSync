@@ -68,6 +68,7 @@ struct SETTINGS {
     const char* androidStorePass;
     const char* androidAlias;
     const char* androidKeyPass;
+    const char* androidInstallLocation;
 
     // BlackBerry specific settings
     const char* blackberryJde;
@@ -106,6 +107,7 @@ void testVsBuildPath(const SETTINGS& s);
 
 void testAndroidPackage(const SETTINGS&);
 void testAndroidVersionCode(const SETTINGS&);
+void testAndroidInstallLocation(const SETTINGS&);
 
 void testBlackberryJde(const SETTINGS&);
 

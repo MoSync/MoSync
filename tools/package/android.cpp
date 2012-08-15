@@ -51,6 +51,7 @@ void packageAndroid(const SETTINGS& s, const RuntimeInfo& ri) {
 	testVendor(s);
 	testAndroidPackage(s);
 	testAndroidVersionCode(s);
+	testAndroidInstallLocation(s);
 
 	// copy program and resource files to add/assets/*.mp3
 	// build AndroidManifest.xml, res/layout/main.xml, res/values/strings.xml
@@ -256,14 +257,19 @@ static void writeManifest(const char* filename, const SETTINGS& s, const Runtime
 	string packageName = string(s.androidPackage);
 	string versionCode = string(s.androidVersionCode);
 	string version = string(s.version);
+	string installLocation = string(s.androidInstallLocation ? s.androidInstallLocation : "internalOnly");
 
 	ofstream file(filename, ios::binary);
 	file <<"<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
 		<<"<manifest xmlns:android=\"http://schemas.android.com/apk/res/android\"\n"
 		<<"\tpackage=\"" << packageName << "\"\n"
 		<<"\tandroid:versionCode=\"" << versionCode << "\"\n"
-		<<"\tandroid:versionName=\"" << version << "\">\n"
-		<<"\t<application\n";
+		<<"\tandroid:versionName=\"" << version << "\"\n";
+	if (ri.androidVersion >= 8) {
+		file<<"\tandroid:installLocation=\"" << installLocation << "\"\n";
+	}
+	file<<">";
+	file <<"\t<application\n";
 	if (s.icon) {
 		file <<"\t\tandroid:icon=\"@drawable/icon\"\n";
 	}
