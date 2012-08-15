@@ -164,7 +164,6 @@ extern ThreadPool gThreadPool;
 - (id)init{
     if((self = [super init]))
     {
-        NSLog(@"CameraPreviewEventHandler: init");
         mEventStatus = -1; //neither FRAME nor AUTO_FOCUS
         mCaptureOutput = false;
         mSerialQueue = dispatch_queue_create("com.mosync.cameraPreviewQueue", NULL); //need a serial queue to get preview frames in order
@@ -177,7 +176,6 @@ extern ThreadPool gThreadPool;
 }
 - (void)captureOutput:(AVCaptureOutput *)captureOutput didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer fromConnection:(AVCaptureConnection *)connection{
     if(mCaptureOutput){//only capture one frame at a time
-        NSLog(@"CameraPreviewEventHandler: captureOutput %d", mCaptureOutput);
         [self image2Buf:sampleBuffer];//copy the image data within previewArea from sampleBuffer to mPreviewBuf
         MAEvent event;
         event.type = EVENT_TYPE_CAMERA_PREVIEW;
@@ -211,7 +209,6 @@ extern ThreadPool gThreadPool;
     }
     if ([keyPath isEqualToString:@"adjustingFocus"] )
     {
-        NSLog(@"[!!] captured adjustingFocus kvp");
         mCaptureOutput = true;
     }
 }
@@ -1931,7 +1928,6 @@ namespace Base {
 
     SYSCALL(int, maCameraPreviewSize()) //should really be named maCameraGetPreviewSize since it will be a getter
     {
-        NSLog(@"maCameraPreviewSize");
         @try {
             CameraInfo *info = getCurrentCameraInfo(); //get the info struct belonging to the currently active camera
             AVCaptureInput *input = [info->captureSession.inputs objectAtIndex:0];
@@ -1948,7 +1944,6 @@ namespace Base {
 
     SYSCALL(int, maCameraPreviewEventEnable(int previewEventType, void* previewBuffer, const MARect* previewArea))
     {
-        NSLog(@"maCameraPreviewEventEnable");
         //2 events, MA_CAMERA_PREVIEW_FRAME and MA_CAMERA_PREVIEW_AUTO_FOCUS
         @try {
 
@@ -1966,14 +1961,12 @@ namespace Base {
             }
             if(previewEventType == MA_CAMERA_PREVIEW_FRAME)
             {
-                NSLog(@"enable PREVIEW_FRAME, mCaptureOutput = true");
                 gCameraPreviewEventHandler->mEventStatus = previewEventType;
                 gCameraPreviewEventHandler->mCaptureOutput = true; //start capturing output right away
                 return 1;
             }
             else if(previewEventType == MA_CAMERA_PREVIEW_AUTO_FOCUS)
             {
-                NSLog(@"enable PREVIEW_AUTO_FOCUS, mCaptureOutput = false");
                 //set the gCameraPreviewEventHandler as an observer for the adjustingFocus
                 //property of the current camera device
                 CameraInfo *info = getCurrentCameraInfo();
@@ -1995,7 +1988,6 @@ namespace Base {
 
     SYSCALL(int, maCameraPreviewEventDisable()) //wouldn't it be neater to be able to disable a specific preview event?
     {
-        NSLog(@"maCameraPreviewEventDisable");
         @try {
             if(gCameraPreviewEventHandler)
             {
@@ -2011,7 +2003,6 @@ namespace Base {
 
     SYSCALL(int, maCameraPreviewEventConsumed())
     {
-        NSLog(@"maCameraPreviewEventConsumed");
         if(gCameraPreviewEventHandler)
         {
             if(gCameraPreviewEventHandler->mEventStatus == MA_CAMERA_PREVIEW_FRAME)
