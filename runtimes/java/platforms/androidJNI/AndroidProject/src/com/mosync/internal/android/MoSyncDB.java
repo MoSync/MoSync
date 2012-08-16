@@ -1,5 +1,6 @@
 package com.mosync.internal.android;
 
+import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
 
@@ -117,6 +118,7 @@ public class MoSyncDB
 		int paramCount,
 		MoSyncThread mosync)
 	{
+
 		// Execute query.
 		Object[] params = extractExecParams(
 			paramsAddress,
@@ -156,23 +158,21 @@ public class MoSyncDB
 			{
 				int value = buffer.getInt();
 				params[i] = new Integer(value);
-				Log.i("@@@@@", "MA_DB_TYPE_INT params[i]: " + params[i]);
+				//Log.i("@@@@@", "MA_DB_TYPE_INT params[i]: " + params[i]);
 			}
 			else
 			if (MA_DB_TYPE_INT64 == type)
 			{
 				long value = buffer.getLong();
-				// TODO: Find out how to get the INT64 value.
-				// Is this correct?
 				params[i] = new Long(value);
-				Log.i("@@@@@", "MA_DB_TYPE_INT64 params[i]: " + params[i]);
+				//Log.i("@@@@@", "MA_DB_TYPE_INT64 params[i]: " + params[i]);
 			}
 			else
 			if (MA_DB_TYPE_DOUBLE == type)
 			{
 				double value = buffer.getDouble();
 				params[i] = new Double(value);
-				Log.i("@@@@@", "MA_DB_TYPE_DOUBLE params[i]: " + params[i]);
+				//Log.i("@@@@@", "MA_DB_TYPE_DOUBLE params[i]: " + params[i]);
 			}
 			else
 			if (MA_DB_TYPE_NULL == type)
@@ -188,7 +188,7 @@ public class MoSyncDB
 				byte[] bytes = new byte[buf.capacity()];
 				buf.get(bytes, 0, buf.capacity());
 				params[i] = ByteBuffer.wrap(bytes);
-				Log.i("@@@@@", "MA_DB_TYPE_DATA params[i]: " + new String(bytes));
+				//Log.i("@@@@@", "MA_DB_TYPE_DATA params[i]: " + new String(bytes));
 			}
 			else
 			if (MA_DB_TYPE_TEXT == type)
@@ -202,8 +202,8 @@ public class MoSyncDB
 					);
 				byte[] bytes = new byte[dataSize];
 				dataBuffer.get(bytes, 0, dataSize);
-				params[i] = new String(bytes); // TODO: Add charset.
-				Log.i("@@@@@", "MA_DB_TYPE_TEXT params[i]: " + params[i]);
+				params[i] = new String(bytes);
+				//Log.i("@@@@@", "MA_DB_TYPE_TEXT params[i]: " + params[i]);
 			}
 			else
 			if (MA_DB_TYPE_BLOB == type)
@@ -218,7 +218,7 @@ public class MoSyncDB
 				byte[] bytes = new byte[dataSize];
 				dataBuffer.get(bytes, 0, dataSize);
 				params[i] = ByteBuffer.wrap(bytes);
-				Log.i("@@@@@", "MA_DB_TYPE_BLOB params[i]: " + new String(bytes));
+				//Log.i("@@@@@", "MA_DB_TYPE_BLOB params[i]: " + new String(bytes));
 			}
 			else
 			{
@@ -252,7 +252,7 @@ public class MoSyncDB
 
 		try
 		{
-			Log.i("@@@@@", "execSQLHelper: " + sql + " " + params);
+			//Log.i("@@@@@", "execSQLHelper query: " + sql);
 			MoCursor cursor = database.execQuery(sql, params);
 			if (null != cursor)
 			{
@@ -643,6 +643,8 @@ public class MoSyncDB
 
 			String trimmedSQL = sql.trim().toUpperCase();
 
+			// SELECT queries need to be called using rawQuery.
+			// NOTE: To use BLOB fields in a WHERE clause is not supported.
 			if (trimmedSQL.startsWith("SELECT"))
 			{
 				// For rawQuery we need to have the params as Strings.
@@ -652,7 +654,40 @@ public class MoSyncDB
 					stringParams = new String[params.length];
 					for (int i = 0; i < params.length; ++i)
 					{
-						stringParams[i] = null == params[i] ? null : params[i].toString();
+						if (null == params[i])
+						{
+							stringParams[i] = null;
+						}
+						else if (params[i] instanceof Integer)
+						{
+							stringParams[i] = params[i].toString();
+						}
+						else if (params[i] instanceof Long)
+						{
+							stringParams[i] = params[i].toString();
+						}
+						else if (params[i] instanceof Double)
+						{
+							stringParams[i] = params[i].toString();
+						}
+						else if (params[i] instanceof String)
+						{
+							stringParams[i] = (String)params[i];
+						}
+						else if (params[i] instanceof ByteBuffer)
+						{
+							// TODO: ERROR
+							Log.e("@@@@@@",
+								"maDBExecSQLParams: BLOB fields are "+
+								"not supported in WHERE clauses");
+						}
+						else
+						{
+							// TODO: ERROR
+							Log.e("@@@@@@",
+								"maDBExecSQLParams: Unsupported field type: " +
+								params[i].getClass().getName());
+						}
 					}
 				}
 				cursor = mDB.rawQuery(sql, stringParams);
@@ -662,6 +697,8 @@ public class MoSyncDB
 				trimmedSQL.startsWith("UPDATE") ||
 				trimmedSQL.startsWith("DELETE"))
 			{
+				// INSERT/UPDATE/DELETE queries need to be called
+				// using an SQLiteStatement.
 				SQLiteStatement query = mDB.compileStatement(sql);
 				if (null != params)
 				{
@@ -712,11 +749,13 @@ public class MoSyncDB
 			}
 			else
 			{
+				// Queries other than SELECT/INSERT/UPDATE/DELETE
+				// are evaluated here.
+				// This is an alternative: mDB.execSQL(sql);
 				SQLiteStatement query = mDB.compileStatement(sql);
 				query.execute();
 				query.releaseReference();
 				query.close();
-				//mDB.execSQL(sql);
 			}
 
 			// If we got a cursor, we return it wrapped in a MoSync

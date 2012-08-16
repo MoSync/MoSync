@@ -286,8 +286,17 @@ public:
 	{
 		printf("Query rows\n");
 
+		// Check that query that returns no rows works.
+		MAHandle cursor = maDBExecSQL(
+			db,
+			"SELECT * FROM pet WHERE name='NameThatDoesNotExist'");
+		SHOULD_HOLD(0 < cursor, "SELECT did not return cursor");
+		int result = maDBCursorNext(cursor);
+		SHOULD_HOLD(MA_DB_NO_ROW == result, "MA_DB_NO_ROW failed");
+		maDBCursorDestroy(cursor);
+
 		// Query all rows.
-		MAHandle cursor = maDBExecSQL(db, "SELECT * FROM pet");
+		cursor = maDBExecSQL(db, "SELECT * FROM pet");
 		SHOULD_HOLD(cursor > 0, "SELECT * failed");
 
 		// Here follows variables that hold field values,
@@ -355,7 +364,7 @@ public:
 			}
 		}
 
-		int result = maDBCursorDestroy(cursor);
+		result = maDBCursorDestroy(cursor);
 		SHOULD_HOLD(MA_DB_OK == result, "maDBCursorDestroy failed");
 
 		result = maDBClose(db);
@@ -366,11 +375,12 @@ public:
 
 	void testParameters()
 	{
+		// Used for the result from maDB* function calls.
 		int result;
 
-		printf("Test params started\n");
+		printf("Param test started\n");
 
-		// Open/create the database.
+		// Open the database (will create it if it does not exist).
 		MAUtil::String path = DBUtil::getLocalPath();
 		path += "MikiDB";
 		printf("Database path: %s\n", path.c_str());
@@ -378,20 +388,19 @@ public:
 		SHOULD_HOLD(db > 0, "maDBOpen failed");
 
 		// Create a new table, first drop the table if it exists.
-		result = maDBExecSQL(db, "DROP TABLE IF EXISTS para");
+		result = maDBExecSQL(db, "DROP TABLE IF EXISTS paramtest");
 		SHOULD_HOLD(MA_DB_OK == result, "DROP TABLE IF EXISTS failed");
 
 		// Create table.
 		result = maDBExecSQL(db,
-			//"CREATE TABLE para (text TEXT(50), int INTEGER, double REAL, i64 INTEGER, blob BLOB, handle BLOB, temp)");
-			"CREATE TABLE para (textValue TEXT(50), "
-			"intValue INTEGER, doubleValue DOUBLE, int64Value INTEGER, "
-			"blobValue BLOB, handleValue BLOB)");
+			"CREATE TABLE paramtest (textValue TEXT(50), "
+			"intValue INTEGER, doubleValue DOUBLE, "
+			"blobValue BLOB, dataValue BLOB, nullValue BLOB)");
 		SHOULD_HOLD(MA_DB_OK == result, "CREATE TABLE failed");
 
-		// Insert value.
+		// Insert values into the table using a parameter array
+		// of type MADBValue.
 		MADBValue params[6];
-		//printf("@@@@@ sizeof(MA_DB_VALUE): %li\n", sizeof(MADBValue));
 
 		params[0].type = MA_DB_TYPE_TEXT;
 		params[0].text.addr = (char*)"some text";
@@ -403,88 +412,91 @@ public:
 		params[2].type = MA_DB_TYPE_DOUBLE;
 		params[2].d = 3.14;
 
-		params[3].type = MA_DB_TYPE_INT64;
-		params[3].i64 = 9; //1LL << 40;
+		params[3].type = MA_DB_TYPE_BLOB;
+		params[3].blob.data = (void*)"blob data";
+		params[3].blob.size = 9;
 
-		params[4].type = MA_DB_TYPE_BLOB;
-		params[4].blob.data = (void*)"blob data";
-		params[4].blob.size = 9;
+		params[4].type = MA_DB_TYPE_DATA;
+		params[4].dataHandle = maCreatePlaceholder();
+		maCreateData(params[4].dataHandle, 14);
+		maWriteData(params[4].dataHandle, "more blob data", 0, 14);
 
-		params[5].type = MA_DB_TYPE_DATA;
-		params[5].dataHandle = maCreatePlaceholder();
-		maCreateData(params[5].dataHandle, 14);
-		maWriteData(params[5].dataHandle, "more blob data", 0, 14);
+		params[5].type = MA_DB_TYPE_NULL;
 
 		result = maDBExecSQLParams(
 			db,
-			"INSERT INTO para VALUES (?, ?, ?, ?, ?, ?)",
+			"INSERT INTO paramtest VALUES (?, ?, ?, ?, ?, ?)",
 			params,
 			6);
-
-		/*
-		params[6].type = MA_DB_TYPE_NULL;
-		result = maDBExecSQLParams(db, "INSERT INTO para VALUES (?, ?, ?, ?, ?, ?, ?)", params, 7);
-		*/
 		SHOULD_HOLD(MA_DB_OK == result, "INSERT failed");
 
-		// Count all rows.
-		MAHandle cursorx = maDBExecSQL(db, "SELECT COUNT(*) FROM (SELECT * FROM para)");
-		maDBCursorNext(cursorx);
+		// Count rows, there should be one row.
+		MAHandle cursor = maDBExecSQL(
+			db,
+			"SELECT COUNT(*) FROM (SELECT * FROM paramtest)");
+		SHOULD_HOLD(0 < cursor, "SELECT 1 did not return cursor");
+		maDBCursorNext(cursor);
 		int numberOfRows;
-		maDBCursorGetColumnInt(cursorx, 0, &numberOfRows);
-		printf("Number of rows: %i\n", numberOfRows);
+		maDBCursorGetColumnInt(cursor, 0, &numberOfRows);
+	    maDBCursorDestroy(cursor);
 		SHOULD_HOLD(1 == numberOfRows, "Wrong number of rows");
-	    maDBCursorDestroy(cursorx);
 
-		// Query all rows.
-		MAHandle cursor = maDBExecSQL(db, "SELECT * FROM para");
+		// Check that query that returns no rows works.
+		cursor = maDBExecSQLParams(
+			db,
+			"SELECT * FROM paramtest WHERE "
+			"nullValue IS NOT NULL",
+			params,
+			0
+			);
+		SHOULD_HOLD(0 < cursor, "SELECT 2 did not return cursor");
+		result = maDBCursorNext(cursor);
+		SHOULD_HOLD(MA_DB_NO_ROW == result, "MA_DB_NO_ROW failed");
+		maDBCursorDestroy(cursor);
 
-		// Test and print data in all rows.
-		result == maDBCursorNext(cursor);
+		// Query all rows and check that column data is correct.
+		// Note: To use blob fields in a WHERE clause is not supported.
+		cursor = maDBExecSQLParams(
+			db,
+			"SELECT * FROM paramtest WHERE "
+			"textValue=? AND "
+			"intValue=? AND "
+			"doubleValue=? AND "
+			"nullValue IS NULL",
+			params,
+			3
+			);
+		SHOULD_HOLD(0 < cursor, "SELECT 3 did not return cursor");
+		result = maDBCursorNext(cursor);
 		SHOULD_HOLD(MA_DB_OK == result, "maDBCursorNext failed");
-		// Get data.
-		{
-			//char buf[50];
-			int i;
-			//longlong i64;
-			double d;
 
-			String text;
+		String text;
+		result = DBUtil::getColumnString(cursor, 0, text);
+		SHOULD_HOLD(result >= 0, "Could not get value of column 1");
+		SHOULD_HOLD(strcmp(text.c_str(), "some text") == 0, "text");
 
-			result = DBUtil::getColumnString(cursor, 0, text);
-			SHOULD_HOLD(result >= 0, "Error in getColumnString");
-			SHOULD_HOLD(strcmp(text.c_str(), "some text") == 0, "text");
+		int i;
+		result = maDBCursorGetColumnInt(cursor, 1, &i);
+		SHOULD_HOLD(MA_DB_OK == result, "Could not get value of column 2");
+		SHOULD_HOLD(i == 42, "int");
 
-			result = maDBCursorGetColumnInt(cursor, 1, &i);
-			SHOULD_HOLD(MA_DB_OK == result, "Error in maDBCursorGetColumnInt 1");
-			SHOULD_HOLD(i == 42, "int");
+		double d;
+		result = maDBCursorGetColumnDouble(cursor, 2, &d);
+		SHOULD_HOLD(MA_DB_OK == result, "Could not get value of column 3");
+		SHOULD_HOLD(d > 3.13999 && d < 3.14001, "double");
 
-			result = maDBCursorGetColumnDouble(cursor, 2, &d);
-			SHOULD_HOLD(MA_DB_OK == result, "Error in maDBCursorGetColumnDouble");
-			SHOULD_HOLD(d > 3.13999 && d < 3.14001, "double");
+		result = DBUtil::getColumnDataAsString(cursor, 3, text);
+		SHOULD_HOLD(MA_DB_OK == result, "Could not get value of column 4");
+		SHOULD_HOLD(memcmp(text.c_str(), "blob data", 9) == 0, "blob");
 
-			result = maDBCursorGetColumnInt(cursor, 3, &i);
-			SHOULD_HOLD(MA_DB_OK == result, "Error in maDBCursorGetColumnInt 2");
-			SHOULD_HOLD(i == 9, "int");
+		result = DBUtil::getColumnDataAsString(cursor, 4, text);
+		SHOULD_HOLD(MA_DB_OK == result, "Could not get value of column 5");
+		SHOULD_HOLD(memcmp(text.c_str(), "more blob data", 14) == 0, "data");
 
-			result = DBUtil::getColumnDataAsString(cursor, 4, text);
-			SHOULD_HOLD(MA_DB_OK == result, "Error in getColumnDataAsString");
-			printf("@@@ getColumnDataAsString 1 result: %d", result);
-			SHOULD_HOLD(memcmp(text.c_str(), "blob data", 9) == 0, "blob");
+		result = DBUtil::getColumnDataAsString(cursor, 5, text);
+		SHOULD_HOLD(MA_DB_NULL == result, "Column 6 is not NULL");
 
-			result = DBUtil::getColumnDataAsString(cursor, 5, text);
-			printf("@@@ getColumnDataAsString 2 result: %d", result);
-			SHOULD_HOLD(MA_DB_OK == result, "Error in getColumnDataAsString");
-			SHOULD_HOLD(memcmp(text.c_str(), "more blob data", 14) == 0, "data");
-
-			// todo
-			//result = maDBCursorGetColumnInt64(cursor, 3, &i64);
-			//SHOULD_HOLD(MA_DB_OK == result, "Error in maDBCursorGetColumnInt");
-			//SHOULD_HOLD(i64 == 1LL << 40, "int64");
-	/*
-			*/
-		}
-
+		// There should be no more rows.
 		result = maDBCursorNext(cursor);
 		SHOULD_HOLD(MA_DB_NO_ROW == result, "MA_DB_NO_ROW failed");
 
@@ -494,7 +506,7 @@ public:
 		result = maDBClose(db);
 		SHOULD_HOLD(MA_DB_OK == result, "maDBClose failed");
 
-		printf("Test params passed successfully\n");
+		printf("Param test passed successfully\n");
 	}
 };
 
@@ -510,7 +522,13 @@ public:
 	 */
 	DBTestMoblet()
 	{
-		printf("Touch screen to run database test\n");
+		printf("Database test\n");
+
+		DBTest test;
+		test.runTest();
+		test.testParameters();
+
+		printf("Touch screen to run test 1000 times\n");
 		printf("Press zero or back (on Android) to exit\n");
 	}
 
@@ -532,8 +550,11 @@ public:
 	void pointerPressEvent(MAPoint2d point)
 	{
 		DBTest test;
-		//test.runTest();
-		test.testParameters();
+		for (int i = 0; i < 1000; ++i)
+		{
+			test.runTest();
+			test.testParameters();
+		}
 	}
 };
 
