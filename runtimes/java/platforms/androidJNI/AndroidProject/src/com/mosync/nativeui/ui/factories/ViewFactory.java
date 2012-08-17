@@ -129,10 +129,7 @@ public class ViewFactory
 		addFactory( IX_WIDGET.MAW_RADIO_BUTTON, new RadioButtonFactory( ) );
 		addFactory( IX_WIDGET.MAW_RADIO_GROUP, new RadioGroupFactory( ) );
 		addFactory( IX_WIDGET.MAW_RATING_BAR, new RatingBarFactory( ) );
-		addFactory( IX_WIDGET.MAW_SEGMENTED_LIST_VIEW , new SegmentedListViewFactory( ) );
-		addFactory( IX_WIDGET.MAW_SEGMENTED_LIST_VIEW_SECTION, new SegmentedListSectionFactory( ) );
-		addFactory( "alphabetical", new AlphabeticalListViewFactory( ) );
-		addFactory( "alphabeticalSection", new AlphabeticalListSectionFactory( ) );
+		addFactory( IX_WIDGET.MAW_LIST_VIEW_SECTION,  new ListSectionFactory( ) );
 	}
 
 	/**

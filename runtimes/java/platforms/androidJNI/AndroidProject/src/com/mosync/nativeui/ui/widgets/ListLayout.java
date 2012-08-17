@@ -24,13 +24,19 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
+import android.widget.SectionIndexer;
 
+import com.mosync.internal.android.EventQueue;
 import com.mosync.internal.generated.IX_WIDGET;
 import com.mosync.nativeui.core.Types;
+import com.mosync.nativeui.ui.widgets.ListViewSection.AdapterChangedListener;
 import com.mosync.nativeui.util.LayoutParamsSetter;
 import com.mosync.nativeui.util.properties.BooleanConverter;
+import com.mosync.nativeui.util.properties.IntConverter;
 import com.mosync.nativeui.util.properties.InvalidPropertyValueException;
 import com.mosync.nativeui.util.properties.PropertyConversionException;
 
@@ -40,14 +46,62 @@ import com.mosync.nativeui.util.properties.PropertyConversionException;
  * has the same structure, otherwise a linear layout
  * may be preferred.
  *
+ * Update: it can now contain List View Sections.
+ * Therefore, 2 more list types are needed:
+ *  - Segmented ( custom list view with default header
+ *  and footer layouts).
+ *  - Alphabetical ( alphabetical indexed list view).
+ * Based on the list type, sections can be created accordingly.
+ *
  * @author fmattias
  */
 public class ListLayout extends Layout
+	implements AdapterChangedListener
 {
 	/**
+	 * List view types.
+	 */
+	static final int LIST_VIEW_TYPE_ALPHABETICAL = 1;
+	static final int LIST_VIEW_TYPE_SEGMENTED = 2;
+	static final int LIST_VIEW_TYPE_DEFAULT = 3;
+
+	/**
+	 * Item types for segmented list view.
+	 */
+	public static final int ITEM_VIEW_TYPE_ITEM = 0;
+	public static final int ITEM_VIEW_TYPE_HEADER = 1;
+	public static final int ITEM_VIEW_TYPE_FOOTER = 2;
+	public static final int ITEM_VIEW_TYPE_COUNT = 3;
+
+	/**
+	 * The list type:
+	 *  - default.
+	 *  - segmented.
+	 *  - alphabetical.
+	 */
+	private int mListType = LIST_VIEW_TYPE_DEFAULT;
+
+	/**
+	 * The sections of the list.
+	 */
+	private ArrayList<ListViewSection> mSections =
+			new ArrayList<ListViewSection>();
+
+	/**
 	 * Feeds the list with views.
+	 * This adapter is used for default and segmented lists.
 	 */
 	ViewAdapter m_viewAdapter = new ViewAdapter( );
+
+	/**
+	 * The adapter for the alphabetical indexed list.
+	 */
+	AlphabeticalViewAdapter<ListItemWidget> mAlphabeticalViewAdapter;
+
+	/**
+	 * Widget handle, used for posting item clicked events.
+	 */
+	private int mWidgetHandle;
 
 	/**
 	 * Constructor.
@@ -59,24 +113,91 @@ public class ListLayout extends Layout
 	{
 		super( handle, listView );
 		listView.setAdapter( m_viewAdapter );
+		mWidgetHandle = handle;
 	}
 
 	@Override
 	public int addChildAt(Widget child, int index)
 	{
-		child.setParent(this);
-		updateLayoutParamsForChild(child);
+		if ( mListType == LIST_VIEW_TYPE_DEFAULT )
+		{
+			child.setParent(this);
+			updateLayoutParamsForChild(child);
 
+			int listIndex = index;
+			if( index == -1 )
+			{
+				listIndex = m_viewAdapter.getCount( );
+			}
+
+			m_children.add( listIndex, child );
+			m_viewAdapter.addAt( child.getRootView( ), listIndex );
+		}
+		else
+		{
+			if ( !(child instanceof ListViewSection) )
+			{
+				Log.e( "MoSync",
+				"maWidgetInsertChild: ListLayout can only contain ListViewSections.");
+				return IX_WIDGET.MAW_RES_INVALID_HANDLE;
+			}
+			ListViewSection section = (ListViewSection) child;
+			// Check list type against section type.
+			if ( mListType != section.getSectionType() )
+			{
+				Log.e( "MoSync",
+				"maWidgetInsertChild: List type does not match Section type.");
+				return IX_WIDGET.MAW_RES_INVALID_HANDLE;
+			}
+			int listIndex = index;
+			if( index == -1 )
+			{
+				listIndex = mSections.size();
+			}
+			// Add the section to the section list.
+			section.setParent(this);
+			m_children.add(listIndex, child);
+			mSections.add(listIndex, section);
+
+			if ( mListType == LIST_VIEW_TYPE_SEGMENTED )
+				addSegmentedSection(section, listIndex);
+			else
+			{
+				// Disable and enable fast scroll thumb,
+				// so that getSections() can get called
+				// and refresh the preview letters.
+				ListView l = (ListView) getView();
+				l.setFastScrollEnabled(false);
+				mAlphabeticalViewAdapter.reloadPreviewLetters();
+				l.setFastScrollEnabled(true);
+			}
+
+			// Set adapter listeners for each section.
+			section.setAdapterListener(this);
+		}
+
+		return IX_WIDGET.MAW_RES_OK;
+	}
+
+	/**
+	 * Add a segmented section to the list.
+	 * @param child
+	 * @param index
+	 * @return
+	 */
+	public void addSegmentedSection(ListViewSection section,int index)
+	{
 		int listIndex = index;
 		if( index == -1 )
 		{
 			listIndex = m_viewAdapter.getCount( );
 		}
-
-		m_children.add( listIndex, child );
-		m_viewAdapter.addAt( child.getRootView( ), listIndex );
-
-		return IX_WIDGET.MAW_RES_OK;
+		// Get all items from section and add them to the list adapter.
+		for (int i=0; i < section.itemsCount(); i++)
+		{
+			ListItemWidget item = section.getItem(i);
+			m_viewAdapter.addAt(item.getView(), listIndex + i);
+		}
 	}
 
 	/**
@@ -88,11 +209,46 @@ public class ListLayout extends Layout
 	@Override
 	public int removeChild(Widget child)
 	{
-		child.setParent(null);
-		m_children.remove( child );
-		m_viewAdapter.remove( child.getRootView( ) );
+		if ( mListType == LIST_VIEW_TYPE_DEFAULT )
+		{
+			child.setParent(null);
+			m_children.remove( child );
+			m_viewAdapter.remove( child.getRootView( ) );
+		}
+		else if( mListType == LIST_VIEW_TYPE_ALPHABETICAL ||
+				mListType == LIST_VIEW_TYPE_SEGMENTED)
+		{
+			// Do not call super.removeChild because section is more
+			// of a container, that a widget.
+			ListViewSection section = (ListViewSection) child;
+			section.setParent(null);
+			m_children.remove( child );
+			mSections.remove(section);
+
+			// Nullify adapter listener.
+			section.setAdapterListener(null);
+
+			if ( mListType == LIST_VIEW_TYPE_SEGMENTED )
+				removeSegmentedSection(section);
+			else
+				mAlphabeticalViewAdapter.reloadPreviewLetters();
+		}
 
 		return IX_WIDGET.MAW_RES_OK;
+	}
+
+	/**
+	 * Remove all items from the segmented section.
+	 * @param section
+	 */
+	public void removeSegmentedSection(ListViewSection section)
+	{
+		for (int i=0; i < section.itemsCount(); i++)
+		{
+			// Section is removed from list, it's items removed from adapter.
+			m_viewAdapter.remove(section.getItem(i).getView());
+		}
+		m_viewAdapter.notifyDataSetChanged();
 	}
 
 	/**
@@ -145,7 +301,43 @@ public class ListLayout extends Layout
 			return true;
 		}
 
-		if( property.equals( Types.WIDGET_PROPERTY_REVERSED ) )
+		ListView listView = (ListView) getView();
+		if ( property.equals(IX_WIDGET.MAW_LIST_VIEW_TYPE) )
+		{
+			if ( IntConverter.convert(value) == IX_WIDGET.MAW_LIST_VIEW_TYPE_DEFAULT)
+			{
+				listView.setAdapter( m_viewAdapter );
+				mListType = LIST_VIEW_TYPE_DEFAULT;
+			}
+			else if( IntConverter.convert(value) == IX_WIDGET.MAW_LIST_VIEW_TYPE_SEGMENTED )
+			{
+				mListType = LIST_VIEW_TYPE_SEGMENTED;
+				m_viewAdapter = new SegmentedViewAdapter( );
+				listView.setAdapter(m_viewAdapter);
+				listView.setOnItemClickListener(
+						new SectionedListOnItemClickListener( mWidgetHandle ) );
+			}
+			else if( IntConverter.convert(value) == IX_WIDGET.MAW_LIST_VIEW_TYPE_ALPHABETICAL )
+			{
+				mListType = LIST_VIEW_TYPE_ALPHABETICAL;
+				mAlphabeticalViewAdapter = new AlphabeticalViewAdapter<ListItemWidget>( );
+				listView.setAdapter( mAlphabeticalViewAdapter );
+				listView.setOnItemClickListener(
+						new SectionedListOnItemClickListener( mWidgetHandle ) );
+			}
+			else
+			{
+				throw new InvalidPropertyValueException(property, value);
+			}
+		}
+		else if( property.equals(IX_WIDGET.MAW_LIST_VIEW_RELOAD_DATA) )
+		{
+			if ( mListType == LIST_VIEW_TYPE_ALPHABETICAL )
+				mAlphabeticalViewAdapter.notifyDataSetChanged();
+			else if ( mListType == LIST_VIEW_TYPE_SEGMENTED )
+				m_viewAdapter.notifyDataSetChanged();
+		}
+		else if( property.equals( Types.WIDGET_PROPERTY_REVERSED ) )
 		{
 			m_viewAdapter.setReversed( BooleanConverter.convert( value ) );
 		}
@@ -158,7 +350,112 @@ public class ListLayout extends Layout
 	}
 
 	/**
+	 * Class responsible for sending a mosync event when an item
+	 * in the sectioned list has been clicked.
+	 *
+	 * @author emma
+	 */
+	public class SectionedListOnItemClickListener implements OnItemClickListener
+	{
+		private int m_handle = -1;
+
+		public SectionedListOnItemClickListener(int handle)
+		{
+			m_handle = handle;
+		}
+
+		/**
+		 * @see OnItemClickListener.onItemClick.
+		 */
+		@Override
+		public void onItemClick(AdapterView<?> parent, View view, int position, long id)
+		{
+			int browseIndex = 0;
+			int sectionIndex = 0;
+			// Section's start position in list.
+			int sectionPosition = 0;
+
+			// Get the index of the section that holds this item,
+			// and it's start position.
+			for (int i=0; i < mSections.size(); i++)
+			{
+				ListViewSection section = mSections.get(i);
+				browseIndex += section.itemsCount();
+				sectionIndex = i;
+				if ( browseIndex > position )
+				{
+					// The index ignores the header.
+					EventQueue.getDefault().
+							postSegmentedListItemClicked(m_handle, sectionIndex, position-sectionPosition-1);
+					return;
+				}
+				sectionPosition += section.itemsCount();
+			}
+			EventQueue.getDefault().
+					postSegmentedListItemClicked(m_handle, sectionIndex, position-sectionPosition-1);
+		}
+	}
+
+	/**
+	 * See AdapterChangedListener.itemRemoved.
+	 */
+	@Override
+	public void itemRemoved(ListItemWidget item)
+	{
+		if ( mListType == LIST_VIEW_TYPE_ALPHABETICAL )
+		{
+			mAlphabeticalViewAdapter.notifyDataSetChanged();
+		}
+		else
+		{
+			m_viewAdapter.remove(item.getView());
+		}
+
+	}
+
+	/**
+	 * See AdapterChangedListener.itemAdded.
+	 */
+	@Override
+	public void itemAdded(
+			ListItemWidget item, ListViewSection section, int index)
+	{
+		if ( mListType == LIST_VIEW_TYPE_ALPHABETICAL )
+		{
+			mAlphabeticalViewAdapter.notifyDataSetChanged();
+		}
+		else
+		{
+			// Based on index inside the section, compute the position in list.
+			int itemPos = getItemPosition(mSections.indexOf(section), index);
+			m_viewAdapter.addAt(item.getView(), itemPos);
+		}
+	}
+
+	/**
+	 * Helper function.
+	 * Based on item position inside the section,
+	 * return the position inside the list.
+	 * @param sectionIndex The section index.
+	 * @param index The index inside the section.
+	 * @return The position inside the list.
+	 */
+	private int getItemPosition(int sectionIndex, int index)
+	{
+		int browseIndex = 0;
+		if (sectionIndex == 0)
+			return index;
+
+		for (int i=1; i <= sectionIndex; i++)
+		{
+			browseIndex += mSections.get(i).itemsCount();
+		}
+		return browseIndex + index;
+	}
+
+	/**
 	 * An adapter that feeds the list view with views.
+	 * used for default list view type.
 	 *
 	 * @author fmattias
 	 */
@@ -283,6 +580,208 @@ public class ListLayout extends Layout
 		public boolean isEmpty()
 		{
 			return m_views.isEmpty( );
+		}
+	}
+
+	/**
+	 * A custom adapter that feeds the list with views:
+	 * standard list view items and separators for
+	 * header and footer.
+	 *
+	 * @author emma
+	 */
+	class SegmentedViewAdapter extends ViewAdapter
+	{
+		public SegmentedViewAdapter()
+		{
+			super();
+		}
+
+		/**
+		 * @see BaseAdapter.isEnabled.
+		 */
+		@Override
+		public boolean isEnabled(int position) {
+			// A separator cannot be clicked !
+			return getItemViewType(position) == ITEM_VIEW_TYPE_ITEM;
+		}
+
+		/**
+		 * @see BaseAdapter.getItemViewType.
+		 */
+		@Override
+		public int getItemViewType(int position) {
+			ListItemWidget item = (ListItemWidget) getItem(position);
+			return item.getItemType();
+		}
+
+		/**
+		 * @see BaseAdapter.getItem.
+		 */
+		@Override
+		public Object getItem(int position) {
+			int browseIndex = 0;
+			int sectionIndex = 0;
+			// Section start position in list.
+			int sectionPosition = 0;
+
+			// Get the index of the section that holds this item,
+			// and get it's start position.
+			for (int i=0; i < mSections.size(); i++)
+			{
+				ListViewSection section = mSections.get(i);
+				browseIndex += section.itemsCount();
+				sectionIndex = i;
+				if ( browseIndex > position )
+				{
+					return section.getItem(position-sectionPosition);
+				}
+				sectionPosition += section.itemsCount();
+			}
+			return mSections.get(sectionIndex).getItem(position-sectionPosition);
+		}
+	}
+
+	/**
+	 * A custom adapter that feeds the alphabetical indexed list with views.
+	 * Used only on alphabetical list types.
+	 *
+	 * @author emma
+	 */
+	class AlphabeticalViewAdapter<T>
+			extends BaseAdapter
+			implements SectionIndexer {
+
+		/**
+		 * Array object that holds all the preview letters.
+		 */
+        String[] mPreviewLetters;
+
+        /**
+         * Constructor.
+         * When the adapter object is constructed, there are no
+         * containing views.
+         * When items are removed or added, the adapter
+         * will be refreshed.
+         */
+		public AlphabeticalViewAdapter()
+		{
+			super();
+		}
+
+		/**
+		 * Refresh all the preview letters,
+		 * when a section is added or removed.
+		 */
+		public void reloadPreviewLetters()
+		{
+			ArrayList<String> keyList = new ArrayList<String>();
+			for (int i=0; i < mSections.size(); i++)
+			{
+				keyList.add(mSections.get(i).mAlphabeticIndex);
+			}
+			mPreviewLetters = new String[keyList.size()];
+			// Convert to an array of objects.
+			keyList.toArray(mPreviewLetters);
+
+			notifyDataSetChanged();
+		}
+
+		/**
+		 * @see BaseAdapter.getView.
+		 */
+		@Override
+		public View getView(int position, View convertView, ViewGroup parent) {
+			int sectionPosition = 0;
+			int browseIndex = 0;
+			int sectionIndex = 0;
+
+			for (int i = 0; i < mSections.size(); i++) {
+				ListViewSection sectionObj = mSections.get(i);
+				browseIndex += sectionObj.itemsCount();
+				sectionIndex = i;
+				if (browseIndex > position) {
+					Log.e("@@MoSync",
+							"getView found the position index , on i= " + i);
+					return sectionObj.getItem(position - sectionPosition)
+							.getView();
+				}
+				sectionPosition += sectionObj.itemsCount();
+			}
+			return mSections.get(sectionIndex)
+					.getItem(position - sectionPosition).getView();
+		}
+
+		/**
+		 * @see BaseAdapter.isEmpty.
+		 */
+		@Override
+		public boolean isEmpty()
+		{
+			return mSections.isEmpty();
+		}
+
+		/**
+		 * @see BaseAdapter.getCount.
+		 */
+		@Override
+		public int getCount()
+		{
+			int totalCount = 0;
+			for (int i=0; i < mSections.size(); i++)
+			{
+				totalCount += mSections.get(i).itemsCount();
+			}
+
+			return totalCount;
+		}
+
+		/**
+		 * @see SectionIndexer.getSections.
+		 */
+		@Override
+		public int getPositionForSection(int section) {
+			int browseIndex = 0;
+			for (int i=0; i < section; i++)
+			{
+				browseIndex += mSections.get(i).itemsCount();
+			}
+			return browseIndex;
+		}
+
+		/**
+		 * @see SectionIndexer.getSections.
+		 */
+		@Override
+		public int getSectionForPosition(int position) {
+			return 0;
+		}
+
+		/**
+		 * @see SectionIndexer.getSections.
+		 */
+		@Override
+		public Object[] getSections() {
+			// The list view will call toString() on each object
+			// to get the preview letter.
+			return mPreviewLetters;
+		}
+
+		/**
+		 * @see BaseAdapter.getItem.
+		 */
+		@Override
+		public Object getItem(int position) {
+			return getView(position, null,null);
+		}
+
+		/**
+		 * @see BaseAdapter.getItemId.
+		 */
+		@Override
+		public long getItemId(int position)
+		{
+			return position;
 		}
 	}
 }

@@ -36,7 +36,7 @@ import com.mosync.nativeui.util.properties.IntConverter;
 import com.mosync.nativeui.util.properties.InvalidPropertyValueException;
 import com.mosync.nativeui.util.properties.PropertyConversionException;
 
-import static com.mosync.nativeui.ui.widgets.SegmentedListLayout.ITEM_VIEW_TYPE_ITEM;
+import static com.mosync.nativeui.ui.widgets.ListLayout.ITEM_VIEW_TYPE_ITEM;
 
 /**
  * A class that represents a standardized list element, that

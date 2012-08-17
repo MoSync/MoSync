@@ -48,8 +48,6 @@ import com.mosync.nativeui.ui.widgets.NavigationBarWidget;
 import com.mosync.nativeui.ui.widgets.RadioButtonWidget;
 import com.mosync.nativeui.ui.widgets.RadioGroupWidget;
 import com.mosync.nativeui.ui.widgets.ScreenWidget;
-import com.mosync.nativeui.ui.widgets.SegmentedListLayout;
-import com.mosync.nativeui.ui.widgets.SegmentedListViewSection;
 import com.mosync.nativeui.ui.widgets.StackScreenWidget;
 import com.mosync.nativeui.ui.widgets.TabScreenWidget;
 import com.mosync.nativeui.ui.widgets.Widget;
