@@ -64,6 +64,11 @@ public:
 		mCurrentZoomIndex = 0;
 		createUI();
 
+		// set the screen supported orientations
+		int mSupportedOrientations = MA_SCREEN_ORIENTATION_PORTRAIT |
+				MA_SCREEN_ORIENTATION_LANDSCAPE_RIGHT |
+				MA_SCREEN_ORIENTATION_LANDSCAPE_LEFT;
+		maScreenSetSupportedOrientations(mSupportedOrientations);
 	}
 
 

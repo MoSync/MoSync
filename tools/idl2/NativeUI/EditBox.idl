@@ -1,0 +1,274 @@
+group WidgetEditBox "Edit box" {
+	group WidgetEditBoxType "Edit box type" {
+		constset int MAW_EDIT_BOX_TYPE_ {
+			/**
+			* The user is allowed to enter any text, including line breaks.
+			*/
+			ANY = 0;
+			/**
+			* The user is allowed to enter an e-mail address.
+			*/
+			EMAILADDR = 1;
+			/**
+			* The user is allowed to enter an integer value.
+			*/
+			NUMERIC = 2;
+			/**
+			* The user is allowed to enter a phone number.
+			*/
+			PHONENUMBER = 3;
+			/**
+			* The user is allowed to enter a URL.
+			*/
+			URL = 4;
+			/**
+			* The user is allowed to enter a real number value.
+			* This extends #MAW_EDIT_BOX_TYPE_NUMERIC by allowing a decimal point.
+			*/
+			DECIMAL = 5;
+			/**
+			* The user is allowed to enter any text, except for line breaks.
+			* Unavailable on some platforms.
+			*/
+			SINGLE_LINE = 6;
+		}
+	} // end of WidgetEditBoxType
+
+	group WidgetEditBoxFlag "Edit box flag" {
+		constset int MAW_EDIT_BOX_FLAG_ {
+			/**
+			* Indicates that the text entered is confidential data that should be
+			* obscured whenever possible. This implies #MAW_EDIT_BOX_FLAG_SENSITIVE.
+			*/
+			PASSWORD = 0;
+			/**
+			* Indicates that the text entered is sensitive data that the implementation
+			* must never store into a dictionary or table for use in predictive, auto-completing,
+			* or other accelerated input schemes. A credit card number is an example of sensitive data.
+			* Only for Android platform.
+			*/
+			SENSITIVE = 1;
+			/**
+			* This flag is a hint to the implementation that during text editing,
+			* the initial letter of each word should be capitalized.
+			* Not available on Windows Phone 7.1.
+			*/
+			INITIAL_CAPS_WORD = 2;
+			/**
+			* This flag is a hint to the implementation that during text editing,
+			* the initial letter of each sentence should be capitalized.
+			* Input flag not available on Windows Phone 7.1 but the edit box
+			* type 'ANY' does this by default.
+			*/
+			INITIAL_CAPS_SENTENCE = 3;
+			/**
+			* Capitalize all characters automatically.
+			* Not available on Windows Phone 7.1.
+			*/
+			INITIAL_CAPS_ALL_CHARACTERS = 4;
+		}
+	} // end of WidgetEditBoxFlag
+
+	/**
+	* The available widget properties for a #MAW_EDIT_BOX. See of \ref WidgetProperties "Widget properties" for more properties.
+	*/
+	group WidgetEditBoxProperties "Edit box properties" {
+		constset MAString MAW_EDIT_BOX_ {
+			/**
+			* @brief Set or get the text entered in the edit box.
+			*
+			* @validvalue A null-terminated string.
+			*
+			* @setandget
+			*
+			* @par Example set
+			* \code
+			*	maWidgetSetProperty(editBoxHandle, MAW_EDIT_BOX_TEXT, "My label");
+			* \endcode
+			*
+			* @par Example get
+			* \code
+			*	char textBuffer[BUFFER_SIZE];
+			*	int result = maWidgetGetProperty(editBoxHandle, MAW_EDIT_BOX_TEXT, textBuffer, BUFFER_SIZE);
+			*	if (result > 0)
+			*	{
+			*		// Do something with the edit box text
+			*	}
+			* \endcode
+			*/
+			TEXT = "text";
+
+			/**
+			* @brief Set a text in the edit box that acts as a placeholder when an edit box is empty.
+			*
+			* @validvalue A null-terminated string.
+			*
+			* @setonly
+			*
+			* @par Example
+			* \code
+			*	maWidgetSetProperty(editBoxHandle, MAW_EDIT_BOX_PLACEHOLDER, "Enter text...");
+			* \endcode
+			*/
+			PLACEHOLDER = "placeholder";
+
+			/**
+			* @brief Shows or hides the virtual keyboard. If shown the focus will be set to this widget.
+			*
+			* @validvalue A boolean string 'true' or 'false'.
+			*
+			* @setonly
+			*
+			* @par Example
+			* \code
+			*	maWidgetSetProperty(editBoxHandle, MAW_EDIT_BOX_SHOW_KEYBOARD, "true");
+			* \endcode
+			*/
+			SHOW_KEYBOARD = "showKeyboard";
+
+			/**
+			* @brief Specifies what editing mode the edit box should have.
+			* @deprecated use #MAW_EDIT_BOX_INPUT_FLAG instead.
+			* @validvalue Either 'password' or 'text'.
+			*
+			* @setonly
+			*
+			* @par Example
+			* \code
+			*	maWidgetSetProperty(editBoxHandle, MAW_EDIT_BOX_EDIT_MODE, "password");
+			* \endcode
+			*/
+			EDIT_MODE = "editMode";
+
+			/**
+			* @brief Specifies what editing mode the edit box should have.
+			* Those flags are mutual exclusive, so the previous value is always ignored.
+			*
+			* @validvalue One of the values #MAW_EDIT_BOX_TYPE_ANY, #MAW_EDIT_BOX_TYPE_EMAILADDR,
+			* #MAW_EDIT_BOX_TYPE_NUMERIC, #MAW_EDIT_BOX_TYPE_PHONENUMBER, #MAW_EDIT_BOX_TYPE_URL,
+			* #MAW_EDIT_BOX_TYPE_DECIMAL, #MAW_EDIT_BOX_TYPE_SINGLELINE.
+			*
+			* @setonly
+			*
+			* @par Example
+			* \code
+			*	maWidgetSetProperty(editBoxHandle, MAW_EDIT_BOX_INPUT_MODE, toString(MAW_EDIT_BOX_NUMERIC);
+			* \endcode
+			*/
+			INPUT_MODE = "inputMode";
+
+			/**
+			* @brief Specifies the editing flags applied to the edit box.
+			* Those flags are mutual exclusive, so the previous value is always ignored.
+			*
+			* @validvalue One of the values #MAW_EDIT_BOX_FLAG_PASSWORD,
+			* #MAW_EDIT_BOX_FLAG_SENSITIVE, #MAW_EDIT_BOX_FLAG_INITIAL_CAPS_ALL_CHARACTERS,
+			* #MAW_EDIT_BOX_FLAG_INITIAL_CAPS_WORD, #MAW_EDIT_BOX_FLAG_INITIAL_CAPS_SENTENCE.
+			*
+			* @setonly
+			*
+			* @par Example
+			* \code
+			*	maWidgetSetProperty(editBoxHandle, MAW_EDIT_BOX_INPUT_FLAG, toString(MAW_EDIT_BOX_FLAG_PASSWORD));
+			* \endcode
+			*/
+			INPUT_FLAG = "inputFlag";
+
+			/**
+			* @brief Sets the font color of the edit box's text.
+			*
+			* @validvalue A hexadecimal value 0xRRGGBB, where R, G and B are the red, green and blue components respectively.
+			*
+			* @setonly
+			*
+			* @par Example
+			* \code
+			*	maWidgetSetProperty(editBoxHandle, MAW_EDIT_BOX_FONT_COLOR, "0xff0000");
+			* \endcode
+			*/
+			FONT_COLOR = "fontColor";
+
+			/**
+			* @brief Set the number of lines.
+			* Makes the edit box exactly this many lines tall. Note that setting this value
+			* overrides any other (minimum / maximum) number of lines or height setting.
+			* A single line edit box will set this value to 1.
+			* This property will automatically set MAW_EDIT_BOX_TYPE_ANY input mode, so that
+			* the edit box will become multiline.
+			* Available on Android only.
+			*
+			* @validvalue A positive integer.
+			*
+			* @setandget
+			*
+			* @par Example
+			* \code
+			*	maWidgetSetProperty(editBoxHandle, MAW_EDIT_BOX_LINES_NUMBER, "2");
+			* \endcode
+			*/
+			LINES_NUMBER = "linesNumber";
+
+			/**
+			* @brief Makes the edit box at most this many lines tall.
+			* Setting this value overrides any other (maximum) height setting.
+			* Available on Android only.
+			*
+			* @validvalue A positive integer.
+			*
+			* @setonly
+			*
+			* @par Example
+			* \code
+			*	maWidgetSetProperty(editBoxHandle, MAW_EDIT_BOX_MAX_LINES, "2");
+			* \endcode
+			*/
+			MAX_LINES = "maxLines";
+
+			/**
+			* @brief Makes the edit box at least this many lines tall.
+			* Setting this value overrides any other (minimum) height setting.
+			* Available on Android only.
+			*
+			* @validvalue A positive integer.
+			*
+			* @setonly
+			*
+			* @par Example
+			* \code
+			*	maWidgetSetProperty(editBoxHandle, MAW_EDIT_BOX_MIN_LINES, "1");
+			* \endcode
+			*/
+			MIN_LINES = "minLines";
+
+			/**
+			* @brief Sets or gets the maximum input lenght of the edit box.
+			* Setting this value enables multiline input mode by default.
+			* Available on Android, iOS and Windows Phone.
+			*
+			* @validvalue A positive integer.
+			*
+			* @setandget
+			*
+			* @par Example
+			* \code
+			*	maWidgetSetProperty(editBoxHandle, MAW_EDIT_BOX_MAX_LENGTH, "10");
+			* \endcode
+			*/
+			MAX_LENGTH = "maxLength";
+
+			/**
+			* @brief Sets the font color of the placeholder text when an edit box is empty.
+			*
+			* @validvalue A hexadecimal value 0xRRGGBB, where R, G and B are the red, green and blue components respectively.
+			*
+			* @setonly
+			*
+			* @par Example
+			* \code
+			*	maWidgetSetProperty(editBoxHandle, MAW_EDIT_BOX_PLACEHOLDER_FONT_COLOR, "0xff0000");
+			* \endcode
+			*/
+			PLACEHOLDER_FONT_COLOR = "placeholderFontColor";
+		}
+	} // end of WidgetEditBoxProperties
+} // end of WidgetEditBox

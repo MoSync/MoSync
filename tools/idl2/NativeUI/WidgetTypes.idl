@@ -1,0 +1,259 @@
+/**
+* The available widget types for maWidgetCreate().
+*/
+group WidgetTypes "Widget types" {
+	constset MAString MAW_ {
+		/**
+		* @brief A screen is the root of all widgets currently visible on a screen. See \ref WidgetScreenProperties "Screen properties" for the properties available.
+		*/
+		SCREEN = "Screen";
+
+		/**
+		* @brief A tab screen is a special type of screen that can have any number of sub-screens each switchable using a tab bar. See \ref WidgetTabScreenProperties "Tab screen properties" for the properties available.
+		*/
+		TAB_SCREEN = "TabScreen";
+
+		/**
+		* @brief A stack screen is a special type of screen that manages navigation
+		* between a set of screens.
+		*
+		* The screen stack can be pushed or popped. Pushing a given screen will hide
+		* the current screen and display the pushed screen. Popping a screen hides
+		* the current screen and shows the previous screen in the stack. See
+		* maWidgetStackScreenPush() and maWidgetStackScreenPop().
+		*
+		* Navigation between the screens in the stack is handled according to the
+		* norm on the specific platform. On iPhone a navigation bar is added to each
+		* pushed screen that can be used to go back, while on Android there is no
+		* extra UI added and the back button is used to go back to the previous screen.
+		* See \ref WidgetStackScreenProperties "Stack screen properties" for the
+		* properties available.
+		*/
+		STACK_SCREEN = "StackScreen";
+
+		/**
+		* @brief A button is a widget that represent a physical button that can be pressed. See \ref WidgetButtonProperties "Button properties" for the properties available.
+		*/
+		BUTTON = "Button";
+
+		/**
+		* @brief An image is a widget that can be used to display an image. See \ref WidgetImageProperties "Image properties" for the properties available.
+		*/
+		IMAGE = "Image";
+
+		/**
+		* @brief An image button is a button that will also affect the appearance of the background image when pressed. See \ref WidgetImageButtonProperties "Image button properties" for the properties available.
+		*/
+		IMAGE_BUTTON = "ImageButton";
+
+		/**
+		* @brief A label is a widget that can be used to display static non-editable text. See \ref WidgetLabelProperties "Label properties" for the properties available.
+		*/
+		LABEL = "Label";
+
+		/**
+		* @brief An editbox is an editable label. See \ref WidgetEditBoxProperties "Editbox properties" for the properties available.
+		*/
+		EDIT_BOX = "EditBox";
+
+		/**
+		* @brief A list view is a vertical list of widgets that is also scrollable.
+		*/
+		LIST_VIEW = "ListView";
+
+		/**
+		* @brief A list view item is a special kind of layout compatible with the list view. That has a predefined common layout for adding text, an icon etc. See \ref WidgetListViewItemProperties "List view item properties" for the properties available.
+		*/
+		LIST_VIEW_ITEM = "ListViewItem";
+
+		/**
+		 * @brief A check box is a widget that acts like a physical switch. When pressed it will toggle its internal state that can either be checked or non-checked. See \ref WidgetCheckBoxProperties "Check box properties" for the properties available.
+		 * If you want to display it with a "light" indicator, as it is on iOS use a Toggle Button instead.
+
+		 */
+		CHECK_BOX = "CheckBox";
+
+		/**
+		 * @brief A horizontal layout is a layout that stacks widgets in the horizontal axis. See \ref WidgetHorizontalLayoutProperties "Horizontal layout properties" for the properties available.
+		 */
+		HORIZONTAL_LAYOUT = "HorizontalLayout";
+
+		/**
+		 * @brief A vertical layout is a layout that stacks widgets in the vertical axis. See \ref WidgetVerticalLayoutProperties "Vertical layout properties" for the properties available.
+		 */
+		VERTICAL_LAYOUT = "VerticalLayout";
+
+		/**
+		 * @brief A relative layout is a layout that layouts widgets relative to its coordinate system. See \ref WidgetRelativeLayoutProperties "Relative layout properties" for the properties available.
+		 */
+		RELATIVE_LAYOUT = "RelativeLayout";
+
+		/**
+		 * @brief A search bar is a special kind of edit box that is used for searching. See \ref WidgetSearchBarProperties "Search bar properties" for the properties available.
+		 */
+		SEARCH_BAR = "SearchBar";
+
+		/**
+		 * @brief A nav bar is an iphone specific widget that shows a nav bar with an optional title and back button. See \ref WidgetNavBarProperties "Nav bar properties" for the properties available.
+		 * See \ref WidgetNavBarProperties "Navigation Bar properties" for the properties available.
+		 */
+		NAV_BAR = "NavBar";
+
+		/**
+		 * @brief A GL view is a widget that is used to display graphics rendered by the GPU using OpenGL|ES 1.0/1.1 calls. See \ref WidgetGLViewProperties "GL view properties" for the properties available.
+		 */
+		GL_VIEW = "GLView";
+
+		/**
+		 * @brief A GL view is a widget that is used to display graphics rendered by the GPU using OpenGL|ES 2.0 calls. See \ref WidgetGLViewProperties "GL view properties" for the properties available.
+		 */
+		GL2_VIEW = "GL2View";
+
+		/**
+		 * @brief A Camera preview widget is a widget that can bound to a camera and contain the live veiw data from the camera.
+		 */
+		CAMERA_PREVIEW="CameraPreview";
+
+		/**
+		 * @brief A web view is a widget used to render web pages. See \ref WidgetWebViewProperties "Web view properties" for the properties available.
+		 */
+		WEB_VIEW = "WebView";
+
+		/**
+		 * @brief A progress bar is a visual indicator of progress in some operation.
+		 * Displays a bar to the user representing how far the operation has progressed.
+		 * A progress bar can also be made indeterminate, when the length of the task is unknown.
+		 *
+		 * See \ref WidgetProgressBarProperties "Progress bar properties" for the properties available.
+		 */
+		PROGRESS_BAR = "ProgressBar";
+
+		 /**
+		 * @brief An activity indicator is a visual indicator of progress in some operation.
+		 * It shows a cyclic animation without an indication of progress.
+		 * It is used when the length of the task is unknown.
+		 *
+		 * See \ref WidgetActivityIndicatorProperties "Activity Indicator properties" for the properties available.
+		 */
+		ACTIVITY_INDICATOR = "ActivityIndicator";
+
+		/**
+		 * @brief A Slider is an extension of ProgressBar that adds a draggable thumb.
+		 * The user can touch the thumb and drag left or right to set the current progress level.
+		 *
+		 * See \ref WidgetSliderProperties "Slider properties" for the properties available.
+		 */
+		SLIDER = "Slider";
+
+		/**
+		 * @brief A Date Picker is a widget for selecting a date. The date can be selected by a year, month, and day spinners.
+		 * The minimal and maximal date from which dates to be selected can be customized.
+		 * The picker is initialized with the current system date.
+		 *
+		 * See \ref WidgetDatePickerProperties "Date Picker properties" for the properties available.
+		 */
+		DATE_PICKER = "DatePicker";
+
+		/**
+		 * @brief A Time Picker is a widget for selecting time of day, in 24 hour mode.
+		 * The hour and each minute digit can be controlled by vertical spinners.
+		 * The hour can be entered by keyboard input.
+		 * Availabe only on iOS for the moment.
+		 * See \ref WidgetTimePickerProperties "Time Picker properties" for the properties available.
+		 */
+		TIME_PICKER = "TimePicker";
+
+		/**
+		 * @brief A Number Picker is a widget that enables the user to select a number from a predefined range.
+		 * Note: for the moment it is available only on iOS.
+		 * See \ref WidgetNumberPickerProperties "Number Picker properties" for the properties available.
+		 */
+		NUMBER_PICKER = "NumberPicker";
+
+		/**
+		 * @brief A Video View displays a video file.
+		 * By default, it has attached a controller view that typically contains the buttons like
+		 * "Play/Pause", "Rewind", "Fast Forward" and a progress slider.
+		 * See \ref WidgetVideoViewProperties "Video View properties" for the properties available.
+		 */
+		VIDEO_VIEW = "VideoView";
+
+		/**
+		 * @brief A Toggle Button is a widget that acts like a physical switch. Displays checked/unchecked states as a button with a "light" indicator and by default accompanied with the text "ON" or "OFF".
+		 * It is available only on Android, and it's similar to the Check Box on iOS.
+		 * When pressed it will toggle its internal state that can either be checked or non-checked. See \ref WidgetToggleButtonProperties "Toggle button properties" for the properties available.
+		 */
+		TOGGLE_BUTTON = "ToggleButton";
+
+		/**
+		* @brief A dialog is a sort of modal view, that can look different depending on the platform.
+		* A Dialog gets visible only after calling maWidgetModalDialogShow().
+		* On Android it is a modal alert dialog.
+		* On iPad it is a PopoverController, and on iPhone it is a modal view.
+		* On Windows Phone, it's a Popup having inside a StackPanel which contains all the controls added to the dialog view.
+		* When a Dialog widget is created it is empty, it has no content. Any type of widget can be added inside it via #maWidgetAddChild syscalls.
+		* To show a Dialog call #maWidgetModalDialogShow(), to dismiss it call: #maWidgetModalDialogHide(), and to delete it call #maWidgetDestroy.
+		* See \ref WidgetModalDialogProperties "Modal Dialog properties" for the properties available.
+		*/
+		MODAL_DIALOG = "ModalDialog";
+
+		/**
+		* @brief A panorama control is a Windows Phone 7 specific control. The paroramaView is a screen container
+		*		 which may contain more then one screen. A screen can spann over the hardware screen width.
+		*		 In order to enable this you will have to set the width property of a screen to a certain value.
+		*		 For more information regarding this control please check the following link:
+		*		 http://msdn.microsoft.com/en-us/library/ff941104(v=vs.92).aspx
+		*
+		* Available only on Windows Phone 7
+		* See \ref WidgetPanoramaViewProperties "Panorama View properties" for the properties available
+		*/
+		PANORAMA_VIEW = "PanoramaView";
+
+		/**
+		* @brief A radio button available only on Android. A radio button can only have a \ref MAW_RADIO_GROUP parent.
+		* Checking one radio button that belongs to a radio group unchecks any previously checked radio button within the same group.
+		* Initially, all of the radio buttons are unchecked.
+		* While it is not possible to uncheck a particular radio button, the radio group can be cleared to remove the checked state.
+		* See \ref WidgetRadioButtonProperties "Radio Button properties" for the properties available.
+		*/
+		RADIO_BUTTON = "RadioButton";
+
+		/**
+		* \brief A radio group is available only on Android.
+		* This class is used to create a multiple-exclusion scope for a set of the \link #MAW_RADIO_BUTTON RADIO_BUTTONS \endlink .
+		* See \ref WidgetRadioGroupProperties "Radio Group properties" for the properties available.
+		*/
+		RADIO_GROUP = "RadioGroup";
+
+		/**
+		* @brief A RatingBar is an extension of Slider and ProgressBar that shows a rating in stars.
+		* The user can touch/drag or use arrow keys to set the rating when using the default size RatingBar.
+		* When using a RatingBar that supports user interaction, placing widgets to the left or right of the
+		* RatingBar is discouraged.
+		* See \ref WidgetRatingBarProperties "Rating Bar properties" for the properties available.
+		*/
+		RATING_BAR = "RatingBar";
+
+		/**
+		* @brief The map widget will contain the google map (on iOS and Android) and the bing map (on Windows Phone)
+		* controls and will allow the user to interract with the map.
+		* See \ref WidgetMapProperties "Map properties" for the properties available.
+		*/
+		MAP = "Map";
+
+		/**
+		 * @brief A map pin can pe placend on the map at a given set of coordinates and responds to click events.
+		 * See \ref WidgetMapPinProperties "Map pin properties" for the properties available.
+		 */
+		MAP_PIN = "MapPin";
+
+		/**
+		* @brief A list section widget is used to group one or more #MAW_LIST_VIEW_ITEM widgets.
+		* Only #MAW_LIST_VIEW_ITEM objects can be added to this list widget.
+		* None of the widget's properties applies to this widget.
+		* See \ref WidgetListViewSectionProperties for the available properties.
+		* Platform: iOS.
+		*/
+		LIST_VIEW_SECTION = "ListViewSection";
+	}
+} // end of WidgetTypes

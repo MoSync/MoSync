@@ -80,6 +80,16 @@ enum WidgetSize{
     PROGRESS_BAR_MAX_VALUE = 100
 };
 
+/**
+ * Enums used to identify a platform.
+ */
+enum platform_code
+{
+	ANDROID = 0,     //!< ANDROID
+	IOS = 1,         //!< IOS
+	WINDOWSPHONE7 = 2//!< WINDOWSPHONE7
+};
+
 /** Categories names used in home screen. */
 const MAUtil::String CATEGORY_ALL     = " All ";
 const MAUtil::String CATEGORY_SPORTS  = " Sports ";
@@ -277,6 +287,11 @@ char* strReplaceFirst(char* original, const char* remove, const char* replacemen
  */
 void replaceString(String& original, const String& toRemove, const String& replacement);
 
+/**
+ * Detects the current platform
+ * @return platform_code specific for Android, iPhone OS or WindowsPhone
+ */
+extern int getPlatform();
 } // namespace WikiNativeUI
 
 #endif /* UTIL_H_ */

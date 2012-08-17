@@ -28,3 +28,6 @@
 #define LOGOUT DLog(@"OUT %s", __FUNCTION__);
 
 #endif
+
+#define INNativeUILog    ;
+#define OUTNativeUILog    ;

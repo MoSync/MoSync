@@ -1,0 +1,134 @@
+group WidgetListView "List View" {
+	/**
+	* The available list view types.
+	* Platform: Android, iOS and Windows Phone.
+	*/
+	group WidgetListViewType "List View Type" {
+		constset int MAW_LIST_VIEW_TYPE_ {
+			/**
+			* @brief A plain table view.
+			* All section headers or footers are not displayed.
+			* Platform: Android, iOS and Windows Phone.
+			* Default value for list view.
+			*/
+			DEFAULT = 0;
+
+			/**
+			* @brief A plain table view.
+			* Any section headers or footers are displayed as inline separators and float when
+			* the table view is scrolled.
+			* Platform: iOS.
+			* Default value for list view.
+			*/
+			ALPHABETICAL = 1;
+
+			/**
+			* @brief A table view whose sections present distinct groups of rows.
+			* The section headers and footers do not float.
+			* Platform: iOS.
+			*/
+			SEGMENTED = 2;
+		}
+	} // end of WidgetListViewType
+
+	/**
+	* The available list view modes.
+	* Platform: iOS.
+	*/
+	group WidgetListViewMode "List View Mode" {
+		constset int MAW_LIST_VIEW_MODE_ {
+			/**
+			* @brief List items cannot be edited.
+			* Platform: iOS.
+			* Default value for the list view.
+			*/
+			DISPLAY = 0;
+
+			/**
+			* @brief List items can be edited.
+			* For more information see \link #WidgetListViewItemProperties
+			* List View Item Properties \endlink.
+			* Platform: iOS.
+			*/
+			EDIT = 1;
+		}
+	} // end of WidgetListViewMode
+
+	/**
+	* The available widget properties for a #MAW_LIST_VIEW.
+	* See \ref WidgetProperties "Widget properties" for more properties.
+	*/
+	group WidgetListViewProperties "List View properties" {
+		constset MAString MAW_LIST_VIEW_ {
+			/**
+			* @brief Set or get the list type.
+			* Set this property before adding the list to the screen/layout.
+			* Platform: Android, iOS and Windows Phone 7.
+			*
+			* @validvalue One of the \link #MAW_LIST_VIEW_TYPE_DEFAULT MAW_LIST_VIEW_TYPE \endlink constants.
+			* Default value is \link #MAW_LIST_VIEW_TYPE_DEFAULT MAW_LIST_VIEW_TYPE_DEFAULT \endlink.
+			*
+			* @setandget
+			*
+			* @par Example
+			* \code
+			*	char buffer[124];
+			*	sprintf(buffer, "%d", MAW_LIST_VIEW_TYPE_ALPHABETICAL);
+			*	maWidgetSetProperty(listHandle, MAW_LIST_VIEW_TYPE, buffer);
+			* \endcode
+			*/
+			TYPE= "type";
+
+			/**
+			* @brief Set or get the list mode.
+			* Platform: iOS.
+			*
+			* @validvalue One of the \link #MAW_LIST_VIEW_MODE_DISPLAY
+			* MAW_LIST_VIEW_MODE \endlink constants.
+			* Default value is \link #MAW_LIST_VIEW_MODE_DISPLAY MAW_LIST_VIEW_MODE_DISPLAY \endlink.
+			*
+			* @setandget
+			*
+			* @par Example
+			* \code
+			*	char buffer[124];
+			*	sprintf(buffer, "%d", MAW_LIST_VIEW_MODE_EDIT);
+			*	maWidgetSetProperty(listHandle, MAW_LIST_VIEW_MODE, buffer);
+			* \endcode
+			*/
+			MODE= "mode";
+
+			/**
+			* @brief Reload all its items.
+			* Platform: iOS.
+			*
+			* @validvalue Empty string.
+			*
+			* @setonly
+			*
+			* @par Example
+			* \code
+			*	maWidgetSetProperty(listHandle, MAW_LIST_VIEW_RELOAD_DATA, "");
+			* \endcode
+			*/
+			RELOAD_DATA = "reload_data";
+
+			/**
+			* @brief Enable/disable item selection.
+			* If you don't want to allow the user to select any item set this property to false.
+			* Platform: iOS.
+			*
+			* @validvalue "true" or "false".
+			* Default value is "true".
+			*
+			* @setandget
+			*
+			* @par Example
+			* \code
+			*	maWidgetSetProperty(listHandle, MAW_LIST_VIEW_ALLOW_SELECTION, "false");
+			* \endcode
+			*/
+			ALLOW_SELECTION = "allowselection";
+		}
+	} // end of WidgetSegmentedListViewProperties
+} // end of WidgetListView

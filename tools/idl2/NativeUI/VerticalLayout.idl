@@ -1,0 +1,105 @@
+/**
+* The available widget properties for a #MAW_VERTICAL_LAYOUT. See \ref WidgetProperties "Widget properties" for more properties.
+*/
+group WidgetVerticalLayoutProperties "Vertical layout" {
+	constset MAString MAW_VERTICAL_LAYOUT_ {
+		/**
+		* @brief Sets how the children in the layout should be aligned in the vertical axis.
+		*
+		* @validvalue One of the constants #MAW_ALIGNMENT_TOP, #MAW_ALIGNMENT_CENTER or #MAW_ALIGNMENT_BOTTOM.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(verticalLayoutHandle, MAW_VERTICAL_LAYOUT_CHILD_VERTICAL_ALIGNMENT, MAW_ALIGNMENT_CENTER);
+		* \endcode
+		*/
+		CHILD_VERTICAL_ALIGNMENT = "childVerticalAlignment";
+
+		/**
+		* @brief Sets how the children in the layout should be aligned in the horizontal axis.
+		*
+		* @validvalue One of the constants #MAW_ALIGNMENT_LEFT, #MAW_ALIGNMENT_CENTER or #MAW_ALIGNMENT_RIGHT.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(verticalLayoutHandle, MAW_VERTICAL_LAYOUT_CHILD_HORIZONTAL_ALIGNMENT, MAW_ALIGNMENT_CENTER);
+		* \endcode
+		*/
+		CHILD_HORIZONTAL_ALIGNMENT = "childHorizontalAlignment";
+
+		/**
+		* @brief Sets the top padding.
+		*
+		* @validvalue The top padding in pixels.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*  // Set a 50px top padding.
+		*	maWidgetSetProperty(verticalLayoutHandle, MAW_VERTICAL_LAYOUT_PADDING_TOP, "50");
+		* \endcode
+		*/
+		PADDING_TOP = "paddingTop";
+
+		/**
+		* @brief Sets the left padding.
+		*
+		* @validvalue The left padding in pixels.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(verticalLayoutHandle, MAW_VERTICAL_LAYOUT_PADDING_LEFT, "50");
+		* \endcode
+		*/
+		PADDING_LEFT = "paddingLeft";
+
+		/**
+		* @brief Sets the right padding.
+		*
+		* @validvalue The right padding in pixels.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(verticalLayoutHandle, MAW_VERTICAL_LAYOUT_PADDING_RIGHT, "50");
+		* \endcode
+		*/
+		PADDING_RIGHT = "paddingRight";
+
+		/**
+		* @brief Sets the bottom padding.
+		*
+		* @validvalue The bottom padding in pixels.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(verticalLayoutHandle, MAW_VERTICAL_LAYOUT_PADDING_BOTTOM, "50");
+		* \endcode
+		*/
+		PADDING_BOTTOM = "paddingBottom";
+
+		/**
+		* @brief Sets the isScrollable boolean
+		*
+		* @validvalue "true" or "false", for "true" the layout will become scrollable otherwise it will become unscrollable
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(verticalLayoutHandle, MAW_VERTICAL_LAYOUT_SCROLLABLE, "true");
+		* \endcode
+		*/
+		SCROLLABLE = "scrollable";
+	}
+} // end of WidgetVerticalLayoutProperties

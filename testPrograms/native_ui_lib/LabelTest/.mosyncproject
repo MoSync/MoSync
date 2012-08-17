@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project supports-build-configs="true" version="1.2">
+<project supports-build-configs="true" version="1.5">
 <build.cfg id="Debug" types="Debug"/>
 <build.cfg id="Release" types="Release"/>
 <properties>
@@ -10,6 +10,7 @@
 <property key="build.prefs:additional.libraries/Release" value="MAUtil.lib, NativeUI.lib"/>
 <property key="build.prefs:additional.library.paths/Debug" value=""/>
 <property key="build.prefs:additional.library.paths/Release" value=""/>
+<property key="build.prefs:app.permissions" value="File\ Storage Internet\ Access Vibration"/>
 <property key="build.prefs:extra.link.sw/Debug" value=""/>
 <property key="build.prefs:extra.link.sw/Release" value=""/>
 <property key="build.prefs:extra.res.sw/Debug" value=""/>
@@ -25,5 +26,6 @@
 <property key="excludes/Debug" value=""/>
 <property key="excludes/Release" value=""/>
 <property key="template.id" value="project.nativeui"/>
+<property key="winmobilecs:guid" value="0f060bb0-95df-102f-808b-737206df229f"/>
 </properties>
 </project>

@@ -1,0 +1,219 @@
+group WidgetMap "Map" {
+	/**
+	* Type constants of the map widget.
+	*/
+	group WidgetMapType "Map types" {
+		constset int MAW_MAP_TYPE_ {
+			/**
+			* Road map type (landforms not visible).
+			*/
+			ROAD = 0;
+			/**
+			* Sattelite map type (landforms visible).
+			*/
+			SATELLITE = 1;
+		}
+	} // end of WidgetMapTypes
+
+	/**
+	* The available widget properties for a #MAW_MAP. See \ref WidgetProperties "Widget properties" for more properties.
+	*/
+	group WidgetMapProperties "Map properties" {
+		constset MAString MAW_MAP_ {
+			/**
+			* @brief The api key used to access the full features of the google map (on Android platform).
+			* The iOS platform doesn't require a key.
+			*
+			* @validvalue A string containing a google maps key. For further details on how to
+			* obtain these key go to "https://developers.google.com/maps/documentation/android/mapkey".
+			*
+			* @setonly
+			* @par Example
+			* \code
+			*	maWidgetSetProperty(mapHandle, MAW_MAP_API_KEY_GOOGLE, "a_valid_google_key");
+			* \endcode
+			*/
+			API_KEY_GOOGLE = "api_key_google";
+
+			/**
+			* @brief The api key used to access the full features of the bing map (on windows phone platform).
+			*
+			* @validvalue A string containing a bing maps key. For further details on how to
+			* obtain these key go to "http://msdn.microsoft.com/en-us/library/ff428642.aspx".
+			*
+			* @setonly
+			* @par Example
+			* \code
+			*	maWidgetSetProperty(mapHandle, MAW_MAP_API_KEY_BING, "a_valid_bing_key");
+			* \endcode
+			*/
+			API_KEY_BING = "api_key_bing";
+
+			/**
+			* @brief Set or get the map type.
+			*
+			* @validvalue One of the two values: MAW_MAP_TYPE_SATELLITE or MAW_MAP_TYPE_ROAD.
+			*
+			* @setandget
+			* @par Example
+			* \code
+			*	maWidgetSetProperty(mapHandle, MAW_MAP_TYPE, MAW_MAP_TYPE_SATELLITE);
+			*	char mapType[BUF_SIZE];
+			*	maWidgetGetProperty(mapHandle, MAW_MAP_TYPE, mapType, BUF_SIZE);
+			* \endcode
+			*/
+			TYPE = "type";
+
+			/**
+			* @brief Sets and gets the zoom level of the map.
+			*
+			* @validvalue A integer value between 0 and 21.
+			*
+			* @setandget
+			* @par Example
+			* \code
+			*	maWidgetSetProperty(mapHandle, MAW_MAP_ZOOM_LEVEL, "4");
+			*	maWidgetSetProperty(mapHandle, MAW_MAP_ZOOM_LEVEL);
+			*	char zoomLevel[BUF_SIZE];
+			*	maWidgetGetProperty(mapHandle, MAW_MAP_ZOOM_LEVEL, zoomLevel, BUF_SIZE);
+			* \endcode
+			*/
+			ZOOM_LEVEL = "zoom_level";
+
+			/**
+			* @brief Disables/enables the interraction between the user and the map.
+			*
+			* @validvalue A boolean string 'true' or 'false'.
+			*
+			* @setandget
+			* @par Example
+			* \code
+			*	maWidgetSetProperty(mapHandle, MAW_MAP_INTERRACTION_ENABLED, "true");
+			*	char interractionEnabled[BUF_SIZE];
+			*	maWidgetGetProperty(mapHandle, MAW_MAP_INTERRACTION_ENABLED, interractionEnabled, BUF_SIZE);
+			* \endcode
+			*/
+			INTERRACTION_ENABLED = "interraction_enabled";
+
+			/**
+			* @brief Set the map center latitude coordinate.
+			*
+			* @validvalue A double value between -90.0 and 90.0.
+			*
+			* @setonly
+			* @par Example
+			* \code
+			*	maWidgetSetProperty(mapHandle, MAW_MAP_CENTER_LATITUDE, "43.232544");
+			*	maWidgetSetProperty(mapHandle, MAW_MAP_CENTER_LATITUDE, "-12.42324");
+			* \endcode
+			*/
+			CENTER_LATITUDE = "center_latitude";
+
+			/**
+			* @brief Set the map center longitude coordinate.
+			*
+			* @validvalue A double value between -180.0 and 180.0.
+			*
+			* @setonly
+			* @par Example
+			* \code
+			*	maWidgetSetProperty(mapHandle, MAW_MAP_CENTER_LONGITUDE, "80.43352");
+			*	maWidgetSetProperty(mapHandle, MAW_MAP_CENTER_LONGITUDE, "-54.56442");
+			* \endcode
+			*/
+			CENTER_LONGITUDE = "center_longitude";
+
+			/**
+			* @brief Set the map zoom level value.
+			*
+			* @validvalue A double value between 0 and 21.
+			*
+			* @setonly
+			* @par Example
+			* \code
+			*	maWidgetSetProperty(mapHandle, MAW_MAP_CENTER_ZOOM_LEVEL, "12");
+			*	maWidgetSetProperty(mapHandle, MAW_MAP_CENTER_ZOOM_LEVEL, "3");
+			* \endcode
+			*/
+			CENTER_ZOOM_LEVEL = "center_zoom_level";
+
+			/**
+			 * @brief Property used to center the map.
+			 *
+			 * @validvalue A boolean string: "true" or "false".
+			 *
+			 * @setonly
+			 * @par Example
+			 * \code
+			 *	 maWidgetSetProperty(mapHandle, MAW_MAP_CENTERED, "true"); // centers the map on the already set map center
+			 * \endcode
+			 */
+			CENTERED = "centered";
+
+			/**
+			 * @brief Property used specify the upper left corner latitude of the visible area.
+			 *
+			 * @validvalue A double value between -90.0 and 90.0.
+			 *
+			 * @setandget
+			 * @par Example
+			 * \code
+			 *	 maWidgetSetProperty(mapHandle, MAW_MAP_VISIBLE_AREA_UPPER_LEFT_CORNER_LATITUDE, "-34.34234");
+			 * \endcode
+			 */
+			VISIBLE_AREA_UPPER_LEFT_CORNER_LATITUDE = "visible_area_upper_left_corner_latitude";
+
+			/**
+			 * @brief Property used specify the upper left corner longitude of the visible area.
+			 *
+			 * @validvalue A double value between -180.0 and 180.0.
+			 *
+			 * @setandget
+			 * @par Example
+			 * \code
+			 *	 maWidgetSetProperty(mapHandle, MAW_MAP_VISIBLE_AREA_UPPER_LEFT_CORNER_LONGITUDE, "134.312");
+			 * \endcode
+			 */
+			VISIBLE_AREA_UPPER_LEFT_CORNER_LONGITUDE = "visible_area_upper_left_corner_longitude";
+
+			/**
+			 * @brief Property used specify the lower right corner latitude of the visible area.
+			 *
+			 * @validvalue A double value between -90.0 and 90.0.
+			 *
+			 * @setandget
+			 * @par Example
+			 * \code
+			 *	 maWidgetSetProperty(mapHandle, MAW_MAP_VISIBLE_AREA_LOWER_RIGHT_CORNER_LATITUDE, "43.2322");
+			 * \endcode
+			 */
+			VISIBLE_AREA_LOWER_RIGHT_CORNER_LATITUDE = "visible_area_lower_right_corner_latitude";
+
+			/**
+			 * @brief Property used specify the lower right corner longitude of the visible area.
+			 *
+			 * @validvalue A double value between -180.0 and 180.0.
+			 *
+			 * @setandget
+			 * @par Example
+			 * \code
+			 *	 maWidgetSetProperty(mapHandle, MAW_MAP_VISIBLE_AREA_LOWER_RIGHT_CORNER_LONGITUDE, "-100.2324");
+			 * \endcode
+			 */
+			VISIBLE_AREA_LOWER_RIGHT_CORNER_LONGITUDE = "visible_area_lower_right_corner_longitude";
+
+			/**
+			* @brief Used to center the map on a previously set visible area.
+			*
+			* @validvalue A boolean string 'true' or 'false'.
+			*
+			* @setonly
+			* @par Example
+			* \code
+			*	maWidgetSetProperty(mapHandle, MAP_CENTERED_ON_VISIBLE_AREA, "true");
+			* \endcode
+			*/
+			CENTERED_ON_VISIBLE_AREA = "centered_on_visible_area";
+		}
+	} // end of WidgetMapProperties
+} // end of Map
