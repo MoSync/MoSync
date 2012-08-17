@@ -42,7 +42,7 @@ import com.mosync.nativeui.util.properties.PropertyConversionException;
  *
  * @author fmattias
  */
-public class ListLayout extends Widget
+public class ListLayout extends Layout
 {
 	/**
 	 * Feeds the list with views.
@@ -73,6 +73,7 @@ public class ListLayout extends Widget
 			listIndex = m_viewAdapter.getCount( );
 		}
 
+		m_children.add( listIndex, child );
 		m_viewAdapter.addAt( child.getRootView( ), listIndex );
 
 		return IX_WIDGET.MAW_RES_OK;
@@ -88,7 +89,7 @@ public class ListLayout extends Widget
 	public int removeChild(Widget child)
 	{
 		child.setParent(null);
-
+		m_children.remove( child );
 		m_viewAdapter.remove( child.getRootView( ) );
 
 		return IX_WIDGET.MAW_RES_OK;

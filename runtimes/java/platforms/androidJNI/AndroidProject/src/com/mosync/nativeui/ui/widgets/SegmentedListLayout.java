@@ -24,12 +24,14 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.AdapterView.OnItemClickListener;
 
 import com.mosync.internal.android.EventQueue;
 import com.mosync.internal.generated.IX_WIDGET;
 import com.mosync.nativeui.core.Types;
+import com.mosync.nativeui.ui.widgets.ListLayout.ViewAdapter;
 import com.mosync.nativeui.ui.widgets.SegmentedListViewSection.AdapterChangedListener;
 import com.mosync.nativeui.util.properties.InvalidPropertyValueException;
 import com.mosync.nativeui.util.properties.PropertyConversionException;
@@ -49,7 +51,7 @@ public class SegmentedListLayout extends ListLayout
 	public static final int ITEM_VIEW_TYPE_COUNT = 3;
 
 	/**
-	 * Feeds the list with views.
+	 * The sections of the list.
 	 */
 	private ArrayList<SegmentedListViewSection> mSections =
 			new ArrayList<SegmentedListViewSection>();
@@ -139,13 +141,13 @@ public class SegmentedListLayout extends ListLayout
 			listIndex = m_viewAdapter.getCount( );
 		}
 
+		m_children.add(child);
+
 		// Get all items from section and add them to the list adapter.
 		for (int i=0; i < section.itemsCount(); i++)
 		{
 			ListItemWidget item = section.getItem(i);
 			m_viewAdapter.addAt(item.getRootView(), listIndex + i);
-
-//			updateLayoutParamsForChild(item);
 		}
 
 		// Set adapter listeners for each section.
@@ -157,10 +159,8 @@ public class SegmentedListLayout extends ListLayout
 	@Override
 	public void itemRemoved(ListItemWidget item)
 	{
+		//todo see this is really neded.
 		m_viewAdapter.remove(item.getRootView());
-		m_viewAdapter.notifyDataSetChanged();
-//		ViewGroup layout = getView();
-//		layout.removeView(item.getRootView());
 	}
 
 	@Override
@@ -170,7 +170,6 @@ public class SegmentedListLayout extends ListLayout
 		// Based on index inside the section, compute the position in list.
 		int itemPos = getItemPosition(mSections.indexOf(section), index);
 		m_viewAdapter.addAt(item.getRootView(), itemPos);
-//		updateLayoutParamsForChild(item);
 	}
 
 	@Override
@@ -187,6 +186,8 @@ public class SegmentedListLayout extends ListLayout
 		section.setAdapterListener(null);
 
 		section.setParent(null);
+		child.setParent(null);
+		m_children.remove( child );
 		mSections.remove(section);
 		m_viewAdapter.notifyDataSetChanged();
 
@@ -218,56 +219,6 @@ public class SegmentedListLayout extends ListLayout
 	}
 
 	/**
-	 * A custom adapter that feeds the list with views:
-	 * standard list view items and separators for
-	 * header and footer.
-	 *
-	 * @author emma
-	 */
-	class SegmentedViewAdapter extends ViewAdapter
-	{
-		public SegmentedViewAdapter()
-		{
-			super();
-		}
-
-		@Override
-		public boolean isEnabled(int position) {
-			// A separator cannot be clicked !
-			return getItemViewType(position) == ITEM_VIEW_TYPE_ITEM;
-		}
-
-		@Override
-		public int getItemViewType(int position) {
-			ListItemWidget item = (ListItemWidget) getItem(position);
-			return item.getItemType();
-		}
-
-		@Override
-		public Object getItem(int position) {
-			int browseIndex = 0;
-			int sectionIndex = 0;
-			// Section start position in list.
-			int sectionPosition = 0;
-
-			// Get the index of the section that holds this item,
-			// and get it's start position.
-			for (int i=0; i < mSections.size(); i++)
-			{
-				SegmentedListViewSection section = mSections.get(i);
-				browseIndex += section.itemsCount();
-				sectionIndex = i;
-				if ( browseIndex > position )
-				{
-					return mSections.get(sectionIndex).getItem(position-sectionPosition);
-				}
-				sectionPosition += section.itemsCount();
-			}
-			return mSections.get(sectionIndex).getItem(position-sectionPosition);
-		}
-	}
-
-	/**
 	 * Helper function.
 	 * Based on item position inside the section,
 	 * return the position inside the list.
@@ -287,4 +238,64 @@ public class SegmentedListLayout extends ListLayout
 		}
 		return browseIndex + index;
 	}
+
+	/**
+	 * A custom adapter that feeds the list with views:
+	 * standard list view items and separators for
+	 * header and footer.
+	 *
+	 * @author emma
+	 */
+	class SegmentedViewAdapter extends ViewAdapter
+	{
+		public SegmentedViewAdapter()
+		{
+			super();
+		}
+
+		/**
+		 * @see BaseAdapter.isEnabled.
+		 */
+		@Override
+		public boolean isEnabled(int position) {
+			// A separator cannot be clicked !
+			return getItemViewType(position) == ITEM_VIEW_TYPE_ITEM;
+		}
+
+		/**
+		 * @see BaseAdapter.getItemViewType.
+		 */
+		@Override
+		public int getItemViewType(int position) {
+			ListItemWidget item = (ListItemWidget) getItem(position);
+			return item.getItemType();
+		}
+
+		/**
+		 * @see BaseAdapter.getItem.
+		 */
+		@Override
+		public Object getItem(int position) {
+			int browseIndex = 0;
+			int sectionIndex = 0;
+			// Section start position in list.
+			int sectionPosition = 0;
+
+			// Get the index of the section that holds this item,
+			// and get it's start position.
+			for (int i=0; i < mSections.size(); i++)
+			{
+				SegmentedListViewSection section = mSections.get(i);
+				browseIndex += section.itemsCount();
+				sectionIndex = i;
+				if ( browseIndex > position )
+				{
+					return section.getItem(position-sectionPosition);
+				}
+				sectionPosition += section.itemsCount();
+			}
+			return mSections.get(sectionIndex).getItem(position-sectionPosition);
+		}
+	}
+
 }

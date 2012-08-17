@@ -42,10 +42,14 @@ import static com.mosync.nativeui.ui.widgets.SegmentedListLayout.ITEM_VIEW_TYPE_
  * and a footer layout which are in fact customizable
  * ListItemWidgets.
  * Widget properties cannot be set on a Section.
+ * Extend from layout so that maWidgetDestroy will destroy
+ * all it's children.
+ *
+ * A segmented list view section can be parented by a SegmentedListLayout.
  *
  * @author emma
  */
-public class SegmentedListViewSection extends Layout //todo extends Widget
+public class SegmentedListViewSection extends Layout
 {
 	// Default header and footer appearance.
 	static final String HEADER_DEFAULT_BACKGROUND_COLOR = "838B83";
@@ -54,7 +58,7 @@ public class SegmentedListViewSection extends Layout //todo extends Widget
 	static final int FOOTER_DEFAULT_FONT_SIZE = 15;
 
 	/**
-	 * Listener for when the items are removed.
+	 * Listener for when the items are removed or added.
 	 */
 	private AdapterChangedListener mAdapterListener = null;
 

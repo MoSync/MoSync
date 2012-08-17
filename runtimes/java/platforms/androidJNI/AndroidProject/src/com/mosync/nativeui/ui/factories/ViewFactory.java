@@ -131,6 +131,8 @@ public class ViewFactory
 		addFactory( IX_WIDGET.MAW_RATING_BAR, new RatingBarFactory( ) );
 		addFactory( IX_WIDGET.MAW_SEGMENTED_LIST_VIEW , new SegmentedListViewFactory( ) );
 		addFactory( IX_WIDGET.MAW_SEGMENTED_LIST_VIEW_SECTION, new SegmentedListSectionFactory( ) );
+		addFactory( "alphabetical", new AlphabeticalListViewFactory( ) );
+		addFactory( "alphabeticalSection", new AlphabeticalListSectionFactory( ) );
 	}
 
 	/**
