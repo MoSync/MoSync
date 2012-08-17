@@ -170,32 +170,6 @@ namespace NativeUI
 	}
 
 	/**
-	 * Allow the user to move the cell.
-	 * The list must be in edit mode in order for the cells to be moved.
-	 * Platform: iOS.
-	 * @param canMoveValue true if you want to allow the cell to be moved,
-	 * false otherwise.
-	 */
-	void ListViewItem::setCanMove(bool canMoveValue)
-	{
-		const char* value = canMoveValue ? "true" : "false";
-		this->setProperty(MAW_LIST_VIEW_ITEM_MOVE, value);
-	}
-
-	/**
-	 * Check if cell can be moved by the user.
-	 * Platform: iOS.
-	 * @return true if cell can be moved, false otherwise.
-	 */
-	bool ListViewItem::canMove()
-	{
-		MAUtil::String value = this->getPropertyString(
-			MAW_LIST_VIEW_ITEM_MOVE);
-		bool returnValue = (strcmp(value.c_str(), "true")) ? false : true;
-		return returnValue;
-	}
-
-	/**
 	 * Set the title of the delete-confirmation button.
 	 * The list view displays the "Delete" button when the user attempts
 	 * to delete an item, either by swiping the item or tapping the red minus
@@ -372,37 +346,6 @@ namespace NativeUI
 			break;
 		}
 		return editStyle;
-	}
-
-	/**
-	 * Show/hide the reorder control.
-	 * The reordering control is gray, multiple horizontal bar control
-	 * on the right side of the item. Users can drag this control to reorder
-	 * the iteml within the list view.
-	 * The list must be in edit mode.
-	 * Platform: iOS.
-	 * @param show If true shows the reorder control, false hides it.
-	 */
-	void ListViewItem::showReorderControl(bool show)
-	{
-		const char* value = show ? "true" : "false";
-		this->setProperty(MAW_LIST_VIEW_ITEM_SHOW_REORDER_CONTROL,
-			value);
-	}
-
-	/**
-	 * Check if the reorder control is shown.
-	 * The reordering control is gray, multiple horizontal bar control
-	 * on the right side of the item.
-	 * Platform: iOS.
-	 * @return true if it's shown, false otherwise.
-	 */
-	bool ListViewItem::isReorderControlShown()
-	{
-		MAUtil::String value = this->getPropertyString(
-			MAW_LIST_VIEW_ITEM_SHOW_REORDER_CONTROL);
-		bool returnValue = (strcmp(value.c_str(), "true")) ? false : true;
-		return returnValue;
 	}
 
 	/**

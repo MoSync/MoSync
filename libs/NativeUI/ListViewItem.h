@@ -183,23 +183,6 @@ namespace NativeUI
 		bool isEditable();
 
 		/**
-		 * Allow the user to move the cell.
-		 * The list must be in edit mode in order for the cells to
-		 * be moved.
-		 * Platform: iOS.
-		 * @param canMove true if you want to allow the cell to be moved,
-		 * false otherwise.
-		 */
-		void setCanMove(bool canMove);
-
-		/**
-		 * Check if cell can be moved by the user.
-		 * Platform: iOS.
-		 * @return true if cell can be moved, false otherwise.
-		 */
-		bool canMove();
-
-		/**
 		 * Set the title of the delete-confirmation button.
 		 * The list view displays the "Delete" button when the user attempts
 		 * to delete an item, either by swiping the item or tapping the red minus
@@ -294,26 +277,6 @@ namespace NativeUI
 		 * @return The editing style used.
 		 */
 		ListViewItemEditStyle getEditStyle();
-
-		/**
-		 * Show/hide the reorder control.
-		 * The reordering control is gray, multiple horizontal bar control
-		 * on the right side of the item. Users can drag this control to reorder
-		 * the iteml within the list view.
-		 * The list must be in edit mode.
-		 * Platform: iOS.
-		 * @param show If true shows the reorder control, false hides it.
-		 */
-		void showReorderControl(bool show = true);
-
-		/**
-		 * Check if the reorder control is shown.
-		 * The reordering control is gray, multiple horizontal bar control
-		 * on the right side of the item.
-		 * Platform: iOS.
-		 * @return true if it's shown, false otherwise.
-		 */
-		bool isReorderControlShown();
 
 	private:
 		/**
