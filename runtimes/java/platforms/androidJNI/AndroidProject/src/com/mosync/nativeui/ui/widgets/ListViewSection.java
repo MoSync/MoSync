@@ -28,6 +28,7 @@ import android.widget.ListView;
 import com.mosync.internal.android.MoSyncThread;
 import com.mosync.internal.android.MoSyncFont.MoSyncFontHandle;
 import com.mosync.internal.generated.IX_WIDGET;
+import com.mosync.nativeui.core.Types;
 import com.mosync.nativeui.ui.factories.ViewFactory;
 import com.mosync.nativeui.util.properties.IntConverter;
 import com.mosync.nativeui.util.properties.InvalidPropertyValueException;
@@ -212,7 +213,7 @@ public class ListViewSection extends Layout
 			}
 			setFooterText(value);
 		}
-		else if( property.equals( "headerBackground") )
+		else if( property.equals( IX_WIDGET.MAW_LIST_VIEW_SECTION_HEADER_BACKGROUND) )
 		{
 			if ( mSectionType != LIST_VIEW_SECTION_TYPE_SEGMENTED )
 			{
@@ -222,17 +223,17 @@ public class ListViewSection extends Layout
 			}
 			mItems.get(0).setProperty(IX_WIDGET.MAW_WIDGET_BACKGROUND_COLOR, value);
 		}
-		else if( property.equals( "footerBackgrouond") )
+		else if( property.equals( IX_WIDGET.MAW_LIST_VIEW_SECTION_FOOTER_BACKGROUND) )
 		{
 			if ( mSectionType != LIST_VIEW_SECTION_TYPE_SEGMENTED )
 			{
 				Log.e("@@MoSync",
-				"maWidgetSetProperty section header is available only on Segmented list type");
+				"maWidgetSetProperty section footer is available only on Segmented list type");
 				throw new InvalidPropertyValueException(property, value);
 			}
-			mItems.get( mItems.size()-1).setProperty(IX_WIDGET.MAW_WIDGET_BACKGROUND_COLOR, value);
+			mItems.get(mItems.size()-1).setProperty(IX_WIDGET.MAW_WIDGET_BACKGROUND_COLOR, value);
 		}
-		else if( property.equals( "headerFontColor") )
+		else if( property.equals( IX_WIDGET.MAW_LIST_VIEW_SECTION_HEADER_FONT_COLOR) )
 		{
 			if ( mSectionType != LIST_VIEW_SECTION_TYPE_SEGMENTED )
 			{
@@ -242,7 +243,17 @@ public class ListViewSection extends Layout
 			}
 			mItems.get(0).setProperty(IX_WIDGET.MAW_LIST_VIEW_ITEM_FONT_COLOR, value);
 		}
-		else if( property.equals( "headerFontSize") )
+		else if( property.equals( IX_WIDGET.MAW_LIST_VIEW_SECTION_FOOTER_FONT_COLOR) )
+		{
+			if ( mSectionType != LIST_VIEW_SECTION_TYPE_SEGMENTED )
+			{
+				Log.e("@@MoSync",
+				"maWidgetSetProperty section footer is available only on Segmented list type");
+				throw new InvalidPropertyValueException(property, value);
+			}
+			mItems.get(mItems.size()-1).setProperty(IX_WIDGET.MAW_LIST_VIEW_ITEM_FONT_COLOR, value);
+		}
+		else if( property.equals( IX_WIDGET.MAW_LIST_VIEW_SECTION_HEADER_FONT_SIZE) )
 		{
 			if ( mSectionType != LIST_VIEW_SECTION_TYPE_SEGMENTED )
 			{
@@ -252,7 +263,18 @@ public class ListViewSection extends Layout
 			}
 			mItems.get(0).setProperty(IX_WIDGET.MAW_LIST_VIEW_ITEM_FONT_SIZE, value);
 		}
-		else if( property.equals( "headerFont") )
+		else if( property.equals( IX_WIDGET.MAW_LIST_VIEW_SECTION_FOOTER_FONT_SIZE) )
+		{
+			if ( mSectionType != LIST_VIEW_SECTION_TYPE_SEGMENTED )
+			{
+				Log.e("@@MoSync",
+				"maWidgetSetProperty section footer is available only on Segmented list type");
+				throw new InvalidPropertyValueException(property, value);
+			}
+			mItems.get(mItems.size()-1).setProperty(IX_WIDGET.MAW_LIST_VIEW_ITEM_FONT_SIZE, value);
+		}
+		else if( property.equals( IX_WIDGET.MAW_LIST_VIEW_SECTION_HEADER_FONT_HANDLE) ||
+				property.equals(IX_WIDGET.MAW_LIST_VIEW_SECTION_FOOTER_FONT_HANDLE) )
 		{
 			if ( mSectionType != LIST_VIEW_SECTION_TYPE_SEGMENTED )
 			{
@@ -267,12 +289,17 @@ public class ListViewSection extends Layout
 
 			if ( currentFont != null )
 			{
-				mItems.get(0).setFontTypeface( currentFont.getTypeface(), currentFont.getFontSize() );
+				if ( property.equals(IX_WIDGET.MAW_LIST_VIEW_SECTION_HEADER_FONT_HANDLE) )
+					mItems.get(0).
+						setFontTypeface( currentFont.getTypeface(), currentFont.getFontSize() );
+				else
+					mItems.get(mItems.size()-1).
+						setFontTypeface( currentFont.getTypeface(), currentFont.getFontSize() );
 			}
 			else
 				throw new InvalidPropertyValueException(property, value);
 		}
-		else if( property.equals("headerAlignment") )
+		else if( property.equals(IX_WIDGET.MAW_LIST_VIEW_SECTION_HEADER_HORIZONTAL_ALIGNMENT) )
 		{
 			if ( mSectionType != LIST_VIEW_SECTION_TYPE_SEGMENTED )
 			{
@@ -280,7 +307,37 @@ public class ListViewSection extends Layout
 				"maWidgetSetProperty section header is available only on Segmented list type");
 				throw new InvalidPropertyValueException(property, value);
 			}
-			mItems.get(0).setProperty("horizontalAlignment", value);
+			mItems.get(0).setProperty(Types.WIDGET_PROPERTY_HORIZONTAL_ALIGNMENT , value);
+		}
+		else if( property.equals(IX_WIDGET.MAW_LIST_VIEW_SECTION_FOOTER_HORIZONTAL_ALIGNMENT) )
+		{
+			if ( mSectionType != LIST_VIEW_SECTION_TYPE_SEGMENTED )
+			{
+				Log.e("@@MoSync",
+				"maWidgetSetProperty section footer is available only on Segmented list type");
+				throw new InvalidPropertyValueException(property, value);
+			}
+			mItems.get(mItems.size()-1).setProperty(Types.WIDGET_PROPERTY_HORIZONTAL_ALIGNMENT , value);
+		}
+		else if( property.equals(IX_WIDGET.MAW_LIST_VIEW_SECTION_HEADER_VERTICAL_ALIGNMENT) )
+		{
+			if ( mSectionType != LIST_VIEW_SECTION_TYPE_SEGMENTED )
+			{
+				Log.e("@@MoSync",
+				"maWidgetSetProperty section header is available only on Segmented list type");
+				throw new InvalidPropertyValueException(property, value);
+			}
+			mItems.get(0).setProperty(Types.WIDGET_PROPERTY_VERTICAL_ALIGNMENT, value);
+		}
+		else if( property.equals(IX_WIDGET.MAW_LIST_VIEW_SECTION_FOOTER_VERTICAL_ALIGNMENT) )
+		{
+			if ( mSectionType != LIST_VIEW_SECTION_TYPE_SEGMENTED )
+			{
+				Log.e("@@MoSync",
+				"maWidgetSetProperty section footer is available only on Segmented list type");
+				throw new InvalidPropertyValueException(property, value);
+			}
+			mItems.get(mItems.size()-1).setProperty(Types.WIDGET_PROPERTY_VERTICAL_ALIGNMENT , value);
 		}
 		else
 		{
