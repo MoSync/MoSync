@@ -199,10 +199,11 @@ public:
 	void run() {
 		LOGST("ConnReadToData %i", mac.handle);
 		int result = masc.conn->read((byte*)dst.ptr() + offset, size);
-
+        gConnMutex.lock();
 		DefluxBinPushEvent(handle, dst);
-
+        gConnMutex.unlock();
 		handleResult(CONNOP_READ, result);
+
 	}
 private:
 	MemStream& dst;
@@ -230,10 +231,11 @@ public:
 				result = masc.conn->write(temp(), size);
 			}
 		}
-
+        gConnMutex.lock();
 		DefluxBinPushEvent(handle, src);
-
+        gConnMutex.unlock();
 		handleResult(CONNOP_WRITE, result);
+
 	}
 private:
 	Stream& src;
