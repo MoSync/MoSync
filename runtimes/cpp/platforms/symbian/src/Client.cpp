@@ -74,10 +74,16 @@ static void StartServer() {
 
 int RMoSyncServerSession::Connect() {
 	StartServer();
-	return CreateSession(KMoSyncServer, Version(), 4);
+	int res = CreateSession(KMoSyncServer, Version(), 4);
+	if(res == KErrNone) {
+		mConnected = true;
+	}
+	return res;
 }
 
 TVersion RMoSyncServerSession::Version() const {
+	LOG("Client version: %i.%i.%i\n", KMoSyncMajorVersionNumber,
+		KMoSyncMinorVersionNumber, KMoSyncBuildVersionNumber);
 	return TVersion(KMoSyncMajorVersionNumber, KMoSyncMinorVersionNumber,
 		KMoSyncBuildVersionNumber);
 }
@@ -92,6 +98,8 @@ void RMoSyncServerSession::LocationGet(TRequestStatus& aStatus) {
 	SendReceive(EMoSyncLocationGet, args, aStatus);
 }
 int RMoSyncServerSession::LocationStop() {
+	if(!mConnected)
+		return 0;
 	return Send(EMoSyncLocationStop);
 }
 

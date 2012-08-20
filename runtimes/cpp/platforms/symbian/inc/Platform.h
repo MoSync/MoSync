@@ -170,7 +170,7 @@ public:
 #ifdef SUPPORT_MOSYNC_SERVER
 class RMoSyncServerSession : public RSessionBase {
 public:
-	RMoSyncServerSession() : mPositionPckg(mPosition) {}
+	RMoSyncServerSession() : mPositionPckg(mPosition), mConnected(false) {}
 
 	int Connect();
 	TVersion Version(void) const;
@@ -187,6 +187,7 @@ public:
 private:
 	TPosition mPosition;
 	TPckg<TPosition> mPositionPckg;
+	bool mConnected;
 };
 #endif	//SUPPORT_MOSYNC_SERVER
 

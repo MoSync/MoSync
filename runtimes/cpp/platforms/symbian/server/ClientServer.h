@@ -21,7 +21,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <e32base.h>
 
 // server name
-_LIT(KMoSyncServer, "MoSync Server");
+_LIT(KMoSyncServer, "MoSync Server 2");
 
 // A version must be specified when creating a session with the server
 const TUint KMoSyncMajorVersionNumber=1;
