@@ -134,7 +134,7 @@ private:
 				done();
 			} else {
 				orig->pop();
-			}			
+			}
 		}
 	}
 
@@ -164,10 +164,10 @@ private:
 	void dump() const {
 		//copy the queue, since it can't be read in a non-destructive way.
 		std::stack<FunctorQueue> ops = mOps;
-		LOG("OpQueue: %"PFZT" levels\n", ops.size());
+		LOG("OpQueue: %" PFZT " levels\n", ops.size());
 		while(!ops.empty()) {
 			FunctorQueue& fq(ops.top());
-			LOG(" %"PFZT" elements:\n", fq.size());
+			LOG(" %" PFZT " elements:\n", fq.size());
 			while(!fq.empty()) {
 #ifdef LOGGING_ENABLED
 				Functor& f(fq.front());

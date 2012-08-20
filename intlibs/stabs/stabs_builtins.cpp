@@ -72,14 +72,14 @@ void Int::printMI(printfPtr pf, const void* data, TypeBase::PrintFormat fmt) con
 }
 
 void Char::printMI(printfPtr pf, const void* data, TypeBase::PrintFormat fmt) const {
-	
+
 	if(fmt==eNatural) {
 		printPrimitiveByFormat<char>(pf, data, "%i", eDecimal, eDecimal);
 		char c = *(char*)data;
 		if(c>=0 && c<=32) pf(" \'\\\\%o\'", c);
 		else pf(" \'%c\'", c);
 	} else {
-		printPrimitiveByFormat<char>(pf, data, "%i", fmt, fmt);	
+		printPrimitiveByFormat<char>(pf, data, "%i", fmt, fmt);
 	}
 }
 
@@ -96,11 +96,11 @@ void LongUnsignedInt::printMI(printfPtr pf, const void* data, TypeBase::PrintFor
 }
 
 void LongLongInt::printMI(printfPtr pf, const void* data, TypeBase::PrintFormat fmt) const {
-	printPrimitiveByFormat<s64>(pf, data, "%"INT64PREFIX"i", fmt, TypeBase::eDecimal);
+	printPrimitiveByFormat<s64>(pf, data, "%" INT64PREFIX "i", fmt, TypeBase::eDecimal);
 }
 
 void LongLongUnsignedInt::printMI(printfPtr pf, const void* data, TypeBase::PrintFormat fmt) const {
-	printPrimitiveByFormat<u64>(pf, data, "%"INT64PREFIX"u", fmt, TypeBase::eDecimal);
+	printPrimitiveByFormat<u64>(pf, data, "%" INT64PREFIX "u", fmt, TypeBase::eDecimal);
 }
 
 void ShortInt::printMI(printfPtr pf, const void* data, TypeBase::PrintFormat fmt) const {
