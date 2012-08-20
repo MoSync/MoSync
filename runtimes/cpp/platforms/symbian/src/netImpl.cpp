@@ -25,8 +25,10 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "AppView.h"
 #include "net/net_errors.h"
 #include "net/net.h"
+#include "symbian_errors.h"
 
 using namespace Base;
+using namespace MoSyncError;
 
 static void storeBtAddr(TBTDevAddr btaddr, MAConnAddr* addr);
 static void storeSockAddr(const TSockAddr& sockaddr, MAConnAddr* addr);
@@ -35,51 +37,113 @@ void Syscall::ClearNetworkingVariables() {
 	gConnNextHandle = 1;
 	gConnCleanupQue = NULL;
 	gNetworkingState = EIdle;
+#ifdef __SERIES60_3X__
+	gIapMethod = MA_IAP_METHOD_STANDARD;
+	gIapFilter = MA_IAP_FILTER_ALL;
+#endif
 }
 
 void Syscall::ConstructNetworkingL() {
 	gHttpStringPool.OpenL();
 	gConnOps.SetOffset(_FOFF(ConnOp, mLink));
 	gConnCleanupQue = new (ELeave) CActiveEnder(_FOFF(ConnOp, mLink));
+
+	MyRFs myrfs;
+	myrfs.Connect();
+	LHEL(FSS.SessionPath(gIapPath16));
+
+	// apparently, it doesn't exist by default.
+	int res = FSS.MkDir(gIapPath16);
+	if(res != KErrAlreadyExists) {
+		LHEL(res);
+	}
+
+	_LIT(KIapFileName, "iap.txt");
+	gIapPath16.Append(KIapFileName);
+	gIapPath8.Copy(gIapPath16);
+	LOGS("iap path: %s\n", gIapPath8.PtrZ());
 }
 
-#if defined(SAVE_IAP)
+void Syscall::DestructNetworking() {
+	maIapShutdown();
+	SAFE_DELETE(gConnCleanupQue);
+	gHttpStringPool.Close();
+}
 
-#ifdef __SERIES60_3X__
-#define IAP_STORE_PATH "C:\\Data\\MAStore\\iap.txt"
-#else  //Series 60, 2nd Ed.
-#define IAP_STORE_PATH "C:\\MAStore\\iap.txt"
-#endif  //__SERIES60_3X__
-
-#ifdef GUIDO
-static int getSavedIap() {
-	FileStream readFile(IAP_STORE_PATH);
+// todo: improve efficiency by using native file api instead of FileStream.
+bool Syscall::getSavedIap(TUint& iap) {
+	FileStream readFile(CCP gIapPath8.PtrZ());
 	if(!readFile.isOpen())
-		return 0;
+		return false;
 	TBuf8<32> buf;
 	int len;
 	DEBUG_ASSERT(readFile.length(len));
 	buf.SetLength(len);
 	DEBUG_ASSERT(readFile.read((void*)buf.Ptr(), len));
 	TLex8 lex(buf);
-	uint iap;
 	DEBUG_ASSERT(!lex.Val(iap));
-	return iap;
+	return true;
 }
-#endif	//GUIDO
 
-static void saveIap(uint iap) {
-	MyRFs myrfs;
-	myrfs.Connect();
-	FSS.MkDir(KMAStorePath16);
-
-	WriteFileStream writeFile(IAP_STORE_PATH);
+int Syscall::maIapSave() {
+	if(gNetworkingState != EStarted)
+		return 0;
+	WriteFileStream writeFile(CCP gIapPath8.PtrZ());
 	DEBUG_ASSERT(writeFile.isOpen());
 	TBuf8<32> buf;
-	buf.Format(_L8("%i\n"), iap);
+	buf.Format(_L8("%i\n"), gIapId);
 	DEBUG_ASSERT(writeFile.write(buf.Ptr(), buf.Size()));
+	return 1;
 }
-#endif	//SAVE_IAP
+
+int Syscall::maIapReset() {
+	MyRFs myrfs;
+	myrfs.Connect();
+	int res = FSS.Delete(gIapPath16);
+	switch(res) {
+	case KErrNone:
+		return 1;
+	case KErrNotFound:
+		return 0;
+	default:
+		return res;
+	}
+}
+
+// unstable. please don't use.
+int Syscall::maIapShutdown() {
+	if(gNetworkingState == EIdle) {
+		DEBUG_ASSERT(gConnections.size() == 0);
+		return 0;
+	}
+	StopNetworking();
+
+	gConnOpsWaitingForNetworkingStart.Close();
+
+	//destroy all humans... I mean Connections :)
+	gConnections.close();
+
+	gConnection.Close();
+	gNetworkingState = EIdle;
+
+	return 1;
+}
+
+#ifdef __SERIES60_3X__
+int Syscall::maIapSetMethod(int method) {
+	MYASSERT(method == MA_IAP_METHOD_STANDARD || method == MA_IAP_METHOD_WLAN,
+		SYMERR_IAP_METHOD);
+	gIapMethod = method;
+	return 1;
+}
+
+int Syscall::maIapSetFilter(int filter) {
+	MYASSERT(filter >= MA_IAP_FILTER_NOT_WLAN && filter <= MA_IAP_FILTER_ALL,
+		SYMERR_IAP_FILTER);
+	gIapFilter = filter;
+	return 1;
+}
+#endif	//__SERIES60_3X__
 
 void Syscall::StartNetworkingL(ConnOp& connOp) {
 	LOGST("StartNetworkingL");
@@ -95,33 +159,19 @@ void Syscall::StartNetworkingL(ConnOp& connOp) {
 	gNetworkingState = EStarting;
 	LHEL(gConnection.Open(gSocketServ));
 
-#if 0//defined(__WINSCW__)
-	{
-		TUint count;
-		LHEL(gConnection.EnumerateConnections(count));
-		LOG("%i active connections.\n", count);
-		if(count == 0) {
-			gConnection.Start(connOp.iStatus);
-		}
-	}
-#else	//hardware
-	{
-		//TODO: enable user to select. keep default code for Gui-Do.
-		TCommDbConnPref pref;
-#ifdef GUIDO
-		uint iap = 0;
-#ifdef SAVE_IAP
-		iap = getSavedIap();
-#endif
+	TCommDbConnPref pref;
+	bool hasSavedIap = getSavedIap(gIapId);
+	if(hasSavedIap) {
+		LOGS("Saved IAP: %u\n", gIapId);
 		pref.SetDialogPreference(ECommDbDialogPrefDoNotPrompt);
-		pref.SetIapId(iap);	//magic number, uses the default IAP
-		DEBUG_ASSERT(pref.IapId() == iap);
-#else	//GUIDO
+		pref.SetIapId(gIapId);
+		DEBUG_ASSERT(pref.IapId() == gIapId);
+	} else {
+		LOGS("No saved IAP, showing dialog...\n");
 		pref.SetDialogPreference(ECommDbDialogPrefPrompt);
-#endif	//GUIDO
-		gConnection.Start(pref, connOp.iStatus);
 	}
-#endif	//__WINSCW__
+	gConnection.Start(pref, connOp.iStatus);
+
 	connOp.SetActive();
 	LOGST("SN active");
 }
@@ -139,9 +189,7 @@ void Syscall::FinishNetworkingStartL() {
 	//name seems extremely hard to get. maybe just save IAP number in an ini file?
 	//what if user wants to change IAP? maybe she picked the wrong one.
 
-#ifdef SAVE_IAP
-	saveIap(ci.iIapId);
-#endif
+	gIapId = ci.iIapId;
 
 	gNetworkingState = EStarted;
 
@@ -167,23 +215,6 @@ void Syscall::StopNetworking() {
 		LOGD("op %i cancel done.\n", i);
 		i++;
 	}
-}
-
-void Syscall::DestructNetworking() {
-	StopNetworking();
-
-	gConnOpsWaitingForNetworkingStart.Close();
-
-	//destroy all humans... I mean Connections :)
-	gConnections.close();
-
-	SAFE_DELETE(gConnCleanupQue);
-
-#if SYNCTEST
-	delete tSync;
-#endif
-	gConnection.Close();
-	gHttpStringPool.Close();
 }
 
 void Syscall::CancelConnOps(MAHandle conn) {
@@ -309,7 +340,7 @@ void Syscall::ConnOp::SendResult(int result) {
 	//LOGS("cops %i 0x%08X\n", mSyscall.gConnOps.IsEmpty(), mSyscall.gConnOps.First());
 	mSyscall.gConnCleanupQue->move(this);
 	//LOGS("cops %i\n", mSyscall.gConnOps.IsEmpty());
-	
+
 	if(mConn.errorOverride)
 		result = mConn.errorOverride;
 
@@ -432,7 +463,7 @@ void Syscall::ConnOp::RunL() {
 
 		subOps.Pop();
 	}
-	
+
 	if(!subOps.IsEmpty()) {
 		StartConnSubOpL();
 	} else {
@@ -585,7 +616,9 @@ void Syscall::ConnOp::StartConnSubOpL() {
 		LOG("Unhandled SubConnOp %i\n", sop.type);
 		DEBIG_PHAT_ERROR;
 	}
-	LOGST("SCSO end");
+	// this line would randomly (maybe 30%) cause KERN-EXEC 3
+	// during StartNetworkingL after a call to maIapShutdown().
+	//LOGST("SCSO end");
 }
 
 //******************************************************************************
@@ -714,7 +747,7 @@ void Syscall::ConnOp::addHttpSendHeaders() {
 	//send headers
 	http->mBufPtr.Set(CBufFlatPtr(http->mBuffer()));
 	CSO_ADD(Write, http->mBufPtr);
-	
+
 	http->mState = CHttpConnection::WRITING;
 }
 
@@ -768,7 +801,7 @@ void CHttpConnection::FormatRequestL() {
 	default:
 		BIG_PHAT_ERROR(ERR_HTTP_METHOD_INVALID);
 	}
-	
+
 	APPEND(*mPath);
 	APPEND(_L8(" HTTP/1.0\r\n"));
 
@@ -860,7 +893,7 @@ void CHttpConnection::RunL(TInt aResult) {
 		LOG("HTTP header buffer full!\n");
 		CompleteReadHeaders(CONNERR_INTERNAL, 0);
 	}
-	
+
 	// copy partial header lines to beginning of buffer
 	if(startPos != 0) {
 		LOGS("Deleting %i bytes.\n", startPos);
@@ -1088,7 +1121,7 @@ void CBtServerSocket::init(RSocketServ& aServer, const TUUID& uuid, bool hasName
 
 	// set protocol list to the record
 	mSdpDB.UpdateAttributeL(mHandle, KSdpAttrIdProtocolDescriptorList, *pdl);
-	
+
 	// set browse group
 	// service will not appear in scans unless this is set properly!
 	TCleaner<CSdpAttrValueDES> bga(CSdpAttrValueDES::NewDESL(NULL));
@@ -1273,7 +1306,7 @@ SYSCALL(MAHandle, maConnect(const char* url)) {
 			return CONNERR_URL;
 		}
 		Smartie<CSocket> sockp(createSocket(ssl));
-		
+
 		_LIT8(K127, "127.");
 		TInetAddr addr;
 		bool localhost = false;
@@ -1412,7 +1445,7 @@ SYSCALL(int, maConnGetAddr(MAHandle conn, MAConnAddr* addr)) {
 		if(addr->family == CONN_FAMILY_BT) {
 			TBTDevAddr btaddr;
 			//TPckgBuf<TBTDevAddr> pckg(btaddr);
-			
+
 			//old style, might work on Symbian 7.0 and earlier
 			//update: doesn't work on 6630.
 #if 0//!defined(__SERIES60_3X__)
@@ -1455,7 +1488,7 @@ SYSCALL(int, maConnGetAddr(MAHandle conn, MAConnAddr* addr)) {
 			return CONNERR_INTERNAL;
 		}
 	}
-	
+
 	CConnection* cc = gConnections.find(conn);
 	MYASSERT(cc, ERR_CONN_HANDLE_INVALID);
 	//we have 4 options: tcp client, bt client, tcp server, bt server

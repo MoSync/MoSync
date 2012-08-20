@@ -1329,14 +1329,14 @@ interface MAAPI {
 		TEXTBOX = 23;
 
 		/** \brief The home screen became visible.
-		 * Currently implemented only on Android.
+		 * Currently implemented only on Android and Symbian.
 		 * \see maHomeScreenEventsOn()
 		 */
 		HOMESCREEN_SHOWN = 24;
 
 		/** \brief The home screen was hidden because an
 		 * application came to front.
-		 * Currently implemented only on Android.
+		 * Currently implemented only on Android and Symbian.
 		 * \see maHomeScreenEventsOn()
 		 */
 		HOMESCREEN_HIDDEN = 25;
@@ -1483,7 +1483,14 @@ interface MAAPI {
 		* This event will contain a MAPurchaseEventData struct.
 		*/
 		PURCHASE = 48;
+
+		/** \brief The telephone network status changed.
+		* MAEvent::state the new state,
+		* one of the \link #MA_NETWORK_UNKNOWN MA_NETWORK \endlink constants.
+		*/
+		EVENT_TYPE_NETWORK = 49;
 		}
+	}
 
 	/**
 	* \brief Data for a connection event, including an indicator or success or failure.
@@ -3248,6 +3255,112 @@ interface MAAPI {
 		*/
 		int maGetSystemProperty(in MAString key, out MAString buf range("size"), in int size);
 
+		/**
+		* Normally, when the first Internet connection is made in a Symbian application,
+		* the user must choose an Internet Access Point.
+		*
+		* This function saves the ID of the active IAP for this application.
+		* It will be used automatically the next time the application is started.
+		*
+		* \returns 1 if the ID was successfully saved. 0 if there is no active IAP. \< 0 on error.
+		* \note Implemented only on Symbian.
+		*/
+		int maIapSave();
+
+		/**
+		* Removes any saved IAP ID for this application.
+		* The next time the application is started,
+		* or the next time an Internet connection is made after a call to maIapShutdown(),
+		* the user will have to select a new IAP.
+		* \returns 1 if the ID was successfully removed. 0 if there was no saved ID. \< 0 on error.
+		* \note Implemented only on Symbian.
+		* \see maIapSave()
+		*/
+		int maIapReset();
+
+		/**
+		* Shuts down the active IAP.
+		* This has the effect of calling maConnClose() on all existing connections.
+		* \returns 1 if the IAP was successfully shut down. 0 if there was no active IAP. \< 0 on error.
+		* \note Implemented only on Symbian.
+		* \see maIapSave()
+		*/
+		int maIapShutdown();
+
+		/**
+		* Returns the current telephone network status.
+		* This is one of the \link #MA_NETWORK_UNKNOWN MA_NETWORK \endlink constants.
+		* #MA_NETWORK_HOME and #MA_NETWORK_ROAMING are the most interesting ones;
+		* all the others are variants of "not connected".
+		* Returns \< 0 on error.
+		* \see #EVENT_TYPE_NETWORK
+		* \note Implemented only on Symbian, 3rd edition and later.
+		*/
+		int maNetworkStatus();
+
+		constset int MA_NETWORK_ {
+			UNKNOWN = 0;
+			NO_SERVICE = 1;
+			EMERGENCY_ONLY = 2;
+			SEARCHING = 3;
+			BUSY = 4;
+
+			/**
+			* Your operator's home network. Data connections are possible here.
+			*/
+			HOME = 5;
+			DENIED = 6;
+
+			/**
+			* You're abroad. Data connections are possible here, but usually, extremely expensive.
+			* Avoid making any connections unless you have WLAN access,
+			* or the user is very sure of the cost.
+			*/
+			ROAMING = 7;
+		}
+
+		/**
+		* Decides how IAP connection attempts should work.
+		*
+		* IAP connection attempts are made asynchronously by maConnect(),
+		* if there is no active IAP.
+		*
+		* This setting is reset to default when the application starts.
+		* \param type One of the \link #MA_IAP_METHOD_STANDARD MA_IAP_METHOD \endlink constants.
+		* \returns \< 0 on error.
+		* \note Implemented only on Symbian, 3rd edition and later.
+		*/
+		int maIapSetMethod(in int type);
+
+		constset int MA_IAP_METHOD_ {
+			/** The default. Connects to the IAP saved by maIapSave(), or,
+			* if there is no saved IAP, opens the IAP selection dialog.
+			*/
+			STANDARD = 1;
+			/**
+			* Connects to the WLAN IAP with the highest signal strength.
+			*/
+			WLAN = 2;
+		}
+
+		/**
+		* Decides which IAPs are visible in the IAP selection dialog.
+		* This setting is reset to default when the application starts.
+		* \param filter One of the \link #MA_IAP_FILTER_NOT_WLAN MA_IAP_FILTER \endlink constants.
+		* \returns \< 0 on error.
+		* \note Implemented only on Symbian, 3rd edition and later.
+		*/
+		int maIapSetFilter(in int filter);
+
+		constset int MA_IAP_FILTER_ {
+			/// All IAPs except WLAN.
+			NOT_WLAN = 1;
+			/// Only WLAN IAPs.
+			WLAN = 2;
+			/// All IAPs. This is the default.
+			ALL = 3;
+		}
+
 group PIMAPI "PIM API" {
 
 #if IX_PIM
@@ -4578,6 +4691,10 @@ group WidgetAPI "Widget API" {
 		 * @brief Sent when a map pin is clicked by the user.
 		 */
 		MAP_PIN_CLICKED = 32;
+	}
+
+	constset int IOCTL_ {
+		UNAVAILABLE = -1;
 	}
 	} // end of WidgetEventTypes
 

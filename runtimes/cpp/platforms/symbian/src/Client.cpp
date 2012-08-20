@@ -111,4 +111,11 @@ int RMoSyncServerSession::AutostartOff() {
 	return SendReceive(EMoSyncAutostartOff);
 }
 
+int RMoSyncServerSession::GetNetworkStatus(CTelephony::TNetworkRegistrationV1&) {
+	return KErrNotFound;
+}
+int RMoSyncServerSession::GetNetworkStatusChange(CTelephony::TNetworkRegistrationV1&) {
+	return KErrNotFound;
+}
+
 #endif	//SUPPORT_MOSYNC_SERVER
