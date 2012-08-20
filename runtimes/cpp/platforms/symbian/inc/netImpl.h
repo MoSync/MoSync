@@ -250,6 +250,7 @@ int maIapShutdown();
 #ifdef __SERIES60_3X__
 #ifdef SUPPORT_MOSYNC_SERVER
 int maNetworkStatus();
+void NetworkStatusChangeHandlerL(TInt result);
 #endif
 
 int maIapSetMethod(int method);
@@ -267,6 +268,11 @@ TDblQue<ConnOp> gConnOps;
 CActiveEnder* gConnCleanupQue;
 RStringPool gHttpStringPool;
 #ifdef __SERIES60_3X__
+#ifdef SUPPORT_MOSYNC_SERVER
+CTelephony::TNetworkRegistrationV1 gNetworkRegistration;
+CTelephony::TNetworkRegistrationV1Pckg gNetworkRegistrationPckg;
+CClassSynchronizer<Syscall>* gNetworkStatusSync;
+#endif
 int gIapMethod;
 int gIapFilter;
 #endif

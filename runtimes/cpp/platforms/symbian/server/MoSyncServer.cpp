@@ -28,6 +28,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "ClientServer.h"
 #include "ActiveEnder.h"
 #include "Log.h"
+#include "NetworkInfo.h"
 
 //**********************************
 //CMoSyncServer - implementations
@@ -106,6 +107,22 @@ CMoSyncSession::~CMoSyncSession() {
 	if(mEnder != NULL)
 		delete mEnder;
 	LOG("~CMoSyncSession 4\n");
+	//LOG("~mNetworkInfo\n");
+	if(mNetworkInfo != NULL)
+		delete mNetworkInfo;
+	//LOG("~mNetworkStatus\n");
+	if(mNetworkStatus != NULL)
+		delete mNetworkStatus;
+	//LOG("~mNetworkStatusChange\n");
+	if(mNetworkStatusChange != NULL)
+		delete mNetworkStatusChange;
+	//LOG("~mTelephony\n");
+	if(mTelephony != NULL)
+		delete mTelephony;
+	//LOG("~mEnder\n");
+	if(mEnder != NULL)
+		delete mEnder;
+	LOG("~CMoSyncSession ends\n");
 }
 
 void CMoSyncSession::ConstructL() {
@@ -133,7 +150,7 @@ void CMoSyncSession::DispatchMessageL(const RMessage2& aMessage)
 	switch (aMessage.Function())
 	{
 	case EMoSyncGetNetworkInfo:
-		GetNetworkInfoL(aMessage);
+		GetTelephonyInfoL(aMessage, mNetworkInfo);
 		return;
 	case EMoSyncLocationGet:
 		LocationGetL(aMessage);
@@ -147,14 +164,34 @@ void CMoSyncSession::DispatchMessageL(const RMessage2& aMessage)
 	case EMoSyncAutostartOff:
 		AutostartOffL(aMessage);
 		return;
-	//  Requests that we don't understand at all are a different matter.
-	//  This is considered a client programming error, so we panic the
-	//  client - this also completes the message.
+	case EMoSyncGetNetworkStatus:
+		GetTelephonyInfoL(aMessage, mNetworkStatus);
+		return;
+	case EMoSyncGetNetworkStatusChange:
+		GetTelephonyInfoL(aMessage, mNetworkStatusChange);
+		return;
+	case EMoSyncCancelNetworkStatusChange:
+		CancelNetworkStatusChange(aMessage);
+		return;
+
+	 //  Requests that we don't understand at all are a different matter.
+	 //  This is considered a client programming error, so we panic the
+	 //  client - this also completes the message.
 	default:
 		LOG("Bad request: %i\n", aMessage.Function());
 		PanicClient(aMessage, EBadRequest);
 		return;
 	}
+}
+
+void CMoSyncSession::CancelNetworkStatusChange(const RMessage2& aMessage) {
+	LOG("CancelNetworkStatusChange\n");
+	if(mNetworkStatusChange) {
+		if(mNetworkStatusChange->IsActive()) {
+			mNetworkStatusChange->Cancel();
+		}
+	}
+	aMessage.Complete(KErrNone);
 }
 
 /**

@@ -4,7 +4,7 @@
 &EN
 
 ; standard SIS file header
-#{"MoSyncServer"},(0x20022A9D),1,2,0, TYPE=SA
+#{"MoSyncServer2"},(0x20037EBF),1,5,0, TYPE=SA
 
 ;Localised Vendor name
 %{"Mobile Sorcery AB"}

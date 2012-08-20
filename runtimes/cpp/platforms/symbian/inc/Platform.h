@@ -186,7 +186,8 @@ public:
 	int AutostartOff();
 
 	int GetNetworkStatus(CTelephony::TNetworkRegistrationV1&);
-	int GetNetworkStatusChange(CTelephony::TNetworkRegistrationV1&);
+	void GetNetworkStatusChange(CTelephony::TNetworkRegistrationV1Pckg&, TRequestStatus&);
+	void CancelNetworkStatusChange();
 private:
 	TPosition mPosition;
 	TPckg<TPosition> mPositionPckg;

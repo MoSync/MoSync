@@ -38,6 +38,9 @@ void Syscall::ClearNetworkingVariables() {
 	gConnCleanupQue = NULL;
 	gNetworkingState = EIdle;
 #ifdef __SERIES60_3X__
+#ifdef SUPPORT_MOSYNC_SERVER
+	gNetworkStatusSync = NULL;
+#endif
 	gIapMethod = MA_IAP_METHOD_STANDARD;
 	gIapFilter = MA_IAP_FILTER_ALL;
 #endif
@@ -62,13 +65,60 @@ void Syscall::ConstructNetworkingL() {
 	gIapPath16.Append(KIapFileName);
 	gIapPath8.Copy(gIapPath16);
 	LOGS("iap path: %s\n", gIapPath8.PtrZ());
+
+#ifdef SUPPORT_MOSYNC_SERVER
+	gNetworkStatusSync = new (ELeave) CClassSynchronizer<Syscall>(this,
+		&Syscall::NetworkStatusChangeHandlerL);
+	gServer.GetNetworkStatusChange(gNetworkRegistrationPckg,
+		*gNetworkStatusSync->Status());
+	gNetworkStatusSync->SetActive();
+#endif
 }
 
 void Syscall::DestructNetworking() {
+	LOG("DestructNetworking\n");
+#ifdef SUPPORT_MOSYNC_SERVER
+	if(gNetworkStatusSync) {
+		gServer.CancelNetworkStatusChange();
+		User::WaitForRequest(*gNetworkStatusSync->Status());
+	}
+	SAFE_DELETE(gNetworkStatusSync);
+#endif
 	maIapShutdown();
 	SAFE_DELETE(gConnCleanupQue);
 	gHttpStringPool.Close();
+	LOG("DestructNetworking done\n");
 }
+
+#ifdef SUPPORT_MOSYNC_SERVER
+int Syscall::maNetworkStatus() {
+	CTelephony::TNetworkRegistrationV1 nr;
+	int res = gServer.GetNetworkStatus(nr);
+	if(res != KErrNone) {
+		LOG("GetNetworkStatus error %i\n", res);
+		return res;
+	}
+	return nr.iRegStatus;
+}
+
+void Syscall::NetworkStatusChangeHandlerL(TInt result) {
+	LOG("NetworkStatusChangeHandlerL(%i) %i\n", result, gNetworkRegistration.iRegStatus);
+	if(result != KErrNone) {
+		LOG("Error %i, stopping network status change notifications.\n", result);
+		return;
+	}
+	// send event to inferior.
+	MAEvent e;
+	e.type = EVENT_TYPE_NETWORK;
+	e.state = gNetworkRegistration.iRegStatus;
+	gAppView.AddEvent(e);
+
+	// moar notifications, please.
+	gServer.GetNetworkStatusChange(gNetworkRegistrationPckg,
+		*gNetworkStatusSync->Status());
+	gNetworkStatusSync->SetActive();
+}
+#endif	//SUPPORT_MOSYNC_SERVER
 
 // todo: improve efficiency by using native file api instead of FileStream.
 bool Syscall::getSavedIap(TUint& iap) {

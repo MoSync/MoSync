@@ -111,11 +111,23 @@ int RMoSyncServerSession::AutostartOff() {
 	return SendReceive(EMoSyncAutostartOff);
 }
 
-int RMoSyncServerSession::GetNetworkStatus(CTelephony::TNetworkRegistrationV1&) {
-	return KErrNotFound;
+int RMoSyncServerSession::GetNetworkStatus(
+	CTelephony::TNetworkRegistrationV1& nr)
+{
+	CTelephony::TNetworkRegistrationV1Pckg pckg(nr);
+	TIpcArgs args(&pckg);
+	return SendReceive(EMoSyncGetNetworkStatus, args);
 }
-int RMoSyncServerSession::GetNetworkStatusChange(CTelephony::TNetworkRegistrationV1&) {
-	return KErrNotFound;
+
+void RMoSyncServerSession::GetNetworkStatusChange(
+	CTelephony::TNetworkRegistrationV1Pckg& nr, TRequestStatus& aStatus)
+{
+	TIpcArgs args(&nr);
+	SendReceive(EMoSyncGetNetworkStatusChange, args, aStatus);
+}
+
+void RMoSyncServerSession::CancelNetworkStatusChange() {
+	Send(EMoSyncCancelNetworkStatusChange);
 }
 
 #endif	//SUPPORT_MOSYNC_SERVER

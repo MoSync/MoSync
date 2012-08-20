@@ -248,6 +248,9 @@ CONSTRUCTOR_ARGUMENTS(INIT_ARG_VAR, COMMA),
 #ifdef TELEPHONY
 gTelephony(NULL),
 #endif
+#ifdef SUPPORT_MOSYNC_SERVER
+gNetworkRegistrationPckg(gNetworkRegistration),
+#endif
 gBtDeviceArray(8, 0),
 resourcesCount(-1),
 resource(NULL)
@@ -507,6 +510,11 @@ void Syscall::platformDestruct() {
 	SAFE_DELETE(gVibraControl);
 
 	gFileLists.close();
+
+#ifdef SUPPORT_MOSYNC_SERVER
+	LOG("gServer.Close();\n");
+	gServer.Close();
+#endif
 
 	DebugMarkEnd();
 	LOG("platformDestruct() done\n");

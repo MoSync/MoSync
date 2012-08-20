@@ -25,7 +25,7 @@ _LIT(KMoSyncServer, "MoSync Server 2");
 
 // A version must be specified when creating a session with the server
 const TUint KMoSyncMajorVersionNumber=1;
-const TUint KMoSyncMinorVersionNumber=2;
+const TUint KMoSyncMinorVersionNumber=5;
 const TUint KMoSyncBuildVersionNumber=0;
 
 // Function codes (opcodes) used in message passing between client and server
@@ -37,6 +37,10 @@ enum TMoSyncServRqst
 	EMoSyncLocationStop,
 	EMoSyncAutostartOn,
 	EMoSyncAutostartOff,
+	EMoSyncAutostartTimer,
+	EMoSyncGetNetworkStatus,
+	EMoSyncGetNetworkStatusChange,
+	EMoSyncCancelNetworkStatusChange,
 };
 
 // reasons for server panic

@@ -1485,10 +1485,10 @@ interface MAAPI {
 		PURCHASE = 48;
 
 		/** \brief The telephone network status changed.
-		* MAEvent::state the new state,
+		* MAEvent::state is the new state,
 		* one of the \link #MA_NETWORK_UNKNOWN MA_NETWORK \endlink constants.
 		*/
-		EVENT_TYPE_NETWORK = 49;
+		NETWORK = 49;
 		}
 	}
 

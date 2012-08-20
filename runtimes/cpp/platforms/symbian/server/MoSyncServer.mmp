@@ -16,7 +16,6 @@ EPOCSTACKSIZE	0x10000
 
 SOURCEPATH	.
 SOURCE		MoSyncServer.cpp
-SOURCE		GetNetworkInfo.cpp
 SOURCE		ActiveEnder.cpp
 SOURCE		Log.cpp
 SOURCE		Location.cpp
