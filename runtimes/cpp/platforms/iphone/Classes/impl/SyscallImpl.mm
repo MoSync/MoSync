@@ -140,6 +140,8 @@ extern ThreadPool gThreadPool;
     MARect mPreviewArea; //the sub area captured from the frame
     int mEventStatus; //MA_CAMERA_PREVIEW_FRAME/AUTO_FOCUS
     bool mCaptureOutput; //only want to capture one frame and then wait for maCameraPreviewEventConsumed is called, this bool is used for that
+    unsigned int mCaptureOnFocus; //flag for capturing frame on autofocus, which should only be done every second time, because on the first event,
+    //the camera hasn't focus yet
     @private
     dispatch_queue_t mSerialQueue;
 }
@@ -164,6 +166,7 @@ extern ThreadPool gThreadPool;
 - (id)init{
     if((self = [super init]))
     {
+        mCaptureOnFocus = 0;
         mEventStatus = -1; //neither FRAME nor AUTO_FOCUS
         mCaptureOutput = false;
         mSerialQueue = dispatch_queue_create("com.mosync.cameraPreviewQueue", NULL); //need a serial queue to get preview frames in order
@@ -172,7 +175,7 @@ extern ThreadPool gThreadPool;
 }
 - (void)dealloc{
     dispatch_release(mSerialQueue); //release dispatch queue
-    //[super dealloc]; //this hung the application
+    //no [super dealloc]; on delegates
 }
 - (void)captureOutput:(AVCaptureOutput *)captureOutput didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer fromConnection:(AVCaptureConnection *)connection{
     if(mCaptureOutput){//only capture one frame at a time
@@ -209,7 +212,10 @@ extern ThreadPool gThreadPool;
     }
     if ([keyPath isEqualToString:@"adjustingFocus"] )
     {
-        mCaptureOutput = true;
+        if(mCaptureOnFocus % 2) {//only capture a frame on the 2nd of two AF events
+            mCaptureOutput = true;
+        }
+        ++mCaptureOnFocus;
     }
 }
 - (dispatch_queue_t)getQueue{
@@ -1977,7 +1983,7 @@ namespace Base {
             }
             else //unsupported event type
             {
-                return -2;
+                return -1;
             }
 
         }
@@ -1991,6 +1997,8 @@ namespace Base {
         @try {
             if(gCameraPreviewEventHandler)
             {
+                CameraInfo *info = getCurrentCameraInfo();
+                [info->captureSession removeOutput:info->videoDataOutput];//stop listening for camera output
                 [gCameraPreviewEventHandler release];
                 gCameraPreviewEventHandler = NULL; //so that next maCameraPreviewEventEnable call can init it again
             }
