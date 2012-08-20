@@ -1672,14 +1672,6 @@ SYSCALL(longlong, maIOCtl(int function, int a, int b, int c)) {
 	}
 }
 
-#ifdef SUPPORT_MOSYNC_SERVER
-int Syscall::maNetworkStatus() {
-	CTelephony::TNetworkRegistrationV1 nr;
-	LHEL(gServer.GetNetworkStatus(nr));
-	return nr.iRegStatus;
-}
-#endif
-
 #ifdef CALL
 int Syscall::platformTel(const char* tel) {
 	TPtrC8 np(CBP tel);

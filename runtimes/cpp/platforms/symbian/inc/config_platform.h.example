@@ -12,7 +12,7 @@
 #define MOSYNC_COMMERCIAL	//controls nag text
 #define PUBLIC_DEBUG
 
-//#define MA_PROF_SUPPORT_FRAMEBUFFER_32BIT 
+//#define MA_PROF_SUPPORT_FRAMEBUFFER_32BIT
 
 
 //#define GUIDO
@@ -21,7 +21,7 @@
 #define WLAN
 //#define CELLID
 #define CALL
-//#define SUPPORT_MOSYNC_SERVER
+#define SUPPORT_MOSYNC_SERVER
 //#define SUPPORT_AUDIOBUFFER
 
 //#define USE_ARM_RECOMPILER

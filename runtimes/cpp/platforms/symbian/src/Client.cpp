@@ -23,7 +23,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <apgcli.h> // link against apgrfx.lib
 #include <apacmdln.h> // link against apparc.lib
 
-_LIT(KMoSyncServerExe, "MoSyncServer.exe");
+_LIT(KMoSyncServerExe, "20037EBF.exe");
 
 //does nothing if server is already started
 //todo: don't die if server can't be started

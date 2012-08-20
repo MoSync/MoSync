@@ -18,6 +18,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <eikon.hrh>
 #include <apgcli.h>
 #include <aknutils.h>
+#include <APGWGNAM.H>
 
 #include "Application.h"
 #include "AppUi.h"

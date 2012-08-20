@@ -27,14 +27,18 @@ private:
 	bool mPressed;
 public:
 	MyMoblet() {
+		int res;
 		printf("Capturing hash key.\n");
+#if 0
 		printf("Will bring app to foreground on long-press.\n");
-		int res = maKeyCaptureLongStart('#');
+		res = maKeyCaptureLongStart('#');
 		printf("kcls: %i\n", res);
+#endif
 		res = maHomeScreenEventsOn();
-		printf("sceo: %i\n", res);
+		printf("hseo: %i\n", res);
 		res = maAutostartOn();
 		printf("ao: %i\n", res);
+		maBringToForeground();
 	}
 
 	void keyPressEvent(int keyCode, int nativeCode) {
@@ -42,6 +46,7 @@ public:
 			maExit(0);
 	}
 
+#if 0
 	void customEvent(const MAEvent& e) {
 		printf("cE %i. key %i\n", e.type, e.key);
 		if(e.type == EVENT_TYPE_KEY_LONGPRESS) {
@@ -49,6 +54,7 @@ public:
 			printf("btf: %i\n", res);
 		}
 	}
+#endif
 };
 
 extern "C" int MAMain() {

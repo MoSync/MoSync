@@ -1489,7 +1489,6 @@ interface MAAPI {
 		* one of the \link #MA_NETWORK_UNKNOWN MA_NETWORK \endlink constants.
 		*/
 		NETWORK = 49;
-		}
 	}
 
 	/**
@@ -4691,10 +4690,6 @@ group WidgetAPI "Widget API" {
 		 * @brief Sent when a map pin is clicked by the user.
 		 */
 		MAP_PIN_CLICKED = 32;
-	}
-
-	constset int IOCTL_ {
-		UNAVAILABLE = -1;
 	}
 	} // end of WidgetEventTypes
 

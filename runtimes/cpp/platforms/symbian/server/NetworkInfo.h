@@ -29,7 +29,7 @@ protected:
 	CTelephony* mTelephony;
 public:
 	template<class T> CTelephonyHandler(CTelephony* aTelephony, CTelephony::TCancellationRequest cr, T& data) :
-		CActive(EPriorityStandard), mPckg((TUint8*)&data, sizeof(T), sizeof(T)), mCancellationCode(cr), mTelephony(aTelephony) {}
+		mPckg((TUint8*)&data, sizeof(T), sizeof(T)), mCancellationCode(cr), mTelephony(aTelephony) {}
 	virtual ~CTelephonyHandler() {
 		if(IsActive())
 			Cancel();
@@ -52,7 +52,7 @@ public:
 class CNetworkInfoGetter : public CTelephonyHandler {
 public:
 	CNetworkInfoGetter(CTelephony* aTelephony) :
-		CActive(EPriorityStandard), CTelephonyHandler(aTelephony, CTelephony::EGetCurrentNetworkInfoCancel, mInfo) {}
+		CTelephonyHandler(aTelephony, CTelephony::EGetCurrentNetworkInfoCancel, mInfo) {}
 	virtual ~CNetworkInfoGetter() {}
 
 	void start(const RMessage2& aMessage) {
@@ -68,7 +68,7 @@ private:
 class CNetworkStatusGetter : public CTelephonyHandler {
 public:
 	CNetworkStatusGetter(CTelephony* aTelephony) :
-		CActive(EPriorityStandard), CTelephonyHandler(aTelephony, CTelephony::EGetNetworkRegistrationStatusCancel, mNR) {}
+		CTelephonyHandler(aTelephony, CTelephony::EGetNetworkRegistrationStatusCancel, mNR) {}
 	virtual ~CNetworkStatusGetter() {}
 
 	void start(const RMessage2& aMessage) {
@@ -84,7 +84,7 @@ private:
 class CNetworkStatusChangeGetter : public CTelephonyHandler {
 public:
 	CNetworkStatusChangeGetter(CTelephony* aTelephony) :
-		CActive(EPriorityStandard), CTelephonyHandler(aTelephony, CTelephony::ENetworkRegistrationStatusChangeCancel, mNR) {}
+		CTelephonyHandler(aTelephony, CTelephony::ENetworkRegistrationStatusChangeCancel, mNR) {}
 	virtual ~CNetworkStatusChangeGetter() {}
 
 	void start(const RMessage2& aMessage) {

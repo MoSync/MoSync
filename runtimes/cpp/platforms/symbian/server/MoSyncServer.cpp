@@ -93,33 +93,30 @@ void CMoSyncServer::PanicServer(TMoSyncPanic aPanic)
 //***********************************
 
 CMoSyncSession::CMoSyncSession()
-: mEnder(NULL), mTelephony(NULL), mPn(NULL), mPositionerOpen(false)
+: mEnder(NULL), mTelephony(NULL),
+mNetworkInfo(NULL),
+mNetworkStatus(NULL),
+mNetworkStatusChange(NULL),
+mPn(NULL), mPositionerOpen(false)
 {
 }
 
 CMoSyncSession::~CMoSyncSession() {
 	LOG("~CMoSyncSession 1\n");
 	LocationStop();
-	LOG("~CMoSyncSession 2\n");
+	LOG("~mTelephony\n");
 	if(mTelephony != NULL)
 		delete mTelephony;
-	LOG("~CMoSyncSession 3\n");
-	if(mEnder != NULL)
-		delete mEnder;
-	LOG("~CMoSyncSession 4\n");
-	//LOG("~mNetworkInfo\n");
+	LOG("~mNetworkInfo\n");
 	if(mNetworkInfo != NULL)
 		delete mNetworkInfo;
-	//LOG("~mNetworkStatus\n");
+	LOG("~mNetworkStatus\n");
 	if(mNetworkStatus != NULL)
 		delete mNetworkStatus;
-	//LOG("~mNetworkStatusChange\n");
+	LOG("~mNetworkStatusChange\n");
 	if(mNetworkStatusChange != NULL)
 		delete mNetworkStatusChange;
-	//LOG("~mTelephony\n");
-	if(mTelephony != NULL)
-		delete mTelephony;
-	//LOG("~mEnder\n");
+	LOG("~mEnder\n");
 	if(mEnder != NULL)
 		delete mEnder;
 	LOG("~CMoSyncSession ends\n");

@@ -108,7 +108,7 @@ void CMoSyncServer::doAutostartL() {
 	as.ResizeL(count);
 	if(count == 0) {
 		LOG("Database empty.\n");
-		return asp;
+		return;
 	}
 	//LOG("doAutostartL 5\n");
 	TPtr8 ptr((TUint8 *)&as[0], size);
