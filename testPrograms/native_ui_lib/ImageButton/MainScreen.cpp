@@ -88,10 +88,10 @@ void MainScreen::buttonPressed(Widget* button)
     if (button == mImageButton)
     {
         printf("button pressed event for mImageButton");
+        ListViewItem* item = new ListViewItem();
+        item->setText("buttonPressed");
+        mEvents->addChild(item);
     }
-    Label* event = new Label();
-    event->setText("buttonPressed");
-    mEvents->addChild(event);
 }
 
 /**
@@ -105,10 +105,10 @@ void MainScreen::buttonReleased(Widget* button)
     if (button == mImageButton)
     {
         printf("button released event for mImageButton");
+        ListViewItem* item = new ListViewItem();
+        item->setText("buttonReleased");
+        mEvents->addChild(item);
     }
-    Label* event = new Label();
-    event->setText("buttonReleased");
-    mEvents->addChild(event);
 }
 
 /**
@@ -122,8 +122,8 @@ void MainScreen::buttonClicked(Widget* button)
     if (button == mImageButton)
     {
         printf("button clicked event for mImageButton");
+        ListViewItem* item = new ListViewItem();
+        item->setText("buttonClicked");
+        mEvents->addChild(item);
     }
-    Label* event = new Label();
-    event->setText("buttonClicked");
-    mEvents->addChild(event);
 }
