@@ -37,11 +37,14 @@ CAppUi::~CAppUi()
 		RemoveFromStack(iAppView);
 		delete iAppView;
 	}
+#ifdef __SERIES60_3X__
+	SAFE_DELETE(iGn);
+#endif
 	SAFE_DELETE(iBuf);
 	LOGD("~CAppUi ends\n");
 }
 
-void CAppUi::ConstructL( void ) 
+void CAppUi::ConstructL( void )
 {
 	// initialize appUI with standard values, read standard resource files
 	BaseConstructL(EAknEnableSkin);
@@ -53,6 +56,8 @@ void CAppUi::ConstructL( void )
 	AddToStackL( iAppView );        // view now gets key press events
 
 #ifdef __SERIES60_3X__
+	iGn = CApaWindowGroupName::NewL(iWsSession);
+
 	iInterfaceSelector = CRemConInterfaceSelector::NewL();
 	iCoreTarget = CRemConCoreApiTarget::NewL(*iInterfaceSelector, *this);
 	iInterfaceSelector->OpenTargetL();
@@ -61,13 +66,16 @@ void CAppUi::ConstructL( void )
 	LOG("Initialization complete.\n");
 }
 
-CAppUi::CAppUi( CDocument& aDocument ) 
+CAppUi::CAppUi( CDocument& aDocument )
 : iDocument(aDocument), iReload(false), iAppView(NULL), iExiting(false), iBuf(NULL)
-{    
+#ifdef __SERIES60_3X__
+	,iWsSession(iEikonEnv->WsSession()), iGn(NULL), iHomeScreenShown(false)
+#endif
+{
 }
 
-void CAppUi::HandleCommandL( TInt aCommand ) 
-{    
+void CAppUi::HandleCommandL( TInt aCommand )
+{
 	switch(aCommand) {
 		case EEikCmdExit:
 			LOG("EEikCmdExit\n");
@@ -143,12 +151,49 @@ void CAppUi::Exit() {
 	}
 	iExiting = true;
 	Stop();
-	
+
 	//HACK-test, recompiler USER-EXEC 3
 	//LOG("calling User::Leave()\n");
 	//User::Leave(KLeaveMoSyncExit);
-	
+
 	LOG("calling CAknAppUi::Exit()\n");
 	CAknAppUi::Exit();
 	LOG("CAppUi::Exit() ends\n");
+}
+
+void CAppUi::HandleWsEventL(const TWsEvent& aEvent, CCoeControl* aDestination) {
+	CAknAppUi::HandleWsEventL(aEvent, aDestination);
+	LOGD("WsEvent type %i\n", aEvent.Type());
+#ifdef __SERIES60_3X__
+	if(aEvent.Type() == EEventFocusGroupChanged) {
+		LOGD("EEventFocusGroupChanged\n");
+		TInt wgid = iWsSession.GetFocusWindowGroup();
+		iGn->ConstructFromWgIdL(wgid);
+		int uid = iGn->AppUid().iUid;
+		LOGD("UID: 0x%08X\n", uid);
+		MAEvent e;
+		bool doEvent = false;
+		switch(uid) {
+		// http://wiki.forum.nokia.com/index.php/UID_standby_phone
+		case 0x100058B3:
+		case 0x102750F0:
+		case 0x101FD64C:
+			LOGD("Standby screen!\n");
+			e.type = EVENT_TYPE_HOMESCREEN_SHOWN;
+			if(!iHomeScreenShown) {
+				iHomeScreenShown = true;
+				doEvent = true;
+			}
+			break;
+		default:
+			e.type = EVENT_TYPE_HOMESCREEN_HIDDEN;
+			if(iHomeScreenShown) {
+				iHomeScreenShown = false;
+				doEvent = true;
+			}
+		}
+		if(doEvent)
+			iAppView->AddEvent(e);
+	}
+#endif	//__SERIES60_3X__
 }
