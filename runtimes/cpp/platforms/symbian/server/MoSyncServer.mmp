@@ -20,6 +20,9 @@ SOURCE		GetNetworkInfo.cpp
 SOURCE		ActiveEnder.cpp
 SOURCE		Log.cpp
 SOURCE		Location.cpp
+SOURCE		Autostart.cpp
+
+RESOURCE		MoSyncServer_startup.rss
 
 USERINCLUDE	.
 SYSTEMINCLUDE	\Epoc32\include
@@ -28,3 +31,4 @@ LIBRARY		euser.lib
 LIBRARY		etel3rdparty.lib
 LIBRARY		efsrv.lib
 LIBRARY		Lbs.lib
+LIBRARY apparc.lib

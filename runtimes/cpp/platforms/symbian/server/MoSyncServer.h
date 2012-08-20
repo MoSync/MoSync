@@ -48,8 +48,14 @@ public:
 	static void PanicServer(TMoSyncPanic aPanic);
 
 	CMoSyncServer(CActive::TPriority aActiveObjectPriority);
-};
+	virtual ~CMoSyncServer();
 
+	// Load autostart database and start any programs therein.
+	void doAutostartL();
+	void writeAutostartDbL();
+
+	CArrayFixFlat<TInt>* mAutostart;
+};
 
 //**********************************
 //CMoSyncSession
@@ -81,6 +87,9 @@ public:
 	
 	void LocationGetL(const RMessage2& aMessage);
 	void LocationStopL(const RMessage2& aMessage);
+
+	void AutostartOnL(const RMessage2& aMessage);
+	void AutostartOffL(const RMessage2& aMessage);
 
 protected:
 	// panic the client, but leave the server running

@@ -8767,6 +8767,20 @@ group CameraFunctions "Camera Functions" {
 		int maScreenSetFullscreen(in int fullscreen);
 
 		/**
+		* Registers this application for autostart on device reboot.
+		* Applications started this way start in the background;
+		* invisible to the user, unless they check the list of running applications.
+		* \returns 1 on success, 0 if already registered, \< 0 on error.
+		*/
+		int maAutostartOn();
+
+		/**
+		* Removes autostart registration for this application.
+		* \returns 1 on success, 0 if already unregistered, \< 0 on error.
+		*/
+		int maAutostartOff();
+
+		/**
 		* Set supported screen orientations.
 		* Currently implemented on iOS and WindowsPhone 7.1.
 		* @param orientations A bitmask consisting of flags describing the supported screen orientations.

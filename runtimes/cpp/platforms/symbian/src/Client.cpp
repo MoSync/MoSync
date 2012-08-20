@@ -39,7 +39,7 @@ static void StartServer() {
 	LOG("Starting server...\n");
 
 /*	TThreadId app_threadid;
-	CApaCommandLine* cmdLine; 
+	CApaCommandLine* cmdLine;
 	cmdLine=CApaCommandLine::NewLC();
 	cmdLine->SetExecutableNameL(KMoSyncServerExe);
 	cmdLine->SetCommandL(EApaCommandRun);
@@ -49,10 +49,10 @@ static void StartServer() {
 	ls.Close();
 	CleanupStack::PopAndDestroy(cmdLine);
 	LHEL(err);*/
-	
+
 	RProcess proc;
 	TRequestStatus rendezvousStatus;
-	
+
 	//if this fails, display a friendly "reinstall" message.
 	TInt res = proc.Create(KMoSyncServerExe, KNullDesC);
 	if(IS_SYMBIAN_ERROR(res)) {
@@ -64,7 +64,7 @@ static void StartServer() {
 #endif
 		ShowAknErrorNoteThenExitL(KErrorMessage);
 	}
-	
+
 	proc.Rendezvous(rendezvousStatus);
 	proc.Resume();
 	User::WaitForRequest(rendezvousStatus);
@@ -93,6 +93,14 @@ void RMoSyncServerSession::LocationGet(TRequestStatus& aStatus) {
 }
 int RMoSyncServerSession::LocationStop() {
 	return Send(EMoSyncLocationStop);
+}
+
+int RMoSyncServerSession::AutostartOn() {
+	return SendReceive(EMoSyncAutostartOn);
+}
+
+int RMoSyncServerSession::AutostartOff() {
+	return SendReceive(EMoSyncAutostartOff);
 }
 
 #endif	//SUPPORT_MOSYNC_SERVER

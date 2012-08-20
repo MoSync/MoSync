@@ -1633,6 +1633,20 @@ SYSCALL(longlong, maIOCtl(int function, int a, int b, int c)) {
 
 	maIOCtl_syscall_case(maTextBox);
 
+#ifdef SUPPORT_MOSYNC_SERVER
+	case maIOCtl_maAutostartOn:
+		return gServer.AutostartOn();
+	case maIOCtl_maAutostartOff:
+		return gServer.AutostartOff();
+#endif
+
+	case maIOCtl_maHomeScreenEventsOn:
+		gAppView.HomeScreenEventsOn();
+		return 1;
+	case maIOCtl_maHomeScreenEventsOff:
+		gAppView.HomeScreenEventsOff();
+		return 1;
+
 	default:
 		return IOCTL_UNAVAILABLE;
 	}

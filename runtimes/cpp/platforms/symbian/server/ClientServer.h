@@ -35,6 +35,8 @@ enum TMoSyncServRqst
 	EMoSyncGetSubscriberId,	//CTelephony::GetSubscriberId
 	EMoSyncLocationGet,
 	EMoSyncLocationStop,
+	EMoSyncAutostartOn,
+	EMoSyncAutostartOff,
 };
 
 // reasons for server panic
@@ -45,7 +47,8 @@ enum TMoSyncPanic
 	EMainSchedulerError,
 	ESvrCreateServer,
 	ESvrStartServer,
-	ECreateTrapCleanup
+	ECreateTrapCleanup,
+	EInternal,
 	//ENotImplementedYet,
 };
 

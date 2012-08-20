@@ -155,7 +155,7 @@ public:
 	virtual bool Write(const TDesC8& aDesc, CPublicActive& op) = 0;
 
 	virtual void CancelAll() = 0;
-	
+
 	virtual void GetAddr(MAConnAddr* addr) = 0;
 
 	virtual CHttpConnection* http() { return NULL; }
@@ -176,11 +176,14 @@ public:
 	TVersion Version(void) const;
 
 	int GetNetworkInfo(TDes8& aPckg);
-	
+
 	void LocationGet(TRequestStatus& aStatus);
 	int LocationStop();
-	
+
 	const TPosition& Position() const { return mPosition; }
+
+	int AutostartOn();
+	int AutostartOff();
 private:
 	TPosition mPosition;
 	TPckg<TPosition> mPositionPckg;

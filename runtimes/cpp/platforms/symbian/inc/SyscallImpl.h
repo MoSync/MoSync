@@ -137,7 +137,7 @@ private:
 #endif	//CALL
 
 	//Location API
-#if defined(SUPPORT_MOSYNC_SERVER) && !defined(__S60_50__)
+#if defined(SUPPORT_MOSYNC_SERVER)
 	RMoSyncServerSession gServer;
 #endif
 
@@ -155,6 +155,9 @@ private:
 	void LocationHandlerL(TInt status);
 	void AddLocationEvent(const TPosition&);
 #endif
+
+	int maAutostartOn();
+	int maAutostartOff();
 
 	bool gStreamWantsToPause;
 

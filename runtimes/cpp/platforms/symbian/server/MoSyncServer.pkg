@@ -15,8 +15,12 @@
 ;Supports S60 3rd Edition
 [0x101F7961], 0, 0, 0, {"S60ProductID"};
 
-;Files to install
-"\Symbian\9.2\S60_3rd_FP1\Epoc32\release\gcce\urel\MoSyncServer.exe" -"!:\sys\bin\MoSyncServer.exe"
+;Supports S60 5th Edition
+[0x1028315F], 0, 0, 0, {"Series60ProductID"}
 
-;required for application to be covered by backup/restore facility 
+;Files to install
+"\Symbian\9.2\S60_3rd_FP1\Epoc32\data\MoSyncServer_startup.RSC" -"c:\private\101f875a\import\[20037EBF].rsc"
+"\Symbian\9.2\S60_3rd_FP1\Epoc32\release\gcce\urel\MoSyncServer.exe" -"!:\sys\bin\20037EBF.exe"
+
+;required for application to be covered by backup/restore facility
 ;	"backup_registration.xml" -"!:\private\MoSyncServer\backup_registration.xml"

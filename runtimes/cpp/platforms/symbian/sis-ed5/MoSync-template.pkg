@@ -15,6 +15,10 @@
 ;Supports S60 5th Edition
 [0x1028315F], 0, 0, 0, {"Series60ProductID"}
 
+;Requires the MoSync Server, v1.3.0
+@"%pkg-runtime-dir%/MoSyncServer.sis",(0x20037EBF)
+(0x20037EBF), 1, 3, 0, {"MoSync Server"}
+
 ;Files to install
 "%pkg-package-output-dir%\%uid%.exe" -"!:\sys\bin\%uid%.exe"
 "%pkg-programcomb-output%" -"!:\resource\apps\%uid%.comb"
