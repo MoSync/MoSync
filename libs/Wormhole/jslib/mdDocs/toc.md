@@ -19,3 +19,5 @@ Wormhole
 [Keyword Index](./_index.html)
 
 [License](./licenses.md.html)
+
+[C++ API Reference](http://www.mobilesorcery.com/files/imports/doxygen/latest/html/index.html)
