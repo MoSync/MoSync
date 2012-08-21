@@ -101,7 +101,21 @@ void MainScreen::createMainLayout() {
 	// Create and add the main layout to the screen.
 	VerticalLayout* mainLayout = new VerticalLayout();
 	Screen::setMainWidget(mainLayout);
-	mBanner = new Banner("a14dbba084368db");
+
+	int platformType = getPlatform();
+	if (platformType == ANDROID || platformType == IOS)
+	{
+		// ID required for the android platform (the IOS platform will ignore it)
+		mBanner = new Banner("a14dbba084368db");
+	}
+	else if (getPlatform() == WINDOWSPHONE7)
+	{
+		// we need to send the APP ID and the AD ID to the mosync banner constructor
+		// for the windows phone 7 platform (we'll use APP ID = 'test_client' and
+		// AD ID = 'Image480_80' to enable the test mode)
+		mBanner = new Banner("test_client|Image480_80");
+	}
+
 	mBanner->requestContent(true);
 	mainLayout->addBanner(mBanner);
 
@@ -207,7 +221,7 @@ void MainScreen::bannerFailedLoad(
 	itoa(error, buf, 10);
 	MAUtil::String text = "bannerFailedLoad error code = ";
 	text += buf;
-	mBannerMessage->setText("bannerFailedLoad");
+	mBannerMessage->setText(text);
 }
 
 /**
