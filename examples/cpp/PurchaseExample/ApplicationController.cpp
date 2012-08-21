@@ -139,6 +139,18 @@ void ApplicationController::requestFailed(const Purchase& purchase,
 {
 	mMainScreen->productError("Purchase failed for product "
 			+ purchase.getProductId() );
+	for (int i = 0; i < mPurchases.size(); i++)
+	{
+		Purchase* purchaseObj = mPurchases[i];
+		if (purchase.getHandle() == purchaseObj->getHandle())
+		{
+			mPurchases.remove(i);
+			delete purchaseObj;
+			purchaseObj = NULL;
+			break;
+		}
+	}
+
 }
 
 /**

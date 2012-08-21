@@ -1129,7 +1129,9 @@ public class MoSyncThread extends Thread
 		mClipWidth = mWidth;
 		mClipHeight = mHeight;
 
-		// Reset cliprect
+		// Set original clip rect.
+		// First we save the clip state.
+		mCanvas.save();
 		mCanvas.clipRect(mClipLeft, mClipTop, mClipWidth, mClipHeight, Region.Op.REPLACE);
 
 		mPaint.setStyle(Paint.Style.FILL);
@@ -1182,6 +1184,10 @@ public class MoSyncThread extends Thread
 		mClipWidth = width;
 		mClipHeight = height;
 
+		// Restore clip state and save before setting the clip rect.
+		// Note that we do an initial save of the clip state in initSyscalls.
+		mCanvas.restore();
+		mCanvas.save();
 		mCanvas.clipRect(left, top, left+width, top+height, Region.Op.REPLACE);
 	}
 
@@ -3447,7 +3453,7 @@ public class MoSyncThread extends Thread
 	}
 
 	/**
-	 * Registers the current application for receiving push notifications for C2DM server.
+	 * Registers the current application for receiving push notifications for GCM/C2DM server.
 	 * @param pushNotificationTypes ignored on Android.
 	 * @param accountID Is the ID of the account authorized to send messages to the application,
 	 * typically the email address of an account set up by the application's developer.
