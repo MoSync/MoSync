@@ -27,6 +27,7 @@
 #import <Foundation/Foundation.h>
 
 #import "IWidget.h"
+#import "ListViewSectionWidgetDelegate.h"
 
 /**
  * @brief ListViewItemWidget widget interface file.
@@ -35,6 +36,12 @@
  */
 @interface ListViewItemWidget : IWidget
 {
+
+    /**
+     * Delegate to the section that the item belongs.
+     */
+    id <ListViewSectionWidgetDelegate> _delegate;
+
     /**
      * The title of the delete-confirmation button.
      * The table view displays a button with this text when the user attempts to delete a row,
@@ -57,6 +64,11 @@
      */
     BOOL _canMove;
 }
+
+/**
+ * Delegate property.
+ */
+@property (retain) id delegate;
 
 /**
  * Get item's cell.
@@ -130,5 +142,11 @@
  * The returned value should not be autoreleased. The caller will release the returned value.
  */
 - (NSString*)getPropertyWithKey:(NSString*)key;
+
+/**
+ * Asks the widget to calculate and return the size that best fits its subviews.
+ * @return The size that best fits itself.
+ */
+-(CGSize)sizeThatFitsForWidget;
 
 @end

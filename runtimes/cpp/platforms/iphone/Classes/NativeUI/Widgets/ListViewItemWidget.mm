@@ -24,21 +24,178 @@
  * cells/items that appear in ListViewWidget objects.
  */
 
-//#include "Platform.h"
-//#include <helpers/cpp_defs.h>
-//#include <helpers/CPP_IX_WIDGET.h>
-//#include <base/Syscall.h>
-
 #import "ListViewItemWidget.h"
 #import "UIColorExpanded.h"
+#import "NSStringExpanded.h"
 #import "HorizontalLayoutWidget.h"
 #import "VerticalLayoutWidget.h"
 #import "RelativeLayoutWidget.h"
+#import "WidgetLayoutingMacro.h"
+
+/**
+ * Hidden functions/methods for ListViewItemWidget class
+ */
+@interface ListViewItemWidget (hidden)
+
+/**
+ * Set an icon of the list view item that is placed to the left of the text.
+ * Setter for MAW_LIST_VIEW_ITEM_ICON.
+ * @param iconHandle Handle to an uncompressed image resource.
+ * @return One of the following constants:
+ * - MAW_RES_OK if the icon was set.
+ * - MAW_RES_INVALID_PROPERTY_VALUE if the iconHandle param was invalid.
+ */
+-(int) setIconProperty:(NSString*) iconHandle;
+
+/**
+ * Set the type of list item displayed. Provides the corresponding icon in the right side of the list view.
+ * Setter for MAW_LIST_VIEW_ITEM_ACCESSORY_TYPE.
+ * @param accessoryType One of "none", "hasChildren", "hasDetails" or "isChecked".
+ * @return One of the following constants:
+ * - MAW_RES_OK if the accessory type was set.
+ * - MAW_RES_INVALID_PROPERTY_VALUE if the accessoryType param was invalid.
+ */
+-(int) setAccessoryTypeProperty:(NSString*) accessoryType;
+
+/**
+ * Set the font color of the text
+ * Setter for MAW_LIST_VIEW_ITEM_FONT_COLOR.
+ * @param fontColor  A hexadecimal value 0xRRGGBB, where R, G and B are the red, green and blue
+ * components respectively.
+ * @return One of the following constants:
+ * - MAW_RES_OK if the font color was set.
+ * - MAW_RES_INVALID_PROPERTY_VALUE if the font color param was invalid.
+ */
+-(int) setFontColorProperty:(NSString*) fontColor;
+
+/**
+ * Set the font size of the text
+ * Setter for MAW_LIST_VIEW_ITEM_FONT_SIZE.
+ * @param fontSize  Font size, in points.
+ * @return One of the following constants:
+ * - MAW_RES_OK if the font size was set.
+ * - MAW_RES_INVALID_PROPERTY_VALUE if the font size param was invalid.
+ */
+-(int) setFontSizeProperty:(NSString*) fontSize;
+
+/**
+ * Set the font handle of the text
+ * Setter for MAW_LIST_VIEW_ITEM_FONT_HANDLE.
+ * @param fontHandle A font handle received from loading fonts using
+ * maFontGetName and maFontLoadWithName syscalls.
+ * @return One of the following constants:
+ * - MAW_RES_OK if the font handle was set.
+ * - MAW_RES_INVALID_PROPERTY_VALUE if the font handle param was invalid.
+ */
+-(int) setFontHandleProperty:(NSString*) fontHandle;
+
+/**
+ * Set the widget's background color.
+ * Setter for MAW_WIDGET_BACKGROUND_COLOR.
+ * @param backgroundColor  A hexadecimal value 0xRRGGBB, where R, G and B are the red, green and blue
+ * components respectively.
+ * @return One of the following constants:
+ * - MAW_RES_OK if the background color was set.
+ * - MAW_RES_INVALID_PROPERTY_VALUE if the background color param was invalid.
+ */
+-(int) setBackgroundColorProperty:(NSString*) backgroundColor;
+
+/**
+ * Set cell editable property value.
+ * Setter for MAW_LIST_VIEW_ITEM_EDIT.
+ * @param value "true" or "false" values.
+ * @return MAW_RES_OK if value param is valid, or MAW_RES_INVALID_PROEPRTY_VALUE otherwise.
+ */
+-(int) setEditableProperty:(NSString*) value;
+
+/**
+ * Check if cell is editable.
+ * Setter for MAW_LIST_VIEW_ITEM_EDIT.
+ * @return "true" is cell is editable, "false" otherwise.
+ */
+-(NSString*) isEditableProperty;
+
+/**
+ * Set the selected state of the item.
+ * @param value If "true" the item will be selected, if "false" the item
+ * item will be unselected.
+ * @param animated If "true" will animate the transition between selected states,
+ * if "false" will do the transition immediate.
+ * @return MAW_RES_OK if the params have valid values, otherwise MAW_RES_INVALID_PROEPRTY_VALUE.
+ */
+-(int) setSelected:(NSString*) value
+          animated:(NSString*) animated;
+
+/**
+ * Set the highlighted state of the item.
+ * @param value If "true" the item will be highlighted, if "false" the item
+ * item will be unhighlighted.
+ * @param animated If "true" will animate the transition between highlighted states,
+ * if "false" will do the transition immediate.
+ * @return MAW_RES_OK if the params have valid values, otherwise MAW_RES_INVALID_PROEPRTY_VALUE.
+ */
+-(int) setHighlighted:(NSString*) value
+             animated:(NSString*) animated;
+
+/**
+ * Set the type of standard accessory used by the item(normal state).
+ * Setter for MAW_LIST_VIEW_ITEM_ACCESSORY_TYPE_INT.
+ * @param accessoryTypeString One of the MAW_LIST_VIEW_ITEM_ACCESSORY_TYPE constants.
+ * @param state If YES, the accessory will be set for normal mode, otherwise it will be set for
+ * editing mode.
+ * @return MAW_RES_OK if the accessoryTypeString is valid, otherwise MAW_RES_INVALID_PROEPRTY_VALUE.
+ */
+-(int) setAccessoryTypeIntProperty:(NSString*) accessoryTypeString
+                       normalState:(BOOL) state;
+
+/**
+ * Get the string constant assocciated with an accessory type.
+ * Getter for MAW_LIST_VIEW_ITEM_ACCESSORY_TYPE_INT.
+ * @param accessoryType A cell accessory type.
+ * @return One of the MAW_LIST_VIEW_ITEM_ACCESSORY_TYPE constants.
+ */
+-(NSString*) getAccessoryTypeIntProperty:(UITableViewCellAccessoryType) accessoryType;
+
+/**
+ * Get the cell accessory type assocciated with a string constant.
+ * @param accessoryTypeString One of the MAW_LIST_VIEW_ITEM_ACCESSORY_TYPE constants.
+ * @return A cell accessory type. If the accessoryTypeString is invalid UITableViewCellAccessoryNone
+ * is returned.
+ */
+-(UITableViewCellAccessoryType) getAccessoryTypeIntFromString:(NSString*) accessoryTypeString;
+
+/**
+ * Check if a given string contains one of the MAW_LIST_VIEW_ITEM_ACCESSORY_TYPE values.
+ * @return YES if it contains, NO otherwise.
+ */
+-(BOOL) isAccessoryTypeIntValid:(NSString*) accessoryTypeString;
+
+/**
+ * Set the editing style.
+ * Setter for MAW_LIST_VIEW_ITEM_EDITING_STYLE.
+ * @param editingStyleString One of the MAW_LIST_VIEW_ITEM_EDIT_STYLE constants.
+ * @return MAW_RES_OK if the editingStyleString is valid, otherwise MAW_RES_INVALID_PROPERTY_VALUE.
+ */
+-(int) setEditingStyleProperty:(NSString*) editingStyleString;
+
+/**
+ * Get the editing style.
+ * Getter for MAW_LIST_VIEW_ITEM_EDITING_STYLE.
+ * @return One of the MAW_LIST_VIEW_ITEM_EDIT_STYLE constants.
+ */
+-(NSString*) getEditingStyleProperty;
+
+@end
+
+
+
+MAKE_UIWRAPPER_LAYOUTING_IMPLEMENTATION(MoSync, UITableViewCell)
 
 @implementation ListViewItemWidget
 
 static NSString* kReuseIdentifier = @"Cell";
 
+@synthesize delegate = _delegate;
 @synthesize deleteButtonTitle = _deleteButtonTitle;
 @synthesize editingStyle = _editingStyle;
 @synthesize editable = _canEdit;
@@ -52,11 +209,12 @@ static NSString* kReuseIdentifier = @"Cell";
     self = [super init];
     if (self)
     {
-        UITableViewCell* cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault
+        MoSyncUITableViewCell* moSyncCell = [[MoSyncUITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault
                                        reuseIdentifier:kReuseIdentifier];
-        self.view = cell;
-        [cell release];
-        cell = nil;
+        [moSyncCell setWidget:self];
+        self.view = moSyncCell;
+        [moSyncCell release];
+        moSyncCell = nil;
     }
 
     return self;
@@ -89,7 +247,9 @@ static NSString* kReuseIdentifier = @"Cell";
     {
         return MAW_RES_INVALID_LAYOUT;
     }
+
     [super addChild:child toSubview:YES];
+
     return MAW_RES_OK;
 }
 
@@ -138,86 +298,75 @@ static NSString* kReuseIdentifier = @"Cell";
  */
 - (int)setPropertyWithKey:(NSString*)key toValue:(NSString*)value
 {
-    if([key isEqualToString:@MAW_LIST_VIEW_ITEM_TEXT]) {
-		UITableViewCell* cell = (UITableViewCell*) self.view;
-		UILabel* label = cell.textLabel;
-		label.text = value;
+    if([key isEqualToString:@MAW_LIST_VIEW_ITEM_TEXT])
+    {
+        self.cell.textLabel.text = value;
 		[self layout];
 	}
-    else if ([key isEqualToString:@MAW_LIST_VIEW_ITEM_FONT_HANDLE])
+	else if([key isEqualToString:@MAW_LIST_VIEW_ITEM_ICON])
     {
-        UITableViewCell* cell = (UITableViewCell*) self.view;
-		UILabel* label = cell.textLabel;
-        UIFont* font = Base::getUIFontObject([value intValue]);
-        if (!font)
-        {
-            return MAW_RES_INVALID_PROPERTY_VALUE;
-        }
-        [label setFont:font];
-        [self layout];
-    }
-	else if([key isEqualToString:@MAW_LIST_VIEW_ITEM_ICON]) {
-		int imageHandle = [value intValue];
-		if(imageHandle<=0) return MAW_RES_INVALID_HANDLE;
-		UITableViewCell* cell = (UITableViewCell*) self.view;
-		UIImageView* imageView = cell.imageView;
-		Surface* imageResource = Base::gSyscall->resources.get_RT_IMAGE(imageHandle);
-		imageView.image = [UIImage imageWithCGImage:imageResource->image];
+        return [self setIconProperty:value];
 	}
-	else if([key isEqualToString:@MAW_WIDGET_BACKGROUND_COLOR]) {
-		UITableViewCell *cell = (UITableViewCell*)self.view;
-		UIColor* color = [UIColor colorWithHexString:value];
-		if(!color) return MAW_RES_INVALID_PROPERTY_VALUE;
-
-		cell.contentView.backgroundColor = color;
-		cell.textLabel.backgroundColor = color;
-		cell.accessoryView.backgroundColor = color;
-	}
-    else if([key isEqualToString:@MAW_LIST_VIEW_ITEM_ACCESSORY_TYPE]) {
-		UITableViewCell *cell = (UITableViewCell*)self.view;
-
-		if([value isEqualToString:@"hasChildren"]) {
-			cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
-		}
-		else if([value isEqualToString:@"hasDetails"]) {
-			cell.accessoryType = UITableViewCellAccessoryDetailDisclosureButton;
-		}
-		else if([value isEqualToString:@"isChecked"]) {
-			cell.accessoryType = UITableViewCellAccessoryCheckmark;
-		}
-		else if([value isEqualToString:@"none"]) {
-			cell.accessoryType = UITableViewCellAccessoryNone;
-		} else
-        {
-            return MAW_RES_INVALID_PROPERTY_VALUE;
-        }
+    else if([key isEqualToString:@MAW_LIST_VIEW_ITEM_ACCESSORY_TYPE])
+    {
+        return [self setAccessoryTypeProperty:value];
 	}
     else if([key isEqualToString:@MAW_LIST_VIEW_ITEM_FONT_COLOR])
     {
-        UITableViewCell* cell = (UITableViewCell*) self.view;
-		UILabel* label = cell.textLabel;
-        UIColor* color = [UIColor colorWithHexString:value];
-		if(!color)
-        {
-            return MAW_RES_INVALID_PROPERTY_VALUE;
-        }
-        label.textColor = color;
+        return [self setFontColorProperty:value];
     }
     else if([key isEqualToString:@MAW_LIST_VIEW_ITEM_FONT_SIZE])
     {
-        UITableViewCell* cell = (UITableViewCell*) self.view;
-		UILabel* label = cell.textLabel;
-		float fontSize = [value floatValue];
-        UIFont* currentFont = label.font;
-        NSString* currentFontName = [currentFont fontName];
-        UIFont* newFont = [UIFont fontWithName:currentFontName size:fontSize];
-        [label setFont:newFont];
-		[self layout];
+        return [self setFontSizeProperty:value];
     }
-	else {
+    else if ([key isEqualToString:@MAW_LIST_VIEW_ITEM_FONT_HANDLE])
+    {
+        [self setFontHandleProperty:value];
+    }
+	else if([key isEqualToString:@MAW_WIDGET_BACKGROUND_COLOR])
+    {
+        return [self setBackgroundColorProperty:value];
+	}
+    else if([key isEqualToString:@MAW_LIST_VIEW_ITEM_EDIT])
+    {
+        return [self setEditableProperty:value];
+    }
+    else if ([key isEqualToString:@MAW_LIST_VIEW_ITEM_DELETE_BUTTON_TITLE])
+    {
+        self.deleteButtonTitle = value;
+    }
+    else if ([key isEqualToString:@MAW_LIST_VIEW_ITEM_SET_SELECTED])
+    {
+        return [self setSelected:kWidgetTrueValue animated:value];
+    }
+    else if ([key isEqualToString:@MAW_LIST_VIEW_ITEM_SET_UNSELECTED])
+    {
+        return [self setSelected:kWidgetFalseValue animated:value];
+    }
+    else if ([key isEqualToString:@MAW_LIST_VIEW_ITEM_SET_HIGHLIGHTED])
+    {
+        return [self setHighlighted:kWidgetTrueValue animated:value];
+    }
+    else if ([key isEqualToString:@MAW_LIST_VIEW_ITEM_SET_UNHIGHLIGHTED])
+    {
+        return [self setHighlighted:kWidgetFalseValue animated:value];
+    }
+    else if ([key isEqualToString:@MAW_LIST_VIEW_ITEM_ACCESSORY_TYPE_INT])
+    {
+        return [self setAccessoryTypeIntProperty:value normalState:YES];
+    }
+    else if ([key isEqualToString:@MAW_LIST_VIEW_ITEM_ACCESSORY_TYPE_EDIT])
+    {
+        return [self setAccessoryTypeIntProperty:value normalState:NO];
+    }
+    else if ([key isEqualToString:@MAW_LIST_VIEW_ITEM_EDITING_STYLE])
+    {
+        return [self setEditingStyleProperty:value];
+    }
+	else
+    {
 		return [super setPropertyWithKey:key toValue:value];
 	}
-
 	return MAW_RES_OK;
 
 }
@@ -230,7 +379,81 @@ static NSString* kReuseIdentifier = @"Cell";
  */
 - (NSString*)getPropertyWithKey:(NSString*)key
 {
-    return [super getPropertyWithKey:key];
+    if ([key isEqualToString:@MAW_LIST_VIEW_ITEM_EDIT])
+    {
+        return [[self isEditableProperty] retain];
+    }
+    else if ([key isEqualToString:@MAW_LIST_VIEW_ITEM_DELETE_BUTTON_TITLE])
+    {
+        return [[self deleteButtonTitle] retain];
+    }
+    else if ([key isEqualToString:@MAW_LIST_VIEW_ITEM_IS_SHOWING_DELETE_CONFIRMATION])
+    {
+        NSString* value = self.cell.showingDeleteConfirmation ? kWidgetTrueValue : kWidgetFalseValue;
+        return [value retain];
+    }
+    else if ([key isEqualToString:@MAW_LIST_VIEW_ITEM_IS_SELECTED])
+    {
+        NSString* value = self.cell.isSelected ? kWidgetTrueValue : kWidgetFalseValue;
+        return [value retain];
+    }
+    else if ([key isEqualToString:@MAW_LIST_VIEW_ITEM_IS_HIGHLIGHTED])
+    {
+        NSString* value = self.cell.isHighlighted ? kWidgetTrueValue : kWidgetFalseValue;
+        return [value retain];
+    }
+    else if ([key isEqualToString:@MAW_LIST_VIEW_ITEM_ACCESSORY_TYPE_INT])
+    {
+        NSString* type = [self getAccessoryTypeIntProperty:self.cell.accessoryType];
+        return [type retain];
+    }
+    else if ([key isEqualToString:@MAW_LIST_VIEW_ITEM_ACCESSORY_TYPE_EDIT])
+    {
+        NSString* type = [self getAccessoryTypeIntProperty:self.cell.editingAccessoryType];
+        return [type retain];
+    }
+    else if ([key isEqualToString:@MAW_LIST_VIEW_ITEM_EDITING_STYLE])
+    {
+        return [[self getEditingStyleProperty] retain];
+    }
+    else
+    {
+        return [super getPropertyWithKey:key];
+    }
+}
+
+/**
+ * Layout its children size.
+ * This method should be called by the class generated by widget layouting macro.
+ * @param view The view that requested the operation.
+ */
+-(void) layoutSubviews:(UIView*) view
+{
+    MoSyncUITableViewCell* cell = (MoSyncUITableViewCell*) self.view;
+    [cell superLayoutSubviews];
+}
+
+/**
+ * Asks the widget to calculate and return the size that best fits its subviews.
+ * @return The size that best fits itself.
+ */
+-(CGSize)sizeThatFitsForWidget
+{
+    CGSize size = self.size;
+    if ([_children count] > 0)
+    {
+        IWidget* child = [_children objectAtIndex:0];
+        size = child.size;
+    }
+    return  size;
+}
+
+/**
+ * Get widget's height.
+ */
+-(CGFloat) height
+{
+    return [self sizeThatFitsForWidget].height;
 }
 
 /**
@@ -241,6 +464,419 @@ static NSString* kReuseIdentifier = @"Cell";
     [_deleteButtonTitle release];
 
     [super dealloc];
+}
+
+@end
+
+
+@implementation ListViewItemWidget (hidden)
+
+/**
+ * Set an icon of the list view item that is placed to the left of the text.
+ * Setter for MAW_LIST_VIEW_ITEM_ICON.
+ * @param iconHandle Handle to an uncompressed image resource.
+ * @return One of the following constants:
+ * - MAW_RES_OK if the icon was set.
+ * - MAW_RES_INVALID_PROPERTY_VALUE if the iconHandle param was invalid.
+ */
+-(int) setIconProperty:(NSString*) iconHandle
+{
+    if (![iconHandle canParseNumber])
+    {
+        return MAW_RES_INVALID_PROPERTY_VALUE;
+    }
+    int handle = [iconHandle intValue];
+    if (handle <= 0)
+    {
+        return MAW_RES_INVALID_PROPERTY_VALUE;
+    }
+
+    Surface* imageResource = Base::gSyscall->resources.get_RT_IMAGE(handle);
+    self.cell.imageView.image = [UIImage imageWithCGImage:imageResource->image];
+    return MAW_RES_OK;
+}
+
+/**
+ * Set the type of list item displayed. Provides the corresponding icon in the right side of the list view.
+ * Setter for MAW_LIST_VIEW_ITEM_ACCESSORY_TYPE.
+ * @param accessoryType One of "none", "hasChildren", "hasDetails" or "isChecked".
+ * @return One of the following constants:
+ * - MAW_RES_OK if the accessory type was set.
+ * - MAW_RES_INVALID_PROPERTY_VALUE if the accessoryType param was invalid.
+ */
+-(int) setAccessoryTypeProperty:(NSString*) accessoryType
+{
+    UITableViewCell *cell = self.cell;
+
+    if ([accessoryType isEqualToString:@"hasChildren"])
+    {
+        cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+    }
+    else if ([accessoryType isEqualToString:@"hasDetails"])
+    {
+        cell.accessoryType = UITableViewCellAccessoryDetailDisclosureButton;
+    }
+    else if ([accessoryType isEqualToString:@"isChecked"])
+    {
+        cell.accessoryType = UITableViewCellAccessoryCheckmark;
+    }
+    else if ([accessoryType isEqualToString:@"none"])
+    {
+        cell.accessoryType = UITableViewCellAccessoryNone;
+    }
+    else
+    {
+        return MAW_RES_INVALID_PROPERTY_VALUE;
+    }
+
+    return MAW_RES_OK;
+}
+
+/**
+ * Set the font color of the text
+ * Setter for MAW_LIST_VIEW_ITEM_FONT_COLOR.
+ * @param fontColor  A hexadecimal value 0xRRGGBB, where R, G and B are the red, green and blue
+ * components respectively.
+ * @return One of the following constants:
+ * - MAW_RES_OK if the font color was set.
+ * - MAW_RES_INVALID_PROPERTY_VALUE if the font color param was invalid.
+ */
+-(int) setFontColorProperty:(NSString*) fontColor
+{
+    UILabel* label = self.cell.textLabel;
+    UIColor* color = [UIColor colorWithHexString:fontColor];
+    if (!color)
+    {
+        return MAW_RES_INVALID_PROPERTY_VALUE;
+    }
+    label.textColor = color;
+    return MAW_RES_OK;
+}
+
+/**
+ * Set the font size of the text
+ * Setter for MAW_LIST_VIEW_ITEM_FONT_SIZE.
+ * @param fontSize  Font size, in points.
+ * @return One of the following constants:
+ * - MAW_RES_OK if the font size was set.
+ * - MAW_RES_INVALID_PROPERTY_VALUE if the font size param was invalid.
+ */
+-(int) setFontSizeProperty:(NSString*) fontSize
+{
+    if (![fontSize canParseNumber])
+    {
+        return MAW_RES_INVALID_PROPERTY_VALUE;
+    }
+
+    float fontSizeFloat = [fontSize floatValue];
+    UILabel* label = self.cell.textLabel;
+    UIFont* currentFont = label.font;
+    NSString* currentFontName = [currentFont fontName];
+    UIFont* newFont = [UIFont fontWithName:currentFontName size:fontSizeFloat];
+    [label setFont:newFont];
+    [self layout];
+    return MAW_RES_OK;
+}
+
+/**
+ * Set the font handle of the text
+ * Setter for MAW_LIST_VIEW_ITEM_FONT_HANDLE.
+ * @param fontHandle A font handle received from loading fonts using
+ * maFontGetName and maFontLoadWithName syscalls.
+ * @return One of the following constants:
+ * - MAW_RES_OK if the font handle was set.
+ * - MAW_RES_INVALID_PROPERTY_VALUE if the font handle param was invalid.
+ */
+-(int) setFontHandleProperty:(NSString*) fontHandle
+{
+    if (![fontHandle canParseNumber])
+    {
+        return MAW_RES_INVALID_PROPERTY_VALUE;
+    }
+
+    UILabel* label = self.cell.textLabel;
+    UIFont* font = Base::getUIFontObject([fontHandle intValue]);
+    if (!font)
+    {
+        return MAW_RES_INVALID_PROPERTY_VALUE;
+    }
+    [label setFont:font];
+    [self layout];
+    return MAW_RES_OK;
+}
+
+/**
+ * Set the widget's background color.
+ * Setter for MAW_WIDGET_BACKGROUND_COLOR.
+ * @param backgroundColor  A hexadecimal value 0xRRGGBB, where R, G and B are the red, green and blue
+ * components respectively.
+ * @return One of the following constants:
+ * - MAW_RES_OK if the background color was set.
+ * - MAW_RES_INVALID_PROPERTY_VALUE if the background color param was invalid.
+ */
+-(int) setBackgroundColorProperty:(NSString*) backgroundColor
+{
+    if (![backgroundColor canParseNumber])
+    {
+        return MAW_RES_INVALID_PROPERTY_VALUE;
+    }
+    UIColor* color = [UIColor colorWithHexString:backgroundColor];
+    if (!color)
+    {
+        return MAW_RES_INVALID_PROPERTY_VALUE;
+    }
+
+    self.cell.contentView.backgroundColor = color;
+    self.cell.textLabel.backgroundColor = color;
+    self.cell.accessoryView.backgroundColor = color;
+    return MAW_RES_OK;
+}
+
+/**
+ * Set cell editable property value.
+ * Setter for MAW_LIST_VIEW_ITEM_EDIT.
+ * @param value "true" or "false" values.
+ * @return MAW_RES_OK if value param is valid, or MAW_RES_INVALID_PROEPRTY_VALUE otherwise.
+ */
+-(int) setEditableProperty:(NSString*) value
+{
+    if (![value isEqualToString:kWidgetFalseValue] &&
+        ![value isEqualToString:kWidgetTrueValue])
+    {
+        return MAW_RES_INVALID_PROPERTY_VALUE;
+    }
+
+    self.editable = [value boolValue];
+    return MAW_RES_OK;
+}
+
+/**
+ * Check if cell is editable.
+ * Setter for MAW_LIST_VIEW_ITEM_EDIT.
+ * @return "true" is cell is editable, "false" otherwise.
+ */
+-(NSString*) isEditableProperty
+{
+    NSString* returnValue = self.editable ? kWidgetTrueValue : kWidgetFalseValue;
+    return returnValue;
+}
+
+/**
+ * Set the selected state of the item.
+ * @param value If "true" the item will be selected, if "false" the item
+ * item will be unselected.
+ * @param animated If "true" will animate the transition between selected states,
+ * if "false" will do the transition immediate.
+ * @return MAW_RES_OK if the params have valid values, otherwise MAW_RES_INVALID_PROEPRTY_VALUE.
+ */
+-(int) setSelected:(NSString*) value
+          animated:(NSString*) animated
+{
+    if (![value isEqualToString:kWidgetTrueValue]    &&
+        ![value isEqualToString:kWidgetFalseValue]   &&
+        ![animated isEqualToString:kWidgetTrueValue] &&
+        ![animated isEqualToString:kWidgetFalseValue])
+    {
+        return MAW_RES_INVALID_PROPERTY_VALUE;
+    }
+
+    [self.cell setSelected:[value boolValue] animated:[animated boolValue]];
+    return MAW_RES_OK;
+}
+
+/**
+ * Set the highlighted state of the item.
+ * @param value If "true" the item will be highlighted, if "false" the item
+ * item will be unhighlighted.
+ * @param animated If "true" will animate the transition between highlighted states,
+ * if "false" will do the transition immediate.
+ * @return MAW_RES_OK if the params have valid values, otherwise MAW_RES_INVALID_PROEPRTY_VALUE.
+ */
+-(int) setHighlighted:(NSString*) value
+             animated:(NSString*) animated
+{
+    if (![value isEqualToString:kWidgetTrueValue]    &&
+        ![value isEqualToString:kWidgetFalseValue]   &&
+        ![animated isEqualToString:kWidgetTrueValue] &&
+        ![animated isEqualToString:kWidgetFalseValue])
+    {
+        return MAW_RES_INVALID_PROPERTY_VALUE;
+    }
+
+    [self.cell setHighlighted:[value boolValue] animated:[animated boolValue]];
+    return MAW_RES_OK;
+}
+
+/**
+ * Set the type of standard accessory used by the item(normal state).
+ * Setter for MAW_LIST_VIEW_ITEM_ACCESSORY_TYPE_INT.
+ * @param accessoryTypeString One of the MAW_LIST_VIEW_ITEM_ACCESSORY_TYPE constants.
+ * @param state If YES, the accessory will be set for normal mode, otherwise it will be set for
+ * editing mode.
+ * @return MAW_RES_OK if the accessoryTypeString is valid, otherwise MAW_RES_INVALID_PROEPRTY_VALUE.
+ */
+-(int) setAccessoryTypeIntProperty:(NSString*) accessoryTypeString
+                       normalState:(BOOL) state
+{
+    if (![self isAccessoryTypeIntValid:accessoryTypeString])
+    {
+        return MAW_RES_INVALID_PROPERTY_VALUE;
+    }
+    UITableViewCellAccessoryType type = [self getAccessoryTypeIntFromString:accessoryTypeString];
+    if (state)
+    {
+        self.cell.accessoryType = type;
+    }
+    else
+    {
+        self.cell.editingAccessoryType = type;
+    }
+    return MAW_RES_OK;
+}
+
+/**
+ * Get the string constant assocciated with an accessory type.
+ * Getter for MAW_LIST_VIEW_ITEM_ACCESSORY_TYPE_INT.
+ * @param accessoryType A cell accessory type.
+ * @return One of the MAW_LIST_VIEW_ITEM_ACCESSORY_TYPE constants.
+ */
+-(NSString*) getAccessoryTypeIntProperty:(UITableViewCellAccessoryType) accessoryType
+{
+    int accessoryTypeInt = MAW_LIST_VIEW_ITEM_ACCESSORY_TYPE_NONE;
+    switch (accessoryType)
+    {
+        case UITableViewCellAccessoryDisclosureIndicator:
+            accessoryTypeInt = MAW_LIST_VIEW_ITEM_ACCESSORY_TYPE_DISCLOSURE;
+            break;
+        case UITableViewCellAccessoryDetailDisclosureButton:
+            accessoryTypeInt = MAW_LIST_VIEW_ITEM_ACCESSORY_TYPE_DETAIL;
+            break;
+        case UITableViewCellAccessoryCheckmark:
+            accessoryTypeInt = MAW_LIST_VIEW_ITEM_ACCESSORY_TYPE_CHECKMARK;
+            break;
+        case UITableViewCellAccessoryNone:
+        default:
+            accessoryTypeInt = MAW_LIST_VIEW_ITEM_ACCESSORY_TYPE_NONE;
+            break;
+    }
+
+    return [NSString stringWithFormat:@"%d", accessoryTypeInt];
+}
+
+/**
+ * Get the cell accessory type assocciated with a string constant.
+ * @param accessoryTypeString One of the MAW_LIST_VIEW_ITEM_ACCESSORY_TYPE constants.
+ * @return A cell accessory type. If the accessoryTypeString is invalid UITableViewCellAccessoryNone
+ * is returned.
+ */
+-(UITableViewCellAccessoryType) getAccessoryTypeIntFromString:(NSString*) accessoryTypeString
+{
+    UITableViewCellAccessoryType accessoryType =  UITableViewCellAccessoryNone;
+    int accessoryTypeInt = [accessoryTypeString intValue];
+    switch (accessoryTypeInt)
+    {
+        case MAW_LIST_VIEW_ITEM_ACCESSORY_TYPE_DISCLOSURE:
+            accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+            break;
+        case MAW_LIST_VIEW_ITEM_ACCESSORY_TYPE_DETAIL:
+            accessoryType = UITableViewCellAccessoryDetailDisclosureButton;
+            break;
+        case MAW_LIST_VIEW_ITEM_ACCESSORY_TYPE_CHECKMARK:
+            accessoryType = UITableViewCellAccessoryCheckmark;
+            break;
+        case MAW_LIST_VIEW_ITEM_ACCESSORY_TYPE_NONE:
+        default:
+            accessoryType = UITableViewCellAccessoryNone;
+            break;
+    }
+    return accessoryType;
+}
+
+/**
+ * Check if a given string contains one of the MAW_LIST_VIEW_ITEM_ACCESSORY_TYPE values.
+ * @return YES if it contains, NO otherwise.
+ */
+-(BOOL) isAccessoryTypeIntValid:(NSString*) accessoryTypeString
+{
+    if (![accessoryTypeString canParseNumber])
+    {
+        return NO;
+    }
+    BOOL returnValue = NO;
+    switch ([accessoryTypeString intValue])
+    {
+        case MAW_LIST_VIEW_ITEM_ACCESSORY_TYPE_DISCLOSURE:
+        case MAW_LIST_VIEW_ITEM_ACCESSORY_TYPE_DETAIL:
+        case MAW_LIST_VIEW_ITEM_ACCESSORY_TYPE_CHECKMARK:
+        case MAW_LIST_VIEW_ITEM_ACCESSORY_TYPE_NONE:
+            returnValue = YES;
+            break;
+        default:
+            returnValue = NO;
+            break;
+    }
+    return returnValue;
+}
+
+/**
+ * Set the editing style.
+ * Setter for MAW_LIST_VIEW_ITEM_EDITING_STYLE.
+ * @param editingStyleString One of the MAW_LIST_VIEW_ITEM_EDIT_STYLE constants.
+ * @return MAW_RES_OK if the editingStyleString is valid, otherwise MAW_RES_INVALID_PROPERTY_VALUE.
+ */
+-(int) setEditingStyleProperty:(NSString*) editingStyleString
+{
+    if (![editingStyleString canParseNumber])
+    {
+        return MAW_RES_INVALID_PROPERTY_VALUE;
+    }
+
+    UITableViewCellEditingStyle style = UITableViewCellEditingStyleNone;
+    int returnValue = MAW_RES_OK;
+    switch ([editingStyleString intValue])
+    {
+        case MAW_LIST_VIEW_ITEM_EDIT_STYLE_DELETE:
+            style = UITableViewCellEditingStyleDelete;
+            break;
+        case MAW_LIST_VIEW_ITEM_EDIT_STYLE_INSERT:
+            style = UITableViewCellEditingStyleInsert;
+            break;
+        case MAW_LIST_VIEW_ITEM_EDIT_STYLE_NONE:
+            style = UITableViewCellEditingStyleNone;
+            break;
+        default:
+            returnValue = MAW_RES_INVALID_PROPERTY_VALUE;
+            break;
+    }
+    if (returnValue != MAW_RES_OK)
+    {
+        self.editingStyle = style;
+    }
+    return returnValue;
+}
+
+/**
+ * Get the editing style.
+ * Getter for MAW_LIST_VIEW_ITEM_EDITING_STYLE.
+ * @return One of the MAW_LIST_VIEW_ITEM_EDIT_STYLE constants.
+ */
+-(NSString*) getEditingStyleProperty
+{
+    int style;
+    switch (self.cell.editingStyle)
+    {
+        case UITableViewCellEditingStyleDelete:
+            style = MAW_LIST_VIEW_ITEM_EDIT_STYLE_DELETE;
+            break;
+        case UITableViewCellEditingStyleInsert:
+            style = MAW_LIST_VIEW_ITEM_EDIT_STYLE_INSERT;
+            break;
+        case UITableViewCellEditingStyleNone:
+        default:
+            style = MAW_LIST_VIEW_ITEM_EDIT_STYLE_NONE;
+            break;
+    }
+    return [NSString stringWithFormat:@"%d", style];
 }
 
 @end

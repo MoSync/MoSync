@@ -61,6 +61,8 @@
         return MAW_RES_INVALID_LAYOUT;
     }
     [super addChild:child toSubview:NO];
+    ListViewItemWidget* item = (ListViewItemWidget*)child;
+    item.delegate = self;
     int row = [_children count] - 1;
     NSIndexPath* indexPath = [NSIndexPath indexPathForRow:row inSection:_index];
     [_delegate insertItemAtIndexPath:indexPath];
@@ -90,6 +92,8 @@
     }
     NSIndexPath* indexPath = [NSIndexPath indexPathForRow:[index intValue] inSection:_index];
     [_delegate insertItemAtIndexPath:indexPath];
+    ListViewItemWidget* item = (ListViewItemWidget*)child;
+    item.delegate = self;
     return MAW_RES_OK;
 }
 
@@ -198,6 +202,19 @@
     }
 
     return [_children objectAtIndex:index];
+}
+
+#pragma mark ListViewSectionWidgetDelegate
+
+/**
+ * Notify that an list item's size has changed.
+ * @param listItem List item that changed its size.
+ */
+-(void)sizeChangedFor:(ListViewItemWidget*) listItem
+{
+    int row = [_children indexOfObject:listItem];
+    NSIndexPath* indexPath = [NSIndexPath indexPathForRow:row inSection:_index];
+    [_delegate reloadItemAtIndexPath:indexPath];
 }
 
 /**

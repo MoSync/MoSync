@@ -16,34 +16,24 @@
  */
 
 /**
- * @file ListViewWidgetDelegate.h
+ * @file ListViewSectionWidgetDelegate.h
  * @author Bogdan Iusco
  *
- * @brief ListView widget delegate.
- * Used by ListViewSectionWidget objects to notify the list view that its
- * content has been changed.
+ * @brief ListViewSection widget delegate.
+ * Used by ListViewItemWidget objects to notify when their size has changed.
  */
 
 #import <Foundation/Foundation.h>
 
-@protocol ListViewWidgetDelegate <NSObject>
+@class ListViewItemWidget;
+
+@protocol ListViewSectionWidgetDelegate <NSObject>
 
 @required
 /**
- * Delete an list view item from the list.
- * @param indexPath List item index to be deleted.
+ * Notify that an list item's size has changed.
+ * @param listItem List item that changed its size.
  */
--(void)deleteItemAtIndexPath:(NSIndexPath*) indexPath;
+-(void)sizeChangedFor:(ListViewItemWidget*) listItem;
 
-/**
- * Insert an list view item into the list.
- * @param indexPath List item index where to be inserted.
- */
--(void)insertItemAtIndexPath:(NSIndexPath*) indexPath;
-
-/**
- * Reload an list view item. Its size has changed so it needs to be reloaded.
- * @param indexPath List item index that needs to be reloaded.
- */
--(void)reloadItemAtIndexPath:(NSIndexPath*) indexPath;
 @end
