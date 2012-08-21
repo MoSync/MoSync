@@ -1,4 +1,4 @@
->Edit box properties
+>EditBox properties
 >===================
 >
 text
