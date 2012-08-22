@@ -41,6 +41,8 @@ namespace MoSync
         public class PanoramaView : Screen
         {
             protected Microsoft.Phone.Controls.Panorama mPanorama;
+            private int mCurrentScreenIndex = 0;
+
             /**
              * The constructor
              */
@@ -55,7 +57,7 @@ namespace MoSync
                 mPanorama.Loaded += new RoutedEventHandler(
                     delegate(object from, RoutedEventArgs args)
                     {
-                        SetApplicationBarVisibility(0);
+                        SetApplicationBarVisibility(mCurrentScreenIndex);
                     });
 
                 //The application bar is chanded at the SelectionChanged event occurence.
@@ -63,6 +65,7 @@ namespace MoSync
                 mPanorama.SelectionChanged += new EventHandler<SelectionChangedEventArgs>(
                     delegate(object from, SelectionChangedEventArgs target)
                     {
+                        mCurrentScreenIndex = (from as Microsoft.Phone.Controls.Panorama).SelectedIndex;
                         SetApplicationBarVisibility((from as Microsoft.Phone.Controls.Panorama).SelectedIndex);
                     });
             }
@@ -189,7 +192,10 @@ namespace MoSync
                 set
                 {
                     if (-1 < value && mPanorama.Items.Count > value)
+                    {
                         mPanorama.DefaultItem = mPanorama.Items[value];
+                        mCurrentScreenIndex = value;
+                    }
                     else throw new InvalidPropertyValueException();
                 }
                 get
