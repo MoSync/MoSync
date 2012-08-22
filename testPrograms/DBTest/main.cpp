@@ -317,7 +317,7 @@ static void testParameters()
 	result = maDBClose(db);
 	SHOULD_HOLD(MA_DB_OK == result, "maDBClose failed");
 
-	printf("Test 1 passed successfully\n");
+	printf("Test 3 passed successfully\n");
 }
 
 
