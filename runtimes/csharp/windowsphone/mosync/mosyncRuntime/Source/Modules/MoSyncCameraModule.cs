@@ -219,6 +219,7 @@ namespace MoSync
                             if (currentPage.Orientation == PageOrientation.PortraitUp)
                             {
                                 rotateAngle = 90;
+
                             }
                             else if (currentPage.Orientation == PageOrientation.LandscapeRight)
                             {
@@ -428,11 +429,18 @@ namespace MoSync
             if (page.Orientation == PageOrientation.LandscapeLeft)
             {
                 rotation -= 90;
+                mVideoBrush.Stretch = Stretch.Uniform;
             }
             else if (page.Orientation == PageOrientation.LandscapeRight)
             {
                 rotation += 90;
+                mVideoBrush.Stretch = Stretch.Uniform;
             }
+            else
+            {
+                mVideoBrush.Stretch = Stretch.Fill;
+            }
+
             mVideoBrush.RelativeTransform = new CompositeTransform()
             {
                 CenterX = 0.5,
@@ -455,10 +463,16 @@ namespace MoSync
                     if (args.Orientation == PageOrientation.LandscapeLeft)
                     {
                         rotation -= 90;
+                        mVideoBrush.Stretch = Stretch.Uniform;
                     }
                     else if (args.Orientation == PageOrientation.LandscapeRight)
                     {
                         rotation += 90;
+                        mVideoBrush.Stretch = Stretch.Uniform;
+                    }
+                    else
+                    {
+                        mVideoBrush.Stretch = Stretch.Fill;
                     }
 
                     mVideoBrush.RelativeTransform = new CompositeTransform()

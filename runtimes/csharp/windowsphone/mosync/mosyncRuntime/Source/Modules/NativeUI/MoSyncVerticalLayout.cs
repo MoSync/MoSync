@@ -208,10 +208,13 @@ namespace MoSync
                 {
                     WidgetBaseWindowsPhone widget = (child as WidgetBaseWindowsPhone);
                     int x = Grid.GetRow((widget.View) as System.Windows.FrameworkElement);
-                    mGrid.RowDefinitions.RemoveAt(x + 1);
-                    mGrid.RowDefinitions.RemoveAt(x);
-                    mGrid.RowDefinitions.RemoveAt(x - 1);
-                    mGrid.Children.Remove((child as WidgetBaseWindowsPhone).View);
+                    if ((x + 1) < mGrid.RowDefinitions.Count)
+                    {
+                        mGrid.RowDefinitions.RemoveAt(x + 1);
+                        mGrid.RowDefinitions.RemoveAt(x);
+                        mGrid.RowDefinitions.RemoveAt(x - 1);
+                        mGrid.Children.Remove((child as WidgetBaseWindowsPhone).View);
+                    }
                 });
                 base.RemoveChild(child);
             }
