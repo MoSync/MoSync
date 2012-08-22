@@ -42,7 +42,8 @@ Wormhole::WebAppMoblet, Wormhole::WebViewMessage, Wormhole::FileUtil
 \ref 	WormHoleGroup
 </td>
 <td>
-<a href="http://www.mosync.com/content/html5-javascript-wormhole"  target="_blank"><strong>User guides and online resources</strong></a>
+<a href="http://www.mosync.com/content/html5-javascript-wormhole"  target="_blank"><strong>User guides and online resources</strong></a><br>
+<a href="http://www.mosync.com/files/imports/doxygen/latest/html5/index.html"  target="_blank"><strong>JavaScript API Reference</strong></a>
 </td>
 </tr>
 
