@@ -5385,6 +5385,20 @@ public class MoSyncThread extends Thread
 		return mMoSyncDB.maDBExecSQL(databaseHandle, sql);
 	}
 
+	int maDBExecSQLParams(
+		int databaseHandle,
+		String sql,
+		int paramsAddress,
+		int paramCount)
+	{
+		return mMoSyncDB.maDBExecSQLParams(
+			databaseHandle,
+			sql,
+			paramsAddress,
+			paramCount,
+			this);
+	}
+
 	int maDBCursorDestroy(int cursorHandle)
 	{
 		return mMoSyncDB.maDBCursorDestroy(cursorHandle);
