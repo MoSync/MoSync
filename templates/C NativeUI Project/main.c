@@ -2,6 +2,10 @@
  * Template for a Native UI C application.
  */
 
+#define BUFFER_SIZE 256
+#define FONT_SIZE_POINTS 25
+#define FONT_SIZE_PIXELS 36
+
 #include <ma.h>
 #include <mavsprintf.h>
 #include <IX_WIDGET.h>
@@ -17,7 +21,7 @@ static int sButtonClickCount = 0;
  */
 int widgetSetPropertyInt(MAHandle handle, const char *property, int value)
 {
-	char buffer[256];
+	char buffer[BUFFER_SIZE];
 	sprintf(buffer, "%i", value);
 	maWidgetSetProperty(handle, property, buffer);
 }
@@ -78,10 +82,26 @@ void createUI()
 		sButton,
 		MAW_BUTTON_FONT_COLOR,
 		"0x000000");
+
+	// Set the font size.
+	// On iOS it's measured in points, while on Android and Windows Phone
+	// it's measured in pixels.
+	char platform[BUFFER_SIZE];
+	char fontSize[BUFFER_SIZE];
+	maGetSystemProperty("mosync.device.OS", platform, BUFFER_SIZE);
+	if(strcmp(platform, "iPhone OS") == 0)
+	{
+		sprintf(fontSize, "%d", FONT_SIZE_POINTS);
+	}
+	else
+	{
+		sprintf(fontSize, "%d", FONT_SIZE_PIXELS);
+	}
 	maWidgetSetProperty(
 		sButton,
 		MAW_BUTTON_FONT_SIZE,
-		"36");
+		fontSize);
+
 	maWidgetAddChild(layout, sButton);
 
 	// Show the screen.
