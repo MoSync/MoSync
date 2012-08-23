@@ -762,7 +762,7 @@ interface MAAPI {
 	*
 	* Example HTTP url: <tt>http://www.example.com/directory/document.html</tt>
 	*
-	* Example HTTPS url: <tt>https://www.example.com/directory/document.html</tt>
+	* Example HTTPS url: <tt>https://www.google.com</tt>
 	*
 	* Example Bluetooth url: <tt>btspp://001dbe15e455:9</tt>
 	*
