@@ -25,6 +25,7 @@
 #include <NativeUI/MapRegion.h>
 #include <NativeUI/MapPin.h>
 #include <NativeUI/MapLocation.h>
+#include <mastdlib.h>
 
 #define HORIZONTAL_LAYOUT_HEIGHT 80
 
@@ -58,6 +59,8 @@ MainScreen::MainScreen() :
  */
 MainScreen::~MainScreen()
 {
+	mMapPins.clear();
+
 	mMap->removeMapListener(this);
 	mGetVisibleAreaButton->removeButtonListener(this);
 	mSetVisibleAreaButton->removeButtonListener(this);
@@ -96,7 +99,7 @@ void MainScreen::createMainLayout() {
 	mMainLayout->addChild(mSetCenterButton);
 
 	// create the main map and add it to the main layout
-	mMap = new Map("google test credentials", "bing test credentials");
+	mMap = new Map("google test credentials", "AsIe6nHOHjIuf9MQS4fW7up92BO6HuCwspKJqYwffZiqUJsgXuLIXeBdCf9EM4yz");
 	mMap->fillSpaceHorizontally();
 	mMap->fillSpaceVertically();
 
@@ -109,10 +112,6 @@ void MainScreen::createMainLayout() {
 	printf("Map zoom level: %d", mMap->getZoomLevel());
 
 	mMainLayout->addChild(mMap);
-
-	// create the map pin
-	mMapPin = new MapPin(Location(32.3, 32.2));
-	mMapPin->setText("test");
 }
 
 /**
@@ -218,11 +217,30 @@ void MainScreen::buttonClicked(Widget* button)
 	}
 	else if (button == mAddPinToMap)
 	{
-		mMap->addMapPin(mMapPin);
+		// then, we add 5 new pins
+		for (int i = 0; i < 5; i++)
+		{
+			// generate random values for the coordinates
+			// latitude is between 0 an 90
+			double latitude = (double)(rand() % 90);
+			// longitude is between -180 and 180
+			double longitude = (double)(rand() & 180);
+			int sign = rand()%2;
+			if (sign == 0)
+				longitude *= (-1);
+
+			MapPin *newPin = new MapPin(Location(latitude, longitude));
+			newPin->setText("test title");
+			mMapPins.add(newPin);
+			mMap->addMapPin(newPin);
+		}
 	}
 	else if (button == mRemovePinFromMap)
 	{
-		mMap->removeMapPin(mMapPin);
+		for (int i = 0; i < mMapPins.size(); i++)
+		{
+			mMap->removeMapPin(mMapPins[i]);
+		}
 	}
 	else if (button == mSetCenterButton)
 	{
