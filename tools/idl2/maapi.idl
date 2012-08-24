@@ -3554,7 +3554,7 @@ group PIMAPI "PIM API" {
 			RELATION = 120;
 
 			/**
-			* @brief Information about the organization. Has \link #MA_PIM_CONTACT_ORGANIZATION_NAME MA_PIM_CONTACT_ORGANIZATION \endlink indices.
+			* @brief Information about the organization. Has \link #MA_PIM_CONTACT_ORG_INFO_DEPARTMENT MA_PIM_CONTACT_ORG_INFO \endlink indices.
 			*
 			* @validvalue #MA_PIM_TYPE_STRING_ARRAY.
 			*
@@ -8770,7 +8770,7 @@ group CameraFunctions "Camera Functions" {
 		* Set supported screen orientations.
 		* Currently implemented on iOS and WindowsPhone 7.1.
 		* @param orientations A bitmask consisting of flags describing the supported screen orientations.
-		* The bitmask can be created using \link #MA_SCREEN_ORIENTATION_ MA_SCREEN_ORIENTATION \endlink
+		* The bitmask can be created using \link #MA_SCREEN_ORIENTATION_PORTRAIT MA_SCREEN_ORIENTATION \endlink
 		* values.
 		* @return One of the next constants:
 		* - #MA_SCREEN_ORIENTATION_RES_OK
@@ -8783,7 +8783,7 @@ group CameraFunctions "Camera Functions" {
 		* Get supported screen orientations.
 		* Currently implemented on iOS and WindowsPhone 7.1.
 		* @return A bitmask consisting of flags describing the supported screen orientations.
-		* The bitmask is created using \link #MA_SCREEN_ORIENTATION_ MA_SCREEN_ORIENTATION \endlink
+		* The bitmask is created using \link #MA_SCREEN_ORIENTATION_PORTRAIT MA_SCREEN_ORIENTATION \endlink
 		* values.
 		*/
 		int maScreenGetSupportedOrientations();
@@ -8791,7 +8791,7 @@ group CameraFunctions "Camera Functions" {
 		/**
 		* Get current screen orientation.
 		* Currently implemented on iOS and WindowsPhone 7.1.
-		* @return One of the \link #MA_SCREEN_ORIENTATION_ MA_SCREEN_ORIENTATION \endlink constants.
+		* @return One of the \link #MA_SCREEN_ORIENTATION_PORTRAIT MA_SCREEN_ORIENTATION \endlink constants.
 		*/
 		int maScreenGetCurrentOrientation();
 
