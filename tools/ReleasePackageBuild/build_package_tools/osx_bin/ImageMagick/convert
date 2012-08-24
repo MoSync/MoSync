@@ -1,5 +1,11 @@
 #!/bin/sh
-export MAGICK_HOME=/Applications/MoSync/bin/ImageMagick/
-export DYLD_LIBRARY_PATH="$MAGICK_HOME/lib/"
 
-/Applications/MoSync/bin/ImageMagick/bin/convert $1 $2
+if
+	#try running the installed version first.
+	/opt/local/bin/convert $1 $2 $3 $4 $5 $6
+then
+	export MAGICK_HOME=/Applications/MoSync/bin/ImageMagick/
+	export DYLD_LIBRARY_PATH="$MAGICK_HOME/lib/"
+
+	/Applications/MoSync/bin/ImageMagick/bin/convert $1 $2 $3 $4 $5 $6
+fi
