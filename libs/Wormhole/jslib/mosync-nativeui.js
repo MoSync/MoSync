@@ -867,7 +867,7 @@ mosync.nativeui.NativeWidgetElement = function(widgetType, widgetID, params,
 				{
 					if(self.childList[index] ==  childID)
 					{
-						self.childList.splic(index,1);
+						self.childList.splice(index,1);
 					}
 				}
 				mosync.nativeui.maWidgetRemoveChild(childID, successCallback,
