@@ -370,15 +370,27 @@ namespace MoSync
                 switch (property)
                 {
                     case MoSync.Constants.MA_ADS_HEIGHT:
+                        stringvalue = "";
+                        MoSync.Util.RunActionOnMainThreadSync(() =>
+                            {
+                                stringvalue = ((int)mAd.Height).ToString();
+                            }
+                        );
                         core.GetDataMemory().WriteStringAtAddress(
                             _value,
-                            mAd.Height.ToString(),
+                            stringvalue,
                             _bufSize);
                         break;
                     case MoSync.Constants.MA_ADS_WIDTH:
+                        stringvalue = "";
+                        MoSync.Util.RunActionOnMainThreadSync(() =>
+                            {
+                                stringvalue = ((int)mAd.Width).ToString();
+                            }
+                        );
                         core.GetDataMemory().WriteStringAtAddress(
                             _value,
-                            mAd.Width.ToString(),
+                            stringvalue,
                             _bufSize);
                         break;
                     case MoSync.Constants.MA_ADS_VISIBLE:
@@ -406,21 +418,39 @@ namespace MoSync
                             _bufSize);
                         break;
                     case MoSync.Constants.MA_ADS_COLOR_BG:
+                        stringvalue = "";
+                        MoSync.Util.RunActionOnMainThreadSync(() =>
+                            {
+                                stringvalue = mAd.BackgroundColor.ToString();
+                            }
+                        );
                         core.GetDataMemory().WriteStringAtAddress(
                             _value,
-                            mAd.BackgroundColor,
+                            stringvalue,
                             _bufSize);
                         break;
                     case MoSync.Constants.MA_ADS_COLOR_BORDER:
+                        stringvalue = "";
+                        MoSync.Util.RunActionOnMainThreadSync(() =>
+                            {
+                                stringvalue = mAd.BorderColor.ToString();
+                            }
+                        );
                         core.GetDataMemory().WriteStringAtAddress(
                             _value,
-                            mAd.BorderColor,
+                            stringvalue,
                             _bufSize);
                         break;
                     case MoSync.Constants.MA_ADS_COLOR_TEXT:
+                        stringvalue = "";
+                        MoSync.Util.RunActionOnMainThreadSync(() =>
+                            {
+                                stringvalue = mAd.TextColor.ToString();
+                            }
+                        );
                         core.GetDataMemory().WriteStringAtAddress(
                             _value,
-                            mAd.TextColor,
+                            stringvalue,
                             _bufSize);
                         break;
                     default:

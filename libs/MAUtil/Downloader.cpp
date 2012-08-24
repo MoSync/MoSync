@@ -203,6 +203,12 @@ void Downloader::httpFinished(HttpConnection* http, int result)
 			return;
 		}
 
+		if (RES_OK != errorCode)
+		{
+			fireError(CONNERR_DOWNLOADER_OTHER - errorCode);
+			return;
+		}
+
 		// Delete old reader and create new one and start receiving
 		// data via the reader.
 		deleteReader();
@@ -288,8 +294,9 @@ MAHandle ImageDownloader::getHandle()
 		0,
 		mReader->getContentLength());
 
-	if (RES_OUT_OF_MEMORY == res)
+	if (RES_OK != res)
 	{
+		fireError(CONNERR_DOWNLOADER_OTHER - res);
 		return 0;
 	}
 

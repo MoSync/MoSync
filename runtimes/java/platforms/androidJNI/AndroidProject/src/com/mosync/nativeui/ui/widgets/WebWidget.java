@@ -549,6 +549,16 @@ public class WebWidget extends Widget
 			    mWebWidget.getView().getContext().startActivity(intent);
 			    return true;
 			}
+			else if (url.startsWith("mailto:"))
+			{
+				//start the external email app
+			    String[] email = url.split(":");
+			    Intent emailIntent = new Intent(android.content.Intent.ACTION_SEND);
+			    emailIntent.setType("text/plain");
+			    emailIntent.putExtra(android.content.Intent.EXTRA_EMAIL, new String[]{email[1]});
+			    mWebWidget.getView().getContext().startActivity(emailIntent);
+			    return true;
+			}
 			else
 			{
 				//Log.i("@@@ MoSync", "Processing standard url: " + url);

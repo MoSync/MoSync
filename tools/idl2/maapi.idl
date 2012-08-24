@@ -762,7 +762,7 @@ interface MAAPI {
 	*
 	* Example HTTP url: <tt>http://www.example.com/directory/document.html</tt>
 	*
-	* Example HTTPS url: <tt>https://www.example.com/directory/document.html</tt>
+	* Example HTTPS url: <tt>https://www.google.com</tt>
 	*
 	* Example Bluetooth url: <tt>btspp://001dbe15e455:9</tt>
 	*
@@ -9562,8 +9562,7 @@ group NFCAPI "NFC API" {
 		 * @param paramCount Number of elements in the array pointed to
 		 * by \a params.
 		 *
-		 * This function is currently available on iOS and MoRE
-		 * (not on Android).
+		 * This function is available on iOS, Android, and in MoRE.
 		 */
 		MAHandle maDBExecSQLParams(in MAHandle databaseHandle, in MAString sql,
 			in MADBValue params, in int paramCount);
