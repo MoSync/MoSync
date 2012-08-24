@@ -312,7 +312,7 @@ public class MoSyncAudio implements OnCompletionListener, OnPreparedListener, On
 	{
 
 		AudioStore audioStore = mMoSyncThread.mMoSyncSound.
-			obtainAudioStoreObject(data, offset, length);
+			obtainAudioStoreObject(data, offset);
 
 		if(audioStore != null)
 			return maAudioDataCreateFromURL(mime,

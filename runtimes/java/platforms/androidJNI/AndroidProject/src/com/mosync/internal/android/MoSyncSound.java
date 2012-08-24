@@ -73,16 +73,15 @@ public class MoSyncSound
 	/**
 	 * Play a sound.
 	 *
-	 * TODO: Who deallocates the handle once it is written to disk?
-	 *
-	 * @param soundHandle Handle to sound data. At the beginning of the
-	 * data is a mime type header.
-	 * @param offset Offset from the beginning of the data to the start
-	 * of the sound data.
-	 * @param length Length of sound data.
+	 * @param handle Handle to data object that contains sound data.
+	 * @param offset Offset from the beginning of the data object
+	 * to the start of the sound data (mime type + audio data).
+	 * @param length Length of sound data (including mime header).
 	 */
-	int maSoundPlay(int soundResource, int offset, int length)
+	int maSoundPlay(int handle, int offset, int length)
 	{
+		Log.i("@@@@@@@", "maSoundPlay handle: "
+			+ handle + " offset: " + offset + " length: " + length);
 		try
 		{
 			// Free current MediaPlayer instance.
@@ -96,33 +95,60 @@ public class MoSyncSound
 			mMediaPlayer = new MediaPlayer();
 
 			SYSLOG("MoSyncSound.maSoundPlay()" +
-				"Reading audio resource:" + soundResource);
+				"Reading audio resource:" + handle);
 
 			// Get audio information.
-			AudioStore audioStore = obtainAudioStoreObject(
-				soundResource,
-				offset,
-				length);
+			AudioStore audioStore = obtainAudioStoreObject(handle, offset);
 			if (audioStore == null)
 			{
-				//Log.e("MoSyncSound.maSoundPlay",
-				//	"No audio resource with handle: "
-				//		+ soundResource + " found!");
+				Log.e("MoSyncSound.maSoundPlay",
+					"No audio resource with handle: "
+					+ handle + " found!");
 				return -1;
 			}
 
-			// Get file descriptor for audio file.
-			FileDescriptor fileDesc =
-				getActivity().openFileInput(
-					audioStore.mTemporaryFileName).getFD();
+			// Open the audio file.
+			FileInputStream stream = getActivity().openFileInput(
+				audioStore.mTemporaryFileName);
 
+			// Find beginning of audio data (starts after mime header).
+			if (offset > 0)
+			{
+				long skipped = stream.skip(offset);
+				if (skipped != offset)
+				{
+					Log.e("MoSyncSound.maSoundPlay",
+						"Could not locate start of sound data " +
+						"for handle: " + handle + " at offset: " + offset);
+					return -1;
+				}
+			}
+
+			// Read past the mime header (mime type ends with zero byte).
+			int mimeLength = 0;
+			int b;
+			do
+			{
+				b = stream.read();
+				++mimeLength;
+			}
+			while (0 != b);
+
+			// Log.i("@@@@@@@", "maSoundPlay mimeLength: " + mimeLength);
+
+			// Get file descriptor for audio file.
+			FileDescriptor fileDesc = stream.getFD();
 			if (null == fileDesc)
 			{
 				//Log.e("MoSyncSound.maSoundPlay", "File Descriptor was null!");
 				return -1;
 			}
 
-			mMediaPlayer.setDataSource(fileDesc, offset, length);
+			// Play sound.
+			mMediaPlayer.setDataSource(
+				fileDesc,
+				offset + mimeLength,
+				length - mimeLength);
 			mMediaPlayer.prepare();
 			mMediaPlayer.start();
 
@@ -242,21 +268,13 @@ public class MoSyncSound
 	 */
 	class AudioStore
 	{
-		//public int mSize;
-		//public String mMimeType;
-
 		/**
-		 * The file name of the audio object.
-		 * TODO: Are the temporary files deleted?
+		 * The file name of the audio object. Android needs
+		 * sound to be in a file to play it?
+		 * TODO: Perhaps a memory file would work? Is that an option?
+		 * TODO: Another thing, is the temporary file ever deleted?
 		 */
 		public String mTemporaryFileName;
-
-		/**
-		 * The offset into audio data. Stored here to be able to compare
-		 * if a requested play offset is different from the existing one.
-		 * In this case a new temporary file is created.
-		 */
-		public int mOffset;
 
 		/**
 		 * Constructor.
@@ -265,12 +283,9 @@ public class MoSyncSound
 		 * @param offset Offset into data buffer.
 		 * @param temporaryFileName The name of the audio file.
 		 */
-		AudioStore(int offset, String temporaryFileName)
+		AudioStore(String temporaryFileName)
 		{
 			SYSLOG("AudioStore temp file savec :" + temporaryFileName);
-			//mMimeType = mimeType;
-			//mSize = size;
-			mOffset = offset;
 			mTemporaryFileName = temporaryFileName;
 		}
 	};
@@ -280,11 +295,9 @@ public class MoSyncSound
 	 * This is done because we need an audio file to play the sound.
 	 * @param soundHandle The handle to the sound object. The audio object
 	 * @param dataOffset Offset into data object where mime type + audio data begins.
-	 * @param dataLength Length of mime type + audio data. If -1 is passed in,
-	 * the length of the entire buffer is used.
 	 * begins with a null terminated mime string, then follows audio data.
 	 */
-	void storeIfBinaryAudioResource(int soundHandle, int dataOffset, int dataLength)
+	void storeIfBinaryAudioResource(int soundHandle, int offset)
 	{
 		ByteBuffer audioData = mMoSyncThread.getBinaryResource(soundHandle);
 		if (null == audioData)
@@ -295,15 +308,8 @@ public class MoSyncSound
 			return;
 		}
 
-		// If length is -1 we use the length of the entire buffer.
-		// It goes without saying that this is one ugly hack.
-		if (-1 == dataLength)
-		{
-			dataLength = audioData.capacity(); // Or limit()? The same?
-		}
-
-		// Is this an audio object?
-		if (!checkIfMimeAudioType(audioData, dataOffset, dataLength))
+		// Is there a mime type at the offset?
+		if (!checkIfMimeAudioType(audioData, offset))
 		{
 			// No it was not.
 			SYSLOG("MoSyncAudio.storeIfBinaryAudioResource: "
@@ -312,24 +318,19 @@ public class MoSyncSound
 			return;
 		}
 
-		// Read the mime string.
-		String mimeType = readMimeString(audioData, dataOffset);
+		// Check that we can read the mime string.
+		String mimeType = readMimeString(audioData, offset);
 		if (mimeType == null)
 		{
 			SYSLOG("MoSyncAudio.storeIfBinaryAudioResource: No mime type!");
 			// TODO: What about returning an error code?
 			return;
 		}
-
+/*
 		// Determine the length of the audio data.
 		int mimeStringLength = mimeType.length() + 1;
-		int audioDataLength = dataLength - mimeStringLength;
-
-		SYSLOG("MoSyncAudio.storeIfBinaryAudioResource" +
-			" initial capacity: " + audioData.capacity() +
-			" mimeLength: " + mimeType.length() +
-			" audio length: " + audioDataLength);
-
+*/
+		// Write the entire data object to file.
 		try
 		{
 			// Create file name.
@@ -345,11 +346,7 @@ public class MoSyncSound
 			FileChannel channel = audioFileOutputStream.getChannel();
 
 			// Set position to start of audio data.
-			audioData.position(dataOffset + mimeStringLength);
-
-			// Set limit.
-			int oldLimit = audioData.limit();
-			audioData.limit(dataOffset + dataLength);
+			audioData.position(0);
 
 			// Write data.
 			channel.write(audioData);
@@ -357,16 +354,13 @@ public class MoSyncSound
 			// Close the channel, also closes the output stream.
 			channel.close();
 
-			// Restore limit.
-			audioData.limit(oldLimit);
-
 			// Add entry to audio resource table.
-			mAudioStores.put(soundHandle, new AudioStore(dataOffset, fileName));
+			mAudioStores.put(soundHandle, new AudioStore(fileName));
 		}
 		catch (Exception ex)
 		{
-			//Log.e("MoSyncSound.storeIfBinaryAudioResource",
-			//	"Unable to save temporary audio file.");
+			Log.e("MoSyncSound.storeIfBinaryAudioResource",
+				"Unable to save temporary audio file.");
 			ex.printStackTrace();
 			// TODO: What about returning an error code?
 		}
@@ -375,7 +369,7 @@ public class MoSyncSound
 	/**
 	 * If this is an audio ubin, we store the resource as a file that
 	 * can be played with MediaPlayer.
-	 * @param ubinData An object honding information about this resource.
+	 * @param ubinData An object holding information about this resource.
 	 * @param resHandle The id of the audio resource.
 	 */
 	public void storeIfAudioUBin(UBinData ubinData, int resHandle)
@@ -389,6 +383,7 @@ public class MoSyncSound
 			return;
 		}
 
+		// Write content of entire ubin to file (including the mime header).
 		try
 		{
 			// Open the resource file.
@@ -402,23 +397,16 @@ public class MoSyncSound
 			inputStream.skip(
 				ubinData.getOffset() - mMoSyncThread.getResourceStartOffset());
 
-			// Read mime string.
-			String mimeType = readMimeStringFromFile(inputStream);
-			int mimeStringLength = mimeType.length() + 1;
+			// Create buffer to hold audio data (mime type plus sound data).
+			byte[] buffer = new byte[ubinData.getSize()];
 
-			// Calculate size of audio data.
-			int length = ubinData.getSize() - mimeStringLength;
-
-			// Create buffer to hold audio data.
-			byte[] buffer = new byte[length];
-
-			// We should be at the start of audio data after reading the mime string.
+			// Read data.
 			inputStream.read(buffer);
 
 			// Close input stream.
 			inputStream.close();
 
-			// Create a temporary audio file
+			// Create a temporary file.
 			String fileName = "MOSYNCTEMP:audio" + resHandle + ".tmp";
 			FileOutputStream outputStream = getActivity().openFileOutput(
 				fileName,
@@ -431,8 +419,8 @@ public class MoSyncSound
 			outputStream.close();
 
 			// TODO: Unify AudioStore with UBinData ?
-			// Store sound data in audio table. Here we use offset zero.
-			mAudioStores.put(resHandle, new AudioStore(0, fileName));
+			// Store sound data in audio table.
+			mAudioStores.put(resHandle, new AudioStore(fileName));
 		}
 		catch(Exception ex)
 		{
@@ -442,15 +430,14 @@ public class MoSyncSound
 	}
 
 	/**
-	 * Get the AudioStore object for the given audio handle and
-	 * write an audio file and an AuiStore object if it does not exist.
+	 * Get the AudioStore object for the given audio handle and write an
+	 * audio file and create an AudioStore object if it does not exist.
 	 * @param soundHandle The audio handle.
 	 * @param offset The offset into the data where the mime type
 	 * and sound is located. The mime type is a null-terminated string.
-	 * @param length Length of sound data (including mime type).
 	 * @return An AudioStore object for the sound or null if there is an error.
 	 */
-	AudioStore obtainAudioStoreObject(int soundHandle, int offset, int length)
+	AudioStore obtainAudioStoreObject(int soundHandle, int offset)
 	{
 		// Does the sound already exist in the AudioStore table?
 		AudioStore audioStore =
@@ -458,26 +445,18 @@ public class MoSyncSound
 		if (audioStore != null)
 		{
 			// Yes it exists.
-			// Is offset the same as in the stored object?
-			// (You could potentially have multiple sounds in a data object,
-			// at different offsets...)
-			// TODO: Problem here is that if offset is different, we will
-			// create a new AudioStore object and a new temporary file,
-			// without erasing the old ones.
-			if (offset == audioStore.mOffset)
-			{
-				// Yes same offset.
-				return audioStore;
-			}
+			return audioStore;
 		}
+		else
+		{
+			// The sound did not exist. Store it.
+			storeIfBinaryAudioResource(soundHandle, offset);
 
-		// The sound did not exist. Store it.
-		storeIfBinaryAudioResource(soundHandle, offset, length);
-
-		// If this handle contained proper sound data there
-		// should now be an audio object in the audio store.
-		// If not, null will be returned.
-		return (AudioStore) mAudioStores.get(new Integer(soundHandle));
+			// If this handle contained proper sound data there
+			// should now be an audio object in the audio store.
+			// If not, null will be returned.
+			return (AudioStore) mAudioStores.get(new Integer(soundHandle));
+		}
 	}
 
 	/**
@@ -500,24 +479,15 @@ public class MoSyncSound
 	 * @param audioData A buffer containing audio data.
 	 * @param offset The offset into the data where the mime type
 	 * and sound is located. The mime type is a null-terminated string.
-	 * @param length Length of sound data (including mime type).
 	 * @return true if the audioData is of type "audio", false if not.
 	 */
-	final boolean checkIfMimeAudioType(ByteBuffer audioData, int offset, int length)
+	final boolean checkIfMimeAudioType(ByteBuffer audioData, int offset)
 	{
 		// No point in checking audio type unless we have at least five bytes.
-		if (audioData.capacity() < 5)
+		if (audioData.limit() < 5)
 		{
 			//Log.e("MoSyncAudio.checkIfMimeAudioType",
 			//	"Resource was smaller than 5 bytes");
-			return false;
-		}
-
-		// Do sanity checks on data buffer size
-		if (audioData.capacity() < offset + length)
-		{
-			Log.e("MoSyncAudio.checkIfMimeAudioType",
-				"Resource is smaller than offset + length");
 			return false;
 		}
 

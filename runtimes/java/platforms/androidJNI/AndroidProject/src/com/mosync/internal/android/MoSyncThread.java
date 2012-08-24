@@ -849,7 +849,7 @@ public class MoSyncThread extends Thread
 	 */
 	void storeIfBinaryAudioResource(int soundHandle)
 	{
-		mMoSyncSound.storeIfBinaryAudioResource(soundHandle, 0, -1);
+		mMoSyncSound.storeIfBinaryAudioResource(soundHandle, 0);
 	}
 
 	/*
