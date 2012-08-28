@@ -36,6 +36,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "PimSyscall.h"
 #include "OptionsDialogView.h"
 #include <CoreMedia/CoreMedia.h>
+#include <sys/types.h> //
+#include <sys/sysctl.h>//to retrieve device model
 
 #include <helpers/CPP_IX_GUIDO.h>
 //#include <helpers/CPP_IX_ACCELEROMETER.h>
@@ -1281,6 +1283,15 @@ namespace Base {
 			res = size;
 		} else if (strcmp(key, "mosync.device.OS.version") == 0) {
 			[[[UIDevice currentDevice] systemVersion] getCString:buf maxLength:size encoding:NSASCIIStringEncoding];
+			res = size;
+		} else if (strcmp(key, "mosync.device") == 0) {
+			size_t responseSz;
+			sysctlbyname("hw.machine", NULL, &responseSz, NULL, 0);
+			char *machine = (char*)malloc(responseSz);
+			sysctlbyname("hw.machine", machine, &responseSz, NULL, 0);
+			NSString *platform = [NSString stringWithCString:machine encoding:NSASCIIStringEncoding];
+			[platform getCString:buf maxLength:size encoding:NSASCIIStringEncoding];
+			free(machine);
 			res = size;
 		} else if (strcmp(key, "mosync.network.type") == 0) {
 			NSString* networkType;

@@ -13,6 +13,11 @@ if [ "$PLISTBUDDY" = "" ]; then
 	exit 1
 fi
 
+# For OS X, version 10.8 or higher, we need to add the MOSYNCDIR to the Info.plist
+# of the app instead of adding it to the global environment.plist:
+/usr/libexec/PlistBuddy -c "Delete :LSEnvironment:MOSYNCDIR" /Applications/MoSync/eclipse/mosync.app/Contents/Info.plist
+/usr/libexec/PlistBuddy -c "Add :LSEnvironment:MOSYNCDIR string /Applications/MoSync" /Applications/MoSync/eclipse/mosync.app/Contents/Info.plist
+
 #
 # If ~/.MacOSX/environment.plist exists, add MOSYNCDIR to it
 # otherwise create the file with default content and add MOSYNCDIR
