@@ -126,6 +126,42 @@ namespace MoSync
                     });
             }
 
+            #region MoSync Widget Properties
+
+            /**
+             * Implementation of the "Height" property.
+             * Gets/sets the height of the widget.
+             */
+            [MoSyncWidgetProperty(MoSync.Constants.MAW_WIDGET_HEIGHT)]
+            public new double Height
+            {
+                get
+                {
+                    return mGrid.Height;
+                }
+                set
+                {
+                    mGrid.Height = value;
+                }
+            }
+
+            /**
+             * Implementation of the "Width" property.
+             * Gets/sets the height of the widget.
+             */
+            [MoSyncWidgetProperty(MoSync.Constants.MAW_WIDGET_WIDTH)]
+            public new double Width
+            {
+                get
+                {
+                    return mGrid.Width;
+                }
+                set
+                {
+                    mGrid.Width = value;
+                }
+            }
+
             /**
              * Implementation of the "Text" property.
              * Sets the text that will appear on the list view item
@@ -204,7 +240,7 @@ namespace MoSync
 			}
 
             /**
-             * The implementation of the "FontHandle" property. 
+             * The implementation of the "FontHandle" property.
              * Sets the font handle used to display the item's text
              */
             [MoSyncWidgetProperty(MoSync.Constants.MAW_LABEL_FONT_HANDLE)]
@@ -220,6 +256,8 @@ namespace MoSync
 					mText.FontStyle = fontInfo.style;
 				}
             }
-		}
-	}
-}
+
+            #endregion
+        } // end of ListViewItem class
+	} // end of NativeUI namespace
+} // end of MoSync namespace
