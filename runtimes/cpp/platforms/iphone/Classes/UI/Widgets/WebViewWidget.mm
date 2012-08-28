@@ -229,7 +229,12 @@
     {
         return NO;
     }
-
+    //open mail for mailto links
+    if ([[request.URL scheme] isEqual:@"mailto"]) {
+        NSLog(@"sending URL to mailto");
+        [[UIApplication sharedApplication] openURL:request.URL];
+        return NO;
+    }
     NSString *url=[NSString stringWithString:request.URL.absoluteString];
 	//Hook by-pass system for the case of the MoSync coder using the
 	//set url property. used by maWidgetSetProperty syscall

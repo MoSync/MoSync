@@ -33,7 +33,7 @@ int MAMain()
 					break;
 				}
 
-				printf("You typed: %c\n", event.key);
+				printf("You typed key code: %d\n", event.key);
 			}
 		}
 	}

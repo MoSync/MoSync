@@ -495,7 +495,8 @@ static PurchaseManager *sharedInstance = nil;
         {
             continue;
         }
-        if ([payment isEqual:productPayment])
+        if ([payment isEqual:productPayment] &&
+            !product.isPurchased)
         {
             return product;
         }

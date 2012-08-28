@@ -96,6 +96,7 @@ mosync.nativeui.maWidgetCreate = function(
 	}
 
 	mosync.bridge.send(message, processedCallback);
+	// TODO: Micke says: Should we move this code to before send?
 	mosync.nativeui.callBackTable[callbackID] = {
 		success : successCallback,
 		error : errorCallback
@@ -649,10 +650,11 @@ mosync.nativeui.NativeWidgetElement = function(widgetType, widgetID, params,
 	 * @param property
 	 *            name of the property
 	 * @param successCallback
-	 *            a function that will be called if the operation is successful.
-	 *            The value and wigetID will be passed to this function
+	 *            a function that will be called if the operation is successful,
+	 *            called with two parameters, property name and property value, for example:
+	 *            function(prop, value) { ... }
 	 * @param errorCallback
-	 *            a function that will be called if an error occurs
+	 *            a function that will be called if an error occurs, takes no parameters
 	 */
 	this.getProperty = function(property, successCallback, errorCallback)
 	{
@@ -1241,9 +1243,9 @@ mosync.nativeui.create = function(widgetType, widgetID, params,
  */
 mosync.nativeui.destroyAll = function()
 {
-	for(var widget in mosync.nativeui.widgetIDList)
+	for (var widget in mosync.nativeui.widgetIDList)
 	{
-		//Destroy all widgets and do not wait for anything
+		// Destroy all widgets and do not wait for anything.
 		mosync.nativeui.maWidgetDestroy(widget, null, null, null);
 	}
 };
@@ -1271,14 +1273,20 @@ mosync.nativeui.numWidgetsCreated = 0;
 mosync.nativeui.showInterval;
 
 /**
- * List of WidetIDs and handles. Used for accessign widgets through their IDs
+ * List of WidetIDs and handles. Used for accessing MoSync widget handles through their IDs.
  * @private
  */
 mosync.nativeui.widgetIDList = {};
 
 /**
- * Provides access to C++ handles through IDs. It is accessible though document object as well.
+ * TODO: Micke says: The comment "It is accessible though document object as well."
+ * seems misleading, because that returns a DOM object, not a widget handle.
+ * Is this the case? Then we should update the comment. And why is this private?
+ * This is useful to have in applications. And should we rename the function,
+ * to not confuse it with document.getElementsById ? Why not call it
+ * "getWidgetHandleById" ??
  *
+ * Provides access to C++ handles through IDs. It is accessible though document object as well.
  *
  * @param elementID
  *            ID of the widget in question
@@ -1287,13 +1295,17 @@ mosync.nativeui.widgetIDList = {};
  * Example
  * -------
  * \code
+ * TODO: Micke says: Is this code example relevant for this function?
+ * The example shows something else. And should "getElementsById"
+ * not be "getElementById"?
  *
  *   var myButton = document.getElementsById("MyButton");
  *   myButton.addTo("myLayout");
  * \endcode
  * @private
  */
-mosync.nativeui.getElementById = function(elementID) {
+mosync.nativeui.getElementById = function(elementID)
+{
 	return mosync.nativeui.widgetIDList[elementID];
 };
 
@@ -1615,6 +1627,8 @@ mosync.nativeui.showScreen = function(screenID) {
  * Initializes the UI system and parsing of the XML input.
  * This function should be called when the document body is loaded.
  *
+ * @return true on success, false on error.
+ *
  * \code
  *  <!-- The function can be called in the initialization phase of HTML document.-->
  *  <body onload="mosync.nativeui.initUI()">
@@ -1628,14 +1642,20 @@ mosync.nativeui.showScreen = function(screenID) {
  *  //Do something, and show your main screen
  *  }
  * \endcode
- *
- *
  */
 mosync.nativeui.initUI = function() {
 	var MoSyncDiv = document.getElementById("NativeUI");
+	if (!MoSyncDiv) {
+		// TODO: Add log error message.
+		return false;
+	}
 	MoSyncDiv.style.display = "none"; //hide the Native Container
 	var MoSyncNodes = document.getElementById("NativeUI").childNodes;
-	for ( var i = 1; i < MoSyncNodes.length; i++) {
+	if (!MoSyncNodes) {
+		// TODO: Add log error message.
+		return false;
+	}
+	for (var i = 1; i < MoSyncNodes.length; i++) {
 		if ((MoSyncNodes[i] != null) && (MoSyncNodes[i].tagName != undefined)) {
 			if (MoSyncNodes[i].id == null) {
 				MoSyncNodes[i].id = "widget" + mosync.nativeui.widgetCounter;
@@ -1645,7 +1665,8 @@ mosync.nativeui.initUI = function() {
 		}
 	}
 	mosync.nativeui.showInterval = self.setInterval(
-			"mosync.nativeui.CheckUIStatus()", 100);
+		"mosync.nativeui.CheckUIStatus()", 100);
+	return true;
 };
 
 /*

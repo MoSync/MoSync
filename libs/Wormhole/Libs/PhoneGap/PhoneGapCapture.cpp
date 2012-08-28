@@ -129,94 +129,114 @@ namespace Wormhole
 	 */
 	void PhoneGapCapture::customEvent(const MAEvent &event)
 	{
-		char pathBuffer[256];
-		char messageBuffer[512];
+		char pathBuffer[1024];
+		char messageBuffer[1024];
 
-		if(event.type == EVENT_TYPE_CAPTURE)
+		if (event.type == EVENT_TYPE_CAPTURE)
 		{
-
 			MACaptureEventData eventData = event.captureData;
 
-			switch(eventData.type)
+			switch (eventData.type)
 			{
-			case MA_CAPTURE_EVENT_TYPE_VIDEO:
-				//Videos are already stored, we need the filepath
-				maCaptureGetVideoPath(eventData.handle, pathBuffer, 256);
-
-				sprintf(messageBuffer, "{\"message\":[{\"fullPath\":\"%s\",\"name\":\"%s\"}]}",
-						pathBuffer, FileNameFromPath(pathBuffer));
-				mMessageHandler->callSuccess(
-					mCaptureCallBack,
-					PHONEGAP_CALLBACK_STATUS_OK,
-					messageBuffer,
-					false);
-				break;
-
-			case MA_CAPTURE_EVENT_TYPE_IMAGE:
-			{
-				char deviceOS[16];
-				String extension;
-				char localPath[128];
-
-				maGetSystemProperty(
-						"mosync.device.OS",
-						deviceOS,
-						16);
-
-				// TODO: Check that this really works.
-				if(strcmp(deviceOS, "iPhone OS") == 0)
-				{
-					extension = "png";
-				}
-				else if(strcmp(deviceOS, "Android") == 0)
-				{
-					extension = "jpg";
-				}
-
-				maGetSystemProperty(
-					"mosync.path.local",
-					localPath,
-					128);
-
-				//Images need to be stored. We use maLocalTime to get a unique number for the filename
-				sprintf(
-					pathBuffer,
-					"%simg%d.%s",
-					localPath,
-					maLocalTime(),
-					extension.c_str());
-				int result = maCaptureWriteImage(eventData.handle, pathBuffer, 256);
-				sprintf(messageBuffer,
-					"{\"message\":[{\"fullPath\":\"%s\",\"name\":\"%s\"}]}",
-					pathBuffer, FileNameFromPath(pathBuffer));
-
-				if(result == MA_CAPTURE_RES_OK)
-				{
+				case MA_CAPTURE_EVENT_TYPE_VIDEO:
+					// Videos are already stored, we need the filepath
+					maCaptureGetVideoPath(
+						eventData.handle,
+						pathBuffer,
+						sizeof(pathBuffer));
+					sprintf(
+						messageBuffer,
+						"{\"message\":[{\"fullPath\":\"%s\",\"name\":\"%s\"}]}",
+						pathBuffer,
+						FileNameFromPath(pathBuffer));
 					mMessageHandler->callSuccess(
 						mCaptureCallBack,
 						PHONEGAP_CALLBACK_STATUS_OK,
 						messageBuffer,
 						false);
-				}
-				else
+					maCaptureDestroyData(eventData.handle);
+					break;
+
+				case MA_CAPTURE_EVENT_TYPE_IMAGE:
 				{
+					char deviceOS[64];
+					String extension;
+					char localPath[1024];
+
+					maGetSystemProperty(
+						"mosync.device.OS",
+						deviceOS,
+						sizeof(deviceOS));
+
+					// File format is different on different platforms.
+					// TODO: What about WP?
+					if (strcmp(deviceOS, "iPhone OS") == 0)
+					{
+						extension = "png";
+					}
+					else if(strcmp(deviceOS, "Android") == 0)
+					{
+						extension = "jpg";
+					}
+					else
+					{
+						// TODO: What to use as default?
+						extension = "image";
+					}
+
+					// Images need to be stored. We use maLocalTime to
+					// get a unique number for the filename.
+					maGetSystemProperty(
+						"mosync.path.local",
+						localPath,
+						sizeof(localPath));
+					sprintf(
+						pathBuffer,
+						"%simg%d.%s",
+						localPath,
+						maLocalTime(),
+						extension.c_str());
+					int result = maCaptureWriteImage(
+						eventData.handle,
+						pathBuffer,
+						sizeof(pathBuffer));
+					sprintf(
+						messageBuffer,
+						"{\"message\":[{\"fullPath\":\"%s\",\"name\":\"%s\"}]}",
+						pathBuffer,
+						FileNameFromPath(pathBuffer));
+
+					if (result == MA_CAPTURE_RES_OK)
+					{
+						mMessageHandler->callSuccess(
+							mCaptureCallBack,
+							PHONEGAP_CALLBACK_STATUS_OK,
+							messageBuffer,
+							false);
+					}
+					else
+					{
+						mMessageHandler->callError(
+							mCaptureCallBack,
+							PHONEGAP_CALLBACK_STATUS_ERROR,
+							"{\"code\":\"CAPTURE_INTERNAL_ERR\"}",
+							false);
+					}
+
+					// Free capture data.
+					maCaptureDestroyData(eventData.handle);
+
+					break;
+				}
+
+				case MA_CAPTURE_EVENT_TYPE_CANCEL:
 					mMessageHandler->callError(
 						mCaptureCallBack,
 						PHONEGAP_CALLBACK_STATUS_ERROR,
-						"{\"code\":\"CAPTURE_INTERNAL_ERR\"}",
+						"{\"code\":\"CAPTURE_NO_MEDIA_FILES\"}",
 						false);
-				}
-				break;
-			}
-
-			case MA_CAPTURE_EVENT_TYPE_CANCEL:
-				mMessageHandler->callError(
-					mCaptureCallBack,
-					PHONEGAP_CALLBACK_STATUS_ERROR,
-					"{\"code\":\"CAPTURE_NO_MEDIA_FILES\"}",
-					false);
-				break;
-			}
+					break;
+			} // switch
 		}
 	}
 } // namespace

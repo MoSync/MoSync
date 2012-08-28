@@ -72,6 +72,8 @@ listener.error ->
 /// The system has run out of memory.
 #define CONNERR_DOWNLOADER_OOM (CONNERR_USER - 1)
 
+#define CONNERR_DOWNLOADER_OTHER (CONNERR_USER + (CONNERR_USER / 2))
+
 /**
  * Use values below this for your own error codes when you inherit the Downloader class.
  * \see #CONNERR_USER

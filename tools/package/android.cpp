@@ -40,7 +40,7 @@ static void writePermissions(ostream& stream, const SETTINGS& s, const RuntimeIn
 static void writePermission(ostream& stream, bool flag, const char* nativePerm);
 static void writeNFCDirectives(ostream& stream, const SETTINGS& s);
 static void writeNFCResource(ostream& stream, const SETTINGS& s);
-static void writeC2DMReceiver(ostream& stream, const string& packageName);
+static void writeGCMReceiver(ostream& stream, const string& packageName);
 static void writeBillingReceiver(ostream& stream);
 static string packageNameToByteCodeName(const string& packageName);
 
@@ -296,7 +296,7 @@ static void writeManifest(const char* filename, const SETTINGS& s, const Runtime
 	file <<"\t\t<service android:name=\"com.mosync.internal.android.notifications.LocalNotificationsService\" />\n";
 	file <<"\t\t<service android:name=\".MoSyncService\" />\n";
 
-	writeC2DMReceiver(file, packageName);
+	writeGCMReceiver(file, packageName);
 
 	file << "\t\t<service android:name=\"com.mosync.internal.android.billing.BillingService\" />\n";
 	writeBillingReceiver(file);
@@ -400,7 +400,7 @@ static void writePermissions(ostream& stream, const SETTINGS& s, const RuntimeIn
 	// Add in-app billing only for android 1.6 and higher.
 	if (ri.androidVersion >= 4)
 	{
-		writePermission(stream, true, "com.android.vending.BILLING");
+		writePermission(stream, isPermissionSet(permissionSet, PURCHASE), "com.android.vending.BILLING");
 	}
 }
 static void writePermission(ostream& stream, bool flag, const char* nativePerm) {
@@ -445,10 +445,10 @@ static void writeNFCResource(ostream& stream, const SETTINGS& s) {
 	//TODO: delete nfcInfo;
 }
 
-static void writeC2DMReceiver(ostream& stream, const string& packageName) {
+static void writeGCMReceiver(ostream& stream, const string& packageName) {
 	// Receiver for messages and registration responses.
-	stream << "\t\t<service android:name=\".C2DMReceiver\" />\n";
-	stream << "\t\t<receiver android:name=\"com.google.android.c2dm.C2DMBroadcastReceiver\"\n";
+	stream << "\t\t<service android:name=\".GCMIntentService\" />\n";
+	stream << "\t\t<receiver android:name=\"com.google.android.gcm.GCMBroadcastReceiver\"\n";
 	stream << "\t\t\tandroid:permission=\"com.google.android.c2dm.permission.SEND\">\n";
 	stream << "\t\t\t<intent-filter>\n";
 	stream << "\t\t\t\t<action android:name=\"com.google.android.c2dm.intent.RECEIVE\" />\n";

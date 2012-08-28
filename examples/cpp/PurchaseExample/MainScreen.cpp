@@ -23,7 +23,8 @@
  *  - "Buy" section with a buy button and a list of available items for sale.
  *  - "History" section with a list of purchased items.
  *  For each purchased item there is a Receipt button.
- *  When the Receipt button is pressed a dialog/new screen shows the receipt details.
+ *  When the Receipt button is pressed a dialog shows the receipt details.
+ *  @author Emma Tresanszki
  */
 
 #include <conprint.h>
@@ -34,13 +35,14 @@
 #include <mastdlib.h>
 #include <matime.h>
 
+#include <Purchase/Purchase.h>
+
 #include "Util.h"
+#include "Config.h"
 #include "MainScreen.h"
 
 #define BREAKLINE_HEIGHT 10
-#define ANDROID_PRODUCT_TYPE_PURCHASED "android.test.purchased"
-#define IOS_PRODUCT_TYPE_1 "com.mosync.purchase2.consumable"
-#define IOS_PRODUCT_TYPE_2 "com.mosync.purchase2.nonconsumable"
+#define RECEIPT_DIALOG_TITLE "Receipt"
 
 /**
  * Constructor.
@@ -57,7 +59,6 @@ MainScreen::MainScreen() :
 	mReceiptAppId(NULL),
 	mReceiptTransactionDate(NULL),
 	mReceiptTransactionId(NULL),
-	mReceiptVersionExternalId(NULL),
 	mReceiptBid(NULL),
 	mReceiptOkButton(NULL)
 {
@@ -104,7 +105,7 @@ void MainScreen::buttonClicked(Widget* button)
  */
 void MainScreen::fillReceiptDialog(MAUtil::String appID, MAUtil::String productID,
 		int transactionDate, MAUtil::String transactionId,
-		MAUtil::String versionExternalId, MAUtil::String BID)
+		MAUtil::String BID)
 {
 	// If the field is unavailable, print a line character instead.
 	if ( appID.length() == 0 )
@@ -126,11 +127,14 @@ void MainScreen::fillReceiptDialog(MAUtil::String appID, MAUtil::String productI
 				MAUtil::integerToString(transaction.tm_sec +1) );
 	}
 	mReceiptProductId->setText(productID);
-	mReceiptAppId->setText(appID);
-	if ( getPlatform() == IOS )
+	int platform = getPlatform();
+	if ( platform == ANDROID )
+	{
+		mReceiptAppId->setText(appID);
+	}
+	else if ( platform == IOS )
 	{
 		mReceiptTransactionId->setText(transactionId);
-		mReceiptVersionExternalId->setText(versionExternalId);
 		mReceiptBid->setText(BID);
 	}
 
@@ -189,9 +193,19 @@ void MainScreen::productPurchased(MAUtil::String productId)
 	mBuyButton->setEnabled(true);
 
 	ListViewItem* item = new ListViewItem();
-	item->setText(productId);
 	item->setFontColor(ITEMS_COLOR);
 	mPurchasedItemsList->addChild(item);
+
+	// Search the productId among the product list,
+	// and only display the product name.
+	for (int i=0; i < mProductIdList.size(); i++)
+	{
+		if ( strcmp(mProductIdList[i].c_str(), productId.c_str()) == 0 )
+		{
+			item->setText(mProductNamesList[i]);
+			break;
+		}
+	}
 }
 
 /**
@@ -238,16 +252,9 @@ void MainScreen::checkBoxStateChanged(
 void MainScreen::createReceiptDialog()
 {
 	mReceiptDialog = new Dialog();
+	mReceiptDialog->setTitle(RECEIPT_DIALOG_TITLE);
 	VerticalLayout* dialogLayout = new VerticalLayout();
 	mReceiptDialog->setMainWidget(dialogLayout);
-
-	HorizontalLayout* titleLayout = new HorizontalLayout();
-	titleLayout->wrapContentVertically();
-	titleLayout->setChildHorizontalAlignment(MAW_ALIGNMENT_CENTER);
-	Label* title = new Label("Product Receipt");
-	title->setFontColor(RECEIPT_FIELD_COLOR);
-	titleLayout->addChild(title);
-	dialogLayout->addChild(titleLayout);
 
 	Label* receiptProductIdInfo = new Label("Product ID");
 	receiptProductIdInfo->setFontColor(RECEIPT_FIELD_COLOR);
@@ -261,26 +268,25 @@ void MainScreen::createReceiptDialog()
 
 	dialogLayout->addChild(receiptProductIdInfo);
 	dialogLayout->addChild(mReceiptProductId);
-	dialogLayout->addChild(receiptAppId);
-	dialogLayout->addChild(mReceiptAppId);
 	dialogLayout->addChild(receiptTransactionDate);
 	dialogLayout->addChild(mReceiptTransactionDate);
 
-	if ( getPlatform() == IOS )
+	int platform = getPlatform();
+	if ( platform == ANDROID)
+	{
+		dialogLayout->addChild(receiptAppId);
+		dialogLayout->addChild(mReceiptAppId);
+	}
+	else if ( platform == IOS )
 	{
 		Label* receiptTransactionId = new Label("Transaction ID");
 		receiptTransactionId->setFontColor(RECEIPT_FIELD_COLOR);
 		mReceiptTransactionId = new Label();
-		Label* receiptVersionExternalId = new Label("Version external ID");
-		receiptVersionExternalId->setFontColor(RECEIPT_FIELD_COLOR);
-		mReceiptVersionExternalId = new Label();
 		Label* receiptBid = new Label("BID");
 		receiptBid->setFontColor(RECEIPT_FIELD_COLOR);
 		mReceiptBid = new Label();
 		dialogLayout->addChild(receiptTransactionId);
 		dialogLayout->addChild(mReceiptTransactionId);
-		dialogLayout->addChild(receiptVersionExternalId);
-		dialogLayout->addChild(mReceiptVersionExternalId);
 		dialogLayout->addChild(receiptBid);
 		dialogLayout->addChild(mReceiptBid);
 	}
@@ -303,12 +309,15 @@ void MainScreen::createProductIdList()
 		 * If you want to run the example for your own product ids,
 		 * add them to the mProductIdList list.
 		 */
-		mProductIdList.add(ANDROID_PRODUCT_TYPE_PURCHASED);
+		mProductIdList.add(sGooglePlayPurchasedProductId);
+		mProductNamesList.add("Test product");
 	}
 	else
 	{
 		mProductIdList.add(IOS_PRODUCT_TYPE_1);
+		mProductNamesList.add("Consumable product");
 		mProductIdList.add(IOS_PRODUCT_TYPE_2);
+		mProductNamesList.add("Non-consumable product");
 	}
 }
 
@@ -332,7 +341,7 @@ void MainScreen::createMainLayout()
 	buyLayout->addChild(info);
 
 	// Add the list of available items for sale along with check boxes.
-	for (int i=0; i < mProductIdList.size(); i++)
+	for (int i=0; i < mProductNamesList.size(); i++)
 	{
 		HorizontalLayout* itemLayout = new HorizontalLayout();
 		itemLayout->wrapContentVertically();
@@ -340,7 +349,7 @@ void MainScreen::createMainLayout()
 		itemLayout->addChild(itemCheckBox);
 		mItemsCheckBoxes.add(itemCheckBox);
 		Label* itemId = new Label();
-		itemId->setText(mProductIdList[i]);
+		itemId->setText(mProductNamesList[i]);
 		itemId->setFontColor(ITEMS_COLOR);
 		itemLayout->addChild(itemId);
 		buyLayout->addChild(itemLayout);

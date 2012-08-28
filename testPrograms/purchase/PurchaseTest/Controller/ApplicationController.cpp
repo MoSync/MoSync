@@ -43,6 +43,7 @@
 #include "../tests/Test8.h"
 #include "../tests/Test9.h"
 #include "../tests/Test10.h"
+#include "../tests/Test11.h"
 
 #include "../Util.h"
 #include "Config.h"
@@ -81,7 +82,8 @@ namespace PurchaseTest
 		else
 		{
 			MAUtil::String developerKey = DEVELOPER_PUBLIC_KEY;
-			if ( developerKey.size() == 0 )
+			if ( developerKey.size() == 0 &&
+				 platform == ANDROID )
 			{
 				maAlert("Error", "You need to set developer key in Config.h ",
 					"OK", NULL, NULL);
@@ -191,6 +193,7 @@ namespace PurchaseTest
 		mTests.add(new Test8(*this));
 		mTests.add(new Test9(*this));
 		mTests.add(new Test10(*this));
+		mTests.add(new Test11(*this));
 	}
 
 	/**

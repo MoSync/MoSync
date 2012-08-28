@@ -72,6 +72,7 @@ import com.mosync.internal.android.nfc.MoSyncNFCForegroundUtil;
 import com.mosync.internal.android.nfc.MoSyncNFCService;
 import com.mosync.internal.android.notifications.LocalNotificationsManager;
 import com.mosync.internal.android.notifications.PushNotificationsManager;
+import com.mosync.internal.android.notifications.PushNotificationsUtil;
 import com.mosync.nativeui.ui.widgets.OptionsMenuItem;
 import com.mosync.nativeui.ui.widgets.ScreenWidget;
 
@@ -148,15 +149,16 @@ public class MoSync extends Activity
 		}
 
 		try {
-			// If triggered by a C2DM message, handle it here.
+			// If triggered by a GCM/C2DM message, handle it here.
 			// Call this after the MoSyncThread is created.
-			if ( getIntent().getBooleanExtra(C2DMReceiver.MOSYNC_INTENT_EXTRA_NOTIFICATION, false) )
+			if ( getIntent().getBooleanExtra(
+					PushNotificationsUtil.MOSYNC_INTENT_EXTRA_NOTIFICATION, false) )
 			{
 				Log.e("@@MoSync","MoSync activity started after a push notification was received");
 				PushNotificationsManager.handlePushNotificationIntent(getIntent());
 			}
 		}catch(Throwable t){
-			SYSLOG("No C2DM message");
+			SYSLOG("No GCM/C2DM message");
 		}
 
 		// Create the view.
@@ -411,21 +413,21 @@ public class MoSync extends Activity
 		else if ( resultCode == RESULT_OK &&
 				requestCode == CAPTURE_MODE_RECORD_VIDEO_REQUEST )
 		{
-			Log.e("@@MoSync","Capture ready, control returned to MoSync activity.");
+			Log.i("@@MoSync","Capture ready, control returned to MoSync activity.");
 			// A video was recorded.
 			MoSyncCapture.handleVideo(data);
 		}
 		else if ( resultCode == RESULT_OK &&
 				requestCode == CAPTURE_MODE_TAKE_PICTURE_REQUEST )
 		{
-			Log.e("@@MoSync","Capture ready, control returned to MoSync activity.");
+			Log.i("@@MoSync","Capture ready, control returned to MoSync activity.");
 			// A picture was taken.
 			MoSyncCapture.handlePicture(data);
 		}
 		else if ( resultCode == RESULT_CANCELED &&
 				(requestCode == CAPTURE_MODE_TAKE_PICTURE_REQUEST || requestCode == CAPTURE_MODE_RECORD_VIDEO_REQUEST) )
 		{
-			Log.e("@@MoSync","Capture canceled, control returned to MoSync activity.");
+			Log.i("@@MoSync","Capture canceled, control returned to MoSync activity.");
 			// Send MoSync event: the capture was canceled by the user.
 			MoSyncCapture.handleCaptureCanceled();
 		}

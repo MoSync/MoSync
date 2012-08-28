@@ -2,23 +2,37 @@
 <!--
 * @file index.html
 * @author Mikael Kindborg
+*
+* Main application file, contains the "app" object that defines the
+* application logic and handles requests from the Camera and Gallery
+* WebViews. This file also defines the tabbed Native UI of the
+* application. Note that the code in this file runs in a hidden WebView.
+*
+* All Wormhole requests are routed through this WebView, since Wormhole
+* currently has built-in support for only one WebView. Custom code
+* defined in C++ enables the visible WebViews to send messages to this
+* WebView, thereby accessing functionality in the Wormhole library.
+* Similar functionality may be included in future versions of Wormhole.
 -->
 <html>
 	<head>
-		<meta name="viewport" content="width=320, user-scalable=no">
+		<meta name="viewport" content="width=device-width">
 		<meta http-equiv="Content-type" content="text/html; charset=utf-8">
 		<title>Photo Gallery</title>
 		<link rel="stylesheet" href="style.css" type="text/css" media="screen" title="no title" charset="utf-8">
 		<script type="text/javascript" charset="utf-8" src="js/wormhole.js"></script>
+		<script type="text/javascript" charset="utf-8" src="mosync-extensions.js"></script>
 		<script type="text/javascript">
 		var app = (function()
 		{
 			var app = {};
 
-			var gFileURL = null;
-
+			/**
+			 * Initialize the JavaScript part of the application.
+			 */
 			app.init = function()
 			{
+				// Exit app on back button (on Android).
 				document.addEventListener(
 					"backbutton",
 					function()
@@ -26,17 +40,105 @@
 						mosync.bridge.send(["close"]);
 					},
 					true);
+
+				// Called when the UI is ready to be shown. Show the main screen here.
+				mosync.nativeui.UIReady = function()
+				{
+					// First get the screen we want to show.
+					var mainScreen = document.getNativeElementById("mainScreen");
+
+					// Show the screen.
+					mainScreen.show();
+				};
+
+				// Remember to call this to initialise the NativeUI system.
+				mosync.nativeui.initUI();
 			};
 
-			app.uploadPhoto = function()
+			/**
+			 * Open the camera ui to take a picture.
+			 */
+			app.snapPhoto = function()
 			{
-				var fileURL = gFileURL;
-				if (null == fileURL)
+				// Helper function that iterates over all files in the
+				// application's root directory and removes old capture
+				// files. This prevents the app from consuming storage.
+				function removeAllImageFilesExcept(filePath, successFun, errorFun)
 				{
-					alert("First snap a photo");
-					return;
+					window.requestFileSystem(
+						LocalFileSystem.PERSISTENT,
+						0,
+						function (fileSystem)
+						{
+							var directoryReader = fileSystem.root.createReader();
+							directoryReader.readEntries(
+								function(entries)
+								{
+									for (var i = 0; i < entries.length; ++i)
+									{
+										removeImageFileExcept(entries[i], filePath);
+									}
+									successFun();
+								},
+								function ()
+								{
+									errorFun("Could not read directory");
+								});
+						},
+						function ()
+						{
+							errorFun("Could not open file system");
+						});
+				};
+
+				// Helper function that removes old capture files.
+				// The name format for captured image files is:
+				// "img<timestamp>.jpg|png"
+				function removeImageFileExcept(entry, filePath)
+				{
+					if (!entry.isFile) { return; }
+					if (entry.fullPath == filePath) { return; }
+					if (/.*\/img.*((\.jpg)|(\.png))$/.test(entry.fullPath))
+					{
+						entry.remove(function() {}, function() {});
+					}
 				}
 
+				// Do actual capture.
+				navigator.device.capture.captureImage(
+					// Callback that gets the image that was captured.
+					function(mediaFiles)
+					{
+						var filePath = mediaFiles[0].fullPath;
+						var fileURL = "file://" + filePath;
+
+						removeAllImageFilesExcept(
+							filePath,
+							function()
+							{
+								// Pass the URL of the captured image to the camera page.
+								var cameraWebViewHandle =
+									mosync.nativeui.getWidgetHandleById("cameraWebView");
+								mosync.bridge.callJS(
+									cameraWebViewHandle,
+									"camera.setPhotoURL('" + fileURL + "')");
+							},
+							function(errorMessage)
+							{
+								alert(errorMessage);
+							});
+					},
+					function(error)
+					{
+						alert("Could not take picture. Error code: " + error.code);
+					});
+			};
+
+			/**
+			 * Upload an image to the server.
+			 */
+			app.uploadPhoto = function(fileURL)
+			{
 				var options = new FileUploadOptions();
 				options.fileKey = "file";
 				options.fileName = fileURL.substr(fileURL.lastIndexOf('/') + 1);
@@ -47,23 +149,21 @@
 
 				transfer.upload(
 					fileURL,
-					//"http://192.168.0.145:4042/",
-					"http://dev.mosync.com/mobilelua/upload.php",
+					"http://dev.mosync.com/mobilelua/PhotoGallery/upload.php",
 					function(result)
 					{
-						alert("Photo uploaded - response: " + result.response);
-						console.log("@@Code = " + result.responseCode);
-						console.log("@@Response = " + result.response);
-						console.log("@@Sent = " + result.bytesSent);
+						alert("Photo uploaded");
 					},
 					function(error)
 					{
 						alert("Could not upload photo - error: " + error.code);
-						console.log("@@Could not upload photo - error: " + error.code);
 					},
 					options);
 			}
 
+			/**
+			 * Helper function to get the Mime-Type of an image.
+			 */
 			app.getMimeType = function(fileName)
 			{
 				if (/\.jpg$/.test(fileName)) return "image/jpeg";
@@ -73,69 +173,18 @@
 			}
 
 			/**
-			 * Open the camera ui to take a picture.
-			 */
-			app.snapPhoto = function()
-			{
-				navigator.device.capture.captureImage(
-					/**
-					 * Callback that returns the image that was captured.
-					 * @param mediaFiles Array with images.
-					 */
-					function(mediaFiles)
-					{
-						gFileURL = "file://" + mediaFiles[0].fullPath;
-						console.log("@@@ gFileURL: " + gFileURL);
-						console.log("@@@ mediaFiles.length: " + mediaFiles.length);
-						var imageElement = document.getElementById('photo');
-						imageElement.src = gFileURL;
-					},
-					function(error)
-					{
-						alert("Could not take picture - error: " + error.code);
-					});
-			};
-
-			/**
 			 * Initiate download of list of photos.
 			 * Will call setPhotoList when complete.
 			 */
 			app.downloadPhotoList = function()
 			{
-				mosync.bridge.send(["Custom", "DownloadPhotoList"]);
-			};
-
-			app.downloadPhotoListDebug = function()
-			{
-				app.setPhotoList('["http:\/\/dev.mosync.com\/mobilelua\/PhotoGallery\/photos\/2010-02-07 15.05.13.jpg","http:\/\/dev.mosync.com\/mobilelua\/PhotoGallery\/photos\/testimg.jpg"]');
-			};
-
-			/**
-			 * Called when download of list of photos is
-			 * complete.
-			 * @param json Array of urls (strings) to images.
-			 */
-			app.setPhotoList = function(json)
-			{
-				// Delete existing DOM list of images.
-				var list = document.getElementById("photolist");
-				while(list.hasChildNodes())
-				{
-					list.removeChild(list.firstChild);
-				}
-
-				// Build new list (populate DOM).
-				var urls = JSON.parse(json);
-				var limit = Math.min(20, urls.length);
-				for (var i = 0; i < urls.length; ++i)
-				{
-					var image = document.createElement('img');
-					image.src = urls[i];
-					image.style.width = "100%";
-					// TODO: Add more properties to the image object as needed.
-
-					list.appendChild(image);
-				}
+				var galleryWebViewHandle =
+					mosync.nativeui.getWidgetHandleById("galleryWebView");
+				mosync.bridge.send([
+					"Custom",
+					"DownloadPhotoList",
+					"" + galleryWebViewHandle,
+					"http://dev.mosync.com/mobilelua/PhotoGallery/upload.php"]);
 			};
 
 			return app;
@@ -143,17 +192,35 @@
 		</script>
 	</head>
 	<body onload="app.init()">
-		<div id="screen">
-			<div class="pane" id="heading">Photo Gallery</div>
-			<div class="pane button" onclick="app.snapPhoto()">Snap Photo</div>
-			<div class="pane view">
-				<img id="photo" src="MoSyncLogo.png" style="width:100%"/>
+	<!--  Here the NativeUI components are declared. -->
+	<div id="NativeUI">
+		<!-- Tab screen that contains three tabs with child screens -->
+		<div data-widgetType="TabScreen" id="mainScreen">
+			<!-- First Screen -->
+			<div data-widgetType="Screen" id="cameraScreen" data-title="Camera"
+				data-icon_android="img/86-camera-big.png"
+				data-icon_iOS="img/168-upload-photo-2.png">
+				<div data-widgetType="WebView" id="cameraWebView"
+					data-width="100%" data-height="100%" data-url="page-camera.html">
+				</div>
 			</div>
-			<div class="pane button" onclick="app.uploadPhoto()">Upload Photo</div>
-			<div class="pane button" onclick="app.downloadPhotoList()">Show Uploaded Photos</div>
-			<div class="pane view" id="photolist">
-				<!-- Images are dynamically added here. -->
+			<!-- Second Screen -->
+			<div data-widgetType="Screen" data-id="galleryScreen" data-title="Gallery"
+				data-icon_android="img/42-photos-big.png"
+				data-icon_iOS="img/42-photos.png">
+				<div data-widgetType="WebView" id="galleryWebView"
+					data-width="100%" data-height="100%" data-url="page-gallery.html">
+				</div>
+			</div>
+			<!-- Third Screen -->
+			<div data-widgetType="Screen" data-id="aboutScreen" data-title="About"
+				data-icon_android="img/29-heart-big.png"
+				data-icon_iOS="img/29-heart.png">
+				<div data-widgetType="WebView" id="aboutWebView"
+					data-width="100%" data-height="100%" data-url="page-about.html">
+				</div>
 			</div>
 		</div>
-	</body>
+	</div>
+</body>
 </html>

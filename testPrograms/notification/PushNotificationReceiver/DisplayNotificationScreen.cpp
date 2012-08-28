@@ -27,6 +27,7 @@ MA 02110-1301, USA.
 #define DEFAULT_SOUND_TEXT "Sound: "
 #define DEFAULT_BADGE_NUMBER_TEXT "Badge number: "
 #define APPLICATION_REGISTERED "Application has registered for push notifications"
+#define APPLICATION_ALREADY_REGISTERED "Application is already registered for push notifications"
 #define APPLICATION_CANNOT_REGISTER "Application did not register for push notifications"
 
 // Default width for numeric edit box widgets.
@@ -80,6 +81,14 @@ void DisplayNotificationScreen::pushRegistrationDone(bool registrationStatus)
 	else
 		mMessageLabel->setText(APPLICATION_CANNOT_REGISTER);
 
+}
+
+/**
+ * This screen is notified that the registration was already completed.
+ */
+void DisplayNotificationScreen::pushRegistrationAlreadyCompleted()
+{
+	mMessageLabel->setText(APPLICATION_ALREADY_REGISTERED);
 }
 
 /**

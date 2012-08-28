@@ -50,7 +50,7 @@ namespace NativeUI
         /**
          * This method is called when an edit box gains focus.
          * The virtual keyboard is shown.
-         * Only for iphone platform.
+         * Platform: Android and iOS.
          * @param editBox The edit box object that generated the event.
          */
         virtual void editBoxEditingDidBegin(EditBox* editBox) {};
@@ -58,7 +58,7 @@ namespace NativeUI
         /**
          * This method is called when an edit box loses focus.
          * The virtual keyboard is hidden.
-         * Only for iphone platform.
+         * Platform: Android and iOS.
          * @param editBox The edit box object that generated the event.
          */
         virtual void editBoxEditingDidEnd(EditBox* editBox) {};

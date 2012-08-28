@@ -24,6 +24,7 @@ MA 02110-1301, USA.
  *  - "History" section with a list of purchased items.
  *  For each purchased item there is a Receipt button.
  *  When the Receipt button is pressed a dialog/new screen shows the receipt details.
+ *  @author Emma Tresanszki
  */
 
 #ifndef MAINSCREEN_H_
@@ -94,7 +95,7 @@ public:
 	 */
 	void fillReceiptDialog(MAUtil::String appID, MAUtil::String productID,
 			int transactionDate, MAUtil::String transactionId,
-			MAUtil::String versionExternalId, MAUtil::String BID);
+			MAUtil::String BID);
 
 	/**
 	 * Dismiss receipt dialog when Ok button is pressed.
@@ -123,15 +124,6 @@ public:
      */
     virtual void buttonClicked(Widget* button);
 
-//    /**
-//     * This method is called when a list view item is clicked.
-//     * @param listView The list view object that generated the event.
-//     * @param listViewItem The ListViewItem object that was clicked.
-//     */
-//     void listViewItemClicked(
-//        ListView* listView,
-//        ListViewItem* listViewItem);
-
     /**
      * This method is called when the state of the check box was changed
      * by the user.
@@ -158,10 +150,16 @@ private:
 	 */
 	void createReceiptDialog();
 private:
-	// List of purchases.
-	//MAUtil::Vector<Purchase*> mPurchases;
 
+	/**
+	 * The productIds of the available items, exactly as they are
+	 * going to be send to the server in the purchase request.
+	 */
 	MAUtil::Vector<MAUtil::String> mProductIdList;
+	/**
+	 * The product names of the available items, user readable.
+	 */
+	MAUtil::Vector<MAUtil::String> mProductNamesList;
 	/**
 	 * Main layout.
 	 */
@@ -180,10 +178,8 @@ private:
 	Label* mReceiptAppId;
 	Label* mReceiptTransactionDate;
 	Label* mReceiptTransactionId;
-	Label* mReceiptVersionExternalId;
 	Label* mReceiptBid;
 	Button* mReceiptOkButton;
 };
-
 
 #endif /* MAINSCREEN_H_ */

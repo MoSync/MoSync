@@ -26,39 +26,36 @@ MA 02110-1301, USA.
 #ifndef UTIL_H_
 #define UTIL_H_
 
-#include <maprofile.h>	// Profile database.
 #include <mastring.h>		// C string functions
 
-/**
- * Detects if the current platform is Android.
- * @return true if the platform is Android, false otherwise.
- */
-static bool isAndroid()
-{
-	if ( NULL != strstr(MA_PROF_STRING_PLATFORM, "android"))
-	{
-		return true;
-	}
-	else
-	{
-		return false;
-	}
-}
+#define BUF_MAX 256
+
+enum platform_code{
+	ANDROID = 0,
+	IOS = 1,
+	WINDOWSPHONE7 = 2
+};
 
 /**
- * Detects if the current platform is iOS.
- * @return true if the platform is iOS, false otherwise.
+ * Detects the current platform
+ * @return platform_code specific for Android, iPhone OS or WindowsPhone
  */
-static bool isIOS()
+static int getPlatform()
 {
-	if ( NULL != strstr(MA_PROF_STRING_PLATFORM, "iphoneos"))
+	char platform[BUF_MAX];
+	maGetSystemProperty("mosync.device.OS", platform, BUF_MAX);
+
+	if(strcmp(platform, "Android") == 0)
 	{
-		return true;
+		return ANDROID;
 	}
 	else
 	{
-		return false;
+		if(strcmp(platform, "iPhone OS") == 0)
+			return IOS;
 	}
+	return WINDOWSPHONE7;
 }
+
 
 #endif /* UTIL_H_ */

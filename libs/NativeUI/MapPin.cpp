@@ -23,7 +23,10 @@ MA 02110-1301, USA.
  * @brief Class that represents a pin on the map (it has two coordinates: latitude and longitude).
  */
 
+#define MAP_EPS 0.000001
+
 #include "MapPin.h"
+#include <madmath.h>
 
 namespace NativeUI
 {
@@ -125,4 +128,17 @@ namespace NativeUI
             }
         }
     }
+
+	/**
+	 * Equality operator.
+	 */
+	bool MapPin::operator==(const MapPin &mapPin) const
+	{
+		if (fabs(mLatitude - mapPin.getLatitude()) < MAP_EPS &&
+			fabs(mLongitude - mapPin.getLongitude()) < MAP_EPS)
+		{
+			return true;
+		}
+		return false;
+	}
 } // end of NativeUI namespace

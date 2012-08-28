@@ -22,7 +22,9 @@ MA 02110-1301, USA.
  * @date 10 Nov 2011
  *
  * @brief Send package to a server application using tcp socket.
+ * Used by iOS devices.
  */
+
 
 #ifndef TCPCONNECTION_H_
 #define TCPCONNECTION_H_
