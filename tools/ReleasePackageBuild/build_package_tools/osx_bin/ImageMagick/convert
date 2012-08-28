@@ -1,13 +1,17 @@
 #!/bin/sh
 
-if
-	# try using the version shipped with MoSync
-	export MAGICK_HOME=/Applications/MoSync/bin/ImageMagick/
-	export DYLD_LIBRARY_PATH="$MAGICK_HOME/lib/"
 
-	/Applications/MoSync/bin/ImageMagick/bin/convert $1 $2 $3 $4 $5 $6
-then
+function run_installed
+{
 	#The shipped version did not work
 	#try running the installed version first.
 	/opt/local/bin/convert $1 $2 $3 $4 $5 $6
-fi
+}
+
+
+# try using the version shipped with MoSync
+export MAGICK_HOME=/Applications/MoSync/bin/ImageMagick/
+export DYLD_LIBRARY_PATH="$MAGICK_HOME/lib/"
+
+/Applications/MoSync/bin/ImageMagick/bin/convert $1 $2 $3 $4 $5 $6 || run_installed $1 $2 $3 $4 $5 $6
+
