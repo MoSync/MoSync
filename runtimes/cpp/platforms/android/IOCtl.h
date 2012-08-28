@@ -981,6 +981,17 @@ namespace Base
 		jobject jThis);
 
 	/**
+	 * Invoke maDBExecSQLParams.
+	 */
+	int _maDBExecSQLParams(
+		MAHandle databaseHandle,
+		const char* sql,
+		int paramsAddress,
+		int paramCount,
+		JNIEnv* jNIEnv,
+		jobject jThis);
+
+	/**
 	 * Destroys a cursor. You must call this function
 	 * when you are done with the cursor to release
 	 * its resources.

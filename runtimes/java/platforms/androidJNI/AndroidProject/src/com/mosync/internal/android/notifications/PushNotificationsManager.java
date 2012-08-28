@@ -21,10 +21,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
+import com.google.android.gcm.GCMRegistrar;
+
 import com.mosync.internal.android.MoSyncThread;
 import com.mosync.nativeui.util.HandleTable;
-import com.google.android.c2dm.C2DMessaging;
-import com.mosync.java.android.C2DMReceiver;
 import com.mosync.internal.android.notifications.PushNotificationsUtil;
 
 import static com.mosync.internal.generated.MAAPI_consts.MA_NOTIFICATION_RES_ERROR;
@@ -43,9 +43,10 @@ import static com.mosync.internal.generated.MAAPI_consts.MA_NOTIFICATION_DISPLAY
 
 /**
  * The Notifications Manager that holds all the notifications that were
- * received from C2Dm server.
- * Receives all C2DM events.
- * C2DM supports only devices with Android 2.2 and higher.
+ * received from GCM server.
+ * Receives all GCM events ( registration response, push notifications).
+ * GCM supports only devices with Android 2.2 and higher.
+ * Note that C2DM server was deprecated and GCM is available instead.
  * This manager is not created on unsupported platforms.
  * @author emma tresanszki
  */
@@ -56,7 +57,7 @@ public class PushNotificationsManager
 	 */
 	public PushNotificationsManager(MoSyncThread mThread, Context context)
 	{
-		Log.e("@@MoSync","C2DM Create PushNotificationManager");
+		Log.e("@@MoSync","GCM Create PushNotificationManager");
 		mMosyncThread = mThread;
 		mAppContext = context;
 		ref = this;
@@ -67,12 +68,12 @@ public class PushNotificationsManager
 	}
 
 	/**
-	 * Handles an C2DM intent.
-	 * Routine: C2DM message is received.
+	 * Handles an GCM/C2DM intent.
+	 * Routine: GCM/C2DM message is received.
 	 * If the MoSync activity is started by clicking on the
 	 * notification this function is called.
 	 * @param intent
-	 * @return {@code true} If the intent was a C2DM intent and handled.
+	 * @return {@code true} If the intent was a GCM/C2DM intent and handled.
 	 */
 	public static boolean handlePushNotificationIntent(Intent intent)
 	{
@@ -84,7 +85,8 @@ public class PushNotificationsManager
 			return false;
 		}
 
-		int notificationHandle = intent.getIntExtra(C2DMReceiver.MOSYNC_INTENT_EXTRA_NOTIFICATION_HANDLE, -1);
+		int notificationHandle = intent.getIntExtra(
+				PushNotificationsUtil.MOSYNC_INTENT_EXTRA_NOTIFICATION_HANDLE, -1);
 		if ( -1 != notificationHandle )
 		{
 			// Post a message to MoSync queue.
@@ -134,7 +136,7 @@ public class PushNotificationsManager
 
 	/**
 	 * The manager is notified when the application
-	 * was unregistered from C2DM service.
+	 * was unregistered from GCM/C2DM service.
 	 */
 	public void unregistered()
 	{
@@ -143,14 +145,12 @@ public class PushNotificationsManager
 
 	/**
 	 * The manager is notified by a new incoming message.
-	 * @param message The C2DM message.
+	 * @param message The GCM/C2DM message.
 	 * @param showNotification True if the notification should be
 	 * displayed to the user.
 	 */
 	public void messageReceived(String message, Boolean showNotification)
 	{
-		Log.e("@@MoSync","C2DM messageReceived");
-
 		// Create local notification object.
 		int newHandle = createNotification(mMosyncThread.getActivity(), message);
 
@@ -174,7 +174,7 @@ public class PushNotificationsManager
 	 */
 	public static void messageReceivedWhenAppNotRunning(String message, Context context)
 	{
-		Log.e("@@MoSync","C2DM messageReceived when application is not running");
+		Log.e("@@MoSync","GCM messageReceived when application is not running");
 
 		int newHandle = createNotification(context, message);
 		triggerNotification(context, newHandle);
@@ -250,15 +250,17 @@ public class PushNotificationsManager
 	}
 
 	/**
-	 * Register to the C2DM server.
-	 * @param accountID The ID of the account authorized to send messages to the application,
+	 * Register to the GCM/C2DM server.
+	 * @param senderId The projectId obtained from here:
+	 * http://developer.android.com/guide/google/gcm/gs.html#create-proj
+	 * deprecated: accountID The ID of the account authorized to send messages to the application,
 	 * typically the email address of an account set up by the application's developer.
 	 *
 	 * @return a result code.
 	 * The registration request is asynchronous. Get the request result using
 	 * maNotificationPushGetRegistration.
 	 */
-	public int register(String accountID)
+	public int register(String senderId)
 	{
 		if ( mRegistrationInfo.registrationInProgress )
 		{
@@ -267,7 +269,7 @@ public class PushNotificationsManager
 		}
 		if ( mRegistrationInfo.registrationSuccess )
 		{
-			Log.e("@@MoSync", "Application is already registered to C2DM");
+			Log.e("@@MoSync", "Application is already registered to GCM/C2DM");
 			return MA_NOTIFICATION_RES_ALREADY_REGISTERED;
 		}
 
@@ -275,25 +277,18 @@ public class PushNotificationsManager
 		mRegistrationInfo.registrationInProgress = true;
 		mRegistrationInfo.registrationAttempted = true;
 
-		// Register with the ID of the account authorized to send push messages.
-		C2DMessaging.register(mMosyncThread.getActivity(), accountID);
-
+		GCMRegistrar.register(mMosyncThread.getActivity(), senderId);
 		return MA_NOTIFICATION_RES_OK;
 	}
 
 	/**
-	 * Unregister from the C2DM server if already registered.
+	 * Unregister from the GCM/C2DM server if already registered.
 	 * @return a result code.
 	 */
 	public int unregister()
 	{
-		if ( !mRegistrationInfo.registrationSuccess )
-		{
-			Log.e("@@MoSync", "maNotificationPushUnregister error: application is not registered.");
-			return MA_NOTIFICATION_RES_NOT_REGISTERED;
-		}
+		GCMRegistrar.unregister(mAppContext);
 
-		C2DMessaging.unregister(mAppContext);
 		mRegistrationInfo.registrationSuccess = false;
 		return MA_NOTIFICATION_RES_OK;
 	}

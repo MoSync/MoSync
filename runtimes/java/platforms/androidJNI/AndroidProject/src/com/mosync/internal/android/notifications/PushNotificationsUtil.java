@@ -21,6 +21,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 
+import static com.mosync.internal.generated.MAAPI_consts.MA_NOTIFICATION_DISPLAY_FLAG_ANYTIME;
 import static com.mosync.internal.generated.MAAPI_consts.MA_NOTIFICATION_DISPLAY_FLAG_DEFAULT;
 
 /**
@@ -34,6 +35,14 @@ import static com.mosync.internal.generated.MAAPI_consts.MA_NOTIFICATION_DISPLAY
  */
 public class PushNotificationsUtil
 {
+	/**
+	 * The name of the extra data sent when launching MoSync activity.
+	 * Used at incoming push notifications.
+	 */
+	public static String MOSYNC_INTENT_EXTRA_MESSAGE = "com.mosync.java.android.IntentExtra";
+	public static String MOSYNC_INTENT_EXTRA_NOTIFICATION_HANDLE = "push.notification.handle";
+	public static String MOSYNC_INTENT_EXTRA_NOTIFICATION = "push.notification";
+
 	// Fields to store in Editor preferences.
     public static final String PREFERENCE = "com.mosync.internal.android.notifications";
     public static final String NOTIFICATION_TITLE = "title";

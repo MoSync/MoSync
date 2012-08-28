@@ -27,10 +27,11 @@ MA 02110-1301, USA.
 #include "SettingsScreen.h"
 #include "DisplayNotificationScreen.h"
 #include "TCPConnection.h"
+#include "HTTPConnection.h"
 #include "Util.h"
 
-#define C2DM_USER_ACCOUNT "emmaTestMosync@gmail.com"
-//#define C2DM_USER_ACCOUNT "emma.tresanszki@mobilesorcery.com"
+#define GCM_PROJECT_ID "yourProjectId_here"
+
 /**
  * Constructor.
  */
@@ -43,7 +44,14 @@ MainScreen::MainScreen() :
 {
 	mDisplayNotificationScreen = new DisplayNotificationScreen();
 	mSettingsScreen = new SettingsScreen(this);
-	mTCPConnection = new TCPConnection(this);
+	if ( isAndroid() )
+	{
+		mHttpConnection = new HTTPConnection(this);
+	}
+	else if ( isIOS() )
+	{
+		mTCPConnection = new TCPConnection(this);
+	}
 
 	this->addTab(mDisplayNotificationScreen);
 	this->addTab(mSettingsScreen);
@@ -59,7 +67,7 @@ MainScreen::MainScreen() :
 				Notification::PUSH_NOTIFICATION_TYPE_BADGE |
 				Notification::PUSH_NOTIFICATION_TYPE_ALERT |
 				Notification::PUSH_NOTIFICATION_TYPE_SOUND,
-				C2DM_USER_ACCOUNT);
+				GCM_PROJECT_ID);
 
 		if ( MA_NOTIFICATION_RES_UNSUPPORTED == registerCode )
 			maPanic(0, "This device does not support push notifications");
@@ -87,7 +95,7 @@ void MainScreen::checkStore() {
 				Notification::PUSH_NOTIFICATION_TYPE_BADGE
 						| Notification::PUSH_NOTIFICATION_TYPE_ALERT
 						| Notification::PUSH_NOTIFICATION_TYPE_SOUND,
-				C2DM_USER_ACCOUNT);
+				GCM_PROJECT_ID);
 		if ( MA_NOTIFICATION_RES_UNSUPPORTED == registerCode )
 			maPanic(0, "This device does not support push notifications");
 
@@ -96,6 +104,7 @@ void MainScreen::checkStore() {
 	}
 	else
 	{
+		mDisplayNotificationScreen->pushRegistrationAlreadyCompleted();
 		mSendRegistrationNeeded = false;
 		// Close store without deleting it.
 		maCloseStore(myStore, 0);
@@ -129,8 +138,6 @@ void MainScreen::storeRegistrationID(MAUtil::String* token)
 		 maCloseStore(myStore, 0);
 	}
 
-	// Finally, send it over TCP to the server.
-//	mConnection->sendData(token);
 }
 
 /**
@@ -192,22 +199,30 @@ void MainScreen::didFailedToRegister(
  * Called when the application is connected to the server.
  */
 void MainScreen::connectionEstablished()
-{
+ {
 	printf("MainScreen::connectionEstablished()");
 	// Update the UI.
 	mSettingsScreen->connectionEstablished();
 
-	if (mToken)
+	// Finally send it over TCP to the iOS server,
+	// or over HTTP to the Java web app.
+	if (isIOS() && mToken)
 	{
-		// This is the first time the app is launched on Android phone.
-		// Need to send the token. Also, store it to the store.
-		if (isAndroid())
-		{
-			storeRegistrationID(mToken);
-		}
-
-		// Finally send it over TCP to the server.
 		mTCPConnection->sendData(*mToken);
+	}
+}
+
+/**
+ * Called when the server has received the authorization key.
+ */
+void MainScreen::messageSent()
+{
+	connectionEstablished();
+	// This is the first time the app is launched on Android phone.
+	// Need to send the token. Also, store it to the store.
+	if (isAndroid() && mToken)
+	{
+		storeRegistrationID(mToken);
 	}
 }
 
@@ -219,8 +234,16 @@ void MainScreen::connectionEstablished()
 void MainScreen::connectToServer(const MAUtil::String& ipAddress,
 		const MAUtil::String& port)
 {
-	int resultCode = mTCPConnection->connect(ipAddress, port);
-	if (resultCode != resultCode)
+	int resultCode;
+	if ( isAndroid() )
+	{
+		resultCode = mHttpConnection->sendApiKey(ipAddress, *mToken);
+	}
+	else if( isIOS() )
+	{
+		resultCode = mTCPConnection->connect(ipAddress, port);
+	}
+	if (resultCode <= 0 )
 	{
 		mSettingsScreen->connectionFailed();
 	}

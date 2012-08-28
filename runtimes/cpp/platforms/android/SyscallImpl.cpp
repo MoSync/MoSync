@@ -3060,6 +3060,25 @@ namespace Base
 				mJNIEnv,
 				mJThis);
 
+		case maIOCtl_maDBExecSQLParams:
+		{
+			// Get fourth parameter.
+			int d = SYSCALL_THIS->GetValidatedStackValue(0);
+			return _maDBExecSQLParams(
+				// Database handle
+				a,
+				// SQL string
+				SYSCALL_THIS->GetValidatedStr(b),
+				// Params address
+				//(int)SYSCALL_THIS->GetValidatedMemRange(c, sizeof(MADBValue) * d)
+				//	- (int)gCore->mem_ds,
+				c,
+				// Param count.
+				d,
+				mJNIEnv,
+				mJThis);
+		}
+
 		case maIOCtl_maDBCursorDestroy:
 			return _maDBCursorDestroy(
 				a,

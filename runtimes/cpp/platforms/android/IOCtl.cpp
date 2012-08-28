@@ -3737,6 +3737,40 @@ namespace Base
 	}
 
 	/**
+	 * Invoke maDBExecSQLParams.
+	 */
+	int _maDBExecSQLParams(
+		MAHandle databaseHandle,
+		const char* sql,
+		int paramsAddress,
+		int paramCount,
+		JNIEnv* jNIEnv,
+		jobject jThis)
+	{
+		jstring jstrSql = jNIEnv->NewStringUTF(sql);
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(
+			cls,
+			"maDBExecSQLParams",
+			"(ILjava/lang/String;II)I");
+		if (methodID == 0)
+		{
+			// Method not found.
+			return -1;
+		}
+		jint result = jNIEnv->CallIntMethod(
+			jThis,
+			methodID,
+			databaseHandle,
+			jstrSql,
+			paramsAddress,
+			paramCount);
+		jNIEnv->DeleteLocalRef(cls);
+		jNIEnv->DeleteLocalRef(jstrSql);
+		return (int)result;
+	}
+
+	/**
 	 * Destroys a cursor. You must call this function
 	 * when you are done with the cursor to release
 	 * its resources.
