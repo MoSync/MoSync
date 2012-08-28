@@ -2,4 +2,5 @@
   <capability name="OpenGL ES 1.0" state="SUPPORTED"/>
   <capability name="OpenGL ES 2.0" state="SUPPORTED"/>
   <capability name="Bluetooth" state="UNSUPPORTED"/>
+  <capability name="In-App Purchase" state="SUPPORTED"/>
 </platform>
