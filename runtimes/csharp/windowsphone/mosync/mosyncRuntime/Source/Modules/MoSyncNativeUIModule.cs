@@ -61,8 +61,11 @@ namespace MoSync
 				if (_widget < 0 || _widget >= mWidgets.Count)
 					return MoSync.Constants.MAW_RES_INVALID_HANDLE;
                 IWidget widget = mWidgets[_widget];
-                widget.RemoveFromParent();
-                mWidgets.RemoveAt(_widget);
+                if (widget != null)
+                {
+                    widget.RemoveFromParent();
+                    mWidgets[_widget] = null;
+                }
                 return MoSync.Constants.MAW_RES_OK;
             };
 
