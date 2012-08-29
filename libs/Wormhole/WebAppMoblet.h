@@ -51,7 +51,10 @@ namespace Wormhole
 	class WebAppMoblet_WebViewListener;
 
 	/**
-	 * \brief A web view is a widget used to render web pages.
+	 * \brief A Moblet with additional functionality that allows easier interaction with
+	 * JavaScript code. It provides a wormhole-enabled WebView, methods to extract and load
+	 * your HTML files and JavaScript code, and a structure for communicating with your JS
+	 * code.
 	 */
 	class WebAppMoblet : public MAUtil::Moblet
 	{

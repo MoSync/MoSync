@@ -849,7 +849,7 @@ public class MoSyncThread extends Thread
 	 */
 	void storeIfBinaryAudioResource(int soundHandle)
 	{
-		mMoSyncSound.storeIfBinaryAudioResource(soundHandle);
+		mMoSyncSound.storeIfBinaryAudioResource(soundHandle, 0);
 	}
 
 	/*
@@ -5383,6 +5383,20 @@ public class MoSyncThread extends Thread
 	int maDBExecSQL(int databaseHandle, String sql)
 	{
 		return mMoSyncDB.maDBExecSQL(databaseHandle, sql);
+	}
+
+	int maDBExecSQLParams(
+		int databaseHandle,
+		String sql,
+		int paramsAddress,
+		int paramCount)
+	{
+		return mMoSyncDB.maDBExecSQLParams(
+			databaseHandle,
+			sql,
+			paramsAddress,
+			paramCount,
+			this);
 	}
 
 	int maDBCursorDestroy(int cursorHandle)
