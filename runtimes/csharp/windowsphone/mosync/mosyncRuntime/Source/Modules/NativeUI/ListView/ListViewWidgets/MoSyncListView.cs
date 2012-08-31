@@ -60,10 +60,24 @@ namespace MoSync
             protected System.Windows.Controls.ListBox mList;
 
             /**
+             * By default, the selection is enabled on the list. This value keeps track of
+             * the selection status: if set to false, inside the selection changed event,
+             * we deselect the selected item.
+             */
+            protected bool mListSelectionEnabled = true;
+
+            /**
              * The LongListSelector is used when the type of the list is segmented or
              * alphabetical.
              */
             protected LongListSelector mLongListSelector;
+
+            /**
+             * By default, the selection is enabled on the long list selector. This value keeps track of
+             * the selection status: if set to false, inside the selection changed event,
+             * we deselect the selected item.
+             */
+            protected bool mLongListSelectorSelectionEnabled = true;
 
             /**
              * The current list view type.
@@ -73,9 +87,6 @@ namespace MoSync
             /* TODO - should contain the long list selector items and sections */
 
             List<ListSection<ListItem>> mListSections;
-
-            List<ListItem> source;
-            IList<ListSection<ListItem>> list;
 
             #region Constructor
 
@@ -88,12 +99,10 @@ namespace MoSync
 
                 // create the LongListSelector that will be used as a segmented/alphabetical listview
                 mLongListSelector = new LongListSelector();
+                mLongListSelector.Height = 500;
+                mLongListSelector.Width = 400;
                 // apply the predefined templates on the mLongListSelector
-                mLongListSelector.ItemTemplate = Application.Current.Resources["listItemTemplate"] as DataTemplate;
-                mLongListSelector.GroupItemTemplate = Application.Current.Resources["groupItemTemplate"] as DataTemplate;
-                mLongListSelector.GroupHeaderTemplate = Application.Current.Resources["groupHeaderTemplate"] as DataTemplate;
-                mLongListSelector.GroupFooterTemplate = Application.Current.Resources["groupFooterTemplate"] as DataTemplate;
-                mLongListSelector.GroupItemsPanel = Application.Current.Resources["groupHeaderItemsTemplate"] as ItemsPanelTemplate;
+                ApplyTemplatesOnLongListSelector();
 
                 mListSections = new List<ListSection<ListItem>>();
 
@@ -117,13 +126,13 @@ namespace MoSync
 			 */
             public override void AddChild(IWidget child)
             {
-                if (child is ListViewItem)
+                if (child is ListViewSection)
                 {
-                    AddListItem(child as ListViewItem);
+                    AddListSection(child as ListViewSection);
                 }
                 else
                 {
-                    AddListSection(child as ListViewSection);
+                    AddListItem(child);
                 }
             }
 
@@ -132,14 +141,14 @@ namespace MoSync
              */
             public override void InsertChild(IWidget child, int index)
             {
-                base.InsertChild(child, index);
-                MoSync.Util.RunActionOnMainThreadSync(() =>
+                if (child is ListViewSection)
                 {
-                    System.Windows.Controls.ListBoxItem item = new System.Windows.Controls.ListBoxItem();
-                    WidgetBaseWindowsPhone widget = (child as WidgetBaseWindowsPhone);
-                    item.Content = widget.View;
-                    mList.Items.Insert(index, item);
-                });
+                    InsertListSection(child as ListViewSection, index);
+                }
+                else
+                {
+                    InsertListItem(child, index);
+                }
             }
 
             /**
@@ -147,11 +156,14 @@ namespace MoSync
              */
             public override void RemoveChild(int index)
             {
-                base.RemoveChild(index);
-                MoSync.Util.RunActionOnMainThreadSync(() =>
+                if (mListViewType == ListViewType.Default)
                 {
-                    mList.Items.RemoveAt(index);
-                });
+                    RemoveListItem(index);
+                }
+                else
+                {
+                    RemoveListSection(index);
+                }
             }
 
             /**
@@ -170,8 +182,13 @@ namespace MoSync
 
             #region Events
 
+            /**
+             * Event triggered when the user clicks on a ListBox item.
+             */
             void mList_Tap(object sender, System.Windows.Input.GestureEventArgs e)
             {
+                // TODO SA: do nothing if selection is disabled
+
                 //create a Memory object of 8 Bytes
                 Memory eventData = new Memory(12);
 
@@ -197,21 +214,47 @@ namespace MoSync
                 }
             }
 
+            /**
+             * Event triggered when the user clicks on a ListBox section.
+             */
             void mLongListSelector_SelectionChanged(object sender, SelectionChangedEventArgs e)
             {
-                // TODO SA: send the event to the MoSync runtime
-
-                // if the user presses the header, the selected item will be null and we don't have
-                // to do anything
-                if (mLongListSelector.SelectedItem != null)
+                if (mLongListSelectorSelectionEnabled)
                 {
-                /*    GridLength len1 = new GridLength(50);
-                    ColumnDefinition col1 = new ColumnDefinition { Width = len1 };
-                    (mLongListSelector.SelectedItem as ListItem).Content.ColumnDefinitions.Add(col1);
-                    TextBlock testTB = new TextBlock();
-                    testTB.Text = "CLICK!";
-                    Grid.SetColumn(testTB, (mLongListSelector.SelectedItem as ListItem).Content.ColumnDefinitions.Count);
-                    (mLongListSelector.SelectedItem as ListItem).Content.Children.Add(testTB); */
+                    // if the user presses the header, the selected item will be null and we don't have
+                    // to do anything
+                    if (mLongListSelector.SelectedItem != null)
+                    {
+                        //create a Memory object of 8 Bytes
+                        Memory eventData = new Memory(12);
+
+                        //starting with the 0 Byte we write the eventType
+                        const int MAWidgetEventData_eventType = 0;
+
+                        //starting with the 4th Byte we write the widgetHandle
+                        const int MAWidgetEventData_widgetHandle = 4;
+
+                        //starting with the 8th Byte we write the selectedIndex
+                        const int MAWidgetEventData_selectedIndex = 8;
+
+                        // TODO SA: get the real index
+                        int selIndex = 2;
+
+                        eventData.WriteInt32(MAWidgetEventData_eventType, MoSync.Constants.MAW_EVENT_ITEM_CLICKED);
+                        eventData.WriteInt32(MAWidgetEventData_widgetHandle, mHandle);
+
+                        if (selIndex > -1)
+                        {
+                            eventData.WriteInt32(MAWidgetEventData_selectedIndex, selIndex);
+                            //posting a CustomEvent
+                            mRuntime.PostCustomEvent(MoSync.Constants.EVENT_TYPE_WIDGET, eventData);
+                        }
+                    }
+                }
+                else
+                {
+                    // this is the only way I found to disable selection on the LongListSelector
+                    mLongListSelector.SelectedItem = null;
                 }
             }
 
@@ -307,16 +350,42 @@ namespace MoSync
             {
                 get
                 {
-                    // TODO SA: return true if selection is allowed and false otherwise
-
-                    return "true";
+                    if (mListViewType == ListViewType.Default)
+                    {
+                        if (mListSelectionEnabled)
+                        {
+                            return "true";
+                        }
+                        return "false";
+                    }
+                    else
+                    {
+                        if (mLongListSelectorSelectionEnabled)
+                        {
+                            return "true";
+                        }
+                        return "false";
+                    }
                 }
                 set
                 {
                     bool allowSelection = false;
                     if (Boolean.TryParse(value, out allowSelection))
                     {
-                        // TODO SA: allow or not the selection inside the list view
+                        if (mListViewType == ListViewType.Default)
+                        {
+                            mListSelectionEnabled = allowSelection;
+                        }
+                        else
+                        {
+                            mLongListSelectorSelectionEnabled = allowSelection;
+                            // if the allow selection is set to false, we deselect the
+                            // currently selected items
+                            if (!mLongListSelectorSelectionEnabled)
+                            {
+                                mLongListSelector.SelectedItem = null;
+                            }
+                        }
                     }
                     else
                     {
@@ -330,9 +399,22 @@ namespace MoSync
             #region Private methods
 
             /**
-             * Adds a ListViewItem to the main list.
+             * Applies templates on the long list selector.
              */
-            private void AddListItem(ListViewItem child)
+            private void ApplyTemplatesOnLongListSelector()
+            {
+                mLongListSelector.ItemTemplate = Application.Current.Resources["listItemTemplate"] as DataTemplate;
+                mLongListSelector.GroupItemTemplate = Application.Current.Resources["groupItemTemplate"] as DataTemplate;
+                mLongListSelector.GroupHeaderTemplate = Application.Current.Resources["groupHeaderTemplate"] as DataTemplate;
+                mLongListSelector.GroupFooterTemplate = Application.Current.Resources["groupFooterTemplate"] as DataTemplate;
+                mLongListSelector.GroupItemsPanel = Application.Current.Resources["groupHeaderItemsTemplate"] as ItemsPanelTemplate;
+            }
+
+            /**
+             * Adds a ListViewItem to the main list.
+             * @param child The list view item to be added.
+             */
+            private void AddListItem(IWidget child)
             {
                 base.AddChild(child);
                 MoSync.Util.RunActionOnMainThreadSync(() =>
@@ -363,10 +445,12 @@ namespace MoSync
 
             /**
              * Adds a ListViewSection to the LongListSelector.
+             * @param section The list view section to be added.
              */
             private void AddListSection(ListViewSection section)
             {
                 ListSection<ListItem> newSection = null;
+                base.AddChild(section);
                 MoSync.Util.RunActionOnMainThreadSync(() =>
                     {
                         newSection = new ListSection<ListItem>(section.Title,
@@ -375,6 +459,69 @@ namespace MoSync
                 mListSections.Add(newSection);
             }
 
+            /**
+             * Inserts a list view item at a certain index.
+             * @param child The widget to be added to the list.
+             * @param index The index where the widget should be added.
+             */
+            private void InsertListItem(IWidget child, int index)
+            {
+                base.InsertChild(child, index);
+                MoSync.Util.RunActionOnMainThreadSync(() =>
+                {
+                    System.Windows.Controls.ListBoxItem item = new System.Windows.Controls.ListBoxItem();
+                    WidgetBaseWindowsPhone widget = (child as WidgetBaseWindowsPhone);
+                    item.Content = widget.View;
+                    mList.Items.Insert(index, item);
+                });
+            }
+
+            /**
+             * Inserts a list view section at a certain index.
+             * @param child The widget to be added to the list.
+             * @param index The index where the widget should be added.
+             */
+            private void InsertListSection(ListViewSection section, int index)
+            {
+                ListSection<ListItem> newSection = null;
+                base.AddChild(section);
+                MoSync.Util.RunActionOnMainThreadSync(() =>
+                {
+                    newSection = new ListSection<ListItem>(section.Title,
+                                                           section.SectionItems);
+                });
+                mListSections.Insert(index, newSection);
+            }
+
+            /**
+             * Removes a list view item from the list.
+             * @param index The index of the list view item to be removed.
+             */
+            private void RemoveListItem(int index)
+            {
+                base.RemoveChild(index);
+                MoSync.Util.RunActionOnMainThreadSync(() =>
+                {
+                    mList.Items.RemoveAt(index);
+                });
+            }
+
+            /**
+             * Removes a list view section from the list.
+             * @param index The index of the list view section to be removed.
+             */
+            private void RemoveListSection(int index)
+            {
+                base.RemoveChild(index);
+                MoSync.Util.RunActionOnMainThreadSync(() =>
+                {
+                    mListSections.RemoveAt(index);
+                });
+            }
+
+            /**
+             * Removes the items from the list and reloads it.
+             */
             private void ClearLongList()
             {
                 mListSections.Clear();

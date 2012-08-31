@@ -46,7 +46,7 @@ public:
 	/**
 	 * Constructor.
 	 */
-		MainScreen();
+	MainScreen();
 
 	/**
 	 * Destructor.
@@ -67,7 +67,6 @@ private:
     virtual void tabScreenTabChanged(
         TabScreen* tabScreen,
         const int tabScreenIndex);
-
 private:
 	/**
 	 * Main layout.

@@ -57,6 +57,7 @@ void MainScreen::createMainLayout()
 
     mSettingsScreen = new SettingsScreen();
     mSettingsScreen->setTitle("Settings screen");
+    mSettingsScreen->setListView(mListScreen->getAlphabeticalListView());
     this->addTab(mSettingsScreen);
 }
 

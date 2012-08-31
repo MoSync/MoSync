@@ -63,73 +63,36 @@ void ListScreen::createMainLayout() {
 
 	mListView = new ListView(LIST_VIEW_TYPE_ALPHABETICAL);
 
-	lprintfln("OK");
-
-	ListViewItem* item1 = new ListViewItem();
-//	item1->setText("firstItem");
-
-	Button* newButton = new Button();
-	newButton->setHeight(500);
-	newButton->setWidth(100);
-	newButton->setText("test");
-	item1->addChild(newButton);
-
-	ListViewItem* item2 = new ListViewItem();
-//	item2->setText("secondItem");
-
-	Button* newButton2 = new Button();
-	newButton2->setHeight(300);
-	newButton2->setWidth(200);
-	newButton2->setText("test2");
-	item2->addChild(newButton2);
-
-	ListViewSection* newSection = new ListViewSection();
-	newSection->setTitle("A");
-	newSection->addItem(item1);
-	newSection->addItem(item2);
-
-	mListView->addChild(newSection);
-
-	ListViewItem* item3 = new ListViewItem();
-//	item3->setText("secondItem");
-
-	Button* newButton3 = new Button();
-	newButton3->setHeight(300);
-	newButton3->setWidth(200);
-	newButton3->setText("test3");
-	item3->addChild(newButton3);
-
-	ListViewSection* newSection2 = new ListViewSection();
-	newSection2->setTitle("B");
-	newSection2->addItem(item3);
-
-	mListView->addChild(newSection2);
-
-/*	this->setItemText(item1, "first item");
-	this->setItemBackground(item1, 0xff0000);
-	this->setItemIcon(item1, IMG);
-	this->setItemAccessoryType(item1, LIST_VIEW_ITEM_ACCESSORY_CHECKMARK);
-	this->setItemFontSize(item1, 30);
-	this->setItemFontColor(item1, 0x00ff00);
-	this->setItemFont(item1); */
-
-
-//	mListView->addChild(item1);
-
-	// The second item has different font.
-/*	ListViewItem* item2 = new ListViewItem();
-	item2->setText("secondItem");
-	this->setItemText(item2, "first item");
-	this->setItemBackground(item2, 0xffff00);
-	this->setItemAccessoryType(item2, LIST_VIEW_ITEM_ACCESSORY_CHECKMARK);
-	this->setItemFontSize(item2, 30);
-	this->setItemFontColor(item2, 0xff0000);
-	this->setItemFont(item2);
-	item2->fillSpaceHorizontally();
-	mListView->addChild(item2); */
+	// the list view doesn't automatically sort its elements - the
+	// developer has to handle the sorting
+	for (int i = 0; i <= 4; i++)
+	{
+		ListViewSection* section = new ListViewSection();
+		MAUtil::String sectionTitle = "A";
+		sectionTitle[0] += i;
+		section->setTitle(sectionTitle);
+		for (int j = 0; j <= 3; j++)
+		{
+			ListViewItem* item = new ListViewItem();
+			MAUtil::String itemText = sectionTitle + "0";
+			itemText[1] += j;
+			item->setText(itemText);
+			section->addItem(item);
+		}
+		mListView->addChild(section);
+	}
 
 	int result = mMainLayout->addChild(mListView);
     printf("add mListView result = %d", result);
+}
+
+/**
+ * Gets the current alphabetical list view.
+ * @return The current alphabetical list view.
+ */
+ListView* ListScreen::getAlphabeticalListView()
+{
+	return mListView;
 }
 
 /**
@@ -143,8 +106,6 @@ void ListScreen::listViewItemClicked(
 {
     if (listView == mListView)
     {
-        printf("mListView event: item clicked");
-        listViewItem->setText("item clicked");
-        listViewItem->setBackgroundColor(0x0000ff);
+        printf("ListScreen: mListView event: item clicked");
     }
 }

@@ -22,6 +22,7 @@ namespace MoSync
         {
             #region Private members
 
+            // contains the list model items
             List<ListItem> mSectionItems;
 
             #endregion
@@ -42,6 +43,7 @@ namespace MoSync
 
             /**
 			 * Override of the WidgetBase AddChild function
+             * @param child The child to be added.
 			 */
             public override void AddChild(IWidget child)
             {
@@ -52,7 +54,7 @@ namespace MoSync
                     {
                         ListViewItem widget = (child as ListViewItem);
                         ListItem newItem = new ListItem();
-                        newItem.Content.Children.Add(widget.View);
+                        newItem.Content = (Grid)widget.View;
                         newItem.BackgroundColor = new SolidColorBrush(Colors.Black);
                         newItem.GroupBy = this.Title;
                         newItem.Height = widget.Height;

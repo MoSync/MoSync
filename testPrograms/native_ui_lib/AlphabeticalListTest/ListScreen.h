@@ -46,6 +46,12 @@ public:
 	ListScreen();
 
 	/**
+	 * Gets the current alphabetical list view.
+	 * @return The current alphabetical list view.
+	 */
+	ListView* getAlphabeticalListView();
+
+	/**
 	 * Destructor.
 	 */
 	~ListScreen();
