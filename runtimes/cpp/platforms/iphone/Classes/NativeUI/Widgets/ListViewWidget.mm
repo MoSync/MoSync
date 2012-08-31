@@ -271,24 +271,18 @@
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     INNativeUILog;
-    UITableView* view = (UITableView*) self.view;
-    UITableViewCell *cell = [view dequeueReusableCellWithIdentifier:@"Cell"];
-    if (!cell)
+    ListViewSectionWidget* section = [_children objectAtIndex:indexPath.section];
+    if (!section)
     {
-        ListViewSectionWidget* section = [_children objectAtIndex:indexPath.section];
-        if (!section)
-        {
-            return nil;
-        }
-
-        ListViewItemWidget *cellWidget = [section cellWidgetAtIndex:indexPath.row];
-        if (!cellWidget)
-        {
-            return nil;
-        }
-        cell = cellWidget.cell;
+        return nil;
     }
-    return cell;
+
+    ListViewItemWidget *cellWidget = [section cellWidgetAtIndex:indexPath.row];
+    if (!cellWidget)
+    {
+        return nil;
+    }
+    return cellWidget.cell;
 }
 
 /**
