@@ -131,6 +131,8 @@
 					}
 					else
 					{
+						stopAllW3CSensors();
+						stopAllPhonegapSensors();
 						// Same action as software back button.
 						jQT.goBack();
 					}
@@ -193,7 +195,7 @@
 		<div id="PhoneGapSensors">
 			<div class="toolbar">
 				<h1 id="InfoTitle">Phonegap Sensors</h1>
-				<a class="button back" onclick="jQT.goBack()" id="backButton">Back</a>
+				<a class="button back" onclick="stopAllPhonegapSensors();jQT.goBack()" id="backButton">Back</a>
 			</div>
 
 			<ul id="Accelerometer" class="rounded">
@@ -228,7 +230,7 @@
 		<div id="W3cSensors">
 			<div class="toolbar">
 				<h1 id="InfoTitle">Sensors 2</h1>
-				<a class="button back" onclick="jQT.goBack()" id="backButton">Back</a>
+				<a class="button back" onclick="stopAllW3CSensors();jQT.goBack()" id="backButton">Back</a>
 			</div>
 
 			<ul id="Accelerometer" class="rounded">

@@ -204,3 +204,60 @@ function toggleProximityW3C()
 		}});
 	}
 }
+
+/**
+ * This function stops all the sensors. It's called when the
+ * user leaves the page.
+ */
+function stopAllW3CSensors()
+{
+	if (accelerometer.status == "watching")
+	{
+		accelerometer.endWatch();
+		updateAccelW3C({data:{
+			x: "&nbsp;",
+			y: "&nbsp;",
+			z: "&nbsp;"
+		}});
+	}
+
+	if (magneticField.status == "watching")
+	{
+		magneticField.endWatch();
+		updateMagDataW3C({data:{
+			x: "&nbsp;",
+			y: "&nbsp;",
+			z: "&nbsp;"
+		}});
+	}
+
+	if (orientationSensor.status == "watching")
+	{
+		orientationSensor.endWatch();
+		updateOrientDataW3C({data:{
+			x: "&nbsp;",
+			y: "&nbsp;",
+			z: "&nbsp;"
+		}});
+	}
+
+	if (gyroscope.status == "watching")
+	{
+		gyroscope.endWatch();
+		updateGyroDataW3C({data:{
+			x: "&nbsp;",
+			y: "&nbsp;",
+			z: "&nbsp;"
+		}});
+	}
+
+	if (proximity.status == "watching")
+	{
+		proximity.endWatch();
+		updateProxDataW3C({data:{
+			x: "&nbsp;",
+			y: "&nbsp;",
+			z: "&nbsp;"
+		}});
+	}
+}
