@@ -305,7 +305,7 @@ void Syscall::ConstructL(VMCore* aCore) {
 	LHEL(gKeyLock.Connect());
 	//gKeyLock.EnableSoftNotifications(EFalse);
 
-	LHEL(gSocketServ.Connect());
+	LHEL(gSocketServ.Connect(CONN_MAX));
 	ConstructNetworkingL();
 	ConstructBluetoothL();
 

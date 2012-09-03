@@ -1,0 +1,8 @@
+.res SOUND1
+.media "audio/x-wav", "ColorWhite.wav"
+
+.res SOUND2
+.media "audio/x-wav", "SoundMystic.wav"
+
+.res SOUND3
+.media "audio/mpeg", "SoundMystic.mp3"

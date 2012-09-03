@@ -6,13 +6,17 @@ on the virtual device under Settings > Accounts Sync.
 
 The application consists of a Tab Screen with 2 Screens:
 
- - The received Notification screen.
+ 1. The received Notification screen.
 Here you will see all the info related to the latest received push notification:
 	- on IOS the badge number
 	- on both platforms the message text.
 
- - The Settings screen. Here you can connect to the server side and this will result in your registration_id being sent to the server.
- Remember to press Connect after you got the registration result - you will be updated in the 2nd screen when this occurs.
+2. The Settings screen. Here you can connect to the server side and this will result in your registration_id being sent to the server.
+On iOS the registration_id is sent to the server via a TCP connection, while on Android it's sent using an HTTP connection ( This is
+because the GCM server-demo web server supplied by Google is waiting for the registration via an HTTP POST).
+Follow this link for setting up the Web server for Android: http://developer.android.com/guide/google/gcm/demo.html#webserver-setup
+
+Remember to press Connect after you got the registration result - you will be updated in the 2nd screen when this occurs.
  Also, remember that on Android the registration is done only once per app and so you don't need to connect to the server more that once.
 - For both platforms you can set here: the IP address and the port of the server.
 - On Android: set the ticker text and the title for the displayed notifications. They are set by default to the following: "ticker text" and "content title".
@@ -23,5 +27,5 @@ Here you will see all the info related to the latest received push notification:
 When the app is launched it will automatically try to register for push notifications. There is a platform specific difference here:
  - On iOS the registration process is done every time the app is launched.
   -On Android the registration is done only the first time the app is launched. Because it is recommended that the application
- registers with Google C2DM only the first time it’s launched, and then stores the registration ID for later use. Due to this,
+ registers with Google GCM only the first time it’s launched, and then stores the registration ID for later use. Due to this,
  the server side should wait for the REGISTRATION_ID only once.

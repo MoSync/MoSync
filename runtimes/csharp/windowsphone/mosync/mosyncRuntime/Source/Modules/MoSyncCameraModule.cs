@@ -7,6 +7,7 @@ using System.Windows;
 using System.Windows.Media.Imaging;
 using System.Windows.Media;
 using Microsoft.Phone.Controls;
+using System.Windows.Controls;
 
 namespace MoSync
 {
@@ -47,32 +48,6 @@ namespace MoSync
          */
         bool isCameraInitialized = false;
 
-		bool GetCameraFormat(int index, out System.Windows.Size dim)
-		{
-			dim = new System.Windows.Size();
-
-            // if the camera is not initialized, we cannot access any of its properties
-            if (!isCameraInitialized)
-            {
-                return false;
-            }
-
-			IEnumerable<System.Windows.Size> res = mCamera.AvailableResolutions;
-			if (res == null) return false;
-			IEnumerator<System.Windows.Size> resolutions = res.GetEnumerator();
-			resolutions.MoveNext();
-			int number = 0;
-			while (resolutions.Current != null)
-			{
-				if (index == number)
-					break;
-				number++;
-			}
-
-			dim = resolutions.Current;
-			return true;
-		}
-
         /**
          * Initializing the ioctls.
          */
@@ -90,50 +65,12 @@ namespace MoSync
                 }
 			});
 
-			// this should be set according to the orientation of
-			// the device I guess.
-
-            // we need to handle the camera orientation by hand
             PhoneApplicationPage currentPage = (((PhoneApplicationFrame)Application.Current.RootVisual).Content as PhoneApplicationPage);
 
-            // we need to handle the initial page orientation
-            double rotation = mCamera.Orientation;
-            if (currentPage.Orientation == PageOrientation.LandscapeLeft)
-            {
-                rotation -= 90;
-            }
-            else if (currentPage.Orientation == PageOrientation.LandscapeRight)
-            {
-                rotation += 90;
-            }
-            mVideoBrush.RelativeTransform = new CompositeTransform()
-            {
-                CenterX = 0.5,
-                CenterY = 0.5,
-                Rotation = rotation
-            };
-
-            // on orientation changed, we need to rotate the video brush
-            currentPage.OrientationChanged += new System.EventHandler<OrientationChangedEventArgs>(
-                delegate(object o, OrientationChangedEventArgs args)
-                {
-                    rotation = mCamera.Orientation;
-                    if (args.Orientation == PageOrientation.LandscapeLeft)
-                    {
-                        rotation -= 90;
-                    }
-                    else if (args.Orientation == PageOrientation.LandscapeRight)
-                    {
-                        rotation += 90;
-                    }
-
-                    mVideoBrush.RelativeTransform = new CompositeTransform()
-                    {
-                        CenterX = 0.5,
-                        CenterY = 0.5,
-                        Rotation = rotation
-                    };
-                });
+            // set the initial camera orientation in respect to the current page orientation
+            SetInitialCameraOrientation(currentPage);
+            // handle current page orientation and adjust the camera orientation accordingly
+            HandleDeviceOrientation(currentPage);
 
             /**
              * Stores an output format in fmm parameter.
@@ -190,7 +127,7 @@ namespace MoSync
              */
 			ioctls.maCameraStart = delegate()
 			{
-                initCamera();
+                InitCamera();
 
                 MoSync.Util.RunActionOnMainThreadSync(() =>
                 {
@@ -222,7 +159,7 @@ namespace MoSync
                 // setting the preview
                 if (!isCameraInitialized)
                 {
-                    initCamera();
+                    InitCamera();
                 }
 
 				IWidget w = runtime.GetModule<NativeUIModule>().GetWidget(_widgetHandle);
@@ -271,7 +208,31 @@ namespace MoSync
 					MoSync.Util.RunActionOnMainThreadSync(() =>
 					{
 						Resource res = runtime.GetResource(MoSync.Constants.RT_PLACEHOLDER, _placeHolder);
-						Stream data = args.ImageStream;
+
+                        Stream data = null;
+                        try
+                        {
+                            // as the camera always takes a snapshot in landscape left orientation,
+                            // we need to rotate the resulting image 90 degrees for a current PortraitUp orientation
+                            // and 180 degrees for a current LandscapeRight orientation
+                            int rotateAngle = 0;
+                            if (currentPage.Orientation == PageOrientation.PortraitUp)
+                            {
+                                rotateAngle = 90;
+
+                            }
+                            else if (currentPage.Orientation == PageOrientation.LandscapeRight)
+                            {
+                                rotateAngle = 180;
+                            }
+                            // if the current page is in a LandscapeLeft orientation, the orientation angle will be 0
+                            data = RotateImage(args.ImageStream, rotateAngle);
+                        }
+                        catch
+                        {
+                            // the orientation angle was not a multiple of 90 - we keep the original image
+                            data = args.ImageStream;
+                        }
 						MemoryStream dataMem = new MemoryStream((int)data.Length);
 						MoSync.Util.CopySeekableStreams(data, 0, dataMem, 0, (int)data.Length);
 						res.SetInternalObject(dataMem);
@@ -353,7 +314,6 @@ namespace MoSync
              * in this eigther the back or the front camera is
              * chosen
              */
-
 			ioctls.maCameraSelect = delegate(int _camera)
 			{
                 // if the camera is not initialized, we cannot access any of its properties
@@ -367,7 +327,7 @@ namespace MoSync
                     if (mCamera.CameraType != CameraType.Primary)
                     {
                         mCameraType = CameraType.Primary;
-                        initCamera();
+                        InitCamera();
                     }
                 }
                 else if (MoSync.Constants.MA_CAMERA_CONST_FRONT_CAMERA == _camera)
@@ -375,7 +335,7 @@ namespace MoSync
                     if (mCamera.CameraType != CameraType.FrontFacing)
                     {
                         mCameraType = CameraType.FrontFacing;
-                        initCamera();
+                        InitCamera();
                     }
                 }
                 else return MoSync.Constants.MA_CAMERA_RES_FAILED;
@@ -424,7 +384,111 @@ namespace MoSync
 			};
 		}
 
-        private void initCamera()
+        /**
+         * Sets the output parameter 'dim' to the current camera available resolution or
+         * returns false if the camera is not initialized or no resolutions are available.
+         * @param index The index of the required format.
+         * @param dim Output parameter that holds the current available camera resolution.
+         */
+        bool GetCameraFormat(int index, out System.Windows.Size dim)
+        {
+            dim = new System.Windows.Size();
+
+            // if the camera is not initialized, we cannot access any of its properties
+            if (!isCameraInitialized)
+            {
+                return false;
+            }
+
+            IEnumerable<System.Windows.Size> res = mCamera.AvailableResolutions;
+            if (res == null) return false;
+            IEnumerator<System.Windows.Size> resolutions = res.GetEnumerator();
+            resolutions.MoveNext();
+            int number = 0;
+            while (resolutions.Current != null)
+            {
+                if (index == number)
+                    break;
+                number++;
+                resolutions.MoveNext();
+            }
+
+            dim = resolutions.Current;
+            return true;
+        }
+
+        /**
+         * Sets the initial camera orientation by hand by rotating the video brush to match
+         * the device orientation.
+         * @param page The PhoneApplication page that is used as a reference for the camera orientation.
+         */
+        private void SetInitialCameraOrientation(PhoneApplicationPage page)
+        {
+            // we need to handle the initial page orientation
+            double rotation = mCamera.Orientation;
+            if (page.Orientation == PageOrientation.LandscapeLeft)
+            {
+                rotation -= 90;
+                mVideoBrush.Stretch = Stretch.Uniform;
+            }
+            else if (page.Orientation == PageOrientation.LandscapeRight)
+            {
+                rotation += 90;
+                mVideoBrush.Stretch = Stretch.Uniform;
+            }
+            else
+            {
+                mVideoBrush.Stretch = Stretch.Fill;
+            }
+
+            mVideoBrush.RelativeTransform = new CompositeTransform()
+            {
+                CenterX = 0.5,
+                CenterY = 0.5,
+                Rotation = rotation
+            };
+        }
+
+        /**
+         * Handles device orientation and sets the camera orientation accordingly.
+         * @param page The PhoneApplication page that is used as a reference for the camera orientation.
+         */
+        private void HandleDeviceOrientation(PhoneApplicationPage page)
+        {
+            // on orientation changed, we need to rotate the video brush
+            page.OrientationChanged += new System.EventHandler<OrientationChangedEventArgs>(
+                delegate(object o, OrientationChangedEventArgs args)
+                {
+                    double rotation = mCamera.Orientation;
+                    if (args.Orientation == PageOrientation.LandscapeLeft)
+                    {
+                        rotation -= 90;
+                        mVideoBrush.Stretch = Stretch.Uniform;
+                    }
+                    else if (args.Orientation == PageOrientation.LandscapeRight)
+                    {
+                        rotation += 90;
+                        mVideoBrush.Stretch = Stretch.Uniform;
+                    }
+                    else
+                    {
+                        mVideoBrush.Stretch = Stretch.Fill;
+                    }
+
+                    mVideoBrush.RelativeTransform = new CompositeTransform()
+                    {
+                        CenterX = 0.5,
+                        CenterY = 0.5,
+                        Rotation = rotation
+                    };
+                });
+        }
+
+        /**
+         * Reinitializes the camera: creates a new one, and adds it as a source for the
+         * video brush.
+         */
+        private void InitCamera()
         {
             mCamera.Dispose();
             mCamera = null;
@@ -453,5 +517,62 @@ namespace MoSync
             // with it or getting/setting its properties
             are.WaitOne();
         }
+
+        /**
+         * Because the camera captured image is always in landscape mode, we
+         * need to rotate it. This is done by creating a writable bitmap from the image
+         * stream and then translating it pixel by pixel into a new bitmap and then
+         * into a new stream.
+         * @param imageStream The image to be rotated as a data stream.
+         * @param angle The angle of rotation (needs to be a multiple of 90).
+         */
+        private Stream RotateImage(Stream imageStream, int angle)
+        {
+            imageStream.Position = 0;
+            // the angle must be a multiple of 90 degrees
+            if (angle % 90 != 0 || angle < 0) throw new ArgumentException();
+            if (angle % 360 == 0) return imageStream;
+
+            BitmapImage bitmap = new BitmapImage();
+            bitmap.SetSource(imageStream);
+            WriteableBitmap wbSource = new WriteableBitmap(bitmap);
+
+            // the target bitmap will contain the rotated image
+            WriteableBitmap wbTarget = null;
+            if (angle % 180 == 0)
+            {
+                // if the image is rotated 180 degrees, the width and height remain the same
+                wbTarget = new WriteableBitmap(wbSource.PixelWidth, wbSource.PixelHeight);
+            }
+            else
+            {
+                wbTarget = new WriteableBitmap(wbSource.PixelHeight, wbSource.PixelWidth);
+            }
+
+            for (int x = 0; x < wbSource.PixelWidth; x++)
+            {
+                for (int y = 0; y < wbSource.PixelHeight; y++)
+                {
+                    switch (angle % 360)
+                    {
+                        case 90:
+                            wbTarget.Pixels[(wbSource.PixelHeight - y - 1) + x * wbTarget.PixelWidth] = wbSource.Pixels[x + y * wbSource.PixelWidth];
+                            break;
+                        case 180:
+                            wbTarget.Pixels[(wbSource.PixelWidth - x - 1) + (wbSource.PixelHeight - y - 1) * wbSource.PixelWidth] = wbSource.Pixels[x + y * wbSource.PixelWidth];
+                            break;
+                        case 270:
+                            wbTarget.Pixels[y + (wbSource.PixelWidth - x - 1) * wbTarget.PixelWidth] = wbSource.Pixels[x + y * wbSource.PixelWidth];
+                            break;
+                    }
+                }
+            }
+
+            // transform the rotated bitmap into a stream
+            MemoryStream targetStream = new MemoryStream();
+            wbTarget.SaveJpeg(targetStream, wbTarget.PixelWidth, wbTarget.PixelHeight, 0, 100);
+            return targetStream;
+        }
+
 	} // end class CameraModule
 } // end namespace MoSync

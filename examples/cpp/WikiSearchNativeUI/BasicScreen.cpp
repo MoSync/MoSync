@@ -99,6 +99,13 @@ void BasicScreen::setSizes()
 		mFontSize = FONT_EXTRA_LARGE;
 		mPaddingSize = PADDING;
 	}
+
+	// Set the font for iPhone devices.
+	if (getPlatform() == IOS && mScreenHeight < 1000)
+	{
+		mFontSize = FONT_LARGE;
+		mPaddingSize = PADDING;
+	}
 }
 
 /**

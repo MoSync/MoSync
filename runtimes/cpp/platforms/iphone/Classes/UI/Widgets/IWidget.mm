@@ -187,7 +187,11 @@
 }
 
 - (int)remove {
-	//if(!parent) return MAW_RES_REMOVED_ROOT;
+	if(parent == nil) return MAW_RES_REMOVED_ROOT;
+    for (IWidget *child in children)
+	{
+        [child removeChild:self];//remove all children
+    }
 	[parent removeChild: self];
 	return MAW_RES_OK;
 }

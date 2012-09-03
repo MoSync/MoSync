@@ -40,6 +40,8 @@ class MoSyncNotifications
 {
 	/**
 	 * Constructor.
+	 * GCM/C2DM supports only devices with Android 2.2 and higher.
+	 * Version.SDK_INT is not available on sdk 3.
 	 * @param thread
 	 *            The MoSync thread.
 	 */
@@ -47,8 +49,7 @@ class MoSyncNotifications
 	{
 		mMoSyncThread = thread;
 		mLocalNotificationsManager = new LocalNotificationsManager(thread);
-		// C2DM supports only devices with Android 2.2 and higher.
-		// Version.SDK_INT is not available on sdk 3.
+
 		try{
 			int target = IntConverter.convert( Build.VERSION.SDK );
 			if ( target >= 8 )
@@ -146,7 +147,7 @@ class MoSyncNotifications
 		else
 		{
 			// No need to send registration request, it can be handled locally.
-			Log.e("@@MoSync", "Current Android version does not support C2DM. Use Android 2.2 or higher.");
+			Log.e("@@MoSync", "Current Android version does not support GCM/C2DM. Use Android 2.2 or higher.");
 			return MA_NOTIFICATION_RES_UNSUPPORTED;
 		}
 	}

@@ -867,7 +867,7 @@ mosync.nativeui.NativeWidgetElement = function(widgetType, widgetID, params,
 				{
 					if(self.childList[index] ==  childID)
 					{
-						self.childList.splic(index,1);
+						self.childList.splice(index,1);
 					}
 				}
 				mosync.nativeui.maWidgetRemoveChild(childID, successCallback,
@@ -1627,6 +1627,8 @@ mosync.nativeui.showScreen = function(screenID) {
  * Initializes the UI system and parsing of the XML input.
  * This function should be called when the document body is loaded.
  *
+ * @return true on success, false on error.
+ *
  * \code
  *  <!-- The function can be called in the initialization phase of HTML document.-->
  *  <body onload="mosync.nativeui.initUI()">
@@ -1640,14 +1642,20 @@ mosync.nativeui.showScreen = function(screenID) {
  *  //Do something, and show your main screen
  *  }
  * \endcode
- *
- *
  */
 mosync.nativeui.initUI = function() {
 	var MoSyncDiv = document.getElementById("NativeUI");
+	if (!MoSyncDiv) {
+		// TODO: Add log error message.
+		return false;
+	}
 	MoSyncDiv.style.display = "none"; //hide the Native Container
 	var MoSyncNodes = document.getElementById("NativeUI").childNodes;
-	for ( var i = 1; i < MoSyncNodes.length; i++) {
+	if (!MoSyncNodes) {
+		// TODO: Add log error message.
+		return false;
+	}
+	for (var i = 1; i < MoSyncNodes.length; i++) {
 		if ((MoSyncNodes[i] != null) && (MoSyncNodes[i].tagName != undefined)) {
 			if (MoSyncNodes[i].id == null) {
 				MoSyncNodes[i].id = "widget" + mosync.nativeui.widgetCounter;
@@ -1657,7 +1665,8 @@ mosync.nativeui.initUI = function() {
 		}
 	}
 	mosync.nativeui.showInterval = self.setInterval(
-			"mosync.nativeui.CheckUIStatus()", 100);
+		"mosync.nativeui.CheckUIStatus()", 100);
+	return true;
 };
 
 /*

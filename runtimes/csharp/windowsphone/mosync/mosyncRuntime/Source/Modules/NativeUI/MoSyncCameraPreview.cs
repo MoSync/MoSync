@@ -55,9 +55,9 @@ namespace MoSync
                 mViewFinder = new System.Windows.Controls.Canvas();
                 mViewFinder.Opacity = 0.0;
 
-                Grid.SetRow(mViewFinder, 0);
-
                 mLayout.Children.Add(mViewFinder);
+
+                Grid.SetRow(mViewFinder, 0);
 
                 View = mLayout;
             }

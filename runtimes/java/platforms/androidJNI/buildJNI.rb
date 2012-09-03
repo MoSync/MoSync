@@ -197,7 +197,6 @@ packages = ["src/com/mosync/java/android/*.java",
             "src/com/mosync/internal/android/nfc/*.java",
             "src/com/mosync/internal/android/nfc/ops/*.java",
 	        "src/com/mosync/nativeui/ui/ads/*.java",
-			"src/com/google/android/c2dm/*.java",
 			"src/com/mosync/internal/android/notifications/*.java",
 			"src/com/mosync/internal/android/billing/*.java",
 			"src/com/mosync/internal/android/billing/request/*.java",
@@ -218,12 +217,12 @@ if ENV['OS'] == "Windows_NT"
 	sh(
 		"javac -source 1.6 -target 1.6 -g -d #{class_dir} " +
 		"-classpath " +
-		"\"#{File.join(androidSDKPath, "android.jar")};#{File.join("#{package_root}libs/", "GoogleAdMobAdsSdk.jar")}\" " + java_files);
+		"\"#{File.join(androidSDKPath, "android.jar")};#{File.join("#{package_root}libs/", "GoogleAdMobAdsSdk.jar")};#{File.join("#{package_root}libs/","gcm.jar")}\" " + java_files);
 else
 	sh(
 		"javac -source 1.6 -target 1.6 -g -d #{class_dir} " +
 		"-classpath " +
-		"\"#{File.join(androidSDKPath, "android.jar")}:#{File.join("#{package_root}libs/", "GoogleAdMobAdsSdk.jar")}\" " + java_files);
+		"\"#{File.join(androidSDKPath, "android.jar")}:#{File.join("#{package_root}libs/", "GoogleAdMobAdsSdk.jar")}:#{File.join("#{package_root}libs/","gcm.jar")}\" " + java_files);
 end
 
 puts "Copy Generated Library File\n"
@@ -232,6 +231,7 @@ FileUtils.copy_file( "#{File.join(cpath, "AndroidProject/libs/armeabi/libmosync.
 
 puts "Copy external Library Files\n\n"
 FileUtils.copy_file( "#{File.join(cpath, "AndroidProject/libs/GoogleAdMobAdsSdk.jar")}", "temp/GoogleAdMobAdsSdk.jar")
+FileUtils.copy_file( "#{File.join(cpath, "AndroidProject/libs/gcm.jar")}", "temp/gcm.jar")
 
 puts "Build Zip Package\n\n"
 

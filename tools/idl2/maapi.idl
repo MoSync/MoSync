@@ -762,7 +762,7 @@ interface MAAPI {
 	*
 	* Example HTTP url: <tt>http://www.example.com/directory/document.html</tt>
 	*
-	* Example HTTPS url: <tt>https://www.example.com/directory/document.html</tt>
+	* Example HTTPS url: <tt>https://www.google.com</tt>
 	*
 	* Example Bluetooth url: <tt>btspp://001dbe15e455:9</tt>
 	*
@@ -1452,7 +1452,7 @@ interface MAAPI {
 
 		/**
 		* \brief Send when the application receives a registration result.
-		* The application tries to register to Apple Push Service, or Google C2DM Service,
+		* The application tries to register to Apple Push Service, or Google GCM/C2DM Service,
 		* and the received result ( either success, either fail) is sending this event.
 		* After this event is received, get the result of the registration request by
 		* calling maNotificationPushGetRegistration.
@@ -1461,7 +1461,7 @@ interface MAAPI {
 
 		/**
 		* \brief Send when the application receives an unregistration result.
-		* The application unregistered from Google C2DM Service, and will not
+		* The application unregistered from Google GCM/C2DM Service, and will not
 		* receive anymore push messages.
 		* Platform: Android only.
 		*/
@@ -1898,8 +1898,8 @@ interface MAAPI {
 	* \returns \>= 0 on success and \< 0 on failure.
 	*
 	* \param sound_res The data object in which the sound is stored.
-	* \param offset The offset in the data object where the sound is stored.
-	* \param size The size of the sound data.
+	* \param offset The offset in the data object where the mime type and sound data is stored.
+	* \param size The size of mime type string and sound data.
 	*/
 	//TODO: make the sound resource go into flux while playing.
 	int maSoundPlay(in MAHandle sound_res, in int offset, in int size);
@@ -3666,7 +3666,7 @@ group PIMAPI "PIM API" {
 			RELATION = 120;
 
 			/**
-			* @brief Information about the organization. Has \link #MA_PIM_CONTACT_ORGANIZATION_NAME MA_PIM_CONTACT_ORGANIZATION \endlink indices.
+			* @brief Information about the organization. Has \link #MA_PIM_CONTACT_ORG_INFO_DEPARTMENT MA_PIM_CONTACT_ORG_INFO \endlink indices.
 			*
 			* @validvalue #MA_PIM_TYPE_STRING_ARRAY.
 			*
@@ -8896,7 +8896,7 @@ group CameraFunctions "Camera Functions" {
 		* Set supported screen orientations.
 		* Currently implemented on iOS and WindowsPhone 7.1.
 		* @param orientations A bitmask consisting of flags describing the supported screen orientations.
-		* The bitmask can be created using \link #MA_SCREEN_ORIENTATION_ MA_SCREEN_ORIENTATION \endlink
+		* The bitmask can be created using \link #MA_SCREEN_ORIENTATION_PORTRAIT MA_SCREEN_ORIENTATION \endlink
 		* values.
 		* @return One of the next constants:
 		* - #MA_SCREEN_ORIENTATION_RES_OK
@@ -8909,7 +8909,7 @@ group CameraFunctions "Camera Functions" {
 		* Get supported screen orientations.
 		* Currently implemented on iOS and WindowsPhone 7.1.
 		* @return A bitmask consisting of flags describing the supported screen orientations.
-		* The bitmask is created using \link #MA_SCREEN_ORIENTATION_ MA_SCREEN_ORIENTATION \endlink
+		* The bitmask is created using \link #MA_SCREEN_ORIENTATION_PORTRAIT MA_SCREEN_ORIENTATION \endlink
 		* values.
 		*/
 		int maScreenGetSupportedOrientations();
@@ -8917,7 +8917,7 @@ group CameraFunctions "Camera Functions" {
 		/**
 		* Get current screen orientation.
 		* Currently implemented on iOS and WindowsPhone 7.1.
-		* @return One of the \link #MA_SCREEN_ORIENTATION_ MA_SCREEN_ORIENTATION \endlink constants.
+		* @return One of the \link #MA_SCREEN_ORIENTATION_PORTRAIT MA_SCREEN_ORIENTATION \endlink constants.
 		*/
 		int maScreenGetCurrentOrientation();
 
@@ -9688,8 +9688,7 @@ group NFCAPI "NFC API" {
 		 * @param paramCount Number of elements in the array pointed to
 		 * by \a params.
 		 *
-		 * This function is currently available on iOS and MoRE
-		 * (not on Android).
+		 * This function is available on iOS, Android, and in MoRE.
 		 */
 		MAHandle maDBExecSQLParams(in MAHandle databaseHandle, in MAString sql,
 			in MADBValue params, in int paramCount);
@@ -10585,7 +10584,7 @@ group NotificationAPI "Notification API" {
 
 			/**
 			* @brief  Indicates that the call to maNotificationPushRegister was unsuccesfull because of incorrect
-			* phone registration with Google. This phone doesn't currently support C2DM.
+			* phone registration with Google. This phone doesn't currently support GCM/C2DM.
 			* Platform: Android only.
 			*/
 			REGISTRATION_PHONE_REGISTRATION_ERROR = -17;
@@ -11064,9 +11063,17 @@ group NotificationAPI "Notification API" {
 		* See \link #MA_NOTIFICATION_PUSH_TYPE_BADGE MA_NOTIFICATION_PUSH_TYPE_ \endlink
 		* for valid bit-mask values.
 		* On Android platform this param is ignored.
-		* \param accountID Is the ID of the account authorized to send messages to the application,
-		* typically the email address of an account set up by the application's developer.
+		* \param senderId Your projectId obtained from here:
+		* http://developer.android.com/guide/google/gcm/gs.html#create-proj
+		* For old applications, this param was set as the ID of the account
+		* authorized to send messages to the application, typically the email
+		* address of an account set up by the application's developer.
+		* Even though setting the senderId as the accountID was deprecated, old
+		* Android applications still support it.
 		* On iOS platform this param is ignored.
+		*
+		* Example: maNotificationPushRegister(
+		* PUSH_NOTIFICATION_TYPE_BADGE | PUSH_NOTIFICATION_TYPE_ALERT, "yoursenderId_here");
 		*
 		* \returns One of the next constants:
 		* - #MA_NOTIFICATION_RES_OK if no error occurred.
@@ -11074,7 +11081,7 @@ group NotificationAPI "Notification API" {
 		* receiving push notifications.
 		* - #MA_NOTIFICATION_RES_UNSUPPORTED if notifications are not supported on current platform.
 		*/
-		int maNotificationPushRegister(in MAHandle pushNotificationTypes, in MAString accountID);
+		int maNotificationPushRegister(in MAHandle pushNotificationTypes, in MAString senderId);
 
 		/**
 		* \brief Unregister application for push notifications.
