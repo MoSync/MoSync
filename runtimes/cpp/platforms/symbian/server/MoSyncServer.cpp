@@ -28,13 +28,14 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "ClientServer.h"
 #include "ActiveEnder.h"
 #include "Log.h"
+#include "NetworkInfo.h"
 
 //**********************************
 //CMoSyncServer - implementations
 //**********************************
 
 /**
-Constructor takes the server priority value. 
+Constructor takes the server priority value.
 
 The server is an active object, and the priority value is the priority
 of this active object.
@@ -44,10 +45,13 @@ By default, the session is not sharable, which is what we want here
 so no second parameter is passed to the CServer2 constructor.
 */
 CMoSyncServer::CMoSyncServer(CActive::TPriority aActiveObjectPriority)
-: CServer2(aActiveObjectPriority)
+: CServer2(aActiveObjectPriority), mAutostart(NULL)
 {
 }
 
+CMoSyncServer::~CMoSyncServer() {
+	delete mAutostart;
+}
 
 /**
 Creates a new session with the server.
@@ -59,12 +63,12 @@ CSession2* CMoSyncServer::NewSessionL(const TVersion& aVersion,
 	TVersion v(KMoSyncMajorVersionNumber, KMoSyncMinorVersionNumber,
 		KMoSyncBuildVersionNumber);
 	if (!User::QueryVersionSupported(v,aVersion))
-		User::Leave(KErrNotSupported);	
-	
+		User::Leave(KErrNotSupported);
+
 	// CAN USE THE aMessage argument to check client's security and identity
 	// can make use of this later but for now ignore. AH 4/5/05
-	// the connect message is delivered via the RMessage2 object passed. 
-	
+	// the connect message is delivered via the RMessage2 object passed.
+
 	// Create the session.
 	CMoSyncSession* s = new (ELeave) CMoSyncSession;
 	CleanupStack::PushL(s);
@@ -89,20 +93,33 @@ void CMoSyncServer::PanicServer(TMoSyncPanic aPanic)
 //***********************************
 
 CMoSyncSession::CMoSyncSession()
-: mEnder(NULL), mTelephony(NULL), mPn(NULL), mPositionerOpen(false)
+: mEnder(NULL), mTelephony(NULL),
+mNetworkInfo(NULL),
+mNetworkStatus(NULL),
+mNetworkStatusChange(NULL),
+mPn(NULL), mPositionerOpen(false)
 {
 }
 
 CMoSyncSession::~CMoSyncSession() {
 	LOG("~CMoSyncSession 1\n");
 	LocationStop();
-	LOG("~CMoSyncSession 2\n");
+	LOG("~mTelephony\n");
 	if(mTelephony != NULL)
 		delete mTelephony;
-	LOG("~CMoSyncSession 3\n");
+	LOG("~mNetworkInfo\n");
+	if(mNetworkInfo != NULL)
+		delete mNetworkInfo;
+	LOG("~mNetworkStatus\n");
+	if(mNetworkStatus != NULL)
+		delete mNetworkStatus;
+	LOG("~mNetworkStatusChange\n");
+	if(mNetworkStatusChange != NULL)
+		delete mNetworkStatusChange;
+	LOG("~mEnder\n");
 	if(mEnder != NULL)
 		delete mEnder;
-	LOG("~CMoSyncSession 4\n");
+	LOG("~CMoSyncSession ends\n");
 }
 
 void CMoSyncSession::ConstructL() {
@@ -130,7 +147,7 @@ void CMoSyncSession::DispatchMessageL(const RMessage2& aMessage)
 	switch (aMessage.Function())
 	{
 	case EMoSyncGetNetworkInfo:
-		GetNetworkInfoL(aMessage);
+		GetTelephonyInfoL(aMessage, mNetworkInfo);
 		return;
 	case EMoSyncLocationGet:
 		LocationGetL(aMessage);
@@ -138,15 +155,40 @@ void CMoSyncSession::DispatchMessageL(const RMessage2& aMessage)
 	case EMoSyncLocationStop:
 		LocationStopL(aMessage);
 		return;
-		
+	case EMoSyncAutostartOn:
+		AutostartOnL(aMessage);
+		return;
+	case EMoSyncAutostartOff:
+		AutostartOffL(aMessage);
+		return;
+	case EMoSyncGetNetworkStatus:
+		GetTelephonyInfoL(aMessage, mNetworkStatus);
+		return;
+	case EMoSyncGetNetworkStatusChange:
+		GetTelephonyInfoL(aMessage, mNetworkStatusChange);
+		return;
+	case EMoSyncCancelNetworkStatusChange:
+		CancelNetworkStatusChange(aMessage);
+		return;
+
 	 //  Requests that we don't understand at all are a different matter.
-	 //  This is considered a client programming error, so we panic the 
+	 //  This is considered a client programming error, so we panic the
 	 //  client - this also completes the message.
 	default:
 		LOG("Bad request: %i\n", aMessage.Function());
 		PanicClient(aMessage, EBadRequest);
 		return;
 	}
+}
+
+void CMoSyncSession::CancelNetworkStatusChange(const RMessage2& aMessage) {
+	LOG("CancelNetworkStatusChange\n");
+	if(mNetworkStatusChange) {
+		if(mNetworkStatusChange->IsActive()) {
+			mNetworkStatusChange->Cancel();
+		}
+	}
+	aMessage.Complete(KErrNone);
 }
 
 /**
@@ -187,7 +229,7 @@ GLDEF_C TInt E32Main() // Symbian EXE file entry point
 
 
 LOCAL_C void runServerL()
-{ 
+{
 	// Create the server, if one with this name does not already exist.
 	TFindServer findServer(KMoSyncServer);
 	TFullName name;
@@ -205,7 +247,7 @@ LOCAL_C void runServerL()
 
 	//Install the active scheduler
 	CActiveScheduler::Install(pA);
-	
+
 	LOG("CActiveScheduler Installed.\n");
 
 	// Start the server
@@ -222,11 +264,13 @@ LOCAL_C void runServerL()
 	RProcess::Rendezvous(KErrNone);
 	LOG("RProcess Rendezvous'd.\n");
 
+	pS->doAutostartL();
+
 	// And start fielding requests from client(s).
 	CActiveScheduler::Start();
 	LOG("CActiveScheduler Started.\n");
 
-	// Tidy up... 	
+	// Tidy up...
 	delete pS;
 	delete pA;
 

@@ -49,6 +49,8 @@ public:
      */
     AudioChannel ( int s, AudioSource* audioSource = NULL );
 
+		virtual ~AudioChannel() {}
+
     /**
      * Set the channel audio source
      *
