@@ -22,5 +22,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 	m(200004, SYMERR_VIBRATION_DURATION_NEGATIVE, "Negative vibration duration")\
 	m(200005, SYMERR_NO_MATCHING_DECODER, "No matching decoder found")\
 	m(200006, SYMERR_SOUND_DECODING_ERROR, "Error while decoding sound"/* Can happen when MIME type and sound file don't match. */ )\
+	m(200007, SYMERR_IAP_METHOD, "Invalid IAP method")\
+	m(200008, SYMERR_IAP_FILTER, "Invalid IAP filter")\
 
 DECLARE_ERROR_ENUM(SYMBIAN)

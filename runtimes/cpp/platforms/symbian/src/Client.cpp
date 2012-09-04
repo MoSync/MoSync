@@ -23,7 +23,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <apgcli.h> // link against apgrfx.lib
 #include <apacmdln.h> // link against apparc.lib
 
-_LIT(KMoSyncServerExe, "MoSyncServer.exe");
+_LIT(KMoSyncServerExe, "20037EBF.exe");
 
 //does nothing if server is already started
 //todo: don't die if server can't be started
@@ -39,7 +39,7 @@ static void StartServer() {
 	LOG("Starting server...\n");
 
 /*	TThreadId app_threadid;
-	CApaCommandLine* cmdLine; 
+	CApaCommandLine* cmdLine;
 	cmdLine=CApaCommandLine::NewLC();
 	cmdLine->SetExecutableNameL(KMoSyncServerExe);
 	cmdLine->SetCommandL(EApaCommandRun);
@@ -49,10 +49,10 @@ static void StartServer() {
 	ls.Close();
 	CleanupStack::PopAndDestroy(cmdLine);
 	LHEL(err);*/
-	
+
 	RProcess proc;
 	TRequestStatus rendezvousStatus;
-	
+
 	//if this fails, display a friendly "reinstall" message.
 	TInt res = proc.Create(KMoSyncServerExe, KNullDesC);
 	if(IS_SYMBIAN_ERROR(res)) {
@@ -64,7 +64,7 @@ static void StartServer() {
 #endif
 		ShowAknErrorNoteThenExitL(KErrorMessage);
 	}
-	
+
 	proc.Rendezvous(rendezvousStatus);
 	proc.Resume();
 	User::WaitForRequest(rendezvousStatus);
@@ -74,10 +74,16 @@ static void StartServer() {
 
 int RMoSyncServerSession::Connect() {
 	StartServer();
-	return CreateSession(KMoSyncServer, Version(), 4);
+	int res = CreateSession(KMoSyncServer, Version(), 4);
+	if(res == KErrNone) {
+		mConnected = true;
+	}
+	return res;
 }
 
 TVersion RMoSyncServerSession::Version() const {
+	LOG("Client version: %i.%i.%i\n", KMoSyncMajorVersionNumber,
+		KMoSyncMinorVersionNumber, KMoSyncBuildVersionNumber);
 	return TVersion(KMoSyncMajorVersionNumber, KMoSyncMinorVersionNumber,
 		KMoSyncBuildVersionNumber);
 }
@@ -92,7 +98,36 @@ void RMoSyncServerSession::LocationGet(TRequestStatus& aStatus) {
 	SendReceive(EMoSyncLocationGet, args, aStatus);
 }
 int RMoSyncServerSession::LocationStop() {
+	if(!mConnected)
+		return 0;
 	return Send(EMoSyncLocationStop);
+}
+
+int RMoSyncServerSession::AutostartOn() {
+	return SendReceive(EMoSyncAutostartOn);
+}
+
+int RMoSyncServerSession::AutostartOff() {
+	return SendReceive(EMoSyncAutostartOff);
+}
+
+int RMoSyncServerSession::GetNetworkStatus(
+	CTelephony::TNetworkRegistrationV1& nr)
+{
+	CTelephony::TNetworkRegistrationV1Pckg pckg(nr);
+	TIpcArgs args(&pckg);
+	return SendReceive(EMoSyncGetNetworkStatus, args);
+}
+
+void RMoSyncServerSession::GetNetworkStatusChange(
+	CTelephony::TNetworkRegistrationV1Pckg& nr, TRequestStatus& aStatus)
+{
+	TIpcArgs args(&nr);
+	SendReceive(EMoSyncGetNetworkStatusChange, args, aStatus);
+}
+
+void RMoSyncServerSession::CancelNetworkStatusChange() {
+	Send(EMoSyncCancelNetworkStatusChange);
 }
 
 #endif	//SUPPORT_MOSYNC_SERVER

@@ -60,6 +60,12 @@ public:
 	int TextBox(const TDesC& title, const TDesC& inText, TDes& outText, int constraints);
 	void SetIdleDelay(int ms);
 
+#ifdef __SERIES60_3X__
+	int WindowGroupId() const { return Window().WindowGroupId(); }
+#endif
+	void HomeScreenEventsOn();
+	void HomeScreenEventsOff();
+
 	//CCoeControl
 public:
 	TKeyResponse OfferKeyEventL(const TKeyEvent& aKeyEvent, TEventCode aType);
@@ -76,7 +82,7 @@ private:
 	static TInt RunIdle(TAny*);
 	TInt RunL();
 	static TInt StartStuff(TAny*);
-	
+
 	void CreateCoreL();
 	void LoadProgramL();
 #ifndef MOSYNC_COMMERCIAL
@@ -117,12 +123,12 @@ private:
 		CAppView& mAppView;
 	};	//DO NOT INSTANTIATE C-TYPE CLASSES AS MEMBERS! THEY WILL FUCK YOU UP! :)
 	CWaitTimer* iWaitTimer;
-	
+
 	class CCloseTimer : public CMyBaseTimer {
 		void RunL();
 	};
 	CCloseTimer* iCloseTimer;
-	
+
 	class CDelayTimer : public CMyBaseTimer {
 	public:
 		CDelayTimer(CAppView& appView);
@@ -133,7 +139,7 @@ private:
 	CDelayTimer* iDelayTimer;
 	int iIdleLoopDelay;	// milliseconds
 	friend class CDelayTimer;
-	
+
 	CAppUi& iAppUi;
 };
 

@@ -11,7 +11,7 @@
 *
 * Contributors:
 *
-* Description: 
+* Description:
 *
 */
 
@@ -27,8 +27,9 @@ class rcscan
 	{
 public:
 	rcscan(const FileLineManager& aFileLineHandler,FILE* aSourceFile);
+	virtual ~rcscan() {}
 	virtual void yyerror(char *,...);
-	#if defined(__TOOLS2_WINDOWS__) 
+	#if defined(__TOOLS2_WINDOWS__)
 	void yyerror(char* aCharPtr, __VALIST aList);
 	#else
 	void yyerror(char* aCharPtr, va_list aList);
