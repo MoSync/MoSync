@@ -68,6 +68,7 @@ wormhole.js
 
 /tools/ReleasePackageBuild/run.bat
 /tools/ReleasePackageBuild/setcurrev.bat
+/tools/ReleasePackageBuild/build_package_tools/mosync_bin/version.dat
 
 /tools/DocbookIndexer/src/*.c
 /tools/DocbookIndexer/src/*.s
@@ -102,6 +103,7 @@ wormhole.js
 /libs/newlib/libc/sys/mosync/maapi_defs.h
 
 /libs/Wormhole/jslib/html5
+/libs/Wormhole/jslib/mosync-constants.js
 
 /testPrograms/_masterdump.s
 /testPrograms/temp.s

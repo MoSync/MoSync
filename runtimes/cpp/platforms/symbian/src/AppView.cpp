@@ -839,3 +839,13 @@ int CAppView::TextBox(const TDesC& title, const TDesC& inText, TDes& outText, in
 	CleanupStack::Pop(dlg);
 	return answer ? 1 : 0;
 }
+
+void CAppView::HomeScreenEventsOn() {
+	RWindowGroup& wg(CCoeEnv::Static()->RootWin());
+	LHEL(wg.EnableFocusChangeEvents());
+}
+
+void CAppView::HomeScreenEventsOff() {
+	RWindowGroup& wg(CCoeEnv::Static()->RootWin());
+	wg.DisableFocusChangeEvents();
+}

@@ -265,7 +265,7 @@ bool loadSLD(const char* filename) {
 	while(1) {
 		TEST(readLine(buffer, BUFSIZE, file));
 		LineMapping m;
-		if(sscanf(buffer, "%x:%i:%"PFZT"i", &m.ip, &m.line, &m.file) != 3)
+		if(sscanf(buffer, "%x:%i:%" PFZT "i", &m.ip, &m.line, &m.file) != 3)
 			break;
 		std::pair<std::set<LineMapping>::iterator, bool> res = sLineSet.insert(m);
 		TEST(res.second);

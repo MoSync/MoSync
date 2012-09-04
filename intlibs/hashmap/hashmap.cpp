@@ -92,6 +92,7 @@ void HashMapBase::close() {
 	}
 	free(m.base);
 	m.base = NULL;
+	memset(&m, 0, sizeof(m));
 	//DebugMarkEnd();
 	LOG_HASH("HashMapBase::close() complete.\n\n");
 }

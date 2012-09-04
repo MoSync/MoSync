@@ -727,7 +727,7 @@ runtimes.each do |platform_name, platform|
 		if(platform_name == :sp2003 || platform_name == :wm5 || platform_name == :wm6 || platform_name == :wm6pro || platform_name == :s60v3 || platform_name == :s60v5 || platform_name == :android_7x )
 			release_defines << "USE_ARM_RECOMPILER"
 		end
-		if(platform_name == :s60v3)
+		if(platform_name == :s60v3 || platform_name == :s60v5)
 			release_defines << "SUPPORT_MOSYNC_SERVER"
 		end
 		write_config_h(runtime, "#{RUNTIME_DIR}/#{runtime_dir}/config.h", RELEVANT_DEFINES[platform_name.to_sym], release_defines)
