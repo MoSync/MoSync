@@ -29,8 +29,7 @@ MA 02110-1301, USA.
 #include "TCPConnection.h"
 #include "HTTPConnection.h"
 #include "Util.h"
-
-#define GCM_PROJECT_ID "yourProjectId_here"
+#include "Config.h"
 
 /**
  * Constructor.

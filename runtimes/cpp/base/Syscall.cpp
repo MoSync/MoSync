@@ -988,6 +988,7 @@ namespace Base {
 #if !defined(_android)
 	int Syscall::maBtGetNewDevice(MABtDevice* dst) {
 		MABtDeviceNative dn;
+		dn.nameBufSize = dst->nameBufSize;
 		dn.name = (char*)GetValidatedMemRange(dst->name, dst->nameBufSize);
 		int res = BLUETOOTH(maBtGetNewDevice)(&dn);
 		dst->actualNameLength = dn.actualNameLength;
@@ -1001,6 +1002,7 @@ namespace Base {
 		if(res <= 0)
 			return res;
 		MABtServiceNative sn;
+		sn.nameBufSize = dst->nameBufSize;
 		sn.name = (char*)GetValidatedMemRange(dst->name, dst->nameBufSize);
 		sn.uuids = (MAUUID*)GetValidatedMemRange(dst->uuids, ss.nUuids * sizeof(MAUUID));
 		res = BLUETOOTH(maBtGetNewService)(&sn);
