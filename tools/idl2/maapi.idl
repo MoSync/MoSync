@@ -1488,7 +1488,6 @@ interface MAAPI {
 		* \brief A camera event fired when you get any of the camera preview events
 		*/
 		CAMERA_PREVIEW = 49;
-		}
 
 		/** \brief The telephone network status changed.
 		* MAEvent::state is the new state,
