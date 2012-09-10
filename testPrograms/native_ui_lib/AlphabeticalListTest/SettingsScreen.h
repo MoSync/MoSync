@@ -144,7 +144,7 @@ private:
 	/**
 	 * The list contains all the properties of the list view, list view section and list view item.
 	 */
-	RelativeLayout *mPropertiesRelativeLayout;
+	ListView *mPropertiesListView;
 
 	/**
 	 * The application alphabetical list view.

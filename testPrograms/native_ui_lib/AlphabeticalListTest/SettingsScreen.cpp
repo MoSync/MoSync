@@ -37,7 +37,7 @@ MA 02110-1301, USA.
 SettingsScreen::SettingsScreen():
 	Screen(),
 	mMainLayout(NULL),
-	mPropertiesRelativeLayout(NULL),
+	mPropertiesListView(NULL),
 	mListViewAllowSelectionCheckbox(NULL),
 	mListViewSectionLabel(NULL),
 	mCurrentListViewItemLabel(NULL),
@@ -146,14 +146,13 @@ void SettingsScreen::createMainLayout()
 	mMainLayout = new VerticalLayout();
 	setMainWidget(mMainLayout);
 
-	mPropertiesRelativeLayout = new RelativeLayout();
+	mPropertiesListView = new ListView();
 
 	createListViewPropertiesLayout();
 	createListViewSectionPropertiesLayout();
 	createListViewItemPropertiesLayout();
-	mPropertiesRelativeLayout->setScrollable(true);
 
-	mMainLayout->addChild(mPropertiesRelativeLayout);
+	mMainLayout->addChild(mPropertiesListView);
 }
 
 /**
@@ -201,7 +200,7 @@ void SettingsScreen::createListViewPropertiesLayout()
 	modeSelectionLayout->addChild(setEditLabel);
 	listViewPropertiesVerticalLayout->addChild(modeSelectionLayout);
 
-	mPropertiesRelativeLayout->addChild(listViewPropertiesVerticalLayout);
+	mPropertiesListView->addChild(listViewPropertiesVerticalLayout);
 }
 
 /**
@@ -254,7 +253,7 @@ void SettingsScreen::createListViewSectionPropertiesLayout()
 	currentSectionFooterTextLayout->addChild(mCurrentListViewSectionFooterEditBox);
 	listViewSectionPropertiesVerticalLayout->addChild(currentSectionFooterTextLayout);
 
-	mPropertiesRelativeLayout->addChild(listViewSectionPropertiesVerticalLayout);
+	mPropertiesListView->addChild(listViewSectionPropertiesVerticalLayout);
 }
 
 /**
@@ -284,7 +283,7 @@ void SettingsScreen::createListViewItemPropertiesLayout()
 	createListViewItemAccessoryTypeEditModeLayout(listViewItemPropertiesVerticalLayout);
 	createListViewItemEditStyleLayout(listViewItemPropertiesVerticalLayout);
 
-	mPropertiesRelativeLayout->addChild(listViewItemPropertiesVerticalLayout);
+	mPropertiesListView->addChild(listViewItemPropertiesVerticalLayout);
 }
 
 void SettingsScreen::createListViewItemTextLayout(VerticalLayout* listViewItemPropertiesVerticalLayout)
