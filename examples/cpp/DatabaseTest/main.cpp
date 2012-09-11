@@ -277,7 +277,7 @@ public:
 		SHOULD_HOLD(3 == numberOfRows, "Wrong number of rows");
 
 		// Free the cursor.
-	    maDBCursorDestroy(cursor);
+		maDBCursorDestroy(cursor);
 
 		printf("Count rows success\n");
 	}
@@ -438,7 +438,7 @@ public:
 		maDBCursorNext(cursor);
 		int numberOfRows;
 		maDBCursorGetColumnInt(cursor, 0, &numberOfRows);
-	    maDBCursorDestroy(cursor);
+		maDBCursorDestroy(cursor);
 		SHOULD_HOLD(1 == numberOfRows, "Wrong number of rows");
 
 		// Check that query that returns no rows works.

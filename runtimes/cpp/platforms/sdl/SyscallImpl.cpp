@@ -127,7 +127,7 @@ namespace Base {
 	static MAHandle gDrawTargetHandle = HANDLE_SCREEN;
 
 	static bool gCameraViewFinderActive = false;
-	static MAPoint2d gCameraViewFinderPoint, gCameraViewFinderDirection;
+	static MAPoint2dNative gCameraViewFinderPoint, gCameraViewFinderDirection;
 	static SDL_TimerID gCameraViewFinderTimer = NULL;
 
 	static CircularFifo<MAEvent, EVENT_BUFFER_SIZE> gEventFifo;
