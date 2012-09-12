@@ -40,6 +40,10 @@ import com.mosync.nativeui.util.properties.IntConverter;
 import com.mosync.nativeui.util.properties.InvalidPropertyValueException;
 import com.mosync.nativeui.util.properties.PropertyConversionException;
 
+import static com.mosync.internal.generated.IX_WIDGET.MAW_LIST_VIEW_TYPE_DEFAULT;
+import static com.mosync.internal.generated.IX_WIDGET.MAW_LIST_VIEW_TYPE_ALPHABETICAL;
+import static com.mosync.internal.generated.IX_WIDGET.MAW_LIST_VIEW_TYPE_SEGMENTED;
+
 /**
  * This class wraps a list that displays a list of views.
  * The intention of this class is display views that all
@@ -59,13 +63,6 @@ public class ListLayout extends Layout
 	implements AdapterChangedListener
 {
 	/**
-	 * List view types.
-	 */
-	static final int LIST_VIEW_TYPE_ALPHABETICAL = 1;
-	static final int LIST_VIEW_TYPE_SEGMENTED = 2;
-	static final int LIST_VIEW_TYPE_DEFAULT = 3;
-
-	/**
 	 * Item types for segmented list view.
 	 */
 	public static final int ITEM_VIEW_TYPE_ITEM = 0;
@@ -75,11 +72,11 @@ public class ListLayout extends Layout
 
 	/**
 	 * The list type:
-	 *  - default.
-	 *  - segmented.
-	 *  - alphabetical.
+	 *  - MAW_LIST_VIEW_TYPE_DEFAULT
+	 *  - MAW_LIST_VIEW_TYPE_ALPHABETICAL
+	 *  - MAW_LIST_VIEW_TYPE_SEGMENTED
 	 */
-	private int mListType = LIST_VIEW_TYPE_DEFAULT;
+	private int mListType = IX_WIDGET.MAW_LIST_VIEW_TYPE_DEFAULT;
 
 	/**
 	 * The sections of the list.
@@ -114,13 +111,20 @@ public class ListLayout extends Layout
 		super( handle, listView );
 		listView.setAdapter( m_viewAdapter );
 		mWidgetHandle = handle;
+		//listView.setFocusable(true);
 	}
 
 	@Override
 	public int addChildAt(Widget child, int index)
 	{
-		if ( mListType == LIST_VIEW_TYPE_DEFAULT )
+		if ( mListType == IX_WIDGET.MAW_LIST_VIEW_TYPE_DEFAULT )
 		{
+			if ( child instanceof ListViewSection )
+			{
+				Log.e( "MoSync",
+				"maWidgetInsertChild: Default ListLayout cannot contain ListViewSections.");
+				return IX_WIDGET.MAW_RES_INVALID_HANDLE;
+			}
 			child.setParent(this);
 			updateLayoutParamsForChild(child);
 
@@ -159,17 +163,11 @@ public class ListLayout extends Layout
 			m_children.add(listIndex, child);
 			mSections.add(listIndex, section);
 
-			if ( mListType == LIST_VIEW_TYPE_SEGMENTED )
+			if ( mListType == IX_WIDGET.MAW_LIST_VIEW_TYPE_SEGMENTED )
 				addSegmentedSection(section, listIndex);
 			else
 			{
-				// Disable and enable fast scroll thumb,
-				// so that getSections() can get called
-				// and refresh the preview letters.
-				ListView l = (ListView) getView();
-				l.setFastScrollEnabled(false);
 				mAlphabeticalViewAdapter.reloadPreviewLetters();
-				l.setFastScrollEnabled(true);
 			}
 
 			// Set adapter listeners for each section.
@@ -209,14 +207,14 @@ public class ListLayout extends Layout
 	@Override
 	public int removeChild(Widget child)
 	{
-		if ( mListType == LIST_VIEW_TYPE_DEFAULT )
+		if ( mListType == IX_WIDGET.MAW_LIST_VIEW_TYPE_DEFAULT )
 		{
 			child.setParent(null);
 			m_children.remove( child );
 			m_viewAdapter.remove( child.getRootView( ) );
 		}
-		else if( mListType == LIST_VIEW_TYPE_ALPHABETICAL ||
-				mListType == LIST_VIEW_TYPE_SEGMENTED)
+		else if( mListType == IX_WIDGET.MAW_LIST_VIEW_TYPE_ALPHABETICAL ||
+				mListType == IX_WIDGET.MAW_LIST_VIEW_TYPE_SEGMENTED)
 		{
 			// Do not call super.removeChild because section is more
 			// of a container, that a widget.
@@ -228,7 +226,7 @@ public class ListLayout extends Layout
 			// Nullify adapter listener.
 			section.setAdapterListener(null);
 
-			if ( mListType == LIST_VIEW_TYPE_SEGMENTED )
+			if ( mListType == IX_WIDGET.MAW_LIST_VIEW_TYPE_SEGMENTED )
 				removeSegmentedSection(section);
 			else
 				mAlphabeticalViewAdapter.reloadPreviewLetters();
@@ -307,11 +305,11 @@ public class ListLayout extends Layout
 			if ( IntConverter.convert(value) == IX_WIDGET.MAW_LIST_VIEW_TYPE_DEFAULT)
 			{
 				listView.setAdapter( m_viewAdapter );
-				mListType = LIST_VIEW_TYPE_DEFAULT;
+				mListType = IX_WIDGET.MAW_LIST_VIEW_TYPE_DEFAULT;
 			}
 			else if( IntConverter.convert(value) == IX_WIDGET.MAW_LIST_VIEW_TYPE_SEGMENTED )
 			{
-				mListType = LIST_VIEW_TYPE_SEGMENTED;
+				mListType = IX_WIDGET.MAW_LIST_VIEW_TYPE_SEGMENTED;
 				m_viewAdapter = new SegmentedViewAdapter( );
 				listView.setAdapter(m_viewAdapter);
 				listView.setOnItemClickListener(
@@ -319,9 +317,10 @@ public class ListLayout extends Layout
 			}
 			else if( IntConverter.convert(value) == IX_WIDGET.MAW_LIST_VIEW_TYPE_ALPHABETICAL )
 			{
-				mListType = LIST_VIEW_TYPE_ALPHABETICAL;
+				mListType = IX_WIDGET.MAW_LIST_VIEW_TYPE_ALPHABETICAL;
 				mAlphabeticalViewAdapter = new AlphabeticalViewAdapter<ListItemWidget>( );
 				listView.setAdapter( mAlphabeticalViewAdapter );
+				listView.setFastScrollEnabled(true);
 				listView.setOnItemClickListener(
 						new SectionedListOnItemClickListener( mWidgetHandle ) );
 			}
@@ -332,9 +331,9 @@ public class ListLayout extends Layout
 		}
 		else if( property.equals(IX_WIDGET.MAW_LIST_VIEW_RELOAD_DATA) )
 		{
-			if ( mListType == LIST_VIEW_TYPE_ALPHABETICAL )
+			if ( mListType == IX_WIDGET.MAW_LIST_VIEW_TYPE_ALPHABETICAL )
 				mAlphabeticalViewAdapter.notifyDataSetChanged();
-			else if ( mListType == LIST_VIEW_TYPE_SEGMENTED )
+			else if ( mListType == IX_WIDGET.MAW_LIST_VIEW_TYPE_SEGMENTED )
 				m_viewAdapter.notifyDataSetChanged();
 		}
 		else if( property.equals( Types.WIDGET_PROPERTY_REVERSED ) )
@@ -402,7 +401,7 @@ public class ListLayout extends Layout
 	@Override
 	public void itemRemoved(ListItemWidget item)
 	{
-		if ( mListType == LIST_VIEW_TYPE_ALPHABETICAL )
+		if ( mListType == IX_WIDGET.MAW_LIST_VIEW_TYPE_ALPHABETICAL )
 		{
 			mAlphabeticalViewAdapter.notifyDataSetChanged();
 		}
@@ -420,7 +419,7 @@ public class ListLayout extends Layout
 	public void itemAdded(
 			ListItemWidget item, ListViewSection section, int index)
 	{
-		if ( mListType == LIST_VIEW_TYPE_ALPHABETICAL )
+		if ( mListType == IX_WIDGET.MAW_LIST_VIEW_TYPE_ALPHABETICAL )
 		{
 			mAlphabeticalViewAdapter.notifyDataSetChanged();
 		}
@@ -701,8 +700,6 @@ public class ListLayout extends Layout
 				browseIndex += sectionObj.itemsCount();
 				sectionIndex = i;
 				if (browseIndex > position) {
-					Log.e("@@MoSync",
-							"getView found the position index , on i= " + i);
 					return sectionObj.getItem(position - sectionPosition)
 							.getView();
 				}

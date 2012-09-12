@@ -58,6 +58,7 @@ group WidgetTypes "Widget types" {
 
 		/**
 		* @brief A list view is a vertical list of widgets that is also scrollable.
+		* When creating a list view object the #MAW_LIST_VIEW_TYPE property must be immediately set.
 		*/
 		LIST_VIEW = "ListView";
 
@@ -250,9 +251,10 @@ group WidgetTypes "Widget types" {
 		/**
 		* @brief A list section widget is used to group one or more #MAW_LIST_VIEW_ITEM widgets.
 		* Only #MAW_LIST_VIEW_ITEM objects can be added to this list widget.
-		* None of the widget's properties applies to this widget.
+		* None of the widget's properties applies to this widget, as it only acts like a widget container.
+		* When creating a list section the #MAW_LIST_VIEW_SECTION_TYPE property must be immediately set.
 		* See \ref WidgetListViewSectionProperties for the available properties.
-		* Platform: iOS.
+		* Platform: iOS and Android.
 		*/
 		LIST_VIEW_SECTION = "ListViewSection";
 	}
