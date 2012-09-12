@@ -18,7 +18,6 @@ group WidgetListView "List View" {
 			* Any section headers or footers are displayed as inline separators and float when
 			* the table view is scrolled.
 			* Platform: iOS and Android.
-			* Default value for list view.
 			*/
 			ALPHABETICAL = 1;
 
