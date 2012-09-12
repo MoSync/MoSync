@@ -1,20 +1,20 @@
 group WidgetListViewSection "List View Section" {
 	/**
 	* The available list view section types.
-	* Platform: Android, iOS and Windows Phone.
+	* Platform: Android, iOS and Windows Phone 7.
 	*/
 	group WidgetListViewSectionType "List View Section Type" {
 		constset int MAW_LIST_VIEW_SECTION_TYPE_ {
 			/**
 			* @brief A section that presents a group of rows, that corespond to the same #MAW_LIST_VIEW_SECTION_TITLE.
-			* Platform: iOS and Android.
+			* Platform: iOS, Android and Windows Phone 7.
 			*/
 			ALPHABETICAL = 1;
 
 			/**
 			* @brief A section that presents a group of rows, specifically list view items.
 			* Header and footer information can be set to segmented sections.
-			* Platform: iOS and Android.
+			* Platform: iOS, Android and Windows Phone 7.
 			*/
 			SEGMENTED = 2;
 		}
@@ -51,7 +51,7 @@ group WidgetListViewSection "List View Section" {
 			* Section title will appear on the right side of the list.
 			* This preview letter is available only for list views of alphabetical type.
 			*
-			* Platform: iOS and Android.
+			* Platform: iOS, Android and Windows Phone 7.
 			*
 			* @validvalue A string.
 			*
@@ -68,7 +68,7 @@ group WidgetListViewSection "List View Section" {
 			* @brief Set or get section header text.
 			* Section text will appear above the section items.
 			*
-			* Platform: iOS and Android.
+			* Platform: iOS, Android and Windows Phone 7.
 			*
 			* @validvalue A string.
 			*
@@ -85,7 +85,7 @@ group WidgetListViewSection "List View Section" {
 			* @brief Set or get section footer text.
 			* Section text will appear below the section items.
 			*
-			* Platform: iOS and Android.
+			* Platform: iOS, Android and Windows Phone 7.
 			*
 			* @validvalue A string.
 			*
@@ -101,7 +101,7 @@ group WidgetListViewSection "List View Section" {
 			/**
 			* @brief Set the section header background color.
 			*
-			* Platform: Android.
+			* Platform: Android and Windows Phone 7.
 			*
 			* @validvalue A hexadecimal value 0xRRGGBB, where R, G and B are the red, green and blue components respectively.
 			*
@@ -117,7 +117,7 @@ group WidgetListViewSection "List View Section" {
 			/**
 			* @brief Set the section footer background color.
 			*
-			* Platform: Android.
+			* Platform: Android and Windows Phone 7.
 			*
 			* @validvalue A hexadecimal value 0xRRGGBB, where R, G and B are the red, green and blue components respectively.
 			*
@@ -133,7 +133,7 @@ group WidgetListViewSection "List View Section" {
 			/**
 			* @brief Sets the font color of the header.
 			*
-			* Platform: Android.
+			* Platform: Android and Windows Phone 7.
 			*
 			* @validvalue A hexadecimal value 0xRRGGBB, where R, G and B are the red, green and blue components respectively.
 			*
@@ -149,7 +149,7 @@ group WidgetListViewSection "List View Section" {
 			/**
 			* @brief Sets the font color of the footer.
 			*
-			* Platform: Android.
+			* Platform: Android and Windows Phone 7.
 			*
 			* @validvalue A hexadecimal value 0xRRGGBB, where R, G and B are the red, green and blue components respectively.
 			*
@@ -165,7 +165,7 @@ group WidgetListViewSection "List View Section" {
 			/**
 			* @brief Sets the font size in points of the header.
 			*
-			* Platform: Android.
+			* Platform: Android and Windows Phone 7.
 			*
 			* @validvalue A float that specifies the number of pixels on Android.
 			*
@@ -181,7 +181,7 @@ group WidgetListViewSection "List View Section" {
 			/**
 			* @brief Sets the font size in points of the footer.
 			*
-			* Platform: Android.
+			* Platform: Android and Windows Phone 7.
 			*
 			* @validvalue A float that specifies the number of pixels on Android.
 			*
@@ -200,7 +200,7 @@ group WidgetListViewSection "List View Section" {
 			* @validvalue A font handle received from loading fonts using
 			* #maFontGetName and #maFontLoadWithName syscalls.
 			*
-			* Platform: Android.
+			* Platform: Android and Windows Phone 7.
 			*
 			* @setonly
 			*
@@ -224,7 +224,7 @@ group WidgetListViewSection "List View Section" {
 			* @validvalue A font handle received from loading fonts using
 			* #maFontGetName and #maFontLoadWithName syscalls.
 			*
-			* Platform: Android.
+			* Platform: Android and Windows Phone 7.
 			*
 			* @setonly
 			*
@@ -245,6 +245,7 @@ group WidgetListViewSection "List View Section" {
 			/**
 			* @brief Sets the horizontal alignment of the text inside the header.
 			*
+			* Platform: Android and Windows Phone 7.
 			*
 			* @validvalue Takes one of the constants #MAW_ALIGNMENT_TOP, #MAW_ALIGNMENT_CENTER or #MAW_ALIGNMENT_BOTTOM.
 			*
@@ -260,7 +261,7 @@ group WidgetListViewSection "List View Section" {
 			/**
 			* @brief Sets the horizontal alignment of the text inside the footer.
 			*
-			* Platform: Android.
+			* Platform: Android and Windows Phone 7.
 			*
 			* @validvalue Takes one of the constants #MAW_ALIGNMENT_TOP, #MAW_ALIGNMENT_CENTER or #MAW_ALIGNMENT_BOTTOM.
 			*
@@ -276,7 +277,7 @@ group WidgetListViewSection "List View Section" {
 			/**
 			* @brief Sets the vertical alignment of the text inside the header.
 			*
-			* Platform: Android.
+			* Platform: Android and Windows Phone 7.
 			*
 			* @validvalue One of the constants #MAW_ALIGNMENT_TOP, #MAW_ALIGNMENT_CENTER or #MAW_ALIGNMENT_BOTTOM.
 			*
@@ -292,7 +293,7 @@ group WidgetListViewSection "List View Section" {
 			/**
 			* @brief Sets the vertical alignment of the text inside the footer.
 			*
-			* Platform: Android.
+			* Platform: Android and Windows Phone 7.
 			*
 			* @validvalue One of the constants #MAW_ALIGNMENT_TOP, #MAW_ALIGNMENT_CENTER or #MAW_ALIGNMENT_BOTTOM.
 			*

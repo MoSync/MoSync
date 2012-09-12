@@ -67,16 +67,18 @@ void ListScreen::createMainLayout() {
 	// developer has to handle the sorting
 	for (int i = 0; i <= 4; i++)
 	{
-		ListViewSection* section = new ListViewSection();
+		ListViewSection* section = new ListViewSection(LIST_VIEW_SECTION_TYPE_ALPHABETICAL);
 		MAUtil::String sectionTitle = "A";
 		sectionTitle[0] += i;
 		section->setTitle(sectionTitle);
-		for (int j = 0; j <= 3; j++)
+		section->setHeaderText(sectionTitle);
+		for (int j = 0; j <= 20; j++)
 		{
 			ListViewItem* item = new ListViewItem();
 			MAUtil::String itemText = sectionTitle + "0";
 			itemText[1] += j;
 			item->setText(itemText);
+			item->setSubtitle("subtitle");
 			section->addItem(item);
 		}
 		mListView->addChild(section);

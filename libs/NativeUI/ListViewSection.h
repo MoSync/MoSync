@@ -92,49 +92,49 @@ namespace NativeUI
 		 * Set section title.
 		 * On iOS section title will appear on the right side of the list.
 		 * On Android section title will appear on the fast scroll thumb.
-		 * Platform: iOS and Android.
+		 * Platform: iOS, Android and Windows Phone 7.
 		 * @param title The given title.
 		 */
 		void setTitle(const MAUtil::String& title);
 
 		/**
 		 * Get section title.
-		 * Platform: iOS and Android.
+		 * Platform: iOS, Android and Windows Phone 7.
 		 * @return Section title.
 		 */
 		MAUtil::String getTitle();
 
 		/**
 		 * Set the section header text.
-		 * Platform: iOS.
+		 * Platform: iOS and Windows Phone 7.
 		 * @param headerText The given header text.
 		 */
 		void setHeaderText(const MAUtil::String& headerText);
 
 		/**
 		 * Get the section header text.
-		 * Platform: iOS and Android.
+		 * Platform: iOS, Android and Windows Phone 7.
 		 * @return Header text.
 		 */
 		MAUtil::String getHeaderText();
 
 		/**
 		 * Set the section footer text.
-		 * Platform: iOS and Android.
+		 * Platform: iOS, Android and Windows Phone 7.
 		 * @param footerText The given footer text.
 		 */
 		void setFooterText(const MAUtil::String& footerText);
 
 		/**
 		 * Get the section footer text.
-		 * Platform: iOS and Android.
+		 * Platform: iOS, Android and Windows Phone 7.
 		 * @return Footer text.
 		 */
 		MAUtil::String getFooterText();
 
         /**
          * Set the background color of the header row.
-         * Platform: Android and Windows Phone.
+         * Platform: Android and Windows Phone 7.
          * @param color A hexadecimal color value, e.g. 0xFF0000.
          * @return Any of the following result codes:
          * - #MAW_RES_OK if the value was set.
@@ -146,7 +146,7 @@ namespace NativeUI
 
         /**
          * Set the background color of the footer row.
-         * Platform: Android and Windows Phone.
+         * Platform: Android and Windows Phone 7.
          * @param color A hexadecimal color value, e.g. 0xFF0000.
          * @return Any of the following result codes:
          * - #MAW_RES_OK if the value was set.
@@ -158,7 +158,7 @@ namespace NativeUI
 
         /**
          * Set the font color of the header text.
-         * Platform: Android and Windows Phone.
+         * Platform: Android and Windows Phone 7.
          * @param color A hexadecimal value 0xRRGGBB, where R, G and B are the
          *              red, green and blue components respectively.
          * @return Any of the following result codes:
@@ -169,7 +169,7 @@ namespace NativeUI
 
         /**
          * Set the font color of the footer text.
-         * Platform: Android and Windows Phone.
+         * Platform: Android and Windows Phone 7.
          * @param color A hexadecimal value 0xRRGGBB, where R, G and B are the
          *              red, green and blue components respectively.
          * @return Any of the following result codes:
@@ -180,7 +180,7 @@ namespace NativeUI
 
         /**
          * Set the font size in points of the header text.
-         * Platform: Android and Windows Phone.
+         * Platform: Android and Windows Phone 7.
          * @param size A float that specifies the number of pixels for Android
          * and WP7, and number of points for iOS.
          * @return Any of the following result codes:
@@ -191,7 +191,7 @@ namespace NativeUI
 
         /**
          * Set the font size in points of the footer text.
-         * Platform: Android and Windows Phone.
+         * Platform: Android and Windows Phone 7.
          * @param size A float that specifies the number of pixels for Android
          * and WP7, and number of points for iOS.
          * @return Any of the following result codes:
@@ -202,7 +202,7 @@ namespace NativeUI
 
 		/**
 		* Sets the typeface and style in which the header text should be displayed.
-		* Platform: Android and Windows Phone.
+		* Platform: Android and Windows Phone 7.
 		* @param fontHandle A font handle received from loading fonts using
 		*  #maFontGetName and #maFontLoadWithName syscalls.
 		* @return Any of the following result codes:
@@ -216,7 +216,7 @@ namespace NativeUI
 
 		/**
 		* Sets the typeface and style in which the footer text should be displayed.
-		* Platform: Android and Windows Phone.
+		* Platform: Android and Windows Phone 7.
 		* @param fontHandle A font handle received from loading fonts using
 		*  #maFontGetName and #maFontLoadWithName syscalls.
 		* @return Any of the following result codes:
@@ -230,7 +230,7 @@ namespace NativeUI
 
         /**
          * Set the vertical alignment of the header text.
-         * Platform: Android and Windows Phone.
+         * Platform: Android and Windows Phone 7.
          * @param alignment One of the constants:
          * - #MAW_ALIGNMENT_TOP
          * - #MAW_ALIGNMENT_CENTER
@@ -243,7 +243,7 @@ namespace NativeUI
 
         /**
          * Set the vertical alignment of the footer text.
-         * Platform: Android and Windows Phone.
+         * Platform: Android and Windows Phone 7.
          * @param alignment One of the constants:
          * - #MAW_ALIGNMENT_TOP
          * - #MAW_ALIGNMENT_CENTER
@@ -256,7 +256,7 @@ namespace NativeUI
 
         /**
          * Set the horizontal alignment of the header text.
-         * Platform: Android and Windows Phone.
+         * Platform: Android and Windows Phone 7.
          * @param alignment one of the constants:
          * - #MAW_ALIGNMENT_LEFT
          * - #MAW_ALIGNMENT_CENTER
@@ -269,7 +269,7 @@ namespace NativeUI
 
         /**
          * Set the horizontal alignment of the footer text.
-         * Platform: Android and Windows Phone.
+         * Platform: Android and Windows Phone 7.
          * @param alignment one of the constants:
          * - #MAW_ALIGNMENT_LEFT
          * - #MAW_ALIGNMENT_CENTER
