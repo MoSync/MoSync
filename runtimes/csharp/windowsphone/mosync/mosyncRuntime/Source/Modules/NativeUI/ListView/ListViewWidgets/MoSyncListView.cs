@@ -84,8 +84,9 @@ namespace MoSync
              */
             protected ListViewType mListViewType;
 
-            /* TODO - should contain the long list selector items and sections */
-
+            /**
+             * Contains the long list selector sections.
+             */
             List<ListSection<ListItem>> mListSections;
 
             #region Constructor
@@ -293,15 +294,17 @@ namespace MoSync
                         case MoSync.Constants.MAW_LIST_VIEW_TYPE_ALPHABETICAL:
                             mListViewType = ListViewType.Alphabetical;
                             ClearLongList();
-                            SwitchToAlphabeticalListView();
+                            SwitchToLongListSelector();
                             break;
                         case MoSync.Constants.MAW_LIST_VIEW_TYPE_DEFAULT:
                             mListViewType = ListViewType.Default;
                             ClearLongList();
-                            SwitchToSegmentedListView();
+                            SwitchToListBox();
                             break;
                         case MoSync.Constants.MAW_LIST_VIEW_TYPE_SEGMENTED:
                             mListViewType = ListViewType.Segmented;
+                            ClearLongList();
+                            SwitchToLongListSelector();
                             break;
                         default:
                             throw new InvalidPropertyValueException();
@@ -449,14 +452,8 @@ namespace MoSync
              */
             private void AddListSection(ListViewSection section)
             {
-                ListSection<ListItem> newSection = null;
                 base.AddChild(section);
-                MoSync.Util.RunActionOnMainThreadSync(() =>
-                    {
-                        newSection = new ListSection<ListItem>(section.Title,
-                                                               section.SectionItems);
-                    });
-                mListSections.Add(newSection);
+                mListSections.Add(section.SectionData);
             }
 
             /**
@@ -483,14 +480,8 @@ namespace MoSync
              */
             private void InsertListSection(ListViewSection section, int index)
             {
-                ListSection<ListItem> newSection = null;
                 base.AddChild(section);
-                MoSync.Util.RunActionOnMainThreadSync(() =>
-                {
-                    newSection = new ListSection<ListItem>(section.Title,
-                                                           section.SectionItems);
-                });
-                mListSections.Insert(index, newSection);
+                mListSections.Insert(index, section.SectionData);
             }
 
             /**
@@ -525,25 +516,26 @@ namespace MoSync
             private void ClearLongList()
             {
                 mListSections.Clear();
-                this.ReloadData = "true";
             }
 
             /**
-             * Switches the current widget view to a alphabetical list view.
+             * Switches the current widget view to the long list selector view.
              */
-            private void SwitchToAlphabeticalListView()
+            private void SwitchToLongListSelector()
             {
                 mView = mLongListSelector;
                 mLongListSelector.ItemsSource = mListSections;
             }
 
             /**
-             * Switches the current widget view to a segmented list view.
+             * Switches the current widget view to the list box view.
              */
-            private void SwitchToSegmentedListView()
+            private void SwitchToListBox()
             {
-                mView = mLongListSelector;
-                mLongListSelector.ItemsSource = mListSections;
+                if (mView != mList)
+                {
+                    mView = mList;
+                }
             }
 
             #endregion

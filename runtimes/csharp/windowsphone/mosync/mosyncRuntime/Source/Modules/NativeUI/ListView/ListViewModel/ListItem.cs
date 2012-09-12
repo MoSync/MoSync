@@ -21,7 +21,11 @@ namespace MoSync
             #region Private members
 
             private Brush mBackgroundColor;
-            private Grid mContent;
+            private String mTitle;
+            private String mSubtitle;
+            private Visibility mSubtitleVisibility;
+            private double mSubtitleHeight;
+            private ImageSource mImageSource;
 
             // if the values are not set, the size of the Item is the same
             // as the size of its content (mContent)
@@ -35,7 +39,8 @@ namespace MoSync
             public ListItem()
             {
                 mBackgroundColor = new SolidColorBrush(Colors.Black);
-                mContent = new Grid();
+                mTitle = "";
+                mSubtitle = "";
             }
 
             #endregion
@@ -68,16 +73,55 @@ namespace MoSync
                 }
             }
 
-            public Grid Content
+            public String Title
             {
                 get
                 {
-                    return mContent;
+                    return mTitle;
                 }
                 set
                 {
-                    mContent = value;
-                    OnPropertyChanged("Content");
+                    mTitle = value;
+                    OnPropertyChanged("Title");
+                }
+            }
+
+            public String Subtitle
+            {
+                get
+                {
+                    return mSubtitle;
+                }
+                set
+                {
+                    mSubtitle = value;
+                    OnPropertyChanged("Subtitle");
+                }
+            }
+
+            public Visibility SubtitleVisibility
+            {
+                get
+                {
+                    return mSubtitleVisibility;
+                }
+                set
+                {
+                    mSubtitleVisibility = value;
+                    OnPropertyChanged("SubtitleVisibility");
+                }
+            }
+
+            public ImageSource ImageSource
+            {
+                get
+                {
+                    return mImageSource;
+                }
+                set
+                {
+                    mImageSource = value;
+                    OnPropertyChanged("ImageSource");
                 }
             }
 
