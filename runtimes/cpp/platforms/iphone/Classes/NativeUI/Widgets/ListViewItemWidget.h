@@ -100,19 +100,18 @@
 /**
  * Adds an widget to the end of the children list.
  * @param child Widget to be added.
- * @return One of the following constants:
- * - MAW_RES_OK if the child was added.
- * - MAW_RES_INVALID_LAYOUT if child's type is not an layout.
+ * It is recommended that the child should be an layout.
+ * @return MAW_RES_OK.
  */
 - (int)addChild:(IWidget*)child;
 
 /**
  * Insert a widget to a given index.
  * @param child Widget to be added.
+ * It is recommended that the child should be an layout.
  * @param index The index where the child should be inserted.
  * @return One of the following constants:
  * - MAW_RES_OK if the child was added.
- * - MAW_RES_INVALID_LAYOUT if the child's type is not an layout.
  * - MAW_RES_INVALID_INDEX if the index was out of bounds.
  */
 - (int)insertChild:(IWidget*)child atIndex:(NSNumber*)index;
