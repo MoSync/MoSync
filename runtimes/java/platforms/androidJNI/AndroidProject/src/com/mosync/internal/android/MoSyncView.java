@@ -34,7 +34,7 @@ import android.view.SurfaceView;
 public class MoSyncView extends SurfaceView implements SurfaceHolder.Callback
 {
 	public SurfaceHolder mSurfaceHolder;
-	
+
 	private Context mContext;
 	private MoSyncThread mMoSyncThread;
 
@@ -43,13 +43,13 @@ public class MoSyncView extends SurfaceView implements SurfaceHolder.Callback
 	 * @param context		The Android Activity Context
 	 * @param moSyncThread	The thread in which the runtime is running
 	 */
-	public MoSyncView(Context context, MoSyncThread moSyncThread) 
+	public MoSyncView(Context context, MoSyncThread moSyncThread)
 		throws Exception
 	{
 		super(context);
-		
+
 		SYSLOG("Constructor");
-		
+
 		mContext = context;
 		mMoSyncThread = moSyncThread;
 
@@ -86,16 +86,16 @@ public class MoSyncView extends SurfaceView implements SurfaceHolder.Callback
 			default: Log.i("MoSync", "No hardware acceleration available");
 		}
 */
-		mSurfaceHolder.addCallback(this);    
-		
+		mSurfaceHolder.addCallback(this);
+
 		setVisibility(VISIBLE);
-		
+
 		setFocusableInTouchMode(true);
 	}
 
 	/**
-	 * Called during layout when the size of this view has changed. 
-	 * If you were just added to the view hierarchy, you're called 
+	 * Called during layout when the size of this view has changed.
+	 * If you were just added to the view hierarchy, you're called
 	 * with the old values of 0.
 	 * @param w Current width of this view.
 	 * @param w h Current height of this view.
@@ -105,12 +105,12 @@ public class MoSyncView extends SurfaceView implements SurfaceHolder.Callback
 	@Override
 	public void onSizeChanged(int w, int h, int oldw, int oldh)
 	{
-		SYSLOG("onSizeChanged w:" + w + " h:" + h 
+		SYSLOG("onSizeChanged w:" + w + " h:" + h
 			+ " oldw:" + oldw + " oldh:" + oldh);
-		
+
 		super.onSizeChanged(w, h, oldw, oldh);
 	}
-	
+
 	/**
 	 * This function is called directly after a change to the surface.
 	 *
@@ -123,16 +123,18 @@ public class MoSyncView extends SurfaceView implements SurfaceHolder.Callback
 	 */
 	@Override
 	public void surfaceChanged(
-		SurfaceHolder holder, 
-		int format, 
-		int width, 
+		SurfaceHolder holder,
+		int format,
+		int width,
 		int height)
 	{
 		SYSLOG("surfaceChanged");
-		
+
+		//Log.i("@@@@@", "surfaceChanged");
+
 		// Allocate new screen buffer.
 		mMoSyncThread.updateSurfaceSize(width, height);
-		
+
 		// Post screen changed event.
 		// TODO: Should this be done also initially, when the surface is
 		// first created, or only when it is changed after it has been created?
@@ -145,7 +147,7 @@ public class MoSyncView extends SurfaceView implements SurfaceHolder.Callback
 	}
 
 	/**
-	 * Function which is called by Android directly after the surface 
+	 * Function which is called by Android directly after the surface
 	 * has been created.
 	 *
 	 * NOTE: Here we start the MoSync thread.
@@ -156,19 +158,23 @@ public class MoSyncView extends SurfaceView implements SurfaceHolder.Callback
 	public void surfaceCreated(SurfaceHolder holder)
 	{
 		SYSLOG("surfaceCreated");
-		
+
+		//Log.i("@@@@@", "surfaceCreated");
+
 		if (!mMoSyncThread.isAlive())
 		{
-			mMoSyncThread.updateSurfaceSize(getWidth(), getHeight());
+			//Log.i("@@@@@", "surfaceCreated 1");
 			mMoSyncThread.initSyscalls();
+			mMoSyncThread.updateSurfaceSize(getWidth(), getHeight());
 			mMoSyncThread.start();
 		}
 		else
 		{
+			//Log.i("@@@@@", "surfaceCreated 2");
 			mMoSyncThread.updateScreen();
 		}
 	}
-	
+
 	/**
 	 * Method that is called directly before the surface is destroyed.
 	 */
@@ -185,13 +191,13 @@ public class MoSyncView extends SurfaceView implements SurfaceHolder.Callback
 	}
 
 	protected void onFocusChanged(
-		boolean gainFocus, 
-		int direction, 
+		boolean gainFocus,
+		int direction,
 		Rect previouslyFocusedRect)
 	{
 		SYSLOG("onFocusChanged");
 	}
-	
+
 	public boolean onTouchEvent(MotionEvent motionEvent)
 	{
 		return ((Activity) mContext).onTouchEvent(motionEvent);
