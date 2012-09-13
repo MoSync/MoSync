@@ -122,7 +122,7 @@ void data_list_register_values(const string& args) {
 		error("Unsupported format");
 		return;
 	}
-	
+
 	NEED_REG;
 
 	oprintDone();
@@ -171,7 +171,7 @@ static void Callback::read_memory() {
 	int next = sRMP.address + sReadMemBuf.size();
 	int rowSize = sRMP.wordSize * sRMP.nCols;
 	oprintDone();
-	oprintf(",addr=\"0x%X\",nr-bytes=\"%"PFZT"\",total-bytes=\"%"PFZT"\","
+	oprintf(",addr=\"0x%X\",nr-bytes=\"%" PFZT "\",total-bytes=\"%" PFZT "\","
 		"next-row=\"0x%X\",prev-row=\"0x%X\",next-page=\"0x%X\",prev-page=\"0x%X\","
 		"memory=[",
 		sRMP.address, sReadMemBuf.size(), sReadMemBuf.size(),

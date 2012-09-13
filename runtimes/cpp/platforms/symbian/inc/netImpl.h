@@ -241,6 +241,22 @@ void FinishNetworkingStartL();
 
 void maAccept(MAHandle conn);
 
+bool getSavedIap(TUint& iap);
+
+int maIapSave();
+int maIapReset();
+int maIapShutdown();
+
+#ifdef __SERIES60_3X__
+#ifdef SUPPORT_MOSYNC_SERVER
+int maNetworkStatus();
+void NetworkStatusChangeHandlerL(TInt result);
+#endif
+
+int maIapSetMethod(int method);
+int maIapSetFilter(int filter);
+#endif	//__SERIES60_3X__
+
 //******************************************************************************
 //Variables
 //******************************************************************************
@@ -251,6 +267,18 @@ HashMap<CConnection> gConnections;
 TDblQue<ConnOp> gConnOps;
 CActiveEnder* gConnCleanupQue;
 RStringPool gHttpStringPool;
+#ifdef __SERIES60_3X__
+#ifdef SUPPORT_MOSYNC_SERVER
+CTelephony::TNetworkRegistrationV1 gNetworkRegistration;
+CTelephony::TNetworkRegistrationV1Pckg gNetworkRegistrationPckg;
+CClassSynchronizer<Syscall>* gNetworkStatusSync;
+#endif
+int gIapMethod;
+int gIapFilter;
+#endif
+TUint gIapId;
+TBuf16<KMaxPath> gIapPath16;
+TBuf8<KMaxPath> gIapPath8;
 
 //TDblQue<ConnOp> gConnOpsWaitingForNetworkingStart;	//error; can't be in two Ques at once.
 //just a little inefficient, but since this is used only once,
@@ -260,10 +288,3 @@ RPointerArray<ConnOp> gConnOpsWaitingForNetworkingStart;
 enum NetworkingState {
 	EIdle, EStarting, EStarted
 } gNetworkingState;
-
-//temp, for testing
-#if SYNCTEST
-TNameEntry tNameEntry;
-CCBSynchronizer* tSync;
-friend void tSyncFunc(TAny* arg, TInt res);
-#endif
