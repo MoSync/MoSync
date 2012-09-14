@@ -11,7 +11,7 @@
 #ifndef CONFIG_H_
 #define CONFIG_H_
 
-#define GCM_PROJECT_ID "231523521163"//"YourProjectIdHere"
+#define GCM_PROJECT_ID "YourProjectIdHere"
 
 
 #endif /* CONFIG_H_ */
