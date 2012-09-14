@@ -586,6 +586,19 @@ public class MoSyncThread extends Thread
 		mCanvas = mDrawTargetScreen.mCanvas;
 		mBitmap = mDrawTargetScreen.mBitmap;
 
+		// Set/reset clip rect.
+		mClipLeft = 0;
+		mClipTop = 0;
+		mClipWidth = mWidth;
+		mClipHeight = mHeight;
+
+		// Set original clip rect.
+		// Save the clip state since we have a new canvas created.
+		// This initial save is needed for the clip rect stack to
+		// work correctly when calling restore clip rect.
+		mCanvas.save();
+		mCanvas.clipRect(mClipLeft, mClipTop, mClipWidth, mClipHeight, Region.Op.REPLACE);
+
 		updateScreen();
 
 		SYSLOG("mBitmap width:" + mBitmap.getWidth()
@@ -1122,17 +1135,10 @@ public class MoSyncThread extends Thread
 	void initSyscalls()
 	{
 		SYSLOG("initSyscalls");
+
+		//Log.i("@@@@@", "initSyscalls");
+
 		mUsingFrameBuffer = false;
-
-		mClipLeft = 0;
-		mClipTop = 0;
-		mClipWidth = mWidth;
-		mClipHeight = mHeight;
-
-		// Set original clip rect.
-		// First we save the clip state.
-		mCanvas.save();
-		mCanvas.clipRect(mClipLeft, mClipTop, mClipWidth, mClipHeight, Region.Op.REPLACE);
 
 		mPaint.setStyle(Paint.Style.FILL);
 		mPaint.setAntiAlias(false);
