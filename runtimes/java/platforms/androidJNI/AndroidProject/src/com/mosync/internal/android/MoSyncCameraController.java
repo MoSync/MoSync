@@ -283,6 +283,12 @@ public class MoSyncCameraController {
 
 	private void setPreviewCallback()
 	{
+		if(mCamera == null)
+		{
+			android.util.Log.e("MOSYNC INTERNAL","No Preview set");
+			return;
+		}
+
 		try
 		{
 			//We have to use and static instance of the camera in the reflection here
@@ -308,8 +314,8 @@ public class MoSyncCameraController {
 			mIsUsingPreviewCallbackBuffer = false;
 
 			mCamera.setPreviewCallback(previewCallback);
-
 		}
+
 	}
 
 	/**
