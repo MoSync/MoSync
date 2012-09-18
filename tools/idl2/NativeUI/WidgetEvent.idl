@@ -28,6 +28,20 @@ group WidgetEvent "Widget event" {
 			int listItemIndex;
 
 			/**
+			* @brief The parameters for the #MAW_EVENT_SEGMENTED_LIST_ITEM_CLICKED.
+			*/
+			struct {
+				/**
+				* @brief The index of the section that contains the selected item.
+				*/
+				int sectionIndex;
+				/**
+				* @brief The index of the selected item within its parent section.
+				*/
+				int sectionItemIndex;
+			} listViewSectionInfo;
+
+			/**
 			* @brief The type of button that was clicked when a #MAW_EVENT_CLICKED event is receieved for a searchbar.
 			* The type of searchbar button clicked:
 			* - 0 means 'search'
@@ -384,12 +398,20 @@ group WidgetEvent "Widget event" {
 			MAP_PIN_CLICKED = 32;
 
 			/**
-			* @brief Send by a ListView when an item is about to be selected.
+			* @brief Sent by a ListView when an item is about to be selected.
 			* The listItemIndex member from MAWidgetEventData struct will contain the item index
 			* that is about to be selected.
 			* Available only on iOS.
 			*/
 			ITEM_WILL_SELECT = 33;
+
+			/**
+			* @brief Sent by a Segmented or Alphabetical ListView when an item is selected.
+			* The event will contain the sectionIndex and the sectionItemIndex coresponding to the
+			* selected item.
+			* Available on Windows Phone 7.
+			*/
+			SEGMENTED_LIST_ITEM_CLICKED = 34;
 		}
 	} // end of WidgetEventTypes
 } // end of WidgetEvent

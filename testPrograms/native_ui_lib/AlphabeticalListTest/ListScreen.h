@@ -31,6 +31,7 @@
 
 // Include all the wrappers.
 #include <NativeUI/Widgets.h>
+#include "ListScreenListener.h"
 
 using namespace NativeUI;
 
@@ -52,6 +53,18 @@ public:
 	ListView* getAlphabeticalListView();
 
 	/**
+	 * Add a list screen event listener.
+	 * @param listener The listener that will receive list screen events.
+	 */
+	void addListScreenListener(ListScreenListener* listener);
+
+	/**
+	 * Remove the list screen listener.
+	 * @param listener The listener that receives list screen events.
+	 */
+	void removeListScreenListener(ListScreenListener* listener);
+
+	/**
 	 * Destructor.
 	 */
 	~ListScreen();
@@ -71,6 +84,16 @@ private:
 		ListView* listView,
 		ListViewItem* listViewItem);
 
+	/**
+	 * This method is called when a segmented/alphabetical list view item is clicked.
+	 * @param listView The list view object that generated the event.
+	 * @param listViewSection The ListViewSection object that contains the selected item.
+	 * @param listViewItem The ListViewItem objet clicked.
+	 */
+	virtual void segmentedListViewItemClicked(
+		ListView* listView,
+		ListViewSection* listViewSection,
+		ListViewItem* listViewItem);
 private:
 	/**
 	 * Main layout.
@@ -81,6 +104,11 @@ private:
 	 * The alphabetical list view.
 	 */
 	ListView* mListView;
+
+	/**
+	 * Array with list screen listeners.
+	 */
+	MAUtil::Vector<ListScreenListener*> mListScreenListeners;
 };
 
 #endif /* LISTSCREEN_H_ */

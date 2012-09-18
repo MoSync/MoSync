@@ -82,7 +82,6 @@ namespace NativeUI
 
 	// Forward declaration.
 	class ListViewListener;
-	class ListViewSection;
 
 	/**
 	 * \brief An instance of ListView is used for displaying list of information.

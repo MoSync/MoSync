@@ -31,12 +31,13 @@ MA 02110-1301, USA.
 
 // Include all the wrappers.
 #include <NativeUI/Widgets.h>
+#include "ListScreenListener.h"
 
 using namespace NativeUI;
 
 class SettingsScreen:
 	public Screen,
-	public ListViewListener,
+	public ListScreenListener,
 	public CheckBoxListener,
 	public ButtonListener
 {
@@ -109,15 +110,6 @@ private:
 	 */
 	void setEditModeProperty(ListViewItemEditStyle editMode);
 
-    /** from ListViewListener
-     * This method is called when a list view item is clicked.
-     * @param listView The list view object that generated the event.
-     * @param listViewItem The ListViewItem object that was clicked.
-     */
-	virtual void listViewItemClicked(
-        ListView* listView,
-        ListViewItem* listViewItem);
-
     /**
      * This method is called when the state of the check box was changed
      * by the user.
@@ -131,10 +123,17 @@ private:
     /**
      * This method is called if the touch-up event was inside the
      * bounds of the button.
-     * Platform: iOS and Android.
+     * Platform: iOS, Android and Windows Phone 7.
      * @param button The button object that generated the event.
      */
     virtual void buttonClicked(Widget* button);
+
+	/**
+	 * This method is called when a list item is clicked.
+	 * @param parentSection The parent section of the list view item clicked.
+	 * @param item The list view item clicked.
+	 */
+	virtual void listScreenItemClicked(ListViewSection* &parentSection, ListViewItem* &listViewItem);
 private:
 	/**
 	 * Main layout.
@@ -142,14 +141,14 @@ private:
 	VerticalLayout* mMainLayout;
 
 	/**
+	 * The main list (located on the ListScreen).
+	 */
+	ListView* mListView;
+
+	/**
 	 * The list contains all the properties of the list view, list view section and list view item.
 	 */
 	ListView *mPropertiesListView;
-
-	/**
-	 * The application alphabetical list view.
-	 */
-	ListView* mListView;
 
 	/**
 	 * The current list view section in focus.

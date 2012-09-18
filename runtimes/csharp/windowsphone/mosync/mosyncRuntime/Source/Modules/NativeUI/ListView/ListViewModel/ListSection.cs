@@ -10,15 +10,24 @@ using System.Windows.Media.Animation;
 using System.Windows.Shapes;
 using System.Collections.ObjectModel;
 using System.Collections.Generic;
+using System.ComponentModel;
 
 namespace MoSync
 {
     namespace NativeUI
     {
-        public class ListSection<T> : ObservableCollection<T>
+        public class ListSection<T> : ObservableCollection<T>, INotifyPropertyChanged
         {
+            public event PropertyChangedEventHandler PropertyChanged;
+
             const double DEFAULT_HEADER_FONT_SIZE = 32.0;
             const double DEFAULT_FOOTER_FONT_SIZE = 32.0;
+
+            #region Private class members
+
+            private string headerText = "";
+
+            #endregion
 
             #region Constructors
 
@@ -104,8 +113,15 @@ namespace MoSync
 
             public string Header
             {
-                get;
-                set;
+                get
+                {
+                    return headerText;
+                }
+                set
+                {
+                    headerText = value;
+                    OnPropertyChanged("Header");
+                }
             }
 
             public string FooterTitle
@@ -265,6 +281,18 @@ namespace MoSync
             {
                 get;
                 set;
+            }
+
+            #endregion
+
+            #region Private methods
+
+            private void OnPropertyChanged(string property)
+            {
+                if (PropertyChanged != null)
+                {
+                    PropertyChanged(this, new PropertyChangedEventArgs(property));
+                }
             }
 
             #endregion

@@ -41,6 +41,7 @@ namespace NativeUI
 	// Forward declaration.
 	class ListView;
 	class ListViewItem;
+	class ListViewSection;
 
 	/**
 	 * \brief Listener for ListView events.
@@ -65,6 +66,28 @@ namespace NativeUI
 		virtual void listViewItemClicked(
 			ListView* listView,
 			int index){};
+
+		/**
+		 * This method is called when a segmented/alphabetical list view item is clicked.
+		 * @param listView The list view object that generated the event.
+		 * @param sectionIndex The index of the section that contains the selected item.
+		 * @param itemIndex The index (within the parent section) of the list view item clicked.
+		 */
+		virtual void segmentedListViewItemClicked(
+			ListView* listView,
+			int sectionIndex,
+			int itemIndex){};
+
+		/**
+		 * This method is called when a segmented/alphabetical list view item is clicked.
+		 * @param listView The list view object that generated the event.
+		 * @param listViewSection The ListViewSection object that contains the selected item.
+		 * @param listViewItem The ListViewItem objet clicked.
+		 */
+		virtual void segmentedListViewItemClicked(
+			ListView* listView,
+			ListViewSection* listViewSection,
+			ListViewItem* listViewItem){};
 	};
 
 } // namespace NativeUI

@@ -28,10 +28,10 @@
         <DataTemplate x:Key="groupFooterTemplate">
             <Border Background="{Binding FooterColor}" Padding="{StaticResource PhoneTouchTargetOverhang}" Visibility="{Binding FooterVisibility}">
                 <TextBlock Margin="10,0,1,5" Style="{StaticResource PhoneTextLargeStyle}" Text="{Binding FooterTitle}"
-                           TextAlignment="{Binding FooterTextHorizontalAlignment}" VerticalAlignment="{Binding FooterTextVerticalAlignment}" />
-                       <!--    FontSize="{Binding FooterFontSize}" FontFamily="{Binding FooterFontFamily}" />
+                           TextAlignment="{Binding FooterTextHorizontalAlignment}" VerticalAlignment="{Binding FooterTextVerticalAlignment}"
+                           FontSize="{Binding FooterFontSize}" FontFamily="{Binding FooterFontFamily}"
                            FontWeight="{Binding FooterFontWeight}" FontStyle="{Binding FooterFontStyle}"
-                           Foreground="{Binding FooterFontColor}"/> -->
+                           Foreground="{Binding FooterFontColor}"/>
             </Border>
         </DataTemplate>
 

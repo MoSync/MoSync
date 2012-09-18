@@ -115,7 +115,6 @@ SettingsScreen::~SettingsScreen()
 	mSetListViewSectionTitleButton->removeButtonListener(this);
 	mSetListViewSectionHeaderButton->removeButtonListener(this);
 	mSetListViewSectionFooterButton->removeButtonListener(this);
-	mListView->removeListViewListener(this);
 	mSetListViewItemTextButton->removeButtonListener(this);
 	mSetListViewItemFontColorButton->removeButtonListener(this);
 	mSetListViewItemFontSizeButton->removeButtonListener(this);
@@ -520,18 +519,15 @@ void SettingsScreen::createListViewItemEditStyleLayout(VerticalLayout* listViewI
 }
 
 /**
- * This method is called when a list view item is clicked.
- * @param listView The list view object that generated the event.
- * @param listViewItem The ListViewItem object that was clicked.
+ * This method is called when a list item is clicked.
+ * @param parentSection The parent section of the list view item clicked.
+ * @param item The list view item clicked.
  */
-void SettingsScreen::listViewItemClicked(
-	ListView* listView, ListViewItem* listViewItem)
+void SettingsScreen::listScreenItemClicked(ListViewSection* &parentSection, ListViewItem* &listViewItem)
 {
-	if (listView == mListView)
-	{
-		mCurrentListViewItem = listViewItem;
-		updateSelectedItemUI();
-	}
+	mCurrentListViewItem = listViewItem;
+	mCurrentListViewSection = parentSection;
+	updateSelectedItemUI();
 }
 
 /**
@@ -778,42 +774,42 @@ void SettingsScreen::setEditModeProperty(ListViewItemEditStyle editMode)
 /**
  * This method is called if the touch-up event was inside the
  * bounds of the button.
- * Platform: iOS and Android.
+ * Platform: iOS, Android and Windows Phone 7.
  * @param button The button object that generated the event.
  */
 void SettingsScreen::buttonClicked(Widget* button)
 {
 	if (mSetListViewSectionTitleButton == button)
 	{
-		if (mCurrentListViewSection != NULL && mCurrentListViewSectionTitleEditBox->getText() != NULL)
+		if (mCurrentListViewSection != NULL && mCurrentListViewSectionTitleEditBox->getText() != "")
 		{
 			mCurrentListViewSection->setTitle(mCurrentListViewSectionTitleEditBox->getText());
 		}
 	}
 	else if (mSetListViewSectionHeaderButton == button)
 	{
-		if (mCurrentListViewSection != NULL && mCurrentListViewSectionHeaderEditBox->getText() != NULL)
+		if (mCurrentListViewSection != NULL && mCurrentListViewSectionHeaderEditBox->getText() != "")
 		{
 			mCurrentListViewSection->setHeaderText(mCurrentListViewSectionHeaderEditBox->getText());
 		}
 	}
 	else if (mSetListViewSectionFooterButton == button)
 	{
-		if (mCurrentListViewSection != NULL && mCurrentListViewSectionFooterEditBox->getText() != NULL)
+		if (mCurrentListViewSection != NULL && mCurrentListViewSectionFooterEditBox->getText() != "")
 		{
 			mCurrentListViewSection->setFooterText(mCurrentListViewSectionFooterEditBox->getText());
 		}
 	}
 	else if (mSetListViewItemTextButton == button)
 	{
-		if (mCurrentListViewItem != NULL && mSetListViewItemTextEditBox->getText() != NULL)
+		if (mCurrentListViewItem != NULL && mSetListViewItemTextEditBox->getText() != "")
 		{
 			mCurrentListViewItem->setText(mSetListViewItemTextEditBox->getText());
 		}
 	}
 	else if (mSetListViewItemFontColorButton == button)
 	{
-		if (mCurrentListViewItem != NULL && mSetListViewItemFontColorEditBox->getText() != NULL)
+		if (mCurrentListViewItem != NULL && mSetListViewItemFontColorEditBox->getText() != "")
 		{
 			int fontColor = MAUtil::stringToInteger(mSetListViewItemFontColorEditBox->getText());
 			mCurrentListViewItem->setFontColor(fontColor);
@@ -821,7 +817,7 @@ void SettingsScreen::buttonClicked(Widget* button)
 	}
 	else if (mSetListViewItemFontSizeButton == button)
 	{
-		if (mCurrentListViewItem != NULL && mSetListViewItemFontSizeEditBox->getText() != NULL)
+		if (mCurrentListViewItem != NULL && mSetListViewItemFontSizeEditBox->getText() != "")
 		{
 			float fontSize = MAUtil::stringToDouble(mSetListViewItemFontSizeEditBox->getText());
 			mCurrentListViewItem->setFontSize(fontSize);
@@ -829,7 +825,7 @@ void SettingsScreen::buttonClicked(Widget* button)
 	}
 	else if (mSetListViewItemDeleteTitleButton == button)
 	{
-		if (mCurrentListViewItem != NULL && mSetListViewItemDeleteTitleEditBox->getText() != NULL)
+		if (mCurrentListViewItem != NULL && mSetListViewItemDeleteTitleEditBox->getText() != "")
 		{
 			mCurrentListViewItem->setDeleteButtonTitle(mSetListViewItemDeleteTitleEditBox->getText());
 		}
@@ -841,7 +837,8 @@ void SettingsScreen::buttonClicked(Widget* button)
  */
 void SettingsScreen::updateSelectedItemUI()
 {
-	mCurrentListViewItemLabel->setText("Current item: " + mCurrentListViewItem->getPropertyString(MAW_LIST_VIEW_SECTION_TITLE));
+	mCurrentListViewItemLabel->setText("Current item: " + mCurrentListViewItem->getPropertyString(MAW_LIST_VIEW_ITEM_TEXT));
+	mListViewSectionLabel->setText("Current section: " + mCurrentListViewSection->getTitle());
 }
 
 /**
@@ -850,5 +847,4 @@ void SettingsScreen::updateSelectedItemUI()
 void SettingsScreen::setListView(ListView* listView)
 {
 	mListView = listView;
-	mListView->addListViewListener(this);
 }
