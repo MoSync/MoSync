@@ -15,8 +15,8 @@ group WidgetListView "List View" {
 
 			/**
 			* @brief A plain table view.
-			* Any section headers or footers are displayed as inline separators and float when
-			* the table view is scrolled.
+			* Any section headers or footers are displayed as inline separators.
+			* On iOS section headers or footers float when the table view is scrolled.
 			* Platform: iOS and Android.
 			*/
 			ALPHABETICAL = 1;

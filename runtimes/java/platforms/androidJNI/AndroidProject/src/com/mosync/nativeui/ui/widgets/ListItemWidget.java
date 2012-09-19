@@ -60,7 +60,7 @@ public class ListItemWidget extends Layout
 	 * Standard list view item, or part of SegmentedListViewSection.
 	 * ITEM_VIEW_TYPE_ITEM / ITEM_VIEW_TYPE_HEADER / ITEM_VIEW_TYPE_FOOTER
 	 */
-	private int mItemType;
+	private int mItemType = ITEM_VIEW_TYPE_ITEM;
 
 	/**
 	 *

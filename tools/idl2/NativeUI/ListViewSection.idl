@@ -6,7 +6,7 @@ group WidgetListViewSection "List View Section" {
 	group WidgetListViewSectionType "List View Section Type" {
 		constset int MAW_LIST_VIEW_SECTION_TYPE_ {
 			/**
-			* @brief A section that presents a group of rows, that corespond to the same #MAW_LIST_VIEW_SECTION_TITLE.
+			* @brief A section that presents a group of rows, that correspond to the same #MAW_LIST_VIEW_SECTION_TITLE.
 			* Platform: iOS and Android.
 			*/
 			ALPHABETICAL = 1;
@@ -100,6 +100,7 @@ group WidgetListViewSection "List View Section" {
 
 			/**
 			* @brief Set the section header background color.
+			* Default value is 0xBEBEBE (grey).
 			*
 			* Platform: Android.
 			*
@@ -116,6 +117,7 @@ group WidgetListViewSection "List View Section" {
 
 			/**
 			* @brief Set the section footer background color.
+			* Default value is 0xBEBEBE (grey).
 			*
 			* Platform: Android.
 			*
@@ -164,6 +166,7 @@ group WidgetListViewSection "List View Section" {
 
 			/**
 			* @brief Sets the font size in points of the header.
+			* Default value is 20.
 			*
 			* Platform: Android.
 			*
@@ -180,6 +183,7 @@ group WidgetListViewSection "List View Section" {
 
 			/**
 			* @brief Sets the font size in points of the footer.
+			* Default value is 15.
 			*
 			* Platform: Android.
 			*

@@ -64,8 +64,8 @@ public class ListViewSection extends Layout
 	/**
 	 * Default header and footer appearance for segmented list views.
 	 */
-	static final String HEADER_DEFAULT_BACKGROUND_COLOR = "838B83";
-	static final String FOOTER_DEFAULT_BACKGROUND_COLOR = "838B83";
+	static final String HEADER_DEFAULT_BACKGROUND_COLOR = "696969";
+	static final String FOOTER_DEFAULT_BACKGROUND_COLOR = "696969";
 	static final int HEADER_DEFAULT_FONT_SIZE = 20;
 	static final int FOOTER_DEFAULT_FONT_SIZE = 15;
 
@@ -125,7 +125,9 @@ public class ListViewSection extends Layout
 			listIndex = mItems.size();
 			// If segmented list, add the item always before the footer,
 			// before the last position.
-			if ( mSectionType == IX_WIDGET.MAW_LIST_VIEW_SECTION_TYPE_SEGMENTED )
+			if ( mSectionType == IX_WIDGET.MAW_LIST_VIEW_SECTION_TYPE_SEGMENTED ||
+					(mSectionType == IX_WIDGET.MAW_LIST_VIEW_SECTION_TYPE_ALPHABETICAL
+					&& hasFooter()) )
 			{
 				listIndex --;
 			}
@@ -193,10 +195,22 @@ public class ListViewSection extends Layout
 			}
 			mAlphabeticIndex = value;
 		}
+		else if( property.equals( IX_WIDGET.MAW_LIST_VIEW_SECTION_HEADER )
+				&& (mSectionType == IX_WIDGET.MAW_LIST_VIEW_SECTION_TYPE_ALPHABETICAL) )
+		{
+			setAlphaSectionHeader(value);
+		}
+		else if( property.equals( IX_WIDGET.MAW_LIST_VIEW_SECTION_FOOTER )
+				&& (mSectionType == IX_WIDGET.MAW_LIST_VIEW_SECTION_TYPE_ALPHABETICAL) )
+		{
+			setAlphaSectionFooter(value);
+		}
 		else if ( mSectionType == IX_WIDGET.MAW_LIST_VIEW_SECTION_TYPE_SEGMENTED )
 		{
 			if( property.equals( IX_WIDGET.MAW_LIST_VIEW_SECTION_HEADER ) )
 			{
+				// Just update header text. The header row is created by default
+				// when the section is created.
 				setHeaderText(value);
 			}
 			else if( property.equals( IX_WIDGET.MAW_LIST_VIEW_SECTION_FOOTER ) )
@@ -285,13 +299,13 @@ public class ListViewSection extends Layout
 			return mAlphabeticIndex;
 		}
 		else if( property.equals( IX_WIDGET.MAW_LIST_VIEW_SECTION_HEADER )
-				&& mSectionType == IX_WIDGET.MAW_LIST_VIEW_SECTION_TYPE_SEGMENTED)
+				&& mSectionType != LIST_VIEW_SECTION_TYPE_NONE_SELECTED)
 		{
 			if (!mItems.isEmpty())
 				return mItems.get(0).getProperty(IX_WIDGET.MAW_LIST_VIEW_ITEM_TEXT);
 		}
 		else if( property.equals( IX_WIDGET.MAW_LIST_VIEW_SECTION_FOOTER )
-				&& mSectionType == IX_WIDGET.MAW_LIST_VIEW_SECTION_TYPE_SEGMENTED)
+				&& mSectionType != LIST_VIEW_SECTION_TYPE_NONE_SELECTED)
 		{
 			if (!mItems.isEmpty())
 				return mItems.get(mItems.size()).getProperty(IX_WIDGET.MAW_LIST_VIEW_ITEM_TEXT);
@@ -315,49 +329,186 @@ public class ListViewSection extends Layout
 	}
 
 	/**
+	 * Create a header or a footer widget.
+	 * @param itemType header or footer type:
+	 *  - ITEM_VIEW_TYPE_HEADER or
+	 *  - ITEM_VIEW_TYPE_FOOTER
+	 * @return The list item widget.
+	 */
+	public ListItemWidget createSectionItem(int itemType)
+	{
+		// We don't need to later reffer to those objects using the widget handles.
+		Widget rowWidget = ViewFactory.createView(
+				IX_WIDGET.MAW_LIST_VIEW_ITEM,
+				mAppActivity,
+				MoSyncThread.getInstance().nativeCreatePlaceholder());
+		ListItemWidget itemWidget = (ListItemWidget) rowWidget;
+		itemWidget.alignLabelHorizontally(IX_WIDGET.MAW_ALIGNMENT_CENTER);
+
+		if ( itemType == ITEM_VIEW_TYPE_HEADER )
+		{
+			rowWidget.setProperty(
+					IX_WIDGET.MAW_WIDGET_BACKGROUND_COLOR,
+					HEADER_DEFAULT_BACKGROUND_COLOR);
+			itemWidget.setProperty(
+					IX_WIDGET.MAW_LIST_VIEW_ITEM_FONT_SIZE,
+					Integer.toString(HEADER_DEFAULT_FONT_SIZE));
+			itemWidget.setItemType(ITEM_VIEW_TYPE_HEADER);
+		}
+		else if ( itemType == ITEM_VIEW_TYPE_FOOTER)
+		{
+			rowWidget.setProperty(
+					IX_WIDGET.MAW_WIDGET_BACKGROUND_COLOR,
+					FOOTER_DEFAULT_BACKGROUND_COLOR);
+			itemWidget.setProperty(
+					IX_WIDGET.MAW_LIST_VIEW_ITEM_FONT_SIZE,
+					Integer.toString(FOOTER_DEFAULT_FONT_SIZE));
+			itemWidget.setItemType(ITEM_VIEW_TYPE_FOOTER);
+		}
+		else
+		{
+			return null;
+		}
+		return itemWidget;
+	}
+
+	/**
 	 * Add by default a header and a footer layout to a
 	 * segmented section.
 	 * Set different background colors and align labels to center.
 	 */
 	public void createSegmentedSectionDefaultUI()
 	{
-		// We don't need to later reffer to those objects using the widget handles.
-		Widget headerWidget = ViewFactory.createView(
-				IX_WIDGET.MAW_LIST_VIEW_ITEM,
-				mAppActivity,
-				MoSyncThread.getInstance().nativeCreatePlaceholder());
+		addSectionHeader();
+		addSectionFooter();
+	}
 
-		headerWidget.setProperty(
-				IX_WIDGET.MAW_WIDGET_BACKGROUND_COLOR,
-				HEADER_DEFAULT_BACKGROUND_COLOR);
-		ListItemWidget headerItem = (ListItemWidget) headerWidget;
-		headerItem.alignLabelHorizontally(IX_WIDGET.MAW_ALIGNMENT_CENTER);
-		headerItem.setProperty(
-				IX_WIDGET.MAW_LIST_VIEW_ITEM_FONT_SIZE,
-				Integer.toString(HEADER_DEFAULT_FONT_SIZE));
-
-		Widget footerWidget = ViewFactory.createView(
-				IX_WIDGET.MAW_LIST_VIEW_ITEM,
-				mAppActivity,
-				MoSyncThread.getInstance().nativeCreatePlaceholder() );
-
-		footerWidget.setProperty(
-				IX_WIDGET.MAW_WIDGET_BACKGROUND_COLOR,
-				FOOTER_DEFAULT_BACKGROUND_COLOR);
-		ListItemWidget footerItem = (ListItemWidget) footerWidget;
-		footerItem.alignLabelHorizontally(IX_WIDGET.MAW_ALIGNMENT_CENTER);
-		footerItem.setProperty(
-				IX_WIDGET.MAW_LIST_VIEW_ITEM_FONT_SIZE,
-				Integer.toString(FOOTER_DEFAULT_FONT_SIZE));
-
-		headerItem.setItemType(ITEM_VIEW_TYPE_HEADER);
+	/**
+	 * Add by default a header layout to a section.
+	 * Set different background colors and align labels to center.
+	 */
+	public void addSectionHeader()
+	{
+		ListItemWidget headerItem = createSectionItem(ITEM_VIEW_TYPE_HEADER);
+		// Add the header to the children widget list.
 		mItems.add(0, headerItem);
-		footerItem.setItemType(ITEM_VIEW_TYPE_FOOTER);
-		mItems.add(1, footerItem);
-
-		// Add the header and footer to the children widget list.
 		m_children.add( 0, headerItem );
-		m_children.add( 1, footerItem );
+	}
+
+	/**
+	 * Add by default a footer layout to a section.
+	 * Set different background colors and align labels to center.
+	 */
+	public void addSectionFooter()
+	{
+		ListItemWidget footerItem = createSectionItem(ITEM_VIEW_TYPE_FOOTER);
+		// Add the footer to the children widget list.
+		mItems.add(mItems.size(), footerItem);
+		m_children.add( m_children.size(), footerItem );
+	}
+
+	/**
+	 * Check if this section contains a header list item.
+	 * @return
+	 */
+	public boolean hasHeader()
+	{
+		if ( !mItems.isEmpty()
+				&& mItems.get(0) != null
+				&& (mItems.get(0).getItemType() == ITEM_VIEW_TYPE_HEADER) )
+		{
+			return true;
+		}
+		return false;
+	}
+
+	/**
+	 * Check if this section contains a footer list item.
+	 * @return
+	 */
+	public boolean hasFooter()
+	{
+		if ( !mItems.isEmpty()
+				&& mItems.get(mItems.size()-1) != null
+				&& (mItems.get(mItems.size()-1).getItemType() == ITEM_VIEW_TYPE_FOOTER) )
+		{
+			return true;
+		}
+		return false;
+	}
+
+	/**
+	 * Set the header for an alphabetical section.
+	 * Create a header row if one does not exist,
+	 * or update it.
+	 * @param text
+	 */
+	public void setAlphaSectionHeader(String text)
+	{
+		// Check if header already exists.
+		if ( hasHeader() )
+		{
+			if ( !text.isEmpty() )
+			{
+				// Just update the header text.
+				setHeaderText(text);
+			}
+			else
+			{
+				// If the new value is null, remove the header row.
+				m_children.remove(0);
+				mItems.remove(0);
+
+				// Notify list adapter.
+				if (mAdapterListener != null)
+					mAdapterListener.itemRemoved(mItems.get(0));
+			}
+		}
+		else
+		{
+			// Create and add the header before the first item - if that exists.
+			addSectionHeader();
+			setHeaderText(text);
+			if (mAdapterListener != null)
+				mAdapterListener.itemAdded(mItems.get(0), this, 0);
+		}
+	}
+
+	/**
+	 * Set the header for an alphabetical section.
+	 * Create a header row if one does not exist,
+	 * or update it.
+	 * @param text
+	 */
+	public void setAlphaSectionFooter(String text)
+	{
+		// Check if header already exists.
+		if ( hasFooter() )
+		{
+			if ( !text.isEmpty() )
+			{
+				// Just update the footer text.
+				setFooterText(text);
+			}
+			else
+			{
+				// If the new value is null, remove the footer row.
+				m_children.remove(mItems.get(mItems.size()-1));
+				mItems.remove(mItems.get(mItems.size()-1));
+
+				// Notify list adapter.
+				if (mAdapterListener != null)
+					mAdapterListener.itemRemoved(mItems.get(mItems.size()-1));
+			}
+		}
+		else
+		{
+			// Create and add the footer after the last item - if that exists.
+			addSectionFooter();
+			setFooterText(text);
+			if (mAdapterListener != null)
+				mAdapterListener.itemAdded(mItems.get(mItems.size()), this, mItems.size());
+		}
 	}
 
 	/**
