@@ -340,6 +340,10 @@ public class ListLayout extends Layout
 		{
 			m_viewAdapter.setReversed( BooleanConverter.convert( value ) );
 		}
+		else if( property.equals( IX_WIDGET.MAW_LIST_VIEW_ALLOW_SELECTION ) )
+		{
+			setProperty(IX_WIDGET.MAW_WIDGET_ENABLED, value);
+		}
 		else
 		{
 			return false;

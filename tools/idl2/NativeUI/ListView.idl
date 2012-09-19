@@ -115,7 +115,7 @@ group WidgetListView "List View" {
 			/**
 			* @brief Enable/disable item selection.
 			* If you don't want to allow the user to select any item set this property to false.
-			* Platform: iOS and Windows Phone 7.
+			* Platform: iOS, Android and Windows Phone 7.
 			*
 			* @validvalue "true" or "false".
 			* Default value is "true".
