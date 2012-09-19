@@ -22,8 +22,8 @@ namespace MoSync
         {
             #region Private members
 
-            // contains the list model items
-            List<ListItem> mSectionItems;
+            // the corresponding list section
+            ListSection<ListItem> mSection;
 
             #endregion
 
@@ -34,7 +34,7 @@ namespace MoSync
 			 */
             public ListViewSection()
             {
-                mSectionItems = new List<ListItem>();
+                mSection = new ListSection<ListItem>();
             }
 
             #endregion
@@ -54,17 +54,61 @@ namespace MoSync
                     {
                         ListViewItem widget = (child as ListViewItem);
                         ListItem newItem = new ListItem();
-                        newItem.Content = (Grid)widget.View;
+                        newItem.Title = widget.Text;
+                        newItem.ImageSource = widget.IconImageSource;
+                        // TODO SA: add subtitle property
+                        newItem.Subtitle = "subtitle";
+                        newItem.SubtitleVisibility = Visibility.Visible;
                         newItem.BackgroundColor = new SolidColorBrush(Colors.Black);
                         newItem.GroupBy = this.Title;
                         newItem.Height = widget.Height;
                         newItem.Width = widget.Width;
-                        mSectionItems.Add(newItem);
+
+                        widget.ListItemData = newItem;
+                        mSection.Add(newItem);
                     });
                 }
             }
 
-            // TODO SA: implement the insert and remove child too
+            /**
+             * Override of the WidgetBase InsertChild function
+             */
+            public override void InsertChild(IWidget child, int index)
+            {
+                if (child is ListViewItem)
+                {
+                    base.InsertChild(child, index);
+                    MoSync.Util.RunActionOnMainThreadSync(() =>
+                    {
+                        ListViewItem widget = (child as ListViewItem);
+                        ListItem newItem = new ListItem();
+                        newItem.Title = widget.Text;
+                        newItem.ImageSource = widget.IconImageSource;
+                        // TODO SA: add subtitle property
+                        newItem.Subtitle = "subtitle";
+                        newItem.SubtitleVisibility = Visibility.Visible;
+                        newItem.BackgroundColor = new SolidColorBrush(Colors.Black);
+                        newItem.GroupBy = this.Title;
+                        newItem.Height = widget.Height;
+                        newItem.Width = widget.Width;
+
+                        widget.ListItemData = newItem;
+                        mSection.Insert(index, newItem);
+                    });
+                }
+            }
+
+            /**
+             * Override of the WidgetBase RemoveChild function
+             */
+            public override void RemoveChild(int index)
+            {
+                base.RemoveChild(index);
+                MoSync.Util.RunActionOnMainThreadSync(() =>
+                {
+                    mSection.RemoveAt(index);
+                });
+            }
 
             #endregion
 
@@ -74,11 +118,11 @@ namespace MoSync
              * A getter for the items inside the section - will be used by the ListView
              * to present its content.
              */
-            public List<ListItem> SectionItems
+            public ListSection<ListItem> SectionData
             {
                 get
                 {
-                    return mSectionItems;
+                    return mSection;
                 }
             }
 
@@ -92,8 +136,14 @@ namespace MoSync
             [MoSyncWidgetProperty(MoSync.Constants.MAW_LIST_VIEW_SECTION_TITLE)]
             public string Title
             {
-                get;
-                set;
+                get
+                {
+                    return mSection.Title;
+                }
+                set
+                {
+                    mSection.Title = value;
+                }
             }
 
             /**
@@ -102,8 +152,119 @@ namespace MoSync
             [MoSyncWidgetProperty(MoSync.Constants.MAW_LIST_VIEW_SECTION_HEADER)]
             public string Header
             {
-                get;
-                set;
+                get
+                {
+                    return mSection.Header;
+                }
+                set
+                {
+                    mSection.Header = value;
+                }
+            }
+
+            /**
+             * MAW_LIST_VIEW_SECTION_HEADER_BACKGROUND property implementation
+             */
+            [MoSyncWidgetProperty(MoSync.Constants.MAW_LIST_VIEW_SECTION_HEADER_BACKGROUND)]
+            public string HeaderBackgroundColor
+            {
+                set
+                {
+                    System.Windows.Media.SolidColorBrush brush;
+                    MoSync.Util.convertStringToColor(value, out brush);
+                    mSection.HeaderColor = brush;
+                }
+            }
+
+            /**
+             * MAW_LIST_VIEW_SECTION_HEADER_HORIZONTAL_ALIGNMENT property implementation
+             */
+            [MoSyncWidgetProperty(MoSync.Constants.MAW_LIST_VIEW_SECTION_HEADER_HORIZONTAL_ALIGNMENT)]
+            public string HeaderTextHorizontalAlignment
+            {
+                set
+                {
+                    if (value.Equals(MoSync.Constants.MAW_ALIGNMENT_LEFT))
+                    {
+                        mSection.HeaderTextHorizontalAlignment = HorizontalAlignment.Left;
+                    }
+                    else if (value.Equals(MoSync.Constants.MAW_ALIGNMENT_RIGHT))
+                    {
+                        mSection.HeaderTextHorizontalAlignment = HorizontalAlignment.Right;
+                    }
+                    else if (value.Equals(MoSync.Constants.MAW_ALIGNMENT_CENTER))
+                    {
+                        mSection.HeaderTextHorizontalAlignment = HorizontalAlignment.Center;
+                    }
+                    else throw new InvalidPropertyValueException();
+                }
+            }
+
+            /**
+             * MAW_LIST_VIEW_SECTION_HEADER_VERTICAL_ALIGNMENT property implementation
+             */
+            [MoSyncWidgetProperty(MoSync.Constants.MAW_LIST_VIEW_SECTION_HEADER_VERTICAL_ALIGNMENT)]
+            public string HeaderTextVerticalAlignment
+            {
+                set
+                {
+                    if (value.Equals(MoSync.Constants.MAW_ALIGNMENT_TOP))
+                    {
+                        mSection.HeaderTextVerticalAlignment = VerticalAlignment.Top;
+                    }
+                    else if (value.Equals(MoSync.Constants.MAW_ALIGNMENT_BOTTOM))
+                    {
+                        mSection.HeaderTextVerticalAlignment = VerticalAlignment.Bottom;
+                    }
+                    else if (value.Equals(MoSync.Constants.MAW_ALIGNMENT_CENTER))
+                    {
+                        mSection.HeaderTextVerticalAlignment = VerticalAlignment.Center;
+                    }
+                    else throw new InvalidPropertyValueException();
+                }
+            }
+
+            /**
+             * MAW_LIST_VIEW_SECTION_HEADER_FONT_COLOR property implementation
+             */
+            [MoSyncWidgetProperty(MoSync.Constants.MAW_LIST_VIEW_SECTION_HEADER_FONT_COLOR)]
+            public string HeaderFontColor
+            {
+                set
+                {
+                    System.Windows.Media.SolidColorBrush brush;
+                    MoSync.Util.convertStringToColor(value, out brush);
+                    mSection.HeaderFontColor = brush;
+                }
+            }
+
+            /**
+             * MAW_LIST_VIEW_SECTION_HEADER_FONT_SIZE property implementation
+             */
+            [MoSyncWidgetProperty(MoSync.Constants.MAW_LIST_VIEW_SECTION_HEADER_FONT_SIZE)]
+            public double HeaderFontSize
+            {
+                set
+                {
+                    mSection.HeaderFontSize = value;
+                }
+            }
+
+            /**
+             * MAW_LIST_VIEW_SECTION_HEADER_FONT_HANDLE property implementation
+             */
+            [MoSyncWidgetProperty(MoSync.Constants.MAW_LIST_VIEW_SECTION_HEADER_FONT_HANDLE)]
+            public int HeaderFontHandle
+            {
+                set
+                {
+                    FontModule.FontInfo fontInfo =
+                        mRuntime.GetModule<FontModule>().GetFont(value);
+
+                    mSection.HeaderFontFamily = fontInfo.family;
+                    mSection.HeaderFontWeight = fontInfo.weight;
+                    mSection.HeaderFontStyle = fontInfo.style;
+                }
             }
 
             /**
@@ -114,6 +275,111 @@ namespace MoSync
             {
                 get;
                 set;
+            }
+
+            /**
+             * MAW_LIST_VIEW_SECTION_FOOTER_BACKGROUND property implementation
+             */
+            [MoSyncWidgetProperty(MoSync.Constants.MAW_LIST_VIEW_SECTION_FOOTER_BACKGROUND)]
+            public string FooterBackgroundColor
+            {
+                set
+                {
+                    System.Windows.Media.SolidColorBrush brush;
+                    MoSync.Util.convertStringToColor(value, out brush);
+                    mSection.FooterColor = brush;
+                }
+            }
+
+            /**
+             * MAW_LIST_VIEW_SECTION_FOOTER_HORIZONTAL_ALIGNMENT property implementation
+             */
+            [MoSyncWidgetProperty(MoSync.Constants.MAW_LIST_VIEW_SECTION_FOOTER_HORIZONTAL_ALIGNMENT)]
+            public string FooterTextHorizontalAlignment
+            {
+                set
+                {
+                    if (value.Equals(MoSync.Constants.MAW_ALIGNMENT_LEFT))
+                    {
+                        mSection.FooterTextHorizontalAlignment = HorizontalAlignment.Left;
+                    }
+                    else if (value.Equals(MoSync.Constants.MAW_ALIGNMENT_RIGHT))
+                    {
+                        mSection.FooterTextHorizontalAlignment = HorizontalAlignment.Right;
+                    }
+                    else if (value.Equals(MoSync.Constants.MAW_ALIGNMENT_CENTER))
+                    {
+                        mSection.FooterTextHorizontalAlignment = HorizontalAlignment.Center;
+                    }
+                    else throw new InvalidPropertyValueException();
+                }
+            }
+
+            /**
+             * MAW_LIST_VIEW_SECTION_FOOTER_VERTICAL_ALIGNMENT property implementation
+             */
+            [MoSyncWidgetProperty(MoSync.Constants.MAW_LIST_VIEW_SECTION_FOOTER_VERTICAL_ALIGNMENT)]
+            public string FooterTextVerticalAlignment
+            {
+                set
+                {
+                    if (value.Equals(MoSync.Constants.MAW_ALIGNMENT_TOP))
+                    {
+                        mSection.FooterTextVerticalAlignment = VerticalAlignment.Top;
+                    }
+                    else if (value.Equals(MoSync.Constants.MAW_ALIGNMENT_BOTTOM))
+                    {
+                        mSection.FooterTextVerticalAlignment = VerticalAlignment.Bottom;
+                    }
+                    else if (value.Equals(MoSync.Constants.MAW_ALIGNMENT_CENTER))
+                    {
+                        mSection.FooterTextVerticalAlignment = VerticalAlignment.Center;
+                    }
+                    else throw new InvalidPropertyValueException();
+                }
+            }
+
+            /**
+             * MAW_LIST_VIEW_SECTION_FOOTER_FONT_COLOR property implementation
+             */
+            [MoSyncWidgetProperty(MoSync.Constants.MAW_LIST_VIEW_SECTION_FOOTER_FONT_COLOR)]
+            public string FooterFontColor
+            {
+                set
+                {
+                    System.Windows.Media.SolidColorBrush brush;
+                    MoSync.Util.convertStringToColor(value, out brush);
+                    mSection.FooterFontColor = brush;
+                }
+            }
+
+            /**
+             * MAW_LIST_VIEW_SECTION_FOOTER_FONT_SIZE property implementation
+             */
+            [MoSyncWidgetProperty(MoSync.Constants.MAW_LIST_VIEW_SECTION_FOOTER_FONT_SIZE)]
+            public double FooterFontSize
+            {
+                set
+                {
+                    mSection.FooterFontSize = value;
+                }
+            }
+
+            /**
+             * MAW_LIST_VIEW_SECTION_FOOTER_FONT_HANDLE property implementation
+             */
+            [MoSyncWidgetProperty(MoSync.Constants.MAW_LIST_VIEW_SECTION_FOOTER_FONT_HANDLE)]
+            public int FooterFontHandle
+            {
+                set
+                {
+                    FontModule.FontInfo fontInfo =
+                        mRuntime.GetModule<FontModule>().GetFont(value);
+
+                    mSection.FooterFontFamily = fontInfo.family;
+                    mSection.FooterFontWeight = fontInfo.weight;
+                    mSection.FooterFontStyle = fontInfo.style;
+                }
             }
 
             #endregion

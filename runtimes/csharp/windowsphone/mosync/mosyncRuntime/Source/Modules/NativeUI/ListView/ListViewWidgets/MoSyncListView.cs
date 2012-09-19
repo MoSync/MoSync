@@ -84,8 +84,9 @@ namespace MoSync
              */
             protected ListViewType mListViewType;
 
-            /* TODO - should contain the long list selector items and sections */
-
+            /**
+             * Contains the long list selector sections.
+             */
             List<ListSection<ListItem>> mListSections;
 
             #region Constructor
@@ -226,7 +227,7 @@ namespace MoSync
                     if (mLongListSelector.SelectedItem != null)
                     {
                         //create a Memory object of 8 Bytes
-                        Memory eventData = new Memory(12);
+                        Memory eventData = new Memory(16);
 
                         //starting with the 0 Byte we write the eventType
                         const int MAWidgetEventData_eventType = 0;
@@ -234,18 +235,42 @@ namespace MoSync
                         //starting with the 4th Byte we write the widgetHandle
                         const int MAWidgetEventData_widgetHandle = 4;
 
-                        //starting with the 8th Byte we write the selectedIndex
-                        const int MAWidgetEventData_selectedIndex = 8;
+                        //starting with the 8th Byte we write the selectedSectionIndex
+                        const int MAWidgetEventData_selectedSectionIndex = 8;
 
-                        // TODO SA: get the real index
-                        int selIndex = 2;
+                        //starting with the 8th Byte we write the selectedItemIndex
+                        const int MAWidgetEventData_selectedItemIndex = 12;
 
-                        eventData.WriteInt32(MAWidgetEventData_eventType, MoSync.Constants.MAW_EVENT_ITEM_CLICKED);
+                        int sectionIndex = -1;
+                        int itemInSectionIndex = -1;
+                        bool foundItem = false;
+                        for (int i = 0; i < mListSections.Count; i++)
+                        {
+                            ListSection<ListItem> section = mListSections[i];
+                            for (int j = 0; j < section.Count; j++ )
+                            {
+                                ListItem item = section[j];
+                                if (item.Equals(mLongListSelector.SelectedItem))
+                                {
+                                    sectionIndex = i;
+                                    itemInSectionIndex = j;
+                                    foundItem = true;
+                                    break;
+                                }
+                            }
+                            if (foundItem)
+                            {
+                                break;
+                            }
+                        }
+
+                        eventData.WriteInt32(MAWidgetEventData_eventType, MoSync.Constants.MAW_EVENT_SEGMENTED_LIST_ITEM_CLICKED);
                         eventData.WriteInt32(MAWidgetEventData_widgetHandle, mHandle);
 
-                        if (selIndex > -1)
+                        if (sectionIndex > -1)
                         {
-                            eventData.WriteInt32(MAWidgetEventData_selectedIndex, selIndex);
+                            eventData.WriteInt32(MAWidgetEventData_selectedSectionIndex, sectionIndex);
+                            eventData.WriteInt32(MAWidgetEventData_selectedItemIndex, itemInSectionIndex);
                             //posting a CustomEvent
                             mRuntime.PostCustomEvent(MoSync.Constants.EVENT_TYPE_WIDGET, eventData);
                         }
@@ -293,15 +318,17 @@ namespace MoSync
                         case MoSync.Constants.MAW_LIST_VIEW_TYPE_ALPHABETICAL:
                             mListViewType = ListViewType.Alphabetical;
                             ClearLongList();
-                            SwitchToAlphabeticalListView();
+                            SwitchToLongListSelector();
                             break;
                         case MoSync.Constants.MAW_LIST_VIEW_TYPE_DEFAULT:
                             mListViewType = ListViewType.Default;
                             ClearLongList();
-                            SwitchToSegmentedListView();
+                            SwitchToListBox();
                             break;
                         case MoSync.Constants.MAW_LIST_VIEW_TYPE_SEGMENTED:
                             mListViewType = ListViewType.Segmented;
+                            ClearLongList();
+                            SwitchToLongListSelector();
                             break;
                         default:
                             throw new InvalidPropertyValueException();
@@ -449,14 +476,8 @@ namespace MoSync
              */
             private void AddListSection(ListViewSection section)
             {
-                ListSection<ListItem> newSection = null;
                 base.AddChild(section);
-                MoSync.Util.RunActionOnMainThreadSync(() =>
-                    {
-                        newSection = new ListSection<ListItem>(section.Title,
-                                                               section.SectionItems);
-                    });
-                mListSections.Add(newSection);
+                mListSections.Add(section.SectionData);
             }
 
             /**
@@ -483,14 +504,8 @@ namespace MoSync
              */
             private void InsertListSection(ListViewSection section, int index)
             {
-                ListSection<ListItem> newSection = null;
                 base.AddChild(section);
-                MoSync.Util.RunActionOnMainThreadSync(() =>
-                {
-                    newSection = new ListSection<ListItem>(section.Title,
-                                                           section.SectionItems);
-                });
-                mListSections.Insert(index, newSection);
+                mListSections.Insert(index, section.SectionData);
             }
 
             /**
@@ -525,25 +540,26 @@ namespace MoSync
             private void ClearLongList()
             {
                 mListSections.Clear();
-                this.ReloadData = "true";
             }
 
             /**
-             * Switches the current widget view to a alphabetical list view.
+             * Switches the current widget view to the long list selector view.
              */
-            private void SwitchToAlphabeticalListView()
+            private void SwitchToLongListSelector()
             {
                 mView = mLongListSelector;
                 mLongListSelector.ItemsSource = mListSections;
             }
 
             /**
-             * Switches the current widget view to a segmented list view.
+             * Switches the current widget view to the list box view.
              */
-            private void SwitchToSegmentedListView()
+            private void SwitchToListBox()
             {
-                mView = mLongListSelector;
-                mLongListSelector.ItemsSource = mListSections;
+                if (mView != mList)
+                {
+                    mView = mList;
+                }
             }
 
             #endregion

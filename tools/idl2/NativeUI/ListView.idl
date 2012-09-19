@@ -1,14 +1,14 @@
 group WidgetListView "List View" {
 	/**
 	* The available list view types.
-	* Platform: Android, iOS and Windows Phone.
+	* Platform: Android, iOS and Windows Phone 7.
 	*/
 	group WidgetListViewType "List View Type" {
 		constset int MAW_LIST_VIEW_TYPE_ {
 			/**
 			* @brief A plain table view.
 			* All section headers or footers are not displayed.
-			* Platform: Android, iOS and Windows Phone.
+			* Platform: Android, iOS and Windows Phone 7.
 			* Default value for list view.
 			*/
 			DEFAULT = 0;
@@ -17,14 +17,14 @@ group WidgetListView "List View" {
 			* @brief A plain table view.
 			* Any section headers or footers are displayed as inline separators.
 			* On iOS section headers or footers float when the table view is scrolled.
-			* Platform: iOS and Android.
+			* Platform: iOS, Android and Windows Phone 7.
 			*/
 			ALPHABETICAL = 1;
 
 			/**
 			* @brief A table view whose sections present distinct groups of rows.
 			* The section headers and footers do not float.
-			* Platform: iOS and Android.
+			* Platform: iOS, Android and Windows Phone 7.
 			*/
 			SEGMENTED = 2;
 		}
@@ -115,7 +115,7 @@ group WidgetListView "List View" {
 			/**
 			* @brief Enable/disable item selection.
 			* If you don't want to allow the user to select any item set this property to false.
-			* Platform: iOS.
+			* Platform: iOS and Windows Phone 7.
 			*
 			* @validvalue "true" or "false".
 			* Default value is "true".

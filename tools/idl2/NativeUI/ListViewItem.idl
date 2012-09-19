@@ -85,6 +85,22 @@ group WidgetListViewItem "List View Item" {
 			TEXT = "text";
 
 			/**
+			* @brief Sets the subtitle part of the list view item. The subtitle will be placed bellow the item text.
+			*
+			* Platform: Windows Phone 7.
+			*
+			* @validvalue A null-terminated string.
+			*
+			* @setonly
+			*
+			* @par Example
+			* \code
+			*	maWidgetSetProperty(listViewItemHandle, MAW_LIST_VIEW_ITEM_SUBTITLE, "subtitle");
+			* \endcode
+			*/
+			SUBTITLE = "subtitle";
+
+			/**
 			* @brief Sets an icon of the list view item that is placed to the left of the text.
 			*
 			* @validvalue MoSync handle to an uncompressed image resource.

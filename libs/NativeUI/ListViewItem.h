@@ -99,6 +99,13 @@ namespace NativeUI
 		virtual void setText(const MAUtil::String& text);
 
 		/**
+		 * Sets the subtitle part of the list view item.
+		 * The subtitle will be placed bellow the item text.
+		 * @param subtitle The given subtitle.
+		 */
+		virtual void setSubtitle(const MAUtil::String& subtitle);
+
+		/**
 		 * Set an icon of the list view item that is placed to the left
 		 * of the text.
 		 * @param icon MoSync handle to an uncompressed image resource.

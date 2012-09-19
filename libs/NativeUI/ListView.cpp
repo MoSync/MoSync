@@ -25,6 +25,7 @@ MA 02110-1301, USA.
  */
 
 #include "ListView.h"
+#include "ListViewSection.h"
 #include "ListViewListener.h"
 
 namespace NativeUI
@@ -167,6 +168,27 @@ namespace NativeUI
 				mListViewListeners[i]->listViewItemClicked(
 					this,
 					itemClickedIndex);
+			}
+		}
+		else if (MAW_EVENT_SEGMENTED_LIST_ITEM_CLICKED == widgetEventData->eventType)
+		{
+			int sectionClickedIndex = widgetEventData->sectionIndex;
+			int itemIndexWithinSection = widgetEventData->sectionItemIndex;
+			ListViewSection* listViewSection = (ListViewSection*)
+				this->getChild(sectionClickedIndex);
+			ListViewItem* listViewItem = (ListViewItem*)
+				listViewSection->getChild(itemIndexWithinSection);
+
+			for (int i = 0; i < mListViewListeners.size(); i++)
+			{
+				mListViewListeners[i]->segmentedListViewItemClicked(
+					this,
+					sectionClickedIndex,
+					itemIndexWithinSection);
+				mListViewListeners[i]->segmentedListViewItemClicked(
+					this,
+					listViewSection,
+					listViewItem);
 			}
 		}
 	}

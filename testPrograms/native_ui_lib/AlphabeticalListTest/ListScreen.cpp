@@ -31,6 +31,7 @@
 #include <NativeUI/ListViewSection.h>
 
 #include "ListScreen.h"
+#include "ListScreenListener.h"
 
 /**
  * Constructor.
@@ -51,6 +52,7 @@ ListScreen::ListScreen() :
 ListScreen::~ListScreen()
 {
 	mListView->removeListViewListener(this);
+	mListScreenListeners.clear();
 }
 
 /**
@@ -67,16 +69,18 @@ void ListScreen::createMainLayout() {
 	// developer has to handle the sorting
 	for (int i = 0; i <= 4; i++)
 	{
-		ListViewSection* section = new ListViewSection();
+		ListViewSection* section = new ListViewSection(LIST_VIEW_SECTION_TYPE_ALPHABETICAL);
 		MAUtil::String sectionTitle = "A";
 		sectionTitle[0] += i;
 		section->setTitle(sectionTitle);
-		for (int j = 0; j <= 3; j++)
+		section->setHeaderText(sectionTitle);
+		for (int j = 0; j <= 20; j++)
 		{
 			ListViewItem* item = new ListViewItem();
 			MAUtil::String itemText = sectionTitle + "0";
 			itemText[1] += j;
 			item->setText(itemText);
+			item->setSubtitle("subtitle");
 			section->addItem(item);
 		}
 		mListView->addChild(section);
@@ -96,6 +100,39 @@ ListView* ListScreen::getAlphabeticalListView()
 }
 
 /**
+ * Add a list screen event listener.
+ * @param listener The listener that will receive list screen events.
+ */
+void ListScreen::addListScreenListener(ListScreenListener* listener)
+{
+    for (int i = 0; i < mListScreenListeners.size(); i++)
+    {
+        if (listener == mListScreenListeners[i])
+        {
+            return;
+        }
+    }
+
+    mListScreenListeners.add(listener);
+}
+
+/**
+ * Remove the list screen listener.
+ * @param listener The listener that receives list screen events.
+ */
+void ListScreen::removeListScreenListener(ListScreenListener* listener)
+{
+    for (int i = 0; i < mListScreenListeners.size(); i++)
+    {
+        if (listener == mListScreenListeners[i])
+        {
+			mListScreenListeners.remove(i);
+            break;
+        }
+    }
+}
+
+/**
  * This method is called when a list view item is clicked.
  * @param listView The list view object that generated the event.
  * @param listViewItem The ListViewItem object that was clicked.
@@ -108,4 +145,22 @@ void ListScreen::listViewItemClicked(
     {
         printf("ListScreen: mListView event: item clicked");
     }
+}
+
+/**
+ * This method is called when a segmented/alphabetical list view item is clicked.
+ * @param listView The list view object that generated the event.
+ * @param listViewSection The ListViewSection object that contains the selected item.
+ * @param listViewItem The ListViewItem objet clicked.
+ */
+void ListScreen::segmentedListViewItemClicked(
+	ListView* listView,
+	ListViewSection* listViewSection,
+	ListViewItem* listViewItem)
+{
+	for (int i = 0; i < mListScreenListeners.size(); i++)
+	{
+		mListScreenListeners[i]->listScreenItemClicked(listViewSection,
+			listViewItem);
+	}
 }

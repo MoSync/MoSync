@@ -74,6 +74,11 @@ namespace MoSync
 			protected ColumnDefinition mColumn2;
 
             /**
+             * Contains the data model for a list item when the list is Alphabetical or Segmented.
+             */
+            private ListItem mListItem = null;
+
+            /**
             * Constructor
             */
 			public ListViewItem()
@@ -126,6 +131,21 @@ namespace MoSync
                     });
             }
 
+            /**
+             * Set when this item is added to a section of a Alphabetical/Segmented list.
+             */
+            public ListItem ListItemData
+            {
+                get
+                {
+                    return mListItem;
+                }
+                set
+                {
+                    mListItem = value;
+                }
+            }
+
             #region MoSync Widget Properties
 
             /**
@@ -171,11 +191,22 @@ namespace MoSync
 			{
 				set
 				{
-					mText.Text = value;
+                    if (mListItem == null)
+                    {
+                        mText.Text = value;
+                    }
+                    else
+                    {
+                        mListItem.Title = value;
+                    }
 				}
 				get
 				{
-					return mText.Text;
+                    if (mListItem == null)
+                    {
+                        return mText.Text;
+                    }
+                    return mListItem.Title;
 				}
 			}
 
@@ -204,12 +235,29 @@ namespace MoSync
                             (System.Windows.Media.Imaging.BitmapSource)(res.GetInternalObject());
 
                             mIcon.Source = bmpSource;
+
+                            if (mListItem != null)
+                            {
+                                mListItem.ImageSource = bmpSource;
+                            }
                         }
                         else throw new InvalidPropertyValueException();
                     }
                     else throw new InvalidPropertyValueException();
 				}
 			}
+
+            /**
+             * Returns the Icon image source (needed to set the image of the list view item
+             * if the list is alphabetical or segmented).
+             */
+            public ImageSource IconImageSource
+            {
+                get
+                {
+                    return mIcon.Source;
+                }
+            }
 
             /**
              * The implementation of the "FontColor" property.
