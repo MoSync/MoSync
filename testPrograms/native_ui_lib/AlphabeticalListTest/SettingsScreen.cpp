@@ -25,6 +25,7 @@ MA 02110-1301, USA.
 
 #include "SettingsScreen.h"
 #include <NativeUI/ListViewSection.h>
+#include "Util.h"
 
 #define TITLE_FONT_SIZE 26.0
 #define ONE_LINE_HORIZONTAL_LAYOUT_HEIGHT 70
@@ -85,23 +86,26 @@ SettingsScreen::SettingsScreen():
 	mSetListViewItemTextButton->addButtonListener(this);
 	mSetListViewItemFontColorButton->addButtonListener(this);
 	mSetListViewItemFontSizeButton->addButtonListener(this);
-	mListViewItemEditModeCheckbox->addCheckBoxListener(this);
-	mSetListViewItemDeleteTitleButton->addButtonListener(this);
-	mListViewItemSelectedCheckbox->addCheckBoxListener(this);
-	mListViewItemUnselectedCheckbox->addCheckBoxListener(this);
-	mListViewItemHighlightedCheckbox->addCheckBoxListener(this);
-	mListViewItemUnhighlightedCheckbox->addCheckBoxListener(this);
-	mListViewItemAccessoryTypeIntNoneCheckbox->addCheckBoxListener(this);
-	mListViewItemAccessoryTypeIntDisclosureCheckbox->addCheckBoxListener(this);
-	mListViewItemAccessoryTypeIntDetailCheckbox->addCheckBoxListener(this);
-	mListViewItemAccessoryTypeIntCheckmarkCheckbox->addCheckBoxListener(this);
-	mListViewItemAccessoryTypeEditModeNoneCheckbox->addCheckBoxListener(this);
-	mListViewItemAccessoryTypeEditModeDisclosureCheckbox->addCheckBoxListener(this);
-	mListViewItemAccessoryTypeEditModeDetailCheckbox->addCheckBoxListener(this);
-	mListViewItemAccessoryTypeEditModeCheckmarkCheckbox->addCheckBoxListener(this);
-	mListViewItemEditStyleNoneCheckbox->addCheckBoxListener(this);
-	mListViewItemEditStyleDeleteCheckbox->addCheckBoxListener(this);
-	mListViewItemEditStyleInsertCheckbox->addCheckBoxListener(this);
+	if (isIOS())
+	{
+		mListViewItemEditModeCheckbox->addCheckBoxListener(this);
+		mSetListViewItemDeleteTitleButton->addButtonListener(this);
+		mListViewItemSelectedCheckbox->addCheckBoxListener(this);
+		mListViewItemUnselectedCheckbox->addCheckBoxListener(this);
+		mListViewItemHighlightedCheckbox->addCheckBoxListener(this);
+		mListViewItemUnhighlightedCheckbox->addCheckBoxListener(this);
+		mListViewItemAccessoryTypeIntNoneCheckbox->addCheckBoxListener(this);
+		mListViewItemAccessoryTypeIntDisclosureCheckbox->addCheckBoxListener(this);
+		mListViewItemAccessoryTypeIntDetailCheckbox->addCheckBoxListener(this);
+		mListViewItemAccessoryTypeIntCheckmarkCheckbox->addCheckBoxListener(this);
+		mListViewItemAccessoryTypeEditModeNoneCheckbox->addCheckBoxListener(this);
+		mListViewItemAccessoryTypeEditModeDisclosureCheckbox->addCheckBoxListener(this);
+		mListViewItemAccessoryTypeEditModeDetailCheckbox->addCheckBoxListener(this);
+		mListViewItemAccessoryTypeEditModeCheckmarkCheckbox->addCheckBoxListener(this);
+		mListViewItemEditStyleNoneCheckbox->addCheckBoxListener(this);
+		mListViewItemEditStyleDeleteCheckbox->addCheckBoxListener(this);
+		mListViewItemEditStyleInsertCheckbox->addCheckBoxListener(this);
+	}
 }
 
 /**
@@ -118,23 +122,27 @@ SettingsScreen::~SettingsScreen()
 	mSetListViewItemTextButton->removeButtonListener(this);
 	mSetListViewItemFontColorButton->removeButtonListener(this);
 	mSetListViewItemFontSizeButton->removeButtonListener(this);
-	mListViewItemEditModeCheckbox->removeCheckBoxListener(this);
-	mSetListViewItemDeleteTitleButton->removeButtonListener(this);
-	mListViewItemSelectedCheckbox->removeCheckBoxListener(this);
-	mListViewItemUnselectedCheckbox->removeCheckBoxListener(this);
-	mListViewItemHighlightedCheckbox->removeCheckBoxListener(this);
-	mListViewItemUnhighlightedCheckbox->removeCheckBoxListener(this);
-	mListViewItemAccessoryTypeIntNoneCheckbox->removeCheckBoxListener(this);
-	mListViewItemAccessoryTypeIntDisclosureCheckbox->removeCheckBoxListener(this);
-	mListViewItemAccessoryTypeIntDetailCheckbox->removeCheckBoxListener(this);
-	mListViewItemAccessoryTypeIntCheckmarkCheckbox->removeCheckBoxListener(this);
-	mListViewItemAccessoryTypeEditModeNoneCheckbox->removeCheckBoxListener(this);
-	mListViewItemAccessoryTypeEditModeDisclosureCheckbox->removeCheckBoxListener(this);
-	mListViewItemAccessoryTypeEditModeDetailCheckbox->removeCheckBoxListener(this);
-	mListViewItemAccessoryTypeEditModeCheckmarkCheckbox->removeCheckBoxListener(this);
-	mListViewItemEditStyleNoneCheckbox->addCheckBoxListener(this);
-	mListViewItemEditStyleDeleteCheckbox->addCheckBoxListener(this);
-	mListViewItemEditStyleInsertCheckbox->addCheckBoxListener(this);
+
+	if (isIOS())
+	{
+		mListViewItemEditModeCheckbox->removeCheckBoxListener(this);
+		mSetListViewItemDeleteTitleButton->removeButtonListener(this);
+		mListViewItemSelectedCheckbox->removeCheckBoxListener(this);
+		mListViewItemUnselectedCheckbox->removeCheckBoxListener(this);
+		mListViewItemHighlightedCheckbox->removeCheckBoxListener(this);
+		mListViewItemUnhighlightedCheckbox->removeCheckBoxListener(this);
+		mListViewItemAccessoryTypeIntNoneCheckbox->removeCheckBoxListener(this);
+		mListViewItemAccessoryTypeIntDisclosureCheckbox->removeCheckBoxListener(this);
+		mListViewItemAccessoryTypeIntDetailCheckbox->removeCheckBoxListener(this);
+		mListViewItemAccessoryTypeIntCheckmarkCheckbox->removeCheckBoxListener(this);
+		mListViewItemAccessoryTypeEditModeNoneCheckbox->removeCheckBoxListener(this);
+		mListViewItemAccessoryTypeEditModeDisclosureCheckbox->removeCheckBoxListener(this);
+		mListViewItemAccessoryTypeEditModeDetailCheckbox->removeCheckBoxListener(this);
+		mListViewItemAccessoryTypeEditModeCheckmarkCheckbox->removeCheckBoxListener(this);
+		mListViewItemEditStyleNoneCheckbox->addCheckBoxListener(this);
+		mListViewItemEditStyleDeleteCheckbox->addCheckBoxListener(this);
+		mListViewItemEditStyleInsertCheckbox->addCheckBoxListener(this);
+	}
 }
 
 /**
@@ -161,7 +169,7 @@ void SettingsScreen::createListViewPropertiesLayout()
 {
 	VerticalLayout* listViewPropertiesVerticalLayout = new VerticalLayout();
 	listViewPropertiesVerticalLayout->setTopPosition(0);
-	listViewPropertiesVerticalLayout->setHeight(ONE_LINE_HORIZONTAL_LAYOUT_HEIGHT * 3);
+	listViewPropertiesVerticalLayout->setHeight(ONE_LINE_HORIZONTAL_LAYOUT_HEIGHT * 2);
 	Label* mListViewPropertiesLabel = new Label();
 	mListViewPropertiesLabel->setText("ListView properties");
 	mListViewPropertiesLabel->setFontSize(TITLE_FONT_SIZE);
@@ -179,25 +187,30 @@ void SettingsScreen::createListViewPropertiesLayout()
 	allowSelectionLayout->addChild(allowSelectionLabel);
 	listViewPropertiesVerticalLayout->addChild(allowSelectionLayout);
 
-	// create the mode selection layout
-	HorizontalLayout* modeSelectionLayout = new HorizontalLayout();
-	modeSelectionLayout->setHeight(ONE_LINE_HORIZONTAL_LAYOUT_HEIGHT);
-	Label* setModeLabel = new Label();
-	setModeLabel->setText("Set mode: ");
-	modeSelectionLayout->addChild(setModeLabel);
-	mDisplayCheckBox = new CheckBox();
-	mDisplayCheckBox->setState(true);
-	Label* setDisplayLabel = new Label();
-	setDisplayLabel->setText("Display");
-	modeSelectionLayout->addChild(mDisplayCheckBox);
-	modeSelectionLayout->addChild(setDisplayLabel);
-	mEditCheckBox = new CheckBox();
-	mEditCheckBox->setState(false);
-	Label* setEditLabel = new Label();
-	setEditLabel->setText("Edit");
-	modeSelectionLayout->addChild(mEditCheckBox);
-	modeSelectionLayout->addChild(setEditLabel);
-	listViewPropertiesVerticalLayout->addChild(modeSelectionLayout);
+	if (isIOS())
+	{
+		listViewPropertiesVerticalLayout->setHeight(ONE_LINE_HORIZONTAL_LAYOUT_HEIGHT * 3);
+
+		// create the mode selection layout
+		HorizontalLayout* modeSelectionLayout = new HorizontalLayout();
+		modeSelectionLayout->setHeight(ONE_LINE_HORIZONTAL_LAYOUT_HEIGHT);
+		Label* setModeLabel = new Label();
+		setModeLabel->setText("Set mode: ");
+		modeSelectionLayout->addChild(setModeLabel);
+		mDisplayCheckBox = new CheckBox();
+		mDisplayCheckBox->setState(true);
+		Label* setDisplayLabel = new Label();
+		setDisplayLabel->setText("Display");
+		modeSelectionLayout->addChild(mDisplayCheckBox);
+		modeSelectionLayout->addChild(setDisplayLabel);
+		mEditCheckBox = new CheckBox();
+		mEditCheckBox->setState(false);
+		Label* setEditLabel = new Label();
+		setEditLabel->setText("Edit");
+		modeSelectionLayout->addChild(mEditCheckBox);
+		modeSelectionLayout->addChild(setEditLabel);
+		listViewPropertiesVerticalLayout->addChild(modeSelectionLayout);
+	}
 
 	mPropertiesListView->addChild(listViewPropertiesVerticalLayout);
 }
@@ -262,7 +275,7 @@ void SettingsScreen::createListViewItemPropertiesLayout()
 {
 	VerticalLayout* listViewItemPropertiesVerticalLayout = new VerticalLayout();
 	listViewItemPropertiesVerticalLayout->setTopPosition(ONE_LINE_HORIZONTAL_LAYOUT_HEIGHT * 7);
-	listViewItemPropertiesVerticalLayout->setHeight(ONE_LINE_HORIZONTAL_LAYOUT_HEIGHT*17);
+	listViewItemPropertiesVerticalLayout->setHeight(ONE_LINE_HORIZONTAL_LAYOUT_HEIGHT*4);
 	mCurrentListViewItemLabel = new Label();
 	mCurrentListViewItemLabel->setText("No item selected");
 	mCurrentListViewItemLabel->setFontSize(TITLE_FONT_SIZE);
@@ -272,15 +285,21 @@ void SettingsScreen::createListViewItemPropertiesLayout()
 	createListViewItemTextLayout(listViewItemPropertiesVerticalLayout);
 	createListViewItemFontColorLayout(listViewItemPropertiesVerticalLayout);
 	createListViewItemFontSizeLayout(listViewItemPropertiesVerticalLayout);
-	createListViewItemEditModeLayout(listViewItemPropertiesVerticalLayout);
-	createListViewItemDeleteButtonTextLayout(listViewItemPropertiesVerticalLayout);
-	createListViewItemSelectedAnimationLayout(listViewItemPropertiesVerticalLayout);
-	createListViewItemUnselectedAnimationLayout(listViewItemPropertiesVerticalLayout);
-	createListViewItemHighlightedAnimationLayout(listViewItemPropertiesVerticalLayout);
-	createListViewItemUnhighlightedAnimationLayout(listViewItemPropertiesVerticalLayout);
-	createListViewItemAccessoryTypeIntLayout(listViewItemPropertiesVerticalLayout);
-	createListViewItemAccessoryTypeEditModeLayout(listViewItemPropertiesVerticalLayout);
-	createListViewItemEditStyleLayout(listViewItemPropertiesVerticalLayout);
+
+	if (isIOS())
+	{
+		listViewItemPropertiesVerticalLayout->setHeight(ONE_LINE_HORIZONTAL_LAYOUT_HEIGHT*17);
+		createListViewItemEditModeLayout(listViewItemPropertiesVerticalLayout);
+		createListViewItemDeleteButtonTextLayout(listViewItemPropertiesVerticalLayout);
+		createListViewItemSelectedAnimationLayout(listViewItemPropertiesVerticalLayout);
+		createListViewItemUnselectedAnimationLayout(listViewItemPropertiesVerticalLayout);
+		createListViewItemHighlightedAnimationLayout(listViewItemPropertiesVerticalLayout);
+		createListViewItemUnhighlightedAnimationLayout(listViewItemPropertiesVerticalLayout);
+		createListViewItemAccessoryTypeIntLayout(listViewItemPropertiesVerticalLayout);
+		createListViewItemAccessoryTypeEditModeLayout(listViewItemPropertiesVerticalLayout);
+		createListViewItemEditStyleLayout(listViewItemPropertiesVerticalLayout);
+	}
+
 
 	mPropertiesListView->addChild(listViewItemPropertiesVerticalLayout);
 }
