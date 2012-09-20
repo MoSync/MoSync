@@ -34,6 +34,7 @@ using System.Collections.Generic;
 using System.Windows.Media;
 
 using System.Linq;
+using System.Collections.ObjectModel;
 
 namespace MoSync
 {
@@ -87,7 +88,7 @@ namespace MoSync
             /**
              * Contains the long list selector sections.
              */
-            List<ListSection<ListItem>> mListSections;
+            ObservableCollection<ListSection<ListItem>> mListSections;
 
             #region Constructor
 
@@ -105,7 +106,7 @@ namespace MoSync
                 // apply the predefined templates on the mLongListSelector
                 ApplyTemplatesOnLongListSelector();
 
-                mListSections = new List<ListSection<ListItem>>();
+                mListSections = new ObservableCollection<ListSection<ListItem>>();
 
                 // add the selection changed event handler on the mLongListSelector
                 mLongListSelector.SelectionChanged += new SelectionChangedEventHandler(mLongListSelector_SelectionChanged);
@@ -364,7 +365,7 @@ namespace MoSync
             {
                 set
                 {
-                    // TODO SA: reload the list data
+                    ReloadListData();
                 }
             }
 
@@ -477,7 +478,11 @@ namespace MoSync
             private void AddListSection(ListViewSection section)
             {
                 base.AddChild(section);
-                mListSections.Add(section.SectionData);
+                MoSync.Util.RunActionOnMainThreadSync(() =>
+                {
+                    mListSections.Add(section.SectionData);
+                    section.SectionIndex = mListSections.Count - 1;
+                });
             }
 
             /**
@@ -505,7 +510,10 @@ namespace MoSync
             private void InsertListSection(ListViewSection section, int index)
             {
                 base.AddChild(section);
-                mListSections.Insert(index, section.SectionData);
+                MoSync.Util.RunActionOnMainThreadSync(() =>
+                {
+                    mListSections.Insert(index, section.SectionData);
+                });
             }
 
             /**
@@ -543,6 +551,15 @@ namespace MoSync
             }
 
             /**
+             * Reloads the data inside the list.
+             */
+            private void ReloadListData()
+            {
+                mLongListSelector.ItemsSource = null;
+                mLongListSelector.ItemsSource = mListSections;
+            }
+
+            /**
              * Switches the current widget view to the long list selector view.
              */
             private void SwitchToLongListSelector()
@@ -559,6 +576,18 @@ namespace MoSync
                 if (mView != mList)
                 {
                     mView = mList;
+                }
+            }
+
+            #endregion
+
+            #region Helper method for updating the UI when a section has changed
+
+            public void UpdateSection(int sectionIndex, ListSection<ListItem> newSection)
+            {
+                if (mListSections.Count > sectionIndex)
+                {
+                    mListSections[sectionIndex] = newSection;
                 }
             }
 

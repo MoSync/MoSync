@@ -37,7 +37,8 @@ using namespace NativeUI;
 
 class ListScreen:
 	public Screen,
-	public ListViewListener
+	public ListViewListener,
+	public ButtonListener
 {
 
 public:
@@ -76,6 +77,11 @@ private:
 	void createMainLayout();
 
 	/**
+	 * Creates the list manipulation UI (remove section, add/remove item).
+	 */
+	void createListManipulationLayout();
+
+	/**
 	 * This method is called when a list view item is clicked.
 	 * @param listView The list view object that generated the event.
 	 * @param listViewItem The ListViewItem object that was clicked.
@@ -94,6 +100,14 @@ private:
 		ListView* listView,
 		ListViewSection* listViewSection,
 		ListViewItem* listViewItem);
+
+    /**
+     * This method is called if the touch-up event was inside the
+     * bounds of the button.
+     * Platform: iOS, Android and Windows Phone 7.
+     * @param button The button object that generated the event.
+     */
+    virtual void buttonClicked(Widget* button);
 private:
 	/**
 	 * Main layout.
@@ -109,6 +123,26 @@ private:
 	 * Array with list screen listeners.
 	 */
 	MAUtil::Vector<ListScreenListener*> mListScreenListeners;
+
+	/**
+	 * Reloads the list data.
+	 */
+	Button* mReloadData;
+
+	/**
+	 * Removes a whole section.
+	 */
+	Button* mRemoveFirstSection;
+
+	/**
+	 * Adds an item to the begining of the first section.
+	 */
+	Button* mAddItem;
+
+	/**
+	 * Removes the first item from the first section.
+	 */
+	Button* mRemoveItem;
 };
 
 #endif /* LISTSCREEN_H_ */

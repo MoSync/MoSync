@@ -99,7 +99,7 @@ group WidgetListView "List View" {
 
 			/**
 			* @brief Reload all its items.
-			* Platform: iOS and Android.
+			* Platform: iOS, Android and Windows Phone 7.
 			*
 			* @validvalue Empty string.
 			*

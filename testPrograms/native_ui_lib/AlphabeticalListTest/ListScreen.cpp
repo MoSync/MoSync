@@ -32,6 +32,7 @@
 
 #include "ListScreen.h"
 #include "ListScreenListener.h"
+#include "Util.h"
 
 /**
  * Constructor.
@@ -39,11 +40,22 @@
 ListScreen::ListScreen() :
 	Screen(),
 	mMainLayout(NULL),
-	mListView(NULL)
+	mListView(NULL),
+	mRemoveFirstSection(NULL),
+	mAddItem(NULL),
+	mRemoveItem(NULL),
+	mReloadData(NULL)
 {
 	createMainLayout();
 
 	mListView->addListViewListener(this);
+	mRemoveFirstSection->addButtonListener(this);
+	mAddItem->addButtonListener(this);
+	mRemoveItem->addButtonListener(this);
+	if (isIOS() || isAndroid())
+	{
+		mReloadData->addButtonListener(this);
+	}
 }
 
 /**
@@ -52,6 +64,13 @@ ListScreen::ListScreen() :
 ListScreen::~ListScreen()
 {
 	mListView->removeListViewListener(this);
+	mRemoveFirstSection->removeButtonListener(this);
+	mAddItem->removeButtonListener(this);
+	mRemoveItem->removeButtonListener(this);
+	if (isIOS() || isAndroid())
+	{
+		mReloadData->removeButtonListener(this);
+	}
 	mListScreenListeners.clear();
 }
 
@@ -88,6 +107,41 @@ void ListScreen::createMainLayout() {
 
 	int result = mMainLayout->addChild(mListView);
     printf("add mListView result = %d", result);
+
+    createListManipulationLayout();
+
+    if (isIOS() || isAndroid())
+    {
+		mReloadData = new Button();
+		mReloadData->setText("Reload data");
+		mReloadData->fillSpaceHorizontally();
+		mMainLayout->addChild(mReloadData);
+    }
+}
+
+/**
+ * Creates the list manipulation UI (remove section, add/remove item).
+ */
+void ListScreen::createListManipulationLayout()
+{
+	mRemoveFirstSection = new Button();
+	mRemoveFirstSection->setText("Remove first secction");
+	mRemoveFirstSection->fillSpaceHorizontally();
+	mMainLayout->addChild(mRemoveFirstSection);
+
+	HorizontalLayout* itemManipulationLayout = new HorizontalLayout();
+	itemManipulationLayout->setHeight(ONE_LINE_HORIZONTAL_LAYOUT_HEIGHT);
+	mAddItem = new Button();
+	mAddItem->setText("Add item");
+	mAddItem->fillSpaceHorizontally();
+	itemManipulationLayout->addChild(mAddItem);
+
+	mRemoveItem = new Button();
+	mRemoveItem->setText("Remove item");
+	mRemoveItem->fillSpaceHorizontally();
+	itemManipulationLayout->addChild(mRemoveItem);
+
+	mMainLayout->addChild(itemManipulationLayout);
 }
 
 /**
@@ -162,5 +216,48 @@ void ListScreen::segmentedListViewItemClicked(
 	{
 		mListScreenListeners[i]->listScreenItemClicked(listViewSection,
 			listViewItem);
+	}
+}
+
+/**
+ * This method is called if the touch-up event was inside the
+ * bounds of the button.
+ * Platform: iOS, Android and Windows Phone 7.
+ * @param button The button object that generated the event.
+ */
+void ListScreen::buttonClicked(Widget* button)
+{
+	if (button == mReloadData)
+	{
+		mListView->reloadData();
+	}
+	else if (button == mRemoveFirstSection)
+	{
+		if (mListView->countChildWidgets() > 0)
+		{
+			mListView->removeChild(mListView->getChild(0));
+		}
+	}
+	else if (button == mRemoveItem)
+	{
+		if (mListView->countChildWidgets() > 0)
+		{
+			ListViewSection* firstSection = (ListViewSection*)mListView->getChild(0);
+			if (firstSection->countChildWidgets() > 0)
+			{
+				firstSection->removeItem(0);
+			}
+		}
+	}
+	else if (button == mAddItem)
+	{
+		if (mListView->countChildWidgets() > 0)
+		{
+			ListViewSection* firstSection = (ListViewSection*)mListView->getChild(0);
+			ListViewItem* newItem = new ListViewItem();
+			newItem->setText("testItem");
+			newItem->setSubtitle("subtitle");
+			firstSection->insertItem(newItem, 0);
+		}
 	}
 }

@@ -66,6 +66,14 @@ namespace MoSync
 
                         widget.ListItemData = newItem;
                         mSection.Add(newItem);
+
+                        // we need to update the parent UI the parent exists (it might not if the child was
+                        // created before the parent)
+                        ListView parentListView = (ListView)this.GetParent();
+                        if (parentListView != null)
+                        {
+                            parentListView.UpdateSection(this.SectionIndex, this.mSection);
+                        }
                     });
                 }
             }
@@ -94,6 +102,14 @@ namespace MoSync
 
                         widget.ListItemData = newItem;
                         mSection.Insert(index, newItem);
+
+                        // we need to update the parent UI the parent exists (it might not if the child was
+                        // created before the parent)
+                        ListView parentListView = (ListView)this.GetParent();
+                        if (parentListView != null)
+                        {
+                            parentListView.UpdateSection(this.SectionIndex, this.mSection);
+                        }
                     });
                 }
             }
@@ -107,6 +123,35 @@ namespace MoSync
                 MoSync.Util.RunActionOnMainThreadSync(() =>
                 {
                     mSection.RemoveAt(index);
+
+                    // we need to update the parent UI the parent exists (it might not if the child was
+                    // created before the parent)
+                    ListView parentListView = (ListView)this.GetParent();
+                    if (parentListView != null)
+                    {
+                        parentListView.UpdateSection(this.SectionIndex, this.mSection);
+                    }
+                });
+            }
+
+            /**
+             * Override the WidgetBase RemoveChild function.
+             */
+            public override void RemoveChild(IWidget child)
+            {
+                List<IWidget> children = this.mChildren;
+                base.RemoveChild(child);
+                MoSync.Util.RunActionOnMainThreadSync(() =>
+                {
+                    mSection.Remove(((ListViewItem)child).ListItemData);
+
+                    // we need to update the parent UI the parent exists (it might not if the child was
+                    // created before the parent)
+                    ListView parentListView = (ListView)this.GetParent();
+                    if (parentListView != null)
+                    {
+                        parentListView.UpdateSection(this.SectionIndex, this.mSection);
+                    }
                 });
             }
 
@@ -124,6 +169,15 @@ namespace MoSync
                 {
                     return mSection;
                 }
+            }
+
+            /**
+             * The section index within the parent list,
+             */
+            public int SectionIndex
+            {
+                get;
+                set;
             }
 
             #endregion

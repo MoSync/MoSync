@@ -27,11 +27,6 @@ MA 02110-1301, USA.
 #include <NativeUI/ListViewSection.h>
 #include "Util.h"
 
-#define TITLE_FONT_SIZE 26.0
-#define ONE_LINE_HORIZONTAL_LAYOUT_HEIGHT 70
-#define EDIT_BOX_WIDTH 240
-#define BUTTON_WIDTH 210
-
 /**
  * Constructor.
  */

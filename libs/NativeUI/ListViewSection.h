@@ -82,11 +82,37 @@ namespace NativeUI
 		ListViewSectionType getType();
 
 		/**
-		 * Add an list item to this section.
+		 * Add a list item to this section.
 		 * @param item The item that will be added.
 		 * The ownership of the item object is passed to this method.
 		 */
 		void addItem(ListViewItem* item);
+
+		/**
+		 * Insert a list item to this section at a certain index.
+		 * @param item The item that will be added.
+		 * @param index The index at which the item will be added
+		 * The ownership of the item object is passed to this method.
+		 */
+		void insertItem(ListViewItem* item, int index);
+
+		/**
+		 * Removes a list item from this section.
+		 * @param item The item that will be removed.
+		 */
+		void removeItem(ListViewItem* item);
+
+		/**
+		 * Removes a list item from this section.
+		 * @param index The index of the item that will be removed.
+		 */
+		void removeItem(int index);
+
+		/**
+		 * Gets a list item from this section.
+		 * @param index The index of the item.
+		 */
+		void getItem(int index);
 
 		/**
 		 * Set section title.

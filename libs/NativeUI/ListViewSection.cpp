@@ -61,6 +61,47 @@ namespace NativeUI
 	}
 
 	/**
+	 * Insert a list item to this section at a certain index.
+	 * @param item The item that will be added.
+	 * @param index The index at which the item will be added
+	 * The ownership of the item object is passed to this method.
+	 */
+	void ListViewSection::insertItem(ListViewItem* item, int index)
+	{
+		this->insertChild(item, index);
+	}
+
+	/**
+	 * Removes a list item from this section.
+	 * @param item The item that will be removed.
+	 */
+	void ListViewSection::removeItem(ListViewItem* item)
+	{
+		this->removeChild(item);
+	}
+
+	/**
+	 * Removes a list item from this section.
+	 * @param index The index of the item that will be removed.
+	 */
+	void ListViewSection::removeItem(int index)
+	{
+		if (this->countChildWidgets() > index)
+		{
+			this->removeChild(this->getChild(index));
+		}
+	}
+
+	/**
+	 * Gets a list item from this section.
+	 * @param index The index of the item.
+	 */
+	void ListViewSection::getItem(int index)
+	{
+		this->getChild(index);
+	}
+
+	/**
 	 * Set section title.
 	 * On iOS section title will appear on the right side of the list.
 	 * On Android section title will appear on the fast scroll thumb.
