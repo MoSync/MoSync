@@ -133,6 +133,7 @@
     <Content Include="program">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+	<Compile Include="RebuildData\rebuild.build.cs" />
     <Content Include="AppBar.Icons\17301555.png" />
     <Content Include="AppBar.Icons\17301559.png" />
     <Content Include="AppBar.Icons\17301560.png" />
