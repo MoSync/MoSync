@@ -55,6 +55,15 @@ namespace MoSync
                 Segmented
             };
 
+            /**
+             * The available list view styles.
+             */
+            protected enum ListViewStyle
+            {
+                Subtitle,
+                NoSubtitle
+            };
+
 			/**
 			 * A ListBox object that will hold the items
 			 */
@@ -84,6 +93,11 @@ namespace MoSync
              * The current list view type.
              */
             protected ListViewType mListViewType;
+
+            /**
+             * The current list view style.
+             */
+            protected ListViewStyle mListViewStyle;
 
             /**
              * Contains the long list selector sections.
@@ -327,6 +341,43 @@ namespace MoSync
                             mListViewType = ListViewType.Segmented;
                             ClearLongList();
                             SwitchToLongListSelector();
+                            break;
+                        default:
+                            throw new InvalidPropertyValueException();
+                    }
+                }
+            }
+
+            /**
+             * MAW_LIST_VIEW_STYLE property implementation
+             * There are three available list styles:
+             *  - MAW_LIST_VIEW_STYLE_SUBTITLE
+             *  - MAW_LIST_VIEW_STYLE_NO_SUBTITLE
+             */
+            [MoSyncWidgetProperty(MoSync.Constants.MAW_LIST_VIEW_STYLE)]
+            public int Style
+            {
+                get
+                {
+                    switch (mListViewStyle)
+                    {
+                        case ListViewStyle.Subtitle:
+                            return MoSync.Constants.MAW_LIST_VIEW_STYLE_SUBTITLE;
+                        case ListViewStyle.NoSubtitle:
+                            return MoSync.Constants.MAW_LIST_VIEW_STYLE_NO_SUBTITLE;
+                        default:
+                            return MoSync.Constants.MAW_LIST_VIEW_STYLE_SUBTITLE;
+                    }
+                }
+                set
+                {
+                    switch (value)
+                    {
+                        case MoSync.Constants.MAW_LIST_VIEW_STYLE_SUBTITLE:
+                            mListViewStyle = ListViewStyle.Subtitle;
+                            break;
+                        case MoSync.Constants.MAW_LIST_VIEW_STYLE_NO_SUBTITLE:
+                            mListViewStyle = ListViewStyle.NoSubtitle;
                             break;
                         default:
                             throw new InvalidPropertyValueException();

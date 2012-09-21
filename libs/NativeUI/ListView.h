@@ -80,6 +80,23 @@ namespace NativeUI
 		LIST_VIEW_MODE_EDIT
 	};
 
+	/**
+	 * @brief List view style.
+	 * Platform: Windows Phone 7.
+	 */
+	enum ListViewStyle
+	{
+		/**
+		 * @brief Every list view item will contain an image, a title and a subtitle.
+		 */
+		LIST_VIEW_STYLE_SUBTITLE = 0,
+
+		/**
+		 * @brief Every list view item will contain an image and a title.
+		 */
+		LIST_VIEW_STYLE_NO_SUBTITLE
+	};
+
 	// Forward declaration.
 	class ListViewListener;
 
@@ -94,7 +111,7 @@ namespace NativeUI
 		 * Constructor.
 		 * @param type List view's type.
 		 */
-		ListView(ListViewType type = LIST_VIEW_TYPE_DEFAULT);
+		ListView(ListViewType type = LIST_VIEW_TYPE_DEFAULT, ListViewStyle style = LIST_VIEW_STYLE_SUBTITLE);
 
 		/**
 		 * Destructor.
@@ -106,6 +123,12 @@ namespace NativeUI
 		 * @return List view type.
 		 */
 		ListViewType getType();
+
+		/**
+		 * Get the list view style.
+		 * @return List view style.
+		 */
+		ListViewStyle getStyle();
 
 		/**
 		 * Set the list view mode.
@@ -183,6 +206,24 @@ namespace NativeUI
 		 * @return One of the ListViewType enum values.
 		 */
 		ListViewType getListViewTypeEnum(int listType);
+
+		/**
+		 * Get the list view style constant.
+		 * @param listStyle Given list style enum.
+		 * @return One of the following values:
+		 * - MAW_LIST_VIEW_STYLE_SUBTITLE
+		 * - MAW_LIST_VIEW_STYLE_NO_SUBTITLE
+		 */
+		int getListViewStyleFromEnum(ListViewStyle listStyle);
+
+		/**
+		 * Get the list view style enum from a constant.
+		 * @param listStyle One of the following values:
+		 * - MAW_LIST_VIEW_STYLE_SUBTITLE
+		 * - MAW_LIST_VIEW_STYLE_NO_SUBTITLE
+		 * @return One of the ListViewStyle enum values.
+		 */
+		ListViewStyle getListViewStyleEnum(int listStyle);
 
 	private:
 		/**
