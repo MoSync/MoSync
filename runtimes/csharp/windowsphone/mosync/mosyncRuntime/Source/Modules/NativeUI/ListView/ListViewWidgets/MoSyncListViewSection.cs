@@ -39,6 +39,22 @@ namespace MoSync
 
             #endregion
 
+            #region Public methods
+
+            /**
+             * Returns a child.
+             */
+            public IWidget GetChild(int index)
+            {
+                if (index < mChildren.Count)
+                {
+                    return mChildren[index];
+                }
+                return null;
+            }
+
+            #endregion
+
             #region Overridden methods
 
             /**
@@ -178,6 +194,17 @@ namespace MoSync
             {
                 get;
                 set;
+            }
+
+            /**
+             * Returns the numeber of children.
+             */
+            public int ChildrenCount
+            {
+                get
+                {
+                    return mChildren.Count;
+                }
             }
 
             #endregion

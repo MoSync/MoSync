@@ -189,30 +189,47 @@ namespace MoSync
              */
             void mList_Tap(object sender, System.Windows.Input.GestureEventArgs e)
             {
-                // TODO SA: do nothing if selection is disabled
-
-                //create a Memory object of 8 Bytes
-                Memory eventData = new Memory(12);
-
-                //starting with the 0 Byte we write the eventType
-                const int MAWidgetEventData_eventType = 0;
-
-                //starting with the 4th Byte we write the widgetHandle
-                const int MAWidgetEventData_widgetHandle = 4;
-
-                //starting with the 8th Byte we write the selectedIndex
-                const int MAWidgetEventData_selectedIndex = 8;
-
-                int selIndex = mList.SelectedIndex;
-
-                eventData.WriteInt32(MAWidgetEventData_eventType, MoSync.Constants.MAW_EVENT_ITEM_CLICKED);
-                eventData.WriteInt32(MAWidgetEventData_widgetHandle, mHandle);
-
-                if (selIndex > -1)
+                if (mListSelectionEnabled)
                 {
-                    eventData.WriteInt32(MAWidgetEventData_selectedIndex, selIndex);
-                    //posting a CustomEvent
-                    mRuntime.PostCustomEvent(MoSync.Constants.EVENT_TYPE_WIDGET, eventData);
+                    //create a Memory object of 8 Bytes
+                    Memory eventData = new Memory(12);
+
+                    //starting with the 0 Byte we write the eventType
+                    const int MAWidgetEventData_eventType = 0;
+
+                    //starting with the 4th Byte we write the widgetHandle
+                    const int MAWidgetEventData_widgetHandle = 4;
+
+                    //starting with the 8th Byte we write the selectedIndex
+                    const int MAWidgetEventData_selectedIndex = 8;
+
+                    int selIndex = mList.SelectedIndex;
+
+                    for (int i = 0; i < mChildren.Count; i++)
+                    {
+                        if (mChildren[i] is ListViewItem)
+                        {
+                            (mChildren[i] as ListViewItem).ItemSelected = false;
+                            if (i == selIndex)
+                            {
+                                (mChildren[i] as ListViewItem).ItemSelected = true;
+                            }
+                        }
+                    }
+
+                    eventData.WriteInt32(MAWidgetEventData_eventType, MoSync.Constants.MAW_EVENT_ITEM_CLICKED);
+                    eventData.WriteInt32(MAWidgetEventData_widgetHandle, mHandle);
+
+                    if (selIndex > -1)
+                    {
+                        eventData.WriteInt32(MAWidgetEventData_selectedIndex, selIndex);
+                        //posting a CustomEvent
+                        mRuntime.PostCustomEvent(MoSync.Constants.EVENT_TYPE_WIDGET, eventData);
+                    }
+                }
+                else
+                {
+                    mList.SelectedItem = null;
                 }
             }
 
@@ -242,28 +259,8 @@ namespace MoSync
                         //starting with the 8th Byte we write the selectedItemIndex
                         const int MAWidgetEventData_selectedItemIndex = 12;
 
-                        int sectionIndex = -1;
-                        int itemInSectionIndex = -1;
-                        bool foundItem = false;
-                        for (int i = 0; i < mListSections.Count; i++)
-                        {
-                            ListSection<ListItem> section = mListSections[i];
-                            for (int j = 0; j < section.Count; j++ )
-                            {
-                                ListItem item = section[j];
-                                if (item.Equals(mLongListSelector.SelectedItem))
-                                {
-                                    sectionIndex = i;
-                                    itemInSectionIndex = j;
-                                    foundItem = true;
-                                    break;
-                                }
-                            }
-                            if (foundItem)
-                            {
-                                break;
-                            }
-                        }
+                        int sectionIndex, itemInSectionIndex;
+                        GetSectionAndSelectedItemIndex(out sectionIndex, out itemInSectionIndex);
 
                         eventData.WriteInt32(MAWidgetEventData_eventType, MoSync.Constants.MAW_EVENT_SEGMENTED_LIST_ITEM_CLICKED);
                         eventData.WriteInt32(MAWidgetEventData_widgetHandle, mHandle);
@@ -576,6 +573,67 @@ namespace MoSync
                 if (mView != mList)
                 {
                     mView = mList;
+                }
+            }
+
+            /**
+             * Outputs the index of the section in focus and the index of the selected item
+             * within that section.
+             */
+            private void GetSectionAndSelectedItemIndex(out int sectionIndex, out int itemIndex)
+            {
+                // we need to find the selected item through the LongListSelector
+                // items source and through the child widgets aswell in order to
+                // set its selected state
+                sectionIndex = -1;
+                itemIndex = -1;
+                bool foundItem = false;
+                for (int i = 0; i < mListSections.Count; i++)
+                {
+                    ListSection<ListItem> section = mListSections[i];
+
+                    // get the current section index
+                    ListViewSection currentSection = null;
+                    if (i < mChildren.Count && mChildren[i] is ListViewSection)
+                    {
+                        currentSection = mChildren[i] as ListViewSection;
+                    }
+
+                    for (int j = 0; j < section.Count; j++)
+                    {
+                        ListItem item = section[j];
+
+                        // get the current ListViewItem - it's going to be the same item
+                        // as the selected one only if the developer has created a list by only adding
+                        // sections to it and items to every section
+                        ListViewItem currentItem = null;
+                        if (currentSection != null && j < currentSection.ChildrenCount &&
+                            currentSection.GetChild(j) is ListViewItem)
+                        {
+                            currentItem = currentSection.GetChild(j) as ListViewItem;
+                            currentItem.ItemSelected = false;
+                        }
+
+                        if (item.Equals(mLongListSelector.SelectedItem))
+                        {
+                            sectionIndex = i;
+                            itemIndex = j;
+                            foundItem = true;
+
+                            // set the selected state of the current item if it's the same
+                            // with the one visible on the screen
+                            if (currentItem != null && currentItem.ListItemData.Equals(mLongListSelector.SelectedItem))
+                            {
+                                currentItem.ItemSelected = true;
+                            }
+
+                            break;
+                        }
+                    }
+                    if (foundItem)
+                    {
+                        break;
+                    }
                 }
             }
 

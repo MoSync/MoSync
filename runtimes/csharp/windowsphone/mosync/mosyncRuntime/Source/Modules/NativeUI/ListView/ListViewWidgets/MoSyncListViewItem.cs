@@ -119,6 +119,8 @@ namespace MoSync
 				mGrid.Children.Add(mText);
 
                 mView = mGrid;
+
+                this.ItemSelected = false;
 			}
 
             public override void AddChild(IWidget child)
@@ -129,6 +131,15 @@ namespace MoSync
                         WidgetBaseWindowsPhone widget = (child as WidgetBaseWindowsPhone);
                         mGrid.Children.Add(widget.View);
                     });
+            }
+
+            /**
+             * Sets the selected state of the item.
+             */
+            public bool ItemSelected
+            {
+                get;
+                set;
             }
 
             /**
@@ -209,6 +220,23 @@ namespace MoSync
                     return mListItem.Title;
 				}
 			}
+
+            /**
+             * Implementation of the "IsSelected" property.
+             * Gets the selected state of the current item.
+             */
+            [MoSyncWidgetProperty(MoSync.Constants.MAW_LIST_VIEW_ITEM_IS_SELECTED)]
+            public string IsSelected
+            {
+                get
+                {
+                    if (this.ItemSelected == true)
+                    {
+                        return "true";
+                    }
+                    return "false";
+                }
+            }
 
             /**
              * Implementation of the "Icon" property.
