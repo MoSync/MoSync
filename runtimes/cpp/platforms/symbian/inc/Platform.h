@@ -155,7 +155,7 @@ public:
 	virtual bool Write(const TDesC8& aDesc, CPublicActive& op) = 0;
 
 	virtual void CancelAll() = 0;
-	
+
 	virtual void GetAddr(MAConnAddr* addr) = 0;
 
 	virtual CHttpConnection* http() { return NULL; }
@@ -170,20 +170,28 @@ public:
 #ifdef SUPPORT_MOSYNC_SERVER
 class RMoSyncServerSession : public RSessionBase {
 public:
-	RMoSyncServerSession() : mPositionPckg(mPosition) {}
+	RMoSyncServerSession() : mPositionPckg(mPosition), mConnected(false) {}
 
 	int Connect();
 	TVersion Version(void) const;
 
 	int GetNetworkInfo(TDes8& aPckg);
-	
+
 	void LocationGet(TRequestStatus& aStatus);
 	int LocationStop();
-	
+
 	const TPosition& Position() const { return mPosition; }
+
+	int AutostartOn();
+	int AutostartOff();
+
+	int GetNetworkStatus(CTelephony::TNetworkRegistrationV1&);
+	void GetNetworkStatusChange(CTelephony::TNetworkRegistrationV1Pckg&, TRequestStatus&);
+	void CancelNetworkStatusChange();
 private:
 	TPosition mPosition;
 	TPckg<TPosition> mPositionPckg;
+	bool mConnected;
 };
 #endif	//SUPPORT_MOSYNC_SERVER
 

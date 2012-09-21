@@ -124,7 +124,7 @@ public:
 	int csRegs[128];
 	int *csMem;
 
-	struct StateChange { 
+	struct StateChange {
 		int type; // 0 = reg state change, 1 = mem state change
 		int ip, instCount;
 		struct regdata
@@ -136,7 +136,7 @@ public:
 			int address;
 			unsigned char before, after;
 		};
-	
+
 		regdata regdata;
 		memdata memdata;
 	};
@@ -144,7 +144,7 @@ public:
 #define STATE_BUFFER_SIZE 1024
 	StateChange stateChanges[STATE_BUFFER_SIZE];
 	int curStateChange;
-	
+
 	void initStateChange() {
 		csMem = 0;
 		curStateChange = 0;
@@ -215,7 +215,7 @@ public:
 
 	void logStateChange(int ip) {
 		//LOG("logStateChange(0x%x)\n", ip);
-		
+
 		if(!csMem) {
 			curStateChange = 0;
 #if 0
@@ -273,7 +273,7 @@ public:
 		while(i--) {
 			if(csRegs[i] != regs[i]) {
 				//LOG("R%d: 0x%x != %d\n", i, csRegs[i], gCore->regs[i]);
-				
+
 				stateChanges[curStateChange].type = 0;
 				stateChanges[curStateChange].ip = ip;
 				stateChanges[curStateChange].instCount = stateChangeInstCount;
@@ -318,7 +318,7 @@ public:
 	byte* rIP;
 
 	int VM_Yield;
-	
+
 	void* customEventPointer;
 
 #ifdef USE_ARM_RECOMPILER
@@ -617,7 +617,7 @@ public:
 	void GenConstTable() {
 		int n, p;
 		int mask;
-		
+
 		for(p=0; p<32; p++) {
 			regs[p] = 0;
 		}
@@ -658,7 +658,7 @@ public:
 		FileStream mod(modfile);
 		if(!LoadVM(mod))
 			return false;
-			
+
 		FileStream res(resfile);
 		if(!mSyscall.loadResources(res, resfile))
 			return false;
@@ -751,12 +751,12 @@ public:
 		LOG("Recompiler Closed!\n");
 #endif
 	}
-	
+
 	//****************************************
 	//Loader
 	//****************************************
 	int LoadVM(Stream& file) {
-	
+
 		LOG("LoadVM\n");
 
 		TEST(file.isOpen());
@@ -817,37 +817,37 @@ public:
 		DUMPHEX(Head.DataSize);
 		if(Head.DataLen > 0) {
 			DATA_SEGMENT_SIZE = nextPowerOf2(16, Head.DataSize);
-			
+
 #ifdef _android
 			/*
 			jclass cls = mJniEnv->GetObjectClass(mJThis);
 			jmethodID methodID = mJniEnv->GetMethodID(cls, "generateDataSection", "(I)Ljava/nio/ByteBuffer;");
 			if (methodID == 0) return -1;
 			jobject jo = mJniEnv->CallObjectMethod(mJThis, methodID, (DATA_SEGMENT_SIZE));
-			
+
 			// if the java object jo is NULL at this point there was not enought memory to allocate the data section
-			if(jo == NULL) 
+			if(jo == NULL)
 			{
 				__android_log_write(ANDROID_LOG_INFO, "MoSync Syscall", "Deta section was allocated, not enough memory!");
 				return 0;
 			}
-			
+
 			mem_ds = (int*)mJniEnv->GetDirectBufferAddress(jo);
 			mJniEnv->DeleteLocalRef(cls);
 			*/
 
 			char* buffer = (char*)malloc(DATA_SEGMENT_SIZE);
 			if(buffer == NULL) return 0;
-			
+
 			jobject byteBuffer = mJniEnv->NewDirectByteBuffer((void*)buffer, DATA_SEGMENT_SIZE);
 			if(byteBuffer == NULL) return 0;
-			
+
 			jclass cls = mJniEnv->GetObjectClass(mJThis);
 			jmethodID methodID = mJniEnv->GetMethodID(cls, "generateDataSection", "(Ljava/nio/ByteBuffer;)Z");
 			if (methodID == 0) return 0;
-			
+
 			jboolean ret = mJniEnv->CallBooleanMethod(mJThis, methodID, byteBuffer);
-			if(false == ret) 
+			if(false == ret)
 			{
 				__android_log_write(ANDROID_LOG_INFO, "MoSync Syscall", "Deta section was allocated, not enough memory!");
 				return 0;
@@ -857,10 +857,10 @@ public:
 
 			mJniEnv->DeleteLocalRef(cls);
 			mJniEnv->DeleteLocalRef(byteBuffer);
-		
+
 #else
 			mem_ds = new int[DATA_SEGMENT_SIZE / sizeof(int)];
-#endif		
+#endif
 
 			if(!mem_ds) BIG_PHAT_ERROR(ERR_OOM);
 			TEST(file.read(mem_ds, Head.DataLen));
@@ -893,7 +893,7 @@ public:
 #endif
 
 		customEventPointer = ((char*)mem_ds) + (Head.DataSize - maxCustomEventSize);
-		
+
 #ifdef USE_ARM_RECOMPILER
 		//initRecompilerVariables();
 #ifndef _android
@@ -1017,7 +1017,7 @@ void WRITE_REG(int reg, int value) {
 
 	void checkProtection(uint address, uint size) const {
 		if(protectionEnabled) {
-		for(uint i = address; i < address+size; i++) 
+		for(uint i = address; i < address+size; i++)
 			if(GET_PROTECTION(i)) {
 				BIG_PHAT_ERROR(ERR_MEMORY_PROTECTED);
 			}
@@ -1040,7 +1040,7 @@ void WRITE_REG(int reg, int value) {
 			((address & (sizeof(T) - 1)) != 0) || //alignment check
 			(address < 4))	//NULL pointer check
 		{
-			LOG("Memory reference validation failed. Size %"PFZT", address 0x%x\n",
+			LOG("Memory reference validation failed. Size %" PFZT ", address 0x%x\n",
 				sizeof(T), address);
 			if((address & (sizeof(T) - 1)) != 0) {
 				BIG_PHAT_ERROR(ERR_MEMORY_ALIGNMENT);
@@ -1051,7 +1051,7 @@ void WRITE_REG(int reg, int value) {
 			}
 		}
 
-#ifdef MEMORY_PROTECTION	
+#ifdef MEMORY_PROTECTION
 		checkProtection(address, sizeof(T));
 #endif
 
@@ -1066,19 +1066,19 @@ void WRITE_REG(int reg, int value) {
 	//****************************************
 #define PTR2ADDRESS(ptr) ((unsigned)((char*)ptr - (char*)mem_ds))
 	void ValidateMemStringAddress(unsigned address) const {
-#ifdef MEMORY_PROTECTION	
+#ifdef MEMORY_PROTECTION
 		int initialAddr = address;
 #endif
 		do {
 			if(address >= DATA_SEGMENT_SIZE)
 				BIG_PHAT_ERROR(ERR_MEMORY_OOB);
 		} while(RAW_MEMREF(char, address++) != 0);
-#ifdef MEMORY_PROTECTION	
+#ifdef MEMORY_PROTECTION
 		checkProtection(initialAddr, address-initialAddr);
 #endif
 	}
 	void ValidateMemWStringAddress(unsigned address) const {
-#ifdef MEMORY_PROTECTION	
+#ifdef MEMORY_PROTECTION
 		int initialAddr = address;
 #endif
 		address -= 2;
@@ -1087,7 +1087,7 @@ void WRITE_REG(int reg, int value) {
 			if(address >= DATA_SEGMENT_SIZE)
 				BIG_PHAT_ERROR(ERR_MEMORY_OOB);
 		} while(RAW_MEMREF(short, address) != 0);
-#ifdef MEMORY_PROTECTION	
+#ifdef MEMORY_PROTECTION
 		checkProtection(initialAddr, address-initialAddr);
 #endif
 	}
@@ -1098,7 +1098,7 @@ void WRITE_REG(int reg, int value) {
 				BIG_PHAT_ERROR(ERR_MEMORY_OOB);
 		} while(RAW_MEMREF(char, address++) != 0);
 
-#ifdef MEMORY_PROTECTION	
+#ifdef MEMORY_PROTECTION
 		checkProtection(PTR2ADDRESS(ptr), address-PTR2ADDRESS(ptr));
 #endif
 		return address - PTR2ADDRESS(ptr) - 1;
@@ -1108,7 +1108,7 @@ void WRITE_REG(int reg, int value) {
 		if(address >= DATA_SEGMENT_SIZE || (address+size) >= DATA_SEGMENT_SIZE ||
 			size > DATA_SEGMENT_SIZE)
 			BIG_PHAT_ERROR(ERR_MEMORY_OOB);
-#ifdef MEMORY_PROTECTION	
+#ifdef MEMORY_PROTECTION
 		checkProtection(address, size);
 #endif
 	}
@@ -1117,7 +1117,7 @@ void WRITE_REG(int reg, int value) {
 		if(uint(address) >= DATA_SEGMENT_SIZE || uint(address+size) >= DATA_SEGMENT_SIZE ||
 			uint(size) > DATA_SEGMENT_SIZE)
 			BIG_PHAT_ERROR(ERR_MEMORY_OOB);
-#ifdef MEMORY_PROTECTION	
+#ifdef MEMORY_PROTECTION
 		checkProtection(address, size);
 #endif
 		return ((char*)mem_ds) + address;
@@ -1144,7 +1144,7 @@ void WRITE_REG(int reg, int value) {
 			if(address >= DATA_SEGMENT_SIZE)
 				BIG_PHAT_ERROR(ERR_MEMORY_OOB);
 		} while(RAW_MEMREF(char, address++) != 0);
-#ifdef MEMORY_PROTECTION	
+#ifdef MEMORY_PROTECTION
 		checkProtection(a, address-a);
 #endif
 		return ((char*)mem_ds) + a;
@@ -1158,7 +1158,7 @@ void WRITE_REG(int reg, int value) {
 			if(address >= DATA_SEGMENT_SIZE)
 				BIG_PHAT_ERROR(ERR_MEMORY_OOB);
 		} while(RAW_MEMREF(wchar, address) != 0);
-#ifdef MEMORY_PROTECTION	
+#ifdef MEMORY_PROTECTION
 		checkProtection(a, address-a);
 #endif
 		return (wchar*)(((char*)mem_ds) + a);
@@ -1315,7 +1315,7 @@ void WRITE_REG(int reg, int value) {
 		initStateChange();
 #endif
 	}
-	
+
 	virtual ~VMCoreInt() {
 #ifdef GDB_DEBUG
 		if(mGdbOn)
@@ -1375,7 +1375,7 @@ void WRITE_REG(int reg, int value) {
 #endif
 
 	}
-	
+
 private:
 	Syscall& mSyscall;
 };
@@ -1460,7 +1460,7 @@ void RunFrom(VMCore* core, int ip) {
 
 // ***************************************
 // Debugger
-// ***************************************	
+// ***************************************
 /*
 #ifdef ENABLE_DEBUGGER
 bool initDebugger(VMCore* core, int port) {
@@ -1472,7 +1472,7 @@ void closeDebugger() {
 }
 #endif
 */
-// ***************************************	
+// ***************************************
 
 void Run2(VMCore* core) {
 	CORE->Run2();

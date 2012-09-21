@@ -83,8 +83,11 @@ SettingsScreen::SettingsScreen(SettingsScreenListener* listener):
 
 	mIPEditBox->addEditBoxListener(this);
 	mPortEditBox->addEditBoxListener(this);
+	if (isAndroid())
+	{
 	mTickerText->addEditBoxListener(this);
 	mContentTitle->addEditBoxListener(this);
+	}
 	mConnectButton->addButtonListener(this);
 
 	if (isAndroid())
@@ -92,8 +95,6 @@ SettingsScreen::SettingsScreen(SettingsScreenListener* listener):
 		mShowOnlyIfInBackground->addCheckBoxListener(this);
 	}
 
-	mIPEditBox->setText("192.168.1.111");
-	mPortEditBox->setText("6789");
 	Notification::NotificationManager::getInstance()->setPushNotificationsTickerText(mTickerText->getText());
 	Notification::NotificationManager::getInstance()->setPushNotificationsTitle(mContentTitle->getText());
 }
@@ -158,6 +159,9 @@ void SettingsScreen::createMainLayout()
 	mPortEditBox = new EditBox();
 	mPortEditBox->setInputMode(EDIT_BOX_INPUT_MODE_NUMERIC);
 	listView->addChild(this->createListViewItem(PORT_LABEL_TEXT, mPortEditBox));
+
+	mIPEditBox->setText("192.168.1.111");
+	mPortEditBox->setText("6789");
 
 	if ( isAndroid() )
 	{

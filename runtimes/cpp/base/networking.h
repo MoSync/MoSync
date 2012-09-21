@@ -129,9 +129,13 @@ protected:
 	ConnOp(MAConn& m) : mac(m) {}
 	MAConn& mac;
 
-	void handleResult(int opcode, int result) {
+	void handleResult(int opcode, int result, bool lock = true) {
 		LOGST("ConnOp::handleResult %i %i %i", mac.handle, opcode, result);
-		if(result < 0 && mac.cancel) {
+		if(lock)
+		{
+			gConnMutex.lock();
+		}
+        if(result < 0 && mac.cancel) {
 			result = CONNERR_CANCELED;
 		}
 		DEBUG_ASSERT(mac.state & opcode);
@@ -145,6 +149,10 @@ protected:
 		mac.state &= ~opcode;
 
 		ConnPushEvent(ep);	//send event to be processed
+		if(lock)
+		{
+			gConnMutex.unlock();
+		}
 	}
 };
 
@@ -160,11 +168,7 @@ public:
 	Connect(MAStreamConn& m) : ConnStreamOp(m) {}
 	void run() {
 		LOGST("Connect %i", mac.handle);
-        gConnMutex.lock();
-        {
-            handleResult(CONNOP_CONNECT, masc.conn->connect());
-        }
-        gConnMutex.unlock();
+        handleResult(CONNOP_CONNECT, masc.conn->connect());
 	}
 };
 
@@ -173,11 +177,7 @@ public:
 	ConnRead(MAStreamConn& m, void* d, int s) : ConnStreamOp(m), dst(d), size(s) {}
 	void run() {
 		LOGST("ConnRead %i", mac.handle);
-        gConnMutex.lock();
-        {
-            handleResult(CONNOP_READ, masc.conn->read(dst, size));
-        }
-        gConnMutex.unlock();
+        handleResult(CONNOP_READ, masc.conn->read(dst, size));
 	}
 private:
 	void* dst;
@@ -189,11 +189,7 @@ public:
 	ConnWrite(MAStreamConn& m, const void* sr, int si) : ConnStreamOp(m), src(sr), size(si) {}
 	void run() {
 		LOGST("ConnWrite %i", mac.handle);
-        gConnMutex.lock();
-        {
-            handleResult(CONNOP_WRITE, masc.conn->write(src, size));
-        }
-        gConnMutex.unlock();
+        handleResult(CONNOP_WRITE, masc.conn->write(src, size));
 	}
 private:
 	const void* src;
@@ -206,13 +202,12 @@ public:
 		: ConnStreamOp(m), dst(d), handle(h), offset(o), size(s) {}
 	void run() {
 		LOGST("ConnReadToData %i", mac.handle);
+		int result = masc.conn->read((byte*)dst.ptr() + offset, size);
         gConnMutex.lock();
         {
-            int result = masc.conn->read((byte*)dst.ptr() + offset, size);
-
             DefluxBinPushEvent(handle, dst);
 
-            handleResult(CONNOP_READ, result);
+            handleResult(CONNOP_READ, result, false);
         }
         gConnMutex.unlock();
 
@@ -230,24 +225,24 @@ public:
 		: ConnStreamOp(m), src(sr), handle(h), offset(o), size(si) {}
 	void run() {
 		LOGST("ConnWriteFromData %i", mac.handle);
-        gConnMutex.lock();
-        {
-            int result;
-            if(src.ptrc() != NULL) {
-                result = masc.conn->write((byte*)src.ptrc() + offset, size);
-            } else {
-                Smartie<byte> temp(new byte[size]);
-                if(!src.read(temp(), size)) {
-                    LOG("Stream error in ConnWriteFromData!\n");
-                    result = CONNERR_GENERIC;
-                } else {
-                    result = masc.conn->write(temp(), size);
-                }
-            }
 
+        int result;
+        if(src.ptrc() != NULL) {
+            result = masc.conn->write((byte*)src.ptrc() + offset, size);
+        } else {
+            Smartie<byte> temp(new byte[size]);
+            if(!src.read(temp(), size)) {
+                LOG("Stream error in ConnWriteFromData!\n");
+                result = CONNERR_GENERIC;
+            } else {
+                result = masc.conn->write(temp(), size);
+            }
+        }
+		gConnMutex.lock();
+        {
             DefluxBinPushEvent(handle, src);
 
-            handleResult(CONNOP_WRITE, result);
+            handleResult(CONNOP_WRITE, result, false);
         }
         gConnMutex.unlock();
 
@@ -264,11 +259,7 @@ public:
 	HttpFinish(MAConn& m, HttpConnection& h) : ConnOp(m), http(h) {}
 	void run() {
 		LOGST("HttpFinish %i", mac.handle);
-        gConnMutex.lock();
-        {
-            handleResult(CONNOP_FINISH, http.finish());
-        }
-        gConnMutex.unlock();
+        handleResult(CONNOP_FINISH, http.finish());
 	}
 private:
 	HttpConnection& http;
@@ -280,20 +271,16 @@ public:
 	void run() {
 		LOGST("Accept %i\n", mac.handle);
         BtSppConnection* conn;
-        gConnMutex.lock();
-        {
-            int res = masc.serv->accept(conn);
-            if(res < 0) {
-                handleResult(CONNOP_ACCEPT, res);
 
-                return;
-            }
+		int res = masc.serv->accept(conn);
+		if(res < 0) {
+			handleResult(CONNOP_ACCEPT, res);
+			return;
+        }
             //success. let's store our new connection.
-			MAConn* newMac = new MAStreamConn(gConnNextHandle, conn);
-			gConnections.insert(ConnPair(gConnNextHandle, newMac));
-			handleResult(CONNOP_ACCEPT, gConnNextHandle++);
-		}
-		gConnMutex.unlock();
+		MAConn* newMac = new MAStreamConn(gConnNextHandle, conn);
+		gConnections.insert(ConnPair(gConnNextHandle, newMac));
+		handleResult(CONNOP_ACCEPT, gConnNextHandle++);
 	}
 private:
 	MAServerConn& masc;

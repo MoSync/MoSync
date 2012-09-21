@@ -168,7 +168,7 @@ static void Callback::lsReadMem() {
 		level++;
 	} while(true);
 	if(level != sFrames.size()) {
-		LOG("Warning: stack broken at level %i (%"PFZT")\n", level, sFrames.size());
+		LOG("Warning: stack broken at level %i (%" PFZT ")\n", level, sFrames.size());
 	}
 	sLsCallback();
 }
@@ -379,7 +379,7 @@ void Callback::sll() {
 // select-frame
 //******************************************************************************
 void stack_select_frame(const string& args) {
-	if(sscanf(args.c_str(), "%"PFZT"", &sFrameRequest) != 1) {
+	if(sscanf(args.c_str(), "%" PFZT "", &sFrameRequest) != 1) {
 		error("Not enough arg");
 		return;
 	}
@@ -415,7 +415,7 @@ void Callback::sif() {
 		pc = sFrames[sCurrentFrameIndex].pc;
 	}
 	oprintDone();
-	oprintf(",frame={level=\"%"PFZT"\",", sCurrentFrameIndex);
+	oprintf(",frame={level=\"%" PFZT "\",", sCurrentFrameIndex);
 	oprintFrame(pc);
 	oprintf("\n");
 	commandComplete();
@@ -518,7 +518,7 @@ static void Callback::print_type(const Value* value, const char *err) {
 	if(err) {
 		error("%s", err);
 		return;
-	} 
+	}
 
 	string type = getType(typeBase->resolve(), sComplex);
 	print_type_from_type(type);

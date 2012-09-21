@@ -248,6 +248,9 @@ CONSTRUCTOR_ARGUMENTS(INIT_ARG_VAR, COMMA),
 #ifdef TELEPHONY
 gTelephony(NULL),
 #endif
+#ifdef SUPPORT_MOSYNC_SERVER
+gNetworkRegistrationPckg(gNetworkRegistration),
+#endif
 gBtDeviceArray(8, 0),
 resourcesCount(-1),
 resource(NULL)
@@ -507,6 +510,11 @@ void Syscall::platformDestruct() {
 	SAFE_DELETE(gVibraControl);
 
 	gFileLists.close();
+
+#ifdef SUPPORT_MOSYNC_SERVER
+	LOG("gServer.Close();\n");
+	gServer.Close();
+#endif
 
 	DebugMarkEnd();
 	LOG("platformDestruct() done\n");
@@ -1633,6 +1641,32 @@ SYSCALL(longlong, maIOCtl(int function, int a, int b, int c)) {
 
 	maIOCtl_syscall_case(maTextBox);
 
+#ifdef SUPPORT_MOSYNC_SERVER
+	case maIOCtl_maAutostartOn:
+		return gServer.AutostartOn();
+	case maIOCtl_maAutostartOff:
+		return gServer.AutostartOff();
+#endif
+
+	case maIOCtl_maHomeScreenEventsOn:
+		gAppView.HomeScreenEventsOn();
+		return 1;
+	case maIOCtl_maHomeScreenEventsOff:
+		gAppView.HomeScreenEventsOff();
+		return 1;
+
+	maIOCtl_syscall_case(maIapSave);
+	maIOCtl_syscall_case(maIapReset);
+	maIOCtl_syscall_case(maIapShutdown);
+
+#ifdef __SERIES60_3X__
+#ifdef SUPPORT_MOSYNC_SERVER
+	maIOCtl_syscall_case(maNetworkStatus);
+#endif
+	maIOCtl_syscall_case(maIapSetMethod);
+	maIOCtl_syscall_case(maIapSetFilter);
+#endif	//__SERIES60_3X__
+
 	default:
 		return IOCTL_UNAVAILABLE;
 	}
@@ -1641,7 +1675,6 @@ SYSCALL(longlong, maIOCtl(int function, int a, int b, int c)) {
 #ifdef CALL
 int Syscall::platformTel(const char* tel) {
 	TPtrC8 np(CBP tel);
-
 	LOG("platformTel \"%s\"\n", tel);
 
 	if(gCallSync->Status()->Int() == KRequestPending ||

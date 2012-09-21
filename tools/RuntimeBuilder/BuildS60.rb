@@ -138,6 +138,7 @@ class RuntimeBuilder
 			FileUtils.copy_file(exe_file, "#{runtime_dir}MoSync#{debug}.exe")
 			FileUtils.copy_file("#{sis_dir}MoSync-template.pkg", "#{runtime_dir}MoSync-template.pkg")
 
+			FileUtils.copy_file("#{$SETTINGS[:symbian_source]}/server/MoSyncServer_Express_Signed.sis", "#{runtime_dir}MoSyncServer.sis")
 			puts "\nFINISHED! - #{runtime_dir}MoSync#{debug}.exe, and other runtime files was succesfully generated!\n\n"
 			return 0
 		else
