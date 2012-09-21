@@ -228,13 +228,17 @@ namespace Notification
      * See PushNotificationType for valid bit-mask values.
      * This param is applied only on iOS platform. Android platform will
      * ignore this value.
-     * @param accountID Is the ID of the account authorized to send messages
-     * to the application, typically the email address of an account set up
-     * by the application's developer.
+     * @param senderId Your projectId obtained from here:
+     * http://developer.android.com/guide/google/gcm/gs.html#create-proj
+     * For old applications, this param was set as the ID of the account
+     * authorized to send messages to the application, typically the email
+     * address of an account set up by the application's developer.
+     * Even though setting the senderId as the accountID was deprecated, old
+     * Android applications still support it.
      * On iOS platform this param is ignored.
      *
      * Example: Notification::getInstance->registerPushNotification(
-     *  PUSH_NOTIFICATION_TYPE_BADGE | PUSH_NOTIFICATION_TYPE_ALERT, "");
+     *  PUSH_NOTIFICATION_TYPE_BADGE | PUSH_NOTIFICATION_TYPE_ALERT, "yoursenderId_here");
      *
      *  @return One of the next result codes:
      *  - #MA_NOTIFICATION_RES_OK if no error occurred.
@@ -245,9 +249,9 @@ namespace Notification
      */
     int NotificationManager::registerPushNotification(
         const int types,
-        const MAUtil::String& accountID)
+        const MAUtil::String& senderId)
     {
-        return maNotificationPushRegister(types, accountID.c_str());
+        return maNotificationPushRegister(types, senderId.c_str());
     }
 
     /**

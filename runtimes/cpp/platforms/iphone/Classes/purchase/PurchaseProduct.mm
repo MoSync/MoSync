@@ -112,6 +112,7 @@ NSString* const kReceiptDateMsKey = @"original_purchase_date_ms";
 @implementation PurchaseProduct
 
 @synthesize handle = _handle;
+@synthesize isPurchased = _isPurchased;
 
 /**
  * Create a product product using a handle and an id.
@@ -129,6 +130,7 @@ NSString* const kReceiptDateMsKey = @"original_purchase_date_ms";
         _restoredPayment = nil;
         _handle = productHandle;
         _productID = [productID retain];
+        _isPurchased = NO;
         NSSet* productSet = [NSSet setWithObject:_productID];
         _productRequest = [[SKProductsRequest alloc] initWithProductIdentifiers:productSet];
         _productRequest.delegate = self;
@@ -158,7 +160,7 @@ NSString* const kReceiptDateMsKey = @"original_purchase_date_ms";
         _productID = [_restoredPayment.productIdentifier retain];
         _transaction = [transaction retain];
         _product = nil;
-
+        _isPurchased = YES;
         [self createParserComponents];
     }
 
@@ -458,6 +460,7 @@ NSString* const kReceiptDateMsKey = @"original_purchase_date_ms";
 -(void) handleTransactionStatePurchased:(SKPaymentTransaction*) transaction
 {
     _transaction = [transaction retain];
+    _isPurchased = YES;
     [self sendPurchaseEvent:MA_PURCHASE_EVENT_REQUEST
                       state:MA_PURCHASE_STATE_COMPLETED
                   errorCode:0];

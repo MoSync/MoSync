@@ -40,7 +40,7 @@ public class PushRegistrationData {
 	public static final String REG_ERR_MESSAGE_INVALID_SENDER = "The sender account is not recognized.";
 
 	public static final String REG_ERR_MESSAGE_PHONE_ERROR = "Incorrect phone registration with Google." +
-			"This phone doesn't currently support C2DM.";
+			"This phone doesn't currently support GCM/C2DM.";
 
 	/**
 	 * Constructor.
@@ -59,12 +59,12 @@ public class PushRegistrationData {
 	public Boolean registrationInProgress = false;
 
 	/**
-	 * True if the application is already registered to the C2DM service.
+	 * True if the application is already registered to the GCM/C2DM service.
 	 */
 	public Boolean registrationSuccess = false;
 
 	/**
-	 * The registration ID received from the C2DM server.
+	 * The registration ID received from the GCM/C2DM server.
 	 */
 	public String registrationID = null;
 

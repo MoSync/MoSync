@@ -139,7 +139,6 @@ void SettingsScreen::connectionFailed()
  */
 void SettingsScreen::createMainLayout()
 {
-
 	VerticalLayout* mainLayout = new VerticalLayout();
 	Screen::setMainWidget(mainLayout);
 
@@ -152,7 +151,7 @@ void SettingsScreen::createMainLayout()
 
 	// Add IP label and edit box
 	mIPEditBox = new EditBox();
-	mIPEditBox->setInputMode(EDIT_BOX_INPUT_MODE_NUMERIC);
+//	mIPEditBox->setInputMode(EDIT_BOX_INPUT_MODE_NUMERIC);
 	listView->addChild(this->createListViewItem(IP_LABEL_TEXT, mIPEditBox));
 
 	// Add port label and edit box
@@ -173,6 +172,8 @@ void SettingsScreen::createMainLayout()
 		mContentTitle = new EditBox();
 		mContentTitle->setText(TITLE_DEFAULT);
 		listView->addChild(createListViewItem(TITLE_LABEL, mContentTitle));
+		mPortEditBox->setText("8080");
+		mPortEditBox->setEnabled(false);
 	}
 
 	// Android: If the registrationID was already saved from previous launches,

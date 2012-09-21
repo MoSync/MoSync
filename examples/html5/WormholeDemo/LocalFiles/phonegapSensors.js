@@ -138,3 +138,34 @@ function updateCompass(result) {
 function errorCompass(error) {
 	document.getElementById('CompassHeading').innerHTML = "n/a";
 }
+
+function stopAllPhonegapSensors()
+{
+	if (accelPhonegapWatch !== null) {
+		navigator.accelerometer.clearWatch(accelPhonegapWatch);
+		updateAccelPhonegap({
+			x : "&nbsp;",
+			y : "&nbsp;",
+			z : "&nbsp;"
+		});
+		accelPhonegapWatch = null;
+	}
+
+	if (geolocationWatch !== null) {
+		navigator.geolocation.clearWatch(geolocationWatch);
+		updateGeolocation({ coords: {
+			latitude : "&nbsp;",
+			longitude : "&nbsp;",
+			altitude : "&nbsp;"
+		}});
+		geolocationWatch = null;
+	}
+
+	if (compassWatch !== null) {
+		navigator.compass.clearWatch(compassWatch);
+		updateCompass({
+			magneticHeading : "&nbsp;"
+		});
+		compassWatch = null;
+	}
+}

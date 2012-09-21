@@ -57,6 +57,7 @@ namespace OrientationTest
 		mLabel->setWidth(LABEL_WIDTH);
 		mLabel->setHeight(LABEL_HEIGHT);
 		mLabel->setBackgroundColor(LABEL_BG_COLOR);
+		mLabel->setText("test");
 		mMainLayout->addChild(mLabel);
 
 		MAUtil::Environment::getEnvironment().addPointerListener(this);
