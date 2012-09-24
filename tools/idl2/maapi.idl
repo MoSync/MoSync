@@ -5031,7 +5031,7 @@ group WidgetAPI "Widget API" {
 		EDIT_BOX = "EditBox";
 
 		/**
-		* @brief A list view is a vertical list of widgets that is also scrollable.
+		* @brief A list view is a vertical list of widgets that is also scrollable. See \ref WidgetListViewProperties "List view properties" for the properties available.
 		*/
 		LIST_VIEW = "ListView";
 
@@ -6397,6 +6397,29 @@ group WidgetAPI "Widget API" {
 		FONT_HANDLE = "fontHandle";
 	}
 	} // end of WidgetListViewItemProperties
+
+	/**
+	* The available widget properties for a #MAW_LIST_VIEW. See \ref WidgetProperties "Widget properties" for more properties.
+	*/
+	group WidgetListViewProperties "List view properties" {
+	constset MAString MAW_LIST_VIEW_ {
+		/**
+		* @brief Enforces the focus on the list. Generally needed when for some reason the list looses it's focus.
+		*
+		* @validvalue None needed.
+		*
+		* Platform: Android.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(listViewHandle, MAW_LIST_VIEW_REQUEST_FOCUS, "");
+		* \endcode
+		*/
+		REQUEST_FOCUS = "requestFocus";
+	}
+	} // end of WidgetListViewProperties
 
 	/**
 	* The available widget properties for a #MAW_CHECK_BOX. See \ref WidgetProperties "Widget properties" for more properties.
