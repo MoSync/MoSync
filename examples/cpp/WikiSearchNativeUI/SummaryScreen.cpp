@@ -127,6 +127,9 @@ void SummaryScreen::showScreen(bool needsRefresh) {
 
 	// Display the current screen.
 	BasicScreen::showScreen();
+
+	// Enforce the focus on the list.
+	maWidgetSetProperty(mListView, MAW_LIST_VIEW_REQUEST_FOCUS,"");
 }
 
 /**
