@@ -16,7 +16,7 @@ MA 02110-1301, USA.
 */
 /**
  * @file MoSyncListViewItem.cs
- * @author Rata Gabriela
+ * @author Rata Gabriela and Spiridon Alexandru
  *
  * @brief This represents the ListView implementation for the NativeUI
  *        component on Windows Phone 7, language C#
