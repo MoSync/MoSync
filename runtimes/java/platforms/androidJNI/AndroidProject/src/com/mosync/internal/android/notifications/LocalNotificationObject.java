@@ -337,7 +337,7 @@ public class LocalNotificationObject {
 		}
 		else if( name.equals(MA_NOTIFICATION_LOCAL_FIRE_DATE) )
 		{
-			return Long.toString(mFireDate);
+			return Long.toString(mFireDate/(long)1000);
 		}
 		else if( name.equals(MA_NOTIFICATION_LOCAL_PLAY_SOUND) )
 		{
