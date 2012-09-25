@@ -393,9 +393,9 @@
  */
 - (void)layout
 {
+    INNativeUILog;
     CGSize previousSize = self.size;
     [self layoutSubviews:_view];
-    CGSize currentSize = self.size;
 
     CGSize sizeThatFits = [self sizeThatFitsForWidget];
     float width = self.width;
@@ -409,6 +409,7 @@
         height = sizeThatFits.height;
     }
     self.size = CGSizeMake(width, height);
+    CGSize currentSize = self.size;
     if (CGSizeEqualToSize(previousSize, currentSize))
     {
         return;
@@ -569,7 +570,7 @@
 - (void)dealloc
 {
     // Destroy its children.
-    for (IWidget* child in _children)
+    for (IWidget* child in [[_children copy] autorelease])
     {
         maWidgetDestroy(child.handle);
     }
