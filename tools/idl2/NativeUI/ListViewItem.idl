@@ -272,7 +272,7 @@ group WidgetListViewItem "List View Item" {
 			/**
 			* @brief Check if the item is selected.
 			*
-			* Platform: iOS.
+			* Platform: iOS and Android.
 			*
 			* @validvalue "true" if the item is selected, "false" otherwise.
 			*

@@ -40,10 +40,6 @@ import com.mosync.nativeui.util.properties.IntConverter;
 import com.mosync.nativeui.util.properties.InvalidPropertyValueException;
 import com.mosync.nativeui.util.properties.PropertyConversionException;
 
-import static com.mosync.internal.generated.IX_WIDGET.MAW_LIST_VIEW_TYPE_DEFAULT;
-import static com.mosync.internal.generated.IX_WIDGET.MAW_LIST_VIEW_TYPE_ALPHABETICAL;
-import static com.mosync.internal.generated.IX_WIDGET.MAW_LIST_VIEW_TYPE_SEGMENTED;
-
 /**
  * This class wraps a list that displays a list of views.
  * The intention of this class is display views that all
@@ -99,6 +95,10 @@ public class ListLayout extends Layout
 	 * Widget handle, used for posting item clicked events.
 	 */
 	private int mWidgetHandle;
+	/**
+	 * Widget handle of the selected item.
+	 */
+	private int mSelectedItemHandle;
 
 	/**
 	 * Constructor.
@@ -111,6 +111,8 @@ public class ListLayout extends Layout
 		super( handle, listView );
 		listView.setAdapter( m_viewAdapter );
 		mWidgetHandle = handle;
+		listView.setOnItemClickListener(
+				new ListOnItemClickListener( handle ) );
 		//listView.setFocusable(true);
 	}
 
@@ -353,6 +355,44 @@ public class ListLayout extends Layout
 	}
 
 	/**
+	 * Get the handle of the  last item that was selected in the list.
+	 * @return The selected item widget handle.
+	 */
+	public int getSelectedItem()
+	{
+		return mSelectedItemHandle;
+	}
+
+	/**
+	 * Class responsible for sending a mosync event when an item
+	 * in the default list view has been clicked.
+	 *
+	 * @author fmattias
+	 */
+	public class ListOnItemClickListener implements OnItemClickListener
+	{
+		private int m_handle = -1;
+
+		public ListOnItemClickListener(int handle)
+		{
+			m_handle = handle;
+		}
+
+		/**
+		 * @see OnItemClickListener.onItemClick.
+		 */
+		@Override
+		public void onItemClick(AdapterView<?> parent, View view, int position, long id)
+		{
+			// Store the last selected item.
+			mSelectedItemHandle = m_children.get(position).getHandle();
+			//mSelectedItem = (ListItemWidget) m_viewAdapter.getView(position, null, null);
+			// Assume that the view's id is always the same as the handle.
+			EventQueue.getDefault( ).postWidgetItemClickedEvent( m_handle, position );
+		}
+	}
+
+	/**
 	 * Class responsible for sending a mosync event when an item
 	 * in the sectioned list has been clicked.
 	 *
@@ -387,15 +427,18 @@ public class ListLayout extends Layout
 				sectionIndex = i;
 				if ( browseIndex > position )
 				{
+					// Store the selected state of the item.
+					mSelectedItemHandle = section.getItem(position-sectionPosition).getHandle();
+
 					// The index ignores the header.
 					EventQueue.getDefault().
-							postSegmentedListItemClicked(m_handle, sectionIndex, position-sectionPosition-1);
+							postSegmentedListItemClicked(m_handle, sectionIndex, position-sectionPosition);
 					return;
 				}
 				sectionPosition += section.itemsCount();
 			}
 			EventQueue.getDefault().
-					postSegmentedListItemClicked(m_handle, sectionIndex, position-sectionPosition-1);
+					postSegmentedListItemClicked(m_handle, sectionIndex, position-sectionPosition);
 		}
 	}
 

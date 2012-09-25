@@ -242,7 +242,7 @@ namespace NativeUI
 
 	/**
 	 * Check if the item is selected.
-	 * Platform: iOS.
+	 * Platform: iOS and Android.
 	 * @return True if selected, false otherwise.
 	 */
 	bool ListViewItem::isSelected()

@@ -18,7 +18,6 @@ MA 02110-1301, USA.
 package com.mosync.nativeui.ui.widgets;
 
 import android.graphics.Typeface;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -128,10 +127,23 @@ public class ListItemWidget extends Layout
 		{
 			return m_label.getText().toString();
 		}
-		else
+		else if( property.equals(IX_WIDGET.MAW_LIST_VIEW_ITEM_IS_SELECTED) )
 		{
-			return super.getProperty( property );
+			if ( getParent() instanceof ListViewSection )
+			{
+				// Get the parent section of this item.
+				ListViewSection section = (ListViewSection) getParent();
+				// Get the parent list of the section.
+				ListLayout list = (ListLayout) section.getParent();
+				return String.valueOf ( getHandle() == list.getSelectedItem() );
+			}
+			else if ( getParent() instanceof ListLayout )
+			{
+				ListLayout list = (ListLayout) getParent();
+				return String.valueOf( getHandle() == list.getSelectedItem() );
+			}
 		}
+		return super.getProperty( property );
 	}
 
 	public ViewGroup.LayoutParams createNativeLayoutParams(LayoutParams mosyncLayoutParams)
@@ -182,4 +194,5 @@ public class ListItemWidget extends Layout
 	{
 		m_label.setGravity( HorizontalAlignment.convert( alignment ) );
 	}
+
 }
