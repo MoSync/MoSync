@@ -74,6 +74,17 @@ namespace NativeUI
 		return this->getListViewStyleEnum(style);
 	}
 
+	/**
+	 * Sets the list view style.
+	 * This property should be set before the list contains any children.
+	 * @param newStyle The new style to be set.
+	 */
+	void ListView::setStyle(ListViewStyle newStyle)
+	{
+		int style = this->getListViewStyleFromEnum(newStyle);
+		this->setPropertyInt(MAW_LIST_VIEW_STYLE, style);
+	}
+
 	 /**
 	  * Set the list view mode.
 	  * Platform: iOS.

@@ -101,6 +101,7 @@ group WidgetListView "List View" {
 
 			/**
 			* @brief Set or get the list style.
+			* This property should be set before the list contains any children.
 			* Platform: Windows Phone 7.
 			*
 			* @validvalue One of the \link #MAW_LIST_VIEW_STYLE MAW_LIST_VIEW_STYLE \endlink constants.

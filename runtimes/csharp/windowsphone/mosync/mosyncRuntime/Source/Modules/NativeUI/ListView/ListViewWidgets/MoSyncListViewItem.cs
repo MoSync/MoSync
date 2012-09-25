@@ -76,7 +76,10 @@ namespace MoSync
             /**
              * Contains the data model for a list item when the list is Alphabetical or Segmented.
              */
-            private ListItem mListItem = null;
+            protected ListItem mListItem = null;
+
+            // contains the subtitle text
+            protected string mSubtitle;
 
             /**
             * Constructor
@@ -220,6 +223,23 @@ namespace MoSync
                     return mListItem.Title;
 				}
 			}
+
+            /**
+             * Implementation of the "Text" property.
+             * Sets the text that will appear on the list view item
+             */
+            [MoSyncWidgetProperty(MoSync.Constants.MAW_LIST_VIEW_ITEM_SUBTITLE)]
+            public String Subtitle
+            {
+                set
+                {
+                    mSubtitle = value;
+                }
+                get
+                {
+                    return mSubtitle;
+                }
+            }
 
             /**
              * Implementation of the "IsSelected" property.

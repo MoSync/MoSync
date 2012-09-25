@@ -131,6 +131,13 @@ namespace NativeUI
 		ListViewStyle getStyle();
 
 		/**
+		 * Sets the list view style.
+		 * This property should be set before the list contains any children.
+		 * @param newStyle The new style to be set.
+		 */
+		void setStyle(ListViewStyle newStyle);
+
+		/**
 		 * Set the list view mode.
 		 * Platform: iOS.
 		 * @param listMode List mode to set.

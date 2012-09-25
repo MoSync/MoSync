@@ -49,7 +49,10 @@ namespace MoSync
             #region Private members
 
             // the corresponding list section
-            ListSection<ListItem> mSection;
+            private ListSection<ListItem> mSection;
+
+            // the current list view style
+            ListView.ListViewStyle mListViewStyle = MoSync.Constants.MAW_LIST_VIEW_STYLE_SUBTITLE;
 
             #endregion
 
@@ -96,11 +99,10 @@ namespace MoSync
                     {
                         ListViewItem widget = (child as ListViewItem);
                         ListItem newItem = new ListItem();
+                        newItem.ListStyle = mListViewStyle;
                         newItem.Title = widget.Text;
                         newItem.ImageSource = widget.IconImageSource;
-                        // TODO SA: add subtitle property
-                        newItem.Subtitle = "subtitle";
-                        newItem.SubtitleVisibility = Visibility.Visible;
+                        newItem.Subtitle = widget.Subtitle;
                         newItem.BackgroundColor = new SolidColorBrush(Colors.Black);
                         newItem.GroupBy = this.Title;
                         newItem.Height = widget.Height;
@@ -134,8 +136,7 @@ namespace MoSync
                         ListItem newItem = new ListItem();
                         newItem.Title = widget.Text;
                         newItem.ImageSource = widget.IconImageSource;
-                        // TODO SA: add subtitle property
-                        newItem.Subtitle = "subtitle";
+                        newItem.Subtitle = widget.Subtitle;
                         newItem.SubtitleVisibility = Visibility.Visible;
                         newItem.BackgroundColor = new SolidColorBrush(Colors.Black);
                         newItem.GroupBy = this.Title;
@@ -210,6 +211,21 @@ namespace MoSync
                 get
                 {
                     return mSection;
+                }
+            }
+
+            /**
+             * A getter/setter for the list view style.
+             */
+            public ListView.ListViewStyle ListStyle
+            {
+                get
+                {
+                    return mListViewStyle;
+                }
+                set
+                {
+                    mListViewStyle = value;
                 }
             }
 

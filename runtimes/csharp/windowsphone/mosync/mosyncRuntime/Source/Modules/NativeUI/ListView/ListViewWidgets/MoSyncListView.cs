@@ -58,7 +58,7 @@ namespace MoSync
             /**
              * The available list view styles.
              */
-            protected enum ListViewStyle
+            public enum ListViewStyle
             {
                 Subtitle,
                 NoSubtitle
@@ -375,9 +375,11 @@ namespace MoSync
                     {
                         case MoSync.Constants.MAW_LIST_VIEW_STYLE_SUBTITLE:
                             mListViewStyle = ListViewStyle.Subtitle;
+                            SetListStyle(ListViewStyle.Subtitle);
                             break;
                         case MoSync.Constants.MAW_LIST_VIEW_STYLE_NO_SUBTITLE:
                             mListViewStyle = ListViewStyle.NoSubtitle;
+                            SetListStyle(ListViewStyle.NoSubtitle);
                             break;
                         default:
                             throw new InvalidPropertyValueException();
@@ -528,6 +530,7 @@ namespace MoSync
                 base.AddChild(section);
                 MoSync.Util.RunActionOnMainThreadSync(() =>
                 {
+                    section.ListStyle = mListViewStyle;
                     mListSections.Add(section.SectionData);
                     section.SectionIndex = mListSections.Count - 1;
                 });
@@ -560,6 +563,7 @@ namespace MoSync
                 base.AddChild(section);
                 MoSync.Util.RunActionOnMainThreadSync(() =>
                 {
+                    section.ListStyle = mListViewStyle;
                     mListSections.Insert(index, section.SectionData);
                 });
             }
@@ -684,6 +688,36 @@ namespace MoSync
                     if (foundItem)
                     {
                         break;
+                    }
+                }
+            }
+
+            private void SetListStyle(ListViewStyle style)
+            {
+                mListViewStyle = style;
+                // set the style on all the model list items
+                foreach (ListSection<ListItem> section in mListSections)
+                {
+                    foreach (ListItem item in section)
+                    {
+                        item.ListStyle = mListViewStyle;
+                    }
+                }
+                // set the style on all the widget children
+                foreach (IWidget widget in mChildren)
+                {
+                    if (widget is ListViewSection)
+                    {
+                        ListViewSection section = widget as ListViewSection;
+                        for (int i = 0; i < section.ChildrenCount; i++)
+                        {
+                            IWidget child = section.GetChild(i);
+                            if (child is ListViewItem)
+                            {
+                                ListViewItem listItem = child as ListViewItem;
+                                listItem.ListItemData.ListStyle = mListViewStyle;
+                            }
+                        }
                     }
                 }
             }

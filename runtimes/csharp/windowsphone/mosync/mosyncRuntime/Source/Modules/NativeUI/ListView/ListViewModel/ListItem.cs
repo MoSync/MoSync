@@ -60,6 +60,9 @@ namespace MoSync
             private double mHeight;
             private double mWidth;
 
+            // the current list view style
+            private ListView.ListViewStyle mListStyle = MoSync.Constants.MAW_LIST_VIEW_STYLE_SUBTITLE;
+
             #endregion
 
             #region Constructors
@@ -124,6 +127,29 @@ namespace MoSync
                 {
                     mSubtitle = value;
                     OnPropertyChanged("Subtitle");
+                }
+            }
+
+            /**
+             * A getter/setter for the list view style.
+             */
+            public ListView.ListViewStyle ListStyle
+            {
+                get
+                {
+                    return mListStyle;
+                }
+                set
+                {
+                    mListStyle = value;
+                    if (mListStyle == ListView.ListViewStyle.Subtitle)
+                    {
+                        this.SubtitleVisibility = Visibility.Visible;
+                    }
+                    else
+                    {
+                        this.SubtitleVisibility = Visibility.Collapsed;
+                    }
                 }
             }
 
