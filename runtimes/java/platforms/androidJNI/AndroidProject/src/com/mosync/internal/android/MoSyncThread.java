@@ -4460,7 +4460,8 @@ public class MoSyncThread extends Thread
 	 */
 	public void acquireHardware()
 	{
-		if (mMoSyncCameraController != null) {
+		if (mMoSyncCameraController != null)
+		{
 			mMoSyncCameraController.acquireCamera();
 		}
 	}

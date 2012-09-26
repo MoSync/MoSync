@@ -833,6 +833,7 @@ public class MoSyncCapture
 	 */
 	public static void handleCaptureCanceled()
 	{
+
 		// Clear out the image uri.
 		sImageUri = null;
 

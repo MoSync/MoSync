@@ -265,6 +265,9 @@ public class MoSyncCameraController {
 	 */
 	public void setPreview(MoSyncCameraPreview preview)
 	{
+
+		acquireCamera();
+
 		mPreview = preview;
 		if(mPreview.mCamera == null)
 		{
@@ -376,6 +379,8 @@ public class MoSyncCameraController {
 	 */
 	public int cameraStart()
 	{
+		acquireCamera();
+
 		try
 		{
 			if(mPreview.mCamera == null)
@@ -622,14 +627,27 @@ public class MoSyncCameraController {
 	 */
 	public void acquireCamera()
 	{
-		if(mCamera == null && mPreview != null)
+		if(mCamera == null)// && mPreview != null)
 		{
-			mCamera = Camera.open();
-			if(mPreview != null)
+			try
 			{
-				mPreview.mCamera = mCamera;
+				mCamera = Camera.open();
+				//mPreview.mCamera = mCamera;
 			}
+			catch (RuntimeException re)
+			{
+				SYSLOG("Exception while aquiring camera: " + re.toString());
+				mCamera = null;
+				mPreview = null;
+				return;
+			}
+
+			SYSLOG("Camera was aquired");
+			return;
 		}
+
+		SYSLOG("Camera already aquired");
+		return;
 	}
 
 	/**
@@ -653,6 +671,8 @@ public class MoSyncCameraController {
 
 	public int getPreviewSize()
 	{
+		acquireCamera();
+
 		Camera.Parameters parameters = getCurrentParameters();
 		Camera.Size size = parameters.getPreviewSize();
 
@@ -897,6 +917,9 @@ public class MoSyncCameraController {
 			int width,
 			int height)
 	{
+		if(mPreview == null && mCamera == null)
+			return MAAPI_consts.MA_CAMERA_RES_FAILED;
+
 		if(mMoSyncPreviewEventEnabled)
 			return MAAPI_consts.MA_CAMERA_RES_EVENTS_ALREADY_ENABLED;
 
@@ -924,6 +947,12 @@ public class MoSyncCameraController {
 		// ins't too big!
 		//Camera.Parameters camParam = mCamera.getParameters();
 		Camera.Size previewSize = mPreview.mPreviewSize;
+
+		if(previewSize == null)
+		{
+			SYSLOG("Preview size is null");
+			return MAAPI_consts.MA_CAMERA_RES_FAILED;
+		}
 
 		int w = previewSize.width;
 		int h = previewSize.height;
