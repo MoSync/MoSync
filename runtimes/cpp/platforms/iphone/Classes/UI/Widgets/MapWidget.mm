@@ -20,8 +20,14 @@
 #include <helpers/cpp_defs.h>
 #include <helpers/CPP_IX_WIDGET.h>
 
-#define MERCATOR_OFFSET 268435456
-#define MERCATOR_RADIUS 85445659.44705395
+// Because the MKMapView doesn't contain a zoom level property, I used some
+// help to scale the map based on the zoom level integer.
+// A detailed explanation about the math/logig of setting the zoom level
+// for the MKMapView can be found here:
+// http://troybrant.net/blog/2010/01/set-the-zoom-level-of-an-mkmapview/
+// http://troybrant.net/blog/2010/01/mkmapview-and-zoom-levels-a-visual-guide/
+#define MERCATOR_OFFSET 268435456 /* (total pixels at zoom level 20) / 2 */
+#define MERCATOR_RADIUS 85445659.44705395 /* MERCATOR_OFFSET / pi */
 
 @interface MapWidget()
 
@@ -68,7 +74,9 @@
         [child setParent:self];
         [children addObject:child];
         MapPinWidget *currentMapPin = (MapPinWidget*)child;
-        [((MKMapView*)view) addAnnotation:[currentMapPin getAnnotation]];
+        MapAnnotation *currentAnnotation = [currentMapPin getAnnotation];
+
+        [((MKMapView*)view) addAnnotation:currentAnnotation];
     }
 }
 
@@ -154,6 +162,7 @@
 	{
 		if ([value isEqualToString:@"true"])
 		{
+            mapView.centerCoordinate = centerCoordinates;
 			[self setCenterCoordinate:centerCoordinates zoomLevel:centerZoomLevel animated:YES];
 		}
 	}
@@ -295,6 +304,38 @@
 	// TODO: send visible region changed event
 }
 
+- (MKAnnotationView *)mapView:(MKMapView *)mapView viewForAnnotation:(id<MKAnnotation>)annotation
+{
+    // If annotation is of user's location, return nil to use default view.
+    if ([annotation isKindOfClass:[MKUserLocation class]])
+    {
+        return nil;
+    }
+
+    // Try to dequeue an existing pin.
+    static NSString *viewIdentifier = @"mapAnnotation";
+    MKPinAnnotationView *pinAnnotationView = (MKPinAnnotationView *)[mapView dequeueReusableAnnotationViewWithIdentifier:viewIdentifier];
+
+    if (!pinAnnotationView)
+    {
+        pinAnnotationView = [[MKPinAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:viewIdentifier];
+    }
+    else
+    {
+        pinAnnotationView.annotation = annotation;
+    }
+    pinAnnotationView.pinColor = MKPinAnnotationColorRed; // PURPLE!
+
+    // enable the pin to show the title on click
+    [pinAnnotationView setCanShowCallout:YES];
+    return [pinAnnotationView autorelease];
+}
+
+
+// A detailed explanation about the math/logig of setting the zoom level
+// for the MKMapView can be found here:
+// http://troybrant.net/blog/2010/01/set-the-zoom-level-of-an-mkmapview/
+// http://troybrant.net/blog/2010/01/mkmapview-and-zoom-levels-a-visual-guide/
 #pragma mark -
 #pragma mark Map conversion methods
 
@@ -363,14 +404,13 @@
 {
 	MKMapView* mapView = (MKMapView*) view;
 
-    // clamp large numbers to 28
 	if (zoomLevel < 1)
 	{
 		zoomLevel = 1;
 	}
-	else if (zoomLevel > 21)
+	else if (zoomLevel > 20)
 	{
-		zoomLevel = 21;
+		zoomLevel = 20;
 	}
 
     // use the zoom level to compute the region

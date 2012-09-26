@@ -27,7 +27,7 @@
 #include <NativeUI/MapLocation.h>
 #include <mastdlib.h>
 
-#define HORIZONTAL_LAYOUT_HEIGHT 80
+#define HORIZONTAL_LAYOUT_HEIGHT 40
 
 /**
  * Constructor.
@@ -214,20 +214,23 @@ void MainScreen::buttonClicked(Widget* button)
 	else if (button == mSetZoomLevel)
 	{
 		mMap->setZoomLevel(MAUtil::stringToInteger(mZoomLevelEditBox->getText()));
+		mZoomLevelEditBox->hideKeyboard();
 	}
 	else if (button == mAddPinToMap)
 	{
-		// then, we add 5 new pins
-		for (int i = 0; i < 5; i++)
+		for (int i = 0; i < 20; i++)
 		{
 			// generate random values for the coordinates
-			// latitude is between 0 an 90
-			double latitude = (double)(rand() % 90);
-			// longitude is between -180 and 180
-			double longitude = (double)(rand() & 180);
-			int sign = rand()%2;
-			if (sign == 0)
+			// get a random latitude and longitude
+			double latitude = (double)(rand() % 80);
+			double longitude = (double)(rand() & 170);
+			int longSign = rand()%2;
+			if (longSign == 0)
 				longitude *= (-1);
+
+			int latSign = rand()%2;
+			if (latSign == 0)
+				latitude *= (-1);
 
 			MapPin *newPin = new MapPin(Location(latitude, longitude));
 			newPin->setText("test title");
