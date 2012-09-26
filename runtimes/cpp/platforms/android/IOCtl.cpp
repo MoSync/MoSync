@@ -1736,6 +1736,93 @@ namespace Base
 		return result;
 	}
 
+	int _maCameraPreviewSize(JNIEnv* jNIEnv, jobject jThis)
+	{
+		// Get the Java method
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls,
+					"maCameraPreviewSize", "()I");
+		if (methodID == 0)
+		{
+			return -1;
+		}
+
+		// Call the java method
+		int result = jNIEnv->CallIntMethod(jThis, methodID);
+
+		// Delete allocated memory
+		jNIEnv->DeleteLocalRef(cls);
+
+		return result;
+	}
+
+	int _maCameraPreviewEventEnable(int memStart,
+									int previewEventType,
+									int previewBuffer,
+									MARect* previewArea,
+									JNIEnv* jNIEnv, jobject jThis)
+	{
+		// Get the Java method
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls,
+					"maCameraPreviewEventEnable", "(IIIIII)I");
+		if (methodID == 0)
+		{
+			return -1;
+		}
+
+		// Call the java method
+		int result = jNIEnv->CallIntMethod(jThis, methodID,
+					previewEventType, previewBuffer - memStart,
+					previewArea->left, previewArea->top,
+					previewArea->width, previewArea->height);
+
+		// Delete allocated memory
+		jNIEnv->DeleteLocalRef(cls);
+
+		return result;
+	}
+
+	int _maCameraPreviewEventDisable(JNIEnv* jNIEnv, jobject jThis)
+	{
+		// Get the Java method
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls,
+					"maCameraPreviewEventDisable", "()I");
+		if (methodID == 0)
+		{
+			return -1;
+		}
+
+		// Call the java method
+		int result = jNIEnv->CallIntMethod(jThis, methodID);
+
+		// Delete allocated memory
+		jNIEnv->DeleteLocalRef(cls);
+
+		return result;
+	}
+
+	int _maCameraPreviewEventConsumed(JNIEnv* jNIEnv, jobject jThis)
+	{
+		// Get the Java method
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls,
+					"maCameraPreviewEventConsumed", "()I");
+		if (methodID == 0)
+		{
+			return -1;
+		}
+
+		// Call the java method
+		int result = jNIEnv->CallIntMethod(jThis, methodID);
+
+		// Delete allocated memory
+		jNIEnv->DeleteLocalRef(cls);
+
+		return result;
+	}
+
 	//////////////
 	//  SENSOR  //
 	//////////////

@@ -422,7 +422,7 @@ void CAppView::Wait(int timeout) {
 	if(timeout > 0) {
 		iWaitTimer->mSequence = iWaitTimerSequence;
 		// careful: if (timeout * 1000) > INT_MAX, then Symbian Panic USER 87.
-		static const int MAX_MS = (((1 << 31) - 1) / 1000);	// about 35 minutes.
+		static const int MAX_MS = (0x7FFFFFFF / 1000);	// about 35 minutes.
 		LOGD("MAX_MS: %i\n", MAX_MS);
 		if(timeout > MAX_MS) {
 			// maWait() will return sooner than expected, with no events, but that's ok;

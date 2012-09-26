@@ -234,8 +234,9 @@ void Syscall::StartNetworkingL(ConnOp& connOp) {
 			return;
 		}
 	} else
+	if(gIapMethod == MA_IAP_METHOD_STANDARD)
 #endif	//__SERIES60_3X__
-	if(gIapMethod == MA_IAP_METHOD_STANDARD) {
+	{
 		bool hasSavedIap = getSavedIap(gIapId);
 		if(hasSavedIap) {
 			LOG("Saved IAP: %u\n", gIapId);
@@ -258,9 +259,13 @@ void Syscall::StartNetworkingL(ConnOp& connOp) {
 #endif	//__SERIES60_3X__
 			pref.SetDialogPreference(ECommDbDialogPrefPrompt);
 		}
-	} else {
+	}
+#ifdef __SERIES60_3X__
+	else
+	{
 		DEBIG_PHAT_ERROR;
 	}
+#endif	//__SERIES60_3X__
 	gConnection.Start(pref, connOp.iStatus);
 
 	connOp.SetActive();

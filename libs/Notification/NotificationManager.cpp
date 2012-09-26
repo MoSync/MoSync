@@ -223,7 +223,7 @@ namespace Notification
 
     /**
      * Registers the current application for receiving push notifications.
-     * Registration is made on the Apple Push Service, or Google C2DM Service,
+     * Registration is made on the Apple Push Service, or Google GCM/C2DM Service,
      * depending on the underlying platform.
      * @param types A bit mask specifying the types of notifications the
      * application accepts.

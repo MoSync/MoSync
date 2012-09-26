@@ -70,6 +70,8 @@ using namespace MoSyncError;
 #include "CMGlyphDrawing.h"
 
 #import <AVFoundation/AVFoundation.h>
+#import <CoreVideo/CoreVideo.h>
+#import <CoreVideo/CVPixelBuffer.h>
 #include <AudioToolbox/AudioToolbox.h>
 
 #ifdef SUPPORT_OPENGL_ES
@@ -130,6 +132,114 @@ extern ThreadPool gThreadPool;
 }
 @end
 
+
+
+//This delegate is needed for capturing video frame data from the camera, when using the maCameraPreview* syscalls
+//It is also used as an observer for the "adjustingFocus"-property of the camera.
+@interface CameraPreviewEventHandler:NSObject<AVCaptureVideoDataOutputSampleBufferDelegate> {
+    @public
+    void* mPreviewBuf; //buffer for storing the sub section of the frame
+    MARect mPreviewArea; //the sub area captured from the frame
+    int mEventStatus; //MA_CAMERA_PREVIEW_FRAME/AUTO_FOCUS
+    bool mCaptureOutput; //only want to capture one frame and then wait for maCameraPreviewEventConsumed is called, this bool is used for that
+    unsigned int mCaptureOnFocus; //flag for capturing frame on autofocus, which should only be done every second time, because on the first event,
+    //the camera hasn't focus yet
+    @private
+    dispatch_queue_t mSerialQueue;
+}
+- (id)init;
+- (void)dealloc;
+- (void)captureOutput:(AVCaptureOutput *)captureOutput didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer fromConnection:(AVCaptureConnection *)connection;
+- (void)image2Buf:(CMSampleBufferRef)sampleBuf;
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object
+                        change:(NSDictionary *)change
+                       context:(void *)context;
+- (dispatch_queue_t)getQueue;
+- (void*)previewBuf;
+- (void)setPreviewBuf:(void*)previewBuf;
+- (MARect)previewArea;
+- (void)setPreviewArea:(MARect)previewArea;
+@property void* previewBuf;
+@property MARect previewArea;
+
+@end
+
+@implementation CameraPreviewEventHandler
+- (id)init{
+    if((self = [super init]))
+    {
+        mCaptureOnFocus = 0;
+        mEventStatus = -1; //neither FRAME nor AUTO_FOCUS
+        mCaptureOutput = false;
+        mSerialQueue = dispatch_queue_create("com.mosync.cameraPreviewQueue", NULL); //need a serial queue to get preview frames in order
+    }
+    return self;
+}
+- (void)dealloc{
+    dispatch_release(mSerialQueue); //release dispatch queue
+    //no [super dealloc]; on delegates
+}
+- (void)captureOutput:(AVCaptureOutput *)captureOutput didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer fromConnection:(AVCaptureConnection *)connection{
+    if(mCaptureOutput){//only capture one frame at a time
+        [self image2Buf:sampleBuffer];//copy the image data within previewArea from sampleBuffer to mPreviewBuf
+        MAEvent event;
+        event.type = EVENT_TYPE_CAMERA_PREVIEW;
+        event.status = mEventStatus;
+        Base::gEventQueue.put(event);
+        mCaptureOutput = false;//stop capturing output until maCameraPreviewEventConsumed is called
+    }
+}
+- (void)image2Buf:(CMSampleBufferRef)sampleBuf{//process and store image data in mPreviewBuf, mosync wants the image data in RGB888 format, but here we get it in BGRA8888
+    CVImageBufferRef imageBuffer = CMSampleBufferGetImageBuffer(sampleBuf);
+    CVPixelBufferLockBaseAddress(imageBuffer,0);//the zero is just a flag, not an offset
+    size_t bytesPerRow = CVPixelBufferGetBytesPerRow(imageBuffer);
+    size_t width = CVPixelBufferGetWidth(imageBuffer);
+    size_t bytesPerPixel = bytesPerRow/width;
+    int rowOffset = mPreviewArea.top;
+    int colOffset = mPreviewArea.left;
+    void *srcBuf = CVPixelBufferGetBaseAddress(imageBuffer);
+    //fill the buffer with the image data inside the rect specified by mPreviewArea, need to fill the buffer with RGBA8888, so have to convert BGRA8888->RGBA8888
+    for(size_t i = rowOffset; i < rowOffset+mPreviewArea.height; ++i){ //copy row by row
+        int bufOffset = (i*bytesPerRow) + (colOffset*bytesPerPixel);
+        memcpy((char*)mPreviewBuf+((i-rowOffset)*bytesPerPixel*mPreviewArea.width), (char*)srcBuf+bufOffset, mPreviewArea.width*bytesPerPixel); //move 3 steps in dest buf and 4 steps in source buf (RBGA->RGB)
+    }
+    CVPixelBufferUnlockBaseAddress(imageBuffer, 0);
+}
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object
+                        change:(NSDictionary *)change
+                       context:(void *)context
+{
+    if(mEventStatus != MA_CAMERA_PREVIEW_AUTO_FOCUS){
+        return;//don't capture auto focus events if they're not enabled
+    }
+    if ([keyPath isEqualToString:@"adjustingFocus"] )
+    {
+        if(mCaptureOnFocus % 2) {//only capture a frame on the 2nd of two AF events
+            mCaptureOutput = true;
+        }
+        ++mCaptureOnFocus;
+    }
+}
+- (dispatch_queue_t)getQueue{
+    return mSerialQueue;
+}
+- (void*)previewBuf{
+    return mPreviewBuf;
+}
+- (void)setPreviewBuf:(void*)previewBuf{
+    mPreviewBuf = previewBuf;
+}
+- (MARect)previewArea{
+    return mPreviewArea;
+}
+- (void)setPreviewArea:(MARect)previewArea{
+    mPreviewArea = previewArea;
+}
+
+@end
+
+
+
 namespace Base {
 
 	//***************************************************************************
@@ -138,6 +248,7 @@ namespace Base {
 	static void MAUpdateScreen();
 
 	Syscall* gSyscall;
+    CameraPreviewEventHandler* gCameraPreviewEventHandler = NULL;
 
 	uint realColor;
 	uint currentColor;
@@ -1454,6 +1565,7 @@ namespace Base {
 		AVCaptureVideoPreviewLayer *previewLayer;
 		AVCaptureDevice *device; //The physical camera device
         AVCaptureStillImageOutput *stillImageOutput;
+        AVCaptureVideoDataOutput *videoDataOutput;
 		UIView *view;
 	};
 
@@ -1572,12 +1684,18 @@ namespace Base {
             NSDictionary *outputSettings = [[NSDictionary alloc] initWithObjectsAndKeys:
                                             AVVideoCodecJPEG, AVVideoCodecKey, nil];
             [curCam->stillImageOutput setOutputSettings:outputSettings];
+            //set up video output as well
+            curCam->videoDataOutput = [[AVCaptureVideoDataOutput alloc] init];
+            outputSettings = [NSDictionary dictionaryWithObject:
+                              [NSNumber numberWithInt:kCVPixelFormatType_32BGRA] forKey:(id)kCVPixelBufferPixelFormatTypeKey];  //this format is recommended for iphone 3/4
+            curCam->videoDataOutput.videoSettings = outputSettings;
 			[outputSettings release];
 			if ([curCam->captureSession canSetSessionPreset:AVCaptureSessionPresetMedium]) {
 				curCam->captureSession.sessionPreset = AVCaptureSessionPresetMedium;
 			}
 			[curCam->captureSession addInput:input];
 			[curCam->captureSession addOutput:curCam->stillImageOutput];
+            //perhaps init the videoDataOutput here as well?
 		}
 		return curCam;
 	}
@@ -1797,7 +1915,7 @@ namespace Base {
 		}
 	}
 
-	SYSCALL(int, maCameraGetProperty(const char *property, char *value, int maxSize))
+	SYSCALL(int, maCameraGetProperty(const char *property, char *value, int maxSize)) //@property the property to get (string), @value will contain the value of the property when the func returns, @maxSize the size of the value buffer
 	{
 		@try {
 			NSString *propertyString = [NSString stringWithUTF8String:property];
@@ -1813,7 +1931,7 @@ namespace Base {
 				return -2;
 			}
 
-			[retval getCString:value maxLength:length encoding:NSASCIIStringEncoding];
+			[retval getCString:value maxLength:length encoding:NSASCIIStringEncoding]; //stores the cstring value of retval in value
 			[retval release];
 			[propertyString release];
 			[configurator release];
@@ -1824,6 +1942,104 @@ namespace Base {
 			return -1;
 		}
 	}
+
+    SYSCALL(int, maCameraPreviewSize()) //should really be named maCameraGetPreviewSize since it will be a getter
+    {
+        @try {
+            CameraInfo *info = getCurrentCameraInfo(); //get the info struct belonging to the currently active camera
+            AVCaptureInput *input = [info->captureSession.inputs objectAtIndex:0];
+            AVCaptureInputPort *port = [input.ports objectAtIndex:0];
+            CMFormatDescriptionRef formatDescription = port.formatDescription;
+            CMVideoDimensions dimensions = CMVideoFormatDescriptionGetDimensions(formatDescription);
+            int size = EXTENT((int) dimensions.width, (int) dimensions.height);
+            return size;
+        }
+        @catch (NSException *exception) {
+            return -1;
+        }
+    }
+
+    SYSCALL(int, maCameraPreviewEventEnable(int previewEventType, void* previewBuffer, const MARect* previewArea))
+    {
+        //2 events, MA_CAMERA_PREVIEW_FRAME and MA_CAMERA_PREVIEW_AUTO_FOCUS
+        @try {
+
+            if(!gCameraPreviewEventHandler) //no delegate, set one up for handling preview frames
+            {
+                CameraInfo *info = getCurrentCameraInfo();
+                gCameraPreviewEventHandler = [[CameraPreviewEventHandler alloc] init];
+                gCameraPreviewEventHandler->mPreviewArea = *previewArea;
+                gCameraPreviewEventHandler->mPreviewBuf = previewBuffer;
+                //set the gCameraPreviewEventHandler as delegate and set its dispatch queue as the queue for handling frames
+                [info->videoDataOutput setSampleBufferDelegate:gCameraPreviewEventHandler queue:[gCameraPreviewEventHandler getQueue]];
+                if ([info->captureSession canAddOutput:info->videoDataOutput]) {
+                    [info->captureSession addOutput:info->videoDataOutput]; //add the video data output to the capture session
+                }
+            }
+            if(previewEventType == MA_CAMERA_PREVIEW_FRAME)
+            {
+                gCameraPreviewEventHandler->mEventStatus = previewEventType;
+                gCameraPreviewEventHandler->mCaptureOutput = true; //start capturing output right away
+                return 1;
+            }
+            else if(previewEventType == MA_CAMERA_PREVIEW_AUTO_FOCUS)
+            {
+                //set the gCameraPreviewEventHandler as an observer for the adjustingFocus
+                //property of the current camera device
+                CameraInfo *info = getCurrentCameraInfo();
+                [info->device addObserver:gCameraPreviewEventHandler forKeyPath:@"adjustingFocus" options:NSKeyValueObservingOptionNew context:nil]; //nil is not recommended, but which context should be set?
+                gCameraPreviewEventHandler->mEventStatus = previewEventType;
+                gCameraPreviewEventHandler->mCaptureOutput = false; //don't capture until we got adjustingFocus event in the previewEventHandler
+                return 1;
+            }
+            else //unsupported event type
+            {
+                return -1;
+            }
+
+        }
+        @catch (NSException *exception) {
+            return -1;
+        }
+    }
+
+    SYSCALL(int, maCameraPreviewEventDisable()) //wouldn't it be neater to be able to disable a specific preview event?
+    {
+        @try {
+            if(gCameraPreviewEventHandler)
+            {
+                CameraInfo *info = getCurrentCameraInfo();
+                [info->captureSession removeOutput:info->videoDataOutput];//stop listening for camera output
+                [gCameraPreviewEventHandler release];
+                gCameraPreviewEventHandler = NULL; //so that next maCameraPreviewEventEnable call can init it again
+            }
+        }
+        @catch (NSException *exception) {
+            return -1;
+        }
+        return 1;
+    }
+
+    SYSCALL(int, maCameraPreviewEventConsumed())
+    {
+        if(gCameraPreviewEventHandler)
+        {
+            if(gCameraPreviewEventHandler->mEventStatus == MA_CAMERA_PREVIEW_FRAME)
+            {
+                gCameraPreviewEventHandler->mCaptureOutput = true; //frame event consumed, capture output again
+                return 1;
+            }
+            if(gCameraPreviewEventHandler->mEventStatus == MA_CAMERA_PREVIEW_AUTO_FOCUS)
+            {
+                return 1;
+            }
+            return -1;
+        }
+        else
+        {
+            return -1;//no cameraPreviewEventHandler present.
+        }
+    }
 
 	SYSCALL(int, maWakeLock(int flag))
 	{
@@ -2106,6 +2322,10 @@ namespace Base {
 		maIOCtl_case(maCameraRecord);
 		maIOCtl_case(maCameraSetProperty);
 		maIOCtl_case(maCameraGetProperty);
+        maIOCtl_case(maCameraPreviewSize);
+        maIOCtl_case(maCameraPreviewEventEnable);
+        maIOCtl_case(maCameraPreviewEventDisable);
+        maIOCtl_case(maCameraPreviewEventConsumed);
 		maIOCtl_case(maWakeLock);
         maIOCtl_case(maSensorStart);
         maIOCtl_case(maSensorStop);

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project supports-build-configs="true" version="1.5">
+<build.cfg id="Debug" types="Debug"/>
+<build.cfg id="Release" types="Release"/>
+<properties>
+<property key="build.prefs:additional.include.paths/Release" value="%project:benchdblib%/include/"/>
+<property key="build.prefs:additional.libraries" value="MAUtil.lib"/>
+<property key="build.prefs:additional.libraries/Debug" value="MAUtilD.lib"/>
+<property key="build.prefs:additional.libraries/Release" value="MAUtil.lib, benchdb.lib"/>
+<property key="build.prefs:additional.library.paths/Release" value="%project:benchdblib%/lib/"/>
+<property key="build.prefs:app.permissions" value="File\ Storage Internet\ Access Vibration"/>
+<property key="build.prefs:extra.link.sw/Release" value=""/>
+<property key="build.prefs:extra.res.sw/Release" value=""/>
+<property key="build.prefs:gcc.warnings/Release" value="6"/>
+<property key="build.prefs:ignore.default.libraries/Release" value="false"/>
+<property key="build.prefs:ignore.default.library.paths/Release" value="false"/>
+<property key="build.prefs:memory.data/Release" value="16384"/>
+<property key="build.prefs:memory.heap/Release" value="512"/>
+<property key="build.prefs:memory.stack/Release" value="256"/>
+<property key="build.prefs:project.type" value=""/>
+<property key="dependency.strategy" value="0"/>
+<property key="excludes/Release" value=""/>
+<property key="template.id" value="project.cpp"/>
+</properties>
+</project>
