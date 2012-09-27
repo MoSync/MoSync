@@ -417,6 +417,8 @@ public class ListLayout extends Layout
 			int sectionIndex = 0;
 			// Section's start position in list.
 			int sectionPosition = 0;
+			// Item's position in the section.
+			int itemPosition = 0;
 
 			// Get the index of the section that holds this item,
 			// and it's start position.
@@ -427,18 +429,24 @@ public class ListLayout extends Layout
 				sectionIndex = i;
 				if ( browseIndex > position )
 				{
+					itemPosition = position-sectionPosition;
+					// Get the position inside the section, decrease it by 1 if the section has a header.
+					if ( section.hasHeader() )
+					{
+						itemPosition --;
+					}
 					// Store the selected state of the item.
-					mSelectedItemHandle = section.getItem(position-sectionPosition).getHandle();
+					mSelectedItemHandle = section.getItem(itemPosition).getHandle();
 
 					// The index ignores the header.
 					EventQueue.getDefault().
-							postSegmentedListItemClicked(m_handle, sectionIndex, position-sectionPosition);
+							postSegmentedListItemClicked(m_handle, sectionIndex, itemPosition);
 					return;
 				}
 				sectionPosition += section.itemsCount();
 			}
 			EventQueue.getDefault().
-					postSegmentedListItemClicked(m_handle, sectionIndex, position-sectionPosition);
+					postSegmentedListItemClicked(m_handle, sectionIndex, itemPosition);
 		}
 	}
 
@@ -738,22 +746,8 @@ public class ListLayout extends Layout
 		 */
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent) {
-			int sectionPosition = 0;
-			int browseIndex = 0;
-			int sectionIndex = 0;
-
-			for (int i = 0; i < mSections.size(); i++) {
-				ListViewSection sectionObj = mSections.get(i);
-				browseIndex += sectionObj.itemsCount();
-				sectionIndex = i;
-				if (browseIndex > position) {
-					return sectionObj.getItem(position - sectionPosition)
-							.getView();
-				}
-				sectionPosition += sectionObj.itemsCount();
-			}
-			return mSections.get(sectionIndex)
-					.getItem(position - sectionPosition).getView();
+			ListItemWidget item = (ListItemWidget) getItem(position);
+			return item.getRootView();
 		}
 
 		/**
@@ -816,7 +810,26 @@ public class ListLayout extends Layout
 		 */
 		@Override
 		public Object getItem(int position) {
-			return getView(position, null,null);
+			//return getView(position, null,null);
+			int browseIndex = 0;
+			int sectionIndex = 0;
+			// Section start position in list.
+			int sectionPosition = 0;
+
+			// Get the index of the section that holds this item,
+			// and get it's start position.
+			for (int i=0; i < mSections.size(); i++)
+			{
+				ListViewSection section = mSections.get(i);
+				browseIndex += section.itemsCount();
+				sectionIndex = i;
+				if ( browseIndex > position )
+				{
+					return section.getItem(position-sectionPosition);
+				}
+				sectionPosition += section.itemsCount();
+			}
+			return mSections.get(sectionIndex).getItem(position-sectionPosition);
 		}
 
 		/**
@@ -826,6 +839,24 @@ public class ListLayout extends Layout
 		public long getItemId(int position)
 		{
 			return position;
+		}
+
+		/**
+		 * @see BaseAdapter.isEnabled.
+		 */
+		@Override
+		public boolean isEnabled(int position) {
+			// A separator cannot be clicked !
+			return getItemViewType(position) == ITEM_VIEW_TYPE_ITEM;
+		}
+
+		/**
+		 * @see BaseAdapter.getItemViewType.
+		 */
+		@Override
+		public int getItemViewType(int position) {
+			ListItemWidget item = (ListItemWidget) getItem(position);
+			return item.getItemType();
 		}
 	}
 }

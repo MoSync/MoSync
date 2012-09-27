@@ -409,7 +409,7 @@ group WidgetEvent "Widget event" {
 			* @brief Sent by a Segmented or Alphabetical ListView when an item is selected.
 			* The event will contain the sectionIndex and the sectionItemIndex coresponding to the
 			* selected item.
-			* Available on Windows Phone 7.
+			* Available on Windows Phone 7 and Android.
 			*/
 			SEGMENTED_LIST_ITEM_CLICKED = 34;
 		}

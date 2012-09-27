@@ -331,7 +331,7 @@ public class EventQueue
 	public void postSegmentedListItemClicked(int widgetHandle, int position, int index)
 	{
 		postWidgetEvent(
-				IX_WIDGET.MAW_EVENT_ITEM_CLICKED,
+				IX_WIDGET.MAW_EVENT_SEGMENTED_LIST_ITEM_CLICKED,
 				widgetHandle,
 				position,
 				index);
