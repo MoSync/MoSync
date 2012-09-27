@@ -229,10 +229,10 @@ void SettingsScreen::createListViewSectionPropertiesLayout()
 	currentSectionTitleLayout->setHeight(ONE_LINE_HORIZONTAL_LAYOUT_HEIGHT);
 	mSetListViewSectionTitleButton = new Button();
 	mSetListViewSectionTitleButton->setText("Set title");
-	mSetListViewSectionTitleButton->setWidth(BUTTON_WIDTH);
+	mSetListViewSectionTitleButton->fillSpaceHorizontally();
 	currentSectionTitleLayout->addChild(mSetListViewSectionTitleButton);
 	mCurrentListViewSectionTitleEditBox = new EditBox();
-	mCurrentListViewSectionTitleEditBox->setWidth(EDIT_BOX_WIDTH);
+	mCurrentListViewSectionTitleEditBox->fillSpaceHorizontally();
 	currentSectionTitleLayout->addChild(mCurrentListViewSectionTitleEditBox);
 	listViewSectionPropertiesVerticalLayout->addChild(currentSectionTitleLayout);
 
@@ -241,10 +241,10 @@ void SettingsScreen::createListViewSectionPropertiesLayout()
 	currentSectionHeaderTextLayout->setHeight(ONE_LINE_HORIZONTAL_LAYOUT_HEIGHT);
 	mSetListViewSectionHeaderButton = new Button();
 	mSetListViewSectionHeaderButton->setText("Set header");
-	mSetListViewSectionHeaderButton->setWidth(BUTTON_WIDTH);
+	mSetListViewSectionHeaderButton->fillSpaceHorizontally();
 	currentSectionHeaderTextLayout->addChild(mSetListViewSectionHeaderButton);
 	mCurrentListViewSectionHeaderEditBox = new EditBox();
-	mCurrentListViewSectionHeaderEditBox->setWidth(EDIT_BOX_WIDTH);
+	mCurrentListViewSectionHeaderEditBox->fillSpaceHorizontally();
 	currentSectionHeaderTextLayout->addChild(mCurrentListViewSectionHeaderEditBox);
 	listViewSectionPropertiesVerticalLayout->addChild(currentSectionHeaderTextLayout);
 
@@ -253,10 +253,10 @@ void SettingsScreen::createListViewSectionPropertiesLayout()
 	currentSectionFooterTextLayout->setHeight(ONE_LINE_HORIZONTAL_LAYOUT_HEIGHT);
 	mSetListViewSectionFooterButton = new Button();
 	mSetListViewSectionFooterButton->setText("Set footer");
-	mSetListViewSectionFooterButton->setWidth(BUTTON_WIDTH);
+	mSetListViewSectionFooterButton->fillSpaceHorizontally();
 	currentSectionFooterTextLayout->addChild(mSetListViewSectionFooterButton);
 	mCurrentListViewSectionFooterEditBox = new EditBox();
-	mCurrentListViewSectionFooterEditBox->setWidth(EDIT_BOX_WIDTH);
+	mCurrentListViewSectionFooterEditBox->fillSpaceHorizontally();
 	currentSectionFooterTextLayout->addChild(mCurrentListViewSectionFooterEditBox);
 	listViewSectionPropertiesVerticalLayout->addChild(currentSectionFooterTextLayout);
 
@@ -305,10 +305,10 @@ void SettingsScreen::createListViewItemTextLayout(VerticalLayout* listViewItemPr
 	currentListViewItemTextLayout->setHeight(ONE_LINE_HORIZONTAL_LAYOUT_HEIGHT);
 	mSetListViewItemTextButton = new Button();
 	mSetListViewItemTextButton->setText("Set text");
-	mSetListViewItemTextButton->setWidth(BUTTON_WIDTH);
+	mSetListViewItemTextButton->fillSpaceHorizontally();
 	currentListViewItemTextLayout->addChild(mSetListViewItemTextButton);
 	mSetListViewItemTextEditBox = new EditBox();
-	mSetListViewItemTextEditBox->setWidth(EDIT_BOX_WIDTH);
+	mSetListViewItemTextEditBox->fillSpaceHorizontally();
 	currentListViewItemTextLayout->addChild(mSetListViewItemTextEditBox);
 	listViewItemPropertiesVerticalLayout->addChild(currentListViewItemTextLayout);
 }
@@ -319,10 +319,10 @@ void SettingsScreen::createListViewItemFontColorLayout(VerticalLayout* listViewI
 	currentListViewItemFontColorLayout->setHeight(ONE_LINE_HORIZONTAL_LAYOUT_HEIGHT);
 	mSetListViewItemFontColorButton = new Button();
 	mSetListViewItemFontColorButton->setText("Set font color");
-	mSetListViewItemFontColorButton->setWidth(BUTTON_WIDTH);
+	mSetListViewItemFontColorButton->fillSpaceHorizontally();
 	currentListViewItemFontColorLayout->addChild(mSetListViewItemFontColorButton);
 	mSetListViewItemFontColorEditBox = new EditBox();
-	mSetListViewItemFontColorEditBox->setWidth(EDIT_BOX_WIDTH);
+	mSetListViewItemFontColorEditBox->fillSpaceHorizontally();
 	mSetListViewItemFontColorEditBox->setPlaceholder("ex: 0xFF0000");
 	currentListViewItemFontColorLayout->addChild(mSetListViewItemFontColorEditBox);
 	listViewItemPropertiesVerticalLayout->addChild(currentListViewItemFontColorLayout);
@@ -334,10 +334,10 @@ void SettingsScreen::createListViewItemFontSizeLayout(VerticalLayout* listViewIt
 	currentListViewItemFontSizeLayout->setHeight(ONE_LINE_HORIZONTAL_LAYOUT_HEIGHT);
 	mSetListViewItemFontSizeButton = new Button();
 	mSetListViewItemFontSizeButton->setText("Set font size");
-	mSetListViewItemFontSizeButton->setWidth(BUTTON_WIDTH);
+	mSetListViewItemFontSizeButton->fillSpaceHorizontally();
 	currentListViewItemFontSizeLayout->addChild(mSetListViewItemFontSizeButton);
 	mSetListViewItemFontSizeEditBox = new EditBox();
-	mSetListViewItemFontSizeEditBox->setWidth(EDIT_BOX_WIDTH);
+	mSetListViewItemFontSizeEditBox->fillSpaceHorizontally();
 	currentListViewItemFontSizeLayout->addChild(mSetListViewItemFontSizeEditBox);
 	listViewItemPropertiesVerticalLayout->addChild(currentListViewItemFontSizeLayout);
 }
@@ -361,10 +361,10 @@ void SettingsScreen::createListViewItemDeleteButtonTextLayout(VerticalLayout* li
 	currentListViewItemDeleteButtonLayout->setHeight(ONE_LINE_HORIZONTAL_LAYOUT_HEIGHT);
 	mSetListViewItemDeleteTitleButton = new Button();
 	mSetListViewItemDeleteTitleButton->setText("Set delete");
-	mSetListViewItemDeleteTitleButton->setWidth(BUTTON_WIDTH);
+	mSetListViewItemDeleteTitleButton->fillSpaceHorizontally();
 	currentListViewItemDeleteButtonLayout->addChild(mSetListViewItemDeleteTitleButton);
 	mSetListViewItemDeleteTitleEditBox = new EditBox();
-	mSetListViewItemDeleteTitleEditBox->setWidth(EDIT_BOX_WIDTH);
+	mSetListViewItemDeleteTitleEditBox->fillSpaceHorizontally();
 	currentListViewItemDeleteButtonLayout->addChild(mSetListViewItemDeleteTitleEditBox);
 	listViewItemPropertiesVerticalLayout->addChild(currentListViewItemDeleteButtonLayout);
 }
