@@ -334,7 +334,7 @@ public class ListLayout extends Layout
 		else if( property.equals(IX_WIDGET.MAW_LIST_VIEW_RELOAD_DATA) )
 		{
 			if ( mListType == IX_WIDGET.MAW_LIST_VIEW_TYPE_ALPHABETICAL )
-				mAlphabeticalViewAdapter.notifyDataSetChanged();
+				mAlphabeticalViewAdapter.reloadPreviewLetters();
 			else if ( mListType == IX_WIDGET.MAW_LIST_VIEW_TYPE_SEGMENTED )
 				m_viewAdapter.notifyDataSetChanged();
 		}

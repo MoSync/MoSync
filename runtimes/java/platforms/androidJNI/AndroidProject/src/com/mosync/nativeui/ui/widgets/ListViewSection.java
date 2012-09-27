@@ -194,6 +194,12 @@ public class ListViewSection extends Layout
 				throw new InvalidPropertyValueException(property, value);
 			}
 			mAlphabeticIndex = value;
+			// Reload the preview letters on the parent list view.
+			if ( getParent() != null )
+			{
+				ListLayout parent = (ListLayout) getParent();
+				parent.setProperty(IX_WIDGET.MAW_LIST_VIEW_RELOAD_DATA, "");
+			}
 		}
 		else if( property.equals( IX_WIDGET.MAW_LIST_VIEW_SECTION_HEADER )
 				&& (mSectionType == IX_WIDGET.MAW_LIST_VIEW_SECTION_TYPE_ALPHABETICAL) )

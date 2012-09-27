@@ -825,7 +825,7 @@ void SettingsScreen::buttonClicked(Widget* button)
 	{
 		if (mCurrentListViewItem != NULL && mSetListViewItemFontColorEditBox->getText() != "")
 		{
-			int fontColor = MAUtil::stringToInteger(mSetListViewItemFontColorEditBox->getText());
+			int fontColor = MAUtil::stringToInteger(mSetListViewItemFontColorEditBox->getText(),16);
 			mCurrentListViewItem->setFontColor(fontColor);
 		}
 	}

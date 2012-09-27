@@ -118,7 +118,7 @@ namespace NativeUI
 
 	/**
 	 * Reload all its items.
-	 * Platform: iOS.
+	 * Platform: iOS, Android and Windows Phone 7.
 	 */
 	void ListView::reloadData()
 	{
