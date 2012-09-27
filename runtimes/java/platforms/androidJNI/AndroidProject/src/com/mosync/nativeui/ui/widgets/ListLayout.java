@@ -101,6 +101,12 @@ public class ListLayout extends Layout
 	private int mSelectedItemHandle;
 
 	/**
+	 * Allow selection property on the list.
+	 * If disabled, none of the adapter's items can be selected.
+	 */
+	private boolean mAllowSelection = true;
+
+	/**
 	 * Constructor.
 	 *
 	 * @param handle Integer handle corresponding to this instance.
@@ -344,7 +350,7 @@ public class ListLayout extends Layout
 		}
 		else if( property.equals( IX_WIDGET.MAW_LIST_VIEW_ALLOW_SELECTION ) )
 		{
-			setProperty(IX_WIDGET.MAW_WIDGET_ENABLED, value);
+			mAllowSelection = BooleanConverter.convert(value);
 		}
 		else
 		{
@@ -352,6 +358,22 @@ public class ListLayout extends Layout
 		}
 
 		return true;
+	}
+
+	/**
+	 * @see Widget.getProperty.
+	 */
+	@Override
+	public String getProperty(String property)
+	{
+		if( property.equals( IX_WIDGET.MAW_LIST_VIEW_ALLOW_SELECTION ) )
+		{
+			return Boolean.toString(mAllowSelection);
+		}
+		else
+		{
+			return super.getProperty( property );
+		}
 	}
 
 	/**
@@ -635,6 +657,14 @@ public class ListLayout extends Layout
 		{
 			return m_views.isEmpty( );
 		}
+
+		/**
+		 * @see BaseAdapter.isEnabled.
+		 */
+		@Override
+		public boolean isEnabled(int position) {
+			return mAllowSelection;
+		}
 	}
 
 	/**
@@ -657,7 +687,7 @@ public class ListLayout extends Layout
 		@Override
 		public boolean isEnabled(int position) {
 			// A separator cannot be clicked !
-			return getItemViewType(position) == ITEM_VIEW_TYPE_ITEM;
+			return (getItemViewType(position) == ITEM_VIEW_TYPE_ITEM && mAllowSelection) ;
 		}
 
 		/**
@@ -847,7 +877,7 @@ public class ListLayout extends Layout
 		@Override
 		public boolean isEnabled(int position) {
 			// A separator cannot be clicked !
-			return getItemViewType(position) == ITEM_VIEW_TYPE_ITEM;
+			return (getItemViewType(position) == ITEM_VIEW_TYPE_ITEM && mAllowSelection);
 		}
 
 		/**

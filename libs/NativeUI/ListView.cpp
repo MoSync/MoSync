@@ -129,7 +129,7 @@ namespace NativeUI
 	 * Enable/disable item selection.
 	 * If you don't want to allow the user to select any items, set this
 	 * property to false.
-	 * Platform: iOS.
+	 * Platform: iOS, Android and Windows Phone 7.
 	 * @param allow true to enable it, false to disable it.
 	 */
 	void ListView::allowSelection(bool allow)
@@ -140,7 +140,7 @@ namespace NativeUI
 
 	/**
 	 * Check if user is allowed to select an item.
-	 * Platform: iOS.
+	 * Platform: iOS, Android and Windows Phone 7.
 	 * @return true if it's allowed, false otherwise.
 	 */
 	bool ListView::isSelectionAllowed()
