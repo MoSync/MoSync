@@ -48,8 +48,30 @@ namespace MoSync
         {
             #region Private members
 
-            // the corresponding list section
-            private ListSection<ListItem> mSection;
+            // section title (appears when the header is clicked)
+            private string mTitle;
+
+            // header properties
+            private string mHeader;
+            private SolidColorBrush mHeaderBackgroundColor;
+            private HorizontalAlignment mHeaderHorizontalAlignment;
+            private VerticalAlignment mHeaderVerticalAlignment;
+            private SolidColorBrush mHeaderFontColor;
+            private double mHeaderFontSize;
+            private FontFamily mHeaderFontFamily;
+            private FontWeight mHeaderFontWeight;
+            private FontStyle mHeaderFontStyle;
+
+            // footer properties
+            private string mFooter;
+            private SolidColorBrush mFooterBackgroundColor;
+            private HorizontalAlignment mFooterHorizontalAlignment;
+            private VerticalAlignment mFooterVerticalAlignment;
+            private SolidColorBrush mFooterFontColor;
+            private double mFooterFontSize;
+            private FontFamily mFooterFontFamily;
+            private FontWeight mFooterFontWeight;
+            private FontStyle mFooterFontStyle;
 
             // the current list view style
             ListView.ListViewStyle mListViewStyle = MoSync.Constants.MAW_LIST_VIEW_STYLE_SUBTITLE;
@@ -63,7 +85,7 @@ namespace MoSync
 			 */
             public ListViewSection()
             {
-                mSection = new ListSection<ListItem>();
+
             }
 
             #endregion
@@ -82,6 +104,33 @@ namespace MoSync
                 return null;
             }
 
+            /**
+             * Rebuilds the parent list view model.
+             */
+            public void RebuildParentListSync()
+            {
+                if (mParent is ListView)
+                {
+                    ListView parentListView = mParent as ListView;
+                    MoSync.Util.RunActionOnMainThreadSync(() =>
+                    {
+                        parentListView.RebuildList();
+                    });
+                }
+            }
+
+            /**
+             * Rebuilds the parent list view model.
+             */
+            public void RebuildParentList()
+            {
+                if (mParent is ListView)
+                {
+                    ListView parentListView = mParent as ListView;
+                    parentListView.RebuildList();
+                }
+            }
+
             #endregion
 
             #region Overridden methods
@@ -95,30 +144,7 @@ namespace MoSync
                 if (child is ListViewItem)
                 {
                     base.AddChild(child);
-                    MoSync.Util.RunActionOnMainThreadSync(() =>
-                    {
-                        ListViewItem widget = (child as ListViewItem);
-                        ListItem newItem = new ListItem();
-                        newItem.ListStyle = mListViewStyle;
-                        newItem.Title = widget.Text;
-                        newItem.ImageSource = widget.IconImageSource;
-                        newItem.Subtitle = widget.Subtitle;
-                        newItem.BackgroundColor = new SolidColorBrush(Colors.Black);
-                        newItem.GroupBy = this.Title;
-                        newItem.Height = widget.Height;
-                        newItem.Width = widget.Width;
-
-                        widget.ListItemData = newItem;
-                        mSection.Add(newItem);
-
-                        // we need to update the parent UI the parent exists (it might not if the child was
-                        // created before the parent)
-                        ListView parentListView = (ListView)this.GetParent();
-                        if (parentListView != null)
-                        {
-                            parentListView.UpdateSection(this.SectionIndex, this.mSection);
-                        }
-                    });
+                    RebuildParentListSync();
                 }
             }
 
@@ -130,30 +156,7 @@ namespace MoSync
                 if (child is ListViewItem)
                 {
                     base.InsertChild(child, index);
-                    MoSync.Util.RunActionOnMainThreadSync(() =>
-                    {
-                        ListViewItem widget = (child as ListViewItem);
-                        ListItem newItem = new ListItem();
-                        newItem.Title = widget.Text;
-                        newItem.ImageSource = widget.IconImageSource;
-                        newItem.Subtitle = widget.Subtitle;
-                        newItem.SubtitleVisibility = Visibility.Visible;
-                        newItem.BackgroundColor = new SolidColorBrush(Colors.Black);
-                        newItem.GroupBy = this.Title;
-                        newItem.Height = widget.Height;
-                        newItem.Width = widget.Width;
-
-                        widget.ListItemData = newItem;
-                        mSection.Insert(index, newItem);
-
-                        // we need to update the parent UI the parent exists (it might not if the child was
-                        // created before the parent)
-                        ListView parentListView = (ListView)this.GetParent();
-                        if (parentListView != null)
-                        {
-                            parentListView.UpdateSection(this.SectionIndex, this.mSection);
-                        }
-                    });
+                    RebuildParentListSync();
                 }
             }
 
@@ -163,18 +166,7 @@ namespace MoSync
             public override void RemoveChild(int index)
             {
                 base.RemoveChild(index);
-                MoSync.Util.RunActionOnMainThreadSync(() =>
-                {
-                    mSection.RemoveAt(index);
-
-                    // we need to update the parent UI the parent exists (it might not if the child was
-                    // created before the parent)
-                    ListView parentListView = (ListView)this.GetParent();
-                    if (parentListView != null)
-                    {
-                        parentListView.UpdateSection(this.SectionIndex, this.mSection);
-                    }
-                });
+                RebuildParentListSync();
             }
 
             /**
@@ -182,37 +174,13 @@ namespace MoSync
              */
             public override void RemoveChild(IWidget child)
             {
-                List<IWidget> children = this.mChildren;
                 base.RemoveChild(child);
-                MoSync.Util.RunActionOnMainThreadSync(() =>
-                {
-                    mSection.Remove(((ListViewItem)child).ListItemData);
-
-                    // we need to update the parent UI the parent exists (it might not if the child was
-                    // created before the parent)
-                    ListView parentListView = (ListView)this.GetParent();
-                    if (parentListView != null)
-                    {
-                        parentListView.UpdateSection(this.SectionIndex, this.mSection);
-                    }
-                });
+                RebuildParentListSync();
             }
 
             #endregion
 
             #region Properties
-
-            /**
-             * A getter for the items inside the section - will be used by the ListView
-             * to present its content.
-             */
-            public ListSection<ListItem> SectionData
-            {
-                get
-                {
-                    return mSection;
-                }
-            }
 
             /**
              * A getter/setter for the list view style.
@@ -261,11 +229,12 @@ namespace MoSync
             {
                 get
                 {
-                    return mSection.Title;
+                    return mTitle;
                 }
                 set
                 {
-                    mSection.Title = value;
+                    mTitle = value;
+                    RebuildParentList();
                 }
             }
 
@@ -277,11 +246,12 @@ namespace MoSync
             {
                 get
                 {
-                    return mSection.Header;
+                    return mHeader;
                 }
                 set
                 {
-                    mSection.Header = value;
+                    mHeader = value;
+                    RebuildParentList();
                 }
             }
 
@@ -295,7 +265,8 @@ namespace MoSync
                 {
                     System.Windows.Media.SolidColorBrush brush;
                     MoSync.Util.convertStringToColor(value, out brush);
-                    mSection.HeaderColor = brush;
+                    mHeaderBackgroundColor = brush;
+                    RebuildParentList();
                 }
             }
 
@@ -309,17 +280,18 @@ namespace MoSync
                 {
                     if (value.Equals(MoSync.Constants.MAW_ALIGNMENT_LEFT))
                     {
-                        mSection.HeaderTextHorizontalAlignment = HorizontalAlignment.Left;
+                        mHeaderHorizontalAlignment = HorizontalAlignment.Left;
                     }
                     else if (value.Equals(MoSync.Constants.MAW_ALIGNMENT_RIGHT))
                     {
-                        mSection.HeaderTextHorizontalAlignment = HorizontalAlignment.Right;
+                        mHeaderHorizontalAlignment = HorizontalAlignment.Right;
                     }
                     else if (value.Equals(MoSync.Constants.MAW_ALIGNMENT_CENTER))
                     {
-                        mSection.HeaderTextHorizontalAlignment = HorizontalAlignment.Center;
+                        mHeaderHorizontalAlignment = HorizontalAlignment.Center;
                     }
                     else throw new InvalidPropertyValueException();
+                    RebuildParentList();
                 }
             }
 
@@ -333,17 +305,18 @@ namespace MoSync
                 {
                     if (value.Equals(MoSync.Constants.MAW_ALIGNMENT_TOP))
                     {
-                        mSection.HeaderTextVerticalAlignment = VerticalAlignment.Top;
+                        mHeaderVerticalAlignment = VerticalAlignment.Top;
                     }
                     else if (value.Equals(MoSync.Constants.MAW_ALIGNMENT_BOTTOM))
                     {
-                        mSection.HeaderTextVerticalAlignment = VerticalAlignment.Bottom;
+                        mHeaderVerticalAlignment = VerticalAlignment.Bottom;
                     }
                     else if (value.Equals(MoSync.Constants.MAW_ALIGNMENT_CENTER))
                     {
-                        mSection.HeaderTextVerticalAlignment = VerticalAlignment.Center;
+                        mHeaderVerticalAlignment = VerticalAlignment.Center;
                     }
                     else throw new InvalidPropertyValueException();
+                    RebuildParentList();
                 }
             }
 
@@ -357,7 +330,8 @@ namespace MoSync
                 {
                     System.Windows.Media.SolidColorBrush brush;
                     MoSync.Util.convertStringToColor(value, out brush);
-                    mSection.HeaderFontColor = brush;
+                    mHeaderFontColor = brush;
+                    RebuildParentList();
                 }
             }
 
@@ -369,7 +343,8 @@ namespace MoSync
             {
                 set
                 {
-                    mSection.HeaderFontSize = value;
+                    mHeaderFontSize = value;
+                    RebuildParentList();
                 }
             }
 
@@ -384,20 +359,29 @@ namespace MoSync
                     FontModule.FontInfo fontInfo =
                         mRuntime.GetModule<FontModule>().GetFont(value);
 
-                    mSection.HeaderFontFamily = fontInfo.family;
-                    mSection.HeaderFontWeight = fontInfo.weight;
-                    mSection.HeaderFontStyle = fontInfo.style;
+                    mHeaderFontFamily = fontInfo.family;
+                    mHeaderFontWeight = fontInfo.weight;
+                    mHeaderFontStyle = fontInfo.style;
+                    RebuildParentList();
                 }
             }
 
             /**
              * MAW_LIST_VIEW_SECTION_FOOTER property implementation
+             * // TODO SA: implement properly
              */
             [MoSyncWidgetProperty(MoSync.Constants.MAW_LIST_VIEW_SECTION_FOOTER)]
             public string Footer
             {
-                get;
-                set;
+                get
+                {
+                    return mFooter;
+                }
+                set
+                {
+                    mFooter = value;
+                    RebuildParentList();
+                }
             }
 
             /**
@@ -410,7 +394,8 @@ namespace MoSync
                 {
                     System.Windows.Media.SolidColorBrush brush;
                     MoSync.Util.convertStringToColor(value, out brush);
-                    mSection.FooterColor = brush;
+                    mFooterBackgroundColor = brush;
+                    RebuildParentList();
                 }
             }
 
@@ -424,17 +409,18 @@ namespace MoSync
                 {
                     if (value.Equals(MoSync.Constants.MAW_ALIGNMENT_LEFT))
                     {
-                        mSection.FooterTextHorizontalAlignment = HorizontalAlignment.Left;
+                        mFooterHorizontalAlignment = HorizontalAlignment.Left;
                     }
                     else if (value.Equals(MoSync.Constants.MAW_ALIGNMENT_RIGHT))
                     {
-                        mSection.FooterTextHorizontalAlignment = HorizontalAlignment.Right;
+                        mFooterHorizontalAlignment = HorizontalAlignment.Right;
                     }
                     else if (value.Equals(MoSync.Constants.MAW_ALIGNMENT_CENTER))
                     {
-                        mSection.FooterTextHorizontalAlignment = HorizontalAlignment.Center;
+                        mFooterHorizontalAlignment = HorizontalAlignment.Center;
                     }
                     else throw new InvalidPropertyValueException();
+                    RebuildParentList();
                 }
             }
 
@@ -448,17 +434,18 @@ namespace MoSync
                 {
                     if (value.Equals(MoSync.Constants.MAW_ALIGNMENT_TOP))
                     {
-                        mSection.FooterTextVerticalAlignment = VerticalAlignment.Top;
+                        mFooterVerticalAlignment = VerticalAlignment.Top;
                     }
                     else if (value.Equals(MoSync.Constants.MAW_ALIGNMENT_BOTTOM))
                     {
-                        mSection.FooterTextVerticalAlignment = VerticalAlignment.Bottom;
+                        mFooterVerticalAlignment = VerticalAlignment.Bottom;
                     }
                     else if (value.Equals(MoSync.Constants.MAW_ALIGNMENT_CENTER))
                     {
-                        mSection.FooterTextVerticalAlignment = VerticalAlignment.Center;
+                        mFooterVerticalAlignment = VerticalAlignment.Center;
                     }
                     else throw new InvalidPropertyValueException();
+                    RebuildParentList();
                 }
             }
 
@@ -472,7 +459,8 @@ namespace MoSync
                 {
                     System.Windows.Media.SolidColorBrush brush;
                     MoSync.Util.convertStringToColor(value, out brush);
-                    mSection.FooterFontColor = brush;
+                    mFooterFontColor = brush;
+                    RebuildParentList();
                 }
             }
 
@@ -484,7 +472,8 @@ namespace MoSync
             {
                 set
                 {
-                    mSection.FooterFontSize = value;
+                    mFooterFontSize = value;
+                    RebuildParentList();
                 }
             }
 
@@ -499,9 +488,10 @@ namespace MoSync
                     FontModule.FontInfo fontInfo =
                         mRuntime.GetModule<FontModule>().GetFont(value);
 
-                    mSection.FooterFontFamily = fontInfo.family;
-                    mSection.FooterFontWeight = fontInfo.weight;
-                    mSection.FooterFontStyle = fontInfo.style;
+                    mFooterFontFamily = fontInfo.family;
+                    mFooterFontWeight = fontInfo.weight;
+                    mFooterFontStyle = fontInfo.style;
+                    RebuildParentList();
                 }
             }
 

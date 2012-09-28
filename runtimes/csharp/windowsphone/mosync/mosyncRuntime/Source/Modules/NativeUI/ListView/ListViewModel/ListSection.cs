@@ -52,7 +52,7 @@ namespace MoSync
 
             #region Private class members
 
-            private string headerText = "";
+            private string footerText = "";
 
             #endregion
 
@@ -66,7 +66,7 @@ namespace MoSync
             public ListSection(string headerTitle, IEnumerable<T> items)
             {
                 this.Title = headerTitle;
-                this.FooterTitle = "";
+                this.Footer = "";
                 foreach (T item in items)
                 {
                     this.Add(item);
@@ -77,7 +77,7 @@ namespace MoSync
             public ListSection(string headerTitle, IEnumerable<T> items, Brush headerColor)
             {
                 this.Title = headerTitle;
-                this.FooterTitle = "";
+                this.Footer = "";
                 foreach (T item in items)
                 {
                     this.Add(item);
@@ -89,7 +89,7 @@ namespace MoSync
             public ListSection(string headerTitle, string footerTitle, IEnumerable<T> items, Brush headerColor)
             {
                 this.Title = headerTitle;
-                this.FooterTitle = footerTitle;
+                this.Footer = footerTitle;
                 foreach (T item in items)
                 {
                     this.Add(item);
@@ -140,21 +140,24 @@ namespace MoSync
 
             public string Header
             {
+                get;
+                set;
+            }
+
+            public string Footer
+            {
                 get
                 {
-                    return headerText;
+                    return footerText;
                 }
                 set
                 {
-                    headerText = value;
-                    OnPropertyChanged("Header");
+                    footerText = value;
+                    if (footerText != "")
+                    {
+                        FooterVisibility = Visibility.Visible;
+                    }
                 }
-            }
-
-            public string FooterTitle
-            {
-                get;
-                set;
             }
 
             public Brush HeaderColor
