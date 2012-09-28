@@ -72,6 +72,8 @@ private:
 	 * Create ListView section properties layout
 	 */
 	void createListViewSectionPropertiesLayout();
+	void createListViewSectionHeaderPropertiesLayout(VerticalLayout* parent);
+	void createListViewSectionFooterPropertiesLayout(VerticalLayout* parent);
 
 	/**
 	 * Create ListView item properties layout
@@ -330,6 +332,66 @@ private:
 	 * If checked, sets the list view item edit style to insert.
 	 */
 	CheckBox* mListViewItemEditStyleInsertCheckbox;
+
+	/**
+	 * Sets the section in focus header background color.
+	 */
+	Button* mSetSectionHeaderBackgroundColor;
+
+	/**
+	 * Sets the section in focus header font size.
+	 */
+	Button* mSetSectionHeaderFontSize;
+
+	/**
+	 * Sets the section in focus header font color.
+	 */
+	Button* mSetSectionHeaderFontColor;
+
+	/**
+	 * Contains the section in focus header background color.
+	 */
+	EditBox* mHeaderBackgroundColorEditBox;
+
+	/**
+	 * Contains the section in focus header font size.
+	 */
+	EditBox* mHeaderFontSizeEditBox;
+
+	/**
+	 * Contains the section in focus header font color.
+	 */
+	EditBox* mHeaderFontColorEditBox;
+
+	/**
+	 * Sets the section in focus footer background color.
+	 */
+	Button* mSetSectionFooterBackgroundColor;
+
+	/**
+	 * Sets the section in focus footer font size.
+	 */
+	Button* mSetSectionFooterFontSize;
+
+	/**
+	 * Sets the section in focus footer font color.
+	 */
+	Button* mSetSectionFooterFontColor;
+
+	/**
+	 * Contains the section in focus footer background color.
+	 */
+	EditBox* mFooterBackgroundColorEditBox;
+
+	/**
+	 * Contains the section in focus footer font size.
+	 */
+	EditBox* mFooterFontSizeEditBox;
+
+	/**
+	 * Contains the section in focus footer font color.
+	 */
+	EditBox* mFooterFontColorEditBox;
 };
 
 #endif /* SETTINGSSCREEN_H_ */

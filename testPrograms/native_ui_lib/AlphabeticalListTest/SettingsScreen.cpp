@@ -68,7 +68,19 @@ SettingsScreen::SettingsScreen():
 	mListViewItemAccessoryTypeEditModeCheckmarkCheckbox(NULL),
 	mListViewItemEditStyleNoneCheckbox(NULL),
 	mListViewItemEditStyleDeleteCheckbox(NULL),
-	mListViewItemEditStyleInsertCheckbox(NULL)
+	mListViewItemEditStyleInsertCheckbox(NULL),
+	mSetSectionHeaderBackgroundColor(NULL),
+	mSetSectionHeaderFontSize(NULL),
+	mSetSectionHeaderFontColor(NULL),
+	mHeaderBackgroundColorEditBox(NULL),
+	mHeaderFontSizeEditBox(NULL),
+	mHeaderFontColorEditBox(NULL),
+	mSetSectionFooterBackgroundColor(NULL),
+	mSetSectionFooterFontSize(NULL),
+	mSetSectionFooterFontColor(NULL),
+	mFooterBackgroundColorEditBox(NULL),
+	mFooterFontSizeEditBox(NULL),
+	mFooterFontColorEditBox(NULL)
 {
 	createMainLayout();
 
@@ -100,6 +112,15 @@ SettingsScreen::SettingsScreen():
 		mListViewItemEditStyleNoneCheckbox->addCheckBoxListener(this);
 		mListViewItemEditStyleDeleteCheckbox->addCheckBoxListener(this);
 		mListViewItemEditStyleInsertCheckbox->addCheckBoxListener(this);
+	}
+	if (isWindowsPhone() || isAndroid())
+	{
+		mSetSectionHeaderBackgroundColor->addButtonListener(this);
+		mSetSectionHeaderFontSize->addButtonListener(this);
+		mSetSectionHeaderFontColor->addButtonListener(this);
+		mSetSectionFooterBackgroundColor->addButtonListener(this);
+		mSetSectionFooterFontSize->addButtonListener(this);
+		mSetSectionFooterFontColor->addButtonListener(this);
 	}
 }
 
@@ -137,6 +158,15 @@ SettingsScreen::~SettingsScreen()
 		mListViewItemEditStyleNoneCheckbox->addCheckBoxListener(this);
 		mListViewItemEditStyleDeleteCheckbox->addCheckBoxListener(this);
 		mListViewItemEditStyleInsertCheckbox->addCheckBoxListener(this);
+	}
+	if (isWindowsPhone() || isAndroid())
+	{
+		mSetSectionHeaderBackgroundColor->removeButtonListener(this);
+		mSetSectionHeaderFontSize->removeButtonListener(this);
+		mSetSectionHeaderFontColor->removeButtonListener(this);
+		mSetSectionFooterBackgroundColor->removeButtonListener(this);
+		mSetSectionFooterFontSize->removeButtonListener(this);
+		mSetSectionFooterFontColor->removeButtonListener(this);
 	}
 }
 
@@ -260,7 +290,98 @@ void SettingsScreen::createListViewSectionPropertiesLayout()
 	currentSectionFooterTextLayout->addChild(mCurrentListViewSectionFooterEditBox);
 	listViewSectionPropertiesVerticalLayout->addChild(currentSectionFooterTextLayout);
 
+	if (isWindowsPhone() || isAndroid())
+	{
+		listViewSectionPropertiesVerticalLayout->setHeight(ONE_LINE_HORIZONTAL_LAYOUT_HEIGHT * 10);
+		createListViewSectionHeaderPropertiesLayout(listViewSectionPropertiesVerticalLayout);
+		createListViewSectionFooterPropertiesLayout(listViewSectionPropertiesVerticalLayout);
+	}
+
 	mPropertiesListView->addChild(listViewSectionPropertiesVerticalLayout);
+}
+
+void SettingsScreen::createListViewSectionHeaderPropertiesLayout(VerticalLayout* listViewSectionPropertiesVerticalLayout)
+{
+	// create the current section header background color layout
+	HorizontalLayout* currentSectionHeaderBackgroundColorLayout = new HorizontalLayout();
+	currentSectionHeaderBackgroundColorLayout->setHeight(ONE_LINE_HORIZONTAL_LAYOUT_HEIGHT);
+	mSetSectionHeaderBackgroundColor = new Button();
+	mSetSectionHeaderBackgroundColor->setText("Header bg");
+	mSetSectionHeaderBackgroundColor->fillSpaceHorizontally();
+	currentSectionHeaderBackgroundColorLayout->addChild(mSetSectionHeaderBackgroundColor);
+	mHeaderBackgroundColorEditBox = new EditBox();
+	mHeaderBackgroundColorEditBox->setPlaceholder("ex: 0xFF0000");
+	mHeaderBackgroundColorEditBox->fillSpaceHorizontally();
+	currentSectionHeaderBackgroundColorLayout->addChild(mHeaderBackgroundColorEditBox);
+	listViewSectionPropertiesVerticalLayout->addChild(currentSectionHeaderBackgroundColorLayout);
+
+	// create the current section header font size layout
+	HorizontalLayout* currentSectionHeaderFontSizeLayout = new HorizontalLayout();
+	currentSectionHeaderFontSizeLayout->setHeight(ONE_LINE_HORIZONTAL_LAYOUT_HEIGHT);
+	mSetSectionHeaderFontSize = new Button();
+	mSetSectionHeaderFontSize->setText("Header font sz");
+	mSetSectionHeaderFontSize->fillSpaceHorizontally();
+	currentSectionHeaderFontSizeLayout->addChild(mSetSectionHeaderFontSize);
+	mHeaderFontSizeEditBox = new EditBox();
+	mHeaderFontSizeEditBox->setInputMode(EDIT_BOX_INPUT_MODE_NUMERIC);
+	mHeaderFontSizeEditBox->fillSpaceHorizontally();
+	currentSectionHeaderFontSizeLayout->addChild(mHeaderFontSizeEditBox);
+	listViewSectionPropertiesVerticalLayout->addChild(currentSectionHeaderFontSizeLayout);
+
+	// create the current section header font color layout
+	HorizontalLayout* currentSectionHeaderFontColorLayout = new HorizontalLayout();
+	currentSectionHeaderFontColorLayout->setHeight(ONE_LINE_HORIZONTAL_LAYOUT_HEIGHT);
+	mSetSectionHeaderFontColor = new Button();
+	mSetSectionHeaderFontColor->setText("Header font color");
+	mSetSectionHeaderFontColor->fillSpaceHorizontally();
+	currentSectionHeaderFontColorLayout->addChild(mSetSectionHeaderFontColor);
+	mHeaderFontColorEditBox = new EditBox();
+	mHeaderFontColorEditBox->setPlaceholder("ex: 0xFF0000");
+	mHeaderFontColorEditBox->fillSpaceHorizontally();
+	currentSectionHeaderFontColorLayout->addChild(mHeaderFontColorEditBox);
+	listViewSectionPropertiesVerticalLayout->addChild(currentSectionHeaderFontColorLayout);
+}
+
+void SettingsScreen::createListViewSectionFooterPropertiesLayout(VerticalLayout* listViewSectionPropertiesVerticalLayout)
+{
+	// create the current section footer background color layout
+	HorizontalLayout* currentSectionFooterBackgroundColorLayout = new HorizontalLayout();
+	currentSectionFooterBackgroundColorLayout->setHeight(ONE_LINE_HORIZONTAL_LAYOUT_HEIGHT);
+	mSetSectionFooterBackgroundColor = new Button();
+	mSetSectionFooterBackgroundColor->setText("Footer bg");
+	mSetSectionFooterBackgroundColor->fillSpaceHorizontally();
+	currentSectionFooterBackgroundColorLayout->addChild(mSetSectionFooterBackgroundColor);
+	mFooterBackgroundColorEditBox = new EditBox();
+	mFooterBackgroundColorEditBox->setPlaceholder("ex: 0xFF0000");
+	mFooterBackgroundColorEditBox->fillSpaceHorizontally();
+	currentSectionFooterBackgroundColorLayout->addChild(mFooterBackgroundColorEditBox);
+	listViewSectionPropertiesVerticalLayout->addChild(currentSectionFooterBackgroundColorLayout);
+
+	// create the current section footer font size layout
+	HorizontalLayout* currentSectionFooterFontSizeLayout = new HorizontalLayout();
+	currentSectionFooterFontSizeLayout->setHeight(ONE_LINE_HORIZONTAL_LAYOUT_HEIGHT);
+	mSetSectionFooterFontSize = new Button();
+	mSetSectionFooterFontSize->setText("Footer font sz");
+	mSetSectionFooterFontSize->fillSpaceHorizontally();
+	currentSectionFooterFontSizeLayout->addChild(mSetSectionFooterFontSize);
+	mFooterFontSizeEditBox = new EditBox();
+	mFooterFontSizeEditBox->setInputMode(EDIT_BOX_INPUT_MODE_NUMERIC);
+	mFooterFontSizeEditBox->fillSpaceHorizontally();
+	currentSectionFooterFontSizeLayout->addChild(mFooterFontSizeEditBox);
+	listViewSectionPropertiesVerticalLayout->addChild(currentSectionFooterFontSizeLayout);
+
+	// create the current section footer font color layout
+	HorizontalLayout* currentSectionFooterFontColorLayout = new HorizontalLayout();
+	currentSectionFooterFontColorLayout->setHeight(ONE_LINE_HORIZONTAL_LAYOUT_HEIGHT);
+	mSetSectionFooterFontColor = new Button();
+	mSetSectionFooterFontColor->setText("Footer font color");
+	mSetSectionFooterFontColor->fillSpaceHorizontally();
+	currentSectionFooterFontColorLayout->addChild(mSetSectionFooterFontColor);
+	mFooterFontColorEditBox = new EditBox();
+	mFooterFontColorEditBox->setPlaceholder("ex: 0xFF0000");
+	mFooterFontColorEditBox->fillSpaceHorizontally();
+	currentSectionFooterFontColorLayout->addChild(mFooterFontColorEditBox);
+	listViewSectionPropertiesVerticalLayout->addChild(currentSectionFooterFontColorLayout);
 }
 
 /**
@@ -812,6 +933,54 @@ void SettingsScreen::buttonClicked(Widget* button)
 		if (mCurrentListViewSection != NULL && mCurrentListViewSectionFooterEditBox->getText() != "")
 		{
 			mCurrentListViewSection->setFooterText(mCurrentListViewSectionFooterEditBox->getText());
+		}
+	}
+	else if (mSetSectionHeaderBackgroundColor == button)
+	{
+		if (mCurrentListViewSection != NULL && mHeaderBackgroundColorEditBox->getText() != "")
+		{
+			int backgroundColor = MAUtil::stringToInteger(mHeaderBackgroundColorEditBox->getText(),16);
+			mCurrentListViewSection->setPropertyInt(MAW_LIST_VIEW_SECTION_HEADER_BACKGROUND,backgroundColor);
+		}
+	}
+	else if (mSetSectionHeaderFontSize == button)
+	{
+		if (mCurrentListViewSection != NULL && mHeaderFontSizeEditBox->getText() != "")
+		{
+			int fontSize = MAUtil::stringToInteger(mHeaderFontSizeEditBox->getText(),10);
+			mCurrentListViewSection->setPropertyInt(MAW_LIST_VIEW_SECTION_HEADER_FONT_SIZE,fontSize);
+		}
+	}
+	else if (mSetSectionHeaderFontColor == button)
+	{
+		if (mCurrentListViewSection != NULL && mHeaderFontColorEditBox->getText() != "")
+		{
+			int fontColor = MAUtil::stringToInteger(mHeaderFontColorEditBox->getText(),16);
+			mCurrentListViewSection->setPropertyInt(MAW_LIST_VIEW_SECTION_HEADER_FONT_COLOR,fontColor);
+		}
+	}
+	else if (mSetSectionFooterBackgroundColor == button)
+	{
+		if (mCurrentListViewSection != NULL && mFooterBackgroundColorEditBox->getText() != "")
+		{
+			int backgroundColor = MAUtil::stringToInteger(mFooterBackgroundColorEditBox->getText(),16);
+			mCurrentListViewSection->setPropertyInt(MAW_LIST_VIEW_SECTION_FOOTER_BACKGROUND,backgroundColor);
+		}
+	}
+	else if (mSetSectionFooterFontSize == button)
+	{
+		if (mCurrentListViewSection != NULL && mFooterFontSizeEditBox->getText() != "")
+		{
+			int fontSize = MAUtil::stringToInteger(mFooterFontSizeEditBox->getText(),10);
+			mCurrentListViewSection->setPropertyInt(MAW_LIST_VIEW_SECTION_FOOTER_FONT_SIZE,fontSize);
+		}
+	}
+	else if (mSetSectionFooterFontColor == button)
+	{
+		if (mCurrentListViewSection != NULL && mFooterFontColorEditBox->getText() != "")
+		{
+			int fontColor = MAUtil::stringToInteger(mFooterFontColorEditBox->getText(),16);
+			mCurrentListViewSection->setPropertyInt(MAW_LIST_VIEW_SECTION_FOOTER_FONT_COLOR,fontColor);
 		}
 	}
 	else if (mSetListViewItemTextButton == button)

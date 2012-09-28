@@ -17,10 +17,10 @@ MA 02110-1301, USA.
 */
 
 /**
- * @file Util.cpp
- * @author Spiridon Alexandru
+ * Util.cpp
  *
- * This file contains the utility functions and values for the application.
+ *  Created on: Aug 7, 2012
+ *      Author: Spiridon Alexandru
  */
 
 #include <maapi.h>
