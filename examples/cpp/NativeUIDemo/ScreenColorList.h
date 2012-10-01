@@ -37,7 +37,8 @@ using namespace NativeUI;
  */
 class ScreenColorList :
 	public StackScreen,
-	public ListViewListener
+	public ListViewListener,
+	public StackScreenListener
 {
 public:
 
@@ -81,6 +82,17 @@ public:
         ListView* listView,
         ListViewItem* listViewItem);
 
+    /**
+     * This method is called when a screen has been popped from a stack
+     * screen.
+     * @param stackScreen The stack screen object that generated the event.
+     * @param fromScreen The screen that was popped from the stack screen.
+     * @param toScreen The screen that will be shown.
+     */
+    virtual void stackScreenScreenPopped(
+        StackScreen* stackScreen,
+        Screen* fromScreen,
+        Screen* toScreen);
 private:
     /**
      * The list view widget.
