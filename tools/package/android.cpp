@@ -20,8 +20,10 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "tools.h"
 #include "permissions.h"
 #include "nfc.h"
+#include "mustache.h"
 #include "helpers/mkdir.h"
 #include "filelist/filelist.h"
+#include "profiledb/profiledb.h"
 #include <fstream>
 #include <sstream>
 #include <errno.h>
@@ -30,19 +32,39 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 using namespace std;
 
-static void writeManifest(const char* filename, const SETTINGS& s, const RuntimeInfo& ri);
+static string writeManifest(const SETTINGS& s, const RuntimeInfo& ri);
+static void fromTemplate(const char* templateFile, const char* outputFile, const SETTINGS& s, const RuntimeInfo& ri);
 static void writeMain(const char* filename, const SETTINGS& s, const RuntimeInfo& ri);
 static void writeStrings(const char* filename, const SETTINGS& s, const RuntimeInfo& ri);
 static void injectIcons(const SETTINGS& s, const RuntimeInfo& ri);
 static void sign(const SETTINGS& s, const RuntimeInfo& ri, string& unsignedApk, string& signedApk);
 static void createSignCmd(ostringstream& cmd, string& keystore, string& alias, string& storepass, string& keypass, string& signedApk, string& unsignedApk, bool hidden);
-static void writePermissions(ostream& stream, const SETTINGS& s, const RuntimeInfo& ri);
-static void writePermission(ostream& stream, bool flag, const char* nativePerm);
-static void writeNFCDirectives(ostream& stream, const SETTINGS& s);
-static void writeNFCResource(ostream& stream, const SETTINGS& s);
-static void writeGCMReceiver(ostream& stream, const string& packageName);
-static void writeBillingReceiver(ostream& stream);
+static void writeNFCResource(const SETTINGS& s, const RuntimeInfo& ri);
 static string packageNameToByteCodeName(const string& packageName);
+
+class AndroidContext : public DefaultContext {
+private:
+	unsigned int fAndroidVersion;
+
+public:
+	AndroidContext(MustacheContext* parent, unsigned int androidVersion) : DefaultContext(parent) {
+		fAndroidVersion = androidVersion;
+	}
+
+	string getParameter(string key) {
+		// Special variable.
+		unsigned int min;
+		unsigned int max;
+		int matches = sscanf(key.c_str(), "sdk-version-%u-%u", &min, &max);
+		if (matches && matches != EOF) {
+			bool matchesMin = fAndroidVersion >= min;
+			bool matchesMax = matches < 2 || fAndroidVersion <= max;
+			return matchesMin && matchesMax ? key : string();
+		} else {
+			return DefaultContext::getParameter(key);
+		}
+	}
+};
 
 void packageAndroid(const SETTINGS& s, const RuntimeInfo& ri) {
 	testDst(s);
@@ -89,8 +111,12 @@ void packageAndroid(const SETTINGS& s, const RuntimeInfo& ri) {
 	// Inject icon
 	injectIcons(s, ri);
 
-	string manifestXml = dstDir + "/AndroidManifest.xml";
-	writeManifest(manifestXml.c_str(), s, ri);
+	string manifestXml = writeManifest(s, ri);
+
+	if (s.nfc) {
+		writeNFCResource(s, ri);
+	}
+
 	string mainXml = layout + "/main.xml";
 	writeMain(mainXml.c_str(), s, ri);
 	string stringsXml = values + "/strings.xml";
@@ -252,179 +278,20 @@ static string packageNameToByteCodeName(const string& packageName) {
 	return bcn;
 }
 
-static void writeManifest(const char* filename, const SETTINGS& s, const RuntimeInfo& ri)
-{
-	string packageName = string(s.androidPackage);
-	string versionCode = string(s.androidVersionCode);
-	string version = string(s.version);
-	string installLocation = string(s.androidInstallLocation ? s.androidInstallLocation : "internalOnly");
+static string writeManifest(const SETTINGS& s, const RuntimeInfo& ri) {
+	string dstDir = string(s.dst);
+	string manifestXml = dstDir + "/AndroidManifest.xml";
+	ProfileDB db;
+	string androidProfilesDir = db.profilesdir("Android");
+	string manifestTemplate = s.androidManifestTemplate ?
+			string(s.androidManifestTemplate) :
+			androidProfilesDir + "/AndroidManifest.template";
+	fromTemplate(manifestTemplate.c_str(), manifestXml.c_str(), s, ri);
 
-	ofstream file(filename, ios::binary);
-	file <<"<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
-		<<"<manifest xmlns:android=\"http://schemas.android.com/apk/res/android\"\n"
-		<<"\tpackage=\"" << packageName << "\"\n"
-		<<"\tandroid:versionCode=\"" << versionCode << "\"\n"
-		<<"\tandroid:versionName=\"" << version << "\"\n";
-	if (ri.androidVersion >= 8) {
-		file<<"\tandroid:installLocation=\"" << installLocation << "\"\n";
-	}
-	file<<">";
-	file <<"\t<application\n";
-	if (s.icon) {
-		file <<"\t\tandroid:icon=\"@drawable/icon\"\n";
-	}
-	file <<"\t\tandroid:label=\"@string/app_name\">\n"
-		<<"\t\t<activity android:name=\".MoSync\"\n"
-		// Use portrait orientation as default.
-		<<"\t\t\tandroid:screenOrientation=\"portrait\"\n"
-		<<"\t\t\tandroid:configChanges=\"keyboardHidden|orientation\"\n"
-		<<"\t\t\tandroid:launchMode=\"singleTask\"\n"
-		<<"\t\t\tandroid:label=\"@string/app_name\">\n"
-		<<"\t\t\t<intent-filter>\n"
-		<<"\t\t\t\t<action android:name=\"android.intent.action.MAIN\" />\n"
-		<<"\t\t\t\t<category android:name=\"android.intent.category.LAUNCHER\" />\n"
-		<<"\t\t\t</intent-filter>\n";
-	if (s.nfc) {
-		writeNFCDirectives(file, s);
-	}
-	file <<"\t\t</activity>\n"
-		<<"\t\t<activity android:name=\".MoSyncPanicDialog\"\n"
-		<<"\t\t\tandroid:label=\"@string/app_name\">\n"
-		<<"\t\t</activity>\n"
-		<<"\t\t<activity android:name=\".TextBox\"\n"
-		<<"\t\t\tandroid:label=\"@string/app_name\">\n"
-		<<"\t\t</activity>\n"
-		// Enable Google AdMob Ads.
-		<<"\t\t<activity android:name=\"com.google.ads.AdActivity\"\n"
-		//<<"\t\t\tandroid:theme=\"@android:style/Theme.NoTitleBar.FullScreen\">\n"
-		<<"\t\t\tandroid:configChanges=\"orientation|keyboard|keyboardHidden\">\n"
-		<<"\t\t</activity>\n"
-		;
-	file <<"\t\t<service android:name=\"com.mosync.internal.android.notifications.LocalNotificationsService\" />\n";
-	file <<"\t\t<service android:name=\".MoSyncService\" />\n";
-
-	writeGCMReceiver(file, packageName);
-
-	file << "\t\t<service android:name=\"com.mosync.internal.android.billing.BillingService\" />\n";
-	writeBillingReceiver(file);
-
-	file <<"\t</application>\n"
-		<<"\t<uses-sdk android:minSdkVersion=\""<<ri.androidVersion<<"\" />\n"
-		;
-
-	// Adding the support-screens for cupcake would lead to problems.
-	if(ri.androidVersion >= 4) {
-		file <<"\t<supports-screens\n"
-			<<"\t\tandroid:largeScreens=\"true\"\n"
-			<<"\t\tandroid:normalScreens=\"true\"\n"
-			<<"\t\tandroid:smallScreens=\"true\"\n"
-			<<"\t\tandroid:anyDensity=\"true\" />\n"
-			;
-	}
-
-	writePermissions(file, s, ri);
-
-	if (s.nfc) {
-		string nfcResourceDir = string(s.dst) + "/res/xml/";
-		_mkdir(nfcResourceDir.c_str());
-		string nfcResource = string(nfcResourceDir) + "nfc.xml";
-		ofstream nfcFile(nfcResource.c_str(), ios::binary);
-		writeNFCResource(nfcFile, s);
-		nfcFile.close();
-	}
-
-	file <<"</manifest>\n";
-	if(!file.good()) {
-		printf("Failed to write %s\n", filename);
-		exit(1);
-	}
+	return manifestXml;
 }
 
-static void writePermissions(ostream& stream, const SETTINGS& s, const RuntimeInfo& ri) {
-	if (!s.permissions) {
-		return;
-	}
-	string packageName = string(s.androidPackage);
-	set<string> permissionSet = set<string>();
-	parsePermissions(permissionSet, s.permissions);
-
-	writePermission(stream, isPermissionSet(permissionSet, VIBRATE), "android.permission.VIBRATE");
-	writePermission(stream, isPermissionSet(permissionSet, VIBRATE_DEPRECATED), "android.permission.VIBRATE");
-	writePermission(stream, isPermissionSet(permissionSet, INTERNET), "android.permission.INTERNET");
-	writePermission(stream, isPermissionSet(permissionSet, INTERNET), "android.permission.ACCESS_NETWORK_STATE");
-	writePermission(stream, isPermissionSet(permissionSet, LOCATION_COARSE), "android.permission.ACCESS_COARSE_LOCATION");
-	writePermission(stream, isPermissionSet(permissionSet, LOCATION_FINE), "android.permission.ACCESS_FINE_LOCATION");
-	writePermission(stream, isPermissionSet(permissionSet, POWER_MANAGEMENT), "android.permission.BATTERY_STATS");
-	writePermission(stream, isPermissionSet(permissionSet, CALENDAR_READ), "android.permission.READ_CALENDAR");
-	writePermission(stream, isPermissionSet(permissionSet, CALENDAR_WRITE), "android.permission.WRITE_CALENDAR");
-	writePermission(stream, isPermissionSet(permissionSet, CONTACTS_READ), "android.permission.READ_CONTACTS");
-	writePermission(stream, isPermissionSet(permissionSet, CONTACTS_WRITE), "android.permission.WRITE_CONTACTS");
-	writePermission(stream, isPermissionSet(permissionSet, SMS_READ), "android.permission.READ_SMS");
-	writePermission(stream, isPermissionSet(permissionSet, SMS_SEND), "android.permission.SEND_SMS");
-	writePermission(stream, isPermissionSet(permissionSet, SMS_RECEIVE), "android.permission.RECEIVE_SMS");
-	writePermission(stream, isPermissionSet(permissionSet, CAMERA), "android.permission.CAMERA");
-	writePermission(stream, isPermissionSet(permissionSet, HOMESCREEN), "android.permission.GET_TASKS");
-	writePermission(stream, isPermissionSet(permissionSet, HOMESCREEN), "android.permission.SET_WALLPAPER");
-	writePermission(stream, isPermissionSet(permissionSet, HOMESCREEN), "android.permission.SET_WALLPAPER_HINTS");
-	writePermission(stream, isPermissionSet(permissionSet, HOMESCREEN), "com.android.launcher.permission.INSTALL_SHORTCUT");
-	writePermission(stream, isPermissionSet(permissionSet, HOMESCREEN), "com.android.launcher.permission.UNINSTALL_SHORTCUT");
-	writePermission(stream, isPermissionSet(permissionSet, AUTOSTART), "android.permission.RECEIVE_BOOT_COMPLETED");
-	writePermission(stream, isPermissionSet(permissionSet, AUTOSTART_DEPRECATED), "android.permission.RECEIVE_BOOT_COMPLETED");
-	writePermission(stream, isPermissionSet(permissionSet, PHONE_CALLS), "android.permission.CALL_PHONE");
-
-	// Only add this for android 1.6 and higher.
-	if (ri.androidVersion >= 4)
-	{
-		// And always enable it to be able to log in debug runtime
-		writePermission(stream, s.debug || isPermissionSet(permissionSet, FILE_STORAGE_WRITE), "android.permission.WRITE_EXTERNAL_STORAGE");
-	}
-
-	// Only add this for android 2.0 and higher.
-	if (ri.androidVersion >= 7)
-	{
-		writePermission(stream, isPermissionSet(permissionSet, BLUETOOTH), "android.permission.BLUETOOTH");
-		writePermission(stream, isPermissionSet(permissionSet, BLUETOOTH), "android.permission.BLUETOOTH_ADMIN");
-	}
-
-	//if (ri.androidVersion >= 10) {
-		writePermission(stream, isPermissionSet(permissionSet, NFC), "android.permission.NFC");
-	//}
-
-	// Always add this.
-	writePermission(stream, true, "android.permission.READ_PHONE_STATE");
-
-	// Permission for Google C2DM Service for push notifications.
-	if (isPermissionSet(permissionSet, PUSH_NOTIFICATIONS))
-	{
-		stream <<"\t<permission android:name=\""<<packageName<<".permission.C2D_MESSAGE\"\n";
-		stream <<"\t\tandroid:protectionLevel=\"signature\" />\n";
-	}
-	writePermission(stream, isPermissionSet(permissionSet, PUSH_NOTIFICATIONS), "android.permission.WAKE_LOCK");
-	string permMessage = packageName + ".permission.C2D_MESSAGE";
-	writePermission(stream, isPermissionSet(permissionSet, PUSH_NOTIFICATIONS), permMessage.c_str());
-	writePermission(stream, isPermissionSet(permissionSet, PUSH_NOTIFICATIONS), "com.google.android.c2dm.permission.RECEIVE");
-
-	// Add in-app billing only for android 1.6 and higher.
-	if (ri.androidVersion >= 4)
-	{
-		writePermission(stream, isPermissionSet(permissionSet, PURCHASE), "com.android.vending.BILLING");
-	}
-}
-static void writePermission(ostream& stream, bool flag, const char* nativePerm) {
-	if (flag) {
-		stream <<"\t<uses-permission android:name=\""<<nativePerm<<"\" />\n";
-	}
-}
-
-static void writeNFCDirectives(ostream& stream, const SETTINGS& s) {
-	// Only TECH_DISCOVERED at this point.
-	stream << "\t\t\t<intent-filter>\n";
-	stream << "\t\t\t\t<action android:name=\"android.nfc.action.TECH_DISCOVERED\"/>\n";
-	stream << "\t\t\t</intent-filter>\n";
-	stream << "\t\t\t<meta-data android:name=\"android.nfc.action.TECH_DISCOVERED\" android:resource=\"@xml/nfc\"/>\n";
-}
-
-static void writeNFCResource(ostream& stream, const SETTINGS& s) {
+static void writeNFCResource(const SETTINGS& s, const RuntimeInfo& ri) {
 	if (!s.nfc || !existsFile(s.nfc)) {
 		printf("If NFC permissions are set, then\n"
 				"1.the --nfc parameter must be set, and\n"
@@ -432,50 +299,79 @@ static void writeNFCResource(ostream& stream, const SETTINGS& s) {
 		exit(1);
 	}
 
-	NfcInfo* nfcInfo = NfcInfo::parse(string(s.nfc));
-	vector<TechList*> techLists = nfcInfo->getTechLists();
-	stream << "<resources xmlns:xliff=\"urn:oasis:names:tc:xliff:document:1.2\">\n";
-	for (size_t i = 0; i < techLists.size(); i++) {
-		TechList* techList = techLists.at(i);
-		vector<string> technologies = techList->technologies;
-		stream << "\t<tech-list>\n";
-		for (size_t j = 0; j < technologies.size(); j++) {
-			stream << "\t\t<tech>";
-			// Simple for now :)
-			string tech = technologies.at(j);
-			stream << "android.nfc.tech." << tech;
-			stream << "</tech>\n";
+	string dstDir = string(s.dst);
+	ProfileDB db;
+	string androidProfilesDir = db.profilesdir("Android");
+
+	// To customize the NFC resources should be a *very* rare event, but we allow it
+	// by exposing it as a file.
+	string nfcTemplate = androidProfilesDir + "/nfc.template";
+	string nfcResourceDir = dstDir + "/res/xml/";
+	_mkdir(nfcResourceDir.c_str());
+	string nfcResource = string(nfcResourceDir) + "nfc.xml";
+	fromTemplate(nfcTemplate.c_str(), nfcResource.c_str(), s, ri);
+}
+
+static void fromTemplate(const char* templateFile, const char* filename, const SETTINGS& s, const RuntimeInfo& ri) {
+	string packageName = string(s.androidPackage);
+	string versionCode = string(s.androidVersionCode);
+	string version = string(s.version);
+	string installLocation = string(s.androidInstallLocation ? s.androidInstallLocation : "internalOnly");
+
+	MustacheParser parser(true);
+	AndroidContext root(NULL, ri.androidVersion);
+	root.setParameter("debug", s.debug ? "debug" : "");
+	root.setParameter("package-name", packageName);
+	root.setParameter("version-code", versionCode);
+	root.setParameter("version", version);
+	root.setParameter("install-location", installLocation);
+	char androidVersionStr[8];
+	sprintf(androidVersionStr, "%d", ri.androidVersion);
+	root.setParameter("sdk-version", androidVersionStr);
+
+	PermissionContext permissions(&root, s.permissions);
+	root.addChild("permissions", &permissions);
+
+	vector<AndroidContext*> deleteUs;
+
+	if (s.nfc) {
+		NfcInfo* nfcInfo = NfcInfo::parse(string(s.nfc));
+		vector<TechList*> techLists = nfcInfo->getTechLists();
+		for (size_t i = 0; i < techLists.size(); i++) {
+			TechList* techList = techLists.at(i);
+			AndroidContext* techListContext = new AndroidContext(&root, ri.androidVersion);
+			deleteUs.push_back(techListContext);
+			root.addChild("tech-list", techListContext);
+			vector<string> technologies = techList->technologies;
+			for (size_t j = 0; j < technologies.size(); j++) {
+				AndroidContext* techContext = new AndroidContext(techListContext, ri.androidVersion);
+				deleteUs.push_back(techContext);
+				techListContext->addChild("tech", techContext);
+				string techName = technologies.at(j);
+				techContext->setParameter("name", techName);
+			}
 		}
-		stream << "\t</tech-list>\n";
 	}
-	stream << "</resources>";
-	//TODO: delete nfcInfo;
-}
 
-static void writeGCMReceiver(ostream& stream, const string& packageName) {
-	// Receiver for messages and registration responses.
-	stream << "\t\t<service android:name=\".GCMIntentService\" />\n";
-	stream << "\t\t<receiver android:name=\"com.google.android.gcm.GCMBroadcastReceiver\"\n";
-	stream << "\t\t\tandroid:permission=\"com.google.android.c2dm.permission.SEND\">\n";
-	stream << "\t\t\t<intent-filter>\n";
-	stream << "\t\t\t\t<action android:name=\"com.google.android.c2dm.intent.RECEIVE\" />\n";
-	stream << "\t\t\t\t<category android:name=\""<<packageName<<"\" />\n";
-	stream << "\t\t\t</intent-filter>\n";
-	stream << "\t\t\t<intent-filter>\n";
-	stream << "\t\t\t\t<action android:name=\"com.google.android.c2dm.intent.REGISTRATION\" />\n";
-	stream << "\t\t\t\t<category android:name=\""<<packageName<<"\" />\n";
-	stream << "\t\t\t</intent-filter>\n";
-	stream << "\t\t</receiver>\n";
-}
+	ofstream output(filename);
+	if (output.good()) {
+		DefaultParserCallback cb(&root, output);
+		string templateFileStr = string(templateFile);
+		string result = parser.parseFile(templateFileStr, &cb);
+		output.flush();
+		output.close();
+		if (!result.empty()) {
+			printf("Error creating android manifest: %s\n", result.c_str());
+			exit(1);
+		}
+	} else {
+		printf("Could not write android manifest!\n");
+		exit(1);
+	}
 
-static void writeBillingReceiver(ostream& stream) {
-	stream << "\t\t<receiver android:name=\"com.mosync.internal.android.billing.BillingReceiver\">\n";
-	stream << "\t\t\t<intent-filter>\n";
-	stream << "\t\t\t\t<action android:name=\"com.android.vending.billing.IN_APP_NOTIFY\" />\n";
-	stream << "\t\t\t\t<action android:name=\"com.android.vending.billing.RESPONSE_CODE\" />\n";
-	stream << "\t\t\t\t<action android:name=\"com.android.vending.billing.PURCHASE_STATE_CHANGED\" />\n";
-	stream << "\t\t\t</intent-filter>\n";
-	stream << "\t\t</receiver>\n";
+	for (size_t i = 0; i < deleteUs.size(); i++) {
+		delete deleteUs[(int) i];
+	}
 }
 
 static void writeMain(const char* filename, const SETTINGS& s, const RuntimeInfo& ri) {

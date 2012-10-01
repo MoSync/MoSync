@@ -69,6 +69,7 @@ struct SETTINGS {
     const char* androidAlias;
     const char* androidKeyPass;
     const char* androidInstallLocation;
+    const char* androidManifestTemplate;
 
     // BlackBerry specific settings
     const char* blackberryJde;

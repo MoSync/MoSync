@@ -61,6 +61,10 @@ string ProfileDB::profilesdir() {
 	return toSlashes(string(md) + "/profiles/platforms");
 }
 
+string ProfileDB::profilesdir(string family) {
+	return profilesdir() + F_SEPERATOR + family;
+}
+
 static bool isWildcard(string pattern) {
 	return pattern.length() > 0 && pattern.at(pattern.length() - 1) == '*';
 }

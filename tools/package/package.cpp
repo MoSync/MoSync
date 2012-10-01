@@ -206,6 +206,8 @@ int main(int argc, const char** argv) {
 			setString(i, argc, argv, s.androidKeyPass);
 		} else if(streq(argv[i], "--android-install-location")) {
 			setString(i, argc, argv, s.androidInstallLocation);
+		} else if(streq(argv[i], "--android-manifest-template")) {
+			setString(i, argc, argv, s.androidManifestTemplate);
 		} else if(streq(argv[i], "--blackberry-jde")) {
 			setString(i, argc, argv, s.blackberryJde);
 		} else if(streq(argv[i], "--blackberry-signkey")) {

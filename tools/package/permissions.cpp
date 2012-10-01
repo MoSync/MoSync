@@ -20,6 +20,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <algorithm>
 
 #include "permissions.h"
 
@@ -36,13 +37,22 @@ void parsePermissions(set<string>& out, const char* permissions) {
 	string::size_type pos = permissionStr.find_first_of(",", lastPos);
 
 	while (string::npos != pos || string::npos != lastPos) {
-		out.insert(permissionStr.substr(lastPos, pos - lastPos));
-        lastPos = permissionStr.find_first_not_of(",", pos);
+		string permission = permissionStr.substr(lastPos, pos - lastPos);
+		out.insert(normalizePermission(permission));
+		lastPos = permissionStr.find_first_not_of(",", pos);
         pos = permissionStr.find_first_of(",", lastPos);
 	}
 }
 
+std::string normalizePermission(std::string permission) {
+	std::string result(permission);
+	std::replace(result.begin(), result.end(), ' ', '-');
+	std::transform(result.begin(), result.end(), result.begin(), ::tolower);
+	return result;
+}
+
 string getParentPermission(string permission) {
+	permission = normalizePermission(permission);
 	string::size_type slashPos = permission.find_last_of("/", string::npos);
 	if (string::npos == slashPos) {
 		return string();
@@ -55,7 +65,23 @@ bool isPermissionSet(std::set<std::string>& permissionSet, string permission) {
 	if (permission.length() == 0) {
 		return false;
 	}
+	permission = normalizePermission(permission);
 	string parent = getParentPermission(permission);
 	return permissionSet.find(string(permission)) != permissionSet.end() ||
 		isPermissionSet(permissionSet, parent);
+}
+
+PermissionContext::PermissionContext(MustacheContext* parent, const char* permissions) : DefaultContext(parent) {
+	parsePermissions(fParsedPermissions, permissions);
+}
+
+string PermissionContext::getParameter(string key) {
+	// Convert : to /
+	std::replace(key.begin(), key.end(), ':', '/');
+	string result = isPermissionSet(fParsedPermissions, key) ? key : string();
+	return result;
+}
+
+vector<MustacheContext*> PermissionContext::getChildren(string key) {
+	return vector<MustacheContext*>();
 }
