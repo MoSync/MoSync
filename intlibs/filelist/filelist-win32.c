@@ -23,6 +23,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <windows.h>
 #include "filelist.h"
 
+static void getFileTime(const char* path, FILETIME* ft);
+
 int scanDirectory(const char* path, FileListCallback cb) {
 #ifdef _WIN32_WCE
 	WCHAR tpath[MAX_PATH];
@@ -70,6 +72,41 @@ int isDirectory(const char* filename) {
 	if(res == (DWORD)-1)
 		return -1;
 	return (res & FILE_ATTRIBUTE_DIRECTORY) ? 1 : 0;
+}
+
+int compareTime(const char* file1, const char* file2) {
+#ifdef _WIN32_WCE
+	WCHAR tfn1[MAX_PATH];
+	WCHAR tfn2[MAX_PATH];
+	convertAsciiToUnicode(tfn1, MAX_PATH, file1);
+	convertAsciiToUnicode(tfn2, MAX_PATH, file2);
+#else
+	const char* tfn1 = file1;
+	const char* tfn2 = file2;
+#endif
+	FILETIME ft1, ft2;
+	int hDiff, lDiff;
+
+	getFileTime(file1, &ft1);
+	getFileTime(file2, &ft2);
+
+	hDiff = ft1->dwHighDateTime - ft2->dwHighDateTime;
+	lDiff = ft1->dwLowDateTime - ft2->dwLowDateTime;
+	if (hDiff) {
+		return hDiff;
+	} else {
+		return lDiff;
+	}
+}
+
+static void getFileTime(const char* path, FILETIME* ft) {
+	HANDLE handle;
+	handle = CreateFile(path, 0, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
+	if (handle == INVALID_HANDLE_VALUE || !GetFileTime(hFile, NULL, NULL, ft)) {
+		ft->dwLowDateTime = 0;
+		ft->dwHighDateTime = 0;
+    }
+	CloseHandle(handle);
 }
 
 #ifndef _WIN32_WCE
