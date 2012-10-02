@@ -12,7 +12,7 @@ static void doTest() {
 		printf("mpl: %i\n", len);
 		return;
 	}
-	strcpy(path+len, "testFile.bin");
+	strcpy(path+len-1, "testFile.bin");
 	printf("%s\n", path);
 
 	MAHandle f;

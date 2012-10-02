@@ -2709,7 +2709,7 @@ namespace Base {
 #endif
 		if(strcmp(key, "mosync.path.local") == 0) {
 			strncpy(buf, "/", size);
-			return 1;
+			return 2;
 		}
 
 		if(strcmp(key, "mosync.device") == 0) {
