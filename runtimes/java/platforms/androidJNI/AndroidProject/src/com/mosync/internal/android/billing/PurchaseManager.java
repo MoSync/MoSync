@@ -285,6 +285,8 @@ public class PurchaseManager extends BillingListener
 			if ( purchase.getState() == MA_PURCHASE_STATE_COMPLETED ||
 					purchase.getState() == MA_PURCHASE_STATE_PRODUCT_REFUNDED )
 			{
+				// Post the pending event, but don't remove it from the queue,
+				// as the receipt may be requested again.
 				int[] event = m_PendingEvents.get(handle);
 				if ( null != event )
 				{
@@ -292,8 +294,6 @@ public class PurchaseManager extends BillingListener
 							BillingEvent.onVerifyReceipt(
 												event[3],event[2],event[4]));
 				}
-				// Remove pending receipt event if there is one.
-				m_PendingEvents.remove(handle);
 			}
 			else
 			{

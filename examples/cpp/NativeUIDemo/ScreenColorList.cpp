@@ -72,6 +72,7 @@ ScreenColorList::ScreenColorList():
 	StackScreen()
 {
 	createUI();
+	addStackScreenListener(this);
 }
 
 /**
@@ -80,6 +81,7 @@ ScreenColorList::ScreenColorList():
 ScreenColorList::~ScreenColorList()
 {
 	mListView->removeListViewListener(this);
+	removeStackScreenListener(this);
 	// TODO: Deallocate the images we create!
 }
 
@@ -187,4 +189,19 @@ void ScreenColorList::listViewItemClicked(
 			}
 		}
 	}
+}
+
+/**
+ * This method is called when a screen has been popped from a stack
+ * screen.
+ * @param stackScreen The stack screen object that generated the event.
+ * @param fromScreen The screen that was popped from the stack screen.
+ * @param toScreen The screen that will be shown.
+ */
+void ScreenColorList::stackScreenScreenPopped(
+    StackScreen* stackScreen,
+    Screen* fromScreen,
+    Screen* toScreen)
+{
+	mListView->requestFocus();
 }
