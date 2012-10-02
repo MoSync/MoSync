@@ -244,12 +244,12 @@ static void injectIcons(const SETTINGS& s, const RuntimeInfo& ri) {
 			//36x36 for low-density (ldpi)
 			//48x48 for medium-density (mdpi)
 			//72x72 for high-density (hdpi)
-			/*sizes.push_back("36x36");
+			sizes.push_back("36x36");
 			sizes.push_back("48x48");
 			sizes.push_back("72x72");
 			directories.push_back("/res/drawable-ldpi");
 			directories.push_back("/res/drawable-mdpi");
-			directories.push_back("/res/drawable-hdpi");*/
+			directories.push_back("/res/drawable-hdpi");
 		}
 
 		if (ri.androidVersion >= 8) {
