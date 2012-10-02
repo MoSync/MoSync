@@ -31,7 +31,7 @@ class Profiles
 				else
 					name = line.slice(s.length, spaceIndex - s.length)
 					value = line.slice(spaceIndex + 1, line.length - (spaceIndex + 2))
-					hash[name] = value
+					hash[name] = value.strip
 				end
 			end
 		end
