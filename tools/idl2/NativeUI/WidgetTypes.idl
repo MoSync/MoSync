@@ -180,7 +180,7 @@ group WidgetTypes "Widget types" {
 
 		/**
 		 * @brief A Toggle Button is a widget that acts like a physical switch. Displays checked/unchecked states as a button with a "light" indicator and by default accompanied with the text "ON" or "OFF".
-		 * It is available only on Android, and it's similar to the Check Box on iOS.
+		 * It is available on Android, iOS and Windows Phone 7.
 		 * When pressed it will toggle its internal state that can either be checked or non-checked. See \ref WidgetToggleButtonProperties "Toggle button properties" for the properties available.
 		 */
 		TOGGLE_BUTTON = "ToggleButton";
