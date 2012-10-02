@@ -39,4 +39,10 @@
  */
 - (NSString*)getPropertyWithKey:(NSString*)key;
 
+/**
+ * Asks the label to calculate and return the size that best fits itself.
+ * @return Wrap size of the label.
+ */
+- (CGSize)sizeThatFitsForWidget;
+
 @end

@@ -121,13 +121,6 @@ typedef enum VerticalAlignment
     {
 		UILabel* label = (UILabel*) self.view;
 		[label setText: value];
-		if (self.autoSizeWidth == WidgetAutoSizeWrapContent)
-		{
-			CGSize textSize = [label.text sizeWithFont:label.font];
-			CGRect rect = label.frame;
-			rect.size.width = textSize.width;
-			label.frame = rect;
-		}
 		[self layout];
 	}
 	else if([key isEqualToString:@MAW_LABEL_MAX_NUMBER_OF_LINES])
@@ -227,6 +220,40 @@ typedef enum VerticalAlignment
     {
 		return [super getPropertyWithKey:key];
 	}
+}
+
+/**
+ * Asks the label to calculate and return the size that best fits itself.
+ * @return Wrap size of the label.
+ */
+- (CGSize)sizeThatFitsForWidget
+{
+    UILabel* label = (UILabel*) self.view;
+    CGSize constrainedSize = self.size;
+
+    // If one of the autosize values is wrap calculate label's size
+    // using the text size functions.
+    if (self.autoSizeWidth == WidgetAutoSizeWrapContent ||
+        self.autoSizeHeight == WidgetAutoSizeWrapContent)
+    {
+        constrainedSize = [label.text sizeWithFont:label.font];
+    }
+
+    // If one of the autosize values is fill set the according
+    // size to maximum.
+    if (self.autoSizeHeight == WidgetAutoSizeFillParent)
+    {
+        constrainedSize.height = FLT_MAX;
+    }
+    if (self.autoSizeWidth == WidgetAutoSizeFillParent)
+    {
+        constrainedSize.width = FLT_MAX;
+    }
+
+    // Calculate label size that best fits itself.
+	CGSize size = [label.text sizeWithFont:label.font constrainedToSize:constrainedSize
+                             lineBreakMode:label.lineBreakMode ];
+    return size;
 }
 
 @end
