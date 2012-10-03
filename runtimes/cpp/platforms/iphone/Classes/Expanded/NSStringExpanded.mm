@@ -48,4 +48,33 @@
     return false;
 }
 
+/**
+ * Returns a string created by copying the data from a given C array of UTF16-encoded bytes.
+ * @param bytes A NULL-terminated C array of bytes in UTF16 encoding.
+ * @return A string created by copying the data from bytes.
+ */
++(NSString*)stringWithUTF16String:(const wchar*) bytes
+{
+    void* address = (void*) bytes;
+    int wcharSize = sizeof(wchar);
+    NSString* returnedValue = @"";
+    while (true)
+    {
+        NSString* utf16Char = [[NSString alloc] initWithBytes:address
+                                                      length:wcharSize
+                                                    encoding:NSUTF16LittleEndianStringEncoding];
+
+        if ([utf16Char isEqualToString:@"\0"])
+        {
+            break;
+        }
+        address = (wchar*)address + 1;
+        returnedValue = [returnedValue stringByAppendingString:utf16Char];
+        [utf16Char release];
+        utf16Char = nil;
+    }
+
+    return returnedValue;
+}
+
 @end
