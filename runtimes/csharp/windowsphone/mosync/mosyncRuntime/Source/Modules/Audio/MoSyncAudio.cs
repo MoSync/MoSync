@@ -701,7 +701,7 @@ namespace MoSync
 					SoundEffect se = SoundEffect.FromStream(stream);
 					return new AudioDataSoundEffect(se);
 				}
-				catch (Exception e)
+				catch (Exception)
 				{
 					throw new MoSync.Util.ReturnValueException(MoSync.Constants.MA_AUDIO_ERR_INVALID_DATA);
 				}
@@ -714,7 +714,7 @@ namespace MoSync
 			{
 				return new AudioInstanceDynamic(_sampleRate, _numChannels, _bufferSize);
 			}
-			catch (Exception e)
+			catch (Exception)
 			{
 				throw new MoSync.Util.ReturnValueException(MoSync.Constants.MA_AUDIO_ERR_INVALID_SOUND_FORMAT);
 			}
