@@ -427,6 +427,32 @@ static NSString* kReuseIdentifier = @"Cell";
 }
 
 /**
+ * Recalculate its and children size.
+ */
+- (void)layout
+{
+    if ([_children count] == 0)
+    {
+        return;
+    }
+    IWidget* child = [_children objectAtIndex:0];
+    CGSize oldSize = child.size;
+    CGSize newSize = oldSize;
+    if (child.autoSizeHeight == WidgetAutoSizeFillParent)
+    {
+        newSize.height = super.height;
+    }
+    if (child.autoSizeWidth == WidgetAutoSizeFillParent)
+    {
+        newSize.width = super.width;
+    }
+    if (!CGSizeEqualToSize(oldSize, newSize))
+    {
+        child.size = newSize;
+    }
+}
+
+/**
  * Get widget's height.
  */
 -(CGFloat) height

@@ -148,4 +148,9 @@
  */
 -(CGSize)sizeThatFitsForWidget;
 
+/**
+ * Recalculate its and children size.
+ */
+- (void)layout;
+
 @end
