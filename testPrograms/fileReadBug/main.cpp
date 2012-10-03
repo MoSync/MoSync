@@ -36,11 +36,21 @@ static void doTest() {
 	}
 	int res = maFileRead(f, path, sizeof(path));
 	if(res != MA_FERR_GENERIC) {
-		printf("Got %i\n", res);
+		printf("FR Got %i\n", res);
 		printf("Expected %i\n", MA_FERR_GENERIC);
 		return;
 	}
-	printf("Test success!\n");
+	printf("FR success!\n");
+	TEST(maFileSeek(f, MA_SEEK_SET, 0));
+	MAHandle data = maCreatePlaceholder();
+	TEST(maCreateData(data, sizeof(path)));
+	res = maFileReadToData(f, data, 0, sizeof(path));
+	if(res != MA_FERR_GENERIC) {
+		printf("FRTD Got %i\n", res);
+		printf("Expected %i\n", MA_FERR_GENERIC);
+		return;
+	}
+	printf("FRTD success!\n");
 }
 
 int MAMain() GCCATTRIB(noreturn);
