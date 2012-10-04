@@ -78,9 +78,6 @@
 		4383ADF7161AC99D00F11991 /* ToggleButtonWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 4383ADF5161AC99D00F11991 /* ToggleButtonWidget.h */; };
 		4383ADF8161AC99D00F11991 /* ToggleButtonWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4383ADF6161AC99D00F11991 /* ToggleButtonWidget.mm */; };
 		4383ADF9161AC99D00F11991 /* ToggleButtonWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4383ADF6161AC99D00F11991 /* ToggleButtonWidget.mm */; };
-		438DBD401475388500980239 /* AudioSyscall.mm in Sources */ = {isa = PBXBuildFile; fileRef = E4D36EA71459AC5B00477B1E /* AudioSyscall.mm */; };
-		438DBD451475393800980239 /* AudioInstance.mm in Sources */ = {isa = PBXBuildFile; fileRef = E4D36EAB1459B5B600477B1E /* AudioInstance.mm */; };
-		438DBD461475393800980239 /* AudioData.mm in Sources */ = {isa = PBXBuildFile; fileRef = E4D36EA51459AC5B00477B1E /* AudioData.mm */; };
 		4392606A15B478F400B53B88 /* LICENSE.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4392606915B478F400B53B88 /* LICENSE.txt */; };
 		43B322D715BC4168009634BC /* HorizontalLayoutWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 43B322D515BC4168009634BC /* HorizontalLayoutWidget.h */; };
 		43B322D815BC4168009634BC /* HorizontalLayoutWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43B322D615BC4168009634BC /* HorizontalLayoutWidget.mm */; };
@@ -715,9 +712,6 @@
 		8D1107310486CEB800E47090 /* MoSync-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "MoSync-Info.plist"; plistStructureDefinitionIdentifier = "com.apple.xcode.plist.structure-definition.iphone.info-plist"; sourceTree = "<group>"; };
 		E413FAB714C0604D00BF1E3D /* ResourceArray.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ResourceArray.cpp; path = ../../../base/ResourceArray.cpp; sourceTree = "<group>"; };
 		E438DF4F1535D35C008B5005 /* CoreMedia.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMedia.framework; path = System/Library/Frameworks/CoreMedia.framework; sourceTree = SDKROOT; };
-		E4D36EA51459AC5B00477B1E /* AudioData.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = AudioData.mm; path = /Users/bogdan/Experimental/runtimes/cpp/platforms/iphone/Classes/audio/AudioData.mm; sourceTree = "<absolute>"; };
-		E4D36EA71459AC5B00477B1E /* AudioSyscall.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = AudioSyscall.mm; path = /Users/bogdan/Experimental/runtimes/cpp/platforms/iphone/Classes/audio/AudioSyscall.mm; sourceTree = "<absolute>"; };
-		E4D36EAB1459B5B600477B1E /* AudioInstance.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = AudioInstance.mm; path = /Users/bogdan/Experimental/runtimes/cpp/platforms/iphone/Classes/audio/AudioInstance.mm; sourceTree = "<absolute>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1800,9 +1794,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				438DBD451475393800980239 /* AudioInstance.mm in Sources */,
-				438DBD461475393800980239 /* AudioData.mm in Sources */,
-				438DBD401475388500980239 /* AudioSyscall.mm in Sources */,
 				858B44BB12E7B1060058DBFC /* log.cpp in Sources */,
 				E4B3144E14B483FF009F88B4 /* MoSync.mm in Sources */,
 				E4B3145014B48404009F88B4 /* MoSyncExtension.mm in Sources */,
