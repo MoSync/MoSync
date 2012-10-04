@@ -120,6 +120,7 @@ namespace MoSync
                 mView = mGrid;
 
                 this.ItemSelected = false;
+                this.ItemsSourceItemIndex = -1;
 			}
 
             public override void AddChild(IWidget child)
@@ -133,14 +134,14 @@ namespace MoSync
             }
 
             /**
-             * Asks for the parent section to rebuild the list view model.
+             * Asks for the parent section to reload the list view model.
              */
-            public void RebuildParentList()
+            public void ReloadParentList()
             {
                 if (mParent is ListViewSection)
                 {
                     ListViewSection parentSection = mParent as ListViewSection;
-                    parentSection.RebuildParentList();
+                    parentSection.ReloadParentItem(this);
                 }
             }
 
@@ -148,6 +149,16 @@ namespace MoSync
              * Sets the selected state of the item.
              */
             public bool ItemSelected
+            {
+                get;
+                set;
+            }
+
+            /**
+             * The index of the item data within the section contained by the parent list view
+             * items source (the long list selector items source).
+             */
+            public int ItemsSourceItemIndex
             {
                 get;
                 set;
@@ -199,7 +210,7 @@ namespace MoSync
 				set
 				{
                     mText.Text = value;
-                    RebuildParentList();
+                    ReloadParentList();
 				}
 				get
 				{
@@ -217,7 +228,7 @@ namespace MoSync
                 set
                 {
                     mSubtitle = value;
-                    RebuildParentList();
+                    ReloadParentList();
                 }
                 get
                 {
@@ -271,7 +282,7 @@ namespace MoSync
                         else throw new InvalidPropertyValueException();
                     }
                     else throw new InvalidPropertyValueException();
-                    RebuildParentList();
+                    ReloadParentList();
 				}
 			}
 

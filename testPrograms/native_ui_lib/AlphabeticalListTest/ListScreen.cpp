@@ -93,16 +93,19 @@ void ListScreen::createMainLayout() {
 		sectionTitle[0] += i;
 		section->setTitle(sectionTitle);
 		section->setHeaderText(sectionTitle);
+		section->setFooterText("footer");
+
+		mListView->addChild(section);
 		for (int j = 0; j <= 20; j++)
 		{
 			ListViewItem* item = new ListViewItem();
 			MAUtil::String itemText = sectionTitle + "0";
 			itemText[1] += j;
 			item->setText(itemText);
-			item->setSubtitle("subtitle");
+			item->setSubtitle("some subtitle text");
 			section->addItem(item);
 		}
-		mListView->addChild(section);
+
 	}
 
 	int result = mMainLayout->addChild(mListView);

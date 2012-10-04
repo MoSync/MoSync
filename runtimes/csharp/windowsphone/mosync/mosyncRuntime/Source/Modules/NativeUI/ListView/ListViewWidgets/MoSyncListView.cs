@@ -532,6 +532,7 @@ namespace MoSync
                 {
                     section.ListStyle = mListViewStyle;
                     ListSection<ListItem> sectionModel = CreateSectionModelFromWidget(section);
+                    section.ItemsSourceSectionIndex = mListSections.Count;
                     mListSections.Add(sectionModel);
                     section.SectionIndex = mListSections.Count - 1;
                 });
@@ -566,6 +567,7 @@ namespace MoSync
                 {
                     section.ListStyle = mListViewStyle;
                     ListSection<ListItem> sectionModel = CreateSectionModelFromWidget(section);
+                    section.ItemsSourceSectionIndex = index;
                     mListSections.Insert(index, sectionModel);
                     section.SectionIndex = index;
                 });
@@ -585,6 +587,19 @@ namespace MoSync
             }
 
             /**
+             * Removes a list view section from the list.
+             * @param index The index of the list view section to be removed.
+             */
+            private void RemoveListSection(int index)
+            {
+                base.RemoveChild(index);
+                MoSync.Util.RunActionOnMainThreadSync(() =>
+                {
+                    mListSections.RemoveAt(index);
+                });
+            }
+
+            /**
              * Creates a section model from the added widget.
              */
             private ListSection<ListItem> CreateSectionModelFromWidget(ListViewSection section)
@@ -593,8 +608,23 @@ namespace MoSync
                 currentSection.Title = section.Title;
                 currentSection.Header = section.Header;
                 currentSection.Footer = section.Footer;
-
-                // TODO SA: add the rest of the section props
+                currentSection.HeaderColor = section.GetHeaderBackgroundColor();
+                currentSection.HeaderFontColor = section.GetHeaderFontColor();
+                currentSection.HeaderFontFamily = section.GetHeaderFontFamily();
+                currentSection.HeaderFontSize = section.GetHeaderFontSize();
+                currentSection.HeaderFontStyle = section.GetHeaderFontStyle();
+                currentSection.HeaderFontWeight = section.GetHeaderFontWeight();
+                currentSection.HeaderTextHorizontalAlignment = section.GetHeaderHorizontalAlignment();
+                currentSection.HeaderTextVerticalAlignment = section.GetHeaderVerticalAlignment();
+                currentSection.Footer = section.Footer;
+                currentSection.FooterColor = section.GetFooterBackgroundColor();
+                currentSection.FooterFontColor = section.GetFooterFontColor();
+                currentSection.FooterFontFamily = section.GetFooterFontFamily();
+                currentSection.FooterFontSize = section.GetFooterFontSize();
+                currentSection.FooterFontStyle = section.GetFooterFontStyle();
+                currentSection.FooterFontWeight = section.GetFooterFontWeight();
+                currentSection.FooterTextHorizontalAlignment = section.GetFooterHorizontalAlignment();
+                currentSection.FooterTextVerticalAlignment = section.GetFooterVerticalAlignment();
 
                 for (int i = 0; i < section.ChildrenCount; i++ )
                 {
@@ -603,6 +633,8 @@ namespace MoSync
                     {
                         ListViewItem listItem = widget as ListViewItem;
                         ListItem newItem = new ListItem();
+                        newItem.Height = listItem.Height;
+                        newItem.Width = listItem.Width;
                         newItem.Title = listItem.Text;
                         newItem.Subtitle = listItem.Subtitle;
                         if (mListViewStyle == ListViewStyle.NoSubtitle)
@@ -615,25 +647,12 @@ namespace MoSync
                         }
                         newItem.ImageSource = listItem.IconImageSource;
 
-                        // TODO SA: add the rest of the item properties
+                        listItem.ItemsSourceItemIndex = currentSection.Count;
                         currentSection.Add(newItem);
                     }
                 }
 
                 return currentSection;
-            }
-
-            /**
-             * Removes a list view section from the list.
-             * @param index The index of the list view section to be removed.
-             */
-            private void RemoveListSection(int index)
-            {
-                base.RemoveChild(index);
-                MoSync.Util.RunActionOnMainThreadSync(() =>
-                {
-                    mListSections.RemoveAt(index);
-                });
             }
 
             /**
@@ -679,59 +698,68 @@ namespace MoSync
              */
             private void GetSectionAndSelectedItemIndex(out int sectionIndex, out int itemIndex)
             {
-                // TODO SA: get the selected index
+                // TODO SA: do this better - add some kind of mapping between the section items
+                // and the widget children
 
                 // we need to find the selected item through the LongListSelector
                 // items source and through the child widgets aswell in order to
                 // set its selected state
                 sectionIndex = -1;
                 itemIndex = -1;
-                bool foundItem = false;
+
+                // we need to firs find the selected item index and its section index
+                // within the long list selector items source
+                int itemsSourceSectionIndex = -1;
+                int itemsSourceItemIndex = -1;
+                bool foundItemWithinItemsSource = false;
                 for (int i = 0; i < mListSections.Count; i++)
                 {
                     ListSection<ListItem> section = mListSections[i];
-
-                    // get the current section index
-                    ListViewSection currentSection = null;
-                    if (i < mChildren.Count && mChildren[i] is ListViewSection)
-                    {
-                        currentSection = mChildren[i] as ListViewSection;
-                    }
 
                     for (int j = 0; j < section.Count; j++)
                     {
                         ListItem item = section[j];
 
-                        // get the current ListViewItem - it's going to be the same item
-                        // as the selected one only if the developer has created a list by only adding
-                        // sections to it and items to every section
-                        ListViewItem currentItem = null;
-                        if (currentSection != null && j < currentSection.ChildrenCount &&
-                            currentSection.GetChild(j) is ListViewItem)
-                        {
-                            currentItem = currentSection.GetChild(j) as ListViewItem;
-                            currentItem.ItemSelected = false;
-                        }
-
                         if (item.Equals(mLongListSelector.SelectedItem))
                         {
-                            sectionIndex = i;
-                            itemIndex = j;
-                            foundItem = true;
-
-                            // set the selected state of the current item if it's the same
-                            // with the one visible on the screen
-                       /*     if (currentItem != null && currentItem.ListItemData.Equals(mLongListSelector.SelectedItem))
-                            {
-                                currentItem.ItemSelected = true;
-                            } */
+                            itemsSourceSectionIndex = i;
+                            itemsSourceItemIndex = j;
+                            foundItemWithinItemsSource = true;
 
                             break;
                         }
                     }
-                    if (foundItem)
+                    if (foundItemWithinItemsSource)
                     {
                         break;
+                    }
+                }
+
+                // then we need to go through the widget children and find
+                // the section/item that match the section/item indexes within
+                // the items source
+                for (int i = 0; i < mChildren.Count; i++)
+                {
+                    if (mChildren[i] is ListViewSection)
+                    {
+                        ListViewSection section = mChildren[i] as ListViewSection;
+                        if (section.ItemsSourceSectionIndex == itemsSourceSectionIndex)
+                        {
+                            for (int j = 0; j < section.ChildrenCount; j++)
+                            {
+                                if (section.GetChild(j) is ListViewItem)
+                                {
+                                    ListViewItem item = section.GetChild(j) as ListViewItem;
+                                    item.ItemSelected = false;
+                                    if (item.ItemsSourceItemIndex == itemsSourceItemIndex)
+                                    {
+                                        sectionIndex = i;
+                                        itemIndex = j;
+                                        item.ItemSelected = true;
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -760,6 +788,83 @@ namespace MoSync
 
             #region Helper method for updating the UI when a section has changed
 
+            /**
+             * Reloads a list section within the long list selector items source.
+             */
+            public void ReloadListSection(ListViewSection section)
+            {
+                if (mListSections.Count > section.ItemsSourceSectionIndex)
+                {
+                    ListSection<ListItem> sectionToReload = mListSections[section.ItemsSourceSectionIndex];
+                    sectionToReload.Title = section.Title;
+                    sectionToReload.Header = section.Header;
+                    sectionToReload.HeaderColor = section.GetHeaderBackgroundColor();
+                    sectionToReload.HeaderFontColor = section.GetHeaderFontColor();
+                    sectionToReload.HeaderFontFamily = section.GetHeaderFontFamily();
+                    sectionToReload.HeaderFontSize = section.GetHeaderFontSize();
+                    sectionToReload.HeaderFontStyle = section.GetHeaderFontStyle();
+                    sectionToReload.HeaderFontWeight = section.GetHeaderFontWeight();
+                    sectionToReload.HeaderTextHorizontalAlignment = section.GetHeaderHorizontalAlignment();
+                    sectionToReload.HeaderTextVerticalAlignment = section.GetHeaderVerticalAlignment();
+                    sectionToReload.Footer = section.Footer;
+                    sectionToReload.FooterColor = section.GetFooterBackgroundColor();
+                    sectionToReload.FooterFontColor = section.GetFooterFontColor();
+                    sectionToReload.FooterFontFamily = section.GetFooterFontFamily();
+                    sectionToReload.FooterFontSize = section.GetFooterFontSize();
+                    sectionToReload.FooterFontStyle = section.GetFooterFontStyle();
+                    sectionToReload.FooterFontWeight = section.GetFooterFontWeight();
+                    sectionToReload.FooterTextHorizontalAlignment = section.GetFooterHorizontalAlignment();
+                    sectionToReload.FooterTextVerticalAlignment = section.GetFooterVerticalAlignment();
+
+                    mListSections[section.ItemsSourceSectionIndex] = sectionToReload;
+                }
+            }
+
+            /**
+             * Reloads a list item within the long list selector items source.
+             */
+            public void ReloadListItem(ListViewSection section, ListViewItem item)
+            {
+                if (mListSections.Count > section.ItemsSourceSectionIndex)
+                {
+                    ListSection<ListItem> sectionToReload = mListSections[section.ItemsSourceSectionIndex];
+                    if (sectionToReload.Count > item.ItemsSourceItemIndex)
+                    {
+                        ListItem itemToReload = sectionToReload[item.ItemsSourceItemIndex];
+                        itemToReload.Height = item.Height;
+                        itemToReload.Width = item.Width;
+                        itemToReload.Title = item.Text;
+                        itemToReload.Subtitle = item.Subtitle;
+                        if (mListViewStyle == ListViewStyle.NoSubtitle)
+                        {
+                            itemToReload.SubtitleVisibility = Visibility.Collapsed;
+                        }
+                        else
+                        {
+                            itemToReload.SubtitleVisibility = Visibility.Visible;
+                        }
+                        itemToReload.ImageSource = item.IconImageSource;
+
+                        sectionToReload[item.ItemsSourceItemIndex] = itemToReload;
+                    }
+                }
+            }
+
+            /**
+             * Reloads all the section items within the long list selector items source.
+             */
+            public void ReloadListSectionMembers(ListViewSection section)
+            {
+                if (mListSections.Count > section.ItemsSourceSectionIndex)
+                {
+                    // TODO SA: this could be more performant
+                    mListSections[section.ItemsSourceSectionIndex] = CreateSectionModelFromWidget(section);
+                }
+            }
+
+            /**
+             * Reloads a section at a certain index inside the long list selector items source.
+             */
             public void UpdateSection(int sectionIndex, ListSection<ListItem> newSection)
             {
                 if (mListSections.Count > sectionIndex)

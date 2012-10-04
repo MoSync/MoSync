@@ -27,7 +27,7 @@
         <!-- The footer template of a LongListSelector -->
         <DataTemplate x:Key="groupFooterTemplate">
             <Border Background="{Binding FooterColor}" Padding="{StaticResource PhoneTouchTargetOverhang}" Visibility="{Binding FooterVisibility}">
-                <TextBlock Margin="10,0,1,5" Style="{StaticResource PhoneTextLargeStyle}" Text="{Binding FooterTitle}"
+                <TextBlock Margin="10,0,1,5" Style="{StaticResource PhoneTextLargeStyle}" Text="{Binding Footer}"
                            TextAlignment="{Binding FooterTextHorizontalAlignment}" VerticalAlignment="{Binding FooterTextVerticalAlignment}"
                            FontSize="{Binding FooterFontSize}" FontFamily="{Binding FooterFontFamily}"
                            FontWeight="{Binding FooterFontWeight}" FontStyle="{Binding FooterFontStyle}"
@@ -38,13 +38,13 @@
         <!-- The list item template of a LongListSelector -->
         <DataTemplate x:Key="listItemTemplate">
             <Border BorderThickness="2">
-                <Grid>
+                <Grid Height="{Binding Height}" Width="{Binding Width}">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"></ColumnDefinition>
                         <ColumnDefinition></ColumnDefinition>
                     </Grid.ColumnDefinitions>
                     <Border BorderThickness="1" Grid.Column="0">
-                        <Image Source="{Binding ImageSource}" Width="40" Height="50">
+                        <Image Source="{Binding ImageSource}" Width="40" Height="100">
                         </Image>
                     </Border>
 

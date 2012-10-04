@@ -43,16 +43,37 @@ namespace MoSync
 {
     namespace NativeUI
     {
-        public class ListSection<T> : ObservableCollection<T>, INotifyPropertyChanged
+        public class ListSection<T> : ObservableCollection<T>
         {
-            public event PropertyChangedEventHandler PropertyChanged;
+            public new event PropertyChangedEventHandler PropertyChanged;
 
             const double DEFAULT_HEADER_FONT_SIZE = 32.0;
             const double DEFAULT_FOOTER_FONT_SIZE = 32.0;
 
             #region Private class members
 
-            private string footerText = "";
+            private string mFooterText = "";
+            private string mTitle;
+            private string mHeader;
+            private string mFooter;
+            private Brush mHeaderColor;
+            private Brush mFooterColor;
+            private Visibility mFooterVisibility;
+            private Brush mGroupHeaderColor;
+            private VerticalAlignment mHeaderTextVerticalAlignment;
+            private VerticalAlignment mFooterTextVerticalAlignment;
+            private HorizontalAlignment mHeaderTextHorizontalAlignment;
+            private HorizontalAlignment mFooterTextHorizontalAlignment;
+            private double mHeaderFontSize;
+            private double mFooterFontSize;
+            private Brush mHeaderFontColor;
+            private Brush mFooterFontColor;
+            private FontFamily mHeaderFontFamily;
+            private FontFamily mFooterFontFamily;
+            private FontWeight mHeaderFontWeight;
+            private FontWeight mFooterFontWeight;
+            private FontStyle mHeaderFontStyle;
+            private FontStyle mFooterFontStyle;
 
             #endregion
 
@@ -134,26 +155,44 @@ namespace MoSync
 
             public string Title
             {
-                get;
-                set;
+                get
+                {
+                    return mTitle;
+                }
+                set
+                {
+                    if (value != null)
+                    {
+                        mTitle = value;
+                    }
+                }
             }
 
             public string Header
             {
-                get;
-                set;
+                get
+                {
+                    return mHeader;
+                }
+                set
+                {
+                    if (value != null)
+                    {
+                        mHeader = value;
+                    }
+                }
             }
 
             public string Footer
             {
                 get
                 {
-                    return footerText;
+                    return mFooterText;
                 }
                 set
                 {
-                    footerText = value;
-                    if (footerText != "")
+                    mFooterText = value;
+                    if (mFooterText != "")
                     {
                         FooterVisibility = Visibility.Visible;
                     }
@@ -162,20 +201,47 @@ namespace MoSync
 
             public Brush HeaderColor
             {
-                get;
-                set;
+                get
+                {
+                    return mHeaderColor;
+                }
+                set
+                {
+                    if (value != null)
+                    {
+                        mHeaderColor = value;
+                    }
+                }
             }
 
             public Brush FooterColor
             {
-                get;
-                set;
+                get
+                {
+                    return mFooterColor;
+                }
+                set
+                {
+                    if (value != null)
+                    {
+                        mFooterColor = value;
+                    }
+                }
             }
 
             public Visibility FooterVisibility
             {
-                get;
-                set;
+                get
+                {
+                    return mFooterVisibility;
+                }
+                set
+                {
+                    if (value != null)
+                    {
+                        mFooterVisibility = value;
+                    }
+                }
             }
 
             /**
@@ -183,8 +249,17 @@ namespace MoSync
              */
             public Brush GroupHeaderColor
             {
-                get;
-                set;
+                get
+                {
+                    return mGroupHeaderColor;
+                }
+                set
+                {
+                    if (value != null)
+                    {
+                        mGroupHeaderColor = value;
+                    }
+                }
             }
 
             /**
@@ -192,8 +267,17 @@ namespace MoSync
              */
             public VerticalAlignment HeaderTextVerticalAlignment
             {
-                get;
-                set;
+                get
+                {
+                    return mHeaderTextVerticalAlignment;
+                }
+                set
+                {
+                    if (value != null)
+                    {
+                        mHeaderTextVerticalAlignment = value;
+                    }
+                }
             }
 
             /**
@@ -201,8 +285,17 @@ namespace MoSync
              */
             public VerticalAlignment FooterTextVerticalAlignment
             {
-                get;
-                set;
+                get
+                {
+                    return mFooterTextVerticalAlignment;
+                }
+                set
+                {
+                    if (value != null)
+                    {
+                        mFooterTextVerticalAlignment = value;
+                    }
+                }
             }
 
             /**
@@ -210,8 +303,17 @@ namespace MoSync
              */
             public HorizontalAlignment HeaderTextHorizontalAlignment
             {
-                get;
-                set;
+                get
+                {
+                    return mHeaderTextHorizontalAlignment;
+                }
+                set
+                {
+                    if (value != null)
+                    {
+                        mHeaderTextHorizontalAlignment = value;
+                    }
+                }
             }
 
             /**
@@ -219,8 +321,17 @@ namespace MoSync
              */
             public HorizontalAlignment FooterTextHorizontalAlignment
             {
-                get;
-                set;
+                get
+                {
+                    return mFooterTextHorizontalAlignment;
+                }
+                set
+                {
+                    if (value != null)
+                    {
+                        mFooterTextHorizontalAlignment = value;
+                    }
+                }
             }
 
             /**
@@ -228,8 +339,17 @@ namespace MoSync
              */
             public double HeaderFontSize
             {
-                get;
-                set;
+                get
+                {
+                    return mHeaderFontSize;
+                }
+                set
+                {
+                    if (value > 0)
+                    {
+                        mHeaderFontSize = value;
+                    }
+                }
             }
 
             /**
@@ -237,8 +357,17 @@ namespace MoSync
              */
             public double FooterFontSize
             {
-                get;
-                set;
+                get
+                {
+                    return mFooterFontSize;
+                }
+                set
+                {
+                    if (value > 0)
+                    {
+                        mFooterFontSize = value;
+                    }
+                }
             }
 
             /**
@@ -246,8 +375,17 @@ namespace MoSync
              */
             public Brush HeaderFontColor
             {
-                get;
-                set;
+                get
+                {
+                    return mHeaderFontColor;
+                }
+                set
+                {
+                    if (value != null)
+                    {
+                        mHeaderFontColor = value;
+                    }
+                }
             }
 
             /**
@@ -255,8 +393,17 @@ namespace MoSync
              */
             public Brush FooterFontColor
             {
-                get;
-                set;
+                get
+                {
+                    return mFooterFontColor;
+                }
+                set
+                {
+                    if (value != null)
+                    {
+                        mFooterFontColor = value;
+                    }
+                }
             }
 
             /**
@@ -264,8 +411,17 @@ namespace MoSync
              */
             public FontFamily HeaderFontFamily
             {
-                get;
-                set;
+                get
+                {
+                    return mHeaderFontFamily;
+                }
+                set
+                {
+                    if (value != null)
+                    {
+                        mHeaderFontFamily = value;
+                    }
+                }
             }
 
             /**
@@ -273,8 +429,17 @@ namespace MoSync
              */
             public FontFamily FooterFontFamily
             {
-                get;
-                set;
+                get
+                {
+                    return mFooterFontFamily;
+                }
+                set
+                {
+                    if (value != null)
+                    {
+                        mFooterFontFamily = value;
+                    }
+                }
             }
 
             /**
@@ -282,8 +447,17 @@ namespace MoSync
              */
             public FontWeight HeaderFontWeight
             {
-                get;
-                set;
+                get
+                {
+                    return mHeaderFontWeight;
+                }
+                set
+                {
+                    if (value != null)
+                    {
+                        mHeaderFontWeight = value;
+                    }
+                }
             }
 
             /**
@@ -291,8 +465,17 @@ namespace MoSync
              */
             public FontWeight FooterFontWeight
             {
-                get;
-                set;
+                get
+                {
+                    return mFooterFontWeight;
+                }
+                set
+                {
+                    if (value != null)
+                    {
+                        mFooterFontWeight = value;
+                    }
+                }
             }
 
             /**
@@ -300,8 +483,17 @@ namespace MoSync
              */
             public FontStyle HeaderFontStyle
             {
-                get;
-                set;
+                get
+                {
+                    return mHeaderFontStyle;
+                }
+                set
+                {
+                    if (value != null)
+                    {
+                        mHeaderFontStyle = value;
+                    }
+                }
             }
 
             /**
@@ -309,8 +501,17 @@ namespace MoSync
              */
             public FontStyle FooterFontStyle
             {
-                get;
-                set;
+                get
+                {
+                    return mFooterFontStyle;
+                }
+                set
+                {
+                    if (value != null)
+                    {
+                        mFooterFontStyle = value;
+                    }
+                }
             }
 
             #endregion

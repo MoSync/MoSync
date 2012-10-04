@@ -52,7 +52,6 @@ namespace MoSync
             private String mTitle;
             private String mSubtitle;
             private Visibility mSubtitleVisibility;
-            private double mSubtitleHeight;
             private ImageSource mImageSource;
 
             // if the values are not set, the size of the Item is the same
@@ -72,6 +71,9 @@ namespace MoSync
                 mBackgroundColor = new SolidColorBrush(Colors.Black);
                 mTitle = "";
                 mSubtitle = "";
+                // the equivalent of xaml 'Auto' - the item resizez according to its content
+                mHeight = double.NaN;
+                mWidth = double.NaN;
             }
 
             #endregion
@@ -112,8 +114,11 @@ namespace MoSync
                 }
                 set
                 {
-                    mTitle = value;
-                    OnPropertyChanged("Title");
+                    if (mTitle != null)
+                    {
+                        mTitle = value;
+                        OnPropertyChanged("Title");
+                    }
                 }
             }
 
@@ -125,8 +130,11 @@ namespace MoSync
                 }
                 set
                 {
-                    mSubtitle = value;
-                    OnPropertyChanged("Subtitle");
+                    if (mSubtitle != null)
+                    {
+                        mSubtitle = value;
+                        OnPropertyChanged("Subtitle");
+                    }
                 }
             }
 
