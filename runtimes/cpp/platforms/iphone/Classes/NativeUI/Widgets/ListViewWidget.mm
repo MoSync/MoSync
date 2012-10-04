@@ -505,8 +505,12 @@
  */
 -(void)reloadItemAtIndexPath:(NSIndexPath*) indexPath
 {
+    /*
+     Note: reloadRowsAtIndexPaths does not resize item's height!
     [self.tableView reloadRowsAtIndexPaths:[NSArray arrayWithObject:indexPath]
                           withRowAnimation:UITableViewRowAnimationNone];
+     */
+    [self.tableView reloadData];
 }
 
 /**

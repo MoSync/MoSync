@@ -215,6 +215,8 @@ static NSString* kReuseIdentifier = @"Cell";
         self.view = moSyncCell;
         [moSyncCell release];
         moSyncCell = nil;
+        self.autoSizeHeight = WidgetAutoSizeWrapContent;
+        self.autoSizeWidth = WidgetAutoSizeFillParent;
     }
 
     return self;
@@ -237,7 +239,10 @@ static NSString* kReuseIdentifier = @"Cell";
  */
 - (int)addChild:(IWidget*)child
 {
-    [super addChild:child toSubview:YES];
+    if (_children.count ==0 )
+    {
+        [super addChild:child toSubview:YES];
+    }
     return MAW_RES_OK;
 }
 
@@ -449,6 +454,11 @@ static NSString* kReuseIdentifier = @"Cell";
     if (!CGSizeEqualToSize(oldSize, newSize))
     {
         child.size = newSize;
+    }
+    CGSize sizaThatFits = [self sizeThatFitsForWidget];
+    if (!CGSizeEqualToSize(self.size, sizaThatFits))
+    {
+        [_delegate sizeChangedFor:self];
     }
 }
 
