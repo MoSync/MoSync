@@ -410,8 +410,8 @@ namespace NativeUI
      * Remove a child widget from its parent (but does not destroy it).
      * Removing a currently visible top-level widget causes the MoSync view
      * to become visible.
-     * When the parent widget will be destroyed, the child widget will not
-     * be deleted.
+     * When the parent widget will be destroyed, the removed child widget will not
+     * be deleted (this responsibility is left to the developer).
      * @param widget The widget to be removed.
      * @return Any of the following result codes:
      * - #MAW_RES_OK if the child could be removed from the parent.

@@ -68,13 +68,20 @@ private:
 	CAppView* iAppView;
 	TBool iExiting;
 	HBufC8* iBuf;
+
 #ifdef __SERIES60_3X__
+	RWsSession& iWsSession;
+	CApaWindowGroupName* iGn;
+	bool iHomeScreenShown;
+
 	CRemConInterfaceSelector* iInterfaceSelector;
 	CRemConCoreApiTarget* iCoreTarget;
 
 	void MrccatoCommand(TRemConCoreApiOperationId aOperationId,
 		TRemConCoreApiButtonAction aButtonAct);
 #endif
+
+	void HandleWsEventL(const TWsEvent& aEvent, CCoeControl* aDestination);
 };
 
 #endif // __CAPPUI_H__

@@ -59,13 +59,6 @@ public class ListLayout extends Layout
 	implements AdapterChangedListener
 {
 	/**
-	 * List view types.
-	 */
-	static final int LIST_VIEW_TYPE_ALPHABETICAL = 1;
-	static final int LIST_VIEW_TYPE_SEGMENTED = 2;
-	static final int LIST_VIEW_TYPE_DEFAULT = 3;
-
-	/**
 	 * Item types for segmented list view.
 	 */
 	public static final int ITEM_VIEW_TYPE_ITEM = 0;
@@ -75,11 +68,11 @@ public class ListLayout extends Layout
 
 	/**
 	 * The list type:
-	 *  - default.
-	 *  - segmented.
-	 *  - alphabetical.
+	 *  - MAW_LIST_VIEW_TYPE_DEFAULT
+	 *  - MAW_LIST_VIEW_TYPE_ALPHABETICAL
+	 *  - MAW_LIST_VIEW_TYPE_SEGMENTED
 	 */
-	private int mListType = LIST_VIEW_TYPE_DEFAULT;
+	private int mListType = IX_WIDGET.MAW_LIST_VIEW_TYPE_DEFAULT;
 
 	/**
 	 * The sections of the list.
@@ -102,6 +95,16 @@ public class ListLayout extends Layout
 	 * Widget handle, used for posting item clicked events.
 	 */
 	private int mWidgetHandle;
+	/**
+	 * Widget handle of the selected item.
+	 */
+	private int mSelectedItemHandle;
+
+	/**
+	 * Allow selection property on the list.
+	 * If disabled, none of the adapter's items can be selected.
+	 */
+	private boolean mAllowSelection = true;
 
 	/**
 	 * Constructor.
@@ -114,13 +117,22 @@ public class ListLayout extends Layout
 		super( handle, listView );
 		listView.setAdapter( m_viewAdapter );
 		mWidgetHandle = handle;
+		listView.setOnItemClickListener(
+				new ListOnItemClickListener( handle ) );
+		//listView.setFocusable(true);
 	}
 
 	@Override
 	public int addChildAt(Widget child, int index)
 	{
-		if ( mListType == LIST_VIEW_TYPE_DEFAULT )
+		if ( mListType == IX_WIDGET.MAW_LIST_VIEW_TYPE_DEFAULT )
 		{
+			if ( child instanceof ListViewSection )
+			{
+				Log.e( "MoSync",
+				"maWidgetInsertChild: Default ListLayout cannot contain ListViewSections.");
+				return IX_WIDGET.MAW_RES_INVALID_HANDLE;
+			}
 			child.setParent(this);
 			updateLayoutParamsForChild(child);
 
@@ -159,17 +171,11 @@ public class ListLayout extends Layout
 			m_children.add(listIndex, child);
 			mSections.add(listIndex, section);
 
-			if ( mListType == LIST_VIEW_TYPE_SEGMENTED )
+			if ( mListType == IX_WIDGET.MAW_LIST_VIEW_TYPE_SEGMENTED )
 				addSegmentedSection(section, listIndex);
 			else
 			{
-				// Disable and enable fast scroll thumb,
-				// so that getSections() can get called
-				// and refresh the preview letters.
-				ListView l = (ListView) getView();
-				l.setFastScrollEnabled(false);
 				mAlphabeticalViewAdapter.reloadPreviewLetters();
-				l.setFastScrollEnabled(true);
 			}
 
 			// Set adapter listeners for each section.
@@ -209,14 +215,14 @@ public class ListLayout extends Layout
 	@Override
 	public int removeChild(Widget child)
 	{
-		if ( mListType == LIST_VIEW_TYPE_DEFAULT )
+		if ( mListType == IX_WIDGET.MAW_LIST_VIEW_TYPE_DEFAULT )
 		{
 			child.setParent(null);
 			m_children.remove( child );
 			m_viewAdapter.remove( child.getRootView( ) );
 		}
-		else if( mListType == LIST_VIEW_TYPE_ALPHABETICAL ||
-				mListType == LIST_VIEW_TYPE_SEGMENTED)
+		else if( mListType == IX_WIDGET.MAW_LIST_VIEW_TYPE_ALPHABETICAL ||
+				mListType == IX_WIDGET.MAW_LIST_VIEW_TYPE_SEGMENTED)
 		{
 			// Do not call super.removeChild because section is more
 			// of a container, that a widget.
@@ -228,7 +234,7 @@ public class ListLayout extends Layout
 			// Nullify adapter listener.
 			section.setAdapterListener(null);
 
-			if ( mListType == LIST_VIEW_TYPE_SEGMENTED )
+			if ( mListType == IX_WIDGET.MAW_LIST_VIEW_TYPE_SEGMENTED )
 				removeSegmentedSection(section);
 			else
 				mAlphabeticalViewAdapter.reloadPreviewLetters();
@@ -307,11 +313,11 @@ public class ListLayout extends Layout
 			if ( IntConverter.convert(value) == IX_WIDGET.MAW_LIST_VIEW_TYPE_DEFAULT)
 			{
 				listView.setAdapter( m_viewAdapter );
-				mListType = LIST_VIEW_TYPE_DEFAULT;
+				mListType = IX_WIDGET.MAW_LIST_VIEW_TYPE_DEFAULT;
 			}
 			else if( IntConverter.convert(value) == IX_WIDGET.MAW_LIST_VIEW_TYPE_SEGMENTED )
 			{
-				mListType = LIST_VIEW_TYPE_SEGMENTED;
+				mListType = IX_WIDGET.MAW_LIST_VIEW_TYPE_SEGMENTED;
 				m_viewAdapter = new SegmentedViewAdapter( );
 				listView.setAdapter(m_viewAdapter);
 				listView.setOnItemClickListener(
@@ -319,9 +325,10 @@ public class ListLayout extends Layout
 			}
 			else if( IntConverter.convert(value) == IX_WIDGET.MAW_LIST_VIEW_TYPE_ALPHABETICAL )
 			{
-				mListType = LIST_VIEW_TYPE_ALPHABETICAL;
+				mListType = IX_WIDGET.MAW_LIST_VIEW_TYPE_ALPHABETICAL;
 				mAlphabeticalViewAdapter = new AlphabeticalViewAdapter<ListItemWidget>( );
 				listView.setAdapter( mAlphabeticalViewAdapter );
+				listView.setFastScrollEnabled(true);
 				listView.setOnItemClickListener(
 						new SectionedListOnItemClickListener( mWidgetHandle ) );
 			}
@@ -332,14 +339,26 @@ public class ListLayout extends Layout
 		}
 		else if( property.equals(IX_WIDGET.MAW_LIST_VIEW_RELOAD_DATA) )
 		{
-			if ( mListType == LIST_VIEW_TYPE_ALPHABETICAL )
-				mAlphabeticalViewAdapter.notifyDataSetChanged();
-			else if ( mListType == LIST_VIEW_TYPE_SEGMENTED )
+			if ( mListType == IX_WIDGET.MAW_LIST_VIEW_TYPE_ALPHABETICAL )
+				mAlphabeticalViewAdapter.reloadPreviewLetters();
+			else if ( mListType == IX_WIDGET.MAW_LIST_VIEW_TYPE_SEGMENTED )
 				m_viewAdapter.notifyDataSetChanged();
 		}
 		else if( property.equals( Types.WIDGET_PROPERTY_REVERSED ) )
 		{
 			m_viewAdapter.setReversed( BooleanConverter.convert( value ) );
+		}
+		else if( property.equals( IX_WIDGET.MAW_LIST_VIEW_ALLOW_SELECTION ) )
+		{
+			mAllowSelection = BooleanConverter.convert(value);
+		}
+		else if(property.equals( IX_WIDGET.MAW_LIST_VIEW_REQUEST_FOCUS ))
+		{
+			ListView listView = (ListView) getView();
+			listView.setFocusable(true);
+			listView.setFocusableInTouchMode(true);
+			listView.requestFocus();
+			listView.setSelection(0);
 		}
 		else
 		{
@@ -347,6 +366,60 @@ public class ListLayout extends Layout
 		}
 
 		return true;
+	}
+
+	/**
+	 * @see Widget.getProperty.
+	 */
+	@Override
+	public String getProperty(String property)
+	{
+		if( property.equals( IX_WIDGET.MAW_LIST_VIEW_ALLOW_SELECTION ) )
+		{
+			return Boolean.toString(mAllowSelection);
+		}
+		else
+		{
+			return super.getProperty( property );
+		}
+	}
+
+	/**
+	 * Get the handle of the  last item that was selected in the list.
+	 * @return The selected item widget handle.
+	 */
+	public int getSelectedItem()
+	{
+		return mSelectedItemHandle;
+	}
+
+	/**
+	 * Class responsible for sending a mosync event when an item
+	 * in the default list view has been clicked.
+	 *
+	 * @author fmattias
+	 */
+	public class ListOnItemClickListener implements OnItemClickListener
+	{
+		private int m_handle = -1;
+
+		public ListOnItemClickListener(int handle)
+		{
+			m_handle = handle;
+		}
+
+		/**
+		 * @see OnItemClickListener.onItemClick.
+		 */
+		@Override
+		public void onItemClick(AdapterView<?> parent, View view, int position, long id)
+		{
+			// Store the last selected item.
+			mSelectedItemHandle = m_children.get(position).getHandle();
+			//mSelectedItem = (ListItemWidget) m_viewAdapter.getView(position, null, null);
+			// Assume that the view's id is always the same as the handle.
+			EventQueue.getDefault( ).postWidgetItemClickedEvent( m_handle, position );
+		}
 	}
 
 	/**
@@ -374,6 +447,8 @@ public class ListLayout extends Layout
 			int sectionIndex = 0;
 			// Section's start position in list.
 			int sectionPosition = 0;
+			// Item's position in the section.
+			int itemPosition = 0;
 
 			// Get the index of the section that holds this item,
 			// and it's start position.
@@ -384,15 +459,24 @@ public class ListLayout extends Layout
 				sectionIndex = i;
 				if ( browseIndex > position )
 				{
+					itemPosition = position-sectionPosition;
+					// Get the position inside the section, decrease it by 1 if the section has a header.
+					if ( section.hasHeader() )
+					{
+						itemPosition --;
+					}
+					// Store the selected state of the item.
+					mSelectedItemHandle = section.getItem(itemPosition).getHandle();
+
 					// The index ignores the header.
 					EventQueue.getDefault().
-							postSegmentedListItemClicked(m_handle, sectionIndex, position-sectionPosition-1);
+							postSegmentedListItemClicked(m_handle, sectionIndex, itemPosition);
 					return;
 				}
 				sectionPosition += section.itemsCount();
 			}
 			EventQueue.getDefault().
-					postSegmentedListItemClicked(m_handle, sectionIndex, position-sectionPosition-1);
+					postSegmentedListItemClicked(m_handle, sectionIndex, itemPosition);
 		}
 	}
 
@@ -402,7 +486,7 @@ public class ListLayout extends Layout
 	@Override
 	public void itemRemoved(ListItemWidget item)
 	{
-		if ( mListType == LIST_VIEW_TYPE_ALPHABETICAL )
+		if ( mListType == IX_WIDGET.MAW_LIST_VIEW_TYPE_ALPHABETICAL )
 		{
 			mAlphabeticalViewAdapter.notifyDataSetChanged();
 		}
@@ -420,7 +504,7 @@ public class ListLayout extends Layout
 	public void itemAdded(
 			ListItemWidget item, ListViewSection section, int index)
 	{
-		if ( mListType == LIST_VIEW_TYPE_ALPHABETICAL )
+		if ( mListType == IX_WIDGET.MAW_LIST_VIEW_TYPE_ALPHABETICAL )
 		{
 			mAlphabeticalViewAdapter.notifyDataSetChanged();
 		}
@@ -581,6 +665,14 @@ public class ListLayout extends Layout
 		{
 			return m_views.isEmpty( );
 		}
+
+		/**
+		 * @see BaseAdapter.isEnabled.
+		 */
+		@Override
+		public boolean isEnabled(int position) {
+			return mAllowSelection;
+		}
 	}
 
 	/**
@@ -603,7 +695,7 @@ public class ListLayout extends Layout
 		@Override
 		public boolean isEnabled(int position) {
 			// A separator cannot be clicked !
-			return getItemViewType(position) == ITEM_VIEW_TYPE_ITEM;
+			return (getItemViewType(position) == ITEM_VIEW_TYPE_ITEM && mAllowSelection) ;
 		}
 
 		/**
@@ -692,24 +784,8 @@ public class ListLayout extends Layout
 		 */
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent) {
-			int sectionPosition = 0;
-			int browseIndex = 0;
-			int sectionIndex = 0;
-
-			for (int i = 0; i < mSections.size(); i++) {
-				ListViewSection sectionObj = mSections.get(i);
-				browseIndex += sectionObj.itemsCount();
-				sectionIndex = i;
-				if (browseIndex > position) {
-					Log.e("@@MoSync",
-							"getView found the position index , on i= " + i);
-					return sectionObj.getItem(position - sectionPosition)
-							.getView();
-				}
-				sectionPosition += sectionObj.itemsCount();
-			}
-			return mSections.get(sectionIndex)
-					.getItem(position - sectionPosition).getView();
+			ListItemWidget item = (ListItemWidget) getItem(position);
+			return item.getRootView();
 		}
 
 		/**
@@ -772,7 +848,26 @@ public class ListLayout extends Layout
 		 */
 		@Override
 		public Object getItem(int position) {
-			return getView(position, null,null);
+			//return getView(position, null,null);
+			int browseIndex = 0;
+			int sectionIndex = 0;
+			// Section start position in list.
+			int sectionPosition = 0;
+
+			// Get the index of the section that holds this item,
+			// and get it's start position.
+			for (int i=0; i < mSections.size(); i++)
+			{
+				ListViewSection section = mSections.get(i);
+				browseIndex += section.itemsCount();
+				sectionIndex = i;
+				if ( browseIndex > position )
+				{
+					return section.getItem(position-sectionPosition);
+				}
+				sectionPosition += section.itemsCount();
+			}
+			return mSections.get(sectionIndex).getItem(position-sectionPosition);
 		}
 
 		/**
@@ -782,6 +877,24 @@ public class ListLayout extends Layout
 		public long getItemId(int position)
 		{
 			return position;
+		}
+
+		/**
+		 * @see BaseAdapter.isEnabled.
+		 */
+		@Override
+		public boolean isEnabled(int position) {
+			// A separator cannot be clicked !
+			return (getItemViewType(position) == ITEM_VIEW_TYPE_ITEM && mAllowSelection);
+		}
+
+		/**
+		 * @see BaseAdapter.getItemViewType.
+		 */
+		@Override
+		public int getItemViewType(int position) {
+			ListItemWidget item = (ListItemWidget) getItem(position);
+			return item.getItemType();
 		}
 	}
 }

@@ -102,6 +102,13 @@ namespace NativeUI
 		 */
 		virtual ~ListView();
 
+        /**
+         * Enforces the focus on the list.
+         * Generally needed when for some reason the list looses it's focus.
+         * Platform: Android.
+         */
+        void requestFocus();
+
 		/**
 		 * Get the list view type.
 		 * @return List view type.

@@ -4,7 +4,7 @@
 &EN
 
 ; standard SIS file header
-#{"%project-name%"},(0x%uid%),1,2,0, TYPE=SA
+#{"%project-name%"},(0x%uid%),1,5,0, TYPE=SA
 
 ;Localised Vendor name
 %%{"%vendor-name%"}
@@ -15,9 +15,9 @@
 ;Supports S60 3rd Edition
 [0x101F7961], 0, 0, 0, {"S60ProductID"};
 
-;Requires the MoSync Server, v1.2.0
-@"%pkg-runtime-dir%/MoSyncServer.sis",(0x20022A9D)
-(0x20022A9D), 1, 2, 0, {"MoSync Server"}
+;Requires the MoSync Server, v1.5.0
+@"%pkg-runtime-dir%/MoSyncServer.sis",(0x20037EBF)
+(0x20037EBF), 1, 5, 0, {"MoSync Server"}
 
 ;Files to install
 "%pkg-package-output-dir%/%uid%.exe" -"!:\sys\bin\%uid%.exe"

@@ -129,6 +129,22 @@ group WidgetListView "List View" {
 			* \endcode
 			*/
 			ALLOW_SELECTION = "allowselection";
+
+			/**
+			* @brief Enforces the focus on the list. Generally needed when for some reason the list looses it's focus.
+			*
+			* @validvalue None needed.
+			*
+			* Platform: Android.
+			*
+			* @setonly
+			*
+			* @par Example
+			* \code
+			*	maWidgetSetProperty(listViewHandle, MAW_LIST_VIEW_REQUEST_FOCUS, "");
+			* \endcode
+			*/
+			REQUEST_FOCUS = "requestFocus";
 		}
 	} // end of WidgetSegmentedListViewProperties
 } // end of WidgetListView

@@ -50,6 +50,16 @@ namespace NativeUI
 		 mListViewListeners.clear();
 	 }
 
+    /**
+     * Enforces the focus on the list.
+     * Generally needed when for some reason the list looses it's focus.
+     * Platform: Android.
+     */
+    void ListView::requestFocus()
+    {
+		setProperty(MAW_LIST_VIEW_REQUEST_FOCUS,"");
+    }
+
 	 /**
 	  * Get the list view type.
 	  * @return List view type.

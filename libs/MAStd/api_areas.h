@@ -36,13 +36,23 @@
 </td>
 <td><a href="http://www.mosync.com/documentation/manualpages/how-communicate-between-javascript-and-c-mosync"  target="_blank"> Communication between JavaScript and C++</a></td>
 <td>
-Wormhole::WebAppMoblet, Wormhole::WebViewMessage, Wormhole::FileUtil
+Wormhole::Encoder,
+Wormhole::FileUtil,
+Wormhole::HighLevelBinaryDownloader,
+Wormhole::HighLevelHttpConnection,
+Wormhole::HighLevelImageDownloader,
+Wormhole::HighLevelTextDownloader,
+Wormhole::MessageProtocol,
+Wormhole::MessageStream,
+Wormhole::MessageStreamJSON,
+Wormhole::WebAppMoblet
 </td>
 <td>
 \ref 	WormHoleGroup
 </td>
 <td>
-<a href="http://www.mosync.com/content/html5-javascript-wormhole"  target="_blank"><strong>User guides and online resources</strong></a>
+<a href="http://www.mosync.com/content/html5-javascript-wormhole"  target="_blank"><strong>User guides and online resources</strong></a><br>
+<a href="http://www.mosync.com/files/imports/doxygen/latest/html5/index.html"  target="_blank"><strong>JavaScript API Reference</strong></a>
 </td>
 </tr>
 

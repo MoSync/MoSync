@@ -31,7 +31,7 @@ Label
 >
 EditBox
 -------
->An editbox is an editable label. See Editbox properties for the properties available.
+>An editbox is an editable label. See EditBox properties for the properties available.
 >
 ListView
 --------

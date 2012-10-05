@@ -23,6 +23,8 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.util.Log;
 
+import com.google.android.gcm.GCMRegistrar;
+
 import com.mosync.internal.android.notifications.LocalNotificationsManager;
 import com.mosync.internal.android.notifications.PushNotificationsManager;
 import com.mosync.nativeui.util.properties.IntConverter;
@@ -40,6 +42,8 @@ class MoSyncNotifications
 {
 	/**
 	 * Constructor.
+	 * GCM/C2DM supports only devices with Android 2.2 and higher.
+	 * Version.SDK_INT is not available on sdk 3.
 	 * @param thread
 	 *            The MoSync thread.
 	 */
@@ -47,8 +51,7 @@ class MoSyncNotifications
 	{
 		mMoSyncThread = thread;
 		mLocalNotificationsManager = new LocalNotificationsManager(thread);
-		// C2DM supports only devices with Android 2.2 and higher.
-		// Version.SDK_INT is not available on sdk 3.
+
 		try{
 			int target = IntConverter.convert( Build.VERSION.SDK );
 			if ( target >= 8 )
@@ -73,26 +76,14 @@ class MoSyncNotifications
 	/**
 	 * Check if Push permissions are set, and if not call maPanic().
 	 */
-	boolean isPushPermissionSet()
-	{
-		return
-			(PackageManager.PERMISSION_GRANTED ==
-				getActivity().checkCallingOrSelfPermission(getActivity().getPackageName() + ".permission.C2D_MESSAGE"))
-			&&
-			(PackageManager.PERMISSION_GRANTED ==
-				getActivity().checkCallingOrSelfPermission(
-						"com.google.android.c2dm.permission.RECEIVE"));
-	}
-
-	/**
-	 * Check if Push permissions are set, and if not call maPanic().
-	 */
 	void panicIfPushPermissionsAreNotSet()
 	{
-		if (!isPushPermissionSet())
+		try{
+		    GCMRegistrar.checkManifest(getActivity());
+		}catch (java.lang.IllegalStateException ise)
 		{
 			mMoSyncThread.maPanic(1,
-				"Push Notifications permission is not set in the MoSync project");
+			    "Push Notifications permission is not set in the MoSync project");
 		}
 	}
 
@@ -146,7 +137,7 @@ class MoSyncNotifications
 		else
 		{
 			// No need to send registration request, it can be handled locally.
-			Log.e("@@MoSync", "Current Android version does not support C2DM. Use Android 2.2 or higher.");
+			Log.e("@@MoSync", "Current Android version does not support GCM/C2DM. Use Android 2.2 or higher.");
 			return MA_NOTIFICATION_RES_UNSUPPORTED;
 		}
 	}

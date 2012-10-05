@@ -51,8 +51,8 @@ using namespace std;
 /**
  * General debugger architecture:
  *
- * The MoSync debugger consists of 3 communicating components: The Eclipse 
- * GDB session, the MoSync DeBugger (this program) and a MoRE instance. 
+ * The MoSync debugger consists of 3 communicating components: The Eclipse
+ * GDB session, the MoSync DeBugger (this program) and a MoRE instance.
  * An overview of their communication is given in the picture below.
  *
  * ---------------           ----------------           -----------------
@@ -62,9 +62,9 @@ using namespace std;
  * ---------------           ----------------           -----------------
  *               GDB/MI protocol            GDB serial protocol
  *
- * A command originates in the Eclipse GDB Session (referred to as the GDB 
+ * A command originates in the Eclipse GDB Session (referred to as the GDB
  * session from here) when a user instructs the debugger to do something. The
- * commands are actually part of a protocol called the GDB/MI interface, which 
+ * commands are actually part of a protocol called the GDB/MI interface, which
  * defines the behavior and structure of the commands. The commands arrive
  * at MDB through its standard input stream.
  *
@@ -76,18 +76,18 @@ using namespace std;
  * Not all of the GDB/MI commands are implemented in MDB. This is the case
  * for the original GNU DeBugger, too.
  *
- * Some commands require communication with the MoRE instance that runs the 
+ * Some commands require communication with the MoRE instance that runs the
  * program being debugged. For example some commands needs the value at
- * a specific memory address. MDB accomplishes such and similar tasks by 
+ * a specific memory address. MDB accomplishes such and similar tasks by
  * communicating with MoRE over TCP with the GDB serial protocol.
  *
- * Another class of commands are those that controls the execution of the 
- * program, e.g. breakpoints and stepping. A breakpoint can be set at a 
+ * Another class of commands are those that controls the execution of the
+ * program, e.g. breakpoints and stepping. A breakpoint can be set at a
  * particular address in the code memory by replacing the instruction at that
- * address with a special debug instruction that halts the execution. The 
+ * address with a special debug instruction that halts the execution. The
  * execution can then be resumed by replacing it with the original instruction.
  *
- * Once a command has been fully executed, the results are passed back to 
+ * Once a command has been fully executed, the results are passed back to
  * Eclispe via the stdout stream. New commands can then be processed.
  *
  * Eclipse sometimes diverts from the GDB/MI interface,
@@ -122,7 +122,7 @@ static void executeCommand(const string& line);
 
 /**
  * Reads a MoSync program file into memory.
- * 
+ *
  * Side effects:
  * Results are placed in gHead, gMemCs and gMemCp.
  *
@@ -312,13 +312,13 @@ int main(int argc, char** argv) {
 	if(stabsFilename) {
 		//load stabs and SLD
 		if(!loadStabs(gSldFilename.c_str(), stabsFilename)) {
-			eprintf("Could not load Stabs file '%s'"STABS_MSG"\n", stabsFilename);
+			eprintf("Could not load Stabs file '%s'" STABS_MSG "\n", stabsFilename);
 			return 1;
 		}
 	} else if(gSldFilename.size() > 0) {
 		//if no stabs, load only SLD.
 		if(!loadSLD(gSldFilename.c_str())) {
-			eprintf("Could not load SLD file '%s'"STABS_MSG"\n", gSldFilename.c_str());
+			eprintf("Could not load SLD file '%s'" STABS_MSG "\n", gSldFilename.c_str());
 			return 1;
 		}
 	}
@@ -375,7 +375,7 @@ int main(int argc, char** argv) {
 			executeCommand(savedLine);
 			savedLine.clear();
 		}
-		if(gTestWaiting && 
+		if(gTestWaiting &&
 			!execIsRunning() &&
 			!StubConnection::isRunning())
 		{
@@ -539,7 +539,7 @@ static bool readOpenProgramFile(int fd) {
 
 /**
  * Reads a program file with the given file name and
- * reads it to memory. The contents are stored in a 
+ * reads it to memory. The contents are stored in a
  * global structure.
  *
  * Side effects:

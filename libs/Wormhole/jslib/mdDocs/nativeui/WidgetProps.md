@@ -8,7 +8,7 @@
 >* Button properties
 >* Image button properties
 >* Image properties
->* Edit box properties
+>* EditBox properties
 >* List view item properties
 >* Check box properties
 >* Toggle button properties

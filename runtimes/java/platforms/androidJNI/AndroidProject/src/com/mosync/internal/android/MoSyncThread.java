@@ -586,6 +586,19 @@ public class MoSyncThread extends Thread
 		mCanvas = mDrawTargetScreen.mCanvas;
 		mBitmap = mDrawTargetScreen.mBitmap;
 
+		// Set/reset clip rect.
+		mClipLeft = 0;
+		mClipTop = 0;
+		mClipWidth = mWidth;
+		mClipHeight = mHeight;
+
+		// Set original clip rect.
+		// Save the clip state since we have a new canvas created.
+		// This initial save is needed for the clip rect stack to
+		// work correctly when calling restore clip rect.
+		mCanvas.save();
+		mCanvas.clipRect(mClipLeft, mClipTop, mClipWidth, mClipHeight, Region.Op.REPLACE);
+
 		updateScreen();
 
 		SYSLOG("mBitmap width:" + mBitmap.getWidth()
@@ -849,7 +862,7 @@ public class MoSyncThread extends Thread
 	 */
 	void storeIfBinaryAudioResource(int soundHandle)
 	{
-		mMoSyncSound.storeIfBinaryAudioResource(soundHandle);
+		mMoSyncSound.storeIfBinaryAudioResource(soundHandle, 0);
 	}
 
 	/*
@@ -1122,15 +1135,10 @@ public class MoSyncThread extends Thread
 	void initSyscalls()
 	{
 		SYSLOG("initSyscalls");
+
+		//Log.i("@@@@@", "initSyscalls");
+
 		mUsingFrameBuffer = false;
-
-		mClipLeft = 0;
-		mClipTop = 0;
-		mClipWidth = mWidth;
-		mClipHeight = mHeight;
-
-		// Reset cliprect
-		mCanvas.clipRect(mClipLeft, mClipTop, mClipWidth, mClipHeight, Region.Op.REPLACE);
 
 		mPaint.setStyle(Paint.Style.FILL);
 		mPaint.setAntiAlias(false);
@@ -1182,6 +1190,10 @@ public class MoSyncThread extends Thread
 		mClipWidth = width;
 		mClipHeight = height;
 
+		// Restore clip state and save before setting the clip rect.
+		// Note that we do an initial save of the clip state in initSyscalls.
+		mCanvas.restore();
+		mCanvas.save();
 		mCanvas.clipRect(left, top, left+width, top+height, Region.Op.REPLACE);
 	}
 
@@ -3447,7 +3459,7 @@ public class MoSyncThread extends Thread
 	}
 
 	/**
-	 * Registers the current application for receiving push notifications for C2DM server.
+	 * Registers the current application for receiving push notifications for GCM/C2DM server.
 	 * @param pushNotificationTypes ignored on Android.
 	 * @param accountID Is the ID of the account authorized to send messages to the application,
 	 * typically the email address of an account set up by the application's developer.
@@ -5377,6 +5389,20 @@ public class MoSyncThread extends Thread
 	int maDBExecSQL(int databaseHandle, String sql)
 	{
 		return mMoSyncDB.maDBExecSQL(databaseHandle, sql);
+	}
+
+	int maDBExecSQLParams(
+		int databaseHandle,
+		String sql,
+		int paramsAddress,
+		int paramCount)
+	{
+		return mMoSyncDB.maDBExecSQLParams(
+			databaseHandle,
+			sql,
+			paramsAddress,
+			paramCount,
+			this);
 	}
 
 	int maDBCursorDestroy(int cursorHandle)

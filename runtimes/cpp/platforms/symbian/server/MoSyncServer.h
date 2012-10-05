@@ -40,7 +40,7 @@ class CMoSyncServer : public CServer2
 {
 public:
 	// Creates a new session with the server; the function
-	// implements the pure virtutal function 
+	// implements the pure virtutal function
 	// defined in class CServer2
 	CSession2* NewSessionL(const TVersion& aVersion, const RMessage2& aMessage) const;
 public:
@@ -48,13 +48,22 @@ public:
 	static void PanicServer(TMoSyncPanic aPanic);
 
 	CMoSyncServer(CActive::TPriority aActiveObjectPriority);
-};
+	virtual ~CMoSyncServer();
 
+	// Load autostart database and start any programs therein.
+	void doAutostartL();
+	void writeAutostartDbL();
+
+	CArrayFixFlat<TInt>* mAutostart;
+};
 
 //**********************************
 //CMoSyncSession
 //**********************************
 class CPositionNotifier;
+class CNetworkInfoGetter;
+class CNetworkStatusGetter;
+class CNetworkStatusChangeGetter;
 
 /**
 This class represents a session with the  server.
@@ -65,22 +74,26 @@ class CMoSyncSession : public CSession2
 public:
 	CMoSyncSession();
 	virtual ~CMoSyncSession();
-	
+
 	void ConstructL();
 
 	//service request
 	void ServiceL(const RMessage2& aMessage);
 	void DispatchMessageL(const RMessage2& aMessage);
-	
+
 	void LazyDelete(CActiveLink* aObject);
 
 	//individual service calls
-	void GetNetworkInfoL(const RMessage2& aMessage);
-	
+	template<class T> void GetTelephonyInfoL(const RMessage2& aMessage, T*&);
+	void CancelNetworkStatusChange(const RMessage2& aMessage);
+
 	void LocationStop();
-	
+
 	void LocationGetL(const RMessage2& aMessage);
 	void LocationStopL(const RMessage2& aMessage);
+
+	void AutostartOnL(const RMessage2& aMessage);
+	void AutostartOffL(const RMessage2& aMessage);
 
 protected:
 	// panic the client, but leave the server running
@@ -88,9 +101,12 @@ protected:
 
 private:
 	CActiveEnder* mEnder;
-	
+
 	CTelephony* mTelephony;
-	
+	CNetworkInfoGetter* mNetworkInfo;
+	CNetworkStatusGetter* mNetworkStatus;
+	CNetworkStatusChangeGetter* mNetworkStatusChange;
+
 	RPositionServer mPositionServer;
 	RPositioner mPositioner;
 	CPositionNotifier* mPn;	//no need to delete this in destructor
