@@ -19,7 +19,7 @@ MA 02110-1301, USA.
 /**
  * SettingsScreen.cpp
  *
- *  Created on: Aug 7, 2012
+ *  Created on: Sept 28, 2012
  *      Author: Spiridon Alexandru
  */
 
@@ -87,7 +87,10 @@ SettingsScreen::SettingsScreen():
 	mListViewAllowSelectionCheckbox->addCheckBoxListener(this);
 	mDisplayCheckBox->addCheckBoxListener(this);
 	mEditCheckBox->addCheckBoxListener(this);
-	mSetListViewSectionTitleButton->addButtonListener(this);
+	if (isWindowsPhone())
+	{
+		mSetListViewSectionTitleButton->addButtonListener(this);
+	}
 	mSetListViewSectionHeaderButton->addButtonListener(this);
 	mSetListViewSectionFooterButton->addButtonListener(this);
 	mSetListViewItemTextButton->addButtonListener(this);
@@ -132,7 +135,10 @@ SettingsScreen::~SettingsScreen()
 	mListViewAllowSelectionCheckbox->removeCheckBoxListener(this);
 	mDisplayCheckBox->removeCheckBoxListener(this);
 	mEditCheckBox->removeCheckBoxListener(this);
-	mSetListViewSectionTitleButton->removeButtonListener(this);
+	if (isWindowsPhone())
+	{
+		mSetListViewSectionTitleButton->removeButtonListener(this);
+	}
 	mSetListViewSectionHeaderButton->removeButtonListener(this);
 	mSetListViewSectionFooterButton->removeButtonListener(this);
 	mSetListViewItemTextButton->removeButtonListener(this);
@@ -193,7 +199,6 @@ void SettingsScreen::createMainLayout()
 void SettingsScreen::createListViewPropertiesLayout()
 {
 	VerticalLayout* listViewPropertiesVerticalLayout = new VerticalLayout();
-	listViewPropertiesVerticalLayout->setTopPosition(0);
 	listViewPropertiesVerticalLayout->setHeight(ONE_LINE_HORIZONTAL_LAYOUT_HEIGHT * 2);
 	Label* mListViewPropertiesLabel = new Label();
 	mListViewPropertiesLabel->setText("ListView properties");
@@ -246,25 +251,28 @@ void SettingsScreen::createListViewPropertiesLayout()
 void SettingsScreen::createListViewSectionPropertiesLayout()
 {
 	VerticalLayout* listViewSectionPropertiesVerticalLayout = new VerticalLayout();
-	listViewSectionPropertiesVerticalLayout->setTopPosition(ONE_LINE_HORIZONTAL_LAYOUT_HEIGHT * 3);
-	listViewSectionPropertiesVerticalLayout->setHeight(ONE_LINE_HORIZONTAL_LAYOUT_HEIGHT * 4);
+	listViewSectionPropertiesVerticalLayout->setHeight(ONE_LINE_HORIZONTAL_LAYOUT_HEIGHT * 3);
 	mListViewSectionLabel = new Label();
 	mListViewSectionLabel->setText("No section in focus");
 	mListViewSectionLabel->setFontSize(TITLE_FONT_SIZE);
 	mListViewSectionLabel->setFontColor(0xFF0000);
 	listViewSectionPropertiesVerticalLayout->addChild(mListViewSectionLabel);
 
-	// create the current section title layout
-	HorizontalLayout* currentSectionTitleLayout = new HorizontalLayout();
-	currentSectionTitleLayout->setHeight(ONE_LINE_HORIZONTAL_LAYOUT_HEIGHT);
-	mSetListViewSectionTitleButton = new Button();
-	mSetListViewSectionTitleButton->setText("Set title");
-	mSetListViewSectionTitleButton->fillSpaceHorizontally();
-	currentSectionTitleLayout->addChild(mSetListViewSectionTitleButton);
-	mCurrentListViewSectionTitleEditBox = new EditBox();
-	mCurrentListViewSectionTitleEditBox->fillSpaceHorizontally();
-	currentSectionTitleLayout->addChild(mCurrentListViewSectionTitleEditBox);
-	listViewSectionPropertiesVerticalLayout->addChild(currentSectionTitleLayout);
+	if (isWindowsPhone())
+	{
+		listViewSectionPropertiesVerticalLayout->setHeight(ONE_LINE_HORIZONTAL_LAYOUT_HEIGHT * 4);
+		// create the current section title layout
+		HorizontalLayout* currentSectionTitleLayout = new HorizontalLayout();
+		currentSectionTitleLayout->setHeight(ONE_LINE_HORIZONTAL_LAYOUT_HEIGHT);
+		mSetListViewSectionTitleButton = new Button();
+		mSetListViewSectionTitleButton->setText("Set title");
+		mSetListViewSectionTitleButton->fillSpaceHorizontally();
+		currentSectionTitleLayout->addChild(mSetListViewSectionTitleButton);
+		mCurrentListViewSectionTitleEditBox = new EditBox();
+		mCurrentListViewSectionTitleEditBox->fillSpaceHorizontally();
+		currentSectionTitleLayout->addChild(mCurrentListViewSectionTitleEditBox);
+		listViewSectionPropertiesVerticalLayout->addChild(currentSectionTitleLayout);
+	}
 
 	// create the current section header text layout
 	HorizontalLayout* currentSectionHeaderTextLayout = new HorizontalLayout();
@@ -390,7 +398,6 @@ void SettingsScreen::createListViewSectionFooterPropertiesLayout(VerticalLayout*
 void SettingsScreen::createListViewItemPropertiesLayout()
 {
 	VerticalLayout* listViewItemPropertiesVerticalLayout = new VerticalLayout();
-	listViewItemPropertiesVerticalLayout->setTopPosition(ONE_LINE_HORIZONTAL_LAYOUT_HEIGHT * 7);
 	listViewItemPropertiesVerticalLayout->setHeight(ONE_LINE_HORIZONTAL_LAYOUT_HEIGHT*4);
 	mCurrentListViewItemLabel = new Label();
 	mCurrentListViewItemLabel->setText("No item selected");
@@ -994,7 +1001,7 @@ void SettingsScreen::buttonClicked(Widget* button)
 	{
 		if (mCurrentListViewItem != NULL && mSetListViewItemFontColorEditBox->getText() != "")
 		{
-			int fontColor = MAUtil::stringToInteger(mSetListViewItemFontColorEditBox->getText(),16);
+			int fontColor = MAUtil::stringToInteger(mSetListViewItemFontColorEditBox->getText());
 			mCurrentListViewItem->setFontColor(fontColor);
 		}
 	}

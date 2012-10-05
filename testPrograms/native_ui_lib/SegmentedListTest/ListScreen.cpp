@@ -19,7 +19,7 @@
 /**
  * ListScreen.cpp
  *
- *  Created on: Aug 7, 2012
+ *  Created on: Sept 28, 2012
  *      Author: Spiridon Alexandru
  */
 #include <conprint.h>
@@ -86,23 +86,23 @@ void ListScreen::createMainLayout() {
 
 	// the list view doesn't automatically sort its elements - the
 	// developer has to handle the sorting
-	for (int i = 0; i <= 4; i++)
+	for (int i = 0; i <= 5; i++)
 	{
-		ListViewSection* section = new ListViewSection(LIST_VIEW_SECTION_TYPE_ALPHABETICAL);
-		MAUtil::String sectionTitle = "A";
-		sectionTitle[0] += i;
-		section->setTitle(sectionTitle);
+		ListViewSection* section = new ListViewSection(LIST_VIEW_SECTION_TYPE_SEGMENTED);
+		MAUtil::String sectionTitle = "Header ";
+		sectionTitle += MAUtil::integerToString(i);
+		section->setTitle("H" + MAUtil::integerToString(i));
 		section->setHeaderText(sectionTitle);
-		section->setFooterText("footer");
+		section->setFooterText("Footer " + MAUtil::integerToString(i));
 
 		mListView->addChild(section);
-		for (int j = 0; j <= 20; j++)
+		for (int j = 0; j <= 6; j++)
 		{
 			ListViewItem* item = new ListViewItem();
-			MAUtil::String itemText = sectionTitle + "0";
-			itemText[1] += j;
+			MAUtil::String itemText = "Item ";
+			itemText += MAUtil::integerToString(j);
 			item->setText(itemText);
-			item->setSubtitle("some subtitle text");
+			item->setSubtitle("subtitle " + MAUtil::integerToString(j));
 			section->addItem(item);
 		}
 

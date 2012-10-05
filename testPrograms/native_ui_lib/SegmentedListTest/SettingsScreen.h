@@ -19,7 +19,7 @@ MA 02110-1301, USA.
 /**
  * SettingsScreen.cpp
  *
- *  Created on: Aug 7, 2012
+ *  Created on: Sept 28, 2012
  *      Author: Spiridon Alexandru
  */
 

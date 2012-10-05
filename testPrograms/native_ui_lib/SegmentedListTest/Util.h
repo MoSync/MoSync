@@ -17,71 +17,38 @@ MA 02110-1301, USA.
 */
 
 /**
- * Util.cpp
+ * Util.h
  *
- *  Created on: Aug 7, 2012
+ *  Created on: Sept 28, 2012
  *      Author: Spiridon Alexandru
  */
 
-#include <maapi.h>
+#include <mastring.h>
 
-#include "Util.h"
+#ifndef UTIL_H_
+#define UTIL_H_
 
-#define BUF_MAX 256
+#define TITLE_FONT_SIZE 26.0
+#define ONE_LINE_HORIZONTAL_LAYOUT_HEIGHT 70
+#define EDIT_BOX_WIDTH 240
+#define BUTTON_WIDTH 210
 
 /**
  * Detects if the current platform is Android.
  * @return true if the platform is Android, false otherwise.
  */
-bool isAndroid()
-{
-	char platform[BUF_MAX];
-	maGetSystemProperty("mosync.device.OS", platform, BUF_MAX);
-	if ( strcmp(platform,"Android") == 0 )
-	{
-		return true;
-	}
-
-	return false;
-}
+bool isAndroid();
 
 /**
  * Detects if the current platform is iOS.
  * @return true if the platform is iOS, false otherwise.
  */
-bool isIOS()
-{
-	char platform[BUF_MAX];
-	maGetSystemProperty("mosync.device.OS", platform, BUF_MAX);
-	for (unsigned int i = 0; i < strlen(platform); i++)
-	{
-		platform[i] = tolower(platform[i]);
-	}
-	if (strstr(platform,"iphone") != NULL)
-	{
-		return true;
-	}
-
-	return false;
-}
+bool isIOS();
 
 /**
  * Detects if the current platform is Windows Phone.
  * @return true if the platform is Windows Phone, false otherwise.
  */
-bool isWindowsPhone()
-{
-	char platform[BUF_MAX];
-	maGetSystemProperty("mosync.device.OS", platform, BUF_MAX);
-	for (unsigned int i = 0; i < strlen(platform); i++)
-	{
-		platform[i] = tolower(platform[i]);
-	}
-	if (strstr(platform,"microsoft") != NULL &&
-		strstr(platform,"windows") != NULL)
-	{
-		return true;
-	}
+bool isWindowsPhone();
 
-	return false;
-}
+#endif /* UTIL_H_ */

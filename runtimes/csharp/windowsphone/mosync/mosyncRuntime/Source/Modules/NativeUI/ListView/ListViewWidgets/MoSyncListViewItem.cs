@@ -73,10 +73,6 @@ namespace MoSync
 			protected ColumnDefinition mColumn1;
 			protected ColumnDefinition mColumn2;
 
-            /**
-             * Contains the data model for a list item when the list is Alphabetical or Segmented.
-             */
-            protected ListItem mListItem = null;
 
             // contains the subtitle text
             protected string mSubtitle;
@@ -124,6 +120,7 @@ namespace MoSync
                 mView = mGrid;
 
                 this.ItemSelected = false;
+                this.ItemsSourceItemIndex = -1;
 			}
 
             public override void AddChild(IWidget child)
@@ -137,6 +134,18 @@ namespace MoSync
             }
 
             /**
+             * Asks for the parent section to reload the list view model.
+             */
+            public void ReloadParentList()
+            {
+                if (mParent is ListViewSection)
+                {
+                    ListViewSection parentSection = mParent as ListViewSection;
+                    parentSection.ReloadParentItem(this);
+                }
+            }
+
+            /**
              * Sets the selected state of the item.
              */
             public bool ItemSelected
@@ -146,18 +155,13 @@ namespace MoSync
             }
 
             /**
-             * Set when this item is added to a section of a Alphabetical/Segmented list.
+             * The index of the item data within the section contained by the parent list view
+             * items source (the long list selector items source).
              */
-            public ListItem ListItemData
+            public int ItemsSourceItemIndex
             {
-                get
-                {
-                    return mListItem;
-                }
-                set
-                {
-                    mListItem = value;
-                }
+                get;
+                set;
             }
 
             #region MoSync Widget Properties
@@ -205,22 +209,12 @@ namespace MoSync
 			{
 				set
 				{
-                    if (mListItem == null)
-                    {
-                        mText.Text = value;
-                    }
-                    else
-                    {
-                        mListItem.Title = value;
-                    }
+                    mText.Text = value;
+                    ReloadParentList();
 				}
 				get
 				{
-                    if (mListItem == null)
-                    {
-                        return mText.Text;
-                    }
-                    return mListItem.Title;
+                    return mText.Text;
 				}
 			}
 
@@ -234,6 +228,7 @@ namespace MoSync
                 set
                 {
                     mSubtitle = value;
+                    ReloadParentList();
                 }
                 get
                 {
@@ -283,15 +278,11 @@ namespace MoSync
                             (System.Windows.Media.Imaging.BitmapSource)(res.GetInternalObject());
 
                             mIcon.Source = bmpSource;
-
-                            if (mListItem != null)
-                            {
-                                mListItem.ImageSource = bmpSource;
-                            }
                         }
                         else throw new InvalidPropertyValueException();
                     }
                     else throw new InvalidPropertyValueException();
+                    ReloadParentList();
 				}
 			}
 
