@@ -31,7 +31,7 @@
 #import "MoSyncUISyscalls.h"
 #import "MoSyncUI.h"
 #import "ScreenWidget.h"
-#import <cwchar>
+#import "NSStringExpanded.h"
 
 static OptionsDialogView *sharedInstance = nil;
 
@@ -78,49 +78,25 @@ otherButtonTitlesSize:(const int) otherButtonTitlesSize
     [mDestructiveButtonTitle release];
     [mCancelButtonTitle release];
 
-    int titleLength = wcslen((wchar_t*) title) * sizeof(wchar_t);
-    if (0 == titleLength)
+    mDialogTitle = [[NSString stringWithUTF16String:title] retain];
+    if (mDialogTitle.length == 0)
     {
+        [mDialogTitle release];
         mDialogTitle = nil;
     }
-    else
-    {
-        NSString* titleString = [[NSString alloc] initWithBytes:title
-                                                         length:titleLength
-                                                       encoding:NSUTF16LittleEndianStringEncoding];
-        mDialogTitle = titleString;
-        [mDialogTitle retain];
-        [titleString release];
-    }
 
-    int destructiveBtnTitleLength = wcslen((wchar_t*) destructiveButtonTitle) * sizeof(wchar_t);
-    if (0 == destructiveBtnTitleLength)
+    mDestructiveButtonTitle = [[NSString stringWithUTF16String:destructiveButtonTitle] retain];
+    if (mDestructiveButtonTitle.length == 0)
     {
+        [mDestructiveButtonTitle release];
         mDestructiveButtonTitle = nil;
     }
-    else
-    {
-        NSString* destructiveButtonTitleString = [[NSString alloc] initWithBytes:destructiveButtonTitle
-                                                                          length:destructiveBtnTitleLength
-                                                                        encoding:NSUTF16LittleEndianStringEncoding];
-        mDestructiveButtonTitle = destructiveButtonTitleString;
-        [mDestructiveButtonTitle retain];
-        [destructiveButtonTitleString release];
-    }
 
-    int cancelBtnTitleLength = wcslen((wchar_t*) cancelButtonTitle) * sizeof(wchar_t);
-    if (0 == cancelBtnTitleLength)
+    mCancelButtonTitle = [[NSString stringWithUTF16String:cancelButtonTitle] retain];
+    if (mCancelButtonTitle.length == 0)
     {
+        [mCancelButtonTitle release];
         mCancelButtonTitle = nil;
-    }
-    else
-    {
-        NSString* cancelButtonTitleString = [[NSString alloc] initWithBytes:cancelButtonTitle
-                                                                     length:cancelBtnTitleLength
-                                                                   encoding:NSUTF16LittleEndianStringEncoding];
-        mCancelButtonTitle = cancelButtonTitleString;
-        [mCancelButtonTitle retain];
-        [cancelButtonTitleString release];
     }
 
     [self readStringArray:otherButtonTitles withSize:otherButtonTitlesSize];

@@ -46,11 +46,13 @@
         float viewWidth = child.width;
         float viewHeight = child.height;
 
-        if(child.autoSizeWidth == WidgetAutoSizeFillParent)
+        if (child.autoSizeWidth == WidgetAutoSizeFillParent &&
+            self.parent)
         {
             viewWidth = self.width - totalHorizontalMargin;
         }
-        else if(child.autoSizeWidth == WidgetAutoSizeWrapContent)
+        else if(child.autoSizeWidth == WidgetAutoSizeWrapContent &&
+            self.parent)
         {
             viewWidth = [child sizeThatFitsForWidget].width;
         }

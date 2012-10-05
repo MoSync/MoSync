@@ -26,6 +26,8 @@
 
 #import <Foundation/Foundation.h>
 
+#include <helpers/cpp_defs.h>
+
 /**
  * @brief Add new methods to NSString class.
  */
@@ -37,5 +39,12 @@
  * @return True if it can be converted, false otherwise.
  */
 -(bool) canParseNumber;
+
+/**
+ * Returns a string created by copying the data from a given C array of UTF16-encoded bytes.
+ * @param bytes A NULL-terminated C array of bytes in UTF16 encoding.
+ * @return A string created by copying the data from bytes.
+ */
++(NSString*)stringWithUTF16String:(const wchar*) bytes;
 
 @end

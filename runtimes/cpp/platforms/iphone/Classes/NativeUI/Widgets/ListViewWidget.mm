@@ -130,17 +130,17 @@
           [section addChild:child];
       }
     }
-    else if (_type == ListViewTypeAlphabetical &&
+    else if (_type == ListViewTypeAlphabetical ||
              _type == ListViewTypeSegmented)
     {
-        if ([child class] != [ListViewSectionWidget class] ||
+        if ([child class] != [ListViewSectionWidget class] &&
             [child superclass] != [ListViewSectionWidget class])
         {
             return MAW_RES_INVALID_LAYOUT;
         }
         else
         {
-            [self addChild:child];
+            [super addChild:child toSubview:NO];
             ListViewSectionWidget* section = (ListViewSectionWidget*) child;
             section.index = [_children count] - 1;
         }
@@ -505,8 +505,12 @@
  */
 -(void)reloadItemAtIndexPath:(NSIndexPath*) indexPath
 {
+    /*
+     Note: reloadRowsAtIndexPaths does not resize item's height!
     [self.tableView reloadRowsAtIndexPaths:[NSArray arrayWithObject:indexPath]
                           withRowAnimation:UITableViewRowAnimationNone];
+     */
+    [self.tableView reloadData];
 }
 
 /**
