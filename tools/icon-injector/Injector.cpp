@@ -18,6 +18,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "Injector.h"
 #include "Shared.h"
 #include "filelist/filelist.h"
+#include <stdio.h>
+#include <stdlib.h>
 #include <sstream>
 
 using namespace std;

@@ -56,9 +56,6 @@ string MustacheParser::parse(const string& input, ParserCallback* cb) {
 		string text = until(startDelim, true, false);
 		verbatimEnd = verbatimStart + text.size();
 
-		if (debug) {
-			printf("%sText: %s\n", location().c_str(), truncateDebug(input.substr(verbatimStart, verbatimEnd)).c_str());
-		}
 		cb->text(input, verbatimStart, verbatimEnd);
 
 		if (fPos < input.size() - 1) {
@@ -140,9 +137,9 @@ string MustacheParser::parse(const string& input, ParserCallback* cb) {
 }
 
 string MustacheParser::location() {
-	char location[20];
-	sprintf(location, "%06d: ", (int) fPos);
-	return string(location);
+	char locationStr[20];
+	sprintf(locationStr, "%06d: ", (int) fPos);
+	return string(locationStr);
 }
 
 bool MustacheParser::match(char ch) {
@@ -219,25 +216,25 @@ void DefaultParserCallback::endSection(string section) {
 	fRenderContext.pop();
 }
 
-void DefaultParserCallback::parameter(string parameter) {
+void DefaultParserCallback::parameter(string key) {
 	RenderableList* currentSection = fRenderContext.top();
-	Parameter* parameterRenderable = new Parameter(parameter);
+	Parameter* parameterRenderable = new Parameter(key);
 	currentSection->addChild(parameterRenderable);
 }
 
-void DefaultParserCallback::text(const string& text, size_t start, size_t end) {
+void DefaultParserCallback::text(const string& textStr, size_t start, size_t end) {
 	RenderableList* currentSection = fRenderContext.top();
-	string str = text.substr(start, end - start);
+	string str = textStr.substr(start, end - start);
 	if (!fTrim || str.find_first_not_of(" \t\r\n") != string::npos) {
 		Text* textRenderable = new Text(str);
 		currentSection->addChild(textRenderable);
 	}
 }
 
-void DefaultParserCallback::directive(string directive) {
-	if (directive == "trim") {
+void DefaultParserCallback::directive(string directiveName) {
+	if (directiveName == "trim") {
 		fTrim = true;
-	} else if (directive == "no-trim") {
+	} else if (directiveName == "no-trim") {
 		fTrim = false;
 	}
 }
