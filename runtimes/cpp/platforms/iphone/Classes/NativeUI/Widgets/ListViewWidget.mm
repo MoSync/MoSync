@@ -143,6 +143,7 @@
             [super addChild:child toSubview:NO];
             ListViewSectionWidget* section = (ListViewSectionWidget*) child;
             section.index = [_children count] - 1;
+            section.delegate = self;
         }
     }
     return MAW_RES_OK;
@@ -197,7 +198,11 @@
  */
 - (void)removeChild: (IWidget*)child
 {
-    [super removeChild:child fromSuperview:NO];
+    [_children removeObjectIdenticalTo:child];
+	[child setParent:nil];
+
+    UITableView* tableView = (UITableView*) self.view;
+    [tableView reloadData];
 }
 
 /**
@@ -325,7 +330,6 @@
     {
         return nil;
     }
-
     return tableViewSection.footerTitle;
 }
 
@@ -484,9 +488,7 @@
  */
 -(void)deleteItemAtIndexPath:(NSIndexPath*) indexPath
 {
-    INNativeUILog;
-    [self.tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath]
-                          withRowAnimation:UITableViewRowAnimationNone];
+    [self.tableView reloadData];
 }
 
 /**
@@ -495,8 +497,7 @@
  */
 -(void)insertItemAtIndexPath:(NSIndexPath*) indexPath
 {
-    [self.tableView insertRowsAtIndexPaths:[NSArray arrayWithObject:indexPath]
-                          withRowAnimation:UITableViewRowAnimationNone];
+    [self.tableView reloadData];
 }
 
 /**
