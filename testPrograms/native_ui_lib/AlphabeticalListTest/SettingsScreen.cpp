@@ -193,7 +193,6 @@ void SettingsScreen::createMainLayout()
 void SettingsScreen::createListViewPropertiesLayout()
 {
 	VerticalLayout* listViewPropertiesVerticalLayout = new VerticalLayout();
-	listViewPropertiesVerticalLayout->setTopPosition(0);
 	listViewPropertiesVerticalLayout->setHeight(ONE_LINE_HORIZONTAL_LAYOUT_HEIGHT * 2);
 	Label* mListViewPropertiesLabel = new Label();
 	mListViewPropertiesLabel->setText("ListView properties");
@@ -249,7 +248,6 @@ void SettingsScreen::createListViewPropertiesLayout()
 void SettingsScreen::createListViewSectionPropertiesLayout()
 {
 	VerticalLayout* listViewSectionPropertiesVerticalLayout = new VerticalLayout();
-	listViewSectionPropertiesVerticalLayout->setTopPosition(ONE_LINE_HORIZONTAL_LAYOUT_HEIGHT * 3);
 	listViewSectionPropertiesVerticalLayout->setHeight(ONE_LINE_HORIZONTAL_LAYOUT_HEIGHT * 4);
 	mListViewSectionLabel = new Label();
 	mListViewSectionLabel->setText("No section in focus");
@@ -396,7 +394,6 @@ void SettingsScreen::createListViewSectionFooterPropertiesLayout(VerticalLayout*
 void SettingsScreen::createListViewItemPropertiesLayout()
 {
 	VerticalLayout* listViewItemPropertiesVerticalLayout = new VerticalLayout();
-	listViewItemPropertiesVerticalLayout->setTopPosition(ONE_LINE_HORIZONTAL_LAYOUT_HEIGHT * 7);
 	listViewItemPropertiesVerticalLayout->setHeight(ONE_LINE_HORIZONTAL_LAYOUT_HEIGHT*4);
 	mCurrentListViewItemLabel = new Label();
 	mCurrentListViewItemLabel->setText("No item selected");
