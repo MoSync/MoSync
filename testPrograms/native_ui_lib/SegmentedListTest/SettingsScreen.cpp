@@ -242,7 +242,10 @@ void SettingsScreen::createListViewPropertiesLayout()
 		listViewPropertiesVerticalLayout->addChild(modeSelectionLayout);
 	}
 
-	mPropertiesListView->addChild(listViewPropertiesVerticalLayout);
+	ListViewItem* mListPropertiesItem = new ListViewItem();
+	mListPropertiesItem->addChild(listViewPropertiesVerticalLayout);
+
+	mPropertiesListView->addChild(mListPropertiesItem);
 }
 
 /**
@@ -305,7 +308,10 @@ void SettingsScreen::createListViewSectionPropertiesLayout()
 		createListViewSectionFooterPropertiesLayout(listViewSectionPropertiesVerticalLayout);
 	}
 
-	mPropertiesListView->addChild(listViewSectionPropertiesVerticalLayout);
+	ListViewItem* mListSectionPropertiesItem = new ListViewItem();
+	mListSectionPropertiesItem->addChild(listViewSectionPropertiesVerticalLayout);
+
+	mPropertiesListView->addChild(mListSectionPropertiesItem);
 }
 
 void SettingsScreen::createListViewSectionHeaderPropertiesLayout(VerticalLayout* listViewSectionPropertiesVerticalLayout)
@@ -423,8 +429,10 @@ void SettingsScreen::createListViewItemPropertiesLayout()
 		createListViewItemEditStyleLayout(listViewItemPropertiesVerticalLayout);
 	}
 
+	ListViewItem* mListItemProperties = new ListViewItem();
+	mListItemProperties->addChild(listViewItemPropertiesVerticalLayout);
 
-	mPropertiesListView->addChild(listViewItemPropertiesVerticalLayout);
+	mPropertiesListView->addChild(mListItemProperties);
 }
 
 void SettingsScreen::createListViewItemTextLayout(VerticalLayout* listViewItemPropertiesVerticalLayout)

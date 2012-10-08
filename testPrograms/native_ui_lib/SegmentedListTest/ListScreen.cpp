@@ -82,7 +82,7 @@ void ListScreen::createMainLayout() {
 	mMainLayout = new VerticalLayout();
 	Screen::setMainWidget(mMainLayout);
 
-	mListView = new ListView(LIST_VIEW_SECTION_TYPE_SEGMENTED);
+	mListView = new ListView(LIST_VIEW_TYPE_SEGMENTED);
 
 	// the list view doesn't automatically sort its elements - the
 	// developer has to handle the sorting
