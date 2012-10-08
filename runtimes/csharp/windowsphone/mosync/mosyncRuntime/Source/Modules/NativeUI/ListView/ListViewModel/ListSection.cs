@@ -1,4 +1,31 @@
-﻿using System;
+﻿/* Copyright (C) 2012 MoSync AB
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License,
+version 2, as published by the Free Software Foundation.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+MA 02110-1301, USA.
+*/
+
+/**
+ * @file ListSection.cs
+ * @author Spiridon Alexandru
+ *
+ * @brief This represents the model of a section. A list of sections will be set as
+ * the 'ItemsSource' of the 'LongListSelector' (used as a implementation for the alphabetical/segmented
+ * 'ListView' for the MoSync NativeUI component on Windows Phone 7, language C#.
+ * @platform WP 7.1
+ **/
+
+using System;
 using System.Net;
 using System.Windows;
 using System.Windows.Controls;
@@ -10,6 +37,7 @@ using System.Windows.Media.Animation;
 using System.Windows.Shapes;
 using System.Collections.ObjectModel;
 using System.Collections.Generic;
+using System.ComponentModel;
 
 namespace MoSync
 {
@@ -17,54 +45,102 @@ namespace MoSync
     {
         public class ListSection<T> : ObservableCollection<T>
         {
+            public new event PropertyChangedEventHandler PropertyChanged;
+
+            const double DEFAULT_HEADER_FONT_SIZE = 32.0;
+            const double DEFAULT_FOOTER_FONT_SIZE = 32.0;
+
+            #region Private class members
+
+            private string mFooterText = "";
+            private string mTitle;
+            private string mHeader;
+            private string mFooter;
+            private Brush mHeaderColor;
+            private Brush mFooterColor;
+            private Visibility mFooterVisibility;
+            private Brush mGroupHeaderColor;
+            private VerticalAlignment mHeaderTextVerticalAlignment;
+            private VerticalAlignment mFooterTextVerticalAlignment;
+            private HorizontalAlignment mHeaderTextHorizontalAlignment;
+            private HorizontalAlignment mFooterTextHorizontalAlignment;
+            private double mHeaderFontSize;
+            private double mFooterFontSize;
+            private Brush mHeaderFontColor;
+            private Brush mFooterFontColor;
+            private FontFamily mHeaderFontFamily;
+            private FontFamily mFooterFontFamily;
+            private FontWeight mHeaderFontWeight;
+            private FontWeight mFooterFontWeight;
+            private FontStyle mHeaderFontStyle;
+            private FontStyle mFooterFontStyle;
+
+            #endregion
+
             #region Constructors
+
+            public ListSection()
+            {
+                SetDefaultPropertyValues();
+            }
 
             public ListSection(string headerTitle, IEnumerable<T> items)
             {
                 this.Title = headerTitle;
-                this.FooterTitle = "";
+                this.Footer = "";
                 foreach (T item in items)
                 {
                     this.Add(item);
                 }
+                SetDefaultPropertyValues();
+            }
+
+            public ListSection(string headerTitle, IEnumerable<T> items, Brush headerColor)
+            {
+                this.Title = headerTitle;
+                this.Footer = "";
+                foreach (T item in items)
+                {
+                    this.Add(item);
+                }
+                SetDefaultPropertyValues();
+                this.HeaderColor = headerColor;
+            }
+
+            public ListSection(string headerTitle, string footerTitle, IEnumerable<T> items, Brush headerColor)
+            {
+                this.Title = headerTitle;
+                this.Footer = footerTitle;
+                foreach (T item in items)
+                {
+                    this.Add(item);
+                }
+                SetDefaultPropertyValues();
+                this.HeaderColor = headerColor;
+            }
+
+            private void SetDefaultPropertyValues()
+            {
                 // we set the default colors according to the theme of the phone
                 SolidColorBrush phoneAccentBrush = Application.Current.Resources["PhoneAccentBrush"] as SolidColorBrush;
                 this.HeaderColor = phoneAccentBrush;
                 this.FooterColor = phoneAccentBrush;
                 this.FooterVisibility = Visibility.Collapsed;
                 this.GroupHeaderColor = phoneAccentBrush;
-            }
 
-            public ListSection(string headerTitle, IEnumerable<T> items, Brush headerColor)
-            {
-                this.Title = headerTitle;
-                this.FooterTitle = "";
-                foreach (T item in items)
-                {
-                    this.Add(item);
-                }
-                this.HeaderColor = headerColor;
-                // we set the default colors according to the theme of the phone
-                SolidColorBrush phoneAccentBrush = Application.Current.Resources["PhoneAccentBrush"] as SolidColorBrush;
-                this.FooterColor = phoneAccentBrush;
-                this.FooterVisibility = Visibility.Collapsed;
-                this.GroupHeaderColor = phoneAccentBrush;
-            }
+                this.HeaderTextHorizontalAlignment = HorizontalAlignment.Left;
+                this.HeaderTextVerticalAlignment = VerticalAlignment.Center;
+                this.FooterTextHorizontalAlignment = HorizontalAlignment.Left;
+                this.FooterTextVerticalAlignment = VerticalAlignment.Center;
 
-            public ListSection(string headerTitle, string footerTitle, IEnumerable<T> items, Brush headerColor)
-            {
-                this.Title = headerTitle;
-                this.FooterTitle = footerTitle;
-                foreach (T item in items)
-                {
-                    this.Add(item);
-                }
-                this.HeaderColor = headerColor;
-                // we set the default colors according to the theme of the phone
-                SolidColorBrush phoneAccentBrush = Application.Current.Resources["PhoneAccentBrush"] as SolidColorBrush;
-                this.FooterColor = phoneAccentBrush;
-                this.FooterVisibility = Visibility.Collapsed;
-                this.GroupHeaderColor = phoneAccentBrush;
+                this.HeaderFontFamily = new FontFamily("PhoneFontFamilyNormal");
+                this.FooterFontFamily = new FontFamily("PhoneFontFamilyNormal");
+
+                this.HeaderFontSize = DEFAULT_HEADER_FONT_SIZE;
+                this.FooterFontSize = DEFAULT_FOOTER_FONT_SIZE;
+
+                this.HeaderFontColor = new SolidColorBrush(Colors.Black);
+                this.FooterFontColor = new SolidColorBrush(Colors.Black);
             }
 
             #endregion
@@ -79,32 +155,93 @@ namespace MoSync
 
             public string Title
             {
-                get;
-                set;
+                get
+                {
+                    return mTitle;
+                }
+                set
+                {
+                    if (value != null)
+                    {
+                        mTitle = value;
+                    }
+                }
             }
 
-            public string FooterTitle
+            public string Header
             {
-                get;
-                set;
+                get
+                {
+                    return mHeader;
+                }
+                set
+                {
+                    if (value != null)
+                    {
+                        mHeader = value;
+                    }
+                }
+            }
+
+            public string Footer
+            {
+                get
+                {
+                    return mFooterText;
+                }
+                set
+                {
+                    mFooterText = value;
+                    if (mFooterText != "")
+                    {
+                        FooterVisibility = Visibility.Visible;
+                    }
+                }
             }
 
             public Brush HeaderColor
             {
-                get;
-                set;
+                get
+                {
+                    return mHeaderColor;
+                }
+                set
+                {
+                    if (value != null)
+                    {
+                        mHeaderColor = value;
+                    }
+                }
             }
 
             public Brush FooterColor
             {
-                get;
-                set;
+                get
+                {
+                    return mFooterColor;
+                }
+                set
+                {
+                    if (value != null)
+                    {
+                        mFooterColor = value;
+                    }
+                }
             }
 
             public Visibility FooterVisibility
             {
-                get;
-                set;
+                get
+                {
+                    return mFooterVisibility;
+                }
+                set
+                {
+                    if (value != null)
+                    {
+                        mFooterVisibility = value;
+                    }
+                }
             }
 
             /**
@@ -112,8 +249,281 @@ namespace MoSync
              */
             public Brush GroupHeaderColor
             {
-                get;
-                set;
+                get
+                {
+                    return mGroupHeaderColor;
+                }
+                set
+                {
+                    if (value != null)
+                    {
+                        mGroupHeaderColor = value;
+                    }
+                }
+            }
+
+            /**
+             * The vertical alignment of the header text.
+             */
+            public VerticalAlignment HeaderTextVerticalAlignment
+            {
+                get
+                {
+                    return mHeaderTextVerticalAlignment;
+                }
+                set
+                {
+                    if (value != null)
+                    {
+                        mHeaderTextVerticalAlignment = value;
+                    }
+                }
+            }
+
+            /**
+             * The vertical alignment of the footer text.
+             */
+            public VerticalAlignment FooterTextVerticalAlignment
+            {
+                get
+                {
+                    return mFooterTextVerticalAlignment;
+                }
+                set
+                {
+                    if (value != null)
+                    {
+                        mFooterTextVerticalAlignment = value;
+                    }
+                }
+            }
+
+            /**
+             * The horizontal alignment of the header text.
+             */
+            public HorizontalAlignment HeaderTextHorizontalAlignment
+            {
+                get
+                {
+                    return mHeaderTextHorizontalAlignment;
+                }
+                set
+                {
+                    if (value != null)
+                    {
+                        mHeaderTextHorizontalAlignment = value;
+                    }
+                }
+            }
+
+            /**
+             * The horizontal alignment of the footer text.
+             */
+            public HorizontalAlignment FooterTextHorizontalAlignment
+            {
+                get
+                {
+                    return mFooterTextHorizontalAlignment;
+                }
+                set
+                {
+                    if (value != null)
+                    {
+                        mFooterTextHorizontalAlignment = value;
+                    }
+                }
+            }
+
+            /**
+             * The font size of the header text.
+             */
+            public double HeaderFontSize
+            {
+                get
+                {
+                    return mHeaderFontSize;
+                }
+                set
+                {
+                    if (value > 0)
+                    {
+                        mHeaderFontSize = value;
+                    }
+                }
+            }
+
+            /**
+             * The font size of the footer text.
+             */
+            public double FooterFontSize
+            {
+                get
+                {
+                    return mFooterFontSize;
+                }
+                set
+                {
+                    if (value > 0)
+                    {
+                        mFooterFontSize = value;
+                    }
+                }
+            }
+
+            /**
+             * The font color of the header text.
+             */
+            public Brush HeaderFontColor
+            {
+                get
+                {
+                    return mHeaderFontColor;
+                }
+                set
+                {
+                    if (value != null)
+                    {
+                        mHeaderFontColor = value;
+                    }
+                }
+            }
+
+            /**
+             * The font color of the footer text.
+             */
+            public Brush FooterFontColor
+            {
+                get
+                {
+                    return mFooterFontColor;
+                }
+                set
+                {
+                    if (value != null)
+                    {
+                        mFooterFontColor = value;
+                    }
+                }
+            }
+
+            /**
+             * The font family of the header text.
+             */
+            public FontFamily HeaderFontFamily
+            {
+                get
+                {
+                    return mHeaderFontFamily;
+                }
+                set
+                {
+                    if (value != null)
+                    {
+                        mHeaderFontFamily = value;
+                    }
+                }
+            }
+
+            /**
+             * The font family of the footer text.
+             */
+            public FontFamily FooterFontFamily
+            {
+                get
+                {
+                    return mFooterFontFamily;
+                }
+                set
+                {
+                    if (value != null)
+                    {
+                        mFooterFontFamily = value;
+                    }
+                }
+            }
+
+            /**
+             * The font weight of the header text.
+             */
+            public FontWeight HeaderFontWeight
+            {
+                get
+                {
+                    return mHeaderFontWeight;
+                }
+                set
+                {
+                    if (value != null)
+                    {
+                        mHeaderFontWeight = value;
+                    }
+                }
+            }
+
+            /**
+             * The font weight of the footer text.
+             */
+            public FontWeight FooterFontWeight
+            {
+                get
+                {
+                    return mFooterFontWeight;
+                }
+                set
+                {
+                    if (value != null)
+                    {
+                        mFooterFontWeight = value;
+                    }
+                }
+            }
+
+            /**
+             * The font style of the header text.
+             */
+            public FontStyle HeaderFontStyle
+            {
+                get
+                {
+                    return mHeaderFontStyle;
+                }
+                set
+                {
+                    if (value != null)
+                    {
+                        mHeaderFontStyle = value;
+                    }
+                }
+            }
+
+            /**
+             * The font style of the footer text.
+             */
+            public FontStyle FooterFontStyle
+            {
+                get
+                {
+                    return mFooterFontStyle;
+                }
+                set
+                {
+                    if (value != null)
+                    {
+                        mFooterFontStyle = value;
+                    }
+                }
+            }
+
+            #endregion
+
+            #region Private methods
+
+            private void OnPropertyChanged(string property)
+            {
+                if (PropertyChanged != null)
+                {
+                    PropertyChanged(this, new PropertyChangedEventArgs(property));
+                }
             }
 
             #endregion

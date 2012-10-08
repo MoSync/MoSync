@@ -53,6 +53,16 @@ namespace NativeUI
 	}
 
 	/**
+	 * Sets the subtitle part of the list view item.
+	 * The subtitle will be placed bellow the item text.
+	 * @param subtitle The given subtitle.
+	 */
+	void ListViewItem::setSubtitle(const MAUtil::String& subtitle)
+	{
+		this->setProperty(MAW_LIST_VIEW_ITEM_SUBTITLE, subtitle);
+	}
+
+	/**
 	 * Set an icon of the list view item that is placed to the left
 	 * of the text.
 	 * @param icon MoSync handle to an uncompressed image resource.
@@ -232,7 +242,7 @@ namespace NativeUI
 
 	/**
 	 * Check if the item is selected.
-	 * Platform: iOS.
+	 * Platform: iOS and Android.
 	 * @return True if selected, false otherwise.
 	 */
 	bool ListViewItem::isSelected()

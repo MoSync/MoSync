@@ -1,4 +1,32 @@
-﻿using System;
+﻿/* Copyright (C) 2012 MoSync AB
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License,
+version 2, as published by the Free Software Foundation.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+MA 02110-1301, USA.
+*/
+
+/**
+ * @file ListItem.cs
+ * @author Spiridon Alexandru
+ *
+ * @brief This represents the model of a list item. A list of items will be contained by a 'ListSection' and a
+ * list of 'ListSection' will be set as the the 'ItemsSource' of the 'LongListSelector' (used as a
+ * implementation for the alphabetical/segmented 'ListView' for the MoSync NativeUI component on
+ * Windows Phone 7, language C#.
+ * @platform WP 7.1
+ **/
+
+using System;
 using System.Net;
 using System.Windows;
 using System.Windows.Controls;
@@ -21,12 +49,18 @@ namespace MoSync
             #region Private members
 
             private Brush mBackgroundColor;
-            private Grid mContent;
+            private String mTitle;
+            private String mSubtitle;
+            private Visibility mSubtitleVisibility;
+            private ImageSource mImageSource;
 
             // if the values are not set, the size of the Item is the same
             // as the size of its content (mContent)
             private double mHeight;
             private double mWidth;
+
+            // the current list view style
+            private ListView.ListViewStyle mListStyle = MoSync.Constants.MAW_LIST_VIEW_STYLE_SUBTITLE;
 
             #endregion
 
@@ -35,7 +69,11 @@ namespace MoSync
             public ListItem()
             {
                 mBackgroundColor = new SolidColorBrush(Colors.Black);
-                mContent = new Grid();
+                mTitle = "";
+                mSubtitle = "";
+                // the equivalent of xaml 'Auto' - the item resizez according to its content
+                mHeight = double.NaN;
+                mWidth = double.NaN;
             }
 
             #endregion
@@ -68,16 +106,84 @@ namespace MoSync
                 }
             }
 
-            public Grid Content
+            public String Title
             {
                 get
                 {
-                    return mContent;
+                    return mTitle;
                 }
                 set
                 {
-                    mContent = value;
-                    OnPropertyChanged("Content");
+                    if (mTitle != null)
+                    {
+                        mTitle = value;
+                        OnPropertyChanged("Title");
+                    }
+                }
+            }
+
+            public String Subtitle
+            {
+                get
+                {
+                    return mSubtitle;
+                }
+                set
+                {
+                    if (mSubtitle != null)
+                    {
+                        mSubtitle = value;
+                        OnPropertyChanged("Subtitle");
+                    }
+                }
+            }
+
+            /**
+             * A getter/setter for the list view style.
+             */
+            public ListView.ListViewStyle ListStyle
+            {
+                get
+                {
+                    return mListStyle;
+                }
+                set
+                {
+                    mListStyle = value;
+                    if (mListStyle == ListView.ListViewStyle.Subtitle)
+                    {
+                        this.SubtitleVisibility = Visibility.Visible;
+                    }
+                    else
+                    {
+                        this.SubtitleVisibility = Visibility.Collapsed;
+                    }
+                }
+            }
+
+            public Visibility SubtitleVisibility
+            {
+                get
+                {
+                    return mSubtitleVisibility;
+                }
+                set
+                {
+                    mSubtitleVisibility = value;
+                    OnPropertyChanged("SubtitleVisibility");
+                }
+            }
+
+            public ImageSource ImageSource
+            {
+                get
+                {
+                    return mImageSource;
+                }
+                set
+                {
+                    mImageSource = value;
+                    OnPropertyChanged("ImageSource");
                 }
             }
 

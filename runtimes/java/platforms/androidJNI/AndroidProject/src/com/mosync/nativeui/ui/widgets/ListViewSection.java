@@ -18,7 +18,8 @@ package com.mosync.nativeui.ui.widgets;
 
 import static com.mosync.nativeui.ui.widgets.ListLayout.ITEM_VIEW_TYPE_FOOTER;
 import static com.mosync.nativeui.ui.widgets.ListLayout.ITEM_VIEW_TYPE_HEADER;
-
+import static com.mosync.internal.generated.IX_WIDGET.MAW_LIST_VIEW_SECTION_TYPE_SEGMENTED;
+import static com.mosync.internal.generated.IX_WIDGET.MAW_LIST_VIEW_SECTION_TYPE_ALPHABETICAL;
 import java.util.ArrayList;
 
 import android.app.Activity;
@@ -51,19 +52,20 @@ import com.mosync.nativeui.util.properties.PropertyConversionException;
  */
 public class ListViewSection extends Layout
 {
-	static final int LIST_VIEW_SECTION_TYPE_ALPHABETICAL = 1;
-	static final int LIST_VIEW_SECTION_TYPE_SEGMENTED = 2;
-	static final int LIST_VIEW_SECTION_TYPE_NONE_SELECTED = 3;
+	static final int LIST_VIEW_SECTION_TYPE_NONE_SELECTED = 2;
+
 	/**
-	 * Section type: segmented or alphabetical.
+	 * Section type:
+	 * MAW_LIST_VIEW_SECTION_TYPE_SEGMENTED
+	 * MAW_LIST_VIEW_SECTION_TYPE_ALPHABETICAL
 	 */
 	private int mSectionType = LIST_VIEW_SECTION_TYPE_NONE_SELECTED;
 
 	/**
 	 * Default header and footer appearance for segmented list views.
 	 */
-	static final String HEADER_DEFAULT_BACKGROUND_COLOR = "838B83";
-	static final String FOOTER_DEFAULT_BACKGROUND_COLOR = "838B83";
+	static final String HEADER_DEFAULT_BACKGROUND_COLOR = "696969";
+	static final String FOOTER_DEFAULT_BACKGROUND_COLOR = "696969";
 	static final int HEADER_DEFAULT_FONT_SIZE = 20;
 	static final int FOOTER_DEFAULT_FONT_SIZE = 15;
 
@@ -123,7 +125,9 @@ public class ListViewSection extends Layout
 			listIndex = mItems.size();
 			// If segmented list, add the item always before the footer,
 			// before the last position.
-			if ( mSectionType == LIST_VIEW_SECTION_TYPE_SEGMENTED )
+			if ( mSectionType == IX_WIDGET.MAW_LIST_VIEW_SECTION_TYPE_SEGMENTED ||
+					(mSectionType == IX_WIDGET.MAW_LIST_VIEW_SECTION_TYPE_ALPHABETICAL
+					&& hasFooter()) )
 			{
 				listIndex --;
 			}
@@ -135,10 +139,8 @@ public class ListViewSection extends Layout
 			}
 		}
 
-		// Always add items before the footer.
 		child.setParent(this);
 		m_children.add( listIndex, child );
-		Log.e("@@MoSync","Section add child at " + listIndex + " in mItems array -------");
 		mItems.add(listIndex, (ListItemWidget)child);
 
 		// Notify parent Segmented list of new item.
@@ -166,178 +168,115 @@ public class ListViewSection extends Layout
 	public boolean setProperty(String property, String value)
 			throws PropertyConversionException, InvalidPropertyValueException
 	{
-		if ( property.equals("TYPE") )
+		if ( property.equals( IX_WIDGET.MAW_LIST_VIEW_SECTION_TYPE ) )
 		{
-			if ( value.equals("segmented") )
+
+			int sectionType = IntConverter.convert(value);
+			switch(sectionType)
 			{
+			case IX_WIDGET.MAW_LIST_VIEW_SECTION_TYPE_SEGMENTED:
 				createSegmentedSectionDefaultUI();
-				mSectionType = LIST_VIEW_SECTION_TYPE_SEGMENTED;
-			}
-			else if( value.equals("alphabetical") )
-			{
-				mSectionType = LIST_VIEW_SECTION_TYPE_ALPHABETICAL;
-			}
-			else
-			{
+				break;
+			case IX_WIDGET.MAW_LIST_VIEW_SECTION_TYPE_ALPHABETICAL:
+				break;
+			default:
 				Log.e("@@MoSync","maWidgetSetProperty invalid List View Section type");
 				throw new InvalidPropertyValueException(property, value);
 			}
+			mSectionType = sectionType;
 		}
 		else if( property.equals( IX_WIDGET.MAW_LIST_VIEW_SECTION_TITLE) )
 		{
-			if ( mSectionType != LIST_VIEW_SECTION_TYPE_ALPHABETICAL )
+			if ( mSectionType != IX_WIDGET.MAW_LIST_VIEW_SECTION_TYPE_ALPHABETICAL )
 			{
 				Log.e("@@MoSync",
 						"maWidgetSetProperty section preview is available only on Alphabetical list type");
 				throw new InvalidPropertyValueException(property, value);
 			}
-			mAlphabeticIndex = value.substring(0,1).toUpperCase();
+			mAlphabeticIndex = value;
 		}
-		else if( property.equals( IX_WIDGET.MAW_LIST_VIEW_SECTION_HEADER ) )
+		else if( property.equals( IX_WIDGET.MAW_LIST_VIEW_SECTION_HEADER )
+				&& (mSectionType == IX_WIDGET.MAW_LIST_VIEW_SECTION_TYPE_ALPHABETICAL) )
 		{
-			if ( mSectionType != LIST_VIEW_SECTION_TYPE_SEGMENTED )
-			{
-				Log.e("@@MoSync",
-				"maWidgetSetProperty section header is available only on Segmented list type");
-				throw new InvalidPropertyValueException(property, value);
-			}
-			setHeaderText(value);
+			setAlphaSectionHeader(value);
 		}
-		else if( property.equals( IX_WIDGET.MAW_LIST_VIEW_SECTION_FOOTER ) )
+		else if( property.equals( IX_WIDGET.MAW_LIST_VIEW_SECTION_FOOTER )
+				&& (mSectionType == IX_WIDGET.MAW_LIST_VIEW_SECTION_TYPE_ALPHABETICAL) )
 		{
-			if ( mSectionType != LIST_VIEW_SECTION_TYPE_SEGMENTED )
-			{
-				Log.e("@@MoSync",
-				"maWidgetSetProperty section header is available only on Segmented list type");
-				throw new InvalidPropertyValueException(property, value);
-			}
-			setFooterText(value);
+			setAlphaSectionFooter(value);
 		}
-		else if( property.equals( IX_WIDGET.MAW_LIST_VIEW_SECTION_HEADER_BACKGROUND) )
+		else if ( mSectionType == IX_WIDGET.MAW_LIST_VIEW_SECTION_TYPE_SEGMENTED )
 		{
-			if ( mSectionType != LIST_VIEW_SECTION_TYPE_SEGMENTED )
+			if( property.equals( IX_WIDGET.MAW_LIST_VIEW_SECTION_HEADER ) )
 			{
-				Log.e("@@MoSync",
-				"maWidgetSetProperty section header is available only on Segmented list type");
-				throw new InvalidPropertyValueException(property, value);
+				// Just update header text. The header row is created by default
+				// when the section is created.
+				setHeaderText(value);
 			}
-			mItems.get(0).setProperty(IX_WIDGET.MAW_WIDGET_BACKGROUND_COLOR, value);
-		}
-		else if( property.equals( IX_WIDGET.MAW_LIST_VIEW_SECTION_FOOTER_BACKGROUND) )
-		{
-			if ( mSectionType != LIST_VIEW_SECTION_TYPE_SEGMENTED )
+			else if( property.equals( IX_WIDGET.MAW_LIST_VIEW_SECTION_FOOTER ) )
 			{
-				Log.e("@@MoSync",
-				"maWidgetSetProperty section footer is available only on Segmented list type");
-				throw new InvalidPropertyValueException(property, value);
+				setFooterText(value);
 			}
-			mItems.get(mItems.size()-1).setProperty(IX_WIDGET.MAW_WIDGET_BACKGROUND_COLOR, value);
-		}
-		else if( property.equals( IX_WIDGET.MAW_LIST_VIEW_SECTION_HEADER_FONT_COLOR) )
-		{
-			if ( mSectionType != LIST_VIEW_SECTION_TYPE_SEGMENTED )
+			else if( property.equals( IX_WIDGET.MAW_LIST_VIEW_SECTION_HEADER_BACKGROUND) )
 			{
-				Log.e("@@MoSync",
-				"maWidgetSetProperty section header is available only on Segmented list type");
-				throw new InvalidPropertyValueException(property, value);
+				mItems.get(0).setProperty(IX_WIDGET.MAW_WIDGET_BACKGROUND_COLOR, value);
 			}
-			mItems.get(0).setProperty(IX_WIDGET.MAW_LIST_VIEW_ITEM_FONT_COLOR, value);
-		}
-		else if( property.equals( IX_WIDGET.MAW_LIST_VIEW_SECTION_FOOTER_FONT_COLOR) )
-		{
-			if ( mSectionType != LIST_VIEW_SECTION_TYPE_SEGMENTED )
+			else if( property.equals( IX_WIDGET.MAW_LIST_VIEW_SECTION_FOOTER_BACKGROUND) )
 			{
-				Log.e("@@MoSync",
-				"maWidgetSetProperty section footer is available only on Segmented list type");
-				throw new InvalidPropertyValueException(property, value);
+				mItems.get(mItems.size()-1).setProperty(IX_WIDGET.MAW_WIDGET_BACKGROUND_COLOR, value);
 			}
-			mItems.get(mItems.size()-1).setProperty(IX_WIDGET.MAW_LIST_VIEW_ITEM_FONT_COLOR, value);
-		}
-		else if( property.equals( IX_WIDGET.MAW_LIST_VIEW_SECTION_HEADER_FONT_SIZE) )
-		{
-			if ( mSectionType != LIST_VIEW_SECTION_TYPE_SEGMENTED )
+			else if( property.equals( IX_WIDGET.MAW_LIST_VIEW_SECTION_HEADER_FONT_COLOR) )
 			{
-				Log.e("@@MoSync",
-				"maWidgetSetProperty section header is available only on Segmented list type");
-				throw new InvalidPropertyValueException(property, value);
+				mItems.get(0).setProperty(IX_WIDGET.MAW_LIST_VIEW_ITEM_FONT_COLOR, value);
 			}
-			mItems.get(0).setProperty(IX_WIDGET.MAW_LIST_VIEW_ITEM_FONT_SIZE, value);
-		}
-		else if( property.equals( IX_WIDGET.MAW_LIST_VIEW_SECTION_FOOTER_FONT_SIZE) )
-		{
-			if ( mSectionType != LIST_VIEW_SECTION_TYPE_SEGMENTED )
+			else if( property.equals( IX_WIDGET.MAW_LIST_VIEW_SECTION_FOOTER_FONT_COLOR) )
 			{
-				Log.e("@@MoSync",
-				"maWidgetSetProperty section footer is available only on Segmented list type");
-				throw new InvalidPropertyValueException(property, value);
+				mItems.get(mItems.size()-1).setProperty(IX_WIDGET.MAW_LIST_VIEW_ITEM_FONT_COLOR, value);
 			}
-			mItems.get(mItems.size()-1).setProperty(IX_WIDGET.MAW_LIST_VIEW_ITEM_FONT_SIZE, value);
-		}
-		else if( property.equals( IX_WIDGET.MAW_LIST_VIEW_SECTION_HEADER_FONT_HANDLE) ||
-				property.equals(IX_WIDGET.MAW_LIST_VIEW_SECTION_FOOTER_FONT_HANDLE) )
-		{
-			if ( mSectionType != LIST_VIEW_SECTION_TYPE_SEGMENTED )
+			else if( property.equals( IX_WIDGET.MAW_LIST_VIEW_SECTION_HEADER_FONT_SIZE) )
 			{
-				Log.e("@@MoSync",
-				"maWidgetSetProperty section header is available only on Segmented list type");
-				throw new InvalidPropertyValueException(property, value);
+				mItems.get(0).setProperty(IX_WIDGET.MAW_LIST_VIEW_ITEM_FONT_SIZE, value);
 			}
-			MoSyncFontHandle currentFont = null;
+			else if( property.equals( IX_WIDGET.MAW_LIST_VIEW_SECTION_FOOTER_FONT_SIZE) )
+			{
+				mItems.get(mItems.size()-1).setProperty(IX_WIDGET.MAW_LIST_VIEW_ITEM_FONT_SIZE, value);
+			}
+			else if( property.equals( IX_WIDGET.MAW_LIST_VIEW_SECTION_HEADER_FONT_HANDLE) ||
+					property.equals(IX_WIDGET.MAW_LIST_VIEW_SECTION_FOOTER_FONT_HANDLE) )
+			{
+				MoSyncFontHandle currentFont = null;
 
-			// Search the handle in the list of fonts.
-			currentFont = MoSyncThread.getMoSyncFont(IntConverter .convert(value));
+				// Search the handle in the list of fonts.
+				currentFont = MoSyncThread.getMoSyncFont(IntConverter .convert(value));
 
-			if ( currentFont != null )
-			{
-				if ( property.equals(IX_WIDGET.MAW_LIST_VIEW_SECTION_HEADER_FONT_HANDLE) )
-					mItems.get(0).
-						setFontTypeface( currentFont.getTypeface(), currentFont.getFontSize() );
+				if ( currentFont != null )
+				{
+					if ( property.equals(IX_WIDGET.MAW_LIST_VIEW_SECTION_HEADER_FONT_HANDLE) )
+						mItems.get(0).
+							setFontTypeface( currentFont.getTypeface(), currentFont.getFontSize() );
+					else
+						mItems.get(mItems.size()-1).
+							setFontTypeface( currentFont.getTypeface(), currentFont.getFontSize() );
+				}
 				else
-					mItems.get(mItems.size()-1).
-						setFontTypeface( currentFont.getTypeface(), currentFont.getFontSize() );
+					throw new InvalidPropertyValueException(property, value);
 			}
-			else
-				throw new InvalidPropertyValueException(property, value);
-		}
-		else if( property.equals(IX_WIDGET.MAW_LIST_VIEW_SECTION_HEADER_HORIZONTAL_ALIGNMENT) )
-		{
-			if ( mSectionType != LIST_VIEW_SECTION_TYPE_SEGMENTED )
+			else if( property.equals(IX_WIDGET.MAW_LIST_VIEW_SECTION_HEADER_HORIZONTAL_ALIGNMENT) )
 			{
-				Log.e("@@MoSync",
-				"maWidgetSetProperty section header is available only on Segmented list type");
-				throw new InvalidPropertyValueException(property, value);
+				mItems.get(0).setProperty(Types.WIDGET_PROPERTY_HORIZONTAL_ALIGNMENT , value);
 			}
-			mItems.get(0).setProperty(Types.WIDGET_PROPERTY_HORIZONTAL_ALIGNMENT , value);
-		}
-		else if( property.equals(IX_WIDGET.MAW_LIST_VIEW_SECTION_FOOTER_HORIZONTAL_ALIGNMENT) )
-		{
-			if ( mSectionType != LIST_VIEW_SECTION_TYPE_SEGMENTED )
+			else if( property.equals(IX_WIDGET.MAW_LIST_VIEW_SECTION_FOOTER_HORIZONTAL_ALIGNMENT) )
 			{
-				Log.e("@@MoSync",
-				"maWidgetSetProperty section footer is available only on Segmented list type");
-				throw new InvalidPropertyValueException(property, value);
+				mItems.get(mItems.size()-1).setProperty(Types.WIDGET_PROPERTY_HORIZONTAL_ALIGNMENT , value);
 			}
-			mItems.get(mItems.size()-1).setProperty(Types.WIDGET_PROPERTY_HORIZONTAL_ALIGNMENT , value);
-		}
-		else if( property.equals(IX_WIDGET.MAW_LIST_VIEW_SECTION_HEADER_VERTICAL_ALIGNMENT) )
-		{
-			if ( mSectionType != LIST_VIEW_SECTION_TYPE_SEGMENTED )
+			else if( property.equals(IX_WIDGET.MAW_LIST_VIEW_SECTION_HEADER_VERTICAL_ALIGNMENT) )
 			{
-				Log.e("@@MoSync",
-				"maWidgetSetProperty section header is available only on Segmented list type");
-				throw new InvalidPropertyValueException(property, value);
+				mItems.get(0).setProperty(Types.WIDGET_PROPERTY_VERTICAL_ALIGNMENT, value);
 			}
-			mItems.get(0).setProperty(Types.WIDGET_PROPERTY_VERTICAL_ALIGNMENT, value);
-		}
-		else if( property.equals(IX_WIDGET.MAW_LIST_VIEW_SECTION_FOOTER_VERTICAL_ALIGNMENT) )
-		{
-			if ( mSectionType != LIST_VIEW_SECTION_TYPE_SEGMENTED )
+			else if( property.equals(IX_WIDGET.MAW_LIST_VIEW_SECTION_FOOTER_VERTICAL_ALIGNMENT) )
 			{
-				Log.e("@@MoSync",
-				"maWidgetSetProperty section footer is available only on Segmented list type");
-				throw new InvalidPropertyValueException(property, value);
+				mItems.get(mItems.size()-1).setProperty(Types.WIDGET_PROPERTY_VERTICAL_ALIGNMENT , value);
 			}
-			mItems.get(mItems.size()-1).setProperty(Types.WIDGET_PROPERTY_VERTICAL_ALIGNMENT , value);
 		}
 		else
 		{
@@ -354,22 +293,28 @@ public class ListViewSection extends Layout
 	@Override
 	public String getProperty(String property)
 	{
-		if( property.equals( IX_WIDGET.MAW_LIST_VIEW_SECTION_TITLE ) )
+		if( property.equals( IX_WIDGET.MAW_LIST_VIEW_SECTION_TITLE )
+				&& mSectionType == IX_WIDGET.MAW_LIST_VIEW_SECTION_TYPE_ALPHABETICAL)
 		{
 			return mAlphabeticIndex;
 		}
-		else if( property.equals( IX_WIDGET.MAW_LIST_VIEW_SECTION_HEADER ) )
+		else if( property.equals( IX_WIDGET.MAW_LIST_VIEW_SECTION_HEADER )
+				&& mSectionType != LIST_VIEW_SECTION_TYPE_NONE_SELECTED)
 		{
-			return mItems.get(0).getProperty(IX_WIDGET.MAW_LIST_VIEW_ITEM_TEXT);
+			if (!mItems.isEmpty())
+				return mItems.get(0).getProperty(IX_WIDGET.MAW_LIST_VIEW_ITEM_TEXT);
 		}
-		else if( property.equals( IX_WIDGET.MAW_LIST_VIEW_SECTION_FOOTER ) )
+		else if( property.equals( IX_WIDGET.MAW_LIST_VIEW_SECTION_FOOTER )
+				&& mSectionType != LIST_VIEW_SECTION_TYPE_NONE_SELECTED)
 		{
-			return mItems.get(mItems.size()).getProperty(IX_WIDGET.MAW_LIST_VIEW_ITEM_TEXT);
+			if (!mItems.isEmpty())
+				return mItems.get(mItems.size()).getProperty(IX_WIDGET.MAW_LIST_VIEW_ITEM_TEXT);
 		}
-		else
+		else if ( property.equals( IX_WIDGET.MAW_LIST_VIEW_SECTION_TYPE ) )
 		{
-			return "";
+			return String.valueOf(mSectionType);
 		}
+		return "";
 	}
 
 	/**
@@ -384,49 +329,186 @@ public class ListViewSection extends Layout
 	}
 
 	/**
+	 * Create a header or a footer widget.
+	 * @param itemType header or footer type:
+	 *  - ITEM_VIEW_TYPE_HEADER or
+	 *  - ITEM_VIEW_TYPE_FOOTER
+	 * @return The list item widget.
+	 */
+	public ListItemWidget createSectionItem(int itemType)
+	{
+		// We don't need to later reffer to those objects using the widget handles.
+		Widget rowWidget = ViewFactory.createView(
+				IX_WIDGET.MAW_LIST_VIEW_ITEM,
+				mAppActivity,
+				MoSyncThread.getInstance().nativeCreatePlaceholder());
+		ListItemWidget itemWidget = (ListItemWidget) rowWidget;
+		itemWidget.alignLabelHorizontally(IX_WIDGET.MAW_ALIGNMENT_CENTER);
+
+		if ( itemType == ITEM_VIEW_TYPE_HEADER )
+		{
+			rowWidget.setProperty(
+					IX_WIDGET.MAW_WIDGET_BACKGROUND_COLOR,
+					HEADER_DEFAULT_BACKGROUND_COLOR);
+			itemWidget.setProperty(
+					IX_WIDGET.MAW_LIST_VIEW_ITEM_FONT_SIZE,
+					Integer.toString(HEADER_DEFAULT_FONT_SIZE));
+			itemWidget.setItemType(ITEM_VIEW_TYPE_HEADER);
+		}
+		else if ( itemType == ITEM_VIEW_TYPE_FOOTER)
+		{
+			rowWidget.setProperty(
+					IX_WIDGET.MAW_WIDGET_BACKGROUND_COLOR,
+					FOOTER_DEFAULT_BACKGROUND_COLOR);
+			itemWidget.setProperty(
+					IX_WIDGET.MAW_LIST_VIEW_ITEM_FONT_SIZE,
+					Integer.toString(FOOTER_DEFAULT_FONT_SIZE));
+			itemWidget.setItemType(ITEM_VIEW_TYPE_FOOTER);
+		}
+		else
+		{
+			return null;
+		}
+		return itemWidget;
+	}
+
+	/**
 	 * Add by default a header and a footer layout to a
 	 * segmented section.
 	 * Set different background colors and align labels to center.
 	 */
 	public void createSegmentedSectionDefaultUI()
 	{
-		// We don't need to later reffer to those objects using the widget handles.
-		Widget headerWidget = ViewFactory.createView(
-				IX_WIDGET.MAW_LIST_VIEW_ITEM,
-				mAppActivity,
-				MoSyncThread.getInstance().nativeCreatePlaceholder());
+		addSectionHeader();
+		addSectionFooter();
+	}
 
-		headerWidget.setProperty(
-				IX_WIDGET.MAW_WIDGET_BACKGROUND_COLOR,
-				HEADER_DEFAULT_BACKGROUND_COLOR);
-		ListItemWidget headerItem = (ListItemWidget) headerWidget;
-		headerItem.alignLabelHorizontally(IX_WIDGET.MAW_ALIGNMENT_CENTER);
-		headerItem.setProperty(
-				IX_WIDGET.MAW_LIST_VIEW_ITEM_FONT_SIZE,
-				Integer.toString(HEADER_DEFAULT_FONT_SIZE));
-
-		Widget footerWidget = ViewFactory.createView(
-				IX_WIDGET.MAW_LIST_VIEW_ITEM,
-				mAppActivity,
-				MoSyncThread.getInstance().nativeCreatePlaceholder() );
-
-		footerWidget.setProperty(
-				IX_WIDGET.MAW_WIDGET_BACKGROUND_COLOR,
-				FOOTER_DEFAULT_BACKGROUND_COLOR);
-		ListItemWidget footerItem = (ListItemWidget) footerWidget;
-		footerItem.alignLabelHorizontally(IX_WIDGET.MAW_ALIGNMENT_CENTER);
-		footerItem.setProperty(
-				IX_WIDGET.MAW_LIST_VIEW_ITEM_FONT_SIZE,
-				Integer.toString(FOOTER_DEFAULT_FONT_SIZE));
-
-		headerItem.setItemType(ITEM_VIEW_TYPE_HEADER);
+	/**
+	 * Add by default a header layout to a section.
+	 * Set different background colors and align labels to center.
+	 */
+	public void addSectionHeader()
+	{
+		ListItemWidget headerItem = createSectionItem(ITEM_VIEW_TYPE_HEADER);
+		// Add the header to the children widget list.
 		mItems.add(0, headerItem);
-		footerItem.setItemType(ITEM_VIEW_TYPE_FOOTER);
-		mItems.add(1, footerItem);
-
-		// Add the header and footer to the children widget list.
 		m_children.add( 0, headerItem );
-		m_children.add( 1, footerItem );
+	}
+
+	/**
+	 * Add by default a footer layout to a section.
+	 * Set different background colors and align labels to center.
+	 */
+	public void addSectionFooter()
+	{
+		ListItemWidget footerItem = createSectionItem(ITEM_VIEW_TYPE_FOOTER);
+		// Add the footer to the children widget list.
+		mItems.add(mItems.size(), footerItem);
+		m_children.add( m_children.size(), footerItem );
+	}
+
+	/**
+	 * Check if this section contains a header list item.
+	 * @return
+	 */
+	public boolean hasHeader()
+	{
+		if ( !mItems.isEmpty()
+				&& mItems.get(0) != null
+				&& (mItems.get(0).getItemType() == ITEM_VIEW_TYPE_HEADER) )
+		{
+			return true;
+		}
+		return false;
+	}
+
+	/**
+	 * Check if this section contains a footer list item.
+	 * @return
+	 */
+	public boolean hasFooter()
+	{
+		if ( !mItems.isEmpty()
+				&& mItems.get(mItems.size()-1) != null
+				&& (mItems.get(mItems.size()-1).getItemType() == ITEM_VIEW_TYPE_FOOTER) )
+		{
+			return true;
+		}
+		return false;
+	}
+
+	/**
+	 * Set the header for an alphabetical section.
+	 * Create a header row if one does not exist,
+	 * or update it.
+	 * @param text
+	 */
+	public void setAlphaSectionHeader(String text)
+	{
+		// Check if header already exists.
+		if ( hasHeader() )
+		{
+			if ( !text.isEmpty() )
+			{
+				// Just update the header text.
+				setHeaderText(text);
+			}
+			else
+			{
+				// If the new value is null, remove the header row.
+				m_children.remove(0);
+				mItems.remove(0);
+
+				// Notify list adapter.
+				if (mAdapterListener != null)
+					mAdapterListener.itemRemoved(mItems.get(0));
+			}
+		}
+		else
+		{
+			// Create and add the header before the first item - if that exists.
+			addSectionHeader();
+			setHeaderText(text);
+			if (mAdapterListener != null)
+				mAdapterListener.itemAdded(mItems.get(0), this, 0);
+		}
+	}
+
+	/**
+	 * Set the header for an alphabetical section.
+	 * Create a header row if one does not exist,
+	 * or update it.
+	 * @param text
+	 */
+	public void setAlphaSectionFooter(String text)
+	{
+		// Check if header already exists.
+		if ( hasFooter() )
+		{
+			if ( !text.isEmpty() )
+			{
+				// Just update the footer text.
+				setFooterText(text);
+			}
+			else
+			{
+				// If the new value is null, remove the footer row.
+				m_children.remove(mItems.get(mItems.size()-1));
+				mItems.remove(mItems.get(mItems.size()-1));
+
+				// Notify list adapter.
+				if (mAdapterListener != null)
+					mAdapterListener.itemRemoved(mItems.get(mItems.size()-1));
+			}
+		}
+		else
+		{
+			// Create and add the footer after the last item - if that exists.
+			addSectionFooter();
+			setFooterText(text);
+			if (mAdapterListener != null)
+				mAdapterListener.itemAdded(mItems.get(mItems.size()), this, mItems.size());
+		}
 	}
 
 	/**

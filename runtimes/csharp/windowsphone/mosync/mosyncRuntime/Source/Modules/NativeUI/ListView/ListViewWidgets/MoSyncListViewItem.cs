@@ -17,7 +17,7 @@ MA 02110-1301, USA.
 
 /**
  * @file MoSyncListViewItem.cs
- * @author Rata Gabriela
+ * @author Rata Gabriela and Spiridon Alexandru
  *
  * @brief This represents the ListViewItem implementation for the NativeUI
  *        component on Windows Phone 7, language C#
@@ -73,6 +73,10 @@ namespace MoSync
 			protected ColumnDefinition mColumn1;
 			protected ColumnDefinition mColumn2;
 
+
+            // contains the subtitle text
+            protected string mSubtitle;
+
             /**
             * Constructor
             */
@@ -114,6 +118,9 @@ namespace MoSync
 				mGrid.Children.Add(mText);
 
                 mView = mGrid;
+
+                this.ItemSelected = false;
+                this.ItemsSourceItemIndex = -1;
 			}
 
             public override void AddChild(IWidget child)
@@ -124,6 +131,37 @@ namespace MoSync
                         WidgetBaseWindowsPhone widget = (child as WidgetBaseWindowsPhone);
                         mGrid.Children.Add(widget.View);
                     });
+            }
+
+            /**
+             * Asks for the parent section to reload the list view model.
+             */
+            public void ReloadParentList()
+            {
+                if (mParent is ListViewSection)
+                {
+                    ListViewSection parentSection = mParent as ListViewSection;
+                    parentSection.ReloadParentItem(this);
+                }
+            }
+
+            /**
+             * Sets the selected state of the item.
+             */
+            public bool ItemSelected
+            {
+                get;
+                set;
+            }
+
+            /**
+             * The index of the item data within the section contained by the parent list view
+             * items source (the long list selector items source).
+             */
+            public int ItemsSourceItemIndex
+            {
+                get;
+                set;
             }
 
             #region MoSync Widget Properties
@@ -171,13 +209,49 @@ namespace MoSync
 			{
 				set
 				{
-					mText.Text = value;
+                    mText.Text = value;
+                    ReloadParentList();
 				}
 				get
 				{
-					return mText.Text;
+                    return mText.Text;
 				}
 			}
+
+            /**
+             * Implementation of the "Text" property.
+             * Sets the text that will appear on the list view item
+             */
+            [MoSyncWidgetProperty(MoSync.Constants.MAW_LIST_VIEW_ITEM_SUBTITLE)]
+            public String Subtitle
+            {
+                set
+                {
+                    mSubtitle = value;
+                    ReloadParentList();
+                }
+                get
+                {
+                    return mSubtitle;
+                }
+            }
+
+            /**
+             * Implementation of the "IsSelected" property.
+             * Gets the selected state of the current item.
+             */
+            [MoSyncWidgetProperty(MoSync.Constants.MAW_LIST_VIEW_ITEM_IS_SELECTED)]
+            public string IsSelected
+            {
+                get
+                {
+                    if (this.ItemSelected == true)
+                    {
+                        return "true";
+                    }
+                    return "false";
+                }
+            }
 
             /**
              * Implementation of the "Icon" property.
@@ -208,8 +282,21 @@ namespace MoSync
                         else throw new InvalidPropertyValueException();
                     }
                     else throw new InvalidPropertyValueException();
+                    ReloadParentList();
 				}
 			}
+
+            /**
+             * Returns the Icon image source (needed to set the image of the list view item
+             * if the list is alphabetical or segmented).
+             */
+            public ImageSource IconImageSource
+            {
+                get
+                {
+                    return mIcon.Source;
+                }
+            }
 
             /**
              * The implementation of the "FontColor" property.

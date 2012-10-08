@@ -80,9 +80,25 @@ namespace NativeUI
 		LIST_VIEW_MODE_EDIT
 	};
 
+	/**
+	 * @brief List view style.
+	 * Platform: Windows Phone 7.
+	 */
+	enum ListViewStyle
+	{
+		/**
+		 * @brief Every list view item will contain an image, a title and a subtitle.
+		 */
+		LIST_VIEW_STYLE_SUBTITLE = 0,
+
+		/**
+		 * @brief Every list view item will contain an image and a title.
+		 */
+		LIST_VIEW_STYLE_NO_SUBTITLE
+	};
+
 	// Forward declaration.
 	class ListViewListener;
-	class ListViewSection;
 
 	/**
 	 * \brief An instance of ListView is used for displaying list of information.
@@ -95,7 +111,7 @@ namespace NativeUI
 		 * Constructor.
 		 * @param type List view's type.
 		 */
-		ListView(ListViewType type = LIST_VIEW_TYPE_DEFAULT);
+		ListView(ListViewType type = LIST_VIEW_TYPE_DEFAULT, ListViewStyle style = LIST_VIEW_STYLE_SUBTITLE);
 
 		/**
 		 * Destructor.
@@ -114,6 +130,19 @@ namespace NativeUI
 		 * @return List view type.
 		 */
 		ListViewType getType();
+
+		/**
+		 * Get the list view style.
+		 * @return List view style.
+		 */
+		ListViewStyle getStyle();
+
+		/**
+		 * Sets the list view style.
+		 * This property should be set before the list contains any children.
+		 * @param newStyle The new style to be set.
+		 */
+		void setStyle(ListViewStyle newStyle);
 
 		/**
 		 * Set the list view mode.
@@ -139,14 +168,14 @@ namespace NativeUI
 		 * Enable/disable item selection.
 		 * If you don't want to allow the user to select any items, set this
 		 * property to false.
-		 * Platform: iOS.
+		 * Platform: iOS and Windows Phone 7.
 		 * @param allow true to enable it, false to disable it.
 		 */
 		void allowSelection(bool allow = true);
 
 		/**
 		 * Check if user is allowed to select an item.
-		 * Platform: iOS.
+		 * Platform: iOS and Windows Phone 7.
 		 * @return true if it's allowed, false otherwise.
 		 */
 		bool isSelectionAllowed();
@@ -191,6 +220,24 @@ namespace NativeUI
 		 * @return One of the ListViewType enum values.
 		 */
 		ListViewType getListViewTypeEnum(int listType);
+
+		/**
+		 * Get the list view style constant.
+		 * @param listStyle Given list style enum.
+		 * @return One of the following values:
+		 * - MAW_LIST_VIEW_STYLE_SUBTITLE
+		 * - MAW_LIST_VIEW_STYLE_NO_SUBTITLE
+		 */
+		int getListViewStyleFromEnum(ListViewStyle listStyle);
+
+		/**
+		 * Get the list view style enum from a constant.
+		 * @param listStyle One of the following values:
+		 * - MAW_LIST_VIEW_STYLE_SUBTITLE
+		 * - MAW_LIST_VIEW_STYLE_NO_SUBTITLE
+		 * @return One of the ListViewStyle enum values.
+		 */
+		ListViewStyle getListViewStyleEnum(int listStyle);
 
 	private:
 		/**

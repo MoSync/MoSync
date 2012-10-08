@@ -14,7 +14,11 @@
             <Grid Margin="12,0,0,0">
                 <Grid Width="60" Height="60" HorizontalAlignment="Left">
                     <Border Background="{Binding HeaderColor}">
-                        <TextBlock Margin="10,0,1,5" Foreground="Black" Style="{StaticResource PhoneTextLargeStyle}" Text="{Binding Title}" TextAlignment="Left" VerticalAlignment="Center"/>
+                        <TextBlock Margin="10,0,1,5" Style="{StaticResource PhoneTextLargeStyle}" Text="{Binding Header}"
+                                   TextAlignment="{Binding HeaderTextHorizontalAlignment}" VerticalAlignment="{Binding HeaderTextVerticalAlignment}"
+                                   FontSize="{Binding HeaderFontSize}" FontFamily="{Binding HeaderFontFamily}"
+                                   FontWeight="{Binding HeaderFontWeight}" FontStyle="{Binding HeaderFontStyle}"
+                                   Foreground="{Binding HeaderFontColor}"/>
                     </Border>
                 </Grid>
             </Grid>
@@ -23,13 +27,38 @@
         <!-- The footer template of a LongListSelector -->
         <DataTemplate x:Key="groupFooterTemplate">
             <Border Background="{Binding FooterColor}" Padding="{StaticResource PhoneTouchTargetOverhang}" Visibility="{Binding FooterVisibility}">
-                <TextBlock Margin="10,0,1,5" Foreground="Black" Style="{StaticResource PhoneTextLargeStyle}" Text="{Binding FooterTitle}" TextAlignment="Left" VerticalAlignment="Center"/>
+                <TextBlock Margin="10,0,1,5" Style="{StaticResource PhoneTextLargeStyle}" Text="{Binding Footer}"
+                           TextAlignment="{Binding FooterTextHorizontalAlignment}" VerticalAlignment="{Binding FooterTextVerticalAlignment}"
+                           FontSize="{Binding FooterFontSize}" FontFamily="{Binding FooterFontFamily}"
+                           FontWeight="{Binding FooterFontWeight}" FontStyle="{Binding FooterFontStyle}"
+                           Foreground="{Binding FooterFontColor}"/>
             </Border>
         </DataTemplate>
 
         <!-- The list item template of a LongListSelector -->
         <DataTemplate x:Key="listItemTemplate">
-            <Border Background="{Binding BackgroundColor}" Margin="0" Child="{Binding Content}" Height="{Binding Height}" Width="{Binding Width}">
+            <Border BorderThickness="2">
+                <Grid Height="{Binding Height}" Width="{Binding Width}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"></ColumnDefinition>
+                        <ColumnDefinition></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+                    <Border BorderThickness="1" Grid.Column="0">
+                        <Image Source="{Binding ImageSource}" Width="40" Height="100">
+                        </Image>
+                    </Border>
+
+                    <Border BorderThickness="2" Grid.Column="1">
+                        <Grid VerticalAlignment="Center">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"></RowDefinition>
+                                <RowDefinition Height="Auto"></RowDefinition>
+                            </Grid.RowDefinitions>
+                            <TextBlock Grid.Row="0" Text="{Binding Title}" VerticalAlignment="Center"></TextBlock>
+                            <TextBlock Grid.Row="1" Text="{Binding Subtitle}" Visibility="{Binding SubtitleVisibility}" VerticalAlignment="Top"></TextBlock>
+                        </Grid>
+                    </Border>
+                </Grid>
             </Border>
         </DataTemplate>
 

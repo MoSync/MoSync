@@ -25,6 +25,7 @@ MA 02110-1301, USA.
  */
 
 #include "ListView.h"
+#include "ListViewSection.h"
 #include "ListViewListener.h"
 
 namespace NativeUI
@@ -33,11 +34,14 @@ namespace NativeUI
 	 * Constructor.
 	 * @param type List view's type.
 	 */
-	ListView::ListView(ListViewType type): Widget(MAW_LIST_VIEW)
+	ListView::ListView(ListViewType type, ListViewStyle style): Widget(MAW_LIST_VIEW)
 	{
 		this->setPropertyInt(
 			MAW_LIST_VIEW_TYPE,
 			this->getListViewTypeFromEnum(type));
+		this->setPropertyInt(
+			MAW_LIST_VIEW_STYLE,
+			this->getListViewStyleFromEnum(style));
 		this->fillSpaceHorizontally();
 		this->fillSpaceVertically();
 	}
@@ -69,6 +73,27 @@ namespace NativeUI
 		 int type = this->getPropertyInt(MAW_LIST_VIEW_TYPE);
 		 return this->getListViewTypeEnum(type);
 	 }
+
+	/**
+	 * Get the list view style.
+	 * @return List view style.
+	 */
+	ListViewStyle ListView::getStyle()
+	{
+		int style = this->getPropertyInt(MAW_LIST_VIEW_STYLE);
+		return this->getListViewStyleEnum(style);
+	}
+
+	/**
+	 * Sets the list view style.
+	 * This property should be set before the list contains any children.
+	 * @param newStyle The new style to be set.
+	 */
+	void ListView::setStyle(ListViewStyle newStyle)
+	{
+		int style = this->getListViewStyleFromEnum(newStyle);
+		this->setPropertyInt(MAW_LIST_VIEW_STYLE, style);
+	}
 
 	 /**
 	  * Set the list view mode.
@@ -179,6 +204,27 @@ namespace NativeUI
 					itemClickedIndex);
 			}
 		}
+		else if (MAW_EVENT_SEGMENTED_LIST_ITEM_CLICKED == widgetEventData->eventType)
+		{
+			int sectionClickedIndex = widgetEventData->sectionIndex;
+			int itemIndexWithinSection = widgetEventData->sectionItemIndex;
+			ListViewSection* listViewSection = (ListViewSection*)
+				this->getChild(sectionClickedIndex);
+			ListViewItem* listViewItem = (ListViewItem*)
+				listViewSection->getChild(itemIndexWithinSection);
+
+			for (int i = 0; i < mListViewListeners.size(); i++)
+			{
+				mListViewListeners[i]->segmentedListViewItemClicked(
+					this,
+					sectionClickedIndex,
+					itemIndexWithinSection);
+				mListViewListeners[i]->segmentedListViewItemClicked(
+					this,
+					listViewSection,
+					listViewItem);
+			}
+		}
 	}
 
 	/**
@@ -235,6 +281,58 @@ namespace NativeUI
 		}
 
 		return type;
+	}
+
+	/**
+	 * Get the list view style constant.
+	 * @param listStyle Given list style enum.
+	 * @return One of the following values:
+	 * - MAW_LIST_VIEW_STYLE_SUBTITLE
+	 * - MAW_LIST_VIEW_STYLE_NO_SUBTITLE
+	 */
+	int ListView::getListViewStyleFromEnum(ListViewStyle listStyle)
+	{
+		int style;
+		switch (listStyle)
+		{
+		case LIST_VIEW_STYLE_SUBTITLE:
+			style = MAW_LIST_VIEW_STYLE_SUBTITLE;
+			break;
+		case LIST_VIEW_STYLE_NO_SUBTITLE:
+			style = MAW_LIST_VIEW_STYLE_NO_SUBTITLE;
+			break;
+		default:
+			style = MAW_LIST_VIEW_STYLE_SUBTITLE;
+			break;
+		}
+
+		return style;
+	}
+
+	/**
+	 * Get the list view style enum from a constant.
+	 * @param listStyle One of the following values:
+	 * - MAW_LIST_VIEW_STYLE_SUBTITLE
+	 * - MAW_LIST_VIEW_STYLE_NO_SUBTITLE
+	 * @return One of the ListViewStyle enum values.
+	 */
+	ListViewStyle ListView::getListViewStyleEnum(int listStyle)
+	{
+		ListViewStyle style;
+		switch (listStyle)
+		{
+		case MAW_LIST_VIEW_STYLE_SUBTITLE:
+			style = LIST_VIEW_STYLE_SUBTITLE;
+			break;
+		case MAW_LIST_VIEW_STYLE_NO_SUBTITLE:
+			style = LIST_VIEW_STYLE_NO_SUBTITLE;
+			break;
+		default:
+			style = LIST_VIEW_STYLE_SUBTITLE;
+			break;
+		}
+
+		return style;
 	}
 
 } // namespace NativeUI

@@ -32,10 +32,22 @@ namespace NativeUI
 	/**
 	 * Constructor.
 	 */
-	ListViewSection::ListViewSection() :
+	ListViewSection::ListViewSection(ListViewSectionType type) :
 		Widget(MAW_LIST_VIEW_SECTION)
 	{
+		this->setPropertyInt(
+			MAW_LIST_VIEW_SECTION_TYPE,
+			this->getListViewSectionTypeFromEnum(type));
+	}
 
+	/**
+	 * Get the list view section type.
+	 * @return List view section type.
+	 */
+	ListViewSectionType ListViewSection::getType()
+	{
+		 int type = this->getPropertyInt(MAW_LIST_VIEW_SECTION_TYPE);
+		 return this->getListViewSectionTypeEnum(type);
 	}
 
 	/**
@@ -49,9 +61,51 @@ namespace NativeUI
 	}
 
 	/**
+	 * Insert a list item to this section at a certain index.
+	 * @param item The item that will be added.
+	 * @param index The index at which the item will be added
+	 * The ownership of the item object is passed to this method.
+	 */
+	void ListViewSection::insertItem(ListViewItem* item, int index)
+	{
+		this->insertChild(item, index);
+	}
+
+	/**
+	 * Removes a list item from this section.
+	 * @param item The item that will be removed.
+	 */
+	void ListViewSection::removeItem(ListViewItem* item)
+	{
+		this->removeChild(item);
+	}
+
+	/**
+	 * Removes a list item from this section.
+	 * @param index The index of the item that will be removed.
+	 */
+	void ListViewSection::removeItem(int index)
+	{
+		if (this->countChildWidgets() > index)
+		{
+			this->removeChild(this->getChild(index));
+		}
+	}
+
+	/**
+	 * Gets a list item from this section.
+	 * @param index The index of the item.
+	 */
+	void ListViewSection::getItem(int index)
+	{
+		this->getChild(index);
+	}
+
+	/**
 	 * Set section title.
-	 * Section title will appear on the right side of the list.
-	 * Platform: iOS.
+	 * On iOS section title will appear on the right side of the list.
+	 * On Android section title will appear on the fast scroll thumb.
+	 * Platform: iOS, Android and Windows Phone 7.
 	 * @param title The given title.
 	 */
 	void ListViewSection::setTitle(const MAUtil::String& title)
@@ -61,7 +115,7 @@ namespace NativeUI
 
 	/**
 	 * Get section title.
-	 * Platform: iOS.
+	 * Platform: iOS, Android and Windows Phone 7.
 	 * @return Section title.
 	 */
 	MAUtil::String ListViewSection::getTitle()
@@ -71,7 +125,7 @@ namespace NativeUI
 
 	/**
 	 * Set the section header text.
-	 * Platform: iOS.
+	 * Platform: iOS, Android and Windows Phone 7.
 	 * @param headerText The given header text.
 	 */
 	void ListViewSection::setHeaderText(
@@ -82,7 +136,7 @@ namespace NativeUI
 
 	/**
 	 * Get the section header text.
-	 * Platform: iOS.
+	 * Platform: iOS, Android and Windows Phone 7.
 	 * @return Header text.
 	 */
 	MAUtil::String ListViewSection::getHeaderText()
@@ -92,7 +146,7 @@ namespace NativeUI
 
 	/**
 	 * Set the section footer text.
-	 * Platform: iOS.
+	 * Platform: iOS, Android and Windows Phone 7.
 	 * @param footerText The given footer text.
 	 */
 	void ListViewSection::setFooterText(
@@ -103,7 +157,7 @@ namespace NativeUI
 
 	/**
 	 * Get the section footer text.
-	 * Platform: iOS.
+	 * Platform: iOS, Android and Windows Phone 7.
 	 * @return Footer text.
 	 */
 	MAUtil::String ListViewSection::getFooterText()
@@ -161,4 +215,248 @@ namespace NativeUI
 	{
 		return Widget::removeChild(widget);
 	}
+
+	/**
+	 * Get the list view section type constant.
+	 * @param sectionType Given list section type enum.
+	 * @return One of the following values:
+	 * - MAW_LIST_VIEW_SECTION_TYPE_ALPHABETICAL
+	 * - MAW_LIST_VIEW_SECTION_TYPE_SEGMENTED
+	 */
+	int ListViewSection::getListViewSectionTypeFromEnum(ListViewSectionType sectionType)
+	{
+		int type;
+		switch (sectionType)
+		{
+		case LIST_VIEW_SECTION_TYPE_ALPHABETICAL:
+			type = MAW_LIST_VIEW_SECTION_TYPE_ALPHABETICAL;
+			break;
+		case LIST_VIEW_SECTION_TYPE_SEGMENTED:
+			type = MAW_LIST_VIEW_SECTION_TYPE_SEGMENTED;
+			break;
+		default:
+			type = MAW_LIST_VIEW_SECTION_TYPE_ALPHABETICAL;
+			break;
+		}
+
+		return type;
+	}
+
+	/**
+	 * Get the list view section type enum from a constant.
+	 * @param sectionType One of the following values:
+	 * - MAW_LIST_VIEW_SECTION_TYPE_ALPHABETICAL
+	 * - MAW_LIST_VIEW_SECTION_TYPE_SEGMENTED
+	 * @return One of the ListViewSectionType enum values.
+	 */
+	ListViewSectionType ListViewSection::getListViewSectionTypeEnum(int sectionType)
+	{
+		ListViewSectionType type;
+		switch (sectionType)
+		{
+		case MAW_LIST_VIEW_SECTION_TYPE_ALPHABETICAL:
+			type = LIST_VIEW_SECTION_TYPE_ALPHABETICAL;
+			break;
+		case MAW_LIST_VIEW_SECTION_TYPE_SEGMENTED:
+			type = LIST_VIEW_SECTION_TYPE_SEGMENTED;
+			break;
+		default:
+			type = LIST_VIEW_SECTION_TYPE_ALPHABETICAL;
+			break;
+		}
+
+		return type;
+	}
+
+    /**
+     * Set the background color of the header row.
+     * Platform: Android and Windows Phone 7.
+     * @param color A hexadecimal color value, e.g. 0xFF0000.
+     * @return Any of the following result codes:
+     * - #MAW_RES_OK if the value was set.
+     * - #MAW_RES_INVALID_HANDLE if the handle was invalid.
+     * - #MAW_RES_INVALID_PROPERTY_VALUE if the property value was invalid.
+     * - #MAW_RES_ERROR otherwise.
+     */
+    int ListViewSection::setHeaderBackgroundColor(const int color)
+    {
+        char buffer[BUF_SIZE];
+        sprintf(buffer, "0x%.6X", color);
+        return setProperty(MAW_LIST_VIEW_SECTION_HEADER_BACKGROUND, buffer);
+    }
+
+    /**
+     * Set the background color of the footer row.
+     * Platform: Android and Windows Phone 7.
+     * @param color A hexadecimal color value, e.g. 0xFF0000.
+     * @return Any of the following result codes:
+     * - #MAW_RES_OK if the value was set.
+     * - #MAW_RES_INVALID_HANDLE if the handle was invalid.
+     * - #MAW_RES_INVALID_PROPERTY_VALUE if the property value was invalid.
+     * - #MAW_RES_ERROR otherwise.
+     */
+    int ListViewSection::setFooterBackgroundColor(const int color)
+    {
+        char buffer[BUF_SIZE];
+        sprintf(buffer, "0x%.6X", color);
+        return setProperty(MAW_LIST_VIEW_SECTION_FOOTER_BACKGROUND, buffer);
+    }
+
+    /**
+     * Set the font color of the header text.
+     * Platform: Android and Windows Phone 7.
+     * @param color A hexadecimal value 0xRRGGBB, where R, G and B are the
+     *              red, green and blue components respectively.
+     * @return Any of the following result codes:
+     * - #MAW_RES_OK if the property could be set.
+     * - #MAW_RES_INVALID_PROPERTY_VALUE if the color value was invalid.
+     */
+    int ListViewSection::setHeaderFontColor(const int color)
+    {
+        char buffer[BUF_SIZE];
+        sprintf(buffer, "0x%.6X", color);
+        return this->setProperty(MAW_LIST_VIEW_SECTION_HEADER_FONT_COLOR, buffer);
+    }
+
+    /**
+     * Set the font color of the footer text.
+     * Platform: Android and Windows Phone 7.
+     * @param color A hexadecimal value 0xRRGGBB, where R, G and B are the
+     *              red, green and blue components respectively.
+     * @return Any of the following result codes:
+     * - #MAW_RES_OK if the property could be set.
+     * - #MAW_RES_INVALID_PROPERTY_VALUE if the color value was invalid.
+     */
+    int ListViewSection::setFooterFontColor(const int color)
+    {
+        char buffer[BUF_SIZE];
+        sprintf(buffer, "0x%.6X", color);
+        return this->setProperty(MAW_LIST_VIEW_SECTION_FOOTER_FONT_COLOR, buffer);
+    }
+
+    /**
+     * Set the font size in points of the header text.
+     * Platform: Android and Windows Phone 7.
+     * @param size A float that specifies the number of pixels for Android
+     * and WP7.
+     * @return Any of the following result codes:
+     * - #MAW_RES_OK if the property could be set.
+     * - #MAW_RES_INVALID_PROPERTY_VALUE if the size value was invalid.
+     */
+    int ListViewSection::setHeaderFontSize(const float size)
+    {
+        return this->setPropertyFloat(MAW_LIST_VIEW_SECTION_HEADER_FONT_SIZE, size);
+    }
+
+    /**
+     * Set the font size in points of the footer text.
+     * Platform: Android and Windows Phone 7.
+     * @param size A float that specifies the number of pixels for Android
+     * and WP7.
+     * @return Any of the following result codes:
+     * - #MAW_RES_OK if the property could be set.
+     * - #MAW_RES_INVALID_PROPERTY_VALUE if the size value was invalid.
+     */
+    int ListViewSection::setFooterFontSize(const float size)
+    {
+        return this->setPropertyFloat(MAW_LIST_VIEW_SECTION_FOOTER_FONT_SIZE, size);
+    }
+
+	/**
+	* Sets the typeface and style in which the header text should be displayed.
+	* Platform: Android and Windows Phone 7.
+	* @param fontHandle A font handle received from loading fonts using
+	*  #maFontGetName and #maFontLoadWithName syscalls.
+	* @return Any of the following result codes:
+	* - #MAW_RES_OK if the property could be set.
+	* - #MAW_RES_INVALID_HANDLE if the handle was invalid.
+	* - #MAW_RES_INVALID_PROPERTY_NAME if the property name was invalid.
+	* - #MAW_RES_INVALID_PROPERTY_VALUE if the property value was invalid.
+	* - #MAW_RES_ERROR otherwise.
+	*/
+    int ListViewSection::setHeaderFont(const MAHandle fontHandle)
+    {
+		return this->setPropertyInt(MAW_LIST_VIEW_SECTION_HEADER_FONT_HANDLE, fontHandle);
+    }
+
+	/**
+	* Sets the typeface and style in which the footer text should be displayed.
+	* Platform: Android and Windows Phone 7.
+	* @param fontHandle A font handle received from loading fonts using
+	*  #maFontGetName and #maFontLoadWithName syscalls.
+	* @return Any of the following result codes:
+	* - #MAW_RES_OK if the property could be set.
+	* - #MAW_RES_INVALID_HANDLE if the handle was invalid.
+	* - #MAW_RES_INVALID_PROPERTY_NAME if the property name was invalid.
+	* - #MAW_RES_INVALID_PROPERTY_VALUE if the property value was invalid.
+	* - #MAW_RES_ERROR otherwise.
+	*/
+    int ListViewSection::setFooterFont(const MAHandle fontHandle)
+    {
+		return this->setPropertyInt(MAW_LIST_VIEW_SECTION_FOOTER_FONT_HANDLE, fontHandle);
+    }
+
+    /**
+     * Set the vertical alignment of the header text.
+     * Platform: Android and Windows Phone 7.
+     * @param alignment One of the constants:
+     * - #MAW_ALIGNMENT_TOP
+     * - #MAW_ALIGNMENT_CENTER
+     * - #MAW_ALIGNMENT_BOTTOM
+     * @return Any of the following result codes:
+     * - #MAW_RES_OK if the property could be set.
+     * - #MAW_RES_INVALID_PROPERTY_VALUE if the alignment value was invalid.
+     */
+    int ListViewSection::setHeaderTextVerticalAlignment(const MAUtil::String& alignment)
+    {
+		return this->setProperty(MAW_LIST_VIEW_SECTION_HEADER_VERTICAL_ALIGNMENT, alignment);
+    }
+
+    /**
+     * Set the vertical alignment of the footer text.
+     * Platform: Android and Windows Phone 7.
+     * @param alignment One of the constants:
+     * - #MAW_ALIGNMENT_TOP
+     * - #MAW_ALIGNMENT_CENTER
+     * - #MAW_ALIGNMENT_BOTTOM
+     * @return Any of the following result codes:
+     * - #MAW_RES_OK if the property could be set.
+     * - #MAW_RES_INVALID_PROPERTY_VALUE if the alignment value was invalid.
+     */
+    int ListViewSection::setFooterTextVerticalAlignment(const MAUtil::String& alignment)
+    {
+		return this->setProperty(MAW_LIST_VIEW_SECTION_FOOTER_VERTICAL_ALIGNMENT, alignment);
+    }
+
+    /**
+     * Set the horizontal alignment of the header text.
+     * Platform: Android and Windows Phone 7.
+     * @param alignment one of the constants:
+     * - #MAW_ALIGNMENT_LEFT
+     * - #MAW_ALIGNMENT_CENTER
+     * - #MAW_ALIGNMENT_RIGHT
+     * @return Any of the following result codes:
+     * - #MAW_RES_OK if the property could be set.
+     * - #MAW_RES_INVALID_PROPERTY_VALUE if the alignment value was invalid.
+     */
+    int ListViewSection::setHeaderTextHorizontalAlignment(const MAUtil::String& alignment)
+    {
+		return this->setProperty(MAW_LIST_VIEW_SECTION_HEADER_HORIZONTAL_ALIGNMENT, alignment);
+    }
+
+    /**
+     * Set the horizontal alignment of the footer text.
+     * Platform: Android and Windows Phone 7.
+     * @param alignment one of the constants:
+     * - #MAW_ALIGNMENT_LEFT
+     * - #MAW_ALIGNMENT_CENTER
+     * - #MAW_ALIGNMENT_RIGHT
+     * @return Any of the following result codes:
+     * - #MAW_RES_OK if the property could be set.
+     * - #MAW_RES_INVALID_PROPERTY_VALUE if the alignment value was invalid.
+     */
+    int ListViewSection::setFooterTextHorizontalAlignment(const MAUtil::String& alignment)
+    {
+		return this->setProperty(MAW_LIST_VIEW_SECTION_FOOTER_HORIZONTAL_ALIGNMENT, alignment);
+    }
 }
