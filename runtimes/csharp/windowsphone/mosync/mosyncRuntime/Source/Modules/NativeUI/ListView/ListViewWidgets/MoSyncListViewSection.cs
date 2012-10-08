@@ -402,9 +402,16 @@ namespace MoSync
                 set
                 {
                     System.Windows.Media.SolidColorBrush brush;
-                    MoSync.Util.convertStringToColor(value, out brush);
-                    mHeaderBackgroundColor = brush;
-                    ReloadParentSection();
+                    try
+                    {
+                        MoSync.Util.convertStringToColor(value, out brush);
+                        mHeaderBackgroundColor = brush;
+                        ReloadParentSection();
+                    }
+                    catch
+                    {
+                        throw new InvalidPropertyValueException();
+                    }
                 }
             }
 
@@ -466,10 +473,17 @@ namespace MoSync
             {
                 set
                 {
-                    System.Windows.Media.SolidColorBrush brush;
-                    MoSync.Util.convertStringToColor(value, out brush);
-                    mHeaderFontColor = brush;
-                    ReloadParentSection();
+                    try
+                    {
+                        System.Windows.Media.SolidColorBrush brush;
+                        MoSync.Util.convertStringToColor(value, out brush);
+                        mHeaderFontColor = brush;
+                        ReloadParentSection();
+                    }
+                    catch
+                    {
+                        throw new InvalidPropertyValueException();
+                    }
                 }
             }
 
@@ -529,10 +543,17 @@ namespace MoSync
             {
                 set
                 {
-                    System.Windows.Media.SolidColorBrush brush;
-                    MoSync.Util.convertStringToColor(value, out brush);
-                    mFooterBackgroundColor = brush;
-                    ReloadParentSection();
+                    try
+                    {
+                        System.Windows.Media.SolidColorBrush brush;
+                        MoSync.Util.convertStringToColor(value, out brush);
+                        mFooterBackgroundColor = brush;
+                        ReloadParentSection();
+                    }
+                    catch
+                    {
+                        throw new InvalidPropertyValueException();
+                    }
                 }
             }
 
@@ -594,10 +615,17 @@ namespace MoSync
             {
                 set
                 {
-                    System.Windows.Media.SolidColorBrush brush;
-                    MoSync.Util.convertStringToColor(value, out brush);
-                    mFooterFontColor = brush;
-                    ReloadParentSection();
+                    try
+                    {
+                        System.Windows.Media.SolidColorBrush brush;
+                        MoSync.Util.convertStringToColor(value, out brush);
+                        mFooterFontColor = brush;
+                        ReloadParentSection();
+                    }
+                    catch
+                    {
+                        throw new InvalidPropertyValueException();
+                    }
                 }
             }
 

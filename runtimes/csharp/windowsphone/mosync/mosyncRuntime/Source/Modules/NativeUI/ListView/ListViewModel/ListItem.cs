@@ -46,9 +46,13 @@ namespace MoSync
         {
             public event PropertyChangedEventHandler PropertyChanged;
 
+            const double DEFAULT_ITEM_FONT_SIZE = 19.0;
+
             #region Private members
 
             private Brush mBackgroundColor;
+            private Brush mFontColor;
+            private double mFontSize;
             private String mTitle;
             private String mSubtitle;
             private Visibility mSubtitleVisibility;
@@ -74,6 +78,8 @@ namespace MoSync
                 // the equivalent of xaml 'Auto' - the item resizez according to its content
                 mHeight = double.NaN;
                 mWidth = double.NaN;
+                this.FontSize = DEFAULT_ITEM_FONT_SIZE;
+                this.FontColor = new SolidColorBrush(Colors.White);
             }
 
             #endregion
@@ -114,11 +120,8 @@ namespace MoSync
                 }
                 set
                 {
-                    if (mTitle != null)
-                    {
-                        mTitle = value;
-                        OnPropertyChanged("Title");
-                    }
+                    mTitle = value;
+                    OnPropertyChanged("Title");
                 }
             }
 
@@ -130,11 +133,8 @@ namespace MoSync
                 }
                 set
                 {
-                    if (mSubtitle != null)
-                    {
-                        mSubtitle = value;
-                        OnPropertyChanged("Subtitle");
-                    }
+                    mSubtitle = value;
+                    OnPropertyChanged("Subtitle");
                 }
             }
 
@@ -182,8 +182,11 @@ namespace MoSync
                 }
                 set
                 {
-                    mImageSource = value;
-                    OnPropertyChanged("ImageSource");
+                    if (mImageSource != null)
+                    {
+                        mImageSource = value;
+                        OnPropertyChanged("ImageSource");
+                    }
                 }
             }
 
@@ -201,8 +204,43 @@ namespace MoSync
                 }
                 set
                 {
-                    mBackgroundColor = value;
-                    OnPropertyChanged("BackgroundColor");
+                    if (mBackgroundColor != null)
+                    {
+                        mBackgroundColor = value;
+                        OnPropertyChanged("BackgroundColor");
+                    }
+                }
+            }
+
+            public Brush FontColor
+            {
+                get
+                {
+                    return mFontColor;
+                }
+                set
+                {
+                    if (value != null)
+                    {
+                        mFontColor = value;
+                        OnPropertyChanged("FontColor");
+                    }
+                }
+            }
+
+            public double FontSize
+            {
+                get
+                {
+                    return mFontSize;
+                }
+                set
+                {
+                    if (value > 0)
+                    {
+                        mFontSize = value;
+                        OnPropertyChanged("FontSize");
+                    }
                 }
             }
 

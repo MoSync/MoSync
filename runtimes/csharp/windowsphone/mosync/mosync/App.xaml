@@ -8,11 +8,11 @@
     xmlns:toolkit="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone.Controls.Toolkit">
 
     <!--Application Resources-->
-    <Application.Resources>
+    <Application.Resources>                                                                                                        b
         <!-- The header template of a LongListSelector -->
         <DataTemplate x:Key="groupHeaderTemplate">
             <Grid Margin="12,0,0,0">
-                <Grid Width="60" Height="60" HorizontalAlignment="Left">
+                <Grid Width="Auto" MinWidth="50" Height="Auto" MinHeight="50" HorizontalAlignment="Left">
                     <Border Background="{Binding HeaderColor}">
                         <TextBlock Margin="10,0,1,5" Style="{StaticResource PhoneTextLargeStyle}" Text="{Binding Header}"
                                    TextAlignment="{Binding HeaderTextHorizontalAlignment}" VerticalAlignment="{Binding HeaderTextVerticalAlignment}"
@@ -44,7 +44,7 @@
                         <ColumnDefinition></ColumnDefinition>
                     </Grid.ColumnDefinitions>
                     <Border BorderThickness="1" Grid.Column="0">
-                        <Image Source="{Binding ImageSource}" Width="40" Height="100">
+                        <Image Source="{Binding ImageSource}" Width="Auto" Height="Auto">
                         </Image>
                     </Border>
 
@@ -54,7 +54,7 @@
                                 <RowDefinition Height="Auto"></RowDefinition>
                                 <RowDefinition Height="Auto"></RowDefinition>
                             </Grid.RowDefinitions>
-                            <TextBlock Grid.Row="0" Text="{Binding Title}" VerticalAlignment="Center"></TextBlock>
+                            <TextBlock Grid.Row="0" Text="{Binding Title}" FontSize="{Binding FontSize}" Foreground="{Binding FontColor}" VerticalAlignment="Center"></TextBlock>
                             <TextBlock Grid.Row="1" Text="{Binding Subtitle}" Visibility="{Binding SubtitleVisibility}" VerticalAlignment="Top"></TextBlock>
                         </Grid>
                     </Border>

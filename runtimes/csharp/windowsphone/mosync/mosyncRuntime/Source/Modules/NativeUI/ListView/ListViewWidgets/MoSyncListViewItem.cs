@@ -76,6 +76,9 @@ namespace MoSync
 
             // contains the subtitle text
             protected string mSubtitle;
+            protected Brush mFontColor;
+            protected double mFontSize;
+            protected bool mItemSelected;
 
             /**
             * Constructor
@@ -150,8 +153,22 @@ namespace MoSync
              */
             public bool ItemSelected
             {
-                get;
-                set;
+                get
+                {
+                    return mItemSelected;
+                }
+                set
+                {
+                    mItemSelected = value;
+                    if (mItemSelected)
+                    {
+                    //    this.FontColor = "#FF0000";
+                    }
+                    else
+                    {
+                    //    this.FontColor = "#FFFFFF";
+                    }
+                }
             }
 
             /**
@@ -162,6 +179,22 @@ namespace MoSync
             {
                 get;
                 set;
+            }
+
+            /**
+             * Gets the font color of the long list selector item.
+             */
+            public Brush GetFontColor()
+            {
+                return mFontColor;
+            }
+
+            /**
+             * Gets the font size of the long list selector item.
+             */
+            public double GetFontSize()
+            {
+                return mFontSize;
             }
 
             #region MoSync Widget Properties
@@ -307,9 +340,18 @@ namespace MoSync
 			{
 				set
 				{
-					System.Windows.Media.SolidColorBrush brush;
-					MoSync.Util.convertStringToColor(value, out brush);
-					mText.Foreground = brush;
+                    try
+                    {
+                        System.Windows.Media.SolidColorBrush brush;
+                        MoSync.Util.convertStringToColor(value, out brush);
+                        mText.Foreground = brush;
+                        mFontColor = brush;
+                        ReloadParentList();
+                    }
+                    catch
+                    {
+                        throw new InvalidPropertyValueException();
+                    }
 				}
 			}
 
@@ -323,6 +365,8 @@ namespace MoSync
                 set
                 {
                     mText.FontSize = value;
+                    mFontSize = value;
+                    ReloadParentList();
                 }
 			}
 
@@ -341,6 +385,7 @@ namespace MoSync
 					mText.FontFamily = fontInfo.family;
 					mText.FontWeight = fontInfo.weight;
 					mText.FontStyle = fontInfo.style;
+                    ReloadParentList();
 				}
             }
 
