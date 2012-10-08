@@ -114,7 +114,6 @@
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="AppServiceProvider.cs" />
-	<Compile Include="RebuildData\rebuild.build.cs" />
   </ItemGroup>
   <ItemGroup>
     <ApplicationDefinition Include="App.xaml">
@@ -157,7 +156,6 @@
     <Content Include="resources">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-	<Content Include="RebuildData\data_section.bin" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="ApplicationIcon.png">

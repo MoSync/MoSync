@@ -466,6 +466,7 @@ void SettingsScreen::createListViewItemFontSizeLayout(VerticalLayout* listViewIt
 	currentListViewItemFontSizeLayout->addChild(mSetListViewItemFontSizeButton);
 	mSetListViewItemFontSizeEditBox = new EditBox();
 	mSetListViewItemFontSizeEditBox->fillSpaceHorizontally();
+	mSetListViewItemFontSizeEditBox->setInputMode(EDIT_BOX_INPUT_MODE_NUMERIC);
 	currentListViewItemFontSizeLayout->addChild(mSetListViewItemFontSizeEditBox);
 	listViewItemPropertiesVerticalLayout->addChild(currentListViewItemFontSizeLayout);
 }
@@ -946,8 +947,7 @@ void SettingsScreen::buttonClicked(Widget* button)
 	{
 		if (mCurrentListViewSection != NULL && mHeaderBackgroundColorEditBox->getText() != "")
 		{
-			int backgroundColor = MAUtil::stringToInteger(mHeaderBackgroundColorEditBox->getText(),16);
-			mCurrentListViewSection->setPropertyInt(MAW_LIST_VIEW_SECTION_HEADER_BACKGROUND,backgroundColor);
+			mCurrentListViewSection->setProperty(MAW_LIST_VIEW_SECTION_HEADER_BACKGROUND,mHeaderBackgroundColorEditBox->getText().c_str());
 		}
 	}
 	else if (mSetSectionHeaderFontSize == button)
@@ -962,16 +962,14 @@ void SettingsScreen::buttonClicked(Widget* button)
 	{
 		if (mCurrentListViewSection != NULL && mHeaderFontColorEditBox->getText() != "")
 		{
-			int fontColor = MAUtil::stringToInteger(mHeaderFontColorEditBox->getText(),16);
-			mCurrentListViewSection->setPropertyInt(MAW_LIST_VIEW_SECTION_HEADER_FONT_COLOR,fontColor);
+			mCurrentListViewSection->setProperty(MAW_LIST_VIEW_SECTION_HEADER_FONT_COLOR,mHeaderFontColorEditBox->getText().c_str());
 		}
 	}
 	else if (mSetSectionFooterBackgroundColor == button)
 	{
 		if (mCurrentListViewSection != NULL && mFooterBackgroundColorEditBox->getText() != "")
 		{
-			int backgroundColor = MAUtil::stringToInteger(mFooterBackgroundColorEditBox->getText(),16);
-			mCurrentListViewSection->setPropertyInt(MAW_LIST_VIEW_SECTION_FOOTER_BACKGROUND,backgroundColor);
+			mCurrentListViewSection->setProperty(MAW_LIST_VIEW_SECTION_FOOTER_BACKGROUND,mFooterBackgroundColorEditBox->getText().c_str());
 		}
 	}
 	else if (mSetSectionFooterFontSize == button)
@@ -986,8 +984,7 @@ void SettingsScreen::buttonClicked(Widget* button)
 	{
 		if (mCurrentListViewSection != NULL && mFooterFontColorEditBox->getText() != "")
 		{
-			int fontColor = MAUtil::stringToInteger(mFooterFontColorEditBox->getText(),16);
-			mCurrentListViewSection->setPropertyInt(MAW_LIST_VIEW_SECTION_FOOTER_FONT_COLOR,fontColor);
+			mCurrentListViewSection->setProperty(MAW_LIST_VIEW_SECTION_FOOTER_FONT_COLOR,mFooterFontColorEditBox->getText().c_str());
 		}
 	}
 	else if (mSetListViewItemTextButton == button)
@@ -1001,7 +998,7 @@ void SettingsScreen::buttonClicked(Widget* button)
 	{
 		if (mCurrentListViewItem != NULL && mSetListViewItemFontColorEditBox->getText() != "")
 		{
-			int fontColor = MAUtil::stringToInteger(mSetListViewItemFontColorEditBox->getText());
+			int fontColor = MAUtil::stringToInteger(mSetListViewItemFontColorEditBox->getText(),16);
 			mCurrentListViewItem->setFontColor(fontColor);
 		}
 	}

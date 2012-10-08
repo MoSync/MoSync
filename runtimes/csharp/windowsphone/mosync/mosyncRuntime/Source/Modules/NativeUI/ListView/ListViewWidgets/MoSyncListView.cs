@@ -637,6 +637,8 @@ namespace MoSync
                         newItem.Width = listItem.Width;
                         newItem.Title = listItem.Text;
                         newItem.Subtitle = listItem.Subtitle;
+                        newItem.FontSize = listItem.GetFontSize();
+                        newItem.FontColor = listItem.GetFontColor();
                         if (mListViewStyle == ListViewStyle.NoSubtitle)
                         {
                             newItem.SubtitleVisibility = Visibility.Collapsed;
@@ -835,6 +837,8 @@ namespace MoSync
                         itemToReload.Width = item.Width;
                         itemToReload.Title = item.Text;
                         itemToReload.Subtitle = item.Subtitle;
+                        itemToReload.FontSize = item.GetFontSize();
+                        itemToReload.FontColor = item.GetFontColor();
                         if (mListViewStyle == ListViewStyle.NoSubtitle)
                         {
                             itemToReload.SubtitleVisibility = Visibility.Collapsed;
