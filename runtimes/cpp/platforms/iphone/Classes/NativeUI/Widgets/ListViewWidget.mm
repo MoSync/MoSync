@@ -435,9 +435,20 @@
 	MAEvent event;
 	event.type = EVENT_TYPE_WIDGET;
 	MAWidgetEventData *eventData = new MAWidgetEventData;
-	eventData->eventType = MAW_EVENT_ITEM_CLICKED;
+
+    if (_type == ListViewTypeDefault)
+    {
+        eventData->eventType = MAW_EVENT_ITEM_CLICKED;
+        eventData->listItemIndex = [indexPath row];
+    }
+    else
+    {
+        eventData->eventType = MAW_EVENT_SEGMENTED_LIST_ITEM_CLICKED;
+        eventData->sectionIndex = indexPath.section;
+        eventData->sectionItemIndex = indexPath.row;
+    }
+
 	eventData->widgetHandle = self.handle;
-	eventData->listItemIndex = [indexPath row];
 	event.data = (int)eventData;
 	Base::gEventQueue.put(event);
 }
