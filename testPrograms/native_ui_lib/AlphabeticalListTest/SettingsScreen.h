@@ -44,7 +44,8 @@ class SettingsScreen:
 	public ListScreenListener,
 	public CheckBoxListener,
 	public ButtonListener,
-	public OptionsBoxListener
+	public OptionsBoxListener,
+	public EditBoxListener
 {
 public:
 	/**
@@ -172,6 +173,14 @@ private:
 	 */
 	virtual void optionsBoxButtonClicked(const int buttonIndex,
 		const MAUtil::WString& buttonTitle);
+
+    /**
+     * This method is called when the return button was pressed.
+     * On iphone platform the virtual keyboard is not hidden after
+     * receiving this event.
+     * @param editBox The edit box object that generated the event.
+     */
+    virtual void editBoxReturn(EditBox* editBox);
 
 private:
 	/**

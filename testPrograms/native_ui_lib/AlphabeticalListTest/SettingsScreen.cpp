@@ -97,6 +97,13 @@ SettingsScreen::SettingsScreen():
 	mSetListViewItemTextButton->addButtonListener(this);
 	mSetListViewItemFontColorButton->addButtonListener(this);
 	mSetListViewItemFontSizeButton->addButtonListener(this);
+	mCurrentListViewSectionTitleEditBox->addEditBoxListener(this);
+	mCurrentListViewSectionHeaderEditBox->addEditBoxListener(this);
+	mCurrentListViewSectionFooterEditBox->addEditBoxListener(this);
+	mSetListViewItemTextEditBox->addEditBoxListener(this);
+	mSetListViewItemFontColorEditBox->addEditBoxListener(this);
+	mSetListViewItemFontSizeEditBox->addEditBoxListener(this);
+
 	if (isIOS())
 	{
 		mListViewItemEditModeCheckbox->addCheckBoxListener(this);
@@ -118,6 +125,7 @@ SettingsScreen::SettingsScreen():
 		mListViewItemEditStyleInsertCheckbox->addCheckBoxListener(this);
 		mSetSelectionStyle->addButtonListener(this);
 		mGetSelectionStyle->addButtonListener(this);
+		mSetListViewItemDeleteTitleEditBox->addEditBoxListener(this);
 		OptionsBox* optionBox = OptionsBox::getInstance();
 		optionBox->addOptionsBoxListener(this);
 	}
@@ -129,6 +137,12 @@ SettingsScreen::SettingsScreen():
 		mSetSectionFooterBackgroundColor->addButtonListener(this);
 		mSetSectionFooterFontSize->addButtonListener(this);
 		mSetSectionFooterFontColor->addButtonListener(this);
+		mHeaderBackgroundColorEditBox->addEditBoxListener(this);
+		mHeaderFontSizeEditBox->addEditBoxListener(this);
+		mHeaderFontColorEditBox->addEditBoxListener(this);
+		mFooterBackgroundColorEditBox->addEditBoxListener(this);
+		mFooterFontSizeEditBox->addEditBoxListener(this);
+		mFooterFontColorEditBox->addEditBoxListener(this);
 	}
 }
 
@@ -146,6 +160,11 @@ SettingsScreen::~SettingsScreen()
 	mSetListViewItemTextButton->removeButtonListener(this);
 	mSetListViewItemFontColorButton->removeButtonListener(this);
 	mSetListViewItemFontSizeButton->removeButtonListener(this);
+	mCurrentListViewSectionTitleEditBox->removeEditBoxListener(this);
+	mCurrentListViewSectionFooterEditBox->removeEditBoxListener(this);
+	mSetListViewItemTextEditBox->removeEditBoxListener(this);
+	mSetListViewItemFontColorEditBox->removeEditBoxListener(this);
+	mSetListViewItemFontSizeEditBox->removeEditBoxListener(this);
 
 	if (isIOS())
 	{
@@ -168,6 +187,7 @@ SettingsScreen::~SettingsScreen()
 		mListViewItemEditStyleInsertCheckbox->removeCheckBoxListener(this);
 		mSetSelectionStyle->removeButtonListener(this);
 		mGetSelectionStyle->removeButtonListener(this);
+		mSetListViewItemDeleteTitleEditBox->removeEditBoxListener(this);
 		OptionsBox* optionBox = OptionsBox::getInstance();
 		optionBox->addOptionsBoxListener(this);
 		OptionsBox::destroyInstance();
@@ -180,6 +200,12 @@ SettingsScreen::~SettingsScreen()
 		mSetSectionFooterBackgroundColor->removeButtonListener(this);
 		mSetSectionFooterFontSize->removeButtonListener(this);
 		mSetSectionFooterFontColor->removeButtonListener(this);
+		mHeaderBackgroundColorEditBox->removeEditBoxListener(this);
+		mHeaderFontSizeEditBox->removeEditBoxListener(this);
+		mHeaderFontColorEditBox->removeEditBoxListener(this);
+		mFooterBackgroundColorEditBox->removeEditBoxListener(this);
+		mFooterFontSizeEditBox->removeEditBoxListener(this);
+		mFooterFontColorEditBox->removeEditBoxListener(this);
 	}
 }
 
@@ -813,6 +839,20 @@ void SettingsScreen::optionsBoxButtonClicked(const int buttonIndex,
 		break;
 	}
 	this->changeSelectionStyle(style);
+}
+
+/**
+ * This method is called when the return button was pressed.
+ * On iphone platform the virtual keyboard is not hidden after
+ * receiving this event.
+ * @param editBox The edit box object that generated the event.
+ */
+void SettingsScreen::editBoxReturn(EditBox* editBox)
+{
+	if (isIOS())
+	{
+		editBox->hideKeyboard();
+	}
 }
 
 /**
