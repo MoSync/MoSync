@@ -1363,47 +1363,47 @@ namespace Base {
 	}
 
 	int maGetSystemProperty(const char *key, char *buf, int size) {
-		int res = -1;
+		int res = -2; //Property not found
 		if(strcmp(key, "mosync.iso-639-1")==0) {
 			// I don't know if this works perfectly (in the documentation it
 			// says that it will return iso-639-x, but it looks like iso-639-1)
 			CFLocaleRef userLocaleRef = CFLocaleCopyCurrent();
 			CFStringRef str = (CFStringRef)CFLocaleGetValue(userLocaleRef, kCFLocaleLanguageCode);
-			res = CFStringGetLength(str);
-			CFStringGetCString(str, buf, size, kCFStringEncodingUTF8);
+			bool success = CFStringGetCString(str, buf, size, kCFStringEncodingUTF8);
+            res = (success)?strlen(buf) + 1: -1;
 			CFRelease(str);
 			CFRelease(userLocaleRef);
 		} else if (strcmp(key, "mosync.path.local") == 0) {
 			NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
 			NSString *documentsDirectoryPath = [NSString stringWithFormat:@"%@/",[paths objectAtIndex:0]];
-			[documentsDirectoryPath getCString:buf maxLength:size encoding:NSASCIIStringEncoding];
+			BOOL success = [documentsDirectoryPath getCString:buf maxLength:size encoding:NSASCIIStringEncoding];
 			[documentsDirectoryPath release];
 			[paths release];
-			res = size;
+			res = (success)?strlen(buf) + 1: -1;
 		} else if (strcmp(key, "mosync.path.local.urlPrefix") == 0) {
-			[@"file://localhost/" getCString:buf maxLength:size encoding:NSASCIIStringEncoding];
-			res = size;
+			BOOL success = [@"file://localhost/" getCString:buf maxLength:size encoding:NSASCIIStringEncoding];
+			res = (success)?strlen(buf) + 1: -1;
 		} else if (strcmp(key, "mosync.device.name") == 0) {
-			[[[UIDevice currentDevice] name] getCString:buf maxLength:size encoding:NSASCIIStringEncoding];
-			res = size;
+			BOOL success = [[[UIDevice currentDevice] name] getCString:buf maxLength:size encoding:NSASCIIStringEncoding];
+			res = (success)?strlen(buf) + 1: -1;
 		} else if (strcmp(key, "mosync.device.UUID")== 0) {
-			[[[UIDevice currentDevice] uniqueIdentifier] getCString:buf maxLength:size encoding:NSASCIIStringEncoding];
-			res = size;
+			BOOL success = [[[UIDevice currentDevice] uniqueIdentifier] getCString:buf maxLength:size encoding:NSASCIIStringEncoding];
+			res = (success)?strlen(buf) + 1: -1;
 		} else if (strcmp(key, "mosync.device.OS")== 0) {
-			[[[UIDevice currentDevice] systemName] getCString:buf maxLength:size encoding:NSASCIIStringEncoding];
-			res = size;
+			BOOL success = [[[UIDevice currentDevice] systemName] getCString:buf maxLength:size encoding:NSASCIIStringEncoding];
+			res = (success)?strlen(buf) + 1: -1;
 		} else if (strcmp(key, "mosync.device.OS.version") == 0) {
-			[[[UIDevice currentDevice] systemVersion] getCString:buf maxLength:size encoding:NSASCIIStringEncoding];
-			res = size;
+			BOOL success = [[[UIDevice currentDevice] systemVersion] getCString:buf maxLength:size encoding:NSASCIIStringEncoding];
+			res = (success)?strlen(buf) + 1: -1;
 		} else if (strcmp(key, "mosync.device") == 0) {
 			size_t responseSz;
 			sysctlbyname("hw.machine", NULL, &responseSz, NULL, 0);
 			char *machine = (char*)malloc(responseSz);
 			sysctlbyname("hw.machine", machine, &responseSz, NULL, 0);
 			NSString *platform = [NSString stringWithCString:machine encoding:NSASCIIStringEncoding];
-			[platform getCString:buf maxLength:size encoding:NSASCIIStringEncoding];
+			BOOL success = [platform getCString:buf maxLength:size encoding:NSASCIIStringEncoding];
 			free(machine);
-			res = size;
+			res = (success)?strlen(buf) + 1: -1;
 		} else if (strcmp(key, "mosync.network.type") == 0) {
 			NSString* networkType;
 			//Use Apples Reachability sample class for detecting the network type
@@ -1425,9 +1425,9 @@ namespace Base {
 					networkType = @"unknown";
 					break;
 			}
-			[networkType getCString:buf maxLength:size encoding:NSASCIIStringEncoding];
+			BOOL success = [networkType getCString:buf maxLength:size encoding:NSASCIIStringEncoding];
 			[reachability release];
-			res = size;
+			res = (success)?strlen(buf) + 1: -1;
 		}
 
 		return res;
