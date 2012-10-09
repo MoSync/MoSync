@@ -503,3 +503,14 @@ var mosync = (function()
 	// Return the library object.
 	return mosync;
 })();
+
+// Send OpenWormhole message to C++ when document is loaded.
+document.addEventListener(
+	"DOMContentLoaded",
+	function()
+	{
+		// This signals that the document is loaded and Wormhole
+		// is ready be initialized.
+		mosync.bridge.send(["MoSync", "OpenWormhole"]);
+	},
+	false);

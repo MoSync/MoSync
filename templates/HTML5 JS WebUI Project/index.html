@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <!--
 * @file index.html
-* @author Ali Sarrafi
 *
 * Template application that includes librares to access device servies
 * from JavaScript.
@@ -19,17 +18,25 @@
 			 */
 			function initialize()
 			{
-				document.addEventListener("deviceready", displayDeviceInfo, true);
-				document.addEventListener("backbutton", close, true);
-			}
+				// The "deviceready" event is sent when
+				// PhoneGap has finished loading.
+				document.addEventListener(
+					"deviceready",
+					displayDeviceInfo,
+					true);
 
-			/**
-			 * Handle the backbutton event.
-			 */
-			function close()
-			{
-				// Close the application if the back key is pressed.
-				mosync.bridge.send(["close"]);
+				// Close the application when the back key is pressed.
+				document.addEventListener(
+					"backbutton",
+					function()
+					{
+						mosync.bridge.send(["MoSync", "ExitApplication"]);
+					},
+					true);
+
+				// This signals that the document is loaded and Wormhole
+				// is ready be initialized.
+				mosync.bridge.send(["MoSync", "OpenWormhole"]);
 			}
 
 			/**
@@ -46,11 +53,11 @@
 			}
 
 			/**
-			 * Vibrate for 1 second.
+			 * Vibrate device.
 			 */
 			function vibrate()
 			{
-				navigator.notification.vibrate(1000);
+				navigator.notification.vibrate(500);
 			}
 
 			/**
@@ -62,7 +69,7 @@
 			}
 
 			/**
-			 * Change page background to random color.
+			 * Change page background to a random color.
 			 */
 			function changeColor()
 			{
@@ -72,9 +79,15 @@
 				document.documentElement.style.backgroundColor = color;
 				document.body.style.backgroundColor = color;
 			}
+
+			// Call initialize function when document has loaded.
+			document.addEventListener(
+				"DOMContentLoaded",
+				initialize,
+				false);
 		</script>
 	</head>
-	<body onload="initialize();">
+	<body>
 		<div id="screen">
 			<div class="pane" id="heading">Powered by Wormhole Technology</div>
 			<div class="pane" id="info">
@@ -85,9 +98,9 @@
 				<div class="infoItem">Width: <span id="width">&nbsp;</span></div>
 				<div class="infoItem">Height: <span id="height">&nbsp;</span></div>
 			</div>
-			<div class="pane button" onclick="vibrate();">Vibrate</div>
-			<div class="pane button" onclick="beep();">Beep</div>
-			<div class="pane button" onclick="changeColor();">Change Color</div>
+			<div class="pane button" onclick="vibrate()">Vibrate</div>
+			<div class="pane button" onclick="beep()">Beep</div>
+			<div class="pane button" onclick="changeColor()">Change Color</div>
 		</div>
 	</body>
 </html>

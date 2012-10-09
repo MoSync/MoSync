@@ -39,6 +39,7 @@ MA 02110-1301, USA.
 #include <MAUtil/String.h>
 #include <NativeUI/Screen.h>
 #include <NativeUI/WebView.h>
+#include "CustomMoblet.h"
 #include "WebViewMessage.h"
 #include "FileUtil.h"
 
@@ -56,7 +57,7 @@ namespace Wormhole
 	 * your HTML files and JavaScript code, and a structure for communicating with your JS
 	 * code.
 	 */
-	class WebAppMoblet : public MAUtil::Moblet
+	class WebAppMoblet : public Wormhole::CustomMoblet
 	{
 	public:
 		/**
@@ -99,14 +100,26 @@ namespace Wormhole
 		virtual void showPage(const MAUtil::String& url);
 
 		/**
-		 * Display the WebView.
+		 * Display the main WebView of this moblet.
 		 */
 		virtual void showWebView();
 
 		/**
-		 * Run JavaScript code in the WebView.
+		 * Run JavaScript code in the main WebView
+		 * of this moblet.
+		 * @param script JavaScript code to evaluate.
 		 */
 		virtual void callJS(const MAUtil::String& script);
+
+		/**
+		 * Evaluate JavaScript code in a WebView.
+		 * @param webViewHandle The MoSync handle to the WebView in which
+		 * to evaluate the script (this handle is an integer id).
+		 * @param script JavaScript string.
+		 */
+		virtual void WebAppMoblet::callJS(
+			MAWidgetHandle webViewHandle,
+			const MAUtil::String& script);
 
 		/**
 		 * This method handles messages sent from the WebView.
