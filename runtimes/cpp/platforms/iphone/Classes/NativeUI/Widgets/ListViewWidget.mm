@@ -76,6 +76,45 @@
  */
 -(NSString*)getListViewTypeProperty;
 
+/**
+ * Set the list view editing mode.
+ * Setter for MAW_LIST_VIEW_MODE.
+ * @param mode MAW_LIST_VIEW_MODE_DISPLAY will turn the editing mode to off, or
+ * MAW_LIST_VIEW_MODE_EDIT will allow editing.
+ * @return One of the following values:
+ * - MAW_RES_OK if the bool value was set.
+ * - MAW_RES_INVALID_PROPERTY_VALUE if the mode param was invalid.
+ */
+-(int)setModeProperty:(NSString*) mode;
+
+/**
+ * Check if the list is in editing mode or not.
+ * Getter for MAW_LIST_VIEW_MODE.
+ * @return One of the following values:
+ * - MAW_LIST_VIEW_MODE_DISPLAY if the list in not in the editing mdoe.
+ * - MAW_LIST_VIEW_MODE_EDIT if the list is in the editing mode.
+ */
+-(NSString*) getModeProperty;
+
+/**
+ * Enable/disable user interaction with an list view item.
+ * A boolean value that determines whether the users can select a row will be set.
+ * Setter for MAW_LIST_VIEW_ALLOW_SELECTION.
+ * @param allowSelection "true" will allow the user to select an item, "false" will not
+ * allow the user to select it.
+ * @return One of the following values:
+ * - MAW_RES_OK if the bool value was set.
+ * - MAW_RES_INVALID_PROPERTY_VALUE if the allowSelection param was invalid.
+ */
+-(int)setAllowSelectionProperty:(NSString*) allowSelection;
+
+/**
+ * Check if user can select an list view item.
+ * Getter for MAW_LIST_VIEW_ALLOW_SELECTION.
+ * @return "true" if the user can select an item, "false" otherwise.
+ */
+-(NSString*) getAllowSelectionProperty;
+
 @end
 
 @implementation ListViewWidget
@@ -222,6 +261,14 @@
     {
         returnValue = [self setListViewTypeProperty:value];
     }
+    else if ([key isEqualToString:@MAW_LIST_VIEW_MODE])
+    {
+        returnValue = [self setModeProperty:value];
+    }
+    else if ([key isEqualToString:@MAW_LIST_VIEW_ALLOW_SELECTION])
+    {
+        returnValue = [self setAllowSelectionProperty:value];
+    }
     else
     {
         returnValue = [super setPropertyWithKey:key toValue:value];
@@ -241,6 +288,14 @@
     if ([key isEqualToString:@MAW_LIST_VIEW_TYPE])
     {
         return [[self getListViewTypeProperty] retain];
+    }
+    else if ([key isEqualToString:@MAW_LIST_VIEW_MODE])
+    {
+        return [[self getModeProperty] retain];
+    }
+    else if ([key isEqualToString:@MAW_LIST_VIEW_ALLOW_SELECTION])
+    {
+        return [[self getAllowSelectionProperty] retain];
     }
     else
     {
@@ -668,6 +723,99 @@
             break;
     }
     return [NSString stringWithFormat:@"%d", listType];
+}
+
+/**
+ * Set the list view editing mode.
+ * Setter for MAW_LIST_VIEW_MODE.
+ * @param mode MAW_LIST_VIEW_MODE_DISPLAY will turn the editing mode to off, or
+ * MAW_LIST_VIEW_MODE_EDIT will allow editing.
+ * @return One of the following values:
+ * - MAW_RES_OK if the bool value was set.
+ * - MAW_RES_INVALID_PROPERTY_VALUE if the mode param was invalid.
+ */
+-(int)setModeProperty:(NSString*) mode
+{
+    if (![mode canParseNumber])
+    {
+        return MAW_RES_INVALID_PROPERTY_VALUE;
+    }
+
+    BOOL isModeParamValid = YES;
+    BOOL editMode;
+    switch ([mode intValue])
+    {
+        case MAW_LIST_VIEW_MODE_DISPLAY:
+            editMode = NO;
+            break;
+        case MAW_LIST_VIEW_MODE_EDIT:
+            editMode = YES;
+            break;
+        default:
+            isModeParamValid = NO;
+            break;
+    }
+
+    if (!isModeParamValid)
+    {
+        return MAW_RES_INVALID_PROPERTY_VALUE;
+    }
+
+    [self.tableView setEditing:editMode animated:YES];
+    return MAW_RES_OK;
+}
+
+/**
+ * Check if the list is in editing mode or not.
+ * Getter for MAW_LIST_VIEW_MODE.
+ * @return One of the following values:
+ * - MAW_LIST_VIEW_MODE_DISPLAY if the list in not in the editing mdoe.
+ * - MAW_LIST_VIEW_MODE_EDIT if the list is in the editing mode.
+ */
+-(NSString*) getModeProperty
+{
+    int modeInt = [self.tableView isEditing] ? MAW_LIST_VIEW_MODE_EDIT : MAW_LIST_VIEW_MODE_DISPLAY;
+    return [NSString stringWithFormat:@"%d", modeInt];
+}
+
+/**
+ * Enable/disable user interaction with an list view item.
+ * A boolean value that determines whether the users can select a row will be set.
+ * Setter for MAW_LIST_VIEW_ALLOW_SELECTION.
+ * @param allowSelection "true" will allow the user to select an item, "false" will not
+ * allow the user to select it.
+ * @return One of the following values:
+ * - MAW_RES_OK if the bool value was set.
+ * - MAW_RES_INVALID_PROPERTY_VALUE if the allowSelection param was invalid.
+ */
+-(int)setAllowSelectionProperty:(NSString*) allowSelection
+{
+    BOOL allowSelectionBool;
+    if ([allowSelection isEqualToString:kWidgetTrueValue])
+    {
+        allowSelectionBool = YES;
+    }
+    else if ([allowSelection isEqualToString:kWidgetFalseValue])
+    {
+        allowSelectionBool = NO;
+    }
+    else
+    {
+        return MAW_RES_INVALID_PROPERTY_VALUE;
+    }
+
+    self.tableView.allowsSelection = allowSelectionBool;
+    return MAW_RES_OK;
+}
+
+/**
+ * Check if user can select an list view item.
+ * Getter for MAW_LIST_VIEW_ALLOW_SELECTION.
+ * @return "true" if the user can select an item, "false" otherwise.
+ */
+-(NSString*) getAllowSelectionProperty
+{
+    return self.tableView.allowsSelection ? kWidgetTrueValue : kWidgetFalseValue;
 }
 
 @end
