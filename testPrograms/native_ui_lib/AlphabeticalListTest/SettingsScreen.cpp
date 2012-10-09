@@ -206,8 +206,7 @@ void SettingsScreen::createMainLayout()
 void SettingsScreen::createListViewPropertiesLayout()
 {
 	VerticalLayout* listViewPropertiesVerticalLayout = new VerticalLayout();
-	listViewPropertiesVerticalLayout->setTopPosition(0);
-	listViewPropertiesVerticalLayout->setHeight(ONE_LINE_HORIZONTAL_LAYOUT_HEIGHT * 2);
+	listViewPropertiesVerticalLayout->wrapContentVertically();
 	Label* mListViewPropertiesLabel = new Label();
 	mListViewPropertiesLabel->setText("ListView properties");
 	mListViewPropertiesLabel->setFontSize(TITLE_FONT_SIZE);
@@ -216,7 +215,7 @@ void SettingsScreen::createListViewPropertiesLayout()
 
 	// create the allow selection layout
 	HorizontalLayout* allowSelectionLayout = new HorizontalLayout();
-	allowSelectionLayout->setHeight(ONE_LINE_HORIZONTAL_LAYOUT_HEIGHT);
+	allowSelectionLayout->wrapContentVertically();
 	mListViewAllowSelectionCheckbox = new CheckBox();
 	mListViewAllowSelectionCheckbox->setState(true);
 	Label* allowSelectionLabel = new Label();
@@ -227,11 +226,11 @@ void SettingsScreen::createListViewPropertiesLayout()
 
 	if (isIOS())
 	{
-		listViewPropertiesVerticalLayout->setHeight(ONE_LINE_HORIZONTAL_LAYOUT_HEIGHT * 6);
+		listViewPropertiesVerticalLayout->wrapContentVertically();
 
 		// create the mode selection layout
 		HorizontalLayout* modeSelectionLayout = new HorizontalLayout();
-		modeSelectionLayout->setHeight(ONE_LINE_HORIZONTAL_LAYOUT_HEIGHT);
+		modeSelectionLayout->wrapContentVertically();
 		Label* setModeLabel = new Label();
 		setModeLabel->setText("Set mode: ");
 		modeSelectionLayout->addChild(setModeLabel);
@@ -264,8 +263,7 @@ void SettingsScreen::createListViewPropertiesLayout()
 void SettingsScreen::createListViewSectionPropertiesLayout()
 {
 	VerticalLayout* listViewSectionPropertiesVerticalLayout = new VerticalLayout();
-	listViewSectionPropertiesVerticalLayout->setTopPosition(ONE_LINE_HORIZONTAL_LAYOUT_HEIGHT * 3);
-	listViewSectionPropertiesVerticalLayout->setHeight(ONE_LINE_HORIZONTAL_LAYOUT_HEIGHT * 4);
+	listViewSectionPropertiesVerticalLayout->wrapContentVertically();
 	mListViewSectionLabel = new Label();
 	mListViewSectionLabel->setText("No section in focus");
 	mListViewSectionLabel->setFontSize(TITLE_FONT_SIZE);
@@ -274,7 +272,7 @@ void SettingsScreen::createListViewSectionPropertiesLayout()
 
 	// create the current section title layout
 	HorizontalLayout* currentSectionTitleLayout = new HorizontalLayout();
-	currentSectionTitleLayout->setHeight(ONE_LINE_HORIZONTAL_LAYOUT_HEIGHT);
+	currentSectionTitleLayout->wrapContentVertically();
 	mSetListViewSectionTitleButton = new Button();
 	mSetListViewSectionTitleButton->setText("Set title");
 	mSetListViewSectionTitleButton->fillSpaceHorizontally();
@@ -286,7 +284,7 @@ void SettingsScreen::createListViewSectionPropertiesLayout()
 
 	// create the current section header text layout
 	HorizontalLayout* currentSectionHeaderTextLayout = new HorizontalLayout();
-	currentSectionHeaderTextLayout->setHeight(ONE_LINE_HORIZONTAL_LAYOUT_HEIGHT);
+	currentSectionHeaderTextLayout->wrapContentVertically();
 	mSetListViewSectionHeaderButton = new Button();
 	mSetListViewSectionHeaderButton->setText("Set header");
 	mSetListViewSectionHeaderButton->fillSpaceHorizontally();
@@ -298,7 +296,7 @@ void SettingsScreen::createListViewSectionPropertiesLayout()
 
 	// create the current section footer text layout
 	HorizontalLayout* currentSectionFooterTextLayout = new HorizontalLayout();
-	currentSectionFooterTextLayout->setHeight(ONE_LINE_HORIZONTAL_LAYOUT_HEIGHT);
+	currentSectionFooterTextLayout->wrapContentVertically();
 	mSetListViewSectionFooterButton = new Button();
 	mSetListViewSectionFooterButton->setText("Set footer");
 	mSetListViewSectionFooterButton->fillSpaceHorizontally();
@@ -310,7 +308,7 @@ void SettingsScreen::createListViewSectionPropertiesLayout()
 
 	if (isWindowsPhone() || isAndroid())
 	{
-		listViewSectionPropertiesVerticalLayout->setHeight(ONE_LINE_HORIZONTAL_LAYOUT_HEIGHT * 10);
+		listViewSectionPropertiesVerticalLayout->wrapContentVertically();
 		createListViewSectionHeaderPropertiesLayout(listViewSectionPropertiesVerticalLayout);
 		createListViewSectionFooterPropertiesLayout(listViewSectionPropertiesVerticalLayout);
 	}
@@ -325,7 +323,7 @@ void SettingsScreen::createListViewSectionHeaderPropertiesLayout(VerticalLayout*
 {
 	// create the current section header background color layout
 	HorizontalLayout* currentSectionHeaderBackgroundColorLayout = new HorizontalLayout();
-	currentSectionHeaderBackgroundColorLayout->setHeight(ONE_LINE_HORIZONTAL_LAYOUT_HEIGHT);
+	currentSectionHeaderBackgroundColorLayout->wrapContentVertically();
 	mSetSectionHeaderBackgroundColor = new Button();
 	mSetSectionHeaderBackgroundColor->setText("Header bg");
 	mSetSectionHeaderBackgroundColor->fillSpaceHorizontally();
@@ -338,7 +336,7 @@ void SettingsScreen::createListViewSectionHeaderPropertiesLayout(VerticalLayout*
 
 	// create the current section header font size layout
 	HorizontalLayout* currentSectionHeaderFontSizeLayout = new HorizontalLayout();
-	currentSectionHeaderFontSizeLayout->setHeight(ONE_LINE_HORIZONTAL_LAYOUT_HEIGHT);
+	currentSectionHeaderFontSizeLayout->wrapContentVertically();
 	mSetSectionHeaderFontSize = new Button();
 	mSetSectionHeaderFontSize->setText("Header font sz");
 	mSetSectionHeaderFontSize->fillSpaceHorizontally();
@@ -351,7 +349,7 @@ void SettingsScreen::createListViewSectionHeaderPropertiesLayout(VerticalLayout*
 
 	// create the current section header font color layout
 	HorizontalLayout* currentSectionHeaderFontColorLayout = new HorizontalLayout();
-	currentSectionHeaderFontColorLayout->setHeight(ONE_LINE_HORIZONTAL_LAYOUT_HEIGHT);
+	currentSectionHeaderFontColorLayout->wrapContentVertically();
 	mSetSectionHeaderFontColor = new Button();
 	mSetSectionHeaderFontColor->setText("Header font color");
 	mSetSectionHeaderFontColor->fillSpaceHorizontally();
@@ -367,7 +365,7 @@ void SettingsScreen::createListViewSectionFooterPropertiesLayout(VerticalLayout*
 {
 	// create the current section footer background color layout
 	HorizontalLayout* currentSectionFooterBackgroundColorLayout = new HorizontalLayout();
-	currentSectionFooterBackgroundColorLayout->setHeight(ONE_LINE_HORIZONTAL_LAYOUT_HEIGHT);
+	currentSectionFooterBackgroundColorLayout->wrapContentVertically();
 	mSetSectionFooterBackgroundColor = new Button();
 	mSetSectionFooterBackgroundColor->setText("Footer bg");
 	mSetSectionFooterBackgroundColor->fillSpaceHorizontally();
@@ -380,7 +378,7 @@ void SettingsScreen::createListViewSectionFooterPropertiesLayout(VerticalLayout*
 
 	// create the current section footer font size layout
 	HorizontalLayout* currentSectionFooterFontSizeLayout = new HorizontalLayout();
-	currentSectionFooterFontSizeLayout->setHeight(ONE_LINE_HORIZONTAL_LAYOUT_HEIGHT);
+	currentSectionFooterFontSizeLayout->wrapContentVertically();
 	mSetSectionFooterFontSize = new Button();
 	mSetSectionFooterFontSize->setText("Footer font sz");
 	mSetSectionFooterFontSize->fillSpaceHorizontally();
@@ -393,7 +391,7 @@ void SettingsScreen::createListViewSectionFooterPropertiesLayout(VerticalLayout*
 
 	// create the current section footer font color layout
 	HorizontalLayout* currentSectionFooterFontColorLayout = new HorizontalLayout();
-	currentSectionFooterFontColorLayout->setHeight(ONE_LINE_HORIZONTAL_LAYOUT_HEIGHT);
+	currentSectionFooterFontColorLayout->wrapContentVertically();
 	mSetSectionFooterFontColor = new Button();
 	mSetSectionFooterFontColor->setText("Footer font color");
 	mSetSectionFooterFontColor->fillSpaceHorizontally();
@@ -411,8 +409,7 @@ void SettingsScreen::createListViewSectionFooterPropertiesLayout(VerticalLayout*
 void SettingsScreen::createListViewItemPropertiesLayout()
 {
 	VerticalLayout* listViewItemPropertiesVerticalLayout = new VerticalLayout();
-	listViewItemPropertiesVerticalLayout->setTopPosition(ONE_LINE_HORIZONTAL_LAYOUT_HEIGHT * 7);
-	listViewItemPropertiesVerticalLayout->setHeight(ONE_LINE_HORIZONTAL_LAYOUT_HEIGHT*4);
+	listViewItemPropertiesVerticalLayout->wrapContentVertically();
 	mCurrentListViewItemLabel = new Label();
 	mCurrentListViewItemLabel->setText("No item selected");
 	mCurrentListViewItemLabel->setFontSize(TITLE_FONT_SIZE);
@@ -425,7 +422,7 @@ void SettingsScreen::createListViewItemPropertiesLayout()
 
 	if (isIOS())
 	{
-		listViewItemPropertiesVerticalLayout->setHeight(ONE_LINE_HORIZONTAL_LAYOUT_HEIGHT*17);
+		listViewItemPropertiesVerticalLayout->wrapContentVertically();
 		createListViewItemEditModeLayout(listViewItemPropertiesVerticalLayout);
 		createListViewItemDeleteButtonTextLayout(listViewItemPropertiesVerticalLayout);
 		createListViewItemSelectedAnimationLayout(listViewItemPropertiesVerticalLayout);
@@ -446,7 +443,7 @@ void SettingsScreen::createListViewItemPropertiesLayout()
 void SettingsScreen::createListViewItemTextLayout(VerticalLayout* listViewItemPropertiesVerticalLayout)
 {
 	HorizontalLayout* currentListViewItemTextLayout = new HorizontalLayout();
-	currentListViewItemTextLayout->setHeight(ONE_LINE_HORIZONTAL_LAYOUT_HEIGHT);
+	currentListViewItemTextLayout->wrapContentVertically();
 	mSetListViewItemTextButton = new Button();
 	mSetListViewItemTextButton->setText("Set text");
 	mSetListViewItemTextButton->fillSpaceHorizontally();
@@ -460,7 +457,7 @@ void SettingsScreen::createListViewItemTextLayout(VerticalLayout* listViewItemPr
 void SettingsScreen::createListViewItemFontColorLayout(VerticalLayout* listViewItemPropertiesVerticalLayout)
 {
 	HorizontalLayout* currentListViewItemFontColorLayout = new HorizontalLayout();
-	currentListViewItemFontColorLayout->setHeight(ONE_LINE_HORIZONTAL_LAYOUT_HEIGHT);
+	currentListViewItemFontColorLayout->wrapContentVertically();
 	mSetListViewItemFontColorButton = new Button();
 	mSetListViewItemFontColorButton->setText("Set font color");
 	mSetListViewItemFontColorButton->fillSpaceHorizontally();
@@ -475,7 +472,7 @@ void SettingsScreen::createListViewItemFontColorLayout(VerticalLayout* listViewI
 void SettingsScreen::createListViewItemFontSizeLayout(VerticalLayout* listViewItemPropertiesVerticalLayout)
 {
 	HorizontalLayout* currentListViewItemFontSizeLayout = new HorizontalLayout();
-	currentListViewItemFontSizeLayout->setHeight(ONE_LINE_HORIZONTAL_LAYOUT_HEIGHT);
+	currentListViewItemFontSizeLayout->wrapContentVertically();
 	mSetListViewItemFontSizeButton = new Button();
 	mSetListViewItemFontSizeButton->setText("Set font size");
 	mSetListViewItemFontSizeButton->fillSpaceHorizontally();
@@ -489,7 +486,7 @@ void SettingsScreen::createListViewItemFontSizeLayout(VerticalLayout* listViewIt
 void SettingsScreen::createListViewItemEditModeLayout(VerticalLayout* listViewItemPropertiesVerticalLayout)
 {
 	HorizontalLayout* editModeLayout = new HorizontalLayout();
-	editModeLayout->setHeight(ONE_LINE_HORIZONTAL_LAYOUT_HEIGHT);
+	editModeLayout->wrapContentVertically();
 	mListViewItemEditModeCheckbox = new CheckBox();
 	mListViewItemEditModeCheckbox->setState(false);
 	Label* editModeLabel = new Label();
@@ -502,7 +499,7 @@ void SettingsScreen::createListViewItemEditModeLayout(VerticalLayout* listViewIt
 void SettingsScreen::createListViewItemDeleteButtonTextLayout(VerticalLayout* listViewItemPropertiesVerticalLayout)
 {
 	HorizontalLayout* currentListViewItemDeleteButtonLayout = new HorizontalLayout();
-	currentListViewItemDeleteButtonLayout->setHeight(ONE_LINE_HORIZONTAL_LAYOUT_HEIGHT);
+	currentListViewItemDeleteButtonLayout->wrapContentVertically();
 	mSetListViewItemDeleteTitleButton = new Button();
 	mSetListViewItemDeleteTitleButton->setText("Set delete");
 	mSetListViewItemDeleteTitleButton->fillSpaceHorizontally();
@@ -516,7 +513,7 @@ void SettingsScreen::createListViewItemDeleteButtonTextLayout(VerticalLayout* li
 void SettingsScreen::createListViewItemSelectedAnimationLayout(VerticalLayout* listViewItemPropertiesVerticalLayout)
 {
 	HorizontalLayout* selectedAnimationLayout = new HorizontalLayout();
-	selectedAnimationLayout->setHeight(ONE_LINE_HORIZONTAL_LAYOUT_HEIGHT);
+	selectedAnimationLayout->wrapContentVertically();
 	mListViewItemSelectedCheckbox = new CheckBox();
 	mListViewItemSelectedCheckbox->setState(false);
 	Label* selectedAnimationLabel = new Label();
@@ -529,7 +526,7 @@ void SettingsScreen::createListViewItemSelectedAnimationLayout(VerticalLayout* l
 void SettingsScreen::createListViewItemUnselectedAnimationLayout(VerticalLayout* listViewItemPropertiesVerticalLayout)
 {
 	HorizontalLayout* unselectedAnimationLayout = new HorizontalLayout();
-	unselectedAnimationLayout->setHeight(ONE_LINE_HORIZONTAL_LAYOUT_HEIGHT);
+	unselectedAnimationLayout->wrapContentVertically();
 	mListViewItemUnselectedCheckbox = new CheckBox();
 	mListViewItemUnselectedCheckbox->setState(false);
 	Label* unselectedAnimationLabel = new Label();
@@ -542,7 +539,7 @@ void SettingsScreen::createListViewItemUnselectedAnimationLayout(VerticalLayout*
 void SettingsScreen::createListViewItemHighlightedAnimationLayout(VerticalLayout* listViewItemPropertiesVerticalLayout)
 {
 	HorizontalLayout* highlightedAnimationLayout = new HorizontalLayout();
-	highlightedAnimationLayout->setHeight(ONE_LINE_HORIZONTAL_LAYOUT_HEIGHT);
+	highlightedAnimationLayout->wrapContentVertically();
 	mListViewItemHighlightedCheckbox = new CheckBox();
 	mListViewItemHighlightedCheckbox->setState(false);
 	Label* highlightedAnimationLabel = new Label();
@@ -555,7 +552,7 @@ void SettingsScreen::createListViewItemHighlightedAnimationLayout(VerticalLayout
 void SettingsScreen::createListViewItemUnhighlightedAnimationLayout(VerticalLayout* listViewItemPropertiesVerticalLayout)
 {
 	HorizontalLayout* unhighlightedAnimationLayout = new HorizontalLayout();
-	unhighlightedAnimationLayout->setHeight(ONE_LINE_HORIZONTAL_LAYOUT_HEIGHT);
+	unhighlightedAnimationLayout->wrapContentVertically();
 	mListViewItemUnhighlightedCheckbox = new CheckBox();
 	mListViewItemUnhighlightedCheckbox->setState(false);
 	Label* unhighlightedAnimationLabel = new Label();
@@ -572,7 +569,7 @@ void SettingsScreen::createListViewItemAccessoryTypeIntLayout(VerticalLayout* li
 	listViewItemPropertiesVerticalLayout->addChild(accessoryTypeIntLabel);
 
 	HorizontalLayout* accessoryTypeIntLine1Layout = new HorizontalLayout();
-	accessoryTypeIntLine1Layout->setHeight(ONE_LINE_HORIZONTAL_LAYOUT_HEIGHT);
+	accessoryTypeIntLine1Layout->wrapContentVertically();
 	mListViewItemAccessoryTypeIntNoneCheckbox = new CheckBox();
 	mListViewItemAccessoryTypeIntNoneCheckbox->setState(true);
 	Label* accessoryTypeIntNoneLabel = new Label();
@@ -588,7 +585,7 @@ void SettingsScreen::createListViewItemAccessoryTypeIntLayout(VerticalLayout* li
 	listViewItemPropertiesVerticalLayout->addChild(accessoryTypeIntLine1Layout);
 
 	HorizontalLayout* accessoryTypeIntLine2Layout = new HorizontalLayout();
-	accessoryTypeIntLine2Layout->setHeight(ONE_LINE_HORIZONTAL_LAYOUT_HEIGHT);
+	accessoryTypeIntLine2Layout->wrapContentVertically();
 	mListViewItemAccessoryTypeIntDetailCheckbox = new CheckBox();
 	mListViewItemAccessoryTypeIntDetailCheckbox->setState(false);
 	Label* accessoryTypeIntDetailLabel = new Label();
@@ -611,7 +608,7 @@ void SettingsScreen::createListViewItemAccessoryTypeEditModeLayout(VerticalLayou
 	listViewItemPropertiesVerticalLayout->addChild(accessoryTypeEditModeLabel);
 
 	HorizontalLayout* accessoryTypeEditModeLine1Layout = new HorizontalLayout();
-	accessoryTypeEditModeLine1Layout->setHeight(ONE_LINE_HORIZONTAL_LAYOUT_HEIGHT);
+	accessoryTypeEditModeLine1Layout->wrapContentVertically();
 	mListViewItemAccessoryTypeEditModeNoneCheckbox = new CheckBox();
 	mListViewItemAccessoryTypeEditModeNoneCheckbox->setState(true);
 	Label* accessoryTypeEditModeNoneLabel = new Label();
@@ -627,7 +624,7 @@ void SettingsScreen::createListViewItemAccessoryTypeEditModeLayout(VerticalLayou
 	listViewItemPropertiesVerticalLayout->addChild(accessoryTypeEditModeLine1Layout);
 
 	HorizontalLayout* accessoryTypeEditModeLine2Layout = new HorizontalLayout();
-	accessoryTypeEditModeLine2Layout->setHeight(ONE_LINE_HORIZONTAL_LAYOUT_HEIGHT);
+	accessoryTypeEditModeLine2Layout->wrapContentVertically();
 	mListViewItemAccessoryTypeEditModeDetailCheckbox = new CheckBox();
 	mListViewItemAccessoryTypeEditModeDetailCheckbox->setState(false);
 	Label* accessoryTypeEditModeDetailLabel = new Label();
@@ -650,7 +647,7 @@ void SettingsScreen::createListViewItemEditStyleLayout(VerticalLayout* listViewI
 	listViewItemPropertiesVerticalLayout->addChild(listViewItemEditModeLabel);
 
 	HorizontalLayout* listViewItemEditModeLine1Layout = new HorizontalLayout();
-	listViewItemEditModeLine1Layout->setHeight(ONE_LINE_HORIZONTAL_LAYOUT_HEIGHT);
+	listViewItemEditModeLine1Layout->wrapContentVertically();
 	mListViewItemEditStyleNoneCheckbox = new CheckBox();
 	mListViewItemEditStyleNoneCheckbox->setState(true);
 	Label* listViewItemEditModeNoneLabel = new Label();
@@ -666,7 +663,7 @@ void SettingsScreen::createListViewItemEditStyleLayout(VerticalLayout* listViewI
 	listViewItemPropertiesVerticalLayout->addChild(listViewItemEditModeLine1Layout);
 
 	HorizontalLayout* listViewItemEditModeLine2Layout = new HorizontalLayout();
-	listViewItemEditModeLine2Layout->setHeight(ONE_LINE_HORIZONTAL_LAYOUT_HEIGHT);
+	listViewItemEditModeLine2Layout->wrapContentVertically();
 	mListViewItemEditStyleInsertCheckbox = new CheckBox();
 	mListViewItemEditStyleInsertCheckbox->setState(false);
 	Label* listViewItemEditModeInsertLabel = new Label();

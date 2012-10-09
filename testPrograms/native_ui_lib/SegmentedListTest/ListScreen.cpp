@@ -133,7 +133,7 @@ void ListScreen::createListManipulationLayout()
 	mMainLayout->addChild(mRemoveFirstSection);
 
 	HorizontalLayout* itemManipulationLayout = new HorizontalLayout();
-	itemManipulationLayout->setHeight(ONE_LINE_HORIZONTAL_LAYOUT_HEIGHT);
+	itemManipulationLayout->wrapContentVertically();
 	mAddItem = new Button();
 	mAddItem->setText("Add item");
 	mAddItem->fillSpaceHorizontally();
