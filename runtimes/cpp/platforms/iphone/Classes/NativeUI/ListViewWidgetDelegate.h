@@ -46,4 +46,16 @@
  * @param indexPath List item index that needs to be reloaded.
  */
 -(void)reloadItemAtIndexPath:(NSIndexPath*) indexPath;
+
+/**
+ * Reload the index for all sections.
+ */
+-(void)reloadListViewSectionIndexTitles;
+
+/**
+ * Reload an given section.
+ * @param sectionIndex Section's index in list view.
+ */
+-(void)reloadListViewSectionAtIndex:(int)sectionIndex;
+
 @end

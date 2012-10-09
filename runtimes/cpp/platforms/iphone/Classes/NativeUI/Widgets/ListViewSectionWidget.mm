@@ -126,14 +126,17 @@
     if ([key isEqualToString:@MAW_LIST_VIEW_SECTION_TITLE])
     {
         self.title = value;
+        [_delegate reloadListViewSectionIndexTitles];
     }
     else if ([key isEqualToString:@MAW_LIST_VIEW_SECTION_HEADER])
     {
         self.headerTitle = value;
+        [_delegate reloadListViewSectionAtIndex:_index];
     }
     else if ([key isEqualToString:@MAW_LIST_VIEW_SECTION_FOOTER])
     {
         self.footerTitle = value;
+        [_delegate reloadListViewSectionAtIndex:_index];
     }
     else
     {

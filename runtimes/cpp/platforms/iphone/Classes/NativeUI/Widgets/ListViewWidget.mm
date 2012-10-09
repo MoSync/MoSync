@@ -375,17 +375,6 @@
     return array;
 }
 
-/**
- * Move a row at a specific location in the table view to another location.
- * @param tableView The table-view object requesting this action.
- * @param fromIndexPath An index path locating the row to be moved in tableView.
- * @param toIndexPath An index path locating the row in tableView that is the destination of the move.
- */
-- (void)tableView:(UITableView *)tableView moveRowAtIndexPath:(NSIndexPath *)fromIndexPath toIndexPath:(NSIndexPath *)toIndexPath
-{
-    NSLog(@"IN %s", __FUNCTION__);
-}
-
 #pragma mark UITableViewDelegate
 
 /**
@@ -523,6 +512,28 @@
                           withRowAnimation:UITableViewRowAnimationNone];
      */
     [self.tableView reloadData];
+}
+
+/**
+ * Reload the index for all sections.
+ */
+-(void)reloadListViewSectionIndexTitles
+{
+    /*
+     * Note: reloadSectionIndexTitles is not working after the list is loaded.
+     * [self.tableView reloadSectionIndexTitles];
+     */
+    [self.tableView reloadData];
+}
+
+/**
+ * Reload an given section.
+ * @param sectionIndex Section's index in list view.
+ */
+-(void)reloadListViewSectionAtIndex:(int)sectionIndex
+{
+    [self.tableView reloadSections:[NSIndexSet indexSetWithIndex:sectionIndex]
+                  withRowAnimation:UITableViewRowAnimationNone];
 }
 
 /**

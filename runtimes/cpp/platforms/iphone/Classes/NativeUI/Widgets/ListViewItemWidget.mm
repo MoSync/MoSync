@@ -381,7 +381,11 @@ static NSString* kReuseIdentifier = @"Cell";
  */
 - (NSString*)getPropertyWithKey:(NSString*)key
 {
-    if ([key isEqualToString:@MAW_LIST_VIEW_ITEM_EDIT])
+    if([key isEqualToString:@MAW_LIST_VIEW_ITEM_TEXT])
+    {
+        return [self.cell.textLabel.text retain];
+    }
+    else if ([key isEqualToString:@MAW_LIST_VIEW_ITEM_EDIT])
     {
         return [[self isEditableProperty] retain];
     }
