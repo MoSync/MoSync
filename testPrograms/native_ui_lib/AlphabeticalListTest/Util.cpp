@@ -85,3 +85,28 @@ bool isWindowsPhone()
 
 	return false;
 }
+
+
+/**
+ * Get the string associated with a ListViewItemSelectionStyle.
+ * @param style The given style.
+ * @return The string associated with the given style.
+ */
+MAUtil::String getSelectionStyleString(NativeUI::ListViewItemSelectionStyle style)
+{
+	MAUtil::String returnedValue;
+	switch (style)
+	{
+	case NativeUI::LIST_VIEW_ITEM_SELECTION_STYLE_BLUE:
+		returnedValue = "blue";
+		break;
+	case NativeUI::LIST_VIEW_ITEM_SELECTION_STYLE_GRAY:
+		returnedValue = "gray";
+		break;
+	case NativeUI::LIST_VIEW_ITEM_SELECTION_STYLE_NONE:
+	default:
+		returnedValue = "none";
+		break;
+	}
+	return returnedValue;
+}

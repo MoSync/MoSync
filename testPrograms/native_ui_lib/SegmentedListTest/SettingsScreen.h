@@ -32,6 +32,10 @@ MA 02110-1301, USA.
 // Include all the wrappers.
 #include <NativeUI/Widgets.h>
 #include "ListScreenListener.h"
+#include "OptionsBoxListener.h"
+
+// Forward class declaration
+class OptionsBox;
 
 using namespace NativeUI;
 
@@ -39,7 +43,8 @@ class SettingsScreen:
 	public Screen,
 	public ListScreenListener,
 	public CheckBoxListener,
-	public ButtonListener
+	public ButtonListener,
+	public OptionsBoxListener
 {
 public:
 	/**
@@ -91,6 +96,7 @@ private:
 	void createListViewItemAccessoryTypeIntLayout(VerticalLayout* parent);
 	void createListViewItemAccessoryTypeEditModeLayout(VerticalLayout* parent);
 	void createListViewItemEditStyleLayout(VerticalLayout* parent);
+	void createListViewItemSelectionStyleLayout(VerticalLayout* parent);
 
 	/**
 	 * Updates the widgets related to the selected list view item.
@@ -136,6 +142,37 @@ private:
 	 * @param item The list view item clicked.
 	 */
 	virtual void listScreenItemClicked(ListViewSection* &parentSection, ListViewItem* &listViewItem);
+
+	/**
+	 * Will show an options box so user can select the list view item selection
+	 * style.
+	 * Works on iOS platform only.
+	 */
+	void showSelectionStyleOptionBox();
+
+	/**
+	 * Show currently used selection style for an list view item.
+	 * Works on iOS platform.
+	 */
+	void showSelectionStyleMessageBox();
+
+	/**
+	 * Change all the list view's items selection style to a given value.
+	 * @param style Style to set.
+	 */
+	void changeSelectionStyle(ListViewItemSelectionStyle style);
+
+	/**
+	 * This method is called when a button from options dialog was
+	 * clicked.
+	 * This method is not called if the destructive or cancel button were
+	 * clicked.
+	 * @param buttonIndex The index of the button that was clicked.
+	 * @param buttonTitle The title of the button that was clicked.
+	 */
+	virtual void optionsBoxButtonClicked(const int buttonIndex,
+		const MAUtil::WString& buttonTitle);
+
 private:
 	/**
 	 * Main layout.
@@ -377,6 +414,18 @@ private:
 	 * Sets the section in focus footer font color.
 	 */
 	Button* mSetSectionFooterFontColor;
+
+	/**
+	 * Sets the selection style for an list view item.
+	 * Used to test tMAW_LIST_VIEW_ITEM_SELECTION_STYLE setter property.
+	 */
+	Button* mSetSelectionStyle;
+
+	/**
+	 * Gets the selection style for an list view item.
+	 * Used to test tMAW_LIST_VIEW_ITEM_SELECTION_STYLE getter property.
+	 */
+	Button* mGetSelectionStyle;
 
 	/**
 	 * Contains the section in focus footer background color.

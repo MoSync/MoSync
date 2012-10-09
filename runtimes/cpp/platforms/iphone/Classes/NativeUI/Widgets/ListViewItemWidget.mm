@@ -185,6 +185,21 @@
  */
 -(NSString*) getEditingStyleProperty;
 
+/**
+ * Set the selection style.
+ * Setter for MAW_LIST_VIEW_ITEM_SELECTION_STYLE.
+ * @param selectionStyleString One of the MAW_LIST_VIEW_ITEM_SELECTION_STYLE constants.
+ * @return MAW_RES_OK if the selectionStyleString is valid, otherwise MAW_RES_INVALID_PROPERTY_VALUE.
+ */
+-(int) setSelectionStyleProperty:(NSString*) selectionStyleString;
+
+/**
+ * Get the selection style.
+ * Getter for MAW_LIST_VIEW_ITEM_SELECTION_STYLE.
+ * @return One of the MAW_LIST_VIEW_ITEM_SELECTION_STYLE constants.
+ */
+-(NSString*) getSelectionStyleProperty;
+
 @end
 
 
@@ -346,6 +361,10 @@ static NSString* kReuseIdentifier = @"Cell";
     {
         return [self setEditingStyleProperty:value];
     }
+    else if ([key isEqualToString:@MAW_LIST_VIEW_ITEM_SELECTION_STYLE])
+    {
+        return [self setSelectionStyleProperty:value];
+    }
 	else
     {
 		return [super setPropertyWithKey:key toValue:value];
@@ -398,6 +417,10 @@ static NSString* kReuseIdentifier = @"Cell";
     else if ([key isEqualToString:@MAW_LIST_VIEW_ITEM_EDITING_STYLE])
     {
         return [[self getEditingStyleProperty] retain];
+    }
+    else if ([key isEqualToString:@MAW_LIST_VIEW_ITEM_SELECTION_STYLE])
+    {
+        return [[self getSelectionStyleProperty] retain];
     }
     else
     {
@@ -891,6 +914,78 @@ static NSString* kReuseIdentifier = @"Cell";
             break;
     }
     return [NSString stringWithFormat:@"%d", style];
+}
+
+/**
+ * Set the selection style.
+ * Setter for MAW_LIST_VIEW_ITEM_SELECTION_STYLE.
+ * @param selectionStyleString One of the MAW_LIST_VIEW_ITEM_SELECTION_STYLE constants.
+ * @return MAW_RES_OK if the selectionStyleString is valid, otherwise MAW_RES_INVALID_PROPERTY_VALUE.
+ */
+-(int) setSelectionStyleProperty:(NSString*) selectionStyleString
+{
+    // Check if param can be parsed into number.
+    if (![selectionStyleString canParseNumber])
+    {
+        return MAW_RES_INVALID_PROPERTY_VALUE;
+    }
+
+    UITableViewCellSelectionStyle style;
+    BOOL isSelectionStyleParamValid = YES;
+
+    // Convert int param into UITableViewCellSelectionStyle type.
+    switch ([selectionStyleString intValue])
+    {
+        case MAW_LIST_VIEW_ITEM_SELECTION_STYLE_BLUE:
+            style = UITableViewCellSelectionStyleBlue;
+            break;
+        case MAW_LIST_VIEW_ITEM_SELECTION_STYLE_GRAY:
+            style = UITableViewCellSelectionStyleGray;
+            break;
+        case MAW_LIST_VIEW_ITEM_SELECTION_STYLE_NONE:
+            style = UITableViewCellSelectionStyleNone;
+            break;
+        default:
+            isSelectionStyleParamValid = NO;
+            break;
+    }
+
+    // Check if selectionStyleString param is valid.
+    if (!isSelectionStyleParamValid)
+    {
+        return MAW_RES_INVALID_PROPERTY_VALUE;
+    }
+
+    // Set the style.
+    self.cell.selectionStyle = style;
+    return MAW_RES_OK;
+}
+
+/**
+ * Get the selection style.
+ * Getter for MAW_LIST_VIEW_ITEM_SELECTION_STYLE.
+ * @return One of the MAW_LIST_VIEW_ITEM_SELECTION_STYLE constants.
+ */
+-(NSString*) getSelectionStyleProperty
+{
+    int selectionStyleInt;
+
+    switch (self.cell.selectionStyle)
+    {
+        case UITableViewCellSelectionStyleGray:
+            selectionStyleInt = MAW_LIST_VIEW_ITEM_SELECTION_STYLE_GRAY;
+            break;
+        case UITableViewCellSelectionStyleNone:
+            selectionStyleInt = MAW_LIST_VIEW_ITEM_SELECTION_STYLE_NONE;
+            break;
+        case UITableViewCellSelectionStyleBlue:
+        default:
+            selectionStyleInt = MAW_LIST_VIEW_ITEM_SELECTION_STYLE_BLUE;
+            break;
+
+    }
+
+    return [NSString stringWithFormat:@"%d", selectionStyleInt];
 }
 
 @end

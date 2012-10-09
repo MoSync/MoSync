@@ -359,6 +359,62 @@ namespace NativeUI
 	}
 
 	/**
+	 * Set the predefined background color of an selected list view item.
+	 * @param selectionStyle Predefined styles.
+	 * The default value is LIST_VIEW_ITEM_SELECTION_STYLE_BLUE.
+	 * Platform: iOS.
+	 */
+	void ListViewItem::setSelectionStyle(ListViewItemSelectionStyle selectionStyle)
+	{
+		int selectionStyleInt;
+
+		switch (selectionStyle)
+		{
+		case LIST_VIEW_ITEM_SELECTION_STYLE_GRAY:
+			selectionStyleInt = MAW_LIST_VIEW_ITEM_SELECTION_STYLE_GRAY;
+			break;
+		case LIST_VIEW_ITEM_SELECTION_STYLE_NONE:
+			selectionStyleInt = MAW_LIST_VIEW_ITEM_SELECTION_STYLE_NONE;
+			break;
+		case LIST_VIEW_ITEM_SELECTION_STYLE_BLUE:
+		default:
+			selectionStyleInt = MAW_LIST_VIEW_ITEM_SELECTION_STYLE_BLUE;
+			break;
+
+		}
+
+		this->setPropertyInt(MAW_LIST_VIEW_ITEM_SELECTION_STYLE, selectionStyleInt);
+	}
+
+	/**
+	 * Get the predefined background color of an selected list view item.
+	 * Platform: iOS.
+	 * @return The predefined style.
+	 */
+	ListViewItemSelectionStyle ListViewItem::getSelectionStyle()
+	{
+		ListViewItemSelectionStyle style;
+		int selectionStyleInt = this->getPropertyInt(
+			MAW_LIST_VIEW_ITEM_SELECTION_STYLE);
+
+		switch (selectionStyleInt)
+		{
+		case MAW_LIST_VIEW_ITEM_SELECTION_STYLE_GRAY:
+			style = LIST_VIEW_ITEM_SELECTION_STYLE_GRAY;
+			break;
+		case MAW_LIST_VIEW_ITEM_SELECTION_STYLE_NONE:
+			style = LIST_VIEW_ITEM_SELECTION_STYLE_NONE;
+			break;
+		case MAW_LIST_VIEW_ITEM_SELECTION_STYLE_BLUE:
+		default:
+			style = LIST_VIEW_ITEM_SELECTION_STYLE_BLUE;
+			break;
+		}
+
+		return style;
+	}
+
+	/**
 	 * Convert enum to one of the
 	 * \link MAW_LIST_VIEW_ITEM_ACCESSORY_TYPE
 	 * MAW_LIST_VIEW_ITEM_ACCESSORY_TYPE_NONE \endlink values.
@@ -417,4 +473,5 @@ namespace NativeUI
 		}
 		return type;
 	}
+
 } // namespace NativeUI

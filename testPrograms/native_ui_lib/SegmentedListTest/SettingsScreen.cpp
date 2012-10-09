@@ -23,8 +23,10 @@ MA 02110-1301, USA.
  *      Author: Spiridon Alexandru
  */
 
-#include "SettingsScreen.h"
 #include <NativeUI/ListViewSection.h>
+
+#include "SettingsScreen.h"
+#include "OptionsBox.h"
 #include "Util.h"
 
 /**
@@ -78,6 +80,8 @@ SettingsScreen::SettingsScreen():
 	mSetSectionFooterBackgroundColor(NULL),
 	mSetSectionFooterFontSize(NULL),
 	mSetSectionFooterFontColor(NULL),
+	mSetSelectionStyle(NULL),
+	mGetSelectionStyle(NULL),
 	mFooterBackgroundColorEditBox(NULL),
 	mFooterFontSizeEditBox(NULL),
 	mFooterFontColorEditBox(NULL)
@@ -115,6 +119,10 @@ SettingsScreen::SettingsScreen():
 		mListViewItemEditStyleNoneCheckbox->addCheckBoxListener(this);
 		mListViewItemEditStyleDeleteCheckbox->addCheckBoxListener(this);
 		mListViewItemEditStyleInsertCheckbox->addCheckBoxListener(this);
+		mSetSelectionStyle->addButtonListener(this);
+		mGetSelectionStyle->addButtonListener(this);
+		OptionsBox* optionBox = OptionsBox::getInstance();
+		optionBox->addOptionsBoxListener(this);
 	}
 	if (isWindowsPhone() || isAndroid())
 	{
@@ -161,9 +169,14 @@ SettingsScreen::~SettingsScreen()
 		mListViewItemAccessoryTypeEditModeDisclosureCheckbox->removeCheckBoxListener(this);
 		mListViewItemAccessoryTypeEditModeDetailCheckbox->removeCheckBoxListener(this);
 		mListViewItemAccessoryTypeEditModeCheckmarkCheckbox->removeCheckBoxListener(this);
-		mListViewItemEditStyleNoneCheckbox->addCheckBoxListener(this);
-		mListViewItemEditStyleDeleteCheckbox->addCheckBoxListener(this);
-		mListViewItemEditStyleInsertCheckbox->addCheckBoxListener(this);
+		mListViewItemEditStyleNoneCheckbox->removeCheckBoxListener(this);
+		mListViewItemEditStyleDeleteCheckbox->removeCheckBoxListener(this);
+		mListViewItemEditStyleInsertCheckbox->removeCheckBoxListener(this);
+		mSetSelectionStyle->removeButtonListener(this);
+		mGetSelectionStyle->removeButtonListener(this);
+		OptionsBox* optionBox = OptionsBox::getInstance();
+		optionBox->addOptionsBoxListener(this);
+		OptionsBox::destroyInstance();
 	}
 	if (isWindowsPhone() || isAndroid())
 	{
@@ -219,7 +232,7 @@ void SettingsScreen::createListViewPropertiesLayout()
 
 	if (isIOS())
 	{
-		listViewPropertiesVerticalLayout->setHeight(ONE_LINE_HORIZONTAL_LAYOUT_HEIGHT * 3);
+		listViewPropertiesVerticalLayout->setHeight(ONE_LINE_HORIZONTAL_LAYOUT_HEIGHT * 6);
 
 		// create the mode selection layout
 		HorizontalLayout* modeSelectionLayout = new HorizontalLayout();
@@ -240,6 +253,8 @@ void SettingsScreen::createListViewPropertiesLayout()
 		modeSelectionLayout->addChild(mEditCheckBox);
 		modeSelectionLayout->addChild(setEditLabel);
 		listViewPropertiesVerticalLayout->addChild(modeSelectionLayout);
+
+		createListViewItemSelectionStyleLayout(listViewPropertiesVerticalLayout);
 	}
 
 	ListViewItem* mListPropertiesItem = new ListViewItem();
@@ -417,7 +432,7 @@ void SettingsScreen::createListViewItemPropertiesLayout()
 
 	if (isIOS())
 	{
-		listViewItemPropertiesVerticalLayout->setHeight(ONE_LINE_HORIZONTAL_LAYOUT_HEIGHT*17);
+		listViewItemPropertiesVerticalLayout->setHeight(ONE_LINE_HORIZONTAL_LAYOUT_HEIGHT*19);
 		createListViewItemEditModeLayout(listViewItemPropertiesVerticalLayout);
 		createListViewItemDeleteButtonTextLayout(listViewItemPropertiesVerticalLayout);
 		createListViewItemSelectedAnimationLayout(listViewItemPropertiesVerticalLayout);
@@ -670,6 +685,33 @@ void SettingsScreen::createListViewItemEditStyleLayout(VerticalLayout* listViewI
 }
 
 /**
+ * Will create and add to the parent layout an info label and two buttons.
+ * The buttons will be used to test getter and setter for
+ * MAW_LIST_VIEW_ITEM_SELECTION_STYLE property.
+ * @param parent Will contain the widgets.
+ */
+void SettingsScreen::createListViewItemSelectionStyleLayout(VerticalLayout* parent)
+{
+	Label* label = new Label();
+	label->wrapContentHorizontally();
+	label->wrapContentVertically();
+	label->setText("Selection style");
+	parent->addChild(label);
+
+	mSetSelectionStyle = new Button();
+	mSetSelectionStyle->fillSpaceHorizontally();
+	mSetSelectionStyle->wrapContentVertically();
+	mSetSelectionStyle->setText("Set selection style");
+	parent->addChild(mSetSelectionStyle);
+
+	mGetSelectionStyle = new Button();
+	mGetSelectionStyle->fillSpaceHorizontally();
+	mGetSelectionStyle->wrapContentVertically();
+	mGetSelectionStyle->setText("Get used selection style");
+	parent->addChild(mGetSelectionStyle);
+}
+
+/**
  * This method is called when a list item is clicked.
  * @param parentSection The parent section of the list view item clicked.
  * @param item The list view item clicked.
@@ -679,6 +721,109 @@ void SettingsScreen::listScreenItemClicked(ListViewSection* &parentSection, List
 	mCurrentListViewItem = listViewItem;
 	mCurrentListViewSection = parentSection;
 	updateSelectedItemUI();
+}
+
+/**
+ * Will show an options box so user can select the list view item selection
+ * style.
+ * Works on iOS platform only.
+ */
+void SettingsScreen::showSelectionStyleOptionBox()
+{
+	OptionsBox* optionBox = OptionsBox::getInstance();
+	optionBox->resetDialog();
+	optionBox->setTitle(L"Set selection style");
+	optionBox->addButton(L"Blue");
+	optionBox->addButton(L"Gray");
+	optionBox->addButton(L"None");
+	optionBox->setCancelButtonTitle(L"Cancel");
+	optionBox->setCancelButtonVisible(true);
+	optionBox->show();
+}
+
+/**
+ * Show currently used selection style for an list view item.
+ * Works on iOS platform.
+ */
+void SettingsScreen::showSelectionStyleMessageBox()
+{
+	MAUtil::String textToShow;
+	if (mListView->countChildWidgets() == 0)
+	{
+		textToShow = "The list view section does not have sections.";
+	}
+	else
+	{
+		ListViewSection* section = (ListViewSection*) mListView->getChild(0);
+		if (section->countChildWidgets() == 0)
+		{
+			textToShow = "The list view section does not have items.";
+		}
+		else
+		{
+			ListViewItem* item = (ListViewItem*) section->getChild(0);
+			ListViewItemSelectionStyle selectionStyle =
+				item->getSelectionStyle();
+			textToShow = "The selection style is: " +
+				getSelectionStyleString(selectionStyle);
+		}
+	}
+	maAlert("ListViewItem selection style", textToShow.c_str(), "OK", NULL, NULL);
+}
+
+/**
+ * Change all the list view's items selection style to a given value.
+ * @param style Style to set.
+ */
+void SettingsScreen::changeSelectionStyle(ListViewItemSelectionStyle style)
+{
+	int sectionIndex = 0;
+	int countSections = mListView->countChildWidgets();
+
+	while (sectionIndex < countSections)
+	{
+		ListViewSection* section = (ListViewSection*) mListView->getChild(sectionIndex);
+		int itemIndex = 0;
+		int countItems = section->countChildWidgets();
+
+		while (itemIndex < countItems)
+		{
+			ListViewItem* item = (ListViewItem*) section->getChild(itemIndex);
+			item->setSelectionStyle(style);
+
+			itemIndex++;
+		}
+
+		sectionIndex++;
+	}
+}
+
+/**
+ * This method is called when a button from options dialog was
+ * clicked.
+ * This method is not called if the destructive or cancel button were
+ * clicked.
+ * @param buttonIndex The index of the button that was clicked.
+ * @param buttonTitle The title of the button that was clicked.
+ */
+void SettingsScreen::optionsBoxButtonClicked(const int buttonIndex,
+	const MAUtil::WString& buttonTitle)
+{
+	ListViewItemSelectionStyle style;
+	switch (buttonIndex)
+	{
+	case 0:
+		style = LIST_VIEW_ITEM_SELECTION_STYLE_BLUE;
+		break;
+	case 1:
+		style = LIST_VIEW_ITEM_SELECTION_STYLE_GRAY;
+		break;
+	case 2:
+	default:
+		style = LIST_VIEW_ITEM_SELECTION_STYLE_NONE;
+		break;
+	}
+	this->changeSelectionStyle(style);
 }
 
 /**
@@ -1024,6 +1169,14 @@ void SettingsScreen::buttonClicked(Widget* button)
 		{
 			mCurrentListViewItem->setDeleteButtonTitle(mSetListViewItemDeleteTitleEditBox->getText());
 		}
+	}
+	else if (mSetSelectionStyle == button)
+	{
+		this->showSelectionStyleOptionBox();
+	}
+	else if (mGetSelectionStyle == button)
+	{
+		this->showSelectionStyleMessageBox();
 	}
 }
 

@@ -75,6 +75,26 @@ namespace NativeUI
 		LIST_VIEW_ITEM_EDIT_STYLE_INSERT
 	};
 
+	enum ListViewItemSelectionStyle
+	{
+		/**
+		 * @brief The item has no distinct style for when it is selected.
+		 * Platform: iOS.
+		 */
+		LIST_VIEW_ITEM_SELECTION_STYLE_NONE = 0,
+		/**
+		 * @brief The item has a blue background for selected state.
+		 * This is the default value.
+		 * Platform: iOS.
+		 */
+		LIST_VIEW_ITEM_SELECTION_STYLE_BLUE,
+		/**
+		 * @brief Then item has a gray background for selected state.
+		 * Platform: iOS.
+		 */
+		LIST_VIEW_ITEM_SELECTION_STYLE_GRAY
+	};
+
 	/**
 	 * \brief Class for list view items.
 	 */
@@ -284,6 +304,21 @@ namespace NativeUI
 		 * @return The editing style used.
 		 */
 		ListViewItemEditStyle getEditStyle();
+
+		/**
+		 * Set the predefined background color of an selected list view item.
+		 * @param selectionStyle Predefined styles.
+		 * The default value is LIST_VIEW_ITEM_SELECTION_STYLE_BLUE.
+		 * Platform: iOS.
+		 */
+		void setSelectionStyle(ListViewItemSelectionStyle selectionStyle);
+
+		/**
+		 * Get the predefined background color of an selected list view item.
+		 * Platform: iOS.
+		 * @return The predefined style.
+		 */
+		ListViewItemSelectionStyle getSelectionStyle();
 
 	private:
 		/**
