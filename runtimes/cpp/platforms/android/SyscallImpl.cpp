@@ -2251,6 +2251,45 @@ namespace Base
 			return _maCameraGetProperty((int)gCore->mem_ds, _property, _valueBuffer, _valueBufferSize, mJNIEnv, mJThis);
 		}
 
+		case maIOCtl_maCameraPreviewSize:
+		{
+
+			return _maCameraPreviewSize(mJNIEnv, mJThis);
+		}
+
+
+		// int maCameraEnablePreviewEvents( in int previewEventType,
+		//									in MAAddress previewBuffer,
+		//									in MARect previewArea);
+
+		case maIOCtl_maCameraPreviewEventEnable:
+		{
+
+			MARect* rect = (MARect*) SYSCALL_THIS->GetValidatedMemRange(c, sizeof(MARect));
+
+			int type = a;
+
+			int previewSize = rect->width * rect->height;
+
+			int data = (int) SYSCALL_THIS->GetValidatedMemRange(b, (previewSize*4));
+
+			char t[200];
+			sprintf(t, "pbuffer :%u data :%u\n", b, data);
+			__android_log_write(ANDROID_LOG_INFO, "@@@@@@ MOSYNC JNI", t);
+
+			return _maCameraPreviewEventEnable((int)gCore->mem_ds, type, data, rect, mJNIEnv, mJThis);
+		}
+
+		case maIOCtl_maCameraPreviewEventDisable:
+		{
+			return _maCameraPreviewEventDisable(mJNIEnv, mJThis);
+		}
+
+		case maIOCtl_maCameraPreviewEventConsumed:
+		{
+			return _maCameraPreviewEventConsumed(mJNIEnv, mJThis);
+		}
+
 		// ********** Sensor API **********
 
 		case maIOCtl_maSensorStart:

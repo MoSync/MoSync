@@ -90,6 +90,17 @@ void free(void *mem);
 */
 void* realloc(void* old, size_t size);
 
+/**
+* Returns the total size of the heap, in bytes.
+*/
+size_t heapTotalMemory(void);
+
+/**
+* Returns the amount of available memory on the heap, in bytes.
+* \note Due to overhead, you will not be able to allocate exactly this amount.
+*/
+size_t heapFreeMemory(void);
+
 #endif	//MAPIP
 
 typedef void (*malloc_handler)(int size);
@@ -157,6 +168,20 @@ block_size_hook set_block_size_hook(block_size_hook hook);
 * \param length The length of the heap, in bytes.
 */
 void override_heap_init_crt0(char* start, int length);
+
+/**
+* The default heap initialization function.
+* \see override_heap_init_crt0()
+*/
+void ansi_heap_init_crt0(char *start, int length);
+
+/**
+* Starts a system for dumping information about every call to malloc() or free().
+* Only available in debug builds.
+* It is recommended to call this from override_heap_init_crt0(), in order to
+* catch malloc() calls from static constructors.
+*/
+void initStackDump(void);
 
 #ifdef __cplusplus
 }	//extern "C"

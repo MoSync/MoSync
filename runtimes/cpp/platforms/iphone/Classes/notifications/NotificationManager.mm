@@ -409,7 +409,7 @@ static NotificationManager *sharedInstance = nil;
     for (NSNumber* key in allKeys)
     {
         UILocalNotification* localNotification = [mLocalNotificationDictionary objectForKey:key];
-        if (localNotification == notification)
+        if ([localNotification isEqual: notification])
         {
             return [key intValue];
         }
