@@ -188,7 +188,7 @@ namespace Wormhole
 	}
 
 	/**
-	 * Display the main WebView of this moblet.
+	 * Display the WebView.
 	 */
 	void WebAppMoblet::showWebView()
 	{
@@ -200,31 +200,11 @@ namespace Wormhole
 	}
 
 	/**
-	 * Run JavaScript code in the main WebView
-	 * of this moblet.
-	 * @param script JavaScript code to evaluate.
+	 * Run JavaScript code in the WebView.
 	 */
 	void WebAppMoblet::callJS(const MAUtil::String& script)
 	{
 		getWebView()->callJS(script);
-	}
-
-	/**
-	 * Evaluate JavaScript code in a WebView.
-	 * @param webViewHandle The MoSync handle to the WebView in which
-	 * to evaluate the script (this handle is an integer id).
-	 * @param script JavaScript string.
-	 */
-	void WebAppMoblet::callJS(
-		MAWidgetHandle webViewHandle,
-		const MAUtil::String& script)
-	{
-		// Call the JavaScript code on the WebView.
-		MAUtil::String url = "javascript:" + script;
-		maWidgetSetProperty(
-			webViewHandle,
-			MAW_WEB_VIEW_URL,
-			url.c_str());
 	}
 
 	// /**
