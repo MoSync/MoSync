@@ -1695,7 +1695,8 @@ mosync.nativeui.initUI = function() {
 
 /**
  * Store the screen size information coming from MoSync
- * in the mosync.nativeui namespace.
+ * in the mosync.nativeui namespace. This function is
+ * called from C++.
  */
 mosync.nativeui.setScreenSize = function(width, height) {
 	mosync.nativeui.screenWidth = width;

@@ -16,36 +16,55 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301, USA.
 */
 
-/**
- * @file HybridMoblet.h
- *
- * @author Mikael Kindborg
+/*! \addtogroup WormHoleGroup
+ *  @{
  */
 
-#ifndef WORMHOLE_CUSTOM_WEB_APP_MOBLET_H_
-#define WORMHOLE_CUSTOM_WEB_APP_MOBLET_H_
+/** @defgroup WormHoleGroup Wormhole Library
+ *  @{
+ */
+
+/**
+ * @file HybridMoblet.h
+ * @author Mikael Kindborg
+ *
+ * @brief High-level moblet that has a WebView and supports
+ * communication between a JavaScript and C++.
+ */
+
+#ifndef WORMHOLE_HYBRID_MOBLET_H_
+#define WORMHOLE_HYBRID_MOBLET_H_
 
 #include <ma.h>
 #include <maassert.h>
 #include <MAUtil/Environment.h>
 #include <MAUtil/Vector.h>
 
-#include "WebAppMoblet.h"
+#include "CustomMoblet.h"
 #include "MessageHandler.h"
-
-namespace Wormhole
-{
+#include "FileUtil.h"
 
 /**
- * Moblet designed to make it easy to add custom C++ code that
- * can be invoked from JavaScript.
+ * @brief Classes for Hybrid app support.
+ */
+namespace Wormhole
+{
+// Forward declaration.
+class HybridMoblet_WebViewListener;
+
+/**
+ * @brief Moblet designed to make it easy to add custom C++ code that
+ * can be invoked from JavaScript. This class provides a
+ * Wormhole-enabled WebView, methods to extract and load
+ * your HTML files and JavaScript code, and a structure for
+ * communicating with JavaScript.
  *
  * Members are made virtual and public by design, to give
  * maximum flexibility to users of this class. Do not access
  * instance variables directly, unless absolutely needed.
  */
 class HybridMoblet :
-	public WebAppMoblet,
+	public CustomMoblet,
 	public FunObject
 {
 public:
@@ -59,11 +78,6 @@ public:
 	 */
 	virtual ~HybridMoblet();
 
-	/**
-	 * Display a page. Will automatically call initialize()
-	 * if it has not been called.
-	 */
-	virtual void showPage(const MAUtil::String& url);
 
 	/**
 	 * Initialize the moblet.
@@ -76,6 +90,32 @@ public:
 	 */
 	virtual void openWormhole(
 		Wormhole::HybridMoblet* moblet);
+
+	/**
+	 * Get the WebView widget displayed by this moblet.
+	 * @return Pointer to the WebView instance.
+	 */
+	virtual NativeUI::WebView* getWebView();
+
+	/**
+	 * Get a file utility object used for accessing the
+	 * device's local file system.
+	 * @return Pointer to a FileUtil instance.
+	 */
+	virtual FileUtil* getFileUtil();
+
+	/**
+	 * Display a page in the main WebView of this moblet.
+	 * Will automatically call initialize() if not called
+	 * previously.
+	 * @param url Url of page to open.
+	 */
+	virtual void showPage(const MAUtil::String& url);
+
+	/**
+	 * Display the main WebView of this moblet.
+	 */
+	virtual void showWebView();
 
 	/**
 	 * Set the sound used for the PhoneGap beep notification.
@@ -99,7 +139,8 @@ public:
 	 *
 	 * @param command String identifying the command.
 	 * @param fun Function of type MessageHandlerFun. This function must
-	 * be a member of a subclass of WebAppMoblet.
+	 * be a member of a subclass of the class FunObject (HybridMoblet
+	 * inherits FunObject, methods in subclasses of HybridMoblet work fine).
 	 */
 	virtual void addMessageFun(
 		const char* command,
@@ -121,9 +162,75 @@ public:
 
 	/**
 	 * This method is called when a key is pressed.
-	 * Eventually forwards the event to PhoneGapMessageHandler.
+	 * Forwards the event to PhoneGapMessageHandler.
+	 * Override to implement your own behaviour.
 	 */
 	virtual void keyPressEvent(int keyCode, int nativeCode);
+
+	/**
+	 * Run JavaScript code in the main WebView
+	 * of this moblet.
+	 * @param script JavaScript code to evaluate.
+	 */
+	virtual void callJS(const MAUtil::String& script);
+
+	/**
+	 * Evaluate JavaScript code in a WebView.
+	 * @param webViewHandle The MoSync handle to the WebView in which
+	 * to evaluate the script (this handle is an integer id).
+	 * @param script JavaScript string.
+	 */
+	virtual void callJS(
+		MAWidgetHandle webViewHandle,
+		const MAUtil::String& script);
+
+	/**
+	 * Enable JavaScript to C++ communication.
+	 */
+	virtual void enableWebViewMessages();
+
+	/**
+	 * Disable JavaScript to C++ communication.
+	 */
+	virtual void disableWebViewMessages();
+
+	/**
+	 * Extract HTML/CSS/JS/Media files to the local file system.
+	 */
+	virtual void extractFileSystem();
+
+	/**
+	 * @return true if the checksum has changed (or if the old
+	 * value did not exist, such as on first time load).
+	 */
+	virtual bool checksumHasChanged();
+
+	/**
+	 * Write the current checksum to file.
+	 */
+	virtual void writeChecksum();
+
+public: // On purpose!
+
+	/**
+	 * The screen widget that is the root of the UI.
+	 */
+	NativeUI::Screen* mScreen;
+
+	/**
+	 * The WebView widget that displays the application UI.
+	 */
+	NativeUI::WebView* mWebView;
+
+	/**
+	 * JavaScript message listener.
+	 */
+	HybridMoblet_WebViewListener* mWebViewListener;
+
+	/**
+	 * File utility object.
+	 */
+	FileUtil* mFileUtil;
 
 	/**
 	 * Handles messages sent from JavaScript.
@@ -140,3 +247,5 @@ public:
 } // namespace
 
 #endif
+
+/*! @} */
