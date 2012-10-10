@@ -77,6 +77,7 @@ namespace MoSync
             // contains the subtitle text
             protected string mSubtitle;
             protected Brush mFontColor;
+            protected Brush mSubtitleFontColor;
             protected double mFontSize;
             protected bool mItemSelected;
 
@@ -124,6 +125,10 @@ namespace MoSync
 
                 this.ItemSelected = false;
                 this.ItemsSourceItemIndex = -1;
+
+                // set the default font color values
+                mFontColor = new SolidColorBrush(Colors.White);
+                mSubtitleFontColor = new SolidColorBrush(Colors.White);
 			}
 
             public override void AddChild(IWidget child)
@@ -137,9 +142,9 @@ namespace MoSync
             }
 
             /**
-             * Asks for the parent section to reload the list view model.
+             * Asks for the parent section to reload the list view model item.
              */
-            public void ReloadParentList()
+            public void ReloadParentListItem()
             {
                 if (mParent is ListViewSection)
                 {
@@ -160,14 +165,6 @@ namespace MoSync
                 set
                 {
                     mItemSelected = value;
-                    if (mItemSelected)
-                    {
-                    //    this.FontColor = "#FF0000";
-                    }
-                    else
-                    {
-                    //    this.FontColor = "#FFFFFF";
-                    }
                 }
             }
 
@@ -187,6 +184,14 @@ namespace MoSync
             public Brush GetFontColor()
             {
                 return mFontColor;
+            }
+
+            /**
+             * Gets the subtitle font color of the current long list selector item.
+             */
+            public Brush GetSubtitleFontColor()
+            {
+                return mSubtitleFontColor;
             }
 
             /**
@@ -243,7 +248,7 @@ namespace MoSync
 				set
 				{
                     mText.Text = value;
-                    ReloadParentList();
+                    ReloadParentListItem();
 				}
 				get
 				{
@@ -261,7 +266,7 @@ namespace MoSync
                 set
                 {
                     mSubtitle = value;
-                    ReloadParentList();
+                    ReloadParentListItem();
                 }
                 get
                 {
@@ -315,7 +320,7 @@ namespace MoSync
                         else throw new InvalidPropertyValueException();
                     }
                     else throw new InvalidPropertyValueException();
-                    ReloadParentList();
+                    ReloadParentListItem();
 				}
 			}
 
@@ -346,7 +351,7 @@ namespace MoSync
                         MoSync.Util.convertStringToColor(value, out brush);
                         mText.Foreground = brush;
                         mFontColor = brush;
-                        ReloadParentList();
+                        ReloadParentListItem();
                     }
                     catch
                     {
@@ -366,7 +371,7 @@ namespace MoSync
                 {
                     mText.FontSize = value;
                     mFontSize = value;
-                    ReloadParentList();
+                    ReloadParentListItem();
                 }
 			}
 
@@ -385,7 +390,7 @@ namespace MoSync
 					mText.FontFamily = fontInfo.family;
 					mText.FontWeight = fontInfo.weight;
 					mText.FontStyle = fontInfo.style;
-                    ReloadParentList();
+                    ReloadParentListItem();
 				}
             }
 

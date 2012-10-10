@@ -37,6 +37,8 @@ using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Shapes;
 using System.ComponentModel;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace MoSync
 {
@@ -52,6 +54,7 @@ namespace MoSync
 
             private Brush mBackgroundColor;
             private Brush mFontColor;
+            private Brush mSubtitleFontColor;
             private double mFontSize;
             private String mTitle;
             private String mSubtitle;
@@ -65,6 +68,10 @@ namespace MoSync
 
             // the current list view style
             private ListView.ListViewStyle mListStyle = MoSync.Constants.MAW_LIST_VIEW_STYLE_SUBTITLE;
+
+            // a unique string to be used as a hash key for maping the model item with the coresponding
+            // mosync ListViewItem
+            private string mUniqueID;
 
             #endregion
 
@@ -80,11 +87,22 @@ namespace MoSync
                 mWidth = double.NaN;
                 this.FontSize = DEFAULT_ITEM_FONT_SIZE;
                 this.FontColor = new SolidColorBrush(Colors.White);
+                this.SubtitleFontColor = new SolidColorBrush(Colors.White);
+
+                mUniqueID = GetUniqueKey();
             }
 
             #endregion
 
             #region Properties
+
+            public string UniqueID
+            {
+                get
+                {
+                    return mUniqueID;
+                }
+            }
 
             public double Height
             {
@@ -228,6 +246,22 @@ namespace MoSync
                 }
             }
 
+            public Brush SubtitleFontColor
+            {
+                get
+                {
+                    return mSubtitleFontColor;
+                }
+                set
+                {
+                    if (value != null)
+                    {
+                        mSubtitleFontColor = value;
+                        OnPropertyChanged("SubtitleFontColor");
+                    }
+                }
+            }
+
             public double FontSize
             {
                 get
@@ -254,6 +288,11 @@ namespace MoSync
                 {
                     PropertyChanged(this, new PropertyChangedEventArgs(property));
                 }
+            }
+
+            private string GetUniqueKey()
+            {
+                return Guid.NewGuid().ToString();
             }
 
             #endregion
