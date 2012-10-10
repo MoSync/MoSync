@@ -113,6 +113,12 @@ public:
 	virtual void showPage(const MAUtil::String& url);
 
 	/**
+	 * Display a NativeUI page.
+	 * @param url Url of NativeUI page to open.
+	 */
+	virtual void showNativeUI(const MAUtil::String& url);
+
+	/**
 	 * Display the main WebView of this moblet.
 	 */
 	virtual void showWebView();

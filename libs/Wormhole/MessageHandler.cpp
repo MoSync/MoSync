@@ -268,26 +268,7 @@ void MessageHandler::handleCallJSMessage(
 
 	// Evaluate the JavaScript code in the WebView.
 	const char* script = message.getNext();
-	callJS(webViewHandle, script);
-	//moblet->callJS(webViewHandle, script);
-}
-
-/**
- * Evaluate JavaScript code in a WebView.
- * @param webViewHandle The MoSync handle to the WebView in which
- * to evaluate the script (this handle is an integer id).
- * @param script JavaScript string.
- */
-void MessageHandler::callJS(
-	MAWidgetHandle webViewHandle,
-	const MAUtil::String& script)
-{
-	// Call the JavaScript code on the WebView.
-	MAUtil::String url = "javascript:" + script;
-	maWidgetSetProperty(
-		webViewHandle,
-		MAW_WEB_VIEW_URL,
-		url.c_str());
+	moblet->callJS(webViewHandle, script);
 }
 
 } // namespace

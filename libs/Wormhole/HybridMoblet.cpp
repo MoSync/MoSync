@@ -121,12 +121,6 @@ void HybridMoblet::initialize()
 	// Enable message sending from JavaScript to C++.
 	enableWebViewMessages();
 
-	// Show the main WebView. In a NativeUI app we hide the
-	// main WebView and use NativeUI to display widgets.
-	// The hidden WebView to handle application logic written
-	// in JavaScript.
-	getWebView()->setVisible(true);
-
 	// Initialize the message handler. All messages from
 	// JavaScript are routed through this handler.
 	mMessageHandler.initialize(this);
@@ -153,7 +147,7 @@ NativeUI::WebView* HybridMoblet::getWebView()
 		mWebView->fillSpaceHorizontally();
 		mWebView->fillSpaceVertically();
 
-		// Create and show the screen that holds the WebView.
+		// Create the screen that holds the WebView.
 		mScreen = new NativeUI::Screen();
 		mScreen->setMainWidget(mWebView);
 	}
@@ -180,9 +174,28 @@ void HybridMoblet::showPage(const MAUtil::String& url)
 	// Extract files system and perform other initialisation.
 	initialize();
 
-	// Make sure the WebView is displayed.
-	// It should do no harm to call this method multiple times.
+	// Make the main WebView visible.
+	getWebView()->setVisible(true);
+
+	// Show the WebView screen.
 	showWebView();
+
+	// Open the page.
+	getWebView()->openURL(url);
+}
+
+/**
+ * Display a NativeUI page.
+ * @param url Url of NativeUI page to open.
+ */
+void HybridMoblet::showNativeUI(const MAUtil::String& url)
+{
+	// Extract files system and perform other initialisation.
+	initialize();
+
+	// In a NativeUI app we hide the main WebView and use NativeUI
+	// to display widgets.
+	getWebView()->setVisible(false);
 
 	// Open the page.
 	getWebView()->openURL(url);

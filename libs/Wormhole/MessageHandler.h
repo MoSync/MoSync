@@ -145,15 +145,7 @@ public:
 		NativeUI::WebView* webView,
 		Wormhole::HybridMoblet* moblet);
 
-	/**
-	 * Evaluate JavaScript code in a WebView.
-	 * @param webViewHandle The MoSync handle to the WebView in which
-	 * to evaluate the script (this handle is an integer id).
-	 * @param script JavaScript string.
-	 */
-	virtual void MessageHandler::callJS(
-		MAWidgetHandle webViewHandle,
-		const MAUtil::String& script);
+public: // On purpose.
 
 	/**
 	 * Handler for PhoneGap messages.
