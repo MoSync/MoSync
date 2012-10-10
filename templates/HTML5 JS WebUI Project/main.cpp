@@ -1,12 +1,12 @@
 /**
  * @file main.cpp
  *
- * This file contains the support code at the C++ level for an HTML5/JS
- * application that can access device services from JavaScript.
+ * This file contains the support code at the C++ level for
+ * an HTML5/JS application that has access to device services.
  *
- * You don't need to change anything in this code file unless you
- * wish to add support for functions not available out-of-the box
- * in wormhole.js.
+ * You don't need to change anything in this code file unless
+ * you wish to add support for functions that are not available
+ * out-of-the box in wormhole.js.
  */
 
 #include <Wormhole/HybridMoblet.h>
@@ -30,15 +30,7 @@ public:
 
 		// Set the sound used by the PhoneGap beep notification API.
 		// BEEP_WAV is defined in file Resources/Resources.lst.
-		// Below we add our own beep message, to illustrate how to
-		// invoke custom C++ code from JavaScript. Do not confuse these
-		// two ways of playing a beep sound.
 		setBeepSound(BEEP_WAV);
-	}
-
-	virtual ~MyMoblet()
-	{
-		// Add cleanup code as needed.
 	}
 };
 

@@ -1,8 +1,8 @@
 /**
  * @file main.cpp
  *
- * This template application shows how to extend the functionality
- * in HTML5/JS with custom code written in C++.
+ * This template application shows how to extend the
+ * functionality in HTML5/JS with custom code in C++.
  */
 
 #include <Wormhole/HybridMoblet.h>
@@ -40,11 +40,6 @@ public:
 		addMessageFun(
 			"Beep",
 			(FunTable::MessageHandlerFun)&MyMoblet::beep);
-	}
-
-	virtual ~MyMoblet()
-	{
-		// Add cleanup code as needed.
 	}
 
 	void vibrate(Wormhole::MessageStream& message)

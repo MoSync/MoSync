@@ -3,7 +3,8 @@
 * @file index.html
 *
 * Template application that shows how to send custom messages to C++
-* using the HybridMoblet class.
+* using the HybridMoblet class. The C++ support code is implemented
+* in file main.cpp.
 -->
 <html>
 	<head>
@@ -13,30 +14,6 @@
 		<link rel="stylesheet" href="style.css" type="text/css" media="screen" title="no title" charset="utf-8">
 		<script type="text/javascript" charset="utf-8" src="js/wormhole.js"></script>
 		<script type="text/javascript">
-			/**
-			 * Initialization.
-			 */
-			function initialize()
-			{
-				// The "deviceready" event is sent when
-				// PhoneGap has finished loading.
-				document.addEventListener(
-					"deviceready",
-					displayDeviceInfo,
-					true);
-
-				// Close the application when the back key is pressed.
-				document.addEventListener(
-					"backbutton",
-					function()
-					{
-						mosync.bridge.send(["MoSync", "ExitApplication"]);
-					},
-					true);
-
-				mosync.bridge.send(["MoSync", "InitializePhoneGap"]);
-			}
-
 			/**
 			 * Displays the device information on the screen.
 			 */
@@ -93,11 +70,20 @@
 				document.body.style.backgroundColor = color;
 			}
 
-			// Call initialize function when document has loaded.
+			// Register event listeners.
+
+			// The "deviceready" event is sent when the system
+			// has finished loading.
 			document.addEventListener(
-				"DOMContentLoaded",
-				initialize,
-				false);
+				"deviceready",
+				displayDeviceInfo,
+				true);
+
+			// Close the application when the back key is pressed.
+			document.addEventListener(
+				"backbutton",
+				function() { mosync.app.exit(); },
+				true);
 		</script>
 	</head>
 	<body>
