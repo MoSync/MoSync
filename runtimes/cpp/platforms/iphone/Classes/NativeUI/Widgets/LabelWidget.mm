@@ -231,21 +231,13 @@ typedef enum VerticalAlignment
     UILabel* label = (UILabel*) self.view;
     CGSize constrainedSize = self.size;
 
-    // If one of the autosize values is wrap calculate label's size
-    // using the text size functions.
-    if (self.autoSizeWidth == WidgetAutoSizeWrapContent ||
-        self.autoSizeHeight == WidgetAutoSizeWrapContent)
-    {
-        constrainedSize = [label.text sizeWithFont:label.font];
-    }
-
-    // If one of the autosize values is fill set the according
+    // If one of the autosize values is fill or wrap set the according
     // size to maximum.
-    if (self.autoSizeHeight == WidgetAutoSizeFillParent)
+    if (self.autoSizeHeight != WidgetAutoSizeFixed)
     {
         constrainedSize.height = FLT_MAX;
     }
-    if (self.autoSizeWidth == WidgetAutoSizeFillParent)
+    if (self.autoSizeWidth != WidgetAutoSizeFixed)
     {
         constrainedSize.width = FLT_MAX;
     }
