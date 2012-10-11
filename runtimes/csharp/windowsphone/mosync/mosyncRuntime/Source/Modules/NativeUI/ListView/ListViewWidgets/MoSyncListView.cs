@@ -104,6 +104,18 @@ namespace MoSync
              */
             ObservableCollection<ListSection<ListItem>> mListSections;
 
+            /**
+             * Maps the every model item to the coresponding list view item widget in
+             * order to get the selected ListViewItem faster.
+             */
+            Dictionary<string, ListViewItem> mModelToItemWidgetMap;
+
+            /**
+             * Contains the last selected item widget (when a new item is selected, we need
+             * to update the last selected item properties).
+             */
+            ListViewItem mLastSelectedItemWidget = null;
+
             #region Constructor
 
             /**
@@ -131,6 +143,8 @@ namespace MoSync
 
                 // add the tap event handler on the default list (mList)
                 mList.Tap += new EventHandler<System.Windows.Input.GestureEventArgs>(mList_Tap);
+
+                mModelToItemWidgetMap = new Dictionary<string, ListViewItem>();
             }
 
             #endregion
@@ -570,6 +584,15 @@ namespace MoSync
                     section.ItemsSourceSectionIndex = index;
                     mListSections.Insert(index, sectionModel);
                     section.SectionIndex = index;
+
+                    // update the section indexes for all the sections after the inserted one
+                    for (int i = index + 1; i < mChildren.Count; i++)
+                    {
+                        if (mChildren[i] is ListViewSection)
+                        {
+                            (mChildren[i] as ListViewSection).ItemsSourceSectionIndex++;
+                        }
+                    }
                 });
             }
 
@@ -596,6 +619,15 @@ namespace MoSync
                 MoSync.Util.RunActionOnMainThreadSync(() =>
                 {
                     mListSections.RemoveAt(index);
+
+                    // update the section indexes for all the sections after the removed one
+                    for (int i = index; i < mChildren.Count; i++)
+                    {
+                        if (mChildren[i] is ListViewSection)
+                        {
+                            (mChildren[i] as ListViewSection).ItemsSourceSectionIndex--;
+                        }
+                    }
                 });
             }
 
@@ -625,6 +657,7 @@ namespace MoSync
                 currentSection.FooterFontWeight = section.GetFooterFontWeight();
                 currentSection.FooterTextHorizontalAlignment = section.GetFooterHorizontalAlignment();
                 currentSection.FooterTextVerticalAlignment = section.GetFooterVerticalAlignment();
+                currentSection.GroupHeaderColor = section.GetGroupHeaderBackgroundColor();
 
                 for (int i = 0; i < section.ChildrenCount; i++ )
                 {
@@ -639,6 +672,7 @@ namespace MoSync
                         newItem.Subtitle = listItem.Subtitle;
                         newItem.FontSize = listItem.GetFontSize();
                         newItem.FontColor = listItem.GetFontColor();
+                        newItem.SubtitleFontColor = listItem.GetSubtitleFontColor();
                         if (mListViewStyle == ListViewStyle.NoSubtitle)
                         {
                             newItem.SubtitleVisibility = Visibility.Collapsed;
@@ -650,7 +684,10 @@ namespace MoSync
                         newItem.ImageSource = listItem.IconImageSource;
 
                         listItem.ItemsSourceItemIndex = currentSection.Count;
+
                         currentSection.Add(newItem);
+
+                        mModelToItemWidgetMap.Add(newItem.UniqueID, listItem);
                     }
                 }
 
@@ -700,42 +737,50 @@ namespace MoSync
              */
             private void GetSectionAndSelectedItemIndex(out int sectionIndex, out int itemIndex)
             {
-                // TODO SA: do this better - add some kind of mapping between the section items
-                // and the widget children
-
                 // we need to find the selected item through the LongListSelector
                 // items source and through the child widgets aswell in order to
                 // set its selected state
                 sectionIndex = -1;
                 itemIndex = -1;
 
-                // we need to firs find the selected item index and its section index
+                // we need to first find the selected item index and its section index
                 // within the long list selector items source
                 int itemsSourceSectionIndex = -1;
                 int itemsSourceItemIndex = -1;
-                bool foundItemWithinItemsSource = false;
+
                 for (int i = 0; i < mListSections.Count; i++)
                 {
                     ListSection<ListItem> section = mListSections[i];
 
+                    int index = section.IndexOf(mLongListSelector.SelectedItem as ListItem);
+                    if ( index >= 0)
+                    {
+                        itemsSourceSectionIndex = i;
+                        itemsSourceItemIndex = index;
+                    }
+
+                    // deselect all the items
                     for (int j = 0; j < section.Count; j++)
                     {
-                        ListItem item = section[j];
-
-                        if (item.Equals(mLongListSelector.SelectedItem))
-                        {
-                            itemsSourceSectionIndex = i;
-                            itemsSourceItemIndex = j;
-                            foundItemWithinItemsSource = true;
-
-                            break;
-                        }
-                    }
-                    if (foundItemWithinItemsSource)
-                    {
-                        break;
+                        section[j].FontColor = mModelToItemWidgetMap[section[j].UniqueID].GetFontColor();
+                        section[j].SubtitleFontColor = mModelToItemWidgetMap[section[j].UniqueID].GetSubtitleFontColor();
                     }
                 }
+
+                // select the current item
+                SolidColorBrush phoneAccentBrush = Application.Current.Resources["PhoneAccentBrush"] as SolidColorBrush;
+                (mLongListSelector.SelectedItem as ListItem).FontColor = phoneAccentBrush;
+                (mLongListSelector.SelectedItem as ListItem).SubtitleFontColor = phoneAccentBrush;
+
+                // set the coresponding list view item widget selection status
+                ListViewItem selectedItem = mModelToItemWidgetMap[(mLongListSelector.SelectedItem as ListItem).UniqueID];
+                selectedItem.ItemSelected = true;
+
+                if (mLastSelectedItemWidget != null)
+                {
+                    mLastSelectedItemWidget.ItemSelected = false;
+                }
+                mLastSelectedItemWidget = selectedItem;
 
                 // then we need to go through the widget children and find
                 // the section/item that match the section/item indexes within
@@ -752,12 +797,10 @@ namespace MoSync
                                 if (section.GetChild(j) is ListViewItem)
                                 {
                                     ListViewItem item = section.GetChild(j) as ListViewItem;
-                                    item.ItemSelected = false;
                                     if (item.ItemsSourceItemIndex == itemsSourceItemIndex)
                                     {
                                         sectionIndex = i;
                                         itemIndex = j;
-                                        item.ItemSelected = true;
                                     }
                                 }
                             }
@@ -817,6 +860,7 @@ namespace MoSync
                     sectionToReload.FooterFontWeight = section.GetFooterFontWeight();
                     sectionToReload.FooterTextHorizontalAlignment = section.GetFooterHorizontalAlignment();
                     sectionToReload.FooterTextVerticalAlignment = section.GetFooterVerticalAlignment();
+                    sectionToReload.GroupHeaderColor = section.GetGroupHeaderBackgroundColor();
 
                     mListSections[section.ItemsSourceSectionIndex] = sectionToReload;
                 }
@@ -839,6 +883,7 @@ namespace MoSync
                         itemToReload.Subtitle = item.Subtitle;
                         itemToReload.FontSize = item.GetFontSize();
                         itemToReload.FontColor = item.GetFontColor();
+                        itemToReload.SubtitleFontColor = item.GetSubtitleFontColor();
                         if (mListViewStyle == ListViewStyle.NoSubtitle)
                         {
                             itemToReload.SubtitleVisibility = Visibility.Collapsed;

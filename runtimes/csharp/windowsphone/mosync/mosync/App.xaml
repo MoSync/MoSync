@@ -8,7 +8,7 @@
     xmlns:toolkit="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone.Controls.Toolkit">
 
     <!--Application Resources-->
-    <Application.Resources>                                                                                                        b
+    <Application.Resources>
         <!-- The header template of a LongListSelector -->
         <DataTemplate x:Key="groupHeaderTemplate">
             <Grid Margin="12,0,0,0">
@@ -55,7 +55,7 @@
                                 <RowDefinition Height="Auto"></RowDefinition>
                             </Grid.RowDefinitions>
                             <TextBlock Grid.Row="0" Text="{Binding Title}" FontSize="{Binding FontSize}" Foreground="{Binding FontColor}" VerticalAlignment="Center"></TextBlock>
-                            <TextBlock Grid.Row="1" Text="{Binding Subtitle}" Visibility="{Binding SubtitleVisibility}" VerticalAlignment="Top"></TextBlock>
+                            <TextBlock Grid.Row="1" Text="{Binding Subtitle}" Visibility="{Binding SubtitleVisibility}" Foreground="{Binding SubtitleFontColor}" VerticalAlignment="Top"></TextBlock>
                         </Grid>
                     </Border>
                 </Grid>

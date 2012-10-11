@@ -34,7 +34,6 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Shapes;
-using System.Collections.Generic;
 
 namespace MoSync
 {
@@ -72,6 +71,10 @@ namespace MoSync
             private FontFamily mFooterFontFamily;
             private FontWeight mFooterFontWeight;
             private FontStyle mFooterFontStyle;
+
+            // the group header appears when the user clicks on a section header (inside the
+            // long list selector)
+            private SolidColorBrush mGroupHeaderBackgroundColor;
 
             // the current list view style
             ListView.ListViewStyle mListViewStyle = MoSync.Constants.MAW_LIST_VIEW_STYLE_SUBTITLE;
@@ -175,6 +178,15 @@ namespace MoSync
             public FontStyle GetFooterFontStyle()
             {
                 return mFooterFontStyle;
+            }
+
+            #endregion
+
+            #region Group Header getters
+
+            public SolidColorBrush GetGroupHeaderBackgroundColor()
+            {
+                return mGroupHeaderBackgroundColor;
             }
 
             #endregion
@@ -406,6 +418,7 @@ namespace MoSync
                     {
                         MoSync.Util.convertStringToColor(value, out brush);
                         mHeaderBackgroundColor = brush;
+                        mGroupHeaderBackgroundColor = brush;
                         ReloadParentSection();
                     }
                     catch
