@@ -17,6 +17,7 @@ MA 02110-1301, USA.
 /**
  * @file MoSyncEditBox.cs
  * @author Rata Gabriela
+ *
  *         ovidiu
  *         Spiridon Alexandru
  *
@@ -340,6 +341,7 @@ namespace MoSync
                 set
                 {
                     mIsWatermarkMode = true;
+                    mFirstChar = true;
 
                     mEditBox.Foreground = mWaterMarkBrush;
                     mPlaceholderText = value;
