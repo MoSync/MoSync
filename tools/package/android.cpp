@@ -38,6 +38,7 @@ static void sign(const SETTINGS& s, const RuntimeInfo& ri, string& unsignedApk, 
 static void createSignCmd(ostringstream& cmd, string& keystore, string& alias, string& storepass, string& keypass, string& signedApk, string& unsignedApk, bool hidden);
 static void writePermissions(ostream& stream, const SETTINGS& s, const RuntimeInfo& ri);
 static void writePermission(ostream& stream, bool flag, const char* nativePerm);
+static void writeFeature(ostream& stream, bool flag, const char* feature);
 static void writeNFCDirectives(ostream& stream, const SETTINGS& s);
 static void writeNFCResource(ostream& stream, const SETTINGS& s);
 static void writeGCMReceiver(ostream& stream, const string& packageName);
@@ -357,6 +358,8 @@ static void writePermissions(ostream& stream, const SETTINGS& s, const RuntimeIn
 	writePermission(stream, isPermissionSet(permissionSet, SMS_SEND), "android.permission.SEND_SMS");
 	writePermission(stream, isPermissionSet(permissionSet, SMS_RECEIVE), "android.permission.RECEIVE_SMS");
 	writePermission(stream, isPermissionSet(permissionSet, CAMERA), "android.permission.CAMERA");
+	writeFeature(stream, isPermissionSet(permissionSet, CAMERA), "android.hardware.camera");
+	writeFeature(stream, isPermissionSet(permissionSet, CAMERA), "android.hardware.camera.autofocus");
 	writePermission(stream, isPermissionSet(permissionSet, HOMESCREEN), "android.permission.GET_TASKS");
 	writePermission(stream, isPermissionSet(permissionSet, HOMESCREEN), "android.permission.SET_WALLPAPER");
 	writePermission(stream, isPermissionSet(permissionSet, HOMESCREEN), "android.permission.SET_WALLPAPER_HINTS");
@@ -407,6 +410,14 @@ static void writePermissions(ostream& stream, const SETTINGS& s, const RuntimeIn
 static void writePermission(ostream& stream, bool flag, const char* nativePerm) {
 	if (flag) {
 		stream <<"\t<uses-permission android:name=\""<<nativePerm<<"\" />\n";
+	}
+}
+
+static void writeFeature(ostream& stream, bool flag, const char* feature)
+{
+	if (flag)
+	{
+		stream << "<uses-feature android:name=\""<<feature<<"\" />\n";
 	}
 }
 

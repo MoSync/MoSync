@@ -1,0 +1,290 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		107FE5C213CAFEC10028E6F9 /* stropbench.mm in Sources */ = {isa = PBXBuildFile; fileRef = 107FE5BF13CAFEC10028E6F9 /* stropbench.mm */; };
+		10C49C5713C750EB003936ED /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 10C49C5613C750EB003936ED /* UIKit.framework */; };
+		10C49C5913C750EB003936ED /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 10C49C5813C750EB003936ED /* Foundation.framework */; };
+		10C49C5B13C750EB003936ED /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 10C49C5A13C750EB003936ED /* CoreGraphics.framework */; };
+		10C49C6113C750EB003936ED /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 10C49C5F13C750EB003936ED /* InfoPlist.strings */; };
+		10C49C6413C750EB003936ED /* main.mm in Sources */ = {isa = PBXBuildFile; fileRef = 10C49C6313C750EB003936ED /* main.mm */; };
+		10C49C6713C750EB003936ED /* STROPBenchIOSAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 10C49C6613C750EB003936ED /* STROPBenchIOSAppDelegate.m */; };
+		10C49C6A13C750EB003936ED /* MainWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 10C49C6813C750EB003936ED /* MainWindow.xib */; };
+		10C49C6D13C750EB003936ED /* STROPBenchIOSViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 10C49C6C13C750EB003936ED /* STROPBenchIOSViewController.mm */; };
+		10C49C7013C750EB003936ED /* STROPBenchIOSViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 10C49C6E13C750EB003936ED /* STROPBenchIOSViewController.xib */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		107FE5BF13CAFEC10028E6F9 /* stropbench.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = stropbench.mm; sourceTree = "<group>"; };
+		107FE5C013CAFEC10028E6F9 /* stropbench.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stropbench.h; sourceTree = "<group>"; };
+		10C49C5213C750EB003936ED /* STROPBenchIOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = STROPBenchIOS.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		10C49C5613C750EB003936ED /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
+		10C49C5813C750EB003936ED /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		10C49C5A13C750EB003936ED /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
+		10C49C5E13C750EB003936ED /* STROPBenchIOS-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "STROPBenchIOS-Info.plist"; sourceTree = "<group>"; };
+		10C49C6013C750EB003936ED /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		10C49C6213C750EB003936ED /* STROPBenchIOS-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "STROPBenchIOS-Prefix.pch"; sourceTree = "<group>"; };
+		10C49C6313C750EB003936ED /* main.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = main.mm; sourceTree = "<group>"; };
+		10C49C6513C750EB003936ED /* STROPBenchIOSAppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = STROPBenchIOSAppDelegate.h; sourceTree = "<group>"; };
+		10C49C6613C750EB003936ED /* STROPBenchIOSAppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = STROPBenchIOSAppDelegate.m; sourceTree = "<group>"; };
+		10C49C6913C750EB003936ED /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/MainWindow.xib; sourceTree = "<group>"; };
+		10C49C6B13C750EB003936ED /* STROPBenchIOSViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = STROPBenchIOSViewController.h; sourceTree = "<group>"; };
+		10C49C6C13C750EB003936ED /* STROPBenchIOSViewController.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = STROPBenchIOSViewController.mm; sourceTree = "<group>"; };
+		10C49C6F13C750EB003936ED /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/STROPBenchIOSViewController.xib; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		10C49C4F13C750EB003936ED /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				10C49C5713C750EB003936ED /* UIKit.framework in Frameworks */,
+				10C49C5913C750EB003936ED /* Foundation.framework in Frameworks */,
+				10C49C5B13C750EB003936ED /* CoreGraphics.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		10C49C4713C750E9003936ED = {
+			isa = PBXGroup;
+			children = (
+				10C49C5C13C750EB003936ED /* STROPBenchIOS */,
+				10C49C5513C750EB003936ED /* Frameworks */,
+				10C49C5313C750EB003936ED /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		10C49C5313C750EB003936ED /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				10C49C5213C750EB003936ED /* STROPBenchIOS.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		10C49C5513C750EB003936ED /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				10C49C5613C750EB003936ED /* UIKit.framework */,
+				10C49C5813C750EB003936ED /* Foundation.framework */,
+				10C49C5A13C750EB003936ED /* CoreGraphics.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		10C49C5C13C750EB003936ED /* STROPBenchIOS */ = {
+			isa = PBXGroup;
+			children = (
+				107FE5BF13CAFEC10028E6F9 /* stropbench.mm */,
+				107FE5C013CAFEC10028E6F9 /* stropbench.h */,
+				10C49C6513C750EB003936ED /* STROPBenchIOSAppDelegate.h */,
+				10C49C6613C750EB003936ED /* STROPBenchIOSAppDelegate.m */,
+				10C49C6813C750EB003936ED /* MainWindow.xib */,
+				10C49C6B13C750EB003936ED /* STROPBenchIOSViewController.h */,
+				10C49C6C13C750EB003936ED /* STROPBenchIOSViewController.mm */,
+				10C49C6E13C750EB003936ED /* STROPBenchIOSViewController.xib */,
+				10C49C5D13C750EB003936ED /* Supporting Files */,
+			);
+			path = STROPBenchIOS;
+			sourceTree = "<group>";
+		};
+		10C49C5D13C750EB003936ED /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				10C49C5E13C750EB003936ED /* STROPBenchIOS-Info.plist */,
+				10C49C5F13C750EB003936ED /* InfoPlist.strings */,
+				10C49C6213C750EB003936ED /* STROPBenchIOS-Prefix.pch */,
+				10C49C6313C750EB003936ED /* main.mm */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		10C49C5113C750EB003936ED /* STROPBenchIOS */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 10C49C7313C750EB003936ED /* Build configuration list for PBXNativeTarget "STROPBenchIOS" */;
+			buildPhases = (
+				10C49C4E13C750EB003936ED /* Sources */,
+				10C49C4F13C750EB003936ED /* Frameworks */,
+				10C49C5013C750EB003936ED /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = STROPBenchIOS;
+			productName = STROPBenchIOS;
+			productReference = 10C49C5213C750EB003936ED /* STROPBenchIOS.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		10C49C4913C750E9003936ED /* Project object */ = {
+			isa = PBXProject;
+			buildConfigurationList = 10C49C4C13C750E9003936ED /* Build configuration list for PBXProject "STROPBenchIOS" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 10C49C4713C750E9003936ED;
+			productRefGroup = 10C49C5313C750EB003936ED /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				10C49C5113C750EB003936ED /* STROPBenchIOS */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		10C49C5013C750EB003936ED /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				10C49C6113C750EB003936ED /* InfoPlist.strings in Resources */,
+				10C49C6A13C750EB003936ED /* MainWindow.xib in Resources */,
+				10C49C7013C750EB003936ED /* STROPBenchIOSViewController.xib in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		10C49C4E13C750EB003936ED /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				10C49C6413C750EB003936ED /* main.mm in Sources */,
+				10C49C6713C750EB003936ED /* STROPBenchIOSAppDelegate.m in Sources */,
+				10C49C6D13C750EB003936ED /* STROPBenchIOSViewController.mm in Sources */,
+				107FE5C213CAFEC10028E6F9 /* stropbench.mm in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		10C49C5F13C750EB003936ED /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				10C49C6013C750EB003936ED /* en */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+		10C49C6813C750EB003936ED /* MainWindow.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				10C49C6913C750EB003936ED /* en */,
+			);
+			name = MainWindow.xib;
+			sourceTree = "<group>";
+		};
+		10C49C6E13C750EB003936ED /* STROPBenchIOSViewController.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				10C49C6F13C750EB003936ED /* en */,
+			);
+			name = STROPBenchIOSViewController.xib;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		10C49C7113C750EB003936ED /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = DEBUG;
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_VERSION = com.apple.compilers.llvmgcc42;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
+				SDKROOT = iphoneos;
+			};
+			name = Debug;
+		};
+		10C49C7213C750EB003936ED /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_VERSION = com.apple.compilers.llvmgcc42;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
+				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
+				SDKROOT = iphoneos;
+			};
+			name = Release;
+		};
+		10C49C7413C750EB003936ED /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "STROPBenchIOS/STROPBenchIOS-Prefix.pch";
+				INFOPLIST_FILE = "STROPBenchIOS/STROPBenchIOS-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = app;
+			};
+			name = Debug;
+		};
+		10C49C7513C750EB003936ED /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = YES;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "STROPBenchIOS/STROPBenchIOS-Prefix.pch";
+				INFOPLIST_FILE = "STROPBenchIOS/STROPBenchIOS-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				VALIDATE_PRODUCT = YES;
+				WRAPPER_EXTENSION = app;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		10C49C4C13C750E9003936ED /* Build configuration list for PBXProject "STROPBenchIOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				10C49C7113C750EB003936ED /* Debug */,
+				10C49C7213C750EB003936ED /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		10C49C7313C750EB003936ED /* Build configuration list for PBXNativeTarget "STROPBenchIOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				10C49C7413C750EB003936ED /* Debug */,
+				10C49C7513C750EB003936ED /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 10C49C4913C750E9003936ED /* Project object */;
+}
