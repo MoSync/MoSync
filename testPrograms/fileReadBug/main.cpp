@@ -12,6 +12,8 @@ static void doTest() {
 		printf("mpl: %i\n", len);
 		return;
 	}
+	printf("len: %i\n", len);
+	printf("strlen: %i\n", strlen(path));
 	strcpy(path+len-1, "testFile.bin");
 	printf("%s\n", path);
 
