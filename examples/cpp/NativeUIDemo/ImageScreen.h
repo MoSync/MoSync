@@ -89,6 +89,11 @@ private:
 	int mScreenHeight;
 	int mCurrentPosition;
 	int mImagesSize;
+
+	/**
+	 * Ads banner that will be added on top of the screen.
+	 */
+	Ads::Banner* mAdsBanner;
 };
 
 #endif //_IMAGESCREEN_H
