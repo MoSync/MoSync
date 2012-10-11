@@ -61,7 +61,10 @@ static void initInjectors() {
 static bool parseCmdLine(map<string, string>& params, int argc, char **argv) {
 	for(int i = 1; i < argc; i++) {
 		const char *name = argv[i];
-		if(strncmp(name, "-", 1)==0) {
+		if(!strcmp(name, "-force")) {
+			// Special op.
+			params["force"] = "true";
+		} else if(strncmp(name, "-", 1)==0) {
 			name++;
 			i++;
 			if(i>=argc) return false;
