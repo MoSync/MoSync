@@ -1764,7 +1764,7 @@ namespace Base
 			// the background during the time the maTextBox is running.
 			MAEvent event;
 			event.type = EVENT_TYPE_FOCUS_LOST;
-			event.data = NULL;
+			event.data = 0;
 			Base::gSyscall->postEvent(event);
 
 			// Get the two first parameters of the IOCtl function

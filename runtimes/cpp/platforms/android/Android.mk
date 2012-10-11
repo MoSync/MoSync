@@ -47,6 +47,6 @@ ifeq ($(ANDROID_API_BELOW_7),true)
 else
 	LOCAL_LDLIBS	:= -L$(SYSROOT)/usr/lib -llog -lGLESv1_CM -lGLESv2
 endif
-LOCAL_CFLAGS	+= -DFPM_ARM
+LOCAL_CFLAGS	+= -DFPM_ARM -Wno-psabi
 
 include $(BUILD_SHARED_LIBRARY)
