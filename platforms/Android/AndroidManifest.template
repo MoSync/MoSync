@@ -130,6 +130,8 @@
 {{/sms:read}}{{#sms:send}}		<uses-permission android:name="android.permission.SEND_SMS" />
 {{/sms:send}}{{#sms:receive}}		<uses-permission android:name="android.permission.RECEIVE_SMS" />
 {{/sms:receive}}{{#camera}}		<uses-permission android:name="android.permission.CAMERA" />
+		<uses-feature android:name="android.hardware.camera"/>
+		<uses-feature android:name="android.hardware.camera.autofocus"/>
 {{/camera}}{{#home-screen}}		<uses-permission android:name="android.permission.GET_TASKS" />
 		<uses-permission android:name="android.permission.SET_WALLPAPER" />
 		<uses-permission android:name="android.permission.SET_WALLPAPER_HINTS" />
