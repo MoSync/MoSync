@@ -737,7 +737,9 @@ namespace Base {
 	SYSCALL(int, maGetDataSize(MAHandle data)) {
 		Stream* b = SYSCALL_THIS->resources.get_RT_BINARY(data);
 		int len;
-		DEBUG_ASSERT(b->length(len));
+		bool res = b->length(len);
+		DEBUG_ASSERT(res);
+		//DEBUG_ASSERT(b->length(len));
 		return len;
 	}
 	SYSCALL(void, maReadData(MAHandle data, void* dst, int offset, int size)) {

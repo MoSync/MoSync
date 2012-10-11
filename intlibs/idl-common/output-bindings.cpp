@@ -167,6 +167,8 @@ static void lua_streamHeaderFunctions(
 			continue;
 		}
 
+		stream << f.comment;
+
 		stream << cType(inf, f.returnType);
 
 		stream << " " << f.name << "(";
@@ -195,7 +197,7 @@ static void lua_streamHeaderFunctions(
 		//if (f.isIOCtl)
 		//	stream << " MA_IOCTL_ELLIPSIS";
 
-		stream << ");\n";
+		stream << ");\n\n";
 	}
 
 	stream << "// End of header functions.\n";
@@ -208,6 +210,8 @@ static void lua_streamIoctlFunction(
 	const string& ioctlName)
 {
 	string tempVars;
+
+	stream << f.comment;
 
 	stream << f.returnType << " " << f.name << "(";
 
@@ -268,7 +272,7 @@ static void lua_streamIoctlFunction(
 		stream << " " << a.name;
 
 	}	//args
-	stream << ");\n";
+	stream << ");\n\n";
 }
 
 static void lua_streamIoctls(
@@ -434,7 +438,8 @@ static void lua_streamConstants(
 			const Constant& c(cs.constants[j]);
 			if (c.ix == ix)
 			{
-				stream << "#define " << cs.name << c.name << " " << c.value << "\n";
+				stream << c.comment;
+				stream << "#define " << cs.name << c.name << " " << c.value << "\n\n";
 			}
 		}
 	}
