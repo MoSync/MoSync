@@ -2410,7 +2410,6 @@ static int maBringToForeground() {
 //------------------------------------------------------------------------------
 #if defined(SUPPORT_MOSYNC_SERVER) && !defined(__S60_50__)
 int Syscall::maLocationStart() {
-	LOG("maLocationStart()\n");
 	if(gLocationSync->IsActive())
 		return 0;
 	gServer.LocationGet(*gLocationSync->Status());
@@ -2420,15 +2419,12 @@ int Syscall::maLocationStart() {
 
 int Syscall::maLocationStop() {
 	int res = gServer.LocationStop();	//silent fail
-	LOG("LocationStop: %i\n", res);
 	if(gLocationSync)
 		gLocationSync->Cancel();
-	LOG("maLocationStop done.\n");
 	return res;
 }
 
 void Syscall::LocationHandlerL(TInt status) {
-	LOG("LocationHandlerL(%i)\n", status);
 	//not so good; will fail silently.
 	if(IS_SYMBIAN_ERROR(status))
 		return;
@@ -2461,7 +2457,6 @@ static double swapd(double d) {
 
 void Syscall::AddLocationEvent(const TPosition& p) {
 	MALocation* loc = new MALocation;
-	LOG("lat: %g\n", p.Latitude());
 	loc->state = p.Datum() == KPositionDatumWgs84 ?
 		MA_LOC_QUALIFIED : MA_LOC_INVALID;
 	loc->lat = swapd(p.Latitude());
@@ -2482,7 +2477,6 @@ void Syscall::AddLocationEvent(const TPosition& p) {
 
 #ifdef __S60_50__
 int Syscall::maLocationStart() {
-	LOG("maLocationStart()\n");
 	if(gLocationSync->IsActive())
 		return 0;
 
@@ -2500,14 +2494,12 @@ int Syscall::maLocationStart() {
 }
 
 int Syscall::maLocationStop() {
-	LOG("maLocationStop()\n");
 	if(gLocationSync) {
 		if(gLocationSync->IsActive())
 			TSNR(gPositioner.CancelRequest(EPositionerNotifyPositionUpdate));
 		gPositioner.Close();
 		gPositionServer.Close();
 	}
-	LOG("maLocationStop done.\n");
 	return 0;
 }
 
