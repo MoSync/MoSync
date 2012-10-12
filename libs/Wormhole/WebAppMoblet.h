@@ -30,6 +30,9 @@ MA 02110-1301, USA.
  *
  * @brief High-level moblet that has a WebView and supports
  * communication between a JavaScript and C++.
+ *
+ * Class WebAppMoblet is deprecated. For new applications,
+ * use class HybridMoblet.
  */
 
 #ifndef WORMHOLE_WEB_APP_MOBLET_H_
@@ -51,6 +54,7 @@ namespace Wormhole
 	class WebAppMoblet_WebViewListener;
 
 	/**
+	 * @deprecated For new applications, use class HybridMoblet.
 	 * \brief A Moblet with additional functionality that allows easier interaction with
 	 * JavaScript code. It provides a wormhole-enabled WebView, methods to extract and load
 	 * your HTML files and JavaScript code, and a structure for communicating with your JS

@@ -18,6 +18,8 @@ MA 02110-1301, USA.
 package com.mosync.nativeui.ui.widgets;
 
 import java.lang.reflect.Method;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 
 import android.util.Log;
 import android.widget.DatePicker;
@@ -45,6 +47,10 @@ public class DatePickerWidget extends Widget {
 	public static Method mDatePicker_getMinDate = null;
 	public static Method mDatePicker_setMaxDate = null;
 	public static Method mDatePicker_setMinDate = null;
+
+	// Default min and max dates.
+	GregorianCalendar mMinDate = new GregorianCalendar(1900,1,1);
+	GregorianCalendar mMaxDate = new GregorianCalendar(2100,11,31);
 
 	// Static initializer , which does the methods lookup.
 	static {
@@ -100,12 +106,27 @@ public class DatePickerWidget extends Widget {
 
 	/**   Wrap the new methods.   */
 
-	private void setMaxDate(DatePicker datePicker, long maxValue)
-			throws FeatureNotAvailableException
+	private void setMaxDate(DatePicker datePicker)
+			throws FeatureNotAvailableException, IllegalArgumentException
 	{
+		long mMaxDateInMillis;
+		mMaxDateInMillis = mMaxDate.getTimeInMillis();
+		setMaxDate(datePicker, mMaxDateInMillis);
+	}
+
+	private void setMinDate(DatePicker datePicker)
+			throws FeatureNotAvailableException, IllegalArgumentException
+	{
+		long mMinDateInMillis;
+		mMinDateInMillis = mMinDate.getTimeInMillis();
+		setMinDate(datePicker, mMinDateInMillis);
+	}
+
+	private void setMaxDate(DatePicker datePicker, long maxValue)
+			throws FeatureNotAvailableException {
 		try {
 			mDatePicker_setMaxDate.invoke(datePicker, maxValue);
-		} catch (Exception ex){
+		} catch (Exception ex) {
 			throw new FeatureNotAvailableException("setMaxDate");
 		}
 	}
@@ -138,7 +159,7 @@ public class DatePickerWidget extends Widget {
 	{
 		long result = 0;
 		try {
-			result = (Long) mDatePicker_getMaxDate.invoke(datePicker,
+			result = (Long) mDatePicker_getMinDate.invoke(datePicker,
 					(Object[]) null);
 			return result;
 		} catch (Exception ex) {
@@ -226,6 +247,72 @@ public class DatePickerWidget extends Widget {
 			// It will throw further the FeatureNotAvailableException on older devices.
 			setMinDate(datePicker, LongConverter.convert(value));
 		}
+		else if(property.equals(IX_WIDGET.MAW_DATE_PICKER_MAX_DATE_YEAR) )
+		{
+			mMaxDate.set(Calendar.YEAR, IntConverter.convert(value));
+			try{
+				setMaxDate(datePicker);
+			}catch(IllegalArgumentException iae)
+			{
+				throw new InvalidPropertyValueException(
+						IX_WIDGET.MAW_DATE_PICKER_MAX_DATE_YEAR, value);
+			}
+		}
+		else if(property.equals(IX_WIDGET.MAW_DATE_PICKER_MAX_DATE_MONTH) )
+		{
+			mMaxDate.set(Calendar.MONTH, IntConverter.convert(value)-1);
+			try{
+				setMaxDate(datePicker);
+			}catch(IllegalArgumentException iae)
+			{
+				throw new InvalidPropertyValueException(
+						IX_WIDGET.MAW_DATE_PICKER_MAX_DATE_MONTH, value);
+			}
+		}
+		else if(property.equals(IX_WIDGET.MAW_DATE_PICKER_MAX_DATE_DAY) )
+		{
+			mMaxDate.set(Calendar.DAY_OF_MONTH, IntConverter.convert(value));
+			try{
+				setMaxDate(datePicker);
+			}catch(IllegalArgumentException iae)
+			{
+				throw new InvalidPropertyValueException(
+						IX_WIDGET.MAW_DATE_PICKER_MAX_DATE_DAY, value);
+			}
+		}
+		else if(property.equals(IX_WIDGET.MAW_DATE_PICKER_MIN_DATE_YEAR) )
+		{
+			mMinDate.set(Calendar.YEAR, IntConverter.convert(value));
+			try{
+				setMinDate(datePicker);
+			}catch(IllegalArgumentException iae)
+			{
+				throw new InvalidPropertyValueException(
+						IX_WIDGET.MAW_DATE_PICKER_MIN_DATE_YEAR, value);
+			}
+		}
+		else if(property.equals(IX_WIDGET.MAW_DATE_PICKER_MIN_DATE_MONTH) )
+		{
+			mMinDate.set(Calendar.MONTH, IntConverter.convert(value)-1);
+			try{
+				setMinDate(datePicker);
+			}catch(IllegalArgumentException iae)
+			{
+				throw new InvalidPropertyValueException(
+						IX_WIDGET.MAW_DATE_PICKER_MIN_DATE_MONTH, value);
+			}
+		}
+		else if(property.equals(IX_WIDGET.MAW_DATE_PICKER_MIN_DATE_DAY) )
+		{
+			mMinDate.set(Calendar.DAY_OF_MONTH, IntConverter.convert(value));
+			try{
+				setMinDate(datePicker);
+			}catch(IllegalArgumentException iae)
+			{
+				throw new InvalidPropertyValueException(
+						IX_WIDGET.MAW_DATE_PICKER_MIN_DATE_DAY, value);
+			}
+		}
 		else
 		{
 			return false;
@@ -266,6 +353,30 @@ public class DatePickerWidget extends Widget {
 		{
 			// Throws FeatureNotAvailableException on older devices.
 			return Long.toString( getMinDate(datePicker) );
+		}
+		else if(property.equals(IX_WIDGET.MAW_DATE_PICKER_MAX_DATE_YEAR) )
+		{
+			return String.valueOf(mMaxDate.get(Calendar.YEAR));
+		}
+		else if(property.equals(IX_WIDGET.MAW_DATE_PICKER_MAX_DATE_MONTH) )
+		{
+			return String.valueOf(mMaxDate.get(Calendar.MONTH) +1);
+		}
+		else if(property.equals(IX_WIDGET.MAW_DATE_PICKER_MAX_DATE_DAY) )
+		{
+			return String.valueOf(mMaxDate.get(Calendar.DAY_OF_MONTH));
+		}
+		else if(property.equals(IX_WIDGET.MAW_DATE_PICKER_MIN_DATE_YEAR) )
+		{
+			return String.valueOf(mMinDate.get(Calendar.YEAR));
+		}
+		else if(property.equals(IX_WIDGET.MAW_DATE_PICKER_MIN_DATE_MONTH) )
+		{
+			return String.valueOf(mMinDate.get(Calendar.MONTH) +1);
+		}
+		else if(property.equals(IX_WIDGET.MAW_DATE_PICKER_MIN_DATE_DAY) )
+		{
+			return String.valueOf(mMinDate.get(Calendar.DAY_OF_MONTH));
 		}
 		else
 		{

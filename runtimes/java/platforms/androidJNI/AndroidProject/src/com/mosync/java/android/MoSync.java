@@ -227,10 +227,11 @@ public class MoSync extends Activity
     protected void onStop()
 	{
 		Log.i("MoSync", "onStop");
-		mMoSyncThread.releaseHardware();
 		super.onStop();
 
 		if (theMoSyncThreadIsDead()) { return ; }
+
+		mMoSyncThread.releaseHardware();
 	}
 
 	@Override
@@ -264,16 +265,15 @@ public class MoSync extends Activity
     protected void onPause()
 	{
 		Log.i("MoSync", "onPause");
-
-		// TODO: Why is this done before super.onPause()?
-		// Move to after super.onPause() if not need to call before it.
-		mMoSyncThread.releaseHardware();
-
 		super.onPause();
+
+
 
 		if (theMoSyncThreadIsDead()) { return ; }
 
 		mMoSyncThread.onPause();
+		//Moved the release hardware to the correct position seems to solve the problem.
+		mMoSyncThread.releaseHardware();
 
 		if (nfcForegroundHandler != null) {
 			nfcForegroundHandler.disableForeground();
@@ -282,6 +282,7 @@ public class MoSync extends Activity
 		// Notify the local notifications manager that the application
 		// has lost focus.
 		LocalNotificationsManager.focusLost();
+
 
 		SYSLOG("Posting EVENT_TYPE_FOCUS_LOST to MoSync");
 		int[] event = new int[1];
@@ -305,6 +306,7 @@ public class MoSync extends Activity
 		Log.i("MoSync", "onDestroy");
 
 		super.onDestroy();
+
 
 		// Tell the MoSync thread to do cleanup.
 		mMoSyncThread.onDestroy();

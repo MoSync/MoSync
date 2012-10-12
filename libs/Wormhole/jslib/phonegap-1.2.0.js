@@ -530,7 +530,13 @@ PhoneGap.onDeviceReady = new PhoneGap.Channel('onDeviceReady');
 
 
 // Array of channels that must fire before "deviceready" is fired
-PhoneGap.deviceReadyChannelsArray = [ PhoneGap.onPhoneGapReady, PhoneGap.onPhoneGapInfoReady, PhoneGap.onPhoneGapConnectionReady];
+// MOSYNC: Added PhoneGap.onNativeReady to channels array to fix
+// bug that caused onDeviceReady to fire too early.
+PhoneGap.deviceReadyChannelsArray = [
+	PhoneGap.onPhoneGapReady,
+	PhoneGap.onPhoneGapInfoReady,
+	PhoneGap.onPhoneGapConnectionReady,
+	PhoneGap.onNativeReady];
 
 // Hashtable of user defined channels that must also fire before "deviceready" is fired
 PhoneGap.deviceReadyChannelsMap = {};
