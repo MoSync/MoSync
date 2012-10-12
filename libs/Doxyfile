@@ -17,7 +17,7 @@
 # The PROJECT_NAME tag is a single word (or a sequence of words surrounded
 # by quotes) that should identify the project.
 
-PROJECT_NAME           = "MoSync 3.1.1"
+PROJECT_NAME           = "MoSync 3.2"
 
 
 # The PROJECT_NUMBER tag can be used to enter a project or revision number.
