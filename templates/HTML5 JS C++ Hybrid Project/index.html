@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <!--
 * @file index.html
-* @author Ali Sarrafi
 *
-* Template application that shows how to send custom messages to C++.
+* Template application that shows how to send custom messages to C++
+* using the HybridMoblet class. The C++ support code is implemented
+* in file main.cpp.
 -->
 <html>
 	<head>
@@ -13,24 +14,6 @@
 		<link rel="stylesheet" href="style.css" type="text/css" media="screen" title="no title" charset="utf-8">
 		<script type="text/javascript" charset="utf-8" src="js/wormhole.js"></script>
 		<script type="text/javascript">
-			/**
-			 * Initialization.
-			 */
-			function initialize()
-			{
-				document.addEventListener("deviceready", displayDeviceInfo, true);
-				document.addEventListener("backbutton", close, true);
-			}
-
-			/**
-			 * Handle the backbutton event.
-			 */
-			function close()
-			{
-				// Close the application if the back key is pressed.
-				mosync.bridge.send(["close"]);
-			}
-
 			/**
 			 * Displays the device information on the screen.
 			 */
@@ -45,19 +28,11 @@
 			}
 
 			/**
-			 * Vibrate for 1 second.
+			 * Vibrate device.
 			 */
 			function vibrate()
 			{
-				// Send message to C++ to make device vibrate.
-				// We use the JSON format. The message will
-				// be delivered to C++ in a JSON array.
-				mosync.bridge.sendJSON(
-				{
-					"messageName":"Custom",
-					"command":"vibrate",
-					"duration":1000
-				});
+				mosync.bridge.send(["Custom", "Vibrate", "500"]);
 			}
 
 			/**
@@ -67,13 +42,26 @@
 			{
 				// Send message to C++ to make device beep.
 				// Here we used the string stream format.
-				mosync.bridge.send(["Custom", "beep"]);
+				mosync.bridge.send(["Custom", "Beep"]);
 			}
 
 			/**
-			 * Change page background to random color.
+			 * "Dry-run" the ability to call JS in another WebView.
+			 * Note that we call back into this very same WebView,
+			 * just for testing purposes. This is useful in a NativeUI
+			 * app that has multiple WebViews that need to communicate.
 			 */
 			function changeColor()
+			{
+				mosync.nativeui.callJS(
+					mosync.nativeui.MAIN_WEBVIEW,
+					"performChangeColor()");
+			}
+
+			/**
+			 * Change page background to a random color.
+			 */
+			function performChangeColor()
 			{
 				var color = "#" +
 					(Math.random() * 0xFFFFFF + 0x1000000)
@@ -81,9 +69,24 @@
 				document.documentElement.style.backgroundColor = color;
 				document.body.style.backgroundColor = color;
 			}
+
+			// Register event listeners.
+
+			// The "deviceready" event is sent when the system
+			// has finished loading.
+			document.addEventListener(
+				"deviceready",
+				displayDeviceInfo,
+				true);
+
+			// Close the application when the back key is pressed.
+			document.addEventListener(
+				"backbutton",
+				function() { mosync.app.exit(); },
+				true);
 		</script>
 	</head>
-	<body onload="initialize();">
+	<body>
 		<div id="screen">
 			<div class="pane" id="heading">Customized Wormhole Technology</div>
 			<div class="pane" id="info">
@@ -94,9 +97,9 @@
 				<div class="infoItem">Width: <span id="width">&nbsp;</span></div>
 				<div class="infoItem">Height: <span id="height">&nbsp;</span></div>
 			</div>
-			<div class="pane button" onclick="vibrate();">Vibrate</div>
-			<div class="pane button" onclick="beep();">Beep</div>
-			<div class="pane button" onclick="changeColor();">Change Color</div>
+			<div class="pane button" onclick="vibrate()">Vibrate</div>
+			<div class="pane button" onclick="beep()">Beep</div>
+			<div class="pane button" onclick="changeColor()">Change Color</div>
 		</div>
 	</body>
 </html>
