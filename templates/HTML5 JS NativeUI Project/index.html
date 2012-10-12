@@ -11,24 +11,6 @@
 	<script type="text/javascript" charset="utf-8" src="js/wormhole.js"></script>
 	<script type="text/javascript">
 		/**
-		 * Initialization.
-		 */
-		function initialize()
-		{
-			document.addEventListener("backbutton", close, true);
-			mosync.nativeui.initUI();
-		}
-
-		/**
-		 * Handle the backbutton event.
-		 */
-		function close()
-		{
-			// Close the application if the back key is pressed.
-			mosync.bridge.send(["close"]);
-		}
-
-		/**
 		 * Called by the NativeUI library when the UI is ready to
 		 * be shown. Show the main screen here.
 		 *
@@ -88,14 +70,30 @@
 			++clickCounter;
 			label.setProperty("text", "No. of clicks: " + clickCounter);
 		}
+
+		// Register event listeners.
+
+		// The "deviceready" event is sent when the system
+		// has finished loading. Here we initialise the UI.
+		document.addEventListener(
+			"deviceready",
+			function() { mosync.nativeui.initUI(); },
+			true);
+
+		// Close the application when the back key is pressed.
+		document.addEventListener(
+			"backbutton",
+			function() { mosync.app.exit(); },
+			true);
 	</script>
 </head>
 
-<body onload="initialize()">
+<body>
 	<!-- All of the mosync.nativeui widgets should be wraped inside a
 		tag with id="NativeUI" -->
 	<div id="NativeUI">
-		<!-- The element with id="mainScreen" has two tabs with screens -->
+		<!-- The element with id="mainScreen" contains the main UI screen.
+			In this app the main screen has two tabs with screens. -->
 		<div data-widgetType="TabScreen" id="mainScreen">
 			<!-- First Screen -->
 			<div data-widgetType="Screen" id="widgetScreen" data-title="Widgets"
@@ -112,7 +110,7 @@
 						data-onevent="counterButtonClicked()">
 					</div>
 					<div data-widgetType="Button" id="vibrateButton"
-						data-width="100%" data-text="Vibrate"  data-fontSize="20">
+						data-width="100%" data-text="Vibrate" data-fontSize="20">
 					</div>
 				</div>
 			</div>
@@ -121,7 +119,8 @@
 				data-icon_android="img/Android_TabIconWebView.png"
 				data-icon_iOS="img/IOS_TabIconWebView.png">
 				<div data-widgetType="WebView" id="webBrowser"
-					data-width="100%" data-height="100%" data-url="http://www.google.com">
+					data-width="100%" data-height="100%"
+					data-url="http://www.google.com">
 				</div>
 			</div>
 		</div>
