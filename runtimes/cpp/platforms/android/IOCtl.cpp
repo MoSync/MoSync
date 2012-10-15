@@ -2458,7 +2458,7 @@ namespace Base
 		if (methodID == 0)
 			return 0;
 
-		jint result = jNIEnv->CallIntMethod(jThis, methodID, ndefRecordHandle, fixedDst, len);
+		jint result = jNIEnv->CallIntMethod(jThis, methodID, tagHandle, fixedDst, len);
 
 		return result;
 	}

@@ -9285,7 +9285,7 @@ group NFCAPI "NFC API" {
 		* \param tag The tag to read from.
                 * \param dst Where the result should be written to.
                 * \param len The maximum length to write.
-		* \return The length written.
+		* \return The number of bytes of the id.
 		*/
 		int maNFCGetId(in MAHandle tag, out MAAddress dst, in int len);
 

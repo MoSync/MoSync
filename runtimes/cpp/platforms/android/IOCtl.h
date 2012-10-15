@@ -800,6 +800,8 @@ namespace Base
 
 	int _maNFCGetSize(MAHandle tagHandle, JNIEnv* jNIEnv, jobject jThis);
 
+	int _maNFCGetId(MAHandle tagHandle, int dst, int len, int memStart, JNIEnv* jNIEnv, jobject jThis);
+
 	int _maNFCReadNDEFMessage(MAHandle tag, JNIEnv* jNIEnv, jobject jThis);
 
 	int _maNFCWriteNDEFMessage(MAHandle tag, MAHandle ndefMessage, JNIEnv* jNIEnv, jobject jThis);
