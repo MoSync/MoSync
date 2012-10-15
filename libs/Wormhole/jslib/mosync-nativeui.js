@@ -1310,6 +1310,30 @@ mosync.nativeui.getElementById = function(elementID)
 };
 
 /**
+ * Constant to be used to reference the main WebView in an app
+ * when calling mosync.nativeui.callJS().
+ */
+mosync.nativeui.MAIN_WEBVIEW = 0;
+
+/**
+ * Evaluate JavaScript code in another WebView. This provides a
+ * way to pass messages and communicate between WebViews.
+ *
+ * @param webViewHandle The MoSync handle of the WebView widget.
+ * Use mosync.nativeui.MAIN_WEBVIEW to refer to the main WebView
+ * in the application (this is the hidden WebView in a JavaScript
+ * NativeUI app).
+ * @param script A string with JavaScript code.
+ */
+mosync.nativeui.callJS = function(webViewHandle, script)
+{
+	mosync.bridge.send([
+		"CallJS",
+		"" + webViewHandle,
+		script]);
+};
+
+/**
  * An internal function that returns the correct property name Used to overcome
  * case sensitivity problems in browsers.
  *
@@ -1669,26 +1693,12 @@ mosync.nativeui.initUI = function() {
 	return true;
 };
 
-/*
+/**
  * Store the screen size information coming from MoSync
- * in the mosync.nativeui namespace.
+ * in the mosync.nativeui namespace. This function is
+ * called from C++.
  */
-if (typeof mosyncScreenWidth != "undefined" &&
-	typeof mosyncScreenHeight != "undefined")
-{
-	mosync.nativeui.screenWidth = mosyncScreenWidth;
-	mosync.nativeui.screenHeight = mosyncScreenHeight;
-}
-else
-{
-	try
-	{
-		mosync.nativeui.screenWidth = window.screen.availWidth;
-		mosync.nativeui.screenHeight = window.screen.availHeight;
-	}
-	catch (error)
-	{
-		mosync.nativeui.screenWidth = window.innerWidth;
-		mosync.nativeui.screenHeight = window.innerHeight;
-	}
+mosync.nativeui.setScreenSize = function(width, height) {
+	mosync.nativeui.screenWidth = width;
+	mosync.nativeui.screenHeight = height;
 }

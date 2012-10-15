@@ -49,6 +49,27 @@ var mosync = (function()
 	mosync.isWindowsPhone =
 		navigator.userAgent.indexOf("Windows Phone OS") != -1;
 
+	// Application functions.
+
+	mosync.app = {};
+
+	/**
+	 * Exit the application.
+	 * Supported on Android. Not supported on iOS.
+	 */
+	mosync.app.exit = function()
+	{
+		mosync.bridge.send(["MoSync", "ExitApplication"]);
+	}
+
+	/**
+	 * Send application to background.
+	 */
+	mosync.app.sendToBackground = function()
+	{
+		mosync.bridge.send(["MoSync", "SendToBackground"]);
+	}
+
 	// Alerts and logging.
 
 	mosync.notification = {};
@@ -503,3 +524,14 @@ var mosync = (function()
 	// Return the library object.
 	return mosync;
 })();
+
+// Send OpenWormhole message to C++ when document is loaded.
+document.addEventListener(
+	"DOMContentLoaded",
+	function()
+	{
+		// This signals that the document is loaded and Wormhole
+		// is ready be initialized.
+		mosync.bridge.send(["MoSync", "OpenWormhole"]);
+	},
+	false);
