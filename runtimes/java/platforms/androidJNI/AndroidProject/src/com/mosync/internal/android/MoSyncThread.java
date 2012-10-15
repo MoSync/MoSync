@@ -5230,6 +5230,10 @@ public class MoSyncThread extends Thread
 		return mMoSyncNFC == null ? IOCTL_UNAVAILABLE : mMoSyncNFC.maNFCGetSize(tagHandle);
 	}
 
+	public int maNFCGetId(int tagHandle, int dst, int len) {
+		return mMoSyncNFC == null ? IOCTL_UNAVAILABLE : mMoSyncNFC.maNFCGetId(tagHandle, dst, len);
+	}
+
 	void maNFCConnectTag(int tagHandle) {
 		if (mMoSyncNFC != null) {
 			mMoSyncNFC.maNFCConnectTag(tagHandle);

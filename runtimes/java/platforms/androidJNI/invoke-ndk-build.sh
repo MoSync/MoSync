@@ -26,4 +26,4 @@ echo "Build library!"
 
 cd $MOSYNC_JAVA_SRC/AndroidProject/jni
 
-$ANDROID_NDK_PATH/ndk-build -B
+/Users/mattias/development/android-ndk-r8b/ndk-build -B

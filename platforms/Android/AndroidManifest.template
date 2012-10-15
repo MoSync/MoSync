@@ -53,7 +53,7 @@
 %%
 %%={{ }}%%<?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-	package="com.mosync.app_WormholeDemo"
+	package="{{package-name}}"
 	android:versionCode="{{version-code}}"
 	android:versionName="{{version}}"{{#sdk-version-8}}
 	android:installLocation="{{install-location}}"{{/sdk-version-8}}

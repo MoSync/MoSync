@@ -2537,6 +2537,15 @@ namespace Base
 		case maIOCtl_maNFCGetSize:
 			return _maNFCGetSize(a, mJNIEnv, mJThis);
 
+			case maIOCtl_maNFCGetId:
+				return _maNFCGetId(
+					a,
+					(int) SYSCALL_THIS->GetValidatedMemRange( b, c * sizeof(byte)),
+					c,
+					(int)gCore->mem_ds,
+					mJNIEnv,
+					mJThis);
+
 		case maIOCtl_maNFCGetNDEFMessage:
 			return _maNFCGetNDEFMessage(a, mJNIEnv, mJThis);
 

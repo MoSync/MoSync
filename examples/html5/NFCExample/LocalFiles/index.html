@@ -99,6 +99,11 @@ function updateInfo(icon, info) {
 	infoIcon.src = "images/" + icon + ".png";
 }
 
+function updateTagId(tagId) {
+    var tagIdElem = document.getElementById("TagId");
+    tagIdElem.innerHTML = tagId;
+}
+
 </script>
 </head>
 
@@ -130,6 +135,8 @@ Write vCard &gt;&nbsp;&nbsp;
 </div>
 <div id="InfoBoxContents">
 &lt;No messages yet&gt;
+</div>
+<div id="TagId" style="font-weight: bold; color: #999;">
 </div>
 <div class="spacer"></div>
 </div>
