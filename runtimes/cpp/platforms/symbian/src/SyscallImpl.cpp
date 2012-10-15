@@ -2439,30 +2439,18 @@ void Syscall::LocationHandlerL(TInt status) {
 #endif	//SUPPORT_MOSYNC_SERVER && !__S60_50__
 
 #if defined(SUPPORT_MOSYNC_SERVER) || defined(__S60_50__)
-
-//quick hack
-union DV {
-	int i[2];
-	double dbl;
-};
-
-static double swapd(double d) {
-	DV dv1;
-	dv1.dbl = d;
-	DV dv2;
-	dv2.i[0] = dv1.i[1];
-	dv2.i[1] = dv1.i[0];
-	return dv2.dbl;
-}
-
 void Syscall::AddLocationEvent(const TPosition& p) {
 	MALocation* loc = new MALocation;
 	loc->state = p.Datum() == KPositionDatumWgs84 ?
 		MA_LOC_QUALIFIED : MA_LOC_INVALID;
-	loc->lat = swapd(p.Latitude());
-	loc->lon = swapd(p.Longitude());
-	loc->horzAcc = swapd(p.HorizontalAccuracy());
-	loc->vertAcc = swapd(p.VerticalAccuracy());
+	//LOG("lat: %g\n", p.Latitude());
+	//LOG("hrz: %g\n", p.HorizontalAccuracy());
+	//LOG("vrt: %g\n", p.VerticalAccuracy());
+	//LOG("alt: %g\n", p.Altitude());
+	loc->lat = p.Latitude();
+	loc->lon = p.Longitude();
+	loc->horzAcc = p.HorizontalAccuracy();
+	loc->vertAcc = p.VerticalAccuracy();
 	loc->alt = p.Altitude();
 
 	MAEvent e;

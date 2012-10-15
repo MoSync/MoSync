@@ -8,16 +8,16 @@
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
 // are met:
-// 
-// 1. Redistributions of source code must retain the above copyright 
-//    notice, this list of conditions and the following disclaimer.  
+//
+// 1. Redistributions of source code must retain the above copyright
+//    notice, this list of conditions and the following disclaimer.
 // 2. Redistributions in binary form must reproduce the above copyright
 //    notice, this list of conditions and the following disclaimer in the
-//    documentation and/or other materials provided with the distribution.  
+//    documentation and/or other materials provided with the distribution.
 // 3. Neither the name of the project nor the names of its contributors
 //    may be used to endorse or promote products derived from this software
-//    without specific prior written permission. 
-// 
+//    without specific prior written permission.
+//
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 // ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
 // IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -27,9 +27,9 @@
 // OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
 // HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
 // LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
-// OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF 
+// OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 // SUCH DAMAGE.
-// 
+//
 
 //#include <sys/types.h>
 #include "maarg.h"
@@ -72,25 +72,25 @@ static wchar *cvt(double arg, int ndigits, int *decpt, int *sign, wchar *buf, in
   arg = modf(arg, &fi);
   p1 = &buf[CVTBUFSIZE];
 
-  if (fi != 0) 
+  if (fi != 0)
   {
     p1 = &buf[CVTBUFSIZE];
-    while (fi != 0) 
+    while (fi != 0)
     {
       fj = modf(fi / 10, &fi);
       *--p1 = (int)((fj + .03) * 10) + '0';
       r2++;
-	/** 
+	/**
 		\bug Some large doubles seem to generate errors on MosyncLib here.
 		do a check for now.
 	*/
 	  if(r2>=CVTBUFSIZE) break;
     }
     while (p1 < &buf[CVTBUFSIZE]) *p++ = *p1++;
-  } 
+  }
   else if (arg > 0)
   {
-    while ((fj = arg * 10) < 1) 
+    while ((fj = arg * 10) < 1)
     {
       arg = fj;
       r2--;
@@ -99,7 +99,7 @@ static wchar *cvt(double arg, int ndigits, int *decpt, int *sign, wchar *buf, in
   p1 = &buf[ndigits];
   if (eflag == 0) p1 += r2;
   *decpt = r2;
-  if (p1 < &buf[0]) 
+  if (p1 < &buf[0])
   {
     buf[0] = '\0';
     return buf;
@@ -110,23 +110,23 @@ static wchar *cvt(double arg, int ndigits, int *decpt, int *sign, wchar *buf, in
     arg = modf(arg, &fj);
     *p++ = (int) fj + '0';
   }
-  if (p1 >= &buf[CVTBUFSIZE]) 
+  if (p1 >= &buf[CVTBUFSIZE])
   {
     buf[CVTBUFSIZE - 1] = '\0';
     return buf;
   }
   p = p1;
   *p1 += 5;
-  while (*p1 > '9') 
+  while (*p1 > '9')
   {
     *p1 = '0';
     if (p1 > buf)
       ++*--p1;
-    else 
+    else
     {
       *p1 = '1';
       (*decpt)++;
-      if (eflag == 0) 
+      if (eflag == 0)
       {
         if (p > buf) *p = '0';
         p++;
@@ -186,7 +186,7 @@ static wchar *number(wchar *str, long num, int base, int size, int precision, in
   if (type & LARGE)  dig = upper_digits;
   if (type & LEFT) type &= ~ZEROPAD;
   if (base < 2 || base > 36) return 0;
-  
+
   c = (type & ZEROPAD) ? '0' : ' ';
   sign = 0;
   if (type & SIGN)
@@ -234,7 +234,7 @@ static wchar *number(wchar *str, long num, int base, int size, int precision, in
   size -= precision;
   if (!(type & (ZEROPAD | LEFT))) while (size-- > 0) *str++ = ' ';
   if (sign) *str++ = sign;
-  
+
   if (type & SPECIAL)
   {
     if (base == 8)
@@ -286,19 +286,19 @@ static wchar *iaddr(wchar *str, wchar *addr, int size, int type)
   {
     if (i != 0) tmp[len++] = '.';
     n = addr[i];
-    
+
     if (n == 0)
       tmp[len++] = digits[0];
     else
     {
-      if (n >= 100) 
+      if (n >= 100)
       {
         tmp[len++] = digits[n / 100];
         n = n % 100;
         tmp[len++] = digits[n / 10];
         n = n % 10;
       }
-      else if (n >= 10) 
+      else if (n >= 10)
       {
         tmp[len++] = digits[n / 10];
         n = n % 10;
@@ -439,7 +439,7 @@ static void forcdecpt(wchar *buffer)
   if (*buffer)
   {
     int n = wcslen(buffer);
-    while (n > 0) 
+    while (n > 0)
     {
       buffer[n + 1] = buffer[n];
       n--;
@@ -474,6 +474,14 @@ static wchar *flt(wchar *str, double num, int size, int precision, wchar fmt, in
   wchar tmp[80];
   wchar c, sign;
   int n, i;
+
+	if(isnan(num)) {
+		//wcscpy(str, L"NaN");
+		*(str++) = 'N';
+		*(str++) = 'a';
+		*(str++) = 'N';
+		return str;
+	}
 
   // Left align means no zero padding
   if (flags & LEFT) flags &= ~ZEROPAD;
@@ -552,7 +560,7 @@ int wvsprintf(wchar *buf, const wchar *fmt, va_list args)
       *str++ = *fmt;
       continue;
     }
-                  
+
     // Process flags
     flags = 0;
 repeat:
@@ -565,7 +573,7 @@ repeat:
       case '#': flags |= SPECIAL; goto repeat;
       case '0': flags |= ZEROPAD; goto repeat;
     }
-          
+
     // Get field width
     field_width = -1;
     if (is_digit(*fmt))
@@ -585,7 +593,7 @@ repeat:
     precision = -1;
     if (*fmt == '.')
     {
-      ++fmt;    
+      ++fmt;
       if (is_digit(*fmt))
         precision = skip_atoi(&fmt);
       else if (*fmt == '*')
@@ -755,7 +763,7 @@ int wlprintfln(const wchar* fmt, ...)
 	char buf8[BUFLEN * MB_LEN_MAX];
 	int len, len8;
 	static int lastWLres = 0;
-	
+
 	if(lastWLres < 0)
 		return lastWLres;
 
