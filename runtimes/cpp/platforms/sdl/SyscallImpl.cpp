@@ -1532,7 +1532,7 @@ namespace Base {
 			SDL_Surface* img = SYSCALL_THIS->resources.extract_RT_IMAGE(handle);
 			gDrawSurface = img;
 #ifdef RESOURCE_MEMORY_LIMIT
-			void* o = (void*)size_RT_IMAGE(img);
+			void* o = (void*)(size_t)size_RT_IMAGE(img);
 #else
 			void* o = NULL;
 #endif
@@ -1629,7 +1629,7 @@ namespace Base {
 		DEBUG_ASSERT(gTimerId == NULL);
 		if(timeout > 0) {
 			//LOGD("Setting timer sequence %i\n", gTimerSequence);
-			gTimerId = SDL_AddTimer(timeout, MATimerCallback, (void*)gTimerSequence);
+			gTimerId = SDL_AddTimer(timeout, MATimerCallback, (void*)(size_t)gTimerSequence);
 			DEBUG_ASSERT(gTimerId != NULL);
 		}
 		while(true) {

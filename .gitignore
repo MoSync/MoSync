@@ -44,6 +44,8 @@ config_platform.h
 
 wormhole.js
 
+LocalFiles.bin*
+
 /*.bat
 
 /ipch/*
