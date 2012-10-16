@@ -45,9 +45,11 @@ namespace MoSync {
 		string mosyncdir = mosyncdir_c;
 
 		string src = iconInstance->filename;
+		string dst = string(dstFilename);
+
 		string extension = getExtension(src);
 
-		if (!fForce && compareTime(src.c_str(), dstFilename) < 0) {
+		if (!fForce && compareTime(src.c_str(), dst.c_str()) < 0) {
 			printf("No need to generate icon, use -force switch to override.\n");
 			return true;
 		}
@@ -55,7 +57,7 @@ namespace MoSync {
 		if(extension == "svg") {
 			ostringstream batik;
 			batik << "java -jar \""<<mosyncdir<<"/bin/Batik/batik-rasterizer.jar\""
-				" \""<<src<<"\" -d \""<<dstFilename<<"\"";
+				" \""<<src<<"\" -d \""<<dst<<"\"";
 			if(size != "default") {
 				unsigned int n;
 				unsigned w, h;
@@ -76,11 +78,11 @@ namespace MoSync {
 	#if defined(WIN32)
 		string magick =
 			"\""+mosyncdir+"\\bin\\ImageMagick\\convert.exe\" \"" + src + "\"" +
-			resizeFlag + " \"" + string(dstFilename) + "\"";
+			resizeFlag + " \"" + dst + "\"";
 	#else
 		string magick =
 		"\""+mosyncdir+"/bin/ImageMagick/convert\" \"" + src + "\"" +
-		resizeFlag + " \"" + string(dstFilename) + "\"";
+		resizeFlag + " \"" + dst + "\"";
 	#endif
 
 		if(run(magick.c_str()) != 0) errorExit("Image Magick failed.");
