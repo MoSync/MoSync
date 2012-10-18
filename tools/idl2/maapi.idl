@@ -9761,6 +9761,7 @@ group NFCAPI "NFC API" {
 		/**
 		 * Executes an SQL statement. If the statement returns a
 		 * query result, a cursor handle is returned.
+		 * If a query result is empty, #MA_DB_OK is returned.
 		 * @param databaseHandle Handle to the database.
 		 * @param sql The SQL statement.
 		 * @return #MA_DB_ERROR on error, #MA_DB_OK on success,
