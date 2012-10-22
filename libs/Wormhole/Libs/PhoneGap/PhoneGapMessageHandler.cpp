@@ -67,10 +67,7 @@ namespace Wormhole
 	 */
 	void PhoneGapMessageHandler::initializePhoneGap()
 	{
-		// Send native ready event to PhoneGap using the lazy version.
-		// This way we allow PhoneGap to initialize itself whenever
-		// it is convenient.
-		callJS("{_nativeReady = true;}");
+		callJS("try{PhoneGap.onNativeReady.fire()}catch(e){_nativeReady = true}");
 	}
 
 	/**

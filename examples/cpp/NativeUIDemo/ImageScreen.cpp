@@ -18,7 +18,8 @@
 #define DEFAULT_IMAGE_INDEX				0
 
 ImageScreenWithButtons::ImageScreenWithButtons() :
-		Screen() {
+		Screen(),
+		mAdsBanner(NULL) {
 	CreateUI();
 }
 
@@ -35,6 +36,8 @@ ImageScreenWithButtons::~ImageScreenWithButtons() {
 
 	for (int i = 0; i < mImages.size(); i++)
 		delete mImages[i];
+
+	delete mAdsBanner;
 }
 
 void ImageScreenWithButtons::CreateUI() {
@@ -97,6 +100,16 @@ void ImageScreenWithButtons::CreateUI() {
 	mImageName->setFontColor(FONT_COLOR);
 
 	mImageNameLayout->addChild(mImageName);
+
+	// add the ads banner to the main layout
+
+	// we need to send the APP ID and the AD ID to the mosync banner constructor
+	// for the windows phone 7 platform (we'll use APP ID = 'test_client' and
+	// AD ID = 'Image480_80' to enable the test mode)
+	mAdsBanner = new Ads::Banner("test_client|Image480_80");
+
+	mAdsBanner->requestContent(true);
+	mMainLayout->addBanner(mAdsBanner);
 
 	mMainLayout->addChild(mImageLayout);
 	mMainLayout->addChild(mImageNameLayout);
