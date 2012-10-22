@@ -25,13 +25,13 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <stdlib.h>
 #include "filelist.h"
 
-/*#ifdef _WIN32_WCE
-	typedef WCHAR* PATH_TYPE;
+#ifdef _WIN32_WCE
+	#define PATH_TYPE WCHAR*
 #else
-	typedef char* PATH_TYPE;
+	#define PATH_TYPE char*
 #endif
 
-static void getFileTime(const PATH_TYPE path, FILETIME* ft);*/
+static void getFileTime(const PATH_TYPE path, FILETIME* ft);
 
 
 int scanDirectory(const char* path, FileListCallback cb) {
@@ -84,9 +84,6 @@ int isDirectory(const char* filename) {
 }
 
 int compareTime(const char* file1, const char* file2) {
-	return 0;
-}
-/*int compareTime(const char* file1, const char* file2) {
 #ifdef _WIN32_WCE
 	WCHAR tfn1[MAX_PATH];
 	WCHAR tfn2[MAX_PATH];
@@ -119,7 +116,7 @@ static void getFileTime(const PATH_TYPE path, FILETIME* ft) {
 		ft->dwHighDateTime = 0;
     }
 	CloseHandle(handle);
-}*/
+}
 
 #ifndef _WIN32_WCE
 char* fullpath(const char* name) {
