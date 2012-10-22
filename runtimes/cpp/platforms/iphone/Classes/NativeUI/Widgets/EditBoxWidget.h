@@ -18,18 +18,59 @@
 #import <Foundation/Foundation.h>
 #import "IWidget.h"
 
-@interface EditBoxWidget : IWidget <UITextFieldDelegate>
+@interface EditBoxWidget : IWidget <UITextFieldDelegate, UITextViewDelegate>
 {
     /**
-     * Native view for the widget.
+     * Edit box mode.
+     * Can be MAW_EDIT_BOX_MODE_SINGLE_LINE or MAW_EDIT_BOX_MODE_MULTI_LINE.
      */
-	UITextField* _textField;
+    int _mode;
+
+    /**
+     * Placeholder for text view.
+     * Only for MAW_EDIT_BOX_MODE_MULTI_LINE mode.
+     */
+    NSString* _placeholder;
+
+    /**
+     * Text font color.
+     * Used mostly for MAW_EDIT_BOX_MODE_MULTI_LINE mode.
+     */
+    UIColor* _textColor;
+
+    /**
+     * Flag to indicate if the placeholder is shown or not.
+     * Only for MAW_EDIT_BOX_MODE_MULTI_LINE mode.
+     */
+    BOOL _isPlaceholderShown;
 
     /**
      * Maximum text length for this edit box.
      */
     int _maxTextLength;
 }
+
+/**
+ * Getter for view object.
+ * Will return nil if widget's mode is not MAW_EDIT_BOX_MODE_SINGLE_LINE.
+ */
+@property(nonatomic, readonly) UITextField* textField;
+
+/**
+ * Getter for view object.
+ * Will return nil if widget's mode is not MAW_EDIT_BOX_MODE_MULTI_LINE.
+ */
+@property(nonatomic, readonly) UITextView* textView;
+
+/**
+ * Getter and setter for placeholder.
+ */
+@property(nonatomic, retain) NSString* placeholder;
+
+/**
+ * Getter and setter for font text color.
+ */
+@property(nonatomic, retain) UIColor* textColor;
 
 /**
  * Set a widget property value.

@@ -30,6 +30,7 @@
 #include <MAUtil/String.h>
 
 #include "MainScreen.h"
+#include "Util.h"
 
 using namespace MAUtil;
 
@@ -104,6 +105,7 @@ MainScreen::MainScreen() :
 	mPlaceholderColorLabel(NULL),
 	mLinesNumberEditBox(NULL),
 	mLinesNumberLabel(NULL),
+	mSingleLineCheckBox(NULL),
 	mKeyboard(false)
 {
 	// Set the screen size, available for each screen.
@@ -138,6 +140,11 @@ MainScreen::MainScreen() :
 	mMinLinesEditBox->addEditBoxListener(this);
 	mPlaceholderColorEditBox->addEditBoxListener(this);
 	mLinesNumberEditBox->addEditBoxListener(this);
+
+	if (isIOS())
+	{
+		mSingleLineCheckBox->addCheckBoxListener(this);
+	}
 }
 
 /**
@@ -156,6 +163,11 @@ MainScreen::~MainScreen()
 	mMinLinesEditBox->removeEditBoxListener(this);
 	mPlaceholderColorEditBox->removeEditBoxListener(this);
 	mLinesNumberEditBox->removeEditBoxListener(this);
+
+	if (isIOS())
+	{
+		mSingleLineCheckBox->removeCheckBoxListener(this);
+	}
 }
 
 /**
@@ -209,6 +221,12 @@ void MainScreen::createMainLayout()
 	this->createDecimalEditBoxView(mMinLinesEditBox, firstScreenVerticalLayout, MIN_LINES_LABEL_TEXT);
 	this->createDecimalEditBoxView(mLinesNumberEditBox, firstScreenVerticalLayout, LINES_NUMBER_LABEL_TEXT);
 	this->createDecimalEditBoxView(mPlaceholderColorEditBox, firstScreenVerticalLayout, PLACEHOLDER_COLOR_LABEL_TEXT);
+
+	// Create widgets for testing MAW_EDIT_BOX_MODE property on iOS.
+	if (isIOS())
+	{
+		firstScreenVerticalLayout->addChild(this->createModePropertyLayout());
+	}
 
 	// set the main widget for the first screen and
 	// then add it as a application tab
@@ -343,6 +361,39 @@ void MainScreen::createDecimalEditBoxView(EditBox* &editBox, VerticalLayout* aVe
 	editBox->setInputMode(EDIT_BOX_INPUT_MODE_DECIMAL);
 	editBox->fillSpaceHorizontally();
 	layout->addChild(editBox);
+}
+
+/**
+ * Create an layout containing a label and a check box widget.
+ * The check box will be used to set the edit box #MAW_EDIT_BOX_MODE property.
+ * Platform: iOS.
+ */
+HorizontalLayout* MainScreen::createModePropertyLayout()
+{
+	if (!isIOS())
+	{
+		return NULL;
+	}
+
+	HorizontalLayout* hLayout = new HorizontalLayout();
+	hLayout->wrapContentVertically();
+
+	Label* label = new Label();
+	label->setText("Single line");
+	hLayout->addChild(label);
+
+	mSingleLineCheckBox = new CheckBox();
+	mSingleLineCheckBox->setState(true);
+
+	HorizontalLayout* spacer = new HorizontalLayout();
+	int spacerWidth = this->getWidth() - label->getWidth() -
+		mSingleLineCheckBox->getWidth();
+	spacer->setWidth(spacerWidth);
+
+	hLayout->addChild(spacer);
+	hLayout->addChild(mSingleLineCheckBox);
+
+	return hLayout;
 }
 
 /**
@@ -564,4 +615,21 @@ void MainScreen::editBoxTextChanged(
 void MainScreen::editBoxReturn(EditBox* editBox)
 {
 	 mEditBox->hideKeyboard();
+}
+
+/**
+ * This method is called when the state of the check box was changed
+ * by the user.
+ * @param checkBox The check box object that generated the event.
+ * @param state True if the check box is checked, false otherwise.
+ */
+void MainScreen::checkBoxStateChanged(
+    CheckBox* checkBox,
+    bool state)
+{
+	if (checkBox == mSingleLineCheckBox)
+	{
+		int mode = state ? 0 : 1;
+		mEditBox->setPropertyInt(MAW_EDIT_BOX_MODE, mode);
+	}
 }
