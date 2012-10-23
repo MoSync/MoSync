@@ -79,6 +79,7 @@
 		4383ADF8161AC99D00F11991 /* ToggleButtonWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4383ADF6161AC99D00F11991 /* ToggleButtonWidget.mm */; };
 		4383ADF9161AC99D00F11991 /* ToggleButtonWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4383ADF6161AC99D00F11991 /* ToggleButtonWidget.mm */; };
 		4392606A15B478F400B53B88 /* LICENSE.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4392606915B478F400B53B88 /* LICENSE.txt */; };
+		43A8A1E0163588B9002776D0 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 43A8A1DF163588B9002776D0 /* Default-568h@2x.png */; };
 		43B322D715BC4168009634BC /* HorizontalLayoutWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 43B322D515BC4168009634BC /* HorizontalLayoutWidget.h */; };
 		43B322D815BC4168009634BC /* HorizontalLayoutWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43B322D615BC4168009634BC /* HorizontalLayoutWidget.mm */; };
 		43B322D915BC4168009634BC /* HorizontalLayoutWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43B322D615BC4168009634BC /* HorizontalLayoutWidget.mm */; };
@@ -463,6 +464,7 @@
 		4383ADF5161AC99D00F11991 /* ToggleButtonWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ToggleButtonWidget.h; path = NativeUI/Widgets/ToggleButtonWidget.h; sourceTree = "<group>"; };
 		4383ADF6161AC99D00F11991 /* ToggleButtonWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = ToggleButtonWidget.mm; path = NativeUI/Widgets/ToggleButtonWidget.mm; sourceTree = "<group>"; };
 		4392606915B478F400B53B88 /* LICENSE.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = LICENSE.txt; path = SBJson/LICENSE.txt; sourceTree = "<group>"; };
+		43A8A1DF163588B9002776D0 /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
 		43B322D515BC4168009634BC /* HorizontalLayoutWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = HorizontalLayoutWidget.h; path = NativeUI/Layouts/HorizontalLayoutWidget.h; sourceTree = "<group>"; };
 		43B322D615BC4168009634BC /* HorizontalLayoutWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = HorizontalLayoutWidget.mm; path = NativeUI/Layouts/HorizontalLayoutWidget.mm; sourceTree = "<group>"; };
 		43B322DB15BC421E009634BC /* VerticalLayoutWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VerticalLayoutWidget.h; path = NativeUI/Layouts/VerticalLayoutWidget.h; sourceTree = "<group>"; };
@@ -831,6 +833,7 @@
 		29B97314FDCFA39411CA2CEA /* CustomTemplate */ = {
 			isa = PBXGroup;
 			children = (
+				43A8A1DF163588B9002776D0 /* Default-568h@2x.png */,
 				080E96DDFE201D6D7F000001 /* Classes */,
 				29B97315FDCFA39411CA2CEA /* Other Sources */,
 				29B97317FDCFA39411CA2CEA /* Resources */,
@@ -1647,6 +1650,7 @@
 				43F36EFC15B45C750095B3C6 /* License.txt in Resources */,
 				43F36EFD15B45C750095B3C6 /* Readme.txt in Resources */,
 				4392606A15B478F400B53B88 /* LICENSE.txt in Resources */,
+				43A8A1E0163588B9002776D0 /* Default-568h@2x.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
