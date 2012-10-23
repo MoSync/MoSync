@@ -833,7 +833,6 @@
 		29B97314FDCFA39411CA2CEA /* CustomTemplate */ = {
 			isa = PBXGroup;
 			children = (
-				43A8A1DF163588B9002776D0 /* Default-568h@2x.png */,
 				080E96DDFE201D6D7F000001 /* Classes */,
 				29B97315FDCFA39411CA2CEA /* Other Sources */,
 				29B97317FDCFA39411CA2CEA /* Resources */,
@@ -856,6 +855,7 @@
 			isa = PBXGroup;
 			children = (
 				8519011E1199B90400B71F58 /* data_section.bin */,
+				43A8A1DF163588B9002776D0 /* Default-568h@2x.png */,
 				85A0815311353EDE00267D56 /* resources */,
 				85BF2C3A11341EF000BB0201 /* program */,
 				8D1107310486CEB800E47090 /* MoSync-Info.plist */,
