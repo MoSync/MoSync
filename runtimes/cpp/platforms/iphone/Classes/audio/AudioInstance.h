@@ -22,7 +22,7 @@
 
 @class AudioData;
 
-@protocol AudioInstance
+@protocol AudioInstance <NSObject>
 	-(BOOL) isPrepared;
 	-(BOOL) isPreparing;
 	-(BOOL) prepare:(BOOL)async;
