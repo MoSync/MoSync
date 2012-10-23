@@ -151,6 +151,23 @@ namespace NativeUI
 	};
 
 	/**
+	 * \brief Edit box categories.
+	 */
+	enum EditBoxCategory
+	{
+		/**
+		 * The input text will be single line.
+		 * Platform: iOS.
+		 */
+		EDIT_BOX_SINGLE_LINE = 0,
+		/**
+		 * The input text will be multi line.
+		 * Platform: iOS.
+		 */
+		EDIT_BOX_MULTI_LINE
+	};
+
+	/**
 	 * \brief Class for edit box.
 	 *
 	 * You can use this widget to gather small amounts of text from the user.
@@ -162,8 +179,9 @@ namespace NativeUI
 	public:
 		/**
 		 * Constructor.
+		 * @param category The type of the edit box.
 		 */
-		EditBox();
+		EditBox(EditBoxCategory category = EDIT_BOX_SINGLE_LINE);
 
 		/**
 		 * Destructor.

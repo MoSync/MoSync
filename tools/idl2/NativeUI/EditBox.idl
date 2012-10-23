@@ -8,8 +8,7 @@ group WidgetEditBox "Edit box" {
 			*/
 			SINGLE_LINE = 0;
 			/**
-			* The input text will be single line.
-			* Default value.
+			* The input text will be multi line.
 			* Platform: iOS.
 			*/
 			MULTI_LINE = 1;
@@ -20,6 +19,8 @@ group WidgetEditBox "Edit box" {
 		constset int MAW_EDIT_BOX_TYPE_ {
 			/**
 			* The user is allowed to enter any text, including line breaks.
+			* On iOS platform the #MAW_EDIT_BOX_MODE property must be set to
+			* #MAW_EDIT_BOX_MODE_MULTI_LINE in order to have a multi line edit box.
 			*/
 			ANY = 0;
 			/**

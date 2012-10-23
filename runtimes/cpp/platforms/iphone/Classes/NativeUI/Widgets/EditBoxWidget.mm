@@ -23,7 +23,7 @@
  */
 #define TEXT_VIEW_CORNER_RADIUS 10
 #define TEXT_VIEW_BORDER_COLOR_ALPHA 0.5
-#define TEXT_VIEW_BORDER_WIDTH 2.0
+#define TEXT_VIEW_BORDER_WIDTH 1.0
 
 #import <QuartzCore/QuartzCore.h>
 #include <helpers/cpp_defs.h>

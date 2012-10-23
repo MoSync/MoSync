@@ -33,9 +33,17 @@ namespace NativeUI
 {
 	/**
 	 * Constructor.
+	 * @param category The type of the edit box.
 	 */
-	EditBox::EditBox(): Widget(MAW_EDIT_BOX)
+	EditBox::EditBox(EditBoxCategory category): Widget(MAW_EDIT_BOX)
 	{
+		if (category == EDIT_BOX_MULTI_LINE)
+		{
+			// Set multi line on iOS platform.
+			this->setPropertyInt(MAW_EDIT_BOX_MODE, MAW_EDIT_BOX_MODE_MULTI_LINE);
+			// Set multi line on Android and Windows Phone 7 platforms.
+			this->setInputMode(EDIT_BOX_INPUT_MODE_ANY);
+		}
 	}
 
 	/**

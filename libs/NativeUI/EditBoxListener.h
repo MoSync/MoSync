@@ -74,8 +74,10 @@ namespace NativeUI
 
         /**
          * This method is called when the return button was pressed.
-         * On iphone platform the virtual keyboard is not hidden after
+         * On iOS platform the virtual keyboard is not closed after
          * receiving this event.
+         * This method is called only if the edit box mode is
+         * #MAW_EDIT_BOX_SINGLE_LINE.
          * @param editBox The edit box object that generated the event.
          */
         virtual void editBoxReturn(EditBox* editBox) = 0;
