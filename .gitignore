@@ -111,6 +111,7 @@ LocalFiles.bin*
 /testPrograms/temp.s
 /testPrograms/copyfiles.bat
 /testPrograms/filesystem/
+/testPrograms/httpPut/config.h
 
 /runtimes/cpp/generated
 
