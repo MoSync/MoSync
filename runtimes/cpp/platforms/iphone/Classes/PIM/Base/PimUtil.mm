@@ -79,7 +79,7 @@ static PimUtils *sharedInstance = nil;
                         forKey:[NSString stringWithFormat:@"%d", MA_PIM_ATTR_EMAIL_HOME]];
     [mEmailAttributes setValue:workLabel
                         forKey:[NSString stringWithFormat:@"%d", MA_PIM_ATTR_EMAIL_WORK]];
-    [mEmailAttributes setValue:[NSString stringWithString:@"mobile"]
+    [mEmailAttributes setValue:@"mobile"
                         forKey:[NSString stringWithFormat:@"%d", MA_PIM_ATTR_EMAIL_MOBILE]];
     [mEmailAttributes setValue:otherLabel
                         forKey:[NSString stringWithFormat:@"%d", MA_PIM_ATTR_EMAIL_OTHER]];
@@ -105,27 +105,27 @@ static PimUtils *sharedInstance = nil;
                         forKey:[NSString stringWithFormat:@"%d", MA_PIM_ATTR_PHONE_PAGER]];
     [mPhoneAttributes setValue:[NSString stringWithString:(NSString*)kABPersonPhoneIPhoneLabel]
                         forKey:[NSString stringWithFormat:@"%d", MA_PIM_ATTR_PHONE_IPHONE]];
-    [mPhoneAttributes setValue:[NSString stringWithString:@"callback"]
+    [mPhoneAttributes setValue:@"callback"
                         forKey:[NSString stringWithFormat:@"%d", MA_PIM_ATTR_PHONE_CALLBACK]];
-    [mPhoneAttributes setValue:[NSString stringWithString:@"company main"]
+    [mPhoneAttributes setValue:@"company main"
                         forKey:[NSString stringWithFormat:@"%d", MA_PIM_ATTR_PHONE_COMPANY_MAIN]];
-    [mPhoneAttributes setValue:[NSString stringWithString:@"ISDN"]
+    [mPhoneAttributes setValue:@"ISDN"
                         forKey:[NSString stringWithFormat:@"%d", MA_PIM_ATTR_PHONE_ISDN]];
-    [mPhoneAttributes setValue:[NSString stringWithString:@"radio"]
+    [mPhoneAttributes setValue:@"radio"
                         forKey:[NSString stringWithFormat:@"%d", MA_PIM_ATTR_PHONE_RADIO]];
-    [mPhoneAttributes setValue:[NSString stringWithString:@"other fax"]
+    [mPhoneAttributes setValue:@"other fax"
                         forKey:[NSString stringWithFormat:@"%d", MA_PIM_ATTR_PHONE_OTHER_FAX]];
-    [mPhoneAttributes setValue:[NSString stringWithString:@"telex"]
+    [mPhoneAttributes setValue:@"telex"
                         forKey:[NSString stringWithFormat:@"%d", MA_PIM_ATTR_PHONE_TELEX]];
-    [mPhoneAttributes setValue:[NSString stringWithString:@"TTY TDD"]
+    [mPhoneAttributes setValue:@"TTY TDD"
                         forKey:[NSString stringWithFormat:@"%d", MA_PIM_ATTR_PHONE_TTY_TDD]];
-    [mPhoneAttributes setValue:[NSString stringWithString:@"work mobile"]
+    [mPhoneAttributes setValue:@"work mobile"
                         forKey:[NSString stringWithFormat:@"%d", MA_PIM_ATTR_PHONE_WORK_MOBILE]];
-    [mPhoneAttributes setValue:[NSString stringWithString:@"work pager"]
+    [mPhoneAttributes setValue:@"work pager"
                         forKey:[NSString stringWithFormat:@"%d", MA_PIM_ATTR_PHONE_WORK_PAGER]];
-    [mPhoneAttributes setValue:[NSString stringWithString:@"assistent"]
+    [mPhoneAttributes setValue:@"assistent"
                         forKey:[NSString stringWithFormat:@"%d", MA_PIM_ATTR_PHONE_ASSISTANT]];
-    [mPhoneAttributes setValue:[NSString stringWithString:@"MMS"]
+    [mPhoneAttributes setValue:@"MMS"
                         forKey:[NSString stringWithFormat:@"%d", MA_PIM_ATTR_PHONE_MMS]];
 
     mWebSiteAttributes = [[NSMutableDictionary alloc] init];
@@ -135,11 +135,11 @@ static PimUtils *sharedInstance = nil;
                           forKey:[NSString stringWithFormat:@"%d", MA_PIM_ATTR_WEBSITE_WORK]];
     [mWebSiteAttributes setValue:otherLabel
                           forKey:[NSString stringWithFormat:@"%d", MA_PIM_ATTR_WEBSITE_OTHER]];
-    [mWebSiteAttributes setValue:[NSString stringWithString:@"blog"]
+    [mWebSiteAttributes setValue:@"blog"
                           forKey:[NSString stringWithFormat:@"%d", MA_PIM_ATTR_WEBSITE_BLOG]];
-    [mWebSiteAttributes setValue:[NSString stringWithString:@"profile"]
+    [mWebSiteAttributes setValue:@"profile"
                           forKey:[NSString stringWithFormat:@"%d", MA_PIM_ATTR_WEBSITE_PROFILE]];
-    [mWebSiteAttributes setValue:[NSString stringWithString:@"FTP"]
+    [mWebSiteAttributes setValue:@"FTP"
                           forKey:[NSString stringWithFormat:@"%d", MA_PIM_ATTR_WEBSITE_FTP]];
     [mWebSiteAttributes setValue:[NSString string]
                           forKey:[NSString stringWithFormat:@"%d", MA_PIM_ATTR_WEBSITE_CUSTOM]];
@@ -178,11 +178,11 @@ static PimUtils *sharedInstance = nil;
                            forKey:[NSString stringWithFormat:@"%d", MA_PIM_ATTR_RELATION_MANAGER]];
     [mRelationAttributes setValue:(NSString*)kABPersonAssistantLabel
                            forKey:[NSString stringWithFormat:@"%d", MA_PIM_ATTR_RELATION_ASSISTANT]];
-    [mRelationAttributes setValue:[NSString stringWithString:@"domectic partner"]
+    [mRelationAttributes setValue:@"domectic partner"
                            forKey:[NSString stringWithFormat:@"%d", MA_PIM_ATTR_RELATION_DOMESTIC_PARTNER]];
-    [mRelationAttributes setValue:[NSString stringWithString:@"reffered by"]
+    [mRelationAttributes setValue:@"reffered by"
                            forKey:[NSString stringWithFormat:@"%d", MA_PIM_ATTR_RELATION_REFERRED_BY]];
-    [mRelationAttributes setValue:[NSString stringWithString:@"relative"]
+    [mRelationAttributes setValue:@"relative"
                            forKey:[NSString stringWithFormat:@"%d", MA_PIM_ATTR_RELATION_RELATIVE]];
     [mRelationAttributes setValue:[NSString string]
                            forKey:[NSString stringWithFormat:@"%d", MA_PIM_ATTR_RELATION_CUSTOM]];

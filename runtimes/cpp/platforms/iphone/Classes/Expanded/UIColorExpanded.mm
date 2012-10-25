@@ -328,7 +328,7 @@ static NSMutableDictionary *colorNameCache = nil;
 }
 
 - (NSString *)hexStringFromColor {
-	return [NSString stringWithFormat:@"%0.6X", self.rgbHex];
+	return [NSString stringWithFormat:@"%0.6lX", self.rgbHex];
 }
 
 + (UIColor *)colorWithString:(NSString *)stringToConvert {

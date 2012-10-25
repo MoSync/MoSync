@@ -1,8 +1,26 @@
 group WidgetEditBox "Edit box" {
+	group WidgetEditBoxMode "Edit box mode" {
+		constset int MAW_EDIT_BOX_MODE_ {
+			/**
+			* The input text will be single line.
+			* Default value.
+			* Platform: iOS.
+			*/
+			SINGLE_LINE = 0;
+			/**
+			* The input text will be multi line.
+			* Platform: iOS.
+			*/
+			MULTI_LINE = 1;
+		}
+	} // end of WidgetEditBoxMode
+
 	group WidgetEditBoxType "Edit box type" {
 		constset int MAW_EDIT_BOX_TYPE_ {
 			/**
 			* The user is allowed to enter any text, including line breaks.
+			* On iOS platform the #MAW_EDIT_BOX_MODE property must be set to
+			* #MAW_EDIT_BOX_MODE_MULTI_LINE in order to have a multi line edit box.
 			*/
 			ANY = 0;
 			/**
@@ -39,6 +57,7 @@ group WidgetEditBox "Edit box" {
 			/**
 			* Indicates that the text entered is confidential data that should be
 			* obscured whenever possible. This implies #MAW_EDIT_BOX_FLAG_SENSITIVE.
+			* On iOS this flag works only if edit box mode is #MAW_EDIT_BOX_MODE_SINGLE_LINE.
 			*/
 			PASSWORD = 0;
 			/**
@@ -68,6 +87,28 @@ group WidgetEditBox "Edit box" {
 			INITIAL_CAPS_ALL_CHARACTERS = 4;
 		}
 	} // end of WidgetEditBoxFlag
+
+	group WidgetEditBoxAutocorrectionType "Edit box autocorrection type" {
+		constset int MAW_EDIT_BOX_AUTOCORRECTION_TYPE_ {
+			/**
+			* System's default value.
+			* Usually, this value it can be turned on/off from settings.
+			* Default value.
+			* Platform: iOS.
+			*/
+			DEFAULT = 0;
+			/**
+			* Enable auto-correction behavior.
+			* Platform: iOS.
+			*/
+			ENABLE = 1;
+			/**
+			* Disable auto-correction behavior.
+			* Platform: iOS.
+			*/
+			DISABLE = 2;
+		}
+	} // end of WidgetEditBoxMode
 
 	/**
 	* The available widget properties for a #MAW_EDIT_BOX. See of \ref WidgetProperties "Widget properties" for more properties.
@@ -128,6 +169,7 @@ group WidgetEditBox "Edit box" {
 
 			/**
 			* @brief Specifies what editing mode the edit box should have.
+			* On iOS this property works only if check box mode is #MAW_EDIT_BOX_MODE_SINGLE_LINE.
 			* @deprecated use #MAW_EDIT_BOX_INPUT_FLAG instead.
 			* @validvalue Either 'password' or 'text'.
 			*
@@ -269,6 +311,67 @@ group WidgetEditBox "Edit box" {
 			* \endcode
 			*/
 			PLACEHOLDER_FONT_COLOR = "placeholderFontColor";
+
+			/**
+			* @brief Sets or gets the edit box mode.
+			* Changing this value on iOS platform will reset all widget's properties, because
+			* the widget will be replaced with a new one.
+			* It is recommended to set this value after creating the widget, and before adding it
+			* to a layout.
+			* Platform: iOS.
+			*
+			* @validvalue #MAW_EDIT_BOX_MODE_SINGLE_LINE will set the mode to single line, or
+			* MAW_EDIT_BOX_MULTI_LINE will set the mode to multi line.
+			*
+			* @setandget
+			*
+			* @par Example
+			* \code
+			*   char buffer[BUFFER_SIZE];
+			*   sprintf(buffer, "%d", MAW_EDIT_BOX_MODE_MULTI_LINE);
+			*	maWidgetSetProperty(editBoxHandle, MAW_EDIT_BOX_MODE, buffer);
+			* \endcode
+			*/
+			MODE = "mode";
+
+			/**
+			* @brief Sets or gets the autocorrection type.
+			* Enable/disable the auto correction during typing. With auto correction enabled,
+			* the text object tracks unknown words and suggests a more suitable replacement candidate to the user,
+			* replacing the typed text automatically unless the user explicitly overrides the action.
+			* The default value is #MAW_EDIT_BOX_AUTOCORRECTION_TYPE_DEAFULT.
+			* Platform: iOS.
+			*
+			* @validvalue #MAW_EDIT_BOX_AUTOCORRECTION_TYPE_DEFAULT, #MAW_EDIT_BOX_AUTOCORRECTION_TYPE_ENABLE
+			* or #MAW_EDIT_BOX_AUTOCORRECTION_TYPE_DISABLE.
+			*
+			* @setandget
+			*
+			* @par Example
+			* \code
+			*   char buffer[BUFFER_SIZE];
+			*   sprintf(buffer, "%d", MAW_EDIT_BOX_AUTOCORRECTION_TYPE_YES;
+			*	maWidgetSetProperty(editBoxHandle, MAW_EDIT_BOX_AUTOCORRECTION_TYPE, buffer);
+			* \endcode
+			*/
+			AUTOCORRECTION_TYPE = "autoCorrectionType";
+
+			/**
+			* @brief Sets or gets the horizontal alignment of the text inside the edit box.
+			* The default value is #MAW_ALIGNMENT_LEFT.
+			* Platform: iOS.
+			*
+			* @validvalue #MAW_ALIGNMENT_LEFT, #MAW_ALIGNMENT_CENTER or #MAW_ALIGNMENT_RIGHT.
+			*
+			* @setandget
+			*
+			* @par Example
+			* \code
+			*	maWidgetSetProperty(editBoxHandle, MAW_EDIT_BOX_TEXT_HORIZONTAL_ALIGNMENT,
+			*                       MAW_ALIGNMENT_RIGHT);
+			* \endcode
+			*/
+			TEXT_HORIZONTAL_ALIGNMENT = "textHorizontalAlignment";
 		}
 	} // end of WidgetEditBoxProperties
 } // end of WidgetEditBox

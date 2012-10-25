@@ -296,8 +296,9 @@ group WidgetEvent "Widget event" {
 
 			/**
 			 * @brief Sent from the Edit box when the return button was pressed.
-			 * On iphone platform the virtual keyboard is not closed after receiving this event.
+			 * On iOS platform the virtual keyboard is not closed after receiving this event.
 			 * The virtual keyboard can be hided by setting the MAW_EDIT_BOX_SHOW_KEYBOARD to "false".
+			 * This event is send only if the edit box mode is #MAW_EDIT_BOX_SINGLE_LINE.
 			 * Not available on Windows Phone 7.1
 			 */
 			EDIT_BOX_RETURN = 19;

@@ -69,10 +69,6 @@ static ImagePickerController *sharedInstance = nil;
 {
     MoSyncUI* mosyncUI = getMoSyncUI();
     [mosyncUI showModal:mImagePicker];
-	//ScreenWidget* shownScreen = (ScreenWidget*)[mosyncUI getCurrentlyShownScreen];
-    //UIViewController* controller = [shownScreen getController];
-
-    //[self performSelectorOnMainThread: @ selector(displayImagePicker:) withObject:controller waitUntilDone:YES];
 }
 
 /**
@@ -83,9 +79,6 @@ static ImagePickerController *sharedInstance = nil;
 {
     MoSyncUI* mosyncUI = getMoSyncUI();
 	[mosyncUI hideModal];
-    //ScreenWidget* shownScreen = (ScreenWidget*)[mosyncUI getCurrentlyShownScreen];
-    //UIViewController* controller = [shownScreen getController];
-    //[controller dismissModalViewControllerAnimated:YES];
 }
 
 /**
@@ -128,27 +121,15 @@ static ImagePickerController *sharedInstance = nil;
  */
 - (void)popoverControllerDidDismissPopover:(UIPopoverController *)popover
 {
-	[self imagePickerControllerDidCancel:popover.contentViewController];
+	[self imagePickerControllerDidCancel:mImagePicker];
 }
-
-
-/**
- * Displays the image picker.
- * This function must be called on the main thread.
- * @param The current UIViewController object.
- */
-/*-(void) displayImagePicker:(id) obj
-{
-    UIViewController* controller = (UIViewController*) obj;
-	[controller presentModalViewController:mImagePicker animated:false];
-}*/
 
 /**
  * Gets an image handle for a given image.
  * @param image The given image.
  * @return A image handle or RES_OUT_OF_MEMORY in case of error.
  */
--(MAHandle) getImageHandle:(UIImage*) image
+- (MAHandle)getImageHandle:(UIImage*)image
 {
     NSData* data = UIImageJPEGRepresentation(image, 0);
     int size = [data length];

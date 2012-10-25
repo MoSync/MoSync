@@ -69,17 +69,10 @@
 - (void)popoverControllerDidDismissPopover:(UIPopoverController *)popover;
 
 /**
- * Displays the image picker.
- * This function must be called on the main thread.
- * @param The current UIViewController object.
- */
--(void) displayImagePicker:(id) controller;
-
-/**
  * Gets an image handle for a given image.
  * @param image The given image.
  * @return A image handle or RES_OUT_OF_MEMORY in case of error.
  */
--(MAHandle) getImageHandle:(UIImage*) image;
+- (MAHandle)getImageHandle:(UIImage*)image;
 
 @end

@@ -5,7 +5,7 @@
 #ifdef DEBUGON
 #define DEBUGLOG if (DEBUGON) NSLog
 #else
-#define DEBUGLOG
+#define DEBUGLOG(...)
 #endif
 
 #import <UIKit/UIKit.h>

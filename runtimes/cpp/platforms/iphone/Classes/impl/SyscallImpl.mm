@@ -1835,6 +1835,7 @@ namespace Base {
 		{
 			[UIApplication sharedApplication].idleTimerDisabled = NO;
 		}
+        return RES_OK;
 	}
 
     SYSCALL(int, maSensorStart(int sensor, int interval))

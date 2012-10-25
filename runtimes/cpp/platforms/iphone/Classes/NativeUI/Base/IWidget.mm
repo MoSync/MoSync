@@ -581,4 +581,15 @@
 	[super dealloc];
 }
 
+/**
+ * Get the index of a child from the children list.
+ * @param child The child object whose index should be returned.
+ * @return The index of the child, or NSNotFound if the child param is not
+ * an child of the current widget.
+ */
+- (NSUInteger)indexOfChild:(IWidget*)child
+{
+    return [_children indexOfObject:child];
+}
+
 @end
