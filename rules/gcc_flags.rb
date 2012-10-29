@@ -107,8 +107,11 @@ elsif(HOST == :linux)
 	end
 	@HOST_CPPFLAGS = ""
 elsif(HOST == :darwin)
-	sdkNumber = (File.exist?("/Developer/SDKs/MacOSX10.5.sdk")) ? "5":"6"
-	sdkAdress = "/Developer/SDKs/MacOSX10.#{sdkNumber}.sdk"
+	sdkAdress = "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.7.sdk"
+	if(!File.exist?(sdkAdress))
+		sdkNumber = (File.exist?("/Developer/SDKs/MacOSX10.5.sdk")) ? "5":"6"
+		sdkAdress = "/Developer/SDKs/MacOSX10.#{sdkNumber}.sdk"
+	end
 	@HOST_FLAGS = " -isysroot #{sdkAdress} -mmacosx-version-min=10.5 -m32 -DDARWIN"
 	@HOST_CPPFLAGS = " -isysroot #{sdkAdress} -mmacosx-version-min=10.5 -m32 -fPIC"
 else

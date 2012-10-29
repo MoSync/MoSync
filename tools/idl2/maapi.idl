@@ -1484,11 +1484,16 @@ interface MAAPI {
 		*/
 		PURCHASE = 48;
 
+		/**
+		* \brief A camera event fired when you get any of the camera preview events
+		*/
+		CAMERA_PREVIEW = 49;
+
 		/** \brief The telephone network status changed.
 		* MAEvent::state is the new state,
 		* one of the \link #MA_NETWORK_UNKNOWN MA_NETWORK \endlink constants.
 		*/
-		NETWORK = 49;
+		NETWORK = 50;
 	}
 
 	/**
@@ -4402,6 +4407,17 @@ group CameraResultCodes "Camera Result Codes" {
 		*/
 		VALUE_NOTSUPPORTED = -6;
 
+		/**
+		* @brief Another type of camera preview events has aldready been enabled.
+		*/
+		EVENTS_ALREADY_ENABLED = -7;
+
+		/**
+		* @brief The size of the screen which you want to read from the preview is not
+		* withing the visual area.
+		*/
+		INVALID_PREVIEW_SIZE = -8;
+
 	}
 } //end CameraResultCodes
 
@@ -4553,6 +4569,15 @@ group CameraProperties "Camera Properties" {
 	} //end of MAC_
 } // end of CameraProperties
 
+group CameraPreviewEvents "Camera Preview Events" {
+	constset int MA_CAMERA_PREVIEW_ {
+
+		FRAME = 1;
+
+		AUTO_FOCUS = 2;
+	}
+}
+
 group CameraFunctions "Camera Functions" {
 		/**
 		* \brief The camera format, in pixels.
@@ -4646,6 +4671,41 @@ group CameraFunctions "Camera Functions" {
 		* \returns 1 for success and <0 for failure.
 		*/
 		int maCameraGetProperty( in MAString property, out MAString value range("bufSize"), in int bufSize);
+
+		/**
+		* Retrieves the underlying camera preview size. This can be different
+		* from the preview view so before enabling preview events it's
+		* important that you check the true size.
+		*
+		* \returns the size as an EXTENT, <0 on failure.
+		*/
+		int maCameraPreviewSize();
+
+		/**
+		* Enables events for accessing data during camera preview.
+		* Only one preview event may be used at the same time.
+		*
+		* \param previewEventType One of the CameraPreviewEvents
+		* \param previewBuffer An int buffer in which the data will stored
+		* \param previewArea The rectangle of the preview in which we will get data
+		*
+		* \return 1 on success and <0 on failure
+		*/
+		int maCameraPreviewEventEnable( in int previewEventType, out MAAddress previewBuffer, in MARect previewArea);
+
+		/**
+		* Turns off the current preview event
+		*/
+		int maCameraPreviewEventDisable();
+
+		/**
+		* Function that informs the runtime that it's ready to get
+		* the next preview event.
+		* This is because the preview sends a lot of events and if it
+		* take some time to process the image the event cue should get
+		* filled with events.
+		*/
+		int maCameraPreviewEventConsumed();
 
 	} // end of CameraFunctions
 

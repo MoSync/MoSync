@@ -210,7 +210,6 @@ public:
             handleResult(CONNOP_READ, result, false);
         }
         gConnMutex.unlock();
-
 	}
 private:
 	MemStream& dst;

@@ -721,6 +721,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6019003815B84618008F2D0E /* CoreVideo.framework in Frameworks */,
 				E438DF511535D368008B5005 /* CoreMedia.framework in Frameworks */,
 				43CE0BF61463EE5F00F8FFC3 /* iAd.framework in Frameworks */,
 				4300E3E8152C611100B40FA2 /* StoreKit.framework in Frameworks */,
@@ -868,6 +869,7 @@
 			isa = PBXGroup;
 			children = (
 				41EB03E3146A69BF0088E3A4 /* libsqlite3.dylib */,
+				6019003715B84618008F2D0E /* CoreVideo.framework */,
 				4300E3E6152C60FA00B40FA2 /* StoreKit.framework */,
 				E438DF4F1535D35C008B5005 /* CoreMedia.framework */,
 				41804801147E91050048FB95 /* SystemConfiguration.framework */,

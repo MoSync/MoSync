@@ -512,6 +512,9 @@ public class NativeUI
 	 */
 	public ScreenWidget getCurrentScreen()
 	{
+		if(m_currentScreen == null)
+			return null;
+
 		if ( m_currentScreen instanceof StackScreenWidget )
 		{
 			return ((StackScreenWidget)  m_currentScreen).getCurrentScreen();
@@ -525,8 +528,10 @@ public class NativeUI
 			}
 			return screen;
 		}
+		else if(m_currentScreen instanceof ScreenWidget )
+			return (ScreenWidget) m_currentScreen;
 
-		return (ScreenWidget) m_currentScreen;
+		return null;//(ScreenWidget) m_currentScreen;
 	}
 
 	/**

@@ -774,6 +774,17 @@ namespace Base
 								int memBuffer, int memBufferSize,
 								JNIEnv* jNIEnv, jobject jThis);
 
+	int _maCameraPreviewSize(JNIEnv* jNIEnv, jobject jThis);
+
+	int _maCameraPreviewEventEnable(int memStart, int previewEventType,
+									int previewBuffer,
+									MARect* previewArea,
+									JNIEnv* jNIEnv, jobject jThis);
+
+	int _maCameraPreviewEventDisable(JNIEnv* jNIEnv, jobject jThis);
+
+	int _maCameraPreviewEventConsumed(JNIEnv* jNIEnv, jobject jThis);
+
 	int _maNFCStart(JNIEnv* jNIEnv, jobject jThis);
 
 	int _maNFCStop(JNIEnv* jNIEnv, jobject jThis);

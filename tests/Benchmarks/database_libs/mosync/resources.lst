@@ -1,0 +1,5 @@
+.res R_BUILDINFO
+.string "Nightly Build"
+.string "120625-1112"
+.string "/usr/local/bin/git rev-parse HEAD081101737963bcbff99e1f1ae5a0055d2398fb73"
+.string "/usr/local/bin/git rev-parse HEAD24debf6dfa8aa7219260f7caa222613ea71c9a05"

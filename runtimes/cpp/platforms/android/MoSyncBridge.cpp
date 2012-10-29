@@ -600,6 +600,10 @@ static void nativePostEvent(JNIEnv* env, jobject jthis, jintArray eventBuffer)
 	{
 		event.audioInstance = intArray[1];
 	}
+	else if (event.type == EVENT_TYPE_CAMERA_PREVIEW)
+	{
+		__android_log_write(ANDROID_LOG_INFO, "@@@@@@@@ MoSync JNI", "Camera event sent");
+	}
 
 	// Release the memory used for the int array.
 	env->ReleaseIntArrayElements(eventBuffer, intArray, 0);
