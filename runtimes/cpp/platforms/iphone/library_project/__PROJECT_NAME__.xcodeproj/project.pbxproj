@@ -296,6 +296,7 @@
 					"libs/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)",
 					"\"$(SRCROOT)/libs/Release-iphonesimulator\"",
 				);
+				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = __PROJECT_NAME__;
 			};
 			name = Debug;
@@ -314,6 +315,7 @@
 					"libs/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)",
 					"\"$(SRCROOT)/libs/Release-iphonesimulator\"",
 				);
+				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = __PROJECT_NAME__;
 			};
 			name = Release;
