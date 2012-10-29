@@ -44,6 +44,16 @@ int isDirectory(const char* filename);
 // On error, errno is set.
 char* fullpath(const char* name);
 
+// Compares the timestamp (last modified) of two files.
+// Returns a positive value if the first file is newer,
+// a negative value if the second file is and zero if
+// they are equal. A non-existing file counts as the lowest
+// possible timestamp, so an existing file will always
+// be considered 'newer' than a non-existing file.
+// \file1 One file
+// \file2 Another file
+int compareTime(const char* file1, const char* file2);
+
 #ifdef __cplusplus
 }
 #endif
