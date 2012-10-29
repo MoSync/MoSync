@@ -354,7 +354,6 @@ public class ListLayout extends Layout
 		}
 		else if(property.equals( IX_WIDGET.MAW_LIST_VIEW_REQUEST_FOCUS ))
 		{
-			ListView listView = (ListView) getView();
 			listView.setFocusable(true);
 			listView.setFocusableInTouchMode(true);
 			listView.requestFocus();
