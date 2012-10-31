@@ -1,0 +1,9 @@
+{{@trim}}
+{{@debug}}<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+{{#tech-list}}
+	<tech-list>{{#tech}}
+		{{! Just a simple mapping (for now) }}
+		<tech>android.nfc.tech.{{name}}</tech>{{/tech}}
+	</tech-list>
+{{/tech-list}}
+</resources>
