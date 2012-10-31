@@ -204,7 +204,7 @@ void MainScreen::buttonClicked(Widget* button)
 		MAUtil::Vector<Location> loc = mMap->getVisibleArea();
 		mVisibleAreaCoordinatesLabel->setText("UL la: " + MAUtil::doubleToString(loc[0].getLatitude()) +
 				" UL lo: " + MAUtil::doubleToString(loc[0].getLongitude()) +
-				" LR la: " + MAUtil::doubleToString(loc[1].getLongitude()) +
+				" LR la: " + MAUtil::doubleToString(loc[1].getLatitude()) +
 				" LR lo: " + MAUtil::doubleToString(loc[1].getLongitude()));
 	}
 	else if (button == mSetVisibleAreaButton)
@@ -247,7 +247,7 @@ void MainScreen::buttonClicked(Widget* button)
 	}
 	else if (button == mSetCenterButton)
 	{
-		mMap->setCenter(MapLocation(32.43, 43.34, 13));
+		mMap->setCenter(MapLocation(32.43, 43.34, 11));
 		mMap->centerMap();
 	}
 }

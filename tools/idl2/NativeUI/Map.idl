@@ -151,7 +151,7 @@ group WidgetMap "Map" {
 			CENTERED = "centered";
 
 			/**
-			 * @brief Property used specify the upper left corner latitude of the visible area.
+			 * @brief Property used to specify the upper left corner latitude of the visible area.
 			 *
 			 * @validvalue A double value between -90.0 and 90.0.
 			 *
