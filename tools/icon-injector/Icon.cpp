@@ -20,6 +20,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <stdio.h>
 #include <cstring>
 #include "Shared.h"
+#include "Util.h"
 
 using namespace std;
 
@@ -102,8 +103,10 @@ static void end(void *data, const char *el) {
 		for(size_t i = 0; i < mInstances.size(); i++) {
 #ifdef WIN32
 			mInstances[i]->filename = absolutePath + "\\" + mInstances[i]->filename;
+			toBackSlashes(mInstances[i]->filename);
 #else
 			mInstances[i]->filename = absolutePath + "/" + mInstances[i]->filename;
+			toSlashes(mInstances[i]->filename);
 #endif
 		}
 

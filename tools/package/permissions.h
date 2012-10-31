@@ -20,6 +20,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include <set>
 #include <string>
+#include "mustache.h"
 
 #define BLUETOOTH "Bluetooth"
 #define CALENDAR "Calendar"
@@ -54,8 +55,24 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 // Parse permissions
 void parsePermissions(std::set<std::string>& out, const char* permissions);
 
+/**
+ * 'Normalizes' a permission, ie converts it to lower case
+ * and replaces all spaces with -.
+ */
+std::string normalizePermission(std::string permission);
+
 std::string getParentPermission(std::string permission);
 
 bool isPermissionSet(std::set<std::string>& permissions, std::string permission);
+
+class PermissionContext : public DefaultContext {
+private:
+	std::set<std::string> fParsedPermissions;
+
+public:
+	PermissionContext(MustacheContext* parent, const char* permissions);
+	string getParameter(string key);
+	vector<MustacheContext*> getChildren(string key);
+};
 
 #endif // PERMISSION_H

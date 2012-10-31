@@ -31,15 +31,6 @@ namespace MoSync {
 void errorExit(const std::string& reason) GCCATTRIB(noreturn);
 
 /**
- * Function used to convert an icon instance to an image.
- * \param iconInstance The icon instance.
- * \param dstFilename The filename of the resulting image.
- * \param size A string describing the size of the resulting image on the form: WxH
- * \param format A string describing the format of the resulting image (the file extension of the format)
- */
-bool convertInstanceToImageFormat(const IconInstance *iconInstance, const char *dstFilename, const std::string& size, const std::string& format);
-
-/**
  * Function to get the extension of a full filepath string.
  */
 std::string getExtension(const std::string& str);
