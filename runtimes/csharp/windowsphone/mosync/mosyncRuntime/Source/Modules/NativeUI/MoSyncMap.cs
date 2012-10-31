@@ -76,6 +76,9 @@ namespace MoSync
                 mBingMap.MapPan += new EventHandler<MapDragEventArgs>(
                     delegate(object from, MapDragEventArgs args)
                     {
+                        // update the visible area points
+                        mVisibleAreaUpperLeftCorner = mBingMap.BoundingRectangle.Northwest;
+                        mVisibleAreaLowerRightCorner = mBingMap.BoundingRectangle.Southeast;
                         /**
                          * post the event to MoSync runtime
                          */
