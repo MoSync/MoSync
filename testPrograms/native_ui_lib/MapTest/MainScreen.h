@@ -26,6 +26,7 @@ MA 02110-1301, USA.
 
 #include <maapi.h>
 #include <MAUtil/util.h>
+#include <MAUtil/Vector.h>
 
 // Include all the wrappers.
 #include <NativeUI/Widgets.h>
@@ -173,9 +174,9 @@ private:
 	Map* mMap;
 
 	/**
-	 * A example map pin to be added on the map.
+	 * A vector containing map pins with the coordinates randomized.
 	 */
-	MapPin* mMapPin;
+	MAUtil::Vector<MapPin*> mMapPins;
 };
 
 

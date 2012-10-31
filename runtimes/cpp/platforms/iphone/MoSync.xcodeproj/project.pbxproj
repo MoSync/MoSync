@@ -88,6 +88,17 @@
 		43B322DE15BC421E009634BC /* VerticalLayoutWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43B322DC15BC421E009634BC /* VerticalLayoutWidget.mm */; };
 		43B322DF15BC421E009634BC /* VerticalLayoutWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43B322DC15BC421E009634BC /* VerticalLayoutWidget.mm */; };
 		43B39B3E15B98B1100E9032F /* WidgetLayoutingMacro.h in Headers */ = {isa = PBXBuildFile; fileRef = 43B39B3D15B98B1100E9032F /* WidgetLayoutingMacro.h */; };
+		43C48355164178C0008F9A39 /* MapAnnotation.h in Headers */ = {isa = PBXBuildFile; fileRef = 43C4834F164178C0008F9A39 /* MapAnnotation.h */; };
+		43C48356164178C0008F9A39 /* MapAnnotation.m in Sources */ = {isa = PBXBuildFile; fileRef = 43C48350164178C0008F9A39 /* MapAnnotation.m */; };
+		43C48357164178C0008F9A39 /* MapAnnotation.m in Sources */ = {isa = PBXBuildFile; fileRef = 43C48350164178C0008F9A39 /* MapAnnotation.m */; };
+		43C48358164178C0008F9A39 /* MapPinWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 43C48351164178C0008F9A39 /* MapPinWidget.h */; };
+		43C48359164178C0008F9A39 /* MapPinWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43C48352164178C0008F9A39 /* MapPinWidget.mm */; };
+		43C4835A164178C0008F9A39 /* MapPinWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43C48352164178C0008F9A39 /* MapPinWidget.mm */; };
+		43C4835B164178C0008F9A39 /* MapWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 43C48353164178C0008F9A39 /* MapWidget.h */; };
+		43C4835C164178C0008F9A39 /* MapWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43C48354164178C0008F9A39 /* MapWidget.mm */; };
+		43C4835D164178C0008F9A39 /* MapWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43C48354164178C0008F9A39 /* MapWidget.mm */; };
+		43C4836116417AF6008F9A39 /* MapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 43C4835F16417ACE008F9A39 /* MapKit.framework */; };
+		43C4836216417AFA008F9A39 /* MapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 43C4835F16417ACE008F9A39 /* MapKit.framework */; };
 		43CE0BF61463EE5F00F8FFC3 /* iAd.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 43CE0BF51463EE5F00F8FFC3 /* iAd.framework */; };
 		43CE0BF91463EE7600F8FFC3 /* iAd.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 43CE0BF51463EE5F00F8FFC3 /* iAd.framework */; };
 		43D8048413EFBEEE00183387 /* MediaPlayer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 43D8048213EFBCC700183387 /* MediaPlayer.framework */; };
@@ -472,6 +483,13 @@
 		43B322DB15BC421E009634BC /* VerticalLayoutWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VerticalLayoutWidget.h; path = NativeUI/Layouts/VerticalLayoutWidget.h; sourceTree = "<group>"; };
 		43B322DC15BC421E009634BC /* VerticalLayoutWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = VerticalLayoutWidget.mm; path = NativeUI/Layouts/VerticalLayoutWidget.mm; sourceTree = "<group>"; };
 		43B39B3D15B98B1100E9032F /* WidgetLayoutingMacro.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = WidgetLayoutingMacro.h; path = NativeUI/Base/WidgetLayoutingMacro.h; sourceTree = "<group>"; };
+		43C4834F164178C0008F9A39 /* MapAnnotation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MapAnnotation.h; path = NativeUI/Widgets/MapAnnotation.h; sourceTree = "<group>"; };
+		43C48350164178C0008F9A39 /* MapAnnotation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MapAnnotation.m; path = NativeUI/Widgets/MapAnnotation.m; sourceTree = "<group>"; };
+		43C48351164178C0008F9A39 /* MapPinWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MapPinWidget.h; path = NativeUI/Widgets/MapPinWidget.h; sourceTree = "<group>"; };
+		43C48352164178C0008F9A39 /* MapPinWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = MapPinWidget.mm; path = NativeUI/Widgets/MapPinWidget.mm; sourceTree = "<group>"; };
+		43C48353164178C0008F9A39 /* MapWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MapWidget.h; path = NativeUI/Widgets/MapWidget.h; sourceTree = "<group>"; };
+		43C48354164178C0008F9A39 /* MapWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = MapWidget.mm; path = NativeUI/Widgets/MapWidget.mm; sourceTree = "<group>"; };
+		43C4835F16417ACE008F9A39 /* MapKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MapKit.framework; path = System/Library/Frameworks/MapKit.framework; sourceTree = SDKROOT; };
 		43CE0BF51463EE5F00F8FFC3 /* iAd.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = iAd.framework; path = System/Library/Frameworks/iAd.framework; sourceTree = SDKROOT; };
 		43D8048213EFBCC700183387 /* MediaPlayer.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MediaPlayer.framework; path = System/Library/Frameworks/MediaPlayer.framework; sourceTree = SDKROOT; };
 		43F36EE115B45C380095B3C6 /* IWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IWidget.h; path = NativeUI/Base/IWidget.h; sourceTree = "<group>"; };
@@ -723,6 +741,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				43C4836116417AF6008F9A39 /* MapKit.framework in Frameworks */,
 				43277C49163ED76100DE2CF5 /* CoreVideo.framework in Frameworks */,
 				E438DF511535D368008B5005 /* CoreMedia.framework in Frameworks */,
 				43CE0BF61463EE5F00F8FFC3 /* iAd.framework in Frameworks */,
@@ -750,6 +769,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				43C4836216417AFA008F9A39 /* MapKit.framework in Frameworks */,
 				E438DF501535D35D008B5005 /* CoreMedia.framework in Frameworks */,
 				431869A913F68E660051D97A /* AddressBook.framework in Frameworks */,
 				4300E3E9152C611900B40FA2 /* StoreKit.framework in Frameworks */,
@@ -870,6 +890,7 @@
 		29B97323FDCFA39411CA2CEA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				43C4835F16417ACE008F9A39 /* MapKit.framework */,
 				43277C48163ED76100DE2CF5 /* CoreVideo.framework */,
 				4300E3E6152C60FA00B40FA2 /* StoreKit.framework */,
 				E438DF4F1535D35C008B5005 /* CoreMedia.framework */,
@@ -1038,6 +1059,12 @@
 				4324A72015D11986004C5732 /* ListViewSectionWidget.mm */,
 				43F36F3F15B45D5B0095B3C6 /* ListViewWidget.h */,
 				43F36F4015B45D5B0095B3C6 /* ListViewWidget.mm */,
+				43C4834F164178C0008F9A39 /* MapAnnotation.h */,
+				43C48350164178C0008F9A39 /* MapAnnotation.m */,
+				43C48351164178C0008F9A39 /* MapPinWidget.h */,
+				43C48352164178C0008F9A39 /* MapPinWidget.mm */,
+				43C48353164178C0008F9A39 /* MapWidget.h */,
+				43C48354164178C0008F9A39 /* MapWidget.mm */,
 				43F36F4115B45D5B0095B3C6 /* ModalDialogWidget.h */,
 				43F36F4215B45D5B0095B3C6 /* ModalDialogWidget.mm */,
 				43F36F4315B45D5B0095B3C6 /* NavBarWidget.h */,
@@ -1556,6 +1583,9 @@
 				4354772415D166740064CF20 /* ListViewWidgetDelegate.h in Headers */,
 				43770EE415D2917F00C82FDD /* ListViewSectionWidgetDelegate.h in Headers */,
 				4383ADF7161AC99D00F11991 /* ToggleButtonWidget.h in Headers */,
+				43C48355164178C0008F9A39 /* MapAnnotation.h in Headers */,
+				43C48358164178C0008F9A39 /* MapPinWidget.h in Headers */,
+				43C4835B164178C0008F9A39 /* MapWidget.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1795,6 +1825,9 @@
 				4332FB4915BD3B8D00E6E048 /* UINavigationControllerExpanded.mm in Sources */,
 				4324A72215D11986004C5732 /* ListViewSectionWidget.mm in Sources */,
 				4383ADF8161AC99D00F11991 /* ToggleButtonWidget.mm in Sources */,
+				43C48356164178C0008F9A39 /* MapAnnotation.m in Sources */,
+				43C48359164178C0008F9A39 /* MapPinWidget.mm in Sources */,
+				43C4835C164178C0008F9A39 /* MapWidget.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1919,6 +1952,9 @@
 				4332FB4A15BD3B8D00E6E048 /* UINavigationControllerExpanded.mm in Sources */,
 				4324A72315D11986004C5732 /* ListViewSectionWidget.mm in Sources */,
 				4383ADF9161AC99D00F11991 /* ToggleButtonWidget.mm in Sources */,
+				43C48357164178C0008F9A39 /* MapAnnotation.m in Sources */,
+				43C4835A164178C0008F9A39 /* MapPinWidget.mm in Sources */,
+				43C4835D164178C0008F9A39 /* MapWidget.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

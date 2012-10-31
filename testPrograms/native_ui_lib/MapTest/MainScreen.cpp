@@ -25,8 +25,9 @@
 #include <NativeUI/MapRegion.h>
 #include <NativeUI/MapPin.h>
 #include <NativeUI/MapLocation.h>
+#include <mastdlib.h>
 
-#define HORIZONTAL_LAYOUT_HEIGHT 80
+#define HORIZONTAL_LAYOUT_HEIGHT 40
 
 /**
  * Constructor.
@@ -58,6 +59,8 @@ MainScreen::MainScreen() :
  */
 MainScreen::~MainScreen()
 {
+	mMapPins.clear();
+
 	mMap->removeMapListener(this);
 	mGetVisibleAreaButton->removeButtonListener(this);
 	mSetVisibleAreaButton->removeButtonListener(this);
@@ -96,7 +99,7 @@ void MainScreen::createMainLayout() {
 	mMainLayout->addChild(mSetCenterButton);
 
 	// create the main map and add it to the main layout
-	mMap = new Map("google test credentials", "bing test credentials");
+	mMap = new Map("google test credentials", "AsIe6nHOHjIuf9MQS4fW7up92BO6HuCwspKJqYwffZiqUJsgXuLIXeBdCf9EM4yz");
 	mMap->fillSpaceHorizontally();
 	mMap->fillSpaceVertically();
 
@@ -109,10 +112,6 @@ void MainScreen::createMainLayout() {
 	printf("Map zoom level: %d", mMap->getZoomLevel());
 
 	mMainLayout->addChild(mMap);
-
-	// create the map pin
-	mMapPin = new MapPin(Location(32.3, 32.2));
-	mMapPin->setText("test");
 }
 
 /**
@@ -215,14 +214,36 @@ void MainScreen::buttonClicked(Widget* button)
 	else if (button == mSetZoomLevel)
 	{
 		mMap->setZoomLevel(MAUtil::stringToInteger(mZoomLevelEditBox->getText()));
+		mZoomLevelEditBox->hideKeyboard();
 	}
 	else if (button == mAddPinToMap)
 	{
-		mMap->addMapPin(mMapPin);
+		for (int i = 0; i < 20; i++)
+		{
+			// generate random values for the coordinates
+			// get a random latitude and longitude
+			double latitude = (double)(rand() % 80);
+			double longitude = (double)(rand() & 170);
+			int longSign = rand()%2;
+			if (longSign == 0)
+				longitude *= (-1);
+
+			int latSign = rand()%2;
+			if (latSign == 0)
+				latitude *= (-1);
+
+			MapPin *newPin = new MapPin(Location(latitude, longitude));
+			newPin->setText("test title");
+			mMapPins.add(newPin);
+			mMap->addMapPin(newPin);
+		}
 	}
 	else if (button == mRemovePinFromMap)
 	{
-		mMap->removeMapPin(mMapPin);
+		for (int i = 0; i < mMapPins.size(); i++)
+		{
+			mMap->removeMapPin(mMapPins[i]);
+		}
 	}
 	else if (button == mSetCenterButton)
 	{
