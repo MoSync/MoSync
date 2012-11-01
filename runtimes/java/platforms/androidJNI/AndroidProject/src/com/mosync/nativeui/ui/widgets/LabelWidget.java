@@ -19,6 +19,7 @@ package com.mosync.nativeui.ui.widgets;
 
 import android.graphics.Typeface;
 import android.util.TypedValue;
+import android.view.Gravity;
 import android.widget.TextView;
 
 import com.mosync.internal.android.MoSyncFont;
@@ -57,7 +58,7 @@ public class LabelWidget extends Widget
 	public LabelWidget(int handle, TextView view)
 	{
 		super( handle, view );
-		view.setGravity( 0 );
+		view.setGravity( Gravity.CENTER );
 	}
 
 	/**
