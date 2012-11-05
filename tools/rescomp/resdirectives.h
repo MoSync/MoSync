@@ -20,8 +20,10 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include <sstream>
 #include <string>
+#include <vector>
 
 enum LoadType { LoadType_Startup, LoadType_Unloaded };
+enum DataType { Byte, Half, Word };
 
 // Copied from compile.h
 enum
@@ -51,15 +53,25 @@ protected:
 	LoadType fLoadType;
 	string fFile;
 	int fLineNo;
+	ResourceDirective* fParent;
+	vector<ResourceDirective*> fChildren;
+	bool fCanHaveParent;
+	bool fCanHaveChildren;
+	string fErrorMessage;
 public:
-	ResourceDirective() { }
-	ResourceDirective(const char* resType) : fResType(string(resType)) { }
+	ResourceDirective() : fParent(NULL) { }
+	ResourceDirective(const char* resType, bool canHaveParent, bool canHaveChildren) :
+		fResType(string(resType)), fParent(NULL), fCanHaveParent(canHaveParent), fCanHaveChildren(canHaveChildren) { }
+	void setParent(ResourceDirective* parent);
 	void setId(string id);
 	string getId();
 	void setLoadType(LoadType loadType);
 	LoadType getLoadType();
 	virtual int getResourceTypeAsInt() { return ResType_Binary; }
 	virtual void writeDirectives(ostringstream& output, bool asVariant);
+	virtual void writeDirectiveIdentifier(ostringstream& output, bool asVariant);
+	virtual void writeDirectiveBody(ostringstream& output, bool asVariant);
+	virtual void writeDirectiveChildren(ostringstream& output, bool asVariant);
 	virtual void initDirectiveFromAttributes(const char **attributes);
 	virtual void initDirectiveFromCData(const char* cdata, int length);
 	virtual string getUniqueToken();
@@ -69,6 +81,7 @@ public:
 	void setLineNo(int lineNo);
 	int getLineNo();
 	static void writeByteDirective(ostringstream& output, const char* array, size_t offset, size_t len);
+	static void writeWordDirective(ostringstream& output, DataType type, const int* array, size_t offset, size_t len);
 };
 
 static string gLastLFileDirective;
@@ -79,7 +92,9 @@ protected:
 	bool fUseIncludeDirective;
 public:
 	FileResourceDirective(const char* resType, bool useIncludeDirective)
-		: ResourceDirective(resType) { fUseIncludeDirective = useIncludeDirective; }
+		: ResourceDirective(resType, false, false) { fUseIncludeDirective = useIncludeDirective; }
+	FileResourceDirective(const char* resType, bool useIncludeDirective, bool canHaveParent, bool canHaveChildren)
+		: ResourceDirective(resType, canHaveParent, canHaveParent) { fUseIncludeDirective = useIncludeDirective; }
 	void setResource(string resource);
 	string getUniqueToken();
 	virtual void writeDirectives(ostringstream& output, bool asVariant);
@@ -90,8 +105,21 @@ public:
 
 class BinaryResourceDirective : public FileResourceDirective {
 public:
-	BinaryResourceDirective() : FileResourceDirective("bin", true) { }
+	BinaryResourceDirective() : FileResourceDirective("bin", true, true, true) { }
 	int getResourceTypeAsInt() { return ResType_Binary; }
+	string validate();
+};
+
+class DataResourceDirective : public ResourceDirective {
+private:
+	DataType fType;
+	vector<int> fInts;
+	string fBinaryData;
+	bool parseInts();
+public:
+	DataResourceDirective(DataType type) : ResourceDirective("", true, false), fType(type) { }
+	virtual void writeDirectives(ostringstream& output, bool asVariant);
+	void initDirectiveFromCData(const char* cdata, int length);
 };
 
 class ImageResourceDirective : public FileResourceDirective {
@@ -119,19 +147,22 @@ public:
 };
 
 class StringResourceDirective : public ResourceDirective {
-private:
-	string fStringValue;
-	void writeDirectiveAsString(ostringstream& output, size_t offset, size_t len);
 public:
-	StringResourceDirective() : ResourceDirective("string") { }
+	enum StringType { STRING, PSTRING, CSTRING } ;
+	StringResourceDirective(StringType type) : ResourceDirective("string", true, false), fType(type) { }
 	void writeDirectives(ostringstream& output, bool asVariant);
 	void initDirectiveFromCData(const char* cdata, int length);
 	string getUniqueToken();
+	string validate();
+private:
+	StringType fType;
+	string fStringValue;
+	void writeDirectiveAsString(ostringstream& output, size_t offset, size_t len);
 };
 
 class PlaceholderDirective : public ResourceDirective {
 public:
-	PlaceholderDirective() : ResourceDirective("placeholder") { }
+	PlaceholderDirective() : ResourceDirective("placeholder", false, false) { }
 	void writeDirectives(ostringstream& output, bool asVariant);
 	int getResourceType() { return ResType_PlaceHolder; }
 };

@@ -184,6 +184,7 @@ public:
 	        vector<Capability> optionalCapabilities);
 	Profile* findProfile(string profileName);
 	Profile* findProfile(string profileName, set<string> alreadyFound);
+	string profilesdir(string family);
 };
 
 // XML parsing decl's

@@ -1,6 +1,7 @@
 package com.mosync.internal.android.nfc;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 
 import android.nfc.tech.TagTechnology;
 
@@ -14,4 +15,5 @@ public interface INFCTag<NativeTagType extends TagTechnology> extends IResource 
 
 	NativeTagType nativeTag();
 
+	public int getId(ByteBuffer result);
 }

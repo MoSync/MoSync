@@ -101,8 +101,8 @@ struct ParserState {
 	stack<VariantCondition> conditionStack;
 	// The resource set
 	VariantResourceSet* resourceSet;
-	// The last directive added
-	ResourceDirective* currentDirective;
+	// The stack of directives, with the top being the last one added
+	stack<ResourceDirective*> directiveStack;
 	// Do we pass through the main tag?
 	bool started;
 	// Line #

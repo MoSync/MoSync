@@ -49,6 +49,23 @@ int isDirectory(const char* filename) {
 	return S_ISDIR(s.st_mode);
 }
 
+int compareTime(const char* file1, const char* file2) {
+	struct stat s1, s2;
+	time_t t1, t2;
+	int res1, res2;
+
+	res1 = stat(file1, &s1);
+	t1 = res1 ? 0 : s1.st_mtime;
+	res2 = stat(file2, &s2);
+	t2 = res2 ? 0 : s2.st_mtime;
+
+	if (t1 == t2) {
+		return 0;
+	}
+
+	return t1 - t2;
+}
+
 char* fullpath(const char* name) {
 	return realpath(name, NULL);
 }
