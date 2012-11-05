@@ -83,8 +83,11 @@ SettingsScreen::SettingsScreen(SettingsScreenListener* listener):
 
 	mIPEditBox->addEditBoxListener(this);
 	mPortEditBox->addEditBoxListener(this);
+	if (isAndroid())
+	{
 	mTickerText->addEditBoxListener(this);
 	mContentTitle->addEditBoxListener(this);
+	}
 	mConnectButton->addButtonListener(this);
 
 	if (isAndroid())
