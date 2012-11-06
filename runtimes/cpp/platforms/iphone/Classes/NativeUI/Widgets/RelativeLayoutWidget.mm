@@ -93,6 +93,9 @@ MAKE_UIWRAPPER_LAYOUTING_IMPLEMENTATION(MoSync, UIScrollView)
         [scrollView setWidget:self];
         [scrollView release];
         scrollView = nil;
+
+        self.autoSizeHeight = WidgetAutoSizeWrapContent;
+        self.autoSizeWidth = WidgetAutoSizeWrapContent;
     }
     return self;
 }

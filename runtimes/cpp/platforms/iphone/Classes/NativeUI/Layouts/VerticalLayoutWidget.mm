@@ -97,7 +97,7 @@
 - (CGSize)sizeThatFitsForWidget
 {
     INNativeUILog;
-    float maxWidth = self.width;
+    float maxWidth = 0.0;
     float countHeight = 0.0;
     for (IWidget* child in _children)
     {

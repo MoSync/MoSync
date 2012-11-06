@@ -85,6 +85,13 @@ typedef enum {
  */
 - (int)setPropertyWithKey:(NSString*)key toValue:(NSString*)value;
 
+/**
+ * Recalculate its and children size.
+ * If needed and possible the parent will be resized too.
+ */
+- (void)layout;
+
 - (void)superLayoutSubviews;
+
 
 @end

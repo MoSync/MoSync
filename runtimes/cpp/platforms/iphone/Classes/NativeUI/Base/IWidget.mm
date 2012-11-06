@@ -388,38 +388,26 @@
 }
 
 /**
- * Recalculate its and children size.
- * If needed and possible the parent will be resized too.
+ * Recalculate its size and other widget sizes, if needed.
  */
 - (void)layout
 {
-    INNativeUILog;
-    CGSize previousSize = self.size;
-    [self layoutSubviews:_view];
-
     CGSize sizeThatFits = [self sizeThatFitsForWidget];
     float width = self.width;
     float height = self.height;
-    if (_autoSizeWidth == WidgetAutoSizeWrapContent)
+    if (self.autoSizeWidth != WidgetAutoSizeFixed)
     {
         width = sizeThatFits.width;
     }
-    if (_autoSizeHeight == WidgetAutoSizeWrapContent)
+    if (self.autoSizeHeight != WidgetAutoSizeFixed)
     {
         height = sizeThatFits.height;
     }
-    self.size = CGSizeMake(width, height);
-    CGSize currentSize = self.size;
-    if (CGSizeEqualToSize(previousSize, currentSize))
-    {
-        return;
-    }
 
-    // If the widget has parent and if at least one of its auto size params is wrap content,
-    // then ask the parent to layout itself.
-    if (_parent &&
-        (_parent.autoSizeWidth == WidgetAutoSizeWrapContent ||
-         _parent.autoSizeHeight == WidgetAutoSizeWrapContent))
+    self.size = CGSizeMake(width, height);
+
+    // The widget's size will be set by the parent(if it has one).
+    if (_parent)
     {
         [_parent layout];
     }
@@ -508,6 +496,8 @@
             self.width = (CGFloat)width / getScreenScale();
             break;
     }
+
+    [self layout];
     return MAW_RES_OK;
 }
 
@@ -546,6 +536,8 @@
             self.height = (CGFloat)height / getScreenScale();
             break;
     }
+
+    [self layout];
     return MAW_RES_OK;
 }
 

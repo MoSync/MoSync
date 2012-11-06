@@ -48,11 +48,13 @@
         float viewHeight = child.height;
         float viewWidth = child.width;
 
-        if(child.autoSizeHeight == WidgetAutoSizeFillParent)
+        if(child.autoSizeHeight == WidgetAutoSizeFillParent &&
+           self.parent)
         {
             viewHeight = self.height - totalVerticalMargin;
         }
-        else if(child.autoSizeHeight == WidgetAutoSizeWrapContent)
+        else if(child.autoSizeHeight == WidgetAutoSizeWrapContent &&
+            self.parent)
         {
             viewHeight = [child sizeThatFitsForWidget].height;
         }
@@ -97,7 +99,7 @@
 {
     INNativeUILog;
     float countWidth = 0.0;
-    float maxHeight = self.height;
+    float maxHeight = 0.0;
     for (IWidget* child in _children)
     {
         countWidth += child.width;

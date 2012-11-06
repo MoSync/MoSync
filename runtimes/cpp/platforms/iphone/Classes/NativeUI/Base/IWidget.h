@@ -208,8 +208,7 @@
 - (NSString*)getPropertyWithKey:(NSString*)key;
 
 /**
- * Recalculate its and children size.
- * If needed and possible the parent will be resized too.
+ * Recalculate its size and other widget sizes, if needed.
  */
 - (void)layout;
 

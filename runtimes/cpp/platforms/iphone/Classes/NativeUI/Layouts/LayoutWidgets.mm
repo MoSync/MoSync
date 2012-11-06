@@ -116,8 +116,8 @@ MAKE_UIWRAPPER_LAYOUTING_IMPLEMENTATION(MoSync, HLayoutView)
         }
 
         self.view = layout;
-        self.autoSizeWidth = WidgetAutoSizeFixed;
-        self.autoSizeHeight = WidgetAutoSizeFixed;
+        self.autoSizeWidth = WidgetAutoSizeWrapContent;
+        self.autoSizeHeight = WidgetAutoSizeWrapContent;
         [layout release];
         layout = NULL;
     }
@@ -203,6 +203,49 @@ MAKE_UIWRAPPER_LAYOUTING_IMPLEMENTATION(MoSync, HLayoutView)
 		return [super setPropertyWithKey:key toValue:value];
 	}
 	return MAW_RES_OK;
+}
+
+/**
+ * Recalculate its and children size.
+ * If needed and possible the parent will be resized too.
+ */
+- (void)layout
+{
+    INNativeUILog;
+
+    CGSize sizeThatFits = [self sizeThatFitsForWidget];
+    float width = self.width;
+    float height = self.height;
+    if (self.autoSizeWidth == WidgetAutoSizeWrapContent)
+    {
+        width = sizeThatFits.width;
+    }
+    else if (self.autoSizeWidth == WidgetAutoSizeFillParent &&
+             width < sizeThatFits.width)
+    {
+        width = sizeThatFits.width;
+    }
+    if (self.autoSizeHeight == WidgetAutoSizeWrapContent)
+    {
+        height = sizeThatFits.height;
+    }
+    else if (self.autoSizeHeight == WidgetAutoSizeFillParent &&
+             height < sizeThatFits.height)
+    {
+        height = sizeThatFits.height;
+    }
+
+    self.size = CGSizeMake(width, height);
+    [self layoutSubviews:self.view];
+
+    // If the widget has parent and if at least one of its auto size params is wrap content,
+    // then ask the parent to layout itself.
+    if (self.parent &&
+        (self.parent.autoSizeWidth != WidgetAutoSizeFixed ||
+         self.parent.autoSizeHeight != WidgetAutoSizeFixed))
+    {
+        [self.parent layout];
+    }
 }
 
 - (void)superLayoutSubviews

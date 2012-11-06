@@ -451,24 +451,21 @@ static NSString* kReuseIdentifier = @"Cell";
     {
         return;
     }
-    IWidget* child = [_children objectAtIndex:0];
-    CGSize oldSize = child.size;
-    CGSize newSize = oldSize;
-    if (child.autoSizeHeight == WidgetAutoSizeFillParent)
+
+    CGSize previousSize = self.size;
+    CGSize newSize;
+    if (self.autoSizeHeight == WidgetAutoSizeFixed)
     {
-        newSize.height = super.height;
+        newSize = self.size;
     }
-    if (child.autoSizeWidth == WidgetAutoSizeFillParent)
+    else
     {
-        newSize.width = super.width;
+        newSize = [self sizeThatFitsForWidget];
     }
-    if (!CGSizeEqualToSize(oldSize, newSize))
+
+    if (!CGSizeEqualToSize(previousSize, newSize))
     {
-        child.size = newSize;
-    }
-    CGSize sizaThatFits = [self sizeThatFitsForWidget];
-    if (!CGSizeEqualToSize(self.size, sizaThatFits))
-    {
+        self.size = newSize;
         [_delegate sizeChangedFor:self];
     }
 }
