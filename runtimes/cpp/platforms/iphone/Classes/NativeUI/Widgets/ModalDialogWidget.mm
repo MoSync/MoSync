@@ -59,6 +59,7 @@
 
         // Will contain the navigation bar and the view where the widgets will be added.
         UIView* bigView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, screenSize.size.width, screenSize.size.height)];
+        bigView.backgroundColor = [UIColor whiteColor];
 
         mModalViewController.view = bigView;
 
