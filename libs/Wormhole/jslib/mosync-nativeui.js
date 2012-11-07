@@ -50,6 +50,11 @@ mosync.nativeui.eventCallBackTable = {};
 mosync.nativeui.widgetCounter = 0;
 
 /**
+ * The unique root layout ID.
+ */
+mosync.nativeui.mainWebViewId = "mosync.nativeui.mainWebViewId";
+
+/**
  * Creates a mosync.nativeui Widget and registers it callback for return of the
  * handle, Used internally use mosync.nativeui.create in your code.
  *
@@ -404,6 +409,26 @@ mosync.nativeui.createCallback = function(callbackID, widgetID, handle) {
 	}
 };
 
+/**
+ * Sets the web view widget handle and maps it inside the widgetIDList
+ * @param handle
+ *            The handle of the web view widget.
+ */
+mosync.nativeui.setWebViewHandle = function(handle)
+{
+	mosync.nativeui.widgetIDList[mosync.nativeui.mainWebViewId] = handle;
+	new mosync.nativeui.NativeWidgetElement("WebView", mosync.nativeui.mainWebViewId, {
+	}, null, null);
+};
+
+/**
+ * Gets the root layout ID
+ */
+mosync.nativeui.getRootLayoutID = function()
+{
+	return mosync.nativeui.rootLayoutID;
+};
+
 mosync.nativeui.success = function(callbackID) {
 	var callBack = mosync.nativeui.callBackTable[callbackID];
 
@@ -606,9 +631,18 @@ mosync.nativeui.NativeWidgetElement = function(widgetType, widgetID, params,
 	};
 	/*
 	 * Create the widget in the Native Side
+	 * TODO SA
 	 */
-	mosync.nativeui.maWidgetCreate(widgetType, self.id, this.onSuccess, this.onError,
-			self.processedMessage, self.params);
+	if (self.id !== mosync.nativeui.mainWebViewId)
+	{
+		mosync.nativeui.maWidgetCreate(widgetType, self.id, this.onSuccess, this.onError,
+				self.processedMessage, self.params);
+	}
+	else
+	{
+		self.created = true;
+		self.handle = mosync.nativeui.widgetIDList[mosync.nativeui.mainWebViewId];
+	}
 
 	/**
 	 * Sets a property to the widget in question.
@@ -1202,6 +1236,12 @@ document.getNativeElementById = function(widgetID) {
 	return mosync.nativeui.NativeElementsTable[widgetID];
 };
 
+// TODO SA: add doc
+mosync.nativeui.getMainWebViewID = function()
+{
+	return mosync.nativeui.mainWebViewId;
+};
+
 /**
  * creates a widget and returns a mosync.nativeui.NativeWidgetElement object.
  * The object then can be used for modifying the respective NativeElement.
@@ -1228,7 +1268,6 @@ document.getNativeElementById = function(widgetID) {
  *					"width" : "100%"
  * 					});
  * \endcode
-
  */
 mosync.nativeui.create = function(widgetType, widgetID, params,
 		successCallback, errorCallback) {

@@ -88,6 +88,8 @@ HybridMoblet::HybridMoblet()
 
 	// Create file utility object.
 	mFileUtil = new FileUtil();
+
+	createUI();
 }
 
 /**
@@ -129,7 +131,24 @@ void HybridMoblet::initialize()
 void HybridMoblet::openWormhole(
 	Wormhole::HybridMoblet* moblet)
 {
+	sendDeviceScreenSizeToJavaScript();
+	sendWebViewHandleToJavaScript();
+
 	mMessageHandler.openWormhole(moblet);
+}
+
+/**
+ * Creates the main UI of the root screen.
+ */
+void HybridMoblet::createUI()
+{
+	// Create and show the screen that holds the WebView.
+	mScreen = new NativeUI::Screen();
+
+	// Create and configure the WebView.
+	mWebView = new NativeUI::WebView();
+	mWebView->fillSpaceHorizontally();
+	mWebView->fillSpaceVertically();
 }
 
 /**
@@ -139,19 +158,6 @@ void HybridMoblet::openWormhole(
  */
 NativeUI::WebView* HybridMoblet::getWebView()
 {
-	// Create the WebView if it does not exist.
-	if (NULL == mWebView)
-	{
-		// Create and configure the WebView.
-		mWebView = new NativeUI::WebView();
-		mWebView->fillSpaceHorizontally();
-		mWebView->fillSpaceVertically();
-
-		// Create the screen that holds the WebView.
-		mScreen = new NativeUI::Screen();
-		mScreen->setMainWidget(mWebView);
-	}
-
 	return mWebView;
 }
 
@@ -206,9 +212,7 @@ void HybridMoblet::showNativeUI(const MAUtil::String& url)
  */
 void HybridMoblet::showWebView()
 {
-	// Make sure the WebView is created.
-	getWebView();
-
+	mScreen->setMainWidget(mWebView);
 	// Show the screen that contains the WebView.
 	mScreen->show();
 }
@@ -283,6 +287,38 @@ void HybridMoblet::keyPressEvent(int keyCode, int nativeCode)
 void HybridMoblet::callJS(const MAUtil::String& script)
 {
 	getWebView()->callJS(script);
+}
+
+/**
+ * Sends the Device Screen size to JavaScript.
+ */
+void HybridMoblet::sendDeviceScreenSizeToJavaScript()
+{
+	MAExtent scrSize = maGetScrSize();
+	int width = EXTENT_X(scrSize);
+	int height = EXTENT_Y(scrSize);
+	char buf[512];
+	sprintf(
+		buf,
+		"mosync.nativeui.setScreenSize(%d,%d)",
+		width,
+		height);
+	callJS(buf);
+}
+
+/**
+ * Sends the web view handle to JavaScript.
+ */
+void HybridMoblet::sendWebViewHandleToJavaScript()
+{
+	char buffer[1024];
+	MAWidgetHandle widget = mWebView->getWidgetHandle();
+	//We use a special callback for widget creation
+	sprintf(
+		buffer,
+		"mosync.nativeui.setWebViewHandle('%d')",
+		widget);
+	callJS(buffer);
 }
 
 /**
