@@ -278,6 +278,14 @@ public class MoSyncNFC {
 		return null;
 	}
 
+	public int maNFCGetId(int tagHandle, int dst, int len) {
+		IResource res = getResource(tagHandle);
+		if (res instanceof INFCTag) {
+			return ((INFCTag) res).getId(getMemoryAt(dst, len));
+		}
+		return invalidTagType("maNFCGetId");
+	}
+
 	public int maNFCGetSize(int tagHandle) {
 		IResource resource = getResource(tagHandle);
 		if (resource instanceof ISizeHolder) {

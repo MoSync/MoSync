@@ -204,6 +204,10 @@ int main(int argc, const char** argv) {
 			setString(i, argc, argv, s.androidAlias);
 		} else if(streq(argv[i], "--android-keypass")) {
 			setString(i, argc, argv, s.androidKeyPass);
+		} else if(streq(argv[i], "--android-install-location")) {
+			setString(i, argc, argv, s.androidInstallLocation);
+		} else if(streq(argv[i], "--android-manifest-template")) {
+			setString(i, argc, argv, s.androidManifestTemplate);
 		} else if(streq(argv[i], "--blackberry-jde")) {
 			setString(i, argc, argv, s.blackberryJde);
 		} else if(streq(argv[i], "--blackberry-signkey")) {
@@ -418,6 +422,18 @@ void testAndroidVersionCode(const SETTINGS& s) {
 	if (atoi(s.androidVersionCode) < 1) {
 		printf("Android version code must be a number > 0!\n");
 		exit(1);
+	}
+}
+
+void testAndroidInstallLocation(const SETTINGS& s) {
+	if (s.androidInstallLocation) {
+		if (strcmp("internalOnly", s.androidInstallLocation) &&
+			strcmp("preferExternal", s.androidInstallLocation) &&
+			strcmp("auto", s.androidInstallLocation)) {
+			printf("Android install location must be one of these:\n");
+			printf("\"internalOnly\", \"preferExternal\", \"auto\"");
+			exit(1);
+		}
 	}
 }
 
