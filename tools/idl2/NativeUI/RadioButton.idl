@@ -1,0 +1,64 @@
+/**
+* The available widget properties for a #MAW_RADIO_BUTTON. See \ref WidgetProperties "Widget properties" for more properties.
+*/
+group WidgetRadioButtonProperties "Radio Button" {
+	constset MAString MAW_RADIO_BUTTON_ {
+		/**
+		* @brief Get the checked state of the radio button.
+		*
+		* @validvalue A boolean string 'true' or 'false'.
+		*
+		* @getonly
+		*
+		* @par Example
+		* \code
+		*	char state[BUFFER_SIZE];
+		*	maWidgetGetProperty(radioButtonHandle, MAW_RADIO_BUTTON_CHECKED, state, BUFFER_SIZE);
+		* \endcode
+		*/
+		CHECKED = "checked";
+
+		/**
+		* @brief Change the checked state of the view to the inverse of its current state.
+		* If the radio button is already checked, this method will not toggle the radio button.
+		*
+		* @validvalue No neccessary value needed.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(radioButtonHandle, MAW_RADIO_BUTTON_TOGGLE, "");
+		* \endcode
+		*/
+		TOGGLE = "toggle";
+
+		/**
+		* @brief Set or get the text to display.
+		*
+		* @validvalue A null-terminated string.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(radioButtonHandle, MAW_RADIO_BUTTON_TEXT, "Option A");
+		* \endcode
+		*/
+		TEXT = "text";
+
+		/**
+		* @brief Specifies the text color of the radio button.
+		*
+		* @validvalue A hexadecimal value 0xRRGGBB, where R, G and B are the red, green and blue components respectively.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(widgetHandle, MAW_RADIO_BUTTON_TEXT_COLOR, "0xff0000"); // Red
+		* \endcode
+		*/
+		TEXT_COLOR = "textcolor";
+	}
+} // end of WidgetRadioButtonProperties

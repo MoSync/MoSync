@@ -2,7 +2,7 @@
  * membench.cpp
  *
  * Created on: 13 jul 2011
- *      Author: Alex
+ *		Author: Alex
  *
  * A Memory Benchmark to test the performance of
  * malloc/free, new/delete and access of different kind of datatypes/structures
@@ -331,5 +331,3 @@ int MemBench::memAccess(int numRuns, int size, int testType) {
 int MemBench::currTime() {
 	return maGetMilliSecondCount();
 }
-
-

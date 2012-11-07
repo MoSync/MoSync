@@ -1,0 +1,57 @@
+/**
+* The available widget properties for a #MAW_RADIO_GROUP. See \ref WidgetProperties "Widget properties" for more properties.
+*/
+group WidgetRadioGroupProperties "Radio Group" {
+	constset MAString MAW_RADIO_GROUP_ {
+		/**
+		* @brief Add the radio buttons grouped in this widget.
+		* This is the only widget type that accepts Radio Buttons as children.
+		*
+		* @validvalue An int specifying the radio button handle.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	// Attach two radio buttons to this group.
+		*	maWidgetSetProperty(radioGroupHandle, MAW_RADIO_GROUP_ADD_VIEW, "3");
+		*	maWidgetSetProperty(radioGroupHandle, MAW_RADIO_GROUP_ADD_VIEW, "4");
+		* \endcode
+		*/
+		ADD_VIEW = "addview";
+
+		/**
+		* @brief Clear the selection.
+		* When the selection is cleared, no radio button in this group is selected and
+		* #MAW_RADIO_GROUP_SELECTED returns -1.
+		*
+		* @validvalue No neccessary value needed.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(radioGroupHandle, MAW_RADIO_GROUP_CLEAR_CHECK, "");
+		* \endcode
+		*/
+		CLEAR_CHECK = "clearcheck";
+
+		/**
+		* @brief Set or get the selected radio button in this group.
+		* Upon empty selection, get property returns -1.
+		* Setting -1 as the selection identifier clears the selection; such an operation
+		* is equivalent to invoking #MAW_RADIO_GROUP_CLEAR_CHECK.
+		*
+		* @validvalue A valid radio button handle.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+		*	char buttonHandle[BUF_SIZE];
+		*	maWidgetGetProperty(radioGroupHandle, MAW_RADIO_GROUP_SELECTED, buttonHandle, BUF_SIZE);
+		* \endcode
+		*/
+		SELECTED = "selected";
+	}
+} // end of WidgetRadioGroupProperties

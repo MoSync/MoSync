@@ -11,7 +11,7 @@ $benchmark = mysql_real_escape_string($_GET['benchmark']); 				//which benchmark
 $revision = mysql_real_escape_string($_GET['revision']); 				//which revision of mosync we ran it on (if we did not run a native runtime)
 $runtime = mysql_real_escape_string($_GET['runtime']); 					//the runtime name, must be matched to a runtime_id
 $git_hash = mysql_real_escape_string($_GET['git_hash']); 				//the git_hash of the current build (if running a mosync runtime or mosync generated native code)
-$phone = mysql_real_escape_string($_GET['phone']); 						//the phone name, must be matched to a phone_id 
+$phone = mysql_real_escape_string($_GET['phone']); 						//the phone name, must be matched to a phone_id
 $native_sdk_ver = mysql_real_escape_string($_GET['native_sdk_ver']);	//the native SDK version
 
 //only access the $_GET indexes we use
@@ -55,7 +55,7 @@ if(mysql_num_rows($res) == 0){ /* NO match in the database, we need to add this 
 	$row = mysql_fetch_assoc($res);
 	$phone_id = $row['phone_id'];
 }
-	
+
 /* retrieve the runtime ID of this runtime from the 'runtimes' table*/
 $res = mysql_query("SELECT runtime_id from runtimes WHERE runtime_name = '$runtime'");
 $row = mysql_fetch_assoc($res);
@@ -76,7 +76,7 @@ $native_sdk_ver', '$mflops')");
 	$res = mysql_query("INSERT INTO opengl_testruns (revision, runtime_id, git_hash, phone_id, native_sdk_ver, test1, test2, test3, test4) VALUES ('$revision', '$runtime_id', '$git_hash', '$phone_id', '$native_sdk_ver
 ', '$test1', '$test2', '$test3', '$test4')");
 }else if($benchmark == 'membench'){
-	$res = mysql_query("INSERT INTO membench_testruns (revision, runtime_id, git_hash, phone_id, native_sdk_ver, alloc_str_10, alloc_str_100, alloc_void_1, alloc_void_100, alloc_void_1000, 
+	$res = mysql_query("INSERT INTO membench_testruns (revision, runtime_id, git_hash, phone_id, native_sdk_ver, alloc_str_10, alloc_str_100, alloc_void_1, alloc_void_100, alloc_void_1000,
 	alloc_dummy, alloc_dummy_struct, alloc_dummy_mix, access_array, access_vector, add_vector, access_dummy, access_dummy_struct, access_dummy_mix) VALUES ('$revision', '$runtime_id', '$git_hash', '
 	$phone_id', '$native_sdk_ver', '$alloc_str_10', '$alloc_str_100', '$alloc_void_1', '$alloc_void_100', '$alloc_void_1000', '$alloc_dummy', '$alloc_dummy_struct', '$alloc_dummy_mix', '$access_array
 	', '$access_vector', '$add_vector', '$access_dummy', '$access_dummy_struct', '$access_dummy_mix')");

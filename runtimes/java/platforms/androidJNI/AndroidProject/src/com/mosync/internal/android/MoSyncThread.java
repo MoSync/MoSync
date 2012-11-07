@@ -178,7 +178,7 @@ public class MoSyncThread extends Thread
 	MoSyncNativeUI mMoSyncNativeUI;
 	MoSyncFile mMoSyncFile;
 	// Module for device fonts.
-	MoSyncFont mMoSyncFont;
+	static MoSyncFont mMoSyncFont;
 	MoSyncCameraController mMoSyncCameraController;
 	MoSyncSMS mMoSyncSMS;
 	MoSyncSensor mMoSyncSensor;
@@ -1504,7 +1504,7 @@ public class MoSyncThread extends Thread
 	 * @param fontHandle A font handle.
 	 * @return The font handle object.
 	 */
-	public MoSyncFontHandle getMoSyncFont(int fontHandle)
+	public static MoSyncFontHandle getMoSyncFont(int fontHandle)
 	{
 		return mMoSyncFont.getMoSyncFont(fontHandle);
 	}

@@ -1787,7 +1787,7 @@ namespace Base {
 				return 0;
 			}
 
-			UIView *newView = [widget getView];
+			UIView *newView = widget.view;
 
 			CameraInfo *info = getCurrentCameraInfo();
 
@@ -2051,6 +2051,7 @@ namespace Base {
 		{
 			[UIApplication sharedApplication].idleTimerDisabled = NO;
 		}
+        return RES_OK;
 	}
 
     SYSCALL(int, maSensorStart(int sensor, int interval))

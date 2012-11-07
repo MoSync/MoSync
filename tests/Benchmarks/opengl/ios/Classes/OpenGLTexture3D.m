@@ -1,9 +1,9 @@
 //
-//  OpenGLTexture3D.m
-//  NeHe Lesson 06
+//	OpenGLTexture3D.m
+//	NeHe Lesson 06
 //
-//  Created by Jeff LaMarche on 12/24/08.
-//  Copyright 2008 Jeff LaMarche Consulting. All rights reserved.
+//	Created by Jeff LaMarche on 12/24/08.
+//	Copyright 2008 Jeff LaMarche Consulting. All rights reserved.
 //
 
 #import "OpenGLTexture3D.h"
@@ -17,27 +17,27 @@
 	if ((self = [super init]))
 	{
 		glEnable(GL_TEXTURE_2D);
-		
+
 		self.filename = inFilename;
-		glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);  
+		glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
 		glGenTextures(1, &texture[0]);
 		glBindTexture(GL_TEXTURE_2D, texture[0]);
 		//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR); 
-		glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR); 
+		glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		glBlendFunc(GL_ONE, GL_SRC_COLOR);
-		
+
 		NSString *extension = [inFilename pathExtension];
 		NSString *baseFilenameWithExtension = [inFilename lastPathComponent];
 		NSString *baseFilename = [baseFilenameWithExtension substringToIndex:[baseFilenameWithExtension length] - [extension length] - 1];
 
 		NSString *path = [[NSBundle mainBundle] pathForResource:baseFilename ofType:extension];
 		NSData *texData = [[NSData alloc] initWithContentsOfFile:path];
-		
+
 		// Assumes pvr4 is RGB not RGBA, which is how texturetool generates them
 		if ([extension isEqualToString:@"pvr4"])
 			glCompressedTexImage2D(GL_TEXTURE_2D, 0, GL_COMPRESSED_RGB_PVRTC_4BPPV1_IMG, inWidth, inHeight, 0, (inWidth * inHeight) / 2, [texData bytes]);
@@ -48,7 +48,7 @@
 			UIImage *image = [[UIImage alloc] initWithData:texData];
 			if (image == nil)
 				return nil;
-			
+
 			GLuint width = CGImageGetWidth(image.CGImage);
 			GLuint height = CGImageGetHeight(image.CGImage);
 			CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
@@ -61,7 +61,7 @@
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, imageData);
 			//GLuint errorcode = glGetError();
 			CGContextRelease(context);
-			
+
 			free(imageData);
 			[image release];
 		}

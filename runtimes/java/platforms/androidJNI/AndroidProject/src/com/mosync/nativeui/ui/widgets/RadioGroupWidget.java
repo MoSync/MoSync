@@ -20,9 +20,11 @@ package com.mosync.nativeui.ui.widgets;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.util.Log;
 import android.widget.RadioGroup;
 
 import com.mosync.internal.generated.IX_WIDGET;
+import com.mosync.nativeui.util.properties.IntConverter;
 import com.mosync.nativeui.util.properties.InvalidPropertyValueException;
 import com.mosync.nativeui.util.properties.PropertyConversionException;
 
@@ -58,26 +60,9 @@ public class RadioGroupWidget extends Widget
 	}
 
 	/**
-	 *
-	 * @param id
-	 * @return
-	 */
-	public RadioButtonWidget getButton(int id)
-	{
-		for (int i=0; i < mButtons.size(); i++)
-		{
-			if ( mButtons.get(i).getId() == id )
-			{
-				return mButtons.get(i);
-			}
-		}
-		return null;
-	}
-
-	/**
-	 *
-	 * @param id
-	 * @return
+	 * Get the handle of a radio button widget.
+	 * @param id The radio button id.
+	 * @return The radio button widget handle.
 	 */
 	public int getButtonHandle(int id)
 	{
@@ -101,10 +86,26 @@ public class RadioGroupWidget extends Widget
 		radioGroup.check(id);
 	}
 
+	/**
+	 * Get checked radio button id.
+	 * @return The radio button id.
+	 */
 	public int getChecked()
 	{
 		RadioGroup radioGroup = (RadioGroup) getView( );
 		return radioGroup.getCheckedRadioButtonId();
+	}
+
+	@Override
+	public int addChildAt(Widget child,int index)
+	{
+		if ( !(child instanceof RadioButtonWidget) )
+		{
+			Log.e("@@MoSync","maWidgetAddChild error: RadioGroupWidget can only add RadioButtons.");
+			return IX_WIDGET.MAW_RES_INVALID_LAYOUT;
+		}
+
+		return IX_WIDGET.MAW_RES_OK;
 	}
 
 	@Override
@@ -121,11 +122,33 @@ public class RadioGroupWidget extends Widget
 			RadioGroup radioGroup = (RadioGroup) getView( );
 			radioGroup.clearCheck();
 		}
+		else if( property.equals( IX_WIDGET.MAW_RADIO_GROUP_SELECTED ) )
+		{
+			checkRadioButton(IntConverter.convert(value));
+		}
+		else if( property.equals( IX_WIDGET.MAW_RADIO_GROUP_ADD_VIEW ) )
+		{
+			// TODO get RadioButtonWidget from widgetHandle (IntConverter.convert(value)).
+//			addButton(IntConverter.convert(value));
+		}
 		else
 		{
 			return false;
 		}
 		return true;
+	}
+
+	@Override
+	public String getProperty(String property)
+	{
+		if ( property.equals( IX_WIDGET.MAW_RADIO_GROUP_SELECTED ))
+		{
+			int checkedButtonHandle = getButtonHandle( getChecked() );
+			if ( checkedButtonHandle != -1 )
+				return Integer.toString(checkedButtonHandle);
+		}
+
+		return INVALID_PROPERTY_NAME;
 	}
 
 }

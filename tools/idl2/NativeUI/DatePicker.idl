@@ -1,0 +1,186 @@
+/**
+* The available widget properties for a #MAW_DATE_PICKER. See \ref WidgetProperties "Widget properties" for more properties.
+*/
+group WidgetDatePickerProperties "Date Picker" {
+	constset MAString MAW_DATE_PICKER_ {
+		/**
+		* @deprecated use MAX_DATE_YEAR, MAX_DATE_MONTH and MAX_DATE_DAY instead
+		* @brief Sets or gets  maximal date supported by this DatePicker in seconds since January 1, 1970 00:00:00.
+		* NOTE: On Android the default maximal date is 12/31/2100.
+		* NOTE: The property can be set on iOS only.
+		* @validvalue A long int that specifies the upper range of this date picker.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(datePickerHandle, MAW_DATE_PICKER_MAX_DATE, "1291939200");
+		*	// Now the maximum date is	the 10th of December 2010.
+		* \endcode
+		*/
+		MAX_DATE = "maxDate";
+
+		/**
+		* @brief Sets or gets the year of the maximal date supported by this DatePicker.
+		* Note: On Android the default maximal date year is 2100.
+		* Note: On Windows Phone 7 and iOS the default maximal date year is 9999.
+		* @validvalue An int that specifies the value of the year of the maximal date
+		* for this date picker.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(datePickerHandle, MAW_DATE_PICKER_MAX_DATE_YEAR, "2999");
+		* \endcode
+		*/
+		MAX_DATE_YEAR = "maxdateyear";
+
+		/**
+		* @brief Sets or gets the month of the maximal date supported by this DatePicker.
+		* @validvalue An int that specifies the value of the month of the maximal date for
+		* this date picker. The value must be a number between 1 and 12.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(datePickerHandle, MAW_DATE_PICKER_MAX_DATE_MONTH, "12");
+		* \endcode
+		*/
+		MAX_DATE_MONTH = "maxdatemonth";
+
+		/**
+		* @brief Sets or gets the day of the maximal date supported by this DatePicker.
+		* @validvalue An int that specifies the value of the day of the maximal date for
+		* this date picker. This number must be a valid day of the month specified with
+		* the MAX_DATE_MONTH property.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(datePickerHandle, MAW_DATE_PICKER_MAX_DATE_DAY, "31");
+		* \endcode
+		*/
+		MAX_DATE_DAY = "maxdateday";
+
+		/**
+		* @deprecated use MIN_DATE_YEAR, MIN_DATE_MONTH and MIN_DATE_DAY instead
+		* @brief Sets or gets  minimal date supported by this DatePicker in seconds since January 1, 1970 00:00:00
+		* Note: On Android the default minimal date is 01/01/1900.
+		* @validvalue A long int that specifies the minimal supported date.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(datePickerHandle, MAW_DATE_PICKER_MIN_DATE, "946684800");
+		*	// Now the minimum date is the 1st of January 2000.
+		* \endcode
+		*/
+		MIN_DATE = "minDate";
+
+		/**
+		* @brief Sets or gets the year of the minimal date supported by this DatePicker.
+		* Note: On Android the default minimal date year  is 1900.
+		* Note: On Windows Phone 7 and iOS the default minimal date year is 1.
+		* @validvalue An int that specifies the value of the year of the minimal date
+		* for this date picker.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(datePickerHandle, MAW_DATE_PICKER_MIN_DATE_YEAR, "1830");
+		* \endcode
+		*/
+		MIN_DATE_YEAR = "mindateyear";
+
+		/**
+		* @brief Sets or gets the month of the minimal date supported by this DatePicker.
+		* @validvalue An int that specifies the value of the month of the minimal date for
+		* this date picker. The value must be a number between 1 and 12.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(datePickerHandle, MAW_DATE_PICKER_MIN_DATE_MONTH, "1");
+		* \endcode
+		*/
+		MIN_DATE_MONTH = "mindatemonth";
+
+		/**
+		* @brief Sets or gets the day of the minimal date supported by this DatePicker.
+		* @validvalue An int that specifies the value of the day of the minimal date for
+		* this date picker. This number must be a valid day of the month specified with
+		* the MIN_DATE_MONTH property.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(datePickerHandle, MAW_DATE_PICKER_MIN_DATE_DAY, "1");
+		* \endcode
+		*/
+		MIN_DATE_DAY = "mindateday";
+
+		/**
+		* @brief Sets or gets the currently displayed year.
+		*
+		* @validvalue An int that specifies a valid year.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+		*	char yearBuffer[BUFFER_SIZE];
+		*	int getStatus = maWidgetGetProperty(datePickerHandle, MAW_DATE_PICKER_YEAR, yearBuffer, BUFFER_SIZE);
+		*	if(getStatus == MAW_RES_OK)
+		*	{
+		*		// Do something with the year.
+		*	}
+		* \endcode
+		*/
+		YEAR = "year";
+
+		/**
+		* @brief Sets or gets the currently displayed month.
+		*
+		* @validvalue An int that specifies a valid month.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+		*	char monthBuffer[BUFFER_SIZE];
+		*	int getStatus = maWidgetGetProperty(datePickerHandle, MAW_DATE_PICKER_MONTH, monthBuffer, BUFFER_SIZE);
+		*	if(getStatus == MAW_RES_OK)
+		*	{
+		*		// Do something with the month.
+		*	}
+		* \endcode
+		*/
+		MONTH = "month";
+
+		/**
+		* @brief Sets or gets the currently displayed day of month.
+		*
+		* @validvalue An int that specifies a valid day of month.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+		*	char dayBuffer[BUFFER_SIZE];
+		*	int getStatus = maWidgetGetProperty(datePickerHandle, MAW_DATE_PICKER_DAY_OF_MONTH, dayBuffer, BUFFER_SIZE);
+		*	if(getStatus == MAW_RES_OK)
+		*	{
+		*		// Do something with the day.
+		*	}
+		* \endcode
+		*/
+		DAY_OF_MONTH = "dayOfMonth";
+	}
+} // end of WidgetDatePickerProperties

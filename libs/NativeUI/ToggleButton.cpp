@@ -21,7 +21,8 @@ MA 02110-1301, USA.
  * @author Emma Tresanszki
  *
  * Class for a a special kind of check button.
- * It is available only on Android, and it's similar to the Check Box on iOS.
+ * It is available on Android, iOS and Windows Phone 7.
+ * On iOS it looks and acts exactly the same as CheckBox widget.
  * For toggle button events see ToggleButtonListener
  */
 

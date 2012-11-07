@@ -18,6 +18,7 @@
 		43CCA6EE15774C3000545361 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 433CCCB7152DC7E90055828B /* StoreKit.framework */; };
 		43CE0BFF1463EEA400F8FFC3 /* iAd.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 43CE0BFE1463EEA400F8FFC3 /* iAd.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		6019007415B8587C008F2D0E /* CoreVideo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6019007315B8587C008F2D0E /* CoreVideo.framework */; };
+		5D376CA81588703F00CEF01D /* MapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5D376CA71588703F00CEF01D /* MapKit.framework */; };
 		85796C5512719251002B7859 /* Icon-72.png in Resources */ = {isa = PBXBuildFile; fileRef = 85796C5312719251002B7859 /* Icon-72.png */; };
 		85796C5612719251002B7859 /* Icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 85796C5412719251002B7859 /* Icon.png */; };
 		858B401012E67D8D0058DBFC /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 858B400F12E67D8D0058DBFC /* OpenGLES.framework */; };
@@ -59,6 +60,7 @@
 		43B44A0513F94480001F2492 /* MediaPlayer.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MediaPlayer.framework; path = System/Library/Frameworks/MediaPlayer.framework; sourceTree = SDKROOT; };
 		43CE0BFE1463EEA400F8FFC3 /* iAd.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = iAd.framework; path = System/Library/Frameworks/iAd.framework; sourceTree = SDKROOT; };
 		6019007315B8587C008F2D0E /* CoreVideo.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreVideo.framework; path = System/Library/Frameworks/CoreVideo.framework; sourceTree = SDKROOT; };
+		5D376CA71588703F00CEF01D /* MapKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MapKit.framework; path = System/Library/Frameworks/MapKit.framework; sourceTree = SDKROOT; };
 		850943881185B35D004A3B2D /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		850944001185C440004A3B2D /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = System/Library/Frameworks/CoreLocation.framework; sourceTree = SDKROOT; };
 		8519011E1199B90400B71F58 /* data_section.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; path = data_section.bin; sourceTree = "<group>"; };
@@ -105,6 +107,7 @@
 				0B10E94A14065AE600B6DA6B /* MessageUI.framework in Frameworks */,
 				41EB0400146A6A410088E3A4 /* libsqlite3.dylib in Frameworks */,
 				4180481C147E91DC0048FB95 /* SystemConfiguration.framework in Frameworks */,
+				5D376CA81588703F00CEF01D /* MapKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -190,6 +193,7 @@
 				858B400F12E67D8D0058DBFC /* OpenGLES.framework */,
 				858B403D12E67F790058DBFC /* QuartzCore.framework */,
 				0B10E94914065AE600B6DA6B /* MessageUI.framework */,
+				5D376CA71588703F00CEF01D /* MapKit.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -296,6 +300,7 @@
 					"libs/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)",
 					"\"$(SRCROOT)/libs/Release-iphonesimulator\"",
 				);
+				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = __PROJECT_NAME__;
 			};
 			name = Debug;
@@ -314,6 +319,7 @@
 					"libs/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)",
 					"\"$(SRCROOT)/libs/Release-iphonesimulator\"",
 				);
+				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = __PROJECT_NAME__;
 			};
 			name = Release;

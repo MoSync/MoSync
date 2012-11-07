@@ -12,7 +12,7 @@
 #import <OpenGLES/ES1/glext.h>
 
 @interface OpenGLTexture3D : NSObject {
-	GLuint		texture[1];  
+	GLuint		texture[1];
 	NSString	*filename;
 }
 @property (nonatomic, retain) NSString *filename;

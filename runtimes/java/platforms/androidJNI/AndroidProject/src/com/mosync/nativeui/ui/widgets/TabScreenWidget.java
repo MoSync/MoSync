@@ -61,7 +61,7 @@ public class TabScreenWidget extends ScreenWidget
 	}
 
 	@Override
-	public void addChildAt(Widget child, int index)
+	public int addChildAt(Widget child, int index)
 	{
 		// We cannot support adding tabs anywhere right now,
 		// since the Android api does not support it.
@@ -73,8 +73,10 @@ public class TabScreenWidget extends ScreenWidget
 
 		if( !( child instanceof ScreenWidget ) )
 		{
-			return;
+			Log.e( "MoSync", "maWidgetInsertChild: TabScreen can only contain ScreenWidgets." );
+			return IX_WIDGET.MAW_RES_INVALID_HANDLE;
 		}
+
 		ScreenWidget screen = (ScreenWidget) child;
 		final View screenView = screen.getView( );
 
@@ -97,6 +99,8 @@ public class TabScreenWidget extends ScreenWidget
 		m_tabIndexToScreen.put( screen, indexOfNewTab );
 		screen.setTitleChangedListener( this );
 		screen.setIconChangedListener( this );
+
+		return IX_WIDGET.MAW_RES_OK;
 	}
 
 	private void setIndicators(TabSpec tabSpec, String title, Drawable icon)
@@ -193,13 +197,13 @@ public class TabScreenWidget extends ScreenWidget
 	}
 
 	@Override
-	public void removeChild(Widget child)
+	public int removeChild(Widget child)
 	{
 		// There seems to be no sane way of removing
 		// tabs on Android.
 		Log.e( "MoSync", "It is currently not possible to remove children " +
 			" from a tab screen on Android." );
-		return;
+		return IX_WIDGET.MAW_RES_ERROR;
 	}
 
 	@Override

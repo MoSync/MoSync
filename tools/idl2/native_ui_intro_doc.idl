@@ -177,7 +177,7 @@ MA 02110-1301, USA.
 *	A view for selecting the time of day, in 24 hour mode.
 *
 *- \b ToggleButton \n
-*	Displays checked/unchecked states as a button with a "light" indicator and by default accompanied with the text "ON" or "OFF". It is available on Android and windows Phone, and it is similar to the CheckBox on iOS.
+*	Displays checked/unchecked states as a button with a "light" indicator and by default accompanied with the text "ON" or "OFF". It is available on Android, iOS and Windows Phone.
 *
 *- \b VideoView \n
 *	Manages the playback of a movie from a file or a network stream.</li>
