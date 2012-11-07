@@ -1,6 +1,7 @@
 package com.mosync.internal.android.nfc;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 
 import android.nfc.tech.TagTechnology;
 
@@ -31,6 +32,17 @@ public abstract class NFCTagBase<NativeTagType extends TagTechnology> extends Re
 			return this;
 		}
 		return null;
+	}
+
+	@Override
+	public int getId(ByteBuffer result) {
+		byte[] id = nativeTag.getTag().getId();
+		if (result == null) {
+			return id.length;
+		}
+		int size = Math.min(result.remaining(), id.length);
+		result.put(id, 0, size);
+		return size;
 	}
 
 	@Override

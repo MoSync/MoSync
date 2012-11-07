@@ -9332,10 +9332,22 @@ group NFCAPI "NFC API" {
 		int maNFCIsReadOnly(in MAHandle tag);
 
 		/**
-		* Returns the capacity/size of a tag,
-		* or -1 if unknown.
+		* Returns the capacity/size of a tag.
+		* \param tag The tag to get the size from.
+		* \return The size of the tag, or -1 if unknown.
 		*/
 		int maNFCGetSize(in MAHandle tag);
+
+		/**
+		* Returns the (serial) id a tag. This id may or may
+		* not be unique depending on the underlying technology.
+		* The serial id may also be empty.
+		* \param tag The tag to read from.
+                * \param dst Where the result should be written to.
+                * \param len The maximum length to write.
+		* \return The number of bytes of the id.
+		*/
+		int maNFCGetId(in MAHandle tag, out MAAddress dst, in int len);
 
 		/**
 		* Reads an NDEF message from the given tag, which must

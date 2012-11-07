@@ -2541,6 +2541,23 @@ namespace Base
 		return (int)result;
 	}
 
+    int _maNFCGetId(MAHandle tagHandle, int dst, int len, int memStart, JNIEnv* jNIEnv, jobject jThis) {
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+
+		int fixedDst = dst == NULL ? 0 : dst - memStart;
+
+		jmethodID methodID = jNIEnv->GetMethodID(
+												 cls,
+												 "maNFCGetId",
+												 "(III)I");
+		if (methodID == 0)
+			return 0;
+
+		jint result = jNIEnv->CallIntMethod(jThis, methodID, tagHandle, fixedDst, len);
+
+		return result;
+	}
+
 	MAHandle _maNFCGetNDEFMessage(MAHandle tagHandle, JNIEnv* jNIEnv, jobject jThis) {
 		jclass cls = jNIEnv->GetObjectClass(jThis);
 

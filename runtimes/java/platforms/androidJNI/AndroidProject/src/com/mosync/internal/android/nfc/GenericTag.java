@@ -9,6 +9,7 @@ import static com.mosync.internal.generated.MAAPI_consts.MA_NFC_TAG_TYPE_NFC_A;
 import static com.mosync.internal.generated.MAAPI_consts.MA_NFC_TAG_TYPE_NFC_B;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.HashMap;
 
 import android.nfc.Tag;
@@ -87,6 +88,12 @@ public class GenericTag extends ResourceBase implements INFCTag {
 	@Override
 	public TagTechnology nativeTag() {
 		return null;
+	}
+
+	@Override
+	public int getId(ByteBuffer result) {
+		// Does nothing
+		return 0;
 	}
 
 }
