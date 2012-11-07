@@ -382,7 +382,7 @@ namespace Notification
         MAUtil::String* mTickerText;
 
         /**
-         * Dictionary of local notifications identified by handles.
+         * Dictionary of scheduled local notifications identified by handles.
          */
         MAUtil::Map<MAHandle, LocalNotification*> mLocalNotificationMap;
 

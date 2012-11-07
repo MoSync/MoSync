@@ -1,6 +1,6 @@
 /*
  * This file is auto-generated.  DO NOT MODIFY.
- * Original file: D:\\MoSyncSources\\MoSync\\runtimes\\java\\platforms\\androidJNI\\AndroidProject\\src\\com\\android\\vending\\billing\\IMarketBillingService.aidl
+ * Original file: /Users/mattias/development/mosync/MoSync/runtimes/java/platforms/androidJNI/AndroidProject/src/com/android/vending/billing/IMarketBillingService.aidl
  */
 package com.android.vending.billing;
 public interface IMarketBillingService extends android.os.IInterface

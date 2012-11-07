@@ -8,18 +8,20 @@
 
 TARGET		MoSyncServer.exe
 TARGETTYPE	exe
-UID		0x100039CE 0x20022A9D
+UID		0x100039CE 0x20037EBF
 VENDORID	0
-CAPABILITY	ReadDeviceData Location
+CAPABILITY	ReadDeviceData Location WriteDeviceData SwEvent
 EPOCSTACKSIZE	0x10000
 
 
 SOURCEPATH	.
 SOURCE		MoSyncServer.cpp
-SOURCE		GetNetworkInfo.cpp
 SOURCE		ActiveEnder.cpp
 SOURCE		Log.cpp
 SOURCE		Location.cpp
+SOURCE		Autostart.cpp
+
+RESOURCE		MoSyncServer_startup.rss
 
 USERINCLUDE	.
 SYSTEMINCLUDE	\Epoc32\include
@@ -28,3 +30,5 @@ LIBRARY		euser.lib
 LIBRARY		etel3rdparty.lib
 LIBRARY		efsrv.lib
 LIBRARY		Lbs.lib
+LIBRARY ws32.lib apgrfx.lib
+LIBRARY apparc.lib

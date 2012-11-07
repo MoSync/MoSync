@@ -199,6 +199,7 @@ namespace Notification
     int NotificationManager::scheduleLocalNotification(
         LocalNotification* localNotification)
     {
+		mLocalNotificationMap.insert(localNotification->getHandle(), localNotification);
         return maNotificationLocalSchedule(localNotification->getHandle());
     }
 
@@ -216,6 +217,7 @@ namespace Notification
     int NotificationManager::unscheduleLocalNotification(
         LocalNotification* localNotification)
     {
+		mLocalNotificationMap.erase(localNotification->getHandle());
         return maNotificationLocalUnschedule(localNotification->getHandle());
     }
 

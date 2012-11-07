@@ -1,0 +1,7 @@
+#include <startupitem.rh>
+
+RESOURCE STARTUP_ITEM_INFO mosync_server
+{
+	executable_name = "!:\\sys\\bin\\20037EBF.exe";
+	recovery = EStartupItemExPolicyNone;
+}

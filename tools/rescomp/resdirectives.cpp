@@ -36,16 +36,43 @@ void ResourceDirective::setId(string id) {
 	fId = id;
 }
 
+void ResourceDirective::setParent(ResourceDirective* parent) {
+	fParent = parent;
+	if (parent) {
+		parent->fChildren.push_back(this);
+	}
+}
+
 string ResourceDirective::getId() {
 	return fId;
 }
 
 void ResourceDirective::writeDirectives(ostringstream& output, bool asVariant) {
-	output << ".res ";
-	if (asVariant) {
-		output << "// ID: " << fId << '\n';
-	} else {
-		output << fId << '\n';
+	writeDirectiveIdentifier(output, asVariant);
+	writeDirectiveBody(output, asVariant);
+}
+
+void ResourceDirective::writeDirectiveIdentifier(ostringstream& output, bool asVariant) {
+	if (!fParent) {
+		output << ".res ";
+		if (asVariant) {
+			output << "// ID: " << fId << '\n';
+		} else {
+			output << fId << '\n';
+		}
+	}
+}
+
+void ResourceDirective::writeDirectiveBody(ostringstream& output, bool asVariant) {
+	// By default does nothing.
+}
+
+void ResourceDirective::writeDirectiveChildren(ostringstream& output, bool asVariant) {
+	for (size_t i = 0; i < fChildren.size(); i++) {
+		ResourceDirective* child = fChildren[i];
+		if (child) {
+			child->writeDirectives(output, asVariant);
+		}
 	}
 }
 
@@ -63,7 +90,10 @@ void ResourceDirective::initDirectiveFromAttributes(const char** attributes) {
 }
 
 void ResourceDirective::initDirectiveFromCData(const char* cdata, int length) {
-	// Do nothing.
+	// Only allow whitespace!
+	if (string(cdata, length).find_first_not_of("\n\r\t ") != string::npos) {
+		fErrorMessage = "No text allowed within tag";
+	}
 }
 
 void ResourceDirective::writeByteDirective(ostringstream& output, const char* array, size_t offset, size_t len) {
@@ -81,9 +111,52 @@ void ResourceDirective::writeByteDirective(ostringstream& output, const char* ar
 	}
 }
 
+void ResourceDirective::writeWordDirective(ostringstream& output, DataType type, const int* array, size_t offset, size_t len) {
+	int mask;
+	string directive;
+	switch (type) {
+	case Byte:
+		mask = 0xff;
+		directive = ".byte";
+		break;
+	case Half:
+		mask = 0xffff;
+		directive = ".half";
+		break;
+	default:
+		mask = 0xffffffff;
+		directive = ".word";
+		break;
+	}
+
+	size_t i = 0;
+	while (i < len) {
+		output << directive << " ";
+		for (size_t j = 0; j < 12 && i < len; j++, i++) {
+			if (j > 0) {
+				output << ",";
+			}
+			if (array[i] >= 0) {
+				output << "0x" << hex << array[i];
+			} else {
+				output << dec << array[i];
+			}
+		}
+		output << "\n";
+	}
+}
+
 string ResourceDirective::validate() {
-	if (fId.size() == 0) {
+	if (!fErrorMessage.empty()) {
+		return fErrorMessage;
+	} else if  (fId.empty() && !fParent) {
 		return "No id specified for tag";
+	} else if (!fId.empty() && fParent) {
+		return "Child tags cannot have an id";
+	} else if (fParent && !fCanHaveParent) {
+		return "This tag cannot be a child of another tag";
+	} else if (!fChildren.empty() && !fCanHaveChildren) {
+		return "This tag cannot have child tags";
 	}
 	return string();
 }
@@ -116,6 +189,49 @@ string ResourceDirective::getUniqueToken() {
 	return string();
 }
 
+string BinaryResourceDirective::validate() {
+	return ResourceDirective::validate();
+}
+
+void DataResourceDirective::initDirectiveFromCData(const char* cdata, int length) {
+	// O(n^2)
+	string binaryDataFragment = string(cdata, length);
+	fBinaryData += binaryDataFragment;
+	// Hm, we now do this at every new text fragment...
+	if (!parseInts()) {
+		fErrorMessage = "Invalid integer value";
+	}
+}
+
+bool DataResourceDirective::parseInts() {
+	fInts.clear();
+	size_t pos = 0;
+	while (pos < fBinaryData.size()) {
+		size_t intStart = fBinaryData.find_first_not_of("\n\r\t ,", pos);
+		if (intStart == string::npos) {
+			return true;
+		}
+		size_t intEnd = fBinaryData.find_first_of("\n\r\t ,", intStart);
+		if (intEnd == string::npos) {
+			intEnd = fBinaryData.size();
+		}
+		int value = 0;
+		if (sscanf(fBinaryData.substr(intStart, intEnd - intStart).c_str(), "%i", &value) == 1) {
+			fInts.push_back(value);
+			printf("-> %i\n",  value);
+		} else {
+			return false;
+		}
+		pos = intEnd;
+	}
+	return true;
+}
+
+void DataResourceDirective::writeDirectives(ostringstream& output, bool asVariant) {
+	// The data type is .bin, no need to write it.
+	ResourceDirective::writeWordDirective(output, fType, &fInts[0], 0, fInts.size());
+}
+
 void FileResourceDirective::setResource(string resource) {
 	fResource = resource;
 }
@@ -129,16 +245,22 @@ void FileResourceDirective::writeDirectives(ostringstream& output, bool asVarian
 	}
 	ResourceDirective::writeDirectives(output, asVariant);
 	writeResourceTypeDirective(output);
+	ResourceDirective::writeDirectiveChildren(output, asVariant);
 }
 
 void FileResourceDirective::writeResourceTypeDirective(ostringstream& output) {
 	string resourceStr = string("\"") + fResource + string("\"");
-	if (fUseIncludeDirective) {
-		output << "." << fResType << "\n";
-		output << ".include " << resourceStr << "\n";
-	} else {
-		output << "." << fResType << " " << resourceStr << "\n";
+	if (!fParent) {
+		output << "." << fResType;
 	}
+	if (fUseIncludeDirective && !fResource.empty()) {
+		output << ".include " << resourceStr;
+	} else {
+		if (!fResource.empty()) {
+			output << " " << resourceStr;
+		}
+	}
+	output << "\n";
 }
 
 void FileResourceDirective::initDirectiveFromAttributes(const char** attributes) {
@@ -205,9 +327,18 @@ void StringResourceDirective::writeDirectiveAsString(ostringstream& output, size
 	output << ".string \"" << fStringValue.substr(offset, len) << "\"\n";
 }
 
+string StringResourceDirective::validate() {
+	if (fType == PSTRING && (int) fStringValue.length() > 255) {
+		return "pstrings can be no longer than 255 bytes";
+	}
+	return ResourceDirective::validate();
+}
+
 void StringResourceDirective::writeDirectives(ostringstream& output, bool asVariant) {
 	ResourceDirective::writeDirectives(output, asVariant);
-	output << ".bin\n";
+	if (!fParent) {
+		output << ".bin\n";
+	}
 	size_t currentPos = 0;
 	size_t currentOffset = 0;
 	bool isInSpecialString = false;
@@ -215,6 +346,10 @@ void StringResourceDirective::writeDirectives(ostringstream& output, bool asVari
 	bool final = false;
 	size_t len = fStringValue.length();
 	const char* chArray = fStringValue.c_str();
+	if (fType == PSTRING) {
+		char lenByte = len & 0xff;
+		ResourceDirective::writeByteDirective(output, &lenByte, 0, 1);
+	}
 	while (!final) {
 		char ch = chArray[currentPos];
 		isInSpecialString = isSpecialChar(ch);
@@ -232,6 +367,10 @@ void StringResourceDirective::writeDirectives(ostringstream& output, bool asVari
 			currentPos++;
 		}
 		final = len < currentPos;
+	}
+	if (fType == CSTRING) {
+		char zeroByte = 0x00;
+		ResourceDirective::writeByteDirective(output, &zeroByte, 0, 1);
 	}
 }
 

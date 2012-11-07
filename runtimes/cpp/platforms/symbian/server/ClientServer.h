@@ -21,11 +21,11 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <e32base.h>
 
 // server name
-_LIT(KMoSyncServer, "MoSync Server");
+_LIT(KMoSyncServer, "MoSync Server 2");
 
 // A version must be specified when creating a session with the server
 const TUint KMoSyncMajorVersionNumber=1;
-const TUint KMoSyncMinorVersionNumber=2;
+const TUint KMoSyncMinorVersionNumber=5;
 const TUint KMoSyncBuildVersionNumber=0;
 
 // Function codes (opcodes) used in message passing between client and server
@@ -35,6 +35,12 @@ enum TMoSyncServRqst
 	EMoSyncGetSubscriberId,	//CTelephony::GetSubscriberId
 	EMoSyncLocationGet,
 	EMoSyncLocationStop,
+	EMoSyncAutostartOn,
+	EMoSyncAutostartOff,
+	EMoSyncAutostartTimer,
+	EMoSyncGetNetworkStatus,
+	EMoSyncGetNetworkStatusChange,
+	EMoSyncCancelNetworkStatusChange,
 };
 
 // reasons for server panic
@@ -45,7 +51,8 @@ enum TMoSyncPanic
 	EMainSchedulerError,
 	ESvrCreateServer,
 	ESvrStartServer,
-	ECreateTrapCleanup
+	ECreateTrapCleanup,
+	EInternal,
 	//ENotImplementedYet,
 };
 

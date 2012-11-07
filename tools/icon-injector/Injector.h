@@ -28,6 +28,9 @@ namespace MoSync {
  * Base class for the icon injectors.
  */
 class Injector {
+protected:
+	bool fForce;
+
 public:
 	/**
 	 *  This virtual function is used to inject an icon into a platform-specific application
@@ -48,6 +51,22 @@ public:
 	static std::string verifyParameter(
 		const std::map<std::string, std::string>& params, 
 		const std::string& name);
+
+	/**
+	 * If set, this will enforce icon generation regardless of whether
+	 * the timestamp of the icon is older than the icon file.
+	 */
+	void setForce(bool force);
+
+	/**
+	 * Function used to convert an icon instance to an image.
+	 * \param iconInstance The icon instance.
+	 * \param dstFilename The filename of the resulting image.
+	 * \param size A string describing the size of the resulting image on the form: WxH
+	 * \param format A string describing the format of the resulting image (the file extension of the format)
+	 */
+	bool convertInstanceToImageFormat(const IconInstance *iconInstance,
+		const char *dstFilename, const std::string& size, const std::string& format);
 };
 
 }

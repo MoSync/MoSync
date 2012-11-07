@@ -1736,6 +1736,93 @@ namespace Base
 		return result;
 	}
 
+	int _maCameraPreviewSize(JNIEnv* jNIEnv, jobject jThis)
+	{
+		// Get the Java method
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls,
+					"maCameraPreviewSize", "()I");
+		if (methodID == 0)
+		{
+			return -1;
+		}
+
+		// Call the java method
+		int result = jNIEnv->CallIntMethod(jThis, methodID);
+
+		// Delete allocated memory
+		jNIEnv->DeleteLocalRef(cls);
+
+		return result;
+	}
+
+	int _maCameraPreviewEventEnable(int memStart,
+									int previewEventType,
+									int previewBuffer,
+									MARect* previewArea,
+									JNIEnv* jNIEnv, jobject jThis)
+	{
+		// Get the Java method
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls,
+					"maCameraPreviewEventEnable", "(IIIIII)I");
+		if (methodID == 0)
+		{
+			return -1;
+		}
+
+		// Call the java method
+		int result = jNIEnv->CallIntMethod(jThis, methodID,
+					previewEventType, previewBuffer - memStart,
+					previewArea->left, previewArea->top,
+					previewArea->width, previewArea->height);
+
+		// Delete allocated memory
+		jNIEnv->DeleteLocalRef(cls);
+
+		return result;
+	}
+
+	int _maCameraPreviewEventDisable(JNIEnv* jNIEnv, jobject jThis)
+	{
+		// Get the Java method
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls,
+					"maCameraPreviewEventDisable", "()I");
+		if (methodID == 0)
+		{
+			return -1;
+		}
+
+		// Call the java method
+		int result = jNIEnv->CallIntMethod(jThis, methodID);
+
+		// Delete allocated memory
+		jNIEnv->DeleteLocalRef(cls);
+
+		return result;
+	}
+
+	int _maCameraPreviewEventConsumed(JNIEnv* jNIEnv, jobject jThis)
+	{
+		// Get the Java method
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls,
+					"maCameraPreviewEventConsumed", "()I");
+		if (methodID == 0)
+		{
+			return -1;
+		}
+
+		// Call the java method
+		int result = jNIEnv->CallIntMethod(jThis, methodID);
+
+		// Delete allocated memory
+		jNIEnv->DeleteLocalRef(cls);
+
+		return result;
+	}
+
 	//////////////
 	//  SENSOR  //
 	//////////////
@@ -2444,6 +2531,23 @@ namespace Base
 		jNIEnv->DeleteLocalRef(cls);
 
 		return (int)result;
+	}
+
+    int _maNFCGetId(MAHandle tagHandle, int dst, int len, int memStart, JNIEnv* jNIEnv, jobject jThis) {
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+
+		int fixedDst = dst == NULL ? 0 : dst - memStart;
+
+		jmethodID methodID = jNIEnv->GetMethodID(
+												 cls,
+												 "maNFCGetId",
+												 "(III)I");
+		if (methodID == 0)
+			return 0;
+
+		jint result = jNIEnv->CallIntMethod(jThis, methodID, tagHandle, fixedDst, len);
+
+		return result;
 	}
 
 	MAHandle _maNFCGetNDEFMessage(MAHandle tagHandle, JNIEnv* jNIEnv, jobject jThis) {

@@ -1329,14 +1329,14 @@ interface MAAPI {
 		TEXTBOX = 23;
 
 		/** \brief The home screen became visible.
-		 * Currently implemented only on Android.
+		 * Currently implemented only on Android and Symbian.
 		 * \see maHomeScreenEventsOn()
 		 */
 		HOMESCREEN_SHOWN = 24;
 
 		/** \brief The home screen was hidden because an
 		 * application came to front.
-		 * Currently implemented only on Android.
+		 * Currently implemented only on Android and Symbian.
 		 * \see maHomeScreenEventsOn()
 		 */
 		HOMESCREEN_HIDDEN = 25;
@@ -1483,7 +1483,18 @@ interface MAAPI {
 		* This event will contain a MAPurchaseEventData struct.
 		*/
 		PURCHASE = 48;
-		}
+
+		/**
+		* \brief A camera event fired when you get any of the camera preview events
+		*/
+		CAMERA_PREVIEW = 49;
+
+		/** \brief The telephone network status changed.
+		* MAEvent::state is the new state,
+		* one of the \link #MA_NETWORK_UNKNOWN MA_NETWORK \endlink constants.
+		*/
+		NETWORK = 50;
+	}
 
 	/**
 	* \brief Data for a connection event, including an indicator or success or failure.
@@ -3248,6 +3259,112 @@ interface MAAPI {
 		*/
 		int maGetSystemProperty(in MAString key, out MAString buf range("size"), in int size);
 
+		/**
+		* Normally, when the first Internet connection is made in a Symbian application,
+		* the user must choose an Internet Access Point.
+		*
+		* This function saves the ID of the active IAP for this application.
+		* It will be used automatically the next time the application is started.
+		*
+		* \returns 1 if the ID was successfully saved. 0 if there is no active IAP. \< 0 on error.
+		* \note Implemented only on Symbian.
+		*/
+		int maIapSave();
+
+		/**
+		* Removes any saved IAP ID for this application.
+		* The next time the application is started,
+		* or the next time an Internet connection is made after a call to maIapShutdown(),
+		* the user will have to select a new IAP.
+		* \returns 1 if the ID was successfully removed. 0 if there was no saved ID. \< 0 on error.
+		* \note Implemented only on Symbian.
+		* \see maIapSave()
+		*/
+		int maIapReset();
+
+		/**
+		* Shuts down the active IAP.
+		* This has the effect of calling maConnClose() on all existing connections.
+		* \returns 1 if the IAP was successfully shut down. 0 if there was no active IAP. \< 0 on error.
+		* \note Implemented only on Symbian.
+		* \see maIapSave()
+		*/
+		int maIapShutdown();
+
+		/**
+		* Returns the current telephone network status.
+		* This is one of the \link #MA_NETWORK_UNKNOWN MA_NETWORK \endlink constants.
+		* #MA_NETWORK_HOME and #MA_NETWORK_ROAMING are the most interesting ones;
+		* all the others are variants of "not connected".
+		* Returns \< 0 on error.
+		* \see #EVENT_TYPE_NETWORK
+		* \note Implemented only on Symbian, 3rd edition and later.
+		*/
+		int maNetworkStatus();
+
+		constset int MA_NETWORK_ {
+			UNKNOWN = 0;
+			NO_SERVICE = 1;
+			EMERGENCY_ONLY = 2;
+			SEARCHING = 3;
+			BUSY = 4;
+
+			/**
+			* Your operator's home network. Data connections are possible here.
+			*/
+			HOME = 5;
+			DENIED = 6;
+
+			/**
+			* You're abroad. Data connections are possible here, but usually, extremely expensive.
+			* Avoid making any connections unless you have WLAN access,
+			* or the user is very sure of the cost.
+			*/
+			ROAMING = 7;
+		}
+
+		/**
+		* Decides how IAP connection attempts should work.
+		*
+		* IAP connection attempts are made asynchronously by maConnect(),
+		* if there is no active IAP.
+		*
+		* This setting is reset to default when the application starts.
+		* \param type One of the \link #MA_IAP_METHOD_STANDARD MA_IAP_METHOD \endlink constants.
+		* \returns \< 0 on error.
+		* \note Implemented only on Symbian, 3rd edition and later.
+		*/
+		int maIapSetMethod(in int type);
+
+		constset int MA_IAP_METHOD_ {
+			/** The default. Connects to the IAP saved by maIapSave(), or,
+			* if there is no saved IAP, opens the IAP selection dialog.
+			*/
+			STANDARD = 1;
+			/**
+			* Connects to the WLAN IAP with the highest signal strength.
+			*/
+			WLAN = 2;
+		}
+
+		/**
+		* Decides which IAPs are visible in the IAP selection dialog.
+		* This setting is reset to default when the application starts.
+		* \param filter One of the \link #MA_IAP_FILTER_NOT_WLAN MA_IAP_FILTER \endlink constants.
+		* \returns \< 0 on error.
+		* \note Implemented only on Symbian, 3rd edition and later.
+		*/
+		int maIapSetFilter(in int filter);
+
+		constset int MA_IAP_FILTER_ {
+			/// All IAPs except WLAN.
+			NOT_WLAN = 1;
+			/// Only WLAN IAPs.
+			WLAN = 2;
+			/// All IAPs. This is the default.
+			ALL = 3;
+		}
+
 group PIMAPI "PIM API" {
 
 #if IX_PIM
@@ -4914,7 +5031,7 @@ group WidgetAPI "Widget API" {
 		EDIT_BOX = "EditBox";
 
 		/**
-		* @brief A list view is a vertical list of widgets that is also scrollable.
+		* @brief A list view is a vertical list of widgets that is also scrollable. See \ref WidgetListViewProperties "List view properties" for the properties available.
 		*/
 		LIST_VIEW = "ListView";
 
@@ -6280,6 +6397,29 @@ group WidgetAPI "Widget API" {
 		FONT_HANDLE = "fontHandle";
 	}
 	} // end of WidgetListViewItemProperties
+
+	/**
+	* The available widget properties for a #MAW_LIST_VIEW. See \ref WidgetProperties "Widget properties" for more properties.
+	*/
+	group WidgetListViewProperties "List view properties" {
+	constset MAString MAW_LIST_VIEW_ {
+		/**
+		* @brief Enforces the focus on the list. Generally needed when for some reason the list looses it's focus.
+		*
+		* @validvalue None needed.
+		*
+		* Platform: Android.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(listViewHandle, MAW_LIST_VIEW_REQUEST_FOCUS, "");
+		* \endcode
+		*/
+		REQUEST_FOCUS = "requestFocus";
+	}
+	} // end of WidgetListViewProperties
 
 	/**
 	* The available widget properties for a #MAW_CHECK_BOX. See \ref WidgetProperties "Widget properties" for more properties.
@@ -8307,6 +8447,17 @@ group CameraResultCodes "Camera Result Codes" {
 		*/
 		VALUE_NOTSUPPORTED = -6;
 
+		/**
+		* @brief Another type of camera preview events has aldready been enabled.
+		*/
+		EVENTS_ALREADY_ENABLED = -7;
+
+		/**
+		* @brief The size of the screen which you want to read from the preview is not
+		* withing the visual area.
+		*/
+		INVALID_PREVIEW_SIZE = -8;
+
 	}
 } //end CameraResultCodes
 
@@ -8458,6 +8609,15 @@ group CameraProperties "Camera Properties" {
 	} //end of MAC_
 } // end of CameraProperties
 
+group CameraPreviewEvents "Camera Preview Events" {
+	constset int MA_CAMERA_PREVIEW_ {
+
+		FRAME = 1;
+
+		AUTO_FOCUS = 2;
+	}
+}
+
 group CameraFunctions "Camera Functions" {
 		/**
 		* \brief The camera format, in pixels.
@@ -8551,6 +8711,41 @@ group CameraFunctions "Camera Functions" {
 		* \returns 1 for success and <0 for failure.
 		*/
 		int maCameraGetProperty( in MAString property, out MAString value range("bufSize"), in int bufSize);
+
+		/**
+		* Retrieves the underlying camera preview size. This can be different
+		* from the preview view so before enabling preview events it's
+		* important that you check the true size.
+		*
+		* \returns the size as an EXTENT, <0 on failure.
+		*/
+		int maCameraPreviewSize();
+
+		/**
+		* Enables events for accessing data during camera preview.
+		* Only one preview event may be used at the same time.
+		*
+		* \param previewEventType One of the CameraPreviewEvents
+		* \param previewBuffer An int buffer in which the data will stored
+		* \param previewArea The rectangle of the preview in which we will get data
+		*
+		* \return 1 on success and <0 on failure
+		*/
+		int maCameraPreviewEventEnable( in int previewEventType, out MAAddress previewBuffer, in MARect previewArea);
+
+		/**
+		* Turns off the current preview event
+		*/
+		int maCameraPreviewEventDisable();
+
+		/**
+		* Function that informs the runtime that it's ready to get
+		* the next preview event.
+		* This is because the preview sends a lot of events and if it
+		* take some time to process the image the event cue should get
+		* filled with events.
+		*/
+		int maCameraPreviewEventConsumed();
 
 	} // end of CameraFunctions
 
@@ -8765,6 +8960,20 @@ group CameraFunctions "Camera Functions" {
 		 * @return \< 0 on error.
 		 */
 		int maScreenSetFullscreen(in int fullscreen);
+
+		/**
+		* Registers this application for autostart on device reboot.
+		* Applications started this way start in the background;
+		* invisible to the user, unless they check the list of running applications.
+		* \returns 1 on success, 0 if already registered, \< 0 on error.
+		*/
+		int maAutostartOn();
+
+		/**
+		* Removes autostart registration for this application.
+		* \returns 1 on success, 0 if already unregistered, \< 0 on error.
+		*/
+		int maAutostartOff();
 
 		/**
 		* Set supported screen orientations.
@@ -9123,10 +9332,22 @@ group NFCAPI "NFC API" {
 		int maNFCIsReadOnly(in MAHandle tag);
 
 		/**
-		* Returns the capacity/size of a tag,
-		* or -1 if unknown.
+		* Returns the capacity/size of a tag.
+		* \param tag The tag to get the size from.
+		* \return The size of the tag, or -1 if unknown.
 		*/
 		int maNFCGetSize(in MAHandle tag);
+
+		/**
+		* Returns the (serial) id a tag. This id may or may
+		* not be unique depending on the underlying technology.
+		* The serial id may also be empty.
+		* \param tag The tag to read from.
+                * \param dst Where the result should be written to.
+                * \param len The maximum length to write.
+		* \return The number of bytes of the id.
+		*/
+		int maNFCGetId(in MAHandle tag, out MAAddress dst, in int len);
 
 		/**
 		* Reads an NDEF message from the given tag, which must

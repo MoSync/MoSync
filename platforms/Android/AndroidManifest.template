@@ -1,0 +1,167 @@
+{{@trim}}
+{{=%% %%}}
+%%!
+
+	This is the template for android manifests. Copy it and modify it to match your project's needs.
+	The template format roughly follows the mustache template format:
+
+		{{param}}
+			Replaces param with a parameter value.
+		{{#section}}
+		{{/section}}
+			Starts and ends a section. A section can be rendered several times, if the
+			section is represented by a list. The {{# tag will also render it contents
+			if there is no matching section but a matching parameter name.
+		{{^paramOrSection}}
+			Negation. If no parameter or sections called 'paramOrSection' exists, the
+			contents within the opening and closing negation tag is not rendered.
+		{{!comment}}
+			Comment. Whatever is put on the {{! tag is not rendered.
+		{{=start end}}
+			Changes delimiter to 'start' and 'end'. Can be used for escaping.
+		{{@directive}}
+			Sets an internal parser directive. Available directives are 'debug', which
+			will output diagnostic parser messages, 'trim' which makes sure to remove
+			text sections that only have whitespace, and 'no-trim' which turns off the
+			'trim' directive.
+
+	Available parameters:
+
+		version-code
+			The android version code, supplied via the packager argument --android-version-code.
+		version
+			The app version (eg "1.0.0"), supplied via the packager argument --version.
+		sdk-version
+			The android target SDK version, provided by the build system.
+		install-location
+			The installation location of the app, supplied via the packager argument --android-install-location.
+		package-name
+			The app's package name, supplied via the packager argument --android-package.
+
+	Available sections/collections:
+
+		permissions
+			The permissions, in lower case, that the app requires, supplied via the packager argument --permissions. See this template
+			for how it may be used. (Note that if a permission contains a space, the corresponding parameter has
+			a dash, -, in it's place. And slashes are replaced with colons, :) Example: the 'File Storage/Read' permission
+			becomes 'file-storage:read'.
+		nfc
+			Set if nfc support is required.
+		sdk-version-min-max
+			Set if the android target SDK version is at least min and no more than max. (The max may be omitted.)
+
+%%
+%%={{ }}%%<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+	package="{{package-name}}"
+	android:versionCode="{{version-code}}"
+	android:versionName="{{version}}"{{#sdk-version-8}}
+	android:installLocation="{{install-location}}"{{/sdk-version-8}}
+>	<application
+		android:icon="@drawable/icon"
+		android:label="@string/app_name">
+		<activity android:name=".MoSync"
+			android:screenOrientation="portrait"
+			android:configChanges="keyboardHidden|orientation"
+			android:label="@string/app_name">
+			<intent-filter>
+				<action android:name="android.intent.action.MAIN" />
+				<category android:name="android.intent.category.LAUNCHER" />
+			</intent-filter>
+		</activity>{{#nfc}}
+		<intent-filter>
+		<action android:name="android.nfc.action.TECH_DISCOVERED"/>
+		</intent-filter>
+		<meta-data android:name="android.nfc.action.TECH_DISCOVERED" android:resource="@xml/nfc"/>{{/nfc}}
+		<activity android:name=".MoSyncPanicDialog"
+			android:label="@string/app_name">
+		</activity>
+		<activity android:name=".TextBox"
+			android:label="@string/app_name">
+		</activity>
+		<activity android:name="com.google.ads.AdActivity"
+			android:configChanges="orientation|keyboard|keyboardHidden">
+		</activity>
+		<service android:name="com.mosync.internal.android.notifications.LocalNotificationsService" />
+		<service android:name=".MoSyncService" />
+{{! TODO: Condition on permission? A }}
+		<service android:name=".GCMIntentService" />
+		<receiver android:name="com.google.android.gcm.GCMBroadcastReceiver"
+			android:permission="com.google.android.c2dm.permission.SEND">
+			<intent-filter>
+				<action android:name="com.google.android.c2dm.intent.RECEIVE" />
+				<category android:name="{{package-name}}" />
+			</intent-filter>
+			<intent-filter>
+				<action android:name="com.google.android.c2dm.intent.REGISTRATION" />
+				<category android:name="{{package-name}}" />
+			</intent-filter>
+		</receiver>
+{{! END TODO }}
+{{! TODO: Condition on permission? B }}
+		<service android:name="com.mosync.internal.android.billing.BillingService" />
+		<receiver android:name="com.mosync.internal.android.billing.BillingReceiver">
+			<intent-filter>
+				<action android:name="com.android.vending.billing.IN_APP_NOTIFY" />
+				<action android:name="com.android.vending.billing.RESPONSE_CODE" />
+				<action android:name="com.android.vending.billing.PURCHASE_STATE_CHANGED" />
+			</intent-filter>
+		</receiver>
+{{! END TODO }}
+	</application>
+	<uses-sdk android:minSdkVersion="{{sdk-version}}" />
+	<supports-screens
+		android:largeScreens="true"
+		android:normalScreens="true"
+		android:smallScreens="true"
+		android:anyDensity="true" />
+{{#permissions}}<!-- Permissions -->
+{{#vibration}}		<uses-permission android:name="android.permission.VIBRATE" />
+{{/vibration}}{{#internet-access}}		<uses-permission android:name="android.permission.INTERNET" />
+		<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+{{/internet-access}}{{#location:coarse}}		<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+{{/location:coarse}}{{#location:fine}}		<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+{{/location:fine}}{{#power-management}}		<uses-permission android:name="android.permission.BATTERY_STATS" />
+{{/power-management}}{{#calendar:read}}		<uses-permission android:name="android.permission.READ_CALENDAR" />
+{{/calendar:read}}{{#calendar:write}}		<uses-permission android:name="android.permission.WRITE_CALENDAR" />
+{{/calendar:write}}{{#contacts:read}}		<uses-permission android:name="android.permission.READ_CONTACTS" />
+{{/contacts:read}}{{#contacts:write}}		<uses-permission android:name="android.permission.WRITE_CONTACTS" />
+{{/contacts:write}}{{#sms:read}}		<uses-permission android:name="android.permission.READ_SMS" />
+{{/sms:read}}{{#sms:send}}		<uses-permission android:name="android.permission.SEND_SMS" />
+{{/sms:send}}{{#sms:receive}}		<uses-permission android:name="android.permission.RECEIVE_SMS" />
+{{/sms:receive}}{{#camera}}		<uses-permission android:name="android.permission.CAMERA" />
+		<uses-feature android:name="android.hardware.camera"/>
+		<uses-feature android:name="android.hardware.camera.autofocus"/>
+{{/camera}}{{#home-screen}}		<uses-permission android:name="android.permission.GET_TASKS" />
+		<uses-permission android:name="android.permission.SET_WALLPAPER" />
+		<uses-permission android:name="android.permission.SET_WALLPAPER_HINTS" />
+		<uses-permission android:name="com.android.launcher.permission.INSTALL_SHORTCUT" />
+		<uses-permission android:name="com.android.launcher.permission.UNINSTALL_SHORTCUT" />
+{{/home-screen}}{{#autostart}}		<uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+{{/autostart}}{{#phone-calls}}		<uses-permission android:name="android.permission.CALL_PHONE" />
+{{/phone-calls}}{{#sdk-version-4}}
+{{! This is a simple (?) or construct; either debug mode OR file storage permission. }}
+{{#file-storage:write}}{{^debug}}		<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />{{/debug}}{{/file-storage:write}}
+{{#debug}}		<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+{{/debug}}{{#in-app-purchase}}		<uses-permission android:name="com.android.vending.BILLING" />
+{{/in-app-purchase}}{{/sdk-version-4}}
+{{#sdk-version-7}}
+{{#bluetooth}}		<uses-permission android:name="android.permission.BLUETOOTH" />
+		<uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+{{/bluetooth}}
+{{/sdk-version-7}}
+{{#nfc}}		<uses-permission android:name="android.permission.NFC" />
+{{/nfc}}{{#push-notifications}}		<permission android:name="{{package-name}}.permission.C2D_MESSAGE"
+			android:protectionLevel="signature" />
+		<uses-permission android:name="android.permission.WAKE_LOCK" />
+		<uses-permission android:name="{{package-name}}.permission.C2D_MESSAGE" />
+		<uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
+{{/push-notifications}}{{! Always add this one; users may customize. }}
+		<uses-permission android:name="android.permission.READ_PHONE_STATE" />
+
+{{! These are deprecated but work }}
+{{#vibrate}}		<uses-permission android:name="android.permission.VIBRATE" />
+{{/vibrate}}{{#auto-start}}			<uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+{{/auto-start}}
+{{/permissions}}
+</manifest>

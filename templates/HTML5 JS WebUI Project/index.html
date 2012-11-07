@@ -1,10 +1,9 @@
 <!DOCTYPE html>
 <!--
 * @file index.html
-* @author Ali Sarrafi
 *
-* Template application that includes librares to access device servies
-* from JavaScript.
+* Template application that shows examples of how to access
+* device services from JavaScript using the Wormhole library.
 -->
 <html>
 	<head>
@@ -14,24 +13,6 @@
 		<link rel="stylesheet" href="style.css" type="text/css" media="screen" title="no title" charset="utf-8">
 		<script type="text/javascript" charset="utf-8" src="js/wormhole.js"></script>
 		<script type="text/javascript">
-			/**
-			 * Initialization.
-			 */
-			function initialize()
-			{
-				document.addEventListener("deviceready", displayDeviceInfo, true);
-				document.addEventListener("backbutton", close, true);
-			}
-
-			/**
-			 * Handle the backbutton event.
-			 */
-			function close()
-			{
-				// Close the application if the back key is pressed.
-				mosync.bridge.send(["close"]);
-			}
-
 			/**
 			 * Displays the device information on the screen.
 			 */
@@ -46,11 +27,11 @@
 			}
 
 			/**
-			 * Vibrate for 1 second.
+			 * Vibrate device.
 			 */
 			function vibrate()
 			{
-				navigator.notification.vibrate(1000);
+				navigator.notification.vibrate(500);
 			}
 
 			/**
@@ -62,7 +43,7 @@
 			}
 
 			/**
-			 * Change page background to random color.
+			 * Change page background to a random color.
 			 */
 			function changeColor()
 			{
@@ -72,11 +53,26 @@
 				document.documentElement.style.backgroundColor = color;
 				document.body.style.backgroundColor = color;
 			}
+
+			// Register event listeners.
+
+			// The "deviceready" event is sent when the system
+			// has finished loading.
+			document.addEventListener(
+				"deviceready",
+				displayDeviceInfo,
+				true);
+
+			// Close the application when the back key is pressed.
+			document.addEventListener(
+				"backbutton",
+				function() { mosync.app.exit(); },
+				true);
 		</script>
 	</head>
-	<body onload="initialize();">
+	<body>
 		<div id="screen">
-			<div class="pane" id="heading">Powered by Wormhole Technology</div>
+			<div class="pane" id="heading">Customized Wormhole Technology</div>
 			<div class="pane" id="info">
 				<div class="infoItem">Platform: <span id="platform">&nbsp;</span></div>
 				<div class="infoItem">Version: <span id="version">&nbsp;</span></div>
@@ -85,9 +81,9 @@
 				<div class="infoItem">Width: <span id="width">&nbsp;</span></div>
 				<div class="infoItem">Height: <span id="height">&nbsp;</span></div>
 			</div>
-			<div class="pane button" onclick="vibrate();">Vibrate</div>
-			<div class="pane button" onclick="beep();">Beep</div>
-			<div class="pane button" onclick="changeColor();">Change Color</div>
+			<div class="pane button" onclick="vibrate()">Vibrate</div>
+			<div class="pane button" onclick="beep()">Beep</div>
+			<div class="pane button" onclick="changeColor()">Change Color</div>
 		</div>
 	</body>
 </html>

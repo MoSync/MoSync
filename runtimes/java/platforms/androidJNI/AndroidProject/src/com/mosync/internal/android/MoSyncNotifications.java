@@ -23,6 +23,8 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.util.Log;
 
+import com.google.android.gcm.GCMRegistrar;
+
 import com.mosync.internal.android.notifications.LocalNotificationsManager;
 import com.mosync.internal.android.notifications.PushNotificationsManager;
 import com.mosync.nativeui.util.properties.IntConverter;
@@ -74,26 +76,14 @@ class MoSyncNotifications
 	/**
 	 * Check if Push permissions are set, and if not call maPanic().
 	 */
-	boolean isPushPermissionSet()
-	{
-		return
-			(PackageManager.PERMISSION_GRANTED ==
-				getActivity().checkCallingOrSelfPermission(getActivity().getPackageName() + ".permission.C2D_MESSAGE"))
-			&&
-			(PackageManager.PERMISSION_GRANTED ==
-				getActivity().checkCallingOrSelfPermission(
-						"com.google.android.c2dm.permission.RECEIVE"));
-	}
-
-	/**
-	 * Check if Push permissions are set, and if not call maPanic().
-	 */
 	void panicIfPushPermissionsAreNotSet()
 	{
-		if (!isPushPermissionSet())
+		try{
+		    GCMRegistrar.checkManifest(getActivity());
+		}catch (java.lang.IllegalStateException ise)
 		{
 			mMoSyncThread.maPanic(1,
-				"Push Notifications permission is not set in the MoSync project");
+			    "Push Notifications permission is not set in the MoSync project");
 		}
 	}
 

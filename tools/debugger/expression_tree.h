@@ -29,6 +29,7 @@ class ExpressionTree;
 class ExpressionTreeNode : public RefCounted {
 public:
 	ExpressionTreeNode(ExpressionTree *tree);
+	virtual ~ExpressionTreeNode() {}
 
 	virtual Value evaluate() = 0;
 protected:
