@@ -2544,7 +2544,7 @@ namespace Base
     int _maNFCGetId(MAHandle tagHandle, int dst, int len, int memStart, JNIEnv* jNIEnv, jobject jThis) {
 		jclass cls = jNIEnv->GetObjectClass(jThis);
 
-		int fixedDst = dst == NULL ? 0 : dst - memStart;
+		int fixedDst = (dst == 0) ? 0 : (dst - memStart);
 
 		jmethodID methodID = jNIEnv->GetMethodID(
 												 cls,
@@ -2657,7 +2657,7 @@ namespace Base
 	int _maNFCGetNDEFId(MAHandle ndefRecordHandle, int dst, int len, int memStart, JNIEnv* jNIEnv, jobject jThis) {
 		jclass cls = jNIEnv->GetObjectClass(jThis);
 
-		int fixedDst = dst == NULL ? 0 : dst - memStart;
+		int fixedDst = (dst == 0) ? 0 : (dst - memStart);
 
 		jmethodID methodID = jNIEnv->GetMethodID(
 												 cls,
@@ -2675,7 +2675,7 @@ namespace Base
 	int _maNFCGetNDEFPayload(MAHandle ndefRecordHandle, int dst, int len, int memStart, JNIEnv* jNIEnv, jobject jThis) {
 		jclass cls = jNIEnv->GetObjectClass(jThis);
 
-		int fixedDst = dst == NULL ? 0 : dst - memStart;
+		int fixedDst = (dst == 0) ? 0 : (dst - memStart);
 
 		jmethodID methodID = jNIEnv->GetMethodID(
 												 cls,
@@ -2707,7 +2707,7 @@ namespace Base
 	int _maNFCGetNDEFType(MAHandle ndefRecordHandle, int dst, int len, int memStart, JNIEnv* jNIEnv, jobject jThis) {
 		jclass cls = jNIEnv->GetObjectClass(jThis);
 
-		int fixedDst = dst == NULL ? 0 : dst - memStart;
+		int fixedDst = (dst == 0) ? 0 : (dst - memStart);
 
 		jmethodID methodID = jNIEnv->GetMethodID(
 												 cls,

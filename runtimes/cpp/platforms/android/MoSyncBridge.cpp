@@ -330,7 +330,7 @@ static void nativePostEvent(JNIEnv* env, jobject jthis, jintArray eventBuffer)
 	// Build the event.
 	MAEvent event;
 	event.type = intArray[0];
-	event.data = 0;
+	event.data = (MAAddress)NULL;
 
 	// Print log message.
 	char logBuf[256];

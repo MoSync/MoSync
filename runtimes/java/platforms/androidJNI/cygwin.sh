@@ -17,13 +17,13 @@
 #!/bin/bash
 
 export ANDROID_NDK_PATH=`cygpath -u $1`
-export MOSYNC_SRC=`cygpath -u $3` 
-export MOSYNC_CPP=`cygpath -u $3"/runtimes/cpp"`
+export MOSYNC_SRC=$3
+export MOSYNC_CPP=$3"/runtimes/cpp"
 export MOSYNC_CPP_SRC=`cygpath -u $3"/runtimes/cpp/platforms/android"`
 export MOSYNC_JAVA_SRC=`cygpath -u $3"/runtimes/java/platforms/androidJNI"`
 
 echo "Build library!"
-
 cd $MOSYNC_JAVA_SRC/AndroidProject
 
+#$ANDROID_NDK_PATH/ndk-build V=1
 $ANDROID_NDK_PATH/ndk-build -B
