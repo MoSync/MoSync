@@ -203,6 +203,11 @@ void MessageHandler::handleMessageStream(
 			// Forward Resource messages.
 			mResourceMessageHandler->handleMessage(stream);
 		}
+		else if (0 == strcmp(p, "close"))
+		{
+			// Note: The "close" messge is deprecated.
+			moblet->close();
+		}
 		else if (0 == strcmp(p, "Custom"))
 		{
 			// Lookup and call function to handle custom message.
