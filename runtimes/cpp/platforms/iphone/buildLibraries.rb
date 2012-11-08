@@ -31,12 +31,16 @@ ARGV.each do |x|
 	end
 end
 
+xcodebuild = "/Developer/usr/bin/xcodebuild";
+if(!File.exist?(xcodebuild))
+	xcodebuild = "/Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild"
+end
 
 # build everything
-sh "/Developer/usr/bin/xcodebuild -target MoSyncLib -configuration Debug  -sdk iphoneos -project MoSync.xcodeproj"
-sh "/Developer/usr/bin/xcodebuild -target MoSyncLib -configuration Release -sdk iphoneos -project MoSync.xcodeproj"
-sh "/Developer/usr/bin/xcodebuild -target MoSyncLib -configuration Debug  -sdk iphonesimulator -project MoSync.xcodeproj"
-sh "/Developer/usr/bin/xcodebuild -target MoSyncLib -configuration Release -sdk iphonesimulator -project MoSync.xcodeproj"
+sh "#{xcodebuild} -target MoSyncLib -configuration Debug  -sdk iphoneos -project MoSync.xcodeproj"
+sh "#{xcodebuild} -target MoSyncLib -configuration Release -sdk iphoneos -project MoSync.xcodeproj"
+sh "#{xcodebuild} -target MoSyncLib -configuration Debug  -sdk iphonesimulator -project MoSync.xcodeproj"
+sh "#{xcodebuild} -target MoSyncLib -configuration Release -sdk iphonesimulator -project MoSync.xcodeproj"
 #sh "/Developer/usr/bin/xcodebuild -target MoSyncLib -configuration Debug  -sdk iphoneos3.2 -project MoSync.xcodeproj"
 #sh "/Developer/usr/bin/xcodebuild -target MoSyncLib -configuration Release -sdk iphoneos3.2 -project MoSync.xcodeproj"
 #sh "/Developer/usr/bin/xcodebuild -target MoSyncLib -configuration Debug  -sdk iphonesimulator3.2 -project MoSync.xcodeproj"
