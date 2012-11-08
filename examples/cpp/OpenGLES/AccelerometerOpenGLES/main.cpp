@@ -95,6 +95,16 @@ public:
 	 */
 	MyMoblet() :
 		GLMoblet(GLMoblet::GL1) {
+
+		// Add ourselves as a sensor listener.
+		Environment::getEnvironment().addSensorListener(this);
+
+		// Start the gyro or accelerometer sensor with a predefined rate
+		// for sending events, suitable for games.
+
+		if(maSensorStart(SENSOR_TYPE_ACCELEROMETER, SENSOR_RATE_GAME) < 0) {
+			maPanic(1, "Failed to initialize accelerometer!");
+		}
 	}
 
 	/**
@@ -108,17 +118,6 @@ public:
 	}
 
 	void init() {
-
-		// Add ourselves as a sensor listener.
-		Environment::getEnvironment().addSensorListener(this);
-
-		// Start the gyro or accelerometer sensor with a predefined rate
-		// for sending events, suitable for games.
-
-		if(maSensorStart(SENSOR_TYPE_ACCELEROMETER, SENSOR_RATE_GAME) < 0) {
-			maPanic(1, "Failed to initialize accelerometer!");
-		}
-
 		// Make an instance of the SimpleRenderer class that just
 		// renders a simple finite plane (quad).
 		mRenderer = new SimpleRenderer();

@@ -1243,7 +1243,7 @@ public class MoSyncThread extends Thread
 		//mMemDataSection.position(address);
 		//IntBuffer ib = mMemDataSection.asIntBuffer();
 
-		IntBuffer ib = getMemorySlice(address, -1).asIntBuffer();
+		IntBuffer ib = getMemorySlice(address, -1).order(null).asIntBuffer();
 
 		int[] vertices = new int[count*2];
 		ib.get(vertices);
@@ -1305,7 +1305,7 @@ public class MoSyncThread extends Thread
 		//mMemDataSection.position(address);
 		//IntBuffer ib = mMemDataSection.asIntBuffer();
 
-		IntBuffer ib = getMemorySlice(address, -1).asIntBuffer();
+		IntBuffer ib = getMemorySlice(address, -1).order(null).asIntBuffer();
 
 		int[] vertices = new int[count*2];
 		ib.get(vertices);
@@ -1664,7 +1664,7 @@ public class MoSyncThread extends Thread
 		//mMemDataSection.position(mem);
 		//IntBuffer ib = mMemDataSection.asIntBuffer();
 
-		IntBuffer ib = getMemorySlice(mem, -1).asIntBuffer();
+		IntBuffer ib = getMemorySlice(mem, -1).order(null).asIntBuffer();
 
 		for (int y = 0; y < srcRectHeight; y++)
 		{

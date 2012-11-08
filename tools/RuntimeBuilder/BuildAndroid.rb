@@ -91,6 +91,10 @@ class RuntimeBuilder
 		return androidBuilder(runtime_dir, mode, "16", "16")
 	end
 
+	def android_16x(runtime_dir, mode)
+		return androidBuilder(runtime_dir, mode, "16", "16")
+	end
+
 	def androidBuilder(runtime_dir, mode, platform, version)
 		debug = (mode=="debug") ? "D" : ""
 		android_tools = "#{$SETTINGS[:android_sdk]}/platform-tools"

@@ -23,8 +23,6 @@ export MOSYNC_CPP_SRC=`cygpath -u $3"/runtimes/cpp/platforms/android"`
 export MOSYNC_JAVA_SRC=`cygpath -u $3"/runtimes/java/platforms/androidJNI"`
 
 echo "Build library!"
-#echo $3
-#echo $MOSYNC_CPP
 cd $MOSYNC_JAVA_SRC/AndroidProject
 
 #$ANDROID_NDK_PATH/ndk-build V=1
