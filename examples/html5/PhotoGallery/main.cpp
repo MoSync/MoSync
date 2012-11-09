@@ -35,27 +35,26 @@ MA 02110-1301, USA.
  * - Downloading data from a server, using a custom function added
  *   to JavaScript.
  * - A simplified way of adding custom JavaScript message handling
- *   functions in C++, implemented by the MyMessageHandler class
- *   (this may be added to the MoSync Wormhole library in an
- *   upcoming release of MoSync).
- * - How to send messages between WebViews (via C++).
+ *   functions in C++.
+ * - How to send messages between WebViews from JavaScript.
  *
  * The folder "Server" contains the server side code. Note that this
- * code is not part of the actual mobile app, but is intended to run
- * on a web server.
+ * code is not part of the actual mobile application, but is intended
+ * to run on a web server.
  */
 
-#include <Wormhole/WebAppMoblet.h>
-#include <Wormhole/MessageStream.h>
+#include <conprint.h>
+#include <Wormhole/HybridMoblet.h>
 #include <Wormhole/HighLevelTextDownloader.h>
-#include "MyMessageHandler.h"
 #include "MAHeaders.h"
+
+using namespace Wormhole;
 
 /**
  * Helper class for downloading a list of photos from a server.
  * This downloader will delete itself upon completion.
  */
-class MyPhotoListDownloader : public Wormhole::HighLevelTextDownloader
+class MyPhotoListDownloader : public HighLevelTextDownloader
 {
 public:
 	MAWidgetHandle mGalleryWebViewHandle;
@@ -112,37 +111,22 @@ public:
 /**
  * The application class.
  */
-class MyMoblet : public Wormhole::WebAppMoblet
+class MyMoblet : public HybridMoblet
 {
 public:
-	MyMoblet() :
-		mMyMessageHandler(getWebView())
+	MyMoblet()
 	{
-		// Extract files in LocalFiles folder to the device.
-		extractFileSystem();
+		// Show the page with NativeUI definitions.
+		showNativeUI("index.html");
 
-		// Enable message sending from JavaScript to C++.
-		enableWebViewMessages();
-
-		// Hide the main WebView (we will use NativeUI to display
-		// widgets and use this hidden WebView to handle application
-		// logic written in JavaScript).
-		getWebView()->setVisible(false);
-
-		// Load page in the "LocalFiles" folder into the hidden WebView.
-		//getWebView()->openURL("index.html");
-		showPage("index.html");
-
-		// The beep sound is defined in file "Resources/Resources.lst".
-		mMyMessageHandler.init(BEEP_WAV, this);
+		// Set the sound used by the PhoneGap beep notification API.
+		// BEEP_WAV is defined in file Resources/Resources.lst.
+		setBeepSound(BEEP_WAV);
 
 		// Register functions to handle custom messages sent from JavaScript.
-		mMyMessageHandler.addMessageFun(
+		addMessageFun(
 			"DownloadPhotoList",
-			(MyMessageHandlerFun)&MyMoblet::downloadPhotoList);
-		mMyMessageHandler.addMessageFun(
-			"CallJS",
-			(MyMessageHandlerFun)&MyMoblet::callJSInWebView);
+			(FunTable::MessageHandlerFun)&MyMoblet::downloadPhotoList);
 	}
 
 	virtual ~MyMoblet()
@@ -150,123 +134,9 @@ public:
 	}
 
 	/**
-	 * Here we handle HOOK_INVOKED events for WebViews in the app.
-	 * This code enables WebViews to send messages to each other.
-	 */
-	void customEvent(const MAEvent& event)
-	{
-		if (EVENT_TYPE_WIDGET == event.type)
-		{
-			MAWidgetEventData* widgetEventData = (MAWidgetEventData*)event.data;
-			MAWidgetHandle widgetHandle = widgetEventData->widgetHandle;
-
-			// If target object is the main WebView, then we just return
-			// because this is handled by the NativeUI library event processing.
-			if (getWebView()->getWidgetHandle() == widgetHandle)
-			{
-				return;
-			}
-
-			// Process HOOK_INVOKED messages. This makes CallJS messages work.
-			if (MAW_EVENT_WEB_VIEW_HOOK_INVOKED == widgetEventData->eventType)
-			{
-				//int hookType = widgetEventData->hookType;
-				MAHandle data = widgetEventData->urlData;
-
-				// Works with NULL as first param as long as the the only
-				// thing we do is passing messages to other WebViews.
-				// This is done by custom function callJSInWebView,
-				// which is invoked via handleWebViewMessage.
-				handleWebViewMessage(NULL, data);
-				//handleWebViewMessage(getWebView(), data); // Alternative.
-
-				// Free data.
-				maDestroyPlaceholder(data);
-			}
-		}
-	}
-
-	/**
-	 * This method is called when a key is pressed.
-	 * Forwards the event to PhoneGapMessageHandler.
-	 */
-	void keyPressEvent(int keyCode, int nativeCode)
-	{
-		// Forward to MyMessageHandler.
-		mMyMessageHandler.keyPressEvent(keyCode, nativeCode);
-	}
-
-	/**
-	 * Called from JavaScript to download a list of photos.
-	 */
-	void downloadPhotoList(Wormhole::MessageStream& stream)
-	{
-		// Get the Gallery WebView widget handle.
-		int webViewHandle = MAUtil::stringToInteger(stream.getNext());
-
-		// Get download url.
-		const char* url = stream.getNext();
-
-		// Initiate download.
-		(new MyPhotoListDownloader(webViewHandle))->get(url);
-	}
-
-	/**
-	 * Called from JavaScript to evaluate a JS script in a WebView.
-	 */
-	void callJSInWebView(Wormhole::MessageStream& stream)
-	{
-		// Get the native MoSync widget handle for the WebView
-		// this call should be forwarded to.
-		int webViewHandle = MAUtil::stringToInteger(stream.getNext());
-		if (0 == webViewHandle)
-		{
-			// When the handle is zero, we should use the main
-			// WebView (hidden in this app).
-			webViewHandle = getWebView()->getWidgetHandle();
-		}
-
-		// Evaluate the JavaScript code in the WebView.
-		callJS(webViewHandle, stream.getNext());
-	}
-
-	/**
-	 * Evaluate JavaScript code in the given WebView.
-	 */
-	void callJS(MAWidgetHandle webViewHandle, const MAUtil::String& script)
-	{
-		// Call the JavaScript code on the WebView.
-		MAUtil::String url = "javascript:" + script;
-		maWidgetSetProperty(
-			webViewHandle,
-			MAW_WEB_VIEW_URL,
-			url.c_str());
-	}
-
-	/**
-	 * This method handles messages sent from the WebView.
-	 *
-	 * Note that the data object will be valid only during
-	 * the life-time of the call of this method, then it
-	 * will be deallocated.
-	 *
-	 * @param webView The WebView that sent the message.
-	 * @param urlData Data object that holds message content.
-	 */
-	void handleWebViewMessage(NativeUI::WebView* webView, MAHandle data)
-	{
-		// Uncomment to print message data for debugging.
-		// You need to build the project in debug mode for
-		// the log output to be displayed.
-		//printMessage(data);
-
-		mMyMessageHandler.handleWebViewMessage(webView, data, this);
-	}
-
-	/**
 	 * For debugging.
 	 */
-	void printMessage(MAHandle dataHandle)
+	void printMessage(MAHandle dataHandle, const char* label)
 	{
 		// Get length of the data, it is not zero terminated.
 		int dataSize = maGetDataSize(dataHandle);
@@ -281,14 +151,57 @@ public:
 		stringData[dataSize] = 0;
 
 		// Print unparsed message data.
-		maWriteLog("@@@ MOSYNC Message:", 19);
+		maWriteLog(label, strlen(label));
 		maWriteLog(stringData, dataSize);
 
 		free(stringData);
 	}
 
-private:
-	MyMessageHandler mMyMessageHandler;
+	virtual void handleWebViewMessage(
+		NativeUI::WebView* webView,
+		MAHandle data)
+	{
+		mMessageHandler.handleWebViewMessage(webView, data, this);
+	}
+
+	virtual void customEvent(const MAEvent& event)
+	{
+		if (EVENT_TYPE_WIDGET == event.type)
+		{
+			MAWidgetEventData* widgetEventData = (MAWidgetEventData*)event.data;
+			MAWidgetHandle widgetHandle = widgetEventData->widgetHandle;
+
+			if (getWebView()->getWidgetHandle() == widgetHandle)
+			{
+				return;
+			}
+
+			if (MAW_EVENT_WEB_VIEW_HOOK_INVOKED == widgetEventData->eventType)
+			{
+				MAHandle data = widgetEventData->urlData;
+				char buf[128];
+				sprintf(buf, "@@@@ MOSYNC widgetHandle: %i", widgetHandle);
+				printMessage(data, buf);
+				handleWebViewMessage(NULL, data);
+				maDestroyPlaceholder(data);
+			}
+		}
+	}
+
+	/**
+	 * Called from JavaScript to download a list of photos.
+	 */
+	void downloadPhotoList(Wormhole::MessageStream& stream)
+	{
+		// Get the Gallery WebView widget handle.
+		int webViewHandle = MAUtil::stringToInteger(stream.getNext());
+
+		// Get download url.
+		const char* url = stream.getNext();
+
+		// Initiate download. The downloader will delete itself.
+		(new MyPhotoListDownloader(webViewHandle))->get(url);
+	}
 };
 
 /**
@@ -298,7 +211,6 @@ private:
  */
 extern "C" int MAMain()
 {
-	MAUtil::Moblet::run(new MyMoblet());
-
+	(new MyMoblet())->enterEventLoop();
 	return 0;
 }

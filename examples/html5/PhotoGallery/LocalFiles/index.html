@@ -5,8 +5,10 @@
 *
 * Main application file, contains the "app" object that defines the
 * application logic and handles requests from the Camera and Gallery
-* WebViews. This file also defines the tabbed Native UI of the
-* application. Note that the code in this file runs in a hidden WebView.
+* WebViews. This file also defines the tabs in the Native UI of the
+* application.
+*
+* Note that the code in this file runs in a hidden WebView.
 *
 * All Wormhole requests are routed through this WebView, since Wormhole
 * currently has built-in support for only one WebView. Custom code
@@ -16,12 +18,8 @@
 -->
 <html>
 	<head>
-		<meta name="viewport" content="width=device-width">
-		<meta http-equiv="Content-type" content="text/html; charset=utf-8">
 		<title>Photo Gallery</title>
-		<link rel="stylesheet" href="style.css" type="text/css" media="screen" title="no title" charset="utf-8">
-		<script type="text/javascript" charset="utf-8" src="js/wormhole.js"></script>
-		<script type="text/javascript" charset="utf-8" src="mosync-extensions.js"></script>
+		<script src="js/wormhole.js"></script>
 		<script type="text/javascript">
 		var app = (function()
 		{
@@ -37,7 +35,7 @@
 					"backbutton",
 					function()
 					{
-						mosync.bridge.send(["close"]);
+						mosync.app.exit();
 					},
 					true);
 
@@ -118,8 +116,8 @@
 							{
 								// Pass the URL of the captured image to the camera page.
 								var cameraWebViewHandle =
-									mosync.nativeui.getWidgetHandleById("cameraWebView");
-								mosync.bridge.callJS(
+									mosync.nativeui.getNativeHandleById("cameraWebView");
+								mosync.nativeui.callJS(
 									cameraWebViewHandle,
 									"camera.setPhotoURL('" + fileURL + "')");
 							},
@@ -179,7 +177,7 @@
 			app.downloadPhotoList = function()
 			{
 				var galleryWebViewHandle =
-					mosync.nativeui.getWidgetHandleById("galleryWebView");
+					mosync.nativeui.getNativeHandleById("galleryWebView");
 				mosync.bridge.send([
 					"Custom",
 					"DownloadPhotoList",
@@ -189,9 +187,15 @@
 
 			return app;
 		})();
+
+		// Call app.init when document has loaded.
+		document.addEventListener(
+			"DOMContentLoaded",
+			app.init,
+			false);
 		</script>
 	</head>
-	<body onload="app.init()">
+	<body>
 	<!--  Here the NativeUI components are declared. -->
 	<div id="NativeUI">
 		<!-- Tab screen that contains three tabs with child screens -->
