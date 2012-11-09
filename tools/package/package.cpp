@@ -35,6 +35,8 @@ static const char* sUsage =
 " -h, --help                   Print this information.\n"
 " -p, --program <file>         Input: compiled program file.\n"
 " -r, --resource <file>        Input: compiled resource file.\n"
+" -x, --extensions <extensions>\n"
+"                              Input: the extensions to use.\n"
 " -i, --icon <file>            Input: MoSync icon definition file (XML).\n"
 "     --cpp-output <path>      Input: Absolute path to a directory containing\n"
 "                              'rebuild.build.cpp' and 'data_section.bin',\n"
@@ -136,6 +138,8 @@ int main(int argc, const char** argv) {
 			setString(i, argc, argv, s.program);
 		} else if(streq(argv[i], "-r") || streq(argv[i], "--resource")) {
 			setString(i, argc, argv, s.resource);
+		} else if(streq(argv[i], "-x") || streq(argv[i], "--extensions")) {
+			setString(i, argc, argv, s.extensions);
 		} else if(streq(argv[i], "-i") || streq(argv[i], "--icon")) {
 			setString(i, argc, argv, s.icon);
 		} else if(streq(argv[i], "-m") || streq(argv[i], "--model")) {
@@ -286,6 +290,9 @@ void testVersion(const SETTINGS& s) {
 		printf("Must specify version!\n");
 		exit(1);
 	}
+}
+void testExtensions(const SETTINGS& s) {
+	// TODO!
 }
 void testOutputType(const SETTINGS& s) {
 	if (s.outputType) {
