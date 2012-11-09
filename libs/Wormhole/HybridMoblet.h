@@ -167,6 +167,12 @@ public:
 		MAHandle data);
 
 	/**
+	 * Handles HOOK_INVOKED events for WebViews in the app.
+	 * This code enables WebViews to send messages to each other.
+	 */
+	virtual void customEvent(const MAEvent& event);
+
+	/**
 	 * This method is called when a key is pressed.
 	 * Forwards the event to PhoneGapMessageHandler.
 	 * Override to implement your own behaviour.

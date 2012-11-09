@@ -266,6 +266,63 @@ void HybridMoblet::handleWebViewMessage(
 }
 
 /**
+ * Handles HOOK_INVOKED events for WebViews in the app.
+ * This code enables WebViews to send messages to each other.
+ */
+void HybridMoblet::customEvent(const MAEvent& event)
+{
+	if (EVENT_TYPE_WIDGET == event.type)
+	{
+		MAWidgetEventData* widgetEventData = (MAWidgetEventData*)event.data;
+		MAWidgetHandle widgetHandle = widgetEventData->widgetHandle;
+
+		// If target object is the main WebView, then we just return
+		// because this is handled by the NativeUI library event processing,
+		// which will invoke HybridMoblet::handleWebViewMessage().
+		if (getWebView()->getWidgetHandle() == widgetHandle)
+		{
+			return;
+		}
+
+		// Process HOOK_INVOKED messages. This makes CallJS messages work.
+		if (MAW_EVENT_WEB_VIEW_HOOK_INVOKED == widgetEventData->eventType)
+		{
+			// We don't care about the hook type.
+			// int hookType = widgetEventData->hookType;
+
+			MAHandle data = widgetEventData->urlData;
+
+			// This works with NULL as first param as long as the the only
+			// thing we do is passing messages to other WebViews.
+			//
+			// To make other WebViews than the main one work with the
+			// full Wormhole API, we would need to pass in the WebView
+			// object here (instead of NULL), or chaneg the code so that
+			// a widget handle is passed instead. Another alternative is
+			// to pass in the main WebView, but then the result would be
+			// passed to that one, not the WebView that send the message.
+			//
+			// The only things that work reliable from other WebViews than
+			// the main one, are CallJS and calls that do not return anything,
+			// like mosync.app.sendToBackground().
+			//
+			// Apps are supposed to use the main WebView to for accessing the
+			// fulll Wormhole JS API, and only use mosync.nativeui.callJS()
+			// from other WebViews. This way, the main WebView becomes a
+			// mediator, which is a good design because native access is
+			// restricted to one point.
+			handleWebViewMessage(NULL, data);
+
+			// Alternative, use main WebView, but this is not really useful.
+			//handleWebViewMessage(getWebView(), data);
+
+			// Free data.
+			maDestroyPlaceholder(data);
+		}
+	}
+}
+
+/**
  * This method is called when a key is pressed.
  * Forwards the event to PhoneGapMessageHandler.
  * Override to implement your own behaviour.

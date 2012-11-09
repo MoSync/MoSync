@@ -205,7 +205,7 @@ void MessageHandler::handleMessageStream(
 		}
 		else if (0 == strcmp(p, "close"))
 		{
-			// Note: The "close" messge is deprecated.
+			// Note: The "close" message is deprecated.
 			moblet->close();
 		}
 		else if (0 == strcmp(p, "Custom"))
@@ -258,20 +258,20 @@ void MessageHandler::handleCallJSMessage(
 	NativeUI::WebView* webView,
 	Wormhole::HybridMoblet* moblet)
 {
-	// TODO: Add error handling (missing parameters).
+	// TODO: Add error handling for missing parameters.
 
 	// Get the native MoSync widget handle for the WebView
 	// this call should be forwarded to.
 	int webViewHandle = MAUtil::stringToInteger(message.getNext());
 
 	// When the handle is zero, we use the main WebView
-	// (which is hidden in a NativeUI app).
+	// (which is usually hidden in a NativeUI app).
 	if (0 == webViewHandle)
 	{
 		webViewHandle = moblet->getWebView()->getWidgetHandle();
 	}
 
-	// Evaluate the JavaScript code in the WebView.
+	// Evaluate the JavaScript code in the target WebView.
 	const char* script = message.getNext();
 	moblet->callJS(webViewHandle, script);
 }
