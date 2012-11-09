@@ -22,7 +22,17 @@ MA 02110-1301, USA.
  *
  * Application for testing parts of the File API.
  *
- * Uses a utility library developed for WebView (WebViewUtil.h/cpp).
+ * How to use:
+ *
+ * Edit function getPath() below in this file to set the
+ * file system to be tested (application local file system
+ * or the SD card file system on Android).
+ *
+ * Build and run the app.
+ *
+ * Inspect the output shown on the screen. If all test
+ * passes "All tests passed." is displayed, if a test fails,
+ * "Test failed." is displayed.
  */
 
 #include <ma.h>
@@ -87,13 +97,26 @@ public:
 		return success;
 	}
 
+	/**
+	 * This is where the path to be tested is set.
+	 * You can test the application local path, or the
+	 * Android SD card path. Comment/uncomment the lines
+	 * below to set the path to be tested.
+	 * @return The path.
+	 */
+	MAUtil::String getPath()
+	{
+		// return mPlatform->getLocalPath();
+		return mPlatform->getAndroidSDCardPath();
+	}
+
 	void testFileAPI()
 	{
 		MAUtil::String fileName1 = "testfile1";
 		MAUtil::String fileName2 = "testfile2";
 		MAUtil::String fileName3 = "testfile3";
 		MAUtil::String fileName4 = "testfile4";
-		MAUtil::String fullFileName4 = mPlatform->getLocalPath() + fileName4;
+		MAUtil::String fullFileName4 = getPath() + fileName4;
 		MAUtil::String testData = "12345";
 
 		// Write data.
@@ -140,7 +163,7 @@ public:
 	{
 		// Write a string.
 		bool success = mPlatform->writeTextToFile(
-			mPlatform->getLocalPath() + fileName.c_str(),
+			getPath() + fileName.c_str(),
 			text.c_str());
 		CHECK(success, "testFileWriteText")
 	}
@@ -152,7 +175,7 @@ public:
 		// Read the string.
 		MAUtil::String data;
 		bool success = mPlatform->readTextFromFile(
-			mPlatform->getLocalPath() + fileName.c_str(),
+			getPath() + fileName.c_str(),
 			data);
 		CHECK(success, "testFileReadText")
 		CHECK(data.length() == text.length(), "data.length() == text.length()")
@@ -172,7 +195,7 @@ public:
 	{
 		// Read to a handle.
 		bool success = mPlatform->readDataFromFile(
-			mPlatform->getLocalPath() + fileName.c_str(),
+			getPath() + fileName.c_str(),
 			placeholder);
 		CHECK(success, "testFileReadData")
 		CHECK(
@@ -186,7 +209,7 @@ public:
 	{
 		// Write from handle to file.
 		bool success = mPlatform->writeDataToFile(
-			mPlatform->getLocalPath() + fileName.c_str(),
+			getPath() + fileName.c_str(),
 			h);
 		CHECK(success, "testFileWriteData")
 	}
@@ -203,7 +226,7 @@ public:
 		if (mTestHasFailed) { return; }
 
 		// Rename file using full path.
-		MAUtil::String fullFileName = mPlatform->getLocalPath() + fileName;
+		MAUtil::String fullFileName = getPath() + fileName;
 		MAHandle file = maFileOpen(fullFileName.c_str(), MA_ACCESS_READ_WRITE);
 		CHECK(file > 0, "testFileRename: maFileOpen");
 		CHECK(maFileExists(file), "testFileRename: maFileExists");
