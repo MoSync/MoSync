@@ -83,6 +83,15 @@ MAUtil::String Platform::getLocalPath()
 }
 
 /**
+ * Get the path to the SD card on the Android file system.
+ * @return Path that ends with a slash.
+ */
+MAUtil::String Platform::getAndroidSDCardPath()
+{
+	return "/sdcard/";
+}
+
+/**
  * Write a data object to a file.
  * @return true on success, false on error.
  */
