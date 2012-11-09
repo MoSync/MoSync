@@ -134,61 +134,6 @@ public:
 	}
 
 	/**
-	 * For debugging.
-	 */
-	void printMessage(MAHandle dataHandle, const char* label)
-	{
-		// Get length of the data, it is not zero terminated.
-		int dataSize = maGetDataSize(dataHandle);
-
-		// Allocate buffer for string data.
-		char* stringData = (char*) malloc(dataSize + 1);
-
-		// Get the data.
-		maReadData(dataHandle, stringData, 0, dataSize);
-
-		// Zero terminate.
-		stringData[dataSize] = 0;
-
-		// Print unparsed message data.
-		maWriteLog(label, strlen(label));
-		maWriteLog(stringData, dataSize);
-
-		free(stringData);
-	}
-
-	virtual void handleWebViewMessage(
-		NativeUI::WebView* webView,
-		MAHandle data)
-	{
-		mMessageHandler.handleWebViewMessage(webView, data, this);
-	}
-
-	virtual void customEvent(const MAEvent& event)
-	{
-		if (EVENT_TYPE_WIDGET == event.type)
-		{
-			MAWidgetEventData* widgetEventData = (MAWidgetEventData*)event.data;
-			MAWidgetHandle widgetHandle = widgetEventData->widgetHandle;
-
-			if (getWebView()->getWidgetHandle() == widgetHandle)
-			{
-				return;
-			}
-
-			if (MAW_EVENT_WEB_VIEW_HOOK_INVOKED == widgetEventData->eventType)
-			{
-				MAHandle data = widgetEventData->urlData;
-				char buf[128];
-				sprintf(buf, "@@@@ MOSYNC widgetHandle: %i", widgetHandle);
-				printMessage(data, buf);
-				handleWebViewMessage(NULL, data);
-				maDestroyPlaceholder(data);
-			}
-		}
-	}
-
-	/**
 	 * Called from JavaScript to download a list of photos.
 	 */
 	void downloadPhotoList(Wormhole::MessageStream& stream)

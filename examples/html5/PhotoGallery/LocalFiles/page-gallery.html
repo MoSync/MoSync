@@ -25,14 +25,13 @@
 			 */
 			gallery.downloadPhotoList = function()
 			{
-				alert("step2")
 				// Delete existing DOM list of images.
 				var list = document.getElementById("photolist");
 				while(list.hasChildNodes())
 				{
 					list.removeChild(list.firstChild);
 				}
-alert("Call main app.downloadPhotoList()")
+
 				// Ask the main WebView to download the photo list.
 				// When download is complete setPhotoList is called.
 				mosync.nativeui.callJS(
