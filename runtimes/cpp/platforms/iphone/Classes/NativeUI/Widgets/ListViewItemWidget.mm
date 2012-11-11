@@ -439,6 +439,15 @@ static NSString* kReuseIdentifier = @"Cell";
         IWidget* child = [_children objectAtIndex:0];
         size = child.size;
     }
+    else
+    {
+        // Fix for MOSYNC-2560.
+        // The system resizes the cell's height after loading it, so if
+        // the table loads the same cell for many times its height increases.
+        // Setting the item's height with the rowHeight value from the table view will
+        // prevent that from happening.
+        size.height = [_delegate tableViewSectionRowHeight];
+    }
     return  size;
 }
 

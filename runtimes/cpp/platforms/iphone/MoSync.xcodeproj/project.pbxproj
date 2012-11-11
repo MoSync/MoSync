@@ -71,16 +71,16 @@
 		4332FB4815BD3B8D00E6E048 /* UINavigationControllerExpanded.h in Headers */ = {isa = PBXBuildFile; fileRef = 4332FB4615BD3B8D00E6E048 /* UINavigationControllerExpanded.h */; };
 		4332FB4915BD3B8D00E6E048 /* UINavigationControllerExpanded.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4332FB4715BD3B8D00E6E048 /* UINavigationControllerExpanded.mm */; };
 		4332FB4A15BD3B8D00E6E048 /* UINavigationControllerExpanded.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4332FB4715BD3B8D00E6E048 /* UINavigationControllerExpanded.mm */; };
-		433F53DB15B6F61500CF34A6 /* WidgetUtils.h in Headers */ = {isa = PBXBuildFile; fileRef = 433F53D915B6F61500CF34A6 /* WidgetUtils.h */; };
-		433F53DC15B6F61500CF34A6 /* WidgetUtils.mm in Sources */ = {isa = PBXBuildFile; fileRef = 433F53DA15B6F61500CF34A6 /* WidgetUtils.mm */; };
-		433F53DD15B6F61500CF34A6 /* WidgetUtils.mm in Sources */ = {isa = PBXBuildFile; fileRef = 433F53DA15B6F61500CF34A6 /* WidgetUtils.mm */; };
-		4354772415D166740064CF20 /* ListViewWidgetDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = 4354772315D166740064CF20 /* ListViewWidgetDelegate.h */; };
-		43770EE415D2917F00C82FDD /* ListViewSectionWidgetDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = 43770EE315D2917F00C82FDD /* ListViewSectionWidgetDelegate.h */; };
 		4383ADF7161AC99D00F11991 /* ToggleButtonWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 4383ADF5161AC99D00F11991 /* ToggleButtonWidget.h */; };
 		4383ADF8161AC99D00F11991 /* ToggleButtonWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4383ADF6161AC99D00F11991 /* ToggleButtonWidget.mm */; };
 		4383ADF9161AC99D00F11991 /* ToggleButtonWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4383ADF6161AC99D00F11991 /* ToggleButtonWidget.mm */; };
 		4392606A15B478F400B53B88 /* LICENSE.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4392606915B478F400B53B88 /* LICENSE.txt */; };
 		43A8A1E0163588B9002776D0 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 43A8A1DF163588B9002776D0 /* Default-568h@2x.png */; };
+		43A8F214164FC71A00B0FD35 /* ListViewSectionWidgetDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = 43A8F210164FC71900B0FD35 /* ListViewSectionWidgetDelegate.h */; };
+		43A8F215164FC71A00B0FD35 /* ListViewWidgetDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = 43A8F211164FC71900B0FD35 /* ListViewWidgetDelegate.h */; };
+		43A8F216164FC71A00B0FD35 /* WidgetUtils.h in Headers */ = {isa = PBXBuildFile; fileRef = 43A8F212164FC71A00B0FD35 /* WidgetUtils.h */; };
+		43A8F217164FC71A00B0FD35 /* WidgetUtils.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43A8F213164FC71A00B0FD35 /* WidgetUtils.mm */; };
+		43A8F218164FC71A00B0FD35 /* WidgetUtils.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43A8F213164FC71A00B0FD35 /* WidgetUtils.mm */; };
 		43B322D715BC4168009634BC /* HorizontalLayoutWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 43B322D515BC4168009634BC /* HorizontalLayoutWidget.h */; };
 		43B322D815BC4168009634BC /* HorizontalLayoutWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43B322D615BC4168009634BC /* HorizontalLayoutWidget.mm */; };
 		43B322D915BC4168009634BC /* HorizontalLayoutWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43B322D615BC4168009634BC /* HorizontalLayoutWidget.mm */; };
@@ -470,14 +470,14 @@
 		433134D615345A73005DDAD8 /* SBJsonWriter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SBJsonWriter.m; path = SBJson/SBJsonWriter.m; sourceTree = "<group>"; };
 		4332FB4615BD3B8D00E6E048 /* UINavigationControllerExpanded.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UINavigationControllerExpanded.h; path = Expanded/UINavigationControllerExpanded.h; sourceTree = "<group>"; };
 		4332FB4715BD3B8D00E6E048 /* UINavigationControllerExpanded.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = UINavigationControllerExpanded.mm; path = Expanded/UINavigationControllerExpanded.mm; sourceTree = "<group>"; };
-		433F53D915B6F61500CF34A6 /* WidgetUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = WidgetUtils.h; path = Classes/NativeUI/WidgetUtils.h; sourceTree = SOURCE_ROOT; };
-		433F53DA15B6F61500CF34A6 /* WidgetUtils.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = WidgetUtils.mm; path = Classes/NativeUI/WidgetUtils.mm; sourceTree = SOURCE_ROOT; };
-		4354772315D166740064CF20 /* ListViewWidgetDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ListViewWidgetDelegate.h; path = Classes/NativeUI/ListViewWidgetDelegate.h; sourceTree = SOURCE_ROOT; };
-		43770EE315D2917F00C82FDD /* ListViewSectionWidgetDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ListViewSectionWidgetDelegate.h; path = Classes/NativeUI/ListViewSectionWidgetDelegate.h; sourceTree = SOURCE_ROOT; };
 		4383ADF5161AC99D00F11991 /* ToggleButtonWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ToggleButtonWidget.h; path = NativeUI/Widgets/ToggleButtonWidget.h; sourceTree = "<group>"; };
 		4383ADF6161AC99D00F11991 /* ToggleButtonWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = ToggleButtonWidget.mm; path = NativeUI/Widgets/ToggleButtonWidget.mm; sourceTree = "<group>"; };
 		4392606915B478F400B53B88 /* LICENSE.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = LICENSE.txt; path = SBJson/LICENSE.txt; sourceTree = "<group>"; };
 		43A8A1DF163588B9002776D0 /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
+		43A8F210164FC71900B0FD35 /* ListViewSectionWidgetDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ListViewSectionWidgetDelegate.h; path = Classes/NativeUI/WidgetUtils/ListViewSectionWidgetDelegate.h; sourceTree = SOURCE_ROOT; };
+		43A8F211164FC71900B0FD35 /* ListViewWidgetDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ListViewWidgetDelegate.h; path = Classes/NativeUI/WidgetUtils/ListViewWidgetDelegate.h; sourceTree = SOURCE_ROOT; };
+		43A8F212164FC71A00B0FD35 /* WidgetUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = WidgetUtils.h; path = Classes/NativeUI/WidgetUtils/WidgetUtils.h; sourceTree = SOURCE_ROOT; };
+		43A8F213164FC71A00B0FD35 /* WidgetUtils.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = WidgetUtils.mm; path = Classes/NativeUI/WidgetUtils/WidgetUtils.mm; sourceTree = SOURCE_ROOT; };
 		43B322D515BC4168009634BC /* HorizontalLayoutWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = HorizontalLayoutWidget.h; path = NativeUI/Layouts/HorizontalLayoutWidget.h; sourceTree = "<group>"; };
 		43B322D615BC4168009634BC /* HorizontalLayoutWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = HorizontalLayoutWidget.mm; path = NativeUI/Layouts/HorizontalLayoutWidget.mm; sourceTree = "<group>"; };
 		43B322DB15BC421E009634BC /* VerticalLayoutWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VerticalLayoutWidget.h; path = NativeUI/Layouts/VerticalLayoutWidget.h; sourceTree = "<group>"; };
@@ -1296,10 +1296,10 @@
 		43F9809015B560F700302EA9 /* WIdgetUtils */ = {
 			isa = PBXGroup;
 			children = (
-				433F53D915B6F61500CF34A6 /* WidgetUtils.h */,
-				433F53DA15B6F61500CF34A6 /* WidgetUtils.mm */,
-				4354772315D166740064CF20 /* ListViewWidgetDelegate.h */,
-				43770EE315D2917F00C82FDD /* ListViewSectionWidgetDelegate.h */,
+				43A8F210164FC71900B0FD35 /* ListViewSectionWidgetDelegate.h */,
+				43A8F211164FC71900B0FD35 /* ListViewWidgetDelegate.h */,
+				43A8F212164FC71A00B0FD35 /* WidgetUtils.h */,
+				43A8F213164FC71A00B0FD35 /* WidgetUtils.mm */,
 			);
 			name = WIdgetUtils;
 			path = NativeUI/WIdgetUtils;
@@ -1574,18 +1574,18 @@
 				43F3705D15B476300095B3C6 /* ImagePickerController.h in Headers */,
 				43F3706015B476300095B3C6 /* ScreenWidgetController.h in Headers */,
 				43F3706515B476940095B3C6 /* TouchHelper.h in Headers */,
-				433F53DB15B6F61500CF34A6 /* WidgetUtils.h in Headers */,
 				43B39B3E15B98B1100E9032F /* WidgetLayoutingMacro.h in Headers */,
 				43B322D715BC4168009634BC /* HorizontalLayoutWidget.h in Headers */,
 				43B322DD15BC421E009634BC /* VerticalLayoutWidget.h in Headers */,
 				4332FB4815BD3B8D00E6E048 /* UINavigationControllerExpanded.h in Headers */,
 				4324A72115D11986004C5732 /* ListViewSectionWidget.h in Headers */,
-				4354772415D166740064CF20 /* ListViewWidgetDelegate.h in Headers */,
-				43770EE415D2917F00C82FDD /* ListViewSectionWidgetDelegate.h in Headers */,
 				4383ADF7161AC99D00F11991 /* ToggleButtonWidget.h in Headers */,
 				43C48355164178C0008F9A39 /* MapAnnotation.h in Headers */,
 				43C48358164178C0008F9A39 /* MapPinWidget.h in Headers */,
 				43C4835B164178C0008F9A39 /* MapWidget.h in Headers */,
+				43A8F214164FC71A00B0FD35 /* ListViewSectionWidgetDelegate.h in Headers */,
+				43A8F215164FC71A00B0FD35 /* ListViewWidgetDelegate.h in Headers */,
+				43A8F216164FC71A00B0FD35 /* WidgetUtils.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1819,7 +1819,6 @@
 				43F3705E15B476300095B3C6 /* ImagePickerController.mm in Sources */,
 				43F3706115B476300095B3C6 /* ScreenWidgetController.mm in Sources */,
 				43F3706615B476940095B3C6 /* TouchHelper.mm in Sources */,
-				433F53DC15B6F61500CF34A6 /* WidgetUtils.mm in Sources */,
 				43B322D815BC4168009634BC /* HorizontalLayoutWidget.mm in Sources */,
 				43B322DE15BC421E009634BC /* VerticalLayoutWidget.mm in Sources */,
 				4332FB4915BD3B8D00E6E048 /* UINavigationControllerExpanded.mm in Sources */,
@@ -1828,6 +1827,7 @@
 				43C48356164178C0008F9A39 /* MapAnnotation.m in Sources */,
 				43C48359164178C0008F9A39 /* MapPinWidget.mm in Sources */,
 				43C4835C164178C0008F9A39 /* MapWidget.mm in Sources */,
+				43A8F217164FC71A00B0FD35 /* WidgetUtils.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1946,7 +1946,6 @@
 				43F3705F15B476300095B3C6 /* ImagePickerController.mm in Sources */,
 				43F3706215B476300095B3C6 /* ScreenWidgetController.mm in Sources */,
 				43F3706715B476940095B3C6 /* TouchHelper.mm in Sources */,
-				433F53DD15B6F61500CF34A6 /* WidgetUtils.mm in Sources */,
 				43B322D915BC4168009634BC /* HorizontalLayoutWidget.mm in Sources */,
 				43B322DF15BC421E009634BC /* VerticalLayoutWidget.mm in Sources */,
 				4332FB4A15BD3B8D00E6E048 /* UINavigationControllerExpanded.mm in Sources */,
@@ -1955,6 +1954,7 @@
 				43C48357164178C0008F9A39 /* MapAnnotation.m in Sources */,
 				43C4835A164178C0008F9A39 /* MapPinWidget.mm in Sources */,
 				43C4835D164178C0008F9A39 /* MapWidget.mm in Sources */,
+				43A8F218164FC71A00B0FD35 /* WidgetUtils.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

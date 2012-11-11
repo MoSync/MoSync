@@ -58,4 +58,10 @@
  */
 -(void)reloadListViewSectionAtIndex:(int)sectionIndex;
 
+/**
+ * Ask the table for the item's height.
+ * @return The item height set in the table view.
+ */
+- (CGFloat)tableViewRowHeight;
+
 @end

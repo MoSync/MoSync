@@ -36,4 +36,10 @@
  */
 -(void)sizeChangedFor:(ListViewItemWidget*) listItem;
 
+/**
+ * Ask the list section for the item's height.
+ * @return The item height set in the table view.
+ */
+- (CGFloat)tableViewSectionRowHeight;
+
 @end
