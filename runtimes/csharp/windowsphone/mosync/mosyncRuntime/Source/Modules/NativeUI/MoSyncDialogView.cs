@@ -88,6 +88,9 @@ namespace MoSync
             {
                 // create the dialog view
                 mDialogView = new StackPanel();
+
+                dialogViewBackgroundColor = Application.Current.Resources["PhoneBackgroundColor"].ToString();
+
                 mDialogView.Background = GetColorFromHexa(dialogViewBackgroundColor);
                 // remove the bottom margin from the total height of the dialog view
                 mDialogView.Height = Application.Current.Host.Content.ActualHeight - marginDistance;

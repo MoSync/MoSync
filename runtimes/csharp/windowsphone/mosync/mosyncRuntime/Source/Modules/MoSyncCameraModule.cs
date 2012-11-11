@@ -336,6 +336,12 @@ namespace MoSync
                     {
                         mCameraType = CameraType.FrontFacing;
                         InitCamera();
+
+                        MoSync.Util.RunActionOnMainThreadSync(() =>
+                            {
+                                SetInitialCameraOrientation(currentPage);
+                            }
+                        );
                     }
                 }
                 else return MoSync.Constants.MA_CAMERA_RES_FAILED;
@@ -438,6 +444,8 @@ namespace MoSync
             }
             else
             {
+                if (mCamera.CameraType == CameraType.FrontFacing)
+                    rotation += 180;
                 mVideoBrush.Stretch = Stretch.Fill;
             }
 
@@ -472,6 +480,8 @@ namespace MoSync
                     }
                     else
                     {
+                        if (mCamera.CameraType == CameraType.FrontFacing)
+                            rotation += 180;
                         mVideoBrush.Stretch = Stretch.Fill;
                     }
 
