@@ -59,6 +59,12 @@ public:
 	virtual MAUtil::String getLocalPath();
 
 	/**
+	 * Get the path to the SD card on the Android file system.
+	 * @return Path that ends with a slash.
+	 */
+	virtual MAUtil::String getAndroidSDCardPath();
+
+	/**
 	 * Write a data object to a file.
 	 * @return true on success, false on error.
 	 */
