@@ -1377,8 +1377,6 @@ namespace Base {
 			NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
 			NSString *documentsDirectoryPath = [NSString stringWithFormat:@"%@/",[paths objectAtIndex:0]];
 			BOOL success = [documentsDirectoryPath getCString:buf maxLength:size encoding:NSASCIIStringEncoding];
-			[documentsDirectoryPath release];
-			[paths release];
 			res = (success)?strlen(buf) + 1: -1;
 		} else if (strcmp(key, "mosync.path.local.urlPrefix") == 0) {
 			BOOL success = [@"file://localhost/" getCString:buf maxLength:size encoding:NSASCIIStringEncoding];
@@ -1426,7 +1424,6 @@ namespace Base {
 					break;
 			}
 			BOOL success = [networkType getCString:buf maxLength:size encoding:NSASCIIStringEncoding];
-			[reachability release];
 			res = (success)?strlen(buf) + 1: -1;
 		}
 
