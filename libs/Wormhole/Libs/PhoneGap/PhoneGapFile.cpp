@@ -1835,11 +1835,47 @@ HELLO
 --==========================2231600360--
 */
 
-// http://www.w3.org/Protocols/rfc1341/7_2_Multipart.html
-// http://en.wikipedia.org/wiki/Multipart/form-data#Form_Data
-// http://en.wikipedia.org/wiki/File_select
+/*
+Examples of request headers:
+
+Android:
+
+POST / HTTP/1.1
+Content-Type: multipart/form-data;boundary===========================250350775
+connection: close
+content-length: 46306
+User-Agent: Dalvik/1.4.0 (Linux; U; Android 2.3.6; Nexus One Build/GRK39F)
+Host: 192.168.0.104:4044
+Accept-Encoding: gzip
+
+--==========================250350775
+Content-Disposition: form-data; name="file"; filename="img1351268646.jpg"
+Content-Type: image/jpeg
+
+
+And on iOS:
+
+POST / HTTP/1.0
+host: 192.168.0.104
+content-type: multipart/form-data;boundary===========================29854
+content-length: 631267
+connection: close
+
+--==========================29854
+Content-Disposition: form-data; name="file"; filename="img1351263665.png"
+Content-Type: image/png
+*/
 
 /*
+Documentation links:
+http://www.w3.org/Protocols/rfc1341/7_2_Multipart.html
+http://en.wikipedia.org/wiki/Multipart/form-data#Form_Data
+http://en.wikipedia.org/wiki/File_select
+*/
+
+/*
+Format of PhoneGap message:
+
 I/maWriteLog(12821): ma:[{
 "messageName":"PhoneGap",
 "service":"FileTransfer",
@@ -1932,14 +1968,15 @@ I/maWriteLog(12821): ma:[{
 		char boundary[1024];
 		sprintf(boundary, "==========================%u", ms);
 
-		// Set HTTP params.
+		// Set HTTP content type.
 		String contentType = "multipart/form-data;boundary=";
 		contentType += boundary;
 		httpParams.add("Content-Type");
 		httpParams.add(contentType);
 
-		httpParams.add("Connection");
-		httpParams.add("Keep-Alive");
+		// No need to keep connection open.
+		httpParams.add("connection");
+		httpParams.add("close");
 
 		// Build request body. The reason we dynamically
 		// allocate the request data is that this buffer
@@ -1981,6 +2018,13 @@ I/maWriteLog(12821): ma:[{
 
 		// Now we can free the fileData buffer.
 		free(fileData);
+
+		// Set content-length HTTP param, now that we know
+		// the size of the data.
+		char sizeBuffer[64];
+		sprintf(sizeBuffer, "%d", requestBody->size());
+		httpParams.add("content-length");
+		httpParams.add(sizeBuffer);
 
 		// Create the connection.
 		PhoneGapFileUploadConnection* connection =

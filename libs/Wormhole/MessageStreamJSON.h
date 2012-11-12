@@ -61,18 +61,20 @@ public:
 	/**
 	 * Constructor.
 	 */
-	MessageStreamJSON(NativeUI::WebView* webView, MAHandle dataHandle);
+	MessageStreamJSON(MAHandle dataHandle);
+
+	/**
+	 * Constructor.
+	 * @deprecated
+	 */
+	MessageStreamJSON::MessageStreamJSON(
+		NativeUI::WebView* webView,
+		MAHandle dataHandle);
 
 	/**
 	 * Destructor.
 	 */
 	virtual ~MessageStreamJSON();
-
-	/**
-	 * Get the WebView widget associated with this message.
-	 * @return Pointer to WebView object.
-	 */
-	NativeUI::WebView* getWebView();
 
 	/**
 	 * Move to the next message. Initially, the message
@@ -121,12 +123,6 @@ public:
 	 * creates a dictionary with the message parameters.
 	 */
 	void parse(MAHandle dataHandle);
-
-private:
-	/**
-	 * The WebView of this message.
-	 */
-	NativeUI::WebView* mWebView;
 
 protected:
 	/**

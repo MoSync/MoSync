@@ -58,7 +58,17 @@ public:
 	/**
 	 * Constructor.
 	 */
-	MessageStream(NativeUI::WebView* webView, MAHandle dataHandle);
+	MessageStream(
+		MAWidgetHandle webViewHandle,
+		MAHandle dataHandle);
+
+	/**
+	 * Constructor.
+	 * @deprecated
+	 */
+	MessageStream::MessageStream(
+		NativeUI::WebView* webView,
+		MAHandle dataHandle);
 
 	/**
 	 * Destructor.
@@ -71,10 +81,10 @@ public:
 	bool isValid();
 
 	/**
-	 * Get the WebView widget associated with this message.
-	 * @return Pointer to WebView object.
+	 * Get the WebView widget handle associated with this message.
+	 * @return Handle to WebView widget.
 	 */
-	NativeUI::WebView* getWebView();
+	MAWidgetHandle getWebViewHandle();
 
 	/**
 	 * Get a pointer to the next string in the message stream,
@@ -105,11 +115,10 @@ protected:
 	 */
 	int raise(int base, int e);
 
-protected:
 	/**
-	 * The WebView of this message.
+	 * The WebView widget handle of this message.
 	 */
-	NativeUI::WebView* mWebView;
+	MAWidgetHandle mWebViewHandle;
 
 public:
 	char* mData;
