@@ -126,7 +126,8 @@ public class Layout extends Widget
 	 *        this index after it has been added, the index starts at 0. If
 	 *        the index is -1 it will be added at the end.
 	 */
-	public void addChildAt(Widget child, int index)
+	@Override
+	public int addChildAt(Widget child, int index)
 	{
 		int listIndex = index;
 		if( index == -1 )
@@ -142,6 +143,8 @@ public class Layout extends Widget
 		// Add child to layout
 		ViewGroup layout = getView( );
 		layout.addView( child.getRootView( ), listIndex );
+
+		return IX_WIDGET.MAW_RES_OK;
 	}
 
 	/**
@@ -209,12 +212,15 @@ public class Layout extends Widget
 	 *
 	 * @param child
 	 */
-	public void removeChild(Widget child)
+	@Override
+	public int removeChild(Widget child)
 	{
 		child.setParent( null );
 		m_children.remove( child );
 		ViewGroup layout = getView( );
 		layout.removeView( child.getRootView( ) );
+
+		return IX_WIDGET.MAW_RES_OK;
 	}
 
 	/**

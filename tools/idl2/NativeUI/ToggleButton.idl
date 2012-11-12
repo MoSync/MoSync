@@ -1,0 +1,18 @@
+/**
+* The available widget properties for a #MAW_TOGGLE_BUTTON. See \ref WidgetProperties "Widget properties" for more properties.
+*/
+group WidgetToggleButtonProperties "Toggle button" {
+	constset MAString MAW_TOGGLE_BUTTON_ {
+		/**
+		* @brief Set or get the checked state of the toggle button.
+		*
+		* @validvalue A boolean string 'true' or 'false'.
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(toggleButtonHandle, MAW_TOGGLE_BUTTON_CHECKED, "true");
+		* \endcode
+		*/
+		CHECKED = "checked";
+	}
+} // end of WidgetCheckBoxProperties

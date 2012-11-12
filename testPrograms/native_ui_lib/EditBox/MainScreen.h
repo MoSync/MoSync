@@ -41,7 +41,8 @@ class MainScreen:
 	public EditBoxListener,
 	public ListViewListener,
 	public TabScreen,
-	public TabScreenListener
+	public TabScreenListener,
+	public CheckBoxListener
 {
 
 public:
@@ -122,6 +123,16 @@ private:
      */
     virtual void editBoxReturn(EditBox* editBox);
 
+    /**
+     * This method is called when the state of the check box was changed
+     * by the user.
+     * @param checkBox The check box object that generated the event.
+     * @param state True if the check box is checked, false otherwise.
+     */
+    virtual void checkBoxStateChanged(
+        CheckBox* checkBox,
+        bool state);
+
 	/**
 	 * Creates and adds main layout to the screen.
 	 */
@@ -147,6 +158,13 @@ private:
 	 * @param text The text that will fill the label.
 	 */
 	void createDecimalEditBoxView(EditBox* &editBox, VerticalLayout* aVerticalLayout, MAUtil::String text);
+
+	/**
+	 * Create an layout containing a label and a check box widget.
+	 * The check box will be used to set the edit box #MAW_EDIT_BOX_MODE property.
+	 * Platform: iOS.
+	 */
+	HorizontalLayout* createModePropertyLayout();
 
 	/**
 	 * Set the input mode of the edit box
@@ -211,6 +229,12 @@ private:
 	 */
 	EditBox* mLinesNumberEditBox;
 	Label *mLinesNumberLabel;
+
+	/**
+	 * Used to test MAW_EDIT_BOX_MODE.
+	 * Platform: iOS.
+	 */
+	CheckBox* mSingleLineCheckBox;
 
 	bool mKeyboard;
 

@@ -1,0 +1,34 @@
+/**
+* The available widget properties for a #MAW_GL_VIEW. See \ref WidgetProperties "Widget properties" for more properties.
+*/
+group WidgetGLViewProperties "GL view" {
+	constset MAString MAW_GL_VIEW_ {
+		/**
+		* @brief Property that tells the gl view that it should be redrawn.
+		*
+		* @validvalue The value isn't taken into account.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(glViewHandle, MAW_GL_VIEW_INVALIDATE, "");
+		* \endcode
+		*/
+		INVALIDATE = "invalidate";
+
+		/**
+		* @brief Property that tells the gl view that all following gl calls will apply to this view.
+		*
+		* @validvalue The value isn't taken into account.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(glViewHandle, MAW_GL_VIEW_BIND, "");
+		* \endcode
+		*/
+		BIND = "bind";
+	}
+} // end of WidgetGLViewProperties

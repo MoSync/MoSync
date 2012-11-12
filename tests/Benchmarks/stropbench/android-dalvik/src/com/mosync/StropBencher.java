@@ -9,7 +9,7 @@ import android.widget.TextView;
 public class StropBencher extends AsyncTask<Void, Integer, Void>{
 
 	/* The different benchmarks */
-	static final int APPEND = 0; 
+	static final int APPEND = 0;
 	static final int COPY = 1;
 	static final int FIND = 2;
 	static final int SUBSTR = 3;
@@ -26,49 +26,49 @@ public class StropBencher extends AsyncTask<Void, Integer, Void>{
 
 	/* Other constants */
 	static final int RUNNING_TIME = 1000; // msecs
-	
+
 	/* members */
 	TextView mTv;
 	String mResults;
-	
+
 	/* Constructor */
 	public StropBencher(TextView tv) {
 		mTv = tv;
 		mResults = "";
 	}
-	
+
 	@Override
 	protected Void doInBackground(Void... params) {
-		
+
 		mResults = bench(StropBencher.APPEND);
 		publishProgress(100/8);
 		mResults = bench(StropBencher.COPY);
-        publishProgress(100/8*2);
-        mResults = bench(StropBencher.FIND);
-        publishProgress(100/8*3);
-        mResults = bench(StropBencher.SUBSTR);
-        publishProgress(100/8*4);
-        mResults = bench(StropBencher.INSERT);
-        publishProgress(100/8*5);
-        mResults = bench(StropBencher.REMOVE);
-        publishProgress(100/8*6);
-        mResults = bench(StropBencher.RESIZE);
-        publishProgress(100/8*7);
-        mResults = bench(StropBencher.COMPARE);
-        publishProgress(100);
-        
-        return null;
-		
+		publishProgress(100/8*2);
+		mResults = bench(StropBencher.FIND);
+		publishProgress(100/8*3);
+		mResults = bench(StropBencher.SUBSTR);
+		publishProgress(100/8*4);
+		mResults = bench(StropBencher.INSERT);
+		publishProgress(100/8*5);
+		mResults = bench(StropBencher.REMOVE);
+		publishProgress(100/8*6);
+		mResults = bench(StropBencher.RESIZE);
+		publishProgress(100/8*7);
+		mResults = bench(StropBencher.COMPARE);
+		publishProgress(100);
+
+		return null;
+
 	}
-	
+
 	@Override
 	protected void onProgressUpdate(Integer... progress) {
-    	
+
 		mTv.append("===============\n");
 		mTv.append(mResults);
 		mTv.append(progress[0] + "% done\n");
-		
-    }
+
+	}
 
 	/* Performs a benchmark according to @param benchmark */
 	public String bench(int benchmark) {
@@ -125,13 +125,13 @@ public class StropBencher extends AsyncTask<Void, Integer, Void>{
 			for(i = 1; (time = this.compare(i, JAVA_LANG_STRING, 0)) < RUNNING_TIME; i*=2);
 			ret += "comparing java.lang.String with another " + ALOT*i + " times";
 			ret += "Time: " + time + " msecs,  " + (float) (ALOT*i)/(float) time + " KSTROPS.\n";
-			
+
 			for(i = 1; (time = this.compare(i, JAVA_LANG_STRING, 1)) < RUNNING_TIME; i*=2);
 			ret += "comparing java.lang.String with another " + ALOT*i + " times";
 			ret += "Time: " + time + " msecs,  " + (float) (ALOT*i)/(float) time + " KSTROPS.\n";
 			break;
 
-		}		
+		}
 		return ret;
 	}
 
@@ -220,7 +220,7 @@ public class StropBencher extends AsyncTask<Void, Integer, Void>{
 				for(int j = 0; j < ALOT; ++j){
 					for(char k = 0; k < alphabet.length(); ++k){
 						if(func == 0){
-							res = alphabet.indexOf((char) k+97); 
+							res = alphabet.indexOf((char) k+97);
 							if(res == -1)
 								System.err.println("Error in find(), no match but it should be!");
 						}else if(func == 1){

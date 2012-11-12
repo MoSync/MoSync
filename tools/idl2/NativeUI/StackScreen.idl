@@ -1,0 +1,32 @@
+/**
+* The available widget properties for a #MAW_STACK_SCREEN. See \ref WidgetProperties "Widget properties" for more properties.
+*/
+group WidgetStackScreenProperties "Stack screen" {
+	constset MAString MAW_STACK_SCREEN_ {
+		/**
+		* @copydoc #MAW_SCREEN_TITLE
+		*/
+		TITLE = "title";
+
+		/**
+		* @copydoc #MAW_SCREEN_ICON
+		*/
+		ICON = "icon";
+
+		/**
+		* @brief Specifies whether the back button automatically should pop the stack screen.
+		*
+		* This can have different behaviors on different platforms, on iPhone the UI back button is disabled, on Android the stack screen ignores back button events.
+		*
+		* @validvalue A boolean string 'true' or 'false'.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(stackScreenHandle, MAW_STACK_SCREEN_BACK_BUTTON_ENABLED, "false");
+		* \endcode
+		*/
+		BACK_BUTTON_ENABLED = "backButtonEnabled";
+	}
+} // end of WidgetStackScreenProperties

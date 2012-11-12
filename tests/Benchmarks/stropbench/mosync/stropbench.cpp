@@ -570,5 +570,3 @@ int StropBencher::compare(int numRuns, int strType, int cmpType) {
 int StropBencher::currTime() {
 	return maGetMilliSecondCount();
 }
-
-

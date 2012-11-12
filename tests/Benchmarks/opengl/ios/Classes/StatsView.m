@@ -12,16 +12,16 @@
 
 @synthesize delegate;
 
-- (void)drawView 
+- (void)drawView
 {
 
-    [delegate drawView:self];
+	[delegate drawView:self];
 
 }
 
-- (void)dealloc 
+- (void)dealloc
 {
-    [super dealloc];
+	[super dealloc];
 }
 
 @end

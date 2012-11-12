@@ -21,8 +21,3 @@
 @property (nonatomic, retain) IBOutlet StatsView *statsView;
 
 @end
-
-
-
-
-

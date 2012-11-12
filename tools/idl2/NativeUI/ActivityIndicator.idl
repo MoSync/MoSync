@@ -1,0 +1,21 @@
+/**
+* The available widget properties for a #MAW_ACTIVITY_INDICATOR. See \ref WidgetProperties "Widget properties" for more properties.
+*/
+group WidgetActivityIndicatorProperties "Activity Indicator" {
+	constset MAString MAW_ACTIVITY_INDICATOR_ {
+		/**
+		* @brief Sets if the indicator is still on or off.
+		* If set to false, it doesn't delete the widget just dismisses it.
+		* @validvalue A boolean string 'true' or 'false'.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	// The activity is done. Now this widget is dismissed.
+		*	maWidgetSetProperty(activityIndicatorHandle, MAW_ACTIVITY_INDICATOR_IN_PROGRESS, "false");
+		* \endcode
+		*/
+		IN_PROGRESS = "inProgress";
+	}
+} // end of WidgetActivityIndicatorProperties

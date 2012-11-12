@@ -34,7 +34,7 @@ public:
 	~StropBencher();
 
 	void bench();
-    
+
     /* Register objective-C object */
     void reg_objc_obj(id obj);
 
@@ -52,7 +52,7 @@ private:
 
 	/* Timer functions */
 	float currTime();
-    
+
     /* Callback to obj-C */
     void call_objc_obj(char *msg);
     id mObjcPtr;
