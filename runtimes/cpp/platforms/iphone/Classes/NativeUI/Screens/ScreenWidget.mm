@@ -99,6 +99,8 @@
     }
 
     IWidget* child = [_children objectAtIndex:0];
+    child.autoSizeHeight = WidgetAutoSizeFixed;
+    child.autoSizeWidth = WidgetAutoSizeFixed;
     child.size = self.size;
     OUTNativeUILog;
 }
