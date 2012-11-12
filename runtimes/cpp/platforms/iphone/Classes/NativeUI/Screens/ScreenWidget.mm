@@ -91,7 +91,6 @@
  */
 -(void) layout
 {
-    INNativeUILog;
     // Check if the screen has child.
     if ([_children count] == 0)
     {
@@ -102,7 +101,6 @@
     child.autoSizeHeight = WidgetAutoSizeFixed;
     child.autoSizeWidth = WidgetAutoSizeFixed;
     child.size = self.size;
-    OUTNativeUILog;
 }
 
 /**

@@ -37,7 +37,6 @@
  */
 - (void)layoutSubviews:(UIView*)view
 {
-    INNativeUILog;
     AbstractLayoutView* alv = (AbstractLayoutView*)self.view;
 	float totalHorizontalMargin = ([alv getLeftMargin] + [alv getRightMargin]);
 	float totalVerticalMargin = ([alv getTopMargin] + [alv getBottomMargin]);
@@ -88,7 +87,6 @@
     [fillParentWidgets release];
     fillParentWidgets = nil;
     [super superLayoutSubviews];
-    OUTNativeUILog;
 }
 
 /**
@@ -97,7 +95,6 @@
  */
 - (CGSize)sizeThatFitsForWidget
 {
-    INNativeUILog;
     float countWidth = 0.0;
     float maxHeight = 0.0;
     for (IWidget* child in _children)
@@ -105,7 +102,6 @@
         countWidth += child.width;
         maxHeight = MAX(maxHeight, child.height);
     }
-    OUTNativeUILog;
     return CGSizeMake(countWidth, maxHeight);
 }
 

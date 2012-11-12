@@ -211,8 +211,6 @@ MAKE_UIWRAPPER_LAYOUTING_IMPLEMENTATION(MoSync, HLayoutView)
  */
 - (void)layout
 {
-    INNativeUILog;
-
     CGSize sizeThatFits = [self sizeThatFitsForWidget];
     float width = self.width;
     float height = self.height;

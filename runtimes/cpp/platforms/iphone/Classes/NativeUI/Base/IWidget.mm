@@ -193,7 +193,6 @@
  */
 - (void)addChild: (IWidget*)child toSubview:(BOOL)toSubview
 {
-    INNativeUILog;
 	UIView* childView = child.view;
 	[child setParent:self];
 	[_children addObject:child];
@@ -203,7 +202,6 @@
 	}
 
 	[self layout];
-    OUTNativeUILog;
 }
 
 /**

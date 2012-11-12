@@ -330,7 +330,6 @@
  */
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    INNativeUILog;
     ListViewSectionWidget* section = [_children objectAtIndex:indexPath.section];
     if (!section)
     {
