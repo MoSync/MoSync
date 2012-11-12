@@ -38,10 +38,22 @@ namespace Wormhole
 	 * Constructor.
 	 */
 	MessageStream::MessageStream(
+		MAWidgetHandle webViewHandle,
+		MAHandle dataHandle)
+	{
+		mWebViewHandle = webViewHandle;
+		initialize(dataHandle);
+	}
+
+	/**
+	 * Constructor.
+	 * @deprecated
+	 */
+	MessageStream::MessageStream(
 		NativeUI::WebView* webView,
 		MAHandle dataHandle)
 	{
-		mWebView = webView;
+		mWebViewHandle = webView->getWidgetHandle();
 		initialize(dataHandle);
 	}
 
@@ -66,12 +78,12 @@ namespace Wormhole
 	}
 
 	/**
-	 * Get the WebView widget associated with this message.
-	 * @return Pointer to WebView object.
+	 * Get the WebView widget handle associated with this message.
+	 * @return Handle to WebView widget.
 	 */
-	NativeUI::WebView* MessageStream::getWebView()
+	MAWidgetHandle MessageStream::getWebViewHandle()
 	{
-		return mWebView;
+		return mWebViewHandle;
 	}
 
 	/**

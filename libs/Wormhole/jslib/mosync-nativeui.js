@@ -1198,7 +1198,8 @@ mosync.nativeui.NativeWidgetElement = function(widgetType, widgetID, params,
  *    myScreen.show()
  * \endcode
  */
-document.getNativeElementById = function(widgetID) {
+document.getNativeElementById = function(widgetID)
+{
 	return mosync.nativeui.NativeElementsTable[widgetID];
 };
 
@@ -1307,6 +1308,18 @@ mosync.nativeui.widgetIDList = {};
 mosync.nativeui.getElementById = function(elementID)
 {
 	return mosync.nativeui.widgetIDList[elementID];
+};
+
+/**
+ * Get the MoSync widget handle for the JavaScript NativeUI
+ * element with the given ID.
+ *
+ * @param elementId A string id that identifies the widget (this
+ * is the id of the DOM element that holds the widget info).
+ */
+mosync.nativeui.getNativeHandleById = function(elementId)
+{
+	return mosync.nativeui.widgetIDList[elementId];
 };
 
 /**

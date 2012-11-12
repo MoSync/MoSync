@@ -12,11 +12,9 @@
 <html>
 	<head>
 		<meta name="viewport" content="width=device-width">
-		<meta http-equiv="Content-type" content="text/html; charset=utf-8">
 		<title>Camera</title>
-		<link rel="stylesheet" href="style.css" type="text/css" media="screen" title="no title" charset="utf-8">
-		<script type="text/javascript" charset="utf-8" src="js/wormhole.js"></script>
-		<script type="text/javascript" charset="utf-8" src="mosync-extensions.js"></script>
+		<link rel="stylesheet" href="style.css">
+		<script src="js/wormhole.js"></script>
 		<script type="text/javascript">
 		var camera = (function()
 		{
@@ -29,7 +27,7 @@
 			 */
 			camera.snapPhoto = function()
 			{
-				mosync.bridge.callJS(
+				mosync.nativeui.callJS(
 					mosync.nativeui.MAIN_WEBVIEW,
 					"app.snapPhoto()");
 			}
@@ -52,7 +50,7 @@
 					return;
 				}
 
-				mosync.bridge.callJS(
+				mosync.nativeui.callJS(
 					mosync.nativeui.MAIN_WEBVIEW,
 					"app.uploadPhoto('" + mFileURL + "')");
 			}
