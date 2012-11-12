@@ -98,7 +98,7 @@ namespace MoSync
 				int err = mGL.glGetError();
 				if (err != GL.GL_NO_ERROR)
 				{
-					int a = 2;
+					//int a = 2;
 					//err = GL.GL_NO_ERROR;
 				}
 				return err;

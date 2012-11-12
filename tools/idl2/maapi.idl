@@ -2680,23 +2680,37 @@ interface MAAPI {
 		int maFileTruncate(in MAHandle file, in int offset);
 
 		/**
-		* Write from memory to file.
-		* Returns 0 on success, or \< 0 on error.
+		* Writes from memory to file.
+		* \param file Target file.
+		* \param src Source memory address.
+		* \param len Length, in bytes, of the data to be written.
+		* \returns 0 on success, or \< 0 on error.
 		*/
 		int maFileWrite(in MAHandle file, in MAAddress src, in int len);
 		/**
-		* Write from data object to file.
-		* Returns 0 on success, or \< 0 on error.
+		* Writes from a data object to file.
+		* \param file Target file.
+		* \param data Source data object.
+		* \param offset Offset from the start of the data object.
+		* \param len Length, in bytes, of the data to be written.
+		* \returns 0 on success, or \< 0 on error.
 		*/
 		int maFileWriteFromData(in MAHandle file, in MAHandle data, in int offset, in int len);
 		/**
-		* Read from file to memory.
-		* Returns 0 on success, or \< 0 on error.
+		* Reads exactly \a len bytes from file to memory.
+		* \param file Source file.
+		* \param src Target memory address.
+		* \param len Length, in bytes, of the data to be read.
+		* \returns 0 on success, or \< 0 on error. If \a len bytes is not available, #MA_FERR_GENERIC is returned.
 		*/
 		int maFileRead(in MAHandle file, out MAAddress dst, in int len);
 		/**
-		* Read from file to data object.
-		* Returns 0 on success, or \< 0 on error.
+		* Reads exactly \a len bytes from file to a data object.
+		* \param file Source file.
+		* \param data Target data object.
+		* \param offset Offset from the start of the data object.
+		* \param len Length, in bytes, of the data to be read.
+		* \returns 0 on success, or \< 0 on error. If \a len bytes is not available, #MA_FERR_GENERIC is returned.
 		*/
 		int maFileReadToData(in MAHandle file, in MAHandle data, in int offset, in int len);
 
@@ -5719,6 +5733,7 @@ group NFCAPI "NFC API" {
 		/**
 		 * Executes an SQL statement. If the statement returns a
 		 * query result, a cursor handle is returned.
+		 * If a query result is empty, #MA_DB_OK is returned.
 		 * @param databaseHandle Handle to the database.
 		 * @param sql The SQL statement.
 		 * @return #MA_DB_ERROR on error, #MA_DB_OK on success,

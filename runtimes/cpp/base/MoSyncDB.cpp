@@ -307,6 +307,7 @@ MAHandle maDBExecSQLParams(MAHandle databaseHandle, const char* sql,
 		return result;
 
 	// Bind parameters
+	DEBUG_ASSERT(sizeof(MADBValue) == 12);
 	for(int i=1; i<=paramCount; i++) {
 		const MADBValue& v(params[i-1]);
 		switch(v.type) {
@@ -355,6 +356,8 @@ MAHandle maDBExecSQLParams(MAHandle databaseHandle, const char* sql,
 				result = sqlite3_bind_text(statement, i, text, v.text.length, SQLITE_STATIC);
 			}
 			break;
+		default:
+			BIG_PHAT_ERROR(ERR_DB_PARAM_TYPE_INVALID);
 		}
 		DEBUG_ASSERT(result == SQLITE_OK);
 	}

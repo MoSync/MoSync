@@ -86,7 +86,7 @@ BluetoothBluez::BluetoothBluez ( void )
     mDeviceListMutex->init( );
     mServiceListMutex->init( );
 	mDeviceDiscoveryCritical->init( );
-    
+
     // Start discovery thread
     mMainFunctor = Base::Thread::bind( &BluetoothBluez::threadStub, this );
     mDiscThread->start( mMainFunctor );
@@ -232,7 +232,7 @@ int BluetoothBluez::getNextDevice ( MABtDeviceNative *d )
  * @param a     Address of the device to do discovery on.
  * @param u     The UUID to search for.
  *
- * @return 0 on success, \< 0 on failure.	
+ * @return 0 on success, \< 0 on failure.
  */
 int BluetoothBluez::startServiceDiscovery ( MABtCallback cb,
                                             const MABtAddr* a,
@@ -270,7 +270,7 @@ int BluetoothBluez::startServiceDiscovery ( MABtCallback cb,
                                     *a,
                                     *u ) );
     }
-	
+
 	return 0;
 }
 
@@ -322,10 +322,10 @@ int BluetoothBluez::getNextServiceSize ( MABtServiceSize* d )
 
 
 /**
- * Cancels an on going device discovery, 
- * Note: If an operation was canceled, its last BT event will have 
- *       the status CONNERR_CANCELED. This is an asynchronous operation. 
- *       It is not safe to start another discovery before you've recieved 
+ * Cancels an on going device discovery,
+ * Note: If an operation was canceled, its last BT event will have
+ *       the status CONNERR_CANCELED. This is an asynchronous operation.
+ *       It is not safe to start another discovery before you've recieved
  *       the CONNERR_CANCELED event.
  *
  * @return 0 if there was no active operation
@@ -467,13 +467,13 @@ void BluetoothBluez::discoverDevices ( MABtCallback cb,
 			if ( mWorkState == DEVICE_DISC_CANCELED )
 				break;
 
-            devName[0] = NULL;
+            devName[0] = 0;
 
 			// Perform a name query
 			if ( n == true )
-			{            
+			{
 		        if ( hci_read_remote_name( devSock, &pQueryInfo[i].bdaddr,
-		                                   sizeof( devName ), devName, NULL ) < 0 )
+		                                   sizeof( devName ), devName, 0 ) < 0 )
 		        {
 		            LOGBT( "Device name inquiry failed" );
 		        }
@@ -519,7 +519,7 @@ void BluetoothBluez::doCleanupDiscoverDevices ( void )
 
 	while ( mServiceList.empty( ) == true )
 	{
-		delete mServiceList.front( ); 
+		delete mServiceList.front( );
 		mServiceList.pop_front( );
 	}
 
@@ -538,7 +538,7 @@ void BluetoothBluez::discoverServices ( MABtCallback cb, MABtAddr a, MAUUID u )
     int             errCode;
     MAUUID          mauuid;
     uuid_t*         uuid128;
-    
+
     bdaddr_t        devAddr;
     uuid_t          servUuid;
     CBtService*     service;
@@ -647,7 +647,7 @@ void BluetoothBluez::discoverServices ( MABtCallback cb, MABtAddr a, MAUUID u )
                             {
                                 case SDP_UUID16:
                                 case SDP_UUID32:
-                                case SDP_UUID128:                                    
+                                case SDP_UUID128:
                                     // Add the service UUID
                                     uuid128 = sdp_uuid_to_uuid128( &d->val.uuid );
                                     if ( uuid128 == NULL )
@@ -680,7 +680,7 @@ void BluetoothBluez::discoverServices ( MABtCallback cb, MABtAddr a, MAUUID u )
 
                     sdp_list_free( (sdp_list_t*)p->data, 0 );
                 }
-                
+
                 sdp_list_free( protoList, 0 );
                 mServiceList.push_back( service );
             }
@@ -690,7 +690,7 @@ void BluetoothBluez::discoverServices ( MABtCallback cb, MABtAddr a, MAUUID u )
     }
 
     sdp_close( session );
-    
+
     // Invoke the callback to send the event to the user
     mWorkState = IDLE;
     mState     = mServiceList.size( )+1;
@@ -714,7 +714,7 @@ void BluetoothBluez::threadStub ( void )
 
         // Attempt to fetch a task
         task = NULL;
-        {            
+        {
             Lock lck( mTaskListMutex );
 
             if ( mTaskList.empty( ) == false )
@@ -728,7 +728,7 @@ void BluetoothBluez::threadStub ( void )
         if ( task != NULL )
         {
             (*task)( );
-            delete task;         
+            delete task;
         }
 
         // Sleep for a while
