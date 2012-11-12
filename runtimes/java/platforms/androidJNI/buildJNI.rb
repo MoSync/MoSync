@@ -84,7 +84,6 @@ if(androidVersionInt < 7)
 end
 
 if(androidVersionInt >= 15)
-	puts "Android ICS!"
 	ENV['ANDROID_API_15_OR_ABOVE'] = "true"
 end
 

@@ -32,39 +32,39 @@ class RuntimeBuilder
 	end
 
 	def android_3(runtime_dir, mode)
-		return androidBuilder(runtime_dir, mode, "10", "3")
+		return androidBuilder(runtime_dir, mode, "16", "3")
 	end
 
 	def android_4(runtime_dir, mode)
-		return androidBuilder(runtime_dir, mode, "10", "4")
+		return androidBuilder(runtime_dir, mode, "16", "4")
 	end
 
 	def android_5(runtime_dir, mode)
-		return androidBuilder(runtime_dir, mode, "10", "5")
+		return androidBuilder(runtime_dir, mode, "16", "5")
 	end
 
 	def android_6(runtime_dir, mode)
-		return androidBuilder(runtime_dir, mode, "10", "6")
+		return androidBuilder(runtime_dir, mode, "16", "6")
 	end
 
 	def android_7(runtime_dir, mode)
-		return androidBuilder(runtime_dir, mode, "10", "7")
+		return androidBuilder(runtime_dir, mode, "16", "7")
 	end
 
 	def android_7x(runtime_dir, mode)
-		return androidBuilder(runtime_dir, mode, "10", "7")
+		return androidBuilder(runtime_dir, mode, "16", "7")
 	end
 
 	def android_8(runtime_dir, mode)
-		return androidBuilder(runtime_dir, mode, "10", "8")
+		return androidBuilder(runtime_dir, mode, "16", "8")
 	end
 
 	def android_9(runtime_dir, mode)
-		return androidBuilder(runtime_dir, mode, "10", "9")
+		return androidBuilder(runtime_dir, mode, "16", "9")
 	end
 
 	def android_10(runtime_dir, mode)
-		return androidBuilder(runtime_dir, mode, "10", "10")
+		return androidBuilder(runtime_dir, mode, "16", "10")
 	end
 
 	def android_11(runtime_dir, mode)
