@@ -40,10 +40,20 @@ namespace Wormhole
 	 * Constructor. Here we parse the message.
 	 */
 	MessageStreamJSON::MessageStreamJSON(
+		MAHandle dataHandle)
+	{
+		mCurrentMessageIndex = -1;
+		parse(dataHandle);
+	}
+
+	/**
+	 * Constructor.
+	 * @deprecated
+	 */
+	MessageStreamJSON::MessageStreamJSON(
 		NativeUI::WebView* webView,
 		MAHandle dataHandle)
 	{
-		mWebView = webView;
 		mCurrentMessageIndex = -1;
 		parse(dataHandle);
 	}
@@ -60,15 +70,6 @@ namespace Wormhole
 			YAJLDom::deleteValue(mJSONRoot);
 			mJSONRoot = NULL;
 		}
-	}
-
-	/**
-	 * Get the WebView widget associated with this message.
-	 * @return Pointer to WebView object.
-	 */
-	NativeUI::WebView* MessageStreamJSON::getWebView()
-	{
-		return mWebView;
 	}
 
 	/**
