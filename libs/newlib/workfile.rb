@@ -91,7 +91,7 @@ work.instance_eval do
 
 		@IGNORED_FILES = ["engine.c"]
 
-		@EXTRA_OBJECTS = [FileTask.new(self, "libc/sys/mosync/crtlib.s")]
+		@EXTRA_OBJECTS = [FileTask.new(self, "libc/sys/mosync/crtlib.s"), FileTask.new(self, "libc/sys/mosync/mastack.s")]
 
 		# copy subdirs
 		copyHeaderDir("sys")

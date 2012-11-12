@@ -17,7 +17,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #define NET_ERRORS(m)\
 	m(280001, ERR_HTTP_METHOD_INVALID, "HTTP method invalid")\
-	m(280002, ERR_HTTP_NONPOST_WRITE, "Attempted to write to a non-POST HTTP connection")\
+	m(280002, ERR_HTTP_READONLY_WRITE, "Attempted to write to a read-only HTTP connection")\
 	m(280003, ERR_URL_SPACE, "Whitespace is not allowed in URLs")
 
 DECLARE_ERROR_ENUM(NET)

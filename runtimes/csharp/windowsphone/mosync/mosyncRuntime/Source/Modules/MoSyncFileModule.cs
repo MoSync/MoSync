@@ -338,6 +338,8 @@ namespace MoSync
 				IsolatedStorageFileStream fileStream = file.FileStream;
 				if (fileStream == null)
 					return MoSync.Constants.MA_FERR_GENERIC;
+				if(fileStream.Length < fileStream.Position + _len)
+					return MoSync.Constants.MA_FERR_GENERIC;
 				core.GetDataMemory().WriteFromStream(_dst, fileStream, _len);
 				return 0;
 			};
@@ -351,11 +353,10 @@ namespace MoSync
 				if (fileStream == null)
 					return MoSync.Constants.MA_FERR_GENERIC;
 				Resource dataRes = runtime.GetResource(MoSync.Constants.RT_BINARY, _data);
-				//Memory data = (Memory)dataRes.GetInternalObject();
 				Stream data = (Stream)dataRes.GetInternalObject();
-				MoSync.Util.CopySeekableStreams(fileStream, (int)fileStream.Position,
-					data, _offset, _len);
-				//data.WriteFromStream(_offset, fileStream, _len);
+				if(!MoSync.Util.CopySeekableStreams(fileStream, (int)fileStream.Position,
+					data, _offset, _len))
+					return MoSync.Constants.MA_FERR_GENERIC;
 				return 0;
 			};
 

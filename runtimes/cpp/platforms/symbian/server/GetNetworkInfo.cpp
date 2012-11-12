@@ -25,28 +25,25 @@ class CNetworkInfoGetter : public CActiveLink {
 public:
 	CNetworkInfoGetter(const RMessage2& aMessage) : mMessage(aMessage), mPckg(mInfo) {}
 	virtual ~CNetworkInfoGetter() {}
-	
+
 	void start(CTelephony* aTelephony) {
 		mTelephony = aTelephony;
-		LOG("GetCurrentNetworkInfo\n");
 		mTelephony->GetCurrentNetworkInfo(iStatus, mPckg);
 		SetActive();
 	}
-	
+
 	void RunL() {
-		LOG("CNetworkInfoGetter:RunL %i\n", iStatus.Int());
 		if(iStatus == KErrNone)
 			mMessage.WriteL(0, mPckg);
 		mMessage.Complete(iStatus.Int());
 		lazyDelete(mMessage, this);
 	}
-	
+
 	void DoCancel() {
-		LOG("CNetworkInfoGetter:DoCancel\n");
 		mTelephony->CancelAsync(CTelephony::EGetCurrentNetworkInfoCancel);
 		lazyDelete(mMessage, this);
 	}
-	
+
 private:
 	const RMessage2& mMessage;
 	CTelephony::TNetworkInfoV1 mInfo;
