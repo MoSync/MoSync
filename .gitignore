@@ -44,6 +44,8 @@ config_platform.h
 
 wormhole.js
 
+LocalFiles.bin*
+
 /*.bat
 
 /ipch/*
@@ -109,6 +111,7 @@ wormhole.js
 /testPrograms/temp.s
 /testPrograms/copyfiles.bat
 /testPrograms/filesystem/
+/testPrograms/httpPut/config.h
 
 /runtimes/cpp/generated
 
@@ -234,10 +237,12 @@ wormhole.js
 
 /tools/vis/sld.*
 
-/examples/GenerateResources/config.rb
-/examples/GenerateResources/profile.rb
+/examples/cpp/GenerateResources/config.rb
+/examples/cpp/GenerateResources/profile.rb
 
-/examples/FacebookDemo/config.h
+/examples/cpp/FacebookDemo/config.h
+
+/examples/cpp/*/filesystem/
 
 /docs/*.dot.*
 

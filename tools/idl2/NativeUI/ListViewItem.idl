@@ -1,0 +1,453 @@
+group WidgetListViewItem "List View Item" {
+	/**
+	* The available accessory types for a #MAW_LIST_VIEW_ITEM.
+	* It appears on the right side of the item.
+	* Platform: iOS.
+	*/
+	group WidgetListViewItemAccessoryType "List View Item Accessory Type" {
+		constset int MAW_LIST_VIEW_ITEM_ACCESSORY_TYPE_ {
+			/**
+			* @brief The item does not have any accessory type.
+			* This is the default value.
+			* Platform: iOS.
+			*/
+			NONE = 0;
+
+			/**
+			* @brief The item has an accessory control shaped like a regular chevron.
+			* It is intended as a disclosure indicator.
+			* Platform: iOS.
+			*/
+			DISCLOSURE = 1;
+
+			/**
+			* @brief The item has an accessory control that is a blue button with a chevron image as content.
+			* It is intended for configuration purposes.
+			* Platform: iOS.
+			*/
+			DETAIL = 2;
+
+			/**
+			* @brief The cell has a check mark on its right side.
+			* Platform: iOS.
+			*/
+			CHECKMARK = 3;
+		}
+	} // end of WidgetListViewItemAccessoryType
+
+	/**
+	* The available editing style for a #MAW_LIST_VIEW_ITEM.
+	* Platform: iOS.
+	*/
+	group WidgetListViewItemEditStyle "List View Item Edit Style" {
+		constset int MAW_LIST_VIEW_ITEM_EDIT_STYLE_ {
+			/**
+			* @brief The item has no editing control.
+			* This is the default value.
+			* Platform: iOS.
+			*/
+			NONE = 0;
+
+			/**
+			* @brief The item has the delete editing control.
+			* This control is a red circle enclosing a minus sign.
+			* Platform: iOS.
+			*/
+			DELETE = 1;
+
+			/**
+			* @brief The item has the insert editing control.
+			* This control is a green circle enclosing a plus sign.
+			* Platform: iOS.
+			*/
+			INSERT = 2;
+		}
+	} // end of WidgetListViewItemEditStyle
+
+	/**
+	* The available selection style for a #MAW_LIST_VIEW_ITEM.
+	* Platform: iOS.
+	*/
+	group WidgetListViewItemSelectionStyle "List View Item Selection Style" {
+		constset int MAW_LIST_VIEW_ITEM_SELECTION_STYLE_ {
+			/**
+			* @brief The item has no distinct style for when it is selected.
+			* Platform: iOS.
+			*/
+			NONE = 0;
+
+			/**
+			* @brief The item has a blue background for selected state.
+			* This is the default value.
+			* Platform: iOS.
+			*/
+			BLUE = 1;
+
+			/**
+			* @brief Then item has a gray background for selected state.
+			* Platform: iOS.
+			*/
+			GRAY = 2;
+		}
+	} // end of WidgetListViewItemSelectionStyle
+
+	/**
+	* The available widget properties for a #MAW_LIST_VIEW_ITEM.
+	* See \ref WidgetProperties "Widget properties" for more properties.
+	*/
+	group WidgetListViewItemProperties "List view item properties" {
+		constset MAString MAW_LIST_VIEW_ITEM_ {
+			/**
+			* @brief Sets the text part of the list view item. If there is an icon the text will be placed to the right of it, otherwise near the left edge.
+			*
+			* @validvalue A null-terminated string.
+			*
+			* @setonly
+			*
+			* @par Example
+			* \code
+			*	maWidgetSetProperty(listViewItemHandle, MAW_LIST_VIEW_ITEM_TEXT, "My label");
+			* \endcode
+			*/
+			TEXT = "text";
+
+			/**
+			* @brief Sets the subtitle part of the list view item. The subtitle will be placed bellow the item text.
+			*
+			* Platform: Windows Phone 7.
+			*
+			* @validvalue A null-terminated string.
+			*
+			* @setonly
+			*
+			* @par Example
+			* \code
+			*	maWidgetSetProperty(listViewItemHandle, MAW_LIST_VIEW_ITEM_SUBTITLE, "subtitle");
+			* \endcode
+			*/
+			SUBTITLE = "subtitle";
+
+			/**
+			* @brief Sets an icon of the list view item that is placed to the left of the text.
+			*
+			* @validvalue MoSync handle to an uncompressed image resource.
+			*
+			* @par Example
+			* \code
+			*	maWidgetSetProperty(listViewItemHandle, MAW_LIST_VIEW_ITEM_ICON, toString(R_MY_ICON));
+			* \endcode
+			*/
+			ICON = "icon";
+
+			/**
+			* @brief Sets the type of list item displayed. Provides the corresponding icon in the right side of the list view.
+			*
+			* @note Only available for iOS.
+			*
+			* @validvalue One of "none", "hasChildren", "hasDetails" or "isChecked".
+			*
+			* @par Example
+			* \code
+			*	maWidgetSetProperty(listViewItemHandle, MAW_LIST_VIEW_ITEM_ACCESSORY_TYPE, "hasChildren");
+			* \endcode
+			*/
+			ACCESSORY_TYPE = "accessoryType";
+
+			/**
+			* @brief Sets the font color of the text part.
+			*
+			* @validvalue  A hexadecimal value 0xRRGGBB, where R, G and B are the red, green and blue components respectively.
+			*
+			* @setonly
+			*
+			* @par Example set the font color to red.
+			* \code
+			*	maWidgetSetProperty(listViewItemHandle, MAW_LIST_VIEW_ITEM_FONT_COLOR, "0xFF0000");
+			* \endcode
+			*/
+			FONT_COLOR = "fontColor";
+
+			/**
+			* @brief Sets the font size in points of the text part.
+			*
+			* @validvalue A float that specifies the number of pixels on Android
+			* and WP7, and number of points on iOS.
+			*
+			* @setonly
+			*
+			* @par Example
+			* \code
+			*	maWidgetSetProperty(listViewItemHandle, MAW_LIST_VIEW_ITEM_FONT_SIZE, "13.0");
+			* \endcode
+			*/
+			FONT_SIZE = "fontSize";
+
+			/**
+			* @brief Sets the typeface and style in which the text should be displayed.
+			*
+			* @validvalue A font handle received from loading fonts using
+			* #maFontGetName and #maFontLoadWithName syscalls.
+			*
+			* @setonly
+			*
+			* @par Example
+			* \code
+			*	int nrFonts = maFontGetCount();
+			*	 char buf[256];
+			*	 // Get first font name.
+			*	 maFontGetName(1, buf, 256);
+			*	 // Load that font for size 10.
+			*	 int fontHandle = maFontLoadWithName(buf, 10);
+			*	 // Set that font to the list view item.
+			*	maWidgetSetProperty(listViewItemHandle, MAW_LIST_VIEW_ITEM_FONT_HANDLE, toString(fontHandle));
+			* \endcode
+			*/
+			FONT_HANDLE = "fontHandle";
+
+			/**
+			* @brief Set or get the edit value.
+			* If an item is editable it means that the user can insert or delete a cell.
+			* In order to have those options the segmented list must be in edit mode.
+			*
+			* Platform: iOS.
+			*
+			* @validvalue "false" or "true" string values.
+			* Default value is "true".
+			*
+			* @setandget
+			*
+			* @par Example
+			* \code
+			*	maWidgetSetProperty(listItemHandle, MAW_LIST_VIEW_ITEM_EDIT, "true");
+			* \endcode
+			*/
+			EDIT = "edit";
+
+			/**
+			* @brief Set the title of the delete-confirmation button.
+			* The table view displays the "Delete" button when the user attempts to delete a row,
+			* either by swiping the row or tapping the red minus icon in editing mode.
+			*
+			* Platform: iOS.
+			*
+			* @validvalue A string.
+			* Default value is "Delete".
+			*
+			* @setandget
+			*
+			* @par Example
+			* \code
+			*	maWidgetSetProperty(listItemHandle, MAW_LIST_VIEW_ITEM_DELETE_BUTTON_TITLE, "Remove");
+			* \endcode
+			*/
+			DELETE_BUTTON_TITLE = "deleteButtonTitle";
+
+			/**
+			* @brief Check if the item is currently showing the delete-confirmation button.
+			* When users tap the deletion control (the red circle to the left of the cell),
+			* the cell displays a "Delete" button on the right side of the cell.
+			*
+			* Platform: iOS.
+			*
+			* @validvalue "true" of "false".
+			*
+			* @getonly
+			*
+			* @par Example
+			* \code
+			*	char buffer[BUFFER_SIZE];
+			*	maWidgetGetProperty(listItemHandle, MAW_LIST_VIEW_ITEM_IS_SHOWING_DELETE_CONFIRMATION,
+			*						buffer, BUFFER_SIZE);
+			* \endcode
+			*/
+			IS_SHOWING_DELETE_CONFIRMATION = "isShowingDeleteConfirmation";
+
+			/**
+			* @brief Set the selected state of the item.
+			*
+			* Platform: iOS.
+			*
+			* @validvalue "true" to animate the transition between selected states,
+			* "false" to make the transition immediate.
+			*
+			* @setonly
+			*
+			* @par Example
+			* \code
+			*	maWidgetSetProperty(listItemHandle, MAW_LIST_VIEW_ITEM_SET_SELECTED, "true");
+			* \endcode
+			*/
+			SET_SELECTED = "setSelected";
+
+			/**
+			* @brief Set the unselected state of the item.
+			*
+			* Platform: iOS.
+			*
+			* @validvalue "true" to animate the transition between selected states,
+			* "false" to make the transition immediate.
+			*
+			* @setonly
+			*
+			* @par Example
+			* \code
+			*	maWidgetSetProperty(listItemHandle, MAW_LIST_VIEW_ITEM_SET_UNSELECTED, "true");
+			* \endcode
+			*/
+			SET_UNSELECTED = "setUnselected";
+
+			/**
+			* @brief Check if the item is selected.
+			*
+			* Platform: iOS and Android.
+			*
+			* @validvalue "true" if the item is selected, "false" otherwise.
+			*
+			* @getonly
+			*
+			* @par Example
+			* \code
+			*	char buffer[BUFFER_SIZE];
+			*	maWidgetGetProperty(listItemHandle, MAW_LIST_VIEW_ITEM_IS_SELECTED,
+			*						buffer, BUFFER_SIZE);
+			* \endcode
+			*/
+			IS_SELECTED = "isSelected";
+
+			/**
+			* @brief Set the highlighted state of the item.
+			*
+			* Platform: iOS.
+			*
+			* @validvalue "true" to animate the transition between highlighted states,
+			* "false" to make the transition immediate.
+			*
+			* @setonly
+			*
+			* @par Example
+			* \code
+			*	maWidgetSetProperty(listItemHandle, MAW_LIST_VIEW_ITEM_SET_HIGHLIGHTED, "true");
+			* \endcode
+			*/
+			SET_HIGHLIGHTED = "setHighlighted";
+
+			/**
+			* @brief Set the unhighlighted state of the item.
+			*
+			* Platform: iOS.
+			*
+			* @validvalue "true" to animate the transition between highlighted states,
+			* "false" to make the transition immediate.
+			*
+			* @setonly
+			*
+			* @par Example
+			* \code
+			*	maWidgetSetProperty(listItemHandle, MAW_LIST_VIEW_ITEM_SET_UNHIGHLIGHTED,
+			*						"true");
+			* \endcode
+			*/
+			SET_UNHIGHLIGHTED = "setUnhighlighted";
+
+			/**
+			* @brief Check if the item is highlighted.
+			*
+			* Platform: iOS.
+			*
+			* @validvalue "true" if the item is highlighted, "false" otherwise.
+			*
+			* @getonly
+			*
+			* @par Example
+			* \code
+			*	char buffer[BUFFER_SIZE];
+			*	maWidgetGetProperty(listItemHandle, MAW_LIST_VIEW_ITEM_IS_SELECTED,
+			*						buffer, BUFFER_SIZE);
+			* \endcode
+			*/
+			IS_HIGHLIGHTED = "isHighlighted";
+
+			/**
+			* @brief Set or get the type of standard accessory used by the item(normal state).
+			* The accessory view appears in the right side of the item in the table view’s normal state.
+			*
+			* Platform: iOS.
+			*
+			* @validvalue One of the \link MAW_LIST_VIEW_ITEM_ACCESSORY_TYPE
+			* MAW_LIST_VIEW_ITEM_ACCESSORY_TYPE_NONE \endlink values.
+			*
+			* @setandget
+			*
+			* @par Example
+			* \code
+			*	char buffer[BUFFER_SIZE];
+			*	sprintf(buffer, "%d", MAW_LIST_VIEW_ITEM_ACCESSORY_TYPE_CHECKMARK);
+			*	maWidgetSetProperty(listItemHandle, MAW_LIST_VIEW_ITEM_ACCESSORY_TYPE, buffer);
+			* \endcode
+			*/
+			ACCESSORY_TYPE_INT = "accessoryTypeInt";
+
+			/**
+			* @brief Set or get the type of standard accessory used by the item(editing state).
+			* The accessory view appears in the right side of the item in the table view’s editing state.
+			*
+			* Platform: iOS.
+			*
+			* @validvalue One of the \link MAW_LIST_VIEW_ITEM_ACCESSORY_TYPE
+			* MAW_LIST_VIEW_ITEM_ACCESSORY_TYPE_NONE \endlink values.
+			*
+			* @setandget
+			*
+			* @par Example
+			* \code
+			*	char buffer[BUFFER_SIZE];
+			*	sprintf(buffer, "%d", MAW_LIST_VIEW_ITEM_ACCESSORY_TYPE_CHECKMARK);
+			*	maWidgetSetProperty(listItemHandle,
+			*					   MAW_LIST_VIEW_ITEM_ACCESSORY_TYPE_EDIT_STATE buffer);
+			* \endcode
+			*/
+			ACCESSORY_TYPE_EDIT = "accessoryTypeEditState";
+
+			/**
+			* @brief Set or get the editing style of an item.
+			* This applies only for the editing state.
+			*
+			* Platform: iOS.
+			*
+			* @validvalue One of the \link MAW_LIST_VIEW_ITEM_EDIT_STYLE
+			* MAW_LIST_VIEW_ITEM_EDIT_STYLE_NONE \endlink values.
+			*
+			* @setandget
+			*
+			* @par Example
+			* \code
+			*	char buffer[BUFFER_SIZE];
+			*	sprintf(buffer, "%d", MAW_LIST_VIEW_ITEM_EDIT_STYLE_INSERT);
+			*	maWidgetSetProperty(listItemHandle,
+			*					   MAW_LIST_VIEW_ITEM_EDITING_STYLE, buffer);
+			* \endcode
+			*/
+			EDITING_STYLE = "editingStyle";
+
+			/**
+			* @brief Set or get the background color constant for an item when it's selected.
+			*
+			* Platform: iOS.
+			*
+			* @validvalue One of the \link MAW_LIST_VIEW_ITEM_SELECTION_STYLE
+			* MAW_LIST_VIEW_ITEM_SELECTION_STYLE_NONE \endlink values.
+			*
+			* @setandget
+			*
+			* @par Example
+			* \code
+			*	char buffer[BUFFER_SIZE];
+			*	sprintf(buffer, "%d", MAW_LIST_VIEW_ITEM_SELECTION_STYLE_GRAY);
+			*	maWidgetSetProperty(listItemHandle,
+			*					   MAW_LIST_VIEW_ITEM_SELECTION_STYLE, buffer);
+			* \endcode
+			*/
+			SELECTION_STYLE = "selectionStyle";
+		}
+	} // end of WidgetListViewItemProperties
+}// end of WidgetListViewItem

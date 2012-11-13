@@ -33,7 +33,7 @@ typedef int socklen_t;
 #ifdef _WIN32_WCE
 #if _WIN32_WCE >= 0x500
 #include <initguid.h>
-#include <connmgr.h>  
+#include <connmgr.h>
 #endif
 #endif
 
@@ -561,7 +561,7 @@ int HttpConnection::readResponseCode(const char* line, int len) {
 }
 
 int HttpConnection::write(const void* src, int len) {
-	MYASSERT(mMethod == HTTP_POST, ERR_HTTP_NONPOST_WRITE);
+	MYASSERT(mMethod == HTTP_POST || mMethod == HTTP_PUT, ERR_HTTP_READONLY_WRITE);
 	return ProtocolConnection::write(src, len);
 }
 
@@ -591,14 +591,14 @@ int TcpServer::open(int port) {
 	}
 
 	sockaddr_in sa;
-	char myname[/*MAXHOSTNAME*/256+1]; 
-	struct hostent *hp; 
+	char myname[/*MAXHOSTNAME*/256+1];
+	struct hostent *hp;
 
 	memset(&sa, 0, sizeof(struct sockaddr_in));
-	gethostname(myname, 256); /* who are we? */ 
-	hp = gethostbyname(myname); /* get our address info */ 
-	if (hp == NULL) /* we don't exist !? */ return 0; 
-	sa.sin_family = hp->h_addrtype; /* this is our host address */ 
+	gethostname(myname, 256); /* who are we? */
+	hp = gethostbyname(myname); /* get our address info */
+	if (hp == NULL) /* we don't exist !? */ return 0;
+	sa.sin_family = hp->h_addrtype; /* this is our host address */
 	sa.sin_port = htons( port );
 
 	if(bind(mSock, (struct sockaddr*)&sa, sizeof(struct sockaddr_in))<0) {

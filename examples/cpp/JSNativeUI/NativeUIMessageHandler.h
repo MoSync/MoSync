@@ -29,7 +29,7 @@ MA 02110-1301, USA.
 #include <Wormhole/WebViewMessage.h>
 #include <NativeUI/WebView.h>
 #include <MAUtil/String.h>
-#include "MessageStream.h"
+#include <Wormhole/MessageStream.h>
 /**
  * Class that implements JavaScript calls.
  *

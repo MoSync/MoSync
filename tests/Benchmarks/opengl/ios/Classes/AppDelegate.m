@@ -1,9 +1,9 @@
 //
-//  ___PROJECTNAMEASIDENTIFIER___AppDelegate.m
-//  ___PROJECTNAME___
+//	___PROJECTNAMEASIDENTIFIER___AppDelegate.m
+//	___PROJECTNAME___
 //
-//  Created by ___FULLUSERNAME___ on ___DATE___.
-//  Copyright ___ORGANIZATIONNAME___ ___YEAR___. All rights reserved.
+//	Created by ___FULLUSERNAME___ on ___DATE___.
+//	Copyright ___ORGANIZATIONNAME___ ___YEAR___. All rights reserved.
 
 #import "AppDelegate.h"
 #import "GLView.h"
@@ -16,18 +16,18 @@
 @synthesize statsView;
 
 - (void)applicationDidFinishLaunching:(UIApplication *)application {
-    
-    //allocate the view
-    self.statsView = [StatsView alloc];
-    
+
+	//allocate the view
+	self.statsView = [StatsView alloc];
+
 	glView.animationInterval = 1.0 / kRenderingFrequency;
 	[glView startAnimation];
-    
-    //add the view controller's view to the window
-    
-    [window addSubview:self.statsView];
-    
-    //[window makeKeyAndVisible];
+
+	//add the view controller's view to the window
+
+	[window addSubview:self.statsView];
+
+	//[window makeKeyAndVisible];
 }
 
 
@@ -43,7 +43,7 @@
 - (void)dealloc {
 	[window release];
 	[glView release];
-    [statsView release];
+	[statsView release];
 	[super dealloc];
 }
 

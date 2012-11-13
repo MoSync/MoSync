@@ -3,6 +3,17 @@ TARGETTYPE exe
 UID 0x100039CE 0xE7654321
 VENDORID 0
 
+// http://blog.codepainters.com/2010/07/26/symbian-separate-builds-for-different-s60-editions/
+#if defined(SYMBIAN_C32_SERCOMMS_V2)
+#define __S60_50__
+#elif defined(SYMBIAN_APPARC_APPINFO_CACHE)
+#define __S60_32__
+#elif defined(SYMBIAN_FLEXIBLE_ALARM)
+#define __S60_31__
+#else
+#define __S60_30__
+#endif
+
 #ifdef __S60_50__
 CAPABILITY LocalServices UserEnvironment ReadUserData WriteUserData NetworkServices Location
 #else

@@ -12,13 +12,13 @@
 //- (void)setupView:(UIView *)theView;
 @end
 
-@interface StatsView : UIView 
+@interface StatsView : UIView
 {
-    
+
 @private
-    
+
     id <StatsViewDelegate>     delegate;
-    
+
 }
 @property (assign) /* weak ref */ id <StatsViewDelegate> delegate;
 //- (void)drawView;

@@ -158,87 +158,8 @@ public:
 	}
 
 	/**
-	 * A Wrapper function for creating the camera control buttons
-	 * and the layout that holds them
-	 */
-/*
-	void createCameraControlButtons()
-	{
-
-		mZoomInButton = new Button();
-		mZoomInButton->setText("Zoom +");
-		mZoomInButton->fillSpaceHorizontally();
-		mZoomInButton->addButtonListener(this);
-
-		mShowLastImageButton = new Button();
-		mShowLastImageButton->setText("Image");
-		mShowLastImageButton->fillSpaceHorizontally();
-		mShowLastImageButton->addButtonListener(this);
-
-		mSettingsButton = new Button();
-		mSettingsButton->setText("Settings");
-		mSettingsButton->fillSpaceHorizontally();
-		mSettingsButton->addButtonListener(this);
-
-		mZoomOutButton = new Button();
-		mZoomOutButton->setText("Zoom -");
-		mZoomOutButton->fillSpaceHorizontally();
-		mZoomOutButton->addButtonListener(this);
-
-		mSecondLayoutWidget = new HorizontalLayout();
-		mSecondLayoutWidget->fillSpaceHorizontally();
-
-		if(isWP7())
-		{
-			mZoomInButton->setHeight(80);
-			mZoomInButton->setFontSize(17);
-			mZoomOutButton->setHeight(80);
-			mZoomOutButton->setFontSize(17);
-			mSettingsButton->setHeight(80);
-			mSettingsButton->setFontSize(17);
-			mShowLastImageButton->setHeight(80);
-			mShowLastImageButton->setFontSize(17);
-			mSecondLayoutWidget->setHeight(80);
-		}
-		else
-		{
-			mZoomInButton->setHeight(60);
-			mZoomOutButton->setHeight(60);
-			mSettingsButton->setHeight(60);
-			mShowLastImageButton->setHeight(60);
-			mSecondLayoutWidget->setHeight(60);
-		}
-
-		//Adding buttons to the horizontal Layout
-		mSecondLayoutWidget->addChild(mZoomInButton);
-		mSecondLayoutWidget->addChild(mShowLastImageButton);
-		mSecondLayoutWidget->addChild(mSettingsButton);
-		mSecondLayoutWidget->addChild(mZoomOutButton);
-
-
-		// Then we add the layout to its parent
-		mMainLayoutWidget->addChild(mSecondLayoutWidget);
-
-		//We create the capture button as a larger button
-		//so it is easier to be touched
-		mCaptureButton = new Button();
-
-		mCaptureButton->setText("Take snapshot");
-		mCaptureButton->fillSpaceHorizontally();
-		mCaptureButton->wrapContentVertically();
-		mCaptureButton->addButtonListener(this);
-
-
-		//Add the capture button to the main layout so
-		//it will be larger than others.
-		mMainLayoutWidget->addChild(mCaptureButton);
-
-	}
-*/
-	/**
 	 * A Wrapper function that creates the camera widget
-	 * and binds it to the default camera, The binding
-	 * can be changed through the settings screen
+	 * and binds it to the default camera.
 	 */
 	void createCameraWidget()
 	{
@@ -279,7 +200,7 @@ public:
 
 		int e = maCameraPreviewEventEnable(MA_CAMERA_PREVIEW_FRAME, mCameraPreviewBuffer, &previewRect);
 		if(e<0)
-			maPanic(e, "NO!");
+			maPanic(e, "Error while enabling camera preview events!");
 
 		mBarcodeScanner = new BarcodeScanner();
 		mBarcodeScanner->initiate();
@@ -299,11 +220,11 @@ public:
 		int res = maCameraSetProperty(MA_CAMERA_FOCUS_MODE, MA_CAMERA_FOCUS_MACRO );
 		if(res < 0)
 		{
-			lprintfln("NO! WE HAVE NO MACRO FOCUS!");
+			lprintfln("This camera doesn't support macro focus.");
 			res = maCameraSetProperty(MA_CAMERA_FOCUS_MODE, MA_CAMERA_FOCUS_AUTO );
 			if(res < 0)
 			{
-				lprintfln("NO! WE HAVE NO AUTO FOCUS!");
+				lprintfln("This camera has no auto focus.");
 			}
 		}
 
@@ -323,40 +244,10 @@ public:
 			MA_CAMERA_FLASH_MODE,
 			mSettingsScreen->getFLashMode()
 			);
-/*
-		int res = maCameraSetProperty(MA_CAMERA_FOCUS_MODE, MA_CAMERA_FOCUS_MACRO );
-		if(res < 0)
-		{
-			lprintfln("NO! WE HAVE NO MACRO FOCUS!");
-			res = maCameraSetProperty(MA_CAMERA_FOCUS_MODE, MA_CAMERA_FOCUS_AUTO );
-			if(res < 0)
-			{
-				lprintfln("NO! WE HAVE NO AUTO FOCUS!");
-			}
-		}
-*/
+
 		char buffer[256];
 		maCameraGetProperty(MA_CAMERA_MAX_ZOOM, buffer, 256);
 		maxZoom = atoi(buffer);
-/*
-		//Disable the zoom buttons if zoom is not supported
-		if(maxZoom == 0)
-		{
-			mZoomInButton->setEnabled(false);
-			mZoomInButton->setFontColor(0x969696);
-
-			mZoomOutButton->setEnabled(false);
-			mZoomOutButton->setFontColor(0x969696);
-		}
-		else //Or enable show them if it's supported
-		{
-			mZoomInButton->setEnabled(true);
-			mZoomInButton->setFontColor(0x000000);
-
-			mZoomOutButton->setEnabled(true);
-			mZoomOutButton->setFontColor(0x000000);
-		}
-*/
 	}
 
 
@@ -381,46 +272,6 @@ public:
 				res = maCameraSetProperty(MA_CAMERA_FOCUS_MODE, MA_CAMERA_FOCUS_AUTO );
 			}
 		}
-/*
-		if (mCaptureButton == button)
-		{
-			captureButtonClicked();
-		}
-		else if (mSettingsButton == button)
-		{
-			maCameraStop();
-			mSettingsScreen->pushSettingsScreen();
-		}
-		else if (mShowLastImageButton == button)
-		{
-			showImageButtonClicked();
-		}
-		else if (mZoomInButton == button)
-		{
-			//Increase the zoom level if it is more
-			//than the maximum supported zoom
-			if(mCurrentZoomIndex < maxZoom)
-			{
-				mCurrentZoomIndex++;
-			}
-			char buffer[256];
-			sprintf(buffer, "%i", mCurrentZoomIndex);
-			maCameraSetProperty(MA_CAMERA_ZOOM, buffer);
-
-		}
-		else if (mZoomOutButton == button)
-		{
-			//Decrease the zoom index if it is more than 0
-			if(mCurrentZoomIndex > 0)
-			{
-				mCurrentZoomIndex--;
-			}
-			char buffer[256];
-			sprintf(buffer, "%i", mCurrentZoomIndex);
-			maCameraSetProperty(MA_CAMERA_ZOOM, buffer);
-
-		}
-*/
 	}
 
 	/**
@@ -468,13 +319,7 @@ public:
 	 */
 	void showImageButtonClicked()
 	{
-		//if(mLastEnc == 0)
-		//{
-			//do nothing when there is no image
-			//return;
-		//}
 		maCameraStop();
-		//mImageScreen->setImageDataHandle(mLastEnc);
 
 		mImageScreen->setImageDataRaw(mCameraPreviewBuffer,
 										mCameraPreviewWidth,
@@ -486,7 +331,6 @@ public:
 
 	bool getBarCode()
 	{
-		//mBarcodeScanner->uploadImage(mImageHandle);
 		mBarcodeScanner->uploadRGB888(mCameraPreviewBuffer,
 										mCameraPreviewWidth,
 										mCameraPreviewHeight);
@@ -494,10 +338,9 @@ public:
 		char t[40];
 		char c[40];
 
-
 		if(mBarcodeScanner->getBarcode(t, c))
 		{
-			maAlert(t, c, "apa", "ko", "kalv");
+			maAlert(t, c, "yes", "success", "found it!");
 			return true;
 		}
 
@@ -526,28 +369,10 @@ private:
 	/** The main layout that holds the other widgets. */
 	VerticalLayout *mMainLayoutWidget;
 
-	/** The main layout that holds the other widgets. */
-//	HorizontalLayout *mSecondLayoutWidget;
-
 	/** Text editor box for user input. */
 	CameraPreview *mCameraPreview;
 
 	Button *mAutoFocusButton;
-
-	/** The Settings button. */
-//	Button *mSettingsButton;
-
-	/** The Show Image button. */
-//	Button *mShowLastImageButton;
-
-	/** The Capture button. */
-//	Button *mCaptureButton;
-
-	/** The Zoom In button. */
-//	Button *mZoomInButton;
-
-	/** The Zoom Out button. */
-//	Button *mZoomOutButton;
 
 	/* index of the current zoom level*/
 	int mCurrentZoomIndex;

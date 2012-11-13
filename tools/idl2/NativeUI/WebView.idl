@@ -1,0 +1,263 @@
+/**
+* The available widget properties for a #MAW_WEB_VIEW.
+* See @ref WidgetProperties "Widget properties" for more properties.
+*/
+group WidgetWebViewProperties "Web view" {
+	constset MAString MAW_WEB_VIEW_ {
+		/**
+		* @brief Set or get the currently displayed url in the web view.
+		*
+		* You can also use this property to evaluate JavaScript in the WebView,
+		* by using a url that starts with "javascript:" followed by the
+		* JavaScript code.
+		*
+		* Note that if the url is a non-local url that will cause data to
+		* be downloaded over the network, you need to set "Internet Access"
+		* permissions for the application.
+		*
+		* @validvalue Any valid URL.
+		*
+		* @setandget
+		*
+		* @par Example
+		* @code
+		*	maWidgetSetProperty(webViewHandle, MAW_WEB_VIEW_URL, "http://www.mosync.com/");
+		* @endcode
+		*
+		* @code
+		*	maWidgetSetProperty(
+		*		webViewHandle,
+		*		MAW_WEB_VIEW_URL,
+		*		"javascript:document.body.innerHTML= '<p>Hello World</p>'");
+		* @endcode
+		*/
+		URL = "url";
+
+		/**
+		* @brief Set the currently displayed HTML data in the web view.
+		*
+		* @validvalue Any valid HTML data.
+		*
+		* @setonly
+		*
+		* @par Example
+		* @code
+		*	maWidgetSetProperty(webViewHandle, MAW_WEB_VIEW_HTML, "<h1>Hello World</h1>");
+		* @endcode
+		*/
+		HTML = "html";
+
+		/**
+		* @brief Set the base URL used by the web-view when loading relative paths.
+		* The value of this URL is used when setting the #MAW_WEB_VIEW_URL and
+		* #MAW_WEB_VIEW_HTML properties. The default value for this property points to
+		* the Assets folder in the local file system ("file://pathToLocalFileSystem/Assets/").
+		*
+		* @note Use: #maGetSystemProperty ("mosync.path.local.url") to find the baseURL
+		* for the local file system.
+		*
+		* @validvalue Any valid URL schema.
+		*
+		* @setandget
+		*/
+		BASE_URL = "baseUrl";
+
+		/**
+		* @brief Set the pattern used to "soft hook" urls, to get notified
+		* when pages are being loaded.
+		*
+		* When this pattern matches a url that is being requested
+		* to load in the WebView, event #MAW_EVENT_WEB_VIEW_HOOK_INVOKED
+		* is sent, and the page loads NORMALLY.
+		*
+		* Note that when receiving event #MAW_EVENT_WEB_VIEW_HOOK_INVOKED
+		* you MUST deallocate the urlData handle of the event by calling
+		* maDestroyPlaceholder on the handle. Destory the handle when you are
+		* done reading the url data, to avoid that memory will get used up.
+		*
+		* The pattern is a url pattern specified using regular expression
+		* syntax, according to the ICU regular expression standard, using
+		* complete match. For example, the ".*" matching expression is used
+		* to match any url string. To match all HTTP requests, use the
+		* pattern "http://.*". To match all requests for a specific domain,
+		* use a pattern like ".*google.com.*". For further infomation, see:
+		* http://userguide.icu-project.org/strings/regexp
+		* When typing a C-string with a pattern that contains a matching
+		* expression with a backslash, make sure to escape the backslash,
+		* for example "\B" should be "\\B".
+		*
+		* By setting the pattern to an empty string, the soft hook mechanism
+		* is turned off, and #MAW_EVENT_WEB_VIEW_HOOK_INVOKED is not sent.
+		*
+		* Both "soft" hooks and "hard" hooks can be enabled simultaneously,
+		* but only one hook pattern can be used for each type of hook. When
+		* setting a new hook pattern, the old hook is replaced.
+		*
+		* Note that urls opened using maWidgetSetProperty with the property
+		* MAW_WEB_VIEW_URL are NOT hooked. This way of loading a page is
+		* excluded from the hook mechanism to prevent "loops" when loading
+		* pages.
+		*
+		* @validvalue A string with a url pattern.
+		*
+		* @setonly
+		*
+		* @par Example
+		* @code
+		*	// Hook all urls.
+		*	maWidgetSetProperty(webViewHandle, MAW_WEB_VIEW_SOFT_HOOK, ".*");
+		*
+		*	// Hook no urls.
+		*	maWidgetSetProperty(webViewHandle, MAW_WEB_VIEW_SOFT_HOOK, "");
+		*
+		*	// Hook urls that start with "mosync:".
+		*	maWidgetSetProperty(webViewHandle, MAW_WEB_VIEW_SOFT_HOOK, "mosync://.*");
+		* @endcode
+		*/
+		SOFT_HOOK = "softHook";
+
+		/**
+		* @brief Set the pattern used to "hard hook" urls, to get notified
+		* and prevent loading of pages.
+		*
+		* Hard hooks are useful for communicating events from a WebView,
+		* for example by setting document.location to a url string in
+		* JavaScript. Example: document.location = 'mosync://ExitApp'
+		* The application can then examine the url data and take action
+		* depending on the url content.
+		*
+		* When this pattern matches a url that is being requested
+		* to load in the WebView, event #MAW_EVENT_WEB_VIEW_HOOK_INVOKED
+		* is sent, and page loading is ABORTED.
+		*
+		* Note that when receiving event #MAW_EVENT_WEB_VIEW_HOOK_INVOKED
+		* you MUST deallocate the urlData handle of the event by calling
+		* maDestroyPlaceholder on the handle. Destory the handle when you are
+		* done reading the url data, to avoid that memory will get used up.
+		*
+		* The pattern is a url pattern specified using regular expression
+		* syntax, according to the ICU regular expression standard, using
+		* complete match. For example, the ".*" matching expression is used
+		* to match any url string. To match all HTTP requests, use the
+		* pattern "http://.*". To match all requests for a specific domain,
+		* use a pattern like ".*google.com.*". For further infomation, see:
+		* http://userguide.icu-project.org/strings/regexp
+		* When typing a C-string with a pattern that contains a matching
+		* expression with a backslash, make sure to escape the backslash,
+		* for example "\B" should be "\\B".
+		*
+		* By setting the pattern to an empty string, the soft hook mechanism
+		* is turned off, and #MAW_EVENT_WEB_VIEW_HOOK_INVOKED is not sent.
+		*
+		* Both "soft" hooks and "hard" hooks can be enabled simultaneously,
+		* but only one hook pattern can be used for each type of hook. When
+		* setting a new hook pattern, the old hook is replaced.
+		*
+		* The "hard" hook property takes precedence over the "soft" hook
+		* property. When both properties are set,
+		* #MAW_EVENT_WEB_VIEW_HOOK_INVOKED is sent once, for the
+		* "hard" hook type.
+		*
+		* Note that urls opened using maWidgetSetProperty with the property
+		* MAW_WEB_VIEW_URL are NOT hooked. This way of loading a page is
+		* excluded from the hook mechanism to prevent "loops" when loading
+		* pages.
+		*
+		* @validvalue A string with a url pattern.
+		*
+		* @setonly
+		*
+		* @par Example
+		* @code
+		*	// Hook urls that start with "mosync:".
+		*	maWidgetSetProperty(webViewHandle, MAW_WEB_VIEW_HARD_HOOK, "mosync://.*");
+		* @endcode
+		*/
+		HARD_HOOK = "hardHook";
+
+		/**
+		* @brief Property to get a new url whenever the webview changes the url.
+		* See #MAW_EVENT_WEB_VIEW_URL_CHANGED.
+		*
+		* @deprecated Use event #MAW_EVENT_WEB_VIEW_HOOK_INVOKED
+		*
+		* @validvalue Any valid URL.
+		*
+		* @getonly
+		*
+		* @par Example
+		* @code
+		*	char urlBuffer[BUFFER_SIZE];
+		*	int result = maWidgetGetProperty(
+		*	  webViewHandle,
+		*	  MAW_WEB_VIEW_NEW_URL,
+		*	  urlBuffer,
+		*	  BUFFER_SIZE);
+		*	if (result > 0)
+		*	{
+		*		// Do something with URL.
+		*	}
+		* @endcode
+		*/
+		NEW_URL = "newurl";
+
+		/**
+		* @brief Sets or gets whether the horizontal scrollbar should be drawn or not.
+		* Available only on Android for the moment.
+		*
+		* @validvalue A boolean string 'true' or 'false'.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(webViewHandle, MAW_WEB_VIEW_HORIZONTAL_SCROLLBAR_ENABLED, "true");
+		* \endcode
+		*/
+		HORIZONTAL_SCROLL_BAR_ENABLED = "horizontalScrollBarEnabled";
+
+		/**
+		* @brief Sets or gets whether the vertical scrollbar should be drawn or not.
+		* The scrollbar is drawn by default.
+		* Available only on Android for the moment.
+		*
+		* @validvalue A boolean string 'true' or 'false'.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(webViewHandle, MAW_WEB_VIEW_VERTICAL_SCROLLBAR_ENABLED, "false");
+		* \endcode
+		*/
+		VERTICAL_SCROLL_BAR_ENABLED = "verticalScrollBarEnabled";
+
+		/**
+		* @brief Enable or disable the zoom controls of the web view.
+		*
+		* @validvalue "true" to enable, "false" to disable.
+		*
+		* @setonly
+		*
+		* @par Example
+		* @code
+		*	maWidgetSetProperty(webViewHandle, MAW_WEB_VIEW_ENABLE_ZOOM, "true");
+		* @endcode
+		*/
+		ENABLE_ZOOM = "enableZoom";
+
+		/**
+		* @brief Navigate forward or back the browsing history.
+		*
+		* @validvalue "back" or "forward".
+		*
+		* @setonly
+		*
+		* @par Example
+		* @code
+		*	maWidgetSetProperty(webViewHandle, MAW_WEB_VIEW_NAVIGATE, "back");
+		* @endcode
+		*/
+		NAVIGATE = "navigate";
+	}
+} // end of WidgetWebViewProperties

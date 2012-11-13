@@ -1,0 +1,109 @@
+/**
+* The available widget properties for a #MAW_BUTTON. See of \ref WidgetProperties "Widget properties" for more properties.
+*/
+group WidgetButtonProperties "Button" {
+	constset MAString MAW_BUTTON_ {
+		/**
+		* @brief Sets or gets the text that is displayed in the label.
+		*
+		* @validvalue A null-terminated string.
+		*
+		* @setandget
+		*
+		* @par Example set
+		* \code
+		*	maWidgetSetProperty(buttonHandle, MAW_BUTTON_TEXT, "My button");
+		* \endcode
+		*
+		* @par Example get
+		* \code
+		*	char textBuffer[BUFFER_SIZE];
+		*	int result = maWidgetGetProperty(buttonHandle, MAW_BUTTON_TEXT, textBuffer, BUFFER_SIZE);
+		*	if (result > 0)
+		*	{
+		*		// Do something with the label text.
+		*	}
+		* \endcode
+		*/
+		TEXT = "text";
+
+		/**
+		* @brief Sets the vertical alignment of the text inside the button. If the widget's height is WRAP_CONTENT this property has no effect.
+		*
+		* @validvalue One of the constants #MAW_ALIGNMENT_TOP, #MAW_ALIGNMENT_CENTER or #MAW_ALIGNMENT_BOTTOM.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(buttonHandle, MAW_BUTTON_TEXT_VERTICAL_ALIGNMENT, MAW_ALIGNMENT_CENTER);
+		* \endcode
+		*/
+		TEXT_VERTICAL_ALIGNMENT = "textVerticalAlignment";
+
+		/**
+		* @brief Sets the horizontal alignment of the text inside the button. If the widget's width is WRAP_CONTENT this property has no effect.
+		*
+		* @validvalue Takes one of the constants #MAW_ALIGNMENT_LEFT, #MAW_ALIGNMENT_CENTER or #MAW_ALIGNMENT_RIGHT.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(buttonHandle, MAW_BUTTON_TEXT_HORIZONTAL_ALIGNMENT, MAW_ALIGNMENT_CENTER);
+		* \endcode
+		*/
+		TEXT_HORIZONTAL_ALIGNMENT = "textHorizontalAlignment";
+
+		/**
+		* @brief Sets the font color of the button's text.
+		*
+		* @validvalue A hexadecimal value 0xRRGGBB, where R, G and B are the red, green and blue components respectively.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(buttonHandle, MAW_BUTTON_FONT_COLOR, "0xff0000");
+		* \endcode
+		*/
+		FONT_COLOR = "fontColor";
+
+		/**
+		* @brief Sets the font size in points of the button's text.
+		*
+		* @validvalue A float that specifies the number of pixels on Android
+		* and WP7, and number of points on iOS.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(buttonHandle, MAW_BUTTON_FONT_SIZE, "13.0");
+		* \endcode
+		*/
+		FONT_SIZE = "fontSize";
+
+		/**
+		* @brief Sets the typeface and style in which the text should be displayed.
+		*
+		* @validvalue A font handle received from loading fonts using
+		* #maFontGetName and #maFontLoadWithName syscalls.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	int nrFonts = maFontGetCount();
+		*	 char buf[256];
+		*	 // Get first font name.
+		*	 maFontGetName(1, buf, 256);
+		*	 // Load that font for size 10.
+		*	 int fontHandle = maFontLoadWithName(buf, 10);
+		*	 // Set that font to the label.
+		*	maWidgetSetProperty(buttonHandle, MAW_BUTTON_FONT_HANDLE, toString(fontHandle));
+		* \endcode
+		*/
+		FONT_HANDLE = "fontHandle";
+	}
+} // end of WidgetButtonProperties

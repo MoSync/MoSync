@@ -5,14 +5,14 @@ extern "C" {
 
 /* Calls a java function to print a message stored in buf */
 void pass_jni_msg(char *buf) {
-    /* Callback to Java to print buf */
-    jstring msg2java = ((*glob_env).NewStringUTF(buf));
-    jclass cls = ((*glob_env).GetObjectClass(*glob_obj));
-    jmethodID mid = (*glob_env).GetMethodID(cls, "printMsg", "(Ljava/lang/String;)V");
-    if(mid == 0) /* Could not find the method */
-    	return;
-//    (*glob_env)->ExceptionClear();
-    (*glob_env).CallVoidMethod(*glob_obj, mid, msg2java);
+	/* Callback to Java to print buf */
+	jstring msg2java = ((*glob_env).NewStringUTF(buf));
+	jclass cls = ((*glob_env).GetObjectClass(*glob_obj));
+	jmethodID mid = (*glob_env).GetMethodID(cls, "printMsg", "(Ljava/lang/String;)V");
+	if(mid == 0) /* Could not find the method */
+		return;
+//	  (*glob_env)->ExceptionClear();
+	(*glob_env).CallVoidMethod(*glob_obj, mid, msg2java);
 }
 
 /* entry point callable from the Dalvik VM */
@@ -20,8 +20,8 @@ JNIEXPORT jstring JNICALL Java_com_mosync_STROPBenchNativeAndroidActivity_invoke
 	glob_env = env; //save the java environment
 	glob_obj = &javaThis; //save the object that called us!
 	StropBencher * sb = new StropBencher();
-    sb->bench();
-    delete sb;
+	sb->bench();
+	delete sb;
 //	return (*env)->NewStringUTF(env, "Done!");
 }
 
@@ -170,7 +170,7 @@ void StropBencher::bench() {
 float StropBencher::appender(int numRuns, int strType, int func) {
 
 	float startTime = currTime();
-    std::string str("Ima String!");
+	std::string str("Ima String!");
 	std::string appStr("Append me!");
 	switch(strType) {
 
@@ -195,7 +195,7 @@ float StropBencher::appender(int numRuns, int strType, int func) {
 		return currTime() - startTime;*/
 
 	}
-    return currTime() - startTime;
+	return currTime() - startTime;
 
 }
 
@@ -232,7 +232,7 @@ float StropBencher::insert(int numRuns, int strType, int insType) {
 		return currTime() - startTime;*/
 
 	}
-    return currTime() - startTime;
+	return currTime() - startTime;
 
 }
 
@@ -257,12 +257,12 @@ float StropBencher::copy(int numRuns, int strType) {
 			}
 		}
 		printf("cpyStr = %s", cpyStr.c_str());
-		
+
 
 		/*case STD_STRING: TODO Will have to wait until STL is implemented*/
 
 	}
-    return currTime() - startTime;
+	return currTime() - startTime;
 
 }
 
@@ -307,7 +307,7 @@ float StropBencher::find(int numRuns, int strType, int func) {
 		/*case STD_STRING: TODO Will have to wait until STL is implemented*/
 
 	}
-    return currTime() - startTime;
+	return currTime() - startTime;
 
 }
 
@@ -331,12 +331,12 @@ float StropBencher::substr(int numRuns, int strType) {
 			}
 		}
 		printf("subStr: %s", subStr.c_str()); //force the compiler to actually do the operations because subStr is used!
-		
+
 
 		/*case STD_STRING: TODO Will have to wait until STL is implemented*/
 
 	}
-    return currTime() - startTime;
+	return currTime() - startTime;
 
 }
 
@@ -357,7 +357,7 @@ float StropBencher::remove(int numRuns, int strType) { //TODO remove this, std::
 		for(int i = 0; i < numRuns; ++i){
 			for(int j = 0; j < ALOT; ++j){
 				longStr = std::string("abcdefghiljkmnopqrstuvwxyzabcdefghiljkmnopqrstuvwxyzabcdefghiljkmnopqrstuvwxyzabcdefghiljkmnopqrstuvwxyzabcdefghiljkmnopqrstuvwxyz");
-				//longStr.remove(pos = rand()%(longStr.length()-1), rand()%(longStr.length()-pos)); 
+				//longStr.remove(pos = rand()%(longStr.length()-1), rand()%(longStr.length()-pos));
 			}
 		}
 		printf("longStr: %s", longStr.c_str()); //force the compiler to actually do the operations because subStr is used!
@@ -365,8 +365,8 @@ float StropBencher::remove(int numRuns, int strType) { //TODO remove this, std::
 		/*case STD_STRING: TODO Will have to wait until STL is implemented*/
 
 	}
-    return currTime() - startTime;
-    
+	return currTime() - startTime;
+
 }
 
 /*
@@ -393,7 +393,7 @@ float StropBencher::resize(int numRuns, int strType) {
 		/*case STD_STRING: TODO Will have to wait until STL is implemented*/
 
 	}
-    return currTime() - startTime;
+	return currTime() - startTime;
 
 }
 
@@ -437,7 +437,7 @@ float StropBencher::compare(int numRuns, int strType, int cmpType) {
 		/*case STD_STRING: TODO Will have to wait until STL is implemented*/
 
 	}
-    return currTime() - startTime;
+	return currTime() - startTime;
 
 }
 
@@ -446,7 +446,7 @@ float StropBencher::compare(int numRuns, int strType, int cmpType) {
  */
 float StropBencher::currTime() {
 	return ((float)((float)clock()/(float)CLOCKS_PER_SEC));
-    //return maGetMilliSecondCount();
+	//return maGetMilliSecondCount();
 }
 
 

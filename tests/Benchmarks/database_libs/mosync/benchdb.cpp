@@ -1,10 +1,10 @@
 /*
  * benchdb.cpp
  *
- *  Created on: 3 nov 2011
- *      Author: Alex
+ *	Created on: 3 nov 2011
+ *		Author: Alex
  *
- *  Uses an environment and a HttpConnectionListener to send HTTP/GET to URL (which should point to a publish script)
+ *	Uses an environment and a HttpConnectionListener to send HTTP/GET to URL (which should point to a publish script)
  *	TODO: Get device info in this library instead of having to send that as parameters to the functions
  *
  */
@@ -76,7 +76,7 @@ void BenchDBConnector::initiateConnection(const char* url) {
 		if(maCreateData(myData, strlen(url)) == RES_OK)
 		{
 			printf("RES_OK\n");
-		    maWriteData(myData, url, 0, strlen(url));
+			maWriteData(myData, url, 0, strlen(url));
 		}
 
 		printf("using POST\n");
@@ -231,5 +231,3 @@ BenchDBConnector::~BenchDBConnector() {
 //	return 0;
 //
 //}
-
-

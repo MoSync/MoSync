@@ -1,0 +1,37 @@
+/**
+* The available widget properties for a #MAW_TIME_PICKER. See \ref WidgetProperties "Widget properties" for more properties.
+*/
+group WidgetTimePickerProperties "Time Picker" {
+	constset MAString MAW_TIME_PICKER_ {
+		/**
+		* @brief Sets or gets the current hour in 24h mode( in the range: 0-23 ).
+		*
+		* @validvalue An int that specifies the current hour.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+		*	// Set hour to 20, that is 8PM.
+		*	maWidgetSetProperty(timePickerHandle, MAW_TIME_PICKER_CURRENT_HOUR, "20");
+		* \endcode
+		*/
+		CURRENT_HOUR = "currentHour";
+
+		/**
+		* @brief Sets or gets the current minute (0-59).
+		*
+		* @validvalue An int that specifies the current minute.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+		*	char buf[BUFFER_SIZE];
+		*	maWidgetGetProperty(timePickerHandle, MAW_TIME_PICKER_CURRENT_MINUTE, buf, BUFFER_SIZE);
+		*	// Do something with the minute.
+		* \endcode
+		*/
+		CURRENT_MINUTE = "currentMinute";
+	}
+} // end of WidgetTimePickerProperties

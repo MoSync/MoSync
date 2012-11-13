@@ -60,7 +60,7 @@ TypeBase* getTypeBaseFromType(Builtin::SubType type) {
 
 Value::Value() {
 	mSym.symType = eNone;
-	mSym.type = NULL; 
+	mSym.type = NULL;
 	mSym.address = NULL;
 }
 
@@ -79,13 +79,13 @@ Value::Value(const std::string& value) {
 	} else if(value.find_first_of("x")!=std::string::npos) {
 		this->Int = 0;
 		sscanf(value.c_str(), "0x%x", &this->Int);
-		mPrimitiveType = Builtin::eInt;			
+		mPrimitiveType = Builtin::eInt;
 	} else if(value.find_first_of(".")!=std::string::npos ||
 		value[value.size()-1]=='f')
 	{
 		if(value[value.size()-1]=='f') {
 			this->Float = (float)atof(value.c_str());
-			mPrimitiveType = Builtin::eFloat;		
+			mPrimitiveType = Builtin::eFloat;
 		} else {
 			this->Double = strtod(value.c_str(), NULL);
 			mPrimitiveType = Builtin::eDouble;
@@ -106,20 +106,20 @@ Value::Value(const SYM& sym) : mSym(sym), mPrimitiveType(Builtin::NUM_SUB_TYPES)
 	mSym.type = convertConstType(mSym.type->resolve());
 	if(getType() == TypeBase::ePointer ) {
 		if(!mSym.address) throw ParseException("Invalid pointer.");
-		this->Int = *(const int*)mSym.address;	
+		this->Int = *(const int*)mSym.address;
 		mPrimitiveType = Builtin::eInt;
 	} else if(getType() == TypeBase::eArray) {
 		if(!mSym.address) throw ParseException("Invalid array.");
-		this->Int = (int)((const char*)mSym.address-(const char*)gMemBuf);	
+		this->Int = (int)((const char*)mSym.address-(const char*)gMemBuf);
 		mPrimitiveType = Builtin::eInt;
 	} else if(getType() == TypeBase::eEnum) {
 		if(!mSym.address) throw ParseException("Invalid enum.");
-		this->Int = *(const int*)mSym.address;	
-		mPrimitiveType = Builtin::eInt;		
+		this->Int = *(const int*)mSym.address;
+		mPrimitiveType = Builtin::eInt;
 	}  else if(getType() == TypeBase::eFunction) {
 		//if(!mSym.address) throw ParseException("Invalid function.");
-		this->Int = (int)(size_t)mSym.address;	
-		mPrimitiveType = Builtin::eInt;		
+		this->Int = (int)(size_t)mSym.address;
+		mPrimitiveType = Builtin::eInt;
 	}
 }
 
@@ -150,7 +150,7 @@ bool Value::isDereferencable() const {
 	if(type->type() == TypeBase::eConst)
 		type = ((ConstType*)type)->mTarget;
 
-	if(type->type() == TypeBase::eArray) 
+	if(type->type() == TypeBase::eArray)
 		return true;
 
 	if(type->type() == TypeBase::ePointer) {
@@ -165,8 +165,8 @@ bool Value::isDereferencable() const {
 	return false;
 }
 
-bool Value::isPointer() const { 
-	return getType()==TypeBase::ePointer; 
+bool Value::isPointer() const {
+	return getType()==TypeBase::ePointer;
 }
 
 Builtin::SubType Value::getPrimitiveType() const {
@@ -177,12 +177,12 @@ TypeBase::Type Value::getType() const {
 	return (!mSym.type) ? TypeBase::eUnknown : mSym.type->resolve()->type();
 }
 
-const SYM& Value::getSymbol() const { 
-	return mSym; 
+const SYM& Value::getSymbol() const {
+	return mSym;
 }
 
-void Value::setSymbol(const SYM& sym) { 
-	mSym = sym; 
+void Value::setSymbol(const SYM& sym) {
+	mSym = sym;
 }
 
 void Value::setTypeBase(const TypeBase* type) {

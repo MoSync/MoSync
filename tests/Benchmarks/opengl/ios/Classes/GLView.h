@@ -15,21 +15,21 @@
 - (void)setupView:(UIView *)theView;
 @end
 
-@interface GLView : UIView 
+@interface GLView : UIView
 {
-    
+
 @private
 
     GLint backingWidth;
     GLint backingHeight;
-    
-    EAGLContext *context;    
+
+    EAGLContext *context;
     GLuint viewRenderbuffer, viewFramebuffer;
     GLuint depthRenderbuffer;
-    
+
     NSTimer *animationTimer;
     NSTimeInterval animationInterval;
-    
+
     id <GLViewDelegate>     delegate;
 }
 @property NSTimeInterval animationInterval;
