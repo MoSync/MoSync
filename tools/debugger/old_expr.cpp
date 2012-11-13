@@ -123,7 +123,7 @@ static bool handleLocalsAndArguments(const string& name, const FRAME& frame, con
 	if(handle_params(f, f->params, frame, name, cb))
 		return true;
 
-	return false;	
+	return false;
 }
 
 bool isLocalGlobalOrStatic(const string& name) {
@@ -152,7 +152,7 @@ static void thisHandler(const SYM& sym) {
 
 	if(resolved && resolved->type() == TypeBase::eStruct) {
 		const StructType *type = ((const StructType*)resolved);
-		
+
 		// cannot be c++ (if we are in a method, the this pointer must have methods naturally.)
 		if(type->getMethods().size()==0) return;
 
@@ -217,7 +217,7 @@ void locate_symbol(const string& name, SeeCallback cb) {
 	if(s->type == eFunction) {
 		const Function* sf = (Function*)s;
 		sym.type = sf->type->resolve();
-		sym.address = (void*)s->address;	//hack. see FunctionType::printMI().
+		sym.address = (void*)(size_t)s->address;	//hack. see FunctionType::printMI().
 		sym.scope = sScope;
 		cb(sym);
 	} else if(s->type == eVariable) {

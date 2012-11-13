@@ -136,7 +136,7 @@ std::string RtspConnection::methodString() {
 	case RTSP_DESCRIBE: return "DESCRIBE";
 	case RTSP_SETUP: return "SETUP";
 	case RTSP_PLAY: return "PLAY";
-	case RTSP_PAUSE: return "PAUSE"; 
+	case RTSP_PAUSE: return "PAUSE";
 	case RTSP_TEARDOWN: return "TEARDOWN";
 	default:
 		DEBIG_PHAT_ERROR;
@@ -202,16 +202,16 @@ void RtspConnection::parseDescribeData(const char *desc) {
 		int type = *desc;
 		desc+=2;
 		switch(type) {
-			case 'a': 
+			case 'a':
 				{
-					const char *str = "control:trackID="; 
+					const char *str = "control:trackID=";
 					if(strncmp(desc, str, strlen(str)-1)==0) {
 						desc+=strlen(str);
 						sscanf(desc, "%d", &streams[streams.size()-1].trackID);
 					}
 				}
 				break;
-			case 'm': 
+			case 'm':
 				{
 					//Stream stream;
 					streams.resize(streams.size()+1);
@@ -241,7 +241,7 @@ int RtspConnection::sendAndVerify(int method) {
 	int recvCSeq = atoi(cseqStr->c_str());
 	if(recvCSeq != CSeq) return CONNERR_GENERIC;
 
-	const std::string *recvSessionId = GetResponseHeader("Session");	
+	const std::string *recvSessionId = GetResponseHeader("Session");
 	if(recvSessionId) {
 		std::string temp = *recvSessionId + ";";
 		if(gotSessionId) {
@@ -302,7 +302,7 @@ int RtspConnection::setup() {
 	const std::string *contentLengthStr = GetResponseHeader("Content-Length");
 	if(!contentLengthStr) return CONNERR_GENERIC;
 	int contentLength = atoi(contentLengthStr->c_str());
-	
+
 	char *describeData = new char[contentLength+1];
 	if((res=read(describeData, contentLength))<0) return res;	//TODO: error handling
 	describeData[contentLength] = 0;
@@ -609,7 +609,7 @@ SYSCALL(void, maConnReadToData(MAHandle conn, MAHandle data, int offset, int siz
 		int sLength;
 		MYASSERT(stream.length(sLength), ERR_DATA_OOB);
 		MYASSERT(sLength >= offset + size, ERR_DATA_OOB);
-		ROOM(SYSCALL_THIS->resources.add_RT_FLUX(data, (void*)sLength));
+		ROOM(SYSCALL_THIS->resources.add_RT_FLUX(data, (void*)(size_t)sLength));
 	}
 
 	mac.state |= CONNOP_READ;
@@ -630,7 +630,7 @@ SYSCALL(void, maConnWriteFromData(MAHandle conn, MAHandle data, int offset, int 
 		int sLength;
 		MYASSERT(stream.length(sLength), ERR_DATA_OOB);
 		MYASSERT(sLength >= offset + size, ERR_DATA_OOB);
-		ROOM(SYSCALL_THIS->resources.add_RT_FLUX(data, (void*)sLength));
+		ROOM(SYSCALL_THIS->resources.add_RT_FLUX(data, (void*)(size_t)sLength));
 	}
 
 	mac.state |= CONNOP_WRITE;

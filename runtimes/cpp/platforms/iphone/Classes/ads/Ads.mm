@@ -178,7 +178,7 @@ static Ads *sharedInstance = nil;
         return MA_ADS_RES_INVALID_LAYOUT_HANDLE;
     }
 
-    [layoutWidget addChild:widget];
+    [layoutWidget addChild:widget toSubview:YES];
     return MA_ADS_RES_OK;
 }
 

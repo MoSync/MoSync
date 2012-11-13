@@ -346,7 +346,12 @@ int main(int argc, char **argv) {
 	command.append("project/AppBar.Icons\"");
 #endif
 
-	system(command.c_str());
+	printf("%s\n", command.c_str());
+	int r = system(command.c_str());
+	if(r) {
+		printf("Command failed: %i\n", r);
+		exit(r);
+	}
 
 	struct dirent* de = NULL;
 	DIR* d = NULL;
@@ -369,9 +374,13 @@ int main(int argc, char **argv) {
 				copyCmd.append( de->d_name );
 				copyCmd.append("\" \"");
 				copyCmd.append(outputDirPath);
-				system(copyCmd.c_str());
+				r = system(copyCmd.c_str());
+				if(r) {
+					printf("Command failed: %i\n", r);
+					exit(r);
+				}
 			}
-            de = readdir(d);
+			de = readdir(d);
 		}
 		closedir(d);
 	}

@@ -11,7 +11,7 @@
 
 @interface benchdbTests : SenTestCase {
 @private
-    
+
 }
 
 @end

@@ -76,6 +76,9 @@ namespace MoSync
                 mBingMap.MapPan += new EventHandler<MapDragEventArgs>(
                     delegate(object from, MapDragEventArgs args)
                     {
+                        // update the visible area points
+                        mVisibleAreaUpperLeftCorner = mBingMap.BoundingRectangle.Northwest;
+                        mVisibleAreaLowerRightCorner = mBingMap.BoundingRectangle.Southeast;
                         /**
                          * post the event to MoSync runtime
                          */
@@ -115,7 +118,10 @@ namespace MoSync
                     MoSync.Util.RunActionOnMainThreadSync(() =>
                     {
                         MapPin pin = (MapPin)child;
-                        mBingMap.Children.Add(pin.Pushpin);
+                        if (!mBingMap.Children.Contains(pin.Pushpin))
+                        {
+                            mBingMap.Children.Add(pin.Pushpin);
+                        }
                     });
                 }
             }
@@ -301,10 +307,7 @@ namespace MoSync
                 {
                     if (value.Equals("true"))
                     {
-                        List<System.Device.Location.GeoCoordinate> points = new List<System.Device.Location.GeoCoordinate>();
-                        points.Add(mBingMap.Center);
-                        mBingMap.SetView(LocationRect.CreateLocationRect(points));
-                        mBingMap.ZoomLevel = mCenterZoomLevel;
+                        mBingMap.SetView(mBingMap.Center, mCenterZoomLevel);
                     }
                     else if (value.Equals("false"))
                     {

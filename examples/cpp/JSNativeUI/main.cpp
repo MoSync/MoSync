@@ -7,9 +7,9 @@
 
 #include <Wormhole/WebAppMoblet.h>
 #include <conprint.h>
-#include "MessageProtocol.h"
-#include "MessageStream.h"
-#include "MessageStreamJSON.h"
+#include <Wormhole/MessageProtocol.h>
+#include <Wormhole/MessageStream.h>
+#include <Wormhole/MessageStreamJSON.h>
 #include "NativeUIMessageHandler.h"
 #include "ResourceMessageHandler.h"
 
@@ -98,7 +98,7 @@ public:
 		{
 			 handleMessageStream(webView, data);
 		}
-		else if (protocol.isMessageArrayJSON())
+		else if (protocol.isMessageStreamJSON())
 		{
 			 handleMessageStreamJSON(webView, data);
 		}

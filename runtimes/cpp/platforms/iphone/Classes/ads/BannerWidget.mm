@@ -41,7 +41,8 @@
  */
 - (id)initWithHandle:(MAHandle) bannerHandle
 {
-    if (!view)
+    self = [super init];
+    if (self)
     {
         ADBannerView* bannerView = [[ADBannerView alloc] initWithFrame:CGRectZero];
         bannerView.requiredContentSizeIdentifiers = [NSSet setWithObject:ADBannerContentSizeIdentifierPortrait];
@@ -53,11 +54,13 @@
         // The widget's width and height must be set to a fix size.
         [super setPropertyWithKey:@MAW_WIDGET_WIDTH toValue:[NSString stringWithFormat:@"%d", BANNER_WIDTH]];
         [super setPropertyWithKey:@MAW_WIDGET_HEIGHT toValue:[NSString stringWithFormat:@"%d", BANNER_HEIGHT]];
-        view = bannerView;
+        self.view = bannerView;
+        [bannerView release];
+        bannerView = NULL;
     }
 
     mBannerHandle = bannerHandle;
-    return [super init];
+    return self;
 }
 
 /**
@@ -71,7 +74,7 @@
  */
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value
 {
-    ADBannerView* bannerView  = (ADBannerView*) view;
+    ADBannerView* bannerView  = (ADBannerView*) self.view;
     if ([key isEqualToString:@MA_ADS_ENABLED])
     {
         if ([value isEqualToString:@"true"])
@@ -118,7 +121,7 @@
  */
 - (NSString*)getPropertyWithKey: (NSString*)key
 {
-    ADBannerView* bannerView  = (ADBannerView*) view;
+    ADBannerView* bannerView  = (ADBannerView*) self.view;
     if ([key isEqualToString:@MA_ADS_WIDTH])
     {
         return [[NSString alloc] initWithFormat:@"%d", BANNER_WIDTH];

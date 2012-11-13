@@ -52,9 +52,6 @@ void ImageScreen::initialize(StackScreen* stackScreen)
 	mImageHandle = 0;
 	mStackScreen = stackScreen;
 	createUI();
-
-	//mBarcodeScanner = new BarcodeScanner();
-	//mBarcodeScanner->initiate();
 }
 
 /**
@@ -77,20 +74,13 @@ void ImageScreen::createUI()
 
 	// Add the layout as the root of the screen's widget tree.
 	mScreen->setMainWidget(mMainLayoutWidget);
-/*
-	mBarcodeLabel = new Label();
-	mBarcodeLabel->fillSpaceHorizontally();
-	mBarcodeLabel->wrapContentVertically();
-	mBarcodeLabel->setText("Barcode");
-	mMainLayoutWidget->addChild(mBarcodeLabel);
-*/
+
 	mImageWidget = new Image();
 
 	mImageWidget->fillSpaceHorizontally();
 	mImageWidget->fillSpaceVertically();
 
 	mMainLayoutWidget->addChild(mImageWidget);
-
 
 	mOKButton = new Button();
 
@@ -133,10 +123,6 @@ void ImageScreen::setImageDataHandle(MAHandle dataHandle)
 		//Set the image to the image widget
 	mImageWidget->setScaleMode(IMAGE_SCALE_PRESERVE_ASPECT);
 	mImageWidget->setImage(mImageHandle);
-
-	//mBarcodeScanner->uploadImage(mImageHandle);
-
-	//mBarcodeLabel->setText(mBarcodeScanner->getBarcode().c_str());
 }
 
 void ImageScreen::setImageDataRaw(int* data, int width, int height)
@@ -158,18 +144,4 @@ void ImageScreen::setImageDataRaw(int* data, int width, int height)
 	mImageWidget->setScaleMode(IMAGE_SCALE_PRESERVE_ASPECT);
 	mImageWidget->setImage(mImageHandle);
 
-/*
-	int res = maCreateImageFromData(
-			mImageHandle,
-				dataHandle,
-				0,
-				maGetDataSize(dataHandle));
-		if(res != RES_OK)
-	{
-		maPanic(res, "failed to create the image");
-	}
-		//Set the image to the image widget
-	mImageWidget->setScaleMode(IMAGE_SCALE_PRESERVE_ASPECT);
-	mImageWidget->setImage(mImageHandle);
-*/
 }

@@ -178,7 +178,7 @@ public class MoSyncThread extends Thread
 	MoSyncNativeUI mMoSyncNativeUI;
 	MoSyncFile mMoSyncFile;
 	// Module for device fonts.
-	MoSyncFont mMoSyncFont;
+	static MoSyncFont mMoSyncFont;
 	MoSyncCameraController mMoSyncCameraController;
 	MoSyncSMS mMoSyncSMS;
 	MoSyncSensor mMoSyncSensor;
@@ -1243,7 +1243,7 @@ public class MoSyncThread extends Thread
 		//mMemDataSection.position(address);
 		//IntBuffer ib = mMemDataSection.asIntBuffer();
 
-		IntBuffer ib = getMemorySlice(address, -1).asIntBuffer();
+		IntBuffer ib = getMemorySlice(address, -1).order(null).asIntBuffer();
 
 		int[] vertices = new int[count*2];
 		ib.get(vertices);
@@ -1305,7 +1305,7 @@ public class MoSyncThread extends Thread
 		//mMemDataSection.position(address);
 		//IntBuffer ib = mMemDataSection.asIntBuffer();
 
-		IntBuffer ib = getMemorySlice(address, -1).asIntBuffer();
+		IntBuffer ib = getMemorySlice(address, -1).order(null).asIntBuffer();
 
 		int[] vertices = new int[count*2];
 		ib.get(vertices);
@@ -1504,7 +1504,7 @@ public class MoSyncThread extends Thread
 	 * @param fontHandle A font handle.
 	 * @return The font handle object.
 	 */
-	public MoSyncFontHandle getMoSyncFont(int fontHandle)
+	public static MoSyncFontHandle getMoSyncFont(int fontHandle)
 	{
 		return mMoSyncFont.getMoSyncFont(fontHandle);
 	}
@@ -1664,7 +1664,7 @@ public class MoSyncThread extends Thread
 		//mMemDataSection.position(mem);
 		//IntBuffer ib = mMemDataSection.asIntBuffer();
 
-		IntBuffer ib = getMemorySlice(mem, -1).asIntBuffer();
+		IntBuffer ib = getMemorySlice(mem, -1).order(null).asIntBuffer();
 
 		for (int y = 0; y < srcRectHeight; y++)
 		{

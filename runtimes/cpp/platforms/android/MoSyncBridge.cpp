@@ -330,7 +330,7 @@ static void nativePostEvent(JNIEnv* env, jobject jthis, jintArray eventBuffer)
 	// Build the event.
 	MAEvent event;
 	event.type = intArray[0];
-	event.data = NULL;
+	event.data = (MAAddress)NULL;
 
 	// Print log message.
 	char logBuf[256];
@@ -512,6 +512,11 @@ static void nativePostEvent(JNIEnv* env, jobject jthis, jintArray eventBuffer)
 		else if (widgetEventType == MAW_EVENT_ITEM_CLICKED)
 		{
 			widgetEvent->listItemIndex = intArray[3];
+		}
+		else if (widgetEventType == MAW_EVENT_SEGMENTED_LIST_ITEM_CLICKED)
+		{
+			widgetEvent->sectionIndex = intArray[3];
+			widgetEvent->sectionItemIndex = intArray[4];
 		}
 		else if (widgetEventType == MAW_EVENT_TAB_CHANGED)
 		{

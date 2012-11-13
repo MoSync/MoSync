@@ -1,0 +1,34 @@
+/**
+* The available widget properties for a #MAW_IMAGE. See \ref WidgetProperties "Widget properties" for more properties.
+*/
+group WidgetImageProperties "Image" {
+	constset MAString MAW_IMAGE_ {
+		/**
+		* Sets the image that will be displayed.
+		*
+		* @validvalue MoSync handle to an uncompressed image resource.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(buttonHandle, MAW_IMAGE_IMAGE, toString(R_MY_IMAGE));
+		* \endcode
+		*/
+		IMAGE = "image";
+
+		/**
+		* @brief Specifies what type of scaling should be applied to the image.
+		*
+		* @validvalue Either 'none', 'scaleXY' or 'scalePreserveAspect'. Default 'none'.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(imageHandle, MAW_IMAGE_SCALE_MODE, "scaleXY");
+		* \endcode
+		*/
+		SCALE_MODE = "scaleMode";
+	}
+} // end of WidgetImageProperties

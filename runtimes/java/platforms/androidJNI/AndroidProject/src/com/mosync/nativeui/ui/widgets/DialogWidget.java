@@ -109,7 +109,7 @@ public class DialogWidget extends Layout
 	 *        the index is -1 it will be added at the end.
 	 */
 	@Override
-	public void addChildAt(Widget child, int index)
+	public int addChildAt(Widget child, int index)
 	{
 		int listIndex = index;
 		if( index == -1 )
@@ -125,6 +125,8 @@ public class DialogWidget extends Layout
 		// Add child to layout
 		m_container.addView(child.getRootView(), listIndex);
 		m_dialogBuilder.setView(m_container);
+
+		return IX_WIDGET.MAW_RES_OK;
 	}
 
 	/**
@@ -136,11 +138,13 @@ public class DialogWidget extends Layout
 	 * @param child
 	 */
 	@Override
-	public void removeChild(Widget child)
+	public int removeChild(Widget child)
 	{
 		child.setParent( null );
 		m_children.remove( child );
 		m_container.removeView( child.getRootView( ) );
+
+		return IX_WIDGET.MAW_RES_OK;
 	}
 
 	/**

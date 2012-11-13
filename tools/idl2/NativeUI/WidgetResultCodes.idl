@@ -1,0 +1,72 @@
+/**
+* The available result codes for the widget api.
+*/
+group WidgetResultCodes "Widget result codes" {
+	constset int MAW_RES_ {
+		/**
+		* @brief Indicates that the call to a widget syscall was successful.
+		*/
+		OK = 0;
+
+		/**
+		* @brief Indicates that the call to a widget syscall was unsuccessful.
+		*/
+		ERROR = -2;
+
+		/**
+		* @brief Indicates that the call to maWidgetSetProperty or maWidgetGetProperty received an invalid property name.
+		*/
+		INVALID_PROPERTY_NAME = -2;
+
+		/**
+		* @brief Indicates that the call to maWidgetSetProperty or maWidgetGetProperty received an invalid property value.
+		*/
+		INVALID_PROPERTY_VALUE = -3;
+
+		/**
+		* @brief Indicates that the call to a widget function received an invalid handle.
+		*/
+		INVALID_HANDLE = -4;
+
+		/**
+		* @brief Indicates that the call maWidgetCreate received an invalid type name.
+		*/
+		INVALID_TYPE_NAME = -5;
+
+		/**
+		* @brief Indicates that the call to maWidgetInsertChild received an invalid index.
+		*/
+		INVALID_INDEX = -6;
+
+		/**
+		* @brief Indicates that the call maWidgetGetProperty needs a larger buffer.
+		*/
+		INVALID_STRING_BUFFER_SIZE = -7;
+
+		/**
+		* @brief Indicates that maWidgetScreenShow received an invalid (non-screen) widget handle.
+		*/
+		INVALID_SCREEN = -8;
+
+		/**
+		* @brief Indicates that the caller tried to add a widget to a non-layout.
+		*/
+		INVALID_LAYOUT = -9;
+
+		/**
+		* @brief Indicates that the caller tried to remove a visible root widget (screen) and the MoSync view will become visible.
+		*/
+		REMOVED_ROOT = -10;
+
+		/**
+		* @brief Indicates that a syscall tried to access a feature that is not supported by the current framework version.
+		*/
+		FEATURE_NOT_AVAILABLE = -11;
+
+		/**
+		* @brief Indicates that a syscall tried to add a dialog to a parent, which cannot be done because dialogs are in fact
+		* containers for other widgets.
+		*/
+		CANNOT_INSERT_DIALOG = -12;
+	}
+} // end of WidgetResultCodes

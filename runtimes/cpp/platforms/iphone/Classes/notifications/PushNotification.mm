@@ -49,7 +49,7 @@
     [mSoundFileName release];
     [mBadgeIcon release];
 
-    [super release];
+    [super dealloc];
 }
 
 @end

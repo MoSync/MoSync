@@ -1,0 +1,50 @@
+/**
+* The available widget properties for a #MAW_NUMBER_PICKER. See \ref WidgetProperties "Widget properties" for more properties.
+*/
+group WidgetNumberPickerProperties "Number Picker" {
+	constset MAString MAW_NUMBER_PICKER_ {
+		/**
+		* @brief Sets or gets the current value for the number picker.
+		* If the value is less than MAW_NUMBER_PICKER_MIN_VALUE property value, the current value is set to min.
+		* If the value is greater than MAW_NUMBER_PICKER_MAX_VALUE value, the current value is set to max.
+		*
+		* @validvalue A valid int.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(numberPickerHandle, MAW_NUMBER_PICKER_VALUE, "50");
+		* \endcode
+		*/
+		VALUE = "value";
+
+		/**
+		* @brief Sets or gets the min value of the picker.
+		*
+		* @validvalue An int that specifies the minimum value.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(numberPickerHandle, MAW_NUMBER_PICKER_MIN_VALUE, "0");
+		* \endcode
+		*/
+		MIN_VALUE = "minValue";
+
+		/**
+		* @brief Sets or gets the max value of the picker.
+		*
+		* @validvalue An int that specifies the maximum value.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(numberPickerHandle, MAW_NUMBER_PICKER_MAX_VALUE, "100");
+		* \endcode
+		*/
+		MAX_VALUE = "maxValue";
+	}
+} // end of WidgetNumberPickerProperties

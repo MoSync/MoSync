@@ -1,0 +1,49 @@
+/**
+* The available widget properties for a #MAW_SCREEN. See \ref WidgetProperties "Widget properties" for more properties.
+*/
+group WidgetScreenProperties "Screen" {
+	constset MAString MAW_SCREEN_ {
+		/**
+		* @brief Sets the title of a screen. The screen title is used by tab screen to display a text on the tab indicator.
+		*
+		* @validvalue Null terminated string. The length of the string should be short enough to fit in a tab indicator.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(screenHandle, MAW_SCREEN_TITLE, "My title");
+		* \endcode
+		*/
+		TITLE = "title";
+
+		/**
+		* @brief Sets an icon for a screen. The icon is used by a tab screen to display an icon on the tab indicator.
+		*
+		* @validvalue MoSync handle to an uncompressed image resource. The size of the image should be small enough to fit in a tab indicator.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(screenHandle, MAW_SCREEN_ICON, toString(R_MY_ICON));
+		* \endcode
+		*/
+		ICON = "icon";
+
+		/**
+		* @brief Remove the options menu from this screen.
+		* The options menu can be added by calling \ref maWidgetScreenAddOptionsMenuItem for each item.
+		*
+		* @validvalue No value needed.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(screenHandle, MAW_SCREEN_REMOVE_OPTIONS_MENU, "");
+		* \endcode
+		*/
+		REMOVE_OPTIONS_MENU = "removeoptionsmenu";
+	}
+} // end of WidgetScreenProperties

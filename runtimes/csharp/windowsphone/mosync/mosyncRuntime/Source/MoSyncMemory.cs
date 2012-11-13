@@ -200,7 +200,9 @@ namespace MoSync
 
 		public void WriteFromStream(int dstaddress, Stream stream, int length)
 		{
-			stream.Read(mData, dstaddress, length);
+			int res = stream.Read(mData, dstaddress, length);
+			if (res != length)
+				throw new Exception("WriteFromStream(" + length + ") returned " + res);
 		}
 
 		public void FillRange(int dstaddress, byte val, int length)
