@@ -15,6 +15,12 @@
  02111-1307, USA.
  */
 
+// Constants for map's rect
+#define MAP_RECT_X 0
+#define MAP_RECT_Y 0
+#define MAP_RECT_WIDTH 100
+#define MAP_RECT_HEIGHT 100
+
 #import "MapWidget.h"
 #import "MapPinWidget.h"
 #include <helpers/cpp_defs.h>
@@ -56,7 +62,10 @@
     self = [super init];
     if(self)
     {
-		MKMapView *mapView = [[MKMapView alloc] init];
+		MKMapView *mapView = [[MKMapView alloc] initWithFrame:CGRectMake(MAP_RECT_X,
+                                                                         MAP_RECT_Y,
+                                                                         MAP_RECT_WIDTH,
+                                                                         MAP_RECT_HEIGHT)];
 		mapView.delegate = self;
         self.view = mapView;
 		currentMapZoomLevel = 0;
