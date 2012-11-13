@@ -112,7 +112,7 @@ namespace NativeUI
 		 * Gets a list item from this section.
 		 * @param index The index of the item.
 		 */
-		void getItem(int index);
+		ListViewItem* getItem(int index);
 
 		/**
 		 * Set section title.

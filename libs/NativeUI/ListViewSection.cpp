@@ -96,9 +96,9 @@ namespace NativeUI
 	 * Gets a list item from this section.
 	 * @param index The index of the item.
 	 */
-	void ListViewSection::getItem(int index)
+	ListViewItem* ListViewSection::getItem(int index)
 	{
-		this->getChild(index);
+		return (ListViewItem*) this->getChild(index);
 	}
 
 	/**
