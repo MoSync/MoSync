@@ -70,6 +70,7 @@ FileUtils.cp "Classes/MoSyncViewController.mm", "template/Classes/MoSyncViewCont
 FileUtils.cp "Icon-72.png", "template"
 FileUtils.cp "Icon.png", "template"
 FileUtils.cp "Default-568h@2x.png", "template"
+FileUtils.cp "Icon@2x.png", "template"
 FileUtils.cp "MoSync_Prefix.pch", "template/MoSync_Prefix.pch"
 FileUtils.cp "main.m", "template/main.m"
 FileUtils.cp "../../../../intlibs/helpers/maapi_defs.h", "template/Classes/helpers/maapi_defs.h"
