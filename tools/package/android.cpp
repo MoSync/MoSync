@@ -283,9 +283,9 @@ static string writeManifest(const SETTINGS& s, const RuntimeInfo& ri) {
 	string manifestXml = dstDir + "/AndroidManifest.xml";
 	ProfileDB db;
 	string androidProfilesDir = db.profilesdir("Android");
-	string manifestTemplate = s.androidManifestTemplate ?
+	string manifestTemplate = file(s.androidManifestTemplate ?
 			string(s.androidManifestTemplate) :
-			androidProfilesDir + "/AndroidManifest.template";
+			androidProfilesDir + "/AndroidManifest.template");
 	fromTemplate(manifestTemplate.c_str(), manifestXml.c_str(), s, ri);
 
 	return manifestXml;
