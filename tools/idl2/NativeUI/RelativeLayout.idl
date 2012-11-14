@@ -1,0 +1,36 @@
+group WidgetRelativeLayoutProperties "Relative layout" {
+	constset MAString MAW_RELATIVE_LAYOUT_{
+		/**
+		* @brief Sets the isScrollable boolean
+		*
+		* @validvalue "true" or "false", for "true" the layout will become scrollable otherwise it will become unscrollable
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(verticalLayoutHandle, MAW_RELATIVE_LAYOUT_SCROLLABLE, "true");
+		* \endcode
+		*/
+		SCROLLABLE = "scrollable";
+
+		/**
+		* @brief Sets the content offset. The layout will be scrolled to the given coordinate.
+		* Platform: iOS.
+		*
+		* @validvalue Two int values separated by dash "-". The first int value represents the x coord and
+		* the second value represents the y coord.
+		* If the value is not as described the content offset will not be set and syscall will return
+		* #MAW_RES_INVALID_PROPERTY_VALUE.
+		* The default value is (0,0).
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(verticalLayoutHandle, MAW_RELATIVE_LAYOUT_SCROLLABLE, "30-30");
+		* \endcode
+		*/
+		CONTENT_OFFSET = "contentOffset";
+	}
+}

@@ -110,7 +110,7 @@ class RuntimeBuilder
 
 		Dir.chdir "../../runtimes/java/platforms/androidJNI"
 
-		sh("ruby buildJNI.rb #{android_ndk} #{android_sdk} #{android_tools} #{runtime_dir} #{version} #{debug}")
+		sh("ruby buildJNI.rb \"#{android_ndk}\" \"#{android_sdk}\" \"#{android_tools}\" \"#{runtime_dir}\" #{version} #{debug}")
 
 		Dir.chdir cpath
 

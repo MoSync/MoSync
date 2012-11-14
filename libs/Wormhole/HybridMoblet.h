@@ -91,6 +91,11 @@ public:
 	virtual void openWormhole(MAHandle webViewHandle);
 
 	/**
+	 * Creates the main UI elements, but does not connect them.
+	 */
+	virtual void createUI();
+
+	/**
 	 * Get the WebView widget displayed by this moblet.
 	 * @return Pointer to the WebView instance.
 	 */
@@ -204,6 +209,17 @@ public:
 	virtual void callJS(
 		MAWidgetHandle webViewHandle,
 		const MAUtil::String& script);
+
+
+	/**
+	 * Sends the Device Screen size to JavaScript.
+	 */
+	virtual void sendDeviceScreenSizeToJavaScript();
+
+	/**
+	 * Sends the web view handle to JavaScript.
+	 */
+	virtual void sendWebViewHandleToJavaScript();
 
 	/**
 	 * Enable JavaScript to C++ communication.

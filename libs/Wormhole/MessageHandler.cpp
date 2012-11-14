@@ -77,18 +77,6 @@ void MessageHandler::openWormhole(
 	MAWidgetHandle webViewHandle,
 	Wormhole::HybridMoblet* moblet)
 {
-	// Send the Device Screen size to JavaScript.
-	MAExtent scrSize = maGetScrSize();
-	int width = EXTENT_X(scrSize);
-	int height = EXTENT_Y(scrSize);
-	char buf[512];
-	sprintf(
-		buf,
-		"mosync.nativeui.setScreenSize(%d,%d)",
-		width,
-		height);
-	moblet->callJS(webViewHandle, buf);
-
 	// Initialize PhoneGap.
 	mPhoneGapMessageHandler->initializePhoneGap();
 }

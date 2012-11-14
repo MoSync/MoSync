@@ -1,0 +1,48 @@
+/**
+* The available widget properties for a #MAW_SEARCH_BAR. See \ref WidgetProperties "Widget properties" for more properties.
+*/
+group WidgetSearchBarProperties "Search bar" {
+	constset MAString MAW_SEARCH_BAR_ {
+		/**
+		* @brief Set or get the current text of the search bar.
+		*
+		* @validvalue A null-terminated string.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(searchBarHandle, MAW_SEARCH_BAR_TEXT, "My search query");
+		* \endcode
+		*/
+		TEXT = "text";
+
+		/**
+		* @brief Set a text in the search bar that acts as a placeholder when an edit box is empty.
+		*
+		* @validvalue A null-terminated string.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(searchBarHandle, MAW_SEARCH_BAR_PLACEHOLDER, "Search...");
+		* \endcode
+		*/
+		PLACEHOLDER = "placeholder";
+
+		/**
+		* @brief Shows or hides the virtual keyboard. If shown the focus will be set to this widget.
+		*
+		* @validvalue A boolean string 'true' or 'false'.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(searchBarHandle, MAW_SEARCH_BAR_SHOW_KEYBOARD, "true");
+		* \endcode
+		*/
+		SHOW_KEYBOARD = "showKeyboard";
+	}
+} // end of WidgetSearchBarProperties

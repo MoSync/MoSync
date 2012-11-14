@@ -86,7 +86,7 @@ int StringPrintFunctor::operator()(const char* fmt, ...) {
 		}
 	}
 	return len;
-}	
+}
 
 const TypeBase* TypeBase::deref() const {
 	return NULL;
@@ -209,10 +209,10 @@ void PointerType::printTypeMI(printfPtr pf, bool complex) const {
 	if(mTarget->type() == eArray) {
 		ArrayType* arrayType = (ArrayType*)mTarget->resolve();
 		arrayType->mElemType->printTypeMI(pf, complex);
-		pf(" (*)[%i]", arrayType->mLength);	
+		pf(" (*)[%i]", arrayType->mLength);
 		return;
 	}
-	
+
 	mTarget->printTypeMI(pf, complex);
 	pf(" *");
 }
@@ -240,7 +240,7 @@ void FunctionType::addParam(const TypeBase* p) {
 }
 void FunctionType::printMI(printfPtr pf, const void* data, TypeBase::PrintFormat fmt) const {
 	//relies on data being a MoSync function pointer.
-	pf("0x%p", data);
+	pf("0x%x", (int)(size_t)data);
 }
 void FunctionType::printTypeMI(printfPtr pf, bool complex) const {
 	mReturnType->printTypeMI(pf, false);
@@ -289,7 +289,7 @@ void StructType::printTypeMI(printfPtr pf, bool complex) const {
 #endif
 	if(complex) {
 		pf("struct %s", mName.c_str());
-		
+
 		if(mBases.size()) pf(" : ");
 
 		for(size_t i=0; i<mBases.size(); i++) {
@@ -302,7 +302,7 @@ void StructType::printTypeMI(printfPtr pf, bool complex) const {
 		pf(" {\n");
 		for(size_t i=0; i<mDataMembers.size(); i++) {
 			const TypeBase* tb = mDataMembers[i].type->resolve();
-			
+
 			if(tb->type() == ePointer) {
 #if 0
 				if(mName == "Widget") {
@@ -443,7 +443,7 @@ void EnumType::printTypeMI(printfPtr pf, bool complex) const {
 	pf("%s", mName.c_str());
 	if(complex) {
 		//todo: print members, specifying values for member that had values specified in source,
-		//name only for the other members. 
+		//name only for the other members.
 		// added by niklas, don't know if this is right though.
 		pf("{\n");
 		for(size_t i=0; i<mMembers.size(); i++) {

@@ -10,9 +10,9 @@
 #include "MAHeaders.h" // Defines BEEP_WAV
 
 // Namespaces we want to access.
-using namespace MAUtil; // Class Moblet
-using namespace NativeUI; // WebView widget.
-using namespace Wormhole; // Wormhole library.
+using namespace MAUtil;
+using namespace NativeUI;
+using namespace Wormhole;
 
 /**
  * The application class.

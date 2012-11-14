@@ -24,7 +24,7 @@
 #include "util.h"
 #include "tools.h"
 #include "helpers/mkdir.h"
-#include "filelist/copyFiles.h"
+#include "filelist/copyfiles.h"
 
 #if defined (WIN32) || defined(_WIN32)
 #define PLATFORM_WIN32

@@ -1,0 +1,65 @@
+/**
+* The available constants for the Android predefined drawables used in OptionsMenu.
+* The drawables can be set via \ref maWidgetScreenAddOptionsMenuItem syscall.
+* The icons can be found here: http://androiddrawables.com/menu.html .
+* Note that only these are supported on WP7:
+*	- ADD
+*	- CAMERA
+*	- CLOSE_CLEAR_CANCEL
+*	- DELETE
+*	- EDIT
+*	- GALLERY
+*	- HELP
+*	- MORE
+*	- PREFERENCES
+*	- SAVE
+*	- SEARCH
+*	- SHARE
+*	- UPLOAD
+*	- UPLOAD_YOU_TUBE
+*/
+group OptionsMenuIconConstants "Options menu icon" {
+	constset MAString MAW_OPTIONS_MENU_ICON_CONSTANT_ {
+		ADD = "17301555" ;
+		AGENDA = "17301556" ;
+		ALWAYS_LANDSCAPE_PORTRAIT = "17301557" ;
+		CALL = "17301558" ;
+		CAMERA = "17301559" ;
+		CLOSE_CLEAR_CANCEL = "17301560" ;
+		COMPASS = "17301561" ;
+		CROP = "17301562" ;
+		DAY =  "17301563" ;
+		DELETE = "17301564" ;
+		DIRECTIONS = "17301565" ;
+		EDIT = "17301566" ;
+		GALLERY = "17301567" ;
+		HELP = "17301568" ;
+		INFO_DETAILS = "17301569" ;
+		MANAGE = "17301570" ;
+		MAPMODE = "17301571" ;
+		MONTH = "17301572" ;
+		MORE = "17301573" ;
+		MY_CALENDAR = "17301574" ;
+		MYLOCATION = "17301575" ;
+		MYPLACES = "17301576" ;
+		PREFERENCES = "17301577" ;
+		RECENT_HISTORY = "17301578" ;
+		REPORT_IMAGE = "17301579" ;
+		REVERT = "17301580" ;
+		ROTATE = "17301581" ;
+		SAVE = "17301582" ;
+		SEARCH = "17301583" ;
+		SEND = "17301584" ;
+		SET_AS = "17301585" ;
+		SHARE = "17301586" ;
+		SLIDESHOW = "17301587" ;
+		SORT_ALPHABETICALLY = "17301660" ;
+		SORT_BY_SIZE = "17301661" ;
+		TODAY = "17301588" ;
+		UPLOAD = "17301589" ;
+		UPLOAD_YOU_TUBE = "17301590" ;
+		VIEW = "17301591" ;
+		WEEK = "17301592" ;
+		ZOOM = "17301593" ;
+	}
+} // end of OptionsMenuIconConstants

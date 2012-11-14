@@ -1,0 +1,62 @@
+/**
+* The available widget properties for a #MAW_SLIDER. See \ref WidgetProperties "Widget properties" for more properties.
+*/
+group WidgetSliderProperties "Slider" {
+	constset MAString MAW_SLIDER_ {
+		/**
+		* @brief Sets or gets the range of the slider to 0..max.
+		*
+		* @validvalue An positive integer that specifies the upper range of this slider.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(sliderHandle, MAW_SLIDER_MAX, "100");
+		* \endcode
+		*/
+		MAX = "max";
+
+		/**
+		* @brief Set or gets the current value to the slider.
+		*
+		* @validvalue An int that specifies the new value, between 0 and max value. See \ref MAW_SLIDER_MAX.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(sliderHandle, MAW_SLIDER_VALUE, "10");
+		* \endcode
+		*/
+		VALUE = "value";
+
+		/**
+		* @brief Increase the current value of the slider by the specified amount.
+		*
+		* @validvalue An int that specifies the amount by which the slider value must be increased.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(sliderHandle, MAW_SLIDER_INCREASE_VALUE, "20");
+		* \endcode
+		*/
+		INCREASE_VALUE = "increaseValue";
+
+		/**
+		* @brief Decreases the current value of the slider by the specified amount.
+		*
+		* @validvalue An int that specifies the amount by which the slider value must be decreased.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(sliderHandle, MAW_SLIDER_DECREASE_VALUE, "20");
+		* \endcode
+		*/
+		DECREASE_VALUE = "decreaseValue";
+	}
+} // end of WidgetSliderProperties
