@@ -19,6 +19,7 @@ package com.mosync.nativeui.ui.widgets;
 
 import android.text.InputFilter;
 import android.text.InputType;
+import android.view.Gravity;
 import android.widget.EditText;
 
 import com.mosync.internal.generated.IX_WIDGET;
@@ -50,6 +51,7 @@ public class EditBoxWidget extends LabelWidget
 	public EditBoxWidget(int handle, EditText editView)
 	{
 		super( handle, editView );
+		editView.setGravity( Gravity.LEFT );
 		// TODO Auto-generated constructor stub
 	}
 

@@ -27,8 +27,6 @@
 #include <NativeUI/MapLocation.h>
 #include <mastdlib.h>
 
-#define HORIZONTAL_LAYOUT_HEIGHT 40
-
 /**
  * Constructor.
  */
@@ -123,7 +121,7 @@ void MainScreen::createMapPinLayout()
 	// and add it to the main layout
 	mPinsLayout = new HorizontalLayout();
 	mPinsLayout->fillSpaceHorizontally();
-	mPinsLayout->setHeight(HORIZONTAL_LAYOUT_HEIGHT);
+	mPinsLayout->wrapContentVertically();
 
 	mAddPinToMap = new Button();
 	mAddPinToMap->fillSpaceHorizontally();
@@ -147,7 +145,7 @@ void MainScreen::createVisibleAreaLayout()
 	// and add it to the main layout
 	mVisibleAreaLayout = new HorizontalLayout();
 	mVisibleAreaLayout->fillSpaceHorizontally();
-	mVisibleAreaLayout->setHeight(HORIZONTAL_LAYOUT_HEIGHT);
+	mVisibleAreaLayout->wrapContentVertically();
 
 	mGetVisibleAreaButton = new Button();
 	mGetVisibleAreaButton->setText("Get visible area ");
@@ -178,7 +176,7 @@ void MainScreen::createZoomLevelLayout()
 	// button and the zoom level edit box and add it to the main layout
 	mZoomLevelLayout = new HorizontalLayout();
 	mZoomLevelLayout->fillSpaceHorizontally();
-	mZoomLevelLayout->setHeight(HORIZONTAL_LAYOUT_HEIGHT);
+	mZoomLevelLayout->wrapContentVertically();
 
 	mSetZoomLevel = new Button();
 	mSetZoomLevel->setText("Set Z level");
