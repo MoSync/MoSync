@@ -1147,6 +1147,7 @@ public class MoSyncNetwork
 
 			mUrlConnection.setAllowUserInteraction(true);
 			mUrlConnection.setUseCaches(false);
+			mUrlConnection.setDoOutput(true);
 
 			HttpURLConnection httpConnection =
 				(HttpURLConnection) mUrlConnection;
