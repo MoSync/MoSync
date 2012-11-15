@@ -225,6 +225,14 @@ namespace NativeUI
 					listViewItem);
 			}
 		}
+		else if (MAW_EVENT_SEGMENTED_LIST_ITEM_INSERT_BTN == widgetEventData->eventType)
+		{
+			this->notifyListenersClickedInsertButton(widgetEventData);
+		}
+		else if (MAW_EVENT_SEGMENTED_LIST_ITEM_DELETE_BTN == widgetEventData->eventType)
+		{
+			this->notifyListenersClickedDeleteButton(widgetEventData);
+		}
 	}
 
 	/**
@@ -333,6 +341,52 @@ namespace NativeUI
 		}
 
 		return style;
+	}
+
+	/**
+	 * Notify listeners when receiving #MAW_EVENT_SEGMENTED_LIST_ITEM_INSERT_BTN.
+	 * @param widgetEventData Event's data.
+	 */
+	void ListView::notifyListenersClickedInsertButton(
+		MAWidgetEventData* widgetEventData)
+	{
+		int sectionClickedIndex = widgetEventData->sectionIndex;
+		int itemIndexWithinSection = widgetEventData->sectionItemIndex;
+		ListViewSection* listViewSection = (ListViewSection*)
+			this->getChild(sectionClickedIndex);
+		ListViewItem* listViewItem = (ListViewItem*)
+			listViewSection->getChild(itemIndexWithinSection);
+
+		for (int i = 0; i < mListViewListeners.size(); i++)
+		{
+			mListViewListeners[i]->segmentedListViewItemInsert(
+				this,
+				listViewSection,
+				listViewItem);
+		}
+	}
+
+	/**
+	 * Notify listeners when receiving #MAW_EVENT_SEGMENTED_LIST_ITEM_DELETE_BTN.
+	 * @param widgetEventData Event's data.
+	 */
+	void ListView::notifyListenersClickedDeleteButton(
+		MAWidgetEventData* widgetEventData)
+	{
+		int sectionClickedIndex = widgetEventData->sectionIndex;
+		int itemIndexWithinSection = widgetEventData->sectionItemIndex;
+		ListViewSection* listViewSection = (ListViewSection*)
+			this->getChild(sectionClickedIndex);
+		ListViewItem* listViewItem = (ListViewItem*)
+			listViewSection->getChild(itemIndexWithinSection);
+
+		for (int i = 0; i < mListViewListeners.size(); i++)
+		{
+			mListViewListeners[i]->segmentedListViewItemDelete(
+				this,
+				listViewSection,
+				listViewItem);
+		}
 	}
 
 } // namespace NativeUI
