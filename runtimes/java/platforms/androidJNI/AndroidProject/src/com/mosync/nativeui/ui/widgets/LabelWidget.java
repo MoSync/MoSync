@@ -72,7 +72,7 @@ public class LabelWidget extends Widget
 	public LabelWidget(int handle, TextView view)
 	{
 		super( handle, view );
-		view.setGravity(mHorizontalGravity | mVerticalGravity);
+		view.setGravity( Gravity.CENTER );
 	}
 
 	/**

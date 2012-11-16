@@ -28,6 +28,7 @@ import com.mosync.internal.android.MoSyncThread;
 import com.mosync.internal.android.MoSyncFont.MoSyncFontHandle;
 import com.mosync.internal.generated.IX_WIDGET;
 import com.mosync.nativeui.core.NativeUI;
+import com.mosync.nativeui.core.Types;
 import com.mosync.nativeui.util.properties.ColorConverter;
 import com.mosync.nativeui.util.properties.FloatConverter;
 import com.mosync.nativeui.util.properties.HorizontalAlignment;
@@ -111,6 +112,10 @@ public class ListItemWidget extends Layout
 			}
 			else
 				throw new InvalidPropertyValueException(property, value);
+		}
+		else if( property.equals(Types.WIDGET_PROPERTY_HORIZONTAL_ALIGNMENT))
+		{
+			alignLabelHorizontally(value);
 		}
 		else
 		{

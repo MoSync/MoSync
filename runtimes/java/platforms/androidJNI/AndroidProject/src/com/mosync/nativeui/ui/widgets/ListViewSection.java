@@ -125,7 +125,7 @@ public class ListViewSection extends Layout
 			listIndex = mItems.size();
 			// If segmented list, add the item always before the footer,
 			// before the last position.
-			if ( mSectionType == IX_WIDGET.MAW_LIST_VIEW_SECTION_TYPE_SEGMENTED ||
+			if ( (mSectionType == IX_WIDGET.MAW_LIST_VIEW_SECTION_TYPE_SEGMENTED && hasFooter())||
 					(mSectionType == IX_WIDGET.MAW_LIST_VIEW_SECTION_TYPE_ALPHABETICAL
 					&& hasFooter()) )
 			{
@@ -359,6 +359,8 @@ public class ListViewSection extends Layout
 			itemWidget.setProperty(
 					IX_WIDGET.MAW_LIST_VIEW_ITEM_FONT_SIZE,
 					Integer.toString(HEADER_DEFAULT_FONT_SIZE));
+			itemWidget.alignLabelHorizontally(
+					IX_WIDGET.MAW_ALIGNMENT_LEFT);
 			itemWidget.setItemType(ITEM_VIEW_TYPE_HEADER);
 		}
 		else if ( itemType == ITEM_VIEW_TYPE_FOOTER)
@@ -369,6 +371,8 @@ public class ListViewSection extends Layout
 			itemWidget.setProperty(
 					IX_WIDGET.MAW_LIST_VIEW_ITEM_FONT_SIZE,
 					Integer.toString(FOOTER_DEFAULT_FONT_SIZE));
+			itemWidget.alignLabelHorizontally(
+					IX_WIDGET.MAW_ALIGNMENT_LEFT);
 			itemWidget.setItemType(ITEM_VIEW_TYPE_FOOTER);
 		}
 		else
@@ -546,13 +550,29 @@ public class ListViewSection extends Layout
 	}
 
 	/**
-	 * Set the footer label text.
+	 * Set the footer label text to a segmented section.
+	 * The footer is added by default, so if the text
+	 * is an empty string, remove the footer.
 	 * @param text
 	 */
 	public void setFooterText(final String text)
 	{
-		mItems.get(mItems.size()-1).setProperty(
-				IX_WIDGET.MAW_LIST_VIEW_ITEM_TEXT, text);
+		if ( text.isEmpty() )
+		{
+			// Remove the footer row.
+			m_children.remove(mItems.get(mItems.size()-1));
+
+			// Notify list adapter.
+			if (mAdapterListener != null)
+				mAdapterListener.itemRemoved(mItems.get(mItems.size()-1));
+			mItems.remove(mItems.get(mItems.size()-1));
+		}
+		else
+		{
+			// Just update the footer text.
+			mItems.get(mItems.size()-1).setProperty(
+					IX_WIDGET.MAW_LIST_VIEW_ITEM_TEXT, text);
+		}
 	}
 
 	/**

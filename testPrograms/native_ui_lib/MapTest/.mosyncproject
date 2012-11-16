@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project supports-build-configs="true" version="1.4">
+<project supports-build-configs="true" version="1.5">
 <build.cfg id="Debug" types="Debug"/>
 <build.cfg id="Release" types="Release"/>
 <criteria>
@@ -12,7 +12,7 @@
 <property key="build.prefs:additional.include.paths/Release" value=""/>
 <property key="build.prefs:additional.libraries" value="MAUtil.lib,nativeui.lib"/>
 <property key="build.prefs:additional.libraries/Debug" value="MAUtilD.lib,nativeuiD.lib"/>
-<property key="build.prefs:additional.libraries/Release" value="MAUtil.lib,nativeui.lib,rescompiler.lib"/>
+<property key="build.prefs:additional.libraries/Release" value="MAUtil.lib,nativeui.lib"/>
 <property key="build.prefs:additional.library.paths/Debug" value=""/>
 <property key="build.prefs:additional.library.paths/Release" value=""/>
 <property key="build.prefs:extra.link.sw/Debug" value=""/>

@@ -77,7 +77,20 @@ namespace NativeUI
      */
     int ImageButton::setImage(MAHandle image)
     {
-        return setPropertyInt(MAW_IMAGE_BUTTON_IMAGE, image);
+		int res = setPropertyInt(MAW_IMAGE_BUTTON_IMAGE, image);
+		mImageHandle = image;
+        return res;
+    }
+
+    /**
+     * Get the foreground image of the button.
+     * @return Any of the following result codes:
+     * - image MoSync handle to an uncompressed image resource.
+     * - #MAW_RES_INVALID_PROPERTY_VALUE if the image handle was invalid.
+     */
+    MAHandle ImageButton::getImage()
+    {
+		return mImageHandle;
     }
 
     /**
