@@ -61,7 +61,9 @@ public:
 	/**
 	 * Constructor.
 	 */
-	MessageStreamJSON(MAHandle dataHandle);
+	MessageStreamJSON(
+		MAWidgetHandle webViewHandle,
+		MAHandle dataHandle);
 
 	/**
 	 * Constructor.
@@ -75,6 +77,25 @@ public:
 	 * Destructor.
 	 */
 	virtual ~MessageStreamJSON();
+
+	/**
+	 * Get the WebView widget handle associated with this message.
+	 * @return Handle to WebView widget.
+	 */
+	MAWidgetHandle getWebViewHandle();
+
+	/**
+	 * Get the WebView object associated with this message.
+	 * @return WebView object.
+	 * @deprecated
+	 */
+	NativeUI::WebView* getWebView();
+
+	/**
+	 * Evaluate JavaScript the WebView associated with this message.
+	 * @param script JavaScript string.
+	 */
+	void callJS(const MAUtil::String& script);
 
 	/**
 	 * Move to the next message. Initially, the message
@@ -125,6 +146,17 @@ public:
 	void parse(MAHandle dataHandle);
 
 protected:
+	/**
+	 * The WebView widget handle of this message.
+	 */
+	MAWidgetHandle mWebViewHandle;
+
+	/**
+	 * The WebView widget handle of this message.
+	 * @deprecated
+	 */
+	NativeUI::WebView* mWebView;
+
 	/**
 	 * Table for message parameters.
 	 */
