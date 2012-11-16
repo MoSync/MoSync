@@ -52,7 +52,7 @@ namespace Wormhole
 		/**
 		 * Constructor.
 		 */
-		JSONMessage(MAHandle dataHandle);
+		JSONMessage(MAWidgetHandle webViewHandle, MAHandle dataHandle);
 
 		/**
 		 * Constructor.

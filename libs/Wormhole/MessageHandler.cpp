@@ -127,7 +127,7 @@ void MessageHandler::handleWebViewMessage(
 	Wormhole::MessageProtocol protocol(data);
 	if (protocol.isMessageStreamJSON())
 	{
-		handleMessageStreamJSON(data);
+		handleMessageStreamJSON(webViewHandle, data);
 	}
 	else if (protocol.isMessageStream())
 	{
@@ -142,11 +142,12 @@ void MessageHandler::handleWebViewMessage(
  * @param data The raw encoded JSON message array.
  */
 void MessageHandler::handleMessageStreamJSON(
+	MAWidgetHandle webViewHandle,
 	MAHandle data)
 {
 	// Create the message object. This parses the message data.
 	// The message object contains one or more messages.
-	Wormhole::JSONMessage message(data);
+	Wormhole::JSONMessage message(webViewHandle, data);
 
 	// Loop through messages.
 	while (message.next())
