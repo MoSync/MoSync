@@ -43,6 +43,7 @@ MA 02110-1301, USA.
 #include "SettingsScreen.h"
 #include "ImageScreen.h"
 
+#define FONT_HEIGHT_WP7			17
 
 using namespace MAUtil;
 using namespace NativeUI;
@@ -183,24 +184,17 @@ public:
 
 		if(isWP7())
 		{
-			mZoomInButton->setHeight(80);
-			mZoomInButton->setFontSize(17);
-			mZoomOutButton->setHeight(80);
-			mZoomOutButton->setFontSize(17);
-			mSettingsButton->setHeight(80);
-			mSettingsButton->setFontSize(17);
-			mShowLastImageButton->setHeight(80);
-			mShowLastImageButton->setFontSize(17);
-			mSecondLayoutWidget->setHeight(80);
+			mZoomInButton->setFontSize(FONT_HEIGHT_WP7);
+			mZoomOutButton->setFontSize(FONT_HEIGHT_WP7);
+			mSettingsButton->setFontSize(FONT_HEIGHT_WP7);
+			mShowLastImageButton->setFontSize(FONT_HEIGHT_WP7);
 		}
-		else
-		{
-			mZoomInButton->setHeight(60);
-			mZoomOutButton->setHeight(60);
-			mSettingsButton->setHeight(60);
-			mShowLastImageButton->setHeight(60);
-			mSecondLayoutWidget->setHeight(60);
-		}
+
+		mZoomInButton->wrapContentVertically();
+		mZoomOutButton->wrapContentVertically();
+		mSettingsButton->wrapContentVertically();
+		mShowLastImageButton->wrapContentVertically();
+		mSecondLayoutWidget->wrapContentVertically();
 
 		//Adding buttons to the horizontal Layout
 		mSecondLayoutWidget->addChild(mZoomInButton);
