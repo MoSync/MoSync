@@ -87,6 +87,19 @@ public:
 	MAWidgetHandle getWebViewHandle();
 
 	/**
+	 * Get the WebView object associated with this message.
+	 * @return WebView object.
+	 * @deprecated
+	 */
+	NativeUI::WebView* getWebView();
+
+	/**
+	 * Evaluate JavaScript the WebView associated with this message.
+	 * @param script JavaScript string.
+	 */
+	void callJS(const MAUtil::String& script);
+
+	/**
 	 * Get a pointer to the next string in the message stream,
 	 * and optionally get the length of the string.
 	 *
@@ -119,6 +132,12 @@ protected:
 	 * The WebView widget handle of this message.
 	 */
 	MAWidgetHandle mWebViewHandle;
+
+	/**
+	 * The WebView widget handle of this message.
+	 * @deprecated
+	 */
+	NativeUI::WebView* mWebView;
 
 public:
 	char* mData;
