@@ -205,6 +205,38 @@ void ListScreen::listViewItemClicked(
 }
 
 /**
+ * This method is called when an item's insert button is clicked.
+ * The list type must be segmented and in editing mode.
+ * Platform: iOS
+ * @param listView The list view object that generated the event.
+ * @param listViewSection The ListViewSection object that contains the item.
+ * @param listViewItem The item objet whose insert button was clicked.
+ */
+void ListScreen::segmentedListViewItemInsert(
+	ListView* listView,
+	ListViewSection* listViewSection,
+	ListViewItem* listViewItem)
+{
+	maAlert("List View", "Insert button was clicked", "Ok", NULL, NULL);
+}
+
+/**
+ * This method is called when an item's delete button is clicked.
+ * The list type must be segmented and in editing mode.
+ * Platform: iOS
+ * @param listView The list view object that generated the event.
+ * @param listViewSection The ListViewSection object that contains the item.
+ * @param listViewItem The item objet whose delete button was clicked.
+ */
+void ListScreen::segmentedListViewItemDelete(
+	ListView* listView,
+	ListViewSection* listViewSection,
+	ListViewItem* listViewItem)
+{
+	maAlert("List View", "Delete button was clicked", "Ok", NULL, NULL);
+}
+
+/**
  * This method is called when a segmented/alphabetical list view item is clicked.
  * @param listView The list view object that generated the event.
  * @param listViewSection The ListViewSection object that contains the selected item.

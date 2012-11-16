@@ -210,7 +210,6 @@ static NSString* kReuseIdentifier = @"Cell";
 @synthesize deleteButtonTitle = _deleteButtonTitle;
 @synthesize editingStyle = _editingStyle;
 @synthesize editable = _canEdit;
-@synthesize canMove = _canMove;
 
 /**
  * Init function.
@@ -879,10 +878,11 @@ static NSString* kReuseIdentifier = @"Cell";
             returnValue = MAW_RES_INVALID_PROPERTY_VALUE;
             break;
     }
-    if (returnValue != MAW_RES_OK)
+    if (returnValue == MAW_RES_OK)
     {
         self.editingStyle = style;
     }
+
     return returnValue;
 }
 
