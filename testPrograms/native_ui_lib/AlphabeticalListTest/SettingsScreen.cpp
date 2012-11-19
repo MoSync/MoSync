@@ -262,6 +262,9 @@ void SettingsScreen::createListViewPropertiesLayout()
 		modeSelectionLayout->addChild(setModeLabel);
 		mDisplayCheckBox = new CheckBox();
 		mDisplayCheckBox->setState(true);
+		listViewPropertiesVerticalLayout->addChild(modeSelectionLayout);
+
+		modeSelectionLayout = new HorizontalLayout();
 		Label* setDisplayLabel = new Label();
 		setDisplayLabel->setText("Display");
 		modeSelectionLayout->addChild(mDisplayCheckBox);
@@ -278,6 +281,7 @@ void SettingsScreen::createListViewPropertiesLayout()
 	}
 
 	ListViewItem* mListPropertiesItem = new ListViewItem();
+	mListPropertiesItem->setSelectionStyle(LIST_VIEW_ITEM_SELECTION_STYLE_NONE);
 	mListPropertiesItem->addChild(listViewPropertiesVerticalLayout);
 
 	mPropertiesListView->addChild(mListPropertiesItem);
@@ -340,6 +344,7 @@ void SettingsScreen::createListViewSectionPropertiesLayout()
 	}
 
 	ListViewItem* mListSectionPropertiesItem = new ListViewItem();
+	mListSectionPropertiesItem->setSelectionStyle(LIST_VIEW_ITEM_SELECTION_STYLE_NONE);
 	mListSectionPropertiesItem->addChild(listViewSectionPropertiesVerticalLayout);
 
 	mPropertiesListView->addChild(mListSectionPropertiesItem);
@@ -461,6 +466,7 @@ void SettingsScreen::createListViewItemPropertiesLayout()
 	}
 
 	ListViewItem* mListItemProperties = new ListViewItem();
+	mListItemProperties->setSelectionStyle(LIST_VIEW_ITEM_SELECTION_STYLE_NONE);
 	mListItemProperties->addChild(listViewItemPropertiesVerticalLayout);
 
 	mPropertiesListView->addChild(mListItemProperties);

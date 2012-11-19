@@ -395,18 +395,13 @@
  */
 - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    return YES;
-}
-
-/**
- * Verify if a given row can be moved to another location in the table view.
- * @param tableView The table-view object requesting this information.
- * @param indexPath An index path locating a row in tableView.
- * @return YES if the row can be moved; otherwise NO.
- */
-- (BOOL)tableView:(UITableView *)tableView canMoveRowAtIndexPath:(NSIndexPath *)indexPath
-{
-    return YES;
+    ListViewSectionWidget* section = [_children objectAtIndex:indexPath.section];
+    if (!section)
+    {
+        return 0;
+    }
+    ListViewItemWidget* cellWidget = [section cellWidgetAtIndex:indexPath.row];
+    return cellWidget.editable;
 }
 
 /**
@@ -427,6 +422,47 @@
     }
 
     return array;
+}
+
+/**
+ * Asks if to commit the insertion or deletion of a specified row in the receiver.
+ * @param tableView The table view object requesting the insertion or deletion.
+ * @param editingStyle he cell editing style corresponding to a insertion or deletion
+ * requested for the row specified by indexPath.
+ * @param indexPath An index path locating the row in tableView.
+ */
+- (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle
+forRowAtIndexPath:(NSIndexPath *)indexPath
+{
+	MAEvent event;
+	event.type = EVENT_TYPE_WIDGET;
+	MAWidgetEventData *eventData = new MAWidgetEventData;
+
+
+    int widgetEventType = MAW_RES_ERROR;
+    switch (editingStyle)
+    {
+        case UITableViewCellEditingStyleInsert:
+            widgetEventType = MAW_EVENT_SEGMENTED_LIST_ITEM_INSERT_BTN;
+            break;
+        case UITableViewCellEditingStyleDelete:
+            widgetEventType = MAW_EVENT_SEGMENTED_LIST_ITEM_DELETE_BTN;
+            break;
+        default:
+            widgetEventType = MAW_RES_ERROR;
+            break;
+    }
+
+    if (widgetEventType != MAW_RES_ERROR)
+    {
+        eventData->eventType = widgetEventType;
+        eventData->sectionIndex = indexPath.section;
+        eventData->sectionItemIndex = indexPath.row;
+
+        eventData->widgetHandle = self.handle;
+        event.data = (int)eventData;
+        Base::gEventQueue.put(event);
+    }
 }
 
 #pragma mark UITableViewDelegate
@@ -531,6 +567,7 @@
     {
         return UITableViewCellEditingStyleNone;
     }
+
     return cellWidget.editingStyle;
 }
 

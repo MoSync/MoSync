@@ -239,6 +239,18 @@ namespace NativeUI
 		 */
 		ListViewStyle getListViewStyleEnum(int listStyle);
 
+		/**
+		 * Notify listeners when receiving #MAW_EVENT_SEGMENTED_LIST_ITEM_INSERT_BTN.
+		 * @param widgetEventData Event's data.
+		 */
+		void notifyListenersClickedInsertButton(MAWidgetEventData* widgetEventData);
+
+		/**
+		 * Notify listeners when receiving #MAW_EVENT_SEGMENTED_LIST_ITEM_DELETE_BTN.
+		 * @param widgetEventData Event's data.
+		 */
+		void notifyListenersClickedDeleteButton(MAWidgetEventData* widgetEventData);
+
 	private:
 		/**
 		 * Array with list view listeners.

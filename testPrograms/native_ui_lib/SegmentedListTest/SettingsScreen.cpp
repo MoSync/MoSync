@@ -283,6 +283,7 @@ void SettingsScreen::createListViewPropertiesLayout()
 	}
 
 	ListViewItem* mListPropertiesItem = new ListViewItem();
+	mListPropertiesItem->setSelectionStyle(LIST_VIEW_ITEM_SELECTION_STYLE_NONE);
 	mListPropertiesItem->addChild(listViewPropertiesVerticalLayout);
 
 	mPropertiesListView->addChild(mListPropertiesItem);
@@ -349,6 +350,7 @@ void SettingsScreen::createListViewSectionPropertiesLayout()
 	}
 
 	ListViewItem* mListSectionPropertiesItem = new ListViewItem();
+	mListSectionPropertiesItem->setSelectionStyle(LIST_VIEW_ITEM_SELECTION_STYLE_NONE);
 	mListSectionPropertiesItem->addChild(listViewSectionPropertiesVerticalLayout);
 
 	mPropertiesListView->addChild(mListSectionPropertiesItem);
@@ -471,6 +473,7 @@ void SettingsScreen::createListViewItemPropertiesLayout()
 	}
 
 	ListViewItem* mListItemProperties = new ListViewItem();
+	mListItemProperties->setSelectionStyle(LIST_VIEW_ITEM_SELECTION_STYLE_NONE);
 	mListItemProperties->addChild(listViewItemPropertiesVerticalLayout);
 
 	mPropertiesListView->addChild(mListItemProperties);
@@ -748,6 +751,7 @@ void SettingsScreen::listScreenItemClicked(ListViewSection* &parentSection, List
 	mCurrentListViewSection = parentSection;
 	updateSelectedItemUI();
 }
+
 
 /**
  * Will show an options box so user can select the list view item selection

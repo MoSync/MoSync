@@ -413,6 +413,24 @@ group WidgetEvent "Widget event" {
 			* Available on Windows Phone 7, Android and iOS.
 			*/
 			SEGMENTED_LIST_ITEM_CLICKED = 34;
+
+			/**
+			* @brief Sent by a Segmented ListViewItem when its insert button is clicked.
+			* The event will contain the sectionIndex and the sectionItemIndex coresponding of the
+			* item. Insert button is visible only in editing mode and if its editing style is
+			* #MAW_LIST_VIEW_ITEM_EDIT_STYLE_INSERT.
+			* Available on iOS.
+			*/
+			SEGMENTED_LIST_ITEM_INSERT_BTN = 35;
+
+			/**
+			* @brief Sent by a Segmented ListViewItem when its delete button is clicked.
+			* The event will contain the sectionIndex and the sectionItemIndex coresponding of the
+			* item. The delete button is visible only in editing mode and if its editing style is
+			* #MAW_LIST_VIEW_ITEM_EDIT_STYLE_DELETE.
+			* Available on iOS.
+			*/
+			SEGMENTED_LIST_ITEM_DELETE_BTN = 36;
 		}
 	} // end of WidgetEventTypes
 } // end of WidgetEvent

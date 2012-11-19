@@ -53,7 +53,7 @@ import com.mosync.nativeui.util.properties.PropertyConversionException;
  *  - Alphabetical ( alphabetical indexed list view).
  * Based on the list type, sections can be created accordingly.
  *
- * @author fmattias
+ * @author fmattias and emma
  */
 public class ListLayout extends Layout
 	implements AdapterChangedListener
@@ -119,7 +119,6 @@ public class ListLayout extends Layout
 		mWidgetHandle = handle;
 		listView.setOnItemClickListener(
 				new ListOnItemClickListener( handle ) );
-		//listView.setFocusable(true);
 	}
 
 	@Override
@@ -169,15 +168,14 @@ public class ListLayout extends Layout
 			// Add the section to the section list.
 			section.setParent(this);
 			m_children.add(listIndex, child);
-			mSections.add(listIndex, section);
 
 			if ( mListType == IX_WIDGET.MAW_LIST_VIEW_TYPE_SEGMENTED )
-				addSegmentedSection(section, listIndex);
+				addSegmentedSection(section, index);
 			else
 			{
 				mAlphabeticalViewAdapter.reloadPreviewLetters();
 			}
-
+			mSections.add(listIndex, section);
 			// Set adapter listeners for each section.
 			section.setAdapterListener(this);
 		}
@@ -466,7 +464,6 @@ public class ListLayout extends Layout
 					}
 					// Store the selected state of the item.
 					mSelectedItemHandle = section.getItem(itemPosition).getHandle();
-
 					// The index ignores the header.
 					EventQueue.getDefault().
 							postSegmentedListItemClicked(m_handle, sectionIndex, itemPosition);
@@ -609,7 +606,19 @@ public class ListLayout extends Layout
 		@Override
 		public int getCount()
 		{
-			return m_views.size( );
+			if ( mListType == IX_WIDGET.MAW_LIST_VIEW_TYPE_DEFAULT)
+			{
+				return m_views.size( );
+			}
+			else
+			{
+				int items = 0;
+				for (int i=0; i < mSections.size(); i++)
+				{
+					items += mSections.get(i).itemsCount();
+				}
+				return items;
+			}
 		}
 
 		/**
@@ -730,6 +739,20 @@ public class ListLayout extends Layout
 				sectionPosition += section.itemsCount();
 			}
 			return mSections.get(sectionIndex).getItem(position-sectionPosition);
+		}
+
+		/**
+		 * @see BaseAdapter.getCount.
+		 */
+		@Override
+		public int getCount()
+		{
+			int items = 0;
+			for (int i=0; i < mSections.size(); i++)
+			{
+				items += mSections.get(i).itemsCount();
+			}
+			return items;
 		}
 	}
 

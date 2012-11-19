@@ -101,6 +101,32 @@ private:
 		ListViewSection* listViewSection,
 		ListViewItem* listViewItem);
 
+	/**
+	 * This method is called when an item's insert button is clicked.
+	 * The list type must be segmented and in editing mode.
+	 * Platform: iOS
+	 * @param listView The list view object that generated the event.
+	 * @param listViewSection The ListViewSection object that contains the item.
+	 * @param listViewItem The item objet whose insert button was clicked.
+	 */
+	virtual void segmentedListViewItemInsert(
+		ListView* listView,
+		ListViewSection* listViewSection,
+		ListViewItem* listViewItem);
+
+	/**
+	 * This method is called when an item's delete button is clicked.
+	 * The list type must be segmented and in editing mode.
+	 * Platform: iOS
+	 * @param listView The list view object that generated the event.
+	 * @param listViewSection The ListViewSection object that contains the item.
+	 * @param listViewItem The item objet whose delete button was clicked.
+	 */
+	virtual void segmentedListViewItemDelete(
+		ListView* listView,
+		ListViewSection* listViewSection,
+		ListViewItem* listViewItem);
+
     /**
      * This method is called if the touch-up event was inside the
      * bounds of the button.

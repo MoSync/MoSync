@@ -55,8 +55,10 @@ public class ButtonWidget extends LabelWidget
 
 		if( property.equals( IX_WIDGET.MAW_WIDGET_BACKGROUND_COLOR ) )
 		{
+			// Apply the background color.
+			return super.setProperty(property, value);
 			// Make sure bad values get caught, so that the API is consistent.
-			ColorConverter.convert( value );
+			//ColorConverter.convert( value );
 
 			// Ignore the background color of a button, since Android
 			// buttons do not have anything behind the button foreground.

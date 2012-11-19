@@ -119,6 +119,7 @@ public:
 	 * uses this format.
 	 */
 	virtual void handleMessageStreamJSON(
+		MAWidgetHandle webViewHandle,
 		MAHandle data);
 
 	/**
