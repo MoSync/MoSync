@@ -47,6 +47,12 @@ ifeq ($(ANDROID_API_BELOW_7),true)
 else
 	LOCAL_LDLIBS	:= -L$(SYSROOT)/usr/lib -llog -lGLESv1_CM -lGLESv2
 endif
-LOCAL_CFLAGS	+= -DFPM_ARM
+
+# define _android_16 for ICS and above
+ifeq ($(ANDROID_API_15_OR_ABOVE), true)
+	LOCAL_CFLAGS := -D_android_16
+endif
+
+LOCAL_CFLAGS	+= -DFPM_ARM -Wno-psabi
 
 include $(BUILD_SHARED_LIBRARY)

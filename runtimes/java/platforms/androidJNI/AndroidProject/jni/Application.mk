@@ -18,4 +18,14 @@ APP_BUILD_SCRIPT	:= $(MOSYNC_CPP_SRC)/Android.mk
 APP_PROJECT_PATH	:= $(MOSYNC_JAVA_SRC)/AndroidProject
 APP_MODULES			:= mosync
 
+# APP_CPPFLAGS		:= -D_android -Wno-psabi -I$(MOSYNC_CPP)/core -I$(MOSYNC_CPP)/base -I$(MOSYNC_CPP) -I$(MOSYNC_CPP_SRC) -I$(MOSYNC_SRC)/intlibs -I$(MOSYNC_JAVA_SRC)/src
+
+# Fix for running on Windows
+ifeq ($(MOSYNC_WINDOWS),true)
+MOSYNC_CPP := `cygpath -m $(MOSYNC_CPP)`
+MOSYNC_CPP_SRC := `cygpath -m $(MOSYNC_CPP_SRC)`
+MOSYNC_SRC := `cygpath -m $(MOSYNC_SRC)`
+MOSYNC_JAVA_SRC := `cygpath -m $(MOSYNC_JAVA_SRC)`
+endif
+
 APP_CPPFLAGS		:= -D_android -I$(MOSYNC_CPP)/core -I$(MOSYNC_CPP)/base -I$(MOSYNC_CPP) -I$(MOSYNC_CPP_SRC) -I$(MOSYNC_SRC)/intlibs -I$(MOSYNC_JAVA_SRC)/src

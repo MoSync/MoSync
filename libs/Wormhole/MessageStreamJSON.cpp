@@ -40,9 +40,24 @@ namespace Wormhole
 	 * Constructor. Here we parse the message.
 	 */
 	MessageStreamJSON::MessageStreamJSON(
+		MAWidgetHandle webViewHandle,
+		MAHandle dataHandle)
+	{
+		mWebViewHandle = webViewHandle;
+		mWebView = NULL;
+		mCurrentMessageIndex = -1;
+		parse(dataHandle);
+	}
+
+	/**
+	 * Constructor.
+	 * @deprecated
+	 */
+	MessageStreamJSON::MessageStreamJSON(
 		NativeUI::WebView* webView,
 		MAHandle dataHandle)
 	{
+		mWebViewHandle = webView->getWidgetHandle();
 		mWebView = webView;
 		mCurrentMessageIndex = -1;
 		parse(dataHandle);
@@ -63,12 +78,35 @@ namespace Wormhole
 	}
 
 	/**
-	 * Get the WebView widget associated with this message.
-	 * @return Pointer to WebView object.
+	 * Get the WebView widget handle associated with this message.
+	 * @return Handle to WebView widget.
+	 */
+	MAWidgetHandle MessageStreamJSON::getWebViewHandle()
+	{
+		return mWebViewHandle;
+	}
+
+	/**
+	 * Get the WebView object associated with this message.
+	 * @return WebView object.
+	 * @deprecated
 	 */
 	NativeUI::WebView* MessageStreamJSON::getWebView()
 	{
 		return mWebView;
+	}
+
+	/**
+	 * Evaluate JavaScript the WebView associated with this message.
+	 * @param script JavaScript string.
+	 */
+	void MessageStreamJSON::callJS(const MAUtil::String& script)
+	{
+		MAUtil::String url = "javascript:" + script;
+		maWidgetSetProperty(
+			mWebViewHandle,
+			MAW_WEB_VIEW_URL,
+			url.c_str());
 	}
 
 	/**

@@ -99,6 +99,7 @@ namespace MoSync
 				if (_child < 0 || _child >= mWidgets.Count)
 					return MoSync.Constants.MAW_RES_INVALID_HANDLE;
 				IWidget child = mWidgets[_child];
+                child.SetParent(parent);
                 parent.InsertChild(child, index);
                 return MoSync.Constants.MAW_RES_OK;
             };

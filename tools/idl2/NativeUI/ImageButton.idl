@@ -1,0 +1,137 @@
+/**
+* The available widget properties for a #MAW_IMAGE_BUTTON. See \ref WidgetProperties "Widget properties" for more properties.
+*/
+group WidgetImageButtonProperties "Image button" {
+	constset MAString MAW_IMAGE_BUTTON_ {
+		/**
+		* @brief Sets or gets the text that is displayed in the label.
+		* Note: It is not available on Android, as native image buttons do not have text attached.
+		* @validvalue A null-terminated string.
+		*
+		* @setandget
+		*
+		* @par Example set
+		* \code
+		*	maWidgetSetProperty(imageButtonHandle, MAW_IMAGE_BUTTON_TEXT, "My button");
+		* \endcode
+		*
+		* @par Example get
+		* \code
+		*	char textBuffer[BUFFER_SIZE];
+		*	int result = maWidgetGetProperty(imageButtonHandle, MAW_IMAGE_BUTTON_TEXT, textBuffer, BUFFER_SIZE);
+		*	if (result > 0)
+		*	{
+		*		// Do something with the label text.
+		*	}
+		* \endcode
+		*/
+		TEXT = "text";
+
+		/**
+		* @brief Sets the vertical alignment of the text inside the button. If the widget's height is WRAP_CONTENT this property has no effect.
+		*
+		* @validvalue One of the constants #MAW_ALIGNMENT_TOP, #MAW_ALIGNMENT_CENTER or #MAW_ALIGNMENT_BOTTOM.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(imageButtonHandle, MAW_IMAGE_BUTTON_TEXT_VERTICAL_ALIGNMENT, MAW_ALIGNMENT_CENTER);
+		* \endcode
+		*/
+		TEXT_VERTICAL_ALIGNMENT = "textVerticalAlignment";
+
+		/**
+		* @brief Sets the horizontal alignment of the text inside the button. If the widget's height is WRAP_CONTENT this property has no effect.
+		*
+		* @validvalue Takes one of the constants #MAW_ALIGNMENT_TOP, #MAW_ALIGNMENT_CENTER or #MAW_ALIGNMENT_BOTTOM.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(imageButtonHandle, MAW_IMAGE_BUTTON_TEXT_HORIZONTAL_ALIGNMENT, MAW_ALIGNMENT_CENTER);
+		* \endcode
+		*/
+		TEXT_HORIZONTAL_ALIGNMENT = "textHorizontalAlignment";
+
+		/**
+		* @brief Sets the font color of the button's text.
+		*
+		* @validvalue A hexadecimal value 0xRRGGBB, where R, G and B are the red, green and blue components respectively.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(imageButtonHandle, MAW_IMAGE_BUTTON_FONT_COLOR, "0xff0000");
+		* \endcode
+		*/
+		FONT_COLOR = "fontColor";
+
+		/**
+		* @brief Sets the font size in points of the button's text.
+		*
+		* @validvalue A float that specifies the number of pixels on Android
+		* and WP7, and number of points on iOS.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(imageButtonHandle, MAW_IMAGE_BUTTON_FONT_SIZE, "13.0");
+		* \endcode
+		*/
+		FONT_SIZE = "fontSize";
+
+		/**
+		* Sets the background image. This will be scaled to fit the whole widget (not keeping the aspect).
+		*
+		* @validvalue MoSync handle to an uncompressed image resource.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(imageButtonHandle, MAW_IMAGE_BUTTON_BACKGROUND_IMAGE, toString(R_MY_IMAGE));
+		* \endcode
+		*/
+		BACKGROUND_IMAGE = "backgroundImage";
+
+		/**
+		* Sets the foreground image of the button. This won't be scaled at all.
+		*
+		* @validvalue MoSync handle to an uncompressed image resource.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(imageButtonHandle, MAW_IMAGE_BUTTON_IMAGE, toString(R_MY_IMAGE));
+		* \endcode
+		*/
+		IMAGE = "image";
+
+		/**
+		* @brief Sets the typeface and style in which the text should be displayed.
+		*
+		* @validvalue A font handle received from loading fonts using
+		* #maFontGetName and #maFontLoadWithName syscalls.
+		* Note: It is not available on Android, as native image buttons do not have text attached.
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	int nrFonts = maFontGetCount();
+		*	 char buf[256];
+		*	 // Get first font name.
+		*	 maFontGetName(1, buf, 256);
+		*	 // Load that font for size 10.
+		*	 int fontHandle = maFontLoadWithName(buf, 10);
+		*	 // Set that font to the label.
+		*	maWidgetSetProperty(imageButtonHandle, MAW_IMAGE_BUTTON_FONT_HANDLE, toString(fontHandle));
+		* \endcode
+		*/
+		FONT_HANDLE = "fontHandle";
+	}
+} // end of WidgetImageButtonProperties

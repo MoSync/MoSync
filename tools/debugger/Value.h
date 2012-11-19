@@ -35,7 +35,7 @@ typedef Builtin::SubType PrimitiveType;
 // disables warning about using unary '-' on unsigned type.
 //#pragma warning(disable:4146)
 
-// also disabled warning 4800 
+// also disabled warning 4800
 // (that says that you can't typecast for instance doubles to bool)
 
 #include "stabs/stabs_builtins.h"
@@ -82,7 +82,7 @@ public:
 	TYPES(V_OPERATOR_CAST_ELEM_HEADER)
 
 	bool isDereferencable() const;
-	bool isPointer() const; 
+	bool isPointer() const;
 	Builtin::SubType getPrimitiveType() const;
 	TypeBase::Type getType() const;
 	const SYM& getSymbol() const;
@@ -103,7 +103,7 @@ public:
 private:
 #define UNION_ELEM(type, id) type id;
 	union {
-		int mV;
+		size_t mV;
 		TYPES(UNION_ELEM)
 	};
 

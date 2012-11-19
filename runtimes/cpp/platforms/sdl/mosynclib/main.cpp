@@ -68,7 +68,7 @@ extern "C" int mosyncLibMain(int argc, char** argv, mainfunc MAMain) {
 		if(strcmp(argv[i], "-resource")==0) {
 			i++;
 			if(i>=argc) {
-				LOG("not enough parameters for -resource");			
+				LOG("not enough parameters for -resource");
 				return 1;
 			}
 			resourceFile = argv[i];
@@ -76,13 +76,13 @@ extern "C" int mosyncLibMain(int argc, char** argv, mainfunc MAMain) {
 		else if(strcmp(argv[i], "-size")==0) {
 			i++;
 			if(i>=argc) {
-				LOG("not enough parameters for -size");			
+				LOG("not enough parameters for -size");
 				return 1;
 			}
 			settings.profile.mScreenWidth = atoi(argv[i]);
 			i++;
 			if(i>=argc) {
-				LOG("not enough parameters for -size");			
+				LOG("not enough parameters for -size");
 				return 1;
 			}
 			settings.profile.mScreenHeight = atoi(argv[i]);
@@ -95,7 +95,7 @@ extern "C" int mosyncLibMain(int argc, char** argv, mainfunc MAMain) {
 		} else if(strcmp(argv[i], "-resmem")==0) {
 			i++;
 			if(i>=argc) {
-				LOG("not enough parameters for -resmem");			
+				LOG("not enough parameters for -resmem");
 				return 1;
 			}
 			settings.resmem = atoi(argv[i]);
@@ -104,7 +104,7 @@ extern "C" int mosyncLibMain(int argc, char** argv, mainfunc MAMain) {
 			return 1;
 		}
 	}
-        
+
 #ifdef __USE_FULLSCREEN__
         settings.haveSkin = false;
 #endif
@@ -124,7 +124,8 @@ extern "C" int mosyncLibMain(int argc, char** argv, mainfunc MAMain) {
 }
 
 void* Base::Syscall::GetValidatedMemRange(int address, int size) {
-	return (void*)address;
+	DEBUG_ASSERT(sizeof(void*) == sizeof(int));
+	return (void*)(size_t)address;
 }
 void Base::Syscall::ValidateMemRange(const void* ptr, int size) {
 }
@@ -139,10 +140,12 @@ int Base::Syscall::GetValidatedStackValue(int offset, va_list argptr) {
 	return va_arg(argptr, int);
 }
 const char* Base::Syscall::GetValidatedStr(int address) {
-	return (const char*)address;
+	DEBUG_ASSERT(sizeof(void*) == sizeof(int));
+	return (const char*)(size_t)address;
 }
 const wchar* Base::Syscall::GetValidatedWStr(int address) {
-	return (const wchar*)address;
+	DEBUG_ASSERT(sizeof(void*) == sizeof(int));
+	return (const wchar*)(size_t)address;
 }
 
 void Base::Syscall::VM_Yield() {

@@ -23,6 +23,7 @@ import android.view.Gravity;
 import android.widget.TextView;
 
 import com.mosync.internal.android.MoSyncFont;
+import com.mosync.internal.android.MoSyncThread;
 import com.mosync.internal.android.MoSyncFont.MoSyncFontHandle;
 import com.mosync.internal.generated.IX_WIDGET;
 import com.mosync.nativeui.core.Types;
@@ -71,7 +72,7 @@ public class LabelWidget extends Widget
 	public LabelWidget(int handle, TextView view)
 	{
 		super( handle, view );
-		view.setGravity(mHorizontalGravity | mVerticalGravity);
+		view.setGravity( Gravity.CENTER );
 	}
 
 	/**
@@ -132,6 +133,20 @@ public class LabelWidget extends Widget
 				textView.setMaxLines( m_maxNrLines );
 			}
 		}
+		else if( property.equals( IX_WIDGET.MAW_LABEL_FONT_HANDLE ) )
+		{
+			MoSyncFontHandle currentFont = null;
+
+			// Search the handle in the list of fonts.
+			currentFont = MoSyncThread.getMoSyncFont(IntConverter .convert(value));
+
+			if ( currentFont != null )
+			{
+				setFontTypeface(currentFont.getTypeface(), currentFont.getFontSize());
+			}
+			else
+				throw new InvalidPropertyValueException(property, value);
+		}
 		else
 		{
 			return false;
@@ -182,13 +197,11 @@ public class LabelWidget extends Widget
 	 * @return True if the widget supports font setting, false otherwise.
 	 */
 	@Override
-	public boolean setFontTypeface(Typeface aTypeface, float aSize)
+	public void setFontTypeface(Typeface aTypeface, float aSize)
 	{
 		TextView textView = (TextView) getView( );
 		textView.setTypeface(aTypeface);
 		textView.setTextSize(aSize);
-
-		return true;
 	}
 
 }

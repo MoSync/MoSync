@@ -28,35 +28,29 @@ public:
 	CPositionNotifier(const RMessage2& aMessage, RPositioner& aPositioner)
 		: mPositioner(aPositioner), mMessage(aMessage), mWaiting(true) {}
 	virtual ~CPositionNotifier() {}
-	
+
 	void start() {
-		LOG("mPositioner.NotifyPositionUpdate\n");
 		mPositioner.NotifyPositionUpdate(mInfo, iStatus);
 		SetActive();
 	}
-	
+
 	void RunL() {
-		LOG("CPositioner:RunL %i\n", iStatus.Int());
+		//LOG("CPositioner:RunL %i\n", iStatus.Int());
 		TPosition p;
 		TPckg<TPosition> pckg(p);
 		mInfo.GetPosition(p);
-		
-		LOG("lat: %g\n", p.Latitude());
+
 		if(iStatus == KErrNone) {
-			LOG("mMessage.WriteL %i\n", pckg.Size());
 			TRAPD(err, mMessage.WriteL(0, pckg));
-			LOG("mMessage.WriteL res %i\n", err);
 		}
 		//if(iStatus != KErrCancel)
 		if(mWaiting) {
 			mMessage.Complete(iStatus.Int());
 			mWaiting = false;
 		}
-		LOG("Message completed\n");
 		lazyDelete(mMessage, this);
-		LOG("CPositioner:RunL complete\n");
 	}
-	
+
 	void DoCancel() {	//should never be called.
 		LOG("CPositioner:DoCancel\n");
 #if 0
@@ -67,7 +61,7 @@ public:
 		//lazyDelete(mMessage, this);
 #endif
 	}
-	
+
 private:
 	RPositioner& mPositioner;
 	TPositionInfo mInfo;
@@ -87,21 +81,16 @@ void CMoSyncSession::LocationStop() {
 //todo: avoid calling new() all the time; make the notifier a singleton.
 //don't do more than one of these at once!
 void CMoSyncSession::LocationGetL(const RMessage2& aMessage) {
-	LOG("LocationGetL\n");
 	if(!mPositionerOpen) {
 		LocationStop();
-		LOG("mPositionServer.Connect\n");
 		ULIE(mPositionServer.Connect());
-		LOG("mPositioner.Open\n");
 		ULIE(mPositioner.Open(mPositionServer));
-		LOG("mPositioner.SetRequestor\n");
 		ULIE(mPositioner.SetRequestor(CRequestor::ERequestorService,
 			CRequestor::EFormatApplication, KMoSyncServer));
 		mPositionerOpen = true;
 	}
 	mPn = new (ELeave) CPositionNotifier(aMessage, mPositioner);
 	mPn->start();
-	LOG("LocationGetL done\n");
 }
 
 

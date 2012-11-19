@@ -60,7 +60,7 @@ string MustacheParser::parse(const string& input, ParserCallback* cb) {
 
 		if (fPos < input.size() - 1) {
 			if (match('#') || match('^')) {
-				bool negate = input[fPos] == '^';
+				bool negate = input[fPos - 1] == '^';
 
 				whiteSpace();
 				string section = until(endDelim, true, true);

@@ -1,22 +1,22 @@
-Copyright (C) 2012 MoSync AB. MoSync(R) is a registered trademark of MoSync AB in the European Union, the United States, and other countries.
+CCopyright (C) 2012 MoSync AB. MoSync(R) is a registered trademark of MoSync AB in the European Union, the United States, and other countries.
 
 This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License published by the Free Software Foundation, version 2.
 
 This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License along with this program; if not, write to the Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+You should have received a copy of the GNU General Public License along with this program; if not, write to the Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-Licenses for third party libraries and applications included in the software are also located in the /docs/licenses subdirectory of your MoSync installation directory.
+Licenses for third party libraries and applications included in the software are also located in the /docs/licenses subdirectory of your MoSync SDK installation directory.
 
 apache-license-1.1.txt covers part of makesis-4.
 
-apache-license-2.0.txt covers the AMR decoder, gsm_amr, aapt, adb, AdbWinApi.dll, android-3.jar, android-4.jar, android-7.jar apkbuilder.jar, dx.jar, PhoneGap, C2DM, Base64.java, Base64DecoderException.java and Apache Commons Compress.
+apache-license-2.0.txt covers the AMR decoder, gsm_amr, aapt, adb, AdbWinApi.dll, android-3.jar, android-4.jar, android-7.jar apkbuilder.jar, dx.jar, PhoneGap, C2DM, Base64.java, Base64DecoderException.java, Bluecove, and Apache Commons Compress.
 
 expat-license.txt covers Expat.
 
 freeimage-license.txt covers FreeImage.
 
-gpl.txt covers MoSync, GCC, Bluecove, and lcab.
+gpl.txt covers the MoSync SDK, GCC, and lcab.
 
 info-zip-license.txt covers Info-Zip.
 

@@ -75,7 +75,9 @@ public:
 	 * perform initialization of Wormhole that needs to be done
 	 * when all JS has been loaded.
 	 */
-	virtual void openWormhole(Wormhole::HybridMoblet* moblet);
+	virtual void openWormhole(
+		MAWidgetHandle webViewHandle,
+		Wormhole::HybridMoblet* moblet);
 
 	/**
 	 * Set the sound used by the PhoneGap beep notification.
@@ -108,7 +110,7 @@ public:
 	 * Handle messages from JavaScript.
 	 */
 	virtual void handleWebViewMessage(
-		NativeUI::WebView* webView,
+		MAWidgetHandle webViewHandle,
 		MAHandle data,
 		Wormhole::HybridMoblet* moblet);
 
@@ -117,14 +119,14 @@ public:
 	 * uses this format.
 	 */
 	virtual void handleMessageStreamJSON(
-		NativeUI::WebView* webView,
+		MAWidgetHandle webViewHandle,
 		MAHandle data);
 
 	/**
 	 * Handle messages in string stream format.
 	 */
 	virtual void handleMessageStream(
-		NativeUI::WebView* webView,
+		MAWidgetHandle webViewHandle,
 		MAHandle data,
 		Wormhole::HybridMoblet* moblet);
 
@@ -133,7 +135,7 @@ public:
 	 */
 	virtual void handleMoSyncMessage(
 		Wormhole::MessageStream& message,
-		NativeUI::WebView* webView,
+		MAWidgetHandle webViewHandle,
 		Wormhole::HybridMoblet* moblet);
 
 	/**
@@ -142,7 +144,6 @@ public:
 	 */
 	virtual void handleCallJSMessage(
 		Wormhole::MessageStream& message,
-		NativeUI::WebView* webView,
 		Wormhole::HybridMoblet* moblet);
 
 public: // On purpose.

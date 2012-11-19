@@ -33,7 +33,20 @@ namespace Wormhole
 	/**
 	 * Constructor.
 	 */
-	JSONMessage::JSONMessage(NativeUI::WebView* webView, MAHandle dataHandle) :
+	JSONMessage::JSONMessage(
+		MAWidgetHandle webViewHandle,
+		MAHandle dataHandle) :
+		Wormhole::MessageStreamJSON(webViewHandle, dataHandle)
+	{
+	}
+
+	/**
+	 * Constructor.
+	 * @deprecated
+	 */
+	JSONMessage::JSONMessage(
+		NativeUI::WebView* webView,
+		MAHandle dataHandle) :
 		Wormhole::MessageStreamJSON(webView, dataHandle)
 	{
 	}

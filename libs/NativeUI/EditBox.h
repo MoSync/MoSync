@@ -43,24 +43,24 @@ MA 02110-1301, USA.
 namespace NativeUI
 {
 
-    // Forward declaration.
-    class EditBoxListener;
+	// Forward declaration.
+	class EditBoxListener;
 
-    /**
-     * \brief Types for edit box.
-     */
-    enum EditBoxMode
-    {
-        EDIT_BOX_MODE_TEXT = 0,
-        EDIT_BOX_MODE_PASSWORD
-    };
+	/**
+	 * \brief Types for edit box.
+	 */
+	enum EditBoxMode
+	{
+		EDIT_BOX_MODE_TEXT = 0,
+		EDIT_BOX_MODE_PASSWORD
+	};
 
-    /**
-     * \brief The EditBoxInputMode defines the type of text that the user is allowed
-     * to enter.
-     */
-    enum EditBoxInputMode
-    {
+	/**
+	 * \brief The EditBoxInputMode defines the type of text that the user is allowed
+	 * to enter.
+	 */
+	enum EditBoxInputMode
+	{
 		/**
 		* The user is allowed to enter any text, including line breaks.
 		*/
@@ -90,13 +90,13 @@ namespace NativeUI
 		* The user is allowed to enter any text, except for line breaks.
 		*/
 		EDIT_BOX_INPUT_MODE_SINGLE_LINE = 6
-    };
+	};
 
-    /**
-     * \brief The EditBoxInputFlag defines how the input text is displayed/formatted.
-     */
-    enum EditBoxInputFlag
-    {
+	/**
+	 * \brief The EditBoxInputFlag defines how the input text is displayed/formatted.
+	 */
+	enum EditBoxInputFlag
+	{
 		/**
 		* Indicates that the text entered is confidential data that should be
 		* obscured whenever possible. This implies EDIT_BOX_INPUT_FLAG_SENSITIVE.
@@ -123,169 +123,256 @@ namespace NativeUI
 		* Capitalize all characters automatically.
 		*/
 		EDIT_BOX_INPUT_GLAG_INITIAL_CAPS_ALL_CHARACTERS = 4
-    };
+	};
 
-    /**
-     * \brief Class for edit box.
-     *
-     * You can use this widget to gather small amounts of text from the user.
-     * The edit box supports the use of an observer to handle editing-related
-     * events.
-     */
-    class EditBox : public Widget
-    {
-    public:
-        /**
-         * Constructor.
-         */
-        EditBox();
+	/**
+	 * \brief The EditBoxAutocorrectionType defines values for turning on/off
+	 * the autocorrection mode while typing.
+	 */
+	enum EditBoxAutocorrectionType
+	{
+		/**
+		* System's default value.
+		* Usually, this value it can be turned on/off from settings.
+		* Default value.
+		* Platform: iOS.
+		*/
+		EDIT_BOX_AUTOCORRECTION_TYPE_DEFAULT = 0,
+		/**
+		* Enable auto-correction behavior.
+		* Platform: iOS.
+		*/
+		EDIT_BOX_AUTOCORRECTION_TYPE_ENABLE = 1,
+		/**
+		* Disable auto-correction behavior.
+		* Platform: iOS.
+		*/
+		EDIT_BOX_AUTOCORRECTION_TYPE_DISABLE = 2,
+	};
 
-        /**
-         * Destructor.
-         */
-        virtual ~EditBox();
+	/**
+	 * \brief Edit box categories.
+	 */
+	enum EditBoxCategory
+	{
+		/**
+		 * The input text will be single line.
+		 * Platform: iOS.
+		 */
+		EDIT_BOX_SINGLE_LINE = 0,
+		/**
+		 * The input text will be multi line.
+		 * Platform: iOS.
+		 */
+		EDIT_BOX_MULTI_LINE
+	};
 
-        /**
-         * Set the text entered in the edit box.
-         * @param text The given text.
-         */
-        virtual void setText(const MAUtil::String& text);
+	/**
+	 * \brief Class for edit box.
+	 *
+	 * You can use this widget to gather small amounts of text from the user.
+	 * The edit box supports the use of an observer to handle editing-related
+	 * events.
+	 */
+	class EditBox : public Widget
+	{
+	public:
+		/**
+		 * Constructor.
+		 * @param category The type of the edit box.
+		 */
+		EditBox(EditBoxCategory category = EDIT_BOX_SINGLE_LINE);
 
-        /**
-         * Get the text entered in the edit box.
-         * @return The text entered in the edit box.
-         */
-        virtual MAUtil::String getText();
+		/**
+		 * Destructor.
+		 */
+		virtual ~EditBox();
 
-        /**
-         * Set the font color of the widget's text.
-         * @param color A hexadecimal value 0xRRGGBB, where R, G and B are the
-         *              red, green and blue components respectively.
-         * @return Any of the following result codes:
-         * - #MAW_RES_OK if the property could be set.
-         * - #MAW_RES_INVALID_PROPERTY_VALUE if the color value was invalid.
-         */
-        virtual int setFontColor(const int color);
+		/**
+		 * Set the text entered in the edit box.
+		 * @param text The given text.
+		 */
+		virtual void setText(const MAUtil::String& text);
 
-        /**
-         * Set the font color of the placeholder text when the edit box is empty.
-         * @param color A hexadecimal value 0xRRGGBB, where R, G and B are the
-         *              red, green and blue components respectively.
-         * @return Any of the following result codes:
-         * - #MAW_RES_OK if the property could be set.
-         * - #MAW_RES_INVALID_PROPERTY_VALUE if the color value was invalid.
-         */
-        virtual int setPlaceholderFontColor(const int color);
+		/**
+		 * Get the text entered in the edit box.
+		 * @return The text entered in the edit box.
+		 */
+		virtual MAUtil::String getText();
 
-        /**
-         * Set a text in the edit box that acts as a placeholder when an
-         * edit box is empty.
-         * @param text The given text.
-         */
-        virtual void setPlaceholder(const MAUtil::String& text);
+		/**
+		 * Set the font color of the widget's text.
+		 * @param color A hexadecimal value 0xRRGGBB, where R, G and B are the
+		 *			  red, green and blue components respectively.
+		 * @return Any of the following result codes:
+		 * - #MAW_RES_OK if the property could be set.
+		 * - #MAW_RES_INVALID_PROPERTY_VALUE if the color value was invalid.
+		 */
+		virtual int setFontColor(const int color);
 
-        /**
-         * Show the virtual keyboard.
-         * The focus will be set to this widget.
-         */
-        virtual void showKeyboard();
+		/**
+		 * Set the font color of the placeholder text when the edit box is empty.
+		 * @param color A hexadecimal value 0xRRGGBB, where R, G and B are the
+		 *			  red, green and blue components respectively.
+		 * @return Any of the following result codes:
+		 * - #MAW_RES_OK if the property could be set.
+		 * - #MAW_RES_INVALID_PROPERTY_VALUE if the color value was invalid.
+		 */
+		virtual int setPlaceholderFontColor(const int color);
 
-        /**
-         * Hide the virtual keyboard.
-         */
-        virtual void hideKeyboard();
+		/**
+		 * Set a text in the edit box that acts as a placeholder when an
+		 * edit box is empty.
+		 * @param text The given text.
+		 */
+		virtual void setPlaceholder(const MAUtil::String& text);
 
-        /**
-         * Set the mode of the edit box.
-         * @deprecated Use setInputMode and setInputFlag instead.
-         * @param editBoxMode The given mode.
-         */
-        virtual void setEditMode(EditBoxMode editBoxMode);
+		/**
+		 * Show the virtual keyboard.
+		 * The focus will be set to this widget.
+		 */
+		virtual void showKeyboard();
 
-        /**
-         * Set the input mode of the edit box.
-         * @param inputMode One of the EditBoxInputMode constants.
-         */
-        virtual void setInputMode(EditBoxInputMode inputMode);
+		/**
+		 * Hide the virtual keyboard.
+		 */
+		virtual void hideKeyboard();
 
-        /**
-         * Set the number of lines.
-         * Makes the edit box exactly this many lines tall. Note that setting this value
-         * overrides any other (minimum / maximum) number of lines or height setting.
-         * A single line edit box will set this value to 1.
-         * Available on Android only.
-         *
-         * @param lines The number of lines.
-         */
-        void setLinesNumber(int lines);
+		/**
+		 * Set the mode of the edit box.
+		 * @deprecated Use setInputMode and setInputFlag instead.
+		 * @param editBoxMode The given mode.
+		 */
+		virtual void setEditMode(EditBoxMode editBoxMode);
 
-        /**
-         * Makes the edit box at most this many lines tall.
-         * Setting this value overrides any other (maximum) height setting.
-         * Available on Android only.
-         *
-         * @param maxLines The maximum number of lines.
-         */
-        void setMaxLines(int maxLines);
+		/**
+		 * Set the input mode of the edit box.
+		 * @param inputMode One of the EditBoxInputMode constants.
+		 */
+		virtual void setInputMode(EditBoxInputMode inputMode);
 
-        /**
-         * Makes the edit box at least this many lines tall.
-         * Setting this value overrides any other (minimum) height setting.
-         * Available on Android only.
-         *
-         * @param minLines The minimum number of lines.
-         */
-        void setMinLines(int minLines);
+		/**
+		 * Set the number of lines.
+		 * Makes the edit box exactly this many lines tall. Note that setting this value
+		 * overrides any other (minimum / maximum) number of lines or height setting.
+		 * A single line edit box will set this value to 1.
+		 * Available on Android only.
+		 *
+		 * @param lines The number of lines.
+		 */
+		void setLinesNumber(int lines);
 
-        /**
-         * Sets the maximum input length of the edit box.
-         * Setting this value enables multiline input mode by default.
-         * Available on Android, iOS and Windows Phone.
-         *
-         * @param maxLength The maximum length.
-         */
-        void setMaxLength(int maxLength);
+		/**
+		 * Makes the edit box at most this many lines tall.
+		 * Setting this value overrides any other (maximum) height setting.
+		 * Available on Android only.
+		 *
+		 * @param maxLines The maximum number of lines.
+		 */
+		void setMaxLines(int maxLines);
 
-        /**
-         * Gets the maximum input length of the edit box.
-         * Available on Android, iOS and Windows Phone.
-         *
-         * @return Maximum input length.
-         */
-        int getMaxLength(int maxLength);
+		/**
+		 * Makes the edit box at least this many lines tall.
+		 * Setting this value overrides any other (minimum) height setting.
+		 * Available on Android only.
+		 *
+		 * @param minLines The minimum number of lines.
+		 */
+		void setMinLines(int minLines);
 
-        /**
-         * Set the input flags that are to be applied to the edit box.
-         * @param inputFlag One of the EditBoxInputFlag constants.
-         */
-        virtual void setInputFlag(EditBoxInputFlag inputFlag);
+		/**
+		 * Sets the maximum input length of the edit box.
+		 * Setting this value enables multiline input mode by default.
+		 * Available on Android, iOS and Windows Phone.
+		 *
+		 * @param maxLength The maximum length.
+		 */
+		void setMaxLength(int maxLength);
 
-        /**
-         * Add an edit box event listener.
-         * @param listener The listener that will receive edit box events.
-         */
-        virtual void addEditBoxListener(EditBoxListener* listener);
+		/**
+		 * Gets the maximum input length of the edit box.
+		 * Available on Android, iOS and Windows Phone.
+		 *
+		 * @return Maximum input length.
+		 */
+		int getMaxLength(int maxLength);
 
-        /**
-         * Remove the edit box listener.
-         * @param listener The listener that receives edit box events.
-         */
-        virtual void removeEditBoxListener(EditBoxListener* listener);
+		/**
+		 * Set the input flags that are to be applied to the edit box.
+		 * @param inputFlag One of the EditBoxInputFlag constants.
+		 */
+		virtual void setInputFlag(EditBoxInputFlag inputFlag);
 
-    protected:
-        /**
-         * This method is called when there is an event for this widget.
-         * It passes on the event to all widget's listeners.
-         * @param widgetEventData The data for the widget event.
-         */
-        virtual void handleWidgetEvent(MAWidgetEventData* widgetEventData);
+		/**
+		* Set the autocorrection type.
+		* Enable/disable the auto correction during typing. With auto correction
+		* enabled, the text object tracks unknown words and suggests a more
+		* suitable replacement candidate to the user, replacing the typed text
+		* automatically unless the user explicitly overrides the action.
+		* The default value is #MAW_EDIT_BOX_AUTOCORRECTION_TYPE_DEAFULT.
+		* Platform: iOS.
+		* @param One of the following value:
+		*  MAW_EDIT_BOX_AUTOCORRECTION_TYPE_DEFAULT,
+		*  MAW_EDIT_BOX_AUTOCORRECTION_TYPE_ENABLE,
+		*  MAW_EDIT_BOX_AUTOCORRECTION_TYPE_DISABLE.
+		*/
+		void setAutocorrectionType(EditBoxAutocorrectionType autocorrectionType);
 
-    private:
-        /**
-         * Array with edit box listeners.
-         */
-        MAUtil::Vector<EditBoxListener*> mEditBoxListeners;
-    };
+		/**
+		 * Get the autocorrection type.
+		 * Platform: iOS.
+		 * @return One of the following value:
+		 *  MAW_EDIT_BOX_AUTOCORRECTION_TYPE_DEFAULT,
+		 *  MAW_EDIT_BOX_AUTOCORRECTION_TYPE_ENABLE,
+		 *  MAW_EDIT_BOX_AUTOCORRECTION_TYPE_DISABLE.
+		 */
+		EditBoxAutocorrectionType getAutocorrectionType();
+
+		/**
+		 * Set the horizontal alignment of the text inside the edit box.
+		 * The default value is MAW_ALIGNMENT_LEFT;
+		 * @param alignment One of the constants:
+		 * - MAW_ALIGNMENT_LEFT
+		 * - MAW_ALIGNMENT_CENTER
+		 * - MAW_ALIGNMENT_RIGHT
+		 */
+		void setTextHorizontalAlignment(const MAUtil::String& alignment);
+
+		/**
+		 * Get the horizontal alignment of the text inside the edit box.
+		 * @return One of the constants:
+		 * - MAW_ALIGNMENT_LEFT
+		 * - MAW_ALIGNMENT_CENTER
+		 * - MAW_ALIGNMENT_RIGHT
+		 */
+		MAUtil::String getTextHorizontalAlignment();
+
+		/**
+		 * Add an edit box event listener.
+		 * @param listener The listener that will receive edit box events.
+		 */
+		virtual void addEditBoxListener(EditBoxListener* listener);
+
+		/**
+		 * Remove the edit box listener.
+		 * @param listener The listener that receives edit box events.
+		 */
+		virtual void removeEditBoxListener(EditBoxListener* listener);
+
+	protected:
+		/**
+		 * This method is called when there is an event for this widget.
+		 * It passes on the event to all widget's listeners.
+		 * @param widgetEventData The data for the widget event.
+		 */
+		virtual void handleWidgetEvent(MAWidgetEventData* widgetEventData);
+
+	private:
+		/**
+		 * Array with edit box listeners.
+		 */
+		MAUtil::Vector<EditBoxListener*> mEditBoxListeners;
+	};
 
 } // namespace NativeUI
 

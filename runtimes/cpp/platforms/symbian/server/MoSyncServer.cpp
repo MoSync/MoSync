@@ -104,19 +104,14 @@ mPn(NULL), mPositionerOpen(false)
 CMoSyncSession::~CMoSyncSession() {
 	LOG("~CMoSyncSession 1\n");
 	LocationStop();
-	LOG("~mTelephony\n");
 	if(mTelephony != NULL)
 		delete mTelephony;
-	LOG("~mNetworkInfo\n");
 	if(mNetworkInfo != NULL)
 		delete mNetworkInfo;
-	LOG("~mNetworkStatus\n");
 	if(mNetworkStatus != NULL)
 		delete mNetworkStatus;
-	LOG("~mNetworkStatusChange\n");
 	if(mNetworkStatusChange != NULL)
 		delete mNetworkStatusChange;
-	LOG("~mEnder\n");
 	if(mEnder != NULL)
 		delete mEnder;
 	LOG("~CMoSyncSession ends\n");
@@ -182,7 +177,6 @@ void CMoSyncSession::DispatchMessageL(const RMessage2& aMessage)
 }
 
 void CMoSyncSession::CancelNetworkStatusChange(const RMessage2& aMessage) {
-	LOG("CancelNetworkStatusChange\n");
 	if(mNetworkStatusChange) {
 		if(mNetworkStatusChange->IsActive()) {
 			mNetworkStatusChange->Cancel();

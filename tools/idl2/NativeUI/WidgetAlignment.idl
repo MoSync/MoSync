@@ -1,0 +1,29 @@
+group WidgetAlignment "Widget alignment" {
+	constset MAString MAW_ALIGNMENT_
+	{
+		/**
+		* @brief Constant that represents a left aligned widget.
+		*/
+		LEFT = "left";
+
+		/**
+		* @brief Constant that represents a right aligned widget.
+		*/
+		RIGHT = "right";
+
+		/**
+		* @brief Constant that represents a center aligned widget.
+		*/
+		CENTER = "center";
+
+		/**
+		* @brief Constant that represents a top aligned widget.
+		*/
+		TOP = "top";
+
+		/**
+		* @brief Constant that represents a bottom aligned widget.
+		*/
+		BOTTOM = "bottom";
+	}
+}

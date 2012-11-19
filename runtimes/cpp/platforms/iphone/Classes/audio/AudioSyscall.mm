@@ -41,10 +41,10 @@ void MAAudioInit()
     float latency = 0.005; //in seconds gives a 256 sample buffer
     //on an infinitely fast computer, we'd make sure we got a buffer of size 1.
     // but it will take too much CPU. :-)  some latency is inevitable.
-    OSStatus status = AudioSessionSetProperty(
-											  kAudioSessionProperty_PreferredHardwareIOBufferDuration,
-											  sizeof(latency),&latency
-											  );
+    AudioSessionSetProperty(
+                            kAudioSessionProperty_PreferredHardwareIOBufferDuration,
+                            sizeof(latency),&latency
+                                );
 
 	sAudioData = [[NSMutableArray alloc] init];
 	sAudioInstances = [[NSMutableArray alloc] init];

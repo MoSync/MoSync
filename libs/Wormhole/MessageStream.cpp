@@ -38,9 +38,23 @@ namespace Wormhole
 	 * Constructor.
 	 */
 	MessageStream::MessageStream(
+		MAWidgetHandle webViewHandle,
+		MAHandle dataHandle)
+	{
+		mWebViewHandle = webViewHandle;
+		mWebView = NULL;
+		initialize(dataHandle);
+	}
+
+	/**
+	 * Constructor.
+	 * @deprecated
+	 */
+	MessageStream::MessageStream(
 		NativeUI::WebView* webView,
 		MAHandle dataHandle)
 	{
+		mWebViewHandle = webView->getWidgetHandle();
 		mWebView = webView;
 		initialize(dataHandle);
 	}
@@ -66,12 +80,35 @@ namespace Wormhole
 	}
 
 	/**
-	 * Get the WebView widget associated with this message.
-	 * @return Pointer to WebView object.
+	 * Get the WebView widget handle associated with this message.
+	 * @return Handle to WebView widget.
+	 */
+	MAWidgetHandle MessageStream::getWebViewHandle()
+	{
+		return mWebViewHandle;
+	}
+
+	/**
+	 * Get the WebView object associated with this message.
+	 * @return WebView object.
+	 * @deprecated
 	 */
 	NativeUI::WebView* MessageStream::getWebView()
 	{
 		return mWebView;
+	}
+
+	/**
+	 * Evaluate JavaScript the WebView associated with this message.
+	 * @param script JavaScript string.
+	 */
+	void MessageStream::callJS(const MAUtil::String& script)
+	{
+		MAUtil::String url = "javascript:" + script;
+		maWidgetSetProperty(
+			mWebViewHandle,
+			MAW_WEB_VIEW_URL,
+			url.c_str());
 	}
 
 	/**

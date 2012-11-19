@@ -79,7 +79,7 @@ string PermissionContext::getParameter(string key) {
 	// Convert : to /
 	std::replace(key.begin(), key.end(), ':', '/');
 	string result = isPermissionSet(fParsedPermissions, key) ? key : string();
-	return result;
+	return result.empty() ? DefaultContext::getParameter(key) : result;
 }
 
 vector<MustacheContext*> PermissionContext::getChildren(string key) {

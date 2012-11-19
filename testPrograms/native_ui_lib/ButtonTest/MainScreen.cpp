@@ -155,13 +155,13 @@ void MainScreen::createMainLayout() {
  */
 void MainScreen::buttonPressed(Widget* button)
 {
-	Label* event = new Label();
+	ListViewItem* item = new ListViewItem();
     if (button == mButton)
     {
         printf("mButton pointerPressedEvent");
-        event->setText("buttonPressed");
+        item->setText("buttonPressed");
+        mEvents->addChild(item);
     }
-    mEvents->addChild(event);
 }
 
 /**
@@ -175,10 +175,11 @@ void MainScreen::buttonReleased(Widget* button)
     if (button == mButton)
     {
         printf("mButton pointerReleasedEvent");
+        ListViewItem* item = new ListViewItem();
+        item->setText("buttonReleased");
+        mEvents->addChild(item);
     }
-    Label* event = new Label();
-    event->setText("buttonReleased");
-    mEvents->addChild(event);
+
 }
 
 /**
@@ -189,11 +190,11 @@ void MainScreen::buttonReleased(Widget* button)
  */
 void MainScreen::buttonClicked(Widget* button)
 {
-	Label* event = new Label();
+	ListViewItem* item = new ListViewItem();
 	if (button == mButton)
 	{
 		printf("mButton buttonClickedEvent");
-		event->setText("buttonClicked");
+		item->setText("buttonClicked");
 	}
 	else if (button == mCheckEnabledButton)
 	{
@@ -202,15 +203,15 @@ void MainScreen::buttonClicked(Widget* button)
 			mTestEnabledButton->setEnabled(false);
 			mTestEnabledButton->setText("Disabled");
 			mCheckEnabledButton->setText("<- Enable");
-			event->setText("Button was enabled -> button is now disabled");
+			item->setText("Button was enabled -> button is now disabled");
 		}
 		else
 		{
 			mTestEnabledButton->setEnabled(true);
 			mTestEnabledButton->setText("Enabled");
 			mCheckEnabledButton->setText("<- Disable");
-			event->setText("Button was disabled -> button is now enabled");
+			item->setText("Button was disabled -> button is now enabled");
 		}
 	}
-	mEvents->addChild(event);
+	mEvents->addChild(item);
 }

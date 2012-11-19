@@ -1,0 +1,48 @@
+/**
+* The available widget properties for a #MAW_PROGRESS_BAR. See \ref WidgetProperties "Widget properties" for more properties.
+*/
+group WidgetProgressBarProperties "Progress bar" {
+	constset MAString MAW_PROGRESS_BAR_ {
+		/**
+		* @brief Sets or gets the range of the progress bar to 0..max.
+		*
+		* @validvalue An positive integer that specifies the upper range of this progress bar.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(progressBarHandle, MAW_PROGRESS_BAR_MAX, "100");
+		* \endcode
+		*/
+		MAX = "max";
+
+		/**
+		* @brief Set or gets the current progress to the specified value.
+		*
+		* @validvalue An int that specifies the new progress, between 0 and max value. See \ref MAW_PROGRESS_BAR_MAX.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(progressBarHandle, MAW_PROGRESS_BAR_PROGRESS, "10");
+		* \endcode
+		*/
+		PROGRESS = "progress";
+
+		/**
+		* @brief Increase the progress bar's progress by the specified amount.
+		*
+		* @validvalue An int that specifies the amount by which the progress must be increased.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(progressBarHandle, MAW_PROGRESS_BAR_INCREMENT_PROGRESS, "20");
+		* \endcode
+		*/
+		INCREMENT_PROGRESS = "incrementProgress";
+	}
+} // end of WidgetProgressBarProperties

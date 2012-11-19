@@ -1,0 +1,212 @@
+typedef int MAWidgetHandle;
+
+/**
+* The set of functions available for the Widget API.
+*/
+group WidgetAPIFunctions "Widget functions" {
+
+	/**
+	* Creates a new widget of the specified type.
+	*
+	* \note See \ref WidgetTypes "Widget types" for the available widget types.
+	*
+	* \param widgetType A String representing the type of the widget to create.
+	*
+	* \returns A handle to the widget, or any of the following result codes:
+	* - #MAW_RES_ERROR if the widget could not be created.
+	* - #MAW_RES_INVALID_TYPE_NAME if the widget type was not available.
+	* - #MAW_RES_FEATURE_NOT_AVAILABLE if the widget type is not supported by the curent framework version.
+	*/
+	MAWidgetHandle maWidgetCreate(in MAString widgetType);
+
+	/**
+	* Frees the memory and resources held by the given widget. Destryoing a widget
+	* with children will also cause its children to be destroyed. Once a handle has
+	* been destroyed it cannot be referenced by the maWidget* functions.
+	*
+	* \note If the given widget has a parent, the widget will be removed from its
+	* parent.
+	*
+	* \param widget A handle to the widget to be destroyed.
+	*
+	* \returns Any of the following result codes:
+	* - #MAW_RES_OK if the widget was destroyed.
+	* - #MAW_RES_INVALID_HANDLE if the handle was invalid.
+	*/
+	int maWidgetDestroy(in MAWidgetHandle widget);
+
+	/**
+	* Adds a widget to the given parent as a child. Letting the
+	* parent widget layout the child.
+	*
+	* \param parent The widget layout to which the child will be added.
+	* \param child The widget that will be added to the parent.
+	*
+	* \returns Any of the following result codes:
+	* - #MAW_RES_OK if the child could be added to the parent.
+	* - #MAW_RES_INVALID_HANDLE if any of the handles were invalid.
+	* - #MAW_RES_INVALID_LAYOUT if the widget was added to a non-layout.
+	* - #MAW_RES_CANNOT_INSERT_DIALOG if the child is a modal dialog.
+	* - #MAW_RES_ERROR if it could not be added for some other reason.
+	*/
+	int maWidgetAddChild(in MAWidgetHandle parent, in MAWidgetHandle child);
+
+	/**
+	* Inserts a widget to the given parent as a child at an index. Letting the
+	* parent widget layout the child.
+	*
+	* \param parent The widget layout in which the child will be inserted.
+	* \param child The widget that will be added to the parent.
+	* \param index The index where the widget should be inserted (-1 means last)
+	*
+	* \returns Any of the following result codes:
+	* - #MAW_RES_OK if the child could be added to the parent.
+	* - #MAW_RES_INVALID_HANDLE if any of the handles were invalid.
+	* - #MAW_RES_INVALID_INDEX if the index was out of bounds.
+	* - #MAW_RES_INVALID_LAYOUT if the widget was added to a non-layout.
+	* - #MAW_RES_CANNOT_INSERT_DIALOG if the child is a modal dialog.
+	* - #MAW_RES_ERROR if it could not be added for some other reason.
+	*/
+	int maWidgetInsertChild(in MAWidgetHandle parent, in MAWidgetHandle child, in int index);
+
+	/**
+	* Removes a child widget from its parent (but does not destroy it).
+	* Removing a currently visible top-level widget causes the MoSync view to become visible.
+	*
+	* \returns Any of the following result codes:
+	* - #MAW_RES_OK if the child could be removed from the parent.
+	* - #MAW_RES_INVALID_HANDLE if the handle was invalid.
+	* - #MAW_RES_ERROR otherwise.
+	*/
+	int maWidgetRemoveChild(in MAWidgetHandle child);
+
+	/**
+	* Shows a dialog widget.
+	* \param dialogHandle The handle of the dialog that will be shown.
+	*
+	* \returns Any of the following result codes:
+	* - #MAW_RES_OK if the child could be removed from the parent.
+	* - #MAW_RES_INVALID_HANDLE if the handle was invalid.
+	* - #MAW_RES_ERROR otherwise.
+	*/
+	int maWidgetModalDialogShow(in MAWidgetHandle dialogHandle);
+
+	/**
+	* Hides/Dismisses a currently displayed dialog.
+	* \param dialogHandle The handle of the dialog that will be hidden.
+	*
+	* \returns Any of the following result codes:
+	* - #MAW_RES_OK if the child could be removed from the parent.
+	* - #MAW_RES_INVALID_HANDLE if the handle was invalid.
+	* - #MAW_RES_ERROR otherwise.
+	*/
+	int maWidgetModalDialogHide(in MAWidgetHandle dialogHandle);
+
+	/**
+	* Shows a screen. If native UI hasn't been initialized, it is also initialized
+	* and disables regular MoSync drawing.
+	*
+	* \param screenHandle The handle to the screen.
+	*
+	* \returns Any of the following result codes:
+	* - #MAW_RES_OK if the screen could be shown.
+	* - #MAW_RES_INVALID_SCREEN if the \a screenHandle is not a handle to a screen.
+	*/
+	int maWidgetScreenShow(in MAWidgetHandle screenHandle);
+
+	/**
+	 * Pushes a screen to the given screen stack, hides the current screen and
+	 * shows the pushed screen it. Pushing it to the stack will make it
+	 * automatically go back to the previous screen when popped.
+	 *
+	 * \param stackScreen A handle to a #MAW_STACK_SCREEN.
+	 * \param newScreen A handle to either a #MAW_SCREEN or a #MAW_TAB_SCREEN.
+	 *					The handle cannot exist in the stack already.
+	 *
+	 * \return Any of the following result codes:
+	 * - #MAW_RES_OK if the given screen could be pushed.
+	 * - #MAW_RES_INVALID_HANDLE if either the screenStack or newScreen handle
+	 *							 was invalid.
+	 * - #MAW_RES_ERROR if something else than a screen stack was passed, or if
+	 *					the handle already exists in the stack.
+	 */
+	int maWidgetStackScreenPush(in MAWidgetHandle stackScreen, in MAWidgetHandle newScreen);
+
+	/**
+	 * Pops a screen from a screen stack, hides the current screen and shows
+	 * the popped screen before the If there is no previous screen in the screen
+	 * stack, an empty screen will be shown.
+	 *
+	 * \param stackScreen A handle to a #MAW_STACK_SCREEN to pop from.
+	 *
+	 * \return Any of the following result codes:
+	 * - #MAW_RES_OK if the given screen could be popped.
+	 * - #MAW_RES_INVALID_HANDLE if the screen stack does not exist.
+	 * - #MAW_RES_ERROR if something else than a screen stack was passed.
+	 */
+	int maWidgetStackScreenPop(in MAWidgetHandle stackScreen);
+
+	/**
+	* Sets a specified property on the given widget.
+	*
+	* \param widget Handle to the widget.
+	* \param property A string representing which property to set.
+	* \param value The value which will be assigned to the property.
+	*
+	* \note May be synchronous or asynchronous depending on the property.
+	* \note See \ref WidgetProperties "Widget properties" for the available properties.
+	*
+	* \returns Any of the following result codes:
+	* - #MAW_RES_OK if the property could be set.
+	* - #MAW_RES_INVALID_HANDLE if the handle was invalid.
+	* - #MAW_RES_INVALID_PROPERTY_NAME if the property name was invalid.
+	* - #MAW_RES_INVALID_PROPERTY_VALUE if the property value was invalid.
+	* - #MAW_RES_FEATURE_NOT_AVAILABLE if the property is not supported by the curent framework version.
+	* - #MAW_RES_ERROR otherwise.
+	*/
+	int maWidgetSetProperty(in MAWidgetHandle widget, in MAString property, in MAString value);
+
+	/**
+	* Retrieves a specified property from the given widget.
+	*
+	* \param widget Handle to the widget.
+	* \param property A string representing which property to set.
+	* \param value A buffer that will hold the value of the property, represented as a string.
+	* \param bufSize Size of the buffer.
+	*
+	* \returns The number of bytes copied on success, or any of the following result codes:
+	* - #MAW_RES_INVALID_HANDLE if the handle was invalid.
+	* - #MAW_RES_INVALID_PROPERTY_NAME if the property name was invalid.
+	* - #MAW_RES_INVALID_PROPERTY_VALUE if the property value was invalid.
+	* - #MAW_RES_INVALID_STRING_BUFFER_SIZE if the buffer size was to small.
+	* - #MAW_RES_FEATURE_NOT_AVAILABLE if the property is not supported by the curent framework version.
+	* - #MAW_RES_ERROR otherwise.
+	*/
+	int maWidgetGetProperty(in MAWidgetHandle widget, in MAString property, out MAString value range("bufSize"), in int bufSize);
+
+	/**
+	* Add an item to the Options Menu associated to a screen.
+	* Available on Android and WP7.
+	* The options menu is where you should include actions and other options that are relevant to the current activity
+	* context, such as "Search," "Compose email," or "Settings".
+	* When opened, the first visible portion is the icon menu, which holds up to six menu items.
+	* If your menu includes more than six items, Android places the sixth item and the rest into the overflow menu,
+	* which the user can open by selecting More. Those items do not display icons.
+	* \param widget Handle to the screen widget.
+	* \param title The title associated for the new item. Can be left null.
+	* \param iconPath The path to an image or  a predefined icon, one of the \link #MAW_OPTIONS_MENU_ICON_CONSTANT_ADD \endlink constants.
+	* Note that for Windows phone 7 the option menu icons must be added under the following folder
+	* structure "/ApplicationBarIcons/". The function is called with the name of the icon file.
+	* e.g. maWidgetScreenAddOptionsMenuItem(ScreenHandle, "test", "optionsMenuItemIcon.png", 0); where the
+	* file optionsMenuItemIcon.png is found in the folder "/ApplicationBarIcons".
+	* Can be left null. On windows phone 7 a null icon means that the item
+	* will be a part of the extendable menu item list from the native Application Bar.
+	* \iconPredefined Specifies if the icon is a project resource, or one of the predefined Android icons.
+	* By default it's value is 0.
+	*
+	* \returns The the item index on success, or any of the following result codes:
+	* - #MAW_RES_ERROR
+	* - #MAW_RES_INVALID_HANDLE
+	*/
+	int maWidgetScreenAddOptionsMenuItem(in MAWidgetHandle widget, in MAString title, in MAString iconPath, in int iconPredefined);
+} // end of group WidgetAPIFunctions

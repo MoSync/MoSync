@@ -1,0 +1,436 @@
+/**
+* Widgets can send events for instance when their internal state is changed (like when a
+* button is pressed). These are events sent using the MoSync event system \ref maGetEvent.
+* When an event is received with the type #EVENT_TYPE_WIDGET the 'data' member of the MAEvent
+* struct is a pointer to data of type #MAWidgetEventData.
+*/
+group WidgetEvent "Widget event" {
+
+	/**
+	* @brief A struct that holds the data associated with a widget event.
+	*/
+	struct MAWidgetEventData {
+		/**
+		* @brief Determines which kind of widget event that has occurred. See \ref WidgetEventTypes "Widget event types" for the possible values.
+		*/
+		int eventType;
+
+		/**
+		* @brief Handle to the widget that sent the event.
+		*/
+		MAWidgetHandle widgetHandle;
+
+		union {
+			/**
+			* @brief The index when a #MAW_EVENT_CLICKED or a #MAW_EVENT_ITEM_WILL_SELECT
+			* event is received for a #MAW_LIST_VIEW.
+			*/
+			int listItemIndex;
+
+			/**
+			* @brief The parameters for the #MAW_EVENT_SEGMENTED_LIST_ITEM_CLICKED.
+			*/
+			struct {
+				/**
+				* @brief The index of the section that contains the selected item.
+				*/
+				int sectionIndex;
+				/**
+				* @brief The index of the selected item within its parent section.
+				*/
+				int sectionItemIndex;
+			} listViewSectionInfo;
+
+			/**
+			* @brief The type of button that was clicked when a #MAW_EVENT_CLICKED event is receieved for a searchbar.
+			* The type of searchbar button clicked:
+			* - 0 means 'search'
+			* - 1 means 'cancel' (not implemented on Windows Phone platform, because the search bar doesn't contain any buttons)
+			*/
+			int searchBarButton;
+
+			/**
+			* @brief The new state of the checkbox when a #MAW_EVENT_CLICKED event is receieved for a checkbox or toggle button.
+			* - 0 means 'unchecked'
+			* - 1 means 'checked'
+			*/
+			int checked;
+
+			/**
+			* @brief The new tab index when a #MAW_EVENT_TAB_CHANGED event is received.
+			*/
+			int tabIndex;
+
+			/**
+			* @brief Used by event #MAW_EVENT_WEB_VIEW_CONTENT_LOADING.
+			* One of:
+			*  #MAW_CONSTANT_STARTED
+			*  #MAW_CONSTANT_DONE
+			*  #MAW_CONSTANT_STOPPED
+			*  #MAW_CONSTANT_ERROR
+			*/
+			int status;
+
+			/**
+			* @brief Parameters for the #MAW_EVENT_WEB_VIEW_HOOK_INVOKED event.
+			*/
+			struct {
+				/**
+				* @brief The type of hook that has been invoked.
+				* One of:
+				*  #MAW_CONSTANT_SOFT
+				*  #MAW_CONSTANT_HARD
+				*  #MAW_CONSTANT_MESSAGE
+				*/
+				int hookType;
+
+				/**
+				* @brief The handle to url data. This is string data,
+				* there is NO null terminating character. The encoding
+				* of the data is determined by the application.
+				* The data object MUST be deallocated with maDestroyPlaceholder
+				* after it has been used, since each event allocates a new data
+				* object for the url data (which could end up consuming all memory).
+				*/
+				MAHandle urlData;
+			} webViewHookInfo;
+
+			/**
+			* @brief TODO: Document when this structure is used.
+			*/
+			struct {
+				/**
+				* @brief The handle to the screen that was popped from the stack screen.
+				*/
+				MAWidgetHandle fromScreen;
+
+				/**
+				* @brief The handle to the screen that will be shown. If there is no screen
+				* to pop to, this will be the same as widgetHandle.
+				*/
+				MAWidgetHandle toScreen;
+			} stackScreenPopInfo;
+
+			/**
+			* The value of the slider when a #MAW_EVENT_SLIDER_VALUE_CHANGED event is received.
+			*/
+			int sliderValue;
+
+			struct {
+					/**
+					* @brief The day value when a #MAW_EVENT_DATE_PICKER_VALUE_CHANGED event is received.
+					*/
+					int dayOfMonth;
+
+					/**
+					* @brief The month value when a #MAW_EVENT_DATE_PICKER_VALUE_CHANGED event is received.
+					*/
+					int month;
+
+					/**
+					* @brief The year value when a #MAW_EVENT_DATE_PICKER_VALUE_CHANGED event is received.
+					*/
+					int year;
+			} datePickerValueInfo;
+
+			struct {
+					/**
+					* @brief The hour value when a #MAW_EVENT_TIME_PICKER_VALUE_CHANGED event is received.
+					*/
+					int hour;
+
+					/**
+					* @brief The minute value when a #MAW_EVENT_TIME_PICKER_VALUE_CHANGED event is received.
+					*/
+					int minute;
+			} timePickerValueInfo;
+
+			/**
+			* The value of the number picker when a #MAW_EVENT_NUMBER_PICKER_VALUE_CHANGED event is received.
+			*/
+			int numberPickerValue;
+
+			/**
+			* The new state of the Video view when a #MAW_EVENT_VIDEO_STATE_CHANGED event is received.
+			* One of the MAW_VIDEO_WIDGET_STATE constants.
+			*/
+			int videoViewState;
+
+			/**
+			* Send by the OptionDialog view when a #EVENT_TYPE_OPTIONS_BOX_BUTTON_CLICKED event is received.
+			*/
+			int optionDialogButtonIndex;
+
+			struct {
+					/**
+					* The rating bar new value, when a #MAW_EVENT_RATING_BAR_VALUE_CHANGED event is received.
+					*/
+					float value;
+
+					/**
+					* The author that issued the event: the user, or programatically, when a
+					* #MAW_EVENT_RATING_BAR_VALUE_CHANGED event is received.
+					*/
+					int fromUser;
+			} ratingBarValueInfo;
+
+			/**
+			* The selected radio button from a radio group, when a #MAW_EVENT_RADIO_GROUP_ITEM_SELECTED event
+			* is received.
+			*/
+			int radioGroupItemHandle;
+
+			/**
+			* The new state of a radio button, when a #MAW_EVENT_RADIO_BUTTON_STATE_CHANGED event is received.
+			*/
+			int radioButtonState;
+
+			/**
+			*  The selected menu item handle, when a #MAW_EVENT_OPTIONS_MENU_ITEM_SELECTED event is received.
+			*/
+			int optionsMenuItem;
+
+			/**
+			 * The clicked map pin index, when a #MAW_EVENT_MAP_PIN_CLICKED event is received.
+			 */
+			int mapPinIndex;
+		}
+	}
+
+	/**
+	* The available widget event types.
+	*/
+	group WidgetEventTypes "Widget event types" {
+		constset int MAW_EVENT_ {
+			/**
+			* @brief A pointer pressed event has occurred.
+			*/
+			POINTER_PRESSED = 2;
+
+			/**
+			* @brief A pointer released event has occurred.
+			*/
+			POINTER_RELEASED = 3;
+
+			/**
+			* @brief This event is not used and has been deprecated.
+			*
+			* @deprecated Use #MAW_EVENT_WEB_VIEW_CONTENT_LOADING.
+			*/
+			CONTENT_LOADED = 4;
+
+			/**
+			* @brief Sent when something is clicked.
+			*/
+			CLICKED = 5;
+
+			/**
+			* @brief Sent when an item in a list view is clicked.
+			*/
+			ITEM_CLICKED = 6;
+
+			/**
+			* @brief Sent when a tab widget has changed to a new tab.
+			*/
+			TAB_CHANGED = 7;
+
+			/**
+			* @brief Sent when an GLView has been initialized and is ready for setup.
+			*/
+			GL_VIEW_READY = 8;
+
+			/**
+			 * @brief Sent when the URL of a web view changes
+			 * @deprecated Use event #MAW_EVENT_WEB_VIEW_HOOK_INVOKED.
+			 */
+			WEB_VIEW_URL_CHANGED = 9;
+
+			/**
+			 * @brief Sent when a screen has been popped from a stack screen.
+			 */
+			STACK_SCREEN_POPPED = 10;
+
+			/**
+			 * @brief Sent when the progress level has been changed.
+			 * This includes changes that were initiated by the user through a touch gesture,
+			 * or arrow key/trackball as well as changes that were initiated programmatically.
+			 */
+				SLIDER_VALUE_CHANGED = 11;
+
+			/**
+			 * @brief Sent when the user changes\d the date in a Date Picker.
+			 */
+			DATE_PICKER_VALUE_CHANGED = 12;
+
+			/**
+			 * @brief Sent when the user changes\d the time in a Time Picker.
+			 */
+			TIME_PICKER_VALUE_CHANGED = 13;
+
+			/**
+			 * @brief Sent when the user changes\d the value in a Number Picker.
+			 */
+			NUMBER_PICKER_VALUE_CHANGED = 14;
+
+			/**
+			 * @brief Sent from the Video View when the state of the video has changed.
+			 */
+			VIDEO_STATE_CHANGED = 15;
+
+			/**
+			 * @brief Sent from the Edit box when it gains focus(the user selects the widget).
+			 * The virtual keyboard is shown.
+			 */
+			EDIT_BOX_EDITING_DID_BEGIN = 16;
+
+			/**
+			 * @brief Sent from the Edit box when it loses focus.
+			 * The virtual keyboard is hidden.
+			 */
+			EDIT_BOX_EDITING_DID_END = 17;
+
+			/**
+			 * @brief Sent from the Edit box when the text was changed.
+			 */
+			EDIT_BOX_TEXT_CHANGED = 18;
+
+			/**
+			 * @brief Sent from the Edit box when the return button was pressed.
+			 * On iOS platform the virtual keyboard is not closed after receiving this event.
+			 * The virtual keyboard can be hided by setting the MAW_EDIT_BOX_SHOW_KEYBOARD to "false".
+			 * This event is send only if the edit box mode is #MAW_EDIT_BOX_SINGLE_LINE.
+			 * Not available on Windows Phone 7.1
+			 */
+			EDIT_BOX_RETURN = 19;
+
+			/**
+			* @brief A WebView widget reports status of loading
+			* page content. Event parameter status is set to one
+			* of the following values:
+			*	#MAW_CONSTANT_STARTED
+			*	#MAW_CONSTANT_DONE
+			*	#MAW_CONSTANT_STOPPED
+			*	#MAW_CONSTANT_ERROR
+			*/
+			WEB_VIEW_CONTENT_LOADING = 20;
+
+			/**
+			* @brief A web view hook has captured a url.
+			*
+			* The event parameter hookType is set to
+			* the type of hook, one of:
+			*	#MAW_CONSTANT_SOFT
+			*	#MAW_CONSTANT_HARD
+			*
+			* Event parameter urlData is a handle to the url that
+			* has been captured.
+			*
+			* Use syscall maGetDataSize to get the size of the url data
+			* and maReadData to access the data.
+			*
+			* NOTE: When you get this message you have ownership
+			* of the url data handle and you have the responsibility to
+			* deallocate it using maDestroyPlaceholder.
+			*
+			* To get this event, you need to register a hook pattern, using
+			* maWidgetSetProperty with the properties #MAW_WEB_VIEW_SOFT_HOOK
+			* and/or #MAW_WEB_VIEW_HARD_HOOK.
+			*/
+			WEB_VIEW_HOOK_INVOKED = 21;
+
+			/**
+			* Send by a Dialog widget when when a user dismisses a popover by tapping outside of it.
+			* It will not be sent if it was dismissed by calling #maWidgetModalDialogHide().
+			* Available only on the iPad.
+			*/
+			DIALOG_DISMISSED = 22;
+
+			/**
+			* Send by current screen just before it begins rotating.
+			* Platform: iOS and Windows Phone 7.1
+			*/
+			SCREEN_ORIENTATION_WILL_CHANGE = 23;
+
+			/**
+			* Send by current screen after it finishes rotating.
+			* Platform: iOS and Windows Phone 7.1
+			*/
+			SCREEN_ORIENTATION_DID_CHANGE = 24;
+
+			/**
+			* @brief Send when the value in a Rating Bar.
+			*/
+			RATING_BAR_VALUE_CHANGED = 25;
+
+			/**
+			* @brief Send when one of the radio buttons in a radio group is selected.
+			*/
+			RADIO_GROUP_ITEM_SELECTED = 26;
+
+			/**
+			* @brief Send when	the radio button state is changed.
+			*/
+			RADIO_BUTTON_STATE_CHANGED = 27;
+
+			/**
+			* @brief Send when the Options Menu is being closed (either by the user canceling
+			* the menu with the back/menu button, or when an item is selected).
+			*/
+			OPTIONS_MENU_CLOSED = 28;
+
+			/**
+			* @brief Send when an item in your options menu is selected.
+			*/
+			OPTIONS_MENU_ITEM_SELECTED = 29;
+
+			/**
+			* @brief Sent when the zoom level of a map widget has changed (if the user zoomed in or out).
+			*/
+			MAP_ZOOM_LEVEL_CHANGED = 30;
+
+			/**
+			* @brief Sent when the visible region on the map has changed (if the user scrolled/draged the map).
+			*/
+			MAP_REGION_CHANGED = 31;
+
+			/**
+			 * @brief Sent when a map pin is clicked by the user.
+			 */
+			MAP_PIN_CLICKED = 32;
+
+			/**
+			* @brief Sent by a ListView when an item is about to be selected.
+			* The listItemIndex member from MAWidgetEventData struct will contain the item index
+			* that is about to be selected.
+			* Available only on iOS.
+			*/
+			ITEM_WILL_SELECT = 33;
+
+			/**
+			* @brief Sent by a Segmented or Alphabetical ListView when an item is selected.
+			* The event will contain the sectionIndex and the sectionItemIndex coresponding to the
+			* selected item.
+			* Available on Windows Phone 7, Android and iOS.
+			*/
+			SEGMENTED_LIST_ITEM_CLICKED = 34;
+
+			/**
+			* @brief Sent by a Segmented ListViewItem when its insert button is clicked.
+			* The event will contain the sectionIndex and the sectionItemIndex coresponding of the
+			* item. Insert button is visible only in editing mode and if its editing style is
+			* #MAW_LIST_VIEW_ITEM_EDIT_STYLE_INSERT.
+			* Available on iOS.
+			*/
+			SEGMENTED_LIST_ITEM_INSERT_BTN = 35;
+
+			/**
+			* @brief Sent by a Segmented ListViewItem when its delete button is clicked.
+			* The event will contain the sectionIndex and the sectionItemIndex coresponding of the
+			* item. The delete button is visible only in editing mode and if its editing style is
+			* #MAW_LIST_VIEW_ITEM_EDIT_STYLE_DELETE.
+			* Available on iOS.
+			*/
+			SEGMENTED_LIST_ITEM_DELETE_BTN = 36;
+		}
+	} // end of WidgetEventTypes
+} // end of WidgetEvent

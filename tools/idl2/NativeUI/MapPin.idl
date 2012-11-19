@@ -1,0 +1,47 @@
+/**
+* The available widget properties for a #MAW_MAP_PIN. See \ref WidgetProperties "Widget properties" for more properties.
+*/
+group WidgetMapPinProperties "Map pin" {
+	constset MAString MAW_MAP_PIN_ {
+		/**
+		* @brief Set the map pin latitude coordinate.
+		*
+		* @validvalue A double value between -90.0 and 90.0.
+		*
+		* @setonly
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(mapHandle, MAW_MAP_PIN_LATITUDE, "43.232544");
+		*	maWidgetSetProperty(mapHandle, MAW_MAP_PIN_LATITUDE, "-12.42324");
+		* \endcode
+		*/
+		LATITUDE = "latitude";
+
+		/**
+		* @brief Set the map pin longitude coordinate.
+		*
+		* @validvalue A double value between -180.0 and 180.0.
+		*
+		* @setonly
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(mapHandle, MAW_MAP_PIN_LONGITUDE, "80.43352");
+		*	maWidgetSetProperty(mapHandle, MAW_MAP_PIN_LONGITUDE, "-124.56442");
+		* \endcode
+		*/
+		LONGITUDE = "longitude";
+
+		/**
+		* @brief Set the map pin text.
+		*
+		* @validvalue A string value.
+		*
+		* @setandget
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(mapHandle, MAW_MAP_PIN_TEXT, "Cluj");
+		* \endcode
+		*/
+		TEXT = "text";
+	}
+} // end of WidgetMapPinProperties

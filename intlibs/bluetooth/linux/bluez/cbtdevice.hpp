@@ -15,7 +15,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
-/* 
+/*
  * File:   cbtdevice.hpp
  * Author: Ali Mosavian
  *
@@ -49,11 +49,11 @@ public:
      * @param n     Pointer to the bluetooth device name
      */
     CBtDevice ( const MABtAddr *a,
-                const char *n )    
+                const char *n )
     {
         memcpy( &mAddr, a, sizeof( MABtAddr ) );
         strncpy( mName, n, MAX_DEVICE_NAME+1 );
-        mName[MAX_DEVICE_NAME] = NULL;
+        mName[MAX_DEVICE_NAME] = 0;
     }
 
     /**

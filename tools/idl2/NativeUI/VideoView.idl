@@ -1,0 +1,203 @@
+group VideoView "Video view" {
+	/**
+	* The available playback actions for the video view. For more info see \ref WidgetVideoViewProperties.
+	*/
+	group VideoViewAction "Video view action" {
+		constset int MAW_VIDEO_VIEW_ACTION_ {
+			/**
+			* @brief Play the video.
+			*/
+			PLAY = 1;
+
+			/**
+			* @brief Pause the video.
+			*/
+			PAUSE = 2;
+
+			/**
+			* @brief Stop the video.
+			*/
+			STOP = 3;
+		}
+	}
+
+   /**
+	* Events for the video view. When the state of the video view changes an event with one
+	* of the next constants will be send.
+	* NOTE: there is a slightly different behaviour depending on the platform:
+	*  - on iOS the source is loaded into memory when
+	*  MAW_VIDEO_VIEW_STATE_PLAYING is received.
+	*	- on Android and WindowsPhone the source is loaded into memory when
+	*  MAW_VIDEO_VIEW_STATE_SOURCE_READY is received.
+	*/
+	group VideoViewEvent "Video view event" {
+		constset int MAW_VIDEO_VIEW_STATE_ {
+			/**
+			* @brief The video is playing.
+			*/
+			PLAYING = 1;
+
+			/**
+			* @brief The video is paused.
+			*/
+			PAUSED = 2;
+
+			/**
+			* @brief The video is stopped.
+			*/
+			STOPPED = 3;
+
+			/**
+			* @brief The video has finished playing.
+			*/
+			FINISHED = 4;
+
+			/**
+			* @brief The source is ready to be played.
+			* NOTE: On Android this event is received after loading url/path.
+			*		On iOS this event is received after PLAYING event is received.
+			*		On WindowsPhone this event is received after media loding has finished
+			*/
+			SOURCE_READY = 5;
+
+			/**
+			* @brief Playback is temporarily interruped(maybe there's no data in the buffer).
+			* NOTE: On WindowsPhone 7 this occurs when an error is encountered.
+			*/
+			INTERRUPTED = 6;
+		}
+	}
+
+	/**
+	* The available widget properties for a #MAW_VIDEO_VIEW. See \ref WidgetProperties "Widget properties" for more properties.
+	*/
+	group WidgetVideoViewProperties "Video View properties" {
+		constset MAString MAW_VIDEO_VIEW_ {
+			/**
+			* @brief Sets the video path.
+			* Note: available on Android and Windows Phone.
+			* @validvalue Any valid path.
+			*
+			* @setonly
+			*
+			* @par Example
+			* \code
+			*	// Set the video path.
+			*	maWidgetSetProperty(videoViewHandle, MAW_VIDEO_VIEW_PATH, "\data\Video1.wav");
+			* \endcode
+			*/
+			PATH = "path";
+
+			/**
+			* @brief Sets the video url.
+			*
+			* @validvalue Any valid streaming url.
+			*
+			* @setonly
+			*
+			* @par Example
+			* \code
+			*	// Set the video path.
+			*	maWidgetSetProperty(videoViewHandle, MAW_VIDEO_VIEW_URL, "www.example.com/play.m3u8");
+			* \endcode
+			*/
+			URL = "url";
+
+			/**
+			* @brief Start,pause or stop the video playback.
+			*
+			* @validvalue MAW_VIDEO_WIDGET_ACTION_PLAY, MAW_VIDEO_WIDGET_ACTION_PAUSE or MAW_VIDEO_WIDGET_ACTION_STOP constants.
+			*
+			* @setonly
+			*
+			* @par Example
+			* \code
+			*	// Start the playback.
+			*	maWidgetSetProperty(videoViewHandle, MAW_VIDEO_WIDGET_ACTION, toString(MAW_VIDEO_WIDGET_ACTION_PLAY));
+			* \endcode
+			*/
+			ACTION = "action";
+
+			/**
+			* @brief Seeks into the video.
+			*
+			* @validvalue A valid integer for milliseconds.
+			*
+			* @setonly
+			*
+			* @par Example
+			* \code
+			*	maWidgetSetProperty(videoViewHandle, MAW_VIDEO_VIEW_SEEK_TO, "10000");
+			* \endcode
+			*/
+			SEEK_TO = "seekTo";
+
+			/**
+			* @brief Gets the video file duration.
+			*
+			* NOTE: On Android this value can be retrieved after MAW_VIDEO_VIEW_STATE_SOURCE_READY is received.
+			*		On iOS this value can be retrieved after MAW_VIDEO_STATE_PLAYING is received.
+			* @validvalue An integer representing the total media duration in milliseconds.
+			*
+			* @getonly
+			*
+			* @par Example
+			* \code
+			*	char buf[BUFFER_SIZE];
+			*	maWidgetGetProperty(videoViewHandle, MAW_VIDEO_VIEW_DURATION, buf, BUFFER_SIZE);
+			*	// Do something with the duration.
+			* \endcode
+			*/
+			DURATION = "duration";
+
+			/**
+			* @brief Gets the buffer percentage of the played video file.
+			*
+			* @validvalue An int.
+			*
+			* @getonly
+			*
+			* @par Example
+			* \code
+			*	char buf[BUFFER_SIZE];
+			*	maWidgetGetProperty(videoViewHandle, MAW_VIDEO_VIEW_BUFFER_PERCENTAGE, buf, BUFFER_SIZE);
+			*	// Do something with the percentage.
+			* \endcode
+			*/
+			BUFFER_PERCENTAGE = "bufferPercentage";
+
+			/**
+			* @brief Gets the current position in the video file.
+			*
+			* @validvalue An integer representing the current media position in seconds.
+			*
+			* @getonly
+			*
+			* @par Example
+			* \code
+			*	char buf[BUFFER_SIZE];
+			*	maWidgetGetProperty(videoViewHandle, MAW_VIDEO_VIEW_CURRENT_POSITION, buf, BUFFER_SIZE);
+			*	// Do something with the position.
+			* \endcode
+			*/
+			CURRENT_POSITION = "currentPosition";
+
+			/**
+			* @brief Show/hide video control.
+			* Default value is "true"(video control is shown).
+			* Platform: iOS.
+			*
+			* @validvalue "true" show the video control, "false" hide the video control.
+			*
+			* @setandget
+			*
+			* @par Example
+			* \code
+			*	char buf[BUFFER_SIZE];
+			*	maWidgetGetProperty(videoViewHandle, MAW_VIDEO_VIEW_CONTROL, buf, BUFFER_SIZE);
+			* \endcode
+			*/
+			CONTROL = "control";
+		}
+	} // end of WidgetVideoViewProperties
+} // endo of VideoView

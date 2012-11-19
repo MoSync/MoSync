@@ -13,28 +13,28 @@ using Microsoft.Phone.Controls;
 
 namespace HelloButton
 {
-    public partial class MainPage : PhoneApplicationPage
-    {
+	public partial class MainPage : PhoneApplicationPage
+	{
 
-        private string benchRes;
-        // Constructor
-        public MainPage()
-        {
-            InitializeComponent();
-        }
+		private string benchRes;
+		// Constructor
+		public MainPage()
+		{
+			InitializeComponent();
+		}
 
-        private void StartButton_Click(object sender, RoutedEventArgs e)
-        {
+		private void StartButton_Click(object sender, RoutedEventArgs e)
+		{
 
-            StartButton.Content = "Running...";
+			StartButton.Content = "Running...";
 
-            StropBench sb = new StropBench();
-            benchRes = sb.bench();
-            MainText.Text = benchRes;
+			StropBench sb = new StropBench();
+			benchRes = sb.bench();
+			MainText.Text = benchRes;
 
-            StartButton.Content = "Done!";
-   
-        }
+			StartButton.Content = "Done!";
 
-    }
+		}
+
+	}
 }
