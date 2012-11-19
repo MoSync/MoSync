@@ -97,7 +97,7 @@ typedef enum VerticalAlignment
     if (self)
     {
         UILabel* label = [[[UILabelWithVerticalAlignment alloc] initWithFrame:CGRectMake(0, 0, 200, 60)] autorelease];
-        label.opaque = NO;
+        label.backgroundColor = [UIColor clearColor];
         self.view = label;
 
         self.autoSizeWidth = WidgetAutoSizeWrapContent;
