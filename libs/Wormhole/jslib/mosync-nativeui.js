@@ -661,7 +661,7 @@ mosync.nativeui.NativeWidgetElement = function(widgetType, widgetID, params,
 	 * -------
 	 * \code
 	 * 		var myWidget = mosync.nativeui.create("Button" ,"myButton");
-	 * 		myWidget.setProperty("width", "100%")
+	 * 		myWidget.setProperty("width", "FILL_AVAILABLE_SPACE")
 	 * \endcode
 	 */
 	this.setProperty = function(property, value, successCallback, errorCallback)
@@ -725,7 +725,7 @@ mosync.nativeui.NativeWidgetElement = function(widgetType, widgetID, params,
 	 *	var myButton = mosync.nativeui.create("Button" ,"myButton",
 	 *	{
 	 *		//properties of the button
-	 *		"width": "100%",
+	 *		"width": "FILL_AVAILABLE_SPACE",
 	 *		"text": "Click Me!"
 	 *	});
 	 *	myButton.addEventListener("Clicked", function()
@@ -774,7 +774,7 @@ mosync.nativeui.NativeWidgetElement = function(widgetType, widgetID, params,
 	 *	 var myButton = mosync.nativeui.create("Button" ,"myButton",
 	 *	 {
 	 *		//properties of the button
-	 *		"width": "100%",
+	 *		"width": "FILL_AVAILABLE_SPACE",
 	 *		"text": "Click Me!"
 	 *	 });
 	 *
@@ -831,7 +831,7 @@ mosync.nativeui.NativeWidgetElement = function(widgetType, widgetID, params,
 	 *	 var myButton = mosync.nativeui.create("Button" ,"myButton",
 	 *	 {
 	 *		//properties of the button
-	 *		"width": "100%",
+	 *		"width": "FILL_AVAILABLE_SPACE",
 	 *		"text": "Click Me!"
 	 *	 });
 	 *
@@ -883,7 +883,7 @@ mosync.nativeui.NativeWidgetElement = function(widgetType, widgetID, params,
 	 *	 var myButton = mosync.nativeui.create("Button" ,"myButton",
 	 *	 {
 	 *		//properties of the button
-	 *		"width": "100%",
+	 *		"width": "FILL_AVAILABLE_SPACE",
 	 *		"text": "Click Me!"
 	 *	 });
 	 *
@@ -945,7 +945,7 @@ mosync.nativeui.NativeWidgetElement = function(widgetType, widgetID, params,
 	 *	var secondButton = mosync.nativeui.create("Button" ,"SecondButton",
 	 *	{
 	 *		//properties of the button
-	 *		"width": "100%",
+	 *		"width": "FILL_AVAILABLE_SPACE",
 	 *		"text": "Second Button"
 	 *	});
 	 *	secondButton.addTo("mainLayout");
@@ -988,7 +988,7 @@ mosync.nativeui.NativeWidgetElement = function(widgetType, widgetID, params,
 	 *	var secondButton = mosync.nativeui.create("Button" ,"SecondButton",
 	 *	{
 	 *		//properties of the button
-	 *		"width": "100%",
+	 *		"width": "FILL_AVAILABLE_SPACE",
 	 *		"text": "Second Button"
 	 *	});
 	 *	secondButton.addTo("mainLayout");
@@ -1035,7 +1035,7 @@ mosync.nativeui.NativeWidgetElement = function(widgetType, widgetID, params,
 		 *	 var myButton = mosync.nativeui.create("Button" ,"myButton",
 		 *	 {
 		 *		//properties of the button
-		 *		"width": "100%",
+		 *		"width": "FILL_AVAILABLE_SPACE",
 		 *		"text": "Click Me!"
 		 *	 });
 		 *
@@ -1085,7 +1085,7 @@ mosync.nativeui.NativeWidgetElement = function(widgetType, widgetID, params,
 		 *	 var myButton = mosync.nativeui.create("Button" ,"myButton",
 		 *	 {
 		 *		//properties of the button
-		 *		"width": "100%",
+		 *		"width": "FILL_AVAILABLE_SPACE",
 		 *		"text": "Click Me!"
 		 *	 });
 		 *
@@ -1136,7 +1136,7 @@ mosync.nativeui.NativeWidgetElement = function(widgetType, widgetID, params,
 		 *	 var myButton = mosync.nativeui.create("Button" ,"myButton",
 		 *	 {
 		 *		//properties of the button
-		 *		"width": "100%",
+		 *		"width": "FILL_AVAILABLE_SPACE",
 		 *		"text": "Click Me!"
 		 *	 });
 		 *
@@ -1274,7 +1274,7 @@ mosync.nativeui.getMainWebViewId = function()
  * \code
  * 		var myButton = mosync.nativeui.create("Button", "myButton", {
  *					"text" : "Click Me!",
- *					"width" : "100%"
+ *					"width" : "FILL_AVAILABLE_SPACE"
  * 					});
  * \endcode
  */
@@ -1530,8 +1530,15 @@ mosync.nativeui.getNativeAttrName = function(attributeName) {
 
 mosync.nativeui.getNativeAttrValue = function(value) {
 	switch (String(value).toLowerCase()) {
+	// @deprecated Kept for backwards compatibility.
 	case "100%":
 		return "-1";
+		break;
+	case "FILL_AVAILABLE_SPACE":
+		return "-1";
+		break;
+	case "WRAP_CONTENT":
+		return "-2";
 		break;
 	default:
 		return value;
