@@ -1529,7 +1529,7 @@ mosync.nativeui.getNativeAttrName = function(attributeName) {
 };
 
 mosync.nativeui.getNativeAttrValue = function(value) {
-	switch (String(value).toLowerCase()) {
+	switch (String(value)) {
 	// @deprecated Kept for backwards compatibility.
 	case "100%":
 		return "-1";
