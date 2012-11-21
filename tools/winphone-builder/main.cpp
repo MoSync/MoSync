@@ -348,6 +348,12 @@ int main(int argc, char **argv) {
 	{
         de = readdir(d);
 
+#ifdef WIN32
+		std::string copyCall = "copy \"";
+#else
+		std::sting copyCall = "cp \"";
+#endif
+
 		while(de)
 		{
 			// Ignore the . and .. entries
@@ -355,7 +361,7 @@ int main(int argc, char **argv) {
 			{
 				applicationBarIconReferences.push_back( ApplicationBarIconReference( de->d_name ) );
 				std::string copyCmd;
-				copyCmd.append("copy \"");
+				copyCmd.append(copyCall.c_str());
 				copyCmd.append(dirPath.c_str());
 				copyCmd.append( de->d_name );
 				copyCmd.append("\" \"");
