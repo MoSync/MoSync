@@ -417,6 +417,10 @@ public class WebWidget extends Widget
 			this.getSettings().setDatabaseEnabled(true);
 			this.getSettings().setDomStorageEnabled(true);
 
+			// Enable support for cookies.
+			// TODO: Uncomment if we want to have cookies enabled.
+			//CookieManager.getInstance().setAcceptCookie(true);
+
 			this.setVerticalScrollbarOverlay(true);
 		}
 

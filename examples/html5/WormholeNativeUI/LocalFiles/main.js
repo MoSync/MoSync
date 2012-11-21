@@ -22,19 +22,23 @@ MA 02110-1301, USA.
  * Functions to display device info and handle sensors.
  */
 
-function onDeviceReady()
+function showDeviceInfo()
 {
 	var platform = document.getNativeElementById("DeviceOSLabel");
 	platform.setProperty("text" , "Platform: " + device.platform);
+
 	var version = document.getNativeElementById("OSVersionLabel");
 	version.setProperty("text" , "Version: " + device.version);
+
 	var uuid = document.getNativeElementById("UUIDLabel");
 	uuid.setProperty("text" , "UUID: " + device.uuid);
+
 	var deviceName = document.getNativeElementById("DeviceNameLabel");
 	deviceName.setProperty("text" , "Device Name: " + device.name);
 }
 
 var accelPhonegapWatch = null;
+
 function toggleAccelPhonegap()
 {
 	if (accelPhonegapWatch !== null)
@@ -85,6 +89,7 @@ function updateAccelPhonegap(a)
 }
 
 var geolocationWatch = null;
+
 function toggleGeolocation()
 {
 	if (geolocationWatch !== null)
@@ -125,6 +130,7 @@ function updateGeolocation(a)
 }
 
 var compassWatch = null;
+
 function toggleCompass()
 {
 	if (compassWatch !== null)
