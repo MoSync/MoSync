@@ -106,7 +106,6 @@ abstract class PIMField {
 		preProcessData();
 
 		print();
-		DebugPrint("MAX SIZE = " + MAX_SIZE);
 	}
 
 	void preProcessData() {

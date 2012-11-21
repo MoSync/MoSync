@@ -4,6 +4,7 @@ import static com.mosync.internal.android.MoSyncHelpers.DebugPrint;
 import static com.mosync.internal.generated.IX_PIM.MA_PIM_ERR_FIELD_INVALID;
 import static com.mosync.internal.generated.IX_PIM.MA_PIM_ERR_FIELD_UNSUPPORTED;
 import static com.mosync.internal.generated.IX_PIM.MA_PIM_ERR_INDEX_INVALID;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_FIELD_CONTACT_DISPLAY_NAME;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -127,14 +128,20 @@ public class PIMItem {
 	 * @param cr
 	 * @param contactId
 	 */
-	void read(ContentResolver cr, String contactId) {
+	void read(ContentResolver cr, String contactId, boolean summary) {
 		DebugPrint("PIMItem.read(" + cr + ", " + contactId + ")");
 
 		try {
-			Iterator<PIMField> fieldsIt = mPIMFields.iterator();
+			if (summary) {
+				mName.read(cr, contactId);
+				mPhone.read(cr, contactId);
+				return;
+			} else {
+				Iterator<PIMField> fieldsIt = mPIMFields.iterator();
 
-			while (fieldsIt.hasNext()) {
-				fieldsIt.next().read(cr, contactId);
+				while (fieldsIt.hasNext()) {
+					fieldsIt.next().read(cr, contactId);
+				}
 			}
 		} catch (Exception e) {
 			DebugPrint("Failed to read contact " + contactId + ".");
