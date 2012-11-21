@@ -4,7 +4,6 @@ import static com.mosync.internal.android.MoSyncHelpers.DebugPrint;
 import static com.mosync.internal.generated.IX_PIM.MA_PIM_ERR_FIELD_INVALID;
 import static com.mosync.internal.generated.IX_PIM.MA_PIM_ERR_FIELD_UNSUPPORTED;
 import static com.mosync.internal.generated.IX_PIM.MA_PIM_ERR_INDEX_INVALID;
-import static com.mosync.internal.generated.IX_PIM.MA_PIM_FIELD_CONTACT_DISPLAY_NAME;
 
 import java.util.ArrayList;
 import java.util.Iterator;
