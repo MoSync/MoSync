@@ -24,6 +24,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <sys/types.h>
 #include <dirent.h>
 
+#include "helpers/mkdir.h"
 #include "helpers/attribute.h"
 
 using namespace std;
@@ -332,26 +333,11 @@ int main(int argc, char **argv) {
 	//create directory
 	int position = outputFile.find("project");
 	std::string outputDirPath;
-	std::string command;
-	command.append("mkdir \"");
 
 	outputDirPath.append(outputFile.substr(0, position));
-	command.append(outputFile.substr(0, position));
-
-#ifdef WIN32
-	outputDirPath.append("project\\AppBar.Icons\"");
-	command.append("project\\AppBar.Icons\"");
-#else
 	outputDirPath.append("project/AppBar.Icons\"");
-	command.append("project/AppBar.Icons\"");
-#endif
 
-	printf("%s\n", command.c_str());
-	int r = system(command.c_str());
-	if(r) {
-		printf("Command failed: %i\n", r);
-		exit(r);
-	}
+	_mkdir(outputDirPath.c_str());
 
 	struct dirent* de = NULL;
 	DIR* d = NULL;
@@ -369,12 +355,14 @@ int main(int argc, char **argv) {
 			{
 				applicationBarIconReferences.push_back( ApplicationBarIconReference( de->d_name ) );
 				std::string copyCmd;
-				copyCmd.append("cp \"");
+				copyCmd.append("copy \"");
 				copyCmd.append(dirPath.c_str());
 				copyCmd.append( de->d_name );
 				copyCmd.append("\" \"");
 				copyCmd.append(outputDirPath);
-				r = system(copyCmd.c_str());
+				copyCmd.append(" /Y");
+
+				int r = system(copyCmd.c_str());
 				if(r) {
 					printf("Command failed: %i\n", r);
 					exit(r);
