@@ -1530,7 +1530,7 @@ mosync.nativeui.getNativeAttrName = function(attributeName) {
 
 mosync.nativeui.getNativeAttrValue = function(value) {
 	switch (String(value)) {
-	// @deprecated Kept for backwards compatibility.
+	// @deprecated The alias "100%" is kept for backwards compatibility.
 	case "100%":
 		return "-1";
 		break;
