@@ -32,6 +32,7 @@ MA 02110-1301, USA.
  * \brief Class for labels.
  * Methods for setting the text, alignment, font size and color are inherited
  * from TextWidget.
+ * Since MoSync 3.2 its background color is transparent.
  */
 
 #ifndef NATIVEUI_LABEL_H_
@@ -46,6 +47,7 @@ namespace NativeUI
      *
      * Methods for setting the text, alignment, font size and color are
      * inherited from TextWidget.
+     * Since MoSync 3.2 its background color is transparent.
      */
     class Label : public TextWidget
     {

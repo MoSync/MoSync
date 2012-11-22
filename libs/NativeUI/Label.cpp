@@ -23,6 +23,7 @@ MA 02110-1301, USA.
  * Class for labels.
  * Methods for setting the text, alignment, font size and color are inherited
  * from TextWidget.
+ * Since MoSync 3.2 its background color is transparent.
  */
 
 #include "Label.h"
