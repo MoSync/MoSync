@@ -235,7 +235,8 @@ public class WebWidget extends Widget
 //				url = "content://" + activity.getPackageName() + "/" + url;
 
 				// No schema present
-				// Add the local file:// schema and load the url.
+				// Add the base URL to the url and load the page.
+				// The base URL contains the schema.
 				url = mBaseURL + url;
 				webView.loadUrl(url);
 			}
@@ -270,7 +271,17 @@ public class WebWidget extends Widget
 		}
 		else if (property.equals("baseUrl")) //IX_WIDGET.MAW_WEB_VIEW_BASE_URL))
 		{
-			mBaseURL = value;
+			// Is there a schema present in the base URL?
+			if (!value.contains("://"))
+			{
+				// No schema present, add the "file://" schema.
+				mBaseURL = "file://" + value;
+			}
+			else
+			{
+				// Schema is present, just set the base URL.
+				mBaseURL = value;
+			}
 		}
 		else if (property.equals(IX_WIDGET.MAW_WEB_VIEW_SOFT_HOOK))
 		{
