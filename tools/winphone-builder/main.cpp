@@ -335,7 +335,7 @@ int main(int argc, char **argv) {
 	std::string outputDirPath;
 
 	outputDirPath.append(outputFile.substr(0, position));
-	outputDirPath.append("project/AppBar.Icons\"");
+	outputDirPath.append("project/AppBar.Icons");
 
 	_mkdir(outputDirPath.c_str());
 
@@ -349,9 +349,9 @@ int main(int argc, char **argv) {
         de = readdir(d);
 
 #ifdef WIN32
-		std::string copyCall = "copy \"";
+		std::string copyCall = "copy /Y \"";
 #else
-		std::sting copyCall = "cp \"";
+		std::string copyCall = "cp -f \"";
 #endif
 
 		while(de)
@@ -366,7 +366,7 @@ int main(int argc, char **argv) {
 				copyCmd.append( de->d_name );
 				copyCmd.append("\" \"");
 				copyCmd.append(outputDirPath);
-				copyCmd.append(" /Y");
+				copyCmd.append("\"");
 
 				int r = system(copyCmd.c_str());
 				if(r) {
