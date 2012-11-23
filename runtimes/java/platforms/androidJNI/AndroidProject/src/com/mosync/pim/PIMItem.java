@@ -127,14 +127,20 @@ public class PIMItem {
 	 * @param cr
 	 * @param contactId
 	 */
-	void read(ContentResolver cr, String contactId) {
+	void read(ContentResolver cr, String contactId, boolean summary) {
 		DebugPrint("PIMItem.read(" + cr + ", " + contactId + ")");
 
 		try {
-			Iterator<PIMField> fieldsIt = mPIMFields.iterator();
+			if (summary) {
+				mName.read(cr, contactId);
+				mPhone.read(cr, contactId);
+				return;
+			} else {
+				Iterator<PIMField> fieldsIt = mPIMFields.iterator();
 
-			while (fieldsIt.hasNext()) {
-				fieldsIt.next().read(cr, contactId);
+				while (fieldsIt.hasNext()) {
+					fieldsIt.next().read(cr, contactId);
+				}
 			}
 		} catch (Exception e) {
 			DebugPrint("Failed to read contact " + contactId + ".");

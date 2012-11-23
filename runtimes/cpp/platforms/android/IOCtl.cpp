@@ -1947,6 +1947,23 @@ namespace Base
 		return (int)result;
 	}
 
+	MAHandle _maPimListNextSummary(MAHandle list,
+		JNIEnv* jNIEnv, jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maPimListNextSummary", "(I)I");
+
+		jint result = -1;
+		if (methodID != 0)
+			result = jNIEnv->CallIntMethod(
+				jThis, methodID,
+				list);
+
+		jNIEnv->DeleteLocalRef(cls);
+
+		return (int)result;
+	}
+
 	/**
 	* Returns a handle to one of the default fonts of the device, in the style and size you specify.
 	* \param 'type' The type of the font, can be FONT_TYPE_[SANS_SERIF,SERIF,MONOSPACE].
