@@ -5,19 +5,41 @@ Native UI
 
 Widget Creation
 ---------------
-There are two different ways of creating Native UI widgets. The first approach is to write HTML markups with custom attributes. The second way is to create the UI elements using JavaScript. Here we describe the usage of HTML markups in creating Native UI. Please see mosync.nativeui.create for details on creating widgets in JavaScript
-here is an example of a code that creates a Native User Interface on the device:
+There are two different ways of creating Native UI widgets. The first approach is to write HTML markups with custom attributes. The second way is to create the UI elements using JavaScript. Here we describe the usage of HTML markups in creating Native UI. Please see mosync.nativeui.create for details on creating widgets in JavaScript.
+Here is an example of a code that creates a Native User Interface on the device:
 
 		<div id="NativeUI">
-			<!-- the element with id="mainScreen" is loaded to the device screen  by default -->
+			<!-- The element with id="mainScreen" is loaded by default -->
 			<div data-widgetType="TabScreen" id="mainScreen">
-				<div data-widgetType="Screen" id="firstScreen" data-title="Web Screen" data-icon_iOS="img/TabIconWebView.png" >
-					<div data-widgetType="WebView" data-width="100%" data-height="100%" data-url="http://www.google.com"></div>
+				<div data-widgetType="Screen"
+          id="firstScreen"
+          data-title="Web Screen"
+          data-icon_iOS="img/TabIconWebView.png" >
+					<div data-widgetType="WebView"
+            data-width="FILL_AVAILABLE_SPACE"
+            data-height="FILL_AVAILABLE_SPACE"
+            data-url="http://www.google.com">
+          </div>
 				</div>
-				<div data-widgetType="Screen" id="SecondScreen" data-title="Widget Screen">
-					<div data-widgetType="VerticalLayout" id="mainLayout" data-width="100%" data-height="100%">
-						<div data-widgetType="Label" id="myLabel" data-width="100%" data-text="Here is a Label" data-fontSize="19"></div>
-						<div data-widgetType="Button" id="myButton" data-width="100%" data-text="Click !" data-onevent="alert('Clicked!')"></div>
+				<div data-widgetType="Screen"
+          id="SecondScreen" 
+          data-title="Widget Screen">
+					<div data-widgetType="VerticalLayout"
+            id="mainLayout"
+            data-width="FILL_AVAILABLE_SPACE"
+            data-height="FILL_AVAILABLE_SPACE">
+						<div data-widgetType="Label"
+              id="myLabel"
+              data-width="FILL_AVAILABLE_SPACE"
+              data-text="Here is a Label"
+              data-fontSize="24">
+            </div>
+						<div data-widgetType="Button"
+              id="myButton"
+              data-width="FILL_AVAILABLE_SPACE"
+              data-text="Click !"
+              data-onevent="alert('Clicked!')">
+            </div>
 					</div>
 				</div>
 			</div>
@@ -28,6 +50,8 @@ All of the Native UI widgets should be wrapped inside a div tag with id "NativeU
 **Note:**: You can skip the prefix "data-" in the attributes, the system supports both versions. When using a property in the JavaScript code, you should only use the properthy name without the "data-" prefix.
 
 **Note:** Using HTML markup on Windows Phone 7 is not recommended due to performance issues. 
+
+**Note:** The alias "100%" (for value "-1") has been deprecated. It was used to set the width and height of a widget, but it was confusing, since you could not set an arbitrary percent value. New aliases "FILL_AVAILABLE_SPACE" (value "-1") and "WRAP_CONTENT" (value "-2") have been added.
 
 Icons
 -----
