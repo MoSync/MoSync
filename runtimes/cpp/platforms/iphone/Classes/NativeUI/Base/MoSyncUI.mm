@@ -328,7 +328,15 @@ static IWidget* sOldScreen = nil;
 		}
 		popOverController.contentViewController = controller;
 
-		[popOverController presentPopoverFromRect:[sOldScreen view].frame inView:[sOldScreen view] permittedArrowDirections:UIPopoverArrowDirectionAny animated:YES];
+        // Create rect's anchor. It must not have the same size as the device's screen.
+        CGRect rect = CGRectMake(controller.view.frame.origin.x,
+                                 controller.view.frame.origin.y,
+                                 1,
+                                 1);
+		[popOverController presentPopoverFromRect:rect
+                                           inView:[sOldScreen view]
+                         permittedArrowDirections:UIPopoverArrowDirectionAny
+                                         animated:YES];
 	}
 
 	[[UIApplication sharedApplication] setStatusBarHidden:YES
