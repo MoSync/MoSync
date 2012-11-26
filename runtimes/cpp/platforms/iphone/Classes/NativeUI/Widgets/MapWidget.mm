@@ -333,7 +333,7 @@
 
     // Try to dequeue an existing pin.
     static NSString *viewIdentifier = @"mapAnnotation";
-    MKPinAnnotationView *pinAnnotationView = (MKPinAnnotationView *)[mapView dequeueReusableAnnotationViewWithIdentifier:viewIdentifier];
+    MKPinAnnotationView *pinAnnotationView = [(MKPinAnnotationView *)[mapView dequeueReusableAnnotationViewWithIdentifier:viewIdentifier] retain];
 
     if (!pinAnnotationView)
     {
