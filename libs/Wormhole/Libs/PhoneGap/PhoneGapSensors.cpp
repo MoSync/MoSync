@@ -263,7 +263,8 @@ namespace Wormhole
 		{
 			keepCallBack = false;
 		}
-		//Call the Phonegap function, Can call the commandResult function too
+
+		// Call the Phonegap function, Can call the commandResult function too
 		sprintf(
 				result,
 				"\\'{\"magneticHeading\":%f }\\'",
@@ -326,7 +327,6 @@ namespace Wormhole
 			bool isWatched)
 	{
 		int res = maSensorStart(SENSOR_TYPE_COMPASS, SENSOR_RATE_NORMAL);
-		printf("result:%d",res);
 		if (res < 0)
 		{
 			mMessageHandler->callError(
