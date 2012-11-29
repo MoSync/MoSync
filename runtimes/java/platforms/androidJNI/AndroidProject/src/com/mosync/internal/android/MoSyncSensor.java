@@ -196,7 +196,7 @@ public class MoSyncSensor implements SensorEventListener {
 					}
 					if(mActiveSensors.contains(SENSOR_TYPE_COMPASS))
 					{
-						Log.i("@@MOSYNC","got compass data");
+						SYSLOG("@@@ MOSYNC onSensorChanged: got compass data");
 						event[SENSOR_EVENT_SENSOR_TYPE] = SENSOR_TYPE_COMPASS;
 						event[SENSOR_EVENT_VALUES] = Float.floatToIntBits(se.values[0]);
 						sendEvent(event);
