@@ -77,7 +77,7 @@ static void error(ParserState* state, const char* msg) {
 	error(state, string(msg));
 }
 
-string getVariantStr(string variant) {
+static string getVariantStr(string variant) {
 	if (variant.length() == 0) {
 		return string("(fallback variant)");
 	} else {
@@ -364,7 +364,7 @@ void VariantResourceSet::parseLSTX(string inputFile) {
 	delete state;
 }
 
-const char* mosyncdir() {
+static const char* mosyncdir() {
 	static const char* md = NULL;
 	if(!md) {
 		md	= getenv("MOSYNCDIR");
@@ -389,7 +389,7 @@ string VariantResourceSet::parseLST(string lstFile, string outputDir) {
 	return output;
 }
 
-const char* getDefaultVariantAttr(const char* resourceType) {
+static const char* getDefaultVariantAttr(const char* resourceType) {
 	if (!strcmp(RES_BINARY, resourceType)) {
 		return ATTR_PLATFORM;
 	} else if (!strcmp(RES_IMAGE, resourceType)) {
@@ -418,7 +418,7 @@ bool equalsIgnoreCase(const char* attr, const char* variantAttr) {
 	return false;
 }
 
-const char* getStandardVariantAttr(const char* variantAttr) {
+static const char* getStandardVariantAttr(const char* variantAttr) {
 	if (equalsIgnoreCase(ATTR_PLATFORM, variantAttr)) return ATTR_PLATFORM;
 	if (equalsIgnoreCase(ATTR_LOCALE, variantAttr)) return ATTR_LOCALE;
 	if (equalsIgnoreCase(ATTR_SCREENSIZE, variantAttr)) return ATTR_SCREENSIZE;
@@ -652,7 +652,7 @@ static void writePStr(char* array, int& offset, const char* str, size_t len) {
 	}
 }
 
-void addLabelDirective(ostringstream& output, const char* label) {
+static void addLabelDirective(ostringstream& output, const char* label) {
 	output << ".label \"" << label << "\"\n";
 }
 

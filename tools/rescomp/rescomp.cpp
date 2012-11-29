@@ -21,13 +21,14 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <string.h>
 #include "xlstcomp.h"
 #include "File.h"
+#include "helpers/attribute.h"
 
 #define LST_EXT "lst"
 #define LSTX_EXT "lstx"
 
 using namespace std;
 
-void printUsage();
+void printUsage() GCCATTRIB(noreturn);
 bool isExt(const string& filename, const string& ext);
 
 void printUsage() {

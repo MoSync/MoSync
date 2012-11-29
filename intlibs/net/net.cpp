@@ -23,6 +23,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "helpers/cpp_defs.h"
 #include "helpers/helpers.h"
 #include "net_errors.h"
+#if defined(LINUX) || defined(DARWIN)
+#include <unistd.h>
+#endif
 
 using namespace MoSyncError;
 
