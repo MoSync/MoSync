@@ -27,7 +27,7 @@
 <property key="com.mobilesorcery.sdk.html5.support" value="true"/>
 <property key="dependency.strategy" value="0"/>
 <property key="excludes/Debug" value=""/>
-<property key="odd.support" value="true"/>
+<property key="odd.support" value="false"/>
 <property key="profile.mgr.type" value="0"/>
 <property key="template.id" value="project.wormhole.web"/>
 <property key="winmobilecs:guid" value="31b84570-32fb-102f-8027-5f4aeede1a9f"/>
