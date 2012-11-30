@@ -101,6 +101,10 @@ class RuntimeBuilder
 		android_sdk = "#{$SETTINGS[:android_sdk]}/platforms/android-#{platform}"
 		android_ndk = "#{$SETTINGS[:android_ndk]}"
 
+		if(platform == "17" && !File.exist?(android_sdk))
+			android_sdk = "#{$SETTINGS[:android_sdk]}/platforms/android-4.2"
+		end
+
 		cpath = FileUtils.pwd
 
 		# We must fix the path here, if it's relative things will break later..
