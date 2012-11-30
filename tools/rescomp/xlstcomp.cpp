@@ -33,6 +33,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "File.h"
 #include "xlstcomp.h"
 #include "resdirectives.h"
+#include "helpers/attribute.h"
 
 using namespace std;
 
@@ -55,6 +56,7 @@ using namespace std;
 #define RES_HALF "half"
 #define RES_PLACEHOLDER "placeholder"
 
+static void error(const char* file, int lineNo, string msg) GCCATTRIB(noreturn);
 static void error(const char* file, int lineNo, string msg) {
 	ostringstream errMsg;
 	if (file) {
@@ -65,6 +67,7 @@ static void error(const char* file, int lineNo, string msg) {
 	exit(1);
 }
 
+static void error(ParserState* state, string msg) GCCATTRIB(noreturn);
 static void error(ParserState* state, string msg) {
 	if (state) {
 		error(state->fileName.c_str(), state->lineNo, msg);
@@ -73,6 +76,7 @@ static void error(ParserState* state, string msg) {
 	}
 }
 
+static void error(ParserState* state, const char* msg) GCCATTRIB(noreturn);
 static void error(ParserState* state, const char* msg) {
 	error(state, string(msg));
 }
