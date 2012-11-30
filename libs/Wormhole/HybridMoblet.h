@@ -171,6 +171,20 @@ public:
 		MAHandle data);
 
 	/**
+	 * Prints the incoming webview message. Used for debugging.
+	 *
+	 * To call this method, override HybridMoblet::handleWebViewMessage
+	 * in your moblet with the following method:
+	 *
+	 * void handleWebViewMessage(MAHandle webViewHandle, MAHandle data)
+	 * {
+	 *    printWebViewMessage(data);
+	 *    HybridMoblet::handleWebViewMessage(webViewHandle, data);
+	 * }
+	 */
+	virtual void printWebViewMessage(MAHandle dataHandle);
+
+	/**
 	 * Handles HOOK_INVOKED events for WebViews in the app.
 	 * This code enables WebViews to send messages to each other.
 	 *

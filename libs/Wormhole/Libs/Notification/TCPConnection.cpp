@@ -72,7 +72,8 @@ namespace Wormhole
 		}
 		else
 		{
-			printf("Message not sent to server");
+			// TODO: Add error handling, printf should not be used.
+			//printf("Message not sent to server");
 		}
 	}
 
@@ -101,9 +102,11 @@ namespace Wormhole
 	*/
 	void TCPConnection::connectFinished(MAUtil::Connection* conn, int result)
 	{
-		if(result < 0)
+		if (result < 0)
 		{
-			printf("mConnection.connectFinished failed. Error code: %d", result);
+			// TODO: Add error handling, printf should not be used.
+			//printf("mConnection.connectFinished failed. Error code: %d", result);
+			mConnected = false;
 		}
 		else
 		{
@@ -122,7 +125,8 @@ namespace Wormhole
 		if(result < 0)
 		{
 			mMessageSent = false;
-			printf("mConnection.write failed. Error code: %d", result);
+			// TODO: printf should not be used.
+			//printf("mConnection.write failed. Error code: %d", result);
 			maMessageBox(CONNECTION_ERROR_TITLE, CANNOT_SEND_DATA_ERROR);
 		}
 		else

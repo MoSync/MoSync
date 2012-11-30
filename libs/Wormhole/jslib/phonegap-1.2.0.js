@@ -3821,7 +3821,7 @@ var Connection = function()
     var me = this;
     this.getInfo(
         function(type) {
-            console.log("getInfo result" + type);
+            console.log("PhoneGap: Connection getInfo type: " + type);
             // Need to send events if we are on or offline
             if (type == "none") {
                 // set a timer if still offline at the end of timer send the offline event

@@ -42,7 +42,7 @@
 <property key="dependency.strategy" value="0"/>
 <property key="excludes/Debug" value=""/>
 <property key="excludes/Release" value=""/>
-<property key="odd.support" value="true"/>
+<property key="odd.support" value="false"/>
 <property key="profile.mgr.type" value="0"/>
 <property key="standard.excludes" value="%test.ns:test.res%"/>
 <property key="symbian.uids:proj.spec.keys" value="false"/>
