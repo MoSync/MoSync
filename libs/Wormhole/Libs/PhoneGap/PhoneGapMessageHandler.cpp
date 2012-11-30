@@ -176,7 +176,7 @@ namespace Wormhole
 	{
 		if (MAK_BACK == keyCode)
 		{
-			callJS("PhoneGapCommandResult('backbutton');");
+			callJS("try{PhoneGapCommandResult('backbutton')}catch(e){}");
 		}
 	}
 
@@ -308,12 +308,12 @@ namespace Wormhole
 		else if (event.type == EVENT_TYPE_FOCUS_LOST)
 		{
 			//let the phoneGap app know that it should go to sleep
-			callJS("PhoneGapCommandResult('pause');");
+			callJS("try{PhoneGapCommandResult('pause')}catch(e){}");
 		}
 		else if (event.type == EVENT_TYPE_FOCUS_GAINED)
 		{
 			//let the PhoneGap side know that it should resume
-			callJS("PhoneGapCommandResult('resume');");
+			callJS("try{PhoneGapCommandResult('resume')}catch(e){}");
 		}
 	}
 

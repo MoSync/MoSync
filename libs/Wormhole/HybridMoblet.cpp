@@ -381,7 +381,7 @@ void HybridMoblet::sendDeviceScreenSizeToJavaScript()
 	char buf[512];
 	sprintf(
 		buf,
-		"mosync.nativeui.setScreenSize(%d,%d)",
+		"try{mosync.nativeui.setScreenSize(%d,%d)}catch(e){}",
 		width,
 		height);
 	callJS(buf);
@@ -397,7 +397,7 @@ void HybridMoblet::sendWebViewHandleToJavaScript()
 	//We use a special callback for widget creation
 	sprintf(
 		buffer,
-		"mosync.nativeui.setWebViewHandle('%d')",
+		"try{mosync.nativeui.setWebViewHandle('%d')}catch(e){}",
 		widget);
 	callJS(buffer);
 }
