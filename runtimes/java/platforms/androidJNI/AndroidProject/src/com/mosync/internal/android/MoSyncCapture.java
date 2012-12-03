@@ -208,9 +208,7 @@ public class MoSyncCapture
 			if ( property.equals(MA_CAPTURE_MAX_DURATION) )
 			{
 				// EXTRA_DURATION_LIMIT is supported on Android 2.2 and higher.
-				// Version.SDK_INT is not available on sdk 3.
-				int target = IntConverter.convert( Build.VERSION.SDK );
-				if ( target >= 8 )
+				if ( Build.VERSION.SDK_INT >= Build.VERSION_CODES.FROYO )
 				{
 					mVideoDurationLimit = IntConverter.convert(value);
 				}
@@ -270,9 +268,7 @@ public class MoSyncCapture
 		if ( property.equals(MA_CAPTURE_MAX_DURATION) )
 		{
 			// EXTRA_DURATION_LIMIT is supported on Android 2.2 and higher.
-			// Version.SDK_INT is not available on sdk 3.
-			int target = IntConverter.convert( Build.VERSION.SDK );
-			if ( target >= 8 )
+			if ( Build.VERSION.SDK_INT >= Build.VERSION_CODES.FROYO )
 			{
 				// Return max duration only if it was explicitly set.
 				if ( mVideoDurationLimit != CAPTURE_DEFAULT_PROPERTY_VALUE )

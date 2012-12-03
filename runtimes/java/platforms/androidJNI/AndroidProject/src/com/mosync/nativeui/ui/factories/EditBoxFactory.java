@@ -13,14 +13,14 @@ You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301, USA.
-*/
+ */
 
 package com.mosync.nativeui.ui.factories;
 
 import android.app.Activity;
+import android.os.Build;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnFocusChangeListener;
@@ -34,16 +34,16 @@ import com.mosync.internal.android.EventQueue;
 import com.mosync.internal.generated.IX_WIDGET;
 import com.mosync.nativeui.ui.widgets.EditBoxWidget;
 import com.mosync.nativeui.ui.widgets.Widget;
-import com.mosync.nativeui.util.KeyboardManager;
 
 /**
  * A factory that creates an editbox that sends a click event
  * when the enter key is pressed.
- *
  * @author fmattias
  */
 public class EditBoxFactory implements AbstractViewFactory
 {
+	boolean m_clearFocus = true;
+
 	@Override
 	public Widget create(Activity activity, final int handle)
 	{
@@ -79,8 +79,19 @@ public class EditBoxFactory implements AbstractViewFactory
 			@Override
 			public void onFocusChange(View v, boolean hasFocus) {
 				if (hasFocus)
+				{
+					if ( Build.VERSION.SDK_INT < Build.VERSION_CODES.ICE_CREAM_SANDWICH )
+					{
+						//when the editbox is added to the screen it's gaining focus and trying to show the keyboard but it fails
+						if (m_clearFocus) {
+							m_clearFocus = false;
+							v.clearFocus();
+							return;
+						}
+					}
 					EventQueue.getDefault( ).postWidgetEvent(
 							IX_WIDGET.MAW_EVENT_EDIT_BOX_EDITING_DID_BEGIN, handle );
+				}
 				else
 
 					EventQueue.getDefault( ).postWidgetEvent(
