@@ -30,7 +30,7 @@ MA 02110-1301, USA.
  */
 
 // Include Moblet and message class for web applications.
-#include <Wormhole/WebAppMoblet.h>
+#include <Wormhole/HybridMoblet.h>
 #include <Wormhole/MessageStreamJSON.h>
 // Utility functions for working with NDEF tags
 #include "nfcutil.h"
@@ -41,7 +41,7 @@ MA 02110-1301, USA.
 // Namespaces we want to access.
 using namespace MAUtil; // Class Moblet
 using namespace NativeUI; // Class WebView
-using namespace Wormhole; // Class WebAppMoblet
+using namespace Wormhole; // Class HybridMoblet
 
 // A buffer size used as a basis for text buffers and data buffers.
 #define BUF_SIZE 4096
@@ -70,7 +70,7 @@ enum Mode { _read, _write };
 /**
  * The application class.
  */
-class NFCMoblet : public WebAppMoblet, TimerListener
+class NFCMoblet : public HybridMoblet, TimerListener
 {
 private:
 	// This is the buffer used for writing messages in the UI.
@@ -95,9 +95,9 @@ public:
 
 	void initWebView() {
 		// Initialize the web view and show the main page.
-		enableWebViewMessages();
-		getWebView()->disableZoom();
 		showPage("index.html");
+		// Disable zooming of the page.
+		getWebView()->disableZoom();
 	}
 
 	/**
@@ -329,7 +329,7 @@ public:
 	}
 
 	/**
-	 * Set read/write mode and issue an appropiate message to the user.
+	 * Set read/write mode and issue an appropriate message to the user.
 	 */
 	void setMode(Mode mode) {
 		fMode = mode;
@@ -531,6 +531,6 @@ public:
  */
 extern "C" int MAMain()
 {
-	Moblet::run(new NFCMoblet());
+	(new NFCMoblet())->enterEventLoop();
 	return 0;
 }

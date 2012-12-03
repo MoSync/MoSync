@@ -52,7 +52,7 @@ MA 02110-1301, USA.
 #include <maheap.h>					    // C memory allocation functions.
 #include <mastring.h>				    // C String functions.
 #include <mavsprintf.h>				    // sprintf etc.
-#include <Wormhole/WebAppMoblet.h>	    // Moblet for web applications.
+#include <Wormhole/HybridMoblet.h>	    // Moblet for web applications.
 #include <Wormhole/MessageStreamJSON.h>	// Messages from JavaScript.
 
 using namespace MAUtil;
@@ -69,13 +69,14 @@ static bool sSendSMSForReal = true;
 /**
  * The application class.
  */
-class LoveSMSMoblet : public WebAppMoblet
+class LoveSMSMoblet : public HybridMoblet
 {
 public:
 	LoveSMSMoblet()
 	{
-		// Enable message sending from JavaScript to C++.
-		enableWebViewMessages();
+		// The page in the "LocalFiles" folder to
+		// show when the application starts.
+		showPage("index.html");
 
 		// Change this line to enableZoom to enable the
 		// user to zoom the web page. To disable zoom is
@@ -83,10 +84,6 @@ public:
 		// reasonable default size on devices with
 		// different screen sizes.
 		getWebView()->disableZoom();
-
-		// The page in the "LocalFiles" folder to
-		// show when the application starts.
-		showPage("index.html");
 	}
 
 	/**
@@ -123,6 +120,17 @@ public:
 			// We could alternatively use a JavaScript File API
 			// to do this.
 			setSavedPhoneNo();
+		}
+	}
+
+	/**
+	 * Close app when back key is pressed (on Android).
+	 */
+	void keyPressEvent(int keyCode, int nativeCode)
+	{
+		if (MAK_BACK == keyCode)
+		{
+			close();
 		}
 	}
 
@@ -247,6 +255,6 @@ public:
  */
 extern "C" int MAMain()
 {
-	Moblet::run(new LoveSMSMoblet());
+	(new LoveSMSMoblet())->enterEventLoop();
 	return 0;
 }
