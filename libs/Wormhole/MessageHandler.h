@@ -71,6 +71,21 @@ public:
 	virtual void initialize(Wormhole::HybridMoblet* moblet);
 
 	/**
+	 * Experimental way to set a custom message handler.
+	 */
+	virtual void setPhoneGapMessageHandler(PhoneGapMessageHandler* handler);
+
+	/**
+	 * Experimental way to set a custom message handler.
+	 */
+	virtual void setNativeUIMessageHandler(NativeUIMessageHandler* handler);
+
+	/**
+	 * Experimental way to set a custom message handler.
+	 */
+	virtual void setResourceMessageHandler(ResourceMessageHandler* handler);
+
+	/**
 	 * Called when document in main WebView is loaded. Here we
 	 * perform initialization of Wormhole that needs to be done
 	 * when all JS has been loaded.

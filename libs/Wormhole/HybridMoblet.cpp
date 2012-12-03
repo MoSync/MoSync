@@ -90,6 +90,12 @@ HybridMoblet::HybridMoblet()
 
 	// Create file utility object.
 	mFileUtil = new FileUtil();
+
+	// Create message handler.
+	// The idea with moving to pointers for handlers is
+	// that then they are pluggable by the users of this class.
+	// Like the "strategy" or "state" pattern.
+	mMessageHandler = new MessageHandler();
 }
 
 /**
@@ -109,6 +115,9 @@ HybridMoblet::~HybridMoblet()
 
 	// Delete the file utility object.
 	delete mFileUtil;
+
+	// Delete message handler.
+	delete mMessageHandler;
 }
 
 void HybridMoblet::initialize()
@@ -127,7 +136,7 @@ void HybridMoblet::initialize()
 
 	// Initialize the message handler. All messages from
 	// JavaScript are routed through this handler.
-	mMessageHandler.initialize(this);
+	mMessageHandler->initialize(this);
 }
 
 void HybridMoblet::openWormhole(MAHandle webViewHandle)
@@ -135,7 +144,7 @@ void HybridMoblet::openWormhole(MAHandle webViewHandle)
 	sendDeviceScreenSizeToJavaScript();
 	sendWebViewHandleToJavaScript();
 
-	mMessageHandler.openWormhole(webViewHandle, this);
+	mMessageHandler->openWormhole(webViewHandle, this);
 }
 
 /**
@@ -228,7 +237,7 @@ void HybridMoblet::showWebView()
  */
 void HybridMoblet::setBeepSound(MAHandle beepSoundResource)
 {
-	mMessageHandler.setBeepSound(beepSoundResource);
+	mMessageHandler->setBeepSound(beepSoundResource);
 }
 
 /**
@@ -252,7 +261,7 @@ void HybridMoblet::addMessageFun(
 	const char* command,
 	FunTable::MessageHandlerFun fun)
 {
-	mMessageHandler.addMessageFun(command, fun);
+	mMessageHandler->addMessageFun(command, fun);
 }
 
 /**
@@ -269,7 +278,7 @@ void HybridMoblet::handleWebViewMessage(
 	MAHandle webViewHandle,
 	MAHandle data)
 {
-	mMessageHandler.handleWebViewMessage(webViewHandle, data, this);
+	mMessageHandler->handleWebViewMessage(webViewHandle, data, this);
 }
 
 /**
@@ -357,7 +366,7 @@ void HybridMoblet::customEvent(const MAEvent& event)
  */
 void HybridMoblet::keyPressEvent(int keyCode, int nativeCode)
 {
-	mMessageHandler.keyPressEvent(keyCode, nativeCode);
+	mMessageHandler->keyPressEvent(keyCode, nativeCode);
 }
 
 /**

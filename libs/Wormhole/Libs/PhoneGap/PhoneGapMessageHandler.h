@@ -58,6 +58,14 @@ MA 02110-1301, USA.
 
 namespace Wormhole
 {
+	// Forward declarations
+	class PhoneGapSensors;
+	class PhoneGapSensorManager;
+	class PhoneGapFile;
+	class PhoneGapCapture;
+	class PhoneGapCamera;
+	class PushNotificationManager;
+
 	/**
 	 * Class that implements JavaScript calls.
 	 *
@@ -79,13 +87,24 @@ namespace Wormhole
 		virtual ~PhoneGapMessageHandler();
 
 		/**
+		 * Methods that set handlers. Use this method to customize
+		 * event handling by providing your own handler class.
+		 */
+		void setSensorsHandler(PhoneGapSensors* handler);
+		void setSensorManagerHandler(SensorManager* handler);
+		void setFileHandler(PhoneGapFile* handler);
+		void setCaptureHandler(PhoneGapCapture* handler);
+		void setCameraHandler(PhoneGapCamera* handler);
+		void setPushNotificationManagerHandler(PushNotificationManager* handler);
+
+		/**
 		 * Implementation of PhoneGap and other APIs exposed in JavaScript.
 		 * This function is used to detect different messages and call the
 		 * respective function in MoSync.
 		 *
 		 * @return true if message was handled, false if not.
 		 */
-		bool PhoneGapMessageHandler::handlePhoneGapMessage(JSONMessage& message);
+		virtual bool handlePhoneGapMessage(JSONMessage& message);
 
 		/**
 		 * Called whenever sensor data is ready
@@ -209,32 +228,32 @@ namespace Wormhole
 		/**
 		 * PhoneGap sensor API:s message handler.
 		 */
-		PhoneGapSensors mPhoneGapSensors;
+		PhoneGapSensors* mPhoneGapSensors;
 
 		/**
 		 * W3C sensor manager API:s message handler.
 		 */
-		SensorManager mPhoneGapSensorManager;
+		SensorManager* mSensorManager;
 
 		/**
 		 * PhoneGap File API message handler.
 		 */
-		PhoneGapFile mPhoneGapFile;
+		PhoneGapFile* mPhoneGapFile;
 
 		/**
 		 * PhoneGap Capture API message handler.
 		 */
-		PhoneGapCapture mPhoneGapCapture;
+		PhoneGapCapture* mPhoneGapCapture;
 
 		/**
 		 * PhoneGap Camera API message handler.
 		 */
-		PhoneGapCamera mPhoneGapCamera;
+		PhoneGapCamera* mPhoneGapCamera;
 
 		/**
 		 * Notification API message handler.
 		 */
-		PushNotificationManager mPushNotificationManager;
+		PushNotificationManager* mPushNotificationManager;
 
 		/**
 		 * The beep sound.

@@ -31,11 +31,11 @@ MA 02110-1301, USA.
 namespace Wormhole
 {
 
-MessageHandler::MessageHandler() :
-	mPhoneGapMessageHandler(NULL),
-	mNativeUIMessageHandler(NULL),
-	mResourceMessageHandler(NULL)
+MessageHandler::MessageHandler()
 {
+	mPhoneGapMessageHandler = NULL;
+	mNativeUIMessageHandler = NULL;
+	mResourceMessageHandler = NULL;
 }
 
 MessageHandler::~MessageHandler()
@@ -64,13 +64,37 @@ void MessageHandler::initialize(Wormhole::HybridMoblet* moblet)
 	// be relaxed if desired to enable secondary webviews
 	// to use e.g. the PhoneGap API. There is however a
 	// problem with APIs based on MoSync events, e.g. the
-	// accellerometer, since it can not easily be determined,
+	// accelerometer, since it can not easily be determined,
 	// which webviews have subscribed for which events, at least
 	// not without substantial code, causing added complexity.
 	NativeUI::WebView* webView = moblet->getWebView();
 	mPhoneGapMessageHandler = new PhoneGapMessageHandler(webView);
 	mNativeUIMessageHandler = new NativeUIMessageHandler(webView);
 	mResourceMessageHandler = new ResourceMessageHandler(webView);
+}
+
+/**
+ * Experimental way to set a custom message handler.
+ */
+void MessageHandler::setPhoneGapMessageHandler(PhoneGapMessageHandler* handler)
+{
+	if (NULL != mPhoneGapMessageHandler) { delete mPhoneGapMessageHandler; }
+}
+
+/**
+ * Experimental way to set a custom message handler.
+ */
+void MessageHandler::setNativeUIMessageHandler(NativeUIMessageHandler* handler)
+{
+	if (NULL != mNativeUIMessageHandler) { delete mNativeUIMessageHandler; }
+}
+
+/**
+ * Experimental way to set a custom message handler.
+ */
+void MessageHandler::setResourceMessageHandler(ResourceMessageHandler* handler)
+{
+	if (NULL != mResourceMessageHandler) { delete mResourceMessageHandler; }
 }
 
 void MessageHandler::openWormhole(

@@ -39,14 +39,15 @@ namespace Wormhole
 	 */
 	PhoneGapMessageHandler::PhoneGapMessageHandler(NativeUI::WebView* webView) :
 		mWebView(webView),
-		mPhoneGapSensors(this),
-		mPhoneGapSensorManager(this),
-		mPhoneGapFile(this),
-		mPhoneGapCapture(this),
-		mPhoneGapCamera(this),
-		mPushNotificationManager(this),
 		mBeepSound(0)
 	{
+		mPhoneGapSensors = new PhoneGapSensors(this);
+		mSensorManager = new SensorManager(this);
+		mPhoneGapFile = new PhoneGapFile(this);
+		mPhoneGapCapture = new PhoneGapCapture(this);
+		mPhoneGapCamera = new PhoneGapCamera(this);
+		mPushNotificationManager = new PushNotificationManager(this);
+
 		enableHardware();
 
 		for (int i = 0; i < MAXIMUM_SENSORS; i++)
@@ -60,6 +61,54 @@ namespace Wormhole
 	 */
 	PhoneGapMessageHandler::~PhoneGapMessageHandler()
 	{
+		if (mPhoneGapSensors) { delete mPhoneGapSensors; }
+		if (mSensorManager) { delete mSensorManager; }
+		if (mPhoneGapFile) { delete mPhoneGapFile; }
+		if (mPhoneGapCapture) { delete mPhoneGapCapture; }
+		if (mPhoneGapCamera) { delete mPhoneGapCamera; }
+		if (mPushNotificationManager) { delete mPushNotificationManager; }
+	}
+
+	void PhoneGapMessageHandler::setSensorsHandler(
+		PhoneGapSensors* handler)
+	{
+		if (mPhoneGapSensors) { delete mPhoneGapSensors; }
+		mPhoneGapSensors = handler;
+	}
+
+	void PhoneGapMessageHandler::setSensorManagerHandler(
+		SensorManager* handler)
+	{
+		if (mSensorManager) { delete mSensorManager; }
+		mSensorManager = handler;
+	}
+
+	void PhoneGapMessageHandler::setFileHandler(
+		PhoneGapFile* handler)
+	{
+		if (mPhoneGapFile) { delete mPhoneGapFile; }
+		mPhoneGapFile = handler;
+	}
+
+	void PhoneGapMessageHandler::setCaptureHandler(
+		PhoneGapCapture* handler)
+	{
+		if (mPhoneGapCapture) { delete mPhoneGapCapture; }
+		mPhoneGapCapture = handler;
+	}
+
+	void PhoneGapMessageHandler::setCameraHandler(
+		PhoneGapCamera* handler)
+	{
+		if (mPhoneGapCamera) { delete mPhoneGapCamera; }
+		mPhoneGapCamera = handler;
+	}
+
+	void PhoneGapMessageHandler::setPushNotificationManagerHandler(
+		PushNotificationManager* handler)
+	{
+		if (mPushNotificationManager) { delete mPushNotificationManager; }
+		mPushNotificationManager = handler;
 	}
 
 	/**
@@ -132,31 +181,31 @@ namespace Wormhole
 			|| (message.getParam("service") == "GeoLocation")
 			|| (message.getParam("service") == "Compass"))
 		{
-			mPhoneGapSensors.handleMessage(message);
+			mPhoneGapSensors->handleMessage(message);
 		}
 		else if (message.getParam("service") == "SensorManager")
 		{
-			mPhoneGapSensorManager.handleMessage(message);
+			mSensorManager->handleMessage(message);
 		}
 		else if (message.getParam("service") == "File")
 		{
-			mPhoneGapFile.handleFileMessage(message);
+			mPhoneGapFile->handleFileMessage(message);
 		}
 		else if (message.getParam("service") == "FileTransfer")
 		{
-			mPhoneGapFile.handleFileTransferMessage(message);
+			mPhoneGapFile->handleFileTransferMessage(message);
 		}
 		else if (message.getParam("service") == "PushNotification")
 		{
-			mPushNotificationManager.handleMessage(message);
+			mPushNotificationManager->handleMessage(message);
 		}
 		else if (message.getParam("service") == "Capture")
 		{
-			mPhoneGapCapture.handleMessage(message);
+			mPhoneGapCapture->handleMessage(message);
 		}
 //		else if (message.getParam("service") == "Camera")
 //		{
-//			mPhoneGapCamera.handleMessage(message);
+//			mPhoneGapCamera->handleMessage(message);
 //		}
 		else
 		{
@@ -303,7 +352,7 @@ namespace Wormhole
 	{
 		if (event.type == EVENT_TYPE_LOCATION)
 		{
-			mPhoneGapSensors.sendLocationData(event);
+			mPhoneGapSensors->sendLocationData(event);
 		}
 		else if (event.type == EVENT_TYPE_FOCUS_LOST)
 		{
@@ -328,16 +377,16 @@ namespace Wormhole
 		{
 			if (sensorData.type == SENSOR_TYPE_ACCELEROMETER)
 			{
-				mPhoneGapSensors.sendAccelerometerData(sensorData);
+				mPhoneGapSensors->sendAccelerometerData(sensorData);
 			}
 			else if (sensorData.type == SENSOR_TYPE_COMPASS)
 			{
-				mPhoneGapSensors.sendCompassData(sensorData);
+				mPhoneGapSensors->sendCompassData(sensorData);
 			}
 		}
 		else
 		{
-			mPhoneGapSensorManager.sendSensorData(sensorData);
+			mSensorManager->sendSensorData(sensorData);
 		}
 	}
 

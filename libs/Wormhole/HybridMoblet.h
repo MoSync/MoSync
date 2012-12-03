@@ -286,7 +286,7 @@ public: // On purpose!
 	/**
 	 * Handles messages sent from JavaScript.
 	 */
-	MessageHandler mMessageHandler;
+	MessageHandler* mMessageHandler;
 
 	/**
 	 * Is the moblet initialized?
