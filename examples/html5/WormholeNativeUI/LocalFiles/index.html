@@ -8,11 +8,10 @@
 -->
 <html>
 <head>
-	<meta name="viewport" content="width=320, user-scalable=no">
 	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
-	<script type="text/javascript" charset="utf-8" src="js/wormhole.js"></script>
-	<script type="text/javascript" charset="utf-8" src="main.js"></script>
-	<script type="text/javascript">
+	<script src="js/wormhole.js"></script>
+	<script src="main.js"></script>
+	<script>
 		/**
 		 * Called by the NativeUI library when the UI is ready to
 		 * be shown. Show the main screen here.
@@ -97,7 +96,7 @@
 						data-width="FILL_AVAILABLE_SPACE"
 						data-fontSize="24"
 						data-text="Vibrate"
-						data-onevent="navigator.notification.vibrate(1000)" ></div>
+						data-onevent="navigator.notification.vibrate(500)" ></div>
 					<div data-widgetType="Button"
 						id="BeepButton"
 						data-width="FILL_AVAILABLE_SPACE"
@@ -142,7 +141,7 @@
 						id="ToggleAccelButton"
 						data-width="FILL_AVAILABLE_SPACE"
 						data-fontSize="24"
-						data-text="Toggle Accelerometer"
+						data-text="Toggle Accelerometer (is off)"
 						data-onevent="toggleAccelPhonegap()">
 					</div>
 					<div data-widgetType="HorizontalLayout"
@@ -164,7 +163,7 @@
 						id="ToggleLocButton"
 						data-width="FILL_AVAILABLE_SPACE"
 						data-fontSize="24"
-						data-text="Toggle Location"
+						data-text="Toggle Location (is off)"
 						data-onevent="toggleGeolocation()">
 					</div>
 					<div data-widgetType="HorizontalLayout"
@@ -181,7 +180,7 @@
 						id="ToggleCompassButton"
 						data-width="FILL_AVAILABLE_SPACE"
 						data-fontSize="24"
-						data-text="Toggle Compass"
+						data-text="Toggle Compass (is off)"
 						data-onevent="toggleCompass()">
 					</div>
 				</div>

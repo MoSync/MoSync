@@ -273,6 +273,39 @@ void HybridMoblet::handleWebViewMessage(
 }
 
 /**
+ * Prints the incoming webview message. Used for debugging.
+ *
+ * To call this method, override HybridMoblet::handleWebViewMessage
+ * in your moblet with the following method:
+ *
+ * void handleWebViewMessage(MAHandle webViewHandle, MAHandle data)
+ * {
+ *    printWebViewMessage(data);
+ *    HybridMoblet::handleWebViewMessage(webViewHandle, data);
+ * }
+ */
+void HybridMoblet::printWebViewMessage(MAHandle dataHandle)
+{
+	// Get length of the data, it is not zero terminated.
+	int dataSize = maGetDataSize(dataHandle);
+
+	// Allocate buffer for string data.
+	char* dataBuffer = (char*) malloc(dataSize + 1);
+
+	// Get the data.
+	maReadData(dataHandle, dataBuffer, 0, dataSize);
+
+	// Zero terminate.
+	dataBuffer[dataSize] = 0;
+
+	// Print unparsed message data.
+	maWriteLog("@@@ MOSYNC: WebViewMessage:", 27);
+	maWriteLog(dataBuffer, dataSize);
+
+	free(dataBuffer);
+}
+
+/**
  * Handles HOOK_INVOKED events for WebViews in the app.
  * This code enables WebViews to send messages to each other.
  *
@@ -348,7 +381,7 @@ void HybridMoblet::sendDeviceScreenSizeToJavaScript()
 	char buf[512];
 	sprintf(
 		buf,
-		"mosync.nativeui.setScreenSize(%d,%d)",
+		"try{mosync.nativeui.setScreenSize(%d,%d)}catch(e){}",
 		width,
 		height);
 	callJS(buf);
@@ -364,7 +397,7 @@ void HybridMoblet::sendWebViewHandleToJavaScript()
 	//We use a special callback for widget creation
 	sprintf(
 		buffer,
-		"mosync.nativeui.setWebViewHandle('%d')",
+		"try{mosync.nativeui.setWebViewHandle('%d')}catch(e){}",
 		widget);
 	callJS(buffer);
 }

@@ -163,10 +163,14 @@
 		if(self.autoSizeHeight == WidgetAutoSizeWrapContent) {
 			viewHeight = newHeight;
 		}
+        if (!container.navigationBarHidden)
+        {
+            viewHeight += container.navigationBar.frame.size.height;
+        }
 
 		[self.view setFrame:CGRectMake(self.view.frame.origin.x, self.view.frame.origin.y, viewWidth, viewHeight)];
 		//At this point it should have the correct size
-		_controller.contentSizeForViewInPopover = self.view.frame.size;
+        popoverController.popoverContentSize = CGSizeMake(viewWidth, viewHeight);
 
 		//The screen that was active when the popover was shown
 		IWidget* shownScreen = [getMoSyncUI() getCurrentlyShownScreen];

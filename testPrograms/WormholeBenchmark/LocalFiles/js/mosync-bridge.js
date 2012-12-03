@@ -49,6 +49,27 @@ var mosync = (function()
 	mosync.isWindowsPhone =
 		navigator.userAgent.indexOf("Windows Phone OS") != -1;
 
+	// Application functions.
+
+	mosync.app = {};
+
+	/**
+	 * Exit the application.
+	 * Supported on Android. Not supported on iOS.
+	 */
+	mosync.app.exit = function()
+	{
+		mosync.bridge.send(["MoSync", "ExitApplication"]);
+	}
+
+	/**
+	 * Send application to background.
+	 */
+	mosync.app.sendToBackground = function()
+	{
+		mosync.bridge.send(["MoSync", "SendToBackground"]);
+	}
+
 	// Alerts and logging.
 
 	mosync.notification = {};
@@ -283,6 +304,15 @@ var mosync = (function()
 		 * the message, this id can be used when sending a reply
 		 * back to JavaScript from C++.
 		 *
+		 * Example: mosync.bridge.send(["Custom", "Vibrate", "500"]);
+		 *
+		 * See this page for a tutorial: http://www.mosync.com/documentation/manualpages/how-communicate-between-javascript-and-c-mosync
+		 *
+		 * The project template "HTML5/JS/C++ Hybrid Project" is a
+		 * good startihng point for leaning how to add cusom C++ code
+		 * to your JavaScript application. Example the files index.html
+		 * and main.cpp in the project generated from the template.
+		 *
 		 * This method queues messages and can be called multiple
 		 * times in sqeuential JS code. When execution of sequential
 		 * code is done, a timer will get activated and send all messages
@@ -503,3 +533,14 @@ var mosync = (function()
 	// Return the library object.
 	return mosync;
 })();
+
+// Send OpenWormhole message to C++ when document is loaded.
+document.addEventListener(
+	"DOMContentLoaded",
+	function()
+	{
+		// This signals that the document is loaded and Wormhole
+		// is ready be initialized.
+		mosync.bridge.send(["MoSync", "OpenWormhole"]);
+	},
+	false);
