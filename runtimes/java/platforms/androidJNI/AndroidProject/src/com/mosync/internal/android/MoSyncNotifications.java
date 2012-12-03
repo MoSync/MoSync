@@ -53,8 +53,7 @@ class MoSyncNotifications
 		mLocalNotificationsManager = new LocalNotificationsManager(thread);
 
 		try{
-			int target = IntConverter.convert( Build.VERSION.SDK );
-			if ( target >= 8 )
+			if ( Build.VERSION.SDK_INT >= Build.VERSION_CODES.FROYO )
 			{
 				mPushNotificationManager = new PushNotificationsManager(thread, getActivity());
 			}
