@@ -74,27 +74,54 @@ void MessageHandler::initialize(Wormhole::HybridMoblet* moblet)
 }
 
 /**
- * Experimental way to set a custom message handler.
+ * Get the PhoneGap message handler.
+ */
+PhoneGapMessageHandler* MessageHandler::getPhoneGapMessageHandler()
+{
+	return mPhoneGapMessageHandler;
+}
+
+/**
+ * Set the PhoneGap message handler.
  */
 void MessageHandler::setPhoneGapMessageHandler(PhoneGapMessageHandler* handler)
 {
 	if (NULL != mPhoneGapMessageHandler) { delete mPhoneGapMessageHandler; }
+	mPhoneGapMessageHandler = handler;
 }
 
 /**
- * Experimental way to set a custom message handler.
+ * Get the Native UI message handler.
+ */
+NativeUIMessageHandler* MessageHandler::getNativeUIMessageHandler()
+{
+	return mNativeUIMessageHandler;
+}
+
+/**
+ * Set the Native UI message handler.
  */
 void MessageHandler::setNativeUIMessageHandler(NativeUIMessageHandler* handler)
 {
 	if (NULL != mNativeUIMessageHandler) { delete mNativeUIMessageHandler; }
+	mNativeUIMessageHandler = handler;
 }
 
 /**
- * Experimental way to set a custom message handler.
+ * Get the Resource message handler.
+ */
+ResourceMessageHandler* MessageHandler::getResourceMessageHandler()
+{
+	return mResourceMessageHandler;
+}
+
+/**
+ * Set the Resource message handler.
  */
 void MessageHandler::setResourceMessageHandler(ResourceMessageHandler* handler)
 {
 	if (NULL != mResourceMessageHandler) { delete mResourceMessageHandler; }
+	mResourceMessageHandler = handler;
 }
 
 void MessageHandler::openWormhole(
@@ -109,6 +136,22 @@ void MessageHandler::setBeepSound(MAHandle beepSound)
 {
 	// Set beep sound resource.
 	mPhoneGapMessageHandler->setBeepSound(beepSound);
+}
+
+/**
+ * Turn on processing of Native UI events.
+ */
+void MessageHandler::nativeUIEventsOn()
+{
+	mNativeUIMessageHandler->nativeUIEventsOn();
+}
+
+/**
+ * Turn off processing of Native UI events.
+ */
+void MessageHandler::nativeUIEventsOff()
+{
+	mNativeUIMessageHandler->nativeUIEventsOff();
 }
 
 void MessageHandler::addMessageFun(

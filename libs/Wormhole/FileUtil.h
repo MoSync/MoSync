@@ -52,7 +52,6 @@ class FileUtil
 		 */
 		FileUtil();
 
-	public:
 		/**
 		 * Destructor.
 		 */

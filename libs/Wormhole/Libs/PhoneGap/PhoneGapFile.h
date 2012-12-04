@@ -50,47 +50,47 @@ namespace Wormhole
 		 */
 		virtual ~PhoneGapFile();
 
-		MAUtil::String emitFileSystemInfo(
+		virtual MAUtil::String emitFileSystemInfo(
 			const MAUtil::String& name,
 			const MAUtil::String& rootEntry);
 
-		MAUtil::String emitDirectoryEntry(
+		virtual MAUtil::String emitDirectoryEntry(
 			const MAUtil::String& name,
 			const MAUtil::String& fullPath);
 
-		MAUtil::String emitFileEntry(
+		virtual MAUtil::String emitFileEntry(
 			const MAUtil::String& name,
 			const MAUtil::String& fullPath);
 
-		MAUtil::String emitFile(
+		virtual MAUtil::String emitFile(
 			const MAUtil::String& name,
 			const MAUtil::String& fullPath,
 			const MAUtil::String& type,
 			const MAUtil::String& lastModifiedDate,
 			const MAUtil::String& size);
 
-		MAUtil::String emitMetadata(
+		virtual MAUtil::String emitMetadata(
 			const MAUtil::String& modificationTime);
 
-		void callSuccess(
+		virtual void callSuccess(
 			const MAUtil::String& callbackID,
 			const MAUtil::String& args,
 			const MAUtil::String& castFunction = ""
 			);
 
-		void callFileError(
+		virtual void callFileError(
 			const MAUtil::String& callbackID,
 			const MAUtil::String& errorCode
 			);
 
-		void callFileTransferError(
+		virtual void callFileTransferError(
 			const MAUtil::String& callbackID,
 			const MAUtil::String& errorCode,
 			const MAUtil::String& sourceURI,
 			const MAUtil::String& targetURI
 			);
 
-		void callFileUploadResult(
+		virtual void callFileUploadResult(
 			const MAUtil::String& callbackID,
 			const MAUtil::String& responseCode, // long
 			const MAUtil::String& bytesSent, // long (unused)
@@ -169,7 +169,7 @@ namespace Wormhole
 
 		virtual void actionUploadFile(JSONMessage& message);
 
-	private:
+	protected:
 		PhoneGapMessageHandler* mMessageHandler;
 	};
 

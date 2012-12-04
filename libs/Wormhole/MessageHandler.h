@@ -71,17 +71,32 @@ public:
 	virtual void initialize(Wormhole::HybridMoblet* moblet);
 
 	/**
-	 * Experimental way to set a custom message handler.
+	 * Get the PhoneGap message handler.
+	 */
+	virtual PhoneGapMessageHandler* getPhoneGapMessageHandler();
+
+	/**
+	 * Set the PhoneGap message handler.
 	 */
 	virtual void setPhoneGapMessageHandler(PhoneGapMessageHandler* handler);
 
 	/**
-	 * Experimental way to set a custom message handler.
+	 * Get the Native UI message handler.
+	 */
+	virtual NativeUIMessageHandler* getNativeUIMessageHandler();
+
+	/**
+	 * Set the Native UI message handler.
 	 */
 	virtual void setNativeUIMessageHandler(NativeUIMessageHandler* handler);
 
 	/**
-	 * Experimental way to set a custom message handler.
+	 * Get the Resource message handler.
+	 */
+	virtual ResourceMessageHandler* getResourceMessageHandler();
+
+	/**
+	 * Set the Resource message handler.
 	 */
 	virtual void setResourceMessageHandler(ResourceMessageHandler* handler);
 
@@ -98,6 +113,16 @@ public:
 	 * Set the sound used by the PhoneGap beep notification.
 	 */
 	virtual void setBeepSound(MAHandle beepSound);
+
+	/**
+	 * Turn on processing of Native UI events.
+	 */
+	virtual void nativeUIEventsOn();
+
+	/**
+	 * Turn off processing of Native UI events.
+	 */
+	virtual void nativeUIEventsOff();
 
 	/**
 	 * Add a message function callback to be invoked from
@@ -161,8 +186,7 @@ public:
 		Wormhole::MessageStream& message,
 		Wormhole::HybridMoblet* moblet);
 
-public: // On purpose.
-
+protected:
 	/**
 	 * Handler for PhoneGap messages.
 	 */

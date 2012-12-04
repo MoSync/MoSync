@@ -69,7 +69,7 @@ public:
 			urlData);
 	}
 
-private:
+protected:
 	/**
 	 * Pointer to the moblet.
 	 */
@@ -91,7 +91,7 @@ HybridMoblet::HybridMoblet()
 	// Create file utility object.
 	mFileUtil = new FileUtil();
 
-	// Create message handler.
+	// Create the message handler.
 	// The idea with moving to pointers for handlers is
 	// that then they are pluggable by the users of this class.
 	// Like the "strategy" or "state" pattern.
@@ -107,17 +107,13 @@ HybridMoblet::~HybridMoblet()
 	delete mScreen;
 
 	// Delete the WebView listener.
-	if (NULL != mWebViewListener)
-	{
-		delete mWebViewListener;
-		mWebViewListener = NULL;
-	}
+	if (NULL != mWebViewListener) { delete mWebViewListener; }
+
+	// Delete message handler.
+	if (NULL != mMessageHandler) { delete mMessageHandler; }
 
 	// Delete the file utility object.
 	delete mFileUtil;
-
-	// Delete message handler.
-	delete mMessageHandler;
 }
 
 void HybridMoblet::initialize()
@@ -238,6 +234,25 @@ void HybridMoblet::showWebView()
 void HybridMoblet::setBeepSound(MAHandle beepSoundResource)
 {
 	mMessageHandler->setBeepSound(beepSoundResource);
+}
+
+/**
+ * Return the message handler object used by this moblet.
+ */
+MessageHandler* HybridMoblet::getMessageHandler()
+{
+	return mMessageHandler;
+}
+
+/**
+ * Set the message handler object used by this moblet.
+ * Any previous handler is deleted. The moblet takes
+ * ownership of the handler and deletes it when destroyed.
+ */
+void HybridMoblet::setMessageHandler(MessageHandler* handler)
+{
+	if (NULL != mMessageHandler) { delete mMessageHandler; }
+	mMessageHandler = handler;
 }
 
 /**

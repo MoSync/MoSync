@@ -124,18 +124,19 @@ public:
 	virtual void exit();
 
 	/**
+	 * Methods used internally for timers.
+	 */
+	virtual void runPendingTimers();
+	virtual int timeToNextTimer();
+
+	/**
 	 * Calls enterEventLoop on a moblet. For backwards compatibility
 	 * with class Moblet.
 	 * @param moblet The moblet to call enterEventLoop on.
 	 */
 	static void run(CustomMoblet* moblet);
 
-	/**
-	 * Methods used internally for timers.
-	 */
-	void runPendingTimers();
-	int timeToNextTimer();
-
+protected:
 	/**
 	 * Exits the event loop when false. Used internally.
 	 * Avoid modifying directly, call exitEventLoop instead.

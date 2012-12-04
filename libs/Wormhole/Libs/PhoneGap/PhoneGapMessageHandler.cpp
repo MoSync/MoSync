@@ -116,7 +116,7 @@ namespace Wormhole
 	 */
 	void PhoneGapMessageHandler::initializePhoneGap()
 	{
-		callJS("try{PhoneGap.onNativeReady.fire()}catch(e){_nativeReady = true}");
+		callJS("try{PhoneGap.onNativeReady.fire()}catch(e){_nativeReady=true}");
 	}
 
 	/**
