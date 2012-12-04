@@ -61,8 +61,8 @@ namespace MoSync
             private Brush mGroupHeaderColor;
             private VerticalAlignment mHeaderTextVerticalAlignment;
             private VerticalAlignment mFooterTextVerticalAlignment;
-            private HorizontalAlignment mHeaderTextHorizontalAlignment;
-            private HorizontalAlignment mFooterTextHorizontalAlignment;
+            private TextAlignment mHeaderTextHorizontalAlignment;
+            private TextAlignment mFooterTextHorizontalAlignment;
             private double mHeaderFontSize;
             private double mFooterFontSize;
             private Brush mHeaderFontColor;
@@ -127,9 +127,9 @@ namespace MoSync
                 this.FooterVisibility = Visibility.Collapsed;
                 this.GroupHeaderColor = phoneAccentBrush;
 
-                this.HeaderTextHorizontalAlignment = HorizontalAlignment.Left;
+                this.HeaderTextHorizontalAlignment = TextAlignment.Left;
                 this.HeaderTextVerticalAlignment = VerticalAlignment.Center;
-                this.FooterTextHorizontalAlignment = HorizontalAlignment.Left;
+                this.FooterTextHorizontalAlignment = TextAlignment.Left;
                 this.FooterTextVerticalAlignment = VerticalAlignment.Center;
 
                 this.HeaderFontFamily = new FontFamily("PhoneFontFamilyNormal");
@@ -295,7 +295,7 @@ namespace MoSync
             /**
              * The horizontal alignment of the header text.
              */
-            public HorizontalAlignment HeaderTextHorizontalAlignment
+            public TextAlignment HeaderTextHorizontalAlignment
             {
                 get
                 {
@@ -310,7 +310,7 @@ namespace MoSync
             /**
              * The horizontal alignment of the footer text.
              */
-            public HorizontalAlignment FooterTextHorizontalAlignment
+            public TextAlignment FooterTextHorizontalAlignment
             {
                 get
                 {

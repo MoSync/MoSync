@@ -53,7 +53,7 @@ namespace MoSync
             // header properties
             private string mHeader;
             private SolidColorBrush mHeaderBackgroundColor;
-            private HorizontalAlignment mHeaderHorizontalAlignment;
+            private TextAlignment mHeaderHorizontalAlignment;
             private VerticalAlignment mHeaderVerticalAlignment;
             private SolidColorBrush mHeaderFontColor;
             private double mHeaderFontSize;
@@ -64,7 +64,7 @@ namespace MoSync
             // footer properties
             private string mFooter;
             private SolidColorBrush mFooterBackgroundColor;
-            private HorizontalAlignment mFooterHorizontalAlignment;
+            private TextAlignment mFooterHorizontalAlignment;
             private VerticalAlignment mFooterVerticalAlignment;
             private SolidColorBrush mFooterFontColor;
             private double mFooterFontSize;
@@ -101,7 +101,7 @@ namespace MoSync
                 return mHeaderBackgroundColor;
             }
 
-            public HorizontalAlignment GetHeaderHorizontalAlignment()
+            public TextAlignment GetHeaderHorizontalAlignment()
             {
                 return mHeaderHorizontalAlignment;
             }
@@ -145,7 +145,7 @@ namespace MoSync
                 return mFooterBackgroundColor;
             }
 
-            public HorizontalAlignment GetFooterHorizontalAlignment()
+            public TextAlignment GetFooterHorizontalAlignment()
             {
                 return mFooterHorizontalAlignment;
             }
@@ -438,15 +438,15 @@ namespace MoSync
                 {
                     if (value.Equals(MoSync.Constants.MAW_ALIGNMENT_LEFT))
                     {
-                        mHeaderHorizontalAlignment = HorizontalAlignment.Left;
+                        mHeaderHorizontalAlignment = TextAlignment.Left;
                     }
                     else if (value.Equals(MoSync.Constants.MAW_ALIGNMENT_RIGHT))
                     {
-                        mHeaderHorizontalAlignment = HorizontalAlignment.Right;
+                        mHeaderHorizontalAlignment = TextAlignment.Right;
                     }
                     else if (value.Equals(MoSync.Constants.MAW_ALIGNMENT_CENTER))
                     {
-                        mHeaderHorizontalAlignment = HorizontalAlignment.Center;
+                        mHeaderHorizontalAlignment = TextAlignment.Center;
                     }
                     else throw new InvalidPropertyValueException();
                     ReloadParentSection();
@@ -580,15 +580,15 @@ namespace MoSync
                 {
                     if (value.Equals(MoSync.Constants.MAW_ALIGNMENT_LEFT))
                     {
-                        mFooterHorizontalAlignment = HorizontalAlignment.Left;
+                        mFooterHorizontalAlignment = TextAlignment.Left;
                     }
                     else if (value.Equals(MoSync.Constants.MAW_ALIGNMENT_RIGHT))
                     {
-                        mFooterHorizontalAlignment = HorizontalAlignment.Right;
+                        mFooterHorizontalAlignment = TextAlignment.Right;
                     }
                     else if (value.Equals(MoSync.Constants.MAW_ALIGNMENT_CENTER))
                     {
-                        mFooterHorizontalAlignment = HorizontalAlignment.Center;
+                        mFooterHorizontalAlignment = TextAlignment.Center;
                     }
                     else throw new InvalidPropertyValueException();
                     ReloadParentSection();
