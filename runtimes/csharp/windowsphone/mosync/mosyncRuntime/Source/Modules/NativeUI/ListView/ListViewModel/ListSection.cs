@@ -52,10 +52,9 @@ namespace MoSync
 
             #region Private class members
 
-            private string mFooterText = "";
-            private string mTitle;
-            private string mHeader;
-            private string mFooter;
+            private string mFooter = "";
+            private string mTitle = "";
+            private string mHeader = "";
             private Brush mHeaderColor;
             private Brush mFooterColor;
             private Visibility mFooterVisibility;
@@ -187,14 +186,18 @@ namespace MoSync
             {
                 get
                 {
-                    return mFooterText;
+                    return mFooter;
                 }
                 set
                 {
-                    mFooterText = value;
-                    if (mFooterText != "")
+                    mFooter = value;
+                    if (mFooter != null)
                     {
                         FooterVisibility = Visibility.Visible;
+                    }
+                    else
+                    {
+                        FooterVisibility = Visibility.Collapsed;
                     }
                 }
             }
@@ -237,10 +240,7 @@ namespace MoSync
                 }
                 set
                 {
-                    if (value != null)
-                    {
-                        mFooterVisibility = value;
-                    }
+                    mFooterVisibility = value;
                 }
             }
 
@@ -273,10 +273,7 @@ namespace MoSync
                 }
                 set
                 {
-                    if (value != null)
-                    {
-                        mHeaderTextVerticalAlignment = value;
-                    }
+                    mHeaderTextVerticalAlignment = value;
                 }
             }
 
@@ -291,10 +288,7 @@ namespace MoSync
                 }
                 set
                 {
-                    if (value != null)
-                    {
-                        mFooterTextVerticalAlignment = value;
-                    }
+                    mFooterTextVerticalAlignment = value;
                 }
             }
 
@@ -309,10 +303,7 @@ namespace MoSync
                 }
                 set
                 {
-                    if (value != null)
-                    {
-                        mHeaderTextHorizontalAlignment = value;
-                    }
+                    mHeaderTextHorizontalAlignment = value;
                 }
             }
 
@@ -327,10 +318,7 @@ namespace MoSync
                 }
                 set
                 {
-                    if (value != null)
-                    {
-                        mFooterTextHorizontalAlignment = value;
-                    }
+                    mFooterTextHorizontalAlignment = value;
                 }
             }
 
