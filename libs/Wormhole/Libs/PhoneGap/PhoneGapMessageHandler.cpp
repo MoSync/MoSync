@@ -31,8 +31,8 @@ MA 02110-1301, USA.
 namespace Wormhole
 {
 	// NameSpaces we want to access.
-	using namespace MAUtil; // Class Moblet, String
-	using namespace NativeUI; // WebView widget
+	using namespace MAUtil;
+	using namespace NativeUI;
 
 	/**
 	 * Constructor.
@@ -49,9 +49,9 @@ namespace Wormhole
 	{
 		enableHardware();
 
-		for(int i = 0; i < MAXIMUM_SENSORS; i++)
+		for (int i = 0; i < MAXIMUM_SENSORS; i++)
 		{
-			mSensorEventToManager[MAXIMUM_SENSORS] = false;
+			mSensorEventToManager[i] = false;
 		}
 	}
 
@@ -176,7 +176,7 @@ namespace Wormhole
 	{
 		if (MAK_BACK == keyCode)
 		{
-			callJS("PhoneGapCommandResult('backbutton');");
+			callJS("try{PhoneGapCommandResult('backbutton')}catch(e){}");
 		}
 	}
 
@@ -308,12 +308,12 @@ namespace Wormhole
 		else if (event.type == EVENT_TYPE_FOCUS_LOST)
 		{
 			//let the phoneGap app know that it should go to sleep
-			callJS("PhoneGapCommandResult('pause');");
+			callJS("try{PhoneGapCommandResult('pause')}catch(e){}");
 		}
 		else if (event.type == EVENT_TYPE_FOCUS_GAINED)
 		{
 			//let the PhoneGap side know that it should resume
-			callJS("PhoneGapCommandResult('resume');");
+			callJS("try{PhoneGapCommandResult('resume')}catch(e){}");
 		}
 	}
 
@@ -324,7 +324,7 @@ namespace Wormhole
 	 */
 	void PhoneGapMessageHandler::sensorEvent(MASensor sensorData)
 	{
-		if(mSensorEventToManager[sensorData.type] == false)
+		if (mSensorEventToManager[sensorData.type] == false)
 		{
 			if (sensorData.type == SENSOR_TYPE_ACCELEROMETER)
 			{
@@ -463,7 +463,8 @@ namespace Wormhole
 	/**
 	 * Set the target class for sensor event messages.
 	 * @param sensor The sensor that is configured.
-	 * @param toSensorManager If true, the SensorManager object will receive the events, normal PhoneGap API if false
+	 * @param toSensorManager If true, the SensorManager object will
+	 * receive the events, normal PhoneGap API if false.
 	 */
 	void PhoneGapMessageHandler::setSensorEventTarget(int sensor, bool toSensorManager)
 	{

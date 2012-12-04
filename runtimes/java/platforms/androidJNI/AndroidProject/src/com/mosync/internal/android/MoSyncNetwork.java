@@ -1147,7 +1147,6 @@ public class MoSyncNetwork
 
 			mUrlConnection.setAllowUserInteraction(true);
 			mUrlConnection.setUseCaches(false);
-			mUrlConnection.setDoOutput(true);
 
 			HttpURLConnection httpConnection =
 				(HttpURLConnection) mUrlConnection;
@@ -1158,9 +1157,11 @@ public class MoSyncNetwork
 					httpConnection.setRequestMethod("GET");
 					break;
 				case HTTP_POST:
+					mUrlConnection.setDoOutput(true);
 					httpConnection.setRequestMethod("POST");
 					break;
 				case HTTP_PUT:
+					mUrlConnection.setDoOutput(true);
 					httpConnection.setRequestMethod("PUT");
 					break;
 				case HTTP_DELETE:

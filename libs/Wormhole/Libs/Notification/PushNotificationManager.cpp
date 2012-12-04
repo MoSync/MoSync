@@ -85,7 +85,6 @@ namespace Wormhole
 		{
 			if (message.getParam("action") == "types")
 			{
-				//printf("PushNotificationManager::handleMessage set types");
 				this->setPushNotificationTypes(message);
 			}
 			else if (message.getParam("action") == "accountID")
@@ -239,7 +238,6 @@ namespace Wormhole
 		if (bitmask != 0)
 		{
 			mPushNotificationTypes = types;
-			printf("set types: %d", types);
 			mMessageHandler->callSuccess(
 				callbackID,
 				PHONEGAP_CALLBACK_STATUS_OK,

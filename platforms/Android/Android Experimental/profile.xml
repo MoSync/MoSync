@@ -1,4 +1,4 @@
-<platform family="Android" variant="Android Experimental" runtime="android_16x/1" inherit="Android">
+<platform family="Android" variant="Android Experimental" runtime="android_17x/1" inherit="Android">
   <capability name="Autostart" state="REQUIRES_PERMISSION"/>
   <capability name="NFC" state="REQUIRES_PERMISSION"/>
   <capability name="Push Notifications" state="REQUIRES_PERMISSION"/>

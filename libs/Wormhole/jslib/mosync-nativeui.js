@@ -1593,7 +1593,7 @@ mosync.nativeui.createWidget = function(widget, parent) {
 						value : attrValue
 					};
 				} else if ((mosync.isAndroid) && (attrName == "icon_android")) {
-					console.log("detected an Icon" + attrValue);
+					console.log("mosync.nativeui.createWidget detected an icon: " + attrValue);
 					imageResources = {
 						propertyType : "icon",
 						value : attrValue

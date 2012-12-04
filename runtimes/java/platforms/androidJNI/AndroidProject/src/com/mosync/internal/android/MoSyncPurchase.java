@@ -54,8 +54,7 @@ public class MoSyncPurchase
 		{
 			// In-app purchase is supported only from Android 1.6 and higher.
 			try{
-				int target = IntConverter.convert( Build.VERSION.SDK );
-				if ( target >= 4 )
+				if ( Build.VERSION.SDK_INT >= Build.VERSION_CODES.DONUT )
 				{
 					SYSLOG("PurchaseManager is available, android sdk version > 4");
 					mPurchaseManager = new PurchaseManager(thread);
