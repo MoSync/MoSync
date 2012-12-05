@@ -56,7 +56,7 @@ namespace NativeUI
          * button, or when an item is selected.
          * @param screen The screen that generated the event.
          */
-        virtual void optionsMenuClosed(Screen* screen);
+        virtual void optionsMenuClosed(Screen* screen) {};
 
         /**
          * This method is called when an options menu item is selected.
@@ -64,7 +64,7 @@ namespace NativeUI
          * OptionsMenu.
          * @param screen The screen that generated the event.
          */
-        virtual void optionsMenuItemSelected(Screen* screen, int index);
+        virtual void optionsMenuItemSelected(Screen* screen, int index) {};
 
     };
 
