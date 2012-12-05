@@ -785,6 +785,12 @@ namespace Base
 
 	int _maCameraPreviewEventConsumed(JNIEnv* jNIEnv, jobject jThis);
 
+	MAExtensionModule _maExtensionModuleLoad(JNIEnv* jNIEnv, jobject jThis, const char* name, int hash);
+
+	MAExtensionFunction _maExtensionFunctionLoad(JNIEnv* jNIEnv, jobject jThis, MAHandle module, int index);
+
+	int _maExtensionFunctionInvoke2(JNIEnv* jNIEnv, jobject jThis, MAExtensionFunction fn, int numargs, int* ptrs, int memStart);
+
 	int _maNFCStart(JNIEnv* jNIEnv, jobject jThis);
 
 	int _maNFCStop(JNIEnv* jNIEnv, jobject jThis);

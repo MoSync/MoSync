@@ -108,11 +108,13 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.FrameLayout;
+import android.widget.Toast;
 import android.provider.Settings.Secure;
 import android.net.ConnectivityManager;
 
 import com.mosync.internal.android.MoSyncFont.MoSyncFontHandle;
 import com.mosync.internal.android.billing.PurchaseManager;
+import com.mosync.internal.android.extensions.MoSyncExtensionLoader;
 import com.mosync.internal.android.nfc.MoSyncNFC;
 import com.mosync.internal.android.nfc.MoSyncNFCService;
 import com.mosync.internal.generated.IX_OPENGL_ES;
@@ -189,6 +191,7 @@ public class MoSyncThread extends Thread
 	MoSyncCapture mMoSyncCapture;
 	MoSyncPurchase mMoSyncPurchase;
 	MoSyncDB mMoSyncDB;
+	MoSyncExtensionLoader mMoSyncExtensionLoader;
 
 	/**
 	 * Synchronization monitor for postEvent
@@ -435,6 +438,8 @@ public class MoSyncThread extends Thread
 		mMoSyncDB = new MoSyncDB();
 
 		mConnectivityManager = (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+
+		mMoSyncExtensionLoader = new MoSyncExtensionLoader();
 
 		nativeInitRuntime();
 	}
@@ -2686,20 +2691,35 @@ public class MoSyncThread extends Thread
 	/**
 	 * maPanic
 	 */
-	void maPanic(int result, String message)
+	public void maPanic(int result, String message)
 	{
 		SYSLOG("maPanic");
 
 		threadPanic(result, message);
 	}
 
+
+	int maExtensionFunctionInvoke(int function, int[] ptrs, int memstart) {
+		return maInvokeExtension(function, ptrs, memstart);
+	}
+
+	int maExtensionModuleLoad(String name, int hash) {
+		return mMoSyncExtensionLoader.maExtensionModuleLoad(name, hash);
+	}
+
+	int maExtensionFunctionLoad(int module, int ix) {
+		return mMoSyncExtensionLoader.maExtensionFunctionLoad(module, ix);
+	}
+
+
+
 	/**
 	 * maInvokeExtension
 	 */
-	int maInvokeExtension(int function, int a, int b, int c)
+	int maInvokeExtension(int function, int[] ptr, int memstart)
 	{
 		SYSLOG("maInvokeExtension");
-		return -1;
+		return mMoSyncExtensionLoader.maInvokeExtension(function, ptr, memstart);
 	}
 
 	/**

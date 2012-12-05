@@ -1225,10 +1225,27 @@ namespace Base
 
 	// TODO : Implement maInvokeExtension
 
-	SYSCALL(longlong,  maExtensionFunctionInvoke(MAExtensionFunction function, int a, int b, int c))
+	SYSCALL(longlong,  maExtensionFunctionInvoke(MAExtensionFunction function, int numargs, int args, int dummy))
 	{
-		SYSLOG("maExtensionFunctionInvoke NOT IMPLEMENTED");
-		return -1;
+		SYSLOG("maExtensionFunctionInvoke");
+
+		jclass cls = mJNIEnv->GetObjectClass(mJThis);
+		jmethodID methodID = mJNIEnv->GetMethodID(cls, "maExtensionFunctionInvoke", "(I[II)I");
+		if (methodID == 0) ERROR_EXIT;
+		int memStart = (int)gCore->mem_ds;
+		jintArray jargs = mJNIEnv->NewIntArray(numargs);
+		jint* body = new jint[numargs];//mJNIEnv->GetIntArrayElements(jargs, 0);
+		for (int i = 0; i < numargs; i++) {
+			int ptr = ((int*) args)[i];
+			body[i] = ptr;
+		}
+		mJNIEnv->SetIntArrayRegion(jargs, 0, numargs, body);
+		int retVal = mJNIEnv->CallIntMethod(mJThis, methodID, function, jargs, memStart);
+		//mJNIEnv->ReleaseIntArrayElements(jargs, body, 0);
+		delete[] body;
+		mJNIEnv->DeleteLocalRef(cls);
+
+		return retVal;
 	}
 
 	// Temporary kludge to include the implementation of glString,
@@ -2481,6 +2498,27 @@ namespace Base
 				b,
 				mJNIEnv,
 				mJThis);
+
+		// ********** Extensions API ***********
+		case maIOCtl_maExtensionModuleLoad:
+		{
+			SYSLOG("maIOCtl_maExtensionModuleLoad");
+			const char *_module = SYSCALL_THIS->GetValidatedStr(a);
+			return _maExtensionModuleLoad(mJNIEnv, mJThis, _module, b);
+		}
+
+		case maIOCtl_maExtensionFunctionLoad:
+		{
+			SYSLOG("maIOCtl_maExtensionFunctionLoad");
+			return _maExtensionFunctionLoad(mJNIEnv, mJThis, a, b);
+		}
+
+		case maIOCtl_maExtensionFunctionInvoke2:
+		{
+			SYSLOG("maIOCtl_maExtensionFunctionInvoke2");
+			//uintptr_t ptr = (uintptr_t) c;
+			return _maExtensionFunctionInvoke2(mJNIEnv, mJThis, a, b, (int*) c, (int)gCore->mem_ds);
+		}
 
 		// ********** NFC API **********
 
