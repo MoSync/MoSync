@@ -511,11 +511,9 @@ mosync.nativeui.registerEventListener = function(widgetID, eventType,
 	} else {
 		mosync.nativeui.eventCallBackTable[callbackID] = [ listenerFunction ];
 	}
-
 };
 
 /**
- *
  * A widget object that user can interact with instead of using the low level
  * functions. This class is not used directly see  mosync.nativeui.create  for usage.
  *
@@ -530,8 +528,6 @@ mosync.nativeui.registerEventListener = function(widgetID, eventType,
  *            a function that will be called if the operation is successful
  * @param errorCallback
  *            a function that will be called if an error occurs
- *
- *
  */
 mosync.nativeui.NativeWidgetElement = function(widgetType, widgetID, params,
 		successCallback, errorCallback) {
@@ -624,7 +620,6 @@ mosync.nativeui.NativeWidgetElement = function(widgetType, widgetID, params,
 		{
 			errorCallback.apply(null, [ errorCode ]);
 		}
-
 	};
 
 	// Send a message to the native layer to create the widget.
@@ -1612,26 +1607,28 @@ mosync.nativeui.createWidget = function(widget, parent) {
 			}
 		}
 	}
-	var currentWidget = mosync.nativeui
-			.create(widgetType, widgetID, propertyList,
-					function(widgetID, handle) {
-						var thisWidget = document.getNativeElementById(widgetID);
-						mosync.nativeui.numWidgetsRequested--;
-						if (imageResources != null) {
-							mosync.resource.loadImage(imageResources.value,
-									widgetID + "image", function(imageID,
-											imageHandle) {
-										thisWidget.setProperty(
-												imageResources.propertyType,
-												imageHandle, null, null);
+	var currentWidget = mosync.nativeui.create(
+		widgetType,
+		widgetID,
+		propertyList,
+		function(widgetID, handle) {
+			var thisWidget = document.getNativeElementById(widgetID);
+			mosync.nativeui.numWidgetsRequested--;
+			if (imageResources != null) {
+				mosync.resource.loadImage(imageResources.value,
+						widgetID + "image", function(imageID,
+								imageHandle) {
+							thisWidget.setProperty(
+									imageResources.propertyType,
+									imageHandle, null, null);
 
-									});
-						}
-						if (eventList != null) {
-							thisWidget.addEventListener(eventList.type,
-									eventList.func);
-						}
-					}, null);
+						});
+			}
+			if (eventList != null) {
+				thisWidget.addEventListener(eventList.type,
+						eventList.func);
+			}
+		}, null);
 	if (parent != null) {
 		currentWidget.addTo(parent.id);
 	}
