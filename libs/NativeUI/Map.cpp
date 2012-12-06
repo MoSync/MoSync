@@ -243,6 +243,50 @@ namespace NativeUI
 		return corners;
 	}
 
+		/**
+		 * Scrolls and zooms the map on the map region provided.
+		 * @param visibleArea The MapRegion that describes the visible area.
+		 */
+		void Map::setVisibleArea(MapRegion &visibleArea)
+		{
+			Location upperLeftCorner = visibleArea.getUpperLeftCorner();
+			Location lowerRightCorner = visibleArea.getLowerRightCorner();
+
+			// set the visible area coordinates (upper left corner and lower left corner coordinates)
+			this->setProperty(MAW_MAP_VISIBLE_AREA_UPPER_LEFT_CORNER_LATITUDE,
+							MAUtil::doubleToString(upperLeftCorner.getLatitude(),6));
+			this->setProperty(MAW_MAP_VISIBLE_AREA_UPPER_LEFT_CORNER_LONGITUDE,
+							MAUtil::doubleToString(upperLeftCorner.getLongitude(),6));
+			this->setProperty(MAW_MAP_VISIBLE_AREA_LOWER_RIGHT_CORNER_LATITUDE,
+							MAUtil::doubleToString(lowerRightCorner.getLatitude(),6));
+			this->setProperty(MAW_MAP_VISIBLE_AREA_LOWER_RIGHT_CORNER_LONGITUDE,
+							MAUtil::doubleToString(lowerRightCorner.getLongitude(),6));
+
+			// center the map on the visible area
+			this->setProperty(MAW_MAP_CENTERED_ON_VISIBLE_AREA, "true");
+		}
+
+		/**
+		 * Gets the current map visible area.
+		 * @return The MapRegion describing the visible area.
+		 */
+		void Map::getVisibleArea(MapRegion& visibleArea)
+		{
+			MAUtil::String upperLeftCornerLatitude = this->getPropertyString(MAW_MAP_VISIBLE_AREA_UPPER_LEFT_CORNER_LATITUDE);
+			MAUtil::String upperLeftCornerLongitude = this->getPropertyString(MAW_MAP_VISIBLE_AREA_UPPER_LEFT_CORNER_LONGITUDE);
+			MAUtil::String lowerRightCornerLatitude = this->getPropertyString(MAW_MAP_VISIBLE_AREA_LOWER_RIGHT_CORNER_LATITUDE);
+			MAUtil::String lowerRightCornerLongitude = this->getPropertyString(MAW_MAP_VISIBLE_AREA_LOWER_RIGHT_CORNER_LONGITUDE);
+
+			Location upperLeftCorner, lowerRightCorner;
+
+			upperLeftCorner.setLatitude(MAUtil::stringToDouble(upperLeftCornerLatitude));
+			upperLeftCorner.setLongitude(MAUtil::stringToDouble(upperLeftCornerLongitude));
+			lowerRightCorner.setLatitude(MAUtil::stringToDouble(lowerRightCornerLatitude));
+			lowerRightCorner.setLongitude(MAUtil::stringToDouble(lowerRightCornerLongitude));
+
+			visibleArea = MapRegion(upperLeftCorner, lowerRightCorner);
+		}
+
     /**
      * Add a map event listener.
      * @param listener The listener that will receive map events.

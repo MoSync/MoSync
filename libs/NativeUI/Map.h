@@ -40,6 +40,7 @@ MA 02110-1301, USA.
 #include "MapLocation.h"
 #include "MapPin.h"
 #include "MapPinListener.h"
+#include "MapRegion.h"
 #include <MAUtil/Vector.h>
 
 namespace NativeUI
@@ -173,6 +174,18 @@ namespace NativeUI
 		 * the value from the runtime is corrent and NULL otherwise.
 		 */
 		MAUtil::Vector<Location> getVisibleArea();
+
+		/**
+		 * Scrolls and zooms the map on the map region provided.
+		 * @param visibleArea The 'MapRegion' object that describes the visible area.
+		 */
+		void setVisibleArea(MapRegion &visibleArea);
+
+		/**
+		 * Gets the current map visible area.
+		 * @return The 'MapRegion' object that describes the visible area.
+		 */
+		void getVisibleArea(MapRegion& visibleArea);
 
         /**
          * Add a map event listener.
