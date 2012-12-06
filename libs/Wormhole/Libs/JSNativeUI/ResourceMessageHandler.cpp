@@ -59,6 +59,22 @@ namespace Wormhole
 	}
 
 	/**
+	 * Get the FileUtil object to be used for File APIs.
+	 */
+	FileUtil* ResourceMessageHandler::getFileUtil()
+	{
+		return mFileUtil;
+	}
+
+	/**
+	 * Set the FileUtil object to be used for File APIs.
+	 */
+	void ResourceMessageHandler::setFileUtil(FileUtil* fileUtil)
+	{
+		mFileUtil = fileUtil;
+	}
+
+	/**
 	 * Implementation of standard API exposed to JavaScript
 	 * This function is used to detect different messages from JavaScript
 	 * and call the respective function in MoSync.
@@ -116,21 +132,14 @@ namespace Wormhole
 	 */
 	MAHandle ResourceMessageHandler::loadImageResource(const char *imagePath)
 	{
-		int bufferSize = 1024;
-		char buffer[bufferSize];
-
 		//Get the local path which is the same path as the root of HTML apps
-		maGetSystemProperty(
-			"mosync.path.local",
-			buffer,
-			bufferSize);
+		String appPath = getFileUtil()->getAppPath();
 
 		//Construct a full path by concatenating the relative path and local path
 		char completePath[2048];
-
 		sprintf(completePath,
 				"%s%s",
-				buffer,
+				appPath.c_str(),
 				imagePath);
 
 		//Load the image and create a data handle from it

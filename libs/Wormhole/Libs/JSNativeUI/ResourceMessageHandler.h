@@ -33,6 +33,7 @@ MA 02110-1301, USA.
 #include <MAUtil/String.h>
 #include <MAUtil/Downloader.h>
 #include "../../MessageStream.h"
+#include "../../FileUtil.h"
 
 namespace Wormhole
 {
@@ -62,6 +63,16 @@ namespace Wormhole
 		 * Destructor.
 		 */
 		virtual ~ResourceMessageHandler();
+
+		/**
+		 * Get the FileUtil object to be used for File APIs.
+		 */
+		FileUtil* getFileUtil();
+
+		/**
+		 * Set the FileUtil object to be used for File APIs.
+		 */
+		void setFileUtil(FileUtil* fileUtil);
 
 		/**
 		 * Implementation of standard API exposed to JavaScript.
@@ -132,6 +143,11 @@ namespace Wormhole
 		 * are sent from JavaScript.
 		 */
 		LogMessageListener* mLogMessageListener;
+
+		/**
+		 * File system helper object.
+		 */
+		FileUtil* mFileUtil;
 	};
 } // namespace
 

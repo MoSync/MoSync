@@ -128,6 +128,22 @@ namespace Wormhole
 	}
 
 	/**
+	 * Get the FileUtil object to be used for File APIs.
+	 */
+	FileUtil* PhoneGapMessageHandler::getFileUtil()
+	{
+		return mFileUtil;
+	}
+
+	/**
+	 * Set the FileUtil object to be used for File APIs.
+	 */
+	void PhoneGapMessageHandler::setFileUtil(FileUtil* fileUtil)
+	{
+		mFileUtil = fileUtil;
+	}
+
+	/**
 	 * Implementation of PhoneGap and other APIs exposed in JavaScript.
 	 * This function is used to detect different messages and call the
 	 * respective function in MoSync.

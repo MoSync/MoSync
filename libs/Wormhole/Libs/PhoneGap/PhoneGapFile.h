@@ -170,6 +170,9 @@ namespace Wormhole
 		virtual void actionUploadFile(JSONMessage& message);
 
 	protected:
+		/**
+		 * Pointer to message handler.
+		 */
 		PhoneGapMessageHandler* mMessageHandler;
 	};
 
