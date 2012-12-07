@@ -124,7 +124,7 @@ namespace Wormhole
 		 *
 		 * @param imagePath relative path to the image file.
 		 */
-		virtual MAHandle loadImageResource(const char *imagePath);
+		virtual MAHandle loadImageResource(const char* imagePath);
 
 		/**
 		 * An instance of ImageDownloader that will be used for

@@ -25,7 +25,8 @@ MA 02110-1301, USA.
  * resources for UI from JavaScript.
  */
 
-#include <mastdlib.h> // C string conversion functions
+#include <mastdlib.h>
+#include <mastring.h>
 #include <MAUtil/String.h>
 #include "ResourceMessageHandler.h"
 
@@ -83,32 +84,43 @@ namespace Wormhole
 	 */
 	bool ResourceMessageHandler::handleMessage(Wormhole::MessageStream& stream)
 	{
-		char buffer[128];
+		char buffer[512];
 
 		const char * action = stream.getNext();
 
 		if (0 == strcmp("loadImage", action))
 		{
-			const char *imagePath = stream.getNext();
+			const char* imagePath = stream.getNext();
 			const char* imageID = stream.getNext();
-			//Call for loading an Image resource
-			MAHandle imageHandle =
-					loadImageResource(imagePath);
 
-			sprintf(buffer,
-					"mosync.resource.imageLoaded(\"%s\", %d)",
-					imageID,
-					imageHandle);
-			mWebView->callJS(buffer);
+			// Load the Image resource.
+			MAHandle imageHandle = loadImageResource(imagePath);
+			if (imageHandle > 0)
+			{
+				sprintf(buffer,
+						"mosync.resource.imageLoaded(\"%s\", %d)",
+						imageID,
+						imageHandle);
+				mWebView->callJS(buffer);
+			}
+			else
+			{
+				// TODO: Better way to inform about the error?
+				// Call JS function with error code?
+				// mosync.resource.imageLoaded(<imageID>, -1) ??
+				char errorMessage[1024];
+				sprintf(errorMessage,
+					"@@@ MoSync: ResourceMessageHandler could not load image: %s",
+					imagePath);
+				maWriteLog(errorMessage, strlen(errorMessage));
+			}
 		}
 		else if (0 == strcmp("loadRemoteImage", action))
 		{
 			const char* imageURL = stream.getNext();
 			const char* imageID = stream.getNext();
-
 			MAHandle imageHandle = maCreatePlaceholder();
 			mImageDownloader->beginDownloading(imageURL,imageHandle);
-
 			sprintf(buffer,
 					"mosync.resource.imageDownloadStarted(\"%s\", %d)",
 					imageID,
@@ -130,38 +142,62 @@ namespace Wormhole
 	 *
 	 * @param imagePath relative path to the image file.
 	 */
-	MAHandle ResourceMessageHandler::loadImageResource(const char *imagePath)
+	MAHandle ResourceMessageHandler::loadImageResource(const char* imagePath)
 	{
-		//Get the local path which is the same path as the root of HTML apps
+		// Get the current apllication directory path.
 		String appPath = getFileUtil()->getAppPath();
 
-		//Construct a full path by concatenating the relative path and local path
+		// Construct image path.
 		char completePath[2048];
 		sprintf(completePath,
 				"%s%s",
 				appPath.c_str(),
 				imagePath);
 
-		//Load the image and create a data handle from it
+		// Load the image and create a data handle from it.
 		MAHandle imageFile = maFileOpen(completePath, MA_ACCESS_READ);
+		if (imageFile < 0)
+		{
+			return 0;
+		}
 
 		int fileSize = maFileSize(imageFile);
+		if (fileSize < 1)
+		{
+			return 0;
+		}
 
+		// Create buffer to hold file data.
 		MAHandle fileData = maCreatePlaceholder();
+		int result = maCreateData(fileData, fileSize);
+		if (RES_OK != result)
+		{
+			maDestroyPlaceholder(fileData);
+			return 0;
+		}
 
-		int res = maCreateData(fileData, fileSize);
-
-		res = maFileReadToData(imageFile, fileData, 0, fileSize);
+		// Read data from file.
+		result = maFileReadToData(imageFile, fileData, 0, fileSize);
 		maFileClose(imageFile);
+		if (result < 0)
+		{
+			maDestroyPlaceholder(fileData);
+			return 0;
+		}
 
+		// Create image.
 		MAHandle imageHandle = maCreatePlaceholder();
-
-		res = maCreateImageFromData(
+		result = maCreateImageFromData(
 				imageHandle,
 				fileData,
 				0,
 				maGetDataSize(fileData));
-		maDestroyObject(fileData);
+		maDestroyPlaceholder(fileData);
+		if (RES_OK != result)
+		{
+			maDestroyPlaceholder(imageHandle);
+			return 0;
+		}
 
 		// Return the handle to the loaded image.
 		return imageHandle;
