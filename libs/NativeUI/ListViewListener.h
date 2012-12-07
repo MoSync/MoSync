@@ -56,7 +56,7 @@ namespace NativeUI
 		 */
 		virtual void listViewItemClicked(
 			ListView* listView,
-			ListViewItem* listViewItem) = 0;
+			ListViewItem* listViewItem) {};
 
 		/**
 		 * This method is called when a list view item is clicked.
