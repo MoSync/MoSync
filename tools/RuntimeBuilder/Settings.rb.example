@@ -23,7 +23,7 @@ if ENV['OS'] == "Windows_NT"
 
 		:javame_sdk => "C:\\SonyEricsson\\JavaME_SDK_CLDC\\OnDeviceDebug\\",
 		:android_sdk => "C:/Android/android-sdk-windows",
-		:android_ndk => "C:/Android/android-ndk-r4",
+		:android_ndk => "C:/Android/android-ndk-r8c",
 		:s60v5_compiler => "\\Program\\CSL Arm Toolchain\\bin\\",
 
 	
@@ -38,7 +38,7 @@ else
 
 		:javame_sdk => "/home/runtimebuilder/SDK/SonyEricsson/JavaME_SDK_CLDC/OnDeviceDebug/",
 		:android_sdk => "/home/runtimebuilder/SDK/android/android-sdk-linux_x86",
-		:android_ndk => "/home/runtimebuilder/SDK/android/android-ndk-r4b",
+		:android_ndk => "/home/runtimebuilder/SDK/android/android-ndk-r8c",
 		:s60v5_compiler => "\\Program\\CSL Arm Toolchain\\bin\\",
 
 	
