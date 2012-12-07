@@ -118,8 +118,7 @@ public:
 	virtual void exitEventLoop();
 
 	/**
-	 * Exit the event loop. For backwards compatibility
-	 * with class Moblet.
+	 * Exit the event loop. Calls exitEventLoop.
 	 */
 	virtual void exit();
 

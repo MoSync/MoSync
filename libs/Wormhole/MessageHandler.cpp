@@ -307,7 +307,7 @@ void MessageHandler::handleMessageStream(
 		else if (0 == strcmp(p, "close"))
 		{
 			// Note: The "close" message is deprecated.
-			moblet->close();
+			moblet->exit();
 		}
 		else if (0 == strcmp(p, "Custom"))
 		{
@@ -338,8 +338,8 @@ void MessageHandler::handleMoSyncMessage(
 
 	if (0 == strcmp(p, "ExitApplication"))
 	{
-		// Close the application.
-		Wormhole::CustomMoblet::close();
+		// Exit the application.
+		moblet->exit();
 	}
 	else if (0 == strcmp(p, "SendToBackground"))
 	{
