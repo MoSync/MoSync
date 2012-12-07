@@ -78,11 +78,12 @@ int copyWCharArray(void* destination, const wchar_t* source);
  * Get a wchar array from a specified buffer.
  * @param buffer Contains n wchar-arrays, where n is the int value that can
  * be read from buffer address.
+ * @param size The size of the buffer.
  * @param arrayIndex The index of the array.
  * @return A pointer to the wchar array if the arrayIndex is valid, or
  * NULL otherwise.
  */
-const wchar* getWCharArrayFromBuf(void* buffer, const int arrayIndex);
+const wchar* getWCharArrayFromBuf(void* buffer, int size, const int arrayIndex);
 
 /**
  * Write n wchar-arrays to buffer.

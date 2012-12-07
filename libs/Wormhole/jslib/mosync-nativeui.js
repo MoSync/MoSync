@@ -50,6 +50,11 @@ mosync.nativeui.eventCallBackTable = {};
 mosync.nativeui.widgetCounter = 0;
 
 /**
+ * A unique string id for the main webview widget.
+ */
+mosync.nativeui.mainWebViewId = "mosync.nativeui.mainWebViewId";
+
+/**
  * Creates a mosync.nativeui Widget and registers it callback for return of the
  * handle, Used internally use mosync.nativeui.create in your code.
  *
@@ -404,6 +409,23 @@ mosync.nativeui.createCallback = function(callbackID, widgetID, handle) {
 	}
 };
 
+/**
+ * Sets the web view widget handle and maps it inside the widgetIDList
+ * @param handle The handle of the web view widget.
+ */
+mosync.nativeui.setWebViewHandle = function(handle)
+{
+	// Bind the string id of the main webview to the native widget handle.
+	mosync.nativeui.widgetIDList[mosync.nativeui.mainWebViewId] = handle;
+
+	// Create a JS widget object for the main webview.
+	new mosync.nativeui.NativeWidgetElement(
+		"WebView", mosync.nativeui.mainWebViewId,
+		{},
+		null,
+		null);
+};
+
 mosync.nativeui.success = function(callbackID) {
 	var callBack = mosync.nativeui.callBackTable[callbackID];
 
@@ -604,11 +626,27 @@ mosync.nativeui.NativeWidgetElement = function(widgetType, widgetID, params,
 		}
 
 	};
-	/*
-	 * Create the widget in the Native Side
-	 */
-	mosync.nativeui.maWidgetCreate(widgetType, self.id, this.onSuccess, this.onError,
-			self.processedMessage, self.params);
+
+	// Send a message to the native layer to create the widget.
+	// Note that if we get the id of the main webviwe, we don't
+	// create a new widget, it already exists.
+	// This allows us to create widget tree where the main
+	// webveiw can be inserted.
+	if (self.id !== mosync.nativeui.mainWebViewId)
+	{
+		mosync.nativeui.maWidgetCreate(
+			widgetType,
+			self.id,
+			this.onSuccess,
+			this.onError,
+			self.processedMessage,
+			self.params);
+	}
+	else
+	{
+		self.created = true;
+		self.handle = mosync.nativeui.widgetIDList[mosync.nativeui.mainWebViewId];
+	}
 
 	/**
 	 * Sets a property to the widget in question.
@@ -623,7 +661,7 @@ mosync.nativeui.NativeWidgetElement = function(widgetType, widgetID, params,
 	 * -------
 	 * \code
 	 * 		var myWidget = mosync.nativeui.create("Button" ,"myButton");
-	 * 		myWidget.setProperty("width", "100%")
+	 * 		myWidget.setProperty("width", "FILL_AVAILABLE_SPACE")
 	 * \endcode
 	 */
 	this.setProperty = function(property, value, successCallback, errorCallback)
@@ -687,7 +725,7 @@ mosync.nativeui.NativeWidgetElement = function(widgetType, widgetID, params,
 	 *	var myButton = mosync.nativeui.create("Button" ,"myButton",
 	 *	{
 	 *		//properties of the button
-	 *		"width": "100%",
+	 *		"width": "FILL_AVAILABLE_SPACE",
 	 *		"text": "Click Me!"
 	 *	});
 	 *	myButton.addEventListener("Clicked", function()
@@ -736,7 +774,7 @@ mosync.nativeui.NativeWidgetElement = function(widgetType, widgetID, params,
 	 *	 var myButton = mosync.nativeui.create("Button" ,"myButton",
 	 *	 {
 	 *		//properties of the button
-	 *		"width": "100%",
+	 *		"width": "FILL_AVAILABLE_SPACE",
 	 *		"text": "Click Me!"
 	 *	 });
 	 *
@@ -793,7 +831,7 @@ mosync.nativeui.NativeWidgetElement = function(widgetType, widgetID, params,
 	 *	 var myButton = mosync.nativeui.create("Button" ,"myButton",
 	 *	 {
 	 *		//properties of the button
-	 *		"width": "100%",
+	 *		"width": "FILL_AVAILABLE_SPACE",
 	 *		"text": "Click Me!"
 	 *	 });
 	 *
@@ -845,7 +883,7 @@ mosync.nativeui.NativeWidgetElement = function(widgetType, widgetID, params,
 	 *	 var myButton = mosync.nativeui.create("Button" ,"myButton",
 	 *	 {
 	 *		//properties of the button
-	 *		"width": "100%",
+	 *		"width": "FILL_AVAILABLE_SPACE",
 	 *		"text": "Click Me!"
 	 *	 });
 	 *
@@ -907,7 +945,7 @@ mosync.nativeui.NativeWidgetElement = function(widgetType, widgetID, params,
 	 *	var secondButton = mosync.nativeui.create("Button" ,"SecondButton",
 	 *	{
 	 *		//properties of the button
-	 *		"width": "100%",
+	 *		"width": "FILL_AVAILABLE_SPACE",
 	 *		"text": "Second Button"
 	 *	});
 	 *	secondButton.addTo("mainLayout");
@@ -950,7 +988,7 @@ mosync.nativeui.NativeWidgetElement = function(widgetType, widgetID, params,
 	 *	var secondButton = mosync.nativeui.create("Button" ,"SecondButton",
 	 *	{
 	 *		//properties of the button
-	 *		"width": "100%",
+	 *		"width": "FILL_AVAILABLE_SPACE",
 	 *		"text": "Second Button"
 	 *	});
 	 *	secondButton.addTo("mainLayout");
@@ -997,7 +1035,7 @@ mosync.nativeui.NativeWidgetElement = function(widgetType, widgetID, params,
 		 *	 var myButton = mosync.nativeui.create("Button" ,"myButton",
 		 *	 {
 		 *		//properties of the button
-		 *		"width": "100%",
+		 *		"width": "FILL_AVAILABLE_SPACE",
 		 *		"text": "Click Me!"
 		 *	 });
 		 *
@@ -1047,7 +1085,7 @@ mosync.nativeui.NativeWidgetElement = function(widgetType, widgetID, params,
 		 *	 var myButton = mosync.nativeui.create("Button" ,"myButton",
 		 *	 {
 		 *		//properties of the button
-		 *		"width": "100%",
+		 *		"width": "FILL_AVAILABLE_SPACE",
 		 *		"text": "Click Me!"
 		 *	 });
 		 *
@@ -1098,7 +1136,7 @@ mosync.nativeui.NativeWidgetElement = function(widgetType, widgetID, params,
 		 *	 var myButton = mosync.nativeui.create("Button" ,"myButton",
 		 *	 {
 		 *		//properties of the button
-		 *		"width": "100%",
+		 *		"width": "FILL_AVAILABLE_SPACE",
 		 *		"text": "Click Me!"
 		 *	 });
 		 *
@@ -1198,8 +1236,19 @@ mosync.nativeui.NativeWidgetElement = function(widgetType, widgetID, params,
  *    myScreen.show()
  * \endcode
  */
-document.getNativeElementById = function(widgetID) {
+document.getNativeElementById = function(widgetID)
+{
 	return mosync.nativeui.NativeElementsTable[widgetID];
+};
+
+/**
+ * Get the id of the main webview. This can be used to
+ * insert the main webview into a widget tree.
+ * @return The string id of the main webview widget.
+ */
+mosync.nativeui.getMainWebViewId = function()
+{
+	return mosync.nativeui.mainWebViewId;
 };
 
 /**
@@ -1225,10 +1274,9 @@ document.getNativeElementById = function(widgetID) {
  * \code
  * 		var myButton = mosync.nativeui.create("Button", "myButton", {
  *					"text" : "Click Me!",
- *					"width" : "100%"
+ *					"width" : "FILL_AVAILABLE_SPACE"
  * 					});
  * \endcode
-
  */
 mosync.nativeui.create = function(widgetType, widgetID, params,
 		successCallback, errorCallback) {
@@ -1307,6 +1355,18 @@ mosync.nativeui.widgetIDList = {};
 mosync.nativeui.getElementById = function(elementID)
 {
 	return mosync.nativeui.widgetIDList[elementID];
+};
+
+/**
+ * Get the MoSync widget handle for the JavaScript NativeUI
+ * element with the given ID.
+ *
+ * @param elementId A string id that identifies the widget (this
+ * is the id of the DOM element that holds the widget info).
+ */
+mosync.nativeui.getNativeHandleById = function(elementId)
+{
+	return mosync.nativeui.widgetIDList[elementId];
 };
 
 /**
@@ -1469,9 +1529,16 @@ mosync.nativeui.getNativeAttrName = function(attributeName) {
 };
 
 mosync.nativeui.getNativeAttrValue = function(value) {
-	switch (String(value).toLowerCase()) {
+	switch (String(value)) {
+	// @deprecated The alias "100%" is kept for backwards compatibility.
 	case "100%":
 		return "-1";
+		break;
+	case "FILL_AVAILABLE_SPACE":
+		return "-1";
+		break;
+	case "WRAP_CONTENT":
+		return "-2";
 		break;
 	default:
 		return value;

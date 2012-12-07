@@ -66,7 +66,8 @@ namespace NativeUI
 
         markWidgetHandleAsDeleted();
 
-        for (int i = 0; i < mChildren.size(); ++i)
+        int countChildren = mChildren.size();
+        for (int i = 0; i < countChildren; i++)
         {
             delete mChildren[i];
         }

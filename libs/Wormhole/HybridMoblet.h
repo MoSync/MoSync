@@ -88,8 +88,12 @@ public:
 	 * Initialize the Wormhole JS library. Should be
 	 * called after the page has been displayed.
 	 */
-	virtual void openWormhole(
-		Wormhole::HybridMoblet* moblet);
+	virtual void openWormhole(MAHandle webViewHandle);
+
+	/**
+	 * Creates the main UI elements, but does not connect them.
+	 */
+	virtual void createUI();
 
 	/**
 	 * Get the WebView widget displayed by this moblet.
@@ -163,8 +167,24 @@ public:
 	 * @param urlData Data object that holds message content.
 	 */
 	virtual void handleWebViewMessage(
-		NativeUI::WebView* webView,
+		MAWidgetHandle webViewHandle,
 		MAHandle data);
+
+	/**
+	 * Handles HOOK_INVOKED events for WebViews in the app.
+	 * This code enables WebViews to send messages to each other.
+	 *
+	 * The only thing that work reliable from other WebViews than
+	 * the main one, are CallJS and calls that do not return anything,
+	 * like mosync.app.sendToBackground().
+	 *
+	 * Apps are supposed to use the main WebView to for accessing the
+	 * fulll Wormhole JS API, and only use mosync.nativeui.callJS()
+	 * from other WebViews. This way, the main WebView becomes a
+	 * mediator, which is a good design because native access is
+	 * restricted to one point.
+	 */
+	virtual void customEvent(const MAEvent& event);
 
 	/**
 	 * This method is called when a key is pressed.
@@ -189,6 +209,17 @@ public:
 	virtual void callJS(
 		MAWidgetHandle webViewHandle,
 		const MAUtil::String& script);
+
+
+	/**
+	 * Sends the Device Screen size to JavaScript.
+	 */
+	virtual void sendDeviceScreenSizeToJavaScript();
+
+	/**
+	 * Sends the web view handle to JavaScript.
+	 */
+	virtual void sendWebViewHandleToJavaScript();
 
 	/**
 	 * Enable JavaScript to C++ communication.

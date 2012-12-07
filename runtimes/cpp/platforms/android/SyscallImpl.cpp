@@ -1338,7 +1338,7 @@ namespace Base
 	*				if this syscall is not implemented on this platfom.
 	*
 	*/
-	SYSCALL(int,  maIOCtl(int function, int a, int b, int c))
+	SYSCALL(longlong,  maIOCtl(int function, int a, int b, int c))
 	{
 		SYSLOG("maIOCtl");
 		//__android_log_write(ANDROID_LOG_INFO, "MoSync Syscall", "maIOCtl");
@@ -1781,7 +1781,7 @@ namespace Base
 			// the background during the time the maTextBox is running.
 			MAEvent event;
 			event.type = EVENT_TYPE_FOCUS_LOST;
-			event.data = NULL;
+			event.data = (MAAddress)NULL;
 			Base::gSyscall->postEvent(event);
 
 			// Get the two first parameters of the IOCtl function
@@ -2336,6 +2336,13 @@ namespace Base
 		case maIOCtl_maPimListNext:
 			SYSLOG("maIOCtl_maPimListNext");
 			return _maPimListNext(
+				a,
+				mJNIEnv,
+				mJThis);
+
+		case maIOCtl_maPimListNextSummary:
+			SYSLOG("maIOCtl_maPimListNextSummary");
+			return _maPimListNextSummary(
 				a,
 				mJNIEnv,
 				mJThis);

@@ -1,0 +1,145 @@
+/**
+* All widgets have a set of properties that can be set. In order to set them, use maWidgetSetProperty(). These properties may change
+* things like the visual appearance of the widget or the way it works.
+*/
+group WidgetProperties "Widget properties" {
+	/**
+	* The available widget properties for all widgets.
+	*/
+	constset MAString MAW_WIDGET_ {
+		/**
+		* @brief Sets or gets the horizontal distance from the parent widget in a RelativeLayout.
+		*
+		* @validvalue A positive integer in number of pixels.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(widgetHandle, MAW_WIDGET_LEFT, "100");
+		* \endcode
+		*/
+		LEFT = "left";
+
+		/**
+		* @brief Specifies the vertical distance from the parent widget in a RelativeLayout.
+		*
+		* @validvalue A positive integer in number of pixels.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(widgetHandle, MAW_WIDGET_TOP, "100");
+		* \endcode
+		*/
+		TOP = "top";
+
+		/**
+		* @brief Sets or gets the width of a widget.
+		*
+		* @validvalue A positive integer in pixles, or any of the constants #MAW_CONSTANT_FILL_AVAILABLE_SPACE, #MAW_CONSTANT_WRAP_CONTENT.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(widgetHandle, MAW_WIDGET_WIDTH, "100");
+		*	maWidgetSetProperty(widgetHandle, MAW_WIDGET_WIDTH, MAW_CONSTANT_FILL_AVAILABLE_SPACE);
+		* \endcode
+		*/
+		WIDTH = "width";
+
+		/**
+		* @brief Sets or gets the height of a widget.
+		*
+		* @validvalue A positive integer in pixles, or any of the constants #MAW_CONSTANT_FILL_AVAILABLE_SPACE, #MAW_CONSTANT_WRAP_CONTENT.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(widgetHandle, MAW_WIDGET_HEIGHT, "100");
+		*	maWidgetSetProperty(widgetHandle, MAW_WIDGET_HEIGHT, MAW_CONSTANT_FILL_AVAILABLE_SPACE);
+		* \endcode
+		*/
+		HEIGHT = "height";
+
+		/**
+		* @brief Sets the transparency of the widget background.
+		* On Android this property is available for the moment only on Layouts and ImageWidget widgets.
+		*
+		* @validvalue A float between 0.0 and 1.0, where 0.0 is fully transparent and 1.0 is opaque.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(widgetHandle, MAW_WIDGET_ALPHA, "0.0"); // Not visible
+		*	maWidgetSetProperty(widgetHandle, MAW_WIDGET_ALPHA, "0.5"); // Half visible
+		*	maWidgetSetProperty(widgetHandle, MAW_WIDGET_ALPHA, "1.0"); // Fully visible
+		* \endcode
+		*/
+		ALPHA = "alpha";
+
+		/**
+		* @brief Specifies the background color of a widget.
+		*
+		* @validvalue A hexadecimal value 0xRRGGBB, where R, G and B are the red, green and blue components respectively.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(widgetHandle, MAW_WIDGET_BACKGROUND_COLOR, "0xff0000"); // Red
+		* \endcode
+		*/
+		BACKGROUND_COLOR = "backgroundColor";
+
+		/**
+		* @brief Sets whether the widget is visible or not. Layouts ignore invisible widgets.
+		*
+		* @validvalue A boolean string 'true' or 'false', where true is visible and false is invisible.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(widgetHandle, MAW_WIDGET_VISIBLE, "false");
+		* \endcode
+		*/
+		VISIBLE = "visible";
+
+		/**
+		* @brief Sets whether the widget is enabled or not. If not, the widget is grayed out.
+		*
+		* Widgets are enabled by default.
+		*
+		* @validvalue A boolean string 'true' or 'false', where true is enabled and false is disabled.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(buttonHandle, MAW_WIDGET_ENABLED, "false");
+		* \endcode
+		*/
+		ENABLED = "enabled";
+
+		/**
+		* @brief Specifies the background gradient of a widget.
+		* Currently implemented only on Android.
+		*
+		* @validvalue Two hexadecimal values 0xRRGGBB, where R, G and B are the red, green and blue components respectively,
+		* separated by comma.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(widgetHandle, MAW_WIDGET_BACKGROUND_GRADIENT,  "0x27408B,0xCAE1FF");
+		* \endcode
+		*/
+		BACKGROUND_GRADIENT = "backgroundGradient";
+	}
+}

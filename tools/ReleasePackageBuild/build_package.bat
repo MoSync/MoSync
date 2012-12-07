@@ -168,9 +168,9 @@ cd %ORIGINAL_PATH%
 @echo ------------------------------------------------
 @echo Copying Android icon and keystore
 @echo ------------------------------------------------
-@xcopy %MOSYNC_TRUNK%\runtimes\java\platforms\android\AndroidProject\res\drawable\icon.png %MOSYNC_ETC_PATH%\ /y /D
-@xcopy %MOSYNC_TRUNK%\runtimes\java\platforms\android\default.icon %MOSYNC_ETC_PATH%\ /y /D
-@xcopy %MOSYNC_TRUNK%\runtimes\java\platforms\android\mosync.keystore %MOSYNC_ETC_PATH%\ /y /D
+@xcopy %MOSYNC_TRUNK%\runtimes\java\platforms\androidJNI\AndroidProject\res\drawable\icon.png %MOSYNC_ETC_PATH%\ /y /D
+@xcopy %MOSYNC_TRUNK%\runtimes\java\platforms\androidJNI\default.icon %MOSYNC_ETC_PATH%\ /y /D
+@xcopy %MOSYNC_TRUNK%\runtimes\java\platforms\androidJNI\mosync.keystore %MOSYNC_ETC_PATH%\ /y /D
 
 @echo ------------------------------------------------
 @echo Copying example contacts.xml

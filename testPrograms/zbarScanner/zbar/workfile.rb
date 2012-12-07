@@ -10,7 +10,7 @@ mod.class_eval do
 		@SOURCES = ['.', 'qrcode', 'decoder']
 		@EXTRA_SOURCEFILES = ['video/mosyncVideo.c', 'window/mosyncWindow.c']
 		@EXTRA_INCLUDES = ['.', 'include']
-		@IGNORED_FILES = ['jpeg.c', 'svg.c', 'main.c', 'processor.c']
+		@IGNORED_FILES = ['jpeg.c', 'svg.c', 'main.c', 'processor.c', 'qr_finder.c']
 
 		@EXTRA_CFLAGS = ' -Wno-declaration-after-statement'+
 			' -Wno-pointer-arith -Wno-sign-compare'+
@@ -29,8 +29,11 @@ mod.class_eval do
 		}
 		@SPECIFIC_CFLAGS['convert.c'] = ' -w' if(!@GCC_IS_V4)
 
+		@INSTALL_INCDIR = 'zbar/zbar'
+		@HEADER_DIRS = ['include/zbar']
+		copyHeaders
 		@INSTALL_INCDIR = 'zbar'
-		@HEADER_DIRS = []
+		@HEADER_DIRS = ['include']
 		@NAME = 'zbar'
 	end
 end

@@ -1,0 +1,314 @@
+group WidgetListViewSection "List View Section" {
+	/**
+	* The available list view section types.
+	* Platform: Android, iOS and Windows Phone 7.
+	*/
+	group WidgetListViewSectionType "List View Section Type" {
+		constset int MAW_LIST_VIEW_SECTION_TYPE_ {
+			/**
+			* @brief A section that presents a group of rows, that correspond to the same #MAW_LIST_VIEW_SECTION_TITLE.
+			* Platform: iOS, Android and Windows Phone 7.
+			*/
+			ALPHABETICAL = 1;
+
+			/**
+			* @brief A section that presents a group of rows, specifically list view items.
+			* Header and footer information can be set to segmented sections.
+			* Platform: iOS, Android and Windows Phone 7.
+			*/
+			SEGMENTED = 2;
+		}
+	} // end of WidgetListViewSectionType
+
+	/**
+	* The available widget properties for a #MAW_LIST_VIEW_SECTION.
+	*/
+	group WidgetListViewSectionProperties "List View Section Properties" {
+		constset MAString MAW_LIST_VIEW_SECTION_ {
+			/**
+			* @brief Set or get the list section type.
+			* Set this property before adding list view items and adding it to the list.
+			* Platform: Android, iOS and Windows Phone 7.
+			*
+			* @validvalue One of the \link #MAW_LIST_VIEW_SECTION_TYPE_ALPHABETICAL MAW_LIST_VIEW_TYPE \endlink constants.
+			*
+			* @setandget
+			*
+			* @par Example
+			* \code
+			*   char buffer[124];
+			*   sprintf(buffer, "%d", MAW_LIST_VIEW_TYPE_SEGMENTED);
+			*   maWidgetSetProperty(listHandle, MAW_LIST_VIEW_TYPE, buffer);
+			*	sprintf(buffer, "%d", MAW_LIST_VIEW_SECTION_TYPE_SEGMENTED);
+			*	maWidgetSetProperty(listSectionHandle, MAW_LIST_VIEW_SECTION_TYPE, buffer);
+			*   maWidgetAddChild(listHandle, listSectionHandle);
+			* \endcode
+			*/
+			TYPE= "type";
+
+			/**
+			* @brief Set or get section title.
+			* Section title will appear on the right side of the list.
+			* This preview letter is available only for list views of alphabetical type.
+			*
+			* Platform: iOS, Android and Windows Phone 7.
+			*
+			* @validvalue A string.
+			*
+			* @setandget
+			*
+			* @par Example
+			* \code
+			*	maWidgetSetProperty(listSectionHandle, MAW_LIST_VIEW_SECTION_TITLE, "A");
+			* \endcode
+			*/
+			TITLE = "title";
+
+			/**
+			* @brief Set or get section header text.
+			* Section text will appear above the section items.
+			*
+			* Platform: iOS, Android and Windows Phone 7.
+			*
+			* @validvalue A string.
+			*
+			* @setandget
+			*
+			* @par Example
+			* \code
+			*	maWidgetSetProperty(listSectionHandle, MAW_LIST_VIEW_SECTION_HEADER, "Header text");
+			* \endcode
+			*/
+			HEADER = "header";
+
+			/**
+			* @brief Set or get section footer text.
+			* Section text will appear below the section items.
+			*
+			* Platform: iOS, Android and Windows Phone 7.
+			*
+			* @validvalue A string.
+			*
+			* @setandget
+			*
+			* @par Example
+			* \code
+			*	maWidgetSetProperty(listSectionHandle, MAW_LIST_VIEW_SECTION_FOOTER, "Footer text");
+			* \endcode
+			*/
+			FOOTER = "footer";
+
+			/**
+			* @brief Set the section header background color.
+			* Default value is 0xBEBEBE (grey).
+			*
+			* Platform: Android and Windows Phone 7.
+			*
+			* @validvalue A hexadecimal value 0xRRGGBB, where R, G and B are the red, green and blue components respectively.
+			*
+			* @setonly
+			*
+			* @par Example
+			* \code
+			*	maWidgetSetProperty(listSectionHandle, MAW_LIST_VIEW_SECTION_HEADER_BACKGROUND, "0xff0000");
+			* \endcode
+			*/
+			HEADER_BACKGROUND = "headerBackground";
+
+			/**
+			* @brief Set the section footer background color.
+			* Default value is 0xBEBEBE (grey).
+			*
+			* Platform: Android and Windows Phone 7.
+			*
+			* @validvalue A hexadecimal value 0xRRGGBB, where R, G and B are the red, green and blue components respectively.
+			*
+			* @setonly
+			*
+			* @par Example
+			* \code
+			*	maWidgetSetProperty(listSectionHandle, MAW_LIST_VIEW_SECTION_FOOTER_BACKGROUND, "0xff0000");
+			* \endcode
+			*/
+			FOOTER_BACKGROUND = "footerBackground";
+
+			/**
+			* @brief Sets the font color of the header.
+			*
+			* Platform: Android and Windows Phone 7.
+			*
+			* @validvalue A hexadecimal value 0xRRGGBB, where R, G and B are the red, green and blue components respectively.
+			*
+			* @setonly
+			*
+			* @par Example
+			* \code
+			*	maWidgetSetProperty(listSectionHandle, MAW_LIST_VIEW_SECTION_HEADER_FONT_COLOR, "0xff0000");
+			* \endcode
+			*/
+			HEADER_FONT_COLOR = "headerFontColor";
+
+			/**
+			* @brief Sets the font color of the footer.
+			*
+			* Platform: Android and Windows Phone 7.
+			*
+			* @validvalue A hexadecimal value 0xRRGGBB, where R, G and B are the red, green and blue components respectively.
+			*
+			* @setonly
+			*
+			* @par Example
+			* \code
+			*	maWidgetSetProperty(listSectionHandle, MAW_LIST_VIEW_SECTION_FOOTER_FONT_COLOR, "0xff0000");
+			* \endcode
+			*/
+			FOOTER_FONT_COLOR = "footerFontColor";
+
+			/**
+			* @brief Sets the font size in points of the header.
+			* Default value is 20.
+			*
+			* Platform: Android and Windows Phone 7.
+			*
+			* @validvalue A float that specifies the number of pixels on Android.
+			*
+			* @setonly
+			*
+			* @par Example
+			* \code
+			*	maWidgetSetProperty(listSectionHandle, MAW_LIST_VIEW_SECTION_HEADER_FONT_SIZE, "13.0");
+			* \endcode
+			*/
+			HEADER_FONT_SIZE = "headerFontSize";
+
+			/**
+			* @brief Sets the font size in points of the footer.
+			* Default value is 15.
+			*
+			* Platform: Android and Windows Phone 7.
+			*
+			* @validvalue A float that specifies the number of pixels on Android.
+			*
+			* @setonly
+			*
+			* @par Example
+			* \code
+			*	maWidgetSetProperty(listSectionHandle, MAW_LIST_VIEW_SECTION_FOOTER_FONT_SIZE, "13.0");
+			* \endcode
+			*/
+			FOOTER_FONT_SIZE = "footerFontSize";
+
+			/**
+			* @brief Sets the typeface and style in which the header should be displayed.
+			*
+			* @validvalue A font handle received from loading fonts using
+			* #maFontGetName and #maFontLoadWithName syscalls.
+			*
+			* Platform: Android and Windows Phone 7.
+			*
+			* @setonly
+			*
+			* @par Example
+			* \code
+			*	int nrFonts = maFontGetCount();
+			*	 char buf[256];
+			*	 // Get first font name.
+			*	 maFontGetName(1, buf, 256);
+			*	 // Load that font for size 10.
+			*	 int fontHandle = maFontLoadWithName(buf, 10);
+			*	 // Set that font to the header.
+			*	maWidgetSetProperty(listSectionHandle, MAW_LIST_VIEW_SECTION_HEADER_FONT_HANDLE, toString(fontHandle));
+			* \endcode
+			*/
+			HEADER_FONT_HANDLE = "headerFontHandle";
+
+			/**
+			* @brief Sets the typeface and style in which the footer should be displayed.
+			*
+			* @validvalue A font handle received from loading fonts using
+			* #maFontGetName and #maFontLoadWithName syscalls.
+			*
+			* Platform: Android and Windows Phone 7.
+			*
+			* @setonly
+			*
+			* @par Example
+			* \code
+			*	int nrFonts = maFontGetCount();
+			*	 char buf[256];
+			*	 // Get first font name.
+			*	 maFontGetName(1, buf, 256);
+			*	 // Load that font for size 10.
+			*	 int fontHandle = maFontLoadWithName(buf, 10);
+			*	 // Set that font to the header.
+			*	maWidgetSetProperty(listSectionHandle, MAW_LIST_VIEW_SECTION_FOOTER_FONT_HANDLE, toString(fontHandle));
+			* \endcode
+			*/
+			FOOTER_FONT_HANDLE = "footerFontHandle";
+
+			/**
+			* @brief Sets the horizontal alignment of the text inside the header.
+			*
+			* Platform: Android and Windows Phone 7.
+			*
+			* @validvalue Takes one of the constants #MAW_ALIGNMENT_TOP, #MAW_ALIGNMENT_CENTER or #MAW_ALIGNMENT_BOTTOM.
+			*
+			* @setonly
+			*
+			* @par Example
+			* \code
+			*	maWidgetSetProperty(listSectionHandle, MAW_LIST_VIEW_SECTION_HEADER_HORIZONTAL_ALIGNMENT, MAW_ALIGNMENT_CENTER);
+			* \endcode
+			*/
+			HEADER_HORIZONTAL_ALIGNMENT = "headerHorizontalAlignment";
+
+			/**
+			* @brief Sets the horizontal alignment of the text inside the footer.
+			*
+			* Platform: Android and Windows Phone 7.
+			*
+			* @validvalue Takes one of the constants #MAW_ALIGNMENT_TOP, #MAW_ALIGNMENT_CENTER or #MAW_ALIGNMENT_BOTTOM.
+			*
+			* @setonly
+			*
+			* @par Example
+			* \code
+			*	maWidgetSetProperty(listSectionHandle, MAW_LIST_VIEW_SECTION_FOOTER_HORIZONTAL_ALIGNMENT, MAW_ALIGNMENT_CENTER);
+			* \endcode
+			*/
+			FOOTER_HORIZONTAL_ALIGNMENT = "footerHorizontalAlignment";
+
+			/**
+			* @brief Sets the vertical alignment of the text inside the header.
+			*
+			* Platform: Android and Windows Phone 7.
+			*
+			* @validvalue One of the constants #MAW_ALIGNMENT_TOP, #MAW_ALIGNMENT_CENTER or #MAW_ALIGNMENT_BOTTOM.
+			*
+			* @setonly
+			*
+			* @par Example
+			* \code
+			*	maWidgetSetProperty(listSectionHandle, MAW_LIST_VIEW_SECTION_HEADER_VERTICAL_ALIGNMENT, MAW_ALIGNMENT_CENTER);
+			* \endcode
+			*/
+			HEADER_VERTICAL_ALIGNMENT = "headerVerticalAlignment";
+
+			/**
+			* @brief Sets the vertical alignment of the text inside the footer.
+			*
+			* Platform: Android and Windows Phone 7.
+			*
+			* @validvalue One of the constants #MAW_ALIGNMENT_TOP, #MAW_ALIGNMENT_CENTER or #MAW_ALIGNMENT_BOTTOM.
+			*
+			* @setonly
+			*
+			* @par Example
+			* \code
+			*	maWidgetSetProperty(listSectionHandle, MAW_LIST_VIEW_SECTION_FOOTER_VERTICAL_ALIGNMENT, MAW_ALIGNMENT_CENTER);
+			* \endcode
+			*/
+			FOOTER_VERTICAL_ALIGNMENT = "footerVerticalAlignment";
+		}
+	} // end of WidgetListViewSectionProperties
+} // end of WidgetListViewSection

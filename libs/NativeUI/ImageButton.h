@@ -92,6 +92,14 @@ namespace NativeUI
         virtual int setImage(MAHandle image);
 
         /**
+         * Get the foreground image of the button.
+         * @return Any of the following result codes:
+         * - image MoSync handle to an uncompressed image resource.
+         * - #MAW_RES_INVALID_PROPERTY_VALUE if the image handle was invalid.
+         */
+        virtual MAHandle getImage();
+
+        /**
          * Sets the background image. This will be scaled to fit the whole
          * widget (not keeping the aspect).
          * @param image MoSync handle to an uncompressed image resource.
@@ -126,6 +134,11 @@ namespace NativeUI
          * Array with button listeners.
          */
         MAUtil::Vector<ButtonListener*> mButtonListeners;
+
+        /**
+         * The image resource handle.
+         */
+        MAHandle mImageHandle;
     };
 
 } // namespace NativeUI

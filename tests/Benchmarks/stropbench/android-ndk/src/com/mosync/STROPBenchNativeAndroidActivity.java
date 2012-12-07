@@ -6,7 +6,7 @@ import android.os.Bundle;
 import android.widget.TextView;
 
 public class STROPBenchNativeAndroidActivity extends Activity {
-	
+
 	TextView tv;
 
 	// load the library - name matches jni/Android.mk
@@ -33,7 +33,7 @@ public class STROPBenchNativeAndroidActivity extends Activity {
 		}
 		new AlertDialog.Builder(this).setMessage("DONE!").show();
 	}
-	
+
 	public void printMsg(String msg) {
 //		new AlertDialog.Builder(this).setMessage(msg).show();
 		tv.append(msg);

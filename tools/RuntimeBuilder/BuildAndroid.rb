@@ -28,43 +28,71 @@ class RuntimeBuilder
 	# but we need to pass the version to the other script so it knows
 	# which version it builds for
 	def android(runtime_dir, mode)
-		return androidBuilder(runtime_dir, mode, "10", "10")
+		return androidBuilder(runtime_dir, mode, "17", "16")
 	end
 
 	def android_3(runtime_dir, mode)
-		return androidBuilder(runtime_dir, mode, "10", "3")
+		return androidBuilder(runtime_dir, mode, "17", "3")
 	end
 
 	def android_4(runtime_dir, mode)
-		return androidBuilder(runtime_dir, mode, "10", "4")
+		return androidBuilder(runtime_dir, mode, "17", "4")
 	end
 
 	def android_5(runtime_dir, mode)
-		return androidBuilder(runtime_dir, mode, "10", "5")
+		return androidBuilder(runtime_dir, mode, "17", "5")
 	end
 
 	def android_6(runtime_dir, mode)
-		return androidBuilder(runtime_dir, mode, "10", "6")
+		return androidBuilder(runtime_dir, mode, "17", "6")
 	end
 
 	def android_7(runtime_dir, mode)
-		return androidBuilder(runtime_dir, mode, "10", "7")
-	end
-
-	def android_7x(runtime_dir, mode)
-		return androidBuilder(runtime_dir, mode, "10", "7")
+		return androidBuilder(runtime_dir, mode, "17", "7")
 	end
 
 	def android_8(runtime_dir, mode)
-		return androidBuilder(runtime_dir, mode, "10", "8")
+		return androidBuilder(runtime_dir, mode, "17", "8")
 	end
 
 	def android_9(runtime_dir, mode)
-		return androidBuilder(runtime_dir, mode, "10", "9")
+		return androidBuilder(runtime_dir, mode, "17", "9")
 	end
 
 	def android_10(runtime_dir, mode)
-		return androidBuilder(runtime_dir, mode, "10", "10")
+		return androidBuilder(runtime_dir, mode, "17", "10")
+	end
+
+	def android_11(runtime_dir, mode)
+		return androidBuilder(runtime_dir, mode, "17", "11")
+	end
+
+	def android_12(runtime_dir, mode)
+		return androidBuilder(runtime_dir, mode, "17", "12")
+	end
+
+	def android_13(runtime_dir, mode)
+		return androidBuilder(runtime_dir, mode, "17", "13")
+	end
+
+	def android_14(runtime_dir, mode)
+		return androidBuilder(runtime_dir, mode, "17", "14")
+	end
+
+	def android_15(runtime_dir, mode)
+		return androidBuilder(runtime_dir, mode, "17", "15")
+	end
+
+	def android_16(runtime_dir, mode)
+		return androidBuilder(runtime_dir, mode, "17", "16")
+	end
+
+	def android_17(runtime_dir, mode)
+		return androidBuilder(runtime_dir, mode, "17", "17")
+	end
+
+	def android_17x(runtime_dir, mode)
+		return androidBuilder(runtime_dir, mode, "17", "17")
 	end
 
 	def androidBuilder(runtime_dir, mode, platform, version)
@@ -72,6 +100,10 @@ class RuntimeBuilder
 		android_tools = "#{$SETTINGS[:android_sdk]}/platform-tools"
 		android_sdk = "#{$SETTINGS[:android_sdk]}/platforms/android-#{platform}"
 		android_ndk = "#{$SETTINGS[:android_ndk]}"
+
+		if(platform == "17" && !File.exist?(android_sdk))
+			android_sdk = "#{$SETTINGS[:android_sdk]}/platforms/android-4.2"
+		end
 
 		cpath = FileUtils.pwd
 
@@ -82,7 +114,7 @@ class RuntimeBuilder
 
 		Dir.chdir "../../runtimes/java/platforms/androidJNI"
 
-		sh("ruby buildJNI.rb #{android_ndk} #{android_sdk} #{android_tools} #{runtime_dir} #{version} #{debug}")
+		sh("ruby buildJNI.rb \"#{android_ndk}\" \"#{android_sdk}\" \"#{android_tools}\" \"#{runtime_dir}\" #{version} #{debug}")
 
 		Dir.chdir cpath
 

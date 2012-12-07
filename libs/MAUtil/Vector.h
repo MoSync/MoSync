@@ -54,19 +54,20 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 * Example: <tt>Vector_each(class MyType, itr, mySet) { myFunc(*itr); }</tt>
 */
 #define Vector_each(type,itr,v)\
-	for(Vector<type>::iterator itr = (v).begin(); itr != (v).end(); itr++)
+	for(MAUtil::Vector<type>::iterator itr = (v).begin(); itr != (v).end(); itr++)
 
+// For use inside templates.
 #define templateVector_each(type,itr,v)\
-	for(typename Vector<type>::iterator itr = (v).begin(); itr != (v).end(); itr++)
+	for(typename MAUtil::Vector<type>::iterator itr = (v).begin(); itr != (v).end(); itr++)
 
 /** \def Vector_each_const(type,itr,set)
 * A macro for iterating over a const vector.
 */
 #define Vector_each_const(type,itr,v)\
-	for(Vector<type>::const_iterator itr = (v).begin(); itr != (v).end(); itr++)
+	for(MAUtil::Vector<type>::const_iterator itr = (v).begin(); itr != (v).end(); itr++)
 
 #define templateVector_each_const(type,itr,v)\
-	for(typename Vector<type>::const_iterator itr = (v).begin(); itr != (v).end(); itr++)
+	for(typename MAUtil::Vector<type>::const_iterator itr = (v).begin(); itr != (v).end(); itr++)
 
 namespace MAUtil {
 
@@ -99,7 +100,7 @@ namespace MAUtil {
 		typedef const Type* const_iterator;
 
 		/** \brief Constructs the Vector and sets its capacity to \a initialCapacity.
-		 *  \param initialCapacity The initial capacity of the Vector.   
+		 *  \param initialCapacity The initial capacity of the Vector.
 		 */
 		Vector(int initialCapacity=4) {
 #if defined(MAUTIL_VECTOR_DEBUGGING)
@@ -278,7 +279,7 @@ namespace MAUtil {
 			MAUTIL_VECTOR_LOG("resize 0x%08X %i", (uint)this, newSize);
 			reserve(newSize);
 			MAUTIL_VECTOR_LOG("resize 2");
-			
+
 			for(int i = newSize; i < mSize; i++) {
 				mData[i] = Type();
 			}
@@ -312,7 +313,7 @@ namespace MAUtil {
 		/** \brief Clears the Vector, setting its size to 0 but not altering its capacity
 		 */
 		void clear() {
-			//mSize = 0;	
+			//mSize = 0;
 			resize(0);
 		}
 
@@ -322,7 +323,7 @@ namespace MAUtil {
 			return mSize == 0;
 		}
 
-		/** \brief Returns the Vector's current capacity. 
+		/** \brief Returns the Vector's current capacity.
 		 * \see size
 		 */
 		int capacity() const {
@@ -331,7 +332,7 @@ namespace MAUtil {
 
 		/** \brief Returns an iterator pointing to the first element of the Vector.
 		 */
-		
+
 		iterator begin() {
 			return mData;
 		}

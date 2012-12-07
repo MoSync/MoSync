@@ -1,9 +1,9 @@
 //
-//  NativeLinpack3ViewController.m
-//  NativeLinpack3
+//	NativeLinpack3ViewController.m
+//	NativeLinpack3
 //
-//  Created by QA on 6/20/11.
-//  Copyright 2011 __MyCompanyName__. All rights reserved.
+//	Created by QA on 6/20/11.
+//	Copyright 2011 __MyCompanyName__. All rights reserved.
 //
 
 #import "NativeLinpack3ViewController.h"
@@ -17,38 +17,38 @@ void run(void);
 @synthesize activityIndicator;
 
 - (IBAction)bench:(id)sender {
-    reg_objc_obj(self);
-    run();
+	reg_objc_obj(self);
+	run();
 }
 
 - (void)updateFlops:(double)mflops {
-    NSString *flopsString;
-    flopsString = [[NSString alloc] initWithFormat:@"%f",mflops];
-    txtFlops.text = flopsString;
-    
-    //send result to database
-    mBr.benchmark = "linpack";
-    mBr.mflops = mflops;
+	NSString *flopsString;
+	flopsString = [[NSString alloc] initWithFormat:@"%f",mflops];
+	txtFlops.text = flopsString;
 
-    BenchDBConnector * bdbc = [[BenchDBConnector alloc] init];
-    [bdbc submit:mBr];
-    //[activityIndicator stopAnimating]; //stop the activityIndicator from spinning
+	//send result to database
+	mBr.benchmark = "linpack";
+	mBr.mflops = mflops;
 
-    [flopsString release];
-    sleep(2);
+	BenchDBConnector * bdbc = [[BenchDBConnector alloc] init];
+	[bdbc submit:mBr];
+	//[activityIndicator stopAnimating]; //stop the activityIndicator from spinning
+
+	[flopsString release];
+	sleep(2);
 }
 
 - (void)dealloc
 {
-    [super dealloc];
+	[super dealloc];
 }
 
 - (void)didReceiveMemoryWarning
 {
-    // Releases the view if it doesn't have a superview.
-    [super didReceiveMemoryWarning];
-    
-    // Release any cached data, images, etc that aren't in use.
+	// Releases the view if it doesn't have a superview.
+	[super didReceiveMemoryWarning];
+
+	// Release any cached data, images, etc that aren't in use.
 }
 
 #pragma mark - View lifecycle
@@ -57,21 +57,21 @@ void run(void);
 // Implement viewDidLoad to do additional setup after loading the view, typically from a nib.
 - (void)viewDidLoad
 {
-    [super viewDidLoad];
+	[super viewDidLoad];
 }
 */
 
 - (void)viewDidUnload
 {
-    [super viewDidUnload];
-    // Release any retained subviews of the main view.
-    // e.g. self.myOutlet = nil;
+	[super viewDidUnload];
+	// Release any retained subviews of the main view.
+	// e.g. self.myOutlet = nil;
 }
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 {
-    // Return YES for supported orientations
-    return (interfaceOrientation == UIInterfaceOrientationPortrait);
+	// Return YES for supported orientations
+	return (interfaceOrientation == UIInterfaceOrientationPortrait);
 }
 
 @end

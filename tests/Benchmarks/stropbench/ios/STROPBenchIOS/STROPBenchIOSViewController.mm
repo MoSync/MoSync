@@ -11,21 +11,21 @@
 
 @implementation STROPBenchIOSViewController
 
-- (IBAction)startBench:(id)sender 
+- (IBAction)startBench:(id)sender
 {
     //Start the benchmark
     txt = [NSString stringWithFormat:@"%s", ""];
     StropBencher * sb = new StropBencher;
     sb->reg_objc_obj(self);
     sb->bench();
-    
+
     delete sb;
 }
 
-- (void)postResult:(char *)res 
+- (void)postResult:(char *)res
 {
     txt = [NSString stringWithFormat:@"%@%s", txt, res];
-    txtView.text = txt;	
+    txtView.text = txt;
     //[txt release];
 
 }
@@ -39,7 +39,7 @@
 {
     // Releases the view if it doesn't have a superview.
     [super didReceiveMemoryWarning];
-    
+
     // Release any cached data, images, etc that aren't in use.
 }
 

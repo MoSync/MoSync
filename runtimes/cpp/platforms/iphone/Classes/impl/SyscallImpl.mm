@@ -1377,8 +1377,6 @@ namespace Base {
 			NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
 			NSString *documentsDirectoryPath = [NSString stringWithFormat:@"%@/",[paths objectAtIndex:0]];
 			BOOL success = [documentsDirectoryPath getCString:buf maxLength:size encoding:NSASCIIStringEncoding];
-			[documentsDirectoryPath release];
-			[paths release];
 			res = (success)?strlen(buf) + 1: -1;
 		} else if (strcmp(key, "mosync.path.local.urlPrefix") == 0) {
 			BOOL success = [@"file://localhost/" getCString:buf maxLength:size encoding:NSASCIIStringEncoding];
@@ -1426,7 +1424,6 @@ namespace Base {
 					break;
 			}
 			BOOL success = [networkType getCString:buf maxLength:size encoding:NSASCIIStringEncoding];
-			[reachability release];
 			res = (success)?strlen(buf) + 1: -1;
 		}
 
@@ -1787,7 +1784,7 @@ namespace Base {
 				return 0;
 			}
 
-			UIView *newView = [widget getView];
+			UIView *newView = widget.view;
 
 			CameraInfo *info = getCurrentCameraInfo();
 
@@ -2051,6 +2048,7 @@ namespace Base {
 		{
 			[UIApplication sharedApplication].idleTimerDisabled = NO;
 		}
+        return RES_OK;
 	}
 
     SYSCALL(int, maSensorStart(int sensor, int interval))
@@ -2265,6 +2263,7 @@ namespace Base {
 		maIOCtl_case(maFrameBufferInit);
 		maIOCtl_case(maFrameBufferClose);
         maIOCtl_syscall_case(maPimListOpen);
+        maIOCtl_syscall_case(maPimListNextSummary);
         maIOCtl_syscall_case(maPimListNext);
         maIOCtl_syscall_case(maPimItemCount);
         maIOCtl_syscall_case(maPimItemGetValue);

@@ -1,0 +1,47 @@
+/**
+* The available widget properties for a #MAW_RATING_BAR. See \ref WidgetProperties "Widget properties" for more properties.
+*/
+group WidgetRatingBarProperties "Rating Bar" {
+	constset MAString MAW_RATING_BAR_ {
+		/**
+		* @brief Set or get the number of stars to show.
+		* Usually, the default stars number is 5.
+		* @validvalue An int that specifies the number of stars to show.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(ratingBarHandle, MAW_RATING_BAR_NUM_STAR, "4");
+		* \endcode
+		*/
+		NUM_STAR = "numstar";
+
+		/**
+		* @brief Set or get the current rating (number of stars filled).
+		*
+		* @validvalue A float that specifies the number of stars filled.
+		*
+		* @setandget
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(ratingBarHandle, MAW_RATING_BAR_RATING, "3.0");
+		* \endcode
+		*/
+		RATING = "rating";
+
+		/**
+		* @brief Set or get the step size (granularity) of this rating bar.
+		* By default the granularity is 0.5.
+		* @validvalue A float that specifies the step size.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(ratingBarHandle, MAW_RATING_BAR_GRANULARITY, "1.0");
+		* \endcode
+		*/
+		GRANULARITY = "granularity";
+	}
+} // end of WidgetRatingBarProperties

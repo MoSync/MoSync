@@ -113,9 +113,9 @@ static jboolean nativeLoad(
 	jclass fdClass = env->FindClass("java/io/FileDescriptor");
 	if (fdClass != NULL)
 	{
-		jclass fdPrgClassRef = (jclass) env->NewGlobalRef(fdClass);
+		//jclass fdPrgClassRef = (jclass) env->NewGlobalRef(fdClass);
 		jfieldID fdClassDescriptorFieldID =
-			env->GetFieldID(fdPrgClassRef, "descriptor", "I");
+			env->GetFieldID(fdClass, "descriptor", "I");
 
 		if (fdClassDescriptorFieldID != NULL && program != NULL)
 		{
@@ -143,9 +143,9 @@ static jboolean nativeLoad(
 		jclass fdClass2 = env->FindClass("java/io/FileDescriptor");
 		if (fdClass2 != NULL)
 		{
-			jclass fdResClassRef = (jclass) env->NewGlobalRef(fdClass2);
+			//jclass fdResClassRef = (jclass) env->NewGlobalRef(fdClass2);
 			jfieldID fdClassDescriptorFieldID =
-				env->GetFieldID(fdResClassRef, "descriptor", "I");
+				env->GetFieldID(fdClass2, "descriptor", "I");
 
 			if (fdClassDescriptorFieldID != NULL && resource != NULL)
 			{
@@ -191,12 +191,13 @@ static jboolean nativeLoadResource(
 	if (resourceOffset != 0)
 	{
 		SYSLOG("MoSyncBridge.cpp: nativeLoad: Get resource file descriptor");
-		jclass fdClass2 = env->FindClass("java/io/FileDescriptor");
-		if (fdClass2 != NULL)
+		jclass fdClass = env->FindClass("java/io/FileDescriptor");
+		if (fdClass != NULL)
 		{
-			jclass fdResClassRef = (jclass) env->NewGlobalRef(fdClass2);
+			//jclass fdResClassRef = (jclass) env->NewGlobalRef(fdClass2);
 			jfieldID fdClassDescriptorFieldID =
-				env->GetFieldID(fdResClassRef, "descriptor", "I");
+				env->GetFieldID(fdClass, "descriptor", "I");
+				//env->GetFieldID(fdResClassRef, "descriptor", "I");
 
 			if (fdClassDescriptorFieldID != NULL && resource != NULL)
 			{
@@ -257,7 +258,12 @@ static void nativeRun(JNIEnv* env, jobject jthis)
 {
 	SYSLOG("nativeRun");
 
-	Base::gSyscall->setJNIEnvironment(env, jthis);
+	// Updated, ICS made changes in how local and global references are handled.
+	// This global is not deleted since it's used for the entire life cycle of the app.
+	jobject gloablRefJThis = env->NewGlobalRef(jthis);
+	Base::gSyscall->setJNIEnvironment(env, gloablRefJThis);
+
+	//Base::gSyscall->setJNIEnvironment(env, jthis);
 
 	while(1)
 	{
@@ -330,7 +336,7 @@ static void nativePostEvent(JNIEnv* env, jobject jthis, jintArray eventBuffer)
 	// Build the event.
 	MAEvent event;
 	event.type = intArray[0];
-	event.data = NULL;
+	event.data = (MAAddress)NULL;
 
 	// Print log message.
 	char logBuf[256];
@@ -512,6 +518,11 @@ static void nativePostEvent(JNIEnv* env, jobject jthis, jintArray eventBuffer)
 		else if (widgetEventType == MAW_EVENT_ITEM_CLICKED)
 		{
 			widgetEvent->listItemIndex = intArray[3];
+		}
+		else if (widgetEventType == MAW_EVENT_SEGMENTED_LIST_ITEM_CLICKED)
+		{
+			widgetEvent->sectionIndex = intArray[3];
+			widgetEvent->sectionItemIndex = intArray[4];
 		}
 		else if (widgetEventType == MAW_EVENT_TAB_CHANGED)
 		{

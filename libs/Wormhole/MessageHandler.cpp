@@ -59,27 +59,24 @@ MessageHandler::~MessageHandler()
 
 void MessageHandler::initialize(Wormhole::HybridMoblet* moblet)
 {
+	// This code "hard codes" the binding to the main
+	// webview for the message handlers below. This can
+	// be relaxed if desired to enable secondary webviews
+	// to use e.g. the PhoneGap API. There is however a
+	// problem with APIs based on MoSync events, e.g. the
+	// accellerometer, since it can not easily be determined,
+	// which webviews have subscribed for which events, at least
+	// not without substantial code, causing added complexity.
 	NativeUI::WebView* webView = moblet->getWebView();
 	mPhoneGapMessageHandler = new PhoneGapMessageHandler(webView);
 	mNativeUIMessageHandler = new NativeUIMessageHandler(webView);
 	mResourceMessageHandler = new ResourceMessageHandler(webView);
 }
 
-void MessageHandler::openWormhole(Wormhole::HybridMoblet* moblet)
+void MessageHandler::openWormhole(
+	MAWidgetHandle webViewHandle,
+	Wormhole::HybridMoblet* moblet)
 {
-	// Send the Device Screen size to JavaScript.
-	MAExtent scrSize = maGetScrSize();
-	int width = EXTENT_X(scrSize);
-	int height = EXTENT_Y(scrSize);
-	char buf[512];
-	sprintf(
-		buf,
-		"mosync.nativeui.setScreenSize(%d,%d)",
-		//"{mosyncScreenWidth=%d; mosyncScreenHeight=%d;}",
-		width,
-		height);
-	moblet->callJS(buf);
-
 	// Initialize PhoneGap.
 	mPhoneGapMessageHandler->initializePhoneGap();
 }
@@ -122,7 +119,7 @@ void MessageHandler::keyPressEvent(int keyCode, int nativeCode)
  * @param urlData Data object that holds message content.
  */
 void MessageHandler::handleWebViewMessage(
-	NativeUI::WebView* webView,
+	MAWidgetHandle webViewHandle,
 	MAHandle data,
 	Wormhole::HybridMoblet* moblet)
 {
@@ -130,11 +127,11 @@ void MessageHandler::handleWebViewMessage(
 	Wormhole::MessageProtocol protocol(data);
 	if (protocol.isMessageStreamJSON())
 	{
-		handleMessageStreamJSON(webView, data);
+		handleMessageStreamJSON(webViewHandle, data);
 	}
 	else if (protocol.isMessageStream())
 	{
-		handleMessageStream(webView, data, moblet);
+		handleMessageStream(webViewHandle, data, moblet);
 	}
 }
 
@@ -145,12 +142,12 @@ void MessageHandler::handleWebViewMessage(
  * @param data The raw encoded JSON message array.
  */
 void MessageHandler::handleMessageStreamJSON(
-	NativeUI::WebView* webView,
+	MAWidgetHandle webViewHandle,
 	MAHandle data)
 {
 	// Create the message object. This parses the message data.
 	// The message object contains one or more messages.
-	Wormhole::JSONMessage message(webView, data);
+	Wormhole::JSONMessage message(webViewHandle, data);
 
 	// Loop through messages.
 	while (message.next())
@@ -173,59 +170,64 @@ void MessageHandler::handleMessageStreamJSON(
  * @param data The raw encoded stream of string messages.
  */
 void MessageHandler::handleMessageStream(
-	NativeUI::WebView* webView,
+	MAWidgetHandle webViewHandle,
 	MAHandle data,
 	Wormhole::HybridMoblet* moblet)
 {
 	// Create a message stream object. This parses the message data.
 	// The message object contains one or more strings.
-	Wormhole::MessageStream stream(webView, data);
+	Wormhole::MessageStream message(webViewHandle, data);
 
 	// Pointer to a string in the message stream.
 	const char* p;
 
 	// Process messages while there are strings left in the stream.
-	while (p = stream.getNext())
+	while (p = message.getNext())
 	{
 		if (0 == strcmp(p, "CallJS"))
 		{
 			// Call to evaluate JavaScript in another WebView.
 			// This is used to communicate between WebViews.
-			handleCallJSMessage(stream, webView, moblet);
+			handleCallJSMessage(message, moblet);
 		}
 		else if (0 == strcmp(p, "NativeUI"))
 		{
 			// Forward NativeUI messages.
-			mNativeUIMessageHandler->handleMessage(stream);
+			mNativeUIMessageHandler->handleMessage(message);
 		}
 		else if (0 == strcmp(p, "Resource"))
 		{
 			// Forward Resource messages.
-			mResourceMessageHandler->handleMessage(stream);
+			mResourceMessageHandler->handleMessage(message);
+		}
+		else if (0 == strcmp(p, "close"))
+		{
+			// Note: The "close" message is deprecated.
+			moblet->close();
 		}
 		else if (0 == strcmp(p, "Custom"))
 		{
 			// Lookup and call function to handle custom message.
-			const char* command = stream.getNext();
+			const char* command = message.getNext();
 			if (NULL != command)
 			{
 				callMessageFun(
 					command,
-					stream,
+					message,
 					moblet);
 			}
 		}
 		else if (0 == strcmp(p, "MoSync"))
 		{
 			// Handle messages specific to MoSync.
-			handleMoSyncMessage(stream, webView, moblet);
+			handleMoSyncMessage(message, webViewHandle, moblet);
 		}
 	}
 }
 
 void MessageHandler::handleMoSyncMessage(
 	Wormhole::MessageStream& message,
-	NativeUI::WebView* webView,
+	MAWidgetHandle webViewHandle,
 	Wormhole::HybridMoblet* moblet)
 {
 	const char* p = message.getNext();
@@ -241,7 +243,7 @@ void MessageHandler::handleMoSyncMessage(
 	}
 	else if (0 == strcmp(p, "OpenWormhole"))
 	{
-		moblet->openWormhole(moblet);
+		moblet->openWormhole(webViewHandle);
 	}
 }
 
@@ -250,23 +252,22 @@ void MessageHandler::handleMoSyncMessage(
  */
 void MessageHandler::handleCallJSMessage(
 	Wormhole::MessageStream& message,
-	NativeUI::WebView* webView,
 	Wormhole::HybridMoblet* moblet)
 {
-	// TODO: Add error handling (missing parameters).
+	// TODO: Add error handling for missing parameters.
 
 	// Get the native MoSync widget handle for the WebView
 	// this call should be forwarded to.
 	int webViewHandle = MAUtil::stringToInteger(message.getNext());
 
 	// When the handle is zero, we use the main WebView
-	// (which is hidden in a NativeUI app).
+	// (which is usually hidden in a NativeUI app).
 	if (0 == webViewHandle)
 	{
 		webViewHandle = moblet->getWebView()->getWidgetHandle();
 	}
 
-	// Evaluate the JavaScript code in the WebView.
+	// Evaluate the JavaScript code in the target WebView.
 	const char* script = message.getNext();
 	moblet->callJS(webViewHandle, script);
 }

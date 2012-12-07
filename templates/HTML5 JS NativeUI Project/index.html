@@ -39,7 +39,7 @@
 			var helloButton = mosync.nativeui.create("Button", "helloButton",
 			{
 				// Declarative way of setting properties.
-				"width": "100%",
+				"width": "FILL_AVAILABLE_SPACE",
 				"text": "Say Hello"
 			});
 
@@ -77,55 +77,73 @@
 		// has finished loading. Here we initialise the UI.
 		document.addEventListener(
 			"deviceready",
-			function() { mosync.nativeui.initUI(); },
+			function()
+			{
+				// Will call mosync.nativeui.UIReady when
+				// all Native UI widgets have been created.
+				mosync.nativeui.initUI();
+			},
 			true);
 
 		// Close the application when the back key is pressed.
 		document.addEventListener(
 			"backbutton",
-			function() { mosync.app.exit(); },
+			function()
+			{
+				mosync.app.exit();
+			},
 			true);
 	</script>
 </head>
 
 <body>
-	<!-- All of the mosync.nativeui widgets should be wraped inside a
+	<!-- All of the mosync.nativeui widgets should be wrapped inside a
 		tag with id="NativeUI" -->
 	<div id="NativeUI">
 		<!-- The element with id="mainScreen" contains the main UI screen.
 			In this app the main screen has two tabs with screens. -->
 		<div data-widgetType="TabScreen" id="mainScreen">
 			<!-- First Screen -->
-			<div data-widgetType="Screen" id="widgetScreen"
+			<div data-widgetType="Screen"
+				id="widgetScreen"
 				data-title="Widgets"
 				data-icon_android="img/Android_TabIconDevice.png"
 				data-icon_iOS="img/IOS_TabIconDevice.png">
-				<div data-widgetType="VerticalLayout" id="mainLayout"
-					data-width="-1" data-height="-1">
-					<div widgetType="Label" id="textLabel"
-						data-width="100%"
+				<div data-widgetType="VerticalLayout"
+					id="mainLayout"
+					data-width="FILL_AVAILABLE_SPACE"
+					data-height="FILL_AVAILABLE_SPACE">
+					<div widgetType="Label"
+						id="textLabel"
+						data-width="FILL_AVAILABLE_SPACE"
 						data-text="Native UI in JavaScript"
 						data-fontSize="26">
 					</div>
-					<div data-widgetType="Button" id="counterButton"
-						data-width="100%"
+					<div data-widgetType="Button"
+						id="counterButton"
+						data-width="FILL_AVAILABLE_SPACE"
 						data-text="Click Me!"
 						data-fontSize="20"
 						data-onevent="counterButtonClicked()">
 					</div>
-					<div data-widgetType="Button" id="vibrateButton"
-						data-width="100%"
+					<div data-widgetType="Button"
+						id="vibrateButton"
+						data-width="FILL_AVAILABLE_SPACE"
 						data-text="Vibrate"
 						data-fontSize="20">
 					</div>
 				</div>
 			</div>
 			<!-- Second Screen -->
-			<div data-widgetType="Screen" data-id="webScreen" data-title="Web"
+			<div data-widgetType="Screen"
+				data-id="webScreen"
+				data-title="Web"
 				data-icon_android="img/Android_TabIconWebView.png"
 				data-icon_iOS="img/IOS_TabIconWebView.png">
-				<div data-widgetType="WebView" id="webBrowser"
-					data-width="100%" data-height="100%"
+				<div data-widgetType="WebView"
+					id="webBrowser"
+					data-width="FILL_AVAILABLE_SPACE"
+					data-height="FILL_AVAILABLE_SPACE"
 					data-url="http://www.google.com">
 				</div>
 			</div>

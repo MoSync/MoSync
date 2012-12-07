@@ -235,7 +235,8 @@ public class WebWidget extends Widget
 //				url = "content://" + activity.getPackageName() + "/" + url;
 
 				// No schema present
-				// Add the local file:// schema and load the url.
+				// Add the base URL to the url and load the page.
+				// The base URL contains the schema.
 				url = mBaseURL + url;
 				webView.loadUrl(url);
 			}
@@ -270,7 +271,17 @@ public class WebWidget extends Widget
 		}
 		else if (property.equals("baseUrl")) //IX_WIDGET.MAW_WEB_VIEW_BASE_URL))
 		{
-			mBaseURL = value;
+			// Is there a schema present in the base URL?
+			if (!value.contains("://"))
+			{
+				// No schema present, add the "file://" schema.
+				mBaseURL = "file://" + value;
+			}
+			else
+			{
+				// Schema is present, just set the base URL.
+				mBaseURL = value;
+			}
 		}
 		else if (property.equals(IX_WIDGET.MAW_WEB_VIEW_SOFT_HOOK))
 		{
@@ -416,6 +427,10 @@ public class WebWidget extends Widget
 			//enable support for DOM Storage and Database
 			this.getSettings().setDatabaseEnabled(true);
 			this.getSettings().setDomStorageEnabled(true);
+
+			// Enable support for cookies.
+			// TODO: Uncomment if we want to have cookies enabled.
+			//CookieManager.getInstance().setAcceptCookie(true);
 
 			this.setVerticalScrollbarOverlay(true);
 		}

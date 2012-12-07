@@ -277,23 +277,25 @@ public:
 		SHOULD_HOLD(3 == numberOfRows, "Wrong number of rows");
 
 		// Free the cursor.
-	    maDBCursorDestroy(cursor);
+		maDBCursorDestroy(cursor);
 
 		printf("Count rows success\n");
 	}
 
 	void queryRows(MAHandle db)
 	{
+		int result;
+		MAHandle cursor;
 		printf("Query rows\n");
 
 		// Check that query that returns no rows works.
-		MAHandle cursor = maDBExecSQL(
+		result = maDBExecSQL(
 			db,
 			"SELECT * FROM pet WHERE name='NameThatDoesNotExist'");
-		SHOULD_HOLD(0 < cursor, "SELECT did not return cursor");
-		int result = maDBCursorNext(cursor);
-		SHOULD_HOLD(MA_DB_NO_ROW == result, "MA_DB_NO_ROW failed");
-		maDBCursorDestroy(cursor);
+		if(MA_DB_OK != result) {
+			printf("result: %i\n", result);
+		}
+		SHOULD_HOLD(MA_DB_OK == result, "SELECT did not return MA_DB_OK");
 
 		// Query all rows.
 		cursor = maDBExecSQL(db, "SELECT * FROM pet");
@@ -438,21 +440,18 @@ public:
 		maDBCursorNext(cursor);
 		int numberOfRows;
 		maDBCursorGetColumnInt(cursor, 0, &numberOfRows);
-	    maDBCursorDestroy(cursor);
+		maDBCursorDestroy(cursor);
 		SHOULD_HOLD(1 == numberOfRows, "Wrong number of rows");
 
 		// Check that query that returns no rows works.
-		cursor = maDBExecSQLParams(
+		result = maDBExecSQLParams(
 			db,
 			"SELECT * FROM paramtest WHERE "
 			"nullValue IS NOT NULL",
 			params,
 			0
 			);
-		SHOULD_HOLD(0 < cursor, "SELECT 2 did not return cursor");
-		result = maDBCursorNext(cursor);
-		SHOULD_HOLD(MA_DB_NO_ROW == result, "MA_DB_NO_ROW failed");
-		maDBCursorDestroy(cursor);
+		SHOULD_HOLD(result == MA_DB_OK, "SELECT 2 did not return MA_DB_OK");
 
 		// Query all rows and check that column data is correct.
 		// Note: To use blob fields in a WHERE clause is not supported.

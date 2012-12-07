@@ -1129,15 +1129,8 @@ public class MoSyncNetwork
 			mUrlConnection = new URL(url).openConnection();
 
 			mUrlConnection.setAllowUserInteraction(true);
-			// The number is hardcoded here for ICS but we have to change it to
-			// its actual constant after upgrading the our Android SDK
-			if(Build.VERSION.SDK_INT < 14)
-			{
-				mUrlConnection.setDoInput(true);
-				mUrlConnection.setDoOutput(true);
-			}
-
 			mUrlConnection.setUseCaches(false);
+			mUrlConnection.setDoOutput(true);
 
 			return this;
 		}
@@ -1153,13 +1146,6 @@ public class MoSyncNetwork
 			mUrlConnection = new URL(url).openConnection();
 
 			mUrlConnection.setAllowUserInteraction(true);
-			// The number is hardcoded here for ICS but we have to change it to
-			// its actual constant after upgrading the our Android SDK
-			if(Build.VERSION.SDK_INT < 14)
-			{
-				mUrlConnection.setDoInput(true);
-				mUrlConnection.setDoOutput(true);
-			}
 			mUrlConnection.setUseCaches(false);
 
 			HttpURLConnection httpConnection =
@@ -1171,9 +1157,11 @@ public class MoSyncNetwork
 					httpConnection.setRequestMethod("GET");
 					break;
 				case HTTP_POST:
+					mUrlConnection.setDoOutput(true);
 					httpConnection.setRequestMethod("POST");
 					break;
 				case HTTP_PUT:
+					mUrlConnection.setDoOutput(true);
 					httpConnection.setRequestMethod("PUT");
 					break;
 				case HTTP_DELETE:

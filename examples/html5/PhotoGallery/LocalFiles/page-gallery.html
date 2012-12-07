@@ -11,12 +11,11 @@
 <html>
 	<head>
 		<meta name="viewport" content="width=device-width">
-		<meta http-equiv="Content-type" content="text/html; charset=utf-8">
 		<title>Gallery</title>
-		<link rel="stylesheet" href="style.css" type="text/css" media="screen" title="no title" charset="utf-8">
-		<script type="text/javascript" charset="utf-8" src="js/wormhole.js"></script>
-		<script type="text/javascript" charset="utf-8" src="mosync-extensions.js"></script>
-		<script type="text/javascript">
+		<link rel="stylesheet" href="style.css">
+		<script src="js/wormhole.js"></script>
+		<script src="mosync-extensions.js"></script>
+		<script>
 		var gallery = (function()
 		{
 			var gallery = {};
@@ -35,7 +34,7 @@
 
 				// Ask the main WebView to download the photo list.
 				// When download is complete setPhotoList is called.
-				mosync.bridge.callJS(
+				mosync.nativeui.callJS(
 					mosync.nativeui.MAIN_WEBVIEW,
 					"app.downloadPhotoList()");
 			};
@@ -84,7 +83,7 @@
 	<body>
 		<div id="screen">
 			<div id="heading">Gallery</div>
-			<div class="pane button" onclick="gallery.downloadPhotoList()">Show Uploaded Photos</div>
+			<div class="pane button" onclick="gallery.downloadPhotoList()">Update Gallery</div>
 			<div class="pane view" id="photolist">
 				<!-- Images are dynamically added here. -->
 			</div>

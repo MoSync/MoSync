@@ -34,16 +34,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #ifndef MADMATH_H
 #define MADMATH_H
 
-#define DBL_MANT_DIG 	53
-#define DBL_DIG 		15
-#define DBL_EPSILON 	2.2204460492503131e-16
-#define DBL_MIN_EXP 	(-1021)
-#define DBL_MIN 		2.2250738585072014e-308
-#define DBL_MIN_10_EXP 	(-307)
-#define DBL_MAX_EXP 	1024
-#define DBL_MAX 		1.7976931348623157e+308
-#define DBL_MAX_10_EXP 	308
-
 #define M_E		2.7182818284590452354
 #define M_LOG2E		1.4426950408889634074
 #define M_LOG10E	0.43429448190325182765
@@ -68,6 +58,17 @@ extern "C" {
 #endif
 
 #ifdef MAPIP
+
+#define DBL_MANT_DIG 	53
+#define DBL_DIG 		15
+#define DBL_EPSILON 	2.2204460492503131e-16
+#define DBL_MIN_EXP 	(-1021)
+#define DBL_MIN 		2.2250738585072014e-308
+#define DBL_MIN_10_EXP 	(-307)
+#define DBL_MAX_EXP 	1024
+#define DBL_MAX 		1.7976931348623157e+308
+#define DBL_MAX_10_EXP 	308
+
 /**
 * Breaks \a x into two parts: the integer part (stored in the object pointed by \a intpart)
 * and the fractional part (returned by the function).
@@ -160,6 +161,8 @@ int isinf(double x);
 #define _CRT_SECURE_NO_WARNINGS
 #endif
 #include <math.h>
+#include <float.h>
+#define isnan _isnan
 
 #endif //MAPIP
 

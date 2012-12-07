@@ -5,4 +5,29 @@
 #ifdef __OBJC__
     #import <Foundation/Foundation.h>
     #import <UIKit/UIKit.h>
+
+/**
+ Log shown only on debug mode.
+ */
+#ifdef __OPTIMIZE__
+#define DLog(...);
+#else
+#define DLog(fmt, ...) NSLog(fmt, ##__VA_ARGS__);
 #endif
+
+/**
+ Log always shown(debug and release mode).
+ */
+#define ALog(fmt, ...) NSLog(fmt, ##__VA_ARGS__);
+
+/**
+ Logs for showing the current method.
+ Work only on debug mode.
+ */
+#define LOGIN DLog(@"IN %s", __FUNCTION__);
+#define LOGOUT DLog(@"OUT %s", __FUNCTION__);
+
+#endif
+
+#define INNativeUILog    ;
+#define OUTNativeUILog    ;

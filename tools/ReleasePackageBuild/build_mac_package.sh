@@ -199,9 +199,9 @@ cp $SOURCEDIR/tools/ReleasePackageBuild/build_package_tools/osx_bin/iphoneos/iph
 cp $SOURCEDIR/tools/idl2/output/asm_config.lst $MOSYNCDIR/bin || error_exit "Could not copy binary."
 cp $SOURCEDIR/build/release/e32hack $MOSYNCDIR/bin || error_exit "Could not copy binary."
 cp -R $SOURCEDIR/tools/ReleasePackageBuild/build_package_tools/osx_bin/android $MOSYNCDIR/bin/ || error_exit "Could not copy binary."
-cp $SOURCEDIR/runtimes/java/platforms/android/mosync.keystore $MOSYNCDIR/etc || error_exit "Could not copy binary."
-cp $SOURCEDIR/runtimes/java/platforms/android/AndroidProject/res/drawable/icon.png $MOSYNCDIR/etc || error_exit "Could not copy binary."
-cp $SOURCEDIR/runtimes/java/platforms/android/default.icon $MOSYNCDIR/etc || error_exit "Could not copy icon description file."
+cp $SOURCEDIR/runtimes/java/platforms/androidJNI/mosync.keystore $MOSYNCDIR/etc || error_exit "Could not copy binary."
+cp $SOURCEDIR/runtimes/java/platforms/androidJNI/AndroidProject/res/drawable/icon.png $MOSYNCDIR/etc || error_exit "Could not copy binary."
+cp $SOURCEDIR/runtimes/java/platforms/androidJNI/default.icon $MOSYNCDIR/etc || error_exit "Could not copy icon description file."
 
 mv $MOSYNCDIR/bin/moemu $MOSYNCDIR/bin/MoRE
 

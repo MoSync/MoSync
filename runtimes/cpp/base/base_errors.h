@@ -99,6 +99,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 	m(40079, ERR_DB_INVALID_COLUMN_INDEX, "Invalid database column index")\
 	m(40080, ERR_RES_PLACEHOLDER_NOT_DYNAMIC, "Placeholder not created using maCreatePlaceholder")\
 	m(40081, ERR_RES_PLACEHOLDER_ALREADY_DESTROYED, "Placeholder is already destroyed")\
+	m(40082, ERR_ORIENTATION_INVALID, "Invalid orientation")\
+	m(40083, ERR_DB_PARAM_TYPE_INVALID, "DB: Invalid parameter type")\
 
 DECLARE_ERROR_ENUM(BASE)
 

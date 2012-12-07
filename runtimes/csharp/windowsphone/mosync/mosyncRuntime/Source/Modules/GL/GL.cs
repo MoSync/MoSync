@@ -72,7 +72,7 @@ class GL : GLConstants
 	protected internal class GLBuffer
 	{
 		public byte[] data;
-		public bool dirty;
+		//public bool dirty;
 		public int usage;
 	}
 
@@ -2294,9 +2294,9 @@ class GL : GLConstants
 				SetConvertedPixels(surfaceFormat, bytesPerPixel, level, t,
 					format, type, xoffset, yoffset, width, height, textureData, textureDataOffset);
 			}
-			catch (Exception e)
+			catch (Exception)
 			{
-				int a = 2;
+				//int a = 2;
 			}
 			mBasicEffect.Texture = t;
 	}

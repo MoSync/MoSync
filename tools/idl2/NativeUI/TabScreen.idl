@@ -1,0 +1,44 @@
+/**
+* The available widget properties for a #MAW_TAB_SCREEN. See \ref WidgetProperties "Widget properties" for more properties.
+*/
+group WidgetTabScreenProperties "Tab screen" {
+	constset MAString MAW_TAB_SCREEN_ {
+		/**
+		* @copydoc MAW_SCREEN_TITLE
+		*/
+		TITLE = "title";
+
+		/**
+		* @copydoc MAW_SCREEN_ICON
+		*/
+		ICON = "icon";
+
+		/**
+		* @brief Sets or gets the currently open tab to the tab with the given index.
+		*
+		* @validvalue A 0-indexed tab number.
+		*
+		* @setandget
+		*
+		* @par Example set
+		* \code
+		*	maWidgetSetProperty(tabScreenHandle, MAW_TAB_SCREEN_CURRENT_TAB, "1");
+		* \endcode
+		*
+		* @par Example get
+		* \code
+		*	char currentTabBuffer[BUFFER_SIZE];
+		*	int result = maWidgetGetProperty(
+		*		tabScreenHandle,
+		*		MAW_WEB_VIEW_CURRENT_TAB,
+		*		currentTabBuffer,
+		*		BUFFER_SIZE);
+		*	if (result > 0)
+		*	{
+		*		// Do something with current tab.
+		*	}
+		* \endcode
+		*/
+		CURRENT_TAB = "currentTab";
+	}
+} // end of WidgetTabScreenProperties

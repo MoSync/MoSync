@@ -23,6 +23,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.GradientDrawable.Orientation;
+import android.util.Log;
 import android.view.View;
 
 import com.mosync.internal.generated.IX_WIDGET;
@@ -290,6 +291,34 @@ public class Widget
 	}
 
 	/**
+	 * Base widget method for adding a child to a parent widget.
+	 * Available only for Layout widgets that can contain widgets.
+	 *
+	 * @param child The child widget.
+	 * @param index
+	 * @return error code or MAW_RES_OK.
+	 */
+	public int addChildAt(Widget child, int index)
+	{
+		Log.e( "MoSync", "maWidgetInsertChild: Parent " + " is not a layout or a dialog." );
+		return IX_WIDGET.MAW_RES_INVALID_LAYOUT;
+	}
+
+	/**
+	 * Removes a child from its parent, but keeps a
+	 * reference to it.
+	 *
+	 * @param child The child widget.
+	 * @return error code or MAW_RES_OK if the parent is a widget
+	 * container.
+	 */
+	public int removeChild(Widget child)
+	{
+		Log.e( "MoSync", "maWidgetRemove: Parent for is not a layout or a dialog." );
+		return IX_WIDGET.MAW_RES_INVALID_LAYOUT;
+	}
+
+	/**
 	 * Sets the parent of this widget.
 	 *
 	 * @param parent The new parent of this widget.
@@ -409,8 +438,7 @@ public class Widget
 	 * @param aSize The size of MoSyncFontHandle
 	 * @return True if the widget supports font setting, false otherwise.
 	 */
-	public boolean setFontTypeface(Typeface aTypeface, float aSize)
+	public void setFontTypeface(Typeface aTypeface, float aSize)
 	{
-		return false;
 	}
 }

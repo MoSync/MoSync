@@ -64,7 +64,9 @@ public:
 		// Note: urlData is deallocated automatically by
 		// the framework, we should not deallocate it here.
 
-		mMoblet->handleWebViewMessage(webView, urlData);
+		mMoblet->handleWebViewMessage(
+			webView->getWidgetHandle(),
+			urlData);
 	}
 
 private:
@@ -115,6 +117,8 @@ void HybridMoblet::initialize()
 
 	mInitialized = true;
 
+	createUI();
+
 	// Extract files in LocalFiles folder to the device.
 	extractFileSystem();
 
@@ -126,10 +130,26 @@ void HybridMoblet::initialize()
 	mMessageHandler.initialize(this);
 }
 
-void HybridMoblet::openWormhole(
-	Wormhole::HybridMoblet* moblet)
+void HybridMoblet::openWormhole(MAHandle webViewHandle)
 {
-	mMessageHandler.openWormhole(moblet);
+	sendDeviceScreenSizeToJavaScript();
+	sendWebViewHandleToJavaScript();
+
+	mMessageHandler.openWormhole(webViewHandle, this);
+}
+
+/**
+ * Creates the main UI elements, but does not connect them.
+ */
+void HybridMoblet::createUI()
+{
+	// Create and show the screen that holds the WebView.
+	mScreen = new NativeUI::Screen();
+
+	// Create and configure the WebView.
+	mWebView = new NativeUI::WebView();
+	mWebView->fillSpaceHorizontally();
+	mWebView->fillSpaceVertically();
 }
 
 /**
@@ -139,19 +159,6 @@ void HybridMoblet::openWormhole(
  */
 NativeUI::WebView* HybridMoblet::getWebView()
 {
-	// Create the WebView if it does not exist.
-	if (NULL == mWebView)
-	{
-		// Create and configure the WebView.
-		mWebView = new NativeUI::WebView();
-		mWebView->fillSpaceHorizontally();
-		mWebView->fillSpaceVertically();
-
-		// Create the screen that holds the WebView.
-		mScreen = new NativeUI::Screen();
-		mScreen->setMainWidget(mWebView);
-	}
-
 	return mWebView;
 }
 
@@ -206,10 +213,10 @@ void HybridMoblet::showNativeUI(const MAUtil::String& url)
  */
 void HybridMoblet::showWebView()
 {
-	// Make sure the WebView is created.
-	getWebView();
+	// Set the web view as the main widget of the screen.
+	mScreen->setMainWidget(mWebView);
 
-	// Show the screen that contains the WebView.
+	// Show the screen.
 	mScreen->show();
 }
 
@@ -259,10 +266,55 @@ void HybridMoblet::addMessageFun(
  * @param urlData Data object that holds message content.
  */
 void HybridMoblet::handleWebViewMessage(
-	NativeUI::WebView* webView,
+	MAHandle webViewHandle,
 	MAHandle data)
 {
-	mMessageHandler.handleWebViewMessage(webView, data, this);
+	mMessageHandler.handleWebViewMessage(webViewHandle, data, this);
+}
+
+/**
+ * Handles HOOK_INVOKED events for WebViews in the app.
+ * This code enables WebViews to send messages to each other.
+ *
+ * The only thing that work reliable from other WebViews than
+ * the main one, are CallJS and calls that do not return anything,
+ * like mosync.app.sendToBackground().
+ *
+ * Apps are supposed to use the main WebView to for accessing the
+ * fulll Wormhole JS API, and only use mosync.nativeui.callJS()
+ * from other WebViews. This way, the main WebView becomes a
+ * mediator, which is a good design because native access is
+ * restricted to one point.
+ */
+void HybridMoblet::customEvent(const MAEvent& event)
+{
+	if (EVENT_TYPE_WIDGET == event.type)
+	{
+		MAWidgetEventData* widgetEventData = (MAWidgetEventData*)event.data;
+		MAWidgetHandle webViewHandle = widgetEventData->widgetHandle;
+
+		// If target object is the main WebView, then we just return
+		// because this is handled by the NativeUI library event processing,
+		// which will invoke HybridMoblet::handleWebViewMessage().
+		if (getWebView()->getWidgetHandle() == webViewHandle)
+		{
+			return;
+		}
+
+		// Process HOOK_INVOKED messages. This makes CallJS messages work.
+		if (MAW_EVENT_WEB_VIEW_HOOK_INVOKED == widgetEventData->eventType)
+		{
+			// We don't care about the hook type.
+			// int hookType = widgetEventData->hookType;
+
+			MAHandle data = widgetEventData->urlData;
+
+			handleWebViewMessage(webViewHandle, data);
+
+			// Free data.
+			maDestroyPlaceholder(data);
+		}
+	}
 }
 
 /**
@@ -283,6 +335,38 @@ void HybridMoblet::keyPressEvent(int keyCode, int nativeCode)
 void HybridMoblet::callJS(const MAUtil::String& script)
 {
 	getWebView()->callJS(script);
+}
+
+/**
+ * Sends the Device Screen size to JavaScript.
+ */
+void HybridMoblet::sendDeviceScreenSizeToJavaScript()
+{
+	MAExtent scrSize = maGetScrSize();
+	int width = EXTENT_X(scrSize);
+	int height = EXTENT_Y(scrSize);
+	char buf[512];
+	sprintf(
+		buf,
+		"mosync.nativeui.setScreenSize(%d,%d)",
+		width,
+		height);
+	callJS(buf);
+}
+
+/**
+ * Sends the web view handle to JavaScript.
+ */
+void HybridMoblet::sendWebViewHandleToJavaScript()
+{
+	char buffer[1024];
+	MAWidgetHandle widget = mWebView->getWidgetHandle();
+	//We use a special callback for widget creation
+	sprintf(
+		buffer,
+		"mosync.nativeui.setWebViewHandle('%d')",
+		widget);
+	callJS(buffer);
 }
 
 /**
