@@ -148,10 +148,10 @@ namespace NativeUI
 		void setCenter(const MapLocation& center);
 
 		/**
-		 * Sets the interraction enabled property for the map.
-		 * @param interractionEnabled If true, the map can be scrolled/zoomed.
+		 * Sets the interaction enabled property for the map.
+		 * @param interactionEnabled If true, the map can be scrolled/zoomed.
 		 */
-		void setInterractionEnabled(bool interractionEnabled);
+		void setInteractionEnabled(bool interactionEnabled);
 
 		/**
 		 * Centers the map around the map center.
