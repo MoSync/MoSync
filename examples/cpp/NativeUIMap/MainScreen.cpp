@@ -97,7 +97,7 @@ void MainScreen::createMainLayout() {
 	mMainLayout->addChild(mSetCenterButton);
 
 	// create the main map and add it to the main layout
-	mMap = new Map("google test credentials", "AsIe6nHOHjIuf9MQS4fW7up92BO6HuCwspKJqYwffZiqUJsgXuLIXeBdCf9EM4yz");
+	mMap = new Map("google mock credentials", "bing mock credentials");
 	mMap->fillSpaceHorizontally();
 	mMap->fillSpaceVertically();
 
@@ -259,9 +259,7 @@ void MainScreen::buttonClicked(Widget* button)
  */
 void MainScreen::mapZoomLevelChanged(Map* map)
 {
-	// add them only for testing - map performance greatly decreased because this function is called
-	// many times on map zoom
-//	printf("Map zoom level changed!");
+
 }
 
 /**
@@ -271,9 +269,7 @@ void MainScreen::mapZoomLevelChanged(Map* map)
  */
 void MainScreen::mapRegionChanged(Map* map)
 {
-	// add them only for testing - map performance greatly decreased because this function is called
-	// many times on map scroll
-//	printf("Map region changed!");
+
 }
 
 /**
@@ -282,5 +278,5 @@ void MainScreen::mapRegionChanged(Map* map)
  */
 void MainScreen::mapPinClicked(MapPin* mapPin)
 {
-	printf("Map pin clicked!");
+
 }
