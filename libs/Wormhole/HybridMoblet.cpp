@@ -69,7 +69,7 @@ public:
 			urlData);
 	}
 
-private:
+protected:
 	/**
 	 * Pointer to the moblet.
 	 */
@@ -90,6 +90,12 @@ HybridMoblet::HybridMoblet()
 
 	// Create file utility object.
 	mFileUtil = new FileUtil();
+
+	// Create the message handler.
+	// The idea with moving to pointers for handlers is
+	// that then they are pluggable by the users of this class.
+	// Like the "strategy" or "state" pattern.
+	mMessageHandler = new MessageHandler();
 }
 
 /**
@@ -101,11 +107,10 @@ HybridMoblet::~HybridMoblet()
 	delete mScreen;
 
 	// Delete the WebView listener.
-	if (NULL != mWebViewListener)
-	{
-		delete mWebViewListener;
-		mWebViewListener = NULL;
-	}
+	if (NULL != mWebViewListener) { delete mWebViewListener; }
+
+	// Delete message handler.
+	if (NULL != mMessageHandler) { delete mMessageHandler; }
 
 	// Delete the file utility object.
 	delete mFileUtil;
@@ -127,7 +132,7 @@ void HybridMoblet::initialize()
 
 	// Initialize the message handler. All messages from
 	// JavaScript are routed through this handler.
-	mMessageHandler.initialize(this);
+	mMessageHandler->initialize(this);
 }
 
 void HybridMoblet::openWormhole(MAHandle webViewHandle)
@@ -135,7 +140,7 @@ void HybridMoblet::openWormhole(MAHandle webViewHandle)
 	sendDeviceScreenSizeToJavaScript();
 	sendWebViewHandleToJavaScript();
 
-	mMessageHandler.openWormhole(webViewHandle, this);
+	mMessageHandler->openWormhole(webViewHandle, this);
 }
 
 /**
@@ -228,7 +233,26 @@ void HybridMoblet::showWebView()
  */
 void HybridMoblet::setBeepSound(MAHandle beepSoundResource)
 {
-	mMessageHandler.setBeepSound(beepSoundResource);
+	mMessageHandler->setBeepSound(beepSoundResource);
+}
+
+/**
+ * Return the message handler object used by this moblet.
+ */
+MessageHandler* HybridMoblet::getMessageHandler()
+{
+	return mMessageHandler;
+}
+
+/**
+ * Set the message handler object used by this moblet.
+ * Any previous handler is deleted. The moblet takes
+ * ownership of the handler and deletes it when destroyed.
+ */
+void HybridMoblet::setMessageHandler(MessageHandler* handler)
+{
+	if (NULL != mMessageHandler) { delete mMessageHandler; }
+	mMessageHandler = handler;
 }
 
 /**
@@ -252,7 +276,7 @@ void HybridMoblet::addMessageFun(
 	const char* command,
 	FunTable::MessageHandlerFun fun)
 {
-	mMessageHandler.addMessageFun(command, fun);
+	mMessageHandler->addMessageFun(command, fun);
 }
 
 /**
@@ -269,7 +293,7 @@ void HybridMoblet::handleWebViewMessage(
 	MAHandle webViewHandle,
 	MAHandle data)
 {
-	mMessageHandler.handleWebViewMessage(webViewHandle, data, this);
+	mMessageHandler->handleWebViewMessage(webViewHandle, data, this);
 }
 
 /**
@@ -357,7 +381,7 @@ void HybridMoblet::customEvent(const MAEvent& event)
  */
 void HybridMoblet::keyPressEvent(int keyCode, int nativeCode)
 {
-	mMessageHandler.keyPressEvent(keyCode, nativeCode);
+	mMessageHandler->keyPressEvent(keyCode, nativeCode);
 }
 
 /**
