@@ -35,8 +35,8 @@ HEADER_TEXT = 'MoSync SDK'
 version = ['Developer build', 'Unknown']
 
 PLATFORMS = [
-	'Android 1.5 - 2.3.3',
-	'iOS (iPhone, iPad, iPod Touch) 3.0 - 4.3',
+	'Android 2.3, 4.x',
+	'iOS (iPhone, iPad, iPod Touch) 4.3 - 5.0',
 	'Windows Phone 7.5',
 	'Java ME MIDP 2',
 	'Moblin 2.x',

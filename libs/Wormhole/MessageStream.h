@@ -139,7 +139,10 @@ protected:
 	 */
 	NativeUI::WebView* mWebView;
 
-public:
+	/**
+	 * Variables for internal use only, but made protected
+	 * if some future need for subclassing would arise.
+	 */
 	char* mData;
 	int mDataSize;
 	char* mStart;

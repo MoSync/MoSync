@@ -80,7 +80,7 @@ public:
 
 	bool isMessageStreamJSON();
 
-private:
+protected:
 	char mProtocol[3];
 };
 

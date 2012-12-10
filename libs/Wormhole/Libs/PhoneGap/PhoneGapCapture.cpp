@@ -161,7 +161,6 @@ namespace Wormhole
 				{
 					char deviceOS[64];
 					String extension;
-					char localPath[1024];
 
 					maGetSystemProperty(
 						"mosync.device.OS",
@@ -186,14 +185,11 @@ namespace Wormhole
 
 					// Images need to be stored. We use maLocalTime to
 					// get a unique number for the filename.
-					maGetSystemProperty(
-						"mosync.path.local",
-						localPath,
-						sizeof(localPath));
+					String localPath = (mMessageHandler->getFileUtil())->getAppPath();
 					sprintf(
 						pathBuffer,
 						"%simg%d.%s",
-						localPath,
+						localPath.c_str(),
 						maLocalTime(),
 						extension.c_str());
 					int result = maCaptureWriteImage(
