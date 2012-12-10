@@ -54,7 +54,7 @@ namespace Wormhole
 		 * Implementation of Capture API exposed to JavaScript.
 		 * @return true if message was handled, false if not.
 		 */
-		void handleMessage(JSONMessage& message);
+		virtual void handleMessage(JSONMessage& message);
 
 		/**
 		 * Event handler for capture events
@@ -62,7 +62,7 @@ namespace Wormhole
 		 */
 		virtual void customEvent(const MAEvent &event);
 
-	private:
+	protected:
 		PhoneGapMessageHandler* mMessageHandler;
 
 		/**

@@ -52,7 +52,6 @@ class FileUtil
 		 */
 		FileUtil();
 
-	public:
 		/**
 		 * Destructor.
 		 */
@@ -63,6 +62,20 @@ class FileUtil
 		 * @return Path that ends with a slash.
 		 */
 		virtual MAUtil::String getLocalPath();
+
+		/**
+		 * Get the path to the directory to be used as the
+		 * root path by File APIs.
+		 * @return Full path to the current root directory.
+		 */
+		virtual MAUtil::String getAppPath();
+
+		/**
+		 * Set the path to the directory to be used as the
+		 * root path by File APIs.
+		 * @param fullPath Full path to the root directory.
+		 */
+		virtual void setAppPath(const MAUtil::String& fullPath);
 
 		/**
 		 * Extract a file system bundle to a directory in the
@@ -150,6 +163,13 @@ class FileUtil
 		 * Create a text string from data handle.
 		 */
 		virtual MAUtil::String createTextFromHandle(MAHandle data);
+
+	protected:
+		/**
+		 * Full path to the current root directory to be used
+		 * by File APIs.
+		 */
+		MAUtil::String mAppPath;
 	};
 
 } // namespace
