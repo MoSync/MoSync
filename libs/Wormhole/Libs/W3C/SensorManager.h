@@ -54,21 +54,21 @@ namespace Wormhole
 		 * Implementation of the Sensor Manager API exposed to JavaScript.
 		 * @return true if message was handled, false if not.
 		 */
-		void handleMessage(JSONMessage& message);
+		virtual void handleMessage(JSONMessage& message);
 
 		/**
 		 * Dispatching of sensor events.
 		 * @param sensorData The sensor data of the event
 		 */
-		void sendSensorData(MASensor sensorData);
+		virtual void sendSensorData(MASensor sensorData);
 
-	private:
+	protected:
 		/**
 		 * Handles the findSensor message. It then posts the list
 		 * of sensors back to Phonegap
 		 * @param message The phonegap message
 		 */
-		void findSensors(JSONMessage& message);
+		virtual void findSensors(JSONMessage& message);
 
 		PhoneGapMessageHandler* mMessageHandler;
 
