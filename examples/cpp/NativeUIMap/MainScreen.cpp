@@ -79,7 +79,7 @@ void MainScreen::createMainLayout() {
 
 	// create and add the title label to the main layout
 	mTitleLabel = new Label();
-	mTitleLabel->setText("Map widget test program");
+	mTitleLabel->setText("Map widget");
 	mTitleLabel->setFontSize(32.0);
 	mTitleLabel->fillSpaceHorizontally();
 	mTitleLabel->setTextHorizontalAlignment("center");
