@@ -1130,7 +1130,6 @@ public class MoSyncNetwork
 
 			mUrlConnection.setAllowUserInteraction(true);
 			mUrlConnection.setUseCaches(false);
-			mUrlConnection.setDoOutput(true);
 
 			return this;
 		}
