@@ -40,6 +40,8 @@ namespace Wormhole
 	NativeUIMessageHandler::NativeUIMessageHandler(NativeUI::WebView* webView) :
 		mWebView(webView)
 	{
+		mNativeUIEventsOn = true;
+
 		//We have added this class as a custom event listener so it
 		//can forward all of the custom events to JavaScript
 		Environment::getEnvironment().addCustomEventListener(this);
@@ -51,6 +53,22 @@ namespace Wormhole
 	NativeUIMessageHandler::~NativeUIMessageHandler()
 	{
 		// Nothing needs to be explicitly destroyed.
+	}
+
+	/**
+	 * Turn on processing of Native UI events.
+	 */
+	void NativeUIMessageHandler::nativeUIEventsOn()
+	{
+		mNativeUIEventsOn = true;
+	}
+
+	/**
+	 * Turn off processing of Native UI events.
+	 */
+	void NativeUIMessageHandler::nativeUIEventsOff()
+	{
+		mNativeUIEventsOn = false;
 	}
 
 	/**
@@ -92,7 +110,7 @@ namespace Wormhole
 				//We use a special callback for widget creation
 				sprintf(
 					buffer,
-					"mosync.nativeui.createCallback('%s', '%s', %d)",
+					"try{mosync.nativeui.createCallback('%s', '%s', %d)}catch(e){}",
 					callbackID,
 					widgetID,
 					widget);
@@ -305,7 +323,7 @@ namespace Wormhole
 		{
 			sprintf(
 					replyScript,
-					"mosync.bridge.reply(%s)",
+					"try{mosync.bridge.reply(%s)}catch(e){}",
 					mosyncCallBackId);
 			mWebView->callJS(replyScript);
 		}
@@ -320,7 +338,12 @@ namespace Wormhole
 	{
 		char buffer[1024];
 
-		if(event.type == EVENT_TYPE_WIDGET)
+		if (!mNativeUIEventsOn)
+		{
+			return;
+		}
+
+		if (event.type == EVENT_TYPE_WIDGET)
 		{
 			MAWidgetEventData *data = (MAWidgetEventData*)event.data;
 			MAWidgetHandle widget = data->widgetHandle;
@@ -402,7 +425,7 @@ namespace Wormhole
 			// "WebViewHookInvoked" events to be able to pass data to
 			// the main (hidden) WebView using mosync.bridge.sendRaw.
 			sprintf(buffer,
-				"mosync.nativeui.event(%d, \"%s\", %d, %d, %d)",
+				"try{mosync.nativeui.event(%d, \"%s\", %d, %d, %d)}catch(e){}",
 				widget,
 				eventType.c_str(),
 				firstParameter,
@@ -415,14 +438,14 @@ namespace Wormhole
 	void NativeUIMessageHandler::sendNativeUIError(const char *data)
 	{
 		char script[2048];
-		sprintf(script, "mosync.nativeui.error(%s)", data);
+		sprintf(script, "try{mosync.nativeui.error(%s)}catch(e){}", data);
 		mWebView->callJS(script);
 	}
 
 	void NativeUIMessageHandler::sendNativeUISuccess(const char *data)
 	{
 		char script[2048];
-		sprintf(script, "mosync.nativeui.success(%s)", data);
+		sprintf(script, "try{mosync.nativeui.success(%s)}catch(e){}", data);
 		mWebView->callJS(script);
 	}
 } // namespace

@@ -31,11 +31,11 @@ MA 02110-1301, USA.
 namespace Wormhole
 {
 
-MessageHandler::MessageHandler() :
-	mPhoneGapMessageHandler(NULL),
-	mNativeUIMessageHandler(NULL),
-	mResourceMessageHandler(NULL)
+MessageHandler::MessageHandler()
 {
+	mPhoneGapMessageHandler = NULL;
+	mNativeUIMessageHandler = NULL;
+	mResourceMessageHandler = NULL;
 }
 
 MessageHandler::~MessageHandler()
@@ -64,15 +64,89 @@ void MessageHandler::initialize(Wormhole::HybridMoblet* moblet)
 	// be relaxed if desired to enable secondary webviews
 	// to use e.g. the PhoneGap API. There is however a
 	// problem with APIs based on MoSync events, e.g. the
-	// accellerometer, since it can not easily be determined,
+	// accelerometer, since it can not easily be determined,
 	// which webviews have subscribed for which events, at least
 	// not without substantial code, causing added complexity.
 	NativeUI::WebView* webView = moblet->getWebView();
 	mPhoneGapMessageHandler = new PhoneGapMessageHandler(webView);
 	mNativeUIMessageHandler = new NativeUIMessageHandler(webView);
 	mResourceMessageHandler = new ResourceMessageHandler(webView);
+
+	// Set the FileUtil object to use.
+	mPhoneGapMessageHandler->setFileUtil(moblet->getFileUtil());
+	mResourceMessageHandler->setFileUtil(moblet->getFileUtil());
 }
 
+/**
+ * Get the PhoneGap message handler.
+ */
+PhoneGapMessageHandler* MessageHandler::getPhoneGapMessageHandler()
+{
+	return mPhoneGapMessageHandler;
+}
+
+/**
+ * Set the PhoneGap message handler.
+ */
+void MessageHandler::setPhoneGapMessageHandler(PhoneGapMessageHandler* handler)
+{
+	if (NULL != mPhoneGapMessageHandler) { delete mPhoneGapMessageHandler; }
+	mPhoneGapMessageHandler = handler;
+}
+
+/**
+ * Get the Native UI message handler.
+ */
+NativeUIMessageHandler* MessageHandler::getNativeUIMessageHandler()
+{
+	return mNativeUIMessageHandler;
+}
+
+/**
+ * Set the Native UI message handler.
+ */
+void MessageHandler::setNativeUIMessageHandler(NativeUIMessageHandler* handler)
+{
+	if (NULL != mNativeUIMessageHandler) { delete mNativeUIMessageHandler; }
+	mNativeUIMessageHandler = handler;
+}
+
+/**
+ * Get the Resource message handler.
+ */
+ResourceMessageHandler* MessageHandler::getResourceMessageHandler()
+{
+	return mResourceMessageHandler;
+}
+
+/**
+ * Set the Resource message handler.
+ */
+void MessageHandler::setResourceMessageHandler(ResourceMessageHandler* handler)
+{
+	if (NULL != mResourceMessageHandler) { delete mResourceMessageHandler; }
+	mResourceMessageHandler = handler;
+}
+
+/**
+ * Set the object to get notified when log messages are sent.
+ *
+ * Note that the MessageHandler will take ownership of
+ * the listener and delete it upon destruction. Also, when a new
+ * listener is set, the old listener will be deleted.
+ *
+ * @param listener The log message listener.
+ */
+void MessageHandler::setLogMessageListener(LogMessageListener* listener)
+{
+	mResourceMessageHandler->setLogMessageListener(listener);
+}
+
+/**
+ * Called when document in main WebView is loaded. Here we
+ * perform initialization of Wormhole that needs to be done
+ * when all JS has been loaded.
+ */
 void MessageHandler::openWormhole(
 	MAWidgetHandle webViewHandle,
 	Wormhole::HybridMoblet* moblet)
@@ -81,12 +155,35 @@ void MessageHandler::openWormhole(
 	mPhoneGapMessageHandler->initializePhoneGap();
 }
 
+/**
+ * Set the sound used by the PhoneGap beep notification.
+ */
 void MessageHandler::setBeepSound(MAHandle beepSound)
 {
 	// Set beep sound resource.
 	mPhoneGapMessageHandler->setBeepSound(beepSound);
 }
 
+/**
+ * Turn on processing of Native UI events.
+ */
+void MessageHandler::nativeUIEventsOn()
+{
+	mNativeUIMessageHandler->nativeUIEventsOn();
+}
+
+/**
+ * Turn off processing of Native UI events.
+ */
+void MessageHandler::nativeUIEventsOff()
+{
+	mNativeUIMessageHandler->nativeUIEventsOff();
+}
+
+/**
+ * Add a message function callback to be invoked from
+ * JavaScript using the "Custom" protocol.
+ */
 void MessageHandler::addMessageFun(
 	const char* command,
 	FunTable::MessageHandlerFun fun)
@@ -94,6 +191,10 @@ void MessageHandler::addMessageFun(
 	mFunTable.addMessageFun(command, fun);
 }
 
+/**
+ * Called a registered message function invoked
+ * via the "Custom" protocol. Used internally.
+ */
 void MessageHandler::callMessageFun(
 	const char* command,
 	Wormhole::MessageStream& stream,
@@ -102,6 +203,9 @@ void MessageHandler::callMessageFun(
 	mFunTable.callMessageFun(command, stream, moblet);
 }
 
+/**
+ * Handle key press events.
+ */
 void MessageHandler::keyPressEvent(int keyCode, int nativeCode)
 {
 	// Forward to PhoneGap MessageHandler.
@@ -203,7 +307,7 @@ void MessageHandler::handleMessageStream(
 		else if (0 == strcmp(p, "close"))
 		{
 			// Note: The "close" message is deprecated.
-			moblet->close();
+			moblet->exit();
 		}
 		else if (0 == strcmp(p, "Custom"))
 		{
@@ -234,8 +338,8 @@ void MessageHandler::handleMoSyncMessage(
 
 	if (0 == strcmp(p, "ExitApplication"))
 	{
-		// Close the application.
-		Wormhole::CustomMoblet::close();
+		// Exit the application.
+		moblet->exit();
 	}
 	else if (0 == strcmp(p, "SendToBackground"))
 	{

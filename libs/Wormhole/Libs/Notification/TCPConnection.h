@@ -36,7 +36,6 @@ namespace Wormhole
 	 */
 	class TCPConnection: public MAUtil::ConnectionListener
 	{
-
 	public:
 		/**
 		 * Constructor.
@@ -53,7 +52,7 @@ namespace Wormhole
 		 * @param data String that will be sent to server.
 		 * In case of error an alert meesage will be displayed to the user.
 		 */
-		void sendData(const MAUtil::String& data);
+		virtual void sendData(const MAUtil::String& data);
 
 		/**
 		 * Opens a connection to a given address.
@@ -61,10 +60,10 @@ namespace Wormhole
 		 * @param port
 		 * @return One of the CONNERR_GENERIC constants.
 		 */
-		int connect(const MAUtil::String& ipAddress,
+		virtual int connect(const MAUtil::String& ipAddress,
 			const int port);
 
-	private:
+	protected:
 		/**
 		* Called when a write operation finishes.
 		* \param conn The Connection that ran the operation.
@@ -81,7 +80,7 @@ namespace Wormhole
 		*/
 		virtual void connectFinished(MAUtil::Connection* conn, int result);
 
-	private:
+	protected:
 		/**
 		 * Used for sending packages over TCP to a server application.
 		 */

@@ -614,6 +614,13 @@ namespace Base
 	*/
 	MAHandle _maPimListNext(MAHandle list, JNIEnv* jNIEnv, jobject jThis);
 
+	/** Returns a handle to the next PimItem in the \a list, or 0 if there are no more items,
+	* or \< 0 on error.
+	* Using this you can only get name and phone numbers when calling maPimItemGetValue.
+	* You must use maPimItemClose() on every item to prevent memory leaks.
+	*/
+	MAHandle _maPimListNextSummary(MAHandle list, JNIEnv* jNIEnv, jobject jThis);
+
 	/** Closes a PimList.
 	* \note This does not close the list's items, but it does invalidate them,
 	* so that maPimItemClose() is the only function you can safely use on them.

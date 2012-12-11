@@ -10,6 +10,7 @@ import com.mosync.internal.android.MoSyncError;
 import android.content.ContentResolver;
 import android.database.Cursor;
 import android.provider.ContactsContract.Contacts;
+import android.provider.ContactsContract.PhoneLookup;
 
 import static com.mosync.internal.generated.IX_PIM.MA_PIM_ERR_LIST_UNAVAILABLE;
 import static com.mosync.internal.generated.IX_PIM.MA_PIM_ERR_NONE;
@@ -48,8 +49,7 @@ public class PIMList {
 		// try to query for contacts
 		try {
 			listCursor = cr.query(Contacts.CONTENT_URI,
-					new String[] { Contacts._ID },
-					null, null, null);
+					new String[] { Contacts._ID }, null, null, null);
 		} catch (Exception e) {
 			return throwError(MA_PIM_ERR_LIST_UNAVAILABLE,
 					PIMError.PANIC_LIST_UNAVAILABLE,
@@ -64,17 +64,9 @@ public class PIMList {
 
 		// read each item
 		for (int i = 0; i < listCursor.getCount(); i++) {
-			// String contactId = listCursor.getString(listCursor
-			// .getColumnIndex(Contacts._ID));
-
 			PIMItem pimItem = new PIMItem(false);
-			// pimItem.read(cr, contactId);
-
 			mList.add(pimItem);
 		}
-
-		// listCursor.close();
-		// listCursor = null;
 
 		mListIterator = 0;
 
@@ -91,14 +83,15 @@ public class PIMList {
 	/**
 	 * @return The next element in the list.
 	 */
-	PIMItem next(ContentResolver cr) {
+	PIMItem next(ContentResolver cr, boolean summary) {
+		DebugPrint("PMList.next(" + cr + ", " + summary + ");");
 		PIMItem pimItem = mList.get(mListIterator);
 		// read each item
 		if (listCursor.moveToNext()) {
 			String contactId = listCursor.getString(listCursor
 					.getColumnIndex(Contacts._ID));
 
-			pimItem.read(cr, contactId);
+			pimItem.read(cr, contactId, summary);
 
 			mList.set(mListIterator, pimItem);
 		}
@@ -146,7 +139,7 @@ public class PIMList {
 		try {
 			mListIterator = 0;
 			while (hasNext()) {
-				next(cr).close(cr);
+				next(cr, true).close(cr);
 			}
 			listCursor.close();
 			listCursor = null;

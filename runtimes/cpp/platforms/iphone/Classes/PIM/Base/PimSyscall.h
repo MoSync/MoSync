@@ -23,6 +23,7 @@ void MAPimInit();
 void MAPimClose();
 
 MAHandle maPimListOpen(int listType);
+MAHandle maPimListNextSummary(MAHandle list);
 MAHandle maPimListNext(MAHandle list);
 int maPimListClose(MAHandle list);
 
