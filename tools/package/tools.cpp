@@ -24,11 +24,12 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 using namespace std;
 
-void injectIcon(const char* platform, const char* size, const char* srcIcon, const char* dst, bool silent) {
+void injectIcon(const char* platform, const char* size, const char* srcIcon, const char* dst, bool silent, bool force) {
 	ostringstream iconInjectCmd;
 
 	// TODO: That "-lenient yes" switch must be removed...
-	iconInjectCmd << getBinary("icon-injector") << " -lenient yes -platform \"" << platform << "\" -src " <<
+	string forceArg = force ? " -force" : "";
+	iconInjectCmd << getBinary("icon-injector") << forceArg << " -lenient yes -platform \"" << platform << "\" -src " <<
 		file(srcIcon) << " -size " << size << " -dst " << file(dst);
 
 	sh(iconInjectCmd.str().c_str(), silent);
