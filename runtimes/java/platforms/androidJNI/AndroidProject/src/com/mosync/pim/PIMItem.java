@@ -23,7 +23,7 @@ public class PIMItem {
 		NONE, ADDED, UPDATED
 	}
 
-	State mState;
+	State mState = State.NONE;
 
 	PIMFieldAddress mAddress;
 	PIMFieldBirthday mBirthday;
@@ -127,14 +127,20 @@ public class PIMItem {
 	 * @param cr
 	 * @param contactId
 	 */
-	void read(ContentResolver cr, String contactId) {
+	void read(ContentResolver cr, String contactId, boolean summary) {
 		DebugPrint("PIMItem.read(" + cr + ", " + contactId + ")");
 
 		try {
-			Iterator<PIMField> fieldsIt = mPIMFields.iterator();
+			if (summary) {
+				mName.read(cr, contactId);
+				mPhone.read(cr, contactId);
+				return;
+			} else {
+				Iterator<PIMField> fieldsIt = mPIMFields.iterator();
 
-			while (fieldsIt.hasNext()) {
-				fieldsIt.next().read(cr, contactId);
+				while (fieldsIt.hasNext()) {
+					fieldsIt.next().read(cr, contactId);
+				}
 			}
 		} catch (Exception e) {
 			DebugPrint("Failed to read contact " + contactId + ".");
@@ -435,39 +441,43 @@ public class PIMItem {
 	 */
 	void close(ContentResolver cr) {
 		DebugPrint("PIMItem.close()");
-		ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>();
 		Iterator<PIMField> fieldsIt = mPIMFields.iterator();
 
-		int rawContactIndex = 0;
-		if (mState == State.ADDED) {
-			rawContactIndex = ops.size();
-			ops.add(ContentProviderOperation.newInsert(RawContacts.CONTENT_URI)
-					.withValue(RawContacts.ACCOUNT_TYPE, null)
-					.withValue(RawContacts.ACCOUNT_NAME, null).build());
-			while (fieldsIt.hasNext()) {
-				fieldsIt.next().add(ops, rawContactIndex);
-			}
-		} else if (mState == State.UPDATED) {
-			rawContactIndex = Integer.parseInt(mUID.getSpecificData(0));
-			while (fieldsIt.hasNext()) {
-				fieldsIt.next().update(cr, ops, rawContactIndex);
-			}
-		}
+		if (mState != State.NONE) {
+			ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>();
 
-		setState(State.NONE);
-		try {
-			DebugPrint("REQUEST UPDATE");
-			ContentProviderResult[] res = cr.applyBatch(
-					ContactsContract.AUTHORITY, ops);
-			for (int i = 0; i < res.length; i++) {
-				DebugPrint("RESULT " + i + ": " + res[i].toString());
+			int rawContactIndex = 0;
+			if (mState == State.ADDED) {
+				rawContactIndex = ops.size();
+				ops.add(ContentProviderOperation
+						.newInsert(RawContacts.CONTENT_URI)
+						.withValue(RawContacts.ACCOUNT_TYPE, null)
+						.withValue(RawContacts.ACCOUNT_NAME, null).build());
+				while (fieldsIt.hasNext()) {
+					fieldsIt.next().add(ops, rawContactIndex);
+				}
+			} else if (mState == State.UPDATED) {
+				rawContactIndex = Integer.parseInt(mUID.getSpecificData(0));
+				while (fieldsIt.hasNext()) {
+					fieldsIt.next().update(cr, ops, rawContactIndex);
+				}
 			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			DebugPrint("Exception: " + e.getMessage());
-		}
 
-		fieldsIt = mPIMFields.iterator();
+			setState(State.NONE);
+			try {
+				DebugPrint("REQUEST UPDATE");
+				ContentProviderResult[] res = cr.applyBatch(
+						ContactsContract.AUTHORITY, ops);
+				for (int i = 0; i < res.length; i++) {
+					DebugPrint("RESULT " + i + ": " + res[i].toString());
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+				DebugPrint("Exception: " + e.getMessage());
+			}
+
+			fieldsIt = mPIMFields.iterator();
+		}
 
 		while (fieldsIt.hasNext()) {
 			fieldsIt.next().close();
