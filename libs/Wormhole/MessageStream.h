@@ -88,7 +88,10 @@ public:
 
 	/**
 	 * Get the WebView object associated with this message.
-	 * @return WebView object.
+	 * @return WebView object. NULL may be returned if the
+	 * MessageStream constructor was not called with a WebView
+	 * object. Use getWebViewHandle() instead, or use callJS() if you
+	 * wish to evaluate JavScript in the WebViewthat sent this message.
 	 * @deprecated
 	 */
 	NativeUI::WebView* getWebView();
