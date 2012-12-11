@@ -63,9 +63,9 @@ int copyWCharArray(void* destination, const wchar_t* source)
  * @return A pointer to the wchar array if the arrayIndex is valid, or
  * NULL otherwise.
  */
-const wchar* getWCharArrayFromBuf(void* buffer, const int arrayIndex)
+const wchar* getWCharArrayFromBuf(void* buffer, int size, const int arrayIndex)
 {
-	int totalBytes = *(int*) buffer;
+	int totalBytes = size;
 	char* charBuffer = (char*) buffer;
 	const wchar* ptr = (wchar*) (charBuffer + sizeof(int));
 	int countBytes = sizeof(int);
@@ -218,6 +218,9 @@ MAUtil::String getContactNameIndexString(const int index)
 		break;
 	case MA_PIM_CONTACT_NAME_PHONETIC_OTHER:
 		text = "Phonetic other:";
+		break;
+	case MA_PIM_CONTACT_NAME_DISPLAY:
+		text = "Display:";
 		break;
 	}
 

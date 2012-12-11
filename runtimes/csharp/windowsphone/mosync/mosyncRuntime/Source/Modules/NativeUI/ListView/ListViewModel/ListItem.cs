@@ -200,7 +200,7 @@ namespace MoSync
                 }
                 set
                 {
-                    if (mImageSource != null)
+                    if (value != null)
                     {
                         mImageSource = value;
                         OnPropertyChanged("ImageSource");

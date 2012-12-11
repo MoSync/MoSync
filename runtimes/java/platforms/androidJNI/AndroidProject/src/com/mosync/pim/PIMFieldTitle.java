@@ -90,7 +90,11 @@ public class PIMFieldTitle extends PIMField {
 		if ((attribute = getColumnValue(index, Organization.TYPE)) == null) {
 			return -1;
 		}
-		return Integer.parseInt(attribute);
+		try {
+			return Integer.parseInt(attribute);
+		} catch (Exception e) {
+			return -1;
+		}
 	}
 
 	/**

@@ -98,7 +98,11 @@ public class PIMFieldEvent extends PIMField {
 		if ((attribute = getColumnValue(index, Event.TYPE)) == null) {
 			return -1;
 		}
-		return Integer.parseInt(attribute);
+		try {
+			return Integer.parseInt(attribute);
+		} catch (Exception e) {
+			return -1;
+		}
 	}
 
 	int setAttribute(int index, int attribute) {
