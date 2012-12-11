@@ -129,20 +129,20 @@ public class PIM {
 		return mResourceIndex++;
 	}
 
-	public int maPimListNext(int list) {
+	public int maPimListNext(int list, boolean summary) {
 		DebugPrint("maPimListNext(" + list + ")");
 		PIMList pimList = null;
 		if ((list < 0) || ((pimList = mPIMLists.get(list)) == null)) {
 			return throwError(MA_PIM_ERR_HANDLE_INVALID,
 					PIMError.PANIC_HANDLE_INVALID, PIMError.sStrHandleInvalid);
 		}
-
 		if (pimList.hasNext()) {
-			mPIMItems.put(mResourceIndex, pimList.next(getContentResolver()));
+			mPIMItems.put(mResourceIndex,
+					pimList.next(getContentResolver(), summary));
 		} else {
 			return MA_PIM_ERR_NONE;
 		}
-
+		DebugPrint("5");
 		return mResourceIndex++;
 	}
 

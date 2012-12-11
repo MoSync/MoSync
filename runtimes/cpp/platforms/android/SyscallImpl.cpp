@@ -2323,6 +2323,13 @@ namespace Base
 				mJNIEnv,
 				mJThis);
 
+		case maIOCtl_maPimListNextSummary:
+			SYSLOG("maIOCtl_maPimListNextSummary");
+			return _maPimListNextSummary(
+				a,
+				mJNIEnv,
+				mJThis);
+
 		case maIOCtl_maPimListClose:
 			SYSLOG("maIOCtl_maPimListClose");
 			return _maPimListClose(

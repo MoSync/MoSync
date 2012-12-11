@@ -42,7 +42,11 @@ class MoSyncPIM {
 	}
 
 	int maPimListNext(int list) {
-		return mPIM.maPimListNext(list);
+		return mPIM.maPimListNext(list, false);
+	}
+
+	int maPimListNextSummary(int list) {
+		return mPIM.maPimListNext(list, true);
 	}
 
 	int maPimListClose(int list) {
@@ -67,12 +71,14 @@ class MoSyncPIM {
 
 	int maPimItemSetLabel(int item, int field, int buffPointer, int buffSize,
 			int index) {
-		return mPIM.maPimItemSetLabel(item, field, buffPointer, buffSize, index);
+		return mPIM
+				.maPimItemSetLabel(item, field, buffPointer, buffSize, index);
 	}
 
 	int maPimItemGetLabel(int item, int field, int buffPointer, int buffSize,
 			int index) {
-		return mPIM.maPimItemGetLabel(item, field, buffPointer, buffSize, index);
+		return mPIM
+				.maPimItemGetLabel(item, field, buffPointer, buffSize, index);
 	}
 
 	int maPimFieldType(int list, int field) {
@@ -81,7 +87,8 @@ class MoSyncPIM {
 
 	int maPimItemGetValue(int item, int field, int buffPointer, int buffSize,
 			int index) {
-		return mPIM.maPimItemGetValue(item, field, buffPointer, buffSize, index);
+		return mPIM
+				.maPimItemGetValue(item, field, buffPointer, buffSize, index);
 	}
 
 	int maPimItemSetValue(int item, int field, int buffPointer, int buffSize,
