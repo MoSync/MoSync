@@ -40,6 +40,7 @@ MA 02110-1301, USA.
 #include "MapLocation.h"
 #include "MapPin.h"
 #include "MapPinListener.h"
+#include "MapRegion.h"
 #include <MAUtil/Vector.h>
 
 namespace NativeUI
@@ -147,10 +148,10 @@ namespace NativeUI
 		void setCenter(const MapLocation& center);
 
 		/**
-		 * Sets the interraction enabled property for the map.
-		 * @param interractionEnabled If true, the map can be scrolled/zoomed.
+		 * Sets the interaction enabled property for the map.
+		 * @param interactionEnabled If true, the map can be scrolled/zoomed.
 		 */
-		void setInterractionEnabled(bool interractionEnabled);
+		void setInteractionEnabled(bool interactionEnabled);
 
 		/**
 		 * Centers the map around the map center.
@@ -173,6 +174,18 @@ namespace NativeUI
 		 * the value from the runtime is corrent and NULL otherwise.
 		 */
 		MAUtil::Vector<Location> getVisibleArea();
+
+		/**
+		 * Scrolls and zooms the map on the map region provided.
+		 * @param visibleArea The 'MapRegion' object that describes the visible area.
+		 */
+		void setVisibleArea(MapRegion &visibleArea);
+
+		/**
+		 * Gets the current map visible area.
+		 * @return The 'MapRegion' object that describes the visible area.
+		 */
+		void getVisibleArea(MapRegion& visibleArea);
 
         /**
          * Add a map event listener.

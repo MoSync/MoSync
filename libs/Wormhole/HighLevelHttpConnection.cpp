@@ -37,13 +37,12 @@ namespace Wormhole
 // *************** Local functions *************** //
 
 /**
- * Allocate a handle from the placeholder pool.
+ * Allocate a handle.
  */
 static MAHandle AllocateHandle();
 
 /**
- * Return handle to placehoder pool, which deallocates it
- * (PlaceholderPool will call maDestroyObject).
+ * Deallocate handle.
  */
 static void DeallocateHandle(MAHandle handle);
 

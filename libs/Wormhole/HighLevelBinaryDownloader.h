@@ -43,7 +43,7 @@ namespace Wormhole
  * I am an easy-to-use downloader for binary data. Inherit me and
  * override onBinaryDownloaded.
  *
- * Call maDestroyObject to deallocate the downloaded data.
+ * Call maDestroyPlaceholder to deallocate the downloaded data.
  *
  * Example of use:
  *
@@ -77,7 +77,7 @@ public:
 	/**
 	 * Override to do something with the data that is downloaded.
 	 * If download fails, data is NULL.
-	 * Note that data must be deallocated using maDestroyObject().
+	 * Note that data must be deallocated using maDestroyPlaceholder().
 	 */
 	virtual void onDownloadComplete(MAHandle data) = 0;
 

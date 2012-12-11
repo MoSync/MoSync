@@ -43,7 +43,7 @@ namespace Wormhole
  * I am an easy-to-use downloader for images. Inherit me and
  * override onImageDownloaded.
  *
- * Call maDestroyObject to deallocate the downloaded image.
+ * Call maDestroyPlaceholder to deallocate the downloaded image.
  *
  * Example of use:
  *
@@ -77,7 +77,7 @@ public:
 	/**
 	 * Override to do something with the image that is downloaded.
 	 * If download fails, image is 0.
-	 * Note that image must be deallocated using maDestroyObject.
+	 * Note that image must be deallocated using maDestroyPlaceholder.
 	 */
 	virtual void onDownloadComplete(MAHandle image) = 0;
 

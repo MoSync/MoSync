@@ -69,20 +69,20 @@ namespace Wormhole
 		 * @return The string value of a field in the JSON data.
 		 * Return empty string if the field does not exist.
 		 */
-		MAUtil::String getArgsField(const MAUtil::String& fieldName);
+		virtual MAUtil::String getArgsField(const MAUtil::String& fieldName);
 
 		/**
 		 * @return The integer value of a field in the JSON data.
 		 * Return 0 if the field does not exist.
 		 */
-		int getArgsFieldInt(const MAUtil::String& fieldName);
+		virtual int getArgsFieldInt(const MAUtil::String& fieldName);
 
 		/**
 		 * Get the options parameters "create" and "exclusive"
 		 * from the JSON tree.
 		 * @return true on success, false on error.
 		 */
-		bool getJSONParamsOptionsCreateExclusive(
+		virtual bool getJSONParamsOptionsCreateExclusive(
 			bool& create,
 			bool& exclusive);
 
@@ -90,7 +90,7 @@ namespace Wormhole
 		 * Get the parent fullPath of a directory entry from the JSON tree.
 		 * @return true on success, false on error.
 		 */
-		bool getJSONParamParentFullPath(MAUtil::String& destinationPath);
+		virtual bool getJSONParamParentFullPath(MAUtil::String& destinationPath);
 	};
 } // namespace
 

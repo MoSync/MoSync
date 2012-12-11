@@ -52,7 +52,7 @@ namespace NativeUI
 		 * @param upperLeftCorner The upper left corner of the map region.
 		 * @param lowerRightCorner The lower right corner of the map region.
 		 */
-		MapRegion(Location* upperLeftCorner, Location* lowerRightCorner);
+		MapRegion(Location upperLeftCorner, Location lowerRightCorner);
 
 		/**
          * Destructor.
@@ -68,7 +68,7 @@ namespace NativeUI
 		/**
 		 * Getter for the upper left corner of the current map region.
 		 */
-		Location& getUpperLeftCorner();
+		Location& getUpperLeftCorner() const;
 
 		/**
 		 * Setter for the lower right corner of the current map region.
@@ -79,7 +79,12 @@ namespace NativeUI
 		/**
 		 * Getter for the lower right corner of the current map region.
 		 */
-		Location& getLowerRightCorner();
+		Location& getLowerRightCorner() const;
+
+		/**
+		 * Assignment operator.
+		 */
+		MapRegion & operator=(const MapRegion &rightHandSide);
 	private:
 		/**
 		 * The upper left corner of the map region.

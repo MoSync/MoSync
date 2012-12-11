@@ -199,11 +199,13 @@ void MainScreen::buttonClicked(Widget* button)
 {
 	if (button == mGetVisibleAreaButton)
 	{
-		MAUtil::Vector<Location> loc = mMap->getVisibleArea();
-		mVisibleAreaCoordinatesLabel->setText("UL la: " + MAUtil::doubleToString(loc[0].getLatitude()) +
-				" UL lo: " + MAUtil::doubleToString(loc[0].getLongitude()) +
-				" LR la: " + MAUtil::doubleToString(loc[1].getLatitude()) +
-				" LR lo: " + MAUtil::doubleToString(loc[1].getLongitude()));
+		MapRegion region;
+		mMap->getVisibleArea(region);
+
+		mVisibleAreaCoordinatesLabel->setText("UL la: " + MAUtil::doubleToString(region.getUpperLeftCorner().getLatitude()) +
+						" UL lo: " + MAUtil::doubleToString(region.getUpperLeftCorner().getLongitude()) +
+						" LR la: " + MAUtil::doubleToString(region.getLowerRightCorner().getLatitude()) +
+						" LR lo: " + MAUtil::doubleToString(region.getLowerRightCorner().getLongitude()));
 	}
 	else if (button == mSetVisibleAreaButton)
 	{

@@ -30,7 +30,8 @@ public class PIMFieldName extends PIMField {
 				StructuredName.PREFIX, StructuredName.SUFFIX,
 				StructuredName.PHONETIC_FAMILY_NAME,
 				StructuredName.PHONETIC_GIVEN_NAME,
-				StructuredName.PHONETIC_MIDDLE_NAME, StructuredName.IS_PRIMARY };
+				StructuredName.PHONETIC_MIDDLE_NAME,
+				StructuredName.DISPLAY_NAME, StructuredName.IS_PRIMARY };
 	}
 
 	void createMaps() {
@@ -96,8 +97,8 @@ public class PIMFieldName extends PIMField {
 
 	String[] getSpecificData(int index) {
 		String[] val = mValues.get(index);
-		String[] ret = new String[val.length - 4];
-		for (int i = 0; i < val.length - 4; i++) {
+		String[] ret = new String[val.length - 2];
+		for (int i = 0; i < val.length - 2; i++) {
 			ret[i] = val[i + 1];
 		}
 		return ret;
