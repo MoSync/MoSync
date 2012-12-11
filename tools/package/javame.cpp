@@ -125,7 +125,7 @@ void packageJavaME(const SETTINGS& s, const RuntimeInfo& ri) {
 	string outputIcon = dstPath + "/icon.png";
 	if (ri.iconSize.size() != 0 && s.icon) {
 		// For java me, the -dst is the JAR!
-		injectIcon("JavaME", ri.iconSize.c_str(), s.icon, appJarName.c_str(), s.silent);
+		injectIcon("JavaME", ri.iconSize.c_str(), s.icon, appJarName.c_str(), s.silent, true);
 	}
 
 	// write JAD
