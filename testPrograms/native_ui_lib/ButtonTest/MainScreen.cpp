@@ -195,6 +195,7 @@ void MainScreen::buttonClicked(Widget* button)
 	{
 		printf("mButton buttonClickedEvent");
 		item->setText("buttonClicked");
+		mEvents->addChild(item);
 	}
 	else if (button == mCheckEnabledButton)
 	{
@@ -212,6 +213,6 @@ void MainScreen::buttonClicked(Widget* button)
 			mCheckEnabledButton->setText("<- Disable");
 			item->setText("Button was disabled -> button is now enabled");
 		}
+		mEvents->addChild(item);
 	}
-	mEvents->addChild(item);
 }
