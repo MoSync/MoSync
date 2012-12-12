@@ -34,7 +34,8 @@ var app = (function()
 			callbackFun(tweets);
 		}).error(function(jqXHR, textStatus, errorThrown)
 		{
-			alert("getJSON error: " + textStatus);
+			//alert("getJSON error: " + textStatus);
+			callbackFun(null);
 		});
 	};
 

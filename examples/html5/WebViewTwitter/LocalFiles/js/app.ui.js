@@ -38,23 +38,6 @@ app.ui = (function()
 	};
 
 	/**
-	 * Displays the Twitter user name in the UI.
-	 * @param user The Twitter user name.
-	 */
-	ui.showTweetListUserName = function(user)
-	{
-		$("#pageTitle").html(user);
-	};
-
-	/**
-	 * Displays a loading indicator in the UI.
-	 */
-	ui.showLoadingIndicator = function()
-	{
-		$("#tweetList").html("<li>Loading...</li>");
-	};
-
-	/**
 	 * Show the tweets for the user in the input form.
 	 */
 	ui.showTweets = function()
@@ -88,30 +71,6 @@ app.ui = (function()
 		{
 			ui.showTweetList(tweets);
 		});
-	};
-
-	/**
-	 * Outputs the list of tweets to the user-interface.
-	 * @param tweets The tweets as an array. Each element
-	 * represents one tweet and can be accessed via tweets[i].text
-	 */
-	ui.showTweetList = function(tweets)
-	{
-		var results = "";
-		if ((!tweets) ||
-			(tweets.length === 0) ||
-			(tweets.error === "Not found"))
-		{
-			results = "<li>No tweets found</li>";
-		}
-		else
-		{
-			for (var i = 0; i < tweets.length; ++i)
-			{
-				results += "<li>" + tweets[i].text + "</li>";
-			}
-		}
-		$("#tweetList").html(results);
 	};
 
 	/**
@@ -157,25 +116,6 @@ app.ui = (function()
 	};
 
 	/**
-	 * Diplay the list of favourite users in the UI.
-	 * @param userData Array of user names.
-	 */
-	ui.displayFavouriteUsers = function(userData)
-	{
-		var users = app.parseFavouriteUsers(userData);
-		var list = "";
-		for (var i = 0; i < users.length; ++i)
-		{
-			list += "<li><a onclick='app.ui.showTweetsForUser(\"" +
-				users[i] +
-				"\")'>" +
-				users[i] +
-				"</a></li>";
-		}
-		$("#favouriteList").html(list);
-	};
-
-	/**
 	 * Keydown event listener. Gets called when the user presses
 	 * a button on his/her keyboard in the input field.
 	 * @param keynum The pressed key (as an ASCII value).
@@ -209,6 +149,68 @@ app.ui = (function()
 		ui.initializeFramework();
 
 		ui.readAndDisplayFavouriteUsers();
+	};
+
+	/**
+	 * Diplay the list of favourite users in the UI.
+	 * @param userData Array of user names.
+	 */
+	ui.displayFavouriteUsers = function(userData)
+	{
+		alert("ui.displayFavouriteUsers: Implement for the specific UI framework used");
+	};
+
+	/**
+	 * Displays the Twitter user name in the UI.
+	 * @param user The Twitter user name.
+	 */
+	ui.showTweetListUserName = function(user)
+	{
+		//$("#pageTitle").html(user);
+		alert("ui.showTweetListUserName: Implement for the specific UI framework used");
+	};
+
+	/**
+	 * Displays a loading indicator in the UI.
+	 */
+	ui.showLoadingIndicator = function()
+	{
+		//$("#tweetList").html("<li>Loading...</li>");
+		alert("ui.showLoadingIndicator: Implement for the specific UI framework used");
+	};
+
+	/**
+	 * Outputs the list of tweets to the user-interface.
+	 * @param tweets The tweets as an array. Each element
+	 * represents one tweet and can be accessed via tweets[i].text
+	 */
+	ui.showTweetList = function(tweets)
+	{
+		alert("ui.showTweetList: Implement for the specific UI framework used");
+	};
+
+	/**
+	 * Called by framework when document has loaded.
+	 */
+	ui.initializeFramework = function()
+	{
+		alert("ui.initializeFramework: Implement for the specific UI framework used");
+	};
+
+	/**
+	 * Navigate back one page.
+	 */
+	ui.goBack = function()
+	{
+		alert("ui.goBack: Implement for the specific UI framework used");
+	};
+
+	/**
+	 * Show one page.
+	 */
+	ui.showPage = function(page)
+	{
+		alert("ui.showPage: Implement for the specific UI framework used");
 	};
 
 	return ui;
