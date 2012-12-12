@@ -21,11 +21,11 @@ group WidgetMap "Map" {
 	group WidgetMapProperties "Map properties" {
 		constset MAString MAW_MAP_ {
 			/**
-			* @brief The api key used to access the full features of the google map (on Android platform).
+			* @brief The api key used to access the full features of the google map.
 			* The iOS platform doesn't require a key.
 			*
 			* @validvalue A string containing a google maps key. For further details on how to
-			* obtain these key go to "https://developers.google.com/maps/documentation/android/mapkey".
+			* obtain this key go to "https://developers.google.com/maps/documentation/android/mapkey".
 			*
 			* @setonly
 			* @par Example
@@ -39,7 +39,7 @@ group WidgetMap "Map" {
 			* @brief The api key used to access the full features of the bing map (on windows phone platform).
 			*
 			* @validvalue A string containing a bing maps key. For further details on how to
-			* obtain these key go to "http://msdn.microsoft.com/en-us/library/ff428642.aspx".
+			* obtain this key go to "http://msdn.microsoft.com/en-us/library/ff428642.aspx".
 			*
 			* @setonly
 			* @par Example
@@ -81,7 +81,7 @@ group WidgetMap "Map" {
 			ZOOM_LEVEL = "zoom_level";
 
 			/**
-			* @brief Disables/enables the interraction between the user and the map.
+			* @brief Disables/enables the interaction between the user and the map.
 			*
 			* @validvalue A boolean string 'true' or 'false'.
 			*

@@ -2263,6 +2263,7 @@ namespace Base {
 		maIOCtl_case(maFrameBufferInit);
 		maIOCtl_case(maFrameBufferClose);
         maIOCtl_syscall_case(maPimListOpen);
+        maIOCtl_syscall_case(maPimListNextSummary);
         maIOCtl_syscall_case(maPimListNext);
         maIOCtl_syscall_case(maPimItemCount);
         maIOCtl_syscall_case(maPimItemGetValue);

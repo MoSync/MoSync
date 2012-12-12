@@ -1,0 +1,674 @@
+	constset int MA_PIM_ {
+		/**
+		* Each contact commonly includes a name and one or more phone numbers.
+		* May also include a street address and an email address.
+		*/
+		CONTACTS = 1;
+		EVENTS = 2;
+		TODOS = 3;
+	}
+
+group PIMConsts "PIM Constants" {
+	constset int MA_PIM_TYPE_ {
+		/// bytes
+		/// the bytes are not null-terminated.
+		BINARY = 0;
+		/// int
+		BOOLEAN = 1;
+		/// int
+		/// unix time.
+		DATE = 2;
+		/// int
+		INT = 3;
+		/// wide-string '\\0'
+		STRING = 4;
+		/// int (wide-string '\\0')*
+		/// the int specifies the number of strings.
+		/// there is no extra null terminator at the end of the list.
+		STRING_ARRAY = 5;
+	}
+
+	constset int MA_PIM_FIELD_CONTACT_ {
+		/**
+		* @brief The addresses of the contact. Multiple string arrays. Has \link #MA_PIM_CONTACT_ADDR_POBOX MA_PIM_CONTACT_ADDR \endlink indices.
+		*
+		* @validvalue #MA_PIM_TYPE_STRING_ARRAY.
+		*
+		* @addsetget
+		*
+		* @attributes MA_PIM_ATTR_ADDR_HOME, MA_PIM_ATTR_ADDR_WORK, MA_PIM_ATTR_ADDR_OTHER, MA_PIM_ATTR_ADDR_CUSTOM.
+		*
+		* @platforms Android, iOS.
+		*
+		*/
+		ADDR = 100;
+
+		/**
+		* @brief The birthday of the contact. Single date.
+		*
+		* @validvalue #MA_PIM_TYPE_DATE.
+		*
+		* @addsetget
+		*
+		* @platforms Android, iOS.
+		*
+		*/
+		BIRTHDAY = 101;
+
+		/**
+		* @brief Access class. Single integer. May be one of #MA_PIM_CONTACT_CLASS_CONFIDENTIAL, #MA_PIM_CONTACT_CLASS_PRIVATE, or #MA_PIM_CONTACT_CLASS_PUBLIC.
+		*
+		* @validvalue #MA_PIM_TYPE_INT.
+		*
+		* @addsetget
+		*
+		* @platforms Symbian.
+		*
+		*/
+		CLASS = 102;
+
+		/**
+		* @brief The email addresses of the contact. Multiple strings.
+		*
+		* @validvalue #MA_PIM_TYPE_STRING.
+		*
+		* @addsetget
+		*
+		* @attributes MA_PIM_ATTR_EMAIL_HOME, MA_PIM_ATTR_EMAIL_WORK, MA_PIM_ATTR_EMAIL_MOBILE, MA_PIM_ATTR_EMAIL_OTHER, MA_PIM_ATTR_EMAIL_CUSTOM.
+		*
+		* @platforms Android, iOS.
+		*
+		*/
+		EMAIL = 103;
+
+		/**
+		* @brief The formatted addresses of the contact. Single string.
+		*
+		* @validvalue #MA_PIM_TYPE_STRING.
+		*
+		* @getonly
+		*
+		* @attributes MA_PIM_ATTR_FORMATTED_ADDR_HOME, MA_PIM_ATTR_FORMATTED_ADDR_WORK, MA_PIM_ATTR_FORMATTED_ADDR_OTHER, MA_PIM_ATTR_FORMATTED_ADDR_CUSTOM.
+		*
+		* @platforms Android.
+		*
+		*/
+		FORMATTED_ADDR = 104;
+
+		/**
+		* @brief The formatted name of the contact. Single string.
+		*
+		* @validvalue #MA_PIM_TYPE_STRING.
+		*
+		* @getonly
+		*
+		* @platforms Symbian.
+		*
+		*/
+		FORMATTED_NAME = 105;
+
+		/**
+		* @brief The name of the contact. Single string array containing Family name, Given name, Middle name, Prefix,
+		* Suffix, Phonetic family name, Phonetic given name, Phonetic middle name. Has \link #MA_PIM_CONTACT_NAME_FAMILY MA_PIM_CONTACT_NAME \endlink indices.
+		*
+		* @validvalue #MA_PIM_TYPE_STRING_ARRAY.
+		*
+		* @getonly
+		*
+		* @platforms Android, iOS.
+		*
+		*/
+		NAME = 106;
+
+		/**
+		* @brief The nickname of the contact. Single string.
+		*
+		* @validvalue #MA_PIM_TYPE_STRING.
+		*
+		* @addsetget
+		*
+		* @platforms Android, iOS.
+		*
+		*/
+		NICKNAME = 107;
+
+		/**
+		* @brief Supplementary information, or a comment. Multiple string.
+		*
+		* @validvalue #MA_PIM_TYPE_STRING.
+		*
+		* @addsetget
+		*
+		* @platforms Android, iOS.
+		*
+		*/
+		NOTE = 108;
+
+		/**
+		* @brief The organization name of the contact. Multiple string.
+		*
+		* @validvalue #MA_PIM_TYPE_STRING.
+		*
+		* @addsetget
+		*
+		* @attributes MA_PIM_ATTR_ORG_WORK, MA_PIM_ATTR_ORG_OTHER, MA_PIM_ATTR_ORG_CUSTOM.
+		*
+		* @platforms Android, iOS.
+		*
+		*/
+		ORG = 109;
+
+		/**
+		* @brief The contact's photo. A single int representing a data handle. Connected with PHOTO_URL.
+		*
+		* @validvalue #MA_PIM_TYPE_INT.
+		*
+		* @addsetget
+		*
+		* @platforms Android, iOS.
+		*
+		*/
+		PHOTO = 110;
+
+		/**
+		* @brief The contact's photo url. A single string representing the URL of a photo. Connected with PHOTO.
+		*
+		* @validvalue #MA_PIM_TYPE_STRING.
+		*
+		* @setonly
+		*
+		* @platforms Android, iOS.
+		*
+		*/
+		PHOTO_URL = 111;
+
+		/**
+		* @brief The public key of the contact. Connected with PUBLIC_KEY_STRING.
+		*
+		* @validvalue #MA_PIM_TYPE_BINARY.
+		*
+		* @addsetget
+		*
+		* @platforms Symbian.
+		*
+		*/
+		PUBLIC_KEY = 112;
+
+		/**
+		* @brief A string representation of the contact's public key. Connected with PUBLIC_KEY.
+		*
+		* @validvalue #MA_PIM_TYPE_STRING.
+		*
+		* @addsetget
+		*
+		* @platforms Symbian.
+		*
+		*/
+		PUBLIC_KEY_STRING = 113;
+
+		/**
+		* @brief The revision date of the field. Single date.
+		*
+		* @validvalue #MA_PIM_TYPE_DATE.
+		*
+		* @getonly
+		*
+		* @platforms Android, iOS.
+		*
+		*/
+		REVISION = 114;
+
+		/**
+		* @brief The telephone numbers of the contact. Multiple strings.
+		*
+		* @validvalue #MA_PIM_TYPE_STRING.
+		*
+		* @addsetget
+		*
+		* @attributes MA_PIM_ATTR_PHONE_HOME, MA_PIM_ATTR_PHONE_MOBILE, MA_PIM_ATTR_PHONE_HOME_FAX, MA_PIM_ATTR_PHONE_WORK_FAX, MA_PIM_ATTR_PHONE_PAGER, MA_PIM_ATTR_PHONE_IPHONE, MA_PIM_ATTR_PHONE_WORK, MA_PIM_ATTR_PHONE_CALLBACK, MA_PIM_ATTR_PHONE_CAR, MA_PIM_ATTR_PHONE_COMPANY_MAIN, MA_PIM_ATTR_PHONE_ISDN, MA_PIM_ATTR_PHONE_OTHER_FAX, MA_PIM_ATTR_PHONE_RADIO, MA_PIM_ATTR_PHONE_TELEX, MA_PIM_ATTR_PHONE_TTY_TDD, MA_PIM_ATTR_PHONE_WORK_MOBILE, MA_PIM_ATTR_PHONE_WORK_PAGER, MA_PIM_ATTR_PHONE_ASSISTANT, MA_PIM_ATTR_PHONE_MMS, MA_PIM_ATTR_PHONE_OTHER, MA_PIM_ATTR_PHONE_CUSTOM.
+		*
+		* @platforms Android, iOS.
+		*
+		*/
+		TEL = 115;
+
+		/**
+		* @brief The professional title of the contact inside the organization. Multiple strings.
+		*
+		* @validvalue #MA_PIM_TYPE_STRING.
+		*
+		* @addsetget
+		*
+		* @attributes MA_PIM_ATTR_TITLE_WORK, MA_PIM_ATTR_TITLE_OTHER, MA_PIM_ATTR_TITLE_CUSTOM.
+		*
+		* @platforms Android, iOS.
+		*
+		*/
+		TITLE = 116;
+
+		/**
+		* @brief The unique identifier of the contact on the current device. Single string.
+		*
+		* @validvalue Single #MA_PIM_TYPE_STRING.
+		*
+		* @getonly
+		*
+		* @platforms Android, iOS.
+		*
+		*/
+		UID = 117;
+
+		/**
+		* @brief Uniform Resource Locators associated with the contact. Multiple strings.
+		*
+		* @validvalue #MA_PIM_TYPE_STRING.
+		*
+		* @addsetget
+		*
+		* @attributes MA_PIM_ATTR_WEBSITE_HOMEPAGE, MA_PIM_ATTR_WEBSITE_BLOG, MA_PIM_ATTR_WEBSITE_PROFILE, MA_PIM_ATTR_WEBSITE_HOME, MA_PIM_ATTR_WEBSITE_WORK, MA_PIM_ATTR_WEBSITE_FTP, MA_PIM_ATTR_WEBSITE_OTHER, MA_PIM_ATTR_WEBSITE_CUSTOM.
+		*
+		* @platforms Android, iOS.
+		*
+		*/
+		URL = 118;
+
+		/**
+		* @brief The IM addresses of the contact. Multiple arrays. Has \link #MA_PIM_CONTACT_IM_USERNAME MA_PIM_CONTACT_IM \endlink indices.
+		*
+		* @validvalue #MA_PIM_TYPE_STRING_ARRAY.
+		*
+		* @addsetget
+		*
+		* @attributes MA_PIM_ATTR_IM_HOME, MA_PIM_ATTR_IM_WORK, MA_PIM_ATTR_IM_OTHER, MA_PIM_ATTR_IM_CUSTOM.
+		*
+		* @platforms Android, iOS.
+		*
+		*/
+		IM = 119;
+
+		/**
+		* @brief A relation of the contact.
+		*
+		* @validvalue #MA_PIM_TYPE_STRING.
+		*
+		* @addsetget
+		*
+		* @attributes MA_PIM_ATTR_RELATION_MOTHER, MA_PIM_ATTR_RELATION_FATHER, MA_PIM_ATTR_RELATION_PARENT, MA_PIM_ATTR_RELATION_SISTER, MA_PIM_ATTR_RELATION_BROTHER, MA_PIM_ATTR_RELATION_CHILD, MA_PIM_ATTR_RELATION_FRIEND, MA_PIM_ATTR_RELATION_SPOUSE, MA_PIM_ATTR_RELATION_PARTNER, MA_PIM_ATTR_RELATION_MANAGER, MA_PIM_ATTR_RELATION_ASSISTANT, MA_PIM_ATTR_RELATION_DOMESTIC_PARTNER, MA_PIM_ATTR_RELATION_REFERRED_BY, MA_PIM_ATTR_RELATION_RELATIVE, MA_PIM_ATTR_RELATION_CUSTOM.
+		*
+		* @platforms Android, iOS.
+		*
+		*/
+		RELATION = 120;
+
+		/**
+		* @brief Information about the organization. Has \link #MA_PIM_CONTACT_ORG_INFO_DEPARTMENT MA_PIM_CONTACT_ORG_INFO \endlink indices.
+		*
+		* @validvalue #MA_PIM_TYPE_STRING_ARRAY.
+		*
+		* @addsetget
+		*
+		* @attributes MA_PIM_ATTR_ORG_INFO_WORK, MA_PIM_ATTR_ORG_INFO_OTHER, MA_PIM_ATTR_ORG_INFO_CUSTOM.
+		*
+		* @platforms Android, iOS.
+		*
+		*/
+		ORG_INFO = 121;
+	}
+
+	constset int MA_PIM_CONTACT_ADDR_ {
+		/// Index for #MA_PIM_FIELD_CONTACT_ADDR. Post office box number.
+		POBOX = 0;
+		/// Index for #MA_PIM_FIELD_CONTACT_ADDR. Extra info.
+		EXTRA = 1;
+		/// Index for #MA_PIM_FIELD_CONTACT_ADDR. Street name and number.
+		STREET = 2;
+		/// Index for #MA_PIM_FIELD_CONTACT_ADDR. Locality name. (ex. city)
+		LOCALITY = 3;
+		/// Index for #MA_PIM_FIELD_CONTACT_ADDR. Region name. (ex. province, state or territory)
+		REGION = 4;
+		/// Index for #MA_PIM_FIELD_CONTACT_ADDR. Postal code.
+		POSTALCODE = 5;
+		/// Index for #MA_PIM_FIELD_CONTACT_ADDR. Country name.
+		COUNTRY = 6;
+		/// Index for #MA_PIM_FIELD_CONTACT_ADDR. Neighborhood.
+		NEIGHBORHOOD = 7;
+	}
+
+	constset int MA_PIM_CONTACT_NAME_ {
+		/// Index for #MA_PIM_FIELD_CONTACT_NAME. Family name.
+		FAMILY = 0;
+		/// Index for #MA_PIM_FIELD_CONTACT_NAME. Given name.
+		GIVEN = 1;
+		/// Index for #MA_PIM_FIELD_CONTACT_NAME. Alternate/secondary names, if any.
+		OTHER = 2;
+		/// Index for #MA_PIM_FIELD_CONTACT_NAME. Prefix. (ex. "Dr.")
+		PREFIX = 3;
+		/// Index for #MA_PIM_FIELD_CONTACT_NAME. Suffix. (ex. "M.D.")
+		SUFFIX = 4;
+		/// Index for #MA_PIM_FIELD_CONTACT_NAME. Phonetic last name.
+		PHONETIC_FAMILY = 5;
+		/// Index for #MA_PIM_FIELD_CONTACT_NAME. Phonetic first name.
+		PHONETIC_GIVEN = 6;
+		/// Index for #MA_PIM_FIELD_CONTACT_NAME. Phonetic middle name.
+		PHONETIC_OTHER = 7;
+		/// Index for #MA_PIM_FIELD_CONTACT_NAME. Display name.
+		DISPLAY = 8;
+	}
+
+	constset int MA_PIM_CONTACT_ORG_INFO_ {
+		/// #MA_PIM_TYPE_STRING.
+		/// Only for Android and iOS devices.
+		DEPARTMENT = 0;
+		/// #MA_PIM_TYPE_STRING.
+		/// Only for Android devices.
+		JOB_DESCRIPTION = 1;
+		/// #MA_PIM_TYPE_STRING.
+		/// Only for Android devices.
+		SYMBOL = 2;
+		/// #MA_PIM_TYPE_STRING.
+		/// Only for Android devices.
+		PHONETIC_NAME = 3;
+		/// #MA_PIM_TYPE_STRING.
+		/// Only for Android devices.
+		OFFICE_LOCATION = 4;
+		/// #MA_PIM_TYPE_STRING.
+		/// Only for Android devices.
+		PHONETIC_NAME_STYLE = 5;
+	}
+
+	constset int MA_PIM_CONTACT_IM_ {
+		/// #MA_PIM_TYPE_STRING.
+		USERNAME = 0;
+		/// #MA_PIM_TYPE_STRING.
+		PROTOCOL = 1;
+	}
+
+	constset int MA_PIM_CONTACT_CLASS_ {
+		/// Value for #MA_PIM_FIELD_CONTACT_CLASS.
+		CONFIDENTIAL = 200;
+		/// Value for #MA_PIM_FIELD_CONTACT_CLASS.
+		PRIVATE = 201;
+		/// Value for #MA_PIM_FIELD_CONTACT_CLASS.
+		PUBLIC = 202;
+	}
+
+	constset MAString MA_PIM_CONTACT_IM_PROTOCOL_ {
+		/// This constant describes an AIM protocol.
+		AIM = "AIM";
+		/// This constant describes a MSN protocol.
+		MSN = "MSN";
+		/// This constant describes a Yahoo protocol.
+		YAHOO = "Yahoo";
+		/// This constant describes a Skype protocol.
+		SKYPE = "Skype";
+		/// This constant describes a QQ protocol.
+		QQ = "QQ";
+		/// This constant describes a Google Talk protocol.
+		GOOGLE_TALK = "GoogleTalk";
+		/// This constant describes an ICQ protocol.
+		ICQ = "ICQ";
+		/// This constant describes a Jabber protocol.
+		JABBER = "Jabber";
+		/// This constant describes a NetMeeting protocol.
+		NETMEETING = "Netmeeting";
+	}
+
+	// deprecated
+	constset int MA_PIM_ATTR_ {
+		/// The value describes an assistant.
+		ASST = 1;
+		/// Unknown.
+		AUTO = 2;
+		/// The value describes a fax number.
+		FAX = 4;
+		/// The value describes a home phone number.
+		HOME = 8;
+		/// The value describes a mobile phone number.
+		MOBILE = 16;
+		/// Unknown.
+		OTHER = 32;
+		/// The value describes a pager number.
+		PAGER = 64;
+		/// In a field with multiple values, this one is preferred before the others.
+		/// Only one value per field may be marked PREFERRED. Marking a value PREFERRED
+		/// causes any other PREFERRED value in the field to become unmarked.
+		PREFERRED = 128;
+		/// The value describes an SMS number?
+		SMS = 256;
+		/// The value describes a work phone number.
+		WORK = 512;
+	}
+
+	constset int MA_PIM_ATTR_ADDR_ {
+		/// The constant describes a home address.
+		HOME = 101;
+		/// The constant describes a work address.
+		WORK = 102;
+		/// The constant describes a different address type.
+		OTHER = 103;
+		/// The constant describes a custom address type.
+		/// The field's label can be set.
+		CUSTOM = 104;
+	}
+
+	constset int MA_PIM_ATTR_EMAIL_ {
+		/// The constant describes a home e-mail address.
+		HOME = 201;
+		/// The constant describes a work e-mail address.
+		WORK = 202;
+		/// The constant describes a mobile e-mail address.
+		MOBILE = 203;
+		/// The constant describes a different e-mail address type.
+		OTHER = 204;
+		/// The constant describes a custom e-mail address type.
+		/// The field's label can be set.
+		CUSTOM = 205;
+	}
+
+	constset int MA_PIM_ATTR_FORMATTED_ADDR_ {
+		/// The constant describes a home formatted address.
+		HOME = 301;
+		/// The constant describes a work formatted address.
+		WORK = 302;
+		/// The constant describes a different formatted address type.
+		OTHER = 303;
+		/// The constant describes a custom formatted address type.
+		/// The field's label can be set.
+		CUSTOM = 304;
+	}
+
+	constset int MA_PIM_ATTR_ORG_ {
+		/// The constant describes a work organization.
+		WORK = 401;
+		/// The constant describes a different organization type.
+		OTHER = 402;
+		/// The constant describes a custom organization type.
+		/// The field's label can be set.
+		CUSTOM = 403;
+	}
+
+	constset int MA_PIM_ATTR_PHONE_ {
+		/// The constant describes a home phone number.
+		HOME = 501;
+		/// The constant describes a mobile phone number.
+		MOBILE = 502;
+		/// The constant describes a home fax phone number.
+		HOME_FAX = 503;
+		/// The constant describes a work fax phone number.
+		WORK_FAX = 504;
+		/// The constant describes a pager phone number.
+		PAGER = 505;
+		/// The constant describes an iPhone phone number.
+		IPHONE = 506;
+		/// The constant describes a work phone number.
+		WORK = 507;
+		/// The constant describes a callback phone number.
+		CALLBACK = 508;
+		/// The constant describes a car phone number.
+		CAR = 509;
+		/// The constant describes a company main phone number.
+		COMPANY_MAIN = 510;
+		/// The constant describes a ISDN phone number.
+		ISDN = 511;
+		/// The constant describes a other fax type phone number.
+		OTHER_FAX = 512;
+		/// The constant describes a radio phone number.
+		RADIO = 513;
+		/// The constant describes a telex phone number.
+		TELEX = 514;
+		/// The constant describes a TTY TDD phone number.
+		TTY_TDD = 515;
+		/// The constant describes a work mobile phone number.
+		WORK_MOBILE = 516;
+		/// The constant describes a work pager phone number.
+		WORK_PAGER = 517;
+		/// The constant describes an assistant phone number.
+		ASSISTANT = 518;
+		/// The constant describes a MMS phone number.
+		MMS = 519;
+		/// The constant describes a different phone number type.
+		OTHER = 520;
+		/// The constant describes a custom phone number type.
+		/// The field's label can be set.
+		CUSTOM = 521;
+	}
+
+	constset int MA_PIM_ATTR_TITLE_ {
+		/// The constant describes a work title.
+		/// Not available on iOS.
+		WORK = 601;
+		/// The constant describes a different title type.
+		/// Not available on iOS.
+		OTHER = 602;
+		/// The constant describes a custom title type.
+		/// The field's label can be set.
+		/// Not available on iOS.
+		CUSTOM = 603;
+	}
+
+	constset int MA_PIM_ATTR_WEBSITE_ {
+		/// The constant describes a homepage website.
+		HOMEPAGE = 701;
+		/// The constant describes a blog website.
+		BLOG = 702;
+		/// The constant describes a profile website.
+		PROFILE = 703;
+		/// The constant describes a home website.
+		HOME = 704;
+		/// The constant describes a work website.
+		WORK = 705;
+		/// The constant describes a FTP website.
+		FTP = 706;
+		/// The constant describes a different website type.
+		OTHER = 707;
+		/// The constant describes a custom website type.
+		/// The field's label can be set.
+		CUSTOM = 708;
+	}
+
+	constset int MA_PIM_ATTR_IM_ {
+		/// The constant describes a home IM address.
+		HOME = 801;
+		/// The constant describes a work IM address.
+		WORK = 802;
+		/// The constant describes a different IM address type.
+		OTHER = 803;
+		/// The constant describes a custom IM address type.
+		/// The field's label can be set.
+		CUSTOM = 804;
+	}
+
+	constset int MA_PIM_ATTR_RELATION_ {
+		/// The constant describes a mother relation.
+		MOTHER = 901;
+		/// The constant describes a father relation.
+		FATHER = 902;
+		/// The constant describes a parent relation.
+		PARENT = 903;
+		/// The constant describes a sister relation.
+		SISTER = 904;
+		/// The constant describes a brother relation.
+		BROTHER = 905;
+		/// The constant describes a child relation.
+		CHILD = 906;
+		/// The constant describes a friend relation.
+		FRIEND = 907;
+		/// The constant describes a spouse relation.
+		SPOUSE = 908;
+		/// The constant describes a partner relation.
+		PARTNER = 909;
+		/// The constant describes a manager relation.
+		MANAGER = 910;
+		/// The constant describes a assistant relation.
+		ASSISTANT = 911;
+		/// The constant describes a domestic partner relation.
+		DOMESTIC_PARTNER = 912;
+		/// The constant describes a referred by relation.
+		REFERRED_BY = 913;
+		/// The constant describes a relative relation.
+		RELATIVE = 914;
+		/// The constant describes a custom relation type.
+		/// The field's label can be set.
+		/// Not available on iOS.
+		CUSTOM = 915;
+	}
+
+	constset int MA_PIM_ATTR_ORG_INFO_ {
+		/// The constant describes a work organization.
+		/// Not available on iOS.
+		WORK = 1001;
+		/// The constant describes a different organization type.
+		/// Not available on iOS.
+		OTHER = 1002;
+		/// The constant describes a custom organization type.
+		/// The field's label can be set.
+		/// Not available on iOS.
+		CUSTOM = 1003;
+	}
+
+	constset int MA_PIM_ATTR {
+		/// The constant describes a preferred field.
+		PREFERRED = 0x10000;
+	}
+
+	constset int MA_PIM_ERR_ {
+		/// No error. The operation completed successfully.
+		NONE = 0;
+		/// This function is unavailable on the current platform.
+		UNAVAILABLE = -1;
+		/// The native database's data type for the given field did not match the MoSync API.
+		NATIVE_TYPE_MISMATCH = -2;
+		/// The specified list type is invalid.
+		LIST_TYPE_INVALID = -3;
+		/// The specified pim list is not available on the current platform.
+		LIST_UNAVAILABLE = -4;
+		/// The specified list is already opened.
+		LIST_ALREADY_OPENED = -5;
+		/// The specified field is invalid.
+		FIELD_INVALID = -6;
+		/// The field type is not supported.
+		FIELD_UNSUPPORTED = -7;
+		/// The requested field doesn't have a value.
+		FIELD_EMPTY = -8;
+		/// More values in this field are not supported.
+		FIELD_COUNT_MAX = -9;
+		/// The field is read-only.
+		FIELD_READ_ONLY = -10;
+		/// The field is write-only.
+		FIELD_WRITE_ONLY = -11;
+		/// The given index is not valid.
+		INDEX_INVALID = -12;
+		/// Invalid handle.
+		HANDLE_INVALID = -13;
+		/// The field/attribute combination is not supported.
+		ATTRIBUTE_COMBO_UNSUPPORTED = -14;
+		/// The values's attribute is not set to custom.
+		ATTRIBUTE_CUSTOM = -15;
+		/// Invalid buffer structure.
+		BUFFER_INVALID = -16;
+		/// The value does not have a custom label.
+		NO_LABEL = -17;
+		/// The operation is not allowed by the Address Book database.
+		OPERATION_NOT_PERMITTED = -18;
+	}
+}

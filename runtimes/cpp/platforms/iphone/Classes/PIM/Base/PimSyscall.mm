@@ -52,6 +52,11 @@ MAHandle Syscall::maPimListOpen(int listType)
     return [sPimDatabase pimListOpen:listType];
 }
 
+MAHandle Syscall::maPimListNextSummary(MAHandle list)
+{
+    return [sPimDatabase pimListNext:list];
+}
+
 MAHandle Syscall::maPimListNext(MAHandle list)
 {
     return [sPimDatabase pimListNext:list];
