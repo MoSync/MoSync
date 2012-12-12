@@ -111,7 +111,7 @@ void packageWindowsPhone(const SETTINGS& s, const RuntimeInfo& ri) {
 			std::ostringstream iconInjectCmd;
 			string size = sizes[i];
 			string outputIcon = csprojOutput + "/" + filenames[i];
-			injectIcon("Windows Phone", size.c_str(), s.icon, outputIcon.c_str(), s.silent);
+			injectIcon("Windows Phone", size.c_str(), s.icon, outputIcon.c_str(), s.silent, true);
 		}
 	}
 

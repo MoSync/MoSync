@@ -47,6 +47,9 @@ namespace Wormhole
 	 */
 	FileUtil::FileUtil()
 	{
+		// Use the local path as the default
+		// path for File APIs.
+		setAppPath(getLocalPath());
 	}
 
 	/**
@@ -63,7 +66,7 @@ namespace Wormhole
 	 */
 	MAUtil::String FileUtil::getLocalPath()
 	{
-		int bufferSize = 1024;
+		int bufferSize = 2048;
 		char buffer[bufferSize];
 
 		int size = maGetSystemProperty(
@@ -71,13 +74,33 @@ namespace Wormhole
 			buffer,
 			bufferSize);
 
-		// If there was an error, return empty string.
+		// If there was an error, return default root path.
 		if (size < 0 || size > bufferSize)
 		{
-			return "";
+			return "/";
 		}
 
 		return buffer;
+	}
+
+	/**
+	 * Get the path to the directory to be used as the
+	 * root path by File APIs.
+	 * @return Full path to the current root directory.
+	 */
+	MAUtil::String FileUtil::getAppPath()
+	{
+		return mAppPath;
+	}
+
+	/**
+	 * Set the path to the directory to be used as the
+	 * root path by File APIs.
+	 * @param fullPath Full path to the new root directory.
+	 */
+	void FileUtil::setAppPath(const MAUtil::String& fullPath)
+	{
+		mAppPath = fullPath;
 	}
 
 	/**

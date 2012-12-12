@@ -50,47 +50,47 @@ namespace Wormhole
 		 */
 		virtual ~PhoneGapFile();
 
-		MAUtil::String emitFileSystemInfo(
+		virtual MAUtil::String emitFileSystemInfo(
 			const MAUtil::String& name,
 			const MAUtil::String& rootEntry);
 
-		MAUtil::String emitDirectoryEntry(
+		virtual MAUtil::String emitDirectoryEntry(
 			const MAUtil::String& name,
 			const MAUtil::String& fullPath);
 
-		MAUtil::String emitFileEntry(
+		virtual MAUtil::String emitFileEntry(
 			const MAUtil::String& name,
 			const MAUtil::String& fullPath);
 
-		MAUtil::String emitFile(
+		virtual MAUtil::String emitFile(
 			const MAUtil::String& name,
 			const MAUtil::String& fullPath,
 			const MAUtil::String& type,
 			const MAUtil::String& lastModifiedDate,
 			const MAUtil::String& size);
 
-		MAUtil::String emitMetadata(
+		virtual MAUtil::String emitMetadata(
 			const MAUtil::String& modificationTime);
 
-		void callSuccess(
+		virtual void callSuccess(
 			const MAUtil::String& callbackID,
 			const MAUtil::String& args,
 			const MAUtil::String& castFunction = ""
 			);
 
-		void callFileError(
+		virtual void callFileError(
 			const MAUtil::String& callbackID,
 			const MAUtil::String& errorCode
 			);
 
-		void callFileTransferError(
+		virtual void callFileTransferError(
 			const MAUtil::String& callbackID,
 			const MAUtil::String& errorCode,
 			const MAUtil::String& sourceURI,
 			const MAUtil::String& targetURI
 			);
 
-		void callFileUploadResult(
+		virtual void callFileUploadResult(
 			const MAUtil::String& callbackID,
 			const MAUtil::String& responseCode, // long
 			const MAUtil::String& bytesSent, // long (unused)
@@ -101,75 +101,78 @@ namespace Wormhole
 		 * Implementation of the File API.
 		 * @return true if message was handled, false if not.
 		 */
-		void handleFileMessage(JSONMessage& message);
+		virtual void handleFileMessage(JSONMessage& message);
 
 		/**
 		 * Implementation of the FileTransfer API.
 		 * @return true if message was handled, false if not.
 		 */
-		void handleFileTransferMessage(JSONMessage& message);
+		virtual void handleFileTransferMessage(JSONMessage& message);
 
 		/**
 		 * Return a FileSystem object for the application's
 		 * local file system.
 		 */
-		void actionRequestFileSystem(JSONMessage& message);
+		virtual void actionRequestFileSystem(JSONMessage& message);
 
 		/**
 		 * Return a FileSystem object for the given file URL.
 		 */
-		void actionResolveLocalFileSystemURI(JSONMessage& message);
+		virtual void actionResolveLocalFileSystemURI(JSONMessage& message);
 
 		/**
 		 * Return a FileEntry object.
 		 */
-		void actionGetFile(JSONMessage& message);
+		virtual void actionGetFile(JSONMessage& message);
 
 		/**
 		 * Return a DirectoryEntry object.
 		 */
-		void actionGetDirectory(JSONMessage& message);
+		virtual void actionGetDirectory(JSONMessage& message);
 
 		/**
 		 * Return a File object.
 		 */
-		void actionGetFileMetadata(JSONMessage& message);
+		virtual void actionGetFileMetadata(JSONMessage& message);
 
-		void actionGetMetadata(JSONMessage& message);
+		virtual void actionGetMetadata(JSONMessage& message);
 
-		void actionWrite(JSONMessage& message);
+		virtual void actionWrite(JSONMessage& message);
 
-		void actionReadAsText(JSONMessage& message);
+		virtual void actionReadAsText(JSONMessage& message);
 
-		void actionReadAsDataURL(JSONMessage& message);
+		virtual void actionReadAsDataURL(JSONMessage& message);
 
-		void actionTruncate(JSONMessage& message);
+		virtual void actionTruncate(JSONMessage& message);
 
-		void actionCopyTo(JSONMessage& message);
+		virtual void actionCopyTo(JSONMessage& message);
 
-		void actionMoveTo(JSONMessage& message);
+		virtual void actionMoveTo(JSONMessage& message);
 
-		void actionCopyMoveHelper(JSONMessage& message, bool move);
+		virtual void actionCopyMoveHelper(JSONMessage& message, bool move);
 
-		void actionRemove(JSONMessage& message);
+		virtual void actionRemove(JSONMessage& message);
 
-		void actionRemoveRecursively(JSONMessage& message);
+		virtual void actionRemoveRecursively(JSONMessage& message);
 
-		void actionReadEntries(JSONMessage& message);
+		virtual void actionReadEntries(JSONMessage& message);
 
-		void actionTestFileExists(JSONMessage& message);
+		virtual void actionTestFileExists(JSONMessage& message);
 
-		void actionTestDirectoryExists(JSONMessage& message);
+		virtual void actionTestDirectoryExists(JSONMessage& message);
 
 		/**
 		 * TODO: How should we implement this? Which file system are
 		 * we talking about? Unsupported for now.
 		 */
-		void actionGetFreeDiskSpace(JSONMessage& message);
+		virtual void actionGetFreeDiskSpace(JSONMessage& message);
 
-		void actionUploadFile(JSONMessage& message);
+		virtual void actionUploadFile(JSONMessage& message);
 
-	private:
+	protected:
+		/**
+		 * Pointer to message handler.
+		 */
 		PhoneGapMessageHandler* mMessageHandler;
 	};
 

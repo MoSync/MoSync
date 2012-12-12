@@ -60,9 +60,9 @@ namespace Wormhole
 		 * Implementation of Notification API exposed to JavaScript.
 		 * @return true if message was handled, false if not.
 		 */
-		void handleMessage(JSONMessage& message);
+		virtual void handleMessage(JSONMessage& message);
 
-	private:
+	protected:
 		/**
 		 * Called when the application receives a push notification.
 		 * @param pushNotification The received push notification.
@@ -97,7 +97,7 @@ namespace Wormhole
 		 * If bit mask does not contain at least one good value the error callback
 		 * method will be called.
 		 */
-		void setPushNotificationTypes(JSONMessage& message);
+		virtual void setPushNotificationTypes(JSONMessage& message);
 
 		/**
 		 * Connects to a push notification server
@@ -105,7 +105,7 @@ namespace Wormhole
 		 * @param serverIP IPAddress of the server
 		 * @param port TCP port number of the server
 		 */
-		void connectToServer(MAUtil::String & serverIP, const int port);
+		virtual void connectToServer(MAUtil::String & serverIP, const int port);
 
 		/**
 		 * Remove the quotation marks from the begging and ending of a given string.
@@ -114,9 +114,9 @@ namespace Wormhole
 		 * @param string String to be parsed.
 		 * @return The parsed string.
 		 */
-		MAUtil::String parseJSString(const MAUtil::String& string);
+		virtual MAUtil::String parseJSString(const MAUtil::String& string);
 
-	private:
+	protected:
 		PhoneGapMessageHandler* mMessageHandler;
 
 		/**

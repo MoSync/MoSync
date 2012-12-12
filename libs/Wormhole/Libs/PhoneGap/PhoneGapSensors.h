@@ -54,36 +54,36 @@ namespace Wormhole
 		 * Implementation of File API exposed to JavaScript.
 		 * @return true if message was handled, false if not.
 		 */
-		void handleMessage(JSONMessage& message);
+		virtual void handleMessage(JSONMessage& message);
 
-		void sendAccelerometerData(MASensor sensorData);
+		virtual void sendAccelerometerData(MASensor sensorData);
 
-		void sendCompassData(MASensor sensorData);
+		virtual void sendCompassData(MASensor sensorData);
 
 		/**
 		 * Called from PhoneGapMessageHandler on EVENT_TYPE_LOCATION.
 		 */
-		void sendLocationData(const MAEvent& event);
+		virtual void sendLocationData(const MAEvent& event);
 
-	private:
+	protected:
 		/**
 		 * Processes Accelerometer Requests from PhoneGap JavaScript
 		 */
-		void processAcelerometerRequest(
+		virtual void processAcelerometerRequest(
 				MAUtil::String callbackID,
 				bool isWatched);
 
 		/**
 		 * Processes Location Requests from PhoneGap JavaScript
 		 */
-		void processLocationRequest(
+		virtual void processLocationRequest(
 				MAUtil::String callbackID,
 				bool isWatched);
 
 		/**
 		 * Processes Compass Requests from PhoneGap JavaScript
 		 */
-		void processCompassRequest(
+		virtual void processCompassRequest(
 				MAUtil::String callbackID,
 				bool isWatched);
 
@@ -94,7 +94,7 @@ namespace Wormhole
 		 * @param callbackID ID of the PhoneGapCallback to be used
 		 * @param sensorData Accelerometer data
 		 */
-		void sendAccelerometerData(
+		virtual void sendAccelerometerData(
 				MAUtil::String callbackID,
 				MASensor sensorData);
 
@@ -105,11 +105,11 @@ namespace Wormhole
 		 * @param callbackID ID of the PhoneGapCallback to be used
 		 * @param sensorData Accelerometer data
 		 */
-		void sendCompassData(
+		virtual void sendCompassData(
 				MAUtil::String callbackID,
 				MASensor sensorData);
 
-	private:
+	protected:
 		PhoneGapMessageHandler* mMessageHandler;
 
 		/**
