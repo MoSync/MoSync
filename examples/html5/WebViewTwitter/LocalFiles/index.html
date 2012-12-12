@@ -34,16 +34,15 @@
 			 */
 			app.ui.showPage = function(page)
 			{
-				console.log("@@@ app.ui.showPage: " + page);
 				$.mobile.changePage("#" + page);//, {transition: "slideleft"});
 			};
 
 			/**
-			 * Navigates back one page.
+			 * Navigate back one page.
 			 */
 			app.ui.goBack = function()
 			{
-				console.log("@@@ app.ui.goBack activePage: " + $.mobile.activePage[0].id);
+				//console.log("@@@ app.ui.goBack activePage: " + $.mobile.activePage[0].id);
 
 				if ($.mobile.activePage[0].id === "home")
 				{
