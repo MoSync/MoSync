@@ -2523,8 +2523,7 @@ namespace Base
 		case maIOCtl_maExtensionFunctionInvoke2:
 		{
 			SYSLOG("maIOCtl_maExtensionFunctionInvoke2");
-			//uintptr_t ptr = (uintptr_t) c;
-			return _maExtensionFunctionInvoke2(mJNIEnv, mJThis, a, b, (int*) c, (int)gCore->mem_ds);
+			return _maExtensionFunctionInvoke2(mJNIEnv, mJThis, a, b, c, (int)gCore->mem_ds);
 		}
 
 		// ********** NFC API **********

@@ -100,6 +100,15 @@ void packageAndroid(const SETTINGS& s, const RuntimeInfo& ri) {
 		copyFile(resMp3.c_str(), s.resource);
 	}
 
+	if (s.extensions) {
+		// Only one ext as of now!
+		string extManifestAsset = assets + "/" + s.extensions + ".xml";
+		string extManifest = mosyncdir() + "/extensions/" + s.extensions + "/Android/" + s.extensions + ".xml";
+		copyFile(extManifestAsset, extManifest);
+
+
+	}
+
 	// build AndroidManifest.xml, res/layout/main.xml, res/values/strings.xml
 	string res = dstDir + "/res";
 	string layout = res + "/layout";

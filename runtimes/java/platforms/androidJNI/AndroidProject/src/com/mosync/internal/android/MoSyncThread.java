@@ -2699,7 +2699,7 @@ public class MoSyncThread extends Thread
 	}
 
 
-	int maExtensionFunctionInvoke(int function, int[] ptrs, int memstart) {
+	int maExtensionFunctionInvoke(int function, int ptrs, int memstart) {
 		return maInvokeExtension(function, ptrs, memstart);
 	}
 
@@ -2716,7 +2716,7 @@ public class MoSyncThread extends Thread
 	/**
 	 * maInvokeExtension
 	 */
-	int maInvokeExtension(int function, int[] ptr, int memstart)
+	int maInvokeExtension(int function, int ptr, int memstart)
 	{
 		SYSLOG("maInvokeExtension");
 		return mMoSyncExtensionLoader.maInvokeExtension(function, ptr, memstart);
@@ -3216,7 +3216,7 @@ public class MoSyncThread extends Thread
 	 * @param buttonNegative
 	 * @return
 	 */
-	int maAlert(
+	public int maAlert(
 		final String title,
 		final String message,
 		final String buttonPositive,

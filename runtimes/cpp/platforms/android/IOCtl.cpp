@@ -2389,24 +2389,11 @@ namespace Base
 		return retVal;
 	}
 
-	int _maExtensionFunctionInvoke2(JNIEnv* jNIEnv, jobject jThis, MAExtensionFunction fn, int numargs, int* ptrs, int memStart) {
+	int _maExtensionFunctionInvoke2(JNIEnv* jNIEnv, jobject jThis, MAExtensionFunction fn, int numargs, int ptrs, int memStart) {
 		jclass cls = jNIEnv->GetObjectClass(jThis);
-		jmethodID methodID = jNIEnv->GetMethodID(cls, "maExtensionFunctionInvoke", "(I[II)I");
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maExtensionFunctionInvoke", "(III)I");
 		if (methodID == 0) return 0;
-		//int memStart = (int)gCore->mem_ds;
-		jintArray jargs = jNIEnv->NewIntArray(10 * numargs);
-		jint* body = jNIEnv->GetIntArrayElements(jargs, 0);
-		jint* iptrs = (jint*) ptrs;
-		body[0] = (int) ptrs;
-		body[1] = (int) ptrs + 4;
-		for (int i = 0; i < numargs; i++) {
-			jint ptr = iptrs[i];
-			body[i] = ptrs[0] + 4 * i;
-		}
-		jNIEnv->SetIntArrayRegion(jargs, 0, numargs, body);
-		jint retVal = jNIEnv->CallIntMethod(jThis, methodID, fn, jargs, memStart);
-		jNIEnv->ReleaseIntArrayElements(jargs, body, 0);
-		//delete[] body;
+		jint retVal = jNIEnv->CallIntMethod(jThis, methodID, fn, ptrs, memStart);
 		jNIEnv->DeleteLocalRef(cls);
 
 		return retVal;
