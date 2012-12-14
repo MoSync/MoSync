@@ -18,99 +18,75 @@ MA 02110-1301, USA.
 
 /**
  * @file WebViewTwitter.cpp
- * @author Ali Sarrafi
+ * @author Ali Sarrafi, Mikael Kindborg
  *
  * Application that reads Twitter flows.
  *
- * This program illustrates how to use the jQTouch JavAScript
- * library in a MoSync WebView application. The program also
- * shows how to communicate from JavaScript to C++.
- *
  * The entire UI and most of the application logic is implemented
  * in JavaScript.
+ *
+ * This program illustrates how to send messages between JavaScript
+ * and C++. The app uses a simple JavaScript File API, which is
+ * implemented in C++.
  */
 
-#include <Wormhole/WebAppMoblet.h>	     // Moblet for web applications.
-#include <Wormhole/MessageStreamJSON.h>	 // Messages from JavaScript.
-#include "FileMessageHandler.h"          // Handles file messages.
+#include <conprint.h>
+#include <Wormhole/HybridMoblet.h>
+#include "FileMessageHandler.h"   // Custom File API.
+#include "MAHeaders.h"
 
-using namespace MAUtil;
-using namespace NativeUI;
-using namespace Wormhole;
+// Namespaces we want to access.
+using namespace MAUtil; // Class Moblet
+using namespace NativeUI; // WebView widget.
+using namespace Wormhole; // Wormhole library.
 
 /**
  * The application class.
  */
-class TwitterMoblet : public WebAppMoblet
+class TwitterMoblet : public HybridMoblet
 {
+public:
+	TwitterMoblet()
+	{
+		// Show the start page. This will also perform initialization if needed.
+		showPage("index.html");
+
+		// The beep sound is defined in file "Resources/Resources.lst".
+		setBeepSound(BEEP_WAV);
+
+		// Turn off zoom.
+		getWebView()->disableZoom();
+
+		// Register functions to handle custom messages sent from JavaScript.
+		addMessageFun(
+			"File",
+			(FunTable::MessageHandlerFun)&TwitterMoblet::handleFileMessage);
+	}
+
+	virtual ~TwitterMoblet()
+	{
+		// Add cleanup code as needed.
+	}
+
+	void handleFileMessage(Wormhole::MessageStream& message)
+	{
+		mMessageHandler.handleMessage(message);
+	}
+
 private:
 	/**
 	 * Object that handles messages from JavaScript.
 	 */
 	FileMessageHandler mMessageHandler;
-
-public:
-	TwitterMoblet()
-	{
-		enableWebViewMessages();
-		getWebView()->disableZoom();
-		showPage("index.html");
-	}
-
-	/**
-	 * This method handles messages sent from the WebView.
-	 * @param webView The WebView that sent the message.
-	 * @param urlData Data object that holds message content.
-	 * Note that the data object will be valid only during
-	 * the life-time of the call of this method, then it
-	 * will be deallocated.
-	 */
-	void handleWebViewMessage(WebView* webView, MAHandle data)
-	{
-		printMessage(data);
-
-		// Create message object. This parses the message.
-		MessageStreamJSON message(webView, data);
-
-		// Get next message.
-		while (message.next())
-		{
-			// Let the message handler handle the message.
-			mMessageHandler.handleMessage(message);
-		}
-	}
-
-	/**
-	 * For debugging.
-	 */
-	void printMessage(MAHandle dataHandle)
-	{
-		// Get length of the data, it is not zero terminated.
-		int dataSize = maGetDataSize(dataHandle);
-
-		// Allocate buffer for string data.
-		char* stringData = (char*) malloc(dataSize + 1);
-
-		// Get the data.
-		maReadData(dataHandle, stringData, 0, dataSize);
-
-		// Zero terminate.
-		stringData[dataSize] = 0;
-
-		// Print unparsed message data.
-		maWriteLog("@@@ MOSYNC Message:", 19);
-		maWriteLog(stringData, dataSize);
-
-		free(stringData);
-	}
 };
-// End of class TwitterMoblet
 
 /**
  * Main function that is called when the program starts.
+ * Here an instance of the MyMoblet class is created and
+ * the program enters the main event loop.
  */
 extern "C" int MAMain()
 {
-	Moblet::run(new TwitterMoblet());
+	(new TwitterMoblet())->enterEventLoop();
 	return 0;
 }

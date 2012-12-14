@@ -24,7 +24,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
  * Injects an icon in a platform specific manner, using the icon injector.
  * Exits on failure.
  */
-void injectIcon(const char* platform, const char* size, const char* srcIcon, const char* dst, bool silent);
+void injectIcon(const char* platform, const char* size, const char* srcIcon, const char* dst, bool silent, bool force);
 
 /**
  * Returns a MoSync binary, located in the MOSYNCDIR/bin directory.

@@ -53,10 +53,8 @@ MA 02110-1301, USA.
 #include <mastring.h>				    // C String functions.
 #include <mavsprintf.h>				    // sprintf etc.
 #include <Wormhole/HybridMoblet.h>	    // Moblet for web applications.
-#include <Wormhole/MessageStreamJSON.h>	// Messages from JavaScript.
 
 using namespace MAUtil;
-using namespace NativeUI;
 using namespace Wormhole;
 
 /**
@@ -84,43 +82,29 @@ public:
 		// reasonable default size on devices with
 		// different screen sizes.
 		getWebView()->disableZoom();
+
+		// Register functions to handle messages sent from JavaScript.
+		addMessageFun(
+			"SendSMS",
+			(FunTable::MessageHandlerFun)&LoveSMSMoblet::handleSendSMS);
+		addMessageFun(
+			"PageLoaded",
+			(FunTable::MessageHandlerFun)&LoveSMSMoblet::handlePageLoaded);
 	}
 
-	/**
-	 * This method handles messages sent from the WebView.
-	 * @param webView The WebView that sent the message.
-	 * @param urlData Data object that holds message content.
-	 * Note that the data object will be valid only during
-	 * the life-time of the call of this method, then it
-	 * will be deallocated.
-	 */
-	void handleWebViewMessage(WebView* webView, MAHandle data)
+	void handleSendSMS(MessageStream& message)
 	{
-		MessageStreamJSON message(webView, data);
-
-		while (message.next())
-		{
-			handleMessage(message);
-		}
+		// Save phone no and send SMS.
+		savePhoneNoAndSendSMS(
+			message.getNext(),  // phoneNo
+			message.getNext()); // message
 	}
 
-	void handleMessage(MessageStreamJSON& message)
+	void handlePageLoaded(MessageStream& message)
 	{
-		// Handle the message.
-		if (message.is("SendSMS"))
-		{
-			// Save phone no and send SMS.
-			savePhoneNoAndSendSMS(
-				message.getParam("phoneNo"),
-				message.getParam("message"));
-		}
-		else if (message.is("PageLoaded"))
-		{
-			// Load and set saved phone number.
-			// We could alternatively use a JavaScript File API
-			// to do this.
-			setSavedPhoneNo();
-		}
+		// When page is loaded, read and set saved phone number.
+		// Alternatively, we could use a JavaScript File API for this.
+		setSavedPhoneNo();
 	}
 
 	/**
