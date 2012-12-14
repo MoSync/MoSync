@@ -1,6 +1,6 @@
 package com.mosync.internal.android.extensions;
 
-public interface IPointer<T> {
+public interface Pointer<T> {
 
 	T deref();
 	T at(int ix);

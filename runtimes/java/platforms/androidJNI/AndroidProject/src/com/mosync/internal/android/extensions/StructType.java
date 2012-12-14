@@ -11,7 +11,7 @@ public class StructType extends TypeDescriptor {
 	private Map<String, TypeDescriptor> typedefs;
 	private String className;
 	private Class clazz;
-	private IStruct prototype;
+	private Struct prototype;
 
 	public StructType(ExtensionModule module, String type, String className) throws Exception {
 		this.type = type;
@@ -34,7 +34,8 @@ public class StructType extends TypeDescriptor {
 	}
 
 	public Object convert(int[] args, int offset) {
-		return prototype.convert(args, offset);
+		int addr = args[offset];
+		return prototype.unmarshal(addr);
 	}
 
 	public String toString() {
