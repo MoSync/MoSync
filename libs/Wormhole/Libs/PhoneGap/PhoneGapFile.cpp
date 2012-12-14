@@ -107,25 +107,6 @@ namespace Wormhole
 		return sMimeTypeDefault;
 	}
 
-	static String FileGetLocalPath()
-	{
-		int bufferSize = 2048;
-		char buffer[bufferSize];
-
-		int size = maGetSystemProperty(
-			"mosync.path.local",
-			buffer,
-			bufferSize);
-
-		// If there was an error, return default root path.
-		if (size < 0 || size > bufferSize)
-		{
-			return "/";
-		}
-
-		return buffer;
-	}
-
 	/**
 	 * It should work also to get a directory name if the
 	 * path ends with a slash, e.g.: "/sdcard/MyMusic/"
@@ -1049,7 +1030,7 @@ namespace Wormhole
 		}
 
 		// Get local root path and remove trailing slash, if any.
-		String path = FileGetLocalPath();
+		String path = (mMessageHandler->getFileUtil())->getAppPath();
 
 		// If we get just a slash, we won't remove the last slash.
 		// TODO: It is unclear if PhoneGap requires all path names

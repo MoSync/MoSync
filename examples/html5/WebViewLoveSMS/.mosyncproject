@@ -50,7 +50,7 @@
 <property key="dependency.strategy" value="0"/>
 <property key="excludes/Debug" value=""/>
 <property key="excludes/Release" value=""/>
-<property key="odd.support" value="true"/>
+<property key="odd.support" value="false"/>
 <property key="profile.mgr.type" value="0"/>
 <property key="template.id" value="project.c"/>
 <property key="winmobilecs:guid" value="b7b0a280-32f6-102f-8059-450505cec39e"/>

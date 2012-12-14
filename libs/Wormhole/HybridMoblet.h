@@ -136,6 +136,18 @@ public:
 	virtual void setBeepSound(MAHandle beepSoundResource);
 
 	/**
+	 * Return the message handler object used by this moblet.
+	 */
+	virtual MessageHandler* getMessageHandler();
+
+	/**
+	 * Set the message handler object used by this moblet.
+	 * Any previous handler is deleted. The moblet takes
+	 * ownership of the handler and deletes it when destroyed.
+	 */
+	virtual void setMessageHandler(MessageHandler* handler);
+
+	/**
 	 * Add a function invoked when a message is sent from JavaScript.
 	 *
 	 * Invoke from JavaScript using this format:
@@ -169,6 +181,20 @@ public:
 	virtual void handleWebViewMessage(
 		MAWidgetHandle webViewHandle,
 		MAHandle data);
+
+	/**
+	 * Prints the incoming webview message. Used for debugging.
+	 *
+	 * To call this method, override HybridMoblet::handleWebViewMessage
+	 * in your moblet with the following method:
+	 *
+	 * void handleWebViewMessage(MAHandle webViewHandle, MAHandle data)
+	 * {
+	 *    printWebViewMessage(data);
+	 *    HybridMoblet::handleWebViewMessage(webViewHandle, data);
+	 * }
+	 */
+	virtual void printWebViewMessage(MAHandle dataHandle);
 
 	/**
 	 * Handles HOOK_INVOKED events for WebViews in the app.
@@ -247,7 +273,7 @@ public:
 	 */
 	virtual void writeChecksum();
 
-public: // On purpose!
+protected:
 
 	/**
 	 * The screen widget that is the root of the UI.
@@ -272,7 +298,7 @@ public: // On purpose!
 	/**
 	 * Handles messages sent from JavaScript.
 	 */
-	MessageHandler mMessageHandler;
+	MessageHandler* mMessageHandler;
 
 	/**
 	 * Is the moblet initialized?

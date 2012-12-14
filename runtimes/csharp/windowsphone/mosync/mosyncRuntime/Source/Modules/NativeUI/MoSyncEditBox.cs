@@ -287,30 +287,28 @@ namespace MoSync
             {
                 set
                 {
-                    if (mIsWatermarkMode)
+                    if (mIsWatermarkMode || mIsPasswordMode)
                     {
-                        if (!String.IsNullOrEmpty(value))
+                        if (mIsWatermarkMode && !String.IsNullOrEmpty(value))
                         {
                             setWatermarkMode(false);
                             mEditBox.Text = value;
                         }
-                    }
-                    else
-                    {
+
                         if (mIsPasswordMode)
                         {
                             mPasswordBox.Password = value;
                         }
+                    }
+                    else
+                    {
+                        if (String.IsNullOrEmpty(value))
+                        {
+                            setWatermarkMode(true);
+                        }
                         else
                         {
-                            if (String.IsNullOrEmpty(value))
-                            {
-                                setWatermarkMode(true);
-                            }
-                            else
-                            {
-                                mEditBox.Text = value;
-                            }
+                            mEditBox.Text = value;
                         }
                     }
                 }

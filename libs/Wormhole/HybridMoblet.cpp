@@ -69,7 +69,7 @@ public:
 			urlData);
 	}
 
-private:
+protected:
 	/**
 	 * Pointer to the moblet.
 	 */
@@ -90,6 +90,12 @@ HybridMoblet::HybridMoblet()
 
 	// Create file utility object.
 	mFileUtil = new FileUtil();
+
+	// Create the message handler.
+	// The idea with moving to pointers for handlers is
+	// that then they are pluggable by the users of this class.
+	// Like the "strategy" or "state" pattern.
+	mMessageHandler = new MessageHandler();
 }
 
 /**
@@ -101,11 +107,10 @@ HybridMoblet::~HybridMoblet()
 	delete mScreen;
 
 	// Delete the WebView listener.
-	if (NULL != mWebViewListener)
-	{
-		delete mWebViewListener;
-		mWebViewListener = NULL;
-	}
+	if (NULL != mWebViewListener) { delete mWebViewListener; }
+
+	// Delete message handler.
+	if (NULL != mMessageHandler) { delete mMessageHandler; }
 
 	// Delete the file utility object.
 	delete mFileUtil;
@@ -127,7 +132,7 @@ void HybridMoblet::initialize()
 
 	// Initialize the message handler. All messages from
 	// JavaScript are routed through this handler.
-	mMessageHandler.initialize(this);
+	mMessageHandler->initialize(this);
 }
 
 void HybridMoblet::openWormhole(MAHandle webViewHandle)
@@ -135,7 +140,7 @@ void HybridMoblet::openWormhole(MAHandle webViewHandle)
 	sendDeviceScreenSizeToJavaScript();
 	sendWebViewHandleToJavaScript();
 
-	mMessageHandler.openWormhole(webViewHandle, this);
+	mMessageHandler->openWormhole(webViewHandle, this);
 }
 
 /**
@@ -228,7 +233,26 @@ void HybridMoblet::showWebView()
  */
 void HybridMoblet::setBeepSound(MAHandle beepSoundResource)
 {
-	mMessageHandler.setBeepSound(beepSoundResource);
+	mMessageHandler->setBeepSound(beepSoundResource);
+}
+
+/**
+ * Return the message handler object used by this moblet.
+ */
+MessageHandler* HybridMoblet::getMessageHandler()
+{
+	return mMessageHandler;
+}
+
+/**
+ * Set the message handler object used by this moblet.
+ * Any previous handler is deleted. The moblet takes
+ * ownership of the handler and deletes it when destroyed.
+ */
+void HybridMoblet::setMessageHandler(MessageHandler* handler)
+{
+	if (NULL != mMessageHandler) { delete mMessageHandler; }
+	mMessageHandler = handler;
 }
 
 /**
@@ -252,7 +276,7 @@ void HybridMoblet::addMessageFun(
 	const char* command,
 	FunTable::MessageHandlerFun fun)
 {
-	mMessageHandler.addMessageFun(command, fun);
+	mMessageHandler->addMessageFun(command, fun);
 }
 
 /**
@@ -269,7 +293,40 @@ void HybridMoblet::handleWebViewMessage(
 	MAHandle webViewHandle,
 	MAHandle data)
 {
-	mMessageHandler.handleWebViewMessage(webViewHandle, data, this);
+	mMessageHandler->handleWebViewMessage(webViewHandle, data, this);
+}
+
+/**
+ * Prints the incoming webview message. Used for debugging.
+ *
+ * To call this method, override HybridMoblet::handleWebViewMessage
+ * in your moblet with the following method:
+ *
+ * void handleWebViewMessage(MAHandle webViewHandle, MAHandle data)
+ * {
+ *    printWebViewMessage(data);
+ *    HybridMoblet::handleWebViewMessage(webViewHandle, data);
+ * }
+ */
+void HybridMoblet::printWebViewMessage(MAHandle dataHandle)
+{
+	// Get length of the data, it is not zero terminated.
+	int dataSize = maGetDataSize(dataHandle);
+
+	// Allocate buffer for string data.
+	char* dataBuffer = (char*) malloc(dataSize + 1);
+
+	// Get the data.
+	maReadData(dataHandle, dataBuffer, 0, dataSize);
+
+	// Zero terminate.
+	dataBuffer[dataSize] = 0;
+
+	// Print unparsed message data.
+	maWriteLog("@@@ MOSYNC: WebViewMessage:", 27);
+	maWriteLog(dataBuffer, dataSize);
+
+	free(dataBuffer);
 }
 
 /**
@@ -324,7 +381,7 @@ void HybridMoblet::customEvent(const MAEvent& event)
  */
 void HybridMoblet::keyPressEvent(int keyCode, int nativeCode)
 {
-	mMessageHandler.keyPressEvent(keyCode, nativeCode);
+	mMessageHandler->keyPressEvent(keyCode, nativeCode);
 }
 
 /**
@@ -348,7 +405,7 @@ void HybridMoblet::sendDeviceScreenSizeToJavaScript()
 	char buf[512];
 	sprintf(
 		buf,
-		"mosync.nativeui.setScreenSize(%d,%d)",
+		"try{mosync.nativeui.setScreenSize(%d,%d)}catch(e){}",
 		width,
 		height);
 	callJS(buf);
@@ -364,7 +421,7 @@ void HybridMoblet::sendWebViewHandleToJavaScript()
 	//We use a special callback for widget creation
 	sprintf(
 		buffer,
-		"mosync.nativeui.setWebViewHandle('%d')",
+		"try{mosync.nativeui.setWebViewHandle('%d')}catch(e){}",
 		widget);
 	callJS(buffer);
 }

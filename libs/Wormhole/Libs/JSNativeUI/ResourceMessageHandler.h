@@ -33,6 +33,7 @@ MA 02110-1301, USA.
 #include <MAUtil/String.h>
 #include <MAUtil/Downloader.h>
 #include "../../MessageStream.h"
+#include "../../FileUtil.h"
 
 namespace Wormhole
 {
@@ -64,26 +65,36 @@ namespace Wormhole
 		virtual ~ResourceMessageHandler();
 
 		/**
+		 * Get the FileUtil object to be used for File APIs.
+		 */
+		FileUtil* getFileUtil();
+
+		/**
+		 * Set the FileUtil object to be used for File APIs.
+		 */
+		void setFileUtil(FileUtil* fileUtil);
+
+		/**
 		 * Implementation of standard API exposed to JavaScript.
 		 * @return true if message was handled, false if not.
 		 */
-		bool handleMessage(Wormhole::MessageStream& message);
+		virtual bool handleMessage(Wormhole::MessageStream& message);
 
 		/**
 		 * Is called if the downloads is canceled.
 		 */
-		void downloadCancelled(MAUtil::Downloader* downloader);
+		virtual void downloadCancelled(MAUtil::Downloader* downloader);
 
 		/**
 		 * Called if an error occurs when downloading
 		 */
-		void error(MAUtil::Downloader* downloader, int code);
+		virtual void error(MAUtil::Downloader* downloader, int code);
 
 		/**
 		 * On successful download completion, send the
 		 * event to the JavaScript side.
 		 */
-		void finishedDownloading(
+		virtual void finishedDownloading(
 			MAUtil::Downloader* downloader,
 			MAHandle data);
 
@@ -96,30 +107,30 @@ namespace Wormhole
 		 *
 		 * @param listener The log message listener.
 		 */
-		void setLogMessageListener(LogMessageListener* listener);
+		virtual void setLogMessageListener(LogMessageListener* listener);
 
 		/**
 		 * Send a log message to a server.
 		 * @param message The log message, for example: "Hello World".
 		 * @param url The url to use for the remote logging service.
 		 */
-		void sendRemoteLogMessage(
+		virtual void sendRemoteLogMessage(
 			const MAUtil::String& message,
 			const MAUtil::String& url);
 
-	private:
-		/**
-		 * An instance of ImageDownloader that will be used for
-		 * downloading image resources
-		 */
-		MAUtil::ImageDownloader* mImageDownloader;
-
+	protected:
 		/**
 		 * Loads an image from a file and returns the handle to it.
 		 *
 		 * @param imagePath relative path to the image file.
 		 */
-		MAHandle loadImageResource(const char *imagePath);
+		virtual MAHandle loadImageResource(const char* imagePath);
+
+		/**
+		 * An instance of ImageDownloader that will be used for
+		 * downloading image resources
+		 */
+		MAUtil::ImageDownloader* mImageDownloader;
 
 		/**
 		 * A Pointer to the main webview
@@ -132,6 +143,11 @@ namespace Wormhole
 		 * are sent from JavaScript.
 		 */
 		LogMessageListener* mLogMessageListener;
+
+		/**
+		 * File system helper object.
+		 */
+		FileUtil* mFileUtil;
 	};
 } // namespace
 

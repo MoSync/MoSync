@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2011 MoSync AB
+Copyright (C) 2012 MoSync AB
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License,
@@ -23,6 +23,7 @@ MA 02110-1301, USA.
  * Implementation of system calls made from JavaScript.
  */
 
+#include <conprint.h>
 #include <Wormhole/FileUtil.h>
 #include "FileMessageHandler.h"
 
@@ -48,21 +49,23 @@ FileMessageHandler::~FileMessageHandler()
  * Implementation of standard API exposed to JavaScript.
  * @return true if message was handled, false if not.
  */
-bool FileMessageHandler::handleMessage(MessageStreamJSON& message)
+bool FileMessageHandler::handleMessage(Wormhole::MessageStream& message)
 {
-	if (message.is("mosync.file.getLocalPath"))
+	const char* operation = message.getNext();
+
+	if (0 == strcmp(operation, "mosync.file.getLocalPath"))
 	{
 		handleFileGetLocalPath(message);
 	}
-	else if (message.is("mosync.file.read"))
+	else if (0 == strcmp(operation, "mosync.file.read"))
 	{
 		handleFileRead(message);
 	}
-	else if (message.is("mosync.file.write"))
+	else if (0 == strcmp(operation, "mosync.file.write"))
 	{
 		handleFileWrite(message);
 	}
-	else if (message.is("mosync.log"))
+	else if (0 == strcmp(operation, "mosync.log"))
 	{
 		handleLog(message);
 	}
@@ -80,36 +83,22 @@ bool FileMessageHandler::handleMessage(MessageStreamJSON& message)
  * Handle the getLocalPath message.
  */
 void FileMessageHandler::handleFileGetLocalPath(
-	MessageStreamJSON& message)
+	Wormhole::MessageStream& message)
 {
 	FileUtil fileUtil;
-	// fileUtil.getLocalPath() does not work correctly on Windows Phone
-	// because of a bug in maGetSystemProperty for "mosync.path.local".
 	String path = fileUtil.getLocalPath();
-	if (0 == path.length())
-	{
-		// This is a hack to make the program work on Windows Phone.
-		replyString(message, "/");
-
-		// Original code was:
-		// replyNull(message);
-	}
-	else
-	{
-		replyString(message, path);
-	}
+	replyString(message, path);
 }
 
 /**
  * Handle the file read message.
  */
-void FileMessageHandler::handleFileRead(MessageStreamJSON& message)
+void FileMessageHandler::handleFileRead(Wormhole::MessageStream& message)
 {
 	FileUtil fileUtil;
+	const char* filePath = message.getNext();
 	String inText;
-	bool success = fileUtil.readTextFromFile(
-		message.getParam("filePath"),
-		inText);
+	bool success = fileUtil.readTextFromFile(filePath, inText);
 	if (success)
 	{
 		replyString(message, inText);
@@ -123,12 +112,12 @@ void FileMessageHandler::handleFileRead(MessageStreamJSON& message)
 /**
  * Handle the file write message.
  */
-void FileMessageHandler::handleFileWrite(MessageStreamJSON& message)
+void FileMessageHandler::handleFileWrite(Wormhole::MessageStream& message)
 {
 	FileUtil fileUtil;
-	bool success = fileUtil.writeTextToFile(
-		message.getParam("filePath"),
-		message.getParam("data"));
+	const char* filePath = message.getNext();
+	const char* data = message.getNext();
+	bool success = fileUtil.writeTextToFile(filePath, data);
 	if (success)
 	{
 		replyBoolean(message, true);
@@ -142,119 +131,78 @@ void FileMessageHandler::handleFileWrite(MessageStreamJSON& message)
 /**
  * Handle the log message.
  */
-void FileMessageHandler::handleLog(MessageStreamJSON& message)
+void FileMessageHandler::handleLog(Wormhole::MessageStream& message)
 {
-	String s = message.getParam("message");
-	maWriteLog(s.c_str(), s.size());
+	const char* s = message.getNext();
+	maWriteLog(s, strlen(s));
 }
 
 /**
  * Calls a JavaScript callback function using the "callbackId"
  * parameter. The callbackId is supplied automatically when
- * using the mosync.bridge.sendJSON function.
+ * calling mosync.bridge.send wuth a callback function.
+ * @param message The message stream from which to get the
+ * callback id.
  * @param result A string that contains the data to be returned
  * to the JavaScript callback function.
- * @return true on success, false on error.
  */
-bool FileMessageHandler::replyString(
-	MessageStreamJSON& message,
+void FileMessageHandler::replyString(
+	Wormhole::MessageStream& message,
 	const String& result)
 {
-	// Message must have an callbackId parameter.
-	if (hasNoCallbackId(message))
-	{
-		return false;
-	}
-
 	// Get the callbackID parameter.
-	String callbackId = getCallBackId(message);
+	const char* callbackId = message.getNext();
 
 	// Call JavaScript reply handler.
 	String script = "mosync.bridge.reply(";
-	script += callbackId + ", " + "'" + result + "')";
+	script += callbackId;
+	script += ", '" + result + "')";
 
-	message.getWebView()->callJS(script);
-
-	return true;
+	message.callJS(script);
 }
 
 /**
  * Calls a JavaScript callback function using the "callbackId"
  * parameter. The callbackId is supplied automatically when
- * using the mosync.bridge.sendJSON function.
+ * calling mosync.bridge.send wuth a callback function.
+ * @param message The message stream from which to get the
+ * callback id.
  * @param result A boolean to be returned
  * to the JavaScript callback function.
- * @return true on success, false on error.
  */
-bool FileMessageHandler::replyBoolean(MessageStreamJSON& message, bool result)
+void FileMessageHandler::replyBoolean(Wormhole::MessageStream& message, bool result)
 {
-	// Message must have an callbackId parameter.
-	if (hasNoCallbackId(message))
-	{
-		return false;
-	}
-
 	// Get the callbackID parameter.
-	String callbackId = getCallBackId(message);
+	const char* callbackId = message.getNext();
+
+	// Set truth value.
+	String truth = result ? "true" : "false";
 
 	// Call JavaScript reply handler.
 	String script = "mosync.bridge.reply(";
-	if (result)
-	{
-		script += callbackId + ", true)";
-	}
-	else
-	{
-		script += callbackId + ", false)";
-	}
+	script += callbackId;
+	script += "," + truth + ")";
 
-	message.getWebView()->callJS(script);
-
-	return true;
+	message.callJS(script);
 }
 
 /**
  * Calls a JavaScript callback function using the "callbackId"
- * parameter. Returns null to the callback function.
- * The callbackId is supplied automatically when
- * using the mosync.bridge.sendJSON function.
- * @return true on success, false on error.
+ * parameter. The callbackId is supplied automatically when
+ * calling mosync.bridge.send wuth a callback function.
+ * Returns null to the callback function.
+ * @param message The message stream from which to get the
+ * callback id.
  */
-bool FileMessageHandler::replyNull(MessageStreamJSON& message)
+void FileMessageHandler::replyNull(Wormhole::MessageStream& message)
 {
-	// Message must have an callbackId parameter.
-	if (hasNoCallbackId(message))
-	{
-		return false;
-	}
-
 	// Get the callbackID parameter.
-	String callbackId = getCallBackId(message);
+	const char* callbackId = message.getNext();
 
 	// Call JavaScript reply handler.
 	String script = "mosync.bridge.reply(";
-	script += callbackId + ", null)";
+	script += callbackId;
+	script += ", null)";
 
-	message.getWebView()->callJS(script);
-
-	return true;
-}
-
-/**
- * Utility method to check if there is a callbackId.
- */
-bool FileMessageHandler::hasNoCallbackId(MessageStreamJSON& message)
-{
-	return !message.hasParam("callbackId");
-}
-
-/**
- * Utility method for getting the message callbackId as a string.
- */
-String FileMessageHandler::getCallBackId(MessageStreamJSON& message)
-{
-	int id = message.getParamInt("callbackId");
-	char buf[32];
-	sprintf(buf, "%i", id);
-	return buf;
+	message.callJS(script);
 }
