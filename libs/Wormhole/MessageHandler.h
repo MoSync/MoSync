@@ -71,6 +71,47 @@ public:
 	virtual void initialize(Wormhole::HybridMoblet* moblet);
 
 	/**
+	 * Get the PhoneGap message handler.
+	 */
+	virtual PhoneGapMessageHandler* getPhoneGapMessageHandler();
+
+	/**
+	 * Set the PhoneGap message handler.
+	 */
+	virtual void setPhoneGapMessageHandler(PhoneGapMessageHandler* handler);
+
+	/**
+	 * Get the Native UI message handler.
+	 */
+	virtual NativeUIMessageHandler* getNativeUIMessageHandler();
+
+	/**
+	 * Set the Native UI message handler.
+	 */
+	virtual void setNativeUIMessageHandler(NativeUIMessageHandler* handler);
+
+	/**
+	 * Get the Resource message handler.
+	 */
+	virtual ResourceMessageHandler* getResourceMessageHandler();
+
+	/**
+	 * Set the Resource message handler.
+	 */
+	virtual void setResourceMessageHandler(ResourceMessageHandler* handler);
+
+	/**
+	 * Set the object to get notified when log messages are sent.
+	 *
+	 * Note that the MessageHandler will take ownership of
+	 * the listener and delete it upon destruction. Also, when a new
+	 * listener is set, the old listener will be deleted.
+	 *
+	 * @param listener The log message listener.
+	 */
+	virtual void setLogMessageListener(LogMessageListener* listener);
+
+	/**
 	 * Called when document in main WebView is loaded. Here we
 	 * perform initialization of Wormhole that needs to be done
 	 * when all JS has been loaded.
@@ -83,6 +124,16 @@ public:
 	 * Set the sound used by the PhoneGap beep notification.
 	 */
 	virtual void setBeepSound(MAHandle beepSound);
+
+	/**
+	 * Turn on processing of Native UI events.
+	 */
+	virtual void nativeUIEventsOn();
+
+	/**
+	 * Turn off processing of Native UI events.
+	 */
+	virtual void nativeUIEventsOff();
 
 	/**
 	 * Add a message function callback to be invoked from
@@ -107,7 +158,16 @@ public:
 	virtual void keyPressEvent(int keyCode, int nativeCode);
 
 	/**
-	 * Handle messages from JavaScript.
+	 * This method handles messages sent from the WebView.
+	 *
+	 * Note that the data object will be valid only during
+	 * the life-time of the call of this method, then it
+	 * will be deallocated.
+	 *
+	 * @param webViewHandle The NativeUI widget handle of
+	 * the WebView that sent the message.
+	 * @param data Data object that holds message content.
+	 * @param moblet The moblet object.
 	 */
 	virtual void handleWebViewMessage(
 		MAWidgetHandle webViewHandle,
@@ -146,8 +206,7 @@ public:
 		Wormhole::MessageStream& message,
 		Wormhole::HybridMoblet* moblet);
 
-public: // On purpose.
-
+protected:
 	/**
 	 * Handler for PhoneGap messages.
 	 */

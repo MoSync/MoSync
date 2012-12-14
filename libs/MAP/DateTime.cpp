@@ -384,8 +384,11 @@ namespace MAPUtil
 		tm tim;
 		split_time( mTicks, &tim );
 		tim.tm_mon += months;
-		while ( tim.tm_mon >= 12)
-			tim.tm_mon -= 12; tim.tm_year++;
+		while ( tim.tm_mon >= 12 )
+        {
+			tim.tm_mon -= 12;
+            tim.tm_year++;
+        }
 		return DateTime( mktime( &tim ) );
 	}
 

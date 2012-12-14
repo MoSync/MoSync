@@ -1,363 +1,183 @@
 <!DOCTYPE html>
-
+<!--
+* @file index.html
+* @author Mikael Kindborg
+*
+* MoSync hybrid demo application that uses the jQuery Mobile
+* user interface framework.
+-->
 <html>
-	<head>
-		<meta name="viewport" content="width=320, user-scalable=no">
-		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-		<title>Tweet Reader</title>
+<head>
+	<meta name="viewport" content="width=devicewidth; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;"/>
 
-		<!-- import JQTouch -->
-		<script src="js/jqtouch/jqtouch.min.js" type="application/x-javascript" charset="utf-8"></script>
+	<title>Twitter Reader</title>
 
-		<!-- Import JQTouch default style (iPhone look). Replace the string "themes/default" with "themes/jqt" for a neutral (black) theme -->
-		<link type="text/css" rel="stylesheet" media="screen" href="js/jqtouch/jqtouch.css">
-		<link type="text/css" rel="stylesheet" media="screen" href="js/themes/apple/theme.css">
+	<link rel="stylesheet" href="jquery.mobile/jquery.mobile-1.2.0.min.css" />
+	<script src="jquery.mobile/jquery-1.8.2.min.js"></script>
+	<script src="jquery.mobile/jquery.mobile-1.2.0.min.js"></script>
 
-		<!-- include JQuery through Google API => Always have the latest version -->
-		<script src="js/jqtouch/jquery-1.4.2.min.js" type="text/javascript" charset="utf-8"></script>
-		<script src="js/jqtouch/jqtouch.js" type="application/x-javascript" charset="utf-8"></script>
+	<script src="js/wormhole.js"></script>
+	<script src="js/mosync.file.js"></script>
 
-		<!-- Import the mosync library. -->
-		<script src="js/mosync-bridge.js"></script>
+	<script src="js/mosync.mock.js"></script>
+	<script src="js/app.js"></script>
+	<script src="js/app.ui.js"></script>
 
-		<!-- Import file extensions. -->
-		<script src="js/mosync-file.js"></script>
-
-		<!-- JavaScript goes here -->
-		<script type="text/javascript">
-			// Fire up JQTouch
-			var jQT = $.jQTouch({
-				statusBar: 'black'
-			});
-
-			jQT.settings.debug = false;
-
-			// We defince the parsed favorites as global functions because
-			// we use them in multiple places.
-			var gParsedFavorites = "";
-
-			// Make sure we get the correct event type on every touch system.
-			var clickEvent = mosync.isIOS ? 'tap' : 'click';
+	<script>
+		/**
+		 * Here we add jQuery Mobile specific code.
+		 */
+		(function()
+		{
+			/**
+			 * Show one page.
+			 */
+			app.ui.showPage = function(page)
+			{
+				$.mobile.changePage("#" + page);//, {transition: "slideleft"});
+			};
 
 			/**
-			 * Outputs the received tweets to the user-interface
+			 * Navigate back one page.
+			 */
+			app.ui.goBack = function()
+			{
+				//console.log("@@@ app.ui.goBack activePage: " + $.mobile.activePage[0].id);
+
+				if ($.mobile.activePage[0].id === "home")
+				{
+					// Send the app to the background if
+					// we are on the home screen (first page).
+					//mosync.app.sendToBackground();
+					mosync.app.exit();
+				}
+				else
+				{
+					// Otherwise navigate to previous screen.
+					history.back();
+					return false;
+				}
+			};
+
+			/**
+			 * Called by framework when document has loaded.
+			 */
+			app.ui.initializeFramework = function()
+			{
+				// No special initialization is performed.
+			};
+
+
+			/**
+			 * Diplay the list of favourite users in the UI.
+			 * @param userData Array of user names.
+			 */
+			app.ui.displayFavouriteUsers = function(userData)
+			{
+				var users = app.parseFavouriteUsers(userData);
+				var list = "";
+				for (var i = 0; i < users.length; ++i)
+				{
+					list += "<li><a onclick='app.ui.showTweetsForUser(\"" +
+						users[i] +
+						"\")'>" +
+						users[i] +
+						"</a></li>";
+				}
+				$("#favouriteList").html(list);
+				$('#favouriteList').listview('refresh');
+				//$('#twitterList').trigger('create');
+			};
+
+			/**
+			 * Displays the Twitter user name in the UI.
+			 * @param user The Twitter user name.
+			 */
+			app.ui.showTweetListUserName = function(user)
+			{
+				// We do not set this due to problems with
+				// dynamically updating/refreshing the DOM/UI
+				// of jQuery Mobile apps.
+			};
+
+			/**
+			 * Displays a loading indicator in the UI.
+			 */
+			app.ui.showLoadingIndicator = function()
+			{
+				// We do not set this due to problems with
+				// dynamically updating/refreshing the DOM/UI
+				// of jQuery Mobile apps.
+				// TODO: Use the loading support of jQuery Mobile.
+			};
+
+			/**
+			 * Outputs the list of tweets to the user-interface.
 			 * @param tweets The tweets as an array. Each element
 			 * represents one tweet and can be accessed via tweets[i].text
 			 */
-			function showTweets(tweets, username)
+			app.ui.showTweetList = function(tweets)
 			{
-				var tweetsTitle = document.getElementById("tweetsTitle");
-				tweetsTitle.innerHTML = username;
-				var results_ul = document.getElementById("results_ul");
-				// If it is the loading indicator do not parse it.
-				if (tweets == null)
+				var results = "";
+				if ((!tweets) ||
+					(tweets.length === 0) ||
+					(tweets.error === "Not found"))
 				{
-					results_ul.innerHTML = "<li>No tweets to display</li>";
-				}
-				else if (tweets == "Loading...")
-				{
-					results_ul.innerHTML = "<li>" + tweets + "</li>";
+					results = "<li>No tweets found</li>";
 				}
 				else
 				{
-					var results = "";
-					if ((tweets.length == 0) || (tweets.error == "Not found"))
+					for (var i = 0; i < tweets.length; ++i)
 					{
-						results = "<li>No tweets could be found. Please check the username.</li>";
-					}
-					else
-					{
-						for (var i=0; i<tweets.length; i++)
-						{
-							results += "<li>" + tweets[i].text + "</li>";
-						}
-					}
-					results_ul.innerHTML = results;
-				}
-			}
-
-			/**
-			 * Navigates back one page.
-			 */
-			function goBack()
-			{
-				jQT.goBack();
-			}
-
-			/**
-			 * Downloads the Tweets for an specific user.
-			 * @param username the username that should be used
-			 * for downloading.
-			 */
-			function getTweetsForUser(username)
-			{
-				showTweets("Loading...", username);
-
-				// Prepare the Twitter url, so it can be passed as a GET parameter.
-				var twitterUrl = "http://api.twitter.com/1/statuses/user_timeline.json?screen_name=" + username;
-
-				// Do the ajax call with JSON.
-				$.getJSON(twitterUrl,function(d)
-				{
-					showTweets(d, username);
-				});
-
-				jQT.goTo('#tweets');
-			}
-
-			/**
-			 * Gets the tweets for the user indicated in the input form.
-			 */
-			function getTweets()
-			{
-				// Get the username from the input field.
-				var username = document.getElementById("usernameInput").value;
-				if(username.length == 0)
-				{
-					showMessage("Invalid username")
-					jQT.goTo('#theform');
-				}
-				else
-				{
-					getTweetsForUser(username)
-				}
-			}
-
-			/**
-			 * Read the list of favourite users, then
-			 * call the supplied callback function
-			 * with two parameters, the user data
-			 * and the path to the data file.
-			 */
-			function readFavoriteUsers(callbackFun)
-			{
-				console.log("@@@ readFavoriteUsers");
-
-				// Path to file with user data.
-				var filePath;
-
-				function read(path)
-				{
-					if (null == path)
-					{
-						showMessage("Could not read user list");
-						return;
-					}
-
-					filePath = path + "SavedUsers";
-					mosync.file.read(filePath, handleResult);
-				}
-
-				function handleResult(data)
-				{
-					callbackFun(data, filePath);
-				}
-
-				// Get path to local file directory, then
-				// read favourite users from that directory.
-				mosync.file.getLocalPath(read);
-			}
-
-			/**
-			 * Read and display list of favourite users.
-			 */
-			function readAndDisplayFavoriteUsers()
-			{
-				readFavoriteUsers(displayFavoriteUsers);
-			}
-
-			/**
-			 * This function uses calls to Mosync for accessing files
-			 * and saving favorite users.
-			 */
-			function addFavoriteUser()
-			{
-				console.log("@@@ addFavoriteUser");
-
-				// Get the username from the input field
-				var userName = document.getElementById("usernameInput").value;
-
-				if (userName.length == 0)
-				{
-					showMessage("Invalid username")
-					jQT.goTo('#theform');
-					return;
-				}
-
-				var userList;
-
-				function addUser(userData, filePath)
-				{
-					userList = userData;
-					if (null == userList)
-					{
-						userList = "";
-					}
-
-					// Create a unique string, "!" is not in any
-					// Twitter user name.
-					var separatedUserName = "!" + userName + "!";
-
-					// Add user only if not in string.
-					if (-1 == userList.indexOf(separatedUserName))
-					{
-						userList += separatedUserName;
-					}
-
-					// Write user list.
-					mosync.file.write(filePath, userList, reportResult);
-				}
-
-				function reportResult(success)
-				{
-					if (success)
-					{
-						displayFavoriteUsers(userList);
-						showMessage("User successfully saved");
-					}
-					else
-					{
-						showMessage("Could not save user");
+						results += "<li>" + tweets[i].text + "</li>";
 					}
 				}
+				$("#tweetListContent").html(results);
+				$("#tweetListContent").listview("refresh");
+			};
+		})();
+	</script>
+</head>
 
-				readFavoriteUsers(addUser);
-			}
-
-			function showMessage(message)
-			{
-				// Windows Phone does not support alert, show the message
-				// in the user name field for now.
-				if (mosync.isWindowsPhone)
-				{
-					document.getElementById("usernameInput").value = message;
-				}
-				else
-				{
-					alert(message);
-				}
-			}
-
-			function displayFavoriteUsers(userData)
-			{
-				if (null == userData)
-				{
-					return;
-				}
-
-				gParsedFavoriteUsers = parseFavoriteUsers(userData);
-
-				var favorites_ul = document.getElementById("favorites");
-				var myID = "";
-				favorites_ul.innerHTML = "<li> Favorites: </li>";
-				for (var i = 0; i < gParsedFavoriteUsers.length; i++)
-				{
-
-					myID = "#submitButton" + i;
-					favorites_ul.innerHTML += "<li class='arrow'><a id='submitButton" +
-						i +
-						"')' onclick='getTweetsForUser(\"" +
-						gParsedFavoriteUsers[i] +
-						"\")'>" +
-						gParsedFavoriteUsers[i] +
-						"</a></li>";
-				}
-			}
-
-			/**
-			 * Parse a string with a list of user names.
-			 * Format of userData is "!user1!!user2!!...!!userN!"
-			 */
-			function parseFavoriteUsers(userData)
-			{
-				// Split string into elements, remove empty strings.
-				return userData.split("!").filter(
-					function(x){ return x.length > 0 });
-			}
-
-			/**
-			 * Event-listener. Gets called if the user presses a button
-			 * on his/her keyboard in the input field.
-			 * @param keynum The pressed key (as an ASCii value)
-			 */
-			function keydown(keynum)
-			{
-				if (keynum == 13)
-				{
-					$("#submitButton").trigger(clickEvent);
-				}
-			}
-
-			/**
-			 * Will be called after all the markup in <body> was loaded
-			 */
-			function initialize()
-			{
-				$("#submitButton").bind(clickEvent, function(e)
-				{
-					getTweets();
-				});
-				$("#favoriteButton").bind(clickEvent, function(e)
-				{
-					addFavoriteUser();
-				});
-				$("#backButton").bind(clickEvent, function(e)
-				{
-					goBack();
-				});
-
-				readAndDisplayFavoriteUsers();
-			}
-		</script>
-
-		<!-- CSS styles -->
-		<style type="text/css" >
-
-		</style>
-	</head>
-
-	<!-- A simple JQTouch layout consisting of two views -->
-	<body onload="initialize()">
-		<!-- "Page 1" -->
-		<div id="theform">
-			<div class="toolbar">
-				<h1>Tweet Reader</h1>
-			</div>
-			<ul class="rounded">
-				<li>
-					<input onkeydown="keydown(event.which);"
-						type="text"
-						placeholder="User name"
-						name="username"
-						id="usernameInput"
-						autocapitalize="off"
-						autocorrect="off"
-						autocomplete="off">
-				</li>
-
-				<li class="arrow">
-					<a id="submitButton" >View Tweets by this user</a></li>
-				<li><a id="favoriteButton">Add to Favorites List</a></li>
-			</ul>
-
-			<ul id="favorites" class="rounded">
-				<li>Favorites:</li>
-			</ul>
-
+<body>
+	<div id="home" data-role="page">
+		<div data-role="header">
+			<h1>TwitterReader</h1>
 		</div>
 
-		<!-- "Page 2" - Will contain the tweets found -->
-		<div id="tweets">
-			<div class="toolbar">
-				<h1 id="tweetsTitle">Tweets By ...</h1>
-				<a class="button back" href="#theform" id="backButton">Back</a>
-			</div>
+		<div data-role="content">
+			<ul data-role="listview" data-inset="true">
+				<li data-role="fieldcontain">
+					<label for="userNameField" class="ui-hidden-accessible">User name:</label>
+					<input onkeydown="app.ui.keydown(event.which)"
+						type="text"
+						id="userNameField"
+						placeholder="User name"
+						autocapitalize="off"
+						autocorrect="off"
+						autocomplete="off" />
+				</li>
+				<li><a onclick="app.ui.showTweets()">View Tweets by this user</a></li>
+				<li data-icon="false"><a onclick="app.ui.addFavouriteUser()">Add to Favourites</a></li>
+			</ul>
 
-			<ul id="results_ul" class="rounded">
+			<h2>Favourites</h2>
+			<ul id="favouriteList" data-role="listview" data-inset="true">
+				<li><a>(Empty)</a></li>
+			</ul>
+		</div>
+	</div>
+
+	<div id="tweetList" data-role="page" data-add-back-btn="true">
+		<div data-role="header">
+			<h1 id="tweetListHeader">TweetList</h1>
+		</div>
+
+		<div data-role="content">
+			<ul id="tweetListContent" data-role="listview">
 				<li>Loading...</li>
 			</ul>
 		</div>
-
 	</div>
 </body>
 </html>

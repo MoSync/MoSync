@@ -3178,7 +3178,7 @@ LocalFileSystem.prototype.resolveLocalFileSystemURI = function(uri, successCallb
 };
 
 /**
-* TODO: The following comment is misplaced (copy/paste error). The function is used
+* TODO: MOSYNC The following comment is misplaced (copy/paste error). The function is used
 * by the file system API. Update with proper comment.
 *
 * This function returns and array of contacts.  It is required as we need to convert raw
@@ -3821,7 +3821,7 @@ var Connection = function()
     var me = this;
     this.getInfo(
         function(type) {
-            console.log("getInfo result" + type);
+            console.log("PhoneGap: Connection getInfo type: " + type);
             // Need to send events if we are on or offline
             if (type == "none") {
                 // set a timer if still offline at the end of timer send the offline event

@@ -75,7 +75,7 @@ public:
 		Wormhole::MessageStream& stream,
 		FunObject* object);
 
-private:
+protected:
 	/**
 	 * Dictionary with pointers to message handler functions.
 	 * command -> fun
