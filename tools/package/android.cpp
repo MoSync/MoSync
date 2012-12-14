@@ -100,15 +100,6 @@ void packageAndroid(const SETTINGS& s, const RuntimeInfo& ri) {
 		copyFile(resMp3.c_str(), s.resource);
 	}
 
-	if (s.extensions) {
-		// Only one ext as of now!
-		string extManifestAsset = assets + "/" + s.extensions + ".xml";
-		string extManifest = mosyncdir() + "/extensions/" + s.extensions + "/Android/" + s.extensions + ".xml";
-		copyFile(extManifestAsset, extManifest);
-
-
-	}
-
 	// build AndroidManifest.xml, res/layout/main.xml, res/values/strings.xml
 	string res = dstDir + "/res";
 	string layout = res + "/layout";
@@ -126,6 +117,20 @@ void packageAndroid(const SETTINGS& s, const RuntimeInfo& ri) {
 		writeNFCResource(s, ri);
 	}
 
+	string extensionDex;
+	string extensionRes;
+
+	// Extensions.
+	if (s.extensions) {
+		// Only one ext as of now!
+		string extensionDir = mosyncdir() + string("/extensions/") + s.extensions + string("/Android/");
+		string extManifestDir =  extensionDir + "assets";
+		extensionRes = " -A " + file(extManifestDir);
+
+		string extLib = extensionDir + s.extensions + ".jar";
+		extensionDex = " " + file(extLib);
+	}
+
 	string mainXml = layout + "/main.xml";
 	writeMain(mainXml.c_str(), s, ri);
 	string stringsXml = values + "/strings.xml";
@@ -140,6 +145,7 @@ void packageAndroid(const SETTINGS& s, const RuntimeInfo& ri) {
 		" -F "<<file(resourcesAp_)<<
 		" -I \""<<mosyncdir()<<"/bin/android/android-"<<ri.androidVersion<<".jar\""<<
 		" -S "<<file(res)<<
+		extensionRes<<
 		" -0 -A "<<file(add);
 	sh(cmd.str().c_str());
 
@@ -166,11 +172,12 @@ void packageAndroid(const SETTINGS& s, const RuntimeInfo& ri) {
 
 	// run android/dx.jar
 	string classesDex = classes + "/classes.dex";
+
 	cmd.str("");
 	cmd <<"java -jar "<<getBinary("android/dx.jar")<<
 		" --dex --patch-string com/mosync/java/android"
 		" "<<packageNameToByteCodeName(s.androidPackage)<<""
-		" \"--output="<<classesDex<<"\" \""<<classes<<"\"";
+		" \"--output="<<classesDex<<"\" \""<<classes<<"\""<<extensionDex;
 	sh(cmd.str().c_str());
 
 	// run android/apkbuilder.jar
