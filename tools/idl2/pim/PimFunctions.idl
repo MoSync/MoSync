@@ -275,4 +275,4 @@ group PIMFunctions "PIM Functions"{
 	* \note If this function fails, the item is not closed.
 	*/
 	int maPimItemRemove(in MAHandle list, in MAHandle item);
-	} //end of pim functions
+} //end of pim functions

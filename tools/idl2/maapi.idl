@@ -3383,6 +3383,7 @@ interface MAAPI {
 group PIMAPI "PIM API" {
 #include "pim/PimConstants.idl"
 #include "pim/PimFunctions.idl"
+}
 #endif	//IX_PIM
 
 #if IX_WIDGET
