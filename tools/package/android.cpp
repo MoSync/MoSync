@@ -122,13 +122,25 @@ void packageAndroid(const SETTINGS& s, const RuntimeInfo& ri) {
 
 	// Extensions.
 	if (s.extensions) {
-		// Only one ext as of now!
-		string extensionDir = mosyncdir() + string("/extensions/") + s.extensions + string("/Android/");
-		string extManifestDir =  extensionDir + "assets";
-		extensionRes = " -A " + file(extManifestDir);
+		string assetDir = dstDir + "/assets";
+		_mkdir(assetDir.c_str());
 
-		string extLib = extensionDir + s.extensions + ".jar";
-		extensionDex = " " + file(extLib);
+		extensionRes.append(" -A " + file(assetDir));
+
+		vector<string> extensions;
+		split(extensions, s.extensions, ",");
+
+		for (size_t i = 0; i < extensions.size(); i++) {
+			string extension = trim(extensions[i]);
+			string extensionDir = mosyncdir() + string("/extensions/") + extension + string("/Android/");
+			string extManifestDir = extensionDir + "assets/";
+			string assetDst = assetDir + "/" + extension + ".xml";
+			string assetSrc = extManifestDir + extension + ".xml";
+			copyFile(assetDst.c_str(), assetSrc.c_str());
+
+			string extLib = extensionDir + extension + ".jar";
+			extensionDex.append(" " + file(extLib));
+		}
 	}
 
 	string mainXml = layout + "/main.xml";
