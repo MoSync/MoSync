@@ -20,6 +20,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "Core.h"
 
 #include "IOCtl.h"
+#include "EventQueue.h"
 
 #include <helpers/cpp_defs.h>
 #include <helpers/fifo.h>
@@ -67,7 +68,7 @@ namespace Base
 	bool mIsReloading = false;
 
 	static ResourceArray gResourceArray;
-	static CircularFifo<MAEvent, EVENT_BUFFER_SIZE> gEventFifo;
+	static EventQueue gEventFifo;
 
 	int gClipLeft = 0;
 	int gClipTop = 0;
