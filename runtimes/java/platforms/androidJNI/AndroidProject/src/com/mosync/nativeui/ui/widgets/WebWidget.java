@@ -24,14 +24,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
-import android.util.Log;
 import android.view.MotionEvent;
+import android.webkit.GeolocationPermissions.Callback;
 import android.webkit.JsPromptResult;
 import android.webkit.JsResult;
 import android.webkit.WebChromeClient;
 import android.webkit.WebStorage;
-import android.webkit.GeolocationPermissions.Callback;
-
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Toast;
@@ -123,9 +121,6 @@ public class WebWidget extends Widget
 
 		// Create a WebChromeClient object.
 		webView.setWebChromeClient(new WebWidget.MoSyncWebChromeClient(webWidget));
-
-		//Enable GeoLocation for webbased apps
-		webView.getSettings().setGeolocationEnabled(true);
 
 		return webWidget;
 	}
@@ -320,20 +315,22 @@ public class WebWidget extends Widget
 				}
 			}
 		}
-		else if (property.equals("androidAddJavaScriptInterfaceForActivity"))
-		{
-			// Make the string in value a global JavaScript variable
-			// that refers to the application's activity.
-			Activity activity = MoSyncThread.getInstance().getActivity();
-			webView.addJavascriptInterface(activity, value);
-		}
-		else if (property.equals("androidAddJavaScriptInterfaceForWebView"))
-		{
-			// Make the string in value a global JavaScript variable
-			// that refers to this WebView instance.
-			webView.addJavascriptInterface(webView, value);
-		}
-
+		// TODO: These undocumented properties can cause security problems.
+		// Commenting out the code for now. Delete this code if it is not
+		// going to be used.
+//		else if (property.equals("androidAddJavaScriptInterfaceForActivity"))
+//		{
+//			// Make the string in value a global JavaScript variable
+//			// that refers to the application's activity.
+//			Activity activity = MoSyncThread.getInstance().getActivity();
+//			webView.addJavascriptInterface(activity, value);
+//		}
+//		else if (property.equals("androidAddJavaScriptInterfaceForWebView"))
+//		{
+//			// Make the string in value a global JavaScript variable
+//			// that refers to this WebView instance.
+//			webView.addJavascriptInterface(webView, value);
+//		}
 		else if( property.equals( IX_WIDGET.MAW_WEB_VIEW_HORIZONTAL_SCROLL_BAR_ENABLED ) )
 		{
 			webView.setHorizontalScrollBarEnabled(BooleanConverter.convert(value));
@@ -421,7 +418,7 @@ public class WebWidget extends Widget
 			String databasePath = context.getDir("database", Context.MODE_PRIVATE).getPath();
 			this.getSettings().setDatabasePath(databasePath);
 
-			//enable support for geolocation in webview
+			// Enable support for WebView geolocation.
 			this.getSettings().setGeolocationEnabled(true);
 
 			//enable support for DOM Storage and Database
@@ -433,6 +430,16 @@ public class WebWidget extends Widget
 			//CookieManager.getInstance().setAcceptCookie(true);
 
 			this.setVerticalScrollbarOverlay(true);
+
+			// Settings for higher Android versions that may fail at
+			// application loading time are made here.
+			try
+			{
+				new WebWidgetExtraSettings().makeSettings(this);
+			}
+			catch (java.lang.Throwable e)
+			{
+			}
 		}
 
 		/**
