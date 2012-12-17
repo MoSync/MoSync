@@ -33,21 +33,22 @@ public class FunctionInvocation {
 	public int invoke(int ptr) throws Throwable {
 		Object[] convertedArgs = new Object[resolvedMethod
 				.getParameterTypes().length];
-		int[] args = new int[convertedArgs.length];
+		int[] argPtrs = new int[convertedArgs.length];
 		MoSyncThread mThread = MoSyncThread.getInstance();
-		ByteBuffer argBuffer = mThread.getMemorySlice(ptr, 4 * args.length);
+		// Get the pointers to the arguments to use.
+		ByteBuffer argBuffer = mThread.getMemorySlice(ptr, 4 * argPtrs.length);
 		IntBuffer intBuffer = argBuffer.order(null).asIntBuffer();
 		intBuffer.position(0);
-		for (int i = 0; i < args.length; i++) {
-			args[i] = intBuffer.get();
+		for (int i = 0; i < argPtrs.length; i++) {
+			argPtrs[i] = intBuffer.get();
 		}
 
-		for (int i = 0; i < args.length;) {
-			convertedArgs[i] = tds[i].convert(args, i);
-			i += tds[i].size();
+		for (int i = 0; i < argPtrs.length; i++) {
+			convertedArgs[i] = tds[i].readFromMemory(argPtrs[i]);
 		}
 
 		Object result = resolvedMethod.invoke(module.getModule(), convertedArgs);
+
 		if (result instanceof Integer) {
 			return (Integer) result;
 		}

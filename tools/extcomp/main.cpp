@@ -35,7 +35,10 @@ using namespace std;
 
 void streamFunctionCSignature(ostream&, Interface&, Function&);
 void streamFunctionWrapper(ostream&, Interface&, Function&, bool);
+string resolveTypedef(Interface&, string&);
 void streamAndroidExtMF(ostream&, Interface&, string&, string&);
+void streamAndroidStubs(string&, Interface&, string&);
+string toAndroidType(Interface&, string&, bool);
 void streamExtHashValue(ostream&, Interface&);
 void streamXMLComment(ostream&, string& comment);
 string getModHandle(Interface& ext);
@@ -85,6 +88,21 @@ int main(int argc, const char** argv) {
 		sourcefile << "static MAExtensionModule " << getModHandle(ext) << " = 0;\n";
 		sourcefile << "static MAExtensionFunction " << getFnIxHandle(ext) << "[" << ext.functions.size() << "];\n";
 
+		for (size_t i = 0; i < ext.typedefs.size(); i++) {
+			Typedef t = ext.typedefs[i];
+			headerfile << "typedef " << t.name << " " << t.type << ";\n\n";
+		}
+
+		for (size_t i = 0; i < ext.structs.size(); i++) {
+			Struct s = ext.structs[i];
+			headerfile << "typedef struct {\n";
+			for (size_t j = 0; j < s.members.size(); j++) {
+				Member m = s.members[j];
+				headerfile << "\t" << m.pod[0].type << " " << m.pod[0].name << ";\n";
+			}
+			headerfile << "} " << s.name << ";\n\n";
+		}
+
 		for (size_t i = 0; i < ext.functions.size(); i++) {
 			Function f = ext.functions[i];
 			headerfile << "#define " << getFnIxDefine(f) << " " << i << "\n";
@@ -107,6 +125,9 @@ int main(int argc, const char** argv) {
 
 		streamAndroidExtMF(androidMFfile, ext, androidPackageName, androidClassName);
 		androidMFfile.close();
+
+		string stubsDir = androidOut + "stubs/";
+		streamAndroidStubs(stubsDir, ext, androidPackageName);
 
 	} catch (exception e) {
 		printf("Failed: %s\n", e.what());
@@ -144,7 +165,7 @@ void streamFunctionCSignature(ostream& out, Interface& ext, Function& f) {
 		Argument arg = f.args[j];
 		out << cType(ext, arg.type);
 		out << " ";
-		out << arg.name;
+		out << "_" << arg.name;
 	}
 	out << ")";
 }
@@ -159,11 +180,12 @@ void streamFunctionWrapper(ostream& out, Interface& ext, Function& f, bool modHa
 	int numargs = f.args.size();
 	out << " {\n";
 	out << "    int i, result;\n";
-	out << "    int* passedArgs = malloc(sizeof(int) * " << numargs << ");\n";
+	out << "    int passedArgs[" << numargs << "];\n";
 	for (int i = 0; i < numargs; i++) {
-		out << "    passedArgs[" << i << "] = (int) " << f.args[i].name << ";\n";
-//		out << "printf(\"AA: %d\", passedArgs[" << i << "]);\n";
-//		out << "printf(\"AB: %d\", (int) passedArgs);\n";
+		string name = "_" + f.args[i].name;
+		// For simplicity we just always pass the pointer
+		string arg = ("(&" + name + ")");
+		out << "    passedArgs[" << i << "] = (int) " << arg << ";\n";
 	}
 	out << "    if (!" << getModHandle(ext) << ") {\n";
 	out << "         " << getModHandle(ext) << " = maExtensionModuleLoad(\"" << ext.name << "\", ";
@@ -174,7 +196,6 @@ void streamFunctionWrapper(ostream& out, Interface& ext, Function& f, bool modHa
 	out << "    }\n";
 	out << "    result = maExtensionFunctionInvoke2(";
 	out << getFnIxHandle(ext) << "[" << getFnIxDefine(f) << "], " << numargs << ", (int) passedArgs/*, 0dummy*/);\n";
-	out << "    free(passedArgs);\n";
 	if (strcmp("void", cType(ext, f.returnType).c_str())) {
 		out << "    return result;\n";
 	}
@@ -184,6 +205,16 @@ void streamFunctionWrapper(ostream& out, Interface& ext, Function& f, bool modHa
 
 void streamExtHashValue(ostream& out, Interface& ext) {
 	out << setfill('0') << setw(8) << hex << calculateChecksum(ext) << dec;
+}
+
+string resolveTypedef(Interface& ext, string& typedefName) {
+	for (size_t i = 0; i < ext.typedefs.size(); i++) {
+		Typedef t = ext.typedefs[i];
+		if (t.type == typedefName) {
+			return resolveTypedef(ext, t.name);
+		}
+	}
+	return typedefName;
 }
 
 void streamAndroidExtMF(ostream& out, Interface& ext, string& androidPackageName, string& androidSimpleClassName) {
@@ -203,14 +234,16 @@ void streamAndroidExtMF(ostream& out, Interface& ext, string& androidPackageName
 		Struct s = ext.structs[i];
 		streamXMLComment(out, s.comment);
 		out << "<struct type=\"" << s.type << "\" name=\"" << s.name << "\" "
-			<< "class=\"" << androidPackageName << "." << s.name << "\">\n";
+			<< "class=\"" << androidPackageName << ".types." << s.name << "\">\n";
 		for (size_t j = 0; j < s.members.size(); j++) {
 			Member member = s.members[j];
 			if (member.pod.size() == 1) {
 				string name = member.pod[0].name;
 				string type = member.pod[0].type;
+				int pointerDepth = 0;
+				string pointerType = extractPointerType(type, pointerDepth);
 				streamXMLComment(out, member.pod[0].comment);
-				out << "<member type=\"" << type << "\" name=\"" << name << "\"/>\n";
+				out << "<member type=\"" << pointerType << "\" name=\"" << name << "\" ptr=\"" << pointerDepth << "\"/>\n";
 			} else {
 				// TODO: Unsupported!!
 			}
@@ -235,6 +268,94 @@ void streamAndroidExtMF(ostream& out, Interface& ext, string& androidPackageName
 	}
 	out << "</module>";
 
+}
+
+void streamAndroidStubs(string& outputDir, Interface& ext, string& androidPackageName) {
+	// TODO: The actual interface.
+	_mkdir(outputDir.c_str());
+	string typesDir = outputDir + "types/";
+	_mkdir(typesDir.c_str());
+
+	for (size_t i = 0; i < ext.structs.size(); i++) {
+		Struct s = ext.structs[i];
+		string structFileName = typesDir + s.name + ".java";
+		ofstream structFile(structFileName.c_str());
+
+		// Package
+		structFile << "package " << androidPackageName << ".types;\n\n";
+
+		// Import(s)
+		structFile << "import com.mosync.api.*;\n\n";
+
+		// Class declaration and fields
+		structFile << "public class " << s.name << " extends Struct {\n\n";
+
+		for (size_t j = 0; j < s.members.size(); j++) {
+			Member m = s.members[j];
+			string type = m.pod[0].type;
+			string androidType = toAndroidType(ext, type, false);
+			structFile << "\tpublic " << androidType << " " << m.pod[0].name << ";\n";
+			int pointerDepth = 0;
+			string pointerType = extractPointerType(type, pointerDepth);
+			structFile << "\tprivate final static Marshaller __" << m.pod[0].name << " = _m(\"" << ext.name << "\", \"" << pointerType << "\", " << pointerDepth << ");\n\n";
+		}
+
+		// (Un)Marshalling
+		size_t size = 0;
+		structFile << "\n\tpublic Struct unmarshal(byte[] data, int offset) {\n";
+		structFile << "\t\t" << s.name << " s = new " << s.name << "();\n";
+		for (size_t j = 0; j < s.members.size(); j++) {
+			Member m = s.members[j];
+			string ctype = m.pod[0].type;
+			string name = m.pod[0].name;
+			string cast = toAndroidType(ext, ctype, true);
+			structFile << "\t\t" << name << " = (" << cast << ")__" << name << ".unmarshal(data, offset + " << size << ");\n";
+			size += cTypeSize(ext, ctype);
+		}
+		structFile << "\t\treturn s;\n";
+		structFile << "\t}\n\n";
+
+		structFile << "\tpublic int size() { return " << size << "; }\n\n";
+
+		structFile << "}\n";
+
+		structFile.close();
+	}
+}
+
+string toAndroidType(Interface& ext, string& ctype, bool autoBox) {
+	int ptrDepth = 0;
+	string extractedType = extractPointerType(ctype, ptrDepth);
+	if (ptrDepth > 0) {
+		if (extractedType == "char") {
+			ptrDepth--;
+			extractedType = "NCString";
+		}
+		string prefix = "";
+		string suffix = "";
+		for (int i = 0; i < ptrDepth; i++) {
+			prefix.append("Pointer<");
+			suffix.append(">");
+		}
+		return prefix + toAndroidType(ext, extractedType, autoBox) + suffix;
+	} else {
+		extractedType = resolveTypedef(ext, extractedType);
+		if (extractedType == "NCString") {
+			return "String";
+		}
+		if (autoBox) {
+			if (extractedType == "int") return "Integer";
+			if (extractedType == "char") return "Character";
+			if (extractedType == "double") return "Double";
+			if (extractedType == "float") return "Float";
+		} else if (extractedType == "int" || extractedType == "char" ||
+			extractedType == "double" || extractedType == "float") {
+			return extractedType;
+		}
+
+		// The rest are structs
+		return extractedType;
+	}
 }
 
 void streamXMLComment(ostream& out, string& comment) {

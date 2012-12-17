@@ -3,6 +3,7 @@ package com.mosync.internal.android.extensions;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 
+import android.annotation.SuppressLint;
 import com.mosync.internal.android.MoSyncThread;
 
 public class StringType extends TypeDescriptor {
@@ -11,9 +12,10 @@ public class StringType extends TypeDescriptor {
 		return String.class;
 	}
 
+	@SuppressLint("NewApi")
 	@Override
-	public Object convert(int[] args, int offset) {
-		int charPtr = args[offset];
+	public Object unmarshal(byte[] data, int offset) {
+		int charPtr = IntType.unmarshalInt(data, offset);
 		if (charPtr == 0) {
 			return null;
 		}
@@ -28,6 +30,10 @@ public class StringType extends TypeDescriptor {
 		strBuf.get(buf);
 
 		return new String(buf, Charset.forName("UTF-8"));
+	}
+
+	public int size() {
+		return 4;
 	}
 
 }

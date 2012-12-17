@@ -1,4 +1,4 @@
-package com.mosync.internal.android.extensions;
+package com.mosync.api;
 
 public interface Pointer<T> {
 

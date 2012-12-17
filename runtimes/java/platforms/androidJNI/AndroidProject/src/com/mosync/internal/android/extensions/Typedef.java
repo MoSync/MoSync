@@ -36,11 +36,17 @@ public class Typedef extends TypeDescriptor {
 	}
 
 	@Override
-	public Object convert(int[] args, int offset) {
+	public int size() {
+		return resolve().size();
+	}
+
+	@Override
+	public Object unmarshal(byte[] data, int offset) {
 		throw new UnsupportedOperationException("Typedefs must be resolved!");
 	}
 
 	public String toString() {
 		return "name = " + resolve().toString();
 	}
+
 }

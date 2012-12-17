@@ -12,6 +12,7 @@ public class ExtensionModule {
 	private HashMap<String, FunctionInvocation> invokersByName = new HashMap<String, FunctionInvocation>();
 	private Object module;
 	private Map<String, TypeDescriptor> typedefs = new HashMap<String, TypeDescriptor>();
+	private Map<String, StructType> structs = new HashMap<String, StructType>();
 	private int hash;
 
 	public ExtensionModule(int id, String name, String className, int hash)
@@ -59,11 +60,16 @@ public class ExtensionModule {
 		this.typedefs = typedefs;
 	}
 
+
+	public void setStructs(Map<String, StructType> structs) {
+		this.structs = structs;
+	}
+
 	public int getHash() {
 		return hash;
 	}
 
-	TypeDescriptor getTypeDescriptor(String name, int ptrDepth,
+	public TypeDescriptor getTypeDescriptor(String name, int ptrDepth,
 			boolean out) {
 		if (ptrDepth > 4) {
 			throw new IllegalArgumentException("Pointer depth > 4");
@@ -74,10 +80,20 @@ public class ExtensionModule {
 			result = new StringType();
 		} else if (ptrDepth > 0) {
 			result = new PointerType(getTypeDescriptor(name, ptrDepth - 1, out));
-		} else if ("int".equals(name) || "char".equals(name)) {
+		} else if ("int".equals(name)) {
 			result = new IntType();
+		} else if ("char".equals(name)) {
+			result = new CharType();
+		} else if ("double".equals(name)) {
+			result = new DoubleType();
+		} else if ("float".equals(name)) {
+			result = new FloatType();
 		} else {
 			result = typedefs.get(name);
+		}
+
+		if (result == null) {
+			result = structs.get(name);
 		}
 
 		if (result == null) {
@@ -85,10 +101,11 @@ public class ExtensionModule {
 		}
 
 		if (!result.isArray() && out) {
-			result = new ExplicitOutType(result);
+			result = new PointerType(result);
 		}
 
 		return result;
 	}
+
 
 }

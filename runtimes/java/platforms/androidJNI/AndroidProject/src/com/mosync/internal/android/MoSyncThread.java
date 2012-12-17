@@ -439,7 +439,7 @@ public class MoSyncThread extends Thread
 
 		mConnectivityManager = (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
 
-		mMoSyncExtensionLoader = new MoSyncExtensionLoader();
+		mMoSyncExtensionLoader = MoSyncExtensionLoader.getDefault();
 
 		nativeInitRuntime();
 	}

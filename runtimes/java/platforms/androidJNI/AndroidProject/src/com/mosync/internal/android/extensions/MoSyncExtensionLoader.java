@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserFactory;
@@ -33,14 +34,26 @@ public class MoSyncExtensionLoader {
 	public static final String TYPE_ATTR = "type";
 	public static final String POINTER_ATTR = "ptr";
 
+	private static MoSyncExtensionLoader instance = new MoSyncExtensionLoader();
+
 	private HashMap<String, ExtensionModule> modules = new HashMap<String, ExtensionModule>();
 	private HashSet<String> loadedModules = new HashSet<String>();
 	private HashMap<Integer, ExtensionModule> modulesById = new HashMap<Integer, ExtensionModule>();
 	private HashMap<Integer, FunctionInvocation> invokersById = new HashMap<Integer, FunctionInvocation>();
 	private HashMap<String, TypeDescriptor> typedefs;
+	private Map<String, StructType> structs = new HashMap<String, StructType>();
 	private int moduleId = 0;
 
+	private MoSyncExtensionLoader() {
+
+	}
+
 	public void load(String extensionName) {
+		if (loadedModules.contains(extensionName)) {
+			return;
+		}
+		loadedModules.add(extensionName);
+
 		try {
 			ArrayList<ExtensionModule> toBeInitialized = new ArrayList<ExtensionModule>();
 
@@ -62,6 +75,7 @@ public class MoSyncExtensionLoader {
 				ArrayList<TypeDescriptor> currentDescriptors = new ArrayList<TypeDescriptor>();
 				ArrayList<FunctionInvocation> currentFunctions = new ArrayList<FunctionInvocation>();
 				HashMap<String, TypeDescriptor> typedefs = new HashMap<String, TypeDescriptor>();
+				HashMap<String, StructType> structs = new HashMap<String, StructType>();
 
 				for (int eventType = xpp.getEventType(); eventType != XmlPullParser.END_DOCUMENT; eventType = xpp
 						.getEventType()) {
@@ -72,17 +86,21 @@ public class MoSyncExtensionLoader {
 						String name = xpp.getAttributeValue(null,
 								NAME_ATTR);
 						String type = xpp.getAttributeValue(null, TYPE_ATTR);
+						String ptrStr = xpp.getAttributeValue(null, POINTER_ATTR);
+						int ptr = ptrStr == null ? 0 : Integer.valueOf(ptrStr);
 						if (MODULE_TAG.equals(tagName)) {
 							String currentModuleClassName = xpp
 									.getAttributeValue(null, CLASS_ATTR);
 							String hashStr = xpp.getAttributeValue(null, HASH_ATTR);
-							int hash = Integer.parseInt(hashStr, 16);
+							int hash = (int) Long.parseLong(hashStr, 16);
 							moduleId++;
 							currentModule = new ExtensionModule(moduleId,
 									name, currentModuleClassName, hash);
 							toBeInitialized.add(currentModule);
 							modules.put(name, currentModule);
 							modulesById.put(moduleId, currentModule);
+							currentModule.setTypedefs(typedefs);
+							currentModule.setStructs(structs);
 						} else if (TYPEDEF_TAG.equals(tagName)) {
 							if (name != null && type != null) {
 								typedefs.put(name, new Typedef(currentModule, name, type));
@@ -90,16 +108,15 @@ public class MoSyncExtensionLoader {
 						} else if (STRUCT_TAG.equals(tagName)) {
 							String structClass = xpp.getAttributeValue(null, CLASS_ATTR);
 							currentStruct = new StructType(currentModule, type, structClass);
+							structs.put(name, currentStruct);
 						} else if (MEMBER_TAG.equals(tagName)) {
-							currentStruct.addMember(name, type);
+							currentStruct.addMember(name, type, ptr);
 						} else if (FUNCTION_TAG.equals(tagName)) {
 							currentFunction = xpp.getAttributeValue(null,
 									NAME_ATTR);
 						} else if (ARGUMENT_TAG.equals(tagName)) {
 							boolean out = Boolean.valueOf(xpp
 									.getAttributeValue(null, OUT_ATTR));
-							String ptrStr = xpp.getAttributeValue(null, POINTER_ATTR);
-							int ptr = ptrStr == null ? 0 : Integer.valueOf(ptrStr);
 							currentDescriptors.add(currentModule.getTypeDescriptor(type, ptr,
 									out));
 						} else {
@@ -121,7 +138,6 @@ public class MoSyncExtensionLoader {
 							functionId = 0;
 							currentModule.setInvokers(currentFunctions
 									.toArray(new FunctionInvocation[0]));
-							currentModule.setTypedefs(typedefs);
 							Log.d("@@MoSync", "Loaded extension "
 									+ currentModule.getName());
 						}
@@ -158,15 +174,18 @@ public class MoSyncExtensionLoader {
 		}
 	}
 
+	public ExtensionModule getModule(String module) {
+		load(module);
+		return modules.get(module);
+	}
+
 	public synchronized int maExtensionModuleLoad(String name, int hash) {
-		if (!loadedModules.contains(name)) {
-			loadedModules.add(name);
-			// We load them all at first call to this method.
-			load(name);
-		}
+		load(name);
+
 		ExtensionModule module = modules.get(name);
 		if (module != null) {
-			if (module.getHash() != hash) {
+			int moduleHash = module.getHash();
+			if (moduleHash != hash) {
 				MoSyncThread.getInstance().maPanic(40073, "Extension version mismatch.");
 			}
 			return module.getId();
@@ -207,5 +226,10 @@ public class MoSyncExtensionLoader {
 				"Invalid extension call (" + fnName + ")");
 		return 0;
 	}
+
+	public static MoSyncExtensionLoader getDefault() {
+		return instance;
+	}
+
 
 }
