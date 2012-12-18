@@ -327,6 +327,7 @@ MAWidgetHandle NativeScreen::createMainLayout()
 
 	mLabel = maWidgetCreate(MAW_LABEL);
 	setLabelText(mLabel, "No image selected");
+	maWidgetSetProperty(mLabel, MAW_LABEL_FONT_COLOR, "0x000000");
 	maWidgetAddChild(mainLayout, mLabel);
 
 	mButton = createButton("Select image", MAW_CONSTANT_WRAP_CONTENT, MAW_CONSTANT_WRAP_CONTENT);
