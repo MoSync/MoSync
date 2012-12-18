@@ -1,5 +1,7 @@
 package com.mosync.internal.android.extensions;
 
+import android.util.Log;
+
 public class DoubleType extends TypeDescriptor {
 
 	@Override
@@ -9,7 +11,8 @@ public class DoubleType extends TypeDescriptor {
 
 	@Override
 	public Object unmarshal(byte[] data, int offset) {
-		return Double.longBitsToDouble(LongType.unmarshalLong(data, offset));
+		double d1 = Double.longBitsToDouble(LongType.unmarshalLong(data, offset));
+		return d1;
 	}
 
 	@Override

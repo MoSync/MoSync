@@ -1,5 +1,7 @@
 package com.mosync.internal.android.extensions;
 
+import android.util.Log;
+
 public class FloatType extends TypeDescriptor {
 
 	@Override

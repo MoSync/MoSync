@@ -19,7 +19,7 @@ public class PointerType extends TypeDescriptor {
 
 	@Override
 	public Object unmarshal(byte[] data, int offset) {
-		return new PointerImpl(this, IntType.unmarshalInt(data, offset));
+		return new PointerImpl(delegate, IntType.unmarshalInt(data, offset));
 	}
 
 	@Override

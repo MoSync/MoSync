@@ -14,6 +14,9 @@ public class PointerImpl implements Pointer {
 
 	@Override
 	public Object deref() {
+		if (addr == 0) {
+			return null;
+		}
 		return at(0);
 	}
 

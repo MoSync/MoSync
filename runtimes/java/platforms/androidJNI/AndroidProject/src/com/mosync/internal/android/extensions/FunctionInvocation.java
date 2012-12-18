@@ -44,7 +44,14 @@ public class FunctionInvocation {
 		}
 
 		for (int i = 0; i < argPtrs.length; i++) {
-			convertedArgs[i] = tds[i].readFromMemory(argPtrs[i]);
+			int addr = argPtrs[i];
+			// Special case: non-pointer structs have been sent as pointers,
+			// but if it already is a pointer then we need not add an extra
+			// layer. (This comes all the way from the IDL compiler.)
+			if (tds[i] instanceof StructType) {
+				addr = IntType.readIntFromMem(addr);
+			}
+			convertedArgs[i] = tds[i].readFromMemory(addr);
 		}
 
 		Object result = resolvedMethod.invoke(module.getModule(), convertedArgs);

@@ -18,10 +18,15 @@ public class LongType extends TypeDescriptor {
 	}
 
 	public static long unmarshalLong(byte[] data, int offset) {
-		return (data[offset + 7] << 56) | (data[offset + 6] << 48)
-				| (data[offset + 5] << 40) | (data[offset + 4] << 32)
-				| (data[offset + 3] << 24) | (data[offset + 2] << 16)
-				| (data[offset + 1] << 8) | data[offset];
+		long result =((long) (data[offset + 7] & 0xff)) << 56 |
+				((long) (data[offset + 6] & 0xff)) << 48 |
+				((long) (data[offset + 5] & 0xff)) << 40 |
+				((long) (data[offset + 4] & 0xff)) << 32 |
+				((long) (data[offset + 3] & 0xff)) << 24 |
+				((long) (data[offset + 2] & 0xff)) << 16 |
+				((long) (data[offset + 1] & 0xff)) << 8 |
+				((long) (data[offset] & 0xff));
+		return result;
 	}
 
 

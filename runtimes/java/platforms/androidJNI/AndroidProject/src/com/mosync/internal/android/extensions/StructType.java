@@ -41,7 +41,8 @@ public class StructType extends TypeDescriptor {
 	}
 
 	public Object unmarshal(byte[] data, int offset) {
-		return prototype.unmarshal(data, offset);
+		Struct result = (Struct) prototype.unmarshal(data, offset);
+		return result;
 	}
 
 	public int size() {

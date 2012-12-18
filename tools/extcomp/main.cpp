@@ -355,7 +355,7 @@ void streamAndroidStubs(string& outputDir, Interface& ext, string& androidPackag
 			string ctype = m.pod[0].type;
 			string name = m.pod[0].name;
 			string cast = toAndroidType(ext, ctype, true);
-			structFile << "\t\t" << name << " = (" << cast << ")__" << name << ".unmarshal(data, offset + " << size << ");\n";
+			structFile << "\t\ts." << name << " = (" << cast << ")__" << name << ".unmarshal(data, offset + " << size << ");\n";
 			size += cTypeSize(ext, ctype);
 		}
 		structFile << "\t\treturn s;\n";

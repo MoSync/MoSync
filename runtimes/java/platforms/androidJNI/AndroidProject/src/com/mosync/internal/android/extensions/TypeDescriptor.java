@@ -36,7 +36,7 @@ public abstract class TypeDescriptor implements Marshaller {
 	 * @param len
 	 * @return
 	 */
-	protected ByteBuffer getMemorySlice(int addr, int len) {
+	protected static ByteBuffer getMemorySlice(int addr, int len) {
 		return MoSyncThread.getInstance().getMemorySlice(addr, len).order(null);
 	}
 
