@@ -745,7 +745,6 @@ Accelerometer.prototype.getCurrentAcceleration = function(successCallback, error
     var onSuccess = function(result)
     {
         var accResult = JSON.parse(result);
-        console.log("Accel x = " + accResult.x);
         self.lastAcceleration = new Acceleration(accResult.x,accResult.y,accResult.z);
         successCallback(self.lastAcceleration);
     }
@@ -799,7 +798,6 @@ Accelerometer.prototype.watchAcceleration = function(successCallback, errorCallb
 
     var onSuccess = function (result) {
         var accResult = JSON.parse(result);
-        console.log("Accel x = " + accResult.x);
         self.lastAcceleration = new Acceleration(accResult.x, accResult.y, accResult.z);
         successCallback(self.lastAcceleration);
     }
