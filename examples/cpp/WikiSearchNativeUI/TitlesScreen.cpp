@@ -155,6 +155,7 @@ void TitleScreen::fillListBox()
 	maWidgetAddChild(mMainLayout, mListView);
 
 	// Add a Select/Deselect All button.
+	MAWidgetHandle selectAllItem = maWidgetCreate(MAW_LIST_VIEW_ITEM);
 	MAWidgetHandle selectAllLayout = maWidgetCreate(MAW_HORIZONTAL_LAYOUT);
 	// Set layout's size.
 	setWidgetSize(
@@ -171,13 +172,16 @@ void TitleScreen::fillListBox()
 			DARK_GREY,
 			mFontSize );
 	mTitleLabels.add(labelSelectAll);
+
 	maWidgetAddChild(selectAllLayout, labelSelectAll);
-	maWidgetAddChild(mListView,selectAllLayout);
+	maWidgetAddChild(selectAllItem, selectAllLayout);
+	maWidgetAddChild(mListView,selectAllItem);
 
 	// Update the UI.
 	for (int i=0; i < mTitles.size(); i++)
 	{
 		// Add results in a horizontal layout.
+		MAWidgetHandle item = maWidgetCreate(MAW_LIST_VIEW_ITEM);
 		MAWidgetHandle layout = maWidgetCreate(MAW_HORIZONTAL_LAYOUT);
 		setWidgetSize(layout, mScreenWidth, MAW_CONSTANT_FILL_AVAILABLE_SPACE);
 
@@ -195,7 +199,8 @@ void TitleScreen::fillListBox()
 
 		setWidgetProperty(layout, MAW_WIDGET_BACKGROUND_COLOR, DARK_WHITE, 16);
 
-		maWidgetAddChild(mListView,layout);
+		maWidgetAddChild(item, layout);
+		maWidgetAddChild(mListView, item);
 	}
 }
 
