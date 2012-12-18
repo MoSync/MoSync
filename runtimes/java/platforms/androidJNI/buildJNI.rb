@@ -188,9 +188,10 @@ sh( "#{File.join(androidSDKTools, "/aapt")} package -f -v " +
 
 puts "Compiling Java Source Files\n\n"
 
-packages = ["src/com/mosync/java/android/*.java",
+packages = ["src/com/mosync/api/*.java",
+            "src/com/mosync/java/android/*.java",
             "src/com/mosync/internal/android/*.java",
-"src/com/mosync/internal/android/extensions/*.java",
+            "src/com/mosync/internal/android/extensions/*.java",
             "src/com/mosync/internal/generated/*.java",
             "src/com/mosync/nativeui/core/*.java",
 			"src/com/mosync/nativeui/ui/egl/*.java",

@@ -3,7 +3,6 @@ package com.mosync.internal.android.extensions;
 import java.nio.ByteBuffer;
 import java.util.HashSet;
 
-import com.mosync.api.Marshaller;
 import com.mosync.internal.android.MoSyncThread;
 
 public abstract class TypeDescriptor implements Marshaller {

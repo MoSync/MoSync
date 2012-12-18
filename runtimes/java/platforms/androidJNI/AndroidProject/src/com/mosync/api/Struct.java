@@ -1,5 +1,6 @@
 package com.mosync.api;
 
+import com.mosync.internal.android.extensions.Marshaller;
 import com.mosync.internal.android.extensions.MoSyncExtensionLoader;
 import com.mosync.internal.android.extensions.TypeDescriptor;
 
