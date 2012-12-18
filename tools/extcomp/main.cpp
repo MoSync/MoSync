@@ -38,6 +38,7 @@ void streamFunctionWrapper(ostream&, Interface&, Function&, bool);
 string resolveTypedef(Interface&, string&);
 void streamAndroidExtMF(ostream&, Interface&, string&, string&);
 void streamAndroidStubs(string&, Interface&, string&);
+void streamExtensionManifest(string&, string&);
 string toAndroidType(Interface&, string&, bool);
 void streamExtHashValue(ostream&, Interface&);
 void streamXMLComment(ostream&, string& comment);
@@ -129,12 +130,20 @@ int main(int argc, const char** argv) {
 		string stubsDir = androidOut + "stubs/";
 		streamAndroidStubs(stubsDir, ext, androidPackageName);
 
+		streamExtensionManifest(extDir, extName);
 	} catch (exception e) {
 		printf("Failed: %s\n", e.what());
 		return 1;
 	}
 
 	return 0;
+}
+
+void streamExtensionManifest(string& extDir, string& extName) {
+	string manifestOut = extDir + "/extension.mf";
+	ofstream manifest(manifestOut.c_str());
+	manifest << "name = " << extName << "\n";
+	manifest.close();
 }
 
 string getFnIxDefine(Function &f) {
