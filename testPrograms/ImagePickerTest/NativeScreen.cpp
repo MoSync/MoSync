@@ -89,7 +89,8 @@ void NativeScreen::customEvent(const MAEvent& event)
 			int resCode = maWidgetSetProperty(mPreview, MAW_IMAGE_IMAGE, buffer);
 
 			memset(buffer, 0, sizeof(buffer));
-			maReadData(event.imagePickerItemPath, buffer, 0, sizeof(buffer));
+			int pathSize =  maGetDataSize(event.imagePickerItemPath);
+			maReadData(event.imagePickerItemPath, buffer, 0, pathSize);
 
 			char *labelText = "Image path: ";
 			setLabelText(mLabel, strcat(labelText, buffer));
@@ -147,7 +148,7 @@ MAWidgetHandle NativeScreen::createLabel(
 	MAWidgetHandle label = maWidgetCreate(MAW_LABEL);
 
 	// Set the label font color.
-	setWidgetProperty(label, MAW_LABEL_FONT_COLOR, fontColor, 16);
+	setWidgetProperty(label, MAW_LABEL_FONT_COLOR, fontColor, 0x000000);
 
 	// Set the label font size.
 	setWidgetProperty(label, MAW_LABEL_FONT_SIZE, fontSize);

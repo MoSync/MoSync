@@ -124,8 +124,7 @@ public class MoSyncImagePicker {
 				if (imageBitmap != null)
 				{
 					// Get the handle of the selected item and post event.
-//					String fullPath = getFullImagePath(data);
-					String fullPath = "Ala bala portocala";
+					String fullPath = getImageFullPath(pictureUri);
 
 					// Store the full path in a data object.
 					int imageData = MoSyncThread.getInstance().createDataObject(
@@ -156,14 +155,14 @@ public class MoSyncImagePicker {
 	 * @param data
 	 * @return
 	 */
-//	String getImageFullPath(Intent data)
-//	{
-//	    Cursor cursor = mMoSyncThread.getActivity().
-//	    				getContentResolver().query(data, null, null, null, null);
-//	    cursor.moveToFirst();
-//	    int index = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA);
-//	    return cursor.getString(index);
-//	}
+	static String getImageFullPath(Uri data)
+	{
+	    Cursor cursor = mMoSyncThread.getActivity(). getContentResolver().
+					query(data, null, null, null, null);
+	    cursor.moveToFirst();
+	    int index = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA);
+	    return cursor.getString(index);
+	}
 
     /**
      * Get the handle of the selected item.
