@@ -657,7 +657,10 @@ public class MoSyncThread extends Thread
 	 */
 	public void threadPanic(int errorCode, String message)
 	{
-		//new Exception("STACKTRACE: threadPanic").printStackTrace();
+		// Print debug data to the logcat console.
+		Log.e("@@@ MoSync",
+			"threadPanic errorCode: " + errorCode + " message: " + message);
+		new Exception("STACKTRACE: threadPanic").printStackTrace();
 
 		mHasDied = true;
 

@@ -626,11 +626,11 @@ public class MoSync extends Activity
 
 			case MotionEvent.ACTION_MOVE:
 				eventType = EVENT_TYPE_POINTER_DRAGGED;
-				// While drawing, discard this event.
-				if (mMoSyncThread.mIsUpdatingScreen)
-				{
-					return true;
-				}
+//				// While drawing, discard this event.
+//				if (mMoSyncThread.mIsUpdatingScreen)
+//				{
+//					return true;
+//				}
 				break;
 			default:
 				// Return false to indicate that we have not handled the event.
