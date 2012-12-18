@@ -448,6 +448,7 @@ static int extractRecursively(VolumeEntry* vol, const char* basePath, int isRoot
 		result = maFileWrite(file, data, vol->dataLength);
 		maFileClose(file);
 		free(data);
+		maFileSetProperty(path,MA_FPROP_IS_BACKED_UP,0);
 		if (0 != result) { return -1; }
 
 		// Done extracting the file.

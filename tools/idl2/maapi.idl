@@ -1657,6 +1657,11 @@ interface MAAPI {
 				* #EVENT_TYPE_IMAGE_PICKER event, contains the new handle to the selected image.
 				*/
 				MAHandle imagePickerItem;
+
+				/**
+				* #EVENT_TYPE_IMAGE_PICKER event, contains the new handle to the selected image path.
+				*/
+				MAHandle imagePickerItemPath;
 			} imagePicker;
 
 			/**
@@ -2803,6 +2808,16 @@ interface MAAPI {
 		*/
 		int maFileListClose(in MAHandle list);
 
+		/**
+		* Sets the properties of a file
+		*
+		*/
+		int maFileSetProperty(in MAString path, in int property, in int value);
+
+		constset int MA_FPROP_ {
+			IS_BACKED_UP = 1;
+		}
+
 		constset int MA_FERR_ {
 			GENERIC = -2;
 			NOTFOUND = -3;
@@ -2812,7 +2827,9 @@ interface MAAPI {
 			WRONG_TYPE = -7;
 			/// The sorting method requested is unsupported on the current platform.
 			SORTING_UNSUPPORTED = -8;
+			NO_SUCH_PROPERTY = -9;
 		}
+
 
 		//maybe add support for "hidden" files
 

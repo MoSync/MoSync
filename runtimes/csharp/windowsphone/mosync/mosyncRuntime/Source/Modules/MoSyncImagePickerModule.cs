@@ -85,10 +85,11 @@ namespace MoSync
         private void PhotoChooserTaskCompleted(object sender, PhotoResult e)
         {
             photoTaskStarted = false;
-            Memory eventData = new Memory(12);
+            Memory eventData = new Memory(16);
             const int MAWidgetEventData_eventType = 0;
             const int MAWidgetEventData_imagePickerState = 4;
             const int MAWidgetEventData_imageHandle = 8;
+            const int MAWidgetEventData_imagePath = 12;
             eventData.WriteInt32(MAWidgetEventData_eventType, MoSync.Constants.EVENT_TYPE_IMAGE_PICKER);
 
             if (e.TaskResult == TaskResult.OK)
@@ -103,6 +104,15 @@ namespace MoSync
                 // The AddResource returns an int - the image handle that's sent with the event data
                 eventData.WriteInt32(MAWidgetEventData_imageHandle, runtimeReference.AddResource(
                     new Resource(img, MoSync.Constants.RT_IMAGE)));
+
+                String imagePath = e.OriginalFileName;
+                //constructing the image path data
+                System.IO.MemoryStream imagePathData = new System.IO.MemoryStream(imagePath.Length + 1);
+                byte[] strBytes = System.Text.UTF8Encoding.UTF8.GetBytes(imagePath);
+                imagePathData.Write(strBytes, 0, strBytes.Length);
+
+                eventData.WriteInt32(MAWidgetEventData_imagePath, runtimeReference.AddResource(
+                            new Resource(imagePathData, MoSync.Constants.RT_BINARY, true)));
             }
             else
             {

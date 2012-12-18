@@ -88,7 +88,12 @@ void NativeScreen::customEvent(const MAEvent& event)
 	        sprintf(buffer, "%d", myImage);
 			int resCode = maWidgetSetProperty(mPreview, MAW_IMAGE_IMAGE, buffer);
 
-			setLabelText(mLabel, "Preview is available");
+			memset(buffer, 0, sizeof(buffer));
+			maReadData(event.imagePickerItemPath, buffer, 0, sizeof(buffer));
+
+			char *labelText = "Image path: ";
+			setLabelText(mLabel, strcat(labelText, buffer));
+			maDestroyPlaceholder(event.imagePickerItemPath);
 		}
 		else
 		{
