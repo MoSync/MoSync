@@ -24,9 +24,11 @@ import java.util.Hashtable;
 
 import android.content.ContentResolver;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.provider.MediaStore;
 import android.util.Log;
 
 import com.mosync.internal.android.MoSyncThread.ImageCache;
@@ -122,7 +124,16 @@ public class MoSyncImagePicker {
 				if (imageBitmap != null)
 				{
 					// Get the handle of the selected item and post event.
-					postImagePickerReady(getSelectedImageHandle(imageBitmap));
+//					String fullPath = getFullImagePath(data);
+					String fullPath = "Ala bala portocala";
+
+					// Store the full path in a data object.
+					int imageData = MoSyncThread.getInstance().createDataObject(
+						0, // Zero makes the system create a new placeholder.
+						fullPath.getBytes() // Data content.
+						);
+
+					postImagePickerReady(getSelectedImageHandle(imageBitmap), imageData);
 				}
 				else
 				{
@@ -139,6 +150,20 @@ public class MoSyncImagePicker {
 			}
 		}
 	}
+
+	/**
+	 * Get the full path of a captured image.
+	 * @param data
+	 * @return
+	 */
+//	String getImageFullPath(Intent data)
+//	{
+//	    Cursor cursor = mMoSyncThread.getActivity().
+//	    				getContentResolver().query(data, null, null, null, null);
+//	    cursor.moveToFirst();
+//	    int index = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA);
+//	    return cursor.getString(index);
+//	}
 
     /**
      * Get the handle of the selected item.
@@ -168,13 +193,14 @@ public class MoSyncImagePicker {
 	 * Post event to MoSync queue.
 	 * @param imageHandle The image handle of the selected image.
 	 */
-	private static void postImagePickerReady(int imageHandle)
+	private static void postImagePickerReady(int imageHandle, int imageData)
 	{
-		int[] event = new int[3];
+		int[] event = new int[4];
 		event[0] = EVENT_TYPE_IMAGE_PICKER;
 		event[1] = PICKER_READY;
 		// If Cancel is clicked, the handle is -1.
 		event[2] = imageHandle;
+		event[3] = imageData;
 
 		mMoSyncThread.postEvent(event);
 	}

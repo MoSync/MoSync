@@ -389,6 +389,7 @@ static void nativePostEvent(JNIEnv* env, jobject jthis, jintArray eventBuffer)
 	{
 		event.imagePickerState = intArray[1];
 		event.imagePickerItem = intArray[2];
+		event.imageDataPath = intArray[3];
 	}
 	else if (event.type == EVENT_TYPE_SMS)
 	{
