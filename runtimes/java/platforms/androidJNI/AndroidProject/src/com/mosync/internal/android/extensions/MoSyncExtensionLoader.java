@@ -13,6 +13,7 @@ import java.util.Map;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserFactory;
 
+import com.mosync.api.MoSyncContext;
 import com.mosync.internal.android.MoSyncThread;
 
 import android.content.res.AssetManager;
@@ -164,7 +165,7 @@ public class MoSyncExtensionLoader {
 	private void initialize(ExtensionModule module) throws Exception {
 		try {
 			Object implementation = module.getModule();
-			Method initializer = implementation.getClass().getMethod("initialize", MoSyncThread.class);
+			Method initializer = implementation.getClass().getMethod("initialize", MoSyncContext.class);
 			initializer.invoke(implementation, MoSyncThread.getInstance());
 			Log.i("@@MoSync", "Called initializer for extension " + module.getName());
 		} catch (NoSuchMethodException e) {

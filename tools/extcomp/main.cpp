@@ -40,6 +40,7 @@ void streamAndroidExtMF(ostream&, Interface&, string&, string&);
 void streamAndroidStubs(string&, Interface&, string&);
 void streamExtensionManifest(string&, string&);
 string toAndroidType(Interface&, string&, bool);
+string getAndroidDefaultValue(string&);
 void streamExtHashValue(ostream&, Interface&);
 void streamXMLComment(ostream&, string& comment);
 string getModHandle(Interface& ext);
@@ -280,8 +281,44 @@ void streamAndroidExtMF(ostream& out, Interface& ext, string& androidPackageName
 }
 
 void streamAndroidStubs(string& outputDir, Interface& ext, string& androidPackageName) {
-	// TODO: The actual interface.
 	_mkdir(outputDir.c_str());
+
+	// The interface stub
+	string extensionFileName = outputDir + "Extension.java";
+	ofstream extensionFile(extensionFileName.c_str());
+
+	extensionFile << "import com.mosync.api.*;\n";
+	extensionFile << "import " << androidPackageName << ".types.*;\n\n";
+
+	extensionFile << "public class Extension {\n\n";
+
+	extensionFile << "\tpublic void initialize(MoSyncContext context) {\n\t}\n\n";
+
+	for (size_t i = 0; i < ext.functions.size(); i++) {
+		Function f = ext.functions[i];
+		string returnType = toAndroidType(ext, f.returnType, false);
+		extensionFile << "\tpublic " << returnType << " " << f.name << "(";
+		for (size_t j = 0; j < f.args.size(); j++) {
+			if (j > 0) {
+				extensionFile << ", ";
+			}
+			Argument arg = f.args[j];
+			extensionFile << toAndroidType(ext, arg.type, false);
+			extensionFile << " ";
+			extensionFile << arg.name;
+		}
+		extensionFile << ") {\n\t\t/* TODO: Replace this with an implementation */\n";
+		if (returnType != "void") {
+			extensionFile << "\t\treturn " << getAndroidDefaultValue(returnType) << ";\n";
+		}
+		extensionFile << "\t}\n\n";
+	}
+
+	extensionFile << "}\n";
+
+	extensionFile.close();
+
+	// The structs
 	string typesDir = outputDir + "types/";
 	_mkdir(typesDir.c_str());
 
@@ -364,6 +401,14 @@ string toAndroidType(Interface& ext, string& ctype, bool autoBox) {
 
 		// The rest are structs
 		return extractedType;
+	}
+}
+
+string getAndroidDefaultValue(string& type) {
+	if (type == "char" || type == "int" || type == "long" || type == "float" || type == "double") {
+		return "0";
+	} else {
+		return "null";
 	}
 }
 
