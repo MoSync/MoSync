@@ -20,9 +20,65 @@ MA 02110-1301, USA.
 
 #include "config_platform.h"
 #include <helpers/cpp_defs.h>
-#include <helpers/helpers.h>
 #include <helpers/CriticalSection.h>
+#include <helpers/helpers.h>
 #include <helpers/fifo.h>
+
+/**
+ * A FIFO Queue implemented using a non-resizable circular buffer.
+ * This class is copied from intlibs/helpers/fifo.h and updated
+ * with methods for accessing the buffer by index. We need this
+ * to be able to update the elements in the queue.
+ * Note that methods in this class are NOT protected by a critical
+ * section (unlike the origial CircularFifo in fifo.h).
+ */
+template<class T, int size> class NonProtectedCircularFifo {
+public:
+	NonProtectedCircularFifo() : mReadPos(0), mWritePos(0) {
+	}
+	void put(const T& t) {
+		mWritePos++;
+		if(mWritePos == size)
+			mWritePos = 0;
+		//prevent overruns; lose the data being put, but not the rest.
+		//max count becomes capacity - 1.
+		if(mWritePos == mReadPos) {
+			//mWritePos--;
+			BIG_PHAT_ERROR(ERR_FIFO_OVERRUN);
+		} else {
+			mBuf[mWritePos] = t;
+		}
+	}
+	const T& get() {
+		DEBUG_ASSERT(count() != 0);
+		mReadPos++;
+		if(mReadPos == size)
+			mReadPos = 0;
+		const T& t = mBuf[mReadPos];
+		return t;
+	}
+	size_t count() {
+		if(mWritePos >= mReadPos)
+			return mWritePos - mReadPos;
+		else	//(mWritePos < mReadPos)
+			return size - mReadPos + mWritePos;
+	}
+	void clear() {
+		mReadPos = mWritePos = 0;
+	}
+	void putAtIndex(size_t index, const T& t) {
+		mBuf[index] = t;
+	}
+	const T& getAtIndex(size_t index) {
+		return mBuf[index];
+	}
+	size_t getLastIndex() {
+		return mWritePos;
+	}
+private:
+	T mBuf[size];
+	size_t mReadPos, mWritePos;
+};
 
 /**
  * Class that holds events in the MoSync event queue.
@@ -38,8 +94,14 @@ MA 02110-1301, USA.
  * @author Mikael Kindborg
  */
 
-#define ANDROID_EVENTQUEUE_SENSORARRAYSIZE 32
-#define ANDROID_EVENTQUEUE_POINTERARRAYSIZE 32
+#define EVENTQUEUE_SENSORARRAYSIZE 32
+#define EVENTQUEUE_POINTERARRAYSIZE 32
+
+// Value used to define NULL for event array elements.
+// Note that Zero is a valid index value, therefore
+// we use the buffer size  plus one to represent a
+// NULL entry.
+#define EVENTQUEUE_NULL (EVENT_BUFFER_SIZE + 1)
 
 class EventQueue
 {
@@ -52,19 +114,20 @@ public:
 
 private:
 	// Data structure holding the actual events.
-	CircularFifo<MAEvent, EVENT_BUFFER_SIZE> mFifo;
+	NonProtectedCircularFifo<MAEvent, EVENT_BUFFER_SIZE> mFifo;
 
 	// Non-NULL if there is an EVENT_TYPE_POINTER_DRAGGED
 	// in the queue. The array is used for multi-touch
-	// pointers.
-	MAEvent* mLastPointerDraggedEvents[ANDROID_EVENTQUEUE_POINTERARRAYSIZE];
+	// pointers. Values are indexes into the event queue.
+	size_t mPointerDraggedEvents[EVENTQUEUE_POINTERARRAYSIZE];
 
 	// Non-NULL if there is an EVENT_TYPE_SENSOR
 	// in the queue. The array is used for subtypes
 	// of sensor events. Actual values used are 1..6
 	// at the time of writing this code. To have more
 	// entries than used now makes room for future subtypes.
-	MAEvent* mLastSensorEvents[ANDROID_EVENTQUEUE_SENSORARRAYSIZE];
+	// Values are indexes into the event queue.
+	size_t mSensorEvents[EVENTQUEUE_SENSORARRAYSIZE];
 
 	// Protects for concurrent calls.
 	CRITICAL_SECTION mCriticalSection;

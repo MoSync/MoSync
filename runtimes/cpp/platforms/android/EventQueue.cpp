@@ -17,12 +17,13 @@ MA 02110-1301, USA.
 
 #include "EventQueue.h"
 
-#define MIKILOG(a) __android_log_write(ANDROID_LOG_INFO, "@@@ MoSync", a);
+// Use for debugging.
+//#define MYLOG(a) __android_log_write(ANDROID_LOG_INFO, "@@@ MoSync", a);
 
 static int GetSafePointerId(int pointerId)
 {
 	if (pointerId >= 0 &&
-		pointerId < ANDROID_EVENTQUEUE_POINTERARRAYSIZE)
+		pointerId < EVENTQUEUE_POINTERARRAYSIZE)
 	{
 		return pointerId;
 	}
@@ -35,7 +36,7 @@ static int GetSafePointerId(int pointerId)
 static int GetSafeSensorId(int sensorId)
 {
 	if (sensorId >= 0 &&
-		sensorId < ANDROID_EVENTQUEUE_SENSORARRAYSIZE)
+		sensorId < EVENTQUEUE_SENSORARRAYSIZE)
 	{
 		return sensorId;
 	}
@@ -45,30 +46,18 @@ static int GetSafeSensorId(int sensorId)
 	}
 }
 
-static void PrintPointerEvent(const MAEvent& event)
-{
-	char buf[512];
-	sprintf(
-		buf,
-		"  PointerDraggedEvent: %d %d %d",
-		event.point.x,
-		event.point.y,
-		event.touchId);
-	MIKILOG(buf);
-}
-
 EventQueue::EventQueue()
 {
 	InitializeCriticalSection(&mCriticalSection);
 
-	for (int i = 0; i < ANDROID_EVENTQUEUE_POINTERARRAYSIZE; ++i)
+	for (int i = 0; i < EVENTQUEUE_POINTERARRAYSIZE; ++i)
 	{
-		mLastPointerDraggedEvents[i] = NULL;
+		mPointerDraggedEvents[i] = EVENTQUEUE_NULL;
 	}
 
-	for (int i = 0; i < ANDROID_EVENTQUEUE_SENSORARRAYSIZE; ++i)
+	for (int i = 0; i < EVENTQUEUE_SENSORARRAYSIZE; ++i)
 	{
-		mLastSensorEvents[i] = NULL;
+		mSensorEvents[i] = EVENTQUEUE_NULL;
 	}
 }
 
@@ -82,29 +71,20 @@ void EventQueue::put(MAEvent& event)
 
 		int pointerId = GetSafePointerId(event.touchId);
 
-		if (NULL != mLastPointerDraggedEvents[pointerId])
+		if (EVENTQUEUE_NULL != mPointerDraggedEvents[pointerId])
 		{
-			MIKILOG("OLD Pointer Event");
-			PrintPointerEvent(event);
-
 			// If there is already an event of this type in the queue,
 			// we update it by copying the new data to it.
-			memcpy(
-				mLastPointerDraggedEvents[pointerId],
-				&event,
-				sizeof(MAEvent));
-
-			PrintPointerEvent(*(mLastPointerDraggedEvents[pointerId]));
+			mFifo.putAtIndex(
+				mPointerDraggedEvents[pointerId],
+				event);
 		}
 		else
 		{
-			MIKILOG("NEW Pointer Event");
-			PrintPointerEvent(event);
-
 			// If there is no event of this type in the queue,
-			// we save a pointer to it and insert the event.
-			mLastPointerDraggedEvents[pointerId] = &event;
+			// we insert the element and save a pointer to it.
 			mFifo.put(event);
+			mPointerDraggedEvents[pointerId] = mFifo.getLastIndex();
 		}
 	}
 	else if (EVENT_TYPE_SENSOR == event.type)
@@ -113,27 +93,20 @@ void EventQueue::put(MAEvent& event)
 
 		int sensorId = GetSafeSensorId(event.sensor.type);
 
-		if (NULL != mLastSensorEvents[sensorId])
+		if (EVENTQUEUE_NULL != mSensorEvents[sensorId])
 		{
-			MIKILOG("OLD Sensor Event ******");
-
 			// If there is already an event of this type in the queue,
 			// we update it by copying the new data to it.
-			// Since there are many types of sensor events, we save
-			// a pointer to each subtype.
-			memcpy(
-				mLastSensorEvents[sensorId],
-				&event,
-				sizeof(MAEvent));
+			mFifo.putAtIndex(
+				mSensorEvents[sensorId],
+				event);
 		}
 		else
 		{
-			MIKILOG("NEW Sensor Event");
-
 			// If there is no event of this type in the queue,
-			// we save a pointer to it and insert the event.
-			mLastSensorEvents[sensorId] = &event;
+			// we insert the element and save a pointer to it.
 			mFifo.put(event);
+			mSensorEvents[sensorId] = mFifo.getLastIndex();
 		}
 	}
 	else
@@ -151,20 +124,17 @@ const MAEvent& EventQueue::get()
 	const MAEvent& event = mFifo.get();
 
 	// If the event is one of the types that we are handling,
-	// we reset the pointer to the last event to NULL when they
-	// are retrieved.
+	// we reset the pointer to the last event to EVENTQUEUE_NULL
+	// when they are retrieved.
 	if (EVENT_TYPE_POINTER_DRAGGED == event.type)
 	{
-		MIKILOG("REMOVE Pointer Event");
-		PrintPointerEvent(event);
-
 		int pointerId = GetSafePointerId(event.touchId);
-		mLastPointerDraggedEvents[pointerId] = NULL;
+		mPointerDraggedEvents[pointerId] = EVENTQUEUE_NULL;
 	}
 	else if (EVENT_TYPE_SENSOR == event.type)
 	{
 		int sensorId = GetSafePointerId(event.sensor.type);
-		mLastSensorEvents[sensorId] = NULL;
+		mSensorEvents[sensorId] = EVENTQUEUE_NULL;
 	}
 
 	// We always return the event, regardless of the type.
