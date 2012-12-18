@@ -1,0 +1,162 @@
+.res LOCAL_FILES_BIN
+.ubin
+.include "LocalFiles.bin"
+
+.res R_ALBANIA_1
+.image "Flags/Albania.png"
+
+.res R_ANDORRA_2
+.image "Flags/Andorra.png"
+
+.res R_ARMENIA_3
+.image "Flags/Armenia.png"
+
+.res R_AUSTRIA_4
+.image "Flags/Austria.png"
+
+.res R_AZERBAIJAN_5
+.image "Flags/Azerbaijan.png"
+
+.res R_BELARUS_6
+.image "Flags/Belarus.png"
+
+.res R_BELGIUM_7
+.image "Flags/Belgium.png"
+
+.res R_BOSMIA_AND_HERZEGOVINA_8
+.image "Flags/Bosnia_and_Herzegovina.png"
+
+.res R_BULGARIA_9
+.image "Flags/Bulgaria.png"
+
+.res R_CROATIA_10
+.image "Flags/Croatia.png"
+
+.res R_CYPRUS_11
+.image "Flags/Cyprus.png"
+
+.res R_CZECH_REPUBLIC_12
+.image "Flags/Czech_Republic.png"
+
+.res R_DENMARK_13
+.image "Flags/Denmark.png"
+
+.res R_ESTONIA_14
+.image "Flags/Estonia.png"
+
+.res R_FINLAND_15
+.image "Flags/Finland.png"
+
+.res R_FRANCE_16
+.image "Flags/France.png"
+
+.res R_GEORGIA_17
+.image "Flags/Georgia.png"
+
+.res R_GERMANY_18
+.image "Flags/Germany.png"
+
+.res R_GREECE_19
+.image "Flags/Greece.png"
+
+.res R_HUNGARY_20
+.image "Flags/Hungary.png"
+
+.res R_ICELAND_21
+.image "Flags/Iceland.png"
+
+.res R_IRELAND_22
+.image "Flags/Ireland.png"
+
+.res R_ITALY_23
+.image "Flags/Italy.png"
+
+.res R_KAZAKHSTAN_24
+.image "Flags/Kazakhstan.png"
+
+.res R_LATVIA_25
+.image "Flags/Latvia.png"
+
+.res R_LIECHTENSTEIN_26
+.image "Flags/Liechtenstein.png"
+
+.res R_LITHUANIA_27
+.image "Flags/Lithuania.png"
+
+.res R_LUXEMBOURG_28
+.image "Flags/Luxembourg.png"
+
+.res R_MACEDONIA_29
+.image "Flags/Macedonia.png"
+
+.res R_MALTA_30
+.image "Flags/Malta.png"
+
+.res R_MOLDOVA_31
+.image "Flags/Moldova.png"
+
+.res R_MONACO_32
+.image "Flags/Monaco.png"
+
+.res R_MONTENEGRO_33
+.image "Flags/Montenegro.png"
+
+.res R_NETHERLANDS_34
+.image "Flags/Netherlands.png"
+
+.res R_NORWAY_35
+.image "Flags/Norway.png"
+
+.res R_POLAND_36
+.image "Flags/Poland.png"
+
+.res R_PORTUGAL_37
+.image "Flags/Portugal.png"
+
+.res R_ROMANIA_38
+.image "Flags/Romania.png"
+
+.res R_RUSSIA_39
+.image "Flags/Russia.png"
+
+.res R_SAN_MARINO_40
+.image "Flags/San_Marino.png"
+
+.res R_SERBIA_41
+.image "Flags/Serbia.png"
+
+.res R_SLOVAKIA_42
+.image "Flags/Slovakia.png"
+
+.res R_SLOVENIA_43
+.image "Flags/Slovenia.png"
+
+.res R_SPAIN_44
+.image "Flags/Spain.png"
+
+.res R_SWEDEN_45
+.image "Flags/Sweden.png"
+
+.res R_SWITZERLAND_46
+.image "Flags/Switzerland.png"
+
+.res R_TURKEY_47
+.image "Flags/Turkey.png"
+
+.res R_UKRAINE_48
+.image "Flags/Ukraine.png"
+
+.res R_UNITED_KINGDOM_49
+.image "Flags/United_Kingdom.png"
+
+.res R_VATICAN_CITY_50
+.image "Flags/Vatican_City.png"
+
+.res R_SCREEN_BACKGROUND
+.image "Images/ScreenBackground.png"
+
+.res R_BACK_BUTTON
+.image "Images/BackButton.png"
+
+.res R_DISCLAIMER_BUTTON
+.image "Images/Disclaimer.png"
