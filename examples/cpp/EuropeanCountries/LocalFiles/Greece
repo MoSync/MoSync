@@ -1,0 +1,9 @@
+{
+	"Name" : "Greece",
+	"FlagID": 20,
+	"Population" : "10,787,690",
+	"Area" : "131,990 sq km",
+	"Languages" : "The first concrete evidence of the Greek language dates back to 15th century BC and the Linear B script which is associated with the Mycenaean Civilization. Greek was a widely spoken lingua franca in the Mediterranean world and beyond during Classical Antiquity, and would eventually become the official parlance of the Byzantine Empire. During the 19th and 20th centuries there was a major dispute known as Greek language question, on whether the official language of Greece should be the archaic Katharevousa, created in the 19th century and used as the state and scholarly language, or the Dimotiki, the form of the Greek language which evolved naturally from Byzantine Greek and was the language of the people. The dispute was finally resolved in 1976, when Dimotiki was made the only official variation of the Greek language, and Katharevousa fell to disuse.",
+	"Government" : "The politics of Greece takes place in a parliamentary representative democratic republic, whereby the Prime Minister of Greece is the head of government, and of a multi-party system. Legislative power is vested in both the government and the Hellenic Parliament. Between the restoration of democracy and the Greek government-debt crisis the party system was dominated by the liberal-conservative New Democracy and the social-democratic Panhellenic Socialist Movement.",
+	"Capital" : "Athens"
+}
