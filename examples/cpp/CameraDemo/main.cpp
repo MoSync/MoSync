@@ -292,8 +292,19 @@ public:
 	void setupCameraSize()
 	{
 		int numFormats = maCameraFormatNumber();
-		//Choose the smallest possible format.
-		mCameraFormat = numFormats-1;
+
+		// Choose the smallest possible format.
+		// Sometimes it's the first, sometimes the last
+		MA_CAMERA_FORMAT formatFirst;
+		maCameraFormat(0, &formatFirst);
+
+		MA_CAMERA_FORMAT formatLast;
+		maCameraFormat(numFormats-1, &formatLast);
+
+		if(formatFirst.height > formatLast.height)
+			mCameraFormat = numFormats-1;
+		else
+			mCameraFormat = 0;
 	}
 
 	/**
