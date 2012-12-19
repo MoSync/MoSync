@@ -1657,6 +1657,11 @@ interface MAAPI {
 				* #EVENT_TYPE_IMAGE_PICKER event, contains the new handle to the selected image.
 				*/
 				MAHandle imagePickerItem;
+
+				/**
+				* #EVENT_TYPE_IMAGE_PICKER event, contains the new handle to the selected image path.
+				*/
+				MAHandle imagePickerItemPath;
 			} imagePicker;
 
 			/**

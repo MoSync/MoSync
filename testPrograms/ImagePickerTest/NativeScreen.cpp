@@ -88,7 +88,13 @@ void NativeScreen::customEvent(const MAEvent& event)
 	        sprintf(buffer, "%d", myImage);
 			int resCode = maWidgetSetProperty(mPreview, MAW_IMAGE_IMAGE, buffer);
 
-			setLabelText(mLabel, "Preview is available");
+			memset(buffer, 0, sizeof(buffer));
+			int pathSize =  maGetDataSize(event.imagePickerItemPath);
+			maReadData(event.imagePickerItemPath, buffer, 0, pathSize);
+
+			char *labelText = "Image path: ";
+			setLabelText(mLabel, strcat(labelText, buffer));
+			maDestroyPlaceholder(event.imagePickerItemPath);
 		}
 		else
 		{
@@ -142,7 +148,7 @@ MAWidgetHandle NativeScreen::createLabel(
 	MAWidgetHandle label = maWidgetCreate(MAW_LABEL);
 
 	// Set the label font color.
-	setWidgetProperty(label, MAW_LABEL_FONT_COLOR, fontColor, 16);
+	setWidgetProperty(label, MAW_LABEL_FONT_COLOR, fontColor, 0x000000);
 
 	// Set the label font size.
 	setWidgetProperty(label, MAW_LABEL_FONT_SIZE, fontSize);
@@ -321,6 +327,7 @@ MAWidgetHandle NativeScreen::createMainLayout()
 
 	mLabel = maWidgetCreate(MAW_LABEL);
 	setLabelText(mLabel, "No image selected");
+	maWidgetSetProperty(mLabel, MAW_LABEL_FONT_COLOR, "0x000000");
 	maWidgetAddChild(mainLayout, mLabel);
 
 	mButton = createButton("Select image", MAW_CONSTANT_WRAP_CONTENT, MAW_CONSTANT_WRAP_CONTENT);
