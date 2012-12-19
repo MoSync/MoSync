@@ -54,6 +54,9 @@ namespace Wormhole
 		{
 			mSensorEventToManager[i] = false;
 		}
+
+		// Set default FileUtil object.
+		setFileUtil(new FileUtil());
 	}
 
 	/**
