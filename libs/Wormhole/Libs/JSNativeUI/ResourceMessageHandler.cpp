@@ -46,6 +46,9 @@ namespace Wormhole
 		// A new instance of ImageDownloader is created.
 		mImageDownloader = new ImageDownloader();
 		mImageDownloader->addDownloadListener(this);
+
+		// Set default FileUtil object.
+		setFileUtil(new FileUtil());
 	}
 
 	/**
