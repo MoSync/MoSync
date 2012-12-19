@@ -1654,7 +1654,10 @@ interface MAAPI {
 				int imagePickerState;
 
 				/**
-				* #EVENT_TYPE_IMAGE_PICKER event, contains the new handle to the selected image.
+				* #EVENT_TYPE_IMAGE_PICKER event, contains the new handle to the selected image if the image picker
+				* event return type was set to @link #MA_IMAGE_PICKER_ITEM_EVENT_RETURN_TYPE_IMAGE_HANDLE @endlink
+				* (default value) or the handle to the binary image data if the return type was set to
+				* @link #MA_IMAGE_PICKER_ITEM_EVENT_RETURN_TYPE_IMAGE_DATA @endlink.
 				*/
 				MAHandle imagePickerItem;
 
@@ -4160,7 +4163,7 @@ group OpenGLES "OpenGLES" {
 		/**
 		* Determines what kind of event do we need from the image picker.
 		*/
-		constset int MA_IMAGE_PICKER_EVENT_TYPE_ {
+		constset int MA_IMAGE_PICKER_EVENT_RETURN_TYPE_ {
 			// the image picker will return a handle to the bitmap image resource
 			IMAGE_HANDLE = 1;
 			// the image picker will return a handle to the jpeg encoded image resource
@@ -4174,6 +4177,16 @@ group OpenGLES "OpenGLES" {
 		* Note: when a selection is made a #EVENT_TYPE_IMAGE_PICKER event is sent.
 		*/
 		void maImagePickerOpen();
+
+		/**
+		* Displays an image picker to the user and sets the event return type.
+		* It's display depends on the platform.
+		* Note: when a selection is made a #EVENT_TYPE_IMAGE_PICKER event is sent.
+		* \param eventType One of the next constants:
+		* - #MA_IMAGE_PICKER_EVENT_RETURN_TYPE_IMAGE_HANDLE
+		* - #MA_IMAGE_PICKER_EVENT_RETURN_TYPE_IMAGE_DATA
+		*/
+		void maImagePickerOpenWithEventReturnType(in int eventReturnType);
 
 		/**
 		* Displays a special kind of dialog that has a list of possible choices.
