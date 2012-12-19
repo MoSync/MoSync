@@ -111,13 +111,31 @@ static ImagePickerController *sharedInstance = nil;
     else if ( MA_IMAGE_PICKER_EVENT_RETURN_TYPE_IMAGE_DATA == _returnDataType )
     {
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+            NSLog(@"imagePickerController START ENCODING BLOCK: %d", maGetMilliSecondCount());
+
             MAEvent event;
             event.type = EVENT_TYPE_IMAGE_PICKER;
             event.imagePickerState = 1;
 
-            NSLog(@"imagePickerController BEFORE PNG: %d", maGetMilliSecondCount());
-            NSData *imageData = UIImagePNGRepresentation(selectedImage);
-            NSLog(@"imagePickerController AFTER PNG: %d", maGetMilliSecondCount());
+            NSData *imageData = nil;
+            // Workaround for rotation bug of UIImagePNGRepresentation.
+            if (selectedImage.imageOrientation != UIImageOrientationUp)
+            {
+                UIImage *normalizedImage;
+                UIGraphicsBeginImageContextWithOptions(selectedImage.size, NO, selectedImage.scale);
+                [selectedImage drawInRect:(CGRect){0, 0, selectedImage.size}];
+                normalizedImage = UIGraphicsGetImageFromCurrentImageContext();
+                UIGraphicsEndImageContext();
+                NSLog(@"imagePickerController BEFORE ENCODING: %d", maGetMilliSecondCount());
+                imageData = UIImagePNGRepresentation(normalizedImage);
+                NSLog(@"imagePickerController AFTER ENCODING: %d", maGetMilliSecondCount());
+            }
+            else
+            {
+                NSLog(@"imagePickerController BEFORE ENCODING: %d", maGetMilliSecondCount());
+                imageData = UIImagePNGRepresentation(selectedImage);
+                NSLog(@"imagePickerController AFTER ENCODING: %d", maGetMilliSecondCount());
+            }
 
             NSUInteger lenghtOfData = [imageData length];
 
