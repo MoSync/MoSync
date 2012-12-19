@@ -66,6 +66,7 @@ void MoSync_AddCloseEvent();
 void MoSync_AddFocusLostEvent();
 void MoSync_AddFocusGainedEvent();
 void MoSync_ShowImagePicker();
+void MoSync_ShowImagePicker(int returnType);
 void* MoSync_GetCustomEventData();
 void* MoSync_GetCustomEventDataMoSyncPointer();
 void MoSync_AddLayerToView(CALayer* layer);

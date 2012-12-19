@@ -340,7 +340,14 @@ void* MoSync_GetCustomEventDataMoSyncPointer() {
 
 void MoSync_ShowImagePicker()
 {
+    [ImagePickerController getInstance].returnDataType = MA_IMAGE_PICKER_EVENT_RETURN_TYPE_IMAGE_DATA;
     [[ImagePickerController getInstance] show];
+}
+
+void MoSync_ShowImagePicker(int returnType)
+{
+    [ImagePickerController getInstance].returnDataType = returnType;
+    MoSync_ShowImagePicker();
 }
 
 void MoSync_AddLayerToView(CALayer* layer){

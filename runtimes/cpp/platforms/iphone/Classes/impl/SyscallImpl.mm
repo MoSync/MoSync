@@ -1587,6 +1587,11 @@ namespace Base {
 		MoSync_ShowImagePicker();
 	}
 
+    SYSCALL(void, maImagePickerOpenWithEventReturnType(int returnType))
+	{
+		MoSync_ShowImagePicker(returnType);
+	}
+
 	//This struct holds information about what resources are connected
 	//to a single camera. Each device camera has it's own instance
 	//(So, one for most phones, and two for iPhone 4, for example)
@@ -2363,6 +2368,7 @@ namespace Base {
         maIOCtl_case(maSensorStart);
         maIOCtl_case(maSensorStop);
 		maIOCtl_case(maImagePickerOpen);
+        maIOCtl_case(maImagePickerOpenWithEventReturnType);
 		maIOCtl_case(maSendTextSMS);
 		maIOCtl_case(maSyscallPanicsEnable);
 		maIOCtl_case(maSyscallPanicsDisable);

@@ -31,6 +31,8 @@ static ImagePickerController *sharedInstance = nil;
 
 @implementation ImagePickerController
 
+@synthesize returnDataType = _returnDataType;
+
 /**
  * Returns an instance to the shared singleton.
  * @return The shared object.
@@ -58,6 +60,8 @@ static ImagePickerController *sharedInstance = nil;
     mImagePicker = [[UIImagePickerController alloc] init];
     mImagePicker.sourceType = UIImagePickerControllerSourceTypePhotoLibrary;
     mImagePicker.delegate = self;
+
+    _returnDataType = MA_IMAGE_PICKER_EVENT_RETURN_TYPE_IMAGE_HANDLE;
 
     return [super init];
 }
@@ -89,16 +93,51 @@ static ImagePickerController *sharedInstance = nil;
  */
 - (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info
 {
+    NSLog(@"imagePickerController IN: %d", maGetMilliSecondCount());
     UIImage* selectedImage = (UIImage*) [info objectForKey:UIImagePickerControllerOriginalImage];
-    MAHandle handle = [self getImageHandle:selectedImage];
 
-    MAEvent event;
-	event.type = EVENT_TYPE_IMAGE_PICKER;
-	event.imagePickerState = 1;
-    event.imagePickerItem = handle;
-    Base::gEventQueue.put(event);
+    if ( MA_IMAGE_PICKER_EVENT_RETURN_TYPE_IMAGE_HANDLE == _returnDataType )
+    {
+        MAEvent event;
+        event.type = EVENT_TYPE_IMAGE_PICKER;
+        event.imagePickerState = 1;
+        MAHandle handle = [self getImageHandle:selectedImage];
+
+        event.type = EVENT_TYPE_IMAGE_PICKER;
+        event.imagePickerState = 1;
+        event.imagePickerItem = handle;
+        Base::gEventQueue.put(event);
+    }
+    else if ( MA_IMAGE_PICKER_EVENT_RETURN_TYPE_IMAGE_DATA == _returnDataType )
+    {
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+            MAEvent event;
+            event.type = EVENT_TYPE_IMAGE_PICKER;
+            event.imagePickerState = 1;
+
+            NSLog(@"imagePickerController BEFORE PNG: %d", maGetMilliSecondCount());
+            NSData *imageData = UIImagePNGRepresentation(selectedImage);
+            NSLog(@"imagePickerController AFTER PNG: %d", maGetMilliSecondCount());
+
+            NSUInteger lenghtOfData = [imageData length];
+
+            //We create a placeholder resource that holds the url string
+            MAHandle imgDataHandle = (MAHandle) Base::gSyscall->resources.create_RT_PLACEHOLDER();
+
+            Base::MemStream* ms = new Base::MemStream(lenghtOfData);
+            Base::gSyscall->resources.add_RT_BINARY(imgDataHandle, ms);
+
+            ms->seek(Base::Seek::Start, 0);
+
+            ms->write(imageData.bytes, lenghtOfData);
+            event.imagePickerEncodingType = MA_IMAGE_PICKER_ITEM_ENCODING_PNG;
+            event.imagePickerItem = imgDataHandle;
+            Base::gEventQueue.put(event);
+        });
+    }
 
     [self hide];
+    NSLog(@"imagePickerController OUT: %d", maGetMilliSecondCount());
 }
 
 /**
