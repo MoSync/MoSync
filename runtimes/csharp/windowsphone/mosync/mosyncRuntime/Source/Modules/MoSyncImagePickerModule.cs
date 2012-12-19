@@ -94,6 +94,9 @@ namespace MoSync
             };
         }
 
+        /**
+         * Opens the PhotoChooserTask and sets its completed event handler.
+         */
         private int OpenImagePicker()
         {
             mTask = new PhotoChooserTask();
