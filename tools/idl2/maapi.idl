@@ -1657,6 +1657,12 @@ interface MAAPI {
 				* #EVENT_TYPE_IMAGE_PICKER event, contains the new handle to the selected image.
 				*/
 				MAHandle imagePickerItem;
+
+				/**
+				* The encoding used for the image. One of the values
+				* @link #MA_IMAGE_PICKER_ITEM_ENCODING_PNG MA_IMAGE_PICKER_ITEM_ENCODING_* @endlink
+				*/
+				MAHandle imagePickerEncodingType;
 			} imagePicker;
 
 			/**
@@ -4141,6 +4147,26 @@ group OpenGLES "OpenGLES" {
 		* \param button3 The text on the third button. On Android it indicates that a negative selection.
 		*/
 		void maAlert(in MAString title, in MAString message, in MAString button1, in MAString button2, in MAString button3);
+
+		/**
+		* Together with the image picker event (\link EVENT_TYPE_IMAGE_PICKER IMAGE_PICKER \endlink),
+		* this specifies the type of encoding used for the image data returned.
+		*/
+		constset int MA_IMAGE_PICKER_ITEM_ENCODING_ {
+			PNG = 1;
+			JPEG = 2;
+		}
+
+		/**
+		* Determines what kind of event do we need from the image picker.
+		*/
+		constset int MA_IMAGE_PICKER_EVENT_TYPE_ {
+			// the image picker will return a handle to the bitmap image resource
+			IMAGE_HANDLE = 1;
+			// the image picker will return a handle to the jpeg encoded image resource
+			// in binary format
+			IMAGE_DATA = 2;
+		}
 
 		/**
 		* Displays an image picker to the user.

@@ -48,6 +48,9 @@ namespace MoSync
         bool photoTaskStarted = false;
         MoSync.Runtime runtimeReference;
 
+        // by default, the image picker will return a handle to the image
+        int eventType = MoSync.Constants.MA_IMAGE_PICKER_EVENT_TYPE_IMAGE_DATA;
+
         public void Init(Ioctls ioctls, Core core, Runtime runtime)
         {
             /**
@@ -85,10 +88,11 @@ namespace MoSync
         private void PhotoChooserTaskCompleted(object sender, PhotoResult e)
         {
             photoTaskStarted = false;
-            Memory eventData = new Memory(12);
+            Memory eventData = new Memory(16);
             const int MAWidgetEventData_eventType = 0;
             const int MAWidgetEventData_imagePickerState = 4;
             const int MAWidgetEventData_imageHandle = 8;
+            const int MAWidgetEventData_imageEncoding = 12;
             eventData.WriteInt32(MAWidgetEventData_eventType, MoSync.Constants.EVENT_TYPE_IMAGE_PICKER);
 
             if (e.TaskResult == TaskResult.OK)
@@ -99,10 +103,26 @@ namespace MoSync
                 // get a bitmap of the image selected by the user using the Image Picker
                 BitmapImage img = new BitmapImage();
                 img.SetSource(e.ChosenPhoto);
+                switch (eventType)
+                {
+                    case MoSync.Constants.MA_IMAGE_PICKER_EVENT_TYPE_IMAGE_DATA:
+                        // We create a memory stream that will contain the bitmap image
+                        // with jpeg encoding
+                        MemoryStream memoryStream = new MemoryStream();
+                        WriteableBitmap writableBitmap = new WriteableBitmap(img);
+                        writableBitmap.SaveJpeg(memoryStream, img.PixelWidth, img.PixelHeight, 0, 100);
 
-                // The AddResource returns an int - the image handle that's sent with the event data
-                eventData.WriteInt32(MAWidgetEventData_imageHandle, runtimeReference.AddResource(
-                    new Resource(img, MoSync.Constants.RT_IMAGE)));
+                        eventData.WriteInt32(MAWidgetEventData_imageHandle, runtimeReference.AddResource(
+                            new Resource(memoryStream, MoSync.Constants.RT_BINARY, true)));
+                        break;
+                    default:
+                        // The AddResource returns an int - the image handle that's sent with the event data
+                        eventData.WriteInt32(MAWidgetEventData_imageHandle, runtimeReference.AddResource(
+                            new Resource(img, MoSync.Constants.RT_IMAGE)));
+                        break;
+                }
+
+                eventData.WriteInt32(MAWidgetEventData_imageEncoding, MoSync.Constants.MA_IMAGE_PICKER_ITEM_ENCODING_JPEG);
             }
             else
             {
