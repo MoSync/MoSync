@@ -21,6 +21,7 @@
 #include <string.h>
 #include <iomanip>
 #include <vector>
+#include <map>
 
 #include <idl-common/idl-common.h>
 #include <idl-common/tokenizer.h>
@@ -34,16 +35,20 @@
 #include "extcomp.h"
 #include "androidext.h"
 
+void parseArgs(int argc, const char** argv, map<string, string>& argmap);
+string requiredArg(string arg, map<string, string>& args);
 
 using namespace std;
 
 int main(int argc, const char** argv) {
 	try {
-		// TODO: Better args handling!
-		string extDir = argv[1];
-		string extName = argv[2];
-		string androidPackageName = argv[3];
-		string androidClassName = argv[4];
+		map<string, string> args;
+		parseArgs(argc, argv, args);
+
+		string extDir = requiredArg("project", args);
+		string extName = requiredArg("extension", args);
+		string androidPackageName = args["android-package-name"];
+		string androidClassName = args["android-class-name"];
 
 		// This one is empty for extensions.
 		vector<string> ixs;
@@ -77,6 +82,16 @@ int main(int argc, const char** argv) {
 		sourcefile << "#include \"" << extName << ".h\"\n";
 		sourcefile << "static MAExtensionModule " << getModHandle(ext) << " = 0;\n";
 		sourcefile << "static MAExtensionFunction " << getFnIxHandle(ext) << "[" << ext.functions.size() << "];\n";
+
+		for (size_t i = 0; i < ext.constSets.size(); i++) {
+			ConstSet cs = ext.constSets[i];
+			string name = cs.name;
+			for (size_t j = 0; j < cs.constants.size(); j++) {
+				Constant c = cs.constants[j];
+				headerfile << "#define " << name << c.name << " " "/*" << c.type << "*/ " << c.value << "\n";
+			}
+			headerfile << "\n";
+		}
 
 		for (size_t i = 0; i < ext.typedefs.size(); i++) {
 			Typedef t = ext.typedefs[i];
@@ -126,6 +141,25 @@ int main(int argc, const char** argv) {
 	}
 
 	return 0;
+}
+
+string requiredArg(string arg, map<string, string>& args) {
+	string result = args[arg];
+	if (result.empty()) {
+		printf("Missing required arg: %s", arg.c_str());
+		exit(1);
+	}
+	return result;
+}
+
+void parseArgs(int argc, const char** argv, map<string, string>& argmap) {
+	for (int i = 1; i < argc; i += 2) {
+		string argname = argv[i];
+		string argvalue = i < argc - 1 ? argv[i + 1] : "";
+		if (argname[0] == '-' && argname[1] == '-') {
+			argmap[argname.substr(2)] = argvalue;
+		}
+	}
 }
 
 void streamExtensionManifest(string& extDir, string& extName) {
