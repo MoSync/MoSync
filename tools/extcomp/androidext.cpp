@@ -94,6 +94,16 @@ void streamAndroidStubs(string& outputDir, Interface& ext, string& androidPackag
 
 	extensionFile << "public class Extension {\n\n";
 
+	for (size_t i = 0; i < ext.constSets.size(); i++) {
+		ConstSet cs = ext.constSets[i];
+		string name = cs.name;
+		for (size_t j = 0; j < cs.constants.size(); j++) {
+			Constant c = cs.constants[j];
+			extensionFile << "\tpublic final static " << toAndroidType(ext, c.type, false) << " " << name << c.name << " = " << c.value << ";\n";
+		}
+		extensionFile << "\n";
+	}
+
 	extensionFile << "\tpublic void initialize(MoSyncContext context) {\n\t}\n\n";
 
 	for (size_t i = 0; i < ext.functions.size(); i++) {
@@ -188,7 +198,7 @@ string toAndroidType(Interface& ext, string& ctype, bool autoBox) {
 		return prefix + toAndroidType(ext, extractedType, autoBox) + suffix;
 	} else {
 		extractedType = resolveTypedef(ext, extractedType);
-		if (extractedType == "NCString") {
+		if (extractedType == "NCString" || extractedType == "MAString") {
 			return "String";
 		}
 		if (autoBox) {
