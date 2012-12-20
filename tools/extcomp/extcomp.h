@@ -18,10 +18,18 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #ifndef EXTCOMP_H_
 #define EXTCOMP_H_
 
+#include <fstream>
+#include <iostream>
+#include <stdlib.h>
+#include <string.h>
+#include <iomanip>
+#include <vector>
+#include <map>
+
 void streamFunctionCSignature(ostream&, Interface&, Function&);
 void streamFunctionWrapper(ostream&, Interface&, Function&, bool);
 string resolveTypedef(Interface&, string&);
-void streamExtensionManifest(string&, string&);
+void streamExtensionManifest(map<string,string>&);
 void streamExtHashValue(ostream&, Interface&);
 void streamXMLComment(ostream&, string& comment);
 string getModHandle(Interface& ext);

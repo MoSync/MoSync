@@ -134,7 +134,7 @@ int main(int argc, const char** argv) {
 		string stubsDir = androidOut + "stubs/";
 		streamAndroidStubs(stubsDir, ext, androidPackageName);
 
-		streamExtensionManifest(extDir, extName);
+		streamExtensionManifest(args);
 	} catch (exception e) {
 		printf("Failed: %s\n", e.what());
 		return 1;
@@ -162,10 +162,17 @@ void parseArgs(int argc, const char** argv, map<string, string>& argmap) {
 	}
 }
 
-void streamExtensionManifest(string& extDir, string& extName) {
+void streamExtensionManifest(map<string, string>& args) {
+	string extDir = args["project"];
 	string manifestOut = extDir + "/extension.mf";
 	ofstream manifest(manifestOut.c_str());
-	manifest << "name = " << extName << "\n";
+	manifest << "name = " << args["extension"] << "\n";
+	string version = args["version"];
+	manifest << "version = " << (version.empty() ? "1.0.0" : version) << "\n";
+	string vendor = args["vendor"];
+	if (!vendor.empty()) {
+		manifest << "vendor = " << vendor << "\n";
+	}
 	manifest.close();
 }
 
