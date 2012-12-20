@@ -103,8 +103,6 @@ static ImagePickerController *sharedInstance = nil;
         event.imagePickerState = 1;
         MAHandle handle = [self getImageHandle:selectedImage];
 
-        event.type = EVENT_TYPE_IMAGE_PICKER;
-        event.imagePickerState = 1;
         event.imagePickerItem = handle;
         Base::gEventQueue.put(event);
     }
@@ -128,16 +126,19 @@ static ImagePickerController *sharedInstance = nil;
                 UIGraphicsEndImageContext();
                 NSLog(@"imagePickerController BEFORE ENCODING: %d", maGetMilliSecondCount());
                 imageData = UIImagePNGRepresentation(normalizedImage);
+                //imageData = UIImageJPEGRepresentation(normalizedImage, 1.0);
                 NSLog(@"imagePickerController AFTER ENCODING: %d", maGetMilliSecondCount());
             }
             else
             {
                 NSLog(@"imagePickerController BEFORE ENCODING: %d", maGetMilliSecondCount());
                 imageData = UIImagePNGRepresentation(selectedImage);
+                //imageData = UIImageJPEGRepresentation(selectedImage, 1.0);
                 NSLog(@"imagePickerController AFTER ENCODING: %d", maGetMilliSecondCount());
             }
 
             NSUInteger lenghtOfData = [imageData length];
+            NSLog(@"lenght: %d", lenghtOfData);
 
             //We create a placeholder resource that holds the url string
             MAHandle imgDataHandle = (MAHandle) Base::gSyscall->resources.create_RT_PLACEHOLDER();
