@@ -20,6 +20,8 @@
 // Include the main screen.
 #include "NativeScreen.h"
 
+#define BUF_SIZE 256
+
 namespace Test
 {
 
@@ -84,9 +86,24 @@ void NativeScreen::customEvent(const MAEvent& event)
 			// ready, get handle
 			MAHandle myImage = event.imagePickerItem;
 
-	        char buffer[256];
-	        sprintf(buffer, "%d", myImage);
-			int resCode = maWidgetSetProperty(mPreview, MAW_IMAGE_IMAGE, buffer);
+			char checkboxBuffer[BUF_SIZE];
+			maWidgetGetProperty(mEventReturnTypeCheckbox, MAW_CHECK_BOX_CHECKED, checkboxBuffer, BUF_SIZE);
+			if (strcmp(checkboxBuffer, "True") == 0)
+			{
+				MAHandle hImage = maCreatePlaceholder();
+				int dataSize = maGetDataSize(event.imagePickerItem);
+				maCreateImageFromData(hImage, event.imagePickerItem, 0, dataSize);
+
+				char imgHandle[256];
+				sprintf(imgHandle, "%d", hImage);
+				int resCode = maWidgetSetProperty(mPreview, MAW_IMAGE_IMAGE, imgHandle);
+			}
+			else
+			{
+				char buffer[256];
+				sprintf(buffer, "%d", myImage);
+				int resCode = maWidgetSetProperty(mPreview, MAW_IMAGE_IMAGE, buffer);
+			}
 
 			setLabelText(mLabel, "Preview is available");
 		}
@@ -118,7 +135,16 @@ void NativeScreen::widgetClicked(MAHandle widgetHandle)
 	}
 	else if ( mButton == widgetHandle)
 	{
-		maImagePickerOpen();
+		char checkboxBuffer[BUF_SIZE];
+		maWidgetGetProperty(mEventReturnTypeCheckbox, MAW_CHECK_BOX_CHECKED, checkboxBuffer, BUF_SIZE);
+		if (strcmp(checkboxBuffer, "True") == 0)
+		{
+			maImagePickerOpenWithEventReturnType(MA_IMAGE_PICKER_EVENT_RETURN_TYPE_IMAGE_DATA);
+		}
+		else
+		{
+			maImagePickerOpen();
+		}
 	}
 
 }
@@ -325,6 +351,22 @@ MAWidgetHandle NativeScreen::createMainLayout()
 
 	mButton = createButton("Select image", MAW_CONSTANT_WRAP_CONTENT, MAW_CONSTANT_WRAP_CONTENT);
 	maWidgetAddChild(mainLayout, mButton);
+
+	// we need to create the event return type setting ui
+	mEventReturnTypeHorizontalLayout = maWidgetCreate(MAW_HORIZONTAL_LAYOUT);
+	char buffer[BUF_SIZE];
+	sprintf(buffer, "%d", MAW_CONSTANT_FILL_AVAILABLE_SPACE);
+	maWidgetSetProperty(mEventReturnTypeHorizontalLayout, MAW_WIDGET_WIDTH, buffer);
+
+	mEventReturnTypeCheckbox = maWidgetCreate(MAW_CHECK_BOX);
+	maWidgetSetProperty(mEventReturnTypeCheckbox, MAW_CHECK_BOX_CHECKED, "false");
+
+	mEventReturnTypeLabel = maWidgetCreate(MAW_LABEL);
+	maWidgetSetProperty(mEventReturnTypeLabel, MAW_LABEL_TEXT, "Return image data with the event");
+
+	maWidgetAddChild(mEventReturnTypeHorizontalLayout, mEventReturnTypeCheckbox);
+	maWidgetAddChild(mEventReturnTypeHorizontalLayout, mEventReturnTypeLabel);
+	maWidgetAddChild(mainLayout, mEventReturnTypeHorizontalLayout);
 
 	mPreview = maWidgetCreate(MAW_IMAGE);
 	maWidgetSetProperty(mPreview, MAW_WIDGET_WIDTH, "-1");
