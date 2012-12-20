@@ -93,70 +93,27 @@ static ImagePickerController *sharedInstance = nil;
  */
 - (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info
 {
-    NSLog(@"imagePickerController IN: %d", maGetMilliSecondCount());
     UIImage* selectedImage = (UIImage*) [info objectForKey:UIImagePickerControllerOriginalImage];
+
+    MAEvent event;
+    event.type = EVENT_TYPE_IMAGE_PICKER;
+    event.imagePickerState = 1;
 
     if ( MA_IMAGE_PICKER_EVENT_RETURN_TYPE_IMAGE_HANDLE == _returnDataType )
     {
-        MAEvent event;
-        event.type = EVENT_TYPE_IMAGE_PICKER;
-        event.imagePickerState = 1;
         MAHandle handle = [self getImageHandle:selectedImage];
-
         event.imagePickerItem = handle;
-        Base::gEventQueue.put(event);
     }
     else if ( MA_IMAGE_PICKER_EVENT_RETURN_TYPE_IMAGE_DATA == _returnDataType )
     {
-        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-            NSLog(@"imagePickerController START ENCODING BLOCK: %d", maGetMilliSecondCount());
-
-            MAEvent event;
-            event.type = EVENT_TYPE_IMAGE_PICKER;
-            event.imagePickerState = 1;
-
-            NSData *imageData = nil;
-            // Workaround for rotation bug of UIImagePNGRepresentation.
-            if (selectedImage.imageOrientation != UIImageOrientationUp)
-            {
-                UIImage *normalizedImage;
-                UIGraphicsBeginImageContextWithOptions(selectedImage.size, NO, selectedImage.scale);
-                [selectedImage drawInRect:(CGRect){0, 0, selectedImage.size}];
-                normalizedImage = UIGraphicsGetImageFromCurrentImageContext();
-                UIGraphicsEndImageContext();
-                NSLog(@"imagePickerController BEFORE ENCODING: %d", maGetMilliSecondCount());
-                imageData = UIImagePNGRepresentation(normalizedImage);
-                //imageData = UIImageJPEGRepresentation(normalizedImage, 1.0);
-                NSLog(@"imagePickerController AFTER ENCODING: %d", maGetMilliSecondCount());
-            }
-            else
-            {
-                NSLog(@"imagePickerController BEFORE ENCODING: %d", maGetMilliSecondCount());
-                imageData = UIImagePNGRepresentation(selectedImage);
-                //imageData = UIImageJPEGRepresentation(selectedImage, 1.0);
-                NSLog(@"imagePickerController AFTER ENCODING: %d", maGetMilliSecondCount());
-            }
-
-            NSUInteger lenghtOfData = [imageData length];
-            NSLog(@"lenght: %d", lenghtOfData);
-
-            //We create a placeholder resource that holds the url string
-            MAHandle imgDataHandle = (MAHandle) Base::gSyscall->resources.create_RT_PLACEHOLDER();
-
-            Base::MemStream* ms = new Base::MemStream(lenghtOfData);
-            Base::gSyscall->resources.add_RT_BINARY(imgDataHandle, ms);
-
-            ms->seek(Base::Seek::Start, 0);
-
-            ms->write(imageData.bytes, lenghtOfData);
-            event.imagePickerEncodingType = MA_IMAGE_PICKER_ITEM_ENCODING_PNG;
-            event.imagePickerItem = imgDataHandle;
-            Base::gEventQueue.put(event);
-        });
+        MAHandle handle = [self getImageDataHandle:selectedImage];
+        event.imagePickerEncodingType = MA_IMAGE_PICKER_ITEM_ENCODING_JPEG;
+        event.imagePickerItem = handle;
     }
 
+    Base::gEventQueue.put(event);
+
     [self hide];
-    NSLog(@"imagePickerController OUT: %d", maGetMilliSecondCount());
 }
 
 /**
@@ -202,6 +159,24 @@ static ImagePickerController *sharedInstance = nil;
     maDestroyObject(dataPlaceholder);
 
     return imageHandle;
+}
+
+/**
+ * Gets an image data handle for a given image.
+ * @param image The given image.
+ * @return A image data handle or RES_OUT_OF_MEMORY in case of error.
+ */
+- (MAHandle)getImageDataHandle:(UIImage*)image
+{
+    NSData* data = UIImageJPEGRepresentation(image, 0);
+    int size = [data length];
+
+    MAHandle dataPlaceholder = maCreatePlaceholder();
+    TEST_RESULT(maCreateData(dataPlaceholder, size));
+    const void* src = [data bytes];
+    maWriteData(dataPlaceholder,src,0,size);
+
+    return dataPlaceholder;
 }
 
 @end
