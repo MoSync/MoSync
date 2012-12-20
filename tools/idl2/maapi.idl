@@ -1658,6 +1658,9 @@ interface MAAPI {
 				* event return type was set to @link #MA_IMAGE_PICKER_ITEM_EVENT_RETURN_TYPE_IMAGE_HANDLE @endlink
 				* (default value) or the handle to the binary image data if the return type was set to
 				* @link #MA_IMAGE_PICKER_ITEM_EVENT_RETURN_TYPE_IMAGE_DATA @endlink.
+				* Note: Android VM has some limitations when it comes to creating high resolution images. Therefore, if
+				* the user needs to handle the image itself locally and maCreateImageFromData(dataHandle) returns a
+				* RES_OUT_OF_MEMORY, use #MA_IMAGE_PICKER_ITEM_EVENT_RETURN_TYPE_IMAGE_HANDLE instead.
 				*/
 				MAHandle imagePickerItem;
 
@@ -1665,7 +1668,7 @@ interface MAAPI {
 				* The encoding used for the image. One of the values
 				* @link #MA_IMAGE_PICKER_ITEM_ENCODING_PNG MA_IMAGE_PICKER_ITEM_ENCODING_* @endlink
 				*/
-				MAHandle imagePickerEncodingType;
+				int imagePickerEncodingType;
 			} imagePicker;
 
 			/**

@@ -1964,6 +1964,13 @@ namespace Base
 				mJNIEnv,
 				mJThis);
 
+		case maIOCtl_maImagePickerOpenWithEventReturnType:
+			SYSLOG("maIOCtl_maImagePickerOpenWithEventReturnType");
+			return _maImagePickerOpenWithEventReturnType(
+				a,
+				mJNIEnv,
+				mJThis);
+
 		case maIOCtl_maOptionsBox:
 			{
 			SYSLOG("maIOCtl_maOptionsBox");
