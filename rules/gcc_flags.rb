@@ -102,18 +102,18 @@ elsif(HOST == :linux)
 	@HOST_FLAGS = " -DLINUX -fPIC"
 	if(HOST_PLATFORM == :darwin)
 		sdkNumber = (File.exist?("/Developer/SDKs/MacOSX10.5.sdk")) ? "5":"6"
-		sdkAdress = "/Developer/SDKs/MacOSX10.#{sdkNumber}.sdk"
-		@HOST_FLAGS += " -isysroot #{sdkAdress} -mmacosx-version-min=10.5 -m32 -DDARWIN"
+    sdkAdress = "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.7.sdk"
+    @HOST_FLAGS = " -isysroot #{sdkAdress} -mmacosx-version-min=10.5 -DDARWIN"
 	end
 	@HOST_CPPFLAGS = ""
 elsif(HOST == :darwin)
 	sdkAdress = "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.7.sdk"
 	if(!File.exist?(sdkAdress))
 		sdkNumber = (File.exist?("/Developer/SDKs/MacOSX10.5.sdk")) ? "5":"6"
-		sdkAdress = "/Developer/SDKs/MacOSX10.#{sdkNumber}.sdk"
+    sdkAdress = "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.7.sdk"
 	end
-	@HOST_FLAGS = " -isysroot #{sdkAdress} -mmacosx-version-min=10.5 -m32 -DDARWIN"
-	@HOST_CPPFLAGS = " -isysroot #{sdkAdress} -mmacosx-version-min=10.5 -m32 -fPIC"
+  @HOST_FLAGS = " -isysroot #{sdkAdress} -mmacosx-version-min=10.5 -DDARWIN"
+  @HOST_CPPFLAGS = " -isysroot #{sdkAdress} -mmacosx-version-min=10.5 -fPIC"
 else
 	error "Unsupported host: #{HOST}"
 end
