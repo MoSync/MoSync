@@ -1182,6 +1182,39 @@ namespace Base {
 		return 0;
 	}
 
+    SYSCALL(int, maFileSetProperty(const char* path, int property, int value))
+    {
+        NSURL *url = [NSURL fileURLWithPath:[NSString stringWithCString:path encoding:NSASCIIStringEncoding] isDirectory:NO];
+        if(!url || ![[NSFileManager defaultManager] fileExistsAtPath:[url path]])
+        {
+            return MA_FERR_NOTFOUND;
+        }
+
+        switch (property) {
+            case MA_FPROP_IS_BACKED_UP:
+            {
+                BOOL exclude = (value == 0);
+                BOOL set = [url setResourceValue: [NSNumber numberWithBool:exclude] forKey:NSURLIsExcludedFromBackupKey error:NULL];
+
+                if(set)
+                {
+                    return 0;
+                }
+                else
+                {
+                    return MA_FERR_GENERIC;
+                }
+            }
+            break;
+
+            default:
+            {
+                return MA_FERR_NO_SUCH_PROPERTY;
+            }
+            break;
+        }
+    }
+
 	static AVAudioPlayer* sSoundPlayer = NULL;
 
 	SYSCALL(int, maSoundPlay(MAHandle sound_res, int offset, int size))
@@ -1552,6 +1585,11 @@ namespace Base {
     SYSCALL(void, maImagePickerOpen())
 	{
 		MoSync_ShowImagePicker();
+	}
+
+    SYSCALL(void, maImagePickerOpenWithEventReturnType(int returnType))
+	{
+		MoSync_ShowImagePicker(returnType);
 	}
 
 	//This struct holds information about what resources are connected
@@ -2306,6 +2344,7 @@ namespace Base {
         maIOCtl_syscall_case(maFileListStart);
         maIOCtl_syscall_case(maFileListNext);
         maIOCtl_syscall_case(maFileListClose);
+        maIOCtl_case(maFileSetProperty);
 		maIOCtl_case(maTextBox);
 		maIOCtl_case(maGetSystemProperty);
 		maIOCtl_case(maReportResourceInformation);
@@ -2329,6 +2368,7 @@ namespace Base {
         maIOCtl_case(maSensorStart);
         maIOCtl_case(maSensorStop);
 		maIOCtl_case(maImagePickerOpen);
+        maIOCtl_case(maImagePickerOpenWithEventReturnType);
 		maIOCtl_case(maSendTextSMS);
 		maIOCtl_case(maSyscallPanicsEnable);
 		maIOCtl_case(maSyscallPanicsDisable);

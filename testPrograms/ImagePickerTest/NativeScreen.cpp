@@ -20,6 +20,8 @@
 // Include the main screen.
 #include "NativeScreen.h"
 
+#define BUF_SIZE 256
+
 namespace Test
 {
 
@@ -84,9 +86,42 @@ void NativeScreen::customEvent(const MAEvent& event)
 			// ready, get handle
 			MAHandle myImage = event.imagePickerItem;
 
-	        char buffer[256];
-	        sprintf(buffer, "%d", myImage);
-			int resCode = maWidgetSetProperty(mPreview, MAW_IMAGE_IMAGE, buffer);
+			char checkboxBuffer[BUF_SIZE];
+			maWidgetGetProperty(mEventReturnTypeCheckbox, MAW_CHECK_BOX_CHECKED, checkboxBuffer, BUF_SIZE);
+	        MAUtil::String value = MAUtil::lowerString(checkboxBuffer);
+	        if ( strcmp(value.c_str(),"true") == 0 )
+			{
+				MAHandle hImage = maCreatePlaceholder();
+				int dataSize = maGetDataSize(event.imagePickerItem);
+				int createImageRes= maCreateImageFromData(hImage, event.imagePickerItem, 0, dataSize);
+
+				// Used for testing only.
+				MAUtil::String info = "Ready.Size = " + MAUtil::integerToString(dataSize) +
+						"res = " + MAUtil::integerToString(createImageRes) +
+						", mime type = " + MAUtil::integerToString(event.imagePickerEncodingType);
+
+				if ( createImageRes != RES_OK )
+				{
+					maAlert("Memory Warning", " The image cannot be created. Try again", NULL, NULL, NULL);
+					maWidgetSetProperty(mEventReturnTypeCheckbox, MAW_CHECK_BOX_CHECKED, "false");
+					// If the Android VM gets an out of memory exception, get the image handle instead.
+					maImagePickerOpen();
+				}
+				else
+				{
+					char imgHandle[256];
+					sprintf(imgHandle, "%d", hImage);
+					int resCode = maWidgetSetProperty(mPreview, MAW_IMAGE_IMAGE, imgHandle);
+				}
+
+				maDestroyPlaceholder(hImage);
+			}
+			else
+			{
+				char buffer[256];
+				sprintf(buffer, "%d", myImage);
+				int resCode = maWidgetSetProperty(mPreview, MAW_IMAGE_IMAGE, buffer);
+			}
 
 			setLabelText(mLabel, "Preview is available");
 		}
@@ -118,7 +153,17 @@ void NativeScreen::widgetClicked(MAHandle widgetHandle)
 	}
 	else if ( mButton == widgetHandle)
 	{
-		maImagePickerOpen();
+		char checkboxBuffer[BUF_SIZE];
+		maWidgetGetProperty(mEventReturnTypeCheckbox, MAW_CHECK_BOX_CHECKED, checkboxBuffer, BUF_SIZE);
+        MAUtil::String value = MAUtil::lowerString(checkboxBuffer);
+        if ( strcmp(value.c_str(),"true") == 0 )
+		{
+			maImagePickerOpenWithEventReturnType(MA_IMAGE_PICKER_EVENT_RETURN_TYPE_IMAGE_DATA);
+		}
+		else
+		{
+			maImagePickerOpen();
+		}
 	}
 
 }
@@ -325,6 +370,22 @@ MAWidgetHandle NativeScreen::createMainLayout()
 
 	mButton = createButton("Select image", MAW_CONSTANT_WRAP_CONTENT, MAW_CONSTANT_WRAP_CONTENT);
 	maWidgetAddChild(mainLayout, mButton);
+
+	// we need to create the event return type setting ui
+	mEventReturnTypeHorizontalLayout = maWidgetCreate(MAW_HORIZONTAL_LAYOUT);
+	char buffer[BUF_SIZE];
+	sprintf(buffer, "%d", MAW_CONSTANT_FILL_AVAILABLE_SPACE);
+	maWidgetSetProperty(mEventReturnTypeHorizontalLayout, MAW_WIDGET_WIDTH, buffer);
+
+	mEventReturnTypeCheckbox = maWidgetCreate(MAW_CHECK_BOX);
+	maWidgetSetProperty(mEventReturnTypeCheckbox, MAW_CHECK_BOX_CHECKED, "false");
+
+	mEventReturnTypeLabel = maWidgetCreate(MAW_LABEL);
+	maWidgetSetProperty(mEventReturnTypeLabel, MAW_LABEL_TEXT, "Return image data with the event");
+
+	maWidgetAddChild(mEventReturnTypeHorizontalLayout, mEventReturnTypeCheckbox);
+	maWidgetAddChild(mEventReturnTypeHorizontalLayout, mEventReturnTypeLabel);
+	maWidgetAddChild(mainLayout, mEventReturnTypeHorizontalLayout);
 
 	mPreview = maWidgetCreate(MAW_IMAGE);
 	maWidgetSetProperty(mPreview, MAW_WIDGET_WIDTH, "-1");
