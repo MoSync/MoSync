@@ -88,15 +88,31 @@ void NativeScreen::customEvent(const MAEvent& event)
 
 			char checkboxBuffer[BUF_SIZE];
 			maWidgetGetProperty(mEventReturnTypeCheckbox, MAW_CHECK_BOX_CHECKED, checkboxBuffer, BUF_SIZE);
-			if (strcmp(checkboxBuffer, "True") == 0)
+	        MAUtil::String value = MAUtil::lowerString(checkboxBuffer);
+	        if ( strcmp(value.c_str(),"true") == 0 )
 			{
 				MAHandle hImage = maCreatePlaceholder();
 				int dataSize = maGetDataSize(event.imagePickerItem);
-				maCreateImageFromData(hImage, event.imagePickerItem, 0, dataSize);
+				int createImageRes= maCreateImageFromData(hImage, event.imagePickerItem, 0, dataSize);
 
-				char imgHandle[256];
-				sprintf(imgHandle, "%d", hImage);
-				int resCode = maWidgetSetProperty(mPreview, MAW_IMAGE_IMAGE, imgHandle);
+				// Used for testing only.
+				MAUtil::String info = "Ready.Size = " + MAUtil::integerToString(dataSize) +
+						"res = " + MAUtil::integerToString(createImageRes) +
+						", mime type = " + MAUtil::integerToString(event.imagePickerEncodingType);
+
+				if ( createImageRes != RES_OK )
+				{
+					maAlert("Memory Warning", " The image cannot be created. Try again", NULL, NULL, NULL);
+					maWidgetSetProperty(mEventReturnTypeCheckbox, MAW_CHECK_BOX_CHECKED, "false");
+					// If the Android VM gets an out of memory exception, get the image handle instead.
+					maImagePickerOpen();
+				}
+				else
+				{
+					char imgHandle[256];
+					sprintf(imgHandle, "%d", hImage);
+					int resCode = maWidgetSetProperty(mPreview, MAW_IMAGE_IMAGE, imgHandle);
+				}
 
 				maDestroyPlaceholder(hImage);
 			}
@@ -139,7 +155,8 @@ void NativeScreen::widgetClicked(MAHandle widgetHandle)
 	{
 		char checkboxBuffer[BUF_SIZE];
 		maWidgetGetProperty(mEventReturnTypeCheckbox, MAW_CHECK_BOX_CHECKED, checkboxBuffer, BUF_SIZE);
-		if (strcmp(checkboxBuffer, "True") == 0)
+        MAUtil::String value = MAUtil::lowerString(checkboxBuffer);
+        if ( strcmp(value.c_str(),"true") == 0 )
 		{
 			maImagePickerOpenWithEventReturnType(MA_IMAGE_PICKER_EVENT_RETURN_TYPE_IMAGE_DATA);
 		}
