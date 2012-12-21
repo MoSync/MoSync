@@ -30,7 +30,7 @@ MA 02110-1301, USA.
  * @author Emma Tresanszki
  *
  * \brief Class for number picker.
- * Note that this type of widget is available only on iOS for the moment.
+ * Available on iOS, WindowsPhone and Android.
  */
 
 #ifndef NATIVEUI_NUMBER_PICKER_H_
@@ -48,7 +48,7 @@ namespace NativeUI
 	 * \brief  A Number Picker is a widget that enables the user to select a
 	 * number from a predefined range.
 	 *
-	 * Note that this type of widget is available only on iOS for the moment.
+	 * Available on iOS, WindowsPhone and Android.
 	 */
 	class NumberPicker : public Widget
 	{
