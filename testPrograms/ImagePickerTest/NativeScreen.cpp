@@ -97,6 +97,8 @@ void NativeScreen::customEvent(const MAEvent& event)
 				char imgHandle[256];
 				sprintf(imgHandle, "%d", hImage);
 				int resCode = maWidgetSetProperty(mPreview, MAW_IMAGE_IMAGE, imgHandle);
+
+				maDestroyPlaceholder(hImage);
 			}
 			else
 			{

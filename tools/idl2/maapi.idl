@@ -1665,7 +1665,7 @@ interface MAAPI {
 				* The encoding used for the image. One of the values
 				* @link #MA_IMAGE_PICKER_ITEM_ENCODING_PNG MA_IMAGE_PICKER_ITEM_ENCODING_* @endlink
 				*/
-				MAHandle imagePickerEncodingType;
+				int imagePickerEncodingType;
 			} imagePicker;
 
 			/**
