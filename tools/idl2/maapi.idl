@@ -1654,9 +1654,21 @@ interface MAAPI {
 				int imagePickerState;
 
 				/**
-				* #EVENT_TYPE_IMAGE_PICKER event, contains the new handle to the selected image.
+				* #EVENT_TYPE_IMAGE_PICKER event, contains the new handle to the selected image if the image picker
+				* event return type was set to @link #MA_IMAGE_PICKER_ITEM_EVENT_RETURN_TYPE_IMAGE_HANDLE @endlink
+				* (default value) or the handle to the binary image data if the return type was set to
+				* @link #MA_IMAGE_PICKER_ITEM_EVENT_RETURN_TYPE_IMAGE_DATA @endlink.
+				* Note: Android VM has some limitations when it comes to creating high resolution images. Therefore, if
+				* the user needs to handle the image itself locally and maCreateImageFromData(dataHandle) returns a
+				* RES_OUT_OF_MEMORY, use #MA_IMAGE_PICKER_ITEM_EVENT_RETURN_TYPE_IMAGE_HANDLE instead.
 				*/
 				MAHandle imagePickerItem;
+
+				/**
+				* The encoding used for the image. One of the values
+				* @link #MA_IMAGE_PICKER_ITEM_ENCODING_PNG MA_IMAGE_PICKER_ITEM_ENCODING_* @endlink
+				*/
+				int imagePickerEncodingType;
 			} imagePicker;
 
 			/**
@@ -4143,11 +4155,41 @@ group OpenGLES "OpenGLES" {
 		void maAlert(in MAString title, in MAString message, in MAString button1, in MAString button2, in MAString button3);
 
 		/**
+		* Together with the image picker event (\link EVENT_TYPE_IMAGE_PICKER IMAGE_PICKER \endlink),
+		* this specifies the type of encoding used for the image data returned.
+		*/
+		constset int MA_IMAGE_PICKER_ITEM_ENCODING_ {
+			PNG = 1;
+			JPEG = 2;
+		}
+
+		/**
+		* Determines what kind of event do we need from the image picker.
+		*/
+		constset int MA_IMAGE_PICKER_EVENT_RETURN_TYPE_ {
+			// the image picker will return a handle to the bitmap image resource
+			IMAGE_HANDLE = 1;
+			// the image picker will return a handle to the jpeg encoded image resource
+			// in binary format
+			IMAGE_DATA = 2;
+		}
+
+		/**
 		* Displays an image picker to the user.
 		* It's display depends on the platform.
 		* Note: when a selection is made a #EVENT_TYPE_IMAGE_PICKER event is sent.
 		*/
 		void maImagePickerOpen();
+
+		/**
+		* Displays an image picker to the user and sets the event return type.
+		* It's display depends on the platform.
+		* Note: when a selection is made a #EVENT_TYPE_IMAGE_PICKER event is sent.
+		* \param eventType One of the next constants:
+		* - #MA_IMAGE_PICKER_EVENT_RETURN_TYPE_IMAGE_HANDLE
+		* - #MA_IMAGE_PICKER_EVENT_RETURN_TYPE_IMAGE_DATA
+		*/
+		void maImagePickerOpenWithEventReturnType(in int eventReturnType);
 
 		/**
 		* Displays a special kind of dialog that has a list of possible choices.
