@@ -17,6 +17,7 @@ public class StructType extends TypeDescriptor {
 	private Struct prototype;
 	private ArrayList<TypeDescriptor> memberTypes;
 	private ExtensionModule module;
+	private StructType outStruct;
 
 	public StructType(ExtensionModule module, String type, String className) throws Exception {
 		this.module = module;
@@ -24,6 +25,20 @@ public class StructType extends TypeDescriptor {
 		this.className = className;
 		this.clazz = Class.forName(className);
 		this.prototype = (Struct) clazz.newInstance();
+		this.outStruct = new StructType(this, true);
+	}
+
+	private StructType(StructType original, boolean out) {
+		this.module = original.module;
+		this.type = original.type;
+		this.className = original.className;
+		this.clazz = original.clazz;
+		this.prototype = original.prototype;
+		setOut(out);
+	}
+
+	public StructType getOutType() {
+		return outStruct;
 	}
 
 	public void addMember(String name, String typename, int ptrDepth) {
@@ -43,6 +58,11 @@ public class StructType extends TypeDescriptor {
 	public Object unmarshal(byte[] data, int offset) {
 		Struct result = (Struct) prototype.unmarshal(data, offset);
 		return result;
+	}
+
+	@Override
+	public void marshal(Object o, byte[] data, int offset) {
+		prototype.marshal(o, data, offset);
 	}
 
 	public int size() {

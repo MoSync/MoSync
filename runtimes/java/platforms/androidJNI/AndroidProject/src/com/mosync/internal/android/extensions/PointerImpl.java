@@ -2,7 +2,7 @@ package com.mosync.internal.android.extensions;
 
 import com.mosync.api.Pointer;
 
-public class PointerImpl implements Pointer {
+public class PointerImpl extends Pointer {
 
 	private int addr;
 	private TypeDescriptor delegate;
@@ -24,6 +24,21 @@ public class PointerImpl implements Pointer {
 	public Object at(int ix) {
 		int size = delegate.size();
 		return delegate.readFromMemory(addr + ix * size);
+	}
+
+	protected int getAddress() {
+		return addr;
+	}
+
+	@Override
+	public void set(Object o) {
+		at(o, 0);
+	}
+
+	@Override
+	public void at(Object o, int ix) {
+		int size = delegate.size();
+		delegate.writeToMemory(addr + ix * size, o);
 	}
 
 }

@@ -77,17 +77,19 @@ public class ExtensionModule {
 
 		TypeDescriptor result = null;
 		if ("char".equals(name) && ptrDepth == 1) {
-			result = new StringType();
+			result = StringType.getInstance(out);
 		} else if (ptrDepth > 0) {
 			result = new PointerType(getTypeDescriptor(name, ptrDepth - 1, out));
 		} else if ("int".equals(name)) {
-			result = new IntType();
+			result = IntType.getInstance();
 		} else if ("char".equals(name)) {
-			result = new CharType();
+			result = CharType.getInstance();
 		} else if ("double".equals(name)) {
-			result = new DoubleType();
+			result = DoubleType.getInstance();
 		} else if ("float".equals(name)) {
-			result = new FloatType();
+			result = FloatType.getInstance();
+		} else if ("void".equals(name)) {
+			result = VoidType.getInstance();
 		} else {
 			result = typedefs.get(name);
 		}
@@ -100,8 +102,12 @@ public class ExtensionModule {
 			throw new IllegalArgumentException("Unknown type: " + name);
 		}
 
-		if (!result.isArray() && out) {
+		if (result.isPrimitive() && out) {
 			result = new PointerType(result);
+		}
+
+		if (result instanceof StructType && out) {
+			result = ((StructType) result).getOutType();
 		}
 
 		return result;

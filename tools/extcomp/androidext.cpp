@@ -76,13 +76,21 @@ void streamAndroidExtMF(ostream& out, Interface& ext, string& androidPackageName
 					<< "in=\"" << (arg.in ? "true" : "false") << "\" "
 					<< "out=\"" << (arg.in ? "false" : "true") << "\"/>\n";
 		}
+
+		int returnPointerDepth = 0;
+		string returnType = extractPointerType(f.returnType, returnPointerDepth);
+
+		out << "<arg type=\"" << returnType << "\" "
+				<< "ptr=\"" << returnPointerDepth << "\" "
+				<< "ret=\"true\"/>\n";
+
 		out << "</function>\n";
 	}
 	out << "</module>";
 
 }
 
-void streamAndroidStubs(string& outputDir, Interface& ext, string& androidPackageName) {
+void writeAndroidStubs(string& outputDir, Interface& ext, string& androidPackageName) {
 	_mkdir(outputDir.c_str());
 
 	// The interface stub
@@ -99,7 +107,7 @@ void streamAndroidStubs(string& outputDir, Interface& ext, string& androidPackag
 		string name = cs.name;
 		for (size_t j = 0; j < cs.constants.size(); j++) {
 			Constant c = cs.constants[j];
-			extensionFile << "\tpublic final static " << toAndroidType(ext, c.type, false) << " " << name << c.name << " = " << c.value << ";\n";
+			extensionFile << "\tpublic final static " << toAndroidType(ext, c.type, false, true) << " " << name << c.name << " = " << c.value << ";\n";
 		}
 		extensionFile << "\n";
 	}
@@ -108,14 +116,14 @@ void streamAndroidStubs(string& outputDir, Interface& ext, string& androidPackag
 
 	for (size_t i = 0; i < ext.functions.size(); i++) {
 		Function f = ext.functions[i];
-		string returnType = toAndroidType(ext, f.returnType, false);
+		string returnType = toAndroidType(ext, f.returnType, false, false);
 		extensionFile << "\tpublic " << returnType << " " << f.name << "(";
 		for (size_t j = 0; j < f.args.size(); j++) {
 			if (j > 0) {
 				extensionFile << ", ";
 			}
 			Argument arg = f.args[j];
-			extensionFile << toAndroidType(ext, arg.type, false);
+			extensionFile << toAndroidType(ext, arg.type, false, arg.in);
 			extensionFile << " ";
 			extensionFile << arg.name;
 		}
@@ -151,14 +159,14 @@ void streamAndroidStubs(string& outputDir, Interface& ext, string& androidPackag
 		for (size_t j = 0; j < s.members.size(); j++) {
 			Member m = s.members[j];
 			string type = m.pod[0].type;
-			string androidType = toAndroidType(ext, type, false);
+			string androidType = toAndroidType(ext, type, false, false);
 			structFile << "\tpublic " << androidType << " " << m.pod[0].name << ";\n";
 			int pointerDepth = 0;
 			string pointerType = extractPointerType(type, pointerDepth);
 			structFile << "\tprivate final static Marshaller __" << m.pod[0].name << " = _m(\"" << ext.name << "\", \"" << pointerType << "\", " << pointerDepth << ");\n\n";
 		}
 
-		// (Un)Marshalling
+		// Unmarshalling
 		size_t size = 0;
 		structFile << "\n\tpublic Struct unmarshal(byte[] data, int offset) {\n";
 		structFile << "\t\t" << s.name << " s = new " << s.name << "();\n";
@@ -166,11 +174,25 @@ void streamAndroidStubs(string& outputDir, Interface& ext, string& androidPackag
 			Member m = s.members[j];
 			string ctype = m.pod[0].type;
 			string name = m.pod[0].name;
-			string cast = toAndroidType(ext, ctype, true);
+			string cast = toAndroidType(ext, ctype, true, false);
 			structFile << "\t\ts." << name << " = (" << cast << ")__" << name << ".unmarshal(data, offset + " << size << ");\n";
 			size += cTypeSize(ext, ctype);
 		}
 		structFile << "\t\treturn s;\n";
+		structFile << "\t}\n\n";
+
+		// Marshalling
+		size = 0; // <-- Reset size to 0.
+		structFile << "\tpublic void marshal(Object struct, byte[] data, int offset) {\n";
+		structFile << "\t\t" << s.name << " s = (" << s.name << ") struct;\n";
+		for (size_t j = 0; j < s.members.size(); j++) {
+			Member m = s.members[j];
+			string ctype = m.pod[0].type;
+			string name = m.pod[0].name;
+			string cast = toAndroidType(ext, ctype, true, false);
+			structFile << "\t\t__" << name << ".marshal(s." << name << ", data, offset + " << size << ");\n";
+			size += cTypeSize(ext, ctype);
+		}
 		structFile << "\t}\n\n";
 
 		structFile << "\tpublic int size() { return " << size << "; }\n\n";
@@ -181,7 +203,7 @@ void streamAndroidStubs(string& outputDir, Interface& ext, string& androidPackag
 	}
 }
 
-string toAndroidType(Interface& ext, string& ctype, bool autoBox) {
+string toAndroidType(Interface& ext, string& ctype, bool autoBox, bool constant) {
 	int ptrDepth = 0;
 	string extractedType = extractPointerType(ctype, ptrDepth);
 	if (ptrDepth > 0) {
@@ -195,11 +217,11 @@ string toAndroidType(Interface& ext, string& ctype, bool autoBox) {
 			prefix.append("Pointer<");
 			suffix.append(">");
 		}
-		return prefix + toAndroidType(ext, extractedType, autoBox) + suffix;
+		return prefix + toAndroidType(ext, extractedType, autoBox, constant) + suffix;
 	} else {
 		extractedType = resolveTypedef(ext, extractedType);
 		if (extractedType == "NCString" || extractedType == "MAString") {
-			return "String";
+			return constant ? "String" : "CString";
 		}
 		if (autoBox) {
 			if (extractedType == "int") return "Integer";

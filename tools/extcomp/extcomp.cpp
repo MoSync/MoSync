@@ -34,6 +34,7 @@
 
 #include "extcomp.h"
 #include "androidext.h"
+#include "iosext.h"
 
 void parseArgs(int argc, const char** argv, map<string, string>& argmap);
 string requiredArg(string arg, map<string, string>& args);
@@ -49,6 +50,7 @@ int main(int argc, const char** argv) {
 		string extName = requiredArg("extension", args);
 		string androidPackageName = args["android-package-name"];
 		string androidClassName = args["android-class-name"];
+		string iosInterfaceName = args["ios-interface-name"];
 
 		// This one is empty for extensions.
 		vector<string> ixs;
@@ -61,21 +63,10 @@ int main(int argc, const char** argv) {
 		ext.name = extName;
 
 		string headerOut = extName + ".h";
-		ofstream headerfile(headerOut.c_str());
+		writeHeaders(headerOut, ext, true);
 
 		string sourceOut = "_" + extName + ".c";
 		ofstream sourcefile(sourceOut.c_str());
-
-		string modulePrefix = "EXT_MODULE_";
-		string extHashConst = getModHashDefine(ext);
-		string uExtName = toupper(string(extName));
-		string extDef = modulePrefix + uExtName + "_H";
-
-		headerfile << "#ifndef " << extDef << "\n";
-		headerfile << "#define " << extDef << "\n\n";
-		headerfile << "#define " << extHashConst << " ((int)0x";
-		streamExtHashValue(headerfile, ext);
-		headerfile << ")\n\n";
 
 		sourcefile << "// *** GENERATED FILE - Do not modify ***\n\n";
 		sourcefile << "#include <maapi.h>\n";
@@ -83,42 +74,10 @@ int main(int argc, const char** argv) {
 		sourcefile << "static MAExtensionModule " << getModHandle(ext) << " = 0;\n";
 		sourcefile << "static MAExtensionFunction " << getFnIxHandle(ext) << "[" << ext.functions.size() << "];\n";
 
-		for (size_t i = 0; i < ext.constSets.size(); i++) {
-			ConstSet cs = ext.constSets[i];
-			string name = cs.name;
-			for (size_t j = 0; j < cs.constants.size(); j++) {
-				Constant c = cs.constants[j];
-				headerfile << "#define " << name << c.name << " " "/*" << c.type << "*/ " << c.value << "\n";
-			}
-			headerfile << "\n";
-		}
-
-		for (size_t i = 0; i < ext.typedefs.size(); i++) {
-			Typedef t = ext.typedefs[i];
-			headerfile << "typedef " << t.name << " " << t.type << ";\n\n";
-		}
-
-		for (size_t i = 0; i < ext.structs.size(); i++) {
-			Struct s = ext.structs[i];
-			headerfile << "typedef struct {\n";
-			for (size_t j = 0; j < s.members.size(); j++) {
-				Member m = s.members[j];
-				headerfile << "\t" << m.pod[0].type << " " << m.pod[0].name << ";\n";
-			}
-			headerfile << "} " << s.name << ";\n\n";
-		}
-
 		for (size_t i = 0; i < ext.functions.size(); i++) {
-			Function f = ext.functions[i];
-			headerfile << "#define " << getFnIxDefine(f) << " " << i << "\n";
-			streamFunctionCSignature(headerfile, ext, f);
-			headerfile << ";\n\n";
-
-			streamFunctionWrapper(sourcefile, ext, f, i == 0);
+			streamFunctionWrapper(sourcefile, ext, ext.functions[i], i == 0);
 		}
-		headerfile << "#endif //" << extDef << "\n";
 
-		headerfile.close();
 		sourcefile.close();
 
 		string androidOut = extDir + "/android/";
@@ -132,7 +91,12 @@ int main(int argc, const char** argv) {
 		androidMFfile.close();
 
 		string stubsDir = androidOut + "stubs/";
-		streamAndroidStubs(stubsDir, ext, androidPackageName);
+		writeAndroidStubs(stubsDir, ext, androidPackageName);
+
+		string iosOut = extDir + "/iphoneos/";
+		_mkdir(iosOut.c_str());
+		string iosStubsDir = iosOut + "stubs/";
+		writeIosStubs(iosStubsDir, ext, iosInterfaceName);
 
 		streamExtensionManifest(args);
 	} catch (exception e) {
@@ -160,6 +124,57 @@ void parseArgs(int argc, const char** argv, map<string, string>& argmap) {
 			argmap[argname.substr(2)] = argvalue;
 		}
 	}
+}
+
+void writeHeaders(string& headerOut, Interface& ext, bool includeFunctions) {
+	string modulePrefix = "EXT_MODULE_";
+	string extHashConst = getModHashDefine(ext);
+
+	ofstream headerfile(headerOut.c_str());
+
+	string uExtName = toupper(string(ext.name));
+	string extDef = modulePrefix + uExtName + "_H";
+
+	headerfile << "#ifndef " << extDef << "\n";
+	headerfile << "#define " << extDef << "\n\n";
+	headerfile << "#define " << extHashConst << " ((int)0x";
+	streamExtHashValue(headerfile, ext);
+	headerfile << ")\n\n";
+
+	for (size_t i = 0; i < ext.constSets.size(); i++) {
+		ConstSet cs = ext.constSets[i];
+		string name = cs.name;
+		for (size_t j = 0; j < cs.constants.size(); j++) {
+			Constant c = cs.constants[j];
+			headerfile << "#define " << name << c.name << " " "/*" << c.type << "*/ " << c.value << "\n";
+		}
+		headerfile << "\n";
+	}
+
+	for (size_t i = 0; i < ext.typedefs.size(); i++) {
+		Typedef t = ext.typedefs[i];
+		headerfile << "typedef " << t.name << " " << t.type << ";\n\n";
+	}
+
+	for (size_t i = 0; i < ext.structs.size(); i++) {
+		Struct s = ext.structs[i];
+		headerfile << "typedef struct {\n";
+		for (size_t j = 0; j < s.members.size(); j++) {
+			Member m = s.members[j];
+			headerfile << "\t" << m.pod[0].type << " " << m.pod[0].name << ";\n";
+		}
+		headerfile << "} " << s.name << ";\n\n";
+	}
+
+	for (size_t i = 0; includeFunctions && i < ext.functions.size(); i++) {
+		Function f = ext.functions[i];
+		headerfile << "#define " << getFnIxDefine(f) << " " << i << "\n";
+		streamFunctionCSignature(headerfile, ext, f);
+		headerfile << ";\n\n";
+	}
+	headerfile << "#endif //" << extDef << "\n";
+
+	headerfile.close();
 }
 
 void streamExtensionManifest(map<string, string>& args) {
@@ -218,8 +233,13 @@ void streamFunctionWrapper(ostream& out, Interface& ext, Function& f, bool modHa
 	streamFunctionCSignature(out, ext, f);
 	int numargs = f.args.size();
 	out << " {\n";
-	out << "    int i, result;\n";
-	out << "    int passedArgs[" << numargs << "];\n";
+	out << "    int i;\n";
+	out << "    int passedArgs[" << (numargs + 1) << "];\n";
+	if (isReturnType(ext, f.returnType)) {
+		string returnType = cType(ext, f.returnType);
+		out << "    " << returnType << " res;\n";
+		out << "    passedArgs[" << numargs << "] = &res;\n";
+	}
 	for (int i = 0; i < numargs; i++) {
 		string name = "_" + f.args[i].name;
 		// For simplicity we just always pass the pointer
@@ -233,10 +253,10 @@ void streamFunctionWrapper(ostream& out, Interface& ext, Function& f, bool modHa
 	out << "             " << getFnIxHandle(ext) << "[i] = maExtensionFunctionLoad(" << getModHandle(ext) << ", i);\n";
 	out << "         }\n";
 	out << "    }\n";
-	out << "    result = maExtensionFunctionInvoke2(";
+	out << "    maExtensionFunctionInvoke2(";
 	out << getFnIxHandle(ext) << "[" << getFnIxDefine(f) << "], " << numargs << ", (int) passedArgs/*, 0dummy*/);\n";
-	if (strcmp("void", cType(ext, f.returnType).c_str())) {
-		out << "    return result;\n";
+	if (isReturnType(ext, f.returnType)) {
+		out << "    return res;\n";
 	}
 	out << "}\n";
 
@@ -244,6 +264,10 @@ void streamFunctionWrapper(ostream& out, Interface& ext, Function& f, bool modHa
 
 void streamExtHashValue(ostream& out, Interface& ext) {
 	out << setfill('0') << setw(8) << hex << calculateChecksum(ext) << dec;
+}
+
+bool isReturnType(Interface& ext, string& type) {
+	return strcmp("void", cType(ext, type).c_str());
 }
 
 string resolveTypedef(Interface& ext, string& typedefName) {

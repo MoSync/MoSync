@@ -45,8 +45,14 @@ public class Typedef extends TypeDescriptor {
 		throw new UnsupportedOperationException("Typedefs must be resolved!");
 	}
 
+	@Override
+	public void marshal(Object o, byte[] data, int offset) {
+		throw new UnsupportedOperationException("Typedefs must be resolved!");
+	}
+
 	public String toString() {
 		return "name = " + resolve().toString();
 	}
+
 
 }

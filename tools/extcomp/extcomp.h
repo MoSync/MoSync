@@ -32,10 +32,12 @@ string resolveTypedef(Interface&, string&);
 void streamExtensionManifest(map<string,string>&);
 void streamExtHashValue(ostream&, Interface&);
 void streamXMLComment(ostream&, string& comment);
+void writeHeaders(string& outputFile, Interface& ext, bool includeFunctions);
 string getModHandle(Interface& ext);
 string getFnIxDefine(Function& f);
 string getFnIxHandle(Interface& f);
 string getModHashDefine(Interface& ext);
+bool isReturnType(Interface&, string&);
 string extractPointerType(string type, int& ptrDepth);
 
 #endif /* EXTCOMP_H_ */

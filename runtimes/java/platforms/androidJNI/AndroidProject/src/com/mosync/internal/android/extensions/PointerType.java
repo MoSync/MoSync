@@ -23,7 +23,15 @@ public class PointerType extends TypeDescriptor {
 	}
 
 	@Override
+	public void marshal(Object o, byte[] data, int offset) {
+		PointerImpl ptr = (PointerImpl) o;
+		int addr = ptr.getAddress();
+		IntType.marshalInt(addr, data, offset);
+	}
+
+	@Override
 	public int size() {
 		return 4;
 	}
+
 }

@@ -15,9 +15,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
-
-#ifndef ANDROIDEXT_H_
-#define ANDROIDEXT_H_
+#ifndef IPHONEEXT_H_
+#define IPHONEEXT_H_
 
 #include <fstream>
 #include <iostream>
@@ -28,9 +27,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 using namespace std;
 
-void streamAndroidExtMF(ostream&, Interface&, string&, string&);
-void writeAndroidStubs(string&, Interface&, string&);
-string toAndroidType(Interface&, string&, bool, bool);
-string getAndroidDefaultValue(string&);
+void writeIosStubs(string&, Interface&, string&);
+void streamObjCSignature(ostream&, Interface&, Function&);
+string getObjCDefaultValue(string& type);
 
-#endif /* ANDROIDEXT_H_ */
+#endif /* IPHONEEXT_H_ */

@@ -9,17 +9,19 @@ import com.mosync.internal.android.MoSyncThread;
 
 public class FunctionInvocation {
 	private TypeDescriptor[] tds;
+	private TypeDescriptor rd;
 	private ExtensionModule module;
 	private String name;
 	private Method resolvedMethod;
 	private int id;
 
 	public FunctionInvocation(int id, ExtensionModule module, String name,
-			TypeDescriptor[] tds) throws Exception {
+			TypeDescriptor[] tds, TypeDescriptor rd) throws Exception {
 		this.id = id;
 		this.module = module;
 		this.name = name;
 		this.tds = tds;
+		this.rd = rd;
 
 		Class[] parameterTypes = new Class[tds.length];
 		for (int i = 0; i < parameterTypes.length; i++) {
@@ -33,31 +35,38 @@ public class FunctionInvocation {
 	public int invoke(int ptr) throws Throwable {
 		Object[] convertedArgs = new Object[resolvedMethod
 				.getParameterTypes().length];
-		int[] argPtrs = new int[convertedArgs.length];
+		int[] argAndRetPtrs = new int[convertedArgs.length + 1];
 		MoSyncThread mThread = MoSyncThread.getInstance();
 		// Get the pointers to the arguments to use.
-		ByteBuffer argBuffer = mThread.getMemorySlice(ptr, 4 * argPtrs.length);
+		ByteBuffer argBuffer = mThread.getMemorySlice(ptr, 4 * argAndRetPtrs.length);
 		IntBuffer intBuffer = argBuffer.order(null).asIntBuffer();
 		intBuffer.position(0);
-		for (int i = 0; i < argPtrs.length; i++) {
-			argPtrs[i] = intBuffer.get();
+		for (int i = 0; i < argAndRetPtrs.length; i++) {
+			argAndRetPtrs[i] = intBuffer.get();
 		}
 
-		for (int i = 0; i < argPtrs.length; i++) {
-			int addr = argPtrs[i];
+		for (int i = 0; i < argAndRetPtrs.length - 1; i++) {
 			// Special case: non-pointer structs have been sent as pointers,
 			// but if it already is a pointer then we need not add an extra
 			// layer. (This comes all the way from the IDL compiler.)
 			if (tds[i] instanceof StructType) {
-				addr = IntType.readIntFromMem(addr);
+				argAndRetPtrs[i] = IntType.readIntFromMem(argAndRetPtrs[i]);
 			}
-			convertedArgs[i] = tds[i].readFromMemory(addr);
+		}
+		for (int i = 0; i < argAndRetPtrs.length - 1; i++) {
+			convertedArgs[i] = tds[i].readFromMemory(argAndRetPtrs[i]);
 		}
 
 		Object result = resolvedMethod.invoke(module.getModule(), convertedArgs);
 
-		if (result instanceof Integer) {
-			return (Integer) result;
+		for (int i = 0; i < tds.length; i++) {
+			if (tds[i].isOut()) {
+				tds[i].writeToMemory(argAndRetPtrs[i], convertedArgs[i]);
+			}
+		}
+
+		if (rd != null && VoidType.getInstance() != rd) {
+			rd.writeToMemory(argAndRetPtrs[argAndRetPtrs.length - 1], result);
 		}
 		return 0;
 	}

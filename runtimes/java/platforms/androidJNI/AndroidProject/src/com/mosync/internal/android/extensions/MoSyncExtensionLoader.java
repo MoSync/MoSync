@@ -32,6 +32,7 @@ public class MoSyncExtensionLoader {
 	public static final String HASH_ATTR = "hash";
 	public static final String IN_ATTR = "in";
 	public static final String OUT_ATTR = "out";
+	public static final String RET_ATTR = "ret";
 	public static final String TYPE_ATTR = "type";
 	public static final String POINTER_ATTR = "ptr";
 
@@ -74,6 +75,7 @@ public class MoSyncExtensionLoader {
 				String currentFunction = null;
 				StructType currentStruct = null;
 				ArrayList<TypeDescriptor> currentDescriptors = new ArrayList<TypeDescriptor>();
+				TypeDescriptor returnDescriptor = null;
 				ArrayList<FunctionInvocation> currentFunctions = new ArrayList<FunctionInvocation>();
 				HashMap<String, TypeDescriptor> typedefs = new HashMap<String, TypeDescriptor>();
 				HashMap<String, StructType> structs = new HashMap<String, StructType>();
@@ -118,8 +120,13 @@ public class MoSyncExtensionLoader {
 						} else if (ARGUMENT_TAG.equals(tagName)) {
 							boolean out = Boolean.valueOf(xpp
 									.getAttributeValue(null, OUT_ATTR));
-							currentDescriptors.add(currentModule.getTypeDescriptor(type, ptr,
-									out));
+							boolean ret = Boolean.valueOf(xpp.getAttributeValue(null, RET_ATTR));
+							TypeDescriptor desc = currentModule.getTypeDescriptor(type, ptr, out);
+							if (ret) {
+								returnDescriptor = desc;
+							} else {
+								currentDescriptors.add(desc);
+							}
 						} else {
 							throw new IllegalArgumentException("Invalid tag: " + tagName);
 						}
@@ -129,11 +136,12 @@ public class MoSyncExtensionLoader {
 							int handle = moduleId << 20 | functionId;
 							FunctionInvocation invoker = new FunctionInvocation(
 									handle, currentModule, currentFunction,
-									currentDescriptors
-											.toArray(new TypeDescriptor[0]));
+									currentDescriptors.toArray(new TypeDescriptor[0]),
+									returnDescriptor);
 							currentFunctions.add(invoker);
 							invokersById.put(handle, invoker);
 							currentDescriptors.clear();
+							returnDescriptor = null;
 							functionId++;
 						} else if (MODULE_TAG.equals(tagName)) {
 							functionId = 0;
@@ -212,7 +220,6 @@ public class MoSyncExtensionLoader {
 
 		if (invoker != null) {
 			try {
-				// FIXME: We need no array here
 				return invoker.invoke(ptr);
 			} catch (Throwable e) {
 				// Log && Fall-thru.

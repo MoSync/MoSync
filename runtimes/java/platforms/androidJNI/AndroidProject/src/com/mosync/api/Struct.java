@@ -1,6 +1,5 @@
 package com.mosync.api;
 
-import com.mosync.internal.android.extensions.Marshaller;
 import com.mosync.internal.android.extensions.MoSyncExtensionLoader;
 import com.mosync.internal.android.extensions.TypeDescriptor;
 
@@ -9,7 +8,9 @@ import com.mosync.internal.android.extensions.TypeDescriptor;
 public abstract class Struct implements Marshaller {
 
 	protected static final Marshaller _m(String extension, String name, int ptrDepth) {
-		TypeDescriptor desc = MoSyncExtensionLoader.getDefault().getModule(extension).getTypeDescriptor(name, ptrDepth, false);
+		// Special case: String vs CString
+		boolean out = "char".equals(name) && ptrDepth >= 1;
+		TypeDescriptor desc = MoSyncExtensionLoader.getDefault().getModule(extension).getTypeDescriptor(name, ptrDepth, out);
 		return desc;
 	}
 
