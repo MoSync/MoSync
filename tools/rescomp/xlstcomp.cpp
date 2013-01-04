@@ -33,6 +33,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "File.h"
 #include "xlstcomp.h"
 #include "resdirectives.h"
+#include "helpers/attribute.h"
 
 using namespace std;
 
@@ -55,6 +56,7 @@ using namespace std;
 #define RES_HALF "half"
 #define RES_PLACEHOLDER "placeholder"
 
+static void error(const char* file, int lineNo, string msg) GCCATTRIB(noreturn);
 static void error(const char* file, int lineNo, string msg) {
 	ostringstream errMsg;
 	if (file) {
@@ -65,6 +67,7 @@ static void error(const char* file, int lineNo, string msg) {
 	exit(1);
 }
 
+static void error(ParserState* state, string msg) GCCATTRIB(noreturn);
 static void error(ParserState* state, string msg) {
 	if (state) {
 		error(state->fileName.c_str(), state->lineNo, msg);
@@ -73,11 +76,12 @@ static void error(ParserState* state, string msg) {
 	}
 }
 
+static void error(ParserState* state, const char* msg) GCCATTRIB(noreturn);
 static void error(ParserState* state, const char* msg) {
 	error(state, string(msg));
 }
 
-string getVariantStr(string variant) {
+static string getVariantStr(string variant) {
 	if (variant.length() == 0) {
 		return string("(fallback variant)");
 	} else {
@@ -364,7 +368,7 @@ void VariantResourceSet::parseLSTX(string inputFile) {
 	delete state;
 }
 
-const char* mosyncdir() {
+static const char* mosyncdir() {
 	static const char* md = NULL;
 	if(!md) {
 		md	= getenv("MOSYNCDIR");
@@ -389,7 +393,7 @@ string VariantResourceSet::parseLST(string lstFile, string outputDir) {
 	return output;
 }
 
-const char* getDefaultVariantAttr(const char* resourceType) {
+static const char* getDefaultVariantAttr(const char* resourceType) {
 	if (!strcmp(RES_BINARY, resourceType)) {
 		return ATTR_PLATFORM;
 	} else if (!strcmp(RES_IMAGE, resourceType)) {
@@ -418,7 +422,7 @@ bool equalsIgnoreCase(const char* attr, const char* variantAttr) {
 	return false;
 }
 
-const char* getStandardVariantAttr(const char* variantAttr) {
+static const char* getStandardVariantAttr(const char* variantAttr) {
 	if (equalsIgnoreCase(ATTR_PLATFORM, variantAttr)) return ATTR_PLATFORM;
 	if (equalsIgnoreCase(ATTR_LOCALE, variantAttr)) return ATTR_LOCALE;
 	if (equalsIgnoreCase(ATTR_SCREENSIZE, variantAttr)) return ATTR_SCREENSIZE;
@@ -652,7 +656,7 @@ static void writePStr(char* array, int& offset, const char* str, size_t len) {
 	}
 }
 
-void addLabelDirective(ostringstream& output, const char* label) {
+static void addLabelDirective(ostringstream& output, const char* label) {
 	output << ".label \"" << label << "\"\n";
 }
 

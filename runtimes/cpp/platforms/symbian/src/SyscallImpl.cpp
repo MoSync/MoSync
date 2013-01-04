@@ -712,8 +712,7 @@ SYSCALL(void, maFillTriangleStrip(const MAPoint2d* points, int count)) {
 SYSCALL(void, maFillTriangleFan(const MAPoint2d* points, int count)) {
 	SYSCALL_THIS->ValidateMemRange(points, sizeof(MAPoint2d) * count);
 	MYASSERT(((int)points & 0x3) == 0, ERR_MEMORY_ALIGNMENT);
-	//gScreenEngine.FillTriangleStripClip(points, count);
-	BIG_PHAT_ERROR(ERR_FUNCTION_UNIMPLEMENTED);
+	gScreenEngine.FillTriangleFanClip(points, count);
 }
 
 SYSCALL(MAExtent, maGetTextSize(const char* str)) {

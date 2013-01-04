@@ -22,7 +22,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <ostream>
 #include <cerrno>
 #include <sys/stat.h>
-#include "util.h"
+#include "Util.h"
 
 using namespace std;
 

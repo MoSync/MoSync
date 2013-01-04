@@ -233,6 +233,24 @@ void CDirScrAccEng::FillTriangleStripClip(const MAPoint2d* points, int count) {
 			points[i].y);
 	}
 }
+void CDirScrAccEng::FillTriangleFanClip(const MAPoint2d* points, int count) {
+	LOGG("fp color 0x%08x %i:", gCurrentConvertedColor, count);
+	for(int i=0; i<count; i++) {
+		LOGG(" %ix%i", points[i].x, points[i].y);
+	}
+	LOGG("\n");
+	MYASSERT(count >= 3, ERR_POLYGON_TOO_FEW_POINTS);
+	TMyDrawBuf drawBuffer(*iDrawSurface, true);
+	for(int i = 2; i < count; i++) {
+		DrawTriangle(drawBuffer,
+			points[0].x,
+			points[0].y,
+			points[i-1].x,
+			points[i-1].y,
+			points[i].x,
+			points[i].y);
+	}
+}
 
 MAExtent CDirScrAccEng::GetTextSizeL(const TDesC& aText) {
 	return EXTENT(gFont->TextWidthInPixels(aText), gFont->HeightInPixels());
