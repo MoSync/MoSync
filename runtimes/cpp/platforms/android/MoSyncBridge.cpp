@@ -319,6 +319,8 @@ static void nativeRun(JNIEnv* env, jobject jthis)
 
 /**
 * @brief nativePostEvent
+* Don't forget to update the file EventQueue.cpp when adding
+* event types that would potentially overflow the event queue.
 */
 static void nativePostEvent(JNIEnv* env, jobject jthis, jintArray eventBuffer)
 {
@@ -389,6 +391,7 @@ static void nativePostEvent(JNIEnv* env, jobject jthis, jintArray eventBuffer)
 	{
 		event.imagePickerState = intArray[1];
 		event.imagePickerItem = intArray[2];
+		event.imagePickerEncodingType = intArray[3];
 	}
 	else if (event.type == EVENT_TYPE_SMS)
 	{
@@ -610,6 +613,9 @@ static void nativePostEvent(JNIEnv* env, jobject jthis, jintArray eventBuffer)
 	{
 		__android_log_write(ANDROID_LOG_INFO, "@@@@@@@@ MoSync JNI", "Camera event sent");
 	}
+	// HOLD ON!
+	// Don't forget to update the file EventQueue.cpp when adding
+	// event types that would potentially overflow the event queue.
 
 	// Release the memory used for the int array.
 	env->ReleaseIntArrayElements(eventBuffer, intArray, 0);

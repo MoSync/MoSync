@@ -165,18 +165,26 @@ void packageAndroid(const SETTINGS& s, const RuntimeInfo& ri) {
 	sh(cmd.str().c_str());
 
 	// run android/apkbuilder.jar
-	string unsignedApk = dstDir + "/" + string(s.name) + "_unsigned.apk";
+	string unsignedUnalignedApk = dstDir + "/" + string(s.name) + "_unsigned_unaligned.apk";
 	cmd.str("");
 	cmd <<"java -jar "<<getBinary("android/apkbuilder.jar")<<
-		" "<<file(unsignedApk)<<
+		" "<<file(unsignedUnalignedApk)<<
 		" -u -z "<<file(resourcesAp_)<<
 		" -f "<<file(classesDex)<<
 		" -nf "<<file(addlib);
 	sh(cmd.str().c_str());
 
+	// sign the apk
+	string signedUnalignedApk = dstDir + "/" + string(s.name) + "_unaligned.apk";
+	sign(s, ri, unsignedUnalignedApk, signedUnalignedApk);
 
+	//zipalign the apk file
 	string signedApk = dstDir + "/" + string(s.name) + ".apk";
-	sign(s, ri, unsignedApk, signedApk);
+	cmd.str("");
+	cmd <<getBinary("android/zipalign")<<
+		" 4 "<<file(signedUnalignedApk)<<
+		" "<<file(signedApk);
+	sh(cmd.str().c_str());
 
 	// there, that should do it.
 }
@@ -264,7 +272,7 @@ static void injectIcons(const SETTINGS& s, const RuntimeInfo& ri) {
 			string outputDir = file(string(s.dst) + directories.at(i));
 			_mkdir(outputDir.c_str());
 			string outputIcon = outputDir + "/icon.png";
-			injectIcon("Android", size.c_str(), s.icon, file(outputIcon).c_str(), s.silent);
+			injectIcon("Android", size.c_str(), s.icon, file(outputIcon).c_str(), s.silent, false);
 		}
 	}
 }

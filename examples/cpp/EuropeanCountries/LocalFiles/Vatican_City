@@ -1,0 +1,9 @@
+{
+	"Name" : "Vatican City",
+	"FlagID": 51,
+	"Population" : "836",
+	"Area" : "0.44 sq km",
+	"Languages" : "Vatican City has no formally enacted official language, but, unlike the Holy See, which most often uses Latin for the authoritative version of its official documents, Vatican City uses only Italian in its legislation and official communications. Italian is also the everyday language used by most of those who work in the state. In the Swiss Guard, German is the language used for giving commands, but the individual guards take their oath of loyalty in their own languages, German, French, Romansh or Italian. Vatican City's official website languages are Italian, English, French, German, and Spanish. (This site should not be confused with that of the Holy See, which uses all these languages, along with Portuguese, with Latin since 9 May 2008 and Chinese since 18 March 2009.)",
+	"Government" : "The government of Vatican City has a unique structure. The Pope is the sovereign of the state. Legislative authority is vested in the Pontifical Commission for Vatican City State, a body of cardinals appointed by the Pope for five-year periods. Executive power is in the hands of the President of that commission, assisted by the General Secretary and Deputy General Secretary. The state's foreign relations are entrusted to the Holy See's Secretariat of State and diplomatic service. Nevertheless, the pope has full and absolute executive, legislative and judicial power over Vatican City. He is currently the only absolute monarch in Europe.",
+	"Capital" : "Vatican City"
+}

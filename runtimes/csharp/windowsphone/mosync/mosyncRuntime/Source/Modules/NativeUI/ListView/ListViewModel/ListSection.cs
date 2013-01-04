@@ -52,18 +52,17 @@ namespace MoSync
 
             #region Private class members
 
-            private string mFooterText = "";
-            private string mTitle;
-            private string mHeader;
-            private string mFooter;
+            private string mFooter = "";
+            private string mTitle = "";
+            private string mHeader = "";
             private Brush mHeaderColor;
             private Brush mFooterColor;
             private Visibility mFooterVisibility;
             private Brush mGroupHeaderColor;
             private VerticalAlignment mHeaderTextVerticalAlignment;
             private VerticalAlignment mFooterTextVerticalAlignment;
-            private HorizontalAlignment mHeaderTextHorizontalAlignment;
-            private HorizontalAlignment mFooterTextHorizontalAlignment;
+            private TextAlignment mHeaderTextHorizontalAlignment;
+            private TextAlignment mFooterTextHorizontalAlignment;
             private double mHeaderFontSize;
             private double mFooterFontSize;
             private Brush mHeaderFontColor;
@@ -128,9 +127,9 @@ namespace MoSync
                 this.FooterVisibility = Visibility.Collapsed;
                 this.GroupHeaderColor = phoneAccentBrush;
 
-                this.HeaderTextHorizontalAlignment = HorizontalAlignment.Left;
+                this.HeaderTextHorizontalAlignment = TextAlignment.Left;
                 this.HeaderTextVerticalAlignment = VerticalAlignment.Center;
-                this.FooterTextHorizontalAlignment = HorizontalAlignment.Left;
+                this.FooterTextHorizontalAlignment = TextAlignment.Left;
                 this.FooterTextVerticalAlignment = VerticalAlignment.Center;
 
                 this.HeaderFontFamily = new FontFamily("PhoneFontFamilyNormal");
@@ -187,14 +186,18 @@ namespace MoSync
             {
                 get
                 {
-                    return mFooterText;
+                    return mFooter;
                 }
                 set
                 {
-                    mFooterText = value;
-                    if (mFooterText != "")
+                    mFooter = value;
+                    if (mFooter != null)
                     {
                         FooterVisibility = Visibility.Visible;
+                    }
+                    else
+                    {
+                        FooterVisibility = Visibility.Collapsed;
                     }
                 }
             }
@@ -237,10 +240,7 @@ namespace MoSync
                 }
                 set
                 {
-                    if (value != null)
-                    {
-                        mFooterVisibility = value;
-                    }
+                    mFooterVisibility = value;
                 }
             }
 
@@ -273,10 +273,7 @@ namespace MoSync
                 }
                 set
                 {
-                    if (value != null)
-                    {
-                        mHeaderTextVerticalAlignment = value;
-                    }
+                    mHeaderTextVerticalAlignment = value;
                 }
             }
 
@@ -291,17 +288,14 @@ namespace MoSync
                 }
                 set
                 {
-                    if (value != null)
-                    {
-                        mFooterTextVerticalAlignment = value;
-                    }
+                    mFooterTextVerticalAlignment = value;
                 }
             }
 
             /**
              * The horizontal alignment of the header text.
              */
-            public HorizontalAlignment HeaderTextHorizontalAlignment
+            public TextAlignment HeaderTextHorizontalAlignment
             {
                 get
                 {
@@ -309,17 +303,14 @@ namespace MoSync
                 }
                 set
                 {
-                    if (value != null)
-                    {
-                        mHeaderTextHorizontalAlignment = value;
-                    }
+                    mHeaderTextHorizontalAlignment = value;
                 }
             }
 
             /**
              * The horizontal alignment of the footer text.
              */
-            public HorizontalAlignment FooterTextHorizontalAlignment
+            public TextAlignment FooterTextHorizontalAlignment
             {
                 get
                 {
@@ -327,10 +318,7 @@ namespace MoSync
                 }
                 set
                 {
-                    if (value != null)
-                    {
-                        mFooterTextHorizontalAlignment = value;
-                    }
+                    mFooterTextHorizontalAlignment = value;
                 }
             }
 

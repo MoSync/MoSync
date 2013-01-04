@@ -128,7 +128,7 @@ void ListScreen::createMainLayout() {
 void ListScreen::createListManipulationLayout()
 {
 	mRemoveFirstSection = new Button();
-	mRemoveFirstSection->setText("Remove first secction");
+	mRemoveFirstSection->setText("Remove first section");
 	mRemoveFirstSection->fillSpaceHorizontally();
 	mMainLayout->addChild(mRemoveFirstSection);
 

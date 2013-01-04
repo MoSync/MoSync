@@ -166,7 +166,7 @@ group WidgetTypes "Widget types" {
 
 		/**
 		 * @brief A Number Picker is a widget that enables the user to select a number from a predefined range.
-		 * Note: for the moment it is available only on iOS.
+		 * Available on iOS, WindowsPhone and Android.
 		 * See \ref WidgetNumberPickerProperties "Number Picker properties" for the properties available.
 		 */
 		NUMBER_PICKER = "NumberPicker";

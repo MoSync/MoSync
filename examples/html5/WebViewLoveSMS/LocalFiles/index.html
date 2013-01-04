@@ -12,7 +12,6 @@ html
   margin: 0;
   padding: 0;
   width: 100%;
-  height: 100%;
   background-image:url('amor128x128.png');
   background-color: #FF5577;
   font-family: sans-serif;
@@ -96,10 +95,10 @@ body
 }
 </style>
 
-<!-- Import the JavaScript to C++ bridge. -->
-<script type="text/javascript" charset="utf-8" src="js/mosync-bridge.js"></script>
+<!-- Import the Wormhole JavaScript Library. -->
+<script src="js/wormhole.js"></script>
 
-<script type="text/javascript">
+<script>
 // Global variables that hold message content.
 var G_LoveMessage = "";
 var G_KissMessage = "";
@@ -136,11 +135,7 @@ function SendSMS(textMessage)
   if (ValidatePhoneNo())
   {
     DisplayMessage('Sending...');
-    mosync.bridge.sendJSON(
-      { messageName: 'SendSMS',
-        phoneNo: GetPhoneNo(),
-        message: textMessage },
-      null);
+    mosync.bridge.send(['Custom', 'SendSMS', GetPhoneNo(), textMessage]);
   }
 }
 
@@ -262,7 +257,7 @@ CreateMessageStrings();
 </div>
 <script>
   // This informs the application that the page is loaded.
-  mosync.bridge.sendJSON({ messageName: 'PageLoaded' });
+  mosync.bridge.send(['Custom', 'PageLoaded']);
 </script>
 </body>
 </html>

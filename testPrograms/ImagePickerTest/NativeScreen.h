@@ -15,6 +15,7 @@
 #include "MAUtil/Environment.h"
 
 #include <MAUtil/String.h>
+#include <NativeUI/CheckBox.h>
 
 namespace Test
 {
@@ -176,6 +177,9 @@ private: // members
 	MAWidgetHandle mButton;
 
 	MAWidgetHandle mPreview;
+	MAWidgetHandle mEventReturnTypeCheckbox;
+	MAWidgetHandle mEventReturnTypeHorizontalLayout;
+	MAWidgetHandle mEventReturnTypeLabel;
 
 	MAHandle mExitButton;
 

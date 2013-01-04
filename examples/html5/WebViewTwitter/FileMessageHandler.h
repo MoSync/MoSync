@@ -26,7 +26,7 @@ MA 02110-1301, USA.
 #ifndef FILE_MESSAGE_HANDLER_H_
 #define FILE_MESSAGE_HANDLER_H_
 
-#include <Wormhole/MessageStreamJSON.h>
+#include <Wormhole/MessageStream.h>
 
 /**
  * Class that implements JavaScript calls.
@@ -50,69 +50,62 @@ public:
 	 * Implementation of standard API exposed to JavaScript.
 	 * @return true if message was handled, false if not.
 	 */
-	bool handleMessage(Wormhole::MessageStreamJSON& message);
+	bool handleMessage(Wormhole::MessageStream& message);
 
 protected:
 	/**
 	 * Handle the getLocalPath message.
 	 */
-	void handleFileGetLocalPath(Wormhole::MessageStreamJSON& message);
+	void handleFileGetLocalPath(Wormhole::MessageStream& message);
 
 	/**
 	 * Handle the file read message.
 	 */
-	void handleFileRead(Wormhole::MessageStreamJSON& message);
+	void handleFileRead(Wormhole::MessageStream& message);
 
 	/**
 	 * Handle the file write message.
 	 */
-	void handleFileWrite(Wormhole::MessageStreamJSON& message);
+	void handleFileWrite(Wormhole::MessageStream& message);
 
 	/**
 	 * Handle the log message.
 	 */
-	void handleLog(Wormhole::MessageStreamJSON& message);
+	void handleLog(Wormhole::MessageStream& message);
 
 	/**
 	 * Calls a JavaScript callback function using the "callbackId"
 	 * parameter. The callbackId is supplied automatically when
-	 * using the mosync.bridge.sendJSON function.
+	 * calling mosync.bridge.send wuth a callback function.
+	 * @param message The message stream from which to get the
+	 * callback id.
 	 * @param result A string that contains the data to be returned
 	 * to the JavaScript callback function.
-	 * @return true on success, false on error.
 	 */
-	bool replyString(
-		Wormhole::MessageStreamJSON& message,
+	void replyString(
+		Wormhole::MessageStream& message,
 		const MAUtil::String& result);
 
 	/**
 	 * Calls a JavaScript callback function using the "callbackId"
 	 * parameter. The callbackId is supplied automatically when
-	 * using the mosync.bridge.sendJSON function.
+	 * calling mosync.bridge.send wuth a callback function.
+	 * @param message The message stream from which to get the
+	 * callback id.
 	 * @param result A boolean to be returned
 	 * to the JavaScript callback function.
-	 * @return true on success, false on error.
 	 */
-	bool replyBoolean(Wormhole::MessageStreamJSON& message, bool result);
+	void replyBoolean(Wormhole::MessageStream& message, bool result);
 
 	/**
 	 * Calls a JavaScript callback function using the "callbackId"
-	 * parameter. Returns null to the callback function.
-	 * The callbackId is supplied automatically when
-	 * using the mosync.bridge.sendJSON function.
-	 * @return true on success, false on error.
+	 * parameter. The callbackId is supplied automatically when
+	 * calling mosync.bridge.send wuth a callback function.
+	 * Returns null to the callback function.
+	 * @param message The message stream from which to get the
+	 * callback id.
 	 */
-	bool replyNull(Wormhole::MessageStreamJSON& message);
-
-	/**
-	 * Utility method to check if there is a callbackId.
-	 */
-	bool hasNoCallbackId(Wormhole::MessageStreamJSON& message);
-
-	/**
-	 * Utility method for getting the message callbackId as a string.
-	 */
-	MAUtil::String getCallBackId(Wormhole::MessageStreamJSON& message);
+	void replyNull(Wormhole::MessageStream& message);
 };
 
 #endif
