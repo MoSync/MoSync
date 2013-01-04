@@ -18,7 +18,11 @@ public class Typedef extends TypeDescriptor {
 		return name;
 	}
 
-	public TypeDescriptor resolve(HashSet<String> circularCheck) {
+	public TypeDescriptor resolve() {
+		return resolve(new HashSet<String>());
+	}
+
+	private TypeDescriptor resolve(HashSet<String> circularCheck) {
 		TypeDescriptor ref = module.getTypeDescriptor(typeref, 0, false);
 		if (ref == null) {
 			throw new IllegalArgumentException("Unknown type: " + typeref);
@@ -27,7 +31,10 @@ public class Typedef extends TypeDescriptor {
 			throw new IllegalArgumentException("Circular definition of " + name);
 		}
 		circularCheck.add(name);
-		return ref.resolve(circularCheck);
+		if (ref instanceof Typedef) {
+			return ((Typedef) ref).resolve(circularCheck);
+		}
+		return ref;
 	}
 
 	@Override

@@ -77,7 +77,7 @@ public class MoSyncExtensionLoader {
 				ArrayList<TypeDescriptor> currentDescriptors = new ArrayList<TypeDescriptor>();
 				TypeDescriptor returnDescriptor = null;
 				ArrayList<FunctionInvocation> currentFunctions = new ArrayList<FunctionInvocation>();
-				HashMap<String, TypeDescriptor> typedefs = new HashMap<String, TypeDescriptor>();
+				HashMap<String, Typedef> typedefs = new HashMap<String, Typedef>();
 				HashMap<String, StructType> structs = new HashMap<String, StructType>();
 
 				for (int eventType = xpp.getEventType(); eventType != XmlPullParser.END_DOCUMENT; eventType = xpp

@@ -25,7 +25,7 @@ public class FunctionInvocation {
 
 		Class[] parameterTypes = new Class[tds.length];
 		for (int i = 0; i < parameterTypes.length; i++) {
-			TypeDescriptor resolvedParameterType = tds[i].resolve();
+			TypeDescriptor resolvedParameterType = tds[i];
 			parameterTypes[i] = resolvedParameterType.getNativeClass();
 		}
 		resolvedMethod = module.getModule().getClass().getMethod(name,

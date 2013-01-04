@@ -11,7 +11,7 @@ public class ExtensionModule {
 	private HashMap<Integer, FunctionInvocation> invokersById = new HashMap<Integer, FunctionInvocation>();
 	private HashMap<String, FunctionInvocation> invokersByName = new HashMap<String, FunctionInvocation>();
 	private Object module;
-	private Map<String, TypeDescriptor> typedefs = new HashMap<String, TypeDescriptor>();
+	private Map<String, Typedef> typedefs = new HashMap<String, Typedef>();
 	private Map<String, StructType> structs = new HashMap<String, StructType>();
 	private int hash;
 
@@ -56,7 +56,7 @@ public class ExtensionModule {
 		}
 	}
 
-	public void setTypedefs(Map<String, TypeDescriptor> typedefs) {
+	public void setTypedefs(Map<String, Typedef> typedefs) {
 		this.typedefs = typedefs;
 	}
 
@@ -82,6 +82,8 @@ public class ExtensionModule {
 			result = new PointerType(getTypeDescriptor(name, ptrDepth - 1, out));
 		} else if ("int".equals(name)) {
 			result = IntType.getInstance();
+		} else if ("long long".equals(name)) {
+			result = LongType.getInstance();
 		} else if ("char".equals(name)) {
 			result = CharType.getInstance();
 		} else if ("double".equals(name)) {
@@ -91,7 +93,10 @@ public class ExtensionModule {
 		} else if ("void".equals(name)) {
 			result = VoidType.getInstance();
 		} else {
-			result = typedefs.get(name);
+			Typedef td = typedefs.get(name);
+			if (td != null) {
+				result = td.resolve();
+			}
 		}
 
 		if (result == null) {

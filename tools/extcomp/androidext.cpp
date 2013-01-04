@@ -228,9 +228,12 @@ string toAndroidType(Interface& ext, string& ctype, bool autoBox, bool constant)
 			if (extractedType == "char") return "Character";
 			if (extractedType == "double") return "Double";
 			if (extractedType == "float") return "Float";
+			if (extractedType == "long long") return "Long";
 		} else if (extractedType == "int" || extractedType == "char" ||
 			extractedType == "double" || extractedType == "float") {
 			return extractedType;
+		} else if (extractedType == "long long") {
+			return "long";
 		}
 
 		// The rest are structs

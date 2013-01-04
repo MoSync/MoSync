@@ -14,14 +14,6 @@ public abstract class TypeDescriptor implements Marshaller {
 
 	public abstract int size();
 
-	public final TypeDescriptor resolve() {
-		return resolve(new HashSet<String>());
-	}
-
-	public TypeDescriptor resolve(HashSet<String> circularCheck) {
-		return this;
-	}
-
 	public Object readFromMemory(int addr) {
 		byte[] buf = new byte[size()];
 		ByteBuffer mem = getMemorySlice(addr, size());

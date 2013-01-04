@@ -153,7 +153,7 @@ void writeHeaders(string& headerOut, Interface& ext, bool includeFunctions) {
 
 	for (size_t i = 0; i < ext.typedefs.size(); i++) {
 		Typedef t = ext.typedefs[i];
-		headerfile << "typedef " << t.name << " " << t.type << ";\n\n";
+		headerfile << "typedef " << t.type << " " << t.name << ";\n\n";
 	}
 
 	for (size_t i = 0; i < ext.structs.size(); i++) {
@@ -238,7 +238,7 @@ void streamFunctionWrapper(ostream& out, Interface& ext, Function& f, bool modHa
 	if (isReturnType(ext, f.returnType)) {
 		string returnType = cType(ext, f.returnType);
 		out << "    " << returnType << " res;\n";
-		out << "    passedArgs[" << numargs << "] = &res;\n";
+		out << "    passedArgs[" << numargs << "] = (int) &res;\n";
 	}
 	for (int i = 0; i < numargs; i++) {
 		string name = "_" + f.args[i].name;
@@ -273,8 +273,9 @@ bool isReturnType(Interface& ext, string& type) {
 string resolveTypedef(Interface& ext, string& typedefName) {
 	for (size_t i = 0; i < ext.typedefs.size(); i++) {
 		Typedef t = ext.typedefs[i];
-		if (t.type == typedefName) {
-			return resolveTypedef(ext, t.name);
+		printf("TYPEDEF: %s; WANTED: %s\n", t.type.c_str(), typedefName.c_str());
+		if (t.name == typedefName) {
+			return resolveTypedef(ext, t.type);
 		}
 	}
 	return typedefName;
