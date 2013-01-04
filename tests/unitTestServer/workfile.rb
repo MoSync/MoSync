@@ -12,7 +12,7 @@ work.instance_eval do
 		'../../runtimes/cpp/platforms/sdl/ThreadPoolImpl.cpp',
 	]
 	@EXTRA_INCLUDES = ['../../intlibs', '../../runtimes/cpp/base', '../../runtimes/cpp/platforms/sdl']
-	@LOCAL_LIBS = ['mosync_log_file', 'mosync_bluetooth']
+	@LOCAL_LIBS = ['mosync_bluetooth', 'mosync_log_file']
 
 	common_libraries = ['SDL', 'SDLmain']
 	if(HOST == :win32) then

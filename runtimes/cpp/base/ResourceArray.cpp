@@ -324,11 +324,11 @@ namespace Base {
 	}
 
 	void ResourceArray::logEverything() {
+#ifdef LOGGING_ENABLED
 #define RESOURCE_STRINGS(R, T, D) resourceStrings[R] = #R;
 		const char *resourceStrings[128] = {0};
 		TYPES(RESOURCE_STRINGS)
 
-#ifdef LOGGING_ENABLED
 		LOG("Num static resources: %d\n", mResSize);
 		LOG("Num dynamic resources: %d\n", mDynResSize);
 		for(unsigned int i = 0; i < mResSize; i++) {

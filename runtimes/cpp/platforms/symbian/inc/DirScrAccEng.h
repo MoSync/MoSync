@@ -41,7 +41,7 @@ class CDirScrAccEng : public MDirectScreenAccess {
 public:
 	static CDirScrAccEng* NewL(RWsSession& aClient, CWsScreenDevice& aScreenDevice,
 		RWindow& aWindow);
-	virtual ~CDirScrAccEng();	
+	virtual ~CDirScrAccEng();
 public:
 	void StartDrawingL();
 	void StopDrawing();
@@ -52,7 +52,7 @@ public:
 	void SetDrawSurfaceL(TAlphaBitmap* img);
 	void ClearScreen();
 	void UpdateScreenSize();
-	
+
 	void Reset();
 
 	void SetColor(int argb);
@@ -63,6 +63,7 @@ public:
 	void LineDrawClip(long x,long y,long dx,long dy);
 	void FillRectClip(int left, int top, int width, int height);
 	void FillTriangleStripClip(const MAPoint2d* points, int count);
+	void FillTriangleFanClip(const MAPoint2d* points, int count);
 
 	void DrawTextL(const TDesC& aText, TPoint aPoint);
 	MAExtent GetTextSizeL(const TDesC& aText);
@@ -77,19 +78,19 @@ public:
 	int GetFrameBufferLen() { return iFrameBufLen; }
 
 private:
-	//MDirectScreenAccess 
+	//MDirectScreenAccess
 	void Restart(RDirectScreenAccess::TTerminationReasons aReason);
 	void AbortNow(RDirectScreenAccess::TTerminationReasons aReason);
 private:
 	CDirScrAccEng(RWsSession& aClient, CWsScreenDevice& aScreenDevice,
 		RWindow& aWindow);
-	void ConstructL();	
+	void ConstructL();
 
 	void FillDirect(Pixel* drawBuffer, long xy,long d);
 	void HorizontalLineDrawClip(TMyDrawBuf& drawBuffer, long x,long y,long dx);
 	void DrawSpan(long x,long y,long dx, TMyDrawBuf& drawBuffer);
 	void DrawTriangle(TMyDrawBuf& drawBuffer, int x1,int y1,int x2,int y2,int x3,int y3);
-	
+
 	void UpdateClip();
 
 public:	//hack for VideoPlayer
@@ -105,7 +106,7 @@ private:
 	RRegion* iRegion;
 
 	//just caching
-	const CFont* gFont; 
+	const CFont* gFont;
 	TInt gFontBaseline;
 	//Pixel* gDrawBuffer;
 	//int gDrawWidth, gDrawHeight;
@@ -127,7 +128,7 @@ private:
 	CFbsBitGc* iFBGc;
 
 	const void* iRawFrameBuf;
-	
+
 	byte* iMulTable;	// for the Image class.
 };
 

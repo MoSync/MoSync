@@ -37,6 +37,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #ifdef _WIN32
 #include <helpers/platforms/windows/HandleCloser.h>
+#else
+#include <unistd.h>
 #endif
 
 //originally copied from Ptah::BuildThread::execute().
@@ -66,7 +68,7 @@ int execDoublePipe(const char* cmdline, const std::string& in, std::string& out)
 		PIPE_TYPE_BYTE | PIPE_WAIT, 1, BUFSIZE, BUFSIZE, 5000, NULL));
 	W32TEST(hStdinPipeRead = CreateFile("\\\\.\\pipe\\MoSyncStdinPipe", GENERIC_READ,
 		FILE_SHARE_READ, &sa, OPEN_EXISTING, 0, NULL));
-   
+
 	ZERO_OBJECT(si);
 	si.cb = sizeof(si);
 	si.dwFlags = STARTF_USESTDHANDLES;
@@ -150,13 +152,13 @@ int execDoublePipe(const char* cmdline, const std::string& in, std::string& out)
 #define LOG_ERRNO LOG("Errno %i @ %s:%i\n", errno, __FILE__, __LINE__)
 #define FAIL_ERRNO LOG_ERRNO; return -2
 #define ERRNO(a) if((a) < 0) { FAIL_ERRNO; }
-	
-	LOG("execDoublePipe(%s, %"PFZT")\n", cmdline, in.size());
-	
+
+	LOG("execDoublePipe(%s, %" PFZT ")\n", cmdline, in.size());
+
 	int pin[2], pout[2];
 	ERRNO(pipe(pin));
 	ERRNO(pipe(pout));
-	
+
 	pid_t pid = fork();
 	if(pid == 0) {	//child
 		if(dup2(pin[0], STDIN_FILENO) < 0)
@@ -171,7 +173,7 @@ int execDoublePipe(const char* cmdline, const std::string& in, std::string& out)
 		strcpy(arg ,cmdline);
 		char *const argv[2] = {arg, NULL};
 
-		execvp(cmdline, argv);	//if this function returns, it has failed.	
+		execvp(cmdline, argv);	//if this function returns, it has failed.
 		LOG_ERRNO;
 		_exit(errno);
 	} else {	//parent

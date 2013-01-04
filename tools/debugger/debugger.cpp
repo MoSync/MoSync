@@ -22,6 +22,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <fstream>
 #ifdef _MSC_VER
 #include <io.h>
+#else
+#include <unistd.h>
 #endif
 #include <fcntl.h>
 #include <errno.h>

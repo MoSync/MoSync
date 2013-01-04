@@ -121,7 +121,7 @@ std::list<File> File::listFiles ( void )
 }
 
 String getExtension(String filename) {
-	int ix = filename.find_last_of('.');
+	size_t ix = filename.find_last_of('.');
 	if (ix != String::npos) {
 		return filename.substr(ix + 1, filename.length() - ix - 1);
 	}
