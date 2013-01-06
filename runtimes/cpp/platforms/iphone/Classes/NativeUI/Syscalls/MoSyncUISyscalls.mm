@@ -299,6 +299,41 @@ int maWidgetScreenShow(MAWidgetHandle screenHandle) {
 	return returnValue;
 }
 
+int maWidgetScreenShowWithTransition(MAWidgetHandle screenHandle, MAWScreenTransitionType screenTransitionType, int screenTransitionDuration) {
+	IWidget* screen = [mosyncUI getWidget:screenHandle];
+	if(!screen) return MAW_RES_INVALID_SCREEN;
+
+	if(!([screen class] == [ScreenWidget class]) && !([screen superclass] == [ScreenWidget class])) {
+		return MAW_RES_INVALID_SCREEN;
+	}
+
+    if ( (screenTransitionType < MAW_TRANSITION_TYPE_NONE) || (screenTransitionType > MAW_TRANSITION_TYPE_CUSTOM) ) {
+        return MAW_RES_INVALID_SCREEN_TRANSITION_TYPE;
+    }
+
+    if ( (screenTransitionDuration < 0) ) {
+        return MAW_RES_INVALID_SCREEN_TRANSITION_DURATION;
+    }
+
+	sNativeUIEnabled = screenHandle==MAW_CONSTANT_MOSYNC_SCREEN_HANDLE?false:true;
+
+    NSNumber* scrTransType = [[NSNumber alloc] initWithInt:screenTransitionType];
+    NSNumber* scrTransDur = [[NSNumber alloc] initWithInt:screenTransitionDuration];
+
+	int returnValue;
+    NSArray* arguments = [[NSArray alloc] initWithObjects:screen, scrTransType, scrTransDur, nil];
+	[NSObject performSelectorOnMainThread:@selector(show:withTransitionType:andTransitionDuration:)
+                               withTarget:mosyncUI
+							  withObjects:arguments
+							waitUntilDone:YES
+						   andReturnValue:&returnValue];
+    [arguments release];
+    [scrTransDur release];
+    [scrTransType release];
+
+	return returnValue;
+}
+
 /**
  * Pushes a screen to the given screen stack, hides the current screen and
  * shows the pushed screen it. Pushing it to the stack will make it

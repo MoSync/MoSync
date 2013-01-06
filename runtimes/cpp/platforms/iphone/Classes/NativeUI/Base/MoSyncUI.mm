@@ -290,16 +290,90 @@ static IWidget* sOldScreen = nil;
 }
 
 - (int)show: (IWidget*) widget {
-
+    NSLog(@"MVSIGN show");
     if(sOldScreen == widget)
         return MAW_RES_OK;
+
+    if(sOldScreen != nil) {
+        if ([widget class] != [ScreenWidget class] &&
+            [[widget superclass] class] != [ScreenWidget class])
+            {
+                return MAW_RES_INVALID_SCREEN;
+            }
+    }
 
 	if(sOldScreen != nil) {
 		UIView* actualView = [sOldScreen view];
 		[actualView removeFromSuperview];
 	}
 
-	[mainWindow insertSubview:[widget view] atIndex:0];
+    ScreenWidget* screen = (ScreenWidget*)widget;
+    mainWindow.rootViewController = [screen getController];
+	//[mainWindow insertSubview:[widget view] atIndex:0];
+
+	[widget layout];
+	[widget show];
+	[mainWindow makeKeyAndVisible];
+	sOldScreen = widget;
+
+	return MAW_RES_OK;
+}
+
+// shows a screen with a transition.
+- (int)show: (IWidget*) widget withTransitionType: (NSNumber*) transitionType andTransitionDuration: (NSNumber*) transitionDuration {
+    //Obtain/Check screen transition type
+    UIViewAnimationOptions options;
+    switch ([transitionType integerValue]) {
+        case MAW_TRANSITION_TYPE_FLIP_FROM_LEFT:
+            options = UIViewAnimationOptionTransitionFlipFromLeft;
+            break;
+        case MAW_TRANSITION_TYPE_FLIP_FROM_RIGHT:
+            options = UIViewAnimationOptionTransitionFlipFromRight;
+            break;
+        case MAW_TRANSITION_TYPE_CURL_UP:
+            options = UIViewAnimationOptionTransitionCurlUp;
+            break;
+        case MAW_TRANSITION_TYPE_CURL_DOWN:
+            options = UIViewAnimationOptionTransitionCurlDown;
+            break;
+        default:
+            return MAW_RES_INVALID_SCREEN_TRANSITION_TYPE;
+    }
+
+    if(sOldScreen == widget)
+        return MAW_RES_OK;
+
+    if(sOldScreen != nil) {
+        if ([widget class] != [ScreenWidget class] &&
+            [[widget superclass] class] != [ScreenWidget class])
+        {
+            return MAW_RES_INVALID_SCREEN;
+        }
+    }
+
+	if(sOldScreen != nil) {
+		UIView* actualView = [sOldScreen view];
+		[actualView removeFromSuperview];
+	}
+
+    ScreenWidget* screen = (ScreenWidget*)widget;
+    void (^handleTransitionDoneBlock)(BOOL) = ^(BOOL isTransFinished) {
+        if ( isTransFinished ) {
+            DLog(@"doTransition: Transition is finished");
+        }
+    };
+
+    void (^doAnimationBlock)(void) = ^(void) {
+        mainWindow.rootViewController = [screen getController];
+    };
+
+    // convert milliseconds to seconds for duration parameter of transition.
+    NSTimeInterval screenTransitionDuration = 0.001 * [transitionDuration doubleValue];
+
+    [UIView transitionWithView:mainWindow
+                      duration:screenTransitionDuration
+                       options:options
+                    animations:doAnimationBlock completion:handleTransitionDoneBlock];
 
 	[widget layout];
 	[widget show];
