@@ -29,6 +29,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <bluetooth/hci.h>
 #include <bluetooth/hci_lib.h>
 #include <bluetooth/sdp.h>
+#include <unistd.h>
 
 #include "../../config_bluetooth.h"
 #include "bluezcommon.hpp"

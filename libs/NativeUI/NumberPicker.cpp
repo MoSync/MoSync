@@ -21,7 +21,7 @@
  * @author Emma Tresanszki
  *
  * Class for number picker.
- * Note that this type of widget is available only on iOS for the moment.
+ * Available on iOS, WindowsPhone and Android.
  */
 
 #include "NumberPicker.h"

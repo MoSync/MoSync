@@ -689,8 +689,10 @@ static PimUtils *sharedInstance = nil;
     int returnValue;
     switch (fieldID)
     {
-        case MA_PIM_FIELD_CONTACT_ADDR:
         case MA_PIM_FIELD_CONTACT_NAME:
+            returnValue = 9;
+            break;
+        case MA_PIM_FIELD_CONTACT_ADDR:
             returnValue = 8;
             break;
         case MA_PIM_FIELD_CONTACT_ORG_INFO:

@@ -576,6 +576,24 @@ namespace Base
 		return (int)ret;
 	}
 
+	int _maImagePickerOpenWithEventReturnType(int eventReturnType, JNIEnv* jNIEnv, jobject jThis)
+	{
+		Base::gSyscall->VM_Yield();
+
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maImagePickerOpenWithEventReturnType", "(I)I");
+
+		jint ret = -1;
+
+		if (methodID != 0)
+			ret = jNIEnv->CallIntMethod(jThis, methodID, eventReturnType);
+
+		jNIEnv->DeleteLocalRef(cls);
+
+		return (int)ret;
+	}
+
 	int _maOptionsBox(const wchar* title, const wchar* destructiveText, const wchar* cancelText, int bufPointer, int bufSize,
 						JNIEnv* jNIEnv, jobject jThis)
 	{

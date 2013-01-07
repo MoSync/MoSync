@@ -1,0 +1,9 @@
+{
+	"Name" : "Switzerland",
+	"FlagID": 47,
+	"Population" : "8,000,000",
+	"Area" : "41,285 sq km",
+	"Languages" : "Switzerland has four official languages: German (63.7% total population share, with foreign residents; 72.5% of residents with Swiss citizenship, in 2000) in the north, east and centre of the country; French (20.4%; 21.0%) to the west; Italian (6.5%; 4.3%) in the south. Romansh (0.5%; 0.6%), a Romance language spoken locally in the southeastern trilingual canton of Graubünden, is designated by the Federal Constitution as a national language along with German, French and Italian (Article 4 of the Constitution), and as official language if the authorities communicate with persons of Romansh language (Article 70), but federal laws and other official acts do not need to be decreed in this language. The federal government is obliged to communicate in the official languages, and in the federal parliament simultaneous translation is provided from and into German, French and Italian.",
+	"Government" : "The politics of Switzerland take place in the framework of a multi-party federal parliamentary democratic republic, whereby the Federal Council of Switzerland is the head of government. Executive power is exercised by the government and the federal administration and is not concentrated in any one person. Federal legislative power is vested in both the government and the two chambers of the Federal Assembly of Switzerland. The judiciary is independent of the executive and the legislature. For any change in the constitution, a referendum is mandatory; for any change in a law, a referendum can be requested. Through referenda, citizens may challenge any law voted by federal parliament and through initiatives introduce amendments to the federal constitution, making Switzerland the closest state in the world to a direct democracy.",
+	"Capital" : "Bern"
+}

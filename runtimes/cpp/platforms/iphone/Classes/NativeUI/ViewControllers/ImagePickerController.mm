@@ -31,6 +31,8 @@ static ImagePickerController *sharedInstance = nil;
 
 @implementation ImagePickerController
 
+@synthesize returnDataType = _returnDataType;
+
 /**
  * Returns an instance to the shared singleton.
  * @return The shared object.
@@ -58,6 +60,8 @@ static ImagePickerController *sharedInstance = nil;
     mImagePicker = [[UIImagePickerController alloc] init];
     mImagePicker.sourceType = UIImagePickerControllerSourceTypePhotoLibrary;
     mImagePicker.delegate = self;
+
+    _returnDataType = MA_IMAGE_PICKER_EVENT_RETURN_TYPE_IMAGE_HANDLE;
 
     return [super init];
 }
@@ -90,12 +94,23 @@ static ImagePickerController *sharedInstance = nil;
 - (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info
 {
     UIImage* selectedImage = (UIImage*) [info objectForKey:UIImagePickerControllerOriginalImage];
-    MAHandle handle = [self getImageHandle:selectedImage];
 
     MAEvent event;
-	event.type = EVENT_TYPE_IMAGE_PICKER;
-	event.imagePickerState = 1;
-    event.imagePickerItem = handle;
+    event.type = EVENT_TYPE_IMAGE_PICKER;
+    event.imagePickerState = 1;
+
+    if ( MA_IMAGE_PICKER_EVENT_RETURN_TYPE_IMAGE_HANDLE == _returnDataType )
+    {
+        MAHandle handle = [self getImageHandle:selectedImage];
+        event.imagePickerItem = handle;
+    }
+    else if ( MA_IMAGE_PICKER_EVENT_RETURN_TYPE_IMAGE_DATA == _returnDataType )
+    {
+        MAHandle handle = [self getImageDataHandle:selectedImage];
+        event.imagePickerEncodingType = MA_IMAGE_PICKER_ITEM_ENCODING_JPEG;
+        event.imagePickerItem = handle;
+    }
+
     Base::gEventQueue.put(event);
 
     [self hide];
@@ -144,6 +159,24 @@ static ImagePickerController *sharedInstance = nil;
     maDestroyObject(dataPlaceholder);
 
     return imageHandle;
+}
+
+/**
+ * Gets an image data handle for a given image.
+ * @param image The given image.
+ * @return A image data handle or RES_OUT_OF_MEMORY in case of error.
+ */
+- (MAHandle)getImageDataHandle:(UIImage*)image
+{
+    NSData* data = UIImageJPEGRepresentation(image, 0);
+    int size = [data length];
+
+    MAHandle dataPlaceholder = maCreatePlaceholder();
+    TEST_RESULT(maCreateData(dataPlaceholder, size));
+    const void* src = [data bytes];
+    maWriteData(dataPlaceholder,src,0,size);
+
+    return dataPlaceholder;
 }
 
 @end
