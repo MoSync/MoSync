@@ -115,6 +115,20 @@ namespace NativeUI
 	}
 
 	/**
+	 * Show a screen with transition. Only one screen at a time is visible.
+	 * The previous screen will be hidden when showing a screen.
+	 * Note: This method is only applicable to screens.
+	 *
+	 * @param screenTransitionType The type of the screen transition. See available
+	 * screen transitions types \link #MA_TRANSITION_TYPE_NONE here \endlink
+	 * @param screenTransitionDuration The duration of the screen transition in milliseconds.
+	 */
+	void Screen::showWithTransition(MAWScreenTransitionType screenTransitionType, int screenTransitionDuration)
+	{
+		maWidgetScreenShowWithTransition(getWidgetHandle(), screenTransitionType, screenTransitionDuration);
+	}
+
+	/**
 	 * Called just before the screen begins rotating.
 	 * Subclasses may override this method to perform additional actions
 	 * immediately prior to the rotation.

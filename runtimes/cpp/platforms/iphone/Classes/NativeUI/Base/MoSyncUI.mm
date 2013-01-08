@@ -290,7 +290,6 @@ static IWidget* sOldScreen = nil;
 }
 
 - (int)show: (IWidget*) widget {
-    NSLog(@"MVSIGN show");
     if(sOldScreen == widget)
         return MAW_RES_OK;
 
