@@ -91,6 +91,7 @@ namespace Transitions
 			}
 			else
 			{
+				// We need to obtain the correct transition type/index.
 				mObserver.showSecondScreen(MAW_TRANSITION_TYPE_SLIDE_LEFT + mSelectedTransition - 1, kAndroidTransitionsArray[mSelectedTransition]);
 			}
 			//Workaround for Android 4.0 bug related to list view focus.

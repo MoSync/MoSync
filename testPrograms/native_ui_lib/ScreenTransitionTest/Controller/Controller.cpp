@@ -23,6 +23,7 @@
  *
  * @brief App main controller.
  */
+#define TRANSITION_TIME_MS 400
 
 #include "Controller.h"
 #include "../Screens/FirstScreen.h"
@@ -42,8 +43,8 @@ namespace Transitions
 		mFirstScreen = new FirstScreen(*this);
 		mSecondScreen = new SecondScreen(*this);
 
-		maWidgetScreenShow(mFirstScreen->getWidgetHandle());
-		//mFirstScreen->show();
+		//maWidgetScreenShow(mFirstScreen->getWidgetHandle());
+		mFirstScreen->show();
 	}
 
 	/**
@@ -58,13 +59,13 @@ namespace Transitions
 	/**
 	 * Tell the observer to show the second screen.
 	 */
-	void Controller::showSecondScreen(short transType /*TODO Replace with object*/, const char* text)
+	void Controller::showSecondScreen(short transType, const char* text)
 	{
 		currentTransition = transType;
 		mSecondScreen->resetTitleWithString(text);
-		//mSecondScreen->show();
-		//maWidgetScreenShow(mSecondScreen->getWidgetHandle());
-		maWidgetScreenShowWithTransition(mSecondScreen->getWidgetHandle(), transType, 300);
+
+		//maWidgetScreenShowWithTransition(mSecondScreen->getWidgetHandle(), transType, TRANSITION_TIME_MS);
+		mSecondScreen->showWithTransition(transType, TRANSITION_TIME_MS);
 	}
 
 	/**
@@ -72,8 +73,7 @@ namespace Transitions
 	 */
 	void Controller::hideSecondScreen()
 	{
-		//maWidgetScreenShow(mFirstScreen->getWidgetHandle());
-		maWidgetScreenShowWithTransition(mFirstScreen->getWidgetHandle(), currentTransition, 300);
-		//mFirstScreen->show();
+		//maWidgetScreenShowWithTransition(mFirstScreen->getWidgetHandle(), currentTransition, TRANSITION_TIME_MS);
+		mFirstScreen->showWithTransition(currentTransition, TRANSITION_TIME_MS);
 	}
 } // end of Transitions
