@@ -321,7 +321,7 @@ static IWidget* sOldScreen = nil;
 
 // shows a screen with a transition.
 - (int)show: (IWidget*) widget withTransitionType: (NSNumber*) transitionType andTransitionDuration: (NSNumber*) transitionDuration {
-    //Obtain/Check screen transition type
+    //Obtain screen transition option
     UIViewAnimationOptions options;
     switch ([transitionType integerValue]) {
         case MAW_TRANSITION_TYPE_FLIP_FROM_LEFT:
@@ -359,7 +359,7 @@ static IWidget* sOldScreen = nil;
     ScreenWidget* screen = (ScreenWidget*)widget;
     void (^handleTransitionDoneBlock)(BOOL) = ^(BOOL isTransFinished) {
         if ( isTransFinished ) {
-            DLog(@"doTransition: Transition is finished");
+            // If needed in the future.
         }
     };
 

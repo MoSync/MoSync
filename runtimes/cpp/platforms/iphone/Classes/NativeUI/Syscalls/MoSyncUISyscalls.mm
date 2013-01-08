@@ -300,6 +300,13 @@ int maWidgetScreenShow(MAWidgetHandle screenHandle) {
 }
 
 int maWidgetScreenShowWithTransition(MAWidgetHandle screenHandle, MAWScreenTransitionType screenTransitionType, int screenTransitionDuration) {
+
+    if ((0 == screenTransitionDuration) ||
+        (MAW_TRANSITION_TYPE_NONE == screenTransitionType))
+    {
+        return maWidgetScreenShow(screenHandle);
+    }
+
 	IWidget* screen = [mosyncUI getWidget:screenHandle];
 	if(!screen) return MAW_RES_INVALID_SCREEN;
 
