@@ -424,6 +424,51 @@ public class NativeUI
 	}
 
 	/**
+	 * Internal function for the maWidgetScreenShowWithTransition system call.
+	 * Sets the root widget to the root of the given screen using transition, but
+	 * it does not actually call setContentView, this should
+	 * be done through the RootViewReplacedListener.
+	 *
+	 * Note: Should only be called on the UI thread.
+	 */
+	public int maWidgetScreenShowWithTransition(final int screenHandle, final int screenTransitionType, final int screenTransitionDuration)
+	{
+		Widget screen = m_widgetTable.get( screenHandle );
+		if( screen == null )
+		{
+			Log.e( "MoSync", "maWidgetScreenShowWtihTransition: Invalid screen handle: " + screenHandle );
+			return IX_WIDGET.MAW_RES_INVALID_HANDLE;
+		}
+		if( !( screen instanceof ScreenWidget ) && !( screen instanceof MoSyncScreenWidget ) )
+		{
+			Log.e( "MoSync", "maWidgetScreenShowWtihTransition: Widget is not a screen: " + screenHandle );
+			return IX_WIDGET.MAW_RES_INVALID_SCREEN;
+		}
+
+		if ( screenTransitionDuration < 0 )
+		{
+			Log.e( "MoSync", "maWidgetScreenShowWtihTransition: Screen transition duration is invalid: " + screenTransitionDuration );
+			return IX_WIDGET.MAW_RES_INVALID_SCREEN_TRANSITION_DURATION;
+		}
+
+		// Check if the screen transition is available on android. See screen transition types documentation for availability.
+		if ( (IX_WIDGET.MAW_TRANSITION_TYPE_NONE != screenTransitionType) &&
+				((IX_WIDGET.MAW_TRANSITION_TYPE_SLIDE_LEFT > screenTransitionType ) || (screenTransitionType > IX_WIDGET.MAW_TRANSITION_TYPE_FADE_OUT))  )
+		{
+			Log.e( "MoSync", "maWidgetScreenShowWtihTransition: Screen transition type is not available: " + screenTransitionType );
+			return IX_WIDGET.MAW_RES_INVALID_SCREEN_TRANSITION_TYPE;
+		}
+
+		if( m_rootViewReplacedListener != null )
+		{
+			m_rootViewReplacedListener.rootViewReplacedUsingTransition( screen.getRootView( ), screenTransitionType, screenTransitionDuration );
+		}
+		m_currentScreen = screen;
+
+		return IX_WIDGET.MAW_RES_OK;
+	}
+
+	/**
 	 * Internal function for the maWidgetStackScreenPush system call.
 	 * Takes out the stack screen from the widget table and pushes
 	 * the screen to it.
@@ -752,6 +797,16 @@ public class NativeUI
 		 * @param newRoot The new root view.
 		 */
 		void rootViewReplaced(View newRoot);
+
+		/**
+		 * Called when the root view has been replaced
+		 * by another root view using a screen transition..
+		 *
+		 * @param newRoot The new root view.
+		 * @param screenTransitionType The screen transition type.
+		 * @param screenTransitionDuration The screen transition duration.
+		 */
+		void rootViewReplacedUsingTransition(View newRoot, int screenTransitionType, int screenTransitionDuration);
 	}
 
 	public Widget getCameraView(final int handle)
