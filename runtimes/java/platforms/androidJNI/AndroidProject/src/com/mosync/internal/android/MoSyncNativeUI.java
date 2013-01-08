@@ -290,6 +290,31 @@ public class MoSyncNativeUI implements RootViewReplacedListener
 	}
 
 	/**
+	 * Internal wrapper for maWidgetScreenShowWithTransition that runs
+	 * the call in the UI thread.
+	 */
+	public int maWidgetScreenShowWithTransition(final int screenHandle, final int screenTransitionType, final int screenTransitionDurations)
+	{
+		try
+		{
+			final AsyncWait<Integer> waiter = new AsyncWait<Integer>();
+			getActivity().runOnUiThread(new Runnable()
+			{
+				public void run()
+				{
+					int result = mNativeUI.maWidgetScreenShowWithTransition(screenHandle, screenTransitionType, screenTransitionDurations);
+					waiter.setResult(result);
+				}
+			});
+			return waiter.getResult();
+		}
+		catch(InterruptedException ie)
+		{
+			return -1;
+		}
+	}
+
+	/**
 	 * Internal wrapper for maWidgetStackScreenPush that runs
 	 * the call in the UI thread.
 	 */
@@ -510,6 +535,19 @@ public class MoSyncNativeUI implements RootViewReplacedListener
 	public void rootViewReplaced(View newRoot)
 	{
 		((MoSync) getActivity()).setRootView( newRoot );
+	}
+
+	@Override
+	public void rootViewReplacedUsingTransition(View newRoot, int screenTransitionType, int screenTransitionDuration)
+	{
+		if ( (IX_WIDGET.MAW_TRANSITION_TYPE_NONE == screenTransitionType) || (0 == screenTransitionDuration))
+		{
+			((MoSync) getActivity()).setRootView( newRoot );
+		}
+		else
+		{
+			((MoSync) getActivity()).setRootViewUsingTransition( newRoot, screenTransitionType, screenTransitionDuration );
+		}
 	}
 
 	public Widget getCameraPreview(final int handle)
