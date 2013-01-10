@@ -173,6 +173,22 @@ namespace MoSync
                 return MoSync.Constants.MAW_RES_OK;
             };
 
+            ioctls.maWidgetScreenShowWithTransition = delegate(int _screenHandle, int _screenTransitionType, int _screenTransitionDuration)
+            {
+                // Windows Phone Toolkit screen transitions do not have an time argument so _screenTransitionDuration
+                // will be ignored on Windows platform.
+                if (_screenHandle < 0 || _screenHandle >= mWidgets.Count)
+                    return MoSync.Constants.MAW_RES_INVALID_HANDLE;
+
+                // If transition type is not available on this platform return error code.
+                if (!NativeUI.MoSyncScreenTransitions.isTransitionAvailable(_screenTransitionType))
+                    return MoSync.Constants.MAW_RES_INVALID_SCREEN_TRANSITION_TYPE;
+
+                IScreen screen = (IScreen)mWidgets[_screenHandle];
+                screen.ShowWithTransition(_screenTransitionType);
+                return MoSync.Constants.MAW_RES_OK;
+            };
+
             /*
              * Implementation for maWidgetScreenAddOptionsMenuItem
              *

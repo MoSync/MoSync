@@ -264,6 +264,54 @@ namespace MoSync
             }
 
             /**
+             * ShowWithTansition function implementation. Shows next screen with transitions.
+             *
+             * @param screenTransitionType a transition type.
+             */
+            public void ShowWithTransition(int screenTransitionType)
+            {
+                MoSync.Util.RunActionOnMainThreadSync(() =>
+                {
+                    PhoneApplicationFrame frame = (PhoneApplicationFrame)Application.Current.RootVisual;
+                    //If the application bar visibility flag is set on true then the application bar is
+                    //ready to be shown.
+                    if (GetApplicationBarVisibility())
+                    {
+                        //Sets the application bar for the mainPage.xaml to our custom application bar.
+                        (frame.Content as PhoneApplicationPage).ApplicationBar = mApplicationBar;
+                    }
+                    //Sets the content of the mainPage.xaml as our screen content with transitions/animation.
+                    switch (screenTransitionType)
+                    {
+                        case MoSync.Constants.MAW_TRANSITION_TYPE_NONE:
+                            (frame.Content as PhoneApplicationPage).Content = mPage;
+                            break;
+                        case MoSync.Constants.MAW_TRANSITION_TYPE_SLIDE_RIGHT:
+                            MoSyncScreenTransitions.doSlideRightTransition(mPage);
+                            break;
+                        case MoSync.Constants.MAW_TRANSITION_TYPE_SLIDE_LEFT:
+                            MoSyncScreenTransitions.doSlideLeftTransition(mPage);
+                            break;
+                        case MoSync.Constants.MAW_TRANSITION_TYPE_SWIVEL_IN:
+                            MoSyncScreenTransitions.doSwivelInTransition(mPage);
+                            break;
+                        case MoSync.Constants.MAW_TRANSITION_TYPE_SWIVEL_OUT:
+                            MoSyncScreenTransitions.doSwivelOutTransition(mPage);
+                            break;
+                        case MoSync.Constants.MAW_TRANSITION_TYPE_TURNSTILE_FOREWARD:
+                            MoSyncScreenTransitions.doTurnstileForewardTransition(mPage);
+                            break;
+                        case MoSync.Constants.MAW_TRANSITION_TYPE_TURNSTILE_BACKWARD:
+                            MoSyncScreenTransitions.doTurnstileBackwardTransition(mPage);
+                            break;
+                        default:
+                            // It should not reach this point.
+                            break;
+                    }
+                });
+            }
+
+            /**
              * MAW_SCREEN_TITLE property implementation.
              */
             [MoSyncWidgetProperty(MoSync.Constants.MAW_SCREEN_TITLE)]

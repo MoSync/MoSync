@@ -27,6 +27,7 @@ namespace MoSync
         public interface IScreen
         {
             void Show();
+            void ShowWithTransition(int screenTransitionType);
             Microsoft.Phone.Shell.ApplicationBar GetApplicationBar();
             void EnableApplicationBar();
             bool GetApplicationBarVisibility();

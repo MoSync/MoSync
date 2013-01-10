@@ -101,6 +101,7 @@
     <Compile Include="Source\Modules\MoSyncOptionsBoxModule.cs" />
     <Compile Include="Source\Modules\MoSyncScreenOrientationModule.cs" />
     <Compile Include="Source\Modules\MoSyncSensorsModule.cs" />
+    <Compile Include="Source\Modules\NativeUI\MoSyncScreenTransitions.cs" />
     <Compile Include="Source\Modules\NativeUI\ListView\ListViewModel\ListItem.cs" />
     <Compile Include="Source\Modules\NativeUI\ListView\ListViewModel\ListSection.cs" />
     <Compile Include="Source\Modules\NativeUI\ListView\ListViewWidgets\MoSyncListViewSection.cs" />
