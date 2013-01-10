@@ -277,3 +277,5 @@ LocalFiles.bin*
 /runtimes/csharp/windowsphone/mosync/mosyncRuntime/Libraries/Microsoft.Advertising.Mobile.UI
 /runtimes/csharp/windowsphone/mosync/mosyncRuntime/Libraries/Microsoft.Phone.Controls
 /runtimes/csharp/windowsphone/mosync/mosyncRuntime/Libraries/Microsoft.Phone.Controls.Maps
+
+/runtimes/csharp/WP8/template
