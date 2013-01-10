@@ -182,7 +182,7 @@ void packageAndroid(const SETTINGS& s, const RuntimeInfo& ri) {
 	string signedApk = dstDir + "/" + string(s.name) + ".apk";
 	cmd.str("");
 	cmd <<getBinary("android/zipalign")<<
-		" 4 "<<file(signedUnalignedApk)<<
+		" -f 4 "<<file(signedUnalignedApk)<<
 		" "<<file(signedApk);
 	sh(cmd.str().c_str());
 
