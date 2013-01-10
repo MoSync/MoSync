@@ -14,9 +14,11 @@ import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserFactory;
 
 import com.mosync.api.MoSyncContext;
+import com.mosync.api.MoSyncExtension;
 import com.mosync.internal.android.MoSyncThread;
 
 import android.content.res.AssetManager;
+import android.content.res.Resources.Theme;
 import android.util.Log;
 
 public class MoSyncExtensionLoader {
@@ -42,6 +44,7 @@ public class MoSyncExtensionLoader {
 	private HashSet<String> loadedModules = new HashSet<String>();
 	private HashMap<Integer, ExtensionModule> modulesById = new HashMap<Integer, ExtensionModule>();
 	private HashMap<Integer, FunctionInvocation> invokersById = new HashMap<Integer, FunctionInvocation>();
+	private HashMap<String, ExtensionModule> modulesByImplementation = new HashMap<String, ExtensionModule>();
 	private HashMap<String, TypeDescriptor> typedefs;
 	private Map<String, StructType> structs = new HashMap<String, StructType>();
 	private int moduleId = 0;
@@ -102,6 +105,7 @@ public class MoSyncExtensionLoader {
 							toBeInitialized.add(currentModule);
 							modules.put(name, currentModule);
 							modulesById.put(moduleId, currentModule);
+							modulesByImplementation.put(currentModuleClassName, currentModule);
 							currentModule.setTypedefs(typedefs);
 							currentModule.setStructs(structs);
 						} else if (TYPEDEF_TAG.equals(tagName)) {
@@ -156,7 +160,7 @@ public class MoSyncExtensionLoader {
 				}
 
 				for (ExtensionModule module : toBeInitialized) {
-					initialize(module);
+					callOnLoad(module);
 				}
 			} finally {
 				if (extensionFile != null) {
@@ -170,22 +174,36 @@ public class MoSyncExtensionLoader {
 		}
 	}
 
-	private void initialize(ExtensionModule module) throws Exception {
+	private void callOnLoad(ExtensionModule module) throws Exception {
+		MoSyncExtension implementation = module.getModule();
+		implementation.onLoad(MoSyncThread.getInstance());
+		Log.i("@@MoSync", "Called initializer for extension " + module.getName());
+	}
+
+	private void callOnUnload(ExtensionModule module) {
 		try {
-			Object implementation = module.getModule();
-			Method initializer = implementation.getClass().getMethod("initialize", MoSyncContext.class);
-			initializer.invoke(implementation, MoSyncThread.getInstance());
-			Log.i("@@MoSync", "Called initializer for extension " + module.getName());
-		} catch (NoSuchMethodException e) {
-			// This is perfectly ok, but a bit awkward
-			// to rely on an exception.
-			Log.i("@@MoSync", "No initializer exists for extension " + module.getName());
+			MoSyncExtension implementation = module.getModule();
+			implementation.onUnload(MoSyncThread.getInstance());
+			Log.i("@@MoSync", "Called finalizer for extension " + module.getName());
+		} catch (Exception e) {
+			MoSyncThread.getInstance().maPanic(40075, "Error on extension unload, extension " + module.getName());
+		}
+	}
+
+	public void unloadExtensions() {
+		for (ExtensionModule module : modulesById.values()) {
+			callOnUnload(module);
 		}
 	}
 
 	public ExtensionModule getModule(String module) {
 		load(module);
 		return modules.get(module);
+	}
+
+	public int getModuleId(MoSyncExtension extension) {
+		ExtensionModule module = modulesByImplementation.get(extension.getClass().getName());
+		return module == null ? 0 : module.getId();
 	}
 
 	public synchronized int maExtensionModuleLoad(String name, int hash) {
@@ -238,6 +256,5 @@ public class MoSyncExtensionLoader {
 	public static MoSyncExtensionLoader getDefault() {
 		return instance;
 	}
-
 
 }

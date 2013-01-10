@@ -1,7 +1,9 @@
 package com.mosync.api;
 
+import android.content.Context;
+
 public interface MoSyncContext {
 
-	public void postEvent(int[] event);
+	public Context getActivity();
 
 }

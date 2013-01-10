@@ -3,6 +3,8 @@ package com.mosync.internal.android.extensions;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.mosync.api.MoSyncExtension;
+
 
 public class ExtensionModule {
 	private Class clazz;
@@ -10,7 +12,7 @@ public class ExtensionModule {
 	private int id;
 	private HashMap<Integer, FunctionInvocation> invokersById = new HashMap<Integer, FunctionInvocation>();
 	private HashMap<String, FunctionInvocation> invokersByName = new HashMap<String, FunctionInvocation>();
-	private Object module;
+	private MoSyncExtension module;
 	private Map<String, Typedef> typedefs = new HashMap<String, Typedef>();
 	private Map<String, StructType> structs = new HashMap<String, StructType>();
 	private int hash;
@@ -20,7 +22,7 @@ public class ExtensionModule {
 		this.id = id;
 		this.name = name;
 		clazz = Class.forName(className);
-		module = clazz.newInstance();
+		module = (MoSyncExtension) clazz.newInstance();
 		this.hash = hash;
 	}
 
@@ -28,7 +30,7 @@ public class ExtensionModule {
 		return name;
 	}
 
-	public Object getModule() {
+	public MoSyncExtension getModule() {
 		return module;
 	}
 

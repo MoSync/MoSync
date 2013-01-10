@@ -32,11 +32,11 @@ public class PointerImpl extends Pointer {
 
 	@Override
 	public void set(Object o) {
-		at(o, 0);
+		set(o, 0);
 	}
 
 	@Override
-	public void at(Object o, int ix) {
+	public void set(Object o, int ix) {
 		int size = delegate.size();
 		delegate.writeToMemory(addr + ix * size, o);
 	}

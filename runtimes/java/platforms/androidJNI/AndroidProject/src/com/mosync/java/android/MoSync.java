@@ -68,6 +68,7 @@ import com.mosync.internal.android.MoSyncSingleTouchHandler;
 import com.mosync.internal.android.MoSyncThread;
 import com.mosync.internal.android.MoSyncTouchHandler;
 import com.mosync.internal.android.MoSyncView;
+import com.mosync.internal.android.extensions.MoSyncExtensionLoader;
 import com.mosync.internal.android.nfc.MoSyncNFCForegroundUtil;
 import com.mosync.internal.android.nfc.MoSyncNFCService;
 import com.mosync.internal.android.notifications.LocalNotificationsManager;
@@ -748,8 +749,10 @@ public class MoSync extends Activity
      */
     private void sendCloseEvent()
     {
-    	if (!mEventTypeCloseHasBeenSent)
-    	{
+		if (!mEventTypeCloseHasBeenSent)
+		{
+			MoSyncExtensionLoader.getDefault().unloadExtensions();
+
 			// Send EVENT_TYPE_CLOSE
 			int[] event = new int[1];
 			event[0] = EVENT_TYPE_CLOSE;

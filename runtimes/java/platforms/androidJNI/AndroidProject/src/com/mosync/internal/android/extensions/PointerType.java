@@ -1,9 +1,6 @@
 package com.mosync.internal.android.extensions;
 
-import java.nio.ByteBuffer;
-
 import com.mosync.api.Pointer;
-import com.mosync.internal.android.MoSyncThread;
 
 public class PointerType extends TypeDescriptor {
 	TypeDescriptor delegate;

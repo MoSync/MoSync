@@ -97,10 +97,12 @@ void writeAndroidStubs(string& outputDir, Interface& ext, string& androidPackage
 	string extensionFileName = outputDir + "Extension.java";
 	ofstream extensionFile(extensionFileName.c_str());
 
+	extensionFile << "package " << androidPackageName << ";\n\n";
+
 	extensionFile << "import com.mosync.api.*;\n";
 	extensionFile << "import " << androidPackageName << ".types.*;\n\n";
 
-	extensionFile << "public class Extension {\n\n";
+	extensionFile << "public class Extension extends MoSyncExtension {\n\n";
 
 	for (size_t i = 0; i < ext.constSets.size(); i++) {
 		ConstSet cs = ext.constSets[i];
@@ -112,7 +114,8 @@ void writeAndroidStubs(string& outputDir, Interface& ext, string& androidPackage
 		extensionFile << "\n";
 	}
 
-	extensionFile << "\tpublic void initialize(MoSyncContext context) {\n\t}\n\n";
+	extensionFile << "\t/*public void onLoad(MoSyncContext context) {\n\t}*/\n\n";
+	extensionFile << "\t/*public void onUnload(MoSyncContext context) {\n\t}*/\n\n";
 
 	for (size_t i = 0; i < ext.functions.size(); i++) {
 		Function f = ext.functions[i];
@@ -140,7 +143,9 @@ void writeAndroidStubs(string& outputDir, Interface& ext, string& androidPackage
 
 	// The structs
 	string typesDir = outputDir + "types/";
-	_mkdir(typesDir.c_str());
+	if (!ext.structs.empty()) {
+		_mkdir(typesDir.c_str());
+	}
 
 	for (size_t i = 0; i < ext.structs.size(); i++) {
 		Struct s = ext.structs[i];
@@ -217,7 +222,7 @@ string toAndroidType(Interface& ext, string& ctype, bool autoBox, bool constant)
 			prefix.append("Pointer<");
 			suffix.append(">");
 		}
-		return prefix + toAndroidType(ext, extractedType, autoBox, constant) + suffix;
+		return prefix + toAndroidType(ext, extractedType, true, constant) + suffix;
 	} else {
 		extractedType = resolveTypedef(ext, extractedType);
 		if (extractedType == "NCString" || extractedType == "MAString") {

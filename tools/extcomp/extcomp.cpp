@@ -29,6 +29,8 @@
 #include <idl-common/types.h>
 #include <idl-common/output-bindings.h>
 
+#include <filelist/filelist.h>
+
 #include "helpers/mkdir.h"
 #include "helpers/types.h"
 
@@ -52,6 +54,9 @@ int main(int argc, const char** argv) {
 		string androidClassName = args["android-class-name"];
 		string iosInterfaceName = args["ios-interface-name"];
 
+		bool generateStubs = !args["generate-stubs"].empty();
+		bool generateLib = !args["generate-lib"].empty();
+
 		// This one is empty for extensions.
 		vector<string> ixs;
 		ixs.push_back(extName);
@@ -62,43 +67,55 @@ int main(int argc, const char** argv) {
 		Interface ext = parseInterface(ixs, inputIdl);
 		ext.name = extName;
 
-		string headerOut = extName + ".h";
-		writeHeaders(headerOut, ext, true);
-
-		string sourceOut = "_" + extName + ".c";
-		ofstream sourcefile(sourceOut.c_str());
-
-		sourcefile << "// *** GENERATED FILE - Do not modify ***\n\n";
-		sourcefile << "#include <maapi.h>\n";
-		sourcefile << "#include \"" << extName << ".h\"\n";
-		sourcefile << "static MAExtensionModule " << getModHandle(ext) << " = 0;\n";
-		sourcefile << "static MAExtensionFunction " << getFnIxHandle(ext) << "[" << ext.functions.size() << "];\n";
-
-		for (size_t i = 0; i < ext.functions.size(); i++) {
-			streamFunctionWrapper(sourcefile, ext, ext.functions[i], i == 0);
+		if (!generateLib && !generateStubs) {
+			printf("Must generate libs or stubs!\n");
+			exit(1);
 		}
 
-		sourcefile.close();
+		if (generateLib) {
+			string headerOut = extName + ".h";
+			writeHeaders(headerOut, ext, true);
 
-		string androidOut = extDir + "/android/";
-		_mkdir(androidOut.c_str());
-		string androidManifestOut = androidOut + "assets/";
-		_mkdir(androidManifestOut.c_str());
-		string androidMFOut = androidManifestOut + extName + ".xml";
-		ofstream androidMFfile(androidMFOut.c_str());
+			string sourceOut = "_" + extName + ".c";
+			ofstream sourcefile(sourceOut.c_str());
 
-		streamAndroidExtMF(androidMFfile, ext, androidPackageName, androidClassName);
-		androidMFfile.close();
+			sourcefile << "// *** GENERATED FILE - Do not modify ***\n\n";
+			sourcefile << "#include <maapi.h>\n";
+			sourcefile << "#include \"" << extName << ".h\"\n";
+			sourcefile << "static MAExtensionFunction " << getFnIxHandle(ext) << "[" << ext.functions.size() << "];\n\n";
 
-		string stubsDir = androidOut + "stubs/";
-		writeAndroidStubs(stubsDir, ext, androidPackageName);
+			for (size_t i = 0; i < ext.functions.size(); i++) {
+				streamFunctionWrapper(sourcefile, ext, ext.functions[i], i == 0);
+			}
 
-		string iosOut = extDir + "/iphoneos/";
-		_mkdir(iosOut.c_str());
-		string iosStubsDir = iosOut + "stubs/";
-		writeIosStubs(iosStubsDir, ext, iosInterfaceName);
+			sourcefile.close();
 
-		streamExtensionManifest(args);
+			streamExtensionManifest(args);
+		}
+
+		if (generateStubs) {
+			string stubsDir = extDir + "/stubs/";
+			_mkdir(stubsDir.c_str());
+
+			string androidOut = extDir + "/android/";
+			_mkdir(androidOut.c_str());
+			string androidManifestOut = androidOut + "assets/";
+			_mkdir(androidManifestOut.c_str());
+			string androidMFOut = androidManifestOut + extName + ".xml";
+			ofstream androidMFfile(androidMFOut.c_str());
+
+			streamAndroidExtMF(androidMFfile, ext, androidPackageName, androidClassName);
+			androidMFfile.close();
+
+			string androidStubsDir = stubsDir + "android/";
+			_mkdir(androidStubsDir.c_str());
+			writeAndroidStubs(androidStubsDir, ext, androidPackageName);
+
+			string iosStubsDir = stubsDir + "iphoneos/";
+			_mkdir(iosStubsDir.c_str());
+			writeIosStubs(iosStubsDir, ext, iosInterfaceName);
+		}
+
 	} catch (exception e) {
 		printf("Failed: %s\n", e.what());
 		return 1;
@@ -121,6 +138,11 @@ void parseArgs(int argc, const char** argv, map<string, string>& argmap) {
 		string argname = argv[i];
 		string argvalue = i < argc - 1 ? argv[i + 1] : "";
 		if (argname[0] == '-' && argname[1] == '-') {
+			if ((argvalue[0] == '-' && argvalue[1] == '-') ||
+				argvalue.empty()) {
+				argvalue = "true";
+				i--;
+			}
 			argmap[argname.substr(2)] = argvalue;
 		}
 	}
@@ -137,9 +159,13 @@ void writeHeaders(string& headerOut, Interface& ext, bool includeFunctions) {
 
 	headerfile << "#ifndef " << extDef << "\n";
 	headerfile << "#define " << extDef << "\n\n";
+	headerfile << "#include <maapi.h>\n\n";
 	headerfile << "#define " << extHashConst << " ((int)0x";
 	streamExtHashValue(headerfile, ext);
 	headerfile << ")\n\n";
+	headerfile << "static MAExtensionModule " << getModHandle(ext) << " = 0;\n";
+	headerfile << "#define " << uExtName << "_EVENT_TYPE(type) (" << getModHandle(ext)
+			<< " & (type >> 0x3fffff)) ? (type & 0x3fffff) : 0\n\n";
 
 	for (size_t i = 0; i < ext.constSets.size(); i++) {
 		ConstSet cs = ext.constSets[i];
@@ -273,7 +299,6 @@ bool isReturnType(Interface& ext, string& type) {
 string resolveTypedef(Interface& ext, string& typedefName) {
 	for (size_t i = 0; i < ext.typedefs.size(); i++) {
 		Typedef t = ext.typedefs[i];
-		printf("TYPEDEF: %s; WANTED: %s\n", t.type.c_str(), typedefName.c_str());
 		if (t.name == typedefName) {
 			return resolveTypedef(ext, t.type);
 		}
