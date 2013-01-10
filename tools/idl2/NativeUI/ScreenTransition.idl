@@ -62,32 +62,60 @@ group ScreenTransitionTypes "Screen transition types" {
         FLIP_FROM_BOTTOM = 7;
 
         /**
-         * \brief A transition that will remove the current screen by sliding it to left.
+         * \brief A transition that will show the next screen by sliding it to left.
          *
-         * Platform: Android
+         * Platform: Android, Windows Phone 7.
          */
         SLIDE_LEFT = 8;
 
         /**
-         * \brief A transition that will remove the current screen by sliding it to the right.
+         * \brief A transition that will show the next screen by sliding it to the right.
          *
-         * Platform: Android
+         * Platform: Android, Windows Phone 7.
          */
         SLIDE_RIGHT = 9;
 
         /**
          * \brief A transition that will show the next screen by fading it in to the current one.
          *
-         * Platform: Android
+         * Platform: Android.
          */
         FADE_IN = 10;
 
         /**
          * \brief A transition that will remove the current screen by fading it out.
          *
-         * Platform: Android
+         * Platform: Android.
          */
         FADE_OUT = 11;
+
+        /**
+         * \brief A transition that will show the next screen by swiveling it in (full screen).
+         *
+         * Platform: Windows Phone 7.
+         */
+        SWIVEL_IN = 12;
+
+        /**
+         * \brief A transition that will show the next screen by swiveling it out (full screen).
+         *
+         * Platform: Windows Phone 7.
+         */
+        SWIVEL_OUT = 13;
+
+        /**
+         * \brief A transition that will remove the current screen using a tunstile foreward movement.
+         *
+         * Platform: Windows Phone 7.
+         */
+        TURNSTILE_FOREWARD = 14;
+
+        /**
+         * \brief A transition that will show the next screen using a tunstile backward movement.
+         *
+         * Platform: Windows Phone 7.
+         */
+        TURNSTILE_BACKWARD = 15;
 
         /**
          * \brief A custom screen transition defined thru the Screen transitions properties.
@@ -97,6 +125,6 @@ group ScreenTransitionTypes "Screen transition types" {
          *
          * Platform: None.
          */
-        CUSTOM = 12;
+        CUSTOM = 16;
     }
 } //end of ScreenTransitionTypes
