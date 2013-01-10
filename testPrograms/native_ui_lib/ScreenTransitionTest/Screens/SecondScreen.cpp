@@ -91,6 +91,8 @@ namespace Transitions
 		mMainLayout = new NativeUI::VerticalLayout();
 		mMainLayout->setBackgroundColor(SCREEN_COLOR);
 		mMainLayout->setChildHorizontalAlignment(MAW_ALIGNMENT_CENTER);
+		mMainLayout->fillSpaceVertically();
+		mMainLayout->fillSpaceHorizontally();
 		this->setMainWidget(mMainLayout);
 
 		ScreenUtils::addVerticalSpacerToLayout(mMainLayout, SPACER_HEIGHT);

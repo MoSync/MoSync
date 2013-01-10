@@ -41,6 +41,7 @@
 
 static const char* kiOSTransitionsArray[] = {"None", "Flip From Left", "Flip From Right", "Curl Up", "Curl Down"};
 static const char* kAndroidTransitionsArray[] = {"None", "Slide Left", "Slide Right", "Fade in", "Fade out"};
+static const char* kWindowsTransitionsArray[] = {"None", "Slide Left", "Slide Right", "Swivel in", "Swivel out", "Turnstile Foreward", "Turnstile Backward"};
 
 namespace Transitions
 {
@@ -83,23 +84,53 @@ namespace Transitions
 	 */
 	void FirstScreen::buttonClicked(NativeUI::Widget* button)
 	{
-		if ( ScreenUtils::OS_ANDROID == ScreenUtils::getCurrentPlatform() )
+		if ( mSelectedTransition == 0 )
 		{
-			if ( mSelectedTransition == 0 )
-			{
-				mObserver.showSecondScreen(MAW_TRANSITION_TYPE_NONE, kAndroidTransitionsArray[MAW_TRANSITION_TYPE_NONE]);
-			}
-			else
-			{
-				// We need to obtain the correct transition type/index.
-				mObserver.showSecondScreen(MAW_TRANSITION_TYPE_SLIDE_LEFT + mSelectedTransition - 1, kAndroidTransitionsArray[mSelectedTransition]);
-			}
+			mObserver.showSecondScreen(MAW_TRANSITION_TYPE_NONE, kAndroidTransitionsArray[MAW_TRANSITION_TYPE_NONE]);
+			return;
+		}
+
+		if ( ScreenUtils::OS_IOS == ScreenUtils::getCurrentPlatform() )
+		{
+			mObserver.showSecondScreen(mSelectedTransition, kiOSTransitionsArray[mSelectedTransition]);
+		}
+		else if ( ScreenUtils::OS_ANDROID == ScreenUtils::getCurrentPlatform() )
+		{
+			// We need to obtain the correct transition type/index.
+			mObserver.showSecondScreen(MAW_TRANSITION_TYPE_SLIDE_LEFT + mSelectedTransition - 1, kAndroidTransitionsArray[mSelectedTransition]);
+
 			//Workaround for Android 4.0 bug related to list view focus.
 			mScreenTransitionListView->setProperty(MAW_LIST_VIEW_REQUEST_FOCUS, "true");
 		}
-		else if ( ScreenUtils::OS_IOS == ScreenUtils::getCurrentPlatform())
+		else if ( ScreenUtils::OS_WIN == ScreenUtils::getCurrentPlatform() )
 		{
-			mObserver.showSecondScreen(mSelectedTransition, kiOSTransitionsArray[mSelectedTransition]);
+			// We need to obtain the correct transition type/index.
+			int selectedTransition = MAW_TRANSITION_TYPE_NONE;
+			switch ( mSelectedTransition )
+			{
+			case 1:
+				selectedTransition = MAW_TRANSITION_TYPE_SLIDE_RIGHT;
+				break;
+			case 2:
+				selectedTransition = MAW_TRANSITION_TYPE_SLIDE_LEFT;
+				break;
+			case 3:
+				selectedTransition = MAW_TRANSITION_TYPE_SWIVEL_IN;
+				break;
+			case 4:
+				selectedTransition = MAW_TRANSITION_TYPE_SWIVEL_OUT;
+				break;
+			case 5:
+				selectedTransition = MAW_TRANSITION_TYPE_TURNSTILE_FOREWARD;
+				break;
+			case 6:
+				selectedTransition = MAW_TRANSITION_TYPE_TURNSTILE_BACKWARD;
+				break;
+			default:
+				selectedTransition = MAW_TRANSITION_TYPE_NONE;
+				break;
+			}
+			mObserver.showSecondScreen(selectedTransition, kWindowsTransitionsArray[mSelectedTransition]);
 		}
 	}
 
@@ -111,6 +142,8 @@ namespace Transitions
 		mMainLayout = new NativeUI::VerticalLayout();
 		mMainLayout->setBackgroundColor(SCREEN_COLOR);
 		mMainLayout->setChildHorizontalAlignment(MAW_ALIGNMENT_CENTER);
+		mMainLayout->fillSpaceVertically();
+		mMainLayout->fillSpaceHorizontally();
 		this->setMainWidget(mMainLayout);
 
 		ScreenUtils::addVerticalSpacerToLayout(mMainLayout, SPACER_HEIGHT);
@@ -124,17 +157,17 @@ namespace Transitions
 		mListLayout->setBackgroundColor(SCREEN_COLOR);
 		mListLayout->setChildHorizontalAlignment(MAW_ALIGNMENT_CENTER);
 		mListLayout->fillSpaceVertically();
+		mListLayout->fillSpaceHorizontally();
 
 		mScreenTransitionListView = new NativeUI::ListView();
 		mScreenTransitionListView->addListViewListener(this);
 		mScreenTransitionListView->fillSpaceVertically();
+		mScreenTransitionListView->fillSpaceHorizontally();
 		populateTransitionList();
 
 		ScreenUtils::addVerticalSpacerToLayout(mMainLayout, SPACER_HEIGHT);
 
-		//ScreenUtils::addHorizontalSpacerToLayout(mListLayout, SPACER_WIDTH);
 		mListLayout->addChild(mScreenTransitionListView);
-		//ScreenUtils::addHorizontalSpacerToLayout(mListLayout, SPACER_WIDTH);
 
 		mMainLayout->addChild(mListLayout);
 
@@ -165,21 +198,29 @@ namespace Transitions
 			{
 				size_of_TransitionsArray = sizeof(kiOSTransitionsArray) / sizeof( kiOSTransitionsArray[ 0 ] );
 			}
+			else if ( ScreenUtils::OS_WIN == ScreenUtils::getCurrentPlatform() )
+			{
+				size_of_TransitionsArray = sizeof(kWindowsTransitionsArray) / sizeof( kWindowsTransitionsArray[ 0 ] );
+			}
 
 			for ( int i = 0; i < size_of_TransitionsArray; i++ )
 			{
 				NativeUI::ListViewItem* transitionItem = new NativeUI::ListViewItem();
 
-				if ( ScreenUtils::OS_ANDROID == ScreenUtils::getCurrentPlatform() )
+				if ( ScreenUtils::OS_IOS == ScreenUtils::getCurrentPlatform() )
+				{
+					transitionItem->setText(kiOSTransitionsArray[i]);
+				}
+				else if ( ScreenUtils::OS_ANDROID == ScreenUtils::getCurrentPlatform() )
 				{
 					transitionItem->setText(kAndroidTransitionsArray[i]);
 					transitionItem->setBackgroundColor(BLACK_COLOR);
 					transitionItem->setFontColor(WHITE_COLOR);
 					transitionItem->setSelectionStyle(NativeUI::LIST_VIEW_ITEM_SELECTION_STYLE_NONE);
 				}
-				else if ( ScreenUtils::OS_IOS == ScreenUtils::getCurrentPlatform() )
+				else if ( ScreenUtils::OS_WIN == ScreenUtils::getCurrentPlatform() )
 				{
-					transitionItem->setText(kiOSTransitionsArray[i]);
+					transitionItem->setText(kWindowsTransitionsArray[i]);
 				}
 
 				transitionItem->setHeight(LIST_ITEM_HEIGHT);
@@ -197,15 +238,18 @@ namespace Transitions
 	    NativeUI::ListView* listView,
 	    NativeUI::ListViewItem* listViewItem)
 	{
-	    if ( NULL != mPreviousItem )
-	    {
-            mPreviousItem->setBackgroundColor(BLACK_COLOR);
-	    }
-	    if (listView == mScreenTransitionListView)
-	    {
-	        printf("mScreenTransitionListView event: item clicked");
-	        listViewItem->setBackgroundColor(SELECTED_COLOR);
-	    }
+		if ( ScreenUtils::OS_ANDROID == ScreenUtils::getCurrentPlatform() )
+		{
+		    if ( NULL != mPreviousItem )
+		    {
+	            mPreviousItem->setBackgroundColor(BLACK_COLOR);
+		    }
+		    if (listView == mScreenTransitionListView)
+		    {
+		        printf("mScreenTransitionListView event: item clicked");
+		        listViewItem->setBackgroundColor(SELECTED_COLOR);
+		    }
+		}
 	    mPreviousItem = listViewItem;
 	}
 
