@@ -201,6 +201,10 @@ public class MoSyncExtensionLoader {
 		return modules.get(module);
 	}
 
+	public ExtensionModule getModule(int id) {
+		return modulesById.get(id);
+	}
+
 	public int getModuleId(MoSyncExtension extension) {
 		ExtensionModule module = modulesByImplementation.get(extension.getClass().getName());
 		return module == null ? 0 : module.getId();

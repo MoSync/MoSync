@@ -37,6 +37,7 @@
 #include "extcomp.h"
 #include "androidext.h"
 #include "iosext.h"
+#include "jsext.h"
 
 void parseArgs(int argc, const char** argv, map<string, string>& argmap);
 string requiredArg(string arg, map<string, string>& args);
@@ -91,11 +92,6 @@ int main(int argc, const char** argv) {
 			sourcefile.close();
 
 			streamExtensionManifest(args);
-		}
-
-		if (generateStubs) {
-			string stubsDir = extDir + "/stubs/";
-			_mkdir(stubsDir.c_str());
 
 			string androidOut = extDir + "/android/";
 			_mkdir(androidOut.c_str());
@@ -106,6 +102,18 @@ int main(int argc, const char** argv) {
 
 			streamAndroidExtMF(androidMFfile, ext, androidPackageName, androidClassName);
 			androidMFfile.close();
+
+			// JavaScript support
+			string jsOut = extDir + "/js/";
+			_mkdir(jsOut.c_str());
+			string jsBridgeOut = jsOut + extName + ".js";
+
+			writeJSBridge(jsBridgeOut, ext);
+		}
+
+		if (generateStubs) {
+			string stubsDir = extDir + "/stubs/";
+			_mkdir(stubsDir.c_str());
 
 			string androidStubsDir = stubsDir + "android/";
 			_mkdir(androidStubsDir.c_str());
