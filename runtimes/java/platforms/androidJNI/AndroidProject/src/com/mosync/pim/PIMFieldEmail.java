@@ -53,7 +53,11 @@ public class PIMFieldEmail extends PIMField {
 		if ((attribute = getColumnValue(index, Email.TYPE)) == null) {
 			return -1;
 		}
-		return Integer.parseInt(attribute);
+		try {
+			return Integer.parseInt(attribute);
+		} catch (Exception e) {
+			return -1;
+		}
 	}
 
 	/**

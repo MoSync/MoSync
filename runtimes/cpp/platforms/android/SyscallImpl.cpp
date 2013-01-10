@@ -20,9 +20,12 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "Core.h"
 
 #include "IOCtl.h"
+#include "EventQueue.h"
 
 #include <helpers/cpp_defs.h>
-#include <helpers/fifo.h>
+
+// Not used, instead class EventQueue is used.
+//#include <helpers/fifo.h>
 
 #include <jni.h>
 #include <GLES/gl.h>
@@ -67,7 +70,8 @@ namespace Base
 	bool mIsReloading = false;
 
 	static ResourceArray gResourceArray;
-	static CircularFifo<MAEvent, EVENT_BUFFER_SIZE> gEventFifo;
+	static EventQueue gEventFifo;
+	//static CircularFifo<MAEvent, EVENT_BUFFER_SIZE> gEventFifo;
 
 	int gClipLeft = 0;
 	int gClipTop = 0;
@@ -2319,6 +2323,13 @@ namespace Base
 		case maIOCtl_maPimListNext:
 			SYSLOG("maIOCtl_maPimListNext");
 			return _maPimListNext(
+				a,
+				mJNIEnv,
+				mJThis);
+
+		case maIOCtl_maPimListNextSummary:
+			SYSLOG("maIOCtl_maPimListNextSummary");
+			return _maPimListNextSummary(
 				a,
 				mJNIEnv,
 				mJThis);

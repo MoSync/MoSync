@@ -51,6 +51,7 @@ static const wchar_t* sContactName[] =
 	L"", // MA_PIM_CONTACT_NAME_PHONETIC_FAMILY
 	L"", // MA_PIM_CONTACT_NAME_PHONETIC_GIVEN
 	L"", // MA_PIM_CONTACT_NAME_PHONETIC_OTHER
+	L"", // MA_PIM_CONTACT_NAME_DISPLAY
 };
 
 /**
@@ -201,8 +202,9 @@ static const int COUNT_ADDRESS_INDICES = 8;
  * - MA_PIM_CONTACT_NAME_PHONETIC_FAMILY
  * - MA_PIM_CONTACT_NAME_PHONETIC_GIVEN
  * - MA_PIM_CONTACT_NAME_PHONETIC_OTHER
+ * - MA_PIM_CONTACT_NAME_DISPLAY
  */
-static const int COUNT_NAME_INDICES = 8;
+static const int COUNT_NAME_INDICES = 9;
 
 /**
  * Indices for MA_PIM_FIELD_CONTACT_ORG_INFO field:
@@ -526,7 +528,7 @@ void PIMContact::printContactName()
 	for (int i = 0; i < COUNT_NAME_INDICES; i++)
 	{
 		MAUtil::String contactNameType = getContactNameIndexString(i);
-		const wchar* contactNameValue = getWCharArrayFromBuf(mArgs.buf, i);
+		const wchar* contactNameValue = getWCharArrayFromBuf(mArgs.buf, mArgs.bufSize, i);
 		if (contactNameValue && *contactNameValue != 0)
 		{
 			printf("%s %S", contactNameType.c_str(), contactNameValue);
@@ -560,7 +562,7 @@ void PIMContact::printAddress()
 		for (int j = 0; j < COUNT_ADDRESS_INDICES; j++)
 		{
 			MAUtil::String addressValueIndex = getAddressIndexString(j);
-			const wchar* addressValue = getWCharArrayFromBuf(mArgs.buf, j);
+			const wchar* addressValue = getWCharArrayFromBuf(mArgs.buf, mArgs.bufSize, j);
 			if (addressValue && *addressValue != 0)
 			{
 				printf("%s %S", addressValueIndex.c_str(), addressValue);
@@ -851,10 +853,10 @@ void PIMContact::printIM()
 
 		// Print value on the screen.
 		const wchar* protocolValue = getWCharArrayFromBuf(
-			mArgs.buf,
+			mArgs.buf, mArgs.bufSize,
 			MA_PIM_CONTACT_IM_PROTOCOL);
 		const wchar* usernameValue = getWCharArrayFromBuf(
-			mArgs.buf,
+			mArgs.buf, mArgs.bufSize,
 			MA_PIM_CONTACT_IM_USERNAME);
 		printf("Username: %S \nProtocol: %S \n\n",
 			usernameValue,
@@ -912,7 +914,7 @@ void PIMContact::printOrgInfo()
 		for (int j = 0; j < COUNT_ORG_INFO_INDICES; j++)
 		{
 			MAUtil::String orgInfoValueIndex = getOrgInfoIndexString(j);
-			const wchar* orgInfoValue = getWCharArrayFromBuf(mArgs.buf, j);
+			const wchar* orgInfoValue = getWCharArrayFromBuf(mArgs.buf, mArgs.bufSize, j);
 			if (*orgInfoValue != 0)
 			{
 				printf("%s %S\n\n", orgInfoValueIndex.c_str(), orgInfoValue);
