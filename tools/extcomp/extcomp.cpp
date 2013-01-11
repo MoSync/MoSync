@@ -57,6 +57,7 @@ int main(int argc, const char** argv) {
 
 		bool generateStubs = !args["generate-stubs"].empty();
 		bool generateLib = !args["generate-lib"].empty();
+		bool generateJS = !args["generate-js"].empty();
 
 		// This one is empty for extensions.
 		vector<string> ixs;
@@ -102,13 +103,6 @@ int main(int argc, const char** argv) {
 
 			streamAndroidExtMF(androidMFfile, ext, androidPackageName, androidClassName);
 			androidMFfile.close();
-
-			// JavaScript support
-			string jsOut = extDir + "/js/";
-			_mkdir(jsOut.c_str());
-			string jsBridgeOut = jsOut + extName + ".js";
-
-			writeJSBridge(jsBridgeOut, ext);
 		}
 
 		if (generateStubs) {
@@ -122,6 +116,15 @@ int main(int argc, const char** argv) {
 			string iosStubsDir = stubsDir + "iphoneos/";
 			_mkdir(iosStubsDir.c_str());
 			writeIosStubs(iosStubsDir, ext, iosInterfaceName);
+		}
+
+		if (generateJS) {
+			// JavaScript support
+			string jsOut = extDir + "/js/";
+			_mkdir(jsOut.c_str());
+			string jsBridgeOut = jsOut + extName + ".js";
+
+			writeJSBridge(jsBridgeOut, ext);
 		}
 
 	} catch (exception e) {
