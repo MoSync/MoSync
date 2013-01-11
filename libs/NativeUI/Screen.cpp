@@ -122,6 +122,8 @@ namespace NativeUI
 	 * @param screenTransitionType The type of the screen transition. See available
 	 * screen transitions types \link #MA_TRANSITION_TYPE_NONE here \endlink
 	 * @param screenTransitionDuration The duration of the screen transition in milliseconds.
+	 * This argument is not used on the Windows Phone platform due to the constant duration of
+	 * the WP screen transitions.
 	 */
 	void Screen::showWithTransition(MAWScreenTransitionType screenTransitionType, int screenTransitionDuration)
 	{

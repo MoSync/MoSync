@@ -42,6 +42,8 @@ group ScreenTransitionTypes "Screen transition types" {
          * \brief A transition that dissolves from one view to the next.
          *
          * Platform: iOS (5.0 and later).
+         *
+         * \Note Not yet available!
          */
         CROSS_DISSOLVE = 5;
 
@@ -50,6 +52,8 @@ group ScreenTransitionTypes "Screen transition types" {
          * The top side of the view moves toward the front and the bottom side toward the back.
          *
          * Platform: iOS (5.0 and later).
+         *
+         * \Note Not yet available!
          */
         FLIP_FROM_TOP = 6;
 
@@ -58,6 +62,8 @@ group ScreenTransitionTypes "Screen transition types" {
          * The bottom side of the view moves toward the front and the top side toward the back.
          *
          * Platform: iOS (5.0 and later).
+         *
+         * \Note Not yet available!
          */
         FLIP_FROM_BOTTOM = 7;
 

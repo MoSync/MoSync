@@ -121,7 +121,8 @@ group WidgetAPIFunctions "Widget functions" {
 	*
 	* \param screenHandle The handle to the screen.
 	* \param screenTransitionType The transition of the screen.
-	* \param screenTransitionDuration The duration of the transition in milliseconds.
+	* \param screenTransitionDuration The duration of the transition in milliseconds. This argument is
+	* not used on the Windows Phone platform due to the constant duration of the WP screen transitions.
 	*
 	* \returns Any of the following result codes:
 	* - #MAW_RES_OK if the screen could be shown.

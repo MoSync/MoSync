@@ -125,6 +125,7 @@ public class ScreenTransitions {
 
 	/*
 	 * Checks if the screen transition given as parameter is available on Android.
+	 * Screen transition types can be found \link #MA_TRANSITION_TYPE_NONE here \endlink.
 	 *
 	 * @param screenTransitionType a screen transition type.
 	 *

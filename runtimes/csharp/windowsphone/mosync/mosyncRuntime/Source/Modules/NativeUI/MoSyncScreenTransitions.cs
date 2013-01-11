@@ -167,6 +167,7 @@ namespace MoSync
 
             /**
              * Checks if the screen transititon given as parameter is available on WP.
+             * Screen transition can be found \link #MA_TRANSITION_TYPE_NONE here \endlink.
              *
              * @param screenTransitionType a transition type.
              *
