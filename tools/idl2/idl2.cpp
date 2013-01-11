@@ -180,6 +180,7 @@ int main() {
 
 		// Copy windows phone file.
 		copy("Output/maapi.cs", "../../runtimes/csharp/windowsphone/mosync/mosyncRuntime/Source/");
+		copy("Output/maapi.cs", "../../runtimes/csharp/WP8/mosync/mosyncRuntime/Source/");
 
 		copy("Output/cpp_defs.h", "../../intlibs/helpers/");
 		copy("Output/cpp_maapi.h", "../../intlibs/helpers/");

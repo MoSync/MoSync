@@ -279,3 +279,4 @@ LocalFiles.bin*
 /runtimes/csharp/windowsphone/mosync/mosyncRuntime/Libraries/Microsoft.Phone.Controls.Maps
 
 /runtimes/csharp/WP8/template
+/runtimes/csharp/WP8/mosync/mosyncRuntime/Source/maapi.cs
