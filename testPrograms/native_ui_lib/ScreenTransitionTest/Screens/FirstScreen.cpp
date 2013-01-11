@@ -77,64 +77,6 @@ namespace Transitions
 	}
 
 	/**
-	 * This method is called if the touch-up event was inside the
-	 * bounds of the button.
-	 * Platform: iOS, Android, Windows Phone.
-	 * @param button The button object that generated the event.
-	 */
-	void FirstScreen::buttonClicked(NativeUI::Widget* button)
-	{
-		if ( mSelectedTransition == 0 )
-		{
-			mObserver.showSecondScreen(MAW_TRANSITION_TYPE_NONE, kAndroidTransitionsArray[MAW_TRANSITION_TYPE_NONE]);
-			return;
-		}
-
-		if ( ScreenUtils::OS_IOS == ScreenUtils::getCurrentPlatform() )
-		{
-			mObserver.showSecondScreen(mSelectedTransition, kiOSTransitionsArray[mSelectedTransition]);
-		}
-		else if ( ScreenUtils::OS_ANDROID == ScreenUtils::getCurrentPlatform() )
-		{
-			// We need to obtain the correct transition type/index.
-			mObserver.showSecondScreen(MAW_TRANSITION_TYPE_SLIDE_LEFT + mSelectedTransition - 1, kAndroidTransitionsArray[mSelectedTransition]);
-
-			//Workaround for Android 4.0 bug related to list view focus.
-			mScreenTransitionListView->setProperty(MAW_LIST_VIEW_REQUEST_FOCUS, "true");
-		}
-		else if ( ScreenUtils::OS_WIN == ScreenUtils::getCurrentPlatform() )
-		{
-			// We need to obtain the correct transition type/index.
-			int selectedTransition = MAW_TRANSITION_TYPE_NONE;
-			switch ( mSelectedTransition )
-			{
-			case 1:
-				selectedTransition = MAW_TRANSITION_TYPE_SLIDE_RIGHT;
-				break;
-			case 2:
-				selectedTransition = MAW_TRANSITION_TYPE_SLIDE_LEFT;
-				break;
-			case 3:
-				selectedTransition = MAW_TRANSITION_TYPE_SWIVEL_IN;
-				break;
-			case 4:
-				selectedTransition = MAW_TRANSITION_TYPE_SWIVEL_OUT;
-				break;
-			case 5:
-				selectedTransition = MAW_TRANSITION_TYPE_TURNSTILE_FOREWARD;
-				break;
-			case 6:
-				selectedTransition = MAW_TRANSITION_TYPE_TURNSTILE_BACKWARD;
-				break;
-			default:
-				selectedTransition = MAW_TRANSITION_TYPE_NONE;
-				break;
-			}
-			mObserver.showSecondScreen(selectedTransition, kWindowsTransitionsArray[mSelectedTransition]);
-		}
-	}
-
-	/**
 	 * Create screen's UI.
 	 */
 	void FirstScreen::createUI()
@@ -163,6 +105,11 @@ namespace Transitions
 		mScreenTransitionListView->addListViewListener(this);
 		mScreenTransitionListView->fillSpaceVertically();
 		mScreenTransitionListView->fillSpaceHorizontally();
+
+		// Just for esthetics.
+		if ( ScreenUtils::OS_WIN == ScreenUtils::getCurrentPlatform() )
+			mScreenTransitionListView->setBackgroundColor(0x000000);
+
 		populateTransitionList();
 
 		ScreenUtils::addVerticalSpacerToLayout(mMainLayout, SPACER_HEIGHT);
@@ -170,6 +117,8 @@ namespace Transitions
 		mListLayout->addChild(mScreenTransitionListView);
 
 		mMainLayout->addChild(mListLayout);
+
+		ScreenUtils::addVerticalSpacerToLayout(mMainLayout, SPACER_HEIGHT);
 
 		mFooterLayout = new NativeUI::HorizontalLayout();
 		mFooterLayout->setBackgroundColor(BLACK_COLOR);
@@ -183,6 +132,79 @@ namespace Transitions
 		mFooterLayout->addChild(mShowSecondScreenButton);
 
 		mMainLayout->addChild(mFooterLayout);
+	}
+
+	/**
+	 * This method is called if the touch-up event was inside the
+	 * bounds of the button.
+	 * Platform: iOS, Android, Windows Phone.
+	 * @param button The button object that generated the event.
+	 */
+	void FirstScreen::buttonClicked(NativeUI::Widget* button)
+	{
+		if ( mSelectedTransition == 0 )
+		{
+			mObserver.showSecondScreen(MAW_TRANSITION_TYPE_NONE, kAndroidTransitionsArray[MAW_TRANSITION_TYPE_NONE]);
+			return;
+		}
+
+		if ( ScreenUtils::OS_IOS == ScreenUtils::getCurrentPlatform() )
+		{
+			// We need to obtain the correct transition type/index.
+			mObserver.showSecondScreen(getTransitionTypeForiOS(mSelectedTransition), kiOSTransitionsArray[mSelectedTransition]);
+		}
+		else if ( ScreenUtils::OS_ANDROID == ScreenUtils::getCurrentPlatform() )
+		{
+			// We need to obtain the correct transition type/index.
+			mObserver.showSecondScreen(getTransitionTypeForAndroid(mSelectedTransition), kAndroidTransitionsArray[mSelectedTransition]);
+
+			//Workaround for Android 4.0 bug related to list view focus.
+			mScreenTransitionListView->setProperty(MAW_LIST_VIEW_REQUEST_FOCUS, "true");
+		}
+		else if ( ScreenUtils::OS_WIN == ScreenUtils::getCurrentPlatform() )
+		{
+			// We need to obtain the correct transition type/index.
+			mObserver.showSecondScreen(getTransitionTypeForWindows(mSelectedTransition), kWindowsTransitionsArray[mSelectedTransition]);
+		}
+	}
+
+	/**
+	 * This method is called when a list view item is clicked.
+	 * @param listView The list view object that generated the event.
+	 * @param listViewItem The ListViewItem object that was clicked.
+	 */
+	void FirstScreen::listViewItemClicked(
+	    NativeUI::ListView* listView,
+	    NativeUI::ListViewItem* listViewItem)
+	{
+		if ( ScreenUtils::OS_ANDROID == ScreenUtils::getCurrentPlatform() )
+		{
+		    if ( NULL != mPreviousItem )
+		    {
+	            mPreviousItem->setBackgroundColor(BLACK_COLOR);
+		    }
+		    if (listView == mScreenTransitionListView)
+		    {
+		        printf("mScreenTransitionListView event: item clicked");
+		        listViewItem->setBackgroundColor(SELECTED_COLOR);
+		    }
+		}
+	    mPreviousItem = listViewItem;
+	}
+
+    /**
+	 * This method is called when a list view item is clicked.
+	 * @param listView The list view object that generated the event.
+	 * @param index The index on which the  list view item is positioned.
+	 */
+	void FirstScreen::listViewItemClicked(
+		NativeUI::ListView* listView,
+		int index)
+	{
+	    if (listView == mScreenTransitionListView)
+	    {
+	        mSelectedTransition = index;
+	    }
 	}
 
 	void FirstScreen::populateTransitionList()
@@ -229,42 +251,103 @@ namespace Transitions
 		}
 	}
 
+
 	/**
-	 * This method is called when a list view item is clicked.
-	 * @param listView The list view object that generated the event.
-	 * @param listViewItem The ListViewItem object that was clicked.
+	 * Obtain the screen transition type from the list index for iOS screen
+	 * transitions.
+	 *
+	 * @param selectedIndex Selected item from list of screen transitions.
+	 * @return the Transition type corresponding to the selected screen transition.
 	 */
-	void FirstScreen::listViewItemClicked(
-	    NativeUI::ListView* listView,
-	    NativeUI::ListViewItem* listViewItem)
+	MAWScreenTransitionType FirstScreen::getTransitionTypeForiOS(int selectedIndex)
 	{
-		if ( ScreenUtils::OS_ANDROID == ScreenUtils::getCurrentPlatform() )
+		// We need to obtain the correct transition type/index.
+		int selectedTransition = MAW_TRANSITION_TYPE_NONE;
+		switch ( mSelectedTransition )
 		{
-		    if ( NULL != mPreviousItem )
-		    {
-	            mPreviousItem->setBackgroundColor(BLACK_COLOR);
-		    }
-		    if (listView == mScreenTransitionListView)
-		    {
-		        printf("mScreenTransitionListView event: item clicked");
-		        listViewItem->setBackgroundColor(SELECTED_COLOR);
-		    }
+		case 1:
+			selectedTransition = MAW_TRANSITION_TYPE_FLIP_FROM_LEFT;
+			break;
+		case 2:
+			selectedTransition = MAW_TRANSITION_TYPE_FLIP_FROM_RIGHT;
+			break;
+		case 3:
+			selectedTransition = MAW_TRANSITION_TYPE_CURL_UP;
+			break;
+		case 4:
+			selectedTransition = MAW_TRANSITION_TYPE_CURL_DOWN;
+			break;
+		default:
+			break;
 		}
-	    mPreviousItem = listViewItem;
+		return selectedTransition;
 	}
 
-    /**
-	 * This method is called when a list view item is clicked.
-	 * @param listView The list view object that generated the event.
-	 * @param index The index on which the  list view item is positioned.
+	/**
+	 * Obtain the screen transition type from the list index for Android screen
+	 * transitions.
+	 *
+	 * @param selectedIndex Selected item from list of screen transitions.
+	 * @return the Transition type corresponding to the selected screen transition.
 	 */
-	void FirstScreen::listViewItemClicked(
-		NativeUI::ListView* listView,
-		int index)
+	MAWScreenTransitionType FirstScreen::getTransitionTypeForAndroid(int selectedIndex)
 	{
-	    if (listView == mScreenTransitionListView)
-	    {
-	        mSelectedTransition = index;
-	    }
+		// We need to obtain the correct transition type/index.
+		int selectedTransition = MAW_TRANSITION_TYPE_NONE;
+		switch ( mSelectedTransition )
+		{
+		case 1:
+			selectedTransition = MAW_TRANSITION_TYPE_SLIDE_LEFT;
+			break;
+		case 2:
+			selectedTransition = MAW_TRANSITION_TYPE_SLIDE_RIGHT;
+			break;
+		case 3:
+			selectedTransition = MAW_TRANSITION_TYPE_FADE_IN;
+			break;
+		case 4:
+			selectedTransition = MAW_TRANSITION_TYPE_FADE_OUT;
+			break;
+		default:
+			break;
+		}
+		return selectedTransition;
+	}
+
+	/**
+	 * Obtain the screen transition type from the list index for Windows Phone screen
+	 * transitions.
+	 *
+	 * @param selectedIndex Selected item from list of screen transitions.
+	 * @return the Transition type corresponding to the selected screen transition.
+	 */
+	MAWScreenTransitionType FirstScreen::getTransitionTypeForWindows(int selectedIndex)
+	{
+		// We need to obtain the correct transition type/index.
+		int selectedTransition = MAW_TRANSITION_TYPE_NONE;
+		switch ( mSelectedTransition )
+		{
+		case 1:
+			selectedTransition = MAW_TRANSITION_TYPE_SLIDE_LEFT;
+			break;
+		case 2:
+			selectedTransition = MAW_TRANSITION_TYPE_SLIDE_RIGHT;
+			break;
+		case 3:
+			selectedTransition = MAW_TRANSITION_TYPE_SWIVEL_IN;
+			break;
+		case 4:
+			selectedTransition = MAW_TRANSITION_TYPE_SWIVEL_OUT;
+			break;
+		case 5:
+			selectedTransition = MAW_TRANSITION_TYPE_TURNSTILE_FOREWARD;
+			break;
+		case 6:
+			selectedTransition = MAW_TRANSITION_TYPE_TURNSTILE_BACKWARD;
+			break;
+		default:
+			break;
+		}
+		return selectedTransition;
 	}
 }

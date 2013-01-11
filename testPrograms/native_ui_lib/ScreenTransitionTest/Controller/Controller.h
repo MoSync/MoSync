@@ -56,12 +56,18 @@ namespace Transitions
 		/**
 		 * Tell the observer to show the second screen.
 		 */
-		virtual void showSecondScreen(short transType /*TODO Replace with object*/, const char* text);
+		virtual void showSecondScreen(short transType, const char* text);
 
 		/**
 		 * Tell the observer to hide the second screen.
 		 */
 		virtual void hideSecondScreen();
+
+	private:
+		/**
+		 * Tell the observer to hide the second screen.
+		 */
+		MAWScreenTransitionType getSimetricScreenTransition(int screenTransitionType);
 
 	public:
 		/**

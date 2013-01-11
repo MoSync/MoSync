@@ -73,7 +73,54 @@ namespace Transitions
 	 */
 	void Controller::hideSecondScreen()
 	{
-		//maWidgetScreenShowWithTransition(mFirstScreen->getWidgetHandle(), currentTransition, TRANSITION_TIME_MS);
-		mFirstScreen->showWithTransition(currentTransition, TRANSITION_TIME_MS);
+		//maWidgetScreenShowWithTransition(mFirstScreen->getWidgetHandle(), getSimetricScreenTransition(currentTransition), TRANSITION_TIME_MS);
+		mFirstScreen->showWithTransition(getSimetricScreenTransition(currentTransition), TRANSITION_TIME_MS);
+	}
+
+	MAWScreenTransitionType Controller::getSimetricScreenTransition(int screenTransitionType)
+	{
+		MAWScreenTransitionType returnTransition = MAW_TRANSITION_TYPE_NONE;
+		switch(screenTransitionType)
+		{
+		case MAW_TRANSITION_TYPE_FLIP_FROM_LEFT:
+			returnTransition = MAW_TRANSITION_TYPE_FLIP_FROM_RIGHT;
+			break;
+		case MAW_TRANSITION_TYPE_FLIP_FROM_RIGHT:
+			returnTransition = MAW_TRANSITION_TYPE_FLIP_FROM_LEFT;
+			break;
+		case MAW_TRANSITION_TYPE_CURL_UP:
+			returnTransition = MAW_TRANSITION_TYPE_CURL_DOWN;
+			break;
+		case MAW_TRANSITION_TYPE_CURL_DOWN:
+			returnTransition = MAW_TRANSITION_TYPE_CURL_UP;
+			break;
+		case MAW_TRANSITION_TYPE_SLIDE_LEFT:
+			returnTransition = MAW_TRANSITION_TYPE_SLIDE_RIGHT;
+			break;
+		case MAW_TRANSITION_TYPE_SLIDE_RIGHT:
+			returnTransition = MAW_TRANSITION_TYPE_SLIDE_LEFT;
+			break;
+		case MAW_TRANSITION_TYPE_FADE_IN:
+			returnTransition = MAW_TRANSITION_TYPE_FADE_OUT;
+			break;
+		case MAW_TRANSITION_TYPE_FADE_OUT:
+			returnTransition = MAW_TRANSITION_TYPE_FADE_IN;
+			break;
+		case MAW_TRANSITION_TYPE_SWIVEL_IN:
+			returnTransition = MAW_TRANSITION_TYPE_SWIVEL_OUT;
+			break;
+		case MAW_TRANSITION_TYPE_SWIVEL_OUT:
+			returnTransition = MAW_TRANSITION_TYPE_SWIVEL_IN;
+			break;
+		case MAW_TRANSITION_TYPE_TURNSTILE_FOREWARD:
+			returnTransition = MAW_TRANSITION_TYPE_TURNSTILE_BACKWARD;
+			break;
+		case MAW_TRANSITION_TYPE_TURNSTILE_BACKWARD:
+			returnTransition = MAW_TRANSITION_TYPE_TURNSTILE_FOREWARD;
+			break;
+		default:
+			break;
+		}
+		return returnTransition;
 	}
 } // end of Transitions
