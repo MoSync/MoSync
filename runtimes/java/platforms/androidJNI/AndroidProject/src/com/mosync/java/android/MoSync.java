@@ -58,8 +58,6 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 
 import com.mosync.internal.android.EventQueue;
 import com.mosync.internal.android.Mediator;
@@ -78,6 +76,7 @@ import com.mosync.internal.android.notifications.PushNotificationsUtil;
 import com.mosync.internal.generated.IX_WIDGET;
 import com.mosync.nativeui.ui.widgets.OptionsMenuItem;
 import com.mosync.nativeui.ui.widgets.ScreenWidget;
+import com.mosync.nativeui.util.ScreenTransitions;
 
 /**
  * Main MoSync activity
@@ -202,69 +201,38 @@ public class MoSync extends Activity
 		{
 			Log.i("MoSync", "setRootViewUsingTransition, root is null.");
 		}
-		applyTransitions(root, screenTransitionType, screenTransitionDuration);
 
-		setContentView(root);
-	}
-
-	/**
-	 * Applies screen transitions on next view..
-	 */
-    private void applyTransitions(View nextView, int screenTransitionType, int screenTransitionDuration)
-    {
-        // Get the current views
-        ScreenWidget currentScreen = mMoSyncThread.getCurrentScreen();
-
-        if ( null == currentScreen )
-        {
-            return;
-        }
-
-        // Clear transitions for the involved views.
-        currentScreen.getView().clearAnimation();
-        nextView.clearAnimation();
-
-        Animation screenTransition = null;
         switch ( screenTransitionType )
         {
-            // If you add another screen transition adjust/modify the condition in
-            // maWidgetScreenShowWithTransition which verifies if the given
-            // transition is part of the screen transition group available
-            // on android.
+            // When adding a new screen transition make sure you modify the
+            // ScreenTransitions::isScreenTransitionAvailable method so that it
+            // validates the new transitions as available on Android.
             case IX_WIDGET.MAW_TRANSITION_TYPE_SLIDE_LEFT:
-                // This will remove the current screen by sliding it to the left.
-                screenTransition = AnimationUtils.makeOutAnimation(this, false);
-                screenTransition.setDuration(screenTransitionDuration);
-
-                currentScreen.getView().startAnimation(screenTransition);
+                ScreenTransitions.doScreenTransitionSlideLeft(root, screenTransitionDuration);
                 break;
             case IX_WIDGET.MAW_TRANSITION_TYPE_SLIDE_RIGHT:
-                // This will remove the current screen by sliding it to the right.
-                screenTransition = AnimationUtils.makeOutAnimation(this, true);
-                screenTransition.setDuration(screenTransitionDuration);
-
-                currentScreen.getView().startAnimation(screenTransition);
+                ScreenTransitions.doScreenTransitionSlideRight(root, screenTransitionDuration);
                 break;
             case IX_WIDGET.MAW_TRANSITION_TYPE_FADE_IN:
-                // This will show the next screen by fading it in to the current one.
-                screenTransition = AnimationUtils.loadAnimation(this, android.R.anim.fade_in);
-                screenTransition.setDuration(screenTransitionDuration);
-
-                nextView.startAnimation(screenTransition);
+                ScreenTransitions.doScreenTransitionFadeIn(root, screenTransitionDuration);
                 break;
             case IX_WIDGET.MAW_TRANSITION_TYPE_FADE_OUT:
-                // This will remove the current screen by fading it out.
-                screenTransition = AnimationUtils.loadAnimation(this, android.R.anim.fade_out);
-                screenTransition.setDuration(screenTransitionDuration);
-
-                currentScreen.getView().startAnimation(screenTransition);
+                // Get the current views
+                ScreenWidget currentScreen = mMoSyncThread.getCurrentScreen();
+                if ( null == currentScreen )
+                {
+                     Log.i("MoSync", "setRootViewUsingTransition, currentScreen is null.");
+                }
+                else
+                {
+                     ScreenTransitions.doScreenTransitionFadeOut(currentScreen.getView(), screenTransitionDuration);
+                }
                 break;
             default:
-                nextView.clearAnimation();
-                currentScreen.getView().clearAnimation();
                 break;
         }
-    }
+        setContentView(root);
+	}
 
 	@Override
 	public void onNewIntent(Intent intent) {

@@ -52,6 +52,7 @@ import com.mosync.nativeui.ui.widgets.StackScreenWidget;
 import com.mosync.nativeui.ui.widgets.TabScreenWidget;
 import com.mosync.nativeui.ui.widgets.Widget;
 import com.mosync.nativeui.util.HandleTable;
+import com.mosync.nativeui.util.ScreenTransitions;
 import com.mosync.nativeui.util.properties.FeatureNotAvailableException;
 import com.mosync.nativeui.util.properties.IntConverter;
 import com.mosync.nativeui.util.properties.InvalidPropertyValueException;
@@ -452,8 +453,7 @@ public class NativeUI
 		}
 
 		// Check if the screen transition is available on android. See screen transition types documentation for availability.
-		if ( (IX_WIDGET.MAW_TRANSITION_TYPE_NONE != screenTransitionType) &&
-				((IX_WIDGET.MAW_TRANSITION_TYPE_SLIDE_LEFT > screenTransitionType ) || (screenTransitionType > IX_WIDGET.MAW_TRANSITION_TYPE_FADE_OUT))  )
+		if ( !ScreenTransitions.isScreenTransitionAvailable(screenTransitionType)  )
 		{
 			Log.e( "MoSync", "maWidgetScreenShowWtihTransition: Screen transition type is not available: " + screenTransitionType );
 			return IX_WIDGET.MAW_RES_INVALID_SCREEN_TRANSITION_TYPE;
