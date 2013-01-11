@@ -314,11 +314,7 @@ int maWidgetScreenShowWithTransition(MAWidgetHandle screenHandle, MAWScreenTrans
 		return MAW_RES_INVALID_SCREEN;
 	}
 
-    if ( (screenTransitionType < MAW_TRANSITION_TYPE_NONE) || (screenTransitionType > MAW_TRANSITION_TYPE_CUSTOM) ) {
-        return MAW_RES_INVALID_SCREEN_TRANSITION_TYPE;
-    }
-
-    if ( (screenTransitionDuration < 0) ) {
+    if ( screenTransitionDuration < 0 ) {
         return MAW_RES_INVALID_SCREEN_TRANSITION_DURATION;
     }
 

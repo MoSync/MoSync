@@ -336,7 +336,13 @@ static IWidget* sOldScreen = nil;
             options = UIViewAnimationOptionTransitionCurlDown;
             break;
         default:
-            return MAW_RES_INVALID_SCREEN_TRANSITION_TYPE;
+            options = UIViewAnimationOptionTransitionNone;
+            int result = [self show:widget];
+            if ( MAW_RES_OK == result )
+            {
+                return MAW_RES_INVALID_SCREEN_TRANSITION_TYPE;
+            }
+            return result;
     }
 
     if(sOldScreen == widget)
