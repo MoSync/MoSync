@@ -434,6 +434,32 @@ public class NativeUI
 	 */
 	public int maWidgetScreenShowWithTransition(final int screenHandle, final int screenTransitionType, final int screenTransitionDuration)
 	{
+		// Check if the screen transition is available on Android.
+		// If the screen transition is not available, the show operation will be done without animation.
+		if ( !ScreenTransitions.isScreenTransitionAvailable(screenTransitionType)  )
+		{
+			Log.e( "MoSync", "maWidgetScreenShowWtihTransition: Screen transition type is not available: " + screenTransitionType );
+			int result = maWidgetScreenShow(screenHandle);
+			if ( IX_WIDGET.MAW_RES_OK == result )
+			{
+				return IX_WIDGET.MAW_RES_INVALID_SCREEN_TRANSITION_TYPE;
+			}
+			return result;
+		}
+
+		// Check if the screen transition duration is valid.
+		// If the screen transition duration is not valid, the show operation will be done without animation.
+		if ( screenTransitionDuration <= 0 )
+		{
+			Log.e( "MoSync", "maWidgetScreenShowWtihTransition: Screen transition duration is invalid: " + screenTransitionDuration );
+			int result = maWidgetScreenShow(screenHandle);
+			if ( IX_WIDGET.MAW_RES_OK == result )
+			{
+				return IX_WIDGET.MAW_RES_INVALID_SCREEN_TRANSITION_DURATION;
+			}
+			return result;
+		}
+
 		Widget screen = m_widgetTable.get( screenHandle );
 		if( screen == null )
 		{
@@ -444,19 +470,6 @@ public class NativeUI
 		{
 			Log.e( "MoSync", "maWidgetScreenShowWtihTransition: Widget is not a screen: " + screenHandle );
 			return IX_WIDGET.MAW_RES_INVALID_SCREEN;
-		}
-
-		if ( screenTransitionDuration < 0 )
-		{
-			Log.e( "MoSync", "maWidgetScreenShowWtihTransition: Screen transition duration is invalid: " + screenTransitionDuration );
-			return IX_WIDGET.MAW_RES_INVALID_SCREEN_TRANSITION_DURATION;
-		}
-
-		// Check if the screen transition is available on android. See screen transition types documentation for availability.
-		if ( !ScreenTransitions.isScreenTransitionAvailable(screenTransitionType)  )
-		{
-			Log.e( "MoSync", "maWidgetScreenShowWtihTransition: Screen transition type is not available: " + screenTransitionType );
-			return IX_WIDGET.MAW_RES_INVALID_SCREEN_TRANSITION_TYPE;
 		}
 
 		if( m_rootViewReplacedListener != null )
