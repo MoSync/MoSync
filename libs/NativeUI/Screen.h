@@ -112,8 +112,15 @@ namespace NativeUI
 		 * @param screenTransitionDuration The duration of the screen transition in milliseconds.
 		 * This argument is not used on the Windows Phone platform due to the constant duration of
 		 * the WP screen transitions.
+		 *
+		 * @return Any of the following result codes:
+		 * - #MAW_RES_OK if the show with transition operation was successful.
+		 * - #MAW_RES_INVALID_SCREEN_TRANSITION_TYPE if the screen transition type is not available
+		 * on current platform. Show operation is still completed without screen transition.
+		 * - #MAW_RES_INVALID_SCREEN_TRANSITION_DURATION if the screen transition is not a positive
+		 * integer.
 		 */
-		virtual void showWithTransition(int screenTransitionType, int screenTransitionDuration);
+		virtual int showWithTransition(int screenTransitionType, int screenTransitionDuration);
 
 		/**
 		 * Called just before the screen begins rotating.
