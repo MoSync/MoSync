@@ -118,7 +118,8 @@ namespace NativeUI
 		 * - #MAW_RES_INVALID_SCREEN_TRANSITION_TYPE if the screen transition type is not available
 		 * on current platform. Show operation is still completed without screen transition.
 		 * - #MAW_RES_INVALID_SCREEN_TRANSITION_DURATION if the screen transition is not a positive
-		 * integer.
+		 * integer. This error code is not returned on the Windows Phone platform
+		 * due to the constant duration of the WP screen transitions.
 		 */
 		virtual int showWithTransition(int screenTransitionType, int screenTransitionDuration);
 
