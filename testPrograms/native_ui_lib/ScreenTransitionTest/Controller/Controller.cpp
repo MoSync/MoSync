@@ -64,8 +64,8 @@ namespace Transitions
 		currentTransition = transType;
 		mSecondScreen->resetTitleWithString(text);
 
-		int returnVal = maWidgetScreenShowWithTransition(mSecondScreen->getWidgetHandle(), transType, -5);
-		//int returnVal = mSecondScreen->showWithTransition(transType, TRANSITION_TIME_MS);
+		//int returnVal = maWidgetScreenShowWithTransition(mSecondScreen->getWidgetHandle(), transType, 300);
+		int returnVal = mSecondScreen->showWithTransition(transType, TRANSITION_TIME_MS);
 		printf("showWithTransition result: %d", returnVal);
 	}
 
@@ -74,7 +74,7 @@ namespace Transitions
 	 */
 	void Controller::hideSecondScreen()
 	{
-		//int returnval maWidgetScreenShowWithTransition(mFirstScreen->getWidgetHandle(), getSimetricScreenTransition(currentTransition), TRANSITION_TIME_MS);
+		//int returnVal = maWidgetScreenShowWithTransition(mFirstScreen->getWidgetHandle(), getSimetricScreenTransition(currentTransition), TRANSITION_TIME_MS);
 		int returnVal = mFirstScreen->showWithTransition(getSimetricScreenTransition(currentTransition), TRANSITION_TIME_MS);
 		printf("showWithTransition result: %d", returnVal);
 	}
