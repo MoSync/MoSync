@@ -318,8 +318,9 @@ static IWidget* sOldScreen = nil;
 	return MAW_RES_OK;
 }
 
-// shows a screen with a transition.
+// Shows a screen with a transition.
 - (int)show: (IWidget*) widget withTransitionType: (NSNumber*) transitionType andTransitionDuration: (NSNumber*) transitionDuration {
+
     //Obtain screen transition option
     UIViewAnimationOptions options;
     switch ([transitionType integerValue]) {
@@ -336,6 +337,8 @@ static IWidget* sOldScreen = nil;
             options = UIViewAnimationOptionTransitionCurlDown;
             break;
         default:
+            // if the screen transition type is not available on iOS do show without
+            // screen transition and return code error.
             options = UIViewAnimationOptionTransitionNone;
             int result = [self show:widget];
             if ( MAW_RES_OK == result )
@@ -343,6 +346,16 @@ static IWidget* sOldScreen = nil;
                 return MAW_RES_INVALID_SCREEN_TRANSITION_TYPE;
             }
             return result;
+    }
+
+    // If screen transition duration is invalid do normal show and return error code.
+    if ( 0 > [transitionDuration integerValue]) {
+        int result = [self show:widget];
+        if ( MAW_RES_OK == result )
+        {
+            return MAW_RES_INVALID_SCREEN_TRANSITION_DURATION;
+        }
+        return result;
     }
 
     if(sOldScreen == widget)
@@ -362,12 +375,15 @@ static IWidget* sOldScreen = nil;
 	}
 
     ScreenWidget* screen = (ScreenWidget*)widget;
+
+    // after animation block
     void (^handleTransitionDoneBlock)(BOOL) = ^(BOOL isTransFinished) {
         if ( isTransFinished ) {
             // If needed in the future.
         }
     };
 
+    // animation block
     void (^doAnimationBlock)(void) = ^(void) {
         mainWindow.rootViewController = [screen getController];
     };
