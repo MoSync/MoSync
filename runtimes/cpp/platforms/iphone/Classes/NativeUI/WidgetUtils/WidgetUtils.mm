@@ -26,9 +26,66 @@
 
 
 #import "WidgetUtils.h"
+#import "ScreenWidget.h"
 
 /**
  * "true" and "false" string constants used by Native UI widgets.
  */
 NSString* const kWidgetTrueValue = @"true";
 NSString* const kWidgetFalseValue = @"false";
+
+#pragma mark -
+#pragma mark Screen Transitions Utils
+
+namespace ScreenTransitionsUtils {
+int doScreenTransition(UIWindow* aWindow, ScreenWidget* aScreenWidget, NSNumber* aScreenTransitionType, NSNumber* aScreenTransitionDuration)
+{
+    if ( 0 > [aScreenTransitionDuration integerValue]) {
+        return MAW_RES_INVALID_SCREEN_TRANSITION_DURATION;
+    }
+
+    //Obtain screen transition option or return error code if not available on iOS.
+    UIViewAnimationOptions options;
+    switch ([aScreenTransitionType integerValue]) {
+        case MAW_TRANSITION_TYPE_FLIP_FROM_LEFT:
+            options = UIViewAnimationOptionTransitionFlipFromLeft;
+            break;
+        case MAW_TRANSITION_TYPE_FLIP_FROM_RIGHT:
+            options = UIViewAnimationOptionTransitionFlipFromRight;
+            break;
+        case MAW_TRANSITION_TYPE_CURL_UP:
+            options = UIViewAnimationOptionTransitionCurlUp;
+            break;
+        case MAW_TRANSITION_TYPE_CURL_DOWN:
+            options = UIViewAnimationOptionTransitionCurlDown;
+            break;
+        default:
+            return MAW_RES_INVALID_SCREEN_TRANSITION_TYPE;
+    }
+
+    // after animation block
+    void (^handleTransitionDoneBlock)(BOOL) = ^(BOOL isTransFinished) {
+        if ( isTransFinished ) {
+            // If needed in the future.
+        }
+    };
+
+    // animation block
+    void (^doAnimationBlock)(void) = ^(void) {
+        if ( aWindow && aScreenWidget )
+        {
+            aWindow.rootViewController = [aScreenWidget getController];
+        }
+    };
+
+    // convert milliseconds to seconds for duration parameter of transition.
+    NSTimeInterval screenTransitionDuration = 0.001 * [aScreenTransitionDuration doubleValue];
+
+    [UIView transitionWithView:aWindow
+                      duration:screenTransitionDuration
+                       options:options
+                    animations:doAnimationBlock completion:handleTransitionDoneBlock];
+
+    return MAW_RES_OK;
+}
+}

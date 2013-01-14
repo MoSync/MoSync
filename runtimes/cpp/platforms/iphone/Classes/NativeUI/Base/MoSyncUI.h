@@ -50,7 +50,8 @@
 - (int)show: (IWidget*) handle;
 
 // shows a screen with a transition.
-- (int)show: (IWidget*) widget withTransitionType: (NSNumber*) transitionType andTransitionDuration: (NSNumber*) transitionDuration;
+- (int)show: (IWidget*) widget withTransitionType: (NSNumber*) transitionType
+                            andTransitionDuration: (NSNumber*) transitionDuration;
 
 // shows a modal view controller
 - (void) showModal: (UINavigationController*)controller;

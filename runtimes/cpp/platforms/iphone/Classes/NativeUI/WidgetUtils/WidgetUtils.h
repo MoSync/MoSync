@@ -26,6 +26,8 @@
 
 #include "Syscall.h"
 
+@class ScreenWidget;
+
 /**
  * If the value is negative it returns MAW_RES_INVALID_PROPERTY_VALUE constant.
  */
@@ -55,3 +57,11 @@ namespace Base
 {
     UIFont* getUIFontObject(MAHandle fontHandle);
 };
+
+#pragma mark -
+#pragma mark Screen Transitions Utils
+
+namespace ScreenTransitionsUtils
+{
+    int doScreenTransition(UIWindow* aWindow, ScreenWidget* aScreenWidget, NSNumber* aScreenTransitionType, NSNumber* aScreenTransitionDuration);
+}
