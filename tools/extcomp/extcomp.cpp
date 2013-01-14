@@ -340,6 +340,15 @@ string extractPointerType(string type, int& ptrDepth) {
 	return arrayType == string::npos ? type : type.substr(0, arrayType);
 }
 
+Struct* getStruct(Interface& ext, string& structType) {
+	for (size_t i = 0; i < ext.structs.size(); i++) {
+		if (structType == ext.structs[i].name) {
+			return &(ext.structs[i]);
+		}
+	}
+	return NULL;
+}
+
 void streamInvokePrefix(ostream& stream, const Function& f) {
 	// Must have this to compile.
 }

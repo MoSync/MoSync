@@ -39,5 +39,6 @@ string getFnIxHandle(Interface& f);
 string getModHashDefine(Interface& ext);
 bool isReturnType(Interface&, string&);
 string extractPointerType(string type, int& ptrDepth);
+Struct* getStruct(Interface& ext, string& structType);
 
 #endif /* EXTCOMP_H_ */
