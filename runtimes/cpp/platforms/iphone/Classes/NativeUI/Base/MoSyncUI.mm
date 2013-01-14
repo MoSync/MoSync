@@ -28,6 +28,7 @@
 #include "MoSyncViewController.h"
 #import "ScreenOrientation.h"
 #import "MoSyncUISyscalls.h"
+#import "WidgetUtils.h"
 
 @interface MoSyncUIWindow : UIWindow {
 	TouchHelper* touchHelper;
@@ -319,45 +320,8 @@ static IWidget* sOldScreen = nil;
 }
 
 // Shows a screen with a transition.
-- (int)show: (IWidget*) widget withTransitionType: (NSNumber*) transitionType andTransitionDuration: (NSNumber*) transitionDuration {
-
-    //Obtain screen transition option
-    UIViewAnimationOptions options;
-    switch ([transitionType integerValue]) {
-        case MAW_TRANSITION_TYPE_FLIP_FROM_LEFT:
-            options = UIViewAnimationOptionTransitionFlipFromLeft;
-            break;
-        case MAW_TRANSITION_TYPE_FLIP_FROM_RIGHT:
-            options = UIViewAnimationOptionTransitionFlipFromRight;
-            break;
-        case MAW_TRANSITION_TYPE_CURL_UP:
-            options = UIViewAnimationOptionTransitionCurlUp;
-            break;
-        case MAW_TRANSITION_TYPE_CURL_DOWN:
-            options = UIViewAnimationOptionTransitionCurlDown;
-            break;
-        default:
-            // if the screen transition type is not available on iOS do show without
-            // screen transition and return code error.
-            options = UIViewAnimationOptionTransitionNone;
-            int result = [self show:widget];
-            if ( MAW_RES_OK == result )
-            {
-                return MAW_RES_INVALID_SCREEN_TRANSITION_TYPE;
-            }
-            return result;
-    }
-
-    // If screen transition duration is invalid do normal show and return error code.
-    if ( 0 > [transitionDuration integerValue]) {
-        int result = [self show:widget];
-        if ( MAW_RES_OK == result )
-        {
-            return MAW_RES_INVALID_SCREEN_TRANSITION_DURATION;
-        }
-        return result;
-    }
-
+- (int)show: (IWidget*) widget withTransitionType: (NSNumber*) transitionType
+                            andTransitionDuration: (NSNumber*) transitionDuration {
     if(sOldScreen == widget)
         return MAW_RES_OK;
 
@@ -376,25 +340,24 @@ static IWidget* sOldScreen = nil;
 
     ScreenWidget* screen = (ScreenWidget*)widget;
 
-    // after animation block
-    void (^handleTransitionDoneBlock)(BOOL) = ^(BOOL isTransFinished) {
-        if ( isTransFinished ) {
-            // If needed in the future.
+    int screenTransitionResult = ScreenTransitionsUtils::doScreenTransition(mainWindow,
+                                                                            screen,
+                                                                            transitionType,
+                                                                            transitionDuration);
+
+    // Case1: If the screen transition type is not available on iOS do show without
+    // screen transition and return corresponding code error.
+    // Case2: If screen transition duration is invalid do normal show and return error code.
+    if ( MAW_RES_INVALID_SCREEN_TRANSITION_TYPE == screenTransitionResult ||
+         MAW_RES_INVALID_SCREEN_TRANSITION_DURATION == screenTransitionResult)
+    {
+        int showResult = [self show:widget];
+        if ( MAW_RES_OK == showResult )
+        {
+            return screenTransitionResult;
         }
-    };
-
-    // animation block
-    void (^doAnimationBlock)(void) = ^(void) {
-        mainWindow.rootViewController = [screen getController];
-    };
-
-    // convert milliseconds to seconds for duration parameter of transition.
-    NSTimeInterval screenTransitionDuration = 0.001 * [transitionDuration doubleValue];
-
-    [UIView transitionWithView:mainWindow
-                      duration:screenTransitionDuration
-                       options:options
-                    animations:doAnimationBlock completion:handleTransitionDoneBlock];
+        return showResult;
+    }
 
 	[widget layout];
 	[widget show];

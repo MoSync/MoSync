@@ -64,8 +64,8 @@ namespace Transitions
 		currentTransition = transType;
 		mSecondScreen->resetTitleWithString(text);
 
-		//int returnval maWidgetScreenShowWithTransition(mSecondScreen->getWidgetHandle(), transType, TRANSITION_TIME_MS);
-		int returnVal = mSecondScreen->showWithTransition(transType, TRANSITION_TIME_MS);
+		int returnVal = maWidgetScreenShowWithTransition(mSecondScreen->getWidgetHandle(), transType, -5);
+		//int returnVal = mSecondScreen->showWithTransition(transType, TRANSITION_TIME_MS);
 		printf("showWithTransition result: %d", returnVal);
 	}
 

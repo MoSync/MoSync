@@ -134,7 +134,8 @@ group WidgetAPIFunctions "Widget functions" {
 	* - #MAW_RES_INVALID_SCREEN_TRANSITION_DURATION if the value representing the
 	* duration of the screen transition is invalid.
 	*/
-	int maWidgetScreenShowWithTransition(in MAWidgetHandle screenHandle, in MAWScreenTransitionType screenTransitionType, in int screenTransitionDuration);
+	int maWidgetScreenShowWithTransition(in MAWidgetHandle screenHandle,
+		in MAWScreenTransitionType screenTransitionType, in int screenTransitionDuration);
 
 	/**
 	 * Pushes a screen to the given screen stack, hides the current screen and
