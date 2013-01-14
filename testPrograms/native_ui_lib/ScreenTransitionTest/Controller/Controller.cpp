@@ -66,7 +66,7 @@ namespace Transitions
 
 		//int returnval maWidgetScreenShowWithTransition(mSecondScreen->getWidgetHandle(), transType, TRANSITION_TIME_MS);
 		int returnVal = mSecondScreen->showWithTransition(transType, TRANSITION_TIME_MS);
-		printf("showWithTransition result", returnVal);
+		printf("showWithTransition result: %d", returnVal);
 	}
 
 	/**
@@ -76,7 +76,7 @@ namespace Transitions
 	{
 		//int returnval maWidgetScreenShowWithTransition(mFirstScreen->getWidgetHandle(), getSimetricScreenTransition(currentTransition), TRANSITION_TIME_MS);
 		int returnVal = mFirstScreen->showWithTransition(getSimetricScreenTransition(currentTransition), TRANSITION_TIME_MS);
-		printf("showWithTransition result", returnVal);
+		printf("showWithTransition result: %d", returnVal);
 	}
 
 	MAWScreenTransitionType Controller::getSimetricScreenTransition(int screenTransitionType)
