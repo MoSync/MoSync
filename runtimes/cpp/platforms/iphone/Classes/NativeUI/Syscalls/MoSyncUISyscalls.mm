@@ -276,11 +276,12 @@ int maWidgetModalDialogHide(MAWidgetHandle dialogHandle) {
  * @param screenHandle The handle to the screen.
  * @return Any of the following result codes:
  * - MAW_RES_OK if the screen could be shown.
- * - MAW_RES_INVALID_SCREEN if the screenHandle is not a handle to a screen.
+ * - #MAW_RES_INVALID_HANDLE if the screenHandle is invalid.
+ * - #MAW_RES_INVALID_SCREEN if the screenHandle is not a handle to a screen.
  */
 int maWidgetScreenShow(MAWidgetHandle screenHandle) {
 	IWidget* screen = [mosyncUI getWidget:screenHandle];
-	if(!screen) return MAW_RES_INVALID_SCREEN;
+	if(!screen) return MAW_RES_INVALID_HANDLE;
 
 	if(!([screen class] == [ScreenWidget class]) && !([screen superclass] == [ScreenWidget class])) {
 		return MAW_RES_INVALID_SCREEN;
@@ -302,7 +303,7 @@ int maWidgetScreenShow(MAWidgetHandle screenHandle) {
 int maWidgetScreenShowWithTransition(MAWidgetHandle screenHandle, MAWScreenTransitionType screenTransitionType, int screenTransitionDuration) {
 
 	IWidget* screen = [mosyncUI getWidget:screenHandle];
-	if(!screen) return MAW_RES_INVALID_SCREEN;
+	if(!screen) return MAW_RES_INVALID_HANDLE;
 
 	if(!([screen class] == [ScreenWidget class]) && !([screen superclass] == [ScreenWidget class])) {
 		return MAW_RES_INVALID_SCREEN;
