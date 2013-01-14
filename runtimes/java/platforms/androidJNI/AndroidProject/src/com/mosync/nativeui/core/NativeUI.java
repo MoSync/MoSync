@@ -449,7 +449,7 @@ public class NativeUI
 
 		// Check if the screen transition duration is valid.
 		// If the screen transition duration is not valid, the show operation will be done without animation.
-		if ( screenTransitionDuration <= 0 )
+		if ( screenTransitionDuration < 0 )
 		{
 			Log.e( "MoSync", "maWidgetScreenShowWtihTransition: Screen transition duration is invalid: " + screenTransitionDuration );
 			int result = maWidgetScreenShow(screenHandle);
