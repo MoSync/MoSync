@@ -301,22 +301,12 @@ int maWidgetScreenShow(MAWidgetHandle screenHandle) {
 
 int maWidgetScreenShowWithTransition(MAWidgetHandle screenHandle, MAWScreenTransitionType screenTransitionType, int screenTransitionDuration) {
 
-    if ((0 == screenTransitionDuration) ||
-        (MAW_TRANSITION_TYPE_NONE == screenTransitionType))
-    {
-        return maWidgetScreenShow(screenHandle);
-    }
-
 	IWidget* screen = [mosyncUI getWidget:screenHandle];
 	if(!screen) return MAW_RES_INVALID_SCREEN;
 
 	if(!([screen class] == [ScreenWidget class]) && !([screen superclass] == [ScreenWidget class])) {
 		return MAW_RES_INVALID_SCREEN;
 	}
-
-    if ( screenTransitionDuration < 0 ) {
-        return MAW_RES_INVALID_SCREEN_TRANSITION_DURATION;
-    }
 
 	sNativeUIEnabled = screenHandle==MAW_CONSTANT_MOSYNC_SCREEN_HANDLE?false:true;
 
