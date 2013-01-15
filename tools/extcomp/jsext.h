@@ -31,7 +31,8 @@ using namespace std;
 
 void writeJSBridge(string&, Interface&);
 string getJSTypeDesc(Interface& ext, vector<string>& types, vector<bool>* dirs, map<string, int>& structIdMap, vector<string>& typedescs);
-void generateArrayMarshalling(ostream& extensionFile, Interface& ext, Argument& argName, int ptrDepth);
-void generateStructMarshalling(ostream& extensionFile, Interface& ext, string& varName, string& type);
+void generateArrayMarshalling(ostream& extensionFile, Interface& ext, string& arrayName, string& arrayType, int ptrDepth);
+void generateStructMarshalling(ostream& extensionFile, Interface& ext, string& varName, string& varType);
+void generateMarshalling(ostream& extensionFile, Interface& ext, string& varName, string& varType);
 
 #endif /* JSEXT_H_ */

@@ -86,6 +86,10 @@ namespace MAUtil {
 		return strtoul(s.c_str(), 0, base);
 	}
 
+	long long stringToLong(const String &s, int base) {
+		return strtoull(s.c_str(), 0, base);
+	}
+
 	double stringToDouble(const String &s) {
 #if !defined(_WIN32) && !defined(MAPIP)
 		setlocale(LC_ALL, "C");

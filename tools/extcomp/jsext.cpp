@@ -67,75 +67,76 @@ void writeJSBridge(string& outputfile, Interface& ext) {
 		extensionFile << "var args = [";
 		extensionFile << "\"Extension\",";
 		extensionFile << "\"" << extname << "\",";
-		extensionFile << i << ",";
-		extensionFile << f.args.size() << "];\n";
+		extensionFile << i << "];\n";
 
 		map<string, int> structIdMap;
 		vector<string> typeDescs;
 		vector<string> argTypes;
 		vector<bool> argDirs;
 
-		if (!f.args.empty()) {
-			extensionFile << "args.push(\"";
-			for (size_t j = 0; j < f.args.size(); j++) {
-				Argument arg = f.args[j];
-				argTypes.push_back(arg.type);
-				argDirs.push_back(!arg.in);
-			}
-			string argTypeDesc = getJSTypeDesc(ext, argTypes, &argDirs, structIdMap, typeDescs);
-			extensionFile << argTypeDesc << "\");";
+		for (size_t j = 0; j < f.args.size(); j++) {
+			Argument arg = f.args[j];
+			string argName = "_" + arg.name;
+			generateMarshalling(extensionFile, ext, argName, arg.type);
 		}
+		string resultVar = isReturnType(ext, f.returnType) ? "r.result" : "null";
+		string outVar = outParamCount ? "r.out" : "null";
+		extensionFile << "\tmosync.bridge.send(args, function(r) { fnc(" << resultVar << "," << outVar <<  ")}));}\n";
+
+		// Self-executing initializer.
+		extensionFile << "(function() {\n";
+		extensionFile << "var initArgs = [";
+		extensionFile << "\"Extension\",";
+		extensionFile << "\"*" << extname << "\",";
+		streamExtHashValue(extensionFile, ext);
+		extensionFile << "," << i << "];\n";
+
+		extensionFile << "args.push(\":";
+		for (size_t j = 0; j < f.args.size(); j++) {
+			Argument arg = f.args[j];
+			argTypes.push_back(arg.type);
+			argDirs.push_back(!arg.in);
+		}
+		argTypes.push_back(f.returnType);
+		argDirs.push_back(true);
+
+		string argTypeDesc = getJSTypeDesc(ext, argTypes, &argDirs, structIdMap, typeDescs);
+		extensionFile << argTypeDesc << "\");";
 
 		for (size_t j = 0; j < typeDescs.size(); j++) {
 			extensionFile << "args.push(\"" << typeDescs[j] << "\");\n";
 		}
 
-		for (size_t j = 0; j < f.args.size(); j++) {
-			Argument arg = f.args[j];
-			int ptrDepth = 0;
-			string scalarType = extractPointerType(arg.type, ptrDepth);
-			bool stringType = scalarType == "char" && ptrDepth == 1;
-			if (ptrDepth > 0 && !stringType) {
-				extensionFile << "var " << arg.name << ptrDepth << " = _" << arg.name << ";\n";
-				generateArrayMarshalling(extensionFile, ext, arg, ptrDepth);
-			} else if (getStruct(ext, arg.type)) {
-				generateStructMarshalling(extensionFile, ext, arg.name, arg.type);
-			} else {
-				// Primitive
-				extensionFile << "args.push(_" << arg.name << ");";
-			}
-		}
-		string resultVar = isReturnType(ext, f.returnType) ? "r.result" : "null";
-		string outVar = outParamCount ? "r.out" : "null";
-		extensionFile << "\tmosync.bridge.send(args, function(r) { fnc(" << resultVar << "," << outVar <<  ")}));}\n";
+		extensionFile << "args.push(\"-\");\n";
+		extensionFile << "mosync.bridge.send(initArgs);\n";
+		extensionFile << "})();\n";
+
 	}
 
 	extensionFile.close();
 }
 
-void generateArrayMarshalling(ostream& extensionFile, Interface& ext, Argument& arg, int ptrDepth) {
+void generateArrayMarshalling(ostream& extensionFile, Interface& ext, string& arrayName, string& arrayType, int ptrDepth) {
 	if (ptrDepth <= 0) {
 		return;
 	}
-	stringstream arrayVarStr;
-	arrayVarStr << arg.name;
-	arrayVarStr << (ptrDepth - 1);
-	string arrayVar = arrayVarStr.str();
+	string subArrayVar = "A" + arrayName;
 	int throwAway;
-	string scalarType = extractPointerType(arg.type, throwAway);
-	extensionFile << "if Array.isArray(" << arg.name << ") {\n";
-	extensionFile << "args.push(" << arg.name << ".length);\n";
-	extensionFile << "for (int i" << ptrDepth << "; i" << ptrDepth << " < " << arg.name << ".length; i" << ptrDepth << "++) {\n";
-	extensionFile << "var " << arrayVar << " = " << arg.name << "[i" << ptrDepth << "];\n";
-	generateArrayMarshalling(extensionFile, ext, arg, ptrDepth - 1);
+	string scalarType = extractPointerType(arrayType, throwAway);
+	extensionFile << "if (Array.isArray(" << arrayName << ")) {\n";
+	extensionFile << "args.push(" << arrayName << ".length);\n";
+	extensionFile << "for (int i" << ptrDepth << "; i" << ptrDepth << " < " << arrayName << ".length; i" << ptrDepth << "++) {\n";
+	extensionFile << "var " << subArrayVar << " = " << arrayName << "[i" << ptrDepth << "];\n";
+	generateArrayMarshalling(extensionFile, ext, subArrayVar, arrayType, ptrDepth - 1);
 	if (ptrDepth == 1) {
-		generateStructMarshalling(extensionFile, ext, arrayVar, scalarType);
+		generateMarshalling(extensionFile, ext, subArrayVar, scalarType);
 	}
 	extensionFile << "}";
 	extensionFile << "} else {\n";
 	extensionFile << "args.push(1);\n";
+	generateArrayMarshalling(extensionFile, ext, subArrayVar, arrayType, ptrDepth - 1);
 	if (ptrDepth == 1) {
-		generateStructMarshalling(extensionFile, ext, arrayVar, scalarType);
+		generateMarshalling(extensionFile, ext, subArrayVar, scalarType);
 	}
 	extensionFile << "}\n";
 }
@@ -146,9 +147,25 @@ void generateStructMarshalling(ostream& extensionFile, Interface& ext, string& v
 		for (size_t i = 0; i < s->members.size(); i++) {
 			Member m = s->members[i];
 			string name = m.pod[0].name;
-			extensionFile << "args.push(" << varName << "." << name << ");\n";
+			string fieldAccess = varName + "." + name;
+			generateMarshalling(extensionFile, ext, fieldAccess, m.pod[0].type);
+			extensionFile << "\n";
 		}
 
+	}
+}
+
+void generateMarshalling(ostream& extensionFile, Interface& ext, string& name, string& type) {
+	int ptrDepth = 0;
+	string scalarType = extractPointerType(type, ptrDepth);
+	bool stringType = scalarType == "char" && ptrDepth == 1;
+	if (ptrDepth > 0 && !stringType) {
+		generateArrayMarshalling(extensionFile, ext, name, type, ptrDepth);
+	} else if (getStruct(ext, type)) {
+		generateStructMarshalling(extensionFile, ext, name, type);
+	} else {
+		// Primitive
+		extensionFile << "args.push(" << name << ");";
 	}
 }
 
@@ -170,6 +187,9 @@ string getJSTypeDesc(Interface& ext, vector<string>& types, vector<bool>* dirs, 
 			typeDesc.append(out ? "f" : "F");
 		} else if ("double" == type) {
 			typeDesc.append(out ? "d" : "D");
+		} else if ("void" == type) {
+			// Only for return values, always out.
+			typeDesc.append("v");
 		} else {
 			if (structIdMap.find(type) == structIdMap.end()) {
 				structIdMap[type] = typeDescs.size();
