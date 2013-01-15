@@ -37,6 +37,7 @@ MAUtil::Dictionary<Key, Storage>::DictNode::DictNode(Storage s)
 template<class Key, class Storage>
 void MAUtil::Dictionary<Key, Storage>::init(CompareFunction cf) {
 	dict_init(&mDict, DICTCOUNT_T_MAX, (dict_comp_t)cf);
+	dict_set_allocator(&mDict, alloc, free, this);
 }
 
 template<class Key, class Storage>
