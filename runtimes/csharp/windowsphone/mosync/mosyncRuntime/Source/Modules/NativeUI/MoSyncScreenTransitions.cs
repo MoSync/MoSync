@@ -34,17 +34,77 @@ namespace MoSync
     {
         /*
          * When adding a new screen transition make sure you modify the
-         * ScreenTransitions::isScreenTransitionAvailable method so that it
-         * validates the new transitions as available on Android.
+         * MoSyncScreenTransitions::isTransitionAvailable method so that it
+         * validates the new transitions as available on WP.
          */
-        public class MoSyncScreenTransitions
+        sealed public class MoSyncScreenTransitions
         {
+            static public void doShowWithScreenTransition(Grid nextPage, int screenTransitionType)
+            {
+                //Sets the content of the mainPage.xaml as our screen content with transitions/animation.
+                switch (screenTransitionType)
+                {
+                    case MoSync.Constants.MAW_TRANSITION_TYPE_NONE:
+                        PhoneApplicationPage page = (PhoneApplicationPage)((PhoneApplicationFrame)Application.Current.RootVisual).Content;
+                        page.Content = nextPage;
+                        break;
+                    case MoSync.Constants.MAW_TRANSITION_TYPE_SLIDE_RIGHT:
+                        MoSyncScreenTransitions.doSlideRightTransition(nextPage);
+                        break;
+                    case MoSync.Constants.MAW_TRANSITION_TYPE_SLIDE_LEFT:
+                        MoSyncScreenTransitions.doSlideLeftTransition(nextPage);
+                        break;
+                    case MoSync.Constants.MAW_TRANSITION_TYPE_SWIVEL_IN:
+                        MoSyncScreenTransitions.doSwivelInTransition(nextPage);
+                        break;
+                    case MoSync.Constants.MAW_TRANSITION_TYPE_SWIVEL_OUT:
+                        MoSyncScreenTransitions.doSwivelOutTransition(nextPage);
+                        break;
+                    case MoSync.Constants.MAW_TRANSITION_TYPE_TURNSTILE_FOREWARD:
+                        MoSyncScreenTransitions.doTurnstileForewardTransition(nextPage);
+                        break;
+                    case MoSync.Constants.MAW_TRANSITION_TYPE_TURNSTILE_BACKWARD:
+                        MoSyncScreenTransitions.doTurnstileBackwardTransition(nextPage);
+                        break;
+                    default:
+                        // It should not reach this point.
+                        break;
+                }
+            }
+
+
+            /**
+             * Checks if the screen transititon given as parameter is available on WP.
+             * Screen transition can be found \link #MA_TRANSITION_TYPE_NONE here \endlink.
+             *
+             * @param screenTransitionType a transition type.
+             *
+             * @return True if the screen transititon given as parameter is available on WP, false otherwise.
+             */
+            static public bool isTransitionAvailable(int screenTransitionType)
+            {
+                // TODO Find a better solution to validate platform availability for screen transitions.
+                switch (screenTransitionType)
+                {
+                    case MoSync.Constants.MAW_TRANSITION_TYPE_SLIDE_RIGHT:
+                    case MoSync.Constants.MAW_TRANSITION_TYPE_SLIDE_LEFT:
+                    case MoSync.Constants.MAW_TRANSITION_TYPE_SWIVEL_IN:
+                    case MoSync.Constants.MAW_TRANSITION_TYPE_SWIVEL_OUT:
+                    case MoSync.Constants.MAW_TRANSITION_TYPE_TURNSTILE_FOREWARD:
+                    case MoSync.Constants.MAW_TRANSITION_TYPE_TURNSTILE_BACKWARD:
+                    case MoSync.Constants.MAW_TRANSITION_TYPE_NONE:
+                        return true;
+                    default:
+                        return false;
+                }
+            }
+
             /**
              * Sets the content of the mainPage.xaml as our screen content with slide left transition.
              *
              * @param nextPage the next screen/content that will be displayed.
              */
-            static public void doSlideLeftTransition(Grid nextPage)
+            static private void doSlideLeftTransition(Grid nextPage)
             {
                 PhoneApplicationPage page = (PhoneApplicationPage)((PhoneApplicationFrame)Application.Current.RootVisual).Content;
 
@@ -65,7 +125,7 @@ namespace MoSync
              *
              * @param nextPage the next screen/content that will be displayed.
              */
-            static public void doSlideRightTransition(Grid nextPage)
+            static private void doSlideRightTransition(Grid nextPage)
             {
                 PhoneApplicationPage page = (PhoneApplicationPage)((PhoneApplicationFrame)Application.Current.RootVisual).Content;
 
@@ -86,7 +146,7 @@ namespace MoSync
              *
              * @param nextPage the next screen/content that will be displayed.
              */
-            static public void doSwivelInTransition(Grid nextPage)
+            static private void doSwivelInTransition(Grid nextPage)
             {
                 PhoneApplicationPage page = (PhoneApplicationPage)((PhoneApplicationFrame)Application.Current.RootVisual).Content;
 
@@ -107,7 +167,7 @@ namespace MoSync
              *
              * @param nextPage the next screen/content that will be displayed.
              */
-            static public void doSwivelOutTransition(Grid nextPage)
+            static private void doSwivelOutTransition(Grid nextPage)
             {
                 PhoneApplicationPage page = (PhoneApplicationPage)((PhoneApplicationFrame)Application.Current.RootVisual).Content;
 
@@ -128,7 +188,7 @@ namespace MoSync
              *
              * @param nextPage the next screen/content that will be displayed.
              */
-            static public void doTurnstileForewardTransition(Grid nextPage)
+            static private void doTurnstileForewardTransition(Grid nextPage)
             {
                 PhoneApplicationPage page = (PhoneApplicationPage)((PhoneApplicationFrame)Application.Current.RootVisual).Content;
 
@@ -149,7 +209,7 @@ namespace MoSync
              *
              * @param nextPage the next screen/content that will be displayed.
              */
-            static public void doTurnstileBackwardTransition(Grid nextPage)
+            static private void doTurnstileBackwardTransition(Grid nextPage)
             {
                 PhoneApplicationPage page = (PhoneApplicationPage)((PhoneApplicationFrame)Application.Current.RootVisual).Content;
 
@@ -163,32 +223,6 @@ namespace MoSync
                 };
                 transInterf.Begin();
                 page.Content = nextPage;
-            }
-
-            /**
-             * Checks if the screen transititon given as parameter is available on WP.
-             * Screen transition can be found \link #MA_TRANSITION_TYPE_NONE here \endlink.
-             *
-             * @param screenTransitionType a transition type.
-             *
-             * @return True if the screen transititon given as parameter is available on WP, false otherwise.
-             */
-            static public bool isTransitionAvailable(int screenTransitionType)
-            {
-                // TODO Find a better solution to validate platform availabiliry for screen transitions.
-                switch (screenTransitionType)
-                {
-                    case MoSync.Constants.MAW_TRANSITION_TYPE_SLIDE_RIGHT:
-                    case MoSync.Constants.MAW_TRANSITION_TYPE_SLIDE_LEFT:
-                    case MoSync.Constants.MAW_TRANSITION_TYPE_SWIVEL_IN:
-                    case MoSync.Constants.MAW_TRANSITION_TYPE_SWIVEL_OUT:
-                    case MoSync.Constants.MAW_TRANSITION_TYPE_TURNSTILE_FOREWARD:
-                    case MoSync.Constants.MAW_TRANSITION_TYPE_TURNSTILE_BACKWARD:
-                    case MoSync.Constants.MAW_TRANSITION_TYPE_NONE:
-                        return true;
-                    default:
-                        return false;
-                }
             }
         }
     }

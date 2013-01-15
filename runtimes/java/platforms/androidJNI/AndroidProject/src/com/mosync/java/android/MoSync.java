@@ -201,36 +201,7 @@ public class MoSync extends Activity
 		{
 			Log.i("MoSync", "setRootViewUsingTransition, root is null.");
 		}
-
-        switch ( screenTransitionType )
-        {
-            // When adding a new screen transition make sure you modify the
-            // ScreenTransitions::isScreenTransitionAvailable method so that it
-            // validates the new transitions as available on Android.
-            case IX_WIDGET.MAW_TRANSITION_TYPE_SLIDE_LEFT:
-                ScreenTransitions.doScreenTransitionSlideLeft(root, screenTransitionDuration);
-                break;
-            case IX_WIDGET.MAW_TRANSITION_TYPE_SLIDE_RIGHT:
-                ScreenTransitions.doScreenTransitionSlideRight(root, screenTransitionDuration);
-                break;
-            case IX_WIDGET.MAW_TRANSITION_TYPE_FADE_IN:
-                ScreenTransitions.doScreenTransitionFadeIn(root, screenTransitionDuration);
-                break;
-            case IX_WIDGET.MAW_TRANSITION_TYPE_FADE_OUT:
-                // Get the current views
-                ScreenWidget currentScreen = mMoSyncThread.getCurrentScreen();
-                if ( null == currentScreen )
-                {
-                     Log.i("MoSync", "setRootViewUsingTransition, currentScreen is null.");
-                }
-                else
-                {
-                     ScreenTransitions.doScreenTransitionFadeOut(currentScreen.getView(), screenTransitionDuration);
-                }
-                break;
-            default:
-                break;
-        }
+		ScreenTransitions.applyScreenTransition(root, screenTransitionType, screenTransitionDuration);
         setContentView(root);
 	}
 

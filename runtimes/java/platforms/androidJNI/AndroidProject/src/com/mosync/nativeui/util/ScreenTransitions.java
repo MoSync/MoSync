@@ -17,8 +17,11 @@ MA 02110-1301, USA.
 
 package com.mosync.nativeui.util;
 
+import com.mosync.internal.android.MoSyncThread;
 import com.mosync.internal.generated.IX_WIDGET;
+import com.mosync.nativeui.ui.widgets.ScreenWidget;
 
+import android.util.Log;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
@@ -28,7 +31,7 @@ import android.view.animation.AnimationUtils;
  *
  * @author Mircea Vasiliniuc
  */
-public class ScreenTransitions {
+final public class ScreenTransitions {
 	/*
 	 * When adding a new screen transition make sure you modify the
      * ScreenTransitions::isScreenTransitionAvailable method so that it
@@ -36,12 +39,77 @@ public class ScreenTransitions {
 	 */
 
 	/*
+	 * Applies screen transitions according to the parameters.
+	 *
+	 * @param aView the view that will be involved in the transition.
+	 * @param aScreenTransitionType the type of the screen transition.
+	 * @param aScreenTransitionDuration the duration of the screen transition.
+	 */
+	static public void applyScreenTransition(View aView, int aScreenTransitionType, int aScreenTransitionDuration)
+	{
+        switch ( aScreenTransitionType )
+        {
+            // When adding a new screen transition make sure you modify the
+            // ScreenTransitions::isScreenTransitionAvailable method so that it
+            // validates the new transitions as available on Android.
+            case IX_WIDGET.MAW_TRANSITION_TYPE_SLIDE_LEFT:
+                applyScreenTransitionSlideLeft(aView, aScreenTransitionDuration);
+                break;
+            case IX_WIDGET.MAW_TRANSITION_TYPE_SLIDE_RIGHT:
+                applyScreenTransitionSlideRight(aView, aScreenTransitionDuration);
+                break;
+            case IX_WIDGET.MAW_TRANSITION_TYPE_FADE_IN:
+                applyScreenTransitionFadeIn(aView, aScreenTransitionDuration);
+                break;
+            case IX_WIDGET.MAW_TRANSITION_TYPE_FADE_OUT:
+                // Get the current views
+                ScreenWidget currentScreen = MoSyncThread.getInstance().getCurrentScreen();
+                if ( null == currentScreen )
+                {
+                     Log.i("MoSync", "doScreenTransition, currentScreen is null.");
+                }
+                else
+                {
+                     applyScreenTransitionFadeOut(currentScreen.getView(), aScreenTransitionDuration);
+                }
+                break;
+            default:
+                // Apply no transition. The IX_WIDGET.MAW_TRANSITION_TYPE_NONE case.
+                break;
+        }
+	}
+
+	/*
+	 * Checks if the screen transition given as parameter is available on Android.
+	 * Screen transition types can be found \link #MA_TRANSITION_TYPE_NONE here \endlink.
+	 *
+	 * @param screenTransitionType a screen transition type.
+	 *
+	 * @return True if the screen transition given as parameter is available on Android, false otherwise.
+	 */
+	static public Boolean isScreenTransitionAvailable(int screenTransitionType)
+	{
+		// TODO Find a better solution to validate platform availability for screen transitions.
+        switch ( screenTransitionType )
+        {
+            case IX_WIDGET.MAW_TRANSITION_TYPE_SLIDE_LEFT:
+            case IX_WIDGET.MAW_TRANSITION_TYPE_SLIDE_RIGHT:
+            case IX_WIDGET.MAW_TRANSITION_TYPE_FADE_IN:
+            case IX_WIDGET.MAW_TRANSITION_TYPE_FADE_OUT:
+            case IX_WIDGET.MAW_TRANSITION_TYPE_NONE:
+                return true;
+            default:
+                return false;
+        }
+	}
+
+	/*
 	 * A transition that will show the next screen by sliding it from right to left.
 	 *
 	 * @param aView the view that will be involved in the transition.
 	 * @param aScreenTransitionDuration the duration of the screen transition.
 	 */
-	static public void doScreenTransitionSlideLeft(View aView, int aScreenTransitionDuration)
+	static private void applyScreenTransitionSlideLeft(View aView, int aScreenTransitionDuration)
 	{
 		if ( null == aView )
 		{
@@ -63,7 +131,7 @@ public class ScreenTransitions {
 	 * @param aView the view that will be involved in the transition.
 	 * @param aScreenTransitionDuration the duration of the screen transition.
 	 */
-	static public void doScreenTransitionSlideRight(View aView, int aScreenTransitionDuration)
+	static private void applyScreenTransitionSlideRight(View aView, int aScreenTransitionDuration)
 	{
 		if ( null == aView )
 		{
@@ -85,7 +153,7 @@ public class ScreenTransitions {
 	 * @param aView the view that will be involved in the transition.
 	 * @param aScreenTransitionDuration the duration of the screen transition.
 	 */
-	static public void doScreenTransitionFadeIn(View aView, int aScreenTransitionDuration)
+	static private void applyScreenTransitionFadeIn(View aView, int aScreenTransitionDuration)
 	{
 		if ( null == aView )
 		{
@@ -107,7 +175,7 @@ public class ScreenTransitions {
 	 * @param aView the view that will be involved in the transition.
 	 * @param aScreenTransitionDuration the duration of the screen transition.
 	 */
-	static public void doScreenTransitionFadeOut(View aView, int aScreenTransitionDuration)
+	static private void applyScreenTransitionFadeOut(View aView, int aScreenTransitionDuration)
 	{
 		if ( null == aView )
 		{
@@ -121,27 +189,5 @@ public class ScreenTransitions {
 	    screenTransition.setDuration(aScreenTransitionDuration);
 
 	    aView.startAnimation(screenTransition);
-	}
-
-	/*
-	 * Checks if the screen transition given as parameter is available on Android.
-	 * Screen transition types can be found \link #MA_TRANSITION_TYPE_NONE here \endlink.
-	 *
-	 * @param screenTransitionType a screen transition type.
-	 *
-	 * @return True if the screen transition given as parameter is available on Android, false otherwise.
-	 */
-	static public Boolean isScreenTransitionAvailable(int screenTransitionType)
-	{
-        switch ( screenTransitionType )
-        {
-            case IX_WIDGET.MAW_TRANSITION_TYPE_SLIDE_LEFT:
-            case IX_WIDGET.MAW_TRANSITION_TYPE_SLIDE_RIGHT:
-            case IX_WIDGET.MAW_TRANSITION_TYPE_FADE_IN:
-            case IX_WIDGET.MAW_TRANSITION_TYPE_FADE_OUT:
-                return true;
-            default:
-                return false;
-        }
 	}
 }

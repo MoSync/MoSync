@@ -280,34 +280,7 @@ namespace MoSync
                         //Sets the application bar for the mainPage.xaml to our custom application bar.
                         (frame.Content as PhoneApplicationPage).ApplicationBar = mApplicationBar;
                     }
-                    //Sets the content of the mainPage.xaml as our screen content with transitions/animation.
-                    switch (screenTransitionType)
-                    {
-                        case MoSync.Constants.MAW_TRANSITION_TYPE_NONE:
-                            (frame.Content as PhoneApplicationPage).Content = mPage;
-                            break;
-                        case MoSync.Constants.MAW_TRANSITION_TYPE_SLIDE_RIGHT:
-                            MoSyncScreenTransitions.doSlideRightTransition(mPage);
-                            break;
-                        case MoSync.Constants.MAW_TRANSITION_TYPE_SLIDE_LEFT:
-                            MoSyncScreenTransitions.doSlideLeftTransition(mPage);
-                            break;
-                        case MoSync.Constants.MAW_TRANSITION_TYPE_SWIVEL_IN:
-                            MoSyncScreenTransitions.doSwivelInTransition(mPage);
-                            break;
-                        case MoSync.Constants.MAW_TRANSITION_TYPE_SWIVEL_OUT:
-                            MoSyncScreenTransitions.doSwivelOutTransition(mPage);
-                            break;
-                        case MoSync.Constants.MAW_TRANSITION_TYPE_TURNSTILE_FOREWARD:
-                            MoSyncScreenTransitions.doTurnstileForewardTransition(mPage);
-                            break;
-                        case MoSync.Constants.MAW_TRANSITION_TYPE_TURNSTILE_BACKWARD:
-                            MoSyncScreenTransitions.doTurnstileBackwardTransition(mPage);
-                            break;
-                        default:
-                            // It should not reach this point.
-                            break;
-                    }
+                    MoSyncScreenTransitions.doShowWithScreenTransition(mPage, screenTransitionType);
                 });
             }
 

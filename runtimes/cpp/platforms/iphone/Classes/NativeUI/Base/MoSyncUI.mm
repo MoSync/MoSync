@@ -322,6 +322,8 @@ static IWidget* sOldScreen = nil;
 // Shows a screen with a transition.
 - (int)show: (IWidget*) widget withTransitionType: (NSNumber*) transitionType
                             andTransitionDuration: (NSNumber*) transitionDuration {
+    // When refactoring consider adding a new error code if show is called
+    // on the same screen and create a validation function for the two cases below.
     if(sOldScreen == widget)
         return MAW_RES_OK;
 
