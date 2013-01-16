@@ -38,6 +38,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <CoreMedia/CoreMedia.h>
 #include <sys/types.h> //
 #include <sys/sysctl.h>//to retrieve device model
+#include <sys/xattr.h>
 
 #include <helpers/CPP_IX_GUIDO.h>
 //#include <helpers/CPP_IX_ACCELEROMETER.h>
@@ -1190,29 +1191,36 @@ namespace Base {
             return MA_FERR_NOTFOUND;
         }
 
+        int returnValue = 0;
         switch (property) {
             case MA_FPROP_IS_BACKED_UP:
             {
-                BOOL exclude = (value == 0);
-                BOOL set = [url setResourceValue: [NSNumber numberWithBool:exclude] forKey:NSURLIsExcludedFromBackupKey error:NULL];
-
-                if(set)
+                if (&NSURLIsExcludedFromBackupKey == nil)
                 {
-                    return 0;
+                    // For iOS <= 5.0.1.
+                    const char* filePath = [[url path] fileSystemRepresentation];
+                    const char* attrName = "com.apple.MobileBackup";
+                    u_int8_t attrValue = 1;
+                    int result = setxattr(filePath, attrName, &attrValue, sizeof(attrValue), 0, 0);
+                    returnValue = (result == 0) ? 0 : MA_FERR_GENERIC;
                 }
                 else
                 {
-                    return MA_FERR_GENERIC;
+                    // For iOS >= 5.1
+                    NSNumber* value = [NSNumber numberWithBool:(value == 0)];
+                    BOOL set = [url setResourceValue:value forKey:NSURLIsExcludedFromBackupKey error:NULL];
+                    returnValue = set ? 0 : MA_FERR_GENERIC;
                 }
             }
             break;
 
             default:
             {
-                return MA_FERR_NO_SUCH_PROPERTY;
+                returnValue = MA_FERR_NO_SUCH_PROPERTY;
             }
             break;
         }
+        return returnValue;
     }
 
 	static AVAudioPlayer* sSoundPlayer = NULL;
