@@ -1833,7 +1833,11 @@ namespace Base {
 			UIView *newView = widget.view;
 
 			CameraInfo *info = getCurrentCameraInfo();
-
+            if (!info)
+            {
+                // Camera is not available.
+                return MA_CAMERA_RES_FAILED;
+            }
 			if( !info->previewLayer )
 			{
 				info->previewLayer = [[AVCaptureVideoPreviewLayer alloc] initWithSession:info->captureSession];
@@ -1909,6 +1913,11 @@ namespace Base {
 	{
 		@try {
 			CameraInfo *info = getCurrentCameraInfo();
+            if (!info)
+            {
+                // Camera is not available.
+                return MA_CAMERA_RES_FAILED;
+            }
 
 			AVCaptureConnection *videoConnection =	[info->stillImageOutput.connections objectAtIndex:0];
 			if ([videoConnection isVideoOrientationSupported])
@@ -1944,11 +1953,17 @@ namespace Base {
 		@try {
 			int result = 0;
 			CameraInfo *info = getCurrentCameraInfo();
-			NSString *propertyString = [NSString stringWithUTF8String:property];
-			NSString *valueString = [NSString stringWithUTF8String:value];
-			result = [gCameraConfigurator	setCameraProperty: info->device
-										withProperty: propertyString
-										   withValue: valueString];
+            if (!info)
+            {
+                // Camera is not available.
+                return MA_CAMERA_RES_FAILED;
+            }
+
+			NSString *propertyString = [[NSString alloc] initWithUTF8String:property];
+			NSString *valueString = [[NSString alloc] initWithUTF8String:value];
+			result = [gCameraConfigurator setCameraProperty: info->device
+                                               withProperty: propertyString
+                                                  withValue: valueString];
 			[propertyString release];
 			[valueString release];
 			return result;
@@ -1961,13 +1976,20 @@ namespace Base {
 	SYSCALL(int, maCameraGetProperty(const char *property, char *value, int maxSize)) //@property the property to get (string), @value will contain the value of the property when the func returns, @maxSize the size of the value buffer
 	{
 		@try {
-			NSString *propertyString = [NSString stringWithUTF8String:property];
+			NSString *propertyString = [[NSString alloc ] initWithUTF8String:property];
 			CameraConfirgurator *configurator = [[CameraConfirgurator alloc] init];
 			CameraInfo *info = getCurrentCameraInfo();
-			NSString* retval = [configurator	getCameraProperty:info->device
-												  withProperty:propertyString];
+            if (!info)
+            {
+                // Camera is not available.
+                return MA_CAMERA_RES_FAILED;
+            }
 
-			if(retval == nil) return -2;
+			NSString* retval = [[configurator getCameraProperty:info->device withProperty:propertyString] retain];
+			if(!retval)
+            {
+                return MA_CAMERA_RES_FAILED;
+            }
 			int length = maxSize;
 			int realLength = [retval length];
 			if(realLength > length) {
