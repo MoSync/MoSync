@@ -48,31 +48,33 @@
  */
 - (void)viewControllerWillBePoped
 {
-	UINavigationController* navigationController = (UINavigationController*)_controller;
-
-	NSArray *vcs = navigationController.viewControllers;
-
-	[stack removeLastObject];
-	UIViewController* fromViewController = navigationController.topViewController;
-	UIViewController* toViewController = ([vcs count] <= 1)?NULL:[vcs objectAtIndex:[vcs count] - 2];
-
 	MAEvent event;
 	event.type = EVENT_TYPE_WIDGET;
 	MAWidgetEventData *eventData = new MAWidgetEventData;
 	eventData->eventType = MAW_EVENT_STACK_SCREEN_POPPED;
 	eventData->widgetHandle = self.handle;
-	if(fromViewController != NULL)
-		eventData->fromScreen = (MAWidgetHandle)fromViewController.view.tag;
-	else
-		eventData->fromScreen = -1;
+    int fromScreenHandle = -1;
+    int toScreenHandle = -1;
 
-	if(toViewController != NULL)
-		eventData->toScreen = (MAWidgetHandle)toViewController.view.tag;
-	else
-		eventData->toScreen = -1;
+    if ([stack count] > 0)
+    {
+        int fromScreenIndex = [stack count] - 1;
+        IWidget* fromScreen = [stack objectAtIndex:fromScreenIndex];
+        fromScreenHandle = fromScreen.handle;
+    }
+    if ([stack count] > 1)
+    {
+        int toScreenIndex = [stack count] - 2;
+        IWidget* toScreen = [stack objectAtIndex:toScreenIndex];
+        toScreenHandle = toScreen.handle;
+    }
 
+    eventData->fromScreen = fromScreenHandle;
+    eventData->toScreen = toScreenHandle;
 	event.data = (int)eventData;
 	Base::gEventQueue.put(event);
+
+    [stack removeLastObject];
 }
 
 /**
