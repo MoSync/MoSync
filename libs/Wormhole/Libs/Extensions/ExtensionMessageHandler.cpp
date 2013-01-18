@@ -22,7 +22,7 @@
 #include <MAUtil/HashMap.h>
 #include <MAUtil/String.h>
 
-#include <MessageStream.h>
+#include "../../MessageStream.h"
 #include "ExtensionMessageHandler.h"
 
 using namespace NativeUI;
@@ -56,14 +56,20 @@ bool ExtensionMessageHandler::handleMessage(Wormhole::MessageStream& stream) {
 		int fnId = MAUtil::stringToInteger(stream.getNext());
 		if (module) {
 			JSMarshaller* marshaller = module->getMarshaller(fnId);
-			// Values.
-			marshaller->marshal(stream, buffer);
+			if (marshaller) {
+				// Values.
+				marshaller->marshal(stream, buffer);
 
-			// And last, the callback id
-			//int callbackId = stringToInteger(stream.getNext());
+				// And last, the callback id
+				int callbackId = stringToInteger(stream.getNext());
 
-			maExtensionFunctionInvoke2(module->getExtensionFunction(fnId), marshaller->getChildCount(), (int) buffer);
-			mWebView->callJS("mosync.bridge.reply(CALLBACK, RESULT);");
+				maExtensionFunctionInvoke2(module->getExtensionFunction(fnId), marshaller->getChildCount(), (int) buffer);
+				//mWebView->callJS("mosync.bridge.reply(CALLBACK, RESULT);");
+			} else {
+				maPanic(40075, "Unknown function id");
+			}
+		} else {
+			maPanic(40075, "Unknown module");
 		}
 	}
 	return true;
@@ -74,7 +80,8 @@ void JSMarshaller::initialize(MessageStream& stream) {
 	int id = -1;
 
 	// Parse until we get a stop token (-)
-	for (const char* def = stream.getNext(); strcmp("-", def); id++) {
+	for (const char* def = stream.getNext(); strcmp("-", def); def = stream.getNext()) {
+		maWriteLog(def, strlen(def));
 		if (id < 0) {
 			createMarshaller(def, true);
 		} else {
@@ -102,14 +109,13 @@ JSMarshaller* JSMarshaller::createMarshaller(const char* def, bool isArgList) {
 		case 'f':
 		case 'D':
 		case 'd':
-		case 'v':
 			if (current) list.add(current);
 			current = new JSNumberMarshaller(ch);
 			break;
 		case '!':
 		case '?':
 			bool out = ch == '?';
-			current = new JSRefMarshaller(refId, mRefList, out);
+			current = new JSRefMarshaller(refId, &mRefList, out);
 			refId = 0;
 			break;
 		case '0':
@@ -129,7 +135,9 @@ JSMarshaller* JSMarshaller::createMarshaller(const char* def, bool isArgList) {
 			current = new JSArrayMarshaller(current);
 			break;
 		case '\0':
+		case 'v':
 			if (current) list.add(current);
+			current = NULL;
 			break;
 		}
 		pos++;
@@ -190,19 +198,18 @@ int JSArrayMarshaller::marshal(MessageStream& stream, char* buffer) {
 }
 
 int JSRefMarshaller::marshal(MessageStream& stream, char* buffer) {
-	return mList[mRefId]->marshal(stream, buffer);
-}
-
-JSNumberMarshaller::JSNumberMarshaller(char variant) {
-	mVariant = toupper(variant);
-	mOut = toupper(variant) != variant;
+	return (*mRefList)[mRefId]->marshal(stream, buffer);
 }
 
 int JSNumberMarshaller::marshal(MessageStream& stream, char* buffer) {
 	const char* value = stream.getNext();
+	maWriteLog(value, strlen(value));
+	char var[80];
+	sprintf(var, "Variant: %c", mVariant);
+	maWriteLog(var, strlen(var));
 	switch (mVariant) {
 	case 'B':
-		buffer[0] = value[0];
+		buffer[0] = (char) (MAUtil::stringToInteger(value) & 0xff);
 		return sizeof(char);
 	case 'I':
 		((int*) buffer)[0] = MAUtil::stringToInteger(value);

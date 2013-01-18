@@ -6,9 +6,9 @@ import com.mosync.internal.android.extensions.MoSyncExtensionLoader;
 
 public abstract class MoSyncExtension {
 
-	public abstract void onLoad(MoSyncContext context);
+	public void onLoad(MoSyncContext context) { }
 
-	public abstract void onUnload(MoSyncContext context);
+	public void onUnload(MoSyncContext context) { }
 
 	protected void postEvent(int type, int... data) {
 		int extId = MoSyncExtensionLoader.getDefault().getModuleId(this);

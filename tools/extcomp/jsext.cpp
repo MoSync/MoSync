@@ -81,7 +81,7 @@ void writeJSBridge(string& outputfile, Interface& ext) {
 		}
 		string resultVar = isReturnType(ext, f.returnType) ? "r.result" : "null";
 		string outVar = outParamCount ? "r.out" : "null";
-		extensionFile << "\tmosync.bridge.send(args, function(r) { fnc(" << resultVar << "," << outVar <<  ")}));}\n";
+		extensionFile << "mosync.bridge.send(args, function(r) { fnc(" << resultVar << "," << outVar <<  ")});};\n";
 
 		// Self-executing initializer.
 		extensionFile << "(function() {\n";
@@ -91,7 +91,7 @@ void writeJSBridge(string& outputfile, Interface& ext) {
 		streamExtHashValue(extensionFile, ext);
 		extensionFile << "," << i << "];\n";
 
-		extensionFile << "args.push(\":";
+		extensionFile << "initArgs.push(\"";
 		for (size_t j = 0; j < f.args.size(); j++) {
 			Argument arg = f.args[j];
 			argTypes.push_back(arg.type);
@@ -104,12 +104,12 @@ void writeJSBridge(string& outputfile, Interface& ext) {
 		extensionFile << argTypeDesc << "\");";
 
 		for (size_t j = 0; j < typeDescs.size(); j++) {
-			extensionFile << "args.push(\"" << typeDescs[j] << "\");\n";
+			extensionFile << "initArgs.push(\"" << typeDescs[j] << "\");\n";
 		}
 
-		extensionFile << "args.push(\"-\");\n";
+		extensionFile << "initArgs.push(\"-\");\n";
 		extensionFile << "mosync.bridge.send(initArgs);\n";
-		extensionFile << "})();\n";
+		extensionFile << "}());\n";
 
 	}
 
@@ -121,11 +121,12 @@ void generateArrayMarshalling(ostream& extensionFile, Interface& ext, string& ar
 		return;
 	}
 	string subArrayVar = "A" + arrayName;
+	replace(subArrayVar.begin(), subArrayVar.end(), '.', '_');
 	int throwAway;
 	string scalarType = extractPointerType(arrayType, throwAway);
 	extensionFile << "if (Array.isArray(" << arrayName << ")) {\n";
 	extensionFile << "args.push(" << arrayName << ".length);\n";
-	extensionFile << "for (int i" << ptrDepth << "; i" << ptrDepth << " < " << arrayName << ".length; i" << ptrDepth << "++) {\n";
+	extensionFile << "for (var i" << ptrDepth << " = 0; i" << ptrDepth << " < " << arrayName << ".length; i" << ptrDepth << "++) {\n";
 	extensionFile << "var " << subArrayVar << " = " << arrayName << "[i" << ptrDepth << "];\n";
 	generateArrayMarshalling(extensionFile, ext, subArrayVar, arrayType, ptrDepth - 1);
 	if (ptrDepth == 1) {
