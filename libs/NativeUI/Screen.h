@@ -108,7 +108,7 @@ namespace NativeUI
 		 * Note: This method is only applicable to screens.
 		 *
 		 * @param screenTransitionType The type of the screen transition. See available
-		 * screen transitions types \link #MA_TRANSITION_TYPE_NONE here \endlink.
+		 * screen transitions types \link #MAW_TRANSITION_TYPE_NONE here \endlink.
 		 * @param screenTransitionDuration The duration of the screen transition in milliseconds.
 		 * This argument is not used on the Windows Phone platform due to the constant duration of
 		 * the WP screen transitions.
@@ -121,7 +121,7 @@ namespace NativeUI
 		 * integer. This error code is not returned on the Windows Phone platform
 		 * due to the constant duration of the WP screen transitions.
 		 */
-		virtual int showWithTransition(int screenTransitionType, int screenTransitionDuration);
+		virtual int showWithTransition(MAWScreenTransitionType screenTransitionType, int screenTransitionDuration);
 
 		/**
 		 * Called just before the screen begins rotating.

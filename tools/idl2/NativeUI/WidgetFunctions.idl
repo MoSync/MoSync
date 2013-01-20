@@ -121,7 +121,8 @@ group WidgetAPIFunctions "Widget functions" {
 	* and disables regular MoSync drawing.
 	*
 	* \param screenHandle The handle to the screen.
-	* \param screenTransitionType The transition of the screen.
+	* \param screenTransitionType The transition of the screen. See available
+	* screen transitions types \link #MAW_TRANSITION_TYPE_NONE here \endlink.
 	* \param screenTransitionDuration The duration of the transition in milliseconds. This argument is
 	* not used on the Windows Phone platform due to the constant duration of the WP screen transitions.
 	*
