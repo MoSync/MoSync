@@ -1,5 +1,5 @@
 /*
- Copyright (C) 2011 MoSync AB
+ Copyright (C) 2013 MoSync AB
 
  This program is free software; you can redistribute it and/or
  modify it under the terms of the GNU General Public License,
@@ -17,7 +17,7 @@
  */
 
 /**
- * @file ScreenUtils.cpp
+ * @file ScreenUtils.h
  * @author Mircea Vasiliniuc
  * @date 28 Nov 2012
  *

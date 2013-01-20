@@ -1,5 +1,5 @@
 /*
- Copyright (C) 2011 MoSync AB
+ Copyright (C) 2013 MoSync AB
 
  This program is free software; you can redistribute it and/or
  modify it under the terms of the GNU General Public License,
@@ -29,8 +29,6 @@
 
 #include "../Observers/FirstScreenObserver.h"
 #include "../Observers/SecondScreenObserver.h"
-
-#include <NativeUI/ScreenTransition.h>
 
 namespace ScreenTransitionTest
 {
@@ -62,12 +60,6 @@ namespace ScreenTransitionTest
 		 * Tell the observer to hide the second screen.
 		 */
 		virtual void hideSecondScreen();
-
-	private:
-		/**
-		 * Tell the observer to hide the second screen.
-		 */
-		MAWScreenTransitionType getSimetricScreenTransition(int screenTransitionType);
 
 	public:
 		/**

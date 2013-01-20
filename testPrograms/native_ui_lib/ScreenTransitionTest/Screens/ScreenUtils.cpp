@@ -1,3 +1,21 @@
+/*
+ Copyright (C) 2013 MoSync AB
+
+ This program is free software; you can redistribute it and/or
+ modify it under the terms of the GNU General Public License,
+ version 2, as published by the Free Software Foundation.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ MA 02110-1301, USA.
+ */
+
 /**
  * @file ScreenUtils.cpp
  * @author Mircea Vasiliniuc
@@ -106,7 +124,7 @@ namespace ScreenTransitionTest {
 			// Fill name map
 			mScreenTransitionNameMap.insert(MAW_TRANSITION_TYPE_NONE, "None");
 			mScreenTransitionNameMap.insert(MAW_TRANSITION_TYPE_FLIP_FROM_LEFT, "Flip from left");
-			mScreenTransitionNameMap.insert(MAW_TRANSITION_TYPE_FLIP_FROM_RIGHT, "Flip from wight");
+			mScreenTransitionNameMap.insert(MAW_TRANSITION_TYPE_FLIP_FROM_RIGHT, "Flip from right");
 			mScreenTransitionNameMap.insert(MAW_TRANSITION_TYPE_CURL_UP, "Curl up");
 			mScreenTransitionNameMap.insert(MAW_TRANSITION_TYPE_CURL_DOWN, "Curl down");
 			mScreenTransitionNameMap.insert(MAW_TRANSITION_TYPE_SLIDE_LEFT, "Slide left");
