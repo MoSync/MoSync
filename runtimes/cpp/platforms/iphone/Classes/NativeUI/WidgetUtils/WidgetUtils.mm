@@ -47,6 +47,9 @@ int doScreenTransition(UIWindow* aWindow, ScreenWidget* aScreenWidget, NSNumber*
     //Obtain screen transition option or return error code if not available on iOS.
     UIViewAnimationOptions options;
     switch ([aScreenTransitionType integerValue]) {
+        case MAW_TRANSITION_TYPE_NONE:
+            options = UIViewAnimationOptionTransitionNone;
+            break;
         case MAW_TRANSITION_TYPE_FLIP_FROM_LEFT:
             options = UIViewAnimationOptionTransitionFlipFromLeft;
             break;
