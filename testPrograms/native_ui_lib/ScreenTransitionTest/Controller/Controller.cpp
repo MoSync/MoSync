@@ -23,7 +23,7 @@
  *
  * @brief App main controller.
  */
-#define TRANSITION_TIME_MS 400
+#define TRANSITION_TIME_MS 200
 
 #include "Controller.h"
 #include "../Screens/FirstScreen.h"
@@ -31,9 +31,9 @@
 
 #include <NativeUI/Screen.h>
 
-static int currentTransition = MAW_TRANSITION_TYPE_NONE;
+static MAWScreenTransitionType currentTransition = MAW_TRANSITION_TYPE_NONE;
 
-namespace Transitions
+namespace ScreenTransitionTest
 {
 	/**
 	 * Constructor.
@@ -59,12 +59,12 @@ namespace Transitions
 	/**
 	 * Tell the observer to show the second screen.
 	 */
-	void Controller::showSecondScreen(short transType, const char* text)
+	void Controller::showSecondScreen(int transType, const char* text)
 	{
 		currentTransition = transType;
 		mSecondScreen->resetTitleWithString(text);
 
-		//int returnVal = maWidgetScreenShowWithTransition(mSecondScreen->getWidgetHandle(), transType, 300);
+		//int returnVal = maWidgetScreenShowWithTransition(mSecondScreen->getWidgetHandle(), transType, TRANSITION_TIME_MS);
 		int returnVal = mSecondScreen->showWithTransition(transType, TRANSITION_TIME_MS);
 		printf("showWithTransition result: %d", returnVal);
 	}
@@ -74,55 +74,8 @@ namespace Transitions
 	 */
 	void Controller::hideSecondScreen()
 	{
-		//int returnVal = maWidgetScreenShowWithTransition(mFirstScreen->getWidgetHandle(), getSimetricScreenTransition(currentTransition), TRANSITION_TIME_MS);
-		int returnVal = mFirstScreen->showWithTransition(getSimetricScreenTransition(currentTransition), TRANSITION_TIME_MS);
+		//int returnVal = maWidgetScreenShowWithTransition(mFirstScreen->getWidgetHandle(), ScreenUtils::getSimetricTransition(currentTransition), TRANSITION_TIME_MS);
+		int returnVal = mFirstScreen->showWithTransition(ScreenUtils::getSimetricTransition(currentTransition), TRANSITION_TIME_MS);
 		printf("showWithTransition result: %d", returnVal);
-	}
-
-	MAWScreenTransitionType Controller::getSimetricScreenTransition(int screenTransitionType)
-	{
-		MAWScreenTransitionType returnTransition = MAW_TRANSITION_TYPE_NONE;
-		switch(screenTransitionType)
-		{
-		case MAW_TRANSITION_TYPE_FLIP_FROM_LEFT:
-			returnTransition = MAW_TRANSITION_TYPE_FLIP_FROM_RIGHT;
-			break;
-		case MAW_TRANSITION_TYPE_FLIP_FROM_RIGHT:
-			returnTransition = MAW_TRANSITION_TYPE_FLIP_FROM_LEFT;
-			break;
-		case MAW_TRANSITION_TYPE_CURL_UP:
-			returnTransition = MAW_TRANSITION_TYPE_CURL_DOWN;
-			break;
-		case MAW_TRANSITION_TYPE_CURL_DOWN:
-			returnTransition = MAW_TRANSITION_TYPE_CURL_UP;
-			break;
-		case MAW_TRANSITION_TYPE_SLIDE_LEFT:
-			returnTransition = MAW_TRANSITION_TYPE_SLIDE_RIGHT;
-			break;
-		case MAW_TRANSITION_TYPE_SLIDE_RIGHT:
-			returnTransition = MAW_TRANSITION_TYPE_SLIDE_LEFT;
-			break;
-		case MAW_TRANSITION_TYPE_FADE_IN:
-			returnTransition = MAW_TRANSITION_TYPE_FADE_OUT;
-			break;
-		case MAW_TRANSITION_TYPE_FADE_OUT:
-			returnTransition = MAW_TRANSITION_TYPE_FADE_IN;
-			break;
-		case MAW_TRANSITION_TYPE_SWIVEL_IN:
-			returnTransition = MAW_TRANSITION_TYPE_SWIVEL_OUT;
-			break;
-		case MAW_TRANSITION_TYPE_SWIVEL_OUT:
-			returnTransition = MAW_TRANSITION_TYPE_SWIVEL_IN;
-			break;
-		case MAW_TRANSITION_TYPE_TURNSTILE_FOREWARD:
-			returnTransition = MAW_TRANSITION_TYPE_TURNSTILE_BACKWARD;
-			break;
-		case MAW_TRANSITION_TYPE_TURNSTILE_BACKWARD:
-			returnTransition = MAW_TRANSITION_TYPE_TURNSTILE_FOREWARD;
-			break;
-		default:
-			break;
-		}
-		return returnTransition;
 	}
 } // end of Transitions

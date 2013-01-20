@@ -26,7 +26,7 @@
 #ifndef SECOND_SCREEN_OBSERVER_H_
 #define SECOND_SCREEN_OBSERVER_H_
 
-namespace Transitions
+namespace ScreenTransitionTest
 {
 
 	class SecondScreenObserver
@@ -37,7 +37,7 @@ namespace Transitions
 		 */
 		virtual void hideSecondScreen() = 0;
 	};
-}
+} //end of ScreenTransitionTest
 
 
 #endif /* SECOND_SCREEN_OBSERVER_H_ */

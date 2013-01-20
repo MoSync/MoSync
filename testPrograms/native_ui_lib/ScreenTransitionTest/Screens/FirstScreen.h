@@ -32,6 +32,7 @@
 #include <NativeUI/ListViewListener.h>
 
 #include "../Observers/FirstScreenObserver.h"
+#include "ScreenUtils.h"
 
 namespace NativeUI
 {
@@ -43,7 +44,7 @@ namespace NativeUI
 	class ListViewItem;
 }
 
-namespace Transitions
+namespace ScreenTransitionTest
 {
 
 	class FirstScreen:
@@ -94,6 +95,11 @@ namespace Transitions
 		 * Create screen's UI.
 		 */
 		void createUI();
+
+		/**
+		 * Fills the screen transition container.
+		 */
+		void fillScreenTransitionContainer();
 
 		/**
 		 * Populates the screen transition list.
@@ -172,7 +178,12 @@ namespace Transitions
 		/**
 		 * Previous list item
 		 */
-		short mSelectedTransition;
+		int mSelectedListItem;
+
+		/**
+		 * Vector of screen transitions available on the current platform.
+		 */
+		MAUtil::Vector<int> mPlatformTransitions;
 	};
 }
 

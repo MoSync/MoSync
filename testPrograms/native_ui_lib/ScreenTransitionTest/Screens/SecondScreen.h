@@ -40,7 +40,7 @@ namespace NativeUI
 	class VerticalLayout;
 }
 
-namespace Transitions
+namespace ScreenTransitionTest
 {
 
 	class SecondScreen:
@@ -104,6 +104,6 @@ namespace Transitions
 		 */
 		NativeUI::HorizontalLayout* mFooterLayout;
 	};
-}
+} // end of ScreenTransitionTest
 
 #endif /* SECOND_SCREEN_H_ */

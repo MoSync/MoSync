@@ -28,7 +28,7 @@
 
 #include "Controller/Controller.h"
 
-namespace Transitions
+namespace ScreenTransitionTest
 {
 	class NativeUIMoblet : public MAUtil::Moblet
 	{
@@ -65,13 +65,13 @@ namespace Transitions
 		Controller* mController;
 	};
 
-} // end of Transitions
+} // end of ScreenTransitionTest
 
 /**
  * Main function that is called when the program starts.
  */
 extern "C" int MAMain()
 {
-	MAUtil::Moblet::run(new Transitions::NativeUIMoblet());
+	MAUtil::Moblet::run(new ScreenTransitionTest::NativeUIMoblet());
 	return 0;
 }

@@ -37,22 +37,25 @@
 #define WHITE_COLOR 0xffffff
 #define SELECTED_COLOR 0x5b3f23
 
+#include <MAUtil/Map.h>
+#include <IX_WIDGET.h>
+
 namespace NativeUI
 {
 	class VerticalLayout;
 	class HorizontalLayout;
 }
 
-namespace Transitions
+namespace ScreenTransitionTest
 {
 	namespace ScreenUtils
 	{
 		typedef enum
 		{
-			OS_UNKNOWN = 0,
-			OS_IOS,
+			OS_IOS = 0,
 			OS_ANDROID,
-			OS_WIN
+			OS_WIN,
+			OS_UNKNOWN
 		} PLATFORM_TYPE;
 
 		/**
@@ -89,8 +92,39 @@ namespace Transitions
 		 */
 		void addHorizontalSpacerToLayout(NativeUI::HorizontalLayout* aLayout, short aSpacerWidth);
 
-	} //ScreenUtils
+		// Screen transition
+		const int kiOSTransitionsArray[] = {MAW_TRANSITION_TYPE_NONE,
+				MAW_TRANSITION_TYPE_FLIP_FROM_LEFT,
+				MAW_TRANSITION_TYPE_FLIP_FROM_RIGHT,
+				MAW_TRANSITION_TYPE_CURL_UP,
+				MAW_TRANSITION_TYPE_CURL_DOWN};
 
-} //Transitions
+		const int kAndroidTransitionsArray[] = {MAW_TRANSITION_TYPE_NONE,
+				MAW_TRANSITION_TYPE_SLIDE_LEFT,
+				MAW_TRANSITION_TYPE_SLIDE_RIGHT,
+				MAW_TRANSITION_TYPE_FADE_IN,
+				MAW_TRANSITION_TYPE_FADE_OUT};
+
+		const int kWindowsTransitionsArray[] = {MAW_TRANSITION_TYPE_NONE,
+				MAW_TRANSITION_TYPE_SLIDE_LEFT,
+				MAW_TRANSITION_TYPE_SLIDE_RIGHT,
+				MAW_TRANSITION_TYPE_SWIVEL_IN,
+				MAW_TRANSITION_TYPE_SWIVEL_OUT,
+				MAW_TRANSITION_TYPE_TURNSTILE_FOREWARD,
+				MAW_TRANSITION_TYPE_TURNSTILE_BACKWARD};
+
+		/**
+		 * Returns the transition name.
+		 */
+		const char* getTransitionName(MAWScreenTransitionType aTransitionsType);
+
+		/**
+		 * Returns symmetric transition.
+		 */
+		int getSimetricTransition(MAWScreenTransitionType aTransitionsType);
+
+	} // end of ScreenUtils
+
+} // end of ScreenTransitionTest
 
 #endif //SCREEN_UTILS_H_

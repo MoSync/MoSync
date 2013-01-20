@@ -26,7 +26,7 @@
 #ifndef FIRST_SCREEN_OBSERVER_H_
 #define FIRST_SCREEN_OBSERVER_H_
 
-namespace Transitions
+namespace ScreenTransitionTest
 {
 
 	class FirstScreenObserver
@@ -35,9 +35,9 @@ namespace Transitions
 		/**
 		 * Tell the observer to show the second screen.
 		 */
-		virtual void showSecondScreen(short transType /*TODO Replace with object*/, const char* text) = 0;
+		virtual void showSecondScreen(int transType, const char* text) = 0;
 	};
-}
+} // end of ScreenTransitionTest
 
 
 #endif /* FIRST_SCREEN_OBSERVER_H_ */

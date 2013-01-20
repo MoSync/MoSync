@@ -11,7 +11,7 @@
 #include <NativeUI/VerticalLayout.h>
 #include <NativeUI/HorizontalLayout.h>
 
-namespace Transitions {
+namespace ScreenTransitionTest {
 
 	namespace ScreenUtils {
 
@@ -95,6 +95,66 @@ namespace Transitions {
 				spacerTitle->setSize(aLayout->getHeight(), aSpacerWidth);
 				aLayout->addChild(spacerTitle);
 			}
+		}
+
+		// Screen transition
+		MAUtil::Map<int, char*> mScreenTransitionNameMap;
+		MAUtil::Map<int, int> mScreenTransitionSymmetricMap;
+
+		void fillScreenTransitionMaps()
+		{
+			// Fill name map
+			mScreenTransitionNameMap.insert(MAW_TRANSITION_TYPE_NONE, "None");
+			mScreenTransitionNameMap.insert(MAW_TRANSITION_TYPE_FLIP_FROM_LEFT, "Flip from left");
+			mScreenTransitionNameMap.insert(MAW_TRANSITION_TYPE_FLIP_FROM_RIGHT, "Flip from wight");
+			mScreenTransitionNameMap.insert(MAW_TRANSITION_TYPE_CURL_UP, "Curl up");
+			mScreenTransitionNameMap.insert(MAW_TRANSITION_TYPE_CURL_DOWN, "Curl down");
+			mScreenTransitionNameMap.insert(MAW_TRANSITION_TYPE_SLIDE_LEFT, "Slide left");
+			mScreenTransitionNameMap.insert(MAW_TRANSITION_TYPE_SLIDE_RIGHT, "Slide right");
+			mScreenTransitionNameMap.insert(MAW_TRANSITION_TYPE_FADE_IN, "Fade in");
+			mScreenTransitionNameMap.insert(MAW_TRANSITION_TYPE_FADE_OUT, "Fade out");
+			mScreenTransitionNameMap.insert(MAW_TRANSITION_TYPE_SWIVEL_IN, "Swivel in");
+			mScreenTransitionNameMap.insert(MAW_TRANSITION_TYPE_SWIVEL_OUT, "Swivel out");
+			mScreenTransitionNameMap.insert(MAW_TRANSITION_TYPE_TURNSTILE_FOREWARD, "Turnstile foreward");
+			mScreenTransitionNameMap.insert(MAW_TRANSITION_TYPE_TURNSTILE_BACKWARD, "Turnstile backward");
+			// Fill symmetric map
+			mScreenTransitionSymmetricMap.insert(MAW_TRANSITION_TYPE_NONE, MAW_TRANSITION_TYPE_NONE);
+			mScreenTransitionSymmetricMap.insert(MAW_TRANSITION_TYPE_FLIP_FROM_LEFT, MAW_TRANSITION_TYPE_FLIP_FROM_RIGHT);
+			mScreenTransitionSymmetricMap.insert(MAW_TRANSITION_TYPE_FLIP_FROM_RIGHT, MAW_TRANSITION_TYPE_FLIP_FROM_LEFT);
+			mScreenTransitionSymmetricMap.insert(MAW_TRANSITION_TYPE_CURL_UP, MAW_TRANSITION_TYPE_CURL_DOWN);
+			mScreenTransitionSymmetricMap.insert(MAW_TRANSITION_TYPE_CURL_DOWN, MAW_TRANSITION_TYPE_CURL_UP);
+			mScreenTransitionSymmetricMap.insert(MAW_TRANSITION_TYPE_SLIDE_LEFT, MAW_TRANSITION_TYPE_SLIDE_RIGHT);
+			mScreenTransitionSymmetricMap.insert(MAW_TRANSITION_TYPE_SLIDE_RIGHT, MAW_TRANSITION_TYPE_SLIDE_LEFT);
+			mScreenTransitionSymmetricMap.insert(MAW_TRANSITION_TYPE_FADE_IN, MAW_TRANSITION_TYPE_FADE_OUT);
+			mScreenTransitionSymmetricMap.insert(MAW_TRANSITION_TYPE_FADE_OUT, MAW_TRANSITION_TYPE_FADE_IN);
+			mScreenTransitionSymmetricMap.insert(MAW_TRANSITION_TYPE_SWIVEL_IN, MAW_TRANSITION_TYPE_SWIVEL_OUT);
+			mScreenTransitionSymmetricMap.insert(MAW_TRANSITION_TYPE_SWIVEL_OUT, MAW_TRANSITION_TYPE_SWIVEL_IN);
+			mScreenTransitionSymmetricMap.insert(MAW_TRANSITION_TYPE_TURNSTILE_FOREWARD, MAW_TRANSITION_TYPE_TURNSTILE_BACKWARD);
+			mScreenTransitionSymmetricMap.insert(MAW_TRANSITION_TYPE_TURNSTILE_BACKWARD, MAW_TRANSITION_TYPE_TURNSTILE_FOREWARD);
+		}
+
+		/**
+		 * Returns the transition name.
+		 */
+		const char* getTransitionName(MAWScreenTransitionType aTransitionsType)
+		{
+			if ( mScreenTransitionNameMap.size() <= 0 )
+			{
+				fillScreenTransitionMaps();
+			}
+			return mScreenTransitionNameMap[aTransitionsType];
+		}
+
+		/**
+		 * Returns symmetric transition.
+		 */
+		int getSimetricTransition(MAWScreenTransitionType aTransitionsType)
+		{
+			if ( mScreenTransitionSymmetricMap.size() <= 0 )
+			{
+				fillScreenTransitionMaps();
+			}
+			return mScreenTransitionSymmetricMap[aTransitionsType];
 		}
 	}
 }

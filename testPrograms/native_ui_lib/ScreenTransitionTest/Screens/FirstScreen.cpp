@@ -37,13 +37,8 @@
 #include <NativeUI/ListViewItem.h>
 
 #include "FirstScreen.h"
-#include "ScreenUtils.h"
 
-static const char* kiOSTransitionsArray[] = {"None", "Flip From Left", "Flip From Right", "Curl Up", "Curl Down"};
-static const char* kAndroidTransitionsArray[] = {"None", "Slide Left", "Slide Right", "Fade in", "Fade out"};
-static const char* kWindowsTransitionsArray[] = {"None", "Slide Left", "Slide Right", "Swivel in", "Swivel out", "Turnstile Foreward", "Turnstile Backward"};
-
-namespace Transitions
+namespace ScreenTransitionTest
 {
 	/**
 	 * Constructor.
@@ -57,8 +52,9 @@ namespace Transitions
 		mTitleLabel(NULL),
 		mScreenTransitionListView(NULL),
 		mPreviousItem(NULL),
-		mSelectedTransition(0)
+		mSelectedListItem(0)
 	{
+		fillScreenTransitionContainer();
 		ScreenUtils::initScreenSizeConstants(
 			this->getWidth(),
 			this->getHeight());
@@ -115,7 +111,6 @@ namespace Transitions
 		ScreenUtils::addVerticalSpacerToLayout(mMainLayout, SPACER_HEIGHT);
 
 		mListLayout->addChild(mScreenTransitionListView);
-
 		mMainLayout->addChild(mListLayout);
 
 		ScreenUtils::addVerticalSpacerToLayout(mMainLayout, SPACER_HEIGHT);
@@ -130,7 +125,6 @@ namespace Transitions
 		mShowSecondScreenButton->setText(BEGIN_TRANS_BTN_TEXT);
 
 		mFooterLayout->addChild(mShowSecondScreenButton);
-
 		mMainLayout->addChild(mFooterLayout);
 	}
 
@@ -142,29 +136,21 @@ namespace Transitions
 	 */
 	void FirstScreen::buttonClicked(NativeUI::Widget* button)
 	{
-		if ( mSelectedTransition == 0 )
+		printf("MVSIGN");
+		if ( mSelectedListItem == 0 )
 		{
-			mObserver.showSecondScreen(MAW_TRANSITION_TYPE_NONE, kAndroidTransitionsArray[MAW_TRANSITION_TYPE_NONE]);
+			mObserver.showSecondScreen(MAW_TRANSITION_TYPE_NONE,
+					ScreenUtils::getTransitionName(MAW_TRANSITION_TYPE_NONE));
 			return;
 		}
 
-		if ( ScreenUtils::OS_IOS == ScreenUtils::getCurrentPlatform() )
-		{
-			// We need to obtain the correct transition type/index.
-			mObserver.showSecondScreen(getTransitionTypeForiOS(mSelectedTransition), kiOSTransitionsArray[mSelectedTransition]);
-		}
-		else if ( ScreenUtils::OS_ANDROID == ScreenUtils::getCurrentPlatform() )
-		{
-			// We need to obtain the correct transition type/index.
-			mObserver.showSecondScreen(getTransitionTypeForAndroid(mSelectedTransition), kAndroidTransitionsArray[mSelectedTransition]);
+		mObserver.showSecondScreen(mPlatformTransitions[mSelectedListItem],
+				ScreenUtils::getTransitionName(mPlatformTransitions[mSelectedListItem]));
 
+		if ( ScreenUtils::OS_ANDROID == ScreenUtils::getCurrentPlatform() )
+		{
 			//Workaround for Android 4.0 bug related to list view focus.
 			mScreenTransitionListView->setProperty(MAW_LIST_VIEW_REQUEST_FOCUS, "true");
-		}
-		else if ( ScreenUtils::OS_WIN == ScreenUtils::getCurrentPlatform() )
-		{
-			// We need to obtain the correct transition type/index.
-			mObserver.showSecondScreen(getTransitionTypeForWindows(mSelectedTransition), kWindowsTransitionsArray[mSelectedTransition]);
 		}
 	}
 
@@ -203,151 +189,54 @@ namespace Transitions
 	{
 	    if (listView == mScreenTransitionListView)
 	    {
-	        mSelectedTransition = index;
+	        mSelectedListItem = index;
 	    }
 	}
 
+	/**
+	 * Constructs the transitions map.
+	 */
+	void FirstScreen::fillScreenTransitionContainer()
+	{
+		if ( ScreenUtils::OS_ANDROID == ScreenUtils::getCurrentPlatform() )
+		{
+			mPlatformTransitions = MAUtil::Vector<int>(ScreenUtils::kAndroidTransitionsArray,
+					(sizeof(ScreenUtils::kAndroidTransitionsArray) / sizeof(ScreenUtils::kAndroidTransitionsArray[0])));
+		}
+		else if ( ScreenUtils::OS_IOS == ScreenUtils::getCurrentPlatform() )
+		{
+			mPlatformTransitions = MAUtil::Vector<int>(ScreenUtils::kiOSTransitionsArray,
+					(sizeof(ScreenUtils::kiOSTransitionsArray) / sizeof(ScreenUtils::kiOSTransitionsArray[0])));
+		}
+		else if ( ScreenUtils::OS_WIN == ScreenUtils::getCurrentPlatform() )
+		{
+			mPlatformTransitions = MAUtil::Vector<int>(ScreenUtils::kWindowsTransitionsArray,
+					(sizeof(ScreenUtils::kWindowsTransitionsArray) / sizeof(ScreenUtils::kWindowsTransitionsArray[0])));
+		}
+	}
+
+	/**
+	 * Populates the screen transition list.
+	 */
 	void FirstScreen::populateTransitionList()
 	{
 		if ( NULL != mScreenTransitionListView )
 		{
-			int size_of_TransitionsArray = 0;
-			if ( ScreenUtils::OS_ANDROID == ScreenUtils::getCurrentPlatform() )
-			{
-				size_of_TransitionsArray = sizeof( kAndroidTransitionsArray) / sizeof( kAndroidTransitionsArray[ 0 ] );
-			}
-			else if ( ScreenUtils::OS_IOS == ScreenUtils::getCurrentPlatform() )
-			{
-				size_of_TransitionsArray = sizeof(kiOSTransitionsArray) / sizeof( kiOSTransitionsArray[ 0 ] );
-			}
-			else if ( ScreenUtils::OS_WIN == ScreenUtils::getCurrentPlatform() )
-			{
-				size_of_TransitionsArray = sizeof(kWindowsTransitionsArray) / sizeof( kWindowsTransitionsArray[ 0 ] );
-			}
-
-			for ( int i = 0; i < size_of_TransitionsArray; i++ )
+			for ( int i = 0; i < mPlatformTransitions.size(); i++ )
 			{
 				NativeUI::ListViewItem* transitionItem = new NativeUI::ListViewItem();
 
-				if ( ScreenUtils::OS_IOS == ScreenUtils::getCurrentPlatform() )
+				transitionItem->setText(ScreenUtils::getTransitionName(mPlatformTransitions[i]));
+				if ( ScreenUtils::OS_ANDROID == ScreenUtils::getCurrentPlatform() )
 				{
-					transitionItem->setText(kiOSTransitionsArray[i]);
-				}
-				else if ( ScreenUtils::OS_ANDROID == ScreenUtils::getCurrentPlatform() )
-				{
-					transitionItem->setText(kAndroidTransitionsArray[i]);
 					transitionItem->setBackgroundColor(BLACK_COLOR);
 					transitionItem->setFontColor(WHITE_COLOR);
 					transitionItem->setSelectionStyle(NativeUI::LIST_VIEW_ITEM_SELECTION_STYLE_NONE);
-				}
-				else if ( ScreenUtils::OS_WIN == ScreenUtils::getCurrentPlatform() )
-				{
-					transitionItem->setText(kWindowsTransitionsArray[i]);
 				}
 
 				transitionItem->setHeight(LIST_ITEM_HEIGHT);
 				mScreenTransitionListView->addChild(transitionItem);
 			}
 		}
-	}
-
-
-	/**
-	 * Obtain the screen transition type from the list index for iOS screen
-	 * transitions.
-	 *
-	 * @param selectedIndex Selected item from list of screen transitions.
-	 * @return the Transition type corresponding to the selected screen transition.
-	 */
-	MAWScreenTransitionType FirstScreen::getTransitionTypeForiOS(int selectedIndex)
-	{
-		// We need to obtain the correct transition type/index.
-		int selectedTransition = MAW_TRANSITION_TYPE_NONE;
-		switch ( mSelectedTransition )
-		{
-		case 1:
-			selectedTransition = MAW_TRANSITION_TYPE_FLIP_FROM_LEFT;
-			break;
-		case 2:
-			selectedTransition = MAW_TRANSITION_TYPE_FLIP_FROM_RIGHT;
-			break;
-		case 3:
-			selectedTransition = MAW_TRANSITION_TYPE_CURL_UP;
-			break;
-		case 4:
-			selectedTransition = MAW_TRANSITION_TYPE_CURL_DOWN;
-			break;
-		default:
-			break;
-		}
-		return selectedTransition;
-	}
-
-	/**
-	 * Obtain the screen transition type from the list index for Android screen
-	 * transitions.
-	 *
-	 * @param selectedIndex Selected item from list of screen transitions.
-	 * @return the Transition type corresponding to the selected screen transition.
-	 */
-	MAWScreenTransitionType FirstScreen::getTransitionTypeForAndroid(int selectedIndex)
-	{
-		// We need to obtain the correct transition type/index.
-		int selectedTransition = MAW_TRANSITION_TYPE_NONE;
-		switch ( mSelectedTransition )
-		{
-		case 1:
-			selectedTransition = MAW_TRANSITION_TYPE_SLIDE_LEFT;
-			break;
-		case 2:
-			selectedTransition = MAW_TRANSITION_TYPE_SLIDE_RIGHT;
-			break;
-		case 3:
-			selectedTransition = MAW_TRANSITION_TYPE_FADE_IN;
-			break;
-		case 4:
-			selectedTransition = MAW_TRANSITION_TYPE_FADE_OUT;
-			break;
-		default:
-			break;
-		}
-		return selectedTransition;
-	}
-
-	/**
-	 * Obtain the screen transition type from the list index for Windows Phone screen
-	 * transitions.
-	 *
-	 * @param selectedIndex Selected item from list of screen transitions.
-	 * @return the Transition type corresponding to the selected screen transition.
-	 */
-	MAWScreenTransitionType FirstScreen::getTransitionTypeForWindows(int selectedIndex)
-	{
-		// We need to obtain the correct transition type/index.
-		int selectedTransition = MAW_TRANSITION_TYPE_NONE;
-		switch ( mSelectedTransition )
-		{
-		case 1:
-			selectedTransition = MAW_TRANSITION_TYPE_SLIDE_LEFT;
-			break;
-		case 2:
-			selectedTransition = MAW_TRANSITION_TYPE_SLIDE_RIGHT;
-			break;
-		case 3:
-			selectedTransition = MAW_TRANSITION_TYPE_SWIVEL_IN;
-			break;
-		case 4:
-			selectedTransition = MAW_TRANSITION_TYPE_SWIVEL_OUT;
-			break;
-		case 5:
-			selectedTransition = MAW_TRANSITION_TYPE_TURNSTILE_FOREWARD;
-			break;
-		case 6:
-			selectedTransition = MAW_TRANSITION_TYPE_TURNSTILE_BACKWARD;
-			break;
-		default:
-			break;
-		}
-		return selectedTransition;
 	}
 }

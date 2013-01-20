@@ -37,9 +37,8 @@
 #include "SecondScreen.h"
 #include "ScreenUtils.h"
 
-namespace Transitions
+namespace ScreenTransitionTest
 {
-
 	/**
 	 * Constructor.
 	 * @param observer Observer for this screen.

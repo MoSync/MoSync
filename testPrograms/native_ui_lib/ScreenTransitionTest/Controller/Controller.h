@@ -32,7 +32,7 @@
 
 #include <NativeUI/ScreenTransition.h>
 
-namespace Transitions
+namespace ScreenTransitionTest
 {
 
 	class FirstScreen;
@@ -56,7 +56,7 @@ namespace Transitions
 		/**
 		 * Tell the observer to show the second screen.
 		 */
-		virtual void showSecondScreen(short transType, const char* text);
+		virtual void showSecondScreen(int transType, const char* text);
 
 		/**
 		 * Tell the observer to hide the second screen.
@@ -81,7 +81,7 @@ namespace Transitions
 		SecondScreen* mSecondScreen;
 	};
 
-} // end of Transitions
+} //end of ScreenTransitionTest
 
 
 #endif /* CONTROLLER_H_ */
