@@ -86,6 +86,11 @@ namespace MAUtil {
 		return strtoul(s.c_str(), 0, base);
 	}
 
+	String longToString(long long l, int base) {
+		char cBuf[128];
+                return ltoa(l, cBuf, base);
+	}
+
 	long long stringToLong(const String &s, int base) {
 		return strtoull(s.c_str(), 0, base);
 	}

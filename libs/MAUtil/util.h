@@ -50,6 +50,8 @@ namespace MAUtil {
 	String doubleToString(double f, int decimals = 5);
 	/** Converts \a f to its string representation in radix \a base. **/
 	String integerToString(int i, int base = 10);
+	/** Converts \a l to its string representation in radix \a base. **/
+	String longToString(long long l, int base);
 	/** Converts a MAUtil::String to lowercase. **/
 	String lowerString(const String& s);
 	/** Converts a MAUtil::String to uppercase. **/

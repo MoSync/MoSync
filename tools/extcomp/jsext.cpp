@@ -71,6 +71,7 @@ void writeJSBridge(string& outputfile, Interface& ext) {
 
 		map<string, int> structIdMap;
 		vector<string> typeDescs;
+		vector<string> argNames;
 		vector<string> argTypes;
 		vector<bool> argDirs;
 
@@ -81,7 +82,7 @@ void writeJSBridge(string& outputfile, Interface& ext) {
 		}
 		string resultVar = isReturnType(ext, f.returnType) ? "r.result" : "null";
 		string outVar = outParamCount ? "r.out" : "null";
-		extensionFile << "mosync.bridge.send(args, function(r) { if (fnc) { fnc(" << resultVar << "," << outVar <<  ")}});};\n";
+		extensionFile << "mosync.bridge.send(args, function(r) { if (typeof fnc != 'undefined') { fnc(" << resultVar << "," << outVar <<  ")}});};\n";
 
 		// Self-executing initializer.
 		extensionFile << "(function() {\n";
@@ -94,13 +95,15 @@ void writeJSBridge(string& outputfile, Interface& ext) {
 		extensionFile << "initArgs.push(\"";
 		for (size_t j = 0; j < f.args.size(); j++) {
 			Argument arg = f.args[j];
+			argNames.push_back(arg.name);
 			argTypes.push_back(arg.type);
 			argDirs.push_back(!arg.in);
 		}
+		argNames.push_back(""); // Return name.
 		argTypes.push_back(f.returnType);
 		argDirs.push_back(true);
 
-		string argTypeDesc = getJSTypeDesc(ext, argTypes, &argDirs, structIdMap, typeDescs);
+		string argTypeDesc = getJSTypeDesc(ext, argNames, argTypes, &argDirs, structIdMap, typeDescs);
 		extensionFile << argTypeDesc << "\");";
 
 		for (size_t j = 0; j < typeDescs.size(); j++) {
@@ -135,9 +138,9 @@ void generateArrayMarshalling(ostream& extensionFile, Interface& ext, string& ar
 	extensionFile << "}";
 	extensionFile << "} else {\n";
 	extensionFile << "args.push(1);\n";
-	generateArrayMarshalling(extensionFile, ext, subArrayVar, arrayType, ptrDepth - 1);
+	generateArrayMarshalling(extensionFile, ext, arrayName, arrayType, ptrDepth - 1);
 	if (ptrDepth == 1) {
-		generateMarshalling(extensionFile, ext, subArrayVar, scalarType);
+		generateMarshalling(extensionFile, ext, arrayName, scalarType);
 	}
 	extensionFile << "}\n";
 }
@@ -170,10 +173,11 @@ void generateMarshalling(ostream& extensionFile, Interface& ext, string& name, s
 	}
 }
 
-string getJSTypeDesc(Interface& ext, vector<string>& types, vector<bool>* dirs, map<string, int>& structIdMap, vector<string>& typeDescs) {
+string getJSTypeDesc(Interface& ext, vector<string>& names, vector<string>& types, vector<bool>* dirs, map<string, int>& structIdMap, vector<string>& typeDescs) {
 	string typeDesc;
 	for (size_t i = 0; i < types.size(); i++) {
 		string t = types[i];
+		string name = names[i];
 		bool out = dirs && (*dirs)[i];
 		int ptrDepth = 0;
 		string type = extractPointerType(t, ptrDepth);
@@ -198,11 +202,13 @@ string getJSTypeDesc(Interface& ext, vector<string>& types, vector<bool>* dirs, 
 					Struct s = ext.structs[j];
 					if (s.name == type) {
 						vector<string> structTypes;
+						vector<string> structNames;
 						for (size_t j = 0; j < s.members.size(); j++) {
 							Member m = s.members[j];
 							structTypes.push_back(m.pod[0].type);
+							structNames.push_back(m.pod[0].name);
 						}
-						string typeDesc = getJSTypeDesc(ext, structTypes, NULL, structIdMap, typeDescs);
+						string typeDesc = getJSTypeDesc(ext, structNames, structTypes, NULL, structIdMap, typeDescs);
 						typeDescs.push_back(typeDesc);
 					}
 				}
@@ -215,6 +221,9 @@ string getJSTypeDesc(Interface& ext, vector<string>& types, vector<bool>* dirs, 
 		for (int i = 0; i < ptrDepth; i++) {
 			typeDesc.append("*");
 		}
+		typeDesc.append("{");
+		typeDesc.append(name);
+		typeDesc.append("}");
 	}
 
 	return typeDesc;

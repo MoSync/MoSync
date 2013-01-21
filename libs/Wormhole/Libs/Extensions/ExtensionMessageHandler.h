@@ -51,11 +51,21 @@ namespace Wormhole
 		JSMarshaller* createMarshaller(const char* def, bool isArgList);
 		MAUtil::Vector<JSMarshaller*> mList;
 		MAUtil::Vector<JSMarshaller*> mRefList;
+		bool mIsArgList;
+		bool mHasReturnValue;
+		MAUtil::String mName;
+	protected:
+		bool mHasOutValues;
+		JSMarshaller(bool pHasOutValues) : mIsArgList(false), mHasReturnValue(false), mHasOutValues(pHasOutValues) { };
 	public:
-		JSMarshaller() { };
+		JSMarshaller() : mIsArgList(false), mHasReturnValue(false), mHasOutValues(false) { };
 		virtual ~JSMarshaller();
 		void initialize(MessageStream& stream);
 		virtual int marshal(MessageStream& stream, char* buffer);
+		virtual int unmarshal(char* buffer, MAUtil::String& jsExpr);
+		int unmarshalArgList(char* buffer, MAUtil::String& jsExpr);
+		virtual bool hasOutValues() { return mHasOutValues; }
+		void setName(MAUtil::String name) { mName = name; }
 		int getChildCount();
 	};
 
@@ -65,28 +75,29 @@ namespace Wormhole
 	public:
 		JSArrayMarshaller(JSMarshaller* delegate) : JSMarshaller(), mDelegate(delegate) { };
 		virtual int marshal(MessageStream& stream, char* buffer);
+		virtual bool hasOutValues();
 		virtual ~JSArrayMarshaller();
 	};
 
 	class JSNumberMarshaller : public JSMarshaller {
 	private:
 		char mVariant;
-		bool mOut;
 	public:
-		JSNumberMarshaller(char variant) : JSMarshaller(), mVariant(toupper(variant)), mOut(toupper(variant) != variant) { };
+		JSNumberMarshaller(char variant) : JSMarshaller(toupper(variant) != variant), mVariant(toupper(variant)) { };
 		virtual ~JSNumberMarshaller() { };
 		virtual int marshal(MessageStream& stream, char* buffer);
+		virtual int unmarshal(char* buffer, MAUtil::String& jsExpr);
 	};
 
 	class JSRefMarshaller : public JSMarshaller {
 	private:
 		int mRefId;
 		MAUtil::Vector<JSMarshaller*>* mRefList;
-		bool mOut;
 	public:
-		JSRefMarshaller(int refId, MAUtil::Vector<JSMarshaller*>* refList, bool out) : JSMarshaller(), mRefId(refId), mRefList(refList), mOut(out) { };
+		JSRefMarshaller(int refId, MAUtil::Vector<JSMarshaller*>* refList, bool out) : JSMarshaller(out), mRefId(refId), mRefList(refList) { };
 		virtual ~JSRefMarshaller() { };
 		virtual int marshal(MessageStream& stream, char* buffer);
+		virtual int unmarshal(char* buffer, MAUtil::String& jsExpr);
 	};
 
 	class JSExtensionModule {
