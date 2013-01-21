@@ -27,6 +27,7 @@
 #ifndef SCREEN_UTILS_H_
 #define SCREEN_UTILS_H_
 
+// Layout/UI related
 #define TITLE_FONT_SIZE 22
 #define SPACER_HEIGHT 50
 #define SPACER_WIDTH 15
@@ -36,6 +37,9 @@
 #define BLACK_COLOR 0x000000
 #define WHITE_COLOR 0xffffff
 #define SELECTED_COLOR 0x5b3f23
+
+// Screen transitions
+#define TRANSITION_TIME_MS 300
 
 #include <MAUtil/Map.h>
 #include <IX_WIDGET.h>

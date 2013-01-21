@@ -32,7 +32,6 @@
 
 namespace ScreenTransitionTest
 {
-
 	class FirstScreen;
 	class SecondScreen;
 

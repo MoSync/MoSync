@@ -32,7 +32,6 @@
 #include <NativeUI/ListViewListener.h>
 
 #include "../Observers/FirstScreenObserver.h"
-#include "ScreenUtils.h"
 
 namespace NativeUI
 {

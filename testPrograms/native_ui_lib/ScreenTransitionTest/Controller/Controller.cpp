@@ -23,13 +23,13 @@
  *
  * @brief App main controller.
  */
-#define TRANSITION_TIME_MS 200
+#include <NativeUI/Screen.h>
 
 #include "Controller.h"
+
+#include "../Screens/ScreenUtils.h"
 #include "../Screens/FirstScreen.h"
 #include "../Screens/SecondScreen.h"
-
-#include <NativeUI/Screen.h>
 
 static MAWScreenTransitionType currentTransition = MAW_TRANSITION_TYPE_NONE;
 

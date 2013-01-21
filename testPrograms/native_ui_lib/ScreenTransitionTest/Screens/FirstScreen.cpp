@@ -37,6 +37,7 @@
 #include <NativeUI/ListViewItem.h>
 
 #include "FirstScreen.h"
+#include "ScreenUtils.h"
 
 namespace ScreenTransitionTest
 {
