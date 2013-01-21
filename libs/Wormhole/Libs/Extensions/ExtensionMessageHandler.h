@@ -38,20 +38,21 @@ MA 02110-1301, USA.
 #include <MAUtil/Vector.h>
 #include <MAUtil/HashMap.h>
 #include <MAUtil/String.h>
-#include <MessageStream.h>
+#include "../../MessageStream.h"
 
 using namespace NativeUI; // WebView widget
 using namespace std;
 
 namespace Wormhole
 {
+	// TODO: Create abstract base class.
 	class JSMarshaller {
 	private:
 		JSMarshaller* createMarshaller(const char* def, bool isArgList);
 		MAUtil::Vector<JSMarshaller*> mList;
 		MAUtil::Vector<JSMarshaller*> mRefList;
 	public:
-		JSMarshaller();
+		JSMarshaller() { };
 		virtual ~JSMarshaller();
 		void initialize(MessageStream& stream);
 		virtual int marshal(MessageStream& stream, char* buffer);
@@ -62,7 +63,7 @@ namespace Wormhole
 	private:
 		JSMarshaller* mDelegate;
 	public:
-		JSArrayMarshaller(JSMarshaller* delegate) : mDelegate(delegate) { };
+		JSArrayMarshaller(JSMarshaller* delegate) : JSMarshaller(), mDelegate(delegate) { };
 		virtual int marshal(MessageStream& stream, char* buffer);
 		virtual ~JSArrayMarshaller();
 	};
@@ -72,19 +73,19 @@ namespace Wormhole
 		char mVariant;
 		bool mOut;
 	public:
-		JSNumberMarshaller(char variant);
-		virtual ~JSNumberMarshaller();
+		JSNumberMarshaller(char variant) : JSMarshaller(), mVariant(toupper(variant)), mOut(toupper(variant) != variant) { };
+		virtual ~JSNumberMarshaller() { };
 		virtual int marshal(MessageStream& stream, char* buffer);
 	};
 
 	class JSRefMarshaller : public JSMarshaller {
 	private:
 		int mRefId;
-		MAUtil::Vector<JSMarshaller*> mList;
+		MAUtil::Vector<JSMarshaller*>* mRefList;
 		bool mOut;
 	public:
-		JSRefMarshaller(int refId, MAUtil::Vector<JSMarshaller*>& list, bool out) : mRefId(refId), mList(list), mOut(out) { };
-		virtual ~JSRefMarshaller();
+		JSRefMarshaller(int refId, MAUtil::Vector<JSMarshaller*>* refList, bool out) : JSMarshaller(), mRefId(refId), mRefList(refList), mOut(out) { };
+		virtual ~JSRefMarshaller() { };
 		virtual int marshal(MessageStream& stream, char* buffer);
 	};
 

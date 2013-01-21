@@ -81,7 +81,7 @@ void writeJSBridge(string& outputfile, Interface& ext) {
 		}
 		string resultVar = isReturnType(ext, f.returnType) ? "r.result" : "null";
 		string outVar = outParamCount ? "r.out" : "null";
-		extensionFile << "mosync.bridge.send(args, function(r) { fnc(" << resultVar << "," << outVar <<  ")});};\n";
+		extensionFile << "mosync.bridge.send(args, function(r) { if (fnc) { fnc(" << resultVar << "," << outVar <<  ")}});};\n";
 
 		// Self-executing initializer.
 		extensionFile << "(function() {\n";

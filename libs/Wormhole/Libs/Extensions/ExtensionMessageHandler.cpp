@@ -58,13 +58,17 @@ bool ExtensionMessageHandler::handleMessage(Wormhole::MessageStream& stream) {
 			JSMarshaller* marshaller = module->getMarshaller(fnId);
 			if (marshaller) {
 				// Values.
-				marshaller->marshal(stream, buffer);
+				int replySize = marshaller->marshal(stream, buffer);
 
 				// And last, the callback id
-				int callbackId = stringToInteger(stream.getNext());
+				int callbackId = MAUtil::stringToInteger(stream.getNext());
 
 				maExtensionFunctionInvoke2(module->getExtensionFunction(fnId), marshaller->getChildCount(), (int) buffer);
-				//mWebView->callJS("mosync.bridge.reply(CALLBACK, RESULT);");
+
+				char* reply = (char*) malloc(replySize + 128);
+				sprintf(reply, "mosync.bridge.reply(%d, {});", callbackId);
+				mWebView->callJS(reply);
+				free(reply);
 			} else {
 				maPanic(40075, "Unknown function id");
 			}
@@ -81,7 +85,6 @@ void JSMarshaller::initialize(MessageStream& stream) {
 
 	// Parse until we get a stop token (-)
 	for (const char* def = stream.getNext(); strcmp("-", def); def = stream.getNext()) {
-		maWriteLog(def, strlen(def));
 		if (id < 0) {
 			createMarshaller(def, true);
 		} else {
@@ -96,8 +99,12 @@ JSMarshaller* JSMarshaller::createMarshaller(const char* def, bool isArgList) {
 	int refId = 0;
 	MAUtil::Vector<JSMarshaller*> list;
 	JSMarshaller* current = NULL;
+	bool done = false;
 
-	for (char ch = def[pos]; pos++; ch = '\0') {
+	for (char ch = def[pos]; !done; ch = def[pos]) {
+		char chs[80];
+		sprintf(chs, "Char: %c", ch);
+		maWriteLog(chs, strlen(chs));
 		switch (ch) {
 		case 'B':
 		case 'b':
@@ -140,6 +147,7 @@ JSMarshaller* JSMarshaller::createMarshaller(const char* def, bool isArgList) {
 			current = NULL;
 			break;
 		}
+		done = ch == '\0';
 		pos++;
 	}
 
