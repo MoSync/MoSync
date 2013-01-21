@@ -42,8 +42,6 @@ import com.mosync.nativeui.ui.widgets.Widget;
  */
 public class EditBoxFactory implements AbstractViewFactory
 {
-	boolean m_clearFocus = true;
-
 	@Override
 	public Widget create(Activity activity, final int handle)
 	{
@@ -80,15 +78,6 @@ public class EditBoxFactory implements AbstractViewFactory
 			public void onFocusChange(View v, boolean hasFocus) {
 				if (hasFocus)
 				{
-					if ( Build.VERSION.SDK_INT < Build.VERSION_CODES.ICE_CREAM_SANDWICH )
-					{
-						//when the editbox is added to the screen it's gaining focus and trying to show the keyboard but it fails
-						if (m_clearFocus) {
-							m_clearFocus = false;
-							v.clearFocus();
-							return;
-						}
-					}
 					EventQueue.getDefault( ).postWidgetEvent(
 							IX_WIDGET.MAW_EVENT_EDIT_BOX_EDITING_DID_BEGIN, handle );
 				}
