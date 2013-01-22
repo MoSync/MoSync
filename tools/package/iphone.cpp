@@ -31,6 +31,8 @@
 
 using namespace std;
 
+string filterWhiteSpace(const string& str);
+
 void packageIOS(const SETTINGS& s, const RuntimeInfo& ri) {
 	testDst(s);
 	testName(s);
@@ -86,7 +88,8 @@ void packageIOS(const SETTINGS& s, const RuntimeInfo& ri) {
 #ifdef PLATFORM_OSX
 		testIOSSdk(s);
 		chdir(xcodeprojOutput.c_str());
-		buildCmd << "xcodebuild -project " << arg(string(s.name) + ".xcodeproj");
+		string filteredProjName = filterWhiteSpace(string(s.name));
+		buildCmd << "xcodebuild -project " << arg(filteredProjName) << ".xcodeproj";
 		if (s.iOSSdk) {
 			buildCmd << " -sdk " << arg(s.iOSSdk);
 		}
@@ -100,4 +103,17 @@ void packageIOS(const SETTINGS& s, const RuntimeInfo& ri) {
 #endif
 	}
 
+}
+
+string filterWhiteSpace(const string& str) {
+	string newString = "";
+	for(size_t i = 0; i < str.length(); i++) {
+		unsigned char s = str[i];
+		if(s > 32 && s < 127) {
+			newString += str[i];
+		} else {
+			newString += "";
+		}
+	}
+	return newString;
 }
