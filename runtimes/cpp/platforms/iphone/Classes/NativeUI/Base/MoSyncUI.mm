@@ -299,7 +299,8 @@ static IWidget* sOldScreen = nil;
 		[actualView removeFromSuperview];
 	}
 
-	[mainWindow insertSubview:[widget view] atIndex:0];
+	ScreenWidget* screen = (ScreenWidget*)widget;
+	mainWindow.rootViewController = [screen getController];
 
 	[widget layout];
 	[widget show];

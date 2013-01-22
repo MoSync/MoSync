@@ -403,6 +403,12 @@
 		85F2559711AC162700EB47EE /* libMoSyncLib.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 85F2550D11AC125400EB47EE /* libMoSyncLib.a */; };
 		85F25A3611AD614700EB47EE /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; };
 		85F25A3711AD614700EB47EE /* MoSyncAppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1D3623250D0F684500981E51 /* MoSyncAppDelegate.mm */; };
+		8B8D0BCD16ADC03400F287B1 /* StackScreenWidgetController.h in Headers */ = {isa = PBXBuildFile; fileRef = 8B8D0BCB16ADC03400F287B1 /* StackScreenWidgetController.h */; };
+		8B8D0BCE16ADC03400F287B1 /* StackScreenWidgetController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8B8D0BCC16ADC03400F287B1 /* StackScreenWidgetController.mm */; };
+		8B8D0BCF16ADC03400F287B1 /* StackScreenWidgetController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8B8D0BCC16ADC03400F287B1 /* StackScreenWidgetController.mm */; };
+		8B8D0BD216ADC0F900F287B1 /* TabScreenWidgetController.h in Headers */ = {isa = PBXBuildFile; fileRef = 8B8D0BD016ADC0F900F287B1 /* TabScreenWidgetController.h */; };
+		8B8D0BD316ADC0F900F287B1 /* TabScreenWidgetController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8B8D0BD116ADC0F900F287B1 /* TabScreenWidgetController.mm */; };
+		8B8D0BD416ADC0F900F287B1 /* TabScreenWidgetController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8B8D0BD116ADC0F900F287B1 /* TabScreenWidgetController.mm */; };
 		E413FAB814C0604D00BF1E3D /* ResourceArray.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E413FAB714C0604D00BF1E3D /* ResourceArray.cpp */; };
 		E413FABA14C0606A00BF1E3D /* ResourceArray.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E413FAB714C0604D00BF1E3D /* ResourceArray.cpp */; };
 		E438DF501535D35D008B5005 /* CoreMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E438DF4F1535D35C008B5005 /* CoreMedia.framework */; };
@@ -731,6 +737,10 @@
 		85F2550D11AC125400EB47EE /* libMoSyncLib.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libMoSyncLib.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		85F2558711AC155D00EB47EE /* MoSync.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MoSync.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		85F2558911AC155D00EB47EE /* MoSyncWithLib-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "MoSyncWithLib-Info.plist"; sourceTree = "<group>"; };
+		8B8D0BCB16ADC03400F287B1 /* StackScreenWidgetController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StackScreenWidgetController.h; sourceTree = "<group>"; };
+		8B8D0BCC16ADC03400F287B1 /* StackScreenWidgetController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = StackScreenWidgetController.mm; sourceTree = "<group>"; };
+		8B8D0BD016ADC0F900F287B1 /* TabScreenWidgetController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TabScreenWidgetController.h; sourceTree = "<group>"; };
+		8B8D0BD116ADC0F900F287B1 /* TabScreenWidgetController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = TabScreenWidgetController.mm; sourceTree = "<group>"; };
 		8D1107310486CEB800E47090 /* MoSync-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "MoSync-Info.plist"; plistStructureDefinitionIdentifier = "com.apple.xcode.plist.structure-definition.iphone.info-plist"; sourceTree = "<group>"; };
 		E413FAB714C0604D00BF1E3D /* ResourceArray.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ResourceArray.cpp; path = ../../../base/ResourceArray.cpp; sourceTree = "<group>"; };
 		E438DF4F1535D35C008B5005 /* CoreMedia.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMedia.framework; path = System/Library/Frameworks/CoreMedia.framework; sourceTree = SDKROOT; };
@@ -1288,6 +1298,10 @@
 				43F3705A15B476300095B3C6 /* ImagePickerController.mm */,
 				43F3705B15B476300095B3C6 /* ScreenWidgetController.h */,
 				43F3705C15B476300095B3C6 /* ScreenWidgetController.mm */,
+				8B8D0BCB16ADC03400F287B1 /* StackScreenWidgetController.h */,
+				8B8D0BCC16ADC03400F287B1 /* StackScreenWidgetController.mm */,
+				8B8D0BD016ADC0F900F287B1 /* TabScreenWidgetController.h */,
+				8B8D0BD116ADC0F900F287B1 /* TabScreenWidgetController.mm */,
 			);
 			name = ViewControllers;
 			path = NativeUI/ViewControllers;
@@ -1586,6 +1600,8 @@
 				43A8F214164FC71A00B0FD35 /* ListViewSectionWidgetDelegate.h in Headers */,
 				43A8F215164FC71A00B0FD35 /* ListViewWidgetDelegate.h in Headers */,
 				43A8F216164FC71A00B0FD35 /* WidgetUtils.h in Headers */,
+				8B8D0BCD16ADC03400F287B1 /* StackScreenWidgetController.h in Headers */,
+				8B8D0BD216ADC0F900F287B1 /* TabScreenWidgetController.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1828,6 +1844,8 @@
 				43C48359164178C0008F9A39 /* MapPinWidget.mm in Sources */,
 				43C4835C164178C0008F9A39 /* MapWidget.mm in Sources */,
 				43A8F217164FC71A00B0FD35 /* WidgetUtils.mm in Sources */,
+				8B8D0BCE16ADC03400F287B1 /* StackScreenWidgetController.mm in Sources */,
+				8B8D0BD316ADC0F900F287B1 /* TabScreenWidgetController.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1955,6 +1973,8 @@
 				43C4835A164178C0008F9A39 /* MapPinWidget.mm in Sources */,
 				43C4835D164178C0008F9A39 /* MapWidget.mm in Sources */,
 				43A8F218164FC71A00B0FD35 /* WidgetUtils.mm in Sources */,
+				8B8D0BCF16ADC03400F287B1 /* StackScreenWidgetController.mm in Sources */,
+				8B8D0BD416ADC0F900F287B1 /* TabScreenWidgetController.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

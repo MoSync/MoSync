@@ -21,6 +21,7 @@
 
 #include "Platform.h"
 #import "StackScreenWidget.h"
+#import "StackScreenWidgetController.h"
 #import "UINavigationControllerExpanded.h"
 
 @implementation StackScreenWidget
@@ -30,7 +31,7 @@
  */
 - (id)init
 {
-	UINavigationController* navigationController = [[[UINavigationController alloc] init] autorelease];
+	UINavigationController* navigationController = [[[StackScreenWidgetController alloc] init] autorelease];
     self = [super initWithController:navigationController];
     if (self)
     {
