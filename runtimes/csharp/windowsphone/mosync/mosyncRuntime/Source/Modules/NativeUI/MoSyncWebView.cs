@@ -98,7 +98,7 @@ namespace MoSync
                             {
                                 uri = new Uri(value, UriKind.Relative);
                             }
-                    }
+                        }
                         else
                         {
                             uri = new Uri(value, UriKind.Relative);
