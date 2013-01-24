@@ -78,6 +78,11 @@
 @property(nonatomic, assign) MAHandle handle;
 
 /**
+ * Setter and getter for widget's main widget property.
+ */
+@property(nonatomic, assign) BOOL isMainWidget;
+
+/**
  * Setter and getter for widget's width.
  */
 @property(nonatomic, setter = setWidth:, getter = width) CGFloat width;
