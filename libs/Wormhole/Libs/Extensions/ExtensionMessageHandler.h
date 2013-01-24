@@ -43,8 +43,12 @@ MA 02110-1301, USA.
 using namespace NativeUI; // WebView widget
 using namespace std;
 
+#define MAX_ARRAY_SIZE_MASK 0xffff;
+
 namespace Wormhole
 {
+	inline const char* getNext(MessageStream& stream, const char* w = NULL);
+
 	// TODO: Create abstract base class.
 	class JSMarshaller {
 	private:
@@ -66,7 +70,9 @@ namespace Wormhole
 		int unmarshalArgList(char* buffer, MAUtil::String& jsExpr);
 		virtual bool hasOutValues() { return mHasOutValues; }
 		void setName(MAUtil::String name) { mName = name; }
+		virtual int getDataOffset() { return 0; }
 		int getChildCount();
+		virtual const char* getType() { return mIsArgList ? "args" : "struct"; }
 	};
 
 	class JSArrayMarshaller : public JSMarshaller {
@@ -75,8 +81,11 @@ namespace Wormhole
 	public:
 		JSArrayMarshaller(JSMarshaller* delegate) : JSMarshaller(), mDelegate(delegate) { };
 		virtual int marshal(MessageStream& stream, char* buffer);
+		virtual int unmarshal(char* buffer, MAUtil::String& jsExpr);
 		virtual bool hasOutValues();
+		virtual int getDataOffset();
 		virtual ~JSArrayMarshaller();
+		virtual const char* getType() { return (MAUtil::String("array: ") + mDelegate->getType()).c_str(); }
 	};
 
 	class JSNumberMarshaller : public JSMarshaller {
@@ -87,6 +96,17 @@ namespace Wormhole
 		virtual ~JSNumberMarshaller() { };
 		virtual int marshal(MessageStream& stream, char* buffer);
 		virtual int unmarshal(char* buffer, MAUtil::String& jsExpr);
+		virtual const char* getType() { return (MAUtil::String("number: ") + mVariant).c_str(); }
+	};
+
+	class JSStringMarshaller : public JSMarshaller {
+	public:
+		JSStringMarshaller(bool out) : JSMarshaller(out) { }
+		virtual ~JSStringMarshaller() { };
+		virtual int getDataOffset();
+		virtual int marshal(MessageStream& stream, char* buffer);
+		virtual int unmarshal(char* buffer, MAUtil::String& jsExpr);
+		virtual const char* getType() { return "string"; }
 	};
 
 	class JSRefMarshaller : public JSMarshaller {
@@ -98,6 +118,8 @@ namespace Wormhole
 		virtual ~JSRefMarshaller() { };
 		virtual int marshal(MessageStream& stream, char* buffer);
 		virtual int unmarshal(char* buffer, MAUtil::String& jsExpr);
+		virtual int getDataOffset();
+		virtual const char* getType() { return (MAUtil::String("ref") + MAUtil::integerToString(mRefId)).c_str(); }
 	};
 
 	class JSExtensionModule {

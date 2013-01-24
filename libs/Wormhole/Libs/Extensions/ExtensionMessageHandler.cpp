@@ -34,11 +34,11 @@ bool ExtensionMessageHandler::handleMessage(Wormhole::MessageStream& stream) {
 	char buffer[8192];
 
 	// TODO: Optimize this so we don't have to do it *every* invocation!!!
-	const char* ext = stream.getNext();
+	const char* ext = getNext(stream);
 	if (ext[0] == '*') {
 		// Then it's a definition!
-		int hash = MAUtil::stringToInteger(stream.getNext(), 16);
-		int fnId = MAUtil::stringToInteger(stream.getNext());
+		int hash = MAUtil::stringToInteger(getNext(stream), 16);
+		int fnId = MAUtil::stringToInteger(getNext(stream));
 		// Type definitions.
 		JSMarshaller* marshaller = new JSMarshaller();
 		marshaller->initialize(stream);
@@ -53,7 +53,7 @@ bool ExtensionMessageHandler::handleMessage(Wormhole::MessageStream& stream) {
 	} else {
 		// Otherwise it's a call!
 		JSExtensionModule* module = mModules[ext];
-		int fnId = MAUtil::stringToInteger(stream.getNext());
+		int fnId = MAUtil::stringToInteger(getNext(stream));
 		if (module) {
 			JSMarshaller* marshaller = module->getMarshaller(fnId);
 			if (marshaller) {
@@ -61,7 +61,7 @@ bool ExtensionMessageHandler::handleMessage(Wormhole::MessageStream& stream) {
 				int size = marshaller->marshal(stream, buffer);
 
 				// And last, the callback id
-				int callbackId = MAUtil::stringToInteger(stream.getNext());
+				int callbackId = MAUtil::stringToInteger(getNext(stream));
 
 				maExtensionFunctionInvoke2(module->getExtensionFunction(fnId), marshaller->getChildCount(), (int) &buffer);
 
@@ -89,7 +89,7 @@ void JSMarshaller::initialize(MessageStream& stream) {
 	int id = -1;
 
 	// Parse until we get a stop token (-)
-	for (const char* def = stream.getNext(); strcmp("-", def); def = stream.getNext()) {
+	for (const char* def = getNext(stream); strcmp("-", def); def = getNext(stream)) {
 		if (id < 0) {
 			createMarshaller(def, true);
 		} else {
@@ -137,8 +137,14 @@ JSMarshaller* JSMarshaller::createMarshaller(const char* def, bool isArgList) {
 				if (current) list.add(current);
 				current = new JSNumberMarshaller(ch);
 				break;
+			case 'S':
+			case 's':
+				if (current) list.add(current);
+				current = new JSStringMarshaller(ch == 's');
+				break;
 			case '!':
 			case '?':
+				if (current) list.add(current);
 				bool out = ch == '?';
 				current = new JSRefMarshaller(refId, &mRefList, out);
 				refId = 0;
@@ -214,9 +220,12 @@ int JSMarshaller::marshal(MessageStream& stream, char* buffer) {
 		JSMarshaller* marshaller = mList[i];
 		// Set the pointer
 		if (mIsArgList) {
-			((int*)buffer)[i] = ((int) buffer) + offset;
+			// Please note that during marshalling, we need to offset a bit --
+			// some data types have meta data that should not be sent to the extension
+			((int*)buffer)[i] = ((int) buffer) + offset + marshaller->getDataOffset();
 		}
 		// Then marshal stuff
+		printf("MARSHAL %d\n", i);
 		offset += marshaller->marshal(stream, (char*) ((int) buffer + offset));
 	}
 	return offset;
@@ -255,18 +264,18 @@ int JSMarshaller::unmarshalArgList(char* buffer, MAUtil::String& jsExpr) {
 	if (mHasOutValues) {
 		bool first = true;
 		jsExpr += "out: {";
-		for (int i = 0; i < mList.size() - 1; i++) {
+		for (int i = 0; i < mList.size() - (mHasReturnValue ? 1 : 0); i++) {
 			JSMarshaller* marshaller = mList[i];
 			if (marshaller->hasOutValues()) {
-				char* ptr = (char*) ((int*)buffer)[i];
+				char* ptr = (char*) ((int*)buffer)[i] - marshaller->getDataOffset();
 				if (!first) {
 					jsExpr += ",";
-					first = false;
 				}
 				// Then marshal stuff
 				jsExpr += marshaller->mName;
 				jsExpr += ':';
 				marshaller->unmarshal(ptr, jsExpr);
+				first = false;
 			}
 		}
 		jsExpr += "}";
@@ -289,21 +298,37 @@ int JSMarshaller::getChildCount() {
 }
 
 int JSArrayMarshaller::marshal(MessageStream& stream, char* buffer) {
-	int arraySize = MAUtil::stringToInteger(stream.getNext());
-	printf("ARRAY SIZE: %d\n", arraySize);
-	int dataStart = 4 * arraySize;
-	int offset = dataStart;
+	int arraySize = MAUtil::stringToInteger(getNext(stream, "array")) & MAX_ARRAY_SIZE_MASK;
+	int offset = sizeof(int);
+	((int*)buffer)[0] = arraySize;
 	for (int i = 0; i < arraySize; i++) {
-		// Set the pointer
-		((int*)buffer)[i] = ((int) buffer) + offset;
-		// Then marshal stuff
 		offset += mDelegate->marshal(stream, buffer + offset);
 	}
 	return offset;
 }
 
+int JSArrayMarshaller::unmarshal(char* buffer, MAUtil::String& jsExpr) {
+	int arraySize = ((int*)buffer)[0] & MAX_ARRAY_SIZE_MASK;
+	printf("Unmarshalling array: %d\n", arraySize);
+	int offset = sizeof(int);
+	jsExpr += "[";
+	for (int i = 0; i < arraySize; i++) {
+		if (i > 0) {
+			jsExpr += ",";
+		}
+		char* ptr = (char*)((int)buffer + offset);
+		offset += mDelegate->unmarshal(ptr, jsExpr);
+	}
+	jsExpr += "]";
+	return offset;
+}
+
 bool JSArrayMarshaller::hasOutValues() {
 	return mDelegate->hasOutValues();
+}
+
+int JSArrayMarshaller::getDataOffset() {
+	return 4;
 }
 
 int JSRefMarshaller::marshal(MessageStream& stream, char* buffer) {
@@ -314,9 +339,12 @@ int JSRefMarshaller::unmarshal(char* buffer, MAUtil::String& jsExpr) {
 	return (*mRefList)[mRefId]->unmarshal(buffer, jsExpr);
 }
 
+int JSRefMarshaller::getDataOffset() {
+	return (*mRefList)[mRefId]->getDataOffset();
+}
+
 int JSNumberMarshaller::marshal(MessageStream& stream, char* buffer) {
-	const char* value = stream.getNext();
-	printf("NUMBER?: %s\n", value);
+	const char* value = getNext(stream, "number");
 	switch (mVariant) {
 	case 'B':
 		buffer[0] = value ? (char) (MAUtil::stringToInteger(value) & 0xff) : 0;
@@ -360,6 +388,26 @@ int JSNumberMarshaller::unmarshal(char* buffer, MAUtil::String& jsExpr) {
 	return 0;
 }
 
+int JSStringMarshaller::marshal(MessageStream& stream, char* buffer) {
+	// Bytes 0-3 are the length
+	int length = MAUtil::stringToInteger(getNext(stream, "string-len"));
+	MAUtil::String msg = getNext(stream, "message");
+	strncpy((char*) (buffer + sizeof(int)), msg.c_str(), length);
+	return length + sizeof(int);
+}
+
+int JSStringMarshaller::unmarshal(char* buffer, MAUtil::String& jsExpr) {
+	int length = ((int*)buffer)[0];
+	jsExpr += "\"";
+	jsExpr += (char*) (buffer+sizeof(int));
+	jsExpr += "\"";
+	return length + sizeof(int);
+}
+
+int JSStringMarshaller::getDataOffset() {
+	return 4;
+}
+
 JSMarshaller* JSExtensionModule::getMarshaller(int fnId) {
 	return mMarshallers[fnId];
 }
@@ -380,4 +428,9 @@ JSExtensionModule::~JSExtensionModule() {
 	// TODO!!! Delete
 }
 
+inline const char* getNext(MessageStream& stream, const char* w) {
+	const char* result = stream.getNext(NULL);
+	printf("%s: %s\n", w, result);
+	return result;
+}
 }

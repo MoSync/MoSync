@@ -168,6 +168,9 @@ void generateMarshalling(ostream& extensionFile, Interface& ext, string& name, s
 	} else if (getStruct(ext, type)) {
 		generateStructMarshalling(extensionFile, ext, name, type);
 	} else {
+		if (stringType) {
+			extensionFile << "args.push(mosync.encoder.lengthAsUTF8(" << name << "));";
+		}
 		// Primitive
 		extensionFile << "args.push(" << name << ");";
 	}
@@ -187,7 +190,12 @@ string getJSTypeDesc(Interface& ext, vector<string>& names, vector<string>& type
 		} else if ("long long" == type) {
 			typeDesc.append(out ? "l" : "L");
 		} else if ("char" == type) {
-			typeDesc.append(out ? "b" : "B");
+			if (ptrDepth > 0) {
+				typeDesc.append(out ? "s" : "S");
+				ptrDepth--;
+			} else {
+				typeDesc.append(out ? "b" : "B");
+			}
 		} else if ("float" == type) {
 			typeDesc.append(out ? "f" : "F");
 		} else if ("double" == type) {
