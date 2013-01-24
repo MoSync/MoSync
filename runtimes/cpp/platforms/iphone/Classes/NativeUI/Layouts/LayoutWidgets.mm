@@ -68,7 +68,7 @@
 }
 
 - (int) getTopMargin{
-	return topMargin;;
+	return topMargin;
 }
 
 - (int) getBottomMargin {
