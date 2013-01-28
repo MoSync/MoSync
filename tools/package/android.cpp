@@ -74,6 +74,7 @@ void packageAndroid(const SETTINGS& s, const RuntimeInfo& ri) {
 	testAndroidPackage(s);
 	testAndroidVersionCode(s);
 	testAndroidInstallLocation(s);
+	testAndroidHeap(s);
 
 	// copy program and resource files to add/assets/*.mp3
 	// build AndroidManifest.xml, res/layout/main.xml, res/values/strings.xml
@@ -353,6 +354,7 @@ static void fromTemplate(const char* templateFile, const char* filename, const S
 	string versionCode = string(s.androidVersionCode);
 	string version = string(s.version);
 	string installLocation = string(s.androidInstallLocation ? s.androidInstallLocation : "internalOnly");
+	string largeHeap = string(s.androidHeap ? s.androidHeap : "");
 
 	MustacheParser parser(true);
 	AndroidContext root(NULL, ri.androidVersion);
@@ -361,6 +363,7 @@ static void fromTemplate(const char* templateFile, const char* filename, const S
 	root.setParameter("version-code", versionCode);
 	root.setParameter("version", version);
 	root.setParameter("install-location", installLocation);
+	root.setParameter("heap", largeHeap);
 	char androidVersionStr[8];
 	sprintf(androidVersionStr, "%d", ri.androidVersion);
 	root.setParameter("sdk-version", androidVersionStr);

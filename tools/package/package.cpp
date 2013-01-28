@@ -212,6 +212,8 @@ int main(int argc, const char** argv) {
 			setString(i, argc, argv, s.androidInstallLocation);
 		} else if(streq(argv[i], "--android-manifest-template")) {
 			setString(i, argc, argv, s.androidManifestTemplate);
+		} else if(streq(argv[i], "--android-heap")) {
+			setString(i, argc, argv, s.androidHeap);
 		} else if(streq(argv[i], "--blackberry-jde")) {
 			setString(i, argc, argv, s.blackberryJde);
 		} else if(streq(argv[i], "--blackberry-signkey")) {
@@ -439,6 +441,15 @@ void testAndroidInstallLocation(const SETTINGS& s) {
 			strcmp("auto", s.androidInstallLocation)) {
 			printf("Android install location must be one of these:\n");
 			printf("\"internalOnly\", \"preferExternal\", \"auto\"");
+			exit(1);
+		}
+	}
+}
+
+void testAndroidHeap(const SETTINGS& s) {
+	if (s.androidHeap) {
+		if (strcmp("large", s.androidHeap)) {
+			printf("Android heap must be either \"large\" or not set.\n");
 			exit(1);
 		}
 	}
