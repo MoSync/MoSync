@@ -2100,6 +2100,21 @@ public class MoSyncThread extends Thread
 	{
 		SYSLOG("maCreateImageFromData");
 
+		// long freeSize = 0L;
+		// long totalSize = 0L;
+		// long usedSize = -1L;
+		// try {
+		// Runtime info = Runtime.getRuntime();
+		// freeSize = info.freeMemory() / 1024L;
+		// totalSize = info.totalMemory() / 1024L;
+		// usedSize = totalSize - freeSize;
+		// } catch (Exception e) {
+		// e.printStackTrace();
+		// }
+		//
+		// Log.i("memory 2", "################# total = " + totalSize
+		// + "; free = " + freeSize + "; used = " + usedSize);
+
 		// Byte array to hold resource data. This is the data we will
 		// use to create the image.
 		byte[] resourceData = null;
@@ -2186,33 +2201,35 @@ public class MoSyncThread extends Thread
 			BitmapFactory.Options options = new BitmapFactory.Options();
 			options.inPreferredConfig = Bitmap.Config.ARGB_8888;
 
-			/**
-			 * The code below converts the Bitmap to the ARGB format.
-			 * If you do not use this method or a similar one, Android will ignore
-			 * the specified format and use the format of the screen, usually
-			 * RGB 565.
-			 */
-
+			// /**
+			// * The code below converts the Bitmap to the ARGB format.
+			// * If you do not use this method or a similar one, Android will
+			// ignore
+			// * the specified format and use the format of the screen, usually
+			// * RGB 565.
+			// */
+			//
 			Bitmap decodedImage = decodeImageFromData(resourceData, options);
 
-			if (decodedImage == null)
-			{
+			if (decodedImage == null) {
 				logError("maCreateImageFromData - "
-					+ "could not decode image data (decodedImage == null)");
+						+ "could not decode image data (decodedImage == null)");
 				return RES_BAD_INPUT;
 			}
-
-			int width =  decodedImage.getWidth();
-			int height = decodedImage.getHeight();
-			int[] pixels = new int[width * height];
-			decodedImage.getPixels(pixels, 0, width, 0, 0, width, height);
-
-			recycleImageData(decodedImage);
-
-			Bitmap argbImage = createBitmapFromData(width, height, pixels);
-
-			mImageResources.put(
-				placeholder, new ImageCache(null, argbImage));
+			//
+			// int width = decodedImage.getWidth();
+			// int height = decodedImage.getHeight();
+			// int[] pixels = new int[width * height];
+			// decodedImage.getPixels(pixels, 0, width, 0, 0, width, height);
+			//
+			// recycleImageData(decodedImage);
+			//
+			// Bitmap argbImage = createBitmapFromData(width, height, pixels);
+			//
+			// mImageResources.put(
+			// placeholder, new ImageCache(null, argbImage));
+			mImageResources
+					.put(placeholder, new ImageCache(null, decodedImage));
 		}
 		catch (UnsupportedOperationException e)
 		{
@@ -3113,6 +3130,7 @@ public class MoSyncThread extends Thread
 		}
 		else if(null != mImageResources.get(resourceIndex))
 		{
+			mImageResources.get(resourceIndex).mBitmap.recycle(); // fleu TODO
 			mImageResources.remove(resourceIndex);
 		}
 		//else
