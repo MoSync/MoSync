@@ -145,3 +145,18 @@
 - (UIInterfaceOrientationMask)supportedInterfaceOrientations;
 
 @end
+
+/**
+ * Return a boolean value indicating whether the view controller supports the specified orientation.
+ * Deprecated in iOS 6.0.
+ * @param interfaceOrientation The orientation of the app’s user interface after the rotation.
+ * @return YES if the view controller auto-rotates its view to the specified orientation, otherwise NO.
+ */
+BOOL MoSync_IsInterfaceOrientationSupported(UIInterfaceOrientation interfaceOrientation);
+
+/**
+ * Returns all of the interface orientations that the view controller supports.
+ * Available in iOS 6.0 and later.
+ * @return A mask with supported orientations.
+ */
+NSUInteger MoSync_SupportedInterfaceOrientations();

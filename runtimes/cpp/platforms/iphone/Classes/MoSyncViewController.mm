@@ -17,6 +17,24 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #import "MoSyncViewController.h"
 
+/**
+ * Forward declaration.
+ * Return a boolean value indicating whether the view controller supports the specified orientation.
+ * Deprecated in iOS 6.0.
+ * @param interfaceOrientation The orientation of the app’s user interface after the rotation.
+ * @return YES if the view controller auto-rotates its view to the specified orientation, otherwise NO.
+ */
+BOOL MoSync_IsInterfaceOrientationSupported(UIInterfaceOrientation interfaceOrientation);
+
+/**
+ * Forward declaration.
+ * Returns all of the interface orientations that the view controller supports.
+ * Available in iOS 6.0 and later.
+ * @return A mask with supported orientations.
+ */
+NSUInteger MoSync_SupportedInterfaceOrientations();
+
+
 @interface MoSyncView : UIView <UITextFieldDelegate>
 @end
 
@@ -38,18 +56,42 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 	return mosyncView;
 }
 
-/*
-// Override to allow orientations other than the default portrait orientation.
-- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
-    // Return YES for supported orientations
-    return (interfaceOrientation == UIInterfaceOrientationPortrait);
+/**
+ * Return a boolean value indicating whether the view controller supports the specified orientation.
+ * Deprecated in iOS 6.0.
+ * @param interfaceOrientation The orientation of the app’s user interface after the rotation.
+ * @return YES if the view controller auto-rotates its view to the specified orientation, otherwise NO.
+ */
+- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
+{
+    return MoSync_IsInterfaceOrientationSupported(interfaceOrientation);
 }
-*/
+
+/**
+ * Returns whether the view controller’s contents should auto rotate.
+ * Available in iOS 6.0 and later.
+ * @return YES.
+ */
+-(BOOL)shouldAutorotate
+{
+	return YES;
+}
+
+/**
+ * Returns all of the interface orientations that the view controller supports.
+ * Available in iOS 6.0 and later.
+ * @return A mask with supported orientations.
+ */
+- (NSUInteger)supportedInterfaceOrientations
+{
+	NSUInteger orientations = MoSync_SupportedInterfaceOrientations();
+    return orientations;
+}
 
 - (void)didReceiveMemoryWarning {
 	// Releases the view if it doesn't have a superview.
     [super didReceiveMemoryWarning];
-	
+
 	// Release any cached data, images, etc that aren't in use.
 }
 
@@ -57,7 +99,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 	// Release any retained subviews of the main view.
 	// e.g. self.myOutlet = nil;
 }
-
 
 - (void)dealloc {
     [super dealloc];
