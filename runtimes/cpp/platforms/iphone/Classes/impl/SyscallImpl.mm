@@ -901,7 +901,10 @@ namespace Base {
 	}
 
 	SYSCALL(MAExtent, maGetScrSize()) {
-		return EXTENT(gWidth, gHeight);
+		CGSize size = [[ScreenOrientation getInstance] screenSize];
+		int width = (int) size.width;
+		int height = (int)size.height;
+		return EXTENT(width, height);
 	}
 
 	SYSCALL(void, maDrawImage(MAHandle image, int left, int top)) {

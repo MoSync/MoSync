@@ -144,6 +144,12 @@
  */
 - (UIInterfaceOrientationMask)supportedInterfaceOrientations;
 
+/**
+ * Get the screen size based on the current orientation.
+ * @return Screen size in pixels.
+ */
+-(CGSize)screenSize;
+
 @end
 
 /**

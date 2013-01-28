@@ -26,6 +26,7 @@
  */
 
 #include <helpers/cpp_defs.h>
+#include "iphone_helpers.h"
 
 #import "ScreenOrientation.h"
 
@@ -236,6 +237,27 @@ static ScreenOrientation *sharedInstance = nil;
 -(UIInterfaceOrientationMask)supportedInterfaceOrientations
 {
     return mSupportedOrientations;
+}
+
+/**
+ * Get the screen size based on the current orientation.
+ * @return Screen size in pixels.
+ */
+-(CGSize)screenSize
+{
+	int width, height;
+	CGSize screenSize;
+	getScreenResolution(width, height);
+	UIInterfaceOrientation interfaceOrientation = [UIApplication sharedApplication].statusBarOrientation;
+	if(UIInterfaceOrientationIsPortrait(interfaceOrientation))
+	{
+		screenSize = CGSizeMake(width, height);
+	}
+	else
+	{
+		screenSize = CGSizeMake(height, width);
+	}
+	return screenSize;
 }
 
 @end
