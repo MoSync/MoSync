@@ -35,7 +35,7 @@ static const int _DAYS_BEFORE_MONTH[12] =
 {0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334};
 
 #define _ISLEAP(y) (((y) % 4) == 0 && (((y) % 100) != 0 || ((y) % 400) == 0))
-#define _DAYS_IN_YEAR(year) (_ISLEAP(year + 1900) ? 366 : 365)
+#define _DAYS_IN_YEAR(year) (_ISLEAP((year) + 1900) ? 366 : 365)
  
 static const int mon_lengths[2][MONSPERYEAR] = {
 	{31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31},
