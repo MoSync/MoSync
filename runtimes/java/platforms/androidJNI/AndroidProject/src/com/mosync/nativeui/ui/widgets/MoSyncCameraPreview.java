@@ -174,7 +174,6 @@ public class MoSyncCameraPreview extends SurfaceView implements SurfaceHolder.Ca
 	 @Override
 	public void surfaceChanged(SurfaceHolder holder, int format, int w, int h)
 	{
-
 		if(mCamera == null)
 			return;
 
