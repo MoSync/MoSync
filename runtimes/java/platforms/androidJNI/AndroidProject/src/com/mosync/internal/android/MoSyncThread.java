@@ -3128,10 +3128,14 @@ public class MoSyncThread extends Thread
 		{
 			mUBinaryResources.remove(resourceIndex);
 		}
-		else if(null != mImageResources.get(resourceIndex))
+		else
 		{
-			mImageResources.get(resourceIndex).mBitmap.recycle(); // fleu TODO
-			mImageResources.remove(resourceIndex);
+			ImageCache img = mImageResources.get(resourceIndex);
+			if(null != img)
+			{
+				img.mBitmap.recycle();
+				mImageResources.remove(resourceIndex);
+			}
 		}
 		//else
 		//{
