@@ -76,7 +76,11 @@ void Downloader::removeDownloadListener(DownloadListener* listener)
 
 int Downloader::beginDownloading(const char *url, MAHandle placeholder)
 {
-	ASSERT_MSG(!mIsDownloading, "Download already in progress");
+	if ( mIsDownloading )
+	{
+		// Download already in progress.
+		return CONNERR_DOWNLOAD_IN_PROGRESS;
+	}
 
 	// Make sure connection is closed.
 	closeConnection(NO_CLEANUP);
@@ -102,9 +106,13 @@ int Downloader::beginDownloading(const char *url, MAHandle placeholder)
 	return 1;
 }
 
-void Downloader::cancelDownloading()
+int Downloader::cancelDownloading()
 {
-	ASSERT_MSG(mIsDownloading, "Inactive download cancelled.");
+	if ( !mIsDownloading )
+	{
+		// Inactive download cancelled.
+		return CONNERR_NO_ACTIVE_DOWNLOAD;
+	}
 
 	closeConnection(CLEANUP);
 
@@ -113,6 +121,7 @@ void Downloader::cancelDownloading()
 	{
 		mDownloadListeners[i]->downloadCancelled(this);
 	}
+	return 1;
 }
 
 void Downloader::fireFinishedDownloading(MAHandle handle)
@@ -239,11 +248,17 @@ void Downloader::fireNotifyProgress(int dataOffset, int contentLength)
 }
 
 /**
- * Delegate handling to reader.
+ * Delegate handling to reader. If can fire reader unavailable error if the
+ * reader was deleted.
  */
 void Downloader::connRecvFinished(Connection* conn, int result)
 {
-	ASSERT_MSG(mReader, "Downloader has no reader.");
+	if ( !mReader )
+	{
+		// Downloader has no reader.
+		fireError(CONNERR_READER_UNAVAILABLE);
+		return;
+	}
 
 	mReader->connRecvFinished(conn, result);
 }
@@ -275,7 +290,7 @@ ImageDownloader::~ImageDownloader()
  * Return the image handle of the downloader.
  * The caller of this method should fire an error to listeners.
  * @return The image handle (> 0) if successful, 0 if there is
- * an error (out of memory).
+ * an error (out of memory, or reader unavailable).
  */
 MAHandle ImageDownloader::getHandle()
 {
@@ -285,7 +300,12 @@ MAHandle ImageDownloader::getHandle()
 		return mImagePlaceholder;
 	}
 
-	ASSERT_MSG(mReader, "Downloader has no reader.");
+	if ( !mReader )
+	{
+		// Downloader has no reader.
+		fireError(CONNERR_READER_UNAVAILABLE);
+		return 0;
+	}
 
 	// If the image is not created, we do so now.
 	int res = maCreateImageFromData(
