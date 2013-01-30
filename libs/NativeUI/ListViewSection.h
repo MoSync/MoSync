@@ -132,7 +132,7 @@ namespace NativeUI
 
 		/**
 		 * Set the section header text.
-		 * Platform: iOS and Windows Phone 7.
+		 * Platform: iOS, Android and Windows Phone 7.
 		 * @param headerText The given header text.
 		 */
 		void setHeaderText(const MAUtil::String& headerText);
@@ -148,6 +148,8 @@ namespace NativeUI
 		 * Set the section footer text.
 		 * Platform: iOS, Android and Windows Phone 7.
 		 * @param footerText The given footer text.
+		 * Note: On Android you can set this to am empty string
+		 * for the header area to be removed.
 		 */
 		void setFooterText(const MAUtil::String& footerText);
 
@@ -218,8 +220,7 @@ namespace NativeUI
         /**
          * Set the font size in points of the footer text.
          * Platform: Android and Windows Phone 7.
-         * @param size A float that specifies the number of pixels for Android
-         * and WP7, and number of points for iOS.
+         * @param size A float that specifies the number of pixels.
          * @return Any of the following result codes:
          * - #MAW_RES_OK if the property could be set.
          * - #MAW_RES_INVALID_PROPERTY_VALUE if the size value was invalid.
