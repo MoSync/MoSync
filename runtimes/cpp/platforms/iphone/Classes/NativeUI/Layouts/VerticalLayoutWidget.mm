@@ -94,8 +94,9 @@
  */
 - (CGSize)sizeThatFitsForWidget
 {
+    AbstractLayoutView* alv = (AbstractLayoutView*)self.view;
     float maxWidth = 0.0;
-    float countHeight = 0.0;
+    float countHeight = ([alv getTopMargin] + [alv getBottomMargin]);
     for (IWidget* child in _children)
     {
         countHeight += child.height;

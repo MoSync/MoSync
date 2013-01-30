@@ -63,6 +63,8 @@
         return MAW_RES_ERROR;
     }
 
+    child.isMainWidget = TRUE;
+
 	[super addChild:child toSubview:YES];
     [self layout];
     return MAW_RES_OK;
@@ -87,6 +89,17 @@
 }
 
 /**
+ * Remove a child from the widget.
+ * The child's view will be removed its superview.
+ * @param child Widget to remove.
+ */
+- (void)removeChild: (IWidget*)child
+{
+    child.isMainWidget = FALSE;
+    [super removeChild:child];
+}
+
+/**
  * Set child's size.
  */
 -(void) layout
@@ -98,8 +111,6 @@
     }
 
     IWidget* child = [_children objectAtIndex:0];
-    child.autoSizeHeight = WidgetAutoSizeFixed;
-    child.autoSizeWidth = WidgetAutoSizeFixed;
     child.size = self.size;
 }
 
