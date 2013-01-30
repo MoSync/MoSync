@@ -148,6 +148,8 @@ namespace NativeUI
 	 * Set the section footer text.
 	 * Platform: iOS, Android and Windows Phone 7.
 	 * @param footerText The given footer text.
+	 * Note: On Android you can set this to am empty string
+	 * for the header area to be removed.
 	 */
 	void ListViewSection::setFooterText(
 		const MAUtil::String& footerText)
