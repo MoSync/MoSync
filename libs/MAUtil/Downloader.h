@@ -190,8 +190,10 @@ namespace MAUtil {
 		/**
 		 * Function to cancel the current download.
 		 * Do cleanup and send downloadCancelled to listeners.
+		 * \return \>0 on success, or \link #CONNERR_NO_ACTIVE_DOWNLOAD CONNERR \endlink
+		 * code if there is no active download.
 		 */
-		virtual void cancelDownloading();
+		virtual int cancelDownloading();
 
 		/**
 		 * Function to retrieve if the Downloader is currently

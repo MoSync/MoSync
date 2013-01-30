@@ -31,6 +31,7 @@
 @synthesize view = _view;
 @synthesize parent = _parent;
 @synthesize handle = _handle;
+@synthesize isMainWidget = _isMainWidget;
 @synthesize autoSizeWidth = _autoSizeWidth;
 @synthesize autoSizeHeight = _autoSizeHeight;
 
@@ -45,6 +46,7 @@
     {
         _parent = nil;
         _children = [[NSMutableArray alloc] init];
+        _isMainWidget = FALSE;
         self.autoSizeHeight = WidgetAutoSizeFixed;
         self.autoSizeWidth = WidgetAutoSizeFixed;
     }

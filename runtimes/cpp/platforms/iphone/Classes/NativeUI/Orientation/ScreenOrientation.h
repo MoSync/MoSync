@@ -49,6 +49,12 @@
      * Store the current screen orientation.
      */
     UIInterfaceOrientation mCurrentScreenOrientation;
+
+	/**
+	 * A bit mask that represents the supported screen orientation.
+	 * Used in iOS 6.0 and later.
+	 */
+	UIInterfaceOrientationMask mSupportedOrientations;
 }
 
 /**
@@ -129,5 +135,13 @@
  * - MA_SCREEN_ORIENTATION_LANDSCAPE_RIGHT
  */
 -(int) getCurrentScreenOrientation;
+
+
+/**
+ * Get the supported orientations.
+ * Used in iOS 6.0 and later.
+ * @return A bit mask specifying which orientations are supported.
+ */
+- (UIInterfaceOrientationMask)supportedInterfaceOrientations;
 
 @end

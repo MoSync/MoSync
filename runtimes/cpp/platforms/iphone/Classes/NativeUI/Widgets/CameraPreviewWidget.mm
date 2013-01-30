@@ -35,7 +35,7 @@
     {
         self.view = [[[UIPreview alloc] initWithCameraWidget:self] autorelease];
     }
-	return [super init];
+	return self;
 }
 
 - (void)dealloc

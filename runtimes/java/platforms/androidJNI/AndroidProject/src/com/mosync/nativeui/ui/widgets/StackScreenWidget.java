@@ -93,6 +93,7 @@ public class StackScreenWidget extends ScreenWidget
 		m_screenStack.push( screen );
 		getView( ).removeAllViews( );
 		//getView( ).addView( screen.getView( ) );
+		screen.getRootView( ).clearFocus();
 		getView( ).addView( screen.getRootView( ) );
 	}
 
@@ -143,6 +144,7 @@ public class StackScreenWidget extends ScreenWidget
 		ScreenWidget previousScreen = m_screenStack.peek( );
 		if( previousScreen != null )
 		{
+			previousScreen.getView( ).clearFocus();
 			getView( ).addView( previousScreen.getView( ) );
 		}
 	}

@@ -376,7 +376,13 @@ public:
 			maDestroyObject(mLastEnc);
 		}
 		mLastEnc = maCreatePlaceholder();
-		maCameraSnapshot(mCameraFormat, mLastEnc);
+		int snapshotResult = maCameraSnapshot(mCameraFormat, mLastEnc);
+		if (snapshotResult < 0)
+		{
+			// An error occurred while taking the snapshot.
+			maDestroyPlaceholder(mLastEnc);
+			mLastEnc = 0;
+		}
 		setupCameraProperties();
 		maCameraStart();
 	}

@@ -68,7 +68,7 @@
 }
 
 - (int) getTopMargin{
-	return topMargin;;
+	return topMargin;
 }
 
 - (int) getBottomMargin {
@@ -238,7 +238,7 @@ MAKE_UIWRAPPER_LAYOUTING_IMPLEMENTATION(MoSync, HLayoutView)
 
     // If the widget has parent and if at least one of its auto size params is wrap content,
     // then ask the parent to layout itself.
-    if (self.parent &&
+    if (self.parent && (!self.isMainWidget) &&
         (self.parent.autoSizeWidth != WidgetAutoSizeFixed ||
          self.parent.autoSizeHeight != WidgetAutoSizeFixed))
     {
