@@ -570,7 +570,17 @@ public class ListViewSection extends Layout
 		}
 		else
 		{
-			// Just update the footer text,supopsing it was not previously removed.
+			// Add a footer row if it was previously removed.
+			if (!mHasFooter)
+			{
+				mHasFooter = true;
+				addSectionFooter();
+				// Notify list adapter.
+				if (mAdapterListener != null)
+					mAdapterListener.itemAdded(
+							mItems.get(mItems.size()-1), this, mItems.size()-1);
+			}
+
 			mItems.get(mItems.size()-1).setProperty(
 					IX_WIDGET.MAW_LIST_VIEW_ITEM_TEXT, text);
 		}
