@@ -88,7 +88,7 @@ namespace MAUtil {
 
 	String longToString(long long l, int base) {
 		char cBuf[128];
-                return ltoa(l, cBuf, base);
+                return lltoa(l, cBuf, base);
 	}
 
 	long long stringToLong(const String &s, int base) {
