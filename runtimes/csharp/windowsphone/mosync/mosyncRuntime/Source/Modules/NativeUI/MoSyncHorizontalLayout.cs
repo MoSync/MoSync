@@ -136,11 +136,8 @@ namespace MoSync
                         }
                         else
                         {
-                            // TODO this is confusing as hell :) test it on some more cases before commit
                             // Date: 27-jan-2013 11:18PM (this is a successfull attempt for fixing
                             // http://jira.mosync.com/browse/MOSYNC-2725
-                            // PS: Can't recall the reasons I added this line of code BUT it still
-                            // needs some testing on more complex apps.
 
                             if (!(0 >= mPaddingLeft || 0 >= mPaddingRight))
                                 setPaddingSpacers(1, GridUnitType.Auto);
