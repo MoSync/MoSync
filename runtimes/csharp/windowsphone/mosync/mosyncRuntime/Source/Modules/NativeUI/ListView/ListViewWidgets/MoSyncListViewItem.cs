@@ -234,7 +234,14 @@ namespace MoSync
                 }
                 set
                 {
-                    mGrid.Width = value;
+                    if (value > 0)
+                    {
+                        mGrid.Width = value;
+                    }
+                    else
+                    {
+                        base.Width = value;
+                    }
                 }
             }
 
