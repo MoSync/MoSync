@@ -517,7 +517,7 @@ JSExtensionModule::~JSExtensionModule() {
 char* Allocator::request(int size) {
 	// Ok, we might want to just skip this alignment thing
 	// and start allocing right away instead...
-	if (mOffset + size >= 0) {
+	if (mOffset + size >= 256) {
 		// 256 is the 'magic' stack size;
 		// after that we will allocate from the heap
 		if (!mAllocations) {
