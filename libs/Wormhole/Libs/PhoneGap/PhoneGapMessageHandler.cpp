@@ -503,22 +503,6 @@ namespace Wormhole
 		script += ",'" + args + "'";
 		script += ",'" + keepCallbackStr + "'";
 
-		// script += "'{";
-		// script += "\"status\":" + status;
-		// script += ",\"message\":" + args;
-
-		// if (keepCallback)
-		// {
-		// 	script += ",\"keepCallback\":true";
-		// }
-
-		// script += "}'";
-
-		// if (castFunction.size() > 0)
-		// {
-		// 	script += ",'" + castFunction + "'";
-		// }
-
 		script += ")";
 
 		callJS(script);
