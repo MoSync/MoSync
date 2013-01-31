@@ -103,6 +103,7 @@ void ListScreen::createMainLayout() {
 			itemText += MAUtil::integerToString(j);
 			item->setText(itemText);
 			item->setSubtitle("subtitle " + MAUtil::integerToString(j));
+			item->fillSpaceHorizontally();
 			section->addItem(item);
 		}
 
