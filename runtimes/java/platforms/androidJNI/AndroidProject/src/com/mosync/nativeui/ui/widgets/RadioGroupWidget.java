@@ -105,6 +105,8 @@ public class RadioGroupWidget extends Widget
 			return IX_WIDGET.MAW_RES_INVALID_LAYOUT;
 		}
 
+		addButton((RadioButtonWidget) child);
+
 		return IX_WIDGET.MAW_RES_OK;
 	}
 
@@ -128,8 +130,9 @@ public class RadioGroupWidget extends Widget
 		}
 		else if( property.equals( IX_WIDGET.MAW_RADIO_GROUP_ADD_VIEW ) )
 		{
-			// TODO get RadioButtonWidget from widgetHandle (IntConverter.convert(value)).
-//			addButton(IntConverter.convert(value));
+			IntConverter.convert(value);
+			// Deprecated. Use maWidgetAddChild instead.
+			return false;
 		}
 		else
 		{

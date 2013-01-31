@@ -1337,8 +1337,8 @@ public class MoSyncThread extends Thread implements MoSyncContext
 
 			if(i >= count*2)
 				break;
-			xa = vertices[i++];
-			ya = vertices[i++];
+			xb = vertices[i++];
+			yb = vertices[i++];
 			path.moveTo(xa,ya);
 			path.lineTo(xc,yc);
 			path.lineTo(xb,yb);

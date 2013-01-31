@@ -697,7 +697,12 @@ interface MAAPI {
 		NOTFOUND = -17;
 		/// An error occurred during SSL negotiation.
 		SSL = -18;
-
+		/// A download is already in progress.
+		DOWNLOAD_IN_PROGRESS = -19;
+		/// There is no active download.
+		NO_ACTIVE_DOWNLOAD = -20;
+		// Downloader has no available reader. This happens after the connection is closed.
+		READER_UNAVAILABLE = -21;
 		/**
 		* If you wish to share the CONNERR codespace,
 		* use values below this for your own error codes.

@@ -80,7 +80,7 @@ void packageIOS(const SETTINGS& s, const RuntimeInfo& ri) {
 			std::ostringstream iconInjectCmd;
 			string size = sizes[i];
 			string outputIcon = xcodeprojOutput + "/" + filenames[i];
-			injectIcon("iOS", size.c_str(), s.icon, outputIcon.c_str(), s.silent, false);
+			injectIcon("iOS", size.c_str(), s.icon, outputIcon.c_str(), s.silent, true);
 		}
 	}
 

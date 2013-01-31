@@ -38,6 +38,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <CoreMedia/CoreMedia.h>
 #include <sys/types.h> //
 #include <sys/sysctl.h>//to retrieve device model
+#include <sys/xattr.h>
 
 #include <helpers/CPP_IX_GUIDO.h>
 //#include <helpers/CPP_IX_ACCELEROMETER.h>
@@ -1190,29 +1191,36 @@ namespace Base {
             return MA_FERR_NOTFOUND;
         }
 
+        int returnValue = 0;
         switch (property) {
             case MA_FPROP_IS_BACKED_UP:
             {
-                BOOL exclude = (value == 0);
-                BOOL set = [url setResourceValue: [NSNumber numberWithBool:exclude] forKey:NSURLIsExcludedFromBackupKey error:NULL];
-
-                if(set)
+                if (&NSURLIsExcludedFromBackupKey == nil)
                 {
-                    return 0;
+                    // For iOS <= 5.0.1.
+                    const char* filePath = [[url path] fileSystemRepresentation];
+                    const char* attrName = "com.apple.MobileBackup";
+                    u_int8_t attrValue = 1;
+                    int result = setxattr(filePath, attrName, &attrValue, sizeof(attrValue), 0, 0);
+                    returnValue = (result == 0) ? 0 : MA_FERR_GENERIC;
                 }
                 else
                 {
-                    return MA_FERR_GENERIC;
+                    // For iOS >= 5.1
+                    NSNumber* value = [NSNumber numberWithBool:(value == 0)];
+                    BOOL set = [url setResourceValue:value forKey:NSURLIsExcludedFromBackupKey error:NULL];
+                    returnValue = set ? 0 : MA_FERR_GENERIC;
                 }
             }
             break;
 
             default:
             {
-                return MA_FERR_NO_SUCH_PROPERTY;
+                returnValue = MA_FERR_NO_SUCH_PROPERTY;
             }
             break;
         }
+        return returnValue;
     }
 
 	static AVAudioPlayer* sSoundPlayer = NULL;
@@ -1825,7 +1833,11 @@ namespace Base {
 			UIView *newView = widget.view;
 
 			CameraInfo *info = getCurrentCameraInfo();
-
+            if (!info)
+            {
+                // Camera is not available.
+                return MA_CAMERA_RES_FAILED;
+            }
 			if( !info->previewLayer )
 			{
 				info->previewLayer = [[AVCaptureVideoPreviewLayer alloc] initWithSession:info->captureSession];
@@ -1901,6 +1913,11 @@ namespace Base {
 	{
 		@try {
 			CameraInfo *info = getCurrentCameraInfo();
+            if (!info)
+            {
+                // Camera is not available.
+                return MA_CAMERA_RES_FAILED;
+            }
 
 			AVCaptureConnection *videoConnection =	[info->stillImageOutput.connections objectAtIndex:0];
 			if ([videoConnection isVideoOrientationSupported])
@@ -1936,11 +1953,17 @@ namespace Base {
 		@try {
 			int result = 0;
 			CameraInfo *info = getCurrentCameraInfo();
-			NSString *propertyString = [NSString stringWithUTF8String:property];
-			NSString *valueString = [NSString stringWithUTF8String:value];
-			result = [gCameraConfigurator	setCameraProperty: info->device
-										withProperty: propertyString
-										   withValue: valueString];
+            if (!info)
+            {
+                // Camera is not available.
+                return MA_CAMERA_RES_FAILED;
+            }
+
+			NSString *propertyString = [[NSString alloc] initWithUTF8String:property];
+			NSString *valueString = [[NSString alloc] initWithUTF8String:value];
+			result = [gCameraConfigurator setCameraProperty: info->device
+                                               withProperty: propertyString
+                                                  withValue: valueString];
 			[propertyString release];
 			[valueString release];
 			return result;
@@ -1953,13 +1976,20 @@ namespace Base {
 	SYSCALL(int, maCameraGetProperty(const char *property, char *value, int maxSize)) //@property the property to get (string), @value will contain the value of the property when the func returns, @maxSize the size of the value buffer
 	{
 		@try {
-			NSString *propertyString = [NSString stringWithUTF8String:property];
+			NSString *propertyString = [[NSString alloc ] initWithUTF8String:property];
 			CameraConfirgurator *configurator = [[CameraConfirgurator alloc] init];
 			CameraInfo *info = getCurrentCameraInfo();
-			NSString* retval = [configurator	getCameraProperty:info->device
-												  withProperty:propertyString];
+            if (!info)
+            {
+                // Camera is not available.
+                return MA_CAMERA_RES_FAILED;
+            }
 
-			if(retval == nil) return -2;
+			NSString* retval = [[configurator getCameraProperty:info->device withProperty:propertyString] retain];
+			if(!retval)
+            {
+                return MA_CAMERA_RES_FAILED;
+            }
 			int length = maxSize;
 			int realLength = [retval length];
 			if(realLength > length) {

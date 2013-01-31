@@ -6,3 +6,5 @@ description = A standard ANSI C project template consisting of a main file with 
 main.c
 
 [Settings]
+build.prefs:gcc.warnings/Debug=10
+build.prefs:gcc.warnings/Release=10

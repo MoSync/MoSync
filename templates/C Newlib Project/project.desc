@@ -24,3 +24,5 @@ build.prefs:memory.heap/Debug=1536
 build.prefs:memory.heap/Release=1536
 build.prefs:memory.stack/Debug=256
 build.prefs:memory.stack/Release=256
+build.prefs:gcc.warnings/Debug=10
+build.prefs:gcc.warnings/Release=10
