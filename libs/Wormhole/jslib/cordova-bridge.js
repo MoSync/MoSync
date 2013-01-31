@@ -23,17 +23,26 @@ MA 02110-1301, USA.
  * Glue between Cordova and the MoSync Wormhole bridge.
  */
 
-mosync.bridge.PhoneGap = {};
+mosync.bridge.cordova = {};
 
 /**
- * sends a message through bridge as a PhoneGap message
+ * We override the JSON.parse function because it does not work properly on all phones.
+ */
+JSON.parse = function(JSONDocument)
+{
+	var parsedObject = eval('(' + JSONDocument + ')');
+	return parsedObject;
+};
+
+/**
+ * sends a message through bridge as a Cordova message
  *
- * @param callbackId ID of the PhoneGap Callback to be used
- * @param service name of the PhoneGap Service
+ * @param callbackId ID of the Cordova Callback to be used
+ * @param service name of the Cordova Service
  * @param action action name for the specified service
  * @param args extra arguments as JSON
  */
-mosync.bridge.PhoneGap.send = function(callbackId, service, action, args)
+mosync.bridge.cordova.send = function(callbackId, service, action, args)
 {
 	//Generate a MoSync Message from the Cordova command
 	var command = {

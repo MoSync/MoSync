@@ -116,7 +116,7 @@ namespace Wormhole
 	 */
 	void PhoneGapMessageHandler::initializePhoneGap()
 	{
-		callJS("try{PhoneGap.onNativeReady.fire()}catch(e){_nativeReady=true}");
+		callJS("try{cordova.require('cordova/channel').onNativeReady.fire();}catch(e){window._nativeReady=true;}");
 	}
 
 	/**
@@ -332,13 +332,13 @@ namespace Wormhole
 
 		// Send the result back to PhoneGap.
 		sprintf(buffer,
-			"\\'{"
+			"{"
 				"\"platform\":\"%s\","
 				"\"name\":\"%s\","
 				"\"uuid\":\"%s\","
 				"\"version\":\"%s\","
 				"\"phonegap\":\"1.2.0\""
-			"}\\'",
+			"}",
 			deviceOS,
 			deviceName,
 			deviceUUID,
@@ -425,8 +425,9 @@ namespace Wormhole
 		)
 	{
 		callCallback(
-			"PhoneGap.CallbackSuccess",
+			"cordova.callbackFromNative",
 			callbackID,
+			true,
 			status,
 			args,
 			keepCallback,
@@ -462,8 +463,9 @@ namespace Wormhole
 			",\"message\":\"" + err + "\"}";
 
 		callCallback(
-			"PhoneGap.CallbackError",
+			"cordova.callbackFromNative",
 			callbackID,
+			false,
 			PHONEGAP_CALLBACK_STATUS_ERROR,
 			args,
 			keepCallback);
@@ -483,6 +485,7 @@ namespace Wormhole
 	void PhoneGapMessageHandler::callCallback(
 		const String& callbackFunction,
 		const String& callbackID,
+		bool success,
 		const MAUtil::String& status,
 		const String& args,
 		bool keepCallback,
@@ -490,25 +493,31 @@ namespace Wormhole
 		)
 	{
 		// Generate JavaScipt code.
+		String successStr = (success ? "true" : "false");
+		String keepCallbackStr = (keepCallback ? "true" : "false");
 
 		String script = callbackFunction + "(";
 		script += "'" + callbackID + "'";
+		script += ",'" + successStr + "'";
+		script += ",'" + status + "'";
+		script += ",'" + args + "'";
+		script += ",'" + keepCallbackStr + "'";
 
-		script += ",'{";
-		script += "\"status\":" + status;
-		script += ",\"message\":" + args;
+		// script += "'{";
+		// script += "\"status\":" + status;
+		// script += ",\"message\":" + args;
 
-		if (keepCallback)
-		{
-			script += ",\"keepCallback\":true";
-		}
+		// if (keepCallback)
+		// {
+		// 	script += ",\"keepCallback\":true";
+		// }
 
-		script += "}'";
+		// script += "}'";
 
-		if (castFunction.size() > 0)
-		{
-			script += ",'" + castFunction + "'";
-		}
+		// if (castFunction.size() > 0)
+		// {
+		// 	script += ",'" + castFunction + "'";
+		// }
 
 		script += ")";
 

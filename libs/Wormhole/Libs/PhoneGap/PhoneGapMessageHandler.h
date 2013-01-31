@@ -210,6 +210,7 @@ namespace Wormhole
 		virtual void PhoneGapMessageHandler::callCallback(
 			const MAUtil::String& callbackFunction,
 			const MAUtil::String& callbackID,
+			bool success,
 			const MAUtil::String& status,
 			const MAUtil::String& args,
 			bool keepCallback = false,

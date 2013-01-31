@@ -886,8 +886,9 @@ namespace Wormhole
 			",\"target\":\"" + targetURI + "\"}";
 
 		mMessageHandler->callCallback(
-			"PhoneGap.CallbackError",
+			"cordova.callbackFromNative",
 			callbackID,
+			false,
 			PHONEGAP_CALLBACK_STATUS_ERROR,
 			args,
 			false); // Don't keep callback.
