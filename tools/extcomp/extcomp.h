@@ -40,5 +40,7 @@ string getModHashDefine(Interface& ext);
 bool isReturnType(Interface&, string&);
 string extractPointerType(string type, int& ptrDepth);
 Struct* getStruct(Interface& ext, string& structType);
+int getPadding(Interface& ext, string& type);
+size_t cTypeAlignedSize(Interface& ext, string& type);
 
 #endif /* EXTCOMP_H_ */

@@ -180,8 +180,9 @@ void writeAndroidStubs(string& outputDir, Interface& ext, string& androidPackage
 			string ctype = m.pod[0].type;
 			string name = m.pod[0].name;
 			string cast = toAndroidType(ext, ctype, true, false);
-			structFile << "\t\ts." << name << " = (" << cast << ")__" << name << ".unmarshal(data, offset + " << size << ");\n";
-			size += cTypeSize(ext, ctype);
+			int padding = getPadding(ext, ctype);
+			structFile << "\t\ts." << name << " = (" << cast << ")__" << name << ".unmarshal(data, offset + " << (size + padding) << ");\n";
+			size += cTypeAlignedSize(ext, ctype);
 		}
 		structFile << "\t\treturn s;\n";
 		structFile << "\t}\n\n";
@@ -195,8 +196,9 @@ void writeAndroidStubs(string& outputDir, Interface& ext, string& androidPackage
 			string ctype = m.pod[0].type;
 			string name = m.pod[0].name;
 			string cast = toAndroidType(ext, ctype, true, false);
-			structFile << "\t\t__" << name << ".marshal(s." << name << ", data, offset + " << size << ");\n";
-			size += cTypeSize(ext, ctype);
+			int padding = getPadding(ext, ctype);
+			structFile << "\t\t__" << name << ".marshal(s." << name << ", data, offset + " << (size + padding) << ");\n";
+			size += cTypeAlignedSize(ext, ctype);
 		}
 		structFile << "\t}\n\n";
 

@@ -82,15 +82,15 @@ void writeJSBridge(string& outputfile, Interface& ext) {
 		}
 		string resultVar = isReturnType(ext, f.returnType) ? "r.result" : "null";
 		string outVar = outParamCount ? "r.out" : "null";
-		extensionFile << "mosync.bridge.send(args, function(r) { if (typeof fnc != 'undefined') { fnc(" << resultVar << "," << outVar <<  ")}});};\n";
+		extensionFile << "mosync.bridge.send(args, function(r) { if (typeof fnc !== 'undefined') { fnc(" << resultVar << "," << outVar <<  ")}});};\n";
 
 		// Self-executing initializer.
 		extensionFile << "(function() {\n";
 		extensionFile << "var initArgs = [";
 		extensionFile << "\"Extension\",";
-		extensionFile << "\"*" << extname << "\",";
+		extensionFile << "\"*" << extname << "\",\"";
 		streamExtHashValue(extensionFile, ext);
-		extensionFile << "," << i << "];\n";
+		extensionFile << "\"," << i << "];\n";
 
 		extensionFile << "initArgs.push(\"";
 		for (size_t j = 0; j < f.args.size(); j++) {
@@ -103,7 +103,7 @@ void writeJSBridge(string& outputfile, Interface& ext) {
 		argTypes.push_back(f.returnType);
 		argDirs.push_back(true);
 
-		string argTypeDesc = getJSTypeDesc(ext, argNames, argTypes, &argDirs, structIdMap, typeDescs);
+		string argTypeDesc = getJSTypeDesc(ext, argNames, argTypes, &argDirs, structIdMap, typeDescs, true);
 		extensionFile << argTypeDesc << "\");";
 
 		for (size_t j = 0; j < typeDescs.size(); j++) {
@@ -128,7 +128,7 @@ void generateArrayMarshalling(ostream& extensionFile, Interface& ext, string& ar
 	int throwAway;
 	string scalarType = extractPointerType(arrayType, throwAway);
 	extensionFile << "if (Array.isArray(" << arrayName << ")) {\n";
-	extensionFile << "args.push(" << arrayName << ".length);\n";
+	extensionFile << "args.push((" << arrayName << " || []).length);\n";
 	extensionFile << "for (var i" << ptrDepth << " = 0; i" << ptrDepth << " < " << arrayName << ".length; i" << ptrDepth << "++) {\n";
 	extensionFile << "var " << subArrayVar << " = " << arrayName << "[i" << ptrDepth << "];\n";
 	generateArrayMarshalling(extensionFile, ext, subArrayVar, arrayType, ptrDepth - 1);
@@ -137,7 +137,7 @@ void generateArrayMarshalling(ostream& extensionFile, Interface& ext, string& ar
 	}
 	extensionFile << "}";
 	extensionFile << "} else {\n";
-	extensionFile << "args.push(1);\n";
+	extensionFile << "args.push((!" << arrayName << "?0:1));\n";
 	generateArrayMarshalling(extensionFile, ext, arrayName, arrayType, ptrDepth - 1);
 	if (ptrDepth == 1) {
 		generateMarshalling(extensionFile, ext, arrayName, scalarType);
@@ -148,14 +148,13 @@ void generateArrayMarshalling(ostream& extensionFile, Interface& ext, string& ar
 void generateStructMarshalling(ostream& extensionFile, Interface& ext, string& varName, string& structType) {
 	Struct* s = getStruct(ext, structType);
 	if (s) {
+		extensionFile << "if (!" << varName << "){" << varName << " = {};}";
 		for (size_t i = 0; i < s->members.size(); i++) {
 			Member m = s->members[i];
 			string name = m.pod[0].name;
 			string fieldAccess = varName + "." + name;
 			generateMarshalling(extensionFile, ext, fieldAccess, m.pod[0].type);
-			extensionFile << "\n";
 		}
-
 	}
 }
 
@@ -169,14 +168,22 @@ void generateMarshalling(ostream& extensionFile, Interface& ext, string& name, s
 		generateStructMarshalling(extensionFile, ext, name, type);
 	} else {
 		if (stringType) {
-			extensionFile << "args.push(mosync.encoder.lengthAsUTF8(" << name << "));";
+			extensionFile << "args.push(!" << name << "?-1:mosync.encoder.lengthAsUTF8(" << name << "));";
 		}
 		// Primitive
-		extensionFile << "args.push(" << name << ");";
+		extensionFile << "args.push(" << name << " || " << getJSDefaultValue(scalarType) << ");";
 	}
 }
 
-string getJSTypeDesc(Interface& ext, vector<string>& names, vector<string>& types, vector<bool>* dirs, map<string, int>& structIdMap, vector<string>& typeDescs) {
+string getJSDefaultValue(string scalarType) {
+	if ("char" == scalarType) {
+		return "\"\"";
+	}
+	// All others are numbers.
+	return "0";
+}
+
+string getJSTypeDesc(Interface& ext, vector<string>& names, vector<string>& types, vector<bool>* dirs, map<string, int>& structIdMap, vector<string>& typeDescs, bool argList) {
 	string typeDesc;
 	for (size_t i = 0; i < types.size(); i++) {
 		string t = types[i];
@@ -216,14 +223,14 @@ string getJSTypeDesc(Interface& ext, vector<string>& names, vector<string>& type
 							structTypes.push_back(m.pod[0].type);
 							structNames.push_back(m.pod[0].name);
 						}
-						string typeDesc = getJSTypeDesc(ext, structNames, structTypes, NULL, structIdMap, typeDescs);
+						string typeDesc = getJSTypeDesc(ext, structNames, structTypes, NULL, structIdMap, typeDescs, false);
 						typeDescs.push_back(typeDesc);
 					}
 				}
 			}
 			int id = structIdMap[type];
 			ostringstream result;
-			result << id << (out ? "?" : "!");
+			result << id << (out ? "?" : "!") << (argList && ptrDepth == 0 ? "." : "");
 			typeDesc.append(result.str());
 		}
 		for (int i = 0; i < ptrDepth; i++) {

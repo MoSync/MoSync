@@ -30,7 +30,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 using namespace std;
 
 void writeJSBridge(string&, Interface&);
-string getJSTypeDesc(Interface& ext, vector<string>& names, vector<string>& types, vector<bool>* dirs, map<string, int>& structIdMap, vector<string>& typedescs);
+string getJSTypeDesc(Interface& ext, vector<string>& names, vector<string>& types, vector<bool>* dirs, map<string, int>& structIdMap, vector<string>& typedescs, bool argList);
+string getJSDefaultValue(string scalarType);
 void generateArrayMarshalling(ostream& extensionFile, Interface& ext, string& arrayName, string& arrayType, int ptrDepth);
 void generateStructMarshalling(ostream& extensionFile, Interface& ext, string& varName, string& varType);
 void generateMarshalling(ostream& extensionFile, Interface& ext, string& varName, string& varType);

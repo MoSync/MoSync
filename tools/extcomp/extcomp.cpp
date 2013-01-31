@@ -200,7 +200,7 @@ void writeHeaders(string& headerOut, Interface& ext, bool includeFunctions) {
 			Member m = s.members[j];
 			headerfile << "\t" << m.pod[0].type << " " << m.pod[0].name << ";\n";
 		}
-		headerfile << "} " << s.name << ";\n\n";
+		headerfile << "} __attribute__ ((aligned(4))) " << s.name << ";\n\n";
 	}
 
 	for (size_t i = 0; includeFunctions && i < ext.functions.size(); i++) {
@@ -347,6 +347,38 @@ Struct* getStruct(Interface& ext, string& structType) {
 		}
 	}
 	return NULL;
+}
+
+int getPadding(Interface& ext, string& type) {
+	string resolvedType = resolveTypedef(ext, type);
+	Struct* s = getStruct(ext, resolvedType);
+	// Structs are already properly aligned!
+	return s ? 0 : cTypeAlignedSize(ext, type) - cTypeSize(ext, type);
+}
+
+size_t cTypeAlignedSize(Interface& ext, string& type) {
+	string resolvedType = resolveTypedef(ext, type);
+	Struct* s = getStruct(ext, resolvedType);
+	if (s) {
+		int size = 0;
+		for(size_t j = 0; j < s->members.size(); j++) {
+			Member m = s->members[j];
+			size_t max = 0;
+			for(size_t k=0; k<m.pod.size(); k++) {
+				PlainOldData pod = m.pod[k];
+				max = MAX(max, cTypeAlignedSize(ext, pod.type));
+				printf("MEMBER %s: %d\n", pod.name.c_str(), (int) max);
+			}
+			size += max;
+		}
+		printf("TYPE %s: %d\n", type.c_str(), (int) size);
+		return size;
+	} else {
+		size_t size = cTypeSize(ext, type);
+		size_t result = size % 4 ? size + (4 - size % 4) : size;
+		printf("TYPE %s: %d\n", type.c_str(), (int) result);
+		return result;
+	}
 }
 
 void streamInvokePrefix(ostream& stream, const Function& f) {

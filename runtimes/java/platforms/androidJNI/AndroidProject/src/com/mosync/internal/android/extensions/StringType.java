@@ -11,28 +11,26 @@ import com.mosync.internal.android.MoSyncThread;
 public class StringType extends TypeDescriptor {
 
 	private final static Charset UTF8 = Charset.forName("UTF-8");
-	private static StringType constInstance = new StringType(true);
-	private static StringType varInstance = new StringType(false);
+	private static StringType constInstance = new StringType(false);
+	private static StringType varInstance = new StringType(true);
 
 	public static TypeDescriptor getInstance(boolean out) {
 		return out ? varInstance : constInstance;
 	}
 
-	private boolean constant;
-
-	private StringType(boolean constant) {
-		this.constant = constant;
+	private StringType(boolean out) {
+		setOut(out);
 	}
 
 	@Override
 	public Class getNativeClass() {
-		return constant ? String.class : CString.class;
+		return isOut() ? CString.class : String.class;
 	}
 
 	@Override
 	public Object unmarshal(byte[] data, int offset) {
 		int charPtr = IntType.unmarshalInt(data, offset);
-		return constant ? unmarshalString(charPtr, -1) : new CStringImpl(charPtr);
+		return isOut() ? new CStringImpl(charPtr) : unmarshalString(charPtr, -1);
 	}
 
 	@SuppressLint("NewApi")

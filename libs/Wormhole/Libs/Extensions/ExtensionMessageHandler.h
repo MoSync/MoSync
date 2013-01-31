@@ -48,6 +48,35 @@ using namespace std;
 namespace Wormhole
 {
 	inline const char* getNext(MessageStream& stream, const char* w = NULL);
+	inline void marshalInt(char* buffer, int value);
+	inline void marshalPtr(char* buffer, char* value);
+	inline void marshalLong(char* buffer, long long value);
+	inline void marshalFloat(char* buffer, float value);
+	inline void marshalDouble(char* buffer, double value);
+	inline int unmarshalInt(char* buffer);
+	inline char* unmarshalPtr(char* buffer);
+	inline long long unmarshalLong(char* buffer);
+	inline float unmarshalFloat(char* buffer);
+	inline double unmarshalDouble(char* buffer);
+	inline char* pad(char* ptr);
+
+	class Allocator {
+	private:
+		char* mStack;
+		int mOffset;
+		MAUtil::Vector<char*>* mAllocations;
+	public:
+		/**
+		 * The stack allocated, initial buffer. Expected to be
+		 * exactly 256 bytes.
+		 */
+		Allocator(char* stack) : mStack(stack), mOffset(0), mAllocations(NULL) { }
+		virtual ~Allocator();
+		/**
+		 * Request memory.
+		 */
+		char* request(int size);
+	};
 
 	// TODO: Create abstract base class.
 	class JSMarshaller {
@@ -65,12 +94,12 @@ namespace Wormhole
 		JSMarshaller() : mIsArgList(false), mHasReturnValue(false), mHasOutValues(false) { };
 		virtual ~JSMarshaller();
 		void initialize(MessageStream& stream);
-		virtual int marshal(MessageStream& stream, char* buffer);
-		virtual int unmarshal(char* buffer, MAUtil::String& jsExpr);
-		int unmarshalArgList(char* buffer, MAUtil::String& jsExpr);
+		virtual void marshal(MessageStream& stream, char* buffer, Allocator* allocator);
+		virtual void unmarshal(char* buffer, MAUtil::String& jsExpr);
+		void unmarshalArgList(char* buffer, MAUtil::String& jsExpr);
 		virtual bool hasOutValues() { return mHasOutValues; }
 		void setName(MAUtil::String name) { mName = name; }
-		virtual int getDataOffset() { return 0; }
+		virtual int getBufferSize(bool aligned);
 		int getChildCount();
 		virtual const char* getType() { return mIsArgList ? "args" : "struct"; }
 	};
@@ -80,10 +109,10 @@ namespace Wormhole
 		JSMarshaller* mDelegate;
 	public:
 		JSArrayMarshaller(JSMarshaller* delegate) : JSMarshaller(), mDelegate(delegate) { };
-		virtual int marshal(MessageStream& stream, char* buffer);
-		virtual int unmarshal(char* buffer, MAUtil::String& jsExpr);
+		virtual void marshal(MessageStream& stream, char* buffer, Allocator* allocator);
+		virtual void unmarshal(char* buffer, MAUtil::String& jsExpr);
 		virtual bool hasOutValues();
-		virtual int getDataOffset();
+		virtual int getBufferSize(bool aligned);
 		virtual ~JSArrayMarshaller();
 		virtual const char* getType() { return (MAUtil::String("array: ") + mDelegate->getType()).c_str(); }
 	};
@@ -94,8 +123,9 @@ namespace Wormhole
 	public:
 		JSNumberMarshaller(char variant) : JSMarshaller(toupper(variant) != variant), mVariant(toupper(variant)) { };
 		virtual ~JSNumberMarshaller() { };
-		virtual int marshal(MessageStream& stream, char* buffer);
-		virtual int unmarshal(char* buffer, MAUtil::String& jsExpr);
+		virtual void marshal(MessageStream& stream, char* buffer, Allocator* allocator);
+		virtual void unmarshal(char* buffer, MAUtil::String& jsExpr);
+		virtual int getBufferSize(bool aligned);
 		virtual const char* getType() { return (MAUtil::String("number: ") + mVariant).c_str(); }
 	};
 
@@ -103,10 +133,22 @@ namespace Wormhole
 	public:
 		JSStringMarshaller(bool out) : JSMarshaller(out) { }
 		virtual ~JSStringMarshaller() { };
-		virtual int getDataOffset();
-		virtual int marshal(MessageStream& stream, char* buffer);
-		virtual int unmarshal(char* buffer, MAUtil::String& jsExpr);
+		virtual void marshal(MessageStream& stream, char* buffer, Allocator* allocator);
+		virtual void unmarshal(char* buffer, MAUtil::String& jsExpr);
+		virtual int getBufferSize(bool aligned);
 		virtual const char* getType() { return "string"; }
+	};
+
+	class JSIndirectMarshaller : public JSMarshaller {
+	private:
+		JSMarshaller* mDelegate;
+	public:
+		JSIndirectMarshaller(JSMarshaller* delegate) : JSMarshaller(delegate->hasOutValues()), mDelegate(delegate) { }
+		~JSIndirectMarshaller();
+		virtual void marshal(MessageStream& stream, char* buffer, Allocator* allocator);
+		virtual void unmarshal(char* buffer, MAUtil::String& jsExpr);
+		virtual int getBufferSize(bool aligned);
+		virtual const char* getType() { return (MAUtil::String("*") + mDelegate->getType()).c_str(); }
 	};
 
 	class JSRefMarshaller : public JSMarshaller {
@@ -116,9 +158,9 @@ namespace Wormhole
 	public:
 		JSRefMarshaller(int refId, MAUtil::Vector<JSMarshaller*>* refList, bool out) : JSMarshaller(out), mRefId(refId), mRefList(refList) { };
 		virtual ~JSRefMarshaller() { };
-		virtual int marshal(MessageStream& stream, char* buffer);
-		virtual int unmarshal(char* buffer, MAUtil::String& jsExpr);
-		virtual int getDataOffset();
+		virtual void marshal(MessageStream& stream, char* buffer, Allocator* allocator);
+		virtual void unmarshal(char* buffer, MAUtil::String& jsExpr);
+		virtual int getBufferSize(bool aligned);
 		virtual const char* getType() { return (MAUtil::String("ref") + MAUtil::integerToString(mRefId)).c_str(); }
 	};
 

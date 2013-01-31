@@ -28,10 +28,12 @@
 using namespace NativeUI;
 using namespace std;
 
+#define ALIGNMENT 0x4
+#define ALIGNMENT_MASK 0x3
+
 namespace Wormhole {
 bool ExtensionMessageHandler::handleMessage(Wormhole::MessageStream& stream) {
-	// TODO: Dynamic alloc?
-	char buffer[8192];
+	char stackBuffer[256];
 
 	// TODO: Optimize this so we don't have to do it *every* invocation!!!
 	const char* ext = getNext(stream);
@@ -57,23 +59,24 @@ bool ExtensionMessageHandler::handleMessage(Wormhole::MessageStream& stream) {
 		if (module) {
 			JSMarshaller* marshaller = module->getMarshaller(fnId);
 			if (marshaller) {
+				Allocator* allocator = new Allocator(stackBuffer);
 				// Values.
-				int size = marshaller->marshal(stream, buffer);
+				char* buffer = allocator->request(marshaller->getBufferSize(true));
+				marshaller->marshal(stream, buffer, allocator);
 
 				// And last, the callback id
 				int callbackId = MAUtil::stringToInteger(getNext(stream));
 
-				maExtensionFunctionInvoke2(module->getExtensionFunction(fnId), marshaller->getChildCount(), (int) &buffer);
-
-				MAUtil::String unmarshalled(3 * size); // <-- Some heuristics applied there
+				maExtensionFunctionInvoke2(module->getExtensionFunction(fnId), marshaller->getChildCount(), (int) buffer);
+				MAUtil::String unmarshalled(3 * marshaller->getBufferSize(true)); // <-- Just some heuristics.
 				marshaller->unmarshal(buffer, unmarshalled);
 
 				char* reply = (char*) malloc(unmarshalled.size() + 128);
-
 				sprintf(reply, "mosync.bridge.reply(%d, %s);", callbackId, unmarshalled.c_str());
 				maWriteLog(reply, strlen(reply));
 				mWebView->callJS(reply);
 				free(reply);
+				delete allocator;
 			} else {
 				maPanic(40075, "Unknown function id");
 			}
@@ -165,6 +168,11 @@ JSMarshaller* JSMarshaller::createMarshaller(const char* def, bool isArgList) {
 			case '*':
 				current = new JSArrayMarshaller(current);
 				break;
+			case '.':
+				// Structs in arg lists always have an extra
+				// layer of indirection
+				current = new JSIndirectMarshaller(current);
+				break;
 			case 'v':
 				hasReturnValue = false;
 				/* no break */
@@ -212,28 +220,40 @@ JSArrayMarshaller::~JSArrayMarshaller() {
 	}
 }
 
-int JSMarshaller::marshal(MessageStream& stream, char* buffer) {
+void JSMarshaller::marshal(MessageStream& stream, char* buffer, Allocator* allocator) {
 // TODO: Refactor arg list into separate class.
-	int dataStart = mIsArgList ? 4 * mList.size() : 0;
+	int dataStart = mIsArgList ? sizeof(int) * mList.size() : 0;
 	int offset = dataStart;
 	for (int i = 0; i < mList.size(); i++) {
 		JSMarshaller* marshaller = mList[i];
 		// Set the pointer
 		if (mIsArgList) {
-			// Please note that during marshalling, we need to offset a bit --
-			// some data types have meta data that should not be sent to the extension
-			((int*)buffer)[i] = ((int) buffer) + offset + marshaller->getDataOffset();
+			((int*)buffer)[i] = ((int) buffer) + offset;
 		}
 		// Then marshal stuff
-		printf("MARSHAL %d\n", i);
-		offset += marshaller->marshal(stream, (char*) ((int) buffer + offset));
+		if (!mIsArgList || !mHasReturnValue || i < mList.size() - 1) {
+			char* ptr = (char*) buffer + offset;
+			char* padded = pad(ptr);
+			marshaller->marshal(stream, mIsArgList ? ptr : padded, allocator);
+		}
+		offset += marshaller->getBufferSize(true);
 	}
-	return offset;
 }
 
-int JSMarshaller::unmarshal(char* buffer, MAUtil::String& jsExpr) {
+int JSMarshaller::getBufferSize(bool aligned) {
+	int result = 0;
+	for (int i = 0; i < mList.size(); i++) {
+		result += mList[i]->getBufferSize(aligned);
+	}
 	if (mIsArgList) {
-		return unmarshalArgList(buffer, jsExpr);
+		result += sizeof(int) * mList.size();
+	}
+	return result;
+}
+
+void JSMarshaller::unmarshal(char* buffer, MAUtil::String& jsExpr) {
+	if (mIsArgList) {
+		unmarshalArgList(buffer, jsExpr);
 	} else {
 		int offset = 0;
 		jsExpr += "{";
@@ -244,19 +264,22 @@ int JSMarshaller::unmarshal(char* buffer, MAUtil::String& jsExpr) {
 			JSMarshaller* marshaller = mList[i];
 			jsExpr += marshaller->mName;
 			jsExpr += ':';
-			offset += marshaller->unmarshal((char*) ((int) buffer + offset), jsExpr);
+			char* ptr = (char*) buffer + offset;
+			char* padded = pad(ptr);
+			printf("NAME: %s", marshaller->mName.c_str());
+			marshaller->unmarshal(padded, jsExpr);
+			offset += marshaller->getBufferSize(true);
 		}
 		jsExpr += "}";
-		return offset;
 	}
 }
 
-int JSMarshaller::unmarshalArgList(char* buffer, MAUtil::String& jsExpr) {
+void JSMarshaller::unmarshalArgList(char* buffer, MAUtil::String& jsExpr) {
 	// TODO: Again, refactor!
 	// Note: the args list is the only type with both in/out types.
 	if (!mHasOutValues && !mHasReturnValue) {
 		jsExpr += "null";
-		return 0;
+		return;
 	}
 
 	jsExpr += "{";
@@ -267,7 +290,7 @@ int JSMarshaller::unmarshalArgList(char* buffer, MAUtil::String& jsExpr) {
 		for (int i = 0; i < mList.size() - (mHasReturnValue ? 1 : 0); i++) {
 			JSMarshaller* marshaller = mList[i];
 			if (marshaller->hasOutValues()) {
-				char* ptr = (char*) ((int*)buffer)[i] - marshaller->getDataOffset();
+				char* ptr = unmarshalPtr(buffer + sizeof(char*) * i);
 				if (!first) {
 					jsExpr += ",";
 				}
@@ -284,128 +307,191 @@ int JSMarshaller::unmarshalArgList(char* buffer, MAUtil::String& jsExpr) {
 	// Return value
 	if (mHasReturnValue) {
 		JSMarshaller* returnMarshaller = mList[mList.size() - 1];
+		if (mHasOutValues) {
+			jsExpr += ",";
+		}
 		jsExpr += "result: ";
 		returnMarshaller->unmarshal(buffer, jsExpr);
 	}
 	jsExpr += "}";
-
-	// We never use this value.
-	return 0;
 }
 
 int JSMarshaller::getChildCount() {
 	return mList.size();
 }
 
-int JSArrayMarshaller::marshal(MessageStream& stream, char* buffer) {
-	int arraySize = MAUtil::stringToInteger(getNext(stream, "array")) & MAX_ARRAY_SIZE_MASK;
-	int offset = sizeof(int);
-	((int*)buffer)[0] = arraySize;
-	for (int i = 0; i < arraySize; i++) {
-		offset += mDelegate->marshal(stream, buffer + offset);
+void JSArrayMarshaller::marshal(MessageStream& stream, char* buffer, Allocator* allocator) {
+	// Note: we only support arrays as pointers (ie no fixed length arrays).
+	int arraySize = MAUtil::stringToInteger(getNext(stream, "array-len")) & MAX_ARRAY_SIZE_MASK;
+	// ...and then we create a pointer to the array, which just
+	// happens to follow right after the pointer.
+	char* array = NULL;
+	if (arraySize > 0) {
+		int elementSize = mDelegate->getBufferSize(true);
+		char* arrayBuffer = allocator->request(elementSize * arraySize + sizeof(int));
+		// The size is a 'hidden' variable that will be used later by the
+		// unmarshalling code...
+		marshalInt(arrayBuffer, arraySize);
+		array = (char*)(arrayBuffer + sizeof(int));
+		for (int i = 0; i < arraySize; i++) {
+			mDelegate->marshal(stream, (char*) (array + i * elementSize), allocator);
+		}
 	}
-	return offset;
+	marshalPtr(buffer, array);
 }
 
-int JSArrayMarshaller::unmarshal(char* buffer, MAUtil::String& jsExpr) {
-	int arraySize = ((int*)buffer)[0] & MAX_ARRAY_SIZE_MASK;
-	printf("Unmarshalling array: %d\n", arraySize);
-	int offset = sizeof(int);
+void JSArrayMarshaller::unmarshal(char* arrayPtr, MAUtil::String& jsExpr) {
+	char* array = unmarshalPtr(arrayPtr);
+	if (!array) {
+		jsExpr += "null";
+		return;
+	}
+	int arraySize = unmarshalInt(array - sizeof(int)) & MAX_ARRAY_SIZE_MASK;
 	jsExpr += "[";
 	for (int i = 0; i < arraySize; i++) {
 		if (i > 0) {
 			jsExpr += ",";
 		}
-		char* ptr = (char*)((int)buffer + offset);
-		offset += mDelegate->unmarshal(ptr, jsExpr);
+		mDelegate->unmarshal(array + i * mDelegate->getBufferSize(true), jsExpr);
 	}
 	jsExpr += "]";
-	return offset;
+}
+
+int JSArrayMarshaller::getBufferSize(bool aligned) {
+	return sizeof(char*);
 }
 
 bool JSArrayMarshaller::hasOutValues() {
 	return mDelegate->hasOutValues();
 }
 
-int JSArrayMarshaller::getDataOffset() {
-	return 4;
+void JSIndirectMarshaller::marshal(MessageStream& stream, char* buffer, Allocator* allocator) {
+	char* delegateBuffer = allocator->request(mDelegate->getBufferSize(true));
+	mDelegate->marshal(stream, delegateBuffer, allocator);
+	marshalPtr(buffer, delegateBuffer);
 }
 
-int JSRefMarshaller::marshal(MessageStream& stream, char* buffer) {
-	return (*mRefList)[mRefId]->marshal(stream, buffer);
+void JSIndirectMarshaller::unmarshal(char* buffer, MAUtil::String& jsExpr) {
+	char* ptr = unmarshalPtr(buffer);
+	mDelegate->unmarshal(ptr, jsExpr);
 }
 
-int JSRefMarshaller::unmarshal(char* buffer, MAUtil::String& jsExpr) {
-	return (*mRefList)[mRefId]->unmarshal(buffer, jsExpr);
+JSIndirectMarshaller::~JSIndirectMarshaller() {
+	if (mDelegate) {
+		delete mDelegate;
+		mDelegate = NULL;
+	}
 }
 
-int JSRefMarshaller::getDataOffset() {
-	return (*mRefList)[mRefId]->getDataOffset();
+int JSIndirectMarshaller::getBufferSize(bool aligned) {
+	return sizeof(char*);
 }
 
-int JSNumberMarshaller::marshal(MessageStream& stream, char* buffer) {
+void JSRefMarshaller::marshal(MessageStream& stream, char* buffer, Allocator* allocator) {
+	(*mRefList)[mRefId]->marshal(stream, buffer, allocator);
+}
+
+void JSRefMarshaller::unmarshal(char* buffer, MAUtil::String& jsExpr) {
+	(*mRefList)[mRefId]->unmarshal(buffer, jsExpr);
+}
+
+int JSRefMarshaller::getBufferSize(bool aligned) {
+	return (*mRefList)[mRefId]->getBufferSize(aligned);
+}
+
+void JSNumberMarshaller::marshal(MessageStream& stream, char* buffer, Allocator* allocator) {
 	const char* value = getNext(stream, "number");
 	switch (mVariant) {
 	case 'B':
 		buffer[0] = value ? (char) (MAUtil::stringToInteger(value) & 0xff) : 0;
-		return sizeof(char);
+		break;
 	case 'I':
-		((int*) buffer)[0] = value ? MAUtil::stringToInteger(value) : 0;
+		marshalInt(buffer, value ? MAUtil::stringToInteger(value) : 0);
+		break;
+	case 'L':
+		marshalLong(buffer, value ? MAUtil::stringToLong(value) : 0);
+		break;
+	case 'D':
+		marshalDouble(buffer, value ? MAUtil::stringToDouble(value) : 0);
+		break;
+	case 'F':
+		marshalFloat(buffer, value ? (float) MAUtil::stringToDouble(value) : 0);
+		break;
+	}
+}
+
+int JSNumberMarshaller::getBufferSize(bool aligned) {
+	switch(mVariant) {
+	case 'B':
+		return aligned ? ALIGNMENT : sizeof(char);
+	case 'I':
 		return sizeof(int);
 	case 'L':
-		((long long*) buffer)[0] = value ? MAUtil::stringToLong(value) : 0;
 		return sizeof(long long);
 	case 'D':
-		((double*) buffer)[0] = value ? MAUtil::stringToDouble(value) : 0;
 		return sizeof(double);
 	case 'F':
-		((float*) buffer)[0] = value ? (float) MAUtil::stringToDouble(value) : 0;
 		return sizeof(float);
 	}
 	// case 'V':
 	return 0;
 }
 
-int JSNumberMarshaller::unmarshal(char* buffer, MAUtil::String& jsExpr) {
+void JSNumberMarshaller::unmarshal(char* buffer, MAUtil::String& jsExpr) {
 	switch (mVariant) {
 	case 'B':
+		printf("CHR: %d", (int) buffer[0]);
 		jsExpr += MAUtil::integerToString(buffer[0], 10);
-		return sizeof(char);
+		break;
 	case 'I':
-		jsExpr += MAUtil::integerToString(((int*)buffer)[0], 10);
-		return sizeof(int);
+		jsExpr += MAUtil::integerToString(unmarshalInt(buffer), 10);
+		break;
 	case 'L':
-		jsExpr += MAUtil::longToString(((long long*)buffer)[0], 10);
-		return sizeof(long long);
+		jsExpr += MAUtil::longToString(unmarshalLong(buffer), 10);
+		break;
 	case 'D':
-		jsExpr += MAUtil::doubleToString(((double*)buffer)[0], 16);
-		return sizeof(double);
+		jsExpr += MAUtil::doubleToString(unmarshalDouble(buffer), 16);
+		break;
 	case 'F':
-		jsExpr += MAUtil::doubleToString(((float*)buffer)[0], 8);
-		return sizeof(float);
+		jsExpr += MAUtil::doubleToString(unmarshalFloat(buffer), 8);
+		break;
 	}
-	// case 'V':
-	return 0;
 }
 
-int JSStringMarshaller::marshal(MessageStream& stream, char* buffer) {
-	// Bytes 0-3 are the length
+void JSStringMarshaller::marshal(MessageStream& stream, char* buffer, Allocator* allocator) {
+	// Bytes 0-3 are the length. Plus 1 byte to make sure we always zero-terminate
 	int length = MAUtil::stringToInteger(getNext(stream, "string-len"));
 	MAUtil::String msg = getNext(stream, "message");
-	strncpy((char*) (buffer + sizeof(int)), msg.c_str(), length);
-	return length + sizeof(int);
+	char* dataBuffer = NULL;
+	if (length >= 0) {
+		char* msgBuffer = allocator->request(length + sizeof(int) + sizeof(char));
+		marshalInt(msgBuffer, length);
+		dataBuffer = (char*)(msgBuffer + sizeof(int));
+		strncpy(dataBuffer, msg.c_str(), length + 1);
+		dataBuffer[length] = '\0';
+	}
+
+	marshalPtr(buffer, dataBuffer);
 }
 
-int JSStringMarshaller::unmarshal(char* buffer, MAUtil::String& jsExpr) {
-	int length = ((int*)buffer)[0];
-	jsExpr += "\"";
-	jsExpr += (char*) (buffer+sizeof(int));
-	jsExpr += "\"";
-	return length + sizeof(int);
+void JSStringMarshaller::unmarshal(char* buffer, MAUtil::String& jsExpr) {
+	char* ptr = unmarshalPtr(buffer);
+	if (ptr) {
+		printf("STR");
+		int length = unmarshalInt(ptr - sizeof(int)) & MAX_ARRAY_SIZE_MASK;
+		ptr[length] = '\0'; // <-- We've allocated an extra byte for this purpose
+		jsExpr += "\"";
+		jsExpr += ptr;
+		printf(ptr);
+		jsExpr += "\"";
+	} else {
+		// A null value
+		jsExpr += "null";
+	}
 }
 
-int JSStringMarshaller::getDataOffset() {
-	return 4;
+int JSStringMarshaller::getBufferSize(bool aligned) {
+	return sizeof(char*);
 }
 
 JSMarshaller* JSExtensionModule::getMarshaller(int fnId) {
@@ -428,9 +514,92 @@ JSExtensionModule::~JSExtensionModule() {
 	// TODO!!! Delete
 }
 
+char* Allocator::request(int size) {
+	// Ok, we might want to just skip this alignment thing
+	// and start allocing right away instead...
+	if (mOffset + size >= 0) {
+		// 256 is the 'magic' stack size;
+		// after that we will allocate from the heap
+		if (!mAllocations) {
+			mAllocations = new MAUtil::Vector<char*>();
+		}
+		char* allocation = (char*) calloc(size, 1);
+		mAllocations->add(allocation);
+		printf("Allocated %d bytes on heap at %d", size, (int) allocation);
+		return allocation;
+	} else {
+		printf("Allocated %d bytes at %d", size, (int) mStack + mOffset);
+		char* result = (char*) ((int) mStack + mOffset);
+		mOffset = (int) pad((char*) mOffset + size);
+		return result;
+	}
+}
+
+Allocator::~Allocator() {
+	if (mAllocations) {
+		for (int i = 0; i < mAllocations->size(); i++) {
+			char* allocation = (*mAllocations)[i];
+			free(allocation);
+		}
+	}
+}
+
 inline const char* getNext(MessageStream& stream, const char* w) {
 	const char* result = stream.getNext(NULL);
-	printf("%s: %s\n", w, result);
+	//printf("%s: %s\n", w, result);
 	return result;
 }
+
+void marshalInt(char* buffer, int value) {
+	// We trust our alignment :)
+	printf("INT %d TO %p", value, buffer);
+	((int*)buffer)[0] = value;
+}
+
+void marshalPtr(char* buffer, char* ptr) {
+	((char**)buffer)[0] = ptr;
+}
+
+void marshalLong(char* buffer, long long value) {
+	((long long*)buffer)[0] = value;
+}
+
+void marshalFloat(char* buffer, float value) {
+	((float*)buffer)[0] = value;
+}
+
+void marshalDouble(char* buffer, double value) {
+	((double*)buffer)[0] = value;
+}
+
+int unmarshalInt(char* buffer) {
+	printf("INT: %d FROM %p\n", ((int*) buffer)[0], buffer);
+	return ((int*)buffer)[0];
+}
+
+char* unmarshalPtr(char* buffer) {
+	printf("PTR: %p FROM %p\n", ((char**) buffer)[0], buffer);
+	return ((char**)buffer)[0];
+}
+
+long long unmarshalLong(char* buffer) {
+	printf("LNG: %lld FROM %p\n", ((long long*)buffer)[0], buffer);
+	return ((long long*)buffer)[0];
+}
+
+float unmarshalFloat(char* buffer) {
+	return ((float*)buffer)[0];
+}
+
+double unmarshalDouble(char* buffer) {
+	printf("DBL: %f FROM %p\n", ((double*)buffer)[0], buffer);
+	return ((double*)buffer)[0];
+}
+
+char* pad(char* ptr) {
+	return ((int)ptr % ALIGNMENT) ?
+			(char*) ((int) (ptr + ALIGNMENT) & ~ALIGNMENT_MASK) :
+			ptr;
+}
+
 }
