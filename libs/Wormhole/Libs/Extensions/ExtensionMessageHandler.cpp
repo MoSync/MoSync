@@ -73,7 +73,7 @@ bool ExtensionMessageHandler::handleMessage(Wormhole::MessageStream& stream) {
 
 				char* reply = (char*) malloc(unmarshalled.size() + 128);
 				sprintf(reply, "mosync.bridge.reply(%d, %s);", callbackId, unmarshalled.c_str());
-				//maWriteLog(reply, strlen(reply));
+				maWriteLog(reply, strlen(reply));
 				mWebView->callJS(reply);
 				free(reply);
 				delete allocator;
@@ -310,7 +310,9 @@ void JSMarshaller::unmarshalArgList(char* buffer, MAUtil::String& jsExpr) {
 			jsExpr += ",";
 		}
 		jsExpr += "result: ";
-		returnMarshaller->unmarshal(buffer, jsExpr);
+		char* argPtr = buffer + sizeof(char*) * (mList.size() - 1);
+		char* retPtr = unmarshalPtr(argPtr);
+		returnMarshaller->unmarshal(retPtr, jsExpr);
 	}
 	jsExpr += "}";
 }
