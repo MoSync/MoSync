@@ -73,7 +73,7 @@ bool ExtensionMessageHandler::handleMessage(Wormhole::MessageStream& stream) {
 
 				char* reply = (char*) malloc(unmarshalled.size() + 128);
 				sprintf(reply, "mosync.bridge.reply(%d, %s);", callbackId, unmarshalled.c_str());
-				maWriteLog(reply, strlen(reply));
+				//maWriteLog(reply, strlen(reply));
 				mWebView->callJS(reply);
 				free(reply);
 				delete allocator;
@@ -266,7 +266,6 @@ void JSMarshaller::unmarshal(char* buffer, MAUtil::String& jsExpr) {
 			jsExpr += ':';
 			char* ptr = (char*) buffer + offset;
 			char* padded = pad(ptr);
-			printf("NAME: %s", marshaller->mName.c_str());
 			marshaller->unmarshal(padded, jsExpr);
 			offset += marshaller->getBufferSize(true);
 		}
@@ -440,7 +439,6 @@ int JSNumberMarshaller::getBufferSize(bool aligned) {
 void JSNumberMarshaller::unmarshal(char* buffer, MAUtil::String& jsExpr) {
 	switch (mVariant) {
 	case 'B':
-		printf("CHR: %d", (int) buffer[0]);
 		jsExpr += MAUtil::integerToString(buffer[0], 10);
 		break;
 	case 'I':
@@ -477,12 +475,10 @@ void JSStringMarshaller::marshal(MessageStream& stream, char* buffer, Allocator*
 void JSStringMarshaller::unmarshal(char* buffer, MAUtil::String& jsExpr) {
 	char* ptr = unmarshalPtr(buffer);
 	if (ptr) {
-		printf("STR");
 		int length = unmarshalInt(ptr - sizeof(int)) & MAX_ARRAY_SIZE_MASK;
 		ptr[length] = '\0'; // <-- We've allocated an extra byte for this purpose
 		jsExpr += "\"";
 		jsExpr += ptr;
-		printf(ptr);
 		jsExpr += "\"";
 	} else {
 		// A null value
@@ -525,10 +521,10 @@ char* Allocator::request(int size) {
 		}
 		char* allocation = (char*) calloc(size, 1);
 		mAllocations->add(allocation);
-		printf("Allocated %d bytes on heap at %d", size, (int) allocation);
+		//printf("Allocated %d bytes on heap at %d", size, (int) allocation);
 		return allocation;
 	} else {
-		printf("Allocated %d bytes at %d", size, (int) mStack + mOffset);
+		//printf("Allocated %d bytes at %d", size, (int) mStack + mOffset);
 		char* result = (char*) ((int) mStack + mOffset);
 		mOffset = (int) pad((char*) mOffset + size);
 		return result;
@@ -552,7 +548,6 @@ inline const char* getNext(MessageStream& stream, const char* w) {
 
 void marshalInt(char* buffer, int value) {
 	// We trust our alignment :)
-	printf("INT %d TO %p", value, buffer);
 	((int*)buffer)[0] = value;
 }
 
@@ -573,17 +568,14 @@ void marshalDouble(char* buffer, double value) {
 }
 
 int unmarshalInt(char* buffer) {
-	printf("INT: %d FROM %p\n", ((int*) buffer)[0], buffer);
 	return ((int*)buffer)[0];
 }
 
 char* unmarshalPtr(char* buffer) {
-	printf("PTR: %p FROM %p\n", ((char**) buffer)[0], buffer);
 	return ((char**)buffer)[0];
 }
 
 long long unmarshalLong(char* buffer) {
-	printf("LNG: %lld FROM %p\n", ((long long*)buffer)[0], buffer);
 	return ((long long*)buffer)[0];
 }
 
@@ -592,7 +584,6 @@ float unmarshalFloat(char* buffer) {
 }
 
 double unmarshalDouble(char* buffer) {
-	printf("DBL: %f FROM %p\n", ((double*)buffer)[0], buffer);
 	return ((double*)buffer)[0];
 }
 
