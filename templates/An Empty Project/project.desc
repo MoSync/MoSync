@@ -3,3 +3,5 @@ name = Empty Project
 description = A project template with standard settings but no files, roll your own.
 
 [Settings]
+build.prefs:gcc.warnings/Debug=10
+build.prefs:gcc.warnings/Release=10

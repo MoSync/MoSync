@@ -60,9 +60,14 @@ static ScreenOrientation *sharedInstance = nil;
  */
 -(id) init
 {
-    mAllowedScreenOrientations = MA_SCREEN_ORIENTATION_PORTRAIT;
-    mCurrentScreenOrientation = UIInterfaceOrientationPortrait;
-    return [super init];
+	self = [super init];
+	if (self)
+	{
+		mAllowedScreenOrientations = MA_SCREEN_ORIENTATION_PORTRAIT;
+		mCurrentScreenOrientation = UIInterfaceOrientationPortrait;
+		mSupportedOrientations = UIInterfaceOrientationMaskPortrait;
+	}
+    return self;
 }
 
 /**
@@ -95,7 +100,16 @@ static ScreenOrientation *sharedInstance = nil;
     {
         // Store allowed screen orientations.
         mAllowedScreenOrientations = orientations;
-        return MA_SCREEN_ORIENTATION_RES_OK;
+		mSupportedOrientations = 0;
+		mSupportedOrientations |= mAllowedScreenOrientations & MA_SCREEN_ORIENTATION_PORTRAIT ?
+		    UIInterfaceOrientationMaskPortrait : mSupportedOrientations;
+		mSupportedOrientations |= mAllowedScreenOrientations & MA_SCREEN_ORIENTATION_PORTRAIT_UPSIDE_DOWN ?
+            UIInterfaceOrientationMaskPortraitUpsideDown : mSupportedOrientations;
+        mSupportedOrientations |= mAllowedScreenOrientations & MA_SCREEN_ORIENTATION_LANDSCAPE_LEFT ?
+            UIInterfaceOrientationMaskLandscapeLeft : mSupportedOrientations;
+		mSupportedOrientations |= mAllowedScreenOrientations & MA_SCREEN_ORIENTATION_LANDSCAPE_RIGHT ?
+		    UIInterfaceOrientationMaskLandscapeRight : mSupportedOrientations;
+		return MA_SCREEN_ORIENTATION_RES_OK;
     }
 }
 
@@ -212,6 +226,16 @@ static ScreenOrientation *sharedInstance = nil;
     }
 
     return returnValue;
+}
+
+/**
+ * Get the supported orientations.
+ * Used in iOS 6.0 and later.
+ * @return A bit mask specifying which orientations are supported.
+ */
+-(UIInterfaceOrientationMask)supportedInterfaceOrientations
+{
+    return mSupportedOrientations;
 }
 
 @end

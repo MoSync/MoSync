@@ -112,5 +112,9 @@ void MainScreen::stackScreenScreenPopped(
         {
             printf("screen test param is ok!");
         }
+        else
+        {
+            maAlert("Error", "Wrong callback parameter(s)", "OK", NULL, NULL);
+        }
     }
 }

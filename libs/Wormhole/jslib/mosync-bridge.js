@@ -16,7 +16,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301, USA.
 */
 
-
 /*
  * @file mosync-bridge.js
  * @author Mikael Kindborg, Ali Sarrafi
@@ -60,7 +59,7 @@ var mosync = (function()
 	mosync.app.exit = function()
 	{
 		mosync.bridge.send(["MoSync", "ExitApplication"]);
-	}
+	};
 
 	/**
 	 * Send application to background.
@@ -68,7 +67,55 @@ var mosync = (function()
 	mosync.app.sendToBackground = function()
 	{
 		mosync.bridge.send(["MoSync", "SendToBackground"]);
-	}
+	};
+
+	/**
+	 * Screen orientation constants.
+	 */
+	mosync.SCREEN_ORIENTATION_DYNAMIC = "dynamic";
+	mosync.SCREEN_ORIENTATION_PORTRAIT = "portrait";
+	mosync.SCREEN_ORIENTATION_LANDSCAPE = "landscape";
+
+	/**
+	 * Set the screen orientation of the device.
+	 *
+	 * @param orientation The desired screen orientation.
+	 * Can be one of the constants:
+	 *   mosync.SCREEN_ORIENTATION_DYNAMIC
+	 *   mosync.SCREEN_ORIENTATION_PORTRAIT
+	 *   mosync.SCREEN_ORIENTATION_LANDSCAPE
+	 *
+	 * Example:
+	 *   mosync.app.screenSetOrientation(mosync.SCREEN_ORIENTATION_DYNAMIC);
+	 */
+	mosync.app.screenSetOrientation = function(orientation)
+	{
+		mosync.bridge.send(["MoSync", "ScreenSetOrientation", orientation]);
+	};
+
+	/**
+	 * Opens a url in an external browser. Supported url
+	 * schemas are are "http:" to open a web page and
+	 * "tel:" to dial a number. See examples below.
+	 *
+	 * @param url The url to be opened.
+	 *
+	 * Example of opening a web page in an external browser:
+	 *   mosync.app.openExternalURL("http://maps.google.com/");
+	 *
+	 * Example of dialing a number:
+	 *   mosync.app.openExternalURL("tel:046850510300");
+	 *
+	 * Note that your app needs phone permissions to be set for
+	 * dialing a phone number. This is set in the MoSync SDK.
+	 * Note that MoSync Reload does not have phone permissions set.
+	 *
+	 * This function calls the MoSync syscall maPlatformRequest.
+	 */
+	mosync.app.openExternalURL = function(url)
+	{
+		mosync.bridge.send(["MoSync", "OpenExternalURL", url]);
+	};
 
 	// Alerts and logging.
 
