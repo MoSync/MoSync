@@ -362,6 +362,7 @@ void HomeScreen::showScreen()
 	maWidgetSetProperty(mProgressLabel,MAW_WIDGET_VISIBLE, "false");
 	setWidgetProperty(mProgressBar,MAW_PROGRESS_BAR_PROGRESS, 0);
 	maWidgetSetProperty(mProgressBar,MAW_WIDGET_VISIBLE, "false");
+	maWidgetSetProperty(mSearchButton, MAW_WIDGET_ENABLED, "true");
 
 	// Reset the slider value.
 	setWidgetProperty(mSlider, MAW_SLIDER_VALUE, 10);
@@ -494,6 +495,9 @@ void HomeScreen::widgetClicked(MAHandle widgetHandle)
 {
 	if (widgetHandle == mSearchButton)
 	{
+		// Disable the search button until new search is made.
+		maWidgetSetProperty(mSearchButton, MAW_WIDGET_ENABLED, "false");
+
 		// Close the edit box forced.
 		maWidgetSetProperty(mEditBox, MAW_EDIT_BOX_SHOW_KEYBOARD, "false");
 
