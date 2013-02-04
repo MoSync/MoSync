@@ -342,11 +342,15 @@ public class MoSyncCameraController {
 			if(mCurrentCameraIndex != CameraNumber)
 			{
 				mCurrentCameraIndex = CameraNumber;
-				mCamera.release();
+				if (null != mCamera)
+					mCamera.release();
 				mPreview.mCamera = null;
-				mCamera = Camera.open(CameraNumber);
-				mPreview.mCameraIndex = mCurrentCameraIndex;
-				mCamera.setParameters(getCurrentParameters());
+				try {
+					mCamera = Camera.open(CameraNumber);
+					mPreview.mCameraIndex = mCurrentCameraIndex;
+					mCamera.setParameters(getCurrentParameters());
+				} catch (Exception e) {
+				}
 			}
 
 		}
@@ -410,6 +414,7 @@ public class MoSyncCameraController {
 		try
 		{
 			mCamera.stopPreview();
+			releaseCamera();
 		}
 		catch (Exception e)
 		{
