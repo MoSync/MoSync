@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2012 MoSync AB
+Copyright (C) 2012-2013 MoSync AB
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License,
@@ -20,7 +20,7 @@ MA 02110-1301, USA.
  * @file mosync.resource.js
  * @author Ali Sarrafi
  *
- * The library for loading Image resources into Mosync program from Javascript.
+ * Library for loading image resources into Mosync program from Javascript.
  * This library only supports image resources and used  together with the
  * NativeUI library.
  */
@@ -75,7 +75,7 @@ mosync.resource.loadImage = function(imagePath, imageID, successCallback)
  * A function that is called by C++ to pass the loaded image information.
  *
  * @param imageID JavaScript ID of the image
- * @param imageHandle C++ handle of the imge which can be used for refering to the loaded image
+ * @param imageHandle C++ handle of the imge which can be used for referring to the loaded image
  * @private
  */
 mosync.resource.imageLoaded = function(imageID, imageHandle)
@@ -94,7 +94,7 @@ mosync.resource.imageLoaded = function(imageID, imageHandle)
  * Loads images into image handles from a remote URL for use in MoSync UI systems.
  *
  *  @param imageURL URL to the image file.
- *  @param imageID a custom ID used for refering to the image in JavaScript
+ *  @param imageID a custom ID used for referring to the image in JavaScript
  *  @param callBackFunction a function that will be called when the image is ready.
  *
  *  Example
