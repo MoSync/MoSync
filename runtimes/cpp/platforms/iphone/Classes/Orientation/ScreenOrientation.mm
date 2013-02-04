@@ -27,6 +27,8 @@
 
 #include <helpers/cpp_defs.h>
 #include "iphone_helpers.h"
+#include "Platform.h"
+#include "Syscall.h"
 
 #import "ScreenOrientation.h"
 
@@ -76,6 +78,7 @@ static ScreenOrientation *sharedInstance = nil;
  */
 -(void) dealloc
 {
+	[[NSNotificationCenter defaultCenter] removeObserver:self];
     [super dealloc];
 }
 
@@ -281,4 +284,28 @@ BOOL MoSync_IsInterfaceOrientationSupported(UIInterfaceOrientation interfaceOrie
 NSUInteger MoSync_SupportedInterfaceOrientations()
 {
 	return [[ScreenOrientation getInstance] supportedInterfaceOrientations];
+}
+
+/**
+ * Check if the current screen size has changed. If so send EVENT_TYPE_SCREEN_CHANGED event.
+ * It's send only for non NativeUI applications. Once the NativeUI module is used
+ * this event is not sent.
+ * Usually the screen size changes when rotating device from portrait to landscape
+ * and the other way around.
+ * @param fromOrientation The old orientation of the user interface.
+ */
+void MoSync_OrientationChanged(UIInterfaceOrientation fromOrientation)
+{
+	UIInterfaceOrientation currentOrientation = [UIApplication sharedApplication].statusBarOrientation;
+	if ((UIInterfaceOrientationIsPortrait(fromOrientation) &&
+		UIInterfaceOrientationIsLandscape(currentOrientation)) ||
+		(UIInterfaceOrientationIsPortrait(currentOrientation) &&
+		UIInterfaceOrientationIsLandscape(fromOrientation)))
+	{
+		Base::gSyscall->deviceOrientationChanged();
+
+		MAEvent event;
+		event.type = EVENT_TYPE_SCREEN_CHANGED;
+		Base::gEventQueue.put(event);
+	}
 }

@@ -34,17 +34,36 @@ BOOL MoSync_IsInterfaceOrientationSupported(UIInterfaceOrientation interfaceOrie
  */
 NSUInteger MoSync_SupportedInterfaceOrientations();
 
+/**
+ * Forward declaration.
+ * Check if the current screen size has changed. If so send EVENT_TYPE_SCREEN_CHANGED event.
+ * It's send only for non NativeUI applications. Once the NativeUI module is used
+ * this event is not sent.
+ * Usually the screen size changes when rotating device from portrait to landscape
+ * and the other way around.
+ * @param fromOrientation The old orientation of the user interface.
+ */
+void MoSync_OrientationChanged(UIInterfaceOrientation fromOrientation);
 
 @interface MoSyncView : UIView <UITextFieldDelegate>
 @end
 
 @implementation MoSyncViewController
 
+-(id)init
+{
+	self = [super init];
+	if (self)
+	{
+		mosyncView = [[MoSyncView alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
+		self.view = mosyncView;
+	}
+	return self;
+}
+
 // Implement loadView to create a view hierarchy programmatically, without using a nib.
 - (void)loadView {
 	[super loadView];
-	mosyncView = [[MoSyncView alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
-	[self.view addSubview:mosyncView];	 
 }
 
 // Implement viewDidLoad to do additional setup after loading the view, typically from a nib.
@@ -86,6 +105,15 @@ NSUInteger MoSync_SupportedInterfaceOrientations();
 {
 	NSUInteger orientations = MoSync_SupportedInterfaceOrientations();
     return orientations;
+}
+
+/**
+ * Called after the user interface rotates.
+ * @param fromInterfaceOrientation The old orientation of the user interface.
+ */
+- (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation
+{
+	MoSync_OrientationChanged(fromInterfaceOrientation);
 }
 
 - (void)didReceiveMemoryWarning {
