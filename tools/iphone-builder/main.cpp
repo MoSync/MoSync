@@ -266,18 +266,20 @@ void generate() {
 	readFileIntoMem(pbxTemplateFile, pbxInput.c_str());
 	readFileIntoMem(plistTemplateFile, plistInput.c_str());
 
-	string projectName = filterWhiteSpace(validateArgument("project-name"));
+	string projectName = validateArgument("project-name");
+	string filteredProjectName = filterWhiteSpace(projectName);
 
-	string xcodeProjectPath = outputFolder + "/" + projectName + ".xcodeproj";
+	string xcodeProjectPath = outputFolder + "/" + filteredProjectName + ".xcodeproj";
 	string pbxOutput = xcodeProjectPath + "/" + "project.pbxproj";
 	
 	_mkdir(xcodeProjectPath.c_str());	
 
-	string plistOutput = outputFolder + "/" + projectName + ".plist";
+	string plistOutput = outputFolder + "/" + filteredProjectName + ".plist";
 
-	replaceTemplateDefine(pbxTemplateFile, "__PROJECT_NAME__", projectName);
+	replaceTemplateDefine(pbxTemplateFile, "__PROJECT_NAME__", filteredProjectName);
 	replaceTemplateDefine(pbxTemplateFile, "iPhone Developer", validateArgument("cert"));
 	replaceTemplateDefine(plistTemplateFile, "__VERSION__", validateArgument("version"));
+	replaceTemplateDefine(plistTemplateFile, "__APP_DISPLAY_NAME__", projectName);
 	replaceTemplateDefine(plistTemplateFile, "__COMPANY_NAME__", filterWhiteSpace(validateArgument("company-name")));
 	replaceTemplateDefine(plistTemplateFile, "__BUNDLE_IDENTIFIER__", filterWhiteSpace(validateArgument("bundle-identifier")));
 
