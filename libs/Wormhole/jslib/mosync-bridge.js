@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2011 MoSync AB
+Copyright (C) 2011-2013 MoSync AB
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License,
@@ -365,6 +365,16 @@ var mosync = (function()
 		 * code is done, a timer will get activated and send all messages
 		 * in the queue in one chunk. This enhances performance of
 		 * message sending.
+		 * 
+		 * Note: the "close" message is deprecated and should not be used anymore. To close the application. Use mosync.app.exit instead. 
+		 * \code
+		 *    //Deprecated method:
+		 *    mosync.bridge.send(["close"]);
+		 *    
+		 *    //Preferred method:
+		 *    mosync.app.exit();
+		 *
+		 * \endcode
 		 *
 		 * @param message An array of message strings.
 		 *
