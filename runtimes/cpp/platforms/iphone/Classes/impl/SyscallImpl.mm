@@ -90,6 +90,7 @@ using namespace MoSyncError;
 #include "MoSyncExtension.h"
 
 #import "MoSyncCamera.h"
+#import "MoSyncSound.h"
 
 extern ThreadPool gThreadPool;
 
@@ -1135,76 +1136,6 @@ namespace Base {
         return returnValue;
     }
 
-	static AVAudioPlayer* sSoundPlayer = NULL;
-
-	SYSCALL(int, maSoundPlay(MAHandle sound_res, int offset, int size))
-	{
-		Stream *res = gSyscall->resources.get_RT_BINARY(sound_res);
-		MYASSERT(res->seek(Seek::Start, offset), ERR_DATA_ACCESS_FAILED);
-		Stream* src = res->createLimitedCopy(size);
-		MYASSERT(src, ERR_DATA_ACCESS_FAILED);
-
-		byte b;
-		do {
-			if(!src->readByte(b))
-				BIG_PHAT_ERROR(ERR_MIME_READ_FAILED);
-		} while(b);
-
-		int pos;
-		src->tell(pos);
-
-		NSData *data = NULL;
-
-		int encodedSize = size - pos + offset;
-		if(!src->ptrc()) {
-			byte* sound = new byte[encodedSize];
-			src->read(sound, encodedSize);
-			data = [NSData dataWithBytesNoCopy:sound length:encodedSize];
-
-		} else {
-			byte* sound = &(((byte*)src->ptrc())[pos]);
-			data = [NSData dataWithBytesNoCopy:sound length:encodedSize freeWhenDone:NO];
-		}
-
-		if(sSoundPlayer) {
-			if(sSoundPlayer.playing==YES)
-				[sSoundPlayer stop];
-			[sSoundPlayer release];
-		}
-
-		NSError *err;
-		sSoundPlayer = [[AVAudioPlayer alloc] initWithData:data error:&err];
-		[data release];
-		if(!sSoundPlayer) {
-			// check err
-			return -1;
-		}
-        [sSoundPlayer prepareToPlay];
-		[sSoundPlayer play];
-
-		return 0;
-	}
-
-	SYSCALL(void, maSoundStop())
-	{
-		[sSoundPlayer stop];
-		sSoundPlayer.currentTime = 0;
-	}
-
-	SYSCALL(int, maSoundIsPlaying())
-	{
-		return sSoundPlayer.playing==YES;
-	}
-
-	SYSCALL(void, maSoundSetVolume(int vol))
-	{
-		sSoundPlayer.volume = (float)vol/100.0f;
-	}
-
-	SYSCALL(int, maSoundGetVolume())
-	{
-		return (int)(sSoundPlayer.volume*100.0f);
-	}
 
 	SYSCALL(int, maGetBatteryCharge())
 	{
