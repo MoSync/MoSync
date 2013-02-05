@@ -91,6 +91,7 @@ using namespace MoSyncError;
 
 #import "MoSyncCamera.h"
 #import "MoSyncSound.h"
+#import "MoSyncPurchase.h"
 
 extern ThreadPool gThreadPool;
 
@@ -1604,51 +1605,6 @@ namespace Base {
 	{
         return [[Capture getInstance] destroyData:handle];
 
-	}
-
-    SYSCALL(int, maPurchaseSupported())
-	{
-        return [[PurchaseManager getInstance] isPurchaseSupported];
-	}
-
-    SYSCALL(void, maPurchaseCreate(MAHandle productHandle, const char* productID))
-	{
-        [[PurchaseManager getInstance] createProduct:productHandle productID:productID];
-	}
-
-    SYSCALL(int, maPurchaseDestroy(MAHandle productHandle))
-	{
-        return [[PurchaseManager getInstance] destroyProduct:productHandle];
-	}
-    SYSCALL(void, maPurchaseRequest(MAHandle productHandle, const int quantity))
-	{
-        [[PurchaseManager getInstance] requestProduct:productHandle quantity:quantity];
-	}
-    SYSCALL(int, maPurchaseGetName(MAHandle productHandle, char* buffer, const int bufferSize))
-	{
-        return [[PurchaseManager getInstance] productName:productHandle
-                                                   buffer:buffer
-                                               bufferSize:bufferSize];
-	}
-    SYSCALL(void, maPurchaseSetStoreURL(const char* url))
-	{
-        [[PurchaseManager getInstance] setStoreURL:url];
-	}
-    SYSCALL(void, maPurchaseVerifyReceipt(MAHandle productHandle))
-	{
-        [[PurchaseManager getInstance] verifyReceipt:productHandle];
-	}
-    SYSCALL(int, maPurchaseGetField(MAHandle productHandle, const char* fieldName,
-                                    char* buffer, const int bufferSize))
-	{
-        return [[PurchaseManager getInstance] getReceiptField:productHandle
-                                                    fieldName:fieldName
-                                                       buffer:buffer
-                                                   bufferSize:bufferSize];
-	}
-    SYSCALL(void, maPurchaseRestoreTransactions())
-	{
-        [[PurchaseManager getInstance] restoreTransactions];
 	}
 
 	SYSCALL(longlong, maIOCtl(int function, int a, int b, int c))

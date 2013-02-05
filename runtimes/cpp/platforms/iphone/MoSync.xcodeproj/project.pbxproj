@@ -418,6 +418,9 @@
 		8B944BE616C1394800E1B091 /* MoSyncSound.h in Headers */ = {isa = PBXBuildFile; fileRef = 8B944BE416C1394800E1B091 /* MoSyncSound.h */; };
 		8B944BE716C1394800E1B091 /* MoSyncSound.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8B944BE516C1394800E1B091 /* MoSyncSound.mm */; };
 		8B944BE816C1394800E1B091 /* MoSyncSound.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8B944BE516C1394800E1B091 /* MoSyncSound.mm */; };
+		8B944BF016C169BD00E1B091 /* MoSyncPurchase.h in Headers */ = {isa = PBXBuildFile; fileRef = 8B944BEE16C169BD00E1B091 /* MoSyncPurchase.h */; };
+		8B944BF116C169BD00E1B091 /* MoSyncPurchase.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8B944BEF16C169BD00E1B091 /* MoSyncPurchase.mm */; };
+		8B944BF216C169BD00E1B091 /* MoSyncPurchase.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8B944BEF16C169BD00E1B091 /* MoSyncPurchase.mm */; };
 		E413FAB814C0604D00BF1E3D /* ResourceArray.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E413FAB714C0604D00BF1E3D /* ResourceArray.cpp */; };
 		E413FABA14C0606A00BF1E3D /* ResourceArray.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E413FAB714C0604D00BF1E3D /* ResourceArray.cpp */; };
 		E438DF501535D35D008B5005 /* CoreMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E438DF4F1535D35C008B5005 /* CoreMedia.framework */; };
@@ -756,6 +759,8 @@
 		8B944BE016C11A4900E1B091 /* CameraPreviewEventHandler.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = CameraPreviewEventHandler.mm; path = Camera/CameraPreviewEventHandler.mm; sourceTree = "<group>"; };
 		8B944BE416C1394800E1B091 /* MoSyncSound.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MoSyncSound.h; path = audio/MoSyncSound.h; sourceTree = "<group>"; };
 		8B944BE516C1394800E1B091 /* MoSyncSound.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = MoSyncSound.mm; path = audio/MoSyncSound.mm; sourceTree = "<group>"; };
+		8B944BEE16C169BD00E1B091 /* MoSyncPurchase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MoSyncPurchase.h; path = purchase/MoSyncPurchase.h; sourceTree = "<group>"; };
+		8B944BEF16C169BD00E1B091 /* MoSyncPurchase.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = MoSyncPurchase.mm; path = purchase/MoSyncPurchase.mm; sourceTree = "<group>"; };
 		8D1107310486CEB800E47090 /* MoSync-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "MoSync-Info.plist"; plistStructureDefinitionIdentifier = "com.apple.xcode.plist.structure-definition.iphone.info-plist"; sourceTree = "<group>"; };
 		E413FAB714C0604D00BF1E3D /* ResourceArray.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ResourceArray.cpp; path = ../../../base/ResourceArray.cpp; sourceTree = "<group>"; };
 		E438DF4F1535D35C008B5005 /* CoreMedia.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMedia.framework; path = System/Library/Frameworks/CoreMedia.framework; sourceTree = SDKROOT; };
@@ -1253,6 +1258,8 @@
 		43F36FC915B474700095B3C6 /* Purchase */ = {
 			isa = PBXGroup;
 			children = (
+				8B944BEE16C169BD00E1B091 /* MoSyncPurchase.h */,
+				8B944BEF16C169BD00E1B091 /* MoSyncPurchase.mm */,
 				43F3704415B475DA0095B3C6 /* PurchaseManager.h */,
 				43F3704515B475DA0095B3C6 /* PurchaseManager.mm */,
 				43F3704615B475DA0095B3C6 /* PurchaseProduct.h */,
@@ -1626,6 +1633,7 @@
 				8B944BDC16C1179200E1B091 /* MoSyncCamera.h in Headers */,
 				8B944BE116C11A4900E1B091 /* CameraPreviewEventHandler.h in Headers */,
 				8B944BE616C1394800E1B091 /* MoSyncSound.h in Headers */,
+				8B944BF016C169BD00E1B091 /* MoSyncPurchase.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1873,6 +1881,7 @@
 				8B944BDD16C1179200E1B091 /* MoSyncCamera.mm in Sources */,
 				8B944BE216C11A4900E1B091 /* CameraPreviewEventHandler.mm in Sources */,
 				8B944BE716C1394800E1B091 /* MoSyncSound.mm in Sources */,
+				8B944BF116C169BD00E1B091 /* MoSyncPurchase.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2005,6 +2014,7 @@
 				8B944BDE16C1179200E1B091 /* MoSyncCamera.mm in Sources */,
 				8B944BE316C11A4900E1B091 /* CameraPreviewEventHandler.mm in Sources */,
 				8B944BE816C1394800E1B091 /* MoSyncSound.mm in Sources */,
+				8B944BF216C169BD00E1B091 /* MoSyncPurchase.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
