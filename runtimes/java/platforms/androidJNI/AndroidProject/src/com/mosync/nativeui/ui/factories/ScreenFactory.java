@@ -27,21 +27,20 @@ import com.mosync.nativeui.ui.widgets.Widget;
 
 /**
  * Responsible for creating screens.
- * 
+ *
  * @author fmattias
  */
 public class ScreenFactory implements AbstractViewFactory
 {
-
 	@Override
 	public Widget create(Activity activity, int handle)
 	{
 		FrameLayout layout = new FrameLayout( activity );
-		
+
 		// Screen fills the whole screen.
 		LayoutParams layoutParams = new LayoutParams( ViewGroup.LayoutParams.FILL_PARENT, ViewGroup.LayoutParams.FILL_PARENT );
 		layout.setLayoutParams( layoutParams );
-		
+
 		return new ScreenWidget( handle, layout );
-	}	
+	}
 }
