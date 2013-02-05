@@ -356,17 +356,17 @@ var mosync = (function()
 		 * See this page for a tutorial: http://www.mosync.com/documentation/manualpages/how-communicate-between-javascript-and-c-mosync
 		 *
 		 * The project template "HTML5/JS/C++ Hybrid Project" is a
-		 * good startihng point for leaning how to add cusom C++ code
-		 * to your JavaScript application. Example the files index.html
+		 * good starting point for leaning how to add custom C++ code
+		 * to your JavaScript application. Look at the files index.html
 		 * and main.cpp in the project generated from the template.
 		 *
 		 * This method queues messages and can be called multiple
-		 * times in sqeuential JS code. When execution of sequential
-		 * code is done, a timer will get activated and send all messages
+		 * times in sequential JS code. When the sequential code executes,
+		 * a timer will be activated and wil send all messages
 		 * in the queue in one chunk. This enhances performance of
 		 * message sending.
 		 * 
-		 * Note: the "close" message is deprecated and should not be used anymore. To close the application. Use mosync.app.exit instead. 
+		 * Note: the "close" message is deprecated. To close the application, use "mosync.app.exit" instead. 
 		 * \code
 		 *    //Deprecated method:
 		 *    mosync.bridge.send(["close"]);
@@ -379,7 +379,7 @@ var mosync = (function()
 		 * @param message An array of message strings.
 		 *
 		 * @param callbackFun An optional function to receive the
-		 * result of the message asynchronosly. The id of the
+		 * result of the message asynchronosly. The ID of the
 		 * callback function is added after the strings in the
 		 * messageStrings array.
 		 */
@@ -432,13 +432,13 @@ var mosync = (function()
 		 * back to JavaScript from C++.
 		 *
 		 * This method queues a message and can be called multiple
-		 * times in sqeuential JS code. When execution of sequential
-		 * code is done, a timer will get activated and send all messages
+		 * times in sequential JS code. When execution of sequential
+		 * code is done, a timer will is activated and sends all messages
 		 * in the queue in one chunk. This enhances performance of
 		 * message sending.
 		 *
 		 * @param message A dictionary with the message parameters.
-		 * The parameter "messageName" specifyes the name of the
+		 * The parameter "messageName" specifies the name of the
 		 * message selector (the "command name") and must always be
 		 * included.
 		 *
@@ -559,14 +559,14 @@ var mosync = (function()
 		 * JavaScript. The function takes a variable number of parameters.
 		 *
 		 * For example, to return the value 'Hello World' to the callback
-		 * with id 82, you can use this code in a WebAppMoblet:
+		 * with ID 82, you can use this code in a WebAppMoblet:
 		 *
 		 *   callJS("mosync.bridge.reply(82, 'Hello World')");
 		 *
 		 * You can obtain the callbackId from the C++ WebViewMessage
 		 * object, if you use that class to parse the message.
 		 *
-		 * @param callBackId The first parameter is the id of the
+		 * @param callBackId The first parameter is the ID of the
 		 * callback function. Remaning parameters are applied to the
 		 * function refered to by the callbackId.
 		 */
