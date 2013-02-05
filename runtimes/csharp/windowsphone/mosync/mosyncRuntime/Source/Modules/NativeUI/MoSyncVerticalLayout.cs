@@ -141,7 +141,11 @@ namespace MoSync
                         }
                         else
                         {
-                            setPaddingSpacers(1, GridUnitType.Auto);
+                            // Date: 27-jan-2013 11:18PM (this is a successfull attempt for fixing
+                            // http://jira.mosync.com/browse/MOSYNC-2725
+
+                            if(!(0 >= mPaddingBottom || 0 >= mPaddingTop))
+                                setPaddingSpacers(1, GridUnitType.Auto);
                         }
                         rowDef.Height = new System.Windows.GridLength(1, System.Windows.GridUnitType.Star);
                         mGridUnitType = GridUnitType.Pixel;
