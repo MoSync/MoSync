@@ -169,9 +169,11 @@ void generateMarshalling(ostream& extensionFile, Interface& ext, string& name, s
 	} else {
 		if (stringType) {
 			extensionFile << "args.push(!" << name << "?-1:mosync.encoder.lengthAsUTF8(" << name << "));";
-		}
-		// Primitive
-		extensionFile << "args.push(" << name << " || " << getJSDefaultValue(scalarType) << ");";
+			//extensionFile << "args.push(mosync.encoder.encodeUTF8(" << name << " || \"\"));";
+		} //else {
+			// Primitive
+			extensionFile << "args.push(" << name << " || " << getJSDefaultValue(scalarType) << ");";
+		//}
 	}
 }
 

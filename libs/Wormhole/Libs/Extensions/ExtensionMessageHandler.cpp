@@ -22,6 +22,7 @@
 #include <MAUtil/HashMap.h>
 #include <MAUtil/String.h>
 
+#include "../../Encoder.h"
 #include "../../MessageStream.h"
 #include "ExtensionMessageHandler.h"
 
@@ -479,9 +480,9 @@ void JSStringMarshaller::unmarshal(char* buffer, MAUtil::String& jsExpr) {
 	if (ptr) {
 		int length = unmarshalInt(ptr - sizeof(int)) & MAX_ARRAY_SIZE_MASK;
 		ptr[length] = '\0'; // <-- We've allocated an extra byte for this purpose
-		jsExpr += "\"";
-		jsExpr += ptr;
-		jsExpr += "\"";
+		jsExpr += "decodeURIComponent(escape(atob(\"";
+		jsExpr += Encoder::base64Encode(ptr, strlen(ptr));
+		jsExpr += "\")))";
 	} else {
 		// A null value
 		jsExpr += "null";
