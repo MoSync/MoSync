@@ -44,7 +44,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 //#include <helpers/CPP_IX_ACCELEROMETER.h>
 #include "MoSyncPanic.h"
 #import "Ads.h"
-#import "NotificationManager.h"
 #include <helpers/CPP_IX_WIDGET.h>
 #include "MoSyncUISyscalls.h"
 
@@ -92,6 +91,7 @@ using namespace MoSyncError;
 #import "MoSyncSound.h"
 #import "MoSyncPurchase.h"
 #import "MoSyncCapture.h"
+#import "MoSyncNotification.h"
 
 extern ThreadPool gThreadPool;
 
@@ -346,7 +346,6 @@ namespace Base {
 		DeleteCriticalSection(&exitMutex);
 		MANetworkClose();
         MAPimClose();
-        [NotificationManager deleteInstance];
         [Ads deleteInstance];
         [ScreenOrientation deleteInstance];
 
@@ -1507,66 +1506,6 @@ namespace Base {
         return [[Ads getInstance] bannerGetProperty:bannerHandle property:property value:value size:bufSize];
 	}
 
-    SYSCALL(int, maNotificationLocalCreate())
-	{
-		return [[NotificationManager getInstance] createLocalNotificationObject];
-	}
-    SYSCALL(int, maNotificationLocalDestroy(MAHandle notificationHandle))
-	{
-        return [[NotificationManager getInstance] destroyLocalNotificationObject:notificationHandle];
-	}
-    SYSCALL(int, maNotificationLocalSetProperty(MAHandle notificationHandle, const char* property, const char* value))
-	{
-        return [[NotificationManager getInstance] localNotificationSetProperty:notificationHandle
-                                                                      property:property
-                                                                         value:value];
-	}
-    SYSCALL(int, maNotificationLocalGetProperty(MAHandle notificationHandle, const char* property,
-                                                char* value, const int bufSize))
-	{
-        return [[NotificationManager getInstance] localNotificationGetProperty:notificationHandle
-                                                                      property:property
-                                                                         value:value
-                                                                          size:bufSize];
-	}
-    SYSCALL(int, maNotificationLocalSchedule(MAHandle notificationHandle))
-	{
-		return [[NotificationManager getInstance] registerLocalNotification:notificationHandle];
-	}
-    SYSCALL(int, maNotificationLocalUnschedule(MAHandle notificationHandle))
-	{
-        return [[NotificationManager getInstance] unregisterLocalNotification:notificationHandle];
-	}
-    SYSCALL(int, maNotificationPushRegister(MAHandle pushNotificationType, const char* accountID))
-	{
-		return [[NotificationManager getInstance] registerPushNotification:pushNotificationType];
-	}
-    SYSCALL(int, maNotificationPushUnregister())
-	{
-        return [[NotificationManager getInstance] unregisterPushNotification];
-	}
-    SYSCALL(int, maNotificationPushGetData(MAHandle pushNotificationHandle,
-                                           MAPushNotificationData* pushNotificationData))
-	{
-        return [[NotificationManager getInstance] getPushNotificationData:pushNotificationHandle
-                                                              data:pushNotificationData];
-	}
-    SYSCALL(int, maNotificationPushGetRegistration(char* buffer, const int size))
-	{
-        return [[NotificationManager getInstance] getPushRegistrationData:buffer size:size];
-	}
-    SYSCALL(int, maNotificationPushDestroy(MAHandle pushNotificationHandle))
-	{
-        return [[NotificationManager getInstance] pushNotificationDestroy:pushNotificationHandle];
-	}
-    SYSCALL(void, maNotificationSetIconBadge(const int applicationIconBadgeNumber))
-	{
-        [[NotificationManager getInstance] setApplicationIconBadgeNumber:applicationIconBadgeNumber];
-	}
-    SYSCALL(int, maNotificationGetIconBadge())
-	{
-        return [[NotificationManager getInstance] getApplicationIconBadgeNumber];
-	}
 
     SYSCALL(int, maScreenSetSupportedOrientations(const int orientations))
 	{
