@@ -50,7 +50,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #import "ImagePickerController.h"
 #import "ScreenOrientation.h"
-#import "Capture.h"
 #include "netImpl.h"
 #import "Reachability.h"
 #import "PurchaseManager.h"
@@ -92,6 +91,7 @@ using namespace MoSyncError;
 #import "MoSyncCamera.h"
 #import "MoSyncSound.h"
 #import "MoSyncPurchase.h"
+#import "MoSyncCapture.h"
 
 extern ThreadPool gThreadPool;
 
@@ -353,7 +353,6 @@ namespace Base {
         MAAudioClose();
         [OptionsDialogView deleteInstance];
         [ImagePickerController deleteInstance];
-        [Capture deleteInstance];
 	}
 
 
@@ -1581,31 +1580,6 @@ namespace Base {
 	{
         return [[ScreenOrientation getInstance] getCurrentScreenOrientation];
     }
-    SYSCALL(int, maCaptureSetProperty(const char* property, const char* value))
-	{
-        return [[Capture getInstance] setProperty:property withValue:value];
-	}
-    SYSCALL(int, maCaptureGetProperty(const char* property, char* value, const int bufSize))
-	{
-        return [[Capture getInstance] getProperty:property value:value maxSize:bufSize];
-	}
-    SYSCALL(int, maCaptureAction(const int action))
-	{
-        return [[Capture getInstance] action:action];
-	}
-    SYSCALL(int, maCaptureWriteImage(const int handle, const char* fullPath, const int fullPathSize))
-	{
-        return [[Capture getInstance] writeImage:handle withPath:fullPath maxSize:fullPathSize];
-	}
-    SYSCALL(int, maCaptureGetVideoPath(const int handle, char* buffer, const int bufferSize))
-	{
-        return [[Capture getInstance] getVideoPath:handle buffer:buffer maxSize:bufferSize];
-	}
-    SYSCALL(int, maCaptureDestroyData(const int handle))
-	{
-        return [[Capture getInstance] destroyData:handle];
-
-	}
 
 	SYSCALL(longlong, maIOCtl(int function, int a, int b, int c))
 	{
