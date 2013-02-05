@@ -424,6 +424,8 @@
 		8B944BF516C1750200E1B091 /* MoSyncCapture.h in Headers */ = {isa = PBXBuildFile; fileRef = 8B944BF316C1750200E1B091 /* MoSyncCapture.h */; };
 		8B944BF616C1750200E1B091 /* MoSyncCapture.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8B944BF416C1750200E1B091 /* MoSyncCapture.mm */; };
 		8B944BF716C1750200E1B091 /* MoSyncCapture.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8B944BF416C1750200E1B091 /* MoSyncCapture.mm */; };
+		D99A59DF16C1B183000C6649 /* MoSyncAds.mm in Sources */ = {isa = PBXBuildFile; fileRef = D99A59DE16C1B183000C6649 /* MoSyncAds.mm */; };
+		D99A59E016C1B1F9000C6649 /* MoSyncAds.mm in Sources */ = {isa = PBXBuildFile; fileRef = D99A59DE16C1B183000C6649 /* MoSyncAds.mm */; };
 		E413FAB814C0604D00BF1E3D /* ResourceArray.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E413FAB714C0604D00BF1E3D /* ResourceArray.cpp */; };
 		E413FABA14C0606A00BF1E3D /* ResourceArray.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E413FAB714C0604D00BF1E3D /* ResourceArray.cpp */; };
 		E438DF501535D35D008B5005 /* CoreMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E438DF4F1535D35C008B5005 /* CoreMedia.framework */; };
@@ -767,6 +769,8 @@
 		8B944BF316C1750200E1B091 /* MoSyncCapture.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MoSyncCapture.h; path = capture/MoSyncCapture.h; sourceTree = "<group>"; };
 		8B944BF416C1750200E1B091 /* MoSyncCapture.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = MoSyncCapture.mm; path = capture/MoSyncCapture.mm; sourceTree = "<group>"; };
 		8D1107310486CEB800E47090 /* MoSync-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "MoSync-Info.plist"; plistStructureDefinitionIdentifier = "com.apple.xcode.plist.structure-definition.iphone.info-plist"; sourceTree = "<group>"; };
+		D99A59DC16C1B16B000C6649 /* MoSyncAds.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = MoSyncAds.h; path = ads/MoSyncAds.h; sourceTree = "<group>"; };
+		D99A59DE16C1B183000C6649 /* MoSyncAds.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = MoSyncAds.mm; path = ads/MoSyncAds.mm; sourceTree = "<group>"; };
 		E413FAB714C0604D00BF1E3D /* ResourceArray.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ResourceArray.cpp; path = ../../../base/ResourceArray.cpp; sourceTree = "<group>"; };
 		E438DF4F1535D35C008B5005 /* CoreMedia.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMedia.framework; path = System/Library/Frameworks/CoreMedia.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
@@ -1177,6 +1181,8 @@
 				43F36FCD15B4753A0095B3C6 /* Ads.mm */,
 				43F36FCE15B4753A0095B3C6 /* BannerWidget.h */,
 				43F36FCF15B4753A0095B3C6 /* BannerWidget.mm */,
+				D99A59DC16C1B16B000C6649 /* MoSyncAds.h */,
+				D99A59DE16C1B183000C6649 /* MoSyncAds.mm */,
 			);
 			name = Ads;
 			sourceTree = "<group>";
@@ -1891,6 +1897,7 @@
 				8B944BE716C1394800E1B091 /* MoSyncSound.mm in Sources */,
 				8B944BF116C169BD00E1B091 /* MoSyncPurchase.mm in Sources */,
 				8B944BF616C1750200E1B091 /* MoSyncCapture.mm in Sources */,
+				D99A59DF16C1B183000C6649 /* MoSyncAds.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1898,6 +1905,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D99A59E016C1B1F9000C6649 /* MoSyncAds.mm in Sources */,
 				858B44BB12E7B1060058DBFC /* log.cpp in Sources */,
 				E4B3144E14B483FF009F88B4 /* MoSync.mm in Sources */,
 				E4B3145014B48404009F88B4 /* MoSyncExtension.mm in Sources */,
