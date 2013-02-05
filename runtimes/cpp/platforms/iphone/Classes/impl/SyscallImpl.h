@@ -15,6 +15,10 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
+static Surface* gBackbuffer = NULL;
+static Surface* gDrawTarget = NULL;
+static MAHandle gDrawTargetHandle = HANDLE_SCREEN;
+
 class Syscall {
 public:
 Surface* loadImage(MemStreamC& s);
