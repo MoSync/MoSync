@@ -92,6 +92,7 @@ using namespace MoSyncError;
 #import "MoSyncSound.h"
 #import "MoSyncPurchase.h"
 #import "MoSyncCapture.h"
+#import "MoSyncSensorBridge.h"
 
 extern ThreadPool gThreadPool;
 
@@ -1454,16 +1455,6 @@ namespace Base {
 			[UIApplication sharedApplication].idleTimerDisabled = NO;
 		}
         return RES_OK;
-	}
-
-    SYSCALL(int, maSensorStart(int sensor, int interval))
-	{
-		return MoSync_SensorStart(sensor, interval);
-	}
-
-    SYSCALL(int, maSensorStop(int sensor))
-	{
-		return MoSync_SensorStop(sensor);
 	}
 
     SYSCALL(int, maSyscallPanicsEnable())
