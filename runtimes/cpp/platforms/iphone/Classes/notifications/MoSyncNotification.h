@@ -27,7 +27,7 @@ SYSCALL(int, maNotificationLocalSetProperty(MAHandle notificationHandle,
 											const char* property, const char* value));
 SYSCALL(int, maNotificationLocalGetProperty(MAHandle notificationHandle,
 											const char* property, char* value,
-											const int bufSize))
+											const int bufSize));
 SYSCALL(int, maNotificationLocalSchedule(MAHandle notificationHandle));
 SYSCALL(int, maNotificationLocalUnschedule(MAHandle notificationHandle));
 SYSCALL(int, maNotificationPushRegister(MAHandle pushNotificationType,

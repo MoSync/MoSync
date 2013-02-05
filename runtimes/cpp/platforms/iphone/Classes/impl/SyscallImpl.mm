@@ -48,7 +48,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "MoSyncUISyscalls.h"
 
 #import "ImagePickerController.h"
-#import "ScreenOrientation.h"
 #include "netImpl.h"
 #import "Reachability.h"
 #import "PurchaseManager.h"
@@ -92,6 +91,8 @@ using namespace MoSyncError;
 #import "MoSyncPurchase.h"
 #import "MoSyncCapture.h"
 #import "MoSyncNotification.h"
+#import "MoSyncOrientation.h"
+
 
 extern ThreadPool gThreadPool;
 
@@ -347,7 +348,6 @@ namespace Base {
 		MANetworkClose();
         MAPimClose();
         [Ads deleteInstance];
-        [ScreenOrientation deleteInstance];
 
         MAAudioClose();
         [OptionsDialogView deleteInstance];
@@ -1505,20 +1505,6 @@ namespace Base {
 	{
         return [[Ads getInstance] bannerGetProperty:bannerHandle property:property value:value size:bufSize];
 	}
-
-
-    SYSCALL(int, maScreenSetSupportedOrientations(const int orientations))
-	{
-        return [[ScreenOrientation getInstance] setSupportedOrientations:orientations];
-	}
-    SYSCALL(int, maScreenGetSupportedOrientations())
-	{
-        return [[ScreenOrientation getInstance] getSupportedOrientations];
-	}
-    SYSCALL(int, maScreenGetCurrentOrientation())
-	{
-        return [[ScreenOrientation getInstance] getCurrentScreenOrientation];
-    }
 
 	SYSCALL(longlong, maIOCtl(int function, int a, int b, int c))
 	{
