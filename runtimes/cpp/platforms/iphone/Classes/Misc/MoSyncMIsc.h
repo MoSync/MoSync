@@ -20,6 +20,7 @@
 #include "Syscall.h"
 #import <vector>
 
+// Time related
 void initTimeStamps();
 
 SYSCALL(int, maTime());
@@ -30,6 +31,11 @@ SYSCALL(int, maGetMilliSecondCount());
 
 SYSCALL(void, maWait(int timeout));
 
+// Platform related
+SYSCALL(int, maWakeLock(int flag));
+
+SYSCALL(void, maResetBacklight());
+
 SYSCALL(int, maVibrate(int ms));
 
 SYSCALL(int, maGetBatteryCharge());
@@ -38,6 +44,33 @@ SYSCALL(int, maPlatformRequest(const char* url));
 
 SYSCALL(int, maGetKeys());
 
-SYSCALL(int, maSendTextSMS(const char* dst, const char* msg));
+int maGetSystemProperty(const char *key, char *buf, int size);
+
+// UI related
+SYSCALL(void, maMessageBox(const char* title, const char* message));
+
+SYSCALL(void, maImagePickerOpen());
+
+SYSCALL(void, maImagePickerOpenWithEventReturnType(int returnType));
+
+SYSCALL(void, maAlert(const char* title, const char* message, const char* button1, const char* button2, const char* button3));
+
+SYSCALL(void, maOptionsBox(const wchar* title, const wchar* destructiveButtonTitle, const wchar* cancelButtonTitle,
+                           const void* otherButtonTitles, const int otherButtonTitlesSize));
 
 int maTextBox(const wchar* title, const wchar* inText, wchar* outText, int maxSize, int constraints);
+
+// File related
+SYSCALL(int, maFileSetProperty(const char* path, int property, int value));
+
+// Mobility
+SYSCALL(int, maSendTextSMS(const char* dst, const char* msg));
+
+// MoSync
+SYSCALL(int, maFreeObjectMemory());
+
+SYSCALL(int, maTotalObjectMemory());
+
+SYSCALL(int, maSyscallPanicsEnable());
+
+SYSCALL(int, maSyscallPanicsDisable());

@@ -33,21 +33,16 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "Syscall.h"
 #include "MoSyncDB.h"
 #include "PimSyscall.h"
-#include "OptionsDialogView.h"
 #include <CoreMedia/CoreMedia.h>
 #include <sys/types.h> //
-#include <sys/sysctl.h>//to retrieve device model
-#include <sys/xattr.h>
 
 #include <helpers/CPP_IX_GUIDO.h>
 //#include <helpers/CPP_IX_ACCELEROMETER.h>
-#include "MoSyncPanic.h"
 #include <helpers/CPP_IX_WIDGET.h>
 #include "MoSyncUISyscalls.h"
 
 #import "ImagePickerController.h"
 #include "netImpl.h"
-#import "Reachability.h"
 #import "PurchaseManager.h"
 
 #define NETWORKING_H
@@ -299,7 +294,6 @@ namespace Base {
 		MANetworkClose();
         MAPimClose();
         MAAudioClose();
-        [OptionsDialogView deleteInstance];
         [ImagePickerController deleteInstance];
 	}
 
@@ -754,10 +748,6 @@ namespace Base {
 		MoSync_UpdateView(gBackbuffer->image);
 	}
 
-	SYSCALL(void, maResetBacklight()) {
-		// do nothing, it can't be reset as far as I can tell.. still a private api.
-	}
-
 	SYSCALL(MAExtent, maGetScrSize()) {
 		CGSize size = [[ScreenOrientation getInstance] screenSize];
 		int width = (int) size.width;
@@ -980,13 +970,6 @@ namespace Base {
 		return 1;
 	}
 
-	SYSCALL(int, maFreeObjectMemory()) {
-		return getFreeAmountOfMemory();
-	}
-	SYSCALL(int, maTotalObjectMemory()) {
-		return getTotalAmountOfMemory();
-	}
-
 	SYSCALL(void, maPanic(int result, char* message))
 	{
 		MoSync_ShowMessageBox(nil, message, true);
@@ -994,46 +977,6 @@ namespace Base {
 		pthread_exit(NULL);
         //[[NSThread currentThread] exit];
 	}
-
-    SYSCALL(int, maFileSetProperty(const char* path, int property, int value))
-    {
-        NSURL *url = [NSURL fileURLWithPath:[NSString stringWithCString:path encoding:NSASCIIStringEncoding] isDirectory:NO];
-        if(!url || ![[NSFileManager defaultManager] fileExistsAtPath:[url path]])
-        {
-            return MA_FERR_NOTFOUND;
-        }
-
-        int returnValue = 0;
-        switch (property) {
-            case MA_FPROP_IS_BACKED_UP:
-            {
-                if (&NSURLIsExcludedFromBackupKey == nil)
-                {
-                    // For iOS <= 5.0.1.
-                    const char* filePath = [[url path] fileSystemRepresentation];
-                    const char* attrName = "com.apple.MobileBackup";
-                    u_int8_t attrValue = 1;
-                    int result = setxattr(filePath, attrName, &attrValue, sizeof(attrValue), 0, 0);
-                    returnValue = (result == 0) ? 0 : MA_FERR_GENERIC;
-                }
-                else
-                {
-                    // For iOS >= 5.1
-                    NSNumber* value = [NSNumber numberWithBool:(value == 0)];
-                    BOOL set = [url setResourceValue:value forKey:NSURLIsExcludedFromBackupKey error:NULL];
-                    returnValue = set ? 0 : MA_FERR_GENERIC;
-                }
-            }
-            break;
-
-            default:
-            {
-                returnValue = MA_FERR_NO_SUCH_PROPERTY;
-            }
-            break;
-        }
-        return returnValue;
-    }
 
 	SYSCALL(MAExtensionModule, maExtensionModuleLoad(const char* name, int hash))
 	{
@@ -1104,134 +1047,9 @@ namespace Base {
 		return 1;
 	}
 
-	int maGetSystemProperty(const char *key, char *buf, int size) {
-		int res = -2; //Property not found
-		if(strcmp(key, "mosync.iso-639-1")==0) {
-			// I don't know if this works perfectly (in the documentation it
-			// says that it will return iso-639-x, but it looks like iso-639-1)
-			CFLocaleRef userLocaleRef = CFLocaleCopyCurrent();
-			CFStringRef str = (CFStringRef)CFLocaleGetValue(userLocaleRef, kCFLocaleLanguageCode);
-			bool success = CFStringGetCString(str, buf, size, kCFStringEncodingUTF8);
-            res = (success)?strlen(buf) + 1: -1;
-			CFRelease(str);
-			CFRelease(userLocaleRef);
-		} else if (strcmp(key, "mosync.path.local") == 0) {
-			NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-			NSString *documentsDirectoryPath = [NSString stringWithFormat:@"%@/",[paths objectAtIndex:0]];
-			BOOL success = [documentsDirectoryPath getCString:buf maxLength:size encoding:NSASCIIStringEncoding];
-			res = (success)?strlen(buf) + 1: -1;
-		} else if (strcmp(key, "mosync.path.local.urlPrefix") == 0) {
-			BOOL success = [@"file://localhost/" getCString:buf maxLength:size encoding:NSASCIIStringEncoding];
-			res = (success)?strlen(buf) + 1: -1;
-		} else if (strcmp(key, "mosync.device.name") == 0) {
-			BOOL success = [[[UIDevice currentDevice] name] getCString:buf maxLength:size encoding:NSASCIIStringEncoding];
-			res = (success)?strlen(buf) + 1: -1;
-		} else if (strcmp(key, "mosync.device.UUID")== 0) {
-			BOOL success = [[[UIDevice currentDevice] uniqueIdentifier] getCString:buf maxLength:size encoding:NSASCIIStringEncoding];
-			res = (success)?strlen(buf) + 1: -1;
-		} else if (strcmp(key, "mosync.device.OS")== 0) {
-			BOOL success = [[[UIDevice currentDevice] systemName] getCString:buf maxLength:size encoding:NSASCIIStringEncoding];
-			res = (success)?strlen(buf) + 1: -1;
-		} else if (strcmp(key, "mosync.device.OS.version") == 0) {
-			BOOL success = [[[UIDevice currentDevice] systemVersion] getCString:buf maxLength:size encoding:NSASCIIStringEncoding];
-			res = (success)?strlen(buf) + 1: -1;
-		} else if (strcmp(key, "mosync.device") == 0) {
-			size_t responseSz;
-			sysctlbyname("hw.machine", NULL, &responseSz, NULL, 0);
-			char *machine = (char*)malloc(responseSz);
-			sysctlbyname("hw.machine", machine, &responseSz, NULL, 0);
-			NSString *platform = [NSString stringWithCString:machine encoding:NSASCIIStringEncoding];
-			BOOL success = [platform getCString:buf maxLength:size encoding:NSASCIIStringEncoding];
-			free(machine);
-			res = (success)?strlen(buf) + 1: -1;
-		} else if (strcmp(key, "mosync.network.type") == 0) {
-			NSString* networkType;
-			//Use Apples Reachability sample class for detecting the network type
-			Reachability * reachability = [Reachability reachabilityForInternetConnection];
-			NetworkStatus networkStatus = [reachability currentReachabilityStatus];
-			NSLog(@"networkStatus is %d", networkStatus);
-			switch(networkStatus)
-			{
-				case NotReachable:
-					networkType = @"none";
-					break;
-				case ReachableViaWWAN:
-					networkType = @"mobile"; //Generic name for mobile networks
-					break;
-				case ReachableViaWiFi:
-					networkType = @"wifi";
-					break;
-				default:
-					networkType = @"unknown";
-					break;
-			}
-			BOOL success = [networkType getCString:buf maxLength:size encoding:NSASCIIStringEncoding];
-			res = (success)?strlen(buf) + 1: -1;
-		}
-
-		return res;
-	}
-
 	int maReportResourceInformation() {
 		gSyscall->resources.logEverything();
 		return 0;
-	}
-
-	SYSCALL(void, maMessageBox(const char* title, const char* message))
-	{
-		MoSync_ShowMessageBox(title, message, false);
-	}
-
-	//Shows an alert box with up to three buttons
-	SYSCALL(void, maAlert(const char* title, const char* message, const char* button1, const char* button2, const char* button3))
-	{
-		MoSync_ShowAlert(title, message, button1, button2, button3);
-	}
-
-	SYSCALL(void, maOptionsBox(const wchar* title, const wchar* destructiveButtonTitle, const wchar* cancelButtonTitle,
-                          const void* otherButtonTitles, const int otherButtonTitlesSize))
-	{
-        [[OptionsDialogView getInstance] show:title
-                       destructiveButtonTitle:destructiveButtonTitle
-                            cancelButtonTitle:cancelButtonTitle
-                            otherButtonTitles:otherButtonTitles
-                        otherButtonTitlesSize:otherButtonTitlesSize];
-	}
-
-    SYSCALL(void, maImagePickerOpen())
-	{
-		MoSync_ShowImagePicker();
-	}
-
-    SYSCALL(void, maImagePickerOpenWithEventReturnType(int returnType))
-	{
-		MoSync_ShowImagePicker(returnType);
-	}
-
-
-	SYSCALL(int, maWakeLock(int flag))
-	{
-		if (MA_WAKE_LOCK_ON == flag)
-		{
-			[UIApplication sharedApplication].idleTimerDisabled = YES;
-		}
-		else
-		{
-			[UIApplication sharedApplication].idleTimerDisabled = NO;
-		}
-        return RES_OK;
-	}
-
-    SYSCALL(int, maSyscallPanicsEnable())
-	{
-        [[MoSyncPanic getInstance] setThowPanic:true];
-        return RES_OK;
-	}
-
-    SYSCALL(int, maSyscallPanicsDisable())
-	{
-        [[MoSyncPanic getInstance] setThowPanic:false];
-        return RES_OK;
 	}
 
 	SYSCALL(longlong, maIOCtl(int function, int a, int b, int c))
