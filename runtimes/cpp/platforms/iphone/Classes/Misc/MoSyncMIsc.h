@@ -81,6 +81,8 @@ SYSCALL(int, maSyscallPanicsEnable());
 
 SYSCALL(int, maSyscallPanicsDisable());
 
+SYSCALL(void, maPanic(int result, const char* message));
+
 // MoSync Extensions
 SYSCALL(MAExtensionModule, maExtensionModuleLoad(const char* name, int hash));
 

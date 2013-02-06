@@ -399,6 +399,14 @@ SYSCALL(int, maSyscallPanicsDisable())
     return RES_OK;
 }
 
+SYSCALL(void, maPanic(int result, const char* message))
+{
+    MoSync_ShowMessageBox(nil, message, true);
+    gRunning = false;
+    pthread_exit(NULL);
+    //[[NSThread currentThread] exit];
+}
+
 /*
  * MoSync Extensions
  */

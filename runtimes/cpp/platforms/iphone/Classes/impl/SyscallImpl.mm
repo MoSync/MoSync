@@ -617,14 +617,6 @@ namespace Base {
 		delete glyphs;
 	}
 
-	SYSCALL(void, maPanic(int result, char* message))
-	{
-		MoSync_ShowMessageBox(nil, message, true);
-		gRunning = false;
-		pthread_exit(NULL);
-        //[[NSThread currentThread] exit];
-	}
-
 	SYSCALL(longlong, maIOCtl(int function, int a, int b, int c))
 	{
 		switch(function) {
