@@ -26,6 +26,7 @@
 
 #include "MoSyncUISyscalls.h"
 #include "MemStream.h"
+#include "MoSyncGraphics.h"
 
 //This struct holds information about what resources are connected
 //to a single camera. Each device camera has it's own instance
@@ -201,7 +202,7 @@ SYSCALL(int, maCameraStart())
 				}
 
 				MoSync_AddLayerToView(info->previewLayer);
-				MoSync_UpdateView(Base::gBackbuffer->image);
+				MoSync_UpdateView(gBackbuffer->image);
 			}
 			else
 			{
