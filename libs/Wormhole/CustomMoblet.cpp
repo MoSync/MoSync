@@ -51,7 +51,7 @@ void CustomMoblet::enterEventLoop()
 {
 	CustomMoblet* moblet = this;
 
-	mRun = true;
+	moblet->mRun = true;
 
 	while (moblet->mRun)
 	{
@@ -68,11 +68,12 @@ void CustomMoblet::enterEventLoop()
 		moblet->runPendingTimers();
 		moblet->runIdleListeners();
 
-		if (moblet->mIdleListeners.size() == 0)
+		if (moblet->mIdleListeners.size() == 0 && moblet->mRun)
 		{
 			int ttnt = moblet->timeToNextTimer();
-			// Don't do maWait(0) because that waits indefinitely.
-			if (ttnt > 0)
+			// ttnt may be >= -1. If we get zero, we do not do maWait(0)
+			// because in that case time to next timer is zero.
+			if (ttnt)
 			{
 				maWait(ttnt);
 			}
@@ -176,7 +177,9 @@ void CustomMoblet::processEvent(const MAEvent& event)
 }
 
 /**
- * This method always returns >= 0.
+ * Get the time to the next timer that should fire.
+ * @return Time to next timer event.
+ * Returns -1 when there are no timers.
  */
 int CustomMoblet::timeToNextTimer()
 {
@@ -195,6 +198,7 @@ int CustomMoblet::timeToNextTimer()
 		}
 		else
 		{
+			// Get MIN(minTime, ttn).
 			minTime = minTime < ttn ? minTime : ttn;
 		}
 	}
