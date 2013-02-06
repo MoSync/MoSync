@@ -20,6 +20,8 @@
 #include "Syscall.h"
 #import <vector>
 
+// TODO Make proper files/containers for every categry.
+
 // Time related
 void initTimeStamps();
 
@@ -47,6 +49,8 @@ SYSCALL(int, maGetKeys());
 int maGetSystemProperty(const char *key, char *buf, int size);
 
 // UI related
+SYSCALL(MAExtent, maGetScrSize());
+
 SYSCALL(void, maMessageBox(const char* title, const char* message));
 
 SYSCALL(void, maImagePickerOpen());
@@ -66,7 +70,9 @@ SYSCALL(int, maFileSetProperty(const char* path, int property, int value));
 // Mobility
 SYSCALL(int, maSendTextSMS(const char* dst, const char* msg));
 
-// MoSync
+// MoSync basic
+int maReportResourceInformation();
+
 SYSCALL(int, maFreeObjectMemory());
 
 SYSCALL(int, maTotalObjectMemory());
@@ -74,3 +80,10 @@ SYSCALL(int, maTotalObjectMemory());
 SYSCALL(int, maSyscallPanicsEnable());
 
 SYSCALL(int, maSyscallPanicsDisable());
+
+// MoSync Extensions
+SYSCALL(MAExtensionModule, maExtensionModuleLoad(const char* name, int hash));
+
+SYSCALL(MAExtensionFunction, maExtensionFunctionLoad(MAHandle module, int index));
+
+SYSCALL(longlong, maExtensionFunctionInvoke(int, int, int, int));

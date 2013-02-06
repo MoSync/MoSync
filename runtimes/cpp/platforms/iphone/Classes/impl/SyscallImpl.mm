@@ -104,7 +104,7 @@ namespace Base {
 	Syscall* gSyscall;
 
 	EventQueue gEventQueue;
-	static bool gEventOverflow	= false;
+	bool gEventOverflow = false;
 
 	int gVolume = -1;
 
@@ -617,61 +617,12 @@ namespace Base {
 		delete glyphs;
 	}
 
-	SYSCALL(MAExtent, maGetScrSize()) {
-		CGSize size = [[ScreenOrientation getInstance] screenSize];
-		int width = (int) size.width;
-		int height = (int)size.height;
-		return EXTENT(width, height);
-	}
-
-	SYSCALL(int, maGetEvent(MAEvent *dst))
-	{
-		gSyscall->ValidateMemRange(dst, sizeof(MAEvent));
-		MYASSERT(((uint)dst & 3) == 0, ERR_MEMORY_ALIGNMENT);	//alignment
-
-		if(!gClosing)
-			gEventOverflow = false;
-
-		MAEvent ev;
-		bool ret = gEventQueue.getAndProcess(ev);
-		if(!ret) return 0;
-		else *dst = ev; //gEventQueue.get();
-
-#define HANDLE_CUSTOM_EVENT(eventType, dataType) if(ev.type == eventType) {\
-		memcpy(MoSync_GetCustomEventData(), (void*)ev.data, sizeof(dataType));\
-		delete (dataType*)ev.data;\
-		dst->data = (int)MoSync_GetCustomEventDataMoSyncPointer(); }
-
-		CUSTOM_EVENTS(HANDLE_CUSTOM_EVENT);
-
-		return 1;
-	}
-
 	SYSCALL(void, maPanic(int result, char* message))
 	{
 		MoSync_ShowMessageBox(nil, message, true);
 		gRunning = false;
 		pthread_exit(NULL);
         //[[NSThread currentThread] exit];
-	}
-
-	SYSCALL(MAExtensionModule, maExtensionModuleLoad(const char* name, int hash))
-	{
-		return MA_EXTENSION_MODULE_UNAVAILABLE;
-	}
-
-	SYSCALL(MAExtensionFunction, maExtensionFunctionLoad(MAHandle module, int index))
-	{
-		return MA_EXTENSION_FUNCTION_UNAVAILABLE;
-	}
-
-	SYSCALL(int, maExtensionFunctionInvoke(int, int, int, int)) {
-		BIG_PHAT_ERROR(ERR_FUNCTION_UNIMPLEMENTED);
-	}
-
-	int maReportResourceInformation() {
-		gSyscall->resources.logEverything();
-		return 0;
 	}
 
 	SYSCALL(longlong, maIOCtl(int function, int a, int b, int c))

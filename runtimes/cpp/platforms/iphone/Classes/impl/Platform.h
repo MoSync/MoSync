@@ -313,6 +313,7 @@ namespace Base
 {
 	extern EventQueue gEventQueue;
     extern bool gClosing;
+    extern bool gEventOverflow;
 }
 
 #endif

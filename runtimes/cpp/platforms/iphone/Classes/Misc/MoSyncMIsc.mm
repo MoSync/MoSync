@@ -19,6 +19,7 @@
 #import "MoSyncMisc.h"
 
 #include "Platform.h"
+#include "Syscall.h"
 #include "MoSyncUI.h"
 #include "OptionsDialogView.h"
 #include "MoSyncPanic.h"
@@ -34,7 +35,7 @@
 #import <MessageUI/MessageUI.h>
 
 #import "Reachability.h"
-
+#import "ScreenOrientation.h"
 
 static mach_timebase_info_data_t gTimeBase;
 static uint64_t gTimeStart;
@@ -77,6 +78,9 @@ static uint64_t gTimeStart;
 }
 @end
 
+/*
+ * Time related
+ */
 void initTimeStamps()
 {
     mach_timebase_info( &gTimeBase );
@@ -112,6 +116,9 @@ SYSCALL(void, maWait(int timeout))
     Base::gEventQueue.wait(timeout);
 }
 
+/*
+ * Platform related
+ */
 SYSCALL(int, maWakeLock(int flag))
 {
     if (MA_WAKE_LOCK_ON == flag)
@@ -223,6 +230,17 @@ int maGetSystemProperty(const char *key, char *buf, int size)
     return res;
 }
 
+/*
+ * UI related
+ */
+SYSCALL(MAExtent, maGetScrSize())
+{
+    CGSize size = [[ScreenOrientation getInstance] screenSize];
+    int width = (int) size.width;
+    int height = (int)size.height;
+    return EXTENT(width, height);
+}
+
 SYSCALL(void, maMessageBox(const char* title, const char* message))
 {
     MoSync_ShowMessageBox(title, message, false);
@@ -260,6 +278,9 @@ int maTextBox(const wchar* title, const wchar* inText, wchar* outText, int maxSi
     return 0;
 }
 
+/*
+ * File related
+ */
 SYSCALL(int, maFileSetProperty(const char* path, int property, int value))
 {
     NSURL *url = [NSURL fileURLWithPath:[NSString stringWithCString:path encoding:NSASCIIStringEncoding] isDirectory:NO];
@@ -299,6 +320,9 @@ SYSCALL(int, maFileSetProperty(const char* path, int property, int value))
     return returnValue;
 }
 
+/*
+ * Mobility
+ */
 SYSCALL(int, maSendTextSMS(const char* dst, const char* msg))
 {
     if ([MFMessageComposeViewController canSendText] == NO) {
@@ -319,7 +343,40 @@ SYSCALL(int, maSendTextSMS(const char* dst, const char* msg))
     return 0;
 }
 
-// MoSync
+/*
+ * MoSync basic
+ */
+SYSCALL(int, maGetEvent(MAEvent *dst))
+{
+    Base::gSyscall->ValidateMemRange(dst, sizeof(MAEvent));
+    MYASSERT(((uint)dst & 3) == 0, ERR_MEMORY_ALIGNMENT);	//alignment
+
+    if(!Base::gClosing)
+    {
+        Base::gEventOverflow = false;
+    }
+
+    MAEvent ev;
+    bool ret = Base::gEventQueue.getAndProcess(ev);
+    if(!ret) return 0;
+    else *dst = ev; //gEventQueue.get();
+
+#define HANDLE_CUSTOM_EVENT(eventType, dataType) if(ev.type == eventType) {\
+memcpy(MoSync_GetCustomEventData(), (void*)ev.data, sizeof(dataType));\
+delete (dataType*)ev.data;\
+dst->data = (int)MoSync_GetCustomEventDataMoSyncPointer(); }
+
+    CUSTOM_EVENTS(HANDLE_CUSTOM_EVENT);
+
+    return 1;
+}
+
+int maReportResourceInformation()
+{
+    Base::gSyscall->resources.logEverything();
+    return 0;
+}
+
 SYSCALL(int, maFreeObjectMemory())
 {
     return getFreeAmountOfMemory();
@@ -340,4 +397,22 @@ SYSCALL(int, maSyscallPanicsDisable())
 {
     [[MoSyncPanic getInstance] setThowPanic:false];
     return RES_OK;
+}
+
+/*
+ * MoSync Extensions
+ */
+SYSCALL(MAExtensionModule, maExtensionModuleLoad(const char* name, int hash))
+{
+    return MA_EXTENSION_MODULE_UNAVAILABLE;
+}
+
+SYSCALL(MAExtensionFunction, maExtensionFunctionLoad(MAHandle module, int index))
+{
+    return MA_EXTENSION_FUNCTION_UNAVAILABLE;
+}
+
+SYSCALL(longlong, maExtensionFunctionInvoke(int, int, int, int))
+{
+    BIG_PHAT_ERROR(ERR_FUNCTION_UNIMPLEMENTED);
 }
