@@ -312,6 +312,7 @@ private:
 namespace Base
 {
 	extern EventQueue gEventQueue;
+    extern bool gClosing;
 }
 
 #endif

@@ -18,7 +18,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "config_platform.h"
 #import <UIKit/UIKit.h>
 #import <AssetsLibrary/AssetsLibrary.h>
-#import <MessageUI/MessageUI.h>
 #include <string>
 #include <vector>
 #include <map>
@@ -65,12 +64,10 @@ using namespace MoSyncError;
 #include "MoSyncMain.h"
 #import "MoSyncAppDelegate.h"
 
-#include "iphone_helpers.h"
 #include "CMGlyphDrawing.h"
 
 #import <CoreVideo/CoreVideo.h>
 #import <CoreVideo/CVPixelBuffer.h>
-#include <AudioToolbox/AudioToolbox.h>
 
 #ifdef SUPPORT_OPENGL_ES
 #define DONT_WANT_IX_OPENGL_ES_TYPEDEFS
@@ -93,48 +90,11 @@ using namespace MoSyncError;
 #import "MoSyncPurchase.h"
 #import "MoSyncCapture.h"
 #import "MoSyncSensorBridge.h"
+#import "MoSyncMisc.h"
 
 extern ThreadPool gThreadPool;
 
 #define NOT_IMPLEMENTED BIG_PHAT_ERROR(ERR_FUNCTION_UNIMPLEMENTED)
-
-//This delegate is needed for the SMS system, because iOS does not automatically
-//hide the sms window after the user sends an SMS or clicks cancel
-@interface SMSResultDelegate:NSObject<MFMessageComposeViewControllerDelegate>{
-}
-
-- (void)messageComposeViewController:(MFMessageComposeViewController *)controller
-				 didFinishWithResult:(MessageComposeResult)result;
-@end
-
-@implementation SMSResultDelegate
-
-- (void)messageComposeViewController:(MFMessageComposeViewController *)controller
-				 didFinishWithResult:(MessageComposeResult)result{
-	MoSyncUI* msUI = getMoSyncUI();
-	[msUI hideModal];
-
-	MAEvent event;
-	event.type = EVENT_TYPE_SMS;
-
-	if (result == MessageComposeResultCancelled) {
-		event.status = MA_SMS_RESULT_NOT_SENT;
-	}
-	else if (result == MessageComposeResultFailed) {
-		event.status = MA_SMS_RESULT_NOT_DELIVERED;
-	}
-	else if (result == MessageComposeResultSent){
-		MAEvent firstEvent;
-		firstEvent.type = EVENT_TYPE_SMS;
-		firstEvent.status = MA_SMS_RESULT_SENT;
-		Base::gEventQueue.put(firstEvent);
-
-		event.status = MA_SMS_RESULT_DELIVERED;
-	}
-
-	Base::gEventQueue.put(event);
-}
-@end
 
 namespace Base {
 
@@ -154,12 +114,9 @@ namespace Base {
 
 	unsigned char *gBackBufferData;
 
-	mach_timebase_info_data_t gTimeBase;
-	uint64_t gTimeStart;
-
 	EventQueue gEventQueue;
 	static bool gEventOverflow	= false;
-	static bool gClosing		= false;
+	bool gClosing = false;
 
 	int gVolume = -1;
 
@@ -324,10 +281,8 @@ namespace Base {
         MAHandle initFontHandle=maFontLoadDefault(INITIAL_FONT_TYPE,INITIAL_FONT_STYLE,gHeight/40);
         maFontSetCurrent(initFontHandle);
 
-		mach_timebase_info( &gTimeBase );
-		//gTimeConversion = 1e-6 * (double)machInfo.numer/(double)machInfo.denom;
-		gTimeStart = mach_absolute_time();
-
+        //Setting the time base and the time start of the app.
+        initTimeStamps();
 
 		MANetworkInit();
 
@@ -1009,15 +964,6 @@ namespace Base {
 		return gSyscall->resources.add_RT_IMAGE(placeholder, surf);
 	}
 
-
-	SYSCALL(int, maGetKeys())
-	{
-		if(gClosing)
-			return 0;
-		return 0; // there's no keys on iphone :)
-	}
-
-
 	SYSCALL(int, maGetEvent(MAEvent *dst))
 	{
 		gSyscall->ValidateMemRange(dst, sizeof(MAEvent));
@@ -1041,45 +987,11 @@ namespace Base {
 		return 1;
 	}
 
-	SYSCALL(void, maWait(int timeout))
-	{
-		if(gClosing)
-			return;
-		gEventQueue.wait(timeout);
-	}
-
-	SYSCALL(int, maTime())
-	{
-		return (int)time(NULL);
-	}
-
-	SYSCALL(int, maLocalTime())
-	{
-		time_t t = time(NULL);
-		tm* lt = localtime(&t);
-		return t + lt->tm_gmtoff;
-	}
-
-	SYSCALL(int, maGetMilliSecondCount())
-	{
-		//int time = (int)(CACurrentMediaTime()*1000.0);
-		//int time = (int)(CFAbsoluteTimeGetCurrent()*1000.0f);
-		//int time = (int)((double)mach_absolute_time()*gTimeConversion);
-		int time = (((mach_absolute_time() - gTimeStart) * gTimeBase.numer) / gTimeBase.denom) / 1000000;
-		return time;
-	}
-
 	SYSCALL(int, maFreeObjectMemory()) {
 		return getFreeAmountOfMemory();
 	}
 	SYSCALL(int, maTotalObjectMemory()) {
 		return getTotalAmountOfMemory();
-	}
-
-	SYSCALL(int, maVibrate(int ms))
-	{
-		AudioServicesPlaySystemSound(kSystemSoundID_Vibrate);
-		return 1;
 	}
 
 	SYSCALL(void, maPanic(int result, char* message))
@@ -1088,12 +1000,6 @@ namespace Base {
 		gRunning = false;
 		pthread_exit(NULL);
         //[[NSThread currentThread] exit];
-	}
-
-	SYSCALL(int, maPlatformRequest(const char* url))
-	{
-		if(!platformRequest(url)) return -1;
-		return 0;
 	}
 
     SYSCALL(int, maFileSetProperty(const char* path, int property, int value))
@@ -1135,32 +1041,6 @@ namespace Base {
         }
         return returnValue;
     }
-
-
-	SYSCALL(int, maGetBatteryCharge())
-	{
-		float batLeft = [[UIDevice currentDevice] batteryLevel];
-		return (int)(batLeft*100.0f);
-	}
-
-	SYSCALL(int, maSendTextSMS(const char* dst, const char* msg)) {
-		if ([MFMessageComposeViewController canSendText] == NO) {
-			return CONNERR_UNAVAILABLE;
-		}
-
-		MFMessageComposeViewController *smsController = [[MFMessageComposeViewController alloc] init];
-
-		smsController.recipients = [NSArray arrayWithObject:[NSString stringWithCString:dst encoding:NSASCIIStringEncoding]];
-		smsController.body = [NSString stringWithCString:msg encoding:NSASCIIStringEncoding];
-
-		smsController.messageComposeDelegate = [[SMSResultDelegate alloc] init];
-
-		MoSyncUI* msUI = getMoSyncUI();
-		[msUI showModal:smsController];
-
-		[smsController release];
-		return 0;
-	}
 
 	SYSCALL(MAExtensionModule, maExtensionModuleLoad(const char* name, int hash))
 	{
@@ -1238,11 +1118,6 @@ namespace Base {
 
 	int maLocationStop() {
 		MoSync_StopUpdatingLocation();
-		return 0;
-	}
-
-	int maTextBox(const wchar* title, const wchar* inText, wchar* outText, int maxSize, int constraints) {
-		MoSync_ShowTextBox(title, inText, outText, maxSize, constraints);
 		return 0;
 	}
 
