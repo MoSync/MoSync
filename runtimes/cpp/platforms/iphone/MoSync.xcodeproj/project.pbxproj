@@ -424,6 +424,15 @@
 		8B944BF516C1750200E1B091 /* MoSyncCapture.h in Headers */ = {isa = PBXBuildFile; fileRef = 8B944BF316C1750200E1B091 /* MoSyncCapture.h */; };
 		8B944BF616C1750200E1B091 /* MoSyncCapture.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8B944BF416C1750200E1B091 /* MoSyncCapture.mm */; };
 		8B944BF716C1750200E1B091 /* MoSyncCapture.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8B944BF416C1750200E1B091 /* MoSyncCapture.mm */; };
+		8B944BFA16C17D3700E1B091 /* MoSyncNotification.h in Headers */ = {isa = PBXBuildFile; fileRef = 8B944BF816C17D3700E1B091 /* MoSyncNotification.h */; };
+		8B944BFB16C17D3700E1B091 /* MoSyncNotification.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8B944BF916C17D3700E1B091 /* MoSyncNotification.mm */; };
+		8B944BFC16C17D3700E1B091 /* MoSyncNotification.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8B944BF916C17D3700E1B091 /* MoSyncNotification.mm */; };
+		8B944BFF16C1809C00E1B091 /* MoSyncOrientation.h in Headers */ = {isa = PBXBuildFile; fileRef = 8B944BFD16C1809C00E1B091 /* MoSyncOrientation.h */; };
+		8B944C0016C1809C00E1B091 /* MoSyncOrientation.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8B944BFE16C1809C00E1B091 /* MoSyncOrientation.mm */; };
+		8B944C0116C1809C00E1B091 /* MoSyncOrientation.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8B944BFE16C1809C00E1B091 /* MoSyncOrientation.mm */; };
+		8BB2E67216C2509B00391242 /* MoSyncOpenGL.h in Headers */ = {isa = PBXBuildFile; fileRef = 8BB2E67016C2509B00391242 /* MoSyncOpenGL.h */; };
+		8BB2E67316C2509B00391242 /* MoSyncOpenGL.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8BB2E67116C2509B00391242 /* MoSyncOpenGL.mm */; };
+		8BB2E67416C2509B00391242 /* MoSyncOpenGL.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8BB2E67116C2509B00391242 /* MoSyncOpenGL.mm */; };
 		D99A59DF16C1B183000C6649 /* MoSyncAds.mm in Sources */ = {isa = PBXBuildFile; fileRef = D99A59DE16C1B183000C6649 /* MoSyncAds.mm */; };
 		D99A59E016C1B1F9000C6649 /* MoSyncAds.mm in Sources */ = {isa = PBXBuildFile; fileRef = D99A59DE16C1B183000C6649 /* MoSyncAds.mm */; };
 		D99A59E316C1C199000C6649 /* MoSyncSensorBridge.mm in Sources */ = {isa = PBXBuildFile; fileRef = D99A59E216C1C199000C6649 /* MoSyncSensorBridge.mm */; };
@@ -773,6 +782,12 @@
 		8B944BEF16C169BD00E1B091 /* MoSyncPurchase.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = MoSyncPurchase.mm; path = purchase/MoSyncPurchase.mm; sourceTree = "<group>"; };
 		8B944BF316C1750200E1B091 /* MoSyncCapture.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MoSyncCapture.h; path = capture/MoSyncCapture.h; sourceTree = "<group>"; };
 		8B944BF416C1750200E1B091 /* MoSyncCapture.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = MoSyncCapture.mm; path = capture/MoSyncCapture.mm; sourceTree = "<group>"; };
+		8B944BF816C17D3700E1B091 /* MoSyncNotification.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MoSyncNotification.h; path = notifications/MoSyncNotification.h; sourceTree = "<group>"; };
+		8B944BF916C17D3700E1B091 /* MoSyncNotification.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = MoSyncNotification.mm; path = notifications/MoSyncNotification.mm; sourceTree = "<group>"; };
+		8B944BFD16C1809C00E1B091 /* MoSyncOrientation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MoSyncOrientation.h; path = Orientation/MoSyncOrientation.h; sourceTree = "<group>"; };
+		8B944BFE16C1809C00E1B091 /* MoSyncOrientation.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = MoSyncOrientation.mm; path = Orientation/MoSyncOrientation.mm; sourceTree = "<group>"; };
+		8BB2E67016C2509B00391242 /* MoSyncOpenGL.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MoSyncOpenGL.h; path = OpenGL/MoSyncOpenGL.h; sourceTree = "<group>"; };
+		8BB2E67116C2509B00391242 /* MoSyncOpenGL.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = MoSyncOpenGL.mm; path = OpenGL/MoSyncOpenGL.mm; sourceTree = "<group>"; };
 		8D1107310486CEB800E47090 /* MoSync-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "MoSync-Info.plist"; plistStructureDefinitionIdentifier = "com.apple.xcode.plist.structure-definition.iphone.info-plist"; sourceTree = "<group>"; };
 		D99A59DC16C1B16B000C6649 /* MoSyncAds.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = MoSyncAds.h; path = ads/MoSyncAds.h; sourceTree = "<group>"; };
 		D99A59DE16C1B183000C6649 /* MoSyncAds.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = MoSyncAds.mm; path = ads/MoSyncAds.mm; sourceTree = "<group>"; };
@@ -1053,6 +1068,8 @@
 			children = (
 				8B7E3EB116B66A650030D100 /* ScreenOrientation.h */,
 				8B7E3EB216B66A650030D100 /* ScreenOrientation.mm */,
+				8B944BFD16C1809C00E1B091 /* MoSyncOrientation.h */,
+				8B944BFE16C1809C00E1B091 /* MoSyncOrientation.mm */,
 			);
 			name = Orientation;
 			sourceTree = "<group>";
@@ -1252,6 +1269,8 @@
 		43F36FC615B474550095B3C6 /* Notifications */ = {
 			isa = PBXGroup;
 			children = (
+				8B944BF816C17D3700E1B091 /* MoSyncNotification.h */,
+				8B944BF916C17D3700E1B091 /* MoSyncNotification.mm */,
 				43F3700415B475920095B3C6 /* NotificationManager.h */,
 				43F3700515B475920095B3C6 /* NotificationManager.mm */,
 				43F3700615B475920095B3C6 /* PushNotification.h */,
@@ -1265,6 +1284,8 @@
 			children = (
 				43F3700E15B475A90095B3C6 /* MoSyncGLView.h */,
 				43F3700F15B475A90095B3C6 /* MoSyncGLView.mm */,
+				8BB2E67016C2509B00391242 /* MoSyncOpenGL.h */,
+				8BB2E67116C2509B00391242 /* MoSyncOpenGL.mm */,
 			);
 			name = OpenGL;
 			sourceTree = "<group>";
@@ -1670,6 +1691,9 @@
 				8B944BF016C169BD00E1B091 /* MoSyncPurchase.h in Headers */,
 				8B944BF516C1750200E1B091 /* MoSyncCapture.h in Headers */,
 				D99A5A0016C25099000C6649 /* MoSyncMisc.h in Headers */,
+				8B944BFA16C17D3700E1B091 /* MoSyncNotification.h in Headers */,
+				8B944BFF16C1809C00E1B091 /* MoSyncOrientation.h in Headers */,
+				8BB2E67216C2509B00391242 /* MoSyncOpenGL.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1919,9 +1943,12 @@
 				8B944BE716C1394800E1B091 /* MoSyncSound.mm in Sources */,
 				8B944BF116C169BD00E1B091 /* MoSyncPurchase.mm in Sources */,
 				8B944BF616C1750200E1B091 /* MoSyncCapture.mm in Sources */,
+				8B944BFB16C17D3700E1B091 /* MoSyncNotification.mm in Sources */,
+				8B944C0016C1809C00E1B091 /* MoSyncOrientation.mm in Sources */,
 				D99A59DF16C1B183000C6649 /* MoSyncAds.mm in Sources */,
 				D99A59E316C1C199000C6649 /* MoSyncSensorBridge.mm in Sources */,
 				D99A5A0116C25099000C6649 /* MoSyncMisc.mm in Sources */,
+				8BB2E67316C2509B00391242 /* MoSyncOpenGL.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2059,6 +2086,9 @@
 				8B944BF216C169BD00E1B091 /* MoSyncPurchase.mm in Sources */,
 				8B944BF716C1750200E1B091 /* MoSyncCapture.mm in Sources */,
 				D99A5A0216C25099000C6649 /* MoSyncMisc.mm in Sources */,
+				8B944BFC16C17D3700E1B091 /* MoSyncNotification.mm in Sources */,
+				8B944C0116C1809C00E1B091 /* MoSyncOrientation.mm in Sources */,
+				8BB2E67416C2509B00391242 /* MoSyncOpenGL.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

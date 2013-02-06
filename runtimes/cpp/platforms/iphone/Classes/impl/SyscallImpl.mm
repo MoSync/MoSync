@@ -42,13 +42,10 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <helpers/CPP_IX_GUIDO.h>
 //#include <helpers/CPP_IX_ACCELEROMETER.h>
 #include "MoSyncPanic.h"
-#import "MoSyncAds.h"
-#import "NotificationManager.h"
 #include <helpers/CPP_IX_WIDGET.h>
 #include "MoSyncUISyscalls.h"
 
 #import "ImagePickerController.h"
-#import "ScreenOrientation.h"
 #include "netImpl.h"
 #import "Reachability.h"
 #import "PurchaseManager.h"
@@ -79,6 +76,7 @@ using namespace MoSyncError;
 #include <OpenGLES/ES2/gl.h>
 #include <OpenGLES/ES1/glext.h>
 #include "../../../../generated/gl.h.cpp"
+#include "GLFixes.h"
 #endif
 
 #include "AudioSyscall.h"
@@ -89,8 +87,12 @@ using namespace MoSyncError;
 #import "MoSyncSound.h"
 #import "MoSyncPurchase.h"
 #import "MoSyncCapture.h"
+#import "MoSyncNotification.h"
+#import "MoSyncOrientation.h"
 #import "MoSyncSensorBridge.h"
 #import "MoSyncMisc.h"
+#import "MoSyncAds.h"
+#import "MoSyncOpenGL.h"
 
 extern ThreadPool gThreadPool;
 
@@ -161,12 +163,6 @@ namespace Base {
     extern "C" MAHandle maFontLoadDefault(int type, int style, int size);
     extern "C" MAHandle maFontSetCurrent(MAHandle font);
 
-
-
-#ifdef SUPPORT_OPENGL_ES
-	static MAHandle sOpenGLScreen = -1;
-	static MAHandle sOpenGLView = -1;
-#endif
 
 	void MALibQuit();
 
@@ -302,9 +298,6 @@ namespace Base {
 		DeleteCriticalSection(&exitMutex);
 		MANetworkClose();
         MAPimClose();
-        [NotificationManager deleteInstance];
-        [ScreenOrientation deleteInstance];
-
         MAAudioClose();
         [OptionsDialogView deleteInstance];
         [ImagePickerController deleteInstance];
@@ -1111,16 +1104,6 @@ namespace Base {
 		return 1;
 	}
 
-	int maLocationStart() {
-		MoSync_StartUpdatingLocation();
-		return MA_LPS_AVAILABLE;
-	}
-
-	int maLocationStop() {
-		MoSync_StopUpdatingLocation();
-		return 0;
-	}
-
 	int maGetSystemProperty(const char *key, char *buf, int size) {
 		int res = -2; //Property not found
 		if(strcmp(key, "mosync.iso-639-1")==0) {
@@ -1189,99 +1172,6 @@ namespace Base {
 		return res;
 	}
 
-#ifdef SUPPORT_OPENGL_ES
-
-#include "GLFixes.h"
-
-	int maOpenGLInitFullscreen(int glApi) {
-		if(sOpenGLScreen != -1) return 0;
-
-
-        if(glApi == MA_GL_API_GL1)
-            sOpenGLView = maWidgetCreate("GLView");
-        else if(glApi == MA_GL_API_GL2)
-            sOpenGLView = maWidgetCreate("GL2View");
-        else
-            return MA_GL_INIT_RES_UNAVAILABLE_API;
-
-        if(sOpenGLView < 0) {
-            return MA_GL_INIT_RES_UNAVAILABLE_API;
-        }
-
-        sOpenGLScreen = maWidgetCreate("Screen");
-		maWidgetSetProperty(sOpenGLView, "width", "-1");
-		maWidgetSetProperty(sOpenGLView, "height", "-1");
-		maWidgetAddChild(sOpenGLScreen, sOpenGLView);
-		maWidgetScreenShow(sOpenGLScreen);
-		maWidgetSetProperty(sOpenGLView, "bind", "");
-		return 1;
-	}
-
-	int maOpenGLCloseFullscreen() {
-		if(sOpenGLScreen == -1) return 0;
-		maWidgetRemoveChild(sOpenGLView);
-		maWidgetDestroy(sOpenGLView);
-		maWidgetDestroy(sOpenGLScreen);
-		sOpenGLView = -1;
-		sOpenGLScreen = -1;
-		return 1;
-	}
-
-	int maOpenGLTexImage2D(MAHandle image) {
-		Surface* img = gSyscall->resources.get_RT_IMAGE(image);
-
-		int powWidth = nextPowerOf2(1, img->width);
-		int powHeight = nextPowerOf2(1, img->height);
-
-		if(powWidth!=img->width || powHeight!=img->height) {
-
-			//surface = SDL_CreateRGBSurface(SDL_SWSURFACE, w, h, surface->format->BitsPerPixel,
-			//							   surface->format->Rmask, surface->format->Gmask, surface->format->Bmask, surface->format->Amask);
-
-			int bytesPerPixel = 4; // for now.
-
-			int oldBytesPerRow = img->rowBytes;
-			int newBytesPerRow = powWidth*bytesPerPixel;
-			int oldActualBytesPerRow = img->width*bytesPerPixel;
-
-			byte* data = new byte[powHeight*newBytesPerRow];
-
-			byte* src = (byte*)img->data;
-			byte* dst = data;
-			for(int y = 0; y < img->height; y++) {
-				memcpy(dst, src, oldActualBytesPerRow);
-				src+=oldBytesPerRow;
-				dst+=newBytesPerRow;
-			}
-
-			glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, powWidth, powHeight, 0,
-						 GL_RGBA, GL_UNSIGNED_BYTE, data);
-
-			delete data;
-
-			return MA_GL_TEX_IMAGE_2D_OK;
-		}
-
-
-		// Edit the texture object's image data using the information SDL_Surface gives us
-		glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, img->width, img->height, 0,
-					 GL_RGBA, GL_UNSIGNED_BYTE, img->data);
-
-		return MA_GL_TEX_IMAGE_2D_OK;
-	}
-
-	int maOpenGLTexSubImage2D(MAHandle image) {
-		Surface* img = gSyscall->resources.get_RT_IMAGE(image);
-
-		// Edit the texture object's image data using the information SDL_Surface gives us
-		glTexSubImage2D( GL_TEXTURE_2D, 0, 0, 0, img->width, img->height, GL_RGBA
-						, GL_UNSIGNED_BYTE, img->data);
-
-		return MA_GL_TEX_IMAGE_2D_OK;
-	}
-
-#endif	//SUPPORT_OPENGL_ES
-
 	int maReportResourceInformation() {
 		gSyscall->resources.logEverything();
 		return 0;
@@ -1343,79 +1233,6 @@ namespace Base {
         [[MoSyncPanic getInstance] setThowPanic:false];
         return RES_OK;
 	}
-    SYSCALL(int, maNotificationLocalCreate())
-	{
-		return [[NotificationManager getInstance] createLocalNotificationObject];
-	}
-    SYSCALL(int, maNotificationLocalDestroy(MAHandle notificationHandle))
-	{
-        return [[NotificationManager getInstance] destroyLocalNotificationObject:notificationHandle];
-	}
-    SYSCALL(int, maNotificationLocalSetProperty(MAHandle notificationHandle, const char* property, const char* value))
-	{
-        return [[NotificationManager getInstance] localNotificationSetProperty:notificationHandle
-                                                                      property:property
-                                                                         value:value];
-	}
-    SYSCALL(int, maNotificationLocalGetProperty(MAHandle notificationHandle, const char* property,
-                                                char* value, const int bufSize))
-	{
-        return [[NotificationManager getInstance] localNotificationGetProperty:notificationHandle
-                                                                      property:property
-                                                                         value:value
-                                                                          size:bufSize];
-	}
-    SYSCALL(int, maNotificationLocalSchedule(MAHandle notificationHandle))
-	{
-		return [[NotificationManager getInstance] registerLocalNotification:notificationHandle];
-	}
-    SYSCALL(int, maNotificationLocalUnschedule(MAHandle notificationHandle))
-	{
-        return [[NotificationManager getInstance] unregisterLocalNotification:notificationHandle];
-	}
-    SYSCALL(int, maNotificationPushRegister(MAHandle pushNotificationType, const char* accountID))
-	{
-		return [[NotificationManager getInstance] registerPushNotification:pushNotificationType];
-	}
-    SYSCALL(int, maNotificationPushUnregister())
-	{
-        return [[NotificationManager getInstance] unregisterPushNotification];
-	}
-    SYSCALL(int, maNotificationPushGetData(MAHandle pushNotificationHandle,
-                                           MAPushNotificationData* pushNotificationData))
-	{
-        return [[NotificationManager getInstance] getPushNotificationData:pushNotificationHandle
-                                                              data:pushNotificationData];
-	}
-    SYSCALL(int, maNotificationPushGetRegistration(char* buffer, const int size))
-	{
-        return [[NotificationManager getInstance] getPushRegistrationData:buffer size:size];
-	}
-    SYSCALL(int, maNotificationPushDestroy(MAHandle pushNotificationHandle))
-	{
-        return [[NotificationManager getInstance] pushNotificationDestroy:pushNotificationHandle];
-	}
-    SYSCALL(void, maNotificationSetIconBadge(const int applicationIconBadgeNumber))
-	{
-        [[NotificationManager getInstance] setApplicationIconBadgeNumber:applicationIconBadgeNumber];
-	}
-    SYSCALL(int, maNotificationGetIconBadge())
-	{
-        return [[NotificationManager getInstance] getApplicationIconBadgeNumber];
-	}
-
-    SYSCALL(int, maScreenSetSupportedOrientations(const int orientations))
-	{
-        return [[ScreenOrientation getInstance] setSupportedOrientations:orientations];
-	}
-    SYSCALL(int, maScreenGetSupportedOrientations())
-	{
-        return [[ScreenOrientation getInstance] getSupportedOrientations];
-	}
-    SYSCALL(int, maScreenGetCurrentOrientation())
-	{
-        return [[ScreenOrientation getInstance] getCurrentScreenOrientation];
-    }
 
 	SYSCALL(longlong, maIOCtl(int function, int a, int b, int c))
 	{
