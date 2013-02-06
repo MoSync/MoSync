@@ -68,9 +68,11 @@ import com.mosync.internal.android.MoSyncSingleTouchHandler;
 import com.mosync.internal.android.MoSyncThread;
 import com.mosync.internal.android.MoSyncTouchHandler;
 import com.mosync.internal.android.MoSyncView;
+import com.mosync.internal.android.billing.Consts;
 import com.mosync.internal.android.nfc.MoSyncNFCForegroundUtil;
 import com.mosync.internal.android.nfc.MoSyncNFCService;
 import com.mosync.internal.android.notifications.LocalNotificationsManager;
+import com.mosync.internal.android.notifications.LocalNotificationsService;
 import com.mosync.internal.android.notifications.PushNotificationsManager;
 import com.mosync.internal.android.notifications.PushNotificationsUtil;
 import com.mosync.nativeui.ui.widgets.OptionsMenuItem;
@@ -198,6 +200,15 @@ public class MoSync extends Activity
 		if (MoSyncNFCService.handleNFCIntent(this, intent)) {
 			Log.d("@@@ MoSync", "Discovered tag");
 		}
+		else if(intent.getAction().equals(LocalNotificationsService.ACTION_NOTIFICATION_RECEIVED))
+		{
+			Log.e("@@MoSync", "onNewIntent: Local Notification received ");
+			int notificationId = intent.getIntExtra(
+					LocalNotificationsService.LOCAL_NOTIFICATION_ID,
+					LocalNotificationsService.LOCAL_NOTIFICATION_ID_DEFAULT);
+
+			LocalNotificationsManager.postEventNotificationReceived(notificationId);
+		}
 		super.onNewIntent(intent);
 	}
 
@@ -251,10 +262,6 @@ public class MoSync extends Activity
 			nfcForegroundHandler.enableForeground();
 		}
 
-		// Notify the local notifications manager that the application
-		// has gained focus.
-		LocalNotificationsManager.focusGained();
-
 		SYSLOG("Posting EVENT_TYPE_FOCUS_GAINED to MoSync");
 		int[] event = new int[1];
 		event[0] = EVENT_TYPE_FOCUS_GAINED;
@@ -278,11 +285,6 @@ public class MoSync extends Activity
 		if (nfcForegroundHandler != null) {
 			nfcForegroundHandler.disableForeground();
 		}
-
-		// Notify the local notifications manager that the application
-		// has lost focus.
-		LocalNotificationsManager.focusLost();
-
 
 		SYSLOG("Posting EVENT_TYPE_FOCUS_LOST to MoSync");
 		int[] event = new int[1];
