@@ -162,7 +162,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 		self.multipleTouchEnabled = YES;
 		touchHelper = [[TouchHelper alloc] init];
         moSyncSensor = [[MoSyncSensor alloc] init];
-		
+		self.contentMode = UIViewContentModeRedraw;
 		/*
 		CGRect appFrame = [[UIScreen mainScreen] bounds];
 		CGFloat screenHeight = appFrame.size.height;
@@ -179,7 +179,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
     CGContextRef context = UIGraphicsGetCurrentContext();
 	CGContextSetInterpolationQuality(context, kCGInterpolationNone);
 	CGContextSetAllowsAntialiasing(context, false);
-	CGContextTranslateCTM(context, 0, self.frame.size.height); //CGImageGetHeight(mosyncView));
+	CGContextTranslateCTM(context, 0, self.bounds.size.height); //CGImageGetHeight(mosyncView));
 	CGContextScaleCTM(context, 1.0, -1.0);
 	CGContextDrawImage(context, rect, mosyncView);		
 	

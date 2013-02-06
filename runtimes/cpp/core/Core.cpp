@@ -1105,7 +1105,7 @@ void WRITE_REG(int reg, int value) {
 	}
 	void ValidateMemRange(const void* ptr, unsigned int size) const {
 		unsigned address = PTR2ADDRESS(ptr);
-		if(address >= DATA_SEGMENT_SIZE || (address+size) >= DATA_SEGMENT_SIZE ||
+		if(address >= DATA_SEGMENT_SIZE || (address+size) > DATA_SEGMENT_SIZE ||
 			size > DATA_SEGMENT_SIZE)
 			BIG_PHAT_ERROR(ERR_MEMORY_OOB);
 #ifdef MEMORY_PROTECTION
@@ -1114,7 +1114,7 @@ void WRITE_REG(int reg, int value) {
 	}
 	void* GetValidatedMemRange(int address, int size) {
 		if(address == 0) return NULL;
-		if(uint(address) >= DATA_SEGMENT_SIZE || uint(address+size) >= DATA_SEGMENT_SIZE ||
+		if(uint(address) >= DATA_SEGMENT_SIZE || uint(address+size) > DATA_SEGMENT_SIZE ||
 			uint(size) > DATA_SEGMENT_SIZE)
 			BIG_PHAT_ERROR(ERR_MEMORY_OOB);
 #ifdef MEMORY_PROTECTION

@@ -16,15 +16,18 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301, USA.
 */
 
-/** @file main.cpp
+/*
+* @file main.cpp
 *
 *  Application that detects a change of screen orientation.
-*  Initially, you should see a blue rectangle that fills the screen, with the
-*  text "Started. When the device is rotated (F4 in the emulator) the text will
-*  change to "Portrait" or "Landscape" to show the current orientation.
-*  Press the zero or back key to exit.
+*  You should see a message that states the device orientation
+*  and display size. When the device is rotated (F4 in the MoSync
+*  emulator) the text will update to show the current orientation.
 *
-* @author Miles Midgley and Chris Hughes
+*  Press the zero or back key to exit on devices that support
+*  key pads.
+*
+* @author Miles Midgley, Chris Hughes, Mikael Kindborg,
 */
 
 #include <MAUtil/Moblet.h>
@@ -32,81 +35,98 @@ MA 02110-1301, USA.
 
 class MyMoblet : public MAUtil::Moblet
 {
-
 public:
-
-	//Constructor.
+	/**
+	 * Constructor.
+	 */
 	MyMoblet()
 	{
-		//Set the orientation mode to dynamic, so that it is possible to switch
-		//between portrait and landscape orientations. You can also use this
-		//syscall to lock the screen in _PORTRAIT or _LANDSCAPE mode. Not all
-		//platforms support or need this syscall.)
+		// Set the orientation mode to dynamic, so that it is possible to switch
+		// between portrait and landscape orientations. You can also use these
+		// syscalls to lock the screen in PORTRAIT or LANDSCAPE mode. Not all
+		// platforms support or need these syscalls.
+
+		// Android and Windows Phone.
 		maScreenSetOrientation(SCREEN_ORIENTATION_DYNAMIC);
 
-		//Get the screen size.
-		MAExtent extent = maGetScrSize();
+		// iOS and Windows Phone.
+		maScreenSetSupportedOrientations(
+			MA_SCREEN_ORIENTATION_LANDSCAPE_LEFT |
+			MA_SCREEN_ORIENTATION_LANDSCAPE_RIGHT |
+			MA_SCREEN_ORIENTATION_PORTRAIT |
+			MA_SCREEN_ORIENTATION_PORTRAIT_UPSIDE_DOWN);
 
-		//Display an initial text message to say we are started.
-		draw(EXTENT_X(extent),EXTENT_Y(extent),0,EXTENT_Y(extent)/2,"Started");
+		// Update the display.
+		drawScreen();
 	}
 
-	//Method for handling key presses.
+	/**
+	 * Method for handling key presses.
+	 */
 	void keyPressEvent(int keyCode, int nativeCode)
 	{
-		if(MAK_0 == keyCode || MAK_BACK == keyCode)
+		if (MAK_0 == keyCode || MAK_BACK == keyCode)
 		{
-			//Exit on any key press
 			maExit(0);
 		}
 	}
 
-	//Method for handling custom events. (Moblet is a CustomEventListener.)
+	/**
+	 * Method for handling events that do not have predefined methods.
+	 */
 	void customEvent(const MAEvent& event)
 	{
-
-		//If the event type is screen changed...
-		if (event.type == EVENT_TYPE_SCREEN_CHANGED)
+		// If the event type is screen changed we update the display.
+		if (EVENT_TYPE_SCREEN_CHANGED == event.type)
 		{
-			//Declare a character buffer to hold the display text.
-			char orientationText[80];
-
-			//Get the screen size
-			MAExtent extent = maGetScrSize();
-
-			if (EXTENT_X(extent) > EXTENT_Y(extent)) // Landscape
-			{
-					sprintf(orientationText,"Landscape %d %d",EXTENT_X(extent),EXTENT_Y(extent));
-			}
-			else // Portrait
-			{
-					sprintf(orientationText,"Portrait %d %d",EXTENT_X(extent),EXTENT_Y(extent));
-			}
-
-			//Call the draw method passing the screen dimensions, the position
-			//to draw the display text, and the text itself.
-			draw(EXTENT_X(extent),EXTENT_Y(extent),0,EXTENT_Y(extent)/2,orientationText);
+			drawScreen();
 		}
 	}
 
-	//Method that draws the screen, writes the text, and then updates the screen.
-	void draw(int screenWidth, int screenHeight,int x, int y, const char* text)
+	/**
+	 * Method that draws display data to the screen.
+	 */
+	void drawScreen()
 	{
-		//Set the drawing colour to blue.
-		maSetColor(0x000099);
-		//Draw a rectangle that will cover the screen.
-		maFillRect(0, 0, screenWidth, screenHeight);
-		//Reset the drawing colour to white.
+		MAExtent screenSize = maGetScrSize();
+		int width = EXTENT_X(screenSize);
+		int height = EXTENT_Y(screenSize);
+		int x = 20;
+		int y = height / 2;
+		char orientationText[128];
+
+		if (width > height) // Landscape
+		{
+			// Set the background color.
+			maSetColor(0x000099);
+
+			// Set text.
+			sprintf(orientationText, "Landscape %d %d", width, height);
+		}
+		else // Portrait
+		{
+			// Set the background color.
+			maSetColor(0x009900);
+
+			// Set text.
+			sprintf(orientationText, "Portrait %d %d", width, height);
+		}
+
+		// Fill background
+		maFillRect(0, 0, width, height);
+
+		// Use white to display the text.
 		maSetColor(0xFFFFFF);
-		//Draw the text at the nominated position.
-		maDrawText(x, y, text);
-		//Display the screen.
+
+		// Draw the text.
+		maDrawText(x, y, orientationText);
+
+		// Redraw the screen.
 		maUpdateScreen();
 	}
-
 };
 
-//Entry point for the application.
+// Entry point for the application.
 extern "C" int MAMain()
 {
 	MAUtil::Moblet::run(new MyMoblet());

@@ -126,9 +126,6 @@
 		43F36F0815B45CA80095B3C6 /* OptionsDialogView.h in Headers */ = {isa = PBXBuildFile; fileRef = 43F36F0615B45CA80095B3C6 /* OptionsDialogView.h */; };
 		43F36F0915B45CA80095B3C6 /* OptionsDialogView.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43F36F0715B45CA80095B3C6 /* OptionsDialogView.mm */; };
 		43F36F0A15B45CA80095B3C6 /* OptionsDialogView.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43F36F0715B45CA80095B3C6 /* OptionsDialogView.mm */; };
-		43F36F0D15B45CBE0095B3C6 /* ScreenOrientation.h in Headers */ = {isa = PBXBuildFile; fileRef = 43F36F0B15B45CBE0095B3C6 /* ScreenOrientation.h */; };
-		43F36F0E15B45CBE0095B3C6 /* ScreenOrientation.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43F36F0C15B45CBE0095B3C6 /* ScreenOrientation.mm */; };
-		43F36F0F15B45CBE0095B3C6 /* ScreenOrientation.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43F36F0C15B45CBE0095B3C6 /* ScreenOrientation.mm */; };
 		43F36F1615B45D160095B3C6 /* ScreenWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 43F36F1015B45D160095B3C6 /* ScreenWidget.h */; };
 		43F36F1715B45D160095B3C6 /* ScreenWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43F36F1115B45D160095B3C6 /* ScreenWidget.mm */; };
 		43F36F1815B45D160095B3C6 /* ScreenWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43F36F1115B45D160095B3C6 /* ScreenWidget.mm */; };
@@ -403,6 +400,9 @@
 		85F2559711AC162700EB47EE /* libMoSyncLib.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 85F2550D11AC125400EB47EE /* libMoSyncLib.a */; };
 		85F25A3611AD614700EB47EE /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; };
 		85F25A3711AD614700EB47EE /* MoSyncAppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1D3623250D0F684500981E51 /* MoSyncAppDelegate.mm */; };
+		8B7E3EB316B66A650030D100 /* ScreenOrientation.h in Headers */ = {isa = PBXBuildFile; fileRef = 8B7E3EB116B66A650030D100 /* ScreenOrientation.h */; };
+		8B7E3EB416B66A650030D100 /* ScreenOrientation.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8B7E3EB216B66A650030D100 /* ScreenOrientation.mm */; };
+		8B7E3EB516B66A650030D100 /* ScreenOrientation.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8B7E3EB216B66A650030D100 /* ScreenOrientation.mm */; };
 		8B8D0BCD16ADC03400F287B1 /* StackScreenWidgetController.h in Headers */ = {isa = PBXBuildFile; fileRef = 8B8D0BCB16ADC03400F287B1 /* StackScreenWidgetController.h */; };
 		8B8D0BCE16ADC03400F287B1 /* StackScreenWidgetController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8B8D0BCC16ADC03400F287B1 /* StackScreenWidgetController.mm */; };
 		8B8D0BCF16ADC03400F287B1 /* StackScreenWidgetController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8B8D0BCC16ADC03400F287B1 /* StackScreenWidgetController.mm */; };
@@ -515,8 +515,6 @@
 		43F36F0215B45C7E0095B3C6 /* LayoutWidgets.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = LayoutWidgets.mm; path = NativeUI/Layouts/LayoutWidgets.mm; sourceTree = "<group>"; };
 		43F36F0615B45CA80095B3C6 /* OptionsDialogView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OptionsDialogView.h; path = NativeUI/OptionsDialog/OptionsDialogView.h; sourceTree = "<group>"; };
 		43F36F0715B45CA80095B3C6 /* OptionsDialogView.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = OptionsDialogView.mm; path = NativeUI/OptionsDialog/OptionsDialogView.mm; sourceTree = "<group>"; };
-		43F36F0B15B45CBE0095B3C6 /* ScreenOrientation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ScreenOrientation.h; path = NativeUI/Orientation/ScreenOrientation.h; sourceTree = "<group>"; };
-		43F36F0C15B45CBE0095B3C6 /* ScreenOrientation.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = ScreenOrientation.mm; path = NativeUI/Orientation/ScreenOrientation.mm; sourceTree = "<group>"; };
 		43F36F1015B45D160095B3C6 /* ScreenWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ScreenWidget.h; path = NativeUI/Screens/ScreenWidget.h; sourceTree = "<group>"; };
 		43F36F1115B45D160095B3C6 /* ScreenWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = ScreenWidget.mm; path = NativeUI/Screens/ScreenWidget.mm; sourceTree = "<group>"; };
 		43F36F1215B45D160095B3C6 /* StackScreenWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = StackScreenWidget.h; path = NativeUI/Screens/StackScreenWidget.h; sourceTree = "<group>"; };
@@ -737,6 +735,8 @@
 		85F2550D11AC125400EB47EE /* libMoSyncLib.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libMoSyncLib.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		85F2558711AC155D00EB47EE /* MoSync.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MoSync.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		85F2558911AC155D00EB47EE /* MoSyncWithLib-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "MoSyncWithLib-Info.plist"; sourceTree = "<group>"; };
+		8B7E3EB116B66A650030D100 /* ScreenOrientation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ScreenOrientation.h; path = Orientation/ScreenOrientation.h; sourceTree = "<group>"; };
+		8B7E3EB216B66A650030D100 /* ScreenOrientation.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = ScreenOrientation.mm; path = Orientation/ScreenOrientation.mm; sourceTree = "<group>"; };
 		8B8D0BCB16ADC03400F287B1 /* StackScreenWidgetController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StackScreenWidgetController.h; sourceTree = "<group>"; };
 		8B8D0BCC16ADC03400F287B1 /* StackScreenWidgetController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = StackScreenWidgetController.mm; sourceTree = "<group>"; };
 		8B8D0BD016ADC0F900F287B1 /* TabScreenWidgetController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TabScreenWidgetController.h; sourceTree = "<group>"; };
@@ -833,6 +833,7 @@
 				43F36ED615B458D60095B3C6 /* NativeUI */,
 				43F36FC615B474550095B3C6 /* Notifications */,
 				43F36FC715B474600095B3C6 /* OpenGL */,
+				43F36EDC15B45B9E0095B3C6 /* Orientation */,
 				43F36FC815B474660095B3C6 /* PIM */,
 				43F36FC915B474700095B3C6 /* Purchase */,
 				43F36FCA15B4747D0095B3C6 /* Reachability */,
@@ -964,7 +965,6 @@
 				43F36ED815B45B210095B3C6 /* Base */,
 				43F36ED915B45B720095B3C6 /* Layouts */,
 				43F36EDB15B45B900095B3C6 /* OptionsDialog */,
-				43F36EDC15B45B9E0095B3C6 /* Orientation */,
 				43F36EDD15B45BAB0095B3C6 /* Screens */,
 				43F36EDE15B45BB30095B3C6 /* Syscalls */,
 				43F3705815B476300095B3C6 /* ViewControllers */,
@@ -1012,8 +1012,8 @@
 		43F36EDC15B45B9E0095B3C6 /* Orientation */ = {
 			isa = PBXGroup;
 			children = (
-				43F36F0B15B45CBE0095B3C6 /* ScreenOrientation.h */,
-				43F36F0C15B45CBE0095B3C6 /* ScreenOrientation.mm */,
+				8B7E3EB116B66A650030D100 /* ScreenOrientation.h */,
+				8B7E3EB216B66A650030D100 /* ScreenOrientation.mm */,
 			);
 			name = Orientation;
 			sourceTree = "<group>";
@@ -1523,7 +1523,6 @@
 				43F36EFE15B45C750095B3C6 /* VLayoutView.h in Headers */,
 				43F36F0315B45C7E0095B3C6 /* LayoutWidgets.h in Headers */,
 				43F36F0815B45CA80095B3C6 /* OptionsDialogView.h in Headers */,
-				43F36F0D15B45CBE0095B3C6 /* ScreenOrientation.h in Headers */,
 				43F36F1615B45D160095B3C6 /* ScreenWidget.h in Headers */,
 				43F36F1915B45D160095B3C6 /* StackScreenWidget.h in Headers */,
 				43F36F1C15B45D160095B3C6 /* TabScreenWidget.h in Headers */,
@@ -1602,6 +1601,7 @@
 				43A8F216164FC71A00B0FD35 /* WidgetUtils.h in Headers */,
 				8B8D0BCD16ADC03400F287B1 /* StackScreenWidgetController.h in Headers */,
 				8B8D0BD216ADC0F900F287B1 /* TabScreenWidgetController.h in Headers */,
+				8B7E3EB316B66A650030D100 /* ScreenOrientation.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1771,7 +1771,6 @@
 				43F36EFF15B45C750095B3C6 /* VLayoutView.m in Sources */,
 				43F36F0415B45C7E0095B3C6 /* LayoutWidgets.mm in Sources */,
 				43F36F0915B45CA80095B3C6 /* OptionsDialogView.mm in Sources */,
-				43F36F0E15B45CBE0095B3C6 /* ScreenOrientation.mm in Sources */,
 				43F36F1715B45D160095B3C6 /* ScreenWidget.mm in Sources */,
 				43F36F1A15B45D160095B3C6 /* StackScreenWidget.mm in Sources */,
 				43F36F1D15B45D160095B3C6 /* TabScreenWidget.mm in Sources */,
@@ -1846,6 +1845,7 @@
 				43A8F217164FC71A00B0FD35 /* WidgetUtils.mm in Sources */,
 				8B8D0BCE16ADC03400F287B1 /* StackScreenWidgetController.mm in Sources */,
 				8B8D0BD316ADC0F900F287B1 /* TabScreenWidgetController.mm in Sources */,
+				8B7E3EB416B66A650030D100 /* ScreenOrientation.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1900,7 +1900,6 @@
 				43F36F0015B45C750095B3C6 /* VLayoutView.m in Sources */,
 				43F36F0515B45C7E0095B3C6 /* LayoutWidgets.mm in Sources */,
 				43F36F0A15B45CA80095B3C6 /* OptionsDialogView.mm in Sources */,
-				43F36F0F15B45CBE0095B3C6 /* ScreenOrientation.mm in Sources */,
 				43F36F1815B45D160095B3C6 /* ScreenWidget.mm in Sources */,
 				43F36F1B15B45D160095B3C6 /* StackScreenWidget.mm in Sources */,
 				43F36F1E15B45D160095B3C6 /* TabScreenWidget.mm in Sources */,
@@ -1975,6 +1974,7 @@
 				43A8F218164FC71A00B0FD35 /* WidgetUtils.mm in Sources */,
 				8B8D0BCF16ADC03400F287B1 /* StackScreenWidgetController.mm in Sources */,
 				8B8D0BD416ADC0F900F287B1 /* TabScreenWidgetController.mm in Sources */,
+				8B7E3EB516B66A650030D100 /* ScreenOrientation.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
