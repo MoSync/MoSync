@@ -79,6 +79,7 @@ using namespace MoSyncError;
 #include <OpenGLES/ES2/gl.h>
 #include <OpenGLES/ES1/glext.h>
 #include "../../../../generated/gl.h.cpp"
+#include "GLFixes.h"
 #endif
 
 #include "AudioSyscall.h"
@@ -93,6 +94,7 @@ using namespace MoSyncError;
 #import "MoSyncOrientation.h"
 #import "MoSyncSensorBridge.h"
 #import "MoSyncAds.h"
+#import "MoSyncOpenGL.h"
 
 extern ThreadPool gThreadPool;
 
@@ -204,12 +206,6 @@ namespace Base {
     extern "C" MAHandle maFontLoadDefault(int type, int style, int size);
     extern "C" MAHandle maFontSetCurrent(MAHandle font);
 
-
-
-#ifdef SUPPORT_OPENGL_ES
-	static MAHandle sOpenGLScreen = -1;
-	static MAHandle sOpenGLView = -1;
-#endif
 
 	void MALibQuit();
 
@@ -1310,99 +1306,6 @@ namespace Base {
 
 		return res;
 	}
-
-#ifdef SUPPORT_OPENGL_ES
-
-#include "GLFixes.h"
-
-	int maOpenGLInitFullscreen(int glApi) {
-		if(sOpenGLScreen != -1) return 0;
-
-
-        if(glApi == MA_GL_API_GL1)
-            sOpenGLView = maWidgetCreate("GLView");
-        else if(glApi == MA_GL_API_GL2)
-            sOpenGLView = maWidgetCreate("GL2View");
-        else
-            return MA_GL_INIT_RES_UNAVAILABLE_API;
-
-        if(sOpenGLView < 0) {
-            return MA_GL_INIT_RES_UNAVAILABLE_API;
-        }
-
-        sOpenGLScreen = maWidgetCreate("Screen");
-		maWidgetSetProperty(sOpenGLView, "width", "-1");
-		maWidgetSetProperty(sOpenGLView, "height", "-1");
-		maWidgetAddChild(sOpenGLScreen, sOpenGLView);
-		maWidgetScreenShow(sOpenGLScreen);
-		maWidgetSetProperty(sOpenGLView, "bind", "");
-		return 1;
-	}
-
-	int maOpenGLCloseFullscreen() {
-		if(sOpenGLScreen == -1) return 0;
-		maWidgetRemoveChild(sOpenGLView);
-		maWidgetDestroy(sOpenGLView);
-		maWidgetDestroy(sOpenGLScreen);
-		sOpenGLView = -1;
-		sOpenGLScreen = -1;
-		return 1;
-	}
-
-	int maOpenGLTexImage2D(MAHandle image) {
-		Surface* img = gSyscall->resources.get_RT_IMAGE(image);
-
-		int powWidth = nextPowerOf2(1, img->width);
-		int powHeight = nextPowerOf2(1, img->height);
-
-		if(powWidth!=img->width || powHeight!=img->height) {
-
-			//surface = SDL_CreateRGBSurface(SDL_SWSURFACE, w, h, surface->format->BitsPerPixel,
-			//							   surface->format->Rmask, surface->format->Gmask, surface->format->Bmask, surface->format->Amask);
-
-			int bytesPerPixel = 4; // for now.
-
-			int oldBytesPerRow = img->rowBytes;
-			int newBytesPerRow = powWidth*bytesPerPixel;
-			int oldActualBytesPerRow = img->width*bytesPerPixel;
-
-			byte* data = new byte[powHeight*newBytesPerRow];
-
-			byte* src = (byte*)img->data;
-			byte* dst = data;
-			for(int y = 0; y < img->height; y++) {
-				memcpy(dst, src, oldActualBytesPerRow);
-				src+=oldBytesPerRow;
-				dst+=newBytesPerRow;
-			}
-
-			glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, powWidth, powHeight, 0,
-						 GL_RGBA, GL_UNSIGNED_BYTE, data);
-
-			delete data;
-
-			return MA_GL_TEX_IMAGE_2D_OK;
-		}
-
-
-		// Edit the texture object's image data using the information SDL_Surface gives us
-		glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, img->width, img->height, 0,
-					 GL_RGBA, GL_UNSIGNED_BYTE, img->data);
-
-		return MA_GL_TEX_IMAGE_2D_OK;
-	}
-
-	int maOpenGLTexSubImage2D(MAHandle image) {
-		Surface* img = gSyscall->resources.get_RT_IMAGE(image);
-
-		// Edit the texture object's image data using the information SDL_Surface gives us
-		glTexSubImage2D( GL_TEXTURE_2D, 0, 0, 0, img->width, img->height, GL_RGBA
-						, GL_UNSIGNED_BYTE, img->data);
-
-		return MA_GL_TEX_IMAGE_2D_OK;
-	}
-
-#endif	//SUPPORT_OPENGL_ES
 
 	int maReportResourceInformation() {
 		gSyscall->resources.logEverything();
