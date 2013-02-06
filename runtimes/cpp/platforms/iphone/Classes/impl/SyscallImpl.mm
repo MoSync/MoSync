@@ -43,7 +43,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <helpers/CPP_IX_GUIDO.h>
 //#include <helpers/CPP_IX_ACCELEROMETER.h>
 #include "MoSyncPanic.h"
-#import "Ads.h"
 #include <helpers/CPP_IX_WIDGET.h>
 #include "MoSyncUISyscalls.h"
 
@@ -92,7 +91,8 @@ using namespace MoSyncError;
 #import "MoSyncCapture.h"
 #import "MoSyncNotification.h"
 #import "MoSyncOrientation.h"
-
+#import "MoSyncSensorBridge.h"
+#import "MoSyncAds.h"
 
 extern ThreadPool gThreadPool;
 
@@ -347,8 +347,6 @@ namespace Base {
 		DeleteCriticalSection(&exitMutex);
 		MANetworkClose();
         MAPimClose();
-        [Ads deleteInstance];
-
         MAAudioClose();
         [OptionsDialogView deleteInstance];
         [ImagePickerController deleteInstance];
@@ -1456,16 +1454,6 @@ namespace Base {
         return RES_OK;
 	}
 
-    SYSCALL(int, maSensorStart(int sensor, int interval))
-	{
-		return MoSync_SensorStart(sensor, interval);
-	}
-
-    SYSCALL(int, maSensorStop(int sensor))
-	{
-		return MoSync_SensorStop(sensor);
-	}
-
     SYSCALL(int, maSyscallPanicsEnable())
 	{
         [[MoSyncPanic getInstance] setThowPanic:true];
@@ -1476,34 +1464,6 @@ namespace Base {
 	{
         [[MoSyncPanic getInstance] setThowPanic:false];
         return RES_OK;
-	}
-
-    SYSCALL(int, maAdsBannerCreate(int size, const char* publisherID))
-	{
-		return [[Ads getInstance] createBanner];
-	}
-
-    SYSCALL(int, maAdsAddBannerToLayout(MAHandle bannerHandle, MAHandle layoutHandle))
-	{
-		return [[Ads getInstance] addBanner:bannerHandle toLayout:layoutHandle];
-	}
-
-    SYSCALL(int, maAdsRemoveBannerFromLayout(MAHandle bannerHandle, MAHandle layoutHandle))
-	{
-		return [[Ads getInstance] removeBanner:bannerHandle fromLayout:layoutHandle];
-	}
-
-    SYSCALL(int, maAdsBannerDestroy(MAHandle bannerHandle))
-	{
-        return [[Ads getInstance] bannerDestroy:bannerHandle];
-	}
-    SYSCALL(int, maAdsBannerSetProperty(MAHandle bannerHandle, const char* property, const char* value))
-	{
-        return [[Ads getInstance] bannerSetProperty:bannerHandle property:property value:value];
-	}
-    SYSCALL(int, maAdsBannerGetProperty(MAHandle bannerHandle, const char* property, char* value, const int bufSize))
-	{
-        return [[Ads getInstance] bannerGetProperty:bannerHandle property:property value:value size:bufSize];
 	}
 
 	SYSCALL(longlong, maIOCtl(int function, int a, int b, int c))
