@@ -1224,16 +1224,6 @@ namespace Base {
 		return 1;
 	}
 
-	int maLocationStart() {
-		MoSync_StartUpdatingLocation();
-		return MA_LPS_AVAILABLE;
-	}
-
-	int maLocationStop() {
-		MoSync_StopUpdatingLocation();
-		return 0;
-	}
-
 	int maTextBox(const wchar* title, const wchar* inText, wchar* outText, int maxSize, int constraints) {
 		MoSync_ShowTextBox(title, inText, outText, maxSize, constraints);
 		return 0;

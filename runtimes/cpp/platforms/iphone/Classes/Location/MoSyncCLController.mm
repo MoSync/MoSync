@@ -18,6 +18,16 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #import "MoSyncCLController.h"
 #include "MoSyncMain.h"
 
+int maLocationStart() {
+	MoSync_StartUpdatingLocation();
+	return MA_LPS_AVAILABLE;
+}
+
+int maLocationStop() {
+	MoSync_StopUpdatingLocation();
+	return 0;
+}
+
 @implementation MoSyncCLController
 
 @synthesize locationManager;
