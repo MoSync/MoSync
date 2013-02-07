@@ -25,5 +25,7 @@ Surface* loadSprite(void* surface, ushort left, ushort top,
 
 public:
 	Syscall(int w, int h);
+	void deviceOrientationChanged();
+	void createBackbuffer();
 
 #include "PimSyscall.h"
