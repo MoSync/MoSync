@@ -11,6 +11,9 @@
 #import "MoSyncOpenGL.h"
 #import "MoSyncUISyscalls.h"
 #import "MoSyncMain.h"
+#import "MoSyncFonts.h"
+
+#include "CMGlyphDrawing.h"
 
 namespace Base
 {
@@ -415,4 +418,80 @@ SYSCALL(int, maFrameBufferClose())
 	sInternalBackBuffer = NULL;
 	gDrawTarget = gBackbuffer;
 	return 1;
+}
+
+/*
+ * Text related
+ */
+int stringLength(const wchar_t* str) {
+    int len = 0;
+    while(*str++ != 0) {
+        if(*str == '\n') return len;
+        len++;
+    }
+    return len;
+}
+
+SYSCALL(void, maDrawTextW(int left, int top, const wchar* str))
+{
+    int numGlyphs = wcharLength(str);
+    FontInfo *currentFont=sFontList[gCurrentFontHandle-1];
+    initCGFont(currentFont);
+    if(numGlyphs==0) return;
+    CGGlyph* glyphs = new CGGlyph[numGlyphs];
+
+    //Not all fonts in the device are supported for Unicode glyphs
+    //We must check whether the operation was successful
+    if(!CMFontGetGlyphsForUnichars(currentFont->cgFontObject, (const UniChar*)str, glyphs, numGlyphs))
+    {
+        delete glyphs;
+        return;
+    }
+
+    CGContextSetRGBFillColor(gDrawTarget->context, currentRed, currentGreen, currentBlue, 1);
+    CGContextSetTextDrawingMode(gDrawTarget->context, kCGTextFill);
+    CGContextSetTextPosition (gDrawTarget->context, 0, 0);
+    CGContextSetAllowsAntialiasing (gDrawTarget->context, true);
+    CGContextShowGlyphsAtPoint(gDrawTarget->context, left, top+sFontList[gCurrentFontHandle-1]->size, glyphs, numGlyphs);
+    CGContextSetAllowsAntialiasing (gDrawTarget->context, false);
+    delete glyphs;
+}
+
+SYSCALL(void, maDrawText(int left, int top, const char* str))
+{
+    CGContextSetRGBFillColor(gDrawTarget->context, currentRed, currentGreen, currentBlue, 1);
+    CGContextSetTextDrawingMode(gDrawTarget->context, kCGTextFill);
+    CGContextSetTextPosition (gDrawTarget->context, 0, 0);
+    CGContextSetAllowsAntialiasing (gDrawTarget->context, true);
+    CGContextShowTextAtPoint(gDrawTarget->context, left, top+sFontList[gCurrentFontHandle-1]->size, str, strlen(str));
+    CGContextSetAllowsAntialiasing (gDrawTarget->context, false);
+}
+
+SYSCALL(MAExtent, maGetTextSizeW(const wchar* str))
+{
+    FontInfo *currentFont=sFontList[gCurrentFontHandle-1];
+    initCGFont(currentFont);
+    int numGlyphs = wcharLength(str);
+    if(numGlyphs==0) return EXTENT(0, 0);
+    CGGlyph* glyphs = new CGGlyph[numGlyphs];
+    CMFontGetGlyphsForUnichars(currentFont->cgFontObject, (const UniChar*)str, glyphs, numGlyphs);
+    CGContextSetTextDrawingMode(gDrawTarget->context, kCGTextInvisible);
+    CGContextSetTextPosition (gDrawTarget->context, 0, 0);
+    CGContextShowGlyphsAtPoint(gDrawTarget->context, 0, 0, glyphs, numGlyphs);
+    CGPoint after = CGContextGetTextPosition(gDrawTarget->context);
+    int width = after.x;
+    int height = (int)sFontList[gCurrentFontHandle-1]->size; //Might be wrong???
+    delete glyphs;
+    return EXTENT(width, height);
+}
+
+SYSCALL(MAExtent, maGetTextSize(const char* str))
+{
+    CGContextSetTextDrawingMode(gDrawTarget->context, kCGTextInvisible);
+    CGContextSetTextPosition (gDrawTarget->context, 0, 0);
+    CGContextShowTextAtPoint(gDrawTarget->context, 0, 0, str, strlen(str));
+    CGPoint after = CGContextGetTextPosition(gDrawTarget->context);
+    int width = after.x;
+    int height = (int)sFontList[gCurrentFontHandle-1]->size; //Might be wrong???
+    return EXTENT(width, height);
 }

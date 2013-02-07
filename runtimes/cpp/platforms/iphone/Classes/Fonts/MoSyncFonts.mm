@@ -104,6 +104,36 @@ MAHandle createFontInfo(CFStringRef name, GLfloat size, UIFont *uiFontObject, CG
     return handle;
 }
 
+//Used to instantiate the CGFont object only when needed
+void initCGFont(FontInfo *fontInfo)
+{
+    if(!fontInfo->cgFontObject)
+    {
+        fontInfo->cgFontObject =CGFontCreateWithFontName(fontInfo->name);
+    }
+}
+
+namespace Base
+{
+    //Used to initialize (if needed) and return a UIFont object from a Font handle, to be used by NativeUI
+    UIFont* getUIFontObject(MAHandle fontHandle)
+    {
+        if(fontHandle<1||fontHandle>sFontList.size()||!sFontList[fontHandle-1])
+        {
+            printf("wrong MAHandle");
+            return NULL;
+        }
+
+        FontInfo *selectedFont=sFontList[fontHandle-1];
+        if (selectedFont->uiFontObject==NULL)
+        {
+            selectedFont->uiFontObject=
+            [[UIFont fontWithName:(NSString *) selectedFont->name size:selectedFont->size] retain];
+        }
+        return selectedFont->uiFontObject;
+    }
+}
+
 SYSCALL(MAHandle, maFontLoadDefault(int type, int style, int size))
 {
     int defaultFontIndex=0; //Index to gDefaultFontNames
@@ -249,13 +279,4 @@ SYSCALL(MAHandle, maFontSetCurrent(MAHandle font))
                         currentFont->size, kCGEncodingMacRoman);
 
     return prevHandle;
-}
-
-//Used to instantiate the CGFont object only when needed
-void initCGFont(FontInfo *fontInfo)
-{
-    if(!fontInfo->cgFontObject)
-    {
-        fontInfo->cgFontObject =CGFontCreateWithFontName(fontInfo->name);
-    }
 }

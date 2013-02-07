@@ -32,6 +32,8 @@
 #import "RelativeLayoutWidget.h"
 #import "WidgetLayoutingMacro.h"
 
+#include "MoSyncFonts.h"
+
 /**
  * Hidden functions/methods for ListViewItemWidget class
  */

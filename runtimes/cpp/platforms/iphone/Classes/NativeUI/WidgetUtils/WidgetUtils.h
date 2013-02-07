@@ -50,8 +50,3 @@ typedef enum {
  */
 extern NSString* const kWidgetTrueValue;
 extern NSString* const kWidgetFalseValue;
-
-namespace Base
-{
-    UIFont* getUIFontObject(MAHandle fontHandle);
-};
