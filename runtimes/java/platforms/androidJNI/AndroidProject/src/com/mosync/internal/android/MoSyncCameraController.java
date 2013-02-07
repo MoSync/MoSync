@@ -666,11 +666,12 @@ public class MoSyncCameraController {
 			List <Camera.Size> supportedSizes =  parameters.getSupportedPictureSizes();
 			Camera.Size optimalPictureSize = supportedSizes.get(formatIndex);
 			parameters.setPictureSize(optimalPictureSize.width,optimalPictureSize.height);
-			mCamera.setParameters(parameters);
+			if (mCamera != null)
+				mCamera.setParameters(parameters);
     	}
     	catch (Exception e)
     	{
-    		SYSLOG("FAILED TO SET the PARAMETERS");
+			SYSLOG("FAILED TO SET the PARAMETERS " + e);
     	}
 	}
 

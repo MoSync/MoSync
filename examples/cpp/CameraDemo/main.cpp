@@ -383,6 +383,7 @@ public:
 			maDestroyPlaceholder(mLastEnc);
 			mLastEnc = 0;
 		}
+		maCameraStop();
 		setupCameraProperties();
 		maCameraStart();
 	}
