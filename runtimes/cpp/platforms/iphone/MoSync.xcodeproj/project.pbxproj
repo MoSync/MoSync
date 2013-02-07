@@ -443,6 +443,9 @@
 		D99A5A0016C25099000C6649 /* MoSyncMisc.h in Headers */ = {isa = PBXBuildFile; fileRef = D99A59FE16C25099000C6649 /* MoSyncMisc.h */; };
 		D99A5A0116C25099000C6649 /* MoSyncMisc.mm in Sources */ = {isa = PBXBuildFile; fileRef = D99A59FF16C25099000C6649 /* MoSyncMisc.mm */; };
 		D99A5A0216C25099000C6649 /* MoSyncMisc.mm in Sources */ = {isa = PBXBuildFile; fileRef = D99A59FF16C25099000C6649 /* MoSyncMisc.mm */; };
+		D99A5A2316C2BDBC000C6649 /* MoSyncFonts.h in Headers */ = {isa = PBXBuildFile; fileRef = D99A5A2116C2BDBC000C6649 /* MoSyncFonts.h */; };
+		D99A5A2416C2BDBC000C6649 /* MoSyncFonts.mm in Sources */ = {isa = PBXBuildFile; fileRef = D99A5A2216C2BDBC000C6649 /* MoSyncFonts.mm */; };
+		D99A5A2516C2BDBC000C6649 /* MoSyncFonts.mm in Sources */ = {isa = PBXBuildFile; fileRef = D99A5A2216C2BDBC000C6649 /* MoSyncFonts.mm */; };
 		E413FAB814C0604D00BF1E3D /* ResourceArray.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E413FAB714C0604D00BF1E3D /* ResourceArray.cpp */; };
 		E413FABA14C0606A00BF1E3D /* ResourceArray.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E413FAB714C0604D00BF1E3D /* ResourceArray.cpp */; };
 		E438DF501535D35D008B5005 /* CoreMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E438DF4F1535D35C008B5005 /* CoreMedia.framework */; };
@@ -800,6 +803,8 @@
 		D99A59E216C1C199000C6649 /* MoSyncSensorBridge.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = MoSyncSensorBridge.mm; path = Sensor/MoSyncSensorBridge.mm; sourceTree = "<group>"; };
 		D99A59FE16C25099000C6649 /* MoSyncMisc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MoSyncMisc.h; path = Misc/MoSyncMisc.h; sourceTree = "<group>"; };
 		D99A59FF16C25099000C6649 /* MoSyncMisc.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = MoSyncMisc.mm; path = Misc/MoSyncMisc.mm; sourceTree = "<group>"; };
+		D99A5A2116C2BDBC000C6649 /* MoSyncFonts.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MoSyncFonts.h; path = Fonts/MoSyncFonts.h; sourceTree = "<group>"; };
+		D99A5A2216C2BDBC000C6649 /* MoSyncFonts.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = MoSyncFonts.mm; path = Fonts/MoSyncFonts.mm; sourceTree = "<group>"; };
 		E413FAB714C0604D00BF1E3D /* ResourceArray.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ResourceArray.cpp; path = ../../../base/ResourceArray.cpp; sourceTree = "<group>"; };
 		E438DF4F1535D35C008B5005 /* CoreMedia.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMedia.framework; path = System/Library/Frameworks/CoreMedia.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
@@ -877,6 +882,7 @@
 		080E96DDFE201D6D7F000001 /* Classes */ = {
 			isa = PBXGroup;
 			children = (
+				D99A5A1F16C2BDA6000C6649 /* Fonts */,
 				D99A59F616C25009000C6649 /* Misc */,
 				43F36FC115B4741A0095B3C6 /* Ads */,
 				43F36FC215B474200095B3C6 /* Audio */,
@@ -1591,6 +1597,15 @@
 			name = Misc;
 			sourceTree = "<group>";
 		};
+		D99A5A1F16C2BDA6000C6649 /* Fonts */ = {
+			isa = PBXGroup;
+			children = (
+				D99A5A2116C2BDBC000C6649 /* MoSyncFonts.h */,
+				D99A5A2216C2BDBC000C6649 /* MoSyncFonts.mm */,
+			);
+			name = Fonts;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
@@ -1710,6 +1725,7 @@
 				8B944BFF16C1809C00E1B091 /* MoSyncOrientation.h in Headers */,
 				8BB2E67216C2509B00391242 /* MoSyncOpenGL.h in Headers */,
 				8BB2E67E16C28AE500391242 /* MoSyncGraphics.h in Headers */,
+				D99A5A2316C2BDBC000C6649 /* MoSyncFonts.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1966,6 +1982,7 @@
 				D99A5A0116C25099000C6649 /* MoSyncMisc.mm in Sources */,
 				8BB2E67316C2509B00391242 /* MoSyncOpenGL.mm in Sources */,
 				8BB2E67F16C28AE500391242 /* MoSyncGraphics.mm in Sources */,
+				D99A5A2416C2BDBC000C6649 /* MoSyncFonts.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2107,6 +2124,7 @@
 				8B944C0116C1809C00E1B091 /* MoSyncOrientation.mm in Sources */,
 				8BB2E67416C2509B00391242 /* MoSyncOpenGL.mm in Sources */,
 				8BB2E68016C28AE500391242 /* MoSyncGraphics.mm in Sources */,
+				D99A5A2516C2BDBC000C6649 /* MoSyncFonts.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
