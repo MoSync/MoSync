@@ -26,7 +26,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "iosext.h"
 #include "extcomp.h"
 
-void writeIosStubs(string& outputDir, Interface& ext, string& iosIfName) {
+void writeIosStubs(string& outputDir, Interface& ext, string& iosIfName, bool headerOnly) {
 	_mkdir(outputDir.c_str());
 
 	// First some headers.

@@ -27,7 +27,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 using namespace std;
 
-void writeIosStubs(string&, Interface&, string&);
+void writeIosStubs(string&, Interface&, string&, bool);
 void streamObjCSignature(ostream&, Interface&, Function&);
 string getObjCDefaultValue(string& type);
 

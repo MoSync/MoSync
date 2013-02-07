@@ -214,10 +214,6 @@ string toAndroidType(Interface& ext, string& ctype, bool autoBox, bool constant)
 	int ptrDepth = 0;
 	string extractedType = extractPointerType(ctype, ptrDepth);
 	if (ptrDepth > 0) {
-		if (extractedType == "char") {
-			ptrDepth--;
-			extractedType = "NCString";
-		}
 		string prefix = "";
 		string suffix = "";
 		for (int i = 0; i < ptrDepth; i++) {

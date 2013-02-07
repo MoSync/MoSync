@@ -1,8 +1,9 @@
 package com.mosync.internal.android.extensions;
 
 import com.mosync.api.CString;
+import com.mosync.api.Pointer;
 
-public class CStringImpl implements CString {
+public class CStringImpl extends CString {
 
 	private int addr;
 	private boolean resolved = false;
@@ -22,6 +23,10 @@ public class CStringImpl implements CString {
 
 	public void set(String str, int maxLen) {
 		StringType.marshalString(addr, str, maxLen);
+	}
+
+	public Pointer<Byte> getPointer() {
+		return new PointerImpl(CharType.getInstance(), addr);
 	}
 
 	int getAddress() {

@@ -78,9 +78,7 @@ public class ExtensionModule {
 		}
 
 		TypeDescriptor result = null;
-		if ("char".equals(name) && ptrDepth == 1) {
-			result = StringType.getInstance(out);
-		} else if (ptrDepth > 0) {
+		if (ptrDepth > 0) {
 			result = new PointerType(getTypeDescriptor(name, ptrDepth - 1, out));
 		} else if ("int".equals(name)) {
 			result = IntType.getInstance();
@@ -92,6 +90,8 @@ public class ExtensionModule {
 			result = DoubleType.getInstance();
 		} else if ("float".equals(name)) {
 			result = FloatType.getInstance();
+		} else if (StringType.isStringType(name)) {
+			result = StringType.getInstance(out);
 		} else if ("void".equals(name)) {
 			result = VoidType.getInstance();
 		} else {

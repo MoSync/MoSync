@@ -129,7 +129,7 @@ void packageAndroid(const SETTINGS& s, const RuntimeInfo& ri) {
 		extensionRes.append(" -A " + file(assetDir));
 
 		vector<string> extensions;
-		split(extensions, s.extensions, ",");
+		getExtensions(s.extensions, extensions);
 
 		for (size_t i = 0; i < extensions.size(); i++) {
 			string extension = trim(extensions[i]);

@@ -2864,9 +2864,13 @@ public class MoSyncThread extends Thread implements MoSyncContext
 		}
 		else if (key.equals("mosync.network.type"))
 		{
+			try {
 			//get the connection that we are using right now
 			NetworkInfo info = mConnectivityManager.getActiveNetworkInfo();
 			property = getNetworkNameFromInfo(info);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
 
 		if (null == property) { return -2; }

@@ -94,7 +94,7 @@ int main(int argc, const char** argv) {
 
 			streamExtensionManifest(args);
 
-			string androidOut = extDir + "/android/";
+			string androidOut = extDir + "/Android/";
 			_mkdir(androidOut.c_str());
 			string androidManifestOut = androidOut + "assets/";
 			_mkdir(androidManifestOut.c_str());
@@ -103,6 +103,10 @@ int main(int argc, const char** argv) {
 
 			streamAndroidExtMF(androidMFfile, ext, androidPackageName, androidClassName);
 			androidMFfile.close();
+
+			string iphoneosOut = extDir + "/iOS/";
+			_mkdir(iphoneosOut.c_str());
+			writeIosStubs(iphoneosOut, ext, iosInterfaceName, false);
 		}
 
 		if (generateStubs) {
@@ -115,7 +119,7 @@ int main(int argc, const char** argv) {
 
 			string iosStubsDir = stubsDir + "iphoneos/";
 			_mkdir(iosStubsDir.c_str());
-			writeIosStubs(iosStubsDir, ext, iosInterfaceName);
+			writeIosStubs(iosStubsDir, ext, iosInterfaceName, false);
 		}
 
 		if (generateJS) {
@@ -198,7 +202,7 @@ void writeHeaders(string& headerOut, Interface& ext, bool includeFunctions) {
 		headerfile << "typedef struct {\n";
 		for (size_t j = 0; j < s.members.size(); j++) {
 			Member m = s.members[j];
-			headerfile << "\t" << m.pod[0].type << " " << m.pod[0].name << ";\n";
+			headerfile << "\t" << cType(ext, m.pod[0].type) << " " << m.pod[0].name << ";\n";
 		}
 		headerfile << "} __attribute__ ((aligned(4))) " << s.name << ";\n\n";
 	}
@@ -224,6 +228,10 @@ void streamExtensionManifest(map<string, string>& args) {
 	string vendor = args["vendor"];
 	if (!vendor.empty()) {
 		manifest << "vendor = " << vendor << "\n";
+	}
+	string platforms = args["platforms"];
+	if (!platforms.empty()) {
+		manifest << "platforms = " << platforms << "\n";
 	}
 	manifest.close();
 }
@@ -367,16 +375,13 @@ size_t cTypeAlignedSize(Interface& ext, string& type) {
 			for(size_t k=0; k<m.pod.size(); k++) {
 				PlainOldData pod = m.pod[k];
 				max = MAX(max, cTypeAlignedSize(ext, pod.type));
-				printf("MEMBER %s: %d\n", pod.name.c_str(), (int) max);
 			}
 			size += max;
 		}
-		printf("TYPE %s: %d\n", type.c_str(), (int) size);
 		return size;
 	} else {
 		size_t size = cTypeSize(ext, type);
 		size_t result = size % 4 ? size + (4 - size % 4) : size;
-		printf("TYPE %s: %d\n", type.c_str(), (int) result);
 		return result;
 	}
 }

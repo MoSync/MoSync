@@ -73,4 +73,8 @@ public class StringType extends TypeDescriptor {
 		return bytes.length;
 	}
 
+	public static boolean isStringType(String type) {
+		return "NCString".equals(type) || "MAString".equals(type);
+	}
+
 }

@@ -161,7 +161,7 @@ void generateStructMarshalling(ostream& extensionFile, Interface& ext, string& v
 void generateMarshalling(ostream& extensionFile, Interface& ext, string& name, string& type) {
 	int ptrDepth = 0;
 	string scalarType = extractPointerType(type, ptrDepth);
-	bool stringType = scalarType == "char" && ptrDepth == 1;
+	bool stringType = (scalarType == "NCString" || scalarType == "MAString");
 	if (ptrDepth > 0 && !stringType) {
 		generateArrayMarshalling(extensionFile, ext, name, type, ptrDepth);
 	} else if (getStruct(ext, type)) {
@@ -199,12 +199,7 @@ string getJSTypeDesc(Interface& ext, vector<string>& names, vector<string>& type
 		} else if ("long long" == type) {
 			typeDesc.append(out ? "l" : "L");
 		} else if ("char" == type) {
-			if (ptrDepth > 0) {
-				typeDesc.append(out ? "s" : "S");
-				ptrDepth--;
-			} else {
-				typeDesc.append(out ? "b" : "B");
-			}
+			typeDesc.append(out ? "b" : "B");
 		} else if ("float" == type) {
 			typeDesc.append(out ? "f" : "F");
 		} else if ("double" == type) {
@@ -212,6 +207,8 @@ string getJSTypeDesc(Interface& ext, vector<string>& names, vector<string>& type
 		} else if ("void" == type) {
 			// Only for return values, always out.
 			typeDesc.append("v");
+		} else if ("NCString" == type || "MAString" == type) {
+			typeDesc.append(out ? "s" : "S");
 		} else {
 			if (structIdMap.find(type) == structIdMap.end()) {
 				structIdMap[type] = typeDescs.size();
