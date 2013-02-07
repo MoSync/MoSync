@@ -59,7 +59,8 @@ public:
 		mCount = 0;
 		mInProgress = false;
 
-		mConn.connect("datagram://192.168.0.1:53");
+		int res = mConn.connect("datagram://192.168.0.1:53");
+		printf("connect: %i\n", res);
 	}
 
 	/**
