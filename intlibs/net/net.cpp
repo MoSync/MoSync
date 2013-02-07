@@ -233,11 +233,47 @@ int TcpConnection::connect() {
 	return MASocketConnect(mSock, mInetAddr, mPort);
 }
 
-bool TcpConnection::isConnected() {
+TcpConnection::~TcpConnection() {
+}
+
+
+int UdpConnection::connect() {
+	// Create socket
+	mSock = socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP);
+	if(mSock == INVALID_SOCKET)
+	{
+		LOG("UdpConnection: socket returned error code %d\n", SOCKET_ERRNO);
+		return CONNERR_GENERIC;
+	}
+
+	// parse address
+	mInetAddr = inet_addr(mHostname.c_str());
+	if(mInetAddr == INADDR_NONE) {
+		hostent *hostEnt;
+		// DNS lookup
+		if((hostEnt = gethostbyname(mHostname.c_str())) == NULL) {
+			LOG("MASocketOpen: DNS resolve failed. %d\n", SOCKET_ERRNO);
+			return CONNERR_DNS;
+		}
+		mInetAddr = (uint)*((uint*)hostEnt->h_addr_list[0]);
+		if(mInetAddr == INADDR_NONE) {
+			LOG("MASocketOpen: Could not parse the resolved ip address. %d\n", SOCKET_ERRNO);
+			return CONNERR_URL;
+		}
+	}
+
+	// connect
+	return MASocketConnect(mSock, mInetAddr, mPort);
+}
+
+UdpConnection::~UdpConnection() {
+}
+
+bool InetConnection::isConnected() {
 	return mSock != INVALID_SOCKET;
 }
 
-int TcpConnection::getAddr(MAConnAddr& addr) {
+int InetConnection::getAddr(MAConnAddr& addr) {
 	if(mSock == INVALID_SOCKET)
 		return CONNERR_GENERIC;
 	addr.family = CONN_FAMILY_INET4;
@@ -246,21 +282,21 @@ int TcpConnection::getAddr(MAConnAddr& addr) {
 	return 1;
 }
 
-TcpConnection::~TcpConnection() {
+InetConnection::~InetConnection() {
 	close();
 }
 
-void TcpConnection::close() {
+void InetConnection::close() {
 	if(mSock != INVALID_SOCKET) {
 		int res;
 		res = shutdown(mSock, 2);	//stop both reading and writing
 		if(SOCKET_ERROR == res) {
 			// may happen a lot..
-			//LOG("TcpConnection::shutdown failed: %i\n", SOCKET_ERRNO);
+			//LOG("InetConnection::shutdown failed: %i\n", SOCKET_ERRNO);
 		}
 		res = closesocket(mSock);
 		if(SOCKET_ERROR == res) {
-			LOG("TcpConnection::closesocket failed: %i\n", SOCKET_ERRNO);
+			LOG("InetConnection::closesocket failed: %i\n", SOCKET_ERRNO);
 		}
 		mSock = INVALID_SOCKET;
 	}
@@ -278,10 +314,27 @@ int TcpConnection::read(void* dst, int max) {
 	}
 }
 
-int TcpConnection::write(const void* src, int len) {
+int UdpConnection::read(void* dst, int max) {
+	int bytesRecv = recv(mSock, (char*)dst, max, 0);
+	if(SOCKET_ERROR == bytesRecv) {
+		LOG("UdpConnection::read: recv failed. error code: %i\n", SOCKET_ERRNO);
+#ifdef WIN32
+		if(SOCKET_ERRNO == WSAEMSGSIZE) {
+			return max;
+		}
+#endif
+		return CONNERR_GENERIC;
+	} else if (bytesRecv == 0) {
+		return CONNERR_CLOSED;
+	} else {
+		return bytesRecv;
+	}
+}
+
+int InetConnection::write(const void* src, int len) {
 	int bytesSent = send(mSock, (const char*) src, len, 0);
 	if(bytesSent != len || SOCKET_ERROR == bytesSent) {
-		LOG("TcpConnection::write: send failed. error code: %i\n", SOCKET_ERRNO);
+		LOG("InetConnection::write: send failed. error code: %i\n", SOCKET_ERRNO);
 		return CONNERR_GENERIC;
 	} else {
 		return 1;

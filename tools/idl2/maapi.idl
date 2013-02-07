@@ -729,6 +729,9 @@ interface MAAPI {
 	*
 	* <tt>socket</tt>, which is TCP. It has no parameters.
 	*
+	* <tt>datagram</tt>, which is UDP. It has no parameters.
+	* Datagrams may arrive corrupted, out-of-order, duplicated, or not at all.
+	*
 	* <tt>ssl</tt>, which is an encrypted TCP connection. It has no parameters.
 	*
 	* <tt>http</tt>, which is HTTP/1.0 GET. When using HTTP, you need not specify the port;
@@ -763,6 +766,8 @@ interface MAAPI {
 	*
 	* Example TCP url: <tt>socket://www.example.com:23</tt>
 	*
+	* Example UDP url: <tt>datagram://www.example.com:53</tt>
+	*
 	* Example SSL url: <tt>ssl://www.example.com:22</tt>
 	*
 	* Example HTTP url: <tt>http://www.example.com/directory/document.html</tt>
@@ -792,9 +797,11 @@ interface MAAPI {
 	* opening connections without closing them, you'll eventually receive the
 	* #CONNERR_MAX error code instead of new connection handles.
 	*
+	*
 	* Alternatively, this function can be called with one of these url types to
 	* create a Server Connection:\n
 	* <tt>socket://[:\<port\>]</tt>, for TCP.\n
+	* <tt>datagram://[:\<port\>]</tt>, for UDP.\n
 	* <tt>btspp://localhost:\<uuid\>[;name=\<YourServiceName\>]</tt>, for Bluetooth.\n
 	* \<uuid\> is a 32-digit hexadecimal number. It will be used to create the
 	* service record. Its MAUUID representation can be used by clients to search for
@@ -829,6 +836,10 @@ interface MAAPI {
 	* The result of the operation will be delivered in a CONN event, with
 	* MAConnEventData::opType set to #CONNOP_READ.
 	* The success value is the number of bytes read.
+	*
+	* Datagrams may be bigger than the receiving buffer. In that case,
+	* #CONNERR_MSGSIZE will be signaled, and the buffer is filled with
+	* the first part of the datagram. The rest of the datagram is lost.
 	*
 	* \see maGetEvent
 	* \see \ref connApiOverview

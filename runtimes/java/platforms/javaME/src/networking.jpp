@@ -36,6 +36,12 @@ NETSYSCALL(MAHandle) maConnect(final String url) {
 		}
 		mConnections.put(new Integer(mConnNextHandle), mac);
 		return mConnNextHandle++;
+	} else if(url.startsWith("datagram://")) {
+		MADatagramConn mac = new MADatagramConn(mConnNextHandle);
+		mConnections.put(new Integer(mConnNextHandle), mac);
+		mac.state |= CONNOP_CONNECT;
+		mThreadPool.execute(new DatagramConnect(mac, url));
+		return mConnNextHandle++;
 	}
 	MAStreamConn mac = new MAStreamConn(mConnNextHandle);
 	mConnections.put(new Integer(mConnNextHandle), mac);
@@ -121,31 +127,34 @@ NETSYSCALL(void) maConnClose(MAHandle conn) {
 }
 
 NETSYSCALL(void) maConnRead(MAHandle conn, Address dst, int size) {
-	MAConn mac = (MAConn)mConnections.get(new Integer(conn));
 	DEBUG_CONN("ConnRead "+conn+", "+size+"\n");
+	MAConn mac = (MAConn)mConnections.get(new Integer(conn));
 	MYASSERT((mac.state & CONNOP_READ) == 0);
-	MYASSERT(mac.in != null);
 	mac.state |= CONNOP_READ;
+	mac.prepareRead();
 	mThreadPool.execute(new ConnRead(mac, dst, size));
 }
 
-final MAStreamConn setupWrite(MAHandle conn) throws IOException {
-	MAStreamConn mac = (MAStreamConn)mConnections.get(new Integer(conn));
-	MYASSERT((mac.state & CONNOP_WRITE) == 0);
-	if(mac.conn instanceof HttpConnection) {
-		HttpConnection http = (HttpConnection)mac.conn;
-		if(http.getRequestMethod().equals(HttpConnection.POST) && mac.httpState == HTTPS_SETUP) {
-			MYASSERT(mac.out == null);
-			mac.out = mac.conn.openOutputStream();
-			mac.httpState = HTTPS_WRITING;
+final MAConn setupWrite(MAHandle conn) throws IOException {
+	MAConn m = (MAConn)mConnections.get(new Integer(conn));
+	MYASSERT((m.state & CONNOP_WRITE) == 0);
+	if(m instanceof MAStreamConn) {
+		MAStreamConn mac = (MAStreamConn)m;
+		if(mac.conn instanceof HttpConnection) {
+			HttpConnection http = (HttpConnection)mac.conn;
+			if(http.getRequestMethod().equals(HttpConnection.POST) && mac.httpState == HTTPS_SETUP) {
+				MYASSERT(mac.out == null);
+				mac.out = mac.conn.openOutputStream();
+				mac.httpState = HTTPS_WRITING;
+			}
 		}
+		MYASSERT(mac.out != null);
 	}
-	MYASSERT(mac.out != null);
-	return mac;
+	return m;
 }
 
 NETSYSCALL(void) maConnWrite(MAHandle conn, Address src, int size) throws IOException {
-	MAStreamConn mac = setupWrite(conn);
+	MAConn mac = setupWrite(conn);
 
 	mac.state |= CONNOP_WRITE;
 	mThreadPool.execute(new ConnWrite(mac, src, size));
@@ -159,9 +168,9 @@ NETSYSCALL(void) maConnReadToData(MAHandle conn, MAHandle data, int offset, int 
 	Binary bin = (Binary)getResource(data);
 	MYASSERT(bin.size() >= offset + size);
 
-	MAStreamConn mac = (MAStreamConn)mConnections.get(new Integer(conn));
+	MAConn mac = (MAConn)mConnections.get(new Integer(conn));
 	MYASSERT((mac.state & CONNOP_READ) == 0);
-	MYASSERT(mac.in != null);
+	mac.prepareRead();
 
 	setResource(data, mFlux);
 	mac.state |= CONNOP_READ;
@@ -176,7 +185,7 @@ NETSYSCALL(void) maConnWriteFromData(MAHandle conn, MAHandle data, int offset, i
 	BinaryInterface bi = (BinaryInterface)getResource(data);
 	MYASSERT(bi.size() >= offset + size);
 
-	MAStreamConn mac = setupWrite(conn);
+	MAConn mac = setupWrite(conn);
 
 	setResource(data, mFlux);
 	mac.state |= CONNOP_WRITE;
