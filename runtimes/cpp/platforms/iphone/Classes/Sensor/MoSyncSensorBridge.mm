@@ -16,14 +16,28 @@
  */
 
 #include "MoSyncSensorBridge.h"
-#include "MoSyncMain.h"
+#include "MoSyncSensor.h"
+
+static MoSyncSensor* sMoSyncSensor = NULL;
+
+MoSyncSensor* getMoSyncSensor()
+{
+	if (!sMoSyncSensor)
+	{
+		sMoSyncSensor = [[MoSyncSensor alloc] init];
+	}
+	return sMoSyncSensor;
+}
 
 SYSCALL(int, maSensorStart(int sensor, int interval))
 {
-    return MoSync_SensorStart(sensor, interval);
+    MoSyncSensor* moSyncSensor = getMoSyncSensor();
+    return [moSyncSensor startSensor:sensor interval:interval];
+
 }
 
 SYSCALL(int, maSensorStop(int sensor))
 {
-    return MoSync_SensorStop(sensor);
+    MoSyncSensor* moSyncSensor = getMoSyncSensor();
+    return [moSyncSensor stopSensor:sensor];
 }
