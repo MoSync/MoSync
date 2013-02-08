@@ -31,6 +31,7 @@ import com.mosync.nativeui.util.HandleTable;
 import com.mosync.nativeui.util.properties.InvalidPropertyValueException;
 import com.mosync.nativeui.util.properties.LongConverter;
 import com.mosync.nativeui.util.properties.PropertyConversionException;
+import static com.mosync.internal.android.MoSyncHelpers.SYSLOG;
 
 import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_LOCAL_NOTIFICATION;
 import static com.mosync.internal.generated.MAAPI_consts.MA_NOTIFICATION_LOCAL_FLASH_LIGHTS;
@@ -134,7 +135,7 @@ public class LocalNotificationsManager
 			return MA_NOTIFICATION_RES_OK;
 		}
 
-		Log.e("@@MoSync", "maNotificationDestroy: Invalid notification handle " + handle);
+		SYSLOG("@@MoSync maNotificationDestroy: Invalid notification handle " + handle);
 		return MA_NOTIFICATION_RES_INVALID_HANDLE;
 	}
 
@@ -153,25 +154,23 @@ public class LocalNotificationsManager
 		{
 			if ( notification.getScheduled() )
 			{
-				Log.e("@@MoSync", "maNotificationLocalSetProperty cannot be called after scheduling the notification.");
+				SYSLOG("@@MoSync maNotificationLocalSetProperty cannot be called after scheduling the notification.");
 				return MA_NOTIFICATION_RES_ALREADY_SCHEDULED;
 			}
 
 			try{
 				return notification.setProperty(property, value);
 			}catch (PropertyConversionException pce){
-				Log.e("@@MoSync",
-						"maNotificationLocalSetProperty: Error while converting property value " + value + ":" + pce.getMessage( ) );
+				SYSLOG("@@MoSync maNotificationLocalSetProperty: Error while converting property value " + value + ":" + pce.getMessage( ) );
 				return MA_NOTIFICATION_RES_INVALID_PROPERTY_VALUE;
 			}catch (InvalidPropertyValueException ipve){
-				Log.e("@@MoSync",
-						"maNotificationLocalSetProperty: Error while setting property: " + ipve.getMessage( ) );
+				SYSLOG("@@MoSync maNotificationLocalSetProperty: Error while setting property: " + ipve.getMessage( ) );
 				return MA_NOTIFICATION_RES_INVALID_PROPERTY_VALUE;
 			}
 		}
 		else
 		{
-			Log.e("@@MoSync", "maNotificationLocalSetProperty: Invalid notification handle: "+ handle);
+			SYSLOG("@@MoSync maNotificationLocalSetProperty: Invalid notification handle: "+ handle);
 			return MA_NOTIFICATION_RES_INVALID_HANDLE;
 		}
 	}
@@ -194,14 +193,14 @@ public class LocalNotificationsManager
 		LocalNotificationObject notification = m_NotificationTable.get(handle);
 		if ( null == notification )
 		{
-			Log.e("@@MoSync", "maNotificationLocalGetProperty: Invalid notification handle: "+ handle);
+			SYSLOG("@@MoSync maNotificationLocalGetProperty: Invalid notification handle: "+ handle);
 			return MA_NOTIFICATION_RES_INVALID_PROPERTY_VALUE;
 		}
 
 		String result = notification.getProperty(property);
 		if( result.length( ) + 1 > memBufferSize )
 		{
-			Log.e( "MoSync", "maNotificationLocalGetProperty: Buffer size " + memBufferSize +
+			SYSLOG( "MoSync maNotificationLocalGetProperty: Buffer size " + memBufferSize +
 					" too short to hold buffer of size: " + result.length( ) + 1 );
 			return IX_WIDGET.MAW_RES_INVALID_STRING_BUFFER_SIZE;
 		}
@@ -228,7 +227,7 @@ public class LocalNotificationsManager
 	 */
 	public int schedule(final int handle, final Context appContext)
 	{
-		Log.e("@@MoSync", "LocalNotificationsManager: schedule notification " + handle);
+		SYSLOG("@@MoSync LocalNotificationsManager: schedule notification " + String.valueOf(handle));
 
 		final LocalNotificationObject notification = m_NotificationTable.get(handle);
 		if ( null == notification )
@@ -240,7 +239,7 @@ public class LocalNotificationsManager
 		{
 			if ( notification.getScheduled() )
 			{
-				Log.e("@@MoSync","maNotificationLocalSchedule was already called.");
+				SYSLOG("@@MoSync maNotificationLocalSchedule was already called.");
 				return MA_NOTIFICATION_RES_ALREADY_SCHEDULED;
 			}
 
@@ -308,7 +307,7 @@ public class LocalNotificationsManager
 	 */
 	public int unschedule(int handle)
 	{
-		Log.e("@@MoSync", "LocalNotificationsManager: unschedule");
+		SYSLOG("@@MoSync LocalNotificationsManager: unschedule");
 
 		LocalNotificationObject notification = m_NotificationTable.get(handle);
 		if ( null == notification )
@@ -320,7 +319,7 @@ public class LocalNotificationsManager
 		{
 			if ( !notification.getScheduled() )
 			{
-				Log.e("@@MoSync","maNotificationLocalUnschedule: failed because notification was not scheduled.");
+				SYSLOG("@@MoSync maNotificationLocalUnschedule: failed because notification was not scheduled.");
 				return MA_NOTIFICATION_RES_CANNOT_UNSCHEDULE;
 			}
 			notification.setScheduled(false);

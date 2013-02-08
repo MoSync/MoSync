@@ -26,6 +26,7 @@ import android.os.IBinder;
 import android.util.Log;
 
 import com.mosync.java.android.MoSync;
+import static com.mosync.internal.android.MoSyncHelpers.SYSLOG;
 
 import static com.mosync.internal.generated.MAAPI_consts.MA_NOTIFICATION_LOCAL_TICKER_TEXT;
 import static com.mosync.internal.generated.MAAPI_consts.MA_NOTIFICATION_LOCAL_CONTENT_BODY;
@@ -123,7 +124,7 @@ public class LocalNotificationsService extends Service
 
 		if ( mLatestNotification == null )
 		{
-			Log.e("@@MoSync","The Local Notification Service cannot be startted");
+			SYSLOG("@@MoSync The Local Notification Service cannot be started");
 			return;
 		}
 
@@ -142,11 +143,11 @@ public class LocalNotificationsService extends Service
 	 */
 	public static int stopService()
 	{
-		Log.i("@@@MoSync", "LocalNotificationsService.stopService");
+		SYSLOG("@@@MoSync LocalNotificationsService.stopService");
 
 		if (null != sMe)
 		{
-			Log.i("@@@MoSync", "LocalNotificationsService.stopService - stopSelf");
+			SYSLOG("@@@MoSync LocalNotificationsService.stopService - stopSelf");
 			// Cancel the pending notifications.
 			sMe.stopSelf();
 			sMe = null;
@@ -163,7 +164,7 @@ public class LocalNotificationsService extends Service
 	public static void removeServiceNotification(
 		int notificationId, Context context)
 	{
-		Log.e("@@MoSync", "LocalNotification: remove service notification");
+		SYSLOG("@@MoSync LocalNotification: remove service notification");
 
 		NotificationManager mNotificationManager = (NotificationManager)
 			context.getSystemService(Context.NOTIFICATION_SERVICE);
@@ -178,7 +179,7 @@ public class LocalNotificationsService extends Service
 	{
 		super.onCreate();
 
-		Log.i("@@@MoSync", "NotificationsService.onCreate");
+		SYSLOG("@@@MoSync NotificationsService.onCreate");
 
 		// Set the single instance of this service.
 		sMe = this;
@@ -196,7 +197,7 @@ public class LocalNotificationsService extends Service
 	@Override
 	public void onStart(Intent intent, int startId)
 	{
-		Log.i("@@@MoSync", "NotificationsService.onStart");
+		SYSLOG("@@@MoSync NotificationsService.onStart");
 
 		startMe(intent);
 	}
@@ -207,7 +208,7 @@ public class LocalNotificationsService extends Service
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId)
 	{
-		Log.i("@@@MoSync", "NotificationsService.onStartCommand");
+		SYSLOG("@@@MoSync NotificationsService.onStartCommand");
 
 		startMe(intent);
 
@@ -221,7 +222,7 @@ public class LocalNotificationsService extends Service
 	{
 		super.onDestroy();
 
-		Log.i("@@@MoSync", "LocalNotificationsService.onDestroy");
+		SYSLOG("@@@MoSync LocalNotificationsService.onDestroy");
 
 		stopService();
 	}
@@ -235,7 +236,7 @@ public class LocalNotificationsService extends Service
 		// Stop the service if there is no intent.
 		if (null == intent)
 		{
-			Log.i("@@@MoSync", "NotificationsService.startMe: "
+			SYSLOG("@@@MoSync NotificationsService.startMe: "
 				+ "stopping service because intent is null");
 			stopSelf();
 			return;
@@ -246,7 +247,7 @@ public class LocalNotificationsService extends Service
 			intent.getBooleanExtra("StartedByTheMoSyncApplication", false);
 		if (!startFlag)
 		{
-			Log.i("@@@MoSync", "NotificationsService.startMe: "
+			SYSLOG("@@@MoSync NotificationsService.startMe: "
 				+ "stopping service because startFlag is false");
 			stopSelf();
 			return;
@@ -255,7 +256,7 @@ public class LocalNotificationsService extends Service
 		// sMe must be set.
 		if (null == sMe)
 		{
-			Log.i("@@@MoSync", "NotificationsService.startMe: "
+			SYSLOG("@@@MoSync NotificationsService.startMe: "
 				+ "stopping service because sMe is null");
 			stopSelf();
 			return;

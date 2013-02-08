@@ -238,7 +238,7 @@ public class LocalNotificationObject {
 		}
 		else if ( name.equals(MA_NOTIFICATION_LOCAL_VIBRATE_DURATION) )
 		{
-			if ( IntConverter.convert(value) < 0 )
+			if ( LongConverter.convert(value) < 0 )
 				throw new InvalidPropertyValueException(name, value);
 			mVibrateDuration = LongConverter.convert(value);
 			// Ignore the default value.

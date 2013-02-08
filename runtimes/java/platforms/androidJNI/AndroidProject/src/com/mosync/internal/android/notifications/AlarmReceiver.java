@@ -53,13 +53,13 @@ public class AlarmReceiver  extends BroadcastReceiver{
 					LocalNotificationsService.LOCAL_NOTIFICATION_ID_DEFAULT);
 
 			String notificationTitle = extras.getString(
-					MA_NOTIFICATION_LOCAL_CONTENT_TITLE, " ");
+					MA_NOTIFICATION_LOCAL_CONTENT_TITLE, "");
 
 			String notificationBody = extras.getString(
-					MA_NOTIFICATION_LOCAL_CONTENT_BODY, " ");
+					MA_NOTIFICATION_LOCAL_CONTENT_BODY, "");
 
 			String notificationTicker = extras.getString(
-					MA_NOTIFICATION_LOCAL_TICKER_TEXT, " ");
+					MA_NOTIFICATION_LOCAL_TICKER_TEXT, "");
 
 			Boolean notificationPlaySound = extras.getBoolean(
 					MA_NOTIFICATION_LOCAL_PLAY_SOUND, false);
