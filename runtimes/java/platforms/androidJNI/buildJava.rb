@@ -15,6 +15,7 @@ if(!File.exist?("#{package_root}/gen"))
 sh("#{File.join(androidSDKPath, "tools/aapt")} package -f -v " +
 	"-M #{File.join(package_root,"AndroidManifest.xml")} -F resources.ap_ " +
 	"-I #{File.join(androidSDKPath, "android.jar")} " +
+	"-I #{File.join("#{package_root}libs/", "GoogleAdMobAdsSdk.jar")} " +
 	"-S #{File.join(package_root, "res")} " +
 	"-m -J #{File.join(package_root, "gen")}");
 end
@@ -40,6 +41,11 @@ packages = [
 	"src/com/mosync/pim/*.java",
 	"src/com/mosync/nativeui/ui/custom/*.java",
 	"gen/com/mosync/java/android/*.java",
+	"src/com/mosync/internal/android/nfc/*.java",
+	"src/com/mosync/internal/android/nfc/ops/*.java",
+	"src/com/mosync/nativeui/ui/ads/*.java",
+	"src/com/google/android/c2dm/*.java",
+	"src/com/mosync/internal/android/notifications/*.java"
 ]
 
 # Concatenate each list element with package_root, and flatten the list to a string
@@ -51,4 +57,4 @@ sh(
 	#"-Xlint:deprecation "+
 	"-source 1.6 -target 1.6 -g -d #{class_dir} " +
 	"-classpath " +
-	"#{File.join(androidSDKPath, "android.jar")} " + java_files)
+	"\"#{File.join(androidSDKPath, "android.jar")};#{File.join("#{package_root}libs/", "GoogleAdMobAdsSdk.jar")}\" " + java_files);

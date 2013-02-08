@@ -40,14 +40,19 @@ public:
 class CSocket : public CBaseSocket {
 public:
 	enum Type {
-		ETcp, ERfcomm, EBlank
+		ETcp, ERfcomm, EBlank, EUdp
 	};
 
 	CSocket(RSocketServ& aServer, Type type) : mClosed(true) {
 		mIsBluetooth = false;
+		mIsDatagram = false;
 		switch(type) {
 		case ETcp:
 			LHEL(mSocket.Open(aServer, KAfInet, KSockStream, KProtocolInetTcp));
+			break;
+		case EUdp:
+			mIsDatagram = true;
+			LHEL(mSocket.Open(aServer, KAfInet, KSockDatagram, KProtocolInetUdp));
 			break;
 		case ERfcomm:
 			mIsBluetooth = true;
@@ -76,9 +81,9 @@ public:
 	}
 	CMySecureSocket* ssl() { return NULL; }
 	bool isBluetooth() const { return mIsBluetooth; }
-	
+
 	void GetAddr(MAConnAddr* addr);
-	
+
 	RSocket& socket() { return mSocket; }
 
 protected:
@@ -86,6 +91,7 @@ protected:
 	TSockXfrLength mDummyLength;
 	bool mClosed;
 	bool mIsBluetooth;
+	bool mIsDatagram;
 };
 
 class CMySecureSocket : public CSocket {
@@ -144,9 +150,9 @@ public:	//CConnection
 
 	//only allowed on POST sockets in WRITING state
 	bool Write(const TDesC8& aDesc, CPublicActive& op);
-	
+
 	CHttpConnection* http() { return this; }
-	
+
 	void CancelAll();
 	void GetAddr(MAConnAddr* addr) { mTransport->GetAddr(addr); }
 
@@ -161,7 +167,7 @@ public:	//CHttpConnection
 	mTransport(transport) {}
 
 	void ConstructL(const TDesC8& hostname, const TDesC8& path);
-	
+
 	~CHttpConnection();
 
 	void SetRequestHeaderL(const TDesC8& key, const TDesC8& value);
@@ -169,7 +175,7 @@ public:	//CHttpConnection
 	int GetResponseCode() const { return mResponseCode; };
 
 	void FormatRequestL();
-	
+
 	//result value is either a negative symbian error code,
 	//or a positive number which is a negated CONNERR code,
 	//or, on success, zero.
@@ -190,7 +196,7 @@ public:	//CHttpConnection
 private:
 	//int readLine(const char*& lineP);
 	//int sendHeaders();	//goes from SETUP to WRITING
-	
+
 	static void SyncCallbackL(TAny* aPtr, TInt aResult);
 	void RunL(TInt aResult);
 	void ReadMoreHeadersL();

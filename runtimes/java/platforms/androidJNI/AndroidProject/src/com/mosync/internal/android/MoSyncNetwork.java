@@ -56,6 +56,9 @@ import java.net.HttpURLConnection;
 import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.Socket;
+import java.net.DatagramSocket;
+import java.net.DatagramPacket;
+import java.net.InetSocketAddress;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.UnknownHostException;
@@ -258,6 +261,11 @@ public class MoSyncNetwork
 			if (url.startsWith("socket://"))
 			{
 				connObj = new SocketConnectionObject(this)
+					.create(url, connHandle);
+			}
+			else if (url.startsWith("datagram://"))
+			{
+				connObj = new DatagramConnectionObject(this)
 					.create(url, connHandle);
 			}
 			else if (url.startsWith("ssl://"))
@@ -760,6 +768,23 @@ public class MoSyncNetwork
 			return mMoSyncNetwork.getMoSyncBluetooth();
 		}
 
+		void assertInputStream() {
+			MYASSERT(getInputStream() != null);
+		}
+
+		void assertOutputStream() {
+			MYASSERT(getOutputStream() != null);
+		}
+
+		// returns the number of bytes actually read.
+		int read(byte[] data) throws IOException {
+			return getInputStream().read(data);
+		}
+
+		void write(byte[] data) throws IOException {
+			getOutputStream().write(data);
+		}
+
 		/**
 		 * Post CONNOP result event. Here the state flag bits for
 		 * the event is cleared.
@@ -825,9 +850,8 @@ public class MoSyncNetwork
 			final int opType = CONNOP_READ;
 
 			enterStateRead();
-
 			// Must have an input stream.
-			MYASSERT(getInputStream() != null);
+			assertInputStream();
 
 			sConnectionThreadPool.execute(new Runnable()
 			{
@@ -837,7 +861,7 @@ public class MoSyncNetwork
 					{
 						// Read data into a byte array.
 						byte[] bytes = new byte[size];
-						int result = getInputStream().read(bytes);
+						int result = read(bytes);
 
 						if (result > 0)
 						{
@@ -870,9 +894,8 @@ public class MoSyncNetwork
 			final int opType = CONNOP_WRITE;
 
 			enterStateWrite();
-
 			// Must have an output stream.
-			MYASSERT(getOutputStream() != null);
+			assertOutputStream();
 
 			sConnectionThreadPool.execute(new Runnable()
 			{
@@ -887,7 +910,7 @@ public class MoSyncNetwork
 						mMoSyncNetwork.readBytesFromMemory(src, data);
 
 						// Write byte array to stream.
-						getOutputStream().write(data);
+						write(data);
 
 						// Post event.
 						postResultEvent(opType, 1); // Success
@@ -931,7 +954,7 @@ public class MoSyncNetwork
 					{
 						// Read data into a byte array.
 						byte[] bytes = new byte[size];
-						int result = getInputStream().read(bytes);
+						int result = read(bytes);
 
 						// Result is number of bytes read if successful.
 						if (result > 0)
@@ -990,7 +1013,7 @@ public class MoSyncNetwork
 						// Get and write data.
 						byteBuffer.position(offset);
 						byteBuffer.get(data);
-						getOutputStream().write(data);
+						write(data);
 
 						// Post event.
 						postResultEvent(opType, 1);
@@ -1530,8 +1553,8 @@ public class MoSyncNetwork
 
 	static class SocketConnectionObject extends ConnectionObject
 	{
-		private String mSocketAddress;
-		private int mSocketPort;
+		protected String mSocketAddress;
+		protected int mSocketPort;
 		private Socket mSocket;
 
 		/**
@@ -1708,6 +1731,85 @@ public class MoSyncNetwork
 
 
 	} // End of class SocketConnectionObject
+
+	static class DatagramConnectionObject extends SocketConnectionObject
+	{
+		private DatagramSocket mDSocket;
+
+		public DatagramConnectionObject(MoSyncNetwork network)
+		{
+			super(network);
+		}
+
+		void setSocketAndOpenStreams(Socket socket) throws IOException
+		{
+			throw new IOException("DatagramConnectionObject.setSocketAndOpenStreams");
+		}
+
+		void doConnect()
+		{
+			try
+			{
+				mDSocket = new DatagramSocket();
+
+				if (null == mDSocket)
+				{
+					// Error
+					//Log.i("SocketConnectionObject", "socket is null");
+					postResultEvent(CONNOP_CONNECT, CONNERR_GENERIC);
+					return;
+				}
+
+				mDSocket.connect(new InetSocketAddress(mSocketAddress, mSocketPort));
+
+				if (!mDSocket.isConnected())
+				{
+					// Error.
+					//Log.i("SocketConnectionObject", "socket is not connected");
+					postResultEvent(CONNOP_CONNECT, CONNERR_GENERIC);
+					return;
+				}
+
+				// TODO: Why synchronized?
+				synchronized (this)
+				{
+					if (mCancelled)
+					{
+						//Log.i("SocketConnectionObject",
+						//	"connection was canceled");
+						postResultEvent(CONNOP_CONNECT, CONNERR_CANCELED);
+						return;
+					}
+				}
+
+				postResultEvent(CONNOP_CONNECT, 1); // Success
+			}
+			catch (IOException ex)
+			{
+				ex.printStackTrace();
+				postResultEvent(CONNOP_CONNECT, CONNERR_GENERIC);
+				return;
+			}
+		}
+
+		void assertInputStream() {
+		}
+
+		void assertOutputStream() {
+		}
+
+		// returns the number of bytes actually read.
+		int read(byte[] dst) throws IOException {
+			DatagramPacket dp = new DatagramPacket(dst, dst.length);
+			mDSocket.receive(dp);
+			return dp.getLength();
+		}
+
+		void write(byte[] src) throws IOException {
+			DatagramPacket dp = new DatagramPacket(src, src.length);
+			mDSocket.send(dp);
+		}
+	} // End of class DatagramConnectionObject
 
 	/**
 	 * This class handles SSL connections.
@@ -2374,11 +2476,6 @@ public class MoSyncNetwork
 
 			//Log.i("@@BluetoothServerConnectionObject",
 			//	"doAccept; socket accepted handle: " + mHandle);
-
-			// TODO: Delete this commented out test code.
-			// Write mock data for testing.
-			//socket.getOutputStream().write("Hej hopp!!!".getBytes());
-			//socket.getOutputStream().flush();
 
 			// Have we reached max number of connection handles?
 			if (mMoSyncNetwork.isMaxNumberOfConnectionsReached())

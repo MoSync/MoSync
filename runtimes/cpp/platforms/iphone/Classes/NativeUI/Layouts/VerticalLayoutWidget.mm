@@ -54,6 +54,13 @@
             self.parent)
         {
             viewWidth = [child sizeThatFitsForWidget].width;
+
+            // Force child to have smaller/equal width with its parrent in the context of vertical layout.
+            int maxViewWidth = self.width - totalHorizontalMargin;
+            if ( viewWidth > maxViewWidth )
+            {
+                viewWidth = maxViewWidth;
+            }
         }
 
         switch (child.autoSizeHeight)

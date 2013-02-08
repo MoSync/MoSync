@@ -25,15 +25,16 @@ namespace MAUtil {
 		//environment = this;
 		addKeyListener(this);
 		addPointerListener(this);
-		addCloseListener(this);		
+		addCloseListener(this);
 		addCustomEventListener(this);
 	}
 
 #ifndef MIN
 #define MIN(a,b) ((a)<(b)?(a):(b))
 #endif
-	
-	//always returns >= 0
+
+	// returns time to next timer, a value >= -1
+	// -1 is returned if there are no timers.
 	int Moblet::timeToNextTimer() {
 		int now = maGetMilliSecondCount();
 		int minTime = -1;
@@ -64,12 +65,12 @@ namespace MAUtil {
 						mTimerEvents.remove(&*tei);
 					}
 				}
-				tei->nextInvoke += tei->period; 
+				tei->nextInvoke += tei->period;
 			}
 		}
 		mTimerEvents.setRunning(false);
 	}
-	
+
 	void Moblet::run(Moblet* moblet) {
 		while(moblet->mRun) {
 			MAEvent event;
@@ -129,7 +130,7 @@ namespace MAUtil {
 			moblet->runPendingTimers();
 
 #if 0	//unstable in the face of removals
-			for(int i=moblet->idleListeners.size()-1; i >= 0; i--) 
+			for(int i=moblet->idleListeners.size()-1; i >= 0; i--)
 				moblet->idleListeners[i]->idle();
 #else
 			moblet->runIdleListeners();
@@ -138,6 +139,7 @@ namespace MAUtil {
 			if ((moblet->mIdleListeners.size() == 0) && (moblet->mRun)) {
 
 				int ttnt = moblet->timeToNextTimer();
+
 				// if ttnt == 0, we shouldn't do maWait(0), since that
 				// doesn't mean waiting no time....
 				if(ttnt)

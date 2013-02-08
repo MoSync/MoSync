@@ -258,8 +258,8 @@ namespace Base {
 
 	int gWidth, gHeight;
 
-	Surface* gBackbuffer;
-	Surface* gDrawTarget;
+	Surface* gBackbuffer = NULL;
+	Surface* gDrawTarget = NULL;
 	MAHandle gDrawTargetHandle = HANDLE_SCREEN;
 
 	unsigned char *gBackBufferData;
@@ -400,11 +400,7 @@ namespace Base {
 
 		InitializeCriticalSection(&exitMutex);
 
-		gBackbuffer = new Surface(gWidth, gHeight);
-		CGContextRestoreGState(gBackbuffer->context);
-		CGContextTranslateCTM(gBackbuffer->context, 0, gHeight);
-		CGContextScaleCTM(gBackbuffer->context, 1.0, -1.0);
-		CGContextSaveGState(gBackbuffer->context);
+		gSyscall->createBackbuffer();
 
         //Construction of the default font names array
         CFStringEncoding enc=kCFStringEncodingMacRoman;
@@ -433,8 +429,6 @@ namespace Base {
                                         CFStringCreateWithCString(NULL, "Courier-Oblique",enc);
         gDefaultFontNames[FONT_MONOSPACE_INDEX|FONT_BOLD_INDEX|FONT_ITALIC_INDEX]=
                                         CFStringCreateWithCString(NULL, "Courier-BoldOblique",enc);
-
-        gDrawTarget = gBackbuffer;
 
         //Setting the initially selected font. "gHeight/40" was used originally, is kept for backwards compatibility
         MAHandle initFontHandle=maFontLoadDefault(INITIAL_FONT_TYPE,INITIAL_FONT_STYLE,gHeight/40);
@@ -495,6 +489,34 @@ namespace Base {
 			exit(0);
 		}
 		init();
+	}
+
+	void Syscall::deviceOrientationChanged()
+	{
+		if (isNativeUIEnabled())
+		{
+			return;
+		}
+
+		gSyscall->createBackbuffer();
+		maUpdateScreen();
+	}
+
+	void Syscall::createBackbuffer()
+	{
+		Surface* oldDrawTarget = gDrawTarget;
+		CGSize screenSize = [[ScreenOrientation getInstance] screenSize];
+		float width = screenSize.width;
+		float height = screenSize.height;
+
+		gBackbuffer = new Surface(width, height);
+		CGContextRestoreGState(gBackbuffer->context);
+		CGContextTranslateCTM(gBackbuffer->context, 0, height);
+		CGContextScaleCTM(gBackbuffer->context, 1.0, -1.0);
+		CGContextSaveGState(gBackbuffer->context);
+
+		gDrawTarget = gBackbuffer;
+		delete oldDrawTarget;
 	}
 
 	void Syscall::platformDestruct() {
@@ -901,7 +923,10 @@ namespace Base {
 	}
 
 	SYSCALL(MAExtent, maGetScrSize()) {
-		return EXTENT(gWidth, gHeight);
+		CGSize size = [[ScreenOrientation getInstance] screenSize];
+		int width = (int) size.width;
+		int height = (int)size.height;
+		return EXTENT(width, height);
 	}
 
 	SYSCALL(void, maDrawImage(MAHandle image, int left, int top)) {
