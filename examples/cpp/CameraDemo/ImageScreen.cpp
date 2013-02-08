@@ -116,12 +116,11 @@ void ImageScreen::setImageDataHandle(MAHandle dataHandle)
 				dataHandle,
 				0,
 				maGetDataSize(dataHandle));
-		if(res != RES_OK)
+	if(res != RES_OK)
 	{
 		maPanic(res, "failed to create the image");
 	}
 		//Set the image to the image widget
 	mImageWidget->setScaleMode(IMAGE_SCALE_PRESERVE_ASPECT);
 	mImageWidget->setImage(mImageHandle);
-
 }
