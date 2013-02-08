@@ -257,8 +257,8 @@ public:
 	 */
 	void setupCameraProperties()
 	{
-		setupCameraSize();
 		maCameraSelect(mSettingsScreen->getCurrentCamera());
+		setupCameraSize();
 		mCameraPreview->bindToCurrentCamera();
 		maCameraSetProperty(
 			MA_CAMERA_FLASH_MODE,
