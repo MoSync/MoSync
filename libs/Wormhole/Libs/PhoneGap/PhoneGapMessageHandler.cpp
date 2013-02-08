@@ -164,7 +164,7 @@ namespace Wormhole
 		}
 		// Send device information to PhoneGap
 		else if ((message.getParam("service") == "Device") &&
-				(message.getParam("action") == "Get"))
+				(message.getParam("action") == "getDeviceInfo"))
 		{
 			sendDeviceProperties(message.getParam("PhoneGapCallBackId"));
 		}
@@ -172,14 +172,14 @@ namespace Wormhole
 		else if ((message.getParam("service") == "Notification") &&
 				(message.getParam("action") == "vibrate"))
 		{
-			int duration = message.getArgsFieldInt("duration");
+			int duration = message.getArgsFieldInt(0);
 			maVibrate(duration);
 		}
 		//Process the beep message
 		else if ((message.getParam("service") == "Notification") &&
 				(message.getParam("action") == "beep"))
 		{
-			int repeatCount = message.getParamInt("args");
+			int repeatCount = message.getArgsFieldInt(0);
 			for (int i = 0; i < repeatCount; i++)
 			{
 				if (mBeepSound > 0)
@@ -188,7 +188,7 @@ namespace Wormhole
 				}
 			}
 		}
-		else if ((message.getParam("service") == "Connection") &&
+		else if ((message.getParam("service") == "NetworkStatus") &&
 				(message.getParam("action") == "getConnectionInfo"))
 		{
 			sendConnectionType(message.getParam("PhoneGapCallBackId"));
@@ -284,6 +284,7 @@ namespace Wormhole
 	void PhoneGapMessageHandler::sendDeviceProperties(MAUtil::String callbackID)
 	{
 		char deviceName[256];
+		char deviceModel[256];
 		char deviceUUID[256];
 		char deviceOS[256];
 		char deviceOSVersion[256];
@@ -292,6 +293,11 @@ namespace Wormhole
 		int nameRes = maGetSystemProperty(
 			"mosync.device.name",
 			deviceName,
+			256);
+
+		int modelRes = maGetSystemProperty(
+			"mosync.device",
+			deviceModel,
 			256);
 
 		int uuidRes = maGetSystemProperty(
@@ -319,6 +325,7 @@ namespace Wormhole
 		}
 		//if Any of the above commands fail send an error to PhoneGap
 		if((nameRes < 0)
+			|| (modelRes < 0)
 			|| (osRes < 0)
 			|| (osVersionRes < 0))
 		{
@@ -335,12 +342,14 @@ namespace Wormhole
 			"{"
 				"\"platform\":\"%s\","
 				"\"name\":\"%s\","
+				"\"model\":\"%s\","
 				"\"uuid\":\"%s\","
 				"\"version\":\"%s\","
-				"\"phonegap\":\"1.2.0\""
+				"\"cordova\":\"2.3.0\""
 			"}",
 			deviceOS,
 			deviceName,
+			deviceModel,
 			deviceUUID,
 			deviceOSVersion
 			);
@@ -498,10 +507,10 @@ namespace Wormhole
 
 		String script = callbackFunction + "(";
 		script += "'" + callbackID + "'";
-		script += ",'" + successStr + "'";
+		script += "," + successStr;
 		script += ",'" + status + "'";
 		script += ",'" + args + "'";
-		script += ",'" + keepCallbackStr + "'";
+		script += "," + keepCallbackStr;
 
 		script += ")";
 

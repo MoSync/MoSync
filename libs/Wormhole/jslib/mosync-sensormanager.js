@@ -16,6 +16,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301, USA.
 */
 
+var exec = cordova.require('cordova/exec');
 
 /**
  * Returns an object that manages device sensor enumeration
@@ -56,14 +57,13 @@ function SensorRequest(type)
 
 	this.result = [];
 	this.readyState = "processing";
-	if(type == undefined)
+	if(type === undefined)
 	{
 		type = "";
 	}
 	this.type = type;
-	var callbackId = "SensorManager" + PhoneGap.callbackId++;
-	PhoneGap.callbacks[callbackId] = {
-		success: function(sensorList)
+	exec(
+		function(sensorList)
 		{
 			self.result = sensorList.result;
 			self.readyState = "done";
@@ -71,8 +71,11 @@ function SensorRequest(type)
 			{
 				self.events.onsuccess[i](self.result);
 			}
-		}
-	};
+		},
+		null,
+		"SensorManager",
+		"findSensors",
+		{"type":"" + type});
 
 	/**
 		@event onsuccess Called when enumeration has finished
@@ -88,7 +91,7 @@ function SensorRequest(type)
 	*/
 	this.addEventListener = function(event, listener)
 	{
-		if(self.events[event] != undefined)
+		if(self.events[event] !== undefined)
 		{
 			self.events[event].push(listener);
 		}
@@ -101,7 +104,7 @@ function SensorRequest(type)
 	*/
 	this.removeEventListener = function(event, listener)
 	{
-		if(self.events[event] != undefined)
+		if(self.events[event] !== undefined)
 		{
 			for(var i = 0; i < self.events[event].length; i++)
 			{
@@ -113,12 +116,6 @@ function SensorRequest(type)
 			}
 		}
 	};
-
-	mosync.bridge.PhoneGap.send(
-		callbackId,
-		"SensorManager",
-		"findSensors",
-		{"type":"" + type});
 }
 
 /**
@@ -180,19 +177,15 @@ function SensorConnection(options)
 			var exception = new DOMException();
 			exception.code = DOMException.INVALID_STATE_ERR;
 			throw exception;
-			return;
 		}
 		this.setStatus("watching");
-		var callbackId = "SensorManager" + PhoneGap.callbackId++;
-		PhoneGap.callbacks[callbackId] = {
-				success:self.sensorEvent,
-				fail:self.sensorError
-		};
-		mosync.bridge.PhoneGap.send(
-			callbackId,
+		exec(
+			self.sensorEvent,
+			self.sensorError,
 			"SensorManager",
 			"startSensor",
-			{"type":"" + self.type, "interval":0});
+			{"type":"" + self.type, "interval":0}
+			);
 	};
 
 	/**
@@ -205,10 +198,10 @@ function SensorConnection(options)
 			var exception = new DOMException();
 			exception.code = DOMException.INVALID_STATE_ERR;
 			throw exception;
-			return;
 		}
 		this.setStatus("open");
-		mosync.bridge.PhoneGap.send(
+		exec(
+			null,
 			null,
 			"SensorManager",
 			"stopSensor",
@@ -225,20 +218,15 @@ function SensorConnection(options)
 			var exception = new DOMException();
 			exception.code = DOMException.INVALID_STATE_ERR;
 			throw exception;
-			return;
 		}
 
-		var callbackId = "SensorManager" + PhoneGap.callbackId++;
-
-		PhoneGap.callbacks[callbackId] = {
-			success:self.sensorEvent
-		};
-
-		mosync.bridge.PhoneGap.send(
-			callbackId,
+		exec(
+			self.sensorEvent,
+			null,
 			"SensorManager",
 			"startSensor",
-			{"type":"" + self.type, "interval":-1});
+			{"type":"" + self.type, "interval":-1}
+			);
 	};
 	/**
 	 onsensordata Called when there is new data from the sensor
@@ -269,7 +257,7 @@ function SensorConnection(options)
 	*/
 	this.addEventListener = function(event, listener, captureMethod)
 	{
-		if(self.events[event] != undefined)
+		if(self.events[event] !== undefined)
 		{
 			self.events[event].push(listener);
 		}
@@ -282,7 +270,7 @@ function SensorConnection(options)
 	*/
 	this.removeEventListener = function(event, listener)
 	{
-		if(self.events[event] != undefined)
+		if(self.events[event] !== undefined)
 		{
 			for(var i = 0; i < self.events[event].length; i++)
 			{

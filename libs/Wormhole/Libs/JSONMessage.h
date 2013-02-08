@@ -66,31 +66,37 @@ namespace Wormhole
 		virtual ~JSONMessage();
 
 		/**
+		 * Used to retrieve an args field when args is an object.
+		 * @param fieldName The key of the field to retrieve.
 		 * @return The string value of a field in the JSON data.
 		 * Return empty string if the field does not exist.
 		 */
 		virtual MAUtil::String getArgsField(const MAUtil::String& fieldName);
 
 		/**
+		 * Used to retrieve an args element when args is an array.
+		 * @param index Zero based index of the array element.
+		 * @return The string value of a field in the JSON data.
+		 * Return empty string if the field does not exist.
+		 */
+		virtual MAUtil::String getArgsField(int index);
+
+		/**
+		 * Used to retrieve an args field when args is an object.
+		 * @param fieldName The key of the field to retrieve.
 		 * @return The integer value of a field in the JSON data.
 		 * Return 0 if the field does not exist.
 		 */
 		virtual int getArgsFieldInt(const MAUtil::String& fieldName);
 
 		/**
-		 * Get the options parameters "create" and "exclusive"
-		 * from the JSON tree.
-		 * @return true on success, false on error.
+		 * Used to retrieve an args element when args is an array.
+		 * @param index Zero based index of the array element.
+		 * @return The integer value of a field in the JSON data.
+		 * Return 0 if the field does not exist.
 		 */
-		virtual bool getJSONParamsOptionsCreateExclusive(
-			bool& create,
-			bool& exclusive);
+		virtual int getArgsFieldInt(int index);
 
-		/**
-		 * Get the parent fullPath of a directory entry from the JSON tree.
-		 * @return true on success, false on error.
-		 */
-		virtual bool getJSONParamParentFullPath(MAUtil::String& destinationPath);
 	};
 } // namespace
 

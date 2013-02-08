@@ -16,6 +16,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301, USA.
 */
 
+var exec = cordova.require('cordova/exec');
+
 /**
  * @file mosync-pushnotifications.js
  * @author Bogdan Iusco
@@ -23,13 +25,6 @@ MA 02110-1301, USA.
  * The library for supporting Push Notifications in Javascript and
  * Web applications.
  */
-
-/**
- * @private
- */
-if (!PhoneGap.hasResource("pushNotification"))
-{
-PhoneGap.addResource("pushNotification");
 
 /**
  * This class provides access to device Push Notifications Service.
@@ -100,15 +95,15 @@ PushNotificationManager.type = {
  */
 PushNotificationManager.prototype.initialize = function(serverAddress, serverPort)
 {
-	PhoneGap.exec(
-			null,
-			null,
-			"PushNotification",
-			"initialize",
-			{
-				"serverAddress": serverAddress,
-				"serverPort": serverPort
-			});
+	exec(
+		null,
+		null,
+		"PushNotification",
+		"initialize",
+		{
+			"serverAddress": serverAddress,
+			"serverPort": serverPort
+		});
 };
 
 /**
@@ -162,7 +157,7 @@ PushNotificationManager.prototype.register = function(
 		errorCallback(err);
 	};
 
-	PhoneGap.exec(onSuccess, onError, "PushNotification", "register", null);
+	exec(onSuccess, onError, "PushNotification", "register", null, []);
 };
 
 /**
@@ -195,7 +190,7 @@ PushNotificationManager.prototype.unregister = function(callback)
 		callback();
 	};
 
-	PhoneGap.exec(onSuccess, null, "PushNotification", "unregister");
+	exec(onSuccess, null, "PushNotification", "unregister", []);
 };
 
 /**
@@ -215,7 +210,7 @@ PushNotificationManager.prototype.unregister = function(callback)
  * Example
  * -------
  * \code
- * 	var typesArray = [PushNotificationManager.type.badge,
+ *  var typesArray = [PushNotificationManager.type.badge,
  *                    PushNotificationManager.type.sound,
  *                    PushNotificationManager.type.alert];
  *
@@ -230,11 +225,12 @@ PushNotificationManager.prototype.types = function(
 	errorCallback,
 	types)
 {
+	var i;
 	var onSuccess = function(result)
 	{
 		if (successCallback && (typeof successCallback == "function"))
 		{
-			successCallback(err);
+			successCallback(result);
 		}
 	};
 
@@ -266,7 +262,7 @@ PushNotificationManager.prototype.types = function(
 		return;
 	}
 
-	PhoneGap.exec(onSuccess, onError, "PushNotification", "types", bitmask);
+	exec(onSuccess, onError, "PushNotification", "types", bitmask, []);
 };
 
 /**
@@ -291,7 +287,7 @@ PushNotificationManager.prototype.types = function(
 PushNotificationManager.prototype.accountID = function(
 	accountID)
 {
-    PhoneGap.exec(null, null, "PushNotification", "accountID", accountID);
+	exec(null, null, "PushNotification", "accountID", accountID, []);
 };
 
 /**
@@ -335,15 +331,7 @@ PushNotificationManager.prototype.listener = function(callback)
 		callback(self.lastPushNotificationData);
 	};
 
-	PhoneGap.exec(onSuccess, null, "PushNotification", "listener");
+	exec(onSuccess, null, "PushNotification", "listener", []);
 };
 
-/**
- * @private
- */
-PhoneGap.addConstructor(function() {
-	if (typeof navigator.pushNotification === "undefined") {
-		navigator.pushNotification = new PushNotificationManager();
-	}
-});
-} // End of Push Notification API
+// End of Push Notification API

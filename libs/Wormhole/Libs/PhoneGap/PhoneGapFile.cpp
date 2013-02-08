@@ -1015,7 +1015,7 @@ namespace Wormhole
 		String callbackID = message.getParam("PhoneGapCallBackId");
 
 		// We support only persistent storage.
-		int type = message.getArgsFieldInt("type");
+		int type = message.getArgsFieldInt(0);
 		if (LOCALFILESYSTEM_PERSISTENT != type)
 		{
 			callFileError(callbackID, FILEERROR_NO_MODIFICATION_ALLOWED_ERR);
@@ -1023,7 +1023,7 @@ namespace Wormhole
 		}
 
 		// Size parameter must be zero.
-		int size = message.getArgsFieldInt("size");
+		int size = message.getArgsFieldInt(1);
 		if (0 != size)
 		{
 			callFileError(callbackID, FILEERROR_NO_MODIFICATION_ALLOWED_ERR);
@@ -1103,14 +1103,14 @@ namespace Wormhole
 	{
 		String callbackID = message.getParam("PhoneGapCallBackId");
 
-		String fullPath = message.getArgsField("fullPath");
-		String path = message.getArgsField("path");
+		String fullPath = message.getArgsField(0);
+		String path = message.getArgsField(0);
 		String fullFilePath = fullPath + "/" + path;
 
 		// Get flags "create" and "exclusive".
 		bool create = false;
 		bool exclusive = false;
-		bool success = message.getJSONParamsOptionsCreateExclusive(create, exclusive);
+		bool success = getJSONParamsOptionsCreateExclusive(message, create, exclusive);
 		if (!success)
 		{
 			callFileError(callbackID, FILEERROR_NO_MODIFICATION_ALLOWED_ERR);
@@ -1163,8 +1163,8 @@ namespace Wormhole
 	{
 		String callbackID = message.getParam("PhoneGapCallBackId");
 
-		String fullPath = message.getArgsField("fullPath");
-		String path = message.getArgsField("path");
+		String fullPath = message.getArgsField(0);
+		String path = message.getArgsField(1);
 		String fullFilePath = fullPath + "/" + path;
 
 		// Add a trailing slash if not present. MoSync API requires this.
@@ -1176,7 +1176,7 @@ namespace Wormhole
 		// Get flags "create" and "exclusive".
 		bool create = false;
 		bool exclusive = false;
-		bool success = message.getJSONParamsOptionsCreateExclusive(create, exclusive);
+		bool success = getJSONParamsOptionsCreateExclusive(message, create, exclusive);
 		if (!success)
 		{
 			callFileError(callbackID, FILEERROR_NO_MODIFICATION_ALLOWED_ERR);
@@ -1228,7 +1228,7 @@ namespace Wormhole
 	{
 		String callbackID = message.getParam("PhoneGapCallBackId");
 
-		String fullPath = message.getArgsField("fullPath");
+		String fullPath = message.getArgsField(0);
 
 		// TODO: What should we do if FileGetSize fails?
 		// Return an error?
@@ -1278,9 +1278,9 @@ namespace Wormhole
 	{
 		String callbackID = message.getParam("PhoneGapCallBackId");
 
-		String fullPath = message.getArgsField("fileName");
-		String data = message.getArgsField("data");
-		int position = message.getArgsFieldInt("position");
+		String fullPath = message.getArgsField(0);
+		String data = message.getArgsField(1);
+		int position = message.getArgsFieldInt(2);
 
 		int result = FileWrite(fullPath, data, position);
 		if (result < 0)
@@ -1303,7 +1303,7 @@ namespace Wormhole
 	{
 		String callbackID = message.getParam("PhoneGapCallBackId");
 
-		String fullPath = message.getArgsField("fileName");
+		String fullPath = message.getArgsField(0);
 
 		// TODO: Encoding param is not used. This is the requested
 		// encoding of the data send back to PhoneGap.
@@ -1327,7 +1327,7 @@ namespace Wormhole
 	{
 		String callbackID = message.getParam("PhoneGapCallBackId");
 
-		String fullPath = message.getArgsField("fileName");
+		String fullPath = message.getArgsField(0);
 
 		String content;
 		int result = FileRead(fullPath, content);
@@ -1351,9 +1351,9 @@ namespace Wormhole
 	{
 		String callbackID = message.getParam("PhoneGapCallBackId");
 
-		String fullPath = message.getArgsField("fileName");
+		String fullPath = message.getArgsField(0);
 
-		int size = message.getArgsFieldInt("size");
+		int size = message.getArgsFieldInt(1);
 
 		int result = FileTruncate(fullPath, size);
 		if (result < 0)
@@ -1382,13 +1382,13 @@ namespace Wormhole
 	{
 		String callbackID = message.getParam("PhoneGapCallBackId");
 
-		String sourcePath = message.getArgsField("fullPath");
+		String sourcePath = message.getArgsField(0);
 
-		String destinationName = message.getArgsField("newName");
+		String destinationName = message.getArgsField(2);
 
 		// Get destination path from JSON data (from DirectoryEntry object).
 		String destinationPath;
-		bool success = message.getJSONParamParentFullPath(destinationPath);
+		bool success = getJSONParamParentFullPath(message, destinationPath);
 		if (!success)
 		{
 			callFileError(callbackID, FILEERROR_NO_MODIFICATION_ALLOWED_ERR);
@@ -1465,7 +1465,8 @@ namespace Wormhole
 	{
 		String callbackID = message.getParam("PhoneGapCallBackId");
 
-		String path = message.getArgsField("fullPath");
+		String path = message.getArgsField(0);
+		printf("actionRemove: %s", path.c_str());
 
 		int result = FileDeleteFile(path);
 		if (result < 0)
@@ -1484,7 +1485,7 @@ namespace Wormhole
 	{
 		String callbackID = message.getParam("PhoneGapCallBackId");
 
-		String path = message.getArgsField("fullPath");
+		String path = message.getArgsField(0);
 
 		int result = FileDeleteDirectory(path);
 		if (result < 0)
@@ -1502,7 +1503,7 @@ namespace Wormhole
 	{
 		String callbackID = message.getParam("PhoneGapCallBackId");
 
-		String path = message.getArgsField("fullPath");
+		String path = message.getArgsField(0);
 
 		// Open entry array.
 		String entries = "[";
@@ -1716,7 +1717,7 @@ namespace Wormhole
 		YAJLDom::Value* args = message.getParamNode("args");
 		if (NULL != args && YAJLDom::Value::MAP == args->getType())
 		{
-			YAJLDom::Value* params = args->getValueForKey("params");
+			YAJLDom::Value* params = args->getValueByIndex(5);
 			if (NULL != params && YAJLDom::Value::ARRAY == params->getType())
 			{
 				for (int i = 0; i < params->getNumChildValues(); ++i)
@@ -1888,31 +1889,31 @@ I/maWriteLog(12821): ma:[{
 		String callbackID = message.getParam("PhoneGapCallBackId");
 
 		// This is the form name of the post request.
-		String fileKey = message.getArgsField("fileKey");
+		String fileKey = message.getArgsField(2);
 		if (0 == fileKey.size())
 		{
 			fileKey = "file";
 		}
 
 		// Name of uploaded file on the server.
-		String fileName = message.getArgsField("fileName");
+		String fileName = message.getArgsField(3);
 		if (0 == fileName.size())
 		{
 			fileName = "image.jpg";
 		}
 
 		// Mime type.
-		String mimeType = message.getArgsField("mimeType");
+		String mimeType = message.getArgsField(4);
 		if (0 == mimeType.size())
 		{
 			mimeType = "image/jpeg";
 		}
 
 		// Server URL.
-		String serverURL = message.getArgsField("server");
+		String serverURL = message.getArgsField(1);
 
 		// Source path of file to upload.
-		String sourceFilePath = message.getArgsField("filePath");
+		String sourceFilePath = message.getArgsField(0);
 
 		// Check that source file URI is valid.
 		if (0 != sourceFilePath.find("file://"))
@@ -2042,6 +2043,72 @@ I/maWriteLog(12821): ma:[{
 
 		// The result of the request is returned to PhoneGap
 		// in the callback of the connection object.
+	}
+
+	/**
+	 * Get the options parameters "create" and "exclusive"
+	 * from the JSON tree.
+	 * @return true on success, false on error.
+	 */
+	bool PhoneGapFile::getJSONParamsOptionsCreateExclusive(
+		JSONMessage& message,
+		bool& create,
+		bool& exclusive)
+	{
+		// Default values.
+		create = false;
+		exclusive = false;
+
+		// Get the root node for the message parameters.
+		YAJLDom::Value* argsNode = message.getParamNode("args");
+		if (NULL == argsNode || YAJLDom::Value::ARRAY != argsNode->getType())
+		{
+			return false;
+		}
+
+		YAJLDom::Value* optionsNode = argsNode->getValueByIndex(2);
+		if (NULL != optionsNode && YAJLDom::Value::NUL != optionsNode->getType())
+		{
+			YAJLDom::Value* createNode = optionsNode->getValueForKey("create");
+			if (NULL != optionsNode && YAJLDom::Value::NUL != optionsNode->getType())
+			{
+				create = createNode->toBoolean();
+			}
+			YAJLDom::Value* exclusiveNode = optionsNode->getValueForKey("exclusive");
+			if (NULL != exclusiveNode && YAJLDom::Value::NUL != exclusiveNode->getType())
+			{
+				exclusive = exclusiveNode->toBoolean();
+			}
+
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
+	 * Get the parent fullPath of a directory entry from the JSON tree.
+	 * @return true on success, false on error.
+	 */
+	bool PhoneGapFile::getJSONParamParentFullPath(
+		JSONMessage& message,
+		String& destinationPath)
+	{
+		// Get the root node for the message parameters.
+		YAJLDom::Value* argsNode = message.getParamNode("args");
+		if (NULL == argsNode || YAJLDom::Value::ARRAY != argsNode->getType())
+		{
+			return false;
+		}
+
+		// Get the node for the parent directory.
+		YAJLDom::Value* pathNode = argsNode->getValueByIndex(1);
+		if (NULL != pathNode && YAJLDom::Value::NUL != pathNode->getType())
+		{
+			destinationPath = pathNode->toString();
+			return true;
+		}
+		return false;
 	}
 
 } // namespace

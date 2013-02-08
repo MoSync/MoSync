@@ -144,9 +144,9 @@ namespace Wormhole
 
 		sprintf(
 			data,
-			"\\'{\"message\": \"%s\","
+			"{\"message\": \"%s\","
 			"\"sound\": \"%s\","
-			"\"iconBadge\":\"%d\"}\\'",
+			"\"iconBadge\":\"%d\"}",
 			message.c_str(),
 			sound.c_str(),
 			iconBadge);

@@ -198,7 +198,7 @@ namespace Wormhole
 						sizeof(pathBuffer));
 					sprintf(
 						messageBuffer,
-						"{\"message\":[{\"fullPath\":\"%s\",\"name\":\"%s\"}]}",
+						"{\"message\":[{\"fullPath\":\"%s\",\"name\":\"%s\",\"lastModifiedDate\":\"\",\"size\":\"\",\"type\":\"\"}]}",
 						pathBuffer,
 						FileNameFromPath(pathBuffer));
 

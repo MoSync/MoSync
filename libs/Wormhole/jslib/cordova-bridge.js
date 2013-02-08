@@ -30,7 +30,9 @@ mosync.bridge.cordova = {};
  */
 JSON.parse = function(JSONDocument)
 {
-	var parsedObject = eval('(' + JSONDocument + ')');
+	try{
+		var parsedObject = eval('(' + JSONDocument + ')');
+	}catch (e) { console.error('JSON parsing failed: ' + e); }
 	return parsedObject;
 };
 
@@ -52,7 +54,10 @@ mosync.bridge.cordova.send = function(callbackId, service, action, args)
 		"args": args,
 		"PhoneGapCallBackId": callbackId
 	};
-
-    // Call into Mosync C++ through bridge library.
+	// Call into Mosync C++ through bridge library.
 	mosync.bridge.sendJSON(command, null);
 };
+
+mosync.bridge.PhoneGap = mosync.bridge.cordova;
+
+var PhoneGap = window.cordova;
