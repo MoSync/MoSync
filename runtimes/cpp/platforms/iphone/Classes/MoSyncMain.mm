@@ -251,14 +251,6 @@ void MoSync_Exit() {
     exit(0);
 }
 
-void MoSync_StartUpdatingLocation() {
-	[sMoSyncView startUpdatingLocation];
-}
-
-void MoSync_StopUpdatingLocation() {
-	[sMoSyncView stopUpdatingLocation];
-}
-
 void MoSync_AddTouchPressedEvent(int x, int y, int touchId) {
 	Base::gEventQueue.addPointerEvent(x, y, touchId, EVENT_TYPE_POINTER_PRESSED);
 }

@@ -90,6 +90,7 @@ using namespace MoSyncError;
 #import "MoSyncOpenGL.h"
 #import "MoSyncGraphics.h"
 #import "MoSyncFonts.h"
+#import "MoSyncLocation.h"
 
 extern ThreadPool gThreadPool;
 

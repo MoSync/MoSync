@@ -255,9 +255,9 @@
 		43F36FFB15B4756E0095B3C6 /* Capture.h in Headers */ = {isa = PBXBuildFile; fileRef = 43F36FF915B4756E0095B3C6 /* Capture.h */; };
 		43F36FFC15B4756E0095B3C6 /* Capture.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43F36FFA15B4756E0095B3C6 /* Capture.mm */; };
 		43F36FFD15B4756E0095B3C6 /* Capture.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43F36FFA15B4756E0095B3C6 /* Capture.mm */; };
-		43F3700115B4757A0095B3C6 /* MoSyncCLController.h in Headers */ = {isa = PBXBuildFile; fileRef = 43F36FFF15B4757A0095B3C6 /* MoSyncCLController.h */; };
-		43F3700215B4757A0095B3C6 /* MoSyncCLController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43F3700015B4757A0095B3C6 /* MoSyncCLController.mm */; };
-		43F3700315B4757A0095B3C6 /* MoSyncCLController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43F3700015B4757A0095B3C6 /* MoSyncCLController.mm */; };
+		43F3700115B4757A0095B3C6 /* MoSyncLocation.h in Headers */ = {isa = PBXBuildFile; fileRef = 43F36FFF15B4757A0095B3C6 /* MoSyncLocation.h */; };
+		43F3700215B4757A0095B3C6 /* MoSyncLocation.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43F3700015B4757A0095B3C6 /* MoSyncLocation.mm */; };
+		43F3700315B4757A0095B3C6 /* MoSyncLocation.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43F3700015B4757A0095B3C6 /* MoSyncLocation.mm */; };
 		43F3700815B475920095B3C6 /* NotificationManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 43F3700415B475920095B3C6 /* NotificationManager.h */; };
 		43F3700915B475920095B3C6 /* NotificationManager.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43F3700515B475920095B3C6 /* NotificationManager.mm */; };
 		43F3700A15B475920095B3C6 /* NotificationManager.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43F3700515B475920095B3C6 /* NotificationManager.mm */; };
@@ -638,8 +638,8 @@
 		43F36FF515B475650095B3C6 /* CameraConfirgurator.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = CameraConfirgurator.mm; path = Camera/CameraConfirgurator.mm; sourceTree = "<group>"; };
 		43F36FF915B4756E0095B3C6 /* Capture.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Capture.h; path = Capture/Capture.h; sourceTree = "<group>"; };
 		43F36FFA15B4756E0095B3C6 /* Capture.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = Capture.mm; path = Capture/Capture.mm; sourceTree = "<group>"; };
-		43F36FFF15B4757A0095B3C6 /* MoSyncCLController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MoSyncCLController.h; path = Location/MoSyncCLController.h; sourceTree = "<group>"; };
-		43F3700015B4757A0095B3C6 /* MoSyncCLController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = MoSyncCLController.mm; path = Location/MoSyncCLController.mm; sourceTree = "<group>"; };
+		43F36FFF15B4757A0095B3C6 /* MoSyncLocation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MoSyncLocation.h; path = Location/MoSyncLocation.h; sourceTree = "<group>"; };
+		43F3700015B4757A0095B3C6 /* MoSyncLocation.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = MoSyncLocation.mm; path = Location/MoSyncLocation.mm; sourceTree = "<group>"; };
 		43F3700415B475920095B3C6 /* NotificationManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NotificationManager.h; path = Notifications/NotificationManager.h; sourceTree = "<group>"; };
 		43F3700515B475920095B3C6 /* NotificationManager.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = NotificationManager.mm; path = Notifications/NotificationManager.mm; sourceTree = "<group>"; };
 		43F3700615B475920095B3C6 /* PushNotification.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PushNotification.h; path = Notifications/PushNotification.h; sourceTree = "<group>"; };
@@ -1272,8 +1272,8 @@
 		43F36FC515B4743F0095B3C6 /* Location */ = {
 			isa = PBXGroup;
 			children = (
-				43F36FFF15B4757A0095B3C6 /* MoSyncCLController.h */,
-				43F3700015B4757A0095B3C6 /* MoSyncCLController.mm */,
+				43F36FFF15B4757A0095B3C6 /* MoSyncLocation.h */,
+				43F3700015B4757A0095B3C6 /* MoSyncLocation.mm */,
 			);
 			name = Location;
 			sourceTree = "<group>";
@@ -1679,7 +1679,7 @@
 				43F36FF115B475500095B3C6 /* MoSyncPanic.h in Headers */,
 				43F36FF615B475650095B3C6 /* CameraConfirgurator.h in Headers */,
 				43F36FFB15B4756E0095B3C6 /* Capture.h in Headers */,
-				43F3700115B4757A0095B3C6 /* MoSyncCLController.h in Headers */,
+				43F3700115B4757A0095B3C6 /* MoSyncLocation.h in Headers */,
 				43F3700815B475920095B3C6 /* NotificationManager.h in Headers */,
 				43F3700B15B475920095B3C6 /* PushNotification.h in Headers */,
 				43F3701015B475A90095B3C6 /* MoSyncGLView.h in Headers */,
@@ -1938,7 +1938,7 @@
 				43F36FF215B475500095B3C6 /* MoSyncPanic.mm in Sources */,
 				43F36FF715B475650095B3C6 /* CameraConfirgurator.mm in Sources */,
 				43F36FFC15B4756E0095B3C6 /* Capture.mm in Sources */,
-				43F3700215B4757A0095B3C6 /* MoSyncCLController.mm in Sources */,
+				43F3700215B4757A0095B3C6 /* MoSyncLocation.mm in Sources */,
 				43F3700915B475920095B3C6 /* NotificationManager.mm in Sources */,
 				43F3700C15B475920095B3C6 /* PushNotification.mm in Sources */,
 				43F3701115B475A90095B3C6 /* MoSyncGLView.mm in Sources */,
@@ -2082,7 +2082,7 @@
 				43F36FF315B475500095B3C6 /* MoSyncPanic.mm in Sources */,
 				43F36FF815B475650095B3C6 /* CameraConfirgurator.mm in Sources */,
 				43F36FFD15B4756E0095B3C6 /* Capture.mm in Sources */,
-				43F3700315B4757A0095B3C6 /* MoSyncCLController.mm in Sources */,
+				43F3700315B4757A0095B3C6 /* MoSyncLocation.mm in Sources */,
 				43F3700A15B475920095B3C6 /* NotificationManager.mm in Sources */,
 				43F3700D15B475920095B3C6 /* PushNotification.mm in Sources */,
 				43F3701215B475A90095B3C6 /* MoSyncGLView.mm in Sources */,
