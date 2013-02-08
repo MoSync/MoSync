@@ -54,6 +54,7 @@ void SettingsScreen::buttonClicked(Widget* button)
 	}
 	else if(mSwapCameraButton == button)
 	{
+		printf("currentCamera = %d; numCameras = %d", currentCamera, numCameras);
 		if(currentCamera < numCameras-1)
 		{
 			currentCamera++;
@@ -84,7 +85,7 @@ void SettingsScreen::buttonClicked(Widget* button)
 void SettingsScreen::initialize(StackScreen* stackScreen)
 {
 	mStackScreen = stackScreen;
-	numCameras = maCameraNumber();
+	//numCameras = maCameraNumber();
 	createUI();
 }
 
@@ -168,7 +169,7 @@ void SettingsScreen::pushSettingsScreen()
 /**
  * A wrapper for iterating over flash modes
  */
-const char* SettingsScreen::getModeForIndex( int index)
+const char* SettingsScreen::getModeForIndex(int index)
 {
 	switch(index)
 	{

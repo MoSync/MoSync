@@ -198,15 +198,12 @@ public class MoSyncCameraController {
 		}
 		 try
 		 {
-			 if(mCamera == null)
-			 {
-				 tempCamera = Camera.open();
-			 }
-			 else
-			 {
-				 mCamera.release();
-				 tempCamera = Camera.open(mCurrentCameraIndex);
-			 }
+			if (mCamera == null) {
+				tempCamera = Camera.open();
+			} else {
+				mCamera.release();
+				tempCamera = Camera.open(mCurrentCameraIndex);
+			}
 
 			 //We have to use and static instance of the camera in the reflection here
 			 mGetNumberofCameras = tempCamera.getClass().getMethod(
@@ -342,11 +339,16 @@ public class MoSyncCameraController {
 			if(mCurrentCameraIndex != CameraNumber)
 			{
 				mCurrentCameraIndex = CameraNumber;
-				mCamera.release();
+				if (null != mCamera)
+					mCamera.release();
 				mPreview.mCamera = null;
-				mCamera = Camera.open(CameraNumber);
-				mPreview.mCameraIndex = mCurrentCameraIndex;
-				mCamera.setParameters(getCurrentParameters());
+				try {
+					mCamera = Camera.open(CameraNumber);
+					mPreview.mCameraIndex = mCurrentCameraIndex;
+					mCamera.setParameters(getCurrentParameters());
+				} catch (Exception e) {
+					SYSLOG("cannot open camera " + e);
+				}
 			}
 
 		}
@@ -410,6 +412,7 @@ public class MoSyncCameraController {
 		try
 		{
 			mCamera.stopPreview();
+			releaseCamera();
 		}
 		catch (Exception e)
 		{
@@ -432,6 +435,7 @@ public class MoSyncCameraController {
 		}
 		resourceIndex = placeHolder;
 
+		// mPreview.mCamera.cancelAutoFocus();
 		mPreview.mCamera.takePicture(null, rawCallback, jpegCallback);
 
 		lock.lock();
@@ -631,7 +635,11 @@ public class MoSyncCameraController {
 		{
 			try
 			{
-				mCamera = Camera.open();
+				if (mNumCameras <= 1) {
+					mCamera = Camera.open();
+				} else {
+					mCamera = Camera.open(mCurrentCameraIndex);
+				}
 				//mPreview.mCamera = mCamera;
 			}
 			catch (RuntimeException re)
@@ -659,13 +667,20 @@ public class MoSyncCameraController {
     	{
 			Camera.Parameters parameters = getCurrentParameters();
 			List <Camera.Size> supportedSizes =  parameters.getSupportedPictureSizes();
-			Camera.Size optimalPictureSize = supportedSizes.get(formatIndex);
-			parameters.setPictureSize(optimalPictureSize.width,optimalPictureSize.height);
-			mCamera.setParameters(parameters);
+			try {
+				Camera.Size optimalPictureSize = supportedSizes
+						.get(formatIndex);
+				parameters.setPictureSize(optimalPictureSize.width,
+						optimalPictureSize.height);
+			} catch (IndexOutOfBoundsException e) {
+				SYSLOG("Size not supported " + formatIndex);
+			}
+			if (mCamera != null)
+				mCamera.setParameters(parameters);
     	}
     	catch (Exception e)
     	{
-    		SYSLOG("FAILED TO SET the PARAMETERS");
+			SYSLOG("FAILED TO SET the PARAMETERS " + e);
     	}
 	}
 
