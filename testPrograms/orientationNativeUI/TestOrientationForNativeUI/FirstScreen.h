@@ -192,6 +192,10 @@ namespace OrientationTest
 		 * 3 - SCREEN_ORIENTATION_DYNAMIC
 		 */
 		int mSelectedOrientation;
+		/**
+		 * Android only. Keep this until getOrientation is implemented.
+		 */
+		int mOrientationChangesCount;
 	};
 
 } // namespace OrientationTest

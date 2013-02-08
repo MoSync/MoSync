@@ -56,6 +56,7 @@ import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
+import android.view.Surface;
 import android.view.View;
 import android.view.Window;
 
@@ -105,6 +106,11 @@ public class MoSync extends Activity
 	private BroadcastReceiver mShutdownListener;
 	private boolean mEventTypeCloseHasBeenSent = false;
 	private MoSyncNFCForegroundUtil nfcForegroundHandler;
+	/**
+	 * Keep the current screen rotation, and check it againts new
+	 * values retrieved when configuration changes.
+	 */
+	private int mScreenRotation = Surface.ROTATION_0;
 
 	/**
 	 * Sets screen and window properties.
@@ -219,9 +225,17 @@ public class MoSync extends Activity
 	@Override
 	public void onConfigurationChanged(Configuration newConfig)
 	{
-		Log.i("MoSync", "onConfigurationChanged");
-
+		SYSLOG("@@MoSync onConfigurationChanged");
 		super.onConfigurationChanged(newConfig);
+
+		SYSLOG("@@MoSync rotation = " + getWindowManager().getDefaultDisplay().getRotation());
+		if ( mScreenRotation != getWindowManager().getDefaultDisplay().getRotation() )
+		{
+			mScreenRotation = getWindowManager().getDefaultDisplay().getRotation();
+
+			EventQueue.getDefault().postScreenOrientationChanged(
+						mMoSyncThread.getCurrentScreen().getHandle());
+		}
 	}
 
 	@Override
