@@ -53,6 +53,11 @@ SYSCALL(int, maFrameBufferGetInfo(MAFrameBufferInfo *info));
 SYSCALL(int, maFrameBufferInit(const void *data));
 SYSCALL(int, maFrameBufferClose());
 
+//Text related
+int stringLength(const wchar_t* str);
 
-
+SYSCALL(void, maDrawTextW(int left, int top, const wchar* str));
+SYSCALL(void, maDrawText(int left, int top, const char* str));
+SYSCALL(MAExtent, maGetTextSizeW(const wchar* str));
+SYSCALL(MAExtent, maGetTextSize(const char* str));
 //}

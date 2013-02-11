@@ -1,10 +1,20 @@
-//
-//  MoSyncFonts.mm
-//  MoSync
-//
-//  Created by Mircea Vasiliniuc on 2/6/13.
-//
-//
+/*
+ Copyright (C) 2013 MoSync AB
+
+ This program is free software; you can redistribute it and/or
+ modify it under the terms of the GNU General Public License,
+ version 2, as published by the Free Software Foundation.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ MA 02110-1301, USA.
+ */
 
 #import "MoSyncFonts.h"
 #import "ScreenOrientation.h"
@@ -102,6 +112,36 @@ MAHandle createFontInfo(CFStringRef name, GLfloat size, UIFont *uiFontObject, CG
     handle=i+1; //Handles start from 1
 
     return handle;
+}
+
+//Used to instantiate the CGFont object only when needed
+void initCGFont(FontInfo *fontInfo)
+{
+    if(!fontInfo->cgFontObject)
+    {
+        fontInfo->cgFontObject =CGFontCreateWithFontName(fontInfo->name);
+    }
+}
+
+namespace Base
+{
+    //Used to initialize (if needed) and return a UIFont object from a Font handle, to be used by NativeUI
+    UIFont* getUIFontObject(MAHandle fontHandle)
+    {
+        if(fontHandle<1||fontHandle>sFontList.size()||!sFontList[fontHandle-1])
+        {
+            printf("wrong MAHandle");
+            return NULL;
+        }
+
+        FontInfo *selectedFont=sFontList[fontHandle-1];
+        if (selectedFont->uiFontObject==NULL)
+        {
+            selectedFont->uiFontObject=
+            [[UIFont fontWithName:(NSString *) selectedFont->name size:selectedFont->size] retain];
+        }
+        return selectedFont->uiFontObject;
+    }
 }
 
 SYSCALL(MAHandle, maFontLoadDefault(int type, int style, int size))
@@ -249,13 +289,4 @@ SYSCALL(MAHandle, maFontSetCurrent(MAHandle font))
                         currentFont->size, kCGEncodingMacRoman);
 
     return prevHandle;
-}
-
-//Used to instantiate the CGFont object only when needed
-void initCGFont(FontInfo *fontInfo)
-{
-    if(!fontInfo->cgFontObject)
-    {
-        fontInfo->cgFontObject =CGFontCreateWithFontName(fontInfo->name);
-    }
 }

@@ -16,66 +16,13 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 */
 
 #include "config_platform.h"
-#import <UIKit/UIKit.h>
-#import <AssetsLibrary/AssetsLibrary.h>
-#include <string>
-#include <vector>
-#include <map>
-#include <time.h>
-#include <math.h>
-#include <helpers/fifo.h>
-#include <helpers/log.h>
-#include <helpers/helpers.h>
-#include <helpers/smartie.h>
-#include <helpers/cpp_defs.h>
-#include <MemStream.h>
-#include <FileStream.h>
-#include "Syscall.h"
 #include "MoSyncDB.h"
-#include <CoreMedia/CoreMedia.h>
-#include <sys/types.h> //
-
-#include <helpers/CPP_IX_GUIDO.h>
-//#include <helpers/CPP_IX_ACCELEROMETER.h>
-#include <helpers/CPP_IX_WIDGET.h>
 #include "MoSyncUISyscalls.h"
-
-#import "ImagePickerController.h"
-#include "netImpl.h"
-#import "PurchaseManager.h"
-
-#define NETWORKING_H
-#include "networking.h"
-#include <bluetooth/discovery.h>
-#include <base_errors.h>
-using namespace MoSyncError;
-
-#include <core/core.h>
-
 #include "MoSyncMain.h"
-#import "MoSyncAppDelegate.h"
-
-#include "CMGlyphDrawing.h"
-
-#import <CoreVideo/CoreVideo.h>
-#import <CoreVideo/CVPixelBuffer.h>
-
-#ifdef SUPPORT_OPENGL_ES
-#define DONT_WANT_IX_OPENGL_ES_TYPEDEFS
-#include <helpers/CPP_IX_OPENGL_ES.h>
-#include <helpers/CPP_IX_GL1.h>
-#include <helpers/CPP_IX_GL2.h>
-#include <helpers/CPP_IX_GL_OES_FRAMEBUFFER_OBJECT.h>
-#include <OpenGLES/ES1/gl.h>
-#include <OpenGLES/ES2/gl.h>
-#include <OpenGLES/ES1/glext.h>
-#include "../../../../generated/gl.h.cpp"
-#include "GLFixes.h"
-#endif
-
-#include "AudioSyscall.h"
-
 #include "MoSyncExtension.h"
+#include "AudioSyscall.h"
+#include "ThreadPool.h"
+#include "MoSyncUIUtils.h"
 
 #import "MoSyncCamera.h"
 #import "MoSyncSound.h"
@@ -91,6 +38,22 @@ using namespace MoSyncError;
 #import "MoSyncFonts.h"
 #import "MoSyncLocation.h"
 #import "PimSyscall.h"
+
+#define NETWORKING_H
+#include "networking.h"
+
+#ifdef SUPPORT_OPENGL_ES
+#define DONT_WANT_IX_OPENGL_ES_TYPEDEFS
+#include <helpers/CPP_IX_OPENGL_ES.h>
+#include <helpers/CPP_IX_GL1.h>
+#include <helpers/CPP_IX_GL2.h>
+#include <helpers/CPP_IX_GL_OES_FRAMEBUFFER_OBJECT.h>
+#include <OpenGLES/ES1/gl.h>
+#include <OpenGLES/ES2/gl.h>
+#include <OpenGLES/ES1/glext.h>
+#include "../../../../generated/gl.h.cpp"
+#include "GLFixes.h"
+#endif
 
 extern ThreadPool gThreadPool;
 
@@ -217,7 +180,6 @@ namespace Base {
 		MANetworkClose();
         MAPimClose();
         MAAudioClose();
-        [ImagePickerController deleteInstance];
 	}
 
 
@@ -267,95 +229,6 @@ namespace Base {
 	//***************************************************************************
 	// Proper syscalls
 	//***************************************************************************
-
-
-	int stringLength(const wchar_t* str) {
-		int len = 0;
-		while(*str++ != 0) {
-			if(*str == '\n') return len;
-			len++;
-		}
-		return len;
-	}
-
-    //Used to initialize (if needed) and return a UIFont object from a Font handle, to be used by NativeUI
-    UIFont* getUIFontObject(MAHandle fontHandle)
-    {
-        if(fontHandle<1||fontHandle>sFontList.size()||!sFontList[fontHandle-1])
-        {
-            printf("wrong MAHandle");
-            return NULL;
-        }
-
-        FontInfo *selectedFont=sFontList[fontHandle-1];
-
-        if (selectedFont->uiFontObject==NULL)
-        {
-            selectedFont->uiFontObject=
-                            [[UIFont fontWithName:(NSString *) selectedFont->name size:selectedFont->size] retain];
-        }
-		return selectedFont->uiFontObject;
-    }
-
-	SYSCALL(MAExtent, maGetTextSize(const char* str)) {
-		CGContextSetTextDrawingMode(gDrawTarget->context, kCGTextInvisible);
-		CGContextSetTextPosition (gDrawTarget->context, 0, 0);
-		CGContextShowTextAtPoint(gDrawTarget->context, 0, 0, str, strlen(str));
-		CGPoint after = CGContextGetTextPosition(gDrawTarget->context);
-		int width = after.x;
-		int height = (int)sFontList[gCurrentFontHandle-1]->size; //Might be wrong???
-		return EXTENT(width, height);
-	}
-
-	SYSCALL(MAExtent, maGetTextSizeW(const wchar* str)) {
-        FontInfo *currentFont=sFontList[gCurrentFontHandle-1];
-        initCGFont(currentFont);
-		int numGlyphs = wcharLength(str);
-		if(numGlyphs==0) return EXTENT(0, 0);
-		CGGlyph* glyphs = new CGGlyph[numGlyphs];
-		CMFontGetGlyphsForUnichars(currentFont->cgFontObject, (const UniChar*)str, glyphs, numGlyphs);
-		CGContextSetTextDrawingMode(gDrawTarget->context, kCGTextInvisible);
-		CGContextSetTextPosition (gDrawTarget->context, 0, 0);
-		CGContextShowGlyphsAtPoint(gDrawTarget->context, 0, 0, glyphs, numGlyphs);
-		CGPoint after = CGContextGetTextPosition(gDrawTarget->context);
-		int width = after.x;
-		int height = (int)sFontList[gCurrentFontHandle-1]->size; //Might be wrong???
-		delete glyphs;
-		return EXTENT(width, height);
-	}
-
-	SYSCALL(void, maDrawText(int left, int top, const char* str)) {
-		CGContextSetRGBFillColor(gDrawTarget->context, currentRed, currentGreen, currentBlue, 1);
-		CGContextSetTextDrawingMode(gDrawTarget->context, kCGTextFill);
-		CGContextSetTextPosition (gDrawTarget->context, 0, 0);
-		CGContextSetAllowsAntialiasing (gDrawTarget->context, true);
-		CGContextShowTextAtPoint(gDrawTarget->context, left, top+sFontList[gCurrentFontHandle-1]->size, str, strlen(str));
-        CGContextSetAllowsAntialiasing (gDrawTarget->context, false);
-	}
-
-	SYSCALL(void, maDrawTextW(int left, int top, const wchar* str)) {
-		int numGlyphs = wcharLength(str);
-        FontInfo *currentFont=sFontList[gCurrentFontHandle-1];
-        initCGFont(currentFont);
-		if(numGlyphs==0) return;
-		CGGlyph* glyphs = new CGGlyph[numGlyphs];
-
-        //Not all fonts in the device are supported for Unicode glyphs
-        //We must check whether the operation was successful
-        if(!CMFontGetGlyphsForUnichars(currentFont->cgFontObject, (const UniChar*)str, glyphs, numGlyphs))
-        {
-            delete glyphs;
-            return;
-        }
-
-		CGContextSetRGBFillColor(gDrawTarget->context, currentRed, currentGreen, currentBlue, 1);
-		CGContextSetTextDrawingMode(gDrawTarget->context, kCGTextFill);
-		CGContextSetTextPosition (gDrawTarget->context, 0, 0);
-        CGContextSetAllowsAntialiasing (gDrawTarget->context, true);
-		CGContextShowGlyphsAtPoint(gDrawTarget->context, left, top+sFontList[gCurrentFontHandle-1]->size, glyphs, numGlyphs);
-        CGContextSetAllowsAntialiasing (gDrawTarget->context, false);
-		delete glyphs;
-	}
 
 	SYSCALL(longlong, maIOCtl(int function, int a, int b, int c))
 	{
@@ -584,6 +457,6 @@ void MoSyncErrorExit(int errorCode)
 
 	gRunning = false;
 	logWithNSLog(buffer, strlen(buffer));
-	MoSync_ShowMessageBox(nil, buffer, true);
+	MoSyncUIUtils_ShowMessageBox(nil, buffer, true);
 	pthread_exit(NULL);
 }

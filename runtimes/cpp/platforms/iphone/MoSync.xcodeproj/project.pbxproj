@@ -436,6 +436,9 @@
 		8BB2E67E16C28AE500391242 /* MoSyncGraphics.h in Headers */ = {isa = PBXBuildFile; fileRef = 8BB2E67C16C28AE500391242 /* MoSyncGraphics.h */; };
 		8BB2E67F16C28AE500391242 /* MoSyncGraphics.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8BB2E67D16C28AE500391242 /* MoSyncGraphics.mm */; };
 		8BB2E68016C28AE500391242 /* MoSyncGraphics.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8BB2E67D16C28AE500391242 /* MoSyncGraphics.mm */; };
+		D962D8D016C914D100B566B1 /* MoSyncUIUtils.mm in Sources */ = {isa = PBXBuildFile; fileRef = D962D8CF16C914D100B566B1 /* MoSyncUIUtils.mm */; };
+		D962D8D116C914D100B566B1 /* MoSyncUIUtils.mm in Sources */ = {isa = PBXBuildFile; fileRef = D962D8CF16C914D100B566B1 /* MoSyncUIUtils.mm */; };
+		D962D8D316C914E300B566B1 /* MoSyncUIUtils.h in Headers */ = {isa = PBXBuildFile; fileRef = D962D8D216C914E300B566B1 /* MoSyncUIUtils.h */; };
 		D99A59DF16C1B183000C6649 /* MoSyncAds.mm in Sources */ = {isa = PBXBuildFile; fileRef = D99A59DE16C1B183000C6649 /* MoSyncAds.mm */; };
 		D99A59E016C1B1F9000C6649 /* MoSyncAds.mm in Sources */ = {isa = PBXBuildFile; fileRef = D99A59DE16C1B183000C6649 /* MoSyncAds.mm */; };
 		D99A59E316C1C199000C6649 /* MoSyncSensorBridge.mm in Sources */ = {isa = PBXBuildFile; fileRef = D99A59E216C1C199000C6649 /* MoSyncSensorBridge.mm */; };
@@ -797,6 +800,8 @@
 		8BB2E67C16C28AE500391242 /* MoSyncGraphics.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MoSyncGraphics.h; path = Graphics/MoSyncGraphics.h; sourceTree = "<group>"; };
 		8BB2E67D16C28AE500391242 /* MoSyncGraphics.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = MoSyncGraphics.mm; path = Graphics/MoSyncGraphics.mm; sourceTree = "<group>"; };
 		8D1107310486CEB800E47090 /* MoSync-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "MoSync-Info.plist"; plistStructureDefinitionIdentifier = "com.apple.xcode.plist.structure-definition.iphone.info-plist"; sourceTree = "<group>"; };
+		D962D8CF16C914D100B566B1 /* MoSyncUIUtils.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = MoSyncUIUtils.mm; path = UIUtils/MoSyncUIUtils.mm; sourceTree = "<group>"; };
+		D962D8D216C914E300B566B1 /* MoSyncUIUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MoSyncUIUtils.h; path = UIUtils/MoSyncUIUtils.h; sourceTree = "<group>"; };
 		D99A59DC16C1B16B000C6649 /* MoSyncAds.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = MoSyncAds.h; path = ads/MoSyncAds.h; sourceTree = "<group>"; };
 		D99A59DE16C1B183000C6649 /* MoSyncAds.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = MoSyncAds.mm; path = ads/MoSyncAds.mm; sourceTree = "<group>"; };
 		D99A59E116C1C16A000C6649 /* MoSyncSensorBridge.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = MoSyncSensorBridge.h; path = Sensor/MoSyncSensorBridge.h; sourceTree = "<group>"; };
@@ -882,6 +887,7 @@
 		080E96DDFE201D6D7F000001 /* Classes */ = {
 			isa = PBXGroup;
 			children = (
+				D962D8C616C8E9F000B566B1 /* UIUtils */,
 				D99A5A1F16C2BDA6000C6649 /* Fonts */,
 				D99A59F616C25009000C6649 /* Misc */,
 				43F36FC115B4741A0095B3C6 /* Ads */,
@@ -1588,6 +1594,15 @@
 			name = Graphics;
 			sourceTree = "<group>";
 		};
+		D962D8C616C8E9F000B566B1 /* UIUtils */ = {
+			isa = PBXGroup;
+			children = (
+				D962D8D216C914E300B566B1 /* MoSyncUIUtils.h */,
+				D962D8CF16C914D100B566B1 /* MoSyncUIUtils.mm */,
+			);
+			name = UIUtils;
+			sourceTree = "<group>";
+		};
 		D99A59F616C25009000C6649 /* Misc */ = {
 			isa = PBXGroup;
 			children = (
@@ -1726,6 +1741,7 @@
 				8BB2E67216C2509B00391242 /* MoSyncOpenGL.h in Headers */,
 				8BB2E67E16C28AE500391242 /* MoSyncGraphics.h in Headers */,
 				D99A5A2316C2BDBC000C6649 /* MoSyncFonts.h in Headers */,
+				D962D8D316C914E300B566B1 /* MoSyncUIUtils.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1983,6 +1999,7 @@
 				8BB2E67316C2509B00391242 /* MoSyncOpenGL.mm in Sources */,
 				8BB2E67F16C28AE500391242 /* MoSyncGraphics.mm in Sources */,
 				D99A5A2416C2BDBC000C6649 /* MoSyncFonts.mm in Sources */,
+				D962D8D016C914D100B566B1 /* MoSyncUIUtils.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2125,6 +2142,7 @@
 				8BB2E67416C2509B00391242 /* MoSyncOpenGL.mm in Sources */,
 				8BB2E68016C28AE500391242 /* MoSyncGraphics.mm in Sources */,
 				D99A5A2516C2BDBC000C6649 /* MoSyncFonts.mm in Sources */,
+				D962D8D116C914D100B566B1 /* MoSyncUIUtils.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
