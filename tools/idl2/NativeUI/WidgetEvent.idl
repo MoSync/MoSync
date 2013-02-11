@@ -347,7 +347,7 @@ group WidgetEvent "Widget event" {
 
 			/**
 			* Send by current screen just before it begins rotating.
-			* Platform: iOS and Windows Phone 7.1
+			* Platform: iOS.
 			*/
 			SCREEN_ORIENTATION_WILL_CHANGE = 23;
 

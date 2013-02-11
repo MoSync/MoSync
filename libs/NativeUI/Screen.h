@@ -106,7 +106,7 @@ namespace NativeUI
 		 * Called just before the screen begins rotating.
 		 * Subclasses may override this method to perform additional actions
 		 * immediately prior to the rotation.
-		 * Note: available only on iOS and WP.
+		 * Note: available only on iOS.
 		 */
 		virtual void orientationWillChange();
 
