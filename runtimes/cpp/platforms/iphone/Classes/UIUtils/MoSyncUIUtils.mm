@@ -18,9 +18,74 @@
 
 #import "MoSyncUIUtils.h"
 
+#include "ImagePickerController.h"
 #include "Platform.h"
 #include "MoSyncMain.h"
 
+/*
+ * C functions
+ */
+void MoSyncUIUtils_ShowMessageBox(const char *title, const char *msg, bool kill)
+{
+	NSString* nsTitle = nil;
+	if(title != nil)
+		nsTitle = [[NSString alloc] initWithBytes:title length:strlen(title) encoding:NSUTF8StringEncoding];
+
+    [MoSyncUIUtils showMessageBox:[[NSString alloc] initWithBytes:msg length:strlen(msg) encoding:NSUTF8StringEncoding]
+                        withTitle:nsTitle
+                       shouldKill:kill];
+}
+
+void MoSyncUIUtils_ShowAlert(const char* title, const char* message, const char* button1, const char* button2, const char* button3)
+{
+	NSString* nsTitle = nil;
+	if(title != nil && (strlen(title) != 0))
+		nsTitle = [[NSString alloc] initWithBytes:title length:strlen(title) encoding:NSUTF8StringEncoding];
+
+	NSString* nsButton1 = nil;
+	if(button1 != nil && (strlen(button1) != 0))
+		nsButton1 = [[NSString alloc] initWithBytes:button1 length:strlen(button1) encoding:NSUTF8StringEncoding];
+
+	NSString* nsButton2 = nil;
+	if(button2 != nil && (strlen(button2) != 0))
+		nsButton2 = [[NSString alloc] initWithBytes:button2 length:strlen(button2) encoding:NSUTF8StringEncoding];
+
+	NSString* nsButton3 = nil;
+	if(button3 != nil && (strlen(button3) != 0))
+		nsButton3 = [[NSString alloc] initWithBytes:button3 length:strlen(button3) encoding:NSUTF8StringEncoding];
+
+    [MoSyncUIUtils showAlert:[[NSString alloc] initWithBytes:message length:strlen(message) encoding:NSUTF8StringEncoding]
+                   withTitle:nsTitle
+                button1Title:nsButton1
+                button2Title:nsButton2
+                button3Title:nsButton3];
+}
+
+void MoSyncUIUtils_ShowTextBox(const wchar* title, const wchar* inText, wchar* outText, int maxSize, int constraints) {
+    [MoSyncUIUtils
+	 showTextBox:[[NSString alloc] initWithCharacters:(const unichar*)title length:wcharLength(title)]
+	 withInText:[[NSString alloc] initWithCharacters:(const unichar*)inText length:wcharLength(inText)]
+	 outText:(wchar*)outText
+	 maxSize:maxSize
+	 andConstraints:constraints
+	 ];
+}
+
+void MoSyncUIUtils_ShowImagePicker()
+{
+    [ImagePickerController getInstance].returnDataType = MA_IMAGE_PICKER_EVENT_RETURN_TYPE_IMAGE_HANDLE;
+    [[ImagePickerController getInstance] show];
+}
+
+void MoSyncUIUtils_ShowImagePicker(int returnType)
+{
+    [ImagePickerController getInstance].returnDataType = returnType;
+    [[ImagePickerController getInstance] show];
+}
+
+/*
+ * ObjC
+ */
 @interface MessageBoxHandler : UIViewController <UIAlertViewDelegate> {
 	BOOL kill;
 	NSString *title;

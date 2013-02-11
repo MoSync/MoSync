@@ -23,6 +23,7 @@
 #include "MoSyncUI.h"
 #include "OptionsDialogView.h"
 #include "MoSyncPanic.h"
+#include "MoSyncUIUtils.h"
 
 #include "MoSyncMain.h"
 #include "MoSyncUISyscalls.h"
@@ -243,23 +244,23 @@ SYSCALL(MAExtent, maGetScrSize())
 
 SYSCALL(void, maMessageBox(const char* title, const char* message))
 {
-    MoSync_ShowMessageBox(title, message, false);
+    MoSyncUIUtils_ShowMessageBox(title, message, false);
 }
 
 SYSCALL(void, maImagePickerOpen())
 {
-    MoSync_ShowImagePicker();
+    MoSyncUIUtils_ShowImagePicker();
 }
 
 SYSCALL(void, maImagePickerOpenWithEventReturnType(int returnType))
 {
-    MoSync_ShowImagePicker(returnType);
+    MoSyncUIUtils_ShowImagePicker(returnType);
 }
 
 //Shows an alert box with up to three buttons
 SYSCALL(void, maAlert(const char* title, const char* message, const char* button1, const char* button2, const char* button3))
 {
-    MoSync_ShowAlert(title, message, button1, button2, button3);
+    MoSyncUIUtils_ShowAlert(title, message, button1, button2, button3);
 }
 
 SYSCALL(void, maOptionsBox(const wchar* title, const wchar* destructiveButtonTitle, const wchar* cancelButtonTitle,
@@ -274,7 +275,7 @@ SYSCALL(void, maOptionsBox(const wchar* title, const wchar* destructiveButtonTit
 
 int maTextBox(const wchar* title, const wchar* inText, wchar* outText, int maxSize, int constraints)
 {
-    MoSync_ShowTextBox(title, inText, outText, maxSize, constraints);
+    MoSyncUIUtils_ShowTextBox(title, inText, outText, maxSize, constraints);
     return 0;
 }
 
@@ -401,7 +402,7 @@ SYSCALL(int, maSyscallPanicsDisable())
 
 SYSCALL(void, maPanic(int result, const char* message))
 {
-    MoSync_ShowMessageBox(nil, message, true);
+    MoSyncUIUtils_ShowMessageBox(nil, message, true);
     gRunning = false;
     pthread_exit(NULL);
     //[[NSThread currentThread] exit];

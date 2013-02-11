@@ -22,6 +22,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "MoSyncExtension.h"
 #include "AudioSyscall.h"
 #include "ThreadPool.h"
+#include "MoSyncUIUtils.h"
 
 #import "MoSyncCamera.h"
 #import "MoSyncSound.h"
@@ -455,6 +456,6 @@ void MoSyncErrorExit(int errorCode)
 
 	gRunning = false;
 	logWithNSLog(buffer, strlen(buffer));
-	MoSync_ShowMessageBox(nil, buffer, true);
+	MoSyncUIUtils_ShowMessageBox(nil, buffer, true);
 	pthread_exit(NULL);
 }
