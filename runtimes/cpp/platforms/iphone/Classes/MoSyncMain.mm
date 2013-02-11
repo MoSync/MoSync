@@ -28,6 +28,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <helpers/CriticalSection.h>
 
 #include "iphone_helpers.h"
+#include "MoSyncUIUtils.h"
 
 //#define _USE_REBUILDER_
 //#undef _USE_REBUILDER_
@@ -196,9 +197,9 @@ void MoSync_ShowMessageBox(const char *title, const char *msg, bool kill) {
 	if(title != nil)
 		nsTitle = [[NSString alloc] initWithBytes:title length:strlen(title) encoding:NSUTF8StringEncoding];
 
-	[sMoSyncView showMessageBox:[[NSString alloc] initWithBytes:msg length:strlen(msg) encoding:NSUTF8StringEncoding]
+    [MoSyncUIUtils showMessageBox:[[NSString alloc] initWithBytes:msg length:strlen(msg) encoding:NSUTF8StringEncoding]
 					  withTitle:nsTitle
-					  shouldKill:kill];
+                     shouldKill:kill];
 }
 
 void MoSync_ShowAlert(const char* title, const char* message, const char* button1, const char* button2, const char* button3)
@@ -219,7 +220,7 @@ void MoSync_ShowAlert(const char* title, const char* message, const char* button
 	if(button3 != nil && (strlen(button3) != 0))
 		nsButton3 = [[NSString alloc] initWithBytes:button3 length:strlen(button3) encoding:NSUTF8StringEncoding];
 
-	[sMoSyncView showAlert:[[NSString alloc] initWithBytes:message length:strlen(message) encoding:NSUTF8StringEncoding]
+    [MoSyncUIUtils showAlert:[[NSString alloc] initWithBytes:message length:strlen(message) encoding:NSUTF8StringEncoding]
 				 withTitle:nsTitle
 			  button1Title:nsButton1
 			  button2Title:nsButton2
@@ -227,7 +228,7 @@ void MoSync_ShowAlert(const char* title, const char* message, const char* button
 }
 
 void MoSync_ShowTextBox(const wchar* title, const wchar* inText, wchar* outText, int maxSize, int constraints) {
-	[sMoSyncView
+    [MoSyncUIUtils
 	 showTextBox:[[NSString alloc] initWithCharacters:(const unichar*)title length:wcharLength(title)]
 	 withInText:[[NSString alloc] initWithCharacters:(const unichar*)inText length:wcharLength(inText)]
 	 outText:(wchar*)outText
