@@ -25,14 +25,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 	[self performSelectorOnMainThread : @ selector(setNeedsDisplay) withObject:nil waitUntilDone:NO];
 }
 
--(void) startUpdatingLocation {
-	[locationController.locationManager startUpdatingLocation];
-}
-
--(void) stopUpdatingLocation {
-	[locationController.locationManager stopUpdatingLocation];
-}
-
 - (id)initWithFrame:(CGRect)frame {
     if (self = [super initWithFrame:frame]) {
         // Initialization code
@@ -54,7 +46,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 		self.frame.origin = CGRectZero.origin;
 		mosyncView = nil;
         // Initialization code
-		locationController = [[MoSyncCLController alloc] init];
 		self.multipleTouchEnabled = YES;
 		touchHelper = [[TouchHelper alloc] init];
 		self.contentMode = UIViewContentModeRedraw;
@@ -78,13 +69,12 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 	CGContextScaleCTM(context, 1.0, -1.0);
 	CGContextDrawImage(context, rect, mosyncView);		
 	
-	MoSync_DoneUpdatingView();	 
+	MoSync_DoneUpdatingView();
 }
 
 
 - (void)dealloc {
     [super dealloc];
-    [locationController release];	
 }
 
 - (void)deviceOrientationChanged:(NSNotification *)notification {

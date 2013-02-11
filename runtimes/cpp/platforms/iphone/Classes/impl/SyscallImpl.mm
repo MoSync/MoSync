@@ -35,6 +35,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #import "MoSyncOpenGL.h"
 #import "MoSyncGraphics.h"
 #import "MoSyncFonts.h"
+#import "MoSyncLocation.h"
 
 #define NETWORKING_H
 #include "networking.h"
