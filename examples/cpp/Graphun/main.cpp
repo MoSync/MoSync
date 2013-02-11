@@ -126,6 +126,10 @@ public:
 
 	void checkboxStateChanged(UIItem* item, bool checked);
 	void listboxItemSelected(UIItem* item, int index);
+	/**
+	 * Enforce list focus on items. (Android 4.x bug).
+	 */
+	virtual void requestListFocus();
 protected:
 	Widget* mListView;
 
@@ -207,8 +211,8 @@ public:
 	virtual void buttonClicked(UIItem* item) {
 		const String& exp = mExpressions[item];
 		sMainScreen->setExpression(exp);
+		sSettingsScreen->requestListFocus();
 		sStackScreen->pop();
-		//sStackScreen->pop();
 	}
 
 protected:
@@ -363,6 +367,7 @@ void MainScreen::pointerReleaseEvent(MAPoint2d p) {
 
 void MainScreen::buttonClicked(UIItem* item) {
 	if (item == mSettingsButton) {
+		sSettingsScreen->requestListFocus();
 		sStackScreen->pushScreen(sSettingsScreen);
 	}
 }
@@ -447,13 +452,24 @@ void SettingsScreen::checkboxStateChanged(UIItem* item, bool checked) {
 
 void SettingsScreen::listboxItemSelected(UIItem* item, int index) {
 	if (item == mListView && index == 1) {
+		Graphun::sResolutionSelector->requestListFocus();
 		Graphun::sStackScreen->pushScreen(Graphun::sResolutionSelector);
 	} else if (item == mListView && index == 2) {
+		requestListFocus();
 		Graphun::sStackScreen->pushScreen(Graphun::sHelpScreen);
 	} else if (item == mListView && index == 3) {
+		requestListFocus();
 		Graphun::sStackScreen->pushScreen(Graphun::sAboutScreen);
 	}
 
+}
+
+/**
+ * Enforce list focus on items. (Android 4.x bug).
+ */
+void SettingsScreen::requestListFocus()
+{
+	maWidgetSetProperty(mListView->getHandle(), MAW_LIST_VIEW_REQUEST_FOCUS, "true");
 }
 
 class ResolutionSelector: public ListSelectionScreen {
@@ -479,6 +495,7 @@ public:
 			else if (index == 2)
 				sMainScreen->getGrid()->initGrid(32, 32);
 
+			sSettingsScreen->requestListFocus();
 			Graphun::sStackScreen->pop();
 		}
 	}
