@@ -32,7 +32,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <FileStream.h>
 #include "Syscall.h"
 #include "MoSyncDB.h"
-#include "PimSyscall.h"
 #include <CoreMedia/CoreMedia.h>
 #include <sys/types.h> //
 
@@ -91,6 +90,7 @@ using namespace MoSyncError;
 #import "MoSyncGraphics.h"
 #import "MoSyncFonts.h"
 #import "MoSyncLocation.h"
+#import "PimSyscall.h"
 
 extern ThreadPool gThreadPool;
 
@@ -374,24 +374,24 @@ namespace Base {
 		maIOCtl_case(maFrameBufferGetInfo);
 		maIOCtl_case(maFrameBufferInit);
 		maIOCtl_case(maFrameBufferClose);
-        maIOCtl_syscall_case(maPimListOpen);
-        maIOCtl_syscall_case(maPimListNextSummary);
-        maIOCtl_syscall_case(maPimListNext);
-        maIOCtl_syscall_case(maPimItemCount);
-        maIOCtl_syscall_case(maPimItemGetValue);
-        maIOCtl_syscall_case(maPimListClose);
-        maIOCtl_syscall_case(maPimItemGetField);
-        maIOCtl_syscall_case(maPimItemFieldCount);
-        maIOCtl_syscall_case(maPimItemGetAttributes);
-        maIOCtl_syscall_case(maPimItemSetLabel);
-        maIOCtl_syscall_case(maPimItemGetLabel);
-        maIOCtl_syscall_case(maPimFieldType);
-        maIOCtl_syscall_case(maPimItemSetValue);
-        maIOCtl_syscall_case(maPimItemAddValue);
-        maIOCtl_syscall_case(maPimItemRemoveValue);
-        maIOCtl_syscall_case(maPimItemClose);
-        maIOCtl_syscall_case(maPimItemCreate);
-        maIOCtl_syscall_case(maPimItemRemove);
+        maIOCtl_case(maPimListOpen);
+        maIOCtl_case(maPimListNextSummary);
+        maIOCtl_case(maPimListNext);
+        maIOCtl_case(maPimItemCount);
+        maIOCtl_case(maPimItemGetValue);
+        maIOCtl_case(maPimListClose);
+        maIOCtl_case(maPimItemGetField);
+        maIOCtl_case(maPimItemFieldCount);
+        maIOCtl_case(maPimItemGetAttributes);
+        maIOCtl_case(maPimItemSetLabel);
+        maIOCtl_case(maPimItemGetLabel);
+        maIOCtl_case(maPimFieldType);
+        maIOCtl_case(maPimItemSetValue);
+        maIOCtl_case(maPimItemAddValue);
+        maIOCtl_case(maPimItemRemoveValue);
+        maIOCtl_case(maPimItemClose);
+        maIOCtl_case(maPimItemCreate);
+        maIOCtl_case(maPimItemRemove);
 		maIOCtl_syscall_case(maFileOpen);
 		maIOCtl_syscall_case(maFileWriteFromData);
 		maIOCtl_syscall_case(maFileReadToData);

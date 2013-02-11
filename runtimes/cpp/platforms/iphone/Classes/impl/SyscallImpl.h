@@ -27,5 +27,3 @@ public:
 	Syscall(int w, int h);
 	void deviceOrientationChanged();
 	void createBackbuffer();
-
-#include "PimSyscall.h"
