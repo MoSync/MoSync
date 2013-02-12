@@ -264,6 +264,27 @@ namespace MoSync
             }
 
             /**
+             * ShowWithTansition function implementation. Shows next screen with transitions.
+             *
+             * @param screenTransitionType a transition type.
+             */
+            public void ShowWithTransition(int screenTransitionType)
+            {
+                MoSync.Util.RunActionOnMainThreadSync(() =>
+                {
+                    PhoneApplicationFrame frame = (PhoneApplicationFrame)Application.Current.RootVisual;
+                    //If the application bar visibility flag is set on true then the application bar is
+                    //ready to be shown.
+                    if (GetApplicationBarVisibility())
+                    {
+                        //Sets the application bar for the mainPage.xaml to our custom application bar.
+                        (frame.Content as PhoneApplicationPage).ApplicationBar = mApplicationBar;
+                    }
+                    MoSyncScreenTransitions.doShowWithScreenTransition(mPage, screenTransitionType);
+                });
+            }
+
+            /**
              * MAW_SCREEN_TITLE property implementation.
              */
             [MoSyncWidgetProperty(MoSync.Constants.MAW_SCREEN_TITLE)]

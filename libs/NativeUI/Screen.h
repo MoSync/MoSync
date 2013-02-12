@@ -103,6 +103,27 @@ namespace NativeUI
 		virtual void show();
 
 		/**
+		 * Show a screen with transition. Only one screen at a time is visible.
+		 * The previous screen will be hidden when showing a screen.
+		 * Note: This method is only applicable to screens.
+		 *
+		 * @param screenTransitionType The type of the screen transition. See available
+		 * screen transitions types \link #MAW_TRANSITION_TYPE_NONE here \endlink.
+		 * @param screenTransitionDuration The duration of the screen transition in milliseconds.
+		 * This argument is not used on the Windows Phone platform due to the constant duration of
+		 * the WP screen transitions.
+		 *
+		 * @return Any of the following result codes:
+		 * - #MAW_RES_OK if the show with transition operation was successful.
+		 * - #MAW_RES_INVALID_SCREEN_TRANSITION_TYPE if the screen transition type is not available
+		 * on current platform. Show operation is still completed without screen transition.
+		 * - #MAW_RES_INVALID_SCREEN_TRANSITION_DURATION if the screen transition is not a positive
+		 * integer. This error code is not returned on the Windows Phone platform
+		 * due to the constant duration of the WP screen transitions.
+		 */
+		virtual int showWithTransition(MAWScreenTransitionType screenTransitionType, int screenTransitionDuration);
+
+		/**
 		 * Called just before the screen begins rotating.
 		 * Subclasses may override this method to perform additional actions
 		 * immediately prior to the rotation.

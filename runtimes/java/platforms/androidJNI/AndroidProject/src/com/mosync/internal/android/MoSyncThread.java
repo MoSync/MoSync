@@ -4402,6 +4402,15 @@ public class MoSyncThread extends Thread
 	}
 
 	/**
+	 * Internal wrapper for maWidgetScreenShowWithTransition that runs
+	 * the call in the UI thread.
+	 */
+	public int maWidgetScreenShowWithTransition(final int screenHandle, final int screenTransitionType, final int screenTransitionDurations)
+	{
+		return mMoSyncNativeUI.maWidgetScreenShowWithTransition(screenHandle, screenTransitionType, screenTransitionDurations);
+	}
+
+	/**
 	 * Internal wrapper for maWidgetSetProperty that runs
 	 * the call in the UI thread.
 	 */
