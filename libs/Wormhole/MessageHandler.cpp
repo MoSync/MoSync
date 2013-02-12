@@ -24,6 +24,7 @@ MA 02110-1301, USA.
  * messages from Wormhole (JavaScript).
  */
 
+#include <mastring.h>
 #include "CustomMoblet.h"
 #include "MessageHandler.h"
 #include "HybridMoblet.h"
@@ -335,6 +336,7 @@ void MessageHandler::handleMoSyncMessage(
 	Wormhole::HybridMoblet* moblet)
 {
 	const char* p = message.getNext();
+	const char* logMessage;
 
 	if (0 == strcmp(p, "ExitApplication"))
 	{
@@ -344,6 +346,11 @@ void MessageHandler::handleMoSyncMessage(
 	else if (0 == strcmp(p, "SendToBackground"))
 	{
 		maSendToBackground();
+	}
+	else if (0 == strcmp(p, "SysLog"))
+	{
+		logMessage = message.getNext();
+		maWriteLog(logMessage, strlen(logMessage));
 	}
 	else if (0 == strcmp(p, "ScreenSetOrientation"))
 	{

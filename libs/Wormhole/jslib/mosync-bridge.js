@@ -70,6 +70,15 @@ var mosync = (function()
 	};
 
 	/**
+	 * Writes log output using MoSync API syscall maWriteLog.
+	 * @param s Log message string.
+	 */
+	mosync.app.log = function(s)
+	{
+		mosync.bridge.send(["MoSync", "SysLog", s]);
+	};
+
+	/**
 	 * Screen orientation constants.
 	 */
 	mosync.SCREEN_ORIENTATION_DYNAMIC = "dynamic";
@@ -208,14 +217,19 @@ var mosync = (function()
 	};
 
 	// console.log does not work on WP7.
+	// Define console if undefined.
 	if (typeof console === "undefined")
 	{
 		console = {}
 	}
+
+	// Define console.log if undefined.
 	if (typeof console.log === "undefined")
 	{
-		// TODO: Send console output somewhere.
-		console.log = function(s) {};
+		console.log = function(s)
+		{
+			mosync.app.log(s);
+		};
 	}
 
 	// alert does not work on WP7, replace with
@@ -365,12 +379,12 @@ var mosync = (function()
 		 * a timer will be activated and wil send all messages
 		 * in the queue in one chunk. This enhances performance of
 		 * message sending.
-		 * 
-		 * Note: the "close" message is deprecated. To close the application, use "mosync.app.exit" instead. 
+		 *
+		 * Note: the "close" message is deprecated. To close the application, use "mosync.app.exit" instead.
 		 * \code
 		 *    //Deprecated method:
 		 *    mosync.bridge.send(["close"]);
-		 *    
+		 *
 		 *    //Preferred method:
 		 *    mosync.app.exit();
 		 *
