@@ -137,16 +137,13 @@ namespace ScreenTransitionTest
 	 */
 	void FirstScreen::buttonClicked(NativeUI::Widget* button)
 	{
-		printf("MVSIGN");
-		if ( mSelectedListItem == 0 )
+		int transitionType = MAW_TRANSITION_TYPE_NONE;
+		if ( mSelectedListItem > 0 )
 		{
-			mObserver.showSecondScreen(MAW_TRANSITION_TYPE_NONE,
-					ScreenUtils::getTransitionName(MAW_TRANSITION_TYPE_NONE));
-			return;
+			transitionType = mPlatformTransitions[mSelectedListItem];
 		}
-
-		mObserver.showSecondScreen(mPlatformTransitions[mSelectedListItem],
-				ScreenUtils::getTransitionName(mPlatformTransitions[mSelectedListItem]));
+		mObserver.showSecondScreen(transitionType,
+				ScreenUtils::getTransitionName(MAW_TRANSITION_TYPE_NONE));
 
 		if ( ScreenUtils::OS_ANDROID == ScreenUtils::getCurrentPlatform() )
 		{
