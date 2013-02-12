@@ -15,10 +15,12 @@
  02111-1307, USA.
  */
 
-#import "TabScreenWidget.h"
-#include "Platform.h"
 #include <helpers/cpp_defs.h>
 #include <helpers/CPP_IX_WIDGET.h>
+
+#import "TabScreenWidget.h"
+#import "TabScreenWidgetController.h"
+#include "Platform.h"
 
 @implementation TabScreenWidget
 
@@ -52,7 +54,7 @@
  */
 - (id)init
 {
-	UITabBarController* tabBarController = [[[UITabBarController alloc] init] autorelease];
+	UITabBarController* tabBarController = [[[TabScreenWidgetController alloc] init] autorelease];
 	tabBarController.viewControllers = [NSArray array];
 	tabBarController.delegate = self;
 	return [super initWithController:tabBarController];

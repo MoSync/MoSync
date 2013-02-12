@@ -89,10 +89,21 @@ namespace MoSync
                             }
 
                         }
+                        else if (!mBaseURL.Equals(""))
+                        {
+                            //external web page
+                            if (mBaseURL.StartsWith("http://"))
+                                uri = new Uri(mBaseURL + value, UriKind.Absolute);
+                            else
+                            {
+                                uri = new Uri(value, UriKind.Relative);
+                            }
+                        }
                         else
                         {
                             uri = new Uri(value, UriKind.Relative);
                         }
+
                         mWebBrowser.Navigate(uri);
 
 						/*
@@ -165,6 +176,14 @@ namespace MoSync
             {
                 set
                 {
+                    mBaseURL = value;
+
+                    if(mBaseURL.StartsWith("file://"))
+                    {
+                        // Removing the "file://" it has no meaning on windows phone 7 since the navigation
+                        // inside the isolatedStorage is done relatively
+                        mBaseURL = mBaseURL.Remove(0, 7);
+                    }
                     mWebBrowser.Base = mBaseURL;
                 }
                 get

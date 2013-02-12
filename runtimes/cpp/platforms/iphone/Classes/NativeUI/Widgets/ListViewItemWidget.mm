@@ -438,7 +438,7 @@ static NSString* kReuseIdentifier = @"Cell";
         IWidget* child = [_children objectAtIndex:0];
         size = child.size;
     }
-    else
+    else if (self.autoSizeHeight != WidgetAutoSizeFixed)
     {
         // Fix for MOSYNC-2560.
         // The system resizes the cell's height after loading it, so if
@@ -484,6 +484,24 @@ static NSString* kReuseIdentifier = @"Cell";
 -(CGFloat) height
 {
     return [self sizeThatFitsForWidget].height;
+}
+
+/**
+ * Setter for MAW_WIDGET_HEIGHT.
+ * @param value MAW_CONSTANT_FILL_AVAILABLE_SPACE, MAW_CONSTANT_WRAP_CONTENT or
+ * an int value greater or equal to zero.
+ * @return MAW_RES_OK if the height was set, otherwise MAW_RES_INVALID_PROPERTY_VALUE.
+ */
+-(int) setHeightProperty:(NSString*) value
+{
+    int returnValue = [super setHeightProperty:value];
+    if (returnValue == MAW_RES_OK &&
+        [_children count] == 0)
+    {
+        // Its height has changed. Notify the table view.
+        [_delegate sizeChangedFor:self];
+    }
+    return returnValue;
 }
 
 /**

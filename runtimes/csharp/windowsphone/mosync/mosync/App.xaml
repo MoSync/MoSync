@@ -38,7 +38,7 @@
         <!-- The list item template of a LongListSelector -->
         <DataTemplate x:Key="listItemTemplate">
             <Border BorderThickness="2">
-                <Grid Height="{Binding Height}" Width="{Binding Width}">
+                <Grid Height="{Binding Height}" Width="{Binding Width}" HorizontalAlignment="Left">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"></ColumnDefinition>
                         <ColumnDefinition></ColumnDefinition>

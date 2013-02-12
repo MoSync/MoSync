@@ -634,8 +634,23 @@ public class NativeUI
 		{
 			return IX_WIDGET.MAW_RES_OK;
 		}
-		else
+		else if ( key.equals(IX_WIDGET.MAW_RADIO_GROUP_ADD_VIEW) )
 		{
+			// Add a RadioButton to a RadioGroup.
+			Widget child = getWidget(IntConverter.convert(value));
+			if ( child != null &&
+					child instanceof RadioButtonWidget &&
+					widget instanceof RadioGroupWidget)
+			{
+				((RadioGroupWidget) widget).addButton( (RadioButtonWidget) child );
+				return IX_WIDGET.MAW_RES_OK;
+			}
+
+			Log.e( "MoSync", "maWidgetSetProperty: Invalid Radio Button handle: " +
+					IntConverter.convert(value) + " for Radio Group: " + widgetHandle);
+			return IX_WIDGET.MAW_RES_INVALID_PROPERTY_VALUE;
+		}
+		else {
 			Log.e( "MoSync", "maWidgetSetProperty: Invalid property '" + key + "' on widget: " + widgetHandle );
 			return IX_WIDGET.MAW_RES_INVALID_PROPERTY_NAME;
 		}

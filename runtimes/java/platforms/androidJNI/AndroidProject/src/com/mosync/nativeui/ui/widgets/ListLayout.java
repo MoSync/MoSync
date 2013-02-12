@@ -526,7 +526,7 @@ public class ListLayout extends Layout
 		if (sectionIndex == 0)
 			return index;
 
-		for (int i=1; i <= sectionIndex; i++)
+		for (int i=0; i < sectionIndex; i++)
 		{
 			browseIndex += mSections.get(i).itemsCount();
 		}

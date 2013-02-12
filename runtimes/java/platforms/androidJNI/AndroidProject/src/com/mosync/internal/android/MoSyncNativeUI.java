@@ -534,6 +534,7 @@ public class MoSyncNativeUI implements RootViewReplacedListener
 	@Override
 	public void rootViewReplaced(View newRoot)
 	{
+		newRoot.clearFocus();
 		((MoSync) getActivity()).setRootView( newRoot );
 	}
 
