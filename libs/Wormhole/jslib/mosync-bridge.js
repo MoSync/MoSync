@@ -48,6 +48,17 @@ var mosync = (function()
 	mosync.isWindowsPhone =
 		navigator.userAgent.indexOf("Windows Phone OS") != -1;
 
+	// Logging support.
+
+	/**
+	 * Write log output using maWriteLog in the MoSync C++ API.
+	 * @param s Log message string.
+	 */
+	mosync.log = function(s)
+	{
+		mosync.bridge.send(["MoSync", "SysLog", s]);
+	};
+
 	// Application functions.
 
 	mosync.app = {};
@@ -67,15 +78,6 @@ var mosync = (function()
 	mosync.app.sendToBackground = function()
 	{
 		mosync.bridge.send(["MoSync", "SendToBackground"]);
-	};
-
-	/**
-	 * Writes log output using MoSync API syscall maWriteLog.
-	 * @param s Log message string.
-	 */
-	mosync.app.log = function(s)
-	{
-		mosync.bridge.send(["MoSync", "SysLog", s]);
 	};
 
 	/**
@@ -228,7 +230,7 @@ var mosync = (function()
 	{
 		console.log = function(s)
 		{
-			mosync.app.log(s);
+			mosync.log(s);
 		};
 	}
 
