@@ -64,9 +64,13 @@ public:
 	//Returns nBytes read or CONNERR code.
 	virtual int read(void* dst, int max) = 0;
 
+	virtual int readFrom(void* dst, int max, MAConnAddr& src) __attribute((noreturn));
+
 	//Writes <len> bytes from <src>.
 	//Returns >0 or CONNERR code.
 	virtual int write(const void* src, int len) = 0;
+
+	virtual int writeTo(const void* src, int len, const MAConnAddr& dst) __attribute((noreturn));
 
 	//Writes the remote connection's address to \a addr.
 	//Will fail if connect() has not completed.

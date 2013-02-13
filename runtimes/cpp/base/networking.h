@@ -184,6 +184,19 @@ private:
 	const int size;
 };
 
+class ConnReadFrom : public ConnStreamOp {
+public:
+	ConnReadFrom(MAStreamConn& m, void* d, int s, MAConnAddr* a) : ConnStreamOp(m), dst(d), size(s), src(a) {}
+	void run() {
+		LOGST("ConnReadFrom %i", mac.handle);
+		handleResult(CONNOP_READ, masc.conn->readFrom(dst, size, *src));
+	}
+private:
+	void* dst;
+	const int size;
+	MAConnAddr* src;
+};
+
 class ConnWrite : public ConnStreamOp {
 public:
 	ConnWrite(MAStreamConn& m, const void* sr, int si) : ConnStreamOp(m), src(sr), size(si) {}
@@ -194,6 +207,19 @@ public:
 private:
 	const void* src;
 	const int size;
+};
+
+class ConnWriteTo : public ConnStreamOp {
+public:
+	ConnWriteTo(MAStreamConn& m, const void* sr, int si, const MAConnAddr& d) : ConnStreamOp(m), src(sr), size(si), dst(d) {}
+	void run() {
+		LOGST("ConnWriteTo %i", mac.handle);
+		handleResult(CONNOP_WRITE, masc.conn->writeTo(src, size, dst));
+	}
+private:
+	const void* src;
+	const int size;
+	const MAConnAddr& dst;
 };
 
 class ConnReadToData : public ConnStreamOp {
