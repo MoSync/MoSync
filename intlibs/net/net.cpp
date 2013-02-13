@@ -287,7 +287,6 @@ int UdpConnection::openServer() {
 	sa.sin_port = htons(mPort);
 	if(bind(mSock, (struct sockaddr*)&sa, sizeof(struct sockaddr_in))<0) {
 		LOG("UdpConnection: bind error %d\n", SOCKET_ERRNO);
-		LOG("%s\n", strerror(errno));
 		close();
 		return CONNERR_GENERIC;
 	}
@@ -389,7 +388,6 @@ int UdpConnection::readFrom(void* dst, int max, MAConnAddr& src) {
 	int bytesRecv = recvfrom(mSock, (char*)dst, max, 0, &from, &fromlen);
 	if(SOCKET_ERROR == bytesRecv) {
 		LOG("UdpConnection::readFrom: recvfrom failed. error code: %i\n", SOCKET_ERRNO);
-		LOG("mSock: %i. strerror: %s\n", mSock, strerror(SOCKET_ERRNO));
 #ifdef WIN32
 		if(SOCKET_ERRNO == WSAEMSGSIZE) {
 			parse_sockaddr(src, &from, fromlen);
@@ -414,7 +412,6 @@ int UdpConnection::writeTo(const void* src, int len, const MAConnAddr& dst) {
 	int bytesSent = sendto(mSock, (const char*) src, len, 0, (sockaddr*)&si, sizeof(si));
 	if(bytesSent != len || SOCKET_ERROR == bytesSent) {
 		LOG("UdpConnection::writeTo: sendto failed. error code: %i\n", SOCKET_ERRNO);
-		LOG("mSock: %i. strerror: %s\n", mSock, strerror(SOCKET_ERRNO));
 		return CONNERR_GENERIC;
 	} else {
 		return 1;
