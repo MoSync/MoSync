@@ -105,7 +105,7 @@ namespace MoSync
                 mStackPanels = new System.Collections.Generic.List<StackPanel>();
 
                 setHorizontalSizePolicyFlags(true, false);
-                setVerticalSizePolivyFlags(true, false);
+                setVerticalSizePolicyFlags(true, false);
 //#if DEBUG
                 //mGrid.ShowGridLines = true;
 //#endif
@@ -128,21 +128,25 @@ namespace MoSync
                     //
                     // Wrap V & Fill H :
                     //  - column.width (1 x star)
+                    //  - row.Height (1 x star)
                     //  - stack panel  (yes)
                     //  - orientation  (vertical)
                     //
                     // Wrap V & Wrap H :
                     //  - column.width (1 x auto)
+                    //  - row.Height (1 x star)
                     //  - stack panel  (yes)
                     //  - orientation  (vertical)
                     //
                     // Fill V & Wrap H :
                     //  - column.width (1 x auto)
+                    //  - row.Height (1 x star)
                     //  - stack panel  (yes)
                     //  - orientation  (horizontal)
                     //
                     // Fill V & Fill H :
                     //  - column.width (1 x star)
+                    //  - row.Height (1 x star)
                     //  - stack panel  (No)
                     //  - orientation  (none)
                     WidgetBaseWindowsPhone widget = (child as WidgetBaseWindowsPhone);
@@ -251,7 +255,7 @@ namespace MoSync
 
                     if (mGrid.Children.Contains(mStackPanels[widget.ColumnNumber - 1]))
                     {
-                        if(removeWidgetFromStackPanelContainer(child, widget.ColumnNumber))
+                        if(RemoveWidgetFromStackPanelContainer(child, widget.ColumnNumber))
                         {
                             mGrid.Children.Remove(fw);
                             mGrid.Children.Remove(mStackPanels[widget.ColumnNumber - 1]);
@@ -385,7 +389,7 @@ namespace MoSync
              * @param1: int index - the index of the column
              * @param2: Orientation orientation - the Orientation value
              */
-            public void setContainerOrientation(IWidget widget, int index, Orientation orientation)
+            public void SetContainerOrientation(IWidget widget, int index, Orientation orientation)
             {
                 // Take 1 away from index since the number of columns
                 // is higher with 1 then the number of stack panel containers.
@@ -413,7 +417,7 @@ namespace MoSync
              * @param1: IWidget widget - the widget
              * @param2: int index - the index of the column
              */
-            public bool removeWidgetFromStackPanelContainer(IWidget widget, int index)
+            public bool RemoveWidgetFromStackPanelContainer(IWidget widget, int index)
             {
                 // Take 1 away from index since the number of columns
                 // is higher with 1 then the number of stack panel containers.

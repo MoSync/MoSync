@@ -93,7 +93,7 @@ namespace MoSync
                 WRAP_CONT_H = wrapContentHorizontally;
             }
 
-            protected void setVerticalSizePolivyFlags(bool fillSpaceVertically, bool wrapContentVertically)
+            protected void setVerticalSizePolicyFlags(bool fillSpaceVertically, bool wrapContentVertically)
             {
                 FILL_SPACE_V = fillSpaceVertically;
                 WRAP_CONT_V = wrapContentVertically;
@@ -175,7 +175,7 @@ namespace MoSync
                         {
                             mView.SetValue(Canvas.HeightProperty, value);
                             mHeight = value;
-                            setVerticalSizePolivyFlags(false, false);
+                            setVerticalSizePolicyFlags(false, false);
                         }
                         else if (MoSync.Constants.MAW_CONSTANT_FILL_AVAILABLE_SPACE == value)
                         {
@@ -328,7 +328,7 @@ namespace MoSync
                 : base()
             {
                 setHorizontalSizePolicyFlags(false, true);
-                setVerticalSizePolivyFlags(false, true);
+                setVerticalSizePolicyFlags(false, true);
                 RowNumber = -1;
                 ColumnNumber = -1;
             }
@@ -353,11 +353,11 @@ namespace MoSync
                     Grid content = (parent.View as Grid);
 
                     content.ColumnDefinitions[ColumnNumber].Width = new GridLength(1, GridUnitType.Auto);
-                    parent.setContainerOrientation(this, ColumnNumber, Orientation.Vertical);
+                    parent.SetContainerOrientation(this, ColumnNumber, Orientation.Vertical);
 
                     if (WRAP_CONT_V)
                     {
-                        parent.setContainerOrientation(this, ColumnNumber, Orientation.Horizontal);
+                        parent.SetContainerOrientation(this, ColumnNumber, Orientation.Horizontal);
                     }
                 }
                 // WRAP_CONT_H in a VerticalLayout
@@ -366,11 +366,11 @@ namespace MoSync
                     VerticalLayout parent = (this.GetParent() as VerticalLayout);
                     Grid content = (parent.View as Grid);
 
-                    parent.setContainerOrientation(this, ColumnNumber, Orientation.Horizontal);
+                    parent.SetContainerOrientation(this, ColumnNumber, Orientation.Horizontal);
 
                     if (WRAP_CONT_V)
                     {
-                        parent.setContainerOrientation(this, ColumnNumber, Orientation.Vertical);
+                        parent.SetContainerOrientation(this, ColumnNumber, Orientation.Vertical);
                     }
                 }
             }
@@ -395,9 +395,9 @@ namespace MoSync
                     Grid content = (parent.View as Grid);
 
                     content.ColumnDefinitions[ColumnNumber].Width = new GridLength(1, GridUnitType.Star);
-                    parent.setContainerOrientation(this, ColumnNumber, Orientation.Vertical);
+                    parent.SetContainerOrientation(this, ColumnNumber, Orientation.Vertical);
 
-                    if (FILL_SPACE_V && parent.removeWidgetFromStackPanelContainer(this, ColumnNumber))
+                    if (FILL_SPACE_V && parent.RemoveWidgetFromStackPanelContainer(this, ColumnNumber))
                     {
                         Grid.SetRow(View as FrameworkElement, RowNumber);
                         Grid.SetColumn(View as FrameworkElement, ColumnNumber);
@@ -410,9 +410,9 @@ namespace MoSync
                     Grid content = (parent.View as Grid);
 
                     content.RowDefinitions[RowNumber].Height = new GridLength(1, GridUnitType.Auto);
-                    parent.setContainerOrientation(this, RowNumber, Orientation.Vertical);
+                    parent.SetContainerOrientation(this, RowNumber, Orientation.Vertical);
 
-                    if (FILL_SPACE_V && parent.removeWidgetFromStackPanelContainer(this, RowNumber))
+                    if (FILL_SPACE_V && parent.RemoveWidgetFromStackPanelContainer(this, RowNumber))
                     {
                         Grid.SetColumn(View as FrameworkElement, ColumnNumber);
                         Grid.SetRow(View as FrameworkElement, RowNumber);
@@ -428,7 +428,7 @@ namespace MoSync
             {
                 mView.ClearValue(Canvas.HeightProperty);
                 mView.SetValue(Canvas.VerticalAlignmentProperty, VerticalAlignment.Center);
-                setVerticalSizePolivyFlags(false, true);
+                setVerticalSizePolicyFlags(false, true);
                 mHeight = MoSync.Constants.MAW_CONSTANT_WRAP_CONTENT;
 
                 //In case of setting the widget property after it is added
@@ -440,12 +440,12 @@ namespace MoSync
                     HorizontalLayout parent = (this.GetParent() as HorizontalLayout);
                     Grid content = (parent.View as Grid);
 
-                    parent.setContainerOrientation(this, ColumnNumber, Orientation.Vertical);
+                    parent.SetContainerOrientation(this, ColumnNumber, Orientation.Vertical);
 
                     if (WRAP_CONT_H)
                     {
                         content.ColumnDefinitions[ColumnNumber].Width = new GridLength(1, GridUnitType.Auto);
-                        parent.setContainerOrientation(this, ColumnNumber, Orientation.Horizontal);
+                        parent.SetContainerOrientation(this, ColumnNumber, Orientation.Horizontal);
                     }
                 }
                 // WRAP_CONT_V in a VerticalLayout
@@ -455,11 +455,11 @@ namespace MoSync
                     Grid content = (parent.View as Grid);
 
                     content.RowDefinitions[RowNumber].Height = new GridLength(1, GridUnitType.Auto);
-                    parent.setContainerOrientation(this, ColumnNumber, Orientation.Vertical);
+                    parent.SetContainerOrientation(this, ColumnNumber, Orientation.Vertical);
 
                     if (WRAP_CONT_V)
                     {
-                        parent.setContainerOrientation(this, ColumnNumber, Orientation.Horizontal);
+                        parent.SetContainerOrientation(this, ColumnNumber, Orientation.Horizontal);
                     }
                 }
             }
@@ -471,7 +471,7 @@ namespace MoSync
             {
                 mView.ClearValue(Canvas.HeightProperty);
                 mView.SetValue(Canvas.VerticalAlignmentProperty, VerticalAlignment.Stretch);
-                setVerticalSizePolivyFlags(true, false);
+                setVerticalSizePolicyFlags(true, false);
                 mHeight = MoSync.Constants.MAW_CONSTANT_FILL_AVAILABLE_SPACE;
 
                 //In case of setting the widget property after it is added
@@ -484,9 +484,9 @@ namespace MoSync
                     Grid content = (parent.View as Grid);
 
                     content.ColumnDefinitions[ColumnNumber].Width = new GridLength(1, GridUnitType.Auto);
-                    parent.setContainerOrientation(this, ColumnNumber, Orientation.Horizontal);
+                    parent.SetContainerOrientation(this, ColumnNumber, Orientation.Horizontal);
 
-                    if (FILL_SPACE_H && parent.removeWidgetFromStackPanelContainer(this, ColumnNumber))
+                    if (FILL_SPACE_H && parent.RemoveWidgetFromStackPanelContainer(this, ColumnNumber))
                     {
                         content.ColumnDefinitions[ColumnNumber].Width = new GridLength(1, GridUnitType.Star);
                         Grid.SetRow(View as FrameworkElement, RowNumber);
@@ -500,9 +500,9 @@ namespace MoSync
                     Grid content = (parent.View as Grid);
 
                     content.RowDefinitions[RowNumber].Height = new GridLength(1, GridUnitType.Star);
-                    parent.setContainerOrientation(this, RowNumber, Orientation.Horizontal);
+                    parent.SetContainerOrientation(this, RowNumber, Orientation.Horizontal);
 
-                    if (FILL_SPACE_H && parent.removeWidgetFromStackPanelContainer(this, RowNumber))
+                    if (FILL_SPACE_H && parent.RemoveWidgetFromStackPanelContainer(this, RowNumber))
                     {
                         Grid.SetColumn(View as FrameworkElement, ColumnNumber);
                         Grid.SetRow(View as FrameworkElement, RowNumber);

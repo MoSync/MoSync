@@ -60,7 +60,7 @@ namespace MoSync
                 mView = mActivityIndicator;
 
                 setHorizontalSizePolicyFlags(true, false);
-                setVerticalSizePolivyFlags(false, true);
+                setVerticalSizePolicyFlags(false, true);
             }
 
             /**
