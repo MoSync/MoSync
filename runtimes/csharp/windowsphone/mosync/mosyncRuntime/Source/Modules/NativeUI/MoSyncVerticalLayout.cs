@@ -249,19 +249,24 @@ namespace MoSync
                 {
                     WidgetBaseWindowsPhone widget = (child as WidgetBaseWindowsPhone);
                     FrameworkElement fw = (widget.View) as System.Windows.FrameworkElement;
+
+                    if (mGrid.Children.Contains(mStackPanels[widget.RowNumber - 1]))
+                    {
+                        if (removeWidgetFromStackPanelContainer(child, widget.RowNumber))
+                        {
+                            mGrid.Children.Remove(fw);
+                            mGrid.Children.Remove(mStackPanels[widget.RowNumber - 1]);
+                        }
+                    }
                     if (mGrid.Children.Contains(fw))
                     {
                         int x = widget.RowNumber;
+
                         if (x < mGrid.RowDefinitions.Count)
                         {
                             mGrid.RowDefinitions.RemoveAt(x);
                             mGrid.Children.Remove(fw);
                         }
-                    }
-                    else if (mGrid.Children.Contains(mStackPanels[widget.RowNumber - 1]))
-                    {
-                        removeWidgetFromStackPanelContainer(child, widget.RowNumber);
-                        mGrid.Children.Remove(mStackPanels[widget.RowNumber - 1]);
                     }
                 });
                 base.RemoveChild(child);
@@ -410,14 +415,26 @@ namespace MoSync
              * @param1: int index - the index of the row
              * @param2: Orientation orientation - the Orientation value
              */
-            public void setContainerOrientation(int index, Orientation orientation)
+            public void setContainerOrientation(IWidget widget, int index, Orientation orientation)
             {
                 // Take 1 away from index since the number of columns
                 // is higher with 1 then the number of stack panel containers.
                 // The extra row is the top padding.
                 index -= 1;
-                if(index < mStackPanels.Count && index >= 0)
+
+                FrameworkElement fElem = (widget as WidgetBaseWindowsPhone).View as FrameworkElement;
+                if (index < mStackPanels.Count && index >= 0)
+                {
+                    if (!mStackPanels[index].Children.Contains(fElem) &&
+                       mStackPanels[index].Children.Count == 0 &&
+                       mGrid.Children.Contains(fElem))
+                    {
+                        mGrid.Children.Remove(fElem);
+                        mStackPanels[index].Children.Add(fElem);
+                    }
+
                     mStackPanels[index].Orientation = orientation;
+                }
             }
 
             /*
@@ -437,6 +454,7 @@ namespace MoSync
                 if (mStackPanels[index].Children.Contains(fElem))
                 {
                     mStackPanels[index].Children.Remove(fElem);
+                    mGrid.Children.Add(fElem);
                     return true;
                 }
 

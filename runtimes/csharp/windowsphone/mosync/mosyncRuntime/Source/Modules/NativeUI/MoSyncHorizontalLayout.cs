@@ -231,18 +231,6 @@ namespace MoSync
                 {
                     IWidget child = mChildren[index];
 
-                    MoSync.Util.RunActionOnMainThreadSync(() =>
-                    {
-                        WidgetBaseWindowsPhone widget = (child as WidgetBaseWindowsPhone);
-                        int x = widget.ColumnNumber;
-
-                        if (x < mGrid.ColumnDefinitions.Count)
-                        {
-                            mGrid.ColumnDefinitions.RemoveAt(x);
-                            mGrid.Children.Remove((child as WidgetBaseWindowsPhone).View);
-                        }
-                    });
-
                     if (null != child)
                     {
                         RemoveChild(child);
@@ -260,6 +248,15 @@ namespace MoSync
                 {
                     WidgetBaseWindowsPhone widget = (child as WidgetBaseWindowsPhone);
                     FrameworkElement fw = (widget.View) as System.Windows.FrameworkElement;
+
+                    if (mGrid.Children.Contains(mStackPanels[widget.ColumnNumber - 1]))
+                    {
+                        if(removeWidgetFromStackPanelContainer(child, widget.ColumnNumber))
+                        {
+                            mGrid.Children.Remove(fw);
+                            mGrid.Children.Remove(mStackPanels[widget.ColumnNumber - 1]);
+                        }
+                    }
                     if (mGrid.Children.Contains(fw))
                     {
                         int x = widget.ColumnNumber;
@@ -269,11 +266,6 @@ namespace MoSync
                             mGrid.ColumnDefinitions.RemoveAt(x);
                             mGrid.Children.Remove(fw);
                         }
-                    }
-                    else if (mGrid.Children.Contains(mStackPanels[widget.ColumnNumber - 1]))
-                    {
-                        removeWidgetFromStackPanelContainer(child, widget.ColumnNumber);
-                        mGrid.Children.Remove(mStackPanels[widget.ColumnNumber - 1]);
                     }
                 });
                 base.RemoveChild(child);
@@ -393,14 +385,25 @@ namespace MoSync
              * @param1: int index - the index of the column
              * @param2: Orientation orientation - the Orientation value
              */
-            public void setContainerOrientation(int index, Orientation orientation)
+            public void setContainerOrientation(IWidget widget, int index, Orientation orientation)
             {
                 // Take 1 away from index since the number of columns
                 // is higher with 1 then the number of stack panel containers.
                 // The extra column is the left padding.
                 index -= 1;
+                FrameworkElement fElem = (widget as WidgetBaseWindowsPhone).View as FrameworkElement;
                 if (index < mStackPanels.Count && index >= 0)
+                {
+                    if (!mStackPanels[index].Children.Contains(fElem) &&
+                       mStackPanels[index].Children.Count == 0 &&
+                       mGrid.Children.Contains(fElem))
+                    {
+                        mGrid.Children.Remove(fElem);
+                        mStackPanels[index].Children.Add(fElem);
+                    }
+
                     mStackPanels[index].Orientation = orientation;
+                }
             }
 
             /*
@@ -420,6 +423,7 @@ namespace MoSync
                 if (mStackPanels[index].Children.Contains(fElem))
                 {
                     mStackPanels[index].Children.Remove(fElem);
+                    mGrid.Children.Add(fElem);
                     return true;
                 }
 

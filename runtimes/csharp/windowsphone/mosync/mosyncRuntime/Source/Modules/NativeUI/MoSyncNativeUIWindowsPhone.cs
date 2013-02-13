@@ -142,96 +142,19 @@ namespace MoSync
                 {
                     if (value != mWidth)
                     {
-                        if (value > 0)
+                        if (0 <= value)
                         {
                             mView.SetValue(Canvas.WidthProperty, value);
                             mWidth = value;
                             setHorizontalSizePolicyFlags(false, false);
                         }
-                        else if (-1 == value)
+                        else if (MoSync.Constants.MAW_CONSTANT_FILL_AVAILABLE_SPACE == value)
                         {
-                            mView.ClearValue(Canvas.WidthProperty);
-                            mView.SetValue(Canvas.HorizontalAlignmentProperty, HorizontalAlignment.Stretch);
-                            setHorizontalSizePolicyFlags(true, false);
-                            mWidth = value;
-
-                            //In case of setting the widget property after it is added
-                            //to a parent widget
-
-                            // FILL_SPACE_H in a HorizontalLayout
-                            if (this.GetParent() is HorizontalLayout)
-                            {
-                                HorizontalLayout parent = (this.GetParent() as HorizontalLayout);
-                                Grid content = (parent.View as Grid);
-
-                                content.ColumnDefinitions[ColumnNumber].Width = new GridLength(1, GridUnitType.Star);
-                                parent.setContainerOrientation(ColumnNumber, Orientation.Vertical);
-
-                                if (FILL_SPACE_V)
-                                {
-                                    if (parent.removeWidgetFromStackPanelContainer(this, ColumnNumber))
-                                    {
-                                        Grid.SetRow(View as FrameworkElement, RowNumber);
-                                        Grid.SetColumn(View as FrameworkElement, ColumnNumber);
-                                    }
-                                }
-                            }
-                            // FILL_SPACE_H in a VerticalLayout
-                            else if (this.GetParent() is VerticalLayout)
-                            {
-                                VerticalLayout parent = (this.GetParent() as VerticalLayout);
-                                Grid content = (parent.View as Grid);
-
-                                content.RowDefinitions[RowNumber].Height = new GridLength(1, GridUnitType.Auto);
-                                parent.setContainerOrientation(ColumnNumber, Orientation.Vertical);
-
-                                if (FILL_SPACE_V)
-                                {
-                                    if (parent.removeWidgetFromStackPanelContainer(this, RowNumber))
-                                    {
-                                        Grid.SetColumn(View as FrameworkElement, ColumnNumber);
-                                        Grid.SetRow(View as FrameworkElement, RowNumber);
-                                    }
-                                }
-                            }
+                            FillSpaceHorizontally();
                         }
-                        else if (-2 == value)
+                        else if (MoSync.Constants.MAW_CONSTANT_WRAP_CONTENT == value)
                         {
-                            mView.ClearValue(Canvas.WidthProperty);
-                            mView.SetValue(Canvas.HorizontalAlignmentProperty, HorizontalAlignment.Center);
-                            setHorizontalSizePolicyFlags(false, true);
-                            mWidth = value;
-
-                            //In case of setting the widget property after it is added
-                            //to a parent widget
-
-                            // WRAP_CONT_H in a HorizontalLayout
-                            if (this.GetParent() is HorizontalLayout)
-                            {
-                                HorizontalLayout parent = (this.GetParent() as HorizontalLayout);
-                                Grid content = (parent.View as Grid);
-
-                                content.ColumnDefinitions[ColumnNumber].Width = new GridLength(1, GridUnitType.Auto);
-                                parent.setContainerOrientation(ColumnNumber, Orientation.Vertical);
-
-                                if (WRAP_CONT_V)
-                                {
-                                    parent.setContainerOrientation(ColumnNumber, Orientation.Horizontal);
-                                }
-                            }
-                            // WRAP_CONT_H in a VerticalLayout
-                            else if (this.GetParent() is VerticalLayout)
-                            {
-                                VerticalLayout parent = (this.GetParent() as VerticalLayout);
-                                Grid content = (parent.View as Grid);
-
-                                parent.setContainerOrientation(ColumnNumber, Orientation.Horizontal);
-
-                                if (WRAP_CONT_V)
-                                {
-                                    parent.setContainerOrientation(ColumnNumber, Orientation.Vertical);
-                                }
-                            }
+                            WrapContentHorizontally();
                         }
                     }
                 }
@@ -248,98 +171,19 @@ namespace MoSync
                 {
                     if (value != mHeight)
                     {
-                        if (value > 0)
+                        if (0 <= value)
                         {
                             mView.SetValue(Canvas.HeightProperty, value);
                             mHeight = value;
                             setVerticalSizePolivyFlags(false, false);
                         }
-                        else if (-1 == value)
+                        else if (MoSync.Constants.MAW_CONSTANT_FILL_AVAILABLE_SPACE == value)
                         {
-                            mView.ClearValue(Canvas.HeightProperty);
-                            mView.SetValue(Canvas.VerticalAlignmentProperty, VerticalAlignment.Stretch);
-                            setVerticalSizePolivyFlags(true, false);
-                            mHeight = value;
-
-                            //In case of setting the widget property after it is added
-                            //to a parent widget
-
-                            // FILL_SPACE_V in a HorizontalLayout
-                            if (this.GetParent() is HorizontalLayout)
-                            {
-                                HorizontalLayout parent = (this.GetParent() as HorizontalLayout);
-                                Grid content = (parent.View as Grid);
-
-                                content.ColumnDefinitions[ColumnNumber].Width = new GridLength(1, GridUnitType.Auto);
-                                parent.setContainerOrientation(ColumnNumber, Orientation.Horizontal);
-
-                                if (FILL_SPACE_H)
-                                {
-                                    if (parent.removeWidgetFromStackPanelContainer(this, ColumnNumber))
-                                    {
-                                        content.ColumnDefinitions[ColumnNumber].Width = new GridLength(1, GridUnitType.Star);
-                                        Grid.SetRow(View as FrameworkElement, RowNumber);
-                                        Grid.SetColumn(View as FrameworkElement, ColumnNumber);
-                                    }
-                                }
-                            }
-                            // FILL_SPACE_V in a VerticalLayout
-                            else if (this.GetParent() is VerticalLayout)
-                            {
-                                VerticalLayout parent = (this.GetParent() as VerticalLayout);
-                                Grid content = (parent.View as Grid);
-
-                                content.RowDefinitions[RowNumber].Height = new GridLength(1, GridUnitType.Star);
-                                parent.setContainerOrientation(ColumnNumber, Orientation.Horizontal);
-
-                                if (FILL_SPACE_H)
-                                {
-                                    if (parent.removeWidgetFromStackPanelContainer(this, RowNumber))
-                                    {
-                                        Grid.SetColumn(View as FrameworkElement, ColumnNumber);
-                                        Grid.SetRow(View as FrameworkElement, RowNumber);
-                                    }
-                                }
-                            }
+                            FillSpaceVertically();
                         }
-                        else if (-2 == value)
+                        else if (MoSync.Constants.MAW_CONSTANT_WRAP_CONTENT == value)
                         {
-                            mView.ClearValue(Canvas.HeightProperty);
-                            mView.SetValue(Canvas.VerticalAlignmentProperty, VerticalAlignment.Center);
-                            setVerticalSizePolivyFlags(false, true);
-                            mHeight = value;
-
-                            //In case of setting the widget property after it is added
-                            //to a parent widget
-
-                            // WRAP_CONT_V in a HorizontalLayout
-                            if (this.GetParent() is HorizontalLayout)
-                            {
-                                HorizontalLayout parent = (this.GetParent() as HorizontalLayout);
-                                Grid content = (parent.View as Grid);
-
-                                parent.setContainerOrientation(ColumnNumber, Orientation.Vertical);
-
-                                if (WRAP_CONT_H)
-                                {
-                                    content.ColumnDefinitions[ColumnNumber].Width = new GridLength(1, GridUnitType.Auto);
-                                    parent.setContainerOrientation(ColumnNumber, Orientation.Horizontal);
-                                }
-                            }
-                            // WRAP_CONT_V in a VerticalLayout
-                            else if (this.GetParent() is VerticalLayout)
-                            {
-                                VerticalLayout parent = (this.GetParent() as VerticalLayout);
-                                Grid content = (parent.View as Grid);
-
-                                content.RowDefinitions[RowNumber].Height = new GridLength(1, GridUnitType.Auto);
-                                parent.setContainerOrientation(ColumnNumber, Orientation.Vertical);
-
-                                if (WRAP_CONT_V)
-                                {
-                                    parent.setContainerOrientation(ColumnNumber, Orientation.Horizontal);
-                                }
-                            }
+                            WrapContentVertically();
                         }
                     }
                 }
@@ -487,6 +331,183 @@ namespace MoSync
                 setVerticalSizePolivyFlags(false, true);
                 RowNumber = -1;
                 ColumnNumber = -1;
+            }
+
+            /**
+             * \brief This functions is called on the wrap content horizontally case
+             */
+            private void WrapContentHorizontally()
+            {
+                mView.ClearValue(Canvas.WidthProperty);
+                mView.SetValue(Canvas.HorizontalAlignmentProperty, HorizontalAlignment.Center);
+                setHorizontalSizePolicyFlags(false, true);
+                mWidth = MoSync.Constants.MAW_CONSTANT_WRAP_CONTENT;
+
+                //In case of setting the widget property after it is added
+                //to a parent widget
+
+                // WRAP_CONT_H in a HorizontalLayout
+                if (this.GetParent() is HorizontalLayout)
+                {
+                    HorizontalLayout parent = (this.GetParent() as HorizontalLayout);
+                    Grid content = (parent.View as Grid);
+
+                    content.ColumnDefinitions[ColumnNumber].Width = new GridLength(1, GridUnitType.Auto);
+                    parent.setContainerOrientation(this, ColumnNumber, Orientation.Vertical);
+
+                    if (WRAP_CONT_V)
+                    {
+                        parent.setContainerOrientation(this, ColumnNumber, Orientation.Horizontal);
+                    }
+                }
+                // WRAP_CONT_H in a VerticalLayout
+                else if (this.GetParent() is VerticalLayout)
+                {
+                    VerticalLayout parent = (this.GetParent() as VerticalLayout);
+                    Grid content = (parent.View as Grid);
+
+                    parent.setContainerOrientation(this, ColumnNumber, Orientation.Horizontal);
+
+                    if (WRAP_CONT_V)
+                    {
+                        parent.setContainerOrientation(this, ColumnNumber, Orientation.Vertical);
+                    }
+                }
+            }
+
+            /**
+             * \brief This functions is called on the fill space horizontally case
+             */
+            private void FillSpaceHorizontally()
+            {
+                mView.ClearValue(Canvas.WidthProperty);
+                mView.SetValue(Canvas.HorizontalAlignmentProperty, HorizontalAlignment.Stretch);
+                setHorizontalSizePolicyFlags(true, false);
+                mWidth = MoSync.Constants.MAW_CONSTANT_FILL_AVAILABLE_SPACE;
+
+                //In case of setting the widget property after it is added
+                //to a parent widget
+
+                // FILL_SPACE_H in a HorizontalLayout
+                if (this.GetParent() is HorizontalLayout)
+                {
+                    HorizontalLayout parent = (this.GetParent() as HorizontalLayout);
+                    Grid content = (parent.View as Grid);
+
+                    content.ColumnDefinitions[ColumnNumber].Width = new GridLength(1, GridUnitType.Star);
+                    parent.setContainerOrientation(this, ColumnNumber, Orientation.Vertical);
+
+                    if (FILL_SPACE_V && parent.removeWidgetFromStackPanelContainer(this, ColumnNumber))
+                    {
+                        Grid.SetRow(View as FrameworkElement, RowNumber);
+                        Grid.SetColumn(View as FrameworkElement, ColumnNumber);
+                    }
+                }
+                // FILL_SPACE_H in a VerticalLayout
+                else if (this.GetParent() is VerticalLayout)
+                {
+                    VerticalLayout parent = (this.GetParent() as VerticalLayout);
+                    Grid content = (parent.View as Grid);
+
+                    content.RowDefinitions[RowNumber].Height = new GridLength(1, GridUnitType.Auto);
+                    parent.setContainerOrientation(this, RowNumber, Orientation.Vertical);
+
+                    if (FILL_SPACE_V && parent.removeWidgetFromStackPanelContainer(this, RowNumber))
+                    {
+                        Grid.SetColumn(View as FrameworkElement, ColumnNumber);
+                        Grid.SetRow(View as FrameworkElement, RowNumber);
+                    }
+                }
+            }
+
+
+            /**
+             * \brief This functions is called on the wrap content vertically case
+             */
+            private void WrapContentVertically()
+            {
+                mView.ClearValue(Canvas.HeightProperty);
+                mView.SetValue(Canvas.VerticalAlignmentProperty, VerticalAlignment.Center);
+                setVerticalSizePolivyFlags(false, true);
+                mHeight = MoSync.Constants.MAW_CONSTANT_WRAP_CONTENT;
+
+                //In case of setting the widget property after it is added
+                //to a parent widget
+
+                // WRAP_CONT_V in a HorizontalLayout
+                if (this.GetParent() is HorizontalLayout)
+                {
+                    HorizontalLayout parent = (this.GetParent() as HorizontalLayout);
+                    Grid content = (parent.View as Grid);
+
+                    parent.setContainerOrientation(this, ColumnNumber, Orientation.Vertical);
+
+                    if (WRAP_CONT_H)
+                    {
+                        content.ColumnDefinitions[ColumnNumber].Width = new GridLength(1, GridUnitType.Auto);
+                        parent.setContainerOrientation(this, ColumnNumber, Orientation.Horizontal);
+                    }
+                }
+                // WRAP_CONT_V in a VerticalLayout
+                else if (this.GetParent() is VerticalLayout)
+                {
+                    VerticalLayout parent = (this.GetParent() as VerticalLayout);
+                    Grid content = (parent.View as Grid);
+
+                    content.RowDefinitions[RowNumber].Height = new GridLength(1, GridUnitType.Auto);
+                    parent.setContainerOrientation(this, ColumnNumber, Orientation.Vertical);
+
+                    if (WRAP_CONT_V)
+                    {
+                        parent.setContainerOrientation(this, ColumnNumber, Orientation.Horizontal);
+                    }
+                }
+            }
+
+            /**
+             * \brief This functions is called on the fill stace vertically case
+             */
+            private void FillSpaceVertically()
+            {
+                mView.ClearValue(Canvas.HeightProperty);
+                mView.SetValue(Canvas.VerticalAlignmentProperty, VerticalAlignment.Stretch);
+                setVerticalSizePolivyFlags(true, false);
+                mHeight = MoSync.Constants.MAW_CONSTANT_FILL_AVAILABLE_SPACE;
+
+                //In case of setting the widget property after it is added
+                //to a parent widget
+
+                // FILL_SPACE_V in a HorizontalLayout
+                if (this.GetParent() is HorizontalLayout)
+                {
+                    HorizontalLayout parent = (this.GetParent() as HorizontalLayout);
+                    Grid content = (parent.View as Grid);
+
+                    content.ColumnDefinitions[ColumnNumber].Width = new GridLength(1, GridUnitType.Auto);
+                    parent.setContainerOrientation(this, ColumnNumber, Orientation.Horizontal);
+
+                    if (FILL_SPACE_H && parent.removeWidgetFromStackPanelContainer(this, ColumnNumber))
+                    {
+                        content.ColumnDefinitions[ColumnNumber].Width = new GridLength(1, GridUnitType.Star);
+                        Grid.SetRow(View as FrameworkElement, RowNumber);
+                        Grid.SetColumn(View as FrameworkElement, ColumnNumber);
+                    }
+                }
+                // FILL_SPACE_V in a VerticalLayout
+                else if (this.GetParent() is VerticalLayout)
+                {
+                    VerticalLayout parent = (this.GetParent() as VerticalLayout);
+                    Grid content = (parent.View as Grid);
+
+                    content.RowDefinitions[RowNumber].Height = new GridLength(1, GridUnitType.Star);
+                    parent.setContainerOrientation(this, RowNumber, Orientation.Horizontal);
+
+                    if (FILL_SPACE_H && parent.removeWidgetFromStackPanelContainer(this, RowNumber))
+                    {
+                        Grid.SetColumn(View as FrameworkElement, ColumnNumber);
+                        Grid.SetRow(View as FrameworkElement, RowNumber);
+                    }
+                }
             }
         }
 
