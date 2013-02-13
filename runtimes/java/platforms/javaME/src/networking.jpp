@@ -160,6 +160,14 @@ NETSYSCALL(void) maConnWrite(MAHandle conn, Address src, int size) throws IOExce
 	mThreadPool.execute(new ConnWrite(mac, src, size));
 }
 
+NETSYSCALL(void) maConnReadFrom(MAHandle conn, Address dst, int size, Address src) {
+	BIG_PHAT_ERROR;
+}
+
+NETSYSCALL(void) maConnWriteTo(MAHandle conn, Address src, int size, Address dst) {
+	BIG_PHAT_ERROR;
+}
+
 NETSYSCALL(void) maConnReadToData(MAHandle conn, MAHandle data, int offset, int size) {
 	MYASSERT(offset >= 0);
 	MYASSERT(size > 0);
