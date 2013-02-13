@@ -65,6 +65,7 @@ void MainScreen::createMainLayout() {
 	mSearchBar = new SearchBar();
 	mSearchBar->fillSpaceHorizontally();
 	mSearchBar->setPlaceholder("search");
+	mSearchBar->setBackgroundColor(0x0000FF); //Test setBackgroundColor on SearchBar.
 	mMainLayout->addChild(mSearchBar);
 
     mDebugLabel = new Label();

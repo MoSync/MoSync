@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2011 MoSync AB
+Copyright (C) 2011-2013 MoSync AB
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License,
@@ -15,7 +15,6 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301, USA.
 */
-
 
 /*
  * @file mosync-bridge.js
@@ -60,7 +59,7 @@ var mosync = (function()
 	mosync.app.exit = function()
 	{
 		mosync.bridge.send(["MoSync", "ExitApplication"]);
-	}
+	};
 
 	/**
 	 * Send application to background.
@@ -68,7 +67,55 @@ var mosync = (function()
 	mosync.app.sendToBackground = function()
 	{
 		mosync.bridge.send(["MoSync", "SendToBackground"]);
-	}
+	};
+
+	/**
+	 * Screen orientation constants.
+	 */
+	mosync.SCREEN_ORIENTATION_DYNAMIC = "dynamic";
+	mosync.SCREEN_ORIENTATION_PORTRAIT = "portrait";
+	mosync.SCREEN_ORIENTATION_LANDSCAPE = "landscape";
+
+	/**
+	 * Set the screen orientation of the device.
+	 *
+	 * @param orientation The desired screen orientation.
+	 * Can be one of the constants:
+	 *   mosync.SCREEN_ORIENTATION_DYNAMIC
+	 *   mosync.SCREEN_ORIENTATION_PORTRAIT
+	 *   mosync.SCREEN_ORIENTATION_LANDSCAPE
+	 *
+	 * Example:
+	 *   mosync.app.screenSetOrientation(mosync.SCREEN_ORIENTATION_DYNAMIC);
+	 */
+	mosync.app.screenSetOrientation = function(orientation)
+	{
+		mosync.bridge.send(["MoSync", "ScreenSetOrientation", orientation]);
+	};
+
+	/**
+	 * Opens a url in an external browser. Supported url
+	 * schemas are are "http:" to open a web page and
+	 * "tel:" to dial a number. See examples below.
+	 *
+	 * @param url The url to be opened.
+	 *
+	 * Example of opening a web page in an external browser:
+	 *   mosync.app.openExternalURL("http://maps.google.com/");
+	 *
+	 * Example of dialing a number:
+	 *   mosync.app.openExternalURL("tel:046850510300");
+	 *
+	 * Note that your app needs phone permissions to be set for
+	 * dialing a phone number. This is set in the MoSync SDK.
+	 * Note that MoSync Reload does not have phone permissions set.
+	 *
+	 * This function calls the MoSync syscall maPlatformRequest.
+	 */
+	mosync.app.openExternalURL = function(url)
+	{
+		mosync.bridge.send(["MoSync", "OpenExternalURL", url]);
+	};
 
 	// Alerts and logging.
 
@@ -309,20 +356,30 @@ var mosync = (function()
 		 * See this page for a tutorial: http://www.mosync.com/documentation/manualpages/how-communicate-between-javascript-and-c-mosync
 		 *
 		 * The project template "HTML5/JS/C++ Hybrid Project" is a
-		 * good startihng point for leaning how to add cusom C++ code
-		 * to your JavaScript application. Example the files index.html
+		 * good starting point for leaning how to add custom C++ code
+		 * to your JavaScript application. Look at the files index.html
 		 * and main.cpp in the project generated from the template.
 		 *
 		 * This method queues messages and can be called multiple
-		 * times in sqeuential JS code. When execution of sequential
-		 * code is done, a timer will get activated and send all messages
+		 * times in sequential JS code. When the sequential code executes,
+		 * a timer will be activated and wil send all messages
 		 * in the queue in one chunk. This enhances performance of
 		 * message sending.
+		 * 
+		 * Note: the "close" message is deprecated. To close the application, use "mosync.app.exit" instead. 
+		 * \code
+		 *    //Deprecated method:
+		 *    mosync.bridge.send(["close"]);
+		 *    
+		 *    //Preferred method:
+		 *    mosync.app.exit();
+		 *
+		 * \endcode
 		 *
 		 * @param message An array of message strings.
 		 *
 		 * @param callbackFun An optional function to receive the
-		 * result of the message asynchronosly. The id of the
+		 * result of the message asynchronosly. The ID of the
 		 * callback function is added after the strings in the
 		 * messageStrings array.
 		 */
@@ -375,13 +432,13 @@ var mosync = (function()
 		 * back to JavaScript from C++.
 		 *
 		 * This method queues a message and can be called multiple
-		 * times in sqeuential JS code. When execution of sequential
-		 * code is done, a timer will get activated and send all messages
+		 * times in sequential JS code. When execution of sequential
+		 * code is done, a timer will is activated and sends all messages
 		 * in the queue in one chunk. This enhances performance of
 		 * message sending.
 		 *
 		 * @param message A dictionary with the message parameters.
-		 * The parameter "messageName" specifyes the name of the
+		 * The parameter "messageName" specifies the name of the
 		 * message selector (the "command name") and must always be
 		 * included.
 		 *
@@ -502,14 +559,14 @@ var mosync = (function()
 		 * JavaScript. The function takes a variable number of parameters.
 		 *
 		 * For example, to return the value 'Hello World' to the callback
-		 * with id 82, you can use this code in a WebAppMoblet:
+		 * with ID 82, you can use this code in a WebAppMoblet:
 		 *
 		 *   callJS("mosync.bridge.reply(82, 'Hello World')");
 		 *
 		 * You can obtain the callbackId from the C++ WebViewMessage
 		 * object, if you use that class to parse the message.
 		 *
-		 * @param callBackId The first parameter is the id of the
+		 * @param callBackId The first parameter is the ID of the
 		 * callback function. Remaning parameters are applied to the
 		 * function refered to by the callbackId.
 		 */

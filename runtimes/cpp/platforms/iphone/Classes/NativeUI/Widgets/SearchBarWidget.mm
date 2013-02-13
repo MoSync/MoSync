@@ -20,6 +20,7 @@
 #include <base/Syscall.h>
 
 #import "SearchBarWidget.h"
+#import "UIColorExpanded.h"
 #include "Platform.h"
 
 @implementation SearchBarWidget
@@ -74,6 +75,12 @@
         {
             return MAW_RES_INVALID_PROPERTY_VALUE;
         }
+	}
+    else if([key isEqualToString:@MAW_WIDGET_BACKGROUND_COLOR])
+    {
+        UIColor* color = [UIColor colorWithHexString:value];
+		if(!color) return MAW_RES_INVALID_PROPERTY_VALUE;
+		_searchBar.tintColor = color;
 	}
 	else
     {

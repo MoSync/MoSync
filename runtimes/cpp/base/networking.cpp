@@ -359,16 +359,21 @@ void RtspConnection::run() {
 //socket creation helpers
 //******************************************************************************
 
-static Connection* newSocketConnection(const std::string& hostname, int port, bool ssl) {
-	if(ssl) {
-		return new SslConnection(hostname, port);
-	} else {
-		return new TcpConnection(hostname, port);
+enum ConnType {
+	Socket, Ssl, Datagram
+};
+
+static Connection* newSocketConnection(const std::string& hostname, int port, ConnType type) {
+	switch(type) {
+	case Ssl: return new SslConnection(hostname, port);
+	case Socket: return new TcpConnection(hostname, port);
+	case Datagram: return new UdpConnection(hostname, port);
+	default: DEBIG_PHAT_ERROR;
 	}
 }
 
 //returns >0 or CONNERR.
-static int createSocketConnection(const char* parturl, Connection*& conn, bool ssl) {
+static int createSocketConnection(const char* parturl, Connection*& conn, ConnType type) {
 	const char* port_m1 = strchr(parturl, ':');
 	if(!port_m1) {
 		return CONNERR_URL;
@@ -378,7 +383,7 @@ static int createSocketConnection(const char* parturl, Connection*& conn, bool s
 	if(port <= 0 || port >= 1 << 16) {
 		return CONNERR_URL;
 	}
-	conn = newSocketConnection(hostname, port, ssl);
+	conn = newSocketConnection(hostname, port, type);
 	return 1;
 }
 
@@ -388,7 +393,7 @@ static int httpCreateConnection(const char* parturl, HttpConnection*& conn, int 
 	const char *path;
 	std::string hostname;
 	if(parseProtocolURL(parturl, &port, ssl ? 443 : 80, &path, hostname)!=SUCCESS) return CONNERR_URL;
-	Connection* transport = newSocketConnection(hostname, port, ssl);
+	Connection* transport = newSocketConnection(hostname, port, ssl ? Ssl : Socket);
 	conn = new HttpConnection(transport, hostname, path, method);
 	return 1;
 }
@@ -413,9 +418,11 @@ SYSCALL(MAHandle, maConnect(const char* url)) {
 	if(sstrcmp(url, http_string) == 0) {
 		const char* parturl = url + sizeof(http_string) - 1;
 		TLTZ_PASS(httpCreateFinishingGetConnection(parturl, conn, false));
+
 	} else if(sstrcmp(url, https_string) == 0) {
 		const char* parturl = url + sizeof(https_string) - 1;
 		TLTZ_PASS(httpCreateFinishingGetConnection(parturl, conn, true));
+
 	} else if(sstrcmp(url, socket_string) == 0) {
 		//possible forms:
 		// socket://	# server on random port
@@ -425,10 +432,16 @@ SYSCALL(MAHandle, maConnect(const char* url)) {
 
 		//extract address and port
 		const char* parturl = url + sizeof(socket_string) - 1;
-		TLTZ_PASS(createSocketConnection(parturl, conn, false));
+		TLTZ_PASS(createSocketConnection(parturl, conn, Socket));
+
 	} else if(sstrcmp(url, ssl_string) == 0) {
 		const char* parturl = url + sizeof(ssl_string) - 1;
-		TLTZ_PASS(createSocketConnection(parturl, conn, true));
+		TLTZ_PASS(createSocketConnection(parturl, conn, Ssl));
+
+	} else if(sstrcmp(url, datagram_string) == 0) {
+		const char* parturl = url + sizeof(datagram_string) - 1;
+		TLTZ_PASS(createSocketConnection(parturl, conn, Datagram));
+
 	} else if(sstrcmp(url, btspp_string) == 0) {
 		//allowed forms:
 		// btspp://localhost:%32x

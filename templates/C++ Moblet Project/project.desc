@@ -8,3 +8,5 @@ main.cpp
 [Settings]
 build.prefs:additional.libraries=MAUtil.lib
 build.prefs:additional.libraries/Debug=MAUtilD.lib
+build.prefs:gcc.warnings/Debug=10
+build.prefs:gcc.warnings/Release=10

@@ -46,7 +46,7 @@ void InitLog(const char* filenameOverride) {
 	if(filenameOverride != NULL) {
 		sFilename = filenameOverride;
 	}
-	
+
 	FILE* file = fopen(sFilename, "wb");
 	if(!file)
 		MoSyncErrorExit(ERR_INTERNAL);

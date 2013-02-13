@@ -62,6 +62,7 @@ public:
 	ResourceDirective() : fParent(NULL) { }
 	ResourceDirective(const char* resType, bool canHaveParent, bool canHaveChildren) :
 		fResType(string(resType)), fParent(NULL), fCanHaveParent(canHaveParent), fCanHaveChildren(canHaveChildren) { }
+	virtual ~ResourceDirective() {}
 	void setParent(ResourceDirective* parent);
 	void setId(string id);
 	string getId();
