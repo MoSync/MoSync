@@ -217,7 +217,14 @@ namespace MoSync
                 }
                 set
                 {
-                    mGrid.Height = value;
+                    if (value > 0)
+                    {
+                        mGrid.Height = value;
+                    }
+                    else
+                    {
+                        base.Height = value;
+                    }
                 }
             }
 
