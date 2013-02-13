@@ -250,7 +250,7 @@ NSString* const kReceiptDateMsKey = @"original_purchase_date_ms";
         return MA_PURCHASE_RES_BUFFER_TOO_SMALL;
     }
 
-    [_productID getCString:buffer maxLength:bufferSize encoding:NSASCIIStringEncoding];
+    [_productID getCString:buffer maxLength:bufferSize encoding:NSUTF8StringEncoding];
     return [_productID length];
 }
 
@@ -332,7 +332,7 @@ NSString* const kReceiptDateMsKey = @"original_purchase_date_ms";
         return MA_PURCHASE_RES_BUFFER_TOO_SMALL;
     }
 
-    [fieldValue getCString:buffer maxLength:bufferSize encoding:NSASCIIStringEncoding];
+    [fieldValue getCString:buffer maxLength:bufferSize encoding:NSUTF8StringEncoding];
     return fieldValueLength;
 }
 

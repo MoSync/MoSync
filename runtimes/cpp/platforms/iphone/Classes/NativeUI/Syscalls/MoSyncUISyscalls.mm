@@ -461,7 +461,7 @@ int maWidgetGetProperty(MAWidgetHandle handle, const char *property, char *value
 		return MAW_RES_INVALID_STRING_BUFFER_SIZE;
 	}
 
-	[retval getCString:value maxLength:length encoding:NSASCIIStringEncoding];
+	[retval getCString:value maxLength:length encoding:NSUTF8StringEncoding];
 	[retval release];
     [propertyString release];
 

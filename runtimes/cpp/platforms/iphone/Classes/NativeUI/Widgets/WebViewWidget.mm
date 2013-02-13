@@ -82,8 +82,8 @@
 			  url = [[NSURL URLWithString: webURLString] filePathURL];
 		  } else {
               // Convert the string URL into ascii encoding.
-              NSData* data = [value dataUsingEncoding:NSASCIIStringEncoding allowLossyConversion:YES];
-              NSString* formattedURL = [[NSString alloc] initWithData:data encoding:NSASCIIStringEncoding];
+              NSData* data = [value dataUsingEncoding:NSUTF8StringEncoding allowLossyConversion:YES];
+              NSString* formattedURL = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
               url = [NSURL URLWithString:formattedURL];
               [formattedURL release];
 		  }
@@ -339,11 +339,11 @@
 
         //We create a placeholder resource that holds the url string
         MAHandle urlHandle = (MAHandle) Base::gSyscall->resources.create_RT_PLACEHOLDER();
-        int size = (int)[url lengthOfBytesUsingEncoding:NSASCIIStringEncoding];
+        int size = (int)[url lengthOfBytesUsingEncoding:NSUTF8StringEncoding];
         Base::MemStream* ms = new Base::MemStream(size);
         Base::gSyscall->resources.add_RT_BINARY(urlHandle, ms);
         ms->seek(Base::Seek::Start, 0);
-        ms->write([url cStringUsingEncoding:NSASCIIStringEncoding], size);
+        ms->write([url cStringUsingEncoding:NSUTF8StringEncoding], size);
 
         eventData->urlData = urlHandle;
         event.data = (MAAddress)eventData;

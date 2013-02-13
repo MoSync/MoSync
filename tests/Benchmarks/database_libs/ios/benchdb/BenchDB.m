@@ -22,12 +22,12 @@
 - (int) submit:(struct BenchResult)br {
 
 	br.revision = "0";
-	br.runtime = [[[[UIDevice currentDevice] systemName] stringByAddingPercentEscapesUsingEncoding: NSASCIIStringEncoding ] cStringUsingEncoding:NSUTF8StringEncoding];
+	br.runtime = [[[[UIDevice currentDevice] systemName] stringByAddingPercentEscapesUsingEncoding: NSUTF8StringEncoding ] cStringUsingEncoding:NSUTF8StringEncoding];
 	br.git_hash = "0";
-	br.phone = [[[[UIDevice currentDevice] name] stringByAddingPercentEscapesUsingEncoding: NSASCIIStringEncoding ] cStringUsingEncoding:NSUTF8StringEncoding];
+	br.phone = [[[[UIDevice currentDevice] name] stringByAddingPercentEscapesUsingEncoding: NSUTF8StringEncoding ] cStringUsingEncoding:NSUTF8StringEncoding];
 ;//[[[UIDevice currentDevice] model] cStringUsingEncoding:NSUTF8StringEncoding];
 	printf("__VERSION__ %s\n", __VERSION__);
-	br.nativeSdkVer = [[[NSString stringWithUTF8String: __VERSION__] stringByAddingPercentEscapesUsingEncoding: NSASCIIStringEncoding ] cStringUsingEncoding:NSUTF8StringEncoding];
+	br.nativeSdkVer = [[[NSString stringWithUTF8String: __VERSION__] stringByAddingPercentEscapesUsingEncoding: NSUTF8StringEncoding ] cStringUsingEncoding:NSUTF8StringEncoding];
 
 	//build url-string
 	NSString *url = [NSString stringWithCString:M_URL encoding:NSUTF8StringEncoding];
