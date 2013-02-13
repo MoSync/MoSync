@@ -507,12 +507,14 @@ namespace Wormhole
 
 		String script = callbackFunction + "(";
 		script += "'" + callbackID + "'";
-		script += "," + successStr;
+		script += ",'" + successStr + "'";
 		script += ",'" + status + "'";
 		script += ",'" + args + "'";
-		script += "," + keepCallbackStr;
+		script += ",'" + keepCallbackStr + "'";
 
 		script += ")";
+
+		lprintfln("callJS: %.*s", 2000, script.c_str());
 
 		callJS(script);
 	}

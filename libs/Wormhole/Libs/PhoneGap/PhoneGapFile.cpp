@@ -1031,7 +1031,14 @@ namespace Wormhole
 		}
 
 		// Get local root path and remove trailing slash, if any.
-		String path = (mMessageHandler->getFileUtil())->getAppPath();
+		FileUtil *fu = mMessageHandler->getFileUtil();
+		// This is a fix for a bug occurring when using the (deprecated)
+		// WebAppMoblet class.
+		if (fu == NULL) {
+			fu = new FileUtil();
+			mMessageHandler->setFileUtil(fu);
+		}
+		String path = fu->getAppPath();
 
 		// If we get just a slash, we won't remove the last slash.
 		// TODO: It is unclear if PhoneGap requires all path names
@@ -1466,7 +1473,6 @@ namespace Wormhole
 		String callbackID = message.getParam("PhoneGapCallBackId");
 
 		String path = message.getArgsField(0);
-		printf("actionRemove: %s", path.c_str());
 
 		int result = FileDeleteFile(path);
 		if (result < 0)

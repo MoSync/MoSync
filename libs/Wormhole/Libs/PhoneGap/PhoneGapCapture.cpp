@@ -146,7 +146,7 @@ namespace Wormhole
 						sizeof(pathBuffer));
 					sprintf(
 						messageBuffer,
-						"{\"message\":[{\"fullPath\":\"%s\",\"name\":\"%s\"}]}",
+						"[{\"fullPath\":\"%s\",\"name\":\"%s\"}]",
 						pathBuffer,
 						FileNameFromPath(pathBuffer));
 					mMessageHandler->callSuccess(
@@ -198,7 +198,7 @@ namespace Wormhole
 						sizeof(pathBuffer));
 					sprintf(
 						messageBuffer,
-						"{\"message\":[{\"fullPath\":\"%s\",\"name\":\"%s\",\"lastModifiedDate\":\"\",\"size\":\"\",\"type\":\"\"}]}",
+						"[{\"fullPath\":\"%s\",\"name\":\"%s\",\"lastModifiedDate\":\"\",\"size\":\"\",\"type\":\"\"}]",
 						pathBuffer,
 						FileNameFromPath(pathBuffer));
 

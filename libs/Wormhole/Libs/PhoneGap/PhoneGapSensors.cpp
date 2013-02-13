@@ -69,7 +69,7 @@ namespace Wormhole
 					message.getParam("PhoneGapCallBackId"),
 					true); // Keep the Accelerometer running
 			}
-			else if (message.getParam("action") == "stopWatch")
+			else if (message.getParam("action") == "stop")
 			{
 				maSensorStop(SENSOR_TYPE_ACCELEROMETER);
 				mAccelerometerWatchStarted = false;

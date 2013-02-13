@@ -279,6 +279,9 @@ namespace Wormhole
 
 		/**
 		 * File system helper object.
+		 * Currently this object is not owned by this class,
+		 * it is not deallocated in the destructor. The
+		 * HybridMoblet sets and deallocates this object.
 		 */
 		FileUtil* mFileUtil;
 	};
