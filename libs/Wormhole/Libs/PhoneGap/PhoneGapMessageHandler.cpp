@@ -26,6 +26,7 @@ MA 02110-1301, USA.
 #include <maapi.h>
 #include <mastdlib.h> // C string conversion functions
 #include <conprint.h>
+#include "../../Encoder.h"
 #include "PhoneGapMessageHandler.h"
 
 namespace Wormhole
@@ -347,11 +348,11 @@ namespace Wormhole
 				"\"version\":\"%s\","
 				"\"cordova\":\"2.3.0\""
 			"}",
-			deviceOS,
-			deviceName,
+			Encoder::JSONStringify(deviceOS).c_str(),
+			Encoder::JSONStringify(deviceName).c_str(),
 			deviceModel,
-			deviceUUID,
-			deviceOSVersion
+			Encoder::JSONStringify(deviceUUID).c_str(),
+			Encoder::JSONStringify(deviceOSVersion).c_str()
 			);
 
 		callSuccess(
