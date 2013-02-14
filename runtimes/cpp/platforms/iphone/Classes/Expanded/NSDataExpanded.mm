@@ -56,7 +56,7 @@
         output[index + 3] = (i + 2) < length ? table[(value >> 0) & 0x3f] : '=';
     }
 
-    return [[[NSString alloc] initWithData:data encoding:NSASCIIStringEncoding] autorelease];
+    return [[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding] autorelease];
 }
 
 @end
