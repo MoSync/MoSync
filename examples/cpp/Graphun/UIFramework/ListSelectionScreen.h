@@ -33,6 +33,7 @@ public:
 	void addStrings(Vector<String>& items);
 
 	virtual void listboxItemSelected(UIItem* item, int index);
+	void requestListFocus();
 protected:
 	Widget* mListView;
 };

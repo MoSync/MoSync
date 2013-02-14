@@ -3964,7 +3964,7 @@ group CameraFunctions "Camera Functions" {
 
 		/**
 		 * Add a notification item.
-		 * @deprecated use maNotificationCreate instead.
+		 * @deprecated use #maNotificationLocalCreate instead.
 		 * Note that there can only be one notification of type
 		 * #NOTIFICATION_TYPE_APPLICATION_LAUNCHER. Additional notification
 		 * types may be added in the future. This syscall is available
@@ -5833,6 +5833,7 @@ group NotificationAPI "Notification API" {
 			/**
 			* For local notifications: if set, the incoming notifications will be displayed to
 			* the user only if the application is in background.
+			* @deprecated for local notifications.
 			* For push notifications: if set, the incoming notifications will be displayed to
 			* the user only if the application is not in use.
 			* Note that the received push notification event will always be received regardless
@@ -6028,6 +6029,7 @@ group NotificationAPI "Notification API" {
 
 			/**
 			* @brief Set the display flag applied to the local notification.
+			* @deprecated. Not required anymore, since the local notification is received regardless of the applications's state.
 			* Note the regardless of this flag, the #EVENT_TYPE_LOCAL_NOTIFICATION event will be received.
 			* Platform: Android.
 			*
@@ -6214,6 +6216,7 @@ group NotificationAPI "Notification API" {
 
 		/**
 		* \brief Schedules a local notification for delivery at its encapsulated date and time.
+		* The local notification is displayed regardless of the applications's state.
 		* By default, the notifications are displayed to the user only if the application is
 		* in background. But on Android you can configure this by setting the
 		* #MA_NOTIFICATION_LOCAL_DISPLAY_FLAG property.
