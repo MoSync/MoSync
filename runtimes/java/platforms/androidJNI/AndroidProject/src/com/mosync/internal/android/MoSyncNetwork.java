@@ -658,7 +658,7 @@ public class MoSyncNetwork
 		// Check that the address is valid.
 		if (null == addr || 6 != addr.length)
 		{
-			return -1;
+			return CONNERR_INTERNAL;
 		}
 
 		// Write family.
@@ -679,20 +679,35 @@ public class MoSyncNetwork
 	int copyInetAddressToMemory(int addrPointer, int port, byte[] addr)
 	{
 		// Check that the address is valid.
-		if (null == addr || 4 != addr.length)
-		{
-			return -1;
+		if(addr == null) {
+			Log.i("copyInetAddressToMemory", "null");
+			return CONNERR_INTERNAL;
 		}
+		if(addr.length == 4) {
+			// Write family.
+			copyIntToMemory(addrPointer, CONN_FAMILY_INET4);
 
-		// Write family.
-		copyIntToMemory(addrPointer, CONN_FAMILY_INET4);
+			// Write address.
+			copyIntToMemory(addrPointer + 4, inet4AddressAsInt(addr));
 
-		// Write address.
-		copyIntToMemory(addrPointer + 4, inet4AddressAsInt(addr));
+			// Write port.
+			copyIntToMemory(addrPointer + 8, port);
+		} else if(addr.length == 16) {
+			// Write family.
+			copyIntToMemory(addrPointer, CONN_FAMILY_INET6);
 
-		// Write port.
-		copyIntToMemory(addrPointer + 8, port);
+			// Write port.
+			copyIntToMemory(addrPointer + 4, port);
 
+			// Write address.
+			copyBytesToMemory(addrPointer + 8, addr);
+		} else {
+			Log.i("copyInetAddressToMemory", "len: "+addr.length);
+			for(int i=0; i<addr.length; i++) {
+				Log.i(""+i, ""+((int)addr[i] & 0xff));
+			}
+			return CONNERR_INTERNAL;
+		}
 		return 1;
 	}
 
@@ -1943,7 +1958,7 @@ public class MoSyncNetwork
 					return CONNERR_GENERIC;
 				}
 
-				Log.i("DatagramConnectionObject", "getAddr port: "+port);
+				Log.i("DatagramConnectionObject", "getAddr host: "+inetAddr.getHostAddress()+" port: "+port);
 
 				return mMoSyncNetwork.copyInetAddressToMemory(
 					addrPointer,

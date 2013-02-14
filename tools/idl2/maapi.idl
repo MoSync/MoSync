@@ -932,6 +932,14 @@ interface MAAPI {
 		int port;
 	}
 
+	/**
+	* \brief An address for the protocols TCP or UDP over IPv6.
+	*/
+	struct MAConnAddrInet6 {
+		int port;
+		byte addr[16];
+	}
+
 	constset int BTADDR_ {
 		LEN = 6;
 	}
@@ -955,6 +963,7 @@ interface MAAPI {
 	constset int CONN_FAMILY_ {
 		INET4 = 1;
 		BT = 2;
+		INET6 = 3;
 	}
 
 	/**
@@ -966,6 +975,7 @@ interface MAAPI {
 		union {
 			MAConnAddrInet4 inet4;
 			MAConnAddrBt bt;
+			MAConnAddrInet6 inet6;
 		}
 	}
 

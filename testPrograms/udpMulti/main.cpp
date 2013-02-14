@@ -26,6 +26,8 @@ MA 02110-1301, USA.
 #include <conprint.h>
 #include <maassert.h>
 #include <mastdlib.h>
+#include <mastring.h>
+#include <inet_ntop.h>
 
 using namespace MAUtil;
 
@@ -53,18 +55,23 @@ static u16 ntohs(u16 x) {
 	return (x << 8) | (x >> 8);
 }
 
-static void dumpInet4Addr(const char* name, const MAConnAddr& addr) {
-	if(addr.family != CONN_FAMILY_INET4) {
+static void dumpInetAddr(const char* name, const MAConnAddr& addr) {
+	if(addr.family == CONN_FAMILY_INET4) {
+		int b = addr.inet4.addr;
+		printf("%s: %i.%i.%i.%i:%i\n", name,
+			(b >> 24) & 0xff,
+			(b >> 16) & 0xff,
+			(b >> 8) & 0xff,
+			(b) & 0xff,
+			addr.inet4.port);
+	} else if(addr.family == CONN_FAMILY_INET6) {
+		char buf[128];
+		inet_ntop6(addr.inet6.addr, buf, sizeof(buf));
+		printf("%s: %s:%i", name, buf, addr.inet6.port);
+	} else {
 		printf("family: %i\n", addr.family);
 		return;
 	}
-	int b = addr.inet4.addr;
-	printf("%s: %i.%i.%i.%i:%i\n", name,
-		(b >> 24) & 0xff,
-		(b >> 16) & 0xff,
-		(b >> 8) & 0xff,
-		(b) & 0xff,
-		addr.inet4.port);
 }
 
 class MyMoblet : public Moblet, private ConnectionListener {
@@ -90,7 +97,7 @@ public:
 		if(res < 0) {
 			printf("getAddr: %i\n", res);
 		} else {
-			dumpInet4Addr("local", a);
+			dumpInetAddr("local", a);
 		}
 		start(EXAMPLE_DOMAIN);
 	}
@@ -142,7 +149,7 @@ public:
 		if(result < 0) {
 			return;
 		}
-		dumpInet4Addr("sender", mAddress);
+		dumpInetAddr("sender", mAddress);
 		parseReply(result);
 		mInProgress = false;
 		if(mRepeat)
