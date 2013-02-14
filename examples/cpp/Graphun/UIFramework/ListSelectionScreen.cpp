@@ -15,7 +15,8 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301, USA.
 */
-
+#include <ma.h>
+#include <IX_WIDGET.h>
 #include "ListSelectionScreen.h"
 
 namespace MoSync {
@@ -42,6 +43,11 @@ namespace UI {
 
 	void ListSelectionScreen::listboxItemSelected(UIItem* item, int index) {
 
+	}
+
+	void ListSelectionScreen::requestListFocus()
+	{
+		maWidgetSetProperty(mListView->getHandle(), MAW_LIST_VIEW_REQUEST_FOCUS, "true");
 	}
 }
 }

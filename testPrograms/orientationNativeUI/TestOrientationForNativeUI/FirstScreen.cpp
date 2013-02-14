@@ -59,7 +59,8 @@ namespace OrientationTest
 		mOrientationLabel(NULL),
 		mSetOrientationDescriptionLabel(NULL),
 		mSetOrientationButton(NULL),
-		mOrientationOptionsListView(NULL)
+		mOrientationOptionsListView(NULL),
+		mOrientationChangesCount(0)
 	{
 		this->setTitle(SCREEN_TITLE);
 
@@ -397,6 +398,21 @@ namespace OrientationTest
 			case MA_SCREEN_ORIENTATION_LANDSCAPE_RIGHT:
 				orientationText = ORIENTATION_LANDSCAPE_RIGHT;
 				break;
+			default:
+			{
+				// maScreenGetCurrentOrientation is not yet implemented on Android.
+				mOrientationChangesCount ++;
+				if (mOrientationChangesCount > 0)
+				{
+					orientationText = "Orientation changed " +
+							MAUtil::integerToString(mOrientationChangesCount) + " times";
+				}
+				else
+				{
+					orientationText = "Orientation changed 1 time";
+				}
+				break;
+			}
 		}
 		return orientationText;
 	}
