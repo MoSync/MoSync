@@ -18,6 +18,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define NET_ERRORS(m)\
 	m(280001, ERR_HTTP_METHOD_INVALID, "HTTP method invalid")\
 	m(280002, ERR_HTTP_READONLY_WRITE, "Attempted to write to a read-only HTTP connection")\
-	m(280003, ERR_URL_SPACE, "Whitespace is not allowed in URLs")
+	m(280003, ERR_URL_SPACE, "Whitespace is not allowed in URLs")\
+	m(280004, ERR_CONN_READFROM, "readFrom not allowed on this connection")\
+	m(280005, ERR_CONN_WRITETO, "writeTo not allowed on this connection")\
 
 DECLARE_ERROR_ENUM(NET)

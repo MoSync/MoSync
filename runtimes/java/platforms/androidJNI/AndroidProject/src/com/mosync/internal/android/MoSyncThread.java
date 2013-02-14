@@ -4022,6 +4022,16 @@ public class MoSyncThread extends Thread
 		mMoSyncNetwork.maConnWrite(connHandle, src, size);
 	}
 
+	void maConnReadFrom(int connHandle, int dst, int size, int src)
+	{
+		mMoSyncNetwork.maConnReadFrom(connHandle, dst, size, src);
+	}
+
+	void maConnWriteTo(int connHandle, int src, int size, int dst)
+	{
+		mMoSyncNetwork.maConnWriteTo(connHandle, src, size, dst);
+	}
+
 	void maConnReadToData(int connHandle, int data, int offset, int size)
 	{
 		mMoSyncNetwork.maConnReadToData(connHandle, data, offset, size);
