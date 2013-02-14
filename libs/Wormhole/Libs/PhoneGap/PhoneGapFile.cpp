@@ -1111,7 +1111,7 @@ namespace Wormhole
 		String callbackID = message.getParam("PhoneGapCallBackId");
 
 		String fullPath = message.getArgsField(0);
-		String path = message.getArgsField(0);
+		String path = message.getArgsField(1);
 		String fullFilePath = fullPath + "/" + path;
 
 		// Get flags "create" and "exclusive".

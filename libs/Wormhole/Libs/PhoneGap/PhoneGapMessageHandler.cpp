@@ -341,11 +341,11 @@ namespace Wormhole
 		// Send the result back to PhoneGap.
 		sprintf(buffer,
 			"{"
-				"\"platform\":\"%s\","
-				"\"name\":\"%s\","
+				"\"platform\":%s,"
+				"\"name\":%s,"
 				"\"model\":\"%s\","
-				"\"uuid\":\"%s\","
-				"\"version\":\"%s\","
+				"\"uuid\":%s,"
+				"\"version\":%s,"
 				"\"cordova\":\"2.3.0\""
 			"}",
 			Encoder::JSONStringify(deviceOS).c_str(),

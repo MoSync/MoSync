@@ -2,7 +2,7 @@
 
 // commit d4c25559adbeb6ed4eaae934e6805edb182ba35f
 
-// File generated at :: Wed Feb 13 2013 10:56:52 GMT+0100 (CET)
+// File generated at :: Thu Feb 14 2013 11:46:08 GMT+0100 (CET)
 
 /*
  Licensed to the Apache Software Foundation (ASF) under one
@@ -1099,6 +1099,14 @@ define("cordova/platform", function(require, exports, module) {
 module.exports = {
 	id: "mosync",
 	initialize:function() {
+		var channel = require("cordova/channel"),
+			cordova = require('cordova'),
+			exec = require('cordova/exec'),
+			modulemapper = require('cordova/modulemapper');
+
+		modulemapper.loadMatchingModules(/cordova.*\/symbols$/);
+		modulemapper.mapModules(window);
+
 		console.log('Initializing Cordova MoSync platform.');
 	},
 	clobbers: {
@@ -1108,57 +1116,6 @@ module.exports = {
 					path:"cordova/plugin/mosync/geolocation"
 				}
 			}
-		},
-		ConfigurationData:{
-			path:"cordova/plugin/ConfigurationData"
-		},
-		DirectoryEntry:{
-			path:"cordova/plugin/DirectoryEntry"
-		},
-		DirectoryReader:{
-			path:"cordova/plugin/DirectoryReader"
-		},
-		File:{
-			path:"cordova/plugin/File"
-		},
-		FileReader:{
-			path:"cordova/plugin/FileReader"
-		},
-		FileEntry:{
-			path:"cordova/plugin/FileEntry"
-		},
-		FileError:{
-			path:"cordova/plugin/FileError"
-		},
-		FileSystem:{
-			path:"cordova/plugin/FileSystem"
-		},
-		FileTransfer:{
-			path:"cordova/plugin/FileTransfer"
-		},
-		FileTransferError:{
-			path:"cordova/plugin/FileTransferError"
-		},
-		FileUploadOptions:{
-			path:"cordova/plugin/FileUploadOptions"
-		},
-		FileUploadResult:{
-			path:"cordova/plugin/FileUploadResult"
-		},
-		FileWriter:{
-			path:"cordova/plugin/FileWriter"
-		},
-		Flags:{
-			path:"cordova/plugin/Flags"
-		},
-		LocalFileSystem:{
-			path:"cordova/plugin/LocalFileSystem"
-		},
-		Metadata:{
-			path:"cordova/plugin/Metadata"
-		},
-		requestFileSystem:{
-			path:"cordova/plugin/requestFileSystem"
 		}
 	},
 	merges: {
@@ -4323,14 +4280,14 @@ module.exports = function(successCallback, errorCallback, message, forceAsync) {
 
 });
 
-// file: lib/common/plugin/file/symbols.js
+// file: lib/mosync/plugin/file/symbols.js
 define("cordova/plugin/file/symbols", function(require, exports, module) {
 
 
 var modulemapper = require('cordova/modulemapper'),
     symbolshelper = require('cordova/plugin/file/symbolshelper');
 
-symbolshelper(modulemapper.defaults);
+symbolshelper(modulemapper.clobbers);
 
 });
 
