@@ -397,6 +397,28 @@ public class MoSyncNetwork
 		connObj.write(src, size);
 	}
 
+	void maConnReadFrom(int connHandle, int dst, int size, int src)
+	{
+		SYSLOG("maConnRead connHandle:" + connHandle +
+			" dst:" + dst + " size:" + size + " src:" + src);
+
+		MYASSERT(size > 0);
+
+		ConnectionObject connObj = getConnectionObject(connHandle);
+		connObj.readFrom(dst, size, src);
+	}
+
+	void maConnWriteTo(int connHandle, int src, int size, int dst)
+	{
+		SYSLOG("maConnWrite connHandle:" + connHandle +
+			" src:" + src + " size:" + size + " dst:" + dst);
+
+		MYASSERT(size > 0);
+
+		ConnectionObject connObj = getConnectionObject(connHandle);
+		connObj.writeTo(src, size, dst);
+	}
+
 	void maConnReadToData(int connHandle, int data, int offset, int size)
 	{
 		// TODO: Remove Log.i() printout when debugging is done.
@@ -636,7 +658,7 @@ public class MoSyncNetwork
 		// Check that the address is valid.
 		if (null == addr || 6 != addr.length)
 		{
-			return -1;
+			return CONNERR_INTERNAL;
 		}
 
 		// Write family.
@@ -657,20 +679,35 @@ public class MoSyncNetwork
 	int copyInetAddressToMemory(int addrPointer, int port, byte[] addr)
 	{
 		// Check that the address is valid.
-		if (null == addr || 4 != addr.length)
-		{
-			return -1;
+		if(addr == null) {
+			Log.i("copyInetAddressToMemory", "null");
+			return CONNERR_INTERNAL;
 		}
+		if(addr.length == 4) {
+			// Write family.
+			copyIntToMemory(addrPointer, CONN_FAMILY_INET4);
 
-		// Write family.
-		copyIntToMemory(addrPointer, CONN_FAMILY_INET4);
+			// Write address.
+			copyIntToMemory(addrPointer + 4, inet4AddressAsInt(addr));
 
-		// Write address.
-		copyIntToMemory(addrPointer + 4, inet4AddressAsInt(addr));
+			// Write port.
+			copyIntToMemory(addrPointer + 8, port);
+		} else if(addr.length == 16) {
+			// Write family.
+			copyIntToMemory(addrPointer, CONN_FAMILY_INET6);
 
-		// Write port.
-		copyIntToMemory(addrPointer + 8, port);
+			// Write port.
+			copyIntToMemory(addrPointer + 4, port);
 
+			// Write address.
+			copyBytesToMemory(addrPointer + 8, addr);
+		} else {
+			Log.i("copyInetAddressToMemory", "len: "+addr.length);
+			for(int i=0; i<addr.length; i++) {
+				Log.i(""+i, ""+((int)addr[i] & 0xff));
+			}
+			return CONNERR_INTERNAL;
+		}
 		return 1;
 	}
 
@@ -680,10 +717,10 @@ public class MoSyncNetwork
 	int inet4AddressAsInt(byte[] addr)
 	{
 		return
-			(((int)addr[0]) << 24) |
-			(((int)addr[1]) << 16) |
-			(((int)addr[2]) << 8) |
-			((int)addr[3]);
+			(((int)addr[0] & 0xff) << 24) |
+			(((int)addr[1] & 0xff) << 16) |
+			(((int)addr[2] & 0xff) << 8) |
+			((int)addr[3] & 0xff);
 	}
 
 	/**
@@ -783,6 +820,15 @@ public class MoSyncNetwork
 
 		void write(byte[] data) throws IOException {
 			getOutputStream().write(data);
+		}
+
+		// returns the number of bytes actually read.
+		int readFrom(byte[] data, int src) throws IOException {
+			throw new BigPhatError("readFrom: Wrong connection type");
+		}
+
+		void writeTo(byte[] data, int dst) throws IOException {
+			throw new BigPhatError("writeTo: Wrong connection type");
 		}
 
 		/**
@@ -911,6 +957,85 @@ public class MoSyncNetwork
 
 						// Write byte array to stream.
 						write(data);
+
+						// Post event.
+						postResultEvent(opType, 1); // Success
+					}
+					catch (Exception ex)
+					{
+						ex.printStackTrace();
+						postResultEvent(opType, CONNERR_GENERIC);
+					}
+				}
+			});
+		}
+
+		public void readFrom(final int dst, final int size, final int src)
+		{
+			final int opType = CONNOP_READ;
+
+			enterStateRead();
+			// Must have an input stream.
+			assertInputStream();
+
+			sConnectionThreadPool.execute(new Runnable()
+			{
+				public final void run()
+				{
+					try
+					{
+						// Read data into a byte array.
+						byte[] bytes = new byte[size];
+						int result = readFrom(bytes, src);
+
+						if (result > 0)
+						{
+							// Store data in memory at address dst.
+							mMoSyncNetwork.copyBytesToMemory(
+								dst, bytes, 0, result);
+
+							postResultEvent(opType, result);
+						}
+						else if (result == -1)
+						{
+							postResultEvent(opType, CONNERR_CLOSED);
+						}
+						else
+						{
+							postResultEvent(opType, CONNERR_INTERNAL);
+						}
+					}
+					catch (Exception ex)
+					{
+						ex.printStackTrace();
+						postResultEvent(opType, CONNERR_GENERIC);
+					}
+				}
+			});
+		}
+
+		public void writeTo(final int src, final int size, final int dst)
+		{
+			final int opType = CONNOP_WRITE;
+
+			enterStateWrite();
+			// Must have an output stream.
+			assertOutputStream();
+
+			sConnectionThreadPool.execute(new Runnable()
+			{
+				public final void run()
+				{
+					try
+					{
+						// Byte array with data to write.
+						byte[] data = new byte[size];
+
+						// Get data to write.
+						mMoSyncNetwork.readBytesFromMemory(src, data);
+
+						// Write byte array to stream.
+						writeTo(data, dst);
 
 						// Post event.
 						postResultEvent(opType, 1); // Success
@@ -1565,6 +1690,10 @@ public class MoSyncNetwork
 			super(network);
 		}
 
+		public int defaultPort() {
+			return 80;
+		}
+
 		/**
 		 * Initialize the connection object.
 		 */
@@ -1581,13 +1710,18 @@ public class MoSyncNetwork
 			String realUrl = url.substring(realUrlStart + 3);
 			String[] splitUrl = realUrl.split("\\b:\\d{1,5}\\b");
 
+			Log.i("ConnectionObject::create", "realUrl: "+realUrl);
+			for(int i=0; i<splitUrl.length; i++) {
+				Log.i("ConnectionObject::create", "splitUrl["+i+"]: "+splitUrl[i]);
+			}
+
 			if (splitUrl.length > 2)
 			{
 				throw new MalformedURLException("Malformed URL: " + url);
 			}
 
 			String newUrl = splitUrl[0];
-			int port = 80;
+			int port;
 			if (splitUrl.length == 2)
 			{
 				int end =
@@ -1598,10 +1732,20 @@ public class MoSyncNetwork
 						splitUrl[0].length() + 1, end)).intValue();
 				newUrl += splitUrl[1];
 			}
+			else if(splitUrl.length == 1 && splitUrl[0].length() > 0)
+			{
+				String p;
+				if(realUrl.charAt(0) == ':') {
+					p = realUrl.substring(1);
+					newUrl = "";
+				} else {
+					p = realUrl.substring(splitUrl[0].length() + 1);
+				}
+				port = Integer.parseInt(p);
+			}
 			else
 			{
-				port = Integer.valueOf(
-					realUrl.substring(splitUrl[0].length() + 1)).intValue();
+				port = defaultPort();
 			}
 
 			mSocketAddress = newUrl;
@@ -1746,6 +1890,88 @@ public class MoSyncNetwork
 			throw new IOException("DatagramConnectionObject.setSocketAndOpenStreams");
 		}
 
+		@Override
+		public int defaultPort() {
+			return 0;
+		}
+
+		@Override
+		public int connect()
+		{
+			if(!mSocketAddress.isEmpty())
+				return super.connect();
+
+			try
+			{
+				Log.i("@@DatagramConnectionObject",
+					"mSocketPort: " + mSocketPort);
+				if(mSocketPort == 0)
+					mDSocket = new DatagramSocket();
+				else
+					mDSocket = new DatagramSocket(mSocketPort);
+				if (null == mDSocket)
+				{
+					return CONNERR_GENERIC;
+				}
+
+				// Important to do this last.
+				mMoSyncNetwork.addConnectionObject(this);
+			}
+			catch (Exception ex)
+			{
+				Log.e("@@DatagramConnectionObject",
+					"Exception in connect, handle: " + mHandle +
+					" exception: " + ex);
+				ex.printStackTrace();
+				return CONNERR_GENERIC;
+			}
+			return RES_OK; // Success
+		}
+
+		@Override
+		public int getAddr(int addrPointer)
+		{
+			try
+			{
+				if (null == mDSocket)
+				{
+					return CONNERR_GENERIC;
+				}
+
+				// Get the IP adress of the socket.
+				InetAddress inetAddr;
+				int port;
+
+				if(mSocketAddress.isEmpty())
+				{
+					inetAddr = mDSocket.getLocalAddress();
+					port = mDSocket.getLocalPort();
+				}
+				else
+				{
+					inetAddr = mDSocket.getInetAddress();
+					port = mDSocket.getPort();
+				}
+
+				if (null == inetAddr)
+				{
+					return CONNERR_GENERIC;
+				}
+
+				Log.i("DatagramConnectionObject", "getAddr host: "+inetAddr.getHostAddress()+" port: "+port);
+
+				return mMoSyncNetwork.copyInetAddressToMemory(
+					addrPointer,
+					port,
+					inetAddr.getAddress());
+			}
+			catch (Exception ex)
+			{
+				ex.printStackTrace();
+				return CONNERR_GENERIC;
+			}
+		}
+
 		void doConnect()
 		{
 			try
@@ -1807,6 +2033,40 @@ public class MoSyncNetwork
 
 		void write(byte[] src) throws IOException {
 			DatagramPacket dp = new DatagramPacket(src, src.length);
+			mDSocket.send(dp);
+		}
+
+		int readFrom(byte[] dst, int src) throws IOException {
+			DatagramPacket dp = new DatagramPacket(dst, dst.length);
+			mDSocket.receive(dp);
+			Log.i("DatagramConnectionObject", "readFrom addr: "+dp.getAddress().getHostAddress());
+			if(mMoSyncNetwork.copyInetAddressToMemory(src, dp.getPort(), dp.getAddress().getAddress()) < 0)
+				return CONNERR_GENERIC;
+			return dp.getLength();
+		}
+
+		void writeTo(byte[] src, int dst) throws IOException {
+			DatagramPacket dp = new DatagramPacket(src, src.length);
+
+			// set dp address/port
+			int family = mMoSyncNetwork.readIntFromMemory(dst);
+			if(family != CONN_FAMILY_INET4)
+				throw new BigPhatError("writeTo family");
+
+			byte[] a = new byte[4];
+			mMoSyncNetwork.readBytesFromMemory(dst + 4, a);
+			// byte array is in host order; gotta reverse it.
+			byte b = a[0];
+			a[0] = a[3];
+			a[3] = b;
+			b = a[1];
+			a[1] = a[2];
+			a[2] = b;
+			dp.setAddress(InetAddress.getByAddress(a));
+
+			int port = mMoSyncNetwork.readIntFromMemory(dst + 8);
+			dp.setPort(port);
+
 			mDSocket.send(dp);
 		}
 	} // End of class DatagramConnectionObject

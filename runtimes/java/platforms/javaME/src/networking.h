@@ -162,6 +162,39 @@ public class MADatagramConn extends MAConn {
 	}
 }
 
+public class MAUdpConn extends MAConn {
+	UDPDatagramConnection dConn;
+	Address src;
+	String dst;
+
+	MAUdpConn(MAHandle h) {
+		super(h);
+	}
+	final void prepareRead() {
+	}
+	final int recv(byte[] bytes, int offset, int size) throws IOException {
+		Datagram d = dConn.newDatagram(bytes, size);
+		d.setData(bytes, offset, size);
+		dConn.receive(d);
+		String a = d.getAddress();
+		WINT(src, CONN_FAMILY_INET4);
+		// convert textual ip address to int.
+		int c = a.indexOf(':', 11);
+		int host = parseIpv4(a, 11, c);
+		int port = Integer.parseInt(a.substring(c+1));
+		WINT(src+4, host);
+		WINT(src+8, port);
+		return d.getLength();
+	}
+
+	final void write(byte[] bytes, int offset, int size) throws IOException {
+		Datagram d = dConn.newDatagram(bytes, size);
+		d.setData(bytes, offset, size);
+		d.setAddress(dst);
+		dConn.send(d);
+	}
+}
+
 #else	//stream connections only
 
 #define MAStreamConn MAConn
