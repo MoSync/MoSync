@@ -183,9 +183,6 @@ namespace MoSync
                 mButton.HorizontalAlignment = HorizontalAlignment.Left;
                 mButton.VerticalAlignment = VerticalAlignment.Top;
 
-                fillSpaceVerticalyEnabled = false;
-                fillSpaceHorizontalyEnabled = false;
-
                 mButton.BorderThickness = new Thickness(0.0);
                 mButton.Margin = new Thickness(0.0);
                 mGrid.Margin = new Thickness(0.0);
