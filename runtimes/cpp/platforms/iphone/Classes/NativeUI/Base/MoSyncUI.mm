@@ -342,10 +342,10 @@ static IWidget* sOldScreen = nil;
 
     ScreenWidget* screen = (ScreenWidget*)widget;
 
-    int screenTransitionResult = ScreenTransitionsUtils::doScreenTransition(mainWindow,
-                                                                            screen,
-                                                                            transitionType,
-                                                                            transitionDuration);
+    int screenTransitionResult = [ScreenTransitionsUtils doScreenTransition:mainWindow
+                                                                   toScreen:screen
+                                                         withTransitionType:transitionType
+                                                      andTransitionDuration:transitionDuration];
 
     // Case1: If the screen transition type is not available on iOS do show without
     // screen transition and return corresponding code error.

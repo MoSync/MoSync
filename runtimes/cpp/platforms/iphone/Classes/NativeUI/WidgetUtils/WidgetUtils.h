@@ -61,7 +61,26 @@ namespace Base
 #pragma mark -
 #pragma mark Screen Transitions Utils
 
-namespace ScreenTransitionsUtils
-{
-    int doScreenTransition(UIWindow* aWindow, ScreenWidget* aScreenWidget, NSNumber* aScreenTransitionType, NSNumber* aScreenTransitionDuration);
-}
+@interface ScreenTransitionsUtils : NSObject
+
+/**
+ * Switches two screen/views using animated transitions.
+ *
+ * @param aWindow The source UIWindow containg the current view.
+ * @param aScreenWidget The screen that needs to be shown next using animated transition.
+ * @param aScreenTransitionType The screen transition type used in the switch.
+ * @param aScreenTransitionDuration The duration of the animated transitions in milliseconds.
+ *
+ * @returns Any of the following result codes:
+ * - MAW_RES_OK if the screen could be shown.
+ * - MAW_RES_INVALID_SCREEN_TRANSITION_TYPE if the screen transition type is not available
+ * on the running platform.
+ * - MAW_RES_INVALID_SCREEN_TRANSITION_DURATION if the value representing the
+ * duration of the screen transition is invalid.
+ */
++(int) doScreenTransition:(UIWindow* )aWindow
+                 toScreen:(ScreenWidget*) aScreenWidget
+       withTransitionType:(NSNumber*) aScreenTransitionType
+    andTransitionDuration:(NSNumber*) aScreenTransitionDuration;
+
+@end

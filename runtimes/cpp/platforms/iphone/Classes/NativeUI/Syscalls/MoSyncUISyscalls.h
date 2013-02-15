@@ -125,11 +125,11 @@ int maWidgetScreenShow(MAWidgetHandle screenHandle);
  * Shows a screen with a transition. If native UI hasn't been initialized, it is also initialized
  * and disables regular MoSync drawing.
  *
- * \param screenHandle The handle to the screen.
- * \param screenTransitionType The transition of the screen.
- * \param screenTransitionDuration The duration of the transition.
+ * @param screenHandle The handle to the screen.
+ * @param screenTransitionType The transition of the screen.
+ * @param screenTransitionDuration The duration of the transition.
  *
- * \returns Any of the following result codes:
+ * @returns Any of the following result codes:
  * - MAW_RES_OK if the screen could be shown.
  * - MAW_RES_INVALID_HANDLE if the screenHandle is invalid.
  * - MAW_RES_INVALID_SCREEN if the screenHandle is not a handle to a screen.
