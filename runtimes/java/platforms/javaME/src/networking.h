@@ -173,6 +173,7 @@ public class MAUdpConn extends MAConn {
 	final void prepareRead() {
 	}
 	final int recv(byte[] bytes, int offset, int size) throws IOException {
+		INIT_MEMDS;
 		Datagram d = dConn.newDatagram(bytes, size);
 		d.setData(bytes, offset, size);
 		dConn.receive(d);

@@ -204,6 +204,7 @@ NETSYSCALL(void) maConnReadFrom(MAHandle conn, Address dst, int size, Address sr
 
 NETSYSCALL(void) maConnWriteTo(MAHandle conn, Address src, int size, Address dst) throws IOException {
 	DEBUG_CONN("ConnWriteTo "+conn+", "+size+"\n");
+	INIT_MEMDS;
 	MYASSERT(RINT(dst) == CONN_FAMILY_INET4);
 	int a = RINT(dst + 4);
 	int port = RINT(dst + 8);

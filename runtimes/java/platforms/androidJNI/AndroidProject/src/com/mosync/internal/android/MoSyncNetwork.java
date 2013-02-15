@@ -415,8 +415,45 @@ public class MoSyncNetwork
 
 		MYASSERT(size > 0);
 
+		// set dp address/port
+		int port;
+		InetAddress addr;
+		int family = readIntFromMemory(dst);
+		try {
+			if(family == CONN_FAMILY_INET4)
+			{
+				byte[] a = new byte[4];
+				readBytesFromMemory(dst + 4, a);
+				// byte array is in host order; gotta reverse it.
+				byte b = a[0];
+				a[0] = a[3];
+				a[3] = b;
+				b = a[1];
+				a[1] = a[2];
+				a[2] = b;
+				addr = InetAddress.getByAddress(a);
+
+				port = readIntFromMemory(dst + 8);
+			}
+			else if(family == CONN_FAMILY_INET6)
+			{
+				port = readIntFromMemory(dst + 4);
+				byte[] a = new byte[16];
+				readBytesFromMemory(dst + 8, a);
+				addr = InetAddress.getByAddress(a);
+			}
+			else
+			{
+				Log.i("writeTo family", ""+family);
+				throw new BigPhatError("writeTo family");
+			}
+		} catch(UnknownHostException e) {
+			e.printStackTrace();
+			throw new BigPhatError("UnknownHostException");
+		}
+
 		ConnectionObject connObj = getConnectionObject(connHandle);
-		connObj.writeTo(src, size, dst);
+		connObj.writeTo(src, size, addr, port);
 	}
 
 	void maConnReadToData(int connHandle, int data, int offset, int size)
@@ -827,7 +864,7 @@ public class MoSyncNetwork
 			throw new BigPhatError("readFrom: Wrong connection type");
 		}
 
-		void writeTo(byte[] data, int dst) throws IOException {
+		void writeTo(byte[] data, InetAddress addr, int port) throws IOException {
 			throw new BigPhatError("writeTo: Wrong connection type");
 		}
 
@@ -1014,7 +1051,7 @@ public class MoSyncNetwork
 			});
 		}
 
-		public void writeTo(final int src, final int size, final int dst)
+		public void writeTo(final int src, final int size, final InetAddress addr, final int port)
 		{
 			final int opType = CONNOP_WRITE;
 
@@ -1035,7 +1072,7 @@ public class MoSyncNetwork
 						mMoSyncNetwork.readBytesFromMemory(src, data);
 
 						// Write byte array to stream.
-						writeTo(data, dst);
+						writeTo(data, addr, port);
 
 						// Post event.
 						postResultEvent(opType, 1); // Success
@@ -2045,28 +2082,10 @@ public class MoSyncNetwork
 			return dp.getLength();
 		}
 
-		void writeTo(byte[] src, int dst) throws IOException {
+		void writeTo(byte[] src, InetAddress addr, int port) throws IOException {
 			DatagramPacket dp = new DatagramPacket(src, src.length);
-
-			// set dp address/port
-			int family = mMoSyncNetwork.readIntFromMemory(dst);
-			if(family != CONN_FAMILY_INET4)
-				throw new BigPhatError("writeTo family");
-
-			byte[] a = new byte[4];
-			mMoSyncNetwork.readBytesFromMemory(dst + 4, a);
-			// byte array is in host order; gotta reverse it.
-			byte b = a[0];
-			a[0] = a[3];
-			a[3] = b;
-			b = a[1];
-			a[1] = a[2];
-			a[2] = b;
-			dp.setAddress(InetAddress.getByAddress(a));
-
-			int port = mMoSyncNetwork.readIntFromMemory(dst + 8);
+			dp.setAddress(addr);
 			dp.setPort(port);
-
 			mDSocket.send(dp);
 		}
 	} // End of class DatagramConnectionObject
