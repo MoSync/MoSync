@@ -149,8 +149,13 @@ public class StackScreenWidget extends ScreenWidget
 	 */
 	public void push(ScreenWidget screen)
 	{
-		ScreenTransitions.applyScreenTransition(screen.getView(),
-				m_pushTransitionType, m_pushTransitionDuration);
+		// Do not animate the first push since this is already animated
+		// by the show of the stack screen (if shown with transition).
+		if ( 0 != m_screenStack.size() )
+		{
+			ScreenTransitions.applyScreenTransition(screen.getView(),
+					m_pushTransitionType, m_pushTransitionDuration);
+		}
 
 		m_screenStack.push( screen );
 
