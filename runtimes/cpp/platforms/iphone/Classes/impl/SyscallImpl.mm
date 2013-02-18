@@ -777,16 +777,16 @@ namespace Base {
         //buffer must be large enough to hold the string
         //lenghtOfBytes does not include terminating '\0',
         //That's why we use less or equal
-        if(!fontName || bufferLength<=[fontName lengthOfBytesUsingEncoding:NSASCIIStringEncoding])
+        if(!fontName || bufferLength<=[fontName lengthOfBytesUsingEncoding:NSUTF8StringEncoding])
         {
             return RES_FONT_INSUFFICIENT_BUFFER;
         }
 
         //strncpy will also fill the rest of the buffer with '\0' characters
-        strncpy(buffer, [fontName cStringUsingEncoding:NSASCIIStringEncoding], bufferLength);
+        strncpy(buffer, [fontName cStringUsingEncoding:NSUTF8StringEncoding], bufferLength);
 
         //Increase by one for the terminating '\0'
-        return [fontName lengthOfBytesUsingEncoding:NSASCIIStringEncoding]+1;
+        return [fontName lengthOfBytesUsingEncoding:NSUTF8StringEncoding]+1;
     }
 
 
@@ -1210,7 +1210,7 @@ namespace Base {
 
     SYSCALL(int, maFileSetProperty(const char* path, int property, int value))
     {
-        NSURL *url = [NSURL fileURLWithPath:[NSString stringWithCString:path encoding:NSASCIIStringEncoding] isDirectory:NO];
+        NSURL *url = [NSURL fileURLWithPath:[NSString stringWithCString:path encoding:NSUTF8StringEncoding] isDirectory:NO];
         if(!url || ![[NSFileManager defaultManager] fileExistsAtPath:[url path]])
         {
             return MA_FERR_NOTFOUND;
@@ -1332,8 +1332,8 @@ namespace Base {
 
 		MFMessageComposeViewController *smsController = [[MFMessageComposeViewController alloc] init];
 
-		smsController.recipients = [NSArray arrayWithObject:[NSString stringWithCString:dst encoding:NSASCIIStringEncoding]];
-		smsController.body = [NSString stringWithCString:msg encoding:NSASCIIStringEncoding];
+		smsController.recipients = [NSArray arrayWithObject:[NSString stringWithCString:dst encoding:NSUTF8StringEncoding]];
+		smsController.body = [NSString stringWithCString:msg encoding:NSUTF8StringEncoding];
 
 		smsController.messageComposeDelegate = [[SMSResultDelegate alloc] init];
 
@@ -1442,30 +1442,30 @@ namespace Base {
 		} else if (strcmp(key, "mosync.path.local") == 0) {
 			NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
 			NSString *documentsDirectoryPath = [NSString stringWithFormat:@"%@/",[paths objectAtIndex:0]];
-			BOOL success = [documentsDirectoryPath getCString:buf maxLength:size encoding:NSASCIIStringEncoding];
+			BOOL success = [documentsDirectoryPath getCString:buf maxLength:size encoding:NSUTF8StringEncoding];
 			res = (success)?strlen(buf) + 1: -1;
 		} else if (strcmp(key, "mosync.path.local.urlPrefix") == 0) {
-			BOOL success = [@"file://localhost/" getCString:buf maxLength:size encoding:NSASCIIStringEncoding];
+			BOOL success = [@"file://localhost/" getCString:buf maxLength:size encoding:NSUTF8StringEncoding];
 			res = (success)?strlen(buf) + 1: -1;
 		} else if (strcmp(key, "mosync.device.name") == 0) {
-			BOOL success = [[[UIDevice currentDevice] name] getCString:buf maxLength:size encoding:NSASCIIStringEncoding];
+			BOOL success = [[[UIDevice currentDevice] name] getCString:buf maxLength:size encoding:NSUTF8StringEncoding];
 			res = (success)?strlen(buf) + 1: -1;
 		} else if (strcmp(key, "mosync.device.UUID")== 0) {
-			BOOL success = [[[UIDevice currentDevice] uniqueIdentifier] getCString:buf maxLength:size encoding:NSASCIIStringEncoding];
+			BOOL success = [[[UIDevice currentDevice] uniqueIdentifier] getCString:buf maxLength:size encoding:NSUTF8StringEncoding];
 			res = (success)?strlen(buf) + 1: -1;
 		} else if (strcmp(key, "mosync.device.OS")== 0) {
-			BOOL success = [[[UIDevice currentDevice] systemName] getCString:buf maxLength:size encoding:NSASCIIStringEncoding];
+			BOOL success = [[[UIDevice currentDevice] systemName] getCString:buf maxLength:size encoding:NSUTF8StringEncoding];
 			res = (success)?strlen(buf) + 1: -1;
 		} else if (strcmp(key, "mosync.device.OS.version") == 0) {
-			BOOL success = [[[UIDevice currentDevice] systemVersion] getCString:buf maxLength:size encoding:NSASCIIStringEncoding];
+			BOOL success = [[[UIDevice currentDevice] systemVersion] getCString:buf maxLength:size encoding:NSUTF8StringEncoding];
 			res = (success)?strlen(buf) + 1: -1;
 		} else if (strcmp(key, "mosync.device") == 0) {
 			size_t responseSz;
 			sysctlbyname("hw.machine", NULL, &responseSz, NULL, 0);
 			char *machine = (char*)malloc(responseSz);
 			sysctlbyname("hw.machine", machine, &responseSz, NULL, 0);
-			NSString *platform = [NSString stringWithCString:machine encoding:NSASCIIStringEncoding];
-			BOOL success = [platform getCString:buf maxLength:size encoding:NSASCIIStringEncoding];
+			NSString *platform = [NSString stringWithCString:machine encoding:NSUTF8StringEncoding];
+			BOOL success = [platform getCString:buf maxLength:size encoding:NSUTF8StringEncoding];
 			free(machine);
 			res = (success)?strlen(buf) + 1: -1;
 		} else if (strcmp(key, "mosync.network.type") == 0) {
@@ -1489,7 +1489,7 @@ namespace Base {
 					networkType = @"unknown";
 					break;
 			}
-			BOOL success = [networkType getCString:buf maxLength:size encoding:NSASCIIStringEncoding];
+			BOOL success = [networkType getCString:buf maxLength:size encoding:NSUTF8StringEncoding];
 			res = (success)?strlen(buf) + 1: -1;
 		}
 
@@ -2021,7 +2021,7 @@ namespace Base {
 				return -2;
 			}
 
-			[retval getCString:value maxLength:length encoding:NSASCIIStringEncoding]; //stores the cstring value of retval in value
+			[retval getCString:value maxLength:length encoding:NSUTF8StringEncoding]; //stores the cstring value of retval in value
 			[retval release];
 			[propertyString release];
 			[configurator release];
