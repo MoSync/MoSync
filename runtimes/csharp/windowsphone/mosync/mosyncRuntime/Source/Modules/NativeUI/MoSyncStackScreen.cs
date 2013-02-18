@@ -40,10 +40,19 @@ namespace MoSync
 {
     namespace NativeUI
     {
+        // Delegate used for push/pop transitions.
+        public delegate void Delegate_AddChildDelegate();
+
         public class StackScreen : Screen
         {
+            Delegate_AddChildDelegate mAddChildDelegate = null;
+
             protected System.Collections.Generic.Stack<IScreen> mStack;
             protected Boolean mBackButtonEnabled = true;
+
+            protected int mPushTransitionType = MoSync.Constants.MAW_TRANSITION_TYPE_NONE;
+
+            protected int mPopTransitionType = MoSync.Constants.MAW_TRANSITION_TYPE_NONE;
 
             /**
              * The constructor
@@ -63,15 +72,21 @@ namespace MoSync
                 {
                     MoSync.Util.RunActionOnMainThreadSync(() =>
                         {
-                            if (mPage.Children.Count > 0)
+                            mAddChildDelegate = delegate()
                             {
-                                mPage.Children.RemoveAt(mPage.Children.Count - 1);
-                            }
-                            mPage.Children.Add((child as Screen).View);
-                            Grid.SetColumn(mPage.Children[mPage.Children.Count - 1] as Grid, 0);
-                            Grid.SetRow(mPage.Children[mPage.Children.Count - 1] as Grid, 0);
+                                if (mPage.Children.Count > 0)
+                                {
+                                    mPage.Children.RemoveAt(mPage.Children.Count - 1);
+                                }
 
-                            ToggleApplicationBar((child as Screen));
+                                mPage.Children.Add((child as Screen).View);
+                                Grid.SetColumn(mPage.Children[mPage.Children.Count - 1] as Grid, 0);
+                                Grid.SetRow(mPage.Children[mPage.Children.Count - 1] as Grid, 0);
+
+                                ToggleApplicationBar((child as Screen));
+                            };
+
+                            MoSyncScreenTransitions.doStackScreenTransition(mAddChildDelegate, mPushTransitionType);
                         });
 
                     /**
@@ -110,17 +125,21 @@ namespace MoSync
                 if (0 < mStack.Count)
                 {
                     MoSync.Util.RunActionOnMainThreadSync(() =>
-					{
-                        if (mPage.Children.Count > 0)
+                    {
+                        mAddChildDelegate = delegate()
                         {
-                            mPage.Children.RemoveAt(mPage.Children.Count - 1);
-                        }
-                        mPage.Children.Add((mStack.Peek() as Screen).View);
-                        Grid.SetColumn(mPage.Children[mPage.Children.Count - 1] as Grid, 0);
-                        Grid.SetRow(mPage.Children[mPage.Children.Count - 1] as Grid, 0);
+                            if (mPage.Children.Count > 0)
+                            {
+                                mPage.Children.RemoveAt(mPage.Children.Count - 1);
+                            }
+                            mPage.Children.Add((mStack.Peek() as Screen).View);
+                            Grid.SetColumn(mPage.Children[mPage.Children.Count - 1] as Grid, 0);
+                            Grid.SetRow(mPage.Children[mPage.Children.Count - 1] as Grid, 0);
 
-                        ToggleApplicationBar((mStack.Peek() as Screen));
-					});
+                            ToggleApplicationBar((mStack.Peek() as Screen));
+                        };
+                        MoSyncScreenTransitions.doStackScreenTransition(mAddChildDelegate, mPopTransitionType);
+                    });
                 }
             }
 
@@ -130,19 +149,24 @@ namespace MoSync
             public void PopFromBackButtonPressed()
             {
                 postPopEvent();
+
                 /**
                  * If the stack is not empty show the top element of the stack
                  */
                 if (0 < mStack.Count)
                 {
-                    if (mPage.Children.Count > 0)
+                    mAddChildDelegate = delegate()
                     {
-                        mPage.Children.RemoveAt(mPage.Children.Count - 1);
-                    }
-                    mPage.Children.Add((mStack.Peek() as Screen).View);
-                    Grid.SetColumn(mPage.Children[mPage.Children.Count - 1] as Grid, 0);
-                    Grid.SetRow(mPage.Children[mPage.Children.Count - 1] as Grid, 0);
-                    ToggleApplicationBar((mStack.Peek() as Screen));
+                        if (mPage.Children.Count > 0)
+                        {
+                            mPage.Children.RemoveAt(mPage.Children.Count - 1);
+                        }
+                        mPage.Children.Add((mStack.Peek() as Screen).View);
+                        Grid.SetColumn(mPage.Children[mPage.Children.Count - 1] as Grid, 0);
+                        Grid.SetRow(mPage.Children[mPage.Children.Count - 1] as Grid, 0);
+                        ToggleApplicationBar((mStack.Peek() as Screen));
+                    };
+                    MoSyncScreenTransitions.doStackScreenTransition(mAddChildDelegate, mPopTransitionType);
                 }
             }
 
@@ -188,6 +212,48 @@ namespace MoSync
                 {
                     if (!Boolean.TryParse(value, out mBackButtonEnabled)) throw new InvalidPropertyValueException();
                 }
+            }
+
+            /**
+             * MAW_STACK_SCREEN_PUSH_TRANSITION_TYPE property implementation.
+             */
+            [MoSyncWidgetProperty(MoSync.Constants.MAW_STACK_SCREEN_PUSH_TRANSITION_TYPE)]
+            public String PushTransitionType
+            {
+                set
+                {
+                    if (!Int32.TryParse(value, out mPushTransitionType)) throw new InvalidPropertyValueException();
+                    if (!NativeUI.MoSyncScreenTransitions.isTransitionAvailable(mPushTransitionType)) throw new InvalidPropertyValueException();
+                }
+            }
+
+            /**
+             * Returns the value of the mPopTransitionType
+             */
+            public int GetPushTransitionType()
+            {
+                return mPushTransitionType;
+            }
+
+            /**
+             * MAW_STACK_SCREEN_POP_TRANSITION_TYPE property implementation.
+             */
+            [MoSyncWidgetProperty(MoSync.Constants.MAW_STACK_SCREEN_POP_TRANSITION_TYPE)]
+            public String PopTransitionType
+            {
+                set
+                {
+                    if (!Int32.TryParse(value, out mPopTransitionType)) throw new InvalidPropertyValueException();
+                    if (!NativeUI.MoSyncScreenTransitions.isTransitionAvailable(mPopTransitionType)) throw new InvalidPropertyValueException();
+                }
+            }
+
+            /**
+             * Returns the value of the mPopTransitionType
+             */
+            public int GetPopTransitionType()
+            {
+                return mPopTransitionType;
             }
 
             /**

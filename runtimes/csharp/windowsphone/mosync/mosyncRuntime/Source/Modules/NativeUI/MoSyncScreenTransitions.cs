@@ -100,6 +100,72 @@ namespace MoSync
             }
 
             /**
+             * Applies transition to the current page and calls the given delegate in a specific moment
+             * (before/after animation) in order to distingues between transition applied on the current
+             * page or the next.
+             *
+             * @param aDelegate a delegate invoked in different moments, depending on the transition type.
+             * @param transitionType a transition type.
+             */
+            static public void doStackScreenTransition(Delegate_AddChildDelegate aDelegate, int transitionType)
+            {
+                if (null != aDelegate)
+                {
+                    TransitionElement transition = null;
+                    bool doTransitionOnCurrentScreen = false;
+                    switch (transitionType)
+                    {
+                        case MoSync.Constants.MAW_TRANSITION_TYPE_SLIDE_RIGHT:
+                             transition = new SlideTransition();
+                            (transition as SlideTransition).Mode = SlideTransitionMode.SlideRightFadeIn;
+                            break;
+                        case MoSync.Constants.MAW_TRANSITION_TYPE_SLIDE_LEFT:
+                            transition = new SlideTransition();
+                            (transition as SlideTransition).Mode = SlideTransitionMode.SlideLeftFadeIn;
+                            break;
+                        case MoSync.Constants.MAW_TRANSITION_TYPE_SWIVEL_IN:
+                            transition = new SwivelTransition();
+                            (transition as SwivelTransition).Mode = SwivelTransitionMode.FullScreenIn;
+                            break;
+                        case MoSync.Constants.MAW_TRANSITION_TYPE_SWIVEL_OUT:
+                            transition = new SwivelTransition();
+                            (transition as SwivelTransition).Mode = SwivelTransitionMode.FullScreenOut;
+                            doTransitionOnCurrentScreen = true;
+                            break;
+                        case MoSync.Constants.MAW_TRANSITION_TYPE_TURNSTILE_FOREWARD:
+                            transition = new TurnstileTransition();
+                            (transition as TurnstileTransition).Mode = TurnstileTransitionMode.ForwardOut;
+                            doTransitionOnCurrentScreen = true;
+                            break;
+                        case MoSync.Constants.MAW_TRANSITION_TYPE_TURNSTILE_BACKWARD:
+                            transition = new TurnstileTransition();
+                            (transition as TurnstileTransition).Mode = TurnstileTransitionMode.BackwardIn;
+                            break;
+                        case MoSync.Constants.MAW_TRANSITION_TYPE_NONE:
+                        default:
+                            aDelegate();
+                            return;
+                    }
+                    PhoneApplicationPage page = (PhoneApplicationPage)((PhoneApplicationFrame)Application.Current.RootVisual).Content;
+
+                    ITransition transInterf = transition.GetTransition(page);
+                    transInterf.Completed += delegate
+                    {
+                        transInterf.Stop();
+                        if (doTransitionOnCurrentScreen)
+                        {
+                            aDelegate();
+                        }
+                    };
+                    transInterf.Begin();
+                    if (!doTransitionOnCurrentScreen)
+                    {
+                        aDelegate();
+                    }
+                }
+            }
+
+            /**
              * Sets the content of the mainPage.xaml as our screen content with slide left transition.
              *
              * @param nextPage the next screen/content that will be displayed.
