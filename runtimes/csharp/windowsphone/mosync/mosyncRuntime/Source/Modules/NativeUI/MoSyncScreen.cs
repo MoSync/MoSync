@@ -37,6 +37,9 @@ namespace MoSync
 {
     namespace NativeUI
     {
+        // Delegate used for shoew screen with transition.
+        public delegate void Delegate_SwitchContentDelegate();
+
         public class Screen : WidgetBaseWindowsPhone, IScreen
         {
             //The container for the screen content.
@@ -47,6 +50,9 @@ namespace MoSync
 
             //The application bar associated to this screen.
             protected Microsoft.Phone.Shell.ApplicationBar mApplicationBar;
+
+            //The delegate when switching the content with animated transition.
+            Delegate_SwitchContentDelegate mSwitchContentDelegate = null;
 
             //The application bar visibility flag.
             protected bool ApplicationBarVisible
@@ -280,7 +286,12 @@ namespace MoSync
                         //Sets the application bar for the mainPage.xaml to our custom application bar.
                         (frame.Content as PhoneApplicationPage).ApplicationBar = mApplicationBar;
                     }
-                    MoSyncScreenTransitions.doShowWithScreenTransition(mPage, screenTransitionType);
+                    mSwitchContentDelegate = delegate()
+                    {
+                        //Sets the content of the mainPage.xaml as our screen content.
+                        (frame.Content as PhoneApplicationPage).Content = mPage;
+                    };
+                    MoSyncScreenTransitions.doScreenTransition(mSwitchContentDelegate, screenTransitionType);
                 });
             }
 

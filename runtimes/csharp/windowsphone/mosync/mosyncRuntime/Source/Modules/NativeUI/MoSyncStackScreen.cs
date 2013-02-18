@@ -40,12 +40,9 @@ namespace MoSync
 {
     namespace NativeUI
     {
-        // Delegate used for push/pop transitions.
-        public delegate void Delegate_AddChildDelegate();
-
         public class StackScreen : Screen
         {
-            Delegate_AddChildDelegate mAddChildDelegate = null;
+            Delegate_SwitchContentDelegate mAddChildDelegate = null;
 
             protected System.Collections.Generic.Stack<IScreen> mStack;
             protected Boolean mBackButtonEnabled = true;
@@ -86,7 +83,7 @@ namespace MoSync
                                 ToggleApplicationBar((child as Screen));
                             };
 
-                            MoSyncScreenTransitions.doStackScreenTransition(mAddChildDelegate, mPushTransitionType);
+                            MoSyncScreenTransitions.doScreenTransition(mAddChildDelegate, mPushTransitionType);
                         });
 
                     /**
@@ -138,7 +135,7 @@ namespace MoSync
 
                             ToggleApplicationBar((mStack.Peek() as Screen));
                         };
-                        MoSyncScreenTransitions.doStackScreenTransition(mAddChildDelegate, mPopTransitionType);
+                        MoSyncScreenTransitions.doScreenTransition(mAddChildDelegate, mPopTransitionType);
                     });
                 }
             }
@@ -166,7 +163,7 @@ namespace MoSync
                         Grid.SetRow(mPage.Children[mPage.Children.Count - 1] as Grid, 0);
                         ToggleApplicationBar((mStack.Peek() as Screen));
                     };
-                    MoSyncScreenTransitions.doStackScreenTransition(mAddChildDelegate, mPopTransitionType);
+                    MoSyncScreenTransitions.doScreenTransition(mAddChildDelegate, mPopTransitionType);
                 }
             }
 

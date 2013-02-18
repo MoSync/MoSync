@@ -39,40 +39,6 @@ namespace MoSync
          */
         sealed public class MoSyncScreenTransitions
         {
-            static public void doShowWithScreenTransition(Grid nextPage, int screenTransitionType)
-            {
-                //Sets the content of the mainPage.xaml as our screen content with transitions/animation.
-                switch (screenTransitionType)
-                {
-                    case MoSync.Constants.MAW_TRANSITION_TYPE_NONE:
-                        PhoneApplicationPage page = (PhoneApplicationPage)((PhoneApplicationFrame)Application.Current.RootVisual).Content;
-                        page.Content = nextPage;
-                        break;
-                    case MoSync.Constants.MAW_TRANSITION_TYPE_SLIDE_RIGHT:
-                        MoSyncScreenTransitions.doSlideRightTransition(nextPage);
-                        break;
-                    case MoSync.Constants.MAW_TRANSITION_TYPE_SLIDE_LEFT:
-                        MoSyncScreenTransitions.doSlideLeftTransition(nextPage);
-                        break;
-                    case MoSync.Constants.MAW_TRANSITION_TYPE_SWIVEL_IN:
-                        MoSyncScreenTransitions.doSwivelInTransition(nextPage);
-                        break;
-                    case MoSync.Constants.MAW_TRANSITION_TYPE_SWIVEL_OUT:
-                        MoSyncScreenTransitions.doSwivelOutTransition(nextPage);
-                        break;
-                    case MoSync.Constants.MAW_TRANSITION_TYPE_TURNSTILE_FOREWARD:
-                        MoSyncScreenTransitions.doTurnstileForewardTransition(nextPage);
-                        break;
-                    case MoSync.Constants.MAW_TRANSITION_TYPE_TURNSTILE_BACKWARD:
-                        MoSyncScreenTransitions.doTurnstileBackwardTransition(nextPage);
-                        break;
-                    default:
-                        // It should not reach this point.
-                        break;
-                }
-            }
-
-
             /**
              * Checks if the screen transititon given as parameter is available on WP.
              * Screen transition can be found \link #MA_TRANSITION_TYPE_NONE here \endlink.
@@ -100,14 +66,15 @@ namespace MoSync
             }
 
             /**
-             * Applies transition to the current page and calls the given delegate in a specific moment
+             * Applies transition to the current content and calls the given delegate in a specific moment
              * (before/after animation) in order to distingues between transition applied on the current
-             * page or the next.
+             * "page/screen" or the next.
              *
              * @param aDelegate a delegate invoked in different moments, depending on the transition type.
+             * The delegate must be responsible for switching screens/context/adding children widgets.
              * @param transitionType a transition type.
              */
-            static public void doStackScreenTransition(Delegate_AddChildDelegate aDelegate, int transitionType)
+            static public void doScreenTransition(Delegate_SwitchContentDelegate aDelegate, int transitionType)
             {
                 if (null != aDelegate)
                 {
@@ -163,132 +130,6 @@ namespace MoSync
                         aDelegate();
                     }
                 }
-            }
-
-            /**
-             * Sets the content of the mainPage.xaml as our screen content with slide left transition.
-             *
-             * @param nextPage the next screen/content that will be displayed.
-             */
-            static private void doSlideLeftTransition(Grid nextPage)
-            {
-                PhoneApplicationPage page = (PhoneApplicationPage)((PhoneApplicationFrame)Application.Current.RootVisual).Content;
-
-                TransitionElement transition = new SlideTransition();
-                (transition as SlideTransition).Mode = SlideTransitionMode.SlideLeftFadeIn;
-
-                ITransition transInterf = transition.GetTransition(page);
-                transInterf.Completed += delegate
-                {
-                    transInterf.Stop();
-                };
-                transInterf.Begin();
-                page.Content = nextPage;
-            }
-
-            /**
-             * Sets the content of the mainPage.xaml as our screen content with slide right transition.
-             *
-             * @param nextPage the next screen/content that will be displayed.
-             */
-            static private void doSlideRightTransition(Grid nextPage)
-            {
-                PhoneApplicationPage page = (PhoneApplicationPage)((PhoneApplicationFrame)Application.Current.RootVisual).Content;
-
-                TransitionElement transition = new SlideTransition();
-                (transition as SlideTransition).Mode = SlideTransitionMode.SlideRightFadeIn;
-
-                ITransition transInterf = transition.GetTransition(page);
-                transInterf.Completed += delegate
-                {
-                    transInterf.Stop();
-                };
-                transInterf.Begin();
-                page.Content = nextPage;
-            }
-
-            /**
-             * Sets the content of the mainPage.xaml as our screen content with a swivel in transition.
-             *
-             * @param nextPage the next screen/content that will be displayed.
-             */
-            static private void doSwivelInTransition(Grid nextPage)
-            {
-                PhoneApplicationPage page = (PhoneApplicationPage)((PhoneApplicationFrame)Application.Current.RootVisual).Content;
-
-                TransitionElement transition = new SwivelTransition();
-                (transition as SwivelTransition).Mode = SwivelTransitionMode.FullScreenIn;
-
-                ITransition transInterf = transition.GetTransition(page);
-                transInterf.Completed += delegate
-                {
-                    transInterf.Stop();
-                };
-                transInterf.Begin();
-                page.Content = nextPage;
-            }
-
-            /**
-             * Sets the content of the mainPage.xaml as our screen content with a swivel out transition.
-             *
-             * @param nextPage the next screen/content that will be displayed.
-             */
-            static private void doSwivelOutTransition(Grid nextPage)
-            {
-                PhoneApplicationPage page = (PhoneApplicationPage)((PhoneApplicationFrame)Application.Current.RootVisual).Content;
-
-                TransitionElement transition = new SwivelTransition();
-                (transition as SwivelTransition).Mode = SwivelTransitionMode.FullScreenOut;
-
-                ITransition transInterf = transition.GetTransition(page);
-                transInterf.Completed += delegate
-                {
-                    transInterf.Stop();
-                    page.Content = nextPage;
-                };
-                transInterf.Begin();
-            }
-
-            /**
-             * Sets the content of the mainPage.xaml as our screen content with a tunstile foreward transition.
-             *
-             * @param nextPage the next screen/content that will be displayed.
-             */
-            static private void doTurnstileForewardTransition(Grid nextPage)
-            {
-                PhoneApplicationPage page = (PhoneApplicationPage)((PhoneApplicationFrame)Application.Current.RootVisual).Content;
-
-                TransitionElement transition = new TurnstileTransition();
-                (transition as TurnstileTransition).Mode = TurnstileTransitionMode.ForwardOut;
-
-                ITransition transInterf = transition.GetTransition(page);
-                transInterf.Completed += delegate
-                {
-                    transInterf.Stop();
-                    page.Content = nextPage;
-                };
-                transInterf.Begin();
-            }
-
-            /**
-             * Sets the content of the mainPage.xaml as our screen content with a tunstile backward transition.
-             *
-             * @param nextPage the next screen/content that will be displayed.
-             */
-            static private void doTurnstileBackwardTransition(Grid nextPage)
-            {
-                PhoneApplicationPage page = (PhoneApplicationPage)((PhoneApplicationFrame)Application.Current.RootVisual).Content;
-
-                TransitionElement transition = new TurnstileTransition();
-                (transition as TurnstileTransition).Mode = TurnstileTransitionMode.BackwardIn;
-
-                ITransition transInterf = transition.GetTransition(page);
-                transInterf.Completed += delegate
-                {
-                    transInterf.Stop();
-                };
-                transInterf.Begin();
-                page.Content = nextPage;
             }
         }
     }
