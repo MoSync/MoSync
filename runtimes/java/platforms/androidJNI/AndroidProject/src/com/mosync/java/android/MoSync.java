@@ -262,7 +262,7 @@ public class MoSync extends Activity
 	@Override
     protected void onResume()
 	{
-		Log.i("MoSync", "onResume");
+		SYSLOG("onResume");
 
 		super.onResume();
 
