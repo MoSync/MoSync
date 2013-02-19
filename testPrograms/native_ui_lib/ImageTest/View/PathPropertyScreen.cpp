@@ -89,6 +89,7 @@ namespace ImageTest
 	void PathPropertyScreen::createUI()
 	{
 		mMainLayout = new NativeUI::VerticalLayout();
+		mMainLayout->setBackgroundColor(0xFF0000);
 		this->setMainWidget(mMainLayout);
 
 		this->createEditBoxLayout();

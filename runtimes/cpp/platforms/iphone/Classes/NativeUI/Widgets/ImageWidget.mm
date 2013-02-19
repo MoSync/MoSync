@@ -21,10 +21,24 @@
 #include "Platform.h"
 #include <base/Syscall.h>
 
+/**
+ * Hidden functions/methods for ImageWidget class.
+ */
 @interface ImageWidget ()
 
+/**
+ * Used by the MAW_IMAGE_IMAGE_PATH property.
+ */
 @property(nonatomic, retain) NSString* imagePath;
 
+/**
+ * Show an image from a given path.
+ * Setter for MAW_IMAGE_IMAGE_PATH.
+ * @param path Image file path.
+ * @return One of the following result codes:
+ * - MAW_RES_OK if the image was shown.
+ * - MAW_RES_INVALID_PROPERTY_VALUE if the path is invalid.
+ */
 - (int)setPropertyImagePath:(NSString*)path;
 
 @end
@@ -101,6 +115,7 @@
 			image = [image stretchableImageWithLeftCapWidth:_leftCapWidth topCapHeight:_topCapHeight];
 		}
         _imageView.image = image;
+		self.imagePath = @"";
 		[self layout];
 	}
 	else if([key isEqualToString:@"leftCapWidth"])
@@ -150,19 +165,6 @@
 	return MAW_RES_OK;
 }
 
-- (int)setPropertyImagePath:(NSString*)path
-{
-	UIImage* image = [[UIImage alloc] initWithContentsOfFile:path];
-	if (!image)
-	{
-		return MAW_RES_INVALID_PROPERTY_VALUE;
-	}
-	self.imagePath = path;
-	_imageView.image = image;
-	[image release];
-	return MAW_RES_OK;
-}
-
 /**
  * Get a widget property value.
  * @param key Widget's property name.
@@ -179,6 +181,40 @@
 	{
 		return [super getPropertyWithKey:key];
 	}
+}
+
+/**
+ * Show an image from a given path.
+ * Setter for MAW_IMAGE_IMAGE_PATH.
+ * @param path Image file path.
+ * @return One of the following result codes:
+ * - MAW_RES_OK if the image was shown.
+ * - MAW_RES_INVALID_PROPERTY_VALUE if the path is invalid.
+ */
+- (int)setPropertyImagePath:(NSString*)path
+{
+	UIImage* image = [[UIImage alloc] initWithContentsOfFile:path];
+	if (!image)
+	{
+		return MAW_RES_INVALID_PROPERTY_VALUE;
+	}
+	self.imagePath = path;
+	_imageView.image = image;
+	[image release];
+	[self layout];
+	return MAW_RES_OK;
+}
+
+/**
+ * Getter implementation for imagePath property.
+ */
+- (NSString*)imagePath
+{
+	if (!_imagePath)
+	{
+		_imagePath = [[NSString alloc] init];
+	}
+	return _imagePath;
 }
 
 /**
