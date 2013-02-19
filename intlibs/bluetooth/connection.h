@@ -18,6 +18,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #ifndef CONNECTION_H
 #define CONNECTION_H
 
+#include "helpers/attribute.h"
+
 #ifdef WIN32
 
 #if defined(_MSC_VER)
@@ -64,9 +66,13 @@ public:
 	//Returns nBytes read or CONNERR code.
 	virtual int read(void* dst, int max) = 0;
 
+	virtual int readFrom(void* dst, int max, MAConnAddr& src) GCCATTRIB(noreturn);
+
 	//Writes <len> bytes from <src>.
 	//Returns >0 or CONNERR code.
 	virtual int write(const void* src, int len) = 0;
+
+	virtual int writeTo(const void* src, int len, const MAConnAddr& dst) GCCATTRIB(noreturn);
 
 	//Writes the remote connection's address to \a addr.
 	//Will fail if connect() has not completed.

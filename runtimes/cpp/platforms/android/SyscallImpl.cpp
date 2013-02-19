@@ -860,6 +860,37 @@ namespace Base
 		mJNIEnv->DeleteLocalRef(cls);
 	}
 
+	SYSCALL(void, maConnReadFrom(MAHandle conn, void* dst, int size, MAConnAddr* src))
+	{
+		SYSLOG("maConnReadFrom");
+
+		int rdst = (int)dst - (int)gCore->mem_ds;
+		int rsrc = (int)src - (int)gCore->mem_ds;
+
+		jclass cls = mJNIEnv->GetObjectClass(mJThis);
+		jmethodID methodID = mJNIEnv->GetMethodID(cls, "maConnReadFrom", "(IIII)V");
+		if (methodID == 0) ERROR_EXIT;
+		mJNIEnv->CallVoidMethod(mJThis, methodID, conn, (jint)rdst, size, rsrc);
+
+		mJNIEnv->DeleteLocalRef(cls);
+
+	}
+
+	SYSCALL(void, maConnWriteTo(MAHandle conn, const void* src, int size, const MAConnAddr* dst))
+	{
+		SYSLOG("maConnWriteTo");
+
+		int rsrc = (int)src - (int)gCore->mem_ds;
+		int rdst = (int)dst - (int)gCore->mem_ds;
+
+		jclass cls = mJNIEnv->GetObjectClass(mJThis);
+		jmethodID methodID = mJNIEnv->GetMethodID(cls, "maConnWriteTo", "(IIII)V");
+		if (methodID == 0) ERROR_EXIT;
+		mJNIEnv->CallVoidMethod(mJThis, methodID, conn, (jint)rsrc, size, rdst);
+
+		mJNIEnv->DeleteLocalRef(cls);
+	}
+
 	SYSCALL(void,  maConnReadToData(MAHandle conn, MAHandle data, int offset, int size))
 	{
 		SYSLOG("maConnReadToData");
