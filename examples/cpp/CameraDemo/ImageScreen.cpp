@@ -33,21 +33,37 @@ MA 02110-1301, USA.
 using namespace NativeUI;
 
 /**
+ * Constructor.
+ */
+ImageScreen::ImageScreen()
+{
+	mImageHandle = 0;
+}
+
+/**
+ * Destructor.
+ */
+ImageScreen::~ImageScreen()
+{
+	delete mScreen;
+}
+
+/**
  * This method implements a button event listener.
  * Button click events are sent here.
  */
 void ImageScreen::buttonClicked(Widget* button)
 {
-	if(mOKButton == button)
+	if (mOKButton == button)
 	{
 		mStackScreen->pop();
 	}
 }
 
 /**
- * Lazy initializations
+ * Initialize the UI of the image screen.
  */
-void ImageScreen::initialize(StackScreen* stackScreen)
+void ImageScreen::initializeUI(StackScreen* stackScreen)
 {
 	mStackScreen = stackScreen;
 	createUI();
@@ -62,12 +78,11 @@ void ImageScreen::createUI()
 	// variable (also called instance variable) we have
 	// prefixed the variable name with "m".
 	mScreen = new Screen();
-
 	mScreen->setTitle("Captured Image");
-	// Create the screen's main layout widget.
-	mMainLayoutWidget = new VerticalLayout();
 
+	// Create the screen's main layout widget.
 	// Make the layout fill the entire screen.
+	mMainLayoutWidget = new VerticalLayout();
 	mMainLayoutWidget->fillSpaceHorizontally();
 	mMainLayoutWidget->fillSpaceVertically();
 
@@ -75,26 +90,20 @@ void ImageScreen::createUI()
 	mScreen->setMainWidget(mMainLayoutWidget);
 
 	mImageWidget = new Image();
-
 	mImageWidget->fillSpaceHorizontally();
 	mImageWidget->fillSpaceVertically();
-
 	mMainLayoutWidget->addChild(mImageWidget);
 
-
 	mOKButton = new Button();
-
 	mOKButton->fillSpaceHorizontally();
 	mOKButton->wrapContentVertically();
 	mOKButton->setText("Back to Main Screen");
 	mOKButton->addButtonListener(this);
-
 	mMainLayoutWidget->addChild(mOKButton);
 }
 
-
 /**
- * Pushes the image screen to the screen
+ * Pushes the image screen to the screen.
  */
 void ImageScreen::pushImageScreen()
 {
@@ -102,25 +111,29 @@ void ImageScreen::pushImageScreen()
 }
 
 /**
- * sets the captured buffer handle to the image handle that
- * can be shown on the screen
+ * Sets the captured buffer handle to the image handle that
+ * can be shown on the screen.
  */
 void ImageScreen::setImageDataHandle(MAHandle dataHandle)
 {
-	if(mImageHandle != 0) {
-		maDestroyObject(mImageHandle);
-	}
-	mImageHandle = maCreatePlaceholder();
-	int res = maCreateImageFromData(
-			mImageHandle,
-				dataHandle,
-				0,
-				maGetDataSize(dataHandle));
-	if(res != RES_OK)
+	if (mImageHandle != 0)
 	{
-		maPanic(res, "failed to create the image");
+		maDestroyPlaceholder(mImageHandle);
 	}
-		//Set the image to the image widget
+
+	mImageHandle = maCreatePlaceholder();
+
+	int result = maCreateImageFromData(
+		mImageHandle,
+		dataHandle,
+		0,
+		maGetDataSize(dataHandle));
+	if (result != RES_OK)
+	{
+		maPanic(result, "Failed to create an image for the camera snapshot");
+	}
+
+	// Set the image on the image widget.
 	mImageWidget->setScaleMode(IMAGE_SCALE_PRESERVE_ASPECT);
 	mImageWidget->setImage(mImageHandle);
 }
