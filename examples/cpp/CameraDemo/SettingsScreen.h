@@ -41,52 +41,29 @@ using namespace NativeUI;
 class SettingsScreen : public ButtonListener
 {
 public:
-	SettingsScreen():currentCamera(0)
-	{
-		currentCamera = 0;
-		//do nothing
-	}
-	virtual ~SettingsScreen()
-	{
-		delete mScreen;
-	}
-
+	SettingsScreen();
+	virtual ~SettingsScreen();
 	virtual void buttonClicked(Widget* button);
-
-	void initialize(StackScreen* stackScreen);
-
+	void initializeUI(StackScreen* stackScreen);
+	void createUI();
+	void setFlashSupported(bool flashSupported);
 	void pushSettingsScreen();
-
 	int getCurrentCamera();
-
-	const char * getFLashMode();
-
-	bool flashSupported;
-
-	int numCameras;
+	void setCurrentCamera(int cameraIndex);
+	const char* getFlashMode();
+	const char* getModeForIndex(int index);
 
 private:
-
-	void createUI();
-
-	const char * getModeForIndex(int index);
-
-	Screen *mScreen;
-
-	Button *mSwapCameraButton;
-
-	Button *mOKButton;
-
-	Button *mFlashModeButton;
-
+	bool mFlashSupported;
+	int mFlashModeIndex;
+	int mNumCameras;
+	int mCurrentCamera;
+	Screen* mScreen;
+	Button* mSwapCameraButton;
+	Button* mOKButton;
+	Button* mFlashModeButton;
 	VerticalLayout *mMainLayoutWidget;
-
-	StackScreen *mStackScreen;
-
-	int flashModeIndex;
-
-	int currentCamera;
+	StackScreen* mStackScreen;
 };
-
 
 #endif /* SETTINGSSCREEN_H_ */
