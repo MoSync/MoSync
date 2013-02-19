@@ -28,7 +28,6 @@
 
 namespace ScreenTransitionTest
 {
-
 	class FirstScreenObserver
 	{
 	public:

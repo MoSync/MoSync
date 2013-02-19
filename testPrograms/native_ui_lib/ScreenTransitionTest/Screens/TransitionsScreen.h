@@ -21,11 +21,11 @@
  * @author Bogdan Iusco & Mircea Vasiliniuc
  * @date 20 Nov 2012
  *
- * @brief First screen shown.
+ * @brief Screen transitions screen.
  */
 
-#ifndef FIRST_SCREEN_H_
-#define FIRST_SCREEN_H_
+#ifndef SCREEN_TRANSITIONS_SCREEN_H_
+#define SCREEN_TRANSITIONS_SCREEN_H_
 
 #include <NativeUI/ButtonListener.h>
 #include <NativeUI/Screen.h>
@@ -45,8 +45,7 @@ namespace NativeUI
 
 namespace ScreenTransitionTest
 {
-
-	class FirstScreen:
+	class TransitionsScreen:
 		public NativeUI::Screen,
 		public NativeUI::ButtonListener,
 		public NativeUI::ListViewListener
@@ -56,12 +55,12 @@ namespace ScreenTransitionTest
 		 * Constructor.
 		 * @param observer Observer for this screen.
 		 */
-		FirstScreen(FirstScreenObserver& observer);
+		TransitionsScreen(FirstScreenObserver& observer);
 
 		/**
 		 * Destructor.
 		 */
-		virtual ~FirstScreen();
+		virtual ~TransitionsScreen();
 
 	private:
 		/**
@@ -187,4 +186,4 @@ namespace ScreenTransitionTest
 }
 
 
-#endif /* FIRST_SCREEN_H_ */
+#endif /* SCREEN_TRANSITIONS_SCREEN_H_ */

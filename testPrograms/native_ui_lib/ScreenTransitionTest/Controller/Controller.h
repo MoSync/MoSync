@@ -32,8 +32,8 @@
 
 namespace ScreenTransitionTest
 {
-	class FirstScreen;
-	class SecondScreen;
+	class LastScreen;
+	class MainStackScreen;
 
 	class Controller:
 		public FirstScreenObserver,
@@ -62,14 +62,14 @@ namespace ScreenTransitionTest
 
 	public:
 		/**
-		 * First screen to show.
+		 * Stack screen to show.
 		 */
-		FirstScreen* mFirstScreen;
+		MainStackScreen* mStackScreen;
 
 		/**
-		 * Second screen to show.
+		 * Last screen to show.
 		 */
-		SecondScreen* mSecondScreen;
+		LastScreen* mSimpleScreen;
 	};
 
 } //end of ScreenTransitionTest

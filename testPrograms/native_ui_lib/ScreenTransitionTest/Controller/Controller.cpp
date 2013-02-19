@@ -28,8 +28,9 @@
 #include "Controller.h"
 
 #include "../Screens/ScreenUtils.h"
-#include "../Screens/FirstScreen.h"
-#include "../Screens/SecondScreen.h"
+#include "../Screens/TransitionsScreen.h"
+#include "../Screens/LastScreen.h"
+#include "../Screens/MainStackScreen.h"
 
 static MAWScreenTransitionType currentTransition = MAW_TRANSITION_TYPE_NONE;
 
@@ -40,11 +41,10 @@ namespace ScreenTransitionTest
 	 */
 	Controller::Controller()
 	{
-		mFirstScreen = new FirstScreen(*this);
-		mSecondScreen = new SecondScreen(*this);
+		mStackScreen = new MainStackScreen(*this);
+		mSimpleScreen = new LastScreen(*this);
 
-		//maWidgetScreenShow(mFirstScreen->getWidgetHandle());
-		mFirstScreen->show();
+		mStackScreen->show();
 	}
 
 	/**
@@ -52,8 +52,8 @@ namespace ScreenTransitionTest
 	 */
 	Controller::~Controller()
 	{
-		delete mFirstScreen;
-		delete mSecondScreen;
+		delete mStackScreen;
+		delete mSimpleScreen;
 	}
 
 	/**
@@ -62,10 +62,10 @@ namespace ScreenTransitionTest
 	void Controller::showSecondScreen(int transType, const char* text)
 	{
 		currentTransition = transType;
-		mSecondScreen->resetTitleWithString(text);
+		mSimpleScreen->resetTitleWithString(text);
 
-		//int returnVal = maWidgetScreenShowWithTransition(mSecondScreen->getWidgetHandle(), transType, TRANSITION_TIME_MS);
-		int returnVal = mSecondScreen->showWithTransition(transType, TRANSITION_TIME_MS);
+		//int returnVal = maWidgetScreenShowWithTransition(mSimpleScreen->getWidgetHandle(), transType, TRANSITION_TIME_MS);
+		int returnVal = mSimpleScreen->showWithTransition(transType, TRANSITION_TIME_MS);
 		printf("showWithTransition result: %d", returnVal);
 	}
 
@@ -75,7 +75,7 @@ namespace ScreenTransitionTest
 	void Controller::hideSecondScreen()
 	{
 		//int returnVal = maWidgetScreenShowWithTransition(mFirstScreen->getWidgetHandle(), ScreenUtils::getSimetricTransition(currentTransition), TRANSITION_TIME_MS);
-		int returnVal = mFirstScreen->showWithTransition(ScreenUtils::getSimetricTransition(currentTransition), TRANSITION_TIME_MS);
+		int returnVal = mStackScreen->showWithTransition(ScreenUtils::getSimetricTransition(currentTransition), TRANSITION_TIME_MS);
 		printf("showWithTransition result: %d", returnVal);
 	}
 } // end of Transitions

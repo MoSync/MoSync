@@ -21,11 +21,11 @@
  * @author Bogdan Iusco & Mircea Vasiliniuc
  * @date 20 Nov 2012
  *
- * @brief Second screen.
+ * @brief Last screen.
  */
 
-#ifndef SECOND_SCREEN_H_
-#define SECOND_SCREEN_H_
+#ifndef LAST_SCREEN_H_
+#define LAST_SCREEN_H_
 
 #include <NativeUI/Screen.h>
 #include <NativeUI/ButtonListener.h>
@@ -43,7 +43,7 @@ namespace NativeUI
 namespace ScreenTransitionTest
 {
 
-	class SecondScreen:
+	class LastScreen:
 		public NativeUI::Screen,
 		public NativeUI::ButtonListener
 	{
@@ -52,12 +52,12 @@ namespace ScreenTransitionTest
 		 * Constructor.
 		 * @param observer Observer for this screen.
 		 */
-		SecondScreen(SecondScreenObserver& observer);
+		LastScreen(SecondScreenObserver& observer);
 
 		/**
 		 * Destructor.
 		 */
-		virtual ~SecondScreen();
+		virtual ~LastScreen();
 
         /**
          * This method is called if the touch-up event was inside the
@@ -106,4 +106,4 @@ namespace ScreenTransitionTest
 	};
 } // end of ScreenTransitionTest
 
-#endif /* SECOND_SCREEN_H_ */
+#endif /* LAST_SCREEN_H_ */

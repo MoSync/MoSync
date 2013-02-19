@@ -21,7 +21,7 @@
  * @author Bogdan Iusco & Mircea Vasiliniuc
  * @date 20 Nov 2012
  *
- * @brief First screen shown.
+ * @brief Screen transitions screen.
  */
 
 #define TITLE_TEXT "1st View. Choose transition!"
@@ -36,7 +36,7 @@
 #include <NativeUI/ListView.h>
 #include <NativeUI/ListViewItem.h>
 
-#include "FirstScreen.h"
+#include "TransitionsScreen.h"
 #include "ScreenUtils.h"
 
 namespace ScreenTransitionTest
@@ -45,7 +45,7 @@ namespace ScreenTransitionTest
 	 * Constructor.
 	 * @param observer Observer for this screen.
 	 */
-	FirstScreen::FirstScreen(FirstScreenObserver& observer):
+	TransitionsScreen::TransitionsScreen(FirstScreenObserver& observer):
 		mObserver(observer),
 		mMainLayout(NULL),
 		mFooterLayout(NULL),
@@ -67,7 +67,7 @@ namespace ScreenTransitionTest
 	/**
 	 * Destructor.
 	 */
-	FirstScreen::~FirstScreen()
+	TransitionsScreen::~TransitionsScreen()
 	{
 		mShowSecondScreenButton->removeButtonListener(this);
 		mScreenTransitionListView->removeListViewListener(this);
@@ -76,7 +76,7 @@ namespace ScreenTransitionTest
 	/**
 	 * Create screen's UI.
 	 */
-	void FirstScreen::createUI()
+	void TransitionsScreen::createUI()
 	{
 		mMainLayout = new NativeUI::VerticalLayout();
 		mMainLayout->setBackgroundColor(SCREEN_COLOR);
@@ -135,7 +135,7 @@ namespace ScreenTransitionTest
 	 * Platform: iOS, Android, Windows Phone.
 	 * @param button The button object that generated the event.
 	 */
-	void FirstScreen::buttonClicked(NativeUI::Widget* button)
+	void TransitionsScreen::buttonClicked(NativeUI::Widget* button)
 	{
 		int transitionType = MAW_TRANSITION_TYPE_NONE;
 		if ( mSelectedListItem > 0 )
@@ -157,7 +157,7 @@ namespace ScreenTransitionTest
 	 * @param listView The list view object that generated the event.
 	 * @param listViewItem The ListViewItem object that was clicked.
 	 */
-	void FirstScreen::listViewItemClicked(
+	void TransitionsScreen::listViewItemClicked(
 	    NativeUI::ListView* listView,
 	    NativeUI::ListViewItem* listViewItem)
 	{
@@ -181,7 +181,7 @@ namespace ScreenTransitionTest
 	 * @param listView The list view object that generated the event.
 	 * @param index The index on which the  list view item is positioned.
 	 */
-	void FirstScreen::listViewItemClicked(
+	void TransitionsScreen::listViewItemClicked(
 		NativeUI::ListView* listView,
 		int index)
 	{
@@ -194,7 +194,7 @@ namespace ScreenTransitionTest
 	/**
 	 * Constructs the transitions map.
 	 */
-	void FirstScreen::fillScreenTransitionContainer()
+	void TransitionsScreen::fillScreenTransitionContainer()
 	{
 		if ( ScreenUtils::OS_ANDROID == ScreenUtils::getCurrentPlatform() )
 		{
@@ -216,7 +216,7 @@ namespace ScreenTransitionTest
 	/**
 	 * Populates the screen transition list.
 	 */
-	void FirstScreen::populateTransitionList()
+	void TransitionsScreen::populateTransitionList()
 	{
 		if ( NULL != mScreenTransitionListView )
 		{

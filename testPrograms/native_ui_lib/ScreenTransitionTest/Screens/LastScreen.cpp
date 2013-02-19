@@ -21,7 +21,7 @@
  * @author Bogdan Iusco & Mircea Vasiliniuc
  * @date 20 Nov 2012
  *
- * @brief Second screen shown.
+ * @brief Last screen.
  */
 
 #define TITLE_TEXT "2nd View. "
@@ -34,7 +34,7 @@
 #include <NativeUI/VerticalLayout.h>
 #include <NativeUI/Label.h>
 
-#include "SecondScreen.h"
+#include "LastScreen.h"
 #include "ScreenUtils.h"
 
 namespace ScreenTransitionTest
@@ -43,7 +43,7 @@ namespace ScreenTransitionTest
 	 * Constructor.
 	 * @param observer Observer for this screen.
 	 */
-	SecondScreen::SecondScreen(SecondScreenObserver& observer):
+	LastScreen::LastScreen(SecondScreenObserver& observer):
 		mObserver(observer),
 		mMainLayout(NULL),
 		mHideScreenButton(NULL),
@@ -56,7 +56,7 @@ namespace ScreenTransitionTest
 	/**
 	 * Destructor.
 	 */
-	SecondScreen::~SecondScreen()
+	LastScreen::~LastScreen()
 	{
 		mHideScreenButton->removeButtonListener(this);
 	}
@@ -67,7 +67,7 @@ namespace ScreenTransitionTest
      * Platform: iOS, Android, Windows Phone.
      * @param button The button object that generated the event.
      */
-    void SecondScreen::buttonClicked(NativeUI::Widget* button)
+    void LastScreen::buttonClicked(NativeUI::Widget* button)
     {
         if (button == mHideScreenButton)
         {
@@ -75,7 +75,7 @@ namespace ScreenTransitionTest
         }
     }
 
-    void SecondScreen::resetTitleWithString(const char* appendText)
+    void LastScreen::resetTitleWithString(const char* appendText)
     {
         MAUtil::String currentText = TITLE_TEXT;
         currentText.append(appendText, strlen(appendText));
@@ -85,7 +85,7 @@ namespace ScreenTransitionTest
 	/**
 	 * Create screen's UI.
 	 */
-	void SecondScreen::createUI()
+	void LastScreen::createUI()
 	{
 		mMainLayout = new NativeUI::VerticalLayout();
 		mMainLayout->setBackgroundColor(SCREEN_COLOR);
