@@ -46,14 +46,6 @@ public class MoSyncCameraController {
 	private byte[] mCallbackBuffer = null;
 	private byte[] mImageBuffer = null;
 
-
-
-	/**
-	 * Static Attributes used for reflection of some functions in the API
-	 */
-	private static Method mGetNumberofCameras;
-	private static Camera tempCamera;
-
 	/**
 	* Stores number of availabe cameras on the device
 	*/
@@ -181,43 +173,20 @@ public class MoSyncCameraController {
 	 * queries the number of available cameras
 	 * @return number of cameras on the device
 	 */
-	public int numberOfCameras()
-	{
-		if(mNumCameras != 0)
+	public int numberOfCameras() {
+		if (mNumCameras != 0)
 		{
-			//Do not do the costly operation of reflection again
+			// Do not do the costly operation of reflection again
 			return mNumCameras;
 		}
-		 try
-		 {
-			if (mCamera == null) {
-				tempCamera = Camera.open();
-			} else {
-				mCamera.release();
-				tempCamera = Camera.open(mCurrentCameraIndex);
-			}
 
-			 //We have to use and static instance of the camera in the reflection here
-			 mGetNumberofCameras = tempCamera.getClass().getMethod(
-					 "getNumberOfCameras");
-			 tempCamera.release();
-			 if(mCamera != null)
-			 {
-				 mCamera = Camera.open(mCurrentCameraIndex);
-			 }
-			 return Camera.getNumberOfCameras();
-
-		 }
-		 catch (NoSuchMethodException nsme)
-		 {
-			 tempCamera.release();
-			 SYSLOG("ANDROID Version is less than 2.3!!");
-			 //before 2.3 only one camera is supported
-			 return 1;
-		 } catch (RuntimeException e) {
-			 SYSLOG("Failed to set camera Parameters");
-			 return MAAPI_consts.MA_CAMERA_RES_FAILED;
-		 }
+		int numCameras = 1;
+		try {
+			numCameras = Camera.getNumberOfCameras();
+		} catch (NoSuchMethodError nsme) {
+			SYSLOG("ANDROID Version is less than 2.3!!");
+		}
+		return numCameras;
 	}
 
 	/**
