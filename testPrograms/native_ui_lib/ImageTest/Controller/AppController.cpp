@@ -63,7 +63,6 @@ namespace ImageTest
 		maGetSystemProperty("mosync.path.local", buf, BUFFER_SIZE);
 		sprintf(buf, "%sImagePath.png", buf);
 		MAUtil::String path = buf;
-		printf("Image path is %s", path.c_str());
 		mPathPropertyScreen->setDisplayedImagePath(path);
 	}
 
@@ -102,7 +101,6 @@ namespace ImageTest
 	void AppController::showImagePath()
 	{
 		MAUtil::String path = mTestScreen->getImagePath();
-		printf("imagePath is %s", path.c_str());
 		maAlert("Image path is",
 				path.c_str(),
 				"OK",

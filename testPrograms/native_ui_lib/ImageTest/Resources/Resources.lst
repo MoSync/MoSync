@@ -3,4 +3,4 @@
 .include "LocalFiles.bin"
 
 .res RES_IMAGE
-.image "button.png"
+.image "ImageHandle.png"

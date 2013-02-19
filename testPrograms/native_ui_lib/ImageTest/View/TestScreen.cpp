@@ -123,8 +123,7 @@ namespace ImageTest
 
 		int result = mImage->setImage(RES_IMAGE);
 		printf("result setImage = %d", result);
-		mImage->fillSpaceHorizontally();
-		mImage->setScaleMode(IMAGE_SCALE_PRESERVE_ASPECT);
+		mImage->setScaleMode(IMAGE_SCALE_NONE);
 
 		Label* infoImage = new Label();
 		infoImage->setText("Set the image transparency");

@@ -96,29 +96,29 @@ namespace ImageTest
 		 */
 		void createGetImagePathButton();
 
-        /**
-         * This method is called when the return button was pressed.
-         * On iOS platform the virtual keyboard is not closed after
-         * receiving this event.
-         * This method is called only if the edit box mode is
-         * #MAW_EDIT_BOX_SINGLE_LINE.
-         * @param editBox The edit box object that generated the event.
-         */
-        virtual void editBoxReturn(NativeUI::EditBox* editBox);
+		/**
+		 * This method is called when the return button was pressed.
+		 * On iOS platform the virtual keyboard is not closed after
+		 * receiving this event.
+		 * This method is called only if the edit box mode is
+		 * #MAW_EDIT_BOX_SINGLE_LINE.
+		 * @param editBox The edit box object that generated the event.
+		 */
+		virtual void editBoxReturn(NativeUI::EditBox* editBox);
 
-        /**
-         * This method is called if the touch-up event was inside the
-         * bounds of the button.
-         * Platform: iOS, Android, Windows Phone.
-         * @param button The button object that generated the event.
-         */
-        virtual void buttonClicked(NativeUI::Widget* button);
+		/**
+		 * This method is called if the touch-up event was inside the
+		 * bounds of the button.
+		 * Platform: iOS, Android, Windows Phone.
+		 * @param button The button object that generated the event.
+		 */
+		virtual void buttonClicked(NativeUI::Widget* button);
 
 	private:
-        /**
-         * Screen listener.
-         */
-        PathPropertyScreenListener& mListener;
+		/**
+		 * Screen listener.
+		 */
+		PathPropertyScreenListener& mListener;
 
 		/**
 		 * Main layout.
