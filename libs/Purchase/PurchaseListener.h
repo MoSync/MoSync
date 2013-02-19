@@ -60,8 +60,8 @@ namespace IAP
 		virtual void productValid(const Purchase& purchase) = 0;
 
 		/**
-		 * Notifies that the product is not valid on the App Store.
-		 * Platform: iOS.
+		 * Notifies that the product is not valid on the App Store or Google Play.
+		 * Platform: iOS and Android.
 		 * @param purchase The object that sent the event.
 		 */
 		virtual void productInvalid(const Purchase& purchase) {};

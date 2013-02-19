@@ -311,6 +311,15 @@ void MainScreen::createProductIdList()
 		 */
 		mProductIdList.add(sGooglePlayPurchasedProductId);
 		mProductNamesList.add("Test product");
+
+		mProductIdList.add("managed_item");
+		mProductNamesList.add("Managed product");
+
+		mProductIdList.add("unmanaged_item");
+		mProductNamesList.add("Unmanaged product");
+
+		mProductIdList.add("sword_item_managed");
+		mProductNamesList.add("Managed Sword product");
 	}
 	else
 	{

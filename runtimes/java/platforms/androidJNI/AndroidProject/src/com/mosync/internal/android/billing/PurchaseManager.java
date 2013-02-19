@@ -17,20 +17,26 @@ MA 02110-1301, USA.
 
 package com.mosync.internal.android.billing;
 
+import android.content.Intent;
 import android.util.Log;
 
 import com.mosync.internal.android.MoSyncThread;
-import com.mosync.internal.android.billing.request.BaseRequest;
-import com.mosync.internal.android.billing.request.RestoreTransactions;
 import com.mosync.nativeui.util.HandleTable;
+import com.mosync.internal.android.billing.util.IabException;
+import com.mosync.internal.android.billing.util.IabHelper;
+import com.mosync.internal.android.billing.util.IabResult;
+import com.mosync.internal.android.billing.util.SkuDetails;
+import com.mosync.internal.android.billing.util.Purchase;
 
 import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_ERROR_INVALID_HANDLE;
 import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_ERROR_NO_RECEIPT;
+import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_RES_MALFORMED_PUBLIC_KEY;
 import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_RES_OK;
 import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_STATE_FAILED;
 import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_STATE_IN_PROGRESS;
 import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_STATE_DUPLICATE_HANDLE;
 import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_STATE_PRODUCT_VALID;
+import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_STATE_PRODUCT_INVALID;
 import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_RECEIPT_PRODUCT_ID;
 import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_RECEIPT_PURCHASE_DATE;
 import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_RECEIPT_TRANSACTION_ID;
@@ -44,7 +50,7 @@ import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_ERROR_UNKNO
 import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_STATE_RESTORE_ERROR;
 import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_STATE_PRODUCT_RESTORED;
 import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_STATE_PRODUCT_REFUNDED;
-import static com.mosync.internal.android.MoSyncHelpers.*;
+import static com.mosync.internal.android.MoSyncHelpers.SYSLOG;
 
 /**
  * The purchase manager holds all purchase info of both user
@@ -62,51 +68,160 @@ public class PurchaseManager extends BillingListener
 	public PurchaseManager(MoSyncThread thread)
 	{
 		mMoSyncThread = thread;
-		mService = new BillingService();
-		mService.setContext(mMoSyncThread.getActivity());
-		mService.setThread(mMoSyncThread);
-		mService.bindToMarketBillingService();
+	}
+
+	/**
+	 * Bind the service if the IAP permission is set.
+	 */
+	public void bindService()
+	{
+		Log.e("@@MoSync","Purchase: bindService ");
+		// IAP permission is set, bind the service.
+		mHelper = new IabHelper(mMoSyncThread.getActivity());
+		if (key != null)
+			mHelper.setSignature(key);
+        // Start setup. This is asynchronous and the specified listener
+        // will be called once setup completes.
+		mHelper.startSetup(new IabHelper.OnIabSetupFinishedListener() {
+            public void onIabSetupFinished(IabResult result) {
+                if (!result.isSuccess()) {
+                    return ; //cannot connect.
+                }
+            }
+        });
 	}
 
 	public void restoreService()
 	{
-		mService.bindToMarketBillingService();
+		//mService.bindToMarketBillingService();
+		if (mHelper == null)
+			bindService();
 	}
 
 	public int checkPurchaseSupported()
 	{
-		return mService.checkBillingSupported();
+		if (mHelper == null)
+		{
+			// Something went wrong with the service connection.
+			return MA_PURCHASE_ERROR_CONNECTION_FAILED;
+		}
+		return Consts.responseCodeValue( mHelper.getBillingSupportedResponse() );
 	}
 
 	public int createPurchase(final int productHandle, final String productID)
-	{
-		PurchaseInformation newPurchase = new PurchaseInformation(productID);
+	{Log.e("@@MoSync","createPurchase -------");
+//		PurchaseInformation newPurchase = new PurchaseInformation(productID);
+		Purchase newPurchase = new Purchase(productID);
 		if ( m_PurchaseTable.add(productHandle, newPurchase) )
 		{
+			Log.e("@@MoSync","createPurchase with handle " + productHandle + " for id = " + productID);
 			newPurchase.setHandle( productHandle );
+
+			SkuDetails skuDetails = null;
+
+			try{
+				if (mHelper == null)
+				{
+					Log.e("@@MoSync","reconnect to service");
+					mHelper = new IabHelper(mMoSyncThread.getActivity(), key);
+					mHelper.startSetup(new IabHelper.OnIabSetupFinishedListener() {
+			            public void onIabSetupFinished(IabResult result) {
+			                if (!result.isSuccess()) { Log.e("@@MoSync","maPurchaseCreate cannot connect to service");
+			                    return ; //cannot connect.
+			                }
+			                try {
+								SkuDetails skuDetails = mHelper.getSkuDetails(productID);
+								Log.e("@@MoSync", "Got sku details after setup  !!!!!!!!!!!!!! details = " + skuDetails.getDescription());
+								Log.e("@@MoSync", "Got sku details !!!!!!!!!!!!!! price = " + skuDetails.getPrice());
+								Log.e("@@MoSync", "Got sku details !!!!!!!!!!!!!! sku = " + skuDetails.getSku());
+								Log.e("@@MoSync", "Got sku details !!!!!!!!!!!!!! title = " + skuDetails.getTitle());
+								Log.e("@@MoSync", "Got sku details !!!!!!!!!!!!!! type = " + skuDetails.getType());
+							} catch (IabException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+			            }
+			        });
+				}
+
+				else
+				{
+					skuDetails = mHelper.getSkuDetails(productID);
+				}
+
+				if (skuDetails == null)
+				{
+
+					SYSLOG("@@MoSync maPurchaseCreate: invalid product" + productID);
+					Log.e("MoSync","@@MoSync maPurchaseCreate: invalid product  " + productID);
+					return MA_PURCHASE_STATE_PRODUCT_INVALID;
+				}
+				else
+				{
+					Log.e("@@MoSync", "Got sku details !!!!!!!!!!!!!! details = " + skuDetails.getDescription());
+					Log.e("@@MoSync", "Got sku details !!!!!!!!!!!!!! price = " + skuDetails.getPrice());
+					Log.e("@@MoSync", "Got sku details !!!!!!!!!!!!!! sku = " + skuDetails.getSku());
+					Log.e("@@MoSync", "Got sku details !!!!!!!!!!!!!! title = " + skuDetails.getTitle());
+					Log.e("@@MoSync", "Got sku details !!!!!!!!!!!!!! type = " + skuDetails.getType());
+
+				}
+			}catch (IabException ibe)
+			{
+				Log.e("@@MoSync"," maPurchaseCreate IABException ");
+				return MA_PURCHASE_ERROR_CONNECTION_FAILED;
+			}
+
+			Log.e("MoSync","@@MoSync maPurchaseCreate: Valid product" + productID);
 			return MA_PURCHASE_STATE_PRODUCT_VALID;
 		}
 
 		return MA_PURCHASE_STATE_DUPLICATE_HANDLE;
 	}
 
+    // Callback for when a purchase is finished
+    IabHelper.OnIabPurchaseFinishedListener mPurchaseFinishedListener = new IabHelper.OnIabPurchaseFinishedListener() {
+        public void onIabPurchaseFinished(IabResult result, Purchase purchase) {
+Log.e("@@MoSYnc", " OnIabPurchaseFinishedListener --------------- " +  result.getResponse());
+            Log.e("@@MoSync","Purchase finished: " + result + ", purchase: " + purchase + " handle = " + result.getPurchaseHandle());
+            if (result.isFailure()) {
+Log.e("@@MoSync","Purchase finished: isFailure!!!!!!!!!!!!!!!!!!!!!!!!!!!!!  ");
+                //complain("Error purchasing: " + result);
+				mMoSyncThread.postEvent(BillingEvent.onPurchaseStateChanged(
+						result.getPurchaseHandle(),//purchase.getProductHandle(),//0,//purchase.getSku()
+						MA_PURCHASE_STATE_FAILED,
+						Consts.responseCodeValue( result.getResponse()) ) );
+				//SYSLOG("@@MoSync maPurchaseRequest: requestID = " +  requestObj.getRequestID() );
+                return;
+            }
+
+            SYSLOG("@@MoSync Purchase successful.");
+            Log.e("@@MoSYnc", " OnIabPurchaseFinishedListener --------------- " + purchase.getProductHandle());
+            Log.e("@@MoSYnc", " OnIabPurchaseFinishedListener --------------- " + result.getPurchaseHandle() + result.getResponse());
+            Log.e("@@MoSync", "OnIabPurchaseFinishedListener: purchase = " + purchase.getOrderId() + purchase.getPurchaseState()+ purchase.getPurchaseTime() + purchase.getSku() + purchase.getPackageName());
+//			mMoSyncThread.postEvent(BillingEvent.onPurchaseStateChanged(
+//					result.getPurchaseHandle(),//purchase.getProductHandle()
+//					MA_PURCHASE_STATE_COMPLETED,
+//					0 ));
+
+            onTransactionInformationReceived(purchase);
+//
+//            if (purchase.getSku().equals(SKU_GAS)) {
+//                // bought 1/4 tank of gas. So consume it.
+//                Log.d(TAG, "Purchase is gas. Starting gas consumption.");
+//                mHelper.consumeAsync(purchase, mConsumeFinishedListener);
+//            }
+        }
+    };
+
 	/**
 	 * Start a purchase request and set it to the current handle.
 	 * @param handle
-	 * @return
 	 */
 	public void requestPurchase(int handle)
-	{
-		if ( !mService.isConnected() )
-		{
-			onPurchaseStateChanged(
-					MA_PURCHASE_STATE_FAILED,
-					handle,
-					MA_PURCHASE_ERROR_CONNECTION_FAILED);
-			return;
-		}
-
-		if ( !mService.isPublicKeySet() )
+	{Log.e("@@MoSync","requestPurchase ---------------------------- " + handle);
+	if (mHelper == null)
+		Log.e("@@MoSync","requestPurchase helper is NULL -------------------");
+		if (!mHelper.isPublicKeySet())
 		{
 			onPurchaseStateChanged(
 					MA_PURCHASE_STATE_FAILED,
@@ -115,55 +230,61 @@ public class PurchaseManager extends BillingListener
 			return;
 		}
 
-		PurchaseInformation purchase = m_PurchaseTable.get(handle);
+		Purchase purchase = m_PurchaseTable.get(handle);
 		if ( null != purchase )
 		{
 			// Remove pending receipt event if there is one.
 			m_PendingEvents.remove(handle);
 
 			// Send the request to the service.
-			// If there is another request in progress, this one will be placed
-			// on the queue.
-			BaseRequest requestObj = mService.requestPurchase(purchase.getProductID(), handle);
-			if ( requestObj.isPending() )
-			{
-				SYSLOG("@@MoSync Request was placed on a queue");
-				return;
-			}
+			mHelper.launchPurchaseFlow(
+					mMoSyncThread.getActivity(), purchase.getSku(), handle, mPurchaseFinishedListener);
+
+			mCurrentPurchaseHandle = handle;
+			purchase.setState(MA_PURCHASE_STATE_IN_PROGRESS);
+
+			mMoSyncThread.postEvent(BillingEvent.onPurchaseStateChanged(
+					handle,
+					MA_PURCHASE_STATE_IN_PROGRESS,
+					0));
 
 			// If request was sent to the server send IN_PROGRESS event, but
 			// keep in mind that RESPONSE_CODE intents can later signal errors on the server side.
-			if ( requestObj != null &&
-					requestObj.getRequestID() != Consts.BILLING_RESPONSE_INVALID_REQUEST_ID )
-			{
-				SYSLOG("@@MoSync maPurchaseRequest: requestID = " +  requestObj.getRequestID() );
-				mCurrentPurchaseHandle = handle;
-
-				purchase.setState(MA_PURCHASE_STATE_IN_PROGRESS);
-				purchase.setRequest(requestObj);
-
-				mMoSyncThread.postEvent(BillingEvent.onPurchaseStateChanged(
-						handle,
-						MA_PURCHASE_STATE_IN_PROGRESS,
-						0));
-			}
-			else
-			{
-				mMoSyncThread.postEvent(BillingEvent.onPurchaseStateChanged(
-						handle,
-						MA_PURCHASE_STATE_FAILED,
-						MA_PURCHASE_ERROR_UNKNOWN)); // Though, it's more like DEVELOPER_ERROR.
-			}
-			SYSLOG("@@MoSync maPurchaseRequest: requestID = " +  requestObj.getRequestID() );
+//			SYSLOG("@@MoSync maPurchaseRequest: requestID = " +  requestObj.getRequestID() );
 		}
 		else
 		{
 			SYSLOG("@@MoSync maPurchaseRequest: Invalid product handle " + handle);
+			Log.e("MoSync","@@MoSync maPurchaseRequest: Invalid product handle " + handle);
 			mMoSyncThread.postEvent(BillingEvent.onPurchaseStateChanged(
 					handle,
 					MA_PURCHASE_STATE_FAILED,
 					MA_PURCHASE_ERROR_INVALID_HANDLE));
 		}
+	}
+
+	public static boolean handleActivityResult(final int requestCode, final int resultCode, final Intent data)
+	{
+		Log.e("@@MoSync","handleActivityResult  !! ");
+		if (mHelper != null)
+		{
+			return mHelper.handleActivityResult(requestCode, resultCode, data);
+		}
+		else
+		{
+			Log.e("@@MoSync", "handleActivityResult  helper is NULL ");
+			mHelper = new IabHelper(mMoSyncThread.getActivity(), key);
+			mHelper.startSetup(new IabHelper.OnIabSetupFinishedListener() {
+	            public void onIabSetupFinished(IabResult result) {
+	                if (!result.isSuccess()) {
+	                    return ; //cannot connect.
+	                }
+	                mHelper.handleActivityResult(requestCode, resultCode, data);
+	            }
+	        });
+
+		}
+		return true;
 	}
 
 	/**
@@ -175,10 +296,10 @@ public class PurchaseManager extends BillingListener
 	{
 		if ( mCurrentPurchaseHandle > 0 )
 		{
-			PurchaseInformation purchase = m_PurchaseTable.get(mCurrentPurchaseHandle);
+			Purchase purchase = m_PurchaseTable.get(mCurrentPurchaseHandle);
 			if ( purchase != null )
 			{
-				purchase.setNotificationID(notificationID);
+				//purchase.setNotificationID(notificationID);
 			}
 		}
 	}
@@ -190,10 +311,10 @@ public class PurchaseManager extends BillingListener
 	 */
 	public String getProductID(int handle)
 	{
-		PurchaseInformation purchase = m_PurchaseTable.get(handle);
+		Purchase purchase = m_PurchaseTable.get(handle);
 		if ( null != purchase )
 		{
-			return purchase.getProductID();
+			return purchase.getSku();
 		}
 
 		return "";
@@ -207,7 +328,7 @@ public class PurchaseManager extends BillingListener
 	 */
 	public String getField(int handle, String field)
 	{
-		PurchaseInformation purchase = m_PurchaseTable.get(handle);
+		Purchase purchase = m_PurchaseTable.get(handle);
 		if ( null != purchase )
 		{
 			if ( purchase.getState() != MA_PURCHASE_STATE_COMPLETED &&
@@ -217,11 +338,11 @@ public class PurchaseManager extends BillingListener
 			}
 			if ( field.equals(MA_PURCHASE_RECEIPT_PRODUCT_ID) )
 			{
-				return purchase.getProductID();
+				return purchase.getSku();
 			}
 			if ( field.equals(MA_PURCHASE_RECEIPT_PURCHASE_DATE) )
 			{
-				return String.valueOf(purchase.mTime);
+				return String.valueOf(purchase.getPurchaseTime());
 			}
 			if ( field.equals(MA_PURCHASE_RECEIPT_APP_ITEM_ID) )
 			{
@@ -231,6 +352,7 @@ public class PurchaseManager extends BillingListener
 			{
 				return purchase.getOrderId();
 			}
+			// TODO add price, title & desciption. + to wrapper.
 			return Consts.RECEIPT_FIELD_NOT_AVAILABLE;
 		}
 		return Consts.RECEIPT_INVALID_HANDLE;
@@ -243,7 +365,7 @@ public class PurchaseManager extends BillingListener
 	 * the app waits for PURCHASE_STATE_CHANGE messages.
 	 */
 	public void restoreTransactions()
-	{
+	{/**
 		if ( !mService.isConnected() )
 		{
 			mMoSyncThread.postEvent(BillingEvent.onRestoreTransaction(
@@ -263,7 +385,7 @@ public class PurchaseManager extends BillingListener
 		}
 
 		RestoreTransactions request = mService.restoreTransactions();
-		SYSLOG("@@MoSync maPurchaseRestoreTransactions requestID = " + request.getRequestID());
+		SYSLOG("@@MoSync maPurchaseRestoreTransactions requestID = " + request.getRequestID());**/
 	}
 
 	/**
@@ -277,7 +399,7 @@ public class PurchaseManager extends BillingListener
 	 */
 	public void verifyReceipt(int handle)
 	{
-		PurchaseInformation purchase = m_PurchaseTable.get(handle);
+		Purchase purchase = m_PurchaseTable.get(handle);
 		if ( null != purchase )
 		{
 			// Check if a purchase was requested for the product.
@@ -314,18 +436,44 @@ public class PurchaseManager extends BillingListener
 		}
 	}
 
+	public static int getCurrentRequestCode()
+	{
+		if (mHelper != null)
+			return mHelper.getRequestCode();
+		return -1;
+	}
+
 	/**
 	 * Generate a PublicKey instance from a string containing the
 	 * Base64-encoded public key.
 	 */
 	public int setKey(final String developerPublicKey)
 	{
-		return mService.setPublicKey(developerPublicKey);
+		try
+		{
+			Security.generatePublicKey(developerPublicKey);
+		} catch (Exception ex)
+		{
+			SYSLOG("maPurchaseSetPublicKey: malformed developerPublicKey");
+			return MA_PURCHASE_RES_MALFORMED_PUBLIC_KEY;
+		}
+
+		if (mHelper == null)
+		{
+			mHelper = new IabHelper(mMoSyncThread.getActivity(), developerPublicKey);
+		}
+		else
+		{
+			mHelper.setSignature(developerPublicKey);
+		}
+
+		key = developerPublicKey;
+		return MA_PURCHASE_RES_OK;
 	}
 
 	public int destroyPurchase(int handle)
 	{
-		PurchaseInformation purchase = m_PurchaseTable.get(handle);
+		Purchase purchase = m_PurchaseTable.get(handle);
 		if ( null != purchase )
 		{
 			// Remove the internal purchase object.
@@ -342,8 +490,9 @@ public class PurchaseManager extends BillingListener
 
 	public void unbindService()
 	{
-		if ( mService != null )
-			mService.unbind();
+		if (mHelper != null)
+			mHelper.dispose();
+		mHelper = null;
 	}
 
 	/**
@@ -353,7 +502,7 @@ public class PurchaseManager extends BillingListener
 	 * user, after he calls verifyReceipt.
 	 * @param purchase The purchase.
 	 */
-	public static void onTransactionInformationReceived(PurchaseInformation purchase)
+	public static void onTransactionInformationReceived(Purchase purchase)
 	{
 		// Keep MA_PURCHASE_EVENT_RECEIPT_VALID event for this purchase.
 		// The event will be sent after verifyreceipt is called.
@@ -371,13 +520,13 @@ public class PurchaseManager extends BillingListener
 	 * @param purchase The purchase object that was created while parsing the
 	 * received JSON.
 	 */
-	public static void setCurrentPurchaseInformation(PurchaseInformation purchase)
+	public static void setCurrentPurchaseInformation(Purchase purchase)
 	{
-		PurchaseInformation currentPurchase = m_PurchaseTable.get(mCurrentPurchaseHandle);
-		currentPurchase.setNotificationID(purchase.getNotificationId());
+		Purchase currentPurchase = m_PurchaseTable.get(mCurrentPurchaseHandle);
+		//currentPurchase.setNotificationID(purchase.getNotificationId());
 		currentPurchase.setState(purchase.getState());
-		currentPurchase.setOrderId(purchase.getOrderId());
-		currentPurchase.mTime = purchase.mTime;
+		currentPurchase.setOrderID(purchase.getOrderId());
+		currentPurchase.setOrderTime(purchase.getPurchaseTime());
 		currentPurchase.setPackageName(purchase.getPackageName());
 	}
 
@@ -385,7 +534,7 @@ public class PurchaseManager extends BillingListener
 	 * Manager is notified through this method when a purchase is restored
 	 * @param purchase The new purchase object.
 	 */
-	public static void onPurchaseRestored(PurchaseInformation purchase)
+	public static void onPurchaseRestored(Purchase purchase)
 	{
 		onReceivedPurchase(purchase, MA_PURCHASE_STATE_PRODUCT_RESTORED);
 	}
@@ -398,7 +547,7 @@ public class PurchaseManager extends BillingListener
 	 *
 	 * @param purchase The new purchase object.
 	 */
-	public static void onPurchaseRefunded(PurchaseInformation purchase)
+	public static void onPurchaseRefunded(Purchase purchase)
 	{
 		onReceivedPurchase(purchase, MA_PURCHASE_STATE_PRODUCT_REFUNDED);
 	}
@@ -412,7 +561,7 @@ public class PurchaseManager extends BillingListener
 	 * 	- MA_PURCHASE_STATE_PRODUCT_REFUNDED,
 	 * 	- MA_PURCHASE_STATE_PRODUCT_RESTORED
 	 */
-	public static void onReceivedPurchase(PurchaseInformation purchase, int purchaseState)
+	public static void onReceivedPurchase(Purchase purchase, int purchaseState)
 	{
 		// Create new product handle.
 		int handle = mMoSyncThread.nativeCreatePlaceholder();
@@ -445,7 +594,7 @@ public class PurchaseManager extends BillingListener
 	 */
 	public static void onPurchaseStateChanged(int state, int handle, int error)
 	{
-		BillingService.setPurchaseRequestInProgress(false);
+		//BillingService.setPurchaseRequestInProgress(false);
 		mMoSyncThread.postEvent(BillingEvent.onPurchaseStateChanged(handle, state, error));
 	}
 
@@ -462,11 +611,15 @@ public class PurchaseManager extends BillingListener
     }
 	/************************ Class members ************************/
 
+    /**
+     * The helper object from InAppPurchase.
+     */
+    private static IabHelper mHelper;
+
 	/**
 	 * The MoSync thread object.
 	 */
 	private static MoSyncThread mMoSyncThread;
-	private BillingService mService;
 
 	/**
 	 * -1 means no active purchase.
@@ -476,12 +629,13 @@ public class PurchaseManager extends BillingListener
 	/**
 	 * A table that contains a mapping between a handle and a purchase object.
 	 */
-	private static HandleTable<PurchaseInformation> m_PurchaseTable =
-		new HandleTable<PurchaseInformation>();
+	private static HandleTable<Purchase> m_PurchaseTable =
+		new HandleTable<Purchase>();
 
     /**
      * Pending events for each product. The events are related to the receipt validation,
      * as they will be sent to the application only after maPurchaseVerifyReceipt is called.
      */
 	private static HandleTable<int[]> m_PendingEvents = new HandleTable<int[]>();
+	private static String key;
 }

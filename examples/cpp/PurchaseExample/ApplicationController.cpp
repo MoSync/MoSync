@@ -98,6 +98,7 @@ void ApplicationController::listViewItemClicked(
  */
 void ApplicationController::productValid(const Purchase& purchase)
 {
+	maAlert("Product valid", "Purchase in progres..", "OK","","");
 	mPurchases[mCurrentPurchase]->requestPurchase();
 }
 
@@ -111,6 +112,8 @@ void ApplicationController::productInvalid(const Purchase& purchase)
 	MAUtil::String errorMessage = "Product " + purchase.getProductId()
 			+ " is invalid!";
 	mMainScreen->productError(errorMessage);
+	//TODO remove, only for android.test.purchased
+//	/mPurchases[mCurrentPurchase]->requestPurchase();
 }
 
 /**
@@ -138,7 +141,7 @@ void ApplicationController::requestFailed(const Purchase& purchase,
 	const int errorCode)
 {
 	mMainScreen->productError("Purchase failed for product "
-			+ purchase.getProductId() );
+			+ purchase.getProductId() + " with err code = "  + MAUtil::integerToString(errorCode) );
 	for (int i = 0; i < mPurchases.size(); i++)
 	{
 		Purchase* purchaseObj = mPurchases[i];
