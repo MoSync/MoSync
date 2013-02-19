@@ -24,6 +24,7 @@ import android.hardware.Camera.PictureCallback;
 
 import java.lang.Thread;
 
+import android.os.Build;
 import android.util.Log;
 
 import com.mosync.internal.generated.MAAPI_consts;
@@ -143,6 +144,25 @@ public class MoSyncCameraController {
 	}
 
 	/**
+	 * Open the given camera. On API levels below 9 only one
+	 * camera is available and Camera.open() is used.
+	 * @param cameraIndex
+	 * @return A Camera object.
+	 */
+	private Camera cameraOpen(int cameraIndex)
+	{
+		int apiLevel = Build.VERSION.SDK_INT;
+		if (apiLevel >= Build.VERSION_CODES.GINGERBREAD)
+		{
+		    return Camera.open(cameraIndex);
+		}
+		else
+		{
+			return Camera.open();
+		}
+	}
+
+	/**
 	* Lazy initialization of the cameras so we can use the number of cameras
 	*/
 	private void initilizeCameras()
@@ -150,9 +170,11 @@ public class MoSyncCameraController {
 		try
 		{
 			mCurrentCameraIndex = 0;
+			// TODO: If mNumCameras is less than 1 we have no camera?
+			// Then does it work to open it?
 			if(mNumCameras <= 1)
 			{
-				mCamera = Camera.open();
+				mCamera = cameraOpen(0);
 				mCameraParametersList.add(mCamera.getParameters());
 			}
 			else
@@ -162,18 +184,17 @@ public class MoSyncCameraController {
 				for(int ii=0; ii < mNumCameras; ii++)
 				{
 
-					mCamera = Camera.open(ii);
+					mCamera = cameraOpen(ii);
 					mCameraParametersList.add(mCamera.getParameters());
 					mCamera.release();
 				}
-				mCamera = Camera.open(mCurrentCameraIndex);
+				mCamera = cameraOpen(mCurrentCameraIndex);
 			}
 		}
 		catch(Exception e)
 		{
 			SYSLOG("Failed to assign Cameras");
 		}
-
 	}
 
 	/**
@@ -199,10 +220,10 @@ public class MoSyncCameraController {
 		 try
 		 {
 			if (mCamera == null) {
-				tempCamera = Camera.open();
+				tempCamera = cameraOpen(0);
 			} else {
 				mCamera.release();
-				tempCamera = Camera.open(mCurrentCameraIndex);
+				tempCamera = cameraOpen(mCurrentCameraIndex);
 			}
 
 			 //We have to use and static instance of the camera in the reflection here
@@ -211,7 +232,7 @@ public class MoSyncCameraController {
 			 tempCamera.release();
 			 if(mCamera != null)
 			 {
-				 mCamera = Camera.open(mCurrentCameraIndex);
+				 mCamera = cameraOpen(mCurrentCameraIndex);
 			 }
 			 return Camera.getNumberOfCameras();
 
@@ -343,7 +364,7 @@ public class MoSyncCameraController {
 					mCamera.release();
 				mPreview.mCamera = null;
 				try {
-					mCamera = Camera.open(CameraNumber);
+					mCamera = cameraOpen(CameraNumber);
 					mPreview.mCameraIndex = mCurrentCameraIndex;
 					mCamera.setParameters(getCurrentParameters());
 				} catch (Exception e) {
@@ -636,9 +657,9 @@ public class MoSyncCameraController {
 			try
 			{
 				if (mNumCameras <= 1) {
-					mCamera = Camera.open();
+					mCamera = cameraOpen(0);
 				} else {
-					mCamera = Camera.open(mCurrentCameraIndex);
+					mCamera = cameraOpen(mCurrentCameraIndex);
 				}
 				//mPreview.mCamera = mCamera;
 			}
