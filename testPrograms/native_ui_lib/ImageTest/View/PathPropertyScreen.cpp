@@ -116,7 +116,7 @@ namespace ImageTest
 		layout->addChild(label);
 
 		mPathEditBox = new NativeUI::EditBox();
-		mPathEditBox->fillSpaceVertically();
+		mPathEditBox->wrapContentVertically();
 		mPathEditBox->fillSpaceHorizontally();
 		layout->addChild(mPathEditBox);
 	}
