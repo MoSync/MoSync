@@ -21,7 +21,17 @@
 #include "Platform.h"
 #include <base/Syscall.h>
 
+@interface ImageWidget ()
+
+@property(nonatomic, retain) NSString* imagePath;
+
+- (int)setPropertyImagePath:(NSString*)path;
+
+@end
+
 @implementation ImageWidget
+
+@synthesize imagePath = _imagePath;
 
 - (id)init
 {
@@ -129,11 +139,46 @@
         else if([value isEqualToString:@"scaleXY"]) self.view.contentMode = UIViewContentModeScaleToFill;
         else if([value isEqualToString:@"scalePreserveAspect"]) self.view.contentMode = UIViewContentModeScaleAspectFit;
     }
+	else if([key isEqualToString:@MAW_IMAGE_IMAGE_PATH])
+	{
+		return [self setPropertyImagePath:value];
+	}
 	else
     {
 		return [super setPropertyWithKey:key toValue:value];
 	}
 	return MAW_RES_OK;
+}
+
+- (int)setPropertyImagePath:(NSString*)path
+{
+	UIImage* image = [[UIImage alloc] initWithContentsOfFile:path];
+	if (!image)
+	{
+		return MAW_RES_INVALID_PROPERTY_VALUE;
+	}
+	self.imagePath = path;
+	_imageView.image = image;
+	[image release];
+	return MAW_RES_OK;
+}
+
+/**
+ * Get a widget property value.
+ * @param key Widget's property name.
+ * @return The property value, or nil if the property name is invalid.
+ * The returned value should not be autoreleased. The caller will release the returned value.
+ */
+- (NSString*)getPropertyWithKey:(NSString*)key
+{
+	if ([key isEqualToString:@MAW_IMAGE_IMAGE_PATH])
+	{
+		return [self.imagePath retain];
+	}
+	else
+	{
+		return [super getPropertyWithKey:key];
+	}
 }
 
 /**
@@ -142,6 +187,7 @@
 -(void) dealloc
 {
     [_imageView release];
+	[_imagePath release];
     [super dealloc];
 }
 
