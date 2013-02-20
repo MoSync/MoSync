@@ -52,7 +52,7 @@ namespace MoSync
             {
                 mStack = new System.Collections.Generic.Stack<IScreen>();
                 mApplicationBarItemsIndexes = new Dictionary<Object, int>();
-            }
+           }
 
             /**
              * Override the AddChild function
@@ -233,6 +233,33 @@ namespace MoSync
                         Microsoft.Phone.Controls.PhoneApplicationPage).ApplicationBar.IsVisible = false;
                     }
                 }
+            }
+
+            /**
+             * Handles the back button pressed event.
+             * @return true if the event has been consumed, false otherwise.
+             */
+            public override bool HandleBackButtonPressed()
+            {
+                if (!(this.GetParent() is TabScreen))
+                {
+                    if (this.GetParent() is PanoramaView)
+                    {
+                        if ((this.GetParent() as PanoramaView).getSelectedScreen().Equals(this) && (this as StackScreen).StackCount() > 1)
+                        {
+                            (this as StackScreen).PopFromBackButtonPressed();
+                            return true;
+                        }
+                    }
+                    else if ((this as StackScreen).StackCount() > 1 && (this as StackScreen).GetBackButtonEnabled() == true)
+                    {
+                        //Do a pop and cancel the event.
+                        (this as StackScreen).PopFromBackButtonPressed();
+                        return true;
+                    }
+                }
+
+                return false;
             }
         }
     }
