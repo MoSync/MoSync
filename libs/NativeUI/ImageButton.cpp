@@ -68,30 +68,61 @@ namespace NativeUI
          return this->getPropertyString(MAW_IMAGE_BUTTON_TEXT);
      }
 
-    /**
-     * Set the foreground image of the button. This won't be scaled at all.
-     * @param image MoSync handle to an uncompressed image resource.
-     * @return Any of the following result codes:
-     * - #MAW_RES_OK if the property could be set.
-     * - #MAW_RES_INVALID_PROPERTY_VALUE if the image handle was invalid.
-     */
-    int ImageButton::setImage(MAHandle image)
-    {
+   /**
+	* Set the foreground image of the button. This won't be scaled at all.
+	* @param image MoSync handle to an uncompressed image resource.
+	* @return Any of the following result codes:
+	* - #MAW_RES_OK if the property could be set. In this case the image
+	* path value will set to contain an empty string.
+	* - #MAW_RES_INVALID_PROPERTY_VALUE if the image handle was invalid.
+	*/
+	int ImageButton::setImage(MAHandle image)
+	{
 		int res = setPropertyInt(MAW_IMAGE_BUTTON_IMAGE, image);
 		mImageHandle = image;
-        return res;
-    }
+		return res;
+	}
 
-    /**
-     * Get the foreground image of the button.
-     * @return Any of the following result codes:
-     * - image MoSync handle to an uncompressed image resource.
-     * - #MAW_RES_INVALID_PROPERTY_VALUE if the image handle was invalid.
-     */
-    MAHandle ImageButton::getImage()
-    {
+	/**
+	 * Get the foreground image of the button.
+	 * @return Any of the following result codes:
+	 * - image MoSync handle to an uncompressed image resource.
+	 * - #MAW_RES_INVALID_PROPERTY_VALUE if the image handle was invalid
+	 * - 0 if the image path was set successfully.
+	 */
+	MAHandle ImageButton::getImage()
+	{
 		return mImageHandle;
-    }
+	}
+
+	/**
+	 * Set the foreground image that will be displayed using a file path.
+	 * @param imagePath Path to an image file.
+	 * @return Any of the following result codes:
+	 * - #MAW_RES_OK if the property could be set. In this case the
+	 * foreground image handle with be set to zero.
+	 * set to zero.
+	 * - #MAW_RES_INVALID_PROPERTY_VALUE if the image path was invalid.
+	 */
+	int ImageButton::setImagePath(const MAUtil::String& imagePath)
+	{
+		int result = this->setProperty(MAW_IMAGE_BUTTON_IMAGE_PATH, imagePath);
+		if (result == MAW_RES_OK)
+		{
+			mImageHandle = 0;
+		}
+		return result;
+	}
+
+	/**
+	 * Get the foreground image path.
+	 * @return An image path if the displayed foreground image was created
+	 * using a file path, or an empty string otherwise.
+	 */
+	MAUtil::String ImageButton::getImagePath()
+	{
+		return this->getPropertyString(MAW_IMAGE_BUTTON_IMAGE_PATH);
+	}
 
     /**
      * Sets the background image. This will be scaled to fit the whole
@@ -105,6 +136,30 @@ namespace NativeUI
     {
         return setPropertyInt(MAW_IMAGE_BUTTON_BACKGROUND_IMAGE, image);
     }
+
+	/**
+	 * Set the background image that will be displayed using a file path.
+	 * @param imagePath Path to an image file.
+	 * @return Any of the following result codes:
+	 * - #MAW_RES_OK if the property could be set.
+	 * - #MAW_RES_INVALID_PROPERTY_VALUE if the image path was invalid.
+	 */
+	int ImageButton::setBackgroundImagePath(const MAUtil::String& imagePath)
+	{
+		return this->setProperty(
+			MAW_IMAGE_BUTTON_BACKGROUND_IMAGE_PATH,
+			imagePath);
+	}
+
+	/**
+	 * Get the background image path.
+	 * @return An image path if the displayed background image was created
+	 * using a file path, or an empty string otherwise.
+	 */
+	MAUtil::String ImageButton::getBackgroundImagePath()
+	{
+		return this->getPropertyString(MAW_IMAGE_BUTTON_BACKGROUND_IMAGE_PATH);
+	}
 
     /**
      * Add an button event listener.
