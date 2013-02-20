@@ -242,7 +242,7 @@ namespace Wormhole
 	{
 		if (MAK_BACK == keyCode)
 		{
-			callJS("try{PhoneGapCommandResult('backbutton')}catch(e){}");
+			callJS("try{cordova.fireDocumentEvent('backbutton');}catch(e){console.log('exception firing backbutton event from native');}");
 		}
 	}
 
@@ -297,7 +297,7 @@ namespace Wormhole
 			256);
 
 		int modelRes = maGetSystemProperty(
-			"mosync.device",
+			"mosync.device.model",
 			deviceModel,
 			256);
 
@@ -343,14 +343,14 @@ namespace Wormhole
 			"{"
 				"\"platform\":%s,"
 				"\"name\":%s,"
-				"\"model\":\"%s\","
+				"\"model\":%s,"
 				"\"uuid\":%s,"
 				"\"version\":%s,"
 				"\"cordova\":\"2.3.0\""
 			"}",
 			Encoder::JSONStringify(deviceOS).c_str(),
 			Encoder::JSONStringify(deviceName).c_str(),
-			deviceModel,
+			Encoder::JSONStringify(deviceModel).c_str(),
 			Encoder::JSONStringify(deviceUUID).c_str(),
 			Encoder::JSONStringify(deviceOSVersion).c_str()
 			);
@@ -369,6 +369,7 @@ namespace Wormhole
 		//Adding this Class as a Sensor Listener
 		MAUtil::Environment::getEnvironment().addSensorListener(this);
 		MAUtil::Environment::getEnvironment().addCustomEventListener(this);
+		MAUtil::Environment::getEnvironment().addFocusListener(this);
 	}
 
 	/**
@@ -380,16 +381,19 @@ namespace Wormhole
 		{
 			mPhoneGapSensors->sendLocationData(event);
 		}
-		else if (event.type == EVENT_TYPE_FOCUS_LOST)
-		{
-			//let the phoneGap app know that it should go to sleep
-			callJS("try{PhoneGapCommandResult('pause')}catch(e){}");
-		}
-		else if (event.type == EVENT_TYPE_FOCUS_GAINED)
-		{
-			//let the PhoneGap side know that it should resume
-			callJS("try{PhoneGapCommandResult('resume')}catch(e){}");
-		}
+	}
+
+	void PhoneGapMessageHandler::focusLost()
+	{
+		//let the phoneGap app know that it should go to sleep
+		callJS("try{cordova.fireDocumentEvent('pause');}catch(e){console.log('exception firing pause event from native');}");
+	}
+
+	void PhoneGapMessageHandler::focusGained()
+	{
+		lprintfln("focusGained");
+		//let the PhoneGap side know that it should resume
+		callJS("try{cordova.fireDocumentEvent('resume');}catch(e){console.log('exception firing resume event from native');}");
 	}
 
 	/**

@@ -2830,6 +2830,10 @@ public class MoSyncThread extends Thread
 		{
 			property = Build.DEVICE;
 		}
+		else if(key.equals("mosync.device.model"))
+		{
+			property = Build.MODEL;
+		}
 		else if(key.equals("mosync.device.UUID"))
 		{
 			property = Secure.getString( mContext.getContentResolver(),
