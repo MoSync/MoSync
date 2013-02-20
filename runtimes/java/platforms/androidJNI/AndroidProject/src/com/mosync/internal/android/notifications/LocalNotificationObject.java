@@ -23,6 +23,7 @@ import android.content.Context;
 import android.net.Uri;
 import android.util.Log;
 
+import com.mosync.internal.generated.IX_WIDGET;
 import com.mosync.nativeui.util.properties.BooleanConverter;
 import com.mosync.nativeui.util.properties.ColorConverter;
 import com.mosync.nativeui.util.properties.IntConverter;
@@ -129,7 +130,7 @@ public class LocalNotificationObject {
 		mIsActive = true;
 		// Set the time to now.
 		mNotification.when = System.currentTimeMillis();
-		mNotification.flags |= Notification.FLAG_ONGOING_EVENT;
+		mNotification.flags |= Notification.FLAG_AUTO_CANCEL;
 		// Set now the default settings like Flashing and Vibration,
 		// because they could override the custom patterns.
 		if ( mFlashingDefault )
@@ -187,11 +188,13 @@ public class LocalNotificationObject {
 		}
 		else if ( name.equals(MA_NOTIFICATION_LOCAL_SOUND_PATH) )
 		{
-			if ( value.length() == 0 )
-				throw new PropertyConversionException(value);
+//			if ( value.length() == 0 )
+//				throw new PropertyConversionException(value);
+			mSoundPath = value;
 			// Disable default sound.
 			mSoundDefault = false;
 			mNotification.sound = Uri.parse(value);
+			mPlaySound = true;
 		}
 		else if ( name.equals(MA_NOTIFICATION_LOCAL_FLAG) )
 		{
@@ -203,6 +206,7 @@ public class LocalNotificationObject {
 				case MA_NOTIFICATION_FLAG_INSISTENT:
 				case MA_NOTIFICATION_FLAG_NO_CLEAR:
 					mNotification.defaults |= flag;
+					mFlag = flag;
 					break;
 				default:
 					throw new InvalidPropertyValueException(name, value);
@@ -234,8 +238,9 @@ public class LocalNotificationObject {
 		}
 		else if ( name.equals(MA_NOTIFICATION_LOCAL_VIBRATE_DURATION) )
 		{
-			if ( IntConverter.convert(value) < 0 )
+			if ( LongConverter.convert(value) < 0 )
 				throw new InvalidPropertyValueException(name, value);
+			mVibrateDuration = LongConverter.convert(value);
 			// Ignore the default value.
 			mVibrateDefault = false;
 			long[] sequence  = new long[2];
@@ -289,6 +294,7 @@ public class LocalNotificationObject {
 						mNotification.ledOnMS = ledOn;
 						mNotification.ledOffMS = ledOff;
 						mNotification.flags |= Notification.FLAG_SHOW_LIGHTS;
+						mFlashingPattern = value;
 					}
 					else
 					{
@@ -335,6 +341,10 @@ public class LocalNotificationObject {
 		{
 			return mTickerText;
 		}
+		else if ( name.equals(MA_NOTIFICATION_LOCAL_FLAG) )
+		{
+			return Integer.toString(mFlag);
+		}
 		else if( name.equals(MA_NOTIFICATION_LOCAL_FIRE_DATE) )
 		{
 			return Long.toString(mFireDate/(long)1000);
@@ -343,13 +353,25 @@ public class LocalNotificationObject {
 		{
 			return Boolean.toString(mPlaySound);
 		}
+		else if( name.equals(MA_NOTIFICATION_LOCAL_SOUND_PATH) )
+		{
+			return mSoundPath;
+		}
 		else if( name.equals(MA_NOTIFICATION_LOCAL_VIBRATE) )
 		{
 			return Boolean.toString(mVibrate);
 		}
+		else if( name.equals(MA_NOTIFICATION_LOCAL_VIBRATE_DURATION) )
+		{
+			return Long.toString(mVibrateDuration);
+		}
 		else if( name.equals(MA_NOTIFICATION_LOCAL_FLASH_LIGHTS) )
 		{
 			return Boolean.toString(mFlashingLights);
+		}
+		else if( name.equals(MA_NOTIFICATION_LOCAL_FLASH_LIGHTS_PATTERN) )
+		{
+			return mFlashingPattern;
 		}
 		Log.e("@@MoSync", "maNotificationGetProperty Invalid property name " + name);
 		return NOTIFICATION_INVALID_PROPERTY_NAME;
@@ -384,6 +406,67 @@ public class LocalNotificationObject {
 		return mText;
 	}
 
+	public String getTicker()
+	{
+		return mTickerText;
+	}
+
+	public String getSoundPath()
+	{
+		return mSoundPath;
+	}
+
+	public long getVibrateDuration()
+	{
+		return mVibrateDuration;
+	}
+
+	public String getFlashPattern()
+	{
+		return mFlashingPattern;
+	}
+
+	public boolean setFlashPattern(String value)
+	{
+		try{
+			setProperty(MA_NOTIFICATION_LOCAL_FLASH_LIGHTS_PATTERN, value);
+			return true;
+		}catch(RuntimeException ex)
+		{
+			return false;
+		}
+	}
+
+	public void setSoundPath(String value)
+	{
+		try{
+			setProperty(MA_NOTIFICATION_LOCAL_SOUND_PATH, value);
+		}catch(RuntimeException re)
+		{
+		}
+	}
+
+	public boolean setFireDate(String value)
+	{
+		try{
+			setProperty(MA_NOTIFICATION_LOCAL_FIRE_DATE, value);
+			return true;
+		}catch(Exception ex)
+		{
+			return false;
+		}
+	}
+
+	public boolean setVibrateDuration(long duration)
+	{
+		try{
+			setProperty(MA_NOTIFICATION_LOCAL_VIBRATE_DURATION, String.valueOf(duration));
+			return true;
+		}catch(RuntimeException re)
+		{
+			return false;
+		}
+	}
 	/**
 	 * Get the content title of the notification.
 	 * @return The title.
@@ -420,6 +503,29 @@ public class LocalNotificationObject {
 		return mFireDate;
 	}
 
+	public void setFlag(int flag)
+	{
+		mFlag = flag;
+		try{
+			setProperty(MA_NOTIFICATION_LOCAL_FLAG, String.valueOf(flag));
+		}catch(RuntimeException re)
+		{
+		}
+	}
+
+	public int getFlag()
+	{
+		return mFlag;
+	}
+	public void setRequestCode(int code)
+	{
+		mRequestCode = code;
+	}
+
+	public int getRequestCode()
+	{
+		return mRequestCode;
+	}
 	/************************ Class members ************************/
 
 	/**
@@ -465,21 +571,29 @@ public class LocalNotificationObject {
 	private long mFireDate;
 
 	/**
+	 * The flag applied to the notification.
+	 */
+	private int mFlag=0;
+
+	/**
 	 * Enable/disable the sound played when an alert is displayed.
 	 */
 	private Boolean mPlaySound = false;
+	private String mSoundPath = "";
 	private Boolean mSoundDefault = false;
 
 	/**
 	 * Enable/disable the vibration when an alert is displayed.
 	 */
 	private Boolean mVibrate = false;
+	private long mVibrateDuration = 0;
 	private Boolean mVibrateDefault = false;
 
 	/**
 	 * Enable/disable the flashing lights.
 	 */
 	private Boolean mFlashingLights = false;
+	private String mFlashingPattern = "";
 	private Boolean mFlashingDefault = false;
 
 	/**
@@ -488,4 +602,9 @@ public class LocalNotificationObject {
 	 * regardless of the focus state of the application.
 	 */
 	private Boolean mDisplayOnlyIfInBackground = true;
+
+	/**
+	 * The unique request code associated to the pending intent of this notification.
+	 */
+	private int mRequestCode = -1;
 }

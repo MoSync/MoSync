@@ -3947,8 +3947,16 @@ public class MoSyncThread extends Thread
 		}
 		else if (SCREEN_ORIENTATION_DYNAMIC == orientation)
 		{
-			maScreenSetOrientationHelper(
-				ActivityInfo.SCREEN_ORIENTATION_SENSOR);
+			if ( Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD )
+			{
+				maScreenSetOrientationHelper(
+						ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR);
+			}
+			else
+			{
+				maScreenSetOrientationHelper(
+						ActivityInfo.SCREEN_ORIENTATION_SENSOR);
+			}
 		}
 		else
 		{

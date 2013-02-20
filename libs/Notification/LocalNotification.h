@@ -338,6 +338,7 @@ namespace Notification
         int setFlag(const NotificationFlag flag);
 
         /**
+         * @deprecated. The local notification is displayed now regardless of the applications's state.
          * Set the display flags applied to the local notification.
          * Note that regardless of this setting, the didReceiveLocalNotification
          * callback will be made for each incoming notification.
