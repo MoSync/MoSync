@@ -75,12 +75,18 @@ void Connection::write(const void* src, int len) {
 void Connection::writeFromData(MAHandle data, int offset, int len) {
 	maConnWriteFromData(mConn, data, offset, len);
 }
+void Connection::writeTo(const void* src, int len, const MAConnAddr& dst) {
+	maConnWriteTo(mConn, src, len, &dst);
+}
 
 void Connection::recv(void* dst, int maxlen) {
 	maConnRead(mConn, dst, maxlen);
 }
 void Connection::recvToData(MAHandle data, int offset, int maxlen) {
 	maConnReadToData(mConn, data, offset, maxlen);
+}
+void Connection::recvFrom(void* dst, int maxlen, MAConnAddr* src) {
+	maConnReadFrom(mConn, dst, maxlen, src);
 }
 
 void Connection::read(void* dst, int len) {

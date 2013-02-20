@@ -92,6 +92,17 @@ int readProtocolResponseCode(const char* protocolSlash, const char* line, int le
 #ifndef SYMBIAN
 
 //******************************************************************************
+// Connection defaults
+//******************************************************************************
+
+int Connection::readFrom(void* dst, int max, MAConnAddr& src) {
+	BIG_PHAT_ERROR(ERR_CONN_READFROM);
+}
+int Connection::writeTo(const void* src, int len, const MAConnAddr& dst) {
+	BIG_PHAT_ERROR(ERR_CONN_WRITETO);
+}
+
+//******************************************************************************
 // TcpConnection helpers
 //******************************************************************************
 #ifdef _WIN32_WCE
@@ -242,9 +253,12 @@ int UdpConnection::connect() {
 	mSock = socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP);
 	if(mSock == INVALID_SOCKET)
 	{
-		LOG("UdpConnection: socket returned error code %d\n", SOCKET_ERRNO);
+		LOG("UdpConnection: socket error %d\n", SOCKET_ERRNO);
 		return CONNERR_GENERIC;
 	}
+
+	if(mHostname.empty())
+		return openServer();
 
 	// parse address
 	mInetAddr = inet_addr(mHostname.c_str());
@@ -266,6 +280,34 @@ int UdpConnection::connect() {
 	return MASocketConnect(mSock, mInetAddr, mPort);
 }
 
+int UdpConnection::openServer() {
+	sockaddr_in sa;
+	sa.sin_family = AF_INET;
+	sa.sin_addr.s_addr = htonl(INADDR_ANY);
+	sa.sin_port = htons(mPort);
+	if(bind(mSock, (struct sockaddr*)&sa, sizeof(struct sockaddr_in))<0) {
+		LOG("UdpConnection: bind error %d\n", SOCKET_ERRNO);
+		close();
+		return CONNERR_GENERIC;
+	}
+	socklen_t saSize = sizeof(sa);
+	int result = getsockname(mSock, (sockaddr*)&sa, &saSize);
+	if(result == (int)INVALID_SOCKET) {
+		LOG("getsockname error %d\n", SOCKET_ERRNO);
+		close();
+		return CONNERR_GENERIC;
+	}
+	mPort = ntohs(sa.sin_port);
+	mInetAddr = sa.sin_addr.s_addr;
+	LOG("UDP server opened on 0x%08x:%i. socket: %i\n", mInetAddr, mPort, mSock);
+	return 1;
+}
+
+UdpConnection::UdpConnection(u16 port)
+: InetConnection("", port)
+{
+}
+
 UdpConnection::~UdpConnection() {
 }
 
@@ -274,6 +316,7 @@ bool InetConnection::isConnected() {
 }
 
 int InetConnection::getAddr(MAConnAddr& addr) {
+	LOG("InetConnection::getAddr %i\n", mSock);
 	if(mSock == INVALID_SOCKET)
 		return CONNERR_GENERIC;
 	addr.family = CONN_FAMILY_INET4;
@@ -328,6 +371,50 @@ int UdpConnection::read(void* dst, int max) {
 		return CONNERR_CLOSED;
 	} else {
 		return bytesRecv;
+	}
+}
+
+static void parse_sockaddr(MAConnAddr& ca, sockaddr* sa, socklen_t len) {
+	DEBUG_ASSERT(sa->sa_family == AF_INET);
+	sockaddr_in* si = (sockaddr_in*)sa;
+	ca.family = CONN_FAMILY_INET4;
+	ca.inet4.port = ntohs(si->sin_port);
+	ca.inet4.addr = ntohl(si->sin_addr.s_addr);
+}
+
+int UdpConnection::readFrom(void* dst, int max, MAConnAddr& src) {
+	sockaddr from;
+	socklen_t fromlen = sizeof(from);
+	int bytesRecv = recvfrom(mSock, (char*)dst, max, 0, &from, &fromlen);
+	if(SOCKET_ERROR == bytesRecv) {
+		LOG("UdpConnection::readFrom: recvfrom failed. error code: %i\n", SOCKET_ERRNO);
+#ifdef WIN32
+		if(SOCKET_ERRNO == WSAEMSGSIZE) {
+			parse_sockaddr(src, &from, fromlen);
+			return max;
+		}
+#endif
+		return CONNERR_GENERIC;
+	} else if (bytesRecv == 0) {
+		return CONNERR_CLOSED;
+	} else {
+		parse_sockaddr(src, &from, fromlen);
+		return bytesRecv;
+	}
+}
+
+int UdpConnection::writeTo(const void* src, int len, const MAConnAddr& dst) {
+	DEBUG_ASSERT(dst.family == CONN_FAMILY_INET4);
+	sockaddr_in si;
+	si.sin_family = AF_INET;
+	si.sin_port = htons(dst.inet4.port);
+	si.sin_addr.s_addr = htonl(dst.inet4.addr);
+	int bytesSent = sendto(mSock, (const char*) src, len, 0, (sockaddr*)&si, sizeof(si));
+	if(bytesSent != len || SOCKET_ERROR == bytesSent) {
+		LOG("UdpConnection::writeTo: sendto failed. error code: %i\n", SOCKET_ERRNO);
+		return CONNERR_GENERIC;
+	} else {
+		return 1;
 	}
 }
 

@@ -323,7 +323,7 @@ static Ads *sharedInstance = nil;
 		return MA_ADS_RES_INVALID_STRING_BUFFER_SIZE;
 	}
 
-	[retval getCString:value maxLength:length encoding:NSASCIIStringEncoding];
+	[retval getCString:value maxLength:length encoding:NSUTF8StringEncoding];
 	[retval release];
 
 	return realLength;

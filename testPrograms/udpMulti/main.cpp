@@ -17,7 +17,7 @@ MA 02110-1301, USA.
 */
 
 /**
-* This example shows how to do DNS over UDP.
+* This example shows how to do DNS over UDP while using unbound sockets.
 */
 
 #include <maapi.h>
@@ -26,6 +26,8 @@ MA 02110-1301, USA.
 #include <conprint.h>
 #include <maassert.h>
 #include <mastdlib.h>
+#include <mastring.h>
+#include <inet_ntop.h>
 
 using namespace MAUtil;
 
@@ -37,12 +39,39 @@ typedef unsigned int u32;
 
 #define EXAMPLE_DOMAIN "example.com"
 
+#define USE_FORCED_PORT 0	// Change this to turn on/off forced port.
+
+#if USE_FORCED_PORT
+#define FORCED_PORT ":1234"
+#else
+#define FORCED_PORT ""
+#endif
+
 static u16 htons(u16 x) {
 	return (x << 8) | (x >> 8);
 }
 
 static u16 ntohs(u16 x) {
 	return (x << 8) | (x >> 8);
+}
+
+static void dumpInetAddr(const char* name, const MAConnAddr& addr) {
+	if(addr.family == CONN_FAMILY_INET4) {
+		int b = addr.inet4.addr;
+		printf("%s: %i.%i.%i.%i:%i\n", name,
+			(b >> 24) & 0xff,
+			(b >> 16) & 0xff,
+			(b >> 8) & 0xff,
+			(b) & 0xff,
+			addr.inet4.port);
+	} else if(addr.family == CONN_FAMILY_INET6) {
+		char buf[128];
+		inet_ntop6(addr.inet6.addr, buf, sizeof(buf));
+		printf("%s: %s:%i", name, buf, addr.inet6.port);
+	} else {
+		printf("family: %i\n", addr.family);
+		return;
+	}
 }
 
 class MyMoblet : public Moblet, private ConnectionListener {
@@ -53,14 +82,24 @@ private:
 	int mCount;
 	bool mInProgress;
 	u16 mQueryId;
+	MAConnAddr mAddress;
 public:
 	MyMoblet() : mConn(this) {
 		mRepeat = false;
 		mCount = 0;
 		mInProgress = false;
 
-		int res = mConn.connect("datagram://192.168.0.1:53");
+		int res = mConn.connect("datagram://" FORCED_PORT);
 		printf("connect: %i\n", res);
+
+		MAConnAddr a;
+		res = mConn.getAddr(&a);
+		if(res < 0) {
+			printf("getAddr: %i\n", res);
+		} else {
+			dumpInetAddr("local", a);
+		}
+		start(EXAMPLE_DOMAIN);
 	}
 
 	/**
@@ -102,7 +141,7 @@ public:
 
 	virtual void connWriteFinished(Connection* conn, int result) {
 		printf("connWriteFinished: %i\n", result);
-		mConn.recv(mBuffer, sizeof(mBuffer));
+		mConn.recvFrom(mBuffer, sizeof(mBuffer), &mAddress);
 	}
 
 	virtual void connRecvFinished(Connection* conn, int result) {
@@ -110,6 +149,7 @@ public:
 		if(result < 0) {
 			return;
 		}
+		dumpInetAddr("sender", mAddress);
 		parseReply(result);
 		mInProgress = false;
 		if(mRepeat)
@@ -187,7 +227,11 @@ public:
 		*dst++ = 1;
 
 		u32 packetLen = dst - mBuffer;
-		mConn.write(mBuffer, packetLen);
+		MAConnAddr a;
+		a.family = CONN_FAMILY_INET4;
+		a.inet4.addr = (192 << 24) | (168 << 16) | (0 << 8) | 1;
+		a.inet4.port = 53;
+		mConn.writeTo(mBuffer, packetLen, a);
 	}
 
 	void parseReply(u32 packetLen) {

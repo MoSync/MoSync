@@ -1625,6 +1625,13 @@ SYSCALL(void, maConnWrite(MAHandle conn, const void* src, int size)) {
 		TPtrC8(CBP src, size)));
 }
 
+SYSCALL(void, maConnReadFrom(MAHandle conn, void* dst, int size, MAConnAddr* src)) {
+	BIG_PHAT_ERROR(ERR_FUNCTION_UNIMPLEMENTED);
+}
+SYSCALL(void, maConnWriteTo(MAHandle conn, const void* src, int size, const MAConnAddr* dst)) {
+	BIG_PHAT_ERROR(ERR_FUNCTION_UNIMPLEMENTED);
+}
+
 SYSCALL(void, maConnReadToData(MAHandle conn, MAHandle data, int offset, int size)) {
 	LOGST("ConnReadToData %i %i %i %i", conn, data, offset, size);
 	MYASSERT(offset >= 0, ERR_DATA_OOB);

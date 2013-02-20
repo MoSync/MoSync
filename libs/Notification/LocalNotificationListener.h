@@ -53,6 +53,9 @@ namespace Notification
     public:
         /**
          * Called when the application receives a local notification.
+         * Note: this event will be received only if the application
+         * was not stopped in the interval from when the notification
+         * is scheduled until it's actually triggered.
          * @param localNotification The received local notification.
          */
         virtual void didReceiveLocalNotification(

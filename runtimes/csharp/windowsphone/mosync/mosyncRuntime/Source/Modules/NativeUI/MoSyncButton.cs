@@ -65,9 +65,6 @@ namespace MoSync
                 mButton.HorizontalAlignment = HorizontalAlignment.Left;
                 mButton.VerticalAlignment = VerticalAlignment.Top;
 
-                fillSpaceVerticalyEnabled = false;
-                fillSpaceHorizontalyEnabled = false;
-
                 this.Width = MoSync.Constants.MAW_CONSTANT_WRAP_CONTENT;
                 this.Height = MoSync.Constants.MAW_CONSTANT_WRAP_CONTENT;
 

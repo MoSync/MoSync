@@ -374,6 +374,10 @@ static Connection* newSocketConnection(const std::string& hostname, int port, Co
 
 //returns >0 or CONNERR.
 static int createSocketConnection(const char* parturl, Connection*& conn, ConnType type) {
+	if(type == Datagram && parturl[0] == 0) {
+		conn = new UdpConnection();
+		return 2;
+	}
 	const char* port_m1 = strchr(parturl, ':');
 	if(!port_m1) {
 		return CONNERR_URL;
@@ -382,6 +386,10 @@ static int createSocketConnection(const char* parturl, Connection*& conn, ConnTy
 	int port = atoi(port_m1 + 1);
 	if(port <= 0 || port >= 1 << 16) {
 		return CONNERR_URL;
+	}
+	if(type == Datagram && hostname.empty()) {
+		conn = new UdpConnection(port);
+		return 2;
 	}
 	conn = newSocketConnection(hostname, port, type);
 	return 1;
@@ -440,8 +448,24 @@ SYSCALL(MAHandle, maConnect(const char* url)) {
 
 	} else if(sstrcmp(url, datagram_string) == 0) {
 		const char* parturl = url + sizeof(datagram_string) - 1;
-		TLTZ_PASS(createSocketConnection(parturl, conn, Datagram));
-
+		int res;
+		TLTZ_PASS(res = createSocketConnection(parturl, conn, Datagram));
+		if(res == 2) {	// server connection
+			res = conn->connect();
+			if(res < 0) {
+				delete conn;
+				return res;
+			}
+			gConnMutex.lock();
+			{
+				MAStreamConn* mac = new MAStreamConn(gConnNextHandle, conn);
+				gConnections.insert(ConnPair(gConnNextHandle, mac));
+				mac->state = 0;
+				res = gConnNextHandle++;
+			}
+			gConnMutex.unlock();
+			return res;
+		}
 	} else if(sstrcmp(url, btspp_string) == 0) {
 		//allowed forms:
 		// btspp://localhost:%32x
@@ -598,6 +622,15 @@ SYSCALL(void, maConnRead(MAHandle conn, void* dst, int size)) {
 	gThreadPool.execute(new ConnRead(mac, dst, size));
 }
 
+SYSCALL(void, maConnReadFrom(MAHandle conn, void* dst, int size, MAConnAddr* src)) {
+	LOGST("ConnReadFrom %i %i", conn, size);
+	SYSCALL_THIS->ValidateMemRange(dst, size);
+	MAStreamConn& mac = getStreamConn(conn);
+	MYASSERT((mac.state & CONNOP_READ) == 0, ERR_CONN_ALREADY_READING);
+	mac.state |= CONNOP_READ;
+	gThreadPool.execute(new ConnReadFrom(mac, dst, size, src));
+}
+
 SYSCALL(void, maConnWrite(MAHandle conn, const void* src, int size)) {
 	LOGST("ConnWrite %i %i", conn, size);
 	SYSCALL_THIS->ValidateMemRange(src, size);
@@ -605,6 +638,15 @@ SYSCALL(void, maConnWrite(MAHandle conn, const void* src, int size)) {
 	MYASSERT((mac.state & CONNOP_WRITE) == 0, ERR_CONN_ALREADY_WRITING);
 	mac.state |= CONNOP_WRITE;
 	gThreadPool.execute(new ConnWrite(mac, src, size));
+}
+
+SYSCALL(void, maConnWriteTo(MAHandle conn, const void* src, int size, const MAConnAddr* dst)) {
+	LOGST("ConnWriteTo %i %i", conn, size);
+	SYSCALL_THIS->ValidateMemRange(src, size);
+	MAStreamConn& mac = getStreamConn(conn);
+	MYASSERT((mac.state & CONNOP_WRITE) == 0, ERR_CONN_ALREADY_WRITING);
+	mac.state |= CONNOP_WRITE;
+	gThreadPool.execute(new ConnWriteTo(mac, src, size, *dst));
 }
 
 SYSCALL(void, maConnReadToData(MAHandle conn, MAHandle data, int offset, int size)) {
