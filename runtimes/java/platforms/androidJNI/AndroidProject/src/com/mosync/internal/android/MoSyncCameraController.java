@@ -6,7 +6,6 @@ import static com.mosync.internal.android.MoSyncHelpers.SYSLOG;
 import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
-import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.locks.Condition;
@@ -14,11 +13,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import java.lang.System;
 
-import java.io.File;
-import java.io.FileOutputStream;
-
 import android.app.Activity;
-import android.content.res.Configuration;
 import android.hardware.Camera;
 import android.hardware.Camera.PictureCallback;
 
@@ -50,15 +45,6 @@ public class MoSyncCameraController {
 
 	private byte[] mCallbackBuffer = null;
 	private byte[] mImageBuffer = null;
-
-
-
-	/**
-	 * Static Attributes used for reflection of some functions in the API
-	 */
-	private static Method mGetNumberofCameras;
-	private static Method mSetPreviewCallbackWithBuffer;
-	private static Camera tempCamera;
 
 	/**
 	* Stores number of availabe cameras on the device
@@ -119,8 +105,6 @@ public class MoSyncCameraController {
 
 	private boolean mSendEvent = true;
 
-	private boolean mIsUsingPreviewCallbackBuffer = false;
-
 	/**
 	 * Constructor.
 	 * @param thread The MoSync thread.
@@ -136,7 +120,7 @@ public class MoSyncCameraController {
 		userHeights = new ArrayList<Integer>();
 		mCameraParametersList = new ArrayList<Camera.Parameters>();
 		mNumCameras = numberOfCameras();
-		initilizeCameras();
+		initializeCameras();
 		rawMode = false;
 		mCurrentCameraIndex = 0;
 
@@ -145,7 +129,7 @@ public class MoSyncCameraController {
 	/**
 	* Lazy initialization of the cameras so we can use the number of cameras
 	*/
-	private void initilizeCameras()
+	private void initializeCameras()
 	{
 		try
 		{
@@ -189,43 +173,20 @@ public class MoSyncCameraController {
 	 * queries the number of available cameras
 	 * @return number of cameras on the device
 	 */
-	public int numberOfCameras()
-	{
-		if(mNumCameras != 0)
+	public int numberOfCameras() {
+		if (mNumCameras != 0)
 		{
-			//Do not do the costly operation of reflection again
+			// Do not do the costly operation of reflection again
 			return mNumCameras;
 		}
-		 try
-		 {
-			if (mCamera == null) {
-				tempCamera = Camera.open();
-			} else {
-				mCamera.release();
-				tempCamera = Camera.open(mCurrentCameraIndex);
-			}
 
-			 //We have to use and static instance of the camera in the reflection here
-			 mGetNumberofCameras = tempCamera.getClass().getMethod(
-					 "getNumberOfCameras");
-			 tempCamera.release();
-			 if(mCamera != null)
-			 {
-				 mCamera = Camera.open(mCurrentCameraIndex);
-			 }
-			 return Camera.getNumberOfCameras();
-
-		 }
-		 catch (NoSuchMethodException nsme)
-		 {
-			 tempCamera.release();
-			 SYSLOG("ANDROID Version is less than 2.3!!");
-			 //before 2.3 only one camera is supported
-			 return 1;
-		 } catch (RuntimeException e) {
-			 SYSLOG("Failed to set camera Parameters");
-			 return MAAPI_consts.MA_CAMERA_RES_FAILED;
-		 }
+		int numCameras = 1;
+		try {
+			numCameras = Camera.getNumberOfCameras();
+		} catch (NoSuchMethodError nsme) {
+			SYSLOG("ANDROID Version is less than 2.3!!");
+		}
+		return numCameras;
 	}
 
 	/**
@@ -251,8 +212,8 @@ public class MoSyncCameraController {
 	public int addSize(int index, int width, int height)
 	{
 		//TODO: move the optimal calculation here for better performance
-		userWidths.add(index, new Integer(width));
-		userHeights.add(index, new Integer(height));
+		userWidths.add(index, Integer.valueOf(width));
+		userHeights.add(index, Integer.valueOf(height));
 		return MAAPI_consts.MA_CAMERA_RES_OK;
 	}
 
@@ -262,7 +223,7 @@ public class MoSyncCameraController {
 	 */
 	public void setPreview(MoSyncCameraPreview preview)
 	{
-
+		SYSLOG("setPreview");
 		acquireCamera();
 
 		mPreview = preview;
@@ -289,11 +250,12 @@ public class MoSyncCameraController {
 			return;
 		}
 
-		try
-		{
-			//We have to use and static instance of the camera in the reflection here
-			mSetPreviewCallbackWithBuffer = mCamera.getClass().getMethod(
-			"setPreviewCallbackWithBuffer", Camera.PreviewCallback.class);
+		// try
+		// {
+			// //We have to use and static instance of the camera in the
+			// reflection here
+			// mSetPreviewCallbackWithBuffer = mCamera.getClass().getMethod(
+			// "setPreviewCallbackWithBuffer", Camera.PreviewCallback.class);
 
 			Camera.Parameters parameters = getCurrentParameters();
 			Camera.Size size = parameters.getPreviewSize();
@@ -302,19 +264,19 @@ public class MoSyncCameraController {
 
 			mCamera.addCallbackBuffer(mCallbackBuffer);
 
-			mIsUsingPreviewCallbackBuffer = true;
+		// mIsUsingPreviewCallbackBuffer = true;
 
 			mCamera.setPreviewCallbackWithBuffer(previewCallback);
 
 
 
-		}
-		catch (NoSuchMethodException nsme)
-		{
-			mIsUsingPreviewCallbackBuffer = false;
-
-			mCamera.setPreviewCallback(previewCallback);
-		}
+		// }
+		// catch (Exception nsme)
+		// {
+		// mIsUsingPreviewCallbackBuffer = false;
+		//
+		// mCamera.setPreviewCallback(previewCallback);
+		// }
 
 	}
 
@@ -381,6 +343,7 @@ public class MoSyncCameraController {
 	 */
 	public int cameraStart()
 	{
+		SYSLOG("cameraStart");
 		acquireCamera();
 
 		try
@@ -397,7 +360,7 @@ public class MoSyncCameraController {
 		}
 		catch (Exception e)
 		{
-			SYSLOG(e.getMessage());
+			SYSLOG("cameraStart: " + e.getMessage());
 			return MAAPI_consts.MA_CAMERA_RES_FAILED;
 		}
 
@@ -631,6 +594,7 @@ public class MoSyncCameraController {
 	 */
 	public void acquireCamera()
 	{
+		SYSLOG("acquireCamera");
 		if(mCamera == null)// && mPreview != null)
 		{
 			try
@@ -686,13 +650,12 @@ public class MoSyncCameraController {
 
 	public int getPreviewSize()
 	{
+		SYSLOG("getPreviewSize");
 		acquireCamera();
 
 		Camera.Parameters parameters = getCurrentParameters();
 		Camera.Size size = parameters.getPreviewSize();
 
-		int width = ((size.width&0x0000ffff)<<16);
-		int height = (size.height&0x0000ffff);
 		int extent = EXTENT(size.width, size.height);
 
 		return extent;
@@ -766,8 +729,7 @@ public class MoSyncCameraController {
 				if(!mMoSyncPreviewAutoFocusEventEnabled)
 				{
 					// Return the buffer if in use
-					if(mIsUsingPreviewCallbackBuffer)
-						camera.addCallbackBuffer(data);
+					camera.addCallbackBuffer(data);
 
 					return;
 				}
@@ -775,8 +737,7 @@ public class MoSyncCameraController {
 				if(!mMoSyncPreviewHasFocus)
 				{
 					// Return the buffer if in use
-					if(mIsUsingPreviewCallbackBuffer)
-						camera.addCallbackBuffer(data);
+					camera.addCallbackBuffer(data);
 
 					return;
 				}
@@ -788,8 +749,7 @@ public class MoSyncCameraController {
 			if(!mSendEvent)
 			{
 				// Return the buffer if in use
-				if(mIsUsingPreviewCallbackBuffer)
-					camera.addCallbackBuffer(data);
+				camera.addCallbackBuffer(data);
 
 				return;
 			}
@@ -829,8 +789,7 @@ public class MoSyncCameraController {
 				lock.unlock();
 
 				// Return the buffer if in use
-				if(mIsUsingPreviewCallbackBuffer)
-					camera.addCallbackBuffer(data);
+				camera.addCallbackBuffer(data);
 			}
 		}
 	};

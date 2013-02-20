@@ -56,6 +56,10 @@
             self.parent)
         {
             viewHeight = [child sizeThatFitsForWidget].height;
+			if (viewHeight > self.height)
+			{
+				viewHeight = self.height;
+			}
         }
 
         switch (child.autoSizeWidth)

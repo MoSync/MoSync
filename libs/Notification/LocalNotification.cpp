@@ -363,14 +363,15 @@ namespace Notification
     }
 
     /**
+     * @deprecated. The local notification is displayed now regardless of the applications's state.
      * Set the display flags applied to the local notification.
      * Note that regardless of this setting, the didReceiveLocalNotification
      * callback will be made for each incoming notification.
-     * #NOTIFICATION_DISPLAY_ONLY_IF_IN_BACKGROUND is enabled by default.
+     * #NOTIFICATION_DISPLAY_DEFAULT is enabled by default.
      * Platform: Android.
      * @param displayFlag  is the required state of the application for
      * a notification to be displayed. One of the constants:
-     *  - #NOTIFICATION_DISPLAY_ONLY_IF_IN_BACKGROUND
+     *  - #NOTIFICATION_DISPLAY_DEFAULT
      *  - #NOTIFICATION_DISPLAY_ANYTIME.
      *  @return Any of the following result codes:
      * - #MA_NOTIFICATION_RES_OK if the property could be set.
