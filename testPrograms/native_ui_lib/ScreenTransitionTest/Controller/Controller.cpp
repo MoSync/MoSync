@@ -57,12 +57,13 @@ namespace ScreenTransitionTest
 	}
 
 	/**
-	 * Tell the observer to show the second screen.
+	 * Tell the observer to show the last screen.
 	 */
-	void Controller::showSecondScreen(int transType, const char* text)
+	void Controller::showLastScreen(int transType)
 	{
 		currentTransition = transType;
-		mSimpleScreen->resetTitleWithString(text);
+		const char* nameOfSymmetricTransition = ScreenUtils::getTransitionName(ScreenUtils::getSimetricTransition(currentTransition));
+		mSimpleScreen->resetTitleWithString(nameOfSymmetricTransition);
 
 		//int returnVal = maWidgetScreenShowWithTransition(mSimpleScreen->getWidgetHandle(), transType, TRANSITION_TIME_MS);
 		int returnVal = mSimpleScreen->showWithTransition(transType, TRANSITION_TIME_MS);
@@ -72,9 +73,9 @@ namespace ScreenTransitionTest
 	/**
 	 * Tell the observer to hide the second screen.
 	 */
-	void Controller::hideSecondScreen()
+	void Controller::hideLastScreen()
 	{
-		//int returnVal = maWidgetScreenShowWithTransition(mFirstScreen->getWidgetHandle(), ScreenUtils::getSimetricTransition(currentTransition), TRANSITION_TIME_MS);
+		//int returnVal = maWidgetScreenShowWithTransition(mStackScreen->getWidgetHandle(), ScreenUtils::getSimetricTransition(currentTransition), TRANSITION_TIME_MS);
 		int returnVal = mStackScreen->showWithTransition(ScreenUtils::getSimetricTransition(currentTransition), TRANSITION_TIME_MS);
 		printf("showWithTransition result: %d", returnVal);
 	}

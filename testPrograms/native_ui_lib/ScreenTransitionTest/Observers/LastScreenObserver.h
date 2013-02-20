@@ -17,26 +17,27 @@
  */
 
 /**
- * @file FirstScreenObserver.h
+ * @file SecondScreenObserver.h
  * @author Bogdan Iusco & Mircea Vasiliniuc
  * @date 20 Nov 2012
  *
- * @brief First screen observer.
+ * @brief Second screen observer.
  */
-#ifndef FIRST_SCREEN_OBSERVER_H_
-#define FIRST_SCREEN_OBSERVER_H_
+#ifndef SECOND_SCREEN_OBSERVER_H_
+#define SECOND_SCREEN_OBSERVER_H_
 
 namespace ScreenTransitionTest
 {
-	class FirstScreenObserver
+
+	class LastScreenObserver
 	{
 	public:
 		/**
-		 * Tell the observer to show the second screen.
+		 * Tell the observer to hide the second screen.
 		 */
-		virtual void showSecondScreen(int transType, const char* text) = 0;
+		virtual void hideLastScreen() = 0;
 	};
-} // end of ScreenTransitionTest
+} //end of ScreenTransitionTest
 
 
-#endif /* FIRST_SCREEN_OBSERVER_H_ */
+#endif /* SECOND_SCREEN_OBSERVER_H_ */

@@ -24,7 +24,8 @@
  * @brief Last screen.
  */
 
-#define TITLE_TEXT "2nd View. "
+#define SCREEN_INFO_LABEL_TXT "This screen was not pushed to the StackScreen. It was displayed using showWithTransition method."
+#define INFO_LABEL_TXT "The symmetric transition used for going back is:"
 #define BACK_BUTTON_TEXT "Go back"
 
 #define SCREEN_COLOR 0x4d5870
@@ -43,7 +44,7 @@ namespace ScreenTransitionTest
 	 * Constructor.
 	 * @param observer Observer for this screen.
 	 */
-	LastScreen::LastScreen(SecondScreenObserver& observer):
+	LastScreen::LastScreen(LastScreenObserver& observer):
 		mObserver(observer),
 		mMainLayout(NULL),
 		mHideScreenButton(NULL),
@@ -71,15 +72,13 @@ namespace ScreenTransitionTest
     {
         if (button == mHideScreenButton)
         {
-            mObserver.hideSecondScreen();
+            mObserver.hideLastScreen();
         }
     }
 
-    void LastScreen::resetTitleWithString(const char* appendText)
+    void LastScreen::resetTitleWithString(const char* aString)
     {
-        MAUtil::String currentText = TITLE_TEXT;
-        currentText.append(appendText, strlen(appendText));
-        mTitleLabel->setText(currentText);
+        mTransitionNameLabel->setText(aString);
     }
 
 	/**
@@ -96,10 +95,32 @@ namespace ScreenTransitionTest
 
 		ScreenUtils::addVerticalSpacerToLayout(mMainLayout, SPACER_HEIGHT);
 
-		mTitleLabel = new NativeUI::Label();
-		mTitleLabel->setText(TITLE_TEXT);
-		mTitleLabel->setFontSize(TITLE_FONT_SIZE);
-		mMainLayout->addChild(mTitleLabel);
+		NativeUI::Label* screenInfoLabel = new NativeUI::Label();
+		screenInfoLabel->setText(SCREEN_INFO_LABEL_TXT);
+		screenInfoLabel->setTextHorizontalAlignment(MAW_ALIGNMENT_CENTER);
+		screenInfoLabel->setTextVerticalAlignment(MAW_ALIGNMENT_CENTER);
+		screenInfoLabel->setMaxNumberOfLines(3);
+		screenInfoLabel->fillSpaceVertically();
+		screenInfoLabel->setFontSize(INFO_FONT_SIZE);
+
+		NativeUI::VerticalLayout* paddingLayout = new NativeUI::VerticalLayout();
+		paddingLayout->setPaddingLeft(5);
+		paddingLayout->setPaddingRight(5);
+		paddingLayout->addChild(screenInfoLabel);
+		mMainLayout->addChild(paddingLayout);
+
+		ScreenUtils::addVerticalSpacerToLayout(mMainLayout, SPACER_HEIGHT);
+
+		NativeUI::Label* infoLabel = new NativeUI::Label();
+		infoLabel->setText(INFO_LABEL_TXT);
+		infoLabel->setTextHorizontalAlignment(MAW_ALIGNMENT_CENTER);
+		infoLabel->setTextVerticalAlignment(MAW_ALIGNMENT_CENTER);
+		infoLabel->setFontSize(INFO_FONT_SIZE);
+		mMainLayout->addChild(infoLabel);
+
+		mTransitionNameLabel = new NativeUI::Label();
+		mTransitionNameLabel->setFontSize(TITLE_FONT_SIZE);
+		mMainLayout->addChild(mTransitionNameLabel);
 
 		ScreenUtils::addVerticalSpacerToLayout(mMainLayout, SPACER_HEIGHT);
 

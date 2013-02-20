@@ -31,7 +31,7 @@
 #include <NativeUI/Screen.h>
 #include <NativeUI/ListViewListener.h>
 
-#include "../Observers/FirstScreenObserver.h"
+#include "../Observers/TransitionsScreenObserver.h"
 
 namespace NativeUI
 {
@@ -55,7 +55,7 @@ namespace ScreenTransitionTest
 		 * Constructor.
 		 * @param observer Observer for this screen.
 		 */
-		TransitionsScreen(FirstScreenObserver& observer);
+		TransitionsScreen(TransitionsScreenObserver& observer);
 
 		/**
 		 * Destructor.
@@ -136,7 +136,7 @@ namespace ScreenTransitionTest
 		/**
 		 * Observer for this screen.
 		 */
-		FirstScreenObserver& mObserver;
+		TransitionsScreenObserver& mObserver;
 
 		/**
 		 * Screen's layout.

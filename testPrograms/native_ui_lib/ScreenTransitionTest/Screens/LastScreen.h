@@ -30,8 +30,7 @@
 #include <NativeUI/Screen.h>
 #include <NativeUI/ButtonListener.h>
 
-#include "../Observers/FirstScreenObserver.h"
-#include "../Observers/SecondScreenObserver.h"
+#include "../Observers/LastScreenObserver.h"
 
 namespace NativeUI
 {
@@ -52,7 +51,7 @@ namespace ScreenTransitionTest
 		 * Constructor.
 		 * @param observer Observer for this screen.
 		 */
-		LastScreen(SecondScreenObserver& observer);
+		LastScreen(LastScreenObserver& observer);
 
 		/**
 		 * Destructor.
@@ -70,7 +69,7 @@ namespace ScreenTransitionTest
 		/**
 		 * Appends text to title.
 		 */
-        void resetTitleWithString(const char* appendText);
+        void resetTitleWithString(const char* aString);
 
 	private:
 		/**
@@ -82,7 +81,7 @@ namespace ScreenTransitionTest
 		/**
 		 * Observer for this screen.
 		 */
-		SecondScreenObserver& mObserver;
+		LastScreenObserver& mObserver;
 
 		/**
 		 * Screen's layout.
@@ -97,7 +96,7 @@ namespace ScreenTransitionTest
 		/**
 		 * Screen Title
 		 */
-		NativeUI::Label* mTitleLabel;
+		NativeUI::Label* mTransitionNameLabel;
 
 		/**
 		 * Footer layout.

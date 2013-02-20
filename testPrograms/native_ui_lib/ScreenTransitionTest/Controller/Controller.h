@@ -27,8 +27,8 @@
 #ifndef CONTROLLER_H_
 #define CONTROLLER_H_
 
-#include "../Observers/FirstScreenObserver.h"
-#include "../Observers/SecondScreenObserver.h"
+#include "../Observers/TransitionsScreenObserver.h"
+#include "../Observers/LastScreenObserver.h"
 
 namespace ScreenTransitionTest
 {
@@ -36,8 +36,8 @@ namespace ScreenTransitionTest
 	class MainStackScreen;
 
 	class Controller:
-		public FirstScreenObserver,
-		public SecondScreenObserver
+		public TransitionsScreenObserver,
+		public LastScreenObserver
 	{
 	public:
 		/**
@@ -51,14 +51,14 @@ namespace ScreenTransitionTest
 		virtual ~Controller();
 
 		/**
-		 * Tell the observer to show the second screen.
+		 * Tell the observer to show the last screen.
 		 */
-		virtual void showSecondScreen(int transType, const char* text);
+		virtual void showLastScreen(int transType);
 
 		/**
-		 * Tell the observer to hide the second screen.
+		 * Tell the observer to hide the last screen.
 		 */
-		virtual void hideSecondScreen();
+		virtual void hideLastScreen();
 
 	public:
 		/**

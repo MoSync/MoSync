@@ -24,7 +24,8 @@
  * @brief Screen transitions screen.
  */
 
-#define TITLE_TEXT "1st View. Choose transition!"
+#define TITLE_TXT "Transitions"
+#define INFO_TXT "Choose transition!"
 #define BEGIN_TRANS_BTN_TEXT "Begin transition"
 
 #define SCREEN_COLOR 0x10637b
@@ -45,7 +46,7 @@ namespace ScreenTransitionTest
 	 * Constructor.
 	 * @param observer Observer for this screen.
 	 */
-	TransitionsScreen::TransitionsScreen(FirstScreenObserver& observer):
+	TransitionsScreen::TransitionsScreen(TransitionsScreenObserver& observer):
 		mObserver(observer),
 		mMainLayout(NULL),
 		mFooterLayout(NULL),
@@ -84,11 +85,12 @@ namespace ScreenTransitionTest
 		mMainLayout->fillSpaceVertically();
 		mMainLayout->fillSpaceHorizontally();
 		this->setMainWidget(mMainLayout);
+		this->setTitle(TITLE_TXT);
 
 		ScreenUtils::addVerticalSpacerToLayout(mMainLayout, SPACER_HEIGHT);
 
 		mTitleLabel = new NativeUI::Label();
-		mTitleLabel->setText(TITLE_TEXT);
+		mTitleLabel->setText(INFO_TXT);
 		mTitleLabel->setFontSize(TITLE_FONT_SIZE);
 		mMainLayout->addChild(mTitleLabel);
 
@@ -142,8 +144,7 @@ namespace ScreenTransitionTest
 		{
 			transitionType = mPlatformTransitions[mSelectedListItem];
 		}
-		mObserver.showSecondScreen(transitionType,
-				ScreenUtils::getTransitionName(MAW_TRANSITION_TYPE_NONE));
+		mObserver.showLastScreen(transitionType);
 
 		if ( ScreenUtils::OS_ANDROID == ScreenUtils::getCurrentPlatform() )
 		{

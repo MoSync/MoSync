@@ -19,32 +19,33 @@ MA 02110-1301, USA.
 #ifndef MAINSTACKSCREEN_H_
 #define MAINSTACKSCREEN_H_
 
-#include <maapi.h>
-#include <MAUtil/util.h>
+#include <NativeUI/StackScreen.h>
+#include <NativeUI/StackScreenListener.h>
+#include <NativeUI/ButtonListener.h>
 
-// Include all the wrappers.
-#include <NativeUI/Widgets.h>
+#include "../Observers/TransitionsScreenObserver.h"
 
-#include "../Observers/FirstScreenObserver.h"
-
-using namespace NativeUI;
+namespace NativeUI
+{
+	class Button;
+	class Screen;
+}
 
 namespace ScreenTransitionTest
 {
-
 	class TransitionsScreen;
 
 	class MainStackScreen:
-		public StackScreen,
-		private ButtonListener,
-		private StackScreenListener
+		public NativeUI::StackScreen,
+		private NativeUI::ButtonListener,
+		private NativeUI::StackScreenListener
 	{
 
 	public:
 		/**
 		 * Constructor.
 		 */
-			MainStackScreen(FirstScreenObserver& observer);
+			MainStackScreen(TransitionsScreenObserver& observer);
 
 		/**
 		 * Destructor.
@@ -60,21 +61,21 @@ namespace ScreenTransitionTest
 		 * a button.
 		 * @param button The button object that generated the event.
 		 */
-		virtual void buttonPressed(Widget* button) {};
+		virtual void buttonPressed(NativeUI::Widget* button) {};
 
 		/**
 		 * This method is called when there is an touch-up event for
 		 * a button.
 		 * @param button The button object that generated the event.
 		 */
-		virtual void buttonReleased(Widget* button) {};
+		virtual void buttonReleased(NativeUI::Widget* button) {};
 
 		/**
 		 * This method is called if the touch-up event was inside the
 		 * bounds of the button.
 		 * @param button The button object that generated the event.
 		 */
-		virtual void buttonClicked(Widget* button);
+		virtual void buttonClicked(NativeUI::Widget* button);
 
 		/**
 		 * This method is called when a screen has been popped from a stack
@@ -84,15 +85,15 @@ namespace ScreenTransitionTest
 		 * @param toScreen The screen that will be shown.
 		 */
 		virtual void stackScreenScreenPopped(
-			StackScreen* stackScreen,
-			Screen* fromScreen,
-			Screen* toScreen);
+			NativeUI::StackScreen* stackScreen,
+			NativeUI::Screen* fromScreen,
+			NativeUI::Screen* toScreen);
 
 	private:
 		/**
 		 * Main screen to push.
 		 */
-		Screen* mMainScreen;
+		NativeUI::Screen* mMainScreen;
 
 		/**
 		 * Transitions screen to show.
@@ -102,7 +103,7 @@ namespace ScreenTransitionTest
 		/**
 		 * Used to push transitions screen.
 		 */
-		Button* mPushScreen_Button;
+		NativeUI::Button* mPushScreen_Button;
 	};
 } //ScreenTransitionTest
 
