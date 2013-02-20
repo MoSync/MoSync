@@ -74,6 +74,10 @@ final public class ScreenTransitions {
                 }
                 break;
             default:
+                if ( null != aView )
+                {
+                    aView.clearAnimation();
+                }
                 // Apply no transition. The IX_WIDGET.MAW_TRANSITION_TYPE_NONE case.
                 break;
         }
