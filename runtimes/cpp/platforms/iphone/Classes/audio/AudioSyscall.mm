@@ -64,7 +64,7 @@ MAAudioData maAudioDataCreateFromResource(const char* mime, MAHandle data, int o
 {
     NSString* mimeType = @"";
     if(mime != NULL)
-        mimeType = [[NSString alloc] initWithCString:mime encoding:NSASCIIStringEncoding];
+        mimeType = [[NSString alloc] initWithCString:mime encoding:NSUTF8StringEncoding];
 
     int error;
     AudioData* audioData = [[AudioData alloc] initWithMime:mimeType audio:data offset:offset length:length andFlags:flags error:&error];
@@ -80,10 +80,10 @@ MAAudioData maAudioDataCreateFromURL(const char* mime, const char* path, int fla
 {
     NSString* mimeType = @"";
     if(mime != NULL)
-        mimeType = [[NSString alloc] initWithCString:mime encoding:NSASCIIStringEncoding];
+        mimeType = [[NSString alloc] initWithCString:mime encoding:NSUTF8StringEncoding];
 
     if(path == NULL) return MA_AUDIO_ERR_INVALID_FILENAME;
-    NSString* filename = [[NSString alloc] initWithCString:path encoding:NSASCIIStringEncoding];
+    NSString* filename = [[NSString alloc] initWithCString:path encoding:NSUTF8StringEncoding];
 
     int error;
     AudioData* audioData = [[AudioData alloc] initWithMime:mimeType filename:filename andFlags:flags error:&error];

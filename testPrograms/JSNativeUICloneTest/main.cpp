@@ -39,6 +39,8 @@ public:
 		mNativeUIMessageHandler(getWebView()),
 		mResourceMessageHandler(getWebView())
 	{
+		mResourceMessageHandler.setFileUtil(mFileUtil);
+
 		// Extract files in LocalFiles folder to the device.
 		extractFileSystem();
 
