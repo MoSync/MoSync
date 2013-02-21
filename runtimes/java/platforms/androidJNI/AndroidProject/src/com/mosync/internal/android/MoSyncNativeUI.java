@@ -473,6 +473,15 @@ public class MoSyncNativeUI implements RootViewReplacedListener
 	}
 
 	/**
+	 * Get the current screen without conversions.
+	 * @return The current screen without conversions.
+	 */
+	public ScreenWidget getUnconvertedCurrentScreen()
+	{
+		return mNativeUI.getUnconvertedCurrentScreen();
+	}
+
+	/**
 	 * Internal wrapper for maImagePickerOpen that runs
 	 * the call in the UI thread.
 	 */

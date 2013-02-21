@@ -4510,6 +4510,16 @@ public class MoSyncThread extends Thread
 	{
 		mMoSyncNativeUI.setCurrentScreen(handle);
 	}
+
+	/**
+	 * Get the current screen without conversions.
+	 * @return The current screen without conversions.
+	 */
+	public ScreenWidget getUnconvertedCurrentScreen()
+	{
+		return mMoSyncNativeUI.getUnconvertedCurrentScreen();
+	}
+
 	/**
 	 * Internal wrapper for maWidgetStackScreenPush that runs
 	 * the call in the UI thread.

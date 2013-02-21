@@ -209,7 +209,7 @@ public class MoSync extends Activity
 		{
 			Log.i("MoSync", "setRootViewUsingTransition, root is null.");
 		}
-		ScreenTransitions.applyScreenTransition(root, screenTransitionType, screenTransitionDuration);
+		ScreenTransitions.applyScreenTransition(root, screenTransitionType, screenTransitionDuration, false);
         setContentView(root);
 	}
 

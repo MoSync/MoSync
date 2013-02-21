@@ -593,6 +593,21 @@ public class NativeUI
 	}
 
 	/**
+	 * Get the current screen widget regardless its type.
+	 * @return the current screen widget.
+	 */
+	public ScreenWidget getUnconvertedCurrentScreen()
+	{
+		if(m_currentScreen == null)
+			return null;
+
+		if(m_currentScreen instanceof ScreenWidget )
+			return (ScreenWidget) m_currentScreen;
+
+		return null;
+	}
+
+	/**
 	 * Internal function for the maWidgetSetProperty system call.
 	 * Sets a property on the given widget, by accessing it from
 	 * the widget table and calling its setProperty method.

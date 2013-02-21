@@ -20,7 +20,9 @@ package com.mosync.nativeui.util;
 import com.mosync.internal.android.MoSyncThread;
 import com.mosync.internal.generated.IX_WIDGET;
 import com.mosync.nativeui.ui.widgets.ScreenWidget;
+import com.mosync.nativeui.ui.widgets.StackScreenWidget;
 
+import android.R.bool;
 import android.util.Log;
 import android.view.View;
 import android.view.animation.Animation;
@@ -44,8 +46,9 @@ final public class ScreenTransitions {
 	 * @param aView the view that will be involved in the transition.
 	 * @param aScreenTransitionType the type of the screen transition.
 	 * @param aScreenTransitionDuration the duration of the screen transition.
+	 * @param isTransitionInStackView true if the transition must be made in a stack screen, false otherwise.
 	 */
-	static public void applyScreenTransition(View aView, int aScreenTransitionType, int aScreenTransitionDuration)
+	static public void applyScreenTransition(View aView, int aScreenTransitionType, int aScreenTransitionDuration, Boolean isTransitionInStackView)
 	{
         switch ( aScreenTransitionType )
         {
@@ -63,14 +66,23 @@ final public class ScreenTransitions {
                 break;
             case IX_WIDGET.MAW_TRANSITION_TYPE_FADE_OUT:
                 // Get the current views
-                ScreenWidget currentScreen = MoSyncThread.getInstance().getCurrentScreen();
-                if ( null == currentScreen )
+                ScreenWidget currentScreen = null;
+                if ( !isTransitionInStackView )
                 {
-                     Log.i("MoSync", "doScreenTransition, currentScreen is null.");
+                    currentScreen = MoSyncThread.getInstance().getUnconvertedCurrentScreen();
                 }
                 else
                 {
-                     applyScreenTransitionFadeOut(currentScreen.getView(), aScreenTransitionDuration);
+                    currentScreen = MoSyncThread.getInstance().getCurrentScreen();
+                }
+
+                if ( null == currentScreen )
+                {
+                    Log.i("MoSync", "doScreenTransition, currentScreen is null.");
+                }
+                else
+                {
+                    applyScreenTransitionFadeOut(currentScreen.getView(), aScreenTransitionDuration);
                 }
                 break;
             default:

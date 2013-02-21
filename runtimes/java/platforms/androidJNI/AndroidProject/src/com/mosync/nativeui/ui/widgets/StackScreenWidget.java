@@ -26,6 +26,7 @@ import com.mosync.nativeui.util.properties.BooleanConverter;
 import com.mosync.nativeui.util.properties.InvalidPropertyValueException;
 import com.mosync.nativeui.util.properties.PropertyConversionException;
 
+import android.util.Log;
 import android.view.ViewGroup;
 
 /**
@@ -153,8 +154,8 @@ public class StackScreenWidget extends ScreenWidget
 		// by the show of the stack screen (if shown with transition).
 		if ( 0 != m_screenStack.size() )
 		{
-			ScreenTransitions.applyScreenTransition(screen.getView(),
-					m_pushTransitionType, m_pushTransitionDuration);
+			ScreenTransitions.applyScreenTransition(screen.getRootView(),
+					m_pushTransitionType, m_pushTransitionDuration, true);
 		}
 
 		m_screenStack.push( screen );
@@ -205,7 +206,7 @@ public class StackScreenWidget extends ScreenWidget
 		if ( IX_WIDGET.MAW_TRANSITION_TYPE_FADE_OUT == m_popTransitionType )
 		{
 			ScreenTransitions.applyScreenTransition(m_screenStack.peek().getView(),
-				m_popTransitionType, m_popTransitionDuration);
+				m_popTransitionType, m_popTransitionDuration, true);
 		}
 		// Remove current view
 		getView( ).removeAllViews( );
@@ -224,7 +225,7 @@ public class StackScreenWidget extends ScreenWidget
 			if ( IX_WIDGET.MAW_TRANSITION_TYPE_FADE_OUT != m_popTransitionType )
 			{
 				ScreenTransitions.applyScreenTransition(previousScreen.getView(),
-						m_popTransitionType, m_popTransitionDuration);
+						m_popTransitionType, m_popTransitionDuration, true);
 			}
 			getView( ).addView( previousScreen.getView( ) );
 		}
