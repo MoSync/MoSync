@@ -24,72 +24,65 @@ MA 02110-1301, USA.
  * that demonstrates NativeUI on MoSync.
  */
 
-#include <ma.h> 				// Syscalls
-#include <MAUtil/String.h>		// C++ String class
 #include <MAUtil/Moblet.h>		// Moblet class
-#include <conprint.h>			// lprintfln for logging
 
-#include <NativeUI/Widget.h>
-#include <NativeUI/Widgets.h>// Include all widgets
+#include "Controller/AppController.h"
 
-#include "MainScreen.h"			// Main UI screen
 
-using namespace MAUtil;
-using namespace NativeUI;
-
-/**
- * Moblet for the  application.
- */
-class NativeUIMoblet : public Moblet
+namespace ImageButtonTest
 {
-public:
 	/**
-	 * Constructor that creates the UI.
+	 * Moblet for the  application.
 	 */
-	NativeUIMoblet()
+	class NativeUIMoblet : public MAUtil::Moblet
 	{
-		// Create the main user interface screen.
-		mMainScreen = new MainScreen();
+	public:
+		/**
+		 * Constructor that creates the UI.
+		 */
+		NativeUIMoblet()
+		{
+			// Create the main user interface screen.
+			mController = new AppController();
+		}
 
-		// Show the screen.
-		mMainScreen->show();
-	}
+		/**
+		 * Destructor.
+		 */
+		virtual ~NativeUIMoblet()
+		{
+			delete mController;
+		}
+		/**
+		 * This method is called when the application is closed.
+		 */
+		void NativeUIMoblet::closeEvent()
+		{
+			// Deallocate the main screen.
+			delete mController;
+			mController = NULL;
 
-	/**
-	 * Destructor.
-	 */
-	virtual ~NativeUIMoblet()
-	{
-		delete mMainScreen;
-	}
-	/**
-	 * This method is called when the application is closed.
-	 */
-	void NativeUIMoblet::closeEvent()
-	{
-		// Deallocate the main screen.
-		delete mMainScreen;
-		mMainScreen = NULL;
+			// Exit the app.
+			close();
+		}
 
-		// Exit the app.
-		close();
-	}
+		/**
+		 * Method called when a key is pressed.
+		 */
+		void NativeUIMoblet::keyPressEvent(int keyCode, int nativeCode)
+		{
+			// Close the application if the back key is pressed.
+			if(MAK_BACK == keyCode)
+			{
+				closeEvent();
+			}
+		}
 
-	/**
-	 * Method called when a key is pressed.
-	 */
-	void NativeUIMoblet::keyPressEvent(int keyCode, int nativeCode)
-	{
-	    // Close the application if the back key is pressed.
-	    if(MAK_BACK == keyCode)
-	    {
-	        closeEvent();
-	    }
-	}
+	private:
+		AppController* mController;
+	};
 
-private:
-	MainScreen* mMainScreen;
-};
+} // end of ImageButtonTest
 
 /**
  * Main function that is called when the program starts.
@@ -97,10 +90,10 @@ private:
 extern "C" int MAMain()
 {
 	// Create a moblet.
-	NativeUIMoblet* moblet = new NativeUIMoblet();
+	ImageButtonTest::NativeUIMoblet* moblet = new ImageButtonTest::NativeUIMoblet();
 
 	// Run the moblet event loop.
-	Moblet::run(moblet);
+	MAUtil::Moblet::run(moblet);
 
 	// Deallocate objects.
 	delete moblet;
