@@ -51,7 +51,6 @@ namespace ScreenTransitionTest
 		mFooterLayout(NULL)
 	{
 		this->createUI();
-		mHideScreenButton->addButtonListener(this);
 	}
 
 	/**
@@ -117,6 +116,8 @@ namespace ScreenTransitionTest
 		infoLabel->setTextHorizontalAlignment(MAW_ALIGNMENT_CENTER);
 		infoLabel->setTextVerticalAlignment(MAW_ALIGNMENT_CENTER);
 		infoLabel->setFontSize(INFO_FONT_SIZE);
+		infoLabel->fillSpaceVertically();
+		infoLabel->setMaxNumberOfLines(3);
 		mMainLayout->addChild(infoLabel);
 
 		mTransitionNameLabel = new NativeUI::Label();
@@ -124,10 +125,6 @@ namespace ScreenTransitionTest
 		mMainLayout->addChild(mTransitionNameLabel);
 
 		ScreenUtils::addVerticalSpacerToLayout(mMainLayout, SPACER_HEIGHT);
-
-		NativeUI::VerticalLayout* spacer = new NativeUI::VerticalLayout();
-		spacer->fillSpaceVertically();
-		mMainLayout->addChild(spacer);
 
 		mFooterLayout = new NativeUI::HorizontalLayout();
 		mFooterLayout->setBackgroundColor(BLACK_COLOR);
@@ -137,6 +134,7 @@ namespace ScreenTransitionTest
 
 		mHideScreenButton = new NativeUI::Button();
 		mHideScreenButton->setText(BACK_BUTTON_TEXT);
+		mHideScreenButton->addButtonListener(this);
 		mFooterLayout->addChild(mHideScreenButton);
 
 		mMainLayout->addChild(mFooterLayout);

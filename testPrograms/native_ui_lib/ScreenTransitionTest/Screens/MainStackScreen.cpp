@@ -97,6 +97,10 @@ namespace ScreenTransitionTest {
 
 		NativeUI::Label* titleLbl = new NativeUI::Label();
 		titleLbl->setText(DESCRIPTION_TEXT);
+		titleLbl->setTextHorizontalAlignment(MAW_ALIGNMENT_CENTER);
+		titleLbl->setTextVerticalAlignment(MAW_ALIGNMENT_CENTER);
+		titleLbl->fillSpaceVertically();
+		titleLbl->setMaxNumberOfLines(2);
 		titleLbl->setFontSize(TITLE_FONT_SIZE);
 		layout->addChild(titleLbl);
 		layout->addChild(new NativeUI::VerticalLayout());
