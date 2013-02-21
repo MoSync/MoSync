@@ -208,16 +208,6 @@ private:
     EditBox* mFlashOffLength;
 
     /**
-     * Checked by default.
-     * If set to true, the notifications will be shown only if the app is
-     * in background.
-     * If set to false, the notification will be shown regardless of the
-     * app's focus state.
-     * Available only for Android.
-     */
-    CheckBox* mShowOnlyIfInBackground;
-
-    /**
      * Used to get the number of seconds on which the notification will be fired.
      */
     EditBox* mTime;

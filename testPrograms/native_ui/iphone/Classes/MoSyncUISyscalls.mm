@@ -89,7 +89,7 @@ int maWidgetGetProperty(MAHandle handle, const char *property, char *value, int 
 		return -1;
 	}
 	
-	[retval getCString:value maxLength:length encoding:NSASCIIStringEncoding];
+	[retval getCString:value maxLength:length encoding:NSUTF8StringEncoding];
 	return realLength;
 }
 

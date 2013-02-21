@@ -21,6 +21,7 @@
 #import "LayoutWidgets.h"
 #import "LayoutManagers.h"
 #import "WidgetUtils.h"
+#import "ScreenWidget.h"
 
 @implementation AbstractLayoutView (AbstractLayoutViewExpanded)
 
@@ -211,6 +212,11 @@ MAKE_UIWRAPPER_LAYOUTING_IMPLEMENTATION(MoSync, HLayoutView)
  */
 - (void)layout
 {
+	if (self.parent &&
+		[self.parent class] == [ScreenWidget class])
+	{
+		return;
+	}
     CGSize sizeThatFits = [self sizeThatFitsForWidget];
     float width = self.width;
     float height = self.height;

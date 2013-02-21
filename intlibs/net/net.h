@@ -77,7 +77,7 @@ public:
 protected:
 	MoSyncSocket mSock;
 	const std::string mHostname;
-	const u16 mPort;
+	u16 mPort;
 	uint mInetAddr;
 };
 
@@ -93,12 +93,18 @@ public:
 
 class UdpConnection : public InetConnection {
 public:
+	UdpConnection(u16 port = 0);	// 0 means random port
 	UdpConnection(const std::string& hostname, u16 port, MoSyncSocket sock=INVALID_SOCKET)
 		: InetConnection(hostname, port, sock) {}
 	virtual ~UdpConnection();
 
 	virtual int connect();
 	virtual int read(void* dst, int max);
+	virtual int readFrom(void* dst, int max, MAConnAddr& src);
+	virtual int writeTo(const void* src, int len, const MAConnAddr& dst);
+
+private:
+	int openServer();
 };
 
 class ProtocolConnection : public Connection {

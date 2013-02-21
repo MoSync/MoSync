@@ -91,7 +91,6 @@ CreateNotificationScreen::CreateNotificationScreen():
 	mFlashColor(NULL),
 	mFlashOnLength(NULL),
 	mFlashOffLength(NULL),
-	mShowOnlyIfInBackground(NULL),
 	mTime(NULL),
 	mCreateNotificationButton(NULL)
 {
@@ -232,10 +231,6 @@ void CreateNotificationScreen::createMainLayout()
 		mFlashOffLength = new EditBox();
 		mFlashOffLength->setInputMode(EDIT_BOX_INPUT_MODE_NUMERIC);
 		listView->addChild(createListViewItem(FLASH_OFF_LABEL_TEXT, mFlashOffLength));
-
-		mShowOnlyIfInBackground = new CheckBox();
-		mShowOnlyIfInBackground->setState(true);
-		listView->addChild(createListViewItem(SHOW_ONLY_IF_IN_BACKGROUND, mShowOnlyIfInBackground));
 	}
 
 	// ================ Fire time =====================
@@ -323,7 +318,7 @@ void CreateNotificationScreen::buttonClicked(Widget* button)
 		// Set fire date.
 		String secondsString = mTime->getText();
 		int seconds = MAUtil::stringToInteger(secondsString);
-		int secondsLocalTime = maLocalTime();
+		int secondsLocalTime = maTime();//maLocalTime();
 		int scheduleTime = secondsLocalTime + seconds;
 		tm fireDate;
 		split_time(scheduleTime, &fireDate);
@@ -401,17 +396,6 @@ void CreateNotificationScreen::buttonClicked(Widget* button)
 			{
 				notification->setSound(mSoundPath->getText());
 			}
-
-			if ( mShowOnlyIfInBackground->isChecked() )
-			{
-				// Show the notification only if the app is in background.
-				notification->setDisplayFlag(NOTIFICATION_DISPLAY_DEFAULT);
-			}
-			else
-			{
-				// Show the notification even if app is in foreground.
-				notification->setDisplayFlag(NOTIFICATION_DISPLAY_ANYTIME);
-			}
 		}
 
 //		notification->setFlag(NOTIFICATION_FLAG_AUTO_CANCEL);
@@ -446,6 +430,7 @@ void CreateNotificationScreen::didReceiveLocalNotification(
 		if (localNotification.getHandle() == storedNotification->getHandle())
 		{
 			printf("delete local notification");
+			maAlert("didReceiveLocalNotification", MAUtil::integerToString(localNotification.getHandle()).c_str() ,NULL,"OK", NULL);
 			mLocalNotificationVector.remove(i);
 			delete storedNotification;
 			break;
