@@ -101,5 +101,6 @@
                 <action android:name="com.android.vending.billing.PURCHASE_STATE_CHANGED" />
             </intent-filter>
         </receiver>
+		<receiver android:process=":remote" android:name="com.mosync.internal.android.notifications.AlarmReceiver" />
     </application>
 </manifest>
