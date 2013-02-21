@@ -24,7 +24,7 @@
  * @brief Last screen.
  */
 
-#define SCREEN_INFO_LABEL_TXT "This screen was not pushed to the StackScreen. It was displayed using showWithTransition method."
+#define SCREEN_INFO_LABEL_TXT "This screen was not pushed to the StackScreen. It was displayed using Screen's showWithTransition method."
 #define INFO_LABEL_TXT "The symmetric transition used for going back is:"
 #define BACK_BUTTON_TEXT "Go back"
 
@@ -104,6 +104,7 @@ namespace ScreenTransitionTest
 		screenInfoLabel->setFontSize(INFO_FONT_SIZE);
 
 		NativeUI::VerticalLayout* paddingLayout = new NativeUI::VerticalLayout();
+		paddingLayout->setChildHorizontalAlignment(MAW_ALIGNMENT_CENTER);
 		paddingLayout->setPaddingLeft(5);
 		paddingLayout->setPaddingRight(5);
 		paddingLayout->addChild(screenInfoLabel);

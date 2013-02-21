@@ -39,7 +39,8 @@ namespace ScreenTransitionTest
 	/**
 	 * Constructor.
 	 */
-	Controller::Controller()
+	Controller::Controller():
+		mIsLastScreenShown(false)
 	{
 		mStackScreen = new MainStackScreen(*this);
 		mSimpleScreen = new LastScreen(*this);
@@ -62,11 +63,13 @@ namespace ScreenTransitionTest
 	void Controller::showLastScreen(int transType)
 	{
 		currentTransition = transType;
+
 		const char* nameOfSymmetricTransition = ScreenUtils::getTransitionName(ScreenUtils::getSimetricTransition(currentTransition));
 		mSimpleScreen->resetTitleWithString(nameOfSymmetricTransition);
 
 		//int returnVal = maWidgetScreenShowWithTransition(mSimpleScreen->getWidgetHandle(), transType, TRANSITION_TIME_MS);
 		int returnVal = mSimpleScreen->showWithTransition(transType, TRANSITION_TIME_MS);
+		(MAW_RES_OK == returnVal) ? mIsLastScreenShown = true:false;
 		printf("showWithTransition result: %d", returnVal);
 	}
 
@@ -77,6 +80,15 @@ namespace ScreenTransitionTest
 	{
 		//int returnVal = maWidgetScreenShowWithTransition(mStackScreen->getWidgetHandle(), ScreenUtils::getSimetricTransition(currentTransition), TRANSITION_TIME_MS);
 		int returnVal = mStackScreen->showWithTransition(ScreenUtils::getSimetricTransition(currentTransition), TRANSITION_TIME_MS);
+		(MAW_RES_OK == returnVal) ? mIsLastScreenShown = false:true;
 		printf("showWithTransition result: %d", returnVal);
 	}
-} // end of Transitions
+
+	void Controller::handleAndroidBackButton()
+	{
+		if ( (1 == mStackScreen->getStackSize()) || mIsLastScreenShown )
+		{
+			maExit(0);
+		}
+	}
+} // end of ScreenTransitionTest

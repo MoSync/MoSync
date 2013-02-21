@@ -33,6 +33,8 @@
 
 #include "../Observers/TransitionsScreenObserver.h"
 
+class MainStackScreen;
+
 namespace NativeUI
 {
 	class Button;
@@ -104,33 +106,10 @@ namespace ScreenTransitionTest
 		 */
 		void populateTransitionList();
 
-		/**
-		 * Obtain the screen transition type from the list index for iOS screen
-		 * transitions.
-		 *
-		 * @param selectedIndex Selected item from list of screen transitions.
-		 * @return the Transition type corresponding to the selected screen transition.
-		 */
-		MAWScreenTransitionType getTransitionTypeForiOS(int selectedIndex);
+		//Workaround for Android 4.0 bug related to list view focus.
+		void giveFocusToList();
 
-		/**
-		 * Obtain the screen transition type from the list index for Android screen
-		 * transitions.
-		 *
-		 * @param selectedIndex Selected item from list of screen transitions.
-		 * @return the Transition type corresponding to the selected screen transition.
-		 */
-		MAWScreenTransitionType getTransitionTypeForAndroid(int selectedIndex);
-
-		/**
-		 * Obtain the screen transition type from the list index for Windows Phone screen
-		 * transitions.
-		 *
-		 * @param selectedIndex Selected item from list of screen transitions.
-		 * @return the Transition type corresponding to the selected screen transition.
-		 */
-		MAWScreenTransitionType getTransitionTypeForWindows(int selectedIndex);
-
+		friend class MainStackScreen;
 
 	private:
 		/**

@@ -60,6 +60,14 @@ namespace ScreenTransitionTest
 		 */
 		virtual void hideLastScreen();
 
+		/**
+		 * Android runtime sends back key event before stack screen pop.
+		 * This has been noted and soon the Android runtime will automatically
+		 * pop the screen from stack when back button is pressed and send a pop
+		 * event instead without a key event (only for non-root screens).
+		 */
+		virtual void handleAndroidBackButton();
+
 	public:
 		/**
 		 * Stack screen to show.
@@ -70,6 +78,11 @@ namespace ScreenTransitionTest
 		 * Last screen to show.
 		 */
 		LastScreen* mSimpleScreen;
+
+		/*
+		 * True if last screen is shown, false otherwise.
+		 */
+		bool mIsLastScreenShown;
 	};
 
 } //end of ScreenTransitionTest

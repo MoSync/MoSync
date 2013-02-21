@@ -27,6 +27,7 @@
 #include <MAUtil/Moblet.h>
 
 #include "Controller/Controller.h"
+#include "Screens/ScreenUtils.h"
 
 namespace ScreenTransitionTest
 {
@@ -57,7 +58,20 @@ namespace ScreenTransitionTest
 			if (MAK_BACK == keyCode || MAK_0 == keyCode)
 			{
 				// Call close to exit the application.
-				close();
+				/*
+				 * Android runtime sends back key event before stack screen pop.
+				 * This has been noted and soon the Android runtime will automatically
+				 * pop the screen from stack when back button is pressed and send a pop
+				 * event instead without a key event (only for non-root screens).
+				 */
+				if ( ScreenUtils::OS_ANDROID == ScreenUtils::getCurrentPlatform() )
+				{
+					mController->handleAndroidBackButton();
+				}
+				else
+				{
+					close();
+				}
 			}
 		}
 

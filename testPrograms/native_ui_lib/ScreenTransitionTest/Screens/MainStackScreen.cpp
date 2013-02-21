@@ -37,7 +37,9 @@
 #define PUSH_BTN_TEXT "Push next screen"
 
 #define SCR_COLOR 0x088da5
-#define INFO_LBL_TEXT "On this example, the transition applied to stacked screens is Slide. Please see MoSync documentation for transitions availability."
+#define DESCRIPTION_TEXT "Screen/StackScreen transition example"
+
+#define INFO_LBL_TEXT "On this example, the transition applied to the screens pushed/popped on the StackScreen is slide. Please see MoSync documentation for transitions availability."
 #define INFO_IOS_LBL_TEXT "On iOS the native transition (slide) is always applied on stacked screens."
 
 namespace ScreenTransitionTest {
@@ -91,9 +93,12 @@ namespace ScreenTransitionTest {
 		layout->fillSpaceHorizontally();
 		mMainScreen->setMainWidget(layout);
 
-		mPushScreen_Button = new NativeUI::Button();
-		mPushScreen_Button->setText(PUSH_BTN_TEXT);
-		mPushScreen_Button->addButtonListener(this);
+		layout->addChild(new NativeUI::VerticalLayout());
+
+		NativeUI::Label* titleLbl = new NativeUI::Label();
+		titleLbl->setText(DESCRIPTION_TEXT);
+		titleLbl->setFontSize(TITLE_FONT_SIZE);
+		layout->addChild(titleLbl);
 		layout->addChild(new NativeUI::VerticalLayout());
 
 		if ( ScreenUtils::OS_IOS == ScreenUtils::getCurrentPlatform() )
@@ -121,6 +126,9 @@ namespace ScreenTransitionTest {
 		footerLayout->setChildVerticalAlignment(MAW_ALIGNMENT_CENTER);
 		footerLayout->setHeight(FOOTER_HEIGHT);
 
+		mPushScreen_Button = new NativeUI::Button();
+		mPushScreen_Button->setText(PUSH_BTN_TEXT);
+		mPushScreen_Button->addButtonListener(this);
 		footerLayout->addChild(mPushScreen_Button);
 		layout->addChild(footerLayout);
 
@@ -152,9 +160,10 @@ namespace ScreenTransitionTest {
 		Screen* fromScreen,
 		Screen* toScreen)
 	{
-		if (this == stackScreen)
+		printf("stackScreenScreenPopped");
+		if (this == stackScreen && (fromScreen == mTransitionsScreen))
 		{
-			printf("stack screen event");
+			mTransitionsScreen->giveFocusToList();
 		}
 	}
 }

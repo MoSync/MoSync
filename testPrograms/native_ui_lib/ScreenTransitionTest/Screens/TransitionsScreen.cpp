@@ -25,7 +25,7 @@
  */
 
 #define TITLE_TXT "Transitions"
-#define INFO_TXT "Choose transition!"
+#define INFO_TXT "Choose screen transition!"
 #define BEGIN_TRANS_BTN_TEXT "Begin transition"
 
 #define SCREEN_COLOR 0x10637b
@@ -146,11 +146,7 @@ namespace ScreenTransitionTest
 		}
 		mObserver.showLastScreen(transitionType);
 
-		if ( ScreenUtils::OS_ANDROID == ScreenUtils::getCurrentPlatform() )
-		{
-			//Workaround for Android 4.0 bug related to list view focus.
-			mScreenTransitionListView->setProperty(MAW_LIST_VIEW_REQUEST_FOCUS, "true");
-		}
+		giveFocusToList();
 	}
 
 	/**
@@ -236,6 +232,15 @@ namespace ScreenTransitionTest
 				transitionItem->setHeight(LIST_ITEM_HEIGHT);
 				mScreenTransitionListView->addChild(transitionItem);
 			}
+		}
+	}
+
+	void TransitionsScreen::giveFocusToList()
+	{
+		if ( ScreenUtils::OS_ANDROID == ScreenUtils::getCurrentPlatform() )
+		{
+			//Workaround for Android 4.0 bug related to list view focus.
+			mScreenTransitionListView->setProperty(MAW_LIST_VIEW_REQUEST_FOCUS, "true");
 		}
 	}
 }

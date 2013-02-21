@@ -28,8 +28,8 @@
 #define SCREEN_UTILS_H_
 
 // Layout/UI related
-#define INFO_FONT_SIZE 14
-#define TITLE_FONT_SIZE 22
+#define INFO_FONT_SIZE 16
+#define TITLE_FONT_SIZE 24
 #define SPACER_HEIGHT 50
 #define SPACER_WIDTH 15
 #define FOOTER_HEIGHT 120
