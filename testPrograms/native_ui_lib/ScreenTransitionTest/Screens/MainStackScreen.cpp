@@ -61,16 +61,10 @@ namespace ScreenTransitionTest {
 		 * where the stack-screen transitions are available, will use SLIDE_LEFT/SLIDE_RIGHT
 		 * since these transitions types are available on both platforms.
 		 */
-		char valueBuffer[32];
-		sprintf(valueBuffer, "%d", MAW_TRANSITION_TYPE_SLIDE_LEFT);
-		this->setProperty(MAW_STACK_SCREEN_PUSH_TRANSITION_TYPE, valueBuffer);
-		sprintf(valueBuffer, "%d", MAW_TRANSITION_TYPE_SLIDE_RIGHT);
-		this->setProperty(MAW_STACK_SCREEN_POP_TRANSITION_TYPE, valueBuffer );
+		setPushTransition(MAW_TRANSITION_TYPE_SLIDE_LEFT, 300);
 
 		// Set duration of the screen transitions. Note that on WP the duration is constrained.
-		sprintf(valueBuffer, "%d", 300);
-		this->setProperty(MAW_STACK_SCREEN_PUSH_TRANSITION_DURATION, valueBuffer);
-		this->setProperty(MAW_STACK_SCREEN_POP_TRANSITION_DURATION, valueBuffer);
+		setPopTransition(MAW_TRANSITION_TYPE_SLIDE_RIGHT, 300);
 
 		mTransitionsScreen = new TransitionsScreen(observer);
 	}
