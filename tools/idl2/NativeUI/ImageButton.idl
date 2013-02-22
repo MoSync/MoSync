@@ -140,7 +140,7 @@ group WidgetImageButtonProperties "Image button" {
 		*	maWidgetSetProperty(imageHandle, MAW_IMAGE_BUTTON_BACKGROUND_IMAGE_PATH, "file_path.png");
 		* \endcode
 		*/
-		BACKGROUND_IMAGE_PATH = "imagePath";
+		BACKGROUND_IMAGE_PATH = "backgroundImagePath";
 
 		/**
 		* @brief Sets the typeface and style in which the text should be displayed.

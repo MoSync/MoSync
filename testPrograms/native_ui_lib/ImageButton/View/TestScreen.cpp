@@ -129,7 +129,7 @@ namespace ImageButtonTest
 		mImageButton->wrapContentHorizontally();
 		mMainLayout->addChild(mImageButton);
 
-		int result = mImageButton->setImage(RES_IMAGE_BACKGROUND);
+		int result = mImageButton->setBackgroundImage(RES_IMAGE_BACKGROUND);
 		mImageButton->setText("click me");
 		printf("result setImage = %d", result);
 

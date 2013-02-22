@@ -59,14 +59,15 @@ namespace ImageButtonTest
 		// Extract bundled files to the local file system.
 		mFileUtil->extractLocalFiles();
 
-		char buf[BUFFER_SIZE];
-		maGetSystemProperty("mosync.path.local", buf, BUFFER_SIZE);
+		char dirPath[BUFFER_SIZE];
+		maGetSystemProperty("mosync.path.local", dirPath, BUFFER_SIZE);
 
-		sprintf(buf, "%sForegroundPath.png", buf);
-		mImagePropertiesScreen->setDisplayedForegoundImagePath(buf);
+		char filePath[BUFFER_SIZE];
+		sprintf(filePath, "%sForegroundPath.png", dirPath);
+		mImagePropertiesScreen->setDisplayedForegoundImagePath(filePath);
 
-		sprintf(buf, "%sBackgroundPath.png", buf);
-		mImagePropertiesScreen->setDisplayedBackgoundImagePath(buf);
+		sprintf(filePath, "%sBackgroundPath.png", dirPath);
+		mImagePropertiesScreen->setDisplayedBackgoundImagePath(filePath);
 	}
 
 	/**
@@ -123,7 +124,7 @@ namespace ImageButtonTest
 	 */
 	void AppController::selectBackgroundImageFromHandle()
 	{
-		mTestScreen->setImageButtonForeground(RES_IMAGE_BACKGROUND);
+		mTestScreen->setImageButtonBackground(RES_IMAGE_BACKGROUND);
 	}
 
 	/**
@@ -131,9 +132,9 @@ namespace ImageButtonTest
 	 */
 	void AppController::showBackgroundImagePath()
 	{
-		MAUtil::String text = mTestScreen->getImageButtonForegroundPath();
+		MAUtil::String text = mTestScreen->getImageButtonBackgroundPath();
 		maAlert(
-			"The foreground image path is",
+			"The background image path is",
 			text.c_str(),
 			"OK",
 			NULL,
