@@ -45,6 +45,10 @@ namespace ScreenTransitionTest
 		mStackScreen = new MainStackScreen(*this);
 		mSimpleScreen = new LastScreen(*this);
 
+		ScreenUtils::initScreenSizeConstants(
+			mStackScreen->getWidth(),
+			mStackScreen->getHeight());
+
 		mStackScreen->show();
 	}
 

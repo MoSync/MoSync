@@ -69,13 +69,19 @@ namespace ScreenTransitionTest
 		/**
 		 * Appends text to title.
 		 */
-        void resetTitleWithString(const char* aString);
+        virtual void resetTitleWithString(const char* aString);
 
 	private:
 		/**
 		 * Create screen's UI.
 		 */
-		void createUI();
+        virtual void createUI();
+
+        virtual void addInfoLabel();
+
+        virtual void addTransitionInfoLabels();
+
+        virtual void addFooter();
 
 	private:
 		/**

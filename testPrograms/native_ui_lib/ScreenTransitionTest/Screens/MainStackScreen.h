@@ -29,6 +29,7 @@ namespace NativeUI
 {
 	class Button;
 	class Screen;
+	class VerticalLayout;
 }
 
 namespace ScreenTransitionTest
@@ -54,7 +55,13 @@ namespace ScreenTransitionTest
 
 	private:
 
-		virtual void addMainScreen();
+		virtual void createUI();
+
+		virtual void addTitleLabel();
+
+		virtual void addInfoLabel();
+
+		virtual void addFooter();
 
 		/**
 		 * This method is called when there is an touch-down event for
@@ -94,6 +101,11 @@ namespace ScreenTransitionTest
 		 * Main screen to push.
 		 */
 		NativeUI::Screen* mMainScreen;
+
+		/**
+		 * Screen's layout.
+		 */
+		NativeUI::VerticalLayout* mMainLayout;
 
 		/**
 		 * Transitions screen to show.

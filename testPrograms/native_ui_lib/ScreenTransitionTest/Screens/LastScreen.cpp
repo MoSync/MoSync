@@ -87,18 +87,35 @@ namespace ScreenTransitionTest
 	{
 		mMainLayout = new NativeUI::VerticalLayout();
 		mMainLayout->setBackgroundColor(SCREEN_COLOR);
-		mMainLayout->setChildHorizontalAlignment(MAW_ALIGNMENT_CENTER);
+		if ( ScreenUtils::OS_WIN != ScreenUtils::getCurrentPlatform() )
+		{
+			mMainLayout->setChildHorizontalAlignment(MAW_ALIGNMENT_CENTER);
+		}
 		mMainLayout->fillSpaceVertically();
 		mMainLayout->fillSpaceHorizontally();
-		this->setMainWidget(mMainLayout);
+		setMainWidget(mMainLayout);
 
 		ScreenUtils::addVerticalSpacerToLayout(mMainLayout, SPACER_HEIGHT);
 
+		addInfoLabel();
+
+		ScreenUtils::addVerticalSpacerToLayout(mMainLayout, SPACER_HEIGHT);
+
+		addTransitionInfoLabels();
+
+		ScreenUtils::addVerticalSpacerToLayout(mMainLayout, SPACER_HEIGHT);
+
+		addFooter();
+	}
+
+	void LastScreen::addInfoLabel()
+	{
 		NativeUI::Label* screenInfoLabel = new NativeUI::Label();
 		screenInfoLabel->setText(SCREEN_INFO_LABEL_TXT);
 		screenInfoLabel->setTextHorizontalAlignment(MAW_ALIGNMENT_CENTER);
 		screenInfoLabel->setTextVerticalAlignment(MAW_ALIGNMENT_CENTER);
 		screenInfoLabel->setMaxNumberOfLines(3);
+		screenInfoLabel->fillSpaceHorizontally();
 		screenInfoLabel->fillSpaceVertically();
 		screenInfoLabel->setFontSize(INFO_FONT_SIZE);
 
@@ -108,34 +125,51 @@ namespace ScreenTransitionTest
 		paddingLayout->setPaddingRight(5);
 		paddingLayout->addChild(screenInfoLabel);
 		mMainLayout->addChild(paddingLayout);
+	}
 
-		ScreenUtils::addVerticalSpacerToLayout(mMainLayout, SPACER_HEIGHT);
-
+	void LastScreen::addTransitionInfoLabels()
+	{
 		NativeUI::Label* infoLabel = new NativeUI::Label();
 		infoLabel->setText(INFO_LABEL_TXT);
 		infoLabel->setTextHorizontalAlignment(MAW_ALIGNMENT_CENTER);
 		infoLabel->setTextVerticalAlignment(MAW_ALIGNMENT_CENTER);
 		infoLabel->setFontSize(INFO_FONT_SIZE);
 		infoLabel->fillSpaceVertically();
+		infoLabel->fillSpaceHorizontally();
 		infoLabel->setMaxNumberOfLines(3);
 		mMainLayout->addChild(infoLabel);
 
 		mTransitionNameLabel = new NativeUI::Label();
 		mTransitionNameLabel->setFontSize(TITLE_FONT_SIZE);
+		mTransitionNameLabel->fillSpaceHorizontally();
+		mTransitionNameLabel->setTextHorizontalAlignment(MAW_ALIGNMENT_CENTER);
+		mTransitionNameLabel->setTextVerticalAlignment(MAW_ALIGNMENT_CENTER);
 		mMainLayout->addChild(mTransitionNameLabel);
+	}
 
-		ScreenUtils::addVerticalSpacerToLayout(mMainLayout, SPACER_HEIGHT);
-
+	void LastScreen::addFooter()
+	{
 		mFooterLayout = new NativeUI::HorizontalLayout();
 		mFooterLayout->setBackgroundColor(BLACK_COLOR);
-		mFooterLayout->setChildHorizontalAlignment(MAW_ALIGNMENT_CENTER);
-		mFooterLayout->setChildVerticalAlignment(MAW_ALIGNMENT_CENTER);
 		mFooterLayout->setHeight(FOOTER_HEIGHT);
 
 		mHideScreenButton = new NativeUI::Button();
 		mHideScreenButton->setText(BACK_BUTTON_TEXT);
 		mHideScreenButton->addButtonListener(this);
-		mFooterLayout->addChild(mHideScreenButton);
+
+		if ( ScreenUtils::OS_WIN == ScreenUtils::getCurrentPlatform() )
+		{
+			mFooterLayout->fillSpaceHorizontally();
+			mFooterLayout->addChild(new NativeUI::HorizontalLayout());
+			mFooterLayout->addChild(mHideScreenButton);
+			mFooterLayout->addChild(new NativeUI::HorizontalLayout());
+		}
+		else
+		{
+			mFooterLayout->setChildHorizontalAlignment(MAW_ALIGNMENT_CENTER);
+			mFooterLayout->setChildVerticalAlignment(MAW_ALIGNMENT_CENTER);
+			mFooterLayout->addChild(mHideScreenButton);
+		}
 
 		mMainLayout->addChild(mFooterLayout);
 	}

@@ -57,9 +57,6 @@ namespace ScreenTransitionTest
 		mSelectedListItem(0)
 	{
 		fillScreenTransitionContainer();
-		ScreenUtils::initScreenSizeConstants(
-			this->getWidth(),
-			this->getHeight());
 
 		this->createUI();
 		mShowSecondScreenButton->addButtonListener(this);
@@ -81,22 +78,47 @@ namespace ScreenTransitionTest
 	{
 		mMainLayout = new NativeUI::VerticalLayout();
 		mMainLayout->setBackgroundColor(SCREEN_COLOR);
-		mMainLayout->setChildHorizontalAlignment(MAW_ALIGNMENT_CENTER);
+		if ( ScreenUtils::OS_WIN != ScreenUtils::getCurrentPlatform() )
+		{
+			mMainLayout->setChildHorizontalAlignment(MAW_ALIGNMENT_CENTER);
+		}
 		mMainLayout->fillSpaceVertically();
 		mMainLayout->fillSpaceHorizontally();
-		this->setMainWidget(mMainLayout);
-		this->setTitle(TITLE_TXT);
+		setMainWidget(mMainLayout);
+		setTitle(TITLE_TXT);
 
 		ScreenUtils::addVerticalSpacerToLayout(mMainLayout, SPACER_HEIGHT);
 
+		addTitleLable();
+
+		ScreenUtils::addVerticalSpacerToLayout(mMainLayout, SPACER_HEIGHT);
+
+		addTransitionsList();
+
+		ScreenUtils::addVerticalSpacerToLayout(mMainLayout, SPACER_HEIGHT);
+
+		addFooter();
+	}
+
+	void TransitionsScreen::addTitleLable()
+	{
 		mTitleLabel = new NativeUI::Label();
 		mTitleLabel->setText(INFO_TXT);
+		mTitleLabel->fillSpaceHorizontally();
+		mTitleLabel->setTextHorizontalAlignment(MAW_ALIGNMENT_CENTER);
+		mTitleLabel->setTextVerticalAlignment(MAW_ALIGNMENT_CENTER);
 		mTitleLabel->setFontSize(TITLE_FONT_SIZE);
 		mMainLayout->addChild(mTitleLabel);
+	}
 
+	void TransitionsScreen::addTransitionsList()
+	{
 		mListLayout = new NativeUI::HorizontalLayout();
 		mListLayout->setBackgroundColor(SCREEN_COLOR);
-		mListLayout->setChildHorizontalAlignment(MAW_ALIGNMENT_CENTER);
+		if ( ScreenUtils::OS_WIN != ScreenUtils::getCurrentPlatform() )
+		{
+			mListLayout->setChildHorizontalAlignment(MAW_ALIGNMENT_CENTER);
+		}
 		mListLayout->fillSpaceVertically();
 		mListLayout->fillSpaceHorizontally();
 
@@ -110,24 +132,32 @@ namespace ScreenTransitionTest
 			mScreenTransitionListView->setBackgroundColor(0x000000);
 
 		populateTransitionList();
-
-		ScreenUtils::addVerticalSpacerToLayout(mMainLayout, SPACER_HEIGHT);
-
 		mListLayout->addChild(mScreenTransitionListView);
 		mMainLayout->addChild(mListLayout);
+	}
 
-		ScreenUtils::addVerticalSpacerToLayout(mMainLayout, SPACER_HEIGHT);
-
+	void TransitionsScreen::addFooter()
+	{
 		mFooterLayout = new NativeUI::HorizontalLayout();
 		mFooterLayout->setBackgroundColor(BLACK_COLOR);
-		mFooterLayout->setChildHorizontalAlignment(MAW_ALIGNMENT_CENTER);
-		mFooterLayout->setChildVerticalAlignment(MAW_ALIGNMENT_CENTER);
 		mFooterLayout->setHeight(FOOTER_HEIGHT);
 
 		mShowSecondScreenButton = new NativeUI::Button();
 		mShowSecondScreenButton->setText(BEGIN_TRANS_BTN_TEXT);
 
-		mFooterLayout->addChild(mShowSecondScreenButton);
+		if ( ScreenUtils::OS_WIN == ScreenUtils::getCurrentPlatform() )
+		{
+			mFooterLayout->fillSpaceHorizontally();
+			mFooterLayout->addChild(new NativeUI::HorizontalLayout());
+			mFooterLayout->addChild(mShowSecondScreenButton);
+			mFooterLayout->addChild(new NativeUI::HorizontalLayout());
+		}
+		else
+		{
+			mFooterLayout->setChildHorizontalAlignment(MAW_ALIGNMENT_CENTER);
+			mFooterLayout->setChildVerticalAlignment(MAW_ALIGNMENT_CENTER);
+			mFooterLayout->addChild(mShowSecondScreenButton);
+		}
 		mMainLayout->addChild(mFooterLayout);
 	}
 

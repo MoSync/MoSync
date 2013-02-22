@@ -94,17 +94,23 @@ namespace ScreenTransitionTest
 		/**
 		 * Create screen's UI.
 		 */
-		void createUI();
+		virtual void createUI();
+
+		virtual void addTitleLable();
+
+		virtual void addTransitionsList();
+
+		virtual void addFooter();
 
 		/**
 		 * Fills the screen transition container.
 		 */
-		void fillScreenTransitionContainer();
+		virtual void fillScreenTransitionContainer();
 
 		/**
 		 * Populates the screen transition list.
 		 */
-		void populateTransitionList();
+		virtual void populateTransitionList();
 
 		//Workaround for Android 4.0 bug related to list view focus.
 		void giveFocusToList();

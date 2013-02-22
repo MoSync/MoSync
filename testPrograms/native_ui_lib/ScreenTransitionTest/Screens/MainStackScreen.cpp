@@ -47,10 +47,14 @@ namespace ScreenTransitionTest {
 	 * Constructor.
 	 */
 	MainStackScreen::MainStackScreen(TransitionsScreenObserver& observer) :
-		StackScreen()
+		StackScreen(),
+		mMainScreen(NULL),
+		mMainLayout(NULL),
+		mTransitionsScreen(NULL),
+		mPushScreen_Button(NULL)
 	{
-		this->addMainScreen();
-		this->addStackScreenListener(this);
+		createUI();
+		addStackScreenListener(this);
 
 		/* Note that stack screen transitions do not apply on iOS due to
 		 * the native animation. For the other two platforms (Android and WP),
@@ -82,29 +86,48 @@ namespace ScreenTransitionTest {
 		delete mMainScreen;
 	}
 
-	void MainStackScreen::addMainScreen()
+	void MainStackScreen::createUI()
 	{
 		mMainScreen = new NativeUI::Screen();
 		mMainScreen->setTitle(MAIN_SCR_TITLE);
-		NativeUI::VerticalLayout* layout = new NativeUI::VerticalLayout();
-		layout->setBackgroundColor(SCR_COLOR);
-		layout->setChildHorizontalAlignment(MAW_ALIGNMENT_CENTER);
-		layout->fillSpaceVertically();
-		layout->fillSpaceHorizontally();
-		mMainScreen->setMainWidget(layout);
 
-		layout->addChild(new NativeUI::VerticalLayout());
+		mMainLayout = new NativeUI::VerticalLayout();
+		mMainLayout->setBackgroundColor(SCR_COLOR);
+		if ( ScreenUtils::OS_WIN != ScreenUtils::getCurrentPlatform() )
+		{
+			mMainLayout->setChildHorizontalAlignment(MAW_ALIGNMENT_CENTER);
+		}
+		mMainLayout->fillSpaceVertically();
+		mMainLayout->fillSpaceHorizontally();
+		mMainScreen->setMainWidget(mMainLayout);
 
+		mMainLayout->addChild(new NativeUI::VerticalLayout());
+
+		addTitleLabel();
+
+		addInfoLabel();
+
+		addFooter();
+
+		this->push(mMainScreen);
+	}
+
+	void MainStackScreen::addTitleLabel()
+	{
 		NativeUI::Label* titleLbl = new NativeUI::Label();
 		titleLbl->setText(DESCRIPTION_TEXT);
 		titleLbl->setTextHorizontalAlignment(MAW_ALIGNMENT_CENTER);
 		titleLbl->setTextVerticalAlignment(MAW_ALIGNMENT_CENTER);
 		titleLbl->fillSpaceVertically();
+		titleLbl->fillSpaceHorizontally();
 		titleLbl->setMaxNumberOfLines(2);
 		titleLbl->setFontSize(TITLE_FONT_SIZE);
-		layout->addChild(titleLbl);
-		layout->addChild(new NativeUI::VerticalLayout());
+		mMainLayout->addChild(titleLbl);
+		mMainLayout->addChild(new NativeUI::VerticalLayout());
+	}
 
+	void MainStackScreen::addInfoLabel()
+	{
 		if ( ScreenUtils::OS_IOS == ScreenUtils::getCurrentPlatform() )
 		{
 			NativeUI::Label* infoLbliOS = new NativeUI::Label();
@@ -114,29 +137,47 @@ namespace ScreenTransitionTest {
 			infoLbliOS->fillSpaceVertically();
 			infoLbliOS->setText(INFO_IOS_LBL_TEXT);
 			infoLbliOS->setFontSize(INFO_FONT_SIZE);
-			layout->addChild(infoLbliOS);
+			mMainLayout->addChild(infoLbliOS);
 		}
 		else
 		{
 			NativeUI::Label* infoLbl = new NativeUI::Label();
 			infoLbl->setText(INFO_LBL_TEXT);
 			infoLbl->setFontSize(INFO_FONT_SIZE);
-			layout->addChild(infoLbl);
+			infoLbl->setTextHorizontalAlignment(MAW_ALIGNMENT_CENTER);
+			infoLbl->setTextVerticalAlignment(MAW_ALIGNMENT_CENTER);
+			infoLbl->fillSpaceHorizontally();
+			infoLbl->fillSpaceVertically();
+			mMainLayout->addChild(infoLbl);
 		}
+	}
 
+	void MainStackScreen::addFooter()
+	{
 		NativeUI::HorizontalLayout* footerLayout = new NativeUI::HorizontalLayout();
 		footerLayout->setBackgroundColor(BLACK_COLOR);
-		footerLayout->setChildHorizontalAlignment(MAW_ALIGNMENT_CENTER);
-		footerLayout->setChildVerticalAlignment(MAW_ALIGNMENT_CENTER);
 		footerLayout->setHeight(FOOTER_HEIGHT);
+		footerLayout->fillSpaceHorizontally();
 
 		mPushScreen_Button = new NativeUI::Button();
 		mPushScreen_Button->setText(PUSH_BTN_TEXT);
 		mPushScreen_Button->addButtonListener(this);
-		footerLayout->addChild(mPushScreen_Button);
-		layout->addChild(footerLayout);
 
-		this->push(mMainScreen);
+		if ( ScreenUtils::OS_WIN == ScreenUtils::getCurrentPlatform() )
+		{
+			footerLayout->fillSpaceHorizontally();
+			footerLayout->addChild(new NativeUI::HorizontalLayout());
+			footerLayout->addChild(mPushScreen_Button);
+			footerLayout->addChild(new NativeUI::HorizontalLayout());
+		}
+		else
+		{
+			footerLayout->setChildHorizontalAlignment(MAW_ALIGNMENT_CENTER);
+			footerLayout->setChildVerticalAlignment(MAW_ALIGNMENT_CENTER);
+			footerLayout->addChild(mPushScreen_Button);
+		}
+
+		mMainLayout->addChild(footerLayout);
 	}
 
 	/**
