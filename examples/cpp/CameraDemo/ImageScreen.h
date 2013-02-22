@@ -21,7 +21,7 @@ MA 02110-1301, USA.
  * @author Ali Sarrafi
  *
  * This application provides a very basic example of how to work
- * with Native UI and the Camera API
+ * with Native UI and the Camera API.
  */
 
 // Include MoSync syscalls.
@@ -36,44 +36,25 @@ MA 02110-1301, USA.
 using namespace NativeUI;
 
 /**
- * A class that encapsulates the behavior of ImageScreen
+ * A class that implements the behavior of ImageScreen.
  */
 class ImageScreen : public ButtonListener
 {
 public:
-	ImageScreen()
-	{
-		mImageHandle = 0;
-	}
-
-	virtual ~ImageScreen()
-	{
-		delete mScreen;
-	}
-
+	ImageScreen();
+	virtual ~ImageScreen();
 	virtual void buttonClicked(Widget* button);
-
-	void initialize(StackScreen* stackScreen);
-
+	void initializeUI(StackScreen* stackScreen);
+	void createUI();
 	void pushImageScreen();
-
 	void setImageDataHandle(MAHandle dataHandle);
 
-
 private:
-
-	void createUI();
-
-	Screen *mScreen;
-
-	Button *mOKButton;
-
-	VerticalLayout *mMainLayoutWidget;
-
-	StackScreen *mStackScreen;
-
-	Image *mImageWidget;
-
+	Screen* mScreen;
+	Button* mOKButton;
+	VerticalLayout* mMainLayoutWidget;
+	StackScreen* mStackScreen;
+	Image* mImageWidget;
 	MAHandle mImageHandle;
 };
 
