@@ -17,6 +17,8 @@ MA 02110-1301, USA.
 
 package com.mosync.nativeui.ui.widgets;
 
+import java.io.File;
+
 import com.mosync.internal.generated.IX_WIDGET;
 import com.mosync.nativeui.core.NativeUI;
 import com.mosync.nativeui.util.properties.IntConverter;
@@ -24,6 +26,7 @@ import com.mosync.nativeui.util.properties.InvalidPropertyValueException;
 import com.mosync.nativeui.util.properties.PropertyConversionException;
 
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -31,14 +34,25 @@ import android.widget.ImageView;
 /**
  * Wraps the behavior of a ImageButton view. Some properties and event handling
  * are extensions of Widget.
- * 
+ *
  * @author fmattias
  */
 public class ImageButtonWidget extends Widget
 {
+
+	/**
+	 * Image file path for MAW_IMAGE_BUTTON_IMAGE_PATH property;
+	 */
+	private String mForegroundImagePath = "";
+
+	/**
+	 * Image file path for MAW_IMAGE_BUTTON_BACKGROUND_IMAGE_PATH property;
+	 */
+	private String mBackgroundImagePath = "";
+
 	/**
 	 * Constructor.
-	 * 
+	 *
 	 * @param handle Integer handle corresponding to this instance.
 	 * @param button
 	 *            An image button wrapped by this widget.
@@ -46,16 +60,16 @@ public class ImageButtonWidget extends Widget
 	public ImageButtonWidget(int handle, ImageButton imageButton)
 	{
 		super( handle, imageButton );
-		
+
 		/**
 		 * Remove the background drawable (we don't want the default button background.).
 		 */
 		imageButton.setBackgroundDrawable( null );
-		
+
 		/**
 		 * Defaults to no scaling.
 		 */
-		imageButton.setScaleType( ImageView.ScaleType.CENTER ); 
+		imageButton.setScaleType( ImageView.ScaleType.CENTER );
 	}
 
 	/**
@@ -74,6 +88,7 @@ public class ImageButtonWidget extends Widget
 			{
 				getView( ).setBackgroundDrawable(
 						new BitmapDrawable( background ) );
+				mBackgroundImagePath = "";
 			}
 		}
 		else if( property
@@ -85,9 +100,10 @@ public class ImageButtonWidget extends Widget
 			{
 				ImageButton imageButton = (ImageButton) getView( );
 				imageButton.setImageBitmap( foreground );
-				imageButton.setScaleType( ImageView.ScaleType.CENTER );	
+				imageButton.setScaleType( ImageView.ScaleType.CENTER );
+				mForegroundImagePath = "";
 			}
-		}		
+		}
 		/*
 		// this doesn't work on iphone we skip this and add the functionality to have
 		// both a background image (that uses scaleXY)
@@ -106,25 +122,79 @@ public class ImageButtonWidget extends Widget
 			else if( value.equals( "scalePreserveAspect" ) )
 			{
 				imageButton.setScaleType( ImageView.ScaleType.FIT_CENTER );
-			} 
-			else 
+			}
+			else
 			{
 				throw new InvalidPropertyValueException( property , value );
 			}
-			
+
 			return true;
 		}
 		*/
+		else if( property.equals( IX_WIDGET.MAW_IMAGE_BUTTON_IMAGE_PATH ) )
+		{
+			File imgFile = new File( value );
+			if( imgFile.exists() )
+			{
+				mForegroundImagePath = value;
+			    Bitmap bitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
+
+				ImageButton imageButton = (ImageButton) getView( );
+				imageButton.setImageBitmap( bitmap );
+				imageButton.setScaleType( ImageView.ScaleType.CENTER );
+			}
+			else
+			{
+				throw new InvalidPropertyValueException( property , value );
+			}
+		}
+		else if( property.equals( IX_WIDGET.MAW_IMAGE_BUTTON_BACKGROUND_IMAGE_PATH ) )
+		{
+			File imgFile = new File( value );
+			if( imgFile.exists() )
+			{
+				mBackgroundImagePath = value;
+			    Bitmap bitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
+
+				getView( ).setBackgroundDrawable(
+						new BitmapDrawable( bitmap ) );
+			}
+			else
+			{
+				throw new InvalidPropertyValueException( property , value );
+			}
+		}
 		else
 		{
 			if( super.setProperty( property, value ) )
 			{
 				return true;
 			}
-			
+
 			return false;
 		}
 
 		return true;
 	}
+
+	/**
+	 * @see Widget.getProperty.
+	 */
+	@Override
+	public String getProperty(String property)
+	{
+		if( property.equals( IX_WIDGET.MAW_IMAGE_BUTTON_IMAGE_PATH ) )
+		{
+			return mForegroundImagePath;
+		}
+		else if( property.equals( IX_WIDGET.MAW_IMAGE_BUTTON_BACKGROUND_IMAGE_PATH ) )
+		{
+			return mBackgroundImagePath;
+		}
+		else
+		{
+			return super.getProperty( property );
+		}
+	}
+
 }
