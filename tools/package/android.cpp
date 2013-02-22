@@ -20,7 +20,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "tools.h"
 #include "permissions.h"
 #include "nfc.h"
-#include "mustache.h"
+#include "mustache/mustache.h"
 #include "helpers/mkdir.h"
 #include "filelist/filelist.h"
 #include "profiledb/profiledb.h"

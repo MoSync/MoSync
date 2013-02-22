@@ -23,6 +23,7 @@
 #include "packagers.h"
 #include "util.h"
 #include "tools.h"
+#include "mustache/mustache.h"
 #include "helpers/mkdir.h"
 
 #if defined (__MACH__) || defined(__APPLE__)
