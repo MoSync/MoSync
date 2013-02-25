@@ -145,6 +145,47 @@ namespace NativeUI
 		 */
 		MAUtil::String getBackgroundImagePath();
 
+		/**
+		 * Set an image that will be displayed by the widget after user clicks on it.
+		 * On iOS platform this property is named selected state.
+		 * If this property is set, when the user taps on the widget its background image will
+		 * be replaced by the image set here.
+		 * Setting this property will reset the pressed image path value.
+		 * @param image Handle to an image.
+		 * @return Any of the following result codes:
+		 * - #MAW_RES_OK if the property could be set.
+		 * - #MAW_RES_INVALID_PROPERTY_VALUE if the handle was invalid.
+		 */
+		int setPressedImage(MAHandle image);
+
+		/**
+		 * Get the pressed image handle.
+		 * @return An image handle if the displayed pressed image was created
+		 * using a handle, or zero otherwise.
+		 */
+		MAHandle getPressedImage();
+
+		/**
+		 * Set a path to a image file that will be displayed by the widget
+		 * after user clicks on it.
+		 * On iOS platform this property is named selected state.
+		 * If this property is set when the user taps on the widget, its background image will
+		 * be replaced by the image set here.
+		 * Setting this property will reset the pressed image value.
+		 * @param imagePath Path to an image file.
+		 * @return Any of the following result codes:
+		 * - #MAW_RES_OK if the property could be set.
+		 * - #MAW_RES_INVALID_PROPERTY_VALUE if the image path was invalid.
+		 */
+		int setPressedImagePath(const MAUtil::String& imagePath);
+
+		/**
+		 * Get the pressed image path.
+		 * @return An image path if the displayed pressed image was created
+		 * using a file path, or an empty string otherwise.
+		 */
+		MAUtil::String getPressedImagePath();
+
         /**
          * Add an button event listener.
          * @param listener The listener that will receive button events.
