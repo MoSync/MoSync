@@ -30,7 +30,7 @@ group WidgetStackScreenProperties "Stack screen" {
 		BACK_BUTTON_ENABLED = "backButtonEnabled";
 
 		/**
-		* @brief Stack screen's pushing transition type
+		* @brief Stack screen's push transition type.
 		*
 		* Type of the animated transition used when pushing a screen from the current screen stack.
 		*
@@ -48,7 +48,7 @@ group WidgetStackScreenProperties "Stack screen" {
 		PUSH_TRANSITION_TYPE = "pushTransitionType";
 
 		/**
-		* @brief Stack screen's pushing transition type
+		* @brief Stack screen's pop transition type.
 		*
 		* Type of the animated transition used when popping a screen from the current screen stack.
 		*
@@ -66,7 +66,7 @@ group WidgetStackScreenProperties "Stack screen" {
 		POP_TRANSITION_TYPE = "popTransitionType";
 
 		/**
-		* @brief Stack screen's pushing transition duration
+		* @brief Stack screen's push transition duration.
 		*
 		* Duration of the animated transition used when pushing a screen from the current screen stack.
 		*
@@ -85,11 +85,11 @@ group WidgetStackScreenProperties "Stack screen" {
 		PUSH_TRANSITION_DURATION = "pushTransitionDuration";
 
 		/**
-		* @brief Stack screen's popping transition duration
+		* @brief Stack screen's pop transition duration.
 		*
 		* Duration of the animated transition used when popping a screen from the current screen stack.
 		*
-		* Note: This property is available only on Android. On iOS the native navigation animation is used when pushing a screen
+		* Note: This property is available only on Android. On iOS the native navigation animation is used when popping a screen
 		* 	and on Windows Phone is ignored due to the constant duration of the native screen transitions.
 		*
 		* @validvalue A positive number representing a time interval in milliseconds.

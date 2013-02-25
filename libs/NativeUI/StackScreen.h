@@ -106,8 +106,8 @@ namespace NativeUI
         virtual void enableBackButton(const bool enabledState);
 
         /**
-         * Specify the screen transition type and duration used when pushing a screen.
-         * This is available only Android and Windows Phone. On iOS the native
+         * Sets the screen transition type and duration used when pushing a screen.
+         * This is available only on Android and Windows Phone. On iOS the native
          * navigation animation is used when pushing a screen.
          *
          * @param screenTransitionType The type of the pop screen transition. See available
@@ -128,11 +128,11 @@ namespace NativeUI
             const int transitionsDuration);
 
         /**
-         * Specify the screen transition type and duration used when popping a screen.
-         * This is available only Android and Windows Phone. On iOS the native
-         * navigation animation is used when pushing a screen.
+         * Sets the screen transition type and duration used when popping a screen.
+         * This is available only on Android and Windows Phone. On iOS the native
+         * navigation animation is used when popping a screen.
          *
-         * @param screenTransitionType The type of the push screen transition. See available
+         * @param screenTransitionType The type of the pop screen transition. See available
          * screen transitions types \link #MAW_TRANSITION_TYPE_NONE here \endlink.
          * @param screenTransitionDuration The duration of the screen transition in milliseconds.
          * This argument is not used on the Windows Phone platform due to the constant duration of
