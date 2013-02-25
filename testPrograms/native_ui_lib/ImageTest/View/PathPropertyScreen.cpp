@@ -20,7 +20,7 @@
  * @file PathPropertyScreen.cpp
  * @author Bogdan Iusco.
  *
- * @brief Shows widgets used to test MAW_IMAGE_IMAGE_PATH property.
+ * @brief Shows widgets used to test MAW_IMAGE_PATH property.
  */
 
 #define SCREEN_TITLE "Image path"

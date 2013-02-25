@@ -39,7 +39,7 @@ public class ImageWidget extends Widget
 {
 
 	/**
-	 * Image file path for MAW_IMAGE_IMAGE_PATH property;
+	 * Image file path for MAW_IMAGE_PATH property;
 	 */
 	private String mImagePath = "";
 
@@ -102,7 +102,7 @@ public class ImageWidget extends Widget
 				throw new InvalidPropertyValueException( property , value );
 			}
 		}
-		else if( property.equals( IX_WIDGET.MAW_IMAGE_IMAGE_PATH ) )
+		else if( property.equals( IX_WIDGET.MAW_IMAGE_PATH ) )
 		{
 			File imgFile = new File( value );
 			if( imgFile.exists() )
@@ -136,7 +136,7 @@ public class ImageWidget extends Widget
 			// TODO Keep it and call it for API level 11.
 //			return Float.toString(imageView.getAlpha());
 		}
-		else if( property.equals( IX_WIDGET.MAW_IMAGE_IMAGE_PATH ) )
+		else if( property.equals( IX_WIDGET.MAW_IMAGE_PATH ) )
 		{
 			return mImagePath;
 		}

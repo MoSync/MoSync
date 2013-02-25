@@ -27,13 +27,13 @@
 @interface ImageWidget ()
 
 /**
- * Used by the MAW_IMAGE_IMAGE_PATH property.
+ * Used by the MAW_IMAGE_PATH property.
  */
 @property(nonatomic, retain) NSString* imagePath;
 
 /**
  * Show an image from a given path.
- * Setter for MAW_IMAGE_IMAGE_PATH.
+ * Setter for MAW_IMAGE_PATH.
  * @param path Image file path.
  * @return One of the following result codes:
  * - MAW_RES_OK if the image was shown.
@@ -154,7 +154,7 @@
         else if([value isEqualToString:@"scaleXY"]) self.view.contentMode = UIViewContentModeScaleToFill;
         else if([value isEqualToString:@"scalePreserveAspect"]) self.view.contentMode = UIViewContentModeScaleAspectFit;
     }
-	else if([key isEqualToString:@MAW_IMAGE_IMAGE_PATH])
+	else if([key isEqualToString:@MAW_IMAGE_PATH])
 	{
 		return [self setPropertyImagePath:value];
 	}
@@ -173,7 +173,7 @@
  */
 - (NSString*)getPropertyWithKey:(NSString*)key
 {
-	if ([key isEqualToString:@MAW_IMAGE_IMAGE_PATH])
+	if ([key isEqualToString:@MAW_IMAGE_PATH])
 	{
 		return [self.imagePath retain];
 	}
@@ -185,7 +185,7 @@
 
 /**
  * Show an image from a given path.
- * Setter for MAW_IMAGE_IMAGE_PATH.
+ * Setter for MAW_IMAGE_PATH.
  * @param path Image file path.
  * @return One of the following result codes:
  * - MAW_RES_OK if the image was shown.

@@ -48,7 +48,7 @@ namespace MoSync
             //Standard stretch object
             protected System.Windows.Media.Stretch mStretch;
 
-            // File image path for MAW_IMAGE_IMAGE_PATH property.
+            // File image path for MAW_IMAGE_PATH property.
             protected String mImagePath;
 
             /**
@@ -118,8 +118,8 @@ namespace MoSync
                 }
             }
 
-            //MAW_IMAGE_IMAGE property implementation
-            [MoSyncWidgetProperty(MoSync.Constants.MAW_IMAGE_IMAGE_PATH)]
+            //MAW_IMAGE_PATH property implementation
+            [MoSyncWidgetProperty(MoSync.Constants.MAW_IMAGE_PATH)]
             public String ImagePath
             {
                 set

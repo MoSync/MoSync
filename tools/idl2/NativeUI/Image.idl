@@ -26,10 +26,10 @@ group WidgetImageProperties "Image" {
 		*
 		* @par Example
 		* \code
-		*	maWidgetSetProperty(imageHandle, MAW_IMAGE_IMAGE_PATH, "file_path.png");
+		*	maWidgetSetProperty(imageHandle, MAW_IMAGE_PATH, "file_path.png");
 		* \endcode
 		*/
-		IMAGE_PATH = "imagePath";
+		PATH = "imagePath";
 
 		/**
 		* @brief Specifies what type of scaling should be applied to the image.

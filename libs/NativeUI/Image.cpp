@@ -62,7 +62,7 @@ namespace NativeUI
      */
     int Image::setImagePath(const MAUtil::String& imagePath)
     {
-		return this->setProperty(MAW_IMAGE_IMAGE_PATH, imagePath);
+		return this->setProperty(MAW_IMAGE_PATH, imagePath);
     }
 
     /**
@@ -72,7 +72,7 @@ namespace NativeUI
      */
     MAUtil::String Image::getImagePath()
     {
-		return this->getPropertyString(MAW_IMAGE_IMAGE_PATH);
+		return this->getPropertyString(MAW_IMAGE_PATH);
     }
 
     /**

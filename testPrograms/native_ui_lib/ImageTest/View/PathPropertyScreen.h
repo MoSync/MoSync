@@ -20,7 +20,7 @@
  * @file PathPropertyScreen.h
  * @author Bogdan Iusco.
  *
- * @brief Shows widgets used to test MAW_IMAGE_IMAGE_PATH property.
+ * @brief Shows widgets used to test MAW_IMAGE_PATH property.
  */
 
 #ifndef IMAGE_TEST_PATH_PROPERTY_SCREEN_H_
@@ -141,7 +141,7 @@ namespace ImageTest
 		NativeUI::Button* mSelectImageFromHandleButton;
 
 		/**
-		 * Used to test getter for MAW_IMAGE_IMAGE_PATH.
+		 * Used to test getter for MAW_IMAGE_PATH.
 		 */
 		NativeUI::Button* mGetImagePathButton;
 
