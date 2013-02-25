@@ -32,6 +32,7 @@
 
 #include "../View/TestScreen.h"
 #include "../View/ImagePropertiesScreen.h"
+#include "../View/PressedImageScreen.h"
 #include "AppController.h"
 #include "MAHeaders.h"
 
@@ -44,14 +45,17 @@ namespace ImageButtonTest
 		mTabScreen(NULL),
 		mTestScreen(NULL),
 		mImagePropertiesScreen(NULL),
+		mPressedImageScreen(NULL),
 		mFileUtil(NULL)
 	{
 		mTabScreen = new NativeUI::TabScreen();
 		mTestScreen = new TestScreen();
 		mImagePropertiesScreen = new ImagePropertiesScreen(*this);
+		mPressedImageScreen = new PressedImageScreen(*this);
 
 		mTabScreen->addTab(mTestScreen);
 		mTabScreen->addTab(mImagePropertiesScreen);
+		mTabScreen->addTab(mPressedImageScreen);
 
 		mTabScreen->show();
 
@@ -68,6 +72,9 @@ namespace ImageButtonTest
 
 		sprintf(filePath, "%sBackgroundPath.png", dirPath);
 		mImagePropertiesScreen->setDisplayedBackgoundImagePath(filePath);
+
+		sprintf(filePath, "%sPressedPath.png", dirPath);
+		mPressedImageScreen->setDisplayedPressedImagePath(filePath);
 	}
 
 	/**
@@ -135,6 +142,52 @@ namespace ImageButtonTest
 		MAUtil::String text = mTestScreen->getImageButtonBackgroundPath();
 		maAlert(
 			"The background image path is",
+			text.c_str(),
+			"OK",
+			NULL,
+			NULL);
+	}
+
+	/**
+	 * Display the pressed image from a given file path.
+	 * @param path Image file path.
+	 */
+	void AppController::selectPressedImageFromPath(const MAUtil::String& path)
+	{
+		mTestScreen->setImageButtonPressed(path);
+	}
+
+	/**
+	 * Display the pressed image from resources.
+	 */
+	void AppController::selectPressedImageFromHandle()
+	{
+		mTestScreen->setImageButtonPressed(RES_IMAGE_PRESSED);
+	}
+
+	/**
+	 * Show previous set pressed image handle.
+	 */
+	void AppController::showPressedImageHandle()
+	{
+		int handle = mTestScreen->getImageButtonPressedHandle();
+		MAUtil::String text = MAUtil::integerToString(handle);
+		maAlert(
+			"The pressed image handle is",
+			text.c_str(),
+			"OK",
+			NULL,
+			NULL);
+	}
+
+	/**
+	 * Show previous set pressed image path.
+	 */
+	void AppController::showPressedImagePath()
+	{
+		MAUtil::String text = mTestScreen->getImageButtonPressedPath();
+		maAlert(
+			"The pressed image path is",
 			text.c_str(),
 			"OK",
 			NULL,

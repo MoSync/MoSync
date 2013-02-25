@@ -28,6 +28,7 @@
 #define IMAGE_BUTTON_APP_CONTROLLER_H_
 
 #include "../View/ImagePropertiesScreenListener.h"
+#include "../View/PressedImageScreenListener.h"
 
 namespace NativeUI
 {
@@ -45,8 +46,11 @@ namespace ImageButtonTest
 
 	class TestScreen;
 	class ImagePropertiesScreen;
+	class PressedImageScreen;
 
-	class AppController: public ImagePropertiesScreenListener
+	class AppController:
+		public ImagePropertiesScreenListener,
+		public PressedImageScreenListener
 	{
 	public:
 		/**
@@ -91,6 +95,27 @@ namespace ImageButtonTest
 		 */
 		virtual void showBackgroundImagePath();
 
+		/**
+		 * Display the pressed image from a given file path.
+		 * @param path Image file path.
+		 */
+		virtual void selectPressedImageFromPath(const MAUtil::String& path);
+
+		/**
+		 * Display the pressed image from resources.
+		 */
+		virtual void selectPressedImageFromHandle();
+
+		/**
+		 * Show previous set pressed image handle.
+		 */
+		virtual void showPressedImageHandle();
+
+		/**
+		 * Show previous set pressed image path.
+		 */
+		virtual void showPressedImagePath();
+
 	private:
 		/**
 		 * Application's tab screen.
@@ -106,6 +131,11 @@ namespace ImageButtonTest
 		 * Second tab screen.
 		 */
 		ImagePropertiesScreen* mImagePropertiesScreen;
+
+		/**
+		 * Third tab screen.
+		 */
+		PressedImageScreen* mPressedImageScreen;
 
 		/**
 		 * Used to extract LocalFiles.bin

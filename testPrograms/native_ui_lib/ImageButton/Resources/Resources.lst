@@ -7,3 +7,6 @@
 
 .res RES_IMAGE_FOREGROUND
 .image "ForegroundHandle.png"
+
+.res RES_IMAGE_PRESSED
+.image "PressedHandle.png"

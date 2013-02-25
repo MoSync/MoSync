@@ -117,6 +117,42 @@ namespace ImageButtonTest
 	}
 
 	/**
+	 * Set the pressed image from a given file path.
+	 * @param path Image file path.
+	 */
+	void TestScreen::setImageButtonPressed(const MAUtil::String& path)
+	{
+		mImageButton->setPressedImagePath(path);
+	}
+
+	/**
+	 * Set the pressed image from resources.
+	 * @param handle Handle to a image.
+	 */
+	void TestScreen::setImageButtonPressed(const MAHandle handle)
+	{
+		mImageButton->setPressedImage(handle);
+	}
+
+	/**
+	 * Get the pressed image handle.
+	 * @return The pressed image handle.
+	 */
+	MAHandle TestScreen::getImageButtonPressedHandle()
+	{
+		return mImageButton->getPressedImage();
+	}
+
+	/**
+	 * Get the pressed image path.
+	 * @return The pressed image path.
+	 */
+	MAUtil::String TestScreen::getImageButtonPressedPath()
+	{
+		return mImageButton->getPressedImagePath();
+	}
+
+	/**
 	 * Creates and adds main layout to the screen.
 	 */
 	void TestScreen::createMainLayout() {

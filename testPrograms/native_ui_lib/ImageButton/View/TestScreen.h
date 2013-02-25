@@ -90,6 +90,30 @@ namespace ImageButtonTest
 		 */
 		MAUtil::String getImageButtonBackgroundPath();
 
+		/**
+		 * Set the pressed image from a given file path.
+		 * @param path Image file path.
+		 */
+		void setImageButtonPressed(const MAUtil::String& path);
+
+		/**
+		 * Set the pressed image from resources.
+		 * @param handle Handle to a image.
+		 */
+		void setImageButtonPressed(const MAHandle handle);
+
+		/**
+		 * Get the pressed image handle.
+		 * @return The pressed image handle.
+		 */
+		MAHandle getImageButtonPressedHandle();
+
+		/**
+		 * Get the pressed image path.
+		 * @return The pressed image path.
+		 */
+		MAUtil::String getImageButtonPressedPath();
+
 	private:
 		/**
 		 * This method is called when there is an touch-down event for
