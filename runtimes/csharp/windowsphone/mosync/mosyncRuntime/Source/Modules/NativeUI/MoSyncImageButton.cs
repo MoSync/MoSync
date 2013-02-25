@@ -74,7 +74,7 @@ namespace MoSync
             protected System.Windows.Media.Imaging.BitmapSource mPressedImageSource = null;
 
             /**
-             * The resource of the image shown when button is in pressed state.
+             * The resource of the image shown when button is in normal state.
              */
             protected System.Windows.Media.Imaging.BitmapSource mNormalImageSource = null;
 
