@@ -47,12 +47,12 @@ SensorTest
 DeviceFonts
 DeviceFontsNativeUI
 ResourceTest
+EuropeanCountries
 [html5]
 WebViewGeoLocation
-WebViewLoveSMS
 WebViewTwitter
 WormholeDemo
 WormholeNativeUI
 NFCExample
 PhotoGallery
-EuropeanCountries
+WebViewLoveSMS
