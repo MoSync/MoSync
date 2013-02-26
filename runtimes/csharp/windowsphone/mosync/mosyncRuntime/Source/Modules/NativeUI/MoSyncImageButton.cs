@@ -69,14 +69,14 @@ namespace MoSync
             protected System.Windows.Controls.Image mBackgroundImage;
 
             /**
-             * The resource of the image shown when button is in pressed state.
+             * The source of the background image shown when button is in pressed state.
              */
-            protected System.Windows.Media.Imaging.BitmapSource mPressedImageSource = null;
+            protected System.Windows.Media.Imaging.BitmapSource mPressedBackgroundImageSource = null;
 
             /**
-             * The resource of the image shown when button is in normal state.
+             * The source of the backround image shown when button is in normal state.
              */
-            protected System.Windows.Media.Imaging.BitmapSource mNormalImageSource = null;
+            protected System.Windows.Media.Imaging.BitmapSource mNormalBackgroundImageSource = null;
 
             /**
              * Strech object, that defines if the background image should be streched, and the streching mode
@@ -92,13 +92,16 @@ namespace MoSync
             private const int DifferenceSpacer = 23;
 
             // File image path for MAW_IMAGE_BUTTON_IMAGE_PATH property.
-            protected String mForegroundImagePath;
+            protected String mForegroundImagePath = "";
 
             // File image path for MAW_IMAGE_BUTTON_BACKGROUND_IMAGE_PATH property.
-            protected String mBackgroundImagePath;
+            protected String mBackgroundImagePath = "";
 
             // File image path for MAW_IMAGE_BUTTON_PRESSED_IMAGE_PATH property.
-            protected String mPressedImagePath;
+            protected String mPressedImagePath = "";
+
+            // Image handle for MAW_IMAGE_BUTTON_PRESSED_IMAGE property.
+            protected int mPressedImageHandle = 0;
 
             /**
              * Function that creates the TextBlock object and setts the alignment of the text
@@ -196,6 +199,11 @@ namespace MoSync
                 mBackgroundImage.Margin = new Thickness(0.0);
                 mForegroundImage.Margin = new Thickness(0.0);
 
+                mBackgroundImage.Width = mGrid.Width - DifferenceSpacer;
+                mBackgroundImage.Height = mGrid.Height - DifferenceSpacer;
+
+                mBackgroundImage.Stretch = mStretchBackground;
+
                 mView = mGrid;
 
                 // the Tap handle for the ImageButton
@@ -218,19 +226,19 @@ namespace MoSync
                 // the MouseEnter handle for the ImageButton. Used for switching background image.
                 mGrid.MouseEnter += new System.Windows.Input.MouseEventHandler(delegate(Object from, System.Windows.Input.MouseEventArgs evt)
                     {
-                        if (mPressedImageSource != null)
+                        if (mPressedBackgroundImageSource != null)
                         {
-                            mNormalImageSource = (System.Windows.Media.Imaging.BitmapSource)mBackgroundImage.Source;
-                            mBackgroundImage.Source = mPressedImageSource;
+                            mNormalBackgroundImageSource = (System.Windows.Media.Imaging.BitmapSource)mBackgroundImage.Source;
+                            mBackgroundImage.Source = mPressedBackgroundImageSource;
                         }
                     });
 
                 // the MouseLeave handle for the ImageButton. Used for switching background image.
                 mGrid.MouseLeave += new System.Windows.Input.MouseEventHandler(delegate(Object from, System.Windows.Input.MouseEventArgs evt)
                     {
-                        if (mNormalImageSource != null)
+                        if (mNormalBackgroundImageSource != null)
                         {
-                            mBackgroundImage.Source = mNormalImageSource;
+                            mBackgroundImage.Source = mNormalBackgroundImageSource;
                         }
                     });
             }
@@ -390,10 +398,6 @@ namespace MoSync
 
                         mBackgroundImage.Source = bmpSource;
 
-                        mBackgroundImage.Width = mGrid.Width - DifferenceSpacer;
-                        mBackgroundImage.Height = mGrid.Height - DifferenceSpacer;
-
-                        mBackgroundImage.Stretch = mStretchBackground;
                         mBackgroundImagePath = "";
                     }
                     else throw new InvalidPropertyValueException();
@@ -415,9 +419,15 @@ namespace MoSync
                         System.Windows.Media.Imaging.BitmapSource bmpSource =
                             (System.Windows.Media.Imaging.BitmapSource)(res.GetInternalObject());
 
-                        mPressedImageSource = bmpSource;
+                        mPressedBackgroundImageSource = bmpSource;
+                        mPressedImageHandle = value;
+                        mPressedImagePath = "";
                     }
                     else throw new InvalidPropertyValueException();
+                }
+                get
+                {
+                    return mPressedImageHandle;
                 }
             }
 
@@ -519,8 +529,9 @@ namespace MoSync
                         image.SetSource(fs);
 
                         //Set the newly created bitmap image for the image widget
-                        mPressedImageSource = image;
+                        mPressedBackgroundImageSource = image;
                         mPressedImagePath = value;
+                        mPressedImageHandle = 0;
                     }
                     //If the file does not exist throw an invalid property value exception
                     else throw new InvalidPropertyValueException();
