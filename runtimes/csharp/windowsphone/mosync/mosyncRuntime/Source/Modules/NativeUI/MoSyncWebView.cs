@@ -294,9 +294,6 @@ namespace MoSync
                         mFocused = false;
                     });
 
-                fillSpaceHorizontalyEnabled = false;
-                fillSpaceVerticalyEnabled = false;
-
                 //adding an event handler for the script notify
                 mWebBrowser.ScriptNotify += new EventHandler<NotifyEventArgs>(
                     delegate(object from, NotifyEventArgs args)

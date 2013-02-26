@@ -2963,8 +2963,30 @@ public class MoSyncThread extends Thread
 
 			return 0;
 		}
+		else if(url.startsWith("fb://") || url.startsWith("mailto:") || url.startsWith("tweetie://"))
+		{
+			Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
+			sharingIntent.setType("text/plain");
+			String sharedText = splitShareIntentText(url);
+			sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, sharedText);
+
+			((Activity)mContext).startActivity(Intent.createChooser(sharingIntent, "Share text via"));
+
+			return 0;
+		}
 
 		return -1;
+	}
+
+	private String splitShareIntentText(String text)
+	{
+		String parsed[] = text.split(":");
+		int size = parsed[1].length();
+		if(parsed[1].startsWith("//"))
+		{
+			return parsed[1].substring(2, size);
+		}
+		return parsed[1];
 	}
 
 	/**
@@ -3925,8 +3947,16 @@ public class MoSyncThread extends Thread
 		}
 		else if (SCREEN_ORIENTATION_DYNAMIC == orientation)
 		{
-			maScreenSetOrientationHelper(
-				ActivityInfo.SCREEN_ORIENTATION_SENSOR);
+			if ( Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD )
+			{
+				maScreenSetOrientationHelper(
+						ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR);
+			}
+			else
+			{
+				maScreenSetOrientationHelper(
+						ActivityInfo.SCREEN_ORIENTATION_SENSOR);
+			}
 		}
 		else
 		{
