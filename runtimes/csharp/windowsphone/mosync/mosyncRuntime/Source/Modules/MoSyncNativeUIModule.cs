@@ -7,6 +7,10 @@ namespace MoSync
     public class NativeUIModule : IIoctlModule
     {
         private UIManager mNativeUI;
+        /**
+         * A reference to the last shown screen.
+         */
+        private IScreen mCurrentScreen = null;
         private List<IWidget> mWidgets = new List<IWidget>();
 
 		public IWidget GetWidget(int handle)
@@ -16,6 +20,19 @@ namespace MoSync
 			IWidget w = mWidgets[handle];
 			return w;
 		}
+
+        /**
+         * Handles the back button pressed event.
+         * @return true if the event has been consumed, false otherwise.
+         */
+        public bool HandleBackButtonPressed()
+        {
+            if (mCurrentScreen != null)
+            {
+                return mCurrentScreen.HandleBackButtonPressed();
+            }
+            return false;
+        }
 
         /*
          * Ads a widget to the widgets array.
@@ -169,6 +186,7 @@ namespace MoSync
 				if (_screenHandle < 0 || _screenHandle >= mWidgets.Count)
 					return MoSync.Constants.MAW_RES_INVALID_HANDLE;
                 IScreen screen = (IScreen)mWidgets[_screenHandle];
+                mCurrentScreen = screen;
                 screen.Show();
                 return MoSync.Constants.MAW_RES_OK;
             };

@@ -32,6 +32,7 @@ using System.Windows.Navigation;
 using System;
 using System.Text.RegularExpressions;
 using System.Reflection;
+using System.Collections.Generic;
 
 namespace MoSync
 {
@@ -51,11 +52,39 @@ namespace MoSync
             //this is used when loading relative paths
             protected String mBaseURL = "";
 
-            //navigation counter helper value
-            private int mBackCounter = 0;
+            /**
+             * Because on the wp7 platform there is no proper way to get the browser history, we need
+             * to manage it ourselves.
+             * The algorithm is as follows:
+             *  - every time we navigate to a new page, the uri is added to the mHistoryStack and
+             *  mHistoryStackIndex increases
+             *  - if we press the back button, we check if mHistoryIndex is greater than one:
+             *      - if it is, we can navigate backwards, we decrease the mHistoryStackIndex,
+             *      we set the mFromHistory to true, we navigate to the uri specified by mHistoryStackIndex - 1
+             *      and we cancel the event (we handled it ourselves)
+             *      - it it's not, the back event isn't canceled and the application will
+             *      handle the back button press
+             *  - when the browser has sent the 'Navigated' event we check if we navigated from history or not:
+             *      - if not, it means that we only need to keep the uri-s from 0 to mHistoryStackIndex - 1 so
+             *      we ditch all the uri-s in the interval [mHistoryStackIndex, mHistoryStack.Count - 1]
+             *  @code
+             *      mHistoryStack.RemoveRange(mHistoryStackIndex, mHistoryStack.Count - mHistoryStackIndex);
+             *  @endcode
+             *      and then we add the new uri to the stack and we increase mHistoryStackIndex;
+             *      - regardless if we navigated from history or not, at the end of the 'Navigated' event
+             *      handler, we set 'mFromHistory' to false (we navigated once from history, the next navigation
+             *      might be to a new page or another one from history if the back button is pressed again)
+             *  A forward navigation through history was also added and it behaves almost the same way as the
+             *  backward one.
+             */
+            // keeps track of all the uri-s we visited
+            List<Uri> mHistoryStack;
+
+            // keeps track of the current location inside the history stack
+            int mHistoryStackIndex;
 
             //navigation boolean, set on true while back is handled
-            private bool mFromHistory = false;
+            private bool mFromHistory;
 
             //boolean set on true if the web browser gains focus
             private bool mFocused = false;
@@ -200,11 +229,20 @@ namespace MoSync
                 {
                     if (value.Equals("back"))
                     {
-                        mWebBrowser.InvokeScript("eval", "history.go(-1)");
+                        // navigate backwards into history
+                        mHistoryStackIndex -= 1;
+                        mFromHistory = true;
+                        mWebBrowser.Navigate(mHistoryStack[mHistoryStackIndex - 1]);
                     }
                     else if (value.Equals("forward"))
                     {
-                        mWebBrowser.InvokeScript("eval", "history.go(1)");
+                        // if there are still pages to navigate to, navigate forward into history
+                        if (mHistoryStackIndex < mHistoryStack.Count)
+                        {
+                            mHistoryStackIndex += 1;
+                            mFromHistory = true;
+                            mWebBrowser.Navigate(mHistoryStack[mHistoryStackIndex - 1]);
+                        }
                     }
                     else throw new InvalidPropertyValueException();
                 }
@@ -214,11 +252,10 @@ namespace MoSync
             {
                 try
                 {
-                    //mBackCounter is firstly increased when the webview navigates to the source page
-                    if (mBackCounter > 1 && mFocused)
+                    // if we can go back into the history stack, cancel the
+                    // event and handle the navigation ourselves
+                    if (mHistoryStackIndex > 1 && mFocused)
                     {
-                        mBackCounter--;
-                        mFromHistory = true;
                         Navigate = "back";
                         args.Cancel = true;
                     }
@@ -237,6 +274,11 @@ namespace MoSync
                 mWebBrowser.IsScriptEnabled = true;
 
                 mWebBrowser.IsGeolocationEnabled = true;
+
+                mHistoryStack = new List<Uri>();
+                // there's nothing inside the history stack until we navigated to a page
+                mHistoryStackIndex = 0;
+                mFromHistory = false;
 
                 (Application.Current.RootVisual as Microsoft.Phone.Controls.PhoneApplicationFrame).BackKeyPress += new EventHandler<System.ComponentModel.CancelEventArgs>(BackKeyPressHandler);
 
@@ -318,14 +360,27 @@ namespace MoSync
                         const int MAWidgetEventData_widgetHandle = 4;
                         const int MAWidgetEventData_status = 8;
 
-
                         eventData.WriteInt32(MAWidgetEventData_eventType, MoSync.Constants.MAW_EVENT_WEB_VIEW_CONTENT_LOADING);
                         eventData.WriteInt32(MAWidgetEventData_widgetHandle, mHandle);
                         eventData.WriteInt32(MAWidgetEventData_status, MoSync.Constants.MAW_CONSTANT_STARTED);
 
                         mRuntime.PostCustomEvent(MoSync.Constants.EVENT_TYPE_WIDGET, eventData);
 
-                        if (!mFromHistory && (args.NavigationMode == NavigationMode.Forward || args.NavigationMode == NavigationMode.New)) mBackCounter++;
+                        if (!mFromHistory)
+                        {
+                            if (mHistoryStackIndex < mHistoryStack.Count)
+                            {
+                                mHistoryStack.RemoveRange(mHistoryStackIndex, mHistoryStack.Count - mHistoryStackIndex);
+                            }
+                            mHistoryStack.Add(args.Uri);
+                            mHistoryStackIndex += 1;
+                        }
+                        // always set the mFromHistory to false because the next navigation could be to a new page
+                        // (if it's a page loaded by pressing the back button, mFromHistory will be true so we
+                        // won't need to digth uris; if it's a new page, we will ditch the history in the interval
+                        // [mHistoryStackIndex, mHistoryStack.Count - 1] and we'll add the new page to the updated
+                        // stack)
+                        mFromHistory = false;
                     });
             }
         }
