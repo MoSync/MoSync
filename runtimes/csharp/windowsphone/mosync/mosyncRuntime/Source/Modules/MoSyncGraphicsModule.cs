@@ -313,7 +313,22 @@ namespace MoSync
 
 			syscalls.maGetScrSize = delegate()
 			{
-				return MoSync.Util.CreateExtent(mBackBuffer.PixelWidth, mBackBuffer.PixelHeight);
+                int w = mBackBuffer.PixelWidth;
+                int h = mBackBuffer.PixelHeight;
+                MoSync.Util.RunActionOnMainThreadSync(() =>
+                {
+                    // if the orientation is landscape, the with and height should be swaped
+                    PhoneApplicationPage currentPage = (((PhoneApplicationFrame)Application.Current.RootVisual).Content as PhoneApplicationPage);
+                    if (currentPage.Orientation == PageOrientation.Landscape ||
+                        currentPage.Orientation == PageOrientation.LandscapeLeft ||
+                        currentPage.Orientation == PageOrientation.LandscapeRight)
+                    {
+                        int aux = w;
+                        w = h;
+                        h = w;
+                    }
+                });
+				return MoSync.Util.CreateExtent(w, h);
 			};
 
 			syscalls.maGetImageSize = delegate(int handle)

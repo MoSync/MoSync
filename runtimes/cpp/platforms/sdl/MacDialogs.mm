@@ -20,7 +20,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #import <Cocoa/Cocoa.h>
 
 void MacMessageBox(const char* msg, const char* title) {
-	NSString *nstitle = [NSString stringWithCString:title encoding:NSASCIIStringEncoding];
-	NSString *nsmessage = [NSString stringWithCString:msg encoding:NSASCIIStringEncoding];
+	NSString *nstitle = [NSString stringWithCString:title encoding:NSUTF8StringEncoding];
+	NSString *nsmessage = [NSString stringWithCString:msg encoding:NSUTF8StringEncoding];
 	NSRunAlertPanel(nstitle, nsmessage, @"OK", NULL, NULL);
 }

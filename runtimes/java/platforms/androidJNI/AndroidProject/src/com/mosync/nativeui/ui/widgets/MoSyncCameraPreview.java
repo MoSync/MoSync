@@ -19,19 +19,13 @@ package com.mosync.nativeui.ui.widgets;
 
 import static com.mosync.internal.android.MoSyncHelpers.SYSLOG;
 
-import java.lang.reflect.Method;
 import java.util.List;
-
-import android.util.Log;
 
 import android.app.Activity;
 
 import android.content.Context;
 import android.content.res.Configuration;
 import android.hardware.Camera;
-import android.hardware.Camera.PreviewCallback;
-import android.os.Build;
-import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
@@ -41,11 +35,6 @@ import android.view.SurfaceView;
  * @author Ali Sarrafi
  */
 public class MoSyncCameraPreview extends SurfaceView implements SurfaceHolder.Callback {
-
-	/**
-	 * a Static Method used for reflection of some functions in the API
-	 */
-	private static Method mCameraDisplayOrientation;
 
 	/**
 	 * a reference to the holder
@@ -85,10 +74,10 @@ public class MoSyncCameraPreview extends SurfaceView implements SurfaceHolder.Ca
      */
 	 @Override
 	public void surfaceCreated(SurfaceHolder holder)
-	 {
+     {
 		 mHolder = holder;
-		 if(mCamera != null)
-			 initiateCamera();
+		// if (mCamera != null)
+		// initiateCamera();
 	 }
 
 	 /**
@@ -96,6 +85,7 @@ public class MoSyncCameraPreview extends SurfaceView implements SurfaceHolder.Ca
 	  */
 	public void initiateCamera()
 	{
+		SYSLOG("initiateCamera");
 		if(mCamera == null)
 			return;
 		try
@@ -106,6 +96,7 @@ public class MoSyncCameraPreview extends SurfaceView implements SurfaceHolder.Ca
 			{
 				return;
 			}
+
 			mCamera.setPreviewDisplay(mHolder);
 
 			// If we use the default preview size things seams to be more stable
@@ -113,11 +104,9 @@ public class MoSyncCameraPreview extends SurfaceView implements SurfaceHolder.Ca
 			mPreviewSize = param.getPreviewSize();
 
 			mCamera.setParameters(param);
-
 		}
 		catch (Exception e)
 		{
-			if (mCamera != null)
 			mCamera.release();
 			mCamera = null;
 		}
@@ -126,46 +115,39 @@ public class MoSyncCameraPreview extends SurfaceView implements SurfaceHolder.Ca
 	 /**
 	  * sets the Orientation of the camera Preview o be the same as MoSyncApp
 	  */
-	 private void setCameraDisplayOrientation()
-	 {
-		 // Set the orientation of the picture on old Android phones
-		 Camera.Parameters parameters = mCamera.getParameters();
+	private void setCameraDisplayOrientation() {
+		// Set the orientation of the picture on old Android phones
+		Camera.Parameters parameters = mCamera.getParameters();
 
-		 if (getResources().getConfiguration().orientation ==
-					Configuration.ORIENTATION_PORTRAIT)
-		 {
-			 parameters.set("orientation", "portrait");
-			 //default camera orientation on android is landscape
-			 //So we need to rotate the preview
-			 parameters.setRotation(90);
-			 mCamera.setDisplayOrientation(90);
-		 }
-		 else if (getResources().getConfiguration().orientation
-				 == Configuration.ORIENTATION_LANDSCAPE)
-		 {
-			 parameters.set("orientation", "landscape");
-			 parameters.setRotation(0);
-			 mCamera.setDisplayOrientation(0);
-		 }
-		 mCamera.setParameters(parameters);
-	 }
+		if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+			parameters.set("orientation", "portrait");
+			// default camera orientation on android is landscape
+			// So we need to rotate the preview
+			parameters.setRotation(90);
+			mCamera.setDisplayOrientation(90);
+		} else if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+			parameters.set("orientation", "landscape");
+			parameters.setRotation(0);
+			mCamera.setDisplayOrientation(0);
+		}
+		mCamera.setParameters(parameters);
+	}
+
 	 /**
 	  * the function that is called by the system when the preview is destroyed
 	  */
 	 @Override
 	public void surfaceDestroyed(SurfaceHolder holder)
 	 {
-	        try
-	        {
-				if(mCamera != null)
-				{
+		try {
+			if (mCamera != null) {
+				mCamera.stopPreview();
+				mCamera.release();
 					mCamera = null;
-				}
-	        }
-	        catch (RuntimeException e)
-	        {
-		      SYSLOG("Failed to stopPreivew after surface destory");
-	        }
+			}
+		} catch (RuntimeException e) {
+			SYSLOG("Failed to stopPreivew after surface destory");
+		}
 	 }
 
 	 /**
@@ -181,7 +163,6 @@ public class MoSyncCameraPreview extends SurfaceView implements SurfaceHolder.Ca
 		{
 			if(mHolder == null)
 				return;
-
 			mCamera.setPreviewDisplay(mHolder);
 		}
 		catch(Exception e)
@@ -208,7 +189,7 @@ public class MoSyncCameraPreview extends SurfaceView implements SurfaceHolder.Ca
 	  */
 	 public Camera.Size getOptimalSize(List<Camera.Size> sizes, int width, int height)
 	 {
-	        final double ASPECT_TOLERANCE = 0.2;
+		final double ASPECT_TOLERANCE = 0.2;
 	        double targetRatio = (double) width / height;
 	        if (sizes == null)
 	            return null;

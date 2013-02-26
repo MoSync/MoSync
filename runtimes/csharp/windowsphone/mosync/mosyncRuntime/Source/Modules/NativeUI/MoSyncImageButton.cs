@@ -31,6 +31,7 @@ using System.Windows.Navigation;
 using System;
 using System.Text.RegularExpressions;
 using System.Reflection;
+using System.IO.IsolatedStorage;
 
 namespace MoSync
 {
@@ -84,6 +85,12 @@ namespace MoSync
              * the grid layout has some unremovable spacers that have almost this amount of pixels
              */
             private const int DifferenceSpacer = 23;
+
+            // File image path for MAW_IMAGE_BUTTON_IMAGE_PATH property.
+            protected String mForegroundImagePath;
+
+            // File image path for MAW_IMAGE_BUTTON_BACKGROUND_IMAGE_PATH property.
+            protected String mBackgroundImagePath;
 
             /**
              * Function that creates the TextBlock object and setts the alignment of the text
@@ -182,9 +189,6 @@ namespace MoSync
 
                 mButton.HorizontalAlignment = HorizontalAlignment.Left;
                 mButton.VerticalAlignment = VerticalAlignment.Top;
-
-                fillSpaceVerticalyEnabled = false;
-                fillSpaceHorizontalyEnabled = false;
 
                 mButton.BorderThickness = new Thickness(0.0);
                 mButton.Margin = new Thickness(0.0);
@@ -352,6 +356,7 @@ namespace MoSync
                             (System.Windows.Media.Imaging.BitmapSource)(res.GetInternalObject());
 
                         mForegroundImage.Source = bmpSource;
+                        mForegroundImagePath = "";
                     }
                     else throw new InvalidPropertyValueException();
                 }
@@ -378,6 +383,7 @@ namespace MoSync
                         mBackgroundImage.Height = mButton.Height - DifferenceSpacer;
 
                         mBackgroundImage.Stretch = mStretchBackground;
+                        mBackgroundImagePath = "";
                     }
                     else throw new InvalidPropertyValueException();
                 }
@@ -396,6 +402,71 @@ namespace MoSync
                     mText.FontStyle = fontInfo.style;
                 }
             }
+
+            //MAW_IMAGE_BUTTON_IMAGE_PATH property implementation
+            [MoSyncWidgetProperty(MoSync.Constants.MAW_IMAGE_BUTTON_IMAGE_PATH)]
+            public String ImagePath
+            {
+                set
+                {
+                    //Take the store for the application (an image of the sandbox)
+                    IsolatedStorageFile f = IsolatedStorageFile.GetUserStoreForApplication();
+
+                    //Verify that the file exists on the isolated storage
+                    if (f.FileExists(value))
+                    {
+                        //Create a file stream for the required file
+                        IsolatedStorageFileStream fs = new IsolatedStorageFileStream(value, System.IO.FileMode.Open, f);
+
+                        //Set the stream as a source for a new bitmap image
+                        var image = new System.Windows.Media.Imaging.BitmapImage();
+                        image.SetSource(fs);
+
+                        //Set the newly created bitmap image for the image widget
+                        mForegroundImage.Source = image;
+                        mForegroundImagePath = value;
+                    }
+                    //If the file does not exist throw an invalid property value exception
+                    else throw new InvalidPropertyValueException();
+                }
+                get
+                {
+                    return mForegroundImagePath;
+                }
+            }
+
+            //MAW_IMAGE_BUTTON_BACKGROUND_IMAGE_PATH property implementation
+            [MoSyncWidgetProperty(MoSync.Constants.MAW_IMAGE_BUTTON_BACKGROUND_IMAGE_PATH)]
+            public String BackgroundImagePath
+            {
+                set
+                {
+                    //Take the store for the application (an image of the sandbox)
+                    IsolatedStorageFile f = IsolatedStorageFile.GetUserStoreForApplication();
+
+                    //Verify that the file exists on the isolated storage
+                    if (f.FileExists(value))
+                    {
+                        //Create a file stream for the required file
+                        IsolatedStorageFileStream fs = new IsolatedStorageFileStream(value, System.IO.FileMode.Open, f);
+
+                        //Set the stream as a source for a new bitmap image
+                        var image = new System.Windows.Media.Imaging.BitmapImage();
+                        image.SetSource(fs);
+
+                        //Set the newly created bitmap image for the image widget
+                        mBackgroundImage.Source = image;
+                        mBackgroundImagePath = value;
+                    }
+                    //If the file does not exist throw an invalid property value exception
+                    else throw new InvalidPropertyValueException();
+                }
+                get
+                {
+                    return mBackgroundImagePath;
+                }
+            }
+
         }
 	}
 }

@@ -198,7 +198,7 @@ int maBtGetNewDevice ( MABtDeviceNative* d )
 			NSString* deviceNameString	= [dev getNameOrAddress];
 			d->actualNameLength=deviceNameString.length;
 			const char *cstr = new char[deviceNameString.length+1];
-			cstr = [deviceNameString cStringUsingEncoding:NSASCIIStringEncoding];
+			cstr = [deviceNameString cStringUsingEncoding:NSUTF8StringEncoding];
 			if (cstr == NULL) cstr = "NO NAME";
 			strcpy(d->name, cstr);
 		}
@@ -259,7 +259,7 @@ int maBtGetNewService ( MABtServiceNative* d )
 		// Fill the name field of the NABtDevice structure
 		NSString *serviceName = [record getServiceName];
 		const char *cstr = new char[serviceName.length+1];
-		cstr = [serviceName cStringUsingEncoding:NSASCIIStringEncoding];
+		cstr = [serviceName cStringUsingEncoding:NSUTF8StringEncoding];
 		if (cstr == NULL) cstr = "NO NAME";
 		strcpy(d->name, cstr);
 		
