@@ -31,7 +31,7 @@ namespace MoSync
             {
                 return mCurrentScreen.HandleBackButtonPressed();
             }
-            return true;
+            return false;
         }
 
         /*
