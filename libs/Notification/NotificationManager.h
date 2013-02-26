@@ -177,9 +177,7 @@ namespace Notification
         /**
          * Schedules a local notification for delivery at its encapsulated
          * date and time.
-         * By default, the notifications are displayed to the user only if the application
-         * is in background. But on Android you can configure this via the
-         * #MA_NOTIFICATION_LOCAL_DISPLAY_FLAG property by calling setDisplayFlag().
+         * The local notification is displayed regardless of the applications's state.
          * @param localNotification Handle to a local notification object.
          * @return One of the constants:
          *  - #MA_NOTIFICATION_RES_OK if no error occurred.

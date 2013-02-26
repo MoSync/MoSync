@@ -34,6 +34,7 @@
 #include <Purchase/Purchase.h>
 #include <Purchase/PurchaseListener.h>
 #include <Purchase/PurchaseManager.h>
+#include <Purchase/PurchaseManagerListener.h>
 #include <Purchase/Receipt.h>
 
 using namespace NativeUI;
@@ -41,11 +42,13 @@ using namespace IAP;
 
 // Forward declarations
 class MainScreen;
+class DatabaseManager;
 
 class ApplicationController:
 	public ButtonListener,
 	public ListViewListener,
-	public PurchaseListener
+	public PurchaseListener,
+	public PurchaseManagerListener
 {
 public:
 	/**
@@ -57,6 +60,17 @@ public:
 	 * Destructor.
 	 */
 	virtual ~ApplicationController();
+
+	/**
+	 * Get the interface to database.
+	 * @return The database's interface.
+	 */
+	DatabaseManager& getDatabase() const;
+
+	/**
+	 * Restore all owned products.
+	 */
+	void restoreTransactions();
 
     /**
      * This method is called if the touch-up event was inside the
@@ -95,6 +109,27 @@ public:
 	 * @param purchase The object that sent the event.
 	 */
 	virtual void productValid(const Purchase& purchase);
+
+	/**
+	 * Notifies that a purchase has been restored.
+	 * Platform: iOS and Android.
+	 * @param purchase The purchase that has been restored.
+	 */
+	virtual void purchaseRestored(Purchase& purchase);
+
+	/**
+	 * Notifies that restoreTransactions() has failed.
+	 * @param errorCode The reason why it failed.
+	 * Platform: iOS and Android.
+	 */
+	virtual void purchaseRestoreError(int errorCode);
+
+	/**
+	 * Notifies that a purchase has been refunded.
+	 * Platform: Android.
+	 * @param purchase The purchase that has been refunded.
+	 */
+	virtual void purchaseRefunded(Purchase& purchase);
 
 	/**
 	 * Notifies that the product is not valid on the App Store.
@@ -169,5 +204,10 @@ private:
 	 */
 	MAUtil::Vector<Purchase*> mPurchases;
 	int mCurrentPurchase;
+
+	/**
+	 * Database manager.
+	 */
+	DatabaseManager* mDatabase;
 };
 #endif /* APPLICATIONCONTROLLER_H_ */
