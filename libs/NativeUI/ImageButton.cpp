@@ -163,7 +163,7 @@ namespace NativeUI
 
 	/**
 	 * Set an image that will be displayed by the widget after user clicks on it.
-	 * On iOS platform this property is named selected state.
+	 * On iOS platform this property is named highlighted state.
 	 * If this property is set, when the user taps on the widget its background image will
 	 * be replaced by the image set here.
 	 * Setting this property will reset the pressed image path value.
@@ -192,7 +192,7 @@ namespace NativeUI
 	/**
 	 * Set a path to a image file that will be displayed by the widget
 	 * after user clicks on it.
-	 * On iOS platform this property is named selected state.
+	 * On iOS platform this property is named highlighted state.
 	 * If this property is set when the user taps on the widget, its background image will
 	 * be replaced by the image set here.
 	 * Setting this property will reset the pressed image value.

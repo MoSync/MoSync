@@ -33,6 +33,16 @@
 @property(nonatomic, retain) NSString* backgroundImagePath;
 
 /**
+ * Used by the MAW_IMAGE_BUTTON_PRESSED_IMAGE_PATH property.
+ */
+@property(nonatomic, retain) NSString* pressedImagePath;
+
+/**
+ * Used by the MAW_IMAGE_BUTTON_PRESSED_IMAGE property.
+ */
+@property(nonatomic, assign) MAHandle pressedImageHadle;
+
+/**
  * Set the foreground image from a given file path.
  * Setter for MAW_IMAGE_BUTTON_IMAGE_PATH.
  * @param path Image file path.
@@ -51,6 +61,26 @@
  * - MAW_RES_INVALID_PROPERTY_VALUE if the path is invalid.
  */
 - (int)setPropertyBackgroundImagePath:(NSString*)path;
+
+/**
+ * Set the pressed image from a handle.
+ * Setter for MAW_IMAGE_BUTTON_PRESSED_IMAGE.
+ * @param image Image handle as string.
+ * @return One of the following result codes:
+ * - MAW_RES_OK if the image was set.
+ * - MAW_RES_INVALID_PROPERTY_VALUE if the handle is invalid.
+ */
+- (int)setPropertyPressedImage:(NSString*)imageHandle;
+
+/**
+ * Set the pressed image from a given file path.
+ * Setter for MAW_IMAGE_BUTTON_PRESSED_IMAGE_PATH.
+ * @param path Image file path.
+ * @return One of the following result codes:
+ * - MAW_RES_OK if the image was set.
+ * - MAW_RES_INVALID_PROPERTY_VALUE if the path is invalid.
+ */
+- (int)setPropertyPressedImagePath:(NSString*)path;
 
 @end
 
@@ -107,6 +137,14 @@
 		}
 		return result;
 	}
+	else if([key isEqualToString:@MAW_IMAGE_BUTTON_PRESSED_IMAGE])
+	{
+		return [self setPropertyPressedImage:value];
+	}
+	else if([key isEqualToString:@MAW_IMAGE_BUTTON_PRESSED_IMAGE_PATH])
+	{
+		return [self setPropertyPressedImagePath:value];
+	}
 	else
 	{
 		return [super setPropertyWithKey:key toValue:value];
@@ -129,6 +167,14 @@
 	else if ([key isEqualToString:@MAW_IMAGE_BUTTON_BACKGROUND_IMAGE_PATH])
 	{
 		return [self.backgroundImagePath retain];
+	}
+	else if ([key isEqualToString:@MAW_IMAGE_BUTTON_PRESSED_IMAGE])
+	{
+		return [[NSString alloc] initWithFormat:@"%d", self.pressedImageHadle];
+	}
+	else if ([key isEqualToString:@MAW_IMAGE_BUTTON_PRESSED_IMAGE_PATH])
+	{
+		return [self.pressedImagePath retain];
 	}
 	else
 	{
@@ -183,6 +229,59 @@
 }
 
 /**
+ * Set the pressed image from a handle.
+ * Setter for MAW_IMAGE_BUTTON_PRESSED_IMAGE.
+ * @param image Image handle as string.
+ * @return One of the following result codes:
+ * - MAW_RES_OK if the image was set.
+ * - MAW_RES_INVALID_PROPERTY_VALUE if the handle is invalid.
+ */
+- (int)setPropertyPressedImage:(NSString*)imageHandle
+{
+	int handle = [imageHandle intValue];
+	if(handle <= 0)
+	{
+		return MAW_RES_INVALID_PROPERTY_VALUE;
+	}
+
+	UIButton* button = (UIButton*) self.view;
+	Surface* imageResource = Base::gSyscall->resources.get_RT_IMAGE(handle);
+	image = [UIImage imageWithCGImage:imageResource->image];
+	[button setBackgroundImage:image forState:UIControlStateHighlighted];
+
+	self.pressedImageHadle = handle;
+	self.pressedImagePath = @"";
+
+	return MAW_RES_OK;
+}
+
+/**
+ * Set the pressed image from a given file path.
+ * Setter for MAW_IMAGE_BUTTON_PRESSED_IMAGE_PATH.
+ * @param path Image file path.
+ * @return One of the following result codes:
+ * - MAW_RES_OK if the image was set.
+ * - MAW_RES_INVALID_PROPERTY_VALUE if the path is invalid.
+ */
+- (int)setPropertyPressedImagePath:(NSString*)path
+{
+	UIImage* imageSource = [[UIImage alloc] initWithContentsOfFile:path];
+	if (!imageSource)
+	{
+		return MAW_RES_INVALID_PROPERTY_VALUE;
+	}
+
+	UIButton* button = (UIButton*)self.view;
+	[button setBackgroundImage:imageSource forState:UIControlStateHighlighted];
+	[imageSource release];
+
+	self.pressedImagePath = path;
+	self.pressedImageHadle = 0;
+
+	return MAW_RES_OK;
+}
+
+/**
  * Getter implementation for foregroundImagePath property.
  */
 - (NSString*)foregroundImagePath
@@ -206,10 +305,22 @@
 	return _backgroundImagePath;
 }
 
+/**
+ * Getter implementation for pressedImagePath property.
+ */
+- (NSString*)pressedImagePath {
+	if (!_pressedImagePath)
+	{
+		_pressedImagePath = [[NSString alloc] init];
+	}
+	return _pressedImagePath;
+}
+
 - (void)dealloc
 {
 	[_foregroundImagePath release];
 	[_backgroundImagePath release];
+	[_pressedImagePath release];
 
 	[super dealloc];
 }
