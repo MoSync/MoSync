@@ -206,23 +206,6 @@ namespace MoSync
 
                 mView = mGrid;
 
-                // the Tap handle for the ImageButton
-                mGrid.Tap += new System.EventHandler<System.Windows.Input.GestureEventArgs>(delegate(Object from, System.Windows.Input.GestureEventArgs evt)
-                {
-                    //create a Memory object of 8 Bytes
-                    Memory eventData = new Memory(8);
-
-                    //starting with the 0 Byte we write the eventType
-                    const int MAWidgetEventData_eventType = 0;
-                    //starting with the 4th Byte we write the widgetHandle
-                    const int MAWidgetEventData_widgetHandle = 4;
-
-                    eventData.WriteInt32(MAWidgetEventData_eventType, MoSync.Constants.MAW_EVENT_CLICKED);
-                    eventData.WriteInt32(MAWidgetEventData_widgetHandle, mHandle);
-                    //posting a CustomEvent
-                    mRuntime.PostCustomEvent(MoSync.Constants.EVENT_TYPE_WIDGET, eventData);
-                });
-
                 // the MouseEnter handle for the ImageButton. Used for switching background image.
                 mGrid.MouseEnter += new System.Windows.Input.MouseEventHandler(delegate(Object from, System.Windows.Input.MouseEventArgs evt)
                     {
@@ -239,7 +222,21 @@ namespace MoSync
                         if (mNormalBackgroundImageSource != null)
                         {
                             mBackgroundImage.Source = mNormalBackgroundImageSource;
+                            mNormalBackgroundImageSource = null;
                         }
+
+                        //create a Memory object of 8 Bytes
+                        Memory eventData = new Memory(8);
+
+                        //starting with the 0 Byte we write the eventType
+                        const int MAWidgetEventData_eventType = 0;
+                        //starting with the 4th Byte we write the widgetHandle
+                        const int MAWidgetEventData_widgetHandle = 4;
+
+                        eventData.WriteInt32(MAWidgetEventData_eventType, MoSync.Constants.MAW_EVENT_CLICKED);
+                        eventData.WriteInt32(MAWidgetEventData_widgetHandle, mHandle);
+                        //posting a CustomEvent
+                        mRuntime.PostCustomEvent(MoSync.Constants.EVENT_TYPE_WIDGET, eventData);
                     });
             }
 
