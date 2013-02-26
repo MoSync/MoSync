@@ -48,31 +48,6 @@ public class ImageButtonFactory implements AbstractViewFactory
 		ImageButton b = new ImageButton( activity );
 		b.setOnClickListener( new MoSyncSendOnClick( handle ) );
 
-		b.setOnTouchListener(new OnTouchListener() {
-			@Override
-			public boolean onTouch(View v, MotionEvent event) {
-		        if(event.getAction() == MotionEvent.ACTION_DOWN) {
-					EventQueue.getDefault( ).postWidgetEvent( IX_WIDGET.MAW_EVENT_POINTER_PRESSED, handle );
-		        } else if (event.getAction() == MotionEvent.ACTION_UP) {
-					EventQueue.getDefault( ).postWidgetEvent( IX_WIDGET.MAW_EVENT_POINTER_RELEASED, handle );
-		        }
-		        // The event is not consumed yet, onClick can be received.
-		        return false;
-			}
-		});
-
-		b.setOnKeyListener(new OnKeyListener() {
-			@Override
-			public boolean onKey(View v, int keyCode, KeyEvent event) {
-				if (event.getAction() == KeyEvent.ACTION_DOWN) {
-					EventQueue.getDefault( ).postWidgetEvent( IX_WIDGET.MAW_EVENT_POINTER_PRESSED, handle );
-				} else if (event.getAction() == KeyEvent.ACTION_UP) {
-					EventQueue.getDefault( ).postWidgetEvent( IX_WIDGET.MAW_EVENT_POINTER_RELEASED, handle );
-				}
-				return false;
-			}
-		});
-
 		return new ImageButtonWidget( handle, b );
 	}
 }
