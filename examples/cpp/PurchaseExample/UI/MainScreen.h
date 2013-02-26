@@ -37,6 +37,7 @@ MA 02110-1301, USA.
 // Include all the wrappers.
 #include <NativeUI/Widgets.h>
 #include <Purchase/PurchaseManager.h>
+#include "../Logic/ApplicationController.h"
 
 using namespace NativeUI;
 using namespace IAP;
@@ -51,6 +52,8 @@ enum Colors{
 	ITEMS_COLOR = 0x006400 ,
 	/** The color used for the receipt fields. */
 	RECEIPT_FIELD_COLOR = 0x98fb98,
+	/** The color used for information. */
+	INFO_BACKGROUND_COLOR = 0xEE0000,
 	/** The color used for spacers. */
 	BREAKLINE_COLOR  = 0x0000EE
 };
@@ -60,6 +63,7 @@ enum Colors{
  * The screen consists of two main parts:
  *  - "Buy" section with a buy button and a list of available items for sale.
  *  - "History" section with a list of purchased items (along with the quantity).
+ *  ( The owned items are retrieved from database repository.)
  *  For each purchased item there is a Receipt available.
  *  When one of the purchase items is selected, a dialog/new screen shows
  *  it's receipt details.
@@ -74,7 +78,7 @@ public:
 	/**
 	 * Constructor.
 	 */
-	MainScreen();
+	MainScreen(ApplicationController* appControler);
 
 	/**
 	 * Destructor.
@@ -95,7 +99,7 @@ public:
 	 */
 	void fillReceiptDialog(MAUtil::String appID, MAUtil::String productID,
 			int transactionDate, MAUtil::String transactionId,
-			MAUtil::String BID);
+			MAUtil::String BID, double price, MAUtil::String title);
 
 	/**
 	 * Dismiss receipt dialog when Ok button is pressed.
@@ -109,6 +113,18 @@ public:
 	 * @param productId the product Id.
 	 */
 	void productPurchased(MAUtil::String productId);
+
+	/**
+	 * Main screen is notified that a purchase was restored.
+	 * @param productId The product Id.
+	 */
+	void productRestored(MAUtil::String productId);
+
+	/**
+	 * Main screen is notified that a purchase was refunded.
+	 * @param productId The product Id.
+	 */
+	void productRefunded(MAUtil::String productId);
 
 	/**
 	 * Main screen is notified of a purchase error.
@@ -164,6 +180,10 @@ private:
 	 * Main layout.
 	 */
 	VerticalLayout* mMainLayout;
+	/**
+	 * Items previously purchased, loaded from the repository.
+	 */
+	VerticalLayout* mDatabaseItems;
 	Button* mBuyButton;
 	ListView* mAvailableItemsList;
 	int mProductToBuy;
@@ -179,7 +199,14 @@ private:
 	Label* mReceiptTransactionDate;
 	Label* mReceiptTransactionId;
 	Label* mReceiptBid;
+	Label* mReceiptPrice;
+	Label* mReceiptTitle;
 	Button* mReceiptOkButton;
+	Button* mRestoreProducts;
+	/**
+	 * Application controller.
+	 */
+	ApplicationController* mApplicationController;
 };
 
 #endif /* MAINSCREEN_H_ */

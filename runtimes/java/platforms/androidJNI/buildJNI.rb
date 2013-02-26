@@ -206,8 +206,6 @@ packages = ["src/com/mosync/java/android/*.java",
 			"src/com/mosync/internal/android/notifications/*.java",
 			"src/com/mosync/internal/android/billing/*.java",
 			"src/com/mosync/internal/android/billing/util/*.java",
-			"src/com/mosync/internal/android/billing/request/*.java",
-			"gen/com/android/vending/billing/IMarketBillingService.java",
 			"gen/com/android/vending/billing/IInAppBillingService.java"
             ]
 

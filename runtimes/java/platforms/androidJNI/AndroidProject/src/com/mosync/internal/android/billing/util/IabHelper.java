@@ -15,6 +15,10 @@
 
 package com.mosync.internal.android.billing.util;
 
+import java.util.ArrayList;
+import java.util.List;
+import org.json.JSONException;
+
 import android.app.Activity;
 import android.app.PendingIntent;
 import android.content.ComponentName;
@@ -30,18 +34,9 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.android.vending.billing.IInAppBillingService;
-import com.mosync.internal.android.MoSyncThread;
-import com.mosync.internal.android.billing.BillingEvent;
 import com.mosync.internal.android.billing.Consts;
 
-import org.json.JSONException;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import static com.mosync.internal.android.MoSyncHelpers.SYSLOG;
-import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_STATE_FAILED;
-import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_STATE_IN_PROGRESS;
 
 /**
  * Provides convenience methods for in-app billing. Create one instance of this
@@ -363,43 +358,37 @@ public class IabHelper {
      *     and will always be returned when the purchase is queried.
      */
     public void launchPurchaseFlow(Activity act, String sku, int requestCode, OnIabPurchaseFinishedListener listener, String extraData) {
-		Log.e("@@MoSync","launchPurchaseFlow ----------------- ");
         checkSetupDone("launchPurchaseFlow");
         flagStartAsync("launchPurchaseFlow");
         IabResult result;
 
         try {
             logDebug("Constructing buy intent for " + sku);
-            Log.e("MoSync", "Constructing buy intent for --------------- " + sku);
             Bundle buyIntentBundle = mService.getBuyIntent(
 					BILLING_API_VERSION, mContext.getPackageName(), sku, ITEM_TYPE_INAPP, extraData);
             int response = getResponseCodeFromBundle(buyIntentBundle);
             if (response != BILLING_RESPONSE_RESULT_OK) {
                 logError("Unable to buy item, Error response: " + getResponseDesc(response));
-                Log.e("MoSync", "Unable to buy item, Error response: " + getResponseDesc(response));
 
                 result = new IabResult(response, "Unable to buy item", requestCode);
                 if (listener != null) listener.onIabPurchaseFinished(result, null);
             }
-
-            PendingIntent pendingIntent = buyIntentBundle.getParcelable(RESPONSE_BUY_INTENT);
-            logDebug("Launching buy intent for " + sku + ". Request code: " + requestCode);
-            Log.e("MoSync","Launching buy intent for " + sku + ". Request code: " + requestCode);
-            mRequestCode = requestCode;
-            mPurchaseListener = listener;
-            act.startIntentSenderForResult(pendingIntent.getIntentSender(),
-                                           requestCode, new Intent(Consts.METHOD_REQUEST_PURCHASE),
-                                           Integer.valueOf(0), Integer.valueOf(0),
-                                           Integer.valueOf(0));
-            // Send IN_PROGRESS event.
-            // Get handle from extra data.
-//            result = new IabResult(BILLING_RESPONSE_RESULT_OK, "Purchase in progress");
-//            int purchaseHandle = Integer.valueOf(extraData);
-//            if (listener != null) listener.onIabPurchaseFinished(result, new Purchase(purchaseHandle));
+            else
+            {
+                PendingIntent pendingIntent = buyIntentBundle.getParcelable(RESPONSE_BUY_INTENT);
+                logDebug("Launching buy intent for " + sku + ". Request code: " + requestCode);
+                SYSLOG("MoSync Launching buy intent for " + sku + ". Request code: " + requestCode);
+                mRequestCode = requestCode;
+                mPurchaseListener = listener;
+                act.startIntentSenderForResult(pendingIntent.getIntentSender(),
+                                               requestCode, new Intent(Consts.METHOD_REQUEST_PURCHASE),
+                                               Integer.valueOf(0), Integer.valueOf(0),
+                                               Integer.valueOf(0));
+            }
         }
         catch (SendIntentException e) {
             logError("SendIntentException while launching purchase flow for sku " + sku);
-            Log.e("MoSync","SendIntentException while launching purchase flow for sku " + sku);
+            SYSLOG("MoSync SendIntentException while launching purchase flow for sku " + sku);
             e.printStackTrace();
 
             result = new IabResult(IABHELPER_SEND_INTENT_FAILED, "Failed to send intent.", requestCode);
@@ -407,7 +396,7 @@ public class IabHelper {
         }
         catch (RemoteException e) {
             logError("RemoteException while launching purchase flow for sku " + sku);
-            Log.e("MoSync","RemoteException while launching purchase flow for sku " + sku);
+            SYSLOG("MoSync RemoteException while launching purchase flow for sku " + sku);
             e.printStackTrace();
 
             result = new IabResult(IABHELPER_REMOTE_EXCEPTION, "Remote exception while starting purchase flow", requestCode);
@@ -429,7 +418,6 @@ public class IabHelper {
      *     handle it normally.
      */
     public boolean handleActivityResult(int requestCode, int resultCode, Intent data) {
-		Log.e("@@MoSync", "handleActivityResult ----------------------- " + requestCode + "," + resultCode);
         IabResult result;
         if (requestCode != mRequestCode) return false;
 
@@ -440,7 +428,6 @@ public class IabHelper {
 
         if (data == null) {
             logError("Null data in IAB activity result.");
-            Log.e("MoSync", "Null data in IAB activity result.");
             result = new IabResult(IABHELPER_BAD_RESPONSE, "Null data in IAB result", requestCode);
             if (mPurchaseListener != null) mPurchaseListener.onIabPurchaseFinished(result, null);
             return true;
@@ -455,10 +442,8 @@ public class IabHelper {
             logDebug("Purchase data: " + purchaseData);
             logDebug("Data signature: " + dataSignature);
             logDebug("Extras: " + data.getExtras());
-            Log.e("@@MoSync", "handleActivityResult ----------------------- "  );
 
             if (purchaseData == null || dataSignature == null) {
-				Log.e("@@MoSync", "handleActivityResult ----------------------- signature NULL "  );
                 logError("BUG: either purchaseData or dataSignature is null.");
                 logDebug("Extras: " + data.getExtras().toString());
                 result = new IabResult(IABHELPER_UNKNOWN_ERROR, "IAB returned null purchaseData or dataSignature", requestCode);
@@ -470,12 +455,10 @@ public class IabHelper {
             try {
                 purchase = new Purchase(purchaseData, dataSignature);
                 String sku = purchase.getSku();
-                Log.e("@@MoSync"," handleActivityResult  get sku === " + sku);
 
                 // Verify signature
                 if (!Security.verifyPurchase(mSignatureBase64, purchaseData, dataSignature)) {
                     logError("Purchase signature verification FAILED for sku " + sku);
-                    Log.e("MoSync","Purchase signature verification FAILED for sku " + sku);
                     result = new IabResult(IABHELPER_VERIFICATION_FAILED, "Signature verification failed for sku " + sku, requestCode);
                     if (mPurchaseListener != null) mPurchaseListener.onIabPurchaseFinished(result, purchase);
                     return true;
@@ -484,7 +467,6 @@ public class IabHelper {
             }
             catch (JSONException e) {
                 logError("Failed to parse purchase data.");
-                Log.e("MoSync", " !!!!!!!!  Failed to parse purchase data.");
                 e.printStackTrace();
                 result = new IabResult(IABHELPER_BAD_RESPONSE, "Failed to parse purchase data.", requestCode);
                 if (mPurchaseListener != null) mPurchaseListener.onIabPurchaseFinished(result, null);
@@ -499,7 +481,6 @@ public class IabHelper {
         else if (resultCode == Activity.RESULT_OK) {
             // result code was OK, but in-app billing response was not OK.
             logDebug("Result code was OK but in-app billing response was not OK: " + getResponseDesc(responseCode));
-            Log.e("MoSync","Result code was OK but in-app billing response was not OK: " + getResponseDesc(responseCode));
             if (mPurchaseListener != null) {
                 result = new IabResult(responseCode, "Problem purchashing item.", requestCode);
                 mPurchaseListener.onIabPurchaseFinished(result, null);
@@ -865,8 +846,7 @@ public class IabHelper {
      */
     public SkuDetails getSkuDetails(String sku) throws IabException{
 		logDebug("Querying SKU details for one item.");
-		Log.e("MoSync","Querying SKU details for one item." + mContext.getPackageName());
-
+		SYSLOG("MoSync Querying SKU details for one item: " + sku);
         Bundle querySkus = new Bundle();
         ArrayList<String> skuList = new ArrayList<String>();
         skuList.add(sku);
@@ -879,7 +859,6 @@ public class IabHelper {
 	        {
 				int response = getResponseCodeFromBundle(skuDetails);
 				SYSLOG("@@MoSync maPurchaseCreate querySkuDetails response error  " + response);
-				Log.e("MoSync","@@MoSync maPurchaseCreate querySkuDetails response error  " + response);
 	            if (response != BILLING_RESPONSE_RESULT_OK)
 	            {
 	                logDebug("getSkuDetails() failed: " + getResponseDesc(response));
@@ -890,38 +869,24 @@ public class IabHelper {
 	            }
 	            return null;
 	        }
-	        else
-	        {
-				Log.e("@@MoSync","getSkuDetails returns some details");
-	        }
 
 	        ArrayList<String> responseList = skuDetails.getStringArrayList(
 	                RESPONSE_GET_SKU_DETAILS_LIST);
-	        Log.e("@@MoSync","the size of response = " + responseList.size());
 
 	        for (String thisResponse : responseList) {
 		        SkuDetails details = new SkuDetails(thisResponse);
 		        logDebug("Got sku details: " + details);
-		        Log.e("@@MoSync","gotSku details ----- " + details.getSku()+ " , " + details.getTitle());
 		        return details;
 	        }
-//	        ArrayList<String> responseList = skuDetails.getStringArrayList(
-//	                RESPONSE_GET_SKU_DETAILS_LIST);
-//
-//	        for (String thisResponse : responseList) {
-//	            SkuDetails d = new SkuDetails(thisResponse);
-//	            logDebug("Got sku details: " + d);
-//	            inv.addSkuDetails(d);
-//	        }
 	        return null;
 
         }
         catch (RemoteException e) {
-			Log.e("@@MoSync","remote exception while getting sku details");
+			SYSLOG("@@MoSync remote exception while getting sku details");
             throw new IabException(IABHELPER_REMOTE_EXCEPTION, "Remote exception while getting sku details.", e);
         }
         catch (JSONException e) {
-			Log.e("@@MoSync","JSON exception while getting sku details");
+			SYSLOG("@@MoSync JSON exception while getting sku details");
             throw new IabException(IABHELPER_BAD_RESPONSE, "Error parsing JSON response while getting sku details.", e);
         }
     }

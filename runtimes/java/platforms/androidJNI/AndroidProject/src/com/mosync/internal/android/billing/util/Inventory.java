@@ -68,7 +68,7 @@ public class Inventory {
     }
 
     /** Returns a list of all purchases. */
-    List<Purchase> getAllPurchases() {
+    public List<Purchase> getAllPurchases() {
         return new ArrayList<Purchase>(mPurchaseMap.values());
     }
 

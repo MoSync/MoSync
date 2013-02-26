@@ -26,18 +26,24 @@
  */
 
 #include <maapi.h>
+#include <Purchase/Purchase.h>
 
 #include "Config.h"
-#include "MainScreen.h"
+#include "../UI/MainScreen.h"
 #include "ApplicationController.h"
+#include "../Database/DatabaseManager.h"
+#include "../Database/DatabaseProduct.h"
+//#include "Util.h"
 
 /**
  * Cosntructor.
  */
 ApplicationController::ApplicationController():
-mMainScreen(NULL)
+mMainScreen(NULL),
+mDatabase(NULL)
 {
-	mMainScreen = new MainScreen();
+	mDatabase = new DatabaseManager();
+	mMainScreen = new MainScreen(this);
 	mMainScreen->show();
 	mMainScreen->getBuyButton()->addButtonListener(this);
 	mMainScreen->getPurchasedItemList()->addListViewListener(this);
@@ -53,23 +59,107 @@ ApplicationController::~ApplicationController()
 	mMainScreen->getBuyButton()->removeButtonListener(this);
 	mMainScreen->getPurchasedItemList()->removeListViewListener(this);
 	delete mMainScreen;
+	delete mDatabase;
+}
+
+/**
+ * Get the interface to database.
+ * @return The database's interface.
+ */
+DatabaseManager& ApplicationController::getDatabase() const
+{
+	return *mDatabase;
 }
 
 /**
  * This method is called if the touch-up event was inside the
  * bounds of the button.
- * Platform: iOS, Android, Windows Phone.
  * @param button The button object that generated the event.
  */
 void ApplicationController::buttonClicked(Widget* button)
 {
 	if ( mMainScreen->getSelectedAvailableProduct() != "")
 	{
-		Purchase* purchaseObj = new Purchase(
-				mMainScreen->getSelectedAvailableProduct(), this);
-		mPurchases.add(purchaseObj);
-		mCurrentPurchase = mPurchases.size()-1;
+		// Create new entry in the DB.
+		DatabaseProduct* dbProduct = mDatabase->getRow(
+				mMainScreen->getSelectedAvailableProduct());
+		if (!dbProduct)
+		{
+			// Purchase a non consumable product.
+			Purchase* purchaseObj = new Purchase(
+					mMainScreen->getSelectedAvailableProduct(), this);
+			mPurchases.add(purchaseObj);
+			mCurrentPurchase = mPurchases.size()-1;
+		}
 	}
+}
+
+/**
+ * Restore all owned products.
+ */
+void ApplicationController::restoreTransactions()
+{
+	PurchaseManager* manager = PurchaseManager::getInstance();
+	manager->addPurchaseListener(this);
+	manager->restoreTransactions();
+}
+
+/**
+ * Notifies that a purchase has been restored.
+ * Platform: iOS and Android.
+ * @param purchase The purchase that has been restored.
+ */
+void ApplicationController::purchaseRestored(Purchase& purchase)
+{
+	Purchase* restoredItem = new Purchase(purchase.getProductId(), this);
+	mPurchases.add(restoredItem);
+	mCurrentPurchase = mPurchases.size()-1;
+	//restoredItem->addPurchaseListener(this);
+	restoredItem->verifyReceipt();
+//	mCurrentPurchase = mPurchase
+
+	// Store the product in the repository.
+	DatabaseProduct* dbProduct = new DatabaseProduct();
+	dbProduct->setProductID(purchase.getProductId());
+	int date = maLocalTime();
+	dbProduct->setDate(date);
+	mDatabase->addRow(*dbProduct);
+	delete dbProduct;
+	dbProduct = NULL;
+	delete restoredItem;
+	restoredItem = NULL;
+
+	// Notify The UI.
+	mMainScreen->productRestored(purchase.getProductId());
+}
+
+/**
+ * Notifies that restoreTransactions() has failed.
+ * @param errorCode The reason why it failed.
+ * Platform: iOS and Android.
+ */
+void ApplicationController::purchaseRestoreError(int errorCode)
+{
+	char buffer[BUF_SIZE];
+	sprintf(buffer, "Restoring products failed with error code %d", errorCode);
+	maAlert("Restore error", "restore failed" , "OK", NULL, NULL);
+}
+
+/**
+ * Notifies that a purchase has been refunded.
+ * Platform: Android.
+ * @param purchase The purchase that has been refunded.
+ */
+void ApplicationController::purchaseRefunded(Purchase& purchase)
+{
+	MAUtil::String refundString = "You received a refund for " + purchase.getProductId();
+	maAlert("Product refunded", refundString.c_str(), "OK", NULL,NULL);
+	Purchase* restoredItem = new Purchase(purchase.getProductId(), this);
+	mPurchases.add(restoredItem);
+	mCurrentPurchase = mPurchases.size()-1;
+
+	// Notify The UI.
+	mMainScreen->productRefunded(purchase.getProductId());
 }
 
 /**
@@ -98,7 +188,7 @@ void ApplicationController::listViewItemClicked(
  */
 void ApplicationController::productValid(const Purchase& purchase)
 {
-	maAlert("Product valid", "Purchase in progres..", "OK","","");
+	//maAlert("Product valid", "Purchase in progres..", "OK","","");
 	mPurchases[mCurrentPurchase]->requestPurchase();
 }
 
@@ -112,6 +202,8 @@ void ApplicationController::productInvalid(const Purchase& purchase)
 	MAUtil::String errorMessage = "Product " + purchase.getProductId()
 			+ " is invalid!";
 	mMainScreen->productError(errorMessage);
+	mPurchases.remove( mCurrentPurchase );
+	mCurrentPurchase = -1;
 	//TODO remove, only for android.test.purchased
 //	/mPurchases[mCurrentPurchase]->requestPurchase();
 }
@@ -126,6 +218,15 @@ void ApplicationController::requestCompleted(const Purchase& purchase)
 {
 	// Notify UI that a product was purchased.
 	mMainScreen->productPurchased(purchase.getProductId());
+
+	// Update DB.
+	DatabaseProduct* dbProduct = new DatabaseProduct();
+	dbProduct->setProductID(purchase.getProductId());
+	int date = maLocalTime();
+	dbProduct->setDate(date);
+	mDatabase->addRow(*dbProduct);
+	delete dbProduct;
+	dbProduct = NULL;
 }
 
 /**
@@ -140,20 +241,18 @@ void ApplicationController::requestCompleted(const Purchase& purchase)
 void ApplicationController::requestFailed(const Purchase& purchase,
 	const int errorCode)
 {
-	mMainScreen->productError("Purchase failed for product "
-			+ purchase.getProductId() + " with err code = "  + MAUtil::integerToString(errorCode) );
-	for (int i = 0; i < mPurchases.size(); i++)
+	mPurchases.remove( mCurrentPurchase );
+	mCurrentPurchase = -1;
+	MAUtil::String errorMessage = "Purchase failed for product " + purchase.getProductId();
+	if ( errorCode == MA_PURCHASE_ERROR_PRODUCT_ALREADY_OWNED)
 	{
-		Purchase* purchaseObj = mPurchases[i];
-		if (purchase.getHandle() == purchaseObj->getHandle())
-		{
-			mPurchases.remove(i);
-			delete purchaseObj;
-			purchaseObj = NULL;
-			break;
-		}
+		errorMessage += ". Item already owned!";
 	}
-
+	else
+	{
+		errorMessage += " with err code = "  + MAUtil::integerToString(errorCode);
+	}
+	mMainScreen->productError(errorMessage);
 }
 
 /**
@@ -172,9 +271,8 @@ void ApplicationController::receiptValid(
 		// Display the dialog containing the receipt information.
 		mMainScreen->fillReceiptDialog(receipt.getAppID(), receipt.getProductID(),
 				receipt.getTransactionDate(), receipt.getTransactionID(),
-				receipt.getBID());
+				receipt.getBID(), receipt.getPrice(), receipt.getTitle());
 	}
-
 }
 
 /**
@@ -186,7 +284,7 @@ void ApplicationController::receiptValid(
 void ApplicationController::receiptInvalid(const Purchase& purchase)
 {
 	mMainScreen->productError("Product " + purchase.getProductId()
-			+ " has an invalid receipt!");
+			+ " does not have a receipt. It may be a managed item.");
 }
 
 /**

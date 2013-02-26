@@ -141,6 +141,11 @@ group PurchaseErrorCodes "Purchase Error Codes" {
 		* Platform: iOS and Android.
 		*/
 		NO_RECEIPT = -11;
+		 /**
+        * \brief Possible error code for #MA_PURCHASE_EVENT_REQUEST event type.
+        * Sent by the #maPurchaseRequest() syscall if the given product is already owned.
+        */
+		PRODUCT_ALREADY_OWNED = -12;
 	}
 } // end of Purchase Error Codes
 

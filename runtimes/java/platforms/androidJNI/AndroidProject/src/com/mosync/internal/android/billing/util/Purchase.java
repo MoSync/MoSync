@@ -38,10 +38,16 @@ public class Purchase {
     String mToken;
     String mOriginalJson;
     String mSignature;
+    // Fields taken through getSkuDetails on owned items.
+    String mPrice;
+    String mTitle;
+    String mDescription;
+
     /**
      * MoSync internal handle for the purchase.
      */
     int mProductHandle = PURCHASE_HANDLE_UNKNOWN;
+
 	/**
 	 * Purchase state is at first unknown.
 	 * After the purchase request is received by Google Play, the state becomes
@@ -98,6 +104,18 @@ public class Purchase {
 	{
 		mPackageName = name;
 	}
+	public void setPrice(String price)
+	{
+		mPrice = price;
+	}
+	public void setTitle(String title)
+	{
+		mTitle = title;
+	}
+	public void setDescription(String description)
+	{
+		mDescription = description;
+	}
     public String getOrderId() { return mOrderId; }
     public String getPackageName() { return mPackageName; }
     public String getSku() { return mSku; }
@@ -108,6 +126,9 @@ public class Purchase {
     public String getOriginalJson() { return mOriginalJson; }
     public String getSignature() { return mSignature; }
     public int getProductHandle() { return mProductHandle; };
+    public String getPrice() { return mPrice; };
+    public String getTitle() { return mTitle; };
+    public String getDescription() { return mDescription; };
 
     @Override
     public String toString() { return "PurchaseInfo:" + mOriginalJson; }

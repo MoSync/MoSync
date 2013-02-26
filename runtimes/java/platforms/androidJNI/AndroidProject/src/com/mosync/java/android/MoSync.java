@@ -460,19 +460,16 @@ public class MoSync extends Activity
 		{
 			MoSyncImagePicker.handleCancelSelectPicture();
 		}
-		//else if ( data.getAction() ==  Consts.METHOD_REQUEST_PURCHASE )//requestCode == PurchaseManager.)
 		else if( requestCode == PurchaseManager.getCurrentRequestCode() )
 		{
-			Log.e("@@MoSync","Activity onActivityResult for  METHOD_REQUEST_PURCHASE");
+			SYSLOG("@@MoSync Activity onActivityResult for METHOD_REQUEST_PURCHASE");
 			if ( !PurchaseManager.handleActivityResult(requestCode, resultCode, data) )
 			{
-				Log.e("@@MoSync","Activity onActivityResult for !!!!!!!!!!!!!!!");
 				super.onActivityResult(requestCode, resultCode, data);
 			}
 		}
 		else
 		{
-			Log.e("@@MoSync","Activity onActivityResult for other intents !!!!!!!!!!!!!!!");
 			super.onActivityResult(requestCode, resultCode, data);
 		}
 	}
