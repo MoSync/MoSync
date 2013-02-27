@@ -167,7 +167,11 @@ static jboolean nativeLoad(
 
 	gCore->mJniEnv = env;
 	gCore->mJThis = jthis;
-	Base::gSyscall->setJNIEnvironment(env, jthis);
+	// Updated, ICS made changes in how local and global references are handled.
+	// This global is not deleted since it's used for the entire life cycle of the app.
+	// Note: never deleted, create nativeInit and nativeDispose. Plus create MoSyncNativeBridge
+	jobject gloablRefJThis = env->NewGlobalRef(jthis);
+	Base::gSyscall->setJNIEnvironment(env, gloablRefJThis);
 
 	SYSLOG("MoSyncBridge.cpp: nativeLoad: Calling Core::LoadVMApp");
 
@@ -692,6 +696,11 @@ static void nativeExit( JNIEnv* env, jobject jthis )
 {
 	exit(1);
 	return;
+}
+
+static jobject nativeGetMemorySlice(JNIEnv* env, jobject jthis, int addr, int size) {
+	jobject buffer = (jobject)env->NewDirectByteBuffer((void*) addr, (jlong) size);
+	return buffer;
 }
 
 /**
