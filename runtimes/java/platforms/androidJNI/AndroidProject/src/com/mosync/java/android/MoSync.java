@@ -70,6 +70,7 @@ import com.mosync.internal.android.MoSyncThread;
 import com.mosync.internal.android.MoSyncTouchHandler;
 import com.mosync.internal.android.MoSyncView;
 import com.mosync.internal.android.billing.Consts;
+import com.mosync.internal.android.billing.PurchaseManager;
 import com.mosync.internal.android.nfc.MoSyncNFCForegroundUtil;
 import com.mosync.internal.android.nfc.MoSyncNFCService;
 import com.mosync.internal.android.notifications.LocalNotificationsManager;
@@ -458,6 +459,18 @@ public class MoSync extends Activity
 				requestCode == PICK_IMAGE_REQUEST )
 		{
 			MoSyncImagePicker.handleCancelSelectPicture();
+		}
+		else if( requestCode == PurchaseManager.getCurrentRequestCode() )
+		{
+			SYSLOG("@@MoSync Activity onActivityResult for METHOD_REQUEST_PURCHASE");
+			if ( !PurchaseManager.handleActivityResult(requestCode, resultCode, data) )
+			{
+				super.onActivityResult(requestCode, resultCode, data);
+			}
+		}
+		else
+		{
+			super.onActivityResult(requestCode, resultCode, data);
 		}
 	}
 

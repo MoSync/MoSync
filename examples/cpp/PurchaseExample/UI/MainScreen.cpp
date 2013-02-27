@@ -37,8 +37,11 @@
 
 #include <Purchase/Purchase.h>
 
-#include "Util.h"
-#include "Config.h"
+#include "../Logic/Util.h"
+#include "../Logic/Config.h"
+#include "../Database/DatabaseManager.h"
+#include "../Database/DatabaseProduct.h"
+#include "../Logic/ApplicationController.h"
 #include "MainScreen.h"
 
 #define BREAKLINE_HEIGHT 10
@@ -47,7 +50,7 @@
 /**
  * Constructor.
  */
-MainScreen::MainScreen() :
+MainScreen::MainScreen(ApplicationController* appController) :
 	Screen(),
 	mMainLayout(NULL),
 	mBuyButton(NULL),
@@ -60,13 +63,15 @@ MainScreen::MainScreen() :
 	mReceiptTransactionDate(NULL),
 	mReceiptTransactionId(NULL),
 	mReceiptBid(NULL),
-	mReceiptOkButton(NULL)
+	mReceiptOkButton(NULL),
+	mApplicationController(appController)
 {
 	createProductIdList();
 	createMainLayout();
 	createReceiptDialog();
 	mBuyButton->addButtonListener(this);
 	mReceiptOkButton->addButtonListener(this);
+	mRestoreProducts->addButtonListener(this);
 	for (int i=0; i < mItemsCheckBoxes.size(); i++)
 	{
 		mItemsCheckBoxes[i]->addCheckBoxListener(this);
@@ -80,6 +85,7 @@ MainScreen::~MainScreen()
 {
 	mBuyButton->removeButtonListener(this);
 	mReceiptOkButton->removeButtonListener(this);
+	mRestoreProducts->removeButtonListener(this);
 	for (int i=0; i < mItemsCheckBoxes.size(); i++)
 	{
 		mItemsCheckBoxes[i]->removeCheckBoxListener(this);
@@ -98,6 +104,10 @@ void MainScreen::buttonClicked(Widget* button)
 	{
 		dismissReceiptDialog();
 	}
+	else if( mRestoreProducts == button )
+	{
+		mApplicationController->restoreTransactions();
+	}
 }
 
 /**
@@ -105,7 +115,7 @@ void MainScreen::buttonClicked(Widget* button)
  */
 void MainScreen::fillReceiptDialog(MAUtil::String appID, MAUtil::String productID,
 		int transactionDate, MAUtil::String transactionId,
-		MAUtil::String BID)
+		MAUtil::String BID, double price, MAUtil::String title)
 {
 	// If the field is unavailable, print a line character instead.
 	if ( appID.length() == 0 )
@@ -127,6 +137,9 @@ void MainScreen::fillReceiptDialog(MAUtil::String appID, MAUtil::String productI
 				MAUtil::integerToString(transaction.tm_sec +1) );
 	}
 	mReceiptProductId->setText(productID);
+	mReceiptPrice->setText(MAUtil::doubleToString(price));
+	mReceiptTitle->setText(title);
+
 	int platform = getPlatform();
 	if ( platform == ANDROID )
 	{
@@ -209,6 +222,29 @@ void MainScreen::productPurchased(MAUtil::String productId)
 }
 
 /**
+ * Main screen is notified that a purchase was restored.
+ * @param productId The product Id.
+ */
+void MainScreen::productRestored(MAUtil::String productId)
+{
+	ListViewItem* item = new ListViewItem();
+	item->setFontColor(ITEMS_COLOR);
+	item->setText("Product " + productId + " was restored.");
+	mPurchasedItemsList->addChild(item);
+}
+
+/**
+ * Main screen is notified that a purchase was refunded.
+ * @param productId The product Id.
+ */
+void MainScreen::productRefunded(MAUtil::String productId)
+{
+	ListViewItem* item = new ListViewItem();
+	item->setFontColor(ITEMS_COLOR);
+	item->setText("Product " + productId + " was refunded.");
+	mPurchasedItemsList->addChild(item);
+}
+/**
  * Main screen is notified of a purchase error.
  * @param errorMessage.
  */
@@ -266,10 +302,21 @@ void MainScreen::createReceiptDialog()
 	receiptTransactionDate->setFontColor(RECEIPT_FIELD_COLOR);
 	mReceiptTransactionDate = new Label();
 
+	Label* receiptProductTitle = new Label("Title");
+	receiptProductTitle->setFontColor(RECEIPT_FIELD_COLOR);
+	mReceiptTitle = new Label();
+	Label* receiptProductPrice = new Label("Price");
+	receiptProductPrice->setFontColor(RECEIPT_FIELD_COLOR);
+	mReceiptPrice = new Label();
+
 	dialogLayout->addChild(receiptProductIdInfo);
 	dialogLayout->addChild(mReceiptProductId);
 	dialogLayout->addChild(receiptTransactionDate);
 	dialogLayout->addChild(mReceiptTransactionDate);
+	dialogLayout->addChild(receiptProductTitle);
+	dialogLayout->addChild(mReceiptTitle);
+	dialogLayout->addChild(receiptProductPrice);
+	dialogLayout->addChild(mReceiptPrice);
 
 	int platform = getPlatform();
 	if ( platform == ANDROID)
@@ -311,6 +358,15 @@ void MainScreen::createProductIdList()
 		 */
 		mProductIdList.add(sGooglePlayPurchasedProductId);
 		mProductNamesList.add("Test product");
+
+		mProductIdList.add(ANDROID_MANAGED_ITEM_1);
+		mProductNamesList.add("Managed product 1");
+
+		mProductIdList.add(ANDROID_MANAGED_ITEM_2);
+		mProductNamesList.add("Managed product 2");
+
+		mProductIdList.add(ANDROID_MANAGED_ITEM_3);
+		mProductNamesList.add("Managed product 3");
 	}
 	else
 	{
@@ -331,6 +387,28 @@ void MainScreen::createMainLayout()
 	mMainLayout->setBackgroundColor(MAIN_LAYOUT_COLOR);
 	Screen::setMainWidget(mMainLayout);
 
+	HorizontalLayout* restoreLayout = new HorizontalLayout();
+	restoreLayout->setBackgroundColor(INFO_BACKGROUND_COLOR);
+	restoreLayout->wrapContentVertically();
+	mRestoreProducts = new Button();
+	mRestoreProducts->setText("Restore previous purchases. ONLY when running the first time after uninstall");
+	restoreLayout->addChild(mRestoreProducts);
+	mMainLayout->addChild(restoreLayout);
+
+	// Items you previously purchased.
+	mDatabaseItems = new VerticalLayout();
+	mDatabaseItems->wrapContentVertically();
+	mMainLayout->addChild(mDatabaseItems);
+	Label* infoRepository = new Label("Items you have previously purchased");
+	infoRepository->setFontColor(INFO_LABELS_COLOR);
+	mDatabaseItems->addChild(infoRepository);
+
+	// Add a small break line between the two sections.
+	HorizontalLayout* lineBreakLayout = new HorizontalLayout();
+	lineBreakLayout->setHeight(BREAKLINE_HEIGHT);
+	lineBreakLayout->setBackgroundColor(BREAKLINE_COLOR);
+	mMainLayout->addChild(lineBreakLayout);
+
 	// Create the "BUY" section.
 	VerticalLayout* buyLayout = new VerticalLayout();
 	buyLayout->wrapContentVertically();
@@ -339,21 +417,6 @@ void MainScreen::createMainLayout()
 	info->setText("Items for sale");
 	info->setFontColor(INFO_LABELS_COLOR);
 	buyLayout->addChild(info);
-
-	// Add the list of available items for sale along with check boxes.
-	for (int i=0; i < mProductNamesList.size(); i++)
-	{
-		HorizontalLayout* itemLayout = new HorizontalLayout();
-		itemLayout->wrapContentVertically();
-		CheckBox* itemCheckBox = new CheckBox();
-		itemLayout->addChild(itemCheckBox);
-		mItemsCheckBoxes.add(itemCheckBox);
-		Label* itemId = new Label();
-		itemId->setText(mProductNamesList[i]);
-		itemId->setFontColor(ITEMS_COLOR);
-		itemLayout->addChild(itemId);
-		buyLayout->addChild(itemLayout);
-	}
 
 	// Use buy button to purchase the checked product it from the "BUY" section.
 	mBuyButton = new Button();
@@ -376,4 +439,33 @@ void MainScreen::createMainLayout()
 	purchasedLayout->addChild(mPurchasedItemsList);
 	mMainLayout->addChild(purchasedLayout);
 
+	// Add the list of available items for sale along with check boxes ( in the BUY section)
+	for (int i=0; i < mProductNamesList.size(); i++)
+	{
+		// Check if the product is already owned, and replace the checkbox with a label instead.
+		DatabaseManager& database = mApplicationController->getDatabase();
+		DatabaseProduct* dbProduct = database.getRow(mProductIdList[i]);
+
+		if (dbProduct)
+		{
+
+			// The item is already owned, just display it.
+			Label* ownedItem = new Label(mProductIdList[i]);
+			ownedItem->setFontColor(ITEMS_COLOR);
+			mDatabaseItems->addChild(ownedItem);
+		}
+		else
+		{
+			HorizontalLayout* itemLayout = new HorizontalLayout();
+			itemLayout->wrapContentVertically();
+			CheckBox* itemCheckBox = new CheckBox();
+			itemLayout->addChild(itemCheckBox);
+			mItemsCheckBoxes.add(itemCheckBox);
+			Label* itemId = new Label();
+			itemId->setText(mProductNamesList[i]);
+			itemId->setFontColor(ITEMS_COLOR);
+			itemLayout->addChild(itemId);
+			buyLayout->addChild(itemLayout);
+		}
+	}
 }

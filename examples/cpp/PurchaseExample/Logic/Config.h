@@ -25,4 +25,7 @@
 #define IOS_PRODUCT_TYPE_1 "yourConsumableProductID"
 #define IOS_PRODUCT_TYPE_2 "yourNonconsumableProductID"
 
+#define ANDROID_MANAGED_ITEM_1 "managed_item_1"
+#define ANDROID_MANAGED_ITEM_2 "managed_item_2"
+#define ANDROID_MANAGED_ITEM_3 "managed_item_3"
 #endif /* CONFIG_H_ */
