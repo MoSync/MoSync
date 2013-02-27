@@ -117,19 +117,16 @@ namespace IAP
 
 		/**
 		 * The cost of the product in the local currency.
-		 * Platform: iOS.
 		 */
 		double getPrice();
 
 		/**
 		 * Get the localized product title.
-		 * Platform: iOS.
 		 */
 		MAUtil::String getTitle();
 
 		/**
 		 * Get the localized product description.
-		 * Platform: iOS.
 		 */
 		MAUtil::String getDescription();
 

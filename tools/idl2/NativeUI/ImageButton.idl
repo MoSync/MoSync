@@ -122,7 +122,7 @@ group WidgetImageButtonProperties "Image button" {
 		*
 		* @par Example
 		* \code
-		*	maWidgetSetProperty(imageHandle, MAW_IMAGE_BUTTON_IMAGE_PATH, "file_path.png");
+		*	maWidgetSetProperty(imageButtonHandle, MAW_IMAGE_BUTTON_IMAGE_PATH, "file_path.png");
 		* \endcode
 		*/
 		IMAGE_PATH = "imagePath";
@@ -137,7 +137,7 @@ group WidgetImageButtonProperties "Image button" {
 		*
 		* @par Example
 		* \code
-		*	maWidgetSetProperty(imageHandle, MAW_IMAGE_BUTTON_BACKGROUND_IMAGE_PATH, "file_path.png");
+		*	maWidgetSetProperty(imageButtonHandle, MAW_IMAGE_BUTTON_BACKGROUND_IMAGE_PATH, "file_path.png");
 		* \endcode
 		*/
 		BACKGROUND_IMAGE_PATH = "backgroundImagePath";
@@ -179,7 +179,7 @@ group WidgetImageButtonProperties "Image button" {
 		* \code
 		* char buffer[BUFFER_SIZE];
 		* sprintf(buffer, "%d", handle);
-		*	maWidgetSetProperty(imageHandle, MAW_IMAGE_BUTTON_PRESSED_IMAGE, buffer);
+		*	maWidgetSetProperty(imageButtonHandle, MAW_IMAGE_BUTTON_PRESSED_IMAGE, buffer);
 		* \endcode
 		*/
 		PRESSED_IMAGE = "pressedImage";
@@ -197,7 +197,7 @@ group WidgetImageButtonProperties "Image button" {
 		*
 		* @par Example
 		* \code
-		*	maWidgetSetProperty(imageHandle, MAW_IMAGE_BUTTON_PRESSED_IMAGE_PATH, "file_path.png");
+		*	maWidgetSetProperty(imageButtonHandle, MAW_IMAGE_BUTTON_PRESSED_IMAGE_PATH, "file_path.png");
 		* \endcode
 		*/
 		PRESSED_IMAGE_PATH = "pressedImagePath";
