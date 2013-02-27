@@ -18,15 +18,8 @@ MA 02110-1301, USA.
 package com.mosync.nativeui.ui.factories;
 
 import android.app.Activity;
-import android.view.KeyEvent;
-import android.view.MotionEvent;
-import android.view.View;
-import android.view.View.OnKeyListener;
-import android.view.View.OnTouchListener;
 import android.widget.ImageButton;
 
-import com.mosync.internal.android.EventQueue;
-import com.mosync.internal.generated.IX_WIDGET;
 import com.mosync.nativeui.ui.widgets.ImageButtonWidget;
 import com.mosync.nativeui.ui.widgets.Widget;
 import com.mosync.nativeui.util.MoSyncSendOnClick;

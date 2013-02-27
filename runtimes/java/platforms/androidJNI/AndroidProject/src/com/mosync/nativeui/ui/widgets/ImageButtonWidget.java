@@ -49,7 +49,7 @@ public class ImageButtonWidget extends Widget
 	 * Default image handle, used to keep track if the background image
 	 * is taken from a file path or a handle.
 	 */
-	private static final int IMAGE_HANDLE_NOT_SET = -1;
+	private static final int IMAGE_HANDLE_NOT_SET = 0;
 
 	/**
 	 * Image file path for MAW_IMAGE_BUTTON_IMAGE_PATH property;
