@@ -225,14 +225,6 @@ namespace MoSync
             }
 
             /**
-             * Returns the value of the mPopTransitionType
-             */
-            public int GetPushTransitionType()
-            {
-                return mPushTransitionType;
-            }
-
-            /**
              * MAW_STACK_SCREEN_POP_TRANSITION_TYPE property implementation.
              */
             [MoSyncWidgetProperty(MoSync.Constants.MAW_STACK_SCREEN_POP_TRANSITION_TYPE)]
@@ -243,14 +235,6 @@ namespace MoSync
                     if (!Int32.TryParse(value, out mPopTransitionType)) throw new InvalidPropertyValueException();
                     if (!NativeUI.MoSyncScreenTransitions.isTransitionAvailable(mPopTransitionType)) throw new InvalidPropertyValueException();
                 }
-            }
-
-            /**
-             * Returns the value of the mPopTransitionType
-             */
-            public int GetPopTransitionType()
-            {
-                return mPopTransitionType;
             }
 
             /**

@@ -63,7 +63,7 @@ namespace ScreenTransitionTest {
 		 */
 		setPushTransition(MAW_TRANSITION_TYPE_SLIDE_LEFT, 300);
 
-		// Set duration of the screen transitions. Note that on WP the duration is constrained.
+		// Set duration of the screen transitions. Note that on WP the duration is set by the platform.
 		setPopTransition(MAW_TRANSITION_TYPE_SLIDE_RIGHT, 300);
 
 		mTransitionsScreen = new TransitionsScreen(observer);
