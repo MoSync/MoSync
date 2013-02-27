@@ -41,6 +41,7 @@ static void sign(const SETTINGS& s, const RuntimeInfo& ri, string& unsignedApk, 
 static void createSignCmd(ostringstream& cmd, string& keystore, string& alias, string& storepass, string& keypass, string& signedApk, string& unsignedApk, bool hidden);
 static void writeNFCResource(const SETTINGS& s, const RuntimeInfo& ri);
 static string packageNameToByteCodeName(const string& packageName);
+static string findNativeLibrary(const SETTINGS& s, string& name, string& arch);
 
 class AndroidContext : public DefaultContext {
 private:
@@ -95,8 +96,14 @@ void packageAndroid(const SETTINGS& s, const RuntimeInfo& ri) {
 
 	_mkdir(add.c_str());
 	_mkdir(assets.c_str());
-	copyFile(programMp3.c_str(), s.program);
-	if(s.resource) {
+	if (s.program && existsFile(s.program)) {
+		copyFile(programMp3.c_str(), s.program);
+	} else {
+		// Create dummy file. We'll fix this later
+		// so the runtime ignores it...
+		copyFile(programMp3.c_str(), (string(mosyncdir()) + "/profiles/runtimes/android_17/1/dummy.mp3").c_str());
+	}
+	if(s.resource && existsFile(s.resource)) {
 		string resMp3 = assets + "/resources.mp3";
 		copyFile(resMp3.c_str(), s.resource);
 	}
@@ -121,27 +128,40 @@ void packageAndroid(const SETTINGS& s, const RuntimeInfo& ri) {
 	string extensionDex;
 	string extensionRes;
 
-	// Extensions.
+	vector<string> extensions;
+	getExtensions(s.extensions ? s.extensions : "", extensions);
+
+	// Extensions & modules.
+	vector<string> modules(extensions);
+	modules.push_back(s.name);
 	if (s.extensions) {
 		string assetDir = dstDir + "/assets";
+		toDir(assetDir);
 		_mkdir(assetDir.c_str());
 
 		extensionRes.append(" -A " + file(assetDir));
 
-		vector<string> extensions;
-		getExtensions(s.extensions, extensions);
-
 		for (size_t i = 0; i < extensions.size(); i++) {
 			string extension = trim(extensions[i]);
-			string extensionDir = mosyncdir() + string("/extensions/") + extension + string("/Android/");
+			string extensionDir = mosyncdir() + string("/modules/") + extension + string("/Android/");
 			string extManifestDir = extensionDir + "assets/";
-			string assetDst = assetDir + "/" + extension + ".xml";
+			string assetDst = assetDir + extension + ".xml";
 			string assetSrc = extManifestDir + extension + ".xml";
-			copyFile(assetDst.c_str(), assetSrc.c_str());
-
-			string extLib = extensionDir + extension + ".jar";
-			extensionDex.append(" " + file(extLib));
+			if (existsFile(assetSrc.c_str())) {
+				copyFile(assetDst.c_str(), assetSrc.c_str());
+				string extLib = extensionDir + extension + ".jar";
+				extensionDex.append(" " + file(extLib));
+			}
 		}
+		// Write list of modules
+		string moduleList = assetDir + "deps.lst";
+		ofstream moduleListOut(moduleList.c_str());
+		for (size_t i = 0; i < modules.size(); i++) {
+			moduleListOut << modules[i];
+			moduleListOut << "\n";
+		}
+		moduleListOut.flush();
+		moduleListOut.close();
 	}
 
 	string mainXml = layout + "/main.xml";
@@ -182,6 +202,18 @@ void packageAndroid(const SETTINGS& s, const RuntimeInfo& ri) {
 	string armeabiSo = armeabi + "/libmosync.so";
 	remove(armeabiSo.c_str());
 	renameFile(armeabiSo, classesSo);
+
+	for (size_t i = 0; i < modules.size(); i++) {
+		string arch = "armeabi";
+		string module = modules[i];
+		string nativeLib = findNativeLibrary(s, module, arch);
+		if (!nativeLib.empty()) {
+			string dstLibDir = addlib + "/" + arch + "/";
+			_mkdir(dstLibDir.c_str());
+			string dstLib = dstLibDir + "lib" + module + ".so";
+			copyFile(dstLib.c_str(), nativeLib.c_str());
+		}
+	}
 
 	// run android/dx.jar
 	string classesDex = classes + "/classes.dex";
@@ -266,6 +298,36 @@ static void createSignCmd(ostringstream& cmd, string& keystore, string& alias, s
 		" -signedjar "<<file(signedApk)<<
 		" "<<file(unsignedApk)<<
 		" "<<arg(alias);
+}
+
+static string findNativeLibrary(const SETTINGS& s, string& name, string& arch) {
+	vector<string> paths;
+
+	// 1. Look for the one built for this project, if any.
+	string projLibPath = string(s.dst) + "/../libs/" + arch;
+	paths.push_back(projLibPath);
+
+	// 2. Look in the modules directory
+	vector<string> extensions;
+	getExtensions(s.extensions, extensions);
+	for (size_t i = 0; i < extensions.size(); i++) {
+		string extension = extensions[i];
+		string extensionDir = mosyncdir() + string("/modules/") + extension + string("/lib/Android/Debug/");
+		string extensionLibPath = extensionDir + arch;
+		paths.push_back(extensionLibPath);
+	}
+
+	for (size_t i = 0; i < paths.size(); i++)  {
+		string path = paths[i];
+		toDir(path);
+		string potentialMatch = path + "lib" + name + ".so";
+		printf("LOOKING IN PATH %s FOR %s\n", path.c_str(), potentialMatch.c_str());
+		if (existsFile(potentialMatch.c_str())) {
+			printf("FOUND!\n");
+			return potentialMatch;
+		}
+	}
+	return "";
 }
 
 static void injectIcons(const SETTINGS& s, const RuntimeInfo& ri) {

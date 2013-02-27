@@ -35,6 +35,12 @@ void injectIcon(const char* platform, const char* size, const char* srcIcon, con
 	sh(iconInjectCmd.str().c_str(), silent);
 }
 
+void getExtensions(const char* extensionList, vector<string>& extensions) {
+	if (extensionList && strlen(extensionList) > 0) {
+		split(extensions, extensionList, ",");
+	}
+}
+
 string getBinary(const char* binaryName) {
 	return file(mosyncdir() + string("/bin/") + binaryName);
 }

@@ -23,6 +23,11 @@ int generateMakefile(map<string, string>& params) {
 
 	vector<string> modules;
 	split(modules, params["--modules"], ",");
+	if (modules.empty()) {
+		// Default
+		modules.push_back("mosync");
+		modules.push_back("mosynclib");
+	}
 
 	DefaultContext rootCtx(NULL);
 	for (size_t i = 0; i < modules.size(); i++) {
@@ -49,7 +54,7 @@ int generateMakefile(map<string, string>& params) {
 		return 1;
 	}
 
-	string androidAppMkOutput = outputDir + "Application.mk";
+	string androidAppMkOutput = outputDir + "/Application.mk";
 	string androidAppMkOriginal = androidProfilesDir + "/Application.mk";
 	copyFile(androidAppMkOutput.c_str(), androidAppMkOriginal.c_str());
 
@@ -92,7 +97,9 @@ int executeNdkBuild(map<string, string>& params) {
 	cmd << arg("MOSYNC_CONFIG=" + configName) << " ";
 	cmd << arg("MOSYNC_MODULE_NAME=" + moduleName) << " ";
 	cmd << arg("MOSYNC_PLATFORM=" + params["--platform"]) << " ";
-	cmd << arg("MOSYNC_LIB_VARIANT=" + libVariant);
+	cmd << arg("MOSYNC_LIB_VARIANT=" + libVariant) << " ";
+	cmd << arg("NDK_PROJECT_PATH=.") << " ";
+	cmd << arg("APP_PLATFORM=android-14");
 
 	sh(cmd.str().c_str(), !isVerbose);
 

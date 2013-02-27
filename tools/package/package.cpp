@@ -243,7 +243,7 @@ int main(int argc, const char** argv) {
 }
 
 void testProgram(const SETTINGS& s) {
-	if(!s.program) {
+	if(!s.program && strcmp(s.outputType, "native")) {
 		printf("Must specify program!\n");
 		exit(1);
 	}
@@ -299,8 +299,9 @@ void testExtensions(const SETTINGS& s) {
 void testOutputType(const SETTINGS& s) {
 	if (s.outputType) {
 		if (strcmp("interpreted", s.outputType) &&
-			strcmp("rebuilt", s.outputType)) {
-			printf("Output type must be either \"interpreted\" or \"rebuilt\"!\n");
+			strcmp("rebuilt", s.outputType) &&
+			strcmp("native", s.outputType)) {
+			printf("Output type must be either \"interpreted\", \"rebuilt\" or \"native\"!\n");
 			exit(1);
 		}
 	}
