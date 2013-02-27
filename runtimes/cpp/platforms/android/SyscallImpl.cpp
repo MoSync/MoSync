@@ -1989,6 +1989,14 @@ namespace Base
 				mJNIEnv,
 				mJThis);
 
+		case maIOCtl_maToast:
+			SYSLOG("maIOCtl_maToast");
+			return _maToast(
+				SYSCALL_THIS->GetValidatedStr(a),
+				b,
+				mJNIEnv,
+				mJThis);
+
 		case maIOCtl_maImagePickerOpen:
 			SYSLOG("maIOCtl_maImagePickerOpen");
 			return _maImagePickerOpen(

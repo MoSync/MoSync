@@ -558,6 +558,22 @@ namespace Base
 		return (int)ret;
 	}
 
+	int _maToast(const char* message, int duration, JNIEnv* jNIEnv, jobject jThis)
+	{
+		jstring jstrMessage = jNIEnv->NewStringUTF(message);
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maToast", "(Ljava/lang/String;I)I");
+
+		jint result = -1;
+		if (methodID != 0)
+			result = jNIEnv->CallIntMethod(jThis, methodID, jstrMessage, duration);
+
+		jNIEnv->DeleteLocalRef(cls);
+		jNIEnv->DeleteLocalRef(jstrMessage);
+
+		return (int)result;
+	}
+
 	int _maImagePickerOpen(JNIEnv* jNIEnv, jobject jThis)
 	{
 		Base::gSyscall->VM_Yield();

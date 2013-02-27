@@ -233,6 +233,8 @@ namespace Base
 	int _maAlert(const char* title, const char* message, const char* button1,
 					const char* button2, const char* button3, JNIEnv* jNIEnv, jobject jThis);
 
+	int _maToast(const char* message, int duration, JNIEnv* jNIEnv, jobject jThis);
+
 	int _maImagePickerOpen(JNIEnv* jNIEnv, jobject jThis);
 
 	int _maImagePickerOpenWithEventReturnType(int eventReturnType, JNIEnv* jNIEnv, jobject jThis);

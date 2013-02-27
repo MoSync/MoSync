@@ -54,6 +54,9 @@ import static com.mosync.internal.generated.MAAPI_consts.MA_RESOURCE_CLOSE;
 import static com.mosync.internal.generated.MAAPI_consts.MA_WAKE_LOCK_ON;
 import static com.mosync.internal.generated.MAAPI_consts.MA_WAKE_LOCK_OFF;
 
+import static com.mosync.internal.generated.MAAPI_consts.MA_TOAST_DURATION_SHORT;
+import static com.mosync.internal.generated.MAAPI_consts.MA_TOAST_DURATION_LONG;
+
 
 import java.io.File;
 import java.io.FileDescriptor;
@@ -109,11 +112,11 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.FrameLayout;
+import android.widget.Toast;
 import android.provider.Settings.Secure;
 import android.net.ConnectivityManager;
 
 import com.mosync.internal.android.MoSyncFont.MoSyncFontHandle;
-import com.mosync.internal.android.billing.PurchaseManager;
 import com.mosync.internal.android.nfc.MoSyncNFC;
 import com.mosync.internal.android.nfc.MoSyncNFCService;
 import com.mosync.internal.generated.IX_OPENGL_ES;
@@ -125,8 +128,6 @@ import com.mosync.java.android.TextBox;
 import com.mosync.nativeui.ui.widgets.MoSyncCameraPreview;
 import com.mosync.nativeui.ui.widgets.ScreenWidget;
 import com.mosync.nativeui.util.AsyncWait;
-import com.mosync.nativeui.util.properties.IntConverter;
-import com.mosync.nativeui.util.properties.PropertyConversionException;
 
 /**
  * Thread that runs the MoSync virtual machine and handles all syscalls.
@@ -3319,6 +3320,32 @@ public class MoSyncThread extends Thread
 		event[1] = index;
 
 		postEvent(event);
+	}
+
+	/**
+	 * Display a toast message.
+	 * A toast is a view containing a quick little message for the user.
+	 * @param message The toast message.
+	 * @param duration One of the constants:
+	 *  - #MA_TOAST_DURATION_SHORT or
+	 *  - #MA_TOAST_DURATION_LONG
+	 * @return
+	 */
+	int maToast(final String message, int duration)
+	{
+		switch(duration)
+		{
+		case MA_TOAST_DURATION_SHORT:
+			Toast.makeText(mContext.getApplicationContext(), message, Toast.LENGTH_SHORT).show();
+			break;
+		case MA_TOAST_DURATION_LONG:
+			Toast.makeText(mContext.getApplicationContext(), message, Toast.LENGTH_LONG).show();
+			break;
+		default:
+			return 0;
+		}
+
+		return 0;
 	}
 
 	/**

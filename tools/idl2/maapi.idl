@@ -4215,6 +4215,30 @@ group OpenGLES "OpenGLES" {
 		void maAlert(in MAString title, in MAString message, in MAString button1, in MAString button2, in MAString button3);
 
 		/**
+		*
+		*/
+		constset int MA_TOAST_DURATION_ {
+			SHORT = 0; //2sec
+			LONG = 1; //3.5sec
+		}
+
+		/** TODO see if IOCTl needed.
+		* \brief A toast is a view containing a quick little message for the user.
+		* A toast provides simple feedback about an operation in a small popup.
+		* It only fills the amount of space required for the message and the current
+		* activity remains visible and interactive.
+		* For example, navigating away from an email before you send it triggers a
+		* "Draft saved" toast to let you know that you can continue editing later.
+		* Toasts automatically disappear after a timeout, and do not handle any user interaction.
+		*
+		* \param message The message in the toast.
+		* \param duration One of the next constants:
+		* - #MA_TOAST_DURATION_SHORT
+		* - #MA_TOAST_DURATION_LONG
+		*/
+		int maToast(in MAString message, in int duration);
+
+		/**
 		* Together with the image picker event (\link EVENT_TYPE_IMAGE_PICKER IMAGE_PICKER \endlink),
 		* this specifies the type of encoding used for the image data returned.
 		*/
