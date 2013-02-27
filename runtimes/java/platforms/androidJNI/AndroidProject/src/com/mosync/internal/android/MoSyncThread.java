@@ -62,11 +62,14 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.LineNumberReader;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
+import java.nio.charset.Charset;
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.Locale;
@@ -135,11 +138,7 @@ import com.mosync.nativeui.util.AsyncWait;
  */
 public class MoSyncThread extends Thread implements MoSyncContext
 {
-	// When this class is loaded we load the native library.
-	static
-	{
-		System.loadLibrary("mosync");
-	}
+	private static boolean usesLibs;
 
 	/**
 	 * Global reference to the single instance of this class.
@@ -161,6 +160,8 @@ public class MoSyncThread extends Thread implements MoSyncContext
 		int placeholder);
 	public native ByteBuffer nativeLoadCombined(ByteBuffer combined);
 	public native void nativeRun();
+	public native void nativeRun2();
+	public native ByteBuffer nativeGetMemorySlice(int addr, int len);
 	public native void nativePostEvent(int[] eventBuffer);
 	public native int nativeGetEventQueueSize();
 	public native int nativeCreateBinaryResource(
@@ -200,6 +201,8 @@ public class MoSyncThread extends Thread implements MoSyncContext
 
 	static final String PROGRAM_FILE = "program.mp3";
 	static final String RESOURCE_FILE = "resources.mp3";
+
+	static boolean loadedNativeLibs = false;
 
 	/**
 	 * Chunk size used when loading resources.
@@ -344,6 +347,7 @@ public class MoSyncThread extends Thread implements MoSyncContext
 	public MoSyncThread(Context context, Handler handler) throws Exception
 	{
 		mContext = (MoSync) context;
+		loadNativeLibraries(context);
 
 		// TODO: Clean this up! The static reference should be in one place.
 		// Now the instance of MoSyncThread is passed to many classes and
@@ -444,6 +448,21 @@ public class MoSyncThread extends Thread implements MoSyncContext
 		nativeInitRuntime();
 	}
 
+	private synchronized void loadNativeLibraries(Context context) {
+		try {
+			InputStream depsList = context.getAssets().open("deps.lst");
+			LineNumberReader reader = new LineNumberReader(new InputStreamReader(depsList, Charset.forName("UTF-8")));
+			for (String line = reader.readLine(); line != null; line = reader.readLine()) {
+				if (line.length() > 0) {
+					System.loadLibrary(line.trim());
+				}
+			}
+			usesLibs = true;
+		} catch (Exception e) {
+			// The native runtime
+			System.loadLibrary("mosync");
+		}
+	}
 	public static MoSyncThread getInstance()
 	{
 		return sMoSyncThread;
@@ -623,11 +642,15 @@ public class MoSyncThread extends Thread implements MoSyncContext
 	 */
 	public synchronized ByteBuffer getMemorySlice(int addr, int len)
 	{
-		mMemDataSection.position(addr);
-		ByteBuffer slice = mMemDataSection.slice();
-		if(-1 != len)
-			slice.limit(len);
-		return slice;
+		if (usesLibs) {
+			return nativeGetMemorySlice(addr, len);
+		} else {
+			mMemDataSection.position(addr);
+			ByteBuffer slice = mMemDataSection.slice();
+			if(-1 != len)
+				slice.limit(len);
+			return slice;
+		}
 	}
 
 	/**
@@ -1069,14 +1092,18 @@ public class MoSyncThread extends Thread implements MoSyncContext
 		//Log.i("MoSync Thread", "run");
 
 		// Load the program.
-		if (false == loadProgram())
+		if (false == loadProgram() && !usesLibs)
 		{
 			logError("load program failed!!");
 			return;
 		}
 
 		// Run program. This enters a while loop in C-code.
-		nativeRun();
+		if (usesLibs) {
+			nativeRun2();
+		} else {
+			nativeRun();
+		}
 	}
 
 	public static void logError(String message , Throwable t)
