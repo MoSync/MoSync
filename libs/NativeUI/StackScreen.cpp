@@ -138,7 +138,8 @@ namespace NativeUI
     }
 
     /**
-     * Get a child screen widget of this widget.
+     * Get a child screen widget of this widget. Overrides 'Widget' class
+     * 'getChild' method.
      * @param index The index of the child.
      * @return The child screen widget at the given index, or null if the
      * index is invalid.
