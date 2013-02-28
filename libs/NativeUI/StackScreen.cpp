@@ -138,6 +138,39 @@ namespace NativeUI
     }
 
     /**
+     * Get a child screen widget of this widget.
+     * @param index The index of the child.
+     * @return The child screen widget at the given index, or null if the
+     * index is invalid.
+     * The ownership of the result is not passed to the caller.
+     */
+    Widget* StackScreen::getChild(const int index) const
+    {
+        if (0 > index || index > mStack.size())
+        {
+            return NULL;
+        }
+
+        return mStack[index];
+    }
+
+    /**
+     * Get a child screen widget of this widget.
+     * @param index The index of the screen.
+     * @return The screen widget at the given index.
+     * The ownership of the result is not passed to the caller.
+     */
+    Screen* StackScreen::getScreen(const int index) const
+    {
+        if (0 > index || index > mStack.size())
+        {
+            return NULL;
+        }
+
+        return mStack[index];
+    }
+
+    /**
      * Add an stack screen event listener.
      * @param listener The listener that will receive stack screen events.
      */
