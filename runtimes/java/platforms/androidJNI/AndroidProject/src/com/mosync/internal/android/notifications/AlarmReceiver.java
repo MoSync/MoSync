@@ -52,20 +52,24 @@ public class AlarmReceiver  extends BroadcastReceiver{
 					LocalNotificationsService.LOCAL_NOTIFICATION_ID,
 					LocalNotificationsService.LOCAL_NOTIFICATION_ID_DEFAULT);
 
-			String notificationTitle = extras.getString(
-					MA_NOTIFICATION_LOCAL_CONTENT_TITLE, "");
+			String notificationTitle = "";
+			notificationTitle = extras.getString(
+					MA_NOTIFICATION_LOCAL_CONTENT_TITLE);
 
-			String notificationBody = extras.getString(
-					MA_NOTIFICATION_LOCAL_CONTENT_BODY, "");
+			String notificationBody = "";
+			notificationBody = extras.getString(
+					MA_NOTIFICATION_LOCAL_CONTENT_BODY);
 
-			String notificationTicker = extras.getString(
-					MA_NOTIFICATION_LOCAL_TICKER_TEXT, "");
+			String notificationTicker = "";
+			notificationTicker = extras.getString(
+					MA_NOTIFICATION_LOCAL_TICKER_TEXT);
 
 			Boolean notificationPlaySound = extras.getBoolean(
 					MA_NOTIFICATION_LOCAL_PLAY_SOUND, false);
 
-			String notificationSoundPath = extras.getString(
-					MA_NOTIFICATION_LOCAL_SOUND_PATH, "");
+			String notificationSoundPath = "";
+			notificationSoundPath = extras.getString(
+					MA_NOTIFICATION_LOCAL_SOUND_PATH);
 
 			Boolean notificationVibrate = extras.getBoolean(
 					MA_NOTIFICATION_LOCAL_VIBRATE, false);
@@ -76,8 +80,9 @@ public class AlarmReceiver  extends BroadcastReceiver{
 			Boolean notificationFlash = extras.getBoolean(
 					MA_NOTIFICATION_LOCAL_FLASH_LIGHTS, false);
 
-			String notificationFlashPattern = extras.getString(
-					MA_NOTIFICATION_LOCAL_FLASH_LIGHTS_PATTERN, "");
+			String notificationFlashPattern = "";
+			notificationFlashPattern = extras.getString(
+					MA_NOTIFICATION_LOCAL_FLASH_LIGHTS_PATTERN);
 
 			int notificationFlag = extras.getInt(
 					MA_NOTIFICATION_LOCAL_FLAG, 0);
