@@ -91,6 +91,7 @@
 	float navBarHeight = navigationController.toolbar.bounds.size.height;
 	float viewHeight = self.height - navBarHeight;
     child.size = CGSizeMake(self.width, viewHeight);
+    [child layout];
 	[child show];
 }
 
