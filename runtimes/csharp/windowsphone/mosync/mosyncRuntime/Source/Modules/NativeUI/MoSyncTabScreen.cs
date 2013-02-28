@@ -190,6 +190,28 @@ namespace MoSync
                     return mPivot.SelectedIndex;
                 }
             }
+
+            /**
+             * Handles the back button pressed event.
+             * @return true if the event has been consumed, false otherwise.
+             */
+            public override bool HandleBackButtonPressed()
+            {
+                Microsoft.Phone.Controls.Pivot pivot = this.mPivot;
+                //If the selected tab is a StackScreen.
+                if (this.mChildren[pivot.SelectedIndex] is StackScreen)
+                {
+                    //If pop is possible.
+                    if ((this.mChildren[pivot.SelectedIndex] as StackScreen).StackCount() > 1 && (this.mChildren[pivot.SelectedIndex] as StackScreen).GetBackButtonEnabled() == true)
+                    {
+                        //Do a pop and cancel the event.
+                        (this.mChildren[pivot.SelectedIndex] as StackScreen).PopFromBackButtonPressed();
+                        return true;
+                    }
+                }
+
+                return false;
+            }
         }
     }
 }

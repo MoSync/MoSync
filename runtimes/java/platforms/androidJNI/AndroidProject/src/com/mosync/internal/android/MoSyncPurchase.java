@@ -58,6 +58,8 @@ public class MoSyncPurchase
 				{
 					SYSLOG("PurchaseManager is available, android sdk version > 4");
 					mPurchaseManager = new PurchaseManager(thread);
+					// Bind the service.
+					mPurchaseManager.bindService();
 				}
 			}
 			catch(PropertyConversionException pce )

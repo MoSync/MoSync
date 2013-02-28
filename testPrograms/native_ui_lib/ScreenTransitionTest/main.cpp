@@ -68,10 +68,6 @@ namespace ScreenTransitionTest
 				{
 					mController->handleAndroidBackButton();
 				}
-				else
-				{
-					close();
-				}
 			}
 		}
 
