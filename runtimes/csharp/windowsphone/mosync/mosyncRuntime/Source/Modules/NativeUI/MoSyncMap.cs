@@ -60,6 +60,8 @@ namespace MoSync
             // used to center the map on an area described by the upper left corner and the lower right corner
             System.Device.Location.GeoCoordinate mVisibleAreaLowerRightCorner;
 
+            private CredentialsProvider mCredentialsProvider;
+
             /**
              * Constructor
              */
@@ -149,7 +151,8 @@ namespace MoSync
             {
                 set
                 {
-                    mBingMap.CredentialsProvider = new ApplicationIdCredentialsProvider(value);
+                    mCredentialsProvider = new ApplicationIdCredentialsProvider(value);
+                    mBingMap.CredentialsProvider = mCredentialsProvider;
                 }
             }
 
