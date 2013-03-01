@@ -55,6 +55,9 @@ namespace Wormhole
 		{
 			mSensorEventToManager[i] = false;
 		}
+
+		// Set default FileUtil object.
+		setFileUtil(new FileUtil());
 	}
 
 	/**
@@ -248,15 +251,15 @@ namespace Wormhole
 
 	void PhoneGapMessageHandler::sendConnectionType(MAUtil::String callbackID)
 	{
-		//currently we only send offline status to PhoneGap
 		char buffer[1024];
 		char networkType[256];
 		int netRes = maGetSystemProperty(
 			"mosync.network.type",
 			networkType,
 			256);
-		//if the property is not available set the result to unknown
-		if(netRes < 0 )
+
+		// If the property is not available set the result to "unknown".
+		if (netRes < 0 || netRes > 255)
 		{
 			sprintf(networkType, "unknown");
 		}
@@ -265,12 +268,11 @@ namespace Wormhole
 			sprintf(networkType, "3g");
 		}
 
-		//create the callback
+		// Send the callback result.
 		sprintf(
 			buffer,
 			"\\\"%s\\\"",
 			networkType);
-
 		callSuccess(
 			callbackID,
 			PHONEGAP_CALLBACK_STATUS_OK,

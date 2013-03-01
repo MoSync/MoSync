@@ -2798,7 +2798,7 @@ public class MoSyncThread extends Thread
 	 */
 	int maGetSystemProperty(String key, int buf, int size)
 	{
-		String property = "";
+		String property = null;
 
 		if (key.equals("mosync.imei"))
 		{
@@ -2866,20 +2866,18 @@ public class MoSyncThread extends Thread
 		}
 		else if (key.equals("mosync.network.type"))
 		{
-			//get the connection that we are using right now
-			NetworkInfo info = mConnectivityManager.getActiveNetworkInfo();
-			property = getNetworkNameFromInfo(info);
+			property = getSystemPropertyNetworkType();
 		}
 
+		// Check that we have a valid property string.
 		if (null == property) { return -2; }
-
-		if (0 == property.compareTo("")) { return -2; }
+		if (property.length() <= 0) { return -2; }
 
 		// If the buffer is not big enough to hold the
 		// property data, then return the length of
 		// the property. This tells the caller that
 		// the buffer was too small.
-		if (property.length() +1 > size)
+		if (property.length() + 1 > size)
 		{
 			return property.length() + 1;
 		}
@@ -2901,36 +2899,46 @@ public class MoSyncThread extends Thread
 	}
 
 	/**
-	 * converts the network information into a single string indicating
-	 * the type of the network.
+	 * Get the network connection type.
 	 *
-	 * @param info NetowrkInformation obtained from a ConnectivityManager instance
-	 * @return a String indicating the type of the connection, for Mobile networks
-	 * it returns the exact type of mobile network, e.g. GSM, GPRS, or HSDPA...
-	 * The result might contain the full name and version of the mobiel network type
+	 * @return a String indicating the type of the connection.
+	 * For Mobile networks it returns the exact type of mobile network,
+	 * e.g. GSM, GPRS, or HSDPA...
+	 * The result might contain the full name and version of the
+	 * mobile network type.
+	 * If there is no connectivity or network permissions are not set,
+	 * "none" is returned.
 	 */
-	private String getNetworkNameFromInfo(NetworkInfo info)
+	private String getSystemPropertyNetworkType()
 	{
-	       if (info != null) {
-	            String type = info.getTypeName();
-	            if(type == null)
-	            {
-					return "unknown";
-	            }
-	            else if (type.toLowerCase().equals("mobile"))
-	            {
-					//return a generic default
-					return "mobile";
-	            }
-	            else
-	            {
-					return "wifi";
-	            }
-	        }
-	        else
-	        {
-				return "none";
-	        }
+		if (PackageManager.PERMISSION_GRANTED !=
+			getActivity().checkCallingOrSelfPermission(
+				android.Manifest.permission.ACCESS_NETWORK_STATE))
+		{
+			return "none";
+		}
+
+		//get the connection that we are using right now
+		NetworkInfo info = mConnectivityManager.getActiveNetworkInfo();
+		if (info != null)
+		{
+			String type = info.getTypeName();
+			if (type == null)
+			{
+				return "unknown";
+			}
+			else if (type.toLowerCase().equals("mobile"))
+			{
+				//return a generic default
+				return "mobile";
+			}
+			else
+			{
+				return "wifi";
+			}
+		}
+
+		return "none";
 	}
 
 	/**

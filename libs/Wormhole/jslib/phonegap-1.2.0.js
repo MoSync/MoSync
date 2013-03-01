@@ -534,10 +534,15 @@ PhoneGap.onDeviceReady = new PhoneGap.Channel('onDeviceReady');
 // bug that caused onDeviceReady to fire too early.
 PhoneGap.deviceReadyChannelsArray = [
 	PhoneGap.onPhoneGapReady,
-	PhoneGap.onPhoneGapInfoReady,
+	//PhoneGap.onPhoneGapInfoReady,
 	PhoneGap.onPhoneGapConnectionReady,
 	PhoneGap.onNativeReady];
 
+// This is hack to overcome the problems with iOs6 devices, should be removed when that is fixed
+if(!mosync.isIOS)
+{
+  PhoneGap.deviceReadyChannelsArray.push(PhoneGap.onPhoneGapInfoReady);  
+}
 // Hashtable of user defined channels that must also fire before "deviceready" is fired
 PhoneGap.deviceReadyChannelsMap = {};
 
