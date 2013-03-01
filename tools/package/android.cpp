@@ -41,7 +41,7 @@ static void sign(const SETTINGS& s, const RuntimeInfo& ri, string& unsignedApk, 
 static void createSignCmd(ostringstream& cmd, string& keystore, string& alias, string& storepass, string& keypass, string& signedApk, string& unsignedApk, bool hidden);
 static void writeNFCResource(const SETTINGS& s, const RuntimeInfo& ri);
 static string packageNameToByteCodeName(const string& packageName);
-static string findNativeLibrary(const SETTINGS& s, string& name, string& arch);
+static string findNativeLibrary(const SETTINGS& s, vector<string>& modules, string& name, string& arch);
 
 class AndroidContext : public DefaultContext {
 private:
@@ -132,10 +132,21 @@ void packageAndroid(const SETTINGS& s, const RuntimeInfo& ri) {
 	getExtensions(s.extensions ? s.extensions : "", extensions);
 
 	// Extensions & modules.
-	vector<string> modules(extensions);
+	vector<string> modules;
+	map<string,string> initFuncs;
+
+	// Default modules; todo: externalize?
+	modules.push_back("mosync");
+	modules.push_back("mosynclib");
+	initFuncs["mosynclib"] = "resource_selector";
+
+	modules.insert(modules.end(), extensions.begin(), extensions.end());
+
 	modules.push_back(s.name);
+	initFuncs[string(s.name)] = "MAMain";
+
+	string assetDir = dstDir + "/assets";
 	if (s.extensions) {
-		string assetDir = dstDir + "/assets";
 		toDir(assetDir);
 		_mkdir(assetDir.c_str());
 
@@ -153,11 +164,19 @@ void packageAndroid(const SETTINGS& s, const RuntimeInfo& ri) {
 				extensionDex.append(" " + file(extLib));
 			}
 		}
+	}
+
+	if (!strcmp("native", s.outputType)) {
 		// Write list of modules
-		string moduleList = assetDir + "deps.lst";
+		string moduleList = assetDir + "startup.mf";
 		ofstream moduleListOut(moduleList.c_str());
 		for (size_t i = 0; i < modules.size(); i++) {
+			// Last one in list is the 'app' lib
 			moduleListOut << modules[i];
+			string initFunc = initFuncs[modules[i]];
+			if (!initFunc.empty()) {
+				moduleListOut << ":" << initFunc;
+			}
 			moduleListOut << "\n";
 		}
 		moduleListOut.flush();
@@ -206,7 +225,7 @@ void packageAndroid(const SETTINGS& s, const RuntimeInfo& ri) {
 	for (size_t i = 0; i < modules.size(); i++) {
 		string arch = "armeabi";
 		string module = modules[i];
-		string nativeLib = findNativeLibrary(s, module, arch);
+		string nativeLib = findNativeLibrary(s, modules, module, arch);
 		if (!nativeLib.empty()) {
 			string dstLibDir = addlib + "/" + arch + "/";
 			_mkdir(dstLibDir.c_str());
@@ -300,7 +319,7 @@ static void createSignCmd(ostringstream& cmd, string& keystore, string& alias, s
 		" "<<arg(alias);
 }
 
-static string findNativeLibrary(const SETTINGS& s, string& name, string& arch) {
+static string findNativeLibrary(const SETTINGS& s, vector<string>& modules, string& name, string& arch) {
 	vector<string> paths;
 
 	// 1. Look for the one built for this project, if any.
@@ -308,13 +327,11 @@ static string findNativeLibrary(const SETTINGS& s, string& name, string& arch) {
 	paths.push_back(projLibPath);
 
 	// 2. Look in the modules directory
-	vector<string> extensions;
-	getExtensions(s.extensions, extensions);
-	for (size_t i = 0; i < extensions.size(); i++) {
-		string extension = extensions[i];
-		string extensionDir = mosyncdir() + string("/modules/") + extension + string("/lib/Android/Debug/");
-		string extensionLibPath = extensionDir + arch;
-		paths.push_back(extensionLibPath);
+	for (size_t i = 0; i < modules.size(); i++) {
+		string module = modules[i];
+		string moduleDir = mosyncdir() + string("/modules/") + module + string("/lib/Android/Debug/");
+		string moduleLibPath = moduleDir + arch;
+		paths.push_back(moduleLibPath);
 	}
 
 	for (size_t i = 0; i < paths.size(); i++)  {

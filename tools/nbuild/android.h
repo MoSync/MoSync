@@ -1,8 +1,10 @@
 #include <map>
 #include <string>
 
+#include "args.h"
+
 using namespace std;
 
-int buildAndroidNative(map<string, string>& params);
-int generateMakefile(map<string, string>& params);
-int executeNdkBuild(map<string, string>& params);
+int buildAndroidNative(Arguments* args);
+int generateMakefile(Arguments* args);
+int executeNdkBuild(Arguments* args);

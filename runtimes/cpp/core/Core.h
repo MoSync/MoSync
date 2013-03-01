@@ -162,7 +162,7 @@ namespace Core {
 #ifndef _android
 	bool LoadVMApp(VMCore* core, const char* modfile, const char* resfile);
 #else
-	bool LoadVMApp(VMCore* core, int modFd, int resFd);
+	bool LoadVMApp(VMCore* core, int modFd, int resFd, bool isNative);
 #endif
 #endif
 	bool LoadVMApp(VMCore* core, Stream& stream, const char* combfile=0);

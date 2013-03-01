@@ -83,7 +83,8 @@ static jboolean nativeLoad(
 	jobject program,
 	jlong programOffset,
 	jobject resource,
-	jlong resourceOffset)
+	jlong resourceOffset,
+	jboolean isNative)
 {
 	SYSLOG("load program and resource");
 
@@ -174,7 +175,7 @@ static jboolean nativeLoad(
 
 	SYSLOG("MoSyncBridge.cpp: nativeLoad: Calling Core::LoadVMApp");
 
-	return Core::LoadVMApp(gCore, prgFd, resFd);
+	return Core::LoadVMApp(gCore, prgFd, resFd, (bool) isNative);
 }
 
 /**
@@ -253,6 +254,27 @@ static jobject nativeLoadCombined(JNIEnv* env, jobject jthis, jobject combined)
 	// do the thing
 
 	return gCore->mem_ds_jobject;
+}
+
+#include <dlfcn.h>
+
+typedef void (*MainFunction) ();
+
+static void nativeRun2(JNIEnv* env, jobject jthis, jstring jLibpath, jstring jMainFn) {
+	const char* libpath = env->GetStringUTFChars(jLibpath, NULL);
+	const char* mainFn = env->GetStringUTFChars(jMainFn, NULL);
+	MainFunction my_function;
+    void* handle = dlopen(libpath, RTLD_LAZY);
+    *(void**)(&my_function) = dlsym(handle, mainFn);
+    SYSLOG("Invoking %s for library %s", mainFn, libpath);
+    env->ReleaseStringUTFChars(jLibpath, libpath);
+    env->ReleaseStringUTFChars(jMainFn, mainFn);
+    if (my_function) {
+        // Execute!
+        (void) my_function();
+    } else {
+        maPanic(1, "Missing entry function!");
+    }
 }
 
 /**
@@ -712,18 +734,18 @@ int jniRegisterNativeMethods(
 
 // NOTE: Remember to update sNumJavaMethods when adding/removing
 // native methods!
-static jint sNumJavaMethods = 10;
+static jint sNumJavaMethods = 12;
 static JNINativeMethod sMethods[] =
 {
 	// name, signature, funcPtr
 	{ "nativeInitRuntime", "()Z", (void*)nativeInitRuntime },
-	{ "nativeLoad", "(Ljava/io/FileDescriptor;JLjava/io/FileDescriptor;J)Z", (void*)nativeLoad },
+	{ "nativeLoad", "(Ljava/io/FileDescriptor;JLjava/io/FileDescriptor;JZ)Z", (void*)nativeLoad },
 	{ "nativeLoadResource", "(Ljava/io/FileDescriptor;JII)Z", (void*)nativeLoadResource },
 	//{ "nativeLoadResource", "(Ljava/nio/ByteBuffer;)Z", (void*)nativeLoadResource },
 	{ "nativeLoadCombined", "(Ljava/nio/ByteBuffer;)Ljava/nio/ByteBuffer;", (void*)nativeLoadCombined },
 	{ "nativeRun", "()V", (void*)nativeRun },
 	{ "nativeGetMemorySlice", "(II)Ljava/nio/ByteBuffer;", (void*)nativeGetMemorySlice },
-	//{ "nativeRun2", "()V", (void*)nativeRun2 },
+	{ "nativeRun2", "(Ljava/lang/String;Ljava/lang/String;)V", (void*)nativeRun2 },
 	{ "nativePostEvent", "([I)V", (void*)nativePostEvent },
 	{ "nativeGetEventQueueSize", "()I", (void*)nativeGetEventQueueSize },
 	{ "nativeCreateBinaryResource", "(II)I", (void*)nativeCreateBinaryResource },
