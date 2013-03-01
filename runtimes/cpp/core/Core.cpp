@@ -663,13 +663,18 @@ public:
 		if(!mSyscall.loadResources(res, resfile))
 			return false;
 #else
-	bool LoadVMApp(int modFd, int resFd) {
+	bool LoadVMApp(int modFd, int resFd, bool isNative) {
 		InitVM();
 
 		FileStream mod(modFd);
 
 		if(!LoadVM(mod))
 			return false;
+
+		// MOSYNC NATIVE: JUST RESET THE MEM_DS:
+		if (isNative) {
+			mem_ds = 0;
+		}
 
 		//-2 means that the mosync application does not need any resources.
 		if(-2 != resFd)
@@ -854,7 +859,6 @@ public:
 			}
 
 			mem_ds = (int*)buffer;
-
 			mJniEnv->DeleteLocalRef(cls);
 			mJniEnv->DeleteLocalRef(byteBuffer);
 
@@ -1425,8 +1429,8 @@ bool LoadVMApp(VMCore* core, const char* modfile,const char* resfile) {
 	return CORE->LoadVMApp(modfile, resfile);
 }
 #else
-bool LoadVMApp(VMCore* core, int modFd, int resFd) {
-	return CORE->LoadVMApp(modFd, resFd);
+bool LoadVMApp(VMCore* core, int modFd, int resFd, bool isNative) {
+	return CORE->LoadVMApp(modFd, resFd, isNative);
 }
 #endif
 #endif

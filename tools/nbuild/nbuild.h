@@ -5,9 +5,11 @@
 #include <string>
 #include <map>
 
+#include "args.h"
+
 using namespace std;
 
-string require(map<string, string>& params, string key);
+string require(Arguments* args, string key);
 const char* mosyncdir();
 void sh(const char* cmd, bool hideOutput = false, const char* shownCmdLine = 0);
 

@@ -10,19 +10,24 @@
 
 using namespace std;
 
-int buildAndroidNative(map<string, string>& params) {
+int buildAndroidNative(Arguments* params) {
 	int result = generateMakefile(params);
-	if (params["--android-generate-makefile"].empty()) {
+	if (!params->isFlagSet("--android-generate-makefile")) {
 		result = executeNdkBuild(params);
 	}
 	return result;
 }
 
-int generateMakefile(map<string, string>& params) {
+int generateMakefile(Arguments* params) {
 	string outputDir = require(params, "--dst");
 
 	vector<string> modules;
-	split(modules, params["--modules"], ",");
+	split(modules, params->getSwitchValue("--modules"), ",");
+	if (modules.empty()) {
+		// Default
+		modules.push_back("mosync");
+		modules.push_back("mosynclib");
+	}
 
 	DefaultContext rootCtx(NULL);
 	for (size_t i = 0; i < modules.size(); i++) {
@@ -32,6 +37,9 @@ int generateMakefile(map<string, string>& params) {
 		rootCtx.addChild("modules", moduleCtx);
 	}
 	rootCtx.setParameter("source-files", require(params, "--source-files"));
+	vector<string> compilerDefines = params->getPrefixedList("-D", true);
+	rootCtx.setParameter("compiler-defines", delim(compilerDefines, " "));
+	rootCtx.setParameter("additional-compiler-switches", params->getSwitchValue("--compiler-switches"));
 
 	MustacheParser parser(true);
 	ProfileDB db;
@@ -57,7 +65,7 @@ int generateMakefile(map<string, string>& params) {
 }
 
 
-int executeNdkBuild(map<string, string>& params) {
+int executeNdkBuild(Arguments* params) {
 	string ndkbuildCmd = require(params, "--android-ndkbuild-cmd");
 	string projectPath = require(params, "--project");
 	string moduleName = require(params, "--name");
@@ -67,8 +75,8 @@ int executeNdkBuild(map<string, string>& params) {
 	toSlashes(outputDir);
 	string libVariant = require(params, "--lib-variant");
 	bool isDebug = libVariant == "debug";
-	bool isVerbose = !params["--verbose"].empty();
-	bool doClean = !params["--clean"].empty();
+	bool isVerbose = params->isFlagSet("--verbose");
+	bool doClean = params->isFlagSet("--clean");
 
 	ostringstream cmd;
 	cmd << file(ndkbuildCmd) << " ";
@@ -91,8 +99,10 @@ int executeNdkBuild(map<string, string>& params) {
 	cmd << arg("APP_BUILD_SCRIPT=" + makeFile) << " ";
 	cmd << arg("MOSYNC_CONFIG=" + configName) << " ";
 	cmd << arg("MOSYNC_MODULE_NAME=" + moduleName) << " ";
-	cmd << arg("MOSYNC_PLATFORM=" + params["--platform"]) << " ";
-	cmd << arg("MOSYNC_LIB_VARIANT=" + libVariant);
+	cmd << arg("MOSYNC_PLATFORM=" + params->getSwitchValue("--platform")) << " ";
+	cmd << arg("MOSYNC_LIB_VARIANT=" + libVariant) << " ";
+	cmd << arg("NDK_PROJECT_PATH=.") << " ";
+	cmd << arg("APP_PLATFORM=android-14");
 
 	sh(cmd.str().c_str(), !isVerbose);
 

@@ -41,6 +41,7 @@ static void sign(const SETTINGS& s, const RuntimeInfo& ri, string& unsignedApk, 
 static void createSignCmd(ostringstream& cmd, string& keystore, string& alias, string& storepass, string& keypass, string& signedApk, string& unsignedApk, bool hidden);
 static void writeNFCResource(const SETTINGS& s, const RuntimeInfo& ri);
 static string packageNameToByteCodeName(const string& packageName);
+static string findNativeLibrary(const SETTINGS& s, vector<string>& modules, string& name, string& arch);
 
 class AndroidContext : public DefaultContext {
 private:
@@ -117,6 +118,64 @@ void packageAndroid(const SETTINGS& s, const RuntimeInfo& ri) {
 		writeNFCResource(s, ri);
 	}
 
+	string extensionDex;
+	string extensionRes;
+
+	vector<string> extensions;
+	getExtensions(s.extensions ? s.extensions : "", extensions);
+
+	// Extensions & modules.
+	vector<string> modules;
+	map<string,string> initFuncs;
+
+	// Default modules; todo: externalize?
+	modules.push_back("mosync");
+	modules.push_back("mosynclib");
+	initFuncs["mosynclib"] = "resource_selector";
+
+	modules.insert(modules.end(), extensions.begin(), extensions.end());
+
+	modules.push_back(s.name);
+	initFuncs[string(s.name)] = "MAMain";
+
+	string assetDir = dstDir + "/assets";
+	if (s.extensions) {
+		toDir(assetDir);
+		_mkdir(assetDir.c_str());
+
+		extensionRes.append(" -A " + file(assetDir));
+
+		for (size_t i = 0; i < extensions.size(); i++) {
+			string extension = trim(extensions[i]);
+			string extensionDir = mosyncdir() + string("/modules/") + extension + string("/Android/");
+			string extManifestDir = extensionDir + "assets/";
+			string assetDst = assetDir + extension + ".xml";
+			string assetSrc = extManifestDir + extension + ".xml";
+			if (existsFile(assetSrc.c_str())) {
+				copyFile(assetDst.c_str(), assetSrc.c_str());
+				string extLib = extensionDir + extension + ".jar";
+				extensionDex.append(" " + file(extLib));
+			}
+		}
+	}
+
+	if (!strcmp("native", s.outputType)) {
+		// Write list of modules
+		string moduleList = assetDir + "startup.mf";
+		ofstream moduleListOut(moduleList.c_str());
+		for (size_t i = 0; i < modules.size(); i++) {
+			// Last one in list is the 'app' lib
+			moduleListOut << modules[i];
+			string initFunc = initFuncs[modules[i]];
+			if (!initFunc.empty()) {
+				moduleListOut << ":" << initFunc;
+			}
+			moduleListOut << "\n";
+		}
+		moduleListOut.flush();
+		moduleListOut.close();
+	}
+
 	string mainXml = layout + "/main.xml";
 	writeMain(mainXml.c_str(), s, ri);
 	string stringsXml = values + "/strings.xml";
@@ -154,6 +213,18 @@ void packageAndroid(const SETTINGS& s, const RuntimeInfo& ri) {
 	string armeabiSo = armeabi + "/libmosync.so";
 	remove(armeabiSo.c_str());
 	renameFile(armeabiSo, classesSo);
+
+	for (size_t i = 0; i < modules.size(); i++) {
+		string arch = "armeabi";
+		string module = modules[i];
+		string nativeLib = findNativeLibrary(s, modules, module, arch);
+		if (!nativeLib.empty()) {
+			string dstLibDir = addlib + "/" + arch + "/";
+			_mkdir(dstLibDir.c_str());
+			string dstLib = dstLibDir + "lib" + module + ".so";
+			copyFile(dstLib.c_str(), nativeLib.c_str());
+		}
+	}
 
 	// run android/dx.jar
 	string classesDex = classes + "/classes.dex";
@@ -237,6 +308,34 @@ static void createSignCmd(ostringstream& cmd, string& keystore, string& alias, s
 		" -signedjar "<<file(signedApk)<<
 		" "<<file(unsignedApk)<<
 		" "<<arg(alias);
+}
+
+static string findNativeLibrary(const SETTINGS& s, vector<string>& modules, string& name, string& arch) {
+	vector<string> paths;
+
+	// 1. Look for the one built for this project, if any.
+	string projLibPath = string(s.dst) + "/../libs/" + arch;
+	paths.push_back(projLibPath);
+
+	// 2. Look in the modules directory
+	for (size_t i = 0; i < modules.size(); i++) {
+		string module = modules[i];
+		string moduleDir = mosyncdir() + string("/modules/") + module + string("/lib/Android/Debug/");
+		string moduleLibPath = moduleDir + arch;
+		paths.push_back(moduleLibPath);
+	}
+
+	for (size_t i = 0; i < paths.size(); i++)  {
+		string path = paths[i];
+		toDir(path);
+		string potentialMatch = path + "lib" + name + ".so";
+		printf("LOOKING IN PATH %s FOR %s\n", path.c_str(), potentialMatch.c_str());
+		if (existsFile(potentialMatch.c_str())) {
+			printf("FOUND!\n");
+			return potentialMatch;
+		}
+	}
+	return "";
 }
 
 static void injectIcons(const SETTINGS& s, const RuntimeInfo& ri) {
