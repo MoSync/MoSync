@@ -383,21 +383,24 @@ namespace Wormhole
 		}
 	}
 
+	/*
+	 * Tells the JavaScript-side of Cordova that it should pause
+	 */
 	void PhoneGapMessageHandler::focusLost()
 	{
-		//let the phoneGap app know that it should go to sleep
 		callJS("try{cordova.fireDocumentEvent('pause');}catch(e){console.log('exception firing pause event from native');}");
 	}
 
+	/*
+	 * Tells the JavaScript-side of Cordova that it should resume
+	 */
 	void PhoneGapMessageHandler::focusGained()
 	{
-		lprintfln("focusGained");
-		//let the PhoneGap side know that it should resume
 		callJS("try{cordova.fireDocumentEvent('resume');}catch(e){console.log('exception firing resume event from native');}");
 	}
 
 	/**
-	 * Receives sensor events and forwards them to PhoneGap
+	 * Receives sensor events and forwards them to Cordova
 	 *
 	 * @param sensorData sensor number and data (See sensor API for more info)
 	 */
@@ -421,7 +424,7 @@ namespace Wormhole
 	}
 
 	/**
-	 * Call the PhoneGap success function.
+	 * Call the Cordova JavaScript success function.
 	 *
 	 * @param callbackID The id of the JS callback function.
 	 * @param status Status code.
@@ -449,7 +452,7 @@ namespace Wormhole
 	}
 
 	/**
-	 * Call the PhoneGap error function.
+	 * Call the Cordova JavaScript error function.
 	 *
 	 * @param callbackID The id of the JS callback function.
 	 * @param errorCode The error code.
@@ -465,7 +468,7 @@ namespace Wormhole
 	{
 		// Use string "error" if there is
 		// no error message.
-		// TODO: Does PhoneGap use this param?
+		// TODO: Does Cordova use this param?
 		String err = errorMessage;
 		if (0 == err.size())
 		{
@@ -538,7 +541,7 @@ namespace Wormhole
 	 * Set the target class for sensor event messages.
 	 * @param sensor The sensor that is configured.
 	 * @param toSensorManager If true, the SensorManager object will
-	 * receive the events, normal PhoneGap API if false.
+	 * receive the events, normal Cordova API if false.
 	 */
 	void PhoneGapMessageHandler::setSensorEventTarget(int sensor, bool toSensorManager)
 	{

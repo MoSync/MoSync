@@ -78,13 +78,13 @@ namespace Wormhole
 		// GeoLocation request from PhoneGap
 		else if (message.getParam("service") == "GeoLocation")
 		{
-			if (message.getParam("action") == "watchPosition")
+			if (message.getParam("action") == "addWatch")
 			{
 				processLocationRequest(
 					message.getParam("PhoneGapCallBackId"),
 					true);
 			}
-			else if (message.getParam("action") == "getCurrentPosition")
+			else if (message.getParam("action") == "getLocation")
 			{
 				processLocationRequest(
 					message.getParam("PhoneGapCallBackId"),
