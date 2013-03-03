@@ -198,10 +198,7 @@ static NotificationManager *sharedInstance = nil;
         }
 
         // Notification fire date must be in GMT + 0:00 format(system time).
-        // Received date is using local time.
         double seconds = [value doubleValue];
-        NSTimeZone* localTimeZone = [NSTimeZone localTimeZone];
-        seconds -= [localTimeZone secondsFromGMT];
         NSDate* date = [NSDate dateWithTimeIntervalSince1970:seconds];
         notification.fireDate = date;
     }
