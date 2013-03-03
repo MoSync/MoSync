@@ -248,7 +248,7 @@ static NSString* kReuseIdentifier = @"Cell";
  */
 - (int)addChild:(IWidget*)child
 {
-    if (_children.count ==0 )
+    if (_children.count == 0 )
     {
         [super addChild:child toSubview:YES];
     }
@@ -437,6 +437,11 @@ static NSString* kReuseIdentifier = @"Cell";
     {
         IWidget* child = [_children objectAtIndex:0];
         size = child.size;
+		if (child.autoSizeWidth == WidgetAutoSizeFillParent)
+		{
+			size.width = self.width;
+			child.width = self.width;
+		}
     }
     else if (self.autoSizeHeight != WidgetAutoSizeFixed)
     {
