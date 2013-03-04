@@ -61,12 +61,17 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.LineNumberReader;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Locale;
 import java.util.TimeZone;
@@ -134,11 +139,7 @@ import com.mosync.nativeui.util.properties.PropertyConversionException;
  */
 public class MoSyncThread extends Thread
 {
-	// When this class is loaded we load the native library.
-	static
-	{
-		System.loadLibrary("mosync");
-	}
+	private static boolean isNative = false;
 
 	/**
 	 * Global reference to the single instance of this class.
@@ -151,7 +152,8 @@ public class MoSyncThread extends Thread
 		FileDescriptor program,
 		long programOffset,
 		FileDescriptor resource,
-		long resourceOffset);
+		long resourceOffset,
+		boolean isNative);
 	//public native boolean nativeLoadResource(ByteBuffer resource);
 	public native boolean nativeLoadResource(
 		FileDescriptor resource,
@@ -160,6 +162,8 @@ public class MoSyncThread extends Thread
 		int placeholder);
 	public native ByteBuffer nativeLoadCombined(ByteBuffer combined);
 	public native void nativeRun();
+	public native void nativeRun2(String appLibPath, String mainFn);
+	public native ByteBuffer nativeGetMemorySlice(int addr, int len);
 	public native void nativePostEvent(int[] eventBuffer);
 	public native int nativeGetEventQueueSize();
 	public native int nativeCreateBinaryResource(
@@ -336,6 +340,12 @@ public class MoSyncThread extends Thread
 	 */
 	BroadcastReceiver mScreenActivatedReceiver = null;
 
+	String mNativeLibraryDir;
+
+	private HashMap<String, String> mAppLibPaths = new HashMap<String, String>();
+
+	private ArrayList<String> mDeferredModules = new ArrayList<String>();
+
 	/**
 	 * MoSyncThread constructor
 	 */
@@ -438,6 +448,31 @@ public class MoSyncThread extends Thread
 		mConnectivityManager = (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
 
 		nativeInitRuntime();
+	}
+
+	private synchronized void loadNativeLibraries(Context context) {
+		try {
+			InputStream depsList = context.getAssets().open("startup.mf");
+			LineNumberReader reader = new LineNumberReader(new InputStreamReader(depsList, Charset.forName("UTF-8")));
+			for (String line = reader.readLine(); line != null; line = reader.readLine()) {
+				if (line.length() > 0) {
+					String[] moduleAndInitFn = line.split(":", 2);
+					String module = moduleAndInitFn[0];
+					String initFn = moduleAndInitFn.length > 1 ? moduleAndInitFn[1] : null;
+					if (initFn != null) {
+						// Deferred init until nativeRun2 is executed.
+						mDeferredModules.add(module);
+						mAppLibPaths.put(module, initFn);
+					}
+					System.loadLibrary(module);
+				}
+			}
+			mNativeLibraryDir = context.getApplicationInfo().nativeLibraryDir;
+			isNative = true;
+		} catch (Exception e) {
+			// The native runtime
+			System.loadLibrary("mosync");
+		}
 	}
 
 	public static MoSyncThread getInstance()
@@ -619,11 +654,15 @@ public class MoSyncThread extends Thread
 	 */
 	public synchronized ByteBuffer getMemorySlice(int addr, int len)
 	{
-		mMemDataSection.position(addr);
-		ByteBuffer slice = mMemDataSection.slice();
-		if(-1 != len)
-			slice.limit(len);
-		return slice;
+		if (isNative) {
+			return nativeGetMemorySlice(addr, len);
+		} else {
+			mMemDataSection.position(addr);
+			ByteBuffer slice = mMemDataSection.slice();
+			if(-1 != len)
+				slice.limit(len);
+			return slice;
+		}
 	}
 
 	/**
@@ -728,7 +767,7 @@ public class MoSyncThread extends Thread
 			// created and if there are any resources they will be loaded.
 			if (null != pFd)
 			{
-				if (false == nativeLoad(pFd, pFdOffset, rFd, mResourceOffset))
+				if (false == nativeLoad(pFd, pFdOffset, rFd, mResourceOffset, isNative))
 				{
 					logError("loadProgram - "
 						+ "ERROR Load program was unsuccesfull");
@@ -1065,14 +1104,25 @@ public class MoSyncThread extends Thread
 		//Log.i("MoSync Thread", "run");
 
 		// Load the program.
-		if (false == loadProgram())
+		if (false == loadProgram() && !isNative)
 		{
 			logError("load program failed!!");
 			return;
 		}
 
 		// Run program. This enters a while loop in C-code.
-		nativeRun();
+		if (isNative) {
+			for (String deferred : mDeferredModules) {
+				runInitFunction(deferred, mAppLibPaths.get(deferred));
+			}
+		} else {
+			nativeRun();
+		}
+	}
+
+	private void runInitFunction(String module, String initFn) {
+		String lib = mNativeLibraryDir + "/lib" + module + ".so";
+		nativeRun2(lib, initFn);
 	}
 
 	public static void logError(String message , Throwable t)
