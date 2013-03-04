@@ -128,22 +128,26 @@ void packageAndroid(const SETTINGS& s, const RuntimeInfo& ri) {
 	vector<string> modules;
 	map<string,string> initFuncs;
 
-	// Default modules; todo: externalize?
-	modules.push_back("mosync");
-	modules.push_back("mosynclib");
-	initFuncs["mosynclib"] = "resource_selector";
+	bool isNative = !strcmp("native", s.outputType);
 
-	modules.insert(modules.end(), extensions.begin(), extensions.end());
+	if (isNative) {
+		// Default modules; todo: externalize?
+		modules.push_back("mosync");
+		modules.push_back("mosynclib");
+		initFuncs["mosynclib"] = "resource_selector";
 
-	modules.push_back(s.name);
-	initFuncs[string(s.name)] = "MAMain";
+		modules.insert(modules.end(), extensions.begin(), extensions.end());
+
+		modules.push_back(s.name);
+		initFuncs[string(s.name)] = "MAMain";
+	}
 
 	string assetDir = dstDir + "/assets";
-	if (s.extensions) {
-		toDir(assetDir);
-		_mkdir(assetDir.c_str());
+	extensionRes.append(" -A " + file(assetDir));
+	toDir(assetDir);
+	_mkdir(assetDir.c_str());
 
-		extensionRes.append(" -A " + file(assetDir));
+	if (s.extensions) {
 
 		for (size_t i = 0; i < extensions.size(); i++) {
 			string extension = trim(extensions[i]);
@@ -159,7 +163,7 @@ void packageAndroid(const SETTINGS& s, const RuntimeInfo& ri) {
 		}
 	}
 
-	if (!strcmp("native", s.outputType)) {
+	if (isNative) {
 		// Write list of modules
 		string moduleList = assetDir + "startup.mf";
 		ofstream moduleListOut(moduleList.c_str());
@@ -223,6 +227,9 @@ void packageAndroid(const SETTINGS& s, const RuntimeInfo& ri) {
 			_mkdir(dstLibDir.c_str());
 			string dstLib = dstLibDir + "lib" + module + ".so";
 			copyFile(dstLib.c_str(), nativeLib.c_str());
+		} else {
+			printf("Could not find library %s!\n", module.c_str());
+			exit(1);
 		}
 	}
 
@@ -329,9 +336,7 @@ static string findNativeLibrary(const SETTINGS& s, vector<string>& modules, stri
 		string path = paths[i];
 		toDir(path);
 		string potentialMatch = path + "lib" + name + ".so";
-		printf("LOOKING IN PATH %s FOR %s\n", path.c_str(), potentialMatch.c_str());
 		if (existsFile(potentialMatch.c_str())) {
-			printf("FOUND!\n");
 			return potentialMatch;
 		}
 	}
