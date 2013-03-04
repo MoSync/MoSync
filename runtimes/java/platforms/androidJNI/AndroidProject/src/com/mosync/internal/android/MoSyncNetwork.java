@@ -1335,6 +1335,8 @@ public class MoSyncNetwork
 			HttpURLConnection httpConnection =
 				(HttpURLConnection) mUrlConnection;
 
+			httpConnection.setInstanceFollowRedirects(false);
+
 			switch (method)
 			{
 				case HTTP_GET:
