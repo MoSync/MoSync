@@ -122,7 +122,8 @@ void packageAndroid(const SETTINGS& s, const RuntimeInfo& ri) {
 	string extensionRes;
 
 	vector<string> extensions;
-	getExtensions(s.extensions ? s.extensions : "", extensions);
+	// Disabling extensions for a while
+	//getExtensions(s.extensions ? s.extensions : "", extensions);
 
 	// Extensions & modules.
 	vector<string> modules;
@@ -136,7 +137,7 @@ void packageAndroid(const SETTINGS& s, const RuntimeInfo& ri) {
 		modules.push_back("mosynclib");
 		initFuncs["mosynclib"] = "resource_selector";
 
-		modules.insert(modules.end(), extensions.begin(), extensions.end());
+		//modules.insert(modules.end(), extensions.begin(), extensions.end());
 
 		modules.push_back(s.name);
 		initFuncs[string(s.name)] = "MAMain";
@@ -147,8 +148,7 @@ void packageAndroid(const SETTINGS& s, const RuntimeInfo& ri) {
 	toDir(assetDir);
 	_mkdir(assetDir.c_str());
 
-	if (s.extensions) {
-
+	if (!extensions.empty()) {
 		for (size_t i = 0; i < extensions.size(); i++) {
 			string extension = trim(extensions[i]);
 			string extensionDir = mosyncdir() + string("/modules/") + extension + string("/Android/");
