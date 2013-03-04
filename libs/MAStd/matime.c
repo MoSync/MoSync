@@ -224,6 +224,7 @@ static void validate_structure(struct tm *tim_p)
 	}
 }
 
+#ifndef MOSYNC_NATIVE
 time_t mktime(struct tm *tim_p)
 {
 	time_t tim = 0;
@@ -274,3 +275,4 @@ time_t mktime(struct tm *tim_p)
 
 	return tim;
 }
+#endif

@@ -195,8 +195,10 @@
 //#include <signal.h>
 
 /* defined in stddef */
+#ifndef MOSYNC_NATIVE
 #ifdef MAPIP
 typedef long ptrdiff_t;
+#endif
 #endif
 
 #ifndef _PSTDINT_H_INCLUDED
@@ -626,9 +628,11 @@ typedef uint_least32_t uint_fast32_t;
   typedef stdint_intptr_glue3(uint,stdint_intptr_bits,_t) uintptr_t;
   typedef stdint_intptr_glue3( int,stdint_intptr_bits,_t)  intptr_t;
 # else
+#ifndef MOSYNC_NATIVE
 /* TODO -- This following is likely wrong for some platforms, and does
    nothing for the definition of uintptr_t. */
   typedef ptrdiff_t intptr_t;
+#endif
 # endif
 # define STDINT_H_UINTPTR_T_DEFINED
 #endif

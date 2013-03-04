@@ -19,6 +19,10 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 * \brief HashDict implementation
 */
 
+#ifdef MOSYNC_NATIVE
+#include <string.h>
+#endif
+
 #ifndef _SE_MSAB_MAUTIL_HASHDICT_H_
 #error Do not include this file directly.
 #endif
