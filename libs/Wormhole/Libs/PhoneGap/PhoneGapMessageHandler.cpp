@@ -26,6 +26,7 @@ MA 02110-1301, USA.
 #include <maapi.h>
 #include <mastdlib.h> // C string conversion functions
 #include <conprint.h>
+#include "../../Encoder.h"
 #include "PhoneGapMessageHandler.h"
 
 namespace Wormhole
@@ -54,6 +55,9 @@ namespace Wormhole
 		{
 			mSensorEventToManager[i] = false;
 		}
+
+		// Set default FileUtil object.
+		setFileUtil(new FileUtil());
 	}
 
 	/**
@@ -247,15 +251,15 @@ namespace Wormhole
 
 	void PhoneGapMessageHandler::sendConnectionType(MAUtil::String callbackID)
 	{
-		//currently we only send offline status to PhoneGap
 		char buffer[1024];
 		char networkType[256];
 		int netRes = maGetSystemProperty(
 			"mosync.network.type",
 			networkType,
 			256);
-		//if the property is not available set the result to unknown
-		if(netRes < 0 )
+
+		// If the property is not available set the result to "unknown".
+		if (netRes < 0 || netRes > 255)
 		{
 			sprintf(networkType, "unknown");
 		}
@@ -264,12 +268,11 @@ namespace Wormhole
 			sprintf(networkType, "3g");
 		}
 
-		//create the callback
+		// Send the callback result.
 		sprintf(
 			buffer,
 			"\\\"%s\\\"",
 			networkType);
-
 		callSuccess(
 			callbackID,
 			PHONEGAP_CALLBACK_STATUS_OK,
@@ -332,17 +335,17 @@ namespace Wormhole
 
 		// Send the result back to PhoneGap.
 		sprintf(buffer,
-			"\\'{"
-				"\"platform\":\"%s\","
-				"\"name\":\"%s\","
-				"\"uuid\":\"%s\","
-				"\"version\":\"%s\","
+			"{"
+				"\"platform\":%s,"
+				"\"name\":%s,"
+				"\"uuid\":%s,"
+				"\"version\":%s,"
 				"\"phonegap\":\"1.2.0\""
-			"}\\'",
-			deviceOS,
-			deviceName,
-			deviceUUID,
-			deviceOSVersion
+			"}",
+			Encoder::JSONStringify(deviceOS).c_str(),
+			Encoder::JSONStringify(deviceName).c_str(),
+			Encoder::JSONStringify(deviceUUID).c_str(),
+			Encoder::JSONStringify(deviceOSVersion).c_str()
 			);
 
 		callSuccess(

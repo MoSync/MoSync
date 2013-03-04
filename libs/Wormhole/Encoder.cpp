@@ -121,16 +121,18 @@ namespace Wormhole
 	String Encoder::JSONStringify(const char* str)
 	{
 		String jsonString = "\"";
-		int length = strlen(str);
+
 		char hexBuf[8];
 		hexBuf[0] = '\\';
-		hexBuf[1] = '\\';
-		hexBuf[2] = 'u';
+		hexBuf[1] = 'u';
+		hexBuf[2] = '0';
 		hexBuf[3] = '0';
-		hexBuf[4] = '0';
-		hexBuf[7] = 0;
+		hexBuf[6] = 0;
+
 		char strBuf[2];
 		strBuf[1] = 0;
+
+		int length = strlen(str);
 
 		for (int i = 0; i < length; ++i)
 		{
@@ -138,18 +140,19 @@ namespace Wormhole
 			String escaped = strBuf;
 			switch (str[i])
 			{
-				case '\r': escaped = "\\\\r"; break;
-				case '\n': escaped = "\\\\n"; break;
-				case '\\': escaped = "\\\\\\\\"; break;
-				case '/': escaped = "\\\\/"; break;
-				case '"': escaped = "\\\\\""; break;
-				case '\f': escaped = "\\\\f"; break;
-				case '\b': escaped = "\\\\b"; break;
-				case '\t': escaped = "\\\\t"; break;
+				case '\r': escaped = "\\r"; break;
+				case '\n': escaped = "\\n"; break;
+				case '\\': escaped = "\\\\"; break;
+				case '/': escaped = "\\/"; break;
+				case '"': escaped = "\\\""; break;
+				case '\'': escaped = "\\'"; break;
+				case '\f': escaped = "\\f"; break;
+				case '\b': escaped = "\\b"; break;
+				case '\t': escaped = "\\t"; break;
 				default:
 					if ((unsigned char) str[i] < 32)
 					{
-						CharToHex(str[i], hexBuf + 5);
+						CharToHex(str[i], hexBuf + 4);
 						escaped = hexBuf;
 					}
 					break;

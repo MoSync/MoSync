@@ -23,6 +23,7 @@ import static com.mosync.internal.generated.IX_WIDGET.MAW_LIST_VIEW_SECTION_TYPE
 import java.util.ArrayList;
 
 import android.app.Activity;
+import android.text.TextUtils;
 import android.util.Log;
 import android.widget.ListView;
 
@@ -458,7 +459,7 @@ public class ListViewSection extends Layout
 		// Check if header already exists.
 		if ( hasHeader() )
 		{
-			if ( !text.isEmpty() )
+			if ( !TextUtils.isEmpty(text) )
 			{
 				// Just update the header text.
 				setHeaderText(text);
@@ -495,7 +496,7 @@ public class ListViewSection extends Layout
 		// Check if header already exists.
 		if ( hasFooter() )
 		{
-			if ( !text.isEmpty() )
+			if ( !TextUtils.isEmpty(text) )
 			{
 				// Just update the footer text.
 				setFooterText(text);
@@ -557,7 +558,7 @@ public class ListViewSection extends Layout
 	 */
 	public void setFooterText(final String text)
 	{
-		if ( text.isEmpty() )
+		if ( TextUtils.isEmpty(text) )
 		{
 			// Remove the footer row.
 			mHasFooter = false;
@@ -570,7 +571,17 @@ public class ListViewSection extends Layout
 		}
 		else
 		{
-			// Just update the footer text,supopsing it was not previously removed.
+			// Add a footer row if it was previously removed.
+			if (!mHasFooter)
+			{
+				mHasFooter = true;
+				addSectionFooter();
+				// Notify list adapter.
+				if (mAdapterListener != null)
+					mAdapterListener.itemAdded(
+							mItems.get(mItems.size()-1), this, mItems.size()-1);
+			}
+
 			mItems.get(mItems.size()-1).setProperty(
 					IX_WIDGET.MAW_LIST_VIEW_ITEM_TEXT, text);
 		}

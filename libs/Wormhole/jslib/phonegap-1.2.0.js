@@ -170,7 +170,7 @@ PhoneGap.CallbackSuccess = function(callbackId, args, cast)
                 }
             }
             catch (e) {
-                console.log("Error in success callback: "+callbackId+" = " + e.message);
+                console.log("Error in success callback with id: "+callbackId+": " + e.message);
             }
         }
 
@@ -534,10 +534,15 @@ PhoneGap.onDeviceReady = new PhoneGap.Channel('onDeviceReady');
 // bug that caused onDeviceReady to fire too early.
 PhoneGap.deviceReadyChannelsArray = [
 	PhoneGap.onPhoneGapReady,
-	PhoneGap.onPhoneGapInfoReady,
+	//PhoneGap.onPhoneGapInfoReady,
 	PhoneGap.onPhoneGapConnectionReady,
 	PhoneGap.onNativeReady];
 
+// This is hack to overcome the problems with iOs6 devices, should be removed when that is fixed
+if(!mosync.isIOS)
+{
+  PhoneGap.deviceReadyChannelsArray.push(PhoneGap.onPhoneGapInfoReady);
+}
 // Hashtable of user defined channels that must also fire before "deviceready" is fired
 PhoneGap.deviceReadyChannelsMap = {};
 
@@ -1835,8 +1840,11 @@ var Device = function() {
     var me = this;
     this.getInfo(
         function (res) {
-            var info = JSON.parse(res);
-            console.log("GotDeviceInfo :: " + info.version);
+            // MOSYNC: We send in device info as an object,
+            // it is already parsed.
+            //var info = JSON.parse(res); // Line kept for reference.
+            var info = res;
+            console.log("GotDeviceInfo: " + info.version);
             me.available = true;
             me.platform = info.platform;
             me.version = info.version;

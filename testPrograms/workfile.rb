@@ -16,6 +16,7 @@ work.instance_eval do
 	@EXTRA_INCLUDES = ['.']
 	@LIBRARIES = ['mautil', 'mtxml']
 	@EXTRA_LINKFLAGS = ' -datasize=1024000 -heapsize=386000 -stacksize=64000'
+	@PACK_PARAMETERS = ' --s60v3uid E1234512 --debug --permissions "Internet Access"'
 end
 
 work.invoke

@@ -56,6 +56,10 @@
             self.parent)
         {
             viewHeight = [child sizeThatFitsForWidget].height;
+			if (viewHeight > self.height)
+			{
+				viewHeight = self.height;
+			}
         }
 
         switch (child.autoSizeWidth)
@@ -66,11 +70,19 @@
             case WidgetAutoSizeWrapContent:
                 viewWidth = [child sizeThatFitsForWidget].width;
                 countWidth += viewWidth;
+
+                // If width of the children excedes the available width force the child to fill the available space.
+                if ( countWidth > (self.width - totalHorizontalMargin) )
+                {
+                    countWidth -= viewWidth;
+                    [fillParentWidgets addObject:child];
+                }
                 break;
             case WidgetAutoSizeFixed:
                 countWidth += viewWidth;
                 break;
         }
+
         child.size = CGSizeMake(viewWidth, viewHeight);
     }
 
@@ -95,13 +107,16 @@
  */
 - (CGSize)sizeThatFitsForWidget
 {
-    float countWidth = 0.0;
+    AbstractLayoutView* alv = (AbstractLayoutView*)self.view;
+    float countWidth = ([alv getLeftMargin] + [alv getRightMargin]); //Add horizontal padding.
     float maxHeight = 0.0;
+
     for (IWidget* child in _children)
     {
         countWidth += child.width;
         maxHeight = MAX(maxHeight, child.height);
     }
+    maxHeight += ([alv getTopMargin] + [alv getBottomMargin]); //Add vertical padding.
     return CGSizeMake(countWidth, maxHeight);
 }
 

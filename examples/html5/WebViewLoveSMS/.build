@@ -5,4 +5,5 @@
 <buildStep type="compile"/>
 <buildStep type="link"/>
 <buildStep type="pack"/>
+<buildStep type="copy.build.results"/>
 </buildSequence>

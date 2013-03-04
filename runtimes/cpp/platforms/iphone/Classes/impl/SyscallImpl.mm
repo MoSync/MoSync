@@ -258,8 +258,8 @@ namespace Base {
 
 	int gWidth, gHeight;
 
-	Surface* gBackbuffer;
-	Surface* gDrawTarget;
+	Surface* gBackbuffer = NULL;
+	Surface* gDrawTarget = NULL;
 	MAHandle gDrawTargetHandle = HANDLE_SCREEN;
 
 	unsigned char *gBackBufferData;
@@ -400,11 +400,7 @@ namespace Base {
 
 		InitializeCriticalSection(&exitMutex);
 
-		gBackbuffer = new Surface(gWidth, gHeight);
-		CGContextRestoreGState(gBackbuffer->context);
-		CGContextTranslateCTM(gBackbuffer->context, 0, gHeight);
-		CGContextScaleCTM(gBackbuffer->context, 1.0, -1.0);
-		CGContextSaveGState(gBackbuffer->context);
+		gSyscall->createBackbuffer();
 
         //Construction of the default font names array
         CFStringEncoding enc=kCFStringEncodingMacRoman;
@@ -433,8 +429,6 @@ namespace Base {
                                         CFStringCreateWithCString(NULL, "Courier-Oblique",enc);
         gDefaultFontNames[FONT_MONOSPACE_INDEX|FONT_BOLD_INDEX|FONT_ITALIC_INDEX]=
                                         CFStringCreateWithCString(NULL, "Courier-BoldOblique",enc);
-
-        gDrawTarget = gBackbuffer;
 
         //Setting the initially selected font. "gHeight/40" was used originally, is kept for backwards compatibility
         MAHandle initFontHandle=maFontLoadDefault(INITIAL_FONT_TYPE,INITIAL_FONT_STYLE,gHeight/40);
@@ -495,6 +489,34 @@ namespace Base {
 			exit(0);
 		}
 		init();
+	}
+
+	void Syscall::deviceOrientationChanged()
+	{
+		if (isNativeUIEnabled())
+		{
+			return;
+		}
+
+		gSyscall->createBackbuffer();
+		maUpdateScreen();
+	}
+
+	void Syscall::createBackbuffer()
+	{
+		Surface* oldDrawTarget = gDrawTarget;
+		CGSize screenSize = [[ScreenOrientation getInstance] screenSize];
+		float width = screenSize.width;
+		float height = screenSize.height;
+
+		gBackbuffer = new Surface(width, height);
+		CGContextRestoreGState(gBackbuffer->context);
+		CGContextTranslateCTM(gBackbuffer->context, 0, height);
+		CGContextScaleCTM(gBackbuffer->context, 1.0, -1.0);
+		CGContextSaveGState(gBackbuffer->context);
+
+		gDrawTarget = gBackbuffer;
+		delete oldDrawTarget;
 	}
 
 	void Syscall::platformDestruct() {
@@ -755,16 +777,16 @@ namespace Base {
         //buffer must be large enough to hold the string
         //lenghtOfBytes does not include terminating '\0',
         //That's why we use less or equal
-        if(!fontName || bufferLength<=[fontName lengthOfBytesUsingEncoding:NSASCIIStringEncoding])
+        if(!fontName || bufferLength<=[fontName lengthOfBytesUsingEncoding:NSUTF8StringEncoding])
         {
             return RES_FONT_INSUFFICIENT_BUFFER;
         }
 
         //strncpy will also fill the rest of the buffer with '\0' characters
-        strncpy(buffer, [fontName cStringUsingEncoding:NSASCIIStringEncoding], bufferLength);
+        strncpy(buffer, [fontName cStringUsingEncoding:NSUTF8StringEncoding], bufferLength);
 
         //Increase by one for the terminating '\0'
-        return [fontName lengthOfBytesUsingEncoding:NSASCIIStringEncoding]+1;
+        return [fontName lengthOfBytesUsingEncoding:NSUTF8StringEncoding]+1;
     }
 
 
@@ -901,7 +923,10 @@ namespace Base {
 	}
 
 	SYSCALL(MAExtent, maGetScrSize()) {
-		return EXTENT(gWidth, gHeight);
+		CGSize size = [[ScreenOrientation getInstance] screenSize];
+		int width = (int) size.width;
+		int height = (int)size.height;
+		return EXTENT(width, height);
 	}
 
 	SYSCALL(void, maDrawImage(MAHandle image, int left, int top)) {
@@ -1185,7 +1210,7 @@ namespace Base {
 
     SYSCALL(int, maFileSetProperty(const char* path, int property, int value))
     {
-        NSURL *url = [NSURL fileURLWithPath:[NSString stringWithCString:path encoding:NSASCIIStringEncoding] isDirectory:NO];
+        NSURL *url = [NSURL fileURLWithPath:[NSString stringWithCString:path encoding:NSUTF8StringEncoding] isDirectory:NO];
         if(!url || ![[NSFileManager defaultManager] fileExistsAtPath:[url path]])
         {
             return MA_FERR_NOTFOUND;
@@ -1307,8 +1332,8 @@ namespace Base {
 
 		MFMessageComposeViewController *smsController = [[MFMessageComposeViewController alloc] init];
 
-		smsController.recipients = [NSArray arrayWithObject:[NSString stringWithCString:dst encoding:NSASCIIStringEncoding]];
-		smsController.body = [NSString stringWithCString:msg encoding:NSASCIIStringEncoding];
+		smsController.recipients = [NSArray arrayWithObject:[NSString stringWithCString:dst encoding:NSUTF8StringEncoding]];
+		smsController.body = [NSString stringWithCString:msg encoding:NSUTF8StringEncoding];
 
 		smsController.messageComposeDelegate = [[SMSResultDelegate alloc] init];
 
@@ -1421,30 +1446,30 @@ namespace Base {
 		} else if (strcmp(key, "mosync.path.local") == 0) {
 			NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
 			NSString *documentsDirectoryPath = [NSString stringWithFormat:@"%@/",[paths objectAtIndex:0]];
-			BOOL success = [documentsDirectoryPath getCString:buf maxLength:size encoding:NSASCIIStringEncoding];
+			BOOL success = [documentsDirectoryPath getCString:buf maxLength:size encoding:NSUTF8StringEncoding];
 			res = (success)?strlen(buf) + 1: -1;
 		} else if (strcmp(key, "mosync.path.local.urlPrefix") == 0) {
-			BOOL success = [@"file://localhost/" getCString:buf maxLength:size encoding:NSASCIIStringEncoding];
+			BOOL success = [@"file://localhost/" getCString:buf maxLength:size encoding:NSUTF8StringEncoding];
 			res = (success)?strlen(buf) + 1: -1;
 		} else if (strcmp(key, "mosync.device.name") == 0) {
-			BOOL success = [[[UIDevice currentDevice] name] getCString:buf maxLength:size encoding:NSASCIIStringEncoding];
+			BOOL success = [[[UIDevice currentDevice] name] getCString:buf maxLength:size encoding:NSUTF8StringEncoding];
 			res = (success)?strlen(buf) + 1: -1;
 		} else if (strcmp(key, "mosync.device.UUID")== 0) {
-			BOOL success = [[[UIDevice currentDevice] uniqueIdentifier] getCString:buf maxLength:size encoding:NSASCIIStringEncoding];
+			BOOL success = [[[UIDevice currentDevice] uniqueIdentifier] getCString:buf maxLength:size encoding:NSUTF8StringEncoding];
 			res = (success)?strlen(buf) + 1: -1;
 		} else if (strcmp(key, "mosync.device.OS")== 0) {
-			BOOL success = [[[UIDevice currentDevice] systemName] getCString:buf maxLength:size encoding:NSASCIIStringEncoding];
+			BOOL success = [[[UIDevice currentDevice] systemName] getCString:buf maxLength:size encoding:NSUTF8StringEncoding];
 			res = (success)?strlen(buf) + 1: -1;
 		} else if (strcmp(key, "mosync.device.OS.version") == 0) {
-			BOOL success = [[[UIDevice currentDevice] systemVersion] getCString:buf maxLength:size encoding:NSASCIIStringEncoding];
+			BOOL success = [[[UIDevice currentDevice] systemVersion] getCString:buf maxLength:size encoding:NSUTF8StringEncoding];
 			res = (success)?strlen(buf) + 1: -1;
 		} else if (strcmp(key, "mosync.device") == 0) {
 			size_t responseSz;
 			sysctlbyname("hw.machine", NULL, &responseSz, NULL, 0);
 			char *machine = (char*)malloc(responseSz);
 			sysctlbyname("hw.machine", machine, &responseSz, NULL, 0);
-			NSString *platform = [NSString stringWithCString:machine encoding:NSASCIIStringEncoding];
-			BOOL success = [platform getCString:buf maxLength:size encoding:NSASCIIStringEncoding];
+			NSString *platform = [NSString stringWithCString:machine encoding:NSUTF8StringEncoding];
+			BOOL success = [platform getCString:buf maxLength:size encoding:NSUTF8StringEncoding];
 			free(machine);
 			res = (success)?strlen(buf) + 1: -1;
 		} else if (strcmp(key, "mosync.network.type") == 0) {
@@ -1468,7 +1493,7 @@ namespace Base {
 					networkType = @"unknown";
 					break;
 			}
-			BOOL success = [networkType getCString:buf maxLength:size encoding:NSASCIIStringEncoding];
+			BOOL success = [networkType getCString:buf maxLength:size encoding:NSUTF8StringEncoding];
 			res = (success)?strlen(buf) + 1: -1;
 		}
 
@@ -2000,7 +2025,7 @@ namespace Base {
 				return -2;
 			}
 
-			[retval getCString:value maxLength:length encoding:NSASCIIStringEncoding]; //stores the cstring value of retval in value
+			[retval getCString:value maxLength:length encoding:NSUTF8StringEncoding]; //stores the cstring value of retval in value
 			[retval release];
 			[propertyString release];
 			[configurator release];

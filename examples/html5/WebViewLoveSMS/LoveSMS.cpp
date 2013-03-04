@@ -49,13 +49,16 @@ MA 02110-1301, USA.
  */
 
 #include <ma.h>						    // MoSync API (base API).
-#include <maheap.h>					    // C memory allocation functions.
+//#include <maheap.h>					    // C memory allocation functions.
 #include <mastring.h>				    // C String functions.
 #include <mavsprintf.h>				    // sprintf etc.
 #include <Wormhole/HybridMoblet.h>	    // Moblet for web applications.
+#include "MAHeaders.h" 					// Defines BEEP_WAV
 
+// Namespaces we want to access.
 using namespace MAUtil;
 using namespace Wormhole;
+
 
 /**
  * Set to true to actually send SMS.
@@ -76,12 +79,12 @@ public:
 		// show when the application starts.
 		showPage("index.html");
 
-		// Change this line to enableZoom to enable the
-		// user to zoom the web page. To disable zoom is
-		// one way of making web pages display in a
-		// reasonable default size on devices with
-		// different screen sizes.
-		getWebView()->disableZoom();
+		// Set the sound used by the PhoneGap beep notification API.
+		// BEEP_WAV is defined in file Resources/Resources.lst.
+		// Below we add our own beep message, to illustrate how to
+		// invoke custom C++ code from JavaScript. Do not confuse these
+		// two ways of playing a beep sound.
+		setBeepSound(BEEP_WAV);
 
 		// Register functions to handle messages sent from JavaScript.
 		addMessageFun(
@@ -114,7 +117,7 @@ public:
 	{
 		if (MAK_BACK == keyCode)
 		{
-			close();
+			exitEventLoop();
 		}
 	}
 

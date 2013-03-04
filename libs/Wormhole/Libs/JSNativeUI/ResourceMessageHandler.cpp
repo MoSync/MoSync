@@ -46,6 +46,9 @@ namespace Wormhole
 		// A new instance of ImageDownloader is created.
 		mImageDownloader = new ImageDownloader();
 		mImageDownloader->addDownloadListener(this);
+
+		// Set default FileUtil object.
+		setFileUtil(new FileUtil());
 	}
 
 	/**
@@ -144,6 +147,11 @@ namespace Wormhole
 	 */
 	MAHandle ResourceMessageHandler::loadImageResource(const char* imagePath)
 	{
+		if (!getFileUtil())
+		{
+			return 0;
+		}
+
 		// Get the current apllication directory path.
 		String appPath = getFileUtil()->getAppPath();
 

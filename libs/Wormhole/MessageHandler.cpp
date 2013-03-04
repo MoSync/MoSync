@@ -24,6 +24,7 @@ MA 02110-1301, USA.
  * messages from Wormhole (JavaScript).
  */
 
+#include <mastring.h>
 #include "CustomMoblet.h"
 #include "MessageHandler.h"
 #include "HybridMoblet.h"
@@ -78,9 +79,33 @@ void MessageHandler::initialize(Wormhole::HybridMoblet* moblet)
 	mResourceMessageHandler = new ResourceMessageHandler(webView);
 	mExtensionMessageHandler = new ExtensionMessageHandler(webView);
 
-	// Set the FileUtil object to use.
-	mPhoneGapMessageHandler->setFileUtil(moblet->getFileUtil());
-	mResourceMessageHandler->setFileUtil(moblet->getFileUtil());
+	// Set the FileUtil object to use...
+
+	// For the PhoneGapMessageHandler.
+	FileUtil* fileUtilPhoneGapHandler = mPhoneGapMessageHandler->getFileUtil();
+	if (fileUtilPhoneGapHandler != moblet->getFileUtil())
+	{
+		if (NULL != fileUtilPhoneGapHandler)
+		{
+			delete fileUtilPhoneGapHandler;
+		}
+		mPhoneGapMessageHandler->setFileUtil(moblet->getFileUtil());
+	}
+
+	// For the ResourceMessageHandler.
+	FileUtil* fileUtilResourceHandler = mResourceMessageHandler->getFileUtil();
+	if (fileUtilResourceHandler != moblet->getFileUtil())
+	{
+		if (NULL != fileUtilResourceHandler)
+		{
+			// Make sure it is not the same as the PhoneGapMessageHandler has.
+			if (fileUtilResourceHandler != fileUtilPhoneGapHandler)
+			{
+				delete fileUtilResourceHandler;
+			}
+			mResourceMessageHandler->setFileUtil(moblet->getFileUtil());
+		}
+	}
 }
 
 /**
@@ -345,6 +370,7 @@ void MessageHandler::handleMoSyncMessage(
 	Wormhole::HybridMoblet* moblet)
 {
 	const char* p = message.getNext();
+	const char* logMessage;
 
 	if (0 == strcmp(p, "ExitApplication"))
 	{
@@ -354,6 +380,11 @@ void MessageHandler::handleMoSyncMessage(
 	else if (0 == strcmp(p, "SendToBackground"))
 	{
 		maSendToBackground();
+	}
+	else if (0 == strcmp(p, "SysLog"))
+	{
+		logMessage = message.getNext();
+		maWriteLog(logMessage, strlen(logMessage));
 	}
 	else if (0 == strcmp(p, "ScreenSetOrientation"))
 	{
