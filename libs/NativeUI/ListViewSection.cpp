@@ -24,6 +24,7 @@ MA 02110-1301, USA.
  * ListViewItem objects.
  */
 
+#include <mavsprintf.h>
 #include "ListViewSection.h"
 #include "ListViewItem.h"
 

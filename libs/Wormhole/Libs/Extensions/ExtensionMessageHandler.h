@@ -38,6 +38,7 @@ MA 02110-1301, USA.
 #include <MAUtil/Vector.h>
 #include <MAUtil/HashMap.h>
 #include <MAUtil/String.h>
+#include <mavsprintf.h>
 #include "../../MessageStream.h"
 
 using namespace NativeUI; // WebView widget

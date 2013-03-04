@@ -18,6 +18,9 @@
 
 #include <maapi.h>
 #include <mastdlib.h> // C string conversion functions
+#include <mactype.h>
+#include <mastring.h>
+#include <mavsprintf.h>
 #include <MAUtil/Vector.h>
 #include <MAUtil/HashMap.h>
 #include <MAUtil/String.h>

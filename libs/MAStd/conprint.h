@@ -22,10 +22,24 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #ifndef _CONSOLE_H_
 #define _CONSOLE_H_
 
+#ifdef MOSYNC_NATIVE
+#include <stdio.h>
+#endif
+
 #include "ma.h"
 #include "maarg.h"
 #include "mastring.h"
 #include "mavsprintf.h"
+
+#ifndef MOSYNC_NATIVE
+#define con_printf printf
+#define con_puts puts
+#define con_wputs wputs
+#define con_vprintf vprintf
+#define con_wprintf wprintf
+#define con_wvprintf wvprintf
+#define con_putchar putchar
+#endif /* COMPAT_LEGACY_MOSYNC */
 
 #ifdef __cplusplus
 extern "C" {
@@ -51,8 +65,8 @@ void DisplayConsole(void);
 */
 
 void PrintConsole(const wchar * str);
-int puts(const char* str);
-int wputs(const wchar* str);
+int con_puts(const char* str);
+int con_wputs(const wchar* str);
 
 /** \brief Prints a formatted string to the console.
 * \param fmt A C string that may contain formatting
@@ -64,17 +78,17 @@ int wputs(const wchar* str);
 * \see InitConsole PrintConsole
 */
 
-int printf(const char *fmt, ...);
+int con_printf(const char *fmt, ...);
 
-int vprintf(const char *fmt, va_list args);
+int con_vprintf(const char *fmt, va_list args);
 
 #define _WSTDIO_DEFINED
 
-int wprintf(const wchar_t *fmt, ...);
+int con_wprintf(const wchar_t *fmt, ...);
 
-int wvprintf(const wchar_t *fmt, va_list args);
+int con_wvprintf(const wchar_t *fmt, va_list args);
 
-int putchar(int character);
+int con_putchar(int character);
 
 /** \brief The console text color.
 *

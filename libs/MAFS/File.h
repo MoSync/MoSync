@@ -62,9 +62,11 @@ extern "C" {
 struct MA_FILE_t;
 typedef struct MA_FILE_t MA_FILE;
 
+#ifndef MOSYNC_NATIVE
 #ifndef DONT_USE_TYPE_DEFINES
 //typedef unsigned int size_t;
 typedef unsigned int fpos_t;
+#endif
 #endif
 
 /**
