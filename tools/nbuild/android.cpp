@@ -19,10 +19,10 @@ int buildAndroidNative(Arguments* params) {
 }
 
 int generateMakefile(Arguments* params) {
-	string outputDir = require(params, "--dst");
+	string outputDir = require(params, OUTPUT_DIR);
 
 	vector<string> modules;
-	split(modules, params->getSwitchValue("--modules"), ",");
+	split(modules, params->getSwitchValue(MODULE_LIST), ",");
 	if (modules.empty()) {
 		// Default
 		modules.push_back("mosync");
@@ -36,8 +36,8 @@ int generateMakefile(Arguments* params) {
 		moduleCtx->setParameter("name", modules[i]);
 		rootCtx.addChild("modules", moduleCtx);
 	}
-	rootCtx.setParameter("source-files", require(params, "--source-files"));
-	vector<string> compilerDefines = params->getPrefixedList("-D", true);
+	rootCtx.setParameter("source-files", require(params, SOURCE_FILES));
+	vector<string> compilerDefines = params->getPrefixedList(MACRO_DEFINES, true);
 	rootCtx.setParameter("compiler-defines", delim(compilerDefines, " "));
 	rootCtx.setParameter("additional-compiler-switches", params->getSwitchValue("--compiler-switches"));
 
@@ -67,16 +67,16 @@ int generateMakefile(Arguments* params) {
 
 int executeNdkBuild(Arguments* params) {
 	string ndkbuildCmd = require(params, "--android-ndkbuild-cmd");
-	string projectPath = require(params, "--project");
-	string moduleName = require(params, "--name");
+	string projectPath = require(params, PROJECT_DIR);
+	string moduleName = require(params, NAME);
 	toSlashes(projectPath);
-	string configName = require(params, "--config");
-	string outputDir = require(params, "--dst");
+	string configName = require(params, CONFIGURATION);
+	string outputDir = require(params, OUTPUT_DIR);
 	toSlashes(outputDir);
-	string libVariant = require(params, "--lib-variant");
+	string libVariant = require(params, BINARY_TYPE);
 	bool isDebug = libVariant == "debug";
-	bool isVerbose = params->isFlagSet("--verbose");
-	bool doClean = params->isFlagSet("--clean");
+	bool isVerbose = params->isFlagSet(VERBOSE);
+	bool doClean = params->isFlagSet(CLEAN);
 
 	ostringstream cmd;
 	cmd << file(ndkbuildCmd) << " ";
