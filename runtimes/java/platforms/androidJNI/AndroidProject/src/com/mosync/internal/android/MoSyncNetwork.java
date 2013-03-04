@@ -1396,6 +1396,19 @@ public class MoSyncNetwork
 					return CONNERR_NOHEADER;
 				}
 
+				{
+					// Android transparently requests and unpacks gzip data,
+					// but then content-length is the length of the packed data.
+					// Therefore, if encoding is gzip,
+					// tell the user that content-length header doesn't exist.
+					String encoding = mUrlConnection.getContentEncoding();
+					if(encoding != null) if(key.equalsIgnoreCase("content-length") &&
+						encoding.equalsIgnoreCase("gzip"))
+					{
+						return CONNERR_NOHEADER;
+					}
+				}
+
 				// Write the bufSize first characters in the String value
 				// to ds_mem starting at address.
 				byte[] valueAsBytes = value.getBytes( );
