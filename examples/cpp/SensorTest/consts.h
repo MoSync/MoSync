@@ -37,7 +37,7 @@ MA 02110-1301, USA.
 #define SCALE_FACTOR 					(gScreenWidth / BASE_SCREEN_WIDTH)
 #define TEXT_SIZE						(10 * SCALE_FACTOR)
 #define OFFSET_X						(10 * SCALE_FACTOR)
-#define OFFSET_Y						20
+#define OFFSET_Y						TEXT_SIZE
 
 // useful texts
 #define TXT_NONE						""
