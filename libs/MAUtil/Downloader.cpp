@@ -29,6 +29,9 @@ using namespace MAUtil;
 // Downloaded data is now owned by the user.
 #define NO_CLEANUP 0
 
+// Redirection attemps limit
+#define MAX_REDIRECTIONS_COUNT 8
+
 // *************** Class DownloadListener *************** //
 
 void DownloadListener::notifyProgress(Downloader* dl, int downloadedBytes, int totalBytes)
@@ -39,14 +42,15 @@ bool DownloadListener::outOfMemory(Downloader*)
 {
 	return false;
 }
-
 // *************** Class Downloader *************** //
 
 Downloader::Downloader()
 : mIsDownloading(false),
   mIsDataPlaceholderSystemAllocated(false),
   mDataPlaceholder(NULL),
-  mReader(NULL)
+  mReader(NULL),
+  mDowndloadController(NULL),
+  mRedirectionCounter(0)
 {
 	mConn = new HttpConnection(this);
 }
@@ -72,6 +76,11 @@ void Downloader::removeDownloadListener(DownloadListener* listener)
 			return;
 		}
 	}
+}
+
+void Downloader::setDownloadController(DownloadController* downloadCtrl)
+{
+	mDowndloadController = downloadCtrl;
 }
 
 int Downloader::beginDownloading(const char *url, MAHandle placeholder)
@@ -182,17 +191,65 @@ void Downloader::deleteReader()
 	}
 }
 
+void Downloader::doRedirect(HttpConnection* http)
+{
+	String str;
+	int res = http->getResponseHeader("location", &str);
+
+	if ( NULL != mDowndloadController && (0 < res) )
+	{
+		bool redirectNeeded = mDowndloadController->handleUrlRedirection(str.c_str());
+		if ( redirectNeeded )
+		{
+			// Make sure connection is closed.
+			closeConnection(NO_CLEANUP);
+			beginDownloading(str.c_str(), mDataPlaceholder);
+		}
+	}
+	else if ( mRedirectionCounter < MAX_REDIRECTIONS_COUNT && (0 < res))
+	{
+		// Make sure connection is closed.
+		closeConnection(NO_CLEANUP);
+		beginDownloading(str.c_str(), mDataPlaceholder);
+
+		mRedirectionCounter++;
+	}
+	else
+	{
+		// Add new error.
+		fireError(CONNERR_REDIRECT);
+	}
+}
+
 /**
  * Called from the HttpConnection via HttpConnectionListener interface.
  */
 void Downloader::httpFinished(HttpConnection* http, int result)
 {
 	// If there is an error, then broadcast the error and return.
-	if (result < 0 || !(result >= 200 && result < 300))
+	// Also broadcast and return in the unsuported Redirect cases: 300 Multiple Choices,
+	// 304 Not Modified, 305 Use Proxy (since HTTP/1.1) and 306 Switch Proxy
+	if (result < 0 || !(result >= 200 && result <= 308)
+		|| (result == 300) || (result == 304) || (result == 305) || (result == 306))
 	{
 		fireError(result);
 		return;
 	}
+
+	/*
+	 * Do redirection for the following return codes:
+	 * 301 Moved Permanently
+	 * 302 Found
+	 * 303 See Other (since HTTP/1.1)
+	 * 307 Temporary Redirect (since HTTP/1.1)
+	 * 308 Permanent Redirect (approved as experimental RFC)[13]
+	 */
+	if ( result == 301 || result == 302 || result == 303 || result == 307 || result == 308 )
+	{
+		doRedirect(http);
+		return;
+	}
+	mRedirectionCounter = 0;
 
 	// Check if we have a content-length header.
 	String str;

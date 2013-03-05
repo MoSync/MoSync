@@ -144,6 +144,29 @@ namespace MAUtil {
 	};
 
 	/**
+	 * \brief This provides methods for controlling the \link #Downloader \endlink
+	 * behaivior in the cases that require a client response (e.g. Redirection).
+	 * For the moment only a handler for http redirection is provided.
+	 */
+	class DownloadController
+	{
+	public:
+		/**
+		 * Handle for http redirection scenarios.
+		 * This is called if the for the \link #DownloadController \endlink object is assined to a
+		 * \link #Downloader \endlink using \link #setDownloadController \endlink method.
+		 *
+		 * Note: If this handle is not used the redirection will be attempted by the
+		 * \link #Downloader \endlink class automatically (this is the default beheivior).
+		 *
+		 * \param newLocation C string containing the alternative location provided by the server.
+		 *
+		 * \return true in order to let the api perform the redirection, false otherwise.
+		 */
+		virtual bool handleUrlRedirection(const char* newLocation) = 0;
+	};
+
+	/**
 	 * \brief The Downloader class. Use it to simplify asynchronous downloading 
 	 * of files to binary resources.
 	 */
@@ -176,6 +199,12 @@ namespace MAUtil {
 		 * \param dl Pointer to the DownloadListener instance.
 		 */
 		void removeDownloadListener(DownloadListener *dl);
+
+		/**
+		 * Sets the DownloadController.
+		 * \param downloadCtrl Pointer to the DownloadController instance.
+		 */
+		void setDownloadController(DownloadController* downloadCtrl);
 
 		/**
 		 * Function to begin downloading a file.
@@ -249,6 +278,14 @@ namespace MAUtil {
 		void deleteReader();
 		
 		/**
+		 * Performs url redirection if not blocked by the Downloader user
+		 * (via DownloadController).
+		 * \param http A http connection that needs redirection.
+		 *
+		 */
+		void doRedirect(HttpConnection* http);
+
+		/**
 		 * Callback method in HttpConnectionListener.
 		 */
 		virtual void httpFinished(HttpConnection* http, int result);
@@ -271,6 +308,17 @@ namespace MAUtil {
 		 * how the server sends the data to the client.
 		 */
 		DownloaderReader* mReader;
+
+		/**
+		 * Object used for comunicating with the Downloader user in the
+		 * scenarios that can involve the user's implication.
+		 */
+		DownloadController* mDowndloadController;
+
+		/**
+		 * A counter representing the number of redirection attemps.
+		 */
+		int mRedirectionCounter;
 	};
 
 	/**

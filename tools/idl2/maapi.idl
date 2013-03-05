@@ -703,6 +703,9 @@ interface MAAPI {
 		NO_ACTIVE_DOWNLOAD = -20;
 		// Downloader has no available reader. This happens after the connection is closed.
 		READER_UNAVAILABLE = -21;
+		/// Redirection failed. This occurs when the server does not provide alternative url
+		/// or if the maximum number of attempts to redirect was exceeded.
+		REDIRECT = -22;
 		/**
 		* If you wish to share the CONNERR codespace,
 		* use values below this for your own error codes.
