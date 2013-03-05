@@ -206,6 +206,18 @@ public:
 };
 
 /**
+ * DownloadController class. Used here to test redirect via handleUrlRedirection method.
+ */
+class DownloadControllerTest : public DownloadController
+{
+	virtual bool handleUrlRedirection(const char* newLocation)
+	{
+		printf("\nRedirected to: %s\n", newLocation);
+		return true;
+	}
+};
+
+/**
  * Automated Downloader test case.
  */
 class DownloaderTestCase : public TestCase, public EventBase
@@ -277,7 +289,11 @@ public:
 		gPassedDownloadNotUsingContentLengthTest = false;
 		Downloader downloader;
 		DownloadNotUsingContentLengthTestListener downloadListener;
+		DownloadControllerTest downloadController;
+
+		downloader.setDownloadController(&downloadController);
 		downloader.addDownloadListener(&downloadListener);
+
 		int result = downloader.beginDownloading(URL_DOCUMENT_THAT_HAS_NO_CONTENT_LENGTH);
 		TESTIFY_ASSERT(0 < result);
 		runEventLoop();
