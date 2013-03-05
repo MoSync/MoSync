@@ -90,6 +90,16 @@ namespace NativeUI
             (enabledState ? "true" : "false") );
     }
 
+	/**
+	 * Check if a stack screen is shown.
+	 * @return true if the stack screen is visible, false otherwise.
+	 */
+	bool StackScreen::isShown()
+	{
+        MAUtil::String value = this->getPropertyString(MAW_STACK_SCREEN_IS_SHOWN);
+        return (strcmp(value.c_str(), "true") == 0) ? true : false;
+	}
+
     /**
      *
      * This method is called when there is an event for this widget.

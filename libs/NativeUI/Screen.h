@@ -198,6 +198,12 @@ namespace NativeUI
 		 */
 		virtual void removeOptionsMenu();
 
+		/**
+		 * Check if a screen is shown.
+		 * @return true if the screen is visible, false otherwise.
+		 */
+		virtual bool isShown();
+
         /**
          * Add a screen event listener.
          * @param listener The listener that will receive screen events.

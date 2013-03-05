@@ -280,6 +280,16 @@ namespace NativeUI
 		setProperty(MAW_SCREEN_REMOVE_OPTIONS_MENU,"");
 	}
 
+	/**
+	 * Check if a screen is shown.
+	 * @return true if the screen is visible, false otherwise.
+	 */
+	bool Screen::isShown()
+	{
+        MAUtil::String value = this->getPropertyString(MAW_SCREEN_IS_SHOWN);
+        return (strcmp(value.c_str(), "true") == 0) ? true : false;
+	}
+
     /**
      * Add a screen event listener.
      * @param listener The listener that will receive screen events.
