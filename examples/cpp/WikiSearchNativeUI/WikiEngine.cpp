@@ -224,12 +224,18 @@ void MediaWiki::search(MAUtil::String searchTerm, int resultsLimit)
 	constructApiUrl();
 
 	int res = mHttp.create(mWiki->apiUrl.c_str(), HTTP_GET);
+
+	// Enforce compress disabling, so we can count on a real content length value.
+	mHttp.setRequestHeader("Accept-Encoding","identity");
+	mHttp.setRequestHeader(HTTP_REQUEST_HEADER_USER_AGENT.c_str(),"WikipediaSearchNativeUI");
+
 	if(res < 0) {
 		// It have failed for some reason.
-		mHomeScreen->engineError(ERROR_NO_CONNECTION);
+		mHomeScreen->engineError("The error is "  + MAUtil::integerToString(res));//ERROR_NO_CONNECTION);
+		mHttp.close();
+		mIsConnected = false;
 	 }
 	 else {
-		mHttp.setRequestHeader("User-Agent","WikipediaSearchNativeUI");
 		mHttp.finish();
 		mIsConnected = true;
 	 }
@@ -248,14 +254,13 @@ void MediaWiki::httpFinished(MAUtil::HttpConnection *conn, int result)
 	if ( result >= 0)
 	{
 		MAUtil::String contentLengthStr;
-		// todo: check return value.
-		mHttp.getResponseHeader("Content-Length",
+		mHttp.getResponseHeader(HTTP_RESPONSE_HEADER_CONTENT_LENGTH.c_str(),
 			&contentLengthStr);
 
 		int contentLength = 0;
 		contentLength = atoi(contentLengthStr.c_str());
 
-		if (contentLength >= CONNECTION_BUFFER_SIZE || contentLength == 0) {
+		if (contentLength >= CONNECTION_BUFFER_SIZE || contentLength != 0) {
 			// Receive in chunks.
 			// Calculate how many chunks we receive, so that we can increment
 			// a progress bar for this action.
@@ -282,7 +287,7 @@ void MediaWiki::httpFinished(MAUtil::HttpConnection *conn, int result)
 	else
 	{
 		// Notify UI on the error.
-		mHomeScreen->engineError( ERROR_NO_CONNECTION );
+		mHomeScreen->engineError( MAUtil::integerToString(result));//ERROR_NO_CONNECTION );
 
 		mHttp.close();
 		mIsConnected = false;
