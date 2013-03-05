@@ -226,7 +226,7 @@ void MediaWiki::search(MAUtil::String searchTerm, int resultsLimit)
 	int res = mHttp.create(mWiki->apiUrl.c_str(), HTTP_GET);
 
 	// Enforce compress disabling, so we can count on a real content length value.
-	mHttp.setRequestHeader("Accept-Encoding","identity");
+	mHttp.setRequestHeader(HTTP_REQUEST_HEADER_ACCEPT_ENCODING.c_str(),"identity");
 	mHttp.setRequestHeader(HTTP_REQUEST_HEADER_USER_AGENT.c_str(),"WikipediaSearchNativeUI");
 
 	if(res < 0) {
