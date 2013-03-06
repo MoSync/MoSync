@@ -76,15 +76,17 @@
         {
 			NSURL *url;
 			//Process a normal URL
+            //URLs can only be sent over the Internet using the ASCII character-set.
           if (schemaLocation.location == NSNotFound) {
 			  NSString *urlString = [NSString stringWithFormat:@"%@%@", baseUrl, value];
-			  NSString* webURLString = [urlString stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+			  NSString* webURLString = [urlString stringByAddingPercentEscapesUsingEncoding:NSASCIIStringEncoding];
 			  url = [[NSURL URLWithString: webURLString] filePathURL];
 		  } else {
               // Convert the string URL into ascii encoding.
-              NSData* data = [value dataUsingEncoding:NSUTF8StringEncoding allowLossyConversion:YES];
-              NSString* formattedURL = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-              url = [NSURL URLWithString:formattedURL];
+              NSData* data = [value dataUsingEncoding:NSASCIIStringEncoding allowLossyConversion:YES];
+              NSString* formattedURL = [[NSString alloc] initWithData:data encoding:NSASCIIStringEncoding];
+              // Used stringByAddingPercentEscapesUsingEncoding in order to replace spaces with speficit percent characters.
+              url = [NSURL URLWithString:[formattedURL stringByAddingPercentEscapesUsingEncoding:NSASCIIStringEncoding]];
               [formattedURL release];
 		  }
 
