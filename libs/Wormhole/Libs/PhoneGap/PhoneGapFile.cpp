@@ -1689,6 +1689,12 @@ namespace Wormhole
 					);
 			}
 
+			// Deallocate the data object.
+			if (NULL != data)
+			{
+				maDestroyPlaceholder(data);
+			}
+
 			// Delete the body of the request.
 			delete mRequestBody;
 

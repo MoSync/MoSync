@@ -491,6 +491,8 @@ namespace Notification
 
         /**
          * Set the date and time when the system should deliver the notification.
+		 * The notification will be fired when the system time is equal to the
+		 * given param time value.
          * @param time A date and time struct that specifies when the system
          * should deliver the notification.
          * @return Any of the following result codes:

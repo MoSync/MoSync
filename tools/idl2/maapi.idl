@@ -5900,9 +5900,12 @@ group NotificationAPI "Notification API" {
 
 			/**
 			* @brief Set the date and time when the system should deliver the notification.
+			* The notification will be fired when the system time is equal to the
+			* given param time value.
 			*
 			* @validvalue an int.
 			* The date is in seconds(UNIX time - seconds elapsed since January 1, 1970).
+			* The value should be given according to device system time.
 			*
 			* @setandget
 			*
