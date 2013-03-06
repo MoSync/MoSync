@@ -144,18 +144,25 @@ namespace Wormhole
 
 		sprintf(
 			data,
-			"\\'{\"message\": \"%s\","
+			"{\"message\": %s,"
 			"\"sound\": \"%s\","
-			"\"iconBadge\":\"%d\"}\\'",
-			message.c_str(),
+			"\"iconBadge\":\"%d\"}",
+			Encoder::JSONStringify(message.c_str()).c_str(),
 			sound.c_str(),
 			iconBadge);
 
-		mMessageHandler->callSuccess(
-			mListenerCallBack,
-			PHONEGAP_CALLBACK_STATUS_OK,
-			data,
-			true);
+		String args = "";
+		args += "{";
+		args += "\"status\":" + ((MAUtil::String) PHONEGAP_CALLBACK_STATUS_OK);
+		args += ",\"message\":" + Encoder::JSONStringify(data);
+		args += ",\"keepCallback\":true";
+		args += "}";
+
+		String script = "PhoneGap.CallbackSuccess(";
+		script += "'" + mListenerCallBack + "',";
+		script += Encoder::JSONStringify(args.c_str()) + ")";
+
+		mMessageHandler->callJS(script);
 	}
 
 	/**
