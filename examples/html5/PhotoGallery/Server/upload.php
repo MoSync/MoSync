@@ -3,17 +3,20 @@ ini_set("display_errors", "1");
 ini_set("log_errors", "1");
 error_reporting(-1);
 
+function mylog($message)
+{
+	$file = 'mylog.txt';
+	// Open the file to get existing content
+	$current = file_get_contents($file);
+	// Append a line to the file
+	$current .= "$message\n";
+	// Write the contents back to the file
+	file_put_contents($file, $current);
+}
+
 function uploadPhoto()
 {
 	$targetPath = "photos/" . basename($_FILES["file"]["name"]);
-
-	echo "Target file: " . $targetPath;
-	echo "<br/>";
-
-	print_r($_FILES);
-	echo "<br/>";
-
-	echo fileIsImage($_FILES["file"]["name"]);
 
 	if (fileIsOK($_FILES["file"]))
 	{
@@ -55,9 +58,8 @@ function endsWith($haystack, $needle)
 
 function getPhotoURLs()
 {
-	$urls = getLast100PhotoURLs();
-
 	/*// For debugging.
+	$urls = getLastTenPhotoURLs();
 	foreach ($urls as $url)
 	{
 		echo "<a href='$url'>$url</a><br/>\n";
@@ -68,12 +70,13 @@ function getPhotoURLs()
 
 function getPhotoURLsAsJSON()
 {
-	$urls = getLast100PhotoURLs();
+	$urls = getLastTenPhotoURLs();
 
 	return json_encode($urls);
 }
 
-function getLast100PhotoURLs()
+// Gets last TEN photo urls.
+function getLastTenPhotoURLs()
 {
 	$baseURL = "http://dev.mosync.com/mobilelua/PhotoGallery/photos/";
 	$baseDir = "photos/";
@@ -103,12 +106,13 @@ function getLast100PhotoURLs()
 	// List if URLs.
 	$urls = array();
 
-	// Create a list of URLs to the most recent 100 files.
+	// Create a list of URLs to the most recent files.
 	$fileCounter = 0;
 	foreach ($files as $file)
 	{
 		++$fileCounter;
-		if ($fileCounter > 100)
+		// We only get TEN recent files (100 is too many!).
+		if ($fileCounter > 10)
 		{
 			// TODO: Move excessive files to an archive directory?
 			break;
