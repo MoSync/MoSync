@@ -73,9 +73,33 @@ void MessageHandler::initialize(Wormhole::HybridMoblet* moblet)
 	mNativeUIMessageHandler = new NativeUIMessageHandler(webView);
 	mResourceMessageHandler = new ResourceMessageHandler(webView);
 
-	// Set the FileUtil object to use.
-	mPhoneGapMessageHandler->setFileUtil(moblet->getFileUtil());
-	mResourceMessageHandler->setFileUtil(moblet->getFileUtil());
+	// Set the FileUtil object to use...
+
+	// For the PhoneGapMessageHandler.
+	FileUtil* fileUtilPhoneGapHandler = mPhoneGapMessageHandler->getFileUtil();
+	if (fileUtilPhoneGapHandler != moblet->getFileUtil())
+	{
+		if (NULL != fileUtilPhoneGapHandler)
+		{
+			delete fileUtilPhoneGapHandler;
+		}
+		mPhoneGapMessageHandler->setFileUtil(moblet->getFileUtil());
+	}
+
+	// For the ResourceMessageHandler.
+	FileUtil* fileUtilResourceHandler = mResourceMessageHandler->getFileUtil();
+	if (fileUtilResourceHandler != moblet->getFileUtil())
+	{
+		if (NULL != fileUtilResourceHandler)
+		{
+			// Make sure it is not the same as the PhoneGapMessageHandler has.
+			if (fileUtilResourceHandler != fileUtilPhoneGapHandler)
+			{
+				delete fileUtilResourceHandler;
+			}
+			mResourceMessageHandler->setFileUtil(moblet->getFileUtil());
+		}
+	}
 }
 
 /**

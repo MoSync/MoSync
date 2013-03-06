@@ -22,6 +22,7 @@ import com.mosync.nativeui.util.properties.BooleanConverter;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.text.TextUtils;
 import android.util.Log;
 
 import static com.mosync.internal.generated.MAAPI_consts.MA_NOTIFICATION_LOCAL_TICKER_TEXT;
@@ -114,7 +115,7 @@ public class LocalNotificationsUtil
 				MA_NOTIFICATION_LOCAL_PLAY_SOUND,
 				String.valueOf(prefs.getBoolean(MA_NOTIFICATION_LOCAL_PLAY_SOUND, false)));
         String soundPath = prefs.getString(MA_NOTIFICATION_LOCAL_SOUND_PATH, "");
-        if (!soundPath.isEmpty())
+        if ( !TextUtils.isEmpty(soundPath) )
         {
 			object.setProperty(
 					MA_NOTIFICATION_LOCAL_SOUND_PATH,
@@ -124,7 +125,7 @@ public class LocalNotificationsUtil
 				MA_NOTIFICATION_LOCAL_FLASH_LIGHTS,
 				String.valueOf(prefs.getBoolean(MA_NOTIFICATION_LOCAL_FLASH_LIGHTS, false)));
         String flashPattern = prefs.getString(MA_NOTIFICATION_LOCAL_FLASH_LIGHTS_PATTERN, "");
-        if (!flashPattern.isEmpty())
+        if ( !TextUtils.isEmpty(flashPattern) )
         {
             object.setProperty(
 					MA_NOTIFICATION_LOCAL_FLASH_LIGHTS_PATTERN,

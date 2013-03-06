@@ -76,6 +76,7 @@ import com.mosync.internal.android.notifications.LocalNotificationsManager;
 import com.mosync.internal.android.notifications.LocalNotificationsService;
 import com.mosync.internal.android.notifications.PushNotificationsManager;
 import com.mosync.internal.android.notifications.PushNotificationsUtil;
+import com.mosync.internal.generated.IX_WIDGET;
 import com.mosync.nativeui.ui.widgets.OptionsMenuItem;
 import com.mosync.nativeui.ui.widgets.ScreenWidget;
 
@@ -226,15 +227,34 @@ public class MoSync extends Activity
 	public void onConfigurationChanged(Configuration newConfig)
 	{
 		SYSLOG("@@MoSync onConfigurationChanged");
+
 		super.onConfigurationChanged(newConfig);
 
-		SYSLOG("@@MoSync rotation = " + getWindowManager().getDefaultDisplay().getRotation());
-		if ( mScreenRotation != getWindowManager().getDefaultDisplay().getRotation() )
-		{
-			mScreenRotation = getWindowManager().getDefaultDisplay().getRotation();
+		// Get the current rotation.
+		int newRotation = getWindowManager().getDefaultDisplay().getRotation();
 
-			EventQueue.getDefault().postScreenOrientationChanged(
-						mMoSyncThread.getCurrentScreen().getHandle());
+		SYSLOG("@@MoSync rotation = " + newRotation);
+
+		// Has the rotation changed?
+		if (mScreenRotation != newRotation)
+		{
+			// Save current rotation.
+			mScreenRotation = newRotation;
+
+			// Post rotation event.
+			ScreenWidget screen = mMoSyncThread.getCurrentScreen();
+			int widgetHandle;
+			if (null != screen)
+			{
+				// There is a NativeUI screen.
+				widgetHandle = screen.getHandle();
+			}
+			else
+			{
+				// No NativeUI screen, use the MoSync screen identifier.
+				widgetHandle = IX_WIDGET.MAW_CONSTANT_MOSYNC_SCREEN_HANDLE;
+			}
+			EventQueue.getDefault().postScreenOrientationChanged(widgetHandle);
 		}
 	}
 
