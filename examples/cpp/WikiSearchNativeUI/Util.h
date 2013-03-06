@@ -122,6 +122,20 @@ const MAUtil::String ERROR_NO_RESULTS = "There are no results.";
 /** The results cannot be parsed. **/
 const MAUtil::String ERROR_INVALID_DATA = "Invalid results.Error:";
 
+// Some Http request and response field names.
+/**
+* Field name that can be used for #maHttpSetRequestHeader.
+*/
+const String HTTP_REQUEST_HEADER_USER_AGENT = "User-Agent";
+/**
+* Field name that can be used for #maHttpSetRequestHeader.
+*/
+const String HTTP_REQUEST_HEADER_ACCEPT_ENCODING = "Accept-Encoding";
+/**
+* Field name that can be used for @maHttpGetResponseHeader.
+*/
+const String HTTP_RESPONSE_HEADER_CONTENT_LENGTH = "Content-Length";
+
 /**
  * Utility functions for creating NativeUI widgets.
  */
