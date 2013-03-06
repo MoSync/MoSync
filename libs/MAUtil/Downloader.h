@@ -15,12 +15,12 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
-/** 
+/**
  * \file Downloader.h
  * \brief Simple asynchronous HTTP download to resources.
  * \author Patrick Broman and Niklas Nummelin.
  */
- 
+
 /*
 Downloader state specification
 ------------------------------
@@ -31,11 +31,11 @@ listeners, initiation of a new download from a listener
 will cause a panic (beginDownloading can only be called
 if a download is not in progress).
 
-downloader.beginDownloading -> 
+downloader.beginDownloading ->
   precondition: closeConnection(NO_CLEANUP)
   downloader.beginDownloading -> Error
   downloader.cancelDownloading -> Ok
-  
+
 downloader.cancelDownloading ->
   precondition: closeConnection(CLEANUP)
   downloader.beginDownloading -> Ok
@@ -121,7 +121,7 @@ namespace MAUtil {
 		 * Called when all data has been downloaded.
 		 * \param downloader A pointer to the downloader sending this event.
 		 * \param data MAHandle to the binary data resource with the downloaded data.
-		 * It is the responsibility of the application to free the data handle 
+		 * It is the responsibility of the application to free the data handle
 		 * once it is not needed (use maDestroyObject() for this). In case a
 		 * handle was supplied to beginDownloading() the data parameter will refer
 		 * to that handle.
@@ -144,30 +144,28 @@ namespace MAUtil {
 	};
 
 	/**
-	 * \brief This provides methods for controlling the \link #Downloader \endlink
-	 * behaivior in the cases that require a client response (e.g. Redirection).
-	 * For the moment only a handler for http redirection is provided.
+	 * \brief Controls certain aspects of \link #Downloader \endlink behavior.
 	 */
 	class DownloadController
 	{
 	public:
 		/**
-		 * Handle for http redirection scenarios.
-		 * This is called if the for the \link #DownloadController \endlink object is assined to a
-		 * \link #Downloader \endlink using \link #setDownloadController \endlink method.
+		 * \brief Handler for HTTP redirection.
 		 *
-		 * Note: If this handle is not used the redirection will be attempted by the
-		 * \link #Downloader \endlink class automatically (this is the default beheivior).
+		 * This function is called whenever a server responds with a redirect (commonly 301 or 302).
+		 * The purpose is to decide if the redirect should be followed or not.
+		 *
+		 * If a Downloader has no controller, it will follow up to 8 redirects. A 9th will cause #CONNERR_REDIRECT.
 		 *
 		 * \param newLocation C string containing the alternative location provided by the server.
 		 *
-		 * \return true in order to let the api perform the redirection, false otherwise.
+		 * \return If true, the Downloader will follow the redirect. If false, it will raise #CONNERR_REDIRECT.
 		 */
-		virtual bool handleUrlRedirection(const char* newLocation) = 0;
+		virtual bool handleRedirect(const char* newLocation) = 0;
 	};
 
 	/**
-	 * \brief The Downloader class. Use it to simplify asynchronous downloading 
+	 * \brief The Downloader class. Use it to simplify asynchronous downloading
 	 * of files to binary resources.
 	 */
 	class Downloader : public HttpConnectionListener
@@ -201,10 +199,14 @@ namespace MAUtil {
 		void removeDownloadListener(DownloadListener *dl);
 
 		/**
-		 * Sets the DownloadController.
-		 * \param downloadCtrl Pointer to the DownloadController instance.
+		 * Sets the controller for this Downloader.
+		 *
+		 * By default, a Downloader has no controller.
+		 * See DownloadController for info on default behavior.
+		 *
+		 * \param dc Pointer to a DownloadController instance, or NULL to remove any existing controller.
 		 */
-		void setDownloadController(DownloadController* downloadCtrl);
+		void setDownloadController(DownloadController* dc);
 
 		/**
 		 * Function to begin downloading a file.
@@ -266,7 +268,7 @@ namespace MAUtil {
 		 * This is part of the normal finishing of the download,
 		 * and is also done on errors and on cancelling the download.
 		 * \param cleanup if 1 free downloaded resources, if 0 do not do
-		 * free downloaded resources. Cleanup is done on errors and on 
+		 * free downloaded resources. Cleanup is done on errors and on
 		 * cancelling a download.
 		 */
 		virtual void closeConnection(int cleanup);
@@ -276,7 +278,7 @@ namespace MAUtil {
 		 * performs the download).
 		 */
 		void deleteReader();
-		
+
 		/**
 		 * Performs url redirection if not blocked by the Downloader user
 		 * (via DownloadController).
@@ -301,7 +303,7 @@ namespace MAUtil {
 		bool mIsDataPlaceholderSystemAllocated;
 		MAHandle mDataPlaceholder;
 		Vector<DownloadListener*> mDownloadListeners;
-		
+
 		/**
 		 * Object that performs the actual download. A downloader
 		 * is configured with different readers depending on the
@@ -309,11 +311,7 @@ namespace MAUtil {
 		 */
 		DownloaderReader* mReader;
 
-		/**
-		 * Object used for comunicating with the Downloader user in the
-		 * scenarios that can involve the user's implication.
-		 */
-		DownloadController* mDowndloadController;
+		DownloadController* mController;
 
 		/**
 		 * A counter representing the number of redirection attemps.
@@ -335,16 +333,16 @@ namespace MAUtil {
 		 * \see Downloader::beginDownloading(const char*, MAHandle);
 		 */
 		int beginDownloading(const char *url, MAHandle placeholder=0);
-		
+
 	protected:
 		/**
 		 * Return the image handle of the downloader.
 		 * The caller of this method should fire an error to listeners.
-		 * @return The image handle (> 0) if successful, 0 if there is 
+		 * @return The image handle (> 0) if successful, 0 if there is
 		 * an error (out of memory).
 		 */
 		virtual MAHandle getHandle();
-		
+
 		virtual void closeConnection(int cleanup);
 
 	protected:
@@ -364,9 +362,9 @@ namespace MAUtil {
 		/**
 		 * Same as Downloader::beginDownloading() with an additional
 		 * optional parameter to specify mime type of the downloaded file.
-		 * If neither the server or you provide a mime type, #CONNERR_NOHEADER 
-		 * will be thrown. If both the server and you provide a mime type, 
-		 * by default the server's will be picked, but you can force use of 
+		 * If neither the server or you provide a mime type, #CONNERR_NOHEADER
+		 * will be thrown. If both the server and you provide a mime type,
+		 * by default the server's will be picked, but you can force use of
 		 * your mime type.
 		 */
 		int beginDownloading(

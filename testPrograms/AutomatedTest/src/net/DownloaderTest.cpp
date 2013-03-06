@@ -210,7 +210,7 @@ public:
  */
 class DownloadControllerTest : public DownloadController
 {
-	virtual bool handleUrlRedirection(const char* newLocation)
+	virtual bool handleRedirect(const char* newLocation)
 	{
 		printf("\nRedirected to: %s\n", newLocation);
 		return true;

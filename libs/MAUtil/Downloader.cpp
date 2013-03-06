@@ -49,8 +49,7 @@ Downloader::Downloader()
   mIsDataPlaceholderSystemAllocated(false),
   mDataPlaceholder(NULL),
   mReader(NULL),
-  mDowndloadController(NULL),
-  mRedirectionCounter(0)
+  mController(NULL)
 {
 	mConn = new HttpConnection(this);
 }
@@ -78,9 +77,9 @@ void Downloader::removeDownloadListener(DownloadListener* listener)
 	}
 }
 
-void Downloader::setDownloadController(DownloadController* downloadCtrl)
+void Downloader::setDownloadController(DownloadController* dc)
 {
-	mDowndloadController = downloadCtrl;
+	mController = dc;
 }
 
 int Downloader::beginDownloading(const char *url, MAHandle placeholder)
@@ -102,6 +101,7 @@ int Downloader::beginDownloading(const char *url, MAHandle placeholder)
 	}
 
 	mIsDownloading = true;
+	mRedirectionCounter = 0;
 
 	// If the supplied placeholder is zero, we will use a
 	// system allocated placeholder.
@@ -196,14 +196,18 @@ void Downloader::doRedirect(HttpConnection* http)
 	String str;
 	int res = http->getResponseHeader("location", &str);
 
-	if ( NULL != mDowndloadController && (0 < res) )
+	if ( NULL != mController && (0 < res) )
 	{
-		bool redirectNeeded = mDowndloadController->handleUrlRedirection(str.c_str());
+		bool redirectNeeded = mController->handleRedirect(str.c_str());
 		if ( redirectNeeded )
 		{
 			// Make sure connection is closed.
 			closeConnection(NO_CLEANUP);
 			beginDownloading(str.c_str(), mDataPlaceholder);
+		}
+		else
+		{
+			fireError(CONNERR_REDIRECT);
 		}
 	}
 	else if ( mRedirectionCounter < MAX_REDIRECTIONS_COUNT && (0 < res))
@@ -227,29 +231,22 @@ void Downloader::doRedirect(HttpConnection* http)
 void Downloader::httpFinished(HttpConnection* http, int result)
 {
 	// If there is an error, then broadcast the error and return.
-	// Also broadcast and return in the unsuported Redirect cases: 300 Multiple Choices,
-	// 304 Not Modified, 305 Use Proxy (since HTTP/1.1) and 306 Switch Proxy
-	if (result < 0 || !(result >= 200 && result <= 308)
-		|| (result == 300) || (result == 304) || (result == 305) || (result == 306))
+	if (result < 0 || !(result >= 200 && result < 300))
 	{
-		fireError(result);
+		// Do redirection for the following result codes:
+		switch(result) {
+		case 301:	// Moved Permanently
+		case 302:	// Found
+		case 303:	// See Other (since HTTP/1.1)
+		case 307:	// Temporary Redirect (since HTTP/1.1)
+		case 308:	// Permanent Redirect (approved as experimental RFC)[13]
+			doRedirect(http);
+			break;
+		default:
+			fireError(result);
+		}
 		return;
 	}
-
-	/*
-	 * Do redirection for the following return codes:
-	 * 301 Moved Permanently
-	 * 302 Found
-	 * 303 See Other (since HTTP/1.1)
-	 * 307 Temporary Redirect (since HTTP/1.1)
-	 * 308 Permanent Redirect (approved as experimental RFC)[13]
-	 */
-	if ( result == 301 || result == 302 || result == 303 || result == 307 || result == 308 )
-	{
-		doRedirect(http);
-		return;
-	}
-	mRedirectionCounter = 0;
 
 	// Check if we have a content-length header.
 	String str;
