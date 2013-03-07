@@ -123,6 +123,24 @@ namespace NativeUI
          */
         virtual void removeStackScreenListener(StackScreenListener* listener);
 
+        /**
+         * Get a child screen widget of this widget. Overrides 'Widget' class
+         * 'getChild' method.
+         * @param index The index of the child.
+         * @return The child screen widget at the given index, or null if the
+         * index is invalid.
+         * The ownership of the result is not passed to the caller.
+         */
+        virtual Widget* getChild(const int index) const;
+
+        /**
+         * Get a child screen widget of this widget.
+         * @param index The index of the screen.
+         * @return The screen widget at the given index.
+         * The ownership of the result is not passed to the caller.
+         */
+        virtual Screen* getScreen(const int index) const;
+
     protected:
         /**
          * This method is called when there is an event for this widget.
