@@ -118,6 +118,23 @@ namespace NativeUI
 		 */
 		virtual ~ListView();
 
+		/**
+		 * Add a widget as a child of this widget.
+		 * @param widget The widget that will be added.
+		 * The ownership of the widget is passed to this function.
+		 * When the parent widget will be destroyed, all child widgets
+		 * will be deleted.
+		 * @return Any of the following result codes:
+		 * - #MAW_RES_OK if the child could be added to the parent.
+		 * - #MAW_RES_INVALID_HANDLE if any of the handles were invalid.
+		 * - #MAW_RES_INVALID_LAYOUT if the widget was added to a non-layout.
+		 * - #MAW_RES_CANNOT_INSERT_DIALOG if the child is a dialog.
+		 * - #MAW_RES_ERROR if it could not be added for some other reason.
+		 * @note Since MoSync 3.2 on iOS platform the added widget must be
+		 * ListViewItem or ListViewSection. Any other type of widgets will ignored.
+		 */
+		virtual int addChild(Widget* widget);
+
         /**
          * Enforces the focus on the list.
          * Generally needed when for some reason the list looses it's focus.
