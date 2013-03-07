@@ -16,6 +16,7 @@ using System;
 using System.Text.RegularExpressions;
 using System.Reflection;
 using System.Windows.Media;
+using System.Globalization;
 
 namespace MoSync
 {
@@ -207,7 +208,9 @@ namespace MoSync
 				set
 				{
 					double size = 0;
-					if (double.TryParse(value, out size))
+                    NumberStyles style = NumberStyles.AllowDecimalPoint;
+                    IFormatProvider provider = CultureInfo.InvariantCulture;
+                    if (Double.TryParse(value, style, provider, out size))
 					{
                         // for some values better use the default size of the platform
                         mLabel.FontSize = size <= 0 ? 11 : size;
