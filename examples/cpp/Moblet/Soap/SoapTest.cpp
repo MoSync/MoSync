@@ -24,13 +24,14 @@ MA 02110-1301, USA.
 
 using namespace MAUtil;
 
-// This request will return a text string, scrambled with rot-13.
+// This request will return a the result of a multiplication.
 
-static const char sUrl[] = "http://www.joelhainley.com/examples/soap/server.php";
+static const char sUrl[] = "http://modev.mine.nu:12346/";
 static const char sData[] =
-"<ns1:getRot13><symbol xsi:type=\"xsd:string\">"
-"Hello World!"
-"</symbol></ns1:getRot13>"
+"<ns:mul>\n"
+	"<param-7>6.0</param-7>\n"
+	"<param-8>7.0</param-8>\n"
+"</ns:mul>\n"
 ;
 
 
@@ -43,9 +44,13 @@ public:
 	}
 
 	void soapError(int code) {
-		printf("soapError(%i)\n", code);
 		// an error code -6 (CONNERR_CLOSED) is normal after soapEnd(),
 		// as the server closes the HTTP connection.
+		if(code == CONNERR_CLOSED) {
+			printf("Connection closed by server.\n");
+			return;
+		}
+		printf("soapError(%i)\n", code);
 	}
 	void soapEnd() {
 		printf("soapEnd()\n");

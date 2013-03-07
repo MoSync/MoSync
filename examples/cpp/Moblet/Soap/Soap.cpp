@@ -35,7 +35,7 @@ MA 02110-1301, USA.
 //static const data
 
 // These particular headers and footers are compatible with
-// Flickr services.
+// gSOAP demowebserver.
 // They will need modification to operate properly with other SOAP servers.
 
 #define SOAPNS "SOAP-ENV"
@@ -45,7 +45,8 @@ MA 02110-1301, USA.
 static const char sSoapHeader[] =
 "<?xml version=\"1.0\" encoding=\"utf-8\"?>"
 "<"SOAPNS":Envelope xmlns:"SOAPNS"=\"http://schemas.xmlsoap.org/soap/envelope/\""
-" xmlns:ns1=\"urn:localhost-scramble\""
+" xmlns:ns=\"urn:demowebserver\""
+" xmlns:f=\"urn:form\""
 " xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\""
 " xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\""
 " xmlns:SOAP-ENC=\"http://schemas.xmlsoap.org/soap/encoding/\""
