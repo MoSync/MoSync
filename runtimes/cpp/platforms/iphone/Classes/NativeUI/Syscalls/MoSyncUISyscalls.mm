@@ -382,24 +382,28 @@ int maWidgetSetProperty(MAWidgetHandle handle, const char *property, const char*
 	IWidget* widget = [mosyncUI getWidget:handle];
 	if(widget == NULL) return MAW_RES_INVALID_HANDLE;
 
+	if(property == NULL)
+		return MAW_RES_INVALID_PROPERTY_NAME;
+
+	if(value == NULL)
+		return MAW_RES_INVALID_PROPERTY_VALUE;
+
 	NSString* propertyString = stringFromChar(property);
 
 	if([widget class] == [GLViewWidget class] || [widget class] == [GL2ViewWidget class] ) {
 		// do this from the MoSync thread. Maybe do a generic system for this later.
-		if([propertyString isEqualToString:@"bind"]) {
+		if([propertyString isEqualToString:@"bind"])
+		{
+			[propertyString release];
 			return [widget setPropertyWithKey:@"bind" toValue:@""];
 		}
 
-		if([propertyString isEqualToString:@"invalidate"]) {
+		if([propertyString isEqualToString:@"invalidate"])
+		{
+			[propertyString release];
 			return [widget setPropertyWithKey:@"invalidate" toValue:@""];
 		}
 	}
-
-    if(property == NULL)
-        return MAW_RES_INVALID_PROPERTY_NAME;
-
-    if(value == NULL)
-        return MAW_RES_INVALID_PROPERTY_VALUE;
 
 	int returnValue;
 
