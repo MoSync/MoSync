@@ -28,5 +28,25 @@ group WidgetStackScreenProperties "Stack screen" {
 		* \endcode
 		*/
 		BACK_BUTTON_ENABLED = "backButtonEnabled";
+
+		/**
+		* @brief Check if a stack screen is shown.
+		*
+		* @validvalue "true" if the stack screen is visible, "false" otherwise.
+		*
+		* @getonly
+		*
+		* @par Example
+		* \code
+		*	char buffer[BUFFER_SIZE];
+		*	int result = maWidgetGetProperty(stackScreenHandle, MAW_STACK_SCREEN_IS_SHOWN,
+		*                                    buffer, BUFFER_SIZE);
+		*	if(result == MAW_RES_OK && strcmp(buffer, "true") == 0)
+		*	{
+		*		// Stack screen is visible.
+		*	}
+		* \endcode
+		*/
+		IS_SHOWN = "isShown";
 	}
 } // end of WidgetStackScreenProperties

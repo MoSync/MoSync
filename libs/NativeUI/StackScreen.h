@@ -105,6 +105,12 @@ namespace NativeUI
          */
         virtual void enableBackButton(const bool enabledState);
 
+		/**
+		 * Check if a stack screen is shown.
+		 * @return true if the stack screen is visible, false otherwise.
+		 */
+		virtual bool isShown();
+
         /**
          * Add an stack screen event listener.
          * @param listener The listener that will receive stack screen events.
