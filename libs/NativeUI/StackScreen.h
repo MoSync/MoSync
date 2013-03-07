@@ -112,6 +112,50 @@ namespace NativeUI
 		virtual bool isShown();
 
         /**
+         * Sets the screen transition type and duration used when pushing a screen.
+         * This is available only on Android and Windows Phone. On iOS the native
+         * navigation animation is used when pushing a screen.
+         *
+         * @param screenTransitionType The type of the pop screen transition. See available
+         * screen transitions types \link #MAW_TRANSITION_TYPE_NONE here \endlink.
+         * @param screenTransitionDuration The duration of the screen transition in milliseconds.
+         * This argument is not used on the Windows Phone platform due to the constant duration of
+         * the WP screen transitions.
+         *
+         * @return Any of the following result codes:
+         * - #MAW_RES_OK if the show with transition operation was successful.
+         * - #MAW_RES_INVALID_SCREEN_TRANSITION_TYPE if the screen transition type is not available
+         * on current platform. Show operation is still completed without screen transition.
+         * - #MAW_RES_INVALID_SCREEN_TRANSITION_DURATION if the screen transition is not a positive
+         * integer. This error code is not returned on the Windows Phone platform
+         * due to the constant duration of the WP screen transitions.
+         */
+        virtual int setPushTransition(const MAWScreenTransitionType transitionType,
+            const int transitionsDuration);
+
+        /**
+         * Sets the screen transition type and duration used when popping a screen.
+         * This is available only on Android and Windows Phone. On iOS the native
+         * navigation animation is used when popping a screen.
+         *
+         * @param screenTransitionType The type of the pop screen transition. See available
+         * screen transitions types \link #MAW_TRANSITION_TYPE_NONE here \endlink.
+         * @param screenTransitionDuration The duration of the screen transition in milliseconds.
+         * This argument is not used on the Windows Phone platform due to the constant duration of
+         * the WP screen transitions.
+         *
+         * @return Any of the following result codes:
+         * - #MAW_RES_OK if the show with transition operation was successful.
+         * - #MAW_RES_INVALID_SCREEN_TRANSITION_TYPE if the screen transition type is not available
+         * on current platform. Show operation is still completed without screen transition.
+         * - #MAW_RES_INVALID_SCREEN_TRANSITION_DURATION if the screen transition is not a positive
+         * integer. This error code is not returned on the Windows Phone platform
+         * due to the constant duration of the WP screen transitions.
+         */
+        virtual int setPopTransition(const MAWScreenTransitionType transitionType,
+            const int transitionsDuration);
+
+        /**
          * Add an stack screen event listener.
          * @param listener The listener that will receive stack screen events.
          */

@@ -1885,6 +1885,10 @@ namespace Base
 			SYSLOG("maIOCtl_maWidgetScreenShow");
 			return _maWidgetScreenShow(a, mJNIEnv, mJThis);
 
+		case maIOCtl_maWidgetScreenShowWithTransition:
+			SYSLOG("maIOCtl_maWidgetScreenShowWithTransition");
+			return _maWidgetScreenShowWithTransition(a, b, c, mJNIEnv, mJThis);
+
 		case maIOCtl_maWidgetStackScreenPush:
 			SYSLOG("maIOCtl_maWidgetStackScreenPush");
 			return _maWidgetStackScreenPush(a, b, mJNIEnv, mJThis);

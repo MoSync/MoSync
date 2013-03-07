@@ -77,8 +77,10 @@ import com.mosync.internal.android.notifications.LocalNotificationsManager;
 import com.mosync.internal.android.notifications.LocalNotificationsService;
 import com.mosync.internal.android.notifications.PushNotificationsManager;
 import com.mosync.internal.android.notifications.PushNotificationsUtil;
+import com.mosync.internal.generated.IX_WIDGET;
 import com.mosync.nativeui.ui.widgets.OptionsMenuItem;
 import com.mosync.nativeui.ui.widgets.ScreenWidget;
+import com.mosync.nativeui.util.ScreenTransitions;
 
 /**
  * Main MoSync activity
@@ -200,6 +202,16 @@ public class MoSync extends Activity
 		}
 
 		setContentView(root);
+	}
+
+	public void setRootViewUsingTransition(View root, int screenTransitionType, int screenTransitionDuration)
+	{
+		if(root == null)
+		{
+			Log.i("MoSync", "setRootViewUsingTransition, root is null.");
+		}
+		ScreenTransitions.applyScreenTransition(root, screenTransitionType, screenTransitionDuration, false);
+        setContentView(root);
 	}
 
 	@Override
