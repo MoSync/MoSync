@@ -144,10 +144,10 @@ namespace Wormhole
 
 		sprintf(
 			data,
-			"{\"message\": \"%s\","
+			"{\"message\": %s,"
 			"\"sound\": \"%s\","
 			"\"iconBadge\":\"%d\"}",
-			message.c_str(),
+			Encoder::JSONStringify(message.c_str()).c_str(),
 			sound.c_str(),
 			iconBadge);
 

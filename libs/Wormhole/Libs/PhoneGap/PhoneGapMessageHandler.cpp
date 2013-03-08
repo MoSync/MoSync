@@ -271,8 +271,8 @@ namespace Wormhole
 		// Send the callback result.
 		sprintf(
 			buffer,
-			"\\\"%s\\\"",
-			networkType);
+			"%s",
+			Encoder::JSONStringify(networkType).c_str());
 		callSuccess(
 			callbackID,
 			PHONEGAP_CALLBACK_STATUS_OK,
@@ -519,7 +519,7 @@ namespace Wormhole
 		script += "'" + callbackID + "'";
 		script += ",'" + successStr + "'";
 		script += ",'" + status + "'";
-		script += ",'" + args + "'";
+		script += "," + Encoder::JSONStringify(args.c_str());
 		script += ",'" + keepCallbackStr + "'";
 
 		script += ")";

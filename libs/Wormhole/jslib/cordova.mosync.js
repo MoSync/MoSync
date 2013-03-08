@@ -2,7 +2,7 @@
 
 // commit d4c25559adbeb6ed4eaae934e6805edb182ba35f
 
-// File generated at :: Wed Feb 20 2013 14:45:51 GMT+0100 (CET)
+// File generated at :: Thu Mar 07 2013 15:17:55 GMT+0100 (CET)
 
 /*
  Licensed to the Apache Software Foundation (ASF) under one
@@ -5422,9 +5422,8 @@ PushNotificationManager.prototype.listener = function(callback)
 
 	var self = this;
 
-	var onSuccess = function(result)
+	var onSuccess = function(data)
 	{
-		var data = JSON.parse(result);
 		var message = data.message ? data.message : "";
 		var sound = data.sound ? data.sound : "";
 		var iconBadge = data.iconBadge ? data.iconBadge : 0;
