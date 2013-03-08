@@ -103,6 +103,8 @@ work.instance_eval do
 		copyGl2Headers()
 		copyResCompilerHeaders()
 
+		CopyDirWork.new(mosync_include + "/glm", '../glm').invoke()
+
 		@prerequisites << CopyFileTask.new(self, mosync_include + '/new',
 			FileTask.new(self, '../libsupc++/new'))
 		@prerequisites << CopyFileTask.new(self, mosync_include + '/macpp.h',
