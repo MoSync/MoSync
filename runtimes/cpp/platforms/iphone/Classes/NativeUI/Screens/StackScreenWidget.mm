@@ -62,6 +62,7 @@
         int fromScreenIndex = [stack count] - 1;
         IWidget* fromScreen = [stack objectAtIndex:fromScreenIndex];
         fromScreenHandle = fromScreen.handle;
+		fromScreen.parent = nil;
     }
     if ([stack count] > 1)
     {
@@ -92,6 +93,7 @@
 	float viewHeight = self.height - navBarHeight;
     child.size = CGSizeMake(self.width, viewHeight);
 	[child show];
+	child.parent = self;
 }
 
 /**
@@ -145,6 +147,39 @@
 		return [super setPropertyWithKey:key toValue:value];
 	}
 	return MAW_RES_OK;
+}
+
+/**
+ * Get a widget property value.
+ * @param key Widget's property name.
+ * @return The property value, or nil if the property name is invalid.
+ * The returned value should not be autoreleased. The caller will release the returned value.
+ */
+- (NSString*)getPropertyWithKey:(NSString*)key
+{
+	if ([key isEqualToString:@MAW_STACK_SCREEN_IS_SHOWN])
+	{
+		return [[super isShownProperty] retain];
+	}
+	else
+	{
+		return [super getPropertyWithKey:key];
+	}
+}
+
+/**
+ * Check if a given child screen is shown inside this stack screen.
+ * @param childScreen Screen to check.
+ * @return YES if the childScreen is currently shown, NO otherwise.
+ */
+- (BOOL)isChildScreenShown:(ScreenWidget*)childScreen
+{
+	if ([stack count] == 0)
+	{
+		return NO;
+	}
+	ScreenWidget* shownScreen = [stack lastObject];
+	return ([shownScreen isEqual:childScreen]) ? YES : NO;
 }
 
 /**
