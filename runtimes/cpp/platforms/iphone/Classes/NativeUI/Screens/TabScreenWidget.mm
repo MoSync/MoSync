@@ -208,7 +208,7 @@
 	int currentlySelectedTabIndex = tabBarController.selectedIndex;
 	UIViewController* currentlyDisplayedController =
 	    [tabBarController.viewControllers objectAtIndex:currentlySelectedTabIndex];
-	if ([currentlyDisplayedController.view isEqual:childScreen])
+	if ([currentlyDisplayedController isEqual:[childScreen getController]])
 	{
 		return YES;
 	}
