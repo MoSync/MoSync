@@ -55,9 +55,9 @@ namespace MAUtil {
 			  Type mData;
 			  ListNode *mPrev, *mNext;
 		};
-		
+
 		class ConstListIterator;
-		
+
 		/**
 		* \brief An iterator for a list container.
 		*/
@@ -117,7 +117,7 @@ namespace MAUtil {
 			bool mFirst;
 			ListNode *mCurrent;
 		};
-		
+
 		/**
 		* \brief A constant iterator for a list container.
 		*/
@@ -178,7 +178,7 @@ namespace MAUtil {
 			bool mFirst;
 			const ListNode *mCurrent;
 		};
-	
+
 		/// Constructs an empty list.
 		List()
 			:	mHead(NULL), mTail(NULL), mSize(0)
@@ -192,7 +192,7 @@ namespace MAUtil {
 			ListNode *newNode = new ListNode(data, NULL, mHead);
 			mSize++;
 			if(!mHead && !mTail) {
-				mHead = mTail = newNode;	
+				mHead = mTail = newNode;
 				return;
 			}
 			mHead->mPrev = newNode;
@@ -206,7 +206,7 @@ namespace MAUtil {
 			ListNode *newNode = new ListNode(data, mTail, NULL);
 			mSize++;
 			if(!mHead && !mTail) {
-				mHead = mTail = newNode;	
+				mHead = mTail = newNode;
 				return;
 			}
 			mTail->mNext = newNode;
@@ -223,7 +223,7 @@ namespace MAUtil {
 		ListIterator insert(ListIterator iterator, const Type& data) {
 			ListNode *next = iterator.mCurrent->mNext;
 			ListNode *newNode = new ListNode(data, iterator.mCurrent, next);
-			iterator.mCurrent->mNext = newNode;	
+			iterator.mCurrent->mNext = newNode;
 			if(next!=NULL) {
 				next->mPrev = newNode;
 			} else {
@@ -251,7 +251,9 @@ namespace MAUtil {
 				mTail = iterator.mCurrent->mPrev;
 			}
 			mSize--;
-			return ListIterator(iterator.mCurrent->mNext);
+			ListIterator nextItr(iterator.mCurrent->mNext);
+			delete iterator.mCurrent;
+			return nextItr;
 		}
 
 		/**

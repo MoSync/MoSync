@@ -29,6 +29,9 @@ using namespace MAUtil;
 // Downloaded data is now owned by the user.
 #define NO_CLEANUP 0
 
+// Redirection attemps limit
+#define MAX_REDIRECTIONS_COUNT 8
+
 // *************** Class DownloadListener *************** //
 
 void DownloadListener::notifyProgress(Downloader* dl, int downloadedBytes, int totalBytes)
@@ -39,14 +42,14 @@ bool DownloadListener::outOfMemory(Downloader*)
 {
 	return false;
 }
-
 // *************** Class Downloader *************** //
 
 Downloader::Downloader()
 : mIsDownloading(false),
   mIsDataPlaceholderSystemAllocated(false),
   mDataPlaceholder(NULL),
-  mReader(NULL)
+  mReader(NULL),
+  mController(NULL)
 {
 	mConn = new HttpConnection(this);
 }
@@ -74,6 +77,11 @@ void Downloader::removeDownloadListener(DownloadListener* listener)
 	}
 }
 
+void Downloader::setDownloadController(DownloadController* dc)
+{
+	mController = dc;
+}
+
 int Downloader::beginDownloading(const char *url, MAHandle placeholder)
 {
 	if ( mIsDownloading )
@@ -93,6 +101,7 @@ int Downloader::beginDownloading(const char *url, MAHandle placeholder)
 	}
 
 	mIsDownloading = true;
+	mRedirectionCounter = 0;
 
 	// If the supplied placeholder is zero, we will use a
 	// system allocated placeholder.
@@ -182,6 +191,40 @@ void Downloader::deleteReader()
 	}
 }
 
+void Downloader::doRedirect(HttpConnection* http)
+{
+	String str;
+	int res = http->getResponseHeader("location", &str);
+
+	if ( NULL != mController && (0 < res) )
+	{
+		bool redirectNeeded = mController->handleRedirect(str.c_str());
+		if ( redirectNeeded )
+		{
+			// Make sure connection is closed.
+			closeConnection(NO_CLEANUP);
+			beginDownloading(str.c_str(), mDataPlaceholder);
+		}
+		else
+		{
+			fireError(CONNERR_REDIRECT);
+		}
+	}
+	else if ( mRedirectionCounter < MAX_REDIRECTIONS_COUNT && (0 < res))
+	{
+		// Make sure connection is closed.
+		closeConnection(NO_CLEANUP);
+		beginDownloading(str.c_str(), mDataPlaceholder);
+
+		mRedirectionCounter++;
+	}
+	else
+	{
+		// Add new error.
+		fireError(CONNERR_REDIRECT);
+	}
+}
+
 /**
  * Called from the HttpConnection via HttpConnectionListener interface.
  */
@@ -190,7 +233,18 @@ void Downloader::httpFinished(HttpConnection* http, int result)
 	// If there is an error, then broadcast the error and return.
 	if (result < 0 || !(result >= 200 && result < 300))
 	{
-		fireError(result);
+		// Do redirection for the following result codes:
+		switch(result) {
+		case 301:	// Moved Permanently
+		case 302:	// Found
+		case 303:	// See Other (since HTTP/1.1)
+		case 307:	// Temporary Redirect (since HTTP/1.1)
+		case 308:	// Permanent Redirect (approved as experimental RFC)[13]
+			doRedirect(http);
+			break;
+		default:
+			fireError(result);
+		}
 		return;
 	}
 
