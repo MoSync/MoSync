@@ -48,5 +48,79 @@ group WidgetStackScreenProperties "Stack screen" {
 		* \endcode
 		*/
 		IS_SHOWN = "isShown";
+
+		/**
+		* @brief Stack screen's push transition type.
+		*
+		* Type of the animated transition used when pushing a screen from the current screen stack.
+		*
+		* Note: This property is available only Android and Windows Phone. On iOS the native navigation animation is used when pushing a screen.
+		*
+		* @validvalue A transition type from the set of available screen transitions found \link #MAW_TRANSITION_TYPE_NONE here \endlink.
+		*
+		* @par Example
+		* \code
+		*	char buf[32];
+		* 	sprintf(buf, "%d", MAW_TRANSITION_TYPE_FADE_IN);
+		*	maWidgetSetProperty(stackScreenHandle, MAW_STACK_SCREEN_PUSH_TRANSITION_TYPE, buf);
+		* \endcode
+		*/
+		PUSH_TRANSITION_TYPE = "pushTransitionType";
+
+		/**
+		* @brief Stack screen's pop transition type.
+		*
+		* Type of the animated transition used when popping a screen from the current screen stack.
+		*
+		* Note: This property is available only Android and Windows Phone. On iOS the native navigation animation is used when popping a screen.
+		*
+		* @validvalue A transition type from the set of available screen transitions found \link #MAW_TRANSITION_TYPE_NONE here \endlink.
+		*
+		* @par Example
+		* \code
+		*	char buf[32];
+		* 	sprintf(buf, "%d", MAW_TRANSITION_TYPE_FADE_OUT);
+		*	maWidgetSetProperty(stackScreenHandle, MAW_STACK_SCREEN_POP_TRANSITION_TYPE, buf);
+		* \endcode
+		*/
+		POP_TRANSITION_TYPE = "popTransitionType";
+
+		/**
+		* @brief Stack screen's push transition duration.
+		*
+		* Duration of the animated transition used when pushing a screen from the current screen stack.
+		*
+		* Note: This property is available only on Android. On iOS the native navigation animation is used when pushing a screen
+		* 	and on Windows Phone is ignored due to the constant duration of the native screen transitions.
+		*
+		* @validvalue A positive number representing a time interval in milliseconds.
+		*
+		* @par Example
+		* \code
+		*	char buf[32];
+		* 	sprintf(buf, "%d", 300);
+		*	maWidgetSetProperty(stackScreenHandle, MAW_STACK_SCREEN_PUSH_TRANSITION_DURATION, buf);
+		* \endcode
+		*/
+		PUSH_TRANSITION_DURATION = "pushTransitionDuration";
+
+		/**
+		* @brief Stack screen's pop transition duration.
+		*
+		* Duration of the animated transition used when popping a screen from the current screen stack.
+		*
+		* Note: This property is available only on Android. On iOS the native navigation animation is used when popping a screen
+		* 	and on Windows Phone is ignored due to the constant duration of the native screen transitions.
+		*
+		* @validvalue A positive number representing a time interval in milliseconds.
+		*
+		* @par Example
+		* \code
+		*	char buf[32];
+		* 	sprintf(buf, "%d", 300);
+		*	maWidgetSetProperty(stackScreenHandle, MAW_STACK_SCREEN_POP_TRANSITION_DURATION, buf);
+		* \endcode
+		*/
+		POP_TRANSITION_DURATION = "popTransitionDuration";
 	}
 } // end of WidgetStackScreenProperties

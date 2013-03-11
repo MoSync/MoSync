@@ -23,6 +23,7 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.os.IBinder;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.mosync.java.android.MoSync;
@@ -104,7 +105,7 @@ public class LocalNotificationsService extends Service
 			mLatestNotification.setFlag(notificationFlag);
 		mLatestNotification.setProperty(
 				MA_NOTIFICATION_LOCAL_PLAY_SOUND, Boolean.toString(notificationPlaySound));
-		if ( !notificationSoundPath.isEmpty() )
+		if ( !TextUtils.isEmpty(notificationSoundPath) )
 		{
 			mLatestNotification.setProperty(
 					MA_NOTIFICATION_LOCAL_SOUND_PATH, notificationSoundPath);
@@ -114,7 +115,7 @@ public class LocalNotificationsService extends Service
 		mLatestNotification.setVibrateDuration(notificationVibrateDuration);
 		mLatestNotification.setProperty(
 				MA_NOTIFICATION_LOCAL_FLASH_LIGHTS, Boolean.toString(notificationFlashingLights));
-		if ( !notificationFlashingPattern.isEmpty() )
+		if ( !TextUtils.isEmpty(notificationFlashingPattern) )
 		{
 			mLatestNotification.setProperty(
 					MA_NOTIFICATION_LOCAL_FLASH_LIGHTS_PATTERN, notificationFlashingPattern);
