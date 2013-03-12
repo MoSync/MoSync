@@ -85,8 +85,7 @@
               // Convert the string URL into ascii encoding.
               NSData* data = [value dataUsingEncoding:NSASCIIStringEncoding allowLossyConversion:YES];
               NSString* formattedURL = [[NSString alloc] initWithData:data encoding:NSASCIIStringEncoding];
-              // Used stringByAddingPercentEscapesUsingEncoding in order to replace spaces with speficit percent characters.
-              url = [NSURL URLWithString:[formattedURL stringByAddingPercentEscapesUsingEncoding:NSASCIIStringEncoding]];
+              url = [NSURL URLWithString:formattedURL];
               [formattedURL release];
 		  }
 
