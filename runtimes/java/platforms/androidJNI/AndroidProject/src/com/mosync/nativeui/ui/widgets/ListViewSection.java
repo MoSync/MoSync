@@ -185,6 +185,7 @@ public class ListViewSection extends Layout
 				createSegmentedSectionDefaultUI();
 				break;
 			case IX_WIDGET.MAW_LIST_VIEW_SECTION_TYPE_ALPHABETICAL:
+				mHasFooter = false;
 				break;
 			default:
 				Log.e("@@MoSync","maWidgetSetProperty invalid List View Section type");
@@ -516,6 +517,7 @@ public class ListViewSection extends Layout
 		{
 			// Create and add the footer after the last item - if that exists.
 			addSectionFooter();
+			mHasFooter = true;
 			setFooterText(text);
 			if (mAdapterListener != null)
 				mAdapterListener.itemAdded(mItems.get(mItems.size()), this, mItems.size());

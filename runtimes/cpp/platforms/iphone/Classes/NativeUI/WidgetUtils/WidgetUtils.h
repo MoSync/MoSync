@@ -34,6 +34,9 @@
 return  MAW_RES_INVALID_PROPERTY_VALUE; \
 }
 
+// Used for converting milliseconds in seconds.
+#define SECOND 1000.0
+
 /**
  * Enums for widget size. Since iOS views are using only fixed sizes, the wrap and fill properties
  * are custom.
