@@ -104,7 +104,9 @@
     else if ([key isEqualToString:@MAW_VIDEO_VIEW_SEEK_TO])
     {
         TEST_FOR_NEGATIVE_VALUE([value floatValue]);
-        [_moviePlayerController setCurrentPlaybackTime:[value floatValue]];
+		// Value is in milliseconds we we have to convert it to seconds.
+		CGFloat timeInSeconds = [value floatValue] / SECOND;
+        [_moviePlayerController setCurrentPlaybackTime: timeInSeconds];
     }
     else if ([key isEqualToString:@MAW_VIDEO_VIEW_CONTROL])
     {
