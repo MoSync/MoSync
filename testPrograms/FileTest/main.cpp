@@ -106,8 +106,8 @@ public:
 	 */
 	MAUtil::String getPath()
 	{
-		// return mPlatform->getLocalPath();
-		return mPlatform->getAndroidSDCardPath();
+		return mPlatform->getLocalPath();
+		//return mPlatform->getAndroidSDCardPath();
 	}
 
 	void testFileAPI()
