@@ -340,12 +340,18 @@ public class EventQueue
 	/**
 	 * Sends a screen orientation changed event.
 	 * @param widgetHandle The screen widget that sends the event.
+	 * @param orientation The new screen orientation.
 	 */
-	public void postScreenOrientationChanged(int widgetHandle)
+	public void postScreenOrientationChanged(int widgetHandle, int orientation)
 	{
-		postWidgetEvent(
-				IX_WIDGET.MAW_EVENT_SCREEN_ORIENTATION_DID_CHANGE,
-				widgetHandle);
+		int event[] = new int[4];
+
+		event[0] = EVENT_TYPE_WIDGET;
+		event[1] = IX_WIDGET.MAW_EVENT_SCREEN_ORIENTATION_DID_CHANGE;
+		event[2] = widgetHandle;
+		event[3] = orientation;
+
+		sMoSyncThread.postEvent(event);
 	}
 
 	public static EventQueue getDefault()

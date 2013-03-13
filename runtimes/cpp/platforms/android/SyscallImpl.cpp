@@ -1930,6 +1930,18 @@ namespace Base
 			SYSLOG("maIOCtl_maScreenSetFullscreen");
 			return _maScreenSetFullscreen(a, mJNIEnv, mJThis);
 
+		case maIOCtl_maScreenSetSupportedOrientations:
+			SYSLOG("maIOCtl_maScreenSetSupportedOrientations");
+			return _maScreenSetSupportedOrientations(a, mJNIEnv, mJThis);
+
+		case maIOCtl_maScreenGetSupportedOrientations:
+			SYSLOG("maIOCtl_maScreenGetSupportedOrientations");
+			return _maScreenGetSupportedOrientations(mJNIEnv, mJThis);
+
+		case maIOCtl_maScreenGetCurrentOrientation:
+			SYSLOG("maIOCtl_maScreenGetCurrentOrientation");
+			return _maScreenGetCurrentOrientation(mJNIEnv, mJThis);
+
 		case maIOCtl_maHomeScreenEventsOn:
 			SYSLOG("maIOCtl_maHomeScreenEventsOn");
 			// 1 = events on
