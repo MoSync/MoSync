@@ -24,15 +24,14 @@ MA 02110-1301, USA.
  *
  * How to use:
  *
- * Edit function getPath() below in this file to set the
- * file system to be tested (application local file system
- * or the SD card file system on Android).
- *
  * Build and run the app.
  *
  * Inspect the output shown on the screen. If all test
  * passes "All tests passed." is displayed, if a test fails,
  * "Test failed." is displayed.
+ *
+ * On Android the SD card is used for file tests, on other
+ * platforms the local app directory is used.
  */
 
 #include <ma.h>
@@ -98,16 +97,26 @@ public:
 	}
 
 	/**
-	 * This is where the path to be tested is set.
-	 * You can test the application local path, or the
-	 * Android SD card path. Comment/uncomment the lines
-	 * below to set the path to be tested.
-	 * @return The path.
+	 * Get the path to be used for file tests.
+	 * On Android SD card is used, on other platforms
+	 * the local app directory.
+	 * @return A path.
 	 */
 	MAUtil::String getPath()
 	{
-		return mPlatform->getLocalPath();
-		//return mPlatform->getAndroidSDCardPath();
+		int SIZE = 256;
+		char os[SIZE];
+		maGetSystemProperty("mosync.device.OS", os, SIZE);
+		if (0 == strncmp(os , "Android", 7))
+		{
+			printf("Using SD card\n");
+			return mPlatform->getAndroidSDCardPath();
+		}
+		else
+		{
+			printf("Using local app folder\n");
+			return mPlatform->getLocalPath();
+		}
 	}
 
 	void testFileAPI()
