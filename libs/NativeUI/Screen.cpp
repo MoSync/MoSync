@@ -149,6 +149,11 @@ namespace NativeUI
 		else if (widgetEventData->eventType == MAW_EVENT_SCREEN_ORIENTATION_DID_CHANGE)
 		{
 			this->orientationDidChange();
+			for (int i=0; i < mScreenListeners.size(); i++)
+			{
+				mScreenListeners[i]->orientationChanged(
+						this, widgetEventData->screenOrientation);
+			}
 		}
 		else if ( MAW_EVENT_OPTIONS_MENU_ITEM_SELECTED == widgetEventData->eventType )
 		{

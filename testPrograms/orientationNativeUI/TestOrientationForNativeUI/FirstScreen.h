@@ -40,14 +40,14 @@ namespace OrientationTest
 		public Screen,
 		public CheckBoxListener,
 		public ButtonListener,
-		public ListViewListener
+		public ScreenListener
 	{
 
 	public:
 		/**
 		 * Constructor.
 		 */
-			FirstScreen();
+		FirstScreen();
 
 		/**
 		 * Destructor.
@@ -72,11 +72,6 @@ namespace OrientationTest
 		void createMainLayout();
 
 		/**
-		 * Creates the set orientation list view (it contains the orientation options)
-		 */
-		void createSetOrientationListView();
-
-		/**
 		 * Gets the current orientation as a string
 		 */
 		MAUtil::String getOrientationString();
@@ -90,22 +85,14 @@ namespace OrientationTest
 		 */
 		HorizontalLayout* createRow(Label* label, CheckBox* checkBox);
 
-		/**
-		 * This method is called when the user selects an item from
-		 * the list view
-		 * @param listView The list view object that generated the event
-		 * @param listViewItem The ListViewItem object that was clicked.
-		 */
-		virtual void listViewItemClicked(ListView* listView, ListViewItem* listViewItem);
-
+		// From ButtonListener
         /**
-         * This method is called when a list view item is clicked.
-         * @param listView The list view object that generated the event.
-         * @param index The index on which the list view item is positioned.
+         * This method is called if the touch-up event was inside the
+         * bounds of the button.
+         * Platform: iOS, Android, Windows Phone.
+         * @param button The button object that generated the event.
          */
-        virtual void listViewItemClicked(
-            ListView* listView,
-            int index) {};
+        virtual void buttonClicked(Widget* button);
 
 		/**
 		 * This method is called when the state of the check box was changed
@@ -117,12 +104,14 @@ namespace OrientationTest
 			CheckBox* checkBox,
 			bool state);
 
-	   /**
-		 * This method is called if the touch-up event was inside the
-		 * bounds of the button.
-		 * @param button The button object that generated the event.
+		// From ScreenListener
+		/**
+		 * Called after the screen has finished rotating.
+		 * Subclasses may override this method to perform additional actions
+		 * after the rotation.
+		 * @param screenOrientation The new screen orientation.
 		 */
-		virtual void buttonClicked(Widget* button);
+		virtual void orientationChanged(Screen* screen, int screenOrientation);
 
 		/**
 		 * Changes the screen orientation bit mask.
@@ -139,6 +128,11 @@ namespace OrientationTest
 
 	private:
 		/**
+		 * Used for applying the orientation flag.
+		 */
+		Button* mSetOrientationBtn;
+
+		/**
 		 * Used for enabling/disabling portrait mode.
 		 */
 		CheckBox* mPortraitCheckBox;
@@ -147,7 +141,12 @@ namespace OrientationTest
 		 * Used for enabling/disabling portrait mode.
 		 */
 		CheckBox* mPortraitUpsideDownCheckBox;
+		CheckBox* mPortraitUpCheckBox;
 
+		/**
+		 * Used for enabling/disabling sensor landscape.
+		 */
+		CheckBox* mLandscapeCheckBox;
 		/**
 		 * Used for enabling/disabling landscape left mode.
 		 */
@@ -159,6 +158,11 @@ namespace OrientationTest
 		CheckBox* mLandscapeRightCheckBox;
 
 		/**
+		 * Used for enabling/disabling dynamic orientation.
+		 */
+		CheckBox* mDynamicCheckBox;
+
+		/**
 		 * Display the current orientation.
 		 */
 		Label* mOrientationLabel;
@@ -166,17 +170,7 @@ namespace OrientationTest
 		/**
 		 * Describes how to use the set orientation feature.
 		 */
-		Label*mSetOrientationDescriptionLabel;
-
-		/**
-		 * Contains the options for the set orientation function.
-		 */
-		ListView*mOrientationOptionsListView;
-
-		/**
-		 * Used to set the orientation.
-		 */
-		Button *mSetOrientationButton;
+		Label *mSetOrientationDescriptionLabel;
 
 		/**
 		 * A bit mask consisting of flags describing the supported screen orientations.
@@ -192,10 +186,7 @@ namespace OrientationTest
 		 * 3 - SCREEN_ORIENTATION_DYNAMIC
 		 */
 		int mSelectedOrientation;
-		/**
-		 * Android only. Keep this until getOrientation is implemented.
-		 */
-		int mOrientationChangesCount;
+
 	};
 
 } // namespace OrientationTest

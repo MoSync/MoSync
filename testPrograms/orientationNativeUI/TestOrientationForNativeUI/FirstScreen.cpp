@@ -25,10 +25,13 @@
 
 #define SCREEN_TITLE "Set orientation"
 
-#define PORTRAIT_LABEL_TEXT "Portrait"
+#define PORTRAIT_LABEL_TEXT "Portrait(SENSOR based)"
+#define PORTRAIT_UP_LABEL_TEXT "Portrait Up"
 #define PORTRAIT_UPSIDE_DOWN_LABEL_TEXT "Portrait upside down"
 #define LANDSCAPE_LEFT_LABEL_TEXT "Landscape left"
 #define LANDSCAPE_RIGHT_LABEL_TEXT "Landscape right"
+#define LANDSCAPE_LABEL_TEXT "Landscape(SENSOR based)"
+#define DYNAMIC_LABEL_TEXT "Dynamic(SENSOR based)"
 #define ORIENTATION_LABEL "Orientation:"
 #define ORIENTATION_PORTRAIT "Portrait"
 #define ORIENTATION_PORTRAIT_UPSIDE_DOWN "Portrait upside down"
@@ -52,41 +55,40 @@ namespace OrientationTest
 	 */
 	FirstScreen::FirstScreen() :
 		Screen(),
+		mSetOrientationBtn(NULL),
 		mPortraitCheckBox(NULL),
 		mPortraitUpsideDownCheckBox(NULL),
 		mLandscapeLeftCheckBox(NULL),
 		mLandscapeRightCheckBox(NULL),
+		mPortraitUpCheckBox(NULL),
+		mLandscapeCheckBox(NULL),
+		mDynamicCheckBox(NULL),
 		mOrientationLabel(NULL),
-		mSetOrientationDescriptionLabel(NULL),
-		mSetOrientationButton(NULL),
-		mOrientationOptionsListView(NULL),
-		mOrientationChangesCount(0)
+		mSetOrientationDescriptionLabel(NULL)
 	{
 		this->setTitle(SCREEN_TITLE);
 
 		mSelectedOrientation = -1;
 
 		createMainLayout();
-		int platform = getPlatform();
-		if (platform == WINDOWSPHONE7 ||
-			platform == IOS)
-		{
-			mPortraitCheckBox->setState(true);
-			mPortraitCheckBox->addCheckBoxListener(this);
-			mPortraitUpsideDownCheckBox->addCheckBoxListener(this);
-			mLandscapeLeftCheckBox->addCheckBoxListener(this);
-			mLandscapeRightCheckBox->addCheckBoxListener(this);
 
-			mSupportedOrientations = MA_SCREEN_ORIENTATION_PORTRAIT;
-			maScreenSetSupportedOrientations(mSupportedOrientations);
-		}
-		else if (platform == ANDROID)
-		{
-			mSetOrientationButton->addButtonListener(this);
-			mOrientationOptionsListView->addListViewListener(this);
-		}
+//			mPortraitCheckBox->setState(true);
+		mPortraitCheckBox->addCheckBoxListener(this);
+		mPortraitUpsideDownCheckBox->addCheckBoxListener(this);
+		mLandscapeLeftCheckBox->addCheckBoxListener(this);
+		mLandscapeRightCheckBox->addCheckBoxListener(this);
+		mLandscapeCheckBox->addCheckBoxListener(this);
+		mPortraitUpCheckBox->addCheckBoxListener(this);
+		mPortraitUpCheckBox->setState(true);
+		mDynamicCheckBox->addCheckBoxListener(this);
+		addScreenListener(this);
+		mSetOrientationBtn->addButtonListener(this);
 
-		mOrientationLabel->setText(ORIENTATION_PORTRAIT);
+		mSupportedOrientations = MA_SCREEN_ORIENTATION_PORTRAIT_UP;
+		// By default it's portrait.
+//		maScreenSetSupportedOrientations(mSupportedOrientations);
+//
+		mOrientationLabel->setText(PORTRAIT_UP_LABEL_TEXT);
 	}
 
 	/**
@@ -94,20 +96,15 @@ namespace OrientationTest
 	 */
 	FirstScreen::~FirstScreen()
 	{
-		int platform = getPlatform();
-		if (platform == WINDOWSPHONE7 ||
-			platform == IOS)
-		{
-			mPortraitCheckBox->removeCheckBoxListener(this);
-			mPortraitUpsideDownCheckBox->removeCheckBoxListener(this);
-			mLandscapeLeftCheckBox->removeCheckBoxListener(this);
-			mLandscapeRightCheckBox->removeCheckBoxListener(this);
-		}
-		else if (platform == ANDROID)
-		{
-			mSetOrientationButton->removeButtonListener(this);
-			mOrientationOptionsListView->removeListViewListener(this);
-		}
+		mPortraitCheckBox->removeCheckBoxListener(this);
+		mPortraitUpsideDownCheckBox->removeCheckBoxListener(this);
+		mLandscapeLeftCheckBox->removeCheckBoxListener(this);
+		mLandscapeRightCheckBox->removeCheckBoxListener(this);
+		mLandscapeCheckBox->removeCheckBoxListener(this);
+		mPortraitUpCheckBox->removeCheckBoxListener(this);
+		mDynamicCheckBox->removeCheckBoxListener(this);
+		removeScreenListener(this);
+		mSetOrientationBtn->removeButtonListener(this);
 	}
 
 	/**
@@ -151,118 +148,58 @@ namespace OrientationTest
 		hLayout->addChild(mOrientationLabel);
 		mainLayout->addChild(hLayout);
 
-		int platform = getPlatform();
-		if (platform == WINDOWSPHONE7 ||
-			platform == IOS)
-		{
-			// Add widgets for enabling/disabling portrait mode.
-			label = new Label();
-			label->setText(PORTRAIT_LABEL_TEXT);
-			mPortraitCheckBox = new CheckBox();
-			mainLayout->addChild(this->createRow(label, mPortraitCheckBox));
+		// Add widgets for enabling/disabling sensor portrait mode.
+		label = new Label();
+		label->setText(PORTRAIT_LABEL_TEXT);
+		mPortraitCheckBox = new CheckBox();
+		mainLayout->addChild(this->createRow(label, mPortraitCheckBox));
 
-			// Add widgets for enabling/disabling portrait upside down mode.
-			label = new Label();
-			label->setText(PORTRAIT_UPSIDE_DOWN_LABEL_TEXT);
-			mPortraitUpsideDownCheckBox = new CheckBox();
-			mainLayout->addChild(this->createRow(label, mPortraitUpsideDownCheckBox));
+		HorizontalLayout* pLayout = new HorizontalLayout();
+		pLayout->wrapContentVertically();
+		// Add widgets for enabling/disabling portrait Up mode.
+		label = new Label();
+		label->setText(PORTRAIT_UP_LABEL_TEXT);
+		mPortraitUpCheckBox = new CheckBox();
+		pLayout->addChild(this->createRow(label, mPortraitUpCheckBox));
 
-			// Add widgets for enabling/disabling landscape left mode.
-			label = new Label();
-			label->setText(LANDSCAPE_LEFT_LABEL_TEXT);
-			mLandscapeLeftCheckBox = new CheckBox();
-			mainLayout->addChild(this->createRow(label, mLandscapeLeftCheckBox));
+		// Add widgets for enabling/disabling portrait upside down mode.
+		label = new Label();
+		label->setText(PORTRAIT_UPSIDE_DOWN_LABEL_TEXT);
+		mPortraitUpsideDownCheckBox = new CheckBox();
+		pLayout->addChild(this->createRow(label, mPortraitUpsideDownCheckBox));
+		mainLayout->addChild(pLayout);
 
-			// Add widgets for enabling/disabling landscape right mode.
-			label = new Label();
-			label->setText(LANDSCAPE_RIGHT_LABEL_TEXT);
-			mLandscapeRightCheckBox = new CheckBox();
-			mainLayout->addChild(this->createRow(label, mLandscapeRightCheckBox));
-		}
-		else if (platform == ANDROID)
-		{
-			// add widgets for changing the current orientation
-			mSetOrientationDescriptionLabel = new Label();
-			mSetOrientationDescriptionLabel->setText("Select a desired orientation from the list and press the set button");
-			mainLayout->addChild(mSetOrientationDescriptionLabel);
+		// Add widgets for enabling/disabling sensor landscape mode.
+		label = new Label();
+		label->setText(LANDSCAPE_LABEL_TEXT);
+		mLandscapeCheckBox = new CheckBox();
+		mainLayout->addChild(this->createRow(label, mLandscapeCheckBox));
 
-			// create the list view containing the set orientation options
-			createSetOrientationListView();
-			mainLayout->addChild(mOrientationOptionsListView);
+		HorizontalLayout* lLayout = new HorizontalLayout();
+		lLayout->wrapContentVertically();
+		// Add widgets for enabling/disabling landscape left mode.
+		label = new Label();
+		label->setText(LANDSCAPE_LEFT_LABEL_TEXT);
+		mLandscapeLeftCheckBox = new CheckBox();
+		lLayout->addChild(this->createRow(label, mLandscapeLeftCheckBox));
 
-			mSetOrientationButton = new Button();
-			mSetOrientationButton->fillSpaceHorizontally();
-			mSetOrientationButton->setText("Set selected orientation");
-			mainLayout->addChild(mSetOrientationButton);
-		}
-	}
+		// Add widgets for enabling/disabling landscape right mode.
+		label = new Label();
+		label->setText(LANDSCAPE_RIGHT_LABEL_TEXT);
+		mLandscapeRightCheckBox = new CheckBox();
+		lLayout->addChild(this->createRow(label, mLandscapeRightCheckBox));
+		mainLayout->addChild(lLayout);
 
-	void FirstScreen::createSetOrientationListView()
-	{
-		mOrientationOptionsListView = new ListView();
+		// Add widgets for enabling/disabling sensor mode.
+		label = new Label();
+		label->setText(DYNAMIC_LABEL_TEXT);
+		mDynamicCheckBox = new CheckBox();
+		mainLayout->addChild(this->createRow(label, mDynamicCheckBox));
 
-		ListViewItem* item1 = new ListViewItem();
-		item1->setText(SCREEN_ORIENTATION_LANDSCAPE_STRING);
-		item1->setBackgroundColor(0xFFFFFF);
-		item1->setFontColor(0x000000);
-		item1->fillSpaceHorizontally();
-		mOrientationOptionsListView->addChild(item1);
-
-		ListViewItem* item2 = new ListViewItem();
-		item2->setText(SCREEN_ORIENTATION_PORTRAIT_STRING);
-		item2->setBackgroundColor(0xFFFFFF);
-		item2->setFontColor(0x000000);
-		item2->fillSpaceHorizontally();
-		mOrientationOptionsListView->addChild(item2);
-
-		ListViewItem* item3 = new ListViewItem();
-		item3->setText(SCREEN_ORIENTATION_DYNAMIC_STRING);
-		item3->setBackgroundColor(0xFFFFFF);
-		item3->setFontColor(0x000000);
-		item3->fillSpaceHorizontally();
-		mOrientationOptionsListView->addChild(item3);
-
-		mOrientationOptionsListView->fillSpaceHorizontally();
-	}
-
-	/**
-	 * This method is called when a list view item is clicked.
-	 * @param listView The list view object that generated the event.
-	 * @param listViewItem The ListViewItem object that was clicked.
-	 */
-	void FirstScreen::listViewItemClicked(ListView* listView, ListViewItem* listViewItem)
-	{
-		if (listView == mOrientationOptionsListView)
-		{
-			// get the index of the selected list view item
-			int listViewItemIndex = -1;
-			for(int i = 0; i < listView->countChildWidgets(); i++)
-			{
-				ListViewItem* currentItem = (ListViewItem*)listView->getChild(i);
-				currentItem->setBackgroundColor(0xFFFFFF);
-
-				if (currentItem == listViewItem)
-				{
-					listViewItemIndex = i;
-				}
-			}
-
-			// change the background color of the selected list view item for highlighting
-			listViewItem->setBackgroundColor(0xFF0000);
-
-			if (listViewItemIndex == 0)
-			{
-				mSelectedOrientation = SCREEN_ORIENTATION_LANDSCAPE;
-			}
-			else if (listViewItemIndex == 1)
-			{
-				mSelectedOrientation = SCREEN_ORIENTATION_PORTRAIT;
-			}
-			else
-			{
-				mSelectedOrientation = SCREEN_ORIENTATION_DYNAMIC;
-			}
-		}
+		mSetOrientationBtn = new Button();
+		mSetOrientationBtn->setText("Apply selected supported orientations");
+		mSetOrientationBtn->setFontColor(0xFF0000);
+		mainLayout->addChild(mSetOrientationBtn);
 	}
 
 	/**
@@ -284,6 +221,15 @@ namespace OrientationTest
 			this->changeOrientationBitmask(isChecked,
 				MA_SCREEN_ORIENTATION_PORTRAIT,
 				mPortraitCheckBox);
+		}
+		else if (checkBox == mPortraitUpCheckBox)
+		{
+			isChecked = mPortraitUpCheckBox->isChecked();
+			printf("FirstScreen::checkBoxStateChanged set portrait Up mode to %d",
+				isChecked);
+			this->changeOrientationBitmask(isChecked,
+				MA_SCREEN_ORIENTATION_PORTRAIT_UP,
+				mPortraitUpCheckBox);
 		}
 		else if (checkBox == mPortraitUpsideDownCheckBox)
 		{
@@ -312,24 +258,45 @@ namespace OrientationTest
 					MA_SCREEN_ORIENTATION_LANDSCAPE_RIGHT,
 				mLandscapeRightCheckBox);
 		}
-		int result = maScreenSetSupportedOrientations(mSupportedOrientations);
-		printf("FirstScreen::checkBoxStateChanged result maScreenSetSupportedOrientations = %d",
-			result);
+		else if (checkBox == mLandscapeCheckBox)
+		{
+			isChecked = mLandscapeCheckBox->isChecked();
+			printf("FirstScreen::checkBoxStateChanged set landscape sensor mode to %d",
+				isChecked);
+			this->changeOrientationBitmask(isChecked,
+					MA_SCREEN_ORIENTATION_LANDSCAPE,
+					mLandscapeCheckBox);
+		}
+		else if (checkBox == mDynamicCheckBox)
+		{
+			isChecked = mDynamicCheckBox->isChecked();
+			printf("FirstScreen::checkBoxStateChanged set landscape sensor mode to %d",
+				isChecked);
+			this->changeOrientationBitmask(isChecked,
+					MA_SCREEN_ORIENTATION_DYNAMIC,
+					mDynamicCheckBox);
+		}
+//		int result = maScreenSetSupportedOrientations(mSupportedOrientations);
+//		printf("FirstScreen::checkBoxStateChanged result maScreenSetSupportedOrientations = %d",
+//			result);
 	}
 
-	/**
-	 * This method is called if the touch-up event was inside the
-	 * bounds of the button.
-	 * @param button The button object that generated the event.
-	 */
-	void FirstScreen::buttonClicked(Widget* button)
-	{
-		if (button == mSetOrientationButton)
+    /**
+     * This method is called if the touch-up event was inside the
+     * bounds of the button.
+     * Platform: iOS, Android, Windows Phone.
+     * @param button The button object that generated the event.
+     */
+    void FirstScreen::buttonClicked(Widget* button)
+    {
+		if (mSetOrientationBtn == button)
 		{
-			// set orientation
-			int result = maScreenSetOrientation(mSelectedOrientation);
+			int result = maScreenSetSupportedOrientations(mSupportedOrientations);
+			printf("FirstScreen::checkBoxStateChanged result maScreenSetSupportedOrientations = %d",
+				result);
 		}
-	}
+
+    }
 
 	/**
 	 * Changes the screen orientation bit mask.
@@ -356,7 +323,7 @@ namespace OrientationTest
 		if (0 == mSupportedOrientations)
 		{
 			mSupportedOrientations = orientation;
-			checkBox->setState(true);
+//			checkBox->setState(true);
 		}
 	}
 
@@ -374,7 +341,38 @@ namespace OrientationTest
 	 */
 	void FirstScreen::orientationDidChange()
 	{
-		mOrientationLabel->setText(this->getOrientationString());
+		//mOrientationLabel->setText(this->getOrientationString());
+	}
+
+	/**
+	 * Called after the screen has finished rotating.
+	 * Subclasses may override this method to perform additional actions
+	 * after the rotation.
+	 * @param screenOrientation The new screen orientation.
+	 */
+	void FirstScreen::orientationChanged(Screen* screen, int screenOrientation)
+	{
+		MAUtil::String orientationText;
+		switch (screenOrientation)
+		{
+			case MA_SCREEN_ORIENTATION_PORTRAIT:
+				orientationText = ORIENTATION_PORTRAIT;
+				break;
+			case MA_SCREEN_ORIENTATION_PORTRAIT_UPSIDE_DOWN:
+				orientationText = ORIENTATION_PORTRAIT_UPSIDE_DOWN;
+				break;
+			case MA_SCREEN_ORIENTATION_LANDSCAPE_LEFT:
+				orientationText = ORIENTATION_LANDSCAPE_LEFT;
+				break;
+			case MA_SCREEN_ORIENTATION_LANDSCAPE_RIGHT:
+				orientationText = ORIENTATION_LANDSCAPE_RIGHT;
+				break;
+			case MA_SCREEN_ORIENTATION_PORTRAIT_UP:
+				orientationText = PORTRAIT_UP_LABEL_TEXT;
+				break;
+		}
+
+		mOrientationLabel->setText(orientationText);
 	}
 
 	/**
@@ -398,22 +396,11 @@ namespace OrientationTest
 			case MA_SCREEN_ORIENTATION_LANDSCAPE_RIGHT:
 				orientationText = ORIENTATION_LANDSCAPE_RIGHT;
 				break;
-			default:
-			{
-				// maScreenGetCurrentOrientation is not yet implemented on Android.
-				mOrientationChangesCount ++;
-				if (mOrientationChangesCount > 0)
-				{
-					orientationText = "Orientation changed " +
-							MAUtil::integerToString(mOrientationChangesCount) + " times";
-				}
-				else
-				{
-					orientationText = "Orientation changed 1 time";
-				}
+			case MA_SCREEN_ORIENTATION_PORTRAIT_UP:
+				orientationText = PORTRAIT_UP_LABEL_TEXT;
 				break;
-			}
 		}
+
 		return orientationText;
 	}
 

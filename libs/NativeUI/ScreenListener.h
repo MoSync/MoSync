@@ -50,6 +50,14 @@ namespace NativeUI
     class ScreenListener
     {
     public:
+		/**
+		 * Called after the screen has finished rotating.
+		 * Subclasses may override this method to perform additional actions
+		 * after the rotation.
+		 * @param screenOrientation The new screen orientation.
+		 */
+		virtual void orientationChanged(Screen* screen, int screenOrientation) {};
+
         /**
          * This method is called when the OptionsMenu is being closed
          * (either by the user canceling the menu with the back/menu
