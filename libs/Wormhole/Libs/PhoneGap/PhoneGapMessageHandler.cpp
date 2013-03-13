@@ -326,9 +326,16 @@ namespace Wormhole
 			//So we just return a value for the phoneGap apps to work
 			sprintf(deviceUUID, "Not Accessible");
 		}
+		//Due to some limitations on some devices
+		//We have to check the device model separately
+		if(modelRes < 0)
+		{
+			//PhoneGap does not return an error if it cannot read device model
+			//So we just return a value for the phoneGap apps to work
+			sprintf(deviceModel, "Not Accessible");
+		}
 		//if Any of the above commands fail send an error to PhoneGap
 		if((nameRes < 0)
-			|| (modelRes < 0)
 			|| (osRes < 0)
 			|| (osVersionRes < 0))
 		{
