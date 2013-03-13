@@ -100,35 +100,6 @@ public class LocalNotificationsManager
 		LocalNotificationObject notification = m_NotificationTable.get(handle);
 		if ( null != notification )
 		{
-			// Remove the service notification if it is pending.
-			if ( notification.isActive() )
-			{
-				LocalNotificationsService.removeServiceNotification(
-						m_NotificationTable.get(handle).getId(),
-						mMoSyncThread.getActivity());
-
-				// Stop the service, even when the application is in background.
-				LocalNotificationsService.stopService();
-			}
-			// Cancel the intent assigned to the notification if scheduled.
-			if ( null != m_Intents.get(handle) )
-			{
-				AlarmManager alarmManager  =
-					(AlarmManager) mMoSyncThread.getActivity().getSystemService(Context.ALARM_SERVICE);
-
-				// Set the unique request code as the handle.
-				PendingIntent pendingIntent = PendingIntent.getBroadcast(
-						mMoSyncThread.getActivity(),
-						notification.getRequestCode(),
-						m_Intents.get(handle),
-						PendingIntent.FLAG_NO_CREATE);
-				if ( pendingIntent != null )
-				{
-					alarmManager.cancel(pendingIntent);
-				}
-				m_Intents.remove(handle);
-			}
-
 			// Remove the internal notification object.
 			m_NotificationTable.remove(handle);
 
@@ -295,6 +266,7 @@ public class LocalNotificationsManager
 			// Register the alarm to the system, for the current date in milliseconds from UTC for this time zone.
 			alarmManager.set(AlarmManager.RTC_WAKEUP, notification.getFireDate(), pendingIntent);
 			m_Intents.put(handle, intent);
+
 
 			return MA_NOTIFICATION_RES_OK;
 		}
