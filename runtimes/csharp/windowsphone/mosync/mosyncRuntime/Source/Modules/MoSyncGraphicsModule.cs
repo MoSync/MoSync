@@ -325,7 +325,7 @@ namespace MoSync
                     {
                         int aux = w;
                         w = h;
-                        h = w;
+                        h = aux;
                     }
                 });
 				return MoSync.Util.CreateExtent(w, h);

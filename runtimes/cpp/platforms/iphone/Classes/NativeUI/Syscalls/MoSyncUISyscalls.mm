@@ -276,11 +276,12 @@ int maWidgetModalDialogHide(MAWidgetHandle dialogHandle) {
  * @param screenHandle The handle to the screen.
  * @return Any of the following result codes:
  * - MAW_RES_OK if the screen could be shown.
+ * - MAW_RES_INVALID_HANDLE if the screenHandle is invalid.
  * - MAW_RES_INVALID_SCREEN if the screenHandle is not a handle to a screen.
  */
 int maWidgetScreenShow(MAWidgetHandle screenHandle) {
 	IWidget* screen = [mosyncUI getWidget:screenHandle];
-	if(!screen) return MAW_RES_INVALID_SCREEN;
+	if(!screen) return MAW_RES_INVALID_HANDLE;
 
 	if(!([screen class] == [ScreenWidget class]) && !([screen superclass] == [ScreenWidget class])) {
 		return MAW_RES_INVALID_SCREEN;
@@ -296,6 +297,34 @@ int maWidgetScreenShow(MAWidgetHandle screenHandle) {
 							waitUntilDone:YES
 						   andReturnValue:&returnValue];
     [arguments release];
+	return returnValue;
+}
+
+int maWidgetScreenShowWithTransition(MAWidgetHandle screenHandle, MAWScreenTransitionType screenTransitionType, int screenTransitionDuration) {
+
+	IWidget* screen = [mosyncUI getWidget:screenHandle];
+	if(!screen) return MAW_RES_INVALID_HANDLE;
+
+	if(!([screen class] == [ScreenWidget class]) && !([screen superclass] == [ScreenWidget class])) {
+		return MAW_RES_INVALID_SCREEN;
+	}
+
+	sNativeUIEnabled = screenHandle==MAW_CONSTANT_MOSYNC_SCREEN_HANDLE?false:true;
+
+    NSNumber* scrTransType = [[NSNumber alloc] initWithInt:screenTransitionType];
+    NSNumber* scrTransDur = [[NSNumber alloc] initWithInt:screenTransitionDuration];
+
+	int returnValue;
+    NSArray* arguments = [[NSArray alloc] initWithObjects:screen, scrTransType, scrTransDur, nil];
+	[NSObject performSelectorOnMainThread:@selector(show:withTransitionType:andTransitionDuration:)
+                               withTarget:mosyncUI
+							  withObjects:arguments
+							waitUntilDone:YES
+						   andReturnValue:&returnValue];
+    [arguments release];
+    [scrTransDur release];
+    [scrTransType release];
+
 	return returnValue;
 }
 

@@ -40,7 +40,7 @@
 /**
  * Used by the MAW_IMAGE_BUTTON_PRESSED_IMAGE property.
  */
-@property(nonatomic, assign) MAHandle pressedImageHadle;
+@property(nonatomic, assign) MAHandle pressedImageHandle;
 
 /**
  * Set the foreground image from a given file path.
@@ -88,6 +88,8 @@
 
 @synthesize foregroundImagePath = _foregroundImagePath;
 @synthesize backgroundImagePath = _backgroundImagePath;
+@synthesize pressedImagePath = _pressedImagePath;
+@synthesize pressedImageHandle;
 
 - (id)init
 {
@@ -170,7 +172,7 @@
 	}
 	else if ([key isEqualToString:@MAW_IMAGE_BUTTON_PRESSED_IMAGE])
 	{
-		return [[NSString alloc] initWithFormat:@"%d", self.pressedImageHadle];
+		return [[NSString alloc] initWithFormat:@"%d", self.pressedImageHandle];
 	}
 	else if ([key isEqualToString:@MAW_IMAGE_BUTTON_PRESSED_IMAGE_PATH])
 	{
@@ -249,7 +251,7 @@
 	image = [UIImage imageWithCGImage:imageResource->image];
 	[button setBackgroundImage:image forState:UIControlStateHighlighted];
 
-	self.pressedImageHadle = handle;
+	self.pressedImageHandle = handle;
 	self.pressedImagePath = @"";
 
 	return MAW_RES_OK;
@@ -276,7 +278,7 @@
 	[imageSource release];
 
 	self.pressedImagePath = path;
-	self.pressedImageHadle = 0;
+	self.pressedImageHandle = 0;
 
 	return MAW_RES_OK;
 }

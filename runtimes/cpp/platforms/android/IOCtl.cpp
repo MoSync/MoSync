@@ -1170,6 +1170,23 @@ namespace Base
 		return (int)result;
 	}
 
+	int _maWidgetScreenShowWithTransition(int screenWidget, int screenTransitionType, int screenTransitionDuration, JNIEnv* jNIEnv, jobject jThis)
+	{
+		// Get the Java method
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maWidgetScreenShowWithTransition", "(III)I");
+
+		jint result = -1;
+
+		if (methodID != 0)
+			result = jNIEnv->CallIntMethod(jThis, methodID, screenWidget, screenTransitionType, screenTransitionDuration);
+
+		// Delete allocated memory
+		jNIEnv->DeleteLocalRef(cls);
+
+		return (int)result;
+	}
+
 	int _maWidgetStackScreenPush(int stackScreenWidget, int newScreen, JNIEnv* jNIEnv, jobject jThis)
 	{
 		// Get the Java method
