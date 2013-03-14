@@ -45,5 +45,24 @@ group WidgetScreenProperties "Screen" {
 		* \endcode
 		*/
 		REMOVE_OPTIONS_MENU = "removeoptionsmenu";
+
+		/**
+		* @brief Check if a screen is shown.
+		*
+		* @validvalue "true" if the screen is visible, "false" otherwise.
+		*
+		* @getonly
+		*
+		* @par Example
+		* \code
+		*	char buffer[BUFFER_SIZE];
+		*	int result = maWidgetGetProperty(screenHandle, MAW_SCREEN_IS_SHOWN, buffer, BUFFER_SIZE);
+		*	if(result == MAW_RES_OK && strcmp(buffer, "true") == 0)
+		*	{
+		*		// Screen is visible.
+		*	}
+		* \endcode
+		*/
+		IS_SHOWN = "isShown";
 	}
 } // end of WidgetScreenProperties

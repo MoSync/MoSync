@@ -31,6 +31,7 @@ using System.Windows.Navigation;
 using System;
 using System.Text.RegularExpressions;
 using System.Reflection;
+using System.IO.IsolatedStorage;
 
 namespace MoSync
 {
@@ -46,6 +47,9 @@ namespace MoSync
 
             //Standard stretch object
             protected System.Windows.Media.Stretch mStretch;
+
+            // File image path for MAW_IMAGE_PATH property.
+            protected String mImagePath;
 
             /**
              * The constructor
@@ -82,6 +86,8 @@ namespace MoSync
 
                         //The image standard object gets that as a source
                         mImage.Source = bmpSource;
+
+                        mImagePath = "";
                     }
                     else throw new InvalidPropertyValueException();
                 }
@@ -109,6 +115,38 @@ namespace MoSync
                         mImage.Stretch = mStretch;
                     }
                     else throw new InvalidPropertyValueException();
+                }
+            }
+
+            //MAW_IMAGE_PATH property implementation
+            [MoSyncWidgetProperty(MoSync.Constants.MAW_IMAGE_PATH)]
+            public String ImagePath
+            {
+                set
+                {
+                    //Take the store for the application (an image of the sandbox)
+                    IsolatedStorageFile f = IsolatedStorageFile.GetUserStoreForApplication();
+
+                    //Verify that the file exists on the isolated storage
+                    if(f.FileExists(value))
+                    {
+                        //Create a file stream for the required file
+                        IsolatedStorageFileStream fs = new IsolatedStorageFileStream(value, System.IO.FileMode.Open, f);
+
+                        //Set the stream as a source for a new bitmap image
+                        var image = new System.Windows.Media.Imaging.BitmapImage();
+                        image.SetSource(fs);
+
+                        //Set the newly created bitmap image for the image widget
+                        mImage.Source = image;
+                        mImagePath = value;
+                    }
+                    //If the file does not exist throw an invalid property value exception
+                    else throw new InvalidPropertyValueException();
+                }
+                get
+                {
+                    return mImagePath;
                 }
             }
         }

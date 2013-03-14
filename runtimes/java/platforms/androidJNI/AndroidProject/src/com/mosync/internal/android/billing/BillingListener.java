@@ -23,13 +23,6 @@ package com.mosync.internal.android.billing;
  */
 public abstract class BillingListener
 {
-
-    public static void onTransactionInformationReceived(PurchaseInformation purchase){};
-
-    public static void onPurchaseRestored(PurchaseInformation purchase){};
-
-    public static void onPurchaseRefunded(PurchaseInformation purchase){};
-
     public static void onPurchaseStateChanged(int state, int handle, int error){};
 
     public static void onReceiptEvent(int[] event, int handle){};

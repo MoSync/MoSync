@@ -81,7 +81,7 @@ public:
 	void NativeUIMoblet::keyPressEvent(int keyCode, int nativeCode)
 	{
 	    // Close the application if the back key is pressed.
-	    if(MAK_BACK == keyCode)
+	    if(MAK_BACK == keyCode && mMainScreen->getStackSize() == 1)
 	    {
 	        closeEvent();
 	    }

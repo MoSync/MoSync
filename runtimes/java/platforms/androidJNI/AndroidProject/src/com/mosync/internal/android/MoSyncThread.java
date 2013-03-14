@@ -4450,6 +4450,15 @@ public class MoSyncThread extends Thread
 	}
 
 	/**
+	 * Internal wrapper for maWidgetScreenShowWithTransition that runs
+	 * the call in the UI thread.
+	 */
+	public int maWidgetScreenShowWithTransition(final int screenHandle, final int screenTransitionType, final int screenTransitionDurations)
+	{
+		return mMoSyncNativeUI.maWidgetScreenShowWithTransition(screenHandle, screenTransitionType, screenTransitionDurations);
+	}
+
+	/**
 	 * Internal wrapper for maWidgetSetProperty that runs
 	 * the call in the UI thread.
 	 */
@@ -4509,6 +4518,16 @@ public class MoSyncThread extends Thread
 	{
 		mMoSyncNativeUI.setCurrentScreen(handle);
 	}
+
+	/**
+	 * Get the current screen without conversions.
+	 * @return The current screen without conversions.
+	 */
+	public ScreenWidget getUnconvertedCurrentScreen()
+	{
+		return mMoSyncNativeUI.getUnconvertedCurrentScreen();
+	}
+
 	/**
 	 * Internal wrapper for maWidgetStackScreenPush that runs
 	 * the call in the UI thread.

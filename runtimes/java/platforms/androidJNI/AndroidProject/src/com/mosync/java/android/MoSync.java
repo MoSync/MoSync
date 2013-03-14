@@ -70,6 +70,7 @@ import com.mosync.internal.android.MoSyncThread;
 import com.mosync.internal.android.MoSyncTouchHandler;
 import com.mosync.internal.android.MoSyncView;
 import com.mosync.internal.android.billing.Consts;
+import com.mosync.internal.android.billing.PurchaseManager;
 import com.mosync.internal.android.nfc.MoSyncNFCForegroundUtil;
 import com.mosync.internal.android.nfc.MoSyncNFCService;
 import com.mosync.internal.android.notifications.LocalNotificationsManager;
@@ -79,6 +80,7 @@ import com.mosync.internal.android.notifications.PushNotificationsUtil;
 import com.mosync.internal.generated.IX_WIDGET;
 import com.mosync.nativeui.ui.widgets.OptionsMenuItem;
 import com.mosync.nativeui.ui.widgets.ScreenWidget;
+import com.mosync.nativeui.util.ScreenTransitions;
 
 /**
  * Main MoSync activity
@@ -200,6 +202,16 @@ public class MoSync extends Activity
 		}
 
 		setContentView(root);
+	}
+
+	public void setRootViewUsingTransition(View root, int screenTransitionType, int screenTransitionDuration)
+	{
+		if(root == null)
+		{
+			Log.i("MoSync", "setRootViewUsingTransition, root is null.");
+		}
+		ScreenTransitions.applyScreenTransition(root, screenTransitionType, screenTransitionDuration, false);
+        setContentView(root);
 	}
 
 	@Override
@@ -478,6 +490,18 @@ public class MoSync extends Activity
 				requestCode == PICK_IMAGE_REQUEST )
 		{
 			MoSyncImagePicker.handleCancelSelectPicture();
+		}
+		else if( requestCode == PurchaseManager.getCurrentRequestCode() )
+		{
+			SYSLOG("@@MoSync Activity onActivityResult for METHOD_REQUEST_PURCHASE");
+			if ( !PurchaseManager.handleActivityResult(requestCode, resultCode, data) )
+			{
+				super.onActivityResult(requestCode, resultCode, data);
+			}
+		}
+		else
+		{
+			super.onActivityResult(requestCode, resultCode, data);
 		}
 	}
 
