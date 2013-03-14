@@ -53,6 +53,7 @@ private:
 
     virtual void createFirstScreen();
     virtual void createSecondScreen();
+    virtual void createThirdScreen();
 
     /**
      * This method is called when there is an touch-down event for
@@ -90,7 +91,9 @@ private:
 private:
     Screen* mFirstScreen;
     Screen* mSecondScreen;
+    Screen* mThirdScreen;
     Button* mPushButton;
+    Button* mSecondPushButton;
 };
 
 #endif /* MAINSCREEN_H_ */

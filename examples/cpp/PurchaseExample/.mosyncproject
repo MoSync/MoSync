@@ -8,6 +8,7 @@
 </filter>
 </criteria>
 <properties>
+<property key="android:version.number" value="25"/>
 <property key="build.prefs:additional.include.paths/Debug" value=""/>
 <property key="build.prefs:additional.include.paths/Release" value=""/>
 <property key="build.prefs:additional.libraries" value="MAUtil.lib"/>

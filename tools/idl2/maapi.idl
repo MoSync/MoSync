@@ -3503,6 +3503,7 @@ group WidgetAPI "Widget API" {
 #include "NativeUI/RatingBar.idl"
 #include "NativeUI/RelativeLayout.idl"
 #include "NativeUI/Screen.idl"
+#include "NativeUI/ScreenTransition.idl"
 #include "NativeUI/SearchBar.idl"
 #include "NativeUI/Slider.idl"
 #include "NativeUI/StackScreen.idl"

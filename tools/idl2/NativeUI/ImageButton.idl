@@ -113,6 +113,36 @@ group WidgetImageButtonProperties "Image button" {
 		IMAGE = "image";
 
 		/**
+		* Sets or gets a path to a image file that will be displayed by the widget
+		* as a foreground image.
+		*
+		* @validvalue A valid path to an image file.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(imageButtonHandle, MAW_IMAGE_BUTTON_IMAGE_PATH, "file_path.png");
+		* \endcode
+		*/
+		IMAGE_PATH = "imagePath";
+
+		/**
+		* Sets or gets a path to a image file that will be displayed by the widget
+		* as a background image.
+		*
+		* @validvalue A valid path to an image file.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(imageButtonHandle, MAW_IMAGE_BUTTON_BACKGROUND_IMAGE_PATH, "file_path.png");
+		* \endcode
+		*/
+		BACKGROUND_IMAGE_PATH = "backgroundImagePath";
+
+		/**
 		* @brief Sets the typeface and style in which the text should be displayed.
 		*
 		* @validvalue A font handle received from loading fonts using
@@ -133,5 +163,43 @@ group WidgetImageButtonProperties "Image button" {
 		* \endcode
 		*/
 		FONT_HANDLE = "fontHandle";
+
+		/**
+		* Sets or gets the image that will be displayed by the widget
+		* after user clicks on it. On iOS platform this property is named highlighted state.
+		* If this property is set when the user taps on the widget, its background image will
+		* be replaced by the image set here.
+		* Setting this property will reset the #MAW_IMAGE_BUTTON_PRESSED_IMAGE_PATH value.
+		*
+		* @validvalue A valid image handle.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+		* char buffer[BUFFER_SIZE];
+		* sprintf(buffer, "%d", handle);
+		*	maWidgetSetProperty(imageButtonHandle, MAW_IMAGE_BUTTON_PRESSED_IMAGE, buffer);
+		* \endcode
+		*/
+		PRESSED_IMAGE = "pressedImage";
+
+		/**
+		* Sets or gets a path to a image file that will be displayed by the widget
+		* after user clicks on it. On iOS platform this property is named highlighted state.
+		* If this property is set when the user taps on the widget, its background image will
+		* be replaced by the image set here.
+		* Setting this property will reset the #MAW_IMAGE_BUTTON_PRESSED_IMAGE value.
+		*
+		* @validvalue A valid path to an image file.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(imageButtonHandle, MAW_IMAGE_BUTTON_PRESSED_IMAGE_PATH, "file_path.png");
+		* \endcode
+		*/
+		PRESSED_IMAGE_PATH = "pressedImagePath";
 	}
 } // end of WidgetImageButtonProperties

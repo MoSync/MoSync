@@ -2016,6 +2016,10 @@
 				GCC_VERSION = com.apple.compilers.llvmgcc42;
 				INFOPLIST_FILE = "MoSync-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 3.0;
+				OTHER_CPLUSPLUSFLAGS = (
+					"$(OTHER_CFLAGS)",
+					"-D__MS_XCODE__",
+				);
 				PRODUCT_NAME = MoSync;
 				PROVISIONING_PROFILE = "";
 				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
@@ -2036,6 +2040,10 @@
 				GCC_VERSION = com.apple.compilers.llvmgcc42;
 				INFOPLIST_FILE = "MoSync-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 3.0;
+				OTHER_CPLUSPLUSFLAGS = (
+					"$(OTHER_CFLAGS)",
+					"-D__MS_XCODE__",
+				);
 				PRODUCT_NAME = MoSync;
 				PROVISIONING_PROFILE = "";
 				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
