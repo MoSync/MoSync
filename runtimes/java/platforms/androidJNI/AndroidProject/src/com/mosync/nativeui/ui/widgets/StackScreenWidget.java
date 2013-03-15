@@ -20,11 +20,14 @@ package com.mosync.nativeui.ui.widgets;
 import java.util.Stack;
 
 import com.mosync.internal.android.EventQueue;
+import com.mosync.internal.android.MoSyncThread;
 import com.mosync.internal.generated.IX_WIDGET;
+import com.mosync.nativeui.util.ScreenTransitions;
 import com.mosync.nativeui.util.properties.BooleanConverter;
 import com.mosync.nativeui.util.properties.InvalidPropertyValueException;
 import com.mosync.nativeui.util.properties.PropertyConversionException;
 
+import android.util.Log;
 import android.view.ViewGroup;
 
 /**
@@ -48,6 +51,28 @@ public class StackScreenWidget extends ScreenWidget
 	 * Determines if the stack screen automatically handles back events.
 	 */
 	private boolean m_backEnabled = true;
+
+	/**
+	 * The type of the animated screen transition used when pushing a screen.
+	 */
+	private int m_pushTransitionType = IX_WIDGET.MAW_TRANSITION_TYPE_NONE;
+
+	/**
+	 * The duration of the animated screen transition used when pushing a
+	 * screen, in milliseconds
+	 */
+	private int m_pushTransitionDuration = 0;
+
+	/**
+	 * The type of the animated screen transition used when popping a screen.
+	 */
+	private int m_popTransitionType = IX_WIDGET.MAW_TRANSITION_TYPE_NONE;
+
+	/**
+	 * The duration of the animated screen transition used when popping a
+	 * screen, in milliseconds
+	 */
+	private int m_popTransitionDuration = 0;
 
 	/**
 	 * Constructor.
@@ -74,6 +99,42 @@ public class StackScreenWidget extends ScreenWidget
 		{
 			m_backEnabled = BooleanConverter.convert( value );
 		}
+		else if( property.equals( IX_WIDGET.MAW_STACK_SCREEN_PUSH_TRANSITION_TYPE ) )
+		{
+			int intValue = Integer.parseInt(value);
+			if ( !ScreenTransitions.isScreenTransitionAvailable(intValue) )
+			{
+				throw new InvalidPropertyValueException( value, property );
+			}
+			m_pushTransitionType = intValue;
+		}
+		else if( property.equals( IX_WIDGET.MAW_STACK_SCREEN_PUSH_TRANSITION_DURATION ) )
+		{
+			int intValue = Integer.parseInt(value);
+			if ( 0 >= intValue )
+			{
+				throw new InvalidPropertyValueException( value, property );
+			}
+			m_pushTransitionDuration = intValue;
+		}
+		else if( property.equals( IX_WIDGET.MAW_STACK_SCREEN_POP_TRANSITION_TYPE ) )
+		{
+			int intValue = Integer.parseInt(value);
+			if ( !ScreenTransitions.isScreenTransitionAvailable(intValue) )
+			{
+				throw new InvalidPropertyValueException( value, property );
+			}
+			m_popTransitionType = intValue;
+		}
+		else if( property.equals( IX_WIDGET.MAW_STACK_SCREEN_POP_TRANSITION_DURATION ) )
+		{
+			int intValue = Integer.parseInt(value);
+			if ( 0 >= intValue )
+			{
+				throw new InvalidPropertyValueException( value, property );
+			}
+			m_popTransitionDuration = intValue;
+		}
 		else
 		{
 			return false;
@@ -90,8 +151,18 @@ public class StackScreenWidget extends ScreenWidget
 	 */
 	public void push(ScreenWidget screen)
 	{
+		// Do not animate the first push since this is already animated
+		// by the show of the stack screen (if shown with transition).
+		if ( 0 != m_screenStack.size() )
+		{
+			ScreenTransitions.applyScreenTransition(screen.getRootView(),
+					m_pushTransitionType, m_pushTransitionDuration, true);
+		}
+
 		m_screenStack.push( screen );
+
 		getView( ).removeAllViews( );
+
 		//getView( ).addView( screen.getView( ) );
 		screen.getRootView( ).clearFocus();
 		getView( ).addView( screen.getRootView( ) );
@@ -126,13 +197,20 @@ public class StackScreenWidget extends ScreenWidget
 	{
 		sendPopEvent();
 
-		// Remove current view
-		getView( ).removeAllViews( );
-
 		if( m_screenStack.empty( ) )
 		{
 			return;
 		}
+
+		// Because the views are removed before pop we need to apply the fade out transition
+		// on the current screen before the view is removed.
+		if ( IX_WIDGET.MAW_TRANSITION_TYPE_FADE_OUT == m_popTransitionType )
+		{
+			ScreenTransitions.applyScreenTransition(m_screenStack.peek().getView(),
+				m_popTransitionType, m_popTransitionDuration, true);
+		}
+		// Remove current view
+		getView( ).removeAllViews( );
 
 		m_screenStack.pop( );
 
@@ -145,6 +223,11 @@ public class StackScreenWidget extends ScreenWidget
 		if( previousScreen != null )
 		{
 			previousScreen.getView( ).clearFocus();
+			if ( IX_WIDGET.MAW_TRANSITION_TYPE_FADE_OUT != m_popTransitionType )
+			{
+				ScreenTransitions.applyScreenTransition(previousScreen.getView(),
+						m_popTransitionType, m_popTransitionDuration, true);
+			}
 			getView( ).addView( previousScreen.getView( ) );
 		}
 	}
@@ -175,5 +258,16 @@ public class StackScreenWidget extends ScreenWidget
 		pop( );
 
 		return true;
+	}
+
+	/**
+	 * Check if this stack screen is shown.
+	 * @return true if the stack screen is displayed, false otherwise.
+	 */
+	@Override
+	public boolean isShown()
+	{
+		ScreenWidget currentScreen = MoSyncThread.getInstance().getUnconvertedCurrentScreen();
+		return this.equals( currentScreen );
 	}
 }

@@ -52,6 +52,7 @@ import com.mosync.nativeui.ui.widgets.StackScreenWidget;
 import com.mosync.nativeui.ui.widgets.TabScreenWidget;
 import com.mosync.nativeui.ui.widgets.Widget;
 import com.mosync.nativeui.util.HandleTable;
+import com.mosync.nativeui.util.ScreenTransitions;
 import com.mosync.nativeui.util.properties.FeatureNotAvailableException;
 import com.mosync.nativeui.util.properties.IntConverter;
 import com.mosync.nativeui.util.properties.InvalidPropertyValueException;
@@ -424,6 +425,63 @@ public class NativeUI
 	}
 
 	/**
+	 * Internal function for the maWidgetScreenShowWithTransition system call.
+	 * Sets the root widget to the root of the given screen using transition, but
+	 * it does not actually call setContentView, this should
+	 * be done through the RootViewReplacedListener.
+	 *
+	 * Note: Should only be called on the UI thread.
+	 */
+	public int maWidgetScreenShowWithTransition(final int screenHandle, final int screenTransitionType, final int screenTransitionDuration)
+	{
+		// Check if the screen transition is available on Android.
+		// If the screen transition is not available, the show operation will be done without animation.
+		if ( !ScreenTransitions.isScreenTransitionAvailable(screenTransitionType)  )
+		{
+			Log.e( "MoSync", "maWidgetScreenShowWtihTransition: Screen transition type is not available: " + screenTransitionType );
+			int result = maWidgetScreenShow(screenHandle);
+			if ( IX_WIDGET.MAW_RES_OK == result )
+			{
+				return IX_WIDGET.MAW_RES_INVALID_SCREEN_TRANSITION_TYPE;
+			}
+			return result;
+		}
+
+		// Check if the screen transition duration is valid.
+		// If the screen transition duration is not valid, the show operation will be done without animation.
+		if ( screenTransitionDuration < 0 )
+		{
+			Log.e( "MoSync", "maWidgetScreenShowWtihTransition: Screen transition duration is invalid: " + screenTransitionDuration );
+			int result = maWidgetScreenShow(screenHandle);
+			if ( IX_WIDGET.MAW_RES_OK == result )
+			{
+				return IX_WIDGET.MAW_RES_INVALID_SCREEN_TRANSITION_DURATION;
+			}
+			return result;
+		}
+
+		Widget screen = m_widgetTable.get( screenHandle );
+		if( screen == null )
+		{
+			Log.e( "MoSync", "maWidgetScreenShowWtihTransition: Invalid screen handle: " + screenHandle );
+			return IX_WIDGET.MAW_RES_INVALID_HANDLE;
+		}
+		if( !( screen instanceof ScreenWidget ) && !( screen instanceof MoSyncScreenWidget ) )
+		{
+			Log.e( "MoSync", "maWidgetScreenShowWtihTransition: Widget is not a screen: " + screenHandle );
+			return IX_WIDGET.MAW_RES_INVALID_SCREEN;
+		}
+
+		if( m_rootViewReplacedListener != null )
+		{
+			m_rootViewReplacedListener.rootViewReplacedUsingTransition( screen.getRootView( ), screenTransitionType, screenTransitionDuration );
+		}
+		m_currentScreen = screen;
+
+		return IX_WIDGET.MAW_RES_OK;
+	}
+
+	/**
 	 * Internal function for the maWidgetStackScreenPush system call.
 	 * Takes out the stack screen from the widget table and pushes
 	 * the screen to it.
@@ -532,6 +590,21 @@ public class NativeUI
 			return (ScreenWidget) m_currentScreen;
 
 		return null;//(ScreenWidget) m_currentScreen;
+	}
+
+	/**
+	 * Get the current screen widget regardless its type.
+	 * @return the current screen widget.
+	 */
+	public ScreenWidget getUnconvertedCurrentScreen()
+	{
+		if(m_currentScreen == null)
+			return null;
+
+		if(m_currentScreen instanceof ScreenWidget )
+			return (ScreenWidget) m_currentScreen;
+
+		return null;
 	}
 
 	/**
@@ -767,6 +840,16 @@ public class NativeUI
 		 * @param newRoot The new root view.
 		 */
 		void rootViewReplaced(View newRoot);
+
+		/**
+		 * Called when the root view has been replaced
+		 * by another root view using a screen transition..
+		 *
+		 * @param newRoot The new root view.
+		 * @param screenTransitionType The screen transition type.
+		 * @param screenTransitionDuration The screen transition duration.
+		 */
+		void rootViewReplacedUsingTransition(View newRoot, int screenTransitionType, int screenTransitionDuration);
 	}
 
 	public Widget getCameraView(final int handle)

@@ -37,11 +37,12 @@ MainScreen::MainScreen() :
 	StackScreen()
 
 {
-//    this->enableNavigationBar(true);
+//	this->enableNavigationBar(true);
     this->createFirstScreen();
     this->push(mFirstScreen);
 
     this->createSecondScreen();
+    this->createThirdScreen();
     this->addStackScreenListener(this);
 }
 
@@ -51,9 +52,11 @@ MainScreen::MainScreen() :
 MainScreen::~MainScreen()
 {
     mPushButton->removeButtonListener(this);
+    mSecondPushButton->removeButtonListener(this);
     this->removeStackScreenListener(this);
     delete mFirstScreen;
     delete mSecondScreen;
+    delete mThirdScreen;
 }
 
 void MainScreen::createFirstScreen()
@@ -65,7 +68,7 @@ void MainScreen::createFirstScreen()
     mFirstScreen->setMainWidget(layout);
 
     mPushButton = new Button();
-    mPushButton->setText("Push screen");
+    mPushButton->setText("Push 2nd screen");
     mPushButton->addButtonListener(this);
     layout->addChild(mPushButton);
 }
@@ -77,6 +80,20 @@ void MainScreen::createSecondScreen()
     VerticalLayout* layout = new VerticalLayout();
     layout->setBackgroundColor(0x123456);
     mSecondScreen->setMainWidget(layout);
+
+    mSecondPushButton = new Button();
+    mSecondPushButton->setText("Push 3rd screen");
+    mSecondPushButton->addButtonListener(this);
+    layout->addChild(mSecondPushButton);
+}
+
+void MainScreen::createThirdScreen()
+{
+    mThirdScreen = new Screen();
+    mThirdScreen->setTitle("3rd screen");
+    VerticalLayout* layout = new VerticalLayout();
+    layout->setBackgroundColor(0x654456);
+    mThirdScreen->setMainWidget(layout);
 }
 
 /**
@@ -90,6 +107,11 @@ void MainScreen::buttonClicked(Widget* button)
     {
         printf("mPushButtonClicked - push screen");
         this->push(mSecondScreen);
+    }
+    if (mSecondPushButton == button)
+    {
+        printf("mPushButtonClicked - second push screen");
+        this->push(mThirdScreen);
     }
 }
 
@@ -108,13 +130,13 @@ void MainScreen::stackScreenScreenPopped(
     if (this == stackScreen)
     {
         printf("stack screen event");
-        if(mFirstScreen == toScreen && mSecondScreen == fromScreen)
+        /*if(mFirstScreen == toScreen && mSecondScreen == fromScreen)
         {
             printf("screen test param is ok!");
         }
         else
         {
             maAlert("Error", "Wrong callback parameter(s)", "OK", NULL, NULL);
-        }
+        }*/
     }
 }

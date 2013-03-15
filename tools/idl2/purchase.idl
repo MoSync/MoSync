@@ -141,6 +141,11 @@ group PurchaseErrorCodes "Purchase Error Codes" {
 		* Platform: iOS and Android.
 		*/
 		NO_RECEIPT = -11;
+		 /**
+        * \brief Possible error code for #MA_PURCHASE_EVENT_REQUEST event type.
+        * Sent by the #maPurchaseRequest() syscall if the given product is already owned.
+        */
+		PRODUCT_ALREADY_OWNED = -12;
 	}
 } // end of Purchase Error Codes
 
@@ -383,8 +388,8 @@ group PurchaseFunctions "Purchase Functions" {
 	* object can have one of the following values:
 	* - #MA_PURCHASE_STATE_PRODUCT_VALID
 	*				- on iOS if the product was validated by the App Store,
-	*				- on Android if the product was internally allocated.
-    * - #MA_PURCHASE_STATE_PRODUCT_INVALID the product is not valid in the App Store.
+	*				- on Android if the product was validated on Google Play.
+    * - #MA_PURCHASE_STATE_PRODUCT_INVALID the product is not valid.
     * - #MA_PURCHASE_STATE_DISABLED purchase is not supported/disabled on the device.
     * - #MA_PURCHASE_STATE_DUPLICATE_HANDLE the given productHandle already exists.
 	* Use #maCreatePlaceholder() to generate a new one.

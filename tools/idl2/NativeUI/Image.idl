@@ -18,6 +18,20 @@ group WidgetImageProperties "Image" {
 		IMAGE = "image";
 
 		/**
+		* Sets or gets a path to a image file that will be displayed by the widget.
+		*
+		* @validvalue A valid path to an image file.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(imageHandle, MAW_IMAGE_PATH, "file_path.png");
+		* \endcode
+		*/
+		PATH = "imagePath";
+
+		/**
 		* @brief Specifies what type of scaling should be applied to the image.
 		*
 		* @validvalue Either 'none', 'scaleXY' or 'scalePreserveAspect'. Default 'none'.
