@@ -122,6 +122,12 @@ namespace MAUtil {
 					case EVENT_TYPE_SENSOR:
 						moblet->fireSensorListeners(event.sensor);
 						break;
+					case EVENT_TYPE_ORIENTATION_DID_CHANGE:
+						moblet->fireOrientationChangedEvent(event.orientation);
+						break;
+					case EVENT_TYPE_ORIENTATION_WILL_CHANGE:
+						moblet->fireOrientationWillChangeEvent();
+						break;
 					default:
 						moblet->fireCustomEventListeners(event);
 				}
