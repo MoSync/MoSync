@@ -214,6 +214,7 @@ namespace MoSync
 
             private void SetApplicationBarVisibility(int screenIndex)
             {
+
                 bool appBarVisible = (this.mChildren[screenIndex] as Screen).GetApplicationBarVisibility();
                 if (appBarVisible)
                 {
@@ -233,6 +234,16 @@ namespace MoSync
                         Microsoft.Phone.Controls.PhoneApplicationPage).ApplicationBar.IsVisible = false;
                     }
                 }
+            }
+
+            /**
+             * Check if a given child screen is shown.
+             * @param child Given child.
+             * @return true if child is currently shown, false otherwise.
+             */
+            public override bool isChildShown(IScreen child)
+            {
+                return getSelectedScreen().Equals(child);
             }
         }
     }

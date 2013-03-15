@@ -365,6 +365,45 @@ namespace MoSync
                 mApplicationBarItemsIndexes.Add(item, mApplicationBarItemsIndexSeed++);
                 return (mApplicationBarItemsIndexSeed - 1);
             }
+
+            /**
+            * MAW_SCREEN_IS_SHOWN property implementation.
+            */
+            [MoSyncWidgetProperty(MoSync.Constants.MAW_SCREEN_IS_SHOWN)]
+            public String IsShown
+            {
+                get
+                {
+                    return isScreenShown().ToString().ToLower();
+                }
+            }
+
+            public bool isScreenShown()
+            {
+                PhoneApplicationFrame frame = (PhoneApplicationFrame)Application.Current.RootVisual;
+                IWidget parentWidget = this.GetParent();
+                if (parentWidget == null)
+                {
+                    return (frame.Content as PhoneApplicationPage).Content.Equals(mPage);
+                }
+                else if (parentWidget is IScreen)
+                {
+                    IScreen parentScreen = (IScreen)parentWidget;
+                    return parentScreen.isChildShown(this);
+                }
+                return false;
+            }
+
+            /**
+             * Check if a given child screen is shown.
+             * A simple screen cannot have another screen as child.
+             * @param child Given child.
+             * @return false.
+             */
+            public virtual bool isChildShown(IScreen child)
+            {
+                return false;
+            }
         }
     }
 }
