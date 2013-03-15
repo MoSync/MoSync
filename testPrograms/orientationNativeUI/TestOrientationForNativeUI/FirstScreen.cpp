@@ -42,11 +42,12 @@
 #define SCREEN_ORIENTATION_PORTRAIT_STRING "Portrait"
 #define SCREEN_ORIENTATION_DYNAMIC_STRING "Dynamic (sensor based)"
 
+#define SCREEN_ORIENTATION_ERROR "Event received invalid orientation value!!!"
+
 #include <conprint.h>
 #include <maapi.h>
 
 #include "FirstScreen.h"
-#include "Util.h"
 
 namespace OrientationTest
 {
@@ -64,30 +65,18 @@ namespace OrientationTest
 		mLandscapeCheckBox(NULL),
 		mDynamicCheckBox(NULL),
 		mOrientationLabel(NULL),
-		mSetOrientationDescriptionLabel(NULL)
+		mSetOrientationDescriptionLabel(NULL),
+		mSupportedOrientations(0)
 	{
 		this->setTitle(SCREEN_TITLE);
 
-		mSelectedOrientation = -1;
-
 		createMainLayout();
 
-//			mPortraitCheckBox->setState(true);
-		mPortraitCheckBox->addCheckBoxListener(this);
-		mPortraitUpsideDownCheckBox->addCheckBoxListener(this);
-		mLandscapeLeftCheckBox->addCheckBoxListener(this);
-		mLandscapeRightCheckBox->addCheckBoxListener(this);
-		mLandscapeCheckBox->addCheckBoxListener(this);
-		mPortraitUpCheckBox->addCheckBoxListener(this);
 		mPortraitUpCheckBox->setState(true);
-		mDynamicCheckBox->addCheckBoxListener(this);
 		addScreenListener(this);
 		mSetOrientationBtn->addButtonListener(this);
 
-		mSupportedOrientations = MA_SCREEN_ORIENTATION_PORTRAIT_UP;
 		// By default it's portrait.
-//		maScreenSetSupportedOrientations(mSupportedOrientations);
-//
 		mOrientationLabel->setText(PORTRAIT_UP_LABEL_TEXT);
 	}
 
@@ -96,13 +85,6 @@ namespace OrientationTest
 	 */
 	FirstScreen::~FirstScreen()
 	{
-		mPortraitCheckBox->removeCheckBoxListener(this);
-		mPortraitUpsideDownCheckBox->removeCheckBoxListener(this);
-		mLandscapeLeftCheckBox->removeCheckBoxListener(this);
-		mLandscapeRightCheckBox->removeCheckBoxListener(this);
-		mLandscapeCheckBox->removeCheckBoxListener(this);
-		mPortraitUpCheckBox->removeCheckBoxListener(this);
-		mDynamicCheckBox->removeCheckBoxListener(this);
 		removeScreenListener(this);
 		mSetOrientationBtn->removeButtonListener(this);
 	}
@@ -202,83 +184,16 @@ namespace OrientationTest
 		mainLayout->addChild(mSetOrientationBtn);
 	}
 
-	/**
-	 * This method is called when the state of the check box was changed
-	 * by the user.
-	 * @param checkBox The check box object that generated the event.
-	 * @param state True if the check box is checked, false otherwise.
-	 */
-	void FirstScreen::checkBoxStateChanged(
-		CheckBox* checkBox,
-		bool state)
+	void FirstScreen::addOrientationFlag(int orientation)
 	{
-		bool isChecked;
-		if (checkBox == mPortraitCheckBox)
+		if (mSupportedOrientations == 0)
 		{
-			isChecked = mPortraitCheckBox->isChecked();
-			printf("FirstScreen::checkBoxStateChanged set portrait mode to %d",
-				isChecked);
-			this->changeOrientationBitmask(isChecked,
-				MA_SCREEN_ORIENTATION_PORTRAIT,
-				mPortraitCheckBox);
+			mSupportedOrientations = orientation;
 		}
-		else if (checkBox == mPortraitUpCheckBox)
+		else
 		{
-			isChecked = mPortraitUpCheckBox->isChecked();
-			printf("FirstScreen::checkBoxStateChanged set portrait Up mode to %d",
-				isChecked);
-			this->changeOrientationBitmask(isChecked,
-				MA_SCREEN_ORIENTATION_PORTRAIT_UP,
-				mPortraitUpCheckBox);
+			mSupportedOrientations |= orientation;
 		}
-		else if (checkBox == mPortraitUpsideDownCheckBox)
-		{
-			isChecked = mPortraitUpsideDownCheckBox->isChecked();
-			printf("FirstScreen::checkBoxStateChanged set portrait upside down mode to %d",
-				isChecked);
-			this->changeOrientationBitmask(isChecked,
-				MA_SCREEN_ORIENTATION_PORTRAIT_UPSIDE_DOWN,
-				mPortraitUpsideDownCheckBox);
-		}
-		else if (checkBox == mLandscapeLeftCheckBox)
-		{
-			isChecked = mLandscapeLeftCheckBox->isChecked();
-			printf("FirstScreen::checkBoxStateChanged set landscape left mode to %d",
-				isChecked);
-			this->changeOrientationBitmask(isChecked,
-				MA_SCREEN_ORIENTATION_LANDSCAPE_LEFT,
-				mLandscapeLeftCheckBox);
-		}
-		else if (checkBox == mLandscapeRightCheckBox)
-		{
-			isChecked = mLandscapeRightCheckBox->isChecked();
-			printf("FirstScreen::checkBoxStateChanged set landscape right mode to %d",
-				isChecked);
-			this->changeOrientationBitmask(isChecked,
-					MA_SCREEN_ORIENTATION_LANDSCAPE_RIGHT,
-				mLandscapeRightCheckBox);
-		}
-		else if (checkBox == mLandscapeCheckBox)
-		{
-			isChecked = mLandscapeCheckBox->isChecked();
-			printf("FirstScreen::checkBoxStateChanged set landscape sensor mode to %d",
-				isChecked);
-			this->changeOrientationBitmask(isChecked,
-					MA_SCREEN_ORIENTATION_LANDSCAPE,
-					mLandscapeCheckBox);
-		}
-		else if (checkBox == mDynamicCheckBox)
-		{
-			isChecked = mDynamicCheckBox->isChecked();
-			printf("FirstScreen::checkBoxStateChanged set landscape sensor mode to %d",
-				isChecked);
-			this->changeOrientationBitmask(isChecked,
-					MA_SCREEN_ORIENTATION_DYNAMIC,
-					mDynamicCheckBox);
-		}
-//		int result = maScreenSetSupportedOrientations(mSupportedOrientations);
-//		printf("FirstScreen::checkBoxStateChanged result maScreenSetSupportedOrientations = %d",
-//			result);
 	}
 
     /**
@@ -291,9 +206,40 @@ namespace OrientationTest
     {
 		if (mSetOrientationBtn == button)
 		{
+			if( (mDynamicCheckBox->isChecked() ) ||
+				( mLandscapeCheckBox->isChecked() && mPortraitCheckBox->isChecked() ))
+			{
+				mSupportedOrientations = MA_SCREEN_ORIENTATION_DYNAMIC;
+			}
+			if (mPortraitCheckBox->isChecked())
+			{
+				addOrientationFlag(MA_SCREEN_ORIENTATION_PORTRAIT);
+			}
+			if (mLandscapeCheckBox->isChecked())
+			{
+				addOrientationFlag(MA_SCREEN_ORIENTATION_LANDSCAPE);
+			}
+			if (mPortraitUpCheckBox->isChecked())
+			{
+				addOrientationFlag(MA_SCREEN_ORIENTATION_PORTRAIT_UP);
+			}
+			if (mPortraitUpsideDownCheckBox->isChecked())
+			{
+				addOrientationFlag(MA_SCREEN_ORIENTATION_PORTRAIT_UPSIDE_DOWN);
+			}
+			if (mLandscapeLeftCheckBox->isChecked())
+			{
+				addOrientationFlag(MA_SCREEN_ORIENTATION_LANDSCAPE_LEFT);
+			}
+			if(mLandscapeRightCheckBox->isChecked())
+			{
+				addOrientationFlag(MA_SCREEN_ORIENTATION_LANDSCAPE_RIGHT);
+			}
+
 			int result = maScreenSetSupportedOrientations(mSupportedOrientations);
 			printf("FirstScreen::checkBoxStateChanged result maScreenSetSupportedOrientations = %d",
 				result);
+			mSupportedOrientations = 0;
 		}
 
     }
@@ -323,25 +269,8 @@ namespace OrientationTest
 		if (0 == mSupportedOrientations)
 		{
 			mSupportedOrientations = orientation;
-//			checkBox->setState(true);
+			checkBox->setState(true);
 		}
-	}
-
-	/**
-	 * Called just before the screen begins rotating.
-	 */
-	void FirstScreen::orientationWillChange()
-	{
-		mOrientationLabel->setText(this->getOrientationString());
-	}
-
-	/**
-	 * Called after the screen orientation has changed.
-	 * Available only on iOS and Windows Phone 7.1 platforms.
-	 */
-	void FirstScreen::orientationDidChange()
-	{
-		//mOrientationLabel->setText(this->getOrientationString());
 	}
 
 	/**
@@ -372,7 +301,17 @@ namespace OrientationTest
 				break;
 		}
 
-		mOrientationLabel->setText(orientationText);
+		int currentOrientation = maScreenGetCurrentOrientation();
+		printf("FirstScreen::maScreenGetCurrentOrientation result = %d",
+				currentOrientation);
+		if (currentOrientation == screenOrientation )
+		{
+			mOrientationLabel->setText(orientationText);
+		}
+		else
+		{
+			mOrientationLabel->setText(SCREEN_ORIENTATION_ERROR);
+		}
 	}
 
 	/**

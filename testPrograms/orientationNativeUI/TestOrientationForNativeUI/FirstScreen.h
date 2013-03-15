@@ -38,7 +38,6 @@ namespace OrientationTest
 	 */
 	class FirstScreen:
 		public Screen,
-		public CheckBoxListener,
 		public ButtonListener,
 		public ScreenListener
 	{
@@ -53,17 +52,6 @@ namespace OrientationTest
 		 * Destructor.
 		 */
 		virtual ~FirstScreen();
-
-		/**
-		 * Called just before the screen begins rotating.
-		 */
-		virtual void orientationWillChange();
-
-		/**
-		 * Called after the screen orientation has changed.
-		 * Available only on iOS and Windows Phone 7.1 platforms.
-		 */
-		virtual void orientationDidChange();
 
 	private:
 		/**
@@ -94,16 +82,6 @@ namespace OrientationTest
          */
         virtual void buttonClicked(Widget* button);
 
-		/**
-		 * This method is called when the state of the check box was changed
-		 * by the user.
-		 * @param checkBox The check box object that generated the event.
-		 * @param state True if the check box is checked, false otherwise.
-		 */
-		virtual void checkBoxStateChanged(
-			CheckBox* checkBox,
-			bool state);
-
 		// From ScreenListener
 		/**
 		 * Called after the screen has finished rotating.
@@ -126,6 +104,7 @@ namespace OrientationTest
 			const int orientation,
 			CheckBox* checkBox);
 
+		void addOrientationFlag(int orientation);
 	private:
 		/**
 		 * Used for applying the orientation flag.
