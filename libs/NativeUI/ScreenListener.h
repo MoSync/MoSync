@@ -58,6 +58,14 @@ namespace NativeUI
 		 */
 		virtual void orientationChanged(Screen* screen, int screenOrientation) {};
 
+		/**
+		 * Called just before the screen begins rotating.
+		 * Subclasses may override this method to perform additional actions
+		 * immediately prior to the rotation.
+		 * Note: available only on iOS.
+		 */
+		virtual void orientationWillChange() {};
+
         /**
          * This method is called when the OptionsMenu is being closed
          * (either by the user canceling the menu with the back/menu

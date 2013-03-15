@@ -268,10 +268,17 @@ public class MoSync extends Activity
 			else
 			{
 				// No NativeUI screen, use the MoSync screen identifier.
+				// NOTE: when no native UI screens are available, the widget related
+				// event should not be sent, but in this case it's too late to remove this.
 				widgetHandle = IX_WIDGET.MAW_CONSTANT_MOSYNC_SCREEN_HANDLE;
 			}
+			// Post screen orientation event, handled by the NativeUI module.
 			EventQueue.getDefault().postScreenOrientationChanged(
 						mMoSyncThread.getCurrentScreen().getHandle(),
+						getScreenOrientation());
+
+			// Post orientation event, handled by the Moblet.
+			EventQueue.getDefault().postOrientationChanged(
 						getScreenOrientation());
 		}
 	}

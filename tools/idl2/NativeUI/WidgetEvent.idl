@@ -261,7 +261,7 @@ group WidgetEvent "Widget event" {
 			 * This includes changes that were initiated by the user through a touch gesture,
 			 * or arrow key/trackball as well as changes that were initiated programmatically.
 			 */
-				SLIDER_VALUE_CHANGED = 11;
+			SLIDER_VALUE_CHANGED = 11;
 
 			/**
 			 * @brief Sent when the user changes\d the date in a Date Picker.

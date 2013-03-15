@@ -18,6 +18,7 @@ MA 02110-1301, USA.
 package com.mosync.internal.android;
 
 import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_WIDGET;
+import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_ORIENTATION_DID_CHANGE;
 
 import android.util.Log;
 
@@ -350,6 +351,21 @@ public class EventQueue
 		event[1] = IX_WIDGET.MAW_EVENT_SCREEN_ORIENTATION_DID_CHANGE;
 		event[2] = widgetHandle;
 		event[3] = orientation;
+
+		sMoSyncThread.postEvent(event);
+	}
+
+	/**
+	 * Sends an orientation changed event.
+	 * Callback not related to Native ui screens.
+	 * @param orientation The new orientation.
+	 */
+	public void postOrientationChanged(int orientation)
+	{
+		int event[] = new int[2];
+
+		event[0] = EVENT_TYPE_ORIENTATION_DID_CHANGE;
+		event[1] = orientation;
 
 		sMoSyncThread.postEvent(event);
 	}

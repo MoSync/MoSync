@@ -440,6 +440,10 @@ static void nativePostEvent(JNIEnv* env, jobject jthis, jintArray eventBuffer)
 		event.purchaseData.productHandle = intArray[3];
 		event.purchaseData.errorCode = intArray[4];
 	}
+	else if (event.type == EVENT_TYPE_ORIENTATION_DID_CHANGE)
+	{
+		event.orientation = intArray[1];
+	}
 	else if (event.type == EVENT_TYPE_WIDGET)
 	{
 		/*

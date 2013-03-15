@@ -1554,6 +1554,19 @@ interface MAAPI {
 		* one of the \link #MA_NETWORK_UNKNOWN MA_NETWORK \endlink constants.
 		*/
 		NETWORK = 50;
+
+		/**
+		* \brief Sent when the current screen orientation has changed.
+		* MAEvent::orientation is the new screen orientation. One of the constants
+		* \link #MA_SCREEN_ORIENTATION_PORTRAIT MA_SCREEN_ORIENTATION \endlink.
+		*/
+		ORIENTATION_DID_CHANGE = 51;
+
+		/**
+		* \brief Sent just before the current screen orientation starts changing.
+		* Platform: iOS only.
+		*/
+		ORIENTATION_WILL_CHANGE = 52;
 	}
 
 	/**
@@ -1800,6 +1813,11 @@ interface MAAPI {
 			* Valid only if the event type is \link #EVENT_TYPE_PURCHASE PURCHASE \endlink.
 			*/
 			MAPurchaseEventData purchaseData;
+
+			/**
+			* Contains the new orientation when a #EVENT_TYPE_ORIENTATION_DID_CHANGE event is sent.
+			*/
+			int orientation;
 			}
 	}
 
@@ -4056,26 +4074,6 @@ group CameraFunctions "Camera Functions" {
 		}
 
 		/**
-		* @deprecated Use @maScreenSetSupportedOrientations instead.
-		 * Set the screen orientation.
-		 * Currently implemented only on Android and Windows Phone.
-		 * @param orientation One of the \link #SCREEN_ORIENTATION_LANDSCAPE
-		 * #SCREEN_ORIENTATION_PORTRAIT #SCREEN_ORIENTATION_DYNAMIC \endlink
-		 * constants.
-		 * @return \< 0 on error.
-		 */
-		int maScreenSetOrientation(in int orientation);
-
-		constset int SCREEN_ORIENTATION_ {
-			/// Landscape screen orientation.
-			LANDSCAPE = 1;
-			/// Portrait screen orientation.
-			PORTRAIT = 2;
-			/// Screen orientation is based on device sensor.
-			DYNAMIC = 3;
-		}
-
-		/**
 		 * Enable/disable fullscreen mode.
 		 * Currently implemented only on Android.
 		 * @param fullscreen 1 for fullscreen on, 0 for fullscreen off.
@@ -4096,69 +4094,6 @@ group CameraFunctions "Camera Functions" {
 		* \returns 1 on success, 0 if already unregistered, \< 0 on error.
 		*/
 		int maAutostartOff();
-
-		/**
-		* Set supported screen orientations.
-		* Currently implemented on iOS, WindowsPhone 7.1 and Android.
-		* @param orientations A bitmask consisting of flags describing the supported screen orientations.
-		* The bitmask can be created using \link #MA_SCREEN_ORIENTATION_PORTRAIT MA_SCREEN_ORIENTATION \endlink
-		* values.
-		* @return One of the next constants:
-		* - #MA_SCREEN_ORIENTATION_RES_OK
-		* - #MA_SCREEN_ORIENTATION_RES_NOT_SUPPORTED
-		* - #MA_SCREEN_ORIENTATION_RES_INVALID_VALUE
-		*/
-		int maScreenSetSupportedOrientations(in int orientations);
-
-		/**
-		* Get supported screen orientations.
-		* Currently implemented on iOS, WindowsPhone 7.1 and Android.
-		* @return A bitmask consisting of flags describing the supported screen orientations.
-		* The bitmask is created using \link #MA_SCREEN_ORIENTATION_PORTRAIT MA_SCREEN_ORIENTATION \endlink
-		* values.
-		*/
-		int maScreenGetSupportedOrientations();
-
-		/**
-		* Get current screen orientation.
-		* Currently implemented on iOS, WindowsPhone 7.1 and Android.
-		* @return One of the \link #MA_SCREEN_ORIENTATION_PORTRAIT MA_SCREEN_ORIENTATION \endlink constants.
-		*/
-		int maScreenGetCurrentOrientation();
-
-		constset int MA_SCREEN_ORIENTATION_ {
-			/// @deprecated: The device is in portrait mode, with the device held upright and the home button on
-			/// the bottom.
-			/// New Usage: The device is in portrait mode, based on sensor. Depending on user rotation,
-			/// #MA_SCREEN_ORIENTATION_PORTRAIT_LEFT or #MA_SCREEN_ORIENTATION_PORTRAIT_RIGHT will be used.
-			PORTRAIT = 0x000001;
-			/// The device is in portrait mode but upside down, with the device held upright and the
-			/// home button at the top.
-			PORTRAIT_UPSIDE_DOWN = 0x000002;
-			/// The device is in landscape mode, with the device held upright and the home button on
-			/// the left side.
-			LANDSCAPE_LEFT = 0x000004;
-			/// The device is in landscape mode, with the device held upright and the home button on
-			/// the right side.
-			LANDSCAPE_RIGHT = 0x000008;
-			/// The device is in portrait mode, with the device held upright and the home button on
-			/// the bottom.
-			PORTRAIT_UP = 0x000009;
-			/// The device is in landscape mode, based on sensor. Depending on user rotation,
-			/// #MA_SCREEN_ORIENTATION_LANDSCAPE_LEFT or #MA_SCREEN_ORIENTATION_LANDSCAPE_RIGHT will be used.
-			LANDSCAPE = 0x000010;
-			/// Screen orientation is based on device sensor.
-			DYNAMIC = 0x000011;
-		}
-
-		constset int MA_SCREEN_ORIENTATION_RES_ {
-			///
-			OK = 0;
-			///
-			NOT_SUPPORTED = -1;
-			///
-			INVALID_VALUE = -2;
-		}
 
 		/**
 		 * Turn on sending of screen state events. Off by default.
@@ -6853,6 +6788,10 @@ group CaptureAPI "Capture API" {
 group PurchaseAPI "Purchase API" {
 #include "purchase.idl"
 } // End of Purchase API
+
+group OrientationAPI "Orientation API" {
+#include "orientation.idl"
+} // End of Orientation API
 
 }
 	constset int IOCTL_ {
