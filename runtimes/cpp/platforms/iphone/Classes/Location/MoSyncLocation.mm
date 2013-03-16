@@ -15,8 +15,33 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
-#import "MoSyncCLController.h"
-#include "MoSyncMain.h"
+#import "MoSyncLocation.h"
+#import "Platform.h"
+
+static MoSyncCLController *sLocationController = NULL;
+
+MoSyncCLController* getLocationController()
+{
+	if (!sLocationController)
+	{
+		sLocationController = [[MoSyncCLController alloc] init];
+	}
+	return sLocationController;
+}
+
+int maLocationStart()
+{
+	MoSyncCLController* locationController = getLocationController();
+	[locationController.locationManager startUpdatingLocation];
+	return MA_LPS_AVAILABLE;
+}
+
+int maLocationStop()
+{
+	MoSyncCLController* locationController = getLocationController();
+	[locationController.locationManager stopUpdatingLocation];
+	return 0;
+}
 
 @implementation MoSyncCLController
 
@@ -35,8 +60,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
     didUpdateToLocation:(CLLocation *)newLocation
            fromLocation:(CLLocation *)oldLocation
 {
-    NSLog(@"Location: %@", [newLocation description]);
-
 	MAEvent event;
 	event.type = EVENT_TYPE_LOCATION;
 	MALocation* location = new MALocation;

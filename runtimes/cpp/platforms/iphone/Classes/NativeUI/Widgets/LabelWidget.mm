@@ -22,6 +22,7 @@
 #import "LabelWidget.h"
 #import "UIColorExpanded.h"
 #include "Platform.h"
+#include "MoSyncFonts.h"
 
 typedef enum VerticalAlignment
 {
