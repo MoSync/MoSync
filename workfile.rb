@@ -61,23 +61,8 @@ ALL_DIRS = MAIN_DIRS + EXAM_DIRS
 
 NEWLIB_DIRS = ["libs"]
 
-class CopyDirWork < Work
-	def initialize(name)
-		@NAME = name
-	end
-	def setup
-		builddir = "#{mosyncdir}/#{@NAME}"
-		@prerequisites = [DirTask.new(self, builddir)]
-		sources = Dir["#{@NAME}/*"]
-		sources.each do |src|
-			@prerequisites << CopyFileTask.new(self, "#{builddir}/#{File.basename(src)}",
-				FileTask.new(self, src))
-		end
-	end
-end
-
-SKINS = CopyDirWork.new('skins')
-RULES = CopyDirWork.new('rules')
+SKINS = CopyDirWork.new(mosyncdir, 'skins')
+RULES = CopyDirWork.new(mosyncdir, 'rules')
 
 class ExtensionIncludeWork < Work
 	def setup
