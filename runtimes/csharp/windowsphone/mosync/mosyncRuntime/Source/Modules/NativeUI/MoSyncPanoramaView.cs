@@ -214,6 +214,10 @@ namespace MoSync
 
             private void SetApplicationBarVisibility(int screenIndex)
             {
+				if (this.mChildren.Count <= screenIndex)
+				{
+					return;
+				}
 
                 bool appBarVisible = (this.mChildren[screenIndex] as Screen).GetApplicationBarVisibility();
                 if (appBarVisible)
