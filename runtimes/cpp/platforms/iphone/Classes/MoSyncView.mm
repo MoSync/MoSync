@@ -30,11 +30,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
         // Initialization code
 		self.clearsContextBeforeDrawing = NO;
 		UIDevice* myDevice = [UIDevice currentDevice];
-		[myDevice beginGeneratingDeviceOrientationNotifications];
 		[myDevice setBatteryMonitoringEnabled:YES];
-		
-		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(deviceOrientationChanged:)
-													 name:UIDeviceOrientationDidChangeNotification object:nil];
+
         int w, h;
         getScreenResolution(w, h);
         if (w == 640 && h == 960) // Retina display detected
@@ -72,14 +69,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 	MoSync_DoneUpdatingView();
 }
 
-
 - (void)dealloc {
     [super dealloc];
-}
-
-- (void)deviceOrientationChanged:(NSNotification *)notification {
-	//UIDeviceOrientation deviceOrientation = [UIDevice currentDevice].orientation;
-	//MoSync_AddScreenChangedEvent();
 }
 
 @end
