@@ -89,6 +89,12 @@ namespace NativeUI
 		 * @return The index of the current screen.
 		 */
 		int getActiveScreen();
+
+		/**
+		 * Check if panorama view is shown.
+		 * @return true if the panorama view is visible, false otherwise.
+		 */
+		virtual bool isShown();
 	};
 
 } // namespace NativeUI
