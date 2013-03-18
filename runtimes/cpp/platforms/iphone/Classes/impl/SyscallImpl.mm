@@ -170,8 +170,6 @@ namespace Base {
 		initMulTable();
 		initRecipLut();
 
-        initExtensions(NULL);
-
 		return true;
 	}
 
