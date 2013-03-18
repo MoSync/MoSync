@@ -1554,6 +1554,14 @@ interface MAAPI {
 		* one of the \link #MA_NETWORK_UNKNOWN MA_NETWORK \endlink constants.
 		*/
 		NETWORK = 50;
+
+		/** \brief Used to notify when the snapshot taken via #maCameraSnapshotAsync,
+		* is completed.
+		* The events of this type contain the place holder for the image data,
+		* the image format index, the \link #MA_IMAGE_REPRESENTATION_UNKNOWN data representation \endlink
+		* and a return code.
+		*/
+		CAMERA_SNAPSHOT = 51;
 	}
 
 	/**
@@ -1730,6 +1738,34 @@ interface MAAPI {
 				*/
 				int imagePickerEncodingType;
 			} imagePicker;
+
+			struct {
+				/**
+				 * Used in #EVENT_TYPE_CAMERA_SNAPSHOT events.
+				 * Holds the place holder for the data object representing the camera snapshot.
+				 */
+				MAHandle snapshotImageDataHandle;
+
+				/**
+				 * Used in #EVENT_TYPE_CAMERA_SNAPSHOT events.
+				 * Holds the snapshot format that is specified when #maCameraSnapshotAsync is called.
+				 */
+				int snapshotFormatIndex;
+
+				/**
+				 * Used in #EVENT_TYPE_CAMERA_SNAPSHOT events.
+				 * Holds the snapshot data representation.
+				 * Possible values are found \link #MA_IMAGE_REPRESENTATION_UNKNOWN here \endlink.
+				 */
+				int snapshotImageDataRepresentation;
+
+				/**
+				 * Used in #EVENT_TYPE_CAMERA_SNAPSHOT events.
+				 * Holds the return code of the camera snapshot operation.
+				 * It #MA_CAMERA_RES_OK on success, or #MA_CAMERA_RES_FAILED on error
+				 */
+				int snapshotReturnCode;
+			} cameraSnapshot;
 
 			/**
 			* #EVENT_TYPE_OPTIONS_BOX_BUTTON_CLICKED event, contains the index of the selected option.
@@ -3646,6 +3682,28 @@ group ImageFormat "Image Formats" {
 		RAW = "raw";
 
 	} //end MA_CAMERA_IMAGE_
+
+	constset int MA_IMAGE_REPRESENTATION_ {
+		/**
+		* @brief An integer constant that represents unknown image format.
+		*/
+		UNKNOWN = -1;
+
+		/**
+		* @brief An integer constant that represents RAW image format.
+		*/
+		RAW = 0;
+
+		/**
+		* @brief An integer constant that represents JPEG image format.
+		*/
+		JPEG = 1;
+
+		/**
+		* @brief An integer constant that represents PNG image format.
+		*/
+		PNG = 2;
+	} //end MA_IMAGE_REPRESENTATION_
 } //end ImageFormats
 
 group CameraProperties "Camera Properties" {
@@ -3800,8 +3858,24 @@ group CameraFunctions "Camera Functions" {
 		* Takes a snapshot using the specified format. The snapshot is
 		* stored as a new data object in the supplied placeholder.
 		* Returns 0 on success, or \< 0 on error.
+		*
+		* Note: Since MoSync 3.3 the usage of ths syscall is deprecated
+		* and the use of #maCameraSnapshotAsync is recommended.
 		*/
 		int maCameraSnapshot(in int formatIndex, in MAHandle placeholder);
+
+		/**
+		* Requires the viewfinder to be active.
+		* Takes a snapshot using the specified format. The snapshot is
+		* stored as a new data object and it's provided in the #snapshotImageDataHandle
+		* field of the #EVENT_TYPE_CAMERA_SNAPSHOT custom event. This event will
+		* be fired when the snapshot data is ready and only if the
+		* #maCameraSnapshotAsync returns a success code.
+		*
+		* \param formatIndex camera format index. See #maCameraFormatNumber().
+		* \returns #MA_CAMERA_RES_OK on success, or #MA_CAMERA_RES_FAILED on error.
+		*/
+		int maCameraSnapshotAsync(in int formatIndex);
 
 		/**
 		* Starts or stops recording video.
