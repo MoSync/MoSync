@@ -17,8 +17,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 package com.mosync.internal.android;
 
-import static com.mosync.internal.android.MoSyncHelpers.DebugPrint;
-
 import static com.mosync.internal.android.MoSyncHelpers.EXTENT;
 import static com.mosync.internal.android.MoSyncHelpers.SYSLOG;
 import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_BLUETOOTH_TURNED_OFF;
@@ -32,9 +30,6 @@ import static com.mosync.internal.generated.MAAPI_consts.NOTIFICATION_TYPE_APPLI
 import static com.mosync.internal.generated.MAAPI_consts.RES_BAD_INPUT;
 import static com.mosync.internal.generated.MAAPI_consts.RES_OK;
 import static com.mosync.internal.generated.MAAPI_consts.RES_OUT_OF_MEMORY;
-import static com.mosync.internal.generated.MAAPI_consts.SCREEN_ORIENTATION_DYNAMIC;
-import static com.mosync.internal.generated.MAAPI_consts.SCREEN_ORIENTATION_LANDSCAPE;
-import static com.mosync.internal.generated.MAAPI_consts.SCREEN_ORIENTATION_PORTRAIT;
 import static com.mosync.internal.generated.MAAPI_consts.STERR_GENERIC;
 import static com.mosync.internal.generated.MAAPI_consts.STERR_NONEXISTENT;
 import static com.mosync.internal.generated.MAAPI_consts.TRANS_MIRROR;
@@ -52,7 +47,9 @@ import static com.mosync.internal.generated.MAAPI_consts.MA_RESOURCE_OPEN;
 import static com.mosync.internal.generated.MAAPI_consts.MA_RESOURCE_CLOSE;
 
 import static com.mosync.internal.generated.MAAPI_consts.MA_WAKE_LOCK_ON;
-import static com.mosync.internal.generated.MAAPI_consts.MA_WAKE_LOCK_OFF;
+
+import static com.mosync.internal.generated.MAAPI_consts.MA_TOAST_DURATION_SHORT;
+import static com.mosync.internal.generated.MAAPI_consts.MA_TOAST_DURATION_LONG;
 
 
 import java.io.File;
@@ -81,7 +78,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.res.AssetFileDescriptor;
 import android.content.res.AssetManager;
@@ -109,11 +105,11 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.FrameLayout;
+import android.widget.Toast;
 import android.provider.Settings.Secure;
 import android.net.ConnectivityManager;
 
 import com.mosync.internal.android.MoSyncFont.MoSyncFontHandle;
-import com.mosync.internal.android.billing.PurchaseManager;
 import com.mosync.internal.android.nfc.MoSyncNFC;
 import com.mosync.internal.android.nfc.MoSyncNFCService;
 import com.mosync.internal.generated.IX_OPENGL_ES;
@@ -125,8 +121,6 @@ import com.mosync.java.android.TextBox;
 import com.mosync.nativeui.ui.widgets.MoSyncCameraPreview;
 import com.mosync.nativeui.ui.widgets.ScreenWidget;
 import com.mosync.nativeui.util.AsyncWait;
-import com.mosync.nativeui.util.properties.IntConverter;
-import com.mosync.nativeui.util.properties.PropertyConversionException;
 
 /**
  * Thread that runs the MoSync virtual machine and handles all syscalls.
@@ -190,6 +184,7 @@ public class MoSyncThread extends Thread
 	MoSyncCapture mMoSyncCapture;
 	MoSyncPurchase mMoSyncPurchase;
 	MoSyncDB mMoSyncDB;
+	MoSyncOrientationHelper mOrientation;
 
 	/**
 	 * Synchronization monitor for postEvent
@@ -436,6 +431,8 @@ public class MoSyncThread extends Thread
 		mMoSyncDB = new MoSyncDB();
 
 		mConnectivityManager = (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+
+		mOrientation = new MoSyncOrientationHelper(mContext);
 
 		nativeInitRuntime();
 	}
@@ -3330,6 +3327,32 @@ public class MoSyncThread extends Thread
 	}
 
 	/**
+	 * Display a toast message.
+	 * A toast is a view containing a quick little message for the user.
+	 * @param message The toast message.
+	 * @param duration One of the constants:
+	 *  - #MA_TOAST_DURATION_SHORT or
+	 *  - #MA_TOAST_DURATION_LONG
+	 * @return
+	 */
+	int maToast(final String message, int duration)
+	{
+		switch(duration)
+		{
+		case MA_TOAST_DURATION_SHORT:
+			Toast.makeText(mContext.getApplicationContext(), message, Toast.LENGTH_SHORT).show();
+			break;
+		case MA_TOAST_DURATION_LONG:
+			Toast.makeText(mContext.getApplicationContext(), message, Toast.LENGTH_LONG).show();
+			break;
+		default:
+			return 0;
+		}
+
+		return 0;
+	}
+
+	/**
 	 * Internal wrapper for maImagePickerOpen that runs
 	 * the call in the UI thread.
 	 */
@@ -3938,54 +3961,53 @@ public class MoSyncThread extends Thread
 		return 0;
 	}
 
+	@Deprecated
 	int maScreenSetOrientation(int orientation)
 	{
-		//Log.i("MoSync", "maScreenSetOrientation orientation: "
-		//	+ orientation);
+		SYSLOG("@@MoSync maScreenSetOrientation " + orientation);
 
-		if (SCREEN_ORIENTATION_LANDSCAPE == orientation)
-		{
-			maScreenSetOrientationHelper(
-				ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-		}
-		else if (SCREEN_ORIENTATION_PORTRAIT == orientation)
-		{
-			maScreenSetOrientationHelper(
-				ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-		}
-		else if (SCREEN_ORIENTATION_DYNAMIC == orientation)
-		{
-			if ( Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD )
-			{
-				maScreenSetOrientationHelper(
-						ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR);
-			}
-			else
-			{
-				maScreenSetOrientationHelper(
-						ActivityInfo.SCREEN_ORIENTATION_SENSOR);
-			}
-		}
-		else
-		{
-			return -1;
-		}
-
-		return 0;
+		return mOrientation.setOrientation(orientation);
 	}
 
-	void maScreenSetOrientationHelper(final int androidScreenOrientation)
+	/**
+	 * Set supported screen orientations.
+	 * @param orientation A bitmask consisting of flags describing the supported screen orientations.
+	 * On Android there is only one accepted value.
+	 * @return One of the values:
+	 * - #MA_SCREEN_ORIENTATION_RES_OK
+	 * - #MA_SCREEN_ORIENTATION_RES_NOT_SUPPORTED
+	 * - #MA_SCREEN_ORIENTATION_RES_INVALID_VALUE
+	 */
+	int maScreenSetSupportedOrientations(int orientation)
 	{
-		final Activity activity = mContext;
+		SYSLOG("MoSync maScreenSetSupportedOrientations " + orientation);
 
-		activity.runOnUiThread(new Runnable()
-		{
-			@Override
-			public void run()
-			{
-				activity.setRequestedOrientation(androidScreenOrientation);
-			}
-		});
+		return mOrientation.setSupportedOrientation(orientation);
+	}
+
+	/**
+	* Get supported screen orientations.
+	* @return A bitmask consisting of flags describing the supported screen orientations.
+	* The bitmask is created using \link #MA_SCREEN_ORIENTATION_PORTRAIT MA_SCREEN_ORIENTATION \endlink
+	* values.
+	*/
+	int maScreenGetSupportedOrientations()
+	{
+		SYSLOG("MoSync maScreenGetSupportedOrientations");
+
+		return mOrientation.getSupportedOrientations();
+	}
+
+	/**
+	* Get current screen orientation.
+	* Currently implemented on iOS, WindowsPhone 7.1 and Android.
+	* @return One of the \link #MA_SCREEN_ORIENTATION_PORTRAIT MA_SCREEN_ORIENTATION \endlink constants.
+	*/
+	int maScreenGetCurrentOrientation()
+	{
+		SYSLOG("@MoSync maScreenGetCurrentOrientation");
+
+		return MoSync.getScreenOrientation();
 	}
 
 	int maScreenSetFullscreen(final int fullscreen)

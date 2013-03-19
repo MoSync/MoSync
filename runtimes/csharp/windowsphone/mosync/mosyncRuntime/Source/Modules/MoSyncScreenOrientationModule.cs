@@ -51,39 +51,17 @@ namespace MoSync
                 bool isPortrait = false;
                 bool isLandscape = false;
 
-                // if the first or the second bit is 1, it means that the portrait orientation is
-                // currently accepted (because wp7 doesn't let you specify the
-                // type of a portrait orientation when writing the SupportedOrientations
-                // we consider that portrait is supported if PORTRAIT or PORTRAIT_UPSIDE_DOWN are
-                // supported
+                // MA_SCREEN_ORIENTATION_PORTRAIT = MA_SCREEN_ORIENTATION_PORTRAIT_UP|MA_SCREEN_ORIENTATION_PORTRAIT_UPSIDE_DOWN.
+                if (((orientations & MoSync.Constants.MA_SCREEN_ORIENTATION_PORTRAIT_UP) == MoSync.Constants.MA_SCREEN_ORIENTATION_PORTRAIT_UP) ||
+                    ((orientations & MoSync.Constants.MA_SCREEN_ORIENTATION_PORTRAIT_UPSIDE_DOWN) == MoSync.Constants.MA_SCREEN_ORIENTATION_PORTRAIT_UPSIDE_DOWN))
 
-                // check the first bit (PORTRAIT)g
-                // ((A & (1 << bit)) != 0) checks if the bit 'bit - 1' is 1
-                // For example, let's check if the bit 4 (starting from the least signifiant
-                // bit = bit one) for A = 11001100 is 0 or not
-                // 1<<3 -> 1000
-                // 11001100 &
-                // 00001000
-                // --------
-                // 00001000 != 0 -> the bit at position 4 is 1
-
-                UInt32 o = 0;
-
-                // check if the in param is valid
-                if(!UInt32.TryParse(orientations.ToString(), out o))
-                {
-                    return MoSync.Constants.MA_SCREEN_ORIENTATION_RES_INVALID_VALUE;
-                }
-
-                // check the first and second bits
-                if(((o & 1) != 0) | ((o & (1 << 1)) != 0))
                 {
                     isPortrait = true;
                 }
 
-                // check the third bit (LANDSCAPE_LEFT) and the forth bit (LANDSCAPE_RIGHT)
-                // we only need to check the Landscape
-                if( ((o & (1 << 2)) != 0) | ((o & (1 << 3)) != 0) )
+                // MA_SCREEN_ORIENTATION_LANDSCAPE = MA_SCREEN_ORIENTATION_LANDSCAPE_RIGHT|MA_SCREEN_ORIENTATION_LANDSCAPE_LEFT.
+                if (((orientations & MoSync.Constants.MA_SCREEN_ORIENTATION_LANDSCAPE_LEFT) == MoSync.Constants.MA_SCREEN_ORIENTATION_LANDSCAPE_LEFT) ||
+                    ((orientations & MoSync.Constants.MA_SCREEN_ORIENTATION_LANDSCAPE_RIGHT) == MoSync.Constants.MA_SCREEN_ORIENTATION_LANDSCAPE_RIGHT))
                 {
                     isLandscape = true;
                 }
@@ -118,6 +96,7 @@ namespace MoSync
 
 
             /**
+             * @deprecated Use maScreenSetSupportedOrientations instead.
 		     * Set the screen orientation.
 		     * @param orientation One of the \link #SCREEN_ORIENTATION_LANDSCAPE
 		     * #SCREEN_ORIENTATION_PORTRAIT #SCREEN_ORIENTATION_DYNAMIC \endlink
@@ -172,27 +151,21 @@ namespace MoSync
                     PhoneApplicationPage currentPage = (((PhoneApplicationFrame)Application.Current.RootVisual).Content as PhoneApplicationPage);
 
                     // based on the SupportedOrientations property, we create
-                    // a bitmask containing the suported orientations. The bitmask will contain
-                    // the orientations in the following order:
-                    // PORTRAIT, PORTRAIT_UPSIDE_DOWN, LANDSCAPE_LEFT and LANDSCAPE_RIGHT
+                    // a bitmask containing the suported orientations.
                     switch (currentPage.SupportedOrientations)
                     {
                         case SupportedPageOrientation.PortraitOrLandscape:
                             suportedOrientations = suportedOrientations |
                                                MoSync.Constants.MA_SCREEN_ORIENTATION_PORTRAIT |
-                                               MoSync.Constants.MA_SCREEN_ORIENTATION_PORTRAIT_UPSIDE_DOWN |
-                                               MoSync.Constants.MA_SCREEN_ORIENTATION_LANDSCAPE_LEFT |
-                                               MoSync.Constants.MA_SCREEN_ORIENTATION_LANDSCAPE_RIGHT;
+                                               MoSync.Constants.MA_SCREEN_ORIENTATION_LANDSCAPE;
                             break;
                         case SupportedPageOrientation.Landscape:
                             suportedOrientations = suportedOrientations |
-                                               MoSync.Constants.MA_SCREEN_ORIENTATION_LANDSCAPE_LEFT |
-                                               MoSync.Constants.MA_SCREEN_ORIENTATION_LANDSCAPE_RIGHT;
+                                               MoSync.Constants.MA_SCREEN_ORIENTATION_LANDSCAPE;
                             break;
                         case SupportedPageOrientation.Portrait:
                             suportedOrientations = suportedOrientations |
-                                               MoSync.Constants.MA_SCREEN_ORIENTATION_PORTRAIT |
-                                               MoSync.Constants.MA_SCREEN_ORIENTATION_PORTRAIT_UPSIDE_DOWN;
+                                               MoSync.Constants.MA_SCREEN_ORIENTATION_PORTRAIT;
                             break;
                         default:
                             break;
@@ -219,10 +192,12 @@ namespace MoSync
                             currentOrientation = MoSync.Constants.MA_SCREEN_ORIENTATION_LANDSCAPE_RIGHT;
                             break;
                         case PageOrientation.LandscapeLeft:
+                        case PageOrientation.Landscape:
                             currentOrientation = MoSync.Constants.MA_SCREEN_ORIENTATION_LANDSCAPE_LEFT;
                             break;
                         case PageOrientation.PortraitUp:
-                            currentOrientation = MoSync.Constants.MA_SCREEN_ORIENTATION_PORTRAIT;
+                        case PageOrientation.Portrait:
+                            currentOrientation = MoSync.Constants.MA_SCREEN_ORIENTATION_PORTRAIT_UP;
                             break;
                         case PageOrientation.PortraitDown:
                             currentOrientation = MoSync.Constants.MA_SCREEN_ORIENTATION_PORTRAIT_UPSIDE_DOWN;

@@ -558,6 +558,22 @@ namespace Base
 		return (int)ret;
 	}
 
+	int _maToast(const char* message, int duration, JNIEnv* jNIEnv, jobject jThis)
+	{
+		jstring jstrMessage = jNIEnv->NewStringUTF(message);
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maToast", "(Ljava/lang/String;I)I");
+
+		jint result = -1;
+		if (methodID != 0)
+			result = jNIEnv->CallIntMethod(jThis, methodID, jstrMessage, duration);
+
+		jNIEnv->DeleteLocalRef(cls);
+		jNIEnv->DeleteLocalRef(jstrMessage);
+
+		return (int)result;
+	}
+
 	int _maImagePickerOpen(JNIEnv* jNIEnv, jobject jThis)
 	{
 		Base::gSyscall->VM_Yield();
@@ -735,6 +751,74 @@ namespace Base
 
 		if (methodID != 0)
 			ret = jNIEnv->CallIntMethod(jThis, methodID, orientation);
+
+		jNIEnv->DeleteLocalRef(cls);
+
+		return (int)ret;
+	}
+
+	/**
+	* Set supported screen orientations.
+	* @param orientations A bitmask consisting of flags describing the
+	* supported screen orientations.
+	* @return \< 0 on error.
+	*/
+	int _maScreenSetSupportedOrientations(int orientations, JNIEnv* jNIEnv, jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(
+			cls,
+			"maScreenSetSupportedOrientations",
+			"(I)I");
+
+		jint ret = -1;
+
+		if (methodID != 0)
+			ret = jNIEnv->CallIntMethod(jThis, methodID, orientations);
+
+		jNIEnv->DeleteLocalRef(cls);
+
+		return (int)ret;
+	}
+
+	/**
+	* Get supported screen orientations.
+	* @return A bitmask consisting of flags describing the supported screen orientations.
+	*/
+	int _maScreenGetSupportedOrientations(JNIEnv* jNIEnv, jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(
+			cls,
+			"maScreenGetSupportedOrientations",
+			"()I");
+
+		jint ret = -1;
+
+		if (methodID != 0)
+			ret = jNIEnv->CallIntMethod(jThis, methodID);
+
+		jNIEnv->DeleteLocalRef(cls);
+
+		return (int)ret;
+	}
+
+	/**
+	* Get current screen orientation.
+	* @return One of the \link #MA_SCREEN_ORIENTATION_PORTRAIT MA_SCREEN_ORIENTATION \endlink constants.
+	*/
+	int _maScreenGetCurrentOrientation(JNIEnv* jNIEnv, jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(
+			cls,
+			"maScreenGetCurrentOrientation",
+			"()I");
+
+		jint ret = -1;
+
+		if (methodID != 0)
+			ret = jNIEnv->CallIntMethod(jThis, methodID);
 
 		jNIEnv->DeleteLocalRef(cls);
 

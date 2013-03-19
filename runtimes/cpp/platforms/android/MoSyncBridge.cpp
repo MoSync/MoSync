@@ -440,6 +440,10 @@ static void nativePostEvent(JNIEnv* env, jobject jthis, jintArray eventBuffer)
 		event.purchaseData.productHandle = intArray[3];
 		event.purchaseData.errorCode = intArray[4];
 	}
+	else if (event.type == EVENT_TYPE_ORIENTATION_DID_CHANGE)
+	{
+		event.orientation = intArray[1];
+	}
 	else if (event.type == EVENT_TYPE_WIDGET)
 	{
 		/*
@@ -586,6 +590,10 @@ static void nativePostEvent(JNIEnv* env, jobject jthis, jintArray eventBuffer)
 		else if (widgetEventType == MAW_EVENT_OPTIONS_MENU_ITEM_SELECTED)
 		{
 			widgetEvent->optionsMenuItem = intArray[3];
+		}
+		else if(widgetEventType == MAW_EVENT_SCREEN_ORIENTATION_DID_CHANGE)
+		{
+			widgetEvent->screenOrientation = intArray[3];
 		}
 
 		event.data = (int)widgetEvent;

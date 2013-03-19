@@ -18,25 +18,28 @@ MA 02110-1301, USA.
 
 /**
  * @file Main.cpp
- * @author Bogdan Iusco
+ * @author Mikael Kindborg
  *
- * This is the main entry point for the application.
+ * This is the main entry point for the example application
+ * that demonstrates NativeUI on MoSync.
  */
 
 #include <ma.h> 				// Syscalls
 #include <MAUtil/String.h>		// C++ String class
 #include <MAUtil/Moblet.h>		// Moblet class
-#include <MAUtil/Environment.h>
+#include <conprint.h>			// lprintfln for logging
 
-#include "AppTabScreen.h"
+#include <NativeUI/Widgets.h>	// Include all widgets
+
+#include "MainScreen.h"			// Main UI screen
 
 using namespace MAUtil;
-using namespace OrientationTest;
+using namespace NativeUI;
 
 /**
  * Moblet for the  application.
  */
-class NativeUIMoblet : public Moblet, public OrientationListener
+class NativeUIMoblet : public Moblet
 {
 public:
 	/**
@@ -45,12 +48,10 @@ public:
 	NativeUIMoblet()
 	{
 		// Create the main user interface screen.
-		mTabScreen = new AppTabScreen();
+		mMainScreen = new MainScreen();
 
 		// Show the screen.
-		mTabScreen->show();
-
-		Environment::addOrientationListener(this);
+		mMainScreen->show();
 	}
 
 	/**
@@ -58,8 +59,7 @@ public:
 	 */
 	virtual ~NativeUIMoblet()
 	{
-		delete mTabScreen;
-		Environment::removeOrientationListener(this);
+		delete mMainScreen;
 	}
 
 	/**
@@ -68,8 +68,8 @@ public:
 	void NativeUIMoblet::closeEvent()
 	{
 		// Deallocate the main screen.
-		delete mTabScreen;
-		mTabScreen = NULL;
+		delete mMainScreen;
+		mMainScreen = NULL;
 
 		// Exit the app.
 		close();
@@ -87,26 +87,8 @@ public:
 	    }
 	}
 
-	/**
-	* Called after the screen has finished rotating.
-	* \param 'screenOrientation' One of the
-	* \link #MA_SCREEN_ORIENTATION_PORTRAIT MA_SCREEN_ORIENTATION \endlink codes.
-	*/
-	virtual void orientationChanged(int screenOrientation)
-	{
-		lprintfln("Orientation changed to: %d", screenOrientation);
-	}
-
-	/**
-	* Send by current screen just before it begins rotating.
-	* Note: available only on iOS platform.
-	*/
-	virtual void orientationWillChange()
-	{
-
-	}
 private:
-	AppTabScreen* mTabScreen;
+	MainScreen* mMainScreen;
 };
 
 /**
