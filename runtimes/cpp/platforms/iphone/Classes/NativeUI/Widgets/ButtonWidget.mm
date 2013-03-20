@@ -22,6 +22,7 @@
 #import "ButtonWidget.h"
 #import "UIColorExpanded.h"
 #include "Platform.h"
+#include "MoSyncFonts.h"
 
 @implementation ButtonWidget
 
@@ -113,6 +114,7 @@
 		Surface* imageResource = Base::gSyscall->resources.get_RT_IMAGE(imageHandle);
 		image = [UIImage imageWithCGImage:imageResource->image];
 		[button setBackgroundImage:image forState:UIControlStateNormal];
+		[self layout];
 	}
     else
     if([key isEqualToString:@MAW_IMAGE_BUTTON_IMAGE]) {
@@ -122,6 +124,7 @@
         Surface* imageResource = Base::gSyscall->resources.get_RT_IMAGE(imageHandle);
         image = [UIImage imageWithCGImage:imageResource->image];
         [button setImage:image forState:UIControlStateNormal];
+		[self layout];
     }
 	else if([key isEqualToString:@"leftCapWidth"]) {
 		int newLeftCapWidth = [value intValue];

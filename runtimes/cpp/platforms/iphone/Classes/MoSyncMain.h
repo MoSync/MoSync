@@ -29,34 +29,9 @@ void MoSync_Main(int width, int height, MoSyncView* mosyncView);
 void MoSync_UpdateView(CGImageRef ref);
 void MoSync_DoneUpdatingView();
 
-void MoSync_ShowMessageBox(const char *title, const char *msg, bool kill);
-
-//Shows an alert box with up to three buttons
-void MoSync_ShowAlert(const char* title, const char* message, const char* button1, const char* button2, const char* button3);
-void MoSync_ShowTextBox(const wchar* title, const wchar* inText, wchar* outText, int maxSize, int constraints);
-
 void MoSync_Exit();
 
 void MoSync_ReloadProgram(MAHandle data, int reload);
-void MoSync_StartUpdatingLocation();
-void MoSync_StopUpdatingLocation();
-
-/**
- * Start a sensor.
- * @param sensorType What type of sensor to start.
- * @param value Update interval value.
- * @return NO_ERROR if the sensor has been started, or a code error otherwise(for more info see MoSyncSenor.h).
- */
-int MoSync_SensorStart(int sensor, int interval);
-
-/**
- * Stop a sensor.
- * @param sensorType What type of sensor to stop.
- * @return NO_ERROR if the sensor has been started, or a code error otherwise(for more info see MoSyncSenor.h).
- */
-int MoSync_SensorStop(int sensor);
-
-
 
 void MoSync_AddTouchPressedEvent(int x, int y, int touchId);
 void MoSync_AddTouchMovedEvent(int x, int y, int touchId);
@@ -65,8 +40,7 @@ void MoSync_AddScreenChangedEvent();
 void MoSync_AddCloseEvent();
 void MoSync_AddFocusLostEvent();
 void MoSync_AddFocusGainedEvent();
-void MoSync_ShowImagePicker();
-void MoSync_ShowImagePicker(int returnType);
+
 void* MoSync_GetCustomEventData();
 void* MoSync_GetCustomEventDataMoSyncPointer();
 void MoSync_AddLayerToView(CALayer* layer);
