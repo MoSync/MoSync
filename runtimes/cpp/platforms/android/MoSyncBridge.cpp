@@ -615,6 +615,13 @@ static void nativePostEvent(JNIEnv* env, jobject jthis, jintArray eventBuffer)
 	{
 		__android_log_write(ANDROID_LOG_INFO, "@@@@@@@@ MoSync JNI", "Camera event sent");
 	}
+	else if (event.type == EVENT_TYPE_CAMERA_SNAPSHOT)
+	{
+		event.snapshotImageDataHandle = intArray[1];
+		event.snapshotFormatIndex = intArray[2];
+		event.snapshotImageDataRepresentation = intArray[3];
+		event.snapshotReturnCode = intArray[4];
+	}
 	// HOLD ON!
 	// Don't forget to update the file EventQueue.cpp when adding
 	// event types that would potentially overflow the event queue.

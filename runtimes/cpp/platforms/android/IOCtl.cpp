@@ -1743,6 +1743,23 @@ namespace Base
 		return (int)result;
 	}
 
+	int _maCameraSnapshotAsync(int formatIndex, JNIEnv* jNIEnv, jobject jThis)
+	{
+		// Get the Java method
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maCameraSnapshotAsync", "(I)I");
+
+		jint result = -1;
+
+		if (methodID != 0)
+			result = jNIEnv->CallIntMethod(jThis, methodID, formatIndex);
+
+		// Delete allocated memory
+		jNIEnv->DeleteLocalRef(cls);
+
+		return (int)result;
+	}
+
 	int _maCameraRecord(int flag, JNIEnv* jNIEnv, jobject jThis)
 	{
 		// Get the Java method

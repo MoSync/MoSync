@@ -17,8 +17,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 package com.mosync.internal.android;
 
-import static com.mosync.internal.android.MoSyncHelpers.DebugPrint;
-
 import static com.mosync.internal.android.MoSyncHelpers.EXTENT;
 import static com.mosync.internal.android.MoSyncHelpers.SYSLOG;
 import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_BLUETOOTH_TURNED_OFF;
@@ -52,7 +50,7 @@ import static com.mosync.internal.generated.MAAPI_consts.MA_RESOURCE_OPEN;
 import static com.mosync.internal.generated.MAAPI_consts.MA_RESOURCE_CLOSE;
 
 import static com.mosync.internal.generated.MAAPI_consts.MA_WAKE_LOCK_ON;
-import static com.mosync.internal.generated.MAAPI_consts.MA_WAKE_LOCK_OFF;
+import static com.mosync.internal.generated.MAAPI_consts.MA_CAMERA_RES_OK;
 
 
 import java.io.File;
@@ -113,7 +111,6 @@ import android.provider.Settings.Secure;
 import android.net.ConnectivityManager;
 
 import com.mosync.internal.android.MoSyncFont.MoSyncFontHandle;
-import com.mosync.internal.android.billing.PurchaseManager;
 import com.mosync.internal.android.nfc.MoSyncNFC;
 import com.mosync.internal.android.nfc.MoSyncNFCService;
 import com.mosync.internal.generated.IX_OPENGL_ES;
@@ -125,8 +122,6 @@ import com.mosync.java.android.TextBox;
 import com.mosync.nativeui.ui.widgets.MoSyncCameraPreview;
 import com.mosync.nativeui.ui.widgets.ScreenWidget;
 import com.mosync.nativeui.util.AsyncWait;
-import com.mosync.nativeui.util.properties.IntConverter;
-import com.mosync.nativeui.util.properties.PropertyConversionException;
 
 /**
  * Thread that runs the MoSync virtual machine and handles all syscalls.
@@ -4638,6 +4633,23 @@ public class MoSyncThread extends Thread
 		}
 
 		return mMoSyncCameraController.cameraSnapshot(formatIndex, placeHolder);
+	}
+
+	/**
+	 * Takes a snapshot and send the place holder created via
+	 * #EVENT_TYPE_CAMERA_SNAPSHOT.
+	 *
+	 * @param formatIndex index of the format set by the user
+	 * @return IOCTL_UNAVAILABLE if fails and MA_CAMERA_RES_OK if succeeds
+	 */
+	int maCameraSnapshotAsync(int formatIndex)
+	{
+		if(mMoSyncCameraController == null)
+		{
+			return IOCTL_UNAVAILABLE;
+		}
+		mMoSyncCameraController.cameraSnapshotAsync(formatIndex);
+		return MA_CAMERA_RES_OK;
 	}
 
 
