@@ -21,7 +21,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.os.Build;
-import android.util.Log;
 
 import com.mosync.java.android.MoSync;
 
@@ -32,7 +31,6 @@ import static com.mosync.internal.generated.MAAPI_consts.MA_SCREEN_ORIENTATION_P
 import static com.mosync.internal.generated.MAAPI_consts.MA_SCREEN_ORIENTATION_PORTRAIT_UP;
 import static com.mosync.internal.generated.MAAPI_consts.MA_SCREEN_ORIENTATION_PORTRAIT_UPSIDE_DOWN;
 import static com.mosync.internal.generated.MAAPI_consts.MA_SCREEN_ORIENTATION_RES_INVALID_VALUE;
-import static com.mosync.internal.generated.MAAPI_consts.MA_SCREEN_ORIENTATION_RES_NOT_SUPPORTED;
 import static com.mosync.internal.generated.MAAPI_consts.MA_SCREEN_ORIENTATION_RES_OK;
 import static com.mosync.internal.generated.MAAPI_consts.MA_SCREEN_ORIENTATION_DYNAMIC;
 import static com.mosync.internal.generated.MAAPI_consts.SCREEN_ORIENTATION_DYNAMIC;
@@ -67,23 +65,27 @@ public class MoSyncOrientationHelper {
 		mSupportedOrientations = orientation;
 
 		// Set to FULL_SENSOR or SENSOR.
-		if ( ( (orientation & MA_SCREEN_ORIENTATION_PORTRAIT) == MA_SCREEN_ORIENTATION_PORTRAIT)
-				&& ( (orientation & MA_SCREEN_ORIENTATION_LANDSCAPE) == MA_SCREEN_ORIENTATION_LANDSCAPE) )
+		if ( orientation == MA_SCREEN_ORIENTATION_DYNAMIC )
 		{
-			setDynamicOrientation();
-			return MA_SCREEN_ORIENTATION_RES_OK;
+			setOrientation(
+					ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR,
+					ActivityInfo.SCREEN_ORIENTATION_SENSOR);
 		}
 		// Set to SENSOR_PORTRAIT if supported, to normal portrait otherwise.
 		else if ( (orientation & MA_SCREEN_ORIENTATION_PORTRAIT)
 					== MA_SCREEN_ORIENTATION_PORTRAIT)
 		{
-			setPortraitOrientation();
+			setOrientation(
+					ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT,
+					ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 		}
 		// Set to SENSOR_LANDSCAPE is supported, to normal landscape otherwise.
 		else if( (orientation & MA_SCREEN_ORIENTATION_LANDSCAPE)
 					== MA_SCREEN_ORIENTATION_LANDSCAPE)
 		{
-			setLandscapeOrientation();
+			setOrientation(
+					ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE,
+					ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 		}
 		// Set to PORTRAIT_UP.
 		else if ( (orientation & MA_SCREEN_ORIENTATION_PORTRAIT_UP)
@@ -95,14 +97,9 @@ public class MoSyncOrientationHelper {
 		else if ( (orientation & MA_SCREEN_ORIENTATION_PORTRAIT_UPSIDE_DOWN)
 					== MA_SCREEN_ORIENTATION_PORTRAIT_UPSIDE_DOWN)
 		{
-			if ( Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD )
-			{
-				maScreenSetOrientationHelper(ActivityInfo.SCREEN_ORIENTATION_REVERSE_PORTRAIT);
-			}
-			else
-			{
-				maScreenSetOrientationHelper(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-			}
+			setOrientation(
+					ActivityInfo.SCREEN_ORIENTATION_REVERSE_PORTRAIT,
+					ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 		}
 		// Set to NORMAL_LANDSCAPE.
 		else if( (orientation & MA_SCREEN_ORIENTATION_LANDSCAPE_LEFT)
@@ -114,14 +111,9 @@ public class MoSyncOrientationHelper {
 		else if( (orientation & MA_SCREEN_ORIENTATION_LANDSCAPE_RIGHT)
 					== MA_SCREEN_ORIENTATION_LANDSCAPE_RIGHT)
 		{
-			if ( Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD )
-			{
-				maScreenSetOrientationHelper(ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE);
-			}
-			else
-			{
-				maScreenSetOrientationHelper(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-			}
+			setOrientation(
+					ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE,
+					ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 		}
 		else
 		{
@@ -147,7 +139,7 @@ public class MoSyncOrientationHelper {
 
 	protected int getSupportedOrientations()
 	{
-		if (mSupportedOrientations != 0x000000)
+		if (mSupportedOrientations != 0)
 		{
 			return mSupportedOrientations;
 		}
@@ -156,7 +148,7 @@ public class MoSyncOrientationHelper {
 	}
 
 	@Deprecated
-	protected int setOrientation(int orientation)
+	protected int maScreenSetOrientation(int orientation)
 	{
 		if (SCREEN_ORIENTATION_LANDSCAPE == orientation)
 		{
@@ -170,16 +162,9 @@ public class MoSyncOrientationHelper {
 		}
 		else if (SCREEN_ORIENTATION_DYNAMIC == orientation)
 		{
-			if ( Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD )
-			{
-				maScreenSetOrientationHelper(
-						ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR);
-			}
-			else
-			{
-				maScreenSetOrientationHelper(
-						ActivityInfo.SCREEN_ORIENTATION_SENSOR);
-			}
+			setOrientation(
+					ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR,
+					ActivityInfo.SCREEN_ORIENTATION_SENSOR);
 		}
 		else
 		{
@@ -189,40 +174,15 @@ public class MoSyncOrientationHelper {
 		return 0;
 	}
 
-	private void setPortraitOrientation()
+	private void setOrientation(int orientation, int alternativeOrientation)
 	{
 		if ( Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD )
 		{
-			maScreenSetOrientationHelper(ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT);
+			maScreenSetOrientationHelper(orientation);
 		}
 		else
 		{
-			maScreenSetOrientationHelper(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-		}
-	}
-
-	private void setLandscapeOrientation()
-	{
-		if ( Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD )
-		{
-			maScreenSetOrientationHelper(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
-		}
-		else
-		{
-			maScreenSetOrientationHelper(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-		}
-	}
-
-	private void setDynamicOrientation()
-	{
-		// Check if FULL_SENSOR AVAILABLE
-		if ( Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD )
-		{
-			maScreenSetOrientationHelper(ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR);
-		}
-		else
-		{
-			maScreenSetOrientationHelper(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
+			maScreenSetOrientationHelper(alternativeOrientation);
 		}
 	}
 }
