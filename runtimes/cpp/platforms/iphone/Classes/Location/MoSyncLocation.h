@@ -17,6 +17,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #import <CoreLocation/CoreLocation.h>
 
+int maLocationStart();
+int maLocationStop();
+
 @interface MoSyncCLController : NSObject <CLLocationManagerDelegate> {
 	CLLocationManager *locationManager;
 }

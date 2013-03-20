@@ -29,6 +29,11 @@ _STLP_BEGIN_NAMESPACE
 
 _STLP_BEGIN_TR1_NAMESPACE
 
+namespace std
+{
+typedef unsigned long size_t;
+}
+
 namespace detail {
 
 struct __select_types

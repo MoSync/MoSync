@@ -20,6 +20,7 @@ package com.mosync.nativeui.ui.widgets;
 import java.util.Stack;
 
 import com.mosync.internal.android.EventQueue;
+import com.mosync.internal.android.MoSyncThread;
 import com.mosync.internal.generated.IX_WIDGET;
 import com.mosync.nativeui.util.ScreenTransitions;
 import com.mosync.nativeui.util.properties.BooleanConverter;
@@ -257,5 +258,16 @@ public class StackScreenWidget extends ScreenWidget
 		pop( );
 
 		return true;
+	}
+
+	/**
+	 * Check if this stack screen is shown.
+	 * @return true if the stack screen is displayed, false otherwise.
+	 */
+	@Override
+	public boolean isShown()
+	{
+		ScreenWidget currentScreen = MoSyncThread.getInstance().getUnconvertedCurrentScreen();
+		return this.equals( currentScreen );
 	}
 }

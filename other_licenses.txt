@@ -29,6 +29,7 @@ build-one.rb
 /libs/SDL
 /libs/yajl/
 /libs/stlport/
+/libs/glm
 
 /intlibs/gsm_amr
 /intlibs/sqlite
