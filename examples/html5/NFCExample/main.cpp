@@ -91,6 +91,13 @@ public:
 	NFCMoblet() {
 		initWebView();
 		fDisallowStatusMessages = false;
+
+		addMessageFun("StartNFC",
+			(FunTable::MessageHandlerFun)&NFCMoblet::StartNFC);
+		addMessageFun("WriteSampleURL",
+			(FunTable::MessageHandlerFun)&NFCMoblet::WriteSampleURL);
+		addMessageFun("WriteSampleVCard",
+			(FunTable::MessageHandlerFun)&NFCMoblet::WriteSampleVCard);
 	}
 
 	void initWebView() {
@@ -100,50 +107,37 @@ public:
 		getWebView()->disableZoom();
 	}
 
-	/**
-	 * Here we handle messages sent from JavaScript. Our example
-	 * uses three messages:
-	 * - StartNFC, at startup
-	 * - WriteSampleURL, for writing an example NDEF URI
-	 * - WriteSampleVCard, for writing an example NDEF vCard
-	 */
-	void handleWebViewMessage(WebView* webView, MAHandle data) {
-		MessageStreamJSON message(webView, data);
-		while (message.next())
-		{
-			handleMessage(message);
+	void StartNFC() {
+		// First, let's start listening to NFC events...
+		if (maNFCStart()) {
+			// For the off-chance of a device not having NFC,
+			// show an error message.
+			showStatus(
+				ERROR_ICON,
+				"This device does not have NFC, or NFC is disabled.<br/>"
+				"<b>Please quit.</b>",
+				0);
+			// And this flag is just a hack to never clear
+			// the above message.
+			fDisallowStatusMessages = true;
 		}
+		// ...and we're in read mode at this point.
+		setMode(_read);
 	}
 
-	void handleMessage(MessageStreamJSON& message) {
-		if (message.is("StartNFC")) {
-			// First, let's start listening to NFC events...
-			if (maNFCStart()) {
-				// For the off-chance of a device not having NFC,
-				// show an error message.
-				showStatus(
-					ERROR_ICON,
-					"This device does not have NFC, or NFC is disabled.<br/>"
-					"<b>Please quit.</b>",
-					0);
-				// And this flag is just a hack to never clear
-				// the above message.
-				fDisallowStatusMessages = true;
-			}
-			// ...and we're in read mode at this point.
-			setMode(_read);
-		} else if (message.is("WriteSampleURL")) {
-			// If the user pressed the 'Write Web Address' button,
-			// we enter write mode...
-			setMode(_write);
-			// ...and create a tag to write next time a tag is
-			// held close to the device.
-			fSampleTag = createSampleURLTag();
-		} else if (message.is("WriteSampleVCard")) {
-			// Same as above, but a different type of data.
-			setMode(_write);
-			fSampleTag = createSampleVCardTag();
-		}
+	void WriteSampleURL() {
+		// If the user pressed the 'Write Web Address' button,
+		// we enter write mode...
+		setMode(_write);
+		// ...and create a tag to write next time a tag is
+		// held close to the device.
+		fSampleTag = createSampleURLTag();
+	}
+
+	void WriteSampleVCard() {
+		// Same as above, but a different type of data.
+		setMode(_write);
+		fSampleTag = createSampleVCardTag();
 	}
 
 	/**
