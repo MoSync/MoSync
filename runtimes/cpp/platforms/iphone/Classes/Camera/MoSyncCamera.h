@@ -26,6 +26,7 @@ SYSCALL(int, maCameraSetPreview(MAHandle widgetHandle));
 SYSCALL(int, maCameraSelect(MAHandle cameraNumber));
 SYSCALL(int, maCameraNumber());
 SYSCALL(int, maCameraSnapshot(int formatIndex, MAHandle placeholder));
+SYSCALL(int, maCameraSnapshotAsync(int formatIndex));
 SYSCALL(int, maCameraRecord(int stopStartFlag));
 SYSCALL(int, maCameraSetProperty(const char *property, const char* value));
 SYSCALL(int, maCameraGetProperty(const char *property, char *value, int maxSize));

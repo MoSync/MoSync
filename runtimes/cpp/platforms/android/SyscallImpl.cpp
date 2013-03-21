@@ -2260,6 +2260,12 @@ namespace Base
 				mJNIEnv,
 				mJThis);
 
+		case maIOCtl_maCameraSnapshotAsync:
+			return _maCameraSnapshotAsync(
+				a,
+				mJNIEnv,
+				mJThis);
+
 		case maIOCtl_maCameraSetPreview:
 			return _maCameraSetPreview(
 				a,

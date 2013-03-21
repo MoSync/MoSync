@@ -82,11 +82,11 @@ html
 <script type="text/javascript">
 
 function WriteURLToTag() {
-	mosync.bridge.sendJSON({messageName: "WriteSampleURL"});
+	mosync.bridge.send(["Custom", "WriteSampleURL"]);
 }
 
 function WriteVCardToTag() {
-	mosync.bridge.sendJSON({messageName: "WriteSampleVCard"});
+	mosync.bridge.send(["Custom", "WriteSampleVCard"]);
 }
 
 function showWriteAlert() {
@@ -142,6 +142,6 @@ Write vCard &gt;&nbsp;&nbsp;
 </div>
 </body>
 <script>
-mosync.bridge.sendJSON({messageName: "StartNFC"});
+mosync.bridge.send(["Custom", "StartNFC"]);
 </script>
 </html>

@@ -227,7 +227,6 @@ namespace Base {
 	//***************************************************************************
 	// Proper syscalls
 	//***************************************************************************
-
 	SYSCALL(longlong, maIOCtl(int function, int a, int b, int c))
 	{
 		switch(function) {
@@ -302,6 +301,7 @@ namespace Base {
 		maIOCtl_case(maCameraSelect);
 		maIOCtl_case(maCameraNumber);
 		maIOCtl_case(maCameraSnapshot);
+        maIOCtl_case(maCameraSnapshotAsync);
 		maIOCtl_case(maCameraRecord);
 		maIOCtl_case(maCameraSetProperty);
 		maIOCtl_case(maCameraGetProperty);

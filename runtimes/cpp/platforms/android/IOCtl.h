@@ -795,6 +795,8 @@ namespace Base
 
 	int _maCameraSnapshot(int formatIndex, MAHandle placeHolder, JNIEnv* jNIEnv, jobject jThis);
 
+	int _maCameraSnapshotAsync(int formatIndex, JNIEnv* jNIEnv, jobject jThis);
+
 	int _maCameraRecord(int flag, JNIEnv* jNIEnv, jobject jThis);
 
 	int _maCameraFormatNumber(JNIEnv* jNIEnv, jobject jThis);

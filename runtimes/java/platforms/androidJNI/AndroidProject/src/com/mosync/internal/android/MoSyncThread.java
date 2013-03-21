@@ -46,10 +46,10 @@ import static com.mosync.internal.generated.MAAPI_consts.MA_RESOURCE_OPEN;
 import static com.mosync.internal.generated.MAAPI_consts.MA_RESOURCE_CLOSE;
 
 import static com.mosync.internal.generated.MAAPI_consts.MA_WAKE_LOCK_ON;
+import static com.mosync.internal.generated.MAAPI_consts.MA_CAMERA_RES_OK;
 
 import static com.mosync.internal.generated.MAAPI_consts.MA_TOAST_DURATION_SHORT;
 import static com.mosync.internal.generated.MAAPI_consts.MA_TOAST_DURATION_LONG;
-
 
 import java.io.File;
 import java.io.FileDescriptor;
@@ -4661,6 +4661,23 @@ public class MoSyncThread extends Thread
 		}
 
 		return mMoSyncCameraController.cameraSnapshot(formatIndex, placeHolder);
+	}
+
+	/**
+	 * Takes a snapshot and send the place holder created via
+	 * #EVENT_TYPE_CAMERA_SNAPSHOT.
+	 *
+	 * @param formatIndex index of the format set by the user
+	 * @return IOCTL_UNAVAILABLE if fails and MA_CAMERA_RES_OK if succeeds
+	 */
+	int maCameraSnapshotAsync(int formatIndex)
+	{
+		if(mMoSyncCameraController == null)
+		{
+			return IOCTL_UNAVAILABLE;
+		}
+		mMoSyncCameraController.cameraSnapshotAsync(formatIndex);
+		return MA_CAMERA_RES_OK;
 	}
 
 
