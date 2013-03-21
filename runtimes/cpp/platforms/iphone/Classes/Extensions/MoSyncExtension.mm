@@ -20,6 +20,8 @@ void initExtensions(MoSync* mosync)
 			[sExtensions addObject:extension];
 		}
 	}
+
+	free((void*) classes);
 }
 
 #if 0

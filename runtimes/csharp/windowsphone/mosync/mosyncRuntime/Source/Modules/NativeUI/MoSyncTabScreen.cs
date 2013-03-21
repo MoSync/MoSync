@@ -123,6 +123,7 @@ namespace MoSync
                             if ((mPivot.Items[i] as Microsoft.Phone.Controls.PivotItem).Content.Equals((child as Screen).View))
                             {
                                 mPivot.Items.RemoveAt(i);
+                                child.SetParent(null);
                                 break;
                             }
                         }
@@ -211,6 +212,36 @@ namespace MoSync
                 }
 
                 return false;
+            }
+
+            /**
+             * Check if a given child screen is shown.
+             * @param child Given child.
+             * @return true if child is currently shown, false otherwise.
+             */
+            public override bool isChildShown(IScreen child)
+            {
+                if (mPivot.Items.Count > 0)
+                {
+                    int index = mPivot.SelectedIndex;
+                    if ((mPivot.Items[index] as Microsoft.Phone.Controls.PivotItem).Content.Equals((child as Screen).View))
+                    {
+                        return true;
+                    }
+                }
+                return false;
+            }
+
+            /**
+            * MAW_TAB_SCREEN_IS_SHOWN property implementation.
+            */
+            [MoSyncWidgetProperty(MoSync.Constants.MAW_TAB_SCREEN_IS_SHOWN)]
+            public String IsShown
+            {
+                get
+                {
+                    return isScreenShown().ToString().ToLower();
+                }
             }
         }
     }

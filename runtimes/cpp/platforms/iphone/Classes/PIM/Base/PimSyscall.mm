@@ -24,8 +24,6 @@
 #import "MoSyncPanic.h"
 
 using namespace MoSyncError;
-using namespace Base;
-
 
 //***************************************************************************
 //Variables
@@ -47,27 +45,27 @@ void MAPimClose() {
 }
 
 
-MAHandle Syscall::maPimListOpen(int listType)
+MAHandle maPimListOpen(int listType)
 {
     return [sPimDatabase pimListOpen:listType];
 }
 
-MAHandle Syscall::maPimListNextSummary(MAHandle list)
+MAHandle maPimListNextSummary(MAHandle list)
 {
     return [sPimDatabase pimListNext:list];
 }
 
-MAHandle Syscall::maPimListNext(MAHandle list)
+MAHandle maPimListNext(MAHandle list)
 {
     return [sPimDatabase pimListNext:list];
 }
 
-int Syscall::maPimListClose(MAHandle list)
+int maPimListClose(MAHandle list)
 {
      return [sPimDatabase pimListClose:list];
 }
 
-int Syscall::maPimItemCount(MAHandle item)
+int maPimItemCount(MAHandle item)
 {
     PimItem* pimItem = [sPimDatabase getItem:item];
 
@@ -81,7 +79,7 @@ int Syscall::maPimItemCount(MAHandle item)
     return [pimItem count];
 }
 
-int Syscall::maPimItemGetField(MAHandle item, int n)
+int maPimItemGetField(MAHandle item, int n)
 {
     PimItem* pimItem = [sPimDatabase getItem:item];
 
@@ -95,7 +93,7 @@ int Syscall::maPimItemGetField(MAHandle item, int n)
     return [pimItem getFieldID:n];
 }
 
-int Syscall::maPimItemFieldCount(MAHandle item, int field)
+int maPimItemFieldCount(MAHandle item, int field)
 {
     PimItem* pimItem = [sPimDatabase getItem:item];
 
@@ -109,7 +107,7 @@ int Syscall::maPimItemFieldCount(MAHandle item, int field)
     return [pimItem fieldCount:field];
 }
 
-int Syscall::maPimItemGetAttributes(MAHandle item, int field, int index)
+int maPimItemGetAttributes(MAHandle item, int field, int index)
 {
     PimItem* pimItem = [sPimDatabase getItem:item];
 
@@ -124,7 +122,7 @@ int Syscall::maPimItemGetAttributes(MAHandle item, int field, int index)
 }
 
 
-int Syscall::maPimItemSetLabel(const MA_PIM_ARGS* args, int index)
+int maPimItemSetLabel(const MA_PIM_ARGS* args, int index)
 {
 
     PimItem* pimItem = [sPimDatabase getItem:args->item];
@@ -139,7 +137,7 @@ int Syscall::maPimItemSetLabel(const MA_PIM_ARGS* args, int index)
     return [pimItem setLabel:args indexValue:index];
 }
 
-int Syscall::maPimItemGetLabel(const MA_PIM_ARGS* args, int index)
+int maPimItemGetLabel(const MA_PIM_ARGS* args, int index)
 {
     PimItem* pimItem = [sPimDatabase getItem:args->item];
 
@@ -153,7 +151,7 @@ int Syscall::maPimItemGetLabel(const MA_PIM_ARGS* args, int index)
     return [pimItem getLabel:args indexValue:index];
 }
 
-int Syscall::maPimFieldType(MAHandle list, int field)
+int maPimFieldType(MAHandle list, int field)
 {
     bool singleFieldValue;
     int fieldType;
@@ -179,7 +177,7 @@ int Syscall::maPimFieldType(MAHandle list, int field)
     return resultCode;
 }
 
-int Syscall::maPimItemGetValue(const MA_PIM_ARGS *args, int index)
+int maPimItemGetValue(const MA_PIM_ARGS *args, int index)
 {
     PimItem* pimItem = [sPimDatabase getItem:args->item];
 
@@ -194,7 +192,7 @@ int Syscall::maPimItemGetValue(const MA_PIM_ARGS *args, int index)
 }
 
 
-int Syscall::maPimItemSetValue(const MA_PIM_ARGS* args, int index, int attributes)
+int maPimItemSetValue(const MA_PIM_ARGS* args, int index, int attributes)
 {
     PimItem* pimItem = [sPimDatabase getItem:args->item];
 
@@ -210,7 +208,7 @@ int Syscall::maPimItemSetValue(const MA_PIM_ARGS* args, int index, int attribute
               valueAttribute:attributes];
 }
 
-int Syscall::maPimItemAddValue(const MA_PIM_ARGS* args, int attributes)
+int maPimItemAddValue(const MA_PIM_ARGS* args, int attributes)
 {
     PimItem* pimItem = [sPimDatabase getItem:args->item];
 
@@ -225,7 +223,7 @@ int Syscall::maPimItemAddValue(const MA_PIM_ARGS* args, int attributes)
                withAttribute:attributes];
 }
 
-int Syscall::maPimItemRemoveValue(MAHandle item, int field, int index)
+int maPimItemRemoveValue(MAHandle item, int field, int index)
 {
     PimItem* pimItem = [sPimDatabase getItem:item];
 
@@ -239,17 +237,17 @@ int Syscall::maPimItemRemoveValue(MAHandle item, int field, int index)
     return [pimItem removeValue:field atIndex:index];
 }
 
-int Syscall::maPimItemClose(MAHandle item)
+int maPimItemClose(MAHandle item)
 {
     return [sPimDatabase closeItem:item];
 }
 
-MAHandle Syscall::maPimItemCreate(MAHandle list)
+MAHandle maPimItemCreate(MAHandle list)
 {
     return [sPimDatabase createItem:list];
 }
 
-int Syscall::maPimItemRemove(MAHandle list, MAHandle item)
+int maPimItemRemove(MAHandle list, MAHandle item)
 {
     return [sPimDatabase removeItem:list item:item];
 }
