@@ -144,7 +144,6 @@ void packageAndroid(const SETTINGS& s, const RuntimeInfo& ri) {
 		initFuncs["mosynclib"] = "resource_selector";
 
 		modules.insert(modules.end(), extensions.begin(), extensions.end());
-
 		modules.push_back(s.name);
 		initFuncs[string(s.name)] = "MAMain";
 	}
@@ -154,8 +153,7 @@ void packageAndroid(const SETTINGS& s, const RuntimeInfo& ri) {
 	toDir(assetDir);
 	_mkdir(assetDir.c_str());
 
-	if (s.extensions) {
-
+	if (!extensions.empty()) {
 		for (size_t i = 0; i < extensions.size(); i++) {
 			string extension = trim(extensions[i]);
 			string extensionDir = mosyncdir() + string("/modules/") + extension + string("/Android/");

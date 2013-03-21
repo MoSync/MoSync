@@ -481,6 +481,7 @@ public class MoSyncThread extends Thread implements MoSyncContext
 			System.loadLibrary("mosync");
 		}
 	}
+
 	public static MoSyncThread getInstance()
 	{
 		return sMoSyncThread;
