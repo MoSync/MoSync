@@ -371,12 +371,7 @@ public class EventQueue
 
 		sMoSyncThread.postEvent(event);
 	}
-	/**
-	 * Post a message to the MoSync event queue.
-	 * This event it sent when one of the buttons in the alert was pressed.
-	 * See maAlert syscall that pops-up an alert.
-	 * The state is: Ready or Canceled.
-	 */
+
 	/**
 	 * Send an alert event.
 	 * This event it sent when one of the buttons in the alert was pressed.

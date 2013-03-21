@@ -28,6 +28,8 @@ MA 02110-1301, USA.
 #include <MAUtil/Moblet.h>		// Moblet class
 #include <conprint.h>			// lprintfln for logging
 
+#include "Util.h"
+
 using namespace MAUtil;
 
 /**
@@ -39,10 +41,18 @@ public:
 	/**
 	 * Constructor.
 	 */
-	TestMoblet()
+	TestMoblet():
+	mTestCount(0)
 	{
+		printf("Running tests ...............\n");
+		createTest();
+	}
+
+	void TestMoblet::createTest()
+	{
+		mTestCount = 1;
 		// Call the maAlert syscall with all 3 buttons.
-		maAlert("Title", "This is a message", "Ok", "Maybe", "Cancel");
+		maAlert("First test", "Press <<OK>> for the test to pass.", "Ok", "Maybe", "Cancel");
 	}
 
 	/**
@@ -61,6 +71,16 @@ public:
 		close();
 	}
 
+	void TestMoblet::testFailed(int testNumber)
+	{
+		printf("Test %d has failed", testNumber);
+	}
+
+	void TestMoblet::testsSucceeded()
+	{
+		printf("All test have passed. You can now exit.");
+	}
+
 	/**
 	* This function is called when an event that Moblet doesn't recognize is recieved.
 	*/
@@ -74,26 +94,68 @@ public:
 			{
 			case 1:
 				temp += "First ";
+				if (mTestCount == 1)
+				{
+					printf("First test has passed");
+					mTestCount ++;
+					maAlert("Second test", "Press <<Maybe>> for the test to pass.", "Ok", "Maybe", "Cancel");
+				}
+				else
+				{
+					testFailed(1);
+				}
 				break;
 			case 2:
 				temp += "Second ";
+				if (mTestCount == 2)
+				{
+					printf("Second test has passed");
+					mTestCount++;
+					maAlert("Third test", "Press <<Cancel>> for the test to pass.", "Ok", "Maybe", "Cancel");
+				}
+				else
+				{
+					testFailed(2);
+				}
 				break;
 			case 3:
 				temp += "Third ";
+				if (mTestCount == 3)
+				{
+					printf("Third test has passed");
+					if ( isAndroid() )
+					{
+						mTestCount++;
+						maAlert("Fourth test", "Press Back key for the test to pass.", "Ok", "Maybe", "Cancel");
+					}
+					else
+					{
+						testsSucceeded();
+					}
+				}
+				else
+				{
+					testFailed(3);
+				}
 				break;
 			default:
 				temp = "err";
 			}
 			temp += " button was clicked";
-//			maMessageBox("Alert Event received", temp.c_str());
 			printf(temp.c_str());
-			printf("\n ------------- This was all ------------- \n");
 		}
-		else if( event.type == EVENT_TYPE_ALERT_DISMISSED)
+		else if( event.type == EVENT_TYPE_ALERT_DISMISSED )
 		{
 			printf("Alert was dismissed by pressing back!");
+			if (mTestCount == 4)
+			{
+				testsSucceeded();
+			}
+			else
+			{
+				testFailed(4);
+			}
 		}
-
 	}
 
 	/**
@@ -107,6 +169,8 @@ public:
 	        closeEvent();
 	    }
 	}
+private:
+	int mTestCount;
 };
 
 /**

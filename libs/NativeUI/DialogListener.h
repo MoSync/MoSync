@@ -48,7 +48,6 @@ namespace NativeUI
     {
     public:
         /**
-         * Note: this is available only on the iPad.
          * This method is sent by a Dialog widget when when a user dismisses a
          * popover by tapping outside of it.
          * It will not be sent if it was dismissed by calling hide().
