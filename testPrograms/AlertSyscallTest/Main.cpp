@@ -89,6 +89,10 @@ public:
 			printf(temp.c_str());
 			printf("\n ------------- This was all ------------- \n");
 		}
+		else if( event.type == EVENT_TYPE_ALERT_DISMISSED)
+		{
+			printf("Alert was dismissed by pressing back!");
+		}
 
 	}
 

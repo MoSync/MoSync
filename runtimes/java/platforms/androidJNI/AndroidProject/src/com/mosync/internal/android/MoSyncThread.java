@@ -40,7 +40,6 @@ import static com.mosync.internal.generated.MAAPI_consts.TRANS_NONE;
 import static com.mosync.internal.generated.MAAPI_consts.TRANS_ROT180;
 import static com.mosync.internal.generated.MAAPI_consts.TRANS_ROT270;
 import static com.mosync.internal.generated.MAAPI_consts.TRANS_ROT90;
-import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_ALERT;
 import static com.mosync.internal.generated.MAAPI_consts.MA_IMAGE_PICKER_EVENT_RETURN_TYPE_IMAGE_HANDLE;
 
 import static com.mosync.internal.generated.MAAPI_consts.MA_RESOURCE_OPEN;
@@ -76,6 +75,7 @@ import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.DialogInterface.OnKeyListener;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
@@ -101,6 +101,7 @@ import android.os.Vibrator;
 import android.telephony.TelephonyManager;
 import android.telephony.gsm.GsmCellLocation;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
@@ -3277,7 +3278,7 @@ public class MoSyncThread extends Thread
 
 						@Override
 						public void onClick(DialogInterface dialog, int which) {
-							postAlertEvent(1);
+							EventQueue.getDefault().postAlertEvent(1);
 						}
 					});
 				}
@@ -3287,7 +3288,7 @@ public class MoSyncThread extends Thread
 
 						@Override
 						public void onClick(DialogInterface dialog, int which) {
-							postAlertEvent(2);
+							EventQueue.getDefault().postAlertEvent(2);
 						}
 					});
 				}
@@ -3297,33 +3298,33 @@ public class MoSyncThread extends Thread
 
 						@Override
 						public void onClick(DialogInterface dialog, int which) {
-							postAlertEvent(3);
+							EventQueue.getDefault().postAlertEvent(3);
 						}
 					});
 				}
 
-				AlertDialog alertDialog = builder.create();
+				final AlertDialog alertDialog = builder.create();
+				alertDialog.setCancelable(true);
+				alertDialog.setOnKeyListener(new OnKeyListener() {
+
+					@Override
+					public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event) {
+						if(keyCode == KeyEvent.KEYCODE_BACK)
+						{
+							//todo see if the back btn is send again.
+							EventQueue.getDefault().postAlertDismissed();
+							alertDialog.dismiss();
+							return true;
+						}
+						return false;
+					}
+				});
+
 				alertDialog.show();
 			}
 		});
 
 		return 0;
-	}
-
-	/**
-	 * Post a message to the MoSync event queue.
-	 * This event it sent when one of the buttons in the alert was pressed.
-	 * See maAlert syscall that pops-up an alert.
-	 * The state is: Ready or Canceled.
-	 */
-	private void postAlertEvent(int index)
-	{
-		int[] event = new int[2];
-		event[0] = EVENT_TYPE_ALERT;
-		// Send the button index.
-		event[1] = index;
-
-		postEvent(event);
 	}
 
 	/**
@@ -3966,7 +3967,7 @@ public class MoSyncThread extends Thread
 	{
 		SYSLOG("@@MoSync maScreenSetOrientation " + orientation);
 
-		return mOrientation.setOrientation(orientation);
+		return mOrientation.maScreenSetOrientation(orientation);
 	}
 
 	/**
