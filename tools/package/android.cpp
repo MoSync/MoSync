@@ -213,29 +213,36 @@ void packageAndroid(const SETTINGS& s, const RuntimeInfo& ri) {
 		" -d \""<<classes<<"\"";
 	sh(cmd.str().c_str());
 
-	// move libmosync.so
 	string addlib = dstDir + "/addlib";
-	string armeabi = addlib + "/armeabi";
-	_mkdir(addlib.c_str());
-	_mkdir(armeabi.c_str());
 
-	string classesSo = classes + "/libmosync.so";
-	string armeabiSo = armeabi + "/libmosync.so";
-	remove(armeabiSo.c_str());
-	renameFile(armeabiSo, classesSo);
+	vector<string> archs;
+	archs.push_back("armeabi");
+	archs.push_back("armeabi-v7a");
 
-	for (size_t i = 0; i < modules.size(); i++) {
-		string arch = "armeabi";
-		string module = modules[i];
-		string nativeLib = findNativeLibrary(s, modules, module, arch);
-		if (!nativeLib.empty()) {
-			string dstLibDir = addlib + "/" + arch + "/";
-			_mkdir(dstLibDir.c_str());
-			string dstLib = dstLibDir + "lib" + module + ".so";
-			copyFile(dstLib.c_str(), nativeLib.c_str());
-		} else {
-			printf("Could not find library %s!\n", module.c_str());
-			exit(1);
+	for (size_t i = 0; i < archs.size(); i++) {
+		string arch = archs[i];
+
+		string armeabi = addlib + "/" + arch;
+		_mkdir(addlib.c_str());
+		_mkdir(armeabi.c_str());
+
+		//string classesSo = classes + "/libmosync.so";
+		//string armeabiSo = armeabi + "/libmosync.so";
+		//remove(armeabiSo.c_str());
+		//renameFile(armeabiSo, classesSo);
+
+		for (size_t i = 0; i < modules.size(); i++) {
+			string module = modules[i];
+			string nativeLib = findNativeLibrary(s, modules, module, arch);
+			if (!nativeLib.empty()) {
+				string dstLibDir = addlib + "/" + arch + "/";
+				_mkdir(dstLibDir.c_str());
+				string dstLib = dstLibDir + "lib" + module + ".so";
+				copyFile(dstLib.c_str(), nativeLib.c_str());
+			} else {
+				printf("Could not find library %s!\n", module.c_str());
+				exit(1);
+			}
 		}
 	}
 

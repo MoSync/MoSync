@@ -102,6 +102,8 @@ int executeNdkBuild(Arguments* params) {
 	cmd << arg("MOSYNC_PLATFORM=" + params->getSwitchValue("--platform")) << " ";
 	cmd << arg("MOSYNC_LIB_VARIANT=" + libVariant) << " ";
 	cmd << arg("NDK_PROJECT_PATH=.") << " ";
+	cmd << arg("APP_ABI=all") << " ";
+	// TODO: Un-hardcode
 	cmd << arg("APP_PLATFORM=android-14");
 
 	sh(cmd.str().c_str(), !isVerbose);
