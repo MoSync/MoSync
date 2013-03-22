@@ -259,23 +259,28 @@ public class MoSync extends Activity
 
 			// Post rotation event.
 			ScreenWidget screen = mMoSyncThread.getCurrentScreen();
-			int widgetHandle;
 			if (null != screen)
 			{
 				// There is a NativeUI screen.
-				widgetHandle = screen.getHandle();
+				// Post screen orientation event, handled by the NativeUI module.
+				EventQueue.getDefault().postScreenOrientationChanged(
+							mMoSyncThread.getCurrentScreen().getHandle(),
+							getScreenOrientation());
+				// Post screen orientation event, for the screen parent(TabScreen of StackScreen).
+				EventQueue.getDefault().postScreenOrientationChanged(
+						mMoSyncThread.getUnconvertedCurrentScreen().getHandle(),
+							getScreenOrientation());
 			}
 			else
 			{
 				// No NativeUI screen, use the MoSync screen identifier.
 				// NOTE: when no native UI screens are available, the widget related
 				// event should not be sent, but in this case it's too late to remove this.
-				widgetHandle = IX_WIDGET.MAW_CONSTANT_MOSYNC_SCREEN_HANDLE;
+				// Post screen orientation event, handled by the NativeUI module.
+				EventQueue.getDefault().postScreenOrientationChanged(
+							IX_WIDGET.MAW_CONSTANT_MOSYNC_SCREEN_HANDLE,
+							getScreenOrientation());
 			}
-			// Post screen orientation event, handled by the NativeUI module.
-			EventQueue.getDefault().postScreenOrientationChanged(
-						mMoSyncThread.getCurrentScreen().getHandle(),
-						getScreenOrientation());
 
 			// Post orientation event, handled by the Moblet.
 			EventQueue.getDefault().postOrientationChanged(
