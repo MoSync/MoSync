@@ -15,11 +15,10 @@
  02111-1307, USA.
 */
 
-#import "helpers/cpp_defs.h"
+#include <helpers/cpp_defs.h>
 #include <helpers/CPP_IX_PIM.h>
 
 void MAPimInit();
-
 void MAPimClose();
 
 MAHandle maPimListOpen(int listType);

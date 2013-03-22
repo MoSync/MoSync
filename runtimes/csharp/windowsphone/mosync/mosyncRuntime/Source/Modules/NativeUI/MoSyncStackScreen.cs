@@ -308,6 +308,34 @@ namespace MoSync
 
                 return false;
             }
+
+           /**
+            * Check if a given child screen is shown.
+            * @param child Given child.
+            * @return true if child is currently shown, false otherwise.
+            */
+            public override bool isChildShown(IScreen child)
+            {
+                if (mStack.Count > 0 && mStack.Peek().Equals(child))
+                {
+                    return true;
+                }
+
+                return false;
+            }
+
+            /**
+            * MAW_STACK_SCREEN_IS_SHOWN property implementation.
+            */
+            [MoSyncWidgetProperty(MoSync.Constants.MAW_STACK_SCREEN_IS_SHOWN)]
+            public String IsShown
+            {
+                get
+                {
+                    return isScreenShown().ToString().ToLower();
+                }
+            }
         }
+
     }
 }

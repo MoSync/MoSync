@@ -194,6 +194,12 @@ group WidgetEvent "Widget event" {
 			 * The clicked map pin index, when a #MAW_EVENT_MAP_PIN_CLICKED event is received.
 			 */
 			int mapPinIndex;
+
+			/**
+			* The screen orientation, when a #MAW_EVENT_SCREEN_ORIENTATION_DID_CHANGE event is received.
+			* May be one of the constants: \link #MA_SCREEN_ORIENTATION_PORTRAIT MA_SCREEN_ORIENTATION \endlink
+			*/
+			int screenOrientation;
 		}
 	}
 
@@ -255,7 +261,7 @@ group WidgetEvent "Widget event" {
 			 * This includes changes that were initiated by the user through a touch gesture,
 			 * or arrow key/trackball as well as changes that were initiated programmatically.
 			 */
-				SLIDER_VALUE_CHANGED = 11;
+			SLIDER_VALUE_CHANGED = 11;
 
 			/**
 			 * @brief Sent when the user changes\d the date in a Date Picker.

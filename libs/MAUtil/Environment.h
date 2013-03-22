@@ -167,7 +167,29 @@ namespace MAUtil {
 		 */
 		virtual void sensorEvent(MASensor a) = 0;
 	};
-	
+
+	/**
+	* \brief A listener for orientation changes.
+	* Note: If the application uses NativeUI, it is preffered
+	* to use Screen::addScreenListener() instead, so that
+	* all events will be received for specific screens.
+	* \see Environment::addOrientationListener()
+	*/
+	class OrientationListener {
+	public:
+		/**
+		* Called after the screen has finished rotating.
+		* \param 'screenOrientation' One of the
+		* \link #MA_SCREEN_ORIENTATION_PORTRAIT MA_SCREEN_ORIENTATION \endlink codes.
+		*/
+		virtual void orientationChanged(int orientation) = 0;
+		/**
+		* Send by current screen just before it begins rotating.
+		* Note: available only on iOS platform.
+		*/
+		virtual void orientationWillChange() {};
+	};
+
 	/**
 	* \brief A base class for cross-platform event managers.
 	*/
@@ -318,6 +340,9 @@ namespace MAUtil {
 		void addSensorListener(SensorListener* tl);
 		void removeSensorListener(SensorListener* tl);
 
+		void addOrientationListener(OrientationListener* ol);
+		void removeOrientationListener(OrientationListener* ol);
+
 		/**
 		* Returns a reference to the Environment.
 		* Causes a panic if no Environment exists.
@@ -418,6 +443,16 @@ namespace MAUtil {
 		void fireCloseEvent();
 
 		/**
+		* Calls orientationChanged() of all registered orientation listeners.
+		*/
+		void fireOrientationChangedEvent(int screenOrientation);
+
+		/**
+		* Calls orientationWillChange() of all registered orientation listeners.
+		*/
+		void fireOrientationWillChangeEvent();
+
+		/**
 		* Calls all registered IdleListeners once each.
 		*/
 		void runIdleListeners();
@@ -446,6 +481,7 @@ namespace MAUtil {
 		ListenerSet<CustomEventListener> mCustomEventListeners;
 		ListenerSet<TextBoxListener> mTextBoxListeners;
 		ListenerSet<SensorListener> mSensorListeners;
+		ListenerSet<OrientationListener> mOrientationListeners;
 private:
 		static Environment* sEnvironment;
 	};

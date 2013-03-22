@@ -63,6 +63,31 @@ import static com.mosync.internal.android.MoSyncHelpers.SYSLOG;
  */
 public class PurchaseManager extends BillingListener
 {
+	/************************ Class members ************************/
+
+    /**
+     * The helper object from InAppPurchase.
+     */
+    private static IabHelper mHelper;
+
+	/**
+	 * The MoSync thread object.
+	 */
+	private static MoSyncThread mMoSyncThread;
+
+	/**
+	 * -1 means no active purchase.
+	 */
+	private static int mCurrentPurchaseHandle = -1;
+
+	/**
+	 * A table that contains a mapping between a handle and a purchase object.
+	 */
+	private static HandleTable<Purchase> m_PurchaseTable =
+		new HandleTable<Purchase>();
+
+	private static String key;
+	private boolean mRestoringTransactions = false;
 
 	/**
 	 * Constructor.
@@ -586,29 +611,4 @@ public class PurchaseManager extends BillingListener
 	{
 		mMoSyncThread.postEvent(BillingEvent.onPurchaseStateChanged(handle, state, error));
 	}
-	/************************ Class members ************************/
-
-    /**
-     * The helper object from InAppPurchase.
-     */
-    private static IabHelper mHelper;
-
-	/**
-	 * The MoSync thread object.
-	 */
-	private static MoSyncThread mMoSyncThread;
-
-	/**
-	 * -1 means no active purchase.
-	 */
-	private static int mCurrentPurchaseHandle = -1;
-
-	/**
-	 * A table that contains a mapping between a handle and a purchase object.
-	 */
-	private static HandleTable<Purchase> m_PurchaseTable =
-		new HandleTable<Purchase>();
-
-	private static String key;
-	private boolean mRestoringTransactions = false;
 }

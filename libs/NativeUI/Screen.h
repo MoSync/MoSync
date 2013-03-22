@@ -124,6 +124,7 @@ namespace NativeUI
 		virtual int showWithTransition(MAWScreenTransitionType screenTransitionType, int screenTransitionDuration);
 
 		/**
+		 * @deprecated: Use addScreenListener(ScreenListener*) instead.
 		 * Called just before the screen begins rotating.
 		 * Subclasses may override this method to perform additional actions
 		 * immediately prior to the rotation.
@@ -132,6 +133,7 @@ namespace NativeUI
 		virtual void orientationWillChange();
 
 		/**
+		 * @deprecated: Use addScreenListener(ScreenListener*) instead.
 		 * Called after the screen has finished rotating.
 		 * Subclasses may override this method to perform additional actions
 		 * after the rotation.

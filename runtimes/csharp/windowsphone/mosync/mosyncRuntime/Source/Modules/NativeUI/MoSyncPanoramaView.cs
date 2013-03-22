@@ -214,6 +214,11 @@ namespace MoSync
 
             private void SetApplicationBarVisibility(int screenIndex)
             {
+				if (this.mChildren.Count <= screenIndex)
+				{
+					return;
+				}
+
                 bool appBarVisible = (this.mChildren[screenIndex] as Screen).GetApplicationBarVisibility();
                 if (appBarVisible)
                 {
@@ -232,6 +237,28 @@ namespace MoSync
                         ((Application.Current.RootVisual as Microsoft.Phone.Controls.PhoneApplicationFrame).Content as
                         Microsoft.Phone.Controls.PhoneApplicationPage).ApplicationBar.IsVisible = false;
                     }
+                }
+            }
+
+            /**
+             * Check if a given child screen is shown.
+             * @param child Given child.
+             * @return true if child is currently shown, false otherwise.
+             */
+            public override bool isChildShown(IScreen child)
+            {
+                return getSelectedScreen().Equals(child);
+            }
+
+            /**
+            * MAW_PANORAMA_VIEW_IS_SHOWN property implementation.
+            */
+            [MoSyncWidgetProperty(MoSync.Constants.MAW_PANORAMA_VIEW_IS_SHOWN)]
+            public String IsShown
+            {
+                get
+                {
+                    return isScreenShown().ToString().ToLower();
                 }
             }
         }
