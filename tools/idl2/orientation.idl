@@ -1,28 +1,29 @@
 group OrientationConstants "Orientation constants" {
 	constset int MA_SCREEN_ORIENTATION_ {
-		/// The device is in portrait mode, based on sensor. Depending on user rotation,
-		/// #MA_SCREEN_ORIENTATION_PORTRAIT_UP or #MA_SCREEN_ORIENTATION_PORTRAIT_UPSIDE_DOWN will be used.
-		/// Value equals: #MA_SCREEN_ORIENTATION_PORTRAIT_UP | #MA_SCREEN_ORIENTATION_PORTRAIT_UPSIDE_DOWN.
-		PORTRAIT = 0x000003;
 		/// The device is in portrait mode, with the device held upright and the home button on
 		/// the bottom.
-		PORTRAIT_UP = 0x000001;
+		PORTRAIT_UP = 0x1;
 		/// The device is in portrait mode but upside down, with the device held upright and the
 		/// home button at the top.
 		// Note: not available on Windows Phone.
-		PORTRAIT_UPSIDE_DOWN = 0x000002;
+		PORTRAIT_UPSIDE_DOWN = 0x2;
+		/// The device is in portrait mode, based on sensor. Depending on user rotation,
+		/// #MA_SCREEN_ORIENTATION_PORTRAIT_UP or #MA_SCREEN_ORIENTATION_PORTRAIT_UPSIDE_DOWN will be used.
+		/// Value equals: #MA_SCREEN_ORIENTATION_PORTRAIT_UP | #MA_SCREEN_ORIENTATION_PORTRAIT_UPSIDE_DOWN.
+		PORTRAIT = 0x3;
 		/// The device is in landscape mode, with the device held upright and the home button on
 		/// the left side.
-		LANDSCAPE_LEFT = 0x000004;
+		LANDSCAPE_LEFT = 0x4;
 		/// The device is in landscape mode, with the device held upright and the home button on
 		/// the right side.
-		LANDSCAPE_RIGHT = 0x000008;
+		LANDSCAPE_RIGHT = 0x8;
 		/// The device is in landscape mode, based on sensor. Depending on user rotation,
 		/// #MA_SCREEN_ORIENTATION_LANDSCAPE_LEFT or #MA_SCREEN_ORIENTATION_LANDSCAPE_RIGHT will be used.
-		LANDSCAPE = 0x00000C;
+		/// Value equals: #MA_SCREEN_ORIENTATION_LANDSCAPE_LEFT | #MA_SCREEN_ORIENTATION_LANDSCAPE_RIGHT.
+		LANDSCAPE = 0xC;
 		/// Screen orientation is based on device sensor.
 		/// Value equals: #MA_SCREEN_ORIENTATION_PORTRAIT| #MA_SCREEN_ORIENTATION_LANDSCAPE.
-		DYNAMIC = 0x00000F;
+		DYNAMIC = 0xF;
 	}
 
 	/**

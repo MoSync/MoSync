@@ -1579,6 +1579,11 @@ interface MAAPI {
 		* and a return code.
 		*/
 		CAMERA_SNAPSHOT = 53;
+
+		/**
+		* \brief Send by maAlert dialog being canceled by user dimissing it.
+		*/
+		ALERT_DISMISSED = 54;
 	}
 
 	/**

@@ -64,7 +64,7 @@ namespace NativeUI
 		 * immediately prior to the rotation.
 		 * Note: available only on iOS.
 		 */
-		virtual void orientationWillChange() {};
+		virtual void orientationWillChange(Screen* screen) {};
 
         /**
          * This method is called when the OptionsMenu is being closed

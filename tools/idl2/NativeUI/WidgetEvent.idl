@@ -347,7 +347,6 @@ group WidgetEvent "Widget event" {
 			/**
 			* Send by a Dialog widget when when a user dismisses a popover by tapping outside of it.
 			* It will not be sent if it was dismissed by calling #maWidgetModalDialogHide().
-			* Available only on the iPad.
 			*/
 			DIALOG_DISMISSED = 22;
 
