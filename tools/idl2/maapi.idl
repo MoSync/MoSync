@@ -4245,14 +4245,14 @@ group OpenGLES "OpenGLES" {
 		void maAlert(in MAString title, in MAString message, in MAString button1, in MAString button2, in MAString button3);
 
 		/**
-		*
+		* \brief The toast timeout. Toasts can be displayed using #maToast.
 		*/
 		constset int MA_TOAST_DURATION_ {
-			SHORT = 0; //2sec
-			LONG = 1; //3.5sec
+			SHORT = 0; // aprox 2sec
+			LONG = 1; // aprox 3.5sec
 		}
 
-		/** TODO see if IOCTl needed.
+		/**
 		* \brief A toast is a view containing a quick little message for the user.
 		* A toast provides simple feedback about an operation in a small popup.
 		* It only fills the amount of space required for the message and the current
@@ -4260,6 +4260,7 @@ group OpenGLES "OpenGLES" {
 		* For example, navigating away from an email before you send it triggers a
 		* "Draft saved" toast to let you know that you can continue editing later.
 		* Toasts automatically disappear after a timeout, and do not handle any user interaction.
+		* Toast are available only on Android.
 		*
 		* \param message The message in the toast.
 		* \param duration One of the next constants:
