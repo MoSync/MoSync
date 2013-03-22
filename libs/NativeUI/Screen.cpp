@@ -176,6 +176,10 @@ namespace NativeUI
         if (widgetEventData->eventType == MAW_EVENT_SCREEN_ORIENTATION_WILL_CHANGE)
         {
             this->orientationWillChange();
+			for (int i=0; i < mScreenListeners.size(); i++)
+			{
+				mScreenListeners[i]->orientationWillChange(this);
+			}
         }
 		else if (widgetEventData->eventType == MAW_EVENT_SCREEN_ORIENTATION_DID_CHANGE)
 		{
