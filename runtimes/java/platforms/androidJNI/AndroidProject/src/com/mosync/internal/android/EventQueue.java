@@ -17,6 +17,8 @@ MA 02110-1301, USA.
 
 package com.mosync.internal.android;
 
+import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_ALERT;
+import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_ALERT_DISMISSED;
 import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_WIDGET;
 import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_ORIENTATION_DID_CHANGE;
 
@@ -366,6 +368,29 @@ public class EventQueue
 
 		event[0] = EVENT_TYPE_ORIENTATION_DID_CHANGE;
 		event[1] = orientation;
+
+		sMoSyncThread.postEvent(event);
+	}
+
+	/**
+	 * Send an alert event.
+	 * This event it sent when one of the buttons in the alert was pressed.
+	 * See maAlert syscall that pops-up an alert.
+	 * @param index The index of the button that was pressed.
+	 */
+	public void postAlertEvent(int index)
+	{
+		int[] event = new int[2];
+		event[0] = EVENT_TYPE_ALERT;
+		event[1] = index;
+
+		sMoSyncThread.postEvent(event);
+	}
+
+	public void postAlertDismissed()
+	{
+		int[] event = new int[1];
+		event[0] = EVENT_TYPE_ALERT_DISMISSED;
 
 		sMoSyncThread.postEvent(event);
 	}
