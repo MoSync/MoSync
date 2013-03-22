@@ -20,7 +20,6 @@
 #include <helpers/cpp_defs.h>
 
 // C
-void MoSyncUIUtils_ShowMessageBox(const char *title, const char *msg, bool kill);
 void MoSyncUIUtils_ShowAlert(const char* title, const char* message, const char* button1, const char* button2, const char* button3);
 void MoSyncUIUtils_ShowTextBox(const wchar* title, const wchar* inText, wchar* outText, int maxSize, int constraints);
 
@@ -29,16 +28,6 @@ void MoSyncUIUtils_ShowImagePicker(int returnType);
 
 // Obj
 @interface MoSyncUIUtils : NSObject
-
-+(void) showMessageBox:(NSString*)msg
-             withTitle:(NSString*)title
-            shouldKill:(bool)kill;
-
-+(void) showAlert:(NSString*)msg
-        withTitle:(NSString*)title
-     button1Title:(NSString*)buton1
-     button2Title:(NSString*)buton2
-     button3Title:(NSString*)buton3;
 
 +(void) showTextBox:(NSString*)title
          withInText:(NSString*)inText
