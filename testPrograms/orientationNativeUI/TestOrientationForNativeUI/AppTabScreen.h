@@ -59,17 +59,6 @@ namespace OrientationTest
 		 */
 		virtual ~AppTabScreen();
 
-		/**
-		 * Called just before the screen begins rotating.
-		 */
-		virtual void orientationWillChange();
-
-		/**
-		 * Called after the screen orientation has changed.
-		 * Available only on iOS and Windows Phone 7.1 platforms.
-		 */
-		virtual void orientationDidChange();
-
 	private:
 		/**
 		 * This method is called when a tab screen has changed to a new tab.

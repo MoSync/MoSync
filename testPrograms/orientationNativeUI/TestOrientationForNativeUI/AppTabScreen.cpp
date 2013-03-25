@@ -75,35 +75,4 @@ namespace OrientationTest
 		}
 	}
 
-	/**
-	 * Called just before the screen begins rotating.
-	 */
-	void AppTabScreen::orientationWillChange()
-	{
-		if (mVisibleTabScreen == TAB_SCREEN_ONE)
-		{
-			mFirstScreen->orientationWillChange();
-		}
-		else if (mVisibleTabScreen == TAB_SCREEN_TWO)
-		{
-			mSecondScreen->orientationWillChange();
-		}
-	}
-
-	/**
-	 * Called after the screen orientation has changed.
-	 * Available only on iOS and Windows Phone 7.1 platforms.
-	 */
-	void AppTabScreen::orientationDidChange()
-	{
-		if (mVisibleTabScreen == TAB_SCREEN_ONE)
-		{
-			mFirstScreen->orientationDidChange();
-		}
-		else if (mVisibleTabScreen == TAB_SCREEN_TWO)
-		{
-			mSecondScreen->orientationDidChange();
-		}
-	}
-
 } //namespace OrientationTest

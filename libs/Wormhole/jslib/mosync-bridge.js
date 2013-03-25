@@ -80,9 +80,6 @@ var mosync = (function()
 		mosync.bridge.send(["MoSync", "SendToBackground"]);
 	};
 
-	/**
-	 * Screen orientation constants.
-	 */
 	mosync.SCREEN_ORIENTATION_DYNAMIC = "dynamic";
 	mosync.SCREEN_ORIENTATION_PORTRAIT = "portrait";
 	mosync.SCREEN_ORIENTATION_LANDSCAPE = "landscape";
@@ -92,12 +89,12 @@ var mosync = (function()
 	 *
 	 * @param orientation The desired screen orientation.
 	 * Can be one of the constants:
-	 *   mosync.SCREEN_ORIENTATION_DYNAMIC
-	 *   mosync.SCREEN_ORIENTATION_PORTRAIT
-	 *   mosync.SCREEN_ORIENTATION_LANDSCAPE
+	 *   mosync.SCREEN\_ORIENTATION\_DYNAMIC
+	 *   mosync.SCREEN\_ORIENTATION\_PORTRAIT
+	 *   mosync.SCREEN\_ORIENTATION\_LANDSCAPE
 	 *
 	 * Example:
-	 *   mosync.app.screenSetOrientation(mosync.SCREEN_ORIENTATION_DYNAMIC);
+	 *   mosync.app.screenSetOrientation(mosync.SCREEN\_ORIENTATION\_DYNAMIC);
 	 */
 	mosync.app.screenSetOrientation = function(orientation)
 	{
