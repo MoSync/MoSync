@@ -144,7 +144,7 @@ namespace MoSync
                         mosyncScreenOrientation = MoSync.Constants.MA_SCREEN_ORIENTATION_LANDSCAPE_RIGHT;
                         break;
                     case PageOrientation.Portrait:
-                        mosyncScreenOrientation = MoSync.Constants.MA_SCREEN_ORIENTATION_PORTRAIT;
+                        mosyncScreenOrientation = MoSync.Constants.MA_SCREEN_ORIENTATION_PORTRAIT_UP;
                         break;
                     case PageOrientation.PortraitDown:
                         mosyncScreenOrientation = MoSync.Constants.MA_SCREEN_ORIENTATION_PORTRAIT_UPSIDE_DOWN;
@@ -155,8 +155,38 @@ namespace MoSync
                 }
 
                 // Post events handled by both NativeUI and Moblet.
-                postOrientationEvent(mosyncScreenOrientation);
-                postScreenOrientationEvent(mosyncScreenOrientation);
+                postOrientationEvents(mosyncScreenOrientation);
+            }
+
+            /**
+             * Post orientation changed events for:
+             *  - the moblet, in case no NativeUI is available.
+             *  - the parent tab or stack screen, as well as all the child screens.
+             *  - the screen itself, in case it is not parented by a stack or a tab.
+             */
+            public void postOrientationEvents(int orientation)
+            {
+                // Post events handled by both NativeUI and Moblet.
+                postOrientationEvent(orientation);
+
+                // Post orientation changed event for screen widget, and in the case
+                // of StackScreen or TabScreen notifiy all the children as well.
+                if (this.GetParent() is TabScreen || this.GetParent() is StackScreen)
+                {
+                    Screen parentScreen = (this.GetParent() as Screen);
+                    for (int i = 0; i < parentScreen.getChildCount(); i++)
+                    {
+                        postScreenOrientationEvent(
+                                orientation,
+                                parentScreen.getChild(i).GetHandle());
+                    }
+                    // Finally send event for the parent tab/stack screen.
+                    postScreenOrientationEvent(orientation, parentScreen.GetHandle());
+                }
+                else
+                {
+                    postScreenOrientationEvent(orientation, mHandle);
+                }
             }
 
             /**
@@ -178,15 +208,17 @@ namespace MoSync
              * Post screen orientation event to MoSync queue.
              * @param orientation The new screen orientation.
              */
-            protected void postScreenOrientationEvent(int orientation)
+            protected void postScreenOrientationEvent(int orientation, int widgetHandle)
             {
                 // send the event to the mosync runtime.
                 Memory eventData = new Memory(12);
                 const int MAWidgetEventData_eventType = 0;
                 const int MAWidgetEventData_widgetHandle = 4;
                 const int MAWidgetEventData_screenOrientation = 8;
-                eventData.WriteInt32(MAWidgetEventData_eventType, MoSync.Constants.MAW_EVENT_SCREEN_ORIENTATION_DID_CHANGE);
-                eventData.WriteInt32(MAWidgetEventData_widgetHandle, mHandle);
+                eventData.WriteInt32(
+                    MAWidgetEventData_eventType,
+                    MoSync.Constants.MAW_EVENT_SCREEN_ORIENTATION_DID_CHANGE);
+                eventData.WriteInt32(MAWidgetEventData_widgetHandle, widgetHandle);
                 eventData.WriteInt32(MAWidgetEventData_screenOrientation, orientation);
 
                 mRuntime.PostCustomEvent(MoSync.Constants.EVENT_TYPE_WIDGET, eventData);
