@@ -76,13 +76,20 @@
     [currentScreen layout];
 
     // Send MoSync Widget event notifying that the screen will change its orientation.
-    MAEvent event;
-	event.type = EVENT_TYPE_WIDGET;
+    MAEvent widgetEvent;
+	widgetEvent.type = EVENT_TYPE_WIDGET;
 	MAWidgetEventData *eventData = new MAWidgetEventData;
 	eventData->eventType = MAW_EVENT_SCREEN_ORIENTATION_WILL_CHANGE;
 	eventData->widgetHandle = screenHandle;
-	event.data = (int)eventData;
-	Base::gEventQueue.put(event);
+	widgetEvent.data = (int)eventData;
+	Base::gEventQueue.put(widgetEvent);
+
+    // Send MoSync event also, to be handled outside the NativeUI.
+    MAEvent event;
+    event.type = EVENT_TYPE_ORIENTATION_WILL_CHANGE;
+    Base::gEventQueue.put(event);
+
+    mOrientation = (UIInterfaceOrientation)interfaceOrientation;
 }
 
 /**
@@ -96,14 +103,39 @@
     IWidget* currentScreen = [mosyncUI getCurrentlyShownScreen];
     int screenHandle = [currentScreen handle];
 
+    // Convert current screen orientation to MoSync constant.
+    int screenOrientation = MA_SCREEN_ORIENTATION_PORTRAIT_UP;
+    switch(mOrientation)
+    {
+        case UIInterfaceOrientationPortrait:
+            screenOrientation = MA_SCREEN_ORIENTATION_PORTRAIT_UP;
+            break;
+        case UIInterfaceOrientationPortraitUpsideDown:
+            screenOrientation = MA_SCREEN_ORIENTATION_PORTRAIT_UPSIDE_DOWN;
+            break;
+        case UIInterfaceOrientationLandscapeRight:
+            screenOrientation = MA_SCREEN_ORIENTATION_LANDSCAPE_RIGHT;
+            break;
+        case UIInterfaceOrientationLandscapeLeft:
+            screenOrientation = MA_SCREEN_ORIENTATION_LANDSCAPE_LEFT;
+            break;
+    }
+
     // Send MoSync Widget event notifying that the screen changed its orientation.
-    MAEvent event;
-	event.type = EVENT_TYPE_WIDGET;
+    MAEvent widgetEvent;
+	widgetEvent.type = EVENT_TYPE_WIDGET;
 	MAWidgetEventData *eventData = new MAWidgetEventData;
 	eventData->eventType = MAW_EVENT_SCREEN_ORIENTATION_DID_CHANGE;
 	eventData->widgetHandle = screenHandle;
-	event.data = (int)eventData;
-	Base::gEventQueue.put(event);
+    eventData->screenOrientation = screenOrientation;
+	widgetEvent.data = (int)eventData;
+	Base::gEventQueue.put(widgetEvent);
+
+    // Send MoSync event notifying that a screen changed its orientation.
+    MAEvent event;
+    event.type = EVENT_TYPE_ORIENTATION_DID_CHANGE;
+    event.orientation = screenOrientation;
+    Base::gEventQueue.put(event);
 }
 
 - (void)dealloc

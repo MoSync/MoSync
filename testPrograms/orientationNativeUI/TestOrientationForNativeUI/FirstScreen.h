@@ -53,6 +53,14 @@ namespace OrientationTest
 		 */
 		virtual ~FirstScreen();
 
+		// From ScreenListener
+		/**
+		 * Called after the screen has finished rotating.
+		 * Subclasses may override this method to perform additional actions
+		 * after the rotation.
+		 * @param screenOrientation The new screen orientation.
+		 */
+		virtual void orientationChanged(Screen* screen, int screenOrientation);
 	private:
 		/**
 		 * Creates and adds main layout to the screen.
@@ -73,6 +81,8 @@ namespace OrientationTest
 		 */
 		HorizontalLayout* createRow(Label* label, CheckBox* checkBox);
 
+		ListViewItem* createItem(Label* label, CheckBox* checkBox);
+
 		// From ButtonListener
         /**
          * This method is called if the touch-up event was inside the
@@ -81,15 +91,6 @@ namespace OrientationTest
          * @param button The button object that generated the event.
          */
         virtual void buttonClicked(Widget* button);
-
-		// From ScreenListener
-		/**
-		 * Called after the screen has finished rotating.
-		 * Subclasses may override this method to perform additional actions
-		 * after the rotation.
-		 * @param screenOrientation The new screen orientation.
-		 */
-		virtual void orientationChanged(Screen* screen, int screenOrientation);
 
 		/**
 		 * Changes the screen orientation bit mask.
@@ -110,6 +111,11 @@ namespace OrientationTest
 		 * Used for applying the orientation flag.
 		 */
 		Button* mSetOrientationBtn;
+
+		/**
+		 * Used for aligning all orientation check boxes.
+		 */
+		ListView* mListView;
 
 		/**
 		 * Used for enabling/disabling portrait mode.

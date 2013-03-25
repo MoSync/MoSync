@@ -38,10 +38,16 @@
     /**
      * Store allowed screen orientations.
      * A bitmask created using the next values:
-     * - MA_SCREEN_ORIENTATION_PORTRAIT
+     * - MA_SCREEN_ORIENTATION_PORTRAIT =
+     *   MA_SCREEN_ORIENTATION_PORTRAIT_UP | MA_SCREEN_ORIENTATION_PORTRAIT_UPSIDE_DOWN
+     * - MA_SCREEN_ORIENTATION_PORTRAIT_UP
      * - MA_SCREEN_ORIENTATION_PORTRAIT_UPSIDE_DOWN
+     * - MA_SCREEN_ORIENTATION_LANDSCAPE =
+     *   MA_SCREEN_ORIENTATION_LANDSCAPE_LEFT | MA_SCREEN_ORIENTATION_LANDSCAPE_RIGHT
      * - MA_SCREEN_ORIENTATION_LANDSCAPE_LEFT
      * - MA_SCREEN_ORIENTATION_LANDSCAPE_RIGHT
+     * - MA_SCREEN_ORIENTATION_DYNAMIC =
+     *   MA_SCREEN_ORIENTATION_PORTRAIT | MA_SCREEN_ORIENTATION_LANDSCAPE
      */
     int mAllowedScreenOrientations;
 
@@ -93,10 +99,18 @@
 -(bool) isInterfaceOrientationSupported:(UIInterfaceOrientation) orientation;
 
 /**
- * Check if portrait mode is supported by the application.
- * @return True if portrait mode is supported by the application, false otherwise.
+ * Check if sensor portrait mode is supported by the application.
+ * The device supports sensor portrait if it supports both portrait up
+ * and portrait upside down modes.
+ * @return True if sensor portrait mode is supported by the application, false otherwise.
  */
 -(bool) isPortraitModeSupported;
+
+/**
+ * Check if portrait up mode is supported by the application.
+ * @return True if portrait up mode is supported by the application, false otherwise.
+ */
+-(bool) isPortraitUpModeSupported;
 
 /**
  * Check if portrait upside down mode is supported by the application.

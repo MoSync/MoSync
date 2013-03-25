@@ -57,6 +57,7 @@ namespace OrientationTest
 	FirstScreen::FirstScreen() :
 		Screen(),
 		mSetOrientationBtn(NULL),
+		mListView(NULL),
 		mPortraitCheckBox(NULL),
 		mPortraitUpsideDownCheckBox(NULL),
 		mLandscapeLeftCheckBox(NULL),
@@ -111,6 +112,23 @@ namespace OrientationTest
 		return hLayout;
 	}
 
+	ListViewItem* FirstScreen::createItem(Label* label, CheckBox* checkBox)
+	{
+		HorizontalLayout* hLayout = new HorizontalLayout();
+		hLayout->wrapContentVertically();
+		hLayout->addChild(label);
+		if (checkBox)
+		{
+			HorizontalLayout* space = new HorizontalLayout();
+			space->setWidth(10);
+			hLayout->addChild(space);
+			hLayout->addChild(checkBox);
+		}
+		ListViewItem* item = new ListViewItem();
+		item->addChild(hLayout);
+		return item;
+	}
+
 	/**
 	 * Creates and adds main layout to the screen.
 	 */
@@ -130,11 +148,13 @@ namespace OrientationTest
 		hLayout->addChild(mOrientationLabel);
 		mainLayout->addChild(hLayout);
 
+		mListView = new ListView();
+		mainLayout->addChild(mListView);
 		// Add widgets for enabling/disabling sensor portrait mode.
 		label = new Label();
 		label->setText(PORTRAIT_LABEL_TEXT);
 		mPortraitCheckBox = new CheckBox();
-		mainLayout->addChild(this->createRow(label, mPortraitCheckBox));
+		mListView->addChild(createItem(label, mPortraitCheckBox));
 
 		HorizontalLayout* pLayout = new HorizontalLayout();
 		pLayout->wrapContentVertically();
@@ -142,20 +162,19 @@ namespace OrientationTest
 		label = new Label();
 		label->setText(PORTRAIT_UP_LABEL_TEXT);
 		mPortraitUpCheckBox = new CheckBox();
-		pLayout->addChild(this->createRow(label, mPortraitUpCheckBox));
+		mListView->addChild(createItem(label, mPortraitUpCheckBox));
 
 		// Add widgets for enabling/disabling portrait upside down mode.
 		label = new Label();
 		label->setText(PORTRAIT_UPSIDE_DOWN_LABEL_TEXT);
 		mPortraitUpsideDownCheckBox = new CheckBox();
-		pLayout->addChild(this->createRow(label, mPortraitUpsideDownCheckBox));
-		mainLayout->addChild(pLayout);
+		mListView->addChild(createItem(label, mPortraitUpsideDownCheckBox));
 
 		// Add widgets for enabling/disabling sensor landscape mode.
 		label = new Label();
 		label->setText(LANDSCAPE_LABEL_TEXT);
 		mLandscapeCheckBox = new CheckBox();
-		mainLayout->addChild(this->createRow(label, mLandscapeCheckBox));
+		mListView->addChild(createItem(label, mLandscapeCheckBox));
 
 		HorizontalLayout* lLayout = new HorizontalLayout();
 		lLayout->wrapContentVertically();
@@ -163,20 +182,19 @@ namespace OrientationTest
 		label = new Label();
 		label->setText(LANDSCAPE_LEFT_LABEL_TEXT);
 		mLandscapeLeftCheckBox = new CheckBox();
-		lLayout->addChild(this->createRow(label, mLandscapeLeftCheckBox));
+		mListView->addChild(createItem(label, mLandscapeLeftCheckBox));
 
 		// Add widgets for enabling/disabling landscape right mode.
 		label = new Label();
 		label->setText(LANDSCAPE_RIGHT_LABEL_TEXT);
 		mLandscapeRightCheckBox = new CheckBox();
-		lLayout->addChild(this->createRow(label, mLandscapeRightCheckBox));
-		mainLayout->addChild(lLayout);
+		mListView->addChild(createItem(label, mLandscapeRightCheckBox));
 
 		// Add widgets for enabling/disabling sensor mode.
 		label = new Label();
 		label->setText(DYNAMIC_LABEL_TEXT);
 		mDynamicCheckBox = new CheckBox();
-		mainLayout->addChild(this->createRow(label, mDynamicCheckBox));
+		mListView->addChild(createItem(label, mDynamicCheckBox));
 
 		mSetOrientationBtn = new Button();
 		mSetOrientationBtn->setText("Apply selected supported orientations");
@@ -237,7 +255,7 @@ namespace OrientationTest
 			}
 
 			int result = maScreenSetSupportedOrientations(mSupportedOrientations);
-			printf("FirstScreen::checkBoxStateChanged result maScreenSetSupportedOrientations = %d",
+			printf("FirstScreen: result maScreenSetSupportedOrientations = %d",
 				result);
 			mSupportedOrientations = 0;
 		}
@@ -281,11 +299,12 @@ namespace OrientationTest
 	 */
 	void FirstScreen::orientationChanged(Screen* screen, int screenOrientation)
 	{
+		printf("First Screen: orientationChanged to: %d", screenOrientation);
 		MAUtil::String orientationText;
 		switch (screenOrientation)
 		{
-			case MA_SCREEN_ORIENTATION_PORTRAIT:
-				orientationText = ORIENTATION_PORTRAIT;
+			case MA_SCREEN_ORIENTATION_PORTRAIT_UP:
+				orientationText = PORTRAIT_UP_LABEL_TEXT;
 				break;
 			case MA_SCREEN_ORIENTATION_PORTRAIT_UPSIDE_DOWN:
 				orientationText = ORIENTATION_PORTRAIT_UPSIDE_DOWN;
@@ -295,9 +314,6 @@ namespace OrientationTest
 				break;
 			case MA_SCREEN_ORIENTATION_LANDSCAPE_RIGHT:
 				orientationText = ORIENTATION_LANDSCAPE_RIGHT;
-				break;
-			case MA_SCREEN_ORIENTATION_PORTRAIT_UP:
-				orientationText = PORTRAIT_UP_LABEL_TEXT;
 				break;
 		}
 

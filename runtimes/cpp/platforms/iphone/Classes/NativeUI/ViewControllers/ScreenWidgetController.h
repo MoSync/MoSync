@@ -20,6 +20,7 @@
 
 @interface ScreenWidgetController : UIViewController {
 
+    UIInterfaceOrientation mOrientation;
 }
 
 @end
