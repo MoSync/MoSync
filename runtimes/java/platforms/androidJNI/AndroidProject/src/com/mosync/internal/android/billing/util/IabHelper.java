@@ -781,7 +781,6 @@ public class IabHelper {
         // Query purchases
         logDebug("Querying owned items...");
         logDebug("Package name: " + mContext.getPackageName());
-        boolean hasMore = true;
         boolean verificationFailed = false;
         String continueToken = null;
 

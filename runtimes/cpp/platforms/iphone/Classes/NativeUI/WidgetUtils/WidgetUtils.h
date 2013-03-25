@@ -61,7 +61,6 @@ namespace Base
     UIFont* getUIFontObject(MAHandle fontHandle);
 };
 
-#pragma mark -
 #pragma mark Screen Transitions Utils
 
 @interface ScreenTransitionsUtils : NSObject

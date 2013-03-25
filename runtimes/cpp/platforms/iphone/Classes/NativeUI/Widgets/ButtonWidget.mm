@@ -22,6 +22,7 @@
 #import "ButtonWidget.h"
 #import "UIColorExpanded.h"
 #include "Platform.h"
+#include "MoSyncFonts.h"
 
 @implementation ButtonWidget
 

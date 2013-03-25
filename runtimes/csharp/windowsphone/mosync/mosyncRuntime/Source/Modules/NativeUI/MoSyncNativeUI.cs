@@ -34,6 +34,13 @@ namespace MoSync
             void SetApplicationBarVisibility(bool value);
             int AddApplicationBarItemIndex(Object item);
             bool HandleBackButtonPressed();
+
+            /**
+             * Check if a given child screen is shown.
+             * @param child Given child.
+             * @return true if the child is shown, false otherwise.
+             */
+            bool isChildShown(IScreen child);
         }
 
         public class MoSyncWidgetPropertyAttribute : Attribute

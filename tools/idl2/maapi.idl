@@ -1557,6 +1557,33 @@ interface MAAPI {
 		* one of the \link #MA_NETWORK_UNKNOWN MA_NETWORK \endlink constants.
 		*/
 		NETWORK = 50;
+
+		/**
+		* \brief Sent when the current screen orientation has changed.
+		* MAEvent::orientation is the new screen orientation. One of the constants
+		* \link #MA_SCREEN_ORIENTATION_PORTRAIT MA_SCREEN_ORIENTATION \endlink.
+		*/
+		ORIENTATION_DID_CHANGE = 51;
+
+		/**
+		* \brief Sent just before the current screen orientation starts changing.
+		* Platform: iOS only.
+		*/
+		ORIENTATION_WILL_CHANGE = 52;
+
+		/**
+		* \brief Used to notify when the snapshot taken via #maCameraSnapshotAsync,
+		* is completed.
+		* The events of this type contain the place holder for the image data,
+		* the image format index, the \link #MA_IMAGE_REPRESENTATION_UNKNOWN data representation \endlink
+		* and a return code.
+		*/
+		CAMERA_SNAPSHOT = 53;
+
+		/**
+		* \brief Send by maAlert dialog being canceled by user dimissing it.
+		*/
+		ALERT_DISMISSED = 54;
 	}
 
 	/**
@@ -1734,6 +1761,34 @@ interface MAAPI {
 				int imagePickerEncodingType;
 			} imagePicker;
 
+			struct {
+				/**
+				 * Used in #EVENT_TYPE_CAMERA_SNAPSHOT events.
+				 * Holds the place holder for the data object representing the camera snapshot.
+				 */
+				MAHandle snapshotImageDataHandle;
+
+				/**
+				 * Used in #EVENT_TYPE_CAMERA_SNAPSHOT events.
+				 * Holds the snapshot format that is specified when #maCameraSnapshotAsync is called.
+				 */
+				int snapshotFormatIndex;
+
+				/**
+				 * Used in #EVENT_TYPE_CAMERA_SNAPSHOT events.
+				 * Holds the snapshot data representation.
+				 * Possible values are found \link #MA_IMAGE_REPRESENTATION_UNKNOWN here \endlink.
+				 */
+				int snapshotImageDataRepresentation;
+
+				/**
+				 * Used in #EVENT_TYPE_CAMERA_SNAPSHOT events.
+				 * Holds the return code of the camera snapshot operation.
+				 * It #MA_CAMERA_RES_OK on success, or #MA_CAMERA_RES_FAILED on error
+				 */
+				int snapshotReturnCode;
+			} cameraSnapshot;
+
 			/**
 			* #EVENT_TYPE_OPTIONS_BOX_BUTTON_CLICKED event, contains the index of the selected option.
 			*/
@@ -1803,6 +1858,11 @@ interface MAAPI {
 			* Valid only if the event type is \link #EVENT_TYPE_PURCHASE PURCHASE \endlink.
 			*/
 			MAPurchaseEventData purchaseData;
+
+			/**
+			* Contains the new orientation when a #EVENT_TYPE_ORIENTATION_DID_CHANGE event is sent.
+			*/
+			int orientation;
 			}
 	}
 
@@ -3649,6 +3709,28 @@ group ImageFormat "Image Formats" {
 		RAW = "raw";
 
 	} //end MA_CAMERA_IMAGE_
+
+	constset int MA_IMAGE_REPRESENTATION_ {
+		/**
+		* @brief An integer constant that represents unknown image format.
+		*/
+		UNKNOWN = -1;
+
+		/**
+		* @brief An integer constant that represents RAW image format.
+		*/
+		RAW = 0;
+
+		/**
+		* @brief An integer constant that represents JPEG image format.
+		*/
+		JPEG = 1;
+
+		/**
+		* @brief An integer constant that represents PNG image format.
+		*/
+		PNG = 2;
+	} //end MA_IMAGE_REPRESENTATION_
 } //end ImageFormats
 
 group CameraProperties "Camera Properties" {
@@ -3803,8 +3885,24 @@ group CameraFunctions "Camera Functions" {
 		* Takes a snapshot using the specified format. The snapshot is
 		* stored as a new data object in the supplied placeholder.
 		* Returns 0 on success, or \< 0 on error.
+		*
+		* Note: Since MoSync 3.3 the usage of ths syscall is deprecated
+		* and the use of #maCameraSnapshotAsync is recommended.
 		*/
 		int maCameraSnapshot(in int formatIndex, in MAHandle placeholder);
+
+		/**
+		* Requires the viewfinder to be active.
+		* Takes a snapshot using the specified format. The snapshot is
+		* stored as a new data object and it's provided in the #snapshotImageDataHandle
+		* field of the #EVENT_TYPE_CAMERA_SNAPSHOT custom event. This event will
+		* be fired when the snapshot data is ready and only if the
+		* #maCameraSnapshotAsync returns a success code.
+		*
+		* \param formatIndex camera format index. See #maCameraFormatNumber().
+		* \returns #MA_CAMERA_RES_OK on success, or #MA_CAMERA_RES_FAILED on error.
+		*/
+		int maCameraSnapshotAsync(in int formatIndex);
 
 		/**
 		* Starts or stops recording video.
@@ -4059,25 +4157,6 @@ group CameraFunctions "Camera Functions" {
 		}
 
 		/**
-		 * Set the screen orientation.
-		 * Currently implemented only on Android and Windows Phone.
-		 * @param orientation One of the \link #SCREEN_ORIENTATION_LANDSCAPE
-		 * #SCREEN_ORIENTATION_PORTRAIT #SCREEN_ORIENTATION_DYNAMIC \endlink
-		 * constants.
-		 * @return \< 0 on error.
-		 */
-		int maScreenSetOrientation(in int orientation);
-
-		constset int SCREEN_ORIENTATION_ {
-			/// Landscape screen orientation.
-			LANDSCAPE = 1;
-			/// Portrait screen orientation.
-			PORTRAIT = 2;
-			/// Screen orientation is based on device sensor.
-			DYNAMIC = 3;
-		}
-
-		/**
 		 * Enable/disable fullscreen mode.
 		 * Currently implemented only on Android.
 		 * @param fullscreen 1 for fullscreen on, 0 for fullscreen off.
@@ -4098,59 +4177,6 @@ group CameraFunctions "Camera Functions" {
 		* \returns 1 on success, 0 if already unregistered, \< 0 on error.
 		*/
 		int maAutostartOff();
-
-		/**
-		* Set supported screen orientations.
-		* Currently implemented on iOS and WindowsPhone 7.1.
-		* @param orientations A bitmask consisting of flags describing the supported screen orientations.
-		* The bitmask can be created using \link #MA_SCREEN_ORIENTATION_PORTRAIT MA_SCREEN_ORIENTATION \endlink
-		* values.
-		* @return One of the next constants:
-		* - #MA_SCREEN_ORIENTATION_RES_OK
-		* - #MA_SCREEN_ORIENTATION_RES_NOT_SUPPORTED
-		* - #MA_SCREEN_ORIENTATION_RES_INVALID_VALUE
-		*/
-		int maScreenSetSupportedOrientations(in int orientations);
-
-		/**
-		* Get supported screen orientations.
-		* Currently implemented on iOS and WindowsPhone 7.1.
-		* @return A bitmask consisting of flags describing the supported screen orientations.
-		* The bitmask is created using \link #MA_SCREEN_ORIENTATION_PORTRAIT MA_SCREEN_ORIENTATION \endlink
-		* values.
-		*/
-		int maScreenGetSupportedOrientations();
-
-		/**
-		* Get current screen orientation.
-		* Currently implemented on iOS and WindowsPhone 7.1.
-		* @return One of the \link #MA_SCREEN_ORIENTATION_PORTRAIT MA_SCREEN_ORIENTATION \endlink constants.
-		*/
-		int maScreenGetCurrentOrientation();
-
-		constset int MA_SCREEN_ORIENTATION_ {
-			/// The device is in portrait mode, with the device held upright and the home button on
-			/// the bottom.
-			PORTRAIT = 0x000001;
-			/// The device is in portrait mode but upside down, with the device held upright and the
-			/// home button at the top.
-			PORTRAIT_UPSIDE_DOWN = 0x000002;
-			/// The device is in landscape mode, with the device held upright and the home button on
-			/// the left side.
-			LANDSCAPE_LEFT = 0x000004;
-			/// The device is in landscape mode, with the device held upright and the home button on
-			/// the right side.
-			LANDSCAPE_RIGHT = 0x000008;
-		}
-
-		constset int MA_SCREEN_ORIENTATION_RES_ {
-			///
-			OK = 0;
-			///
-			NOT_SUPPORTED = -1;
-			///
-			INVALID_VALUE = -2;
-		}
 
 		/**
 		 * Turn on sending of screen state events. Off by default.
@@ -4217,6 +4243,30 @@ group OpenGLES "OpenGLES" {
 		* \param button3 The text on the third button. On Android it indicates that a negative selection.
 		*/
 		void maAlert(in MAString title, in MAString message, in MAString button1, in MAString button2, in MAString button3);
+
+		/**
+		*
+		*/
+		constset int MA_TOAST_DURATION_ {
+			SHORT = 0; //2sec
+			LONG = 1; //3.5sec
+		}
+
+		/** TODO see if IOCTl needed.
+		* \brief A toast is a view containing a quick little message for the user.
+		* A toast provides simple feedback about an operation in a small popup.
+		* It only fills the amount of space required for the message and the current
+		* activity remains visible and interactive.
+		* For example, navigating away from an email before you send it triggers a
+		* "Draft saved" toast to let you know that you can continue editing later.
+		* Toasts automatically disappear after a timeout, and do not handle any user interaction.
+		*
+		* \param message The message in the toast.
+		* \param duration One of the next constants:
+		* - #MA_TOAST_DURATION_SHORT
+		* - #MA_TOAST_DURATION_LONG
+		*/
+		int maToast(in MAString message, in int duration);
 
 		/**
 		* Together with the image picker event (\link EVENT_TYPE_IMAGE_PICKER IMAGE_PICKER \endlink),
@@ -6824,6 +6874,10 @@ group CaptureAPI "Capture API" {
 group PurchaseAPI "Purchase API" {
 #include "purchase.idl"
 } // End of Purchase API
+
+group OrientationAPI "Orientation API" {
+#include "orientation.idl"
+} // End of Orientation API
 
 }
 	constset int IOCTL_ {

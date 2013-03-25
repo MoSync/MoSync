@@ -144,6 +144,7 @@ namespace NativeUI
 	}
 
 	/**
+	 * @deprecated: Use addScreenListener(ScreenListener*) instead.
 	 * Called just before the screen begins rotating.
 	 * Subclasses may override this method to perform additional actions
 	 * immediately prior to the rotation.
@@ -155,6 +156,7 @@ namespace NativeUI
 	}
 
 	/**
+	 * @deprecated: Use addScreenListener(ScreenListener*) instead.
 	 * Called after the screen has finished rotating.
 	 * Subclasses may override this method to perform additional actions
 	 * after the rotation.
@@ -174,10 +176,19 @@ namespace NativeUI
         if (widgetEventData->eventType == MAW_EVENT_SCREEN_ORIENTATION_WILL_CHANGE)
         {
             this->orientationWillChange();
+			for (int i=0; i < mScreenListeners.size(); i++)
+			{
+				mScreenListeners[i]->orientationWillChange(this);
+			}
         }
 		else if (widgetEventData->eventType == MAW_EVENT_SCREEN_ORIENTATION_DID_CHANGE)
 		{
 			this->orientationDidChange();
+			for (int i=0; i < mScreenListeners.size(); i++)
+			{
+				mScreenListeners[i]->orientationChanged(
+						this, widgetEventData->screenOrientation);
+			}
 		}
 		else if ( MAW_EVENT_OPTIONS_MENU_ITEM_SELECTED == widgetEventData->eventType )
 		{

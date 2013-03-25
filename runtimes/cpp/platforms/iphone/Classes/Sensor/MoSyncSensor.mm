@@ -25,9 +25,9 @@
 #define SECOND 1000.0
 
 #include <helpers/cpp_defs.h>
+#include "Platform.h"
 
 #import "MoSyncSensor.h"
-#include "MosyncMain.h"
 
 @implementation MoSyncSensor
 

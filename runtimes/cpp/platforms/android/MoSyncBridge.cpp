@@ -440,6 +440,10 @@ static void nativePostEvent(JNIEnv* env, jobject jthis, jintArray eventBuffer)
 		event.purchaseData.productHandle = intArray[3];
 		event.purchaseData.errorCode = intArray[4];
 	}
+	else if (event.type == EVENT_TYPE_ORIENTATION_DID_CHANGE)
+	{
+		event.orientation = intArray[1];
+	}
 	else if (event.type == EVENT_TYPE_WIDGET)
 	{
 		/*
@@ -587,6 +591,10 @@ static void nativePostEvent(JNIEnv* env, jobject jthis, jintArray eventBuffer)
 		{
 			widgetEvent->optionsMenuItem = intArray[3];
 		}
+		else if(widgetEventType == MAW_EVENT_SCREEN_ORIENTATION_DID_CHANGE)
+		{
+			widgetEvent->screenOrientation = intArray[3];
+		}
 
 		event.data = (int)widgetEvent;
 	}
@@ -614,6 +622,13 @@ static void nativePostEvent(JNIEnv* env, jobject jthis, jintArray eventBuffer)
 	else if (event.type == EVENT_TYPE_CAMERA_PREVIEW)
 	{
 		__android_log_write(ANDROID_LOG_INFO, "@@@@@@@@ MoSync JNI", "Camera event sent");
+	}
+	else if (event.type == EVENT_TYPE_CAMERA_SNAPSHOT)
+	{
+		event.snapshotImageDataHandle = intArray[1];
+		event.snapshotFormatIndex = intArray[2];
+		event.snapshotImageDataRepresentation = intArray[3];
+		event.snapshotReturnCode = intArray[4];
 	}
 	// HOLD ON!
 	// Don't forget to update the file EventQueue.cpp when adding
