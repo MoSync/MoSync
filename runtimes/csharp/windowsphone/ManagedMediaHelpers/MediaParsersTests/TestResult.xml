@@ -1,0 +1,44 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!--This file represents the results of running a test suite-->
+<test-results name="C:\Users\Larry\Desktop\Repositories\ManagedMediaParsers\MediaParsersTests\MediaParsersTests.nunit" total="10" failures="1" not-run="0" date="2008-12-07" time="23:32:05">
+  <environment nunit-version="2.4.8.0" clr-version="2.0.50727.3053" os-version="Microsoft Windows NT 6.0.6001 Service Pack 1" platform="Win32NT" cwd="C:\Users\Larry\Desktop\Repositories\ManagedMediaParsers\MediaParsersTests" machine-name="BIGBEASTIE" user="Larry" user-domain="BigBeastie" />
+  <culture-info current-culture="en-US" current-uiculture="en-US" />
+  <test-suite name="C:\Users\Larry\Desktop\Repositories\ManagedMediaParsers\MediaParsersTests\MediaParsersTests.nunit" success="False" time="0.270" asserts="0">
+    <results>
+      <test-suite name="C:\Users\Larry\Desktop\Repositories\ManagedMediaParsers\MediaParsersTests\ClientBin\ManagedMediaParsersTests.dll" success="False" time="0.258" asserts="0">
+        <results>
+          <test-suite name="MediaParsersTests" success="False" time="0.254" asserts="0">
+            <results>
+              <test-suite name="BitToolsTests" success="False" time="0.245" asserts="0">
+                <results>
+                  <test-suite name="MaskBitsTests" success="False" time="0.213" asserts="0">
+                    <results>
+                      <test-case name="MediaParsersTests.BitToolsTests.MaskBitsTests.InvalidFirstBitTest" executed="True" success="True" time="0.085" asserts="1" />
+                      <test-case name="MediaParsersTests.BitToolsTests.MaskBitsTests.InvalidLastBitTest" executed="True" success="True" time="0.010" asserts="0" />
+                      <test-case name="MediaParsersTests.BitToolsTests.MaskBitsTests.LowerEdgeArrayTest" executed="True" success="True" time="0.001" asserts="1" />
+                      <test-case name="MediaParsersTests.BitToolsTests.MaskBitsTests.MaskOutFullSizedAlignedBitsTest" executed="True" success="False" time="0.017" asserts="2">
+                        <failure>
+                          <message><![CDATA[  Expected: -2145645253
+  But was:  990715008
+]]></message>
+                          <stack-trace><![CDATA[at MediaParsersTests.BitToolsTests.MaskBitsTests.MaskOutFullSizedAlignedBitsTest() in C:\Users\Larry\Desktop\Repositories\ManagedMediaParsers\MediaParsersTests\BitToolsTests\MaskBitsTests.cs:line 164
+]]></stack-trace>
+                        </failure>
+                      </test-case>
+                      <test-case name="MediaParsersTests.BitToolsTests.MaskBitsTests.MaskOutFullSizeNonAlignedBitsTest" executed="True" success="True" time="0.001" asserts="1" />
+                      <test-case name="MediaParsersTests.BitToolsTests.MaskBitsTests.NullDataTest" executed="True" success="True" time="0.003" asserts="0" />
+                      <test-case name="MediaParsersTests.BitToolsTests.MaskBitsTests.SimpleTest" executed="True" success="True" time="0.003" asserts="1" />
+                      <test-case name="MediaParsersTests.BitToolsTests.MaskBitsTests.TooLargeSizeTest" executed="True" success="True" time="0.001" asserts="0" />
+                      <test-case name="MediaParsersTests.BitToolsTests.MaskBitsTests.TooSmallSizeTest" executed="True" success="True" time="0.003" asserts="3" />
+                      <test-case name="MediaParsersTests.BitToolsTests.MaskBitsTests.UpperEdgeOfArrayTest" executed="True" success="True" time="0.001" asserts="1" />
+                    </results>
+                  </test-suite>
+                </results>
+              </test-suite>
+            </results>
+          </test-suite>
+        </results>
+      </test-suite>
+    </results>
+  </test-suite>
+</test-results>
