@@ -94,7 +94,7 @@ public:
 	*/
 	virtual void orientationChanged(int screenOrientation)
 	{
-		lprintfln("Main: Orientation will change");
+		lprintfln("Main: Orientation did change to %d", screenOrientation);
 	}
 private:
 	AppTabScreen* mTabScreen;

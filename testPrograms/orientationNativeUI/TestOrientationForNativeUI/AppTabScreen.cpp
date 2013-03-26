@@ -84,14 +84,15 @@ namespace OrientationTest
 	 */
 	void AppTabScreen::orientationDidChange()
 	{
-		if (mVisibleTabScreen == TAB_SCREEN_ONE)
-		{
-			mFirstScreen->orientationDidChange();
-		}
-		else if (mVisibleTabScreen == TAB_SCREEN_TWO)
-		{
-			mSecondScreen->orientationDidChange();
-		}
+		printf("TabScreen orientationDidChange");
+//		if (mVisibleTabScreen == TAB_SCREEN_ONE)
+//		{
+//			mFirstScreen->orientationDidChange();
+//		}
+//		else if (mVisibleTabScreen == TAB_SCREEN_TWO)
+//		{
+//			mSecondScreen->orientationDidChange();
+//		}
 	}
 
 	/**
@@ -102,12 +103,13 @@ namespace OrientationTest
 	 */
 	void AppTabScreen::orientationChanged(Screen* screen, int screenOrientation)
 	{
-		if (this == screen)
-		{
-			if (mVisibleTabScreen == TAB_SCREEN_ONE)
-			{
-				mFirstScreen->orientationChanged(mFirstScreen, screenOrientation);
-			}
-		}
+		printf("Tab screen orientationChanged to %d" + screenOrientation);
+//		if (this == screen)
+//		{
+//			if (mVisibleTabScreen == TAB_SCREEN_ONE)
+//			{
+//				mFirstScreen->orientationChanged(mFirstScreen, screenOrientation);
+//			}
+//		}
 	}
 } //namespace OrientationTest

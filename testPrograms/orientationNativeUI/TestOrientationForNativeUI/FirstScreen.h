@@ -53,6 +53,13 @@ namespace OrientationTest
 		 */
 		virtual ~FirstScreen();
 
+		/**
+		 * @deprecated: Use addScreenListener(ScreenListener*) instead.
+		 * Called after the screen has finished rotating.
+		 * Subclasses may override this method to perform additional actions
+		 * after the rotation.
+		 */
+		virtual void orientationDidChange();
 		// From ScreenListener
 		/**
 		 * Called after the screen has finished rotating.

@@ -292,6 +292,17 @@ namespace OrientationTest
 	}
 
 	/**
+	 * @deprecated: Use addScreenListener(ScreenListener*) instead.
+	 * Called after the screen has finished rotating.
+	 * Subclasses may override this method to perform additional actions
+	 * after the rotation.
+	 */
+	void FirstScreen::orientationDidChange()
+	{
+		printf("FIRST Screen: orientation DID Changed event came from TabScreen ");
+	}
+
+	/**
 	 * Called after the screen has finished rotating.
 	 * Subclasses may override this method to perform additional actions
 	 * after the rotation.
@@ -299,7 +310,7 @@ namespace OrientationTest
 	 */
 	void FirstScreen::orientationChanged(Screen* screen, int screenOrientation)
 	{
-		printf("First Screen: orientationChanged to: %d", screenOrientation);
+		printf("FIRST Screen: orientationChanged to: %d", screenOrientation);
 		MAUtil::String orientationText;
 		switch (screenOrientation)
 		{
