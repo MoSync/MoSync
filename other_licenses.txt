@@ -36,6 +36,8 @@ build-one.rb
 /intlibs/dgles-0.5
 /intlibs/demangle
 
+/runtimes/csharp/windowsphone/ManagedMediaHelpers
+
 /templates
 
 /testPrograms/agendaroids
