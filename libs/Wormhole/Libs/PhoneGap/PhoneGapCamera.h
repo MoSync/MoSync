@@ -28,6 +28,7 @@ MA 02110-1301, USA.
 
 #include <Wormhole/WebViewMessage.h>
 #include <NativeUI/WebView.h>
+#include "PhoneGapCameraConstants.h"
 
 namespace Wormhole
 {
@@ -39,6 +40,25 @@ namespace Wormhole
 	 */
 	class PhoneGapCamera: public MAUtil::CustomEventListener
 	{
+	private:
+		/**
+		 * Starts the camera and according to the properties sent as parameters
+		 * and calls the success/error callback depending on the result.
+		 * @param quality Quality of saved image. Range is [0, 100].
+		 * @param destinationType The format of the return value. See enum 'DestinationType'.
+		 * @param targetWidth Width in pixels to scale image. Must be used with targetHeight. Aspect ratio is maintained.
+		 * @param targetHeight Height in pixels to scale image. Must be used with targetWidth. Aspect ratio is maintained.
+		 * @param encodingType The encoding of the returned image file. See enum 'EncodingType'.
+		 * @param correctOrientation Rotate the image to correct for the orientation of the device during capture.
+		 * @param savePhotoToAlbum Rotate the image to correct for the orientation of the device during capture.
+		 */
+		void startCamera(int quality, int targetWidth, int targetHeight,
+					EncodingType encodingType, bool correctOrientation, bool savePhotoToAlbum);
+	private:
+		/**
+		 *	The destination of the image captured. One of the values: DATA_URL, FILE_URI.
+		 */
+		DestinationType destinationType;
 	public:
 		/**
 		 * Constructor.

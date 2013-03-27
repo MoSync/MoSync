@@ -114,4 +114,33 @@ namespace Wormhole
 		return 0;
 	}
 
+
+	bool JSONMessage::getArgsFieldBool(const MAUtil::String& fieldName)
+	{
+		YAJLDom::Value* argsNode = getParamNode("args");
+		if (NULL != argsNode && YAJLDom::Value::MAP == argsNode->getType())
+		{
+			YAJLDom::Value* value = argsNode->getValueForKey(fieldName.c_str());
+			if (NULL != value && YAJLDom::Value::BOOLEAN == value->getType())
+			{
+				return value->toBoolean();
+			}
+		}
+		return false;
+	}
+
+	bool JSONMessage::getArgsFieldBool(int index)
+	{
+		YAJLDom::Value* argsNode = getParamNode("args");
+		if (NULL != argsNode && YAJLDom::Value::ARRAY == argsNode->getType())
+		{
+			YAJLDom::Value* value = argsNode->getValueByIndex(index);
+			if (NULL != value && YAJLDom::Value::BOOLEAN == value->getType())
+			{
+				return value->toBoolean();
+			}
+		}
+		return false;
+	}
+
 } // namespace

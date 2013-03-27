@@ -58,155 +58,158 @@ namespace Wormhole
 	 */
 	void PhoneGapCamera::handleMessage(JSONMessage& message)
 	{
-		if (message.getParam("action") == "getPicture")
+		if (message.getParam("action") == "takePicture")
 		{
-			MYLOG("PhoneGapCamera::handleMessage getPicture");
+			MYLOG("PhoneGapCamera::handleMessage takePicture");
 
 			mCaptureCallBack = message.getParam("PhoneGapCallBackId");
 
-			//maImagePickerOpen() #EVENT_TYPE_IMAGE_PICKER
+			int quality = message.getArgsFieldInt(0);
+			destinationType = (DestinationType)message.getArgsFieldInt(1);
+			PictureSourceType sourceType = (PictureSourceType)message.getArgsFieldInt(2);
+			int targetWidth = message.getArgsFieldInt(3);
+			int targetHeight = message.getArgsFieldInt(4);
+			EncodingType encodingType = (EncodingType)message.getArgsFieldInt(5);
+			MediaType mediaType = (MediaType)message.getArgsFieldInt(6);
+			bool allowEdit = message.getArgsFieldBool(7);
+			bool correctOrientation = message.getArgsFieldBool(8);
+			bool savePhotoToAlbum = message.getArgsFieldBool(9);
 
-			/*
-			struct {
-				// #EVENT_TYPE_IMAGE_PICKER events, this will be 0 if canceled or 1 if Ok was pressed.
-				int imagePickerState;
-				// #EVENT_TYPE_IMAGE_PICKER event, contains the new handle to the selected image.
-				MAHandle imagePickerItem;
-			} imagePicker;
-			*/
+			//MAUtil::String popoverOptions = message.getArgsField(10);
 
-			mMessageHandler->callSuccess(
-				mCaptureCallBack,
-				PHONEGAP_CALLBACK_STATUS_OK,
-				"{\"message\":\"Hello\"}",
-				false);
+			lprintfln("Camera options: %d %d %d %d %d %d %d %s %s %s", quality, destinationType, sourceType,
+				targetWidth, targetHeight, encodingType, mediaType,
+				(allowEdit ? "true" : "false"),
+				(correctOrientation ? "true" : "false"),
+				(savePhotoToAlbum ? "true" : "false"));
 
-			/*int duration = message.getArgsFieldInt("duration");
-			if(duration > 0)
+			switch (sourceType)
 			{
-				char durationString[16];
-				maCaptureSetProperty(MA_CAPTURE_MAX_DURATION, itoa(duration,durationString,10));
+				case PHOTOLIBRARY:
+					if (destinationType == DATA_URL)
+					{
+						// #EVENT_TYPE_IMAGE_PICKER
+						maImagePickerOpenWithEventReturnType(MA_IMAGE_PICKER_EVENT_RETURN_TYPE_IMAGE_DATA);
+					}
+					else
+					{
+						mMessageHandler->callError(
+							mCaptureCallBack,
+							PHONEGAP_CALLBACK_STATUS_ERROR,
+							"{\"code\":\"DESTINATION_TYPE_FILE_URI_NOT_AVAILABLE\"}",
+							false);
+					}
+					break;
+				case CAMERA:
+					startCamera(quality, targetWidth, targetHeight,
+						encodingType, correctOrientation, savePhotoToAlbum);
+					break;
+				case SAVEDPHOTOALBUM:
+					mMessageHandler->callError(
+							mCaptureCallBack,
+							PHONEGAP_CALLBACK_STATUS_ERROR,
+							"{\"code\":\"SOURCE_TYPE_SAVEDPHOTOALBUM_NOT_AVAILABLE\"}",
+							false);
+					break;
+				default: // not a valid value
+					mMessageHandler->callError(
+						mCaptureCallBack,
+						PHONEGAP_CALLBACK_STATUS_ERROR,
+						"{\"code\":\"INVALID_SOURCE_TYPE\"}",
+						false);
 			}
-
-			mCaptureCallBack = message.getParam("PhoneGapCallBackId");
-
-			int result = maCaptureAction(MA_CAPTURE_ACTION_RECORD_VIDEO);
-
-			if(result == MA_CAPTURE_RES_CAMERA_NOT_AVAILABLE)
-			{
-				//Camera was busy by another app
-				mMessageHandler->callError(
-					mCaptureCallBack,
-					PHONEGAP_CALLBACK_STATUS_ERROR,
-					"{\"code\":\"CAPTURE_APPLICATION_BUSY\"}",
-					false);
-			}
-			else if(result == MA_CAPTURE_RES_VIDEO_NOT_SUPPORTED)
-			{
-				//No camera
-				mMessageHandler->callError(
-					mCaptureCallBack,
-					PHONEGAP_CALLBACK_STATUS_ERROR,
-					"{\"code\":\"CAPTURE_NOT_SUPPORTED\"}",
-					false);
-			}
-			*/
 		}
 	}
 
 	/**
-	 * Event handler for capture events
+	 * Event handler for camera/image picker events
 	 * @param event the event struct.
 	 */
 	void PhoneGapCamera::customEvent(const MAEvent &event)
 	{
-		/*
-		char pathBuffer[256];
-		char messageBuffer[512];
-
-		if(event.type == EVENT_TYPE_CAPTURE)
+		if ( event.type == EVENT_TYPE_IMAGE_PICKER)
 		{
-
-			MACaptureEventData eventData = event.captureData;
-
-			switch(eventData.type)
+			if ( event.imagePickerState == 1 )
 			{
-			case MA_CAPTURE_EVENT_TYPE_VIDEO:
-				//Videos are already stored, we need the filepath
-				maCaptureGetVideoPath(eventData.handle, pathBuffer, 256);
-
-				sprintf(messageBuffer, "{\"message\":[{\"fullPath\":\"%s\",\"name\":\"%s\"}]}",
-						pathBuffer, FileNameFromPath(pathBuffer));
-				mMessageHandler->callSuccess(
-					mCaptureCallBack,
-					PHONEGAP_CALLBACK_STATUS_OK,
-					messageBuffer,
-					false);
-				break;
-
-			case MA_CAPTURE_EVENT_TYPE_IMAGE:
-			{
-				char deviceOS[16];
-				String extension;
-				char localPath[128];
-
-				maGetSystemProperty(
-						"mosync.device.OS",
-						deviceOS,
-						16);
-				if(strcmp(deviceOS, "iPhone OS") == 0)
+				if (destinationType == DATA_URL)
 				{
-					extension = "png";
-				}
-				else if(strcmp(deviceOS, "Android OS") == 0)
-				{
-					extension = "jpg";
-				}
+					int dataSize = maGetDataSize(event.imagePickerItem);
 
-				maGetSystemProperty(
-					"mosync.path.local",
-					localPath,
-					128);
+					lprintfln("Data size: %d", dataSize);
 
-				//Images need to be stored. We use maLocalTime to get a unique number for the filename
-				sprintf(
-					pathBuffer,
-					"%simg%d.%s",
-					localPath,
-					maLocalTime(),
-					extension.c_str());
-				int result = maCaptureWriteImage(eventData.handle, pathBuffer, 256);
-				sprintf(messageBuffer,
-					"{\"message\":[{\"fullPath\":\"%s\",\"name\":\"%s\"}]}",
-					pathBuffer, FileNameFromPath(pathBuffer));
-				if(result == MA_CAPTURE_RES_OK)
-				{
-					mMessageHandler->callSuccess(
-						mCaptureCallBack,
-						PHONEGAP_CALLBACK_STATUS_OK,
+					char* imageData = new char[dataSize];
+					memset(imageData, 0, dataSize);
+					maReadData(event.imagePickerItem, imageData, 0, dataSize);
+
+					lprintfln("Data: %s", imageData);
+
+				/*	char messageBuffer[dataSize+2];
+					sprintf(
 						messageBuffer,
-						false);
+						"\"%s\"",
+						imageData);
+
+					mMessageHandler->callSuccess(
+							mCaptureCallBack,
+							PHONEGAP_CALLBACK_STATUS_OK,
+							messageBuffer,
+							false); */
+
+					delete imageData;
+
+					//sprintf(dataBuffer, "%s", (char*)imageData);
+
+					if (imageData != NULL)
+					{
+					/*	mMessageHandler->callSuccess(
+							mCaptureCallBack,
+							PHONEGAP_CALLBACK_STATUS_OK,
+							(char*)imageData,
+							false); */
+					}
+					else
+					{
+						mMessageHandler->callError(
+							mCaptureCallBack,
+							PHONEGAP_CALLBACK_STATUS_ERROR,
+							"{\"code\":\"INVALID_DESTINATION_TYPE\"}",
+							false);
+					}
 				}
 				else
 				{
 					mMessageHandler->callError(
 						mCaptureCallBack,
 						PHONEGAP_CALLBACK_STATUS_ERROR,
-						"{\"code\":\"CAPTURE_INTERNAL_ERR\"}",
+						"{\"code\":\"INVALID_DESTINATION_TYPE\"}",
 						false);
 				}
-				break;
 			}
-
-			case MA_CAPTURE_EVENT_TYPE_CANCEL:
+			else
+			{
 				mMessageHandler->callError(
 					mCaptureCallBack,
 					PHONEGAP_CALLBACK_STATUS_ERROR,
-					"{\"code\":\"CAPTURE_NO_MEDIA_FILES\"}",
+					"{\"code\":\"USER_CANCELED_IMAGE_SELECTION\"}",
 					false);
-				break;
 			}
 		}
-		*/
 	}
+
+	/**
+	 * Starts the camera and according to the properties sent as parameters
+	 * and calls the success/error callback depending on the result.
+	 * @param quality Quality of saved image. Range is [0, 100].
+	 * @param destinationType The format of the return value. See enum 'DestinationType'.
+	 * @param targetWidth Width in pixels to scale image. Must be used with targetHeight. Aspect ratio is maintained.
+	 * @param targetHeight Height in pixels to scale image. Must be used with targetWidth. Aspect ratio is maintained.
+	 * @param encodingType The encoding of the returned image file. See enum 'EncodingType'.
+	 * @param correctOrientation Rotate the image to correct for the orientation of the device during capture.
+	 * @param savePhotoToAlbum Rotate the image to correct for the orientation of the device during capture.
+	 */
+	 void PhoneGapCamera::startCamera(int quality, int targetWidth, int targetHeight,
+					EncodingType encodingType, bool correctOrientation, bool savePhotoToAlbum)
+	 {
+
+	 }
 } // namespace
