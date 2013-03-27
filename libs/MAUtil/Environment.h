@@ -36,6 +36,17 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "ListenerSet.h"
 
 namespace MAUtil {
+	/*
+	 * Enum containing the available platforms.
+	 */
+	typedef enum
+	{
+		OS_IOS = 0,
+		OS_ANDROID,
+		OS_WIN,
+		OS_UNKNOWN
+	} PLATFORM_TYPE;
+
 	/**
 	* \brief A listener for keypad events.
 	*
@@ -344,6 +355,11 @@ namespace MAUtil {
 		void removeOrientationListener(OrientationListener* ol);
 
 		/**
+		 * Retrieves the current platform.
+		 */
+		PLATFORM_TYPE getCurrentPlatform();
+
+		/**
 		* Returns a reference to the Environment.
 		* Causes a panic if no Environment exists.
 		*/
@@ -482,6 +498,7 @@ namespace MAUtil {
 		ListenerSet<TextBoxListener> mTextBoxListeners;
 		ListenerSet<SensorListener> mSensorListeners;
 		ListenerSet<OrientationListener> mOrientationListeners;
+		PLATFORM_TYPE mCurrentPlatform;
 private:
 		static Environment* sEnvironment;
 	};
