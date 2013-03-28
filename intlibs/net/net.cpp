@@ -257,6 +257,12 @@ int UdpConnection::connect() {
 		return CONNERR_GENERIC;
 	}
 
+    int shouldBroadCast = 1;
+    if (setsockopt(mSock, SOL_SOCKET, SO_BROADCAST, &shouldBroadCast, sizeof shouldBroadCast) == -1)
+    {
+        LOG("UdpConnection: Could not enable broadcast");
+    }
+
 	if(mHostname.empty())
 		return openServer();
 
@@ -409,6 +415,7 @@ int UdpConnection::writeTo(const void* src, int len, const MAConnAddr& dst) {
 	si.sin_family = AF_INET;
 	si.sin_port = htons(dst.inet4.port);
 	si.sin_addr.s_addr = htonl(dst.inet4.addr);
+
 	int bytesSent = sendto(mSock, (const char*) src, len, 0, (sockaddr*)&si, sizeof(si));
 	if(bytesSent != len || SOCKET_ERROR == bytesSent) {
 		LOG("UdpConnection::writeTo: sendto failed. error code: %i\n", SOCKET_ERRNO);
