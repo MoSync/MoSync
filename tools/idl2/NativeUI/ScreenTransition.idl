@@ -110,11 +110,11 @@ group ScreenTransitionTypes "Screen transition types" {
 		SWIVEL_OUT = 13;
 
 		/**
-		 * \brief A transition that will remove the current screen using a tunstile foreward movement.
+		 * \brief A transition that will remove the current screen using a tunstile forward movement.
 		 *
 		 * Platform: Windows Phone 7.
 		 */
-		TURNSTILE_FOREWARD = 14;
+		TURNSTILE_FORWARD = 14;
 
 		/**
 		 * \brief A transition that will show the next screen using a tunstile backward movement.
