@@ -56,7 +56,7 @@ namespace MoSync
                     case MoSync.Constants.MAW_TRANSITION_TYPE_SLIDE_LEFT:
                     case MoSync.Constants.MAW_TRANSITION_TYPE_SWIVEL_IN:
                     case MoSync.Constants.MAW_TRANSITION_TYPE_SWIVEL_OUT:
-                    case MoSync.Constants.MAW_TRANSITION_TYPE_TURNSTILE_FOREWARD:
+                    case MoSync.Constants.MAW_TRANSITION_TYPE_TURNSTILE_FORWARD:
                     case MoSync.Constants.MAW_TRANSITION_TYPE_TURNSTILE_BACKWARD:
                     case MoSync.Constants.MAW_TRANSITION_TYPE_NONE:
                         return true;
@@ -99,7 +99,7 @@ namespace MoSync
                             (transition as SwivelTransition).Mode = SwivelTransitionMode.FullScreenOut;
                             doTransitionOnCurrentScreen = true;
                             break;
-                        case MoSync.Constants.MAW_TRANSITION_TYPE_TURNSTILE_FOREWARD:
+                        case MoSync.Constants.MAW_TRANSITION_TYPE_TURNSTILE_FORWARD:
                             transition = new TurnstileTransition();
                             (transition as TurnstileTransition).Mode = TurnstileTransitionMode.ForwardOut;
                             doTransitionOnCurrentScreen = true;
