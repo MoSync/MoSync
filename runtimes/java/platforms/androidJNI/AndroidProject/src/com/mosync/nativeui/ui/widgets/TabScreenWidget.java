@@ -29,6 +29,7 @@ import android.widget.TabHost.TabContentFactory;
 import android.widget.TabHost.TabSpec;
 import android.widget.TextView;
 
+import com.mosync.internal.android.MoSyncThread;
 import com.mosync.internal.generated.IX_WIDGET;
 import com.mosync.nativeui.util.properties.IntConverter;
 import com.mosync.nativeui.util.properties.InvalidPropertyValueException;
@@ -231,5 +232,16 @@ public class TabScreenWidget extends ScreenWidget
 		View tabIndicatorView = tabHost.getTabWidget( ).getChildTabViewAt( tabIndex );
 		ImageView icon = (ImageView) tabIndicatorView.findViewById(android.R.id.icon);
 		icon.setImageDrawable(newIcon);
+	}
+
+	/**
+	 * Check if this tab screen is shown.
+	 * @return true if the tab screen is displayed, false otherwise.
+	 */
+	@Override
+	public boolean isShown()
+	{
+		ScreenWidget currentScreen = MoSyncThread.getInstance().getUnconvertedCurrentScreen();
+		return this.equals( currentScreen );
 	}
 }

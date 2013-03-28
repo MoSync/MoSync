@@ -37,6 +37,9 @@ namespace MoSync
 {
     namespace NativeUI
     {
+        // Delegate used for shoew screen with transition.
+        public delegate void Delegate_SwitchContentDelegate();
+
         public class Screen : WidgetBaseWindowsPhone, IScreen
         {
             //The container for the screen content.
@@ -47,6 +50,9 @@ namespace MoSync
 
             //The application bar associated to this screen.
             protected Microsoft.Phone.Shell.ApplicationBar mApplicationBar;
+
+            //The delegate when switching the content with animated transition.
+            Delegate_SwitchContentDelegate mSwitchContentDelegate = null;
 
             //The application bar visibility flag.
             protected bool ApplicationBarVisible
@@ -85,67 +91,18 @@ namespace MoSync
                 mApplicationBarItemsIndexes = new Dictionary<Object, int>();
 
                 /**
-                 * This will add a BackKeyPress event handler to the Application.Current.RootVisual, this is application wide.
-                 */
-                (Application.Current.RootVisual as Microsoft.Phone.Controls.PhoneApplicationFrame).BackKeyPress += new EventHandler<System.ComponentModel.CancelEventArgs>(BackKeyPressHandler);
-                /**
-                 * This will add a BackKeyPress event handler to the Application.Current.RootVisual, this is application wide.
+                 * This will add a OrientationChanged event handler to the Application.Current.RootVisual, this is application wide.
                  */
                 (Application.Current.RootVisual as Microsoft.Phone.Controls.PhoneApplicationFrame).OrientationChanged += new EventHandler<Microsoft.Phone.Controls.OrientationChangedEventArgs>(OrientationChangedHandler);
             }
 
             /**
-             * The BackKeyPress event handler.
-             * Currently it contains the functionality for the back event when a StackScreen is a child of a TabScreen.
-             * When this handler does not cover the functionality required it should be updated.
-             * @param from Object the object that triggers the event.
-             * @param args System.ComponentModel.CancelEventArgs the event arguments.
+             * Handles the back button pressed event.
+             * @return true if the event has been consumed, false otherwise.
              */
-            public void BackKeyPressHandler(object from, System.ComponentModel.CancelEventArgs args)
+            public virtual bool HandleBackButtonPressed()
             {
-                //Will check if the event is not canceled.
-                if (false == args.Cancel)
-                {
-                    //If the caller screen is a TabScreen, otherwise pass the event to the parent.
-                    if (this is TabScreen)
-                    {
-                        Microsoft.Phone.Controls.Pivot pivot = ((this as TabScreen).mPivot);
-                        //If the selected tab is a StackScreen.
-                        if (this.mChildren[pivot.SelectedIndex] is StackScreen)
-                        {
-                            //If pop is possible.
-                            if ((this.mChildren[pivot.SelectedIndex] as StackScreen).StackCount() > 1 && (this.mChildren[pivot.SelectedIndex] as StackScreen).GetBackButtonEnabled() == true)
-                            {
-                                //Do a pop and cancel the event.
-                                (this.mChildren[pivot.SelectedIndex] as StackScreen).PopFromBackButtonPressed();
-                                args.Cancel = true;
-                            }
-                        }
-                        //If the selected tab is not a StackScreen the application should exit.
-                        else
-                        {
-                            //Remove the event handler from the TabScreen.
-                            (Application.Current.RootVisual as Microsoft.Phone.Controls.PhoneApplicationFrame).BackKeyPress -= BackKeyPressHandler;
-                        }
-                    }
-                    else if(this is StackScreen && !(this.GetParent() is TabScreen))
-                    {
-                        if (this.GetParent() is PanoramaView)
-                        {
-                            if ((this.GetParent() as PanoramaView).getSelectedScreen().Equals(this) && (this as StackScreen).StackCount() > 1)
-                            {
-                                (this as StackScreen).PopFromBackButtonPressed();
-                                args.Cancel = true;
-                            }
-                        }
-                        else if((this as StackScreen).StackCount() > 1 && (this as StackScreen).GetBackButtonEnabled() == true)
-                        {
-                            //Do a pop and cancel the event.
-                            (this as StackScreen).PopFromBackButtonPressed();
-                            args.Cancel = true;
-                        }
-                    }
-                }
+                return false;
             }
 
             /**
@@ -158,7 +115,7 @@ namespace MoSync
             {
                 PhoneApplicationPage currentPage = (((PhoneApplicationFrame)Application.Current.RootVisual).Content as PhoneApplicationPage);
 
-                // change the current page in regard to the current orientaion.
+                // change the current page in regard to the current orientation.
                 if (args.Orientation == PageOrientation.Landscape |
                     args.Orientation == PageOrientation.LandscapeLeft |
                     args.Orientation == PageOrientation.LandscapeRight)
@@ -174,12 +131,64 @@ namespace MoSync
                     currentPage.Width = Application.Current.Host.Content.ActualWidth;
                 }
 
-                // send the event to the mosync runtime.
+                int mosyncScreenOrientation = MoSync.Constants.MA_SCREEN_ORIENTATION_PORTRAIT_UP;
+                switch (currentPage.Orientation)
+                {
+                    case PageOrientation.Landscape:
+                        mosyncScreenOrientation = MoSync.Constants.MA_SCREEN_ORIENTATION_LANDSCAPE;
+                        break;
+                    case PageOrientation.LandscapeLeft:
+                        mosyncScreenOrientation = MoSync.Constants.MA_SCREEN_ORIENTATION_LANDSCAPE_LEFT;
+                        break;
+                    case PageOrientation.LandscapeRight:
+                        mosyncScreenOrientation = MoSync.Constants.MA_SCREEN_ORIENTATION_LANDSCAPE_RIGHT;
+                        break;
+                    case PageOrientation.Portrait:
+                        mosyncScreenOrientation = MoSync.Constants.MA_SCREEN_ORIENTATION_PORTRAIT;
+                        break;
+                    case PageOrientation.PortraitDown:
+                        mosyncScreenOrientation = MoSync.Constants.MA_SCREEN_ORIENTATION_PORTRAIT_UPSIDE_DOWN;
+                        break;
+                    case PageOrientation.PortraitUp:
+                        mosyncScreenOrientation = MoSync.Constants.MA_SCREEN_ORIENTATION_PORTRAIT_UP;
+                        break;
+                }
+
+                // Post events handled by both NativeUI and Moblet.
+                postOrientationEvent(mosyncScreenOrientation);
+                postScreenOrientationEvent(mosyncScreenOrientation);
+            }
+
+            /**
+             * Post orientation event to MoSync queue.
+             * @param orientation The new orientation.
+             */
+            protected void postOrientationEvent(int orientation)
+            {
                 Memory eventData = new Memory(8);
+                const int MAEventData_eventType = 0;
+                const int MAEventData_orientation = 4;
+                eventData.WriteInt32(MAEventData_eventType, MoSync.Constants.EVENT_TYPE_ORIENTATION_DID_CHANGE);
+                eventData.WriteInt32(MAEventData_orientation, orientation);
+
+                mRuntime.PostEvent(new Event(eventData));
+            }
+
+            /**
+             * Post screen orientation event to MoSync queue.
+             * @param orientation The new screen orientation.
+             */
+            protected void postScreenOrientationEvent(int orientation)
+            {
+                // send the event to the mosync runtime.
+                Memory eventData = new Memory(12);
                 const int MAWidgetEventData_eventType = 0;
                 const int MAWidgetEventData_widgetHandle = 4;
+                const int MAWidgetEventData_screenOrientation = 8;
                 eventData.WriteInt32(MAWidgetEventData_eventType, MoSync.Constants.MAW_EVENT_SCREEN_ORIENTATION_DID_CHANGE);
                 eventData.WriteInt32(MAWidgetEventData_widgetHandle, mHandle);
+                eventData.WriteInt32(MAWidgetEventData_screenOrientation, orientation);
+
                 mRuntime.PostCustomEvent(MoSync.Constants.EVENT_TYPE_WIDGET, eventData);
             }
 
@@ -260,6 +269,32 @@ namespace MoSync
                     }
                     //Sets the content of the mainPage.xaml as our screen content.
                     (frame.Content as PhoneApplicationPage).Content = mPage;
+                });
+            }
+
+            /**
+             * ShowWithTansition function implementation. Shows next screen with transitions.
+             *
+             * @param screenTransitionType a transition type.
+             */
+            public void ShowWithTransition(int screenTransitionType)
+            {
+                MoSync.Util.RunActionOnMainThreadSync(() =>
+                {
+                    PhoneApplicationFrame frame = (PhoneApplicationFrame)Application.Current.RootVisual;
+                    //If the application bar visibility flag is set on true then the application bar is
+                    //ready to be shown.
+                    if (GetApplicationBarVisibility())
+                    {
+                        //Sets the application bar for the mainPage.xaml to our custom application bar.
+                        (frame.Content as PhoneApplicationPage).ApplicationBar = mApplicationBar;
+                    }
+                    mSwitchContentDelegate = delegate()
+                    {
+                        //Sets the content of the mainPage.xaml as our screen content.
+                        (frame.Content as PhoneApplicationPage).Content = mPage;
+                    };
+                    MoSyncScreenTransitions.doScreenTransition(mSwitchContentDelegate, screenTransitionType);
                 });
             }
 
@@ -381,6 +416,45 @@ namespace MoSync
                 //Associate an index to the native object.
                 mApplicationBarItemsIndexes.Add(item, mApplicationBarItemsIndexSeed++);
                 return (mApplicationBarItemsIndexSeed - 1);
+            }
+
+            /**
+            * MAW_SCREEN_IS_SHOWN property implementation.
+            */
+            [MoSyncWidgetProperty(MoSync.Constants.MAW_SCREEN_IS_SHOWN)]
+            public String IsShown
+            {
+                get
+                {
+                    return isScreenShown().ToString().ToLower();
+                }
+            }
+
+            public bool isScreenShown()
+            {
+                PhoneApplicationFrame frame = (PhoneApplicationFrame)Application.Current.RootVisual;
+                IWidget parentWidget = this.GetParent();
+                if (parentWidget == null)
+                {
+                    return (frame.Content as PhoneApplicationPage).Content.Equals(mPage);
+                }
+                else if (parentWidget is IScreen)
+                {
+                    IScreen parentScreen = (IScreen)parentWidget;
+                    return parentScreen.isChildShown(this);
+                }
+                return false;
+            }
+
+            /**
+             * Check if a given child screen is shown.
+             * A simple screen cannot have another screen as child.
+             * @param child Given child.
+             * @return false.
+             */
+            public virtual bool isChildShown(IScreen child)
+            {
+                return false;
             }
         }
     }

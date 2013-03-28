@@ -82,4 +82,14 @@ namespace NativeUI
 		return (this->getPropertyInt(MAW_TAB_SCREEN_CURRENT_TAB));
 	}
 
+	/**
+	 * Check if panorama view is shown.
+	 * @return true if the panorama view is visible, false otherwise.
+	 */
+	bool PanoramaView::isShown()
+	{
+        MAUtil::String value = this->getPropertyString(MAW_PANORAMA_VIEW_IS_SHOWN);
+        return (strcmp(value.c_str(), "true") == 0) ? true : false;
+	}
+
 } // namespace NativeUI

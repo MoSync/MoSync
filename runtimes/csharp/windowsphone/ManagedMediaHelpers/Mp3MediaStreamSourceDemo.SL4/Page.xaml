@@ -1,0 +1,18 @@
+﻿<!--
+  // <copyright file="Page.xaml" company="Larry Olson">
+  // (c) Copyright Larry Olson.
+  // This source is subject to the Microsoft Public License (Ms-PL)
+  // See http://code.msdn.microsoft.com/ManagedMediaHelpers/Project/License.aspx
+  // All other rights reserved.
+  //
+</copyright>
+-->
+<UserControl x:Class="Mp3MediaStreamSourceDemo.Page"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
+    Width="400" Height="300">
+  <StackPanel>
+    <Button Click="OpenMedia" Content="OpenMedia" />
+    <MediaElement x:Name="me" />
+  </StackPanel>
+</UserControl>

@@ -16,42 +16,18 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 */
 
 #import <UIKit/UIKit.h>
-#import "MoSyncCLController.h"
 #include <helpers/cpp_defs.h>
 #include "TouchHelper.h"
-#include "MoSyncSensor.h"
 
 // todo: remove all the functions that don't have to be here
 
 @interface MoSyncView : UIView <UITextFieldDelegate> {
 	CGImageRef mosyncView;
-    MoSyncCLController *locationController;
-	TouchHelper* touchHelper;
-    /**
-     * Used for handling sensors.
-     */
-    MoSyncSensor* moSyncSensor;
 
+	TouchHelper* touchHelper;
 }
 
 -(void) updateMoSyncView: (CGImageRef)ref;
--(void) showMessageBox:(NSString*)msg withTitle:(NSString*)title shouldKill:(bool)kill;
--(void) showAlert:(NSString*)msg withTitle:(NSString*)title
-	 button1Title:(NSString*)buton1
-	 button2Title:(NSString*)buton2
-	 button3Title:(NSString*)buton3;
--(void) showTextBox:(NSString*)title
-			withInText:(NSString*)inText
-			outText:(wchar*)outText
-			maxSize:(int)maxSize
-			andConstraints:(int)constraints;
--(void) startUpdatingLocation;
--(void) stopUpdatingLocation;
 - (void)deviceOrientationChanged:(NSNotification *)notification;
-
-/**
- * Returns a pointer to the MoSyncSensor object.
- */
--(MoSyncSensor*) getMoSyncSensor;
 
 @end

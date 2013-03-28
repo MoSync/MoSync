@@ -45,7 +45,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <bt_sdp.h>	//must be below other includes to avoid compilation errors.
 #endif
 
-#ifdef __llvm__
+#if defined(__MS_XCODE__) && defined(__llvm__)
 namespace Bluetooth {
 	BluetoothStack gBluetoothStack;
 }

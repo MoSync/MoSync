@@ -98,20 +98,4 @@ namespace OrientationTest
 	void SecondScreen::pointerReleaseEvent(MAPoint2d point)
 	{
 	}
-
-	/**
-	 * Called just before the screen begins rotating.
-	 */
-	void SecondScreen::orientationWillChange()
-	{
-	}
-
-	/**
-	 * Called after the screen orientation has changed.
-	 * Available only on iOS and Windows Phone 7.1 platforms.
-	 */
-	void SecondScreen::orientationDidChange()
-	{
-
-	}
 } // namespace OrientationTest

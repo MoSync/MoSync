@@ -22,6 +22,8 @@ void initExtensions(MoSync* mosync)
 			[sExtensions setObject:extension forKey:extensionName];
 		}
 	}
+
+	free((void*) classes);
 }
 
 int invokeExtensionFunction(MAExtensionFunction fn, int numargs, int ptrs) {

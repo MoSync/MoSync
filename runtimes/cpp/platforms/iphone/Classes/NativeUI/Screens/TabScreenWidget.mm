@@ -197,4 +197,22 @@
 	}
 }
 
+/**
+ * Check if a given child screen is shown inside this tab screen.
+ * @param childScreen Screen to check.
+ * @return YES if the childScreen is currently shown, NO otherwise.
+ */
+- (BOOL)isChildScreenShown:(ScreenWidget*)childScreen
+{
+	UITabBarController* tabBarController = (UITabBarController*)_controller;
+	int currentlySelectedTabIndex = tabBarController.selectedIndex;
+	UIViewController* currentlyDisplayedController =
+	    [tabBarController.viewControllers objectAtIndex:currentlySelectedTabIndex];
+	if ([currentlyDisplayedController isEqual:[childScreen getController]])
+	{
+		return YES;
+	}
+	return NO;
+}
+
 @end

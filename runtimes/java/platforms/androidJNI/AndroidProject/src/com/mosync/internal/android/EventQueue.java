@@ -17,7 +17,10 @@ MA 02110-1301, USA.
 
 package com.mosync.internal.android;
 
+import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_ALERT;
+import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_ALERT_DISMISSED;
 import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_WIDGET;
+import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_ORIENTATION_DID_CHANGE;
 
 import android.util.Log;
 
@@ -340,12 +343,56 @@ public class EventQueue
 	/**
 	 * Sends a screen orientation changed event.
 	 * @param widgetHandle The screen widget that sends the event.
+	 * @param orientation The new screen orientation.
 	 */
-	public void postScreenOrientationChanged(int widgetHandle)
+	public void postScreenOrientationChanged(int widgetHandle, int orientation)
 	{
-		postWidgetEvent(
-				IX_WIDGET.MAW_EVENT_SCREEN_ORIENTATION_DID_CHANGE,
-				widgetHandle);
+		int event[] = new int[4];
+
+		event[0] = EVENT_TYPE_WIDGET;
+		event[1] = IX_WIDGET.MAW_EVENT_SCREEN_ORIENTATION_DID_CHANGE;
+		event[2] = widgetHandle;
+		event[3] = orientation;
+
+		sMoSyncThread.postEvent(event);
+	}
+
+	/**
+	 * Sends an orientation changed event.
+	 * Callback not related to Native ui screens.
+	 * @param orientation The new orientation.
+	 */
+	public void postOrientationChanged(int orientation)
+	{
+		int event[] = new int[2];
+
+		event[0] = EVENT_TYPE_ORIENTATION_DID_CHANGE;
+		event[1] = orientation;
+
+		sMoSyncThread.postEvent(event);
+	}
+
+	/**
+	 * Send an alert event.
+	 * This event it sent when one of the buttons in the alert was pressed.
+	 * See maAlert syscall that pops-up an alert.
+	 * @param index The index of the button that was pressed.
+	 */
+	public void postAlertEvent(int index)
+	{
+		int[] event = new int[2];
+		event[0] = EVENT_TYPE_ALERT;
+		event[1] = index;
+
+		sMoSyncThread.postEvent(event);
+	}
+
+	public void postAlertDismissed()
+	{
+		int[] event = new int[1];
+		event[0] = EVENT_TYPE_ALERT_DISMISSED;
+
+		sMoSyncThread.postEvent(event);
 	}
 
 	public static EventQueue getDefault()

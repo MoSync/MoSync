@@ -34,9 +34,6 @@ import static com.mosync.internal.generated.MAAPI_consts.NOTIFICATION_TYPE_APPLI
 import static com.mosync.internal.generated.MAAPI_consts.RES_BAD_INPUT;
 import static com.mosync.internal.generated.MAAPI_consts.RES_OK;
 import static com.mosync.internal.generated.MAAPI_consts.RES_OUT_OF_MEMORY;
-import static com.mosync.internal.generated.MAAPI_consts.SCREEN_ORIENTATION_DYNAMIC;
-import static com.mosync.internal.generated.MAAPI_consts.SCREEN_ORIENTATION_LANDSCAPE;
-import static com.mosync.internal.generated.MAAPI_consts.SCREEN_ORIENTATION_PORTRAIT;
 import static com.mosync.internal.generated.MAAPI_consts.STERR_GENERIC;
 import static com.mosync.internal.generated.MAAPI_consts.STERR_NONEXISTENT;
 import static com.mosync.internal.generated.MAAPI_consts.TRANS_MIRROR;
@@ -47,14 +44,16 @@ import static com.mosync.internal.generated.MAAPI_consts.TRANS_NONE;
 import static com.mosync.internal.generated.MAAPI_consts.TRANS_ROT180;
 import static com.mosync.internal.generated.MAAPI_consts.TRANS_ROT270;
 import static com.mosync.internal.generated.MAAPI_consts.TRANS_ROT90;
-import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_ALERT;
 import static com.mosync.internal.generated.MAAPI_consts.MA_IMAGE_PICKER_EVENT_RETURN_TYPE_IMAGE_HANDLE;
 
 import static com.mosync.internal.generated.MAAPI_consts.MA_RESOURCE_OPEN;
 import static com.mosync.internal.generated.MAAPI_consts.MA_RESOURCE_CLOSE;
 
 import static com.mosync.internal.generated.MAAPI_consts.MA_WAKE_LOCK_ON;
-import static com.mosync.internal.generated.MAAPI_consts.MA_WAKE_LOCK_OFF;
+import static com.mosync.internal.generated.MAAPI_consts.MA_CAMERA_RES_OK;
+
+import static com.mosync.internal.generated.MAAPI_consts.MA_TOAST_DURATION_SHORT;
+import static com.mosync.internal.generated.MAAPI_consts.MA_TOAST_DURATION_LONG;
 
 import java.io.File;
 import java.io.FileDescriptor;
@@ -86,9 +85,9 @@ import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.DialogInterface.OnKeyListener;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.res.AssetFileDescriptor;
 import android.content.res.AssetManager;
@@ -114,10 +113,14 @@ import android.provider.Settings.Secure;
 import android.telephony.TelephonyManager;
 import android.telephony.gsm.GsmCellLocation;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.FrameLayout;
+import android.widget.Toast;
+import android.provider.Settings.Secure;
+import android.net.ConnectivityManager;
 
 import com.mosync.api.MoSyncContext;
 import com.mosync.internal.android.MoSyncFont.MoSyncFontHandle;
@@ -196,6 +199,7 @@ public class MoSyncThread extends Thread implements MoSyncContext
 	MoSyncPurchase mMoSyncPurchase;
 	MoSyncDB mMoSyncDB;
 	MoSyncExtensionLoader mMoSyncExtensionLoader;
+	MoSyncOrientationHelper mOrientation;
 
 	/**
 	 * Synchronization monitor for postEvent
@@ -453,6 +457,8 @@ public class MoSyncThread extends Thread implements MoSyncContext
 		mConnectivityManager = (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
 
 		mMoSyncExtensionLoader = MoSyncExtensionLoader.getDefault();
+
+		mOrientation = new MoSyncOrientationHelper(mContext);
 
 		nativeInitRuntime();
 	}
@@ -3352,7 +3358,7 @@ public class MoSyncThread extends Thread implements MoSyncContext
 
 						@Override
 						public void onClick(DialogInterface dialog, int which) {
-							postAlertEvent(1);
+							EventQueue.getDefault().postAlertEvent(1);
 						}
 					});
 				}
@@ -3362,7 +3368,7 @@ public class MoSyncThread extends Thread implements MoSyncContext
 
 						@Override
 						public void onClick(DialogInterface dialog, int which) {
-							postAlertEvent(2);
+							EventQueue.getDefault().postAlertEvent(2);
 						}
 					});
 				}
@@ -3372,12 +3378,28 @@ public class MoSyncThread extends Thread implements MoSyncContext
 
 						@Override
 						public void onClick(DialogInterface dialog, int which) {
-							postAlertEvent(3);
+							EventQueue.getDefault().postAlertEvent(3);
 						}
 					});
 				}
 
-				AlertDialog alertDialog = builder.create();
+				final AlertDialog alertDialog = builder.create();
+				alertDialog.setCancelable(true);
+				alertDialog.setOnKeyListener(new OnKeyListener() {
+
+					@Override
+					public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event) {
+						if(keyCode == KeyEvent.KEYCODE_BACK)
+						{
+							//todo see if the back btn is send again.
+							EventQueue.getDefault().postAlertDismissed();
+							alertDialog.dismiss();
+							return true;
+						}
+						return false;
+					}
+				});
+
 				alertDialog.show();
 			}
 		});
@@ -3386,19 +3408,29 @@ public class MoSyncThread extends Thread implements MoSyncContext
 	}
 
 	/**
-	 * Post a message to the MoSync event queue.
-	 * This event it sent when one of the buttons in the alert was pressed.
-	 * See maAlert syscall that pops-up an alert.
-	 * The state is: Ready or Canceled.
+	 * Display a toast message.
+	 * A toast is a view containing a quick little message for the user.
+	 * @param message The toast message.
+	 * @param duration One of the constants:
+	 *  - #MA_TOAST_DURATION_SHORT or
+	 *  - #MA_TOAST_DURATION_LONG
+	 * @return
 	 */
-	private void postAlertEvent(int index)
+	int maToast(final String message, int duration)
 	{
-		int[] event = new int[2];
-		event[0] = EVENT_TYPE_ALERT;
-		// Send the button index.
-		event[1] = index;
+		switch(duration)
+		{
+		case MA_TOAST_DURATION_SHORT:
+			Toast.makeText(mContext.getApplicationContext(), message, Toast.LENGTH_SHORT).show();
+			break;
+		case MA_TOAST_DURATION_LONG:
+			Toast.makeText(mContext.getApplicationContext(), message, Toast.LENGTH_LONG).show();
+			break;
+		default:
+			return 0;
+		}
 
-		postEvent(event);
+		return 0;
 	}
 
 	/**
@@ -4010,54 +4042,53 @@ public class MoSyncThread extends Thread implements MoSyncContext
 		return 0;
 	}
 
+	@Deprecated
 	int maScreenSetOrientation(int orientation)
 	{
-		//Log.i("MoSync", "maScreenSetOrientation orientation: "
-		//	+ orientation);
+		SYSLOG("@@MoSync maScreenSetOrientation " + orientation);
 
-		if (SCREEN_ORIENTATION_LANDSCAPE == orientation)
-		{
-			maScreenSetOrientationHelper(
-				ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-		}
-		else if (SCREEN_ORIENTATION_PORTRAIT == orientation)
-		{
-			maScreenSetOrientationHelper(
-				ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-		}
-		else if (SCREEN_ORIENTATION_DYNAMIC == orientation)
-		{
-			if ( Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD )
-			{
-				maScreenSetOrientationHelper(
-						ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR);
-			}
-			else
-			{
-				maScreenSetOrientationHelper(
-						ActivityInfo.SCREEN_ORIENTATION_SENSOR);
-			}
-		}
-		else
-		{
-			return -1;
-		}
-
-		return 0;
+		return mOrientation.maScreenSetOrientation(orientation);
 	}
 
-	void maScreenSetOrientationHelper(final int androidScreenOrientation)
+	/**
+	 * Set supported screen orientations.
+	 * @param orientation A bitmask consisting of flags describing the supported screen orientations.
+	 * On Android there is only one accepted value.
+	 * @return One of the values:
+	 * - #MA_SCREEN_ORIENTATION_RES_OK
+	 * - #MA_SCREEN_ORIENTATION_RES_NOT_SUPPORTED
+	 * - #MA_SCREEN_ORIENTATION_RES_INVALID_VALUE
+	 */
+	int maScreenSetSupportedOrientations(int orientation)
 	{
-		final Activity activity = mContext;
+		SYSLOG("MoSync maScreenSetSupportedOrientations " + orientation);
 
-		activity.runOnUiThread(new Runnable()
-		{
-			@Override
-			public void run()
-			{
-				activity.setRequestedOrientation(androidScreenOrientation);
-			}
-		});
+		return mOrientation.setSupportedOrientation(orientation);
+	}
+
+	/**
+	* Get supported screen orientations.
+	* @return A bitmask consisting of flags describing the supported screen orientations.
+	* The bitmask is created using \link #MA_SCREEN_ORIENTATION_PORTRAIT MA_SCREEN_ORIENTATION \endlink
+	* values.
+	*/
+	int maScreenGetSupportedOrientations()
+	{
+		SYSLOG("MoSync maScreenGetSupportedOrientations");
+
+		return mOrientation.getSupportedOrientations();
+	}
+
+	/**
+	* Get current screen orientation.
+	* Currently implemented on iOS, WindowsPhone 7.1 and Android.
+	* @return One of the \link #MA_SCREEN_ORIENTATION_PORTRAIT MA_SCREEN_ORIENTATION \endlink constants.
+	*/
+	int maScreenGetCurrentOrientation()
+	{
+		SYSLOG("@MoSync maScreenGetCurrentOrientation");
+
+		return MoSync.getScreenOrientation();
 	}
 
 	int maScreenSetFullscreen(final int fullscreen)
@@ -4522,6 +4553,15 @@ public class MoSyncThread extends Thread implements MoSyncContext
 	}
 
 	/**
+	 * Internal wrapper for maWidgetScreenShowWithTransition that runs
+	 * the call in the UI thread.
+	 */
+	public int maWidgetScreenShowWithTransition(final int screenHandle, final int screenTransitionType, final int screenTransitionDurations)
+	{
+		return mMoSyncNativeUI.maWidgetScreenShowWithTransition(screenHandle, screenTransitionType, screenTransitionDurations);
+	}
+
+	/**
 	 * Internal wrapper for maWidgetSetProperty that runs
 	 * the call in the UI thread.
 	 */
@@ -4581,6 +4621,16 @@ public class MoSyncThread extends Thread implements MoSyncContext
 	{
 		mMoSyncNativeUI.setCurrentScreen(handle);
 	}
+
+	/**
+	 * Get the current screen without conversions.
+	 * @return The current screen without conversions.
+	 */
+	public ScreenWidget getUnconvertedCurrentScreen()
+	{
+		return mMoSyncNativeUI.getUnconvertedCurrentScreen();
+	}
+
 	/**
 	 * Internal wrapper for maWidgetStackScreenPush that runs
 	 * the call in the UI thread.
@@ -4691,6 +4741,23 @@ public class MoSyncThread extends Thread implements MoSyncContext
 		}
 
 		return mMoSyncCameraController.cameraSnapshot(formatIndex, placeHolder);
+	}
+
+	/**
+	 * Takes a snapshot and send the place holder created via
+	 * #EVENT_TYPE_CAMERA_SNAPSHOT.
+	 *
+	 * @param formatIndex index of the format set by the user
+	 * @return IOCTL_UNAVAILABLE if fails and MA_CAMERA_RES_OK if succeeds
+	 */
+	int maCameraSnapshotAsync(int formatIndex)
+	{
+		if(mMoSyncCameraController == null)
+		{
+			return IOCTL_UNAVAILABLE;
+		}
+		mMoSyncCameraController.cameraSnapshotAsync(formatIndex);
+		return MA_CAMERA_RES_OK;
 	}
 
 

@@ -1,0 +1,17 @@
+﻿<!--
+  // <copyright file="App.xaml" company="Larry Olson">
+  // (c) Copyright Larry Olson.
+  // This source is subject to the Microsoft Public License (Ms-PL)
+  // See http://code.msdn.microsoft.com/ManagedMediaHelpers/Project/License.aspx
+  // All other rights reserved.
+  //
+</copyright>
+-->
+<Application xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
+             x:Class="Mp3MediaStreamSourceDemo.App"
+             >
+    <Application.Resources>
+        
+    </Application.Resources>
+</Application>

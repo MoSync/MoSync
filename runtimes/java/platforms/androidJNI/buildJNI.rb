@@ -241,38 +241,31 @@ sh( "#{File.join(androidSDKTools, "/aapt")} package -f -v " +
 
 puts "Compiling Java Source Files\n\n"
 
-packages = [
-	"src/com/mosync/java/android/*.java",
-	"src/com/mosync/api/*.java",
-	"src/com/mosync/internal/android/*.java",
-	"src/com/mosync/internal/android/extensions/*.java",
-	"src/com/mosync/internal/generated/*.java",
-	"src/com/mosync/nativeui/core/*.java",
-	"src/com/mosync/nativeui/ui/egl/*.java",
-	"src/com/mosync/nativeui/ui/factories/*.java",
-	"src/com/mosync/nativeui/ui/widgets/*.java",
-	"src/com/mosync/nativeui/util/*.java",
-	"src/com/mosync/nativeui/util/properties/*.java",
-	"src/com/mosync/pim/*.java",
-	"src/com/mosync/nativeui/ui/custom/*.java",
-	"gen/com/mosync/java/android/*.java",
-	"src/com/mosync/internal/android/nfc/*.java",
-	"src/com/mosync/internal/android/nfc/ops/*.java",
-	"src/com/mosync/nativeui/ui/ads/*.java",
-	"src/com/mosync/internal/android/notifications/*.java",
-	"src/com/mosync/internal/android/billing/*.java",
-	"src/com/mosync/internal/android/billing/request/*.java",
-	"gen/com/android/vending/billing/IMarketBillingService.java",
-]
+packages = ["src/com/mosync/java/android/*.java",
+            "src/com/mosync/api/*.java",
+            "src/com/mosync/internal/android/*.java",
+            "src/com/mosync/internal/android/extensions/*.java",
+            "src/com/mosync/internal/generated/*.java",
+            "src/com/mosync/nativeui/core/*.java",
+            "src/com/mosync/nativeui/ui/egl/*.java",
+            "src/com/mosync/nativeui/ui/factories/*.java",
+            "src/com/mosync/nativeui/ui/widgets/*.java",
+            "src/com/mosync/nativeui/util/*.java",
+		"src/com/mosync/nativeui/util/properties/*.java",
+		"src/com/mosync/pim/*.java",
+		"src/com/mosync/nativeui/ui/custom/*.java",
+		"gen/com/mosync/java/android/*.java",
+		"src/com/mosync/internal/android/nfc/*.java",
+		"src/com/mosync/internal/android/nfc/ops/*.java",
+		"src/com/mosync/nativeui/ui/ads/*.java",
+		"src/com/mosync/internal/android/notifications/*.java",
+		"src/com/mosync/internal/android/billing/*.java",
+		"src/com/mosync/internal/android/billing/util/*.java",
+		"gen/com/android/vending/billing/IInAppBillingService.java"
+            ]
 
 # Concatenate each list element with package_root, and flatten the list to a string
 java_files = packages.map { |package| File.join(package_root, package) }.join(" ")
-
-#puts "Compiling aidl files\n\n"
-# Compile the aidl file into java class, the output will be generated in gen folder.
-#sh( "#{File.join(androidSDKTools, "/aidl")} -I " + "\"#{File.join(androidSDKPath, "android.jar")}\" " + " -o " +
-#	"#{File.join("#{package_root}src/com/android/vending/billing/", "IMarketBillingService.aidl")} " );
-#	"#{File.join("#{package_root}gen/com/android/vending/billing/", "IMarketBillingService.java")} ");
 
 # Compile all the java files into class files
 if ENV['OS'] == "Windows_NT"
@@ -315,4 +308,3 @@ FileUtils.rm_rf class_dir
 if (!success)
 	exitBuilder(0, mosyncppsource, configPath)
 end
-

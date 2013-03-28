@@ -192,6 +192,26 @@ namespace Base
 	int _maScreenSetFullscreen(int fullscreen, JNIEnv* jNIEnv, jobject jThis);
 
 	/**
+	* Set supported screen orientations.
+	* @param orientations A bitmask consisting of flags describing the
+	* supported screen orientations.
+	* @return \< 0 on error.
+	*/
+	int _maScreenSetSupportedOrientations(int orientations, JNIEnv* jNIEnv, jobject jThis);
+
+	/**
+	* Get supported screen orientations.
+	* @return A bitmask consisting of flags describing the supported screen orientations.
+	*/
+	int _maScreenGetSupportedOrientations(JNIEnv* jNIEnv, jobject jThis);
+
+	/**
+	* Get current screen orientation.
+	* @return One of the \link #MA_SCREEN_ORIENTATION_PORTRAIT MA_SCREEN_ORIENTATION \endlink constants.
+	*/
+	int _maScreenGetCurrentOrientation(JNIEnv* jNIEnv, jobject jThis);
+
+	/**
 	* Turn on/off sending of HomeScreen events. Off by default.
 	* @param eventsOn 1 = events on, 0 = events off
 	* @return \< 0 on error.
@@ -233,6 +253,8 @@ namespace Base
 	int _maAlert(const char* title, const char* message, const char* button1,
 					const char* button2, const char* button3, JNIEnv* jNIEnv, jobject jThis);
 
+	int _maToast(const char* message, int duration, JNIEnv* jNIEnv, jobject jThis);
+
 	int _maImagePickerOpen(JNIEnv* jNIEnv, jobject jThis);
 
 	int _maImagePickerOpenWithEventReturnType(int eventReturnType, JNIEnv* jNIEnv, jobject jThis);
@@ -267,6 +289,9 @@ namespace Base
 											JNIEnv* jNIEnv, jobject jThis);
 
 	int _maWidgetScreenShow(int screenWidget, JNIEnv* jNIEnv, jobject jThis);
+	int _maWidgetScreenShowWithTransition(int screenWidget, int screenTransitionType, int screenTransitionDuration,
+											JNIEnv* jNIEnv, jobject jThis);
+
 	int _maWidgetStackScreenPush(int stackScreenWidget, int newScreen, JNIEnv* jNIEnv, jobject jThis);
 	int _maWidgetStackScreenPop(int stackScreenWidget, JNIEnv* jNIEnv, jobject jThis);
 
@@ -769,6 +794,8 @@ namespace Base
 	int _maCameraNumber(JNIEnv* jNIEnv, jobject jThis);
 
 	int _maCameraSnapshot(int formatIndex, MAHandle placeHolder, JNIEnv* jNIEnv, jobject jThis);
+
+	int _maCameraSnapshotAsync(int formatIndex, JNIEnv* jNIEnv, jobject jThis);
 
 	int _maCameraRecord(int flag, JNIEnv* jNIEnv, jobject jThis);
 

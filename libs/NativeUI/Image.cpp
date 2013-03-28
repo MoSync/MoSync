@@ -54,6 +54,28 @@ namespace NativeUI
     }
 
     /**
+     * Set the image that will be displayed using a file path.
+     * @param imagePath Path to an image file.
+     * @return Any of the following result codes:
+     * - #MAW_RES_OK if the property could be set.
+     * - #MAW_RES_INVALID_PROPERTY_VALUE if the image path was invalid.
+     */
+    int Image::setImagePath(const MAUtil::String& imagePath)
+    {
+		return this->setProperty(MAW_IMAGE_PATH, imagePath);
+    }
+
+    /**
+     * Get the image path.
+     * @return An image path if the displayed image was created using
+	 * a file path, or an enpty string otherwise.
+     */
+    MAUtil::String Image::getImagePath()
+    {
+		return this->getPropertyString(MAW_IMAGE_PATH);
+    }
+
+    /**
      * Set the type of scaling that should be applied to the image.
      * @param scaleMode The type of scaling.
      * One of the following:
