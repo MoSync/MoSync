@@ -78,10 +78,11 @@ int main(int argc, const char** argv) {
 			string headerOut = extName + ".h";
 			writeHeaders(headerOut, ext, true);
 
-			string sourceOut = "_" + extName + ".c";
+			string sourceOut = "_" + extName + ".pipe.c";
 			ofstream sourcefile(sourceOut.c_str());
 
 			sourcefile << "// *** GENERATED FILE - Do not modify ***\n\n";
+			sourcefile << "#ifndef MOSYNC_NATIVE\n\n";
 			sourcefile << "#include <maapi.h>\n";
 			sourcefile << "#include \"" << extName << ".h\"\n";
 			sourcefile << "static MAExtensionFunction " << getFnIxHandle(ext) << "[" << ext.functions.size() << "];\n\n";
@@ -90,6 +91,7 @@ int main(int argc, const char** argv) {
 				streamFunctionWrapper(sourcefile, ext, ext.functions[i], i == 0);
 			}
 
+			sourcefile << "#endif\n";
 			sourcefile.close();
 
 			streamExtensionManifest(args);
