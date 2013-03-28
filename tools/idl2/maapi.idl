@@ -2045,7 +2045,7 @@ interface MAAPI {
 	int maSoundPlay(in MAHandle sound_res, in int offset, in int size);
 
 	/**
-	* Stops the sound and rewinds it.
+	* Stops any sound started with maSoundPlay().
 	*/
 	void maSoundStop();
 
