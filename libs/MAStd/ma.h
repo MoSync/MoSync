@@ -36,7 +36,7 @@ typedef unsigned long size_t;
 #define SIZE_T_DEFINED
 #endif
 
-#endif /* COMPAT_LEGACY_MOSYNC */
+#endif /* MOSYNC_NATIVE */
 
 #ifdef MAPIP
 #define BOOL	int

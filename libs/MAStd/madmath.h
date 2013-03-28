@@ -162,7 +162,9 @@ int isinf(double x);
 #endif
 #include <math.h>
 #include <float.h>
+#ifndef MOSYNC_NATIVE
 #define isnan _isnan
+#endif
 
 #endif //MAPIP
 

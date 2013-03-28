@@ -35,7 +35,9 @@ extern "C" {
 #ifdef _MSC_VER
 #pragma warning(disable:4273 4005)
 #else
+#ifndef MOSYNC_NATIVE
 #define stricmp strcasecmp
+#endif
 #endif
 #else
 

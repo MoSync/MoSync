@@ -44,7 +44,6 @@
 #include <string.h>
 #else
 
-#ifndef MOSYNC_NATIVE
 
 #include "ma.h"
 #include "mactype.h"
@@ -226,8 +225,6 @@ size_t strnlen(const char *s, size_t count);
 #endif
 
 #endif	//MAPIP
-
-#endif /* CONVERT_LEGACY_MOSYNC */
 
 /**
 * Compares strings \a s1 with \a s2 without case sensitivity.
