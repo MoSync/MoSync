@@ -257,11 +257,16 @@ int UdpConnection::connect() {
 		return CONNERR_GENERIC;
 	}
 
+#ifdef __MS_XCODE__
+    //Broadcasting is disabled by default on iOS, need to enable it.
+    //Also, if anyone wants to call this for other platforms in the future,
+    //know that it should be a char on other platforms, not int.
     int shouldBroadCast = 1;
     if (setsockopt(mSock, SOL_SOCKET, SO_BROADCAST, &shouldBroadCast, sizeof shouldBroadCast) == -1)
     {
         LOG("UdpConnection: Could not enable broadcast");
     }
+#endif
 
 	if(mHostname.empty())
 		return openServer();
