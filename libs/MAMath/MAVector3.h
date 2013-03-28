@@ -91,7 +91,7 @@ Vector3 Vec3_add(Vector3* v1, Vector3* v2);
 Vector3 Vec3_sub(Vector3* v1, Vector3* v2);
 
 float Vec3_magnitude(Vector3* v);
-0
+
 Vector3* Vec3_normalize(Vector3* v);
 Vector3 Vec3_toUnit(Vector3* v);
 	
@@ -102,4 +102,4 @@ Vector3 Vec3_cross(Vector3* v1, Vector3* v2);
 
 char* Vec3_toString(Vector3* v);
 
-#endif	
+#endif
