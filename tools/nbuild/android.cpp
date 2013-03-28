@@ -55,6 +55,10 @@ int generateMakefile(Arguments* params) {
 	rootCtx.setParameter("compiler-defines", delim(compilerDefines, " "));
 	rootCtx.setParameter("additional-compiler-switches", params->getSwitchValue("--compiler-switches"));
 
+	if (params->isFlagSet("--android-static-lib")) {
+		rootCtx.setParameter("static-lib", "true");
+	}
+
 	MustacheParser parser(true);
 	ProfileDB db;
 	string androidProfilesDir = db.profilesdir("Android");
