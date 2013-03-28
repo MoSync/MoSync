@@ -46,6 +46,17 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "helpers/CPP_IX_PIM.h"
 #include "helpers/CPP_IX_CELLID.h"
 
+#ifdef MOSYNC_NATIVE
+#define ARG_NO_4 d
+#define ARG_NO_5 e
+#define ARG_NO_6 f
+#define MA_IOCTL_ELLIPSIS , ...
+#else
+#define ARG_NO_4 SYSCALL_THIS->GetValidatedStackValue(0)
+#define ARG_NO_5 SYSCALL_THIS->GetValidatedStackValue(4)
+#define ARG_NO_6 SYSCALL_THIS->GetValidatedStackValue(8)
+#endif
+
 #define ERROR_EXIT { MoSyncErrorExit(-1); }
 
 //#define SYSLOG(a) __android_log_write(ANDROID_LOG_INFO, "MoSync Syscall", a);
@@ -1373,20 +1384,39 @@ namespace Base
 	*				if this syscall is not implemented on this platfom.
 	*
 	*/
-	SYSCALL(longlong,  maIOCtl(int function, int a, int b, int c))
+	SYSCALL(longlong,  maIOCtl(int function, int a, int b, int c MA_IOCTL_ELLIPSIS))
 	{
+#ifdef MOSYNC_NATIVE
+		va_list args;
+		va_start(args, c);
+		int d = va_arg(args, int);
+		int e = va_arg(args, int);
+		int f = va_arg(args, int);
+		va_end(args);
+#endif
 		SYSLOG("maIOCtl");
 		//__android_log_write(ANDROID_LOG_INFO, "MoSync Syscall", "maIOCtl");
 		//handlePendingExceptions(mJNIEnv);
 
 		switch(function)
 		{
+#ifndef MOSYNC_NATIVE
 		maIOCtl_IX_OPENGL_ES_caselist
 		maIOCtl_IX_GL1_caselist
 #ifndef _android_1
 		maIOCtl_IX_GL2_caselist
 #endif
 		maIOCtl_IX_GL_OES_FRAMEBUFFER_OBJECT_caselist
+#else
+		case maIOCtl_maOpenGLInitFullscreen:
+			return _maOpenGLInitFullscreen(a, mJNIEnv, mJThis);
+		case maIOCtl_maOpenGLCloseFullscreen:
+			return _maOpenGLCloseFullscreen(mJNIEnv, mJThis);
+		case maIOCtl_maOpenGLTexImage2D:
+			return _maOpenGLTexImage2D(a, mJNIEnv, mJThis);
+		case maIOCtl_maOpenGLTexSubImage2D:
+			return _maOpenGLTexSubImage2D(a, mJNIEnv, mJThis);
+#endif
 
 		case maIOCtl_maWriteLog:
 			SYSLOG("maIOCtl_maWriteLog");
@@ -1586,8 +1616,8 @@ namespace Base
 			const char* mime = SYSCALL_THIS->GetValidatedStr(a);
 			int data = b;
 			int offset = c;
-			int length = SYSCALL_THIS->GetValidatedStackValue(0);
-			int flags = SYSCALL_THIS->GetValidatedStackValue(4);
+			int length = ARG_NO_4;
+			int flags = ARG_NO_5;
 
 			return _maAudioDataCreateFromResource(mime, data, offset, length, flags, mJNIEnv, mJThis);
 		}
@@ -1823,8 +1853,8 @@ namespace Base
 			const wchar* _title = GVWS(a);
 			const wchar* _inText = GVWS(b);
 			// Get two parameters from the stack
-			int _maxSize = SYSCALL_THIS->GetValidatedStackValue(0);
-			int _constraints = SYSCALL_THIS->GetValidatedStackValue(4);
+			int _maxSize = ARG_NO_4;
+			int _constraints = ARG_NO_5;
 			// Allocate memory for the output buffer
 			int _outText = (int) SYSCALL_THIS->GetValidatedMemRange(
 				c,
@@ -1883,7 +1913,7 @@ namespace Base
 			const char *_property = SYSCALL_THIS->GetValidatedStr(b);
 			//Read the fourth parameter from the register
 			//(the first three can be read directly)
-			int _valueBufferSize = SYSCALL_THIS->GetValidatedStackValue(0);
+			int _valueBufferSize = ARG_NO_4;
 			int _valueBuffer = (int) SYSCALL_THIS->GetValidatedMemRange(
 				c,
 				_valueBufferSize * sizeof(char));
@@ -1894,7 +1924,7 @@ namespace Base
 		case maIOCtl_maWidgetScreenAddOptionsMenuItem:
 		{
 			SYSLOG("maIOCtl_maWidgetScreenAddOptionsMenuItem");
-			int _iconPredefined = SYSCALL_THIS->GetValidatedStackValue(0);
+			int _iconPredefined = ARG_NO_4;
 			return _maWidgetScreenAddOptionsMenuItem(a, SYSCALL_THIS->GetValidatedStr(b), SYSCALL_THIS->GetValidatedStr(c), _iconPredefined, mJNIEnv, mJThis);
 		}
 
@@ -1919,7 +1949,7 @@ namespace Base
 				b,
 				SYSCALL_THIS->GetValidatedStr(c),
 				SYSCALL_THIS->GetValidatedStr(
-					SYSCALL_THIS->GetValidatedStackValue(0)),
+					ARG_NO_4),
 				mJNIEnv,
 				mJThis);
 
@@ -2000,9 +2030,9 @@ namespace Base
 				SYSCALL_THIS->GetValidatedStr(b),
 				SYSCALL_THIS->GetValidatedStr(c),
 				SYSCALL_THIS->GetValidatedStr(
-					SYSCALL_THIS->GetValidatedStackValue(0)),
+					ARG_NO_4),
 				SYSCALL_THIS->GetValidatedStr(
-					SYSCALL_THIS->GetValidatedStackValue(4)),
+					ARG_NO_5),
 				mJNIEnv,
 				mJThis);
 
@@ -2031,8 +2061,8 @@ namespace Base
 				_title,
 				_text,
 				_cancel,
-				SYSCALL_THIS->GetValidatedStackValue(0),
-				SYSCALL_THIS->GetValidatedStackValue(4),
+				ARG_NO_4,
+				ARG_NO_5,
 				mJNIEnv,
 				mJThis);
 			}
@@ -2123,7 +2153,7 @@ namespace Base
 				a,
 				b,
 				c,
-				SYSCALL_THIS->GetValidatedStackValue(0),
+				ARG_NO_4,
 				mJNIEnv,
 				mJThis);
 
@@ -2141,7 +2171,7 @@ namespace Base
 				a,
 				b,
 				c,
-				SYSCALL_THIS->GetValidatedStackValue(0),
+				ARG_NO_4,
 				mJNIEnv,
 				mJThis);
 
@@ -2607,8 +2637,8 @@ namespace Base
 
 		case maIOCtl_maNFCTransceive:
 		{
-			int dst = SYSCALL_THIS->GetValidatedStackValue(0);
-			int dstLen = SYSCALL_THIS->GetValidatedStackValue(4);
+			int dst = ARG_NO_4;
+			int dstLen = ARG_NO_5;
 			return _maNFCTransceive(
 					a,
 					(int) SYSCALL_THIS->GetValidatedMemRange( b, c * sizeof(byte)),
@@ -2719,8 +2749,8 @@ namespace Base
 
 		case maIOCtl_maNFCAuthenticateMifareSector:
 		{
-			int keyAddr = SYSCALL_THIS->GetValidatedStackValue(0);
-			int keyLen = SYSCALL_THIS->GetValidatedStackValue(4);
+			int keyAddr = ARG_NO_4;
+			int keyLen = ARG_NO_5;
 			return _maNFCAuthenticateMifareSector(
 					a,
 					b,
@@ -2754,7 +2784,7 @@ namespace Base
 
 		case maIOCtl_maNFCReadMifareBlocks:
 		{
-			int len = SYSCALL_THIS->GetValidatedStackValue(0);
+			int len = ARG_NO_4;
 			return _maNFCReadMifareBlocks(
 					a,
 					b,
@@ -2767,7 +2797,7 @@ namespace Base
 
 		case maIOCtl_maNFCReadMifarePages:
 		{
-			int len = SYSCALL_THIS->GetValidatedStackValue(0);
+			int len = ARG_NO_4;
 			return _maNFCReadMifarePages(
 					a,
 					b,
@@ -2780,7 +2810,7 @@ namespace Base
 
 		case maIOCtl_maNFCWriteMifareBlocks:
 		{
-			int len = SYSCALL_THIS->GetValidatedStackValue(0);
+			int len = ARG_NO_4;
 			return _maNFCWriteMifareBlocks(
 					a,
 					b,
@@ -2793,7 +2823,7 @@ namespace Base
 
 		case maIOCtl_maNFCWriteMifarePages:
 		{
-			int len = SYSCALL_THIS->GetValidatedStackValue(0);
+			int len = ARG_NO_4;
 			return _maNFCWriteMifarePages(
 					a,
 					b,
@@ -2855,7 +2885,7 @@ namespace Base
 			const char *_property = SYSCALL_THIS->GetValidatedStr(b);
 			//Read the fourth parameter from the register
 			//(the first three can be read directly)
-			int _valueBufferSize = SYSCALL_THIS->GetValidatedStackValue(0);
+			int _valueBufferSize = ARG_NO_4;
 			int _valueBuffer = (int) SYSCALL_THIS->GetValidatedMemRange(
 				c,
 				_valueBufferSize * sizeof(char));
@@ -2896,7 +2926,7 @@ namespace Base
 			const char *_property = SYSCALL_THIS->GetValidatedStr(b);
 			//Read the fourth parameter from the register
 			//(the first three can be read directly)
-			int _valueBufferSize = SYSCALL_THIS->GetValidatedStackValue(0);
+			int _valueBufferSize = ARG_NO_4;
 			int _valueBuffer = (int) SYSCALL_THIS->GetValidatedMemRange(
 				c,
 				_valueBufferSize * sizeof(char));
@@ -3095,7 +3125,7 @@ namespace Base
 			const char *_property = SYSCALL_THIS->GetValidatedStr(b);
 			//Read the fourth parameter from the register
 			//(the first three can be read directly)
-			int _valueBufferSize = SYSCALL_THIS->GetValidatedStackValue(0);
+			int _valueBufferSize = ARG_NO_4;
 			int _valueBuffer = (int) SYSCALL_THIS->GetValidatedMemRange(
 				c,
 				_valueBufferSize * sizeof(char));
@@ -3158,7 +3188,7 @@ namespace Base
 		case maIOCtl_maDBExecSQLParams:
 		{
 			// Get fourth parameter.
-			int d = SYSCALL_THIS->GetValidatedStackValue(0);
+			int d = ARG_NO_4;
 			return _maDBExecSQLParams(
 				// Database handle
 				a,
@@ -3197,7 +3227,7 @@ namespace Base
 		case maIOCtl_maDBCursorGetColumnText:
 		{
 			// Get fourth parameter.
-			int d = SYSCALL_THIS->GetValidatedStackValue(0);
+			int d = ARG_NO_4;
 			return _maDBCursorGetColumnText(
 				a,
 				b,
