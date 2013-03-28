@@ -41,7 +41,7 @@ static void sign(const SETTINGS& s, const RuntimeInfo& ri, string& unsignedApk, 
 static void createSignCmd(ostringstream& cmd, string& keystore, string& alias, string& storepass, string& keypass, string& signedApk, string& unsignedApk, bool hidden);
 static void writeNFCResource(const SETTINGS& s, const RuntimeInfo& ri);
 static string packageNameToByteCodeName(const string& packageName);
-static string findNativeLibrary(const SETTINGS& s, vector<string>& modules, string& name, string& arch);
+static string findNativeLibrary(const SETTINGS& s, vector<string>& modules, string& name, string& arch, bool debug);
 
 class AndroidContext : public DefaultContext {
 private:
@@ -235,7 +235,7 @@ void packageAndroid(const SETTINGS& s, const RuntimeInfo& ri) {
 
 		for (size_t j = 0; j < modules.size(); j++) {
 			string module = modules[j];
-			string nativeLib = findNativeLibrary(s, modules, module, arch);
+			string nativeLib = findNativeLibrary(s, modules, module, arch, s.debug);
 			if (!nativeLib.empty()) {
 				string dstLibDir = addlib + "/" + arch + "/";
 				_mkdir(dstLibDir.c_str());
@@ -333,14 +333,18 @@ static void createSignCmd(ostringstream& cmd, string& keystore, string& alias, s
 		" "<<arg(alias);
 }
 
-static string findNativeLibrary(const SETTINGS& s, vector<string>& modules, string& name, string& arch) {
+static string findNativeLibrary(const SETTINGS& s, vector<string>& modules, string& name, string& arch, bool debug) {
 	vector<string> paths;
 
 	// 1. Look for the one built for this project, if any.
 	string projLibPath = string(s.dst) + "/../libs/" + arch;
 	paths.push_back(projLibPath);
 
-	// 2. Look in the modules directory
+	// 2. Look in the lib directory
+	string libPath = mosyncdir() + string("/lib/android_") + arch + (debug ? "_debug" : "_release");
+	paths.push_back(libPath);
+
+	// 3. Look in the modules directory
 	for (size_t i = 0; i < modules.size(); i++) {
 		string module = modules[i];
 		string moduleDir = mosyncdir() + string("/modules/") + module + string("/lib/Android/Debug/");
