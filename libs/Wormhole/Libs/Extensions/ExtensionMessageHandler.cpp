@@ -150,12 +150,13 @@ JSMarshaller* JSMarshaller::createMarshaller(const char* def, bool isArgList) {
 				current = new JSStringMarshaller(ch == 's');
 				break;
 			case '!':
-			case '?':
+			case '?': {
 				if (current) list.add(current);
 				bool out = ch == '?';
 				current = new JSRefMarshaller(refId, &mRefList, out);
 				refId = 0;
 				break;
+			}
 			case '0':
 			case '1':
 			case '2':

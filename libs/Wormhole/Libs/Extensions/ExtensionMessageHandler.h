@@ -39,6 +39,9 @@ MA 02110-1301, USA.
 #include <MAUtil/HashMap.h>
 #include <MAUtil/String.h>
 #include <mavsprintf.h>
+#ifdef MOSYNC_NATIVE
+#include <ctype.h>
+#endif
 #include "../../MessageStream.h"
 
 using namespace NativeUI; // WebView widget
