@@ -15,7 +15,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
-#include "File.h"
 #include <maheap.h>
 #include <mactype.h>
 
@@ -25,6 +24,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #else
 #include <string.h>
 #endif
+
+#include "File.h"
 
 // Magic numbers used in the Bubdle file header.
 // The version 2 Bundle format has an Adler32 checksum
