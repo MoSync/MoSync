@@ -186,7 +186,9 @@ namespace Core {
 
 	//for ioctl
 	void* GetValidatedMemRange(VMCore* core, int address, int size);
+#ifndef MOSYNC_NATIVE
 	int GetValidatedStackValue(VMCore* core, int offset);
+#endif
 	int TranslateNativePointerToMoSyncPointer(VMCore* core, void* ptr);
 	const char* GetValidatedStr(const VMCore* core, int address);
 	const wchar* GetValidatedWStr(const VMCore* core, int address);

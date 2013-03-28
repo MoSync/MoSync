@@ -1138,6 +1138,7 @@ void WRITE_REG(int reg, int value) {
 		address>>=2;
 		return mem_ds[address];
 	}
+#endif
 
 	int TranslateNativePointerToMoSyncPointer(void *nativePointer) {
 	    if(nativePointer == NULL)
