@@ -58,3 +58,12 @@ vector<string> Arguments::getPrefixedList(string prefix, bool retainPrefix) {
 	}
 	return result;
 }
+
+vector<string> Arguments::all() {
+	vector<string> result;
+	for (int i = 0; i < mArgc; i++) {
+		string arg = at(i);
+		result.push_back(arg);
+	}
+	return result;
+}

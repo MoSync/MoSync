@@ -16,6 +16,7 @@ public:
 	Arguments(int argc, const char** argv) : mArgc(argc), mArgv(argv) { }
 	string at(int ix);
 	//void defineSwitchAlias(string key, string alternative);
+	vector<string> all();
 	map<string, string> getPrefixedArguments(string prefix);
 	vector<string> getPrefixedList(string prefix, bool retainPrefix);
 	string getSwitchValue(string value);

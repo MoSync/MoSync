@@ -226,13 +226,15 @@ void packageAndroid(const SETTINGS& s, const RuntimeInfo& ri) {
 		_mkdir(addlib.c_str());
 		_mkdir(armeabi.c_str());
 
-		//string classesSo = classes + "/libmosync.so";
-		//string armeabiSo = armeabi + "/libmosync.so";
-		//remove(armeabiSo.c_str());
-		//renameFile(armeabiSo, classesSo);
+		if (!isNative && arch == "armeabi") {
+			string classesSo = classes + "/libmosync.so";
+			string armeabiSo = armeabi + "/libmosync.so";
+			remove(armeabiSo.c_str());
+			renameFile(armeabiSo, classesSo);
+		}
 
-		for (size_t i = 0; i < modules.size(); i++) {
-			string module = modules[i];
+		for (size_t j = 0; j < modules.size(); j++) {
+			string module = modules[j];
 			string nativeLib = findNativeLibrary(s, modules, module, arch);
 			if (!nativeLib.empty()) {
 				string dstLibDir = addlib + "/" + arch + "/";

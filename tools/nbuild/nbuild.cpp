@@ -1,11 +1,16 @@
 #include "nbuild.h"
 #include "android.h"
 #include "args.h"
+#include "fileset.h"
 
 #include <string>
 #include <map>
+#include <set>
+#include <vector>
 #include <stdio.h>
 #include <stdlib.h>
+
+#include <filelist/filelist.h>
 
 using namespace std;
 
@@ -27,6 +32,35 @@ string require(Arguments* args, string key) {
 		exit(1);
 	}
 	return value;
+}
+
+vector<string> getSourceFiles(Arguments* args) {
+	string projectPath = require(args, PROJECT_DIR);
+
+	vector<string> argList = args->getPrefixedList("-", false);
+
+	FileSetList fs;
+
+	vector<string> cExtensions;
+	cExtensions.push_back("cpp");
+	cExtensions.push_back("c");
+	ExtensionFileFilter filter(cExtensions);
+
+	for (size_t i = 0; i < argList.size(); i++) {
+		string arg = argList[i];
+		bool isExclusion = arg[0] == 'X';
+		if (arg[0] == 'S' || isExclusion) {
+			string file = arg.substr(1);
+			string fullPath = projectPath + "/" + file;
+			// TODO: delete dfs!
+			DefaultFileSet* dfs = new DefaultFileSet(projectPath, file, isExclusion, &filter);
+			fs.addFileSet(dfs);
+		}
+	}
+
+	vector<string> result;
+	fs.listFiles(result);
+	return result;
 }
 
 const char* mosyncdir() {
@@ -71,4 +105,9 @@ void sh(const char* cmd, bool hideOutput, const char* shownCmdLine) {
 		printf("System error %i\n", res);
 		exit(res);
 	}
+}
+
+void error(const char* msg, int errorCode) {
+	puts(msg);
+	exit(errorCode);
 }

@@ -21,13 +21,18 @@ int buildAndroidNative(Arguments* params) {
 int generateMakefile(Arguments* params) {
 	string outputDir = require(params, OUTPUT_DIR);
 
-	vector<string> modules;
-	split(modules, params->getSwitchValue(MODULE_LIST), ",");
-	if (modules.empty()) {
+	vector<string> bootstrapModules;
+	split(bootstrapModules, params->getSwitchValue(BOOT_MODULE_LIST), ",");
+	if (bootstrapModules.empty()) {
 		// Default
-		modules.push_back("mosync");
-		modules.push_back("mosynclib");
+		bootstrapModules.push_back("mosync");
+		bootstrapModules.push_back("mosynclib");
+	} else if (bootstrapModules[0] == ".") {
+		bootstrapModules.clear();
 	}
+
+	vector<string> modules(bootstrapModules);
+	split(modules, params->getSwitchValue(MODULE_LIST), ",");
 
 	DefaultContext rootCtx(NULL);
 	for (size_t i = 0; i < modules.size(); i++) {
@@ -36,7 +41,16 @@ int generateMakefile(Arguments* params) {
 		moduleCtx->setParameter("name", modules[i]);
 		rootCtx.addChild("modules", moduleCtx);
 	}
-	rootCtx.setParameter("source-files", require(params, SOURCE_FILES));
+	vector<string> sourceFiles = getSourceFiles(params);
+	string sourceFileList;
+	for (size_t i = 0; i < sourceFiles.size(); i++) {
+		sourceFileList += sourceFiles[i];
+		sourceFileList += " ";
+	}
+	if (sourceFiles.empty()) {
+		error("No source files!\n");
+	}
+	rootCtx.setParameter("source-files", sourceFileList);
 	vector<string> compilerDefines = params->getPrefixedList(MACRO_DEFINES, true);
 	rootCtx.setParameter("compiler-defines", delim(compilerDefines, " "));
 	rootCtx.setParameter("additional-compiler-switches", params->getSwitchValue("--compiler-switches"));
@@ -102,7 +116,7 @@ int executeNdkBuild(Arguments* params) {
 	cmd << arg("MOSYNC_PLATFORM=" + params->getSwitchValue("--platform")) << " ";
 	cmd << arg("MOSYNC_LIB_VARIANT=" + libVariant) << " ";
 	cmd << arg("NDK_PROJECT_PATH=.") << " ";
-	cmd << arg("APP_ABI=all") << " ";
+	cmd << arg("APP_ABI=armeabi armeabi-v7a") << " ";
 	// TODO: Un-hardcode
 	cmd << arg("APP_PLATFORM=android-14");
 
