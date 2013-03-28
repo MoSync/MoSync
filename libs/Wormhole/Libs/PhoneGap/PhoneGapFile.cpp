@@ -35,6 +35,24 @@ MA 02110-1301, USA.
 #include "PhoneGapMessageHandler.h"
 #include "MimeTypes.h"
 
+#if defined(MOSYNC_NATIVE) && defined(ANDROID)
+// WHAT IS GOING ON HERE!?
+int stricmp(const char *s1, const char *s2)
+{
+        char f, l;
+
+        do
+        {
+                f = ((*s1 <= 'Z') && (*s1 >= 'A')) ? *s1 + 'a' - 'A' : *s1;
+                l = ((*s2 <= 'Z') && (*s2 >= 'A')) ? *s2 + 'a' - 'A' : *s2;
+                s1++;
+                s2++;
+        } while ((f) && (f == l));
+
+        return (int) (f - l);
+}
+#endif
+
 // File error codes.
 #define FILEERROR_NOT_FOUND_ERR "1"
 #define FILEERROR_SECURITY_ERR "2"
