@@ -48,6 +48,11 @@ private:
 	MAUtil::String mValue;
 };
 
+#if defined(MOSYNC_NATIVE) && defined(ANDROID)
+// Yep, compilation issue needs forward decl
+class HttpQueryDownloader;
+#endif
+
 // performs a get query with the provided fields.
 
 class HttpQueryDownloadListener {
