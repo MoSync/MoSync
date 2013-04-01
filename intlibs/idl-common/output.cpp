@@ -539,7 +539,6 @@ static void streamTypedefs(ostream& stream, const vector<Typedef>& typedefs, int
 		"#else\n"
 		"typedef unsigned short wchar;\n"
 		"#endif // MOSYNC_NATIVE && ANDROID\n"
-		"typedef unsigned short wchar;\n"
 		"#endif	//MAPIP\n"
 		"#endif	//_WCHAR_DEFINED\n"
 		"\n"

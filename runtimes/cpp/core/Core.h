@@ -41,8 +41,11 @@ typedef union _LARGE_INTEGER {
 
 #ifdef _android
 #include <jni.h>
-
+#ifndef MOSYNC_NATIVE
 typedef unsigned short wchar;
+#else
+typedef wchar_t wchar;
+#endif
 #endif
 
 #define USE_VAR_INT
