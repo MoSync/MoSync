@@ -1535,7 +1535,9 @@ const wchar* GetValidatedWStr(const VMCore* core, int address) {
 	return CORE->GetValidatedWStr(address);
 }
 
+#ifdef MOSYNC_NATIVE
 static char* gCustomEventPointer[512];
+#endif
 
 void* GetCustomEventPointer(VMCore* core) {
 #ifndef MOSYNC_NATIVE
