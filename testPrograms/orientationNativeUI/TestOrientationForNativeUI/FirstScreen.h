@@ -75,11 +75,6 @@ namespace OrientationTest
 		void createMainLayout();
 
 		/**
-		 * Gets the current orientation as a string
-		 */
-		MAUtil::String getOrientationString();
-
-		/**
 		 * Create a new horizontal layout.
 		 * Will contain a label and a check box.
 		 * @param label The given label.
@@ -87,7 +82,6 @@ namespace OrientationTest
 		 * @return The new created horizontal layout.
 		 */
 		HorizontalLayout* createRow(Label* label, CheckBox* checkBox);
-
 		ListViewItem* createItem(Label* label, CheckBox* checkBox);
 
 		// From ButtonListener
