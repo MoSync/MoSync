@@ -28,6 +28,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <sstream>
 #include <errno.h>
 #include <vector>
+#include <cstring>
 #include <stdlib.h>
 
 using namespace std;
