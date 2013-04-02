@@ -87,8 +87,13 @@ namespace MAUtil {
 	}
 
 	String longToString(long long l, int base) {
+#ifndef lltoa
+		// This is just plain stupid.
+		return integerToString((int) l, base);
+#else
 		char cBuf[128];
         return lltoa(l, cBuf, base);
+#endif
 	}
 
 	long long stringToLong(const String &s, int base) {
