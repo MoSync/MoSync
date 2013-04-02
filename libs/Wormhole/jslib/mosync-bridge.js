@@ -80,25 +80,273 @@ var mosync = (function()
 		mosync.bridge.send(["MoSync", "SendToBackground"]);
 	};
 
-	mosync.SCREEN_ORIENTATION_DYNAMIC = "dynamic";
-	mosync.SCREEN_ORIENTATION_PORTRAIT = "portrait";
-	mosync.SCREEN_ORIENTATION_LANDSCAPE = "landscape";
+	/**
+	 * The device is in portrait mode, with the device held upright and the home button on
+	 * the bottom.
+	 */
+	mosync.SCREEN_ORIENTATION_PORTRAIT_UP = 0x000001;
 
 	/**
-	 * Set the screen orientation of the device.
+	 * The device is in portrait mode but upside down, with the device held upright and the
+	 * home button at the top.
+	 * Note: not available on Windows Phone.
+	 */
+	mosync.SCREEN_ORIENTATION_PORTRAIT_UPSIDE_DOWN = 0x000002;
+
+	/**
+	 * The device is in portrait mode, based on sensor. Depending on user rotation,
+	 * #mosync.MA_SCREEN_ORIENTATION_PORTRAIT_UP or #mosync.MA_SCREEN_ORIENTATION_PORTRAIT_UPSIDE_DOWN will be used.
+	 * Value equals: #mosync.MA_SCREEN_ORIENTATION_PORTRAIT_UP | #mosync.MA_SCREEN_ORIENTATION_PORTRAIT_UPSIDE_DOWN.
+	 */
+	mosync.SCREEN_ORIENTATION_PORTRAIT = 0x000003;
+
+	/**
+	 * The device is in landscape mode, with the device held upright and the home button on
+	 * the left side.
+	 */
+	mosync.SCREEN_ORIENTATION_LANDSCAPE_LEFT = 0x000004;
+
+	/**
+	 * The device is in landscape mode, with the device held upright and the home button on
+	 * the right side.
+	 */
+	mosync.SCREEN_ORIENTATION_LANDSCAPE_RIGHT = 0x000008;
+
+	/**
+	 * The device is in landscape mode, based on sensor. Depending on user rotation,
+	 * #mosync.SCREEN_ORIENTATION_LANDSCAPE_LEFT or #mosync.SCREEN_ORIENTATION_LANDSCAPE_RIGHT will be used.
+	 */
+	mosync.SCREEN_ORIENTATION_LANDSCAPE = 0x00000C;
+
+	/**
+	 * Screen orientation is based on device sensor.
+	 * Value equals: #mosync.SCREEN_ORIENTATION_PORTRAIT| #mosync.SCREEN_ORIENTATION_LANDSCAPE.
+	 */
+	mosync.SCREEN_ORIENTATION_DYNAMIC = 0x00000F;
+
+	/**
+	 * Set the supported screen orientation of the device.
 	 *
 	 * @param orientation The desired screen orientation.
-	 * Can be one of the constants:
-	 *   mosync.SCREEN\_ORIENTATION\_DYNAMIC
-	 *   mosync.SCREEN\_ORIENTATION\_PORTRAIT
-	 *   mosync.SCREEN\_ORIENTATION\_LANDSCAPE
+	 * The bitmask can be created using the following constants:
+	 *   mosync.SCREEN_ORIENTATION_PORTRAIT_UP
+	 *   mosync.SCREEN_ORIENTATION_PORTRAIT_UPSIDE_DOWN
+	 *   mosync.SCREEN_ORIENTATION_PORTRAIT
+	 *   mosync.SCREEN_ORIENTATION_LANDSCAPE_LEFT
+	 *   mosync.SCREEN_ORIENTATION_LANDSCAPE_RIGHT
+	 *   mosync.SCREEN_ORIENTATION_LANDSCAPE
+	 *   mosync.SCREEN_ORIENTATION_DYNAMIC
 	 *
 	 * Example:
-	 *   mosync.app.screenSetOrientation(mosync.SCREEN\_ORIENTATION\_DYNAMIC);
+	 *   mosync.app.screenSetOrientation(mosync.SCREEN_ORIENTATION_DYNAMIC);
 	 */
 	mosync.app.screenSetOrientation = function(orientation)
 	{
-		mosync.bridge.send(["MoSync", "ScreenSetOrientation", orientation]);
+		mosync.bridge.send(["MoSyncOrientation", "ScreenSetOrientation", orientation]);
+	};
+
+	/**
+	 * An array containing all callback functions that are registered for getting
+	 * supported orientations.
+	 * @private
+	 */
+	var orientationCallBackArray = [];
+
+	/**
+	 * Get the supported screen orientations of the device.
+	 *
+	 * @param callback
+	 *            Function to call with supported orientations flag as param.
+	 *            The flag is created using the following constants:
+	 *   			mosync.SCREEN_ORIENTATION_PORTRAIT_UP
+	 *   			mosync.SCREEN_ORIENTATION_PORTRAIT_UPSIDE_DOWN
+	 *   			mosync.SCREEN_ORIENTATION_PORTRAIT
+	 *   			mosync.SCREEN_ORIENTATION_LANDSCAPE_LEFT
+	 *   			mosync.SCREEN_ORIENTATION_LANDSCAPE_RIGHT
+	 *   			mosync.SCREEN_ORIENTATION_LANDSCAPE
+	 *   			mosync.SCREEN_ORIENTATION_DYNAMIC
+	 *
+	 * Example:
+	 *   mosync.app.screenGetOrientation(
+	 *		function(supportedOrientations)
+	 *		{
+	 *			mosync.log("supported orietations bitmask is " + supportedOrientations);
+	 *		});
+	 */
+	mosync.app.screenGetOrientation = function(callback)
+	{
+		mosync.bridge.send(["MoSyncOrientation", "ScreenGetOrientation"]);
+		orientationCallBackArray.push(callback);
+	};
+
+	/**
+	 * Get the current screen orientation of the device.
+	 *
+	 * @param callback
+	 *            Function to call with current orientation flag as param.
+	 *            The flag can be one of the following constants:
+	 *   			mosync.SCREEN_ORIENTATION_PORTRAIT_UP
+	 *   			mosync.SCREEN_ORIENTATION_PORTRAIT_UPSIDE_DOWN
+	 *   			mosync.SCREEN_ORIENTATION_LANDSCAPE_LEFT
+	 *   			mosync.SCREEN_ORIENTATION_LANDSCAPE_RIGHT
+	 *
+	 * Example:
+	 *   mosync.app.screenGetCurrentOrientation(
+	 *		function(currentOrientation)
+	 *		{
+	 *			mosync.log("current orientation is " + currentOrientation);
+	 *		});
+	 */
+	mosync.app.screenGetCurrentOrientation = function(callback)
+	{
+		mosync.bridge.send(["MoSyncOrientation", "ScreenGetCurrentOrientation"]);
+		orientationCallBackArray.push(callback);
+	};
+
+	/**
+	* Callback function for getting the supported orientations.
+	* Registered functions will be called.
+	* @param supportedOrientations
+	*            Supported screen orientations of the device.
+	* @private
+	*/
+	mosync.app.supportedOrientation = function(orientation)
+	{
+		var callback = orientationCallBackArray.shift();
+		callback(orientation);
+	};
+
+	/**
+	* Callback function for getting the current orientation.
+	* Registered functions will be called.
+	* @param currentOrientation
+	*            Supported screen orientations of the device.
+	* @private
+	*/
+	mosync.app.currentOrientation = function(currentOrientation)
+	{
+		var callback = orientationCallBackArray.shift();
+		callback(currentOrientation);
+	};
+
+	/**
+	 * An array containing all callback functions that are registered to be notified
+	 * when the orientation did change.
+	 * @private
+	 */
+	var orientationDidChangeArray = [];
+
+	/**
+	 * Register a function to be called when the orientation has changed.
+	 *
+	 * @param callback
+	 *            Function to call with current orientation flag as param when the
+	 *            orientation has changed.
+	 *            The flag can be one of the following constants:
+	 *   			mosync.SCREEN_ORIENTATION_PORTRAIT_UP
+	 *   			mosync.SCREEN_ORIENTATION_PORTRAIT_UPSIDE_DOWN
+	 *   			mosync.SCREEN_ORIENTATION_LANDSCAPE_LEFT
+	 *   			mosync.SCREEN_ORIENTATION_LANDSCAPE_RIGHT
+	 *
+	 * Example:
+	 *   mosync.app.registerOrientationDidChange(
+	 *		function(currentOrientation)
+	 *		{
+	 *			mosync.log("orientation changed to " + currentOrientation);
+	 *		});
+	 */
+	mosync.app.registerOrientationDidChange = function(callback)
+	{
+		orientationDidChangeArray.push(callback);
+		if (orientationDidChangeArray.length == 1)
+		{
+			mosync.bridge.send(["MoSyncOrientation", "RegisterOrientationDidChange"]);
+		}
+	};
+
+	/**
+	 * Unregister a function from calling when the orientation has changed.
+	 */
+	mosync.app.unregisterOrientationDidChange = function(callback)
+	{
+		var index = orientationDidChangeArray.indexOf(callback);
+		orientationDidChangeArray.splice(index, 1);
+		if (orientationDidChangeArray.length == 0)
+		{
+			mosync.bridge.send(["MoSyncOrientation", "UnregisterOrientationDidChange"]);
+		}
+	};
+
+	/**
+	* Callback function for notifying registered functions when orientation did change.
+	* @param newOrientation
+	*            Current screen orientation of the device.
+	* @private
+	*/
+	mosync.app.orientationDidChange = function(newOrientation)
+	{
+		for(var i = 0; i < orientationDidChangeArray.length; i++)
+		{
+			var callback = orientationDidChangeArray[i];
+			callback(newOrientation);
+		}
+	};
+
+	/**
+	 * An array containing all callback functions that are registered to be notified
+	 * before the orientation is changed.
+	 * @private
+	 */
+	var orientationWillChangeArray = [];
+
+	/**
+	 * Register a function to be called before the orientation is changed.
+	 * Only on iOS platform.
+	 *
+	 * @param callback
+	 *            Function to call before the orientation is changed.
+	 *
+	 * Example:
+	 *   mosync.app.registerOrientationWillChange(
+	 *		function()
+	 *		{
+	 *			mosync.log("orientation will be changed");
+	 *		});
+	 */
+	mosync.app.registerOrientationWillChange = function(callback)
+	{
+		orientationWillChangeArray.push(callback);
+		if (orientationWillChangeArray.length == 1)
+		{
+			mosync.bridge.send(["MoSyncOrientation", "RegisterOrientationWillChange"]);
+		}
+	};
+
+	/**
+	 * Unregister a function to be called before the orientation is changed.
+	 * Only on iOS platform.
+	 */
+	mosync.app.unregisterOrientationWillChange = function(callback)
+	{
+		var index = orientationWillChangeArray.indexOf(callback);
+		orientationWillChangeArray.splice(index, 1);
+		if (orientationWillChangeArray.length == 0)
+		{
+			mosync.bridge.send(["MoSyncOrientation", "UnregisterOrientationWillChange"]);
+		}
+	};
+
+	/**
+	* Callback function for notifying registered functions before the orientation is changed.
+	* @private
+	*/
+	mosync.app.orientationWillChange = function()
+	{
+		for(var i = 0; i < orientationWillChangeArray.length; i++)
+		{
+			var callback = orientationWillChangeArray[i];
+			callback();
+		}
 	};
 
 	/**

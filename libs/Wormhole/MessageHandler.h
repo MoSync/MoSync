@@ -37,6 +37,7 @@ MA 02110-1301, USA.
 #include "Libs/PhoneGap/PhoneGapMessageHandler.h"
 #include "Libs/JSNativeUI/NativeUIMessageHandler.h"
 #include "Libs/JSNativeUI/ResourceMessageHandler.h"
+#include "OrientationMessageHandler.h"
 #include "Encoder.h"
 #include "FunTable.h"
 
@@ -199,11 +200,6 @@ public:
 		Wormhole::HybridMoblet* moblet);
 
 	/**
-	 * Sets the screen orientation of the device.
-	 */
-	virtual void screenSetOrientation(const char* orientation);
-
-	/**
 	 * Invoked from JavaScript using the "CallJS" protocol
 	 * to evaluate a script in a WebView.
 	 */
@@ -232,6 +228,11 @@ protected:
 	 * command -> fun
 	 */
 	Wormhole::FunTable mFunTable;
+
+	/**
+	 * Handler for orientation related messages.
+	 */
+	Wormhole::OrientationMessageHandler* mOrientationMessageHandler;
 };
 
 } // namespace
