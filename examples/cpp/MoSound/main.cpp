@@ -21,7 +21,7 @@ MA 02110-1301, USA.
 * This file contains the main example program source.
 *
 * Shows how to use the sound api. This example shows
-* how to play and loop a sound once.
+* how to play a sound once.
 *
 * \author Niklas Nummelin
 *
@@ -29,6 +29,9 @@ MA 02110-1301, USA.
 #include <ma.h>
 #include <conprint.h>
 #include "MAHeaders.h"
+
+// Set to zero to play only the WAV file.
+#define DO_MP3 1
 
 extern "C" {
 /**
@@ -38,13 +41,31 @@ int MAMain() GCCATTRIB(noreturn);
 int MAMain()
 {
 	//MAExtent e = maGetScrSize();
+	int res;
 
 	/// play R_MOSO sound
-	if ( maSoundPlay(R_MOSO_MP3, 0, maGetDataSize(R_MOSO_MP3)) < 0 )
+#if DO_MP3
+	res = maSoundPlay(R_MOSO_MP3, 0, maGetDataSize(R_MOSO_MP3));
+	if(res >= 0)
 	{
-		maSoundPlay(R_MOSO_WAV, 0, maGetDataSize(R_MOSO_WAV));
+		printf("MP3 succeeded.\n");
 	}
-
+	else
+#endif
+	{
+#if DO_MP3
+		printf("MP3 failed %i\n", res);
+#endif
+		res = maSoundPlay(R_MOSO_WAV, 0, maGetDataSize(R_MOSO_WAV));
+		if(res >= 0)
+		{
+			printf("WAV succeeded.\n");
+		}
+		else
+		{
+			printf("WAV failed %i\n", res);
+		}
+	}
 	printf("Press 0/RSK to exit.");
 
 	while(1) {

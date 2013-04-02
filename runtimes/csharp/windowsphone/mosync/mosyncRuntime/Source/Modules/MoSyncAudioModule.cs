@@ -22,16 +22,8 @@ using System.Threading;
 
 namespace MoSync
 {
-    public class AudioModule : IIoctlModule, ISyscallModule
+    public class AudioModule : IIoctlModule
     {
-		public void Init(Syscalls syscalls, Core core, Runtime runtime)
-		{
-			syscalls.maSoundPlay = delegate(int _sound_res, int _offset, int _size)
-			{
-				// not implemented, but I don't wanna throw exceptions.
-				return -1;
-			};
-		}
 
 		List<IAudioData> mAudioData = new List<IAudioData>();
 		List<IAudioInstance> mAudioInstances = new List<IAudioInstance>();

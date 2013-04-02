@@ -231,18 +231,6 @@ namespace MoSync
                 }
                 return false;
             }
-
-            /**
-            * MAW_TAB_SCREEN_IS_SHOWN property implementation.
-            */
-            [MoSyncWidgetProperty(MoSync.Constants.MAW_TAB_SCREEN_IS_SHOWN)]
-            public String IsShown
-            {
-                get
-                {
-                    return isScreenShown().ToString().ToLower();
-                }
-            }
         }
     }
 }

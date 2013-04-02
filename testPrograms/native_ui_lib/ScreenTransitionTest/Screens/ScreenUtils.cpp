@@ -133,7 +133,7 @@ namespace ScreenTransitionTest {
 			mScreenTransitionNameMap.insert(MAW_TRANSITION_TYPE_FADE_OUT, "Fade out");
 			mScreenTransitionNameMap.insert(MAW_TRANSITION_TYPE_SWIVEL_IN, "Swivel in");
 			mScreenTransitionNameMap.insert(MAW_TRANSITION_TYPE_SWIVEL_OUT, "Swivel out");
-			mScreenTransitionNameMap.insert(MAW_TRANSITION_TYPE_TURNSTILE_FOREWARD, "Turnstile foreward");
+			mScreenTransitionNameMap.insert(MAW_TRANSITION_TYPE_TURNSTILE_FORWARD, "Turnstile forward");
 			mScreenTransitionNameMap.insert(MAW_TRANSITION_TYPE_TURNSTILE_BACKWARD, "Turnstile backward");
 			// Fill symmetric map
 			mScreenTransitionSymmetricMap.insert(MAW_TRANSITION_TYPE_NONE, MAW_TRANSITION_TYPE_NONE);
@@ -147,8 +147,8 @@ namespace ScreenTransitionTest {
 			mScreenTransitionSymmetricMap.insert(MAW_TRANSITION_TYPE_FADE_OUT, MAW_TRANSITION_TYPE_FADE_IN);
 			mScreenTransitionSymmetricMap.insert(MAW_TRANSITION_TYPE_SWIVEL_IN, MAW_TRANSITION_TYPE_SWIVEL_OUT);
 			mScreenTransitionSymmetricMap.insert(MAW_TRANSITION_TYPE_SWIVEL_OUT, MAW_TRANSITION_TYPE_SWIVEL_IN);
-			mScreenTransitionSymmetricMap.insert(MAW_TRANSITION_TYPE_TURNSTILE_FOREWARD, MAW_TRANSITION_TYPE_TURNSTILE_BACKWARD);
-			mScreenTransitionSymmetricMap.insert(MAW_TRANSITION_TYPE_TURNSTILE_BACKWARD, MAW_TRANSITION_TYPE_TURNSTILE_FOREWARD);
+			mScreenTransitionSymmetricMap.insert(MAW_TRANSITION_TYPE_TURNSTILE_FORWARD, MAW_TRANSITION_TYPE_TURNSTILE_BACKWARD);
+			mScreenTransitionSymmetricMap.insert(MAW_TRANSITION_TYPE_TURNSTILE_BACKWARD, MAW_TRANSITION_TYPE_TURNSTILE_FORWARD);
 		}
 
 		/**

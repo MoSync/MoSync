@@ -150,6 +150,11 @@ namespace MoSync
                 return (that != null) && (this.Title.Equals(that.Title));
             }
 
+						public override int GetHashCode()
+						{
+							return this.Title.GetHashCode();
+						}
+
             #region Properties
 
             public string Title
