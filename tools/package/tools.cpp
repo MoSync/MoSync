@@ -19,6 +19,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "tools.h"
 #include "package.h"
 #include <string>
+#include <cstring>
 #include <sstream>
 #include <ostream>
 
