@@ -5,7 +5,11 @@
  *      Author: mattias
  */
 
+#include <cstring>
+#include <string>
+
 #include <filelist/filelist.h>
+
 #include "util.h"
 #include "fileset.h"
 
