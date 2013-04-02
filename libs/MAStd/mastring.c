@@ -682,6 +682,7 @@ end:
 
 #endif
 
+#ifdef MOSYNC_NATIVE
 int stricmp(const char *s1, const char *s2)
 {
         char f, l;
@@ -709,6 +710,7 @@ int strnicmp(const char *s1, const char *s2, size_t count)
 
         return f - l;
 }
+#endif
 
 //****************************************
 //		UTF8 functions
