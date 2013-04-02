@@ -7,6 +7,7 @@
 
 #include <cstring>
 #include <string>
+#include <algorithm>
 
 #include <filelist/filelist.h>
 
