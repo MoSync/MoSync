@@ -29,6 +29,7 @@ MA 02110-1301, USA.
 #include <maxtoa.h>
 #include "PhoneGapMessageHandler.h"
 #include "PhoneGapCamera.h"
+#include "PhoneGapCameraUtil.h"
 
 #define MYLOG(s) maWriteLog(s, strlen(s))
 
@@ -133,51 +134,37 @@ namespace Wormhole
 			{
 				if (destinationType == DATA_URL)
 				{
-					int dataSize = maGetDataSize(event.imagePickerItem);
+					String encodedData = readAndBase64EncodeData(event.imagePickerItem);
+					lprintfln("Encoding ended. Encoded data size: %d", encodedData.size());
 
-					lprintfln("Data size: %d", dataSize);
-
-					char* imageData = new char[dataSize];
-					memset(imageData, 0, dataSize);
-					maReadData(event.imagePickerItem, imageData, 0, dataSize);
-
-					lprintfln("Data: %s", imageData);
-
-				/*	char messageBuffer[dataSize+2];
-					sprintf(
-						messageBuffer,
-						"\"%s\"",
-						imageData);
-
-					mMessageHandler->callSuccess(
-							mCaptureCallBack,
-							PHONEGAP_CALLBACK_STATUS_OK,
-							messageBuffer,
-							false); */
-
-					delete imageData;
-
-					//sprintf(dataBuffer, "%s", (char*)imageData);
-
-					if (imageData != NULL)
+					if (encodedData.size() > 0)
 					{
-					/*	mMessageHandler->callSuccess(
+					/*	int dataSize = maGetDataSize(event.imagePickerItem);
+						char messageBuffer[dataSize+2];
+						sprintf(
+							messageBuffer,
+							"\"%s\"",
+							encodedData.c_str()); */
+
+						lprintfln("Sending success callback...");
+						mMessageHandler->callSuccess(
 							mCaptureCallBack,
 							PHONEGAP_CALLBACK_STATUS_OK,
-							(char*)imageData,
-							false); */
+							encodedData.c_str(),
+							false);
 					}
 					else
 					{
 						mMessageHandler->callError(
 							mCaptureCallBack,
 							PHONEGAP_CALLBACK_STATUS_ERROR,
-							"{\"code\":\"INVALID_DESTINATION_TYPE\"}",
+							"{\"code\":\"INVALID_IMAGE_DATA\"}",
 							false);
 					}
 				}
 				else
 				{
+					// destinationType == FILE_URI
 					mMessageHandler->callError(
 						mCaptureCallBack,
 						PHONEGAP_CALLBACK_STATUS_ERROR,
@@ -207,9 +194,9 @@ namespace Wormhole
 	 * @param correctOrientation Rotate the image to correct for the orientation of the device during capture.
 	 * @param savePhotoToAlbum Rotate the image to correct for the orientation of the device during capture.
 	 */
-	 void PhoneGapCamera::startCamera(int quality, int targetWidth, int targetHeight,
-					EncodingType encodingType, bool correctOrientation, bool savePhotoToAlbum)
-	 {
+	void PhoneGapCamera::startCamera(int quality, int targetWidth, int targetHeight,
+		EncodingType encodingType, bool correctOrientation, bool savePhotoToAlbum)
+	{
 
-	 }
+	}
 } // namespace
