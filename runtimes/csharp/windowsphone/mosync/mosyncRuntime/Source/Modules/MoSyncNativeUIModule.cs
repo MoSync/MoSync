@@ -1,6 +1,7 @@
 using System;
 using Microsoft.Phone.Controls;
 using System.Collections.Generic;
+using System.Windows;
 
 namespace MoSync
 {
@@ -48,6 +49,62 @@ namespace MoSync
         {
             mNativeUI = new NativeUI.NativeUIWindowsPhone();
             //mWidgets.Add(null); // why?
+
+            /**
+             * This will add a OrientationChanged event handler to the Application.Current.RootVisual, this is application wide.
+             */
+            (Application.Current.RootVisual as Microsoft.Phone.Controls.PhoneApplicationFrame).OrientationChanged += delegate(object from, Microsoft.Phone.Controls.OrientationChangedEventArgs args)
+            {
+                PhoneApplicationPage currentPage = (((PhoneApplicationFrame)Application.Current.RootVisual).Content as PhoneApplicationPage);
+
+                // change the current page in regard to the current orientation.
+                if (args.Orientation == PageOrientation.Landscape |
+                    args.Orientation == PageOrientation.LandscapeLeft |
+                    args.Orientation == PageOrientation.LandscapeRight)
+                {
+                    currentPage.Height = Application.Current.Host.Content.ActualWidth;
+                    currentPage.Width = Application.Current.Host.Content.ActualHeight;
+                }
+                else if (args.Orientation == PageOrientation.Portrait |
+                         args.Orientation == PageOrientation.PortraitDown |
+                         args.Orientation == PageOrientation.PortraitUp)
+                {
+                    currentPage.Height = Application.Current.Host.Content.ActualHeight;
+                    currentPage.Width = Application.Current.Host.Content.ActualWidth;
+                }
+
+                int mosyncScreenOrientation = MoSync.Constants.MA_SCREEN_ORIENTATION_PORTRAIT_UP;
+                switch (currentPage.Orientation)
+                {
+                    case PageOrientation.Landscape:
+                        mosyncScreenOrientation = MoSync.Constants.MA_SCREEN_ORIENTATION_LANDSCAPE;
+                        break;
+                    case PageOrientation.LandscapeLeft:
+                        mosyncScreenOrientation = MoSync.Constants.MA_SCREEN_ORIENTATION_LANDSCAPE_LEFT;
+                        break;
+                    case PageOrientation.LandscapeRight:
+                        mosyncScreenOrientation = MoSync.Constants.MA_SCREEN_ORIENTATION_LANDSCAPE_RIGHT;
+                        break;
+                    case PageOrientation.Portrait:
+                        mosyncScreenOrientation = MoSync.Constants.MA_SCREEN_ORIENTATION_PORTRAIT_UP;
+                        break;
+                    case PageOrientation.PortraitDown:
+                        mosyncScreenOrientation = MoSync.Constants.MA_SCREEN_ORIENTATION_PORTRAIT_UPSIDE_DOWN;
+                        break;
+                    case PageOrientation.PortraitUp:
+                        mosyncScreenOrientation = MoSync.Constants.MA_SCREEN_ORIENTATION_PORTRAIT_UP;
+                        break;
+                }
+
+                // Post event handled Moblet.
+                Memory eventData = new Memory(8);
+                const int MAEventData_eventType = 0;
+                const int MAEventData_orientation = 4;
+                eventData.WriteInt32(MAEventData_eventType, MoSync.Constants.EVENT_TYPE_ORIENTATION_DID_CHANGE);
+                eventData.WriteInt32(MAEventData_orientation, mosyncScreenOrientation);
+
+                runtime.PostEvent(new Event(eventData));
+            };
 
             ioctls.maWidgetCreate = delegate(int _widgetType)
             {

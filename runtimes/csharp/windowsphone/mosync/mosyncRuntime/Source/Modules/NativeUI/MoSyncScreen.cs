@@ -154,54 +154,8 @@ namespace MoSync
                         break;
                 }
 
-                // Post events handled by both NativeUI and Moblet.
-                postOrientationEvents(mosyncScreenOrientation);
-            }
-
-            /**
-             * Post orientation changed events for:
-             *  - the moblet, in case no NativeUI is available.
-             *  - the parent tab or stack screen, as well as all the child screens.
-             *  - the screen itself, in case it is not parented by a stack or a tab.
-             */
-            public void postOrientationEvents(int orientation)
-            {
-                // Post events handled by both NativeUI and Moblet.
-                postOrientationEvent(orientation);
-
-                // Post orientation changed event for screen widget, and in the case
-                // of StackScreen or TabScreen notifiy all the children as well.
-                if (this.GetParent() is TabScreen || this.GetParent() is StackScreen)
-                {
-                    Screen parentScreen = (this.GetParent() as Screen);
-                    for (int i = 0; i < parentScreen.getChildCount(); i++)
-                    {
-                        postScreenOrientationEvent(
-                                orientation,
-                                parentScreen.getChild(i).GetHandle());
-                    }
-                    // Finally send event for the parent tab/stack screen.
-                    postScreenOrientationEvent(orientation, parentScreen.GetHandle());
-                }
-                else
-                {
-                    postScreenOrientationEvent(orientation, mHandle);
-                }
-            }
-
-            /**
-             * Post orientation event to MoSync queue.
-             * @param orientation The new orientation.
-             */
-            protected void postOrientationEvent(int orientation)
-            {
-                Memory eventData = new Memory(8);
-                const int MAEventData_eventType = 0;
-                const int MAEventData_orientation = 4;
-                eventData.WriteInt32(MAEventData_eventType, MoSync.Constants.EVENT_TYPE_ORIENTATION_DID_CHANGE);
-                eventData.WriteInt32(MAEventData_orientation, orientation);
-
-                mRuntime.PostEvent(new Event(eventData));
+                // Post events handled by the NativeUI library.
+                postScreenOrientationEvent(mosyncScreenOrientation, mHandle);
             }
 
             /**
