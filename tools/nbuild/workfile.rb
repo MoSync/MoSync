@@ -7,6 +7,9 @@ work.instance_eval do
 	@SOURCES = ["."]
 	@NAME = "nbuild"
 	@TARGETDIR = "."
+	@SPECIFIC_CFLAGS = {
+        "nbuild.cpp" => " -Wno-missing-noreturn",
+	}
     if ( HOST == :darwin )
         # Objective-C++ compiler
         @EXTRA_CPPFLAGS = " -Wno-shadow -Wno-missing-prototypes"
