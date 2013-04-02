@@ -15,6 +15,7 @@
 #include "fileset.h"
 
 using namespace std;
+
 string normalizeFileName(string& filename) {
 	string copy(filename);
 	toSlashes(copy);

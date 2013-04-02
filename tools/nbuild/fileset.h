@@ -63,6 +63,7 @@ public:
 	virtual void listFiles(vector<string>& files);
 };
 
+string normalizeFileName(string& filename);
 
 
 #endif /* FILESET_H_ */
