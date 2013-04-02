@@ -39,8 +39,10 @@ MA 02110-1301, USA.
 #include <MAUtil/HashMap.h>
 #include <MAUtil/String.h>
 #include <mavsprintf.h>
-#ifdef MOSYNC_NATIVE
+#if defined(MOSYNC_NATIVE) || defined(NEWLIB)
 #include <ctype.h>
+#else
+#include <mactype.h>
 #endif
 #include "../../MessageStream.h"
 
