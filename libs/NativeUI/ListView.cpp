@@ -24,6 +24,7 @@ MA 02110-1301, USA.
  * For list view events see ListViewListener.
  */
 
+#include <mavsprintf.h>
 #include "ListView.h"
 #include "ListViewSection.h"
 #include "ListViewListener.h"
@@ -399,6 +400,12 @@ namespace NativeUI
 			this->getChild(sectionClickedIndex);
 		ListViewItem* listViewItem = (ListViewItem*)
 			listViewSection->getChild(itemIndexWithinSection);
+
+        if (listViewItem == NULL)
+        {
+            listViewItem = (ListViewItem*)this->getChild(itemIndexWithinSection);
+            lprintfln("notifyListenersClickedDeleteButton, item was NULL: section: %d, secionIndex: %d, after: 0x%08x", sectionClickedIndex, itemIndexWithinSection, (unsigned int)listViewItem);
+        }
 
 		for (int i = 0; i < mListViewListeners.size(); i++)
 		{
