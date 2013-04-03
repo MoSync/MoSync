@@ -23,4 +23,13 @@
     UIInterfaceOrientation mOrientation;
 }
 
+/**
+ * Send a widget orientation changed event.
+ * @param eventType One of the following:
+ * MAW_EVENT_SCREEN_ORIENTATION_WILL_CHANGE or MAW_EVENT_SCREEN_ORIENTATION_DID_CHANGE.
+ * screenHandle The handle of the screen that will get notified.
+ * @param screenOrientation The new orientation value for the specified screen.
+ */
+- (void)sendOrientationEvent:(const int)eventType forWidget:(const int)screenHandle toValue:(const int)screenOrientation;
+
 @end

@@ -268,4 +268,8 @@
  */
 - (NSUInteger)indexOfChild:(IWidget*)child;
 
+/**
+ * Get the children array list.
+ */
+- (NSMutableArray*) getChildren;
 @end
