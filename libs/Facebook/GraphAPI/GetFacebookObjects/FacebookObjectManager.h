@@ -100,7 +100,7 @@ public:
 					strFields += ",";
 				}
 			}
-			messageBodyParams["fields="] = strFields;
+			messageBodyParams["fields"] = strFields;
 		}
 		mFacebook->requestGraph(RETRIEVE_DATA, JSON, id, HTTP_GET, messageBodyParams);
 	}
@@ -120,7 +120,8 @@ private:
 	 * RetrieveDataListener overwrite
 	 * It is called when a Facebook object is retrieved from server
 	 */
-	virtual void jsonDataReceived(YAJLDom::Value* result, const MAUtil::String &connType)
+	virtual void jsonDataReceived(YAJLDom::Value* result, const MAUtil::String &connType,
+const MAUtil::String &objectId)
 	{
 		parseJSONData(mFacebookObject, result);
 		mListener->facebookObjectReceived(mFacebookObject);
