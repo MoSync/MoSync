@@ -57,8 +57,8 @@ void FacebookObjectManager::setListener(ObjectRequestListener *listener)
  */
 void FacebookObjectManager::facebookObjectReceived(const Album &object)
 {
-	delete mRequester;
 	mListener->facebookObjectReceived(object);
+	delete mRequester;
 }
 
 /*
@@ -66,8 +66,8 @@ void FacebookObjectManager::facebookObjectReceived(const Album &object)
  */
 void FacebookObjectManager::facebookObjectReceived(const Checkin &object)
 {
-	delete mRequester;
 	mListener->facebookObjectReceived(object);
+	delete mRequester;
 }
 
 /*
@@ -75,8 +75,8 @@ void FacebookObjectManager::facebookObjectReceived(const Checkin &object)
  */
 void FacebookObjectManager::facebookObjectReceived(const Comment &object)
 {
-	delete mRequester;
 	mListener->facebookObjectReceived(object);
+	delete mRequester;
 }
 
 /*
@@ -84,8 +84,8 @@ void FacebookObjectManager::facebookObjectReceived(const Comment &object)
  */
 void FacebookObjectManager::facebookObjectReceived(const Event &object)
 {
-	delete mRequester;
 	mListener->facebookObjectReceived(object);
+	delete mRequester;
 }
 
 /*
@@ -93,8 +93,8 @@ void FacebookObjectManager::facebookObjectReceived(const Event &object)
  */
 void FacebookObjectManager::facebookObjectReceived(const FriendList &object)
 {
-	delete mRequester;
 	mListener->facebookObjectReceived(object);
+	delete mRequester;
 }
 
 /*
@@ -102,8 +102,8 @@ void FacebookObjectManager::facebookObjectReceived(const FriendList &object)
  */
 void FacebookObjectManager::facebookObjectReceived(const Group &object)
 {
-	delete mRequester;
 	mListener->facebookObjectReceived(object);
+	delete mRequester;
 }
 
 /*
@@ -111,8 +111,8 @@ void FacebookObjectManager::facebookObjectReceived(const Group &object)
  */
 void FacebookObjectManager::facebookObjectReceived(const Link &object)
 {
-	delete mRequester;
 	mListener->facebookObjectReceived(object);
+	delete mRequester;
 }
 
 /*
@@ -120,8 +120,8 @@ void FacebookObjectManager::facebookObjectReceived(const Link &object)
  */
 void FacebookObjectManager::facebookObjectReceived(const Note &object)
 {
-	delete mRequester;
 	mListener->facebookObjectReceived(object);
+	delete mRequester;
 }
 
 /*
@@ -129,8 +129,8 @@ void FacebookObjectManager::facebookObjectReceived(const Note &object)
  */
 void FacebookObjectManager::facebookObjectReceived(const Photo &object)
 {
-	delete mRequester;
 	mListener->facebookObjectReceived(object);
+	delete mRequester;
 }
 
 /*
@@ -138,8 +138,8 @@ void FacebookObjectManager::facebookObjectReceived(const Photo &object)
  */
 void FacebookObjectManager::facebookObjectReceived(const Page &object)
 {
-	delete mRequester;
 	mListener->facebookObjectReceived(object);
+	delete mRequester;
 }
 
 /*
@@ -147,8 +147,8 @@ void FacebookObjectManager::facebookObjectReceived(const Page &object)
  */
 void FacebookObjectManager::facebookObjectReceived(const Post &object)
 {
-	delete mRequester;
 	mListener->facebookObjectReceived(object);
+	delete mRequester;
 }
 
 /*
@@ -156,8 +156,8 @@ void FacebookObjectManager::facebookObjectReceived(const Post &object)
  */
 void FacebookObjectManager::facebookObjectReceived(const StausMessage &object)
 {
-	delete mRequester;
 	mListener->facebookObjectReceived(object);
+	delete mRequester;
 }
 
 /*
@@ -165,16 +165,16 @@ void FacebookObjectManager::facebookObjectReceived(const StausMessage &object)
  */
 void FacebookObjectManager::facebookObjectReceived(const User &object)
 {
-	delete mRequester;
 	mListener->facebookObjectReceived(object);
+	delete mRequester;
 }
 /*
  * called when an Video object was received
  */
 void FacebookObjectManager::facebookObjectReceived(const Video &object)
 {
-	delete mRequester;
 	mListener->facebookObjectReceived(object);
+	delete mRequester;
 }
 
 /*
@@ -184,6 +184,6 @@ void FacebookObjectManager::facebookObjectReceived(const Video &object)
  */
 void FacebookObjectManager::queryError(int code, const MAUtil::String &path)
 {
-	delete mRequester;
 	mListener->queryError(code, path);
+	delete mRequester;
 }
