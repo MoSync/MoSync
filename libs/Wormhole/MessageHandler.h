@@ -37,7 +37,7 @@ MA 02110-1301, USA.
 #include "Libs/PhoneGap/PhoneGapMessageHandler.h"
 #include "Libs/JSNativeUI/NativeUIMessageHandler.h"
 #include "Libs/JSNativeUI/ResourceMessageHandler.h"
-#include "OrientationMessageHandler.h"
+#include "Libs/Orientation/OrientationMessageHandler.h"
 #include "Encoder.h"
 #include "FunTable.h"
 

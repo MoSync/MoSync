@@ -26,7 +26,7 @@ MA 02110-1301, USA.
 #include <NativeUI/WebView.h>
 #include <MAUtil/util.h>
 
-#include "MessageStream.h"
+#include "../../MessageStream.h"
 #include "OrientationMessageHandler.h"
 
 namespace Wormhole
@@ -141,7 +141,7 @@ namespace Wormhole
 	{
 		int supportedOrientations = maScreenGetSupportedOrientations();
 		char buffer[1024];
-		sprintf(buffer, "try{mosync.app.supportedOrientation(%d)}catch(e){}",
+		sprintf(buffer, "try{mosync.app.fireSupportedOrientations(%d)}catch(e){}",
 				supportedOrientations);
 		mWebView.callJS(buffer);
 	}
@@ -154,7 +154,7 @@ namespace Wormhole
 	{
 		int currentOrientation = maScreenGetCurrentOrientation();
 		char buffer[1024];
-		sprintf(buffer, "try{mosync.app.currentOrientation(%d)}catch(e){}",
+		sprintf(buffer, "try{mosync.app.fireCurrentOrientation(%d)}catch(e){}",
 				currentOrientation);
 		mWebView.callJS(buffer);
 	}

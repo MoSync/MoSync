@@ -125,6 +125,24 @@ var mosync = (function()
 	mosync.SCREEN_ORIENTATION_DYNAMIC = 0x00000F;
 
 	/**
+	 * Set the screen orientation of the device.
+	 * @deprecated Use #mosync.app.screenSetSupportedOrientations().
+	 *
+	 * @param orientation The desired screen orientation.
+	 * Can be one of the constants:
+	 *   mosync.SCREEN_ORIENTATION_DYNAMIC
+	 *   mosync.SCREEN_ORIENTATION_PORTRAIT
+	 *   mosync.SCREEN_ORIENTATION_LANDSCAPE
+	 *
+	 * Example:
+	 *   mosync.app.screenSetOrientation(mosync.SCREEN_ORIENTATION_DYNAMIC);
+	 */
+	mosync.app.screenSetOrientation = function(orientation)
+	{
+		mosync.app.screenSetSupportedOrientations(orientation);
+	};
+
+	/**
 	 * Set the supported screen orientation of the device.
 	 *
 	 * @param orientation The desired screen orientation.
@@ -138,9 +156,9 @@ var mosync = (function()
 	 *   mosync.SCREEN_ORIENTATION_DYNAMIC
 	 *
 	 * Example:
-	 *   mosync.app.screenSetOrientation(mosync.SCREEN_ORIENTATION_DYNAMIC);
+	 *   mosync.app.screenSetSupportedOrientations(mosync.SCREEN_ORIENTATION_DYNAMIC);
 	 */
-	mosync.app.screenSetOrientation = function(orientation)
+	mosync.app.screenSetSupportedOrientations = function(orientation)
 	{
 		mosync.bridge.send(["MoSyncOrientation", "ScreenSetOrientation", orientation]);
 	};
@@ -167,13 +185,13 @@ var mosync = (function()
 	 *   			mosync.SCREEN_ORIENTATION_DYNAMIC
 	 *
 	 * Example:
-	 *   mosync.app.screenGetOrientation(
+	 *   mosync.app.screenGetSupportedOrientations(
 	 *		function(supportedOrientations)
 	 *		{
 	 *			mosync.log("supported orietations bitmask is " + supportedOrientations);
 	 *		});
 	 */
-	mosync.app.screenGetOrientation = function(callback)
+	mosync.app.screenGetSupportedOrientations = function(callback)
 	{
 		mosync.bridge.send(["MoSyncOrientation", "ScreenGetOrientation"]);
 		orientationCallBackArray.push(callback);
@@ -210,7 +228,7 @@ var mosync = (function()
 	*            Supported screen orientations of the device.
 	* @private
 	*/
-	mosync.app.supportedOrientation = function(orientation)
+	mosync.app.fireSupportedOrientations = function(orientation)
 	{
 		var callback = orientationCallBackArray.shift();
 		callback(orientation);
@@ -223,7 +241,7 @@ var mosync = (function()
 	*            Supported screen orientations of the device.
 	* @private
 	*/
-	mosync.app.currentOrientation = function(currentOrientation)
+	mosync.app.fireCurrentOrientation = function(currentOrientation)
 	{
 		var callback = orientationCallBackArray.shift();
 		callback(currentOrientation);
