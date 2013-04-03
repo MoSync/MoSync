@@ -161,6 +161,7 @@ namespace MoSync
             /**
              * Post screen orientation event to MoSync queue.
              * @param orientation The new screen orientation.
+             * @param widgetHandle The handle of the screen that will receive the event.
              */
             protected void postScreenOrientationEvent(int orientation, int widgetHandle)
             {

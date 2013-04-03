@@ -57,22 +57,6 @@ namespace MoSync
             {
                 PhoneApplicationPage currentPage = (((PhoneApplicationFrame)Application.Current.RootVisual).Content as PhoneApplicationPage);
 
-                // change the current page in regard to the current orientation.
-                if (args.Orientation == PageOrientation.Landscape |
-                    args.Orientation == PageOrientation.LandscapeLeft |
-                    args.Orientation == PageOrientation.LandscapeRight)
-                {
-                    currentPage.Height = Application.Current.Host.Content.ActualWidth;
-                    currentPage.Width = Application.Current.Host.Content.ActualHeight;
-                }
-                else if (args.Orientation == PageOrientation.Portrait |
-                         args.Orientation == PageOrientation.PortraitDown |
-                         args.Orientation == PageOrientation.PortraitUp)
-                {
-                    currentPage.Height = Application.Current.Host.Content.ActualHeight;
-                    currentPage.Width = Application.Current.Host.Content.ActualWidth;
-                }
-
                 int mosyncScreenOrientation = MoSync.Constants.MA_SCREEN_ORIENTATION_PORTRAIT_UP;
                 switch (currentPage.Orientation)
                 {
