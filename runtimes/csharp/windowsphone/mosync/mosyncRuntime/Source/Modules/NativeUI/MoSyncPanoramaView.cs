@@ -249,18 +249,6 @@ namespace MoSync
             {
                 return getSelectedScreen().Equals(child);
             }
-
-            /**
-            * MAW_PANORAMA_VIEW_IS_SHOWN property implementation.
-            */
-            [MoSyncWidgetProperty(MoSync.Constants.MAW_PANORAMA_VIEW_IS_SHOWN)]
-            public String IsShown
-            {
-                get
-                {
-                    return isScreenShown().ToString().ToLower();
-                }
-            }
         }
     }
 }
