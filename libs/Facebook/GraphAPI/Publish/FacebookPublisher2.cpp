@@ -466,7 +466,7 @@ void FacebookPublisher2::publishingResponseReceived(const MAUtil::String  &data,
  * @param path - contains the id of the object on which the publish request was made and the request name.
  * 				  e.g: id/feed, id/likes
  */
-void FacebookPublisher2::FacebookPublisher2::queryError(int code, const MAUtil::String &path)
+void FacebookPublisher2::queryError(int code, const MAUtil::String &path)
 {
 	mListener->queryError(code, path);
 }

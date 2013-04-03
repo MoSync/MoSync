@@ -38,6 +38,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #import "MoSyncFonts.h"
 #import "MoSyncLocation.h"
 #import "PimSyscall.h"
+#import "MoSyncUIAlertView.h"
 
 #define NETWORKING_H
 #include "networking.h"
@@ -178,6 +179,7 @@ namespace Base {
 		MANetworkClose();
         MAPimClose();
         MAAudioClose();
+		[MoSyncUIAlertView deleteInstance];
 	}
 
 
@@ -455,6 +457,6 @@ void MoSyncErrorExit(int errorCode)
 
 	gRunning = false;
 	logWithNSLog(buffer, strlen(buffer));
-	MoSyncUIUtils_ShowMessageBox(nil, buffer, true);
+	MoSyncUIUtils_ShowAlert(NULL, buffer, "OK", NULL, NULL);
 	pthread_exit(NULL);
 }
