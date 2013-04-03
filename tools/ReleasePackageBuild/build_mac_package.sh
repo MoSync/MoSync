@@ -28,7 +28,7 @@ BRANCH=$(echo "master")
 # Get the date
 DATE=`date "+%y%m%d-%H%M"`
 
-MOSYNCDIR=$(echo "$script_dir/mac_package_resources/MoSync-pkg/$BUILDTYPE")
+export MOSYNCDIR=$(echo "$script_dir/mac_package_resources/MoSync-pkg/$BUILDTYPE")
 SOURCEDIR=$(echo "$script_dir/../../")
 ECLIPSEDIR=$(echo "$script_dir/../../../Eclipse")
 RESULTDIR=$(echo "$script_dir/../../../result")
@@ -39,7 +39,7 @@ echo "----------------------------------------------------"
 echo "Creating package hierarchy"
 echo "----------------------------------------------------"
 
-mkdir $MOSYNCDIR/
+mkdir $MOSYNCDIR
 mkdir $MOSYNCDIR/bin
 mkdir $MOSYNCDIR/bin/freetype219
 mkdir $MOSYNCDIR/bin/freetype219/lib
@@ -57,10 +57,10 @@ mkdir $RESULTDIR
 
 # If no hash is specified, guess it
 cd $SOURCEDIR
-MOSYNC_HASH=`/usr/local/git/bin/git rev-parse HEAD`
+MOSYNC_HASH=`/usr/bin/git rev-parse HEAD`
 # Guess Eclipse hash
 cd $ECLIPSEDIR
-ECLIPSE_HASH=`/usr/local/git/bin/git rev-parse HEAD`
+ECLIPSE_HASH=`/usr/bin/git rev-parse HEAD`
 # Generate a version text file
 cd $SOURCEDIR
 /usr/bin/touch VERSION.TXT
@@ -86,7 +86,7 @@ echo "----------------------------------------------------"
 echo "Generating splash screen"
 echo "----------------------------------------------------"
 cd $SOURCEDIR/tools/SplashScreenGenerator
-if /opt/local/bin/ruby main.rb "$BUILDTYPE build $DATE" $MOSYNC_HASH $ECLIPSE_HASH; then
+if /usr/bin/ruby main.rb "$BUILDTYPE build $DATE" $MOSYNC_HASH $ECLIPSE_HASH; then
 	cp splash.bmp $ECLIPSEDIR/com.mobilesorcery.sdk.product/
 	cp about.png $ECLIPSEDIR/com.mobilesorcery.sdk.product/
 else
@@ -103,7 +103,7 @@ echo "----------------------------------------------------"
 
 cd $ECLIPSEDIR/com.mobilesorcery.sdk.product/build
 cp $script_dir/target-platform.zip $ECLIPSEDIR/com.mobilesorcery.sdk.product/build/
-ant release 
+ant release
 
 #
 # Build MoSync
@@ -130,33 +130,33 @@ cp /sw/lib/libSDL-1.2.0.dylib $MOSYNCDIR/bin || error_exit "Could not copy dynam
 cp /sw/lib/libSDL_image-1.2.0.dylib $MOSYNCDIR/bin || error_exit "Could not copy dynamic library."
 cp /sw/lib/libSDL_sound-1.0.1.dylib $MOSYNCDIR/bin || error_exit "Could not copy dynamic library."
 cp /sw/lib/libSDL_ttf-2.0.0.dylib $MOSYNCDIR/bin || error_exit "Could not copy dynamic library."
-cp /sw/lib/libcrypto.0.9.8.dylib $MOSYNCDIR/bin || error_exit "Could not copy dynamic library."
+cp /sw/lib/libcrypto.1.0.0.dylib $MOSYNCDIR/bin || error_exit "Could not copy dynamic library."
 cp /sw/lib/libexpat.1.dylib $MOSYNCDIR/bin || error_exit "Could not copy dynamic library."
 cp /opt/local/lib/libfreeimage.3.dylib $MOSYNCDIR/bin || error_exit "Could not copy dynamic library."
 cp /sw/lib/freetype219/lib/libfreetype.6.dylib $MOSYNCDIR/bin/freetype219/lib || error_exit "Could not copy dynamic library."
 cp /sw/lib/libjpeg.62.dylib $MOSYNCDIR/bin || error_exit "Could not copy dynamic library."
 cp /sw/lib/libmikmod.3.dylib $MOSYNCDIR/bin || error_exit "Could not copy dynamic library."
-cp /sw/lib/libmodplug.0.dylib $MOSYNCDIR/bin || error_exit "Could not copy dynamic library."
+cp /sw/lib/libmodplug.1.dylib $MOSYNCDIR/bin || error_exit "Could not copy dynamic library."
 cp /sw/lib/libogg.0.dylib $MOSYNCDIR/bin || error_exit "Could not copy dynamic library."
-cp /sw/lib/libpng12.0.dylib $MOSYNCDIR/bin || error_exit "Could not copy dynamic library."
+cp /sw/lib/libpng15.15.dylib $MOSYNCDIR/bin || error_exit "Could not copy dynamic library."
 cp /sw/lib/libsmpeg-0.4.0.dylib $MOSYNCDIR/bin || error_exit "Could not copy dynamic library."
-cp /sw/lib/libspeex.1.dylib $MOSYNCDIR/bin || error_exit "Could not copy dynamic library."
-cp /sw/lib/libssl.0.9.8.dylib $MOSYNCDIR/bin || error_exit "Could not copy dynamic library."
+cp /sw/lib/libspeex.dylib $MOSYNCDIR/bin || error_exit "Could not copy dynamic library."
+cp /sw/lib/libssl.1.0.0.dylib $MOSYNCDIR/bin || error_exit "Could not copy dynamic library."
 cp /sw/lib/libtiff.3.dylib $MOSYNCDIR/bin || error_exit "Could not copy dynamic library."
 cp /sw/lib/libvorbis.0.dylib $MOSYNCDIR/bin || error_exit "Could not copy dynamic library."
 cp /sw/lib/libvorbisfile.3.dylib $MOSYNCDIR/bin || error_exit "Could not copy dynamic library."
-cp /opt/local/lib/libz.1.2.4.dylib $MOSYNCDIR/bin || error_exit "Could not copy dynamic library."
+cp /opt/local/lib/libz.1.2.7.dylib $MOSYNCDIR/bin || error_exit "Could not copy dynamic library."
 cp /sw/lib/liblcms.1.dylib $MOSYNCDIR/bin || error_exit "Could not copy dynamic library."
 cp /sw/lib/libjasper.1.dylib $MOSYNCDIR/bin || error_exit "Could not copy dynamic library."
-cp /sw/lib/libdjvulibre.15.dylib $MOSYNCDIR/bin || error_exit "Could not copy dynamic library."
+cp /sw/lib/libdjvulibre.21.dylib $MOSYNCDIR/bin || error_exit "Could not copy dynamic library."
 cp /sw/lib/libbz2.1.dylib $MOSYNCDIR/bin || error_exit "Could not copy dynamic library."
 cp /sw/lib/libiconv.2.dylib $MOSYNCDIR/bin || error_exit "Could not copy dynamic library."
 
-cp /opt/local/lib/libMagickCore.3.dylib $MOSYNCDIR/bin/ImageMagick/ || error_exit "Could not copy dynamic library."
-cp /opt/local/lib/libMagickWand.3.dylib $MOSYNCDIR/bin/ImageMagick/ || error_exit "Could not copy dynamic library."
-cp /opt/local/lib/liblcms.1.dylib $MOSYNCDIR/bin/ImageMagick/ || error_exit "Could not copy dynamic library."
-cp /opt/local/lib/libtiff.3.dylib $MOSYNCDIR/bin/ImageMagick/ || error_exit "Could not copy dynamic library."
-cp /opt/local/lib/libjpeg.8.dylib $MOSYNCDIR/bin/ImageMagick/ || error_exit "Could not copy dynamic library."
+cp /opt/local/lib/libMagickCore.6.dylib $MOSYNCDIR/bin/ImageMagick/ || error_exit "Could not copy dynamic library."
+cp /opt/local/lib/libMagickWand.6.dylib $MOSYNCDIR/bin/ImageMagick/ || error_exit "Could not copy dynamic library."
+cp /opt/local/lib/liblcms2.2.dylib $MOSYNCDIR/bin/ImageMagick/ || error_exit "Could not copy dynamic library."
+cp /opt/local/lib/libtiff.5.dylib $MOSYNCDIR/bin/ImageMagick/ || error_exit "Could not copy dynamic library."
+cp /opt/local/lib/libjpeg.9.dylib $MOSYNCDIR/bin/ImageMagick/ || error_exit "Could not copy dynamic library."
 cp /opt/local/lib/libfontconfig.1.dylib $MOSYNCDIR/bin/ImageMagick/ || error_exit "Could not copy dynamic library."
 cp /opt/local/lib/libfreetype.6.dylib $MOSYNCDIR/bin/ImageMagick/ || error_exit "Could not copy dynamic library."
 cp /opt/local/lib/libiconv.2.dylib $MOSYNCDIR/bin/ImageMagick/ || error_exit "Could not copy dynamic library."
@@ -200,7 +200,7 @@ cp $SOURCEDIR/tools/idl2/output/asm_config.lst $MOSYNCDIR/bin || error_exit "Cou
 cp $SOURCEDIR/build/release/e32hack $MOSYNCDIR/bin || error_exit "Could not copy binary."
 cp -R $SOURCEDIR/tools/ReleasePackageBuild/build_package_tools/osx_bin/android $MOSYNCDIR/bin/ || error_exit "Could not copy binary."
 cp $SOURCEDIR/runtimes/java/platforms/androidJNI/mosync.keystore $MOSYNCDIR/etc || error_exit "Could not copy binary."
-cp $SOURCEDIR/runtimes/java/platforms/androidJNI/AndroidProject/res/drawable/icon.png $MOSYNCDIR/etc || error_exit "Could not copy binary."
+cp $SOURCEDIR/runtimes/java/platforms/androidJNI/AndroidProject/res/drawable/icon.svg $MOSYNCDIR/etc || error_exit "Could not copy binary."
 cp $SOURCEDIR/runtimes/java/platforms/androidJNI/default.icon $MOSYNCDIR/etc || error_exit "Could not copy icon description file."
 
 mv $MOSYNCDIR/bin/moemu $MOSYNCDIR/bin/MoRE
@@ -239,30 +239,30 @@ echo "----------------------------------------------------"
 echo "Copying examples and templates"
 echo "----------------------------------------------------"
 
-cp -R $SOURCEDIR/examples/examples.list $MOSYNCDIR/examples/examples.list || error_exit "Could not copy example."
-cp -R $SOURCEDIR/examples/3dLines $MOSYNCDIR/examples/3dLines || error_exit "Could not copy example."
-cp -R $SOURCEDIR/examples/AdvGraphics $MOSYNCDIR/examples/AdvGraphics || error_exit "Could not copy example."
-cp -R $SOURCEDIR/examples/Moblet/btServer $MOSYNCDIR/examples/Moblet/btServer || error_exit "Could not copy example."
-cp -R $SOURCEDIR/examples/Moblet/Connection $MOSYNCDIR/examples/Moblet/Connection || error_exit "Could not copy example."
-cp -R $SOURCEDIR/examples/Moblet/MoTooth $MOSYNCDIR/examples/Moblet/MoTooth || error_exit "Could not copy example."
-cp -R $SOURCEDIR/examples/debugging $MOSYNCDIR/examples/debugging || error_exit "Could not copy example."
-cp -R $SOURCEDIR/examples/HelloMap $MOSYNCDIR/examples/HelloMap || error_exit "Could not copy example."
-cp -R $SOURCEDIR/examples/Moblet/HelloMoblet $MOSYNCDIR/examples/Moblet/HelloMoblet || error_exit "Could not copy example."
-cp -R $SOURCEDIR/examples/location $MOSYNCDIR/examples/location || error_exit "Could not copy example."
-cp -R $SOURCEDIR/examples/MapDemo $MOSYNCDIR/examples/MapDemo || error_exit "Could not copy example."
-cp -R $SOURCEDIR/examples/MAStx $MOSYNCDIR/examples/MAStx || error_exit "Could not copy example."
-cp -R $SOURCEDIR/examples/MAUI/MAUIex $MOSYNCDIR/examples/MAUI/MAUIex || error_exit "Could not copy example."
-cp -R $SOURCEDIR/examples/MinUI $MOSYNCDIR/examples/MinUI || error_exit "Could not copy example."
-cp -R $SOURCEDIR/examples/MoSketch $MOSYNCDIR/examples/MoSketch || error_exit "Could not copy example."
-cp -R $SOURCEDIR/examples/MoSound $MOSYNCDIR/examples/MoSound || error_exit "Could not copy example."
-cp -R $SOURCEDIR/examples/MoTris $MOSYNCDIR/examples/MoTris || error_exit "Could not copy example."
-cp -R $SOURCEDIR/examples/MoTrix $MOSYNCDIR/examples/MoTrix || error_exit "Could not copy example."
-cp -R $SOURCEDIR/examples/OtaLoad $MOSYNCDIR/examples/OtaLoad || error_exit "Could not copy example."
-cp -R $SOURCEDIR/examples/QuakeMDL $MOSYNCDIR/examples/QuakeMDL || error_exit "Could not copy example."
-cp -R $SOURCEDIR/examples/Moblet/simple $MOSYNCDIR/examples/Moblet/simple || error_exit "Could not copy example."
-cp -R $SOURCEDIR/examples/Moblet/Soap $MOSYNCDIR/examples/Moblet/Soap || error_exit "Could not copy example."
-cp -R $SOURCEDIR/examples/Moblet/Stylus $MOSYNCDIR/examples/Moblet/Stylus || error_exit "Could not copy example."
-cp -R $SOURCEDIR/examples/Moblet/timers $MOSYNCDIR/examples/Moblet/timers || error_exit "Could not copy example."
+#cp -R $SOURCEDIR/examples/examples.list $MOSYNCDIR/examples/examples.list || error_exit "Could not copy example."
+#cp -R $SOURCEDIR/examples/3dLines $MOSYNCDIR/examples/3dLines || error_exit "Could not copy example."
+#cp -R $SOURCEDIR/examples/AdvGraphics $MOSYNCDIR/examples/AdvGraphics || error_exit "Could not copy example."
+#cp -R $SOURCEDIR/examples/Moblet/btServer $MOSYNCDIR/examples/Moblet/btServer || error_exit "Could not copy example."
+#cp -R $SOURCEDIR/examples/Moblet/Connection $MOSYNCDIR/examples/Moblet/Connection || error_exit "Could not copy example."
+#cp -R $SOURCEDIR/examples/Moblet/MoTooth $MOSYNCDIR/examples/Moblet/MoTooth || error_exit "Could not copy example."
+#cp -R $SOURCEDIR/examples/debugging $MOSYNCDIR/examples/debugging || error_exit "Could not copy example."
+#cp -R $SOURCEDIR/examples/HelloMap $MOSYNCDIR/examples/HelloMap || error_exit "Could not copy example."
+#cp -R $SOURCEDIR/examples/Moblet/HelloMoblet $MOSYNCDIR/examples/Moblet/HelloMoblet || error_exit "Could not copy example."
+#cp -R $SOURCEDIR/examples/location $MOSYNCDIR/examples/location || error_exit "Could not copy example."
+#cp -R $SOURCEDIR/examples/MapDemo $MOSYNCDIR/examples/MapDemo || error_exit "Could not copy example."
+#cp -R $SOURCEDIR/examples/MAStx $MOSYNCDIR/examples/MAStx || error_exit "Could not copy example."
+#cp -R $SOURCEDIR/examples/MAUI/MAUIex $MOSYNCDIR/examples/MAUI/MAUIex || error_exit "Could not copy example."
+#cp -R $SOURCEDIR/examples/MinUI $MOSYNCDIR/examples/MinUI || error_exit "Could not copy example."
+#cp -R $SOURCEDIR/examples/MoSketch $MOSYNCDIR/examples/MoSketch || error_exit "Could not copy example."
+#cp -R $SOURCEDIR/examples/MoSound $MOSYNCDIR/examples/MoSound || error_exit "Could not copy example."
+#cp -R $SOURCEDIR/examples/MoTris $MOSYNCDIR/examples/MoTris || error_exit "Could not copy example."
+#cp -R $SOURCEDIR/examples/MoTrix $MOSYNCDIR/examples/MoTrix || error_exit "Could not copy example."
+#cp -R $SOURCEDIR/examples/OtaLoad $MOSYNCDIR/examples/OtaLoad || error_exit "Could not copy example."
+#cp -R $SOURCEDIR/examples/QuakeMDL $MOSYNCDIR/examples/QuakeMDL || error_exit "Could not copy example."
+#cp -R $SOURCEDIR/examples/Moblet/simple $MOSYNCDIR/examples/Moblet/simple || error_exit "Could not copy example."
+#cp -R $SOURCEDIR/examples/Moblet/Soap $MOSYNCDIR/examples/Moblet/Soap || error_exit "Could not copy example."
+#cp -R $SOURCEDIR/examples/Moblet/Stylus $MOSYNCDIR/examples/Moblet/Stylus || error_exit "Could not copy example."
+#cp -R $SOURCEDIR/examples/Moblet/timers $MOSYNCDIR/examples/Moblet/timers || error_exit "Could not copy example."
 
 cp -R $SOURCEDIR/templates $MOSYNCDIR/templates || error_exit "Could not copy templates."
 
@@ -332,7 +332,7 @@ echo "Building the OS X package"
 echo "----------------------------------------------------"
 #/Developer/usr/bin/packagemaker -d $script_dir/mosync.pmdoc -v -i com.mosync -o $script_dir/MoSync-install.r$MOSYNC_HASH.mpkg || error_exit "Could not make OS X package."
 cd $script_dir/mac_package_resources/MoSync-Installer
-/usr/local/bin/freeze -v MoSync-$BUILDTYPE.packproj || error_exit "Could not make OS X package."
+sudo /usr/local/bin/freeze -v MoSync-$BUILDTYPE.packproj || error_exit "Could not make OS X package."
 mv build/MoSync-$BUILDTYPE.pkg build/MoSync-$DATE.pkg || error_exit "Could rename OS X package."
 
 #
