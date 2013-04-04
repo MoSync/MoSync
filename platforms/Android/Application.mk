@@ -9,8 +9,6 @@ MOSYNC_OUTPUT_PATH := $(PROJECT_DIR)/$(MOSYNC_OUTPUT_REL_PATH)/$(MOSYNC_CONFIG)/
 # This may cause issues with gdb, beware!
 NDK_APP_OUT := $(MOSYNC_OUTPUT_PATH)/$(TARGET_ARCH_ABI)
 
-APP_ABI := armeabi armeabi-v7a
-
 APP_BUILD_SCRIPT	:= $(MOSYNC_OUTPUT_PATH)/Android.mk
 APP_PROJECT_PATH	:= $(LOCAL_PATH)
 

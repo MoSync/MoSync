@@ -12,7 +12,10 @@ LOCAL_C_INCLUDES += $(MOSYNC_MODULES)/{{name}}/inc
 {{! Default libs }}
 LOCAL_LDLIBS += -llog -landroid -lEGL -lGLESv1_CM -lGLESv2
 {{! We share includes between native and VM }}
+{{^no-default-includes}}
 LOCAL_C_INCLUDES += $(MOSYNCDIR)/include
+{{/no-default-includes}}
+LOCAL_C_INCLUDES += {{additional-includes}}
 {{! Short wchars -- we may want to remove this soon }}
 LOCAL_CFLAGS    += -fpermissive -O3 -DMOSYNC_NATIVE
 LOCAL_CFLAGS    += {{compiler-defines}}
