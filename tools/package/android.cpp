@@ -337,12 +337,14 @@ static void createSignCmd(ostringstream& cmd, string& keystore, string& alias, s
 static string findNativeLibrary(const SETTINGS& s, vector<string>& modules, string& name, string& arch, bool debug) {
 	vector<string> paths;
 
+	string variantDirName = string("android_") + arch + (debug ? "_debug" : "_release");
+
 	// 1. Look for the one built for this project, if any.
-	string projLibPath = string(s.dst) + "/../libs/" + arch;
+	string projLibPath = string(s.dst) + "/../" + variantDirName;
 	paths.push_back(projLibPath);
 
 	// 2. Look in the lib directory
-	string libPath = mosyncdir() + string("/lib/android_") + arch + (debug ? "_debug" : "_release");
+	string libPath = mosyncdir() + string("/lib/") + variantDirName;
 	paths.push_back(libPath);
 
 	// 3. Look in the modules directory
