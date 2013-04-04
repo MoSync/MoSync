@@ -3,10 +3,13 @@
 #include "nbuild.h"
 #include "mustache/mustache.h"
 #include "profiledb/profiledb.h"
+#include "helpers/mkdir.h"
 #include <map>
 #include <vector>
 #include <sstream>
 #include <fstream>
+
+#define TEMP_BUILD_DIR "--android-build-dir"
 
 using namespace std;
 
@@ -18,8 +21,21 @@ int buildAndroidNative(Arguments* params) {
 	return result;
 }
 
+string getTempBuildDir(Arguments* params) {
+	string tmpDir = params->getSwitchValue(PROJECT_DIR);
+	if (tmpDir.empty()) {
+		tmpDir = params->getSwitchValue(TEMP_BUILD_DIR);
+		toDir(tmpDir);
+	} else {
+		toDir(tmpDir);
+		tmpDir += "temp/";
+	}
+	return tmpDir;
+}
+
 int generateMakefile(Arguments* params) {
-	string outputDir = require(params, OUTPUT_DIR);
+	string tmpBuildDir = getTempBuildDir(params);
+	_mkdir(tmpBuildDir.c_str());
 
 	vector<string> bootstrapModules;
 	split(bootstrapModules, params->getSwitchValue(BOOT_MODULE_LIST), ",");
@@ -54,6 +70,10 @@ int generateMakefile(Arguments* params) {
 	vector<string> compilerDefines = params->getPrefixedList(MACRO_DEFINES, true);
 	rootCtx.setParameter("compiler-defines", delim(compilerDefines, " "));
 	rootCtx.setParameter("additional-compiler-switches", params->getSwitchValue("--compiler-switches"));
+	rootCtx.setParameter("additional-includes", params->getSwitchValue("--additional-includes"));
+	if (bootstrapModules.empty()) {
+		rootCtx.setParameter("no-default-includes", "true");
+	}
 
 	if (params->isFlagSet("--android-static-lib")) {
 		rootCtx.setParameter("static-lib", "true");
@@ -64,7 +84,7 @@ int generateMakefile(Arguments* params) {
 	string androidProfilesDir = db.profilesdir("Android");
 	string androidMkTemplate = androidProfilesDir + "/Android.mk.template";
 
-	string androidMkOutput = outputDir + "/Android.mk";
+	string androidMkOutput = tmpBuildDir + "/Android.mk";
 	ofstream output(androidMkOutput.c_str());
 	if (output.good()) {
 		DefaultParserCallback cb(&rootCtx, output);
@@ -75,7 +95,7 @@ int generateMakefile(Arguments* params) {
 		return 1;
 	}
 
-	string androidAppMkOutput = outputDir + "/Application.mk";
+	string androidAppMkOutput = tmpBuildDir + "/Application.mk";
 	string androidAppMkOriginal = androidProfilesDir + "/Application.mk";
 	copyFile(androidAppMkOutput.c_str(), androidAppMkOriginal.c_str());
 
@@ -89,55 +109,71 @@ int executeNdkBuild(Arguments* params) {
 	split(configNames, require(params, CONFIGURATION), ",");
 	split(libVariants, require(params, BINARY_TYPE), ",");
 
+	string ndkbuildCmd = require(params, "--android-ndkbuild-cmd");
+	string projectPath = require(params, PROJECT_DIR);
+	toSlashes(projectPath);
+	string moduleName = require(params, NAME);
+	string outputDir = require(params, OUTPUT_DIR);
+	toDir(outputDir);
+
 	if (configNames.size() != libVariants.size()) {
 		error("--config and --lib-variants must have a the same number of args", 2);
 	}
 
+	vector<string> archs;
+	archs.push_back("armeabi");
+	archs.push_back("armeabi-v7a");
+
 	for (size_t i = 0; i < configNames.size(); i++) {
-		string configName = configNames[i];
-		string libVariant = libVariants[i];
+		for (size_t j = 0; j < archs.size(); j++) {
+			string configName = configNames[i];
+			string libVariant = libVariants[i];
+			string arch = archs[j];
 
-		string ndkbuildCmd = require(params, "--android-ndkbuild-cmd");
-		string projectPath = require(params, PROJECT_DIR);
-		string moduleName = require(params, NAME);
-		toSlashes(projectPath);
-		string outputDir = require(params, OUTPUT_DIR);
-		toSlashes(outputDir);
+			string tmpBuildDir = getTempBuildDir(params);
 
-		bool isDebug = libVariant == "debug";
-		bool isVerbose = params->isFlagSet(VERBOSE);
-		bool doClean = params->isFlagSet(CLEAN);
+			bool isDebug = libVariant == "debug";
+			bool isVerbose = params->isFlagSet(VERBOSE);
+			bool doClean = params->isFlagSet(CLEAN);
 
-		ostringstream cmd;
-		cmd << file(ndkbuildCmd) << " ";
-		cmd << "-C " << file(outputDir) << " ";
-		if (isVerbose) {
-			cmd << "V=1 ";
+			ostringstream cmd;
+			cmd << file(ndkbuildCmd) << " ";
+			cmd << "-C " << file(tmpBuildDir) << " ";
+			if (isVerbose) {
+				cmd << "V=1 ";
+			}
+			if (isDebug) {
+				cmd << "NDK_DEBUG=1 ";
+			}
+			if (doClean) {
+				cmd << "-B ";
+			}
+			string libDir = string(mosyncdir()) + "/lib";
+			string moduleDir = string(mosyncdir()) + "/modules";
+			toSlashes(moduleDir);
+			string makeFile = tmpBuildDir + "Android.mk";
+			toSlashes(makeFile);
+			cmd << arg("MOSYNC_MODULES=" + moduleDir) << " ";
+			cmd << arg("MOSYNC_LIBS=" + libDir) << " ";
+			cmd << arg("PROJECT_DIR=" + projectPath) << " ";
+			cmd << arg("APP_BUILD_SCRIPT=" + makeFile) << " ";
+			cmd << arg("MOSYNC_CONFIG=" + configName) << " ";
+			cmd << arg("MOSYNC_MODULE_NAME=" + moduleName) << " ";
+			string platform = params->getSwitchValue("--platform");
+			cmd << arg("MOSYNC_PLATFORM=" + platform) << " ";
+			cmd << arg("MOSYNC_LIB_VARIANT=" + libVariant) << " ";
+			cmd << arg("NDK_PROJECT_PATH=.") << " ";
+			cmd << arg("APP_ABI=" + arch) << " ";
+			cmd << arg("APP_PLATFORM=android-" + require(params, "--android-version")) << " ";
+
+			sh(cmd.str().c_str(), !isVerbose);
+
+			string fullOutputDir = outputDir + "android_" + arch + "_" + libVariant + "/";
+			_mkdir(fullOutputDir.c_str());
+			// TODO: Static libs
+			string libFile = tmpBuildDir + "libs/" + arch + "/lib" + moduleName + ".so";
+			copyFile((fullOutputDir + "lib" + moduleName + ".so").c_str(), libFile.c_str());
 		}
-		if (isDebug) {
-			cmd << "NDK_DEBUG=1 ";
-		}
-		if (doClean) {
-			cmd << "-B ";
-		}
-		string libDir = string(mosyncdir()) + "/lib";
-		string moduleDir = string(mosyncdir()) + "/modules";
-		toSlashes(moduleDir);
-		string makeFile = outputDir + "/Android.mk";
-		toSlashes(makeFile);
-		cmd << arg("MOSYNC_MODULES=" + moduleDir) << " ";
-		cmd << arg("MOSYNC_LIBS=" + libDir) << " ";
-		cmd << arg("PROJECT_DIR=" + projectPath) << " ";
-		cmd << arg("APP_BUILD_SCRIPT=" + makeFile) << " ";
-		cmd << arg("MOSYNC_CONFIG=" + configName) << " ";
-		cmd << arg("MOSYNC_MODULE_NAME=" + moduleName) << " ";
-		cmd << arg("MOSYNC_PLATFORM=" + params->getSwitchValue("--platform")) << " ";
-		cmd << arg("MOSYNC_LIB_VARIANT=" + libVariant) << " ";
-		cmd << arg("NDK_PROJECT_PATH=.") << " ";
-		cmd << arg("APP_ABI=armeabi armeabi-v7a") << " ";
-		cmd << arg("APP_PLATFORM=android-" + require(params, "--android-version")) << " ";
-
-		sh(cmd.str().c_str(), !isVerbose);
 	}
 	return 0;
 }
