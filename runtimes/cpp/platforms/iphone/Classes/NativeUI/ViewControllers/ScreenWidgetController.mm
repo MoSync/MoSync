@@ -24,6 +24,18 @@
 #include "Platform.h"
 #include <helpers/CPP_IX_WIDGET.h>
 
+@interface ScreenWidgetController(hidden)
+
+    /**
+     * Send a widget orientation changed event.
+     * @param eventType One of the following:
+     * MAW_EVENT_SCREEN_ORIENTATION_WILL_CHANGE or MAW_EVENT_SCREEN_ORIENTATION_DID_CHANGE.
+     * screenHandle The handle of the screen that will get notified.
+     * @param screenOrientation The new orientation value for the specified screen.
+     */
+    - (void)sendOrientationEvent:(const int)eventType forWidget:(const int)screenHandle toValue:(const int)orientation;
+@end
+
 @implementation ScreenWidgetController
 
 /**
@@ -84,9 +96,11 @@
     if ([currentScreen class] == [StackScreenWidget class] ||
         [currentScreen class] == [TabScreenWidget class])
     {
-        for(IWidget *widgetScreen in [currentScreen getChildren])
+        for(IWidget *widgetScreen in [currentScreen children])
         {
-            [self sendOrientationEvent:MAW_EVENT_SCREEN_ORIENTATION_WILL_CHANGE forWidget:[widgetScreen handle] toValue:0];
+            [self sendOrientationEvent:MAW_EVENT_SCREEN_ORIENTATION_WILL_CHANGE
+                             forWidget:[widgetScreen handle]
+                               toValue:0];
         }
     }
 
@@ -94,9 +108,58 @@
     MAEvent event;
     event.type = EVENT_TYPE_ORIENTATION_WILL_CHANGE;
     Base::gEventQueue.put(event);
-
-    mOrientation = (UIInterfaceOrientation)interfaceOrientation;
 }
+
+/**
+ * Called after the user interface rotates.
+ * @param fromInterfaceOrientation The old orientation of the user interface.
+ */
+- (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation
+{
+    // Get current screen handle.
+    MoSyncUI* mosyncUI = getMoSyncUI();
+    IWidget* currentScreen = [mosyncUI getCurrentlyShownScreen];
+    int screenHandle = [currentScreen handle];
+
+    // Get the current screen orientation.
+    int screenOrientation = [[ScreenOrientation getInstance] getCurrentScreenOrientation];
+
+    // Send MoSync Widget event notifying that the screen changed its orientation.
+    [self sendOrientationEvent:MAW_EVENT_SCREEN_ORIENTATION_DID_CHANGE
+                     forWidget:screenHandle
+                       toValue:screenOrientation];
+
+    // For StackScreen or TabScreen, notify all the children screens as well.
+    if ([currentScreen class] == [StackScreenWidget class] ||
+        [currentScreen class] == [TabScreenWidget class])
+    {
+        for(IWidget *widgetScreen in [currentScreen children])
+        {
+            [self sendOrientationEvent:MAW_EVENT_SCREEN_ORIENTATION_DID_CHANGE
+                             forWidget:[widgetScreen handle]
+                               toValue:screenOrientation];
+        }
+    }
+
+    // Send MoSync event notifying that a screen changed its orientation.
+    MAEvent event;
+    event.type = EVENT_TYPE_ORIENTATION_DID_CHANGE;
+    event.orientation = screenOrientation;
+    Base::gEventQueue.put(event);
+}
+
+- (void)dealloc
+{
+    [super dealloc];
+}
+
+
+@end
+
+/**
+ * Implementation for hidden methods/functions.
+ */
+@implementation ScreenWidgetController(hidden)
 
 /**
  * Send a widget orientation changed event.
@@ -119,60 +182,5 @@
 	event.data = (int)eventData;
 	Base::gEventQueue.put(event);
 }
-
-/**
- * Called after the user interface rotates.
- * @param fromInterfaceOrientation The old orientation of the user interface.
- */
-- (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation
-{
-    // Get current screen handle.
-    MoSyncUI* mosyncUI = getMoSyncUI();
-    IWidget* currentScreen = [mosyncUI getCurrentlyShownScreen];
-    int screenHandle = [currentScreen handle];
-
-    // Convert current screen orientation to MoSync constant.
-    int screenOrientation = MA_SCREEN_ORIENTATION_PORTRAIT_UP;
-    switch(mOrientation)
-    {
-        case UIInterfaceOrientationPortrait:
-            screenOrientation = MA_SCREEN_ORIENTATION_PORTRAIT_UP;
-            break;
-        case UIInterfaceOrientationPortraitUpsideDown:
-            screenOrientation = MA_SCREEN_ORIENTATION_PORTRAIT_UPSIDE_DOWN;
-            break;
-        case UIInterfaceOrientationLandscapeRight:
-            screenOrientation = MA_SCREEN_ORIENTATION_LANDSCAPE_RIGHT;
-            break;
-        case UIInterfaceOrientationLandscapeLeft:
-            screenOrientation = MA_SCREEN_ORIENTATION_LANDSCAPE_LEFT;
-            break;
-    }
-
-    // Send MoSync Widget event notifying that the screen changed its orientation.
-    [self sendOrientationEvent:MAW_EVENT_SCREEN_ORIENTATION_DID_CHANGE forWidget:screenHandle toValue:screenOrientation];
-
-    // For StackScreen or TabScreen, notify all the children screens as well.
-    if ([currentScreen class] == [StackScreenWidget class] ||
-        [currentScreen class] == [TabScreenWidget class])
-    {
-        for(IWidget *widgetScreen in [currentScreen getChildren])
-        {
-            [self sendOrientationEvent:MAW_EVENT_SCREEN_ORIENTATION_DID_CHANGE forWidget:[widgetScreen handle] toValue:screenOrientation];
-        }
-    }
-
-    // Send MoSync event notifying that a screen changed its orientation.
-    MAEvent event;
-    event.type = EVENT_TYPE_ORIENTATION_DID_CHANGE;
-    event.orientation = screenOrientation;
-    Base::gEventQueue.put(event);
-}
-
-- (void)dealloc
-{
-    [super dealloc];
-}
-
 
 @end

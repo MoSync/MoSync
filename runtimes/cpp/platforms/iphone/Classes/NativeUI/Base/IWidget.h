@@ -122,6 +122,11 @@
 @property(nonatomic, setter = setOriginY:, getter = originY) CGFloat originY;
 
 /**
+ * Get the children array list.
+ */
+@property(nonatomic, getter = children, assign ) NSArray* children;
+
+/**
  * Set widget's auto size width and height values.
  * Will trigger a layout.
  * @param autoSizeWidth Width auto size value to set.
@@ -268,8 +273,4 @@
  */
 - (NSUInteger)indexOfChild:(IWidget*)child;
 
-/**
- * Get the children array list.
- */
-- (NSMutableArray*) getChildren;
 @end
