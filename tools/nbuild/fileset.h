@@ -57,6 +57,7 @@ private:
 	void internalListFiles(string& name, bool recursive, vector<string>& files);
 	string getActualName(string& name);
 	bool isRecursive(string& name);
+	bool isWildcard(string& name);
 public:
 	DefaultFileSet(string root, string name, bool isExclusion, FileFilter* filter) :
 		FileSet(filter, isExclusion), mRoot(root), mName(name) { };

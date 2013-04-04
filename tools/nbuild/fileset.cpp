@@ -117,9 +117,20 @@ bool DefaultFileSet::isRecursive(string& name) {
 	return name.size() >= 2 && name.substr(name.size() - 2) == "**";
 }
 
+bool DefaultFileSet::isWildcard(string& name) {
+	return name.size() >= 1 && name.substr(name.size() - 1) == "*";
+}
+
 string DefaultFileSet::getActualName(string& name) {
 	if (isRecursive(name)) {
 		string result = name.substr(0, name.size() - 2);
+		if (result.empty()) {
+			return ".";
+		} else {
+			return result;
+		}
+	} else if (isWildcard(name)) {
+		string result = name.substr(0, name.size() - 1);
 		if (result.empty()) {
 			return ".";
 		} else {
