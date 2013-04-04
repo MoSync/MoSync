@@ -128,17 +128,6 @@ puts "Building native Library\n\n"
 
 cd "AndroidProject"
 
-cd ".."
-# Create temporary directory used for output.
-# First make sure delete it if it exists to make
-# sure we get an empty directory.
-class_dir = "temp/"
-if File.exist? class_dir
-	rm_rf class_dir # delete everything in it and itself
-end
-Dir.mkdir class_dir; # No such directory/file.. create a temp directory
-cd "AndroidProject"
-
 if ENV['OS'] == "Windows_NT"
 	# convert a copy of cygwin.sh to unix-style line endings, so bash can run it.
 	FileUtils.copy_file("#{cpath}/cygwin.sh", "#{cpath}/cygwin_u.sh")
@@ -163,58 +152,7 @@ if ENV['OS'] == "Windows_NT"
 
 	success = sh "#{cygPath}/bash.exe --login -i #{File.join(cpath, "cygwin_u.sh")} #{androidNDKPath} #{androidSDKPath} #{ENV['MOSYNC_SRC']}"
 else
-	success = sh("#{File.join(cpath, "invoke-ndk-build.sh")} #{androidNDKPath} #{androidSDKPath} $MOSYNC_SRC DUMMY=1")
-	puts "Copy Generated Library File\n"
-
-	cd ".."
-
-	# copy the library file
-	FileUtils.copy_file( "#{File.join(cpath, "AndroidProject/libs/armeabi/libmosync.so")}", "temp/libmosync.so")
-
-	# Now build the native one and put it where it should be
-	# However, we should merge this using Fredrik's approach soon.
-	success = sh("#{File.join(cpath, "invoke-ndk-build.sh")} #{androidNDKPath} #{androidSDKPath} $MOSYNC_SRC MOSYNC_NATIVE=TRUE")
-	armeabiDirD = "#{File.join(ENV["MOSYNCDIR"], "/lib/android_armeabi_debug")}"
-	armeabiv7aDirD = "#{File.join(ENV["MOSYNCDIR"], "/lib/android_armeabi-v7a_debug")}"
-	armeabiDirR = "#{File.join(ENV["MOSYNCDIR"], "/lib/android_armeabi_release")}"
-	armeabiv7aDirR = "#{File.join(ENV["MOSYNCDIR"], "/lib/android_armeabi-v7a_release")}"
-
-	# Obviously need to refactor
-	if File.exist? armeabiDirD
-		rm_rf armeabiDirD # delete everything in it and itself
-	end
-	Dir.mkdir(armeabiDirD)
-
-	if File.exist? armeabiv7aDirD
-		rm_rf armeabiv7aDirD # delete everything in it and itself
-	end
-	Dir.mkdir(armeabiv7aDirD)
-
-	if File.exist? armeabiDirR
-		rm_rf armeabiDirR # delete everything in it and itself
-	end
-	Dir.mkdir(armeabiDirR)
-
-	if File.exist? armeabiv7aDirR
-		rm_rf armeabiv7aDirR # delete everything in it and itself
-	end
-	Dir.mkdir(armeabiv7aDirR)
-
-	FileUtils.copy_file( "temp/libmosync.so", "#{File.join(armeabiDirD, "libmosync.so")}")
-	FileUtils.copy_file( "temp/libmosync.so", "#{File.join(armeabiv7aDirD, "libmosync.so")}")
-	FileUtils.copy_file( "temp/libmosync.so", "#{File.join(armeabiDirR, "libmosync.so")}")
-	FileUtils.copy_file( "temp/libmosync.so", "#{File.join(armeabiv7aDirR, "libmosync.so")}")
-
-	# And should definitely not be here either. Also, we should split the lib into several smaller
-	# ones.
-	libfiles = "-SMAStd/maassert.c -SMAStd/mastring.c -SMAStd/mawstring.c -SMAStd/matime.c -SMAStd/mavsprintf.c -SMAStd/mawvsprintf.c -SMAStd/maxtoa.c -SMAMath/MAVector3.c -SAds -SMinUI -SResCompiler -Skazlib -Syasper -SFacebook/** -SNativeUI -SHybris -SMAFS/** -SMAUtil -XMAUtil/DomParser.cpp -SNotification -STestify -SMATest -SPurchase -SWormhole/** -Syajl/** -XMAUtil/GraphicsOpenGL.c -XMAUtil/XMLDataProvider.cpp -XMAUtil/XPathTokenizer.cpp"
-	sh("#{ENV["MOSYNCDIR"]}/bin/nbuild --platform Android --name mosynclib --project #{ENV["MOSYNC_SRC"]}/libs --dst #{ENV["MOSYNC_SRC"]}/libs --config Debug,Release --lib-variant debug,release --android-ndkbuild-cmd #{androidNDKPath}/ndk-build --android-version #{androidVersion} #{libfiles} --verbose --boot-modules mosync")
-	FileUtils.copy_file( "#{ENV["MOSYNC_SRC"]}/libs/libs/armeabi/libmosynclib.so", "#{File.join(armeabiDirD, "libmosynclib.so")}")
-	FileUtils.copy_file( "#{ENV["MOSYNC_SRC"]}/libs/libs/armeabi/libmosynclib.so", "#{File.join(armeabiv7aDirD, "libmosynclib.so")}")
-	FileUtils.copy_file( "#{ENV["MOSYNC_SRC"]}/libs/libs/armeabi/libmosynclib.so", "#{File.join(armeabiDirR, "libmosynclib.so")}")
-	FileUtils.copy_file( "#{ENV["MOSYNC_SRC"]}/libs/libs/armeabi/libmosynclib.so", "#{File.join(armeabiv7aDirR, "libmosynclib.so")}")
-
-	cd "AndroidProject"
+	success = sh("#{File.join(cpath, "invoke-ndk-build.sh")} #{androidNDKPath} #{androidSDKPath} $MOSYNC_SRC");
 end
 
 if (!success)
@@ -224,6 +162,15 @@ end
 puts "Getting into to Android Java runtime root directory."
 cd ".."
 puts pwd
+
+# Create temporary directory used for output.
+# First make sure delete it if it exists to make
+# sure we get an empty directory.
+class_dir = "temp/"
+if File.exist? class_dir
+	rm_rf class_dir # delete everything in it and itself
+end
+Dir.mkdir class_dir; # No such directory/file.. create a temp directory
 
 # Don't build Android package file; it'll be done later, by the packager.
 package_root = "#{cpath}/AndroidProject/"
@@ -242,15 +189,15 @@ sh( "#{File.join(androidSDKTools, "/aapt")} package -f -v " +
 puts "Compiling Java Source Files\n\n"
 
 packages = ["src/com/mosync/java/android/*.java",
-            "src/com/mosync/api/*.java",
-            "src/com/mosync/internal/android/*.java",
-            "src/com/mosync/internal/android/extensions/*.java",
-            "src/com/mosync/internal/generated/*.java",
-            "src/com/mosync/nativeui/core/*.java",
-            "src/com/mosync/nativeui/ui/egl/*.java",
-            "src/com/mosync/nativeui/ui/factories/*.java",
-            "src/com/mosync/nativeui/ui/widgets/*.java",
-            "src/com/mosync/nativeui/util/*.java",
+		"src/com/mosync/api/*.java",
+		"src/com/mosync/internal/android/*.java",
+		"src/com/mosync/internal/android/extensions/*.java",
+		"src/com/mosync/internal/generated/*.java",
+		"src/com/mosync/nativeui/core/*.java",
+		"src/com/mosync/nativeui/ui/egl/*.java",
+		"src/com/mosync/nativeui/ui/factories/*.java",
+		"src/com/mosync/nativeui/ui/widgets/*.java",
+		"src/com/mosync/nativeui/util/*.java",
 		"src/com/mosync/nativeui/util/properties/*.java",
 		"src/com/mosync/pim/*.java",
 		"src/com/mosync/nativeui/ui/custom/*.java",
@@ -262,7 +209,7 @@ packages = ["src/com/mosync/java/android/*.java",
 		"src/com/mosync/internal/android/billing/*.java",
 		"src/com/mosync/internal/android/billing/util/*.java",
 		"gen/com/android/vending/billing/IInAppBillingService.java"
-            ]
+]
 
 # Concatenate each list element with package_root, and flatten the list to a string
 java_files = packages.map { |package| File.join(package_root, package) }.join(" ")
@@ -279,6 +226,10 @@ else
 		"-classpath " +
 		"\"#{File.join(androidSDKPath, "android.jar")}:#{File.join("#{package_root}libs/", "GoogleAdMobAdsSdk.jar")}:#{File.join("#{package_root}libs/","gcm.jar")}\" " + java_files);
 end
+
+puts "Copy Generated Library File\n"
+# copy the library file
+FileUtils.copy_file( "#{File.join(cpath, "AndroidProject/libs/armeabi/libmosync.so")}", "temp/libmosync.so")
 
 puts "Copy external Library Files\n\n"
 FileUtils.copy_file( "#{File.join(cpath, "AndroidProject/libs/GoogleAdMobAdsSdk.jar")}", "temp/GoogleAdMobAdsSdk.jar")
