@@ -48,6 +48,9 @@ namespace MoSync
             //Standard stretch object
             protected System.Windows.Media.Stretch mStretch;
 
+            // Image handle for MAW_IMAGE_IMAGE property.
+            protected int mImageHandle = 0;
+
             // File image path for MAW_IMAGE_PATH property.
             protected String mImagePath;
 
@@ -87,9 +90,14 @@ namespace MoSync
                         //The image standard object gets that as a source
                         mImage.Source = bmpSource;
 
+                        mImageHandle = value;
                         mImagePath = "";
                     }
                     else throw new InvalidPropertyValueException();
+                }
+                get
+                {
+                    return mImageHandle;
                 }
             }
 
@@ -140,9 +148,10 @@ namespace MoSync
                         //Set the newly created bitmap image for the image widget
                         mImage.Source = image;
                         mImagePath = value;
+                        mImageHandle = 0;
                     }
                     //If the file does not exist throw an invalid property value exception
-                    else throw new InvalidPropertyValueException();
+                   else throw new InvalidPropertyValueException();
                 }
                 get
                 {

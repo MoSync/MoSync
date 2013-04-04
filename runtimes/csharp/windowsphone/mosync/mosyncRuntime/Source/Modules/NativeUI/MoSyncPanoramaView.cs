@@ -43,6 +43,9 @@ namespace MoSync
             protected Microsoft.Phone.Controls.Panorama mPanorama;
             private int mCurrentScreenIndex = 0;
 
+            // Image handle for MAW_PANORAMA_VIEW_BACKGROUND_IMAGE property.
+            protected int mBackgroundImageHandle = 0;
+
             /**
              * The constructor
              */
@@ -162,10 +165,16 @@ namespace MoSync
 
                             //The panorama gets the brush as a background
                             mPanorama.Background = imgBrush;
+
+                            mBackgroundImageHandle = val;
                         }
                         else throw new InvalidPropertyValueException();
                     }
                     else throw new InvalidPropertyValueException();
+                }
+                get
+                {
+                    return mBackgroundImageHandle.ToString();
                 }
             }
 

@@ -91,8 +91,14 @@ namespace MoSync
              */
             private const int DifferenceSpacer = 23;
 
+            // Image handle for MAW_IMAGE_BUTTON_IMAGE property.
+            protected int mForegroundImageHandle = 0;
+
             // File image path for MAW_IMAGE_BUTTON_IMAGE_PATH property.
             protected String mForegroundImagePath = "";
+
+            // Image handle for MAW_IMAGE_BUTTON_BACKGROUND_IMAGE property.
+            protected int mBackgroundImageHandle = 0;
 
             // File image path for MAW_IMAGE_BUTTON_BACKGROUND_IMAGE_PATH property.
             protected String mBackgroundImagePath = "";
@@ -372,9 +378,14 @@ namespace MoSync
                             (System.Windows.Media.Imaging.BitmapSource)(res.GetInternalObject());
 
                         mForegroundImage.Source = bmpSource;
+                        mForegroundImageHandle = value;
                         mForegroundImagePath = "";
                     }
                     else throw new InvalidPropertyValueException();
+                }
+                get
+                {
+                    return mForegroundImageHandle;
                 }
             }
 
@@ -395,9 +406,14 @@ namespace MoSync
 
                         mBackgroundImage.Source = bmpSource;
 
+                        mBackgroundImageHandle = value;
                         mBackgroundImagePath = "";
                     }
                     else throw new InvalidPropertyValueException();
+                }
+                get
+                {
+                    return mBackgroundImageHandle;
                 }
             }
 
@@ -464,6 +480,7 @@ namespace MoSync
                         //Set the newly created bitmap image for the image widget
                         mForegroundImage.Source = image;
                         mForegroundImagePath = value;
+                        mForegroundImageHandle = 0;
                     }
                     //If the file does not exist throw an invalid property value exception
                     else throw new InvalidPropertyValueException();
@@ -496,6 +513,7 @@ namespace MoSync
                         //Set the newly created bitmap image for the image widget
                         mBackgroundImage.Source = image;
                         mBackgroundImagePath = value;
+                        mBackgroundImageHandle = 0;
                     }
                     //If the file does not exist throw an invalid property value exception
                     else throw new InvalidPropertyValueException();
