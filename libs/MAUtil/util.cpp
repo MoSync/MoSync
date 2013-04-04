@@ -79,7 +79,11 @@ namespace MAUtil {
 
 	String integerToString(int i, int base) {
 		char cBuf[64];
+#ifdef WINDOWS_PHONE_8
+		return _itoa(i, cBuf, base);
+#else
 		return itoa(i, cBuf, base);
+#endif
 	}
 
 	int stringToInteger(const String &s, int base) {

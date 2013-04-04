@@ -454,22 +454,22 @@ size_t init_memory_pool(size_t mem_pool_size, void *mem_pool)
     tlsf = (tlsf_t *) mem_pool;
     /* Check if already initialised */
     if (tlsf->tlsf_signature == TLSF_SIGNATURE) {
-        mp = mem_pool;
+        mp = (char*)mem_pool;
         b = GET_NEXT_BLOCK(mp, ROUNDUP_SIZE(sizeof(tlsf_t)));
         return b->size & BLOCK_SIZE;
     }
 
-    mp = mem_pool;
+    mp = (char*)mem_pool;
 
     /* Zeroing the memory pool */
-    memset(mem_pool, 0, sizeof(tlsf_t));
+    memset((char*)mem_pool, 0, sizeof(tlsf_t));
 
     tlsf->tlsf_signature = TLSF_SIGNATURE;
 
     TLSF_CREATE_LOCK(&tlsf->lock);
 
     ib = process_area(GET_NEXT_BLOCK
-                      (mem_pool, ROUNDUP_SIZE(sizeof(tlsf_t))), ROUNDDOWN_SIZE(mem_pool_size - sizeof(tlsf_t)));
+                      ((char*)mem_pool, ROUNDUP_SIZE(sizeof(tlsf_t))), ROUNDDOWN_SIZE(mem_pool_size - sizeof(tlsf_t)));
     b = GET_NEXT_BLOCK(ib->ptr.buffer, ib->size & BLOCK_SIZE);
     free_ex(b->ptr.buffer, tlsf);
     tlsf->area_head = (area_info_t *) ib->ptr.buffer;

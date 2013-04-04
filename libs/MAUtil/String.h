@@ -337,7 +337,11 @@ namespace MAUtil {
 			return 11;
 		}
 		inline int transcribe(int t, char* dst) {
+#ifdef WINDOWS_PHONE_8
 			_itoa(t, dst, 10);
+#else
+			itoa(t, dst, 10);
+#endif
 			return strlen(dst);
 		}
 
