@@ -66,7 +66,7 @@ static ScreenOrientation *sharedInstance = nil;
 	self = [super init];
 	if (self)
 	{
-		mAllowedScreenOrientations = MA_SCREEN_ORIENTATION_PORTRAIT;
+		mAllowedScreenOrientations = MA_SCREEN_ORIENTATION_PORTRAIT_UP;
 		mCurrentScreenOrientation = UIInterfaceOrientationPortrait;
 		mSupportedOrientations = UIInterfaceOrientationMaskPortrait;
 	}
@@ -93,7 +93,7 @@ static ScreenOrientation *sharedInstance = nil;
 -(int) setSupportedOrientations:(const int) orientations
 {
     // Check if orientations param is valid.
-    if ( !(orientations & MA_SCREEN_ORIENTATION_PORTRAIT) &&
+    if ( !(orientations & MA_SCREEN_ORIENTATION_PORTRAIT_UP) &&
          !(orientations & MA_SCREEN_ORIENTATION_PORTRAIT_UPSIDE_DOWN) &&
          !(orientations & MA_SCREEN_ORIENTATION_LANDSCAPE_LEFT) &&
          !(orientations & MA_SCREEN_ORIENTATION_LANDSCAPE_RIGHT) )
@@ -105,13 +105,13 @@ static ScreenOrientation *sharedInstance = nil;
         // Store allowed screen orientations.
         mAllowedScreenOrientations = orientations;
 		mSupportedOrientations = 0;
-		mSupportedOrientations |= mAllowedScreenOrientations & MA_SCREEN_ORIENTATION_PORTRAIT ?
+		mSupportedOrientations |= mAllowedScreenOrientations & MA_SCREEN_ORIENTATION_PORTRAIT_UP ?
 		    UIInterfaceOrientationMaskPortrait : mSupportedOrientations;
-		mSupportedOrientations |= mAllowedScreenOrientations & MA_SCREEN_ORIENTATION_PORTRAIT_UPSIDE_DOWN ?
-            UIInterfaceOrientationMaskPortraitUpsideDown : mSupportedOrientations;
+		mSupportedOrientations |= mAllowedScreenOrientations &MA_SCREEN_ORIENTATION_PORTRAIT_UPSIDE_DOWN ?
+					UIInterfaceOrientationMaskPortraitUpsideDown : mSupportedOrientations;
         mSupportedOrientations |= mAllowedScreenOrientations & MA_SCREEN_ORIENTATION_LANDSCAPE_LEFT ?
-            UIInterfaceOrientationMaskLandscapeLeft : mSupportedOrientations;
-		mSupportedOrientations |= mAllowedScreenOrientations & MA_SCREEN_ORIENTATION_LANDSCAPE_RIGHT ?
+				UIInterfaceOrientationMaskLandscapeLeft : mSupportedOrientations;
+		mSupportedOrientations |= mAllowedScreenOrientations & MA_SCREEN_ORIENTATION_LANDSCAPE_RIGHT?
 		    UIInterfaceOrientationMaskLandscapeRight : mSupportedOrientations;
 		return MA_SCREEN_ORIENTATION_RES_OK;
     }
@@ -138,7 +138,7 @@ static ScreenOrientation *sharedInstance = nil;
     switch (orientation)
     {
         case UIInterfaceOrientationPortrait:
-            returnValue = [self isPortraitModeSupported];
+            returnValue = [self isPortraitUpModeSupported];
             break;
         case UIInterfaceOrientationPortraitUpsideDown:
             returnValue = [self isPortraitUpsideDownModeSupported];
@@ -154,12 +154,23 @@ static ScreenOrientation *sharedInstance = nil;
 }
 
 /**
- * Check if portrait mode is supported by the application.
- * @return True if portrait mode is supported by the application, false otherwise.
+ * Check if sensor portrait mode is supported by the application.
+ * The device supports sensor portrait if it supports both portrait up
+ * and portrait upside down modes.
+ * @return True if sensor portrait mode is supported by the application, false otherwise.
  */
 -(bool) isPortraitModeSupported
 {
     return mAllowedScreenOrientations & MA_SCREEN_ORIENTATION_PORTRAIT ? true : false;
+}
+
+/**
+ * Check if portrait up mode is supported by the application.
+ * @return True if portrait up mode is supported by the application, false otherwise.
+ */
+-(bool) isPortraitUpModeSupported
+{
+    return mAllowedScreenOrientations & MA_SCREEN_ORIENTATION_PORTRAIT_UP ? true : false;
 }
 
 /**
@@ -205,18 +216,18 @@ static ScreenOrientation *sharedInstance = nil;
 /**
  * Get current screen orientation.
  * @return One of the next constants:
- * - MA_SCREEN_ORIENTATION_PORTRAIT
+ * - MA_SCREEN_ORIENTATION_PORTRAIT_UP
  * - MA_SCREEN_ORIENTATION_PORTRAIT_UPSIDE_DOWN
  * - MA_SCREEN_ORIENTATION_LANDSCAPE_LEFT
  * - MA_SCREEN_ORIENTATION_LANDSCAPE_RIGHT
  */
 -(int) getCurrentScreenOrientation
 {
-    int returnValue = MA_SCREEN_ORIENTATION_PORTRAIT;
+    int returnValue = MA_SCREEN_ORIENTATION_PORTRAIT_UP;
     switch (mCurrentScreenOrientation)
     {
         case UIInterfaceOrientationPortrait:
-            returnValue = MA_SCREEN_ORIENTATION_PORTRAIT;
+            returnValue = MA_SCREEN_ORIENTATION_PORTRAIT_UP;
             break;
         case UIInterfaceOrientationPortraitUpsideDown:
             returnValue = MA_SCREEN_ORIENTATION_PORTRAIT_UPSIDE_DOWN;

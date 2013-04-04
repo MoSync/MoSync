@@ -19,6 +19,8 @@
 #import "ScreenOrientation.h"
 #import "MoSyncUI.h"
 #import "MoSyncUISyscalls.h"
+#import "../Screens/StackScreenWidget.h"
+#import "../Screens/TabScreenWidget.h"
 #include "Platform.h"
 #include <helpers/CPP_IX_WIDGET.h>
 
@@ -76,11 +78,44 @@
     [currentScreen layout];
 
     // Send MoSync Widget event notifying that the screen will change its orientation.
+    [self sendOrientationEvent:MAW_EVENT_SCREEN_ORIENTATION_WILL_CHANGE forWidget:screenHandle toValue:0];
+
+    // For StackScreen or TabScreen, notify all the children screens as well.
+    if ([currentScreen class] == [StackScreenWidget class] ||
+        [currentScreen class] == [TabScreenWidget class])
+    {
+        for(IWidget *widgetScreen in [currentScreen getChildren])
+        {
+            [self sendOrientationEvent:MAW_EVENT_SCREEN_ORIENTATION_WILL_CHANGE forWidget:[widgetScreen handle] toValue:0];
+        }
+    }
+
+    // Send MoSync event also, to be handled outside the NativeUI.
     MAEvent event;
+    event.type = EVENT_TYPE_ORIENTATION_WILL_CHANGE;
+    Base::gEventQueue.put(event);
+
+    mOrientation = (UIInterfaceOrientation)interfaceOrientation;
+}
+
+/**
+ * Send a widget orientation changed event.
+ * @param eventType One of the following:
+ * MAW_EVENT_SCREEN_ORIENTATION_WILL_CHANGE or MAW_EVENT_SCREEN_ORIENTATION_DID_CHANGE.
+ * screenHandle The handle of the screen that will get notified.
+ * @param screenOrientation The new orientation value for the specified screen.
+ */
+- (void)sendOrientationEvent:(const int)eventType forWidget:(const int)screenHandle toValue:(const int)orientation
+{
+	MAEvent event;
 	event.type = EVENT_TYPE_WIDGET;
 	MAWidgetEventData *eventData = new MAWidgetEventData;
-	eventData->eventType = MAW_EVENT_SCREEN_ORIENTATION_WILL_CHANGE;
+	eventData->eventType = eventType;
 	eventData->widgetHandle = screenHandle;
+    if (eventType == MAW_EVENT_SCREEN_ORIENTATION_DID_CHANGE )
+    {
+        eventData->screenOrientation = orientation;
+    }
 	event.data = (int)eventData;
 	Base::gEventQueue.put(event);
 }
@@ -96,14 +131,42 @@
     IWidget* currentScreen = [mosyncUI getCurrentlyShownScreen];
     int screenHandle = [currentScreen handle];
 
+    // Convert current screen orientation to MoSync constant.
+    int screenOrientation = MA_SCREEN_ORIENTATION_PORTRAIT_UP;
+    switch(mOrientation)
+    {
+        case UIInterfaceOrientationPortrait:
+            screenOrientation = MA_SCREEN_ORIENTATION_PORTRAIT_UP;
+            break;
+        case UIInterfaceOrientationPortraitUpsideDown:
+            screenOrientation = MA_SCREEN_ORIENTATION_PORTRAIT_UPSIDE_DOWN;
+            break;
+        case UIInterfaceOrientationLandscapeRight:
+            screenOrientation = MA_SCREEN_ORIENTATION_LANDSCAPE_RIGHT;
+            break;
+        case UIInterfaceOrientationLandscapeLeft:
+            screenOrientation = MA_SCREEN_ORIENTATION_LANDSCAPE_LEFT;
+            break;
+    }
+
     // Send MoSync Widget event notifying that the screen changed its orientation.
+    [self sendOrientationEvent:MAW_EVENT_SCREEN_ORIENTATION_DID_CHANGE forWidget:screenHandle toValue:screenOrientation];
+
+    // For StackScreen or TabScreen, notify all the children screens as well.
+    if ([currentScreen class] == [StackScreenWidget class] ||
+        [currentScreen class] == [TabScreenWidget class])
+    {
+        for(IWidget *widgetScreen in [currentScreen getChildren])
+        {
+            [self sendOrientationEvent:MAW_EVENT_SCREEN_ORIENTATION_DID_CHANGE forWidget:[widgetScreen handle] toValue:screenOrientation];
+        }
+    }
+
+    // Send MoSync event notifying that a screen changed its orientation.
     MAEvent event;
-	event.type = EVENT_TYPE_WIDGET;
-	MAWidgetEventData *eventData = new MAWidgetEventData;
-	eventData->eventType = MAW_EVENT_SCREEN_ORIENTATION_DID_CHANGE;
-	eventData->widgetHandle = screenHandle;
-	event.data = (int)eventData;
-	Base::gEventQueue.put(event);
+    event.type = EVENT_TYPE_ORIENTATION_DID_CHANGE;
+    event.orientation = screenOrientation;
+    Base::gEventQueue.put(event);
 }
 
 - (void)dealloc
