@@ -42,6 +42,20 @@ namespace Wormhole
 	{
 	private:
 		/**
+		 * Handles a image picker event and sends the appropriate message
+		 * to javascript (success or error).
+		 * @param event The image picker event to be handled.
+		 */
+		void handleImagePickerEvent(const MAEvent &event);
+
+		/**
+		 * Handles a camera event and sends the appropriate message
+		 * to javascript (success or error).
+		 * @param event The camera event to be handled.
+		 */
+		void handleCameraEvent(const MAEvent &event);
+
+		/**
 		 * Starts the camera and according to the properties sent as parameters
 		 * and calls the success/error callback depending on the result.
 		 * @param quality Quality of saved image. Range is [0, 100].
@@ -54,6 +68,23 @@ namespace Wormhole
 		 */
 		void startCamera(int quality, int targetWidth, int targetHeight,
 					EncodingType encodingType, bool correctOrientation, bool savePhotoToAlbum);
+
+		/**
+		 * Opens the image picker with different options, depending on the camera destination tyle (DATA_URL or FILE_URI).
+		 */
+		void openImagePicker();
+
+		/**
+		 * Sends an error message to javascript.
+		 * @param message The error message.
+		 */
+		void callError(const char *message);
+
+		/**
+		 * Sends a success message to javascript.
+		 * @param data The data to be sent together with the message.
+		 */
+		void callSuccess(const char *data);
 	private:
 		/**
 		 *	The destination of the image captured. One of the values: DATA_URL, FILE_URI.
@@ -95,7 +126,7 @@ namespace Wormhole
 		 * Stores the CallbackID of the capture call so the result can be sent
 		 * after receiving the media data
 		 */
-		MAUtil::String mCaptureCallBack;
+		MAUtil::String mCameraCallBack;
 	};
 } // namespace
 
