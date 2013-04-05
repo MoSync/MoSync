@@ -1,5 +1,12 @@
 group CameraAPI "Camera API" {
 
+	constset int MA_CAMERA_SNAPSHOT_ {
+		/**
+		* @brief A constant that represents the maximum snapshot size.
+		*/
+		MAX_SIZE = -1;
+	}
+
 	constset int MA_CAMERA_CONST_ {
 		/**
 		* @brief A constant that represents the flash being on.
@@ -307,16 +314,16 @@ group CameraAPI "Camera API" {
 
 		/**
 		* Requires the viewfinder to be active.
-		* Takes a snapshot using the specified format. The snapshot is
-		* stored as a new data object and it's provided in the #snapshotImageDataHandle
-		* field of the #EVENT_TYPE_CAMERA_SNAPSHOT custom event. This event will
-		* be fired when the snapshot data is ready and only if the
-		* #maCameraSnapshotAsync returns a success code.
+		* Triggers the reading of the camera buffer into dataPlaceholder according
+		* to the specified sizeIndex.
+		* The snapshot data will be passed via #EVENT_TYPE_CAMERA_SNAPSHOT event.
 		*
-		* \param formatIndex camera format index. See #maCameraFormatNumber().
-		* \returns #MA_CAMERA_RES_OK on success, or #MA_CAMERA_RES_FAILED on error.
+		* \param dataPlaceholder a valid placeholder where the snapshot data
+		* will be written.
+		* \param sizeIndex snapshot size index. See #maCameraFormatNumber().
+		* \return #MA_CAMERA_RES_OK on success, or #MA_CAMERA_RES_FAILED on error.
 		*/
-		int maCameraSnapshotAsync(in int formatIndex);
+		int maCameraSnapshotAsync(in MAHandle dataPlaceholder, in int sizeIndex);
 
 		/**
 		* Starts or stops recording video.
