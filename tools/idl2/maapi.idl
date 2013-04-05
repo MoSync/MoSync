@@ -1574,8 +1574,8 @@ interface MAAPI {
 		/**
 		* \brief Used to notify when the snapshot taken via #maCameraSnapshotAsync,
 		* is completed.
-		* The events of this type contain the place holder for the image data,
-		* the image format index, the \link #MA_IMAGE_REPRESENTATION_UNKNOWN data representation \endlink
+		* The events of this type contain the handler for the image data,
+		* the image size, the \link #MA_IMAGE_REPRESENTATION_UNKNOWN data representation \endlink
 		* and a return code.
 		*/
 		CAMERA_SNAPSHOT = 53;
@@ -1770,9 +1770,9 @@ interface MAAPI {
 
 				/**
 				 * Used in #EVENT_TYPE_CAMERA_SNAPSHOT events.
-				 * Holds the snapshot format that is specified when #maCameraSnapshotAsync is called.
+				 * Holds the snapshot size.
 				 */
-				int snapshotFormatIndex;
+				int snapshotSize;
 
 				/**
 				 * Used in #EVENT_TYPE_CAMERA_SNAPSHOT events.
