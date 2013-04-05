@@ -12,6 +12,8 @@ using namespace std;
 #define MACRO_DEFINES "-D"
 #define SOURCE_FILE "-S"
 #define EXCLUDE_FILE "-X"
+#define ADDITIONAL_INCLUDES "-I"
+#define ADDITIONAL_LIB_PATHS "-L"
 
 #define NAME "--name"
 #define CONFIGURATION "--config"

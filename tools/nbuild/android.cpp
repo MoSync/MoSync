@@ -73,7 +73,15 @@ int generateMakefile(Arguments* params) {
 	vector<string> compilerDefines = params->getPrefixedList(MACRO_DEFINES, true);
 	rootCtx.setParameter("compiler-defines", delim(compilerDefines, " "));
 	rootCtx.setParameter("additional-compiler-switches", params->getSwitchValue("--compiler-switches"));
-	rootCtx.setParameter("additional-includes", params->getSwitchValue("--additional-includes"));
+	vector<string> additionalIncludeList = params->getPrefixedList(ADDITIONAL_INCLUDES, false);
+	string additionalIncludes;
+	for (size_t i = 0; i < additionalIncludeList.size(); i++) {
+		if (i > 0) {
+			additionalIncludes += " ";
+		}
+		additionalIncludes += toMakefileFile(additionalIncludeList[i]);
+	}
+	rootCtx.setParameter("additional-includes", additionalIncludes);
 	if (bootstrapModules.empty()) {
 		rootCtx.setParameter("no-default-includes", "true");
 	}
