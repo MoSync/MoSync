@@ -14,7 +14,10 @@
 using namespace std;
 
 int buildAndroidNative(Arguments* params) {
-	int result = generateMakefile(params);
+	int result = 1;
+	if (!params->isFlagSet("--android-execute-makefile")) {
+		result = generateMakefile(params);
+	}
 	if (!params->isFlagSet("--android-generate-makefile")) {
 		result = executeNdkBuild(params);
 	}
@@ -102,6 +105,26 @@ int generateMakefile(Arguments* params) {
 	return 0;
 }
 
+string toMakefileFile(string file) {
+#ifdef WIN32
+	// We assume cygwin
+	string result(file);
+	size_t ixColon = result.find(':');
+	if (ixColon != string::npos) {
+		// Device is whatever is before the colon;
+		// if no colon we assume the path is relative
+		string device = result.substr(0, ixColon);
+		transform(device.begin(), device.end(), device.begin(), ::tolower);
+		result = "/cygdrive/" + device + result.substr(ixColon + 1);
+	}
+	toSlashes(result);
+	printf("RESULT: %s\n", result.c_str());
+	return result;
+#else
+	// We are already good to go!
+	return file;
+#endif
+}
 
 int executeNdkBuild(Arguments* params) {
 	vector<string> configNames;
@@ -110,7 +133,7 @@ int executeNdkBuild(Arguments* params) {
 	split(libVariants, require(params, BINARY_TYPE), ",");
 
 	string ndkbuildCmd = require(params, "--android-ndkbuild-cmd");
-	string projectPath = require(params, PROJECT_DIR);
+	string projectPath = toMakefileFile(require(params, PROJECT_DIR));
 	toSlashes(projectPath);
 	string moduleName = require(params, NAME);
 	string outputDir = require(params, OUTPUT_DIR);
@@ -138,7 +161,7 @@ int executeNdkBuild(Arguments* params) {
 
 			ostringstream cmd;
 			cmd << file(ndkbuildCmd) << " ";
-			cmd << "-C " << file(tmpBuildDir) << " ";
+			cmd << "-C " << toMakefileFile(file(tmpBuildDir)) << " ";
 			if (isVerbose) {
 				cmd << "V=1 ";
 			}
@@ -148,11 +171,11 @@ int executeNdkBuild(Arguments* params) {
 			if (doClean) {
 				cmd << "-B ";
 			}
-			string libDir = string(mosyncdir()) + "/lib";
-			string moduleDir = string(mosyncdir()) + "/modules";
+			string libDir = toMakefileFile(string(mosyncdir()) + "/lib");
+			string moduleDir = toMakefileFile(string(mosyncdir()) + "/modules");
 			toSlashes(moduleDir);
 			string makeFile = tmpBuildDir + "Android.mk";
-			toSlashes(makeFile);
+			toMakefileFile(makeFile);
 			cmd << arg("MOSYNC_MODULES=" + moduleDir) << " ";
 			cmd << arg("MOSYNC_LIBS=" + libDir) << " ";
 			cmd << arg("PROJECT_DIR=" + projectPath) << " ";
