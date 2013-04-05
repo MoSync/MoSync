@@ -626,7 +626,7 @@ static void nativePostEvent(JNIEnv* env, jobject jthis, jintArray eventBuffer)
 	else if (event.type == EVENT_TYPE_CAMERA_SNAPSHOT)
 	{
 		event.snapshotImageDataHandle = intArray[1];
-		event.snapshotFormatIndex = intArray[2];
+		event.snapshotSize = intArray[2];
 		event.snapshotImageDataRepresentation = intArray[3];
 		event.snapshotReturnCode = intArray[4];
 	}
