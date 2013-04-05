@@ -67,6 +67,8 @@ namespace MoGraph
 		mScene.setWorldMat( m );
 		mScene.updateMatrix();		// need to update the PVW Matrix, Projection * View * World.
 
+		glEnable(GL_DEPTH_TEST);
+
 		drawBars(tick);
 		drawAxis(tick);
 		drawText(tick);
