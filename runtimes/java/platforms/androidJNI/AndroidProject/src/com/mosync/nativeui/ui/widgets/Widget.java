@@ -251,15 +251,23 @@ public class Widget
 	{
 		if ( property.equals( IX_WIDGET.MAW_WIDGET_WIDTH ) )
 		{
-			// shouldn't return the layout params.. Now it returns the actual pixel width.
-			//return Integer.toString( getLayoutParams( ).getWidth() );
-			return Integer.toString( getView( ).getWidth() );
+			// If it's shown return the actual wight in pixels
+			// else return it's layout width.
+			if ( getView().isShown() )
+			{
+				return Integer.toString( getView().getWidth() );
+			}
+			return Integer.toString( getLayoutParams( ).getWidth() );
 		}
 		else if ( property.equals( IX_WIDGET.MAW_WIDGET_HEIGHT ) )
 		{
-			// shouldn't return the layout params.. Now it returns the actual pixel height.
-			//return Integer.toString(  getLayoutParams( ).getHeight() );
-			return Integer.toString( getView( ).getHeight() );
+			// If it's shown return the actual height in pixels
+			// else return it's layout height.
+			if ( getView().isShown() )
+			{
+				return Integer.toString( getView().getHeight() );
+			}
+			return Integer.toString( getLayoutParams( ).getHeight() );
 		}
 		else if ( property.equals( IX_WIDGET.MAW_WIDGET_LEFT ) )
 		{
