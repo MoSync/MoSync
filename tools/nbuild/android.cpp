@@ -67,7 +67,7 @@ int generateMakefile(Arguments* params) {
 		sourceFileList += " ";
 	}
 	if (sourceFiles.empty()) {
-		error("No source files!\n");
+		error("No source files!");
 	}
 	rootCtx.setParameter("source-files", sourceFileList);
 	vector<string> compilerDefines = params->getPrefixedList(MACRO_DEFINES, true);
@@ -134,13 +134,39 @@ string toMakefileFile(string file) {
 #endif
 }
 
+string getNdkBuildCommand(Arguments* params) {
+	string ndkBuildCmd = toMakefileFile(require(params, "--android-ndkbuild-cmd"));
+#ifdef WIN32
+	bool exists;
+	string cygpath = getCygpath(exists);
+	if (exists) {
+		return "bash.exe -c " + ndkBuildCmd;
+	} else {
+		error("No cygwin found! Please set CYGPATH or add the cygwin bin directory to PATH.");
+	}
+#endif
+	return ndkBuildCmd;
+}
+
+#ifdef WIN32
+string getCygpath(bool& exists) {
+	char* envCygpath = getenv("CYGPATH");
+	if (envCygpath && strlen(envCygpath)) {
+		exists = true;
+		return envCygpath;
+	}
+	exists = !sh("bash.exe", true, "", false);
+	return "";
+}
+#endif
+
 int executeNdkBuild(Arguments* params) {
 	vector<string> configNames;
 	vector<string> libVariants;
 	split(configNames, require(params, CONFIGURATION), ",");
 	split(libVariants, require(params, BINARY_TYPE), ",");
 
-	string ndkbuildCmd = require(params, "--android-ndkbuild-cmd");
+	string ndkbuildCmd = getNdkBuildCommand(params);
 	string projectPath = toMakefileFile(require(params, PROJECT_DIR));
 	toSlashes(projectPath);
 	string moduleName = require(params, NAME);

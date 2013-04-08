@@ -35,7 +35,7 @@ string require(Arguments* args, string key);
  */
 vector<string> getSourceFiles(Arguments* args);
 const char* mosyncdir();
-void sh(const char* cmd, bool hideOutput = false, const char* shownCmdLine = 0);
+int sh(const char* cmd, bool hideOutput = false, const char* shownCmdLine = 0, bool exitOnError = true);
 void error(const char* msg, int errorCode = 1);
 
 #endif
