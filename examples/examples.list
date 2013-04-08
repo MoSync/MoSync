@@ -35,6 +35,7 @@ OtaLoad
 GLMobletOpenGLES1 = OpenGLES/GLMobletOpenGLES1
 GLMobletOpenGLES2 = OpenGLES/GLMobletOpenGLES2
 AccelerometerOpenGLES = OpenGLES/AccelerometerOpenGLES
+MoGraphWave = MoGraph/MoGraphWave
 ScreenOrientation
 QuakeMDL
 CameraDemo
