@@ -8,6 +8,8 @@
 #include <vector>
 #include <sstream>
 #include <fstream>
+#include <algorithm>
+#include <cstring>
 
 #define TEMP_BUILD_DIR "--android-build-dir"
 
