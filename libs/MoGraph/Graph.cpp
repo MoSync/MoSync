@@ -20,7 +20,6 @@ MA 02110-1301, USA.
 #include "graph.h"
 #include "GFont.h"
 #include "RenderText.h"
-//#include "MAHeaders.h"
 #include <maapi.h>
 #include "GraphDesc.h"
 #include <GLES2/gl2.h>
@@ -42,8 +41,7 @@ namespace MoGraph
 		cnt++;
 
 		glViewport((int)mViewPos.x, (int)mViewPos.y, mWidth, mHeight);
-			checkGLError("glViewport");
-//		lprintfln("%d. draw()::glViewport w=%d h=%d\n",cnt,mWidth,mHeight);
+		checkGLError("glViewport");
 		mDeltaTime.tick();
 
 		float tick = static_cast<float>(mTime.update()) * 0.001f;
@@ -90,7 +88,6 @@ namespace MoGraph
 		mGridZ	= desc->gridZ;
 		mFont	= desc->font;
 		mDesc	= *desc;	// keep copy of the description struct to keep track of all other init settings
-//		mScene.create(mGridX,mGridZ,desc->gridYLines,desc->gridStepYLines,desc->bFitScreen);
 		mScene.create(desc);
 		mScene.setWidth(mWidth);
 		mScene.setHeight(mHeight);
@@ -138,8 +135,6 @@ namespace MoGraph
 	{
 		TextMgr &textMgr = mScene.getTextMgr();
 		TextProperty prop;
-	//	float lineHeight = ((BMCommon *)mFont->getCommon())->m_lineHeight;		// need to get hold of the line height from the Font. need to extend the Font API
-//		float graphScale = mDesc.gridStepYLines;//mGridX/500.0f;
 
 		for (int i=0; i<textMgr.size(); i++)
 		{

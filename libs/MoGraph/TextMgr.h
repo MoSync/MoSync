@@ -27,7 +27,7 @@ struct Text
 {
 	Text() :
 		mTextFlagX(CENTER_LEFT),
-		mTextFlagY(/*CENTER_Y*/ CENTER_Y)
+		mTextFlagY(CENTER_Y)
 	{
 
 	}
@@ -48,7 +48,6 @@ struct Text
 	glm::vec4 		mColor;			// Text color
 	glm::vec2		mScale;			// Text scale
 	glm::vec3		mRotate;		// Rotation in degrees. prio Yaw Pitch Roll
-//	int 			mFontType;		// Optional not implemented reference for the font to use
 };
 
 

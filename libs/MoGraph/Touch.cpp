@@ -77,7 +77,6 @@ namespace MoGraph
 	void TouchInput::multitouchReleaseEvent(MAPoint2d p, int touchId)
 	{
 //		lprintfln("multitouchReleaseEvent=(%d,%d) id=%d",p.x,p.y,touchId);
-//		mTouch.erase(touchId);							// could keep the info. with a different state.
 		Touch &t = mTouch[touchId];
 		t.mOldPos = t.mPos;
 		t.mPos = glm::vec2(p.x,p.y);
@@ -182,8 +181,6 @@ namespace MoGraph
 		}
 		else
 		{
-		//	mScalePos = mScaleOldPos = 1.0f;
-
 			mRotSpeed = getSpeed(mTouch[0],mRotSpeed);
 			mRotPos += mRotSpeed;
 			// Create a rotation matrix.

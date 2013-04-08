@@ -689,20 +689,7 @@ float BMFont::BuildVertexArray(glm::vec4 * vertexPtr, const char* sentence, floa
 
 	// Initialize the index to the vertex array.
 	index = 0;
-//	lprintfln("chars:%d\n",m_chars.size());
-
-//	int cnt=0;
-/*	for(std::hash_map<int,BMChar>::iterator it = m_chars.begin(); it != m_chars.end();it++,cnt++)
-	{
-		lprintfln("%d",cnt);
-		unsigned int d = it->first;
-		BMChar &bc = it->second;
-		lprintfln("%d.num chars: %d",cnt,d);
-		lprintfln("BMChar(%d,%d,%d)\n",bc.m_id,bc.m_width,bc.m_height);
-	}
-*/
 	int nTri=0;
-
 
 	// Draw each letter onto a quad.
 	for(i=0; i<numLetters; i++)

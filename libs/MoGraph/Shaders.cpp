@@ -222,7 +222,6 @@ MA 02110-1301, USA.
 			if (infoLen > 1) {
 				char* infoLog = (char*) malloc(sizeof(char) * infoLen);
 				glGetShaderInfoLog(shader, infoLen, NULL, infoLog);
-				//printf("Error compiling shader:\n%s\n", infoLog);
 				lprintfln("Error compiling shader:\n%s\n", infoLog);
 				free(infoLog);
 			}
