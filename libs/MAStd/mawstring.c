@@ -19,7 +19,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "mawstring.h"
 #include "madmath.h"
 
-#ifdef MAPIP
+#if defined(MAPIP) || (defined(MOSYNC_NATIVE) && defined(ANDROID))
 
 #ifndef NO_BUILTINS
 

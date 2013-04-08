@@ -40,7 +40,7 @@
 
 #include "ma.h"
 
-#ifndef MAPIP
+#if !defined(MAPIP) && !(defined(MOSYNC_NATIVE) && defined(ANDROID))
 #include <string.h>
 #else
 
