@@ -127,16 +127,19 @@ namespace test_mosync
             //RootFrame.Navigated += delegate(object _sender, NavigationEventArgs _e)
             RootFrame.Loaded += delegate(object _sender, RoutedEventArgs _e)
             {
-				if (machine == null)
-				{
-#if !REBUILD
-					machine = MoSync.Machine.CreateInterpretedMachine("program", "resources");
-
+                if (machine == null)
+                {
+#if REBUILD
+                    machine = MoSync.Machine.CreateNativeMachine(new CoreNativeProgram(), "resources");
+                    machine.Runt();
+#elif LIB
+                    machine = MoSync.Machine.CreateMachineLib("resources");
+                    MoSync.Machine.runMain();
 #else
-	                machine = MoSync.Machine.CreateNativeMachine(new CoreNativeProgram(), "resources");
+                    machine = MoSync.Machine.CreateInterpretedMachine("program", "resources");
+                    machine.Run();
 #endif
-					InitExtensions(machine.GetCore(), machine.GetRuntime());
-					machine.Run();
+                    InitExtensions(machine.GetCore(), machine.GetRuntime());
 				}
             };
         }
@@ -174,7 +177,7 @@ namespace test_mosync
         {
             Exception eo = e.ExceptionObject;
             if (eo is MoSync.Util.ExitException)
-                return;
+                return; /*@TODO: Application.Current.Terminate() */
             if (System.Diagnostics.Debugger.IsAttached)
             {
                 System.Diagnostics.Debug.WriteLine(eo.StackTrace);

@@ -157,7 +157,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|ARM'">
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>Bin\ARM\Debug</OutputPath>
-    <DefineConstants>DEBUG;TRACE;SILVERLIGHT;WINDOWS_PHONE</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;SILVERLIGHT;WINDOWS_PHONE;LIB</DefineConstants>
     <Optimize>false</Optimize>
     <NoStdLib>true</NoStdLib>
     <DebugType>full</DebugType>
@@ -213,7 +213,9 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Microsoft.Phone.Controls.Toolkit, Version=7.0.0.0, Culture=neutral, PublicKeyToken=b772ad94eb9ca604, processorArchitecture=MSIL" />
+    <Reference Include="Microsoft.Phone.Controls.Toolkit">
+      <HintPath>..\..\packages\WPtoolkit.4.2012.10.30\lib\wp8\Microsoft.Phone.Controls.Toolkit.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.Xna.Framework.Graphics">
       <HintPath>..\..\..\..\..\..\..\Program Files (x86)\Microsoft SDKs\Windows Phone\v8.0\Tools\MDILXAPCompile\Framework\Microsoft.Xna.Framework.Graphics.dll</HintPath>
     </Reference>
@@ -268,9 +270,13 @@
     <Content Include="AppBar.Icons\17301586.png" />
     <Content Include="AppBar.Icons\17301589.png" />
     <Content Include="AppBar.Icons\17301590.png" />
+    <Content Include="README_FIRST.txt" />
     <Content Include="Toolkit.Content\ApplicationBar.Cancel.png" />
     <Content Include="Toolkit.Content\ApplicationBar.Check.png" />
+    <Content Include="Toolkit.Content\ApplicationBar.Delete.png" />
+    <Content Include="Toolkit.Content\ApplicationBar.Select.png" />
     <None Include="app.config" />
+    <None Include="packages.config" />
     <None Include="Properties\AppManifest.xml" />
     <None Include="Properties\WMAppManifest.xml">
       <SubType>Designer</SubType>
@@ -290,6 +296,10 @@
     <Content Include="SplashScreenImage.jpg" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\MoSyncLibrary\MoSyncLibrary.vcxproj">
+      <Project>{0C38E13D-28C7-4A22-899D-96BC215E5E46}</Project>
+      <Name>MoSyncLibrary</Name>
+    </ProjectReference>
     <ProjectReference Include="..\mosyncLib\mosyncLib.csproj">
       <Project>{7746202B-A479-49BE-8FF9-205EB13DDE07}</Project>
       <Name>mosyncLib</Name>

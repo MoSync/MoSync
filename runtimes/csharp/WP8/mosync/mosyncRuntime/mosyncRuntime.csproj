@@ -71,7 +71,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|ARM'">
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>Bin\ARM\Debug</OutputPath>
-    <DefineConstants>DEBUG;TRACE;SILVERLIGHT;WINDOWS_PHONE</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;SILVERLIGHT;WINDOWS_PHONE;LIB</DefineConstants>
     <NoStdLib>true</NoStdLib>
     <DebugType>full</DebugType>
     <PlatformTarget>
@@ -120,9 +120,11 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Source\MosyncMachineGeneratedCode.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Source\CustomPickerDataSources.cs" />
     <Compile Include="Source\maapi.cs" />
+    <Compile Include="Source\maapiWP8.cs" />
     <Compile Include="Source\Modules\Audio\MoSyncAudio.cs" />
     <Compile Include="Source\Modules\Audio\MoSyncAudioData.cs" />
     <Compile Include="Source\Modules\Audio\MoSyncAudioInstance.cs" />
@@ -218,6 +220,15 @@
     <Content Include="Toolkit.Content\ApplicationBar.Check.png" />
     <Content Include="Toolkit.Content\ApplicationBar.Delete.png" />
     <Content Include="Toolkit.Content\ApplicationBar.Select.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\MoSyncLibrary\MoSyncLibrary.vcxproj">
+      <Project>{0C38E13D-28C7-4A22-899D-96BC215E5E46}</Project>
+      <Name>MoSyncLibrary</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\$(TargetFrameworkIdentifier)\$(TargetFrameworkVersion)\Microsoft.$(TargetFrameworkIdentifier).$(TargetFrameworkVersion).Overrides.targets" />
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\$(TargetFrameworkIdentifier)\$(TargetFrameworkVersion)\Microsoft.$(TargetFrameworkIdentifier).CSharp.targets" />
