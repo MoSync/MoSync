@@ -280,3 +280,8 @@ LocalFiles.bin*
 
 /runtimes/csharp/WP8/template
 /runtimes/csharp/WP8/mosync/mosyncRuntime/Source/maapi.cs
+/runtimes/csharp/WP8/mosync/MoSyncLibrary/MosyncLibraryGlueCode.h
+/runtimes/csharp/WP8/mosync/MoSyncLibrary/MosyncLibraryGlueCode.cpp
+/runtimes/csharp/WP8/ARM
+/runtimes/csharp/WP8/mosync/mosyncRuntime/Source/maapiWP8.cs
+/runtimes/csharp/WP8/mosync/mosyncRuntime/Source/MosyncMachineGeneratedCode.cs
