@@ -18,6 +18,7 @@ MA 02110-1301, USA.
 package com.mosync.nativeui.ui.widgets;
 
 import android.graphics.drawable.Drawable;
+import android.view.MenuItem;
 
 /**
  * This class is not a widget, it's just a container for menu items.
@@ -53,6 +54,8 @@ public class OptionsMenuItem
 	 */
 	private int m_itemId = -1;
 
+	private int m_displayFlag = MenuItem.SHOW_AS_ACTION_IF_ROOM;
+
 	/**
 	 * Constructor
 	 *
@@ -63,6 +66,7 @@ public class OptionsMenuItem
 		m_itemId = handle;
 		m_title = title;
 		m_icon = icon;
+		m_displayFlag = MenuItem.SHOW_AS_ACTION_ALWAYS;
 	}
 
 	/**
@@ -80,6 +84,14 @@ public class OptionsMenuItem
 		m_iconResID = iconRes;
 	}
 
+	public void setShowAsAction(int flag)
+	{
+		m_displayFlag = flag;
+	}
+	public int getShowActionFlag()
+	{
+		return m_displayFlag;
+	}
 	public Boolean hasIconFromResources()
 	{
 		return m_iconResource;

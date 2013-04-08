@@ -3580,6 +3580,7 @@ group WidgetAPI "Widget API" {
 #include "NativeUI/WidgetProperties.idl"
 #include "NativeUI/WidgetResultCodes.idl"
 #include "NativeUI/WidgetTypes.idl"
+//#include "NativeUI/ActionBarFunctions.idl"
 
 } // end of group WidgetAPI
 #endif //IX_WIDGET

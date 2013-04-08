@@ -94,7 +94,7 @@ import com.mosync.nativeui.util.ScreenTransitions;
  *
  * As long as this activity is running the application is running.
  */
-public class MoSync extends Activity
+public class MoSync extends ActionBarActivity
 {
 	/**
 	 * Activity request codes for Camera intent.
@@ -123,6 +123,11 @@ public class MoSync extends Activity
 	private static int mScreenRotation = Surface.ROTATION_0;
 
 	/**
+	 *
+	 */
+	final ActionBarHelper mActionBarHelper = ActionBarHelper.createInstance(this);
+
+	/**
 	 * Sets screen and window properties.
 	 * Creates and initializes the MoSync thread
 	 * Calls the createMoSyncView method and then shows the created view.
@@ -146,7 +151,9 @@ public class MoSync extends Activity
 		mMoSyncView = null;
 
 		// MoSync Android apps do not have a system title bar.
-		requestWindowFeature(Window.FEATURE_NO_TITLE);
+		//requestWindowFeature(Window.FEATURE_NO_TITLE);
+		//setTitle("Test");
+		requestWindowFeature(Window.FEATURE_ACTION_BAR);
 
 		// Default screen orientation is portrait mode.
 		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
@@ -194,6 +201,9 @@ public class MoSync extends Activity
 		}
 
 		registerShutdownListener();
+
+		// Not used anymore, since action bar will not be supported on pre-Honeycomb devices
+		mActionBarHelper.onCreate(savedInstanceState);
     }
 
     public MoSyncThread getMoSyncThread()
@@ -423,6 +433,37 @@ public class MoSync extends Activity
 		// cleanup here. Applications should save data etc on
 		// EVENT_TYPE_FOCUS_LOST.
 		sendCloseEvent();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+
+		menu.clear();
+
+		// Get the focused screen widget.
+		ScreenWidget currentScreen = mMoSyncThread.getCurrentScreen();
+		if ( currentScreen != null )
+		{
+			// Get the menu items for that screen.
+			List<OptionsMenuItem> items = currentScreen.getMenuItems();
+			// Add each menu item to the options menu.
+			for (int i=0; i < items.size(); i++)
+			{
+				MenuItem item = menu.add ( 0, items.get(i).getId(), 0, items.get(i).getTitle() );
+				item.setShowAsAction(items.get(i).getShowActionFlag());
+				if ( items.get(i).hasIconFromResources() )
+				{
+					item.setIcon( items.get(i).getIconResId() );
+				}
+				else
+				{
+					item.setIcon( items.get(i).getIcon() );
+				}
+			}
+//			return true;
+		}
+
+		return super.onCreateOptionsMenu(menu);
     }
 
 	@Override
@@ -873,4 +914,5 @@ public class MoSync extends Activity
     		mEventTypeCloseHasBeenSent = true;
     	}
     }
+
 }

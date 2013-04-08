@@ -51,6 +51,9 @@ import static com.mosync.internal.generated.MAAPI_consts.MA_CAMERA_RES_OK;
 import static com.mosync.internal.generated.MAAPI_consts.MA_TOAST_DURATION_SHORT;
 import static com.mosync.internal.generated.MAAPI_consts.MA_TOAST_DURATION_LONG;
 
+//todo remove
+import static com.mosync.internal.generated.IX_WIDGET.MAW_OPTIONS_MENU_ICON_CONSTANT_ADD;
+
 import java.io.File;
 import java.io.FileDescriptor;
 import java.io.FileInputStream;
@@ -4533,6 +4536,24 @@ public class MoSyncThread extends Thread
 	{
 		return mMoSyncNativeUI.maWidgetScreenAddOptionsMenuItem(
 				widgetHandle, title, iconHandle, iconPredefined);
+	}
+
+	/**
+	* Android specific .. TODO test with tab screens
+	* The ActionBar is unique per application, therefore all syscalls that relate to the Action Bar will be handled on that unique instance.
+	* Available only on Android.
+	* @param iconPredefinedId optional icon for the action bar item.
+	*/
+	public int maActionBarAddMenuItem(final String title,
+			final int iconPredefinedId, final int displayFlag)
+	{
+
+		return maWidgetScreenAddOptionsMenuItem(
+				getCurrentScreen().getHandle(), title,
+				MAW_OPTIONS_MENU_ICON_CONSTANT_ADD, iconPredefinedId);
+
+//		return ((MoSync)mContext).addActionBarItem(
+//							title, iconPredefinedId, displayFlag);
 	}
 
 	/**

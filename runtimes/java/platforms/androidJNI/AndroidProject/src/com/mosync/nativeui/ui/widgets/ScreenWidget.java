@@ -71,6 +71,12 @@ public class ScreenWidget extends Layout
 	private List<OptionsMenuItem> m_optionsItems = new ArrayList<OptionsMenuItem>();
 
 	/**
+	 * The action bar menu items. Keep them, and when the menu button
+	 * is pressed check the current focused screen and get this array.
+	 */
+	//private List<ActionBarMenuItem> m_actionBarItems = new ArrayList<ActionBarMenuItem>();
+
+	/**
 	 * Constructor
 	 *
 	 * @param handle handle Integer handle corresponding to this instance.
