@@ -1128,6 +1128,7 @@ public class MoSyncThread extends Thread implements MoSyncContext
 			for (String deferred : mDeferredModules) {
 				runInitFunction(deferred, mAppLibPaths.get(deferred));
 			}
+			mContext.finish();
 		} else {
 			nativeRun();
 		}
