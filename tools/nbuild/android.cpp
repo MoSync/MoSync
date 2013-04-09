@@ -135,29 +135,30 @@ string toMakefileFile(string file) {
 #endif
 }
 
-string getNdkBuildCommand(Arguments* params) {
-	string ndkBuildCmd = toMakefileFile(require(params, "--android-ndkbuild-cmd"));
+string getNdkBuildCommand(string commandLine) {
 #ifdef WIN32
 	bool exists;
 	string cygpath = getCygpath(exists);
-	toDir(cygpath);
+	if (!cygpath.empty()) {
+		toDir(cygpath);
+	}
 	if (exists) {
-		return cygpath + "bash.exe -c " + ndkBuildCmd;
+		return cygpath + "bash.exe -c \"" + commandLine + "\"";
 	} else {
 		error("No cygwin found! Please set CYGPATH or add the cygwin bin directory to PATH.");
 	}
 #endif
-	return ndkBuildCmd;
+	return commandLine;
 }
 
 #ifdef WIN32
 string getCygpath(bool& exists) {
 	char* envCygpath = getenv("CYGPATH");
-	if (envCygpath && strlen(envCygpath)) {
+	if (envCygpath && strlen(envCygpath) > 0) {
 		exists = true;
 		return envCygpath;
 	}
-	exists = !sh("bash.exe -c pwd", true, "", false);
+	exists = !sh("bash.exe -c pwd", false, "", false);
 	return "";
 }
 #endif
@@ -168,7 +169,7 @@ int executeNdkBuild(Arguments* params) {
 	split(configNames, require(params, CONFIGURATION), ",");
 	split(libVariants, require(params, BINARY_TYPE), ",");
 
-	string ndkbuildCmd = getNdkBuildCommand(params);
+	string ndkbuildCmd = toMakefileFile(require(params, "--android-ndkbuild-cmd"));
 	string projectPath = toMakefileFile(require(params, PROJECT_DIR));
 	toSlashes(projectPath);
 	string moduleName = require(params, NAME);
@@ -225,7 +226,8 @@ int executeNdkBuild(Arguments* params) {
 			cmd << arg("APP_PLATFORM=android-" + require(params, "--android-version")) << " ";
 			cmd << arg("MOSYNCDIR=" + toMakefileFile(mosyncdir())) << " ";
 
-			sh(cmd.str().c_str(), !isVerbose);
+			string fullCmd = getNdkBuildCommand(cmd.str());
+			sh(fullCmd.c_str(), !isVerbose);
 
 			string fullOutputDir = outputDir + "android_" + arch + "_" + libVariant + "/";
 			_mkdir(fullOutputDir.c_str());

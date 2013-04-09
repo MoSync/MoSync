@@ -11,7 +11,7 @@ using namespace std;
 int buildAndroidNative(Arguments* args);
 int generateMakefile(Arguments* args);
 string toMakefileFile(string file);
-string getNdkBuildCommand(Arguments* params);
+string getNdkBuildCommand(string commandLine);
 int executeNdkBuild(Arguments* args);
 string getTempBuildDir(Arguments* params);
 #ifdef WIN32
