@@ -156,6 +156,29 @@ namespace NativeUI
             const int transitionsDuration);
 
         /**
+         * Set the typeface and style in which the title should be displayed.
+         * @param fontHandle A font handle received from loading fonts using
+         *  #maFontGetName and #maFontLoadWithName syscalls.
+         * @return Any of the following result codes:
+         * - #MAW_RES_OK if the property could be set.
+         * - #MAW_RES_INVALID_PROPERTY_VALUE if the property value was invalid.
+         * - #MAW_RES_ERROR otherwise.
+         * @par Example
+         * \code
+         *   int nrFonts = maFontGetCount();
+         *    char buf[256];
+         *    // Get first font name.
+         *    maFontGetName(1, buf, 256);
+         *    // Load that font for size 10.
+         *    int fontHandle = maFontLoadWithName(buf, 10);
+         *    // Set that font to the stack screen.
+         *	  maWidgetSetProperty(
+         *      stackScreenHandle, MAW_STACK_SCREEN_TITLE_FONT_HANDLE, toString(fontHandle));
+         * \endcode
+         */
+        virtual int setTitleFont(const MAHandle fontHandle);
+
+        /**
          * Add an stack screen event listener.
          * @param listener The listener that will receive stack screen events.
          */

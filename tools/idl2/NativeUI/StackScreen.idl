@@ -50,6 +50,28 @@ group WidgetStackScreenProperties "Stack screen" {
 		IS_SHOWN = "isShown";
 
 		/**
+		* @brief Sets the typeface and style in which the title should be displayed.
+		*
+		* @validvalue A font handle received from loading fonts using
+		* #maFontGetName and #maFontLoadWithName syscalls.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	int nrFonts = maFontGetCount();
+		*	 char buf[256];
+		*	 // Get first font name.
+		*	 maFontGetName(1, buf, 256);
+		*	 // Load that font for size 10.
+		*	 int fontHandle = maFontLoadWithName(buf, 10);
+		*	 // Set that font to the title.
+		*	maWidgetSetProperty(stackScreenHandle, MAW_STACK_SCREEN_TITLE_FONT_HANDLE, toString(fontHandle));
+		* \endcode
+		*/
+		TITLE_FONT_HANDLE = "titleFontHandle";
+
+		/**
 		* @brief Stack screen's push transition type.
 		*
 		* Type of the animated transition used when pushing a screen from the current screen stack.
