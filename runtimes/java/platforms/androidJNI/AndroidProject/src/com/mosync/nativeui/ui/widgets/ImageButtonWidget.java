@@ -52,6 +52,11 @@ public class ImageButtonWidget extends Widget
 	private static final int IMAGE_HANDLE_NOT_SET = 0;
 
 	/**
+	 * Image handle for MAW_IMAGE_BUTTON_IMAGE property;
+	 */
+	private int mForegroundImageHandle = IMAGE_HANDLE_NOT_SET;
+
+	/**
 	 * Image file path for MAW_IMAGE_BUTTON_IMAGE_PATH property;
 	 */
 	private String mForegroundImagePath = "";
@@ -60,6 +65,10 @@ public class ImageButtonWidget extends Widget
 	 * Image file path for MAW_IMAGE_BUTTON_BACKGROUND_IMAGE_PATH property;
 	 */
 	private String mBackgroundImagePath = "";
+
+	/**
+	 * Image handle for MAW_IMAGE_BUTTON_BACKGROUND_IMAGE property;
+	 */
 	private int mBackgroundImageHandle = IMAGE_HANDLE_NOT_SET;
 
 	/**
@@ -218,6 +227,7 @@ public class ImageButtonWidget extends Widget
 				ImageButton imageButton = (ImageButton) getView( );
 				imageButton.setImageBitmap( foreground );
 				imageButton.setScaleType( ImageView.ScaleType.CENTER );
+				mForegroundImageHandle = imageHandle;
 				mForegroundImagePath = "";
 			}
 			else
@@ -258,6 +268,7 @@ public class ImageButtonWidget extends Widget
 			if( imgFile.exists() )
 			{
 				mForegroundImagePath = value;
+				mForegroundImageHandle = 0;
 			    Bitmap bitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
 
 				ImageButton imageButton = (ImageButton) getView( );
@@ -324,9 +335,17 @@ public class ImageButtonWidget extends Widget
 	@Override
 	public String getProperty(String property)
 	{
-		if( property.equals( IX_WIDGET.MAW_IMAGE_BUTTON_IMAGE_PATH ) )
+		if( property.equals( IX_WIDGET.MAW_IMAGE_BUTTON_IMAGE ) )
+		{
+			return Integer.toString(mForegroundImageHandle);
+		}
+		else if( property.equals( IX_WIDGET.MAW_IMAGE_BUTTON_IMAGE_PATH ) )
 		{
 			return mForegroundImagePath;
+		}
+		else if( property.equals( IX_WIDGET.MAW_IMAGE_BUTTON_BACKGROUND_IMAGE ) )
+		{
+			return Integer.toString(mBackgroundImageHandle);
 		}
 		else if( property.equals( IX_WIDGET.MAW_IMAGE_BUTTON_BACKGROUND_IMAGE_PATH ) )
 		{
