@@ -420,6 +420,12 @@ namespace Wormhole
 				case MAW_EVENT_DIALOG_DISMISSED:
 					eventType = "DialogDismissed";
 					break;
+				case MAW_EVENT_SCREEN_ORIENTATION_DID_CHANGE:
+					eventType = "OrientationDidChange";
+					break;
+				case MAW_EVENT_SCREEN_ORIENTATION_WILL_CHANGE:
+					eventType = "OrientationWillChange";
+					break;
 			}
 			// TODO: Micke says: Here we could add a string parameter for
 			// "WebViewHookInvoked" events to be able to pass data to

@@ -53,16 +53,26 @@ namespace OrientationTest
 		 */
 		virtual ~FirstScreen();
 
+		/**
+		 * @deprecated: Use addScreenListener(ScreenListener*) instead.
+		 * Called after the screen has finished rotating.
+		 * Subclasses may override this method to perform additional actions
+		 * after the rotation.
+		 */
+		virtual void orientationDidChange();
+		// From ScreenListener
+		/**
+		 * Called after the screen has finished rotating.
+		 * Subclasses may override this method to perform additional actions
+		 * after the rotation.
+		 * @param screenOrientation The new screen orientation.
+		 */
+		virtual void orientationChanged(Screen* screen, int screenOrientation);
 	private:
 		/**
 		 * Creates and adds main layout to the screen.
 		 */
 		void createMainLayout();
-
-		/**
-		 * Gets the current orientation as a string
-		 */
-		MAUtil::String getOrientationString();
 
 		/**
 		 * Create a new horizontal layout.
@@ -72,6 +82,7 @@ namespace OrientationTest
 		 * @return The new created horizontal layout.
 		 */
 		HorizontalLayout* createRow(Label* label, CheckBox* checkBox);
+		ListViewItem* createItem(Label* label, CheckBox* checkBox);
 
 		// From ButtonListener
         /**
@@ -81,15 +92,6 @@ namespace OrientationTest
          * @param button The button object that generated the event.
          */
         virtual void buttonClicked(Widget* button);
-
-		// From ScreenListener
-		/**
-		 * Called after the screen has finished rotating.
-		 * Subclasses may override this method to perform additional actions
-		 * after the rotation.
-		 * @param screenOrientation The new screen orientation.
-		 */
-		virtual void orientationChanged(Screen* screen, int screenOrientation);
 
 		/**
 		 * Changes the screen orientation bit mask.
@@ -110,6 +112,11 @@ namespace OrientationTest
 		 * Used for applying the orientation flag.
 		 */
 		Button* mSetOrientationBtn;
+
+		/**
+		 * Used for aligning all orientation check boxes.
+		 */
+		ListView* mListView;
 
 		/**
 		 * Used for enabling/disabling portrait mode.

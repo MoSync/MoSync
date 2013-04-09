@@ -133,6 +133,20 @@ namespace MoSync
                 }
             }
 
+            public IWidget getChild(int offset)
+            {
+                if (offset <= mChildren.Count)
+                {
+                    return mChildren[offset];
+                }
+                return null;
+            }
+
+            public int getChildCount()
+            {
+                return mChildren.Count;
+            }
+
             public void SetParent(IWidget parent)
             {
                 mParent = parent;
