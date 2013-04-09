@@ -94,16 +94,7 @@ public:
 	*/
 	virtual void orientationChanged(int screenOrientation)
 	{
-		lprintfln("Orientation changed to: %d", screenOrientation);
-	}
-
-	/**
-	* Send by current screen just before it begins rotating.
-	* Note: available only on iOS platform.
-	*/
-	virtual void orientationWillChange()
-	{
-
+		lprintfln("Main: Orientation did change to %d", screenOrientation);
 	}
 private:
 	AppTabScreen* mTabScreen;

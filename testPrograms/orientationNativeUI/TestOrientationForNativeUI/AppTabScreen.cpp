@@ -46,6 +46,8 @@ namespace OrientationTest
 		this->addTab(mFirstScreen);
 		this->addTab(mSecondScreen);
 		this->addTabScreenListener(this);
+
+		this->addScreenListener(this);
 	}
 
 	/**
@@ -54,6 +56,7 @@ namespace OrientationTest
 	AppTabScreen::~AppTabScreen()
 	{
 		this->removeTabScreenListener(this);
+		this->removeScreenListener(this);
 	}
 
 	/**
@@ -75,4 +78,23 @@ namespace OrientationTest
 		}
 	}
 
+	/**
+	 * Called after the screen orientation has changed.
+	 * Available only on iOS and Windows Phone 7.1 platforms.
+	 */
+	void AppTabScreen::orientationDidChange()
+	{
+		printf("TabScreen orientationDidChange");
+	}
+
+	/**
+	 * Called after the screen has finished rotating.
+	 * Subclasses may override this method to perform additional actions
+	 * after the rotation.
+	 * @param screenOrientation The new screen orientation.
+	 */
+	void AppTabScreen::orientationChanged(Screen* screen, int screenOrientation)
+	{
+		printf("Tab screen orientationChanged to %d" + screenOrientation);
+	}
 } //namespace OrientationTest

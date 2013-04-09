@@ -19,7 +19,6 @@
 
 
 @interface ScreenWidgetController : UIViewController {
-
 }
 
 @end
