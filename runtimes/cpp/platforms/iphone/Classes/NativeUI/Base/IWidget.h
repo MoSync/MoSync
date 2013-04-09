@@ -124,7 +124,7 @@
 /**
  * Get the children array list.
  */
-@property(nonatomic, getter = children, assign ) NSArray* children;
+@property(nonatomic, readonly, getter = children, assign ) NSArray* children;
 
 /**
  * Set widget's auto size width and height values.

@@ -33,7 +33,9 @@
      * screenHandle The handle of the screen that will get notified.
      * @param screenOrientation The new orientation value for the specified screen.
      */
-    - (void)sendOrientationEvent:(const int)eventType forWidget:(const int)screenHandle toValue:(const int)orientation;
+    - (void)sendOrientationEvent:(const int)eventType
+					   forWidget:(const int)screenHandle
+						 toValue:(const int)orientation;
 @end
 
 @implementation ScreenWidgetController
@@ -75,7 +77,8 @@
  * @param interfaceOrientation The new orientation for the user interface.
  * @param duration The duration of the pending rotation, measured in seconds.
  */
-- (void)willAnimateRotationToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation duration:(NSTimeInterval)duration
+- (void)willAnimateRotationToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
+										 duration:(NSTimeInterval)duration
 {
     // Store the new screen orientation.
     [[ScreenOrientation getInstance] currentOrientationChanged:interfaceOrientation];
@@ -168,7 +171,9 @@
  * screenHandle The handle of the screen that will get notified.
  * @param screenOrientation The new orientation value for the specified screen.
  */
-- (void)sendOrientationEvent:(const int)eventType forWidget:(const int)screenHandle toValue:(const int)orientation
+- (void)sendOrientationEvent:(const int)eventType
+				   forWidget:(const int)screenHandle
+					 toValue:(const int)orientation
 {
 	MAEvent event;
 	event.type = EVENT_TYPE_WIDGET;
