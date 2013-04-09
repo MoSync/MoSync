@@ -80,6 +80,9 @@ NSString* const kWidgetFalseValue = @"false";
         case MAW_TRANSITION_TYPE_CURL_DOWN:
             options = UIViewAnimationOptionTransitionCurlDown;
             break;
+        case MAW_TRANSITION_TYPE_CROSS_DISSOLVE:
+            options = UIViewAnimationOptionTransitionCrossDissolve;
+            break;
         default:
             return MAW_RES_INVALID_SCREEN_TRANSITION_TYPE;
     }
