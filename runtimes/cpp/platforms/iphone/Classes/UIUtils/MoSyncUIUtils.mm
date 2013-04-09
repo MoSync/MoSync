@@ -22,6 +22,7 @@
 #include "Platform.h"
 #include "MoSyncMain.h"
 #include "MoSyncUIAlertView.h"
+#include <base/Syscall.h>
 
 /*
  * C functions
@@ -58,6 +59,92 @@ void MoSyncUIUtils_ShowImagePicker(int returnType)
     [[ImagePickerController getInstance] show];
 }
 
+int MoSyncUIUtils_SaveImageToGallery(MAHandle imageHandle)
+{
+    int returnCode = MA_MEDIA_RES_IMAGE_EXPORT_FAILED;
+
+    Surface* imageResource = Base::gSyscall->resources.get_RT_IMAGE(imageHandle);
+    if ( imageResource )
+    {
+        // Get corresponding orientation.
+        UIImageOrientation orientation = UIImageOrientationUp;
+		switch (imageResource->orientation)
+        {
+			case 1:
+				orientation = UIImageOrientationUp;
+				break;
+			case 2:
+				orientation = UIImageOrientationUpMirrored;
+				break;
+			case 3:
+				orientation = UIImageOrientationDown;
+				break;
+			case 4:
+				orientation = UIImageOrientationDownMirrored;
+				break;
+			case 5:
+				orientation = UIImageOrientationLeftMirrored;
+				break;
+			case 6:
+				orientation = UIImageOrientationRight;
+				break;
+			case 7:
+				orientation = UIImageOrientationRightMirrored;
+				break;
+			case 8:
+				orientation = UIImageOrientationLeft;
+				break;
+			default:
+				break;
+		}
+		UIImage* image = [UIImage imageWithCGImage:imageResource->image scale:1.0 orientation:orientation];
+
+        ImageSaveListener *sImageSaveListener = [[ImageSaveListener alloc] initWithImageHandle:imageHandle];
+        UIImageWriteToSavedPhotosAlbum(image, sImageSaveListener,
+                                       @selector(image: didFinishSavingWithError: contextInfo:) , nil);
+        [sImageSaveListener release];
+
+        returnCode = MA_MEDIA_RES_OK;
+    }
+    return returnCode;
+}
+
+// Used in image saving operation
+@implementation ImageSaveListener
+
+-(id)initWithImageHandle:(MAHandle) anImageHandle
+{
+    self = [super init];
+    if ( self )
+    {
+        mImageHandle = anImageHandle;
+    }
+    return self;
+}
+
+
+-(void)dealloc
+{
+    [super dealloc];
+}
+
+// This is called at the end of the saving opperation.
+- (void)               image: (UIImage *) image
+    didFinishSavingWithError: (NSError *) error
+                 contextInfo: (void *) contextInfo {
+    MAEvent event;
+
+	event.type = EVENT_TYPE_MEDIA_EXPORT_FINISHED;
+    event.mediaType = MA_MEDIA_TYPE_IMAGE;
+    event.mediaHandle = mImageHandle;
+    event.operationResultCode = (nil == error) ? MA_MEDIA_RES_OK : MA_MEDIA_RES_IMAGE_EXPORT_FAILED;
+
+	Base::gEventQueue.put(event);
+}
+
+@end
+
+// TextBox data
 @interface TextBoxData : UIViewController <UIAlertViewDelegate> {
 	NSString *title;
 	NSString *inText;
