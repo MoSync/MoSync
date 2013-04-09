@@ -30,12 +30,12 @@ MA 02110-1301, USA.
  * \brief RenderText,	Constructor
  */
 RenderText::RenderText()
-:	m_font(0),
-	m_width(0),
-	m_height(0),
-	m_scaleX(0),
-	m_scaleY(0),
-	m_blendType(BL_ADDITIVE)
+:	mFont(0),
+	mWidth(0),
+	mHeight(0),
+	mScaleX(0),
+	mScaleY(0),
+	mBlendType(BL_ADDITIVE)
 {
 }
 
@@ -53,7 +53,7 @@ RenderText::~RenderText()
 void RenderText::release()
 {
 	TextCacheTable::iterator it;
-	for(it=m_textCache.begin();it!=m_textCache.end();it++)
+	for(it=mTextCache.begin();it!=mTextCache.end();it++)
 	{
 		VertStore &vstore = it->second;
 		delete [] static_cast<glm::vec4 *>(vstore.mVertices);
@@ -71,10 +71,10 @@ void RenderText::release()
 
 bool RenderText::init(float width, float height, IFont *font)
 {
-	m_width		= width;
-	m_height	= height;
-	m_font		= font;
-	m_textShader.init();
+	mWidth		= width;
+	mHeight		= height;
+	mFont		= font;
+	mTextShader.init();
 	return true;
 }
 
@@ -84,7 +84,12 @@ bool RenderText::init(float width, float height, IFont *font)
  */
 void RenderText::setFont(IFont *font)
 {
-	m_font = font;
+	mFont = font;
+}
+
+IFont *RenderText::getFont()
+{
+	return mFont;
 }
 
 /**
@@ -105,19 +110,19 @@ glm::vec4 *RenderText::getVertices(const char *str, bool bUseCache, float *width
 	{
 		std::string key = str;
 		num				= key.size();
-		TextCacheTable::iterator it = m_textCache.find(key);
-		if (it == m_textCache.end())
+		TextCacheTable::iterator it = mTextCache.find(key);
+		if (it == mTextCache.end())
 		{										// doesn't exists in tabler, cache it.
 			vertices = new glm::vec4[6*num];  	// create vertex array
 			if(!vertices)						// check if memory alocation was ok
 				maPanic(1,"RenderText: Failed to allocate vertex buffer");
 
-			*width = m_font->BuildVertexArray(vertices, key.c_str(), m_opos.x, m_opos.y, m_scaleX, m_scaleY);			// get vertex array from string,
+			*width = mFont->BuildVertexArray(vertices, key.c_str(), mOPos.x, mOPos.y, mScaleX, mScaleY);			// get vertex array from string,
 
-			glm::vec2 scaleXZ(m_scaleX,m_scaleY);
+			glm::vec2 scaleXZ(mScaleX,mScaleY);
 			VertStore vstore(vertices,*width,scaleXZ);
 
-			if ( (m_textCache.insert(TextCachePair(key,vstore))).second == false )
+			if ( (mTextCache.insert(TextCachePair(key,vstore))).second == false )
 			{
 				// warn in log double insertion failed to insert this one.
 				lprintfln("RenderText::TextCache insertion double entry detected of key=\"%s\"",key.c_str());
@@ -130,8 +135,8 @@ glm::vec4 *RenderText::getVertices(const char *str, bool bUseCache, float *width
 			*width	 = vstore.mWidth;
 
 			// may need to check current scale state or restore system with it.
-			m_scaleX = vstore.mScaleXZ.x;
-			m_scaleY = vstore.mScaleXZ.y;
+			mScaleX = vstore.mScaleXZ.x;
+			mScaleY = vstore.mScaleXZ.y;
 		}
 	}
 	else	// Not using cache create one
@@ -141,7 +146,7 @@ glm::vec4 *RenderText::getVertices(const char *str, bool bUseCache, float *width
 		if(!vertices)
 			maPanic(1,"RenderText: Failed to allocate vertex buffer");
 
-		*width = m_font->BuildVertexArray(vertices, str, m_opos.x, m_opos.y, m_scaleX, m_scaleY);			// get vertex array from string,
+		*width = mFont->BuildVertexArray(vertices, str, mOPos.x, mOPos.y, mScaleX, mScaleY);			// get vertex array from string,
 	}
 	return vertices;
 }
@@ -172,8 +177,8 @@ float RenderText::drawText3D(const char*str, glm::vec3 &pos, glm::vec4 &rgba, gl
 //	checkGLError("RenderText::DrawText   Should be ok!");
 
 	float width = 0;
-	m_opos 		= glm::vec3(0.0f,0.0f,0.0f);//pos;
-	m_pos		= pos;
+	mOPos 		= glm::vec3(0.0f,0.0f,0.0f);//pos;
+	mPos		= pos;
 	int num 	= strlen(str);
 	glm::vec4 *vertices = 0;
 	// Use the font class to build the vertex array from the sentence text and sentence draw location.
@@ -182,11 +187,11 @@ float RenderText::drawText3D(const char*str, glm::vec3 &pos, glm::vec4 &rgba, gl
 	// note uses m_pos creates or retrieves existing vertex buffer from a cache table
 	vertices = getVertices(str, bUseCache, &width);
 
-	TextShader &shader= m_textShader;
+	TextShader &shader= mTextShader;
 
 	glEnable (GL_BLEND);
-	m_blendType = BL_ADDITIVE;
-	switch (m_blendType)
+	mBlendType = BL_ADDITIVE;
+	switch (mBlendType)
 	{
 	case BL_ADDITIVE:					// Additive
 		glBlendFunc(GL_ONE, GL_ONE);
@@ -219,7 +224,7 @@ float RenderText::drawText3D(const char*str, glm::vec3 &pos, glm::vec4 &rgba, gl
 	checkGLError("RenderText::DrawText   glEnableVertexAttribArray (V)");
 	glActiveTexture(GL_TEXTURE0 + 0);
 	checkGLError("RenderText::DrawText   glActiveTexture");
-	glBindTexture(GL_TEXTURE_2D, m_font->GetTexture(0));
+	glBindTexture(GL_TEXTURE_2D, mFont->GetTexture(0));
 	checkGLError("glBindTexture");
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	checkGLError("glTexParameteri");
@@ -231,7 +236,7 @@ float RenderText::drawText3D(const char*str, glm::vec3 &pos, glm::vec4 &rgba, gl
 	// Once per frame
 	glUniform1f(shader.mTimeLoc, tick);
 	checkGLError("RenderText::DrawText   glUniform1f");
-	glUniform2f(shader.mResolutionLoc, 1.0f/(float)m_width, 1.0f/(float)m_height);
+	glUniform2f(shader.mResolutionLoc, 1.0f/(float)mWidth, 1.0f/(float)mHeight);
 	checkGLError("RenderText::DrawText   glUniform2f");
 	glUniformMatrix4fv(shader.mMatrixPVW, 1, GL_FALSE, &pvw[0][0]);
 	checkGLError("RenderText::DrawText   glUniformMatrix4fv");
@@ -241,7 +246,7 @@ float RenderText::drawText3D(const char*str, glm::vec3 &pos, glm::vec4 &rgba, gl
 	glm::vec4 color = rgba;
 	glUniform4fv(shader.mColor,1, (float *)&color.x);
 	checkGLError("RenderText::DrawText   glUniformMatrix4fv");
-	glm::vec4 TPos(m_pos.x,m_pos.y,m_pos.z, 1.0f);
+	glm::vec4 TPos(mPos.x,mPos.y,mPos.z, 1.0f);
 	glUniform4fv(shader.mTPos, 1, (float *)&TPos.x);
 	checkGLError("RenderText::DrawText   glUniformMatrix4fv");
 	glDrawArrays(GL_TRIANGLES, 0, 6*num);
@@ -273,25 +278,25 @@ float RenderText::drawText(const char*str, glm::vec3 &pos, glm::vec4 &rgba, floa
 {
 //	checkGLError("RenderText::DrawText   Should be ok!");
 	float width = 0;
-	m_opos = glm::vec3(0.0f,0.0f,0.0f);
-	m_pos = pos;
+	mOPos = glm::vec3(0.0f,0.0f,0.0f);
+	mOPos = pos;
 	int num = strlen(str);
 	glm::vec4 *vertices = 0;
 
 	glDisable(GL_DEPTH_TEST);
-	glm::mat4 m = glm::ortho(0.0f, static_cast<float>(m_width),static_cast<float>(m_height),0.0f,-200.0f,1000.0f);
+	glm::mat4 m = glm::ortho(0.0f, static_cast<float>(mWidth),static_cast<float>(mHeight),0.0f,-200.0f,1000.0f);
 
 	// Use the font class to build the vertex array from the sentence text and sentence draw location.
 	// Create the vertex array.
 
-	m_scaleY = -m_scaleY;
+	mScaleY = -mScaleY;
 	vertices = getVertices(str, false, &width);		// note uses m_pos creates or retrieves existing vertex buffer from a cache table
-	m_scaleY = -m_scaleY;
+	mScaleY = -mScaleY;
 
-	TextShader &shader= m_textShader;
+	TextShader &shader= mTextShader;
 	glEnable (GL_BLEND);
-	m_blendType = BL_ADDITIVE;
-	switch (m_blendType)
+	mBlendType = BL_ADDITIVE;
+	switch (mBlendType)
 	{
 	case BL_ADDITIVE:					// Additive
 		glBlendFunc(GL_ONE, GL_ONE);
@@ -324,7 +329,7 @@ float RenderText::drawText(const char*str, glm::vec3 &pos, glm::vec4 &rgba, floa
 	checkGLError("RenderText::DrawText   glEnableVertexAttribArray (V)");
 	glActiveTexture(GL_TEXTURE0 + 0);
 	checkGLError("RenderText::DrawText   glActiveTexture");
-	glBindTexture(GL_TEXTURE_2D, m_font->GetTexture(0));
+	glBindTexture(GL_TEXTURE_2D, mFont->GetTexture(0));
 	checkGLError("glBindTexture");
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	checkGLError("glTexParameteri");
@@ -336,7 +341,7 @@ float RenderText::drawText(const char*str, glm::vec3 &pos, glm::vec4 &rgba, floa
 	// Once per frame
 	glUniform1f(shader.mTimeLoc, tick);
 	checkGLError("RenderText::DrawText   glUniform1f");
-	glUniform2f(shader.mResolutionLoc, 1.0f/(float)m_width, 1.0f/(float)m_height);
+	glUniform2f(shader.mResolutionLoc, 1.0f/(float)mWidth, 1.0f/(float)mHeight);
 	checkGLError("RenderText::DrawText   glUniform2f");
 	glUniformMatrix4fv(shader.mMatrixPVW, 1, GL_FALSE, &m[0][0]);
 	checkGLError("RenderText::DrawText   glUniformMatrix4fv");
@@ -346,7 +351,7 @@ float RenderText::drawText(const char*str, glm::vec3 &pos, glm::vec4 &rgba, floa
 	glm::vec4 color = rgba;
 	glUniform4fv(shader.mColor,1, (float *)&color.x);
 	checkGLError("RenderText::DrawText   glUniformMatrix4fv");
-	glm::vec4 TPos(m_pos.x,m_pos.y,m_pos.z, 1.0f);
+	glm::vec4 TPos(mPos.x,mPos.y,mPos.z, 1.0f);
 	glUniform4fv(shader.mTPos, 1, (float *)&TPos.x);
 	checkGLError("RenderText::DrawText   glUniformMatrix4fv");
 	glDrawArrays(GL_TRIANGLES, 0, 6*num);
@@ -374,7 +379,7 @@ float RenderText::drawText(const char*str, glm::vec3 &pos, glm::vec4 &rgba, floa
 float RenderText::getTextWidth(const char *str)
 {
 	TextProperty property;
-	return m_font->getTextProperties(str, 0.0f, 0.0f, m_scaleX, m_scaleY,&property);		// get vertex array from string,
+	return mFont->getTextProperties(str, 0.0f, 0.0f, mScaleX, mScaleY,&property);		// get vertex array from string,
 }
 
 /**
@@ -386,7 +391,7 @@ float RenderText::getTextWidth(const char *str)
 float RenderText::getTextHeight(const char *str)
 {
 	TextProperty property;
-	m_font->getTextProperties(str, 0.0f, 0.0f, m_scaleX, m_scaleY,&property);				// get vertex array from string,
+	mFont->getTextProperties(str, 0.0f, 0.0f, mScaleX, mScaleY,&property);				// get vertex array from string,
 	return property.sHeight;
 }
 
@@ -399,6 +404,6 @@ float RenderText::getTextHeight(const char *str)
  */
 float RenderText::getTextProperty(const char *str, TextProperty *property)
 {
-	m_font->getTextProperties(str, 0.0f, 0.0f, m_scaleX, m_scaleY,property);				// get vertex array from string,
+	mFont->getTextProperties(str, 0.0f, 0.0f, mScaleX, mScaleY,property);				// get vertex array from string,
 	return property->sLineHeight;
 }

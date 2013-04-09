@@ -70,6 +70,11 @@ public:
 	 */
 	virtual void setFont(IFont *font);
 	/**
+	 * \brief getFont,	get's the currently used font for the RenderText.
+	 * @return
+	 */
+	virtual IFont *getFont();
+	/**
 	 * \brief drawText3D,	draws text in the graph (3d space)
 	 * @param str,			output string
 	 * @param pos,			position in 3D space
@@ -118,7 +123,7 @@ public:
 	 * @param x,
 	 * @param y,
 	 */
-	virtual void setScale(float x,float z) {m_scaleX = x; m_scaleY = z;}
+	virtual void setScale(float x,float z) {mScaleX = x; mScaleY = z;}
 protected:
 	/**
 	 * \brief release, internal function for releasing the vertex buffered cache.
@@ -139,16 +144,16 @@ protected:
 	 */
 	void releaseVertices(glm::vec4 *vertices, bool bUseCache);
 
-	IFont			*m_font;		// current pointer for the font to use
-	float			m_width;		// screen width
-	float			m_height;		// screen height
-	float 			m_scaleX;		// used for scaling text in X
-	float			m_scaleY;		// used for scaling text in Y
-	glm::vec3		m_opos;			// position of text. (origo), disposition the origo within the text.
-	glm::vec3		m_pos;			// position of text in 3D space
-	TextShader		m_textShader;	// Text shader to be used for the rendering
-	TextCacheTable	m_textCache;	// using text cache re using vertex buffers for specific text.
-	BlendType		m_blendType;	// blend parameters for th text.
+	IFont			*mFont;		// current pointer for the font to use
+	float			mWidth;		// screen width
+	float			mHeight;		// screen height
+	float 			mScaleX;		// used for scaling text in X
+	float			mScaleY;		// used for scaling text in Y
+	glm::vec3		mOPos;			// position of text. (origo), disposition the origo within the text.
+	glm::vec3		mPos;			// position of text in 3D space
+	TextShader		mTextShader;	// Text shader to be used for the rendering
+	TextCacheTable	mTextCache;	// using text cache re using vertex buffers for specific text.
+	BlendType		mBlendType;	// blend parameters for th text.
 };
 
 #endif /* TEXT_H_ */
