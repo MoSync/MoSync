@@ -128,7 +128,6 @@ string toMakefileFile(string file) {
 		result = "/cygdrive/" + device + result.substr(ixColon + 1);
 	}
 	toSlashes(result);
-	printf("RESULT: %s\n", result.c_str());
 	return result;
 #else
 	// We are already good to go!
@@ -211,8 +210,7 @@ int executeNdkBuild(Arguments* params) {
 			string libDir = toMakefileFile(string(mosyncdir()) + "/lib");
 			string moduleDir = toMakefileFile(string(mosyncdir()) + "/modules");
 			toSlashes(moduleDir);
-			string makeFile = tmpBuildDir + "Android.mk";
-			toMakefileFile(makeFile);
+			string makeFile = toMakefileFile(tmpBuildDir + "Android.mk");
 			cmd << arg("MOSYNC_MODULES=" + moduleDir) << " ";
 			cmd << arg("MOSYNC_LIBS=" + libDir) << " ";
 			cmd << arg("PROJECT_DIR=" + projectPath) << " ";
