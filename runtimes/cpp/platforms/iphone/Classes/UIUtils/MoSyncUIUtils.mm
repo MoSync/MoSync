@@ -21,44 +21,19 @@
 #include "ImagePickerController.h"
 #include "Platform.h"
 #include "MoSyncMain.h"
+#include "MoSyncUIAlertView.h"
 
 /*
  * C functions
  */
-void MoSyncUIUtils_ShowMessageBox(const char *title, const char *msg, bool kill)
-{
-	NSString* nsTitle = nil;
-	if(title != nil)
-		nsTitle = [[NSString alloc] initWithBytes:title length:strlen(title) encoding:NSUTF8StringEncoding];
-
-    [MoSyncUIUtils showMessageBox:[[NSString alloc] initWithBytes:msg length:strlen(msg) encoding:NSUTF8StringEncoding]
-                        withTitle:nsTitle
-                       shouldKill:kill];
-}
 
 void MoSyncUIUtils_ShowAlert(const char* title, const char* message, const char* button1, const char* button2, const char* button3)
 {
-	NSString* nsTitle = nil;
-	if(title != nil && (strlen(title) != 0))
-		nsTitle = [[NSString alloc] initWithBytes:title length:strlen(title) encoding:NSUTF8StringEncoding];
-
-	NSString* nsButton1 = nil;
-	if(button1 != nil && (strlen(button1) != 0))
-		nsButton1 = [[NSString alloc] initWithBytes:button1 length:strlen(button1) encoding:NSUTF8StringEncoding];
-
-	NSString* nsButton2 = nil;
-	if(button2 != nil && (strlen(button2) != 0))
-		nsButton2 = [[NSString alloc] initWithBytes:button2 length:strlen(button2) encoding:NSUTF8StringEncoding];
-
-	NSString* nsButton3 = nil;
-	if(button3 != nil && (strlen(button3) != 0))
-		nsButton3 = [[NSString alloc] initWithBytes:button3 length:strlen(button3) encoding:NSUTF8StringEncoding];
-
-    [MoSyncUIUtils showAlert:[[NSString alloc] initWithBytes:message length:strlen(message) encoding:NSUTF8StringEncoding]
-                   withTitle:nsTitle
-                button1Title:nsButton1
-                button2Title:nsButton2
-                button3Title:nsButton3];
+	[[MoSyncUIAlertView getInstance] showAlertViewChar:title
+										   messageChar:message
+										   button1Char:button1
+										   button2Char:button2
+										   button3Char:button3];
 }
 
 void MoSyncUIUtils_ShowTextBox(const wchar* title, const wchar* inText, wchar* outText, int maxSize, int constraints) {
@@ -82,59 +57,6 @@ void MoSyncUIUtils_ShowImagePicker(int returnType)
     [ImagePickerController getInstance].returnDataType = returnType;
     [[ImagePickerController getInstance] show];
 }
-
-/*
- * ObjC
- */
-@interface MessageBoxHandler : UIViewController <UIAlertViewDelegate> {
-	BOOL kill;
-	NSString *title;
-	NSString *msg;
-	NSString *cancelTitle;
-	NSString *button1Title;
-	NSString *button2Title;
-	NSString *button3Title;
-}
-
-@property BOOL kill;
-@property (copy, nonatomic) NSString* title;
-@property (copy, nonatomic) NSString* msg;
-@property (copy, nonatomic) NSString* cancelTitle;
-@property (copy, nonatomic) NSString* button1Title;
-@property (copy, nonatomic) NSString* button2Title;
-@property (copy, nonatomic) NSString* button3Title;
-
-- (void)alertViewCancel:(UIAlertView *)alertView;
-- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex;
-
-@end
-
-@implementation MessageBoxHandler
-
-@synthesize kill;
-@synthesize title;
-@synthesize msg;
-@synthesize cancelTitle;
-@synthesize button1Title;
-@synthesize button2Title;
-@synthesize button3Title;
-
-- (void)alertViewCancel:(UIAlertView *)alertView {
-	// don't know if this is allowed...
-	[self release];
-	if(kill)
-		MoSync_Exit();
-}
-
-- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex {
-	MAEvent event;
-	event.type = EVENT_TYPE_ALERT;
-	event.alertButtonIndex = buttonIndex + 1;
-	Base::gEventQueue.put(event);
-	[self release];
-}
-
-@end
 
 @interface TextBoxData : UIViewController <UIAlertViewDelegate> {
 	NSString *title;
@@ -181,37 +103,6 @@ void MoSyncUIUtils_ShowImagePicker(int returnType)
 
 @implementation MoSyncUIUtils
 
-+(void) showMessageBox: (NSString*)msg withTitle: (NSString*)title shouldKill: (bool)kill
-{
-	MessageBoxHandler *mbh = [[MessageBoxHandler alloc] autorelease];
-	mbh.kill = kill;
-	mbh.title = title;
-	mbh.msg = msg;
-	mbh.cancelTitle = @"OK";
-	[self performSelectorOnMainThread: @selector(messageBox:) withObject:(id)mbh waitUntilDone:NO];
-    // Think about using dispatch async
-/*    dispatch_async(dispatch_get_main_queue(), ^{
-        [MoSyncUIUtils messageBox:mbh];
-    });*/
-}
-
-+(void) showAlert:(NSString*)msg
-        withTitle:(NSString*)title
-      button1Title:(NSString*)buton1
-      button2Title:(NSString*)buton2
-      button3Title:(NSString*)buton3
-{
-    MessageBoxHandler *mbh = [[MessageBoxHandler alloc] retain];
-    mbh.kill = NO;
-    mbh.title = title;
-    mbh.msg = msg;
-    mbh.cancelTitle = nil;
-    mbh.button1Title = buton1;
-    mbh.button2Title = buton2;
-    mbh.button3Title = buton3;
-    [self performSelectorOnMainThread: @ selector(messageBox:) withObject:(id)mbh waitUntilDone:NO];
-}
-
 +(void) showTextBox:(NSString*)title
 		 withInText:(NSString*)inText
 			outText:(wchar*)outText
@@ -226,37 +117,6 @@ void MoSyncUIUtils_ShowImagePicker(int returnType)
 	textBoxData.constraints = constraints;
 
 	[self performSelectorOnMainThread: @ selector(textBox:) withObject:(id)textBoxData waitUntilDone:NO];
-}
-
-+(void) messageBox:(id) obj
-{
-	MessageBoxHandler *mbh = (MessageBoxHandler*) obj;
-	UIAlertView *alert = [[UIAlertView alloc]
-                          initWithTitle:mbh.title
-                          message:mbh.msg
-                          delegate:mbh
-                          cancelButtonTitle:mbh.cancelTitle
-                          otherButtonTitles:nil];
-
-	// Add only valid strings as buttons.
-	if (mbh.button1Title)
-	{
-		[alert addButtonWithTitle:mbh.button1Title];
-	}
-	if (mbh.button2Title)
-	{
-		[alert addButtonWithTitle:mbh.button2Title];
-	}
-	if (mbh.button3Title)
-	{
-		[alert addButtonWithTitle:mbh.button3Title];
-	}
-
-	if (mbh.cancelTitle == nil) {
-		alert.cancelButtonIndex = -1;
-	}
-    [alert show];
-    [alert release];
 }
 
 +(void) textBox:(id) obj
