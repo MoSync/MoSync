@@ -1079,7 +1079,9 @@ namespace Base
 	SYSCALL(int,  maGetEvent(MAEvent* event))
 	{
 		gSyscall->ValidateMemRange(event, sizeof(MAEvent));
+#ifndef MOSYNC_NATIVE
 		MYASSERT(((uint)event & 3) == 0, ERR_MEMORY_ALIGNMENT);	//alignment
+#endif
 
 		// Exit if event queue is empty.
 		if (gEventFifo.count() == 0) return 0;
@@ -1088,11 +1090,17 @@ namespace Base
 		*event = gEventFifo.get();
 
 		// Copy event data to memory on the MoSync side.
+#ifndef MOSYNC_NATIVE
 		#define HANDLE_CUSTOM_EVENT(eventType, dataType) if(event->type == eventType) { \
 			memcpy(Core::GetCustomEventPointer(gCore), (void*)event->data, sizeof(dataType)); \
 			delete (dataType*) event->data; \
 			event->data = (int(Core::GetCustomEventPointer(gCore)) - int(gCore->mem_ds)); }
-
+#else
+#define HANDLE_CUSTOM_EVENT(eventType, dataType) if(event->type == eventType) { \
+	memcpy(Core::GetCustomEventPointer(gCore), (void*)event->data, sizeof(dataType)); \
+	delete (dataType*) event->data; \
+	event->data = (int(Core::GetCustomEventPointer(gCore))); }
+#endif
 		// Macro CUSTOM_EVENTS is defined in runtimes/cpp/base/Syscall.h
 		CUSTOM_EVENTS(HANDLE_CUSTOM_EVENT);
 
@@ -3304,6 +3312,9 @@ bool reloadProgram()
 
 void MoSyncExit(int errorCode)
 {
+#ifdef MOSYNC_NATIVE
+	exit(errorCode);
+#else
 	//__android_log_write(ANDROID_LOG_INFO, "MoSyncExit!", "Program has exited!");
 
 	if(false == reloadProgram())
@@ -3320,6 +3331,7 @@ void MoSyncExit(int errorCode)
 
 		Base::SYSCALL_THIS->VM_Yield();
 	}
+#endif
 }
 
 void MoSyncErrorExit(int errorCode)
