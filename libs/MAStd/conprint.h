@@ -31,15 +31,13 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "mastring.h"
 #include "mavsprintf.h"
 
-#ifndef MOSYNC_NATIVE
-#define con_printf printf
-#define con_puts puts
-#define con_wputs wputs
-#define con_vprintf vprintf
-#define con_wprintf wprintf
-#define con_wvprintf wvprintf
-#define con_putchar putchar
-#endif /* COMPAT_LEGACY_MOSYNC */
+#define printf con_printf
+#define puts con_puts
+#define wputs con_wputs
+#define vprintf con_vprintf
+#define wprintf con_wprintf
+#define wvprintf con_wvprintf
+#define putchar con_putchar
 
 #ifdef __cplusplus
 extern "C" {

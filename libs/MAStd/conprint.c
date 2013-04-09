@@ -220,7 +220,7 @@ void PrintConsole(const wchar_t *str)
 }
 
 #define PRINTF_BUFSIZE 2048
-int vprintf(const char *fmt, va_list args)
+int con_vprintf(const char *fmt, va_list args)
 {
 	char buf[PRINTF_BUFSIZE];
 	int len;
@@ -237,7 +237,7 @@ int vprintf(const char *fmt, va_list args)
 	return len;
 }
 
-int printf(const char *fmt, ...)
+int con_printf(const char *fmt, ...)
 {
 	va_list args;
 	int len;
@@ -249,7 +249,7 @@ int printf(const char *fmt, ...)
 	return len;
 }
 
-int puts(const char* str)
+int con_puts(const char* str)
 {
 	wchar_t wbuf[PRINTF_BUFSIZE];
 	wsprintf(wbuf, L"%s", str);
@@ -257,14 +257,14 @@ int puts(const char* str)
 	return 0;
 }
 
-int wputs(const wchar_t* str) {
+int con_wputs(const wchar_t* str) {
 	PrintConsole(str);
 	if(!sConsole.postponedLineFeed)
 		FeedLine();
 	return 0;
 }
 
-int wvprintf(const wchar_t *fmt, va_list args)
+int con_wvprintf(const wchar_t *fmt, va_list args)
 {
 	wchar_t wbuf[PRINTF_BUFSIZE];
 	int len;
@@ -283,7 +283,7 @@ int wvprintf(const wchar_t *fmt, va_list args)
 	return len;
 }
 
-int wprintf(const wchar_t* fmt, ...) {
+int con_wprintf(const wchar_t* fmt, ...) {
 	va_list args;
 	int len;
 
@@ -294,7 +294,7 @@ int wprintf(const wchar_t* fmt, ...) {
 	return len;
 }
 
-int putchar(int character)
+int con_putchar(int character)
 {
 	wchar_t temp[2];
 	temp[0] = character;
