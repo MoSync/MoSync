@@ -141,8 +141,9 @@ string getNdkBuildCommand(Arguments* params) {
 #ifdef WIN32
 	bool exists;
 	string cygpath = getCygpath(exists);
+	toDir(cygpath);
 	if (exists) {
-		return "bash.exe -c " + ndkBuildCmd;
+		return cygpath + "bash.exe -c " + ndkBuildCmd;
 	} else {
 		error("No cygwin found! Please set CYGPATH or add the cygwin bin directory to PATH.");
 	}
@@ -157,7 +158,7 @@ string getCygpath(bool& exists) {
 		exists = true;
 		return envCygpath;
 	}
-	exists = !sh("bash.exe", true, "", false);
+	exists = !sh("bash.exe -c pwd", true, "", false);
 	return "";
 }
 #endif
@@ -196,7 +197,7 @@ int executeNdkBuild(Arguments* params) {
 			bool doClean = params->isFlagSet(CLEAN);
 
 			ostringstream cmd;
-			cmd << file(ndkbuildCmd) << " ";
+			cmd << toMakefileFile(ndkbuildCmd) << " ";
 			cmd << "-C " << toMakefileFile(file(tmpBuildDir)) << " ";
 			if (isVerbose) {
 				cmd << "V=1 ";
