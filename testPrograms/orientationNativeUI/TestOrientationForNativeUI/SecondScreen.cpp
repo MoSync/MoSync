@@ -60,6 +60,7 @@ namespace OrientationTest
 		mLabel->setText("test");
 		mMainLayout->addChild(mLabel);
 
+		addScreenListener(this);
 		MAUtil::Environment::getEnvironment().addPointerListener(this);
 	}
 
@@ -68,7 +69,29 @@ namespace OrientationTest
 	 */
 	SecondScreen::~SecondScreen()
 	{
+		removeScreenListener(this);
 		MAUtil::Environment::getEnvironment().removePointerListener(this);
+	}
+
+	/**
+	 * Called after the screen has finished rotating.
+	 * Subclasses may override this method to perform additional actions
+	 * after the rotation.
+	 * @param screenOrientation The new screen orientation.
+	 */
+	void SecondScreen::orientationChanged(Screen* screen, int screenOrientation)
+	{
+		printf("SECOND Screen: orientationChanged to: %d", screenOrientation);
+	}
+
+	/**
+	 * @deprecated: Use addScreenListener(ScreenListener*) instead.
+	 * Called after the screen has finished rotating.
+	 * Subclasses may override this method to perform additional actions
+	 * after the rotation.
+	 */
+	void SecondScreen::orientationDidChange()
+	{
 	}
 
 	/**
