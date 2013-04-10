@@ -596,8 +596,8 @@ float BMFont::getTextProperties(const char* sentence, float drawX, float drawY, 
 {
 	int numLetters, i, letter, second;
 	float start = drawX;
-	float minY = 9999.0f;
-	float maxY = -9999.0f;
+	float minY = 1000000.0f;
+	float maxY = -1000000.0f;
 
 	// Get the number of letters in the sentence.
 	numLetters = (int)strlen(sentence);
@@ -623,7 +623,7 @@ float BMFont::getTextProperties(const char* sentence, float drawX, float drawY, 
 		if(bc == 0)	// unknown default
 		{
 			drawX = drawX + 3.0f;	// Could be other values.
-			lprintfln("deadspace =%c => %d\n", letter,letter);
+//			lprintfln("deadspace =%c => %d\n", letter,letter);
 		}
 		else
 		{
@@ -719,7 +719,7 @@ float BMFont::BuildVertexArray(glm::vec4 * vertexPtr, const char* sentence, floa
 		if(bc == 0)	// unknown default
 		{
 			drawX = drawX + 3.0f;	// Could be other values.
-			lprintfln("deadspace =%c => %d\n", letter,letter);
+//			lprintfln("deadspace =%c => %d\n", letter,letter);
 		}
 		else
 		{

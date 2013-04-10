@@ -124,6 +124,18 @@ public:
 	 * @param y,
 	 */
 	virtual void setScale(float x,float z) {mScaleX = x; mScaleY = z;}
+	/**
+	 * \brief getScale, get the used scale for text render
+	 * @return glm::vec2, (x,y)
+	 */
+	virtual glm::vec2 getScale() {return glm::vec2(mScaleX,mScaleY);}
+	/**
+	 * \brief getLineHeight, gets the scaled height of one text line (general height for font)
+	 * use full for use to set next line, by adding return value with a pos Y
+	 * @return lineHeight,  fonts line height * scale of Y for render text
+	 */
+	virtual float getLineHeight()  {return (mFont)? mFont->getCommon()->m_lineHeight * mScaleY: 0.0f;}
+
 protected:
 	/**
 	 * \brief release, internal function for releasing the vertex buffered cache.
