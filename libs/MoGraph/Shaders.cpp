@@ -58,9 +58,18 @@ MA 02110-1301, USA.
 			sm[3][0]	= TPos.x;
 			sm[3][1]	= TPos.y;
 			sm[3][2]	= TPos.z;
-			sm[0][0] 	= ScaleV.x;
-			sm[1][1] 	= ScaleV.y;
-			sm[2][2] 	= ScaleV.z;
+			if (ScaleV.y >= 0.0)
+			{
+				sm[0][0] 	= ScaleV.x;
+				sm[1][1] 	= ScaleV.y;
+				sm[2][2] 	= ScaleV.z;
+			}
+			else
+			{
+				sm[0][0] 	= -ScaleV.x;
+				sm[1][1] 	= ScaleV.y;
+				sm[2][2] 	= ScaleV.z;
+			}
 			v_color  	= vec4(Color.x*vPosition.y, Color.y*vPosition.y, Color.z*vPosition.y, Color.w);
 			gl_Position = (ProjViewWorld * sm) * vPosition;
 		}
