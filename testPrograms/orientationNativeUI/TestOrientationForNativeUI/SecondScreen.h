@@ -31,6 +31,7 @@ MA 02110-1301, USA.
 
 #include <NativeUI/RelativeLayout.h>
 #include <NativeUI/Label.h>
+#include <NativeUI/ScreenListener.h>
 
 
 namespace OrientationTest
@@ -40,7 +41,8 @@ namespace OrientationTest
 
 	class SecondScreen:
 		public Screen,
-		public PointerListener
+		public PointerListener,
+		public ScreenListener
 	{
 	public:
 		/**
@@ -52,6 +54,19 @@ namespace OrientationTest
 		 * Destructor.
 		 */
 		virtual ~SecondScreen();
+		/**
+		 * Called after the screen has finished rotating.
+		 * Subclasses may override this method to perform additional actions
+		 * after the rotation.
+		 * @param screenOrientation The new screen orientation.
+		 */
+		virtual void orientationChanged(Screen* screen, int screenOrientation);		/**
+		 * @deprecated: Use addScreenListener(ScreenListener*) instead.
+		 * Called after the screen has finished rotating.
+		 * Subclasses may override this method to perform additional actions
+		 * after the rotation.
+		 */
+		virtual void orientationDidChange();
 
 	private:
 		/**

@@ -144,7 +144,7 @@ namespace MoSync
                         mosyncScreenOrientation = MoSync.Constants.MA_SCREEN_ORIENTATION_LANDSCAPE_RIGHT;
                         break;
                     case PageOrientation.Portrait:
-                        mosyncScreenOrientation = MoSync.Constants.MA_SCREEN_ORIENTATION_PORTRAIT;
+                        mosyncScreenOrientation = MoSync.Constants.MA_SCREEN_ORIENTATION_PORTRAIT_UP;
                         break;
                     case PageOrientation.PortraitDown:
                         mosyncScreenOrientation = MoSync.Constants.MA_SCREEN_ORIENTATION_PORTRAIT_UPSIDE_DOWN;
@@ -154,39 +154,26 @@ namespace MoSync
                         break;
                 }
 
-                // Post events handled by both NativeUI and Moblet.
-                postOrientationEvent(mosyncScreenOrientation);
-                postScreenOrientationEvent(mosyncScreenOrientation);
-            }
-
-            /**
-             * Post orientation event to MoSync queue.
-             * @param orientation The new orientation.
-             */
-            protected void postOrientationEvent(int orientation)
-            {
-                Memory eventData = new Memory(8);
-                const int MAEventData_eventType = 0;
-                const int MAEventData_orientation = 4;
-                eventData.WriteInt32(MAEventData_eventType, MoSync.Constants.EVENT_TYPE_ORIENTATION_DID_CHANGE);
-                eventData.WriteInt32(MAEventData_orientation, orientation);
-
-                mRuntime.PostEvent(new Event(eventData));
+                // Post events handled by the NativeUI library.
+                postScreenOrientationEvent(mosyncScreenOrientation, mHandle);
             }
 
             /**
              * Post screen orientation event to MoSync queue.
              * @param orientation The new screen orientation.
+             * @param widgetHandle The handle of the screen that will receive the event.
              */
-            protected void postScreenOrientationEvent(int orientation)
+            protected void postScreenOrientationEvent(int orientation, int widgetHandle)
             {
                 // send the event to the mosync runtime.
                 Memory eventData = new Memory(12);
                 const int MAWidgetEventData_eventType = 0;
                 const int MAWidgetEventData_widgetHandle = 4;
                 const int MAWidgetEventData_screenOrientation = 8;
-                eventData.WriteInt32(MAWidgetEventData_eventType, MoSync.Constants.MAW_EVENT_SCREEN_ORIENTATION_DID_CHANGE);
-                eventData.WriteInt32(MAWidgetEventData_widgetHandle, mHandle);
+                eventData.WriteInt32(
+                    MAWidgetEventData_eventType,
+                    MoSync.Constants.MAW_EVENT_SCREEN_ORIENTATION_DID_CHANGE);
+                eventData.WriteInt32(MAWidgetEventData_widgetHandle, widgetHandle);
                 eventData.WriteInt32(MAWidgetEventData_screenOrientation, orientation);
 
                 mRuntime.PostCustomEvent(MoSync.Constants.EVENT_TYPE_WIDGET, eventData);

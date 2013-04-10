@@ -34,6 +34,7 @@
 @synthesize isMainWidget = _isMainWidget;
 @synthesize autoSizeWidth = _autoSizeWidth;
 @synthesize autoSizeHeight = _autoSizeHeight;
+@synthesize children;
 
 
 /**
@@ -157,6 +158,14 @@
 -(CGFloat) originY
 {
     return _view.frame.origin.y;
+}
+
+/**
+ * Get the children array list.
+ */
+-(NSArray*) children
+{
+    return _children;
 }
 
 /**

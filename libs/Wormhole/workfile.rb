@@ -10,6 +10,7 @@ work.instance_eval do
 			"Libs",
 			"Libs/JSNativeUI",
 			"Libs/Notification",
+	        "Libs/Orientation",
 			"Libs/PhoneGap",
 			"Libs/W3C",
 			"Libs/Extensions"]
@@ -19,6 +20,7 @@ work.instance_eval do
 		copyFilesSubDir("Libs")
 		copyFilesSubDir("Libs/JSNativeUI")
 		copyFilesSubDir("Libs/Notification")
+		copyFilesSubDir("Libs/Orientation")
 		copyFilesSubDir("Libs/PhoneGap")
 		copyFilesSubDir("Libs/W3C")
 		copyFilesSubDir("Libs/Extensions")

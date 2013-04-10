@@ -3421,19 +3421,26 @@ public class MoSyncThread extends Thread implements MoSyncContext
 	 *  - #MA_TOAST_DURATION_LONG
 	 * @return
 	 */
-	int maToast(final String message, int duration)
+	int maToast(final String message, final int duration)
 	{
-		switch(duration)
+		if ( duration != MA_TOAST_DURATION_LONG &&
+				duration != MA_TOAST_DURATION_SHORT )
 		{
-		case MA_TOAST_DURATION_SHORT:
-			Toast.makeText(mContext.getApplicationContext(), message, Toast.LENGTH_SHORT).show();
-			break;
-		case MA_TOAST_DURATION_LONG:
-			Toast.makeText(mContext.getApplicationContext(), message, Toast.LENGTH_LONG).show();
-			break;
-		default:
-			return 0;
+			return -1;
 		}
+
+		mContext.runOnUiThread(new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				Toast.makeText(
+						mContext,
+						message,
+						(duration == MA_TOAST_DURATION_SHORT ? Toast.LENGTH_SHORT : Toast.LENGTH_LONG))
+						.show();
+			}
+		});
 
 		return 0;
 	}
