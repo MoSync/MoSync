@@ -286,7 +286,7 @@ public class MoSyncThread extends Thread implements MoSyncContext
 
 	// Various variables, should be moved to subsystems
 	// along with the syscalls.
-	public ByteBuffer mMemDataSection;
+	private ByteBuffer mMemDataSection;
 	ByteBuffer mResourceFile;
 
 	Canvas mCanvas;

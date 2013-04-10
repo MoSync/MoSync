@@ -34,6 +34,7 @@ import static com.mosync.internal.generated.MAAPI_consts.RES_FONT_DELETE_DENIED;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
@@ -311,9 +312,9 @@ public class MoSyncFont
 		byte[] ba = result.getBytes();
 
 		// Write string to MoSync memory.
-		mMoSyncThread.mMemDataSection.position( memBuffer );
-		mMoSyncThread.mMemDataSection.put( ba );
-		mMoSyncThread.mMemDataSection.put( (byte)0 );
+		ByteBuffer buffer = mMoSyncThread.getMemorySlice(memBuffer, ba.length + 1);
+		buffer.put( ba );
+		buffer.put( (byte)0 );
 
 		return result.length( );
 	}
