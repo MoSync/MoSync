@@ -35,7 +35,7 @@ MA 02110-1301, USA.
 #include "PhoneGapMessageHandler.h"
 #include "MimeTypes.h"
 
-#if defined(MOSYNC_NATIVE) && defined(ANDROID)
+#if defined(MOSYNC_NATIVE) && (defined(ANDROID) || defined(__IOS__))
 // WHAT IS GOING ON HERE!?
 int stricmp(const char *s1, const char *s2)
 {

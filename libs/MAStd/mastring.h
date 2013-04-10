@@ -48,6 +48,7 @@
 #include "ma.h"
 #include "mactype.h"
 
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -226,7 +227,7 @@ size_t strnlen(const char *s, size_t count);
 
 #endif	//MAPIP
 
-#if defined(MAPIP) || (defined(MOSYNC_NATIVE) && defined(ANDROID))
+#if defined(MAPIP) || (defined(MOSYNC_NATIVE) && (defined(ANDROID) || defined(__IOS__)))
 /**
 * Compares strings \a s1 with \a s2 without case sensitivity.
 * \returns

@@ -84,6 +84,10 @@ int con_vprintf(const char *fmt, va_list args);
 
 #define _WSTDIO_DEFINED
 
+#ifdef __IOS__
+typedef wchar wchar_t;
+#endif
+
 int con_wprintf(const wchar_t *fmt, ...);
 
 int con_wvprintf(const wchar_t *fmt, va_list args);

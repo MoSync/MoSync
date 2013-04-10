@@ -97,3 +97,6 @@ end
 
 FileUtils.rm_rf(mosyncdir+"/profiles/runtimes/iphoneos/1/template")
 FileUtils.cp_r "template", mosyncdir+"/profiles/runtimes/iphoneos/1/"
+
+FileUtils.cd "../../../../libs/MoSyncLibIOS"
+sh "ruby buildMoSyncLibs.rb"
