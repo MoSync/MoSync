@@ -680,8 +680,7 @@ public class MoSyncFile {
 		}
 
 		// Create a sliced buffer which we can send to file
-		mMoSyncThread.mMemDataSection.position(src);
-		ByteBuffer slicedBuffer = mMoSyncThread.mMemDataSection.slice();
+		ByteBuffer slicedBuffer = mMoSyncThread.getMemorySlice(src, len);
 		slicedBuffer.limit(len);
 
 		int writtenBytes = writeByteBufferToFile(fileHandle, slicedBuffer);
@@ -798,8 +797,7 @@ public class MoSyncFile {
 		}
 
 		// Create a sliced buffer which we can send to file
-		mMoSyncThread.mMemDataSection.position(dst);
-		ByteBuffer slicedBuffer = mMoSyncThread.mMemDataSection.slice();
+		ByteBuffer slicedBuffer = mMoSyncThread.getMemorySlice(dst, len);
 		slicedBuffer.limit(len);
 
 		int bytesRead = readFileToByteBuffer(fileHandle, slicedBuffer);
@@ -1080,13 +1078,13 @@ public class MoSyncFile {
 		if(bufSize == 0) { return len-1; }
 		if(len > bufSize) { return len-1; }
 
-		mMoSyncThread.mMemDataSection.position(nameBuf);
-		mMoSyncThread.mMemDataSection.put(nameChars);
+		ByteBuffer buffer = mMoSyncThread.getMemorySlice(nameBuf, nameChars.length + 3);
+		buffer.put(nameChars);
 		if(file.isDirectory())
 		{
-			mMoSyncThread.mMemDataSection.putChar('/');
+			buffer.putChar('/');
 		}
-		mMoSyncThread.mMemDataSection.put((byte)0);
+		buffer.put((byte)0);
 
 		fileListing.mIndex++;
 

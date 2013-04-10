@@ -17,6 +17,8 @@ MA 02110-1301, USA.
 
 package com.mosync.internal.android.notifications;
 
+import java.nio.ByteBuffer;
+
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
@@ -303,9 +305,9 @@ public class PushNotificationsManager
 		byte[] ba = value.getBytes();
 
 		// Write string to MoSync memory.
-		mMosyncThread.mMemDataSection.position( dst );
-		mMosyncThread.mMemDataSection.put( ba );
-		mMosyncThread.mMemDataSection.put( (byte)0 );
+		ByteBuffer buffer = mMosyncThread.getMemorySlice(dst, ba.length + 1);
+		buffer.put( ba );
+		buffer.put( (byte)0 );
 	}
 
 	/**
