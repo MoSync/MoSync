@@ -187,21 +187,6 @@
 		0B92CF8C1712BB8B002DFDF6 /* Room.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0B92C7D41712BB8A002DFDF6 /* Room.cpp */; };
 		0B92CF8D1712BB8B002DFDF6 /* Sprite.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0B92C7D61712BB8A002DFDF6 /* Sprite.cpp */; };
 		0B92CF8E1712BB8B002DFDF6 /* MinUI.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0B92C7D91712BB8A002DFDF6 /* MinUI.cpp */; };
-		0B92CFC317146487002DFDF6 /* maheap.h in Headers */ = {isa = PBXBuildFile; fileRef = 0B92CF9017141D18002DFDF6 /* maheap.h */; };
-		0B92CFC417146487002DFDF6 /* mavsprintf.h in Headers */ = {isa = PBXBuildFile; fileRef = 0B92CF9117141D18002DFDF6 /* mavsprintf.h */; settings = {ATTRIBUTES = (); }; };
-		0B92CFC517146487002DFDF6 /* IX_OPENGL_ES.h in Headers */ = {isa = PBXBuildFile; fileRef = 0B92CF9217141D18002DFDF6 /* IX_OPENGL_ES.h */; };
-		0B92CFC617146487002DFDF6 /* madmath.h in Headers */ = {isa = PBXBuildFile; fileRef = 0B92CF9317141D18002DFDF6 /* madmath.h */; };
-		0B92CFC717146487002DFDF6 /* mastdlib.h in Headers */ = {isa = PBXBuildFile; fileRef = 0B92CF9417141D19002DFDF6 /* mastdlib.h */; };
-		0B92CFC817146487002DFDF6 /* conprint.h in Headers */ = {isa = PBXBuildFile; fileRef = 0B92B5971712BB7C002DFDF6 /* conprint.h */; };
-		0B92CFC917146487002DFDF6 /* IX_WIDGET.h in Headers */ = {isa = PBXBuildFile; fileRef = 0B92B5B41712BB7C002DFDF6 /* IX_WIDGET.h */; };
-		0B92CFCA17146487002DFDF6 /* ma.h in Headers */ = {isa = PBXBuildFile; fileRef = 0B92B5BC1712BB7C002DFDF6 /* ma.h */; };
-		0B92CFCC17146487002DFDF6 /* maassert.h in Headers */ = {isa = PBXBuildFile; fileRef = 0B92B5C11712BB7C002DFDF6 /* maassert.h */; };
-		0B92CFCD17146487002DFDF6 /* mactype.h in Headers */ = {isa = PBXBuildFile; fileRef = 0B92B5C41712BB7C002DFDF6 /* mactype.h */; };
-		0B92CFCE17146487002DFDF6 /* mastring.h in Headers */ = {isa = PBXBuildFile; fileRef = 0B92B5D11712BB7D002DFDF6 /* mastring.h */; };
-		0B92CFCF17146487002DFDF6 /* matime.h in Headers */ = {isa = PBXBuildFile; fileRef = 0B92B5D61712BB7D002DFDF6 /* matime.h */; };
-		0B92CFD017146487002DFDF6 /* maxtoa.h in Headers */ = {isa = PBXBuildFile; fileRef = 0B92B5DE1712BB7D002DFDF6 /* maxtoa.h */; };
-		0B92CFD2171598F9002DFDF6 /* maapi.h in Headers */ = {isa = PBXBuildFile; fileRef = 0B92CFD1171598F9002DFDF6 /* maapi.h */; };
-		0B92CFD317159903002DFDF6 /* maarg.h in Headers */ = {isa = PBXBuildFile; fileRef = 0B92B5BF1712BB7C002DFDF6 /* maarg.h */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -1584,37 +1569,12 @@
 		};
 /* End PBXGroup section */
 
-/* Begin PBXHeadersBuildPhase section */
-		0B92CFC2171463BF002DFDF6 /* Headers */ = {
-			isa = PBXHeadersBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				0B92CFD317159903002DFDF6 /* maarg.h in Headers */,
-				0B92CFC317146487002DFDF6 /* maheap.h in Headers */,
-				0B92CFC417146487002DFDF6 /* mavsprintf.h in Headers */,
-				0B92CFC517146487002DFDF6 /* IX_OPENGL_ES.h in Headers */,
-				0B92CFC617146487002DFDF6 /* madmath.h in Headers */,
-				0B92CFC717146487002DFDF6 /* mastdlib.h in Headers */,
-				0B92CFC817146487002DFDF6 /* conprint.h in Headers */,
-				0B92CFC917146487002DFDF6 /* IX_WIDGET.h in Headers */,
-				0B92CFCA17146487002DFDF6 /* ma.h in Headers */,
-				0B92CFCC17146487002DFDF6 /* maassert.h in Headers */,
-				0B92CFCD17146487002DFDF6 /* mactype.h in Headers */,
-				0B92CFCE17146487002DFDF6 /* mastring.h in Headers */,
-				0B92CFCF17146487002DFDF6 /* matime.h in Headers */,
-				0B92CFD017146487002DFDF6 /* maxtoa.h in Headers */,
-				0B92CFD2171598F9002DFDF6 /* maapi.h in Headers */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXHeadersBuildPhase section */
-
 /* Begin PBXNativeTarget section */
 		0B92B46B1712BAE1002DFDF6 /* MoSyncLibIOS */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 0B92B47A1712BAE1002DFDF6 /* Build configuration list for PBXNativeTarget "MoSyncLibIOS" */;
 			buildPhases = (
-				0B92CFC2171463BF002DFDF6 /* Headers */,
+				0B92CFD61715BE88002DFDF6 /* ShellScript */,
 				0B92B4681712BAE1002DFDF6 /* Sources */,
 				0B92B4691712BAE1002DFDF6 /* Frameworks */,
 				0B92B46A1712BAE1002DFDF6 /* CopyFiles */,
@@ -1653,6 +1613,22 @@
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		0B92CFD61715BE88002DFDF6 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "line_1=$(sed -n '/char\\* strcpy/=' ../MAStd/maapi.h)\nlet \"line_2=$line_1-2\"\necho $line_2\n\nrm -r MAStdNative\nmkdir MAStdNative\ncd ../MAStd\ncp IX_OPENGL_ES.h maapi.h madmath.h maxtoa.h IX_WIDGET.h maheap.h matime.h conprint.h maassert.h mastdlib.h mavsprintf.h ma.h mactype.h mastring.h ../MoSyncLibIOS/MAStdNative\ncd ../MoSyncLibIOS/MAStdNative\n\nline_1+=\"d\"\necho $line_1\nline_2+=\"d\"\necho $line_2\n\nsed -i.bak $line_1 maapi.h\nsed -i.bak $line_2 maapi.h\n\n";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		0B92B4681712BAE1002DFDF6 /* Sources */ = {
@@ -1902,7 +1878,10 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "MoSyncLibIOS/MoSyncLibIOS-Prefix.pch";
 				GCC_VERSION = com.apple.compilers.llvmgcc42;
-				HEADER_SEARCH_PATHS = ../;
+				HEADER_SEARCH_PATHS = (
+					../,
+					MAStdNative/,
+				);
 				OTHER_CFLAGS = (
 					"-D__IOS__",
 					"-DUSE_NEWLIB",
@@ -1924,7 +1903,10 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "MoSyncLibIOS/MoSyncLibIOS-Prefix.pch";
 				GCC_VERSION = com.apple.compilers.llvmgcc42;
-				HEADER_SEARCH_PATHS = ../;
+				HEADER_SEARCH_PATHS = (
+					../,
+					MAStdNative/,
+				);
 				OTHER_CFLAGS = (
 					"-D__IOS__",
 					"-DUSE_NEWLIB",
@@ -1958,6 +1940,7 @@
 				0B92B47C1712BAE1002DFDF6 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
