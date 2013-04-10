@@ -5,121 +5,12 @@
       <UniqueIdentifier>5fd0e509-b6ae-4f29-bd2a-4d2cc10f3aa0</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="MAUIEx">
-      <UniqueIdentifier>{81ae9d56-7632-469a-a2bb-a21c81a18f99}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MosyncLibraryGlueCode.cpp" />
-    <ClCompile Include="MAUIex\Clock.cpp">
-      <Filter>MAUIEx</Filter>
-    </ClCompile>
-    <ClCompile Include="MAUIex\CustomScreen.cpp">
-      <Filter>MAUIEx</Filter>
-    </ClCompile>
-    <ClCompile Include="MAUIex\EditBoxScreen.cpp">
-      <Filter>MAUIEx</Filter>
-    </ClCompile>
-    <ClCompile Include="MAUIex\ImageScreen.cpp">
-      <Filter>MAUIEx</Filter>
-    </ClCompile>
-    <ClCompile Include="MAUIex\LabelScreen.cpp">
-      <Filter>MAUIEx</Filter>
-    </ClCompile>
-    <ClCompile Include="MAUIex\LayoutScreen.cpp">
-      <Filter>MAUIEx</Filter>
-    </ClCompile>
-    <ClCompile Include="MAUIex\MAUIex.cpp">
-      <Filter>MAUIEx</Filter>
-    </ClCompile>
-    <ClCompile Include="MAUIex\Util.cpp">
-      <Filter>MAUIEx</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MosyncLibraryGlueCode.h" />
     <ClInclude Include="MAHeaders.h" />
-    <ClInclude Include="MAUIex\Clock.h">
-      <Filter>MAUIEx</Filter>
-    </ClInclude>
-    <ClInclude Include="MAUIex\CustomScreen.h">
-      <Filter>MAUIEx</Filter>
-    </ClInclude>
-    <ClInclude Include="MAUIex\EditBoxScreen.h">
-      <Filter>MAUIEx</Filter>
-    </ClInclude>
-    <ClInclude Include="MAUIex\ImageScreen.h">
-      <Filter>MAUIEx</Filter>
-    </ClInclude>
-    <ClInclude Include="MAUIex\LabelScreen.h">
-      <Filter>MAUIEx</Filter>
-    </ClInclude>
-    <ClInclude Include="MAUIex\LayoutScreen.h">
-      <Filter>MAUIEx</Filter>
-    </ClInclude>
-    <ClInclude Include="MAUIex\MAHeaders.h">
-      <Filter>MAUIEx</Filter>
-    </ClInclude>
-    <ClInclude Include="MAUIex\MAUIex.h">
-      <Filter>MAUIEx</Filter>
-    </ClInclude>
-    <ClInclude Include="MAUIex\Util.h">
-      <Filter>MAUIEx</Filter>
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <Image Include="MAUIex\background_tile_sel.png">
-      <Filter>MAUIEx</Filter>
-    </Image>
-    <Image Include="MAUIex\background_tile_unsel.png">
-      <Filter>MAUIEx</Filter>
-    </Image>
-    <Image Include="MAUIex\icon1.png">
-      <Filter>MAUIEx</Filter>
-    </Image>
-    <Image Include="MAUIex\icon2.png">
-      <Filter>MAUIEx</Filter>
-    </Image>
-    <Image Include="MAUIex\icon3.png">
-      <Filter>MAUIEx</Filter>
-    </Image>
-    <Image Include="MAUIex\icon4.png">
-      <Filter>MAUIEx</Filter>
-    </Image>
-    <Image Include="MAUIex\icon5.png">
-      <Filter>MAUIEx</Filter>
-    </Image>
-    <Image Include="MAUIex\icon6.png">
-      <Filter>MAUIEx</Filter>
-    </Image>
-    <Image Include="MAUIex\icon7.png">
-      <Filter>MAUIEx</Filter>
-    </Image>
-    <Image Include="MAUIex\icon8.png">
-      <Filter>MAUIEx</Filter>
-    </Image>
-    <Image Include="MAUIex\icon9.png">
-      <Filter>MAUIEx</Filter>
-    </Image>
-    <Image Include="MAUIex\image.png">
-      <Filter>MAUIEx</Filter>
-    </Image>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="MAUIex\MAUIex.vcxproj">
-      <Filter>MAUIEx</Filter>
-    </None>
-    <None Include="MAUIex\MAUIex.vcxproj.filters">
-      <Filter>MAUIEx</Filter>
-    </None>
-    <None Include="MAUIex\pretty.mof">
-      <Filter>MAUIEx</Filter>
-    </None>
-    <None Include="MAUIex\res.lst">
-      <Filter>MAUIEx</Filter>
-    </None>
-    <None Include="MAUIex\workfile.rb">
-      <Filter>MAUIEx</Filter>
-    </None>
   </ItemGroup>
 </Project>

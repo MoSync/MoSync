@@ -70,6 +70,7 @@
     <ClCompile Include="GraphicsSoftware.c" />
     <ClCompile Include="PlaceholderPool.cpp" />
     <ClCompile Include="util.cpp" />
+    <ClCompile Include="GLMoblet.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BluetoothConnection.h">
@@ -153,5 +154,12 @@
     <ClInclude Include="GraphicsSoftware.h" />
     <ClInclude Include="PlaceholderPool.h" />
     <ClInclude Include="util.h" />
+    <ClInclude Include="ErrorListenable.h" />
+    <ClInclude Include="GLMoblet.h" />
+    <ClInclude Include="HashDict.h" />
+    <ClInclude Include="HashDict_impl.h" />
+    <ClInclude Include="HashSet.h" />
+    <ClInclude Include="Stack.h" />
+    <ClInclude Include="Tokenizer.h" />
   </ItemGroup>
 </Project>

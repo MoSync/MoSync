@@ -84,14 +84,17 @@
     <ClInclude Include="WebViewMessage.h" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\MAStd\MAStd.vcxproj">
+    <ProjectReference Include="..\MAStd\MAStd_WP8.vcxproj">
       <Project>{eeed04c3-fd4a-47d1-b918-edcbd5b122be}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\MAUtil\MAUtil.vcxproj">
+    <ProjectReference Include="..\MAUtil\MAUtil_WP8.vcxproj">
       <Project>{2856527d-4dc7-4ef5-bc8b-71d53e632730}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\NativeUI\NativeUI.vcxproj">
+    <ProjectReference Include="..\NativeUI\NativeUI_WP8.vcxproj">
       <Project>{d505b50e-8649-4030-9d91-965064dbc867}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\yajl\yajl_WP8.vcxproj">
+      <Project>{e8e93ee7-b75e-4bfe-bbd9-22aa7e69d8c2}</Project>
     </ProjectReference>
   </ItemGroup>
   <PropertyGroup Label="Globals">
@@ -208,7 +211,7 @@
       </PrecompiledHeader>
       <CompileAsWinRT>false</CompileAsWinRT>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>..\;..\MAStd;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../;../MAStd;</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;WINDOWS_PHONE_8;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ExceptionHandling />
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>

@@ -27,87 +27,55 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\kazlib\dict.c">
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">CompileAsC</CompileAs>
+    <ClCompile Include="src\stdlib\stdlib.c" />
+    <ClCompile Include="src\yajl.c" />
+    <ClCompile Include="src\yajl_alloc.c" />
+    <ClCompile Include="src\yajl_buf.c" />
+    <ClCompile Include="src\yajl_encode.c" />
+    <ClCompile Include="src\yajl_gen.c" />
+    <ClCompile Include="src\yajl_lex.c" />
+    <ClCompile Include="src\yajl_parser.c" />
+    <ClCompile Include="src\yajl_version.c" />
+    <ClCompile Include="YAJLDom.cpp">
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">CompileAsCpp</CompileAs>
     </ClCompile>
-    <ClCompile Include="..\kazlib\hash.c">
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">CompileAsC</CompileAs>
-    </ClCompile>
-    <ClCompile Include="BluetoothConnection.cpp" />
-    <ClCompile Include="BluetoothDiscovery.cpp" />
-    <ClCompile Include="BuffDownloader.cpp" />
-    <ClCompile Include="CharInput.cpp" />
-    <ClCompile Include="CharInputC.c" />
-    <ClCompile Include="Connection.cpp" />
-    <ClCompile Include="Downloader.cpp" />
-    <ClCompile Include="Environment.cpp" />
-    <ClCompile Include="FileLister.cpp" />
-    <ClCompile Include="FrameBuffer.c" />
-    <ClCompile Include="Geometry.cpp" />
-    <ClCompile Include="GLMoblet.cpp" />
-    <ClCompile Include="Graphics.c" />
-    <ClCompile Include="GraphicsOpenGL.c" />
-    <ClCompile Include="GraphicsSoftware.c" />
-    <ClCompile Include="HashMap.cpp" />
-    <ClCompile Include="Moblet.cpp" />
-    <ClCompile Include="PlaceholderPool.cpp" />
-    <ClCompile Include="RefCounted.cpp" />
-    <ClCompile Include="Server.cpp" />
-    <ClCompile Include="String.cpp" />
-    <ClCompile Include="util.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\kazlib\dict.h" />
-    <ClInclude Include="..\kazlib\hash.h" />
-    <ClInclude Include="BluetoothConnection.h" />
-    <ClInclude Include="BluetoothDiscovery.h" />
-    <ClInclude Include="BuffDownloader.h" />
-    <ClInclude Include="CharInput.h" />
-    <ClInclude Include="collection_common.h" />
-    <ClInclude Include="Connection.h" />
-    <ClInclude Include="DataHandler.h" />
-    <ClInclude Include="Dictionary.h" />
-    <ClInclude Include="Dictionary_impl.h" />
-    <ClInclude Include="Downloader.h" />
-    <ClInclude Include="Environment.h" />
-    <ClInclude Include="ErrorListenable.h" />
-    <ClInclude Include="FileLister.h" />
-    <ClInclude Include="FrameBuffer.h" />
-    <ClInclude Include="Geometry.h" />
-    <ClInclude Include="GLMoblet.h" />
-    <ClInclude Include="Graphics.h" />
-    <ClInclude Include="GraphicsOpenGL.h" />
-    <ClInclude Include="GraphicsSoftware.h" />
-    <ClInclude Include="HashDict.h" />
-    <ClInclude Include="HashDict_impl.h" />
-    <ClInclude Include="HashMap.h" />
-    <ClInclude Include="HashMap_impl.h" />
-    <ClInclude Include="HashSet.h" />
-    <ClInclude Include="List.h" />
-    <ClInclude Include="ListenerSet.h" />
-    <ClInclude Include="Map.h" />
-    <ClInclude Include="mauuid.h" />
-    <ClInclude Include="Moblet.h" />
-    <ClInclude Include="PlaceholderPool.h" />
-    <ClInclude Include="RefCounted.h" />
-    <ClInclude Include="Server.h" />
-    <ClInclude Include="Set.h" />
-    <ClInclude Include="Stack.h" />
-    <ClInclude Include="String.h" />
-    <ClInclude Include="Tokenizer.h" />
-    <ClInclude Include="util.h" />
-    <ClInclude Include="Vector.h" />
+    <ClInclude Include="src\api\yajl_common.h" />
+    <ClInclude Include="src\api\yajl_gen.h" />
+    <ClInclude Include="src\api\yajl_parse.h" />
+    <ClInclude Include="src\api\yajl_version.h" />
+    <ClInclude Include="src\stdlib\assert.h" />
+    <ClInclude Include="src\stdlib\ctype.h" />
+    <ClInclude Include="src\stdlib\errno.h" />
+    <ClInclude Include="src\stdlib\math.h" />
+    <ClInclude Include="src\stdlib\stdio.h" />
+    <ClInclude Include="src\stdlib\stdlib.h" />
+    <ClInclude Include="src\stdlib\string.h" />
+    <ClInclude Include="src\yajl_alloc.h" />
+    <ClInclude Include="src\yajl_buf.h" />
+    <ClInclude Include="src\yajl_bytestack.h" />
+    <ClInclude Include="src\yajl_encode.h" />
+    <ClInclude Include="src\yajl_lex.h" />
+    <ClInclude Include="src\yajl_parser.h" />
+    <ClInclude Include="YAJLDom.h" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\MAP\MAP_WP8.vcxproj">
+      <Project>{9d8bc5ca-1cd2-4130-b523-55eae2d0dab2}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\MAStd\MAStd_WP8.vcxproj">
       <Project>{eeed04c3-fd4a-47d1-b918-edcbd5b122be}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\MAUtil\MAUtil_WP8.vcxproj">
+      <Project>{2856527d-4dc7-4ef5-bc8b-71d53e632730}</Project>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{2856527d-4dc7-4ef5-bc8b-71d53e632730}</ProjectGuid>
+    <ProjectGuid>{e8e93ee7-b75e-4bfe-bbd9-22aa7e69d8c2}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <ProjectName>MAUtil_WP8</ProjectName>
-    <RootNamespace>MAUtil</RootNamespace>
+    <ProjectName>yajl_WP8</ProjectName>
+    <RootNamespace>yajl</RootNamespace>
     <DefaultLanguage>en-US</DefaultLanguage>
     <MinimumVisualStudioVersion>11.0</MinimumVisualStudioVersion>
     <AppContainerApplication>true</AppContainerApplication>
@@ -169,8 +137,8 @@
   <PropertyGroup />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <GenerateManifest>false</GenerateManifest>
-    <OutDir>$(MOSYNCDIR)\lib\w32\</OutDir>
-    <TargetName>$(ProjectName)D</TargetName>
+    <OutDir>$(MOSYNCDIR)\lib\windowsPhone8\ARM\Debug</OutDir>
+    <TargetName>yajl</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <GenerateManifest>false</GenerateManifest>
@@ -178,7 +146,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
     <GenerateManifest>false</GenerateManifest>
     <OutDir>$(MOSYNCDIR)\lib\windowsPhone8\ARM\Debug</OutDir>
-    <TargetName>MAUtil</TargetName>
+    <TargetName>yajl</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
     <GenerateManifest>false</GenerateManifest>
@@ -191,7 +159,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <CompileAsWinRT>false</CompileAsWinRT>
       <SDLCheck>true</SDLCheck>
     </ClCompile>
@@ -219,21 +187,15 @@
       </PrecompiledHeader>
       <CompileAsWinRT>false</CompileAsWinRT>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>../;../MAStd;</AdditionalIncludeDirectories>
-      <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;WINDOWS_PHONE_8;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <MinimalRebuild>true</MinimalRebuild>
-      <ExceptionHandling>false</ExceptionHandling>
+      <ExceptionHandling />
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <GenerateWindowsMetadata>false</GenerateWindowsMetadata>
     </Link>
-    <Lib>
-      <AdditionalDependencies>
-      </AdditionalDependencies>
-    </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|arm'">
     <ClCompile>

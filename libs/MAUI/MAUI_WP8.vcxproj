@@ -58,10 +58,10 @@
     <ClInclude Include="WidgetSkin.h" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\MAStd\MAStd.vcxproj">
+    <ProjectReference Include="..\MAStd\MAStd_WP8.vcxproj">
       <Project>{eeed04c3-fd4a-47d1-b918-edcbd5b122be}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\MAUtil\MAUtil.vcxproj">
+    <ProjectReference Include="..\MAUtil\MAUtil_WP8.vcxproj">
       <Project>{2856527d-4dc7-4ef5-bc8b-71d53e632730}</Project>
     </ProjectReference>
   </ItemGroup>

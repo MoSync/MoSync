@@ -27,7 +27,12 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "RefCounted.h"
 #include "Vector.h"
+
+#ifndef WINDOWS_PHONE_8
 #include <ma.h>
+#else
+#include "../MAStd/ma.h"
+#endif
 
 #if 0//ndef MAPIP
 #define HAVE_EMPTY_STRING

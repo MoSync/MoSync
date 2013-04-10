@@ -455,8 +455,12 @@ namespace MoSync
 
 			ioctls.glBufferSubData = delegate(int _target, int _offset, int _size, int _data)
 			{
+#if !LIB
 				mGL.glBufferSubData(_target, _offset, _size, core.GetDataMemory().GetData(), _data);
 				return 0;
+#else
+				return MoSync.Constants.IOCTL_UNAVAILABLE;
+#endif
 			};
 
 			ioctls.glMaterialf = delegate(int face, int pname, float value)
