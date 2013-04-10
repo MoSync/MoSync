@@ -372,7 +372,7 @@ SYSCALL(int, maCameraSnapshot(int formatIndex, MAHandle placeholder))
 	}
 }
 
-SYSCALL(int, maCameraSnapshotAsync(int formatIndex))
+SYSCALL(int, maCameraSnapshotAsync(MAHandle placeholder, int formatIndex))
 {
 	@try {
 		CameraInfo *info = getCurrentCameraInfo();
@@ -388,25 +388,26 @@ SYSCALL(int, maCameraSnapshotAsync(int formatIndex))
 			[videoConnection setVideoOrientation:UIDeviceOrientationPortrait];
 		}
 
-        int placeholder = maCreatePlaceholder();
-
         void (^captionCompletionHandler)(CMSampleBufferRef, NSError*) = ^(CMSampleBufferRef imageDataSampleBuffer, NSError *error) {
             MAEvent event;
             event.type = EVENT_TYPE_CAMERA_SNAPSHOT;
-            event.snapshotImageDataHandle = 0;
-            event.snapshotFormatIndex = 0;
+            event.snapshotImageDataHandle = placeholder;
+            event.snapshotSize = 0;
             event.snapshotImageDataRepresentation = MA_IMAGE_REPRESENTATION_JPEG;
             event.snapshotReturnCode = MA_CAMERA_RES_OK;
 
             if ( (NULL != imageDataSampleBuffer) && (NULL == error)) {
                 NSData *imageData = [AVCaptureStillImageOutput jpegStillImageNSDataRepresentation:imageDataSampleBuffer];
+
+                // See if there is better way to obtain the size of the snapshot.
+                UIImage *img = [[UIImage alloc] initWithData:imageData] ;
+                event.snapshotSize = EXTENT((int)floorf(img.size.width), (int)floorf(img.size.height));
+                [img release];
+
                 Base::MemStream *stream = new Base::MemStream([imageData length]);
 
                 stream->write([imageData bytes],[imageData length]);
                 Base::gSyscall->resources.add_RT_BINARY(placeholder, stream);
-
-                event.snapshotImageDataHandle = placeholder;
-                event.snapshotFormatIndex = formatIndex;
             }
             else
             {
@@ -415,7 +416,6 @@ SYSCALL(int, maCameraSnapshotAsync(int formatIndex))
             }
             Base::gEventQueue.put(event);
         };
-
 		[info->stillImageOutput captureStillImageAsynchronouslyFromConnection:videoConnection
                                                             completionHandler:captionCompletionHandler];
 		return MA_CAMERA_RES_OK;

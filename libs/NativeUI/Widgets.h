@@ -40,6 +40,7 @@ MA 02110-1301, USA.
 #include "Button.h"
 #include "ButtonListener.h"
 #include "CameraPreview.h"
+#include "Camera.h"
 #include "CheckBox.h"
 #include "CheckBoxListener.h"
 #include "DatePicker.h"

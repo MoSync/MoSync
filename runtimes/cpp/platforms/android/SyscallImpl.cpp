@@ -2263,6 +2263,7 @@ namespace Base
 		case maIOCtl_maCameraSnapshotAsync:
 			return _maCameraSnapshotAsync(
 				a,
+				b,
 				mJNIEnv,
 				mJThis);
 

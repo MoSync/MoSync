@@ -1827,16 +1827,16 @@ namespace Base
 		return (int)result;
 	}
 
-	int _maCameraSnapshotAsync(int formatIndex, JNIEnv* jNIEnv, jobject jThis)
+	int _maCameraSnapshotAsync(int dataPlaceholder, int sizeIndex, JNIEnv* jNIEnv, jobject jThis)
 	{
 		// Get the Java method
 		jclass cls = jNIEnv->GetObjectClass(jThis);
-		jmethodID methodID = jNIEnv->GetMethodID(cls, "maCameraSnapshotAsync", "(I)I");
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maCameraSnapshotAsync", "(II)I");
 
 		jint result = -1;
 
 		if (methodID != 0)
-			result = jNIEnv->CallIntMethod(jThis, methodID, formatIndex);
+			result = jNIEnv->CallIntMethod(jThis, methodID, dataPlaceholder, sizeIndex);
 
 		// Delete allocated memory
 		jNIEnv->DeleteLocalRef(cls);
