@@ -40,6 +40,7 @@ namespace MoGraph
 		mDelta 			= 1.0f;	// must have the same size as the initial set up. 1.0f.
 		mWidth 			= 640;	// constructor defaults
 		mHeight 		= 480;
+		mOldZ			= 0.0f;
 	}
 
 	/**
@@ -168,7 +169,8 @@ namespace MoGraph
 
 			mScalePosArr[0] = mTouch[0].mPos/scale;		// Normalize position (1) 0..1
 			mScalePosArr[1] = mTouch[1].mPos/scale;		// Normalize position (2) 0..1
-			glm::vec2 diff = mScalePosArr[0] - mScalePosArr[1];	// get delta between the thouches (from both positions)
+			glm::vec2 diff 	= mScalePosArr[0] - mScalePosArr[1];	// get delta between the thouches (from both positions)
+			mRotPos.z 		= -atan2(diff.y,diff.x);	// calculate the Z angle in rad,
 
 			float delta = glm::length(diff);			// get distance from delta (hypetenuse)
 
@@ -180,15 +182,12 @@ namespace MoGraph
 			if (mTouch[0].mState == MoGraph::Moving && mTouch[1].mState == MoGraph::Moving)
 			{
 				mScalePos 		= delta;					// store delta output to scalePos
-				float oldZ 		= mRotPos.z;				// oldZ rot pos.
-				mRotPos.z 		= -atan2(diff.y,diff.x);	// calculate the Z angle in rad,
-				float speedZ 	= mRotPos.z - oldZ;			// get rotational speed
-
+				float speedZ 	= mRotPos.z - mOldZ;			// get rotational speed
 															// handle angular pos wrapp.
 				if (speedZ < -PI)
-					speedZ = (mRotPos.z + 2.0f*PI) - oldZ;
+					speedZ = (mRotPos.z + 2.0f*PI) - mOldZ;
 				else if (speedZ > PI)
-					speedZ = (mRotPos.z - 2.0f*PI) - oldZ;
+					speedZ = (mRotPos.z - 2.0f*PI) - mOldZ;
 															// clamp angular speed
 				const float maxSpeedZ = 0.2f;
 				if (speedZ > maxSpeedZ)
@@ -197,11 +196,14 @@ namespace MoGraph
 				if (speedZ < -maxSpeedZ)
 					speedZ = -maxSpeedZ;
 
+//				lprintfln("RotSpeed = %f = %f - %f",speedZ,mRotPos.z,mOldZ);
 				mRotSpeed.z = speedZ;						// store to ouput speed
+				mOldZ 		= mRotPos.z;				// oldZ rot pos.
 			}
 			else	// 2 touch but not not in moving
 			{
-				mScalePos = mScaleOldPos = delta;			// use delta output to scale position
+				mScalePos 	= mScaleOldPos = delta;			// use delta output to scale position
+				mOldZ		= mRotPos.z;
 			}
 
 			mDelta -= mScaleOldPos - mScalePos;				// get scale speed from 2 pos old and current

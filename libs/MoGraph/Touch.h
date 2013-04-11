@@ -69,6 +69,7 @@ namespace MoGraph
 		float 			mScalePos;			// distance between 2 positions
 		float 			mScaleOldPos;		// previous diance between 2 posions
 		float 			mDelta;				// output scale speed
+		float			mOldZ;
 		int 			mWidth;
 		int				mHeight;			// Screen resolution in ABS form e.g. 640,480
 
