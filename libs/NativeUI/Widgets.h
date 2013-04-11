@@ -42,6 +42,7 @@ MA 02110-1301, USA.
 #include "CameraPreview.h"
 #include "CheckBox.h"
 #include "CheckBoxListener.h"
+#include "CustomPicker.h"
 #include "DatePicker.h"
 #include "DatePickerListener.h"
 #include "Dialog.h"
