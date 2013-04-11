@@ -63,12 +63,12 @@ namespace MoGraph
 	protected:
 		int				mTouchActive;
 		std::hash_map<int, Touch> mTouch;	// table of touch
-		glm::vec2 		mRotSpeed;			// calculated rotation speed
-		glm::vec2 		mRotPos;			// calculated rotation position
-		glm::vec2 		mScaleSpeed[2];		// Swipe scale (req two touches)
-		float 			mScalePos;			// current position of scale
-		float 			mScaleOldPos;		// previous frame position of scale
-		float 			mDelta;				// temp diff value for ui swipe
+		glm::vec3 		mRotSpeed;			// calculated rotation speed
+		glm::vec3 		mRotPos;			// calculated rotation position
+		glm::vec2 		mScalePosArr[2];	// Scale (reqd two touch position)
+		float 			mScalePos;			// distance between 2 positions
+		float 			mScaleOldPos;		// previous diance between 2 posions
+		float 			mDelta;				// output scale speed
 		int 			mWidth;
 		int				mHeight;			// Screen resolution in ABS form e.g. 640,480
 
@@ -79,7 +79,7 @@ namespace MoGraph
 		 * @param speed,	input/output, speed.
 		 * @return speed	returns
 		 */
-		glm::vec2 getSpeed(Touch &t, glm::vec2 &speed);
+		glm::vec3 getSpeed(Touch &t, glm::vec3 &speed);
 
 	public:
 		/**
@@ -109,12 +109,12 @@ namespace MoGraph
 		 * \brief getAngularOrientation, in degrees
 		 * @return yaw angle and pitch angle (y,x) in prio order
 		 */
-		virtual glm::vec2 getAngularOrientation() {return mRotPos;}
+		virtual glm::vec3 getAngularOrientation() {return mRotPos;}
 		/**
 		 * \brief getAngularSpeed, in degrees
 		 * @return yaw speed angle and pitch speed angle (y,x) in prio order
 		 */
-		virtual glm::vec2 getAngularSpeed() {return mRotSpeed;}
+		virtual glm::vec3 getAngularSpeed() {return mRotSpeed;}
 		// optional multi touch is in use here
 		/**
 		 * \brief multitouchPressEvent,	fwd events from the event handler to here

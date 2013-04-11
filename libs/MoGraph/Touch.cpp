@@ -23,21 +23,23 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 namespace MoGraph
 {
 
+	#define FABS(x)	((x<0.0f)?-(x):(x))
 	/**
 	 * \brief TouchInput, constructor
 	 */
 	TouchInput::TouchInput()
 	{
 		glm::vec2 clr(0.0f,0.0f);
-		mScaleSpeed[0] = clr;
-		mScaleSpeed[1] = clr;
-		mScaleOldPos = 1.0f;
-		mScalePos = 1.0f;
-		mRotPos = clr;
-		mRotSpeed = clr;
-		mDelta = 1.0f;	// must have the same size as the initial set up. 1.0f.
-		mWidth = 640;
-		mHeight = 480;
+		glm::vec3 clr3(0.0f,0.0f,0.0f);
+		mScalePosArr[0] = clr;
+		mScalePosArr[1] = clr;
+		mScaleOldPos 	= 1.0f;
+		mScalePos 		= 1.0f;
+		mRotPos 		= clr3;
+		mRotSpeed 		= clr3;
+		mDelta 			= 1.0f;	// must have the same size as the initial set up. 1.0f.
+		mWidth 			= 640;	// constructor defaults
+		mHeight 		= 480;
 	}
 
 	/**
@@ -62,11 +64,11 @@ namespace MoGraph
 	void TouchInput::multitouchMoveEvent(MAPoint2d p, int touchId)
 	{
 //		lprintfln("multitouchMoveEvent=(%d,%d) id=%d",p.x,p.y,touchId);
-		Touch &t = mTouch[touchId];
-		t.mOldPos = t.mPos;
-		t.mPos = glm::vec2(p.x,p.y);
-		t.mId = touchId;
-		t.mState = Moving;
+		Touch &t 	= mTouch[touchId];
+		t.mOldPos 	= t.mPos;
+		t.mPos 		= glm::vec2(p.x,p.y);
+		t.mId 		= touchId;
+		t.mState 	= Moving;
 	}
 
 	/**
@@ -77,11 +79,11 @@ namespace MoGraph
 	void TouchInput::multitouchReleaseEvent(MAPoint2d p, int touchId)
 	{
 //		lprintfln("multitouchReleaseEvent=(%d,%d) id=%d",p.x,p.y,touchId);
-		Touch &t = mTouch[touchId];
-		t.mOldPos = t.mPos;
-		t.mPos = glm::vec2(p.x,p.y);
-		t.mId = touchId;
-		t.mState = Released;
+		Touch &t 	= mTouch[touchId];
+		t.mOldPos 	= t.mPos;
+		t.mPos 		= glm::vec2(p.x,p.y);
+		t.mId 		= touchId;
+		t.mState 	= Released;
 		mTouchActive--;
 	}
 
@@ -91,24 +93,25 @@ namespace MoGraph
 	 * @param speed,	input/output speed
 	 * @return vec2		output speed
 	 */
-	glm::vec2 TouchInput::getSpeed(Touch &t, glm::vec2 &speed)
+	glm::vec3 TouchInput::getSpeed(Touch &t, glm::vec3 &speed)
 	{
 
-		glm::vec2 p,op;
+		glm::vec3 p,op;
 		// Single touch.
 		if (mTouchActive == 0)
 		{
-			p.x = 0.0f;
-			p.y = 0.0f;
-			speed *= 0.98f;
+			p.x 	= 0.0f;
+			p.y 	= 0.0f;
+			p.z		= 0.0f;
+			speed 	*= 0.98f;	// TODO : this needs delta time
 		}
 		else if (mTouchActive == 1)
 		{
 			glm::vec2 scale((float)mWidth,(float)mHeight);
 
-			p	= mTouch[0].mPos/scale;
-			op	= mTouch[0].mOldPos/scale;
-			speed = p - op;
+			p		= glm::vec3(mTouch[0].mPos.x/scale.x, mTouch[0].mPos.y/scale.y,0.0f);
+			op		= glm::vec3(mTouch[0].mOldPos.x/scale.x,mTouch[0].mOldPos.y/scale.y,0.0f);
+			speed 	= p - op;
 		}
 
 		if (speed.x > 1.0f)
@@ -122,7 +125,13 @@ namespace MoGraph
 
 		if (speed.y < -1.0f)
 			speed.y = -1.0f;
+/*
+		if (speed.z > 1.0f)
+			speed.z = 1.0f;
 
+		if (speed.z < -1.0f)
+			speed.z = -1.0f;
+*/
 		return speed;
 	}
 
@@ -143,50 +152,71 @@ namespace MoGraph
 	 */
 	void TouchInput::update()
 	{
+		const float PI = M_PI;
+
 		if (mTouchActive>1)
 		{
-			if (mTouchActive > 2)
+			if (mTouchActive > 2)		// 2 touch (scale and rotation)
 			{
 				lprintfln("Multi x>2 touch not supported yet! = %d",mTouchActive);
 				return;
 			}
 
 			// double touch scale
+
 			glm::vec2 scale((float)mWidth,(float)mHeight);
-			mScaleSpeed[0] = mTouch[0].mPos/scale;
-			mScaleSpeed[1] = mTouch[1].mPos/scale;
-			glm::vec2 diff = mScaleSpeed[0] - mScaleSpeed[1];
 
-			float delta = glm::length(diff);
+			mScalePosArr[0] = mTouch[0].mPos/scale;		// Normalize position (1) 0..1
+			mScalePosArr[1] = mTouch[1].mPos/scale;		// Normalize position (2) 0..1
+			glm::vec2 diff = mScalePosArr[0] - mScalePosArr[1];	// get delta between the thouches (from both positions)
 
-			delta = (delta < 0.0f)? -delta: delta;
-			delta = (delta < 0.1f)? 0.1f: delta;
+			float delta = glm::length(diff);			// get distance from delta (hypetenuse)
+
+			delta = (delta < 0.0f)? -delta: delta;		// abs delta
+			delta = (delta < 0.1f)? 0.1f: delta;		// min/max delta (used for scale output)
 			delta = (delta > 2.0f)? 2.0f: delta;
 
+			// Handle scale and rotation with double touch during its movement
 			if (mTouch[0].mState == MoGraph::Moving && mTouch[1].mState == MoGraph::Moving)
 			{
-				mScalePos 		= delta;
+				mScalePos 		= delta;					// store delta output to scalePos
+				float oldZ 		= mRotPos.z;				// oldZ rot pos.
+				mRotPos.z 		= -atan2(diff.y,diff.x);	// calculate the Z angle in rad,
+				float speedZ 	= mRotPos.z - oldZ;			// get rotational speed
+
+															// handle angular pos wrapp.
+				if (speedZ < -PI)
+					speedZ = (mRotPos.z + 2.0f*PI) - oldZ;
+				else if (speedZ > PI)
+					speedZ = (mRotPos.z - 2.0f*PI) - oldZ;
+															// clamp angular speed
+				const float maxSpeedZ = 0.2f;
+				if (speedZ > maxSpeedZ)
+					speedZ = maxSpeedZ;
+
+				if (speedZ < -maxSpeedZ)
+					speedZ = -maxSpeedZ;
+
+				mRotSpeed.z = speedZ;						// store to ouput speed
 			}
-			else
+			else	// 2 touch but not not in moving
 			{
-				mScalePos = mScaleOldPos = delta;
+				mScalePos = mScaleOldPos = delta;			// use delta output to scale position
 			}
-			mDelta -= mScaleOldPos - mScalePos;
-			if (mDelta > 2.0f)
+
+			mDelta -= mScaleOldPos - mScalePos;				// get scale speed from 2 pos old and current
+			if (mDelta > 2.0f)								// clamp scale speed (mDelta)
 				mDelta = 2.0f;
 			else if (mDelta < 0.1f)
 				mDelta = 0.1f;
-
-	//		lprintfln("%d. Delta = %f = %f - %f",cnt, mDelta,mScaleOldPos,mScalePos);
 		}
-		else
+		else	// Single touch (swipe)
 		{
-			mRotSpeed = getSpeed(mTouch[0],mRotSpeed);
-			mRotPos += mRotSpeed;
-			// Create a rotation matrix.
+			mRotSpeed 	= getSpeed(mTouch[0],mRotSpeed);	// get Swipe speed
+			mRotPos 	+= mRotSpeed;						// use swipe speed for rot speed.
 		}
 
-		mScaleOldPos = mScalePos;
+		mScaleOldPos = mScalePos;							// store mSaleOldPos for next time
 	}
 
 }
