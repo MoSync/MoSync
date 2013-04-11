@@ -1626,7 +1626,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "line_1=$(sed -n '/char\\* strcpy/=' ../MAStd/maapi.h)\nlet \"line_2=$line_1-2\"\necho $line_2\n\nrm -r MAStdNative\nmkdir MAStdNative\ncd ../MAStd\ncp IX_OPENGL_ES.h maapi.h madmath.h maxtoa.h IX_WIDGET.h maheap.h matime.h conprint.h maassert.h mastdlib.h mavsprintf.h ma.h mactype.h mastring.h ../MoSyncLibIOS/MAStdNative\ncd ../MoSyncLibIOS/MAStdNative\n\nline_1+=\"d\"\necho $line_1\nline_2+=\"d\"\necho $line_2\n\nsed -i.bak $line_1 maapi.h\nsed -i.bak $line_2 maapi.h\n\n";
+			shellScript = "line_1=$(sed -n '/char\\* strcpy/=' ../MAStd/maapi.h)\nlet \"line_2=$line_1-2\"\necho $line_2\n\nrm -r MAStdNative || echo MASTDNative already deleted\nmkdir MAStdNative\ncd ../MAStd\ncp IX_OPENGL_ES.h maapi.h madmath.h maxtoa.h IX_WIDGET.h maheap.h matime.h conprint.h maassert.h mastdlib.h mavsprintf.h ma.h mactype.h mastring.h ../MoSyncLibIOS/MAStdNative\ncd ../MoSyncLibIOS/MAStdNative\n\nline_1+=\"d\"\necho $line_1\nline_2+=\"d\"\necho $line_2\n\nsed -i.bak $line_1 maapi.h\nsed -i.bak $line_2 maapi.h\n\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -1874,6 +1874,11 @@
 		0B92B47B1712BAE1002DFDF6 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = (
+					"$(ARCHS_STANDARD_32_BIT)",
+					armv7,
+					armv7s,
+				);
 				DSTROOT = /tmp/MoSyncLibIOS.dst;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "MoSyncLibIOS/MoSyncLibIOS-Prefix.pch";
@@ -1899,6 +1904,11 @@
 		0B92B47C1712BAE1002DFDF6 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = (
+					"$(ARCHS_STANDARD_32_BIT)",
+					armv7,
+					armv7s,
+				);
 				DSTROOT = /tmp/MoSyncLibIOS.dst;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "MoSyncLibIOS/MoSyncLibIOS-Prefix.pch";

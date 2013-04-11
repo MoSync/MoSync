@@ -42,4 +42,4 @@ sh "lipo build/Release-iphoneos/libMoSyncLibIOS.a build/Release-iphonesimulator/
 
 FileUtils.mkpath([mosyncdir+"/lib"]);
 
-FileUtils.cp_r Dir.glob('build/*'), mosyncdir+"/lib", :verbose => true
+FileUtils.cp_r Dir.glob('libs/*'), mosyncdir+"/lib", :verbose => true
