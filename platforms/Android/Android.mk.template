@@ -17,7 +17,7 @@ LOCAL_C_INCLUDES += $(MOSYNCDIR)/include
 {{/no-default-includes}}
 LOCAL_C_INCLUDES += {{additional-includes}}
 {{! Short wchars -- we may want to remove this soon }}
-LOCAL_CFLAGS    += -fpermissive -O3 -DMOSYNC_NATIVE
+LOCAL_CFLAGS    += -fpermissive -O3 -DMOSYNC_NATIVE -DNATIVE_GLES -DNATIVE_GLES2
 LOCAL_CFLAGS    += {{compiler-defines}}
 LOCAL_CFLAGS    += {{additional-compiler-switches}}
 LOCAL_MODULE    := $(MOSYNC_MODULE_NAME)
