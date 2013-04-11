@@ -20,9 +20,7 @@ package com.mosync.nativeui.util;
 import com.mosync.internal.android.MoSyncThread;
 import com.mosync.internal.generated.IX_WIDGET;
 import com.mosync.nativeui.ui.widgets.ScreenWidget;
-import com.mosync.nativeui.ui.widgets.StackScreenWidget;
 
-import android.R.bool;
 import android.util.Log;
 import android.view.View;
 import android.view.animation.Animation;
