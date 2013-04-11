@@ -40,6 +40,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "helpers/CPP_IX_AUDIOBUFFER.h"
 #include "helpers/CPP_IX_OPENGL_ES.h"
+#include "helpers/CPP_IX_OPENGL_ES_MA.h"
 #include "helpers/CPP_IX_GL1.h"
 #include "helpers/CPP_IX_GL2.h"
 #include "helpers/CPP_IX_GL_OES_FRAMEBUFFER_OBJECT.h"

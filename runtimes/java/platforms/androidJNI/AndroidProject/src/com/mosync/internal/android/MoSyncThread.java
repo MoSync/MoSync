@@ -128,6 +128,7 @@ import com.mosync.internal.android.extensions.MoSyncExtensionLoader;
 import com.mosync.internal.android.nfc.MoSyncNFC;
 import com.mosync.internal.android.nfc.MoSyncNFCService;
 import com.mosync.internal.generated.IX_OPENGL_ES;
+import com.mosync.internal.generated.IX_OPENGL_ES_MA;
 import com.mosync.internal.generated.IX_WIDGET;
 import com.mosync.java.android.MoSync;
 import com.mosync.java.android.MoSyncPanicDialog;
@@ -5170,15 +5171,15 @@ public class MoSyncThread extends Thread implements MoSyncContext
 	int maOpenGLInitFullscreen(int glApi) {
 		if(mOpenGLScreen != -1) return 0;
 
-        if(glApi == IX_OPENGL_ES.MA_GL_API_GL1)
+        if(glApi == IX_OPENGL_ES_MA.MA_GL_API_GL1)
             mOpenGLView = maWidgetCreate("GLView");
-        else if(glApi == IX_OPENGL_ES.MA_GL_API_GL2)
+        else if(glApi == IX_OPENGL_ES_MA.MA_GL_API_GL2)
             mOpenGLView = maWidgetCreate("GL2View");
         else
-            return IX_OPENGL_ES.MA_GL_INIT_RES_UNAVAILABLE_API;
+            return IX_OPENGL_ES_MA.MA_GL_INIT_RES_UNAVAILABLE_API;
 
         if(mOpenGLView < 0) {
-            return IX_OPENGL_ES.MA_GL_INIT_RES_UNAVAILABLE_API;
+            return IX_OPENGL_ES_MA.MA_GL_INIT_RES_UNAVAILABLE_API;
         }
 
         mOpenGLScreen = maWidgetCreate("Screen");

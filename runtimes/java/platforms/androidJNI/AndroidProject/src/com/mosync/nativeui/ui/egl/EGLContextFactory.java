@@ -21,7 +21,8 @@ import javax.microedition.khronos.egl.EGL10;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.egl.EGLContext;
 import javax.microedition.khronos.egl.EGLDisplay;
-import com.mosync.internal.generated.IX_OPENGL_ES;
+
+import com.mosync.internal.generated.IX_OPENGL_ES_MA;
 /**
  * Factory for creating and destroying a context from a config and a display.
  *
@@ -44,7 +45,7 @@ public class EGLContextFactory
 
 	public static EGLContext createContext(EGL10 egl, EGLConfig config, EGLDisplay display, int glApi)
 	{
-		if(glApi == IX_OPENGL_ES.MA_GL_API_GL2) {
+		if(glApi == IX_OPENGL_ES_MA.MA_GL_API_GL2) {
 			int[] attrib_list = {EGL_CONTEXT_CLIENT_VERSION, 2, EGL10.EGL_NONE };
 			return egl.eglCreateContext( display, config, EGL10.EGL_NO_CONTEXT, attrib_list );
 		} else {
