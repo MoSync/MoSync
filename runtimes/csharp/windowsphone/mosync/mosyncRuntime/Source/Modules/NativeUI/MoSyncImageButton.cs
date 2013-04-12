@@ -91,8 +91,14 @@ namespace MoSync
              */
             private const int DifferenceSpacer = 23;
 
+            // Image handle for MAW_IMAGE_BUTTON_IMAGE property.
+            protected int mForegroundImageHandle = 0;
+
             // File image path for MAW_IMAGE_BUTTON_IMAGE_PATH property.
             protected String mForegroundImagePath = "";
+
+            // Image handle for MAW_IMAGE_BUTTON_BACKGROUND_IMAGE property.
+            protected int mBackgroundImageHandle = 0;
 
             // File image path for MAW_IMAGE_BUTTON_BACKGROUND_IMAGE_PATH property.
             protected String mBackgroundImagePath = "";
@@ -357,7 +363,7 @@ namespace MoSync
                 set
                 {
                     Resource res = mRuntime.GetResource(MoSync.Constants.RT_IMAGE, value);
-                    if (null != res && res.GetInternalObject() != null)
+                    if (null != res && null != res.GetInternalObject())
                     {
                         /**
                          * Set the height and width of the foreground image
@@ -372,9 +378,14 @@ namespace MoSync
                             (System.Windows.Media.Imaging.BitmapSource)(res.GetInternalObject());
 
                         mForegroundImage.Source = bmpSource;
+                        mForegroundImageHandle = value;
                         mForegroundImagePath = "";
                     }
                     else throw new InvalidPropertyValueException();
+                }
+                get
+                {
+                    return mForegroundImageHandle;
                 }
             }
 
@@ -388,16 +399,21 @@ namespace MoSync
                 set
                 {
                     Resource res = mRuntime.GetResource(MoSync.Constants.RT_IMAGE, value);
-                    if (null != res && res.GetInternalObject() != null)
+                    if (null != res && null != res.GetInternalObject())
                     {
                         System.Windows.Media.Imaging.BitmapSource bmpSource =
                             (System.Windows.Media.Imaging.BitmapSource)(res.GetInternalObject());
 
                         mBackgroundImage.Source = bmpSource;
 
+                        mBackgroundImageHandle = value;
                         mBackgroundImagePath = "";
                     }
                     else throw new InvalidPropertyValueException();
+                }
+                get
+                {
+                    return mBackgroundImageHandle;
                 }
             }
 
@@ -411,7 +427,7 @@ namespace MoSync
                 set
                 {
                     Resource res = mRuntime.GetResource(MoSync.Constants.RT_IMAGE, value);
-                    if (null != res && res.GetInternalObject() != null)
+                    if (null != res && null != res.GetInternalObject())
                     {
                         System.Windows.Media.Imaging.BitmapSource bmpSource =
                             (System.Windows.Media.Imaging.BitmapSource)(res.GetInternalObject());
@@ -454,16 +470,25 @@ namespace MoSync
                     //Verify that the file exists on the isolated storage
                     if (f.FileExists(value))
                     {
-                        //Create a file stream for the required file
-                        IsolatedStorageFileStream fs = new IsolatedStorageFileStream(value, System.IO.FileMode.Open, f);
+                        try
+                        {
+                            //Create a file stream for the required file
+                            IsolatedStorageFileStream fs = new IsolatedStorageFileStream(value, System.IO.FileMode.Open, f);
 
-                        //Set the stream as a source for a new bitmap image
-                        var image = new System.Windows.Media.Imaging.BitmapImage();
-                        image.SetSource(fs);
+                            //Set the stream as a source for a new bitmap image
+                            var image = new System.Windows.Media.Imaging.BitmapImage();
+                            image.SetSource(fs);
 
-                        //Set the newly created bitmap image for the image widget
-                        mForegroundImage.Source = image;
-                        mForegroundImagePath = value;
+                            //  Set the newly created bitmap image for the image widget
+                            mForegroundImage.Source = image;
+                            mForegroundImagePath = value;
+                            mForegroundImageHandle = 0;
+                        }
+                        catch (Exception e)
+                        {
+                            // There was a problem reading the image file.
+                            throw new InvalidPropertyValueException();
+                        }
                     }
                     //If the file does not exist throw an invalid property value exception
                     else throw new InvalidPropertyValueException();
@@ -486,16 +511,25 @@ namespace MoSync
                     //Verify that the file exists on the isolated storage
                     if (f.FileExists(value))
                     {
-                        //Create a file stream for the required file
-                        IsolatedStorageFileStream fs = new IsolatedStorageFileStream(value, System.IO.FileMode.Open, f);
+                        try
+                        {
+                            //Create a file stream for the required file
+                            IsolatedStorageFileStream fs = new IsolatedStorageFileStream(value, System.IO.FileMode.Open, f);
 
-                        //Set the stream as a source for a new bitmap image
-                        var image = new System.Windows.Media.Imaging.BitmapImage();
-                        image.SetSource(fs);
+                            //Set the stream as a source for a new bitmap image
+                            var image = new System.Windows.Media.Imaging.BitmapImage();
+                            image.SetSource(fs);
 
-                        //Set the newly created bitmap image for the image widget
-                        mBackgroundImage.Source = image;
-                        mBackgroundImagePath = value;
+                            //Set the newly created bitmap image for the image widget
+                            mBackgroundImage.Source = image;
+                            mBackgroundImagePath = value;
+                            mBackgroundImageHandle = 0;
+                        }
+                        catch (Exception e)
+                        {
+                            // There was a problem reading the image file.
+                            throw new InvalidPropertyValueException();
+                        }
                     }
                     //If the file does not exist throw an invalid property value exception
                     else throw new InvalidPropertyValueException();
@@ -518,17 +552,25 @@ namespace MoSync
                     //Verify that the file exists on the isolated storage
                     if (f.FileExists(value))
                     {
-                        //Create a file stream for the required file
-                        IsolatedStorageFileStream fs = new IsolatedStorageFileStream(value, System.IO.FileMode.Open, f);
+                        try
+                        {
+                            //Create a file stream for the required file
+                            IsolatedStorageFileStream fs = new IsolatedStorageFileStream(value, System.IO.FileMode.Open, f);
 
-                        //Set the stream as a source for a new bitmap image
-                        var image = new System.Windows.Media.Imaging.BitmapImage();
-                        image.SetSource(fs);
+                            //Set the stream as a source for a new bitmap image
+                            var image = new System.Windows.Media.Imaging.BitmapImage();
+                            image.SetSource(fs);
 
-                        //Set the newly created bitmap image for the image widget
-                        mPressedBackgroundImageSource = image;
-                        mPressedImagePath = value;
-                        mPressedImageHandle = 0;
+                            //Set the newly created bitmap image for the image widget
+                            mPressedBackgroundImageSource = image;
+                            mPressedImagePath = value;
+                            mPressedImageHandle = 0;
+                        }
+                        catch (Exception e)
+                        {
+                            // There was a problem reading the image file.
+                            throw new InvalidPropertyValueException();
+                        }
                     }
                     //If the file does not exist throw an invalid property value exception
                     else throw new InvalidPropertyValueException();

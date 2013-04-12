@@ -17,6 +17,8 @@ MA 02110-1301, USA.
 
 package com.mosync.internal.android;
 
+import java.nio.ByteBuffer;
+
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.text.TextUtils;
@@ -224,9 +226,9 @@ public class MoSyncPurchase
 			byte[] byteArray = result.getBytes();
 
 			// Write string to MoSync memory.
-			mMoSyncThread.mMemDataSection.position( memBuffer );
-			mMoSyncThread.mMemDataSection.put( byteArray );
-			mMoSyncThread.mMemDataSection.put( (byte)0 );
+			ByteBuffer buffer = mMoSyncThread.getMemorySlice(memBuffer, byteArray.length + 1);
+			buffer.put( byteArray );
+			buffer.put( (byte)0 );
 
 			return result.length( );
 		}
@@ -279,9 +281,9 @@ public class MoSyncPurchase
 			byte[] ba = result.getBytes();
 
 			// Write string to MoSync memory.
-			mMoSyncThread.mMemDataSection.position( memBuffer );
-			mMoSyncThread.mMemDataSection.put( ba );
-			mMoSyncThread.mMemDataSection.put( (byte)0 );
+			ByteBuffer buffer = mMoSyncThread.getMemorySlice(memBuffer, ba.length + 1);
+			buffer.put( ba );
+			buffer.put( (byte)0 );
 
 			return result.length( );
 		}

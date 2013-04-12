@@ -23,9 +23,19 @@
 @interface ImageButtonWidget ()
 
 /**
+ * Used by the MAW_IMAGE_BUTTON_IMAGE property.
+ */
+@property(nonatomic, retain) NSNumber* foregroundImageHandle;
+
+/**
  * Used by the MAW_IMAGE_BUTTON_IMAGE_PATH property.
  */
 @property(nonatomic, retain) NSString* foregroundImagePath;
+
+/**
+ * Used by the MAW_IMAGE_BUTTON_BACKGROUND_IMAGE property.
+ */
+@property(nonatomic, retain) NSNumber* backgroundImageHandle;
 
 /**
  * Used by the MAW_IMAGE_BUTTON_BACKGROUND_IMAGE_PATH property.
@@ -86,7 +96,9 @@
 
 @implementation ImageButtonWidget
 
+@synthesize foregroundImageHandle = _foregroundImageHandle;
 @synthesize foregroundImagePath = _foregroundImagePath;
+@synthesize backgroundImageHandle = _backgroundImageHandle;
 @synthesize backgroundImagePath = _backgroundImagePath;
 @synthesize pressedImagePath = _pressedImagePath;
 @synthesize pressedImageHandle;
@@ -127,6 +139,7 @@
 		if (result == MAW_RES_OK)
 		{
 			self.foregroundImagePath = @"";
+			self.foregroundImageHandle = [NSNumber numberWithInt:[value intValue]];
 		}
 		return result;
 	}
@@ -135,6 +148,7 @@
 		int result = [super setPropertyWithKey:key toValue:value];
 		if (result == MAW_RES_OK)
 		{
+			self.backgroundImageHandle = [NSNumber numberWithInt:[value intValue]];
 			self.backgroundImagePath = @"";
 		}
 		return result;
@@ -162,9 +176,17 @@
  */
 - (NSString*)getPropertyWithKey:(NSString*)key
 {
-	if ([key isEqualToString:@MAW_IMAGE_BUTTON_IMAGE_PATH])
+	if ([key isEqualToString:@MAW_IMAGE_BUTTON_IMAGE])
+	{
+		return [[self.foregroundImageHandle stringValue] retain];
+	}
+	else if ([key isEqualToString:@MAW_IMAGE_BUTTON_IMAGE_PATH])
 	{
 		return [self.foregroundImagePath retain];
+	}
+	else if ([key isEqualToString:@MAW_IMAGE_BUTTON_BACKGROUND_IMAGE])
+	{
+		return [[self.backgroundImageHandle stringValue] retain];
 	}
 	else if ([key isEqualToString:@MAW_IMAGE_BUTTON_BACKGROUND_IMAGE_PATH])
 	{
@@ -199,6 +221,7 @@
 	{
 		return MAW_RES_INVALID_PROPERTY_VALUE;
 	}
+	self.foregroundImageHandle = [NSNumber numberWithInt:0];
 	self.foregroundImagePath = path;
 	UIButton* button = (UIButton*)self.view;
 	[button setImage:imageSource forState:UIControlStateNormal];
@@ -222,6 +245,7 @@
 	{
 		return MAW_RES_INVALID_PROPERTY_VALUE;
 	}
+	self.backgroundImageHandle = [NSNumber numberWithInt:0];
 	self.backgroundImagePath = path;
 	UIButton* button = (UIButton*)self.view;
 	[button setBackgroundImage:imageSource forState:UIControlStateNormal];
@@ -284,6 +308,18 @@
 }
 
 /**
+ * Getter implementation for foregroundImageHandle property.
+ */
+- (NSNumber*)foregroundImageHandle
+{
+	if (!_foregroundImageHandle)
+	{
+		_foregroundImageHandle = [[NSNumber alloc] initWithInt:0];
+	}
+	return _foregroundImageHandle;
+}
+
+/**
  * Getter implementation for foregroundImagePath property.
  */
 - (NSString*)foregroundImagePath
@@ -293,6 +329,18 @@
 		_foregroundImagePath = [[NSString alloc] init];
 	}
 	return _foregroundImagePath;
+}
+
+/**
+ * Getter implementation for backgroundImageHandle property.
+ */
+- (NSNumber*)backgroundImageHandle
+{
+	if (!_backgroundImageHandle)
+	{
+		_backgroundImageHandle = [[NSNumber alloc] initWithInt:0];
+	}
+	return _backgroundImageHandle;
 }
 
 /**
@@ -320,7 +368,9 @@
 
 - (void)dealloc
 {
+	[_foregroundImageHandle release];
 	[_foregroundImagePath release];
+	[_backgroundImageHandle release];
 	[_backgroundImagePath release];
 	[_pressedImagePath release];
 
