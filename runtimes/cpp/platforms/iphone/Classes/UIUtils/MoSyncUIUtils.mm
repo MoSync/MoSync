@@ -70,9 +70,6 @@ int MoSyncUIUtils_SaveImageToGallery(MAHandle imageHandle)
         UIImageOrientation orientation = UIImageOrientationUp;
 		switch (imageResource->orientation)
         {
-			case 1:
-				orientation = UIImageOrientationUp;
-				break;
 			case 2:
 				orientation = UIImageOrientationUpMirrored;
 				break;
@@ -94,7 +91,9 @@ int MoSyncUIUtils_SaveImageToGallery(MAHandle imageHandle)
 			case 8:
 				orientation = UIImageOrientationLeft;
 				break;
-			default:
+            case 1:
+            default:
+				orientation = UIImageOrientationUp;
 				break;
 		}
 		UIImage* image = [UIImage imageWithCGImage:imageResource->image scale:1.0 orientation:orientation];
@@ -122,11 +121,6 @@ int MoSyncUIUtils_SaveImageToGallery(MAHandle imageHandle)
     return self;
 }
 
-
--(void)dealloc
-{
-    [super dealloc];
-}
 
 // This is called at the end of the saving opperation.
 - (void)               image: (UIImage *) image
