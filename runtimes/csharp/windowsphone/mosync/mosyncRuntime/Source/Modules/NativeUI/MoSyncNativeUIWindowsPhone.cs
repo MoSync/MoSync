@@ -40,7 +40,17 @@ namespace MoSync
     {
         public class WidgetBaseWindowsPhone : WidgetBase
         {
+            /**
+             * The FrameworkElement that will contain the actual widget view (changed to FrameworkElement
+             * from UIElement because FrameworkElement sends events that notify us of the view lifetime -
+             * LayoutUpdated for example).
+             */
             protected FrameworkElement mView;
+
+            /**
+             * Event handler declaration for the layout updated event.
+             */
+            private EventHandler mLayoutUpdatedDelegate = null;
 
             public WidgetBaseWindowsPhone()
                 : base()
@@ -51,6 +61,9 @@ namespace MoSync
                 ColumnNumber = -1;
             }
 
+            /**
+             * Event handler for the layout updated event sent by the FrameworkElement mView.
+             */
             void mView_LayoutUpdated(object sender, EventArgs e)
             {
                 if (!isViewCreated)
@@ -67,12 +80,16 @@ namespace MoSync
                 }
             }
 
+            /**
+             * Runs a WidgetOperation on the current widget.
+             * @param operation The widget operation (could be a ADD, INSERT, REMOVE, SET or GET) that
+             * needs to be applied on the current widget.
+             */
             protected void RunOperation(WidgetOperation operation)
             {
                 switch (operation.Type)
                 {
                     case WidgetOperation.OperationType.SET:
-                        //SetProperty(operation.Property, operation.Value);
                         PropertyInfo pinfo;
                         MoSyncWidgetPropertyAttribute pattr = GetPropertyAttribute(operation.Property, out pinfo);
                         Exception exception = null;
@@ -164,8 +181,21 @@ namespace MoSync
                 get { return mView; }
                 set
                 {
+                    /**
+                     * If the view is set twice or more, the layout updated delegate is removed
+                     * from the LayoutUpdated event.
+                     */
+                    if (mLayoutUpdatedDelegate != null)
+                    {
+                        isViewCreated = false;
+                        mView.LayoutUpdated -= mLayoutUpdatedDelegate;
+                    }
+
                     mView = value;
-                    mView.LayoutUpdated += new EventHandler(mView_LayoutUpdated);
+
+                    // Create the delegate and add it as a handler for the LayoutUpdated event.
+                    mLayoutUpdatedDelegate = new EventHandler(mView_LayoutUpdated);
+                    mView.LayoutUpdated += mLayoutUpdatedDelegate;
                 }
             }
 
