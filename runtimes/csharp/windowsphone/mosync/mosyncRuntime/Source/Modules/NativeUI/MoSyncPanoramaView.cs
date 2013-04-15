@@ -43,6 +43,9 @@ namespace MoSync
             protected Microsoft.Phone.Controls.Panorama mPanorama;
             private int mCurrentScreenIndex = 0;
 
+            // Image handle for MAW_PANORAMA_VIEW_BACKGROUND_IMAGE property.
+            protected int mBackgroundImageHandle = 0;
+
             /**
              * The constructor
              */
@@ -132,40 +135,39 @@ namespace MoSync
              * MAW_PANORAMA_VIEW_BACKGROUND_IMAGE property implementation
              */
             [MoSyncWidgetProperty(MoSync.Constants.MAW_PANORAMA_VIEW_BACKGROUND_IMAGE)]
-            public String BackgroundImage
+            public int BackgroundImage
             {
                 set
                 {
-                    int val;
-                    if (Int32.TryParse(value, out val))
+                    //Get the resource with the specified handle
+                    Resource res = mRuntime.GetResource(MoSync.Constants.RT_IMAGE, value);
+                    if (null != res)
                     {
-                        //Get the resource with the specified handle
-                        Resource res = mRuntime.GetResource(MoSync.Constants.RT_IMAGE, val);
-                        if (null != res)
+                        //Create a BitmapSource object from the internal object of the resource loaded
+                        object internalObj = res.GetInternalObject();
+                        System.Windows.Media.Imaging.BitmapSource bmpSource;
+                        if (internalObj is Memory)
                         {
-                            //Create a BitmapSource object from the internal object of the resource loaded
-                            object internalObj = res.GetInternalObject();
-                            System.Windows.Media.Imaging.BitmapSource bmpSource;
-                            if (internalObj is Memory)
-                            {
-                                bmpSource = (System.Windows.Media.Imaging.BitmapSource)(Util.CreateWriteableBitmapFromMemory(internalObj as Memory));
-                            }
-                            else
-                            {
-                                bmpSource = (System.Windows.Media.Imaging.BitmapSource)internalObj;
-                            }
-
-                            //The ImageBrush standard object gets that as a source
-                            System.Windows.Media.ImageBrush imgBrush = new System.Windows.Media.ImageBrush();
-
-                            imgBrush.ImageSource = bmpSource;
-
-                            //The panorama gets the brush as a background
-                            mPanorama.Background = imgBrush;
+                            bmpSource = (System.Windows.Media.Imaging.BitmapSource)(Util.CreateWriteableBitmapFromMemory(internalObj as Memory));
                         }
-                        else throw new InvalidPropertyValueException();
+                        else
+                        {
+                            bmpSource = (System.Windows.Media.Imaging.BitmapSource)internalObj;
+                        }
+
+                        //The ImageBrush standard object gets that as a source
+                        System.Windows.Media.ImageBrush imgBrush = new System.Windows.Media.ImageBrush();
+                        imgBrush.ImageSource = bmpSource;
+
+                        //The panorama gets the brush as a background
+                        mPanorama.Background = imgBrush;
+                        mBackgroundImageHandle = value;
                     }
                     else throw new InvalidPropertyValueException();
+                }
+                get
+                {
+                    return mBackgroundImageHandle;
                 }
             }
 

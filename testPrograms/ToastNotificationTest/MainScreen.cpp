@@ -43,6 +43,7 @@ MainScreen::MainScreen() :
 	mToastShortDuration(NULL)
 {
 	createMainLayout();
+	mToastShortDuration->setState(true);
 	mToastButton->addButtonListener(this);
 	mToastLongDuration->addCheckBoxListener(this);
 	mToastShortDuration->addCheckBoxListener(this);
@@ -65,6 +66,7 @@ void MainScreen::createMainLayout() {
 	// Create and add the main layout to the screen.
 	mMainLayout = new VerticalLayout();
 	Screen::setMainWidget(mMainLayout);
+	mMainLayout->setBackgroundColor(0x4400FF);
 
 	Label* infoLabel = new Label("Set toast message and duration, and click Display");
 	mMainLayout->addChild(infoLabel);
@@ -101,31 +103,27 @@ void MainScreen::checkBoxStateChanged(
     CheckBox* checkBox,
     bool state)
 {
-	if ( state && checkBox == mToastShortDuration )
-		mToastLongDuration->setState(false);
-	else if( state && checkBox == mToastLongDuration )
-		mToastShortDuration->setState(false);
-}
-
-/**
- * This method is called when there is an touch-down event for
- * a button.
- * Platform: iOS and Android.
- * @param button The button object that generated the event.
- */
-void MainScreen::buttonPressed(Widget* button)
-{
-	if ( button == mToastButton )
+	if (state)
 	{
-		int duration = (mToastShortDuration->isChecked() ? MA_TOAST_DURATION_SHORT : MA_TOAST_DURATION_LONG);
-		maToast(mToastMessage->getText().c_str(), duration);
+		if (checkBox == mToastShortDuration)
+			mToastLongDuration->setState(false);
+		else
+			mToastShortDuration->setState(false);
+	}
+	else
+	{
+		if ( !mToastLongDuration->isChecked() &&
+				!mToastShortDuration->isChecked())
+		{
+			mToastShortDuration->setState(true);
+		}
 	}
 }
 
 /**
  * This method is called if the touch-up event was inside the
  * bounds of the button.
- * Platform: iOS and Android.
+ * Platform: iOS, Android, Windows Phone.
  * @param button The button object that generated the event.
  */
 void MainScreen::buttonClicked(Widget* button)

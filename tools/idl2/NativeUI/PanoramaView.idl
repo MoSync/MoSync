@@ -37,11 +37,11 @@ group WidgetPanoramaViewProperties "Panorama View" {
 		CURRENT_SCREEN = "currentScreen";
 
 		/**
-		 * @brief Sets the background image of the view
+		 * @brief Sets or gets the background image of the view.
 		 *
 		 * @validvalue MoSync handle to an uncompressed image resource. The size of the image should be large enough to fill the space used by the panorama
 		 *
-		 * @setonly
+		 * @setandget
 		 *
 		 * @par Example
 		 * \code

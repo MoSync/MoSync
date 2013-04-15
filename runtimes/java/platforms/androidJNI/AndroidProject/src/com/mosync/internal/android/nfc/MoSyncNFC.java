@@ -624,10 +624,7 @@ public class MoSyncNFC {
 	}
 
 	private ByteBuffer getMemoryAt(int offset, int bound) {
-		mosyncThread.mMemDataSection.position(offset);
-		ByteBuffer slice = mosyncThread.mMemDataSection.slice();
-		slice.limit(bound);
-		return slice;
+		return mosyncThread.getMemorySlice(offset, bound);
 	}
 
 	private void postResult(NFCEvent event) {

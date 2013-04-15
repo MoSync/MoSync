@@ -68,6 +68,7 @@ namespace NativeUI
 
         /**
          * Set the image that will be displayed.
+         * Setting this value will change the image path value to an empty string.
          * @param image MoSync handle to an uncompressed image resource.
          * @return Any of the following result codes:
          * - #MAW_RES_OK if the property could be set.
@@ -76,7 +77,16 @@ namespace NativeUI
         virtual int setImage(MAHandle image);
 
         /**
+         * Get the displayed image handle.
+         * @return A value greater than zero representing a MoSync handle to an
+         * uncompressed image resource, or zero if the displayed image was created
+         * using set image path function.
+         */
+        MAHandle getImage();
+
+        /**
          * Set the image that will be displayed using a file path.
+         * Setting this value will change the image handle value to zero.
          * @param imagePath Path to an image file.
          * @return Any of the following result codes:
          * - #MAW_RES_OK if the property could be set.
