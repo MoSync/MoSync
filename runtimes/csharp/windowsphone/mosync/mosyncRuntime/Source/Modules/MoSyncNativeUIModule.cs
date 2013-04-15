@@ -47,7 +47,7 @@ namespace MoSync
 
         public void Init(Ioctls ioctls, Core core, Runtime runtime)
         {
-            mNativeUI = new NativeUI.NativeUIWindowsPhone();
+            mNativeUI = new NativeUI.AsyncNativeUIWindowsPhone();
             //mWidgets.Add(null); // why?
 
             /**
@@ -186,7 +186,8 @@ namespace MoSync
                 IWidget widget = mWidgets[_widget];
                 try
                 {
-                    widget.SetProperty(property, value);
+                //    widget.SetProperty(property, value);
+                    mNativeUI.SetProperty(widget, property, value);
                 }
                 catch (InvalidPropertyNameException)
                 {

@@ -32,6 +32,7 @@ using System.Windows.Navigation;
 using System;
 using System.Text.RegularExpressions;
 using System.Reflection;
+using System.Collections.Generic;
 
 namespace MoSync
 {
@@ -39,7 +40,66 @@ namespace MoSync
     {
         public class WidgetBaseWindowsPhone : WidgetBase
         {
-            protected UIElement mView;
+            protected FrameworkElement mView;
+
+            public WidgetBaseWindowsPhone()
+                : base()
+            {
+                setHorizontalSizePolicyFlags(false, true);
+                setVerticalSizePolicyFlags(false, true);
+                RowNumber = -1;
+                ColumnNumber = -1;
+            }
+
+            void mView_LayoutUpdated(object sender, EventArgs e)
+            {
+                if (!isViewCreated)
+                {
+                    isViewCreated = true;
+
+                    // run all the pending operations from the widget operation queue
+                    while (operationQueue.Count != 0)
+                    {
+                        WidgetOperation currentOperation = operationQueue.Dequeue();
+
+                        RunOperation(currentOperation);
+                    }
+                }
+            }
+
+            protected void RunOperation(WidgetOperation operation)
+            {
+                switch (operation.Type)
+                {
+                    case WidgetOperation.OperationType.SET:
+                        //SetProperty(operation.Property, operation.Value);
+                        PropertyInfo pinfo;
+                        MoSyncWidgetPropertyAttribute pattr = GetPropertyAttribute(operation.Property, out pinfo);
+                        Exception exception = null;
+                        if (pinfo == null) throw new InvalidPropertyNameException();
+                        try
+                        {
+                            SetProperty(pinfo, operation.Value);
+                        }
+                        catch (Exception e)
+                        {
+                            exception = e;
+                        }
+                        if (null != exception)
+                            if (exception.InnerException is InvalidPropertyValueException)
+                                throw new InvalidPropertyValueException();
+
+                        break;
+                    case WidgetOperation.OperationType.GET:
+                        break;
+                    case WidgetOperation.OperationType.ADD:
+                        break;
+                    case WidgetOperation.OperationType.INSERT:
+                        break;
+                    case WidgetOperation.OperationType.REMOVE:
+                        break;
+                }
+            }
 
             //Size policies
             public bool FILL_SPACE_V
@@ -99,10 +159,14 @@ namespace MoSync
                 WRAP_CONT_V = wrapContentVertically;
             }
 
-            public UIElement View
+            public FrameworkElement View
             {
                 get { return mView; }
-                set { mView = value; }
+                set
+                {
+                    mView = value;
+                    mView.LayoutUpdated += new EventHandler(mView_LayoutUpdated);
+                }
             }
 
             /**
@@ -324,15 +388,6 @@ namespace MoSync
                 }
             }
 
-            public WidgetBaseWindowsPhone()
-                : base()
-            {
-                setHorizontalSizePolicyFlags(false, true);
-                setVerticalSizePolicyFlags(false, true);
-                RowNumber = -1;
-                ColumnNumber = -1;
-            }
-
             /**
              * \brief This functions is called on the wrap content horizontally case
              */
@@ -519,6 +574,45 @@ namespace MoSync
             {
                 //This should always be a PhoneApplicationFrame.
                 mFrame = (PhoneApplicationFrame)Application.Current.RootVisual;
+            }
+        }
+
+        public class AsyncNativeUIWindowsPhone : UIManager
+        {
+            private PhoneApplicationFrame mFrame;
+            private Core mCore;
+
+            public AsyncNativeUIWindowsPhone()
+                : base()
+            {
+                //This should always be a PhoneApplicationFrame.
+                mFrame = (PhoneApplicationFrame)Application.Current.RootVisual;
+            }
+
+            public new void SetProperty(IWidget widget, string propertyName, string propertyValue)
+            {
+                widget.SetProperty(propertyName, propertyValue);
+            }
+
+            public void GetProperty(IWidget widget, string propertyName)
+            {
+            }
+
+            public void AddChild(IWidget parent, IWidget child)
+            {
+            }
+
+            public void InsertChild(IWidget parent, IWidget child, int index)
+            {
+            }
+
+            public void RemoveChild(IWidget parent, IWidget child)
+            {
+            }
+
+            public void SetCore(Core core)
+            {
+                this.mCore = core;
             }
         }
     }

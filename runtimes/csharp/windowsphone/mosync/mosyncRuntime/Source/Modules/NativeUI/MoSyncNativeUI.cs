@@ -84,9 +84,14 @@ namespace MoSync
             protected int mHandle;
             protected Runtime mRuntime;
 
+            // set by children right after the view becomes available for manipulation
+            protected bool isViewCreated = false;
+
+            protected Queue<WidgetOperation> operationQueue;
 
             public WidgetBase()
             {
+                operationQueue = new Queue<WidgetOperation>();
             }
 
             public virtual void AddChild(IWidget child)
@@ -157,7 +162,7 @@ namespace MoSync
                 return mParent;
             }
 
-            private MoSyncWidgetPropertyAttribute GetPropertyAttribute(String name, out PropertyInfo propertyInfoOut)
+            protected MoSyncWidgetPropertyAttribute GetPropertyAttribute(String name, out PropertyInfo propertyInfoOut)
             {
                 Type type = this.GetType();
                 propertyInfoOut = null;
@@ -169,7 +174,7 @@ namespace MoSync
                         if (attr.GetType() == typeof(MoSyncWidgetPropertyAttribute))
                         {
                             MoSyncWidgetPropertyAttribute e = (MoSyncWidgetPropertyAttribute)attr;
-                            if (e.Name.Equals(name))
+                            if (e.Name.ToLower().Equals(name.ToLower()))
                             {
                                 propertyInfoOut = pinfo;
                                 return e;
@@ -181,22 +186,30 @@ namespace MoSync
                 return null;
             }
 
-            private void SetProperty(PropertyInfo pinfo, String stringValue)
+            protected void SetProperty(PropertyInfo pinfo, String stringValue)
             {
-                switch (pinfo.PropertyType.Name)
+                if (!isViewCreated)
                 {
-                    case "Double":
-                        pinfo.SetValue(this, Convert.ToDouble(stringValue, System.Globalization.CultureInfo.InvariantCulture), null);
-                        break;
-                    case "Float":
-						pinfo.SetValue(this, Convert.ToSingle(stringValue, System.Globalization.CultureInfo.InvariantCulture), null);
-                        break;
-                    case "Int32":
-                        pinfo.SetValue(this, Convert.ToInt32(stringValue), null);
-                        break;
-                    case "String":
-                        pinfo.SetValue(this, stringValue, null);
-                        break;
+                    WidgetOperation setOperation = new WidgetOperation(pinfo.Name, stringValue);
+                    operationQueue.Enqueue(setOperation);
+                }
+                else
+                {
+                    switch (pinfo.PropertyType.Name)
+                    {
+                        case "Double":
+                            pinfo.SetValue(this, Convert.ToDouble(stringValue, System.Globalization.CultureInfo.InvariantCulture), null);
+                            break;
+                        case "Float":
+                            pinfo.SetValue(this, Convert.ToSingle(stringValue, System.Globalization.CultureInfo.InvariantCulture), null);
+                            break;
+                        case "Int32":
+                            pinfo.SetValue(this, Convert.ToInt32(stringValue), null);
+                            break;
+                        case "String":
+                            pinfo.SetValue(this, stringValue, null);
+                            break;
+                    }
                 }
             }
 
@@ -266,6 +279,79 @@ namespace MoSync
             }
         }
 
+        public class WidgetOperation
+        {
+            public enum OperationType
+            {
+                SET,
+                GET,
+                ADD,
+                INSERT,
+                REMOVE
+            };
+
+            private OperationType mType;
+            private string mPropertyName;
+            private string mPropertyValue;
+            private int mHandle;
+
+            public OperationType Type
+            {
+                get
+                {
+                    return mType;
+                }
+            }
+
+            public string Property
+            {
+                get
+                {
+                    return mPropertyName;
+                }
+            }
+
+            public string Value
+            {
+                get
+                {
+                    return mPropertyValue;
+                }
+            }
+
+            public int Handle
+            {
+                get
+                {
+                    return mHandle;
+                }
+            }
+
+            public WidgetOperation(string property, string value)
+            {
+                mType = OperationType.SET;
+                mHandle = -1;
+                mPropertyName = property;
+                mPropertyValue = value;
+            }
+
+            public WidgetOperation(string value)
+            {
+                mType = OperationType.GET;
+                mHandle = -1;
+                mPropertyName = "";
+                mPropertyValue = value;
+            }
+
+            public WidgetOperation(OperationType type, int handle)
+            {
+                mType = type;
+                mHandle = handle;
+                mPropertyName = "";
+                mPropertyValue = "";
+            }
+        }
+
         public abstract class UIManager
         {
             public UIManager()
@@ -289,6 +375,31 @@ namespace MoSync
                 });
 
                 return ret;
+            }
+
+            public void SetProperty(IWidget widget, string propertyName, string propertyValue)
+            {
+                widget.SetProperty(propertyName, propertyValue);
+            }
+
+            public void GetProperty(IWidget widget, string propertyName)
+            {
+            }
+
+            public void AddChild(IWidget parent, IWidget child)
+            {
+            }
+
+            public void InsertChild(IWidget parent, IWidget child, int index)
+            {
+            }
+
+            public void RemoveChild(IWidget parent, IWidget child)
+            {
+            }
+
+            public void SetCore(Core core)
+            {
             }
         }
 }

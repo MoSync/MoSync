@@ -83,6 +83,8 @@ namespace MoSync
                 mPage.RowDefinitions.Add(new RowDefinition { Height = new GridLength( 1, GridUnitType.Star) });
                 mView = mPage;
 
+//                (mView as System.Windows.UIElement).LayoutUpdated += new EventHandler(Button_LayoutUpdated);
+
                 //Initialize the application bar and set its visibility to false.
                 mApplicationBar = new Microsoft.Phone.Shell.ApplicationBar();
                 mApplicationBar.IsVisible = false;
