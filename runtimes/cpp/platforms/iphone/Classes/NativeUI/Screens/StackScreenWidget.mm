@@ -36,6 +36,7 @@
     if (self)
     {
         stack = [[NSMutableArray alloc] init];
+        scaleMode = nil;
         navigationController.viewControllers = [NSArray array];
         navigationController.delegate = self;
     }
@@ -148,6 +149,7 @@
         UIFont* font = Base::getUIFontObject([value intValue]);
         if (font)
         {
+            // Customize the title text for ALL UINavigationBars
             [[UINavigationBar appearance] setTitleTextAttributes:
              [NSDictionary dictionaryWithObjectsAndKeys:
               [UIColor colorWithRed:255.0/255.0 green:255.0/255.0 blue:255.0/255.0 alpha:1.0],
@@ -161,7 +163,71 @@
               nil]];
         }
     }
-	else
+    else if ([key isEqualToString:@MAW_STACK_SCREEN_TITLE_BACKGROUND_IMAGE_HANDLE])
+    {
+        int imageHandle = [value intValue];
+        if(imageHandle<=0) return MAW_RES_INVALID_PROPERTY_VALUE;
+        Surface* imageResource = Base::gSyscall->resources.get_RT_IMAGE(imageHandle);
+        UIImageOrientation orientation = UIImageOrientationUp;
+        switch (imageResource->orientation)
+        {
+            case 1:
+                orientation = UIImageOrientationUp;
+                break;
+            case 2:
+                orientation = UIImageOrientationUpMirrored;
+                break;
+            case 3:
+                orientation = UIImageOrientationDown;
+                break;
+            case 4:
+                orientation = UIImageOrientationDownMirrored;
+                break;
+            case 5:
+                orientation = UIImageOrientationLeftMirrored;
+                break;
+            case 6:
+                orientation = UIImageOrientationRight;
+                break;
+            case 7:
+                orientation = UIImageOrientationRightMirrored;
+                break;
+            case 8:
+                orientation = UIImageOrientationLeft;
+                break;
+            default:
+                break;
+        }
+
+        CGFloat imageScale = 1.0;
+
+        if (scaleMode)
+        {
+            if ([scaleMode isEqualToString:@"scaleAndRepeatXY"])
+            {
+                CGFloat screenScale = [[UIScreen mainScreen] scale];
+                imageScale = imageResource->height / (screenScale * 44.0);
+            }
+        }
+
+        UIImage* image = [UIImage imageWithCGImage:imageResource->image scale:imageScale orientation:orientation];
+
+        [[UINavigationBar appearance] setBackgroundImage:image
+                                           forBarMetrics:UIBarMetricsDefault];
+        [[UINavigationBar appearance] setBackgroundImage:image
+                                           forBarMetrics:UIBarMetricsLandscapePhone];
+    }
+    else if ([key isEqualToString:@MAW_STACK_SCREEN_TITLE_BACKGROUND_SCALE_MODE])
+    {
+        if (scaleMode != value)
+        {
+            if (scaleMode)
+                [scaleMode release];
+
+            scaleMode = [[NSString alloc] initWithString: value];
+        }
+    }
+    else
     {
 		return [super setPropertyWithKey:key toValue:value];
 	}
@@ -206,6 +272,9 @@
  */
 - (void)dealloc
 {
+    if (scaleMode)
+        [scaleMode release];
+
     [stack release];
     [super dealloc];
 }

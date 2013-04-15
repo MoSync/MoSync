@@ -72,6 +72,34 @@ group WidgetStackScreenProperties "Stack screen" {
 		TITLE_FONT_HANDLE = "titleFontHandle";
 
 		/**
+		* Set the background image that will replace the default fade in the title bar.
+		*
+		* @validvalue MoSync handle to an uncompressed image resource.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(stackScreenHandle, MAW_STACK_SCREEN_TITLE_BACKGROUND_IMAGE_HANDLE, toString(R_MY_IMAGE));
+		* \endcode
+		*/
+		TITLE_BACKGROUND_IMAGE_HANDLE = "titleBackgroundImage";
+
+		/**
+		* @brief Specifies what type of scaling should be applied to the title bar.
+		*
+		* @validvalue Either 'none' or 'scaleAndRepeatXY'. Default 'none'.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(stackScreenHandle, MAW_STACK_SCREEN_TITLE_BACKGROUND_SCALE_MODE, "scaleAndRepeatXY");
+		* \endcode
+		*/
+		TITLE_BACKGROUND_SCALE_MODE = "titleBackgroundScaleMode";
+
+		/**
 		* @brief Stack screen's push transition type.
 		*
 		* Type of the animated transition used when pushing a screen from the current screen stack.

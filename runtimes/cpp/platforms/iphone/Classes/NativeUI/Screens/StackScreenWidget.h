@@ -21,6 +21,7 @@
 @interface StackScreenWidget : ScreenWidget <UINavigationControllerDelegate>
 {
     NSMutableArray* stack;
+    NSString* scaleMode;
 }
 
 /**

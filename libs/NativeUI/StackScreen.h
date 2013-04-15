@@ -50,6 +50,15 @@ namespace NativeUI
     class StackScreenListener;
 
     /**
+     * \brief Types of scaling for the image.
+     */
+    enum TitleBackgroundScaleMode
+    {
+        TITLE_BACKGROUND_SCALE_NONE = 0,
+        TITLE_BACKGROUND_SCALE_REPEAT_XY,
+    };
+
+    /**
      * \brief A stack screen is a special type of screen that manages navigation
      * between a set of screens.
      *
@@ -177,6 +186,25 @@ namespace NativeUI
          * \endcode
          */
         virtual int setTitleFont(const MAHandle fontHandle);
+
+        /**
+         * Set the background image that will replace the default fade in the title bar.
+         * @param imageHandle An image handle to be used as a background
+         * @return Any of the following result codes:
+         * - #MAW_RES_OK if the property could be set.
+         * - @MAW_RES_INVALID_PROPERTY_VALUE if the image handle was invalid.
+         * - @MAW_RES_ERROR otherwise.
+         */
+        virtual int setTitleBackgroundImage(const MAHandle imageHandle);
+
+        /**
+         * Set the type of scaling that should be applied to the title background.
+         * @param scaleMode The type of scaling.
+         * One of the following:
+         *  #TITLE_BACKGROUND_SCALE_NONE
+         *  #TITLE_BACKGROUND_SCALE_REPEAT_XY
+         */
+        virtual void setTitleBackgroundScaleMode(const TitleBackgroundScaleMode scaleMode);
 
         /**
          * Add an stack screen event listener.
