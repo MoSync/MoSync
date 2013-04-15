@@ -31,6 +31,7 @@ using System.Windows.Navigation;
 using System;
 using System.Text.RegularExpressions;
 using System.Reflection;
+using System.IO.IsolatedStorage;
 
 namespace MoSync
 {
@@ -42,11 +43,6 @@ namespace MoSync
 		 */
         public class ImageButton : WidgetBaseWindowsPhone
         {
-            /**
-             * The native Button
-             */
-            protected System.Windows.Controls.Button mButton;
-
             /**
              * A Grid that holds the foreground image and the text
              */
@@ -73,6 +69,16 @@ namespace MoSync
             protected System.Windows.Controls.Image mBackgroundImage;
 
             /**
+             * The source of the background image shown when button is in pressed state.
+             */
+            protected System.Windows.Media.Imaging.BitmapSource mPressedBackgroundImageSource = null;
+
+            /**
+             * The source of the backround image shown when button is in normal state.
+             */
+            protected System.Windows.Media.Imaging.BitmapSource mNormalBackgroundImageSource = null;
+
+            /**
              * Strech object, that defines if the background image should be streched, and the streching mode
              */
             protected System.Windows.Media.Stretch mStretchBackground;
@@ -84,6 +90,24 @@ namespace MoSync
              * the grid layout has some unremovable spacers that have almost this amount of pixels
              */
             private const int DifferenceSpacer = 23;
+
+            // Image handle for MAW_IMAGE_BUTTON_IMAGE property.
+            protected int mForegroundImageHandle = 0;
+
+            // File image path for MAW_IMAGE_BUTTON_IMAGE_PATH property.
+            protected String mForegroundImagePath = "";
+
+            // Image handle for MAW_IMAGE_BUTTON_BACKGROUND_IMAGE property.
+            protected int mBackgroundImageHandle = 0;
+
+            // File image path for MAW_IMAGE_BUTTON_BACKGROUND_IMAGE_PATH property.
+            protected String mBackgroundImagePath = "";
+
+            // File image path for MAW_IMAGE_BUTTON_PRESSED_IMAGE_PATH property.
+            protected String mPressedImagePath = "";
+
+            // Image handle for MAW_IMAGE_BUTTON_PRESSED_IMAGE property.
+            protected int mPressedImageHandle = 0;
 
             /**
              * Function that creates the TextBlock object and setts the alignment of the text
@@ -158,8 +182,6 @@ namespace MoSync
              */
             public ImageButton()
             {
-                mButton = new System.Windows.Controls.Button();
-
                 mStretchForeground = new System.Windows.Media.Stretch();
                 mStretchForeground = System.Windows.Media.Stretch.None;
 
@@ -178,24 +200,37 @@ namespace MoSync
                 mGrid = new System.Windows.Controls.Grid();
                 this.AddWidgetsToGrid();
 
-                mButton.Content = mGrid;
-
-                mButton.HorizontalAlignment = HorizontalAlignment.Left;
-                mButton.VerticalAlignment = VerticalAlignment.Top;
-
-                mButton.BorderThickness = new Thickness(0.0);
-                mButton.Margin = new Thickness(0.0);
                 mGrid.Margin = new Thickness(0.0);
-                mButton.Padding = new Thickness(0.0);
+
                 mBackgroundImage.Margin = new Thickness(0.0);
                 mForegroundImage.Margin = new Thickness(0.0);
 
-                mView = mButton;
+                mBackgroundImage.Width = mGrid.Width - DifferenceSpacer;
+                mBackgroundImage.Height = mGrid.Height - DifferenceSpacer;
 
-                //the click handle the button component
-                mButton.Click += new RoutedEventHandler(
-                    delegate(Object from, RoutedEventArgs evt)
+                mBackgroundImage.Stretch = mStretchBackground;
+
+                mView = mGrid;
+
+                // the MouseEnter handle for the ImageButton. Used for switching background image.
+                mGrid.MouseEnter += new System.Windows.Input.MouseEventHandler(delegate(Object from, System.Windows.Input.MouseEventArgs evt)
                     {
+                        if (mPressedBackgroundImageSource != null)
+                        {
+                            mNormalBackgroundImageSource = (System.Windows.Media.Imaging.BitmapSource)mBackgroundImage.Source;
+                            mBackgroundImage.Source = mPressedBackgroundImageSource;
+                        }
+                    });
+
+                // the MouseLeave handle for the ImageButton. Used for switching background image.
+                mGrid.MouseLeave += new System.Windows.Input.MouseEventHandler(delegate(Object from, System.Windows.Input.MouseEventArgs evt)
+                    {
+                        if (mNormalBackgroundImageSource != null)
+                        {
+                            mBackgroundImage.Source = mNormalBackgroundImageSource;
+                            mNormalBackgroundImageSource = null;
+                        }
+
                         //create a Memory object of 8 Bytes
                         Memory eventData = new Memory(8);
 
@@ -240,21 +275,18 @@ namespace MoSync
                     if (value.Equals(MoSync.Constants.MAW_ALIGNMENT_LEFT))
                     {
                         mText.TextAlignment = TextAlignment.Left;
-                        mButton.HorizontalContentAlignment = HorizontalAlignment.Left;
                     }
                     else
                     {
                         if (value.Equals(MoSync.Constants.MAW_ALIGNMENT_RIGHT))
                         {
                             mText.TextAlignment = TextAlignment.Right;
-                            mButton.HorizontalContentAlignment = HorizontalAlignment.Right;
                         }
                         else
                         {
                             if (value.Equals(MoSync.Constants.MAW_ALIGNMENT_CENTER))
                             {
                                 mText.TextAlignment = TextAlignment.Center;
-                                mButton.HorizontalContentAlignment = HorizontalAlignment.Center;
                             }
                             else throw new InvalidPropertyValueException();
                         }
@@ -274,21 +306,18 @@ namespace MoSync
                     if (value.Equals(MoSync.Constants.MAW_ALIGNMENT_TOP))
                     {
                         mText.VerticalAlignment = VerticalAlignment.Top; //todo: rewrite this
-                        mButton.VerticalContentAlignment = VerticalAlignment.Top;
                     }
                     else
                     {
                         if (value.Equals(MoSync.Constants.MAW_ALIGNMENT_BOTTOM))
                         {
                             mText.VerticalAlignment = VerticalAlignment.Bottom;
-                            mButton.VerticalContentAlignment = VerticalAlignment.Bottom;
                         }
                         else
                         {
                             if (value.Equals(MoSync.Constants.MAW_ALIGNMENT_CENTER))
                             {
                                 mText.VerticalAlignment = VerticalAlignment.Center;
-                                mButton.VerticalContentAlignment = VerticalAlignment.Center;
                             }
                             else throw new InvalidPropertyValueException();
                         }
@@ -334,7 +363,7 @@ namespace MoSync
                 set
                 {
                     Resource res = mRuntime.GetResource(MoSync.Constants.RT_IMAGE, value);
-                    if (null != res && res.GetInternalObject() != null)
+                    if (null != res && null != res.GetInternalObject())
                     {
                         /**
                          * Set the height and width of the foreground image
@@ -349,8 +378,14 @@ namespace MoSync
                             (System.Windows.Media.Imaging.BitmapSource)(res.GetInternalObject());
 
                         mForegroundImage.Source = bmpSource;
+                        mForegroundImageHandle = value;
+                        mForegroundImagePath = "";
                     }
                     else throw new InvalidPropertyValueException();
+                }
+                get
+                {
+                    return mForegroundImageHandle;
                 }
             }
 
@@ -364,19 +399,48 @@ namespace MoSync
                 set
                 {
                     Resource res = mRuntime.GetResource(MoSync.Constants.RT_IMAGE, value);
-                    if (null != res && res.GetInternalObject() != null)
+                    if (null != res && null != res.GetInternalObject())
                     {
                         System.Windows.Media.Imaging.BitmapSource bmpSource =
                             (System.Windows.Media.Imaging.BitmapSource)(res.GetInternalObject());
 
                         mBackgroundImage.Source = bmpSource;
 
-                        mBackgroundImage.Width = mButton.Width - DifferenceSpacer;
-                        mBackgroundImage.Height = mButton.Height - DifferenceSpacer;
-
-                        mBackgroundImage.Stretch = mStretchBackground;
+                        mBackgroundImageHandle = value;
+                        mBackgroundImagePath = "";
                     }
                     else throw new InvalidPropertyValueException();
+                }
+                get
+                {
+                    return mBackgroundImageHandle;
+                }
+            }
+
+            /**
+             * Implementation of the PressedImage property.
+             * Sets the background image used when the button is pressed.
+             */
+            [MoSyncWidgetProperty(MoSync.Constants.MAW_IMAGE_BUTTON_PRESSED_IMAGE)]
+            public int PressedImage
+            {
+                set
+                {
+                    Resource res = mRuntime.GetResource(MoSync.Constants.RT_IMAGE, value);
+                    if (null != res && null != res.GetInternalObject())
+                    {
+                        System.Windows.Media.Imaging.BitmapSource bmpSource =
+                            (System.Windows.Media.Imaging.BitmapSource)(res.GetInternalObject());
+
+                        mPressedBackgroundImageSource = bmpSource;
+                        mPressedImageHandle = value;
+                        mPressedImagePath = "";
+                    }
+                    else throw new InvalidPropertyValueException();
+                }
+                get
+                {
+                    return mPressedImageHandle;
                 }
             }
 
@@ -391,6 +455,129 @@ namespace MoSync
                     mText.FontFamily = fontInfo.family;
                     mText.FontWeight = fontInfo.weight;
                     mText.FontStyle = fontInfo.style;
+                }
+            }
+
+            //MAW_IMAGE_BUTTON_IMAGE_PATH property implementation
+            [MoSyncWidgetProperty(MoSync.Constants.MAW_IMAGE_BUTTON_IMAGE_PATH)]
+            public String ImagePath
+            {
+                set
+                {
+                    //Take the store for the application (an image of the sandbox)
+                    IsolatedStorageFile f = IsolatedStorageFile.GetUserStoreForApplication();
+
+                    //Verify that the file exists on the isolated storage
+                    if (f.FileExists(value))
+                    {
+                        try
+                        {
+                            //Create a file stream for the required file
+                            IsolatedStorageFileStream fs = new IsolatedStorageFileStream(value, System.IO.FileMode.Open, f);
+
+                            //Set the stream as a source for a new bitmap image
+                            var image = new System.Windows.Media.Imaging.BitmapImage();
+                            image.SetSource(fs);
+
+                            //  Set the newly created bitmap image for the image widget
+                            mForegroundImage.Source = image;
+                            mForegroundImagePath = value;
+                            mForegroundImageHandle = 0;
+                        }
+                        catch (Exception e)
+                        {
+                            // There was a problem reading the image file.
+                            throw new InvalidPropertyValueException();
+                        }
+                    }
+                    //If the file does not exist throw an invalid property value exception
+                    else throw new InvalidPropertyValueException();
+                }
+                get
+                {
+                    return mForegroundImagePath;
+                }
+            }
+
+            //MAW_IMAGE_BUTTON_BACKGROUND_IMAGE_PATH property implementation
+            [MoSyncWidgetProperty(MoSync.Constants.MAW_IMAGE_BUTTON_BACKGROUND_IMAGE_PATH)]
+            public String BackgroundImagePath
+            {
+                set
+                {
+                    //Take the store for the application (an image of the sandbox)
+                    IsolatedStorageFile f = IsolatedStorageFile.GetUserStoreForApplication();
+
+                    //Verify that the file exists on the isolated storage
+                    if (f.FileExists(value))
+                    {
+                        try
+                        {
+                            //Create a file stream for the required file
+                            IsolatedStorageFileStream fs = new IsolatedStorageFileStream(value, System.IO.FileMode.Open, f);
+
+                            //Set the stream as a source for a new bitmap image
+                            var image = new System.Windows.Media.Imaging.BitmapImage();
+                            image.SetSource(fs);
+
+                            //Set the newly created bitmap image for the image widget
+                            mBackgroundImage.Source = image;
+                            mBackgroundImagePath = value;
+                            mBackgroundImageHandle = 0;
+                        }
+                        catch (Exception e)
+                        {
+                            // There was a problem reading the image file.
+                            throw new InvalidPropertyValueException();
+                        }
+                    }
+                    //If the file does not exist throw an invalid property value exception
+                    else throw new InvalidPropertyValueException();
+                }
+                get
+                {
+                    return mBackgroundImagePath;
+                }
+            }
+
+            //MAW_IMAGE_BUTTON_BACKGROUND_IMAGE_PATH property implementation
+            [MoSyncWidgetProperty(MoSync.Constants.MAW_IMAGE_BUTTON_PRESSED_IMAGE_PATH)]
+            public String PressedImagePath
+            {
+                set
+                {
+                    //Take the store for the application (an image of the sandbox)
+                    IsolatedStorageFile f = IsolatedStorageFile.GetUserStoreForApplication();
+
+                    //Verify that the file exists on the isolated storage
+                    if (f.FileExists(value))
+                    {
+                        try
+                        {
+                            //Create a file stream for the required file
+                            IsolatedStorageFileStream fs = new IsolatedStorageFileStream(value, System.IO.FileMode.Open, f);
+
+                            //Set the stream as a source for a new bitmap image
+                            var image = new System.Windows.Media.Imaging.BitmapImage();
+                            image.SetSource(fs);
+
+                            //Set the newly created bitmap image for the image widget
+                            mPressedBackgroundImageSource = image;
+                            mPressedImagePath = value;
+                            mPressedImageHandle = 0;
+                        }
+                        catch (Exception e)
+                        {
+                            // There was a problem reading the image file.
+                            throw new InvalidPropertyValueException();
+                        }
+                    }
+                    //If the file does not exist throw an invalid property value exception
+                    else throw new InvalidPropertyValueException();
+                }
+                get
+                {
+                    return mPressedImagePath;
                 }
             }
         }

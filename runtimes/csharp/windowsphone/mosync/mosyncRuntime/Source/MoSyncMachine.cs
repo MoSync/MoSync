@@ -1,3 +1,6 @@
+// Disable this to allow debugging of core exceptions.
+#define CATCH_CORE_EXCEPTIONS
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -64,17 +67,21 @@ namespace MoSync
 
         private void ThreadEntry()
         {
-			try
-			{
-				CoreRun();
-			}
-			catch (Exception e)
-			{
-				System.Diagnostics.Debug.WriteLine(e.StackTrace);
-				MoSync.Util.ShowMessage(e.ToString());
-				return;
-			};
-        }
+#if CATCH_CORE_EXCEPTIONS
+					try
+#endif
+					{
+						CoreRun();
+					}
+#if CATCH_CORE_EXCEPTIONS
+					catch (Exception e)
+					{
+						System.Diagnostics.Debug.WriteLine(e.StackTrace);
+						MoSync.Util.ShowMessage(e.ToString());
+						return;
+					};
+#endif
+				}
 
         public void Run()
         {

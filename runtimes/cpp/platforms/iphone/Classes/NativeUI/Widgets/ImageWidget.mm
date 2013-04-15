@@ -21,7 +21,37 @@
 #include "Platform.h"
 #include <base/Syscall.h>
 
+/**
+ * Hidden functions/methods for ImageWidget class.
+ */
+@interface ImageWidget ()
+
+/**
+ * Used by the MAW_IMAGE_IMAGE property.
+ */
+@property(nonatomic, retain) NSNumber* imageHandle;
+
+/**
+ * Used by the MAW_IMAGE_PATH property.
+ */
+@property(nonatomic, retain) NSString* imagePath;
+
+/**
+ * Show an image from a given path.
+ * Setter for MAW_IMAGE_PATH.
+ * @param path Image file path.
+ * @return One of the following result codes:
+ * - MAW_RES_OK if the image was shown.
+ * - MAW_RES_INVALID_PROPERTY_VALUE if the path is invalid.
+ */
+- (int)setPropertyImagePath:(NSString*)path;
+
+@end
+
 @implementation ImageWidget
+
+@synthesize imageHandle = _imageHandle;
+@synthesize imagePath = _imagePath;
 
 - (id)init
 {
@@ -91,6 +121,8 @@
 			image = [image stretchableImageWithLeftCapWidth:_leftCapWidth topCapHeight:_topCapHeight];
 		}
         _imageView.image = image;
+		self.imageHandle = [NSNumber numberWithInt:imageHandle];
+		self.imagePath = @"";
 		[self layout];
 	}
 	else if([key isEqualToString:@"leftCapWidth"])
@@ -129,6 +161,10 @@
         else if([value isEqualToString:@"scaleXY"]) self.view.contentMode = UIViewContentModeScaleToFill;
         else if([value isEqualToString:@"scalePreserveAspect"]) self.view.contentMode = UIViewContentModeScaleAspectFit;
     }
+	else if([key isEqualToString:@MAW_IMAGE_PATH])
+	{
+		return [self setPropertyImagePath:value];
+	}
 	else
     {
 		return [super setPropertyWithKey:key toValue:value];
@@ -137,11 +173,82 @@
 }
 
 /**
+ * Get a widget property value.
+ * @param key Widget's property name.
+ * @return The property value, or nil if the property name is invalid.
+ * The returned value should not be autoreleased. The caller will release the returned value.
+ */
+- (NSString*)getPropertyWithKey:(NSString*)key
+{
+	if ([key isEqualToString:@MAW_IMAGE_IMAGE])
+	{
+		return [[self.imageHandle stringValue] retain];
+	}
+	else if ([key isEqualToString:@MAW_IMAGE_PATH])
+	{
+		return [self.imagePath retain];
+	}
+	else
+	{
+		return [super getPropertyWithKey:key];
+	}
+}
+
+/**
+ * Show an image from a given path.
+ * Setter for MAW_IMAGE_PATH.
+ * @param path Image file path.
+ * @return One of the following result codes:
+ * - MAW_RES_OK if the image was shown.
+ * - MAW_RES_INVALID_PROPERTY_VALUE if the path is invalid.
+ */
+- (int)setPropertyImagePath:(NSString*)path
+{
+	UIImage* image = [[UIImage alloc] initWithContentsOfFile:path];
+	if (!image)
+	{
+		return MAW_RES_INVALID_PROPERTY_VALUE;
+	}
+	self.imagePath = path;
+	self.imageHandle = [NSNumber numberWithInt:0];
+	_imageView.image = image;
+	[image release];
+	[self layout];
+	return MAW_RES_OK;
+}
+
+/**
+ * Getter implementation for imageNumber property.
+ */
+- (NSNumber*)imageHandle
+{
+	if (!_imageHandle)
+	{
+		_imageHandle = [[NSNumber alloc] initWithInt:0];
+	}
+	return _imageHandle;
+}
+
+/**
+ * Getter implementation for imagePath property.
+ */
+- (NSString*)imagePath
+{
+	if (!_imagePath)
+	{
+		_imagePath = [[NSString alloc] init];
+	}
+	return _imagePath;
+}
+
+/**
  * Dealloc method
  */
 -(void) dealloc
 {
     [_imageView release];
+	[_imageHandle release];
+	[_imagePath release];
     [super dealloc];
 }
 

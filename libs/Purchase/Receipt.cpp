@@ -134,7 +134,6 @@ namespace IAP
 
 	/**
 	 * The cost of the product in the local currency.
-	 * Platform: iOS.
 	 */
 	double Receipt::getPrice()
 	{
@@ -148,7 +147,6 @@ namespace IAP
 
 	/**
 	 * Get the localized product title.
-	 * Platform: iOS.
 	 */
 	MAUtil::String Receipt::getTitle()
 	{
@@ -157,7 +155,6 @@ namespace IAP
 
 	/**
 	 * Get the localized product description.
-	 * Platform: iOS.
 	 */
 	MAUtil::String Receipt::getDescription()
 	{

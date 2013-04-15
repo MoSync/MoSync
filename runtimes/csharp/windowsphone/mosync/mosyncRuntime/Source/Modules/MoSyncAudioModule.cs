@@ -22,16 +22,8 @@ using System.Threading;
 
 namespace MoSync
 {
-    public class AudioModule : IIoctlModule, ISyscallModule
-    {
-		public void Init(Syscalls syscalls, Core core, Runtime runtime)
-		{
-			syscalls.maSoundPlay = delegate(int _sound_res, int _offset, int _size)
-			{
-				// not implemented, but I don't wanna throw exceptions.
-				return -1;
-			};
-		}
+	public class AudioModule : IIoctlModule
+	{
 
 		List<IAudioData> mAudioData = new List<IAudioData>();
 		List<IAudioInstance> mAudioInstances = new List<IAudioInstance>();
@@ -74,8 +66,8 @@ namespace MoSync
 #endif
 
 
-        public void Init(Ioctls ioctls, Core core, Runtime runtime)
-        {
+		public void Init(Ioctls ioctls, Core core, Runtime runtime)
+		{
 
 #if false
 			mAudioInstanceUpdater = new AudioInstanceUpdater(mAudioInstances);
@@ -89,7 +81,17 @@ namespace MoSync
 				try
 				{
 					String url = core.GetDataMemory().ReadStringAtAddress(_url);
-					IAudioData ad = Audio.FromUrlOrFilePath(url, (_flags & MoSync.Constants.MA_AUDIO_DATA_STREAM) != 0);
+					String mime = core.GetDataMemory().ReadStringAtAddress(_mime);
+					bool shouldStream = (_flags & MoSync.Constants.MA_AUDIO_DATA_STREAM) != 0;
+					IAudioData ad;
+					if (mime == "audio/mpeg")
+					{
+						ad = Mp3Audio.FromUrlOrFilePath(url, shouldStream);
+					}
+					else
+					{
+						ad = Audio.FromUrlOrFilePath(url, shouldStream);
+					}
 					lock (mAudioData)
 					{
 						mAudioData.Add(ad);
@@ -108,14 +110,23 @@ namespace MoSync
 				return ret;
 			};
 
-            ioctls.maAudioDataCreateFromResource = delegate(int _mime, int _data, int _offset, int _length, int _flags)
-            {
+			ioctls.maAudioDataCreateFromResource = delegate(int _mime, int _data, int _offset, int _length, int _flags)
+			{
 				int ret = MoSync.Constants.MA_AUDIO_ERR_GENERIC;
 				try
 				{
 					Resource audiores = runtime.GetResource(MoSync.Constants.RT_BINARY, _data);
 					BoundedStream s = new BoundedStream((Stream)audiores.GetInternalObject(), _offset, _length);
-					IAudioData ad = Audio.FromStream(s, (_flags & MoSync.Constants.MA_AUDIO_DATA_STREAM) != 0);
+					String mime = core.GetDataMemory().ReadStringAtAddress(_mime);
+					IAudioData ad;
+					if (mime == "audio/mpeg")
+					{
+						ad = Mp3Audio.FromStream(s);
+					}
+					else
+					{
+						ad = Audio.FromStream(s, (_flags & MoSync.Constants.MA_AUDIO_DATA_STREAM) != 0);
+					}
 					lock (mAudioData)
 					{
 						mAudioData.Add(ad);
@@ -132,10 +143,10 @@ namespace MoSync
 				}
 
 				return ret;
-            };
+			};
 
-            ioctls.maAudioDataDestroy = delegate(int _audioData)
-            {
+			ioctls.maAudioDataDestroy = delegate(int _audioData)
+			{
 				try
 				{
 					lock (mAudioData)
@@ -155,7 +166,7 @@ namespace MoSync
 				}
 
 				return MoSync.Constants.MA_AUDIO_ERR_OK;
-            };
+			};
 
 			ioctls.maAudioPrepare = delegate(int _audioInstance, int async)
 			{
@@ -196,8 +207,8 @@ namespace MoSync
 
 			};
 
-            ioctls.maAudioInstanceCreate = delegate(int _audioData)
-            {
+			ioctls.maAudioInstanceCreate = delegate(int _audioData)
+			{
 				int ret = MoSync.Constants.MA_AUDIO_ERR_GENERIC;
 				try
 				{
@@ -219,7 +230,7 @@ namespace MoSync
 				}
 
 				return ret;
-            };
+			};
 
 			ioctls.maAudioInstanceCreateDynamic = delegate(int _sampleRate, int _numChannels, int _bufferSize)
 			{
@@ -300,8 +311,8 @@ namespace MoSync
 				return MoSync.Constants.MA_AUDIO_ERR_OK;
 			};
 
-            ioctls.maAudioInstanceDestroy = delegate(int _audioInstance)
-            {
+			ioctls.maAudioInstanceDestroy = delegate(int _audioInstance)
+			{
 				try
 				{
 					lock (mAudioInstances)
@@ -321,10 +332,10 @@ namespace MoSync
 				}
 
 				return MoSync.Constants.MA_AUDIO_ERR_OK;
-            };
+			};
 
-            ioctls.maAudioPlay = delegate(int _audioInstance)
-            {
+			ioctls.maAudioPlay = delegate(int _audioInstance)
+			{
 				try
 				{
 					lock (mAudioInstances)
@@ -343,7 +354,7 @@ namespace MoSync
 				}
 
 				return MoSync.Constants.MA_AUDIO_ERR_OK;
-            };
+			};
 
 
 			ioctls.maAudioStop = delegate(int _audioInstance)
@@ -511,6 +522,6 @@ namespace MoSync
 
 				return MoSync.Constants.MA_AUDIO_ERR_OK;
 			};
-        }
-    }
+		}
+	}
 }

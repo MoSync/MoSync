@@ -171,6 +171,16 @@ public class Layout extends Widget
 	}
 
 	/**
+	 * Returns the children count for this layout.
+	 *
+	 * @return The layout children count.
+	 */
+	public int getChildCount()
+	{
+		return m_children.size();
+	}
+
+	/**
 	 * Updates the Android layout params for the given child, according
 	 * to the parameters specified in the child. Only the parameters that
 	 * are supported for the layout will be taken into consideration.

@@ -25,6 +25,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.view.ViewGroup;
 
+import com.mosync.internal.android.MoSyncThread;
 import com.mosync.internal.generated.IX_WIDGET;
 import com.mosync.nativeui.core.NativeUI;
 import com.mosync.nativeui.util.properties.IntConverter;
@@ -158,6 +159,22 @@ public class ScreenWidget extends Layout
 	}
 
 	/**
+	 * @see Widget.getProperty.
+	 */
+	@Override
+	public String getProperty(String property)
+	{
+		if( property.equals( IX_WIDGET.MAW_SCREEN_IS_SHOWN ))
+		{
+			return Boolean.toString( this.isShown() );
+		}
+		else
+		{
+			return super.getProperty( property );
+		}
+	}
+
+	/**
 	 * @see Layout.updateLayoutParams.
 	 */
 	@Override
@@ -200,6 +217,16 @@ public class ScreenWidget extends Layout
 	public void setIconChangedListener(IconChangedListener iconChangedListener)
 	{
 		m_iconChangedListener = iconChangedListener;
+	}
+
+	/**
+	 * Check if this screen is shown.
+	 * @return true if the screen is displayed, false otherwise.
+	 */
+	public boolean isShown()
+	{
+		ScreenWidget currentScreen = MoSyncThread.getInstance().getCurrentScreen();
+		return this.equals( currentScreen );
 	}
 
 	/**

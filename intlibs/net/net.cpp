@@ -257,6 +257,17 @@ int UdpConnection::connect() {
 		return CONNERR_GENERIC;
 	}
 
+#ifdef __MS_XCODE__
+    //Broadcasting is disabled by default on iOS, need to enable it.
+    //Also, if anyone wants to call this for other platforms in the future,
+    //know that it should be a char on other platforms, not int.
+    int shouldBroadCast = 1;
+    if (setsockopt(mSock, SOL_SOCKET, SO_BROADCAST, &shouldBroadCast, sizeof shouldBroadCast) == -1)
+    {
+        LOG("UdpConnection: Could not enable broadcast");
+    }
+#endif
+
 	if(mHostname.empty())
 		return openServer();
 
@@ -409,6 +420,7 @@ int UdpConnection::writeTo(const void* src, int len, const MAConnAddr& dst) {
 	si.sin_family = AF_INET;
 	si.sin_port = htons(dst.inet4.port);
 	si.sin_addr.s_addr = htonl(dst.inet4.addr);
+
 	int bytesSent = sendto(mSock, (const char*) src, len, 0, (sockaddr*)&si, sizeof(si));
 	if(bytesSent != len || SOCKET_ERROR == bytesSent) {
 		LOG("UdpConnection::writeTo: sendto failed. error code: %i\n", SOCKET_ERRNO);

@@ -245,8 +245,86 @@ namespace MoSync
 				mCamera.CaptureImage();
 
 				are.WaitOne();
-				return 0;
+                return MoSync.Constants.MA_CAMERA_RES_OK;
 			};
+
+            /**
+             * Captures an image and stores it as a new data object in new
+             * placeholder that is sent via #EVENT_TYPE_CAMERA_SNAPSHOT event.
+             * @param _formatIndex int the required format index (size index).
+             */
+            ioctls.maCameraSnapshotAsync = delegate(int _formatIndex)
+            {
+                System.Windows.Size dim;
+                if (GetCameraFormat(_formatIndex, out dim) == false)
+                {
+                    return MoSync.Constants.MA_CAMERA_RES_FAILED;
+                }
+
+                mCamera.Resolution = dim;
+
+                if (mCameraSnapshotDelegate != null)
+                {
+                    mCamera.CaptureImageAvailable -= mCameraSnapshotDelegate;
+                }
+
+                mCameraSnapshotDelegate = delegate(object o, ContentReadyEventArgs args)
+                {
+                    MoSync.Util.RunActionOnMainThreadSync(() =>
+                    {
+                        Stream data = null;
+                        try
+                        {
+                            // as the camera always takes a snapshot in landscape left orientation,
+                            // we need to rotate the resulting image 90 degrees for a current PortraitUp orientation
+                            // and 180 degrees for a current LandscapeRight orientation
+                            int rotateAngle = 0;
+
+                            if (currentPage.Orientation == PageOrientation.PortraitUp)
+                            {
+                                rotateAngle = 90;
+                            }
+                            else if (currentPage.Orientation == PageOrientation.LandscapeRight)
+                            {
+                                rotateAngle = 180;
+                            }
+                            // if the current page is in a LandscapeLeft orientation, the orientation angle will be 0
+                            data = RotateImage(args.ImageStream, rotateAngle);
+                        }
+                        catch
+                        {
+                            // the orientation angle was not a multiple of 90 - we keep the original image
+                            data = args.ImageStream;
+                        }
+
+                        MemoryStream dataMem = new MemoryStream((int)data.Length);
+                        MoSync.Util.CopySeekableStreams(data, 0, dataMem, 0, (int)data.Length);
+
+                        Memory eventData = new Memory(20);
+
+                        const int MAEventData_eventType = 0;
+                        const int MAEventData_snapshotImageDataHandle = 4;
+                        const int MAEventData_snapshotFormatIndex = 8;
+                        const int MAEventData_snapshotImageDataRepresentation = 12;
+                        const int MAEventData_snapshotReturnCode = 16;
+
+                        eventData.WriteInt32(MAEventData_eventType, MoSync.Constants.EVENT_TYPE_CAMERA_SNAPSHOT);
+
+                        // Create new place holder.
+                        eventData.WriteInt32(MAEventData_snapshotImageDataHandle, runtime.AddResource(
+                            new Resource(dataMem, MoSync.Constants.RT_BINARY, true)));
+                        eventData.WriteInt32(MAEventData_snapshotFormatIndex, _formatIndex);
+                        eventData.WriteInt32(MAEventData_snapshotImageDataRepresentation, MoSync.Constants.MA_IMAGE_REPRESENTATION_RAW);
+                        eventData.WriteInt32(MAEventData_snapshotReturnCode, MoSync.Constants.MA_CAMERA_RES_OK);
+
+                        runtime.PostEvent(new Event(eventData));
+                    });
+                };
+
+                mCamera.CaptureImageAvailable += mCameraSnapshotDelegate;
+                mCamera.CaptureImage();
+                return MoSync.Constants.MA_CAMERA_RES_OK;
+            };
 
             /**
              * Sets the property represented by the string situated at the

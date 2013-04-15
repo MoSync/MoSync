@@ -116,9 +116,31 @@ int maWidgetModalDialogHide(MAWidgetHandle dialogHandle);
  * @param screenHandle The handle to the screen.
  * @return Any of the following result codes:
  * - MAW_RES_OK if the screen could be shown.
+ * - MAW_RES_INVALID_HANDLE if the screenHandle is invalid.
  * - MAW_RES_INVALID_SCREEN if the screenHandle is not a handle to a screen.
  */
 int maWidgetScreenShow(MAWidgetHandle screenHandle);
+
+/**
+ * Shows a screen with a transition. If native UI hasn't been initialized, it is also initialized
+ * and disables regular MoSync drawing.
+ *
+ * @param screenHandle The handle to the screen.
+ * @param screenTransitionType The transition of the screen.
+ * @param screenTransitionDuration The duration of the transition.
+ *
+ * @returns Any of the following result codes:
+ * - MAW_RES_OK if the screen could be shown.
+ * - MAW_RES_INVALID_HANDLE if the screenHandle is invalid.
+ * - MAW_RES_INVALID_SCREEN if the screenHandle is not a handle to a screen.
+ * - MAW_RES_INVALID_SCREEN_TRANSITION_TYPE if the screen transition type is not available
+ * on the running platform.
+ * - MAW_RES_INVALID_SCREEN_TRANSITION_DURATION if the value representing the
+ * duration of the screen transition is invalid.
+ */
+int maWidgetScreenShowWithTransition(MAWidgetHandle screenHandle,
+                                     MAWScreenTransitionType screenTransitionType,
+                                     int screenTransitionDuration);
 
 /**
  * Pushes a screen to the given screen stack, hides the current screen and

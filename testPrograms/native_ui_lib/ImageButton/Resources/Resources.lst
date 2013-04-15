@@ -1,2 +1,12 @@
-.res RES_IMAGE
-.image "button.png"
+.res LOCAL_FILES_BIN
+.ubin
+.include "LocalFiles.bin"
+
+.res RES_IMAGE_BACKGROUND
+.image "BackgroundHandle.png"
+
+.res RES_IMAGE_FOREGROUND
+.image "ForegroundHandle.png"
+
+.res RES_IMAGE_PRESSED
+.image "PressedHandle.png"

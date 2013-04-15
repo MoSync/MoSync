@@ -123,6 +123,7 @@ namespace MoSync
                             if ((mPivot.Items[i] as Microsoft.Phone.Controls.PivotItem).Content.Equals((child as Screen).View))
                             {
                                 mPivot.Items.RemoveAt(i);
+                                child.SetParent(null);
                                 break;
                             }
                         }
@@ -189,6 +190,46 @@ namespace MoSync
                 {
                     return mPivot.SelectedIndex;
                 }
+            }
+
+            /**
+             * Handles the back button pressed event.
+             * @return true if the event has been consumed, false otherwise.
+             */
+            public override bool HandleBackButtonPressed()
+            {
+                Microsoft.Phone.Controls.Pivot pivot = this.mPivot;
+                //If the selected tab is a StackScreen.
+                if (this.mChildren[pivot.SelectedIndex] is StackScreen)
+                {
+                    //If pop is possible.
+                    if ((this.mChildren[pivot.SelectedIndex] as StackScreen).StackCount() > 1 && (this.mChildren[pivot.SelectedIndex] as StackScreen).GetBackButtonEnabled() == true)
+                    {
+                        //Do a pop and cancel the event.
+                        (this.mChildren[pivot.SelectedIndex] as StackScreen).PopFromBackButtonPressed();
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+
+            /**
+             * Check if a given child screen is shown.
+             * @param child Given child.
+             * @return true if child is currently shown, false otherwise.
+             */
+            public override bool isChildShown(IScreen child)
+            {
+                if (mPivot.Items.Count > 0)
+                {
+                    int index = mPivot.SelectedIndex;
+                    if ((mPivot.Items[index] as Microsoft.Phone.Controls.PivotItem).Content.Equals((child as Screen).View))
+                    {
+                        return true;
+                    }
+                }
+                return false;
             }
         }
     }

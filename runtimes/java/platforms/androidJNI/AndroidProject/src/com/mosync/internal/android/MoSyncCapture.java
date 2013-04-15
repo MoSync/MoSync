@@ -42,6 +42,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
+import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.Date;
 import java.util.Hashtable;
@@ -318,9 +319,9 @@ public class MoSyncCapture
 		byte[] byteArray = result.getBytes();
 
 		// Write string to MoSync memory.
-		sMoSyncThread.mMemDataSection.position( valueBuffer );
-		sMoSyncThread.mMemDataSection.put( byteArray );
-		sMoSyncThread.mMemDataSection.put( (byte)0 );
+		ByteBuffer buffer = sMoSyncThread.getMemorySlice(valueBuffer, byteArray.length + 1);
+		buffer.put( byteArray );
+		buffer.put( (byte)0 );
 
 		return MA_CAPTURE_RES_OK;
 	}
@@ -451,9 +452,9 @@ public class MoSyncCapture
 		byte[] byteArray = result.getBytes();
 
 		// Write string to MoSync memory.
-		sMoSyncThread.mMemDataSection.position( buffer );
-		sMoSyncThread.mMemDataSection.put( byteArray );
-		sMoSyncThread.mMemDataSection.put( (byte)0 );
+		ByteBuffer byteBuffer = sMoSyncThread.getMemorySlice(buffer, byteArray.length + 1);
+		byteBuffer.put( byteArray );
+		byteBuffer.put( (byte)0 );
 
 		return MA_CAPTURE_RES_OK;
 	}
@@ -489,9 +490,9 @@ public class MoSyncCapture
 		byte[] byteArray = result.getBytes();
 
 		// Write string to MoSync memory.
-		sMoSyncThread.mMemDataSection.position( buffer );
-		sMoSyncThread.mMemDataSection.put( byteArray );
-		sMoSyncThread.mMemDataSection.put( (byte)0 );
+		ByteBuffer byteBuffer = sMoSyncThread.getMemorySlice(buffer, byteArray.length + 1);
+		byteBuffer.put( byteArray );
+		byteBuffer.put( (byte)0 );
 
 		return MA_CAPTURE_RES_OK;
 	}

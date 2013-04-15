@@ -79,6 +79,16 @@ namespace NativeUI
         return (this->getPropertyInt(MAW_TAB_SCREEN_CURRENT_TAB));
     }
 
+	/**
+	 * Check if a tab screen is shown.
+	 * @return true if the tab screen is visible, false otherwise.
+	 */
+	bool TabScreen::isShown()
+	{
+		MAUtil::String value = this->getPropertyString(MAW_TAB_SCREEN_IS_SHOWN);
+        return (strcmp(value.c_str(), "true") == 0) ? true : false;
+	}
+
     /**
      * Add an tab screen event listener.
      * @param listener The listener that will receive tab screen events.

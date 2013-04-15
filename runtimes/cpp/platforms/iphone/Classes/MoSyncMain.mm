@@ -24,7 +24,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <helpers/log.h>
 #include "Base/ThreadPool.h"
 #include <base/FileStream.h>
-#include "ImagePickerController.h"
 #include <helpers/CriticalSection.h>
 
 #include "iphone_helpers.h"
@@ -191,51 +190,6 @@ void MoSync_DoneUpdatingView() {
 	mViewSemaphore.post();
 }
 
-void MoSync_ShowMessageBox(const char *title, const char *msg, bool kill) {
-	NSString* nsTitle = nil;
-	if(title != nil)
-		nsTitle = [[NSString alloc] initWithBytes:title length:strlen(title) encoding:NSUTF8StringEncoding];
-
-	[sMoSyncView showMessageBox:[[NSString alloc] initWithBytes:msg length:strlen(msg) encoding:NSUTF8StringEncoding]
-					  withTitle:nsTitle
-					  shouldKill:kill];
-}
-
-void MoSync_ShowAlert(const char* title, const char* message, const char* button1, const char* button2, const char* button3)
-{
-	NSString* nsTitle = nil;
-	if(title != nil && (strlen(title) != 0))
-		nsTitle = [[NSString alloc] initWithBytes:title length:strlen(title) encoding:NSUTF8StringEncoding];
-
-	NSString* nsButton1 = nil;
-	if(button1 != nil && (strlen(button1) != 0))
-		nsButton1 = [[NSString alloc] initWithBytes:button1 length:strlen(button1) encoding:NSUTF8StringEncoding];
-
-	NSString* nsButton2 = nil;
-	if(button2 != nil && (strlen(button2) != 0))
-		nsButton2 = [[NSString alloc] initWithBytes:button2 length:strlen(button2) encoding:NSUTF8StringEncoding];
-
-	NSString* nsButton3 = nil;
-	if(button3 != nil && (strlen(button3) != 0))
-		nsButton3 = [[NSString alloc] initWithBytes:button3 length:strlen(button3) encoding:NSUTF8StringEncoding];
-
-	[sMoSyncView showAlert:[[NSString alloc] initWithBytes:message length:strlen(message) encoding:NSUTF8StringEncoding]
-				 withTitle:nsTitle
-			  button1Title:nsButton1
-			  button2Title:nsButton2
-			  button3Title:nsButton3];
-}
-
-void MoSync_ShowTextBox(const wchar* title, const wchar* inText, wchar* outText, int maxSize, int constraints) {
-	[sMoSyncView
-	 showTextBox:[[NSString alloc] initWithCharacters:(const unichar*)title length:wcharLength(title)]
-	 withInText:[[NSString alloc] initWithCharacters:(const unichar*)inText length:wcharLength(inText)]
-	 outText:(wchar*)outText
-	 maxSize:maxSize
-	 andConstraints:constraints
-	 ];
-}
-
 void MoSync_ReloadProgram(MAHandle data, int reload) {
 #ifdef SUPPORT_PROGRAM_RELOAD
 	Base::gSyscall->VM_Yield();
@@ -249,37 +203,6 @@ void MoSync_ReloadProgram(MAHandle data, int reload) {
 void MoSync_Exit() {
     //[[UIApplication sharedApplication] terminateWithSuccess];
     exit(0);
-}
-
-void MoSync_StartUpdatingLocation() {
-	[sMoSyncView startUpdatingLocation];
-}
-
-void MoSync_StopUpdatingLocation() {
-	[sMoSyncView stopUpdatingLocation];
-}
-
-/**
- * Start a sensor.
- * @param sensorType What type of sensor to start.
- * @param value Update interval value.
- * @return NO_ERROR if the sensor has been started, or a code error otherwise(for more info see MoSyncSenor.h).
- */
-int MoSync_SensorStart(int sensor, int interval) {
-    MoSyncSensor* moSyncSensor = [sMoSyncView getMoSyncSensor];
-    int result = [moSyncSensor startSensor:sensor interval:interval];
-    return result;
-}
-
-/**
- * Stop a sensor.
- * @param sensorType What type of sensor to stop.
- * @return NO_ERROR if the sensor has been started, or a code error otherwise(for more info see MoSyncSenor.h).
- */
-int MoSync_SensorStop(int sensor) {
-    MoSyncSensor* moSyncSensor = [sMoSyncView getMoSyncSensor];
-    int result = [moSyncSensor stopSensor:sensor];
-    return result;
 }
 
 void MoSync_AddTouchPressedEvent(int x, int y, int touchId) {
@@ -336,18 +259,6 @@ void* MoSync_GetCustomEventDataMoSyncPointer() {
 	return (void*) (gCore->Head.DataSize-Base::getMaxCustomEventSize());
 
 #endif
-}
-
-void MoSync_ShowImagePicker()
-{
-    [ImagePickerController getInstance].returnDataType = MA_IMAGE_PICKER_EVENT_RETURN_TYPE_IMAGE_HANDLE;
-    [[ImagePickerController getInstance] show];
-}
-
-void MoSync_ShowImagePicker(int returnType)
-{
-    [ImagePickerController getInstance].returnDataType = returnType;
-    [[ImagePickerController getInstance] show];
 }
 
 void MoSync_AddLayerToView(CALayer* layer){

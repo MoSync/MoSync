@@ -4,11 +4,12 @@
 group WidgetImageProperties "Image" {
 	constset MAString MAW_IMAGE_ {
 		/**
-		* Sets the image that will be displayed.
+		* Sets or gets the image that will be displayed.
+		* Setting this property will change #MAW_IMAGE_PATH property value to an empty string.
 		*
 		* @validvalue MoSync handle to an uncompressed image resource.
 		*
-		* @setonly
+		* @setandget
 		*
 		* @par Example
 		* \code
@@ -16,6 +17,21 @@ group WidgetImageProperties "Image" {
 		* \endcode
 		*/
 		IMAGE = "image";
+
+		/**
+		* Sets or gets a path to a image file that will be displayed by the widget.
+		* Setting this property will change #MAW_IMAGE_IMAGE property value to zero.
+		*
+		* @validvalue A valid path to an image file.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(imageHandle, MAW_IMAGE_PATH, "file_path.png");
+		* \endcode
+		*/
+		PATH = "imagePath";
 
 		/**
 		* @brief Specifies what type of scaling should be applied to the image.

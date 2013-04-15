@@ -26,6 +26,7 @@ MA 02110-1301, USA.
 #include <ma.h> 				// Syscalls
 #include <MAUtil/String.h>		// C++ String class
 #include <MAUtil/Moblet.h>		// Moblet class
+#include <MAUtil/Environment.h>
 
 #include "AppTabScreen.h"
 
@@ -35,7 +36,7 @@ using namespace OrientationTest;
 /**
  * Moblet for the  application.
  */
-class NativeUIMoblet : public Moblet
+class NativeUIMoblet : public Moblet, public OrientationListener
 {
 public:
 	/**
@@ -48,6 +49,8 @@ public:
 
 		// Show the screen.
 		mTabScreen->show();
+
+		Environment::addOrientationListener(this);
 	}
 
 	/**
@@ -56,6 +59,7 @@ public:
 	virtual ~NativeUIMoblet()
 	{
 		delete mTabScreen;
+		Environment::removeOrientationListener(this);
 	}
 
 	/**
@@ -83,6 +87,15 @@ public:
 	    }
 	}
 
+	/**
+	* Called after the screen has finished rotating.
+	* \param 'screenOrientation' One of the
+	* \link #MA_SCREEN_ORIENTATION_PORTRAIT MA_SCREEN_ORIENTATION \endlink codes.
+	*/
+	virtual void orientationChanged(int screenOrientation)
+	{
+		lprintfln("Main: Orientation did change to %d", screenOrientation);
+	}
 private:
 	AppTabScreen* mTabScreen;
 };
