@@ -27,13 +27,13 @@ int buildAndroidNative(Arguments* params) {
 }
 
 string getTempBuildDir(Arguments* params) {
-	string tmpDir = params->getSwitchValue(PROJECT_DIR);
+	string tmpDir = params->getSwitchValue(TEMP_BUILD_DIR);
 	if (tmpDir.empty()) {
-		tmpDir = params->getSwitchValue(TEMP_BUILD_DIR);
-		toDir(tmpDir);
-	} else {
+		tmpDir = params->getSwitchValue(PROJECT_DIR);
 		toDir(tmpDir);
 		tmpDir += "temp/";
+	} else {
+		toDir(tmpDir);
 	}
 	return tmpDir;
 }
@@ -46,6 +46,7 @@ int generateMakefile(Arguments* params) {
 	split(bootstrapModules, params->getSwitchValue(BOOT_MODULE_LIST), ",");
 	if (bootstrapModules.empty()) {
 		// Default
+		bootstrapModules.push_back("wchar");
 		bootstrapModules.push_back("mosync");
 		bootstrapModules.push_back("mosynclib");
 	} else if (bootstrapModules[0] == ".") {
@@ -88,7 +89,8 @@ int generateMakefile(Arguments* params) {
 		rootCtx.setParameter("no-default-includes", "true");
 	}
 
-	if (params->isFlagSet("--android-static-lib")) {
+	bool useStatic = "static" == params->getSwitchValue("--android-lib-type");
+	if (useStatic) {
 		rootCtx.setParameter("static-lib", "true");
 	}
 
@@ -213,6 +215,7 @@ int executeNdkBuild(Arguments* params) {
 			toSlashes(moduleDir);
 			string makeFile = toMakefileFile(tmpBuildDir + "Android.mk");
 			cmd << arg("MOSYNC_MODULES=" + moduleDir) << " ";
+			cmd << arg("APP_MODULES=" + moduleName) << " ";
 			cmd << arg("MOSYNC_LIBS=" + libDir) << " ";
 			cmd << arg("PROJECT_DIR=" + projectPath) << " ";
 			cmd << arg("APP_BUILD_SCRIPT=" + makeFile) << " ";
@@ -229,11 +232,14 @@ int executeNdkBuild(Arguments* params) {
 			string fullCmd = getNdkBuildCommand(cmd.str());
 			sh(fullCmd.c_str(), !isVerbose);
 
+			bool useStatic = "static" == params->getSwitchValue("--android-lib-type");
 			string fullOutputDir = outputDir + "android_" + arch + "_" + libVariant + "/";
 			_mkdir(fullOutputDir.c_str());
-			// TODO: Static libs
-			string libFile = tmpBuildDir + "libs/" + arch + "/lib" + moduleName + ".so";
-			copyFile((fullOutputDir + "lib" + moduleName + ".so").c_str(), libFile.c_str());
+			string libFile = useStatic ?
+					tmpBuildDir + "obj/local/" + arch + "/lib" + moduleName + ".a" :
+					tmpBuildDir + "libs/" + arch + "/lib" + moduleName + ".so";
+			string libExt = useStatic ? ".a" : ".so";
+			copyFile((fullOutputDir + "lib" + moduleName + libExt).c_str(), libFile.c_str());
 		}
 	}
 	return 0;
