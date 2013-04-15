@@ -100,21 +100,41 @@ int generateMakefile(Arguments* params) {
 	string androidMkTemplate = androidProfilesDir + "/Android.mk.template";
 
 	string androidMkOutput = tmpBuildDir + "/Android.mk";
-	ofstream output(androidMkOutput.c_str());
-	if (output.good()) {
-		DefaultParserCallback cb(&rootCtx, output);
-		parser.parseFile(androidMkTemplate, &cb);
-		output.flush();
-		output.close();
-	} else {
+	stringstream output;
+
+	DefaultParserCallback cb(&rootCtx, output);
+	parser.parseFile(androidMkTemplate, &cb);
+
+	output.flush();
+	string mf = output.str();
+
+	bool different = true;
+	ifstream cmp(androidMkOutput.c_str(), ifstream::in);
+	if (cmp.good()) {
+		int len = mf.size() * sizeof(char);
+		char* cmpStr = (char*) malloc(len);
+		cmp.read(cmpStr, len);
+		different = cmp.fail();
+		different |= (mf != string(cmpStr));
+		free(cmpStr);
+	}
+
+	if (different) {
+		ofstream outputFile(androidMkOutput.c_str());
+		if (output.good()) {
+			outputFile << mf;
+			outputFile.flush();
+			outputFile.close();
+			string androidAppMkOutput = tmpBuildDir + "/Application.mk";
+			string androidAppMkOriginal = androidProfilesDir + "/Application.mk";
+			copyFile(androidAppMkOutput.c_str(), androidAppMkOriginal.c_str());
+			return 0;
+		}
 		return 1;
 	}
 
-	string androidAppMkOutput = tmpBuildDir + "/Application.mk";
-	string androidAppMkOriginal = androidProfilesDir + "/Application.mk";
-	copyFile(androidAppMkOutput.c_str(), androidAppMkOriginal.c_str());
-
-	return 0;
+	// Failed!
+	return 2;
 }
 
 string toMakefileFile(string file) {
