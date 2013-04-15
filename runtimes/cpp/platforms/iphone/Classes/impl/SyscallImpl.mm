@@ -316,6 +316,7 @@ namespace Base {
         maIOCtl_case(maSensorStop);
 		maIOCtl_case(maImagePickerOpen);
         maIOCtl_case(maImagePickerOpenWithEventReturnType);
+        maIOCtl_case(maSaveImageToDeviceGallery);
 		maIOCtl_case(maSendTextSMS);
 		maIOCtl_case(maSyscallPanicsEnable);
 		maIOCtl_case(maSyscallPanicsDisable);
