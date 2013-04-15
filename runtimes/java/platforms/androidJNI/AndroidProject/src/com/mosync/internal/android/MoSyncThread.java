@@ -122,6 +122,7 @@ import com.mosync.java.android.TextBox;
 import com.mosync.nativeui.ui.widgets.MoSyncCameraPreview;
 import com.mosync.nativeui.ui.widgets.ScreenWidget;
 import com.mosync.nativeui.util.AsyncWait;
+import com.mosync.nativeui.util.MediaManager;
 
 /**
  * Thread that runs the MoSync virtual machine and handles all syscalls.
@@ -5214,6 +5215,11 @@ public class MoSyncThread extends Thread
 	int maFileListClose(int list)
 	{
 		return mMoSyncFile.maFileListClose(list);
+	}
+
+	int maSaveImageToDeviceGallery(int imageHandle, String imageName)
+	{
+		return MediaManager.exportImageToPhotoGallery(imageHandle, imageName);
 	}
 
 	int maSensorStart(int sensor, int interval)
