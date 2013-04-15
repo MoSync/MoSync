@@ -22,6 +22,7 @@
 #include <iomanip>
 #include <vector>
 #include <map>
+//#include <execinfo.h>
 
 #include <idl-common/idl-common.h>
 #include <idl-common/tokenizer.h>
@@ -45,7 +46,7 @@ string requiredArg(string arg, map<string, string>& args);
 using namespace std;
 
 int main(int argc, const char** argv) {
-	try {
+	//try {
 		map<string, string> args;
 		parseArgs(argc, argv, args);
 
@@ -96,19 +97,7 @@ int main(int argc, const char** argv) {
 
 			streamExtensionManifest(args);
 
-			string androidOut = extDir + "/Android/";
-			_mkdir(androidOut.c_str());
-			string androidManifestOut = androidOut + "assets/";
-			_mkdir(androidManifestOut.c_str());
-			string androidMFOut = androidManifestOut + extName + ".xml";
-			ofstream androidMFfile(androidMFOut.c_str());
-
-			streamAndroidExtMF(androidMFfile, ext, androidPackageName, androidClassName);
-			androidMFfile.close();
-
-			string iphoneosOut = extDir + "/iOS/";
-			_mkdir(iphoneosOut.c_str());
-			writeIosStubs(iphoneosOut, ext, iosInterfaceName, false);
+			generateAndroidFiles(extDir, ext, androidPackageName, androidClassName);
 		}
 
 		if (generateStubs) {
@@ -133,10 +122,13 @@ int main(int argc, const char** argv) {
 			writeJSBridge(jsBridgeOut, ext);
 		}
 
-	} catch (exception e) {
-		printf("Failed: %s\n", e.what());
-		return 1;
-	}
+	//} catch (exception e) {
+	//	printf("Failed: %s\n", e.what());
+		/*void* array[10];
+		size_t size = backtrace(array, 10);
+		backtrace_symbols_fd(array, size, 2);
+		return 1;*/
+	//}
 
 	return 0;
 }
@@ -266,9 +258,14 @@ void streamFunctionCSignature(ostream& out, Interface& ext, Function& f) {
 		Argument arg = f.args[j];
 		out << cType(ext, arg.type);
 		out << " ";
-		out << "_" << arg.name;
+		out << safeArg(arg.name);
 	}
 	out << ")";
+}
+
+string safeArg(string& arg) {
+	// Now code generation may use any var not starting with _
+	return "_" + arg;
 }
 
 string getModHandle(Interface& ext) {
@@ -288,7 +285,7 @@ void streamFunctionWrapper(ostream& out, Interface& ext, Function& f, bool modHa
 		out << "    passedArgs[" << numargs << "] = (int) &res;\n";
 	}
 	for (int i = 0; i < numargs; i++) {
-		string name = "_" + f.args[i].name;
+		string name = safeArg(f.args[i].name);
 		// For simplicity we just always pass the pointer
 		string arg = ("(&" + name + ")");
 		out << "    passedArgs[" << i << "] = (int) " << arg << ";\n";
@@ -314,6 +311,7 @@ void streamExtHashValue(ostream& out, Interface& ext) {
 }
 
 bool isReturnType(Interface& ext, string& type) {
+	printf("TYPE: %s\n", type.c_str());
 	return strcmp("void", cType(ext, type).c_str());
 }
 

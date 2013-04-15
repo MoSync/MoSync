@@ -42,5 +42,6 @@ string extractPointerType(string type, int& ptrDepth);
 Struct* getStruct(Interface& ext, string& structType);
 int getPadding(Interface& ext, string& type);
 size_t cTypeAlignedSize(Interface& ext, string& type);
+string safeArg(string& arg);
 
 #endif /* EXTCOMP_H_ */
