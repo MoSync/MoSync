@@ -72,20 +72,6 @@ namespace Wormhole
 		return "";
 	}
 
-	MAUtil::String JSONMessage::getArgsField(int index)
-	{
-		YAJLDom::Value* argsNode = getParamNode("args");
-		if (NULL != argsNode && YAJLDom::Value::ARRAY == argsNode->getType())
-		{
-			YAJLDom::Value* value = argsNode->getValueByIndex(index);
-			if (NULL != value && YAJLDom::Value::STRING == value->getType())
-			{
-				return value->toString();
-			}
-		}
-		return "";
-	}
-
 	int JSONMessage::getArgsFieldInt(const MAUtil::String& fieldName)
 	{
 		YAJLDom::Value* argsNode = getParamNode("args");
@@ -98,6 +84,20 @@ namespace Wormhole
 			}
 		}
 		return 0;
+	}
+
+	MAUtil::String JSONMessage::getArgsField(int index)
+	{
+		YAJLDom::Value* argsNode = getParamNode("args");
+		if (NULL != argsNode && YAJLDom::Value::ARRAY == argsNode->getType())
+		{
+			YAJLDom::Value* value = argsNode->getValueByIndex(index);
+			if (NULL != value && YAJLDom::Value::STRING == value->getType())
+			{
+				return value->toString();
+			}
+		}
+		return "";
 	}
 
 	int JSONMessage::getArgsFieldInt(int index)
