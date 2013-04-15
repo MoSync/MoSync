@@ -577,9 +577,16 @@ namespace MoSync
             }
         }
 
+        /**
+         * Handles the set, get, add, insert and remove operations on a widget.
+         */
         public class AsyncNativeUIWindowsPhone : UIManager
         {
             private PhoneApplicationFrame mFrame;
+
+            /**
+             * Contains a reference to the runtime Core - needed by the get operations.
+             */
             private Core mCore;
 
             public AsyncNativeUIWindowsPhone()
@@ -589,7 +596,7 @@ namespace MoSync
                 mFrame = (PhoneApplicationFrame)Application.Current.RootVisual;
             }
 
-            public new void SetProperty(IWidget widget, string propertyName, string propertyValue)
+            public void SetProperty(IWidget widget, string propertyName, string propertyValue)
             {
                 widget.SetProperty(propertyName, propertyValue);
             }

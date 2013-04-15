@@ -84,9 +84,16 @@ namespace MoSync
             protected int mHandle;
             protected Runtime mRuntime;
 
-            // set by children right after the view becomes available for manipulation
+            /**
+             * Set by widget right after the view becomes available for manipulation.
+             */
             protected bool isViewCreated = false;
 
+            /**
+             * Contains operations that are stacked if the syscalls reach the runtime before
+             * the view is created. After the view becomes available for manipulation, the
+             * queue is emptied and the operations are triggered on the widget.
+             */
             protected Queue<WidgetOperation> operationQueue;
 
             public WidgetBase()
@@ -190,6 +197,8 @@ namespace MoSync
             {
                 if (!isViewCreated)
                 {
+                    // if the widget view is not ready for manipulation, all the setters go into
+                    // the queue
                     WidgetOperation setOperation = new WidgetOperation(pinfo.Name, stringValue);
                     operationQueue.Enqueue(setOperation);
                 }
@@ -279,6 +288,10 @@ namespace MoSync
             }
         }
 
+        /**
+         * Encapsulates a widget operation. The operation types are defined within this
+         * class: SET, GET, ADD, INSERT and REMOVE.
+         */
         public class WidgetOperation
         {
             public enum OperationType
@@ -291,10 +304,26 @@ namespace MoSync
             };
 
             private OperationType mType;
+            /**
+             * If the operation type is SET or GET, the mPropertyName will contain the name of the property
+             * that needs to be SET/GET.
+             */
             private string mPropertyName;
+            /**
+             * If the operation type is SET, the mPropertyValue will contain the value of the property that
+             * needs to be SET.
+             */
             private string mPropertyValue;
+
+            /**
+             * If the operation type is ADD, INSERT or REMOVE the mHandle will contain the handle of the widget
+             * that needs to be added/inserted/removed.
+             */
             private int mHandle;
 
+            /**
+             * Public getter for the operation type.
+             */
             public OperationType Type
             {
                 get
@@ -303,6 +332,9 @@ namespace MoSync
                 }
             }
 
+            /**
+             * Public getter for the property name.
+             */
             public string Property
             {
                 get
@@ -311,6 +343,9 @@ namespace MoSync
                 }
             }
 
+            /**
+             * Public getter for the property value.
+             */
             public string Value
             {
                 get
@@ -319,6 +354,9 @@ namespace MoSync
                 }
             }
 
+            /**
+             * Public getter for the child widget handle.
+             */
             public int Handle
             {
                 get
@@ -327,6 +365,11 @@ namespace MoSync
                 }
             }
 
+            /**
+             * Constructor that creates a SET widget operation.
+             * @param property The name of the property that needs to be set.
+             * @param value The value of the property that needs to be set.
+             */
             public WidgetOperation(string property, string value)
             {
                 mType = OperationType.SET;
@@ -335,20 +378,40 @@ namespace MoSync
                 mPropertyValue = value;
             }
 
-            public WidgetOperation(string value)
+            /**
+             * Constructor that creates a GET widget operation.
+             * @param property The name of the property for the GET operation.
+             */
+            public WidgetOperation(string property)
             {
                 mType = OperationType.GET;
                 mHandle = -1;
-                mPropertyName = "";
-                mPropertyValue = value;
+                mPropertyName = property;
+                mPropertyValue = "";
             }
 
+            /**
+            * Constructor that creates a ADD, INSERT or REMOVE widget operation.
+            * @param type The operation type (ADD, INSERT or REMOVE).
+            */
             public WidgetOperation(OperationType type, int handle)
             {
-                mType = type;
-                mHandle = handle;
-                mPropertyName = "";
-                mPropertyValue = "";
+                if (type == OperationType.ADD || type == OperationType.INSERT || type == OperationType.REMOVE)
+                {
+                    mType = type;
+                    mHandle = handle;
+                    mPropertyName = "";
+                    mPropertyValue = "";
+                }
+                else
+                {
+                    // if the type is not one of the mentioned before, ADD will be considered by default as
+                    // the operation type;
+                    mType = OperationType.ADD;
+                    mHandle = handle;
+                    mPropertyName = "";
+                    mPropertyValue = "";
+                }
             }
         }
 
@@ -375,31 +438,6 @@ namespace MoSync
                 });
 
                 return ret;
-            }
-
-            public void SetProperty(IWidget widget, string propertyName, string propertyValue)
-            {
-                widget.SetProperty(propertyName, propertyValue);
-            }
-
-            public void GetProperty(IWidget widget, string propertyName)
-            {
-            }
-
-            public void AddChild(IWidget parent, IWidget child)
-            {
-            }
-
-            public void InsertChild(IWidget parent, IWidget child, int index)
-            {
-            }
-
-            public void RemoveChild(IWidget parent, IWidget child)
-            {
-            }
-
-            public void SetCore(Core core)
-            {
             }
         }
 }

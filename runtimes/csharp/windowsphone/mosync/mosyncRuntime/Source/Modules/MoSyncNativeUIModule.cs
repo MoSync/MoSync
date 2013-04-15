@@ -7,7 +7,7 @@ namespace MoSync
 {
     public class NativeUIModule : IIoctlModule
     {
-        private UIManager mNativeUI;
+        private NativeUI.AsyncNativeUIWindowsPhone mNativeUI;
         /**
          * A reference to the last shown screen.
          */
