@@ -123,7 +123,7 @@ namespace MoSync
                 // the dialog is not visible at creation
                 visible = false;
 
-                mView = mDialogBackground;
+                View = mDialogBackground;
 
                 // we need to change the width and the height of the mDialogView manually when the orientation changes
                 (Application.Current.RootVisual as Microsoft.Phone.Controls.PhoneApplicationFrame).OrientationChanged += new EventHandler<Microsoft.Phone.Controls.OrientationChangedEventArgs>(OrientationChangedHandler);

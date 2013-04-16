@@ -60,7 +60,7 @@ namespace MoSync
             {
                 // Initialization.
                 mDatePicker = new Microsoft.Phone.Controls.DatePicker();
-                mView = mDatePicker;
+                View = mDatePicker;
                 mUriString = new DatePickerPageCustomUriString();
 
                 mMaxDate = new DateTime(_maxYear, 12, 31);

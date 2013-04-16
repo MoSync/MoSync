@@ -45,7 +45,7 @@ namespace MoSync
              * from UIElement because FrameworkElement sends events that notify us of the view lifetime -
              * LayoutUpdated for example).
              */
-            protected FrameworkElement mView;
+            private FrameworkElement mView;
 
             /**
              * Event handler declaration for the layout updated event.
@@ -71,9 +71,9 @@ namespace MoSync
                     isViewCreated = true;
 
                     // run all the pending operations from the widget operation queue
-                    while (operationQueue.Count != 0)
+                    while (mOperationQueue.Count != 0)
                     {
-                        WidgetOperation currentOperation = operationQueue.Dequeue();
+                        WidgetOperation currentOperation = mOperationQueue.Dequeue();
 
                         RunOperation(currentOperation);
                     }
@@ -110,6 +110,9 @@ namespace MoSync
                     case WidgetOperation.OperationType.GET:
                         break;
                     case WidgetOperation.OperationType.ADD:
+                        IWidget child = mRuntime.GetModule<NativeUIModule>().GetWidget(operation.Handle);
+                        child.SetParent(this);
+                        this.AddChild(child);
                         break;
                     case WidgetOperation.OperationType.INSERT:
                         break;
@@ -637,6 +640,16 @@ namespace MoSync
 
             public void AddChild(IWidget parent, IWidget child)
             {
+                if (!(parent as WidgetBase).IsViewCreated)
+                {
+                    WidgetOperation addChildOperation = new WidgetOperation(WidgetOperation.OperationType.ADD, child.GetHandle());
+                    parent.AddOperation(addChildOperation);
+                }
+                else
+                {
+                    child.SetParent(parent);
+                    parent.AddChild(child);
+                }
             }
 
             public void InsertChild(IWidget parent, IWidget child, int index)

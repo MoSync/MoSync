@@ -81,7 +81,9 @@ namespace MoSync
                 mPage = new Grid();
                 mPage.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
                 mPage.RowDefinitions.Add(new RowDefinition { Height = new GridLength( 1, GridUnitType.Star) });
-                mView = mPage;
+
+                View = mPage;
+                //mView = mPage;
 
 //                (mView as System.Windows.UIElement).LayoutUpdated += new EventHandler(Button_LayoutUpdated);
 
@@ -194,12 +196,12 @@ namespace MoSync
                 base.AddChild(child);
 
                 WidgetBaseWindowsPhone w = (WidgetBaseWindowsPhone)child;
-                MoSync.Util.RunActionOnMainThreadSync(() =>
-                {
+            //    MoSync.Util.RunActionOnMainThreadSync(() =>
+            //    {
                     mPage.Children.Add(w.View);
                     Grid.SetColumn((w.View as FrameworkElement), 0);
                     Grid.SetRow((w.View as FrameworkElement), 0);
-                });
+            //    });
             }
 
             /**

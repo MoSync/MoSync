@@ -21,6 +21,9 @@ namespace MoSync
             void SetHandle(int handle);
             int GetHandle();
             void SetRuntime(Runtime runtime);
+            Runtime GetRuntime();
+            void AddOperationQueue(Queue<WidgetOperation> queue);
+            void AddOperation(WidgetOperation op);
         }
 
         // A screen also needs to implement this interface.
@@ -77,6 +80,14 @@ namespace MoSync
             public InvalidPropertyValueException() : base() { }
         }
 
+        public class WidgetBaseTemp : WidgetBase
+        {
+            public WidgetBaseTemp()
+            {
+                mOperationQueue = new Queue<WidgetOperation>();
+            }
+        }
+
         public abstract class WidgetBase : IWidget
         {
             protected IWidget mParent = null;
@@ -89,16 +100,45 @@ namespace MoSync
              */
             protected bool isViewCreated = false;
 
+            public bool IsViewCreated
+            {
+                get { return isViewCreated; }
+            }
+
             /**
              * Contains operations that are stacked if the syscalls reach the runtime before
              * the view is created. After the view becomes available for manipulation, the
              * queue is emptied and the operations are triggered on the widget.
              */
-            protected Queue<WidgetOperation> operationQueue;
+            protected Queue<WidgetOperation> mOperationQueue;
+
+            public Queue<WidgetOperation> OperationQueue
+            {
+                get { return mOperationQueue; }
+            }
+
+            public void AddOperation(WidgetOperation op)
+            {
+                mOperationQueue.Enqueue(op);
+            }
+
+            public void AddOperationQueue(Queue<WidgetOperation> queue)
+            {
+                Queue<WidgetOperation> tempQ = new Queue<WidgetOperation>(queue);
+                while (tempQ.Count != 0)
+                {
+                    mOperationQueue.Enqueue(tempQ.Dequeue());
+                }
+            }
+
+            public Runtime GetRuntime()
+            {
+                return mRuntime;
+            }
 
             public WidgetBase()
             {
-                operationQueue = new Queue<WidgetOperation>();
+                mOperationQueue = new Queue<WidgetOperation>();
             }
 
             public virtual void AddChild(IWidget child)
@@ -195,58 +235,59 @@ namespace MoSync
 
             protected void SetProperty(PropertyInfo pinfo, String stringValue)
             {
-                if (!isViewCreated)
+                switch (pinfo.PropertyType.Name)
                 {
-                    // if the widget view is not ready for manipulation, all the setters go into
-                    // the queue
-                    WidgetOperation setOperation = new WidgetOperation(pinfo.Name, stringValue);
-                    operationQueue.Enqueue(setOperation);
-                }
-                else
-                {
-                    switch (pinfo.PropertyType.Name)
-                    {
-                        case "Double":
-                            pinfo.SetValue(this, Convert.ToDouble(stringValue, System.Globalization.CultureInfo.InvariantCulture), null);
-                            break;
-                        case "Float":
-                            pinfo.SetValue(this, Convert.ToSingle(stringValue, System.Globalization.CultureInfo.InvariantCulture), null);
-                            break;
-                        case "Int32":
-                            pinfo.SetValue(this, Convert.ToInt32(stringValue), null);
-                            break;
-                        case "String":
-                            pinfo.SetValue(this, stringValue, null);
-                            break;
-                    }
+                    case "Double":
+                        pinfo.SetValue(this, Convert.ToDouble(stringValue, System.Globalization.CultureInfo.InvariantCulture), null);
+                        break;
+                    case "Float":
+                        pinfo.SetValue(this, Convert.ToSingle(stringValue, System.Globalization.CultureInfo.InvariantCulture), null);
+                        break;
+                    case "Int32":
+                        pinfo.SetValue(this, Convert.ToInt32(stringValue), null);
+                        break;
+                    case "String":
+                        pinfo.SetValue(this, stringValue, null);
+                        break;
                 }
             }
 
             public void SetProperty(String property, String stringValue)
             {
-                PropertyInfo pinfo;
-                MoSyncWidgetPropertyAttribute pattr = GetPropertyAttribute(property, out pinfo);
-                Exception exception = null;
-                if (pinfo == null) throw new InvalidPropertyNameException();
-                if (pattr.ShouldExecuteOnMainThread)
+                if (!isViewCreated)
                 {
-                    MoSync.Util.RunActionOnMainThreadSync(() =>
-                        {
-                            try
-                            {
-                                SetProperty(pinfo, stringValue);
-                            }
-                            catch (Exception e)
-                            {
-                                exception = e;
-                            }
-                        });
-                    if (null != exception)
-                        if(exception.InnerException is InvalidPropertyValueException)
-                            throw new InvalidPropertyValueException();
+                    IWidget a = this;
+                    // if the widget view is not ready for manipulation, all the setters go into
+                    // the queue
+                    WidgetOperation setOperation = new WidgetOperation(property, stringValue);
+                    mOperationQueue.Enqueue(setOperation);
                 }
                 else
-                    SetProperty(pinfo, stringValue);
+                {
+                    PropertyInfo pinfo;
+                    MoSyncWidgetPropertyAttribute pattr = GetPropertyAttribute(property, out pinfo);
+                    Exception exception = null;
+                    if (pinfo == null) throw new InvalidPropertyNameException();
+                    if (pattr.ShouldExecuteOnMainThread)
+                    {
+                        MoSync.Util.RunActionOnMainThreadSync(() =>
+                            {
+                                try
+                                {
+                                    SetProperty(pinfo, stringValue);
+                                }
+                                catch (Exception e)
+                                {
+                                    exception = e;
+                                }
+                            });
+                        if (null != exception)
+                            if (exception.InnerException is InvalidPropertyValueException)
+                                throw new InvalidPropertyValueException();
+                    }
+                    else
+                        SetProperty(pinfo, stringValue);
+                }
             }
 
             private String GetProperty(PropertyInfo pinfo)
@@ -421,9 +462,27 @@ namespace MoSync
             {
             }
 
+            public Type VerifyWidget(string widgetName)
+            {
+                Type widgetType = null;
+
+                MoSync.Util.RunActionOnMainThreadSync(() =>
+                {
+                    foreach (Type t in Assembly.GetCallingAssembly().GetTypes())
+                    {
+                        if (t.GetInterface("MoSync.IWidget", false) != null && t.Name == widgetName)
+                        {
+                            widgetType = t;
+                            break;
+                        }
+                    }
+                });
+
+                return widgetType;
+            }
+
             public IWidget CreateWidget(string widgetName)
             {
-
                 IWidget ret = null;
                 MoSync.Util.RunActionOnMainThreadSync(() =>
                 {

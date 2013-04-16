@@ -270,7 +270,7 @@ namespace MoSync
             public WebView()
             {
                 mWebBrowser = new Microsoft.Phone.Controls.WebBrowser();
-                mView = mWebBrowser;
+                View = mWebBrowser;
                 mWebBrowser.IsScriptEnabled = true;
 
                 mWebBrowser.IsGeolocationEnabled = true;

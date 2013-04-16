@@ -61,7 +61,7 @@ namespace MoSync
                 mContentHeight = 0;
                 mContentWidth = 0;
 
-                mView = mPanel;
+                View = mPanel;
             }
 
             /**
@@ -130,7 +130,7 @@ namespace MoSync
                             mPanel.Width = mContentWidth;
                             mScrollViewer.Content = mPanel;
 
-                            mView = mScrollViewer;
+                            View = mScrollViewer;
 
                             //the property needs to be recalled since the mView has changed.
                             Height = this.Height;
@@ -139,7 +139,7 @@ namespace MoSync
                         {
                             if (null != mScrollViewer)
                             {
-                                mView = mPanel;
+                                View = mPanel;
                             }
                         }
                     }

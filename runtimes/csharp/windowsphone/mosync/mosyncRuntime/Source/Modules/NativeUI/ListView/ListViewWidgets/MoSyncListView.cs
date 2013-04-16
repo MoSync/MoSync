@@ -139,7 +139,7 @@ namespace MoSync
 
                 // if the default constructor is called, the list view is of type MAW_LIST_VIEW_TYPE_DEFAULT
                 mListViewType = ListViewType.Default;
-                mView = mList;
+                View = mList;
 
                 // add the tap event handler on the default list (mList)
                 mList.Tap += new EventHandler<System.Windows.Input.GestureEventArgs>(mList_Tap);
@@ -716,7 +716,7 @@ namespace MoSync
              */
             private void SwitchToLongListSelector()
             {
-                mView = mLongListSelector;
+                View = mLongListSelector;
                 mLongListSelector.ItemsSource = mListSections;
             }
 
@@ -725,9 +725,9 @@ namespace MoSync
              */
             private void SwitchToListBox()
             {
-                if (mView != mList)
+                if (View != mList)
                 {
-                    mView = mList;
+                    View = mList;
                 }
             }
 

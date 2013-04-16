@@ -70,7 +70,7 @@ namespace MoSync
                 mVisibleAreaUpperLeftCorner = new System.Device.Location.GeoCoordinate();
                 mVisibleAreaLowerRightCorner = new System.Device.Location.GeoCoordinate();
 
-                mView = mBingMap;
+                View = mBingMap;
 
                 // occurs when the map visible area is changed (on drag/scroll)
                 mBingMap.MapPan += new EventHandler<MapDragEventArgs>(

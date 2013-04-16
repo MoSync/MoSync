@@ -45,47 +45,46 @@ public:
 		//Let the layout fill the entire screen
 		mLayout->fillSpaceHorizontally();
 		mLayout->fillSpaceVertically();
-		mLayout->setScrollable(true);
 
 		//Create a Native UI button
-		mButton = new Button();
+/*		mButton = new Button();
 
 		//Let the button fill it's layout
 		mButton->fillSpaceHorizontally();
-		mButton->fillSpaceVertically();
+		mButton->fillSpaceVertically(); */
 
 		//add many buttons and set properties on them in order to test
 		//the asynchronously setting of properties on the windows phone runtime
-		for (int i = 0; i < 50; i++)
+		for (int j = 0; j < 50; j++)
 		{
 			Button *button = new Button();
+			button->setText("Press Me " + MAUtil::integerToString(j));
+			button->setText("Press Me " + MAUtil::integerToString(j));
+			button->setText("Press Me " + MAUtil::integerToString(j));
+			button->setText("Press Me " + MAUtil::integerToString(j));
+			button->setText("Press Me " + MAUtil::integerToString(j));
 
-			button->setText("Press Me " + MAUtil::integerToString(i));
-			button->setText("Press Me " + MAUtil::integerToString(i));
-			button->setText("Press Me " + MAUtil::integerToString(i));
-			button->setText("Press Me " + MAUtil::integerToString(i));
-			button->setText("Press Me " + MAUtil::integerToString(i));
-
-			button->setText("Press Me " + MAUtil::integerToString(i));
-			button->setText("Press Me " + MAUtil::integerToString(i));
-			button->setText("Press Me " + MAUtil::integerToString(i));
-			button->setText("Press Me " + MAUtil::integerToString(i));
-			button->setText("Press Me " + MAUtil::integerToString(i));
+			button->setText("Press Me " + MAUtil::integerToString(j));
+			button->setText("Press Me " + MAUtil::integerToString(j));
+			button->setText("Press Me " + MAUtil::integerToString(j));
+			button->setText("Press Me " + MAUtil::integerToString(j));
+			button->setText("Press Me " + MAUtil::integerToString(j));
 
 			mLayout->addChild(button);
 		}
 
 		//Set the moblet to receive events from the button
-		mButton->addButtonListener(this);
+//		mButton->addButtonListener(this);
 
 		//Add the button to the layout
-		mLayout->addChild(mButton);
+		//mLayout->addChild(mButton);
 
 		//Add the layout to the screen
 		mScreen->setMainWidget(mLayout);
 
 		//Show the screen
 		mScreen->show();
+		lprintfln("SCREEN SHOWN!");
 	}
 
 	/**

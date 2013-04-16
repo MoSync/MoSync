@@ -81,7 +81,7 @@ namespace MoSync
 
                 Grid.SetRow(mLabel, 1);
 
-                mView = mParentLayout;
+                View = mParentLayout;
 			}
 
             /**

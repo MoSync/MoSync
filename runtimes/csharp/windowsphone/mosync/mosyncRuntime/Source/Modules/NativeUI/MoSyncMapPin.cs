@@ -57,7 +57,7 @@ namespace MoSync
                 mPushpin = new Microsoft.Phone.Controls.Maps.Pushpin();
                 mPushpin.Location = new System.Device.Location.GeoCoordinate();
 
-                mView = mPushpin;
+                View = mPushpin;
 
                 mPushpin.MouseLeftButtonDown += new MouseButtonEventHandler(
                     delegate(object from, MouseButtonEventArgs args)

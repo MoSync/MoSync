@@ -210,7 +210,7 @@ namespace MoSync
 
                 mBackgroundImage.Stretch = mStretchBackground;
 
-                mView = mGrid;
+                View = mGrid;
 
                 // the MouseEnter handle for the ImageButton. Used for switching background image.
                 mGrid.MouseEnter += new System.Windows.Input.MouseEventHandler(delegate(Object from, System.Windows.Input.MouseEventArgs evt)

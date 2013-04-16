@@ -39,7 +39,7 @@ namespace MoSync
             public NumberPicker()
             {
                 mPicker = new CustomNumberPicker();
-                mView = mPicker;
+                View = mPicker;
 
                 Value = 0;
 

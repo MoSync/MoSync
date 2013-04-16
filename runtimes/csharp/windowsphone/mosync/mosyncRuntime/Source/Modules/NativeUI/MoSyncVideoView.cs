@@ -53,7 +53,7 @@ namespace MoSync
             {
                 mMediaElement = new MediaElement();
 
-                mView = mMediaElement;
+                View = mMediaElement;
 
                 /**
                  * the delegates that respond to the widget's events

@@ -107,7 +107,7 @@ namespace MoSync
 
                 createTheEditBoxGrid();
 
-                mView = mEditBoxGrid;
+                View = mEditBoxGrid;
 
                 mIsPasswordMode = false;
                 mIsWatermarkMode = false;

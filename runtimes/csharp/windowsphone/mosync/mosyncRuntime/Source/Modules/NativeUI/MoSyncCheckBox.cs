@@ -52,7 +52,7 @@ namespace MoSync
 			public CheckBox()
 			{
 				mCheckBox = new System.Windows.Controls.CheckBox();
-				mView = mCheckBox;
+                View = mCheckBox;
 
 				mCheckBox.Click += new RoutedEventHandler(
 				delegate(Object from, RoutedEventArgs evt)

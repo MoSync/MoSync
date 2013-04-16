@@ -2,6 +2,7 @@ using System;
 using Microsoft.Phone.Controls;
 using System.Collections.Generic;
 using System.Windows;
+using System.Threading;
 
 namespace MoSync
 {
@@ -43,6 +44,34 @@ namespace MoSync
         {
             mWidgets.Add(widget);
             return mWidgets.Count-1;
+        }
+
+        private void CreateWidget(int widgetHandle, Type widgetType)
+        {
+            MoSync.Util.RunActionOnMainThread(() =>
+            {
+                IWidget widget = Activator.CreateInstance(widgetType) as IWidget;
+                IWidget widgetMock = mWidgets[widgetHandle];
+
+                if (widgetMock is WidgetBaseTemp)
+                {
+                    widget.SetHandle(widgetHandle);
+                    if ((widgetMock as WidgetBaseTemp).OperationQueue.Count != 0)
+                    {
+                        int i = 0;
+                    }
+                    widget.AddOperationQueue((widgetMock as WidgetBaseTemp).OperationQueue);
+
+                    if ((widgetMock as WidgetBaseTemp).OperationQueue.Count != 0)
+                    {
+                        int i = (widget as WidgetBase).OperationQueue.Count;
+                        int j = 0;
+                    }
+                    widget.SetRuntime(widgetMock.GetRuntime());
+                    mWidgets[widgetHandle] = widget;
+                }
+            }, false);
+
         }
 
         public void Init(Ioctls ioctls, Core core, Runtime runtime)
@@ -92,7 +121,7 @@ namespace MoSync
 
             ioctls.maWidgetCreate = delegate(int _widgetType)
             {
-                String widgetType = core.GetDataMemory().ReadStringAtAddress(_widgetType);
+/*                String widgetType = core.GetDataMemory().ReadStringAtAddress(_widgetType);
                 IWidget widget = mNativeUI.CreateWidget(widgetType);
                 if (widget == null)
                     return MoSync.Constants.MAW_RES_INVALID_TYPE_NAME;
@@ -111,7 +140,42 @@ namespace MoSync
 
                 mWidgets.Add(widget);
                 widget.SetHandle(mWidgets.Count - 1);
-                return mWidgets.Count-1;
+                return mWidgets.Count-1; */
+
+                String widgetTypeName = core.GetDataMemory().ReadStringAtAddress(_widgetType);
+
+                Type widgetType = mNativeUI.VerifyWidget(widgetTypeName);
+                if (widgetType == null)
+                {
+                    return MoSync.Constants.MAW_RES_INVALID_TYPE_NAME;
+                }
+                IWidget widget = new WidgetBaseTemp();
+                widget.SetRuntime(runtime);
+
+                Thread createWidgetThread;
+                for (int i = 0; i < mWidgets.Count; i++)
+                {
+                    if (mWidgets[i] == null)
+                    {
+                        widget.SetHandle(i);
+                        mWidgets[i] = widget;
+
+                        createWidgetThread = new Thread(() => CreateWidget(i, widgetType));
+                        createWidgetThread.IsBackground = true;
+                        createWidgetThread.Start();
+
+                        return i;
+                    }
+                }
+
+                mWidgets.Add(widget);
+                widget.SetHandle(mWidgets.Count - 1);
+
+                createWidgetThread = new Thread(() => CreateWidget(mWidgets.Count - 1, widgetType));
+                createWidgetThread.IsBackground = true;
+                createWidgetThread.Start();
+
+                return mWidgets.Count - 1;
             };
 
             ioctls.maWidgetDestroy = delegate(int _widget)
@@ -135,8 +199,7 @@ namespace MoSync
 				if (_child < 0 || _child >= mWidgets.Count)
 					return MoSync.Constants.MAW_RES_INVALID_HANDLE;
 				IWidget child = mWidgets[_child];
-                child.SetParent(parent);
-                parent.AddChild(child);
+                mNativeUI.AddChild(parent, child);
                 return MoSync.Constants.MAW_RES_OK;
             };
 

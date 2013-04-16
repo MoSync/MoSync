@@ -57,7 +57,7 @@ namespace MoSync
                 mActivityIndicator.IsIndeterminate = false;
                 mActivityIndicator.Visibility = Visibility.Collapsed;
 
-                mView = mActivityIndicator;
+                View = mActivityIndicator;
 
                 setHorizontalSizePolicyFlags(true, false);
                 setVerticalSizePolicyFlags(false, true);

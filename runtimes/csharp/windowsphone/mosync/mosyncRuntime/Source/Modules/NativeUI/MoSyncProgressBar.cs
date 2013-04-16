@@ -55,7 +55,7 @@ namespace MoSync
             {
                 mProgressBar = new System.Windows.Controls.ProgressBar();
                 mProgressBar.IsIndeterminate = false;
-                mView = mProgressBar;
+                View = mProgressBar;
             }
 
             /**

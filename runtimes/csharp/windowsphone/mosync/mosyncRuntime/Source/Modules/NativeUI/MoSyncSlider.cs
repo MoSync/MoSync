@@ -59,7 +59,7 @@ namespace MoSync
                 mMinValue = DEFAULT_MIN_VALUE;
                 mProgressValue = DEFAULT_MIN_VALUE;
 
-                mView = mSlider;
+                View = mSlider;
 
                 //the event handler
                 mSlider.ValueChanged += new RoutedPropertyChangedEventHandler<double>(

@@ -98,7 +98,7 @@ namespace MoSync
                 mGrid.RowDefinitions.Add(mRowDef);
                 mGrid.RowDefinitions.Add(mSpacerDown);
 
-                mView = mGrid;
+                View = mGrid;
 
                 mGrid.Margin = new Thickness(0);
 

@@ -83,7 +83,7 @@ namespace MoSync
             {
                 mSearchBar = new System.Windows.Controls.TextBox();
 
-                mView = mSearchBar;
+                View = mSearchBar;
 
                 mIsWatermarkMode = false;
                 mPlaceholderText = "";

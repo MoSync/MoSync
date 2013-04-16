@@ -98,7 +98,8 @@ namespace MoSync
                 mGrid.ColumnDefinitions.Add(mColDef);
                 mGrid.ColumnDefinitions.Add(mSpacerRight);
 
-                mView = mGrid;
+                View = mGrid;
+//                mView = mGrid;
 
                 mGrid.Margin = new Thickness(0.0);
 
@@ -118,8 +119,8 @@ namespace MoSync
             public override void AddChild(IWidget child)
             {
                 base.AddChild(child);
-                MoSync.Util.RunActionOnMainThreadSync(() =>
-                {
+     //           MoSync.Util.RunActionOnMainThreadSync(() =>
+     //           {
                     // The logic behind this layout system is to create a stack panel for each
                     // MoSync widget. The stack panel is used for wrapping and filling size policies.
                     // When the widget size policy states that it should fill on both horizontal and
@@ -223,7 +224,7 @@ namespace MoSync
 
                     widget.RowNumber = mGrid.RowDefinitions.Count - 2;
                     widget.ColumnNumber = 1;
-                });
+           //     });
             }
 
             /**
@@ -399,13 +400,13 @@ namespace MoSync
                         {
                             mScrollViewer = new System.Windows.Controls.ScrollViewer();
                             mScrollViewer.Content = mGrid;
-                            mView = mScrollViewer;
+                            View = mScrollViewer;
                         }
                         else
                         {
                             if (null != mScrollViewer)
                             {
-                                mView = mGrid;
+                                View = mGrid;
                             }
                         }
                     }

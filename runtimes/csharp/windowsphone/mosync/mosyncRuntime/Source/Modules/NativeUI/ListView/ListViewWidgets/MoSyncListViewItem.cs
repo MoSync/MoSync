@@ -121,7 +121,7 @@ namespace MoSync
 				mGrid.Children.Add(mIcon);
 				mGrid.Children.Add(mText);
 
-                mView = mGrid;
+                View = mGrid;
 
                 this.ItemSelected = false;
                 this.ItemsSourceItemIndex = -1;
