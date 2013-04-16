@@ -3540,6 +3540,7 @@ group WidgetAPI "Widget API" {
 #include "NativeUI/ActivityIndicator.idl"
 #include "NativeUI/Button.idl"
 #include "NativeUI/CheckBox.idl"
+#include "NativeUI/CustomPicker.idl"
 #include "NativeUI/DatePicker.idl"
 #include "NativeUI/EditBox.idl"
 #include "NativeUI/GLView.idl"
