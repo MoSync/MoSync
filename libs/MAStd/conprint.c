@@ -148,7 +148,6 @@ void PrintConsole(const wchar_t *str)
 	{
 		static const char prefix[] = "PrintConsole: ";
 		maWriteLog(prefix, strlen(prefix));
-
 		length = wcslen(str);
 		if (length > 0)
 		{

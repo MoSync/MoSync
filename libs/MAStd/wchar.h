@@ -13,8 +13,13 @@ extern "C" {
 #endif
 
 /// The maximum number of bytes in a multibyte character.
+//#if defined(MOSYNC_NATIVE) && defined(ANDROID)
+//#define MB_CUR_MAX 4
+//#define MB_LEN_MAX 4
+//#else
 #define MB_CUR_MAX 3
 #define MB_LEN_MAX 3
+//#endif
 
 #ifdef MAPIP
 typedef int wint_t;
