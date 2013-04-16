@@ -36,7 +36,8 @@
     if (self)
     {
         stack = [[NSMutableArray alloc] init];
-        scaleMode = nil;
+        navBarImageHandle = 0;
+        navBarScaleMode = nil;
         navigationController.viewControllers = [NSArray array];
         navigationController.delegate = self;
     }
@@ -166,7 +167,13 @@
     else if ([key isEqualToString:@MAW_STACK_SCREEN_TITLE_BACKGROUND_IMAGE_HANDLE])
     {
         int imageHandle = [value intValue];
-        if(imageHandle<=0) return MAW_RES_INVALID_PROPERTY_VALUE;
+        if(imageHandle<=0)
+        {
+            navBarImageHandle = 0;
+            return MAW_RES_INVALID_PROPERTY_VALUE;
+        }
+
+        navBarImageHandle = imageHandle;
         Surface* imageResource = Base::gSyscall->resources.get_RT_IMAGE(imageHandle);
         UIImageOrientation orientation = UIImageOrientationUp;
         switch (imageResource->orientation)
@@ -201,9 +208,9 @@
 
         CGFloat imageScale = 1.0;
 
-        if (scaleMode)
+        if (navBarScaleMode)
         {
-            if ([scaleMode isEqualToString:@"scaleAndRepeatXY"])
+            if ([navBarScaleMode isEqualToString:@"scaleAndRepeatXY"])
             {
                 CGFloat screenScale = [[UIScreen mainScreen] scale];
                 imageScale = imageResource->height / (screenScale * 44.0);
@@ -219,12 +226,19 @@
     }
     else if ([key isEqualToString:@MAW_STACK_SCREEN_TITLE_BACKGROUND_SCALE_MODE])
     {
-        if (scaleMode != value)
+        if (navBarScaleMode != value)
         {
-            if (scaleMode)
-                [scaleMode release];
+            if (navBarScaleMode)
+                [navBarScaleMode release];
 
-            scaleMode = [[NSString alloc] initWithString: value];
+            navBarScaleMode = [[NSString alloc] initWithString: value];
+
+            if (navBarImageHandle != 0)
+            {
+                NSString* handleString = [[NSString alloc] initWithString: [NSString stringWithFormat:@"%d", navBarImageHandle]];
+                [self setPropertyWithKey:@MAW_STACK_SCREEN_TITLE_BACKGROUND_IMAGE_HANDLE toValue: handleString];
+                [handleString release];
+            }
         }
     }
     else
@@ -272,8 +286,8 @@
  */
 - (void)dealloc
 {
-    if (scaleMode)
-        [scaleMode release];
+    if (navBarScaleMode)
+        [navBarScaleMode release];
 
     [stack release];
     [super dealloc];
