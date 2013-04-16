@@ -144,7 +144,7 @@ namespace MoSync
 			{
                 if ( isCameraSnapshotInProgress )
                 {
-                    return MoSync.Constants.MA_CAMERA_RES_FAILED;
+                    return MoSync.Constants.MA_CAMERA_RES_SNAPSHOT_IN_PROGRESS;
                 }
 
                 InitCamera();
@@ -164,9 +164,10 @@ namespace MoSync
 			{
                 if ( isCameraSnapshotInProgress )
                 {
-                    // Post snapshot succeeded
+                    // We need to post snapshot failed if the camera was stopped during snapshot operation
                     postSnapshotEvent(snapshotPlaceHolder, mCamera.Resolution,
                        MoSync.Constants.MA_IMAGE_REPRESENTATION_UNKNOWN, MoSync.Constants.MA_CAMERA_RES_FAILED);
+                    isCameraSnapshotInProgress = false;
                 }
 
                 MoSync.Util.RunActionOnMainThreadSync(() =>
@@ -222,11 +223,11 @@ namespace MoSync
 			{
                 if ( isCameraSnapshotInProgress )
                 {
-                    return MoSync.Constants.MA_CAMERA_RES_FAILED;
+                    return MoSync.Constants.MA_CAMERA_RES_SNAPSHOT_IN_PROGRESS;
                 }
 
-                // If the syscall is called with the MA_CAMERA_SNAPSHOT_MAX_SIZE constant
-                // then set the maximum snapshot resolution.
+                // If MA_CAMERA_SNAPSHOT_MAX_SIZE is sent via _formatIndex then we
+                // need to select the biggest available snapshot size/resolution.
                 if ( MoSync.Constants.MA_CAMERA_SNAPSHOT_MAX_SIZE == _formatIndex )
                 {
                     _formatIndex = (int)ioctls.maCameraFormatNumber() - 1;
@@ -296,11 +297,11 @@ namespace MoSync
             {
                 if ( isCameraSnapshotInProgress )
                 {
-                    return MoSync.Constants.MA_CAMERA_RES_FAILED;
+                    return MoSync.Constants.MA_CAMERA_RES_SNAPSHOT_IN_PROGRESS;
                 }
 
-                // If the syscall is called with the MA_CAMERA_SNAPSHOT_MAX_SIZE constant
-                // then set the maximum snapshot resolution.
+                // If MA_CAMERA_SNAPSHOT_MAX_SIZE is sent via _sizeIndex then we
+                // need to select the biggest available snapshot size/resolution.
                 if ( MoSync.Constants.MA_CAMERA_SNAPSHOT_MAX_SIZE == _sizeIndex )
                 {
                     _sizeIndex = (int)ioctls.maCameraFormatNumber() - 1;
@@ -323,6 +324,13 @@ namespace MoSync
                 {
                     MoSync.Util.RunActionOnMainThreadSync(() =>
                     {
+                        // If the camera was stopped and this delegate was still called then we do nothing here
+                        // because in maCameraStop we already send the snapshot failed event.
+                        if ( !isCameraSnapshotInProgress )
+                        {
+                            return;
+                        }
+
                         Stream data = null;
                         try
                         {
@@ -361,9 +369,10 @@ namespace MoSync
                         MoSync.Util.CopySeekableStreams(data, 0, dataMem, 0, (int)data.Length);
                         res.SetInternalObject(dataMem);
 
-                        // Post snapshot succeeded
-                         postSnapshotEvent(_placeHolder, mCamera.Resolution,
+
+                        postSnapshotEvent(_placeHolder, mCamera.Resolution,
                             MoSync.Constants.MA_IMAGE_REPRESENTATION_RAW, MoSync.Constants.MA_CAMERA_RES_OK);
+
 
                         isCameraSnapshotInProgress = false;
                     });

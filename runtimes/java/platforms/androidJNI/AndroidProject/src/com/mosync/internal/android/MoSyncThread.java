@@ -49,6 +49,7 @@ import static com.mosync.internal.generated.MAAPI_consts.MA_RESOURCE_CLOSE;
 import static com.mosync.internal.generated.MAAPI_consts.MA_WAKE_LOCK_ON;
 import static com.mosync.internal.generated.MAAPI_consts.MA_CAMERA_RES_OK;
 import static com.mosync.internal.generated.MAAPI_consts.MA_CAMERA_RES_FAILED;
+import static com.mosync.internal.generated.MAAPI_consts.MA_CAMERA_RES_SNAPSHOT_IN_PROGRESS;
 
 import static com.mosync.internal.generated.MAAPI_consts.MA_TOAST_DURATION_SHORT;
 import static com.mosync.internal.generated.MAAPI_consts.MA_TOAST_DURATION_LONG;
@@ -4620,7 +4621,7 @@ public class MoSyncThread extends Thread
 
 		if ( mMoSyncCameraController.isSnapshotInProgress() )
 		{
-			return MA_CAMERA_RES_FAILED;
+			return MA_CAMERA_RES_SNAPSHOT_IN_PROGRESS;
 		}
 
 		//Start a fullscreen preview and then start the camera
@@ -4681,7 +4682,7 @@ public class MoSyncThread extends Thread
 
 		if ( mMoSyncCameraController.isSnapshotInProgress() )
 		{
-			return MA_CAMERA_RES_FAILED;
+			return MA_CAMERA_RES_SNAPSHOT_IN_PROGRESS;
 		}
 
 		return mMoSyncCameraController.cameraSnapshot(formatIndex, placeHolder);
@@ -4703,7 +4704,7 @@ public class MoSyncThread extends Thread
 		}
 		if ( mMoSyncCameraController.isSnapshotInProgress() )
 		{
-			return MA_CAMERA_RES_FAILED;
+			return MA_CAMERA_RES_SNAPSHOT_IN_PROGRESS;
 		}
 		mMoSyncCameraController.cameraSnapshotAsync(dataPlaceholder, sizeIndex);
 		return MA_CAMERA_RES_OK;
@@ -4853,9 +4854,11 @@ public class MoSyncThread extends Thread
 			return IOCTL_UNAVAILABLE;
 		}
 
-		return mMoSyncCameraController.enablePreviewEvents(
+		int returnVal = mMoSyncCameraController.enablePreviewEvents(
 			eventType, previewBuffer, rectLeft, rectTop,
 			rectWidth, rectHeight);
+
+		return returnVal;
 	}
 
 	int maCameraPreviewEventDisable()
