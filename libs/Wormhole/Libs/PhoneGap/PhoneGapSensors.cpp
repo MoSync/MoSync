@@ -105,15 +105,13 @@ namespace Wormhole
 					message.getParam("PhoneGapCallBackId"),
 					false); //stop Sensor after the first run
 			}
-			/** Cordova 2.3.0 doesn't use Compass.startWatch but
-			 *  it should have better performance and might be brought back.
-			 */
-			/*else if (message.getParam("action") == "startWatch")
+			// Cordova 2.3.0 doesn't use Compass.startWatch
+			/* else if (message.getParam("action") == "startWatch")
 			{
 				processCompassRequest(
 					message.getParam("PhoneGapCallBackId"),
 					true); // Keep the Compass running
-			}*/
+			} */
 			else if (message.getParam("action") == "stopHeading")
 			{
 				maSensorStop(SENSOR_TYPE_COMPASS);
