@@ -140,7 +140,6 @@ void packageAndroid(const SETTINGS& s, const RuntimeInfo& ri) {
 
 	if (isNative) {
 		// Default modules; todo: externalize?
-		modules.push_back("wchar");
 		modules.push_back("mosync");
 		modules.push_back("mosynclib");
 		initFuncs["mosynclib"] = "resource_selector";

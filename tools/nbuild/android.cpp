@@ -46,7 +46,6 @@ int generateMakefile(Arguments* params) {
 	split(bootstrapModules, params->getSwitchValue(BOOT_MODULE_LIST), ",");
 	if (bootstrapModules.empty()) {
 		// Default
-		bootstrapModules.push_back("wchar");
 		bootstrapModules.push_back("mosync");
 		bootstrapModules.push_back("mosynclib");
 	} else if (bootstrapModules[0] == ".") {
