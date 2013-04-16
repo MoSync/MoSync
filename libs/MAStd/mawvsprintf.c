@@ -545,7 +545,7 @@ int wvsprintf(wchar *buf, const wchar *fmt, va_list args)
   int i, base;
   wchar *str;
   const wchar *s;
-	const char* S;
+  const char* S;
 
   int flags;            // Flags to number()
 
@@ -629,19 +629,26 @@ repeat:
       case 'S':
         s = va_arg(args, wchar *);
         if (!s) s = L"<NULL>";
-        len = wcsnlen(s, precision);
+        len = precision > 0 ? wcsnlen(s, precision) : wcslen(s);
         if (!(flags & LEFT)) while (len < field_width--) *str++ = ' ';
         for (i = 0; i < len; ++i) *str++ = *s++;
         while (len < field_width--) *str++ = ' ';
         continue;
 
       case 's':	//latin-1 string
-        //todo: src should be treated as utf-8?
+    	//todo: src should be treated as utf-8?
         S = va_arg(args, char *);
         if (!S) S = "<NULL>";
-        len = strnlen(S, precision);
+        char buff[128];
+                    for (int xx = 0; xx < 8; xx++) {
+                    	sprintf(buff, "%d", (int) ((char*) S)[xx]);
+                    	maWriteLog(buff, strlen(buff));
+                    }
+        len = precision > 0 ? strnlen(S, precision) : strlen(S);
         if (!(flags & LEFT)) while (len < field_width--) *str++ = ' ';
-        for (i = 0; i < len; ++i) *str++ = (unsigned char)*S++;
+        for (i = 0; i < len; ++i) {
+        	*str++ = (unsigned char)*S++;
+        }
         while (len < field_width--) *str++ = ' ';
         continue;
 
