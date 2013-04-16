@@ -45,6 +45,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #ifdef SUPPORT_OPENGL_ES
 #define DONT_WANT_IX_OPENGL_ES_TYPEDEFS
+#include <helpers/CPP_IX_OPENGL_ES_MA.h>
 #include <helpers/CPP_IX_OPENGL_ES.h>
 #include <helpers/CPP_IX_GL1.h>
 #include <helpers/CPP_IX_GL2.h>
