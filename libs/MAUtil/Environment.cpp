@@ -58,6 +58,7 @@ namespace MAUtil {
 		mTextBoxListeners(false),
 		mSensorListeners(false),
 		mOrientationListeners(false),
+		mCameraListeners(false),
 		mCurrentPlatform(OS_UNKNOWN)
 	{
 		if(sEnvironment)
@@ -243,6 +244,17 @@ namespace MAUtil {
 	void Environment::removeOrientationListener(OrientationListener* ol) {
 		mOrientationListeners.remove(ol);
 	}
+
+	void Environment::addCameraListener(CameraListener* camListener)
+	{
+		mCameraListeners.add(camListener);
+	}
+
+	void Environment::removeCameraListener(CameraListener* camListener)
+	{
+		mCameraListeners.remove(camListener);
+	}
+
 
 	PLATFORM_TYPE Environment::getCurrentPlatform()
 	{
@@ -435,6 +447,15 @@ namespace MAUtil {
 			i->orientationWillChange();
 		}
 		mOrientationListeners.setRunning(false);
+	}
+
+	void Environment::fireCameraEvent(const MAEvent& cameraEvent)
+	{
+		mCameraListeners.setRunning(true);
+		ListenerSet_each(CameraListener, i, mCameraListeners) {
+			i->cameraEvent(cameraEvent);
+		}
+		mCameraListeners.setRunning(false);
 	}
 
 	void Environment::runIdleListeners() {

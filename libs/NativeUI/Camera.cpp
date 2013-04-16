@@ -26,54 +26,66 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "WidgetUtil.h"
 
 #include <MAUtil/util.h>
-#include <MAUtil/CameraEventManager.h>
 
 #include <mavsprintf.h>
 #include <mastdlib.h>
 #include <madmath.h>
 
-#define CAMERA_BUF_SIZE 256 // size of buffer used for camera string properties.
+#define STRING_PROPERTY_SIZE 256 // size of buffer used for camera string properties.
 #define SNAPSHOT_TIMEOUT 3000 // wait time for a snapshot event in milliseconds.
+
+#define INVALID_VALUE ""
 
 namespace NativeUI
 {
-	void CameraController::snapshotFailed( const MAHandle& snapshotHandle )
+	CameraSnapshotData* CameraSnapshotData::makeFromEvent( const MAEvent& event )
 	{
+		CameraSnapshotData* data = new CameraSnapshotData();
+		data->dataHandle = event.snapshotImageDataHandle;
+		data->imageSize = event.snapshotSize;
+		data->resultCode = event.snapshotReturnCode;
+
+		// Convert image representation to CAMERA_SNAPSHOT_FORMAT
+		switch (event.snapshotImageDataRepresentation)
+		{
+		case MA_IMAGE_REPRESENTATION_RAW:
+			data->format = SNAPSHOT_RAW;
+			break;
+		case MA_IMAGE_REPRESENTATION_JPEG:
+			data->format = SNAPSHOT_JPEG;
+			break;
+		default:
+			data->format = SNAPSHOT_UNKNOWN;
+			break;
+		}
+
+		return data;
 	}
-
-
-	void CameraController::snapshotSucceeded( const CameraSnapshotData& imageData )
-	{
-	}
-
-
-	bool CameraController::previewFrameReady(int *const previewBuffer,
-			int previewType,
-			MARect previewRect)
-	{
-		return false;
-	};
 
 
 	Camera::Camera():
-		Widget(MAW_CAMERA_PREVIEW)
-		,mController(NULL)
-		,mCameraPreviewBuffer(NULL)
-		,mPreviewRect(MARect())
-		,mCurrentCameraIndex(0)
-		,mIsCameraStarted(false)
+		Widget(MAW_CAMERA_PREVIEW),
+		mPreviewDataListenerRef(NULL),
+		mCameraPreviewBuffer(NULL),
+		mPreviewRect(MARect()),
+		mCurrentCameraIndex(0),
+		mIsCameraStarted(false)
 	{
 		// Set some layout common default values.
 		fillSpaceVertically();
 		fillSpaceHorizontally();
 
-		MAUtil::CameraEventManager::getInstance()->addCameraListener(this);
+		fillSnapshotSizesArray();
+
+		MAUtil::Environment::getEnvironment().addCameraListener(this);
 	}
 
 
 	Camera::~Camera()
 	{
-		MAUtil::CameraEventManager::getInstance()->removeCameraListener(this);
+		mSnapshotListeners.clear();
+
+		MAUtil::Environment::getEnvironment().removeCameraListener(this);
 	}
 
 
@@ -99,6 +111,7 @@ namespace NativeUI
 
 		if ( returnCode >= 0 )
 		{
+			stopRetrievingCameraPreviewData();
 			mIsCameraStarted = false;
 		}
 	}
@@ -112,31 +125,33 @@ namespace NativeUI
 
 	const MAUtil::Vector<MAExtent>& Camera::getAvailableSnapshotSizes()
 	{
-		if ( 0 == mSnapshotSizes.size() )
+		return mSnapshotSizes;
+	}
+
+
+	void Camera::fillSnapshotSizesArray()
+	{
+		mSnapshotSizes.clear();
+		int returnValue = maCameraFormatNumber();
+
+		if ( returnValue  > 0 )
 		{
-			int returnValue = maCameraFormatNumber();
-
-			if ( returnValue  > 0 )
+			MA_CAMERA_FORMAT cameraformat;
+			for ( int index = 0; index < returnValue; index++ )
 			{
-				MA_CAMERA_FORMAT cameraformat;
-				for ( int index = 0; index < returnValue; index++ )
-				{
-					maCameraFormat(index, &cameraformat);
+				maCameraFormat(index, &cameraformat);
 
-					// convert from MA_CAMERA_FORMAT to EXTENT so its
-					// symmetric with getPreviewSize()
-					int size = EXTENT((int) cameraformat.width, (int)cameraformat.height);
-					mSnapshotSizes.add(size);
-				}
+				// convert from MA_CAMERA_FORMAT to EXTENT so its
+				// symmetric with getPreviewSize()
+				int size = EXTENT((int) cameraformat.width, (int)cameraformat.height);
+				mSnapshotSizes.add(size);
 			}
 		}
-		return mSnapshotSizes;
 	}
 
 
 	void Camera::setCurrentCameraByIndex( const unsigned int cameraNumber )
 	{
-		// Even if the camera number is incorrect the camera is stopped.
 		maCameraStop();
 
 		int resultCode =  maCameraSelect(cameraNumber);
@@ -145,12 +160,13 @@ namespace NativeUI
 		{
 			mCurrentCameraIndex = cameraNumber;
 
-			// We need to restart the preview if the camera was started.
+			// When the camera is switched while is active we need to restart
+			// the preview.
 			if ( mIsCameraStarted )
 			{
 				startPreview();
 			}
-			mSnapshotSizes.clear();
+			fillSnapshotSizesArray();
 		}
 	}
 
@@ -167,68 +183,152 @@ namespace NativeUI
 	}
 
 
-	inline void Camera::failSnapshot( const MAHandle& snapshotHandle )
+	inline void Camera::failSnapshot( const MAHandle& snapshotHandle,
+		int errorCode )
 	{
-		if (mController)
+		CameraSnapshotData* imageData = new CameraSnapshotData();
+		imageData->dataHandle = snapshotHandle;
+		imageData->format = SNAPSHOT_UNKNOWN;
+		imageData->imageSize = 0;
+		imageData->resultCode = errorCode;
+
+		for ( int i = 0; i < mSnapshotListeners.size(); i++)
 		{
-			mController->snapshotFailed(snapshotHandle);
+			mSnapshotListeners[i]->snapshotFinished(*imageData);
 		}
+		delete imageData;
 	}
 
 
 	inline void Camera::succeedSnapshot( CameraSnapshotData* imageData )
 	{
-		if (mController)
+		for ( int i = 0; i < mSnapshotListeners.size(); i++)
 		{
-			mController->snapshotSucceeded( *imageData );
+			mSnapshotListeners[i]->snapshotFinished(*imageData);
+		}
+	}
+
+	inline void Camera::failRetrievingPreviewData( int returnCode,
+		const int previewType,
+		const MARect previewRect )
+	{
+		if ( mPreviewDataListenerRef )
+		{
+			CameraPreviewData* previewData = new CameraPreviewData();
+
+			previewData->frameBuffer = NULL;
+			previewData->type = previewType;
+			previewData->rect = previewRect;
+			previewData->resultCode = returnCode;
+
+			mPreviewDataListenerRef->retrievingPreviewFrameFinished(*previewData);
+
+			delete previewData;
 		}
 	}
 
 
-	inline void Camera::restoreCamera()
+	inline void Camera::restartCamera()
 	{
-		// We need to restore the camera only for the Android.
+		// On Android preview needs to be restarted after a snapshot in order to
+		// work. As a future improvement we can move the restart in the Android
+		// runtime but awareness related to backwards compatibility is needed.
 		if ( MAUtil::OS_ANDROID ==
 			MAUtil::Environment::getEnvironment().getCurrentPlatform() )
 		{
-			stopPreview();
-			startPreview();
+			maCameraStop();
+			maCameraStart();
 		}
 	}
 
 
 	void Camera::takeSnapshot( MAHandle dataPlaceholder, int sizeIndex )
 	{
-		// If input is not valid or if triggering the snapshot returns an error it
-		// immediately sends a fail snapshot event.
-		if ( !isSnapshotInputValid( dataPlaceholder, sizeIndex )
-			|| ( MA_CAMERA_RES_OK != maCameraSnapshotAsync( dataPlaceholder, sizeIndex) ) )
+		if ( !isCameraStarted() )
 		{
-			failSnapshot(dataPlaceholder);
+			failSnapshot(dataPlaceholder, MA_CAMERA_RES_NOT_STARTED);
+		}
+		else if (isSnapshotHandleValid( dataPlaceholder ) &&
+				isSnapshotSizeIndexValid( sizeIndex ) )
+		{
+			int returnCode = maCameraSnapshotAsync( dataPlaceholder, sizeIndex);
+
+			if ( returnCode != MA_CAMERA_RES_OK )
+			{
+				failSnapshot(dataPlaceholder, returnCode);
+			}
+		}
+		else
+		{
+			failSnapshot(dataPlaceholder, MA_CAMERA_RES_VALUE_NOTSUPPORTED);
 		}
 	}
 
 
-	bool Camera::isSnapshotInputValid( MAHandle dataPlaceholder, int sizeIndex  )
+	bool Camera::isSnapshotHandleValid( MAHandle dataPlaceholder )
 	{
 		bool isValid = true;
 
 		if ( dataPlaceholder <= 0 )
 		{
-			// If the data place-holder provided is invalid we deny the request for a snapshot.
-			isValid = false;
-		}
-		else if ( sizeIndex > mSnapshotSizes.size() ||
-				(( 0 > sizeIndex) && (MA_CAMERA_SNAPSHOT_MAX_SIZE != sizeIndex)) )
-		{
-			// If the size index provided is not available we deny the request for a snapshot.
 			isValid = false;
 		}
 		return isValid;
 	}
 
 
-	void Camera::handleCameraEvent( const MAEvent& event )
+	bool Camera::isSnapshotSizeIndexValid( int sizeIndex  )
+	{
+		bool isValid = true;
+		if ( sizeIndex > mSnapshotSizes.size() )
+		{
+			isValid = false;
+		}
+		else if ( sizeIndex < 0 )
+		{
+			// MA_CAMERA_SNAPSHOT_MAX_SIZE is defined as -1
+			if ( MA_CAMERA_SNAPSHOT_MAX_SIZE != sizeIndex )
+			{
+				isValid = false;
+			}
+		}
+		return isValid;
+	}
+
+
+	bool Camera::isPreviewTypeValid( int previewType )
+	{
+		bool isValid;
+		switch ( previewType )
+		{
+			case MA_CAMERA_PREVIEW_AUTO_FOCUS:
+			case MA_CAMERA_PREVIEW_FRAME:
+				isValid = true;
+				break;
+			default:
+				isValid = false;
+				break;
+		}
+		return isValid;
+	}
+
+
+	bool Camera::isFrameRectValid( MARect frameRect )
+	{
+		bool isValid = true;
+		if ( frameRect.width <= 0 )
+		{
+			isValid = false;
+		}
+		else if ( frameRect.height <= 0 )
+		{
+			isValid = false;
+		}
+		return isValid;
+	}
+
+
+	void Camera::cameraEvent( const MAEvent& event )
 	{
 		switch (event.type)
 		{
@@ -247,30 +347,41 @@ namespace NativeUI
 
 	void Camera::manageSnapshotEvent( const MAEvent& snapshotEvent )
 	{
-		restoreCamera();
+		restartCamera();
 
-		// If we have a valid snapshot we pass the handling.
 		if ( snapshotEvent.snapshotReturnCode == MA_CAMERA_RES_OK )
 		{
-			CameraSnapshotData* imageData = CameraSnapshotData::makeFromEvent( snapshotEvent );
+			CameraSnapshotData* imageData =
+				CameraSnapshotData::makeFromEvent( snapshotEvent );
+
 			succeedSnapshot( imageData );
 			delete imageData;
 		}
 		else
 		{
-			failSnapshot(snapshotEvent.snapshotImageDataHandle);
+			failSnapshot(snapshotEvent.snapshotImageDataHandle,
+				snapshotEvent.snapshotReturnCode);
 		}
 	}
 
 
 	void Camera::managePreviewEvent( const MAEvent& previewEvent )
 	{
-		// If no controller is set there is no reason to proceed.
-		if ( mController )
+		if ( mPreviewDataListenerRef )
 		{
-			// Check if we need another frame from the camera.
-			bool shouldRequestAnotherFrame = mController->previewFrameReady(
-				mCameraPreviewBuffer, previewEvent.status, mPreviewRect);
+			CameraPreviewData* previewData = new CameraPreviewData();
+
+			previewData->frameBuffer = mCameraPreviewBuffer;
+			previewData->type = previewEvent.status;
+			previewData->rect = mPreviewRect;
+			previewData->resultCode = MA_CAMERA_RES_OK;
+
+			bool shouldRequestAnotherFrame =
+					mPreviewDataListenerRef->retrievingPreviewFrameFinished(*previewData);
+
+			// We need safe-delete macro here when it is available. Also replace other
+			// delete operations in this file with the safe-delete
+			delete previewData;
 
 			if ( shouldRequestAnotherFrame )
 			{
@@ -300,7 +411,7 @@ namespace NativeUI
 
 	bool Camera::setFlashMode( const CAMERA_FLASH_MODE flashMode )
 	{
-		MAUtil::String stringValue = "";
+		MAUtil::String stringValue = INVALID_VALUE;
 
 		switch (flashMode)
 		{
@@ -328,7 +439,8 @@ namespace NativeUI
 
 	CAMERA_FLASH_MODE Camera::getFlashMode() const
 	{
-		MAUtil::String resultString = this->getCameraPropertyString(MA_CAMERA_FLASH_MODE);
+		MAUtil::String resultString =
+			this->getCameraPropertyString(MA_CAMERA_FLASH_MODE);
 
 		CAMERA_FLASH_MODE returnValue = FLASH_UNDEFINED;
 
@@ -383,7 +495,8 @@ namespace NativeUI
 
 	CAMERA_FOCUS_MODE Camera::getFocusMode() const
 	{
-		MAUtil::String resultString = this->getCameraPropertyString(MA_CAMERA_FOCUS_MODE);
+		MAUtil::String resultString =
+			this->getCameraPropertyString(MA_CAMERA_FOCUS_MODE);
 
 		CAMERA_FOCUS_MODE returnValue = FOCUS_UNDEFINED;
 
@@ -432,7 +545,8 @@ namespace NativeUI
 
 	CAMERA_SNAPSHOT_FORMAT Camera::getSnapshotFormat() const
 	{
-		MAUtil::String resultString = this->getCameraPropertyString(MA_CAMERA_IMAGE_FORMAT);
+		MAUtil::String resultString =
+			this->getCameraPropertyString(MA_CAMERA_IMAGE_FORMAT);
 
 		CAMERA_SNAPSHOT_FORMAT returnValue = SNAPSHOT_UNKNOWN;
 
@@ -497,7 +611,13 @@ namespace NativeUI
 	void Camera::startRetrievingCameraPreviewData(
 		const int previewType, const MARect previewRect )
 	{
-		if ( mIsCameraStarted )
+		if ( !isCameraStarted() )
+		{
+			failRetrievingPreviewData(MA_CAMERA_RES_NOT_STARTED,
+				previewType, previewRect);
+		}
+		else if (isPreviewTypeValid(previewType) &&
+				isFrameRectValid(previewRect))
 		{
 			stopRetrievingCameraPreviewData();
 
@@ -505,30 +625,38 @@ namespace NativeUI
 			int size = previewRect.width * previewRect.height;
 			mCameraPreviewBuffer = new int[size];
 
-			int resultCode = maCameraPreviewEventEnable(previewType, mCameraPreviewBuffer,
-				&previewRect);
+			int resultCode =
+				maCameraPreviewEventEnable(previewType, mCameraPreviewBuffer, &previewRect);
 
-			if ( resultCode >= 0 )
+			if ( resultCode == MA_CAMERA_RES_OK )
 			{
 				mPreviewRect = previewRect;
 			}
 			else
 			{
-				// Delete buffer if enabling of the preview data failed.
+				failRetrievingPreviewData(resultCode, previewType, previewRect);
+
+				// Since this class has the ownership of the mCameraPreviewBuffer
+				// it needs to deallocate this memory in case the operation failed.
 				delete [] mCameraPreviewBuffer;
 				mCameraPreviewBuffer = NULL;
 			}
+		}
+		else
+		{
+			failRetrievingPreviewData(MA_CAMERA_RES_VALUE_NOTSUPPORTED,
+							previewType, previewRect);
 		}
 	}
 
 
 	void Camera::stopRetrievingCameraPreviewData()
 	{
-		if ( mIsCameraStarted )
+		if ( isCameraStarted() )
 		{
 			maCameraPreviewEventDisable();
 
-			if ( NULL != mCameraPreviewBuffer )
+			if ( mCameraPreviewBuffer )
 			{
 				delete [] mCameraPreviewBuffer;
 				mCameraPreviewBuffer = NULL;
@@ -537,12 +665,21 @@ namespace NativeUI
 	}
 
 
-	void Camera::setCameraController( CameraController* controller )
+    void Camera::addSnapshotListener(CameraSnapshotListener* listener)
+    {
+        addListenerToVector(mSnapshotListeners, listener);
+    }
+
+
+    void Camera::removeSnapshotListener(CameraSnapshotListener* listener)
+    {
+       removeListenerFromVector(mSnapshotListeners, listener);
+    }
+
+
+	void Camera::setCameraPreviewDataListener( CameraPreviewDataListener* listener )
 	{
-		if ( NULL != controller )
-		{
-			mController = controller;
-		}
+		mPreviewDataListenerRef = listener;
 	}
 
 
@@ -550,7 +687,7 @@ namespace NativeUI
 		const MAUtil::String& cameraProperty,
 		const int value)
 	{
-		char valueBuffer[CAMERA_BUF_SIZE];
+		char valueBuffer[STRING_PROPERTY_SIZE];
 		sprintf(valueBuffer, "%d", value);
 
 		int returnCode = maCameraSetProperty( cameraProperty.c_str(), valueBuffer );
@@ -569,9 +706,9 @@ namespace NativeUI
 	int Camera::getCameraPropertyInt(
 		const MAUtil::String& cameraProperty) const
 	{
-		char valueBuffer[CAMERA_BUF_SIZE];
+		char valueBuffer[STRING_PROPERTY_SIZE];
 		int returnCode = maCameraGetProperty( cameraProperty.c_str(),
-			valueBuffer, CAMERA_BUF_SIZE );
+			valueBuffer, STRING_PROPERTY_SIZE );
 
 		if ( returnCode > 0 )
 		{
@@ -584,11 +721,11 @@ namespace NativeUI
 	MAUtil::String Camera::getCameraPropertyString(
 		const MAUtil::String& cameraProperty ) const
 	{
-		char valueBuffer[CAMERA_BUF_SIZE];
+		char valueBuffer[STRING_PROPERTY_SIZE];
 		int returnCode = maCameraGetProperty(
 			cameraProperty.c_str(),
 			valueBuffer,
-			CAMERA_BUF_SIZE );
+			STRING_PROPERTY_SIZE );
 
 		if ( returnCode < 0 )
 		{

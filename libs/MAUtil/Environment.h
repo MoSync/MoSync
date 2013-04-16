@@ -202,6 +202,24 @@ namespace MAUtil {
 	};
 
 	/**
+     * \brief A listener for camera events.
+     * \see Environment::addCameraListener()
+     *
+     * Note: If the application uses NativeUI, use listener specific to the
+     * #Camera object.
+     */
+    class CameraListener
+    {
+    public:
+        /**
+         * Called when a camera event was triggered.
+         *
+         * \param cameraEvent a camera related event.
+         */
+        virtual void cameraEvent(const MAEvent& cameraEvent) = 0;
+    };
+
+	/**
 	* \brief A base class for cross-platform event managers.
 	*/
 	class Environment {
@@ -354,6 +372,9 @@ namespace MAUtil {
 		void addOrientationListener(OrientationListener* ol);
 		void removeOrientationListener(OrientationListener* ol);
 
+		void addCameraListener(CameraListener* camListener);
+		void removeCameraListener(CameraListener* camListener);
+
 		/**
 		 * Retrieves the current platform.
 		 */
@@ -469,6 +490,11 @@ namespace MAUtil {
 		void fireOrientationWillChangeEvent();
 
 		/**
+		* Calls cameraEvent() of all registered camera listeners.
+		*/
+		void fireCameraEvent(const MAEvent& cameraEvent);
+
+		/**
 		* Calls all registered IdleListeners once each.
 		*/
 		void runIdleListeners();
@@ -498,6 +524,7 @@ namespace MAUtil {
 		ListenerSet<TextBoxListener> mTextBoxListeners;
 		ListenerSet<SensorListener> mSensorListeners;
 		ListenerSet<OrientationListener> mOrientationListeners;
+		ListenerSet<CameraListener> mCameraListeners;
 		PLATFORM_TYPE mCurrentPlatform;
 private:
 		static Environment* sEnvironment;

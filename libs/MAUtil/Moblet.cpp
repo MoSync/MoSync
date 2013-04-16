@@ -128,6 +128,14 @@ namespace MAUtil {
 					case EVENT_TYPE_ORIENTATION_WILL_CHANGE:
 						moblet->fireOrientationWillChangeEvent();
 						break;
+				    case EVENT_TYPE_CAMERA_SNAPSHOT:
+						moblet->fireCameraEvent(event);
+						break;
+				    case EVENT_TYPE_CAMERA_PREVIEW:
+				        moblet->fireCameraEvent(event);
+				        // We need to fire a custom event for backwards compatibility.
+				        moblet->fireCustomEventListeners(event);
+				        break;
 					default:
 						moblet->fireCustomEventListeners(event);
 				}

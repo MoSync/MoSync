@@ -63,6 +63,11 @@ group CameraAPI "Camera API" {
 			*/
 			INVALID_PREVIEW_SIZE = -8;
 
+			/**
+			 * @brief Snapshot operation is in progress. Used when trying to restart a
+			 * camera or when trying to take another snapshot while a snapshot is in progress.
+			 */
+			SNAPSHOT_IN_PROGRESS = -9;
 		}
 	} //end CameraResultCodes
 
