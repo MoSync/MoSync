@@ -31,8 +31,6 @@
 #include <NativeUI/ButtonListener.h>
 #include <NativeUI/Camera.h>
 
-#include "ScreenUtils.h"
-
 namespace NativeUI
 {
 	class RelativeLayout;
@@ -51,13 +49,13 @@ namespace MoSyncCamera
 		 *
 		 * @param imageDataHandle Snapshot image data handle
 		 */
-		virtual void displaySnapshot(const MAHandle& imageDataHandle) {};
+		virtual void displaySnapshot(const MAHandle& imageDataHandle) = 0;
 	};
 
 	class CameraScreen:
 		public NativeUI::Screen,
 		public NativeUI::ButtonListener,
-		public NativeUI::CameraController
+		public NativeUI::CameraSnapshotListener
 	{
 	public:
 		/**
@@ -88,7 +86,6 @@ namespace MoSyncCamera
 		virtual int showWithTransition(MAWScreenTransitionType screenTransitionType,
 				uint screenTransitionDuration);
 
-
         /**
          * This method is called if the touch-up event was inside the
          * bounds of the button.
@@ -99,24 +96,13 @@ namespace MoSyncCamera
         virtual void buttonClicked(NativeUI::Widget* button);
 
         /**
-         * From CameraController.
+         * CameraSnapshotListener.
          */
-        void snapshotSucceeded( const NativeUI::CameraSnapshotData& imageData );
-
-        /**
-         * From CameraController.
-         */
-        void snapshotFailed( const MAHandle& snapshotHandle );
+        void snapshotFinished( const NativeUI::CameraSnapshotData& imageData );
 
 	private:
-		/**
-		 * Create screen's UI.
-		 */
         void createUI();
 
-        /**
-         * Configures the main layout.
-         */
         void setupMainLayout();
 
         /**
@@ -131,20 +117,10 @@ namespace MoSyncCamera
 		 */
         void resetCameraPropeties();
 
-        /**
-         * Configures the camera buttons and
-         * adds them to the main layout.
-         */
         void setupButtons();
 
-        /**
-		 * Configures the activity indicator.
-		 */
 		void setupActivityIndicator();
 
-        /**
-         * Arranges the widgets on the layout.
-         */
         void arrangeWidgets();
 
         /**
@@ -171,16 +147,16 @@ namespace MoSyncCamera
         void captureSnapshot();
 
         /**
-         * Does everything relate to the operation of switching
-         * the camera flash mode.
+         * Activates the next flash mode.
+         * It switches between flash modes in a circular manner.
          */
-        void toogleFlashMode();
+        void activateNextFlashMode();
 
         /**
-         * Does everything relate to the operation of switching
-         * the camera (e.q. front to back).
+         * Activates the next camera.
+         * It switches between cameras in a circular manner.
          */
-        void swapCameras();
+        void activateNextCamera();
 
         /**
           * Does everything relate to the operation of zooming
@@ -195,50 +171,23 @@ namespace MoSyncCamera
         void zoomOut();
 
 	private:
-		/**
-		 * Observer for this screen.
-		 */
+
 		CameraScreenObserver& mObserver;
 
-		/**
-		 * Layout used to hold images.
-		 */
 		NativeUI::RelativeLayout* mMainLayout;
 
-		/**
-		 * Camera.
-		 */
 		NativeUI::Camera* mCamera;
 
-		/**
-		 * Button that triggers a snapshot.
-		 */
 		NativeUI::ImageButton* mTakeSnapshotButton;
 
-		/**
-		 * Button that triggers the display of the latest
-		 * snapshot.
-		 */
 		NativeUI::ImageButton* mShowSnapshotButton;
 
-		/**
-		 * Button that toggles the camera flash mode.
-		 */
-		NativeUI::ImageButton* mToggleFlashModeButton;
+		NativeUI::ImageButton* mSetNextFlashModeButton;
 
-		/**
-		 * Button that swaps the preview's camera source mode.
-		 */
-		NativeUI::ImageButton* mSwapCameraButton;
+		NativeUI::ImageButton* mSetNextCameraButton;
 
-		/**
-		 * Button that zooms in the camera preview.
-		 */
 		NativeUI::ImageButton* mZoomInButton;
 
-		/**
-		 * Button that zooms out the camera preview.
-		 */
 		NativeUI::ImageButton* mZoomOutButton;
 
 		/**
@@ -252,10 +201,7 @@ namespace MoSyncCamera
 		 */
 		MAHandle mLastSnapshotDataHandle;
 
-		/**
-		 * Current flash mode index.
-		 */
 		uint mCurrentFlashMode;
 	};
-} // CameraDemo
+} // MoSyncCamera
 #endif /* CAMERASCREEN_H_ */

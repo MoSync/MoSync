@@ -36,9 +36,12 @@ namespace MoSyncCamera
 		mCameraScreen(NULL),
 		mImageViewerScreen(NULL),
 		mForwardTransition(MAW_TRANSITION_TYPE_NONE),
-		mBackwardTransition(MAW_TRANSITION_TYPE_NONE)
+		mBackwardTransition(MAW_TRANSITION_TYPE_NONE),
+		mDisplayedScreen(0)
 	{
 		mCameraScreen = new CameraScreen(*this);
+		mImageViewerScreen = new ImageViewerScreen(*this);
+
 		setScreenTransitions();
 	}
 
@@ -46,33 +49,41 @@ namespace MoSyncCamera
 	MoSyncCamController::~MoSyncCamController()
 	{
 		delete mCameraScreen;
-		if ( NULL != mImageViewerScreen )
-		{
-			delete mImageViewerScreen;
-		}
+		delete mImageViewerScreen;
 	}
 
 
 	void MoSyncCamController::displayMainScreen()
 	{
-		mCameraScreen->show();
+		if ( !isDisplayed(*mCameraScreen) )
+		{
+			mCameraScreen->show();
+
+			setCurrentScreen(*mCameraScreen);
+		}
 	}
 
 
 	void MoSyncCamController::displaySnapshot(const MAHandle& imageDataHandle)
 	{
-		if ( NULL == mImageViewerScreen )
+		if ( !isDisplayed(*mImageViewerScreen) )
 		{
-			mImageViewerScreen = new ImageViewerScreen(*this);
+			mImageViewerScreen->setImageWithData(imageDataHandle);
+			mImageViewerScreen->showWithTransition(mForwardTransition, SCREEN_TRANSITION_DURATION);
+
+			setCurrentScreen(*mImageViewerScreen);
 		}
-		mImageViewerScreen->setImageWithData(imageDataHandle);
-		mImageViewerScreen->showWithTransition(mForwardTransition, SCREEN_TRANSITION_DURATION);
 	}
 
 
 	void MoSyncCamController::dismissSnapshot()
 	{
-		mCameraScreen->showWithTransition(mBackwardTransition, SCREEN_TRANSITION_DURATION);
+		if ( !isDisplayed(*mCameraScreen) )
+		{
+			mCameraScreen->showWithTransition(mBackwardTransition, SCREEN_TRANSITION_DURATION);
+
+			setCurrentScreen(*mCameraScreen);
+		}
 	}
 
 
@@ -97,6 +108,15 @@ namespace MoSyncCamera
 			mBackwardTransition = MAW_TRANSITION_TYPE_NONE;
 			break;
 		}
-
 	}
-} // CameraDemo
+
+	void MoSyncCamController::setCurrentScreen( const NativeUI::Screen& currentScreen )
+	{
+		mDisplayedScreen = currentScreen.getWidgetHandle();
+	}
+
+	bool MoSyncCamController::isDisplayed( const NativeUI::Screen& currentScreen )
+	{
+		return mDisplayedScreen == currentScreen.getWidgetHandle();
+	}
+} // MoSyncCamera

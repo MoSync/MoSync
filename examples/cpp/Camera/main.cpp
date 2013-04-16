@@ -13,25 +13,19 @@ namespace MoSyncCamera
 	/**
 	 * Moblet to be used as a template for a Native UI application.
 	 */
-	class NativeUIMoblet : public Moblet
+	class CameraMoblet : public Moblet
 	{
 	public:
-		/**
-		 * The constructor creates the user interface.
-		 */
-		NativeUIMoblet()
+		CameraMoblet()
 		{
-			mAppController = new MoSyncCamController();
+			mMoSyncCameraController = new MoSyncCamController();
 
-			mAppController->displayMainScreen();
+			mMoSyncCameraController->displayMainScreen();
 		}
 
-		/**
-		 * Destructor.
-		 */
-		virtual ~NativeUIMoblet()
+		virtual ~CameraMoblet()
 		{
-			delete mAppController;
+			delete mMoSyncCameraController;
 		}
 
 		/**
@@ -47,18 +41,20 @@ namespace MoSyncCamera
 		}
 
 	private:
-		/**
-		 * Application controller
-		 */
-		MoSyncCamController* mAppController;
+		MoSyncCamController* mMoSyncCameraController;
 	};
-} // CameraDemo
+} // MoSyncCamera
 
 /**
  * Main function that is called when the program starts.
  */
 extern "C" int MAMain()
 {
-	Moblet::run(new MoSyncCamera::NativeUIMoblet());
+	MoSyncCamera::CameraMoblet *cameraMoblet = new MoSyncCamera::CameraMoblet();
+
+	Moblet::run( cameraMoblet );
+
+	delete cameraMoblet;
+
 	return 0;
 }

@@ -25,6 +25,7 @@
  */
 
 #include "CameraScreen.h"
+#include "ScreenUtils.h"
 
 // This is needed in order to access resources from the res.lstx
 #include "MAHeaders.h"
@@ -54,8 +55,8 @@ namespace MoSyncCamera
 			mCamera(NULL),
 			mTakeSnapshotButton(NULL),
 			mShowSnapshotButton(NULL),
-			mToggleFlashModeButton(NULL),
-			mSwapCameraButton(NULL),
+			mSetNextFlashModeButton(NULL),
+			mSetNextCameraButton(NULL),
 			mZoomInButton(NULL),
 			mZoomOutButton(NULL),
 			mLastSnapshotDataHandle(0),
@@ -68,13 +69,16 @@ namespace MoSyncCamera
 	CameraScreen::~CameraScreen()
 	{
 		mCamera->stopPreview();
+		mCamera->removeSnapshotListener(this);
+
 		mTakeSnapshotButton->removeButtonListener(this);
 		mShowSnapshotButton->removeButtonListener(this);
-		mToggleFlashModeButton->removeButtonListener(this);
-		mSwapCameraButton->removeButtonListener(this);
+		mSetNextFlashModeButton->removeButtonListener(this);
+		mSetNextCameraButton->removeButtonListener(this);
 		mZoomInButton->removeButtonListener(this);
 		mZoomOutButton->removeButtonListener(this);
-		if ( 0 < mLastSnapshotDataHandle )
+
+		if ( mLastSnapshotDataHandle > 0 )
 		{
 			maDestroyPlaceholder(mLastSnapshotDataHandle);
 		}
@@ -104,7 +108,7 @@ namespace MoSyncCamera
 		mCamera = new Camera();
 		mCamera->fillSpaceHorizontally();
 		mCamera->fillSpaceVertically();
-		mCamera->setCameraController(this);
+		mCamera->addSnapshotListener(this);
 		mMainLayout->addChild(mCamera);
 	}
 
@@ -145,19 +149,19 @@ namespace MoSyncCamera
 		mMainLayout->addChild(mShowSnapshotButton);
 
 		// flash mode button
-		mToggleFlashModeButton = new NativeUI::ImageButton();
-		ScreenUtils::setupImageButton(mToggleFlashModeButton,
+		mSetNextFlashModeButton = new NativeUI::ImageButton();
+		ScreenUtils::setupImageButton(mSetNextFlashModeButton,
 				this, RES_FLASH_AUTO_IMG, RES_FLASH_AUTO_IMG_PRESSED);
-		mMainLayout->addChild(mToggleFlashModeButton);
+		mMainLayout->addChild(mSetNextFlashModeButton);
 
 		// If there is not flash support on the default camera make the button unavailable.
 		if ( !mCamera->isFlashSupported() )
 		{
 			// If flash not supported disable the flash button.
-			mToggleFlashModeButton->setEnabled(false);
-			mToggleFlashModeButton->setBackgroundImage(kFlashModesImg[FLASH_OFF]);
+			mSetNextFlashModeButton->setEnabled(false);
+			mSetNextFlashModeButton->setBackgroundImage(kFlashModesImg[FLASH_OFF]);
 			// Pressed is not handled so no pressed image needed.
-			mToggleFlashModeButton->setPressedImage(kFlashModesImg[FLASH_OFF]);
+			mSetNextFlashModeButton->setPressedImage(kFlashModesImg[FLASH_OFF]);
 		}
 
 		// If we have only one camera we don't add the swap camera button.
@@ -165,10 +169,10 @@ namespace MoSyncCamera
 		if ( nrOfCameras > 1 )
 		{
 			// camera source button
-			mSwapCameraButton = new NativeUI::ImageButton();
-			ScreenUtils::setupImageButton(mSwapCameraButton,
+			mSetNextCameraButton = new NativeUI::ImageButton();
+			ScreenUtils::setupImageButton(mSetNextCameraButton,
 					this, RES_CAMERA_SWAP_IMG, RES_CAMERA_SWAP_IMG_PRESSED);
-			mMainLayout->addChild(mSwapCameraButton);
+			mMainLayout->addChild(mSetNextCameraButton);
 		}
 
 		// If zoom is not supported do not add zoom buttons.
@@ -215,19 +219,19 @@ namespace MoSyncCamera
 		btnX = screenWidth - mShowSnapshotButton->getWidth(); // right
 		mShowSnapshotButton->setPosition(btnX, btnY);
 
-		ScreenUtils::resizeWidget(mToggleFlashModeButton, size, BTN_RATIO);
+		ScreenUtils::resizeWidget(mSetNextFlashModeButton, size, BTN_RATIO);
 		btnY = 0; // top
 		btnX = 0; // left
-		mToggleFlashModeButton->setPosition(btnX, btnY);
+		mSetNextFlashModeButton->setPosition(btnX, btnY);
 
 		// If we have only one camera we don't add the swap camera button.
 		int nrOfCameras = mCamera->getNumberOfAvailableCameras();
 		if ( nrOfCameras > 1 )
 		{
-			ScreenUtils::resizeWidget(mSwapCameraButton, size, BTN_RATIO);
+			ScreenUtils::resizeWidget(mSetNextCameraButton, size, BTN_RATIO);
 			btnY = 0; // top
-			btnX = screenWidth - mSwapCameraButton->getWidth(); // right
-			mSwapCameraButton->setPosition(btnX, btnY);
+			btnX = screenWidth - mSetNextCameraButton->getWidth(); // right
+			mSetNextCameraButton->setPosition(btnX, btnY);
 		}
 
 		if ( mCamera->isZoomSupported() )
@@ -273,19 +277,21 @@ namespace MoSyncCamera
 		{
 			captureSnapshot();
 		}
-		else if ( button == mShowSnapshotButton && (0 < mLastSnapshotDataHandle) )
+		else if ( button == mShowSnapshotButton )
 		{
-			// Only if we have a valid snapshot.
-			mCamera->stopPreview();
-			mObserver.displaySnapshot(mLastSnapshotDataHandle);
+			if ( mLastSnapshotDataHandle > 0 )
+			{
+				mCamera->stopPreview();
+				mObserver.displaySnapshot(mLastSnapshotDataHandle);
+			}
 		}
-		else if ( button == mToggleFlashModeButton )
+		else if ( button == mSetNextFlashModeButton )
 		{
-			toogleFlashMode();
+			activateNextFlashMode();
 		}
-		else if ( button == mSwapCameraButton )
+		else if ( button == mSetNextCameraButton )
 		{
-			swapCameras();
+			activateNextCamera();
 		}
 		else if ( button == mZoomInButton )
 		{
@@ -304,7 +310,7 @@ namespace MoSyncCamera
 		mTakeSnapshotButton->setEnabled(false);
 
 		// Destroy the previous snapshot and ask for another.
-		if ( 0 < mLastSnapshotDataHandle )
+		if ( mLastSnapshotDataHandle > 0 )
 		{
 			maDestroyPlaceholder(mLastSnapshotDataHandle);
 			mLastSnapshotDataHandle = 0;
@@ -316,9 +322,8 @@ namespace MoSyncCamera
 	}
 
 
-	void CameraScreen::toogleFlashMode()
+	void CameraScreen::activateNextFlashMode()
 	{
-		// Toggle the flash modes
 		uint nextFlashMode = mCurrentFlashMode + 1;
 		int arraySize = sizeof(kFlashModes)/sizeof(kFlashModes[0]);
 
@@ -331,13 +336,13 @@ namespace MoSyncCamera
 			nextFlashMode = nextFlashMode % arraySize;
 		}
 
-		mToggleFlashModeButton->setBackgroundImage(kFlashModesImg[nextFlashMode]);
-		mToggleFlashModeButton->setPressedImage(kFlashModesImgPressed[nextFlashMode]);
+		mSetNextFlashModeButton->setBackgroundImage(kFlashModesImg[nextFlashMode]);
+		mSetNextFlashModeButton->setPressedImage(kFlashModesImgPressed[nextFlashMode]);
 		mCurrentFlashMode = nextFlashMode;
 	}
 
 
-	void CameraScreen::swapCameras()
+	void CameraScreen::activateNextCamera()
 	{
 		// See which is the next camera index (in a circular manner).
 		uint currentCameraIndex = mCamera->getCurrentCameraIndex();
@@ -349,18 +354,18 @@ namespace MoSyncCamera
 		if ( !mCamera->isFlashSupported() )
 		{
 			// if flash not supported disable the flash button.
-			mToggleFlashModeButton->setEnabled(false);
-			mToggleFlashModeButton->setBackgroundImage(kFlashModesImg[FLASH_OFF]);
+			mSetNextFlashModeButton->setEnabled(false);
+			mSetNextFlashModeButton->setBackgroundImage(kFlashModesImg[FLASH_OFF]);
 			// Pressed is not handled so no pressed image needed.
-			mToggleFlashModeButton->setPressedImage(kFlashModesImg[FLASH_OFF]);
+			mSetNextFlashModeButton->setPressedImage(kFlashModesImg[FLASH_OFF]);
 		}
 		else
 		{
 			// set/restore flash mode.
-			mToggleFlashModeButton->setEnabled(true);
+			mSetNextFlashModeButton->setEnabled(true);
 			mCamera->setFlashMode(kFlashModes[mCurrentFlashMode]);
-			mToggleFlashModeButton->setBackgroundImage(kFlashModesImg[mCurrentFlashMode]);
-			mToggleFlashModeButton->setPressedImage(kFlashModesImgPressed[mCurrentFlashMode]);
+			mSetNextFlashModeButton->setBackgroundImage(kFlashModesImg[mCurrentFlashMode]);
+			mSetNextFlashModeButton->setPressedImage(kFlashModesImgPressed[mCurrentFlashMode]);
 		}
 	}
 
@@ -395,27 +400,27 @@ namespace MoSyncCamera
 	}
 
 
-	void CameraScreen::snapshotSucceeded( const NativeUI::CameraSnapshotData& imageData )
+	void CameraScreen::snapshotFinished( const NativeUI::CameraSnapshotData& imageData )
 	{
-		if ( mLastSnapshotDataHandle == imageData.dataHandle )
+		if ( imageData.resultCode == MA_CAMERA_RES_OK &&
+				mLastSnapshotDataHandle == imageData.dataHandle )
 		{
+			mTakeSnapshotButton->setEnabled(true);
+			mSetNextCameraButton->setEnabled(true);
 			toogleShowSnapshotButton(true);
 		}
-		mTakeSnapshotButton->setEnabled(true);
-		mSwapCameraButton->setEnabled(true);
-		mActivityIndicator->hide();
-	}
-
-
-	void CameraScreen::snapshotFailed( const MAHandle& snapshotHandle )
-	{
-		maAlert("Camera", "Snapshot failed", "OK", NULL, NULL);
-
-		if ( mLastSnapshotDataHandle > 0 )
+		else
 		{
-			toogleShowSnapshotButton(true);
+			maAlert("Camera", "Snapshot failed", "OK", NULL, NULL);
+
+			if ( mLastSnapshotDataHandle > 0 )
+			{
+				toogleShowSnapshotButton(true);
+			}
+
+			mTakeSnapshotButton->setEnabled(true);
+			mActivityIndicator->hide();
 		}
-		mTakeSnapshotButton->setEnabled(true);
 		mActivityIndicator->hide();
 	}
 
@@ -436,4 +441,4 @@ namespace MoSyncCamera
 		}
 		mShowSnapshotButton->setEnabled(enabled);
 	}
-} // CameraDemo
+} // MoSyncCamera

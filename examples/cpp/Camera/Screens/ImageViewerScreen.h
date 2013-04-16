@@ -46,7 +46,7 @@ namespace MoSyncCamera
 		 * Notifies the observer to dismiss the screen
 		 * displaying the snapshot.
 		 */
-		virtual void dismissSnapshot() {};
+		virtual void dismissSnapshot() = 0;
 	};
 
 	class ImageViewerScreen:
@@ -69,66 +69,36 @@ namespace MoSyncCamera
          * Platform: iOS, Android, Windows Phone.
          * @param button The button object that generated the event.
          */
-        void buttonClicked(NativeUI::Widget* button);
+        virtual void buttonClicked(NativeUI::Widget* button);
 
         /**
-		 * Sets the displayed image using the diven data.
+		 * Sets the displayed image using the given data.
 		 * @param imageDataHandle Snapshot image data handle.
 		 */
         void setImageWithData(const MAHandle& imageDataHandle);
 
 	private:
-		/**
-		 * Create screen's UI.
-		 */
+
         void createUI();
 
-        /**
-         * Configures the main layout.
-         */
         void setupMainLayout();
 
-        /**
-         * Configures the image view and adds it
-         * to the main layout.
-         */
         void setupImageView();
 
-        /**
-         * Configures the image viewer buttons and
-         * adds them to the main layout.
-         */
         void setupButtons();
 
-        /**
-         * Arranges the widgets on the layout.
-         */
         void arrangeWidgets();
 
 	private:
-		/**
-		 * Observer for this screen.
-		 */
+
         ImageViewerScreenObserver& mObserver;
 
-		/**
-		 * Layout used to hold images.
-		 */
 		NativeUI::RelativeLayout* mMainLayout;
 
-		/**
-		 * Camera.
-		 */
 		NativeUI::Image* mImageView;
 
-		/**
-		 * Button that dismisses the screen.
-		 */
 		NativeUI::ImageButton* mDismissButton;
 
-		/**
-		 * Button that saves the image viewed.
-		 */
 		NativeUI::ImageButton* mSaveImageButton;
 
 		/**
@@ -136,5 +106,5 @@ namespace MoSyncCamera
 		 */
 		MAHandle mImageHandle;
 	};
-} // CameraDemo
+} // MoSyncCamera
 #endif /* SNAPSHOTSCREEN_H_ */

@@ -45,7 +45,7 @@ namespace MoSyncCamera
 			mImageView(NULL),
 			mDismissButton(NULL),
 			mSaveImageButton(NULL),
-			mImageHandle(maCreatePlaceholder())
+			mImageHandle(0)
 	{
 		createUI();
 	}
@@ -54,7 +54,7 @@ namespace MoSyncCamera
 	{
 		mDismissButton->removeButtonListener(this);
 		mSaveImageButton->removeButtonListener(this);
-		if ( 0 < mImageHandle )
+		if ( mImageHandle > 0 )
 		{
 			maDestroyPlaceholder(mImageHandle);
 		}
@@ -109,7 +109,6 @@ namespace MoSyncCamera
 		/// Extract the screen height
 		int screenHeight = EXTENT_Y(size);
 
-		// fill all the screen
 		mImageView->setPosition(0, 0);
 		mImageView->setWidth(screenWidth);
 		mImageView->setHeight(screenHeight);
@@ -132,7 +131,7 @@ namespace MoSyncCamera
 		if ( button == mDismissButton )
 		{
 			mObserver.dismissSnapshot();
-			if ( 0 < mImageHandle )
+			if ( mImageHandle > 0 )
 			{
 				maDestroyPlaceholder(mImageHandle);
 				mImageHandle = 0;
@@ -146,21 +145,19 @@ namespace MoSyncCamera
 
 	void ImageViewerScreen::setImageWithData(const MAHandle& imageDataHandle)
 	{
-		if ( 0 < mImageHandle )
+		if ( imageDataHandle != mImageHandle )
 		{
-			maDestroyPlaceholder(mImageHandle);
-			mImageHandle = 0;
+			mImageHandle = maCreatePlaceholder();
+
+			maCreateImageFromData(
+				mImageHandle,
+				imageDataHandle,
+				0,
+				maGetDataSize(imageDataHandle));
+
+			mImageView->setImage(mImageHandle);
+			mImageView->setScaleMode(IMAGE_SCALE_PRESERVE_ASPECT);
+			mImageView->setVisible(true);
 		}
-		mImageHandle = maCreatePlaceholder();
-
-		maCreateImageFromData(
-			mImageHandle,
-			imageDataHandle,
-			0,
-			maGetDataSize(imageDataHandle));
-
-		mImageView->setImage(mImageHandle);
-		mImageView->setScaleMode(IMAGE_SCALE_PRESERVE_ASPECT);
-		mImageView->setVisible(true);
 	}
-} // CameraDemo
+} // MoSyncCamera

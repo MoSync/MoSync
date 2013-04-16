@@ -60,10 +60,26 @@ namespace MoSyncCamera
 
 	private:
 		/**
-		 *	Sets the screen transition used when showing/dismissing
-		 *	a screen.
+		 * Sets the screen transition used when showing/dismissing
+		 * a screen.
 		 */
 		MAWScreenTransitionType setScreenTransitions();
+
+		/**
+		 * Retains the displayed screen handle.
+		 *
+		 * @param currentScreen The screen that will be displayed.
+		 */
+		void setCurrentScreen( const NativeUI::Screen& currentScreen );
+
+		/**
+		 * Returns if the screen given as parameter is displayed.
+		 *
+		 * @param currentScreen the screen that will be verified.
+		 *
+		 * @return true if the screen is already displayed, false otherwise.
+		 */
+		bool isDisplayed( const NativeUI::Screen& currentScreen );
 
 	private:
 		CameraScreen* mCameraScreen;
@@ -83,7 +99,12 @@ namespace MoSyncCamera
 		 * Transition type used when dismissing screens.
 		 */
 		MAWScreenTransitionType mBackwardTransition;
+
+		/**
+		 * Used to prevent displaying the same screen twice.
+		 */
+		MAHandle mDisplayedScreen;
 	};
-} // CameraDemo
+} // MoSyncCamera
 
 #endif /* MOSYNCCAM_CONTROLLER_H_ */
