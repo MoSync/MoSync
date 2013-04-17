@@ -43,10 +43,16 @@ namespace MoSyncCamera
 	{
 	public:
 		/**
-		 * Notifies the observer to dismiss the screen
-		 * displaying the snapshot.
+		 * Notifies the observer that the image viewer screen is ready
+		 * to be dismissed.
 		 */
-		virtual void dismissSnapshot() = 0;
+		virtual void imageViewingDone() = 0;
+
+		/**
+		 * Notifies the observer that a request for saving
+		 * the displayed image was made.
+		 */
+		virtual void exportImageToGalleryRequested() = 0;
 	};
 
 	class ImageViewerScreen:
@@ -100,11 +106,6 @@ namespace MoSyncCamera
 		NativeUI::ImageButton* mDismissButton;
 
 		NativeUI::ImageButton* mSaveImageButton;
-
-		/**
-		 * Handle for the image viewed.
-		 */
-		MAHandle mImageHandle;
 	};
 } // MoSyncCamera
 #endif /* SNAPSHOTSCREEN_H_ */

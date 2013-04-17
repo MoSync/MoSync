@@ -34,7 +34,8 @@ namespace MoSyncCamera
 {
 	class MoSyncCamController:
 		public CameraScreenObserver,
-		public ImageViewerScreenObserver
+		public ImageViewerScreenObserver,
+		public NativeUI::CameraSnapshotListener
 	{
 	public:
 		MoSyncCamController();
@@ -47,16 +48,43 @@ namespace MoSyncCamera
 		void displayMainScreen();
 
 		/**
-		 * Displays a snapshot on a separate screen.
+		 * When notified of this request it
+		 * displays a snapshot on a separate screen.
+		 *
+		 * From CameraScreenObserver
 		 *
 		 * @param imageDataHandle Snapshot image data handle.
 		 */
-		void displaySnapshot(const MAHandle& imageDataHandle);
+		void snapshotDisplayRequested();
 
 		/**
-		 * Dismisses the screen showing the snapshot.
+		 * When notified of this request it
+		 * triggers a snapshot operation.
 		 */
-		void dismissSnapshot();
+		void snapshotRequested();
+
+		/**
+		 * When notified that the image viewer screen is done it
+		 * goes back to the camera screen.
+		 *
+		 * From ImageViewerScreenObserver
+		 */
+		void imageViewingDone();
+
+		/**
+		 * When notified of this the image from the ImageViewerScreen
+		 * will be saved in the photo library of the device.
+		 *
+		 * From ImageViewerScreenObserver
+		 */
+		void exportImageToGalleryRequested();
+
+        /**
+         * Handles the snapshot operation result.
+         *
+         * From CameraSnapshotListener.
+         */
+        void snapshotFinished( const NativeUI::CameraSnapshotData& imageData );
 
 	private:
 		/**
@@ -84,9 +112,6 @@ namespace MoSyncCamera
 	private:
 		CameraScreen* mCameraScreen;
 
-		/**
-		 * Snapshot viewer screen.
-		 */
 		ImageViewerScreen* mImageViewerScreen;
 
 		/**
@@ -104,6 +129,16 @@ namespace MoSyncCamera
 		 * Used to prevent displaying the same screen twice.
 		 */
 		MAHandle mDisplayedScreen;
+
+		/**
+		 * Handle for the image displayed.
+		 */
+		MAHandle mDisplayedImageHandle;
+
+		/**
+		 * Last taken snapshot handle
+		 */
+		MAHandle mLastSnapshotDataHandle;
 	};
 } // MoSyncCamera
 

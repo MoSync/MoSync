@@ -44,18 +44,19 @@ namespace MoSyncCamera
 	{
 	public:
 		/**
-		 * The implementation of this method is responsible for
-		 * showing the last snapshot taken.
-		 *
-		 * @param imageDataHandle Snapshot image data handle
+		 * Notifies that a request for displaying an snapshot was made.
 		 */
-		virtual void displaySnapshot(const MAHandle& imageDataHandle) = 0;
+		virtual void snapshotDisplayRequested() = 0;
+
+		/**
+		 * Notifies that a request for snapshot was made.
+		 */
+		virtual void snapshotRequested() = 0;
 	};
 
 	class CameraScreen:
 		public NativeUI::Screen,
-		public NativeUI::ButtonListener,
-		public NativeUI::CameraSnapshotListener
+		public NativeUI::ButtonListener
 	{
 	public:
 		/**
@@ -95,10 +96,39 @@ namespace MoSyncCamera
          */
         virtual void buttonClicked(NativeUI::Widget* button);
 
-        /**
-         * CameraSnapshotListener.
-         */
-        void snapshotFinished( const NativeUI::CameraSnapshotData& imageData );
+		/**
+		 * This method activates the snapshot operation.
+		 *
+		 * @param imageDataHandle place-holder where the snapshot data will be
+		 * written
+		 */
+		void takeSnapshot(MAHandle imageDataHandle);
+
+		/**
+		 * Registers a snapshot listener to the camera own by this screen.
+		 *
+		 * @param cameraListener The listener that will start receiving snapshot
+		 * notifications
+		 */
+		void registerCameraListener(NativeUI::CameraSnapshotListener* cameraListener);
+
+		/**
+		 * Unregisters a snapshot listener to the camera own by this screen.
+		 *
+		 * @param cameraListener The listener that will stop receiving snapshot
+		 * notifications
+		 */
+		void unregisterCameraListener(NativeUI::CameraSnapshotListener* cameraListener);
+
+		/**
+		 * Makes changes to the UI needed when a snapshot is in progress.
+		 */
+		void showSnapshotInProgress();
+
+		/**
+		 * Makes changes to the UI needed when a snapshot is in not in progress.
+		 */
+		void hideSnapshotInProgress(bool snapshotIsValid);
 
 	private:
         void createUI();
@@ -141,12 +171,6 @@ namespace MoSyncCamera
         void toogleTakeSnapshotButton(bool enabled);
 
         /**
-         * Does everything relate to the operation of taking
-         * a snapshot.
-         */
-        void captureSnapshot();
-
-        /**
          * Activates the next flash mode.
          * It switches between flash modes in a circular manner.
          */
@@ -159,15 +183,9 @@ namespace MoSyncCamera
         void activateNextCamera();
 
         /**
-          * Does everything relate to the operation of zooming
-          * in.
-          */
+         * Handlers for zoom functionalities
+         */
         void zoomIn();
-
-         /**
-           * Does everything relate to the operation of zooming
-           * out.
-           */
         void zoomOut();
 
 	private:
@@ -195,11 +213,6 @@ namespace MoSyncCamera
 		 * Used while taking a snapshot.
 		 */
 		NativeUI::ActivityIndicator* mActivityIndicator;
-
-		/**
-		 * Last taken snapshot handle.
-		 */
-		MAHandle mLastSnapshotDataHandle;
 
 		uint mCurrentFlashMode;
 	};

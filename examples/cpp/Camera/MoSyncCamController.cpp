@@ -37,17 +37,32 @@ namespace MoSyncCamera
 		mImageViewerScreen(NULL),
 		mForwardTransition(MAW_TRANSITION_TYPE_NONE),
 		mBackwardTransition(MAW_TRANSITION_TYPE_NONE),
-		mDisplayedScreen(0)
+		mDisplayedScreen(0),
+		mDisplayedImageHandle(0),
+		mLastSnapshotDataHandle(0)
 	{
 		mCameraScreen = new CameraScreen(*this);
 		mImageViewerScreen = new ImageViewerScreen(*this);
 
+		mCameraScreen->registerCameraListener(this);
 		setScreenTransitions();
 	}
 
 
 	MoSyncCamController::~MoSyncCamController()
 	{
+		if ( mDisplayedImageHandle > 0 )
+		{
+			maDestroyPlaceholder(mDisplayedImageHandle);
+		}
+
+		if ( mLastSnapshotDataHandle > 0 )
+		{
+			maDestroyPlaceholder(mLastSnapshotDataHandle);
+		}
+
+		mCameraScreen->unregisterCameraListener(this);
+
 		delete mCameraScreen;
 		delete mImageViewerScreen;
 	}
@@ -64,26 +79,82 @@ namespace MoSyncCamera
 	}
 
 
-	void MoSyncCamController::displaySnapshot(const MAHandle& imageDataHandle)
+	void MoSyncCamController::snapshotDisplayRequested()
 	{
 		if ( !isDisplayed(*mImageViewerScreen) )
 		{
-			mImageViewerScreen->setImageWithData(imageDataHandle);
-			mImageViewerScreen->showWithTransition(mForwardTransition, SCREEN_TRANSITION_DURATION);
+			if ( mLastSnapshotDataHandle > 0 )
+			{
+				mDisplayedImageHandle = maCreatePlaceholder();
 
-			setCurrentScreen(*mImageViewerScreen);
+				maCreateImageFromData(
+					mDisplayedImageHandle,
+					mLastSnapshotDataHandle,
+					0,
+					maGetDataSize(mLastSnapshotDataHandle));
+
+				mImageViewerScreen->setImageWithData(mDisplayedImageHandle);
+				mImageViewerScreen->showWithTransition(mForwardTransition, SCREEN_TRANSITION_DURATION);
+
+				setCurrentScreen(*mImageViewerScreen);
+			}
 		}
 	}
 
 
-	void MoSyncCamController::dismissSnapshot()
+	void MoSyncCamController::snapshotRequested()
+	{
+		mCameraScreen->showSnapshotInProgress();
+
+		if ( mLastSnapshotDataHandle > 0 )
+		{
+			maDestroyPlaceholder(mLastSnapshotDataHandle);
+			mLastSnapshotDataHandle = 0;
+		}
+		mLastSnapshotDataHandle = maCreatePlaceholder();
+
+		mCameraScreen->takeSnapshot(mLastSnapshotDataHandle);
+	}
+
+
+	void MoSyncCamController::imageViewingDone()
 	{
 		if ( !isDisplayed(*mCameraScreen) )
 		{
 			mCameraScreen->showWithTransition(mBackwardTransition, SCREEN_TRANSITION_DURATION);
 
+			if ( mDisplayedImageHandle > 0 )
+			{
+				maDestroyPlaceholder(mDisplayedImageHandle);
+				mDisplayedImageHandle = 0;
+			}
+
 			setCurrentScreen(*mCameraScreen);
 		}
+	}
+
+
+	void MoSyncCamController::exportImageToGalleryRequested()
+	{
+		maAlert("Save image", "Image saving is not yet available", "OK", NULL, NULL);
+	}
+
+
+	void MoSyncCamController::snapshotFinished( const NativeUI::CameraSnapshotData& imageData )
+	{
+		bool snapshotIsAvailable = true;
+		if ( imageData.resultCode != MA_CAMERA_RES_OK )
+		{
+			maAlert("Camera", "Snapshot failed", "OK", NULL, NULL);
+			snapshotIsAvailable = false;
+
+			if ( mLastSnapshotDataHandle > 0 )
+			{
+				maDestroyPlaceholder(mLastSnapshotDataHandle);
+				mLastSnapshotDataHandle = 0;
+			}
+		}
+		mCameraScreen->hideSnapshotInProgress(snapshotIsAvailable);
 	}
 
 

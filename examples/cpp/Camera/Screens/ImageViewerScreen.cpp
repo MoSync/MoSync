@@ -44,8 +44,7 @@ namespace MoSyncCamera
 			mMainLayout(NULL),
 			mImageView(NULL),
 			mDismissButton(NULL),
-			mSaveImageButton(NULL),
-			mImageHandle(0)
+			mSaveImageButton(NULL)
 	{
 		createUI();
 	}
@@ -54,10 +53,6 @@ namespace MoSyncCamera
 	{
 		mDismissButton->removeButtonListener(this);
 		mSaveImageButton->removeButtonListener(this);
-		if ( mImageHandle > 0 )
-		{
-			maDestroyPlaceholder(mImageHandle);
-		}
 	}
 
 	void ImageViewerScreen::createUI()
@@ -130,34 +125,18 @@ namespace MoSyncCamera
 	{
 		if ( button == mDismissButton )
 		{
-			mObserver.dismissSnapshot();
-			if ( mImageHandle > 0 )
-			{
-				maDestroyPlaceholder(mImageHandle);
-				mImageHandle = 0;
-			}
+			mObserver.imageViewingDone();
 		}
 		else if ( button == mSaveImageButton )
 		{
-			maAlert("Save image", "Image saving is not yet available", "OK", NULL, NULL);
+			mObserver.exportImageToGalleryRequested();
 		}
 	}
 
-	void ImageViewerScreen::setImageWithData(const MAHandle& imageDataHandle)
+	void ImageViewerScreen::setImageWithData(const MAHandle& imageHandle)
 	{
-		if ( imageDataHandle != mImageHandle )
-		{
-			mImageHandle = maCreatePlaceholder();
-
-			maCreateImageFromData(
-				mImageHandle,
-				imageDataHandle,
-				0,
-				maGetDataSize(imageDataHandle));
-
-			mImageView->setImage(mImageHandle);
-			mImageView->setScaleMode(IMAGE_SCALE_PRESERVE_ASPECT);
-			mImageView->setVisible(true);
-		}
+		mImageView->setImage(imageHandle);
+		mImageView->setScaleMode(IMAGE_SCALE_PRESERVE_ASPECT);
+		mImageView->setVisible(true);
 	}
 } // MoSyncCamera

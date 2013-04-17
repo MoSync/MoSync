@@ -59,7 +59,6 @@ namespace MoSyncCamera
 			mSetNextCameraButton(NULL),
 			mZoomInButton(NULL),
 			mZoomOutButton(NULL),
-			mLastSnapshotDataHandle(0),
 			mCurrentFlashMode(0)
 	{
 		createUI();
@@ -69,7 +68,6 @@ namespace MoSyncCamera
 	CameraScreen::~CameraScreen()
 	{
 		mCamera->stopPreview();
-		mCamera->removeSnapshotListener(this);
 
 		mTakeSnapshotButton->removeButtonListener(this);
 		mShowSnapshotButton->removeButtonListener(this);
@@ -77,11 +75,6 @@ namespace MoSyncCamera
 		mSetNextCameraButton->removeButtonListener(this);
 		mZoomInButton->removeButtonListener(this);
 		mZoomOutButton->removeButtonListener(this);
-
-		if ( mLastSnapshotDataHandle > 0 )
-		{
-			maDestroyPlaceholder(mLastSnapshotDataHandle);
-		}
 	}
 
 
@@ -108,7 +101,6 @@ namespace MoSyncCamera
 		mCamera = new Camera();
 		mCamera->fillSpaceHorizontally();
 		mCamera->fillSpaceVertically();
-		mCamera->addSnapshotListener(this);
 		mMainLayout->addChild(mCamera);
 	}
 
@@ -252,6 +244,7 @@ namespace MoSyncCamera
 	void CameraScreen::show()
 	{
 		Screen::show();
+
 		mCamera->startPreview();
 		resetCameraPropeties();
 	}
@@ -271,19 +264,55 @@ namespace MoSyncCamera
 	}
 
 
+	void CameraScreen::takeSnapshot(MAHandle imageDataHandle)
+	{
+		if ( imageDataHandle > 0 )
+		{
+			mCamera->takeSnapshot( imageDataHandle );
+		}
+	}
+
+
+	void CameraScreen::registerCameraListener(CameraSnapshotListener* cameraListener)
+	{
+		mCamera->addSnapshotListener(cameraListener);
+	}
+
+
+	void CameraScreen::unregisterCameraListener(CameraSnapshotListener* cameraListener)
+	{
+		mCamera->removeSnapshotListener(cameraListener);
+	}
+
+
+	void CameraScreen::showSnapshotInProgress()
+	{
+		toogleShowSnapshotButton(false);
+		mTakeSnapshotButton->setEnabled(false);
+
+		mActivityIndicator->show();
+	}
+
+
+	void CameraScreen::hideSnapshotInProgress(bool snapshotIsValid)
+	{
+		toogleShowSnapshotButton(snapshotIsValid);
+		mTakeSnapshotButton->setEnabled(true);
+
+		mActivityIndicator->hide();
+	}
+
+
 	void CameraScreen::buttonClicked(NativeUI::Widget* button)
 	{
 		if (button == mTakeSnapshotButton)
 		{
-			captureSnapshot();
+			mObserver.snapshotRequested();
 		}
 		else if ( button == mShowSnapshotButton )
 		{
-			if ( mLastSnapshotDataHandle > 0 )
-			{
-				mCamera->stopPreview();
-				mObserver.displaySnapshot(mLastSnapshotDataHandle);
-			}
+			mCamera->stopPreview();
+			mObserver.snapshotDisplayRequested();
 		}
 		else if ( button == mSetNextFlashModeButton )
 		{
@@ -301,24 +330,6 @@ namespace MoSyncCamera
 		{
 			zoomOut();
 		}
-	}
-
-
-	void CameraScreen::captureSnapshot()
-	{
-		toogleShowSnapshotButton(false);
-		mTakeSnapshotButton->setEnabled(false);
-
-		// Destroy the previous snapshot and ask for another.
-		if ( mLastSnapshotDataHandle > 0 )
-		{
-			maDestroyPlaceholder(mLastSnapshotDataHandle);
-			mLastSnapshotDataHandle = 0;
-		}
-		mActivityIndicator->show();
-
-		mLastSnapshotDataHandle = maCreatePlaceholder();
-		mCamera->takeSnapshot( mLastSnapshotDataHandle );
 	}
 
 
@@ -398,32 +409,6 @@ namespace MoSyncCamera
 		}
 		mCamera->setZoomLevel(nextZoomLevel);
 	}
-
-
-	void CameraScreen::snapshotFinished( const NativeUI::CameraSnapshotData& imageData )
-	{
-		if ( imageData.resultCode == MA_CAMERA_RES_OK &&
-				mLastSnapshotDataHandle == imageData.dataHandle )
-		{
-			mTakeSnapshotButton->setEnabled(true);
-			mSetNextCameraButton->setEnabled(true);
-			toogleShowSnapshotButton(true);
-		}
-		else
-		{
-			maAlert("Camera", "Snapshot failed", "OK", NULL, NULL);
-
-			if ( mLastSnapshotDataHandle > 0 )
-			{
-				toogleShowSnapshotButton(true);
-			}
-
-			mTakeSnapshotButton->setEnabled(true);
-			mActivityIndicator->hide();
-		}
-		mActivityIndicator->hide();
-	}
-
 
 	void CameraScreen::toogleShowSnapshotButton(bool enabled)
 	{
