@@ -196,12 +196,12 @@ namespace MoSync
                 base.AddChild(child);
 
                 WidgetBaseWindowsPhone w = (WidgetBaseWindowsPhone)child;
-            //    MoSync.Util.RunActionOnMainThreadSync(() =>
-            //    {
+                MoSync.Util.RunActionOnMainThreadSync(() =>
+                {
                     mPage.Children.Add(w.View);
                     Grid.SetColumn((w.View as FrameworkElement), 0);
                     Grid.SetRow((w.View as FrameworkElement), 0);
-            //    });
+                });
             }
 
             /**

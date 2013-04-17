@@ -9,32 +9,14 @@ namespace MoSync
     public class NativeUIModule : IIoctlModule
     {
         private NativeUI.AsyncNativeUIWindowsPhone mNativeUI;
+
         /**
          * A reference to the last shown screen.
          */
         private IScreen mCurrentScreen = null;
         private List<IWidget> mWidgets = new List<IWidget>();
 
-		public IWidget GetWidget(int handle)
-		{
-			if (handle < 0 || handle >= mWidgets.Count)
-				return null;
-			IWidget w = mWidgets[handle];
-			return w;
-		}
-
-        /**
-         * Handles the back button pressed event.
-         * @return true if the event has been consumed, false otherwise.
-         */
-        public bool HandleBackButtonPressed()
-        {
-            if (mCurrentScreen != null)
-            {
-                return mCurrentScreen.HandleBackButtonPressed();
-            }
-            return false;
-        }
+        #region Widget Add/Get
 
         /*
          * Ads a widget to the widgets array.
@@ -46,6 +28,18 @@ namespace MoSync
             return mWidgets.Count-1;
         }
 
+        public IWidget GetWidget(int handle)
+        {
+            if (handle < 0 || handle >= mWidgets.Count)
+                return null;
+            IWidget w = mWidgets[handle];
+            return w;
+        }
+
+        #endregion
+
+        #region Asynchronous Widget Creation methods
+
         private void CreateWidget(int widgetHandle, Type widgetType)
         {
             MoSync.Util.RunActionOnMainThread(() =>
@@ -53,26 +47,21 @@ namespace MoSync
                 IWidget widget = Activator.CreateInstance(widgetType) as IWidget;
                 IWidget widgetMock = mWidgets[widgetHandle];
 
-                if (widgetMock is WidgetBaseTemp)
+                lock (mWidgets);
+
+                if (widgetMock is WidgetBaseMock)
                 {
                     widget.SetHandle(widgetHandle);
-                    if ((widgetMock as WidgetBaseTemp).OperationQueue.Count != 0)
-                    {
-                        int i = 0;
-                    }
-                    widget.AddOperationQueue((widgetMock as WidgetBaseTemp).OperationQueue);
-
-                    if ((widgetMock as WidgetBaseTemp).OperationQueue.Count != 0)
-                    {
-                        int i = (widget as WidgetBase).OperationQueue.Count;
-                        int j = 0;
-                    }
+                    widget.AddOperations((widgetMock as WidgetBaseMock).OperationQueue);
                     widget.SetRuntime(widgetMock.GetRuntime());
                     mWidgets[widgetHandle] = widget;
                 }
             }, false);
-
         }
+
+        #endregion
+
+        #region Ioctls implementation
 
         public void Init(Ioctls ioctls, Core core, Runtime runtime)
         {
@@ -149,7 +138,7 @@ namespace MoSync
                 {
                     return MoSync.Constants.MAW_RES_INVALID_TYPE_NAME;
                 }
-                IWidget widget = new WidgetBaseTemp();
+                IWidget widget = new WidgetBaseMock();
                 widget.SetRuntime(runtime);
 
                 Thread createWidgetThread;
@@ -478,5 +467,24 @@ namespace MoSync
                 }
             };
         }
+
+        #endregion
+
+        #region Back button handler
+
+        /**
+         * Handles the back button pressed event.
+         * @return true if the event has been consumed, false otherwise.
+         */
+        public bool HandleBackButtonPressed()
+        {
+            if (mCurrentScreen != null)
+            {
+                return mCurrentScreen.HandleBackButtonPressed();
+            }
+            return false;
+        }
+
+        #endregion
     }
 }

@@ -52,6 +52,14 @@ namespace MoSync
              */
             private EventHandler mLayoutUpdatedDelegate = null;
 
+            //Width
+            protected double mWidth;
+
+            //Height
+            protected double mHeight;
+
+            #region Constructor
+
             public WidgetBaseWindowsPhone()
                 : base()
             {
@@ -61,24 +69,40 @@ namespace MoSync
                 ColumnNumber = -1;
             }
 
+            #endregion
+
+            #region View property
+
             /**
-             * Event handler for the layout updated event sent by the FrameworkElement mView.
+             * Because the mView class variable is private, every widget will have to use this
+             * property when setting/getting the view.
+             * When setting the view, we make sure to add/remove(if necessary) the 'LayoutUpdated'
+             * delegate which will handle the business logic when the view is ready for manipulation.
              */
-            void mView_LayoutUpdated(object sender, EventArgs e)
+            public FrameworkElement View
             {
-                if (!isViewCreated)
+                get { return mView; }
+                set
                 {
-                    isViewCreated = true;
-
-                    // run all the pending operations from the widget operation queue
-                    while (mOperationQueue.Count != 0)
+                    // If the view is set twice or more, the layout updated delegate is removed
+                    // from the LayoutUpdated event.
+                    if (mLayoutUpdatedDelegate != null)
                     {
-                        WidgetOperation currentOperation = mOperationQueue.Dequeue();
-
-                        RunOperation(currentOperation);
+                        isViewCreated = false;
+                        mView.LayoutUpdated -= mLayoutUpdatedDelegate;
                     }
+
+                    mView = value;
+
+                    // Create the delegate and add it as a handler for the LayoutUpdated event.
+                    mLayoutUpdatedDelegate = new EventHandler(mView_LayoutUpdated);
+                    mView.LayoutUpdated += mLayoutUpdatedDelegate;
                 }
             }
+
+            #endregion
+
+            #region Widget operation queue methods
 
             /**
              * Runs a WidgetOperation on the current widget.
@@ -121,6 +145,10 @@ namespace MoSync
                 }
             }
 
+            #endregion
+
+            #region Properties and methods for setting/getting FILL/WRAP and setting the detault FILL/WRAP values
+
             //Size policies
             public bool FILL_SPACE_V
             {
@@ -161,12 +189,6 @@ namespace MoSync
                 set;
             }
 
-            //Width
-            protected double mWidth;
-
-            //Height
-            protected double mHeight;
-
             protected void setHorizontalSizePolicyFlags(bool fillSpaceHorizontally, bool wrapContentHorizontally)
             {
                 FILL_SPACE_H =  fillSpaceHorizontally;
@@ -179,28 +201,9 @@ namespace MoSync
                 WRAP_CONT_V = wrapContentVertically;
             }
 
-            public FrameworkElement View
-            {
-                get { return mView; }
-                set
-                {
-                    /**
-                     * If the view is set twice or more, the layout updated delegate is removed
-                     * from the LayoutUpdated event.
-                     */
-                    if (mLayoutUpdatedDelegate != null)
-                    {
-                        isViewCreated = false;
-                        mView.LayoutUpdated -= mLayoutUpdatedDelegate;
-                    }
+            #endregion
 
-                    mView = value;
-
-                    // Create the delegate and add it as a handler for the LayoutUpdated event.
-                    mLayoutUpdatedDelegate = new EventHandler(mView_LayoutUpdated);
-                    mView.LayoutUpdated += mLayoutUpdatedDelegate;
-                }
-            }
+            #region Basic widget properties
 
             /**
              * MAW_WIDGET_LEFT implementation
@@ -421,6 +424,10 @@ namespace MoSync
                 }
             }
 
+            #endregion
+
+            #region Helper UI methods (wrapping and filling)
+
             /**
              * \brief This functions is called on the wrap content horizontally case
              */
@@ -597,7 +604,34 @@ namespace MoSync
                     }
                 }
             }
+
+            #endregion
+
+            #region UI Events
+
+            /**
+             * Event handler for the layout updated event sent by the FrameworkElement mView.
+             */
+            void mView_LayoutUpdated(object sender, EventArgs e)
+            {
+                if (!isViewCreated)
+                {
+                    isViewCreated = true;
+
+                    // run all the pending operations from the widget operation queue
+                    while (mOperationQueue.Count != 0)
+                    {
+                        WidgetOperation currentOperation = mOperationQueue.Dequeue();
+
+                        RunOperation(currentOperation);
+                    }
+                }
+            }
+
+            #endregion
         }
+
+        #region UIManagers
 
         public class NativeUIWindowsPhone : UIManager
         {
@@ -610,60 +644,6 @@ namespace MoSync
             }
         }
 
-        /**
-         * Handles the set, get, add, insert and remove operations on a widget.
-         */
-        public class AsyncNativeUIWindowsPhone : UIManager
-        {
-            private PhoneApplicationFrame mFrame;
-
-            /**
-             * Contains a reference to the runtime Core - needed by the get operations.
-             */
-            private Core mCore;
-
-            public AsyncNativeUIWindowsPhone()
-                : base()
-            {
-                //This should always be a PhoneApplicationFrame.
-                mFrame = (PhoneApplicationFrame)Application.Current.RootVisual;
-            }
-
-            public void SetProperty(IWidget widget, string propertyName, string propertyValue)
-            {
-                widget.SetProperty(propertyName, propertyValue);
-            }
-
-            public void GetProperty(IWidget widget, string propertyName)
-            {
-            }
-
-            public void AddChild(IWidget parent, IWidget child)
-            {
-                if (!(parent as WidgetBase).IsViewCreated)
-                {
-                    WidgetOperation addChildOperation = new WidgetOperation(WidgetOperation.OperationType.ADD, child.GetHandle());
-                    parent.AddOperation(addChildOperation);
-                }
-                else
-                {
-                    child.SetParent(parent);
-                    parent.AddChild(child);
-                }
-            }
-
-            public void InsertChild(IWidget parent, IWidget child, int index)
-            {
-            }
-
-            public void RemoveChild(IWidget parent, IWidget child)
-            {
-            }
-
-            public void SetCore(Core core)
-            {
-                this.mCore = core;
-            }
-        }
+        #endregion
     }
 }
