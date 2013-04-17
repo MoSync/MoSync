@@ -460,19 +460,11 @@ namespace Base
 		return retval;
 	}
 
-	int wcharLength(const wchar* str)
-	{
-		int l = 0;
-		while(str[l] != 0) l++;
-		return l;
-	}
-
 	SYSCALL(MAExtent,  maGetTextSizeW(const wchar* str))
 	{
 		//SYSLOG("maGetTextSizeW");
 
-		jsize len = wcharLength(str);
-		jstring jstr = mJNIEnv->NewString((jchar*)str, len);
+		jstring jstr = WCHAR_TO_JCHAR(mJNIEnv, str);
 
 		jclass cls = mJNIEnv->GetObjectClass(mJThis);
 		jmethodID methodID = mJNIEnv->GetMethodID(cls, "maGetTextSizeW", "(Ljava/lang/String;)I");
@@ -504,8 +496,7 @@ namespace Base
 	{
 		//SYSLOG("maDrawTextW");
 
-		jsize len = wcharLength(str);
-		jstring jstr = mJNIEnv->NewString((jchar*)str, len);
+		jstring jstr = WCHAR_TO_JCHAR(mJNIEnv, str);
 
 		jclass cls = mJNIEnv->GetObjectClass(mJThis);
 		jmethodID methodID = mJNIEnv->GetMethodID(cls, "maDrawTextW", "(IILjava/lang/String;)V");

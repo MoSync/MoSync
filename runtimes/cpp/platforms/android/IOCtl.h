@@ -16,9 +16,11 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 */
 
 #include <Syscall.h>
+#include "jniutil.h"
 
 namespace Base
 {
+
 	// Framebuffer API
 
 	int _maFrameBufferGetInfo(MAFrameBufferInfo *info);

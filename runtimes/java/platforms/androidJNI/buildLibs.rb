@@ -60,6 +60,9 @@ def buildLib(name, buildParams)
 	if bootmodules != nil && !bootmodules.empty?
 		bootmoduleList = "--boot-modules " + bootmodules
 	end
+	if compilerflags != nil && !compilerflags.empty?
+		compileflags = "--compiler-switches \"" + compilerflags + " -DANDROID\""
+	end
 	success = sh("#{ENV['MOSYNCDIR']}/bin/nbuild --platform Android --name #{name} --project #{project} --dst #{ENV['MOSYNCDIR']}/lib --config Debug,Release --lib-variant debug,release --android-ndkbuild-cmd #{$androidNDKPath}/ndk-build --android-version #{$androidVersion} #{srcfiles} --verbose #{libtype} #{includes} #{bootmoduleList} #{moduleList} #{compilerflags} --android-lib-type #{libtype} --android-build-dir #{project}/temp_#{name}")
 	if !success
 		exit 1
@@ -114,7 +117,7 @@ puts "Building native Library\n\n"
 # First, we need wchar support
 #buildLib("wchar", { 'src' => "-SMAStd/wchar.c -SMAStd/mawstring.c -SMAStd/mawvsprinf.c", 'bootmodules' => "." })
 
-bootfiles = "-S./* -S../../core/Core.cpp -S../sdl/FileImpl.cpp -S../../base/FileStream.cpp -S../../base/MemStream.cpp -S../../base/Stream.cpp -S../../base/Image.cpp -S../../base/ResourceArray.cpp -S../../base/Syscall.cpp -S../../../../intlibs/helpers/platforms/linux/log.cpp -S../../../../intlibs/hashmap/hashmap.cpp"
+bootfiles = "-S./* -S./UTF/* -S../../core/Core.cpp -S../sdl/FileImpl.cpp -S../../base/FileStream.cpp -S../../base/MemStream.cpp -S../../base/Stream.cpp -S../../base/Image.cpp -S../../base/ResourceArray.cpp -S../../base/Syscall.cpp -S../../../../intlibs/helpers/platforms/linux/log.cpp -S../../../../intlibs/hashmap/hashmap.cpp"
 cppDir = "#{ENV['MOSYNC_SRC']}/runtimes/cpp"
 additionalIncludes = "-I#{cppDir} -I#{cppDir}/base -I#{cppDir}/core -I#{ENV['MOSYNC_SRC']}/intlibs"
 buildLib("mosync", { 'src' => bootfiles, 'compiler-flags' => "-Wno-psabi -D_android", 'project' => "#{cppDir}/platforms/android", 'includes' => additionalIncludes, 'bootmodules' => "."})
@@ -136,6 +139,6 @@ buildLib("mosync", { 'src' => bootfiles, 'compiler-flags' => "-Wno-psabi -D_andr
 #buildLib("yajl", { 'src' => "-Syajl/**", 'modules' => "MAStd,MAUtil" })
 #buildLib("Notification", { 'src' => "-SNotification/**", 'modules' => "MAStd,MAUtil" })
 
-libfiles = "-SMAUI -SMAStd/conprint.c -SMAStd/maassert.c -SMAStd/mastring.c -SMAStd/mawstring.c -SMAStd/matime.c -SMAStd/mavsprintf.c -SMAStd/mawvsprintf.c -SMAStd/maxtoa.c -SMAMath/MAVector3.c -SAds -SMinUI -SResCompiler -Skazlib -Syasper -SFacebook/** -SNativeUI -SHybris -SMAFS/** -SMAUtil -XMAUtil/DomParser.cpp -SNotification -STestify -SMATest -SPurchase -SWormhole/** -Syajl/** -XMAUtil/GraphicsOpenGL.c -XMAUtil/XMLDataProvider.cpp -XMAUtil/XPathTokenizer.cpp"
+libfiles = "-SMAUI -SMAStd/conprint.c -SMAStd/maassert.c -SMAStd/mastring.c -SMAStd/mawstring.c -SMAStd/matime.c -SMAStd/mavsprintf.c -SMAStd/mawvsprintf.c -SMAStd/maxtoa.c -SMAStd/wchar.c -SMAMath/MAVector3.c -SAds -SMinUI -SResCompiler -Skazlib -Syasper -SFacebook/** -SNativeUI -SHybris -SMAFS/** -SMAUtil -XMAUtil/DomParser.cpp -SNotification -STestify -SMATest -SPurchase -SWormhole/** -Syajl/** -XMAUtil/GraphicsOpenGL.c -XMAUtil/XMLDataProvider.cpp -XMAUtil/XPathTokenizer.cpp"
 #libfiles = "- -Skazlib  -SHybris "
-buildLib("mosynclib", { 'shared' => true, 'src' => libfiles })
+buildLib("mosynclib", { 'shared' => true, 'src' => libfiles, 'compiler-flags' => "-D_MB_CAPABLE" })

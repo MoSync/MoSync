@@ -16,34 +16,11 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 */
 
 #include "IOCtl.h"
-
 #include <helpers/cpp_defs.h>
-
-/**
- * Custom Wide Char String length calculation function.
- * Exists because the android NDK does not support wchars.
- *
- * @param s		input multi-byte string
- *
- * @return		length of the input string
- *
- * TODO: Use a build in function instead if this one.
- * This function is written in a non-readable way,
- * improved it a little bit by changing a variable name.
- */
-inline size_t wideCharStringLength(const wchar * s)
-{
-	const wchar *current;
-	if (s == 0)
-	{
-		return 0;
-	}
-	for (current = s; *current; ++current);
-	return current - s;
-}
 
 namespace Base
 {
+
 	int _maFrameBufferGetInfo(MAFrameBufferInfo *info)
 	{
 		int size = maGetScrSize();
@@ -479,8 +456,8 @@ namespace Base
 	{
 
 		// Initialization.
-		jstring jstrTITLE = jNIEnv->NewString((jchar*)title, wideCharStringLength(title));
-		jstring jstrINTEXT = jNIEnv->NewString((jchar*)inText, wideCharStringLength(inText));
+		jstring jstrTITLE = WCHAR_TO_JCHAR(jNIEnv, title);
+		jstring jstrINTEXT = WCHAR_TO_JCHAR(jNIEnv, inText);
 
 		jclass cls = jNIEnv->GetObjectClass(jThis);
 
@@ -615,9 +592,9 @@ namespace Base
 	{
 		Base::gSyscall->VM_Yield();
 
-		jstring jstrTitle = jNIEnv->NewString((jchar*)title, wideCharStringLength(title));
-		jstring jstrText = jNIEnv->NewString((jchar*)destructiveText, wideCharStringLength(destructiveText));
-		jstring jstrCancelText = jNIEnv->NewString((jchar*)cancelText, wideCharStringLength(cancelText));
+		jstring jstrTitle = WCHAR_TO_JCHAR(jNIEnv, title);
+		jstring jstrText = WCHAR_TO_JCHAR(jNIEnv, destructiveText);
+		jstring jstrCancelText = WCHAR_TO_JCHAR(jNIEnv, cancelText);
 
 		jclass cls = jNIEnv->GetObjectClass(jThis);
 
