@@ -426,10 +426,8 @@ namespace MoSync
                     }
                     else
                     {
-                        System.Diagnostics.Debug.WriteLine("maCameraSetProperty fail");
                         return MoSync.Constants.MA_CAMERA_RES_INVALID_PROPERTY_VALUE;
                     }
-                    System.Diagnostics.Debug.WriteLine("maCameraSetProperty ok");
                     return MoSync.Constants.MA_CAMERA_RES_OK;
                 }
                 else if (property.Equals(MoSync.Constants.MA_CAMERA_FOCUS_MODE))

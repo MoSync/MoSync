@@ -37,7 +37,7 @@ namespace MoSyncCamera
 		mImageViewerScreen(NULL),
 		mForwardTransition(MAW_TRANSITION_TYPE_NONE),
 		mBackwardTransition(MAW_TRANSITION_TYPE_NONE),
-		mDisplayedScreen(0),
+		mDisplayedScreen(-1),
 		mDisplayedImageHandle(0),
 		mLastSnapshotDataHandle(0)
 	{
