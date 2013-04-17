@@ -434,6 +434,8 @@ namespace NativeUI
 		 * be retrieved as soon as possible. In case of MA_CAMERA_PREVIEW_AUTO_FOCUS,
 		 * the frame will be retrieved after focus was made.
 		 *
+		 * Note: Windows Phone does not support this for the moment.
+		 *
 		 * \param previewRect a rectangle defining the image frame of the preview data.
          */
         virtual void startRetrievingCameraPreviewData(const int previewType,
