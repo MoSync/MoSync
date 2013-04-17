@@ -64,5 +64,22 @@ group WidgetCustomPickerProperties "CustomPicker" {
 		* \endcode
 		*/
 		SELECTION_INDICATOR = "selectionIndicator";
+
+		/**
+		* @brief Sets of gets the selected item.
+		* Platform: iOS.
+		*
+		* @validvalue A positive integer that represents the index of the item.
+		* By default the first item is selected and it has index zero.
+		* If the widget has no children, #MAW_RES_ERROR will be returned.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(customPickerHandle, MAW_CUSTOM_PICKER_SELECTED_ITEM_INDEX, "1");
+		* \endcode
+		*/
+		SELECTED_ITEM_INDEX = "selectedItemIndex";
 	}
 } // end of WidgetCustomPickerProperties

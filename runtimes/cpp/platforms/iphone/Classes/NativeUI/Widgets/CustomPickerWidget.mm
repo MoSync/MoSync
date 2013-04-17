@@ -46,6 +46,7 @@
 
 /**
  * Set the row height of its items.
+ * Setter for MAW_CUSTOM_PICKER_ROW_HEIGHT property.
  * @param rowHeightString Height to set in pixels.
  * @return One of the following values:
  * - MAW_RES_OK if the height was set, MAW_RES_INVALID_PROPERTY_VALUE if the given
@@ -55,6 +56,7 @@
 
 /**
  * Set the row width of its items.
+ * Setter for MAW_CUSTOM_PICKER_ROW_WIDTH property.
  * @param rowWidthString Width to set in pixels.
  * @return One of the following values:
  * - MAW_RES_OK if the width was set.
@@ -64,6 +66,7 @@
 
 /**
  * Show / hide the selection indicator.
+ * Setter for MAW_CUSTOM_PICKER_SELECTION_INDICATOR property.
  * @param value "true" in order to show it, "false" otherwise.
  * @return One of the following values:
  * - MAW_RES_OK for success.
@@ -77,6 +80,24 @@
  * @return "true" if it is, "false" otherwise.
  */
 -(NSString*)isSelectionIndicatorShown;
+
+/**
+ * Set the selected item by index.
+ * Setter for MAW_CUSTOM_PICKER_SELECTED_ITEM_INDEX.
+ * @param indexString The index of the item to select.
+ * @return One of the following values:
+ * - MAW_RES_OK for success.
+ * - MAW_RES_INVALID_PROPERTY_VALUE if the given indexString is invalid.
+ */
+-(int)setSelectedItemIndexProperty:(NSString*)indexString;
+
+/**
+ * Get the index of the selected item.
+ * Getter for MAW_CUSTOM_PICKER_SELECTED_ITEM_INDEX.
+ * @return The index of the item to select.
+ * If the widget has no children, #MAW_RES_ERROR will be returned.
+ */
+-(NSString*)selectedItemIndexProperty;
 
 /**
  * Get the widget view.
@@ -193,6 +214,10 @@
 	{
 		returnValue = [self showSelectionIndicatorProperty:value];
 	}
+	else if ([key isEqualToString:@MAW_CUSTOM_PICKER_SELECTED_ITEM_INDEX])
+	{
+		returnValue = [self setSelectedItemIndexProperty:value];
+	}
 	else
 	{
 		returnValue = [super setPropertyWithKey:key toValue:value];
@@ -210,17 +235,21 @@
 {
 	if ([key isEqualToString:@MAW_CUSTOM_PICKER_ROW_HEIGHT])
 	{
-		int rowHeightValue = self.rowHeight * [UIScreen mainScreen].scale;
+		int rowHeightValue = self.rowHeight * getScreenScale();
 		return [[NSString alloc] initWithFormat:@"%d", rowHeightValue];
 	}
 	else if ([key isEqualToString:@MAW_CUSTOM_PICKER_ROW_WIDTH])
 	{
-		int rowWidthValue = self.rowWidth * [UIScreen mainScreen].scale;
+		int rowWidthValue = self.rowWidth * getScreenScale();
 		return [[NSString alloc] initWithFormat:@"%d", rowWidthValue];
 	}
 	else if ([key isEqualToString:@MAW_CUSTOM_PICKER_SELECTION_INDICATOR])
 	{
 		return [[self isSelectionIndicatorShown] retain];
+	}
+	else if ([key isEqualToString:@MAW_CUSTOM_PICKER_SELECTED_ITEM_INDEX])
+	{
+		return [[self selectedItemIndexProperty] retain];
 	}
 	else
 	{
@@ -277,7 +306,8 @@
  * Called by the picker view when it needs the view to use for a given row in a given component.
  * @param pickerView Object requesting data.
  * @param component A number identifying a component.
- * @param view A view object that was previously used for this row, but is now hidden and cached by the picker view.
+ * @param view A view object that was previously used for this row, but is now
+ * hidden and cached by the picker view.
  * @return A view object to use as the content of row.
  */
 - (UIView *)pickerView:(UIPickerView *)pickerView
@@ -285,6 +315,10 @@
 		  forComponent:(NSInteger)component
 		   reusingView:(UIView *)view
 {
+	if ([_children count] == 0)
+	{
+		return nil;
+	}
 	IWidget* widget = [_children objectAtIndex:row];
 	return widget.view;
 }
@@ -295,7 +329,9 @@
  * @param row A number identifying a row of component.
  * @param component A number identifying a component.
  */
-- (void)pickerView:(UIPickerView *)pickerView didSelectRow:(NSInteger)row inComponent:(NSInteger)component
+- (void)pickerView:(UIPickerView *)pickerView
+	  didSelectRow:(NSInteger)row
+	   inComponent:(NSInteger)component
 {
 	MAEvent event;
 	event.type = EVENT_TYPE_WIDGET;
@@ -309,6 +345,7 @@
 
 /**
  * Set the row height of its items.
+ * Setter for MAW_CUSTOM_PICKER_ROW_HEIGHT property.
  * @param rowHeightString Height to set in pixels.
  * @return One of the following values:
  * - MAW_RES_OK if the height was set, MAW_RES_INVALID_PROPERTY_VALUE if the given
@@ -328,6 +365,7 @@
 
 /**
  * Set the row width of its items.
+ * Setter for MAW_CUSTOM_PICKER_ROW_WIDTH property.
  * @param rowWidthString Width to set in pixels.
  * @return One of the following values:
  * - MAW_RES_OK if the width was set.
@@ -347,6 +385,7 @@
 
 /**
  * Show / hide the selection indicator.
+ * Setter for MAW_CUSTOM_PICKER_SELECTION_INDICATOR property.
  * @param value "true" in order to show it, "false" otherwise.
  * @return One of the following values:
  * - MAW_RES_OK for success.
@@ -378,6 +417,47 @@
 {
 	BOOL isShown = [[self pickerView] showsSelectionIndicator];
 	return isShown ? kWidgetTrueValue : kWidgetFalseValue;
+}
+
+/**
+ * Set the selected item by index.
+ * Setter for MAW_CUSTOM_PICKER_SELECTED_ITEM_INDEX.
+ * @param indexString The index of the item to select.
+ * @return One of the following values:
+ * - MAW_RES_OK for success.
+ * - MAW_RES_INVALID_PROPERTY_VALUE if the given indexString is invalid.
+ */
+-(int)setSelectedItemIndexProperty:(NSString*)indexString
+{
+	if (![indexString canParseNumber])
+	{
+		return MAW_RES_INVALID_PROPERTY_VALUE;
+	}
+	int index = [indexString intValue];
+	if (index < 0 || index >= [_children count])
+	{
+		return MAW_RES_INVALID_PROPERTY_VALUE;
+	}
+
+	[[self pickerView] selectRow:index inComponent:0 animated:YES];
+	return MAW_RES_OK;
+}
+
+/**
+ * Get the index of the selected item.
+ * Getter for MAW_CUSTOM_PICKER_SELECTED_ITEM_INDEX.
+ * @return The index of the item to select.
+ * If the widget has no children, #MAW_RES_ERROR will be returned.
+ */
+-(NSString*)selectedItemIndexProperty
+{
+	int selectedRow = [[self pickerView] selectedRowInComponent:0];
+	// Check if no row is selected.
+	if (selectedRow == -1)
+	{
+		selectedRow = MAW_RES_ERROR;
+	}
+	return [NSString stringWithFormat:@"%d", selectedRow];
 }
 
 /**
