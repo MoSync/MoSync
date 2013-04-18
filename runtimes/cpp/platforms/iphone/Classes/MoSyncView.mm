@@ -162,7 +162,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 		self.multipleTouchEnabled = YES;
 		touchHelper = [[TouchHelper alloc] init];
         moSyncSensor = [[MoSyncSensor alloc] init];
-		
+		self.contentMode = UIViewContentModeRedraw;
 		/*
 		CGRect appFrame = [[UIScreen mainScreen] bounds];
 		CGFloat screenHeight = appFrame.size.height;
@@ -179,7 +179,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
     CGContextRef context = UIGraphicsGetCurrentContext();
 	CGContextSetInterpolationQuality(context, kCGInterpolationNone);
 	CGContextSetAllowsAntialiasing(context, false);
-	CGContextTranslateCTM(context, 0, self.frame.size.height); //CGImageGetHeight(mosyncView));
+	CGContextTranslateCTM(context, 0, self.bounds.size.height); //CGImageGetHeight(mosyncView));
 	CGContextScaleCTM(context, 1.0, -1.0);
 	CGContextDrawImage(context, rect, mosyncView);		
 	
@@ -199,13 +199,27 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 }
 -(void) messageBox:(id) obj {
 	MessageBoxHandler *mbh = (MessageBoxHandler*) obj;
-	UIAlertView *alert = [[UIAlertView alloc] 
+	UIAlertView *alert = [[UIAlertView alloc]
                           initWithTitle:mbh.title
                           message:mbh.msg
                           delegate:mbh
                           cancelButtonTitle:mbh.cancelTitle
-                          otherButtonTitles:mbh.button1Title, mbh.button2Title, mbh.button3Title, nil];
-	
+                          otherButtonTitles:nil];
+
+	// Add only valid strings as buttons.
+	if (mbh.button1Title)
+	{
+		[alert addButtonWithTitle:mbh.button1Title];
+	}
+	if (mbh.button2Title)
+	{
+		[alert addButtonWithTitle:mbh.button2Title];
+	}
+	if (mbh.button3Title)
+	{
+		[alert addButtonWithTitle:mbh.button3Title];
+	}
+
 	[touchHelper clearTouches];
 	if (mbh.cancelTitle == nil) {
 		alert.cancelButtonIndex = -1;
@@ -215,7 +229,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 }
  
 -(void) showMessageBox: (NSString*)msg withTitle: (NSString*)title shouldKill: (bool)kill {
-	MessageBoxHandler *mbh = [[MessageBoxHandler alloc] retain];
+	MessageBoxHandler *mbh = [[[MessageBoxHandler alloc] init] autorelease];
 	mbh.kill = kill;
 	mbh.title = title;
 	mbh.msg = msg;

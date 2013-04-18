@@ -21,6 +21,7 @@
 #import "LayoutWidgets.h"
 #import "LayoutManagers.h"
 #import "WidgetUtils.h"
+#import "ScreenWidget.h"
 
 @implementation AbstractLayoutView (AbstractLayoutViewExpanded)
 
@@ -68,7 +69,7 @@
 }
 
 - (int) getTopMargin{
-	return topMargin;;
+	return topMargin;
 }
 
 - (int) getBottomMargin {
@@ -211,6 +212,11 @@ MAKE_UIWRAPPER_LAYOUTING_IMPLEMENTATION(MoSync, HLayoutView)
  */
 - (void)layout
 {
+	if (self.parent &&
+		[self.parent class] == [ScreenWidget class])
+	{
+		return;
+	}
     CGSize sizeThatFits = [self sizeThatFitsForWidget];
     float width = self.width;
     float height = self.height;
@@ -238,7 +244,7 @@ MAKE_UIWRAPPER_LAYOUTING_IMPLEMENTATION(MoSync, HLayoutView)
 
     // If the widget has parent and if at least one of its auto size params is wrap content,
     // then ask the parent to layout itself.
-    if (self.parent &&
+    if (self.parent && (!self.isMainWidget) &&
         (self.parent.autoSizeWidth != WidgetAutoSizeFixed ||
          self.parent.autoSizeHeight != WidgetAutoSizeFixed))
     {

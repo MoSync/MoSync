@@ -58,6 +58,13 @@
 - (int)insertChild: (IWidget*)child atIndex:(NSNumber*)index;
 
 /**
+ * Remove a child from the widget.
+ * The child's view will be removed its superview.
+ * @param child Widget to remove.
+ */
+- (void)removeChild: (IWidget*)child;
+
+/**
  * Set child's size.
  */
 -(void) layout;

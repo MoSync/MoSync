@@ -49,6 +49,12 @@
      * Store the current screen orientation.
      */
     UIInterfaceOrientation mCurrentScreenOrientation;
+
+	/**
+	 * A bit mask that represents the supported screen orientation.
+	 * Used in iOS 6.0 and later.
+	 */
+	UIInterfaceOrientationMask mSupportedOrientations;
 }
 
 /**
@@ -130,4 +136,43 @@
  */
 -(int) getCurrentScreenOrientation;
 
+
+/**
+ * Get the supported orientations.
+ * Used in iOS 6.0 and later.
+ * @return A bit mask specifying which orientations are supported.
+ */
+- (UIInterfaceOrientationMask)supportedInterfaceOrientations;
+
+/**
+ * Get the screen size based on the current orientation.
+ * @return Screen size in pixels.
+ */
+-(CGSize)screenSize;
+
 @end
+
+/**
+ * Return a boolean value indicating whether the view controller supports the specified orientation.
+ * Deprecated in iOS 6.0.
+ * @param interfaceOrientation The orientation of the app’s user interface after the rotation.
+ * @return YES if the view controller auto-rotates its view to the specified orientation, otherwise NO.
+ */
+BOOL MoSync_IsInterfaceOrientationSupported(UIInterfaceOrientation interfaceOrientation);
+
+/**
+ * Returns all of the interface orientations that the view controller supports.
+ * Available in iOS 6.0 and later.
+ * @return A mask with supported orientations.
+ */
+NSUInteger MoSync_SupportedInterfaceOrientations();
+
+/**
+ * Check if the current screen size has changed. If so send EVENT_TYPE_SCREEN_CHANGED event.
+ * It's send only for non NativeUI applications. Once the NativeUI module is used
+ * this event is not sent.
+ * Usually the screen size changes when rotating device from portrait to landscape
+ * and the other way around.
+ * @param fromOrientation The old orientation of the user interface.
+ */
+void MoSync_OrientationChanged(UIInterfaceOrientation fromOrientation);

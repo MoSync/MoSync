@@ -24,6 +24,7 @@ MA 02110-1301, USA.
  * messages from Wormhole (JavaScript).
  */
 
+#include <mastring.h>
 #include "CustomMoblet.h"
 #include "MessageHandler.h"
 #include "HybridMoblet.h"
@@ -359,6 +360,7 @@ void MessageHandler::handleMoSyncMessage(
 	Wormhole::HybridMoblet* moblet)
 {
 	const char* p = message.getNext();
+	const char* logMessage;
 
 	if (0 == strcmp(p, "ExitApplication"))
 	{
@@ -369,9 +371,58 @@ void MessageHandler::handleMoSyncMessage(
 	{
 		maSendToBackground();
 	}
+	else if (0 == strcmp(p, "SysLog"))
+	{
+		logMessage = message.getNext();
+		maWriteLog(logMessage, strlen(logMessage));
+	}
+	else if (0 == strcmp(p, "ScreenSetOrientation"))
+	{
+		screenSetOrientation(message.getNext());
+	}
+	else if (0 == strcmp(p, "OpenExternalURL"))
+	{
+		maPlatformRequest(message.getNext());
+	}
 	else if (0 == strcmp(p, "OpenWormhole"))
 	{
 		moblet->openWormhole(webViewHandle);
+	}
+}
+
+void MessageHandler::screenSetOrientation(const char* orientation)
+{
+	if (0 == strcmp(orientation, "dynamic"))
+	{
+		// Android and Windows Phone.
+		maScreenSetOrientation(SCREEN_ORIENTATION_DYNAMIC);
+
+		// iOS and Windows Phone.
+		maScreenSetSupportedOrientations(
+			MA_SCREEN_ORIENTATION_LANDSCAPE_LEFT |
+			MA_SCREEN_ORIENTATION_LANDSCAPE_RIGHT |
+			MA_SCREEN_ORIENTATION_PORTRAIT |
+			MA_SCREEN_ORIENTATION_PORTRAIT_UPSIDE_DOWN);
+	}
+	else if (0 == strcmp(orientation, "portrait"))
+	{
+		// Android and Windows Phone.
+		maScreenSetOrientation(SCREEN_ORIENTATION_PORTRAIT);
+
+		// iOS and Windows Phone.
+		maScreenSetSupportedOrientations(
+			MA_SCREEN_ORIENTATION_PORTRAIT |
+			MA_SCREEN_ORIENTATION_PORTRAIT_UPSIDE_DOWN);
+	}
+	else if (0 == strcmp(orientation, "landscape"))
+	{
+		// Android and Windows Phone.
+		maScreenSetOrientation(SCREEN_ORIENTATION_LANDSCAPE);
+
+		// iOS and Windows Phone.
+		maScreenSetSupportedOrientations(
+			MA_SCREEN_ORIENTATION_LANDSCAPE_LEFT |
+			MA_SCREEN_ORIENTATION_LANDSCAPE_RIGHT);
 	}
 }
 

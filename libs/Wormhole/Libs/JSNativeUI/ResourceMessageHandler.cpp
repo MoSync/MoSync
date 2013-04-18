@@ -147,6 +147,11 @@ namespace Wormhole
 	 */
 	MAHandle ResourceMessageHandler::loadImageResource(const char* imagePath)
 	{
+		if (!getFileUtil())
+		{
+			return 0;
+		}
+
 		// Get the current apllication directory path.
 		String appPath = getFileUtil()->getAppPath();
 

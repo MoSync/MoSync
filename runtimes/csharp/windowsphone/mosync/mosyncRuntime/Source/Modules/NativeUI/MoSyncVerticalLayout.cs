@@ -44,6 +44,8 @@ namespace MoSync
 
             protected System.Windows.Controls.ScrollViewer mScrollViewer;
 
+            private System.Collections.Generic.List<StackPanel> mStackPanels;
+
             //Padding information
             protected double mPaddingBottom;
             protected double mPaddingTop;
@@ -59,15 +61,6 @@ namespace MoSync
             //The main column of the Grid object (an vertical layout is a grid with one column)
             protected ColumnDefinition mColDef;
 
-            //the inter widget spacer unit type
-            protected GridUnitType mGridUnitType;
-
-            //the inter widget spacer value
-            protected int mGridUnitTypeValue;
-
-            //boolean which indicates that the paddings are set by the user
-            protected bool mPaddingSetByUser;
-
             /**
              * The constructor
              */
@@ -75,40 +68,46 @@ namespace MoSync
             {
                 mGrid = new System.Windows.Controls.Grid();
 
+                // The column definitions
+                // The column that will contain the widgets
                 mColDef = new ColumnDefinition();
-                mSpacerUp = new RowDefinition();
-                mSpacerDown = new RowDefinition();
 
+                // The columns used for padding
                 mSpacerRight = new ColumnDefinition();
                 mSpacerLeft = new ColumnDefinition();
 
+                // The rows used for padding
+                mSpacerUp = new RowDefinition();
+                mSpacerDown = new RowDefinition();
+
+                // Setting the main column to star (fill the layout)
                 mColDef.Width = new System.Windows.GridLength(1, System.Windows.GridUnitType.Star);
 
+                // Setting the paddings to 0
                 mSpacerUp.Height = new System.Windows.GridLength(0);
                 mSpacerDown.Height = new System.Windows.GridLength(0);
                 mSpacerRight.Width = new System.Windows.GridLength(0);
                 mSpacerLeft.Width = new System.Windows.GridLength(0);
 
+                // Add the top and bottom padding spacers
                 mGrid.RowDefinitions.Add(mSpacerUp);
                 mGrid.RowDefinitions.Add(mSpacerDown);
 
+                // Add the left and right padding spacers. In the middle it goes the main column.
                 mGrid.ColumnDefinitions.Add(mSpacerLeft);
                 mGrid.ColumnDefinitions.Add(mColDef);
                 mGrid.ColumnDefinitions.Add(mSpacerRight);
 
-                this.fillSpaceVerticalyEnabled = false;
-                this.fillSpaceHorizontalyEnabled = false;
-
-                mGridUnitType = GridUnitType.Auto;
-                mGridUnitTypeValue = 1;
-
-                mPaddingSetByUser = false;
-
                 mView = mGrid;
 
                 mGrid.Margin = new Thickness(0.0);
+
+                mStackPanels = new System.Collections.Generic.List<StackPanel>();
+
+                setHorizontalSizePolicyFlags(true, false);
+                setVerticalSizePolicyFlags(true, false);
 //#if DEBUG
-//                mGrid.ShowGridLines = true;
+                //mGrid.ShowGridLines = true;
 //#endif
             }
 
@@ -121,63 +120,109 @@ namespace MoSync
                 base.AddChild(child);
                 MoSync.Util.RunActionOnMainThreadSync(() =>
                 {
+                    // The logic behind this layout system is to create a stack panel for each
+                    // MoSync widget. The stack panel is used for wrapping and filling size policies.
+                    // When the widget size policy states that it should fill on both horizontal and
+                    // vertical axis the stack panel is not used in the structure but added to the
+                    // grid for future usage.
+                    //
+                    // Wrap V & Fill H :
+                    //  - row.height (1 x auto)
+                    //  - column.width (1 x star)
+                    //  - stack panel  (yes)
+                    //  - orientation  (vertical)
+                    //
+                    // Wrap V & Wrap H :
+                    //  - row.height (1 x auto)
+                    //  - column.width (1 x star)
+                    //  - stack panel  (yes)
+                    //  - orientation  (horizontal)
+                    //
+                    // Fill V & Wrap H :
+                    //  - row.height (1 x star)
+                    //  - column.width (1 x star)
+                    //  - stack panel  (yes)
+                    //  - orientation  (horizontal)
+                    //
+                    // Fill V & Fill H :
+                    //  - row.height (1 x star)
+                    //  - column.width (1 x star)
+                    //  - stack panel  (No)
+                    //  - orientation  (none)
                     WidgetBaseWindowsPhone widget = (child as WidgetBaseWindowsPhone);
                     RowDefinition rowDef = new RowDefinition(); //The row definition for the widget
 
-                    //In order to be able to set various properties on the layout
-                    //there appeared the need for two spacers, top spacer, and
-                    //bottom spacer. For each widget one of each would be added
-                    //to the layout.
+                    // Adding a new container
+                    mStackPanels.Add(new StackPanel());
 
-                    RowDefinition upperSpacerRowDef = new RowDefinition(); //The row definition for the upper spacer
-                    RowDefinition bottomSpacerRowDef = new RowDefinition(); //The row definition for the bottom spacer
+                    int stackPanelIndex = mStackPanels.Count - 1;
+                    bool stackPanelRequired = true;
 
-                    if (widget.fillSpaceVerticalyEnabled) //FillSpaceVerticaly
+                    // The row for the widget has the default GridUnitType set on 1 x Auto
+                    // meaning that it will "wrap" around the widget forcing it to wrap around
+                    // its content on the vertical axis
+                    rowDef.Height = new System.Windows.GridLength(1, System.Windows.GridUnitType.Auto);
+
+                    if (widget.FILL_SPACE_V) //FillSpaceVerticaly
                     {
-                        //Check if the paddings are not set by the user
-                        if (false == mPaddingSetByUser)
-                        {
-                            setPaddingSpacers(0, GridUnitType.Pixel);
-                        }
-                        else
-                        {
-                            setPaddingSpacers(1, GridUnitType.Auto);
-                        }
+                        // The row for the widget gets the Height value set on 1 x Star
+                        // meaning that it will "fill" the space available on the vertical axis
+                        // forcing the widget to do the same
                         rowDef.Height = new System.Windows.GridLength(1, System.Windows.GridUnitType.Star);
-                        mGridUnitType = GridUnitType.Pixel;
-                        mGridUnitTypeValue = 0;
-                    }
-                    else if(double.IsNaN( widget.Height ) == false) //Absolute value
-                    {
-                        rowDef.Height = new System.Windows.GridLength(widget.Height, System.Windows.GridUnitType.Pixel);
-                    }
-                    else //Wrap content as default
-                    {
-                        //Check if the paddings are not set by the user
-                        if (false == mPaddingSetByUser)
+
+                        // FILL_SPACE_V && FILL_SPACE_H
+                        if (widget.FILL_SPACE_H)
                         {
-                            setPaddingSpacers(0, GridUnitType.Pixel);
+                            // If this gets set on false the widget will not get added
+                            // to the stack panel container for the time being.
+                            stackPanelRequired = false;
                         }
-                        rowDef.Height = new System.Windows.GridLength(1, System.Windows.GridUnitType.Auto);
-                        mGridUnitType = GridUnitType.Pixel;
-                        mGridUnitTypeValue = 0;
+                        // FILL_SPACE_V && WRAP_CONT_H
+                        else if (widget.WRAP_CONT_H)
+                        {
+                            mStackPanels[stackPanelIndex].Orientation = Orientation.Horizontal;
+                        }
                     }
-
-                    mGrid.RowDefinitions.Insert(mGrid.RowDefinitions.Count - 1, upperSpacerRowDef);
-                    mGrid.RowDefinitions.Insert(mGrid.RowDefinitions.Count - 1, rowDef);
-                    mGrid.RowDefinitions.Insert(mGrid.RowDefinitions.Count - 1, bottomSpacerRowDef);
-
-                    Grid.SetColumn((widget.View as System.Windows.FrameworkElement), 1);
-                    Grid.SetRow((widget.View as System.Windows.FrameworkElement), mGrid.RowDefinitions.Count - 3);
-
-                    if (widget.View is FrameworkElement)
+                    // WRAP_CONT_V
+                    else if (widget.WRAP_CONT_V)
                     {
-                        (widget.View as FrameworkElement).HorizontalAlignment = this.mGrid.HorizontalAlignment;
-                        (widget.View as FrameworkElement).VerticalAlignment = this.mGrid.VerticalAlignment;
-                    }
-                    mGrid.Children.Add(widget.View);
+                        mStackPanels[mStackPanels.Count - 1].Orientation = Orientation.Vertical;
 
-                    setSpacers(mGridUnitTypeValue, mGridUnitType);
+                        // WRAP_CONT_V && WRAP_CONT_H
+                        if (widget.WRAP_CONT_H)
+                        {
+                            mStackPanels[mStackPanels.Count - 1].Orientation = Orientation.Horizontal;
+                        }
+                    }
+
+                    //Adding the children to the visible structure
+
+                    mGrid.RowDefinitions.Insert(mGrid.RowDefinitions.Count - 1, rowDef);
+
+                    if (stackPanelRequired)
+                    {
+                        // If the stack panel container is required the widget gets added to that container
+                        // and then this goes to the grid. Read above for the logical explanation.
+                        mStackPanels[stackPanelIndex].Children.Add((widget.View as System.Windows.FrameworkElement));
+                        Grid.SetColumn(mStackPanels[stackPanelIndex], 1);
+                        Grid.SetRow(mStackPanels[stackPanelIndex], mGrid.RowDefinitions.Count - 2);
+                        mGrid.Children.Add(mStackPanels[stackPanelIndex]);
+                    }
+                    else
+                    {
+                        // If the stack panel container is not required the widget is added directly
+                        // to the grid. Also the stack panel is added to the parent grid for future
+                        // posible use. (in case the size policy changes after the child widget
+                        // was added to the parent.
+                        Grid.SetColumn((widget.View as FrameworkElement), 1);
+                        Grid.SetRow(mStackPanels[stackPanelIndex], mGrid.RowDefinitions.Count - 2);
+                        Grid.SetRow((widget.View as FrameworkElement), mGrid.RowDefinitions.Count - 2);
+                        mGrid.Children.Add(mStackPanels[stackPanelIndex]);
+                        mGrid.Children.Add(widget.View);
+                    }
+
+                    widget.RowNumber = mGrid.RowDefinitions.Count - 2;
+                    widget.ColumnNumber = 1;
                 });
             }
 
@@ -207,13 +252,25 @@ namespace MoSync
                 MoSync.Util.RunActionOnMainThreadSync(() =>
                 {
                     WidgetBaseWindowsPhone widget = (child as WidgetBaseWindowsPhone);
-                    int x = Grid.GetRow((widget.View) as System.Windows.FrameworkElement);
-                    if ((x + 1) < mGrid.RowDefinitions.Count)
+                    FrameworkElement fw = (widget.View) as System.Windows.FrameworkElement;
+
+                    if (mGrid.Children.Contains(mStackPanels[widget.RowNumber - 1]))
                     {
-                        mGrid.RowDefinitions.RemoveAt(x + 1);
-                        mGrid.RowDefinitions.RemoveAt(x);
-                        mGrid.RowDefinitions.RemoveAt(x - 1);
-                        mGrid.Children.Remove((child as WidgetBaseWindowsPhone).View);
+                        if (RemoveWidgetFromStackPanelContainer(child, widget.RowNumber))
+                        {
+                            mGrid.Children.Remove(fw);
+                            mGrid.Children.Remove(mStackPanels[widget.RowNumber - 1]);
+                        }
+                    }
+                    if (mGrid.Children.Contains(fw))
+                    {
+                        int x = widget.RowNumber;
+
+                        if (x < mGrid.RowDefinitions.Count)
+                        {
+                            mGrid.RowDefinitions.RemoveAt(x);
+                            mGrid.Children.Remove(fw);
+                        }
                     }
                 });
                 base.RemoveChild(child);
@@ -262,24 +319,18 @@ namespace MoSync
                         mGrid.VerticalAlignment = VerticalAlignment.Bottom;
                         mSpacerUp.Height = new GridLength(1, GridUnitType.Star);
                         mSpacerDown.Height = new GridLength(0);
-
-                        mPaddingSetByUser = true;
                     }
                     else if (value.Equals(MoSync.Constants.MAW_ALIGNMENT_TOP))
                     {
                         mGrid.VerticalAlignment = VerticalAlignment.Top;
                         mSpacerDown.Height = new GridLength(1, GridUnitType.Star);
                         mSpacerUp.Height = new GridLength(0);
-
-                        mPaddingSetByUser = true;
                     }
                     else if (value.Equals(MoSync.Constants.MAW_ALIGNMENT_CENTER))
                     {
                         mGrid.VerticalAlignment = VerticalAlignment.Center;
                         mSpacerDown.Height = new GridLength(1, GridUnitType.Auto);
                         mSpacerUp.Height = new GridLength(1, GridUnitType.Auto);
-
-                        mPaddingSetByUser = true;
                     }
                     else throw new InvalidPropertyValueException();
                 }
@@ -294,7 +345,6 @@ namespace MoSync
                 set
                 {
                     mSpacerDown.Height = new GridLength(value);
-                    mPaddingSetByUser = true;
                 }
             }
 
@@ -307,7 +357,6 @@ namespace MoSync
                 set
                 {
                     mSpacerUp.Height = new GridLength(value);
-                    mPaddingSetByUser = true;
                 }
             }
 
@@ -364,31 +413,56 @@ namespace MoSync
                 }
             }
 
-            //Sets all the inter widget spacers to 0, star or auto
-            private void setSpacers(int gridUnitValue, GridUnitType gridUnitType)
+            /*
+             * Sets the orientation of the stack panel container
+             *
+             * @param1: int index - the index of the row
+             * @param2: Orientation orientation - the Orientation value
+             */
+            public void SetContainerOrientation(IWidget widget, int index, Orientation orientation)
             {
-                if (0 != mGrid.RowDefinitions[1].Height.Value || false == mGrid.RowDefinitions[1].Height.IsAbsolute)
-                    mGrid.RowDefinitions[1].Height = new GridLength(0, GridUnitType.Pixel);
-                if (0 != mGrid.RowDefinitions[mGrid.RowDefinitions.Count - 2].Height.Value || false == mGrid.RowDefinitions[mGrid.RowDefinitions.Count - 2].Height.IsAbsolute)
-                    mGrid.RowDefinitions[mGrid.RowDefinitions.Count - 2].Height = new GridLength(0, GridUnitType.Pixel);
+                // Take 1 away from index since the number of columns
+                // is higher with 1 then the number of stack panel containers.
+                // The extra row is the top padding.
+                index -= 1;
 
-                int step = 0;
-
-                for (int i = 3; i < mGrid.RowDefinitions.Count - 2; i++)
+                FrameworkElement fElem = (widget as WidgetBaseWindowsPhone).View as FrameworkElement;
+                if (index < mStackPanels.Count && index >= 0)
                 {
-                    step++;
-                    if (2 >= step)
+                    if (!mStackPanels[index].Children.Contains(fElem) &&
+                       mStackPanels[index].Children.Count == 0 &&
+                       mGrid.Children.Contains(fElem))
                     {
-                        mGrid.RowDefinitions[i].Height = new GridLength(gridUnitValue, gridUnitType);
+                        mGrid.Children.Remove(fElem);
+                        mStackPanels[index].Children.Add(fElem);
                     }
-                    else step = 0;
+
+                    mStackPanels[index].Orientation = orientation;
                 }
             }
 
-            private void setPaddingSpacers(int gridUnitValue, GridUnitType gridUnitType)
+            /*
+             * Removes the widget from the stack panel container. Required
+             * when using FILL_SPACE_V && FILL_SPACE_H on a widget
+             *
+             * @param1: IWidget widget - the widget
+             * @param2: int index - the index of the row
+             */
+            public bool RemoveWidgetFromStackPanelContainer(IWidget widget, int index)
             {
-                mGrid.RowDefinitions[0].Height = new GridLength(gridUnitValue, gridUnitType);
-                mGrid.RowDefinitions[mGrid.RowDefinitions.Count - 1].Height = new GridLength(gridUnitValue, gridUnitType);
+                // Take 1 away from index since the number of columns
+                // is higher with 1 then the number of stack panel containers.
+                // The extra row is the t top padding.
+                index -= 1;
+                FrameworkElement fElem = (widget as WidgetBaseWindowsPhone).View as FrameworkElement;
+                if (mStackPanels[index].Children.Contains(fElem))
+                {
+                    mStackPanels[index].Children.Remove(fElem);
+                    mGrid.Children.Add(fElem);
+                    return true;
+                }
+
+                return false;
             }
         }
     }

@@ -34,14 +34,13 @@ static const int DAYS_IN_MONTH[12] =
 static const int _DAYS_BEFORE_MONTH[12] =
 {0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334};
 
-#define _ISLEAP(y) (((y) % 4) == 0 && (((y) % 100) != 0 || (((y)+1900) % 400) == 0))
-#define _DAYS_IN_YEAR(year) (_ISLEAP(year) ? 366 : 365)
+#define _ISLEAP(y) (((y) % 4) == 0 && (((y) % 100) != 0 || ((y) % 400) == 0))
+#define _DAYS_IN_YEAR(year) (_ISLEAP((year) + 1900) ? 366 : 365)
  
 static const int mon_lengths[2][MONSPERYEAR] = {
 	{31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31},
 	{31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31}
 };
-
 
 static const int year_lengths[2] = {
 	365,
@@ -71,7 +70,6 @@ struct tm* split_time(time_t timer, struct tm* res)
 		rem -= SECSPERDAY;
 		++days;
 	}
-
 	/* compute hour, min, and sec */
 	res->tm_hour = (int) (rem / SECSPERHOUR);
 	rem %= SECSPERHOUR;
@@ -89,7 +87,7 @@ struct tm* split_time(time_t timer, struct tm* res)
 		for (;;)
 		{
 			yleap = _ISLEAP(y);
-			if (days <= year_lengths[yleap])
+			if (days < year_lengths[yleap])
 				break;
 			y++;
 			days -= year_lengths[yleap];
@@ -108,9 +106,9 @@ struct tm* split_time(time_t timer, struct tm* res)
 	res->tm_year = y - YEAR_BASE;
 	res->tm_yday = days;
 	ip = mon_lengths[yleap];
-	for (res->tm_mon = 0; days > ip[res->tm_mon]; ++res->tm_mon)
+	for (res->tm_mon = 0; days >= ip[res->tm_mon]; ++res->tm_mon)
 		days -= ip[res->tm_mon];
-	res->tm_mday = days;
+	res->tm_mday = days + 1;
 
 	return res;
 }

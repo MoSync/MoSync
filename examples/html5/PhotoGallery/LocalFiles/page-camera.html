@@ -12,9 +12,10 @@
 <html>
 	<head>
 		<meta name="viewport" content="width=device-width">
+		<meta http-equiv="Content-type" content="text/html; charset=utf-8">
 		<title>Camera</title>
 		<link rel="stylesheet" href="style.css">
-		<script src="js/wormhole.js"></script>
+		<script src="js/wormhole.js" charset="utf-8"></script>
 		<script type="text/javascript">
 		var camera = (function()
 		{
@@ -66,7 +67,9 @@
 			<div class="pane view">
 				<img id="photo" src="img/MoSyncLogo.png" style="width:100%"/>
 			</div>
-			<div class="pane button" onclick="camera.uploadPhoto()">Upload Photo</div>
+			<div class="pane button" onclick="camera.uploadPhoto()">
+				Upload Photo<br/>(makes your photo publicly available)
+			</div>
 		</div>
 	</body>
 </html>

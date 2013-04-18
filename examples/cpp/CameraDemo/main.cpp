@@ -43,16 +43,19 @@ MA 02110-1301, USA.
 #include "SettingsScreen.h"
 #include "ImageScreen.h"
 
-#define FONT_HEIGHT_WP7			17
+#define FONT_HEIGHT_WP7 17
 
 using namespace MAUtil;
 using namespace NativeUI;
+
 /**
  * Class that wraps a NativeUI screen widget. We implement
  * the CustomEventListener interface to be able to process
  * widget events.
  */
-class AppScreen : public ButtonListener, public StackScreenListener
+class AppScreen :
+	public ButtonListener,
+	public StackScreenListener
 {
 public:
 	/**
@@ -60,18 +63,11 @@ public:
 	 */
 	AppScreen()
 	{
-		mLastEnc = 0;
-
-		mCurrentZoomIndex = 0;
+		setScreenOrientation();
+		initializeCamera();
 		createUI();
-
-		// set the screen supported orientations
-		int mSupportedOrientations = MA_SCREEN_ORIENTATION_PORTRAIT |
-				MA_SCREEN_ORIENTATION_LANDSCAPE_RIGHT |
-				MA_SCREEN_ORIENTATION_LANDSCAPE_LEFT;
-		maScreenSetSupportedOrientations(mSupportedOrientations);
+		setCameraProperties();
 	}
-
 
 	/**
 	 * In the destructor, we destroy the widgets to release memory.
@@ -83,45 +79,42 @@ public:
 		delete mScreen;
 	}
 
+	void setScreenOrientation()
+	{
+		// Set screen orientations.
+		int mSupportedOrientations = MA_SCREEN_ORIENTATION_PORTRAIT |
+				MA_SCREEN_ORIENTATION_LANDSCAPE_RIGHT |
+				MA_SCREEN_ORIENTATION_LANDSCAPE_LEFT;
+		maScreenSetSupportedOrientations(mSupportedOrientations);
+	}
+
 	/**
 	 * Here we create the user interface widgets.
 	 */
 	void createUI()
 	{
-		// Make the AppScreen listen for events coming from widgets.
-		//MAUtil::Environment::getEnvironment().addCustomEventListener(this);
-		char buffer[256];
-		maCameraGetProperty(MA_CAMERA_MAX_ZOOM, buffer, 256);
-		maxZoom = atoi(buffer);
-		mStackScreen = new StackScreen();
-		mStackScreen->addStackScreenListener(this);
+		createStackScreen();
 		createSettingsScreen();
 		createMainScreen();
 		createImageScreen();
-		setupCameraProperties();
+	}
+
+	void createStackScreen()
+	{
+		mStackScreen = new StackScreen();
+		mStackScreen->addStackScreenListener(this);
 	}
 
 	void createSettingsScreen()
 	{
 		mSettingsScreen = new SettingsScreen();
-		mSettingsScreen->numCameras = maCameraNumber();
-		char buffer[256];
-		maCameraGetProperty(MA_CAMERA_FLASH_SUPPORTED, buffer, 256);
-		if(strcmp(buffer, "true") == 0)
-		{
-			mSettingsScreen->flashSupported = true;
-		}
-		else
-		{
-			mSettingsScreen->flashSupported = false;
-		}
-		mSettingsScreen->initialize(mStackScreen);
+		mSettingsScreen->initializeUI(mStackScreen);
 	}
 
 	void createImageScreen()
 	{
 		mImageScreen = new ImageScreen();
-		mImageScreen->initialize(mStackScreen);
+		mImageScreen->initializeUI(mStackScreen);
 	}
 
 	void createMainScreen()
@@ -149,16 +142,30 @@ public:
 
 		//Camera Control buttons are created here
 		createCameraControlButtons();
-
 	}
 
 	/**
-	 * A Wrapper function for creating the camera control buttons
-	 * and the layout that holds them
+	 * A Wrapper function that creates the camera widget
+	 * and binds it to the default camera, The binding
+	 * can be changed through the settings screen
+	 */
+	void createCameraWidget()
+	{
+		mCameraPreview = new CameraPreview();
+
+		mCameraPreview->fillSpaceHorizontally();
+		mCameraPreview->fillSpaceVertically();
+
+		mMainLayoutWidget->addChild(mCameraPreview);
+	}
+
+	/**
+	 * Function for creating the camera control buttons
+	 * and the layout that holds them.
 	 */
 	void createCameraControlButtons()
 	{
-
+		// Create buttons.
 		mZoomInButton = new Button();
 		mZoomInButton->setText("Zoom +");
 		mZoomInButton->fillSpaceHorizontally();
@@ -179,10 +186,7 @@ public:
 		mZoomOutButton->fillSpaceHorizontally();
 		mZoomOutButton->addButtonListener(this);
 
-		mSecondLayoutWidget = new HorizontalLayout();
-		mSecondLayoutWidget->fillSpaceHorizontally();
-
-		if(isWP7())
+		if (isWP7())
 		{
 			mZoomInButton->setFontSize(FONT_HEIGHT_WP7);
 			mZoomOutButton->setFontSize(FONT_HEIGHT_WP7);
@@ -190,53 +194,37 @@ public:
 			mShowLastImageButton->setFontSize(FONT_HEIGHT_WP7);
 		}
 
+		// Create layout to hold buttons.
+		mSecondLayoutWidget = new HorizontalLayout();
+		mSecondLayoutWidget->fillSpaceHorizontally();
+		mSecondLayoutWidget->wrapContentVertically();
+
+		// Make buttons wrap content vertically.
 		mZoomInButton->wrapContentVertically();
 		mZoomOutButton->wrapContentVertically();
 		mSettingsButton->wrapContentVertically();
 		mShowLastImageButton->wrapContentVertically();
-		mSecondLayoutWidget->wrapContentVertically();
 
-		//Adding buttons to the horizontal Layout
+		// Add buttons to the horizontal Layout.
 		mSecondLayoutWidget->addChild(mZoomInButton);
 		mSecondLayoutWidget->addChild(mShowLastImageButton);
 		mSecondLayoutWidget->addChild(mSettingsButton);
 		mSecondLayoutWidget->addChild(mZoomOutButton);
 
-
-		// Then we add the layout to its parent
+		// Then we add the button layout to its parent.
 		mMainLayoutWidget->addChild(mSecondLayoutWidget);
 
-		//We create the capture button as a larger button
-		//so it is easier to be touched
+		// We create the capture button as a larger button
+		// so it is easier to be touched.
 		mCaptureButton = new Button();
-
 		mCaptureButton->setText("Take snapshot");
 		mCaptureButton->fillSpaceHorizontally();
 		mCaptureButton->wrapContentVertically();
 		mCaptureButton->addButtonListener(this);
 
-
-		//Add the capture button to the main layout so
-		//it will be larger than others.
+		// Add the capture button to the main layout so
+		// that it will be larger than others.
 		mMainLayoutWidget->addChild(mCaptureButton);
-
-	}
-
-	/**
-	 * A Wrapper function that creates the camera widget
-	 * and binds it to the default camera, The binding
-	 * can be changed through the settings screen
-	 */
-	void createCameraWidget()
-	{
-		mCameraPreview = new CameraPreview();
-
-		mCameraPreview->fillSpaceHorizontally();
-		mCameraPreview->fillSpaceVertically();
-
-		//bind the widget to the default camera
-		mCameraPreview->bindToCurrentCamera();
-		mMainLayoutWidget->addChild(mCameraPreview);
 	}
 
 	/**
@@ -248,28 +236,63 @@ public:
 		// Note: This would hide any previously visible screen.
 		mStackScreen->push(mScreen);
 		mStackScreen->show();
+
+		// Start the camera.
 		maCameraStart();
 	}
 
 	/**
-	 * A function to setup the camera properties whenever they are
-	 * changed and we come back fro mthe settings screen
+	 * Initialize the camera and camera properties.
 	 */
-	void setupCameraProperties()
+	void initializeCamera()
 	{
-		setupCameraSize();
-		maCameraSelect(mSettingsScreen->getCurrentCamera());
-		mCameraPreview->bindToCurrentCamera();
-		maCameraSetProperty(
-			MA_CAMERA_FLASH_MODE,
-			mSettingsScreen->getFLashMode()
-			);
-		char buffer[256];
-		maCameraGetProperty(MA_CAMERA_MAX_ZOOM, buffer, 256);
-		maxZoom = atoi(buffer);
+		// Use first camera by default.
+		maCameraSelect(0);
 
-		//Disable the zoom buttons if zoom is not supported
-		if(maxZoom == 0)
+		// Initialize variables.
+		mLastImage = 0;
+		mCurrentZoomIndex = 0;
+	}
+
+	/**
+	 * A function to setup the camera properties whenever they are
+	 * changed and we come back from the settings screen.
+	 */
+	void setCameraProperties()
+	{
+		char buffer[256];
+
+		// Select the currently selected camera.
+		maCameraSelect(mSettingsScreen->getCurrentCamera());
+
+		// Bind preview widget to selected camera.
+		mCameraPreview->bindToCurrentCamera();
+
+		// Choose the smallest camera snapshot format.
+		mCameraFormat = maCameraFormatNumber() - 1;
+
+		// Set flash supported mode of the settings screen.
+		maCameraGetProperty(MA_CAMERA_FLASH_SUPPORTED, buffer, 256);
+		bool flashSupported = strcmp(buffer, "true") == 0;
+		lprintfln("@@@@@ flash supported: %s", buffer);
+		mSettingsScreen->setFlashSupported(flashSupported);
+
+		// Set currently selected flash mode.
+		if (flashSupported)
+		{
+			lprintfln("@@@@@ flash is supported");
+			maCameraSetProperty(
+				MA_CAMERA_FLASH_MODE,
+				mSettingsScreen->getFlashMode()
+				);
+		}
+
+		// Obtain max zoom level.
+		maCameraGetProperty(MA_CAMERA_MAX_ZOOM, buffer, 256);
+		mMaxZoom = atoi(buffer);
+
+		// Disable the zoom buttons if zoom is not supported.
+		if (mMaxZoom == 0)
 		{
 			mZoomInButton->setEnabled(false);
 			mZoomInButton->setFontColor(0x969696);
@@ -277,7 +300,7 @@ public:
 			mZoomOutButton->setEnabled(false);
 			mZoomOutButton->setFontColor(0x969696);
 		}
-		else //Or enable show them if it's supported
+		else // Or enable show them if it's supported
 		{
 			mZoomInButton->setEnabled(true);
 			mZoomInButton->setFontColor(0x000000);
@@ -285,33 +308,13 @@ public:
 			mZoomOutButton->setEnabled(true);
 			mZoomOutButton->setFontColor(0x000000);
 		}
-
-	}
-
-
-	void setupCameraSize()
-	{
-		int numFormats = maCameraFormatNumber();
-
-		// Choose the smallest possible format.
-		// Sometimes it's the first, sometimes the last
-		MA_CAMERA_FORMAT formatFirst;
-		maCameraFormat(0, &formatFirst);
-
-		MA_CAMERA_FORMAT formatLast;
-		maCameraFormat(numFormats-1, &formatLast);
-
-		if(formatFirst.height > formatLast.height)
-			mCameraFormat = numFormats-1;
-		else
-			mCameraFormat = 0;
 	}
 
 	/**
 	 * This method implements a button event listener.
 	 * Button click events are sent here.
 	 */
-	virtual void buttonClicked(Widget* button)
+	void buttonClicked(Widget* button)
 	{
 		if (mCaptureButton == button)
 		{
@@ -330,7 +333,7 @@ public:
 		{
 			//Increase the zoom level if it is more
 			//than the maximum supported zoom
-			if(mCurrentZoomIndex < maxZoom)
+			if (mCurrentZoomIndex < mMaxZoom)
 			{
 				mCurrentZoomIndex++;
 			}
@@ -342,29 +345,28 @@ public:
 		else if (mZoomOutButton == button)
 		{
 			//Decrease the zoom index if it is more than 0
-			if(mCurrentZoomIndex > 0)
+			if (mCurrentZoomIndex > 0)
 			{
 				mCurrentZoomIndex--;
 			}
 			char buffer[256];
 			sprintf(buffer, "%i", mCurrentZoomIndex);
 			maCameraSetProperty(MA_CAMERA_ZOOM, buffer);
-
 		}
 	}
 
 	/**
 	 * This method implements a stack screen event listener.
-	 * Pop events are sent here
+	 * Pop events are sent here.
 	 */
-	virtual void stackScreenScreenPopped(
-	            StackScreen* stackScreen,
-	            Screen* fromScreen,
-	            Screen* toScreen)
+	void stackScreenScreenPopped(
+		StackScreen* stackScreen,
+		Screen* fromScreen,
+		Screen* toScreen)
 	{
 		if (toScreen == mScreen)
 		{
-			setupCameraProperties();
+			setCameraProperties();
 			maCameraStart();
 		}
 	}
@@ -382,96 +384,137 @@ public:
 	 */
 	void captureButtonClicked()
 	{
-		if(mLastEnc != 0)
+		if (mLastImage != 0)
 		{
-			maDestroyObject(mLastEnc);
+			maDestroyPlaceholder(mLastImage);
 		}
-		mLastEnc = maCreatePlaceholder();
-		maCameraSnapshot(mCameraFormat, mLastEnc);
-		setupCameraProperties();
+
+		mLastImage = maCreatePlaceholder();
+
+		int snapshotResult = maCameraSnapshot(mCameraFormat, mLastImage);
+		if (snapshotResult < 0)
+		{
+			// An error occurred while taking the snapshot.
+			maDestroyPlaceholder(mLastImage);
+			mLastImage = 0;
+		}
+
+		// Restart camera.
+		maCameraStop();
+		setCameraProperties();
 		maCameraStart();
 	}
-
 
 	/**
 	 * This method is called when the Submit button is clicked.
 	 */
 	void showImageButtonClicked()
 	{
-		if(mLastEnc == 0)
+		if (mLastImage == 0)
 		{
-			//do nothing when there is no image
+			// Do nothing when there is no image taken.
 			return;
 		}
 		maCameraStop();
-		mImageScreen->setImageDataHandle(mLastEnc);
+		mImageScreen->setImageDataHandle(mLastImage);
 		mImageScreen->pushImageScreen();
 	}
 
-private:
-
-	/* The Settings screen class that
-	 * creates and handles the settings view*/
-	SettingsScreen *mSettingsScreen;
-
-	/* The Image screen class that
-	 * creates and handles the Image view*/
-	ImageScreen *mImageScreen;
-
-	/* Stack Screen used to handle screen changes*/
-	StackScreen *mStackScreen;
-
-	/* place holder used for keeping the last image*/
-	MAHandle mLastEnc;
-
-	/** The screen widget. */
-	Screen *mScreen;
-
-	/** The main layout that holds the other widgets. */
-	VerticalLayout *mMainLayoutWidget;
-
-	/** The main layout that holds the other widgets. */
-	HorizontalLayout *mSecondLayoutWidget;
-
-	/** Text editor box for user input. */
-	CameraPreview *mCameraPreview;
-
-	/** The Settings button. */
-	Button *mSettingsButton;
-
-	/** The Show Image button. */
-	Button *mShowLastImageButton;
-
-	/** The Capture button. */
-	Button *mCaptureButton;
-
-	/** The Zoom In button. */
-	Button *mZoomInButton;
-
-	/** The Zoom Out button. */
-	Button *mZoomOutButton;
-
-	/* index of the current zoom level*/
-	int mCurrentZoomIndex;
-
-	/* maximum zoom supported by the camera*/
-	int maxZoom;
-
-	/* Size of the taken picture */
-	int mCameraFormat;
-
 	/**
-	 * isWP7 function verifies if the platform is Windows Phone 7
+	 * This function verifies if the platform is Windows Phone 7
 	 * @return true if we are running on WP7 otherwise false
 	 */
 	bool isWP7()
 	{
-		char platform[20];
+		char platform[64];
 		maGetSystemProperty("mosync.device.OS", platform, 20);
-
-		if(strcmp(platform, "iPhone OS") == 0 || strcmp(platform, "Android") == 0) return false;
-		return true;
+		return
+			strcmp(platform, "iPhone OS") != 0 &&
+			strcmp(platform, "Android") != 0;
 	}
+
+private:
+	/**
+	 * The Settings screen class that
+	 * creates and handles the settings view.
+	 */
+	SettingsScreen* mSettingsScreen;
+
+	/**
+	 * The Image screen class that
+	 * creates and handles the Image view.
+	 */
+	ImageScreen* mImageScreen;
+
+	/**
+	 * Stack Screen used to handle screen changes.
+	 */
+	StackScreen* mStackScreen;
+
+	/**
+	 * The screen widget.
+	 */
+	Screen* mScreen;
+
+	/**
+	 * The main layout that holds the other widgets.
+	 */
+	VerticalLayout* mMainLayoutWidget;
+
+	/**
+	 * The main layout that holds the other widgets.
+	 */
+	HorizontalLayout* mSecondLayoutWidget;
+
+	/**
+	 * Text editor box for user input.
+	 */
+	CameraPreview* mCameraPreview;
+
+	/**
+	 * The Settings button.
+	 */
+	Button* mSettingsButton;
+
+	/**
+	 * The Show Image button.
+	 */
+	Button* mShowLastImageButton;
+
+	/**
+	 * The Capture button.
+	 */
+	Button* mCaptureButton;
+
+	/**
+	 * The Zoom In button.
+	 */
+	Button* mZoomInButton;
+
+	/**
+	 * The Zoom Out button.
+	 */
+	Button* mZoomOutButton;
+
+	/**
+	 * Placeholder used for keeping the last image.
+	 */
+	MAHandle mLastImage;
+
+	/**
+	 * Index of the current zoom level.
+	 */
+	int mCurrentZoomIndex;
+
+	/**
+	 * Maximum zoom supported by the camera.
+	 */
+	int mMaxZoom;
+
+	/**
+	 * Size of the taken picture.
+	 */
+	int mCameraFormat;
 };
 
 // That's the screen class finished, now we move on to the Moblet that
@@ -482,7 +525,9 @@ private:
  * we manage the application and handle events. Our Moblet inherits
  * the Moblet base class in the MAUtil library.
  */
-class CameraDemoMoblet : public MAUtil::Moblet
+class CameraDemoMoblet :
+	public Moblet,
+	public FocusListener
 {
 public:
 	/**
@@ -495,6 +540,9 @@ public:
 
 		// Display the screen.
 		mAppScreen->show();
+
+		// Register to get focus notifications.
+		addFocusListener(this);
 	}
 
 	/**
@@ -503,6 +551,24 @@ public:
 	virtual ~CameraDemoMoblet()
 	{
 		delete mAppScreen;
+	}
+
+	/**
+	 * This method implements a focus listener.
+	 * We stop the camera when focus is lost.
+	 */
+	void focusLost()
+	{
+		maCameraStop();
+	}
+
+	/**
+	 * This method implements a focus listener.
+	 * We start the camera when focus is gained.
+	 */
+	void focusGained()
+	{
+		maCameraStart();
 	}
 
 	/**

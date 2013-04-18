@@ -451,9 +451,10 @@ public class MoSyncNativeUI implements RootViewReplacedListener
 	 * Internal wrapper for maImagePickerOpen that runs
 	 * the call in the UI thread.
 	 */
-	public int maImagePickerOpen()
+	public int maImagePickerOpen(int eventType)
 	{
-		final MoSyncImagePicker imagePicker = new MoSyncImagePicker(mMoSyncThread, mNativeUI.getImageTable());
+		final MoSyncImagePicker imagePicker = new MoSyncImagePicker(
+							mMoSyncThread, mNativeUI.getImageTable(), eventType);
 		getActivity().runOnUiThread(new Runnable() {
 			public void run()
 			{
@@ -508,6 +509,7 @@ public class MoSyncNativeUI implements RootViewReplacedListener
 	@Override
 	public void rootViewReplaced(View newRoot)
 	{
+		newRoot.clearFocus();
 		((MoSync) getActivity()).setRootView( newRoot );
 	}
 

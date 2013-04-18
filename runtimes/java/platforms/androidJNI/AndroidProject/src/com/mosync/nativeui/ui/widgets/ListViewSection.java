@@ -23,6 +23,7 @@ import static com.mosync.internal.generated.IX_WIDGET.MAW_LIST_VIEW_SECTION_TYPE
 import java.util.ArrayList;
 
 import android.app.Activity;
+import android.text.TextUtils;
 import android.util.Log;
 import android.widget.ListView;
 
@@ -52,7 +53,7 @@ import com.mosync.nativeui.util.properties.PropertyConversionException;
  */
 public class ListViewSection extends Layout
 {
-	static final int LIST_VIEW_SECTION_TYPE_NONE_SELECTED = 2;
+	static final int LIST_VIEW_SECTION_TYPE_NONE_SELECTED = -1;
 
 	/**
 	 * Section type:
@@ -87,6 +88,13 @@ public class ListViewSection extends Layout
 	public String mAlphabeticIndex = "";
 
 	private Activity mAppActivity = null;
+
+	/**
+	 * The section has an empty footer by default.
+	 * The footer can be removed by explicitely setting the
+	 * MAW_LIST_VIEW_SECTION_FOOTER property to an empty string.
+	 */
+	private Boolean mHasFooter = true;
 
 	/**
 	 * Constructor.
@@ -138,7 +146,6 @@ public class ListViewSection extends Layout
 				return IX_WIDGET.MAW_RES_INVALID_HANDLE;
 			}
 		}
-
 		child.setParent(this);
 		m_children.add( listIndex, child );
 		mItems.add(listIndex, (ListItemWidget)child);
@@ -178,6 +185,7 @@ public class ListViewSection extends Layout
 				createSegmentedSectionDefaultUI();
 				break;
 			case IX_WIDGET.MAW_LIST_VIEW_SECTION_TYPE_ALPHABETICAL:
+				mHasFooter = false;
 				break;
 			default:
 				Log.e("@@MoSync","maWidgetSetProperty invalid List View Section type");
@@ -438,13 +446,7 @@ public class ListViewSection extends Layout
 	 */
 	public boolean hasFooter()
 	{
-		if ( !mItems.isEmpty()
-				&& mItems.get(mItems.size()-1) != null
-				&& (mItems.get(mItems.size()-1).getItemType() == ITEM_VIEW_TYPE_FOOTER) )
-		{
-			return true;
-		}
-		return false;
+		return mHasFooter;
 	}
 
 	/**
@@ -458,7 +460,7 @@ public class ListViewSection extends Layout
 		// Check if header already exists.
 		if ( hasHeader() )
 		{
-			if ( !text.isEmpty() )
+			if ( !TextUtils.isEmpty(text) )
 			{
 				// Just update the header text.
 				setHeaderText(text);
@@ -495,7 +497,7 @@ public class ListViewSection extends Layout
 		// Check if header already exists.
 		if ( hasFooter() )
 		{
-			if ( !text.isEmpty() )
+			if ( !TextUtils.isEmpty(text) )
 			{
 				// Just update the footer text.
 				setFooterText(text);
@@ -515,6 +517,7 @@ public class ListViewSection extends Layout
 		{
 			// Create and add the footer after the last item - if that exists.
 			addSectionFooter();
+			mHasFooter = true;
 			setFooterText(text);
 			if (mAdapterListener != null)
 				mAdapterListener.itemAdded(mItems.get(mItems.size()), this, mItems.size());
@@ -557,9 +560,10 @@ public class ListViewSection extends Layout
 	 */
 	public void setFooterText(final String text)
 	{
-		if ( text.isEmpty() )
+		if ( TextUtils.isEmpty(text) )
 		{
 			// Remove the footer row.
+			mHasFooter = false;
 			m_children.remove(mItems.get(mItems.size()-1));
 
 			// Notify list adapter.
@@ -569,7 +573,17 @@ public class ListViewSection extends Layout
 		}
 		else
 		{
-			// Just update the footer text.
+			// Add a footer row if it was previously removed.
+			if (!mHasFooter)
+			{
+				mHasFooter = true;
+				addSectionFooter();
+				// Notify list adapter.
+				if (mAdapterListener != null)
+					mAdapterListener.itemAdded(
+							mItems.get(mItems.size()-1), this, mItems.size()-1);
+			}
+
 			mItems.get(mItems.size()-1).setProperty(
 					IX_WIDGET.MAW_LIST_VIEW_ITEM_TEXT, text);
 		}

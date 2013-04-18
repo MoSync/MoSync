@@ -76,9 +76,10 @@
         {
 			NSURL *url;
 			//Process a normal URL
+            //URLs can only be sent over the Internet using the ASCII character-set.
           if (schemaLocation.location == NSNotFound) {
 			  NSString *urlString = [NSString stringWithFormat:@"%@%@", baseUrl, value];
-			  NSString* webURLString = [urlString stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+			  NSString* webURLString = [urlString stringByAddingPercentEscapesUsingEncoding:NSASCIIStringEncoding];
 			  url = [[NSURL URLWithString: webURLString] filePathURL];
 		  } else {
               // Convert the string URL into ascii encoding.
@@ -339,11 +340,11 @@
 
         //We create a placeholder resource that holds the url string
         MAHandle urlHandle = (MAHandle) Base::gSyscall->resources.create_RT_PLACEHOLDER();
-        int size = (int)[url lengthOfBytesUsingEncoding:NSASCIIStringEncoding];
+        int size = (int)[url lengthOfBytesUsingEncoding:NSUTF8StringEncoding];
         Base::MemStream* ms = new Base::MemStream(size);
         Base::gSyscall->resources.add_RT_BINARY(urlHandle, ms);
         ms->seek(Base::Seek::Start, 0);
-        ms->write([url cStringUsingEncoding:NSASCIIStringEncoding], size);
+        ms->write([url cStringUsingEncoding:NSUTF8StringEncoding], size);
 
         eventData->urlData = urlHandle;
         event.data = (MAAddress)eventData;

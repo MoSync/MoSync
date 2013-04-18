@@ -72,7 +72,7 @@ public:
 	class ConstIterator;
 
 	/** \brief Iterator for a Dictionary.
-	* 
+	*
 	* An Iterator is bound to a specific Dictionary object.
 	* The Iterator can point to a specific element in that Dictionary, or at Dictionary::end(),
 	* which is "beyond" the last element of the Dictionary.
@@ -84,7 +84,7 @@ public:
 	public:
 		Storage& operator*();
 		Storage* operator->();
-	
+
 		/**
 		* Causes the Iterator to point to the next element in the Dictionary to which it is bound.
 		* If the Iterator points to Dictionary::end(), this operation will cause a crash.
@@ -114,7 +114,7 @@ public:
 	};
 
 	/** \brief Const Iterator for a Dictionary.
-	* 
+	*
 	* A ConstIterator is just like an ordinary Iterator, except
 	* all its methods and return values are const.
 	*/
@@ -122,7 +122,7 @@ public:
 	public:
 		const Storage& operator*() const;
 		const Storage* operator->() const;
-	
+
 		ConstIterator& operator++();
 		ConstIterator operator++(int);
 		ConstIterator& operator--();
@@ -204,6 +204,9 @@ protected:
 #endif
 
 	void init(CompareFunction);
+
+	static dnode_t* alloc(void*) GCCATTRIB(noreturn) { BIG_PHAT_ERROR; }
+	static void free(dnode_t* node, void*) { delete (DictNode*)node; }
 
 	/// Constructs an empty Dictionary.
 	Dictionary(CompareFunction cf, int keyOffset);

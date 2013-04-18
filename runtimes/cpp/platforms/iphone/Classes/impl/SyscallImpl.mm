@@ -38,6 +38,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <CoreMedia/CoreMedia.h>
 #include <sys/types.h> //
 #include <sys/sysctl.h>//to retrieve device model
+#include <sys/xattr.h>
 
 #include <helpers/CPP_IX_GUIDO.h>
 //#include <helpers/CPP_IX_ACCELEROMETER.h>
@@ -257,8 +258,8 @@ namespace Base {
 
 	int gWidth, gHeight;
 
-	Surface* gBackbuffer;
-	Surface* gDrawTarget;
+	Surface* gBackbuffer = NULL;
+	Surface* gDrawTarget = NULL;
 	MAHandle gDrawTargetHandle = HANDLE_SCREEN;
 
 	unsigned char *gBackBufferData;
@@ -399,11 +400,7 @@ namespace Base {
 
 		InitializeCriticalSection(&exitMutex);
 
-		gBackbuffer = new Surface(gWidth, gHeight);
-		CGContextRestoreGState(gBackbuffer->context);
-		CGContextTranslateCTM(gBackbuffer->context, 0, gHeight);
-		CGContextScaleCTM(gBackbuffer->context, 1.0, -1.0);
-		CGContextSaveGState(gBackbuffer->context);
+		gSyscall->createBackbuffer();
 
         //Construction of the default font names array
         CFStringEncoding enc=kCFStringEncodingMacRoman;
@@ -432,8 +429,6 @@ namespace Base {
                                         CFStringCreateWithCString(NULL, "Courier-Oblique",enc);
         gDefaultFontNames[FONT_MONOSPACE_INDEX|FONT_BOLD_INDEX|FONT_ITALIC_INDEX]=
                                         CFStringCreateWithCString(NULL, "Courier-BoldOblique",enc);
-
-        gDrawTarget = gBackbuffer;
 
         //Setting the initially selected font. "gHeight/40" was used originally, is kept for backwards compatibility
         MAHandle initFontHandle=maFontLoadDefault(INITIAL_FONT_TYPE,INITIAL_FONT_STYLE,gHeight/40);
@@ -494,6 +489,34 @@ namespace Base {
 			exit(0);
 		}
 		init();
+	}
+
+	void Syscall::deviceOrientationChanged()
+	{
+		if (isNativeUIEnabled())
+		{
+			return;
+		}
+
+		gSyscall->createBackbuffer();
+		maUpdateScreen();
+	}
+
+	void Syscall::createBackbuffer()
+	{
+		Surface* oldDrawTarget = gDrawTarget;
+		CGSize screenSize = [[ScreenOrientation getInstance] screenSize];
+		float width = screenSize.width;
+		float height = screenSize.height;
+
+		gBackbuffer = new Surface(width, height);
+		CGContextRestoreGState(gBackbuffer->context);
+		CGContextTranslateCTM(gBackbuffer->context, 0, height);
+		CGContextScaleCTM(gBackbuffer->context, 1.0, -1.0);
+		CGContextSaveGState(gBackbuffer->context);
+
+		gDrawTarget = gBackbuffer;
+		delete oldDrawTarget;
 	}
 
 	void Syscall::platformDestruct() {
@@ -754,16 +777,16 @@ namespace Base {
         //buffer must be large enough to hold the string
         //lenghtOfBytes does not include terminating '\0',
         //That's why we use less or equal
-        if(!fontName || bufferLength<=[fontName lengthOfBytesUsingEncoding:NSASCIIStringEncoding])
+        if(!fontName || bufferLength<=[fontName lengthOfBytesUsingEncoding:NSUTF8StringEncoding])
         {
             return RES_FONT_INSUFFICIENT_BUFFER;
         }
 
         //strncpy will also fill the rest of the buffer with '\0' characters
-        strncpy(buffer, [fontName cStringUsingEncoding:NSASCIIStringEncoding], bufferLength);
+        strncpy(buffer, [fontName cStringUsingEncoding:NSUTF8StringEncoding], bufferLength);
 
         //Increase by one for the terminating '\0'
-        return [fontName lengthOfBytesUsingEncoding:NSASCIIStringEncoding]+1;
+        return [fontName lengthOfBytesUsingEncoding:NSUTF8StringEncoding]+1;
     }
 
 
@@ -900,7 +923,10 @@ namespace Base {
 	}
 
 	SYSCALL(MAExtent, maGetScrSize()) {
-		return EXTENT(gWidth, gHeight);
+		CGSize size = [[ScreenOrientation getInstance] screenSize];
+		int width = (int) size.width;
+		int height = (int)size.height;
+		return EXTENT(width, height);
 	}
 
 	SYSCALL(void, maDrawImage(MAHandle image, int left, int top)) {
@@ -1184,35 +1210,42 @@ namespace Base {
 
     SYSCALL(int, maFileSetProperty(const char* path, int property, int value))
     {
-        NSURL *url = [NSURL fileURLWithPath:[NSString stringWithCString:path encoding:NSASCIIStringEncoding] isDirectory:NO];
+        NSURL *url = [NSURL fileURLWithPath:[NSString stringWithCString:path encoding:NSUTF8StringEncoding] isDirectory:NO];
         if(!url || ![[NSFileManager defaultManager] fileExistsAtPath:[url path]])
         {
             return MA_FERR_NOTFOUND;
         }
 
+        int returnValue = 0;
         switch (property) {
             case MA_FPROP_IS_BACKED_UP:
             {
-                BOOL exclude = (value == 0);
-                BOOL set = [url setResourceValue: [NSNumber numberWithBool:exclude] forKey:NSURLIsExcludedFromBackupKey error:NULL];
-
-                if(set)
+                if (&NSURLIsExcludedFromBackupKey == nil)
                 {
-                    return 0;
+                    // For iOS <= 5.0.1.
+                    const char* filePath = [[url path] fileSystemRepresentation];
+                    const char* attrName = "com.apple.MobileBackup";
+                    u_int8_t attrValue = 1;
+                    int result = setxattr(filePath, attrName, &attrValue, sizeof(attrValue), 0, 0);
+                    returnValue = (result == 0) ? 0 : MA_FERR_GENERIC;
                 }
                 else
                 {
-                    return MA_FERR_GENERIC;
+                    // For iOS >= 5.1
+                    NSNumber* value = [NSNumber numberWithBool:(value == 0)];
+                    BOOL set = [url setResourceValue:value forKey:NSURLIsExcludedFromBackupKey error:NULL];
+                    returnValue = set ? 0 : MA_FERR_GENERIC;
                 }
             }
             break;
 
             default:
             {
-                return MA_FERR_NO_SUCH_PROPERTY;
+                returnValue = MA_FERR_NO_SUCH_PROPERTY;
             }
             break;
         }
+        return returnValue;
     }
 
 	static AVAudioPlayer* sSoundPlayer = NULL;
@@ -1299,8 +1332,8 @@ namespace Base {
 
 		MFMessageComposeViewController *smsController = [[MFMessageComposeViewController alloc] init];
 
-		smsController.recipients = [NSArray arrayWithObject:[NSString stringWithCString:dst encoding:NSASCIIStringEncoding]];
-		smsController.body = [NSString stringWithCString:msg encoding:NSASCIIStringEncoding];
+		smsController.recipients = [NSArray arrayWithObject:[NSString stringWithCString:dst encoding:NSUTF8StringEncoding]];
+		smsController.body = [NSString stringWithCString:msg encoding:NSUTF8StringEncoding];
 
 		smsController.messageComposeDelegate = [[SMSResultDelegate alloc] init];
 
@@ -1409,30 +1442,30 @@ namespace Base {
 		} else if (strcmp(key, "mosync.path.local") == 0) {
 			NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
 			NSString *documentsDirectoryPath = [NSString stringWithFormat:@"%@/",[paths objectAtIndex:0]];
-			BOOL success = [documentsDirectoryPath getCString:buf maxLength:size encoding:NSASCIIStringEncoding];
+			BOOL success = [documentsDirectoryPath getCString:buf maxLength:size encoding:NSUTF8StringEncoding];
 			res = (success)?strlen(buf) + 1: -1;
 		} else if (strcmp(key, "mosync.path.local.urlPrefix") == 0) {
-			BOOL success = [@"file://localhost/" getCString:buf maxLength:size encoding:NSASCIIStringEncoding];
+			BOOL success = [@"file://localhost/" getCString:buf maxLength:size encoding:NSUTF8StringEncoding];
 			res = (success)?strlen(buf) + 1: -1;
 		} else if (strcmp(key, "mosync.device.name") == 0) {
-			BOOL success = [[[UIDevice currentDevice] name] getCString:buf maxLength:size encoding:NSASCIIStringEncoding];
+			BOOL success = [[[UIDevice currentDevice] name] getCString:buf maxLength:size encoding:NSUTF8StringEncoding];
 			res = (success)?strlen(buf) + 1: -1;
 		} else if (strcmp(key, "mosync.device.UUID")== 0) {
-			BOOL success = [[[UIDevice currentDevice] uniqueIdentifier] getCString:buf maxLength:size encoding:NSASCIIStringEncoding];
+			BOOL success = [[[UIDevice currentDevice] uniqueIdentifier] getCString:buf maxLength:size encoding:NSUTF8StringEncoding];
 			res = (success)?strlen(buf) + 1: -1;
 		} else if (strcmp(key, "mosync.device.OS")== 0) {
-			BOOL success = [[[UIDevice currentDevice] systemName] getCString:buf maxLength:size encoding:NSASCIIStringEncoding];
+			BOOL success = [[[UIDevice currentDevice] systemName] getCString:buf maxLength:size encoding:NSUTF8StringEncoding];
 			res = (success)?strlen(buf) + 1: -1;
 		} else if (strcmp(key, "mosync.device.OS.version") == 0) {
-			BOOL success = [[[UIDevice currentDevice] systemVersion] getCString:buf maxLength:size encoding:NSASCIIStringEncoding];
+			BOOL success = [[[UIDevice currentDevice] systemVersion] getCString:buf maxLength:size encoding:NSUTF8StringEncoding];
 			res = (success)?strlen(buf) + 1: -1;
 		} else if (strcmp(key, "mosync.device") == 0) {
 			size_t responseSz;
 			sysctlbyname("hw.machine", NULL, &responseSz, NULL, 0);
 			char *machine = (char*)malloc(responseSz);
 			sysctlbyname("hw.machine", machine, &responseSz, NULL, 0);
-			NSString *platform = [NSString stringWithCString:machine encoding:NSASCIIStringEncoding];
-			BOOL success = [platform getCString:buf maxLength:size encoding:NSASCIIStringEncoding];
+			NSString *platform = [NSString stringWithCString:machine encoding:NSUTF8StringEncoding];
+			BOOL success = [platform getCString:buf maxLength:size encoding:NSUTF8StringEncoding];
 			free(machine);
 			res = (success)?strlen(buf) + 1: -1;
 		} else if (strcmp(key, "mosync.network.type") == 0) {
@@ -1456,7 +1489,7 @@ namespace Base {
 					networkType = @"unknown";
 					break;
 			}
-			BOOL success = [networkType getCString:buf maxLength:size encoding:NSASCIIStringEncoding];
+			BOOL success = [networkType getCString:buf maxLength:size encoding:NSUTF8StringEncoding];
 			res = (success)?strlen(buf) + 1: -1;
 		}
 
@@ -1585,6 +1618,11 @@ namespace Base {
     SYSCALL(void, maImagePickerOpen())
 	{
 		MoSync_ShowImagePicker();
+	}
+
+    SYSCALL(void, maImagePickerOpenWithEventReturnType(int returnType))
+	{
+		MoSync_ShowImagePicker(returnType);
 	}
 
 	//This struct holds information about what resources are connected
@@ -1820,7 +1858,11 @@ namespace Base {
 			UIView *newView = widget.view;
 
 			CameraInfo *info = getCurrentCameraInfo();
-
+            if (!info)
+            {
+                // Camera is not available.
+                return MA_CAMERA_RES_FAILED;
+            }
 			if( !info->previewLayer )
 			{
 				info->previewLayer = [[AVCaptureVideoPreviewLayer alloc] initWithSession:info->captureSession];
@@ -1896,6 +1938,11 @@ namespace Base {
 	{
 		@try {
 			CameraInfo *info = getCurrentCameraInfo();
+            if (!info)
+            {
+                // Camera is not available.
+                return MA_CAMERA_RES_FAILED;
+            }
 
 			AVCaptureConnection *videoConnection =	[info->stillImageOutput.connections objectAtIndex:0];
 			if ([videoConnection isVideoOrientationSupported])
@@ -1931,11 +1978,17 @@ namespace Base {
 		@try {
 			int result = 0;
 			CameraInfo *info = getCurrentCameraInfo();
-			NSString *propertyString = [NSString stringWithUTF8String:property];
-			NSString *valueString = [NSString stringWithUTF8String:value];
-			result = [gCameraConfigurator	setCameraProperty: info->device
-										withProperty: propertyString
-										   withValue: valueString];
+            if (!info)
+            {
+                // Camera is not available.
+                return MA_CAMERA_RES_FAILED;
+            }
+
+			NSString *propertyString = [[NSString alloc] initWithUTF8String:property];
+			NSString *valueString = [[NSString alloc] initWithUTF8String:value];
+			result = [gCameraConfigurator setCameraProperty: info->device
+                                               withProperty: propertyString
+                                                  withValue: valueString];
 			[propertyString release];
 			[valueString release];
 			return result;
@@ -1948,20 +2001,27 @@ namespace Base {
 	SYSCALL(int, maCameraGetProperty(const char *property, char *value, int maxSize)) //@property the property to get (string), @value will contain the value of the property when the func returns, @maxSize the size of the value buffer
 	{
 		@try {
-			NSString *propertyString = [NSString stringWithUTF8String:property];
+			NSString *propertyString = [[NSString alloc ] initWithUTF8String:property];
 			CameraConfirgurator *configurator = [[CameraConfirgurator alloc] init];
 			CameraInfo *info = getCurrentCameraInfo();
-			NSString* retval = [configurator	getCameraProperty:info->device
-												  withProperty:propertyString];
+            if (!info)
+            {
+                // Camera is not available.
+                return MA_CAMERA_RES_FAILED;
+            }
 
-			if(retval == nil) return -2;
+			NSString* retval = [[configurator getCameraProperty:info->device withProperty:propertyString] retain];
+			if(!retval)
+            {
+                return MA_CAMERA_RES_FAILED;
+            }
 			int length = maxSize;
 			int realLength = [retval length];
 			if(realLength > length) {
 				return -2;
 			}
 
-			[retval getCString:value maxLength:length encoding:NSASCIIStringEncoding]; //stores the cstring value of retval in value
+			[retval getCString:value maxLength:length encoding:NSUTF8StringEncoding]; //stores the cstring value of retval in value
 			[retval release];
 			[propertyString release];
 			[configurator release];
@@ -2363,6 +2423,7 @@ namespace Base {
         maIOCtl_case(maSensorStart);
         maIOCtl_case(maSensorStop);
 		maIOCtl_case(maImagePickerOpen);
+        maIOCtl_case(maImagePickerOpenWithEventReturnType);
 		maIOCtl_case(maSendTextSMS);
 		maIOCtl_case(maSyscallPanicsEnable);
 		maIOCtl_case(maSyscallPanicsDisable);

@@ -391,6 +391,7 @@ static void nativePostEvent(JNIEnv* env, jobject jthis, jintArray eventBuffer)
 	{
 		event.imagePickerState = intArray[1];
 		event.imagePickerItem = intArray[2];
+		event.imagePickerEncodingType = intArray[3];
 	}
 	else if (event.type == EVENT_TYPE_SMS)
 	{
@@ -501,6 +502,8 @@ static void nativePostEvent(JNIEnv* env, jobject jthis, jintArray eventBuffer)
 		 * intArray[4] - Handle to url data.
 		 *
 		 * WIDGET_EVENT_RATING_STAR_VALUE_CHANGED
+		 *
+		 * MAW_EVENT_SCREEN_ORIENTATION_DID_CHANGE
 		 */
 
 		// Allocate the widget event data structure.

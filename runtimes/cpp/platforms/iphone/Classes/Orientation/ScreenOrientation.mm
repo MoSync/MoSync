@@ -26,6 +26,9 @@
  */
 
 #include <helpers/cpp_defs.h>
+#include "iphone_helpers.h"
+#include "Platform.h"
+#include "Syscall.h"
 
 #import "ScreenOrientation.h"
 
@@ -60,9 +63,14 @@ static ScreenOrientation *sharedInstance = nil;
  */
 -(id) init
 {
-    mAllowedScreenOrientations = MA_SCREEN_ORIENTATION_PORTRAIT;
-    mCurrentScreenOrientation = UIInterfaceOrientationPortrait;
-    return [super init];
+	self = [super init];
+	if (self)
+	{
+		mAllowedScreenOrientations = MA_SCREEN_ORIENTATION_PORTRAIT;
+		mCurrentScreenOrientation = UIInterfaceOrientationPortrait;
+		mSupportedOrientations = UIInterfaceOrientationMaskPortrait;
+	}
+    return self;
 }
 
 /**
@@ -70,6 +78,7 @@ static ScreenOrientation *sharedInstance = nil;
  */
 -(void) dealloc
 {
+	[[NSNotificationCenter defaultCenter] removeObserver:self];
     [super dealloc];
 }
 
@@ -95,7 +104,16 @@ static ScreenOrientation *sharedInstance = nil;
     {
         // Store allowed screen orientations.
         mAllowedScreenOrientations = orientations;
-        return MA_SCREEN_ORIENTATION_RES_OK;
+		mSupportedOrientations = 0;
+		mSupportedOrientations |= mAllowedScreenOrientations & MA_SCREEN_ORIENTATION_PORTRAIT ?
+		    UIInterfaceOrientationMaskPortrait : mSupportedOrientations;
+		mSupportedOrientations |= mAllowedScreenOrientations & MA_SCREEN_ORIENTATION_PORTRAIT_UPSIDE_DOWN ?
+            UIInterfaceOrientationMaskPortraitUpsideDown : mSupportedOrientations;
+        mSupportedOrientations |= mAllowedScreenOrientations & MA_SCREEN_ORIENTATION_LANDSCAPE_LEFT ?
+            UIInterfaceOrientationMaskLandscapeLeft : mSupportedOrientations;
+		mSupportedOrientations |= mAllowedScreenOrientations & MA_SCREEN_ORIENTATION_LANDSCAPE_RIGHT ?
+		    UIInterfaceOrientationMaskLandscapeRight : mSupportedOrientations;
+		return MA_SCREEN_ORIENTATION_RES_OK;
     }
 }
 
@@ -214,4 +232,80 @@ static ScreenOrientation *sharedInstance = nil;
     return returnValue;
 }
 
+/**
+ * Get the supported orientations.
+ * Used in iOS 6.0 and later.
+ * @return A bit mask specifying which orientations are supported.
+ */
+-(UIInterfaceOrientationMask)supportedInterfaceOrientations
+{
+    return mSupportedOrientations;
+}
+
+/**
+ * Get the screen size based on the current orientation.
+ * @return Screen size in pixels.
+ */
+-(CGSize)screenSize
+{
+	int width, height;
+	CGSize screenSize;
+	getScreenResolution(width, height);
+	UIInterfaceOrientation interfaceOrientation = [UIApplication sharedApplication].statusBarOrientation;
+	if(UIInterfaceOrientationIsPortrait(interfaceOrientation))
+	{
+		screenSize = CGSizeMake(width, height);
+	}
+	else
+	{
+		screenSize = CGSizeMake(height, width);
+	}
+	return screenSize;
+}
+
 @end
+
+/**
+ * Return a boolean value indicating whether the view controller supports the specified orientation.
+ * Deprecated in iOS 6.0.
+ * @param interfaceOrientation The orientation of the app’s user interface after the rotation.
+ * @return YES if the view controller auto-rotates its view to the specified orientation, otherwise NO.
+ */
+BOOL MoSync_IsInterfaceOrientationSupported(UIInterfaceOrientation interfaceOrientation)
+{
+	return [[ScreenOrientation getInstance] isInterfaceOrientationSupported:interfaceOrientation];
+}
+
+/**
+ * Returns all of the interface orientations that the view controller supports.
+ * Available in iOS 6.0 and later.
+ * @return A mask with supported orientations.
+ */
+NSUInteger MoSync_SupportedInterfaceOrientations()
+{
+	return [[ScreenOrientation getInstance] supportedInterfaceOrientations];
+}
+
+/**
+ * Check if the current screen size has changed. If so send EVENT_TYPE_SCREEN_CHANGED event.
+ * It's send only for non NativeUI applications. Once the NativeUI module is used
+ * this event is not sent.
+ * Usually the screen size changes when rotating device from portrait to landscape
+ * and the other way around.
+ * @param fromOrientation The old orientation of the user interface.
+ */
+void MoSync_OrientationChanged(UIInterfaceOrientation fromOrientation)
+{
+	UIInterfaceOrientation currentOrientation = [UIApplication sharedApplication].statusBarOrientation;
+	if ((UIInterfaceOrientationIsPortrait(fromOrientation) &&
+		UIInterfaceOrientationIsLandscape(currentOrientation)) ||
+		(UIInterfaceOrientationIsPortrait(currentOrientation) &&
+		UIInterfaceOrientationIsLandscape(fromOrientation)))
+	{
+		Base::gSyscall->deviceOrientationChanged();
+
+		MAEvent event;
+		event.type = EVENT_TYPE_SCREEN_CHANGED;
+		Base::gEventQueue.put(event);
+	}
+}

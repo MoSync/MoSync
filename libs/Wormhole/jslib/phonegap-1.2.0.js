@@ -170,7 +170,7 @@ PhoneGap.CallbackSuccess = function(callbackId, args, cast)
                 }
             }
             catch (e) {
-                console.log("Error in success callback: "+callbackId+" = " + e.message);
+                console.log("Error in success callback with id: "+callbackId+": " + e.message);
             }
         }
 
@@ -1840,8 +1840,11 @@ var Device = function() {
     var me = this;
     this.getInfo(
         function (res) {
-            var info = JSON.parse(res);
-            console.log("GotDeviceInfo :: " + info.version);
+            // MOSYNC: We send in device info as an object,
+            // it is already parsed.
+            //var info = JSON.parse(res); // Line kept for reference.
+            var info = res;
+            console.log("GotDeviceInfo: " + info.version);
             me.available = true;
             me.platform = info.platform;
             me.version = info.version;

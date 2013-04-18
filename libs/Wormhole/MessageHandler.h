@@ -199,6 +199,11 @@ public:
 		Wormhole::HybridMoblet* moblet);
 
 	/**
+	 * Sets the screen orientation of the device.
+	 */
+	virtual void screenSetOrientation(const char* orientation);
+
+	/**
 	 * Invoked from JavaScript using the "CallJS" protocol
 	 * to evaluate a script in a WebView.
 	 */

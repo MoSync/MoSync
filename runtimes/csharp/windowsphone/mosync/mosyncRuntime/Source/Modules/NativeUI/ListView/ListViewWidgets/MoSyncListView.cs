@@ -518,7 +518,7 @@ namespace MoSync
                     System.Windows.Controls.ListBoxItem item = new System.Windows.Controls.ListBoxItem();
                     WidgetBaseWindowsPhone widget = (child as WidgetBaseWindowsPhone);
                     item.Content = widget.View;
-                    if (widget.fillSpaceHorizontalyEnabled)
+                    if (widget.FILL_SPACE_H)
                     {
                         item.HorizontalContentAlignment = HorizontalAlignment.Stretch;
                     }
@@ -527,7 +527,7 @@ namespace MoSync
                         item.HorizontalContentAlignment = HorizontalAlignment.Left;
                     }
 
-                    if (widget.fillSpaceVerticalyEnabled)
+                    if (widget.FILL_SPACE_V)
                     {
                         item.VerticalContentAlignment = VerticalAlignment.Stretch;
                     }

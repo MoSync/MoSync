@@ -338,6 +338,7 @@ namespace Notification
         int setFlag(const NotificationFlag flag);
 
         /**
+         * @deprecated. The local notification is displayed now regardless of the applications's state.
          * Set the display flags applied to the local notification.
          * Note that regardless of this setting, the didReceiveLocalNotification
          * callback will be made for each incoming notification.
@@ -490,6 +491,8 @@ namespace Notification
 
         /**
          * Set the date and time when the system should deliver the notification.
+		 * The notification will be fired when the system time is equal to the
+		 * given param time value.
          * @param time A date and time struct that specifies when the system
          * should deliver the notification.
          * @return Any of the following result codes:

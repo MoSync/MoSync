@@ -54,6 +54,13 @@
             self.parent)
         {
             viewWidth = [child sizeThatFitsForWidget].width;
+
+            // Force child to have smaller/equal width with its parrent in the context of vertical layout.
+            int maxViewWidth = self.width - totalHorizontalMargin;
+            if ( viewWidth > maxViewWidth )
+            {
+                viewWidth = maxViewWidth;
+            }
         }
 
         switch (child.autoSizeHeight)
@@ -94,8 +101,9 @@
  */
 - (CGSize)sizeThatFitsForWidget
 {
+    AbstractLayoutView* alv = (AbstractLayoutView*)self.view;
     float maxWidth = 0.0;
-    float countHeight = 0.0;
+    float countHeight = ([alv getTopMargin] + [alv getBottomMargin]);
     for (IWidget* child in _children)
     {
         countHeight += child.height;

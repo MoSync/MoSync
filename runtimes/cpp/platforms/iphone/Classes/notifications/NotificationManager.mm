@@ -198,10 +198,7 @@ static NotificationManager *sharedInstance = nil;
         }
 
         // Notification fire date must be in GMT + 0:00 format(system time).
-        // Received date is using local time.
         double seconds = [value doubleValue];
-        NSTimeZone* localTimeZone = [NSTimeZone localTimeZone];
-        seconds -= [localTimeZone secondsFromGMT];
         NSDate* date = [NSDate dateWithTimeIntervalSince1970:seconds];
         notification.fireDate = date;
     }
@@ -330,7 +327,7 @@ static NotificationManager *sharedInstance = nil;
 		return MA_NOTIFICATION_RES_INVALID_STRING_BUFFER_SIZE;
 	}
 
-    [retVal getCString:value maxLength:length encoding:NSASCIIStringEncoding];
+    [retVal getCString:value maxLength:length encoding:NSUTF8StringEncoding];
 	[retVal release];
     return MA_NOTIFICATION_RES_OK;
 }
@@ -589,7 +586,7 @@ static NotificationManager *sharedInstance = nil;
             NSLog(@"NotificationManager::getPushNotificationData Buffer too small.");
             return MA_NOTIFICATION_RES_INVALID_STRING_BUFFER_SIZE;
         }
-        [messageAlert getCString:charAddress maxLength:maxLength encoding:NSASCIIStringEncoding];
+        [messageAlert getCString:charAddress maxLength:maxLength encoding:NSUTF8StringEncoding];
         pushNotificationType = pushNotificationType | MA_NOTIFICATION_PUSH_TYPE_ALERT;
     }
 
@@ -605,7 +602,7 @@ static NotificationManager *sharedInstance = nil;
             NSLog(@"NotificationManager::getPushNotificationData Buffer too small.");
             return MA_NOTIFICATION_RES_INVALID_STRING_BUFFER_SIZE;
         }
-        [soundFileName getCString:charAddress maxLength:maxLength encoding:NSASCIIStringEncoding];
+        [soundFileName getCString:charAddress maxLength:maxLength encoding:NSUTF8StringEncoding];
         pushNotificationType = pushNotificationType | MA_NOTIFICATION_PUSH_TYPE_SOUND;
     }
 
@@ -683,7 +680,7 @@ static NotificationManager *sharedInstance = nil;
         return MA_NOTIFICATION_RES_REGISTRATION_MESSAGE_BUF_TOO_SMALL;
     }
 
-    [messageString getCString:messageAddress maxLength:size encoding:NSASCIIStringEncoding];
+    [messageString getCString:messageAddress maxLength:size encoding:NSUTF8StringEncoding];
     return result;
 }
 

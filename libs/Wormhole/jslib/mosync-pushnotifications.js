@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2012 MoSync AB
+Copyright (C) 2012-2013 MoSync AB
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License,
@@ -122,7 +122,7 @@ PushNotificationManager.prototype.initialize = function(serverAddress, serverPor
  * Example
  * -------
  * \code
- * // The application has successfuly registered for receiving push notifications.
+ * // The application did successfuly register for receiving push notifications.
  * function push_notification_did_registered(token) {};
  *
  * // The application did not registered for receiving push notifications.

@@ -262,7 +262,7 @@ static Capture *sSharedInstance = nil;
         }
         else
         {
-            [valueString getCString:value maxLength:bufSize encoding:NSASCIIStringEncoding];
+            [valueString getCString:value maxLength:bufSize encoding:NSUTF8StringEncoding];
         }
     }
 
@@ -370,7 +370,7 @@ static Capture *sSharedInstance = nil;
         }
         else
         {
-            [path getCString:buffer maxLength:maxSize encoding:NSASCIIStringEncoding];
+            [path getCString:buffer maxLength:maxSize encoding:NSUTF8StringEncoding];
         }
     }
     else
