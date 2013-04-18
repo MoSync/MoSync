@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0B80AC96171D9A78002EDBD1 /* maassert.c in Sources */ = {isa = PBXBuildFile; fileRef = 0B80AC95171D9A78002EDBD1 /* maassert.c */; };
 		0B92B4701712BAE1002DFDF6 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0B92B46F1712BAE1002DFDF6 /* Foundation.framework */; };
 		0B92C85F1712BB8A002DFDF6 /* File.c in Sources */ = {isa = PBXBuildFile; fileRef = 0B92B5FD1712BB7D002DFDF6 /* File.c */; };
 		0B92C8601712BB8A002DFDF6 /* MAVector3.c in Sources */ = {isa = PBXBuildFile; fileRef = 0B92B6031712BB7D002DFDF6 /* MAVector3.c */; };
@@ -26,8 +27,6 @@
 		0B92C8881712BB8A002DFDF6 /* BluetoothConnection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0B92B6761712BB7D002DFDF6 /* BluetoothConnection.cpp */; };
 		0B92C8891712BB8A002DFDF6 /* BluetoothDiscovery.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0B92B6781712BB7D002DFDF6 /* BluetoothDiscovery.cpp */; };
 		0B92C88A1712BB8A002DFDF6 /* BuffDownloader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0B92B67A1712BB7D002DFDF6 /* BuffDownloader.cpp */; };
-		0B92C8BB1712BB8A002DFDF6 /* CharInput.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0B92B70F1712BB7E002DFDF6 /* CharInput.cpp */; };
-		0B92C8BC1712BB8A002DFDF6 /* CharInputC.c in Sources */ = {isa = PBXBuildFile; fileRef = 0B92B7111712BB7E002DFDF6 /* CharInputC.c */; };
 		0B92C8BD1712BB8A002DFDF6 /* Connection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0B92B7131712BB7E002DFDF6 /* Connection.cpp */; };
 		0B92C8BF1712BB8A002DFDF6 /* Downloader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0B92B71A1712BB7E002DFDF6 /* Downloader.cpp */; };
 		0B92C8C01712BB8A002DFDF6 /* Environment.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0B92B71C1712BB7E002DFDF6 /* Environment.cpp */; };
@@ -36,7 +35,6 @@
 		0B92C8C31712BB8A002DFDF6 /* Geometry.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0B92B7231712BB7E002DFDF6 /* Geometry.cpp */; };
 		0B92C8C41712BB8A002DFDF6 /* GLMoblet.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0B92B7251712BB7E002DFDF6 /* GLMoblet.cpp */; };
 		0B92C8C51712BB8A002DFDF6 /* Graphics.c in Sources */ = {isa = PBXBuildFile; fileRef = 0B92B7271712BB7E002DFDF6 /* Graphics.c */; };
-		0B92C8C71712BB8A002DFDF6 /* GraphicsSoftware.c in Sources */ = {isa = PBXBuildFile; fileRef = 0B92B72B1712BB7E002DFDF6 /* GraphicsSoftware.c */; };
 		0B92C8C81712BB8A002DFDF6 /* HashMap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0B92B72F1712BB7E002DFDF6 /* HashMap.cpp */; };
 		0B92C8C91712BB8A002DFDF6 /* Moblet.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0B92B7391712BB7E002DFDF6 /* Moblet.cpp */; };
 		0B92C8CA1712BB8A002DFDF6 /* PlaceholderPool.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0B92B73B1712BB7E002DFDF6 /* PlaceholderPool.cpp */; };
@@ -202,6 +200,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		0B80AC95171D9A78002EDBD1 /* maassert.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = maassert.c; sourceTree = "<group>"; };
 		0B92B46C1712BAE1002DFDF6 /* libMoSyncLibIOS.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libMoSyncLibIOS.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		0B92B46F1712BAE1002DFDF6 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		0B92B4731712BAE1002DFDF6 /* MoSyncLibIOS-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "MoSyncLibIOS-Prefix.pch"; sourceTree = "<group>"; };
@@ -274,8 +273,6 @@
 		0B92B67A1712BB7D002DFDF6 /* BuffDownloader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BuffDownloader.cpp; sourceTree = "<group>"; };
 		0B92B67B1712BB7D002DFDF6 /* BuffDownloader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BuffDownloader.h; sourceTree = "<group>"; };
 		0B92B70F1712BB7E002DFDF6 /* CharInput.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CharInput.cpp; sourceTree = "<group>"; };
-		0B92B7101712BB7E002DFDF6 /* CharInput.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CharInput.h; sourceTree = "<group>"; };
-		0B92B7111712BB7E002DFDF6 /* CharInputC.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = CharInputC.c; sourceTree = "<group>"; };
 		0B92B7121712BB7E002DFDF6 /* collection_common.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = collection_common.h; sourceTree = "<group>"; };
 		0B92B7131712BB7E002DFDF6 /* Connection.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Connection.cpp; sourceTree = "<group>"; };
 		0B92B7141712BB7E002DFDF6 /* Connection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Connection.h; sourceTree = "<group>"; };
@@ -297,8 +294,6 @@
 		0B92B7261712BB7E002DFDF6 /* GLMoblet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GLMoblet.h; sourceTree = "<group>"; };
 		0B92B7271712BB7E002DFDF6 /* Graphics.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = Graphics.c; sourceTree = "<group>"; };
 		0B92B7281712BB7E002DFDF6 /* Graphics.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Graphics.h; sourceTree = "<group>"; };
-		0B92B72B1712BB7E002DFDF6 /* GraphicsSoftware.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = GraphicsSoftware.c; sourceTree = "<group>"; };
-		0B92B72C1712BB7E002DFDF6 /* GraphicsSoftware.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GraphicsSoftware.h; sourceTree = "<group>"; };
 		0B92B72D1712BB7E002DFDF6 /* HashDict.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HashDict.h; sourceTree = "<group>"; };
 		0B92B72E1712BB7E002DFDF6 /* HashDict_impl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HashDict_impl.h; sourceTree = "<group>"; };
 		0B92B72F1712BB7E002DFDF6 /* HashMap.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = HashMap.cpp; sourceTree = "<group>"; };
@@ -770,6 +765,7 @@
 		0B92B47D1712BB7B002DFDF6 /* MAStd */ = {
 			isa = PBXGroup;
 			children = (
+				0B80AC95171D9A78002EDBD1 /* maassert.c */,
 				0B92CFD1171598F9002DFDF6 /* maapi.h */,
 				0B92CF8F17141D18002DFDF6 /* stdint.h */,
 				0B92CF9017141D18002DFDF6 /* maheap.h */,
@@ -888,8 +884,6 @@
 				0B92B67A1712BB7D002DFDF6 /* BuffDownloader.cpp */,
 				0B92B67B1712BB7D002DFDF6 /* BuffDownloader.h */,
 				0B92B70F1712BB7E002DFDF6 /* CharInput.cpp */,
-				0B92B7101712BB7E002DFDF6 /* CharInput.h */,
-				0B92B7111712BB7E002DFDF6 /* CharInputC.c */,
 				0B92B7121712BB7E002DFDF6 /* collection_common.h */,
 				0B92B7131712BB7E002DFDF6 /* Connection.cpp */,
 				0B92B7141712BB7E002DFDF6 /* Connection.h */,
@@ -911,8 +905,6 @@
 				0B92B7261712BB7E002DFDF6 /* GLMoblet.h */,
 				0B92B7271712BB7E002DFDF6 /* Graphics.c */,
 				0B92B7281712BB7E002DFDF6 /* Graphics.h */,
-				0B92B72B1712BB7E002DFDF6 /* GraphicsSoftware.c */,
-				0B92B72C1712BB7E002DFDF6 /* GraphicsSoftware.h */,
 				0B92B72D1712BB7E002DFDF6 /* HashDict.h */,
 				0B92B72E1712BB7E002DFDF6 /* HashDict_impl.h */,
 				0B92B72F1712BB7E002DFDF6 /* HashMap.cpp */,
@@ -1626,7 +1618,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "line_1=$(sed -n '/char\\* strcpy/=' ../MAStd/maapi.h)\nlet \"line_2=$line_1-2\"\necho $line_2\n\nrm -r MAStdNative || echo MASTDNative already deleted\nmkdir MAStdNative\ncd ../MAStd\ncp IX_OPENGL_ES.h maapi.h madmath.h maxtoa.h IX_WIDGET.h maheap.h matime.h conprint.h maassert.h mastdlib.h mavsprintf.h ma.h mactype.h mastring.h ../MoSyncLibIOS/MAStdNative\ncd ../MoSyncLibIOS/MAStdNative\n\nline_1+=\"d\"\necho $line_1\nline_2+=\"d\"\necho $line_2\n\nsed -i.bak $line_1 maapi.h\nsed -i.bak $line_2 maapi.h\n\n";
+			shellScript = "line_1=$(sed -n '/char\\* strcpy/=' ../MAStd/maapi.h)\nlet \"line_2=$line_1-2\"\necho $line_2\n\nrm -r MAStdNative || echo MASTDNative already deleted\nmkdir MAStdNative\ncd ../MAStd\ncp IX_OPENGL_ES.h maapi.h madmath.h maxtoa.h maapi_defs.h maarg.h IX_WIDGET.h maheap.h matime.h conprint.h maassert.h mastdlib.h mavsprintf.h ma.h mactype.h mastring.h ../MoSyncLibIOS/MAStdNative\n\ncd ..\n\nfind . -path ./MoSyncLibIOS -prune -o -iname \"*.h\" | cpio -pmud MoSyncLibIOS/MAStdNative/\n\ncd MoSyncLibIOS/MAStdNative\n\n\nline_1+=\"d\"\necho $line_1\nline_2+=\"d\"\necho $line_2\n\nsed -i.bak $line_1 maapi.h\nsed -i.bak $line_2 maapi.h\n\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -1653,8 +1645,6 @@
 				0B92C8881712BB8A002DFDF6 /* BluetoothConnection.cpp in Sources */,
 				0B92C8891712BB8A002DFDF6 /* BluetoothDiscovery.cpp in Sources */,
 				0B92C88A1712BB8A002DFDF6 /* BuffDownloader.cpp in Sources */,
-				0B92C8BB1712BB8A002DFDF6 /* CharInput.cpp in Sources */,
-				0B92C8BC1712BB8A002DFDF6 /* CharInputC.c in Sources */,
 				0B92C8BD1712BB8A002DFDF6 /* Connection.cpp in Sources */,
 				0B92C8BF1712BB8A002DFDF6 /* Downloader.cpp in Sources */,
 				0B92C8C01712BB8A002DFDF6 /* Environment.cpp in Sources */,
@@ -1663,7 +1653,6 @@
 				0B92C8C31712BB8A002DFDF6 /* Geometry.cpp in Sources */,
 				0B92C8C41712BB8A002DFDF6 /* GLMoblet.cpp in Sources */,
 				0B92C8C51712BB8A002DFDF6 /* Graphics.c in Sources */,
-				0B92C8C71712BB8A002DFDF6 /* GraphicsSoftware.c in Sources */,
 				0B92C8C81712BB8A002DFDF6 /* HashMap.cpp in Sources */,
 				0B92C8C91712BB8A002DFDF6 /* Moblet.cpp in Sources */,
 				0B92C8CA1712BB8A002DFDF6 /* PlaceholderPool.cpp in Sources */,
@@ -1814,6 +1803,7 @@
 				0B92CF8C1712BB8B002DFDF6 /* Room.cpp in Sources */,
 				0B92CF8D1712BB8B002DFDF6 /* Sprite.cpp in Sources */,
 				0B92CF8E1712BB8B002DFDF6 /* MinUI.cpp in Sources */,
+				0B80AC96171D9A78002EDBD1 /* maassert.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1874,12 +1864,9 @@
 		0B92B47B1712BAE1002DFDF6 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = (
-					"$(ARCHS_STANDARD_32_BIT)",
-					armv7,
-					armv7s,
-				);
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				DSTROOT = /tmp/MoSyncLibIOS.dst;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "MoSyncLibIOS/MoSyncLibIOS-Prefix.pch";
 				GCC_VERSION = com.apple.compilers.llvmgcc42;
@@ -1887,6 +1874,7 @@
 					../,
 					MAStdNative/,
 				);
+				ONLY_ACTIVE_ARCH = NO;
 				OTHER_CFLAGS = (
 					"-D__IOS__",
 					"-DUSE_NEWLIB",
@@ -1898,18 +1886,16 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				USER_HEADER_SEARCH_PATHS = "";
+				VALID_ARCHS = "armv7 armv7s i386";
 			};
 			name = Debug;
 		};
 		0B92B47C1712BAE1002DFDF6 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = (
-					"$(ARCHS_STANDARD_32_BIT)",
-					armv7,
-					armv7s,
-				);
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				DSTROOT = /tmp/MoSyncLibIOS.dst;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "MoSyncLibIOS/MoSyncLibIOS-Prefix.pch";
 				GCC_VERSION = com.apple.compilers.llvmgcc42;
@@ -1928,6 +1914,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				USER_HEADER_SEARCH_PATHS = "";
+				VALID_ARCHS = "armv7 armv7s i386";
 			};
 			name = Release;
 		};

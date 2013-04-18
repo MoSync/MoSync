@@ -17,6 +17,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #ifndef __IOS__
 #include <maheap.h>
+#else
+#include <stdlib.h>
 #endif
 #include <mactype.h>
 

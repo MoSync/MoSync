@@ -65,6 +65,7 @@ void DisplayConsole(void);
 */
 
 void PrintConsole(const wchar * str);
+#ifndef MOSYNC_NATIVE
 int con_puts(const char* str);
 int con_wputs(const wchar* str);
 
@@ -84,15 +85,12 @@ int con_vprintf(const char *fmt, va_list args);
 
 #define _WSTDIO_DEFINED
 
-#ifdef __IOS__
-typedef wchar wchar_t;
-#endif
-
 int con_wprintf(const wchar_t *fmt, ...);
 
 int con_wvprintf(const wchar_t *fmt, va_list args);
 
 int con_putchar(int character);
+#endif
 
 /** \brief The console text color.
 *

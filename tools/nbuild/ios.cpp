@@ -1,4 +1,5 @@
 #include "android.h"
+#include "ios.h"
 #include "util.h"
 #include "nbuild.h"
 #include "mustache/mustache.h"
@@ -9,15 +10,16 @@
 #include <sstream>
 #include <fstream>
 
-#define TEMP_BUILD_DIR "--ios-build-dir"
 #define XCODE_LOC_ARG "--ios-xcode-location"
 #define LLVM_GCC_LOC "/Platforms/iPhoneOS.platform/Developer/usr/bin/llvm-gcc"
+//#define LLVM_GCC_LOC "/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang"
 
 using namespace std;
 
 int buildIOSNative(Arguments* params) {
 	int result = 1;
 
+	string projectDir = require(params, "--project");
 	vector<string> sourceFiles = getSourceFiles(params);
 	string sourceFileList;
 	for (size_t i = 0; i < sourceFiles.size(); i++) {
@@ -34,8 +36,14 @@ int buildIOSNative(Arguments* params) {
 	split(libVariants, require(params, BINARY_TYPE), ",");
 
 	string moduleName = require(params, NAME);
-	string outputDir = require(params, OUTPUT_DIR);
-	toDir(outputDir);
+	string outputDir = require(params, "--dst");
+	unsigned int slashPos = 0;
+	do {
+		slashPos = outputDir.find('/', slashPos + 1);
+		_mkdir(outputDir.substr(0,slashPos).c_str());
+	}while(slashPos != string::npos);
+
+	//toDir(outputDir);
 
 	if (configNames.size() != libVariants.size()) {
 		error("--config and --lib-variants must have a the same number of args", 2);
@@ -43,7 +51,7 @@ int buildIOSNative(Arguments* params) {
 
 	vector<string> archs;
 	archs.push_back("armv7");
-	archs.push_back("i386");
+	//archs.push_back("i386");
 
 	for (size_t i = 0; i < configNames.size(); i++) {
 		for (size_t j = 0; j < archs.size(); j++) {
@@ -55,29 +63,43 @@ int buildIOSNative(Arguments* params) {
 
 			bool isDebug = libVariant == "debug";
 			bool isVerbose = params->isFlagSet(VERBOSE);
-			bool doClean = params->isFlagSet(CLEAN);
+			//bool doClean = params->isFlagSet(CLEAN);
 
+			string archSDKName = (archs[j] == "i386")?"iphonesimulator":"iphoneos";
+			string libDir = string(mosyncdir()) + "/lib/ios_" + libVariant;
+			string runtimeDir = string(mosyncdir()) + "/profiles/runtimes/iphoneos/1/template/libs/" + configNames[i] + "-" + archSDKName;
+			string headerDir = string(mosyncdir()) + "/include";
+			string nativeHeaderDir = headerDir + "/MAStdNative";
+
+			//for (size_t k = 0; k < sourceFiles.size(); k++) {
 			ostringstream cmd;
-			cmd << require(params, XCODE_LOC_ARG) << LLVM_GCC_LOC << " ";
-
+			//cmd << require(params, XCODE_LOC_ARG) << LLVM_GCC_LOC << " ";
+			cmd << "/Applications/Xcode.app/Contents/Developer" << LLVM_GCC_LOC << " ";
 			if (isVerbose) {
 				cmd << "-v ";
 			}
 			if (isDebug) {
-				cmd << "-O0 -g ";
+				cmd << "-g ";
 			}
-			else {
-				cmd << "-O2 ";
-			}
-
-			string libDir = string(mosyncdir()) + "/lib";
 
 			cmd << "-arch " + archs[j] << " ";
-			cmd << "-fmessage-length=0 -pipe -std=gnu99 -Wno-trigraphs -fpascal-strings -gdwarf-2 -mthumb -miphoneos-version-min=6.1" << " ";
-			cmd << sourceFileList << " ";
-			cmd << "-o userCode.a" << " ";
 
+
+			cmd << "-Xlinker -r -nostdlib -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS6.1.sdk -miphoneos-version-min=6.1" << " ";
+			cmd << "-D__IOS__ -DUSE_NEWLIB -DMOSYNC_NATIVE" << " ";
+			cmd << "-I" << nativeHeaderDir << " ";
+			//cmd << "-I" << headerDir << " ";
+			cmd << "-I" << outputDir << " ";
+			cmd << sourceFileList << " ";
+			//cmd <<  libDir + "/MoSyncLibs.a" << " ";
+			//cmd <<  runtimeDir + "/libMoSyncLib.a" << " ";
+			cmd << "-o " << outputDir << "/userCode.o" << " ";
+			//cmd << sourceFiles[k] << " ";
+			//cmd << "-o " << outputDir << "/" << sourceFiles[k] << ".o" << " ";
 			sh(cmd.str().c_str(), !isVerbose);
+			//}
+
+			copyFile((outputDir + "/MoSyncLibs.a").c_str(), (libDir + "/MoSyncLibs.a").c_str() );
 
 			/*
 			string fullOutputDir = outputDir + "android_" + arch + "_" + libVariant + "/";
@@ -89,16 +111,4 @@ int buildIOSNative(Arguments* params) {
 		}
 	}
 	return result;
-}
-
-string getTempBuildDir(Arguments* params) {
-	string tmpDir = params->getSwitchValue(PROJECT_DIR);
-	if (tmpDir.empty()) {
-		tmpDir = params->getSwitchValue(TEMP_BUILD_DIR);
-		toDir(tmpDir);
-	} else {
-		toDir(tmpDir);
-		tmpDir += "temp/";
-	}
-	return tmpDir;
 }

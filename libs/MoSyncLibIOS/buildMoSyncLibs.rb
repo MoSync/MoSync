@@ -40,6 +40,7 @@ FileUtils.mkpath(["libs/ios_debug", "libs/ios_release"])
 sh "lipo build/Debug-iphoneos/libMoSyncLibIOS.a build/Debug-iphonesimulator/libMoSyncLibIOS.a -create -output libs/ios_debug/MoSyncLibs.a"
 sh "lipo build/Release-iphoneos/libMoSyncLibIOS.a build/Release-iphonesimulator/libMoSyncLibIOS.a -create -output libs/ios_release/MoSyncLibs.a"
 
-FileUtils.mkpath([mosyncdir+"/lib"]);
+FileUtils.mkpath([mosyncdir+"/lib", mosyncdir+"/include/MAStdNative"]);
 
 FileUtils.cp_r Dir.glob('libs/*'), mosyncdir+"/lib", :verbose => true
+FileUtils.cp_r Dir.glob('MAStdNative/*'), mosyncdir+"/include/MAStdNative", :verbose => true
