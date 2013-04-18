@@ -145,8 +145,8 @@
 - (int)addChild:(IWidget*)child
 {
 	if ([child class] != [HorizontalLayoutWidget class] &&
-		[child class] != [VerticalLayoutWidget class] &&
-		[child class] != [RelativeLayoutWidget class])
+		[child class] != [VerticalLayoutWidget   class] &&
+		[child class] != [RelativeLayoutWidget   class])
 	{
 		return MAW_RES_INVALID_LAYOUT;
 	}
@@ -168,8 +168,8 @@
 - (int)insertChild:(IWidget*)child atIndex:(NSNumber*)index
 {
 	if ([child class] != [HorizontalLayoutWidget class] &&
-		[child class] != [RelativeLayoutWidget class] &&
-		[child class] != [RelativeLayoutWidget class])
+		[child class] != [RelativeLayoutWidget   class] &&
+		[child class] != [RelativeLayoutWidget   class])
 	{
 		return MAW_RES_INVALID_LAYOUT;
 	}
