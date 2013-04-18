@@ -1,4 +1,4 @@
-#ifndef WINDOWS_PHONE_8
+#ifndef WINDOWS_PHONE_8_LIB
 #include <maassert.h>
 #else
 #include "../MAStd/maassert.h"

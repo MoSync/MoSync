@@ -31,7 +31,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define TRACKOBJECTS
 #endif
 
-#ifndef WINDOWS_PHONE_8
+#ifndef WINDOWS_PHONE_8_LIB
 #include <ma.h>
 #include <maheap.h>
 #else
@@ -40,7 +40,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #endif
 
 #ifdef TRACKOBJECTS
-#ifndef WINDOWS_PHONE_8
+#ifndef WINDOWS_PHONE_8_LIB
 #include <MAUtil/Map.h>
 #include <MAUtil/Vector.h>
 #else

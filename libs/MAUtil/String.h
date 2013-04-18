@@ -28,7 +28,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "RefCounted.h"
 #include "Vector.h"
 
-#ifndef WINDOWS_PHONE_8
+#ifndef WINDOWS_PHONE_8_LIB
 #include <ma.h>
 #else
 #include "../MAStd/ma.h"
