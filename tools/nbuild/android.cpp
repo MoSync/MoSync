@@ -64,10 +64,15 @@ int generateMakefile(Arguments* params) {
 	}
 	vector<string> sourceFiles = getSourceFiles(params);
 	string sourceFileList;
+	bool isVerbose = params->isFlagSet(VERBOSE);
 	for (size_t i = 0; i < sourceFiles.size(); i++) {
 		sourceFileList += sourceFiles[i];
 		sourceFileList += " ";
+		if (isVerbose) {
+			printf("Adding source file: %s.\n", sourceFiles[i].c_str());
+		}
 	}
+
 	if (sourceFiles.empty()) {
 		error("No source files!");
 	}
@@ -248,17 +253,23 @@ int executeNdkBuild(Arguments* params) {
 			cmd << arg("APP_PLATFORM=android-" + require(params, "--android-version")) << " ";
 			cmd << arg("MOSYNCDIR=" + toMakefileFile(mosyncdir())) << " ";
 
-			string fullCmd = getNdkBuildCommand(cmd.str());
-			sh(fullCmd.c_str(), !isVerbose);
-
 			bool useStatic = "static" == params->getSwitchValue("--android-lib-type");
 			string fullOutputDir = outputDir + "android_" + arch + "_" + libVariant + "/";
 			_mkdir(fullOutputDir.c_str());
+
 			string libFile = useStatic ?
 					tmpBuildDir + "obj/local/" + arch + "/lib" + moduleName + ".a" :
 					tmpBuildDir + "libs/" + arch + "/lib" + moduleName + ".so";
 			string libExt = useStatic ? ".a" : ".so";
-			copyFile((fullOutputDir + "lib" + moduleName + libExt).c_str(), libFile.c_str());
+			string fullOutputFile = fullOutputDir + "lib" + moduleName + libExt;
+
+			file(libFile.c_str());
+			string fullCmd = getNdkBuildCommand(cmd.str());
+			if (sh(fullCmd.c_str(), !isVerbose)) {
+				error("NDK build command failed!\n", 1);
+			}
+
+			copyFile(fullOutputFile.c_str(), libFile.c_str());
 		}
 	}
 	return 0;
