@@ -56,7 +56,7 @@ namespace MoSync {
 
 		if(extension == "svg") {
 			ostringstream batik;
-			batik << "java -jar \""<<mosyncdir<<"/bin/Batik/batik-rasterizer.jar\""
+			batik << "java -Djava.awt.headless=true -jar \""<<mosyncdir<<"/bin/Batik/batik-rasterizer.jar\""
 				" \""<<src<<"\" -d \""<<dst<<"\"";
 			if(size != "default") {
 				unsigned int n;
