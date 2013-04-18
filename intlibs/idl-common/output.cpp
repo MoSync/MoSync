@@ -1356,11 +1356,6 @@ void streamCSharpFunctionDelegates(ostream& maapiFile, const Interface& maapi)
 			maapiFile << argType << " _" << a.name;
 		}
 
-		if(f.name.compare("maIOCtl") == 0 || f.name.compare("maExtensionFunctionInvoke")  == 0)
-		{
-			maapiFile << ", int _args";
-		}
-
 		maapiFile << ");\n";
 		maapiFile << "\tpublic Delegate_" << f.name << " " << f.name << " = null;\n";
 	}

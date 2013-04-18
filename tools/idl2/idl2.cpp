@@ -185,11 +185,10 @@ int main() {
 
 		// Copy windows phone file.
 		copy("Output/maapi.cs", "../../runtimes/csharp/windowsphone/mosync/mosyncRuntime/Source/");
-		copy("Output/maapiWP8.cs", "../../runtimes/csharp/WP8/mosync/mosyncRuntime/Source/");
-		copy("Output/MosyncMachineGeneratedCode.cs", "../../runtimes/csharp/WP8/mosync/mosyncRuntime/Source/");
-		copy("Output/MosyncLibraryGlueCode.h", "../../runtimes/csharp/WP8/mosync/MoSyncLibrary/");
-		copy("Output/MosyncLibraryGlueCode.cpp", "../../runtimes/csharp/WP8/mosync/MoSyncLibrary/");
-		copy("Output/maapi.cs", "../../runtimes/csharp/WP8/mosync/mosyncRuntime/Source/");
+		copy("Output/maapiWP8.cs", "../../runtimes/csharp/windowsphone/mosync/mosyncRuntime/Source/");
+		copy("Output/MosyncMachineGeneratedCode.cs", "../../runtimes/csharp/windowsphone/mosync/mosyncRuntime/Source/");
+		copy("Output/MosyncLibraryGlueCode.h", "../../runtimes/csharp/windowsphone/mosync/MoSyncLibrary/");
+		copy("Output/MosyncLibraryGlueCode.cpp", "../../runtimes/csharp/windowsphone/mosync/MoSyncLibrary/");
 
 		copy("Output/cpp_defs.h", "../../intlibs/helpers/");
 		copy("Output/cpp_maapi.h", "../../intlibs/helpers/");
