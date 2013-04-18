@@ -18,7 +18,6 @@ MA 02110-1301, USA.
 package com.mosync.nativeui.ui.widgets;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import android.content.Context;
 import android.util.Log;
@@ -50,15 +49,10 @@ public class SpinnerWidget extends Layout
 	private Context mContext;
 
 	/**
-	 * The spinner view items.
-	 */
-	List<View> mSpinnerItems = new ArrayList<View>( );
-
-	/**
 	 * The objects to represent in the spinner. Only used for setting
 	 * the right number of elements at runtime.
 	 */
-	String []mStringItems = {};
+	private String []mStringItems = {};
 
 	/**
 	 * Constructor.
