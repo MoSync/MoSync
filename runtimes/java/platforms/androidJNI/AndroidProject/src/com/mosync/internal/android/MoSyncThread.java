@@ -386,7 +386,6 @@ public class MoSyncThread extends Thread
 			else
 			{
 				mMoSyncCameraController = null;
-				maPanic(MA_CAMERA_RES_FAILED, "Camera permission is not set in the project");
 			}
 		}
 		catch (Throwable e)
@@ -3265,7 +3264,7 @@ public class MoSyncThread extends Thread
 	 * @param buttonNegative
 	 * @return
 	 */
-	int maAlert(
+	public int maAlert(
 		final String title,
 		final String message,
 		final String buttonPositive,
