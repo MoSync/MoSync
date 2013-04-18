@@ -55,7 +55,8 @@ namespace MAUtil {
 		mCustomEventListeners(false),
 		mTextBoxListeners(false),
 		mSensorListeners(false),
-		mOrientationListeners(false)
+		mOrientationListeners(false),
+		mMediaExportListeners(false)
 	{
 		if(sEnvironment)
 			PANIC_MESSAGE("The application tried to instantiate more than one Environment. "
@@ -241,6 +242,14 @@ namespace MAUtil {
 		mOrientationListeners.remove(ol);
 	}
 
+	void Environment::addMediaExportListener(MediaExportListener* meListener) {
+		mMediaExportListeners.add(meListener);
+	}
+
+	void Environment::removeMediaExportListener(MediaExportListener* meListener) {
+		mMediaExportListeners.remove(meListener);
+	}
+
 	void Environment::fireFocusGainedEvent() {
 		//MAASSERT(sEnvironment == this);
 		mFocusListeners.setRunning(true);
@@ -407,6 +416,21 @@ namespace MAUtil {
 			i->orientationWillChange();
 		}
 		mOrientationListeners.setRunning(false);
+	}
+
+	void Environment::fireMediaExportEvent(const MAEvent& mediaExportEvent)
+	{
+		if ( MA_MEDIA_TYPE_IMAGE == mediaExportEvent.mediaType )
+		{
+			mMediaExportListeners.setRunning(true);
+			ListenerSet_each(MediaExportListener, i, mMediaExportListeners)
+			{
+				i->imageExportToGalleryFinished(
+					mediaExportEvent.mediaHandle,
+					mediaExportEvent.operationResultCode);
+			}
+			mMediaExportListeners.setRunning(false);
+		}
 	}
 
 	void Environment::runIdleListeners() {

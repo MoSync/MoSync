@@ -1584,6 +1584,12 @@ interface MAAPI {
 		* \brief Send by maAlert dialog being canceled by user dimissing it.
 		*/
 		ALERT_DISMISSED = 54;
+
+		/**
+		* \brief Used to notify when an operation of exporting files, from the
+		* application to the device storages, reached the finish point.
+		*/
+		MEDIA_EXPORT_FINISHED = 55;
 	}
 
 	/**
@@ -1788,6 +1794,31 @@ interface MAAPI {
 				 */
 				int snapshotReturnCode;
 			} cameraSnapshot;
+
+			struct {
+				/**
+				 * Used in #EVENT_TYPE_MEDIA_EXPORT_FINISHED.
+				 *
+				 * Reprezents the media type.
+				 * It can have a value from this set #MA_MEDIA_TYPE_UNKNOWN
+				 */
+				int mediaType;
+
+				/**
+				 * Used in #EVENT_TYPE_MEDIA_EXPORT_FINISHED.
+				 *
+				 * Reprezents the media handle.
+				 */
+				MAHandle mediaHandle;
+
+				/**
+				 * Used in #EVENT_TYPE_MEDIA_EXPORT_FINISHED.
+				 *
+				 * The result code of the operation. The possible values belong
+				 * to this set #MA_MEDIA_RES_OK
+				 */
+				int operationResultCode;
+			} mediaExportOperation;
 
 			/**
 			* #EVENT_TYPE_OPTIONS_BOX_BUTTON_CLICKED event, contains the index of the selected option.
@@ -2945,6 +2976,51 @@ interface MAAPI {
 		*
 		*/
 		int maFileSetProperty(in MAString path, in int property, in int value);
+
+		/**
+		 * Saves an images in the photo gallery of the device.
+		 *
+		 * Notifications of this operation are available via #MediaExportListener class.
+		 *
+		 * \param imageHandle handle of the image that needs to be exported to the
+		 * device.
+		 * \param imageName the name that the image will have after is saved.
+		 * Note: This argument is ignored on iOS.
+		 *
+		 * \return #MA_MEDIA_RES_OK if the input was correct and the operation started
+		 * or #MA_MEDIA_RES_IMAGE_EXPORT_FAILED otherwise.
+		 */
+		int maSaveImageToDeviceGallery(in MAHandle imageHandle, in MAString imageName);
+
+		/**
+		 * The available multimedia types.
+		 */
+		constset int MA_MEDIA_TYPE_ {
+			/**
+			 * @brief Indicatest an unknown multimedia type.
+			 */
+			UNKNOWN = -1;
+
+			/**
+			 * @brief Indicates an image.
+			 */
+			IMAGE = 0;
+		}
+
+		/**
+		 * The available result codes for the operations related to multimedia.
+		 */
+		constset int MA_MEDIA_RES_ {
+			/**
+			 * @brief Indicates that the operation was successful.
+			 */
+			OK = 0;
+
+			/**
+			 * @brief Indicatest that the operation of exporting an image failed.
+			 */
+			IMAGE_EXPORT_FAILED = -2;
+		}
 
 		constset int MA_FPROP_ {
 			IS_BACKED_UP = 1;

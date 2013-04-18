@@ -128,6 +128,9 @@ namespace MAUtil {
 					case EVENT_TYPE_ORIENTATION_WILL_CHANGE:
 						moblet->fireOrientationWillChangeEvent();
 						break;
+					case EVENT_TYPE_MEDIA_EXPORT_FINISHED:
+						moblet->fireMediaExportEvent(event);
+						break;
 					default:
 						moblet->fireCustomEventListeners(event);
 				}
