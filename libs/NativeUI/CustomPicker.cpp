@@ -22,7 +22,9 @@ MA 02110-1301, USA.
  *
  * \brief A spinning-wheel widget used to shown one or more items(layout widgets).
  */
+
 #include "CustomPicker.h"
+#include "CustomPickerListener.h"
 #include "Layout.h"
 
 namespace NativeUI
@@ -39,6 +41,7 @@ namespace NativeUI
 	 */
 	CustomPicker::~CustomPicker()
 	 {
+		mCustomPickerListeners.clear();
 	 }
 
 	/**
@@ -84,7 +87,166 @@ namespace NativeUI
 	 */
 	void CustomPicker::removeChild(Layout* layout)
 	{
-		Widget::addChild(layout);
+		Widget::removeChild(layout);
+	}
+
+	/**
+	 * Set the custom picker items row height.
+	 * All its items should have the same height.
+	 * Calling this method will reload all its items.
+	 * Default value it's the height of the widget.
+	 * Platform: iOS.
+	 * @param height Height in pixels.
+	 */
+	void CustomPicker::setRowHeight(const int height)
+	{
+		setPropertyInt(MAW_CUSTOM_PICKER_ROW_HEIGHT, height);
+	}
+
+	/**
+	 * Get the custom picker items row height.
+	 * All its items have the same height.
+	 * Default value it's the height of the widget.
+	 * Platform: iOS.
+	 * @return height in pixels.
+	 */
+	int CustomPicker::getRowHeight()
+	{
+		return getPropertyInt(MAW_CUSTOM_PICKER_ROW_HEIGHT);
+	}
+
+	/**
+	 * Set the custom picker items row width.
+	 * All its items should have the same width.
+	 * Calling this method will reload all its items.
+	 * Default value it's the width of the widget.
+	 * Platform: iOS.
+	 * @param width Width in pixels.
+	 */
+	void CustomPicker::setRowWidth(const int width)
+	{
+		setPropertyInt(MAW_CUSTOM_PICKER_ROW_WIDTH, width);
+	}
+
+	/**
+	 * Get the custom picker items row width.
+	 * All its items have the same width.
+	 * Default value it's the width of the widget.
+	 * Platform: iOS.
+	 * @return width in pixels.
+	 */
+	int CustomPicker::getRowWidth()
+	{
+		return getPropertyInt(MAW_CUSTOM_PICKER_ROW_WIDTH);
+	}
+
+	/**
+	 * Reload all its items.
+	 * Platform: iOS.
+	 */
+	void CustomPicker::reloadData()
+	{
+		setProperty(MAW_CUSTOM_PICKER_RELOAD_DATA, "");
+	}
+
+	/**
+	 * Show the selection indicator.
+	 * By default, the selection indicator is hidden.
+	 * Platform: iOS.
+	 */
+	void CustomPicker::showSelectionIndicator()
+	{
+		setProperty(MAW_CUSTOM_PICKER_SELECTION_INDICATOR, "true");
+	}
+
+	/**
+	 * Hide the selection indicator.
+	 * By default, the selection indicator is hidden.
+	 * Platform: iOS.
+	 */
+	void CustomPicker::hideSelectionIndicator()
+	{
+		setProperty(MAW_CUSTOM_PICKER_SELECTION_INDICATOR, "false");
+	}
+
+	/**
+	 * Check if the selection indicator is shown.
+	 * By default, the selection indicator is hidden.
+	 * @return true if it's shown, false otherwise.
+	 */
+	bool CustomPicker::isSelectionIndicatorShown()
+	{
+		MAUtil::String value =
+			getPropertyString(MAW_CUSTOM_PICKER_SELECTION_INDICATOR);
+		return (strcmp(value.c_str(), "true") == 0) ? true : false;
+	}
+
+	/**
+	 * Select an item by index.
+	 * @param index Index of the item. First child has index zero.
+	 */
+	void CustomPicker::setSelectedItemIndex(const int index)
+	{
+		setPropertyInt(MAW_CUSTOM_PICKER_SELECTED_ITEM_INDEX, index);
+	}
+
+	/**
+	 * Get the index of the selected item.
+	 * @return A zero-indexed number identifying the selected item.
+	 * If the widget has no children, #MAW_RES_ERROR will be returned.
+	 */
+	int CustomPicker::getSelectedItemIndex()
+	{
+		return getPropertyInt(MAW_CUSTOM_PICKER_SELECTED_ITEM_INDEX);
+	}
+
+	/**
+	 * Add an custom picker event listener.
+	 * @param listener The listener that will receive custom picker events.
+	 */
+	void CustomPicker::addCustomPickerListener(CustomPickerListener* listener)
+	{
+		addListenerToVector(mCustomPickerListeners, listener);
+	}
+
+	/**
+	 * Remove the custom picker listener.
+	 * @param listener The listener that receives custom picker events.
+	 */
+	void CustomPicker::removeCustomPickerListener(CustomPickerListener* listener)
+	{
+		removeListenerFromVector(mCustomPickerListeners, listener);
+	}
+
+	/**
+	 * This method is called when there is an event for this widget.
+	 * It passes on the event to all widget's listeners.
+	 * @param widgetEventData The data for the widget event.
+	 */
+	void CustomPicker::handleWidgetEvent(MAWidgetEventData* widgetEventData)
+	{
+		Widget::handleWidgetEvent(widgetEventData);
+
+		if (widgetEventData->eventType == MAW_EVENT_CUSTOM_PICKER_ITEM_SELECTED)
+		{
+			notifyListenersItemChanged(widgetEventData->customPickerItemIndex);
+		}
+	}
+
+	/**
+	 * Notify listeners that user selected a new item.
+	 * @param selectedItemIndex Index of the selected item.
+	 */
+	void CustomPicker::notifyListenersItemChanged(const int selectedItemIndex)
+	{
+		Widget* selectedItem = getChild(selectedItemIndex);
+		for (int i = 0; i < mCustomPickerListeners.size(); i++)
+		{
+			mCustomPickerListeners[i]->customPickerItemChanged(
+				this,
+				selectedItem,
+				selectedItemIndex);
+		}
 	}
 
 	/**

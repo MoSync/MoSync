@@ -41,9 +41,9 @@ MA 02110-1301, USA.
 namespace NativeUI
 {
 
-	// Forward declaration.
+	// Forward declarations.
+	class CustomPickerListener;
 	class Layout;
-
 	/**
 	 * \brief A widget that provides a quick way to select one value from a set.
 	 * Platform: Android, iOS.
@@ -98,7 +98,111 @@ namespace NativeUI
 		 */
 		void removeChild(Layout* layout);
 
+		/**
+		 * Set the custom picker items row height.
+		 * All its items should have the same height.
+		 * Calling this method will reload all its items.
+		 * Default value it's the height of the widget.
+		 * Platform: iOS.
+		 * @param height Height in pixels.
+		 */
+		void setRowHeight(const int height);
+
+		/**
+		 * Get the custom picker items row height.
+		 * All its items have the same height.
+		 * Default value it's the height of the widget.
+		 * Platform: iOS.
+		 * @return height in pixels.
+		 */
+		int getRowHeight();
+
+		/**
+		 * Set the custom picker items row width.
+		 * All its items should have the same width.
+		 * Calling this method will reload all its items.
+		 * Default value it's the width of the widget.
+		 * Platform: iOS.
+		 * @param width Width in pixels.
+		 */
+		void setRowWidth(const int width);
+
+		/**
+		 * Get the custom picker items row width.
+		 * All its items have the same width.
+		 * Default value it's the width of the widget.
+		 * Platform: iOS.
+		 * @return width in pixels.
+		 */
+		int getRowWidth();
+
+		/**
+		 * Reload all its items.
+		 * Platform: iOS.
+		 */
+		void reloadData();
+
+		/**
+		 * Show the selection indicator.
+		 * By default, the selection indicator is hidden.
+		 * Platform: iOS.
+		 */
+		void showSelectionIndicator();
+
+		/**
+		 * Hide the selection indicator.
+		 * By default, the selection indicator is hidden.
+		 * Platform: iOS.
+		 */
+		void hideSelectionIndicator();
+
+		/**
+		 * Check if the selection indicator is shown.
+		 * By default, the selection indicator is hidden.
+		 * @return true if it's shown, false otherwise.
+		 */
+		bool isSelectionIndicatorShown();
+
+		/**
+		 * Select an item by index.
+		 * @param index Index of the item. First child has index zero.
+		 */
+		void setSelectedItemIndex(const int index);
+
+		/**
+		 * Get the index of the selected item.
+		 * @return A zero-indexed number identifying the selected item.
+		 * If the widget has no children, #MAW_RES_ERROR will be returned.
+		 */
+		int getSelectedItemIndex();
+
+		/**
+		 * Add an custom picker event listener.
+		 * @param listener The listener that will receive custom picker events.
+		 */
+		void addCustomPickerListener(CustomPickerListener* listener);
+
+		/**
+		 * Remove the custom picker listener.
+		 * @param listener The listener that receives custom picker events.
+		 */
+		void removeCustomPickerListener(CustomPickerListener* listener);
+
+	protected:
+		/**
+		 * This method is called when there is an event for this widget.
+		 * It passes on the event to all widget's listeners.
+		 * @param widgetEventData The data for the widget event.
+		 */
+		virtual void handleWidgetEvent(MAWidgetEventData* widgetEventData);
+
 	private:
+		/**
+		 * Notify listeners that user selected a new item.
+		 * @param selectedItemIndex Index of the selected item.
+		 */
+		void notifyListenersItemChanged(const int selectedItemIndex);
+
 		/**
 		 * Add a widget as a child of this widget.
 		 * Platform: Android, iOS.
@@ -148,6 +252,12 @@ namespace NativeUI
 		 * - #MAW_RES_ERROR otherwise.
 		 */
 		virtual int removeChild(Widget* widget);
+
+	private:
+		/**
+		 * Array with custom picker listeners.
+		 */
+		MAUtil::Vector<CustomPickerListener*> mCustomPickerListeners;
 	};
 
 } // namespace NativeUI

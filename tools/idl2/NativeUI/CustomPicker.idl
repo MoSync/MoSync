@@ -1,0 +1,85 @@
+/**
+* The available widget properties for a #MAW_CUSTOM_PICKER. See \ref WidgetProperties "Widget properties" for more properties.
+*/
+group WidgetCustomPickerProperties "CustomPicker" {
+	constset MAString MAW_CUSTOM_PICKER_ {
+		/**
+		* @brief Sets or gets the custom picker items row height in pixels.
+		* All its items should have the same height.
+		* Default value it's the height of the widget.
+		* Platform: iOS.
+		* @validvalue A positive integer value.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(customPickerHandle, MAW_CUSTOM_PICKER_ROW_HEIGHT, "30");
+		* \endcode
+		*/
+		ROW_HEIGHT = "rowHeight";
+
+		/**
+		* @brief Sets or gets the custom picker items row width in pixels.
+		* All its items should have the same width.
+		* Platform: iOS.
+		* @validvalue A positive integer value.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(customPickerHandle, MAW_CUSTOM_PICKER_ROW_WIDTH, "100");
+		* \endcode
+		*/
+		ROW_WIDTH = "rowWidth";
+
+		/**
+		* @brief Reload all its items.
+		* Platform: iOS.
+		*
+		* @validvalue Empty string.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(customPickerHandle, MAW_CUSTOM_PICKER_RELOAD_DATA, "");
+		* \endcode
+		*/
+		RELOAD_DATA = "reloadData";
+
+		/**
+		* @brief Show/hide the selection indicator.
+		* Platform: iOS.
+		*
+		* @validvalue A boolean string 'true' for displaying hte indicator, 'false' otherwise.
+		* Default value is 'false'.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(customPickerHandle, MAW_CUSTOM_PICKER_SELECTION_INDICATOR, "true");
+		* \endcode
+		*/
+		SELECTION_INDICATOR = "selectionIndicator";
+
+		/**
+		* @brief Sets of gets the selected item.
+		* Platform: iOS.
+		*
+		* @validvalue A positive integer that represents the index of the item.
+		* By default the first item is selected and it has index zero.
+		* If the widget has no children, #MAW_RES_ERROR will be returned.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(customPickerHandle, MAW_CUSTOM_PICKER_SELECTED_ITEM_INDEX, "1");
+		* \endcode
+		*/
+		SELECTED_ITEM_INDEX = "selectedItemIndex";
+	}
+} // end of WidgetCustomPickerProperties
