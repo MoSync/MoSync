@@ -16,7 +16,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 */
 
 #include <Syscall.h>
-#include "jniutil.h"
+#include "JNIUtil.h"
 
 namespace Base
 {

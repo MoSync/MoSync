@@ -1,5 +1,6 @@
+#include "JNIUtil.h"
+
 #ifdef MOSYNC_NATIVE
-#include "jniutil.h"
 #include <jni.h>
 
 static int wctomb_m(char* dst, wchar_t src) {
@@ -105,5 +106,12 @@ jstring mawstojs(JNIEnv* env, const wchar_t* src) {
 	jstring result = (*env)->NewStringUTF(env, dst);
 	free(dst);
 	return result;
+}
+#else
+int wcslen_m(const wchar* maStr) {
+	wchar *p;
+	p = (wchar*) maStr;
+	while (*p) p++;
+	return p - maStr;
 }
 #endif

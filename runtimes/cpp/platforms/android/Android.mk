@@ -26,6 +26,7 @@ LOCAL_SRC_FILES := FileImpl.cpp \
 	MoSyncBridge.cpp \
 	AndroidHelpers.cpp \
 	EventQueue.cpp \
+	JNIUtil.cpp \
 	SyscallImpl.cpp \
 	IOCtl.cpp \
 	../../base/FileStream.cpp \
@@ -53,11 +54,6 @@ endif
 ifeq ($(ANDROID_API_15_OR_ABOVE), true)
 	LOCAL_CFLAGS := -D_android_17
 endif
-
-# native?
-#ifeq ($(MOSYNC_NATIVE),true)
-	LOCAL_CFLAGS += -DMOSYNC_NATIVE
-#endif
 
 LOCAL_CFLAGS	+= -DFPM_ARM -Wno-psabi
 
