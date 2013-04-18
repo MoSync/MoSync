@@ -630,6 +630,12 @@ static void nativePostEvent(JNIEnv* env, jobject jthis, jintArray eventBuffer)
 		event.snapshotImageDataRepresentation = intArray[3];
 		event.snapshotReturnCode = intArray[4];
 	}
+	else if (event.type == EVENT_TYPE_MEDIA_EXPORT_FINISHED)
+	{
+		event.mediaType = intArray[1];
+		event.mediaHandle = intArray[2];
+		event.operationResultCode = intArray[3];
+	}
 	// HOLD ON!
 	// Don't forget to update the file EventQueue.cpp when adding
 	// event types that would potentially overflow the event queue.

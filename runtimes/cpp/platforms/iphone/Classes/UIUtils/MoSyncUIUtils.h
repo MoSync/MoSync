@@ -26,6 +26,9 @@ void MoSyncUIUtils_ShowTextBox(const wchar* title, const wchar* inText, wchar* o
 void MoSyncUIUtils_ShowImagePicker();
 void MoSyncUIUtils_ShowImagePicker(int returnType);
 
+// Saves the image with the given handle to photo album.
+int MoSyncUIUtils_SaveImageToGallery(MAHandle imageDataHandle);
+
 // Obj
 @interface MoSyncUIUtils : NSObject
 
@@ -34,5 +37,22 @@ void MoSyncUIUtils_ShowImagePicker(int returnType);
 			outText:(wchar*)outText
 			maxSize:(int)maxSize
      andConstraints:(int)constraints;
+
+@end
+
+/**
+ * Used as a listener for operation of saving images to photo gallery.
+ */
+@interface ImageSaveListener : NSObject
+{
+    // Handle of the image that must be saved to gallery
+    MAHandle mImageHandle;
+}
+
+-(id)initWithImageHandle:(MAHandle) anImageHandle;
+
+-(void)               image: (UIImage *) image
+    didFinishSavingWithError: (NSError *) error
+                 contextInfo: (void *) contextInfo;
 
 @end
