@@ -33,6 +33,7 @@ using System;
 using System.Text.RegularExpressions;
 using System.Reflection;
 using System.Collections.Generic;
+using System.Threading;
 
 namespace MoSync
 {
@@ -114,35 +115,66 @@ namespace MoSync
                 switch (operation.Type)
                 {
                     case WidgetOperation.OperationType.SET:
-                        PropertyInfo pinfo;
-                        MoSyncWidgetPropertyAttribute pattr = GetPropertyAttribute(operation.Property, out pinfo);
-                        Exception exception = null;
-                        if (pinfo == null) throw new InvalidPropertyNameException();
-                        try
-                        {
-                            SetProperty(pinfo, operation.Value);
-                        }
-                        catch (Exception e)
-                        {
-                            exception = e;
-                        }
-                        if (null != exception)
-                            if (exception.InnerException is InvalidPropertyValueException)
-                                throw new InvalidPropertyValueException();
-
+                        SetProperty(operation);
                         break;
                     case WidgetOperation.OperationType.GET:
                         break;
                     case WidgetOperation.OperationType.ADD:
-                        IWidget child = mRuntime.GetModule<NativeUIModule>().GetWidget(operation.Handle);
-                        child.SetParent(this);
-                        this.AddChild(child);
+                        AddChild(operation);
                         break;
                     case WidgetOperation.OperationType.INSERT:
+                        InsertChild(operation);
                         break;
                     case WidgetOperation.OperationType.REMOVE:
                         break;
                 }
+            }
+
+            protected void SetProperty(WidgetOperation operation)
+            {
+                PropertyInfo pinfo;
+                MoSyncWidgetPropertyAttribute pattr = GetPropertyAttribute(operation.Property, out pinfo);
+                Exception exception = null;
+                // if (pinfo == null) throw new InvalidPropertyNameException();
+                try
+                {
+                    SetProperty(pinfo, operation.Value);
+                }
+                catch (Exception e)
+                {
+                    exception = e;
+                }
+                if (null != exception)
+                    if (exception.InnerException is InvalidPropertyValueException)
+                        throw new InvalidPropertyValueException();
+            }
+
+            protected void AddChild(WidgetOperation operation)
+            {
+                IWidget child = GetChildSychronously(operation.Handle);
+                child.SetParent(this);
+                this.AddChild(child);
+            }
+
+            protected void InsertChild(WidgetOperation operation)
+            {
+                IWidget child = GetChildSychronously(operation.Handle);
+                child.SetParent(this);
+                this.InsertChild(child, operation.Index);
+            }
+
+            protected IWidget GetChildSychronously(int childHandle)
+            {
+                IWidget child = mRuntime.GetModule<NativeUIModule>().GetWidget(childHandle);
+
+                // if the child hasn't been created, we need to wait for its creation
+                if (child is WidgetBaseMock)
+                {
+                    Thread childCreationThread = mRuntime.GetModule<NativeUIModule>().GetWidgetCreationThread(childHandle);
+                    childCreationThread.Join();
+                }
+
+                return child;
             }
 
             #endregion
@@ -616,6 +648,16 @@ namespace MoSync
             {
                 if (!isViewCreated)
                 {
+                    mRuntime.GetModule<NativeUIModule>().nrV++;
+
+                    if (mRuntime.GetModule<NativeUIModule>().nrW == mRuntime.GetModule<NativeUIModule>().nrV)
+                    {
+                        System.Diagnostics.Debug.WriteLine("UI Ready: " +
+                            DateTime.Now.Minute.ToString() + ":" +
+                            DateTime.Now.Second.ToString() + ":" +
+                            DateTime.Now.Millisecond.ToString());
+                    }
+
                     isViewCreated = true;
 
                     // run all the pending operations from the widget operation queue

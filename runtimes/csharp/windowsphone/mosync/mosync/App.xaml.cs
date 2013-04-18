@@ -123,6 +123,10 @@ namespace test_mosync
 
 		private void Application_Launching(object sender, LaunchingEventArgs e)
         {
+            System.Diagnostics.Debug.WriteLine("Application launching: " +
+                DateTime.Now.Minute.ToString() + ":" +
+                DateTime.Now.Second.ToString() + ":" +
+                DateTime.Now.Millisecond.ToString());
 
             //RootFrame.Navigated += delegate(object _sender, NavigationEventArgs _e)
             RootFrame.Loaded += delegate(object _sender, RoutedEventArgs _e)

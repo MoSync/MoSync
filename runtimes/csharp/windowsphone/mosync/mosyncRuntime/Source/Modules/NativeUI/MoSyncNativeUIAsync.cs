@@ -61,6 +61,16 @@ namespace MoSync
 
             public void InsertChild(IWidget parent, IWidget child, int index)
             {
+                if (!(parent as WidgetBase).IsViewCreated)
+                {
+                    WidgetOperation insertChildOperation = new WidgetOperation(child.GetHandle(), index);
+                    parent.AddOperation(insertChildOperation);
+                }
+                else
+                {
+                    child.SetParent(parent);
+                    parent.InsertChild(child, index);
+                }
             }
 
             public void RemoveChild(IWidget parent, IWidget child)
@@ -127,6 +137,11 @@ namespace MoSync
         private int mHandle;
 
         /**
+         * The insert operation comes with the index where the insert needs to be done.
+         */
+        private int mIndex;
+
+        /**
          * Public getter for the operation type.
          */
         public OperationType Type
@@ -171,6 +186,17 @@ namespace MoSync
         }
 
         /**
+         * Public getter for the index property (used by the INSERT operation).
+         */
+        public int Index
+        {
+            get
+            {
+                return mIndex;
+            }
+        }
+
+        /**
          * Constructor that creates a SET widget operation.
          * @param property The name of the property that needs to be set.
          * @param value The value of the property that needs to be set.
@@ -196,12 +222,13 @@ namespace MoSync
         }
 
         /**
-         * Constructor that creates a ADD, INSERT or REMOVE widget operation.
+         * Constructor that creates a ADD or REMOVE widget operation.
          * @param type The operation type (ADD, INSERT or REMOVE).
+         * @param handle The handle of the child widget.
          */
         public WidgetOperation(OperationType type, int handle)
         {
-            if (type == OperationType.ADD || type == OperationType.INSERT || type == OperationType.REMOVE)
+            if (type == OperationType.ADD || type == OperationType.REMOVE)
             {
                 mType = type;
                 mHandle = handle;
@@ -218,6 +245,20 @@ namespace MoSync
                 mPropertyName = "";
                 mPropertyValue = "";
             }
+        }
+
+        /**
+         * Constructor that creates INSERT widget operation.
+         * @param handle The handle of the child widget.
+         * @param index The index where the child widget needs to be inserted.
+         */
+        public WidgetOperation(int handle, int index)
+        {
+            mType = OperationType.INSERT;
+            mHandle = handle;
+            mPropertyName = "";
+            mPropertyValue = "";
+            mIndex = index;
         }
     }
 
