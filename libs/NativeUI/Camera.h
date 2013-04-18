@@ -218,6 +218,9 @@ namespace NativeUI
 		 */
 		virtual void stopPreview();
 
+		/**
+		 * /return True if the camera is started, false otherwise
+		 */
 		virtual bool isCameraStarted() const;
 
 		/**
@@ -255,8 +258,7 @@ namespace NativeUI
 
 		/**
 		 * Captures a still image of the camera. The output of this operation
-		 * is provided via #CameraSnapshotListener's methods #snapshotFailed
-		 * and #snapshotSucceeded.
+		 * is provided via #CameraSnapshotListener.
 		 *
 		 * Note: Any startPreview() or takeSnapshot() calls will be ignored and
 		 * will return a error code until the snapshot operation is finished.
@@ -374,21 +376,21 @@ namespace NativeUI
 		virtual unsigned int getMaxZoomLevel() const;
 
 		/**
-		 * Indicates if the device supports zoom or not.
+		 * Indicates if the current camera supports zoom or not.
 		 *
 		 * \return true if the current camera supports zoom, false otherwise.
 		 */
 		virtual bool isZoomSupported() const;
 
 		/**
-		 * Indicates if the device has a flash or not.
+		 * Indicates if the current camera has flash support or not.
 		 *
 		 * \return true if the current camera supports flash, false otherwise.
 		 */
 		virtual bool isFlashSupported() const;
 
         /**
-         * Add an event listener for the snapshot events of this camera.
+         * Adds an listener for the snapshot events of this camera.
          *
          * \param listener pointer to CameraSnapshotListener representing the
          * listener that will start receiving snapshot notifications.
@@ -396,7 +398,7 @@ namespace NativeUI
         virtual void addSnapshotListener(CameraSnapshotListener* listener);
 
         /**
-         * Remove an event listener for the snapshot events of this camera.
+         * Removes an listener for the snapshot events of this camera.
          *
          * \param listener pointer to CameraSnapshotListener representing the
          * listener that will stop receiving snapshot notifications.
@@ -406,12 +408,10 @@ namespace NativeUI
 
         /**
          * This sets the #CameraPreviewDataListener for this camera. Such an
-         * listener is needed
-         * in order to obtain/manage camera preview data.
+         * listener is needed in order to obtain/manage camera preview data.
          *
          * Note: The last #CameraPreviewDataListener instance set to the camera
-         * is the
-         * active one.
+         * is the active one.
          *
          * \param listener pointer to a #CameraPreviewDataListener.
          */
@@ -552,8 +552,8 @@ namespace NativeUI
 		inline void succeedSnapshot( CameraSnapshotData* imageData );
 
 		/**
-		 * This notifies the camera preview data listener when the snapshot
-		 * operation succeeded.
+		 * This notifies the camera preview data listener when preview frame
+		 * retrieval has failed.
 		 */
 		inline void failRetrievingPreviewData( int returnCode,
 			const int previewType, const MARect previewRect  );
