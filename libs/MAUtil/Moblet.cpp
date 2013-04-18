@@ -136,6 +136,9 @@ namespace MAUtil {
 				        // We need to fire a custom event for backwards compatibility.
 				        moblet->fireCustomEventListeners(event);
 				        break;
+					case EVENT_TYPE_MEDIA_EXPORT_FINISHED:
+						moblet->fireMediaExportEvent(event);
+						break;
 					default:
 						moblet->fireCustomEventListeners(event);
 				}

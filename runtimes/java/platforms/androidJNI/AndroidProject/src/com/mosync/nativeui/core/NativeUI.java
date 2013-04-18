@@ -17,6 +17,7 @@ MA 02110-1301, USA.
 
 package com.mosync.nativeui.core;
 
+import java.nio.ByteBuffer;
 import java.util.Hashtable;
 
 import android.app.Activity;
@@ -718,9 +719,9 @@ public class NativeUI
 
 		// Write string to MoSync memory.
 		MoSyncThread mosyncThread = ((MoSync) m_activity).getMoSyncThread( );
-		mosyncThread.mMemDataSection.position( memBuffer );
-		mosyncThread.mMemDataSection.put( ba );
-		mosyncThread.mMemDataSection.put( (byte)0 );
+		ByteBuffer buffer = mosyncThread.getMemorySlice(memBuffer, ba.length + 1);
+		buffer.put(ba);
+		buffer.put((byte) 0);
 
 		return result.length( );
 	}

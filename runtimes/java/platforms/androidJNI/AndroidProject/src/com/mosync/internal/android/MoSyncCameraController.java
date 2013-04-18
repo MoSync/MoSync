@@ -675,9 +675,9 @@ public class MoSyncCameraController {
 		byte[] ba = result.getBytes();
 
 		// Write string to MoSync memory.
-		mMoSyncThread.mMemDataSection.position( memBuffer );
-		mMoSyncThread.mMemDataSection.put( ba );
-		mMoSyncThread.mMemDataSection.put( (byte)0 );
+		ByteBuffer buffer = mMoSyncThread.getMemorySlice(memBuffer, ba.length + 1);
+		buffer.put(ba);
+		buffer.put((byte) 0);
 
 		return result.length( );
 	}
@@ -1103,11 +1103,9 @@ public class MoSyncCameraController {
 		size[0] = supportedSizes.get(index).width;
 		size[1] = supportedSizes.get(index).height;
 
-		mMoSyncThread.mMemDataSection.position( format );
-		mMoSyncThread.mMemDataSection.put( int2byte(size) );
-		// In this case the end byte 0 is not needed since we did not
-		// write strings.
-		// mMoSyncThread.mMemDataSection.put( (byte)0 );
+		byte[] array = int2byte(size);
+		ByteBuffer buffer = mMoSyncThread.getMemorySlice(format, array.length + 1);
+		buffer.put(array);
 	}
 
 	public int enablePreviewEvents(

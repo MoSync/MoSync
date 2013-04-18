@@ -59,6 +59,7 @@ namespace MAUtil {
 		mSensorListeners(false),
 		mOrientationListeners(false),
 		mCameraListeners(false),
+		mMediaExportListeners(false),
 		mCurrentPlatform(OS_UNKNOWN)
 	{
 		if(sEnvironment)
@@ -281,6 +282,14 @@ namespace MAUtil {
 		return mCurrentPlatform;
 	}
 
+	void Environment::addMediaExportListener(MediaExportListener* meListener) {
+		mMediaExportListeners.add(meListener);
+	}
+
+	void Environment::removeMediaExportListener(MediaExportListener* meListener) {
+		mMediaExportListeners.remove(meListener);
+	}
+
 	void Environment::fireFocusGainedEvent() {
 		//MAASSERT(sEnvironment == this);
 		mFocusListeners.setRunning(true);
@@ -449,6 +458,7 @@ namespace MAUtil {
 		mOrientationListeners.setRunning(false);
 	}
 
+
 	void Environment::fireCameraEvent(const MAEvent& cameraEvent)
 	{
 		mCameraListeners.setRunning(true);
@@ -456,6 +466,21 @@ namespace MAUtil {
 			i->cameraEvent(cameraEvent);
 		}
 		mCameraListeners.setRunning(false);
+	}
+
+	void Environment::fireMediaExportEvent(const MAEvent& mediaExportEvent)
+	{
+		if ( MA_MEDIA_TYPE_IMAGE == mediaExportEvent.mediaType )
+		{
+			mMediaExportListeners.setRunning(true);
+			ListenerSet_each(MediaExportListener, i, mMediaExportListeners)
+			{
+				i->imageExportToGalleryFinished(
+					mediaExportEvent.mediaHandle,
+					mediaExportEvent.operationResultCode);
+			}
+			mMediaExportListeners.setRunning(false);
+		}
 	}
 
 	void Environment::runIdleListeners() {

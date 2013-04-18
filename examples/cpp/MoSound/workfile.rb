@@ -5,7 +5,7 @@ require File.expand_path(ENV['MOSYNCDIR']+'/rules/mosync_exe.rb')
 work = PipeExeWork.new
 work.instance_eval do
 	@SOURCES = ["."]
-	@NAME = "MoSketch"
+	@NAME = "MoSound"
 end
 
 work.invoke

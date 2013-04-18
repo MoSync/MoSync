@@ -84,6 +84,9 @@ import com.mosync.internal.android.notifications.PushNotificationsUtil;
 import com.mosync.internal.generated.IX_WIDGET;
 import com.mosync.nativeui.ui.widgets.OptionsMenuItem;
 import com.mosync.nativeui.ui.widgets.ScreenWidget;
+import com.mosync.nativeui.ui.widgets.StackScreenWidget;
+import com.mosync.nativeui.ui.widgets.TabScreenWidget;
+import com.mosync.nativeui.ui.widgets.Widget;
 import com.mosync.nativeui.util.ScreenTransitions;
 
 /**
@@ -257,19 +260,32 @@ public class MoSync extends Activity
 			// Save current rotation.
 			mScreenRotation = newRotation;
 
+			int screenOrientation = getScreenOrientation();
 			// Post rotation event.
-			ScreenWidget screen = mMoSyncThread.getCurrentScreen();
+			ScreenWidget screen = mMoSyncThread.getUnconvertedCurrentScreen();
 			if (null != screen)
 			{
 				// There is a NativeUI screen.
 				// Post screen orientation event, handled by the NativeUI module.
-				EventQueue.getDefault().postScreenOrientationChanged(
+				if ( screen instanceof StackScreenWidget || screen instanceof TabScreenWidget)
+				{
+					// Post screen orientation event, for the screen parent(TabScreen of StackScreen).
+					EventQueue.getDefault().postScreenOrientationChanged(
+							screen.getHandle(),
+							screenOrientation);
+					for(Widget child : screen.getChildren( ))
+					{
+						EventQueue.getDefault().postScreenOrientationChanged(
+								child.getHandle(),
+								screenOrientation);
+					}
+				}
+				else
+				{
+					EventQueue.getDefault().postScreenOrientationChanged(
 							mMoSyncThread.getCurrentScreen().getHandle(),
-							getScreenOrientation());
-				// Post screen orientation event, for the screen parent(TabScreen of StackScreen).
-				EventQueue.getDefault().postScreenOrientationChanged(
-						mMoSyncThread.getUnconvertedCurrentScreen().getHandle(),
-							getScreenOrientation());
+							screenOrientation);
+				}
 			}
 			else
 			{
@@ -279,12 +295,12 @@ public class MoSync extends Activity
 				// Post screen orientation event, handled by the NativeUI module.
 				EventQueue.getDefault().postScreenOrientationChanged(
 							IX_WIDGET.MAW_CONSTANT_MOSYNC_SCREEN_HANDLE,
-							getScreenOrientation());
+							screenOrientation);
 			}
 
 			// Post orientation event, handled by the Moblet.
 			EventQueue.getDefault().postOrientationChanged(
-						getScreenOrientation());
+					screenOrientation);
 		}
 	}
 

@@ -201,6 +201,30 @@ namespace MAUtil {
 		virtual void orientationWillChange() {};
 	};
 
+
+	/**
+	 * \brief A listener for media export operations.
+	 * \see Environment::addMediaExportListener().
+	 */
+	 class MediaExportListener {
+	 public:
+		/**
+		 * Called after the operation of exporting/saving an image to the
+		 * photo gallery of the device. This event is triggered by the
+		 * #maSaveImageToDeviceGallery() call.
+		 *
+		 * Note: In order to obtain this notification you must register to
+		 * the Enviroment via #addMediaExportListener. Please remember to
+		 * unregister when finished using #removeMediaExportListener.
+		 *
+		 * \param imageHandle Handle of the image that was the subject of the
+		 * export operation.
+		 * \param resultCode The result code of the operation.
+		 */
+		virtual void imageExportToGalleryFinished( const MAHandle& imageHandle,
+			int resultCode ) {};
+	 };
+
 	/**
      * \brief A listener for camera events.
      * \see Environment::addCameraListener()
@@ -381,6 +405,12 @@ namespace MAUtil {
 		PLATFORM_TYPE getCurrentPlatform();
 
 		/**
+		 * Add and remove listeners for media export events.
+		 */
+		void addMediaExportListener(MediaExportListener* meListener);
+		void removeMediaExportListener(MediaExportListener* meListener);
+
+		/**
 		* Returns a reference to the Environment.
 		* Causes a panic if no Environment exists.
 		*/
@@ -495,6 +525,12 @@ namespace MAUtil {
 		void fireCameraEvent(const MAEvent& cameraEvent);
 
 		/**
+		 * Calls specific method of all media export listeners. The method called depends
+		 * on the media export operation.
+		 */
+		void fireMediaExportEvent(const MAEvent& mediaExportEvent);
+
+		/**
 		* Calls all registered IdleListeners once each.
 		*/
 		void runIdleListeners();
@@ -525,6 +561,7 @@ namespace MAUtil {
 		ListenerSet<SensorListener> mSensorListeners;
 		ListenerSet<OrientationListener> mOrientationListeners;
 		ListenerSet<CameraListener> mCameraListeners;
+		ListenerSet<MediaExportListener> mMediaExportListeners;
 		PLATFORM_TYPE mCurrentPlatform;
 private:
 		static Environment* sEnvironment;
