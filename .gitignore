@@ -266,10 +266,15 @@ LocalFiles.bin*
 /rules/local_config.rb
 
 /runtimes/csharp/windowsphone/template
+/runtimes/csharp/windowsphone/mosync/mosyncRuntime/Source/maapi.cs
+/runtimes/csharp/windowsphone/mosync/mosyncRuntime/Source/maapiWP8.cs
 /runtimes/csharp/windowsphone/mosync/mosyncExtensionTemplate/Bin
 /runtimes/csharp/windowsphone/mosync/mosyncExtensionTemplate/obj
 /runtimes/csharp/windowsphone/mosync/mosync/Service References
 /runtimes/csharp/windowsphone/mosync/mosync/Bin
+/runtimes/csharp/windowsphone/mosync/MoSyncLibrary/MosyncLibraryGlueCode.h
+/runtimes/csharp/windowsphone/mosync/MoSyncLibrary/MosyncLibraryGlueCode.cpp
+/runtimes/csharp/windowsphone/mosync/mosyncRuntime/Source/MosyncMachineGeneratedCode.cs
 /tools/winphone-builder/pugixml-1.0/scripts
 /tools/winphone-builder/pugixml-1.0/docs
 
@@ -278,10 +283,8 @@ LocalFiles.bin*
 /runtimes/csharp/windowsphone/mosync/mosyncRuntime/Libraries/Microsoft.Phone.Controls
 /runtimes/csharp/windowsphone/mosync/mosyncRuntime/Libraries/Microsoft.Phone.Controls.Maps
 
-/runtimes/csharp/WP8/template
-/runtimes/csharp/WP8/mosync/mosyncRuntime/Source/maapi.cs
-/runtimes/csharp/WP8/mosync/MoSyncLibrary/MosyncLibraryGlueCode.h
-/runtimes/csharp/WP8/mosync/MoSyncLibrary/MosyncLibraryGlueCode.cpp
-/runtimes/csharp/WP8/ARM
-/runtimes/csharp/WP8/mosync/mosyncRuntime/Source/maapiWP8.cs
-/runtimes/csharp/WP8/mosync/mosyncRuntime/Source/MosyncMachineGeneratedCode.cs
+/runtimes/csharp/windowsphone/ARM
+/runtimes/csharp/windowsphone/mosync/mosync_WP8/Bin
+/runtimes/csharp/windowsphone/mosync/mosync_WP8/obj
+/runtimes/csharp/windowsphone/mosync/MoSyncLibrary/ARM
+/runtimes/csharp/windowsphone/mosync/mosyncRuntime/Bin/ARM

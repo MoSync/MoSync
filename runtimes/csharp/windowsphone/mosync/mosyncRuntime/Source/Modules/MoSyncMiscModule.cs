@@ -2,10 +2,12 @@ using System;
 using System.IO;
 using Microsoft.Phone.Info;
 using System.Windows;
+using System.Diagnostics;
 using System.Collections.Generic;
 using System.Net.NetworkInformation;
 using System.Globalization;
 using Microsoft.Xna.Framework.GamerServices;
+
 
 namespace MoSync
 {
@@ -139,13 +141,13 @@ namespace MoSync
             syscalls.maLoadProgram = delegate(int _data, int _reload)
             {
 #if REBUILD
-                throw new Exception("maLoadProgram not available in rebuild mode");
-#else
-                Resource res = runtime.GetResource(MoSync.Constants.RT_BINARY, _data);
-                //Memory mem = (Memory)res.GetInternalObject();
+				throw new Exception("maLoadProgram not available in rebuild mode");
+#elif !LIB
+				Resource res = runtime.GetResource(MoSync.Constants.RT_BINARY, _data);
+				//Memory mem = (Memory)res.GetInternalObject();
 				Stream mem = (Stream)res.GetInternalObject();
-                MoSync.Machine.SetLoadProgram(mem, _reload != 0);
-                throw new Util.ExitException(0);
+				MoSync.Machine.SetLoadProgram(mem, _reload != 0);
+				throw new Util.ExitException(0);
 #endif
             };
         }
