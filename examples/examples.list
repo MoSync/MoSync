@@ -37,6 +37,7 @@ GLMobletOpenGLES2 = OpenGLES/GLMobletOpenGLES2
 AccelerometerOpenGLES = OpenGLES/AccelerometerOpenGLES
 MoGraphWave = MoGraph/MoGraphWave
 MoGraphWave2 = MoGraph/MoGraphWave2
+MoGraphFinance = MoGraph/MoGraphFinance
 ScreenOrientation
 QuakeMDL
 CameraDemo
