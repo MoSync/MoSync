@@ -204,7 +204,7 @@ protected:	//CActive
 	void DoCancel() { clean(); }
 private:
 	TDblQue<ConnOp> mQue;
-	
+
 	void clean() {
 		LOGS("CConnCleanupQue.clean %i\n", iStatus.Int());
 		while(!mQue.IsEmpty()) {
@@ -231,9 +231,14 @@ void DestructNetworking();
 
 void StartConnOpL(ConnOp* op);
 void CancelConnOps(MAHandle conn);
-CSocket* createSocket(bool ssl);
+
+enum SocketType {
+	SSL, TCP, UDP
+};
+CSocket* createSocket(SocketType);
 int httpCreateConnectionLC(const TDesC8& parturl, CHttpConnection*& conn,
-	int method, bool ssl);
+	int method, SocketType);
+
 CHttpConnection& GetHttp(MAHandle conn);
 void StartNetworkingL(ConnOp& connOp);
 

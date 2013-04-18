@@ -137,7 +137,7 @@ void ResourceDirective::writeWordDirective(ostringstream& output, DataType type,
 				output << ",";
 			}
 			if (array[i] >= 0) {
-				output << "0x" << hex << array[i];
+				output << "0x" << hex << (array[i] & mask);
 			} else {
 				output << dec << array[i];
 			}

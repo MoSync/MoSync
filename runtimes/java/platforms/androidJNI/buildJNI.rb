@@ -205,18 +205,12 @@ packages = ["src/com/mosync/java/android/*.java",
 	        "src/com/mosync/nativeui/ui/ads/*.java",
 			"src/com/mosync/internal/android/notifications/*.java",
 			"src/com/mosync/internal/android/billing/*.java",
-			"src/com/mosync/internal/android/billing/request/*.java",
-			"gen/com/android/vending/billing/IMarketBillingService.java"
+			"src/com/mosync/internal/android/billing/util/*.java",
+			"gen/com/android/vending/billing/IInAppBillingService.java"
             ]
 
 # Concatenate each list element with package_root, and flatten the list to a string
 java_files = packages.map { |package| File.join(package_root, package) }.join(" ")
-
-#puts "Compiling aidl files\n\n"
-# Compile the aidl file into java class, the output will be generated in gen folder.
-#sh( "#{File.join(androidSDKTools, "/aidl")} -I " + "\"#{File.join(androidSDKPath, "android.jar")}\" " + " -o " +
-#	"#{File.join("#{package_root}src/com/android/vending/billing/", "IMarketBillingService.aidl")} " );
-#	"#{File.join("#{package_root}gen/com/android/vending/billing/", "IMarketBillingService.java")} ");
 
 # Compile all the java files into class files
 if ENV['OS'] == "Windows_NT"
@@ -263,4 +257,3 @@ FileUtils.rm_rf class_dir
 if (!success)
 	exitBuilder(0, mosyncppsource, configPath)
 end
-

@@ -931,6 +931,7 @@ namespace Base {
 
 #ifndef _android
 	SYSCALL(int, maLoadResource(MAHandle handle, MAHandle placeholder, int flag)) {
+		DEBUG_ASSERT(resourcesFilename != NULL);
 		if (((flag & MA_RESOURCE_OPEN) != 0) && (resource == NULL))
 		{
 			resource = new FileStream(resourcesFilename);

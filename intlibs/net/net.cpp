@@ -23,6 +23,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "helpers/cpp_defs.h"
 #include "helpers/helpers.h"
 #include "net_errors.h"
+#if defined(LINUX) || defined(DARWIN)
+#include <unistd.h>
+#endif
 
 using namespace MoSyncError;
 
@@ -87,6 +90,17 @@ int readProtocolResponseCode(const char* protocolSlash, const char* line, int le
 }
 
 #ifndef SYMBIAN
+
+//******************************************************************************
+// Connection defaults
+//******************************************************************************
+
+int Connection::readFrom(void* dst, int max, MAConnAddr& src) {
+	BIG_PHAT_ERROR(ERR_CONN_READFROM);
+}
+int Connection::writeTo(const void* src, int len, const MAConnAddr& dst) {
+	BIG_PHAT_ERROR(ERR_CONN_WRITETO);
+}
 
 //******************************************************************************
 // TcpConnection helpers
@@ -230,11 +244,90 @@ int TcpConnection::connect() {
 	return MASocketConnect(mSock, mInetAddr, mPort);
 }
 
-bool TcpConnection::isConnected() {
+TcpConnection::~TcpConnection() {
+}
+
+
+int UdpConnection::connect() {
+	// Create socket
+	mSock = socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP);
+	if(mSock == INVALID_SOCKET)
+	{
+		LOG("UdpConnection: socket error %d\n", SOCKET_ERRNO);
+		return CONNERR_GENERIC;
+	}
+
+#ifdef __MS_XCODE__
+    //Broadcasting is disabled by default on iOS, need to enable it.
+    //Also, if anyone wants to call this for other platforms in the future,
+    //know that it should be a char on other platforms, not int.
+    int shouldBroadCast = 1;
+    if (setsockopt(mSock, SOL_SOCKET, SO_BROADCAST, &shouldBroadCast, sizeof shouldBroadCast) == -1)
+    {
+        LOG("UdpConnection: Could not enable broadcast");
+    }
+#endif
+
+	if(mHostname.empty())
+		return openServer();
+
+	// parse address
+	mInetAddr = inet_addr(mHostname.c_str());
+	if(mInetAddr == INADDR_NONE) {
+		hostent *hostEnt;
+		// DNS lookup
+		if((hostEnt = gethostbyname(mHostname.c_str())) == NULL) {
+			LOG("MASocketOpen: DNS resolve failed. %d\n", SOCKET_ERRNO);
+			return CONNERR_DNS;
+		}
+		mInetAddr = (uint)*((uint*)hostEnt->h_addr_list[0]);
+		if(mInetAddr == INADDR_NONE) {
+			LOG("MASocketOpen: Could not parse the resolved ip address. %d\n", SOCKET_ERRNO);
+			return CONNERR_URL;
+		}
+	}
+
+	// connect
+	return MASocketConnect(mSock, mInetAddr, mPort);
+}
+
+int UdpConnection::openServer() {
+	sockaddr_in sa;
+	sa.sin_family = AF_INET;
+	sa.sin_addr.s_addr = htonl(INADDR_ANY);
+	sa.sin_port = htons(mPort);
+	if(bind(mSock, (struct sockaddr*)&sa, sizeof(struct sockaddr_in))<0) {
+		LOG("UdpConnection: bind error %d\n", SOCKET_ERRNO);
+		close();
+		return CONNERR_GENERIC;
+	}
+	socklen_t saSize = sizeof(sa);
+	int result = getsockname(mSock, (sockaddr*)&sa, &saSize);
+	if(result == (int)INVALID_SOCKET) {
+		LOG("getsockname error %d\n", SOCKET_ERRNO);
+		close();
+		return CONNERR_GENERIC;
+	}
+	mPort = ntohs(sa.sin_port);
+	mInetAddr = sa.sin_addr.s_addr;
+	LOG("UDP server opened on 0x%08x:%i. socket: %i\n", mInetAddr, mPort, mSock);
+	return 1;
+}
+
+UdpConnection::UdpConnection(u16 port)
+: InetConnection("", port)
+{
+}
+
+UdpConnection::~UdpConnection() {
+}
+
+bool InetConnection::isConnected() {
 	return mSock != INVALID_SOCKET;
 }
 
-int TcpConnection::getAddr(MAConnAddr& addr) {
+int InetConnection::getAddr(MAConnAddr& addr) {
+	LOG("InetConnection::getAddr %i\n", mSock);
 	if(mSock == INVALID_SOCKET)
 		return CONNERR_GENERIC;
 	addr.family = CONN_FAMILY_INET4;
@@ -243,21 +336,21 @@ int TcpConnection::getAddr(MAConnAddr& addr) {
 	return 1;
 }
 
-TcpConnection::~TcpConnection() {
+InetConnection::~InetConnection() {
 	close();
 }
 
-void TcpConnection::close() {
+void InetConnection::close() {
 	if(mSock != INVALID_SOCKET) {
 		int res;
 		res = shutdown(mSock, 2);	//stop both reading and writing
 		if(SOCKET_ERROR == res) {
 			// may happen a lot..
-			//LOG("TcpConnection::shutdown failed: %i\n", SOCKET_ERRNO);
+			//LOG("InetConnection::shutdown failed: %i\n", SOCKET_ERRNO);
 		}
 		res = closesocket(mSock);
 		if(SOCKET_ERROR == res) {
-			LOG("TcpConnection::closesocket failed: %i\n", SOCKET_ERRNO);
+			LOG("InetConnection::closesocket failed: %i\n", SOCKET_ERRNO);
 		}
 		mSock = INVALID_SOCKET;
 	}
@@ -275,10 +368,72 @@ int TcpConnection::read(void* dst, int max) {
 	}
 }
 
-int TcpConnection::write(const void* src, int len) {
+int UdpConnection::read(void* dst, int max) {
+	int bytesRecv = recv(mSock, (char*)dst, max, 0);
+	if(SOCKET_ERROR == bytesRecv) {
+		LOG("UdpConnection::read: recv failed. error code: %i\n", SOCKET_ERRNO);
+#ifdef WIN32
+		if(SOCKET_ERRNO == WSAEMSGSIZE) {
+			return max;
+		}
+#endif
+		return CONNERR_GENERIC;
+	} else if (bytesRecv == 0) {
+		return CONNERR_CLOSED;
+	} else {
+		return bytesRecv;
+	}
+}
+
+static void parse_sockaddr(MAConnAddr& ca, sockaddr* sa, socklen_t len) {
+	DEBUG_ASSERT(sa->sa_family == AF_INET);
+	sockaddr_in* si = (sockaddr_in*)sa;
+	ca.family = CONN_FAMILY_INET4;
+	ca.inet4.port = ntohs(si->sin_port);
+	ca.inet4.addr = ntohl(si->sin_addr.s_addr);
+}
+
+int UdpConnection::readFrom(void* dst, int max, MAConnAddr& src) {
+	sockaddr from;
+	socklen_t fromlen = sizeof(from);
+	int bytesRecv = recvfrom(mSock, (char*)dst, max, 0, &from, &fromlen);
+	if(SOCKET_ERROR == bytesRecv) {
+		LOG("UdpConnection::readFrom: recvfrom failed. error code: %i\n", SOCKET_ERRNO);
+#ifdef WIN32
+		if(SOCKET_ERRNO == WSAEMSGSIZE) {
+			parse_sockaddr(src, &from, fromlen);
+			return max;
+		}
+#endif
+		return CONNERR_GENERIC;
+	} else if (bytesRecv == 0) {
+		return CONNERR_CLOSED;
+	} else {
+		parse_sockaddr(src, &from, fromlen);
+		return bytesRecv;
+	}
+}
+
+int UdpConnection::writeTo(const void* src, int len, const MAConnAddr& dst) {
+	DEBUG_ASSERT(dst.family == CONN_FAMILY_INET4);
+	sockaddr_in si;
+	si.sin_family = AF_INET;
+	si.sin_port = htons(dst.inet4.port);
+	si.sin_addr.s_addr = htonl(dst.inet4.addr);
+
+	int bytesSent = sendto(mSock, (const char*) src, len, 0, (sockaddr*)&si, sizeof(si));
+	if(bytesSent != len || SOCKET_ERROR == bytesSent) {
+		LOG("UdpConnection::writeTo: sendto failed. error code: %i\n", SOCKET_ERRNO);
+		return CONNERR_GENERIC;
+	} else {
+		return 1;
+	}
+}
+
+int InetConnection::write(const void* src, int len) {
 	int bytesSent = send(mSock, (const char*) src, len, 0);
 	if(bytesSent != len || SOCKET_ERROR == bytesSent) {
-		LOG("TcpConnection::write: send failed. error code: %i\n", SOCKET_ERRNO);
+		LOG("InetConnection::write: send failed. error code: %i\n", SOCKET_ERRNO);
 		return CONNERR_GENERIC;
 	} else {
 		return 1;

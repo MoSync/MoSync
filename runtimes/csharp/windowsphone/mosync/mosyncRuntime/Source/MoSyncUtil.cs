@@ -219,7 +219,7 @@ namespace MoSync
 		public static void Exit(int res)
 		{
 			//CriticalError("Exited!");
-			throw new ExitException(res);
+			//throw new ExitException(res);
 		}
 
 		public static int CreateExtent(int w, int h)

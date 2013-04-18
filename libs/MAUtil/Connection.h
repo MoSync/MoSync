@@ -122,11 +122,19 @@ public:
 	* use local variables as input.
 	*/
 	void write(const void* src, int len);
+
 	/**
 	* Causes ConnectionListener::connWriteFinished() to be called when the operation is complete.
 	* \see maConnWriteFromData()
 	*/
 	void writeFromData(MAHandle data, int offset, int len);
+
+	/**
+	* Causes ConnectionListener::connWriteFinished() to be called when the operation is complete.
+	* \see maConnWriteTo()
+	* \a dst may be discarded once this function returns.
+	*/
+	void writeTo(const void* src, int len, const MAConnAddr& dst);
 
 	/**
 	* Reads between 1 and \a maxlen bytes to \a dst.
@@ -140,6 +148,14 @@ public:
 	* Causes ConnectionListener::connRecvFinished() to be called when the operation is complete.
 	*/
 	void recvToData(MAHandle data, int offset, int maxlen);
+
+	/**
+	* Reads between 1 and \a maxlen bytes to \a dst. Stores the sender address in \a src.
+	* Causes ConnectionListener::connRecvFinished() to be called when the operation is complete.
+	* \warning \a src must remain valid until the operation is complete.
+	* \see maConnReadFrom()
+	*/
+	void recvFrom(void* dst, int maxlen, MAConnAddr* src);
 
 	/**
 	* Reads exactly \a len bytes to \a dst.

@@ -56,6 +56,7 @@ int MASocketConnect(MoSyncSocket sock, uint inetAddr, u16 port);
 static const char http_string[] = "http://";
 static const char https_string[] = "https://";
 static const char socket_string[] = "socket://";
+static const char datagram_string[] = "datagram://";
 static const char ssl_string[] = "ssl://";
 static const char btspp_string[] = "btspp://";
 
@@ -63,23 +64,47 @@ static const char btspp_string[] = "btspp://";
 //Connection classes
 //***************************************************************************
 
-class TcpConnection : public Connection {
+class InetConnection : public Connection {
 public:
-	TcpConnection(const std::string& hostname, u16 port, MoSyncSocket sock=INVALID_SOCKET)
+	InetConnection(const std::string& hostname, u16 port, MoSyncSocket sock=INVALID_SOCKET)
 		: mSock(sock), mHostname(hostname), mPort(port) {}
-	virtual ~TcpConnection();
+	virtual ~InetConnection();
 
-	virtual int connect();
 	bool isConnected();
-	virtual int read(void* dst, int max);
 	virtual int write(const void* src, int len);
 	virtual void close();
 	int getAddr(MAConnAddr& addr);
 protected:
 	MoSyncSocket mSock;
 	const std::string mHostname;
-	const u16 mPort;
+	u16 mPort;
 	uint mInetAddr;
+};
+
+class TcpConnection : public InetConnection {
+public:
+	TcpConnection(const std::string& hostname, u16 port, MoSyncSocket sock=INVALID_SOCKET)
+		: InetConnection(hostname, port, sock) {}
+	virtual ~TcpConnection();
+
+	virtual int connect();
+	virtual int read(void* dst, int max);
+};
+
+class UdpConnection : public InetConnection {
+public:
+	UdpConnection(u16 port = 0);	// 0 means random port
+	UdpConnection(const std::string& hostname, u16 port, MoSyncSocket sock=INVALID_SOCKET)
+		: InetConnection(hostname, port, sock) {}
+	virtual ~UdpConnection();
+
+	virtual int connect();
+	virtual int read(void* dst, int max);
+	virtual int readFrom(void* dst, int max, MAConnAddr& src);
+	virtual int writeTo(const void* src, int len, const MAConnAddr& dst);
+
+private:
+	int openServer();
 };
 
 class ProtocolConnection : public Connection {

@@ -408,3 +408,27 @@ class MemoryGeneratedFileTask < FileTask
 		@ec = @buf
 	end
 end
+
+# Copies a directory, its contents and subdirectories.
+class CopyDirWork < Work
+	def initialize(dstRoot, name)
+		@NAME = name
+		@dstRoot = dstRoot
+	end
+	def setup
+		@prerequisites = []
+		glob("#{@dstRoot}/#{@NAME}", @NAME)
+	end
+	def glob(dst, src)
+		@prerequisites << DirTask.new(self, dst)
+		sources = Dir["#{src}/*"]
+		sources.each do |s|
+			if(File.directory?(s))
+				glob("#{dst}/#{File.basename(s)}", s)
+			else
+				@prerequisites << CopyFileTask.new(self, "#{dst}/#{File.basename(s)}",
+					FileTask.new(self, s))
+			end
+		end
+	end
+end

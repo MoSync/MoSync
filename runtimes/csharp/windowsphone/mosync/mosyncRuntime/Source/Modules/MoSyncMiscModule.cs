@@ -7,6 +7,8 @@ using System.Collections.Generic;
 using System.Net.NetworkInformation;
 using System.Globalization;
 using Microsoft.Xna.Framework.GamerServices;
+using Microsoft.Xna.Framework.Media;
+using System.Windows.Media.Imaging;
 
 
 namespace MoSync
@@ -43,6 +45,9 @@ namespace MoSync
     {
 		private Microsoft.Devices.VibrateController mVibrateController = null;
 		private Runtime mRuntime = null;
+        private Core mCore = null;
+
+        public delegate void Delegate_SaveImageToCameraRoll(int imageHandle, String imageName, Resource imageResource);
 
         public void Init(Syscalls syscalls, Core core, Runtime runtime)
         {
@@ -168,7 +173,7 @@ namespace MoSync
         public void Init(Ioctls ioctls, Core core, Runtime runtime)
         {
 			mRuntime = runtime;
-
+            mCore = core;
             /**
              * Register system properties
              */
@@ -373,6 +378,77 @@ namespace MoSync
 				}
 				return 1;
 			};
+
+            // validates image input data and dispaches a delegate to save the image to camera roll
+            ioctls.maSaveImageToDeviceGallery = delegate(int imageHandle, int imageNameAddr)
+            {
+                int returnCode = MoSync.Constants.MA_MEDIA_RES_IMAGE_EXPORT_FAILED;
+
+                //Get the resource with the specified handle
+                Resource res = mRuntime.GetResource(MoSync.Constants.RT_IMAGE, imageHandle);
+                String imageName = mCore.GetDataMemory().ReadStringAtAddress(imageNameAddr);
+
+                if ( (null != res) && !String.IsNullOrEmpty(imageName))
+                {
+                    object[] myArray = new object[3];
+                    myArray[0] = imageHandle;
+                    myArray[1] = imageName;
+                    myArray[2] = res;
+
+                    Deployment.Current.Dispatcher.BeginInvoke(
+                        new Delegate_SaveImageToCameraRoll(SaveImageToCameraRoll),myArray);
+
+                    returnCode = MoSync.Constants.MA_MEDIA_RES_OK;
+                }
+
+                return returnCode;
+            };
+        }
+
+        private void SaveImageToCameraRoll(int imageHandle, String imageName, Resource imageResource)
+        {
+            MediaLibrary library = new MediaLibrary();
+            MemoryStream targetStream = new MemoryStream();
+
+            int mediaType = MoSync.Constants.MA_MEDIA_TYPE_IMAGE;
+            int mediaHandle = imageHandle;
+            int eventReturnCode = MoSync.Constants.MA_MEDIA_RES_OK;
+
+            try
+            {
+                WriteableBitmap data = (WriteableBitmap)imageResource.GetInternalObject();
+                data.SaveJpeg(targetStream, data.PixelWidth, data.PixelHeight, 0, 100);
+                data = null;
+
+                library.SavePictureToCameraRoll(imageName, targetStream.GetBuffer()).Dispose();
+            }
+            catch (Exception e)
+            {
+                System.Diagnostics.Debug.WriteLine(e.ToString());
+                eventReturnCode = MoSync.Constants.MA_MEDIA_RES_IMAGE_EXPORT_FAILED;
+            }
+            finally
+            {
+                library.Dispose();
+                targetStream.Dispose();
+                PostMediaEvent(mediaType, mediaHandle, eventReturnCode);
+            }
+        }
+
+        private void PostMediaEvent(int mediaType, int mediaHandle, int returnCode)
+        {
+            const int MAEventData_eventType = 0;
+            const int MAEventData_mediaType = 4;
+            const int MAEventData_mediaHandle = 8;
+            const int MAEventData_operationResultCode = 12;
+
+            Memory eventData = new Memory(16);
+
+            eventData.WriteInt32(MAEventData_eventType, MoSync.Constants.EVENT_TYPE_MEDIA_EXPORT_FINISHED);
+            eventData.WriteInt32(MAEventData_mediaType, mediaType);
+            eventData.WriteInt32(MAEventData_mediaHandle, mediaHandle);
+            eventData.WriteInt32(MAEventData_operationResultCode, returnCode);
+            mRuntime.PostEvent(new Event(eventData));
         }
 
         /**

@@ -26,6 +26,7 @@ import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_ERROR_CANCE
 import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_STATE_COMPLETED;
 import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_STATE_FAILED;
 import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_STATE_PRODUCT_REFUNDED;
+import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_ERROR_PRODUCT_ALREADY_OWNED;
 
 /**
  * Utility class that holds constants required in billing requests.
@@ -75,6 +76,7 @@ public class Consts
     public static final int RESULT_ITEM_UNAVAILABLE = 4;
     public static final int RESULT_DEVELOPER_ERROR = 5;
     public static final int RESULT_ERROR = 6;
+    public static final int BILLING_RESPONSE_RESULT_ITEM_ALREADY_OWNED = 7;
 
 	// Match a response code to a MoSync constant.
 	public static int responseCodeValue(int responseCode)
@@ -91,6 +93,8 @@ public class Consts
 			return MA_PURCHASE_RES_UNAVAILABLE;
 		case RESULT_ITEM_UNAVAILABLE:
 			return MA_PURCHASE_ERROR_INVALID_PRODUCT;
+		case BILLING_RESPONSE_RESULT_ITEM_ALREADY_OWNED:
+			return MA_PURCHASE_ERROR_PRODUCT_ALREADY_OWNED;
 		case RESULT_DEVELOPER_ERROR:
 		case RESULT_ERROR:
 		default:

@@ -40,11 +40,11 @@ ThreadPool mThreadPool = new ThreadPool();
 //*****************************************************************************
 
 #if 1//defined(MA_IX_CONNSERVER)
-public class MAConn {
+public abstract class MAConn {
 	int state = 0;
-	InputStream in;
-	OutputStream out;
 	private final MAHandle handle;
+	Connection baseConn;
+	boolean cancel = false;
 
 	MAConn(MAHandle h) {
 		handle = h;
@@ -63,17 +63,20 @@ public class MAConn {
 		mCanvas.postEvent(event);
 	}
 	synchronized void close() {
-		if(in != null)
-			CATCH(IOException, in.close());
-		if(out != null)
-			CATCH(IOException, out.close());
+		cancel = true;
+		if(baseConn != null)
+			CATCH(IOException, baseConn.close());
 	}
+	abstract void prepareRead();
+	abstract int recv(byte[] bytes, int offset, int size) throws IOException;
+	abstract void write(byte[] bytes, int offset, int size) throws IOException;
 }
 
 public class MAStreamConn extends MAConn {
+	InputStream in;
+	OutputStream out;
 	StreamConnection conn;
 	int httpState = HTTPS_NULL;
-	boolean cancel = false;
 
 	MAStreamConn(MAHandle h) {
 		super(h);
@@ -81,9 +84,22 @@ public class MAStreamConn extends MAConn {
 
 	synchronized final void close() {
 		cancel = true;
+		if(in != null)
+			CATCH(IOException, in.close());
+		if(out != null)
+			CATCH(IOException, out.close());
 		super.close();
-		if(conn != null)
-			CATCH(IOException, conn.close());
+	}
+
+	final void prepareRead() {
+		MYASSERT(in != null);
+	}
+	final int recv(byte[] bytes, int offset, int size) throws IOException {
+		return Syscall.recv(this, bytes, offset, size);
+	}
+	final void write(byte[] bytes, int offset, int size) throws IOException {
+		Syscall.chunkWrite(out, bytes, offset, size);
+		out.flush();
 	}
 }
 
@@ -113,11 +129,70 @@ public class MAServerConn extends MAConn {
 	MAServerConn(MAHandle h) {
 		super(h);
 	}
+	final void prepareRead() {
+		BIG_PHAT_ERROR;
+	}
+	final int recv(byte[] bytes, int offset, int size) throws IOException {
+		BIG_PHAT_ERROR;
+	}
+	final void write(byte[] bytes, int offset, int size) throws IOException {
+		BIG_PHAT_ERROR;
+	}
+}
 
-	synchronized final void close() {
-		super.close();
-		if(notifier != null)
-			CATCH(IOException, notifier.close());
+public class MADatagramConn extends MAConn {
+	DatagramConnection dConn;
+
+	MADatagramConn(MAHandle h) {
+		super(h);
+	}
+	final void prepareRead() {
+	}
+	final int recv(byte[] bytes, int offset, int size) throws IOException {
+		Datagram d = dConn.newDatagram(bytes, size);
+		d.setData(bytes, offset, size);
+		dConn.receive(d);
+		return d.getLength();
+	}
+
+	final void write(byte[] bytes, int offset, int size) throws IOException {
+		Datagram d = dConn.newDatagram(bytes, size);
+		d.setData(bytes, offset, size);
+		dConn.send(d);
+	}
+}
+
+public class MAUdpConn extends MAConn {
+	UDPDatagramConnection dConn;
+	Address src;
+	String dst;
+
+	MAUdpConn(MAHandle h) {
+		super(h);
+	}
+	final void prepareRead() {
+	}
+	final int recv(byte[] bytes, int offset, int size) throws IOException {
+		INIT_MEMDS;
+		Datagram d = dConn.newDatagram(bytes, size);
+		d.setData(bytes, offset, size);
+		dConn.receive(d);
+		String a = d.getAddress();
+		WINT(src, CONN_FAMILY_INET4);
+		// convert textual ip address to int.
+		int c = a.indexOf(':', 11);
+		int host = parseIpv4(a, 11, c);
+		int port = Integer.parseInt(a.substring(c+1));
+		WINT(src+4, host);
+		WINT(src+8, port);
+		return d.getLength();
+	}
+
+	final void write(byte[] bytes, int offset, int size) throws IOException {
+		Datagram d = dConn.newDatagram(bytes, size);
+		d.setData(bytes, offset, size);
+		d.setAddress(dst);
+		dConn.send(d);
 	}
 }
 
@@ -161,6 +236,47 @@ public class MAConn {
 }
 #endif
 
+static class DatagramConnect implements Runnable {
+	MADatagramConn mac;
+	final String url;
+
+	DatagramConnect(MADatagramConn m, String u) {
+		mac = m;
+		url = u;
+	}
+
+	public final void run() {
+		try {
+			mac.baseConn = Connector.open(url);
+			synchronized(mac) {
+				if(mac.cancel) {
+					mac.handleResult(CONNOP_CONNECT, CONNERR_CANCELED);
+					return;
+				}
+				if(mac.baseConn == null) {
+					mac.handleResult(CONNOP_CONNECT, CONNERR_GENERIC);
+					return;
+				}
+				mac.dConn = (DatagramConnection)mac.baseConn;
+			}
+		} catch(Exception e) {
+			PRINT_STACK_TRACE;
+#ifdef CONN_PANIC
+			MAMidlet.self.programError("Conn error", e);
+#else
+			synchronized(mac) {
+				if(mac.cancel) {
+					mac.handleResult(CONNOP_CONNECT, CONNERR_CANCELED);
+					return;
+				}
+				mac.handleResult(CONNOP_CONNECT, CONNERR_GENERIC);
+			}
+#endif
+			return;
+		}
+		mac.handleResult(CONNOP_CONNECT, 1);
+	}
+}
 
 static class Connect implements Runnable {
 	MAStreamConn mac;
@@ -217,6 +333,7 @@ static class Connect implements Runnable {
 					return;
 				}
 				mac.conn = conn;
+				mac.baseConn = conn;
 				mac.in = conn.openInputStream();
 				mac.out = http ? null : conn.openOutputStream();
 			}
@@ -275,6 +392,7 @@ class Accept implements Runnable {
 		synchronized(Syscall.this) {
 			MAStreamConn mac = new MAStreamConn(mConnNextHandle);
 			mac.conn = newConn;
+			mac.baseConn = newConn;
 			mac.in = in;
 			mac.out = out;
 			mConnections.put(new Integer(mConnNextHandle), mac);
@@ -284,9 +402,10 @@ class Accept implements Runnable {
 }
 
 // workaround for the case where the buffer isn't filled
-public static final int recv(InputStream in, byte[] bytes, int offset, int size)
+public static final int recv(MAStreamConn mac, byte[] bytes, int offset, int size)
 throws IOException
 {
+	InputStream in = mac.in;
 	//DEBUG_TEMP("special recv\n");
 #if (MA_PROF_BLACKBERRY_VERSION == 4)
 	int res = in.read(bytes, offset, 1);
@@ -335,7 +454,7 @@ class ConnRead implements Runnable {
 			// you get a NullPointerException.
 			res = mac.in.read(bytes);
 #else
-			res = recv(mac.in, bytes, 0, size);
+			res = mac.recv(bytes, 0, size);
 #endif
 		} catch(InterruptedIOException e) {
 			PRINT_STACK_TRACE;
@@ -403,7 +522,7 @@ class ConnReadToData implements Runnable {
 #if 0
 			res = mac.in.read(bin.arr, offset, size);
 #else
-			res = recv(mac.in, bin.arr, offset, size);
+			res = mac.recv(bin.arr, offset, size);
 #endif	//0
 #endif	//SEGMENTED_DATA
 		} catch(InterruptedIOException e) {
@@ -446,12 +565,7 @@ class ConnWrite implements Runnable {
 
 	public final void run() {
 		try {
-#ifdef OLD_MEMCPY
-			readMemBytes(mac.out, src, size);
-#else
-			readMemStream(mac.out, src, size);
-#endif
-			mac.out.flush();
+			mac.write(getMemBytes(src, size), 0, size);
 		} catch(InterruptedIOException e) {
 			PRINT_STACK_TRACE;
 			mac.handleResult(CONNOP_WRITE, CONNERR_CANCELED);
@@ -510,18 +624,17 @@ class ConnWriteFromData implements Runnable {
 			if(bi instanceof Binary) {
 				Binary bin = (Binary)bi;
 #ifdef SEGMENTED_DATA
-				bin.write(mac.out, offset, size);
+				mac.write(bin, offset, size);
 #else
-				chunkWrite(mac.out, bin.arr, offset, size);
+				mac.write(bin.arr, offset, size);
 #endif
 			} else {
 				byte[] buffer = new byte[size];
 				DataInputStream dis = new DataInputStream(bi.getInputStream());
 				dis.readFully(buffer);
 				dis.close();
-				chunkWrite(mac.out, buffer);
+				mac.write(buffer, 0, size);
 			}
-			mac.out.flush();
 		} catch(InterruptedIOException e) {
 			PRINT_STACK_TRACE;
 			finish(CONNERR_CANCELED);

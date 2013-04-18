@@ -37,6 +37,7 @@ MessageHandler::MessageHandler()
 	mPhoneGapMessageHandler = NULL;
 	mNativeUIMessageHandler = NULL;
 	mResourceMessageHandler = NULL;
+	mOrientationMessageHandler = NULL;
 }
 
 MessageHandler::~MessageHandler()
@@ -56,6 +57,11 @@ MessageHandler::~MessageHandler()
 		delete mResourceMessageHandler;
 		mResourceMessageHandler = NULL;
 	}
+	if (mOrientationMessageHandler)
+	{
+		delete mOrientationMessageHandler;
+		mOrientationMessageHandler = NULL;
+	}
 }
 
 void MessageHandler::initialize(Wormhole::HybridMoblet* moblet)
@@ -72,6 +78,7 @@ void MessageHandler::initialize(Wormhole::HybridMoblet* moblet)
 	mPhoneGapMessageHandler = new PhoneGapMessageHandler(webView);
 	mNativeUIMessageHandler = new NativeUIMessageHandler(webView);
 	mResourceMessageHandler = new ResourceMessageHandler(webView);
+	mOrientationMessageHandler = new OrientationMessageHandler(webView);
 
 	// Set the FileUtil object to use...
 
@@ -351,6 +358,12 @@ void MessageHandler::handleMessageStream(
 			// Handle messages specific to MoSync.
 			handleMoSyncMessage(message, webViewHandle, moblet);
 		}
+		else if (0 == strcmp(p, "MoSyncOrientation"))
+		{
+			// Handle orientation specific messages.
+			mOrientationMessageHandler->handleMessage(message);
+		}
+
 	}
 }
 
@@ -376,10 +389,6 @@ void MessageHandler::handleMoSyncMessage(
 		logMessage = message.getNext();
 		maWriteLog(logMessage, strlen(logMessage));
 	}
-	else if (0 == strcmp(p, "ScreenSetOrientation"))
-	{
-		screenSetOrientation(message.getNext());
-	}
 	else if (0 == strcmp(p, "OpenExternalURL"))
 	{
 		maPlatformRequest(message.getNext());
@@ -387,42 +396,6 @@ void MessageHandler::handleMoSyncMessage(
 	else if (0 == strcmp(p, "OpenWormhole"))
 	{
 		moblet->openWormhole(webViewHandle);
-	}
-}
-
-void MessageHandler::screenSetOrientation(const char* orientation)
-{
-	if (0 == strcmp(orientation, "dynamic"))
-	{
-		// Android and Windows Phone.
-		maScreenSetOrientation(SCREEN_ORIENTATION_DYNAMIC);
-
-		// iOS and Windows Phone.
-		maScreenSetSupportedOrientations(
-			MA_SCREEN_ORIENTATION_LANDSCAPE_LEFT |
-			MA_SCREEN_ORIENTATION_LANDSCAPE_RIGHT |
-			MA_SCREEN_ORIENTATION_PORTRAIT |
-			MA_SCREEN_ORIENTATION_PORTRAIT_UPSIDE_DOWN);
-	}
-	else if (0 == strcmp(orientation, "portrait"))
-	{
-		// Android and Windows Phone.
-		maScreenSetOrientation(SCREEN_ORIENTATION_PORTRAIT);
-
-		// iOS and Windows Phone.
-		maScreenSetSupportedOrientations(
-			MA_SCREEN_ORIENTATION_PORTRAIT |
-			MA_SCREEN_ORIENTATION_PORTRAIT_UPSIDE_DOWN);
-	}
-	else if (0 == strcmp(orientation, "landscape"))
-	{
-		// Android and Windows Phone.
-		maScreenSetOrientation(SCREEN_ORIENTATION_LANDSCAPE);
-
-		// iOS and Windows Phone.
-		maScreenSetSupportedOrientations(
-			MA_SCREEN_ORIENTATION_LANDSCAPE_LEFT |
-			MA_SCREEN_ORIENTATION_LANDSCAPE_RIGHT);
 	}
 }
 

@@ -17,7 +17,10 @@ MA 02110-1301, USA.
 
 package com.mosync.nativeui.ui.widgets;
 
+import java.io.File;
+
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.widget.ImageView;
 
 import com.mosync.internal.generated.IX_WIDGET;
@@ -34,6 +37,17 @@ import com.mosync.nativeui.util.properties.PropertyConversionException;
  */
 public class ImageWidget extends Widget
 {
+
+	/**
+	 * Image handle for MAW_BUTTON_IMAGE property;
+	 */
+	private int mImageHandle = 0;
+
+	/**
+	 * Image file path for MAW_IMAGE_PATH property;
+	 */
+	private String mImagePath = "";
+
 	/**
 	 * Constructor.
 	 *
@@ -70,8 +84,10 @@ public class ImageWidget extends Widget
 
 		if( property.equals( IX_WIDGET.MAW_IMAGE_IMAGE ) )
 		{
-			Bitmap image = NativeUI.getBitmap( IntConverter.convert( value ) );
+			mImageHandle = IntConverter.convert( value );
+			Bitmap image = NativeUI.getBitmap( mImageHandle );
 			imageView.setImageBitmap( image );
+			mImagePath = "";
 		}
 		else if( property.equals( IX_WIDGET.MAW_IMAGE_SCALE_MODE ) )
 		{
@@ -86,6 +102,21 @@ public class ImageWidget extends Widget
 			else if( value.equals( "scalePreserveAspect" ) )
 			{
 				imageView.setScaleType( ImageView.ScaleType.FIT_CENTER );
+			}
+			else
+			{
+				throw new InvalidPropertyValueException( property , value );
+			}
+		}
+		else if( property.equals( IX_WIDGET.MAW_IMAGE_PATH ) )
+		{
+			File imgFile = new File( value );
+			if( imgFile.exists() )
+			{
+				mImagePath = value;
+				mImageHandle = 0;
+			    Bitmap myBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
+			    imageView.setImageBitmap(myBitmap);
 			}
 			else
 			{
@@ -111,6 +142,14 @@ public class ImageWidget extends Widget
 			return Integer.toString(m_alpha);
 			// TODO Keep it and call it for API level 11.
 //			return Float.toString(imageView.getAlpha());
+		}
+		else if( property.equals( IX_WIDGET.MAW_IMAGE_IMAGE ) )
+		{
+			return Integer.toString(mImageHandle);
+		}
+		else if( property.equals( IX_WIDGET.MAW_IMAGE_PATH ) )
+		{
+			return mImagePath;
 		}
 		else
 		{

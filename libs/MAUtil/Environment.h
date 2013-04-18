@@ -167,7 +167,53 @@ namespace MAUtil {
 		 */
 		virtual void sensorEvent(MASensor a) = 0;
 	};
-	
+
+	/**
+	* \brief A listener for orientation changes.
+	* Note: If the application uses NativeUI, it is preffered
+	* to use Screen::addScreenListener() instead, so that
+	* all events will be received for specific screens.
+	* \see Environment::addOrientationListener()
+	*/
+	class OrientationListener {
+	public:
+		/**
+		* Called after the screen has finished rotating.
+		* \param 'screenOrientation' One of the
+		* \link #MA_SCREEN_ORIENTATION_PORTRAIT MA_SCREEN_ORIENTATION \endlink codes.
+		*/
+		virtual void orientationChanged(int orientation) = 0;
+		/**
+		* Send by current screen just before it begins rotating.
+		* Note: available only on iOS platform.
+		*/
+		virtual void orientationWillChange() {};
+	};
+
+
+	/**
+	 * \brief A listener for media export operations.
+	 * \see Environment::addMediaExportListener().
+	 */
+	 class MediaExportListener {
+	 public:
+		/**
+		 * Called after the operation of exporting/saving an image to the
+		 * photo gallery of the device. This event is triggered by the
+		 * #maSaveImageToDeviceGallery() call.
+		 *
+		 * Note: In order to obtain this notification you must register to
+		 * the Enviroment via #addMediaExportListener. Please remember to
+		 * unregister when finished using #removeMediaExportListener.
+		 *
+		 * \param imageHandle Handle of the image that was the subject of the
+		 * export operation.
+		 * \param resultCode The result code of the operation.
+		 */
+		virtual void imageExportToGalleryFinished( const MAHandle& imageHandle,
+			int resultCode ) {};
+	 };
+
 	/**
 	* \brief A base class for cross-platform event managers.
 	*/
@@ -318,6 +364,15 @@ namespace MAUtil {
 		void addSensorListener(SensorListener* tl);
 		void removeSensorListener(SensorListener* tl);
 
+		void addOrientationListener(OrientationListener* ol);
+		void removeOrientationListener(OrientationListener* ol);
+
+		/**
+		 * Add and remove listeners for media export events.
+		 */
+		void addMediaExportListener(MediaExportListener* meListener);
+		void removeMediaExportListener(MediaExportListener* meListener);
+
 		/**
 		* Returns a reference to the Environment.
 		* Causes a panic if no Environment exists.
@@ -418,6 +473,22 @@ namespace MAUtil {
 		void fireCloseEvent();
 
 		/**
+		* Calls orientationChanged() of all registered orientation listeners.
+		*/
+		void fireOrientationChangedEvent(int screenOrientation);
+
+		/**
+		* Calls orientationWillChange() of all registered orientation listeners.
+		*/
+		void fireOrientationWillChangeEvent();
+
+		/**
+		 * Calls method of all media export listeners. The method called depends
+		 * on the media export operation.
+		 */
+		void fireMediaExportEvent(const MAEvent& mediaExportEvent);
+
+		/**
 		* Calls all registered IdleListeners once each.
 		*/
 		void runIdleListeners();
@@ -446,6 +517,8 @@ namespace MAUtil {
 		ListenerSet<CustomEventListener> mCustomEventListeners;
 		ListenerSet<TextBoxListener> mTextBoxListeners;
 		ListenerSet<SensorListener> mSensorListeners;
+		ListenerSet<OrientationListener> mOrientationListeners;
+		ListenerSet<MediaExportListener> mMediaExportListeners;
 private:
 		static Environment* sEnvironment;
 	};

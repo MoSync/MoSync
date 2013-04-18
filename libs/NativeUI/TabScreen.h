@@ -87,6 +87,12 @@ namespace NativeUI
          */
         virtual int getActiveTabIndex();
 
+		/**
+		 * Check if a tab screen is shown.
+		 * @return true if the tab screen is visible, false otherwise.
+		 */
+		virtual bool isShown();
+
         /**
          * Add an tab screen event listener.
          * @param listener The listener that will receive tab screen events.

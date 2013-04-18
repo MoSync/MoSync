@@ -47,11 +47,11 @@ namespace MoSync
 			protected Socket mSocket;
 			DnsEndPoint mHostEntry;
 
-			public SocketConnection(Uri uri, int handle)
+			public SocketConnection(Uri uri, int handle, SocketType st, ProtocolType pt)
 			{
 				mHandle = handle;
 
-				mSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+				mSocket = new Socket(AddressFamily.InterNetwork, st, pt);
 				mHostEntry = new DnsEndPoint(uri.Host, uri.Port);
 			}
 
@@ -343,7 +343,11 @@ namespace MoSync
 				Connection c;
 				if (uri.Scheme.Equals("socket"))
 				{
-					c = new SocketConnection(uri, mNextConnHandle);
+					c = new SocketConnection(uri, mNextConnHandle, SocketType.Stream, ProtocolType.Tcp);
+				}
+				else if (uri.Scheme.Equals("datagram"))
+				{
+					c = new SocketConnection(uri, mNextConnHandle, SocketType.Dgram, ProtocolType.Udp);
 				}
 				else if (uri.Scheme.Equals("http") || uri.Scheme.Equals("https"))
 				{

@@ -860,6 +860,37 @@ namespace Base
 		mJNIEnv->DeleteLocalRef(cls);
 	}
 
+	SYSCALL(void, maConnReadFrom(MAHandle conn, void* dst, int size, MAConnAddr* src))
+	{
+		SYSLOG("maConnReadFrom");
+
+		int rdst = (int)dst - (int)gCore->mem_ds;
+		int rsrc = (int)src - (int)gCore->mem_ds;
+
+		jclass cls = mJNIEnv->GetObjectClass(mJThis);
+		jmethodID methodID = mJNIEnv->GetMethodID(cls, "maConnReadFrom", "(IIII)V");
+		if (methodID == 0) ERROR_EXIT;
+		mJNIEnv->CallVoidMethod(mJThis, methodID, conn, (jint)rdst, size, rsrc);
+
+		mJNIEnv->DeleteLocalRef(cls);
+
+	}
+
+	SYSCALL(void, maConnWriteTo(MAHandle conn, const void* src, int size, const MAConnAddr* dst))
+	{
+		SYSLOG("maConnWriteTo");
+
+		int rsrc = (int)src - (int)gCore->mem_ds;
+		int rdst = (int)dst - (int)gCore->mem_ds;
+
+		jclass cls = mJNIEnv->GetObjectClass(mJThis);
+		jmethodID methodID = mJNIEnv->GetMethodID(cls, "maConnWriteTo", "(IIII)V");
+		if (methodID == 0) ERROR_EXIT;
+		mJNIEnv->CallVoidMethod(mJThis, methodID, conn, (jint)rsrc, size, rdst);
+
+		mJNIEnv->DeleteLocalRef(cls);
+	}
+
 	SYSCALL(void,  maConnReadToData(MAHandle conn, MAHandle data, int offset, int size))
 	{
 		SYSLOG("maConnReadToData");
@@ -1854,6 +1885,10 @@ namespace Base
 			SYSLOG("maIOCtl_maWidgetScreenShow");
 			return _maWidgetScreenShow(a, mJNIEnv, mJThis);
 
+		case maIOCtl_maWidgetScreenShowWithTransition:
+			SYSLOG("maIOCtl_maWidgetScreenShowWithTransition");
+			return _maWidgetScreenShowWithTransition(a, b, c, mJNIEnv, mJThis);
+
 		case maIOCtl_maWidgetStackScreenPush:
 			SYSLOG("maIOCtl_maWidgetStackScreenPush");
 			return _maWidgetStackScreenPush(a, b, mJNIEnv, mJThis);
@@ -1898,6 +1933,18 @@ namespace Base
 		case maIOCtl_maScreenSetFullscreen:
 			SYSLOG("maIOCtl_maScreenSetFullscreen");
 			return _maScreenSetFullscreen(a, mJNIEnv, mJThis);
+
+		case maIOCtl_maScreenSetSupportedOrientations:
+			SYSLOG("maIOCtl_maScreenSetSupportedOrientations");
+			return _maScreenSetSupportedOrientations(a, mJNIEnv, mJThis);
+
+		case maIOCtl_maScreenGetSupportedOrientations:
+			SYSLOG("maIOCtl_maScreenGetSupportedOrientations");
+			return _maScreenGetSupportedOrientations(mJNIEnv, mJThis);
+
+		case maIOCtl_maScreenGetCurrentOrientation:
+			SYSLOG("maIOCtl_maScreenGetCurrentOrientation");
+			return _maScreenGetCurrentOrientation(mJNIEnv, mJThis);
 
 		case maIOCtl_maHomeScreenEventsOn:
 			SYSLOG("maIOCtl_maHomeScreenEventsOn");
@@ -1958,6 +2005,14 @@ namespace Base
 				mJNIEnv,
 				mJThis);
 
+		case maIOCtl_maToast:
+			SYSLOG("maIOCtl_maToast");
+			return _maToast(
+				SYSCALL_THIS->GetValidatedStr(a),
+				b,
+				mJNIEnv,
+				mJThis);
+
 		case maIOCtl_maImagePickerOpen:
 			SYSLOG("maIOCtl_maImagePickerOpen");
 			return _maImagePickerOpen(
@@ -1985,6 +2040,16 @@ namespace Base
 				_cancel,
 				SYSCALL_THIS->GetValidatedStackValue(0),
 				SYSCALL_THIS->GetValidatedStackValue(4),
+				mJNIEnv,
+				mJThis);
+			}
+
+		case maIOCtl_maSaveImageToDeviceGallery:
+			{
+			SYSLOG("maIOCtl_maSaveImageToDeviceGallery");
+			return _maSaveImageToDeviceGallery(
+				a,
+				SYSCALL_THIS->GetValidatedStr(b),
 				mJNIEnv,
 				mJThis);
 			}
@@ -2202,6 +2267,12 @@ namespace Base
 			return _maCameraSnapshot(
 				a,
 				b,
+				mJNIEnv,
+				mJThis);
+
+		case maIOCtl_maCameraSnapshotAsync:
+			return _maCameraSnapshotAsync(
+				a,
 				mJNIEnv,
 				mJThis);
 

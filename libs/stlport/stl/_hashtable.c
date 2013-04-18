@@ -43,11 +43,11 @@ _STLP_MOVE_TO_PRIV_NAMESPACE
   50331653ul,   100663319ul,  201326611ul, 402653189ul, 805306457ul,\
   1610612741ul, 3221225473ul, 4294967291ul  \
 }
+ static const size_t _list[] = __PRIME_LIST_BODY;
 
 template <class _Dummy>
 const size_t* _STLP_CALL
 _Stl_prime<_Dummy>::_S_primes(size_t &__size) {
-  static const size_t _list[] = __PRIME_LIST_BODY;
 #  ifndef __MWERKS__
   __size =  sizeof(_list) / sizeof(_list[0]);
 #  else
