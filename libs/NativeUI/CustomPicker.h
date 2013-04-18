@@ -44,6 +44,7 @@ namespace NativeUI
 	// Forward declarations.
 	class CustomPickerListener;
 	class Layout;
+
 	/**
 	 * \brief A widget that provides a quick way to select one value from a set.
 	 * Platform: Android, iOS.

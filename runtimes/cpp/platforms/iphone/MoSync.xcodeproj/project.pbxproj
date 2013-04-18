@@ -433,6 +433,9 @@
 		8B944BFF16C1809C00E1B091 /* MoSyncOrientation.h in Headers */ = {isa = PBXBuildFile; fileRef = 8B944BFD16C1809C00E1B091 /* MoSyncOrientation.h */; };
 		8B944C0016C1809C00E1B091 /* MoSyncOrientation.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8B944BFE16C1809C00E1B091 /* MoSyncOrientation.mm */; };
 		8B944C0116C1809C00E1B091 /* MoSyncOrientation.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8B944BFE16C1809C00E1B091 /* MoSyncOrientation.mm */; };
+		8B9B2DE01716E9B100D54D00 /* CustomPickerWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 8B9B2DDE1716E9B100D54D00 /* CustomPickerWidget.h */; };
+		8B9B2DE11716E9B100D54D00 /* CustomPickerWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8B9B2DDF1716E9B100D54D00 /* CustomPickerWidget.mm */; };
+		8B9B2DE21716E9B100D54D00 /* CustomPickerWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8B9B2DDF1716E9B100D54D00 /* CustomPickerWidget.mm */; };
 		8BB2E67216C2509B00391242 /* MoSyncOpenGL.h in Headers */ = {isa = PBXBuildFile; fileRef = 8BB2E67016C2509B00391242 /* MoSyncOpenGL.h */; };
 		8BB2E67316C2509B00391242 /* MoSyncOpenGL.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8BB2E67116C2509B00391242 /* MoSyncOpenGL.mm */; };
 		8BB2E67416C2509B00391242 /* MoSyncOpenGL.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8BB2E67116C2509B00391242 /* MoSyncOpenGL.mm */; };
@@ -803,6 +806,8 @@
 		8B944BF916C17D3700E1B091 /* MoSyncNotification.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = MoSyncNotification.mm; path = notifications/MoSyncNotification.mm; sourceTree = "<group>"; };
 		8B944BFD16C1809C00E1B091 /* MoSyncOrientation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MoSyncOrientation.h; path = Orientation/MoSyncOrientation.h; sourceTree = "<group>"; };
 		8B944BFE16C1809C00E1B091 /* MoSyncOrientation.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = MoSyncOrientation.mm; path = Orientation/MoSyncOrientation.mm; sourceTree = "<group>"; };
+		8B9B2DDE1716E9B100D54D00 /* CustomPickerWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CustomPickerWidget.h; path = NativeUI/Widgets/CustomPickerWidget.h; sourceTree = "<group>"; };
+		8B9B2DDF1716E9B100D54D00 /* CustomPickerWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = CustomPickerWidget.mm; path = NativeUI/Widgets/CustomPickerWidget.mm; sourceTree = "<group>"; };
 		8BB2E67016C2509B00391242 /* MoSyncOpenGL.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MoSyncOpenGL.h; path = OpenGL/MoSyncOpenGL.h; sourceTree = "<group>"; };
 		8BB2E67116C2509B00391242 /* MoSyncOpenGL.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = MoSyncOpenGL.mm; path = OpenGL/MoSyncOpenGL.mm; sourceTree = "<group>"; };
 		8BB2E67C16C28AE500391242 /* MoSyncGraphics.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MoSyncGraphics.h; path = Graphics/MoSyncGraphics.h; sourceTree = "<group>"; };
