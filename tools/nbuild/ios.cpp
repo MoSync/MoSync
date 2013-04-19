@@ -22,8 +22,8 @@ int buildIOSNative(Arguments* params) {
 	string projectDir = require(params, "--project");
 	string finalOutputFileName = "userCode.o"; //Should be taked from the command options eventually
 
-	//Special header folder for the native ios build, which does not include headers that already
-	//exist in the iphone SDK
+	//Special header folder for the native ios build, which does not include headers
+	//that already exist in the iphone SDK
 	string nativeHeaderDir = string(mosyncdir()) + "/include/MAStdNative";
 
 	//Gather the source files in a string
@@ -92,10 +92,14 @@ int buildIOSNative(Arguments* params) {
 				cmd << "-v "; //verbose output
 			}
 			if (isDebug) {
-				cmd << "-g "; //debug mode
+				cmd << "-g -O0 -DDEBUG=1 "; //debug mode
+			}
+			else
+			{
+				cmd << "-Os";
 			}
 
-			cmd << "-arch " + archs[j] << " "; //The architecture to build
+			cmd << "-arch " + arch << " "; //The architecture to build
 			cmd << "-Xlinker -r "; //Tell the linker to just bundle all the .o files into one .o instead of linking/assembling
 			cmd << " -nostdlib "; //Don't link with stdlib, xcode will do that
 			cmd << "-isysroot /Applications/Xcode.app/Contents/Developer/Platforms/" << archSDKName << ".platform/Developer/SDKs/" << archSDKName << sdkVersion << ".sdk ";
