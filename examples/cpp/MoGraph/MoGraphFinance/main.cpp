@@ -18,7 +18,6 @@ MA 02110-1301, USA.
 
 #include <yajl/YAJLDom.h>
 #include <mautil/connection.h>
-
 #include <mavsprintf.h>
 #include <MAUtil/GLMoblet.h>
 #include <GLES2/gl2.h>
@@ -28,7 +27,7 @@ MA 02110-1301, USA.
 #include <MoGraph.h>
 
 using namespace MAUtil;
-#define CONNECTION_BUFFER_SIZE 1024	//1024
+#define CONNECTION_BUFFER_SIZE 1024
 
 class MyGLMoblet: public GLMoblet , MAUtil::HttpConnectionListener
 {
@@ -36,26 +35,25 @@ private:
 
 	// ================== Members ==================
 
-	int 			mWidth;
-	int				mHeight;			// Screen resolution in ABS form e.g. 640,480
-	MoGraph::IGraph	*mGraph;			// interface/Base class to MoGraph
-	IFont			*mFont;				// interface/Base class to Font
-	glm::vec4 		*mColors;			// array pointing towards a color table
-	float 			*mTables;			// array pointing towards a float table
-	std::vector<std::string> 	mNameTable;		// array pointing towards name of bar.
-	DTime 			mDTime;				// delta time between each tick! (update) used for fps timer
-	Time  			mTime;				// elapsed time since creation of this class,
-	RenderText 		mText;				// generic render text class. (openGL)
-	float			mOmega;				// used for sin and cos
-	float			mScaleBarHeight;	// scale height of the input data to be more normalized.
-	bool			mTextUpdated;		// state flag to check if text is updated
-	std::string		mDateTime;			// Text date & time of retrieving the stocks.
+	int mWidth;
+	int	mHeight; // Screen resolution in ABS form e.g. 640,480
+	MoGraph::IGraph	*mGraph; // interface/Base class to MoGraph
+	IFont *mFont; // interface/Base class to Font
+	glm::vec4 *mColors; // array pointing towards a color table
+	float *mTables; // array pointing towards a float table
+	std::vector<std::string> mNameTable; // array pointing towards name of bar.
+	DTime mDTime; // delta time between each tick! (update) used for fps timer
+	Time  mTime; // elapsed time since creation of this class,
+	RenderText 	mText; // generic render text class. (openGL)
+	float mOmega; // used for sin and cos
+	float mScaleBarHeight; // scale height of the input data to be more normalized.
+	bool mTextUpdated; // state flag to check if text is updated
+	std::string	mDateTime; // Text date & time of retrieving the stocks.
 
-	MAUtil::HttpConnection mHttp;		// using the HttpConnection class
-	char 			*mBuffer;			// buffer to receive data to
-	char 			*mSharesData;		// accumulated output data
-	int 			mTotalSize;			// total size of the output data
-	bool			mConnected;
+	MAUtil::HttpConnection mHttp; // using the HttpConnection class
+	char *mBuffer; // buffer to receive data to
+	char *mSharesData; // accumulated output data
+	int mTotalSize; // total size of the output data
 
 public:
 
@@ -85,16 +83,22 @@ public:
 	 */
 	virtual ~MyGLMoblet()
 	{
-		mNameTable.clear();				// Clear the name table of shares.
-		delete [] mTables;				// Delete Graph Height table
-		delete [] mColors;				// Delete Graph Color table
-		delete mGraph;					// Delete Graph
-		delete mFont;					// Delete Font
-		delete [] mBuffer;				// Delete buffer
-		free(mSharesData);				// free total buffer (using realloc)  hence the free
+		mNameTable.clear();	// Clear the name table of shares.
+		delete [] mTables; // Delete Graph Height table
+		delete [] mColors; // Delete Graph Color table
+		delete mGraph; // Delete Graph
+		delete mFont; // Delete Font
+		delete [] mBuffer; // Delete buffer
+		free(mSharesData); // free total buffer (using realloc)  hence the free
 	}
 
 	// ================== Callback ==================
+
+	/**
+	 * \brief httpFinished, callback from mHttp.create
+	 * @param conn
+	 * @param result
+	 */
 
 	// 1. call order after a http create... http finnished
 	void httpFinished(HttpConnection *conn, int result)
@@ -120,36 +124,38 @@ public:
 				contentLength = atoi(contentLengthStr.c_str());
 			}
 
-//			contentLength = 2887+3;
-
-			if(contentLength >= CONNECTION_BUFFER_SIZE || contentLength == 0)
+			if(contentLength >= CONNECTION_BUFFER_SIZE || contentLength == 0) // reading chunks of data of CONNECTION_BUFFER_SIZE
 			{
 				lprintfln("@@@ 3DGRAPH: Receive in chunks..\n");
 				mBuffer = new char[CONNECTION_BUFFER_SIZE];
-				mHttp.recv(mBuffer, CONNECTION_BUFFER_SIZE);	// connRecvFinished is callback from this call
+				mHttp.recv(mBuffer, CONNECTION_BUFFER_SIZE); // connRecvFinished is callback from this call
 			}
 			else
-			{	// Not in use really
-				mBuffer = new char[contentLength+1];
+			{
+				mBuffer = new char[contentLength+1]; // reading all data at once. due to size is known
 				mBuffer[contentLength] 	= 0;
-				mSharesData = (char*)malloc((contentLength)*sizeof(char));	// skip the double slashes in from the buffer 4 bytes. we need an extra byte for null term though hence the -4+1 = -3
+				mSharesData = (char*)malloc((contentLength)*sizeof(char)); // skip the double slashes in from the buffer 4 bytes. we need an extra byte for null term though hence the -4+1 = -3
 				mBuffer[contentLength] 	= 0;
 				mTotalSize = contentLength;
-
-				mHttp.read(mBuffer, contentLength);				//connReadFinnished is callback from this call
+				mHttp.read(mBuffer, contentLength); //connReadFinnished is callback from this call
 			}
 		}
 	}
 
-
+	/**
+	 * \brief connRecvFinished, callback from mHttp.recv()
+	 * \note read chunks data of buffer size CONNECTION_BUFFER_SIZE , (streaming)
+	 * @param conn
+	 * @param result
+	 */
 	void connRecvFinished(Connection *conn, int result)
 	{
 		if(result >= 0)
 		{
 			lprintfln("@@@ 3DGRAPH: connRecvFinished %i\n", result);
-			if(mSharesData == NULL)		// create shared data buffer (first time)
+			if(mSharesData == NULL) // create shared data buffer (first time)
 			{
-				mSharesData = (char*)malloc((result-3)*sizeof(char));	// skip the double slashes in from the buffer 4 bytes. we need an extra byte for null term though hence the -4+1 = -3
+				mSharesData = (char*)malloc((result-3)*sizeof(char)); // skip the double slashes in from the buffer 4 bytes. we need an extra byte for null term though hence the -4+1 = -3
 				lprintfln("@@@@@@@@@@@@@@@ size: %d", (int)strlen(mSharesData));
 				mTotalSize = result-4;
 
@@ -160,7 +166,7 @@ public:
 				lprintfln("@@@@@@@@@@@@@@@ FIRST:%sLAST size: %d", mSharesData, (int)strlen(mSharesData));
 
 			}
-			else	// continous buffer read
+			else // continous buffer read
 			{
 				mBuffer[result] = '\0';
 				lprintfln("@@@@@@@@@@@@@@@ FIRST:%sLAST size: %d", mBuffer, (int)strlen(mBuffer));
@@ -180,18 +186,22 @@ public:
 		else if(result == CONNERR_CLOSED)
 		{
 			lprintfln("@@@ 3DGRAPH: Receive finished! totalBytes=%d\n",mTotalSize);
-			updateTextColumns(mNameTable,true);					// this will only update once!
+			updateTextColumns(mNameTable,true);	// this will only update once!
 		}
 		else
 		{
 			lprintfln("@@@ 3DGRAPH: connection error %i\n", result);
-			updateTextColumns(mNameTable,false);					// this will only update once!
+			updateTextColumns(mNameTable,false); // when false fail message will always be generated.
 		}
-
 
 		mHttp.close();
 	}
 
+	/**
+	 * \brief parseJSON
+	 * \note parses from mSharedData and populate the arrays such as
+	 * mNameTable[], mTable[], mDataTime, mColor[]
+	 */
 	void parseJSON()
 	{
 		YAJLDom::Value *jsonRoot = YAJLDom::parse((const unsigned char*)mSharesData, strlen(mSharesData));
@@ -199,7 +209,6 @@ public:
 		if(jsonRoot->getType() == YAJLDom::Value::ARRAY)
 		{
 			lprintfln("SUCCESS IN PARSING JSON DATA");
-			//float l,l_cur,el,el_cur;
 			MAUtil::String tmp,t;
 			float scale = mScaleBarHeight;
 			const int gridX = mGraph->getScene().getGridX();
@@ -252,15 +261,15 @@ public:
 			glm::vec4 colScheme[gridZ];
 			glm::vec4 redScheme[gridZ];
 
-			colScheme[0] = glm::vec4(0.0f, 236.0f/255.0f,	255.0f/255.0f,	1.0f);	// L blue
-			colScheme[1] = glm::vec4(0.0f, 177.0f/255.0f,	191.0f/255.0f,	1.0f);	// D blue
-			colScheme[2] = glm::vec4(181.0f/255.0f, 255.0f/255.0f,	0.0f,	1.0f);	// L Green
-			colScheme[3] = glm::vec4(124.0f/255.0f, 175.0f/255.0f,	0.0f,	1.0f);	// D Green
+			colScheme[0] = glm::vec4(0.0f, 236.0f/255.0f, 255.0f/255.0f, 1.0f);	// L blue
+			colScheme[1] = glm::vec4(0.0f, 177.0f/255.0f, 191.0f/255.0f, 1.0f);	// D blue
+			colScheme[2] = glm::vec4(181.0f/255.0f, 255.0f/255.0f, 0.0f, 1.0f);	// L Green
+			colScheme[3] = glm::vec4(124.0f/255.0f, 175.0f/255.0f, 0.0f, 1.0f);	// D Green
 
-			redScheme[0] = glm::vec4(255.0f/255.0f, 0.0f, 236.0f/255.0f,	1.0f);	// L blue
-			redScheme[1] = glm::vec4(177.0f/255.0f, 0.0f, 191.0f/255.0f,	1.0f);	// D blue
-			redScheme[2] = glm::vec4(255.0f/255.0f, 90.0f/255.0f, 0.0f,		1.0f);	// L Red
-			redScheme[3] = glm::vec4(175.0f/255.0f, 64.0f/255.0f, 0.0f,		1.0f);	// D Red
+			redScheme[0] = glm::vec4(255.0f/255.0f, 0.0f, 236.0f/255.0f, 1.0f);	// L blue
+			redScheme[1] = glm::vec4(177.0f/255.0f, 0.0f, 191.0f/255.0f, 1.0f);	// D blue
+			redScheme[2] = glm::vec4(255.0f/255.0f, 90.0f/255.0f, 0.0f, 1.0f);  // L Red
+			redScheme[3] = glm::vec4(175.0f/255.0f, 64.0f/255.0f, 0.0f, 1.0f);  // D Red
 
 			for(int j=0; j<gridZ; j++)
 			{
@@ -273,6 +282,11 @@ public:
 		}
 	}
 
+	/**
+	 * \brief connReadFinished, callback from listener mHttp.read()
+	 * @param conn
+	 * @param result input failed < 0,
+	 */
 	// 2. call order from mHttp.read
 	void connReadFinished(Connection *conn, int result)
 	{
@@ -283,13 +297,14 @@ public:
 
 			parseJSON();
 			lprintfln("@@@ 3DGRAPH: Read finished!\n");
-			updateTextColumns(mNameTable,true);					// this will only update once!
+			updateTextColumns(mNameTable,true); // this will only update once!
 		}
 		else
 		{
 			lprintfln("@@@ 3DGRAPH: connection error %i\n", result);
-			updateTextColumns(mNameTable,false);					// this will only update once!
+			updateTextColumns(mNameTable,false); // when false fail message will always be generated.
 		}
+
 		mHttp.close();
 	}
 
@@ -341,10 +356,8 @@ public:
 
 	void updateTextColumns(std::vector<std::string> &tableName, bool bIsSuccess)
 	{
-		MoGraph::Text text;
-		MoGraph::Scene &scene 	= mGraph->getScene();	// get scene information
-		std::vector<MoGraph::Text> &textArray = scene.getTextMgr().getTextArray();
-
+		MoGraph::Scene &scene = mGraph->getScene();	// get scene information
+		std::vector<MoGraph::Text> &textArray = scene.getTextMgr().getTextArray(); // get text array
 
 		if (bIsSuccess == true)
 		{
@@ -352,27 +365,28 @@ public:
 			textArray[0].mText = "NASDAQ:" + mDateTime;
 			if (mTextUpdated == false)
 			{
-				const float scale 		= 0.7f*scene.getScaleFactor();
-				const float cx 			= scene.getCx();		// need to be able to read the grid size
-				const float cz 			= scene.getCz();
-				const int	gridX		= scene.getGridX();
+				const float scale = 0.7f*scene.getScaleFactor();
+				const float cx = scene.getCx(); // need to be able to read the grid size
+				const float cz = scene.getCz();
+				const int gridX = scene.getGridX();
 
 				for(int i = 0; i < gridX; i++)
 				{
-					text.mColor 	= glm::vec4(1.0f,1.0f,1.0f,1.0f);
-					text.mPos 		= glm::vec3(cx+i*1.0f,0.0f,cz);
-					text.mText 		= tableName[i];
-					text.mRotate 	= glm::vec3(0.0f,0.0f,0.0f);
-					text.mScale 	= glm::vec2(scale,scale);
+					MoGraph::Text text; // use a working text struct for building new text items.
+					text.mColor = glm::vec4(1.0f,1.0f,1.0f,1.0f);
+					text.mPos = glm::vec3(cx+i*1.0f,0.0f,cz);
+					text.mText = tableName[i]; // add parsed name of the share
+					text.mRotate = glm::vec3(0.0f,0.0f,0.0f);
+					text.mScale = glm::vec2(scale,scale);
 					text.mTextFlagX = MoGraph::Text::CENTER_LEFT;
 					text.mTextFlagY = MoGraph::Text::CENTER_TOP;
 
-					textArray.push_back(text);
+					textArray.push_back(text); // add text item to the back of the text rendering array
 				}
 				mTextUpdated = true;
 			}
 		}
-		else
+		else // failed connection, we provide user with fail msg and redish if the text
 		{
 			textArray[0].mColor = glm::vec4(175.0f/255.0f, 64.0f/255.0f, 0.0f, 1.0f);
 			textArray[0].mText = "Connection Failed!";
@@ -385,8 +399,6 @@ public:
 	 */
 	void init()
 	{
-		//mHttp.create("http://www.example.com", HTTP_GET);
-
 		/*
 		 * Graph object needs to be allocated and then initiated,
 		 * Font is a separate system but is required in the graph for rendering text in 3D
@@ -394,23 +406,24 @@ public:
 		 * can handle both orthogonal projection see drawText and drawText3D
 		 */
 
-		int gridX	= 10;
-		int gridY	= 4;
+		int gridX = 10;
+		int gridY = 4;
 
-		mWidth 		= (int)(EXTENT_X(maGetScrSize()));
-		mHeight 	= (int)(EXTENT_Y(maGetScrSize()));
-		mGraph 		= new MoGraph::Graph();			// Create MoGraph::Graph class
-		mFont 		= new BMFont();					// Create Font class
+		mWidth = (int)(EXTENT_X(maGetScrSize()));
+		mHeight = (int)(EXTENT_Y(maGetScrSize()));
+		mGraph = new MoGraph::Graph(); // Create MoGraph::Graph class
+		mFont = new BMFont(); // Create Font class
 		mNameTable.resize(gridX * gridY);
+
 		// Initiate the RenderText system that will be used in Graph
 		std::vector<MAHandle> fontTexArray;
-		fontTexArray.push_back(R_BOX_TEXTURE /*R_MOSYNC_LOGO*/);
+		fontTexArray.push_back(R_BOX_TEXTURE);
 
-		mFont->Init(R_BOX_FNT, fontTexArray);		// Initiate font where to get its resources (.fnt) file generated from BMFont and the bitmap texture that contains the aphabet
-		mText.init(mWidth,mHeight,mFont);			// initiate the text system by setting a Font & Screen dimensions
+		mFont->Init(R_BOX_FNT, fontTexArray); // Initiate font where to get its resources (.fnt) file generated from BMFont and the bitmap texture that contains the aphabet
+		mText.init(mWidth,mHeight,mFont); // initiate the text system by setting a Font & Screen dimensions
 
-		mDTime.setDesiredFps(50.0f);				// set up the DTime used for calculating FPS
-		setPreferredFramesPerSecond(50);			// set preferred fps for the Moblet
+		mDTime.setDesiredFps(50.0f); // set up the DTime used for calculating FPS
+		setPreferredFramesPerSecond(50); // set preferred fps for the Moblet
 
 		// initiate Graph by setting up a grid sz in X & Z ,
 		// also grid in Y with grid step,
@@ -418,26 +431,26 @@ public:
 		mScaleBarHeight = 0.25f;
 
 		MoGraph::GraphDesc desc;
-		desc.scrWidth 		= mWidth;
-		desc.scrHeight 		= mHeight;
-		desc.gridX 			= gridX;
-		desc.gridZ 			= gridY;
-		desc.gridYLines 	= 16;
-		desc.gridStepYLines = 0.5f;
-		desc.gridStepValue 	= 0.5f/mScaleBarHeight;
-		desc.gridDecimals 	= 1;
-		desc.gridOffsetStartLine = -1;			// requires OFFSET_GRIDS to be set.
-		desc.gridOffsetStartValue = -2.0f;
-		desc.bFitScreen 	= true;
-		desc.flagGridLines 	= MoGraph::DEFAULT_GRIDS; // /* MoGraph::OFFSET_GRIDS; //*/ MoGraph::MIRRORED_GRIDS;
-		desc.bUseGridValue 	= true;
-		desc.font 			= mFont;
+		desc.scrWidth = mWidth; // screen width
+		desc.scrHeight = mHeight; // screen height
+		desc.gridX = gridX; // amount of bars in X axis
+		desc.gridZ = gridY; // amount of bars in Z axis (depth)
+		desc.gridYLines = 16; // amount of horisontal lines to be displayed in graph
+		desc.gridStepYLines = 0.5f; // the step Y position between the lines
+		desc.gridStepValue = 0.5f/mScaleBarHeight; // the step value for the displayed numbers for line
+		desc.gridDecimals = 1; // use amount of decimals e.g 0="1", 1="1.0", 2="1.00", 3="1.000" etc..
+		desc.gridOffsetStartLine = -1; // offset where to start horisontal lines from requires OFFSET_GRIDS to be set. see flagGridLines enums
+		desc.gridOffsetStartValue = -2.0f; // offset startin value can be other then zero, requires OFFSET_GRIDS to be set.
+		desc.bFitScreen = true; // fit graph to screen (default)
+		desc.flagGridLines = MoGraph::DEFAULT_GRIDS; // MoGraph::OFFSET_GRIDS .. MoGraph::MIRRORED_GRIDS;
+		desc.bUseGridValue = true; // switch to turn on/off grid values
+		desc.font = mFont; // use Font for text rendering in Graph such as values titles etc.
 
-		if (!mGraph->init(&desc))
+		if (!mGraph->init(&desc)) // initiates graph
 			maPanic(1,"Failed to initiate Graph");
 
-		glm::vec4 bkcolor(0.2f, 0.2f, 0.2f, 1.0f);
-		mGraph->setBGColor(bkcolor);				// additional set background color
+		glm::vec4 bkcolor(0.2f, 0.2f, 0.2f, 1.0f); // set background color
+		mGraph->setBGColor(bkcolor); // additional set background color
 
 		// TEXT MANIPULATION IN GRAPH
 		// Text strings in the graph has a default setup.
@@ -452,47 +465,45 @@ public:
 		const float ss = 0.75f;
 		glm::vec2 scaleAxisText = glm::vec2(scale*ss,scale*ss);
 
-		textArray[0].mColor		= glm::vec4(124.0f/255.0f, 175.0f/255.0f,	0.0f,	1.0f);
-		textArray[0].mPos.y 	-= 0.3f;
-		textArray[0].mText 		= "Connecting...";		// Graph title text.
+		textArray[0].mColor = glm::vec4(124.0f/255.0f, 175.0f/255.0f,	0.0f,	1.0f);
+		textArray[0].mPos.y -= 0.3f;
+		textArray[0].mText = "Connecting..."; // Graph title text. we also use it for connection status
 		textArray[0].mTextFlagX = MoGraph::Text::CENTER_LEFT;
 		textArray[0].mTextFlagY = MoGraph::Text::CENTER_TOP;
-		textArray[0].mScale		= glm::vec2(scale*0.8,scale*0.8);
+		textArray[0].mScale	= glm::vec2(scale*0.8,scale*0.8);
 
-		textArray[1].mScale 	= scaleAxisText;	// Y-AXIS
+		textArray[1].mScale = scaleAxisText; // Y-AXIS
 		textArray[1].mTextFlagX = MoGraph::Text::CENTER_X;
 		textArray[1].mTextFlagY = MoGraph::Text::CENTER_TOP;
 
-		textArray[2].mPos.x		+= 0.1f;
-		textArray[2].mText		= "Shares";
-		textArray[2].mScale 	= scaleAxisText;	// X-AXIS
+		textArray[2].mPos.x	+= 0.1f;
+		textArray[2].mText = "Shares";
+		textArray[2].mScale = scaleAxisText; // X-AXIS
 		textArray[2].mTextFlagX = MoGraph::Text::CENTER_LEFT;
 		textArray[2].mTextFlagY = MoGraph::Text::CENTER_TOP;
 
-		textArray[textArray.size()-1].mPos.x		+= 0.1f;
-		textArray[textArray.size()-1].mScale 		= scaleAxisText; // Z-AXIS (last entry before user storage! due to z being optional)
-		textArray[textArray.size()-1].mTextFlagX 	= MoGraph::Text::CENTER_RIGHT;
-		textArray[textArray.size()-1].mTextFlagY 	= MoGraph::Text::CENTER_TOP;
+		textArray[textArray.size()-1].mPos.x += 0.1f;
+		textArray[textArray.size()-1].mScale = scaleAxisText; // Z-AXIS (last entry before user storage! due to z being optional)
+		textArray[textArray.size()-1].mTextFlagX = MoGraph::Text::CENTER_RIGHT;
+		textArray[textArray.size()-1].mTextFlagY = MoGraph::Text::CENTER_TOP;
 
 		// create additional example text
 
 		MoGraph::Text text;
-		text.mColor 	= glm::vec4(1.0f,1.0f,1.0f,1.0f);
-		text.mPos 		= glm::vec3(0.0f,10.0f,0.0f);
-		text.mRotate 	= glm::vec3(0.0f,0.0f,0.0f);		// Rotation in degrees
-		text.mScale 	= glm::vec2(scale,scale);
+		text.mColor = glm::vec4(1.0f,1.0f,1.0f,1.0f);
+		text.mPos = glm::vec3(0.0f,10.0f,0.0f);
+		text.mRotate = glm::vec3(0.0f,0.0f,0.0f);		// Rotation in degrees
+		text.mScale = glm::vec2(scale,scale);
 		text.mTextFlagX = MoGraph::Text::CENTER_X;
-		text.mText 		= "MoGraph";
-		textArray.push_back(text);
+		text.mText = "MoGraph";
 
-//		mLogo.init(R_MOSYNC_LOGO);
-//		mLogoH.init(R_MOSYNC_HEIGHT);
+		textArray.push_back(text);
 
 		// Prepare the colors for the Graph.
 		// colors are static so we only need to build them once.
-		const int iGridZ 		= desc.gridZ;		// need to be able to read the grid size
-		const int iGridX 		= desc.gridX;
-		const int sz			= iGridX * iGridZ;
+		const int iGridZ = desc.gridZ;		// need to be able to read the grid size
+		const int iGridX = desc.gridX;
+		const int sz = iGridX * iGridZ;
 
 		if (mTables == 0)					// check if array already is allocated
 			mTables = new float[sz];		// allocate an array for set data to the Bars.
@@ -503,9 +514,9 @@ public:
 		{
 			for(int i=0; i<iGridX; i++)
 			{
-				const int id 	= j*iGridX+i;
-				mColors[id]		= glm::vec4(0.0f, 1.0f, 1.0f, 1.0f);			// set color gradients
-				mTables[id]		= 1.0f;
+				const int id = j*iGridX+i;
+				mColors[id]	= glm::vec4(0.0f, 1.0f, 1.0f, 1.0f);			// set color gradients
+				mTables[id]	= 1.0f;
 			}
 		}
 
@@ -523,7 +534,6 @@ public:
 		{
 			mHttp.finish();
 		}
-
 	}
 
 	/**
@@ -531,28 +541,28 @@ public:
 	 */
 	void draw()
 	{
-		mDTime.tick();									// update delta time ticker. our fps timer (resets for every tick call)
-		MoGraph::Scene &scene 	= mGraph->getScene();	// get scene information
-		const int iGridZ 		= scene.getGridZ();		// need to be able to read the grid size
-		const int iGridX 		= scene.getGridX();
-		const int sz			= iGridX * iGridZ;
+		mDTime.tick(); // update delta time ticker. our fps timer (resets for every tick call)
+		MoGraph::Scene &scene = mGraph->getScene();	// get scene information
+		const int iGridZ = scene.getGridZ(); // need to be able to read the grid size
+		const int iGridX = scene.getGridX();
+		const int sz = iGridX * iGridZ;
 
-		mGraph->setValues(mTables,sz);	// set the value array to the Graph to read from
-		mGraph->setColors(mColors,sz);	// set the color array to the Graph to read from
+		mGraph->setValues(mTables,sz); // set the value array to the Graph to read from
+		mGraph->setColors(mColors,sz); // set the color array to the Graph to read from
 
-		mGraph->draw();					// Draw the whole graph system
+		mGraph->draw(); // Draw the whole graph system
 
 
 		// DRAW ADDITIONAL TEXT ON SCREEN (Orthogonal projections)
 		//---------------------------------------------------------------------
 		glm::vec4 col(1.0f,1.0f,1.0f,1.0f);	// White color
-		glm::vec3 pos(0.0f,0.0f,10.0f);		// set screen position upper left corner 0,0.. note need z depth value for order.
+		glm::vec3 pos(0.0f,0.0f,10.0f); // set screen position upper left corner 0,0.. note need z depth value for order.
 		float sy = (0.6f*(float)scene.getWidth())/320.0f; // scale size regardless to resolution our reference resolution is 320..
 		mText.setScale(sy,sy);
 
-		char buf[64];						// create text string
+		char buf[64]; // create text string
 		sprintf ( buf, "FPS=%.2f ms=%d",mDTime.currentFps(),mDTime.getElapsed());
-		mText.drawText(buf,pos,col);		// call drawText
+		mText.drawText(buf,pos,col); // call drawText
 	}
 };
 
