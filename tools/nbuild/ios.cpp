@@ -20,6 +20,7 @@ int buildIOSNative(Arguments* params) {
 	string xcodeLocation = "/Applications/Xcode.app/Contents/Developer/"; //Should be taked from the command options eventually
 	string sdkVersion = "6.1"; //Should be taked from the command options eventually
 	string projectDir = require(params, "--project");
+	string finalOutputFileName = "userCode.o"; //Should be taked from the command options eventually
 
 	//Special header folder for the native ios build, which does not include headers that already
 	//exist in the iphone SDK
@@ -108,7 +109,7 @@ int buildIOSNative(Arguments* params) {
 		}
 		ostringstream cmd;
 		//Combine all architecture files into one universal .o file
-		cmd << "lipo " << oFileList << " -create -output " + outputDir + "/" + "userCode.o";
+		cmd << "lipo " << oFileList << " -create -output " + outputDir + "/" + finalOutputFileName;
 		sh(cmd.str().c_str(), !isVerbose);
 	}
 	return result;
