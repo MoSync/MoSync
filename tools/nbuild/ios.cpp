@@ -49,24 +49,31 @@ int buildIOSNative(Arguments* params) {
 		error("--config and --lib-variants must have a the same number of args", 2);
 	}
 
+	bool isVerbose = params->isFlagSet(VERBOSE);
+
 	vector<string> archs;
 	archs.push_back("armv7");
-	//archs.push_back("i386");
+	archs.push_back("i386");
+
+	string oFileList;
 
 	for (size_t i = 0; i < configNames.size(); i++) {
+		string configName = configNames[i];
+		string libVariant = libVariants[i];
+		string libDir = string(mosyncdir()) + "/lib/ios_" + libVariant;
+		bool isDebug = libVariant == "debug";
+		copyFile((outputDir + "/MoSyncLibs.a").c_str(), (libDir + "/MoSyncLibs.a").c_str() );
+
 		for (size_t j = 0; j < archs.size(); j++) {
-			string configName = configNames[i];
-			string libVariant = libVariants[i];
 			string arch = archs[j];
 
 			string tmpBuildDir = getTempBuildDir(params);
 
-			bool isDebug = libVariant == "debug";
-			bool isVerbose = params->isFlagSet(VERBOSE);
 			//bool doClean = params->isFlagSet(CLEAN);
 
-			string archSDKName = (archs[j] == "i386")?"iphonesimulator":"iphoneos";
-			string libDir = string(mosyncdir()) + "/lib/ios_" + libVariant;
+			string archSDKName = (archs[j] == "i386")?"iPhoneSimulator":"iPhoneOS";
+			string sdkVersion = "6.1";
+
 			string runtimeDir = string(mosyncdir()) + "/profiles/runtimes/iphoneos/1/template/libs/" + configNames[i] + "-" + archSDKName;
 			string headerDir = string(mosyncdir()) + "/include";
 			string nativeHeaderDir = headerDir + "/MAStdNative";
@@ -82,10 +89,13 @@ int buildIOSNative(Arguments* params) {
 				cmd << "-g ";
 			}
 
+			string outputFile = string("userCode") + arch + ".o";
+			oFileList += outputDir + "/" + outputFile + " ";
+
 			cmd << "-arch " + archs[j] << " ";
 
 
-			cmd << "-Xlinker -r -nostdlib -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS6.1.sdk -miphoneos-version-min=6.1" << " ";
+			cmd << "-Xlinker -r -nostdlib -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/" << archSDKName << ".platform/Developer/SDKs/" << archSDKName << sdkVersion << ".sdk -miphoneos-version-min=" << sdkVersion << " ";
 			cmd << "-D__IOS__ -DUSE_NEWLIB -DMOSYNC_NATIVE" << " ";
 			cmd << "-I" << nativeHeaderDir << " ";
 			//cmd << "-I" << headerDir << " ";
@@ -93,13 +103,13 @@ int buildIOSNative(Arguments* params) {
 			cmd << sourceFileList << " ";
 			//cmd <<  libDir + "/MoSyncLibs.a" << " ";
 			//cmd <<  runtimeDir + "/libMoSyncLib.a" << " ";
-			cmd << "-o " << outputDir << "/userCode.o" << " ";
+			cmd << "-o " << outputDir << "/" << outputFile << " ";
 			//cmd << sourceFiles[k] << " ";
 			//cmd << "-o " << outputDir << "/" << sourceFiles[k] << ".o" << " ";
 			sh(cmd.str().c_str(), !isVerbose);
 			//}
 
-			copyFile((outputDir + "/MoSyncLibs.a").c_str(), (libDir + "/MoSyncLibs.a").c_str() );
+
 
 			/*
 			string fullOutputDir = outputDir + "android_" + arch + "_" + libVariant + "/";
@@ -110,5 +120,9 @@ int buildIOSNative(Arguments* params) {
 			*/
 		}
 	}
+
+	ostringstream cmd;
+	cmd << "lipo " << oFileList << " -create -output " + outputDir + "/" + "userCode.o";
+	sh(cmd.str().c_str(), !isVerbose);
 	return result;
 }
