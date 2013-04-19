@@ -1,0 +1,12 @@
+.res R_BOX_TEXTURE
+.image "resources/Font_0.png"
+
+.res R_BOX_FNT
+.bin
+.include "resources/font.fnt"
+
+.res R_MOSYNC_LOGO
+.image "resources/MoSync32.png"
+
+.res R_MOSYNC_HEIGHT
+.image "resources/MoSync32_height.png"
