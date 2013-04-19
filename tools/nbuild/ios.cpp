@@ -10,16 +10,22 @@
 #include <sstream>
 #include <fstream>
 
-#define XCODE_LOC_ARG "--ios-xcode-location"
 #define LLVM_GCC_LOC "/Platforms/iPhoneOS.platform/Developer/usr/bin/llvm-gcc"
-//#define LLVM_GCC_LOC "/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang"
 
 using namespace std;
 
 int buildIOSNative(Arguments* params) {
 	int result = 1;
 
+	string xcodeLocation = "/Applications/Xcode.app/Contents/Developer/"; //Should be taked from the command options eventually
+	string sdkVersion = "6.1"; //Should be taked from the command options eventually
 	string projectDir = require(params, "--project");
+
+	//Special header folder for the native ios build, which does not include headers that already
+	//exist in the iphone SDK
+	string nativeHeaderDir = string(mosyncdir()) + "/include/MAStdNative";
+
+	//Gather the source files in a string
 	vector<string> sourceFiles = getSourceFiles(params);
 	string sourceFileList;
 	for (size_t i = 0; i < sourceFiles.size(); i++) {
@@ -36,6 +42,8 @@ int buildIOSNative(Arguments* params) {
 	split(libVariants, require(params, BINARY_TYPE), ",");
 
 	string moduleName = require(params, NAME);
+
+	//Recursively create the output dir
 	string outputDir = require(params, "--dst");
 	unsigned int slashPos = 0;
 	do {
@@ -43,86 +51,65 @@ int buildIOSNative(Arguments* params) {
 		_mkdir(outputDir.substr(0,slashPos).c_str());
 	}while(slashPos != string::npos);
 
-	//toDir(outputDir);
-
 	if (configNames.size() != libVariants.size()) {
 		error("--config and --lib-variants must have a the same number of args", 2);
 	}
 
 	bool isVerbose = params->isFlagSet(VERBOSE);
 
+	//List of architectures to build
 	vector<string> archs;
 	archs.push_back("armv7");
-	archs.push_back("i386");
-
-	string oFileList;
+	archs.push_back("armv7s");
+	archs.push_back("i386"); //That's the simulator
 
 	for (size_t i = 0; i < configNames.size(); i++) {
 		string configName = configNames[i];
 		string libVariant = libVariants[i];
 		string libDir = string(mosyncdir()) + "/lib/ios_" + libVariant;
 		bool isDebug = libVariant == "debug";
+
+		//Copy the MoSync libraries. It's not used by this tool (yet), but needed for the packaging step.
 		copyFile((outputDir + "/MoSyncLibs.a").c_str(), (libDir + "/MoSyncLibs.a").c_str() );
 
+		//List of output files to be passed to the lipo tool
+		string oFileList = "";
+
+		//We make a build for each architecture
 		for (size_t j = 0; j < archs.size(); j++) {
 			string arch = archs[j];
 
-			string tmpBuildDir = getTempBuildDir(params);
-
-			//bool doClean = params->isFlagSet(CLEAN);
-
+			//Simulator uses a different sdk
 			string archSDKName = (archs[j] == "i386")?"iPhoneSimulator":"iPhoneOS";
-			string sdkVersion = "6.1";
 
-			string runtimeDir = string(mosyncdir()) + "/profiles/runtimes/iphoneos/1/template/libs/" + configNames[i] + "-" + archSDKName;
-			string headerDir = string(mosyncdir()) + "/include";
-			string nativeHeaderDir = headerDir + "/MAStdNative";
+			string outputFile = outputDir + string("/userCode") + arch + ".o";
+			oFileList += outputFile + " ";
 
-			//for (size_t k = 0; k < sourceFiles.size(); k++) {
-			ostringstream cmd;
-			//cmd << require(params, XCODE_LOC_ARG) << LLVM_GCC_LOC << " ";
-			cmd << "/Applications/Xcode.app/Contents/Developer" << LLVM_GCC_LOC << " ";
+			ostringstream cmd; //The build command
+			cmd << xcodeLocation << LLVM_GCC_LOC << " "; //path to llvm-gcc
 			if (isVerbose) {
-				cmd << "-v ";
+				cmd << "-v "; //verbose output
 			}
 			if (isDebug) {
-				cmd << "-g ";
+				cmd << "-g "; //debug mode
 			}
 
-			string outputFile = string("userCode") + arch + ".o";
-			oFileList += outputDir + "/" + outputFile + " ";
-
-			cmd << "-arch " + archs[j] << " ";
-
-
-			cmd << "-Xlinker -r -nostdlib -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/" << archSDKName << ".platform/Developer/SDKs/" << archSDKName << sdkVersion << ".sdk -miphoneos-version-min=" << sdkVersion << " ";
+			cmd << "-arch " + archs[j] << " "; //The architecture to build
+			cmd << "-Xlinker -r "; //Tell the linker to just bundle all the .o files into one .o instead of linking/assembling
+			cmd << " -nostdlib "; //Don't link with stdlib, xcode will do that
+			cmd << "-isysroot /Applications/Xcode.app/Contents/Developer/Platforms/" << archSDKName << ".platform/Developer/SDKs/" << archSDKName << sdkVersion << ".sdk ";
+			cmd << "-miphoneos-version-min=" << sdkVersion << " ";
 			cmd << "-D__IOS__ -DUSE_NEWLIB -DMOSYNC_NATIVE" << " ";
 			cmd << "-I" << nativeHeaderDir << " ";
-			//cmd << "-I" << headerDir << " ";
 			cmd << "-I" << outputDir << " ";
 			cmd << sourceFileList << " ";
-			//cmd <<  libDir + "/MoSyncLibs.a" << " ";
-			//cmd <<  runtimeDir + "/libMoSyncLib.a" << " ";
-			cmd << "-o " << outputDir << "/" << outputFile << " ";
-			//cmd << sourceFiles[k] << " ";
-			//cmd << "-o " << outputDir << "/" << sourceFiles[k] << ".o" << " ";
+			cmd << "-o " << outputFile << " ";
 			sh(cmd.str().c_str(), !isVerbose);
-			//}
-
-
-
-			/*
-			string fullOutputDir = outputDir + "android_" + arch + "_" + libVariant + "/";
-			_mkdir(fullOutputDir.c_str());
-			// TODO: Static libs
-			string libFile = tmpBuildDir + "libs/" + arch + "/lib" + moduleName + ".so";
-			copyFile((fullOutputDir + "lib" + moduleName + ".so").c_str(), libFile.c_str());
-			*/
 		}
+		ostringstream cmd;
+		//Combine all architecture files into one universal .o file
+		cmd << "lipo " << oFileList << " -create -output " + outputDir + "/" + "userCode.o";
+		sh(cmd.str().c_str(), !isVerbose);
 	}
-
-	ostringstream cmd;
-	cmd << "lipo " << oFileList << " -create -output " + outputDir + "/" + "userCode.o";
-	sh(cmd.str().c_str(), !isVerbose);
 	return result;
 }
