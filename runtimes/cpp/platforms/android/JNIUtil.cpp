@@ -103,7 +103,7 @@ jstring mawstojs(JNIEnv* env, const wchar_t* src) {
 	char* dst = (char*) calloc(len + 1, sizeof(wchar_t));
 	wcstoutf_m(dst, src);
 	// UTF-8 encoding.
-	jstring result = (*env)->NewStringUTF(env, dst);
+	jstring result = env->NewStringUTF(dst);
 	free(dst);
 	return result;
 }

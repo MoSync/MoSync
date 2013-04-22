@@ -12,13 +12,12 @@
 #include <wchar.h>
 #include <stddef.h>
 
-#include "jniutil.h"
-
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 #ifdef MOSYNC_NATIVE
+#include <jni.h>
 // First we'll define an internal function, next we'll let the macro call that.
 // Native wchar on android is 4 bytes.
 jstring mawstojs(JNIEnv* env, const wchar_t* src);
