@@ -51,7 +51,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define ARG_NO_4 d
 #define ARG_NO_5 e
 #define ARG_NO_6 f
-#define MA_IOCTL_ELLIPSIS , ...
+#define MA_IOCTL_ELLIPSIS , int d = 0, int e = 0, int f = 0
 #else
 #define ARG_NO_4 SYSCALL_THIS->GetValidatedStackValue(0)
 #define ARG_NO_5 SYSCALL_THIS->GetValidatedStackValue(4)
@@ -1386,14 +1386,6 @@ namespace Base
 	*/
 	SYSCALL(longlong,  maIOCtl(int function, int a, int b, int c MA_IOCTL_ELLIPSIS))
 	{
-#ifdef MOSYNC_NATIVE
-		va_list args;
-		va_start(args, c);
-		int d = va_arg(args, int);
-		int e = va_arg(args, int);
-		int f = va_arg(args, int);
-		va_end(args);
-#endif
 		SYSLOG("maIOCtl");
 		//__android_log_write(ANDROID_LOG_INFO, "MoSync Syscall", "maIOCtl");
 		//handlePendingExceptions(mJNIEnv);
