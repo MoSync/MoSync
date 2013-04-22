@@ -47,6 +47,7 @@
 
 #include "PropertiesScreen.h"
 #include "ViewUtils.h"
+#include "../Controller/Util.h"
 
 namespace CustomPickerTest
 {
@@ -78,10 +79,12 @@ namespace CustomPickerTest
 		mSelectItemButton->addButtonListener(this);
 		mShowRowHeightButton->addButtonListener(this);
 		mShowRowWidthButton->addButtonListener(this);
-		mIsSelectionIndicatorShownButton->addButtonListener(this);
+		if (isIOS())
+		{
+			mIsSelectionIndicatorShownButton->addButtonListener(this);
+			mSelectionIndicatorCheckBox->addCheckBoxListener(this);
+		}
 		mSelectedItemIndexButton->addButtonListener(this);
-
-		mSelectionIndicatorCheckBox->addCheckBoxListener(this);
 	}
 
 	/**
@@ -94,10 +97,12 @@ namespace CustomPickerTest
 		mSelectItemButton->removeButtonListener(this);
 		mShowRowHeightButton->removeButtonListener(this);
 		mShowRowWidthButton->removeButtonListener(this);
-		mIsSelectionIndicatorShownButton->removeButtonListener(this);
 		mSelectedItemIndexButton->removeButtonListener(this);
-
-		mSelectionIndicatorCheckBox->removeCheckBoxListener(this);
+		if (isIOS())
+		{
+			mIsSelectionIndicatorShownButton->removeButtonListener(this);
+			mSelectionIndicatorCheckBox->removeCheckBoxListener(this);
+		}
 	}
 
 	/**
@@ -170,8 +175,11 @@ namespace CustomPickerTest
 		createSelectItem();
 		createGetRowHeightButton();
 		createGetRowWidthButton();
-		createSelectionIndicatorRow();
-		createIsShownSelectionIndicationButton();
+		if ( isIOS() )
+		{
+			createSelectionIndicatorRow();
+			createIsShownSelectionIndicationButton();
+		}
 		createSelectedItemIndexButton();
 
 		int rowHeight = mCustomPickerScreen.getCustomPickerRowHeight();

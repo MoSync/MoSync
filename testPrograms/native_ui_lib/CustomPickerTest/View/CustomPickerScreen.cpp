@@ -40,6 +40,7 @@
 #include <NativeUI/Label.h>
 #include <NativeUI/Layout.h>
 #include <NativeUI/VerticalLayout.h>
+#include <NativeUI/Label.h>
 
 #include "CustomPickerScreen.h"
 #include "ViewUtils.h"
@@ -275,6 +276,8 @@ namespace CustomPickerTest
 	{
 		NativeUI::VerticalLayout* item = new NativeUI::VerticalLayout();
 		item->setBackgroundColor(getRandomColor());
+		NativeUI::Label* x = new NativeUI::Label(" Custom Picker row ");
+		item->addChild(x);
 		item->setWidth(mCustomPicker->getRowWidth());
 		item->setHeight(mCustomPicker->getRowHeight());
 		return item;
