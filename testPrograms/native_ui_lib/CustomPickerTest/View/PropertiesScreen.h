@@ -52,15 +52,8 @@ namespace CustomPickerTest
 		public NativeUI::CheckBoxListener
 	{
 	public:
-		/**
-		 * Constructor.
-		 * @param customPickerScreen Interface to the custom picker.
-		 */
 		PropertiesScreen(ICustomPickerScreen& customPickerScreen);
 
-		/**
-		 * Destructor.
-		 */
 		virtual ~PropertiesScreen();
 
 		/**
@@ -81,9 +74,6 @@ namespace CustomPickerTest
 			bool state);
 
 	private:
-		/**
-		 * Create screen UI.
-		 */
 		void createUI();
 
 		/**
@@ -178,69 +168,69 @@ namespace CustomPickerTest
 		/**
 		 * Interface to the custom picker.
 		 */
-		ICustomPickerScreen& mCustomPickerScreen;
+		ICustomPickerScreen& mCustomPickerScreenRef;
 
 		/**
 		 * Screen main layout.
 		 */
-		NativeUI::VerticalLayout* mMainLayout;
+		NativeUI::VerticalLayout* mMainLayoutRef;
 
 		/**
 		 * Used to get a row height value from user.
 		 */
-		NativeUI::EditBox* mRowHeightEditBox;
+		NativeUI::EditBox* mRowHeightEditBoxRef;
 
 		/**
 		 * Used to set the row height value when clicked.
 		 */
-		NativeUI::Button* mRowHeightButton;
+		NativeUI::Button* mRowHeightButtonRef;
 
 		/**
 		 * Used to get a row width value from user.
 		 */
-		NativeUI::EditBox* mRowWidthEditBox;
+		NativeUI::EditBox* mRowWidthEditBoxRef;
 
 		/**
 		 * Used to set the row width value when clicked.
 		 */
-		NativeUI::Button* mRowWidthButton;
+		NativeUI::Button* mRowWidthButtonRef;
 
 		/**
 		 * Used to get a row index from user.
 		 */
-		NativeUI::EditBox* mSelectItemEditBox;
+		NativeUI::EditBox* mSelectItemEditBoxRef;
 
 		/**
 		 * Used to set the selected item when clicked.
 		 */
-		NativeUI::Button* mSelectItemButton;
+		NativeUI::Button* mSelectItemButtonRef;
 
 		/**
 		 * A NativeUI Button that will show the CustomPicker row height value
 		 * when clicked.
 		 */
-		NativeUI::Button* mShowRowHeightButton;
+		NativeUI::Button* mShowRowHeightButtonRef;
 
 		/**
 		 * A NativeUI Button that will show the CustomPicker row width value
 		 * when clicked.
 		 */
-		NativeUI::Button* mShowRowWidthButton;
+		NativeUI::Button* mShowRowWidthButtonRef;
 
 		/**
 		 * Used to show/hide the CustomPicker selection indicator.
 		 */
-		NativeUI::CheckBox* mSelectionIndicatorCheckBox;
+		NativeUI::CheckBox* mSelectionIndicatorCheckBoxRef;
 
 		/**
 		 * Used to check if the CustomPicker selection indicator is shown.
 		 */
-		NativeUI::Button* mIsSelectionIndicatorShownButton;
+		NativeUI::Button* mIsSelectionIndicatorShownButtonRef;
 
 		/**
 		 * A NativeUI Button used to show the selected item index when clicked.
 		 */
-		NativeUI::Button* mSelectedItemIndexButton;
+		NativeUI::Button* mSelectedItemIndexButtonRef;
 	};
 } // end of CustomPickerTest
 

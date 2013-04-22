@@ -52,58 +52,49 @@
 namespace CustomPickerTest
 {
 
-	/**
-	 * Constructor.
-	 * @param customPickerScreen Interface to the custom picker.
-	 */
 	PropertiesScreen::PropertiesScreen(ICustomPickerScreen& customPickerScreen):
-		mCustomPickerScreen(customPickerScreen)
+		mCustomPickerScreenRef(customPickerScreen)
 	{
-		mMainLayout = NULL;
-		mRowHeightButton = NULL;
-		mRowWidthEditBox = NULL;
-		mRowWidthButton = NULL;
-		mSelectItemEditBox = NULL;
-		mSelectItemButton = NULL;
-		mShowRowHeightButton = NULL;
-		mShowRowWidthButton = NULL;
-		mSelectionIndicatorCheckBox = NULL;
-		mIsSelectionIndicatorShownButton = NULL;
-		mSelectedItemIndexButton = NULL;
+		mMainLayoutRef = NULL;
+		mRowHeightButtonRef = NULL;
+		mRowWidthEditBoxRef = NULL;
+		mRowWidthButtonRef = NULL;
+		mSelectItemEditBoxRef = NULL;
+		mSelectItemButtonRef = NULL;
+		mShowRowHeightButtonRef = NULL;
+		mShowRowWidthButtonRef = NULL;
+		mSelectionIndicatorCheckBoxRef = NULL;
+		mIsSelectionIndicatorShownButtonRef = NULL;
+		mSelectedItemIndexButtonRef = NULL;
 
 		setTitle(PROPERTIES_SCREEN_TITLE);
 		createUI();
 
-		mRowHeightButton->addButtonListener(this);
-		mRowWidthButton->addButtonListener(this);
-		mSelectItemButton->addButtonListener(this);
-		mShowRowHeightButton->addButtonListener(this);
-		mShowRowWidthButton->addButtonListener(this);
+		mRowHeightButtonRef->addButtonListener(this);
+		mRowWidthButtonRef->addButtonListener(this);
+		mSelectItemButtonRef->addButtonListener(this);
+		mShowRowHeightButtonRef->addButtonListener(this);
+		mShowRowWidthButtonRef->addButtonListener(this);
 		if (isIOS())
 		{
-			mIsSelectionIndicatorShownButton->addButtonListener(this);
-			mSelectionIndicatorCheckBox->addCheckBoxListener(this);
+			mIsSelectionIndicatorShownButtonRef->addButtonListener(this);
+			mSelectionIndicatorCheckBoxRef->addCheckBoxListener(this);
 		}
-		mSelectedItemIndexButton->addButtonListener(this);
+		mSelectedItemIndexButtonRef->addButtonListener(this);
+
+
 	}
 
-	/**
-	 * Destructor.
-	 */
 	PropertiesScreen::~PropertiesScreen()
 	{
-		mRowHeightButton->removeButtonListener(this);
-		mRowWidthButton->removeButtonListener(this);
-		mSelectItemButton->removeButtonListener(this);
-		mShowRowHeightButton->removeButtonListener(this);
-		mShowRowWidthButton->removeButtonListener(this);
-		mSelectedItemIndexButton->removeButtonListener(this);
-		if (isIOS())
-		{
-			mIsSelectionIndicatorShownButton->removeButtonListener(this);
-			mSelectionIndicatorCheckBox->removeCheckBoxListener(this);
-		}
-	}
+		mRowHeightButtonRef->removeButtonListener(this);
+		mRowWidthButtonRef->removeButtonListener(this);
+		mSelectItemButtonRef->removeButtonListener(this);
+		mShowRowHeightButtonRef->removeButtonListener(this);
+		mShowRowWidthButtonRef->removeButtonListener(this);
+		mSelectedItemIndexButtonRef->removeButtonListener(this);
+
+		if (isIOS())		{			mIsSelectionIndicatorShownButtonRef->removeButtonListener(this);			mSelectionIndicatorCheckBoxRef->removeCheckBoxListener(this);		}	}
 
 	/**
 	 * This method is called if the touch-up event was inside the
@@ -112,31 +103,31 @@ namespace CustomPickerTest
 	 */
 	void PropertiesScreen::buttonClicked(NativeUI::Widget* button)
 	{
-		if (button == mRowHeightButton)
+		if (button == mRowHeightButtonRef)
 		{
 			setRowHeightButtonClicked();
 		}
-		else if (button == mRowWidthButton)
+		else if (button == mRowWidthButtonRef)
 		{
 			setRowWidthButtonClicked();
 		}
-		else if (button == mShowRowHeightButton)
+		else if (button == mShowRowHeightButtonRef)
 		{
 			getRowHeightButtonClicked();
 		}
-		else if (button == mShowRowWidthButton)
+		else if (button == mShowRowWidthButtonRef)
 		{
 			getRowWidthButtonClicked();
 		}
-		else if (button == mIsSelectionIndicatorShownButton)
+		else if (button == mIsSelectionIndicatorShownButtonRef)
 		{
 			selectionIndicatorButtonClicked();
 		}
-		else if (button == mSelectItemButton)
+		else if (button == mSelectItemButtonRef)
 		{
 			selectItemButtonCliked();
 		}
-		else if (button == mSelectedItemIndexButton)
+		else if (button == mSelectedItemIndexButtonRef)
 		{
 			selectedItemIndexButtonClicked();
 		}
@@ -154,21 +145,18 @@ namespace CustomPickerTest
 	{
 		if (state)
 		{
-			mCustomPickerScreen.showSelectionIndicator();
+			mCustomPickerScreenRef.showSelectionIndicator();
 		}
 		else
 		{
-			mCustomPickerScreen.hideSelectionIndicator();
+			mCustomPickerScreenRef.hideSelectionIndicator();
 		}
 	}
 
-	/**
-	 * Create screen UI.
-	 */
 	void PropertiesScreen::createUI()
 	{
-		mMainLayout = new NativeUI::VerticalLayout();
-		setMainWidget(mMainLayout);
+		mMainLayoutRef = new NativeUI::VerticalLayout();
+		setMainWidget(mMainLayoutRef);
 
 		createSetRowHeight();
 		createSetRowWidth();
@@ -182,12 +170,12 @@ namespace CustomPickerTest
 		}
 		createSelectedItemIndexButton();
 
-		int rowHeight = mCustomPickerScreen.getCustomPickerRowHeight();
-		int rowWidth = mCustomPickerScreen.getCustomPickerRowWidth();
+		int rowHeight = mCustomPickerScreenRef.getCustomPickerRowHeight();
+		int rowWidth = mCustomPickerScreenRef.getCustomPickerRowWidth();
 		MAUtil::String rowHeightString = MAUtil::integerToString(rowHeight);
 		MAUtil::String rowWidthString = MAUtil::integerToString(rowWidth);
-		mRowHeightEditBox->setText(rowHeightString);
-		mRowWidthEditBox->setText(rowHeightString);
+		mRowHeightEditBoxRef->setText(rowHeightString);
+		mRowWidthEditBoxRef->setText(rowHeightString);
 	}
 
 	/**
@@ -201,17 +189,17 @@ namespace CustomPickerTest
 		hLayout->fillSpaceHorizontally();
 		hLayout->wrapContentVertically();
 
-		mRowHeightEditBox = new NativeUI::EditBox();
-		mRowHeightEditBox->fillSpaceHorizontally();
-		mRowHeightEditBox->setInputMode(NativeUI::EDIT_BOX_INPUT_MODE_DECIMAL);
-		hLayout->addChild(mRowHeightEditBox);
+		mRowHeightEditBoxRef = new NativeUI::EditBox();
+		mRowHeightEditBoxRef->fillSpaceHorizontally();
+		mRowHeightEditBoxRef->setInputMode(NativeUI::EDIT_BOX_INPUT_MODE_DECIMAL);
+		hLayout->addChild(mRowHeightEditBoxRef);
 
-		mRowHeightButton = new NativeUI::Button();
-		mRowHeightButton->fillSpaceHorizontally();
-		mRowHeightButton->setText(SET_ROW_HEIGHT_BUTTON_TEXT);
-		hLayout->addChild(mRowHeightButton);
+		mRowHeightButtonRef = new NativeUI::Button();
+		mRowHeightButtonRef->fillSpaceHorizontally();
+		mRowHeightButtonRef->setText(SET_ROW_HEIGHT_BUTTON_TEXT);
+		hLayout->addChild(mRowHeightButtonRef);
 
-		mMainLayout->addChild(hLayout);
+		mMainLayoutRef->addChild(hLayout);
 	}
 
 	/**
@@ -225,17 +213,17 @@ namespace CustomPickerTest
 		hLayout->fillSpaceHorizontally();
 		hLayout->wrapContentVertically();
 
-		mRowWidthEditBox = new NativeUI::EditBox();
-		mRowWidthEditBox->fillSpaceHorizontally();
-		mRowWidthEditBox->setInputMode(NativeUI::EDIT_BOX_INPUT_MODE_DECIMAL);
-		hLayout->addChild(mRowWidthEditBox);
+		mRowWidthEditBoxRef = new NativeUI::EditBox();
+		mRowWidthEditBoxRef->fillSpaceHorizontally();
+		mRowWidthEditBoxRef->setInputMode(NativeUI::EDIT_BOX_INPUT_MODE_DECIMAL);
+		hLayout->addChild(mRowWidthEditBoxRef);
 
-		mRowWidthButton = new NativeUI::Button();
-		mRowWidthButton->fillSpaceHorizontally();
-		mRowWidthButton->setText(SET_ROW_WIDTH_BUTTON_TEXT);
-		hLayout->addChild(mRowWidthButton);
+		mRowWidthButtonRef = new NativeUI::Button();
+		mRowWidthButtonRef->fillSpaceHorizontally();
+		mRowWidthButtonRef->setText(SET_ROW_WIDTH_BUTTON_TEXT);
+		hLayout->addChild(mRowWidthButtonRef);
 
-		mMainLayout->addChild(hLayout);
+		mMainLayoutRef->addChild(hLayout);
 	}
 
 	/**
@@ -249,17 +237,17 @@ namespace CustomPickerTest
 		hLayout->fillSpaceHorizontally();
 		hLayout->wrapContentVertically();
 
-		mSelectItemEditBox = new NativeUI::EditBox();
-		mSelectItemEditBox->fillSpaceHorizontally();
-		mSelectItemEditBox->setInputMode(NativeUI::EDIT_BOX_INPUT_MODE_DECIMAL);
-		hLayout->addChild(mSelectItemEditBox);
+		mSelectItemEditBoxRef = new NativeUI::EditBox();
+		mSelectItemEditBoxRef->fillSpaceHorizontally();
+		mSelectItemEditBoxRef->setInputMode(NativeUI::EDIT_BOX_INPUT_MODE_DECIMAL);
+		hLayout->addChild(mSelectItemEditBoxRef);
 
-		mSelectItemButton = new NativeUI::Button();
-		mSelectItemButton->fillSpaceHorizontally();
-		mSelectItemButton->setText(SELECT_ITEM_BUTTON_TEXT);
-		hLayout->addChild(mSelectItemButton);
+		mSelectItemButtonRef = new NativeUI::Button();
+		mSelectItemButtonRef->fillSpaceHorizontally();
+		mSelectItemButtonRef->setText(SELECT_ITEM_BUTTON_TEXT);
+		hLayout->addChild(mSelectItemButtonRef);
 
-		mMainLayout->addChild(hLayout);
+		mMainLayoutRef->addChild(hLayout);
 	}
 
 	/**
@@ -268,10 +256,10 @@ namespace CustomPickerTest
 	 */
 	void PropertiesScreen::createGetRowHeightButton()
 	{
-		mShowRowHeightButton = new NativeUI::Button();
-		mShowRowHeightButton->fillSpaceHorizontally();
-		mShowRowHeightButton->setText(GET_ROW_HEIGHT_BUTTON_TEXT);
-		mMainLayout->addChild(mShowRowHeightButton);
+		mShowRowHeightButtonRef = new NativeUI::Button();
+		mShowRowHeightButtonRef->fillSpaceHorizontally();
+		mShowRowHeightButtonRef->setText(GET_ROW_HEIGHT_BUTTON_TEXT);
+		mMainLayoutRef->addChild(mShowRowHeightButtonRef);
 	}
 
 	/**
@@ -280,10 +268,10 @@ namespace CustomPickerTest
 	 */
 	void PropertiesScreen::createGetRowWidthButton()
 	{
-		mShowRowWidthButton = new NativeUI::Button();
-		mShowRowWidthButton->fillSpaceHorizontally();
-		mShowRowWidthButton->setText(GET_ROW_WIDTH_BUTTON_TEXT);
-		mMainLayout->addChild(mShowRowWidthButton);
+		mShowRowWidthButtonRef = new NativeUI::Button();
+		mShowRowWidthButtonRef->fillSpaceHorizontally();
+		mShowRowWidthButtonRef->setText(GET_ROW_WIDTH_BUTTON_TEXT);
+		mMainLayoutRef->addChild(mShowRowWidthButtonRef);
 	}
 
 	/**
@@ -302,11 +290,11 @@ namespace CustomPickerTest
 		label->setText(SELECTION_INDICATOR_LABEL_TEXT);
 		hLayout->addChild(label);
 
-		mSelectionIndicatorCheckBox = new NativeUI::CheckBox();
-		mSelectionIndicatorCheckBox->wrapContentHorizontally();
-		hLayout->addChild(mSelectionIndicatorCheckBox);
+		mSelectionIndicatorCheckBoxRef = new NativeUI::CheckBox();
+		mSelectionIndicatorCheckBoxRef->wrapContentHorizontally();
+		hLayout->addChild(mSelectionIndicatorCheckBoxRef);
 
-		mMainLayout->addChild(hLayout);
+		mMainLayoutRef->addChild(hLayout);
 	}
 
 	/**
@@ -315,10 +303,10 @@ namespace CustomPickerTest
 	 */
 	void PropertiesScreen::createIsShownSelectionIndicationButton()
 	{
-		mIsSelectionIndicatorShownButton = new NativeUI::Button();
-		mIsSelectionIndicatorShownButton->fillSpaceHorizontally();
-		mIsSelectionIndicatorShownButton->setText(IS_SELECTOON_INDICATOR_SHOWN_BTN_TEXT);
-		mMainLayout->addChild(mIsSelectionIndicatorShownButton);
+		mIsSelectionIndicatorShownButtonRef = new NativeUI::Button();
+		mIsSelectionIndicatorShownButtonRef->fillSpaceHorizontally();
+		mIsSelectionIndicatorShownButtonRef->setText(IS_SELECTOON_INDICATOR_SHOWN_BTN_TEXT);
+		mMainLayoutRef->addChild(mIsSelectionIndicatorShownButtonRef);
 	}
 
 	/**
@@ -327,10 +315,10 @@ namespace CustomPickerTest
 	 */
 	void PropertiesScreen::createSelectedItemIndexButton()
 	{
-		mSelectedItemIndexButton = new NativeUI::Button();
-		mSelectedItemIndexButton->fillSpaceHorizontally();
-		mSelectedItemIndexButton->setText(SELECTED_ITEM_BUTTON_TEXT);
-		mMainLayout->addChild(mSelectedItemIndexButton);
+		mSelectedItemIndexButtonRef = new NativeUI::Button();
+		mSelectedItemIndexButtonRef->fillSpaceHorizontally();
+		mSelectedItemIndexButtonRef->setText(SELECTED_ITEM_BUTTON_TEXT);
+		mMainLayoutRef->addChild(mSelectedItemIndexButtonRef);
 	}
 
 	/**
@@ -338,10 +326,10 @@ namespace CustomPickerTest
 	 */
 	void PropertiesScreen::setRowHeightButtonClicked()
 	{
-		MAUtil::String heightString = mRowHeightEditBox->getText();
+		MAUtil::String heightString = mRowHeightEditBoxRef->getText();
 		int height = MAUtil::stringToInteger(heightString);
-		mCustomPickerScreen.setCustomPickerRowHeight(height);
-		mRowHeightEditBox->hideKeyboard();
+		mCustomPickerScreenRef.setCustomPickerRowHeight(height);
+		mRowHeightEditBoxRef->hideKeyboard();
 	}
 
 	/**
@@ -349,10 +337,10 @@ namespace CustomPickerTest
 	 */
 	void PropertiesScreen::setRowWidthButtonClicked()
 	{
-		MAUtil::String widthString = mRowWidthEditBox->getText();
+		MAUtil::String widthString = mRowWidthEditBoxRef->getText();
 		int width = MAUtil::stringToInteger(widthString);
-		mCustomPickerScreen.setCustomPickerRowWidth(width);
-		mRowWidthEditBox->hideKeyboard();
+		mCustomPickerScreenRef.setCustomPickerRowWidth(width);
+		mRowWidthEditBoxRef->hideKeyboard();
 	}
 
 	/**
@@ -360,12 +348,12 @@ namespace CustomPickerTest
 	 */
 	void PropertiesScreen::selectItemButtonCliked()
 	{
-		MAUtil::String itemIndexString = mSelectItemEditBox->getText();
+		MAUtil::String itemIndexString = mSelectItemEditBoxRef->getText();
 		if (itemIndexString.length() > 0)
 		{
 			int itemIndex = MAUtil::stringToInteger(itemIndexString);
-			mCustomPickerScreen.setSelectedItemIndex(itemIndex);
-			mSelectItemEditBox->hideKeyboard();
+			mCustomPickerScreenRef.setSelectedItemIndex(itemIndex);
+			mSelectItemEditBoxRef->hideKeyboard();
 		}
 	}
 
@@ -375,7 +363,7 @@ namespace CustomPickerTest
 	void PropertiesScreen::getRowHeightButtonClicked()
 	{
 		char buffer[kBufferSize];
-		int height = mCustomPickerScreen.getCustomPickerRowHeight();
+		int height = mCustomPickerScreenRef.getCustomPickerRowHeight();
 		sprintf(buffer, "The CustomPicker items height is %d", height);
 		maAlert("Height", buffer, "OK", NULL, NULL);
 	}
@@ -386,7 +374,7 @@ namespace CustomPickerTest
 	void PropertiesScreen::getRowWidthButtonClicked()
 	{
 		char buffer[kBufferSize];
-		int width = mCustomPickerScreen.getCustomPickerRowWidth();
+		int width = mCustomPickerScreenRef.getCustomPickerRowWidth();
 		sprintf(buffer, "The CustomPicker items width is %d", width);
 		maAlert("Width", buffer, "OK", NULL, NULL);
 	}
@@ -397,7 +385,7 @@ namespace CustomPickerTest
 	 */
 	void PropertiesScreen::selectionIndicatorButtonClicked()
 	{
-		bool isShown = mCustomPickerScreen.isSelectionIndicatorShown();
+		bool isShown = mCustomPickerScreenRef.isSelectionIndicatorShown();
 		const char* message = isShown ?
 			"Selection indicator is shown" : "Selection indicator is hidden";
 		maAlert("Selection indicator", message, "OK", NULL, NULL);
@@ -408,7 +396,7 @@ namespace CustomPickerTest
 	 */
 	void PropertiesScreen::selectedItemIndexButtonClicked()
 	{
-		int index = mCustomPickerScreen.getSelectedItemIndex();
+		int index = mCustomPickerScreenRef.getSelectedItemIndex();
 		char buffer[kBufferSize];
 		sprintf(buffer, "Selected item index is %d", index);
 		maAlert("Selected item index", buffer, "OK", NULL, NULL);

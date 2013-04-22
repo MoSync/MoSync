@@ -52,14 +52,8 @@ namespace NativeUI
 	class CustomPicker : public Widget
 	{
 	public:
-		/**
-		 * Constructor.
-		 */
 		CustomPicker();
 
-		/**
-		 * Destructor.
-		 */
 		virtual ~CustomPicker();
 
 		/**
@@ -207,59 +201,24 @@ namespace NativeUI
 		void notifyListenersItemChanged(const int selectedItemIndex);
 
 		/**
-		 * Add a widget as a child of this widget.
-		 * Platform: Android, iOS.
-		 * @param widget The widget that will be added.
-		 * The ownership of the widget is passed to this function.
-		 * When the parent widget will be destroyed, all child widgets
-		 * will be deleted.
-		 * Must be a layout widget.
-		 * @return Any of the following result codes:
-		 * - #MAW_RES_OK if the child could be added to the parent.
-		 * - #MAW_RES_INVALID_HANDLE if any of the handles were invalid.
-		 * - #MAW_RES_INVALID_LAYOUT if the widget was added to a non-layout.
-		 * - #MAW_RES_CANNOT_INSERT_DIALOG if the child is a dialog.
-		 * - #MAW_RES_ERROR if it could not be added for some other reason.
+		 * Forwards call to Widget::addChild().
+		 * Made private in order to force adding only layouts as children.
 		 */
 		virtual int addChild(Widget* widget);
 
 		/**
-		 * Insert a widget as a child of this widget, at a given position.
-		 * Platform: Android, iOS.
-		 * @param widget The widget to be added.
-		 * The ownership of the widget is passed to this function.
-		 * When the parent widget will be destroyed, all child widgets
-		 * will be deleted. Must be a layout.
-		 * @param index The position on which to add the child.
-		 * @return Any of the following result codes:
-		 * - #MAW_RES_OK if the child could be added to the parent.
-		 * - #MAW_RES_INVALID_HANDLE if any of the handles were invalid.
-		 * - #MAW_RES_INVALID_INDEX if the index was out of bounds.
-		 * - #MAW_RES_INVALID_LAYOUT if the widget was added to a non-layout.
-		 * - #MAW_RES_CANNOT_INSERT_DIALOG if the child is a dialog.
-		 * - #MAW_RES_ERROR if it could not be added for some other reason.
+		 * Forwards call to Widget::insertChild().
+		 * Made private in order to force adding only layouts as children.
 		 */
 		virtual int insertChild(Widget* widget, const int index);
 
 		/**
-		 * Remove a child widget from its parent (but does not destroy it).
-		 * Removing a currently visible top-level widget causes the MoSync view
-		 * to become visible.
-		 * When the parent widget will be destroyed, the child widget will not
-		 * be deleted.
-		 * Platform: Android, iOS.
-		 * @param widget The widget to be removed.
-		 * @return Any of the following result codes:
-		 * - #MAW_RES_OK if the child could be removed from the parent.
-		 * - #MAW_RES_INVALID_HANDLE if the handle was invalid.
-		 * - #MAW_RES_ERROR otherwise.
+		 * Forwards call to Widget::addChild().
+		 * Made private in order to force adding only layouts as children.
 		 */
 		virtual int removeChild(Widget* widget);
 
 	private:
-		/**
-		 * Array with custom picker listeners.
-		 */
 		MAUtil::Vector<CustomPickerListener*> mCustomPickerListeners;
 	};
 
