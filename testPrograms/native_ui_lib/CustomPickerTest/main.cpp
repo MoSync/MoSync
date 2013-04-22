@@ -79,5 +79,7 @@ extern "C" int MAMain()
 {
 	CustomPickerTest::NativeUIMoblet* moblet = new CustomPickerTest::NativeUIMoblet();
 	MAUtil::Moblet::run(moblet);
+	delete moblet;
+	moblet = NULL;
 	return 0;
 }

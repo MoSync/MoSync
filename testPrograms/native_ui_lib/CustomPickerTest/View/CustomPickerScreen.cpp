@@ -50,22 +50,22 @@ namespace CustomPickerTest
 	 * Constructor.
 	 */
 	CustomPickerScreen::CustomPickerScreen():
-		mMainLayout(NULL),
-		mCustomPicker(NULL),
-		mAddItemButton(NULL),
-		mRemoveItemButton(NULL),
-		mSelectedItemIndexLabel(NULL)
+		mMainLayoutRef(NULL),
+		mCustomPickerRef(NULL),
+		mAddItemButtonRef(NULL),
+		mRemoveItemButtonRef(NULL),
+		mSelectedItemIndexLabelRef(NULL)
 	{
 		setTitle(CUSTOM_PICKER_SCREEN_TITLE);
 		this->createUI();
 
-		mCustomPicker->setRowHeight(DEFAULT_ROW_HEIGHT);
+		mCustomPickerRef->setRowHeight(DEFAULT_ROW_HEIGHT);
 		populateCustomPicker();
 
-		mAddItemButton->addButtonListener(this);
-		mRemoveItemButton->addButtonListener(this);
+		mAddItemButtonRef->addButtonListener(this);
+		mRemoveItemButtonRef->addButtonListener(this);
 
-		mCustomPicker->addCustomPickerListener(this);
+		mCustomPickerRef->addCustomPickerListener(this);
 	}
 
 	/**
@@ -73,10 +73,10 @@ namespace CustomPickerTest
 	 */
 	CustomPickerScreen::~CustomPickerScreen()
 	{
-		mAddItemButton->removeButtonListener(this);
-		mRemoveItemButton->removeButtonListener(this);
+		mAddItemButtonRef->removeButtonListener(this);
+		mRemoveItemButtonRef->removeButtonListener(this);
 
-		mCustomPicker->removeCustomPickerListener(this);
+		mCustomPickerRef->removeCustomPickerListener(this);
 	}
 
 	/**
@@ -86,7 +86,7 @@ namespace CustomPickerTest
 	 */
 	void CustomPickerScreen::addCustomPickerItem(NativeUI::Layout* layout)
 	{
-		mCustomPicker->addChild(layout);
+		mCustomPickerRef->addChild(layout);
 	}
 
 	/**
@@ -96,7 +96,7 @@ namespace CustomPickerTest
 	 */
 	void CustomPickerScreen::removeCustomPickerItem(NativeUI::Layout* layout)
 	{
-		mCustomPicker->removeChild(layout);
+		mCustomPickerRef->removeChild(layout);
 	}
 
 	/**
@@ -106,7 +106,7 @@ namespace CustomPickerTest
 	 */
 	void CustomPickerScreen::setCustomPickerRowHeight(const int height)
 	{
-		mCustomPicker->setRowHeight(height);
+		mCustomPickerRef->setRowHeight(height);
 	}
 
 	/**
@@ -116,7 +116,7 @@ namespace CustomPickerTest
 	 */
 	void CustomPickerScreen::setCustomPickerRowWidth(const int width)
 	{
-		mCustomPicker->setRowWidth(width);
+		mCustomPickerRef->setRowWidth(width);
 	}
 
 	/**
@@ -126,7 +126,7 @@ namespace CustomPickerTest
 	 */
 	int CustomPickerScreen::getCustomPickerRowHeight()
 	{
-		return mCustomPicker->getRowHeight();
+		return mCustomPickerRef->getRowHeight();
 	}
 
 	/**
@@ -136,7 +136,7 @@ namespace CustomPickerTest
 	 */
 	int CustomPickerScreen::getCustomPickerRowWidth()
 	{
-		return mCustomPicker->getRowWidth();
+		return mCustomPickerRef->getRowWidth();
 	}
 
 	/**
@@ -145,7 +145,7 @@ namespace CustomPickerTest
 	 */
 	void CustomPickerScreen::showSelectionIndicator()
 	{
-		mCustomPicker->showSelectionIndicator();
+		mCustomPickerRef->showSelectionIndicator();
 	}
 
 	/**
@@ -154,7 +154,7 @@ namespace CustomPickerTest
 	 */
 	void CustomPickerScreen::hideSelectionIndicator()
 	{
-		mCustomPicker->hideSelectionIndicator();
+		mCustomPickerRef->hideSelectionIndicator();
 	}
 
 	/**
@@ -163,7 +163,7 @@ namespace CustomPickerTest
 	 */
 	bool CustomPickerScreen::isSelectionIndicatorShown()
 	{
-		return mCustomPicker->isSelectionIndicatorShown();
+		return mCustomPickerRef->isSelectionIndicatorShown();
 	}
 
 	/**
@@ -173,7 +173,7 @@ namespace CustomPickerTest
 	 */
 	void CustomPickerScreen::setSelectedItemIndex(const int index)
 	{
-		mCustomPicker->setSelectedItemIndex(index);
+		mCustomPickerRef->setSelectedItemIndex(index);
 	}
 
 	/**
@@ -184,7 +184,7 @@ namespace CustomPickerTest
 	 */
 	int CustomPickerScreen::getSelectedItemIndex()
 	{
-		return mCustomPicker->getSelectedItemIndex();
+		return mCustomPickerRef->getSelectedItemIndex();
 	}
 
 	/**
@@ -200,7 +200,7 @@ namespace CustomPickerTest
 	{
 		char buffer[kBufferSize];
 		sprintf(buffer, "Selected item index: %d", selectedItemIndex);
-		mSelectedItemIndexLabel->setText(buffer);
+		mSelectedItemIndexLabelRef->setText(buffer);
 	}
 
 	/**
@@ -210,19 +210,19 @@ namespace CustomPickerTest
 	 */
 	void CustomPickerScreen::buttonClicked(NativeUI::Widget* button)
 	{
-		if (button == mAddItemButton)
+		if (button == mAddItemButtonRef)
 		{
 			NativeUI::Layout* item = createCustomPickerItem();
 			addCustomPickerItem(item);
 		}
-		else if (button == mRemoveItemButton)
+		else if (button == mRemoveItemButtonRef)
 		{
-			int index = mCustomPicker->getSelectedItemIndex();
+			int index = mCustomPickerRef->getSelectedItemIndex();
 			if (index >= 0)
 			{
-				NativeUI::Layout* child = (NativeUI::Layout*) mCustomPicker->getChild(index);
-				mCustomPicker->removeChild(child);
-				mCustomPicker->reloadData();
+				NativeUI::Layout* child = (NativeUI::Layout*) mCustomPickerRef->getChild(index);
+				mCustomPickerRef->removeChild(child);
+				mCustomPickerRef->reloadData();
 			}
 		}
 	}
@@ -232,27 +232,27 @@ namespace CustomPickerTest
 	 */
 	void CustomPickerScreen::createUI()
 	{
-		mMainLayout = new NativeUI::VerticalLayout();
-		setMainWidget(mMainLayout);
+		mMainLayoutRef = new NativeUI::VerticalLayout();
+		setMainWidget(mMainLayoutRef);
 
-		mCustomPicker = new NativeUI::CustomPicker();
-		mMainLayout->addChild(mCustomPicker);
+		mCustomPickerRef = new NativeUI::CustomPicker();
+		mMainLayoutRef->addChild(mCustomPickerRef);
 
-		mSelectedItemIndexLabel = new NativeUI::Label();
-		mSelectedItemIndexLabel->fillSpaceHorizontally();
-		mSelectedItemIndexLabel->wrapContentVertically();
-		mSelectedItemIndexLabel->setText("Selected index:");
-		mMainLayout->addChild(mSelectedItemIndexLabel);
+		mSelectedItemIndexLabelRef = new NativeUI::Label();
+		mSelectedItemIndexLabelRef->fillSpaceHorizontally();
+		mSelectedItemIndexLabelRef->wrapContentVertically();
+		mSelectedItemIndexLabelRef->setText("Selected index:");
+		mMainLayoutRef->addChild(mSelectedItemIndexLabelRef);
 
-		mAddItemButton = new NativeUI::Button();
-		mAddItemButton->fillSpaceHorizontally();
-		mAddItemButton->setText(ADD_ITEM_BUTTON_TITLE);
-		mMainLayout->addChild(mAddItemButton);
+		mAddItemButtonRef = new NativeUI::Button();
+		mAddItemButtonRef->fillSpaceHorizontally();
+		mAddItemButtonRef->setText(ADD_ITEM_BUTTON_TITLE);
+		mMainLayoutRef->addChild(mAddItemButtonRef);
 
-		mRemoveItemButton = new NativeUI::Button();
-		mRemoveItemButton->fillSpaceHorizontally();
-		mRemoveItemButton->setText(REMOVE_ITEM_BUTTON_TITLE);
-		mMainLayout->addChild(mRemoveItemButton);
+		mRemoveItemButtonRef = new NativeUI::Button();
+		mRemoveItemButtonRef->fillSpaceHorizontally();
+		mRemoveItemButtonRef->setText(REMOVE_ITEM_BUTTON_TITLE);
+		mMainLayoutRef->addChild(mRemoveItemButtonRef);
 	}
 
 	/**
@@ -275,8 +275,8 @@ namespace CustomPickerTest
 	{
 		NativeUI::VerticalLayout* item = new NativeUI::VerticalLayout();
 		item->setBackgroundColor(getRandomColor());
-		item->setWidth(mCustomPicker->getRowWidth());
-		item->setHeight(mCustomPicker->getRowHeight());
+		item->setWidth(mCustomPickerRef->getRowWidth());
+		item->setHeight(mCustomPickerRef->getRowHeight());
 		return item;
 	}
 

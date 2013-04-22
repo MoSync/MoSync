@@ -180,27 +180,27 @@ namespace CustomPickerTest
 		/**
 		 * Screen main layout.
 		 */
-		NativeUI::VerticalLayout* mMainLayout;
+		NativeUI::VerticalLayout* mMainLayoutRef;
 
 		/**
 		 * Tested CustomPicker.
 		 */
-		NativeUI::CustomPicker* mCustomPicker;
+		NativeUI::CustomPicker* mCustomPickerRef;
 
 		/**
 		 * Shows the selected CustomPicker item index.
 		 */
-		NativeUI::Label* mSelectedItemIndexLabel;
+		NativeUI::Label* mSelectedItemIndexLabelRef;
 
 		/**
 		 * Add an item to the CustomPicker,
 		 */
-		NativeUI::Button* mAddItemButton;
+		NativeUI::Button* mAddItemButtonRef;
 
 		/**
 		 * Remove selected item from the CustomPicker,
 		 */
-		NativeUI::Button* mRemoveItemButton;
+		NativeUI::Button* mRemoveItemButtonRef;
 	};
 } // end of CustomPickerTest
 

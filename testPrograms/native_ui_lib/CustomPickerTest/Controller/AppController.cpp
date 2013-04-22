@@ -37,15 +37,15 @@ namespace CustomPickerTest
 	 */
 	AppController::AppController():
 		mTabScreen(NULL),
-		mCustomPickerScreen(NULL),
-		mPropertiesScreen(NULL)
+		mCustomPickerScreenRef(NULL),
+		mPropertiesScreenRef(NULL)
 	{
 		mTabScreen = new NativeUI::TabScreen();
-		mCustomPickerScreen = new CustomPickerScreen();
-		mPropertiesScreen = new PropertiesScreen(*mCustomPickerScreen);
+		mCustomPickerScreenRef = new CustomPickerScreen();
+		mPropertiesScreenRef = new PropertiesScreen(*mCustomPickerScreenRef);
 
-		mTabScreen->addTab(mCustomPickerScreen);
-		mTabScreen->addTab(mPropertiesScreen);
+		mTabScreen->addTab(mCustomPickerScreenRef);
+		mTabScreen->addTab(mPropertiesScreenRef);
 
 		mTabScreen->show();
 	}

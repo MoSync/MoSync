@@ -45,14 +45,8 @@ namespace CustomPickerTest
 	class AppController
 	{
 	public:
-		/**
-		 * Constructor.
-		 */
 		AppController();
 
-		/**
-		 * Destructor.
-		 */
 		~AppController();
 
 	private:
@@ -65,12 +59,12 @@ namespace CustomPickerTest
 		 * Used to show the tested CustomPicker.
 		 * 1st tab screen.
 		 */
-		CustomPickerScreen* mCustomPickerScreen;
+		CustomPickerScreen* mCustomPickerScreenRef;
 
 		/**
 		 * Used for testing CustomPicker properties.
 		 */
-		PropertiesScreen* mPropertiesScreen;
+		PropertiesScreen* mPropertiesScreenRef;
 
 	};// end of AppController
 
