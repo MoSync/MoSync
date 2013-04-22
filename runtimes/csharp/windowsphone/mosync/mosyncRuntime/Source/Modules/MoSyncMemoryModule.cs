@@ -57,7 +57,7 @@ namespace MoSync
 				return (mem[str1] - mem[str2]);
 #else
 				string s1 = core.GetDataMemory().ReadStringAtAddress(str1);
-				string s2 = core.GetDataMemory().ReadStringAtAddress(str1);
+				string s2 = core.GetDataMemory().ReadStringAtAddress(str2);
 
 				int i = 0, j = 0;
 

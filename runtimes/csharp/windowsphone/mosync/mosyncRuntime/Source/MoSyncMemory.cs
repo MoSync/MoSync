@@ -295,7 +295,7 @@ namespace MoSync
         public void WriteUInt16(int address, ushort b)
         {
             IntPtr ptr = new IntPtr(address);
-            Marshal.StructureToPtr(b, ptr, true);  // TO BE TESTED
+            Marshal.StructureToPtr(b, ptr, false);  // TO BE TESTED
         }
 
         public void WriteInt16(int address, short b)
@@ -307,7 +307,7 @@ namespace MoSync
         public void WriteUInt32(int address, uint b)
         {
             IntPtr ptr = new IntPtr(address);
-            Marshal.StructureToPtr(b, ptr, true); // TO BE TESTED
+            Marshal.StructureToPtr(b, ptr, false); // TO BE TESTED
         }
 
         public void WriteInt32(int address, int b)
@@ -325,13 +325,13 @@ namespace MoSync
         public void WriteDouble(int address, double b)
         {
             IntPtr ptr = new IntPtr(address);
-            Marshal.StructureToPtr(b, ptr, true);
+            Marshal.StructureToPtr(b, ptr, false);
         }
 
         public void WriteFloat(int address, float b)
         {
             IntPtr ptr = new IntPtr(address);
-            Marshal.StructureToPtr(b, ptr, true);
+			Marshal.StructureToPtr(b, ptr, false);
         }
 
         public byte ReadUInt8(int address)
@@ -373,8 +373,8 @@ namespace MoSync
         // reads a null-terminated ascii c string
         public String ReadStringAtAddress(int address)
         {
-            IntPtr ptr = new IntPtr(address);
-            return Marshal.PtrToStringAnsi(ptr);
+			IntPtr ptr = new IntPtr(address);
+			return Marshal.PtrToStringAnsi(ptr);
         }
 
         // reads a null-terminated unicode string.
@@ -388,25 +388,29 @@ namespace MoSync
         {
             IntPtr ptr = new IntPtr(address);
 
-            int sizeChar = sizeof(char);
+			str += '\0';
 
-            for (int i = 0; i < str.Length; i++)
-            {
-                if (1 == sizeChar) WriteUInt8(address + i * (sizeof(char)), (byte)str[i]);
-                else if(2 == sizeChar) WriteUInt16(address + i * sizeof(char), (UInt16)str[i]);
-            }
+			int sizeChar = sizeof(char);
+
+			for (int i = 0; i < str.Length; i++)
+			{
+				if (1 == sizeChar) WriteUInt8(address + i, (byte)str[i]);
+				else if (2 == sizeChar) WriteUInt16(address + i, (UInt16)str[i]);
+			}
         }
 
         public void WriteWStringAtAddress(int address, String str, int maxSize)
         {
             IntPtr ptr = new IntPtr(address);
 
-            int sizeChar = sizeof(char);
+			str += '\0';
+
+			int sizeChar = sizeof(char);
 
             for (int i = 0; i < str.Length; i++)
             {
-                if (2 == sizeChar) WriteUInt16(address + i * (sizeof(char)), (byte)str[i]);
-                else if (4 == sizeChar) WriteUInt32(address + i * sizeof(char), (UInt16)str[i]);
+                if (2 == sizeChar) WriteUInt16(address + i, (UInt16)str[i]);
+				else if (4 == sizeChar) WriteUInt32(address + i, (UInt32)str[i]);
             }
         }
 
@@ -419,7 +423,7 @@ namespace MoSync
         public void WriteBytes(int dst, byte[] bytes, int size)
         {
             for (int i = 0; i < size; i++)
-                WriteUInt8(dst + i * sizeof(byte), bytes[i]);
+                WriteUInt8(dst + i, bytes[i]);
         }
 
         // size equals the amount of integers

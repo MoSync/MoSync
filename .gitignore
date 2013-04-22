@@ -288,3 +288,7 @@ LocalFiles.bin*
 /runtimes/csharp/windowsphone/mosync/mosync_WP8/obj
 /runtimes/csharp/windowsphone/mosync/MoSyncLibrary/ARM
 /runtimes/csharp/windowsphone/mosync/mosyncRuntime/Bin/ARM
+/runtimes/csharp/windowsphone/ManagedMediaHelpers/Mp3MediaStreamSourceDemo.Phone/obj
+/runtimes/csharp/windowsphone/ManagedMediaHelpers/Mp3MediaStreamSourceDemo.Phone/Bin
+/runtimes/csharp/windowsphone/ManagedMediaHelpers/MediaParsers.Phone/Bin
+/runtimes/csharp/windowsphone/ManagedMediaHelpers/MediaParsers.Phone/obj
