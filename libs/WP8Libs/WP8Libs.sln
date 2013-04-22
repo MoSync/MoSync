@@ -19,6 +19,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Notification_WP8", "..\Noti
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MAP_WP8", "..\MAP\MAP_WP8.vcxproj", "{9D8BC5CA-1CD2-4130-B523-55EAE2D0DAB2}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Ads_WP8", "..\Ads\Ads_WP8.vcxproj", "{E4DEFD9F-05A6-4E0D-A846-20AF22B216B3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|ARM = Debug|ARM
@@ -134,6 +136,18 @@ Global
 		{9D8BC5CA-1CD2-4130-B523-55EAE2D0DAB2}.Release|Win32.Build.0 = Release|Win32
 		{9D8BC5CA-1CD2-4130-B523-55EAE2D0DAB2}.Release|x64.ActiveCfg = Release|x64
 		{9D8BC5CA-1CD2-4130-B523-55EAE2D0DAB2}.Release|x64.Build.0 = Release|x64
+		{E4DEFD9F-05A6-4E0D-A846-20AF22B216B3}.Debug|ARM.ActiveCfg = Debug|ARM
+		{E4DEFD9F-05A6-4E0D-A846-20AF22B216B3}.Debug|ARM.Build.0 = Debug|ARM
+		{E4DEFD9F-05A6-4E0D-A846-20AF22B216B3}.Debug|Win32.ActiveCfg = Debug|ARM
+		{E4DEFD9F-05A6-4E0D-A846-20AF22B216B3}.Debug|Win32.Build.0 = Debug|ARM
+		{E4DEFD9F-05A6-4E0D-A846-20AF22B216B3}.Debug|x64.ActiveCfg = Debug|x64
+		{E4DEFD9F-05A6-4E0D-A846-20AF22B216B3}.Debug|x64.Build.0 = Debug|x64
+		{E4DEFD9F-05A6-4E0D-A846-20AF22B216B3}.Release|ARM.ActiveCfg = Release|ARM
+		{E4DEFD9F-05A6-4E0D-A846-20AF22B216B3}.Release|ARM.Build.0 = Release|ARM
+		{E4DEFD9F-05A6-4E0D-A846-20AF22B216B3}.Release|Win32.ActiveCfg = Release|Win32
+		{E4DEFD9F-05A6-4E0D-A846-20AF22B216B3}.Release|Win32.Build.0 = Release|Win32
+		{E4DEFD9F-05A6-4E0D-A846-20AF22B216B3}.Release|x64.ActiveCfg = Release|x64
+		{E4DEFD9F-05A6-4E0D-A846-20AF22B216B3}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
