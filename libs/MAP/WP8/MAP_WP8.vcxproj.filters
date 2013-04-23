@@ -1,0 +1,60 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\Broadcaster.h" />
+    <ClInclude Include="..\CloudMadeMapSource.h" />
+    <ClInclude Include="..\Color.h" />
+    <ClInclude Include="..\DateTime.h" />
+    <ClInclude Include="..\DebugPrintf.h" />
+    <ClInclude Include="..\Enumerator.h" />
+    <ClInclude Include="..\GeoPoint.h" />
+    <ClInclude Include="..\GeoPointDataSource.h" />
+    <ClInclude Include="..\GeoPointLayer.h" />
+    <ClInclude Include="..\GeoPointLayerRenderer.h" />
+    <ClInclude Include="..\GoogleMapSource.h" />
+    <ClInclude Include="..\Layer.h" />
+    <ClInclude Include="..\LayerMapViewport.h" />
+    <ClInclude Include="..\LonLat.h" />
+    <ClInclude Include="..\MapCache.h" />
+    <ClInclude Include="..\MapConfig.h" />
+    <ClInclude Include="..\MapSource.h" />
+    <ClInclude Include="..\MapTile.h" />
+    <ClInclude Include="..\MapTileCoordinate.h" />
+    <ClInclude Include="..\MapViewport.h" />
+    <ClInclude Include="..\MapWidget.h" />
+    <ClInclude Include="..\MemoryMgr.h" />
+    <ClInclude Include="..\OpenStreetMapSource.h" />
+    <ClInclude Include="..\PixelCoordinate.h" />
+    <ClInclude Include="..\Queue.h" />
+    <ClInclude Include="..\TimeSpan.h" />
+    <ClInclude Include="..\TraceScope.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\CloudMadeMapSource.cpp" />
+    <ClCompile Include="..\Color.cpp" />
+    <ClCompile Include="..\DateTime.cpp" />
+    <ClCompile Include="..\GeoPoint.cpp" />
+    <ClCompile Include="..\GeoPointLayer.cpp" />
+    <ClCompile Include="..\GoogleMapSource.cpp" />
+    <ClCompile Include="..\Layer.cpp" />
+    <ClCompile Include="..\LayerMapViewport.cpp" />
+    <ClCompile Include="..\LonLat.cpp" />
+    <ClCompile Include="..\MapCache.cpp" />
+    <ClCompile Include="..\MapSource.cpp" />
+    <ClCompile Include="..\MapViewport.cpp" />
+    <ClCompile Include="..\MapWidget.cpp" />
+    <ClCompile Include="..\MemoryMgr.cpp" />
+    <ClCompile Include="..\OpenStreetMapSource.cpp" />
+    <ClCompile Include="..\TimeSpan.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\MAP.vcxproj" />
+    <None Include="..\MAP.vcxproj.filters" />
+  </ItemGroup>
+</Project>

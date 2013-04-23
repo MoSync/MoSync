@@ -7,12 +7,12 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Banner.cpp" />
-    <ClCompile Include="BannerManager.cpp" />
+    <ClCompile Include="..\Banner.cpp" />
+    <ClCompile Include="..\BannerManager.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Banner.h" />
-    <ClInclude Include="BannerListener.h" />
-    <ClInclude Include="BannerManager.h" />
+    <ClInclude Include="..\Banner.h" />
+    <ClInclude Include="..\BannerListener.h" />
+    <ClInclude Include="..\BannerManager.h" />
   </ItemGroup>
 </Project>

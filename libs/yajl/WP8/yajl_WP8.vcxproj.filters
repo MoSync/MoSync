@@ -5,97 +5,97 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="src">
+    <Filter Include="..\src">
       <UniqueIdentifier>{79fccca4-b66f-4868-a65c-fea8b04a49c5}</UniqueIdentifier>
     </Filter>
-    <Filter Include="src\api">
+    <Filter Include="..\src\api">
       <UniqueIdentifier>{387dc2ca-db67-4c06-9f4e-f86c8d87081a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="src\stdlib">
+    <Filter Include="..\src\stdlib">
       <UniqueIdentifier>{a7f88d7a-8269-486f-bc15-90e2dd6b27e8}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="YAJLDom.cpp" />
-    <ClCompile Include="src\yajl.c">
+    <ClCompile Include="..\YAJLDom.cpp" />
+    <ClCompile Include="..\src\yajl.c">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\yajl_alloc.c">
+    <ClCompile Include="..\src\yajl_alloc.c">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\yajl_buf.c">
+    <ClCompile Include="..\src\yajl_buf.c">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\yajl_encode.c">
+    <ClCompile Include="..\src\yajl_encode.c">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\yajl_gen.c">
+    <ClCompile Include="..\src\yajl_gen.c">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\yajl_lex.c">
+    <ClCompile Include="..\src\yajl_lex.c">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\yajl_parser.c">
+    <ClCompile Include="..\src\yajl_parser.c">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\yajl_version.c">
+    <ClCompile Include="..\src\yajl_version.c">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\stdlib\stdlib.c">
+    <ClCompile Include="..\src\stdlib\stdlib.c">
       <Filter>src\stdlib</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="YAJLDom.h" />
-    <ClInclude Include="src\yajl_alloc.h">
+    <ClInclude Include="..\YAJLDom.h" />
+    <ClInclude Include="..\src\yajl_alloc.h">
       <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="src\yajl_buf.h">
+    <ClInclude Include="..\src\yajl_buf.h">
       <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="src\yajl_bytestack.h">
+    <ClInclude Include="..\src\yajl_bytestack.h">
       <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="src\yajl_encode.h">
+    <ClInclude Include="..\src\yajl_encode.h">
       <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="src\yajl_lex.h">
+    <ClInclude Include="..\src\yajl_lex.h">
       <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="src\yajl_parser.h">
+    <ClInclude Include="..\src\yajl_parser.h">
       <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="src\api\yajl_common.h">
+    <ClInclude Include="..\src\api\yajl_common.h">
       <Filter>src\api</Filter>
     </ClInclude>
-    <ClInclude Include="src\api\yajl_gen.h">
+    <ClInclude Include="..\src\api\yajl_gen.h">
       <Filter>src\api</Filter>
     </ClInclude>
-    <ClInclude Include="src\api\yajl_parse.h">
+    <ClInclude Include="..\src\api\yajl_parse.h">
       <Filter>src\api</Filter>
     </ClInclude>
-    <ClInclude Include="src\api\yajl_version.h">
+    <ClInclude Include="..\src\api\yajl_version.h">
       <Filter>src\api</Filter>
     </ClInclude>
-    <ClInclude Include="src\stdlib\assert.h">
+    <ClInclude Include="..\src\stdlib\assert.h">
       <Filter>src\stdlib</Filter>
     </ClInclude>
-    <ClInclude Include="src\stdlib\ctype.h">
+    <ClInclude Include="..\src\stdlib\ctype.h">
       <Filter>src\stdlib</Filter>
     </ClInclude>
-    <ClInclude Include="src\stdlib\errno.h">
+    <ClInclude Include="..\src\stdlib\errno.h">
       <Filter>src\stdlib</Filter>
     </ClInclude>
-    <ClInclude Include="src\stdlib\math.h">
+    <ClInclude Include="..\src\stdlib\math.h">
       <Filter>src\stdlib</Filter>
     </ClInclude>
-    <ClInclude Include="src\stdlib\stdio.h">
+    <ClInclude Include="..\src\stdlib\stdio.h">
       <Filter>src\stdlib</Filter>
     </ClInclude>
-    <ClInclude Include="src\stdlib\stdlib.h">
+    <ClInclude Include="..\src\stdlib\stdlib.h">
       <Filter>src\stdlib</Filter>
     </ClInclude>
-    <ClInclude Include="src\stdlib\string.h">
+    <ClInclude Include="..\src\stdlib\string.h">
       <Filter>src\stdlib</Filter>
     </ClInclude>
   </ItemGroup>
