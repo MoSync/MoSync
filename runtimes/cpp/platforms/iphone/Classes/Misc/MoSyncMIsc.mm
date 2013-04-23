@@ -257,6 +257,18 @@ SYSCALL(void, maImagePickerOpenWithEventReturnType(int returnType))
     MoSyncUIUtils_ShowImagePicker(returnType);
 }
 
+SYSCALL(int, maSaveImageToDeviceGallery(MAHandle imageDataHandle, const char* imageName))
+{
+    if ( imageDataHandle <= 0 )
+    {
+        return MA_MEDIA_RES_IMAGE_EXPORT_FAILED;
+    }
+    else
+    {
+        return MoSyncUIUtils_SaveImageToGallery(imageDataHandle);
+    }
+}
+
 //Shows an alert box with up to three buttons
 SYSCALL(void, maAlert(const char* title, const char* message, const char* button1, const char* button2, const char* button3))
 {

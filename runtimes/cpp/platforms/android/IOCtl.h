@@ -16,9 +16,11 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 */
 
 #include <Syscall.h>
+#include "JNIUtil.h"
 
 namespace Base
 {
+
 	// Framebuffer API
 
 	int _maFrameBufferGetInfo(MAFrameBufferInfo *info);
@@ -539,6 +541,18 @@ namespace Base
 	* \returns 0.
 	*/
 	int _maFileListClose(MAHandle list, JNIEnv* jNIEnv, jobject jThis);
+
+	/**
+	 * Saves an image in the photo gallery of the device.
+	 *
+	 * returns #MA_MEDIA_RES_OK if the input was correct and the operation started
+	 * or #MA_MEDIA_RES_IMAGE_EXPORT_FAILED otherwise.
+	 */
+	int _maSaveImageToDeviceGallery(
+			MAHandle imageHandle,
+			const char* imageName,
+			JNIEnv* jNIEnv,
+			jobject jThis);
 
 	/**
 	* Returns a handle to one of the default fonts of the device, in the style and size you specify.

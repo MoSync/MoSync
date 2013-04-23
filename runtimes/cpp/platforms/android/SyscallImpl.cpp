@@ -40,6 +40,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "helpers/CPP_IX_AUDIOBUFFER.h"
 #include "helpers/CPP_IX_OPENGL_ES.h"
+#include "helpers/CPP_IX_OPENGL_ES_MA.h"
 #include "helpers/CPP_IX_GL1.h"
 #include "helpers/CPP_IX_GL2.h"
 #include "helpers/CPP_IX_GL_OES_FRAMEBUFFER_OBJECT.h"
@@ -50,7 +51,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define ARG_NO_4 d
 #define ARG_NO_5 e
 #define ARG_NO_6 f
-#define MA_IOCTL_ELLIPSIS , ...
+#define MA_IOCTL_ELLIPSIS , int d = 0, int e = 0, int f = 0
 #else
 #define ARG_NO_4 SYSCALL_THIS->GetValidatedStackValue(0)
 #define ARG_NO_5 SYSCALL_THIS->GetValidatedStackValue(4)
@@ -459,19 +460,11 @@ namespace Base
 		return retval;
 	}
 
-	int wcharLength(const wchar* str)
-	{
-		int l = 0;
-		while(str[l] != 0) l++;
-		return l;
-	}
-
 	SYSCALL(MAExtent,  maGetTextSizeW(const wchar* str))
 	{
 		//SYSLOG("maGetTextSizeW");
 
-		jsize len = wcharLength(str);
-		jstring jstr = mJNIEnv->NewString((jchar*)str, len);
+		jstring jstr = WCHAR_TO_JCHAR(mJNIEnv, str);
 
 		jclass cls = mJNIEnv->GetObjectClass(mJThis);
 		jmethodID methodID = mJNIEnv->GetMethodID(cls, "maGetTextSizeW", "(Ljava/lang/String;)I");
@@ -503,8 +496,7 @@ namespace Base
 	{
 		//SYSLOG("maDrawTextW");
 
-		jsize len = wcharLength(str);
-		jstring jstr = mJNIEnv->NewString((jchar*)str, len);
+		jstring jstr = WCHAR_TO_JCHAR(mJNIEnv, str);
 
 		jclass cls = mJNIEnv->GetObjectClass(mJThis);
 		jmethodID methodID = mJNIEnv->GetMethodID(cls, "maDrawTextW", "(IILjava/lang/String;)V");
@@ -1079,7 +1071,9 @@ namespace Base
 	SYSCALL(int,  maGetEvent(MAEvent* event))
 	{
 		gSyscall->ValidateMemRange(event, sizeof(MAEvent));
+#ifndef MOSYNC_NATIVE
 		MYASSERT(((uint)event & 3) == 0, ERR_MEMORY_ALIGNMENT);	//alignment
+#endif
 
 		// Exit if event queue is empty.
 		if (gEventFifo.count() == 0) return 0;
@@ -1088,11 +1082,17 @@ namespace Base
 		*event = gEventFifo.get();
 
 		// Copy event data to memory on the MoSync side.
+#ifndef MOSYNC_NATIVE
 		#define HANDLE_CUSTOM_EVENT(eventType, dataType) if(event->type == eventType) { \
 			memcpy(Core::GetCustomEventPointer(gCore), (void*)event->data, sizeof(dataType)); \
 			delete (dataType*) event->data; \
 			event->data = (int(Core::GetCustomEventPointer(gCore)) - int(gCore->mem_ds)); }
-
+#else
+#define HANDLE_CUSTOM_EVENT(eventType, dataType) if(event->type == eventType) { \
+	memcpy(Core::GetCustomEventPointer(gCore), (void*)event->data, sizeof(dataType)); \
+	delete (dataType*) event->data; \
+	event->data = (int(Core::GetCustomEventPointer(gCore))); }
+#endif
 		// Macro CUSTOM_EVENTS is defined in runtimes/cpp/base/Syscall.h
 		CUSTOM_EVENTS(HANDLE_CUSTOM_EVENT);
 
@@ -1386,14 +1386,6 @@ namespace Base
 	*/
 	SYSCALL(longlong,  maIOCtl(int function, int a, int b, int c MA_IOCTL_ELLIPSIS))
 	{
-#ifdef MOSYNC_NATIVE
-		va_list args;
-		va_start(args, c);
-		int d = va_arg(args, int);
-		int e = va_arg(args, int);
-		int f = va_arg(args, int);
-		va_end(args);
-#endif
 		SYSLOG("maIOCtl");
 		//__android_log_write(ANDROID_LOG_INFO, "MoSync Syscall", "maIOCtl");
 		//handlePendingExceptions(mJNIEnv);
@@ -2087,6 +2079,16 @@ namespace Base
 				_cancel,
 				ARG_NO_4,
 				ARG_NO_5,
+				mJNIEnv,
+				mJThis);
+			}
+
+		case maIOCtl_maSaveImageToDeviceGallery:
+			{
+			SYSLOG("maIOCtl_maSaveImageToDeviceGallery");
+			return _maSaveImageToDeviceGallery(
+				a,
+				SYSCALL_THIS->GetValidatedStr(b),
 				mJNIEnv,
 				mJThis);
 			}
@@ -3304,6 +3306,9 @@ bool reloadProgram()
 
 void MoSyncExit(int errorCode)
 {
+#ifdef MOSYNC_NATIVE
+	exit(errorCode);
+#else
 	//__android_log_write(ANDROID_LOG_INFO, "MoSyncExit!", "Program has exited!");
 
 	if(false == reloadProgram())
@@ -3320,6 +3325,7 @@ void MoSyncExit(int errorCode)
 
 		Base::SYSCALL_THIS->VM_Yield();
 	}
+#endif
 }
 
 void MoSyncErrorExit(int errorCode)

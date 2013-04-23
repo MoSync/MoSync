@@ -70,6 +70,7 @@ namespace NativeUI
 
    /**
 	* Set the foreground image of the button. This won't be scaled at all.
+	* Setting this value will change the image path value to an empty string.
 	* @param image MoSync handle to an uncompressed image resource.
 	* @return Any of the following result codes:
 	* - #MAW_RES_OK if the property could be set. In this case the image
@@ -79,24 +80,23 @@ namespace NativeUI
 	int ImageButton::setImage(MAHandle image)
 	{
 		int res = setPropertyInt(MAW_IMAGE_BUTTON_IMAGE, image);
-		mImageHandle = image;
 		return res;
 	}
 
 	/**
 	 * Get the foreground image of the button.
-	 * @return Any of the following result codes:
-	 * - image MoSync handle to an uncompressed image resource.
-	 * - #MAW_RES_INVALID_PROPERTY_VALUE if the image handle was invalid
-	 * - 0 if the image path was set successfully.
+	 * @return A value greater than zero representing a MoSync handle to an
+	 * uncompressed image resource, or zero if the foreground image was created
+	 * using set image path function.
 	 */
 	MAHandle ImageButton::getImage()
 	{
-		return mImageHandle;
+		return getPropertyInt(MAW_IMAGE_BUTTON_IMAGE);
 	}
 
 	/**
 	 * Set the foreground image that will be displayed using a file path.
+	 * Setting this value will change the foreground image handle value to zero.
 	 * @param imagePath Path to an image file.
 	 * @return Any of the following result codes:
 	 * - #MAW_RES_OK if the property could be set. In this case the
@@ -106,12 +106,7 @@ namespace NativeUI
 	 */
 	int ImageButton::setImagePath(const MAUtil::String& imagePath)
 	{
-		int result = this->setProperty(MAW_IMAGE_BUTTON_IMAGE_PATH, imagePath);
-		if (result == MAW_RES_OK)
-		{
-			mImageHandle = 0;
-		}
-		return result;
+		return setProperty(MAW_IMAGE_BUTTON_IMAGE_PATH, imagePath);
 	}
 
 	/**
@@ -127,6 +122,8 @@ namespace NativeUI
     /**
      * Sets the background image. This will be scaled to fit the whole
      * widget (not keeping the aspect).
+     * Setting this value will change the background image path value to an
+     * empty string.
      * @param image MoSync handle to an uncompressed image resource.
      * @return Any of the following result codes:
      * - #MAW_RES_OK if the property could be set.
@@ -138,7 +135,19 @@ namespace NativeUI
     }
 
 	/**
+	 * Get the background image of the button.
+	 * @return A value greater than zero representing a MoSync handle to an
+	 * uncompressed image resource, or zero if the background image was created
+	 * using set background image path function.
+	 */
+	MAHandle ImageButton::getBackgroundImage()
+	{
+		return getPropertyInt(MAW_IMAGE_BUTTON_BACKGROUND_IMAGE);
+	}
+
+	/**
 	 * Set the background image that will be displayed using a file path.
+	 * Setting this value will change the background image handle value to zero.
 	 * @param imagePath Path to an image file.
 	 * @return Any of the following result codes:
 	 * - #MAW_RES_OK if the property could be set.

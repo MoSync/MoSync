@@ -252,7 +252,7 @@ void streamHeaderFunctions(ostream& stream, const Interface& inf, bool syscall) 
 
 		if(!syscall && f.returnType != "noreturn")
 			stream <<
-				"#if defined(__arm__) && !defined(MAPIP)\n"
+				"#if defined(__arm__) && !defined(MAPIP) && !defined(MOSYNC_NATIVE)\n"
 				"inline\n"
 				"#endif\n";
 		if(syscall)

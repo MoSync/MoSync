@@ -65,7 +65,7 @@ void FileSetList::listFiles(vector<string>& files) {
 
 static vector<string>* gInternalScanFileList;
 static void internalListFilesCb(const char* filename) {
-	if (gInternalScanFileList) {
+	if (gInternalScanFileList && strcmp(".", filename) && strcmp("..", filename)) {
 		gInternalScanFileList->push_back(filename);
 	}
 }

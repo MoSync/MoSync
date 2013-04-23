@@ -85,11 +85,13 @@ group WidgetImageButtonProperties "Image button" {
 		FONT_SIZE = "fontSize";
 
 		/**
-		* Sets the background image. This will be scaled to fit the whole widget (not keeping the aspect).
+		* Sets or gets the background image. This will be scaled to fit the whole widget (not keeping the aspect).
+		* Setting this property will change #MAW_IMAGE_BUTTON_BACKGROUND_IMAGE_PATH property
+		* value to an empty string.
 		*
 		* @validvalue MoSync handle to an uncompressed image resource.
 		*
-		* @setonly
+		* @setandget
 		*
 		* @par Example
 		* \code
@@ -99,11 +101,13 @@ group WidgetImageButtonProperties "Image button" {
 		BACKGROUND_IMAGE = "backgroundImage";
 
 		/**
-		* Sets the foreground image of the button. This won't be scaled at all.
+		* Sets or gets the foreground image of the button. This won't be scaled at all.
+		* Setting this property will change #MAW_IMAGE_BUTTON_IMAGE_PATH property
+		* value to an empty string.
 		*
 		* @validvalue MoSync handle to an uncompressed image resource.
 		*
-		* @setonly
+		* @setandget
 		*
 		* @par Example
 		* \code
@@ -115,6 +119,7 @@ group WidgetImageButtonProperties "Image button" {
 		/**
 		* Sets or gets a path to a image file that will be displayed by the widget
 		* as a foreground image.
+		* Setting this property will change #MAW_IMAGE_BUTTON_IMAGE property value to zero.
 		*
 		* @validvalue A valid path to an image file.
 		*
@@ -130,6 +135,7 @@ group WidgetImageButtonProperties "Image button" {
 		/**
 		* Sets or gets a path to a image file that will be displayed by the widget
 		* as a background image.
+		* Setting this property will change #MAW_IMAGE_BUTTON_BACKGROUND_IMAGE property value to zero.
 		*
 		* @validvalue A valid path to an image file.
 		*

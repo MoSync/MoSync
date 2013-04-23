@@ -16,9 +16,11 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 */
 
 #include <fstream>
+#include <sstream>
 #include <iostream>
 #include <stdlib.h>
 #include <string.h>
+#include <algorithm>
 
 #include <idl-common/idl-common.h>
 #include <idl-common/types.h>
@@ -28,6 +30,25 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "extcomp.h"
 #include "androidext.h"
+
+#define JAVA_STRING_CLASS "Ljava/lang/String;"
+#define CSTRING_CLASS "Lcom/mosync/api/CString;"
+#define POINTER_CLASS "Lcom/mosync/api/Pointer;"
+
+void generateAndroidFiles(string& outputDir, Interface& ext, string& androidPackageName, string& androidClassName) {
+	string androidOut = outputDir + "/Android/";
+	_mkdir(androidOut.c_str());
+	string androidManifestOut = androidOut + "assets/";
+	_mkdir(androidManifestOut.c_str());
+	string extName = ext.name;
+	string androidMFOut = androidManifestOut + extName + ".xml";
+	ofstream androidMFfile(androidMFOut.c_str());
+
+	writeJNIBridge(outputDir, ext, androidPackageName);
+
+	streamAndroidExtMF(androidMFfile, ext, androidPackageName, androidClassName);
+	androidMFfile.close();
+}
 
 void streamAndroidExtMF(ostream& out, Interface& ext, string& androidPackageName, string& androidSimpleClassName) {
 	streamXMLComment(out, ext.comment);
@@ -90,6 +111,106 @@ void streamAndroidExtMF(ostream& out, Interface& ext, string& androidPackageName
 
 }
 
+void writeJNIBridge(string& outputDir, Interface& ext, string& androidPackageName) {
+	string bridgeFileName = outputDir + "/_ext.android.c";
+	ofstream bridgeFile(bridgeFileName.c_str());
+
+	string extName = ext.name;
+
+	bridgeFile << "// *** GENERATED FILE - Do not modify ***\n\n";
+	bridgeFile << "#if defined(MOSYNC_NATIVE) && defined(PLATFORM_ANDROID)\n\n";
+	bridgeFile << "#include <maapi.h>\n";
+	bridgeFile << "#include <jni.h>\n";
+	bridgeFile << "#include \"" << extName << ".h\"\n";
+
+	bridgeFile << "JNIEnv* g_" << extName << ";\n";
+	bridgeFile << "jobject* g_This_" << extName << ";\n";
+
+	for (size_t i = 0; i < ext.functions.size(); i++) {
+		streamJNIFunctionWrapper(bridgeFile, ext, ext.functions[i], androidPackageName);
+	}
+
+	bridgeFile << "#endif";
+	bridgeFile.flush();
+	bridgeFile.close();
+}
+
+void streamJNIFunctionWrapper(ostream& out, Interface& ext, Function& f, string& androidPackageName) {
+	// TODO: Refs to jni env and this should be global + deleted.
+	streamFunctionCSignature(out, ext, f);
+	out << "{\n";
+	out << "jclass cls = mJNIEnv->GetObjectClass(mJThis);\n";
+	out << "jmethodID methodID = mJNIEnv->GetMethodID(cls, \""
+			<< f.name << "\",\"" << getJavaByteCodeSignature(ext, f, androidPackageName)
+			<< "\");\n";
+
+	stringstream preamble;
+	stringstream postamble;
+	stringstream call;
+
+	bool needsReturn = isReturnType(ext, f.returnType);
+	if (needsReturn) {
+		call << f.returnType;
+		call << " result = ";
+	}
+
+	string callType = "Object";
+	if (f.returnType == "int") callType = "Int";
+	if (f.returnType == "double") callType = "Double";
+	if (f.returnType == "float") callType = "Float";
+	if (f.returnType == "long long") callType = "Long";
+	if (f.returnType == "char") callType = "Byte";
+	if (f.returnType == "void") callType = "Void";
+
+	call << "mJNIEnv->Call" << callType << "Method(";
+
+	for (size_t i = 0; i < f.args.size(); i++) {
+		if (i > 0) call << ",";
+		Argument arg = f.args[i];
+		string name = safeArg(arg.name);
+		string bytecodeType = toAndroidType(ext, androidPackageName, arg.type, false, arg.in, true);
+		string wrapperFn;
+		string prefix;
+		string cast;
+		if (bytecodeType == "I") cast = "(jint)";
+		if (bytecodeType == "D") cast = "(jdouble)";
+		if (bytecodeType == "F") cast = "(jfloat)";
+		if (bytecodeType == "B") cast = "(jbyte)";
+		if (bytecodeType == POINTER_CLASS) wrapperFn = "createJNIPointer";
+		else if (bytecodeType == CSTRING_CLASS) wrapperFn = "createCString";
+		else if (bytecodeType == JAVA_STRING_CLASS) wrapperFn = "createJavaString";
+		else if (bytecodeType.substr(0, 1) == "L") wrapperFn = "createStruct_" + arg.type;
+		if (!wrapperFn.empty()) {
+			prefix = "wr";
+			preamble << "jobject " << prefix << name << " = " << wrapperFn << "(" << name << ");\n";
+			postamble << "mJNIEnv->DeleteLocalRef(" << prefix << name << ");\n";
+		}
+		call << cast << prefix << name;
+	}
+	call << ");\n";
+	out << preamble.str();
+	out << call.str();
+	out << postamble.str();
+
+	if (needsReturn) {
+		out << "return result;\n";
+	}
+	out << "}\n";
+}
+
+string getJavaByteCodeSignature(Interface& ext, Function& f, string& androidPackageName) {
+	string result = "(";
+	for (size_t i = 0; i < f.args.size(); i++) {
+		Argument arg = f.args[i];
+		string ctype = arg.type;
+		result += toAndroidType(ext, androidPackageName, ctype, false, arg.in, true);
+	}
+	result += ")";
+	result += toAndroidType(ext, androidPackageName, f.returnType, false, false, true);
+	return result;
+}
+
+
 void writeAndroidStubs(string& outputDir, Interface& ext, string& androidPackageName) {
 	_mkdir(outputDir.c_str());
 
@@ -109,7 +230,7 @@ void writeAndroidStubs(string& outputDir, Interface& ext, string& androidPackage
 		string name = cs.name;
 		for (size_t j = 0; j < cs.constants.size(); j++) {
 			Constant c = cs.constants[j];
-			extensionFile << "\tpublic final static " << toAndroidType(ext, c.type, false, true) << " " << name << c.name << " = " << c.value << ";\n";
+			extensionFile << "\tpublic final static " << toAndroidType(ext, androidPackageName, c.type, false, true, false) << " " << name << c.name << " = " << c.value << ";\n";
 		}
 		extensionFile << "\n";
 	}
@@ -119,19 +240,19 @@ void writeAndroidStubs(string& outputDir, Interface& ext, string& androidPackage
 
 	for (size_t i = 0; i < ext.functions.size(); i++) {
 		Function f = ext.functions[i];
-		string returnType = toAndroidType(ext, f.returnType, false, false);
+		string returnType = toAndroidType(ext, androidPackageName, f.returnType, false, false, false);
 		extensionFile << "\tpublic " << returnType << " " << f.name << "(";
 		for (size_t j = 0; j < f.args.size(); j++) {
 			if (j > 0) {
 				extensionFile << ", ";
 			}
 			Argument arg = f.args[j];
-			extensionFile << toAndroidType(ext, arg.type, false, arg.in);
+			extensionFile << toAndroidType(ext, androidPackageName, arg.type, false, arg.in, false);
 			extensionFile << " ";
 			extensionFile << arg.name;
 		}
 		extensionFile << ") {\n\t\t/* TODO: Replace this with an implementation */\n";
-		if (returnType != "void") {
+		if (isReturnType(ext, f.returnType)) {
 			extensionFile << "\t\treturn " << getAndroidDefaultValue(returnType) << ";\n";
 		}
 		extensionFile << "\t}\n\n";
@@ -164,7 +285,7 @@ void writeAndroidStubs(string& outputDir, Interface& ext, string& androidPackage
 		for (size_t j = 0; j < s.members.size(); j++) {
 			Member m = s.members[j];
 			string type = m.pod[0].type;
-			string androidType = toAndroidType(ext, type, false, false);
+			string androidType = toAndroidType(ext, androidPackageName, type, false, false, false);
 			structFile << "\tpublic " << androidType << " " << m.pod[0].name << ";\n";
 			int pointerDepth = 0;
 			string pointerType = extractPointerType(type, pointerDepth);
@@ -179,7 +300,7 @@ void writeAndroidStubs(string& outputDir, Interface& ext, string& androidPackage
 			Member m = s.members[j];
 			string ctype = m.pod[0].type;
 			string name = m.pod[0].name;
-			string cast = toAndroidType(ext, ctype, true, false);
+			string cast = toAndroidType(ext, androidPackageName, ctype, true, false, false);
 			int padding = getPadding(ext, ctype);
 			structFile << "\t\ts." << name << " = (" << cast << ")__" << name << ".unmarshal(data, offset + " << (size + padding) << ");\n";
 			size += cTypeAlignedSize(ext, ctype);
@@ -195,7 +316,7 @@ void writeAndroidStubs(string& outputDir, Interface& ext, string& androidPackage
 			Member m = s.members[j];
 			string ctype = m.pod[0].type;
 			string name = m.pod[0].name;
-			string cast = toAndroidType(ext, ctype, true, false);
+			string cast = toAndroidType(ext, androidPackageName, ctype, true, false, false);
 			int padding = getPadding(ext, ctype);
 			structFile << "\t\t__" << name << ".marshal(s." << name << ", data, offset + " << (size + padding) << ");\n";
 			size += cTypeAlignedSize(ext, ctype);
@@ -210,21 +331,29 @@ void writeAndroidStubs(string& outputDir, Interface& ext, string& androidPackage
 	}
 }
 
-string toAndroidType(Interface& ext, string& ctype, bool autoBox, bool constant) {
+string toAndroidType(Interface& ext, string& androidPackageName, string& ctype, bool autoBox, bool constant, bool bytecode) {
 	int ptrDepth = 0;
 	string extractedType = extractPointerType(ctype, ptrDepth);
 	if (ptrDepth > 0) {
-		string prefix = "";
-		string suffix = "";
-		for (int i = 0; i < ptrDepth; i++) {
-			prefix.append("Pointer<");
-			suffix.append(">");
+		if (bytecode) {
+			return POINTER_CLASS;
+		} else {
+			string prefix = "";
+			string suffix = "";
+			for (int i = 0; i < ptrDepth; i++) {
+				prefix.append("Pointer<");
+				suffix.append(">");
+			}
+			return prefix + toAndroidType(ext, androidPackageName, extractedType, true, constant, bytecode) + suffix;
 		}
-		return prefix + toAndroidType(ext, extractedType, true, constant) + suffix;
 	} else {
 		extractedType = resolveTypedef(ext, extractedType);
 		if (extractedType == "NCString" || extractedType == "MAString") {
-			return constant ? "String" : "CString";
+			if (bytecode) {
+				return constant ? JAVA_STRING_CLASS : CSTRING_CLASS;
+			} else {
+				return constant ? "String" : "CString";
+			}
 		}
 		if (autoBox) {
 			if (extractedType == "int") return "Integer";
@@ -232,19 +361,27 @@ string toAndroidType(Interface& ext, string& ctype, bool autoBox, bool constant)
 			if (extractedType == "double") return "Double";
 			if (extractedType == "float") return "Float";
 			if (extractedType == "long long") return "Long";
-		} else if (extractedType == "int" ||
-			extractedType == "double" ||
-			extractedType == "float") {
-			return extractedType;
-		} else if (extractedType == "long long") {
-			return "long";
-		} else if (extractedType == "char") {
-			return "byte";
+		} else {
+			if (extractedType == "int") return (bytecode ? "I" : "int");
+			if (extractedType == "double") return (bytecode ? "D" : "double");
+			if (extractedType == "float") return (bytecode ? "F" : "float");
+			if (extractedType == "void") return (bytecode ? "V" : "void");
+			if (extractedType == "long long") return (bytecode ? "J" : "long");
+			if (extractedType == "char") return (bytecode ? "B" : "byte");
+			// S - short, Z - boolean
 		}
 
 		// The rest are structs
-		return extractedType;
+		return bytecode ?
+				getBytecodeStructClass(androidPackageName, extractedType) :
+				extractedType;
 	}
+}
+
+string getBytecodeStructClass(string& package, string& type) {
+	string result = "L" + package + ".types." + type + ";";
+	::replace(result.begin(), result.end(), '.', '/');
+	return result;
 }
 
 string getAndroidDefaultValue(string& type) {

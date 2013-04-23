@@ -57,6 +57,8 @@ SYSCALL(void, maImagePickerOpen());
 
 SYSCALL(void, maImagePickerOpenWithEventReturnType(int returnType));
 
+SYSCALL(int, maSaveImageToDeviceGallery(MAHandle imageDataHandle, const char* imageName));
+
 SYSCALL(void, maAlert(const char* title, const char* message, const char* button1, const char* button2, const char* button3));
 
 SYSCALL(void, maOptionsBox(const wchar* title, const wchar* destructiveButtonTitle, const wchar* cancelButtonTitle,

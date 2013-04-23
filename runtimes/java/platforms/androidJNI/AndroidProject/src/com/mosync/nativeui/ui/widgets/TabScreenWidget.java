@@ -87,6 +87,10 @@ public class TabScreenWidget extends ScreenWidget
 		TabSpec tabSpec = tab.newTabSpec( Integer.toString( indexOfNewTab ) );
 		setIndicators( tabSpec, screen.getTitle( ), screen.getIcon( ) );
 
+		// Add the screen to the children list.
+		child.setParent( this );
+		m_children.add( indexOfNewTab, child );
+
 		// Provides the tab with its content.
 		tabSpec.setContent( new TabContentFactory( ) {
 			@Override

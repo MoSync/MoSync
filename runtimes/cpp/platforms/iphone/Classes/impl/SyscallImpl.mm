@@ -45,6 +45,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #ifdef SUPPORT_OPENGL_ES
 #define DONT_WANT_IX_OPENGL_ES_TYPEDEFS
+#include <helpers/CPP_IX_OPENGL_ES_MA.h>
 #include <helpers/CPP_IX_OPENGL_ES.h>
 #include <helpers/CPP_IX_GL1.h>
 #include <helpers/CPP_IX_GL2.h>
@@ -233,12 +234,20 @@ namespace Base {
 	{
         int d;
         int e;
+        int f;
+        int g;
+        int h;
+        int i;
         bool native = false;
 #ifdef MOSYNC_NATIVE
         va_list ap;
         va_start(ap, c);
         d = va_arg(ap, int);
         e = va_arg(ap, int);
+        f = va_arg(ap, int);
+        g = va_arg(ap, int);
+        h = va_arg(ap, int);
+        i = va_arg(ap, int);
         va_end(ap);
         native = true;
 #endif
@@ -327,6 +336,7 @@ namespace Base {
         maIOCtl_case(maSensorStop);
 		maIOCtl_case(maImagePickerOpen);
         maIOCtl_case(maImagePickerOpenWithEventReturnType);
+        maIOCtl_case(maSaveImageToDeviceGallery);
 		maIOCtl_case(maSendTextSMS);
 		maIOCtl_case(maSyscallPanicsEnable);
 		maIOCtl_case(maSyscallPanicsDisable);

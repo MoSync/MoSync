@@ -227,7 +227,11 @@ size_t strnlen(const char *s, size_t count);
 
 #endif	//MAPIP
 
-#if defined(MAPIP) || (defined(MOSYNC_NATIVE) && (defined(ANDROID) || defined(__IOS__)))
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#if defined(MAPIP) || defined(MOSYNC_NATIVE)
 /**
 * Compares strings \a s1 with \a s2 without case sensitivity.
 * \returns
@@ -247,10 +251,6 @@ int stricmp(const char *s1, const char *s2);
 */
 
 int strnicmp(const char *s1, const char *s2, size_t count);
-#endif
-
-#ifdef __cplusplus
-extern "C" {
 #endif
 
 /**

@@ -17,7 +17,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include <ma.h>
 #include <IX_WIDGET.h>
-#include <IX_OPENGL_ES.h>
+#include <IX_OPENGL_ES_MA.h>
 #include "GLMoblet.h"
 
 namespace MAUtil {

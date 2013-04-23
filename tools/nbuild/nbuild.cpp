@@ -79,7 +79,7 @@ const char* mosyncdir() {
 	return md;
 }
 
-void sh(const char* cmd, bool hideOutput, const char* shownCmdLine) {
+int sh(const char* cmd, bool hideOutput, const char* shownCmdLine, bool exitOnError) {
 	// COPY & PASTED FROM PACKAGE.CPP
 	if (!shownCmdLine) {
 		printf("%s\n", cmd);
@@ -104,13 +104,15 @@ void sh(const char* cmd, bool hideOutput, const char* shownCmdLine) {
 
 	fflush(stdout);
 	fflush(stderr);
-	if(res != 0) {
+	if(res != 0 && exitOnError) {
 		printf("System error %i\n", res);
 		exit(res);
 	}
+	return res;
 }
 
 void error(const char* msg, int errorCode) {
 	puts(msg);
+	puts("\n");
 	exit(errorCode);
 }

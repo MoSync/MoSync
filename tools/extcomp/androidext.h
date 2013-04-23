@@ -28,9 +28,14 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 using namespace std;
 
+void generateAndroidFiles(string&, Interface&, string&, string&);
+void writeJNIBridge(string& outputDir, Interface& ext, string& androidPackageName);
+void streamJNIFunctionWrapper(ostream& out, Interface& ext, Function& f, string& androidPackageName);
+string getJavaByteCodeSignature(Interface& ext, Function& f, string& androidPackageNames);
+string getBytecodeStructClass(string& package, string& type);
 void streamAndroidExtMF(ostream&, Interface&, string&, string&);
 void writeAndroidStubs(string&, Interface&, string&);
-string toAndroidType(Interface&, string&, bool, bool);
+string toAndroidType(Interface&, string&, string&, bool, bool, bool);
 string getAndroidDefaultValue(string&);
 
 #endif /* ANDROIDEXT_H_ */

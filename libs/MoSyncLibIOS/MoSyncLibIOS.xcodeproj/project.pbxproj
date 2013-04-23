@@ -185,6 +185,7 @@
 		0B92CF8C1712BB8B002DFDF6 /* Room.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0B92C7D41712BB8A002DFDF6 /* Room.cpp */; };
 		0B92CF8D1712BB8B002DFDF6 /* Sprite.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0B92C7D61712BB8A002DFDF6 /* Sprite.cpp */; };
 		0B92CF8E1712BB8B002DFDF6 /* MinUI.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0B92C7D91712BB8A002DFDF6 /* MinUI.cpp */; };
+		0BC7BEFD1726B4DC007662C2 /* mastring.c in Sources */ = {isa = PBXBuildFile; fileRef = 0BC7BEFC1726B4DC007662C2 /* mastring.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -688,6 +689,8 @@
 		0B92CF9D17141D1A002DFDF6 /* math_private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = math_private.h; sourceTree = "<group>"; };
 		0B92CF9E17141D1A002DFDF6 /* mawvsprintf.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = mawvsprintf.h; sourceTree = "<group>"; };
 		0B92CFD1171598F9002DFDF6 /* maapi.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = maapi.h; sourceTree = "<group>"; };
+		0BC7BEFB1726B263007662C2 /* IX_OPENGL_ES_MA.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IX_OPENGL_ES_MA.h; sourceTree = "<group>"; };
+		0BC7BEFC1726B4DC007662C2 /* mastring.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = mastring.c; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -765,6 +768,8 @@
 		0B92B47D1712BB7B002DFDF6 /* MAStd */ = {
 			isa = PBXGroup;
 			children = (
+				0BC7BEFC1726B4DC007662C2 /* mastring.c */,
+				0BC7BEFB1726B263007662C2 /* IX_OPENGL_ES_MA.h */,
 				0B80AC95171D9A78002EDBD1 /* maassert.c */,
 				0B92CFD1171598F9002DFDF6 /* maapi.h */,
 				0B92CF8F17141D18002DFDF6 /* stdint.h */,
@@ -1618,7 +1623,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "line_1=$(sed -n '/char\\* strcpy/=' ../MAStd/maapi.h)\nlet \"line_2=$line_1-2\"\necho $line_2\n\nrm -r MAStdNative || echo MASTDNative already deleted\nmkdir MAStdNative\ncd ../MAStd\ncp IX_OPENGL_ES.h maapi.h madmath.h maxtoa.h maapi_defs.h maarg.h IX_WIDGET.h maheap.h matime.h conprint.h maassert.h mastdlib.h mavsprintf.h ma.h mactype.h mastring.h ../MoSyncLibIOS/MAStdNative\n\ncd ..\n\nfind . -path ./MoSyncLibIOS -prune -o -iname \"*.h\" | cpio -pmud MoSyncLibIOS/MAStdNative/\n\ncd MoSyncLibIOS/MAStdNative\n\n\nline_1+=\"d\"\necho $line_1\nline_2+=\"d\"\necho $line_2\n\nsed -i.bak $line_1 maapi.h\nsed -i.bak $line_2 maapi.h\n\n";
+			shellScript = "line_1=$(sed -n '/char\\* strcpy/=' ../MAStd/maapi.h)\nlet \"line_2=$line_1-2\"\necho $line_2\n\nrm -r MAStdNative || echo MASTDNative already deleted\nmkdir MAStdNative\ncd ../MAStd\ncp IX_OPENGL_ES.h maapi.h madmath.h maxtoa.h maapi_defs.h maarg.h IX_WIDGET.h maheap.h matime.h conprint.h maassert.h mastdlib.h mavsprintf.h ma.h mactype.h mastring.h IX_OPENGL_ES_MA.h ../MoSyncLibIOS/MAStdNative\n\ncd ..\n\nfind . -path ./MoSyncLibIOS -prune -o -iname \"*.h\" | cpio -pmud MoSyncLibIOS/MAStdNative/\n\ncd MoSyncLibIOS/MAStdNative\n\n\nline_1+=\"d\"\necho $line_1\nline_2+=\"d\"\necho $line_2\n\nsed -i.bak $line_1 maapi.h\nsed -i.bak $line_2 maapi.h\n\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -1804,6 +1809,7 @@
 				0B92CF8D1712BB8B002DFDF6 /* Sprite.cpp in Sources */,
 				0B92CF8E1712BB8B002DFDF6 /* MinUI.cpp in Sources */,
 				0B80AC96171D9A78002EDBD1 /* maassert.c in Sources */,
+				0BC7BEFD1726B4DC007662C2 /* mastring.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

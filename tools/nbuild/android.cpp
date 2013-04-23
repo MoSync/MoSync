@@ -8,6 +8,8 @@
 #include <vector>
 #include <sstream>
 #include <fstream>
+#include <algorithm>
+#include <cstring>
 
 #define TEMP_BUILD_DIR "--android-build-dir"
 
@@ -25,13 +27,13 @@ int buildAndroidNative(Arguments* params) {
 }
 
 string getTempBuildDir(Arguments* params) {
-	string tmpDir = params->getSwitchValue(PROJECT_DIR);
+	string tmpDir = params->getSwitchValue(TEMP_BUILD_DIR);
 	if (tmpDir.empty()) {
-		tmpDir = params->getSwitchValue(TEMP_BUILD_DIR);
-		toDir(tmpDir);
-	} else {
+		tmpDir = params->getSwitchValue(PROJECT_DIR);
 		toDir(tmpDir);
 		tmpDir += "temp/";
+	} else {
+		toDir(tmpDir);
 	}
 	return tmpDir;
 }
@@ -62,12 +64,17 @@ int generateMakefile(Arguments* params) {
 	}
 	vector<string> sourceFiles = getSourceFiles(params);
 	string sourceFileList;
+	bool isVerbose = params->isFlagSet(VERBOSE);
 	for (size_t i = 0; i < sourceFiles.size(); i++) {
 		sourceFileList += sourceFiles[i];
 		sourceFileList += " ";
+		if (isVerbose) {
+			printf("Adding source file: %s.\n", sourceFiles[i].c_str());
+		}
 	}
+
 	if (sourceFiles.empty()) {
-		error("No source files!\n");
+		error("No source files!");
 	}
 	rootCtx.setParameter("source-files", sourceFileList);
 	vector<string> compilerDefines = params->getPrefixedList(MACRO_DEFINES, true);
@@ -86,7 +93,8 @@ int generateMakefile(Arguments* params) {
 		rootCtx.setParameter("no-default-includes", "true");
 	}
 
-	if (params->isFlagSet("--android-static-lib")) {
+	bool useStatic = "static" == params->getSwitchValue("--android-lib-type");
+	if (useStatic) {
 		rootCtx.setParameter("static-lib", "true");
 	}
 
@@ -96,21 +104,41 @@ int generateMakefile(Arguments* params) {
 	string androidMkTemplate = androidProfilesDir + "/Android.mk.template";
 
 	string androidMkOutput = tmpBuildDir + "/Android.mk";
-	ofstream output(androidMkOutput.c_str());
-	if (output.good()) {
-		DefaultParserCallback cb(&rootCtx, output);
-		parser.parseFile(androidMkTemplate, &cb);
-		output.flush();
-		output.close();
-	} else {
+	stringstream output;
+
+	DefaultParserCallback cb(&rootCtx, output);
+	parser.parseFile(androidMkTemplate, &cb);
+
+	output.flush();
+	string mf = output.str();
+
+	bool different = true;
+	ifstream cmp(androidMkOutput.c_str(), ifstream::in);
+	if (cmp.good()) {
+		int len = mf.size() * sizeof(char);
+		char* cmpStr = (char*) malloc(len);
+		cmp.read(cmpStr, len);
+		different = cmp.fail();
+		different |= (mf != string(cmpStr));
+		free(cmpStr);
+	}
+
+	if (different) {
+		ofstream outputFile(androidMkOutput.c_str());
+		if (output.good()) {
+			outputFile << mf;
+			outputFile.flush();
+			outputFile.close();
+			string androidAppMkOutput = tmpBuildDir + "/Application.mk";
+			string androidAppMkOriginal = androidProfilesDir + "/Application.mk";
+			copyFile(androidAppMkOutput.c_str(), androidAppMkOriginal.c_str());
+			return 0;
+		}
 		return 1;
 	}
 
-	string androidAppMkOutput = tmpBuildDir + "/Application.mk";
-	string androidAppMkOriginal = androidProfilesDir + "/Application.mk";
-	copyFile(androidAppMkOutput.c_str(), androidAppMkOriginal.c_str());
-
-	return 0;
+	// Failed!
+	return 2;
 }
 
 string toMakefileFile(string file) {
@@ -126,7 +154,6 @@ string toMakefileFile(string file) {
 		result = "/cygdrive/" + device + result.substr(ixColon + 1);
 	}
 	toSlashes(result);
-	printf("RESULT: %s\n", result.c_str());
 	return result;
 #else
 	// We are already good to go!
@@ -134,13 +161,41 @@ string toMakefileFile(string file) {
 #endif
 }
 
+string getNdkBuildCommand(string commandLine) {
+#ifdef WIN32
+	bool exists;
+	string cygpath = getCygpath(exists);
+	if (!cygpath.empty()) {
+		toDir(cygpath);
+	}
+	if (exists) {
+		return cygpath + "bash.exe -c \"" + commandLine + "\"";
+	} else {
+		error("No cygwin found! Please set CYGPATH or add the cygwin bin directory to PATH.");
+	}
+#endif
+	return commandLine;
+}
+
+#ifdef WIN32
+string getCygpath(bool& exists) {
+	char* envCygpath = getenv("CYGPATH");
+	if (envCygpath && strlen(envCygpath) > 0) {
+		exists = true;
+		return envCygpath;
+	}
+	exists = !sh("bash.exe -c pwd", false, "", false);
+	return "";
+}
+#endif
+
 int executeNdkBuild(Arguments* params) {
 	vector<string> configNames;
 	vector<string> libVariants;
 	split(configNames, require(params, CONFIGURATION), ",");
 	split(libVariants, require(params, BINARY_TYPE), ",");
 
-	string ndkbuildCmd = require(params, "--android-ndkbuild-cmd");
+	string ndkbuildCmd = toMakefileFile(require(params, "--android-ndkbuild-cmd"));
 	string projectPath = toMakefileFile(require(params, PROJECT_DIR));
 	toSlashes(projectPath);
 	string moduleName = require(params, NAME);
@@ -168,7 +223,7 @@ int executeNdkBuild(Arguments* params) {
 			bool doClean = params->isFlagSet(CLEAN);
 
 			ostringstream cmd;
-			cmd << file(ndkbuildCmd) << " ";
+			cmd << toMakefileFile(ndkbuildCmd) << " ";
 			cmd << "-C " << toMakefileFile(file(tmpBuildDir)) << " ";
 			if (isVerbose) {
 				cmd << "V=1 ";
@@ -182,9 +237,9 @@ int executeNdkBuild(Arguments* params) {
 			string libDir = toMakefileFile(string(mosyncdir()) + "/lib");
 			string moduleDir = toMakefileFile(string(mosyncdir()) + "/modules");
 			toSlashes(moduleDir);
-			string makeFile = tmpBuildDir + "Android.mk";
-			toMakefileFile(makeFile);
+			string makeFile = toMakefileFile(tmpBuildDir + "Android.mk");
 			cmd << arg("MOSYNC_MODULES=" + moduleDir) << " ";
+			cmd << arg("APP_MODULES=" + moduleName) << " ";
 			cmd << arg("MOSYNC_LIBS=" + libDir) << " ";
 			cmd << arg("PROJECT_DIR=" + projectPath) << " ";
 			cmd << arg("APP_BUILD_SCRIPT=" + makeFile) << " ";
@@ -196,14 +251,25 @@ int executeNdkBuild(Arguments* params) {
 			cmd << arg("NDK_PROJECT_PATH=.") << " ";
 			cmd << arg("APP_ABI=" + arch) << " ";
 			cmd << arg("APP_PLATFORM=android-" + require(params, "--android-version")) << " ";
+			cmd << arg("MOSYNCDIR=" + toMakefileFile(mosyncdir())) << " ";
 
-			sh(cmd.str().c_str(), !isVerbose);
-
+			bool useStatic = "static" == params->getSwitchValue("--android-lib-type");
 			string fullOutputDir = outputDir + "android_" + arch + "_" + libVariant + "/";
 			_mkdir(fullOutputDir.c_str());
-			// TODO: Static libs
-			string libFile = tmpBuildDir + "libs/" + arch + "/lib" + moduleName + ".so";
-			copyFile((fullOutputDir + "lib" + moduleName + ".so").c_str(), libFile.c_str());
+
+			string libFile = useStatic ?
+					tmpBuildDir + "obj/local/" + arch + "/lib" + moduleName + ".a" :
+					tmpBuildDir + "libs/" + arch + "/lib" + moduleName + ".so";
+			string libExt = useStatic ? ".a" : ".so";
+			string fullOutputFile = fullOutputDir + "lib" + moduleName + libExt;
+
+			file(libFile.c_str());
+			string fullCmd = getNdkBuildCommand(cmd.str());
+			if (sh(fullCmd.c_str(), !isVerbose)) {
+				error("NDK build command failed!\n", 1);
+			}
+
+			copyFile(fullOutputFile.c_str(), libFile.c_str());
 		}
 	}
 	return 0;

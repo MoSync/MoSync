@@ -128,6 +128,7 @@ import com.mosync.internal.android.extensions.MoSyncExtensionLoader;
 import com.mosync.internal.android.nfc.MoSyncNFC;
 import com.mosync.internal.android.nfc.MoSyncNFCService;
 import com.mosync.internal.generated.IX_OPENGL_ES;
+import com.mosync.internal.generated.IX_OPENGL_ES_MA;
 import com.mosync.internal.generated.IX_WIDGET;
 import com.mosync.java.android.MoSync;
 import com.mosync.java.android.MoSyncPanicDialog;
@@ -136,6 +137,7 @@ import com.mosync.java.android.TextBox;
 import com.mosync.nativeui.ui.widgets.MoSyncCameraPreview;
 import com.mosync.nativeui.ui.widgets.ScreenWidget;
 import com.mosync.nativeui.util.AsyncWait;
+import com.mosync.nativeui.util.MediaManager;
 
 /**
  * Thread that runs the MoSync virtual machine and handles all syscalls.
@@ -286,7 +288,7 @@ public class MoSyncThread extends Thread implements MoSyncContext
 
 	// Various variables, should be moved to subsystems
 	// along with the syscalls.
-	public ByteBuffer mMemDataSection;
+	private ByteBuffer mMemDataSection;
 	ByteBuffer mResourceFile;
 
 	Canvas mCanvas;
@@ -667,6 +669,9 @@ public class MoSyncThread extends Thread implements MoSyncContext
 	 */
 	public synchronized ByteBuffer getMemorySlice(int addr, int len)
 	{
+		if (len < 0) {
+			maPanic(1, "Negative memory size");
+		}
 		if (isNative) {
 			return nativeGetMemorySlice(addr, len);
 		} else {
@@ -1128,6 +1133,7 @@ public class MoSyncThread extends Thread implements MoSyncContext
 			for (String deferred : mDeferredModules) {
 				runInitFunction(deferred, mAppLibPaths.get(deferred));
 			}
+			mContext.finish();
 		} else {
 			nativeRun();
 		}
@@ -1310,9 +1316,10 @@ public class MoSyncThread extends Thread implements MoSyncContext
 		//mMemDataSection.position(address);
 		//IntBuffer ib = mMemDataSection.asIntBuffer();
 
-		IntBuffer ib = getMemorySlice(address, -1).order(null).asIntBuffer();
-
 		int[] vertices = new int[count*2];
+
+		IntBuffer ib = getMemorySlice(address, 4 * vertices.length).order(null).asIntBuffer();
+
 		ib.get(vertices);
 
 		Path path = new Path();
@@ -1372,9 +1379,10 @@ public class MoSyncThread extends Thread implements MoSyncContext
 		//mMemDataSection.position(address);
 		//IntBuffer ib = mMemDataSection.asIntBuffer();
 
-		IntBuffer ib = getMemorySlice(address, -1).order(null).asIntBuffer();
-
 		int[] vertices = new int[count*2];
+
+		IntBuffer ib = getMemorySlice(address, 4 * vertices.length).order(null).asIntBuffer();
+
 		ib.get(vertices);
 
 		Path path = new Path();
@@ -1635,12 +1643,11 @@ public class MoSyncThread extends Thread implements MoSyncContext
 			{
 				if (mUsingFrameBuffer)
 				{
-					// TODO: Document why this is commented out.
-					// Was this the old way of doing what is done below?
-					// Delete commented out code if not needed.
-					//mMemDataSection.position(mFrameBufferAddress);
-					//mFrameBufferBitmap.copyPixelsFromBuffer(mMemDataSection);
-
+					if (isNative) {
+						// Ok, obviously we need to fix the -1 below. What
+						// should be the proper size?
+						maPanic(1, "Frame buffer not supported when building as library.");
+					}
 					ByteBuffer framebufferSlice = getMemorySlice(mFrameBufferAddress, -1);
 					mFrameBufferBitmap.copyPixelsFromBuffer(framebufferSlice);
 
@@ -1731,7 +1738,7 @@ public class MoSyncThread extends Thread implements MoSyncContext
 		//mMemDataSection.position(mem);
 		//IntBuffer ib = mMemDataSection.asIntBuffer();
 
-		IntBuffer ib = getMemorySlice(mem, -1).order(null).asIntBuffer();
+		IntBuffer ib = getMemorySlice(mem, 4 * srcRectWidth * srcRectHeight).order(null).asIntBuffer();
 
 		for (int y = 0; y < srcRectHeight; y++)
 		{
@@ -2003,7 +2010,7 @@ public class MoSyncThread extends Thread implements MoSyncContext
 		{
 			int pixels[] = new int[srcWidth * srcHeight];
 
-			IntBuffer intBuffer = getMemorySlice(dst, -1).order(null).asIntBuffer();
+			IntBuffer intBuffer = getMemorySlice(dst, 4 * pixels.length).order(null).asIntBuffer();
 
 			imageResource.mBitmap.getPixels(
 				pixels,
@@ -2075,7 +2082,7 @@ public class MoSyncThread extends Thread implements MoSyncContext
 		//mMemDataSection.position(dst);
 		//IntBuffer intBuffer = mMemDataSection.asIntBuffer();
 
-		IntBuffer intBuffer = getMemorySlice(dst, -1).order(null).asIntBuffer();
+		IntBuffer intBuffer = getMemorySlice(dst, 4 * srcWidth * srcHeight).order(null).asIntBuffer();
 
 		try
 		{
@@ -2965,7 +2972,7 @@ public class MoSyncThread extends Thread implements MoSyncContext
 		// Add null termination character.
 		//mMemDataSection.put((byte)0);
 
-		ByteBuffer slicedBuffer = getMemorySlice(buf, -1);
+		ByteBuffer slicedBuffer = getMemorySlice(buf, ba.length + 1);
 		slicedBuffer.put(ba);
 		slicedBuffer.put((byte)0);
 
@@ -3416,19 +3423,26 @@ public class MoSyncThread extends Thread implements MoSyncContext
 	 *  - #MA_TOAST_DURATION_LONG
 	 * @return
 	 */
-	int maToast(final String message, int duration)
+	int maToast(final String message, final int duration)
 	{
-		switch(duration)
+		if ( duration != MA_TOAST_DURATION_LONG &&
+				duration != MA_TOAST_DURATION_SHORT )
 		{
-		case MA_TOAST_DURATION_SHORT:
-			Toast.makeText(mContext.getApplicationContext(), message, Toast.LENGTH_SHORT).show();
-			break;
-		case MA_TOAST_DURATION_LONG:
-			Toast.makeText(mContext.getApplicationContext(), message, Toast.LENGTH_LONG).show();
-			break;
-		default:
-			return 0;
+			return -1;
 		}
+
+		mContext.runOnUiThread(new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				Toast.makeText(
+						mContext,
+						message,
+						(duration == MA_TOAST_DURATION_SHORT ? Toast.LENGTH_SHORT : Toast.LENGTH_LONG))
+						.show();
+			}
+		});
 
 		return 0;
 	}
@@ -5158,15 +5172,15 @@ public class MoSyncThread extends Thread implements MoSyncContext
 	int maOpenGLInitFullscreen(int glApi) {
 		if(mOpenGLScreen != -1) return 0;
 
-        if(glApi == IX_OPENGL_ES.MA_GL_API_GL1)
+        if(glApi == IX_OPENGL_ES_MA.MA_GL_API_GL1)
             mOpenGLView = maWidgetCreate("GLView");
-        else if(glApi == IX_OPENGL_ES.MA_GL_API_GL2)
+        else if(glApi == IX_OPENGL_ES_MA.MA_GL_API_GL2)
             mOpenGLView = maWidgetCreate("GL2View");
         else
-            return IX_OPENGL_ES.MA_GL_INIT_RES_UNAVAILABLE_API;
+            return IX_OPENGL_ES_MA.MA_GL_INIT_RES_UNAVAILABLE_API;
 
         if(mOpenGLView < 0) {
-            return IX_OPENGL_ES.MA_GL_INIT_RES_UNAVAILABLE_API;
+            return IX_OPENGL_ES_MA.MA_GL_INIT_RES_UNAVAILABLE_API;
         }
 
         mOpenGLScreen = maWidgetCreate("Screen");
@@ -5287,6 +5301,11 @@ public class MoSyncThread extends Thread implements MoSyncContext
 	int maFileListClose(int list)
 	{
 		return mMoSyncFile.maFileListClose(list);
+	}
+
+	int maSaveImageToDeviceGallery(int imageHandle, String imageName)
+	{
+		return MediaManager.exportImageToPhotoGallery(imageHandle, imageName);
 	}
 
 	int maSensorStart(int sensor, int interval)

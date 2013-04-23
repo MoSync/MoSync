@@ -69,6 +69,10 @@ using namespace MoSyncError;
 #endif
 
 #include <config_platform.h>
+#ifdef MOSYNC_NATIVE
+#undef USE_ARM_RECOMPILER
+#endif
+
 #if defined(USE_ARM_RECOMPILER)
 /*
 #include "disassembler.h"

@@ -3,6 +3,11 @@
 
 /* $Revision: 10601 $ on $Date:: 2010-03-04 22:15:27 -0800 #$ */
 
+#include <IX_OPENGL_ES_MA.h>
+#ifdef NATIVE_GLES
+#undef __gl_h_
+#include <GLES/gl_native.h>
+#else
 #include <ma.h>
 #include <maapi_defs.h>
 #include <IX_OPENGL_ES.h>
@@ -777,6 +782,8 @@ GL_API void GL_APIENTRY glPointSizePointerOES (GLenum type, GLsizei stride, cons
 
 #ifdef __cplusplus
 }
+#endif
+
 #endif
 
 #endif /* __gl_h_ */

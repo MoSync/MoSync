@@ -94,6 +94,7 @@ extern "C" {
 #include "Skinning/SkinManager.h"
 
 #ifdef SUPPORT_OPENGL_ES
+#include <helpers/CPP_IX_OPENGL_ES_MA.h>
 #include <helpers/CPP_IX_OPENGL_ES.h>
 #include <dgles-0.5/GLES/gl.h>
 #include "../../generated/gl.h.cpp"
