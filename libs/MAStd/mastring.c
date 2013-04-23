@@ -682,7 +682,7 @@ end:
 
 #endif
 
-#ifdef MOSYNC_NATIVE
+#if defined(MAPIP) || (defined(MOSYNC_NATIVE) && defined(ANDROID))
 int stricmp(const char *s1, const char *s2)
 {
         char f, l;
