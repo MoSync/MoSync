@@ -201,6 +201,7 @@ namespace MoSync
 				if (_child < 0 || _child >= mWidgets.Count)
 					return MoSync.Constants.MAW_RES_INVALID_HANDLE;
 				IWidget child = mWidgets[_child];
+                child.SetParent(parent);
                 mNativeUI.AddChild(parent, child);
                 return MoSync.Constants.MAW_RES_OK;
             };
@@ -210,7 +211,8 @@ namespace MoSync
 				if (_child < 0 || _child >= mWidgets.Count)
 					return MoSync.Constants.MAW_RES_INVALID_HANDLE;
                 IWidget child = mWidgets[_child];
-                child.RemoveFromParent();
+                // only the child is needed - it has a reference to its parent
+                mNativeUI.RemoveChild(child);
                 return MoSync.Constants.MAW_RES_OK;
             };
 
@@ -222,6 +224,7 @@ namespace MoSync
 				if (_child < 0 || _child >= mWidgets.Count)
 					return MoSync.Constants.MAW_RES_INVALID_HANDLE;
 				IWidget child = mWidgets[_child];
+                child.SetParent(parent);
                 mNativeUI.InsertChild(parent, child, index);
                 return MoSync.Constants.MAW_RES_OK;
             };
@@ -274,7 +277,8 @@ namespace MoSync
                 IWidget widget = mWidgets[_widget];
                 try
                 {
-                    String value = widget.GetProperty(property);
+                    // String value = widget.GetProperty(property);
+                    String value = mNativeUI.GetProperty(widget, property);
                     core.GetDataMemory().WriteStringAtAddress(_value, value, _bufSize);
                 }
                 catch (InvalidPropertyNameException e)

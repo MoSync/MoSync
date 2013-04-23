@@ -2,6 +2,8 @@
 using System;
 using System.IO;
 using System.Reflection;
+using System.Windows;
+using System.Threading;
 
 namespace MoSync
 {
@@ -321,7 +323,55 @@ namespace MoSync
             return value.ToString();
         }
 
+        protected String GetLastValidSet(String property)
+        {
+            String res = null;
+
+            WidgetOperation[] operations = mOperationQueue.ToArray();
+
+            // get the last valid set
+            for (int i = operations.Length - 1; i >= 0; i--)
+            {
+                WidgetOperation operation = operations[i];
+                if (operation.Type == WidgetOperation.OperationType.SET &&
+                    operation.Property.Equals(property))
+                {
+                    res = operation.Value;
+                    break;
+                }
+            }
+
+            return res;
+        }
+
         public String GetProperty(String property)
+        {
+            if (!isViewCreated)
+            {
+                String propertyValue = GetLastValidSet(property);
+
+                // if there is no valid set, we need to wait for the widget creation in order to get
+                // the property
+                Thread widgetCreationThread = mRuntime.GetModule<NativeUIModule>().GetWidgetCreationThread(mHandle);
+                if (propertyValue == null)
+                {
+                    if (widgetCreationThread != null)
+                    {
+                        widgetCreationThread.Join();
+                    }
+                    propertyValue = GetPropertyValue(property);
+                }
+
+                return propertyValue;
+            }
+            else
+            {
+                String ret = GetPropertyValue(property);
+                return ret;
+            }
+        }
+
+        protected String GetPropertyValue(String property)
         {
             PropertyInfo pinfo;
             MoSyncWidgetPropertyAttribute pattr = GetPropertyAttribute(property, out pinfo);

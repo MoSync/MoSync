@@ -126,6 +126,7 @@ namespace MoSync
                         InsertChild(operation);
                         break;
                     case WidgetOperation.OperationType.REMOVE:
+                        RemoveChild(operation);
                         break;
                 }
             }
@@ -161,6 +162,12 @@ namespace MoSync
                 IWidget child = GetChildSychronously(operation.Handle);
                 child.SetParent(this);
                 this.InsertChild(child, operation.Index);
+            }
+
+            protected void RemoveChild(WidgetOperation operation)
+            {
+                IWidget child = GetChildSychronously(operation.Handle);
+                child.RemoveFromParent();
             }
 
             protected IWidget GetChildSychronously(int childHandle)
@@ -660,6 +667,7 @@ namespace MoSync
 
                     isViewCreated = true;
 
+                    IWidget a = this;
                     // run all the pending operations from the widget operation queue
                     while (mOperationQueue.Count != 0)
                     {

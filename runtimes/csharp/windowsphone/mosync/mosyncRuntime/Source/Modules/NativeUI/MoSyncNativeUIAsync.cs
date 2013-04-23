@@ -41,8 +41,9 @@ namespace MoSync
                 widget.SetProperty(propertyName, propertyValue);
             }
 
-            public void GetProperty(IWidget widget, string propertyName)
+            public String GetProperty(IWidget widget, string propertyName)
             {
+                return widget.GetProperty(propertyName);
             }
 
             public void AddChild(IWidget parent, IWidget child)
@@ -73,8 +74,17 @@ namespace MoSync
                 }
             }
 
-            public void RemoveChild(IWidget parent, IWidget child)
+            public void RemoveChild(IWidget child)
             {
+                if (child.GetParent() != null && !(child.GetParent() as WidgetBase).IsViewCreated)
+                {
+                    WidgetOperation removeChildOperation = new WidgetOperation(WidgetOperation.OperationType.REMOVE, child.GetHandle());
+                    child.GetParent().AddOperation(removeChildOperation);
+                }
+                else
+                {
+                    child.RemoveFromParent();
+                }
             }
 
             public void SetCore(Core core)
