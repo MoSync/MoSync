@@ -100,6 +100,16 @@ unsigned char* CppInitReadData(const char* file, int fileSize, int mallocSize) {
 	return data;
 }
 
+//Used only by native lib approach
+extern "C" unsigned char* InitCustomEventPointer(int mallocSize) {
+	int mces =  Base::getMaxCustomEventSize();
+	sCustomEventDataPointer = (int) malloc(mces);
+	sCustomEventData =(void*) sCustomEventDataPointer; //What is the point of this??
+    mem_ds = 0; //Basically set msm_ds to behave as the native address space.
+
+    return 0;
+}
+
 
 void cpp_main();
 

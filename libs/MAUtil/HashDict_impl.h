@@ -23,6 +23,10 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <string.h>
 #endif
 
+#ifdef __IOS__
+#include <stdlib.h>
+#endif
+
 #ifndef _SE_MSAB_MAUTIL_HASHDICT_H_
 #error Do not include this file directly.
 #endif

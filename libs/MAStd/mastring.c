@@ -15,10 +15,17 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
+#ifndef __IOS__
 #include "ma.h"
 #include "mastring.h"
 #include "madmath.h"
 #include "maheap.h"
+#else
+#include <ma.h>
+#include <mastring.h>
+#include <madmath.h>
+#include <maheap.h>
+#endif
 
 #ifndef MOSYNC_NATIVE
 
@@ -682,7 +689,7 @@ end:
 
 #endif
 
-#if defined(MAPIP) || (defined(MOSYNC_NATIVE) && defined(ANDROID))
+#if defined(MAPIP) || defined(MOSYNC_NATIVE)
 int stricmp(const char *s1, const char *s2)
 {
         char f, l;

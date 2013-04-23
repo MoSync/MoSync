@@ -161,7 +161,7 @@ namespace NativeUI
 		* @return The index on which the menu item was added in the options menu,
 		* an error code otherwise.
 		*/
-		int Screen::addOptionsMenuItem(const MAUtil::String title);
+		int addOptionsMenuItem(const MAUtil::String title);
 
 		/**
 		* Add a new menu item to the Options Menu associated to this screen.
@@ -182,7 +182,7 @@ namespace NativeUI
 		* @return The index on which the menu item was added in the options menu,
 		* an error code otherwise.
 		*/
-		int Screen::addOptionsMenuItem(const MAUtil::String title, int resourceIconID);
+		int addOptionsMenuItem(const MAUtil::String title, int resourceIconID);
 
 		/**
 		* Add a new menu item to the Options Menu associated to this screen.
@@ -213,7 +213,7 @@ namespace NativeUI
 		* @return The index on which the menu item was added in the options menu,
 		* an error code otherwise.
 		*/
-		int Screen::addOptionsMenuItem(
+		int addOptionsMenuItem(
 				const MAUtil::String title, const MAUtil::String icon, bool isPath);
 
 		/**

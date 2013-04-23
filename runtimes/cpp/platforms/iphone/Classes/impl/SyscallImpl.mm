@@ -230,8 +230,27 @@ namespace Base {
 	//***************************************************************************
 	// Proper syscalls
 	//***************************************************************************
-	SYSCALL(longlong, maIOCtl(int function, int a, int b, int c))
+	SYSCALL(longlong, maIOCtl(int function, int a, int b, int c MA_IOCTL_ELLIPSIS))
 	{
+        int d;
+        int e;
+        int f;
+        int g;
+        int h;
+        int i;
+        bool native = false;
+#ifdef MOSYNC_NATIVE
+        va_list ap;
+        va_start(ap, c);
+        d = va_arg(ap, int);
+        e = va_arg(ap, int);
+        f = va_arg(ap, int);
+        g = va_arg(ap, int);
+        h = va_arg(ap, int);
+        i = va_arg(ap, int);
+        va_end(ap);
+        native = true;
+#endif
 		switch(function) {
 
 		case maIOCtl_maWriteLog:
@@ -358,7 +377,6 @@ namespace Base {
 		maIOCtl_case(maCaptureWriteImage);
 		maIOCtl_case(maCaptureGetVideoPath);
 		maIOCtl_case(maCaptureDestroyData);
-
 		maIOCtl_IX_WIDGET_caselist
 #ifdef SUPPORT_OPENGL_ES
 		maIOCtl_IX_OPENGL_ES_caselist;

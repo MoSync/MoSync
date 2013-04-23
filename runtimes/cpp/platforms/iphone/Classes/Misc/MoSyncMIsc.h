@@ -90,4 +90,4 @@ SYSCALL(MAExtensionModule, maExtensionModuleLoad(const char* name, int hash));
 
 SYSCALL(MAExtensionFunction, maExtensionFunctionLoad(MAHandle module, int index));
 
-SYSCALL(longlong, maExtensionFunctionInvoke(int, int, int, int));
+SYSCALL(longlong, maExtensionFunctionInvoke(int, int, int, int MA_IOCTL_ELLIPSIS));

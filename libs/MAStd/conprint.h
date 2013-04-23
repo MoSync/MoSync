@@ -44,6 +44,10 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define CON(ret, fn) ret fn
 #endif
 
+#ifdef __IOS__
+#define wchar_t wchar
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -68,6 +72,7 @@ void DisplayConsole(void);
 */
 
 void PrintConsole(const wchar * str);
+
 CON(int, puts(const char* str));
 CON(int, wputs(const wchar* str));
 
@@ -84,8 +89,6 @@ CON(int, wputs(const wchar* str));
 CON(int, printf(const char *fmt, ...));
 
 CON(int, vprintf(const char *fmt, va_list args));
-
-#define _WSTDIO_DEFINED
 
 CON(int, wprintf(const wchar_t *fmt, ...));
 

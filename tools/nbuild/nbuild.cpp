@@ -1,5 +1,6 @@
 #include "nbuild.h"
 #include "android.h"
+#include "ios.h"
 #include "args.h"
 #include "fileset.h"
 
@@ -19,6 +20,8 @@ int main(int argc, const char** argv) {
 	string platform = require(&args, "--platform");
 	if (platform == "Android") {
 		buildAndroidNative(&args);
+	} else if (platform == "iOS") {
+		buildIOSNative(&args);
 	} else {
 		printf("Unknown platform: %s\n", platform.c_str());
 		exit(1);

@@ -46,6 +46,12 @@ sh "xcodebuild -target MoSyncLib -configuration Release -sdk iphonesimulator -pr
 #sh "/Developer/usr/bin/xcodebuild -target MoSyncLib -configuration Debug  -sdk iphonesimulator3.2 -project MoSync.xcodeproj"
 #sh "/Developer/usr/bin/xcodebuild -target MoSyncLib -configuration Release -sdk iphonesimulator3.2 -project MoSync.xcodeproj"
 
+# build native
+#sh "xcodebuild -target MoSyncLibNative -configuration Debug  -sdk iphoneos -project MoSync.xcodeproj"
+#sh "xcodebuild -target MoSyncLibNative -configuration Release -sdk iphoneos -project MoSync.xcodeproj"
+#sh "xcodebuild -target MoSyncLibNative -configuration Debug  -sdk iphonesimulator -project MoSync.xcodeproj"
+#sh "xcodebuild -target MoSyncLibNative -configuration Release -sdk iphonesimulator -project MoSync.xcodeproj"
+
 # build directory structure
 FileUtils.rm_rf(["template"])
 FileUtils.mkpath(["template/libs", "template/Classes", "template/Classes/helpers"])
@@ -97,3 +103,6 @@ end
 
 FileUtils.rm_rf(mosyncdir+"/profiles/runtimes/iphoneos/1/template")
 FileUtils.cp_r "template", mosyncdir+"/profiles/runtimes/iphoneos/1/"
+
+FileUtils.cd "../../../../libs/MoSyncLibIOS"
+sh "ruby buildMoSyncLibs.rb"
