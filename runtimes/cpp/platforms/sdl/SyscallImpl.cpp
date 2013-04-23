@@ -2062,8 +2062,28 @@ namespace Base {
 #endif // SUPPORT_OPENGL_ES
 
 	SYSCALL(longlong, maIOCtl(int function, int a, int b, int c, ...)) {
+		int d;
+        int e;
+        int f;
+        int g;
+        int h;
+        int i;
+        bool native = false;
+#ifdef MOSYNC_NATIVE
+        va_list ap;
+        va_start(ap, c);
+        d = va_arg(ap, int);
+        e = va_arg(ap, int);
+        f = va_arg(ap, int);
+        g = va_arg(ap, int);
+        h = va_arg(ap, int);
+        i = va_arg(ap, int);
+        va_end(ap);
+        native = true;
+#else
 		va_list argptr;
 		va_start(argptr, c);
+#endif
 		switch(function) {
 
 #ifdef FAKE_CALL_STACK
