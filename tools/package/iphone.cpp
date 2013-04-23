@@ -19,6 +19,7 @@
 #include <list>
 #include <sstream>
 #include <fstream>
+#include <cstream>
 #include <stdlib.h>
 #include "packagers.h"
 #include "util.h"

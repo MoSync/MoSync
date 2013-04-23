@@ -1386,25 +1386,6 @@ namespace Base
 	*/
 	SYSCALL(longlong,  maIOCtl(int function, int a, int b, int c MA_IOCTL_ELLIPSIS))
 	{
-		int d;
-        int e;
-        int f;
-        int g;
-        int h;
-        int i;
-        bool native = false;
-#ifdef MOSYNC_NATIVE
-        va_list ap;
-        va_start(ap, c);
-        d = va_arg(ap, int);
-        e = va_arg(ap, int);
-        f = va_arg(ap, int);
-        g = va_arg(ap, int);
-        h = va_arg(ap, int);
-        i = va_arg(ap, int);
-        va_end(ap);
-        native = true;
-#endif
 		SYSLOG("maIOCtl");
 		//__android_log_write(ANDROID_LOG_INFO, "MoSync Syscall", "maIOCtl");
 		//handlePendingExceptions(mJNIEnv);

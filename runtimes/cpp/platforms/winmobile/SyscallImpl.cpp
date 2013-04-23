@@ -2926,17 +2926,6 @@ retry:
 	//*****************************************************************************
 	SYSCALL(int, maIOCtl(int function, int a, int b, int c)) 
 	{
-		int d = 0;
-		int e = 0;
-        bool native = false;
-#ifdef MOSYNC_NATIVE
-        va_list ap;
-        va_start(ap, c);
-        d = va_arg(ap, int);
-        e = va_arg(ap, int);
-        va_end(ap);
-        native = true;
-#endif
 		switch(function) {
 			/*
 			//these are the same across all C++ platforms. consider sharing them somehow.
