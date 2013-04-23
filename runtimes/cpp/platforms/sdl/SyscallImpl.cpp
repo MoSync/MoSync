@@ -2062,8 +2062,8 @@ namespace Base {
 #endif // SUPPORT_OPENGL_ES
 
 	SYSCALL(longlong, maIOCtl(int function, int a, int b, int c, ...)) {
-		int d;
-		int e;
+		int d = 0;
+		int e = 0;
         bool native = false;
 #ifdef MOSYNC_NATIVE
         va_list ap;
