@@ -1,4 +1,4 @@
-#include "JNIUtil.h"
+#include "JNIStrConv.h"
 
 #ifdef MOSYNC_NATIVE
 #include <jni.h>

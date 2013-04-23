@@ -16,7 +16,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 */
 
 #include <Syscall.h>
-#include "JNIUtil.h"
+#include "JNIStrConv.h"
 
 namespace Base
 {
