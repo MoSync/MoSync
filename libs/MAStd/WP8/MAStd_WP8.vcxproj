@@ -67,12 +67,15 @@
     <ClCompile Include="..\strtod.c" />
     <ClCompile Include="..\strtol.c">
       <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">4146</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">4146</DisableSpecificWarnings>
     </ClCompile>
     <ClCompile Include="..\strtoul.c">
       <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">4146</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">4146</DisableSpecificWarnings>
     </ClCompile>
     <ClCompile Include="..\strtoull.c">
       <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">4146</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">4146</DisableSpecificWarnings>
     </ClCompile>
     <ClCompile Include="..\tlsf.c" />
   </ItemGroup>

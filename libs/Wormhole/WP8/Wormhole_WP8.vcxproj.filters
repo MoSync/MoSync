@@ -5,18 +5,6 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="..\Libs\JSNativeUI">
-      <UniqueIdentifier>{2ec50ab0-def8-4375-8e49-073969c62e41}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="..\Libs\Notification">
-      <UniqueIdentifier>{d321c723-7d4e-41f9-b242-5948bedcbdae}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="..\Libs\PhoneGap">
-      <UniqueIdentifier>{c6233833-c5e1-490c-a6e5-924ec83a711a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="..\Libs\W3C">
-      <UniqueIdentifier>{1bbd6adb-2ec4-4dfb-bcd8-4f68a67e8c60}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\CustomMoblet.cpp" />

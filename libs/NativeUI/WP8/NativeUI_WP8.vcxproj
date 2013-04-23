@@ -195,7 +195,7 @@
       </PrecompiledHeader>
       <CompileAsWinRT>false</CompileAsWinRT>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>../;../MAStd;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../;../../MAStd;</AdditionalIncludeDirectories>
       <ExceptionHandling>
       </ExceptionHandling>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
