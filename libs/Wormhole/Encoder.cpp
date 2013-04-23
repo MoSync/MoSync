@@ -25,7 +25,7 @@ MA 02110-1301, USA.
 
 #include <ma.h>				// MoSync API
 #include <maheap.h>			// C memory allocation
-//#include <mastring.h>		// C string functions
+#include <mastring.h>		// C string functions
 #include <mavsprintf.h>		// C string functions
 #include <mastdlib.h>		// C string conversion functions
 #include <MAUtil/String.h>
