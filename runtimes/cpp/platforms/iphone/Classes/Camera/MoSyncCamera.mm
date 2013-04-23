@@ -50,7 +50,14 @@ struct CameraSystemInfo {
 	CameraInfo *cameraInfo;
 };
 
-CameraSystemInfo gCameraSystem={0,0,FALSE,NULL};
+struct CameraSnapshotInfo {
+    MAHandle placeholder;
+    BOOL isSnapshotInProgress;
+};
+
+CameraSystemInfo gCameraSystem={0, 0, FALSE, NULL};
+
+CameraSnapshotInfo gCameraSnapshot = {0, FALSE};
 
 CameraConfirgurator *gCameraConfigurator;
 
@@ -189,6 +196,11 @@ void StopAllCameraSessions()
 SYSCALL(int, maCameraStart())
 {
 	@try {
+        if ( gCameraSnapshot.isSnapshotInProgress )
+        {
+            return MA_CAMERA_RES_SNAPSHOT_IN_PROGRESS;
+        }
+
 		CameraInfo *info = getCurrentCameraInfo();
 		if( info )
 		{
@@ -232,6 +244,19 @@ SYSCALL(int, maCameraStart())
 SYSCALL(int, maCameraStop())
 {
 	@try {
+        if ( gCameraSnapshot.isSnapshotInProgress )
+        {
+            gCameraSnapshot.isSnapshotInProgress = FALSE;
+
+            MAEvent event;
+            event.type = EVENT_TYPE_CAMERA_SNAPSHOT;
+            event.snapshotImageDataHandle = gCameraSnapshot.placeholder;
+            event.snapshotSize = 0;
+            event.snapshotImageDataRepresentation = MA_IMAGE_REPRESENTATION_UNKNOWN;
+            event.snapshotReturnCode = MA_CAMERA_RES_FAILED;
+            Base::gEventQueue.put(event);
+        }
+
 		CameraInfo *info = getCurrentCameraInfo();
 		if( info )
 		{
@@ -341,6 +366,11 @@ SYSCALL(int, maCameraNumber())
 SYSCALL(int, maCameraSnapshot(int formatIndex, MAHandle placeholder))
 {
 	@try {
+        if ( gCameraSnapshot.isSnapshotInProgress )
+        {
+            return MA_CAMERA_RES_SNAPSHOT_IN_PROGRESS;
+        }
+
 		CameraInfo *info = getCurrentCameraInfo();
 		if (!info)
 		{
@@ -372,9 +402,14 @@ SYSCALL(int, maCameraSnapshot(int formatIndex, MAHandle placeholder))
 	}
 }
 
-SYSCALL(int, maCameraSnapshotAsync(int formatIndex))
+SYSCALL(int, maCameraSnapshotAsync(MAHandle placeholder, int formatIndex))
 {
 	@try {
+        if ( gCameraSnapshot.isSnapshotInProgress )
+        {
+            return MA_CAMERA_RES_SNAPSHOT_IN_PROGRESS;
+        }
+
 		CameraInfo *info = getCurrentCameraInfo();
         if (!info)
         {
@@ -388,25 +423,35 @@ SYSCALL(int, maCameraSnapshotAsync(int formatIndex))
 			[videoConnection setVideoOrientation:UIDeviceOrientationPortrait];
 		}
 
-        int placeholder = maCreatePlaceholder();
-
         void (^captionCompletionHandler)(CMSampleBufferRef, NSError*) = ^(CMSampleBufferRef imageDataSampleBuffer, NSError *error) {
+
+            // This handles the case when the camera was
+            // stopped before this callback was called.
+            if ( !gCameraSnapshot.isSnapshotInProgress )
+            {
+                return;
+            }
+
             MAEvent event;
             event.type = EVENT_TYPE_CAMERA_SNAPSHOT;
-            event.snapshotImageDataHandle = 0;
-            event.snapshotFormatIndex = 0;
+            event.snapshotImageDataHandle = placeholder;
+            event.snapshotSize = 0;
             event.snapshotImageDataRepresentation = MA_IMAGE_REPRESENTATION_JPEG;
             event.snapshotReturnCode = MA_CAMERA_RES_OK;
 
-            if ( (NULL != imageDataSampleBuffer) && (NULL == error)) {
+            if ( (nil != imageDataSampleBuffer) && (nil == error)) {
                 NSData *imageData = [AVCaptureStillImageOutput jpegStillImageNSDataRepresentation:imageDataSampleBuffer];
+
+                // See if there is better way to obtain the size of the snapshot.
+                UIImage *img = [[UIImage alloc] initWithData:imageData] ;
+                event.snapshotSize = EXTENT((int)floorf(img.size.width), (int)floorf(img.size.height));
+                [img release];
+                img = nil;
+
                 Base::MemStream *stream = new Base::MemStream([imageData length]);
 
                 stream->write([imageData bytes],[imageData length]);
                 Base::gSyscall->resources.add_RT_BINARY(placeholder, stream);
-
-                event.snapshotImageDataHandle = placeholder;
-                event.snapshotFormatIndex = formatIndex;
             }
             else
             {
@@ -414,10 +459,12 @@ SYSCALL(int, maCameraSnapshotAsync(int formatIndex))
                 event.snapshotReturnCode = MA_CAMERA_RES_FAILED;
             }
             Base::gEventQueue.put(event);
+            gCameraSnapshot.isSnapshotInProgress = FALSE;
         };
-
 		[info->stillImageOutput captureStillImageAsynchronouslyFromConnection:videoConnection
                                                             completionHandler:captionCompletionHandler];
+        gCameraSnapshot.isSnapshotInProgress = TRUE;
+        gCameraSnapshot.placeholder = placeholder;
 		return MA_CAMERA_RES_OK;
 	}
 	@catch (NSException * e) {

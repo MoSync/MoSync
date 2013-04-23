@@ -40,6 +40,8 @@ data_section.bin
 rebuild.build.cs
 rebuild.build.cpp
 
+xcuserdata
+
 config_platform.h
 
 wormhole.js

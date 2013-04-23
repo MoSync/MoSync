@@ -44,6 +44,7 @@ import static com.mosync.internal.generated.MAAPI_consts.TRANS_NONE;
 import static com.mosync.internal.generated.MAAPI_consts.TRANS_ROT180;
 import static com.mosync.internal.generated.MAAPI_consts.TRANS_ROT270;
 import static com.mosync.internal.generated.MAAPI_consts.TRANS_ROT90;
+import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_ALERT;
 import static com.mosync.internal.generated.MAAPI_consts.MA_IMAGE_PICKER_EVENT_RETURN_TYPE_IMAGE_HANDLE;
 
 import static com.mosync.internal.generated.MAAPI_consts.MA_RESOURCE_OPEN;
@@ -51,6 +52,8 @@ import static com.mosync.internal.generated.MAAPI_consts.MA_RESOURCE_CLOSE;
 
 import static com.mosync.internal.generated.MAAPI_consts.MA_WAKE_LOCK_ON;
 import static com.mosync.internal.generated.MAAPI_consts.MA_CAMERA_RES_OK;
+import static com.mosync.internal.generated.MAAPI_consts.MA_CAMERA_RES_FAILED;
+import static com.mosync.internal.generated.MAAPI_consts.MA_CAMERA_RES_SNAPSHOT_IN_PROGRESS;
 
 import static com.mosync.internal.generated.MAAPI_consts.MA_TOAST_DURATION_SHORT;
 import static com.mosync.internal.generated.MAAPI_consts.MA_TOAST_DURATION_LONG;
@@ -397,7 +400,17 @@ public class MoSyncThread extends Thread implements MoSyncContext
 		//Do not access camera if it is not available
 		try
 		{
-			mMoSyncCameraController = new MoSyncCameraController(this);
+			Boolean isCameraAccessGranted =
+					(PackageManager.PERMISSION_GRANTED ==
+					getActivity().checkCallingOrSelfPermission("android.permission.CAMERA"));
+			if ( isCameraAccessGranted )
+			{
+				mMoSyncCameraController = new MoSyncCameraController(this);
+			}
+			else
+			{
+				mMoSyncCameraController = null;
+			}
 		}
 		catch (Throwable e)
 		{
@@ -4698,6 +4711,12 @@ public class MoSyncThread extends Thread implements MoSyncContext
 		{
 			return IOCTL_UNAVAILABLE;
 		}
+
+		if ( mMoSyncCameraController.isSnapshotInProgress() )
+		{
+			return MA_CAMERA_RES_SNAPSHOT_IN_PROGRESS;
+		}
+
 		//Start a fullscreen preview and then start the camera
 		if(false == mMoSyncCameraController.hasView())
 		{
@@ -4754,6 +4773,11 @@ public class MoSyncThread extends Thread implements MoSyncContext
 			return IOCTL_UNAVAILABLE;
 		}
 
+		if ( mMoSyncCameraController.isSnapshotInProgress() )
+		{
+			return MA_CAMERA_RES_SNAPSHOT_IN_PROGRESS;
+		}
+
 		return mMoSyncCameraController.cameraSnapshot(formatIndex, placeHolder);
 	}
 
@@ -4761,16 +4785,21 @@ public class MoSyncThread extends Thread implements MoSyncContext
 	 * Takes a snapshot and send the place holder created via
 	 * #EVENT_TYPE_CAMERA_SNAPSHOT.
 	 *
-	 * @param formatIndex index of the format set by the user
-	 * @return IOCTL_UNAVAILABLE if fails and MA_CAMERA_RES_OK if succeeds
+	 * @param sizeIndex index of the snapshot size
+	 * @return IOCTL_UNAVAILABLE, MA_CAMERA_RES_FAILED if fails
+	 * and MA_CAMERA_RES_OK if succeeds
 	 */
-	int maCameraSnapshotAsync(int formatIndex)
+	int maCameraSnapshotAsync(int dataPlaceholder, int sizeIndex)
 	{
 		if(mMoSyncCameraController == null)
 		{
 			return IOCTL_UNAVAILABLE;
 		}
-		mMoSyncCameraController.cameraSnapshotAsync(formatIndex);
+		if ( mMoSyncCameraController.isSnapshotInProgress() )
+		{
+			return MA_CAMERA_RES_SNAPSHOT_IN_PROGRESS;
+		}
+		mMoSyncCameraController.cameraSnapshotAsync(dataPlaceholder, sizeIndex);
 		return MA_CAMERA_RES_OK;
 	}
 
@@ -4792,8 +4821,11 @@ public class MoSyncThread extends Thread implements MoSyncContext
 				(FrameLayout)mMoSyncNativeUI.getCameraPreview(widgetHandle).getView();
 		MoSyncCameraPreview preview = (MoSyncCameraPreview)layout.getChildAt(0);
 		if(preview == null)
+		{
 			return 0; //Widget Not Found
+		}
 		mMoSyncCameraController.setPreview(preview);
+
 		return 1;
 	}
 
@@ -4915,9 +4947,11 @@ public class MoSyncThread extends Thread implements MoSyncContext
 			return IOCTL_UNAVAILABLE;
 		}
 
-		return mMoSyncCameraController.enablePreviewEvents(
+		int returnVal = mMoSyncCameraController.enablePreviewEvents(
 			eventType, previewBuffer, rectLeft, rectTop,
 			rectWidth, rectHeight);
+
+		return returnVal;
 	}
 
 	int maCameraPreviewEventDisable()
