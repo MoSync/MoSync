@@ -10,11 +10,57 @@
       <Platform>ARM</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\src\stdlib\stdlib.c" />
+    <ClCompile Include="..\src\yajl.c" />
+    <ClCompile Include="..\src\yajl_alloc.c" />
+    <ClCompile Include="..\src\yajl_buf.c" />
+    <ClCompile Include="..\src\yajl_encode.c" />
+    <ClCompile Include="..\src\yajl_gen.c" />
+    <ClCompile Include="..\src\yajl_lex.c" />
+    <ClCompile Include="..\src\yajl_parser.c" />
+    <ClCompile Include="..\src\yajl_version.c" />
+    <ClCompile Include="..\YAJLDom.cpp">
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">CompileAsCpp</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">CompileAsCpp</CompileAs>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\src\api\yajl_common.h" />
+    <ClInclude Include="..\src\api\yajl_gen.h" />
+    <ClInclude Include="..\src\api\yajl_parse.h" />
+    <ClInclude Include="..\src\api\yajl_version.h" />
+    <ClInclude Include="..\src\stdlib\assert.h" />
+    <ClInclude Include="..\src\stdlib\ctype.h" />
+    <ClInclude Include="..\src\stdlib\errno.h" />
+    <ClInclude Include="..\src\stdlib\math.h" />
+    <ClInclude Include="..\src\stdlib\stdio.h" />
+    <ClInclude Include="..\src\stdlib\stdlib.h" />
+    <ClInclude Include="..\src\stdlib\string.h" />
+    <ClInclude Include="..\src\yajl_alloc.h" />
+    <ClInclude Include="..\src\yajl_buf.h" />
+    <ClInclude Include="..\src\yajl_bytestack.h" />
+    <ClInclude Include="..\src\yajl_encode.h" />
+    <ClInclude Include="..\src\yajl_lex.h" />
+    <ClInclude Include="..\src\yajl_parser.h" />
+    <ClInclude Include="..\YAJLDom.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\MAP\WP8\MAP_WP8.vcxproj">
+      <Project>{9d8bc5ca-1cd2-4130-b523-55eae2d0dab2}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\MAStd\WP8\MAStd_WP8.vcxproj">
+      <Project>{eeed04c3-fd4a-47d1-b918-edcbd5b122be}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\MAUtil\WP8\MAUtil_WP8.vcxproj">
+      <Project>{2856527d-4dc7-4ef5-bc8b-71d53e632730}</Project>
+    </ProjectReference>
+  </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{9d8bc5ca-1cd2-4130-b523-55eae2d0dab2}</ProjectGuid>
+    <ProjectGuid>{e8e93ee7-b75e-4bfe-bbd9-22aa7e69d8c2}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <ProjectName>MAP_WP8</ProjectName>
-    <RootNamespace>MAP_WP8</RootNamespace>
+    <ProjectName>yajl_WP8</ProjectName>
+    <RootNamespace>yajl</RootNamespace>
     <DefaultLanguage>en-US</DefaultLanguage>
     <MinimumVisualStudioVersion>11.0</MinimumVisualStudioVersion>
     <AppContainerApplication>true</AppContainerApplication>
@@ -42,12 +88,12 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
     <GenerateManifest>false</GenerateManifest>
     <OutDir>$(MOSYNCDIR)\lib\windowsPhone8\ARM\Debug</OutDir>
-    <TargetName>MAP</TargetName>
+    <TargetName>yajl</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
     <GenerateManifest>false</GenerateManifest>
     <OutDir>$(MOSYNCDIR)\lib\windowsPhone8\ARM\Release</OutDir>
-    <TargetName>MAP</TargetName>
+    <TargetName>yajl</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|arm'">
     <ClCompile>
@@ -55,9 +101,9 @@
       </PrecompiledHeader>
       <CompileAsWinRT>false</CompileAsWinRT>
       <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_DEPRECATE;WINDOWS_PHONE_8_LIB;WINDOWS_PHONE_8;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ExceptionHandling />
-      <AdditionalIncludeDirectories>../;../MAStd;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -71,10 +117,10 @@
       </PrecompiledHeader>
       <CompileAsWinRT>false</CompileAsWinRT>
       <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_LIB;_CRT_SECURE_NO_DEPRECATE;WINDOWS_PHONE_8_LIB;WINDOWS_PHONE_8;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ExceptionHandling>
       </ExceptionHandling>
-      <AdditionalIncludeDirectories>../;../MAStd;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -94,53 +140,6 @@
       <GenerateWindowsMetadata>false</GenerateWindowsMetadata>
     </Link>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClInclude Include="Broadcaster.h" />
-    <ClInclude Include="CloudMadeMapSource.h" />
-    <ClInclude Include="Color.h" />
-    <ClInclude Include="DateTime.h" />
-    <ClInclude Include="DebugPrintf.h" />
-    <ClInclude Include="Enumerator.h" />
-    <ClInclude Include="GeoPoint.h" />
-    <ClInclude Include="GeoPointDataSource.h" />
-    <ClInclude Include="GeoPointLayer.h" />
-    <ClInclude Include="GeoPointLayerRenderer.h" />
-    <ClInclude Include="GoogleMapSource.h" />
-    <ClInclude Include="Layer.h" />
-    <ClInclude Include="LayerMapViewport.h" />
-    <ClInclude Include="LonLat.h" />
-    <ClInclude Include="MapCache.h" />
-    <ClInclude Include="MapConfig.h" />
-    <ClInclude Include="MapSource.h" />
-    <ClInclude Include="MapTile.h" />
-    <ClInclude Include="MapTileCoordinate.h" />
-    <ClInclude Include="MapViewport.h" />
-    <ClInclude Include="MapWidget.h" />
-    <ClInclude Include="MemoryMgr.h" />
-    <ClInclude Include="OpenStreetMapSource.h" />
-    <ClInclude Include="PixelCoordinate.h" />
-    <ClInclude Include="Queue.h" />
-    <ClInclude Include="TimeSpan.h" />
-    <ClInclude Include="TraceScope.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="CloudMadeMapSource.cpp" />
-    <ClCompile Include="Color.cpp" />
-    <ClCompile Include="DateTime.cpp" />
-    <ClCompile Include="GeoPoint.cpp" />
-    <ClCompile Include="GeoPointLayer.cpp" />
-    <ClCompile Include="GoogleMapSource.cpp" />
-    <ClCompile Include="Layer.cpp" />
-    <ClCompile Include="LayerMapViewport.cpp" />
-    <ClCompile Include="LonLat.cpp" />
-    <ClCompile Include="MapCache.cpp" />
-    <ClCompile Include="MapSource.cpp" />
-    <ClCompile Include="MapViewport.cpp" />
-    <ClCompile Include="MapWidget.cpp" />
-    <ClCompile Include="MemoryMgr.cpp" />
-    <ClCompile Include="OpenStreetMapSource.cpp" />
-    <ClCompile Include="TimeSpan.cpp" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

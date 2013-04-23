@@ -11,16 +11,22 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="File.c" />
+    <ClCompile Include="..\LocalNotification.cpp" />
+    <ClCompile Include="..\NotificationManager.cpp" />
+    <ClCompile Include="..\PushNotification.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="File.h" />
+    <ClInclude Include="..\LocalNotification.h" />
+    <ClInclude Include="..\LocalNotificationListener.h" />
+    <ClInclude Include="..\NotificationManager.h" />
+    <ClInclude Include="..\PushNotification.h" />
+    <ClInclude Include="..\PushNotificationListener.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{e3577c34-854e-490b-8079-01faa03e08f2}</ProjectGuid>
+    <ProjectGuid>{92543802-8163-4308-ae53-478013dd1289}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <ProjectName>MAFS_WP8</ProjectName>
-    <RootNamespace>MAFS</RootNamespace>
+    <ProjectName>Notification_WP8</ProjectName>
+    <RootNamespace>Notification</RootNamespace>
     <DefaultLanguage>en-US</DefaultLanguage>
     <MinimumVisualStudioVersion>11.0</MinimumVisualStudioVersion>
     <AppContainerApplication>true</AppContainerApplication>
@@ -48,22 +54,22 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
     <GenerateManifest>false</GenerateManifest>
     <OutDir>$(MOSYNCDIR)\lib\windowsPhone8\ARM\Debug</OutDir>
-    <TargetName>MAFS</TargetName>
+    <TargetName>Notification</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
     <GenerateManifest>false</GenerateManifest>
     <OutDir>$(MOSYNCDIR)\lib\windowsPhone8\ARM\Release</OutDir>
-    <TargetName>MAFS</TargetName>
+    <TargetName>Notification</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|arm'">
     <ClCompile>
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
       <CompileAsWinRT>false</CompileAsWinRT>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>../;../MAStd;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_DEPRECATE;WINDOWS_PHONE_8_LIB;WINDOWS_PHONE_8;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>../../;../../MAStd;</AdditionalIncludeDirectories>
       <ExceptionHandling />
-      <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_DEPRECATE;WINDOWS_PHONE_8_LIB;WINDOWS_PHONE_8;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -73,14 +79,14 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|arm'">
     <ClCompile>
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
       <CompileAsWinRT>false</CompileAsWinRT>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>../;../MAStd;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_LIB;_CRT_SECURE_NO_DEPRECATE;WINDOWS_PHONE_8_LIB;WINDOWS_PHONE_8;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>../;../MAStd;</AdditionalIncludeDirectories>
       <ExceptionHandling>
       </ExceptionHandling>
-      <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
+      <PreprocessorDefinitions>WIN32;_LIB;_CRT_SECURE_NO_DEPRECATE;WINDOWS_PHONE_8_LIB;WINDOWS_PHONE_8;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
