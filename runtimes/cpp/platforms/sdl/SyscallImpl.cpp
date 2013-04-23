@@ -2062,6 +2062,8 @@ namespace Base {
 #endif // SUPPORT_OPENGL_ES
 
 	SYSCALL(longlong, maIOCtl(int function, int a, int b, int c, ...)) {
+		va_list argptr;
+		va_start(argptr, c);
 		switch(function) {
 
 #ifdef FAKE_CALL_STACK

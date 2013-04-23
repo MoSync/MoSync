@@ -19,7 +19,7 @@
 #include <list>
 #include <sstream>
 #include <fstream>
-#include <cstream>
+#include <cstring>
 #include <stdlib.h>
 #include "packagers.h"
 #include "util.h"

@@ -593,14 +593,12 @@ static void streamIoctlInputParam(ostream& stream, int k, bool java) {
 	if(k < 3) {
 		stream << (char)('a'+k);
 	} else {
-		if(java)
+		if (!java) {
+			stream << "ARG_NO_" << (k + 1);
+		} else {
 			stream << "mCore.";
-		else
-			stream << "(native)?" << (char)('a'+k) << ":SYSCALL_THIS->";
-		stream << "GetValidatedStackValue(" << ((k-3)<<2);
-		if(!java)
-			stream << " VSV_ARGPTR_USE";
-		stream << ")";
+			stream << "GetValidatedStackValue(" << ((k-3)<<2) << ")";
+		}
 	}
 }
 
@@ -758,6 +756,17 @@ void streamIoctlDefines(ostream& stream, const Interface& inf, const string& hea
 		streamCaselist(stream, ioctl, headerName, ix, false);
 		streamCaselist(stream, ioctl, headerName, ix, true);
 
+		for (int k = 3; !java && k < 10; k++) {
+			int argNo = k + 1;
+			stream << "#undef ARG_NO_" << argNo << "\n";
+			stream << "#ifdef __IOS__\n";
+			stream << "#define ARG_NO_" << argNo << " (native)?" << (char)('a'+k) << ":";
+			stream << "SYSCALL_THIS->GetValidatedStackValue(" << ((k-3)<<2) << ")\n";
+			stream << "#else\n";
+			stream << "#define ARG_NO_" << argNo << " ";
+			stream << "SYSCALL_THIS->GetValidatedStackValue(" << ((k-3)<<2) << " VSV_ARGPTR_USE)\n";
+			stream << "#endif\n";
+		}
 		for(size_t j=0; j<ioctl.functions.size(); j++) {
 			const IoctlFunction& f(ioctl.functions[j]);
 			if(f.ix != ix)
