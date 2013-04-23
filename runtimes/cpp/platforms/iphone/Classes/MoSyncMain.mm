@@ -106,6 +106,7 @@ extern "C" unsigned char* InitCustomEventPointer(int mallocSize) {
 	sCustomEventDataPointer = (int) malloc(mces);
 	sCustomEventData =(void*) sCustomEventDataPointer; //What is the point of this??
     mem_ds = 0; //Basically set msm_ds to behave as the native address space.
+
     return 0;
 }
 

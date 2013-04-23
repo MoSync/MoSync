@@ -8,6 +8,273 @@
 
 /* Begin PBXBuildFile section */
 		0B10E8D214064DDB00B6DA6B /* MessageUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0B10E8D114064DDB00B6DA6B /* MessageUI.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
+		0BC7BDE817258331007662C2 /* MoSyncDB.h in Headers */ = {isa = PBXBuildFile; fileRef = 4142402514766C03006977A1 /* MoSyncDB.h */; };
+		0BC7BDE917258331007662C2 /* ResourceArray.h in Headers */ = {isa = PBXBuildFile; fileRef = 85BF2B551134052300BB0201 /* ResourceArray.h */; };
+		0BC7BDEA17258331007662C2 /* NSObject+SBJson.h in Headers */ = {isa = PBXBuildFile; fileRef = 433134BE15345A73005DDAD8 /* NSObject+SBJson.h */; };
+		0BC7BDEB17258331007662C2 /* SBJson.h in Headers */ = {isa = PBXBuildFile; fileRef = 433134C015345A73005DDAD8 /* SBJson.h */; };
+		0BC7BDEC17258331007662C2 /* SBJsonParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 433134C115345A73005DDAD8 /* SBJsonParser.h */; };
+		0BC7BDED17258331007662C2 /* SBJsonStreamParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 433134C315345A73005DDAD8 /* SBJsonStreamParser.h */; };
+		0BC7BDEE17258331007662C2 /* SBJsonStreamParserAccumulator.h in Headers */ = {isa = PBXBuildFile; fileRef = 433134C515345A73005DDAD8 /* SBJsonStreamParserAccumulator.h */; };
+		0BC7BDEF17258331007662C2 /* SBJsonStreamParserAdapter.h in Headers */ = {isa = PBXBuildFile; fileRef = 433134C715345A73005DDAD8 /* SBJsonStreamParserAdapter.h */; };
+		0BC7BDF017258331007662C2 /* SBJsonStreamParserState.h in Headers */ = {isa = PBXBuildFile; fileRef = 433134C915345A73005DDAD8 /* SBJsonStreamParserState.h */; };
+		0BC7BDF117258331007662C2 /* SBJsonStreamWriter.h in Headers */ = {isa = PBXBuildFile; fileRef = 433134CB15345A73005DDAD8 /* SBJsonStreamWriter.h */; };
+		0BC7BDF217258331007662C2 /* SBJsonStreamWriterAccumulator.h in Headers */ = {isa = PBXBuildFile; fileRef = 433134CD15345A73005DDAD8 /* SBJsonStreamWriterAccumulator.h */; };
+		0BC7BDF317258331007662C2 /* SBJsonStreamWriterState.h in Headers */ = {isa = PBXBuildFile; fileRef = 433134CF15345A73005DDAD8 /* SBJsonStreamWriterState.h */; };
+		0BC7BDF417258331007662C2 /* SBJsonTokeniser.h in Headers */ = {isa = PBXBuildFile; fileRef = 433134D115345A73005DDAD8 /* SBJsonTokeniser.h */; };
+		0BC7BDF517258331007662C2 /* SBJsonUTF8Stream.h in Headers */ = {isa = PBXBuildFile; fileRef = 433134D315345A73005DDAD8 /* SBJsonUTF8Stream.h */; };
+		0BC7BDF617258331007662C2 /* SBJsonWriter.h in Headers */ = {isa = PBXBuildFile; fileRef = 433134D515345A73005DDAD8 /* SBJsonWriter.h */; };
+		0BC7BDF717258331007662C2 /* IWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 43F36EE115B45C380095B3C6 /* IWidget.h */; };
+		0BC7BDF817258331007662C2 /* MoSyncUI.h in Headers */ = {isa = PBXBuildFile; fileRef = 43F36EE315B45C380095B3C6 /* MoSyncUI.h */; };
+		0BC7BDF917258331007662C2 /* AbstractLayoutView.h in Headers */ = {isa = PBXBuildFile; fileRef = 43F36EEC15B45C750095B3C6 /* AbstractLayoutView.h */; };
+		0BC7BDFA17258331007662C2 /* HLayoutView.h in Headers */ = {isa = PBXBuildFile; fileRef = 43F36EEE15B45C750095B3C6 /* HLayoutView.h */; };
+		0BC7BDFB17258331007662C2 /* LayoutManagers.h in Headers */ = {isa = PBXBuildFile; fileRef = 43F36EF015B45C750095B3C6 /* LayoutManagers.h */; };
+		0BC7BDFC17258331007662C2 /* VLayoutView.h in Headers */ = {isa = PBXBuildFile; fileRef = 43F36EF315B45C750095B3C6 /* VLayoutView.h */; };
+		0BC7BDFD17258331007662C2 /* LayoutWidgets.h in Headers */ = {isa = PBXBuildFile; fileRef = 43F36F0115B45C7E0095B3C6 /* LayoutWidgets.h */; };
+		0BC7BDFE17258331007662C2 /* OptionsDialogView.h in Headers */ = {isa = PBXBuildFile; fileRef = 43F36F0615B45CA80095B3C6 /* OptionsDialogView.h */; };
+		0BC7BDFF17258331007662C2 /* ScreenWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 43F36F1015B45D160095B3C6 /* ScreenWidget.h */; };
+		0BC7BE0017258331007662C2 /* StackScreenWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 43F36F1215B45D160095B3C6 /* StackScreenWidget.h */; };
+		0BC7BE0117258331007662C2 /* TabScreenWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 43F36F1415B45D160095B3C6 /* TabScreenWidget.h */; };
+		0BC7BE0217258331007662C2 /* MoSyncUISyscalls.h in Headers */ = {isa = PBXBuildFile; fileRef = 43F36F1F15B45D290095B3C6 /* MoSyncUISyscalls.h */; };
+		0BC7BE0317258331007662C2 /* ActivityIndicatorWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 43F36F2915B45D5B0095B3C6 /* ActivityIndicatorWidget.h */; };
+		0BC7BE0417258331007662C2 /* ButtonWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 43F36F2B15B45D5B0095B3C6 /* ButtonWidget.h */; };
+		0BC7BE0517258331007662C2 /* CameraPreviewWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 43F36F2D15B45D5B0095B3C6 /* CameraPreviewWidget.h */; };
+		0BC7BE0617258331007662C2 /* CheckBoxWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 43F36F2F15B45D5B0095B3C6 /* CheckBoxWidget.h */; };
+		0BC7BE0717258331007662C2 /* DatePickerWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 43F36F3115B45D5B0095B3C6 /* DatePickerWidget.h */; };
+		0BC7BE0817258331007662C2 /* EditBoxWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 43F36F3315B45D5B0095B3C6 /* EditBoxWidget.h */; };
+		0BC7BE0917258331007662C2 /* GLViewWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 43F36F3515B45D5B0095B3C6 /* GLViewWidget.h */; };
+		0BC7BE0A17258331007662C2 /* ImageButtonWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 43F36F3715B45D5B0095B3C6 /* ImageButtonWidget.h */; };
+		0BC7BE0B17258331007662C2 /* ImageWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 43F36F3915B45D5B0095B3C6 /* ImageWidget.h */; };
+		0BC7BE0C17258331007662C2 /* LabelWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 43F36F3B15B45D5B0095B3C6 /* LabelWidget.h */; };
+		0BC7BE0D17258331007662C2 /* ListViewItemWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 43F36F3D15B45D5B0095B3C6 /* ListViewItemWidget.h */; };
+		0BC7BE0E17258331007662C2 /* ListViewWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 43F36F3F15B45D5B0095B3C6 /* ListViewWidget.h */; };
+		0BC7BE0F17258331007662C2 /* ModalDialogWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 43F36F4115B45D5B0095B3C6 /* ModalDialogWidget.h */; };
+		0BC7BE1017258331007662C2 /* NavBarWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 43F36F4315B45D5B0095B3C6 /* NavBarWidget.h */; };
+		0BC7BE1117258331007662C2 /* NumberPickerWIdget.h in Headers */ = {isa = PBXBuildFile; fileRef = 43F36F4515B45D5B0095B3C6 /* NumberPickerWIdget.h */; };
+		0BC7BE1217258331007662C2 /* ProgressBarWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 43F36F4715B45D5B0095B3C6 /* ProgressBarWidget.h */; };
+		0BC7BE1317258331007662C2 /* ReflectionWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 43F36F4915B45D5B0095B3C6 /* ReflectionWidget.h */; };
+		0BC7BE1417258331007662C2 /* RelativeLayoutWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 43F36F4B15B45D5B0095B3C6 /* RelativeLayoutWidget.h */; };
+		0BC7BE1517258331007662C2 /* SearchBarWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 43F36F4D15B45D5B0095B3C6 /* SearchBarWidget.h */; };
+		0BC7BE1617258331007662C2 /* SliderWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 43F36F4F15B45D5B0095B3C6 /* SliderWidget.h */; };
+		0BC7BE1717258331007662C2 /* TimePickerWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 43F36F5115B45D5B0095B3C6 /* TimePickerWidget.h */; };
+		0BC7BE1817258331007662C2 /* VideoViewWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 43F36F5315B45D5B0095B3C6 /* VideoViewWidget.h */; };
+		0BC7BE1917258331007662C2 /* WebViewWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 43F36F5515B45D5B0095B3C6 /* WebViewWidget.h */; };
+		0BC7BE1A17258331007662C2 /* NSDataExpanded.h in Headers */ = {isa = PBXBuildFile; fileRef = 43F36FA215B464D50095B3C6 /* NSDataExpanded.h */; };
+		0BC7BE1B17258331007662C2 /* NSObjectExpanded.h in Headers */ = {isa = PBXBuildFile; fileRef = 43F36FA415B464D50095B3C6 /* NSObjectExpanded.h */; };
+		0BC7BE1C17258331007662C2 /* NSStringExpanded.h in Headers */ = {isa = PBXBuildFile; fileRef = 43F36FA615B464D50095B3C6 /* NSStringExpanded.h */; };
+		0BC7BE1D17258331007662C2 /* UIColorExpanded.h in Headers */ = {isa = PBXBuildFile; fileRef = 43F36FA815B464D50095B3C6 /* UIColorExpanded.h */; };
+		0BC7BE1E17258331007662C2 /* iphone_helpers.h in Headers */ = {isa = PBXBuildFile; fileRef = 43F36FB715B46B630095B3C6 /* iphone_helpers.h */; };
+		0BC7BE1F17258331007662C2 /* CMGlyphDrawing.h in Headers */ = {isa = PBXBuildFile; fileRef = 43F36FBC15B46C1E0095B3C6 /* CMGlyphDrawing.h */; };
+		0BC7BE2017258331007662C2 /* Ads.h in Headers */ = {isa = PBXBuildFile; fileRef = 43F36FCC15B4753A0095B3C6 /* Ads.h */; };
+		0BC7BE2117258331007662C2 /* BannerWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 43F36FCE15B4753A0095B3C6 /* BannerWidget.h */; };
+		0BC7BE2217258331007662C2 /* AudioData.h in Headers */ = {isa = PBXBuildFile; fileRef = 43F36FD615B475430095B3C6 /* AudioData.h */; };
+		0BC7BE2317258331007662C2 /* AudioInstance.h in Headers */ = {isa = PBXBuildFile; fileRef = 43F36FD815B475430095B3C6 /* AudioInstance.h */; };
+		0BC7BE2417258331007662C2 /* AudioInstanceDynamic.h in Headers */ = {isa = PBXBuildFile; fileRef = 43F36FDA15B475430095B3C6 /* AudioInstanceDynamic.h */; };
+		0BC7BE2517258331007662C2 /* AudioInstanceURL.h in Headers */ = {isa = PBXBuildFile; fileRef = 43F36FDC15B475430095B3C6 /* AudioInstanceURL.h */; };
+		0BC7BE2617258331007662C2 /* AudioSyscall.h in Headers */ = {isa = PBXBuildFile; fileRef = 43F36FDE15B475430095B3C6 /* AudioSyscall.h */; };
+		0BC7BE2717258331007662C2 /* MoSyncPanic.h in Headers */ = {isa = PBXBuildFile; fileRef = 43F36FEF15B475500095B3C6 /* MoSyncPanic.h */; };
+		0BC7BE2817258331007662C2 /* CameraConfirgurator.h in Headers */ = {isa = PBXBuildFile; fileRef = 43F36FF415B475650095B3C6 /* CameraConfirgurator.h */; };
+		0BC7BE2917258331007662C2 /* Capture.h in Headers */ = {isa = PBXBuildFile; fileRef = 43F36FF915B4756E0095B3C6 /* Capture.h */; };
+		0BC7BE2A17258331007662C2 /* MoSyncLocation.h in Headers */ = {isa = PBXBuildFile; fileRef = 43F36FFF15B4757A0095B3C6 /* MoSyncLocation.h */; };
+		0BC7BE2B17258331007662C2 /* NotificationManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 43F3700415B475920095B3C6 /* NotificationManager.h */; };
+		0BC7BE2C17258331007662C2 /* PushNotification.h in Headers */ = {isa = PBXBuildFile; fileRef = 43F3700615B475920095B3C6 /* PushNotification.h */; };
+		0BC7BE2D17258331007662C2 /* MoSyncGLView.h in Headers */ = {isa = PBXBuildFile; fileRef = 43F3700E15B475A90095B3C6 /* MoSyncGLView.h */; };
+		0BC7BE2E17258331007662C2 /* PimDatabase.h in Headers */ = {isa = PBXBuildFile; fileRef = 43F3701515B475C70095B3C6 /* PimDatabase.h */; };
+		0BC7BE2F17258331007662C2 /* PimError.h in Headers */ = {isa = PBXBuildFile; fileRef = 43F3701715B475C70095B3C6 /* PimError.h */; };
+		0BC7BE3017258331007662C2 /* PimFieldItem.h in Headers */ = {isa = PBXBuildFile; fileRef = 43F3701815B475C70095B3C6 /* PimFieldItem.h */; };
+		0BC7BE3117258331007662C2 /* PimFieldItemValue.h in Headers */ = {isa = PBXBuildFile; fileRef = 43F3701A15B475C70095B3C6 /* PimFieldItemValue.h */; };
+		0BC7BE3217258331007662C2 /* PimItem.h in Headers */ = {isa = PBXBuildFile; fileRef = 43F3701C15B475C70095B3C6 /* PimItem.h */; };
+		0BC7BE3317258331007662C2 /* PimList.h in Headers */ = {isa = PBXBuildFile; fileRef = 43F3701E15B475C70095B3C6 /* PimList.h */; };
+		0BC7BE3417258331007662C2 /* PimSyscall.h in Headers */ = {isa = PBXBuildFile; fileRef = 43F3702015B475C70095B3C6 /* PimSyscall.h */; };
+		0BC7BE3517258331007662C2 /* PimUtil.h in Headers */ = {isa = PBXBuildFile; fileRef = 43F3702215B475C70095B3C6 /* PimUtil.h */; };
+		0BC7BE3617258331007662C2 /* PimContactItem.h in Headers */ = {isa = PBXBuildFile; fileRef = 43F3703A15B475D00095B3C6 /* PimContactItem.h */; };
+		0BC7BE3717258331007662C2 /* PimContactsList.h in Headers */ = {isa = PBXBuildFile; fileRef = 43F3703C15B475D00095B3C6 /* PimContactsList.h */; };
+		0BC7BE3817258331007662C2 /* PurchaseManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 43F3704415B475DA0095B3C6 /* PurchaseManager.h */; };
+		0BC7BE3917258331007662C2 /* PurchaseProduct.h in Headers */ = {isa = PBXBuildFile; fileRef = 43F3704615B475DA0095B3C6 /* PurchaseProduct.h */; };
+		0BC7BE3A17258331007662C2 /* Reachability.h in Headers */ = {isa = PBXBuildFile; fileRef = 43F3704E15B475E30095B3C6 /* Reachability.h */; };
+		0BC7BE3B17258331007662C2 /* MoSyncSensor.h in Headers */ = {isa = PBXBuildFile; fileRef = 43F3705315B475EE0095B3C6 /* MoSyncSensor.h */; };
+		0BC7BE3C17258331007662C2 /* ImagePickerController.h in Headers */ = {isa = PBXBuildFile; fileRef = 43F3705915B476300095B3C6 /* ImagePickerController.h */; };
+		0BC7BE3D17258331007662C2 /* ScreenWidgetController.h in Headers */ = {isa = PBXBuildFile; fileRef = 43F3705B15B476300095B3C6 /* ScreenWidgetController.h */; };
+		0BC7BE3E17258331007662C2 /* TouchHelper.h in Headers */ = {isa = PBXBuildFile; fileRef = 43F3706315B476900095B3C6 /* TouchHelper.h */; };
+		0BC7BE3F17258331007662C2 /* WidgetLayoutingMacro.h in Headers */ = {isa = PBXBuildFile; fileRef = 43B39B3D15B98B1100E9032F /* WidgetLayoutingMacro.h */; };
+		0BC7BE4017258331007662C2 /* HorizontalLayoutWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 43B322D515BC4168009634BC /* HorizontalLayoutWidget.h */; };
+		0BC7BE4117258331007662C2 /* VerticalLayoutWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 43B322DB15BC421E009634BC /* VerticalLayoutWidget.h */; };
+		0BC7BE4217258331007662C2 /* UINavigationControllerExpanded.h in Headers */ = {isa = PBXBuildFile; fileRef = 4332FB4615BD3B8D00E6E048 /* UINavigationControllerExpanded.h */; };
+		0BC7BE4317258331007662C2 /* ListViewSectionWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 4324A71F15D11986004C5732 /* ListViewSectionWidget.h */; };
+		0BC7BE4417258331007662C2 /* ToggleButtonWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 4383ADF5161AC99D00F11991 /* ToggleButtonWidget.h */; };
+		0BC7BE4517258331007662C2 /* MapAnnotation.h in Headers */ = {isa = PBXBuildFile; fileRef = 43C4834F164178C0008F9A39 /* MapAnnotation.h */; };
+		0BC7BE4617258331007662C2 /* MapPinWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 43C48351164178C0008F9A39 /* MapPinWidget.h */; };
+		0BC7BE4717258331007662C2 /* MapWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 43C48353164178C0008F9A39 /* MapWidget.h */; };
+		0BC7BE4817258331007662C2 /* ListViewSectionWidgetDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = 43A8F210164FC71900B0FD35 /* ListViewSectionWidgetDelegate.h */; };
+		0BC7BE4917258331007662C2 /* ListViewWidgetDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = 43A8F211164FC71900B0FD35 /* ListViewWidgetDelegate.h */; };
+		0BC7BE4A17258331007662C2 /* WidgetUtils.h in Headers */ = {isa = PBXBuildFile; fileRef = 43A8F212164FC71A00B0FD35 /* WidgetUtils.h */; };
+		0BC7BE4B17258331007662C2 /* StackScreenWidgetController.h in Headers */ = {isa = PBXBuildFile; fileRef = 8B8D0BCB16ADC03400F287B1 /* StackScreenWidgetController.h */; };
+		0BC7BE4C17258331007662C2 /* TabScreenWidgetController.h in Headers */ = {isa = PBXBuildFile; fileRef = 8B8D0BD016ADC0F900F287B1 /* TabScreenWidgetController.h */; };
+		0BC7BE4D17258331007662C2 /* ScreenOrientation.h in Headers */ = {isa = PBXBuildFile; fileRef = 8B7E3EB116B66A650030D100 /* ScreenOrientation.h */; };
+		0BC7BE4E17258331007662C2 /* MoSyncCamera.h in Headers */ = {isa = PBXBuildFile; fileRef = 8B944BDA16C1179200E1B091 /* MoSyncCamera.h */; };
+		0BC7BE4F17258331007662C2 /* CameraPreviewEventHandler.h in Headers */ = {isa = PBXBuildFile; fileRef = 8B944BDF16C11A4900E1B091 /* CameraPreviewEventHandler.h */; };
+		0BC7BE5017258331007662C2 /* MoSyncSound.h in Headers */ = {isa = PBXBuildFile; fileRef = 8B944BE416C1394800E1B091 /* MoSyncSound.h */; };
+		0BC7BE5117258331007662C2 /* MoSyncPurchase.h in Headers */ = {isa = PBXBuildFile; fileRef = 8B944BEE16C169BD00E1B091 /* MoSyncPurchase.h */; };
+		0BC7BE5217258331007662C2 /* MoSyncCapture.h in Headers */ = {isa = PBXBuildFile; fileRef = 8B944BF316C1750200E1B091 /* MoSyncCapture.h */; };
+		0BC7BE5317258331007662C2 /* MoSyncMisc.h in Headers */ = {isa = PBXBuildFile; fileRef = D99A59FE16C25099000C6649 /* MoSyncMisc.h */; };
+		0BC7BE5417258331007662C2 /* MoSyncNotification.h in Headers */ = {isa = PBXBuildFile; fileRef = 8B944BF816C17D3700E1B091 /* MoSyncNotification.h */; };
+		0BC7BE5517258331007662C2 /* MoSyncOrientation.h in Headers */ = {isa = PBXBuildFile; fileRef = 8B944BFD16C1809C00E1B091 /* MoSyncOrientation.h */; };
+		0BC7BE5617258331007662C2 /* MoSyncOpenGL.h in Headers */ = {isa = PBXBuildFile; fileRef = 8BB2E67016C2509B00391242 /* MoSyncOpenGL.h */; };
+		0BC7BE5717258331007662C2 /* MoSyncGraphics.h in Headers */ = {isa = PBXBuildFile; fileRef = 8BB2E67C16C28AE500391242 /* MoSyncGraphics.h */; };
+		0BC7BE5817258331007662C2 /* MoSyncFonts.h in Headers */ = {isa = PBXBuildFile; fileRef = D99A5A2116C2BDBC000C6649 /* MoSyncFonts.h */; };
+		0BC7BE5917258331007662C2 /* MoSyncUIUtils.h in Headers */ = {isa = PBXBuildFile; fileRef = D962D8D216C914E300B566B1 /* MoSyncUIUtils.h */; };
+		0BC7BE5A17258331007662C2 /* MoSyncUIAlertView.h in Headers */ = {isa = PBXBuildFile; fileRef = 8BB4798F16FAFA390068D6BB /* MoSyncUIAlertView.h */; };
+		0BC7BE5C17258331007662C2 /* MoSyncSensorBridge.mm in Sources */ = {isa = PBXBuildFile; fileRef = D99A59E216C1C199000C6649 /* MoSyncSensorBridge.mm */; };
+		0BC7BE5D17258331007662C2 /* MoSyncAds.mm in Sources */ = {isa = PBXBuildFile; fileRef = D99A59DE16C1B183000C6649 /* MoSyncAds.mm */; };
+		0BC7BE5E17258331007662C2 /* log.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 858B431F12E7325F0058DBFC /* log.cpp */; };
+		0BC7BE5F17258331007662C2 /* MoSync.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85407550149F9E62001B14C0 /* MoSync.mm */; };
+		0BC7BE6017258331007662C2 /* MoSyncExtension.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85407552149F9E62001B14C0 /* MoSyncExtension.mm */; };
+		0BC7BE6117258331007662C2 /* MoSyncView.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2C60113429A900BB0201 /* MoSyncView.mm */; };
+		0BC7BE6217258331007662C2 /* connection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B1E113403FD00BB0201 /* connection.cpp */; };
+		0BC7BE6317258331007662C2 /* discovery.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B21113403FD00BB0201 /* discovery.cpp */; };
+		0BC7BE6417258331007662C2 /* init.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B23113403FD00BB0201 /* init.cpp */; };
+		0BC7BE6517258331007662C2 /* server.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B24113403FD00BB0201 /* server.cpp */; };
+		0BC7BE6617258331007662C2 /* intutil.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B341134047400BB0201 /* intutil.cpp */; };
+		0BC7BE6717258331007662C2 /* TranslatePanic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B3A1134047400BB0201 /* TranslatePanic.cpp */; };
+		0BC7BE6817258331007662C2 /* net.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B45113404E000BB0201 /* net.cpp */; };
+		0BC7BE6917258331007662C2 /* base_errors.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B481134052300BB0201 /* base_errors.cpp */; };
+		0BC7BE6A17258331007662C2 /* FileStream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B4A1134052300BB0201 /* FileStream.cpp */; };
+		0BC7BE6B17258331007662C2 /* Image.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B4E1134052300BB0201 /* Image.cpp */; };
+		0BC7BE6C17258331007662C2 /* MemStream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B501134052300BB0201 /* MemStream.cpp */; };
+		0BC7BE6D17258331007662C2 /* networking.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B521134052300BB0201 /* networking.cpp */; settings = {COMPILER_FLAGS = "-x objective-c++"; }; };
+		0BC7BE6E17258331007662C2 /* Stream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B561134052300BB0201 /* Stream.cpp */; };
+		0BC7BE6F17258331007662C2 /* ResourceArray.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E413FAB714C0604D00BF1E3D /* ResourceArray.cpp */; };
+		0BC7BE7017258331007662C2 /* Syscall.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B591134052300BB0201 /* Syscall.cpp */; };
+		0BC7BE7117258331007662C2 /* ThreadPool.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B5C1134052300BB0201 /* ThreadPool.cpp */; };
+		0BC7BE7217258331007662C2 /* FileImpl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B6B113405A800BB0201 /* FileImpl.cpp */; };
+		0BC7BE7317258331007662C2 /* netImpl.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B6D113405A800BB0201 /* netImpl.mm */; };
+		0BC7BE7417258331007662C2 /* MoSyncMain.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2BF111341A8C00BB0201 /* MoSyncMain.mm */; };
+		0BC7BE7517258331007662C2 /* filelist-linux.c in Sources */ = {isa = PBXBuildFile; fileRef = 85923F24114539F0004875E4 /* filelist-linux.c */; };
+		0BC7BE7617258331007662C2 /* hashmap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 853983A9116CADEF000521C0 /* hashmap.cpp */; };
+		0BC7BE7717258331007662C2 /* ThreadPoolImpl.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85EF80EB1174AA1900B3E43A /* ThreadPoolImpl.mm */; };
+		0BC7BE7817258331007662C2 /* SyscallImpl.mm in Sources */ = {isa = PBXBuildFile; fileRef = 850943291185AF87004A3B2D /* SyscallImpl.mm */; };
+		0BC7BE7917258331007662C2 /* MoSyncDB.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4142402414766C03006977A1 /* MoSyncDB.cpp */; };
+		0BC7BE7A17258331007662C2 /* NSObject+SBJson.m in Sources */ = {isa = PBXBuildFile; fileRef = 433134BF15345A73005DDAD8 /* NSObject+SBJson.m */; };
+		0BC7BE7B17258331007662C2 /* SBJsonParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 433134C215345A73005DDAD8 /* SBJsonParser.m */; };
+		0BC7BE7C17258331007662C2 /* SBJsonStreamParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 433134C415345A73005DDAD8 /* SBJsonStreamParser.m */; };
+		0BC7BE7D17258331007662C2 /* SBJsonStreamParserAccumulator.m in Sources */ = {isa = PBXBuildFile; fileRef = 433134C615345A73005DDAD8 /* SBJsonStreamParserAccumulator.m */; };
+		0BC7BE7E17258331007662C2 /* SBJsonStreamParserAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = 433134C815345A73005DDAD8 /* SBJsonStreamParserAdapter.m */; };
+		0BC7BE7F17258331007662C2 /* SBJsonStreamParserState.m in Sources */ = {isa = PBXBuildFile; fileRef = 433134CA15345A73005DDAD8 /* SBJsonStreamParserState.m */; };
+		0BC7BE8017258331007662C2 /* SBJsonStreamWriter.m in Sources */ = {isa = PBXBuildFile; fileRef = 433134CC15345A73005DDAD8 /* SBJsonStreamWriter.m */; };
+		0BC7BE8117258331007662C2 /* SBJsonStreamWriterAccumulator.m in Sources */ = {isa = PBXBuildFile; fileRef = 433134CE15345A73005DDAD8 /* SBJsonStreamWriterAccumulator.m */; };
+		0BC7BE8217258331007662C2 /* SBJsonStreamWriterState.m in Sources */ = {isa = PBXBuildFile; fileRef = 433134D015345A73005DDAD8 /* SBJsonStreamWriterState.m */; };
+		0BC7BE8317258331007662C2 /* SBJsonTokeniser.m in Sources */ = {isa = PBXBuildFile; fileRef = 433134D215345A73005DDAD8 /* SBJsonTokeniser.m */; };
+		0BC7BE8417258331007662C2 /* SBJsonUTF8Stream.m in Sources */ = {isa = PBXBuildFile; fileRef = 433134D415345A73005DDAD8 /* SBJsonUTF8Stream.m */; };
+		0BC7BE8517258331007662C2 /* SBJsonWriter.m in Sources */ = {isa = PBXBuildFile; fileRef = 433134D615345A73005DDAD8 /* SBJsonWriter.m */; };
+		0BC7BE8617258331007662C2 /* IWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43F36EE215B45C380095B3C6 /* IWidget.mm */; };
+		0BC7BE8717258331007662C2 /* MoSyncUI.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43F36EE415B45C380095B3C6 /* MoSyncUI.mm */; };
+		0BC7BE8817258331007662C2 /* AbstractLayoutView.m in Sources */ = {isa = PBXBuildFile; fileRef = 43F36EED15B45C750095B3C6 /* AbstractLayoutView.m */; };
+		0BC7BE8917258331007662C2 /* HLayoutView.m in Sources */ = {isa = PBXBuildFile; fileRef = 43F36EEF15B45C750095B3C6 /* HLayoutView.m */; };
+		0BC7BE8A17258331007662C2 /* VLayoutView.m in Sources */ = {isa = PBXBuildFile; fileRef = 43F36EF415B45C750095B3C6 /* VLayoutView.m */; };
+		0BC7BE8B17258331007662C2 /* LayoutWidgets.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43F36F0215B45C7E0095B3C6 /* LayoutWidgets.mm */; };
+		0BC7BE8C17258331007662C2 /* OptionsDialogView.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43F36F0715B45CA80095B3C6 /* OptionsDialogView.mm */; };
+		0BC7BE8D17258331007662C2 /* ScreenWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43F36F1115B45D160095B3C6 /* ScreenWidget.mm */; };
+		0BC7BE8E17258331007662C2 /* StackScreenWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43F36F1315B45D160095B3C6 /* StackScreenWidget.mm */; };
+		0BC7BE8F17258331007662C2 /* TabScreenWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43F36F1515B45D160095B3C6 /* TabScreenWidget.mm */; };
+		0BC7BE9017258331007662C2 /* MoSyncUISyscalls.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43F36F2015B45D290095B3C6 /* MoSyncUISyscalls.mm */; };
+		0BC7BE9117258331007662C2 /* ActivityIndicatorWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43F36F2A15B45D5B0095B3C6 /* ActivityIndicatorWidget.mm */; };
+		0BC7BE9217258331007662C2 /* ButtonWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43F36F2C15B45D5B0095B3C6 /* ButtonWidget.mm */; };
+		0BC7BE9317258331007662C2 /* CameraPreviewWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43F36F2E15B45D5B0095B3C6 /* CameraPreviewWidget.mm */; };
+		0BC7BE9417258331007662C2 /* CheckBoxWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43F36F3015B45D5B0095B3C6 /* CheckBoxWidget.mm */; };
+		0BC7BE9517258331007662C2 /* DatePickerWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43F36F3215B45D5B0095B3C6 /* DatePickerWidget.mm */; };
+		0BC7BE9617258331007662C2 /* EditBoxWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43F36F3415B45D5B0095B3C6 /* EditBoxWidget.mm */; };
+		0BC7BE9717258331007662C2 /* GLViewWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43F36F3615B45D5B0095B3C6 /* GLViewWidget.mm */; };
+		0BC7BE9817258331007662C2 /* ImageButtonWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43F36F3815B45D5B0095B3C6 /* ImageButtonWidget.mm */; };
+		0BC7BE9917258331007662C2 /* ImageWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43F36F3A15B45D5B0095B3C6 /* ImageWidget.mm */; };
+		0BC7BE9A17258331007662C2 /* LabelWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43F36F3C15B45D5B0095B3C6 /* LabelWidget.mm */; };
+		0BC7BE9B17258331007662C2 /* ListViewItemWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43F36F3E15B45D5B0095B3C6 /* ListViewItemWidget.mm */; };
+		0BC7BE9C17258331007662C2 /* ListViewWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43F36F4015B45D5B0095B3C6 /* ListViewWidget.mm */; };
+		0BC7BE9D17258331007662C2 /* ModalDialogWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43F36F4215B45D5B0095B3C6 /* ModalDialogWidget.mm */; };
+		0BC7BE9E17258331007662C2 /* NavBarWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43F36F4415B45D5B0095B3C6 /* NavBarWidget.mm */; };
+		0BC7BE9F17258331007662C2 /* NumberPickerWIdget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43F36F4615B45D5B0095B3C6 /* NumberPickerWIdget.mm */; };
+		0BC7BEA017258331007662C2 /* ProgressBarWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43F36F4815B45D5B0095B3C6 /* ProgressBarWidget.mm */; };
+		0BC7BEA117258331007662C2 /* ReflectionWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43F36F4A15B45D5B0095B3C6 /* ReflectionWidget.mm */; };
+		0BC7BEA217258331007662C2 /* RelativeLayoutWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43F36F4C15B45D5B0095B3C6 /* RelativeLayoutWidget.mm */; };
+		0BC7BEA317258331007662C2 /* SearchBarWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43F36F4E15B45D5B0095B3C6 /* SearchBarWidget.mm */; };
+		0BC7BEA417258331007662C2 /* SliderWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43F36F5015B45D5B0095B3C6 /* SliderWidget.mm */; };
+		0BC7BEA517258331007662C2 /* TimePickerWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43F36F5215B45D5B0095B3C6 /* TimePickerWidget.mm */; };
+		0BC7BEA617258331007662C2 /* VideoViewWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43F36F5415B45D5B0095B3C6 /* VideoViewWidget.mm */; };
+		0BC7BEA717258331007662C2 /* WebViewWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43F36F5615B45D5B0095B3C6 /* WebViewWidget.mm */; };
+		0BC7BEA817258331007662C2 /* NSDataExpanded.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43F36FA315B464D50095B3C6 /* NSDataExpanded.mm */; };
+		0BC7BEA917258331007662C2 /* NSObjectExpanded.m in Sources */ = {isa = PBXBuildFile; fileRef = 43F36FA515B464D50095B3C6 /* NSObjectExpanded.m */; };
+		0BC7BEAA17258331007662C2 /* NSStringExpanded.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43F36FA715B464D50095B3C6 /* NSStringExpanded.mm */; };
+		0BC7BEAB17258331007662C2 /* UIColorExpanded.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43F36FA915B464D50095B3C6 /* UIColorExpanded.mm */; };
+		0BC7BEAC17258331007662C2 /* iphone_helpers.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43F36FB815B46B630095B3C6 /* iphone_helpers.mm */; };
+		0BC7BEAD17258331007662C2 /* CMGlyphDrawing.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43F36FBD15B46C1E0095B3C6 /* CMGlyphDrawing.mm */; };
+		0BC7BEAE17258331007662C2 /* Ads.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43F36FCD15B4753A0095B3C6 /* Ads.mm */; };
+		0BC7BEAF17258331007662C2 /* BannerWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43F36FCF15B4753A0095B3C6 /* BannerWidget.mm */; };
+		0BC7BEB017258331007662C2 /* AudioData.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43F36FD715B475430095B3C6 /* AudioData.mm */; };
+		0BC7BEB117258331007662C2 /* AudioInstance.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43F36FD915B475430095B3C6 /* AudioInstance.mm */; };
+		0BC7BEB217258331007662C2 /* AudioInstanceDynamic.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43F36FDB15B475430095B3C6 /* AudioInstanceDynamic.mm */; };
+		0BC7BEB317258331007662C2 /* AudioInstanceURL.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43F36FDD15B475430095B3C6 /* AudioInstanceURL.mm */; };
+		0BC7BEB417258331007662C2 /* AudioSyscall.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43F36FDF15B475430095B3C6 /* AudioSyscall.mm */; };
+		0BC7BEB517258331007662C2 /* MoSyncPanic.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43F36FF015B475500095B3C6 /* MoSyncPanic.mm */; };
+		0BC7BEB617258331007662C2 /* CameraConfirgurator.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43F36FF515B475650095B3C6 /* CameraConfirgurator.mm */; };
+		0BC7BEB717258331007662C2 /* Capture.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43F36FFA15B4756E0095B3C6 /* Capture.mm */; };
+		0BC7BEB817258331007662C2 /* MoSyncLocation.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43F3700015B4757A0095B3C6 /* MoSyncLocation.mm */; };
+		0BC7BEB917258331007662C2 /* NotificationManager.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43F3700515B475920095B3C6 /* NotificationManager.mm */; };
+		0BC7BEBA17258331007662C2 /* PushNotification.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43F3700715B475920095B3C6 /* PushNotification.mm */; };
+		0BC7BEBB17258331007662C2 /* MoSyncGLView.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43F3700F15B475A90095B3C6 /* MoSyncGLView.mm */; };
+		0BC7BEBC17258331007662C2 /* PimDatabase.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43F3701615B475C70095B3C6 /* PimDatabase.mm */; };
+		0BC7BEBD17258331007662C2 /* PimFieldItem.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43F3701915B475C70095B3C6 /* PimFieldItem.mm */; };
+		0BC7BEBE17258331007662C2 /* PimFieldItemValue.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43F3701B15B475C70095B3C6 /* PimFieldItemValue.mm */; };
+		0BC7BEBF17258331007662C2 /* PimItem.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43F3701D15B475C70095B3C6 /* PimItem.mm */; };
+		0BC7BEC017258331007662C2 /* PimList.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43F3701F15B475C70095B3C6 /* PimList.mm */; };
+		0BC7BEC117258331007662C2 /* PimSyscall.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43F3702115B475C70095B3C6 /* PimSyscall.mm */; };
+		0BC7BEC217258331007662C2 /* PimUtil.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43F3702315B475C70095B3C6 /* PimUtil.mm */; };
+		0BC7BEC317258331007662C2 /* PimContactItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 43F3703B15B475D00095B3C6 /* PimContactItem.m */; };
+		0BC7BEC417258331007662C2 /* PimContactsList.m in Sources */ = {isa = PBXBuildFile; fileRef = 43F3703D15B475D00095B3C6 /* PimContactsList.m */; };
+		0BC7BEC517258331007662C2 /* PurchaseManager.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43F3704515B475DA0095B3C6 /* PurchaseManager.mm */; };
+		0BC7BEC617258331007662C2 /* PurchaseProduct.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43F3704715B475DA0095B3C6 /* PurchaseProduct.mm */; };
+		0BC7BEC717258331007662C2 /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = 43F3704F15B475E30095B3C6 /* Reachability.m */; };
+		0BC7BEC817258331007662C2 /* MoSyncSensor.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43F3705415B475EE0095B3C6 /* MoSyncSensor.mm */; };
+		0BC7BEC917258331007662C2 /* ImagePickerController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43F3705A15B476300095B3C6 /* ImagePickerController.mm */; };
+		0BC7BECA17258331007662C2 /* ScreenWidgetController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43F3705C15B476300095B3C6 /* ScreenWidgetController.mm */; };
+		0BC7BECB17258331007662C2 /* TouchHelper.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43F3706415B476910095B3C6 /* TouchHelper.mm */; };
+		0BC7BECC17258331007662C2 /* HorizontalLayoutWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43B322D615BC4168009634BC /* HorizontalLayoutWidget.mm */; };
+		0BC7BECD17258331007662C2 /* VerticalLayoutWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43B322DC15BC421E009634BC /* VerticalLayoutWidget.mm */; };
+		0BC7BECE17258331007662C2 /* UINavigationControllerExpanded.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4332FB4715BD3B8D00E6E048 /* UINavigationControllerExpanded.mm */; };
+		0BC7BECF17258331007662C2 /* ListViewSectionWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4324A72015D11986004C5732 /* ListViewSectionWidget.mm */; };
+		0BC7BED017258331007662C2 /* ToggleButtonWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4383ADF6161AC99D00F11991 /* ToggleButtonWidget.mm */; };
+		0BC7BED117258331007662C2 /* MapAnnotation.m in Sources */ = {isa = PBXBuildFile; fileRef = 43C48350164178C0008F9A39 /* MapAnnotation.m */; };
+		0BC7BED217258331007662C2 /* MapPinWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43C48352164178C0008F9A39 /* MapPinWidget.mm */; };
+		0BC7BED317258331007662C2 /* MapWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43C48354164178C0008F9A39 /* MapWidget.mm */; };
+		0BC7BED417258331007662C2 /* WidgetUtils.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43A8F213164FC71A00B0FD35 /* WidgetUtils.mm */; };
+		0BC7BED517258331007662C2 /* StackScreenWidgetController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8B8D0BCC16ADC03400F287B1 /* StackScreenWidgetController.mm */; };
+		0BC7BED617258331007662C2 /* TabScreenWidgetController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8B8D0BD116ADC0F900F287B1 /* TabScreenWidgetController.mm */; };
+		0BC7BED717258331007662C2 /* ScreenOrientation.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8B7E3EB216B66A650030D100 /* ScreenOrientation.mm */; };
+		0BC7BED817258331007662C2 /* MoSyncCamera.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8B944BDB16C1179200E1B091 /* MoSyncCamera.mm */; };
+		0BC7BED917258331007662C2 /* CameraPreviewEventHandler.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8B944BE016C11A4900E1B091 /* CameraPreviewEventHandler.mm */; };
+		0BC7BEDA17258331007662C2 /* MoSyncSound.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8B944BE516C1394800E1B091 /* MoSyncSound.mm */; };
+		0BC7BEDB17258331007662C2 /* MoSyncPurchase.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8B944BEF16C169BD00E1B091 /* MoSyncPurchase.mm */; };
+		0BC7BEDC17258331007662C2 /* MoSyncCapture.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8B944BF416C1750200E1B091 /* MoSyncCapture.mm */; };
+		0BC7BEDD17258331007662C2 /* MoSyncMisc.mm in Sources */ = {isa = PBXBuildFile; fileRef = D99A59FF16C25099000C6649 /* MoSyncMisc.mm */; };
+		0BC7BEDE17258331007662C2 /* MoSyncNotification.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8B944BF916C17D3700E1B091 /* MoSyncNotification.mm */; };
+		0BC7BEDF17258331007662C2 /* MoSyncOrientation.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8B944BFE16C1809C00E1B091 /* MoSyncOrientation.mm */; };
+		0BC7BEE017258331007662C2 /* MoSyncOpenGL.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8BB2E67116C2509B00391242 /* MoSyncOpenGL.mm */; };
+		0BC7BEE117258331007662C2 /* MoSyncGraphics.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8BB2E67D16C28AE500391242 /* MoSyncGraphics.mm */; };
+		0BC7BEE217258331007662C2 /* MoSyncFonts.mm in Sources */ = {isa = PBXBuildFile; fileRef = D99A5A2216C2BDBC000C6649 /* MoSyncFonts.mm */; };
+		0BC7BEE317258331007662C2 /* MoSyncUIUtils.mm in Sources */ = {isa = PBXBuildFile; fileRef = D962D8CF16C914D100B566B1 /* MoSyncUIUtils.mm */; };
+		0BC7BEE417258331007662C2 /* MoSyncUIAlertView.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8BB4799016FAFA390068D6BB /* MoSyncUIAlertView.mm */; };
+		0BC7BEE617258331007662C2 /* MapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 43C4835F16417ACE008F9A39 /* MapKit.framework */; };
+		0BC7BEE717258331007662C2 /* CoreMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E438DF4F1535D35C008B5005 /* CoreMedia.framework */; };
+		0BC7BEE817258331007662C2 /* AddressBook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 431869A713F68E560051D97A /* AddressBook.framework */; };
+		0BC7BEE917258331007662C2 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4300E3E6152C60FA00B40FA2 /* StoreKit.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
+		0BC7BEEA17258331007662C2 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 850943881185B35D004A3B2D /* AVFoundation.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
+		0BC7BEEB17258331007662C2 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 85E2A0D51181D1B200CDB453 /* AudioToolbox.framework */; };
+		0BC7BEEC17258331007662C2 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 288765A40DF7441C002DB57D /* CoreGraphics.framework */; };
+		0BC7BEED17258331007662C2 /* CoreMotion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 431869B213F691A30051D97A /* CoreMotion.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
+		0BC7BEEE17258331007662C2 /* EventKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 431869AA13F68E8A0051D97A /* EventKit.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
+		0BC7BEEF17258331007662C2 /* iAd.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 43CE0BF51463EE5F00F8FFC3 /* iAd.framework */; };
+		0BC7BEF017258331007662C2 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1D30AB110D05D00D00671497 /* Foundation.framework */; };
+		0BC7BEF117258331007662C2 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1DF5F4DF0D08C38300B7A737 /* UIKit.framework */; };
+		0BC7BEF217258331007662C2 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 857B025512C62F5600DEA306 /* QuartzCore.framework */; };
+		0BC7BEF317258331007662C2 /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 857B020112C627C200DEA306 /* OpenGLES.framework */; };
+		0BC7BEF417258331007662C2 /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 850944001185C440004A3B2D /* CoreLocation.framework */; };
 		1D3623260D0F684500981E51 /* MoSyncAppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1D3623250D0F684500981E51 /* MoSyncAppDelegate.mm */; };
 		1D60589B0D05DD56006BFB54 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; };
 		1D60589F0D05DD5A006BFB54 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1D30AB110D05D00D00671497 /* Foundation.framework */; };
@@ -472,6 +739,7 @@
 
 /* Begin PBXFileReference section */
 		0B10E8D114064DDB00B6DA6B /* MessageUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MessageUI.framework; path = System/Library/Frameworks/MessageUI.framework; sourceTree = SDKROOT; };
+		0BC7BEF817258331007662C2 /* libMoSyncLib copy.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libMoSyncLib copy.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		1D30AB110D05D00D00671497 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		1D3623240D0F684500981E51 /* MoSyncAppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MoSyncAppDelegate.h; sourceTree = "<group>"; };
 		1D3623250D0F684500981E51 /* MoSyncAppDelegate.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MoSyncAppDelegate.mm; sourceTree = "<group>"; };
@@ -820,6 +1088,28 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		0BC7BEE517258331007662C2 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0BC7BEE617258331007662C2 /* MapKit.framework in Frameworks */,
+				0BC7BEE717258331007662C2 /* CoreMedia.framework in Frameworks */,
+				0BC7BEE817258331007662C2 /* AddressBook.framework in Frameworks */,
+				0BC7BEE917258331007662C2 /* StoreKit.framework in Frameworks */,
+				0BC7BEEA17258331007662C2 /* AVFoundation.framework in Frameworks */,
+				0BC7BEEB17258331007662C2 /* AudioToolbox.framework in Frameworks */,
+				0BC7BEEC17258331007662C2 /* CoreGraphics.framework in Frameworks */,
+				0BC7BEED17258331007662C2 /* CoreMotion.framework in Frameworks */,
+				0BC7BEEE17258331007662C2 /* EventKit.framework in Frameworks */,
+				0BC7BEEF17258331007662C2 /* iAd.framework in Frameworks */,
+				0BC7BEF017258331007662C2 /* Foundation.framework in Frameworks */,
+				0BC7BEF117258331007662C2 /* UIKit.framework in Frameworks */,
+				0BC7BEF217258331007662C2 /* QuartzCore.framework in Frameworks */,
+				0BC7BEF317258331007662C2 /* OpenGLES.framework in Frameworks */,
+				0BC7BEF417258331007662C2 /* CoreLocation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		1D60588F0D05DD3D006BFB54 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -937,6 +1227,7 @@
 				1D6058910D05DD3D006BFB54 /* MoSync.app */,
 				85F2550D11AC125400EB47EE /* libMoSyncLib.a */,
 				85F2558711AC155D00EB47EE /* MoSync.app */,
+				0BC7BEF817258331007662C2 /* libMoSyncLib copy.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1631,6 +1922,128 @@
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
+		0BC7BDE717258331007662C2 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0BC7BDE817258331007662C2 /* MoSyncDB.h in Headers */,
+				0BC7BDE917258331007662C2 /* ResourceArray.h in Headers */,
+				0BC7BDEA17258331007662C2 /* NSObject+SBJson.h in Headers */,
+				0BC7BDEB17258331007662C2 /* SBJson.h in Headers */,
+				0BC7BDEC17258331007662C2 /* SBJsonParser.h in Headers */,
+				0BC7BDED17258331007662C2 /* SBJsonStreamParser.h in Headers */,
+				0BC7BDEE17258331007662C2 /* SBJsonStreamParserAccumulator.h in Headers */,
+				0BC7BDEF17258331007662C2 /* SBJsonStreamParserAdapter.h in Headers */,
+				0BC7BDF017258331007662C2 /* SBJsonStreamParserState.h in Headers */,
+				0BC7BDF117258331007662C2 /* SBJsonStreamWriter.h in Headers */,
+				0BC7BDF217258331007662C2 /* SBJsonStreamWriterAccumulator.h in Headers */,
+				0BC7BDF317258331007662C2 /* SBJsonStreamWriterState.h in Headers */,
+				0BC7BDF417258331007662C2 /* SBJsonTokeniser.h in Headers */,
+				0BC7BDF517258331007662C2 /* SBJsonUTF8Stream.h in Headers */,
+				0BC7BDF617258331007662C2 /* SBJsonWriter.h in Headers */,
+				0BC7BDF717258331007662C2 /* IWidget.h in Headers */,
+				0BC7BDF817258331007662C2 /* MoSyncUI.h in Headers */,
+				0BC7BDF917258331007662C2 /* AbstractLayoutView.h in Headers */,
+				0BC7BDFA17258331007662C2 /* HLayoutView.h in Headers */,
+				0BC7BDFB17258331007662C2 /* LayoutManagers.h in Headers */,
+				0BC7BDFC17258331007662C2 /* VLayoutView.h in Headers */,
+				0BC7BDFD17258331007662C2 /* LayoutWidgets.h in Headers */,
+				0BC7BDFE17258331007662C2 /* OptionsDialogView.h in Headers */,
+				0BC7BDFF17258331007662C2 /* ScreenWidget.h in Headers */,
+				0BC7BE0017258331007662C2 /* StackScreenWidget.h in Headers */,
+				0BC7BE0117258331007662C2 /* TabScreenWidget.h in Headers */,
+				0BC7BE0217258331007662C2 /* MoSyncUISyscalls.h in Headers */,
+				0BC7BE0317258331007662C2 /* ActivityIndicatorWidget.h in Headers */,
+				0BC7BE0417258331007662C2 /* ButtonWidget.h in Headers */,
+				0BC7BE0517258331007662C2 /* CameraPreviewWidget.h in Headers */,
+				0BC7BE0617258331007662C2 /* CheckBoxWidget.h in Headers */,
+				0BC7BE0717258331007662C2 /* DatePickerWidget.h in Headers */,
+				0BC7BE0817258331007662C2 /* EditBoxWidget.h in Headers */,
+				0BC7BE0917258331007662C2 /* GLViewWidget.h in Headers */,
+				0BC7BE0A17258331007662C2 /* ImageButtonWidget.h in Headers */,
+				0BC7BE0B17258331007662C2 /* ImageWidget.h in Headers */,
+				0BC7BE0C17258331007662C2 /* LabelWidget.h in Headers */,
+				0BC7BE0D17258331007662C2 /* ListViewItemWidget.h in Headers */,
+				0BC7BE0E17258331007662C2 /* ListViewWidget.h in Headers */,
+				0BC7BE0F17258331007662C2 /* ModalDialogWidget.h in Headers */,
+				0BC7BE1017258331007662C2 /* NavBarWidget.h in Headers */,
+				0BC7BE1117258331007662C2 /* NumberPickerWIdget.h in Headers */,
+				0BC7BE1217258331007662C2 /* ProgressBarWidget.h in Headers */,
+				0BC7BE1317258331007662C2 /* ReflectionWidget.h in Headers */,
+				0BC7BE1417258331007662C2 /* RelativeLayoutWidget.h in Headers */,
+				0BC7BE1517258331007662C2 /* SearchBarWidget.h in Headers */,
+				0BC7BE1617258331007662C2 /* SliderWidget.h in Headers */,
+				0BC7BE1717258331007662C2 /* TimePickerWidget.h in Headers */,
+				0BC7BE1817258331007662C2 /* VideoViewWidget.h in Headers */,
+				0BC7BE1917258331007662C2 /* WebViewWidget.h in Headers */,
+				0BC7BE1A17258331007662C2 /* NSDataExpanded.h in Headers */,
+				0BC7BE1B17258331007662C2 /* NSObjectExpanded.h in Headers */,
+				0BC7BE1C17258331007662C2 /* NSStringExpanded.h in Headers */,
+				0BC7BE1D17258331007662C2 /* UIColorExpanded.h in Headers */,
+				0BC7BE1E17258331007662C2 /* iphone_helpers.h in Headers */,
+				0BC7BE1F17258331007662C2 /* CMGlyphDrawing.h in Headers */,
+				0BC7BE2017258331007662C2 /* Ads.h in Headers */,
+				0BC7BE2117258331007662C2 /* BannerWidget.h in Headers */,
+				0BC7BE2217258331007662C2 /* AudioData.h in Headers */,
+				0BC7BE2317258331007662C2 /* AudioInstance.h in Headers */,
+				0BC7BE2417258331007662C2 /* AudioInstanceDynamic.h in Headers */,
+				0BC7BE2517258331007662C2 /* AudioInstanceURL.h in Headers */,
+				0BC7BE2617258331007662C2 /* AudioSyscall.h in Headers */,
+				0BC7BE2717258331007662C2 /* MoSyncPanic.h in Headers */,
+				0BC7BE2817258331007662C2 /* CameraConfirgurator.h in Headers */,
+				0BC7BE2917258331007662C2 /* Capture.h in Headers */,
+				0BC7BE2A17258331007662C2 /* MoSyncLocation.h in Headers */,
+				0BC7BE2B17258331007662C2 /* NotificationManager.h in Headers */,
+				0BC7BE2C17258331007662C2 /* PushNotification.h in Headers */,
+				0BC7BE2D17258331007662C2 /* MoSyncGLView.h in Headers */,
+				0BC7BE2E17258331007662C2 /* PimDatabase.h in Headers */,
+				0BC7BE2F17258331007662C2 /* PimError.h in Headers */,
+				0BC7BE3017258331007662C2 /* PimFieldItem.h in Headers */,
+				0BC7BE3117258331007662C2 /* PimFieldItemValue.h in Headers */,
+				0BC7BE3217258331007662C2 /* PimItem.h in Headers */,
+				0BC7BE3317258331007662C2 /* PimList.h in Headers */,
+				0BC7BE3417258331007662C2 /* PimSyscall.h in Headers */,
+				0BC7BE3517258331007662C2 /* PimUtil.h in Headers */,
+				0BC7BE3617258331007662C2 /* PimContactItem.h in Headers */,
+				0BC7BE3717258331007662C2 /* PimContactsList.h in Headers */,
+				0BC7BE3817258331007662C2 /* PurchaseManager.h in Headers */,
+				0BC7BE3917258331007662C2 /* PurchaseProduct.h in Headers */,
+				0BC7BE3A17258331007662C2 /* Reachability.h in Headers */,
+				0BC7BE3B17258331007662C2 /* MoSyncSensor.h in Headers */,
+				0BC7BE3C17258331007662C2 /* ImagePickerController.h in Headers */,
+				0BC7BE3D17258331007662C2 /* ScreenWidgetController.h in Headers */,
+				0BC7BE3E17258331007662C2 /* TouchHelper.h in Headers */,
+				0BC7BE3F17258331007662C2 /* WidgetLayoutingMacro.h in Headers */,
+				0BC7BE4017258331007662C2 /* HorizontalLayoutWidget.h in Headers */,
+				0BC7BE4117258331007662C2 /* VerticalLayoutWidget.h in Headers */,
+				0BC7BE4217258331007662C2 /* UINavigationControllerExpanded.h in Headers */,
+				0BC7BE4317258331007662C2 /* ListViewSectionWidget.h in Headers */,
+				0BC7BE4417258331007662C2 /* ToggleButtonWidget.h in Headers */,
+				0BC7BE4517258331007662C2 /* MapAnnotation.h in Headers */,
+				0BC7BE4617258331007662C2 /* MapPinWidget.h in Headers */,
+				0BC7BE4717258331007662C2 /* MapWidget.h in Headers */,
+				0BC7BE4817258331007662C2 /* ListViewSectionWidgetDelegate.h in Headers */,
+				0BC7BE4917258331007662C2 /* ListViewWidgetDelegate.h in Headers */,
+				0BC7BE4A17258331007662C2 /* WidgetUtils.h in Headers */,
+				0BC7BE4B17258331007662C2 /* StackScreenWidgetController.h in Headers */,
+				0BC7BE4C17258331007662C2 /* TabScreenWidgetController.h in Headers */,
+				0BC7BE4D17258331007662C2 /* ScreenOrientation.h in Headers */,
+				0BC7BE4E17258331007662C2 /* MoSyncCamera.h in Headers */,
+				0BC7BE4F17258331007662C2 /* CameraPreviewEventHandler.h in Headers */,
+				0BC7BE5017258331007662C2 /* MoSyncSound.h in Headers */,
+				0BC7BE5117258331007662C2 /* MoSyncPurchase.h in Headers */,
+				0BC7BE5217258331007662C2 /* MoSyncCapture.h in Headers */,
+				0BC7BE5317258331007662C2 /* MoSyncMisc.h in Headers */,
+				0BC7BE5417258331007662C2 /* MoSyncNotification.h in Headers */,
+				0BC7BE5517258331007662C2 /* MoSyncOrientation.h in Headers */,
+				0BC7BE5617258331007662C2 /* MoSyncOpenGL.h in Headers */,
+				0BC7BE5717258331007662C2 /* MoSyncGraphics.h in Headers */,
+				0BC7BE5817258331007662C2 /* MoSyncFonts.h in Headers */,
+				0BC7BE5917258331007662C2 /* MoSyncUIUtils.h in Headers */,
+				0BC7BE5A17258331007662C2 /* MoSyncUIAlertView.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		85F2550911AC125400EB47EE /* Headers */ = {
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
@@ -1756,6 +2169,23 @@
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
+		0BC7BDE617258331007662C2 /* MoSyncLibNative */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 0BC7BEF517258331007662C2 /* Build configuration list for PBXNativeTarget "MoSyncLibNative" */;
+			buildPhases = (
+				0BC7BDE717258331007662C2 /* Headers */,
+				0BC7BE5B17258331007662C2 /* Sources */,
+				0BC7BEE517258331007662C2 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = MoSyncLibNative;
+			productName = MoSyncLib;
+			productReference = 0BC7BEF817258331007662C2 /* libMoSyncLib copy.a */;
+			productType = "com.apple.product-type.library.static";
+		};
 		1D6058900D05DD3D006BFB54 /* MoSync */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 1D6058960D05DD3E006BFB54 /* Build configuration list for PBXNativeTarget "MoSync" */;
@@ -1833,6 +2263,7 @@
 				1D6058900D05DD3D006BFB54 /* MoSync */,
 				85F2550C11AC125400EB47EE /* MoSyncLib */,
 				85F2555511AC155D00EB47EE /* MoSync with library */,
+				0BC7BDE617258331007662C2 /* MoSyncLibNative */,
 			);
 		};
 /* End PBXProject section */
@@ -1864,6 +2295,150 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		0BC7BE5B17258331007662C2 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0BC7BE5C17258331007662C2 /* MoSyncSensorBridge.mm in Sources */,
+				0BC7BE5D17258331007662C2 /* MoSyncAds.mm in Sources */,
+				0BC7BE5E17258331007662C2 /* log.cpp in Sources */,
+				0BC7BE5F17258331007662C2 /* MoSync.mm in Sources */,
+				0BC7BE6017258331007662C2 /* MoSyncExtension.mm in Sources */,
+				0BC7BE6117258331007662C2 /* MoSyncView.mm in Sources */,
+				0BC7BE6217258331007662C2 /* connection.cpp in Sources */,
+				0BC7BE6317258331007662C2 /* discovery.cpp in Sources */,
+				0BC7BE6417258331007662C2 /* init.cpp in Sources */,
+				0BC7BE6517258331007662C2 /* server.cpp in Sources */,
+				0BC7BE6617258331007662C2 /* intutil.cpp in Sources */,
+				0BC7BE6717258331007662C2 /* TranslatePanic.cpp in Sources */,
+				0BC7BE6817258331007662C2 /* net.cpp in Sources */,
+				0BC7BE6917258331007662C2 /* base_errors.cpp in Sources */,
+				0BC7BE6A17258331007662C2 /* FileStream.cpp in Sources */,
+				0BC7BE6B17258331007662C2 /* Image.cpp in Sources */,
+				0BC7BE6C17258331007662C2 /* MemStream.cpp in Sources */,
+				0BC7BE6D17258331007662C2 /* networking.cpp in Sources */,
+				0BC7BE6E17258331007662C2 /* Stream.cpp in Sources */,
+				0BC7BE6F17258331007662C2 /* ResourceArray.cpp in Sources */,
+				0BC7BE7017258331007662C2 /* Syscall.cpp in Sources */,
+				0BC7BE7117258331007662C2 /* ThreadPool.cpp in Sources */,
+				0BC7BE7217258331007662C2 /* FileImpl.cpp in Sources */,
+				0BC7BE7317258331007662C2 /* netImpl.mm in Sources */,
+				0BC7BE7417258331007662C2 /* MoSyncMain.mm in Sources */,
+				0BC7BE7517258331007662C2 /* filelist-linux.c in Sources */,
+				0BC7BE7617258331007662C2 /* hashmap.cpp in Sources */,
+				0BC7BE7717258331007662C2 /* ThreadPoolImpl.mm in Sources */,
+				0BC7BE7817258331007662C2 /* SyscallImpl.mm in Sources */,
+				0BC7BE7917258331007662C2 /* MoSyncDB.cpp in Sources */,
+				0BC7BE7A17258331007662C2 /* NSObject+SBJson.m in Sources */,
+				0BC7BE7B17258331007662C2 /* SBJsonParser.m in Sources */,
+				0BC7BE7C17258331007662C2 /* SBJsonStreamParser.m in Sources */,
+				0BC7BE7D17258331007662C2 /* SBJsonStreamParserAccumulator.m in Sources */,
+				0BC7BE7E17258331007662C2 /* SBJsonStreamParserAdapter.m in Sources */,
+				0BC7BE7F17258331007662C2 /* SBJsonStreamParserState.m in Sources */,
+				0BC7BE8017258331007662C2 /* SBJsonStreamWriter.m in Sources */,
+				0BC7BE8117258331007662C2 /* SBJsonStreamWriterAccumulator.m in Sources */,
+				0BC7BE8217258331007662C2 /* SBJsonStreamWriterState.m in Sources */,
+				0BC7BE8317258331007662C2 /* SBJsonTokeniser.m in Sources */,
+				0BC7BE8417258331007662C2 /* SBJsonUTF8Stream.m in Sources */,
+				0BC7BE8517258331007662C2 /* SBJsonWriter.m in Sources */,
+				0BC7BE8617258331007662C2 /* IWidget.mm in Sources */,
+				0BC7BE8717258331007662C2 /* MoSyncUI.mm in Sources */,
+				0BC7BE8817258331007662C2 /* AbstractLayoutView.m in Sources */,
+				0BC7BE8917258331007662C2 /* HLayoutView.m in Sources */,
+				0BC7BE8A17258331007662C2 /* VLayoutView.m in Sources */,
+				0BC7BE8B17258331007662C2 /* LayoutWidgets.mm in Sources */,
+				0BC7BE8C17258331007662C2 /* OptionsDialogView.mm in Sources */,
+				0BC7BE8D17258331007662C2 /* ScreenWidget.mm in Sources */,
+				0BC7BE8E17258331007662C2 /* StackScreenWidget.mm in Sources */,
+				0BC7BE8F17258331007662C2 /* TabScreenWidget.mm in Sources */,
+				0BC7BE9017258331007662C2 /* MoSyncUISyscalls.mm in Sources */,
+				0BC7BE9117258331007662C2 /* ActivityIndicatorWidget.mm in Sources */,
+				0BC7BE9217258331007662C2 /* ButtonWidget.mm in Sources */,
+				0BC7BE9317258331007662C2 /* CameraPreviewWidget.mm in Sources */,
+				0BC7BE9417258331007662C2 /* CheckBoxWidget.mm in Sources */,
+				0BC7BE9517258331007662C2 /* DatePickerWidget.mm in Sources */,
+				0BC7BE9617258331007662C2 /* EditBoxWidget.mm in Sources */,
+				0BC7BE9717258331007662C2 /* GLViewWidget.mm in Sources */,
+				0BC7BE9817258331007662C2 /* ImageButtonWidget.mm in Sources */,
+				0BC7BE9917258331007662C2 /* ImageWidget.mm in Sources */,
+				0BC7BE9A17258331007662C2 /* LabelWidget.mm in Sources */,
+				0BC7BE9B17258331007662C2 /* ListViewItemWidget.mm in Sources */,
+				0BC7BE9C17258331007662C2 /* ListViewWidget.mm in Sources */,
+				0BC7BE9D17258331007662C2 /* ModalDialogWidget.mm in Sources */,
+				0BC7BE9E17258331007662C2 /* NavBarWidget.mm in Sources */,
+				0BC7BE9F17258331007662C2 /* NumberPickerWIdget.mm in Sources */,
+				0BC7BEA017258331007662C2 /* ProgressBarWidget.mm in Sources */,
+				0BC7BEA117258331007662C2 /* ReflectionWidget.mm in Sources */,
+				0BC7BEA217258331007662C2 /* RelativeLayoutWidget.mm in Sources */,
+				0BC7BEA317258331007662C2 /* SearchBarWidget.mm in Sources */,
+				0BC7BEA417258331007662C2 /* SliderWidget.mm in Sources */,
+				0BC7BEA517258331007662C2 /* TimePickerWidget.mm in Sources */,
+				0BC7BEA617258331007662C2 /* VideoViewWidget.mm in Sources */,
+				0BC7BEA717258331007662C2 /* WebViewWidget.mm in Sources */,
+				0BC7BEA817258331007662C2 /* NSDataExpanded.mm in Sources */,
+				0BC7BEA917258331007662C2 /* NSObjectExpanded.m in Sources */,
+				0BC7BEAA17258331007662C2 /* NSStringExpanded.mm in Sources */,
+				0BC7BEAB17258331007662C2 /* UIColorExpanded.mm in Sources */,
+				0BC7BEAC17258331007662C2 /* iphone_helpers.mm in Sources */,
+				0BC7BEAD17258331007662C2 /* CMGlyphDrawing.mm in Sources */,
+				0BC7BEAE17258331007662C2 /* Ads.mm in Sources */,
+				0BC7BEAF17258331007662C2 /* BannerWidget.mm in Sources */,
+				0BC7BEB017258331007662C2 /* AudioData.mm in Sources */,
+				0BC7BEB117258331007662C2 /* AudioInstance.mm in Sources */,
+				0BC7BEB217258331007662C2 /* AudioInstanceDynamic.mm in Sources */,
+				0BC7BEB317258331007662C2 /* AudioInstanceURL.mm in Sources */,
+				0BC7BEB417258331007662C2 /* AudioSyscall.mm in Sources */,
+				0BC7BEB517258331007662C2 /* MoSyncPanic.mm in Sources */,
+				0BC7BEB617258331007662C2 /* CameraConfirgurator.mm in Sources */,
+				0BC7BEB717258331007662C2 /* Capture.mm in Sources */,
+				0BC7BEB817258331007662C2 /* MoSyncLocation.mm in Sources */,
+				0BC7BEB917258331007662C2 /* NotificationManager.mm in Sources */,
+				0BC7BEBA17258331007662C2 /* PushNotification.mm in Sources */,
+				0BC7BEBB17258331007662C2 /* MoSyncGLView.mm in Sources */,
+				0BC7BEBC17258331007662C2 /* PimDatabase.mm in Sources */,
+				0BC7BEBD17258331007662C2 /* PimFieldItem.mm in Sources */,
+				0BC7BEBE17258331007662C2 /* PimFieldItemValue.mm in Sources */,
+				0BC7BEBF17258331007662C2 /* PimItem.mm in Sources */,
+				0BC7BEC017258331007662C2 /* PimList.mm in Sources */,
+				0BC7BEC117258331007662C2 /* PimSyscall.mm in Sources */,
+				0BC7BEC217258331007662C2 /* PimUtil.mm in Sources */,
+				0BC7BEC317258331007662C2 /* PimContactItem.m in Sources */,
+				0BC7BEC417258331007662C2 /* PimContactsList.m in Sources */,
+				0BC7BEC517258331007662C2 /* PurchaseManager.mm in Sources */,
+				0BC7BEC617258331007662C2 /* PurchaseProduct.mm in Sources */,
+				0BC7BEC717258331007662C2 /* Reachability.m in Sources */,
+				0BC7BEC817258331007662C2 /* MoSyncSensor.mm in Sources */,
+				0BC7BEC917258331007662C2 /* ImagePickerController.mm in Sources */,
+				0BC7BECA17258331007662C2 /* ScreenWidgetController.mm in Sources */,
+				0BC7BECB17258331007662C2 /* TouchHelper.mm in Sources */,
+				0BC7BECC17258331007662C2 /* HorizontalLayoutWidget.mm in Sources */,
+				0BC7BECD17258331007662C2 /* VerticalLayoutWidget.mm in Sources */,
+				0BC7BECE17258331007662C2 /* UINavigationControllerExpanded.mm in Sources */,
+				0BC7BECF17258331007662C2 /* ListViewSectionWidget.mm in Sources */,
+				0BC7BED017258331007662C2 /* ToggleButtonWidget.mm in Sources */,
+				0BC7BED117258331007662C2 /* MapAnnotation.m in Sources */,
+				0BC7BED217258331007662C2 /* MapPinWidget.mm in Sources */,
+				0BC7BED317258331007662C2 /* MapWidget.mm in Sources */,
+				0BC7BED417258331007662C2 /* WidgetUtils.mm in Sources */,
+				0BC7BED517258331007662C2 /* StackScreenWidgetController.mm in Sources */,
+				0BC7BED617258331007662C2 /* TabScreenWidgetController.mm in Sources */,
+				0BC7BED717258331007662C2 /* ScreenOrientation.mm in Sources */,
+				0BC7BED817258331007662C2 /* MoSyncCamera.mm in Sources */,
+				0BC7BED917258331007662C2 /* CameraPreviewEventHandler.mm in Sources */,
+				0BC7BEDA17258331007662C2 /* MoSyncSound.mm in Sources */,
+				0BC7BEDB17258331007662C2 /* MoSyncPurchase.mm in Sources */,
+				0BC7BEDC17258331007662C2 /* MoSyncCapture.mm in Sources */,
+				0BC7BEDD17258331007662C2 /* MoSyncMisc.mm in Sources */,
+				0BC7BEDE17258331007662C2 /* MoSyncNotification.mm in Sources */,
+				0BC7BEDF17258331007662C2 /* MoSyncOrientation.mm in Sources */,
+				0BC7BEE017258331007662C2 /* MoSyncOpenGL.mm in Sources */,
+				0BC7BEE117258331007662C2 /* MoSyncGraphics.mm in Sources */,
+				0BC7BEE217258331007662C2 /* MoSyncFonts.mm in Sources */,
+				0BC7BEE317258331007662C2 /* MoSyncUIUtils.mm in Sources */,
+				0BC7BEE417258331007662C2 /* MoSyncUIAlertView.mm in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		1D60588E0D05DD3D006BFB54 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -2178,6 +2753,49 @@
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
+		0BC7BEF617258331007662C2 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREFIX_HEADER = MoSync_Prefix.pch;
+				GCC_VERSION = com.apple.compilers.llvmgcc42;
+				OTHER_CPLUSPLUSFLAGS = (
+					"$(OTHER_CFLAGS)",
+					"-D__MS_XCODE__",
+					"-DHAVE_IOCTL_ELLIPSIS",
+					"-DMOSYNC_NATIVE",
+					"-D__IOS__",
+				);
+				PREBINDING = NO;
+				PRODUCT_NAME = "MoSyncLib copy";
+			};
+			name = Debug;
+		};
+		0BC7BEF717258331007662C2 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_PREFIX_HEADER = MoSync_Prefix.pch;
+				GCC_VERSION = com.apple.compilers.llvmgcc42;
+				OTHER_CPLUSPLUSFLAGS = (
+					"$(OTHER_CFLAGS)",
+					"-D__MS_XCODE__",
+					"-DHAVE_IOCTL_ELLIPSIS",
+					"-DMOSYNC_NATIVE",
+					"-D__IOS__",
+				);
+				PREBINDING = NO;
+				PRODUCT_NAME = "MoSyncLib copy";
+				ZERO_LINK = NO;
+			};
+			name = Release;
+		};
 		1D6058940D05DD3E006BFB54 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -2346,6 +2964,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		0BC7BEF517258331007662C2 /* Build configuration list for PBXNativeTarget "MoSyncLibNative" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				0BC7BEF617258331007662C2 /* Debug */,
+				0BC7BEF717258331007662C2 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		1D6058960D05DD3E006BFB54 /* Build configuration list for PBXNativeTarget "MoSync" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

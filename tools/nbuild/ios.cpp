@@ -46,7 +46,7 @@ int buildIOSNative(Arguments* params) {
 
 	//Recursively create the output dir
 	string outputDir = require(params, "--dst");
-	unsigned int slashPos = 0;
+	size_t slashPos = 0;
 	do {
 		slashPos = outputDir.find('/', slashPos + 1);
 		_mkdir(outputDir.substr(0,slashPos).c_str());

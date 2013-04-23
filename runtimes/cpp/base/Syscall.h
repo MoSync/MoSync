@@ -163,7 +163,7 @@ namespace Base {
 #define VSV_ARGPTR_USE
 #endif
 
-#ifndef MOSYNC_NATIVE
+#if !(defined(MOSYNC_NATIVE) && defined(ANDROID))
 		int GetValidatedStackValue(int offset VSV_ARGPTR_DECL);
 #endif
 
