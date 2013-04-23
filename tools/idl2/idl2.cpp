@@ -37,6 +37,9 @@ static vector<string> readExtensions(const char* filename);
 static void outputMaapi(const vector<string>& ixs, const Interface& maapi);
 static void outputMaapiJavascript(const vector<string>& ixs, const Interface& maapi);
 static void outputMaapiCSharp(const vector<string>& ixs, const Interface& maapi);
+static void outputMaapiCSharpWP8(const vector<string>& ixs, const Interface& maapi);
+static void outputManagedCppCode(const vector<string>& ixs, const Interface& maapi);
+static void outputPartialMachineFileCSharp(const vector<string>& ixs, const Interface& maapi);
 static void outputRuntimeBuilderFiles(const Interface& maapi);
 static void outputCpp(const Interface& maapi);
 static void outputAsmConfigLst(const Interface& maapi);
@@ -133,7 +136,9 @@ int main() {
 		outputMaapi(ixs, maapi);
 		outputMaapiJavascript(ixs, maapi);
 		outputMaapiCSharp(ixs, maapi);
-
+		outputMaapiCSharpWP8(ixs, maapi);
+		outputManagedCppCode(ixs, maapi);
+		outputPartialMachineFileCSharp(ixs, maapi);
 		// Generate files used when building the runtimes.
 		outputRuntimeBuilderFiles(maapi);
 
@@ -180,6 +185,10 @@ int main() {
 
 		// Copy windows phone file.
 		copy("Output/maapi.cs", "../../runtimes/csharp/windowsphone/mosync/mosyncRuntime/Source/");
+		copy("Output/maapiWP8.cs", "../../runtimes/csharp/windowsphone/mosync/mosyncRuntime/Source/");
+		copy("Output/MosyncMachineGeneratedCode.cs", "../../runtimes/csharp/windowsphone/mosync/mosyncRuntime/Source/");
+		copy("Output/MosyncLibraryGlueCode.h", "../../runtimes/csharp/windowsphone/mosync/MoSyncLibrary/");
+		copy("Output/MosyncLibraryGlueCode.cpp", "../../runtimes/csharp/windowsphone/mosync/MoSyncLibrary/");
 
 		copy("Output/cpp_defs.h", "../../intlibs/helpers/");
 		copy("Output/cpp_maapi.h", "../../intlibs/helpers/");
@@ -416,6 +425,7 @@ static void outputMaapiCSharp(const vector<string>& ixs, const Interface& maapi)
 	ofstream maapiFile("Output/maapi.cs");
 
 	maapiFile << "using System;\n";
+	maapiFile << "#if !LIB\n";
 	maapiFile << "namespace MoSync {\n";
 
 	// generate struct offsets
@@ -706,6 +716,324 @@ static void outputMaapiCSharp(const vector<string>& ixs, const Interface& maapi)
 	};
 
 	maapiFile << "} // namespace MoSync\n";
+	maapiFile << "#endif";
+}
+
+static void outputMaapiCSharpWP8(const vector<string>& ixs, const Interface& maapi) {
+	ofstream maapiFile("Output/maapiWP8.cs");
+
+	maapiFile << "using System;\n";
+	maapiFile << "using MosyncLibrary;\n";
+	maapiFile << "namespace MoSync {\n";
+
+	// generate struct offsets
+	maapiFile << "namespace Struct {\n";
+	for(size_t i=0; i<maapi.structs.size(); i++) {
+		const Struct& s(maapi.structs[i]);
+		if(isAnonStructName(s.name))
+			continue;
+		maapiFile << "\tpublic class "<<s.name<<" {\n";
+		streamCSharpOffsets(maapiFile, maapi, s, 0, 2);
+		maapiFile << "\t}\n";
+	}
+	maapiFile << "}\n\n";
+
+	// generate constant table.
+	maapiFile << "public class Constants {\n";
+	streamCSharpConstants(maapiFile, maapi);
+	maapiFile << "}\n\n";
+
+	// generate syscall delegate declarations
+	maapiFile << "public class Syscalls {\n";
+	streamCSharpFunctionDelegatesWP8(maapiFile, maapi);
+	maapiFile << "}\n\n";
+
+	// generate ioctl delegate declarations
+	const vector<Ioctl>& ioctls = maapi.ioctls;
+
+	maapiFile << "public class Ioctls {\n";
+	for(size_t i=0; i<ioctls.size(); i++) {
+		const Ioctl& ioctl(ioctls[i]);
+		for(size_t j=0; j<ioctl.functions.size(); j++) {
+			const IoctlFunction& ifunc(ioctl.functions[j]);
+			const Function& f(ifunc.f);
+			std::string returnType = "long";//getCSharpType(maapi, f.returnType);
+			maapiFile << "\tpublic delegate " << returnType << " Delegate_" << f.name << "(";
+			for(size_t k=0; k<f.args.size(); k++) {
+				const Argument& a(f.args[k]);
+				if(k != 0)
+					maapiFile << ", ";
+
+				std::string argType = getCSharpType(maapi, a.type, a.in);
+				maapiFile << argType << " _" << a.name;
+			}
+			maapiFile << ");\n";
+			maapiFile << "\tpublic Delegate_" << f.name << " " << f.name << " = null;\n";
+		}
+	}
+	maapiFile << "}\n\n";
+
+// generate CoreNativeBase
+	// CoreNative should implement this.
+	maapiFile << "public class CoreNativeSyscallInvoker\n";
+	maapiFile << "{\n";
+	maapiFile << "\tprotected CoreNative mCore;\n";
+	maapiFile << "\tprotected Syscalls mSyscalls;\n";
+	maapiFile << "\tpublic CoreNativeSyscallInvoker(CoreNative core, Syscalls syscalls)\n";
+	maapiFile << "\t{\n";
+	maapiFile << "\t\tmCore = core;\n";
+	maapiFile << "\t\tmSyscalls = syscalls;\n";
+	maapiFile << "\t}\n\n";
+
+	for(size_t j=0; j<maapi.functions.size(); j++) {
+		const Function& f(maapi.functions[j]);
+		std::string returnType = getCSharpType(maapi, f.returnType, true);
+
+		maapiFile << "\tpublic ";
+
+		if(returnType != "noreturn" && returnType != "void") {
+			maapiFile << "int ";
+		} else {
+			maapiFile << "void ";
+		}
+
+		maapiFile << f.name << "(";
+
+		int i = 0;
+		for(size_t k=0; k<f.args.size(); k++) {
+			const Argument& a(f.args[k]);
+			std::string argType = getCSharpType(maapi, a.type, a.in);
+			if(k!=0)
+				maapiFile << ", ";
+			if(argType == "double")
+			{
+				i+=2;
+				if(i > 4)
+					break;
+				maapiFile << "int " << "i" << (i-2) << ", ";
+				maapiFile << "int " << "i" << (i-1);
+			}
+			else
+			{
+				i+=1;
+				if(i > 4)
+					break;
+				maapiFile << "int " << "i" << (i-1);
+			}
+		};
+
+		if(f.name.compare("maIOCtl") == 0 || f.name.compare("maExtensionFunctionInvoke")  == 0)
+		{
+			maapiFile << ", int args";
+		}
+
+		maapiFile << ")\n";
+		maapiFile << "\t{\n";
+
+		maapiFile << "\t\t";
+
+		if(returnType != "noreturn" && returnType != "void") {
+			maapiFile << "return mCore.SetReturnValue(";
+		}
+
+		maapiFile << "mSyscalls." << f.name << "(";
+
+		i = 0;
+		for(size_t k=0; k<f.args.size(); k++) {
+			const Argument& a(f.args[k]);
+			std::string argType = getCSharpType(maapi, a.type, a.in);
+			if(k != 0)
+				maapiFile << ", ";
+			if(argType == "double") {
+				maapiFile << "MoSync.Util.ConvertToDouble(";
+				outputCSharpSyscallNativeArgWP8(maapiFile, i, "mCore.");
+				maapiFile << ", ";
+				i++;
+				outputCSharpSyscallNativeArgWP8(maapiFile, i, "mCore.");
+				i++;
+				maapiFile << ")";
+			}
+			else if(argType == "float") {
+				maapiFile << "MoSync.Util.ConvertToFloat(";
+				outputCSharpSyscallNativeArgWP8(maapiFile, i, "mCore.");
+				i++;
+				maapiFile << ")";
+			} else {
+				outputCSharpSyscallNativeArgWP8(maapiFile, i, "mCore.");
+				i++;
+			}
+		}
+
+		if(f.name.compare("maIOCtl") == 0 || f.name.compare("maExtensionFunctionInvoke")  == 0)
+		{
+			maapiFile << ", args";
+		}
+
+		maapiFile << ")";
+		if(returnType != "noreturn" && returnType != "void") {
+			maapiFile << ")";
+		}
+		maapiFile << ";\n";
+
+		maapiFile << "\t}\n";
+	}
+	maapiFile << "}\n";
+	// end NativeCoreSyscallInvoker
+
+	// generate ioctl invoker
+
+	maapiFile << "public class IoctlInvoker {\n\n";
+	maapiFile << "\tprivate Core mCore;\n";
+	maapiFile << "\tprivate Ioctls mIoctls;\n\n";
+	maapiFile << "\tpublic IoctlInvoker(Core core, Ioctls ioctls) {\n";
+	maapiFile << "\t\tmCore = core;\n";
+	maapiFile << "\t\tmIoctls = ioctls;\n";
+	maapiFile << "\t}\n\n";
+
+	maapiFile << "\tpublic long InvokeIoctl(int id, int a, int b, int c, int args) {\n";
+	maapiFile << "\t\tlong result;\n";
+	maapiFile << "\t\tswitch(id) {\n";
+	for(size_t i=0; i<ioctls.size(); i++) {
+		const Ioctl& ioctl(ioctls[i]);
+		for(size_t j=0; j<ioctl.functions.size(); j++) {
+			const IoctlFunction& ifunc(ioctl.functions[j]);
+			const Function& f(ifunc.f);
+
+			maapiFile << "\t\t\tcase " << f.number << ":\n";
+
+			maapiFile << "\t\t\tif(mIoctls." << f.name << " == null)\n";
+			maapiFile << "\t\t\t\tresult = MoSync.Constants.IOCTL_UNAVAILABLE;\n";
+			maapiFile << "\t\t\telse\n";
+			maapiFile << "\t\t\tresult = mIoctls." << f.name << "(";
+
+			int argindex = 0;
+			for(size_t k=0; k<f.args.size(); k++) {
+				const Argument& a(f.args[k]);
+				std::string argType = getCSharpType(maapi, a.type, a.in);
+				if(k != 0)
+					maapiFile << ", ";
+				outputCSharpIoctlArgTypedWP8(maapiFile, argindex, a, maapi, "mCore.");
+			}
+			maapiFile << ");\n";
+
+			// SYSCALL_LOG
+			if(f.name != "maWriteLog") {
+			maapiFile << "#if SYSCALL_LOG\n";
+			maapiFile << "\t\t\tUtil.Log(\""<<f.name<<"(\"+\n";
+			argindex = 0;
+			for(size_t k=0; k<f.args.size(); k++) {
+				const Argument& a(f.args[k]);
+				maapiFile << "\t\t\t\t";
+				if(k != 0)
+					maapiFile << "\",\"+";
+				outputCSharpIoctlArgTypedWP8(maapiFile, argindex, a, maapi, "mCore.");
+				maapiFile << "+\n";
+			}
+			maapiFile << "\t\t\t\t\"): \"+result+\"\\n\");\n";
+			maapiFile << "#endif\n";
+			}
+			// END LOG
+
+			maapiFile << "\t\treturn result;\n";
+		}
+	}
+	maapiFile << "\t\t}\n";
+	maapiFile << "\t\treturn MoSync.Constants.IOCTL_UNAVAILABLE;\n";
+	maapiFile << "\t}\n";
+	maapiFile << "}\n\n";
+
+	// output struct info as offsets etc.
+	for(size_t i = 0; i < maapi.structs.size(); i++)
+	{
+		const Struct& s(maapi.structs[i]);
+		for(size_t j = 0; j < s.members.size(); j++)
+		{
+			const Member& m(s.members[j]);
+			if(m.pod.size() == 1) // POD
+			{
+
+			}
+			else // Anonymous union
+			{
+			}
+		}
+	};
+
+	maapiFile << "} // namespace MoSync\n";
+}
+
+void outputManagedCppCode(const vector<string>& ixs, const Interface& maapi)
+{
+	ofstream gluecodeHeaderFile("Output/MosyncLibraryGlueCode.h");
+
+	gluecodeHeaderFile << "#pragma once\n";
+
+	gluecodeHeaderFile << "#include <windows.h>\n";
+	gluecodeHeaderFile << "#include <stdio.h>\n";
+	gluecodeHeaderFile << "#include <stdlib.h>\n";
+
+	gluecodeHeaderFile << "namespace MosyncLibrary\n";
+	gluecodeHeaderFile << "{\n";
+	gluecodeHeaderFile << "\tstatic MAEvent *evt = new MAEvent();\n\n";
+
+	streamManagedCppDelegatesWP8(gluecodeHeaderFile, maapi);
+
+	gluecodeHeaderFile << "\n";
+
+	streamManagedCppDelegateInstancesWP8(gluecodeHeaderFile, maapi);
+
+	gluecodeHeaderFile << "\n\tpublic ref class WindowsPhoneRuntimeComponent sealed\n";
+	gluecodeHeaderFile << "\t{\n";
+	gluecodeHeaderFile << "\tpublic:\n";
+	gluecodeHeaderFile << "\t\tWindowsPhoneRuntimeComponent();\n";
+	gluecodeHeaderFile << "\n";
+
+	streamManagedCppDelegatesSettersWP8(gluecodeHeaderFile, maapi);
+
+	gluecodeHeaderFile << "\t\tstatic int RunMain();\n";
+	gluecodeHeaderFile << "\t\tstatic int GetValidEventPointer();\n";
+	gluecodeHeaderFile << "\t};\n";
+	gluecodeHeaderFile << "} //namespace MosyncLibrary";
+
+	gluecodeHeaderFile.close();
+
+	ofstream gluecodeCppFile("Output/MosyncLibraryGlueCode.cpp");
+
+	gluecodeCppFile << "#include <ma.h>\n";
+	gluecodeCppFile << "#include \"MosyncLibraryGlueCode.h\"\n\n";
+
+	gluecodeCppFile << "using namespace MosyncLibrary;\n";
+	gluecodeCppFile << "using namespace Platform;\n\n";
+
+	gluecodeCppFile << "WindowsPhoneRuntimeComponent::WindowsPhoneRuntimeComponent()\n";
+	gluecodeCppFile << "{}\n\n";
+	gluecodeCppFile << "int WindowsPhoneRuntimeComponent::RunMain()\n{\n\treturn MAMain();\n}\n\n";
+	gluecodeCppFile << "int WindowsPhoneRuntimeComponent::GetValidEventPointer()\n{\n\treturn (int)evt;\n}\n\n";
+
+	streamManagedCppDelegatesSettersImplWP8(gluecodeCppFile, maapi);
+
+	streamManagedCppSyscallImplWP8(gluecodeCppFile, maapi);
+
+	gluecodeCppFile.close();
+}
+
+void outputPartialMachineFileCSharp(const vector<string>& ixs, const Interface& maapi)
+{
+	ofstream gluecodeCSharpFile("Output/MosyncMachineGeneratedCode.cs");
+
+	gluecodeCSharpFile << "using MosyncLibrary;\n";
+	gluecodeCSharpFile << "namespace MoSync\n{\n";
+	gluecodeCSharpFile << "\tpublic partial class Machine\n";
+	gluecodeCSharpFile << "\t{\n\tprivate void InitSyscalls(MoSync.Machine mosyncMachine)\n";
+	gluecodeCSharpFile << "\t\t{\n";
+
+	streamCSharpMachinePartialCodeWP8(gluecodeCSharpFile, maapi);
+
+	gluecodeCSharpFile << "\t\t} //InitSyscalls\n";
+	gluecodeCSharpFile << "\t} //public partial class Mochine\n";
+	gluecodeCSharpFile << "} //namespace MoSync";
+
+	gluecodeCSharpFile.close();
 }
 
 /**

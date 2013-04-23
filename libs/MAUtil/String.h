@@ -27,7 +27,12 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "RefCounted.h"
 #include "Vector.h"
+
+#ifndef WINDOWS_PHONE_8_LIB
 #include <ma.h>
+#else
+#include "../MAStd/ma.h"
+#endif
 
 #if 0//ndef MAPIP
 #define HAVE_EMPTY_STRING
@@ -337,7 +342,11 @@ namespace MAUtil {
 			return 11;
 		}
 		inline int transcribe(int t, char* dst) {
+#ifdef WINDOWS_PHONE_8
 			_itoa(t, dst, 10);
+#else
+			itoa(t, dst, 10);
+#endif
 			return strlen(dst);
 		}
 
