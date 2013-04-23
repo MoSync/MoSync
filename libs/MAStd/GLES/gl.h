@@ -3,13 +3,13 @@
 
 /* $Revision: 10601 $ on $Date:: 2010-03-04 22:15:27 -0800 #$ */
 
+#include <ma.h>
+#include <maapi_defs.h>
 #include <IX_OPENGL_ES_MA.h>
 #ifdef NATIVE_GLES
 #undef __gl_h_
 #include <GLES/gl_native.h>
 #else
-#include <ma.h>
-#include <maapi_defs.h>
 #include <IX_OPENGL_ES.h>
 #include <IX_GL1.h>
 #define GL_API
