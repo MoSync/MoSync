@@ -69,7 +69,7 @@ namespace MoSync
                 mUriString.MaxDate = mMaxDate;
                 mUriString.MinDate = mMinDate;
 
-                mDatePicker.PickerPageUri = new Uri(mUriString.UriString, UriKind.Relative);
+				ResetURI();
 
                 // The ValueChanged event handler. This is when the MoSync event is triggered.
                 mDatePicker.ValueChanged += new EventHandler<DateTimeValueChangedEventArgs>(
@@ -108,7 +108,7 @@ namespace MoSync
                         mMaxDate = mMaxDate.AddYears(-1 * (mMaxDate.Year - value));
                         mUriString.MaxDate = mMaxDate;
                         ResetDate();
-                        mDatePicker.PickerPageUri = new Uri(mUriString.UriString, UriKind.Relative);
+						ResetURI();
                     }
                     catch
                     {
@@ -137,7 +137,7 @@ namespace MoSync
                         mMaxDate = mMaxDate.AddMonths(-1 * (mMaxDate.Month - value));
                         mUriString.MaxDate = mMaxDate;
                         ResetDate();
-                        mDatePicker.PickerPageUri = new Uri(mUriString.UriString, UriKind.Relative);
+						ResetURI();
                     }
                     else throw new InvalidPropertyValueException();
                 }
@@ -165,7 +165,7 @@ namespace MoSync
                     mMaxDate = mMaxDate.AddDays(value - mMaxDate.Day);
                     mUriString.MaxDate = mMaxDate;
                     ResetDate();
-                    mDatePicker.PickerPageUri = new Uri(mUriString.UriString, UriKind.Relative);
+					ResetURI();
                 }
                 get
                 {
@@ -187,7 +187,7 @@ namespace MoSync
 
                     mUriString.MinDate = mMinDate;
                     ResetDate();
-                    mDatePicker.PickerPageUri = new Uri(mUriString.UriString, UriKind.Relative);
+					ResetURI();
                 }
                 get
                 {
@@ -211,7 +211,7 @@ namespace MoSync
                         mMinDate = mMinDate.AddMonths(-1 * (mMinDate.Month - value));
                         mUriString.MinDate = mMinDate;
                         ResetDate();
-                        mDatePicker.PickerPageUri = new Uri(mUriString.UriString, UriKind.Relative);
+						ResetURI();
                     }
                     else throw new InvalidPropertyValueException();
                 }
@@ -239,13 +239,20 @@ namespace MoSync
                     mMinDate = mMinDate.AddDays(value - mMinDate.Day);
                     mUriString.MinDate = mMinDate;
                     ResetDate();
-                    mDatePicker.PickerPageUri = new Uri(mUriString.UriString, UriKind.Relative);
+					ResetURI();
                 }
                 get
                 {
                     return mMinDate.Day;
                 }
             }
+
+			private void ResetURI()
+			{
+#if !LIB
+				mDatePicker.PickerPageUri = new Uri(mUriString.UriString, UriKind.Relative);
+#endif
+			}
 
             /**
             * @author: Ciprian Filipas, Gabriela Rata

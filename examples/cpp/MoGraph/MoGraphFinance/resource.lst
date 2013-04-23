@@ -1,0 +1,6 @@
+.res R_BOX_TEXTURE
+.image "resources/Font_0.png"
+
+.res R_BOX_FNT
+.bin
+.include "resources/font.fnt"

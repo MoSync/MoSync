@@ -1,4 +1,8 @@
+#ifndef WINDOWS_PHONE_8_LIB
 #include <maassert.h>
+#else
+#include "../../../MAStd/maassert.h"
+#endif
 
 #define assert(cond) _assert(cond, #cond)
 

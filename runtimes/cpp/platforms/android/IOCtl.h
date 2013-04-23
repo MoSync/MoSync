@@ -16,7 +16,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 */
 
 #include <Syscall.h>
-#include "JNIUtil.h"
+#include "JNIStrConv.h"
 
 namespace Base
 {
@@ -809,7 +809,7 @@ namespace Base
 
 	int _maCameraSnapshot(int formatIndex, MAHandle placeHolder, JNIEnv* jNIEnv, jobject jThis);
 
-	int _maCameraSnapshotAsync(int formatIndex, JNIEnv* jNIEnv, jobject jThis);
+	int _maCameraSnapshotAsync(int dataPlaceholder, int sizeIndex, JNIEnv* jNIEnv, jobject jThis);
 
 	int _maCameraRecord(int flag, JNIEnv* jNIEnv, jobject jThis);
 

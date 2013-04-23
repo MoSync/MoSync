@@ -38,6 +38,11 @@ namespace MoSync
             return mDataMemory.ReadInt32(GetStackPointer() + offset);
         }
 
+        public int ExtractArgs(int address, int offset)
+        {
+            return mDataMemory.ReadInt32(address + offset);
+        }
+
         // will reset the program.
         public virtual void Init()
         {
@@ -45,13 +50,19 @@ namespace MoSync
 
         public virtual void Run()
         {
-
         }
 
+#if !LIB
         public Memory GetDataMemory()
         {
             return mDataMemory;
         }
+#else
+        public SystemMemory GetDataMemory()
+        {
+            return mDataMemory;
+        }
+#endif
 
         public int GetCustomEventDataPointer()
         {
@@ -59,7 +70,11 @@ namespace MoSync
         }
 
         protected Runtime mRuntime = null;
+#if !LIB
         protected Memory mDataMemory;
+#else
+        protected SystemMemory mDataMemory;
+#endif
         protected uint mDataSegmentSize;
         protected uint mDataSegmentMask;
         protected int mCustomEventPointer;
