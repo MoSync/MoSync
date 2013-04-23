@@ -2063,11 +2063,13 @@ namespace Base {
 
 	SYSCALL(longlong, maIOCtl(int function, int a, int b, int c, ...)) {
 		int d;
+		int e;
         bool native = false;
 #ifdef MOSYNC_NATIVE
         va_list ap;
         va_start(ap, c);
         d = va_arg(ap, int);
+        e = va_arg(ap, int);
         va_end(ap);
         native = true;
 #else
