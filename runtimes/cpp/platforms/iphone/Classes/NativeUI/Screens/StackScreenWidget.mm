@@ -212,8 +212,7 @@
         {
             if ([navBarScaleMode isEqualToString:@"scaleAndRepeatXY"])
             {
-                CGFloat screenScale = [[UIScreen mainScreen] scale];
-                imageScale = imageResource->height / (screenScale * 44.0);
+                imageScale = imageResource->height / 44.0;
             }
         }
 
