@@ -84,6 +84,7 @@ int buildIOSNative(Arguments* params) {
 			string archSDKName = (archs[j] == "i386")?"iPhoneSimulator":"iPhoneOS";
 
 			string outputFile = outputDir + string("/userCode") + arch + ".o";
+			sh((string("rm -f ") + outputFile).c_str());
 			oFileList += outputFile + " ";
 
 			ostringstream cmd; //The build command
@@ -112,6 +113,7 @@ int buildIOSNative(Arguments* params) {
 			sh(cmd.str().c_str(), !isVerbose);
 		}
 		ostringstream cmd;
+		sh((string("rm -f ") + outputDir + "/" + finalOutputFileName).c_str());
 		//Combine all architecture files into one universal .o file
 		cmd << "lipo " << oFileList << " -create -output " + outputDir + "/" + finalOutputFileName;
 		sh(cmd.str().c_str(), !isVerbose);

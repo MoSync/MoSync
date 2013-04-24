@@ -34,6 +34,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #ifdef _USE_REBUILDER_
 //#include "rebuild.build.cpp"
 
+bool gNativeMode;
+int gStackPointer;
 int sp;
 unsigned char *mem_ds;
 void *sCustomEventData;

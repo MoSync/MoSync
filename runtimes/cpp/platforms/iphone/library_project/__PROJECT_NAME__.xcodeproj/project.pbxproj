@@ -77,7 +77,7 @@
 		0B0EF4DC171747890041A357 /* userCode.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = userCode.o; sourceTree = "<group>"; };
 		0B0EF4DF171748A40041A357 /* MoSyncLibs.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = MoSyncLibs.a; sourceTree = "<group>"; };
 		0B10E94914065AE600B6DA6B /* MessageUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MessageUI.framework; path = System/Library/Frameworks/MessageUI.framework; sourceTree = SDKROOT; };
-		0B92CFFE1716AFFF002DFDF6 /* __PROJECT_NAME__ copy.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "__PROJECT_NAME__ copy.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		0B92CFFE1716AFFF002DFDF6 /* __PROJECT_NAME__.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = __PROJECT_NAME__.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1D30AB110D05D00D00671497 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		1D3623240D0F684500981E51 /* MoSyncAppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MoSyncAppDelegate.h; sourceTree = "<group>"; };
 		1D3623250D0F684500981E51 /* MoSyncAppDelegate.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MoSyncAppDelegate.mm; sourceTree = "<group>"; };
@@ -199,7 +199,7 @@
 			isa = PBXGroup;
 			children = (
 				85DF24491267586A003A0FF6 /* __PROJECT_NAME__.app */,
-				0B92CFFE1716AFFF002DFDF6 /* __PROJECT_NAME__ copy.app */,
+				0B92CFFE1716AFFF002DFDF6 /* __PROJECT_NAME__.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -296,7 +296,7 @@
 			);
 			name = __PROJECT_NAME__Native;
 			productName = "__PROJECT_NAME_\U0010_";
-			productReference = 0B92CFFE1716AFFF002DFDF6 /* __PROJECT_NAME__ copy.app */;
+			productReference = 0B92CFFE1716AFFF002DFDF6 /* __PROJECT_NAME__.app */;
 			productType = "com.apple.product-type.application";
 		};
 		85F2555511AC155D00EB47EE /* __PROJECT_NAME__ */ = {
@@ -417,7 +417,7 @@
 				);
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CFLAGS = "-DMOSYNC_NATIVE";
-				PRODUCT_NAME = "__PROJECT_NAME__ copy";
+				PRODUCT_NAME = __PROJECT_NAME__;
 			};
 			name = Debug;
 		};
@@ -439,7 +439,7 @@
 				);
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CFLAGS = "-DMOSYNC_NATIVE";
-				PRODUCT_NAME = "__PROJECT_NAME__ copy";
+				PRODUCT_NAME = __PROJECT_NAME__;
 			};
 			name = Release;
 		};
