@@ -44,6 +44,13 @@ namespace NativeUI
 
 	// Forward declaration.
 	class ScreenListener;
+	class NavigationBarButton;
+
+	enum NavBarSide
+	{
+		NAV_BAR_SIDE_RIGHT = 1,
+		NAV_BAR_SIDE_LEFT  = 2,
+	};
 
 	/**
 	 * \brief Class that represents a visible screen.
@@ -220,6 +227,45 @@ namespace NativeUI
 		 * Remove the options menu from this screen.
 		 */
 		virtual void removeOptionsMenu();
+
+        /**
+         * Adds a navigation bar button to a specific side of the navigation bar
+         * Note: This is only available on iOS.
+         * @param side NAV_BAR_SIDE_RIGHT or NAV_BAR_SIDE_LEFT
+         * @param button The navigation bar button to add
+		 * @return Any of the following result codes:
+		 * - #MAW_RES_OK if the button could be added to the screen.
+		 * - #MAW_RES_INVALID_HANDLE if the button handle was invalid.
+		 * - #MAW_RES_ERROR if it could not be added for some other reason.
+         */
+        int addNavBarButton(const NavBarSide side, NavigationBarButton* button);
+
+        /**
+         * Adds a navigation bar button to a specific side of the navigation bar
+         * Note: This is only available on iOS.
+         * @param side NAV_BAR_SIDE_RIGHT or NAV_BAR_SIDE_LEFT
+         * @param button The navigation bar button to add
+         * @param index Index where to insert the button. -1 means add at the end.
+		 * @return Any of the following result codes:
+		 * - #MAW_RES_OK if the button could be added to the screen.
+		 * - #MAW_RES_INVALID_HANDLE if the button handle was invalid.
+		 * - #MAW_RES_ERROR if it could not be added for some other reason.
+         */
+        int insertNavBarButton(const NavBarSide side, NavigationBarButton* button, int index);
+
+        /**
+         * Removes the navigation bar button from a specific side
+         * Note: This is only available on iOS.
+         * @param button The navigation bar button to add
+         */
+        void removeNavBarButton(NavigationBarButton* button);
+
+        /**
+         * Removes all the navigation bar buttons from a specific side
+         * Note: This is only available on iOS.
+         * @param side NAV_BAR_SIDE_RIGHT or NAV_BAR_SIDE_LEFT
+         */
+        void removeNavBarButtons(const NavBarSide side);
 
 		/**
 		 * Check if a screen is shown.

@@ -26,6 +26,7 @@ MA 02110-1301, USA.
 
 #include "Screen.h"
 #include "ScreenListener.h"
+#include "NavigationBarButton.h"
 
 #define BUF_MAX 256
 
@@ -319,6 +320,34 @@ namespace NativeUI
 	{
 		setProperty(MAW_SCREEN_REMOVE_OPTIONS_MENU,"");
 	}
+
+    int Screen::addNavBarButton(const NavBarSide side, NavigationBarButton* button)
+    {
+        return maWidgetScreenInsertNavBarButton(
+                                                side,
+                                                getWidgetHandle(),
+                                                button->getWidgetHandle(),
+                                                -1);
+    }
+
+    int Screen::insertNavBarButton(const NavBarSide side, NavigationBarButton* button, int index)
+    {
+        return maWidgetScreenInsertNavBarButton(
+                                                side,
+                                                getWidgetHandle(),
+                                                button->getWidgetHandle(),
+                                                index);
+    }
+
+    void Screen::removeNavBarButton(NavigationBarButton* button)
+    {
+        setPropertyInt(MAW_SCREEN_REMOVE_NAV_BAR_BUTTON_WIDGET, button->getWidgetHandle());
+    }
+
+    void Screen::removeNavBarButtons(const NavBarSide side)
+    {
+        setPropertyInt(MAW_SCREEN_REMOVE_NAV_BAR_BUTTONS, side);
+    }
 
 	/**
 	 * Check if a screen is shown.

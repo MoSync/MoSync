@@ -42,6 +42,16 @@ MoSyncUI* getMoSyncUI();
 MAWidgetHandle maWidgetCreate(const char *widgetType);
 
 /**
+ * Creates a new widget of the specified type.
+ * @param widgetType A String representing the type of the widget to create.
+ * @param arg An integer parameter passed to the widget's init function.
+ * @return A handle to the widget, or any of the following result codes:
+ * - MAW_RES_ERROR if the widget could not be created.
+ * - MAW_RES_INVALID_TYPE_NAME if the widget type was not available.
+ */
+MAWidgetHandle maWidgetCreateWithInt(const char *widgetType, int arg);
+
+/**
  * Frees the memory and resources held by the given widget. Destryoing a widget
  * with children will also cause its children to be destroyed. Once a handle has
  * been destroyed it cannot be referenced by the maWidget* functions.
@@ -205,5 +215,19 @@ int maWidgetGetProperty(MAWidgetHandle handle, const char *property, char *value
  * @return IOCTL_UNAVAILABLE
  */
 int maWidgetScreenAddOptionsMenuItem(MAWidgetHandle widget, const char * title, const char* iconPath, int iconPredefined);
+
+/**
+ * Adds a navigation bar button to a Screen. This is only visible
+ * when the screen is added to a StackScreen.
+ * @param side Should be either MAW_SCREEN_NAV_BAR_SIDE_RIGHT or MAW_SCREEN_NAV_BAR_SIDE_LEFT
+ * @param screenWidgetHandle A handle to a MAW_SCREEN or a MAW_STACK_SCREEN add the screen to.
+ * @param navBarButtonWidgetHandle A handle to a MAW_NAV_BAR_BUTTON to be added to the screen.
+ * @param index Index where to insert the button. -1 means add at the end.
+ * @return Any of the following result codes:
+ * - MAW_RES_OK if the given button could be added to the screen.
+ * - MAW_RES_INVALID_HANDLE if the screen or navigation bar button does not exist.
+ * - MAW_RES_ERROR if something else than a screen stack was passed.
+ */
+int maWidgetScreenInsertNavBarButton(int side, MAWidgetHandle screenWidgetHandle, MAWidgetHandle navBarButtonWidgetHandle, int index);
 
 #endif // _MOSYNC_UI_SYSCALLS_

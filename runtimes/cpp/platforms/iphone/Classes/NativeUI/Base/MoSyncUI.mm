@@ -224,6 +224,10 @@ static IWidget* sOldScreen = nil;
 }
 
 - (int) createWidget: (NSString*)name {
+    return [self createWidget:name initParam:nil];
+}
+
+- (int) createWidget: (NSString*)name initParam: (NSObject*)param {
 	IWidget *created = nil;
 	NSString* realName = [name stringByAppendingString:@"Widget"];
 	Class widgetClass = NSClassFromString(realName);
@@ -232,7 +236,10 @@ static IWidget* sOldScreen = nil;
     }
 
 	if(widgetClass != nil) {
-		created = [[widgetClass alloc] init];
+        if (param != nil)
+            created = [[widgetClass alloc] initWithObject:param];
+        else
+            created = [[widgetClass alloc] init];
         if(created == nil)
             return MAW_RES_ERROR;
 

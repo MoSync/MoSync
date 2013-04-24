@@ -1,5 +1,6 @@
 typedef int MAWidgetHandle;
 typedef int MAWScreenTransitionType;
+typedef int MAWNavigationBarButtonSide;
 
 /**
 * The set of functions available for the Widget API.
@@ -19,6 +20,21 @@ group WidgetAPIFunctions "Widget functions" {
 	* - #MAW_RES_FEATURE_NOT_AVAILABLE if the widget type is not supported by the curent framework version.
 	*/
 	MAWidgetHandle maWidgetCreate(in MAString widgetType);
+
+	/**
+	* Creates a new widget of the specified type.
+	*
+	* \note See \ref WidgetTypes "Widget types" for the available widget types.
+	*
+	* \param widgetType A String representing the type of the widget to create.
+	* \param argument An integer argument passed along to the initialization function.
+	*
+	* \returns A handle to the widget, or any of the following result codes:
+	* - #MAW_RES_ERROR if the widget could not be created.
+	* - #MAW_RES_INVALID_TYPE_NAME if the widget type was not available.
+	* - #MAW_RES_FEATURE_NOT_AVAILABLE if the widget type is not supported by the curent framework version.
+	*/
+	MAWidgetHandle maWidgetCreateWithInt(in MAString widgetType, in int argument);
 
 	/**
 	* Frees the memory and resources held by the given widget. Destryoing a widget
@@ -234,4 +250,19 @@ group WidgetAPIFunctions "Widget functions" {
 	* - #MAW_RES_INVALID_HANDLE
 	*/
 	int maWidgetScreenAddOptionsMenuItem(in MAWidgetHandle widget, in MAString title, in MAString iconPath, in int iconPredefined);
+
+    /**
+    * Adds a navigation bar button to a Screen. This is only visible
+    * when the screen is added to a StackScreen.
+    * @param side Should be either MAW_SCREEN_NAV_BAR_SIDE_RIGHT or MAW_SCREEN_NAV_BAR_SIDE_LEFT
+    * @param screenWidgetHandle A handle to a MAW_SCREEN or a MAW_STACK_SCREEN add the screen to.
+    * @param navBarButtonWidgetHandle A handle to a MAW_NAV_BAR_BUTTON to be added to the screen.
+    * @param index Index where to insert the button. -1 means add at the end.
+    * @return Any of the following result codes:
+    * - MAW_RES_OK if the given button could be added to the screen.
+    * - MAW_RES_INVALID_HANDLE if the screen or navigation bar button does not exist.
+    * - MAW_RES_ERROR if something else than a screen stack was passed.
+    */
+    int maWidgetScreenInsertNavBarButton(in MAWNavigationBarButtonSide side, in MAWidgetHandle screenWidget, in MAWidgetHandle navBarButtonWidget, in int index);
+
 } // end of group WidgetAPIFunctions

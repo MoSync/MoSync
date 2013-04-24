@@ -18,6 +18,7 @@
 #import <Foundation/Foundation.h>
 #import "IWidget.h"
 #import "ScreenWidgetController.h"
+#import "NavBarButtonWidget.h"
 
 @interface ScreenWidget : IWidget
 {
@@ -108,5 +109,13 @@
  * @return "true" is the screen is shown, "false" otherwise.
  */
 - (NSString*)isShownProperty;
+
+/**
+ * Attaches a navigation bar button to this screen at a specific side of the title
+ * @param side Either MAW_SCREEN_NAV_BAR_SIDE_RIGHT or MAW_SCREEN_NAV_BAR_SIDE_LEFT
+ * @param button The NavBarButtonWidget to add
+ * @param index At what index to insert the button, starting from the edge of the screen
+ */
+- (void)attachNavBarButton:(int)side navBarButtonWidget:(NavBarButtonWidget*)button atIndex:(int)index;
 
 @end

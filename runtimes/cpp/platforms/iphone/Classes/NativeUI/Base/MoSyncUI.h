@@ -38,6 +38,9 @@
 // returns increasing handles beginning at 0
 - (int)createWidget: (NSString*)name;
 
+// returns increasing handles beginning at 0
+- (int)createWidget: (NSString*)name initParam: (NSObject*)param;
+
 // get a pointer to a widget instance by passing a handle.
 - (IWidget*)getWidget: (int) handle;
 

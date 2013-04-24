@@ -147,11 +147,67 @@
 		Surface* imageResource = Base::gSyscall->resources.get_RT_IMAGE(imageHandle);
 		[_controller.tabBarItem setImage:[UIImage imageWithCGImage:imageResource->image]];
 	}
+    else if([key isEqualToString:@MAW_SCREEN_REMOVE_NAV_BAR_BUTTON_WIDGET])
+    {
+        MoSyncUI* mosyncUI = getMoSyncUI();
+        MAHandle navBarButtonHandle = [value intValue];
+        IWidget* navBarButtonWidget = [mosyncUI getWidget:navBarButtonHandle];
+        if (!navBarButtonWidget) return MAW_RES_INVALID_HANDLE;
+        if ([navBarButtonWidget class] != [NavBarButtonWidget class]) return MAW_RES_ERROR;
+
+        NavBarButtonWidget* navBarButton = (NavBarButtonWidget*)navBarButtonWidget;
+        UINavigationController* navigationController = (UINavigationController*)[self getController];
+        UINavigationItem* navigationItem = navigationController.navigationItem;
+
+        NSMutableArray* newButtonArrayR = [navigationItem.rightBarButtonItems mutableCopy];
+        [newButtonArrayR removeObject:navBarButton.barButtonItem];
+        [navigationItem setRightBarButtonItems:newButtonArrayR];
+
+        NSMutableArray* newButtonArrayL = [navigationItem.leftBarButtonItems mutableCopy];
+        [newButtonArrayL removeObject:navBarButton.barButtonItem];
+        [navigationItem setLeftBarButtonItems:newButtonArrayL];
+    }
+    else if([key isEqualToString:@MAW_SCREEN_REMOVE_NAV_BAR_BUTTONS])
+    {
+        UINavigationController* navigationController = (UINavigationController*)[self getController];
+        if ([value intValue] == MAW_SCREEN_NAV_BAR_SIDE_RIGHT)
+        {
+            [navigationController.navigationItem setRightBarButtonItems:[[NSArray alloc] init]];
+        }
+        else if ([value intValue] == MAW_SCREEN_NAV_BAR_SIDE_LEFT)
+        {
+            [navigationController.navigationItem setLeftBarButtonItems:[[NSArray alloc] init]];
+        }
+    }
 	else
     {
 		return [super setPropertyWithKey:key toValue:value];
 	}
 	return MAW_RES_OK;
+}
+
+- (void)attachNavBarButton:(int)side navBarButtonWidget:(NavBarButtonWidget*)button atIndex:(int)index
+{
+    UIBarButtonItem* buttonItem = button.barButtonItem;
+
+    UINavigationController* navigationController = (UINavigationController*)[self getController];
+    NSMutableArray* buttons;
+    if (side == MAW_SCREEN_NAV_BAR_SIDE_RIGHT)
+        buttons = [navigationController.navigationItem.rightBarButtonItems mutableCopy];
+    else
+        buttons = [navigationController.navigationItem.leftBarButtonItems mutableCopy];
+
+    if (!buttons) buttons = [[NSMutableArray alloc] init];
+
+    if (index < 0 || index >= [buttons count])
+        [buttons addObject:buttonItem];
+    else
+        [buttons insertObject:buttonItem atIndex:index];
+
+    if (side == MAW_SCREEN_NAV_BAR_SIDE_RIGHT)
+        [navigationController.navigationItem setRightBarButtonItems:buttons];
+    else
+        [navigationController.navigationItem setLeftBarButtonItems:buttons];
 }
 
 /**

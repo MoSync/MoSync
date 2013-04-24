@@ -64,5 +64,45 @@ group WidgetScreenProperties "Screen" {
 		* \endcode
 		*/
 		IS_SHOWN = "isShown";
+
+        /**
+        * @brief Remove all the navigation bars on a specific side.
+        *
+        * @validvalue A widget handle to a navigation bar button widget.
+        *
+        * @setonly
+        *
+        * @par Example
+        * \code
+        *   maWidgetSetProperty(screenHandle, REMOVE_NAV_BAR_BUTTON_WIDGET, navBarButtonWidgetHandle);
+        * \endcode
+        */
+        REMOVE_NAV_BAR_BUTTON_WIDGET = "removeNavBarButtonWidget";
+
+        /**
+        * @brief Remove all the navigation bars on a specific side.
+        *
+        * @validvalue MAW_SCREEN_NAV_BAR_SIDE_RIGHT or MAW_SCREEN_NAV_BAR_SIDE_RIGHT depending on the side to clear
+        *
+        * @setonly
+        *
+        * @par Example
+        * \code
+        *   maWidgetSetProperty(screenHandle, MAW_SCREEN_REMOVE_NAV_BAR_BUTTONS, MAW_SCREEN_NAV_BAR_SIDE_RIGHT);
+        * \endcode
+        */
+        REMOVE_NAV_BAR_BUTTONS = "removeNavBarButtons";
 	}
+
+    constset int MAW_SCREEN_NAV_BAR_ {
+		/**
+		* @brief Represents the right side of the title in the navigation bar.
+		*/
+        SIDE_RIGHT = 1;
+
+		/**
+		* @brief Represents the left side of the title in the navigation bar.
+		*/
+        SIDE_LEFT  = 2;
+    }
 } // end of WidgetScreenProperties

@@ -55,6 +55,19 @@ namespace NativeUI
         mWidgetManager->registerWidget(mWidgetHandle, this);
     }
 
+    Widget::Widget(const MAUtil::String& widgetType, int argument) :
+        mWidgetManager(WidgetManager::getInstance()),
+        mLastError(LastError()),
+        mData(NULL)
+    {
+        mWidgetHandle = maWidgetCreateWithInt(widgetType.c_str(), argument);
+        if ( mWidgetHandle == MAW_RES_INVALID_TYPE_NAME )
+        {
+            setLastErrorCode(mWidgetHandle, "maWidgetCreateWithInt");
+        }
+        mWidgetManager->registerWidget(mWidgetHandle, this);
+    }
+
     /**
      * Destructor.
      */

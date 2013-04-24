@@ -61,6 +61,7 @@ MA 02110-1301, USA.
 #include "Map.h"
 #include "MapListener.h"
 #include "NavigationBar.h"
+#include "NavigationBarButton.h"
 #include "NavigationBarListener.h"
 #include "NumberPicker.h"
 #include "NumberPickerListener.h"

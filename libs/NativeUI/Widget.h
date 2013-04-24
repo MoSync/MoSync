@@ -525,6 +525,15 @@ namespace NativeUI
         Widget(const MAUtil::String& widgetType);
 
         /**
+         * Constructor is protected because actual widget instances
+         * should be subclasses of this class.
+         * @widgetType The string constant that identifies the widget type
+         * (one of the MAW_ constants).
+         * @argument An integer argument to be passed to the widget initialization
+         */
+        Widget(const MAUtil::String& widgetType, int argument);
+
+        /**
          * Save the last error information.
          * @param errCode The error code.
          * @param cause The method/property that caused the error.

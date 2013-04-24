@@ -317,6 +317,8 @@
 		43F3706615B476940095B3C6 /* TouchHelper.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43F3706415B476910095B3C6 /* TouchHelper.mm */; };
 		43F3706715B476940095B3C6 /* TouchHelper.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43F3706415B476910095B3C6 /* TouchHelper.mm */; };
 		43F9CBBB14C4198400DE2285 /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 43F9CBB914C4197400DE2285 /* MobileCoreServices.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
+		74126EFB1725BEB400FA5697 /* NavBarButtonWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 74126EFA1725BEB400FA5697 /* NavBarButtonWidget.mm */; };
+		74DBC3501727E368000D7533 /* NavBarButtonWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 74126EFA1725BEB400FA5697 /* NavBarButtonWidget.mm */; };
 		8509432A1185AF87004A3B2D /* SyscallImpl.mm in Sources */ = {isa = PBXBuildFile; fileRef = 850943291185AF87004A3B2D /* SyscallImpl.mm */; };
 		850943891185B35D004A3B2D /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 850943881185B35D004A3B2D /* AVFoundation.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		850944011185C440004A3B2D /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 850944001185C440004A3B2D /* CoreLocation.framework */; };
@@ -686,6 +688,8 @@
 		43F3706315B476900095B3C6 /* TouchHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TouchHelper.h; sourceTree = "<group>"; };
 		43F3706415B476910095B3C6 /* TouchHelper.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = TouchHelper.mm; sourceTree = "<group>"; };
 		43F9CBB914C4197400DE2285 /* MobileCoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MobileCoreServices.framework; path = System/Library/Frameworks/MobileCoreServices.framework; sourceTree = SDKROOT; };
+		74126EF91725BEB400FA5697 /* NavBarButtonWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NavBarButtonWidget.h; path = NativeUI/Widgets/NavBarButtonWidget.h; sourceTree = "<group>"; };
+		74126EFA1725BEB400FA5697 /* NavBarButtonWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = NavBarButtonWidget.mm; path = NativeUI/Widgets/NavBarButtonWidget.mm; sourceTree = "<group>"; };
 		850943291185AF87004A3B2D /* SyscallImpl.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = SyscallImpl.mm; path = impl/SyscallImpl.mm; sourceTree = "<group>"; };
 		850943881185B35D004A3B2D /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		850944001185C440004A3B2D /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = System/Library/Frameworks/CoreLocation.framework; sourceTree = SDKROOT; };
@@ -1156,6 +1160,8 @@
 				43C48354164178C0008F9A39 /* MapWidget.mm */,
 				43F36F4115B45D5B0095B3C6 /* ModalDialogWidget.h */,
 				43F36F4215B45D5B0095B3C6 /* ModalDialogWidget.mm */,
+				74126EF91725BEB400FA5697 /* NavBarButtonWidget.h */,
+				74126EFA1725BEB400FA5697 /* NavBarButtonWidget.mm */,
 				43F36F4315B45D5B0095B3C6 /* NavBarWidget.h */,
 				43F36F4415B45D5B0095B3C6 /* NavBarWidget.mm */,
 				43F36F4515B45D5B0095B3C6 /* NumberPickerWIdget.h */,
@@ -2009,6 +2015,7 @@
 				D99A5A2416C2BDBC000C6649 /* MoSyncFonts.mm in Sources */,
 				D962D8D016C914D100B566B1 /* MoSyncUIUtils.mm in Sources */,
 				8BB4799216FAFA390068D6BB /* MoSyncUIAlertView.mm in Sources */,
+				74126EFB1725BEB400FA5697 /* NavBarButtonWidget.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2016,6 +2023,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				74DBC3501727E368000D7533 /* NavBarButtonWidget.mm in Sources */,
 				D99A59E816C1CD49000C6649 /* MoSyncSensorBridge.mm in Sources */,
 				D99A59E016C1B1F9000C6649 /* MoSyncAds.mm in Sources */,
 				858B44BB12E7B1060058DBFC /* log.cpp in Sources */,

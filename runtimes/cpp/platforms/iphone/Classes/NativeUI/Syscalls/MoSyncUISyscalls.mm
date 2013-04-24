@@ -28,6 +28,7 @@
 #import "OptionsDialogView.h"
 #import "VerticalLayoutWidget.h"
 #import "HorizontalLayoutWidget.h"
+#import "NavBarButtonWidget.h"
 
 MoSyncUI* mosyncUI;
 
@@ -72,6 +73,32 @@ MAWidgetHandle maWidgetCreate(const char *widgetType) {
 							waitUntilDone:YES
 						   andReturnValue:&returnValue];
     [arguments release];
+    [widgetTypeString release];
+
+	return returnValue;
+}
+
+MAWidgetHandle maWidgetCreateWithInt(const char *widgetType, int arg) {
+    if (widgetType == NULL)
+        return MAW_RES_INVALID_TYPE_NAME;
+
+    NSString* widgetTypeString = stringFromChar(widgetType);
+    NSNumber* number = [[NSNumber alloc] initWithInt:arg];
+
+	__block int returnValue;
+    dispatch_queue_t mainQueue = dispatch_get_main_queue();
+    if (mainQueue == dispatch_get_current_queue())
+    {
+        returnValue = [mosyncUI createWidget:widgetTypeString initParam:number];
+    }
+    else
+    {
+        dispatch_sync(mainQueue, ^
+            {
+                returnValue = [mosyncUI createWidget:widgetTypeString initParam:number];
+            });
+    }
+    [number release];
     [widgetTypeString release];
 
 	return returnValue;
@@ -510,4 +537,31 @@ int maWidgetScreenAddOptionsMenuItem(MAWidgetHandle widget, const char * title,
                                      const char* iconHandle, int iconPredefined)
 {
     return IOCTL_UNAVAILABLE;
+}
+
+int maWidgetScreenInsertNavBarButton(int side, MAWidgetHandle screenWidgetHandle, MAWidgetHandle navBarButtonWidgetHandle, int index)
+{
+    IWidget* widget = [mosyncUI getWidget:screenWidgetHandle];
+    if(!widget) return MAW_RES_INVALID_HANDLE;
+    if ([widget class] != [ScreenWidget class] && [widget class] != [StackScreenWidget class]) return MAW_RES_ERROR;
+    ScreenWidget* screen = (ScreenWidget*)widget;
+
+    widget = [mosyncUI getWidget:navBarButtonWidgetHandle];
+    if(!widget) return MAW_RES_INVALID_HANDLE;
+    if ([widget class] != [NavBarButtonWidget class]) return MAW_RES_ERROR;
+    NavBarButtonWidget* button = (NavBarButtonWidget*)widget;
+
+    dispatch_queue_t mainQueue = dispatch_get_main_queue();
+    if (mainQueue == dispatch_get_current_queue())
+    {
+        [screen attachNavBarButton:side navBarButtonWidget:button atIndex:index];
+    }
+    else
+    {
+        dispatch_async(mainQueue, ^
+            {
+                [screen attachNavBarButton:side navBarButtonWidget:button atIndex:index];
+            });
+    }
+    return MAW_RES_OK;
 }

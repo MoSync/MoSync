@@ -101,6 +101,11 @@ group WidgetTypes "Widget types" {
 		NAV_BAR = "NavBar";
 
 		/**
+		 * @brief A nav bar button is an iphone specific widget that is a button that can be either text or a system icon that is attached to a screen and shown when the screen is attached to a Stack Screen.
+		 */
+		NAV_BAR_BUTTON = "NavBarButton";
+
+		/**
 		 * @brief A GL view is a widget that is used to display graphics rendered by the GPU using OpenGL|ES 1.0/1.1 calls. See \ref WidgetGLViewProperties "GL view properties" for the properties available.
 		 */
 		GL_VIEW = "GLView";
