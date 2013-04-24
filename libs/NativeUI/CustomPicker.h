@@ -97,7 +97,7 @@ namespace NativeUI
 		 * Set the custom picker items row height.
 		 * All its items should have the same height.
 		 * Calling this method will reload all its items.
-		 * Default value it's the height of the widget.
+		 * Default value is the height of the widget.
 		 * Platform: iOS and Android.
 		 * @param height Height in pixels.
 		 */
@@ -106,7 +106,7 @@ namespace NativeUI
 		/**
 		 * Get the custom picker items row height.
 		 * All its items have the same height.
-		 * Default value it's the height of the widget.
+		 * Default value is the height of the widget.
 		 * Platform: iOS and Android.
 		 * @return height in pixels.
 		 */
@@ -116,7 +116,7 @@ namespace NativeUI
 		 * Set the custom picker items row width.
 		 * All its items should have the same width.
 		 * Calling this method will reload all its items.
-		 * Default value it's the width of the widget.
+		 * Default value is the width of the widget.
 		 * Platform: iOS and Android.
 		 * @param width Width in pixels.
 		 */
@@ -125,7 +125,7 @@ namespace NativeUI
 		/**
 		 * Get the custom picker items row width.
 		 * All its items have the same width.
-		 * Default value it's the width of the widget.
+		 * Default value is the width of the widget.
 		 * Platform: iOS and Android.
 		 * @return width in pixels.
 		 */
@@ -162,6 +162,7 @@ namespace NativeUI
 		/**
 		 * Select an item by index.
 		 * @param index Index of the item. First child has index zero.
+		 * Platform: Android and iOS.
 		 */
 		void setSelectedItemIndex(const int index);
 
@@ -170,6 +171,7 @@ namespace NativeUI
 		 * @return A zero-indexed number identifying the selected item.
 		 * If the widget has no children, #MAW_RES_ERROR will be returned.
 		 * If there is nothing selected, -1 will be returned.
+		 * Platform: Android and iOS.
 		 */
 		int getSelectedItemIndex();
 

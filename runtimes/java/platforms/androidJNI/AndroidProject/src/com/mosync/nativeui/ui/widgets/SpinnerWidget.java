@@ -232,7 +232,7 @@ public class SpinnerWidget extends Layout implements OnItemSelectedListener
 		if( property.equals(IX_WIDGET.MAW_CUSTOM_PICKER_SELECTED_ITEM_INDEX) )
 		{
 			int selectIndex = IntConverter.convertPositiveNumber(value);
-			if ( selectIndex > m_children.size())
+			if ( selectIndex > m_children.size()-1)
 				throw new InvalidPropertyValueException(property, value);
 			spinner.setSelection( selectIndex );
 		}
@@ -249,7 +249,7 @@ public class SpinnerWidget extends Layout implements OnItemSelectedListener
 					createNativeLayoutParams( child.getLayoutParams( ) );
 
 				AbsListView.LayoutParams layoutParams =
-						new AbsListView.LayoutParams(nativeLayoutParams.width, IntConverter.convert(value));
+						new AbsListView.LayoutParams(nativeLayoutParams.width, mItemHeight);
 
 				child.getView().setLayoutParams(layoutParams);
 			}
@@ -265,10 +265,10 @@ public class SpinnerWidget extends Layout implements OnItemSelectedListener
 				ViewGroup.LayoutParams nativeLayoutParams =
 					createNativeLayoutParams( child.getLayoutParams( ) );
 
-			AbsListView.LayoutParams layoutParams =
-					new AbsListView.LayoutParams(IntConverter.convert(value), nativeLayoutParams.height);
+				AbsListView.LayoutParams layoutParams =
+						new AbsListView.LayoutParams(mItemWidth, nativeLayoutParams.height);
 
-			child.getView().setLayoutParams(layoutParams);
+				child.getView().setLayoutParams(layoutParams);
 			}
 		}
 		else
