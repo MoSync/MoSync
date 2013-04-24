@@ -67,6 +67,9 @@ const wchar* Base::Syscall::GetValidatedWStr(int address) {
 }
 
 int Base::Syscall::GetValidatedStackValue(int offset) {
+    if(gNativeMode) {
+        sp = gStackPointer;
+    }
 	int address = sp + offset;
 	//if(((address&0x03)!=0) || uint(address)<STACK_BOTTOM || uint(address)>STACK_TOP)
 	//	BIG_PHAT_ERROR(ERR_STACK_OOB);
@@ -97,6 +100,8 @@ unsigned char* CppInitReadData(const char* file, int fileSize, int mallocSize) {
 	sCustomEventDataPointer = mallocSize-mces;
 	sCustomEventData = &data[sCustomEventDataPointer];
 
+    gNativeMode = false;
+
 	return data;
 }
 
@@ -106,6 +111,8 @@ extern "C" unsigned char* InitCustomEventPointer(int mallocSize) {
 	sCustomEventDataPointer = (int) malloc(mces);
 	sCustomEventData =(void*) sCustomEventDataPointer; //What is the point of this??
     mem_ds = 0; //Basically set msm_ds to behave as the native address space.
+
+    gNativeMode = true;
 
     return 0;
 }
