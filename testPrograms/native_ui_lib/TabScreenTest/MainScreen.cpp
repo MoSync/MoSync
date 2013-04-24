@@ -42,9 +42,11 @@ MainScreen::MainScreen() :
     this->addTab(firstScreen);
 
     Screen* secondScreen = new Screen();
-    secondScreen->setTitle("2nd screen");
     addMainLayout(secondScreen, 0x123456);
     this->addTab(secondScreen);
+    // we set the title after the screen has been added as a
+    // tab screen child to check if the property is being set right
+    secondScreen->setTitle("2nd screen");
 
     this->addTabScreenListener(this);
     this->setActiveTab(1);
