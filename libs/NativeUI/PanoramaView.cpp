@@ -48,9 +48,19 @@ namespace NativeUI
 	 * is displayed behind the child screens.
 	 * @param imageHandle Handle to an image.
 	 */
-	void PanoramaView::SetBackgroundImage(const MAHandle imageHandle)
+	void PanoramaView::setBackgroundImage(const MAHandle imageHandle)
 	{
 		setPropertyInt(MAW_PANORAMA_VIEW_BACKGROUND_IMAGE, imageHandle);
+	}
+
+	/**
+	 * Get the background image of the panorama view.
+	 * @return A value greater than zero representing a MoSync handle to an
+	 * uncompressed image resource, or zero if the property was not set.
+	 */
+	MAHandle PanoramaView::getBackgroundImage()
+	{
+		return getPropertyInt(MAW_PANORAMA_VIEW_BACKGROUND_IMAGE);
 	}
 
 	/**

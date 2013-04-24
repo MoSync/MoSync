@@ -27,6 +27,11 @@
 @interface ImageWidget ()
 
 /**
+ * Used by the MAW_IMAGE_IMAGE property.
+ */
+@property(nonatomic, retain) NSNumber* imageHandle;
+
+/**
  * Used by the MAW_IMAGE_PATH property.
  */
 @property(nonatomic, retain) NSString* imagePath;
@@ -45,6 +50,7 @@
 
 @implementation ImageWidget
 
+@synthesize imageHandle = _imageHandle;
 @synthesize imagePath = _imagePath;
 
 - (id)init
@@ -115,6 +121,7 @@
 			image = [image stretchableImageWithLeftCapWidth:_leftCapWidth topCapHeight:_topCapHeight];
 		}
         _imageView.image = image;
+		self.imageHandle = [NSNumber numberWithInt:imageHandle];
 		self.imagePath = @"";
 		[self layout];
 	}
@@ -173,7 +180,11 @@
  */
 - (NSString*)getPropertyWithKey:(NSString*)key
 {
-	if ([key isEqualToString:@MAW_IMAGE_PATH])
+	if ([key isEqualToString:@MAW_IMAGE_IMAGE])
+	{
+		return [[self.imageHandle stringValue] retain];
+	}
+	else if ([key isEqualToString:@MAW_IMAGE_PATH])
 	{
 		return [self.imagePath retain];
 	}
@@ -199,10 +210,23 @@
 		return MAW_RES_INVALID_PROPERTY_VALUE;
 	}
 	self.imagePath = path;
+	self.imageHandle = [NSNumber numberWithInt:0];
 	_imageView.image = image;
 	[image release];
 	[self layout];
 	return MAW_RES_OK;
+}
+
+/**
+ * Getter implementation for imageNumber property.
+ */
+- (NSNumber*)imageHandle
+{
+	if (!_imageHandle)
+	{
+		_imageHandle = [[NSNumber alloc] initWithInt:0];
+	}
+	return _imageHandle;
 }
 
 /**
@@ -223,6 +247,7 @@
 -(void) dealloc
 {
     [_imageView release];
+	[_imageHandle release];
 	[_imagePath release];
     [super dealloc];
 }

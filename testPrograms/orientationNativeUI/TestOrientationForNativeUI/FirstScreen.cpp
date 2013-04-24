@@ -341,33 +341,4 @@ namespace OrientationTest
 		}
 	}
 
-	/**
-	 * Gets the current orientation as a string
-	 */
-	MAUtil::String FirstScreen::getOrientationString()
-	{
-		int orientation = maScreenGetCurrentOrientation();
-		MAUtil::String orientationText;
-		switch (orientation)
-		{
-			case MA_SCREEN_ORIENTATION_PORTRAIT:
-				orientationText = ORIENTATION_PORTRAIT;
-				break;
-			case MA_SCREEN_ORIENTATION_PORTRAIT_UPSIDE_DOWN:
-				orientationText = ORIENTATION_PORTRAIT_UPSIDE_DOWN;
-				break;
-			case MA_SCREEN_ORIENTATION_LANDSCAPE_LEFT:
-				orientationText = ORIENTATION_LANDSCAPE_LEFT;
-				break;
-			case MA_SCREEN_ORIENTATION_LANDSCAPE_RIGHT:
-				orientationText = ORIENTATION_LANDSCAPE_RIGHT;
-				break;
-			case MA_SCREEN_ORIENTATION_PORTRAIT_UP:
-				orientationText = PORTRAIT_UP_LABEL_TEXT;
-				break;
-		}
-
-		return orientationText;
-	}
-
 } // namespace OrientationTest

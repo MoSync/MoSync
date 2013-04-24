@@ -244,7 +244,7 @@ SYSCALL(MAExtent, maGetScrSize())
 
 SYSCALL(void, maMessageBox(const char* title, const char* message))
 {
-    MoSyncUIUtils_ShowMessageBox(title, message, false);
+    MoSyncUIUtils_ShowAlert(title, message, "OK", NULL, NULL);
 }
 
 SYSCALL(void, maImagePickerOpen())
@@ -255,6 +255,18 @@ SYSCALL(void, maImagePickerOpen())
 SYSCALL(void, maImagePickerOpenWithEventReturnType(int returnType))
 {
     MoSyncUIUtils_ShowImagePicker(returnType);
+}
+
+SYSCALL(int, maSaveImageToDeviceGallery(MAHandle imageDataHandle, const char* imageName))
+{
+    if ( imageDataHandle <= 0 )
+    {
+        return MA_MEDIA_RES_IMAGE_EXPORT_FAILED;
+    }
+    else
+    {
+        return MoSyncUIUtils_SaveImageToGallery(imageDataHandle);
+    }
 }
 
 //Shows an alert box with up to three buttons
@@ -402,7 +414,7 @@ SYSCALL(int, maSyscallPanicsDisable())
 
 SYSCALL(void, maPanic(int result, const char* message))
 {
-    MoSyncUIUtils_ShowMessageBox(nil, message, true);
+    MoSyncUIUtils_ShowAlert(NULL, message, "OK", NULL, NULL);
     gRunning = false;
     pthread_exit(NULL);
     //[[NSThread currentThread] exit];

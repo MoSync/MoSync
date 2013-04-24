@@ -6,21 +6,8 @@
 
 	<title>Wormhole Demo</title>
 
-	<!-- import JQTouch -->
-	<!--<script src="js/jqtouch/jqtouch.js" type="application/x-javascript"
-		charset="utf-8"></script>-->
-
-	<!-- Import JQTouch default style (iPhone look). Replace the string
-		"themes/default" with "themes/jqt" for a neutral (black) theme -->
-	<link type="text/css" rel="stylesheet" media="screen"
-		href="js/jqtouch/jqtouch.css">
-	<!-- <link type="text/css" rel="stylesheet" media="screen"
-		href="js/themes/apple/theme.css"> -->
-	<!-- include JQuery through Google API => Always have the latest version -->
-	<script src="js/jqtouch/jquery-1.4.2.min.js" type="text/javascript"
-		charset="utf-8"></script>
-	<script src="js/jqtouch/jqtouch.js" type="application/x-javascript"
-		charset="utf-8"></script>
+	<script src="js/zepto.js" type="text/javascript" charset="utf-8"></script>
+	<script src="js/jqtouch.js" type="text/javascript" charset="utf-8"></script>
 
 	<script type="text/javascript" charset="utf-8" src="js/wormhole.js"></script>
 	<script type="text/javascript" charset="utf-8" src="main.js"></script>
@@ -66,7 +53,7 @@
 		// Load different themes for different platforms.
 		if (mosync.isIOS)
 		{
-			loadjscssfile("js/themes/apple/theme.css", "css");
+			loadjscssfile("themes/css/apple.css", "css");
 			// Fire up JQTouch.
 			var jQT = $.jQTouch({
 				statusBar : 'black',
@@ -74,7 +61,7 @@
 		}
 		else if (mosync.isAndroid)
 		{
-			loadjscssfile("js/themes/artspot/theme.css", "css");
+			loadjscssfile("themes/css/jqtouch.css", "css");
 			// Fire up JQTouch without animations due to its
 			// limitations on Android.
 			var jQT = $.jQTouch({
@@ -85,7 +72,7 @@
 		}
 		else if (mosync.isWindowsPhone)
 		{
-			loadjscssfile("js/themes/jqt/theme.css", "css");
+			loadjscssfile("themes/css/vanilla.css", "css");
 			// Fire up JQTouch without animations due to its
 			// limitations on Windows Phone.
 			var jQT = $.jQTouch({
@@ -95,7 +82,7 @@
 		}
 		else
 		{
-			loadjscssfile("js/themes/apple/theme.css", "css");
+			loadjscssfile("themes/css/jqtouch.css", "css");
 			// Fire up JQTouch.
 			var jQT = $.jQTouch({
 				statusBar : 'black',

@@ -81,7 +81,6 @@ namespace OrientationTest
 	 */
 	void SecondScreen::orientationChanged(Screen* screen, int screenOrientation)
 	{
-		//if(screen == this)
 		printf("SECOND Screen: orientationChanged to: %d", screenOrientation);
 	}
 
@@ -93,7 +92,6 @@ namespace OrientationTest
 	 */
 	void SecondScreen::orientationDidChange()
 	{
-//		printf("SECOND Screen: orientation DID Changed event came from TabScreen ");
 	}
 
 	/**
