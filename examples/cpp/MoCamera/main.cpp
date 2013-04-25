@@ -6,7 +6,7 @@
 using namespace MAUtil;
 using namespace NativeUI;
 
-#include "MoSyncCamController.h"
+#include "MoCameraController.h"
 
 namespace MoSyncCamera
 {
@@ -18,7 +18,7 @@ namespace MoSyncCamera
 	public:
 		CameraMoblet()
 		{
-			mMoSyncCameraController = new MoSyncCamController();
+			mMoSyncCameraController = new MoCameraController();
 
 			mMoSyncCameraController->displayMainScreen();
 		}
@@ -41,7 +41,7 @@ namespace MoSyncCamera
 		}
 
 	private:
-		MoSyncCamController* mMoSyncCameraController;
+		MoCameraController* mMoSyncCameraController;
 	};
 } // MoSyncCamera
 

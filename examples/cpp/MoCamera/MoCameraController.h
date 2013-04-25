@@ -17,7 +17,7 @@
  */
 
 /**
- * @file MoSyncCamController.h
+ * @file MoCameraController.h
  * @author Mircea Vasiliniuc
  * @date 16 March 2013
  *
@@ -32,15 +32,15 @@
 
 namespace MoSyncCamera
 {
-	class MoSyncCamController:
+	class MoCameraController:
 		public CameraScreenObserver,
 		public ImageViewerScreenObserver,
 		public NativeUI::CameraSnapshotListener
 	{
 	public:
-		MoSyncCamController();
+		MoCameraController();
 
-		~MoSyncCamController();
+		virtual ~MoCameraController();
 
 		/**
 		 * Shows the first screen of the application.
@@ -91,7 +91,7 @@ namespace MoSyncCamera
 		 * Sets the screen transition used when showing/dismissing
 		 * a screen.
 		 */
-		MAWScreenTransitionType setScreenTransitions();
+		void setScreenTransitions();
 
 		/**
 		 * Retains the displayed screen handle.
