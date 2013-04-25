@@ -1724,6 +1724,30 @@ namespace Base
 		return (int)result;
 	}
 
+	int _maSaveImageToDeviceGallery(
+		MAHandle imageHandle,
+		const char* imageName,
+		JNIEnv* jNIEnv,
+		jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+
+		jstring jstrValue = jNIEnv->NewStringUTF(imageName);
+
+		jmethodID methodID = jNIEnv->GetMethodID(
+												 cls,
+												 "maSaveImageToDeviceGallery",
+												 "(ILjava/lang/String;)I");
+		jint result = -1;
+
+		if (methodID != 0)
+			result = jNIEnv->CallIntMethod(jThis, methodID, imageHandle, jstrValue);
+
+		jNIEnv->DeleteLocalRef(cls);
+
+		return (int)result;
+	}
+
 	int _maCameraStart(JNIEnv* jNIEnv, jobject jThis)
 	{
 		// Get the Java method
@@ -1827,16 +1851,16 @@ namespace Base
 		return (int)result;
 	}
 
-	int _maCameraSnapshotAsync(int formatIndex, JNIEnv* jNIEnv, jobject jThis)
+	int _maCameraSnapshotAsync(int dataPlaceholder, int sizeIndex, JNIEnv* jNIEnv, jobject jThis)
 	{
 		// Get the Java method
 		jclass cls = jNIEnv->GetObjectClass(jThis);
-		jmethodID methodID = jNIEnv->GetMethodID(cls, "maCameraSnapshotAsync", "(I)I");
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maCameraSnapshotAsync", "(II)I");
 
 		jint result = -1;
 
 		if (methodID != 0)
-			result = jNIEnv->CallIntMethod(jThis, methodID, formatIndex);
+			result = jNIEnv->CallIntMethod(jThis, methodID, dataPlaceholder, sizeIndex);
 
 		// Delete allocated memory
 		jNIEnv->DeleteLocalRef(cls);

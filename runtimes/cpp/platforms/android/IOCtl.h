@@ -541,6 +541,18 @@ namespace Base
 	int _maFileListClose(MAHandle list, JNIEnv* jNIEnv, jobject jThis);
 
 	/**
+	 * Saves an image in the photo gallery of the device.
+	 *
+	 * returns #MA_MEDIA_RES_OK if the input was correct and the operation started
+	 * or #MA_MEDIA_RES_IMAGE_EXPORT_FAILED otherwise.
+	 */
+	int _maSaveImageToDeviceGallery(
+			MAHandle imageHandle,
+			const char* imageName,
+			JNIEnv* jNIEnv,
+			jobject jThis);
+
+	/**
 	* Returns a handle to one of the default fonts of the device, in the style and size you specify.
 	* \param 'type' The type of the font, can be FONT_TYPE_[SANS_SERIF,SERIF,MONOSPACE].
 	* \param 'style' The style of the font, can be FONT_STYLE_[NORMAL,BOLD,ITALIC].
@@ -795,7 +807,7 @@ namespace Base
 
 	int _maCameraSnapshot(int formatIndex, MAHandle placeHolder, JNIEnv* jNIEnv, jobject jThis);
 
-	int _maCameraSnapshotAsync(int formatIndex, JNIEnv* jNIEnv, jobject jThis);
+	int _maCameraSnapshotAsync(int dataPlaceholder, int sizeIndex, JNIEnv* jNIEnv, jobject jThis);
 
 	int _maCameraRecord(int flag, JNIEnv* jNIEnv, jobject jThis);
 

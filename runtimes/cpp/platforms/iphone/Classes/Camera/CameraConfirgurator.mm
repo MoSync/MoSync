@@ -59,8 +59,8 @@
 		else if([property isEqualToString:[NSString stringWithUTF8String:MA_CAMERA_FOCUS_MODE]])
 		{
 			if ([value isEqualToString:[NSString stringWithUTF8String:MA_CAMERA_FOCUS_AUTO]]) {
-				if ([device isFocusModeSupported:AVCaptureFocusModeAutoFocus]) {
-					device.focusMode = AVCaptureFocusModeAutoFocus;
+				if ([device isFocusModeSupported:AVCaptureFocusModeContinuousAutoFocus]) {
+					device.focusMode = AVCaptureFocusModeContinuousAutoFocus;
 				}
 			}
 			else if ([value isEqualToString:[NSString stringWithUTF8String:MA_CAMERA_FOCUS_FIXED]]) {

@@ -2044,6 +2044,16 @@ namespace Base
 				mJThis);
 			}
 
+		case maIOCtl_maSaveImageToDeviceGallery:
+			{
+			SYSLOG("maIOCtl_maSaveImageToDeviceGallery");
+			return _maSaveImageToDeviceGallery(
+				a,
+				SYSCALL_THIS->GetValidatedStr(b),
+				mJNIEnv,
+				mJThis);
+			}
+
 		// ********** File API **********
 
 		case maIOCtl_maFileOpen:
@@ -2263,6 +2273,7 @@ namespace Base
 		case maIOCtl_maCameraSnapshotAsync:
 			return _maCameraSnapshotAsync(
 				a,
+				b,
 				mJNIEnv,
 				mJThis);
 
