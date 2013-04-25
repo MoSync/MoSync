@@ -25,7 +25,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <madmath.h>
 #endif
 
-#if defined(MAPIP) || (defined(MOSYNC_NATIVE) && defined(ANDROID))
+#if defined(MAPIP) || (defined(MOSYNC_NATIVE) && defined(__ANDROID__))
 
 #ifndef NO_BUILTINS
 

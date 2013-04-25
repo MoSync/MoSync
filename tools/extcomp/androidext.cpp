@@ -118,7 +118,7 @@ void writeJNIBridge(string& outputDir, Interface& ext, string& androidPackageNam
 	string extName = ext.name;
 
 	bridgeFile << "// *** GENERATED FILE - Do not modify ***\n\n";
-	bridgeFile << "#if defined(MOSYNC_NATIVE) && defined(PLATFORM_ANDROID)\n\n";
+	bridgeFile << "#if defined(MOSYNC_NATIVE) && defined(__ANDROID__)\n\n";
 	bridgeFile << "#include <maapi.h>\n";
 	bridgeFile << "#include <jni.h>\n";
 	bridgeFile << "#include \"" << extName << ".h\"\n";
