@@ -406,6 +406,7 @@ namespace MoSync
 		private Uri mUri = null;
 		private Stream mStream = null;
 		private MediaElement mMediaElement = null;
+		private MediaStreamSource mSource = null;
 		private int mNumLoops = 0;
 
 		public AudioInstanceMediaElement(Uri uri)
@@ -420,6 +421,12 @@ namespace MoSync
 			CreateMediaElement();
 		}
 
+		public AudioInstanceMediaElement(MediaStreamSource source)
+		{
+			this.mSource = source;
+			CreateMediaElement();
+		}
+
 		private void CreateMediaElement()
 		{
 			MoSync.Util.RunActionOnMainThreadSync(() =>
@@ -430,6 +437,8 @@ namespace MoSync
 					this.mMediaElement.Source = mUri;
 				else if (mStream != null)
 					this.mMediaElement.SetSource(mStream);
+				else if (mSource != null)
+					this.mMediaElement.SetSource(mSource);
 			});
 		}
 

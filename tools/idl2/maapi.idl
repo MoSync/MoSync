@@ -1557,6 +1557,39 @@ interface MAAPI {
 		* one of the \link #MA_NETWORK_UNKNOWN MA_NETWORK \endlink constants.
 		*/
 		NETWORK = 50;
+
+		/**
+		* \brief Sent when the current screen orientation has changed.
+		* MAEvent::orientation is the new screen orientation. One of the constants
+		* \link #MA_SCREEN_ORIENTATION_PORTRAIT MA_SCREEN_ORIENTATION \endlink.
+		*/
+		ORIENTATION_DID_CHANGE = 51;
+
+		/**
+		* \brief Sent just before the current screen orientation starts changing.
+		* Platform: iOS only.
+		*/
+		ORIENTATION_WILL_CHANGE = 52;
+
+		/**
+		* \brief Used to notify when the snapshot taken via #maCameraSnapshotAsync,
+		* is completed.
+		* The events of this type contain the handler for the image data,
+		* the image size, the \link #MA_IMAGE_REPRESENTATION_UNKNOWN data representation \endlink
+		* and a return code.
+		*/
+		CAMERA_SNAPSHOT = 53;
+
+		/**
+		* \brief Send by maAlert dialog being canceled by user dimissing it.
+		*/
+		ALERT_DISMISSED = 54;
+
+		/**
+		* \brief Used to notify when an operation of exporting files, from the
+		* application to the device storages, reached the finish point.
+		*/
+		MEDIA_EXPORT_FINISHED = 55;
 	}
 
 	/**
@@ -1734,6 +1767,59 @@ interface MAAPI {
 				int imagePickerEncodingType;
 			} imagePicker;
 
+			struct {
+				/**
+				 * Used in #EVENT_TYPE_CAMERA_SNAPSHOT events.
+				 * Holds the place holder for the data object representing the camera snapshot.
+				 */
+				MAHandle snapshotImageDataHandle;
+
+				/**
+				 * Used in #EVENT_TYPE_CAMERA_SNAPSHOT events.
+				 * Holds the snapshot size.
+				 */
+				int snapshotSize;
+
+				/**
+				 * Used in #EVENT_TYPE_CAMERA_SNAPSHOT events.
+				 * Holds the snapshot data representation.
+				 * Possible values are found \link #MA_IMAGE_REPRESENTATION_UNKNOWN here \endlink.
+				 */
+				int snapshotImageDataRepresentation;
+
+				/**
+				 * Used in #EVENT_TYPE_CAMERA_SNAPSHOT events.
+				 * Holds the return code of the camera snapshot operation.
+				 * It #MA_CAMERA_RES_OK on success, or #MA_CAMERA_RES_FAILED on error
+				 */
+				int snapshotReturnCode;
+			} cameraSnapshot;
+
+			struct {
+				/**
+				 * Used in #EVENT_TYPE_MEDIA_EXPORT_FINISHED.
+				 *
+				 * Reprezents the media type.
+				 * It can have a value from this set #MA_MEDIA_TYPE_UNKNOWN
+				 */
+				int mediaType;
+
+				/**
+				 * Used in #EVENT_TYPE_MEDIA_EXPORT_FINISHED.
+				 *
+				 * Reprezents the media handle.
+				 */
+				MAHandle mediaHandle;
+
+				/**
+				 * Used in #EVENT_TYPE_MEDIA_EXPORT_FINISHED.
+				 *
+				 * The result code of the operation. The possible values belong
+				 * to this set #MA_MEDIA_RES_OK
+				 */
+				int operationResultCode;
+			} mediaExportOperation;
+
 			/**
 			* #EVENT_TYPE_OPTIONS_BOX_BUTTON_CLICKED event, contains the index of the selected option.
 			*/
@@ -1803,6 +1889,11 @@ interface MAAPI {
 			* Valid only if the event type is \link #EVENT_TYPE_PURCHASE PURCHASE \endlink.
 			*/
 			MAPurchaseEventData purchaseData;
+
+			/**
+			* Contains the new orientation when a #EVENT_TYPE_ORIENTATION_DID_CHANGE event is sent.
+			*/
+			int orientation;
 			}
 	}
 
@@ -1985,7 +2076,7 @@ interface MAAPI {
 	int maSoundPlay(in MAHandle sound_res, in int offset, in int size);
 
 	/**
-	* Stops the sound and rewinds it.
+	* Stops any sound started with maSoundPlay().
 	*/
 	void maSoundStop();
 
@@ -2884,6 +2975,51 @@ interface MAAPI {
 		*/
 		int maFileSetProperty(in MAString path, in int property, in int value);
 
+		/**
+		 * Saves an images in the photo gallery of the device.
+		 *
+		 * Notifications of this operation are available via #MediaExportListener class.
+		 *
+		 * \param imageHandle handle of the image that needs to be exported to the
+		 * device.
+		 * \param imageName the name that the image will have after is saved.
+		 * Note: This argument is ignored on iOS.
+		 *
+		 * \return #MA_MEDIA_RES_OK if the input was correct and the operation started
+		 * or #MA_MEDIA_RES_IMAGE_EXPORT_FAILED otherwise.
+		 */
+		int maSaveImageToDeviceGallery(in MAHandle imageHandle, in MAString imageName);
+
+		/**
+		 * The available multimedia types.
+		 */
+		constset int MA_MEDIA_TYPE_ {
+			/**
+			 * @brief Indicatest an unknown multimedia type.
+			 */
+			UNKNOWN = -1;
+
+			/**
+			 * @brief Indicates an image.
+			 */
+			IMAGE = 0;
+		}
+
+		/**
+		 * The available result codes for the operations related to multimedia.
+		 */
+		constset int MA_MEDIA_RES_ {
+			/**
+			 * @brief Indicates that the operation was successful.
+			 */
+			OK = 0;
+
+			/**
+			 * @brief Indicatest that the operation of exporting an image failed.
+			 */
+			IMAGE_EXPORT_FAILED = -2;
+		}
+
 		constset int MA_FPROP_ {
 			IS_BACKED_UP = 1;
 		}
@@ -3480,6 +3616,7 @@ group WidgetAPI "Widget API" {
 #include "NativeUI/ActivityIndicator.idl"
 #include "NativeUI/Button.idl"
 #include "NativeUI/CheckBox.idl"
+#include "NativeUI/CustomPicker.idl"
 #include "NativeUI/DatePicker.idl"
 #include "NativeUI/EditBox.idl"
 #include "NativeUI/GLView.idl"
@@ -3503,6 +3640,7 @@ group WidgetAPI "Widget API" {
 #include "NativeUI/RatingBar.idl"
 #include "NativeUI/RelativeLayout.idl"
 #include "NativeUI/Screen.idl"
+#include "NativeUI/ScreenTransition.idl"
 #include "NativeUI/SearchBar.idl"
 #include "NativeUI/Slider.idl"
 #include "NativeUI/StackScreen.idl"
@@ -3523,356 +3661,7 @@ group WidgetAPI "Widget API" {
 } // end of group WidgetAPI
 #endif //IX_WIDGET
 
-group CameraAPI "Camera API" {
-
-	constset int MA_CAMERA_CONST_ {
-		/**
-		* @brief A constant that represents the flash being on.
-		*/
-		BACK_CAMERA = 0;
-
-		/**
-		* @brief A constant that represents the flash being in the automatic mode.
-		*/
-		FRONT_CAMERA = 1;
-
-	} //end MA_CAMERA_CONST
-
-group CameraResultCodes "Camera Result Codes" {
-	constset int MA_CAMERA_RES_ {
-		/**
-		* @brief A constant that represents successful camera operation.
-		*/
-		OK = 1;
-
-		/**
-		* @brief A constant that represents a failed camera operation.
-		*/
-		FAILED = -2;
-
-		/**
-		* @brief A constant that represents a camera failing to start.
-		*/
-		NOT_STARTED = -3;
-
-		/**
-		* @brief A constant that represents a property not supported by the device.
-		*/
-		PROPERTY_NOTSUPPORTED = -4;
-
-		/**
-		* @brief A constant that represents an invalid value for that property.
-		*/
-		INVALID_PROPERTY_VALUE = -5;
-
-		/**
-		* @brief A constant that represents a property value not supported by the device.
-		*/
-		VALUE_NOTSUPPORTED = -6;
-
-		/**
-		* @brief Another type of camera preview events has aldready been enabled.
-		*/
-		EVENTS_ALREADY_ENABLED = -7;
-
-		/**
-		* @brief The size of the screen which you want to read from the preview is not
-		* withing the visual area.
-		*/
-		INVALID_PREVIEW_SIZE = -8;
-
-	}
-} //end CameraResultCodes
-
-
-group FlashModes "Flash Modes" {
-	constset MAString MA_CAMERA_FLASH_ {
-		/**
-		* @brief A constant that represents the flash being on.
-		*/
-		ON = "on";
-
-		/**
-		* @brief A constant that represents the flash being in the automatic mode.
-		*/
-		AUTO = "auto";
-
-		/**
-		* @brief A constant that represents the flash being off.
-		*/
-		OFF = "off";
-
-		/**
-		* @brief A constant that represents the flash being in the torch mode.
-		*/
-		TORCH = "torch";
-
-	} //end MA_CAMERA_FLASH_
-}// end of FlashMode
-
-group FocusModes "Focus Modes" {
-	constset MAString MA_CAMERA_FOCUS_ {
-		/**
-		* @brief A constant that represents the focus mode being automatic.
-		*/
-		AUTO = "auto";
-
-		/**
-		* @brief A constant that turns the camera to focus to infinity.
-		*/
-		INFINITY = "infinity";
-
-		/**
-		* @brief A constant that turns the camera to macro mode.
-		*/
-		MACRO = "macro";
-
-		/**
-		* @brief A constant that sets the camera to fixed focus mode.
-		*/
-		FIXED = "fixed";
-
-	} //end MA_CAMERA_FOCUS_
-} //end of FocusMode
-
-group ImageFormat "Image Formats" {
-	constset MAString MA_CAMERA_IMAGE_ {
-		/**
-		* @brief A constant that represents JPEG image format.
-		*/
-		JPEG = "jpeg";
-
-		/**
-		* @brief A constant that represents RAW image format.
-		*/
-		RAW = "raw";
-
-	} //end MA_CAMERA_IMAGE_
-} //end ImageFormats
-
-group CameraProperties "Camera Properties" {
-
-	constset MAString MA_CAMERA_ {
-
-		/**
-		* @brief Sets the flash mode for the camera.
-		*
-		* @validvalue can be one of the #MA_CAMERA_FLASH_ON, #MA_CAMERA_FLASH_OFF, #MA_CAMERA_FLASH_AUTO, #MA_CAMERA_FLASH_TORCH constants
-		*
-		* @par Example
-		* \code
-		*	maCameraSetProperty(MAW_CAMERA_FLASH_MODE, MA_CAMERA_FLASH_AUTO);
-		* \endcode
-		*/
-		FLASH_MODE = "flash-mode";
-
-		/**
-		* @brief Sets the focus mode for the camera.
-		*
-		* @validvalue can be one of the #MA_CAMERA_FOCUS_AUTO, #MA_CAMERA_FOCUS_INFINITY, #MA_CAMERA_FOCUS_MACRO, #MA_CAMERA_FOCUS_FIXED constants
-		*
-		* @par Example
-		* \code
-		*	maCameraSetProperty(MAW_CAMERA_FOCUS_MODE, MA_CAMERA_FOCUS_AUTO);
-		* \endcode
-		*/
-		FOCUS_MODE = "focus-mode";
-
-		/**
-		* @brief Sets the image format for the camera.
-		*
-		* @validvalue can be one of the #MA_CAMERA_IMAGE_JPEG, #MA_CAMERA_IMAGE_RAW constants
-		*
-		* @par Example
-		* \code
-		*	maCameraSetProperty(MAW_CAMERA_IMAGE_FORMAT, MA_CAMERA_IMAGE_JPEG);
-		* \endcode
-		*/
-		IMAGE_FORMAT = "image-format";
-
-
-		/**
-		* @brief Sets the zoom level for the camera.
-		*
-		* @validvalue an int string that can be between 0 and #MA_CAMERA_MAX_ZOOM
-		*
-		* @par Example
-		* \code
-		*	maCameraSetProperty(MAW_CAMERA_ZOOM, "1");
-		* \endcode
-		*/
-		ZOOM = "zoom";
-
-		/**
-		* @brief Provides the information about the maximum supported zoom level on the device.
-		*
-		* @getonly
-		*
-		*/
-		MAX_ZOOM = "max-zoom";
-
-		/**
-		* @brief Indicates that if the device supports zoom or not.
-		*
-		* @validvalue the returned value is "true" for support and "false" for lack of support.
-		*
-		* @getonly
-		*/
-		ZOOM_SUPPORTED = "zoom-supported";
-
-		/**
-		* @brief Indicates that if the device has a flash or not.
-		*
-		* @validvalue the returned value is "true" for support and "false" for lack of support.
-		*
-		* @getonly
-		*/
-		FLASH_SUPPORTED = "flash-supported";
-
-	} //end of MAC_
-} // end of CameraProperties
-
-group CameraPreviewEvents "Camera Preview Events" {
-	constset int MA_CAMERA_PREVIEW_ {
-
-		FRAME = 1;
-
-		AUTO_FOCUS = 2;
-	}
-}
-
-group CameraFunctions "Camera Functions" {
-		/**
-		* \brief The camera format, in pixels.
-		*/
-		struct MA_CAMERA_FORMAT {
-			//in pixels.
-			int width;
-			int height;
-		}
-
-		/**
-		* Returns the number of different output formats supported by the current device's camera.
-		* \< 0 if there is no camera support.
-		* 0 if there is camera support, but the format is unknown.
-		*/
-		int maCameraFormatNumber();
-
-		/**
-		* Stores an output format in \a fmt.
-		* \a index must be \>= 0 and \< the number returned by maCameraFormatNumber().
-		* \returns 0.
-		*/
-		int maCameraFormat(in int index, out MA_CAMERA_FORMAT fmt);
-
-		/**
-		* Starts a fullscreen viewfinder.
-		* Returns 1 if the viewfinder was started, 0 if it was already running or \< 0 on error.
-		*/
-		// can be varied, but for now, we're keeping it simple.
-		int maCameraStart();
-
-		/**
-		* Stops the viewfinder.
-		* Returns 1 if the viewfinder was stopped, 0 if it was not running or \< 0 on error.
-		*/
-		int maCameraStop();
-
-		/**
-		* Adds a previewWidget to the camera controller in devices that support native UI.
-		* Returns 1 for success, \< 0 on error.
-		*/
-		int maCameraSetPreview(in MAHandle widgetHandle);
-
-		/**
-		* Selects a Camera from the available ones.
-		* Returns 1 for success, \< 0 on error.
-		*/
-		int maCameraSelect(in int cameraNumber);
-
-
-		/**
-		* Returns the number of available Camera on the device.
-		* Returns 1 for success, \< 0 on error.
-		*/
-		int maCameraNumber();
-
-		/**
-		* Requires the viewfinder to be active.
-		* Takes a snapshot using the specified format. The snapshot is
-		* stored as a new data object in the supplied placeholder.
-		* Returns 0 on success, or \< 0 on error.
-		*/
-		int maCameraSnapshot(in int formatIndex, in MAHandle placeholder);
-
-		/**
-		* Starts or stops recording video.
-		* \a stopStartFlag indicates the operation.
-		* 1 for start recording and 0 for stop recording.
-		* Returns 1 for success, \< 0 on error.
-		*/
-		int maCameraRecord(in int stopStartFlag);
-
-
-		/**
-		* Sets a specified property on the Selected Camera.
-		*
-		* \param property A string representing which property to set.
-		* \param value The value which will be assigned to the property.
-		*
-		* \returns 1 for success and <0 for failure.
-		*/
-		int maCameraSetProperty(in MAString property, in MAString value);
-
-		/**
-		* retrives a specified property on the Selected Camera.
-		*
-		* \param property A string representing which property to set.
-		* \param value A buffer that will hold the value of the property, represented as a string.
-		* \param bufSize Size of the buffer.
-		*
-		* \returns 1 for success and <0 for failure.
-		*/
-		int maCameraGetProperty( in MAString property, out MAString value range("bufSize"), in int bufSize);
-
-		/**
-		* Retrieves the underlying camera preview size. This can be different
-		* from the preview view so before enabling preview events it's
-		* important that you check the true size.
-		*
-		* \returns the size as an EXTENT, <0 on failure.
-		*/
-		int maCameraPreviewSize();
-
-		/**
-		* Enables events for accessing data during camera preview.
-		* Only one preview event may be used at the same time.
-		*
-		* \param previewEventType One of the CameraPreviewEvents
-		* \param previewBuffer An int buffer in which the data will stored
-		* \param previewArea The rectangle of the preview in which we will get data
-		*
-		* \return 1 on success and <0 on failure
-		*/
-		int maCameraPreviewEventEnable( in int previewEventType, out MAAddress previewBuffer, in MARect previewArea);
-
-		/**
-		* Turns off the current preview event
-		*/
-		int maCameraPreviewEventDisable();
-
-		/**
-		* Function that informs the runtime that it's ready to get
-		* the next preview event.
-		* This is because the preview sends a lot of events and if it
-		* take some time to process the image the event cue should get
-		* filled with events.
-		*/
-		int maCameraPreviewEventConsumed();
-
-	} // end of CameraFunctions
-
-	} //end of CameraAPI
+#include "Modules/Camera.idl"
 
 		/**
 		* Shows the virtual keyboard.
@@ -4058,25 +3847,6 @@ group CameraFunctions "Camera Functions" {
 		}
 
 		/**
-		 * Set the screen orientation.
-		 * Currently implemented only on Android and Windows Phone.
-		 * @param orientation One of the \link #SCREEN_ORIENTATION_LANDSCAPE
-		 * #SCREEN_ORIENTATION_PORTRAIT #SCREEN_ORIENTATION_DYNAMIC \endlink
-		 * constants.
-		 * @return \< 0 on error.
-		 */
-		int maScreenSetOrientation(in int orientation);
-
-		constset int SCREEN_ORIENTATION_ {
-			/// Landscape screen orientation.
-			LANDSCAPE = 1;
-			/// Portrait screen orientation.
-			PORTRAIT = 2;
-			/// Screen orientation is based on device sensor.
-			DYNAMIC = 3;
-		}
-
-		/**
 		 * Enable/disable fullscreen mode.
 		 * Currently implemented only on Android.
 		 * @param fullscreen 1 for fullscreen on, 0 for fullscreen off.
@@ -4097,59 +3867,6 @@ group CameraFunctions "Camera Functions" {
 		* \returns 1 on success, 0 if already unregistered, \< 0 on error.
 		*/
 		int maAutostartOff();
-
-		/**
-		* Set supported screen orientations.
-		* Currently implemented on iOS and WindowsPhone 7.1.
-		* @param orientations A bitmask consisting of flags describing the supported screen orientations.
-		* The bitmask can be created using \link #MA_SCREEN_ORIENTATION_PORTRAIT MA_SCREEN_ORIENTATION \endlink
-		* values.
-		* @return One of the next constants:
-		* - #MA_SCREEN_ORIENTATION_RES_OK
-		* - #MA_SCREEN_ORIENTATION_RES_NOT_SUPPORTED
-		* - #MA_SCREEN_ORIENTATION_RES_INVALID_VALUE
-		*/
-		int maScreenSetSupportedOrientations(in int orientations);
-
-		/**
-		* Get supported screen orientations.
-		* Currently implemented on iOS and WindowsPhone 7.1.
-		* @return A bitmask consisting of flags describing the supported screen orientations.
-		* The bitmask is created using \link #MA_SCREEN_ORIENTATION_PORTRAIT MA_SCREEN_ORIENTATION \endlink
-		* values.
-		*/
-		int maScreenGetSupportedOrientations();
-
-		/**
-		* Get current screen orientation.
-		* Currently implemented on iOS and WindowsPhone 7.1.
-		* @return One of the \link #MA_SCREEN_ORIENTATION_PORTRAIT MA_SCREEN_ORIENTATION \endlink constants.
-		*/
-		int maScreenGetCurrentOrientation();
-
-		constset int MA_SCREEN_ORIENTATION_ {
-			/// The device is in portrait mode, with the device held upright and the home button on
-			/// the bottom.
-			PORTRAIT = 0x000001;
-			/// The device is in portrait mode but upside down, with the device held upright and the
-			/// home button at the top.
-			PORTRAIT_UPSIDE_DOWN = 0x000002;
-			/// The device is in landscape mode, with the device held upright and the home button on
-			/// the left side.
-			LANDSCAPE_LEFT = 0x000004;
-			/// The device is in landscape mode, with the device held upright and the home button on
-			/// the right side.
-			LANDSCAPE_RIGHT = 0x000008;
-		}
-
-		constset int MA_SCREEN_ORIENTATION_RES_ {
-			///
-			OK = 0;
-			///
-			NOT_SUPPORTED = -1;
-			///
-			INVALID_VALUE = -2;
-		}
 
 		/**
 		 * Turn on sending of screen state events. Off by default.
@@ -4216,6 +3933,31 @@ group OpenGLES "OpenGLES" {
 		* \param button3 The text on the third button. On Android it indicates that a negative selection.
 		*/
 		void maAlert(in MAString title, in MAString message, in MAString button1, in MAString button2, in MAString button3);
+
+		/**
+		* \brief The toast timeout. Toasts can be displayed using #maToast.
+		*/
+		constset int MA_TOAST_DURATION_ {
+			SHORT = 0; // aprox 2sec
+			LONG = 1; // aprox 3.5sec
+		}
+
+		/**
+		* \brief A toast is a view containing a quick little message for the user.
+		* A toast provides simple feedback about an operation in a small popup.
+		* It only fills the amount of space required for the message and the current
+		* activity remains visible and interactive.
+		* For example, navigating away from an email before you send it triggers a
+		* "Draft saved" toast to let you know that you can continue editing later.
+		* Toasts automatically disappear after a timeout, and do not handle any user interaction.
+		* Toast are available only on Android.
+		*
+		* \param message The message in the toast.
+		* \param duration One of the next constants:
+		* - #MA_TOAST_DURATION_SHORT
+		* - #MA_TOAST_DURATION_LONG
+		*/
+		int maToast(in MAString message, in int duration);
 
 		/**
 		* Together with the image picker event (\link EVENT_TYPE_IMAGE_PICKER IMAGE_PICKER \endlink),
@@ -6823,6 +6565,10 @@ group CaptureAPI "Capture API" {
 group PurchaseAPI "Purchase API" {
 #include "purchase.idl"
 } // End of Purchase API
+
+group OrientationAPI "Orientation API" {
+#include "orientation.idl"
+} // End of Orientation API
 
 }
 	constset int IOCTL_ {

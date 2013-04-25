@@ -20,6 +20,8 @@
 #include <helpers/CPP_IX_WIDGET.h>
 #include "Platform.h"
 #include <base/Syscall.h>
+#include "MoSyncUI.h"
+#include "MoSyncUISyscalls.h"
 
 @implementation ScreenWidget
 
@@ -134,7 +136,6 @@
  */
 - (int)setPropertyWithKey:(NSString*)key toValue:(NSString*)value
 {
-
 	if([key isEqualToString:@MAW_SCREEN_TITLE])
     {
 		_controller.title = value;
@@ -151,6 +152,58 @@
 		return [super setPropertyWithKey:key toValue:value];
 	}
 	return MAW_RES_OK;
+}
+
+/**
+ * Get a widget property value.
+ * @param key Widget's property name.
+ * @return The property value, or nil if the property name is invalid.
+ * The returned value should not be autoreleased. The caller will release the returned value.
+ */
+- (NSString*)getPropertyWithKey:(NSString*)key
+{
+	if ([key isEqualToString:@MAW_SCREEN_IS_SHOWN])
+	{
+		return [self.isShownProperty retain];
+	}
+	else
+	{
+		return [super getPropertyWithKey:key];
+	}
+}
+
+/**
+ * Check if a given child screen is shown inside this screen.
+ * This function should be implemented by all classed inherited from this class,
+ * such as StackScreenWidget and TabScreenWidget.
+ * @param childScreen Screen to check.
+ * @return This function returns NO.
+ */
+- (BOOL)isChildScreenShown:(ScreenWidget*)childScreen
+{
+	return NO;
+}
+
+/**
+ * Check if the screen is shown.
+ * @return "true" is the screen is shown, "false" otherwise.
+ */
+- (NSString*)isShownProperty
+{
+	if (!self.parent)
+	{
+		MoSyncUI* mosyncUI = getMoSyncUI();
+		IWidget* currentlyShownScreen = [mosyncUI getCurrentlyShownScreen];
+		return ([currentlyShownScreen isEqual:self]) ? kWidgetTrueValue : kWidgetFalseValue;
+	}
+
+	if ([self.parent class] == [ScreenWidget class] ||
+		[self.parent superclass] == [ScreenWidget class])
+	{
+		ScreenWidget* parentScreen = (ScreenWidget*)self.parent;
+		return [parentScreen isChildScreenShown:self] ? kWidgetTrueValue : kWidgetFalseValue;
+	}
+	return kWidgetFalseValue;
 }
 
 /**

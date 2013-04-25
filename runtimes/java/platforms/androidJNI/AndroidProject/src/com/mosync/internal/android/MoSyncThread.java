@@ -17,8 +17,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 package com.mosync.internal.android;
 
-import static com.mosync.internal.android.MoSyncHelpers.DebugPrint;
-
 import static com.mosync.internal.android.MoSyncHelpers.EXTENT;
 import static com.mosync.internal.android.MoSyncHelpers.SYSLOG;
 import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_BLUETOOTH_TURNED_OFF;
@@ -32,9 +30,6 @@ import static com.mosync.internal.generated.MAAPI_consts.NOTIFICATION_TYPE_APPLI
 import static com.mosync.internal.generated.MAAPI_consts.RES_BAD_INPUT;
 import static com.mosync.internal.generated.MAAPI_consts.RES_OK;
 import static com.mosync.internal.generated.MAAPI_consts.RES_OUT_OF_MEMORY;
-import static com.mosync.internal.generated.MAAPI_consts.SCREEN_ORIENTATION_DYNAMIC;
-import static com.mosync.internal.generated.MAAPI_consts.SCREEN_ORIENTATION_LANDSCAPE;
-import static com.mosync.internal.generated.MAAPI_consts.SCREEN_ORIENTATION_PORTRAIT;
 import static com.mosync.internal.generated.MAAPI_consts.STERR_GENERIC;
 import static com.mosync.internal.generated.MAAPI_consts.STERR_NONEXISTENT;
 import static com.mosync.internal.generated.MAAPI_consts.TRANS_MIRROR;
@@ -52,8 +47,12 @@ import static com.mosync.internal.generated.MAAPI_consts.MA_RESOURCE_OPEN;
 import static com.mosync.internal.generated.MAAPI_consts.MA_RESOURCE_CLOSE;
 
 import static com.mosync.internal.generated.MAAPI_consts.MA_WAKE_LOCK_ON;
-import static com.mosync.internal.generated.MAAPI_consts.MA_WAKE_LOCK_OFF;
+import static com.mosync.internal.generated.MAAPI_consts.MA_CAMERA_RES_OK;
+import static com.mosync.internal.generated.MAAPI_consts.MA_CAMERA_RES_FAILED;
+import static com.mosync.internal.generated.MAAPI_consts.MA_CAMERA_RES_SNAPSHOT_IN_PROGRESS;
 
+import static com.mosync.internal.generated.MAAPI_consts.MA_TOAST_DURATION_SHORT;
+import static com.mosync.internal.generated.MAAPI_consts.MA_TOAST_DURATION_LONG;
 
 import java.io.File;
 import java.io.FileDescriptor;
@@ -79,9 +78,9 @@ import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.DialogInterface.OnKeyListener;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.res.AssetFileDescriptor;
 import android.content.res.AssetManager;
@@ -105,15 +104,16 @@ import android.os.Vibrator;
 import android.telephony.TelephonyManager;
 import android.telephony.gsm.GsmCellLocation;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.FrameLayout;
+import android.widget.Toast;
 import android.provider.Settings.Secure;
 import android.net.ConnectivityManager;
 
 import com.mosync.internal.android.MoSyncFont.MoSyncFontHandle;
-import com.mosync.internal.android.billing.PurchaseManager;
 import com.mosync.internal.android.nfc.MoSyncNFC;
 import com.mosync.internal.android.nfc.MoSyncNFCService;
 import com.mosync.internal.generated.IX_OPENGL_ES;
@@ -125,8 +125,7 @@ import com.mosync.java.android.TextBox;
 import com.mosync.nativeui.ui.widgets.MoSyncCameraPreview;
 import com.mosync.nativeui.ui.widgets.ScreenWidget;
 import com.mosync.nativeui.util.AsyncWait;
-import com.mosync.nativeui.util.properties.IntConverter;
-import com.mosync.nativeui.util.properties.PropertyConversionException;
+import com.mosync.nativeui.util.MediaManager;
 
 /**
  * Thread that runs the MoSync virtual machine and handles all syscalls.
@@ -190,6 +189,7 @@ public class MoSyncThread extends Thread
 	MoSyncCapture mMoSyncCapture;
 	MoSyncPurchase mMoSyncPurchase;
 	MoSyncDB mMoSyncDB;
+	MoSyncOrientationHelper mOrientation;
 
 	/**
 	 * Synchronization monitor for postEvent
@@ -274,7 +274,7 @@ public class MoSyncThread extends Thread
 
 	// Various variables, should be moved to subsystems
 	// along with the syscalls.
-	public ByteBuffer mMemDataSection;
+	private ByteBuffer mMemDataSection;
 	ByteBuffer mResourceFile;
 
 	Canvas mCanvas;
@@ -376,7 +376,17 @@ public class MoSyncThread extends Thread
 		//Do not access camera if it is not available
 		try
 		{
-			mMoSyncCameraController = new MoSyncCameraController(this);
+			Boolean isCameraAccessGranted =
+					(PackageManager.PERMISSION_GRANTED ==
+					getActivity().checkCallingOrSelfPermission("android.permission.CAMERA"));
+			if ( isCameraAccessGranted )
+			{
+				mMoSyncCameraController = new MoSyncCameraController(this);
+			}
+			else
+			{
+				mMoSyncCameraController = null;
+			}
 		}
 		catch (Throwable e)
 		{
@@ -436,6 +446,8 @@ public class MoSyncThread extends Thread
 		mMoSyncDB = new MoSyncDB();
 
 		mConnectivityManager = (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+
+		mOrientation = new MoSyncOrientationHelper(mContext);
 
 		nativeInitRuntime();
 	}
@@ -3256,7 +3268,7 @@ public class MoSyncThread extends Thread
 	 * @param buttonNegative
 	 * @return
 	 */
-	int maAlert(
+	public int maAlert(
 		final String title,
 		final String message,
 		final String buttonPositive,
@@ -3284,7 +3296,7 @@ public class MoSyncThread extends Thread
 
 						@Override
 						public void onClick(DialogInterface dialog, int which) {
-							postAlertEvent(1);
+							EventQueue.getDefault().postAlertEvent(1);
 						}
 					});
 				}
@@ -3294,7 +3306,7 @@ public class MoSyncThread extends Thread
 
 						@Override
 						public void onClick(DialogInterface dialog, int which) {
-							postAlertEvent(2);
+							EventQueue.getDefault().postAlertEvent(2);
 						}
 					});
 				}
@@ -3304,12 +3316,28 @@ public class MoSyncThread extends Thread
 
 						@Override
 						public void onClick(DialogInterface dialog, int which) {
-							postAlertEvent(3);
+							EventQueue.getDefault().postAlertEvent(3);
 						}
 					});
 				}
 
-				AlertDialog alertDialog = builder.create();
+				final AlertDialog alertDialog = builder.create();
+				alertDialog.setCancelable(true);
+				alertDialog.setOnKeyListener(new OnKeyListener() {
+
+					@Override
+					public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event) {
+						if(keyCode == KeyEvent.KEYCODE_BACK)
+						{
+							//todo see if the back btn is send again.
+							EventQueue.getDefault().postAlertDismissed();
+							alertDialog.dismiss();
+							return true;
+						}
+						return false;
+					}
+				});
+
 				alertDialog.show();
 			}
 		});
@@ -3318,19 +3346,36 @@ public class MoSyncThread extends Thread
 	}
 
 	/**
-	 * Post a message to the MoSync event queue.
-	 * This event it sent when one of the buttons in the alert was pressed.
-	 * See maAlert syscall that pops-up an alert.
-	 * The state is: Ready or Canceled.
+	 * Display a toast message.
+	 * A toast is a view containing a quick little message for the user.
+	 * @param message The toast message.
+	 * @param duration One of the constants:
+	 *  - #MA_TOAST_DURATION_SHORT or
+	 *  - #MA_TOAST_DURATION_LONG
+	 * @return
 	 */
-	private void postAlertEvent(int index)
+	int maToast(final String message, final int duration)
 	{
-		int[] event = new int[2];
-		event[0] = EVENT_TYPE_ALERT;
-		// Send the button index.
-		event[1] = index;
+		if ( duration != MA_TOAST_DURATION_LONG &&
+				duration != MA_TOAST_DURATION_SHORT )
+		{
+			return -1;
+		}
 
-		postEvent(event);
+		mContext.runOnUiThread(new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				Toast.makeText(
+						mContext,
+						message,
+						(duration == MA_TOAST_DURATION_SHORT ? Toast.LENGTH_SHORT : Toast.LENGTH_LONG))
+						.show();
+			}
+		});
+
+		return 0;
 	}
 
 	/**
@@ -3942,54 +3987,53 @@ public class MoSyncThread extends Thread
 		return 0;
 	}
 
+	@Deprecated
 	int maScreenSetOrientation(int orientation)
 	{
-		//Log.i("MoSync", "maScreenSetOrientation orientation: "
-		//	+ orientation);
+		SYSLOG("@@MoSync maScreenSetOrientation " + orientation);
 
-		if (SCREEN_ORIENTATION_LANDSCAPE == orientation)
-		{
-			maScreenSetOrientationHelper(
-				ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-		}
-		else if (SCREEN_ORIENTATION_PORTRAIT == orientation)
-		{
-			maScreenSetOrientationHelper(
-				ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-		}
-		else if (SCREEN_ORIENTATION_DYNAMIC == orientation)
-		{
-			if ( Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD )
-			{
-				maScreenSetOrientationHelper(
-						ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR);
-			}
-			else
-			{
-				maScreenSetOrientationHelper(
-						ActivityInfo.SCREEN_ORIENTATION_SENSOR);
-			}
-		}
-		else
-		{
-			return -1;
-		}
-
-		return 0;
+		return mOrientation.maScreenSetOrientation(orientation);
 	}
 
-	void maScreenSetOrientationHelper(final int androidScreenOrientation)
+	/**
+	 * Set supported screen orientations.
+	 * @param orientation A bitmask consisting of flags describing the supported screen orientations.
+	 * On Android there is only one accepted value.
+	 * @return One of the values:
+	 * - #MA_SCREEN_ORIENTATION_RES_OK
+	 * - #MA_SCREEN_ORIENTATION_RES_NOT_SUPPORTED
+	 * - #MA_SCREEN_ORIENTATION_RES_INVALID_VALUE
+	 */
+	int maScreenSetSupportedOrientations(int orientation)
 	{
-		final Activity activity = mContext;
+		SYSLOG("MoSync maScreenSetSupportedOrientations " + orientation);
 
-		activity.runOnUiThread(new Runnable()
-		{
-			@Override
-			public void run()
-			{
-				activity.setRequestedOrientation(androidScreenOrientation);
-			}
-		});
+		return mOrientation.setSupportedOrientation(orientation);
+	}
+
+	/**
+	* Get supported screen orientations.
+	* @return A bitmask consisting of flags describing the supported screen orientations.
+	* The bitmask is created using \link #MA_SCREEN_ORIENTATION_PORTRAIT MA_SCREEN_ORIENTATION \endlink
+	* values.
+	*/
+	int maScreenGetSupportedOrientations()
+	{
+		SYSLOG("MoSync maScreenGetSupportedOrientations");
+
+		return mOrientation.getSupportedOrientations();
+	}
+
+	/**
+	* Get current screen orientation.
+	* Currently implemented on iOS, WindowsPhone 7.1 and Android.
+	* @return One of the \link #MA_SCREEN_ORIENTATION_PORTRAIT MA_SCREEN_ORIENTATION \endlink constants.
+	*/
+	int maScreenGetCurrentOrientation()
+	{
+		SYSLOG("@MoSync maScreenGetCurrentOrientation");
+
+		return MoSync.getScreenOrientation();
 	}
 
 	int maScreenSetFullscreen(final int fullscreen)
@@ -4454,6 +4498,15 @@ public class MoSyncThread extends Thread
 	}
 
 	/**
+	 * Internal wrapper for maWidgetScreenShowWithTransition that runs
+	 * the call in the UI thread.
+	 */
+	public int maWidgetScreenShowWithTransition(final int screenHandle, final int screenTransitionType, final int screenTransitionDurations)
+	{
+		return mMoSyncNativeUI.maWidgetScreenShowWithTransition(screenHandle, screenTransitionType, screenTransitionDurations);
+	}
+
+	/**
 	 * Internal wrapper for maWidgetSetProperty that runs
 	 * the call in the UI thread.
 	 */
@@ -4513,6 +4566,16 @@ public class MoSyncThread extends Thread
 	{
 		mMoSyncNativeUI.setCurrentScreen(handle);
 	}
+
+	/**
+	 * Get the current screen without conversions.
+	 * @return The current screen without conversions.
+	 */
+	public ScreenWidget getUnconvertedCurrentScreen()
+	{
+		return mMoSyncNativeUI.getUnconvertedCurrentScreen();
+	}
+
 	/**
 	 * Internal wrapper for maWidgetStackScreenPush that runs
 	 * the call in the UI thread.
@@ -4566,6 +4629,12 @@ public class MoSyncThread extends Thread
 		{
 			return IOCTL_UNAVAILABLE;
 		}
+
+		if ( mMoSyncCameraController.isSnapshotInProgress() )
+		{
+			return MA_CAMERA_RES_SNAPSHOT_IN_PROGRESS;
+		}
+
 		//Start a fullscreen preview and then start the camera
 		if(false == mMoSyncCameraController.hasView())
 		{
@@ -4622,7 +4691,34 @@ public class MoSyncThread extends Thread
 			return IOCTL_UNAVAILABLE;
 		}
 
+		if ( mMoSyncCameraController.isSnapshotInProgress() )
+		{
+			return MA_CAMERA_RES_SNAPSHOT_IN_PROGRESS;
+		}
+
 		return mMoSyncCameraController.cameraSnapshot(formatIndex, placeHolder);
+	}
+
+	/**
+	 * Takes a snapshot and send the place holder created via
+	 * #EVENT_TYPE_CAMERA_SNAPSHOT.
+	 *
+	 * @param sizeIndex index of the snapshot size
+	 * @return IOCTL_UNAVAILABLE, MA_CAMERA_RES_FAILED if fails
+	 * and MA_CAMERA_RES_OK if succeeds
+	 */
+	int maCameraSnapshotAsync(int dataPlaceholder, int sizeIndex)
+	{
+		if(mMoSyncCameraController == null)
+		{
+			return IOCTL_UNAVAILABLE;
+		}
+		if ( mMoSyncCameraController.isSnapshotInProgress() )
+		{
+			return MA_CAMERA_RES_SNAPSHOT_IN_PROGRESS;
+		}
+		mMoSyncCameraController.cameraSnapshotAsync(dataPlaceholder, sizeIndex);
+		return MA_CAMERA_RES_OK;
 	}
 
 
@@ -4643,8 +4739,11 @@ public class MoSyncThread extends Thread
 				(FrameLayout)mMoSyncNativeUI.getCameraPreview(widgetHandle).getView();
 		MoSyncCameraPreview preview = (MoSyncCameraPreview)layout.getChildAt(0);
 		if(preview == null)
+		{
 			return 0; //Widget Not Found
+		}
 		mMoSyncCameraController.setPreview(preview);
+
 		return 1;
 	}
 
@@ -4766,9 +4865,11 @@ public class MoSyncThread extends Thread
 			return IOCTL_UNAVAILABLE;
 		}
 
-		return mMoSyncCameraController.enablePreviewEvents(
+		int returnVal = mMoSyncCameraController.enablePreviewEvents(
 			eventType, previewBuffer, rectLeft, rectTop,
 			rectWidth, rectHeight);
+
+		return returnVal;
 	}
 
 	int maCameraPreviewEventDisable()
@@ -5152,6 +5253,11 @@ public class MoSyncThread extends Thread
 	int maFileListClose(int list)
 	{
 		return mMoSyncFile.maFileListClose(list);
+	}
+
+	int maSaveImageToDeviceGallery(int imageHandle, String imageName)
+	{
+		return MediaManager.exportImageToPhotoGallery(imageHandle, imageName);
 	}
 
 	int maSensorStart(int sensor, int interval)

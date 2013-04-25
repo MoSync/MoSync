@@ -1,0 +1,136 @@
+/**
+ * The set of transition types available for a screen transition.
+ */
+group ScreenTransitionTypes "Screen transition types" {
+	constset int MAW_TRANSITION_TYPE_ {
+		/**
+		 * \brief A direct transition, no animation is involved. This is the default type.
+		 */
+		NONE = 0;
+
+		/**
+		 * \brief A transition that flips a view around its vertical axis from left to right.
+		 * The left side of the view moves toward the front and right side toward the back.
+		 *
+		 * Platform: iOS (4.0 and later).
+		 */
+		FLIP_FROM_LEFT = 1;
+
+		/**
+		 * \brief A transition that flips a view around its vertical axis from right to left.
+		 * The right side of the view moves toward the front and left side toward the back.
+		 *
+		 * Platform: iOS (4.0 and later).
+		 */
+		FLIP_FROM_RIGHT  = 2;
+
+		/**
+		 * \brief A transition that curls a view up from the bottom.
+		 *
+		 * Platform: iOS (4.0 and later).
+		 */
+		CURL_UP = 3;
+
+		/**
+		 * \brief A transition that curls a view down from the top.
+		 *
+		 * Platform: iOS (4.0 and later).
+		 */
+		CURL_DOWN = 4;
+
+		/**
+		 * \brief A transition that dissolves from one view to the next.
+		 *
+		 * Platform: iOS (5.0 and later).
+		 *
+		 * \Note Not yet available!
+		 */
+		CROSS_DISSOLVE = 5;
+
+		/**
+		 * \brief A transition that flips a view around its horizontal axis from top to bottom.
+		 * The top side of the view moves toward the front and the bottom side toward the back.
+		 *
+		 * Platform: iOS (5.0 and later).
+		 *
+		 * \Note Not yet available!
+		 */
+		FLIP_FROM_TOP = 6;
+
+		/**
+		 * \brief A transition that flips a view around its horizontal axis from bottom to top.
+		 * The bottom side of the view moves toward the front and the top side toward the back.
+		 *
+		 * Platform: iOS (5.0 and later).
+		 *
+		 * \Note Not yet available!
+		 */
+		FLIP_FROM_BOTTOM = 7;
+
+		/**
+		 * \brief A transition that will show the next screen by sliding it from right to left.
+		 *
+		 * Platform: Android, Windows Phone 7.
+		 */
+		SLIDE_LEFT = 8;
+
+		/**
+		 * \brief A transition that will show the next screen by sliding it from left to right.
+		 *
+		 * Platform: Android, Windows Phone 7.
+		 */
+		SLIDE_RIGHT = 9;
+
+		/**
+		 * \brief A transition that will show the next screen by fading it in to the current one.
+		 *
+		 * Platform: Android.
+		 */
+		FADE_IN = 10;
+
+		/**
+		 * \brief A transition that will remove the current screen by fading it out.
+		 *
+		 * Platform: Android.
+		 */
+		FADE_OUT = 11;
+
+		/**
+		 * \brief A transition that will show the next screen by swiveling it in (full screen).
+		 *
+		 * Platform: Windows Phone 7.
+		 */
+		SWIVEL_IN = 12;
+
+		/**
+		 * \brief A transition that will show the next screen by swiveling it out (full screen).
+		 *
+		 * Platform: Windows Phone 7.
+		 */
+		SWIVEL_OUT = 13;
+
+		/**
+		 * \brief A transition that will remove the current screen using a tunstile forward movement.
+		 *
+		 * Platform: Windows Phone 7.
+		 */
+		TURNSTILE_FORWARD = 14;
+
+		/**
+		 * \brief A transition that will show the next screen using a tunstile backward movement.
+		 *
+		 * Platform: Windows Phone 7.
+		 */
+		TURNSTILE_BACKWARD = 15;
+
+		/**
+		 * \brief A custom screen transition defined thru the Screen transitions properties.
+		 *
+		 * \note This type is not supported at this moment.
+		 * The Api and behavior of a custom screen transition is yet TBD.
+		 *
+		 * Platform: None.
+		 */
+		CUSTOM = 16;
+	}
+} //end of ScreenTransitionTypes

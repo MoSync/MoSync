@@ -34,6 +34,7 @@
 @synthesize isMainWidget = _isMainWidget;
 @synthesize autoSizeWidth = _autoSizeWidth;
 @synthesize autoSizeHeight = _autoSizeHeight;
+@synthesize children;
 
 
 /**
@@ -160,6 +161,14 @@
 }
 
 /**
+ * Get the children array list.
+ */
+-(NSArray*) children
+{
+    return _children;
+}
+
+/**
  * Set widget's auto size width and height values.
  * Will trigger a layout.
  * @param autoSizeWidth Width auto size value to set.
@@ -261,7 +270,7 @@
 
 /**
  * Remove a child from the widget.
- * The child's view will be removed its superview.
+ * The child's view will be removed from its superview.
  * @param child Widget to remove.
  */
 - (void)removeChild: (IWidget*)child

@@ -40,6 +40,11 @@ import static com.mosync.internal.generated.MAAPI_consts.MAK_SEARCH;
 import static com.mosync.internal.generated.MAAPI_consts.MAK_SOFTLEFT;
 import static com.mosync.internal.generated.MAAPI_consts.MAK_SOFTRIGHT;
 import static com.mosync.internal.generated.MAAPI_consts.MAK_UP;
+import static com.mosync.internal.generated.MAAPI_consts.MA_SCREEN_ORIENTATION_PORTRAIT_UP;
+import static com.mosync.internal.generated.MAAPI_consts.MA_SCREEN_ORIENTATION_PORTRAIT_UPSIDE_DOWN;
+import static com.mosync.internal.generated.MAAPI_consts.MA_SCREEN_ORIENTATION_LANDSCAPE_LEFT;
+import static com.mosync.internal.generated.MAAPI_consts.MA_SCREEN_ORIENTATION_LANDSCAPE_RIGHT;
+
 
 import android.app.Activity;
 import android.content.BroadcastReceiver;
@@ -69,7 +74,7 @@ import com.mosync.internal.android.MoSyncSingleTouchHandler;
 import com.mosync.internal.android.MoSyncThread;
 import com.mosync.internal.android.MoSyncTouchHandler;
 import com.mosync.internal.android.MoSyncView;
-import com.mosync.internal.android.billing.Consts;
+import com.mosync.internal.android.billing.PurchaseManager;
 import com.mosync.internal.android.nfc.MoSyncNFCForegroundUtil;
 import com.mosync.internal.android.nfc.MoSyncNFCService;
 import com.mosync.internal.android.notifications.LocalNotificationsManager;
@@ -79,6 +84,10 @@ import com.mosync.internal.android.notifications.PushNotificationsUtil;
 import com.mosync.internal.generated.IX_WIDGET;
 import com.mosync.nativeui.ui.widgets.OptionsMenuItem;
 import com.mosync.nativeui.ui.widgets.ScreenWidget;
+import com.mosync.nativeui.ui.widgets.StackScreenWidget;
+import com.mosync.nativeui.ui.widgets.TabScreenWidget;
+import com.mosync.nativeui.ui.widgets.Widget;
+import com.mosync.nativeui.util.ScreenTransitions;
 
 /**
  * Main MoSync activity
@@ -111,7 +120,7 @@ public class MoSync extends Activity
 	 * Keep the current screen rotation, and check it againts new
 	 * values retrieved when configuration changes.
 	 */
-	private int mScreenRotation = Surface.ROTATION_0;
+	private static int mScreenRotation = Surface.ROTATION_0;
 
 	/**
 	 * Sets screen and window properties.
@@ -202,6 +211,16 @@ public class MoSync extends Activity
 		setContentView(root);
 	}
 
+	public void setRootViewUsingTransition(View root, int screenTransitionType, int screenTransitionDuration)
+	{
+		if(root == null)
+		{
+			Log.i("MoSync", "setRootViewUsingTransition, root is null.");
+		}
+		ScreenTransitions.applyScreenTransition(root, screenTransitionType, screenTransitionDuration, false);
+        setContentView(root);
+	}
+
 	@Override
 	public void onNewIntent(Intent intent) {
 		if (MoSyncNFCService.handleNFCIntent(this, intent)) {
@@ -241,20 +260,68 @@ public class MoSync extends Activity
 			// Save current rotation.
 			mScreenRotation = newRotation;
 
+			int screenOrientation = getScreenOrientation();
 			// Post rotation event.
-			ScreenWidget screen = mMoSyncThread.getCurrentScreen();
-			int widgetHandle;
+			ScreenWidget screen = mMoSyncThread.getUnconvertedCurrentScreen();
 			if (null != screen)
 			{
 				// There is a NativeUI screen.
-				widgetHandle = screen.getHandle();
+				// Post screen orientation event, handled by the NativeUI module.
+				if ( screen instanceof StackScreenWidget || screen instanceof TabScreenWidget)
+				{
+					// Post screen orientation event, for the screen parent(TabScreen of StackScreen).
+					EventQueue.getDefault().postScreenOrientationChanged(
+							screen.getHandle(),
+							screenOrientation);
+					for(Widget child : screen.getChildren( ))
+					{
+						EventQueue.getDefault().postScreenOrientationChanged(
+								child.getHandle(),
+								screenOrientation);
+					}
+				}
+				else
+				{
+					EventQueue.getDefault().postScreenOrientationChanged(
+							mMoSyncThread.getCurrentScreen().getHandle(),
+							screenOrientation);
+				}
 			}
 			else
 			{
 				// No NativeUI screen, use the MoSync screen identifier.
-				widgetHandle = IX_WIDGET.MAW_CONSTANT_MOSYNC_SCREEN_HANDLE;
+				// NOTE: when no native UI screens are available, the widget related
+				// event should not be sent, but in this case it's too late to remove this.
+				// Post screen orientation event, handled by the NativeUI module.
+				EventQueue.getDefault().postScreenOrientationChanged(
+							IX_WIDGET.MAW_CONSTANT_MOSYNC_SCREEN_HANDLE,
+							screenOrientation);
 			}
-			EventQueue.getDefault().postScreenOrientationChanged(widgetHandle);
+
+			// Post orientation event, handled by the Moblet.
+			EventQueue.getDefault().postOrientationChanged(
+					screenOrientation);
+		}
+	}
+
+	/**
+	 * Get the screen orientation based on latest rotation.
+	 * @return
+	 */
+	public static int getScreenOrientation()
+	{
+		switch(mScreenRotation)
+		{
+		case Surface.ROTATION_0:
+			return MA_SCREEN_ORIENTATION_PORTRAIT_UP;
+		case Surface.ROTATION_180:
+			return MA_SCREEN_ORIENTATION_PORTRAIT_UPSIDE_DOWN;
+		case Surface.ROTATION_270:
+			return MA_SCREEN_ORIENTATION_LANDSCAPE_LEFT;
+		case Surface.ROTATION_90:
+			return MA_SCREEN_ORIENTATION_LANDSCAPE_RIGHT;
+		default:
+			return MA_SCREEN_ORIENTATION_PORTRAIT_UP;
 		}
 	}
 
@@ -478,6 +545,18 @@ public class MoSync extends Activity
 				requestCode == PICK_IMAGE_REQUEST )
 		{
 			MoSyncImagePicker.handleCancelSelectPicture();
+		}
+		else if( requestCode == PurchaseManager.getCurrentRequestCode() )
+		{
+			SYSLOG("@@MoSync Activity onActivityResult for METHOD_REQUEST_PURCHASE");
+			if ( !PurchaseManager.handleActivityResult(requestCode, resultCode, data) )
+			{
+				super.onActivityResult(requestCode, resultCode, data);
+			}
+		}
+		else
+		{
+			super.onActivityResult(requestCode, resultCode, data);
 		}
 	}
 

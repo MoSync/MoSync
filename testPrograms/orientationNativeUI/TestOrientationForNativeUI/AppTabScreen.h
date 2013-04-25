@@ -28,6 +28,7 @@ MA 02110-1301, USA.
 
 #include <NativeUI/TabScreen.h>
 #include <NativeUI/TabScreenListener.h>
+#include <NativeUI/ScreenListener.h>
 
 namespace OrientationTest
 {
@@ -46,7 +47,8 @@ namespace OrientationTest
 
 	class AppTabScreen:
 		public TabScreen,
-		public TabScreenListener
+		public TabScreenListener,
+		public ScreenListener
 	{
 	public:
 		/**
@@ -60,16 +62,18 @@ namespace OrientationTest
 		virtual ~AppTabScreen();
 
 		/**
-		 * Called just before the screen begins rotating.
-		 */
-		virtual void orientationWillChange();
-
-		/**
 		 * Called after the screen orientation has changed.
 		 * Available only on iOS and Windows Phone 7.1 platforms.
 		 */
 		virtual void orientationDidChange();
 
+		/**
+		 * Called after the screen has finished rotating.
+		 * Subclasses may override this method to perform additional actions
+		 * after the rotation.
+		 * @param screenOrientation The new screen orientation.
+		 */
+		virtual void orientationChanged(Screen* screen, int screenOrientation);
 	private:
 		/**
 		 * This method is called when a tab screen has changed to a new tab.

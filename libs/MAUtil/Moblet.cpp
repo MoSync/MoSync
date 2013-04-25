@@ -122,6 +122,23 @@ namespace MAUtil {
 					case EVENT_TYPE_SENSOR:
 						moblet->fireSensorListeners(event.sensor);
 						break;
+					case EVENT_TYPE_ORIENTATION_DID_CHANGE:
+						moblet->fireOrientationChangedEvent(event.orientation);
+						break;
+					case EVENT_TYPE_ORIENTATION_WILL_CHANGE:
+						moblet->fireOrientationWillChangeEvent();
+						break;
+				    case EVENT_TYPE_CAMERA_SNAPSHOT:
+						moblet->fireCameraEvent(event);
+						break;
+				    case EVENT_TYPE_CAMERA_PREVIEW:
+				        moblet->fireCameraEvent(event);
+				        // We need to fire a custom event for backwards compatibility.
+				        moblet->fireCustomEventListeners(event);
+				        break;
+					case EVENT_TYPE_MEDIA_EXPORT_FINISHED:
+						moblet->fireMediaExportEvent(event);
+						break;
 					default:
 						moblet->fireCustomEventListeners(event);
 				}

@@ -1,12 +1,17 @@
 using System;
 using Microsoft.Phone.Controls;
 using System.Collections.Generic;
+using System.Windows;
 
 namespace MoSync
 {
     public class NativeUIModule : IIoctlModule
     {
         private UIManager mNativeUI;
+        /**
+         * A reference to the last shown screen.
+         */
+        private IScreen mCurrentScreen = null;
         private List<IWidget> mWidgets = new List<IWidget>();
 
 		public IWidget GetWidget(int handle)
@@ -16,6 +21,19 @@ namespace MoSync
 			IWidget w = mWidgets[handle];
 			return w;
 		}
+
+        /**
+         * Handles the back button pressed event.
+         * @return true if the event has been consumed, false otherwise.
+         */
+        public bool HandleBackButtonPressed()
+        {
+            if (mCurrentScreen != null)
+            {
+                return mCurrentScreen.HandleBackButtonPressed();
+            }
+            return false;
+        }
 
         /*
          * Ads a widget to the widgets array.
@@ -31,6 +49,46 @@ namespace MoSync
         {
             mNativeUI = new NativeUI.NativeUIWindowsPhone();
             //mWidgets.Add(null); // why?
+
+            /**
+             * This will add a OrientationChanged event handler to the Application.Current.RootVisual, this is application wide.
+             */
+            (Application.Current.RootVisual as Microsoft.Phone.Controls.PhoneApplicationFrame).OrientationChanged += delegate(object from, Microsoft.Phone.Controls.OrientationChangedEventArgs args)
+            {
+                PhoneApplicationPage currentPage = (((PhoneApplicationFrame)Application.Current.RootVisual).Content as PhoneApplicationPage);
+
+                int mosyncScreenOrientation = MoSync.Constants.MA_SCREEN_ORIENTATION_PORTRAIT_UP;
+                switch (currentPage.Orientation)
+                {
+                    case PageOrientation.Landscape:
+                        mosyncScreenOrientation = MoSync.Constants.MA_SCREEN_ORIENTATION_LANDSCAPE;
+                        break;
+                    case PageOrientation.LandscapeLeft:
+                        mosyncScreenOrientation = MoSync.Constants.MA_SCREEN_ORIENTATION_LANDSCAPE_LEFT;
+                        break;
+                    case PageOrientation.LandscapeRight:
+                        mosyncScreenOrientation = MoSync.Constants.MA_SCREEN_ORIENTATION_LANDSCAPE_RIGHT;
+                        break;
+                    case PageOrientation.Portrait:
+                        mosyncScreenOrientation = MoSync.Constants.MA_SCREEN_ORIENTATION_PORTRAIT_UP;
+                        break;
+                    case PageOrientation.PortraitDown:
+                        mosyncScreenOrientation = MoSync.Constants.MA_SCREEN_ORIENTATION_PORTRAIT_UPSIDE_DOWN;
+                        break;
+                    case PageOrientation.PortraitUp:
+                        mosyncScreenOrientation = MoSync.Constants.MA_SCREEN_ORIENTATION_PORTRAIT_UP;
+                        break;
+                }
+
+                // Post event handled Moblet.
+                Memory eventData = new Memory(8);
+                const int MAEventData_eventType = 0;
+                const int MAEventData_orientation = 4;
+                eventData.WriteInt32(MAEventData_eventType, MoSync.Constants.EVENT_TYPE_ORIENTATION_DID_CHANGE);
+                eventData.WriteInt32(MAEventData_orientation, mosyncScreenOrientation);
+
+                runtime.PostEvent(new Event(eventData));
+            };
 
             ioctls.maWidgetCreate = delegate(int _widgetType)
             {
@@ -166,10 +224,58 @@ namespace MoSync
 
             ioctls.maWidgetScreenShow = delegate(int _screenHandle)
             {
-				if (_screenHandle < 0 || _screenHandle >= mWidgets.Count)
-					return MoSync.Constants.MAW_RES_INVALID_HANDLE;
-                IScreen screen = (IScreen)mWidgets[_screenHandle];
+                if (_screenHandle < 0 || _screenHandle >= mWidgets.Count)
+                {
+                    return MoSync.Constants.MAW_RES_INVALID_HANDLE;
+                }
+
+                IScreen screen = null;
+
+                if(mWidgets[_screenHandle] is IScreen)
+                {
+                    screen = (IScreen)mWidgets[_screenHandle];
+                }
+                else
+                {
+                    return MoSync.Constants.MAW_RES_INVALID_SCREEN;
+                }
+
+                mCurrentScreen = screen;
+
                 screen.Show();
+                return MoSync.Constants.MAW_RES_OK;
+            };
+
+            ioctls.maWidgetScreenShowWithTransition = delegate(int _screenHandle, int _screenTransitionType, int _screenTransitionDuration)
+            {
+                // Windows Phone Toolkit screen transitions do not have an time argument so _screenTransitionDuration
+                // will be ignored on Windows platform.
+                if (_screenHandle < 0 || _screenHandle >= mWidgets.Count)
+                {
+                    return MoSync.Constants.MAW_RES_INVALID_HANDLE;
+                }
+
+                IScreen screen = null;
+
+                if (mWidgets[_screenHandle] is IScreen)
+                {
+                    screen = (IScreen)mWidgets[_screenHandle];
+                }
+                else
+                {
+                    return MoSync.Constants.MAW_RES_INVALID_SCREEN;
+                }
+
+                mCurrentScreen = screen;
+
+                // If transition type is not available on this platform do show without transitions but return error code.
+                if (!NativeUI.MoSyncScreenTransitions.isTransitionAvailable(_screenTransitionType))
+                {
+                    screen.ShowWithTransition(MoSync.Constants.MAW_TRANSITION_TYPE_NONE);
+                    return MoSync.Constants.MAW_RES_INVALID_SCREEN_TRANSITION_TYPE;
+                }
+
+                screen.ShowWithTransition(_screenTransitionType);
                 return MoSync.Constants.MAW_RES_OK;
             };
 

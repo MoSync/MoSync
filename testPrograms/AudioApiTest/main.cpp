@@ -18,6 +18,7 @@
 
 #include <ma.h>
 #include <mavsprintf.h>
+#include <maassert.h>
 #include <MAUtil/Moblet.h>
 #include <NativeUI/Widgets.h>
 #include <NativeUI/WidgetUtil.h>
@@ -30,12 +31,13 @@ using namespace NativeUI;
 String getLocalPath() {
 	char buffer[1024];
 	int size = maGetSystemProperty("mosync.path.local", buffer, 1024);
-	return String(buffer);
+	MAASSERT(size > 0);
+	return String(buffer, size-1);
 }
 
 void initFiles() {
 	setCurrentFileSystem(R_LOCAL_FILES, 0);
-	int result = MAFS_extractCurrentFileSystem(getLocalPath().c_str());
+	MAFS_extractCurrentFileSystem(getLocalPath().c_str());
 	freeCurrentFileSystem();
 }
 
@@ -47,20 +49,18 @@ enum SoundType {
 };
 
 struct SoundSource {
-	SoundSource() :
-			audioData(-1), audioInstance(-1) {
-
+	SoundSource() : audioData(-1), audioInstance(-1) {
+		name = NULL;
 	}
 
-	explicit SoundSource(const char* name, const String& url) :
-			name(name), type(URL), url(url), audioData(-1), audioInstance(-1) {
-
+	explicit SoundSource(const char* name, const String& url, const char* mime = NULL) :
+		name(name), type(URL), url(url), mime(mime), audioData(-1), audioInstance(-1)
+	{
 	}
 
-	explicit SoundSource(const char* name, MAHandle handle) :
-			name(name), type(RESOURCE), resource(handle), audioData(-1), audioInstance(
-					-1) {
-
+	explicit SoundSource(const char* name, MAHandle handle, const char* mime = NULL) :
+		name(name), type(RESOURCE), resource(handle), mime(mime), audioData(-1), audioInstance(-1)
+	{
 	}
 
 	const char* name;
@@ -68,6 +68,8 @@ struct SoundSource {
 
 	String url;
 	MAHandle resource;
+
+	const char* mime;
 
 	MAAudioData audioData;
 	MAAudioInstance audioInstance;
@@ -81,10 +83,11 @@ struct SoundSource {
  * Moblet to be used as a template for a Native UI application.
  */
 class NativeUIMoblet: public Moblet,
-		public ListViewListener,
-		public ButtonListener,
-		public SliderListener,
-		public EditBoxListener {
+	public ListViewListener,
+	public ButtonListener,
+	public SliderListener,
+	public EditBoxListener
+{
 private:
 	Vector<SoundSource> mSoundSources;
 	SoundSource* mCurrentSoundSource;
@@ -102,29 +105,41 @@ public:
 		initFiles();
 
 		mSoundSources.add(
-				SoundSource("music url web",
-						"http://www.galaxyfaraway.com/Sounds/EWOK.WAV"));
+			SoundSource("WAV url web",
+				"http://www.galaxyfaraway.com/Sounds/EWOK.WAV"));
 		mSoundSources.add(
-				SoundSource("music file mp3 local",
-						getLocalPath() + "mobilesorcery2.mp3"));
+			SoundSource("MP3 url web",
+				"http://www.mosync.com/fred/mobilesorcery2.mp3"));
 		mSoundSources.add(
-				SoundSource("sound file wav local",
-						getLocalPath() + "mobilesorcery2.wav"));
-		mSoundSources.add(SoundSource("music mp3 ubin", R_MP3));
+			SoundSource("music file mp3 local",
+				getLocalPath() + "mobilesorcery2.mp3", "audio/mpeg"));
+		mSoundSources.add(
+			SoundSource("sound file wav local",
+				getLocalPath() + "mobilesorcery2.wav", "audio/x-wav"));
+		mSoundSources.add(SoundSource("music mp3 ubin", R_MP3, "audio/mpeg"));
 		mSoundSources.add(SoundSource("sound wav bin", R_WAV));
 
 		for (int i = 0; i < mSoundSources.size(); i++) {
-			if (mSoundSources[i].type == RESOURCE) {
-				if ((mSoundSources[i].audioData = maAudioDataCreateFromResource(
-						NULL, mSoundSources[i].resource, 0,
-						maGetDataSize(mSoundSources[i].resource), 0)) < 0) {
-					maMessageBox("Error", "Failed to initialize sound source!");
+			SoundSource& s(mSoundSources[i]);
+			if(!s.name)
+				maPanic(0, "NULL!!!");
+			if (s.type == RESOURCE) {
+				if ((s.audioData = maAudioDataCreateFromResource(
+					s.mime, s.resource, 0,
+					maGetDataSize(s.resource), 0)) < 0)
+				{
+					char buf[128];
+					sprintf(buf, "Failed to initialize sound source %i (%s)!", i, s.name);
+					maMessageBox("Error", buf);
 				}
-			} else if (mSoundSources[i].type == URL) {
-				if ((mSoundSources[i].audioData = maAudioDataCreateFromURL(NULL,
-						mSoundSources[i].url.c_str(), MA_AUDIO_DATA_STREAM))
-						< 0) {
-					maMessageBox("Error", "Failed to initialize sound source!");
+			} else if (s.type == URL) {
+				if ((s.audioData = maAudioDataCreateFromURL(s.mime,
+					s.url.c_str(), s.mime ? 0 : MA_AUDIO_DATA_STREAM))
+					< 0)
+				{
+					char buf[128];
+					sprintf(buf, "Failed to initialize sound source %i (%s)!", i, s.name);
+					maMessageBox("Error", buf);
 				}
 			}
 		}
@@ -166,19 +181,19 @@ public:
 		if (mPlayButton == button) {
 			if (mCurrentSoundSource->audioInstance < 0)
 				maMessageBox("Error",
-						"Invalid audio instance (try to create it first)");
+					"Invalid audio instance (try to create it first)");
 			else
 				maAudioPlay(mCurrentSoundSource->audioInstance);
 		} else if (mPauseButton == button) {
 			if (mCurrentSoundSource->audioInstance < 0)
 				maMessageBox("Error",
-						"Invalid audio instance (try to create it first)");
+					"Invalid audio instance (try to create it first)");
 			else
 				maAudioPause(mCurrentSoundSource->audioInstance);
 		} else if (mStopButton == button) {
 			if (mCurrentSoundSource->audioInstance < 0)
 				maMessageBox("Error",
-						"Invalid audio instance (try to create it first)");
+					"Invalid audio instance (try to create it first)");
 			else
 				maAudioStop(mCurrentSoundSource->audioInstance);
 		} else if (mCreateInstanceButton == button) {
@@ -186,23 +201,23 @@ public:
 				maMessageBox("Error", "Audio instance is already created.");
 			} else {
 				mCurrentSoundSource->audioInstance = maAudioInstanceCreate(
-						mCurrentSoundSource->audioData);
+					mCurrentSoundSource->audioData);
 				if (mCurrentSoundSource->audioInstance < 0) {
 					if (mCurrentSoundSource->type == URL) {
 						maMessageBox(
-								"Error",
-								("Failed to create audio instance! Url: "
-										+ mCurrentSoundSource->url).c_str());
+							"Error",
+							("Failed to create audio instance! Url: "
+								+ mCurrentSoundSource->url).c_str());
 					} else
 						maMessageBox("Error",
-								"Failed to create audio instance!");
+							"Failed to create audio instance!");
 				}
 			}
 		} else if (mDestroyInstanceButton == button) {
 			if (mCurrentSoundSource->audioInstance < 0)
 				maMessageBox(
-						"Error",
-						"Audio instance is already destroyed or never created.");
+					"Error",
+					"Audio instance is already destroyed or never created.");
 			else {
 				maAudioInstanceDestroy(mCurrentSoundSource->audioInstance);
 				mCurrentSoundSource->audioInstance = -1;
@@ -214,22 +229,22 @@ public:
 		if (slider == mVolumeSlider) {
 			if (mCurrentSoundSource->audioInstance < 0)
 				maMessageBox(
-						"Error",
-						"Audio instance is already destroyed or never created.");
+					"Error",
+					"Audio instance is already destroyed or never created.");
 			else {
 				maAudioSetVolume(mCurrentSoundSource->audioInstance,
-						(float) sliderValue / 100.0f);
+					(float) sliderValue / 100.0f);
 			}
 		} else if (slider == mPositionSlider) {
 			if (mCurrentSoundSource->audioInstance < 0)
 				maMessageBox(
-						"Error",
-						"Audio instance is already destroyed or never created.");
+					"Error",
+					"Audio instance is already destroyed or never created.");
 			else {
 				int length = maAudioGetLength(
-						mCurrentSoundSource->audioInstance);
+					mCurrentSoundSource->audioInstance);
 				maAudioSetPosition(mCurrentSoundSource->audioInstance,
-						length * sliderValue / 100);
+					length * sliderValue / 100);
 			}
 		}
 	}
@@ -238,13 +253,13 @@ public:
 		if (editBox == mNumLoopsEditBox) {
 			if (mCurrentSoundSource->audioInstance < 0)
 				maMessageBox(
-						"Error",
-						"Audio instance is already destroyed or never created.");
+					"Error",
+					"Audio instance is already destroyed or never created.");
 			else {
 				int numLoops = stringToInteger(mNumLoopsEditBox->getText());
 				mNumLoopsEditBox->setText(integerToString(numLoops));
 				maAudioSetNumberOfLoops(mCurrentSoundSource->audioInstance,
-						numLoops);
+					numLoops);
 			}
 
 			mNumLoopsEditBox->hideKeyboard();

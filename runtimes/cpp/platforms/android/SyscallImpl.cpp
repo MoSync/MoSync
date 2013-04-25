@@ -1885,6 +1885,10 @@ namespace Base
 			SYSLOG("maIOCtl_maWidgetScreenShow");
 			return _maWidgetScreenShow(a, mJNIEnv, mJThis);
 
+		case maIOCtl_maWidgetScreenShowWithTransition:
+			SYSLOG("maIOCtl_maWidgetScreenShowWithTransition");
+			return _maWidgetScreenShowWithTransition(a, b, c, mJNIEnv, mJThis);
+
 		case maIOCtl_maWidgetStackScreenPush:
 			SYSLOG("maIOCtl_maWidgetStackScreenPush");
 			return _maWidgetStackScreenPush(a, b, mJNIEnv, mJThis);
@@ -1929,6 +1933,18 @@ namespace Base
 		case maIOCtl_maScreenSetFullscreen:
 			SYSLOG("maIOCtl_maScreenSetFullscreen");
 			return _maScreenSetFullscreen(a, mJNIEnv, mJThis);
+
+		case maIOCtl_maScreenSetSupportedOrientations:
+			SYSLOG("maIOCtl_maScreenSetSupportedOrientations");
+			return _maScreenSetSupportedOrientations(a, mJNIEnv, mJThis);
+
+		case maIOCtl_maScreenGetSupportedOrientations:
+			SYSLOG("maIOCtl_maScreenGetSupportedOrientations");
+			return _maScreenGetSupportedOrientations(mJNIEnv, mJThis);
+
+		case maIOCtl_maScreenGetCurrentOrientation:
+			SYSLOG("maIOCtl_maScreenGetCurrentOrientation");
+			return _maScreenGetCurrentOrientation(mJNIEnv, mJThis);
 
 		case maIOCtl_maHomeScreenEventsOn:
 			SYSLOG("maIOCtl_maHomeScreenEventsOn");
@@ -1989,6 +2005,14 @@ namespace Base
 				mJNIEnv,
 				mJThis);
 
+		case maIOCtl_maToast:
+			SYSLOG("maIOCtl_maToast");
+			return _maToast(
+				SYSCALL_THIS->GetValidatedStr(a),
+				b,
+				mJNIEnv,
+				mJThis);
+
 		case maIOCtl_maImagePickerOpen:
 			SYSLOG("maIOCtl_maImagePickerOpen");
 			return _maImagePickerOpen(
@@ -2016,6 +2040,16 @@ namespace Base
 				_cancel,
 				SYSCALL_THIS->GetValidatedStackValue(0),
 				SYSCALL_THIS->GetValidatedStackValue(4),
+				mJNIEnv,
+				mJThis);
+			}
+
+		case maIOCtl_maSaveImageToDeviceGallery:
+			{
+			SYSLOG("maIOCtl_maSaveImageToDeviceGallery");
+			return _maSaveImageToDeviceGallery(
+				a,
+				SYSCALL_THIS->GetValidatedStr(b),
 				mJNIEnv,
 				mJThis);
 			}
@@ -2231,6 +2265,13 @@ namespace Base
 
 		case maIOCtl_maCameraSnapshot:
 			return _maCameraSnapshot(
+				a,
+				b,
+				mJNIEnv,
+				mJThis);
+
+		case maIOCtl_maCameraSnapshotAsync:
+			return _maCameraSnapshotAsync(
 				a,
 				b,
 				mJNIEnv,

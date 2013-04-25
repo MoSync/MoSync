@@ -541,7 +541,7 @@ PhoneGap.deviceReadyChannelsArray = [
 // This is hack to overcome the problems with iOs6 devices, should be removed when that is fixed
 if(!mosync.isIOS)
 {
-  PhoneGap.deviceReadyChannelsArray.push(PhoneGap.onPhoneGapInfoReady);  
+  PhoneGap.deviceReadyChannelsArray.push(PhoneGap.onPhoneGapInfoReady);
 }
 // Hashtable of user defined channels that must also fire before "deviceready" is fired
 PhoneGap.deviceReadyChannelsMap = {};

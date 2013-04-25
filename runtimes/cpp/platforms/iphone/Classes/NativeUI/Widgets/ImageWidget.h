@@ -36,4 +36,12 @@
  */
 - (int)setPropertyWithKey:(NSString*)key toValue:(NSString*)value;
 
+/**
+ * Get a widget property value.
+ * @param key Widget's property name.
+ * @return The property value, or nil if the property name is invalid.
+ * The returned value should not be autoreleased. The caller will release the returned value.
+ */
+- (NSString*)getPropertyWithKey:(NSString*)key;
+
 @end

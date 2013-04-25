@@ -122,6 +122,11 @@
 @property(nonatomic, setter = setOriginY:, getter = originY) CGFloat originY;
 
 /**
+ * Get the children array list.
+ */
+@property(nonatomic, readonly, getter = children, assign ) NSArray* children;
+
+/**
  * Set widget's auto size width and height values.
  * Will trigger a layout.
  * @param autoSizeWidth Width auto size value to set.
@@ -179,7 +184,7 @@
 
 /**
  * Remove a child from the widget.
- * The child's view will be removed its superview.
+ * The child's view will be removed from its superview.
  * @param child Widget to remove.
  */
 - (void)removeChild: (IWidget*)child;

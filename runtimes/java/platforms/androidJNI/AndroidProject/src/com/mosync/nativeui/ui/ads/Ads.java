@@ -17,6 +17,8 @@ MA 02110-1301, USA.
 
 package com.mosync.nativeui.ui.ads;
 
+import java.nio.ByteBuffer;
+
 import android.app.Activity;
 import android.util.Log;
 
@@ -307,9 +309,9 @@ public class Ads
 
 		// Write string to MoSync memory.
 		MoSyncThread mosyncThread = ((MoSync) m_activity).getMoSyncThread( );
-		mosyncThread.mMemDataSection.position( memBuffer );
-		mosyncThread.mMemDataSection.put( byteArray );
-		mosyncThread.mMemDataSection.put( (byte)0 );
+		ByteBuffer buffer = mosyncThread.getMemorySlice(memBuffer, byteArray.length + 1);
+		buffer.put( byteArray );
+		buffer.put( (byte)0 );
 
 		return result.length( );
 	}

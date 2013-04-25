@@ -86,4 +86,27 @@
  */
 - (int)setPropertyWithKey:(NSString*)key toValue:(NSString*)value;
 
+/**
+ * Get a widget property value.
+ * @param key Widget's property name.
+ * @return The property value, or nil if the property name is invalid.
+ * The returned value should not be autoreleased. The caller will release the returned value.
+ */
+- (NSString*)getPropertyWithKey:(NSString*)key;
+
+/**
+ * Check if a given child screen is shown inside this screen.
+ * This function should be implemented by all classed inherited from this class,
+ * such as StackScreenWidget and TabScreenWidget.
+ * @param childScreen Screen to check.
+ * @return This function returns NO.
+ */
+- (BOOL)isChildScreenShown:(ScreenWidget*)childScreen;
+
+/**
+ * Check if the screen is shown.
+ * @return "true" is the screen is shown, "false" otherwise.
+ */
+- (NSString*)isShownProperty;
+
 @end

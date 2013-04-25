@@ -27,11 +27,20 @@ namespace MoSync
         public interface IScreen
         {
             void Show();
+            void ShowWithTransition(int screenTransitionType);
             Microsoft.Phone.Shell.ApplicationBar GetApplicationBar();
             void EnableApplicationBar();
             bool GetApplicationBarVisibility();
             void SetApplicationBarVisibility(bool value);
             int AddApplicationBarItemIndex(Object item);
+            bool HandleBackButtonPressed();
+
+            /**
+             * Check if a given child screen is shown.
+             * @param child Given child.
+             * @return true if the child is shown, false otherwise.
+             */
+            bool isChildShown(IScreen child);
         }
 
         public class MoSyncWidgetPropertyAttribute : Attribute
@@ -122,6 +131,20 @@ namespace MoSync
                 {
                     mParent.RemoveChild(this);
                 }
+            }
+
+            public IWidget getChild(int offset)
+            {
+                if (offset <= mChildren.Count)
+                {
+                    return mChildren[offset];
+                }
+                return null;
+            }
+
+            public int getChildCount()
+            {
+                return mChildren.Count;
             }
 
             public void SetParent(IWidget parent)

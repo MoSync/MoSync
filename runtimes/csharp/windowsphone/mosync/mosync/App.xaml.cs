@@ -47,7 +47,7 @@ namespace test_mosync
         /// </summary>
         public App()
         {
-            // Global handler for uncaught exceptions. 
+            // Global handler for uncaught exceptions.
             UnhandledException += Application_UnhandledException;
 
             // Standard Silverlight initialization
@@ -68,7 +68,7 @@ namespace test_mosync
                 // Show the areas of the app that are being redrawn in each frame.
                 //Application.Current.Host.Settings.EnableRedrawRegions = true;
 
-                // Enable non-production analysis visualization mode, 
+                // Enable non-production analysis visualization mode,
                 // which shows areas of a page that are handed off to GPU with a colored overlay.
                 //Application.Current.Host.Settings.EnableCacheVisualization = true;
 
@@ -78,7 +78,7 @@ namespace test_mosync
                 // and consume battery power when the user is not using the phone.
                 PhoneApplicationService.Current.UserIdleDetectionMode = IdleDetectionMode.Disabled;
             }
-        }
+       }
 
         // Code to execute when the application is launching (eg, from Start)
         // This code will not execute when the application is reactivated
@@ -139,6 +139,8 @@ namespace test_mosync
 					machine.Run();
 				}
             };
+
+            RootFrame.BackKeyPress += new EventHandler<System.ComponentModel.CancelEventArgs>(BackKeyPressHandler);
         }
 
         // Code to execute when the application is activated (brought to foreground)
@@ -209,7 +211,7 @@ namespace test_mosync
 
             // Ensure we don't initialize again
             phoneApplicationInitialized = true;
-        }
+       }
 
         // Do not add any additional code to this method
         private void CompleteInitializePhoneApplication(object sender, NavigationEventArgs e)
@@ -217,7 +219,7 @@ namespace test_mosync
             // Set the root visual to allow the application to render
             if (RootVisual != RootFrame)
                 RootVisual = RootFrame;
-      
+
             // Remove this handler since it is no longer needed
             RootFrame.Navigated -= CompleteInitializePhoneApplication;
         }
@@ -257,5 +259,28 @@ namespace test_mosync
         }
 
         #endregion
+
+        /**
+        * The BackKeyPress event handler.
+        * Currently it contains the functionality for the back event when a StackScreen is a child of a TabScreen.
+        * When this handler does not cover the functionality required it should be updated.
+        * @param from Object the object that triggers the event.
+        * @param args System.ComponentModel.CancelEventArgs the event arguments.
+        */
+        public void BackKeyPressHandler(object from, System.ComponentModel.CancelEventArgs args)
+        {
+            NativeUIModule nativeUIModule = machine.GetRuntime().GetModule<NativeUIModule>();
+
+            //EVENT_TYPE_KEY_RELEASED event data
+            Memory eventData = new Memory(8);
+            const int MAEventData_eventType = 0;
+            const int MAEventData_backButtonKeyCode = 4;
+            eventData.WriteInt32(MAEventData_eventType, MoSync.Constants.EVENT_TYPE_KEY_PRESSED);
+            eventData.WriteInt32(MAEventData_backButtonKeyCode, MoSync.Constants.MAK_BACK);
+            //Posting a CustomEvent
+            machine.GetRuntime().PostEvent(new Event(eventData));
+
+            args.Cancel = nativeUIModule.HandleBackButtonPressed();
+        }
     }
 }

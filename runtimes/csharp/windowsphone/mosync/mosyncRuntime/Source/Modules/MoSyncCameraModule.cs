@@ -13,6 +13,8 @@ namespace MoSync
 {
     public class CameraModule : IIoctlModule
     {
+        MoSync.Runtime mRuntime;
+
 		/**
          * The camera object.
          */
@@ -49,6 +51,17 @@ namespace MoSync
         bool isCameraInitialized = false;
 
         /**
+         * Used to check if the camera snapshot is in progress or not.
+         */
+        bool isCameraSnapshotInProgress = false;
+
+        /*
+         * The placeholder that holds the last snapshot.
+         * It is used only during taking a snapshot.
+         */
+        int snapshotPlaceHolder;
+
+        /**
          * Initializing the ioctls.
          */
 		public void Init(Ioctls ioctls, Core core, Runtime runtime)
@@ -64,6 +77,8 @@ namespace MoSync
                     mCamera = null;
                 }
 			});
+
+            mRuntime = runtime;
 
             PhoneApplicationPage currentPage = (((PhoneApplicationFrame)Application.Current.RootVisual).Content as PhoneApplicationPage);
 
@@ -127,6 +142,11 @@ namespace MoSync
              */
 			ioctls.maCameraStart = delegate()
 			{
+                if ( isCameraSnapshotInProgress )
+                {
+                    return MoSync.Constants.MA_CAMERA_RES_SNAPSHOT_IN_PROGRESS;
+                }
+
                 InitCamera();
 
                 MoSync.Util.RunActionOnMainThreadSync(() =>
@@ -142,6 +162,14 @@ namespace MoSync
              */
 			ioctls.maCameraStop = delegate()
 			{
+                if ( isCameraSnapshotInProgress )
+                {
+                    // We need to post snapshot failed if the camera was stopped during snapshot operation
+                    postSnapshotEvent(snapshotPlaceHolder, mCamera.Resolution,
+                       MoSync.Constants.MA_IMAGE_REPRESENTATION_UNKNOWN, MoSync.Constants.MA_CAMERA_RES_FAILED);
+                    isCameraSnapshotInProgress = false;
+                }
+
                 MoSync.Util.RunActionOnMainThreadSync(() =>
                 {
                     mCameraPrev.StopViewFinder();
@@ -193,6 +221,17 @@ namespace MoSync
              */
 			ioctls.maCameraSnapshot = delegate(int _formatIndex, int _placeHolder)
 			{
+                if ( isCameraSnapshotInProgress )
+                {
+                    return MoSync.Constants.MA_CAMERA_RES_SNAPSHOT_IN_PROGRESS;
+                }
+
+                // If MA_CAMERA_SNAPSHOT_MAX_SIZE is sent via _formatIndex then we
+                // need to select the biggest available snapshot size/resolution.
+                if ( MoSync.Constants.MA_CAMERA_SNAPSHOT_MAX_SIZE == _formatIndex )
+                {
+                    _formatIndex = (int)ioctls.maCameraFormatNumber() - 1;
+                }
 				AutoResetEvent are = new AutoResetEvent(false);
 
 				System.Windows.Size dim;
@@ -245,8 +284,107 @@ namespace MoSync
 				mCamera.CaptureImage();
 
 				are.WaitOne();
-				return 0;
+                return MoSync.Constants.MA_CAMERA_RES_OK;
 			};
+
+            /**
+             * Captures an image and stores it as a new data object in new
+             * placeholder that is sent via #EVENT_TYPE_CAMERA_SNAPSHOT event.
+             * @param _placeHolder int the placeholder used for storing the image.
+             * @param _sizeIndex int the required size index.
+             */
+            ioctls.maCameraSnapshotAsync = delegate(int _placeHolder, int _sizeIndex)
+            {
+                if ( isCameraSnapshotInProgress )
+                {
+                    return MoSync.Constants.MA_CAMERA_RES_SNAPSHOT_IN_PROGRESS;
+                }
+
+                // If MA_CAMERA_SNAPSHOT_MAX_SIZE is sent via _sizeIndex then we
+                // need to select the biggest available snapshot size/resolution.
+                if ( MoSync.Constants.MA_CAMERA_SNAPSHOT_MAX_SIZE == _sizeIndex )
+                {
+                    _sizeIndex = (int)ioctls.maCameraFormatNumber() - 1;
+                }
+
+                System.Windows.Size dim;
+                if (GetCameraFormat(_sizeIndex, out dim) == false)
+                {
+                    return MoSync.Constants.MA_CAMERA_RES_FAILED;
+                }
+
+                mCamera.Resolution = dim;
+
+                if (mCameraSnapshotDelegate != null)
+                {
+                    mCamera.CaptureImageAvailable -= mCameraSnapshotDelegate;
+                }
+
+                mCameraSnapshotDelegate = delegate(object o, ContentReadyEventArgs args)
+                {
+                    MoSync.Util.RunActionOnMainThreadSync(() =>
+                    {
+                        // If the camera was stopped and this delegate was still called then we do nothing here
+                        // because in maCameraStop we already send the snapshot failed event.
+                        if ( !isCameraSnapshotInProgress )
+                        {
+                            return;
+                        }
+
+                        Stream data = null;
+                        try
+                        {
+                            // as the camera always takes a snapshot in landscape left orientation,
+                            // we need to rotate the resulting image 90 degrees for a current PortraitUp orientation
+                            // and 180 degrees for a current LandscapeRight orientation
+                            int rotateAngle = 0;
+
+                            if (currentPage.Orientation == PageOrientation.PortraitUp)
+                            {
+                                // This is for the front camera.
+                                if (mCamera.CameraType != CameraType.Primary)
+                                {
+                                    rotateAngle = 270;
+                                }
+                                else
+                                {
+                                    rotateAngle = 90;
+                                }
+                            }
+                            else if (currentPage.Orientation == PageOrientation.LandscapeRight)
+                            {
+                                rotateAngle = 180;
+                            }
+                            // if the current page is in a LandscapeLeft orientation, the orientation angle will be 0
+                            data = RotateImage(args.ImageStream, rotateAngle);
+                        }
+                        catch
+                        {
+                            // the orientation angle was not a multiple of 90 - we keep the original image
+                            data = args.ImageStream;
+                        }
+
+                        Resource res = runtime.GetResource(MoSync.Constants.RT_PLACEHOLDER, _placeHolder);
+                        MemoryStream dataMem = new MemoryStream((int)data.Length);
+                        MoSync.Util.CopySeekableStreams(data, 0, dataMem, 0, (int)data.Length);
+                        res.SetInternalObject(dataMem);
+
+
+                        postSnapshotEvent(_placeHolder, mCamera.Resolution,
+                            MoSync.Constants.MA_IMAGE_REPRESENTATION_RAW, MoSync.Constants.MA_CAMERA_RES_OK);
+
+
+                        isCameraSnapshotInProgress = false;
+                    });
+                };
+
+                mCamera.CaptureImageAvailable += mCameraSnapshotDelegate;
+                mCamera.CaptureImage();
+                snapshotPlaceHolder = _placeHolder;
+                isCameraSnapshotInProgress = true;
+
+                return MoSync.Constants.MA_CAMERA_RES_OK;
+            };
 
             /**
              * Sets the property represented by the string situated at the
@@ -271,23 +409,25 @@ namespace MoSync
 
                 if (property.Equals(MoSync.Constants.MA_CAMERA_FLASH_MODE))
                 {
-                    if (value.Equals(MoSync.Constants.MA_CAMERA_FLASH_ON))
+                    if (value.Equals(MoSync.Constants.MA_CAMERA_FLASH_ON) && mCamera.IsFlashModeSupported(FlashMode.On))
                     {
                         mCamera.FlashMode = FlashMode.On;
                         mFlashMode = FlashMode.On;
                     }
-                    else if (value.Equals(MoSync.Constants.MA_CAMERA_FLASH_OFF))
+                    else if (value.Equals(MoSync.Constants.MA_CAMERA_FLASH_OFF) && mCamera.IsFlashModeSupported(FlashMode.Off))
                     {
                         mCamera.FlashMode = FlashMode.Off;
                         mFlashMode = FlashMode.Off;
                     }
-                    else if (value.Equals(MoSync.Constants.MA_CAMERA_FLASH_AUTO))
+                    else if (value.Equals(MoSync.Constants.MA_CAMERA_FLASH_AUTO) && mCamera.IsFlashModeSupported(FlashMode.Auto))
                     {
                         mCamera.FlashMode = FlashMode.Auto;
                         mFlashMode = FlashMode.Auto;
                     }
-                    else return MoSync.Constants.MA_CAMERA_RES_INVALID_PROPERTY_VALUE;
-
+                    else
+                    {
+                        return MoSync.Constants.MA_CAMERA_RES_INVALID_PROPERTY_VALUE;
+                    }
                     return MoSync.Constants.MA_CAMERA_RES_OK;
                 }
                 else if (property.Equals(MoSync.Constants.MA_CAMERA_FOCUS_MODE))
@@ -328,6 +468,12 @@ namespace MoSync
                     {
                         mCameraType = CameraType.Primary;
                         InitCamera();
+
+                        MoSync.Util.RunActionOnMainThreadSync(() =>
+                            {
+                                SetInitialCameraOrientation(currentPage);
+                            }
+                        );
                     }
                 }
                 else if (MoSync.Constants.MA_CAMERA_CONST_FRONT_CAMERA == _camera)
@@ -375,9 +521,20 @@ namespace MoSync
                 }
                 else if (property.Equals(MoSync.Constants.MA_CAMERA_FLASH_SUPPORTED))
                 {
+                    /*
+                     * Since we cannot see if flash is supported because the camera may be not
+                     * fully initialized when this is called, we assume that each windows phone
+                     * has flash support for primary camera but not for the from camera.
+                     */
+                    String result = "true";
+                    if (mCamera.CameraType != CameraType.Primary)
+                    {
+                        result = "false";
+                    }
+
                     core.GetDataMemory().WriteStringAtAddress(
                         _value,
-                        "true",
+                        result,
                         _bufSize);
                 }
                 else return MoSync.Constants.MA_CAMERA_RES_PROPERTY_NOTSUPPORTED;
@@ -389,6 +546,33 @@ namespace MoSync
                 return MoSync.Constants.MA_CAMERA_RES_FAILED;
 			};
 		}
+
+        private void postSnapshotEvent(int _placeHolder, Size _imageSize, int _format, int _returnCode)
+        {
+            Memory eventData = new Memory(20);
+
+            const int MAEventData_eventType = 0;
+            const int MAEventData_snapshotImageDataHandle = 4;
+            const int MAEventData_snapshotSize = 8;
+            const int MAEventData_snapshotImageDataRepresentation = 12;
+            const int MAEventData_snapshotReturnCode = 16;
+
+            // type
+            eventData.WriteInt32(MAEventData_eventType, MoSync.Constants.EVENT_TYPE_CAMERA_SNAPSHOT);
+            // handle
+            eventData.WriteInt32(MAEventData_snapshotImageDataHandle, _placeHolder);
+
+            // size
+            eventData.WriteInt32(MAEventData_snapshotSize, MoSync.Util.CreateExtent(Convert.ToInt32(_imageSize.Width), Convert.ToInt32(_imageSize.Height)));
+
+            // format
+            eventData.WriteInt32(MAEventData_snapshotImageDataRepresentation, _format);
+
+            // return code
+            eventData.WriteInt32(MAEventData_snapshotReturnCode, _returnCode);
+
+            mRuntime.PostEvent(new Event(eventData));
+        }
 
         /**
          * Sets the output parameter 'dim' to the current camera available resolution or

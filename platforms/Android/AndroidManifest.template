@@ -99,14 +99,6 @@
 		</receiver>
 {{! END TODO }}
 {{! TODO: Condition on permission? B }}
-		<service android:name="com.mosync.internal.android.billing.BillingService" />
-		<receiver android:name="com.mosync.internal.android.billing.BillingReceiver">
-			<intent-filter>
-				<action android:name="com.android.vending.billing.IN_APP_NOTIFY" />
-				<action android:name="com.android.vending.billing.RESPONSE_CODE" />
-				<action android:name="com.android.vending.billing.PURCHASE_STATE_CHANGED" />
-			</intent-filter>
-		</receiver>
 		<receiver android:process=":remote" android:name="com.mosync.internal.android.notifications.AlarmReceiver" />
 {{! END TODO }}
 	</application>

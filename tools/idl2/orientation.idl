@@ -1,0 +1,92 @@
+group OrientationConstants "Orientation constants" {
+	constset int MA_SCREEN_ORIENTATION_ {
+		/// The device is in portrait mode, based on sensor. Depending on user rotation,
+		/// #MA_SCREEN_ORIENTATION_PORTRAIT_UP or #MA_SCREEN_ORIENTATION_PORTRAIT_UPSIDE_DOWN will be used.
+		/// Value equals: #MA_SCREEN_ORIENTATION_PORTRAIT_UP | #MA_SCREEN_ORIENTATION_PORTRAIT_UPSIDE_DOWN.
+		PORTRAIT = 0x3;
+		/// The device is in portrait mode, with the device held upright and the home button on
+		/// the bottom.
+		PORTRAIT_UP = 0x1;
+		/// The device is in portrait mode but upside down, with the device held upright and the
+		/// home button at the top.
+		// Note: not available on Windows Phone.
+		PORTRAIT_UPSIDE_DOWN = 0x2;
+		/// The device is in landscape mode, with the device held upright and the home button on
+		/// the left side.
+		LANDSCAPE_LEFT = 0x4;
+		/// The device is in landscape mode, with the device held upright and the home button on
+		/// the right side.
+		LANDSCAPE_RIGHT = 0x8;
+		/// The device is in landscape mode, based on sensor. Depending on user rotation,
+		/// #MA_SCREEN_ORIENTATION_LANDSCAPE_LEFT or #MA_SCREEN_ORIENTATION_LANDSCAPE_RIGHT will be used.
+		LANDSCAPE = 0xC;
+		/// Screen orientation is based on device sensor.
+		/// Value equals: #MA_SCREEN_ORIENTATION_PORTRAIT| #MA_SCREEN_ORIENTATION_LANDSCAPE.
+		DYNAMIC = 0xF;
+	}
+
+	/**
+	* @deprecated Use use @maScreenSetSupportedOrientations instead.
+	*/
+	constset int SCREEN_ORIENTATION_ {
+		/// Landscape screen orientation.
+		LANDSCAPE = 1;
+		/// Portrait screen orientation.
+		PORTRAIT = 2;
+		/// Screen orientation is based on device sensor.
+		DYNAMIC = 3;
+	}
+} // end of OrientationConstants
+
+group OrientationResultCodes "Orientation result codes" {
+	constset int MA_SCREEN_ORIENTATION_RES_ {
+		///
+		OK = 0;
+		///
+		NOT_SUPPORTED = -1;
+		///
+		INVALID_VALUE = -2;
+	}
+} // end of OrientationResultCodes
+
+group OrientationFunctions "Orientation functions" {
+	/**
+	 * @deprecated Use @maScreenSetSupportedOrientations instead.
+	 * Set the screen orientation.
+	 * Currently implemented only on Android and Windows Phone.
+	 * @param orientation One of the \link #SCREEN_ORIENTATION_LANDSCAPE
+	 * #SCREEN_ORIENTATION_PORTRAIT #SCREEN_ORIENTATION_DYNAMIC \endlink
+	 * constants.
+	 * @return \< 0 on error.
+	 */
+	int maScreenSetOrientation(in int orientation);
+
+	/**
+	* Set supported screen orientations.
+	* Currently implemented on iOS, WindowsPhone 7.1 and Android.
+	* @param orientations A bitmask consisting of flags describing the supported screen orientations.
+	* The bitmask can be created using \link #MA_SCREEN_ORIENTATION_PORTRAIT MA_SCREEN_ORIENTATION \endlink
+	* values.
+	* @return One of the next constants:
+	* - #MA_SCREEN_ORIENTATION_RES_OK
+	* - #MA_SCREEN_ORIENTATION_RES_NOT_SUPPORTED
+	* - #MA_SCREEN_ORIENTATION_RES_INVALID_VALUE
+	*/
+	int maScreenSetSupportedOrientations(in int orientations);
+
+	/**
+	* Get supported screen orientations.
+	* Currently implemented on iOS, WindowsPhone 7.1 and Android.
+	* @return A bitmask consisting of flags describing the supported screen orientations.
+	* The bitmask is created using \link #MA_SCREEN_ORIENTATION_PORTRAIT MA_SCREEN_ORIENTATION \endlink
+	* values.
+	*/
+	int maScreenGetSupportedOrientations();
+
+	/**
+	* Get current screen orientation.
+	* Currently implemented on iOS, WindowsPhone 7.1 and Android.
+	* @return One of the \link #MA_SCREEN_ORIENTATION_PORTRAIT MA_SCREEN_ORIENTATION \endlink constants.
+	*/
+	int maScreenGetCurrentOrientation();
+} // end of OrientationFunctions

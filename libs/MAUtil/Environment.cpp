@@ -19,6 +19,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <maassert.h>
 #include <conprint.h>
 
+#define BUF_SIZE 256
+
 namespace MAUtil {
 	PointerListener::~PointerListener() {
 		bool isListener = Environment::getEnvironment().isPointerListener(this);
@@ -54,7 +56,11 @@ namespace MAUtil {
 		mFocusListeners(false),
 		mCustomEventListeners(false),
 		mTextBoxListeners(false),
-		mSensorListeners(false)
+		mSensorListeners(false),
+		mOrientationListeners(false),
+		mCameraListeners(false),
+		mMediaExportListeners(false),
+		mCurrentPlatform(OS_UNKNOWN)
 	{
 		if(sEnvironment)
 			PANIC_MESSAGE("The application tried to instantiate more than one Environment. "
@@ -231,7 +237,59 @@ namespace MAUtil {
 		//MAASSERT(sEnvironment == this);
 		mSensorListeners.remove(tl);
 	}
-	
+
+	void Environment::addOrientationListener(OrientationListener* ol) {
+		mOrientationListeners.add(ol);
+	}
+
+	void Environment::removeOrientationListener(OrientationListener* ol) {
+		mOrientationListeners.remove(ol);
+	}
+
+	void Environment::addCameraListener(CameraListener* camListener)
+	{
+		mCameraListeners.add(camListener);
+	}
+
+	void Environment::removeCameraListener(CameraListener* camListener)
+	{
+		mCameraListeners.remove(camListener);
+	}
+
+
+	PLATFORM_TYPE Environment::getCurrentPlatform()
+	{
+		if ( OS_UNKNOWN == mCurrentPlatform )
+		{
+			// Used in determining the platform.
+			char platform[BUF_SIZE];
+
+			maGetSystemProperty("mosync.device.OS", platform, BUF_SIZE);
+
+			if (strcmp(platform, "Android") == 0)
+			{
+				mCurrentPlatform = OS_ANDROID;
+			}
+			else if (strcmp(platform, "iPhone OS") == 0)
+			{
+				mCurrentPlatform = OS_IOS;
+			}
+			else
+			{
+				mCurrentPlatform = OS_WIN;
+			}
+		}
+		return mCurrentPlatform;
+	}
+
+	void Environment::addMediaExportListener(MediaExportListener* meListener) {
+		mMediaExportListeners.add(meListener);
+	}
+
+	void Environment::removeMediaExportListener(MediaExportListener* meListener) {
+		mMediaExportListeners.remove(meListener);
+	}
+
 	void Environment::fireFocusGainedEvent() {
 		//MAASSERT(sEnvironment == this);
 		mFocusListeners.setRunning(true);
@@ -382,6 +440,47 @@ namespace MAUtil {
 			i->sensorEvent(a);
 		}
 		mSensorListeners.setRunning(false);
+	}
+
+	void Environment::fireOrientationChangedEvent(int screenOrientation) {
+		mOrientationListeners.setRunning(true);
+		ListenerSet_each(OrientationListener, i, mOrientationListeners) {
+			i->orientationChanged(screenOrientation);
+		}
+		mOrientationListeners.setRunning(false);
+	}
+
+	void Environment::fireOrientationWillChangeEvent() {
+		mOrientationListeners.setRunning(true);
+		ListenerSet_each(OrientationListener, i, mOrientationListeners) {
+			i->orientationWillChange();
+		}
+		mOrientationListeners.setRunning(false);
+	}
+
+
+	void Environment::fireCameraEvent(const MAEvent& cameraEvent)
+	{
+		mCameraListeners.setRunning(true);
+		ListenerSet_each(CameraListener, i, mCameraListeners) {
+			i->cameraEvent(cameraEvent);
+		}
+		mCameraListeners.setRunning(false);
+	}
+
+	void Environment::fireMediaExportEvent(const MAEvent& mediaExportEvent)
+	{
+		if ( MA_MEDIA_TYPE_IMAGE == mediaExportEvent.mediaType )
+		{
+			mMediaExportListeners.setRunning(true);
+			ListenerSet_each(MediaExportListener, i, mMediaExportListeners)
+			{
+				i->imageExportToGalleryFinished(
+					mediaExportEvent.mediaHandle,
+					mediaExportEvent.operationResultCode);
+			}
+			mMediaExportListeners.setRunning(false);
+		}
 	}
 
 	void Environment::runIdleListeners() {

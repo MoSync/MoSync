@@ -35,6 +35,7 @@ import static com.mosync.internal.generated.MAAPI_consts.MA_TB_TYPE_PHONENUMBER;
 import static com.mosync.internal.generated.MAAPI_consts.MA_TB_TYPE_URL;
 import static com.mosync.internal.generated.MAAPI_consts.MA_TB_TYPE_SINGLE_LINE;
 
+import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.lang.String;
 
@@ -340,9 +341,9 @@ public class TextBox extends Activity implements OnClickListener {
 
 			// Write text directly to the MoSync memory
 			char[] ca = output.toCharArray();
-			mosyncThread.mMemDataSection.position(mOutputMemPtr);
+			ByteBuffer buffer = mosyncThread.getMemorySlice(mOutputMemPtr, ca.length * 2 + 1);
 
-			CharBuffer cb = mosyncThread.mMemDataSection.asCharBuffer();
+			CharBuffer cb = buffer.asCharBuffer();
 			cb.put(ca);
 			cb.put((char)0);
 
@@ -366,9 +367,9 @@ public class TextBox extends Activity implements OnClickListener {
 
 			// Write text directly to the MoSync memory
 			byte[] ba = output.getBytes();
-			mosyncThread.mMemDataSection.position(mOutputMemPtr);
-			mosyncThread.mMemDataSection.put(ba);
-			mosyncThread.mMemDataSection.put((byte)0);
+			ByteBuffer buffer = mosyncThread.getMemorySlice(mOutputMemPtr, ba.length + 1);
+			buffer.put(ba);
+			buffer.put((byte)0);
 
 			// Notice that the user clicked cancel
 			int[] event = new int[3];

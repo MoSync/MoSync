@@ -28,6 +28,7 @@ Soap = Moblet/Soap
 Stylus = Moblet/Stylus
 timers = Moblet/timers
 MultiTouch = Moblet/MultiTouch
+MoCamera
 MoSketch
 MoSound
 MoTris
@@ -35,9 +36,11 @@ OtaLoad
 GLMobletOpenGLES1 = OpenGLES/GLMobletOpenGLES1
 GLMobletOpenGLES2 = OpenGLES/GLMobletOpenGLES2
 AccelerometerOpenGLES = OpenGLES/AccelerometerOpenGLES
+MoGraphWave = MoGraph/MoGraphWave
+MoGraphWave2 = MoGraph/MoGraphWave2
+MoGraphFinance = MoGraph/MoGraphFinance
 ScreenOrientation
 QuakeMDL
-CameraDemo
 PIMExample
 PurchaseExample
 VideoNativeUIExample

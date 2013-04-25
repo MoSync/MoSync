@@ -68,7 +68,14 @@ namespace NativeUI
 		 * is displayed behind the child screens.
 		 * @param imageHandle Handle to an image.
 		 */
-		void SetBackgroundImage(const MAHandle imageHandle);
+		void setBackgroundImage(const MAHandle imageHandle);
+
+		/**
+		 * Get the background image of the panorama view.
+		 * @return A value greater than zero representing a MoSync handle to an
+		 * uncompressed image resource, or zero if the property was not set.
+		 */
+		MAHandle getBackgroundImage();
 
 		/**
 		 * Add a new screen to the panorama view.
@@ -89,6 +96,12 @@ namespace NativeUI
 		 * @return The index of the current screen.
 		 */
 		int getActiveScreen();
+
+		/**
+		 * Check if panorama view is shown.
+		 * @return true if the panorama view is visible, false otherwise.
+		 */
+		virtual bool isShown();
 	};
 
 } // namespace NativeUI
