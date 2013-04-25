@@ -387,7 +387,7 @@ namespace MoSyncCamera
 		uint currentZoomLevel = mCamera->getZoomLevel();
 		uint zoomStep = (uint)(ZOOM_STEP_RATIO * maxZoomLevel);
 
-		int nextZoomLevel = currentZoomLevel + zoomStep;
+		unsigned int nextZoomLevel = currentZoomLevel + zoomStep;
 		if ( nextZoomLevel > maxZoomLevel )
 		{
 			nextZoomLevel = maxZoomLevel;

@@ -17,7 +17,7 @@
  */
 
 /**
- * @file MoSyncCamController.cpp
+ * @file MoCameraController.cpp
  * @author Mircea Vasiliniuc
  * @date 16 March 2013
  *
@@ -27,12 +27,12 @@
 #include <NativeUI/Screen.h>
 #include <MAUtil/Environment.h>
 
-#include "MoSyncCamController.h"
+#include "MoCameraController.h"
 #include "Screens/ScreenUtils.h"
 
 namespace MoSyncCamera
 {
-	MoSyncCamController::MoSyncCamController():
+	MoCameraController::MoCameraController():
 		mCameraScreen(NULL),
 		mImageViewerScreen(NULL),
 		mForwardTransition(MAW_TRANSITION_TYPE_NONE),
@@ -49,7 +49,7 @@ namespace MoSyncCamera
 	}
 
 
-	MoSyncCamController::~MoSyncCamController()
+	MoCameraController::~MoCameraController()
 	{
 		if ( mDisplayedImageHandle > 0 )
 		{
@@ -68,7 +68,7 @@ namespace MoSyncCamera
 	}
 
 
-	void MoSyncCamController::displayMainScreen()
+	void MoCameraController::displayMainScreen()
 	{
 		if ( !isDisplayed(*mCameraScreen) )
 		{
@@ -79,7 +79,7 @@ namespace MoSyncCamera
 	}
 
 
-	void MoSyncCamController::snapshotDisplayRequested()
+	void MoCameraController::snapshotDisplayRequested()
 	{
 		if ( !isDisplayed(*mImageViewerScreen) )
 		{
@@ -102,7 +102,7 @@ namespace MoSyncCamera
 	}
 
 
-	void MoSyncCamController::snapshotRequested()
+	void MoCameraController::snapshotRequested()
 	{
 		mCameraScreen->showSnapshotInProgress();
 
@@ -117,7 +117,7 @@ namespace MoSyncCamera
 	}
 
 
-	void MoSyncCamController::imageViewingDone()
+	void MoCameraController::imageViewingDone()
 	{
 		if ( !isDisplayed(*mCameraScreen) )
 		{
@@ -134,13 +134,13 @@ namespace MoSyncCamera
 	}
 
 
-	void MoSyncCamController::exportImageToGalleryRequested()
+	void MoCameraController::exportImageToGalleryRequested()
 	{
 		maAlert("Save image", "Image saving is not yet available", "OK", NULL, NULL);
 	}
 
 
-	void MoSyncCamController::snapshotFinished( const NativeUI::CameraSnapshotData& imageData )
+	void MoCameraController::snapshotFinished( const NativeUI::CameraSnapshotData& imageData )
 	{
 		bool snapshotIsAvailable = true;
 		if ( imageData.resultCode != MA_CAMERA_RES_OK )
@@ -158,7 +158,7 @@ namespace MoSyncCamera
 	}
 
 
-	MAWScreenTransitionType MoSyncCamController::setScreenTransitions()
+	void MoCameraController::setScreenTransitions()
 	{
 		switch (MAUtil::Environment::getEnvironment().getCurrentPlatform())
 		{
@@ -181,12 +181,12 @@ namespace MoSyncCamera
 		}
 	}
 
-	void MoSyncCamController::setCurrentScreen( const NativeUI::Screen& currentScreen )
+	void MoCameraController::setCurrentScreen( const NativeUI::Screen& currentScreen )
 	{
 		mDisplayedScreen = currentScreen.getWidgetHandle();
 	}
 
-	bool MoSyncCamController::isDisplayed( const NativeUI::Screen& currentScreen )
+	bool MoCameraController::isDisplayed( const NativeUI::Screen& currentScreen )
 	{
 		return mDisplayedScreen == currentScreen.getWidgetHandle();
 	}
