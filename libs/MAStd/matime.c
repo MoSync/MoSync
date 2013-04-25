@@ -7,9 +7,15 @@
 *                Adapted for MoSync - 21/02/07, Fredrik Eldh <fredrik.eldh@mobilesorcery.com>
 */
 
+#ifndef __IOS__
 #include "matime.h"
 #include "mavsprintf.h"
 #include "mastdlib.h"
+#else
+#include <matime.h>
+#include <mavsprintf.h>
+#include <mastdlib.h>
+#endif
 
 #define SECSPERMIN	60
 #define MINSPERHOUR	60

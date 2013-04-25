@@ -15,6 +15,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
+#ifndef __IOS__
 #include "ma.h"
 #include "maarg.h"
 #include "mastring.h"
@@ -24,11 +25,26 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "mawvsprintf.h"
 #include "maheap.h"
 #include "conprint.h"
+#else
+#include <ma.h>
+#include <maarg.h>
+#include <mastring.h>
+#include <mavsprintf.h>
+#include <mawstring.h>
+#include <wchar.h>
+#include <mawvsprintf.h>
+#include <maheap.h>
+#include <conprint.h>
+#endif
 
 // Console width, in characters
 // Note that not all characters on a line may be visible on a given device, due
 // to varying screen widths
 #define CONSOLE_WIDTH 47
+
+#ifdef __IOS__
+#define MB_LEN_MAX WCHAR_MIN
+#endif
 
 typedef struct
 {

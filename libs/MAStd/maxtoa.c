@@ -31,7 +31,11 @@
 // SUCH DAMAGE.
 // 
 
+#ifndef __IOS__
 #include "maxtoa.h"
+#else
+#include <maxtoa.h>
+#endif
 
 void xtoa(unsigned long val, char *buf, unsigned radix, int negative)
 {
