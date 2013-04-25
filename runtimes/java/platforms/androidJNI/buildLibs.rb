@@ -61,7 +61,7 @@ def buildLib(name, buildParams)
 		bootmoduleList = "--boot-modules " + bootmodules
 	end
 	if compilerflags != nil && !compilerflags.empty?
-		compileflags = "--compiler-switches \"" + compilerflags + " -DANDROID\""
+		compileflags = "--compiler-switches \"" + compilerflags + "\""
 	end
 	success = sh("#{ENV['MOSYNCDIR']}/bin/nbuild --platform Android --name #{name} --project #{project} --dst #{ENV['MOSYNCDIR']}/lib --config Debug,Release --lib-variant debug,release --android-ndkbuild-cmd #{$androidNDKPath}/ndk-build --android-version #{$androidVersion} #{srcfiles} --verbose #{libtype} #{includes} #{bootmoduleList} #{moduleList} #{compilerflags} --android-lib-type #{libtype} --android-build-dir #{project}/temp_#{name}")
 	if !success

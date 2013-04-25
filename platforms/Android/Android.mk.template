@@ -16,8 +16,8 @@ LOCAL_LDLIBS += -llog -landroid -lEGL -lGLESv1_CM -lGLESv2
 LOCAL_C_INCLUDES += $(MOSYNCDIR)/include
 {{/no-default-includes}}
 LOCAL_C_INCLUDES += {{additional-includes}}
-{{! Short wchars -- we may want to remove this soon }}
-LOCAL_CFLAGS    += -fpermissive -O3 -DMOSYNC_NATIVE -DNATIVE_GLES -DNATIVE_GLES2
+{{! We need to undefine the ANDROID macro }}
+LOCAL_CFLAGS    += -UANDROID -fpermissive -O3 -DMOSYNC_NATIVE -DNATIVE_GLES -DNATIVE_GLES2
 LOCAL_CFLAGS    += -std=c99
 LOCAL_CFLAGS    += {{compiler-defines}}
 LOCAL_CFLAGS    += {{additional-compiler-switches}}
