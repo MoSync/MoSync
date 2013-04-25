@@ -26,6 +26,7 @@ MA 02110-1301, USA.
 #include <mastring.h>
 #include <matime.h>
 #include <conprint.h>
+#include <mavsprintf.h>
 #include <MAUtil/String.h>
 #include <MAUtil/HashDict.h>
 #include "../../Encoder.h"
