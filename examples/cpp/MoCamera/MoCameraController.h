@@ -30,11 +30,15 @@
 #include "Screens/CameraScreen.h"
 #include "Screens/ImageViewerScreen.h"
 
+#include "MAUtil/Environment.h"
+#include "NativeUI/Camera.h"
+
 namespace MoSyncCamera
 {
 	class MoCameraController:
 		public CameraScreenObserver,
 		public ImageViewerScreenObserver,
+		public MAUtil::MediaExportListener,
 		public NativeUI::CameraSnapshotListener
 	{
 	public:
@@ -85,6 +89,14 @@ namespace MoSyncCamera
          * From CameraSnapshotListener.
          */
         void snapshotFinished( const NativeUI::CameraSnapshotData& imageData );
+
+        /**
+         * Handles the image export operation result.
+         *
+         * From MediaExportListener.
+         */
+        void imageExportToGalleryFinished( const MAHandle& imageHandle,
+			int resultCode);
 
 	private:
 		/**

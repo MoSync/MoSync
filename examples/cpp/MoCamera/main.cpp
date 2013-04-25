@@ -1,5 +1,4 @@
 #include <ma.h>
-#include <mavsprintf.h>
 #include <MAUtil/Moblet.h>
 #include <NativeUI/WidgetUtil.h>
 

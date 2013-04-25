@@ -83,6 +83,22 @@ namespace MoSyncCamera
 		 */
         void setImageWithData(const MAHandle& imageDataHandle);
 
+        /**
+         * Makes changes to the UI needed when image saving
+         * is in progress.
+         */
+        void showImageSavingInProgress();
+
+        /**
+         * Makes changes to the UI needed when image saving is
+         * completed.
+         *
+         * @param imageSaved True if image was saved in the
+         * phone library, false otherwise.
+         */
+        void hideImageSavingInProgress(bool imageSaved);
+
+
 	private:
 
         void createUI();
@@ -92,6 +108,8 @@ namespace MoSyncCamera
         void setupImageView();
 
         void setupButtons();
+
+		void setupActivityIndicator();
 
         void arrangeWidgets();
 
@@ -106,6 +124,13 @@ namespace MoSyncCamera
 		NativeUI::ImageButton* mDismissButton;
 
 		NativeUI::ImageButton* mSaveImageButton;
+
+		/**
+		 * Widget that indicates activity.
+		 * Used while taking a exporting an image to photo
+		 * gallery.
+		 */
+		NativeUI::ActivityIndicator* mActivityIndicator;
 	};
 } // MoSyncCamera
 #endif /* SNAPSHOTSCREEN_H_ */

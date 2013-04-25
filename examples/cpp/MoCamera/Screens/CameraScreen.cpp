@@ -38,8 +38,6 @@ using namespace NativeUI;
 #define BTN_RATIO 0.16 // Image button/container width ratio for normal buttons
 #define TAKE_PICTURE_BTN_RATIO 0.30 // Image button/container width ratio for the -take snapshot- button
 #define ZOOM_STEP_RATIO 0.1 // (Zoom step)/(maximum zoom) ratio
-#define ACTIVITY_INDICATOR_WIDTH 100 // Width of the activity indicator
-#define ACTIVITY_INDICATOR_HEIGHT 100 // Height of the activity indicator
 
 // The resource arrays must be synchronized with the kFlashModes array!
 static const CAMERA_FLASH_MODE kFlashModes[] = {FLASH_AUTO, FLASH_ON, FLASH_OFF, FLASH_TORCH};
@@ -59,6 +57,7 @@ namespace MoSyncCamera
 			mSetNextCameraButton(NULL),
 			mZoomInButton(NULL),
 			mZoomOutButton(NULL),
+			mActivityIndicator(NULL),
 			mCurrentFlashMode(0)
 	{
 		createUI();
