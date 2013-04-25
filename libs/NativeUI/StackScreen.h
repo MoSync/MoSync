@@ -114,6 +114,21 @@ namespace NativeUI
          */
         virtual void enableBackButton(const bool enabledState);
 
+        /**
+         * Set the background color of the back button.
+         * @param color A hexadecimal color value in the ARGB format, e.g. 0xFFFF0000 is red.
+         */
+        virtual void setBackButtonTintColor(const int color);
+
+        /**
+         * Set the background color of the back button.
+         * @param red Red component (range 0-255).
+         * @param green Green component (range 0-255).
+         * @param blue Blue component (range 0-255).
+         * @param alpha Alpha component (range 0-255).
+         */
+        virtual void setBackButtonTintColor(const int red, const int blue, const int green, const int alpha);
+
 		/**
 		 * Check if a stack screen is shown.
 		 * @return true if the stack screen is visible, false otherwise.

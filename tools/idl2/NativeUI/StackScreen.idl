@@ -30,6 +30,20 @@ group WidgetStackScreenProperties "Stack screen" {
 		BACK_BUTTON_ENABLED = "backButtonEnabled";
 
 		/**
+		* @brief Specifies the background color of the back button.
+		*
+		* @validvalue A hexadecimal value 0xAARRGGBB, where A, R, G and B are the alpha, red, green and blue components respectively.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(widgetHandle, MAW_STACK_SCREEN_BACK_BUTTON_COLOR, "0xffff0000"); // Red
+		* \endcode
+		*/
+		BACK_BUTTON_COLOR = "backButtonTintColor";
+
+		/**
 		* @brief Check if a stack screen is shown.
 		*
 		* @validvalue "true" if the stack screen is visible, "false" otherwise.

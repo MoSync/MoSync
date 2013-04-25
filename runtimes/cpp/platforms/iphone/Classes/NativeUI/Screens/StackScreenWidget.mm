@@ -23,6 +23,7 @@
 #import "StackScreenWidget.h"
 #import "StackScreenWidgetController.h"
 #import "UINavigationControllerExpanded.h"
+#import "UIColorExpanded.h"
 
 @implementation StackScreenWidget
 
@@ -145,6 +146,12 @@
 		UINavigationController* navigationController = (UINavigationController*)_controller;
 		navigationController.navigationBar.backItem.hidesBackButton = [value boolValue];
 	}
+    else if ([key isEqualToString:@MAW_STACK_SCREEN_BACK_BUTTON_COLOR])
+    {
+        UIColor* color = [UIColor colorWithHexString:value];
+        if(!color) return MAW_RES_INVALID_PROPERTY_VALUE;
+        [[UIBarButtonItem appearance] setTintColor:color];
+    }
     else if ([key isEqualToString:@MAW_STACK_SCREEN_TITLE_FONT_HANDLE])
     {
         UIFont* font = Base::getUIFontObject([value intValue]);

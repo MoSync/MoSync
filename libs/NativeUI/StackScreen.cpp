@@ -90,6 +90,20 @@ namespace NativeUI
             (enabledState ? "true" : "false") );
     }
 
+    void StackScreen::setBackButtonTintColor(const int color)
+    {
+        char buffer[BUF_SIZE];
+        sprintf(buffer, "0x%.8X", color);
+        setProperty(MAW_STACK_SCREEN_BACK_BUTTON_COLOR, buffer);
+    }
+
+    void StackScreen::setBackButtonTintColor(const int red, const int blue, const int green, const int alpha)
+    {
+        char buffer[BUF_SIZE];
+        sprintf(buffer, "0x%.2X%.2X%.2X%.2X", alpha, red, green, blue);
+        setProperty(MAW_STACK_SCREEN_BACK_BUTTON_COLOR, buffer);
+    }
+
 	/**
 	 * Check if a stack screen is shown.
 	 * @return true if the stack screen is visible, false otherwise.
