@@ -55,6 +55,7 @@ namespace NativeUI
 
 	/**
 	 * Set the custom picker items row height.
+	 * @param height Height in pixels.
 	 */
 	void CustomPicker::setRowHeight(const int height)
 	{
@@ -63,6 +64,7 @@ namespace NativeUI
 
 	/**
 	 * Get the custom picker items row height.
+	 * @return height in pixels.
 	 */
 	int CustomPicker::getRowHeight()
 	{
@@ -71,6 +73,7 @@ namespace NativeUI
 
 	/**
 	 * Set the custom picker items row width.
+	 * @param width Width in pixels.
 	 */
 	void CustomPicker::setRowWidth(const int width)
 	{
@@ -79,6 +82,7 @@ namespace NativeUI
 
 	/**
 	 * Get the custom picker items row width.
+	 * @return width in pixels.
 	 */
 	int CustomPicker::getRowWidth()
 	{
@@ -111,6 +115,7 @@ namespace NativeUI
 
 	/**
 	 * Check if the selection indicator is shown.
+	 * Platform: iOS.
 	 */
 	bool CustomPicker::isSelectionIndicatorShown()
 	{
@@ -129,6 +134,7 @@ namespace NativeUI
 
 	/**
 	 * Get the index of the selected item.
+	 * If there is nothing selected, -1 will be returned.
 	 */
 	int CustomPicker::getSelectedItemIndex()
 	{

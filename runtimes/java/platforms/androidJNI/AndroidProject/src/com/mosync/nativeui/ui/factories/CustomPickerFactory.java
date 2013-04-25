@@ -18,12 +18,8 @@ MA 02110-1301, USA.
 package com.mosync.nativeui.ui.factories;
 
 import android.app.Activity;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.Spinner;
 
-import com.mosync.internal.android.EventQueue;
 import com.mosync.nativeui.ui.widgets.SpinnerWidget;
 import com.mosync.nativeui.ui.widgets.Widget;
 
@@ -39,21 +35,6 @@ public class CustomPickerFactory implements AbstractViewFactory
 	public Widget create(Activity activity, final int handle)
 	{
 		Spinner spinner = new Spinner( activity );
-		// A spinner does not support item click events, just selection.
-		spinner.setOnItemSelectedListener(new OnItemSelectedListener() {
-
-			@Override
-			public void onItemSelected(AdapterView<?> arg0, View view,
-					int position, long id) {
-				// Post event to the MoSync queue.
-				EventQueue.getDefault( ).postCustomPickerItemSelectedEvent( handle, position );
-			}
-
-			@Override
-			public void onNothingSelected(AdapterView<?> arg0) {
-				// TODO Auto-generated method stub
-			}
-		});
 
 		return new SpinnerWidget( activity, handle, spinner);
 	}

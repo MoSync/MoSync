@@ -47,6 +47,7 @@
 
 #include "PropertiesScreen.h"
 #include "ViewUtils.h"
+#include "../Controller/Util.h"
 
 namespace CustomPickerTest
 {
@@ -74,10 +75,14 @@ namespace CustomPickerTest
 		mSelectItemButtonRef->addButtonListener(this);
 		mShowRowHeightButtonRef->addButtonListener(this);
 		mShowRowWidthButtonRef->addButtonListener(this);
-		mIsSelectionIndicatorShownButtonRef->addButtonListener(this);
+		if (isIOS())
+		{
+			mIsSelectionIndicatorShownButtonRef->addButtonListener(this);
+			mSelectionIndicatorCheckBoxRef->addCheckBoxListener(this);
+		}
 		mSelectedItemIndexButtonRef->addButtonListener(this);
 
-		mSelectionIndicatorCheckBoxRef->addCheckBoxListener(this);
+
 	}
 
 	PropertiesScreen::~PropertiesScreen()
@@ -87,11 +92,9 @@ namespace CustomPickerTest
 		mSelectItemButtonRef->removeButtonListener(this);
 		mShowRowHeightButtonRef->removeButtonListener(this);
 		mShowRowWidthButtonRef->removeButtonListener(this);
-		mIsSelectionIndicatorShownButtonRef->removeButtonListener(this);
 		mSelectedItemIndexButtonRef->removeButtonListener(this);
 
-		mSelectionIndicatorCheckBoxRef->removeCheckBoxListener(this);
-	}
+		if (isIOS())		{			mIsSelectionIndicatorShownButtonRef->removeButtonListener(this);			mSelectionIndicatorCheckBoxRef->removeCheckBoxListener(this);		}	}
 
 	/**
 	 * This method is called if the touch-up event was inside the
@@ -160,8 +163,11 @@ namespace CustomPickerTest
 		createSelectItem();
 		createGetRowHeightButton();
 		createGetRowWidthButton();
-		createSelectionIndicatorRow();
-		createIsShownSelectionIndicationButton();
+		if ( isIOS() )
+		{
+			createSelectionIndicatorRow();
+			createIsShownSelectionIndicationButton();
+		}
 		createSelectedItemIndexButton();
 
 		int rowHeight = mCustomPickerScreenRef.getCustomPickerRowHeight();

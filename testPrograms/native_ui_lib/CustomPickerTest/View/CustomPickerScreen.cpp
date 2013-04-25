@@ -277,6 +277,8 @@ namespace CustomPickerTest
 		item->setBackgroundColor(getRandomColor());
 		item->setWidth(mCustomPickerRef->getRowWidth());
 		item->setHeight(mCustomPickerRef->getRowHeight());
+		NativeUI::Label* x = new NativeUI::Label(" Custom Picker row ");
+		item->addChild(x);
 		return item;
 	}
 
