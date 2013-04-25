@@ -20,7 +20,7 @@
  * @author Bogdan Iusco
  *
  * @brief NativeUI CustomPicker widget.
- * The widget is implementat as a UIPickerView.
+ * UIPickerView with layout widgets as items.
  */
 
 #import "IWidget.h"
@@ -55,7 +55,7 @@
 
 /**
  * Remove a child from the widget.
- * The child's view will be removed its superview.
+ * The child's view will be removed from its superview.
  * @param child Widget to remove.
  */
 - (void)removeChild:(IWidget*)child;

@@ -20,7 +20,7 @@
  * @author Bogdan Iusco
  *
  * @brief NativeUI CustomPicker widget.
- * The widget is implementat as a UIPickerView.
+ * UIPickerView with layout widgets as items.
  */
 
 #import "CustomPickerWidget.h"
@@ -169,21 +169,25 @@
 {
 	if ([child class] != [HorizontalLayoutWidget class] &&
 		[child class] != [RelativeLayoutWidget   class] &&
-		[child class] != [RelativeLayoutWidget   class])
+		[child class] != [VerticalLayoutWidget   class])
 	{
 		return MAW_RES_INVALID_LAYOUT;
 	}
-	return [super insertChild:child atIndex:index toSubview:NO];
+
+	int result = [super insertChild:child atIndex:index toSubview:NO];
+	[[self pickerView] reloadAllComponents];
+	return result;
 }
 
 /**
  * Remove a child from the widget.
- * The child's view will be removed its superview.
+ * The child's view will be removed from its superview.
  * @param child Widget to remove.
  */
 - (void)removeChild:(IWidget*)child
 {
 	[super removeChild:child fromSuperview:NO];
+	[[self pickerView] reloadAllComponents];
 }
 
 /**
