@@ -303,6 +303,7 @@ namespace Wormhole
 		int exists = maFileExists(file);
 		if (1 != exists)
 		{
+			lprintfln("Truncate error: The file does not exist");
 			// Error.
 			maFileClose(file);
 			return -1;
@@ -311,6 +312,7 @@ namespace Wormhole
 		int fileSize = maFileSize(file);
 		if (fileSize < 0)
 		{
+			lprintfln("Truncate error: The file size could not be determined.");
 			// Error.
 			maFileClose(file);
 			return -1;
@@ -319,6 +321,7 @@ namespace Wormhole
 		if (fileSize < size)
 		{
 			// No need to truncate, return current file size.
+			lprintfln("Truncate: no need to truncate.");
 			maFileClose(file);
 			return fileSize;
 		}
@@ -330,6 +333,7 @@ namespace Wormhole
 			// Success, return truncated size.
 			return size;
 		}
+		lprintfln("Truncate error: unknown.");
 
 		// Error.
 		return -1;
@@ -980,15 +984,15 @@ namespace Wormhole
 		}
 		else if (action == "testFileExists")
 		{
-			actionTestFileExists(message);
+			actionTestFileExists(message); // Deprecated since MoSync 3.3
 		}
 		else if (action == "testDirectoryExists")
 		{
-			actionTestDirectoryExists(message);
+			actionTestDirectoryExists(message); // Deprecated since MoSync 3.3
 		}
 		else if (action == "getFreeDiskSpace")
 		{
-			actionGetFreeDiskSpace(message);
+			actionGetFreeDiskSpace(message); // Deprecated since MoSync 3.3
 		}
 	}
 
@@ -1588,6 +1592,7 @@ namespace Wormhole
 			"window.localFileSystem._castEntries");
 	}
 
+	// Deprecated since MoSync 3.3
 	void PhoneGapFile::actionTestFileExists(JSONMessage& message)
 	{
 		String callbackID = message.getParam("PhoneGapCallBackId");
@@ -1606,6 +1611,7 @@ namespace Wormhole
 			exists);
 	}
 
+	// Deprecated since MoSync 3.3
 	void PhoneGapFile::actionTestDirectoryExists(JSONMessage& message)
 	{
 		String callbackID = message.getParam("PhoneGapCallBackId");
@@ -1624,10 +1630,7 @@ namespace Wormhole
 			exists);
 	}
 
-	/**
-	 * TODO: How should we implement this? Which file system are
-	 * we talking about? Unsupported for now.
-	 */
+	// Deprecated since MoSync 3.3
 	void PhoneGapFile::actionGetFreeDiskSpace(JSONMessage& message)
 	{
 		String callbackID = message.getParam("PhoneGapCallBackId");
