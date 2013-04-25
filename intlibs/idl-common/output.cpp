@@ -532,7 +532,7 @@ static void streamTypedefs(ostream& stream, const vector<Typedef>& typedefs, int
 		"typedef wchar wchar_t;\n"
 		"#endif	//__cplusplus\n"
 		"#else	//MAPIP\n"
-		"#if defined(MOSYNC_NATIVE) && defined(ANDROID)\n"
+		"#if defined(MOSYNC_NATIVE)\n"
 		"#include <stddef.h>\n"
 		"typedef wchar_t wchar;\n"
 		"#else\n"

@@ -96,7 +96,7 @@ int buildIOSNative(Arguments* params) {
 			}
 			else
 			{
-				cmd << "-Os";
+				cmd << "-Os ";
 			}
 
 			cmd << "-arch " + arch << " "; //The architecture to build
