@@ -44,10 +44,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define CON(ret, fn) ret fn
 #endif
 
-#ifdef __IOS__
-#define wchar_t wchar
-#endif
-
 #ifdef __cplusplus
 extern "C" {
 #endif
