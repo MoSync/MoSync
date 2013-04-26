@@ -25,7 +25,6 @@
  */
 
 #include <NativeUI/Screen.h>
-#include <MAUtil/Environment.h>
 
 #include "MoCameraController.h"
 #include "Screens/ScreenUtils.h"
@@ -45,6 +44,8 @@ namespace MoSyncCamera
 		mImageViewerScreen = new ImageViewerScreen(*this);
 
 		mCameraScreen->registerCameraListener(this);
+		MAUtil::Environment::getEnvironment().addMediaExportListener(this);
+
 		setScreenTransitions();
 	}
 
@@ -62,6 +63,7 @@ namespace MoSyncCamera
 		}
 
 		mCameraScreen->unregisterCameraListener(this);
+		MAUtil::Environment::getEnvironment().removeMediaExportListener(this);
 
 		delete mCameraScreen;
 		delete mImageViewerScreen;
@@ -102,21 +104,6 @@ namespace MoSyncCamera
 	}
 
 
-	void MoCameraController::snapshotRequested()
-	{
-		mCameraScreen->showSnapshotInProgress();
-
-		if ( mLastSnapshotDataHandle > 0 )
-		{
-			maDestroyPlaceholder(mLastSnapshotDataHandle);
-			mLastSnapshotDataHandle = 0;
-		}
-		mLastSnapshotDataHandle = maCreatePlaceholder();
-
-		mCameraScreen->takeSnapshot(mLastSnapshotDataHandle);
-	}
-
-
 	void MoCameraController::imageViewingDone()
 	{
 		if ( !isDisplayed(*mCameraScreen) )
@@ -134,9 +121,18 @@ namespace MoSyncCamera
 	}
 
 
-	void MoCameraController::exportImageToGalleryRequested()
+	void MoCameraController::snapshotRequested()
 	{
-		maAlert("Save image", "Image saving is not yet available", "OK", NULL, NULL);
+		mCameraScreen->showSnapshotInProgress();
+
+		if ( mLastSnapshotDataHandle > 0 )
+		{
+			maDestroyPlaceholder(mLastSnapshotDataHandle);
+			mLastSnapshotDataHandle = 0;
+		}
+		mLastSnapshotDataHandle = maCreatePlaceholder();
+
+		mCameraScreen->takeSnapshot(mLastSnapshotDataHandle);
 	}
 
 
@@ -155,6 +151,38 @@ namespace MoSyncCamera
 			}
 		}
 		mCameraScreen->hideSnapshotInProgress(snapshotIsAvailable);
+	}
+
+
+	void MoCameraController::exportImageToGalleryRequested()
+	{
+		if ( mDisplayedImageHandle > 0 )
+		{
+			mImageViewerScreen->toggleImageSavingInProgress(true);
+			int returnCode = maSaveImageToDeviceGallery(mDisplayedImageHandle, "MoSyncCameraPic");
+			if ( returnCode != MA_MEDIA_RES_OK )
+			{
+				mImageViewerScreen->toggleImageSavingInProgress(false);
+				maAlert("Save image", "Image saving failed!", "OK", NULL, NULL);
+			}
+		}
+	}
+
+
+	void MoCameraController::imageExportToGalleryFinished(
+			const MAHandle& imageHandle,
+			int resultCode)
+	{
+		MAUtil::String message = "Image saved!";
+
+		if ( mDisplayedImageHandle != imageHandle &&
+				resultCode != MA_MEDIA_RES_OK )
+		{
+			message = "Image saving failed!";
+		}
+
+		mImageViewerScreen->toggleImageSavingInProgress(false);
+		maAlert("Save image", message.c_str(), "OK", NULL, NULL);
 	}
 
 

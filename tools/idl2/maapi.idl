@@ -2978,7 +2978,8 @@ interface MAAPI {
 		/**
 		 * Saves an images in the photo gallery of the device.
 		 *
-		 * Notifications of this operation are available via #MediaExportListener class.
+		 * Notifications of this operation are available via
+		 * #MAUtil::MediaExportListener.
 		 *
 		 * \param imageHandle handle of the image that needs to be exported to the
 		 * device.
@@ -2990,9 +2991,6 @@ interface MAAPI {
 		 */
 		int maSaveImageToDeviceGallery(in MAHandle imageHandle, in MAString imageName);
 
-		/**
-		 * The available multimedia types.
-		 */
 		constset int MA_MEDIA_TYPE_ {
 			/**
 			 * @brief Indicatest an unknown multimedia type.
@@ -3000,17 +2998,14 @@ interface MAAPI {
 			UNKNOWN = -1;
 
 			/**
-			 * @brief Indicates an image.
+			 * @brief Indicates an image type. This is used in multimedia operations.
 			 */
 			IMAGE = 0;
 		}
 
-		/**
-		 * The available result codes for the operations related to multimedia.
-		 */
 		constset int MA_MEDIA_RES_ {
 			/**
-			 * @brief Indicates that the operation was successful.
+			 * @brief Indicates that the multimedia operation was successful.
 			 */
 			OK = 0;
 

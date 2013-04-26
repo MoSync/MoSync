@@ -39,104 +39,133 @@ using namespace NativeUI;
 
 namespace MoSyncCamera
 {
-	ImageViewerScreen::ImageViewerScreen(ImageViewerScreenObserver& observer):
-			mObserver(observer),
-			mMainLayout(NULL),
-			mImageView(NULL),
-			mDismissButton(NULL),
-			mSaveImageButton(NULL)
-	{
-		createUI();
-	}
+    ImageViewerScreen::ImageViewerScreen(ImageViewerScreenController& controller):
+            mController(controller),
+            mMainLayout(NULL),
+            mImageView(NULL),
+            mDismissButton(NULL),
+            mSaveImageButton(NULL),
+            mActivityIndicator(NULL)
+    {
+        createUI();
+    }
 
-	ImageViewerScreen::~ImageViewerScreen()
-	{
-		mDismissButton->removeButtonListener(this);
-		mSaveImageButton->removeButtonListener(this);
-	}
+    ImageViewerScreen::~ImageViewerScreen()
+    {
+        mDismissButton->removeButtonListener(this);
+        mSaveImageButton->removeButtonListener(this);
+    }
 
-	void ImageViewerScreen::createUI()
-	{
-		setupMainLayout();
-		setupImageView();
-		setupButtons();
-		arrangeWidgets();
-	}
+    void ImageViewerScreen::createUI()
+    {
+        setupMainLayout();
+        setupImageView();
+        setupButtons();
+        setupActivityIndicator();
+        arrangeWidgets();
+    }
 
-	void ImageViewerScreen::setupMainLayout()
-	{
-		mMainLayout = new RelativeLayout();
-		mMainLayout->setBackgroundColor(BLACK_COLOR);
-		setMainWidget(mMainLayout);
-	}
+    void ImageViewerScreen::setupMainLayout()
+    {
+        mMainLayout = new RelativeLayout();
+        mMainLayout->setBackgroundColor(BLACK_COLOR);
+        setMainWidget(mMainLayout);
+    }
 
-	void ImageViewerScreen::setupImageView()
-	{
-		mImageView = new Image();
-		mImageView->fillSpaceHorizontally();
-		mImageView->fillSpaceVertically();
-		mImageView->setScaleMode(IMAGE_SCALE_PRESERVE_ASPECT);
-		mMainLayout->addChild(mImageView);
-		mImageView->setVisible(false);
-	}
+    void ImageViewerScreen::setupImageView()
+    {
+        mImageView = new Image();
+        mImageView->fillSpaceHorizontally();
+        mImageView->fillSpaceVertically();
+        mImageView->setScaleMode(IMAGE_SCALE_PRESERVE_ASPECT);
+        mMainLayout->addChild(mImageView);
+        mImageView->setVisible(false);
+    }
 
-	void ImageViewerScreen::setupButtons()
-	{
-		// dismiss button
-		mDismissButton = new NativeUI::ImageButton();
-		ScreenUtils::setupImageButton(mDismissButton,
-				this, RES_BACK_IMG, RES_BACK_IMG_PRESSED);
-		mMainLayout->addChild(mDismissButton);
+    void ImageViewerScreen::setupButtons()
+    {
+        // dismiss button
+        mDismissButton = new NativeUI::ImageButton();
+        ScreenUtils::setupImageButton(mDismissButton,
+                this, RES_BACK_IMG, RES_BACK_IMG_PRESSED);
+        mMainLayout->addChild(mDismissButton);
 
-		// save button
-		mSaveImageButton = new NativeUI::ImageButton();
-		ScreenUtils::setupImageButton(mSaveImageButton,
-				this, RES_SAVE_IMG, RES_SAVE_IMG_PRESSED);
-		mMainLayout->addChild(mSaveImageButton);
-	}
+        // save button
+        mSaveImageButton = new NativeUI::ImageButton();
+        ScreenUtils::setupImageButton(mSaveImageButton,
+                this, RES_SAVE_IMG, RES_SAVE_IMG_PRESSED);
+        mMainLayout->addChild(mSaveImageButton);
+    }
 
-	void ImageViewerScreen::arrangeWidgets()
-	{
-		/// Get screen dimensions.
-		MAExtent size = maGetScrSize();
-		/// Extract the screen width
-		int screenWidth = EXTENT_X(size);
-		/// Extract the screen height
-		int screenHeight = EXTENT_Y(size);
+    void ImageViewerScreen::setupActivityIndicator()
+    {
+        mActivityIndicator = new ActivityIndicator();
+        mActivityIndicator->setWidth(ACTIVITY_INDICATOR_WIDTH);
+        mActivityIndicator->setHeight(ACTIVITY_INDICATOR_HEIGHT);
+        mActivityIndicator->hide();
+        mMainLayout->addChild(mActivityIndicator);
+    }
 
-		mImageView->setPosition(0, 0);
-		mImageView->setWidth(screenWidth);
-		mImageView->setHeight(screenHeight);
+    void ImageViewerScreen::arrangeWidgets()
+    {
+        /// Get screen dimensions.
+        MAExtent size = maGetScrSize();
+        /// Extract the screen width
+        int screenWidth = EXTENT_X(size);
+        /// Extract the screen height
+        int screenHeight = EXTENT_Y(size);
 
-		ScreenUtils::resizeWidget(mDismissButton, size, CONTAINER_BUTTON_RATIO);
-		// bottom left
-		int btnY = screenHeight - mDismissButton->getHeight();
-		int btnX = 0;
-		mDismissButton->setPosition(btnX, btnY);
+        mImageView->setPosition(0, 0);
+        mImageView->setWidth(screenWidth);
+        mImageView->setHeight(screenHeight);
 
-		ScreenUtils::resizeWidget(mSaveImageButton, size, CONTAINER_BUTTON_RATIO);
-		 // bottom right
-		btnY = screenHeight - mSaveImageButton->getHeight();
-		btnX = screenWidth - mSaveImageButton->getWidth();
-		mSaveImageButton->setPosition(btnX, btnY);
-	}
+        mActivityIndicator->setPosition((screenWidth - mActivityIndicator->getWidth())/2,
+                (screenHeight - mActivityIndicator->getHeight())/2);
 
-	void ImageViewerScreen::buttonClicked(NativeUI::Widget* button)
-	{
-		if ( button == mDismissButton )
-		{
-			mObserver.imageViewingDone();
-		}
-		else if ( button == mSaveImageButton )
-		{
-			mObserver.exportImageToGalleryRequested();
-		}
-	}
+        ScreenUtils::resizeWidget(mDismissButton, size, CONTAINER_BUTTON_RATIO);
+        // bottom left
+        int btnY = screenHeight - mDismissButton->getHeight();
+        int btnX = 0;
+        mDismissButton->setPosition(btnX, btnY);
 
-	void ImageViewerScreen::setImageWithData(const MAHandle& imageHandle)
-	{
-		mImageView->setImage(imageHandle);
-		mImageView->setScaleMode(IMAGE_SCALE_PRESERVE_ASPECT);
-		mImageView->setVisible(true);
-	}
+        ScreenUtils::resizeWidget(mSaveImageButton, size, CONTAINER_BUTTON_RATIO);
+         // bottom right
+        btnY = screenHeight - mSaveImageButton->getHeight();
+        btnX = screenWidth - mSaveImageButton->getWidth();
+        mSaveImageButton->setPosition(btnX, btnY);
+    }
+
+    void ImageViewerScreen::buttonClicked(NativeUI::Widget* button)
+    {
+        if ( button == mDismissButton )
+        {
+            mController.imageViewingDone();
+        }
+        else if ( button == mSaveImageButton )
+        {
+            mController.exportImageToGalleryRequested();
+        }
+    }
+
+    void ImageViewerScreen::setImageWithData(const MAHandle& imageHandle)
+    {
+        mImageView->setImage(imageHandle);
+        mImageView->setScaleMode(IMAGE_SCALE_PRESERVE_ASPECT);
+        mImageView->setVisible(true);
+    }
+
+
+    void ImageViewerScreen::toggleImageSavingInProgress(bool isInProgress)
+    {
+        mSaveImageButton->setEnabled(!isInProgress);
+        mDismissButton->setEnabled(!isInProgress);
+        if ( isInProgress )
+        {
+            mActivityIndicator->show();
+        }
+        else
+        {
+            mActivityIndicator->hide();
+        }
+    }
 } // MoSyncCamera

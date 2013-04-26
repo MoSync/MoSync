@@ -17,10 +17,6 @@
  */
 #include "ScreenUtils.h"
 
-// Include the standard libraries we need.
-//#include <mastdlib.h>
-#include <mavsprintf.h>
-
 // Include NativeUI.
 #include <IX_WIDGET.h>
 
