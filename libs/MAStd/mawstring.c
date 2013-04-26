@@ -15,9 +15,15 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
+#ifndef __IOS__
 #include "ma.h"
 #include "mawstring.h"
 #include "madmath.h"
+#else
+#include <ma.h>
+#include <mawstring.h>
+#include <madmath.h>
+#endif
 
 #if defined(MAPIP) || (defined(MOSYNC_NATIVE) && defined(__ANDROID__))
 

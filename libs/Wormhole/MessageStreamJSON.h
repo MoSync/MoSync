@@ -69,7 +69,7 @@ public:
 	 * Constructor.
 	 * @deprecated
 	 */
-	MessageStreamJSON::MessageStreamJSON(
+	MessageStreamJSON(
 		NativeUI::WebView* webView,
 		MAHandle dataHandle);
 

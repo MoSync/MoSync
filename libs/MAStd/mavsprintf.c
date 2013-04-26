@@ -32,11 +32,19 @@
 //
 
 //#include <sys/types.h>
+#ifndef __IOS__
 #include "maarg.h"
 #include "mastring.h"
 #include "mawstring.h"
 #include "conprint.h"
 #include "madmath.h"
+#else
+#include <maarg.h>
+#include <mastring.h>
+#include <mawstring.h>
+#include <conprint.h>
+#include <madmath.h>
+#endif
 
 #ifdef MAPIP
 

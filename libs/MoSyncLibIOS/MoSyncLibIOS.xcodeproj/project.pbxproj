@@ -8,6 +8,10 @@
 
 /* Begin PBXBuildFile section */
 		0B80AC96171D9A78002EDBD1 /* maassert.c in Sources */ = {isa = PBXBuildFile; fileRef = 0B80AC95171D9A78002EDBD1 /* maassert.c */; };
+		0B81C65217292425006E6E7D /* OrientationMessageHandler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0B81C65017292425006E6E7D /* OrientationMessageHandler.cpp */; };
+		0B81C6541729253E006E6E7D /* conprint.c in Sources */ = {isa = PBXBuildFile; fileRef = 0B81C6531729253E006E6E7D /* conprint.c */; };
+		0B81C65617292769006E6E7D /* matime.c in Sources */ = {isa = PBXBuildFile; fileRef = 0B81C65517292769006E6E7D /* matime.c */; };
+		0B81C658172928F4006E6E7D /* mawvsprintf.c in Sources */ = {isa = PBXBuildFile; fileRef = 0B81C657172928F4006E6E7D /* mawvsprintf.c */; };
 		0B92B4701712BAE1002DFDF6 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0B92B46F1712BAE1002DFDF6 /* Foundation.framework */; };
 		0B92C85F1712BB8A002DFDF6 /* File.c in Sources */ = {isa = PBXBuildFile; fileRef = 0B92B5FD1712BB7D002DFDF6 /* File.c */; };
 		0B92C8601712BB8A002DFDF6 /* MAVector3.c in Sources */ = {isa = PBXBuildFile; fileRef = 0B92B6031712BB7D002DFDF6 /* MAVector3.c */; };
@@ -186,6 +190,9 @@
 		0B92CF8D1712BB8B002DFDF6 /* Sprite.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0B92C7D61712BB8A002DFDF6 /* Sprite.cpp */; };
 		0B92CF8E1712BB8B002DFDF6 /* MinUI.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0B92C7D91712BB8A002DFDF6 /* MinUI.cpp */; };
 		0BC7BEFD1726B4DC007662C2 /* mastring.c in Sources */ = {isa = PBXBuildFile; fileRef = 0BC7BEFC1726B4DC007662C2 /* mastring.c */; };
+		0BC7BEFF1728218F007662C2 /* maxtoa.c in Sources */ = {isa = PBXBuildFile; fileRef = 0BC7BEFE1728218F007662C2 /* maxtoa.c */; };
+		0BC7BF01172821BD007662C2 /* mavsprintf.c in Sources */ = {isa = PBXBuildFile; fileRef = 0BC7BF00172821BD007662C2 /* mavsprintf.c */; };
+		0BC7BF031728226E007662C2 /* mawstring.c in Sources */ = {isa = PBXBuildFile; fileRef = 0BC7BF021728226E007662C2 /* mawstring.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -202,6 +209,11 @@
 
 /* Begin PBXFileReference section */
 		0B80AC95171D9A78002EDBD1 /* maassert.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = maassert.c; sourceTree = "<group>"; };
+		0B81C65017292425006E6E7D /* OrientationMessageHandler.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = OrientationMessageHandler.cpp; sourceTree = "<group>"; };
+		0B81C65117292425006E6E7D /* OrientationMessageHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OrientationMessageHandler.h; sourceTree = "<group>"; };
+		0B81C6531729253E006E6E7D /* conprint.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = conprint.c; sourceTree = "<group>"; };
+		0B81C65517292769006E6E7D /* matime.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = matime.c; sourceTree = "<group>"; };
+		0B81C657172928F4006E6E7D /* mawvsprintf.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = mawvsprintf.c; sourceTree = "<group>"; };
 		0B92B46C1712BAE1002DFDF6 /* libMoSyncLibIOS.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libMoSyncLibIOS.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		0B92B46F1712BAE1002DFDF6 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		0B92B4731712BAE1002DFDF6 /* MoSyncLibIOS-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "MoSyncLibIOS-Prefix.pch"; sourceTree = "<group>"; };
@@ -691,6 +703,9 @@
 		0B92CFD1171598F9002DFDF6 /* maapi.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = maapi.h; sourceTree = "<group>"; };
 		0BC7BEFB1726B263007662C2 /* IX_OPENGL_ES_MA.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IX_OPENGL_ES_MA.h; sourceTree = "<group>"; };
 		0BC7BEFC1726B4DC007662C2 /* mastring.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = mastring.c; sourceTree = "<group>"; };
+		0BC7BEFE1728218F007662C2 /* maxtoa.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = maxtoa.c; sourceTree = "<group>"; };
+		0BC7BF00172821BD007662C2 /* mavsprintf.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = mavsprintf.c; sourceTree = "<group>"; };
+		0BC7BF021728226E007662C2 /* mawstring.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = mawstring.c; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -705,6 +720,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		0B81C64F17292425006E6E7D /* Orientation */ = {
+			isa = PBXGroup;
+			children = (
+				0B81C65017292425006E6E7D /* OrientationMessageHandler.cpp */,
+				0B81C65117292425006E6E7D /* OrientationMessageHandler.h */,
+			);
+			path = Orientation;
+			sourceTree = "<group>";
+		};
 		0B92B4631712BAE1002DFDF6 = {
 			isa = PBXGroup;
 			children = (
@@ -768,6 +792,12 @@
 		0B92B47D1712BB7B002DFDF6 /* MAStd */ = {
 			isa = PBXGroup;
 			children = (
+				0B81C657172928F4006E6E7D /* mawvsprintf.c */,
+				0B81C65517292769006E6E7D /* matime.c */,
+				0B81C6531729253E006E6E7D /* conprint.c */,
+				0BC7BF021728226E007662C2 /* mawstring.c */,
+				0BC7BF00172821BD007662C2 /* mavsprintf.c */,
+				0BC7BEFE1728218F007662C2 /* maxtoa.c */,
 				0BC7BEFC1726B4DC007662C2 /* mastring.c */,
 				0BC7BEFB1726B263007662C2 /* IX_OPENGL_ES_MA.h */,
 				0B80AC95171D9A78002EDBD1 /* maassert.c */,
@@ -1112,6 +1142,7 @@
 		0B92BA3F1712BB81002DFDF6 /* Libs */ = {
 			isa = PBXGroup;
 			children = (
+				0B81C64F17292425006E6E7D /* Orientation */,
 				0B92BA401712BB81002DFDF6 /* Extensions */,
 				0B92BA431712BB81002DFDF6 /* JSNativeUI */,
 				0B92BA481712BB81002DFDF6 /* JSONMessage.cpp */,
@@ -1623,7 +1654,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "line_1=$(sed -n '/char\\* strcpy/=' ../MAStd/maapi.h)\nlet \"line_2=$line_1-2\"\necho $line_2\n\nrm -r MAStdNative || echo MASTDNative already deleted\nmkdir MAStdNative\ncd ../MAStd\ncp IX_OPENGL_ES.h maapi.h madmath.h maxtoa.h maapi_defs.h maarg.h IX_WIDGET.h maheap.h matime.h conprint.h maassert.h mastdlib.h mavsprintf.h ma.h mactype.h mastring.h IX_OPENGL_ES_MA.h ../MoSyncLibIOS/MAStdNative\n\ncd ..\n\nfind . -path ./MoSyncLibIOS -prune -o -iname \"*.h\" | cpio -pmud MoSyncLibIOS/MAStdNative/\n\ncd MoSyncLibIOS/MAStdNative\n\n\nline_1+=\"d\"\necho $line_1\nline_2+=\"d\"\necho $line_2\n\nsed -i.bak $line_1 maapi.h\nsed -i.bak $line_2 maapi.h\n\n";
+			shellScript = "line_1=$(sed -n '/char\\* strcpy/=' ../MAStd/maapi.h)\nlet \"line_2=$line_1-2\"\necho $line_2\n\nrm -r MAStdNative || echo MASTDNative already deleted\nmkdir MAStdNative\ncd ../MAStd\ncp IX_OPENGL_ES.h maapi.h madmath.h maxtoa.h maapi_defs.h maarg.h IX_WIDGET.h maheap.h matime.h conprint.h maassert.h mastdlib.h mavsprintf.h ma.h mactype.h mastring.h mawvsprintf.h mawstring.h IX_OPENGL_ES_MA.h ../MoSyncLibIOS/MAStdNative\n\ncd ..\n\nfind . -path ./MoSyncLibIOS -prune -o -iname \"*.h\" | cpio -pmud MoSyncLibIOS/MAStdNative/\n\ncd MoSyncLibIOS/MAStdNative\n\n\nline_1+=\"d\"\necho $line_1\nline_2+=\"d\"\necho $line_2\n\nsed -i.bak $line_1 maapi.h\nsed -i.bak $line_2 maapi.h\n\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -1810,6 +1841,13 @@
 				0B92CF8E1712BB8B002DFDF6 /* MinUI.cpp in Sources */,
 				0B80AC96171D9A78002EDBD1 /* maassert.c in Sources */,
 				0BC7BEFD1726B4DC007662C2 /* mastring.c in Sources */,
+				0BC7BEFF1728218F007662C2 /* maxtoa.c in Sources */,
+				0BC7BF01172821BD007662C2 /* mavsprintf.c in Sources */,
+				0BC7BF031728226E007662C2 /* mawstring.c in Sources */,
+				0B81C65217292425006E6E7D /* OrientationMessageHandler.cpp in Sources */,
+				0B81C6541729253E006E6E7D /* conprint.c in Sources */,
+				0B81C65617292769006E6E7D /* matime.c in Sources */,
+				0B81C658172928F4006E6E7D /* mawvsprintf.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

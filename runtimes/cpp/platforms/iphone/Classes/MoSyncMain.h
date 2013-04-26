@@ -45,8 +45,8 @@ void* MoSync_GetCustomEventData();
 void* MoSync_GetCustomEventDataMoSyncPointer();
 void MoSync_AddLayerToView(CALayer* layer);
 
-bool gNativeMode;
-int gStackPointer; //May we one day get rid of this
+extern bool gNativeMode;
+extern int gStackPointer; //May we one day get rid of this
 
 /*
 void MoSync_AddLocationProviderEvent(int state);

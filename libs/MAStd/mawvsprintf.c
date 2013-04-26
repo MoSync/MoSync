@@ -31,6 +31,7 @@
 // SUCH DAMAGE.
 //
 
+#ifndef __IOS__
 //#include <sys/types.h>
 #include "maarg.h"
 #include "mawstring.h"
@@ -39,6 +40,14 @@
 //#include "conprint.h"
 #include "madmath.h"
 #include "wchar.h"
+#else
+#include <maarg.h>
+#include <mawstring.h>
+#include <mastring.h>
+#include <mawvsprintf.h>
+#include <madmath.h>
+#include <wchar.h>
+#endif
 
 #if 1//def MAPIP
 
@@ -52,6 +61,10 @@
 
 
 #define CVTBUFSIZE 80
+
+#ifdef __IOS__
+#define MB_LEN_MAX WCHAR_MIN
+#endif
 
 static wchar_t *cvt(double arg, int ndigits, int *decpt, int *sign, wchar_t *buf, int eflag)
 {
