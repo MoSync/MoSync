@@ -105,7 +105,7 @@ int buildIOSNative(Arguments* params) {
 			cmd << " -nostdlib "; //Don't link with stdlib, xcode will do that
 			cmd << "-isysroot /Applications/Xcode.app/Contents/Developer/Platforms/" << archSDKName << ".platform/Developer/SDKs/" << archSDKName << sdkVersion << ".sdk ";
 			cmd << "-miphoneos-version-min=" << sdkVersion << " ";
-			cmd << "-D__IOS__ -DUSE_NEWLIB -DMOSYNC_NATIVE -DNATIVE_GLES  -DNATIVE_GLES2" << " ";
+			cmd << "-D__IOS__ -DUSE_NEWLIB -DMOSYNC_NATIVE" << " ";
 			cmd << "-I" << nativeHeaderDir << " ";
 			cmd << "-I" << outputDir << " ";
 			cmd << sourceFileList << " ";

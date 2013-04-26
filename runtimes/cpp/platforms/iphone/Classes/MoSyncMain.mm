@@ -35,7 +35,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 //#include "rebuild.build.cpp"
 
 bool gNativeMode;
-int gStackPointer;
+
 int sp;
 unsigned char *mem_ds;
 void *sCustomEventData;
@@ -68,9 +68,9 @@ const wchar* Base::Syscall::GetValidatedWStr(int address) {
 	return (const wchar*)(mem_ds+address);
 }
 
-int Base::Syscall::GetValidatedStackValue(int offset) {
+int Base::Syscall::GetValidatedStackValue(int offset VSV_ARGPTR_DECL) {
     if(gNativeMode) {
-        sp = gStackPointer;
+        sp = (int)VSV_ARGPTR_NAME;
     }
 	int address = sp + offset;
 	//if(((address&0x03)!=0) || uint(address)<STACK_BOTTOM || uint(address)>STACK_TOP)
