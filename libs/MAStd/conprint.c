@@ -43,7 +43,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define CONSOLE_WIDTH 47
 
 #ifdef __IOS__
-#define MB_LEN_MAX WCHAR_MIN
+#define MB_LEN_MAX sizeof(wchar)
 #endif
 
 typedef struct

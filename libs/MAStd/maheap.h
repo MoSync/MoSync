@@ -38,6 +38,7 @@ extern "C" {
 #endif
 #ifdef __IOS__
 #include <malloc/malloc.h>
+#include <stdlib.h>
 #else
 #include <malloc.h>
 #endif
