@@ -93,6 +93,28 @@ class PipeLibWork < PipeGccWork
 	#def filename; @NAME + ".lib"; end
 end
 
+class AndroidNativeLibWork < Work
+	include MoSyncMod
+	def invoke
+		# We are at the source tree root.
+		require "#{File.dirname(__FILE__)}/../tools/RuntimeBuilder/Settings.rb"
+		# And here we set the android version to 17.
+		# There is no 'proper' way to get that version so we
+		# just put it here.
+		oldDir = Dir.getwd
+		# This is also very secret-ingredient-y
+		Dir.chdir "#{File.dirname(__FILE__)}/../tools/RuntimeBuilder"
+		if !File.exist? "Settings.rb"
+			puts "Creates the Settings.rb file"
+			FileUtils.copy_file("Settings.rb.example", "Settings.rb")
+		end
+		Dir.chdir "#{File.dirname(__FILE__)}/../runtimes/java/platforms/androidJNI"
+		result = sh "ruby buildLibs.rb #{$SETTINGS[:android_ndk]} 17"
+		Dir.chdir oldDir
+		return result
+	end
+end
+
 module MoSyncLib end
 
 def MoSyncLib.inin(work, mod)
@@ -108,6 +130,8 @@ end
 
 def MoSyncLib.invoke(mod)
 	target :pipe do
+		# Todo: obviously this one should not be here
+		MoSyncLib.inin(AndroidNativeLibWork.new, mod)
 		MoSyncLib.inin(PipeLibWork.new, mod)
 	end
 	target :native do
