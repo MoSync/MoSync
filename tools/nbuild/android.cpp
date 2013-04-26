@@ -234,8 +234,8 @@ int executeNdkBuild(Arguments* params) {
 			if (doClean) {
 				cmd << "-B ";
 			}
-			string libDir = toMakefileFile(string(mosyncdir()) + "/lib");
-			string moduleDir = toMakefileFile(string(mosyncdir()) + "/modules");
+			string libDir = string(mosyncdir()) + "/lib";
+			string moduleDir = string(mosyncdir()) + "/modules";
 			toSlashes(moduleDir);
 			string makeFile = toMakefileFile(tmpBuildDir + "Android.mk");
 			cmd << arg("MOSYNC_MODULES=" + moduleDir) << " ";
