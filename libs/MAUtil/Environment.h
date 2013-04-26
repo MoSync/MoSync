@@ -213,13 +213,15 @@ namespace MAUtil {
 		 * photo gallery of the device. This event is triggered by the
 		 * #maSaveImageToDeviceGallery() call.
 		 *
-		 * Note: In order to obtain this notification you must register to
-		 * the Enviroment via #addMediaExportListener. Please remember to
-		 * unregister when finished using #removeMediaExportListener.
+		 * Note: In order to obtain this notification you must register using
+		 * \link Environment::addMediaExportListener() \endlink.
+		 * Please remember to
+		 * unregister when finished using \link Environment::removeMediaExportListener() \endlink.
 		 *
 		 * \param imageHandle Handle of the image that was the subject of the
 		 * export operation.
-		 * \param resultCode The result code of the operation.
+		 * \param resultCode The result code of the operation of exporting an image to gallery.
+		 * Possible values can be found \link #MA_MEDIA_RES_OK here \endlink.
 		 */
 		virtual void imageExportToGalleryFinished( const MAHandle& imageHandle,
 			int resultCode ) {};
@@ -405,9 +407,12 @@ namespace MAUtil {
 		PLATFORM_TYPE getCurrentPlatform();
 
 		/**
-		 * Add and remove listeners for media export events.
+		 * Adds listener for media export events.
 		 */
 		void addMediaExportListener(MediaExportListener* meListener);
+		/**
+		 * Removes media export events listener.
+		 */
 		void removeMediaExportListener(MediaExportListener* meListener);
 
 		/**

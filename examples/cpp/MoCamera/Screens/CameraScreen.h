@@ -40,7 +40,7 @@ namespace NativeUI
 
 namespace MoSyncCamera
 {
-	class CameraScreenObserver
+	class CameraScreenController
 	{
 	public:
 		/**
@@ -62,13 +62,10 @@ namespace MoSyncCamera
 		/**
 		 * Constructor for the camera screen.
 		 *
-		 * @param observer Observer for this screen.
+		 * @param controller Controller of this screen.
 		 */
-		CameraScreen(CameraScreenObserver& observer);
+		CameraScreen(CameraScreenController& controller);
 
-		/**
-		 *
-		 */
 		virtual ~CameraScreen();
 
 		/**
@@ -190,7 +187,7 @@ namespace MoSyncCamera
 
 	private:
 
-		CameraScreenObserver& mObserver;
+		CameraScreenController& mController;
 
 		NativeUI::RelativeLayout* mMainLayout;
 
