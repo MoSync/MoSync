@@ -158,11 +158,11 @@ namespace MoSyncCamera
 	{
 		if ( mDisplayedImageHandle > 0 )
 		{
-			mImageViewerScreen->showImageSavingInProgress();
+			mImageViewerScreen->toggleImageSavingInProgress(true);
 			int returnCode = maSaveImageToDeviceGallery(mDisplayedImageHandle, "MoSyncCameraPic");
 			if ( returnCode != MA_MEDIA_RES_OK )
 			{
-				mImageViewerScreen->hideImageSavingInProgress(false);
+				mImageViewerScreen->toggleImageSavingInProgress(false);
 				maAlert("Save image", "Image saving failed!", "OK", NULL, NULL);
 			}
 		}
@@ -174,16 +174,14 @@ namespace MoSyncCamera
 			int resultCode)
 	{
 		MAUtil::String message = "Image saved!";
-		bool operationSucceeded = true;
 
 		if ( mDisplayedImageHandle != imageHandle &&
 				resultCode != MA_MEDIA_RES_OK )
 		{
 			message = "Image saving failed!";
-			operationSucceeded = false;
 		}
 
-		mImageViewerScreen->hideImageSavingInProgress(operationSucceeded);
+		mImageViewerScreen->toggleImageSavingInProgress(false);
 		maAlert("Save image", message.c_str(), "OK", NULL, NULL);
 	}
 

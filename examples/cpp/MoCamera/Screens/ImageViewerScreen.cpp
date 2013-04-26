@@ -39,8 +39,8 @@ using namespace NativeUI;
 
 namespace MoSyncCamera
 {
-    ImageViewerScreen::ImageViewerScreen(ImageViewerScreenObserver& observer):
-            mObserver(observer),
+    ImageViewerScreen::ImageViewerScreen(ImageViewerScreenController& controller):
+            mController(controller),
             mMainLayout(NULL),
             mImageView(NULL),
             mDismissButton(NULL),
@@ -97,14 +97,14 @@ namespace MoSyncCamera
         mMainLayout->addChild(mSaveImageButton);
     }
 
-	void ImageViewerScreen::setupActivityIndicator()
-	{
-		mActivityIndicator = new ActivityIndicator();
-		mActivityIndicator->setWidth(ACTIVITY_INDICATOR_WIDTH);
-		mActivityIndicator->setHeight(ACTIVITY_INDICATOR_HEIGHT);
-		mActivityIndicator->hide();
-		mMainLayout->addChild(mActivityIndicator);
-	}
+    void ImageViewerScreen::setupActivityIndicator()
+    {
+        mActivityIndicator = new ActivityIndicator();
+        mActivityIndicator->setWidth(ACTIVITY_INDICATOR_WIDTH);
+        mActivityIndicator->setHeight(ACTIVITY_INDICATOR_HEIGHT);
+        mActivityIndicator->hide();
+        mMainLayout->addChild(mActivityIndicator);
+    }
 
     void ImageViewerScreen::arrangeWidgets()
     {
@@ -119,8 +119,8 @@ namespace MoSyncCamera
         mImageView->setWidth(screenWidth);
         mImageView->setHeight(screenHeight);
 
-		mActivityIndicator->setPosition((screenWidth - mActivityIndicator->getWidth())/2,
-				(screenHeight - mActivityIndicator->getHeight())/2);
+        mActivityIndicator->setPosition((screenWidth - mActivityIndicator->getWidth())/2,
+                (screenHeight - mActivityIndicator->getHeight())/2);
 
         ScreenUtils::resizeWidget(mDismissButton, size, CONTAINER_BUTTON_RATIO);
         // bottom left
@@ -139,11 +139,11 @@ namespace MoSyncCamera
     {
         if ( button == mDismissButton )
         {
-            mObserver.imageViewingDone();
+            mController.imageViewingDone();
         }
         else if ( button == mSaveImageButton )
         {
-            mObserver.exportImageToGalleryRequested();
+            mController.exportImageToGalleryRequested();
         }
     }
 
@@ -155,18 +155,17 @@ namespace MoSyncCamera
     }
 
 
-    void ImageViewerScreen::showImageSavingInProgress()
+    void ImageViewerScreen::toggleImageSavingInProgress(bool isInProgress)
     {
-        mSaveImageButton->setEnabled(false);
-        mDismissButton->setEnabled(false);
-        mActivityIndicator->show();
-    }
-
-
-    void ImageViewerScreen::hideImageSavingInProgress(bool imageSaved)
-    {
-        mSaveImageButton->setEnabled(true);
-        mDismissButton->setEnabled(true);
-        mActivityIndicator->hide();
+        mSaveImageButton->setEnabled(!isInProgress);
+        mDismissButton->setEnabled(!isInProgress);
+        if ( isInProgress )
+        {
+            mActivityIndicator->show();
+        }
+        else
+        {
+            mActivityIndicator->hide();
+        }
     }
 } // MoSyncCamera

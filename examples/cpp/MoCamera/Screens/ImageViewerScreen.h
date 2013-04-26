@@ -39,17 +39,17 @@ namespace NativeUI
 
 namespace MoSyncCamera
 {
-	class ImageViewerScreenObserver
+	class ImageViewerScreenController
 	{
 	public:
 		/**
-		 * Notifies the observer that the image viewer screen is ready
+		 * Notifies the controller that the image viewer screen is ready
 		 * to be dismissed.
 		 */
 		virtual void imageViewingDone() = 0;
 
 		/**
-		 * Notifies the observer that a request for saving
+		 * Notifies the controller that a request for saving
 		 * the displayed image was made.
 		 */
 		virtual void exportImageToGalleryRequested() = 0;
@@ -63,9 +63,9 @@ namespace MoSyncCamera
 		/**
 		 * Constructor.
 		 *
-		 * @param observer Observer for this screen.
+		 * @param controller Controller of this screen.
 		 */
-		ImageViewerScreen(ImageViewerScreenObserver& observer);
+		ImageViewerScreen(ImageViewerScreenController& controller);
 
 		~ImageViewerScreen();
 
@@ -84,20 +84,14 @@ namespace MoSyncCamera
         void setImageWithData(const MAHandle& imageDataHandle);
 
         /**
-         * Makes changes to the UI needed when image saving
-         * is in progress.
-         */
-        void showImageSavingInProgress();
-
-        /**
-         * Makes changes to the UI needed when image saving is
-         * completed.
+         * Makes changes to the UI related to the process of saving an
+         * image to photo gallery.
          *
-         * @param imageSaved True if image was saved in the
-         * phone library, false otherwise.
+         * @param imageSaved True will change the UI suck it suggests
+         * that the operation of saving an image is in progress,
+         * false will restore the normal/idle state.
          */
-        void hideImageSavingInProgress(bool imageSaved);
-
+        void toggleImageSavingInProgress(bool isInProgress);
 
 	private:
 
@@ -115,7 +109,7 @@ namespace MoSyncCamera
 
 	private:
 
-        ImageViewerScreenObserver& mObserver;
+        ImageViewerScreenController& mController;
 
 		NativeUI::RelativeLayout* mMainLayout;
 

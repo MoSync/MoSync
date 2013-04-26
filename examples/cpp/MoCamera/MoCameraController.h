@@ -36,8 +36,8 @@
 namespace MoSyncCamera
 {
 	class MoCameraController:
-		public CameraScreenObserver,
-		public ImageViewerScreenObserver,
+		public CameraScreenController,
+		public ImageViewerScreenController,
 		public MAUtil::MediaExportListener,
 		public NativeUI::CameraSnapshotListener
 	{
@@ -55,7 +55,7 @@ namespace MoSyncCamera
 		 * When notified of this request it
 		 * displays a snapshot on a separate screen.
 		 *
-		 * From CameraScreenObserver
+		 * From CameraScreenController
 		 *
 		 * @param imageDataHandle Snapshot image data handle.
 		 */
@@ -64,6 +64,8 @@ namespace MoSyncCamera
 		/**
 		 * When notified of this request it
 		 * triggers a snapshot operation.
+		 *
+		 * From CameraScreenController
 		 */
 		void snapshotRequested();
 
@@ -71,7 +73,7 @@ namespace MoSyncCamera
 		 * When notified that the image viewer screen is done it
 		 * goes back to the camera screen.
 		 *
-		 * From ImageViewerScreenObserver
+		 * From ImageViewerScreenController
 		 */
 		void imageViewingDone();
 
@@ -79,7 +81,7 @@ namespace MoSyncCamera
 		 * When notified of this the image from the ImageViewerScreen
 		 * will be saved in the photo library of the device.
 		 *
-		 * From ImageViewerScreenObserver
+		 * From ImageViewerScreenController
 		 */
 		void exportImageToGalleryRequested();
 

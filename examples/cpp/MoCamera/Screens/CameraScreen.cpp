@@ -47,8 +47,8 @@ static const int kFlashModesImgPressed[] = {RES_FLASH_AUTO_IMG_PRESSED,
 
 namespace MoSyncCamera
 {
-	CameraScreen::CameraScreen(CameraScreenObserver& observer):
-			mObserver(observer),
+	CameraScreen::CameraScreen(CameraScreenController& controller):
+			mController(controller),
 			mMainLayout(NULL),
 			mCamera(NULL),
 			mTakeSnapshotButton(NULL),
@@ -186,11 +186,9 @@ namespace MoSyncCamera
 
 	void CameraScreen::arrangeWidgets()
 	{
-		/// Get screen dimensions.
 		MAExtent size = maGetScrSize();
-		/// Extract the screen width
+
 		int screenWidth = EXTENT_X(size);
-		/// Extract the screen height
 		int screenHeight = EXTENT_Y(size);
 
 		mCamera->setPosition(0, 0);
@@ -306,12 +304,12 @@ namespace MoSyncCamera
 	{
 		if (button == mTakeSnapshotButton)
 		{
-			mObserver.snapshotRequested();
+			mController.snapshotRequested();
 		}
 		else if ( button == mShowSnapshotButton )
 		{
 			mCamera->stopPreview();
-			mObserver.snapshotDisplayRequested();
+			mController.snapshotDisplayRequested();
 		}
 		else if ( button == mSetNextFlashModeButton )
 		{
