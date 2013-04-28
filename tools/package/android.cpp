@@ -102,7 +102,7 @@ void packageAndroid(const SETTINGS& s, const RuntimeInfo& ri) {
 	} else {
 		// Create dummy file. We'll fix this later
 		// so the runtime ignores it...
-		copyFile(programMp3.c_str(), (string(mosyncdir()) + "/profiles/runtimes/android_17/1/dummy.mp3").c_str());
+		copyFile(programMp3.c_str(), (string(mosyncdir()) + "/profiles/platforms/Android/dummy.mp3").c_str());
 	}
 	if(s.resource && existsFile(s.resource)) {
 		string resMp3 = assets + "/resources.mp3";
