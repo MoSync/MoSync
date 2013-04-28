@@ -96,20 +96,18 @@ end
 class AndroidNativeLibWork < Work
 	include MoSyncMod
 	def invoke
-		# We are at the source tree root.
-		require "#{File.dirname(__FILE__)}/../tools/RuntimeBuilder/Settings.rb"
-		# And here we set the android version to 17.
-		# There is no 'proper' way to get that version so we
-		# just put it here.
 		oldDir = Dir.getwd
-		# This is also very secret-ingredient-y
-		Dir.chdir "#{File.dirname(__FILE__)}/../tools/RuntimeBuilder"
-		if !File.exist? "Settings.rb"
-			puts "Creates the Settings.rb file"
-			FileUtils.copy_file("Settings.rb.example", "Settings.rb")
-		end
+		# This is also very secret-ingredient-y; follows
+		# some kind of pattern from the main build file.
 		Dir.chdir "#{File.dirname(__FILE__)}/../runtimes/java/platforms/androidJNI"
-		result = sh "ruby buildLibs.rb #{$SETTINGS[:android_ndk]} 17"
+		puts "Where are we? #{File.dirname(__FILE__)}"
+		if !File.exist? "#{File.dirname(__FILE__)}/../runtimes/java/platforms/androidJNI/NdkSettings.rb"
+			puts "Creates the NdkSettings.rb file"
+			FileUtils.copy_file("#{File.dirname(__FILE__)}/../runtimes/java/platforms/androidJNI/NdkSettings.rb.example", "#{File.dirname(__FILE__)}/../runtimes/java/platforms/androidJNI/NdkSettings.rb")
+		end
+		# Now include it
+		require "#{File.dirname(__FILE__)}/../runtimes/java/platforms/androidJNI/NdkSettings.rb"
+		result = sh "ruby buildLibs.rb #{$SETTINGS[:android_ndk]} #{$SETTINGS[:android_version]}"
 		Dir.chdir oldDir
 		return result
 	end
@@ -130,9 +128,9 @@ end
 
 def MoSyncLib.invoke(mod)
 	target :pipe do
+		MoSyncLib.inin(PipeLibWork.new, mod)
 		# Todo: obviously this one should not be here
 		MoSyncLib.inin(AndroidNativeLibWork.new, mod)
-		MoSyncLib.inin(PipeLibWork.new, mod)
 	end
 	target :native do
 		MoSyncLib.inin(MoSyncDllWork.new, mod)
