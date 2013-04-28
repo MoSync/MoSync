@@ -52,6 +52,8 @@ void toSlashes(std::string&);
 // convert all / to '\'
 void toBackSlashes(std::string&);
 
+void toOSSlashes(std::string& str);
+
 // add / to end of string, if one wasn't already there.
 void toDir(std::string&);
 

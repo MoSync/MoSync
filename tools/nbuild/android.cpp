@@ -131,6 +131,8 @@ int generateMakefile(Arguments* params) {
 			outputFile.close();
 			string androidAppMkOutput = tmpBuildDir + "/Application.mk";
 			string androidAppMkOriginal = androidProfilesDir + "/Application.mk";
+			toOSSlashes(androidAppMkOutput);
+			toOSSlashes(androidAppMkOriginal);
 			copyFile(androidAppMkOutput.c_str(), androidAppMkOriginal.c_str());
 			return 0;
 		}
