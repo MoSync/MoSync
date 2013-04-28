@@ -15,13 +15,11 @@
 # 02111-1307, USA.
 
 if ENV['OS'] == "Windows_NT"
-
 	$SETTINGS = {
 		:android_ndk => "C:/Android/android-ndk-r8c",
 		:android_version => 17,
 	}
 else
-
 	$SETTINGS = {
 		:android_ndk => "/home/runtimebuilder/SDK/android/android-ndk-r8c",
 		:android_version => 17,

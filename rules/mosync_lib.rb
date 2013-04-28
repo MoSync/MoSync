@@ -93,26 +93,6 @@ class PipeLibWork < PipeGccWork
 	#def filename; @NAME + ".lib"; end
 end
 
-class AndroidNativeLibWork < Work
-	include MoSyncMod
-	def invoke
-		oldDir = Dir.getwd
-		# This is also very secret-ingredient-y; follows
-		# some kind of pattern from the main build file.
-		Dir.chdir "#{File.dirname(__FILE__)}/../runtimes/java/platforms/androidJNI"
-		puts "Where are we? #{File.dirname(__FILE__)}"
-		if !File.exist? "#{File.dirname(__FILE__)}/../runtimes/java/platforms/androidJNI/NdkSettings.rb"
-			puts "Creates the NdkSettings.rb file"
-			FileUtils.copy_file("#{File.dirname(__FILE__)}/../runtimes/java/platforms/androidJNI/NdkSettings.rb.example", "#{File.dirname(__FILE__)}/../runtimes/java/platforms/androidJNI/NdkSettings.rb")
-		end
-		# Now include it
-		require "#{File.dirname(__FILE__)}/../runtimes/java/platforms/androidJNI/NdkSettings.rb"
-		result = sh "ruby buildLibs.rb #{$SETTINGS[:android_ndk]} #{$SETTINGS[:android_version]}"
-		Dir.chdir oldDir
-		return result
-	end
-end
-
 module MoSyncLib end
 
 def MoSyncLib.inin(work, mod)
@@ -129,8 +109,6 @@ end
 def MoSyncLib.invoke(mod)
 	target :pipe do
 		MoSyncLib.inin(PipeLibWork.new, mod)
-		# Todo: obviously this one should not be here
-		MoSyncLib.inin(AndroidNativeLibWork.new, mod)
 	end
 	target :native do
 		MoSyncLib.inin(MoSyncDllWork.new, mod)
