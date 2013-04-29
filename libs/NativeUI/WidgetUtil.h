@@ -57,7 +57,12 @@ namespace NativeUI
     void addListenerToVector(
         MAUtil::Vector<Listener*>& vector,
         Listener* listener)
-    {
+	{
+		if (listener == NULL)
+		{
+			return;
+		}
+
         for (int i = 0; i < vector.size(); i++)
         {
             if (listener == vector[i])
@@ -80,6 +85,11 @@ namespace NativeUI
         MAUtil::Vector<Listener*>& vector,
         Listener* listener)
     {
+		if (listener == NULL)
+		{
+			return;
+		}
+
         for (int i = 0; i < vector.size(); i++)
         {
             if (listener == vector[i])

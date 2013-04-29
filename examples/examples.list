@@ -28,6 +28,7 @@ Soap = Moblet/Soap
 Stylus = Moblet/Stylus
 timers = Moblet/timers
 MultiTouch = Moblet/MultiTouch
+MoCamera
 MoSketch
 MoSound
 MoTris
@@ -40,7 +41,6 @@ MoGraphWave2 = MoGraph/MoGraphWave2
 MoGraphFinance = MoGraph/MoGraphFinance
 ScreenOrientation
 QuakeMDL
-CameraDemo
 PIMExample
 PurchaseExample
 VideoNativeUIExample

@@ -257,5 +257,13 @@ group WidgetTypes "Widget types" {
 		* Platform: iOS and Android.
 		*/
 		LIST_VIEW_SECTION = "ListViewSection";
+
+		/**
+		* @brief A spinning-wheel widget used to shown one or more items(layout widgets).
+		* Only #MAW_HORIZONTAL_LAYOUT, #MAW_RELATIVE_LAYOUT or #MAW_VERTICAL_LAYOUT objects
+		* can be added as children.
+		* Platform: Android, iOS and WP7.
+		*/
+		CUSTOM_PICKER = "CustomPicker";
 	}
 } // end of WidgetTypes
