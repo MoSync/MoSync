@@ -189,6 +189,7 @@
 		0B92CF8C1712BB8B002DFDF6 /* Room.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0B92C7D41712BB8A002DFDF6 /* Room.cpp */; };
 		0B92CF8D1712BB8B002DFDF6 /* Sprite.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0B92C7D61712BB8A002DFDF6 /* Sprite.cpp */; };
 		0B92CF8E1712BB8B002DFDF6 /* MinUI.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0B92C7D91712BB8A002DFDF6 /* MinUI.cpp */; };
+		0BC52146172AC03D00D1D0D8 /* mactype.c in Sources */ = {isa = PBXBuildFile; fileRef = 0BC52145172AC03D00D1D0D8 /* mactype.c */; };
 		0BC7BEFD1726B4DC007662C2 /* mastring.c in Sources */ = {isa = PBXBuildFile; fileRef = 0BC7BEFC1726B4DC007662C2 /* mastring.c */; };
 		0BC7BEFF1728218F007662C2 /* maxtoa.c in Sources */ = {isa = PBXBuildFile; fileRef = 0BC7BEFE1728218F007662C2 /* maxtoa.c */; };
 		0BC7BF01172821BD007662C2 /* mavsprintf.c in Sources */ = {isa = PBXBuildFile; fileRef = 0BC7BF00172821BD007662C2 /* mavsprintf.c */; };
@@ -695,12 +696,15 @@
 		0B92CF9717141D19002DFDF6 /* matask.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = matask.h; sourceTree = "<group>"; };
 		0B92CF9817141D19002DFDF6 /* mawstring.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = mawstring.h; sourceTree = "<group>"; };
 		0B92CF9917141D19002DFDF6 /* wchar.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = wchar.h; sourceTree = "<group>"; };
-		0B92CF9A17141D1A002DFDF6 /* gl.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = gl.h; path = GLES/gl.h; sourceTree = "<group>"; };
-		0B92CF9B17141D1A002DFDF6 /* glext.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = glext.h; path = GLES/glext.h; sourceTree = "<group>"; };
-		0B92CF9C17141D1A002DFDF6 /* gl2.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = gl2.h; path = GLES2/gl2.h; sourceTree = "<group>"; };
 		0B92CF9D17141D1A002DFDF6 /* math_private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = math_private.h; sourceTree = "<group>"; };
 		0B92CF9E17141D1A002DFDF6 /* mawvsprintf.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = mawvsprintf.h; sourceTree = "<group>"; };
 		0B92CFD1171598F9002DFDF6 /* maapi.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = maapi.h; sourceTree = "<group>"; };
+		0BA8B41E17294D9A00ABD129 /* gl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = gl.h; sourceTree = "<group>"; };
+		0BA8B41F17294D9A00ABD129 /* glext.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = glext.h; sourceTree = "<group>"; };
+		0BA8B42117294DA900ABD129 /* gl2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = gl2.h; sourceTree = "<group>"; };
+		0BA8B4221729614F00ABD129 /* gl_native.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = gl_native.h; sourceTree = "<group>"; };
+		0BA8B4231729614F00ABD129 /* glext_native.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = glext_native.h; sourceTree = "<group>"; };
+		0BC52145172AC03D00D1D0D8 /* mactype.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = mactype.c; sourceTree = "<group>"; };
 		0BC7BEFB1726B263007662C2 /* IX_OPENGL_ES_MA.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IX_OPENGL_ES_MA.h; sourceTree = "<group>"; };
 		0BC7BEFC1726B4DC007662C2 /* mastring.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = mastring.c; sourceTree = "<group>"; };
 		0BC7BEFE1728218F007662C2 /* maxtoa.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = maxtoa.c; sourceTree = "<group>"; };
@@ -792,6 +796,9 @@
 		0B92B47D1712BB7B002DFDF6 /* MAStd */ = {
 			isa = PBXGroup;
 			children = (
+				0BC52145172AC03D00D1D0D8 /* mactype.c */,
+				0BA8B42017294DA900ABD129 /* GLES2 */,
+				0BA8B41D17294D9A00ABD129 /* GLES */,
 				0B81C657172928F4006E6E7D /* mawvsprintf.c */,
 				0B81C65517292769006E6E7D /* matime.c */,
 				0B81C6531729253E006E6E7D /* conprint.c */,
@@ -813,9 +820,6 @@
 				0B92CF9717141D19002DFDF6 /* matask.h */,
 				0B92CF9817141D19002DFDF6 /* mawstring.h */,
 				0B92CF9917141D19002DFDF6 /* wchar.h */,
-				0B92CF9A17141D1A002DFDF6 /* gl.h */,
-				0B92CF9B17141D1A002DFDF6 /* glext.h */,
-				0B92CF9C17141D1A002DFDF6 /* gl2.h */,
 				0B92CF9D17141D1A002DFDF6 /* math_private.h */,
 				0B92CF9E17141D1A002DFDF6 /* mawvsprintf.h */,
 				0B92B47E1712BB7B002DFDF6 /* api_areas.h */,
@@ -1595,6 +1599,25 @@
 			path = ../../MinUI;
 			sourceTree = "<group>";
 		};
+		0BA8B41D17294D9A00ABD129 /* GLES */ = {
+			isa = PBXGroup;
+			children = (
+				0BA8B4221729614F00ABD129 /* gl_native.h */,
+				0BA8B4231729614F00ABD129 /* glext_native.h */,
+				0BA8B41E17294D9A00ABD129 /* gl.h */,
+				0BA8B41F17294D9A00ABD129 /* glext.h */,
+			);
+			path = GLES;
+			sourceTree = "<group>";
+		};
+		0BA8B42017294DA900ABD129 /* GLES2 */ = {
+			isa = PBXGroup;
+			children = (
+				0BA8B42117294DA900ABD129 /* gl2.h */,
+			);
+			path = GLES2;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -1654,7 +1677,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "line_1=$(sed -n '/char\\* strcpy/=' ../MAStd/maapi.h)\nlet \"line_2=$line_1-2\"\necho $line_2\n\nrm -r MAStdNative || echo MASTDNative already deleted\nmkdir MAStdNative\ncd ../MAStd\ncp IX_OPENGL_ES.h maapi.h madmath.h maxtoa.h maapi_defs.h maarg.h IX_WIDGET.h maheap.h matime.h conprint.h maassert.h mastdlib.h mavsprintf.h ma.h mactype.h mastring.h mawvsprintf.h mawstring.h IX_OPENGL_ES_MA.h ../MoSyncLibIOS/MAStdNative\n\ncd ..\n\nfind . -path ./MoSyncLibIOS -prune -o -iname \"*.h\" | cpio -pmud MoSyncLibIOS/MAStdNative/\n\ncd MoSyncLibIOS/MAStdNative\n\n\nline_1+=\"d\"\necho $line_1\nline_2+=\"d\"\necho $line_2\n\nsed -i.bak $line_1 maapi.h\nsed -i.bak $line_2 maapi.h\n\n";
+			shellScript = "line_1=$(sed -n '/char\\* strcpy/=' ../MAStd/maapi.h)\nlet \"line_2=$line_1-2\"\necho $line_2\n\nrm -r MAStdNative || echo MASTDNative already deleted\nmkdir MAStdNative\ncd ../MAStd\ncp -r IX_OPENGL_ES.h maapi.h madmath.h maxtoa.h maapi_defs.h maarg.h IX_WIDGET.h maheap.h matime.h conprint.h maassert.h mastdlib.h mavsprintf.h ma.h mactype.h mastring.h mawvsprintf.h mawstring.h IX_OPENGL_ES_MA.h IX_OPENGL_ES.h IX_GL1.h IX_GL2.h GLES GLES2  ../MoSyncLibIOS/MAStdNative\n\ncd ..\n\nfind . -path ./MoSyncLibIOS -prune -o -iname \"*.h*\" | cpio -pmud MoSyncLibIOS/MAStdNative/\n\ncd MoSyncLibIOS/MAStdNative\n\n\nline_1+=\"d\"\necho $line_1\nline_2+=\"d\"\necho $line_2\n\nsed -i.bak $line_1 maapi.h\nsed -i.bak $line_2 maapi.h\n\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -1848,6 +1871,7 @@
 				0B81C6541729253E006E6E7D /* conprint.c in Sources */,
 				0B81C65617292769006E6E7D /* matime.c in Sources */,
 				0B81C658172928F4006E6E7D /* mawvsprintf.c in Sources */,
+				0BC52146172AC03D00D1D0D8 /* mactype.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
