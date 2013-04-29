@@ -237,6 +237,7 @@ int executeNdkBuild(Arguments* params) {
 				cmd << "-B ";
 			}
 			string libDir = string(mosyncdir()) + "/lib";
+			toSlashes(libDir);
 			string moduleDir = string(mosyncdir()) + "/modules";
 			toSlashes(moduleDir);
 			string makeFile = toMakefileFile(tmpBuildDir + "Android.mk");
