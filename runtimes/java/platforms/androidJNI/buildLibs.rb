@@ -63,6 +63,7 @@ def buildLib(name, buildParams)
 
 	compileflags = "--compiler-switches \"--std=c99 #{compilerflags}\""
 
+	mkdir_p "#{ENV['MOSYNCDIR']}/lib"
 	success = sh("#{ENV['MOSYNCDIR']}/bin/nbuild --platform Android --name #{name} --project #{project} --dst #{ENV['MOSYNCDIR']}/lib --config Debug,Release --lib-variant debug,release --android-ndk-location #{$androidNDKPath} --android-version #{$androidVersion} #{srcfiles} --verbose #{libtype} #{includes} #{bootmoduleList} #{moduleList} #{compileflags} --android-lib-type #{libtype} --android-build-dir #{project}/temp_#{name}")
 	if !success
 		exit 1
