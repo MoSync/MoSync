@@ -131,6 +131,8 @@ int generateMakefile(Arguments* params) {
 			outputFile.close();
 			string androidAppMkOutput = tmpBuildDir + "/Application.mk";
 			string androidAppMkOriginal = androidProfilesDir + "/Application.mk";
+			toOSSlashes(androidAppMkOutput);
+			toOSSlashes(androidAppMkOriginal);
 			copyFile(androidAppMkOutput.c_str(), androidAppMkOriginal.c_str());
 			return 0;
 		}
@@ -234,8 +236,8 @@ int executeNdkBuild(Arguments* params) {
 			if (doClean) {
 				cmd << "-B ";
 			}
-			string libDir = toMakefileFile(string(mosyncdir()) + "/lib");
-			string moduleDir = toMakefileFile(string(mosyncdir()) + "/modules");
+			string libDir = string(mosyncdir()) + "/lib";
+			string moduleDir = string(mosyncdir()) + "/modules";
 			toSlashes(moduleDir);
 			string makeFile = toMakefileFile(tmpBuildDir + "Android.mk");
 			cmd << arg("MOSYNC_MODULES=" + moduleDir) << " ";

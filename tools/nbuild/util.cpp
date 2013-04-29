@@ -277,13 +277,17 @@ string arg(string argArg) {
 	return arg(argArg.c_str());
 }
 
+void toOSSlashes(string& str) {
+#ifdef WIN32
+	toBackSlashes(str);
+#else
+	toSlashes(str);
+#endif
+}
+
 string file(const char* argArg) {
 	string argStr = string(argArg);
-#ifdef WIN32
-	toBackSlashes(argStr);
-#else
-	toSlashes(argStr);
-#endif
+	toOSSlashes(argStr);
 	return arg(argStr.c_str());
 }
 

@@ -48,7 +48,7 @@ private:
 	MAUtil::String mValue;
 };
 
-#if defined(MOSYNC_NATIVE) && (defined(ANDROID) || defined(__IOS__))
+#if defined(MOSYNC_NATIVE) && (defined(__ANDROID__) || defined(__IOS__))
 // Yep, compilation issue needs forward decl
 class HttpQueryDownloader;
 #endif

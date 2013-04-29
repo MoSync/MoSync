@@ -61,7 +61,7 @@ def buildLib(name, buildParams)
 		bootmoduleList = "--boot-modules " + bootmodules
 	end
 	if compilerflags != nil && !compilerflags.empty?
-		compileflags = "--compiler-switches \"" + compilerflags + " -DANDROID\""
+		compileflags = "--compiler-switches \"" + compilerflags + "\""
 	end
 	success = sh("#{ENV['MOSYNCDIR']}/bin/nbuild --platform Android --name #{name} --project #{project} --dst #{ENV['MOSYNCDIR']}/lib --config Debug,Release --lib-variant debug,release --android-ndkbuild-cmd #{$androidNDKPath}/ndk-build --android-version #{$androidVersion} #{srcfiles} --verbose #{libtype} #{includes} #{bootmoduleList} #{moduleList} #{compilerflags} --android-lib-type #{libtype} --android-build-dir #{project}/temp_#{name}")
 	if !success
@@ -71,6 +71,18 @@ end
 
 $androidNDKPath = ARGV[0]
 $androidVersion = ARGV[1]
+
+if ($androidNDKPath == '@')
+	# Then use the 'settings' ruby file instead.
+	settingsFile = "#{File.dirname(__FILE__)}/NdkSettings.rb"
+	if !File.exist? settingsFile
+		FileUtils.copy_file(settingsFile + ".example", settingsFile)
+	end
+	require "NdkSettings"
+
+	$androidNDKPath = $SETTINGS[:android_ndk]
+	$androidVersion = $SETTINGS[:android_version]
+end
 
 # Converts the android version to an Integer
 androidVersionInt = Integer($androidVersion)
@@ -85,7 +97,7 @@ cd scriptPath
 
 #We need two different make files for android due to some restrictions in JNI
 
-puts "android version is: #{$androidVersion}"
+puts "Android version is: #{$androidVersion}"
 if(androidVersionInt < 7)
 	ENV['ANDROID_API_BELOW_7'] = "true"
 end
