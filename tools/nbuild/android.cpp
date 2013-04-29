@@ -197,7 +197,7 @@ int executeNdkBuild(Arguments* params) {
 	split(configNames, require(params, CONFIGURATION), ",");
 	split(libVariants, require(params, BINARY_TYPE), ",");
 
-	string ndkbuildCmd = toMakefileFile(require(params, "--android-ndkbuild-cmd"));
+	string ndkbuildCmd = getNdkBuildScript(params);
 	string projectPath = toMakefileFile(require(params, PROJECT_DIR));
 	toSlashes(projectPath);
 	string moduleName = require(params, NAME);
@@ -225,8 +225,8 @@ int executeNdkBuild(Arguments* params) {
 			bool doClean = params->isFlagSet(CLEAN);
 
 			ostringstream cmd;
-			cmd << toMakefileFile(ndkbuildCmd) << " ";
-			cmd << "-C " << toMakefileFile(file(tmpBuildDir)) << " ";
+			string ndkBuildCmd = getNdkBuildScript(params);
+			cmd << ndkBuildCmd << " -C " << toMakefileFile(file(tmpBuildDir)) << " ";
 			if (isVerbose) {
 				cmd << "V=1 ";
 			}
@@ -252,8 +252,11 @@ int executeNdkBuild(Arguments* params) {
 			cmd << arg("MOSYNC_LIB_VARIANT=" + libVariant) << " ";
 			cmd << arg("NDK_PROJECT_PATH=.") << " ";
 			cmd << arg("APP_ABI=" + arch) << " ";
-			cmd << arg("APP_PLATFORM=android-" + require(params, "--android-version")) << " ";
+			string androidVersion = getAppPlatform(params);
+			cmd << arg("APP_PLATFORM=android-" + androidVersion) << " ";
 			cmd << arg("MOSYNCDIR=" + toMakefileFile(mosyncdir())) << " ";
+
+//			cmd << arg("APP_STL=stlport_static") << " ";
 
 			bool useStatic = "static" == params->getSwitchValue("--android-lib-type");
 			string fullOutputDir = outputDir + "android_" + arch + "_" + libVariant + "/";
@@ -275,4 +278,27 @@ int executeNdkBuild(Arguments* params) {
 		}
 	}
 	return 0;
+}
+
+string getNdkBuildScript(Arguments* params) {
+	string ndkDir = require(params, "--android-ndk-location");
+	toDir(ndkDir);
+	string buildCmdRel = params->getSwitchValue("--android-ndkbuild-cmd");
+	if (buildCmdRel.empty()) {
+		buildCmdRel = "ndk-build";
+	}
+	string buildCmdAbs = ndkDir + buildCmdRel;
+	return toMakefileFile(buildCmdAbs);
+}
+
+string getAppPlatform(Arguments* params) {
+	string ndkDir = require(params, "--android-ndk-location");
+	toDir(ndkDir);
+	string androidVersion = require(params, "--android-version");
+	string platformDir = ndkDir + "/platforms/android-" + androidVersion;
+	toOSSlashes(platformDir);
+	if (!existsDir(platformDir.c_str())) {
+		error("Could not find android platform version given by --android-version, set another!", 2);
+	}
+	return androidVersion;
 }

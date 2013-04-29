@@ -63,7 +63,7 @@ def buildLib(name, buildParams)
 
 	compileflags = "--compiler-switches \"--std=c99 #{compilerflags}\""
 
-	success = sh("#{ENV['MOSYNCDIR']}/bin/nbuild --platform Android --name #{name} --project #{project} --dst #{ENV['MOSYNCDIR']}/lib --config Debug,Release --lib-variant debug,release --android-ndkbuild-cmd #{$androidNDKPath}/ndk-build --android-version #{$androidVersion} #{srcfiles} --verbose #{libtype} #{includes} #{bootmoduleList} #{moduleList} #{compileflags} --android-lib-type #{libtype} --android-build-dir #{project}/temp_#{name}")
+	success = sh("#{ENV['MOSYNCDIR']}/bin/nbuild --platform Android --name #{name} --project #{project} --dst #{ENV['MOSYNCDIR']}/lib --config Debug,Release --lib-variant debug,release --android-ndk-location #{$androidNDKPath} --android-version #{$androidVersion} #{srcfiles} --verbose #{libtype} #{includes} #{bootmoduleList} #{moduleList} #{compileflags} --android-lib-type #{libtype} --android-build-dir #{project}/temp_#{name}")
 	if !success
 		exit 1
 	end
@@ -133,7 +133,7 @@ bootfiles = "-S./* -S./UTF/* -S../../core/Core.cpp -S../sdl/FileImpl.cpp -S../..
 cppDir = "#{ENV['MOSYNC_SRC']}/runtimes/cpp"
 additionalIncludes = "-I#{cppDir} -I#{cppDir}/base -I#{cppDir}/core -I#{ENV['MOSYNC_SRC']}/intlibs"
 buildLib("mosync", { 'src' => bootfiles, 'compiler-flags' => "-Wno-psabi -D_android", 'project' => "#{cppDir}/platforms/android", 'includes' => additionalIncludes, 'bootmodules' => "."})
-#sh("#{ENV['MOSYNCDIR']}/bin/nbuild --platform Android --name mosync --project #{cppDir}/platforms/android --dst #{ENV['MOSYNCDIR']}/lib --config Debug,Release --lib-variant debug,release --android-ndkbuild-cmd #{$androidNDKPath}/ndk-build --android-version #{$androidVersion} #{bootfiles} --verbose --boot-modules . #{additionalIncludes} --compiler-switches -Wno-psabi -D_android")
+#sh("#{ENV['MOSYNCDIR']}/bin/nbuild --platform Android --name mosync --project #{cppDir}/platforms/android --dst #{ENV['MOSYNCDIR']}/lib --config Debug,Release --lib-variant debug,release --android-ndk-location #{$androidNDKPath} --android-version #{$androidVersion} #{bootfiles} --verbose --boot-modules . #{additionalIncludes} --compiler-switches -Wno-psabi -D_android")
 
 #wcharfiles = "-S./newlib/libc/string/wcpcpy.c -S./newlib/libc/string/wcsncpy.c -S./newlib/libc/string/wcpncpy.c -S./newlib/libc/string/wcsnlen.c -S./newlib/libc/string/wcscasecmp.c -S./newlib/libc/string/wcspbrk.c -S./newlib/libc/string/wcscat.c -S./newlib/libc/string/wcsrchr.c -S./newlib/libc/string/wcschr.c -S./newlib/libc/string/wcsspn.c -S./newlib/libc/string/wcscmp.c -S./newlib/libc/string/wcsstr.c -S./newlib/libc/string/wcscoll.c -S./newlib/libc/string/wcstok.c -S./newlib/libc/string/wcscpy.c -S./newlib/libc/string/wcswidth.c -S./newlib/libc/string/wcscspn.c -S./newlib/libc/string/wcsxfrm.c -S./newlib/libc/string/wcsdup.c -S./newlib/libc/string/wcwidth.c -S./newlib/libc/string/wcslcat.c -S./newlib/libc/string/wmemchr.c -S./newlib/libc/string/wcslcpy.c -S./newlib/libc/string/wmemcmp.c -S./newlib/libc/string/wcslen.c -S./newlib/libc/string/wmemcpy.c -S./newlib/libc/string/wcsncasecmp.c -S./newlib/libc/string/wmemmove.c -S./newlib/libc/string/wcsncat.c -S./newlib/libc/string/wmemset.c -S./newlib/libc/string/wcsncmp.c"
 #buildLib("MAStd", { 'src' => "-Skazlib -SMinUI -SMAMath/MAVector3.c -SResCompiler -SMAStd/conprint.c -SMAStd/maassert.c -SMAStd/mastring.c -SMAStd/matime.c -SMAStd/mavsprintf.c -SMAStd/mawvsprintf.c -SMAStd/maxtoa.c -SMAStd/wchar.c -SMAStd/mawstring.c -SMAStd/mawvsprinf.c" })
