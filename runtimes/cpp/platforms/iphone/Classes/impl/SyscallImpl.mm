@@ -232,10 +232,9 @@ namespace Base {
 	//***************************************************************************
 	SYSCALL(longlong, maIOCtl(int function, int a, int b, int c MA_IOCTL_ELLIPSIS))
 	{
-        if(gNativeMode) {
-            //What has science done????
-            gStackPointer = (int)&c + sizeof(int);
-        }
+        va_list argptr;
+        va_start(argptr, c);
+
         switch(function) {
 
 		case maIOCtl_maWriteLog:
@@ -364,6 +363,7 @@ namespace Base {
 		maIOCtl_case(maCaptureDestroyData);
 		maIOCtl_IX_WIDGET_caselist
 #ifdef SUPPORT_OPENGL_ES
+        maIOCtl_IX_OPENGL_ES_MA_caselist
 		maIOCtl_IX_OPENGL_ES_caselist;
         maIOCtl_IX_GL1_caselist;
         maIOCtl_IX_GL2_caselist;
@@ -399,7 +399,7 @@ namespace Base {
         maIOCtl_case(maPurchaseGetField);
         maIOCtl_case(maPurchaseRestoreTransactions);
 		}
-
+        va_end(argptr);
 		return IOCTL_UNAVAILABLE;
 	}
 

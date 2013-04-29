@@ -34,6 +34,10 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "../MAStd/ma.h"
 #endif
 
+#ifdef __IOS__
+#include "mactype.h"
+#endif
+
 #if 0//ndef MAPIP
 #define HAVE_EMPTY_STRING
 #endif
