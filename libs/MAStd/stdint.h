@@ -194,6 +194,14 @@
 #include <limits.h>
 //#include <signal.h>
 
+#if defined (MOSYNC_NATIVE) && defined(__ANDROID__)
+// This is because we override the android stdint.h which
+// in its turn includes some types that we really need.
+// TODO: We should not override this, but this requires
+// some restructuring to be done. Let's think it through first.
+#include <machine/_types.h>
+#endif
+
 /* defined in stddef */
 #ifndef MOSYNC_NATIVE
 #ifdef MAPIP
