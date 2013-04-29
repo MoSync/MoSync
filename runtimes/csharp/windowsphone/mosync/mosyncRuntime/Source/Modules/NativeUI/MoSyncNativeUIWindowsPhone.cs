@@ -48,11 +48,6 @@ namespace MoSync
              */
             private FrameworkElement mView;
 
-            /**
-             * Event handler declaration for the layout updated event.
-             */
-            private EventHandler mLayoutUpdatedDelegate = null;
-
             //Width
             protected double mWidth;
 
@@ -85,20 +80,23 @@ namespace MoSync
                 get { return mView; }
                 set
                 {
-                    // If the view is set twice or more, the layout updated delegate is removed
-                    // from the LayoutUpdated event.
-                    if (mLayoutUpdatedDelegate != null)
-                    {
-                        isViewCreated = false;
-                        mView.LayoutUpdated -= mLayoutUpdatedDelegate;
-                    }
-
                     mView = value;
-
-                    // Create the delegate and add it as a handler for the LayoutUpdated event.
-                    mLayoutUpdatedDelegate = new EventHandler(mView_LayoutUpdated);
-                    mView.LayoutUpdated += mLayoutUpdatedDelegate;
                 }
+            }
+
+            public new void RunOperationQueue()
+            {
+                MoSync.Util.RunActionOnMainThread(() =>
+                {
+                    IWidget a = this;
+                    // run all the pending operations from the widget operation queue
+                    while (mOperationQueue.Count != 0)
+                    {
+                        WidgetOperation currentOperation = mOperationQueue.Dequeue();
+
+                        RunOperation(currentOperation);
+                    }
+                }, true);
             }
 
             #endregion
@@ -152,36 +150,27 @@ namespace MoSync
 
             protected void AddChild(WidgetOperation operation)
             {
-                IWidget child = GetChildSychronously(operation.Handle);
+                IWidget child = mRuntime.GetModule<NativeUIModule>().GetChildSync(operation.Handle);
                 child.SetParent(this);
+
+                System.Diagnostics.Debug.WriteLine("WidgetBaseWindowPhone: Add child; Parent: " +
+                        this.GetType().ToString() + "(" + this.GetHandle().ToString() + ")" +
+                        "Child: " +
+                        child.GetType().ToString() + "(" + child.GetHandle().ToString() + ")");
                 this.AddChild(child);
             }
 
             protected void InsertChild(WidgetOperation operation)
             {
-                IWidget child = GetChildSychronously(operation.Handle);
+                IWidget child = mRuntime.GetModule<NativeUIModule>().GetChildSync(operation.Handle);
                 child.SetParent(this);
                 this.InsertChild(child, operation.Index);
             }
 
             protected void RemoveChild(WidgetOperation operation)
             {
-                IWidget child = GetChildSychronously(operation.Handle);
+                IWidget child = mRuntime.GetModule<NativeUIModule>().GetChildSync(operation.Handle);
                 child.RemoveFromParent();
-            }
-
-            protected IWidget GetChildSychronously(int childHandle)
-            {
-                IWidget child = mRuntime.GetModule<NativeUIModule>().GetWidget(childHandle);
-
-                // if the child hasn't been created, we need to wait for its creation
-                if (child is WidgetBaseMock)
-                {
-                    Thread childCreationThread = mRuntime.GetModule<NativeUIModule>().GetWidgetCreationThread(childHandle);
-                    childCreationThread.Join();
-                }
-
-                return child;
             }
 
             #endregion
@@ -472,6 +461,12 @@ namespace MoSync
              */
             private void WrapContentHorizontally()
             {
+                IWidget a = this;
+                IWidget b = GetParent();
+                if (b != null)
+                {
+                    int i = 2;
+                }
                 mView.ClearValue(Canvas.WidthProperty);
                 mView.SetValue(Canvas.HorizontalAlignmentProperty, HorizontalAlignment.Center);
                 setHorizontalSizePolicyFlags(false, true);
@@ -514,6 +509,12 @@ namespace MoSync
              */
             private void FillSpaceHorizontally()
             {
+                IWidget a = this;
+                IWidget b = GetParent();
+                if (b != null)
+                {
+                    int i = 2;
+                }
                 mView.ClearValue(Canvas.WidthProperty);
                 mView.SetValue(Canvas.HorizontalAlignmentProperty, HorizontalAlignment.Stretch);
                 setHorizontalSizePolicyFlags(true, false);
@@ -560,6 +561,12 @@ namespace MoSync
              */
             private void WrapContentVertically()
             {
+                IWidget a = this;
+                IWidget b = GetParent();
+                if (b != null)
+                {
+                    int i = 2;
+                }
                 mView.ClearValue(Canvas.HeightProperty);
                 mView.SetValue(Canvas.VerticalAlignmentProperty, VerticalAlignment.Center);
                 setVerticalSizePolicyFlags(false, true);
@@ -603,6 +610,12 @@ namespace MoSync
              */
             private void FillSpaceVertically()
             {
+                IWidget a = this;
+                IWidget b = GetParent();
+                if (b != null)
+                {
+                    int i = 2;
+                }
                 mView.ClearValue(Canvas.HeightProperty);
                 mView.SetValue(Canvas.VerticalAlignmentProperty, VerticalAlignment.Stretch);
                 setVerticalSizePolicyFlags(true, false);
@@ -640,40 +653,6 @@ namespace MoSync
                     {
                         Grid.SetColumn(View as FrameworkElement, ColumnNumber);
                         Grid.SetRow(View as FrameworkElement, RowNumber);
-                    }
-                }
-            }
-
-            #endregion
-
-            #region UI Events
-
-            /**
-             * Event handler for the layout updated event sent by the FrameworkElement mView.
-             */
-            void mView_LayoutUpdated(object sender, EventArgs e)
-            {
-                if (!isViewCreated)
-                {
-                    mRuntime.GetModule<NativeUIModule>().nrV++;
-
-                    if (mRuntime.GetModule<NativeUIModule>().nrW == mRuntime.GetModule<NativeUIModule>().nrV)
-                    {
-                        System.Diagnostics.Debug.WriteLine("UI Ready: " +
-                            DateTime.Now.Minute.ToString() + ":" +
-                            DateTime.Now.Second.ToString() + ":" +
-                            DateTime.Now.Millisecond.ToString());
-                    }
-
-                    isViewCreated = true;
-
-                    IWidget a = this;
-                    // run all the pending operations from the widget operation queue
-                    while (mOperationQueue.Count != 0)
-                    {
-                        WidgetOperation currentOperation = mOperationQueue.Dequeue();
-
-                        RunOperation(currentOperation);
                     }
                 }
             }

@@ -27,7 +27,7 @@ namespace MoSync
             /**
              * Contains a reference to the runtime Core - needed by the get operations.
              */
-            private Core mCore;
+            private Runtime mRuntime;
 
             public AsyncNativeUIWindowsPhone()
                 : base()
@@ -38,58 +38,92 @@ namespace MoSync
 
             public void SetProperty(IWidget widget, string propertyName, string propertyValue)
             {
-                widget.SetProperty(propertyName, propertyValue);
+                if (widget is WidgetBaseMock)
+                {
+                    WidgetOperation setOperation = new WidgetOperation(propertyName, propertyValue);
+                    widget.AddOperation(setOperation);
+                }
+                else
+                {
+                    widget.SetProperty(propertyName, propertyValue);
+                }
             }
 
             public String GetProperty(IWidget widget, string propertyName)
             {
+                if (widget is WidgetBaseMock)
+                {
+                    String propertyValue = widget.GetLastValidSet(propertyName);
+
+                    if (propertyValue != null)
+                    {
+                        return propertyValue;
+                    }
+
+                    widget = mRuntime.GetModule<NativeUIModule>().GetChildSync(widget.GetHandle());
+                }
+
                 return widget.GetProperty(propertyName);
             }
 
             public void AddChild(IWidget parent, IWidget child)
             {
-                if (!(parent as WidgetBase).IsViewCreated)
+                if (parent is WidgetBaseMock)
                 {
                     WidgetOperation addChildOperation = new WidgetOperation(WidgetOperation.OperationType.ADD, child.GetHandle());
                     parent.AddOperation(addChildOperation);
                 }
                 else
                 {
-                    child.SetParent(parent);
+                    if (child is WidgetBaseMock)
+                    {
+                        child = mRuntime.GetModule<NativeUIModule>().GetChildSync(child.GetHandle());
+                    }
+                    System.Diagnostics.Debug.WriteLine("MoSyncNativeUIAsync: Add child; Parent: " +
+                        parent.GetType().ToString() + "(" + parent.GetHandle().ToString() + ")" +
+                        "Child: " +
+                        child.GetType().ToString() + "(" + child.GetHandle().ToString() + ")");
                     parent.AddChild(child);
                 }
             }
 
             public void InsertChild(IWidget parent, IWidget child, int index)
             {
-                if (!(parent as WidgetBase).IsViewCreated)
+                if (parent is WidgetBaseMock)
                 {
                     WidgetOperation insertChildOperation = new WidgetOperation(child.GetHandle(), index);
                     parent.AddOperation(insertChildOperation);
                 }
                 else
                 {
-                    child.SetParent(parent);
+                    if (child is WidgetBaseMock)
+                    {
+                        child = mRuntime.GetModule<NativeUIModule>().GetChildSync(child.GetHandle());
+                    }
                     parent.InsertChild(child, index);
                 }
             }
 
             public void RemoveChild(IWidget child)
             {
-                if (child.GetParent() != null && !(child.GetParent() as WidgetBase).IsViewCreated)
+                if (child.GetParent() is WidgetBaseMock)
                 {
                     WidgetOperation removeChildOperation = new WidgetOperation(WidgetOperation.OperationType.REMOVE, child.GetHandle());
                     child.GetParent().AddOperation(removeChildOperation);
                 }
                 else
                 {
+                    if (child is WidgetBaseMock)
+                    {
+                        child = mRuntime.GetModule<NativeUIModule>().GetChildSync(child.GetHandle());
+                    }
                     child.RemoveFromParent();
                 }
             }
 
-            public void SetCore(Core core)
+            public void SetRuntime(Runtime runtime)
             {
-                this.mCore = core;
+                this.mRuntime = runtime;
             }
         }
 

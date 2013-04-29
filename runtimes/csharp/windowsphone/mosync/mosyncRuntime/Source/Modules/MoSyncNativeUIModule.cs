@@ -3,6 +3,7 @@ using Microsoft.Phone.Controls;
 using System.Collections.Generic;
 using System.Windows;
 using System.Threading;
+using MoSync.NativeUI;
 
 namespace MoSync
 {
@@ -17,6 +18,7 @@ namespace MoSync
         private List<IWidget> mWidgets = new List<IWidget>();
 
         private Dictionary<int, Thread> mWidgetThreadDictionary;
+        private Dictionary<int, Type> mWidgetTypeDictionary;
 
         #region Widget Add/Get
 
@@ -40,15 +42,16 @@ namespace MoSync
 
         #endregion
 
-        // TODO SA: only for benchmarks - remove this
-        public int nrW = 0;
-        public int nrV = 0;
+        public DateTime mAppLaunchedTime;
 
         #region Asynchronous Widget Creation methods
 
         private void StartWidgetCreationThread(int widgetHandle, Type widgetType)
         {
+            mWidgetTypeDictionary.Add(widgetHandle, widgetType);
+
             Thread createWidgetThread = new Thread(() => CreateWidgetAsync(widgetHandle, widgetType));
+            createWidgetThread.Name = "Creating widget " + widgetType.ToString() + " handle: " + widgetHandle.ToString();
             createWidgetThread.IsBackground = true;
             createWidgetThread.Start();
 
@@ -58,41 +61,94 @@ namespace MoSync
             mWidgetThreadDictionary.Add(widgetHandle, createWidgetThread);
         }
 
-        private void CreateWidgetAsync(int widgetHandle, Type widgetType)
+        public void WaitForWidgetCreation(int widgetHandle)
         {
-            MoSync.Util.RunActionOnMainThread(() =>
+            IWidget widget = mWidgets[widgetHandle];
+            if (Deployment.Current.Dispatcher.CheckAccess())
             {
-                nrW++;
-                IWidget widget = Activator.CreateInstance(widgetType) as IWidget;
-                IWidget widgetMock = mWidgets[widgetHandle];
-
-                // lock the mWidgets array when this thread starts manipulating it
-                lock (mWidgets)
+                Type widgetType = null;
+                mWidgetTypeDictionary.TryGetValue(widgetHandle, out widgetType);
+                if (widgetType != null && widget is WidgetBaseMock)
                 {
-                    if (widgetMock is WidgetBaseMock)
-                    {
-                        widget.SetHandle(widgetHandle);
-                        widget.AddOperations((widgetMock as WidgetBaseMock).OperationQueue);
-                        widget.SetRuntime(widgetMock.GetRuntime());
-                        mWidgets[widgetHandle] = widget;
-
-                        // remove the thread from the widget thread dictionary - the widget has been created
-                        lock (mWidgetThreadDictionary)
-                        {
-                            mWidgetThreadDictionary.Remove(widgetHandle);
-                        }
-                    }
+                    CreateWidgetSync(widgetHandle, widgetType);
+                    return;
                 }
-            }, false);
+            }
+            else
+            {
+                Thread widgetCreationThread = null;
+                mWidgetThreadDictionary.TryGetValue(widgetHandle, out widgetCreationThread);
+
+                if (widgetCreationThread != null)
+                {
+                    widgetCreationThread.Join();
+                }
+            }
         }
 
-        public Thread GetWidgetCreationThread(int widgetHandle)
+        public IWidget GetChildSync(int widgetHandle)
         {
-            Thread widgetCreationThread = null;
-            mWidgetThreadDictionary.TryGetValue(widgetHandle, out widgetCreationThread);
+            WaitForWidgetCreation(widgetHandle);
 
-            // if the thread is not in the dictionary, null will be returned
-            return widgetCreationThread;
+            return mWidgets[widgetHandle];
+        }
+
+        private void CreateWidgetSync(int widgetHandle, Type widgetType)
+        {
+            IWidget widget = Activator.CreateInstance(widgetType) as IWidget;
+            IWidget widgetMock = mWidgets[widgetHandle];
+            widget.SetHandle(widgetHandle);
+            widget.AddOperations((widgetMock as WidgetBaseMock).OperationQueue);
+            widget.SetRuntime(widgetMock.GetRuntime());
+            // lock the mWidgets array when this thread starts manipulating it
+            mWidgets[widgetHandle] = widget;
+            // remove the thread from the widget thread dictionary - the widget has been created
+
+            (widget as WidgetBaseWindowsPhone).RunOperationQueue();
+
+            System.Diagnostics.Debug.WriteLine("Widget created: " +
+                DateTime.Now.Minute.ToString() + ":" +
+                DateTime.Now.Second.ToString() + ":" +
+                DateTime.Now.Millisecond.ToString());
+            TimeSpan timeDifference = DateTime.Now - mAppLaunchedTime;
+            System.Diagnostics.Debug.WriteLine("Time till app launch: " + timeDifference.Minutes.ToString() + ":" +
+                timeDifference.Seconds.ToString() + ":" +
+                timeDifference.Milliseconds.ToString());
+        }
+
+        private void CreateWidgetAsync(int widgetHandle, Type widgetType)
+        {
+            IWidget widget = null;
+            IWidget widgetMock = mWidgets[widgetHandle];
+            if (!(widgetMock is WidgetBaseMock))
+                return;
+            MoSync.Util.RunActionOnMainThread(() =>
+            {
+                widget = Activator.CreateInstance(widgetType) as IWidget;
+            }, true);
+            widget.SetHandle(widgetHandle);
+            widget.AddOperations((widgetMock as WidgetBaseMock).OperationQueue);
+            widget.SetRuntime(widgetMock.GetRuntime());
+            // lock the mWidgets array when this thread starts manipulating it
+            lock (mWidgets)
+            {
+                mWidgets[widgetHandle] = widget;
+            }
+            // remove the thread from the widget thread dictionary - the widget has been created
+
+            MoSync.Util.RunActionOnMainThread(() =>
+            {
+                (widget as WidgetBaseWindowsPhone).RunOperationQueue();
+            }, true);
+
+            System.Diagnostics.Debug.WriteLine("Widget created: " +
+                DateTime.Now.Minute.ToString() + ":" +
+                DateTime.Now.Second.ToString() + ":" +
+                DateTime.Now.Millisecond.ToString());
+            TimeSpan timeDifference = DateTime.Now - mAppLaunchedTime;
+            System.Diagnostics.Debug.WriteLine("Time till app launch: " + timeDifference.Minutes.ToString() + ":" +
+                timeDifference.Seconds.ToString() + ":" +
+                timeDifference.Milliseconds.ToString());
         }
 
         #endregion
@@ -102,10 +158,13 @@ namespace MoSync
         public void Init(Ioctls ioctls, Core core, Runtime runtime)
         {
             mNativeUI = new NativeUI.AsyncNativeUIWindowsPhone();
+            mNativeUI.SetRuntime(runtime);
             //mWidgets.Add(null); // why?
 
             // initialize the widget thread dictionary
             mWidgetThreadDictionary = new Dictionary<int, Thread>();
+
+            mWidgetTypeDictionary = new Dictionary<int, Type>();
 
             /**
              * This will add a OrientationChanged event handler to the Application.Current.RootVisual, this is application wide.
@@ -166,6 +225,20 @@ namespace MoSync
                         widget.SetHandle(i);
                         mWidgets[i] = widget;
 
+                   /*     MoSync.Util.RunActionOnMainThread(() =>
+                        {
+                            widget = Activator.CreateInstance(widgetType) as IWidget;
+                        }, true);
+                        IWidget widgetMock = mWidgets[i];
+                        widget.SetHandle(i);
+                        widget.AddOperations((widgetMock as WidgetBaseMock).OperationQueue);
+                        widget.SetRuntime(widgetMock.GetRuntime());
+                        // lock the mWidgets array when this thread starts manipulating it
+                        mWidgets[i] = widget;
+                        // remove the thread from the widget thread dictionary - the widget has been created
+
+                        (widget as WidgetBaseWindowsPhone).RunOperationQueue(); */
+
                         StartWidgetCreationThread(i, widgetType);
 
                         return i;
@@ -175,6 +248,17 @@ namespace MoSync
                 mWidgets.Add(widget);
                 widget.SetHandle(mWidgets.Count - 1);
 
+         /*       MoSync.Util.RunActionOnMainThread(() =>
+                {
+                    widget = Activator.CreateInstance(widgetType) as IWidget;
+                }, true);
+                IWidget widgetMock2 = mWidgets[mWidgets.Count - 1];
+                widget.SetHandle(mWidgets.Count - 1);
+                widget.AddOperations((widgetMock2 as WidgetBaseMock).OperationQueue);
+                widget.SetRuntime(widgetMock2.GetRuntime());
+                // lock the mWidgets array when this thread starts manipulating it
+                mWidgets[mWidgets.Count - 1] = widget; */
+                // remove the thread from the widget thread dictionary - the widget has been created
                 StartWidgetCreationThread(mWidgets.Count - 1, widgetType);
 
                 return mWidgets.Count - 1;
@@ -201,7 +285,6 @@ namespace MoSync
 				if (_child < 0 || _child >= mWidgets.Count)
 					return MoSync.Constants.MAW_RES_INVALID_HANDLE;
 				IWidget child = mWidgets[_child];
-                child.SetParent(parent);
                 mNativeUI.AddChild(parent, child);
                 return MoSync.Constants.MAW_RES_OK;
             };
@@ -224,7 +307,6 @@ namespace MoSync
 				if (_child < 0 || _child >= mWidgets.Count)
 					return MoSync.Constants.MAW_RES_INVALID_HANDLE;
 				IWidget child = mWidgets[_child];
-                child.SetParent(parent);
                 mNativeUI.InsertChild(parent, child, index);
                 return MoSync.Constants.MAW_RES_OK;
             };

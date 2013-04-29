@@ -26,8 +26,10 @@ namespace MoSync
         int GetHandle();
         void SetRuntime(Runtime runtime);
         Runtime GetRuntime();
+        String GetLastValidSet(String property);
         void AddOperations(Queue<WidgetOperation> queue);
         void AddOperation(WidgetOperation op);
+        void RunOperationQueue();
     }
 
     #endregion
@@ -103,10 +105,9 @@ namespace MoSync
         protected int mHandle;
         protected Runtime mRuntime;
 
-        /**
-         * Set by widget right after the view becomes available for manipulation.
-         */
-        protected bool isViewCreated = false;
+        public void RunOperationQueue()
+        {
+        }
 
         /**
          * Contains operations that are stacked if the syscalls reach the runtime before
@@ -118,14 +119,6 @@ namespace MoSync
         public WidgetBase()
         {
             mOperationQueue = new Queue<WidgetOperation>();
-        }
-
-        /**
-         * Public getter that check is the view is created (ready for manipulation) or not.
-         */
-        public bool IsViewCreated
-        {
-            get { return isViewCreated; }
         }
 
         #region Setters/Getters for the runtime and handle
@@ -281,40 +274,30 @@ namespace MoSync
 
         public void SetProperty(String property, String stringValue)
         {
-            if (!isViewCreated)
+            PropertyInfo pinfo;
+            MoSyncWidgetPropertyAttribute pattr = GetPropertyAttribute(property, out pinfo);
+            Exception exception = null;
+            IWidget i = this;
+            if (pinfo == null) throw new InvalidPropertyNameException();
+            if (pattr.ShouldExecuteOnMainThread)
             {
-                IWidget a = this;
-                // if the widget view is not ready for manipulation, all the setters go into
-                // the queue
-                WidgetOperation setOperation = new WidgetOperation(property, stringValue);
-                mOperationQueue.Enqueue(setOperation);
+                MoSync.Util.RunActionOnMainThreadSync(() =>
+                    {
+                        try
+                        {
+                            SetProperty(pinfo, stringValue);
+                        }
+                        catch (Exception e)
+                        {
+                            exception = e;
+                        }
+                    });
+                if (null != exception)
+                    if (exception.InnerException is InvalidPropertyValueException)
+                        throw new InvalidPropertyValueException();
             }
             else
-            {
-                PropertyInfo pinfo;
-                MoSyncWidgetPropertyAttribute pattr = GetPropertyAttribute(property, out pinfo);
-                Exception exception = null;
-                if (pinfo == null) throw new InvalidPropertyNameException();
-                if (pattr.ShouldExecuteOnMainThread)
-                {
-                    MoSync.Util.RunActionOnMainThreadSync(() =>
-                        {
-                            try
-                            {
-                                SetProperty(pinfo, stringValue);
-                            }
-                            catch (Exception e)
-                            {
-                                exception = e;
-                            }
-                        });
-                    if (null != exception)
-                        if (exception.InnerException is InvalidPropertyValueException)
-                            throw new InvalidPropertyValueException();
-                }
-                else
-                    SetProperty(pinfo, stringValue);
-            }
+                SetProperty(pinfo, stringValue);
         }
 
         private String GetProperty(PropertyInfo pinfo)
@@ -323,7 +306,7 @@ namespace MoSync
             return value.ToString();
         }
 
-        protected String GetLastValidSet(String property)
+        public String GetLastValidSet(String property)
         {
             String res = null;
 
@@ -346,29 +329,8 @@ namespace MoSync
 
         public String GetProperty(String property)
         {
-            if (!isViewCreated)
-            {
-                String propertyValue = GetLastValidSet(property);
-
-                // if there is no valid set, we need to wait for the widget creation in order to get
-                // the property
-                Thread widgetCreationThread = mRuntime.GetModule<NativeUIModule>().GetWidgetCreationThread(mHandle);
-                if (propertyValue == null)
-                {
-                    if (widgetCreationThread != null)
-                    {
-                        widgetCreationThread.Join();
-                    }
-                    propertyValue = GetPropertyValue(property);
-                }
-
-                return propertyValue;
-            }
-            else
-            {
-                String ret = GetPropertyValue(property);
-                return ret;
-            }
+            String ret = GetPropertyValue(property);
+            return ret;
         }
 
         protected String GetPropertyValue(String property)
