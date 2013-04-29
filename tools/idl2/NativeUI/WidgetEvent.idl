@@ -200,6 +200,13 @@ group WidgetEvent "Widget event" {
 			* May be one of the constants: \link #MA_SCREEN_ORIENTATION_PORTRAIT MA_SCREEN_ORIENTATION \endlink
 			*/
 			int screenOrientation;
+
+			/**
+			* @brief The index of the selected custom picker item.
+			* The first item has index zero.
+			* Valid only if event's type is #MAW_EVENT_CUSTOM_PICKER_ITEM_SELECTED.
+			*/
+			int customPickerItemIndex;
 		}
 	}
 
@@ -437,6 +444,13 @@ group WidgetEvent "Widget event" {
 			* Available on iOS.
 			*/
 			SEGMENTED_LIST_ITEM_DELETE_BTN = 36;
+
+			/**
+			* @brief Sent by a CustomPicker when user selects an item.
+			* The event will contain the selected item index in customPickerItemIndex.
+			* Available on iOS.
+			*/
+			CUSTOM_PICKER_ITEM_SELECTED = 37;
 		}
 	} // end of WidgetEventTypes
 } // end of WidgetEvent

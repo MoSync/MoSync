@@ -39,17 +39,17 @@ namespace NativeUI
 
 namespace MoSyncCamera
 {
-	class ImageViewerScreenObserver
+	class ImageViewerScreenController
 	{
 	public:
 		/**
-		 * Notifies the observer that the image viewer screen is ready
+		 * Notifies the controller that the image viewer screen is ready
 		 * to be dismissed.
 		 */
 		virtual void imageViewingDone() = 0;
 
 		/**
-		 * Notifies the observer that a request for saving
+		 * Notifies the controller that a request for saving
 		 * the displayed image was made.
 		 */
 		virtual void exportImageToGalleryRequested() = 0;
@@ -63,9 +63,9 @@ namespace MoSyncCamera
 		/**
 		 * Constructor.
 		 *
-		 * @param observer Observer for this screen.
+		 * @param controller Controller of this screen.
 		 */
-		ImageViewerScreen(ImageViewerScreenObserver& observer);
+		ImageViewerScreen(ImageViewerScreenController& controller);
 
 		~ImageViewerScreen();
 
@@ -83,6 +83,16 @@ namespace MoSyncCamera
 		 */
         void setImageWithData(const MAHandle& imageDataHandle);
 
+        /**
+         * Makes changes to the UI related to the process of saving an
+         * image to photo gallery.
+         *
+         * @param imageSaved True will change the UI suck it suggests
+         * that the operation of saving an image is in progress,
+         * false will restore the normal/idle state.
+         */
+        void toggleImageSavingInProgress(bool isInProgress);
+
 	private:
 
         void createUI();
@@ -93,11 +103,13 @@ namespace MoSyncCamera
 
         void setupButtons();
 
+		void setupActivityIndicator();
+
         void arrangeWidgets();
 
 	private:
 
-        ImageViewerScreenObserver& mObserver;
+        ImageViewerScreenController& mController;
 
 		NativeUI::RelativeLayout* mMainLayout;
 
@@ -106,6 +118,13 @@ namespace MoSyncCamera
 		NativeUI::ImageButton* mDismissButton;
 
 		NativeUI::ImageButton* mSaveImageButton;
+
+		/**
+		 * Widget that indicates activity.
+		 * Used while taking a exporting an image to photo
+		 * gallery.
+		 */
+		NativeUI::ActivityIndicator* mActivityIndicator;
 	};
 } // MoSyncCamera
 #endif /* SNAPSHOTSCREEN_H_ */

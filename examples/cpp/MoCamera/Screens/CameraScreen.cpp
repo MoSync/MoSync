@@ -38,8 +38,6 @@ using namespace NativeUI;
 #define BTN_RATIO 0.16 // Image button/container width ratio for normal buttons
 #define TAKE_PICTURE_BTN_RATIO 0.30 // Image button/container width ratio for the -take snapshot- button
 #define ZOOM_STEP_RATIO 0.1 // (Zoom step)/(maximum zoom) ratio
-#define ACTIVITY_INDICATOR_WIDTH 100 // Width of the activity indicator
-#define ACTIVITY_INDICATOR_HEIGHT 100 // Height of the activity indicator
 
 // The resource arrays must be synchronized with the kFlashModes array!
 static const CAMERA_FLASH_MODE kFlashModes[] = {FLASH_AUTO, FLASH_ON, FLASH_OFF, FLASH_TORCH};
@@ -49,8 +47,8 @@ static const int kFlashModesImgPressed[] = {RES_FLASH_AUTO_IMG_PRESSED,
 
 namespace MoSyncCamera
 {
-	CameraScreen::CameraScreen(CameraScreenObserver& observer):
-			mObserver(observer),
+	CameraScreen::CameraScreen(CameraScreenController& controller):
+			mController(controller),
 			mMainLayout(NULL),
 			mCamera(NULL),
 			mTakeSnapshotButton(NULL),
@@ -59,6 +57,7 @@ namespace MoSyncCamera
 			mSetNextCameraButton(NULL),
 			mZoomInButton(NULL),
 			mZoomOutButton(NULL),
+			mActivityIndicator(NULL),
 			mCurrentFlashMode(0)
 	{
 		createUI();
@@ -187,11 +186,9 @@ namespace MoSyncCamera
 
 	void CameraScreen::arrangeWidgets()
 	{
-		/// Get screen dimensions.
 		MAExtent size = maGetScrSize();
-		/// Extract the screen width
+
 		int screenWidth = EXTENT_X(size);
-		/// Extract the screen height
 		int screenHeight = EXTENT_Y(size);
 
 		mCamera->setPosition(0, 0);
@@ -307,12 +304,12 @@ namespace MoSyncCamera
 	{
 		if (button == mTakeSnapshotButton)
 		{
-			mObserver.snapshotRequested();
+			mController.snapshotRequested();
 		}
 		else if ( button == mShowSnapshotButton )
 		{
 			mCamera->stopPreview();
-			mObserver.snapshotDisplayRequested();
+			mController.snapshotDisplayRequested();
 		}
 		else if ( button == mSetNextFlashModeButton )
 		{
@@ -387,7 +384,7 @@ namespace MoSyncCamera
 		uint currentZoomLevel = mCamera->getZoomLevel();
 		uint zoomStep = (uint)(ZOOM_STEP_RATIO * maxZoomLevel);
 
-		int nextZoomLevel = currentZoomLevel + zoomStep;
+		unsigned int nextZoomLevel = currentZoomLevel + zoomStep;
 		if ( nextZoomLevel > maxZoomLevel )
 		{
 			nextZoomLevel = maxZoomLevel;
