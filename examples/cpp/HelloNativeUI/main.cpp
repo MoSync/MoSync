@@ -76,7 +76,7 @@ public:
 	/**
 	 * This method is called when the application is closed.
 	 */
-	void NativeUIMoblet::closeEvent()
+	void closeEvent()
 	GCCATTRIB(noreturn)
 	{
 		// Deallocate the main screen.
@@ -90,7 +90,7 @@ public:
 	/**
 	 * Method called when a key is pressed.
 	 */
-	void NativeUIMoblet::keyPressEvent(int keyCode, int nativeCode)
+	void keyPressEvent(int keyCode, int nativeCode)
 	{
 	    // Close the application if the back key is pressed.
 	    if(MAK_BACK == keyCode)
