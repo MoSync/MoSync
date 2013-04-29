@@ -267,6 +267,14 @@ namespace NativeUI
          */
         void removeNavBarButtons(const NavBarSide side);
 
+        /**
+         * Replaces the back button on the navigation bar,
+         * which by default is the previous screen's title.
+         * This only applies if the screen is pushed to a stack screen.
+         * @param buttonText Text for the back button.
+         */
+        virtual void replaceBackButton(NavigationBarButton* backButton);
+
 		/**
 		 * Check if a screen is shown.
 		 * @return true if the screen is visible, false otherwise.

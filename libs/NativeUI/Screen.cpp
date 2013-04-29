@@ -349,6 +349,11 @@ namespace NativeUI
         setPropertyInt(MAW_SCREEN_REMOVE_NAV_BAR_BUTTONS, side);
     }
 
+    void Screen::replaceBackButton(NavigationBarButton* backButton)
+    {
+        setPropertyInt(MAW_SCREEN_SET_BACK_BUTTON, backButton->getWidgetHandle());
+    }
+
 	/**
 	 * Check if a screen is shown.
 	 * @return true if the screen is visible, false otherwise.

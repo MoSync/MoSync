@@ -140,6 +140,18 @@
     {
 		_controller.title = value;
 	}
+    else if([key isEqualToString:@MAW_SCREEN_SET_BACK_BUTTON])
+    {
+        MoSyncUI* mosyncUI = getMoSyncUI();
+        MAHandle navBarButtonHandle = [value intValue];
+        IWidget* navBarButtonWidget = [mosyncUI getWidget:navBarButtonHandle];
+        if (!navBarButtonWidget) return MAW_RES_INVALID_HANDLE;
+        if ([navBarButtonWidget class] != [NavBarButtonWidget class]) return MAW_RES_ERROR;
+
+        NavBarButtonWidget* navBarButton = (NavBarButtonWidget*)navBarButtonWidget;
+        UINavigationController* navigationController = (UINavigationController*)[self getController];
+        [navigationController.navigationItem setBackBarButtonItem:navBarButton.barButtonItem];
+    }
 	else if([key isEqualToString:@MAW_SCREEN_ICON])
     {
 		int imageHandle = [value intValue];

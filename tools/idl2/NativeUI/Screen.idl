@@ -18,6 +18,20 @@ group WidgetScreenProperties "Screen" {
 		TITLE = "title";
 
 		/**
+		* @brief Overrides the default back button text, which is the previous screen's title.
+		*
+		* @validvalue MoSync handle to a navigation bar button widget.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(stackScreenHandle, MAW_SCREEN_SET_BACK_BUTTON_TEXT, toString(navBarButtonWidgetHandle));
+		* \endcode
+		*/
+		SET_BACK_BUTTON = "setBackButton";
+
+		/**
 		* @brief Sets an icon for a screen. The icon is used by a tab screen to display an icon on the tab indicator.
 		*
 		* @validvalue MoSync handle to an uncompressed image resource. The size of the image should be small enough to fit in a tab indicator.
