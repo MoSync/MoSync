@@ -34,6 +34,14 @@ string require(Arguments* args, string key);
  * the PROJECT_DIR.
  */
 vector<string> getSourceFiles(Arguments* args);
+
+/**
+ * Validates a configuration name
+ * \return a non-empty string describing what is wrong,
+ * or an empty string if valid
+ */
+string validateConfiguration(string& configName);
+
 const char* mosyncdir();
 int sh(const char* cmd, bool hideOutput = false, const char* shownCmdLine = 0, bool exitOnError = true);
 void error(const char* msg, int errorCode = 1);

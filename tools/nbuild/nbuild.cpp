@@ -66,6 +66,20 @@ vector<string> getSourceFiles(Arguments* args) {
 	return result;
 }
 
+string validateConfiguration(string& configName) {
+	for (size_t i = 0; i < configName.size(); i++) {
+		char ch = configName[i];
+		if (ch == ' ') {
+			return "Spaces are not allowed in configuration names!";
+		}
+		if (!isalnum(ch) && ch != '-' && ch != '_') {
+			return "Invalid character in configuration name!"
+				" Only letters, digits, hyphen and underscore allowed.";
+		}
+	}
+	return "";
+}
+
 const char* mosyncdir() {
 	// COPY & PASTED FROM PACKAGE.CPP
 	static const char* md = NULL;

@@ -35,6 +35,7 @@ string getTempBuildDir(Arguments* params) {
 	} else {
 		toDir(tmpDir);
 	}
+	toOSSlashes(tmpDir);
 	return tmpDir;
 }
 
@@ -211,6 +212,13 @@ int executeNdkBuild(Arguments* params) {
 	vector<string> archs;
 	archs.push_back("armeabi");
 	archs.push_back("armeabi-v7a");
+
+	for (size_t i = 0; i < configNames.size(); i++) {
+		string validatedConfig = validateConfiguration(configNames[i]);
+		if (!validatedConfig.empty()) {
+			error(validatedConfig.c_str(), 2);
+		}
+	}
 
 	for (size_t i = 0; i < configNames.size(); i++) {
 		for (size_t j = 0; j < archs.size(); j++) {
