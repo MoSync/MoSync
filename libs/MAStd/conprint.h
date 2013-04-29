@@ -33,12 +33,19 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #ifdef MOSYNC_NATIVE
 #define CON(ret, fn) ret con_##fn
+#undef printf
 #define printf con_printf
+#undef puts
 #define puts con_puts
+#undef wputs
 #define wputs con_wputs
+#undef vprintf
 #define vprintf con_vprintf
+#undef wprintf
 #define wprintf con_wprintf
+#undef wvprintf
 #define wvprintf con_wvprintf
+#undef putchar
 #define putchar con_putchar
 #else
 #define CON(ret, fn) ret fn

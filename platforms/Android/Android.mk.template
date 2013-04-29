@@ -18,7 +18,6 @@ LOCAL_C_INCLUDES += $(MOSYNCDIR)/include
 LOCAL_C_INCLUDES += {{additional-includes}}
 {{! We need to undefine the ANDROID macro }}
 LOCAL_CFLAGS    += -UANDROID -fpermissive -O3 -DMOSYNC_NATIVE -DNATIVE_GLES -DNATIVE_GLES2
-LOCAL_CFLAGS    += -std=c99
 LOCAL_CFLAGS    += {{compiler-defines}}
 LOCAL_CFLAGS    += {{additional-compiler-switches}}
 LOCAL_MODULE    := $(MOSYNC_MODULE_NAME)
