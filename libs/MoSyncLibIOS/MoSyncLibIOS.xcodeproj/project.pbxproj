@@ -194,6 +194,9 @@
 		0BC7BEFF1728218F007662C2 /* maxtoa.c in Sources */ = {isa = PBXBuildFile; fileRef = 0BC7BEFE1728218F007662C2 /* maxtoa.c */; };
 		0BC7BF01172821BD007662C2 /* mavsprintf.c in Sources */ = {isa = PBXBuildFile; fileRef = 0BC7BF00172821BD007662C2 /* mavsprintf.c */; };
 		0BC7BF031728226E007662C2 /* mawstring.c in Sources */ = {isa = PBXBuildFile; fileRef = 0BC7BF021728226E007662C2 /* mawstring.c */; };
+		8BCE5AEB172F9D4F0095578F /* GraphicsSoftware.c in Sources */ = {isa = PBXBuildFile; fileRef = 8BCE5AE9172F9D4F0095578F /* GraphicsSoftware.c */; };
+		8BCE5AF2172FBABF0095578F /* CharInputC.c in Sources */ = {isa = PBXBuildFile; fileRef = 8BCE5AF1172FBABF0095578F /* CharInputC.c */; };
+		8BCE5AF3172FBAEA0095578F /* CharInput.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0B92B70F1712BB7E002DFDF6 /* CharInput.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -710,6 +713,10 @@
 		0BC7BEFE1728218F007662C2 /* maxtoa.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = maxtoa.c; sourceTree = "<group>"; };
 		0BC7BF00172821BD007662C2 /* mavsprintf.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = mavsprintf.c; sourceTree = "<group>"; };
 		0BC7BF021728226E007662C2 /* mawstring.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = mawstring.c; sourceTree = "<group>"; };
+		8BCE5AE9172F9D4F0095578F /* GraphicsSoftware.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = GraphicsSoftware.c; sourceTree = "<group>"; };
+		8BCE5AEA172F9D4F0095578F /* GraphicsSoftware.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GraphicsSoftware.h; sourceTree = "<group>"; };
+		8BCE5AF0172FBABF0095578F /* CharInput.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CharInput.h; sourceTree = "<group>"; };
+		8BCE5AF1172FBABF0095578F /* CharInputC.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = CharInputC.c; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -923,6 +930,8 @@
 				0B92B67A1712BB7D002DFDF6 /* BuffDownloader.cpp */,
 				0B92B67B1712BB7D002DFDF6 /* BuffDownloader.h */,
 				0B92B70F1712BB7E002DFDF6 /* CharInput.cpp */,
+				8BCE5AF0172FBABF0095578F /* CharInput.h */,
+				8BCE5AF1172FBABF0095578F /* CharInputC.c */,
 				0B92B7121712BB7E002DFDF6 /* collection_common.h */,
 				0B92B7131712BB7E002DFDF6 /* Connection.cpp */,
 				0B92B7141712BB7E002DFDF6 /* Connection.h */,
@@ -944,6 +953,8 @@
 				0B92B7261712BB7E002DFDF6 /* GLMoblet.h */,
 				0B92B7271712BB7E002DFDF6 /* Graphics.c */,
 				0B92B7281712BB7E002DFDF6 /* Graphics.h */,
+				8BCE5AE9172F9D4F0095578F /* GraphicsSoftware.c */,
+				8BCE5AEA172F9D4F0095578F /* GraphicsSoftware.h */,
 				0B92B72D1712BB7E002DFDF6 /* HashDict.h */,
 				0B92B72E1712BB7E002DFDF6 /* HashDict_impl.h */,
 				0B92B72F1712BB7E002DFDF6 /* HashMap.cpp */,
@@ -1677,7 +1688,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "line_1=$(sed -n '/char\\* strcpy/=' ../MAStd/maapi.h)\nlet \"line_2=$line_1-2\"\necho $line_2\n\nrm -r MAStdNative || echo MASTDNative already deleted\nmkdir MAStdNative\ncd ../MAStd\ncp -r IX_OPENGL_ES.h maapi.h madmath.h maxtoa.h maapi_defs.h maarg.h IX_WIDGET.h maheap.h matime.h conprint.h maassert.h mastdlib.h mavsprintf.h ma.h mactype.h mastring.h mawvsprintf.h mawstring.h IX_OPENGL_ES_MA.h IX_OPENGL_ES.h IX_GL1.h IX_GL2.h GLES GLES2  ../MoSyncLibIOS/MAStdNative\n\ncd ..\n\nfind . -path ./MoSyncLibIOS -prune -o -iname \"*.h*\" | cpio -pmud MoSyncLibIOS/MAStdNative/\n\ncd MoSyncLibIOS/MAStdNative\n\n\nline_1+=\"d\"\necho $line_1\nline_2+=\"d\"\necho $line_2\n\nsed -i.bak $line_1 maapi.h\nsed -i.bak $line_2 maapi.h\n\n";
+			shellScript = "line_1=$(sed -n '/char\\* strcpy/=' ../MAStd/maapi.h)\nlet \"line_2=$line_1-2\"\necho $line_2\n\nrm -r MAStdNative || echo MASTDNative already deleted\nmkdir MAStdNative\ncd ../MAStd\ncp -r IX_OPENGL_ES.h maapi.h madmath.h maxtoa.h maapi_defs.h maarg.h IX_WIDGET.h maheap.h matime.h conprint.h maassert.h mastdlib.h mavsprintf.h ma.h mactype.h mastring.h mawvsprintf.h mawstring.h IX_OPENGL_ES_MA.h IX_OPENGL_ES.h IX_GL1.h IX_GL2.h IX_PIM.h GLES GLES2  ../MoSyncLibIOS/MAStdNative\n\ncd ..\n\nfind . -path ./MoSyncLibIOS -prune -o -iname \"*.h*\" | cpio -pmud MoSyncLibIOS/MAStdNative/\n\ncd MoSyncLibIOS/MAStdNative\n\n\nline_1+=\"d\"\necho $line_1\nline_2+=\"d\"\necho $line_2\n\nsed -i.bak $line_1 maapi.h\nsed -i.bak $line_2 maapi.h\n\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -1704,6 +1715,8 @@
 				0B92C8881712BB8A002DFDF6 /* BluetoothConnection.cpp in Sources */,
 				0B92C8891712BB8A002DFDF6 /* BluetoothDiscovery.cpp in Sources */,
 				0B92C88A1712BB8A002DFDF6 /* BuffDownloader.cpp in Sources */,
+				8BCE5AF3172FBAEA0095578F /* CharInput.cpp in Sources */,
+				8BCE5AF2172FBABF0095578F /* CharInputC.c in Sources */,
 				0B92C8BD1712BB8A002DFDF6 /* Connection.cpp in Sources */,
 				0B92C8BF1712BB8A002DFDF6 /* Downloader.cpp in Sources */,
 				0B92C8C01712BB8A002DFDF6 /* Environment.cpp in Sources */,
@@ -1872,6 +1885,7 @@
 				0B81C65617292769006E6E7D /* matime.c in Sources */,
 				0B81C658172928F4006E6E7D /* mawvsprintf.c in Sources */,
 				0BC52146172AC03D00D1D0D8 /* mactype.c in Sources */,
+				8BCE5AEB172F9D4F0095578F /* GraphicsSoftware.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
