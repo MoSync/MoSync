@@ -1,24 +1,58 @@
-#include <ma.h>
-#include <mavsprintf.h>
-#include <MAUtil/Moblet.h>
-#include <NativeUI/Widgets.h>
-#include <NativeUI/WidgetUtil.h>
+/*
+Copyright (C) 2011 MoSync AB
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License,
+version 2, as published by the Free Software Foundation.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+MA 02110-1301, USA.
+*/
+
+/**
+ * @file Main.cpp
+ * @author Mikael Kindborg
+ *
+ * This is the main entry point for the example application
+ * that demonstrates NativeUI on MoSync.
+ */
+
+#include <ma.h> 				// Syscalls
+#include <MAUtil/String.h>		// C++ String class
+#include <MAUtil/Moblet.h>		// Moblet class
+#include <conprint.h>			// lprintfln for logging
+
+#include <NativeUI/Widget.h>
+#include <NativeUI/Widgets.h>// Include all widgets
+
+#include "MainScreen.h"			// Main UI screen
 
 using namespace MAUtil;
 using namespace NativeUI;
 
 /**
- * Moblet to be used as a template for a Native UI application.
+ * Moblet for the  application.
  */
 class NativeUIMoblet : public Moblet
 {
 public:
 	/**
-	 * The constructor creates the user interface.
+	 * Constructor that creates the UI.
 	 */
 	NativeUIMoblet()
 	{
-		createUI();
+		// Create the main user interface screen.
+		mMainScreen = new MainScreen();
+
+		// Show the screen.
+		mMainScreen->show();
 	}
 
 	/**
@@ -26,76 +60,36 @@ public:
 	 */
 	virtual ~NativeUIMoblet()
 	{
-		mButton->removeButtonListener(this);
-		// All the children will be deleted.
-		delete mScreen;
+		delete mMainScreen;
 	}
-
 	/**
-	 * Create the user interface.
+	 * This method is called when the application is closed.
 	 */
-	void createUI()
+	void NativeUIMoblet::closeEvent()
 	{
-		// Create a NativeUI screen that will hold layout and widgets.
-		mScreen = new Screen();
+		// Deallocate the main screen.
+		delete mMainScreen;
+		mMainScreen = NULL;
 
-		//Create a Vertical Layout that will hold widgets
-		mLayout = new VerticalLayout();
-
-		//Let the layout fill the entire screen
-		mLayout->fillSpaceHorizontally();
-		mLayout->fillSpaceVertically();
-
-
-		//Create a Native UI button
-		mButton = new Button();
-
-		//Let the button fill it's layout
-		mButton->fillSpaceHorizontally();
-		mButton->fillSpaceVertically();
-
-		//Set the moblet to receive events from the button
-		mButton->addButtonListener(this);
-
-		//Set the text of the button
-		mButton->setText("Press Me");
-
-		//Add the button to the layout
-		mLayout->addChild(mButton);
-
-		//Add the layout to the screen
-		mScreen->setMainWidget(mLayout);
-
-		//Show the screen
-		mScreen->show();
+		// Exit the app.
+		close();
 	}
 
 	/**
-	 * Called when a key is pressed.
+	 * Method called when a key is pressed.
 	 */
-	void keyPressEvent(int keyCode, int nativeCode)
+	void NativeUIMoblet::keyPressEvent(int keyCode, int nativeCode)
 	{
-		if (MAK_BACK == keyCode || MAK_0 == keyCode)
-		{
-			// Call close to exit the application.
-			close();
-		}
-	}
-
-	/**
-	* This method is called if the touch-up event was inside the
-	* bounds of the button.
-	* @param button The button object that generated the event.
-	*/
-	virtual void buttonClicked(Widget* button)
-	{
-		((Button*) button)->setText("Hello World");
+	    // Close the application if the back key is pressed.
+	    if(MAK_BACK == keyCode)
+	    {
+			// Let the screen handle the keypress.
+			mMainScreen->handleKeyPress(keyCode);
+	    }
 	}
 
 private:
-    Screen* mScreen;			//A Native UI screen
-    VerticalLayout* mLayout;	//A Native UI layout
-    Button* mButton;			//A Native UI button
+	MainScreen* mMainScreen;
 };
 
 /**
@@ -103,6 +97,14 @@ private:
  */
 extern "C" int MAMain()
 {
-	Moblet::run(new NativeUIMoblet());
+	// Create a moblet.
+	NativeUIMoblet* moblet = new NativeUIMoblet();
+
+	// Run the moblet event loop.
+	Moblet::run(moblet);
+
+	// Deallocate objects.
+	delete moblet;
+
 	return 0;
 }
