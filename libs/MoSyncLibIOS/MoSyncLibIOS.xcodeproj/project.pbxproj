@@ -194,6 +194,7 @@
 		0BC7BEFF1728218F007662C2 /* maxtoa.c in Sources */ = {isa = PBXBuildFile; fileRef = 0BC7BEFE1728218F007662C2 /* maxtoa.c */; };
 		0BC7BF01172821BD007662C2 /* mavsprintf.c in Sources */ = {isa = PBXBuildFile; fileRef = 0BC7BF00172821BD007662C2 /* mavsprintf.c */; };
 		0BC7BF031728226E007662C2 /* mawstring.c in Sources */ = {isa = PBXBuildFile; fileRef = 0BC7BF021728226E007662C2 /* mawstring.c */; };
+		8BCE5AEB172F9D4F0095578F /* GraphicsSoftware.c in Sources */ = {isa = PBXBuildFile; fileRef = 8BCE5AE9172F9D4F0095578F /* GraphicsSoftware.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -710,6 +711,8 @@
 		0BC7BEFE1728218F007662C2 /* maxtoa.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = maxtoa.c; sourceTree = "<group>"; };
 		0BC7BF00172821BD007662C2 /* mavsprintf.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = mavsprintf.c; sourceTree = "<group>"; };
 		0BC7BF021728226E007662C2 /* mawstring.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = mawstring.c; sourceTree = "<group>"; };
+		8BCE5AE9172F9D4F0095578F /* GraphicsSoftware.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = GraphicsSoftware.c; sourceTree = "<group>"; };
+		8BCE5AEA172F9D4F0095578F /* GraphicsSoftware.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GraphicsSoftware.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -944,6 +947,8 @@
 				0B92B7261712BB7E002DFDF6 /* GLMoblet.h */,
 				0B92B7271712BB7E002DFDF6 /* Graphics.c */,
 				0B92B7281712BB7E002DFDF6 /* Graphics.h */,
+				8BCE5AE9172F9D4F0095578F /* GraphicsSoftware.c */,
+				8BCE5AEA172F9D4F0095578F /* GraphicsSoftware.h */,
 				0B92B72D1712BB7E002DFDF6 /* HashDict.h */,
 				0B92B72E1712BB7E002DFDF6 /* HashDict_impl.h */,
 				0B92B72F1712BB7E002DFDF6 /* HashMap.cpp */,
@@ -1872,6 +1877,7 @@
 				0B81C65617292769006E6E7D /* matime.c in Sources */,
 				0B81C658172928F4006E6E7D /* mawvsprintf.c in Sources */,
 				0BC52146172AC03D00D1D0D8 /* mactype.c in Sources */,
+				8BCE5AEB172F9D4F0095578F /* GraphicsSoftware.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
