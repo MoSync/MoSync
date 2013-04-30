@@ -195,6 +195,8 @@
 		0BC7BF01172821BD007662C2 /* mavsprintf.c in Sources */ = {isa = PBXBuildFile; fileRef = 0BC7BF00172821BD007662C2 /* mavsprintf.c */; };
 		0BC7BF031728226E007662C2 /* mawstring.c in Sources */ = {isa = PBXBuildFile; fileRef = 0BC7BF021728226E007662C2 /* mawstring.c */; };
 		8BCE5AEB172F9D4F0095578F /* GraphicsSoftware.c in Sources */ = {isa = PBXBuildFile; fileRef = 8BCE5AE9172F9D4F0095578F /* GraphicsSoftware.c */; };
+		8BCE5AF2172FBABF0095578F /* CharInputC.c in Sources */ = {isa = PBXBuildFile; fileRef = 8BCE5AF1172FBABF0095578F /* CharInputC.c */; };
+		8BCE5AF3172FBAEA0095578F /* CharInput.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0B92B70F1712BB7E002DFDF6 /* CharInput.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -713,6 +715,8 @@
 		0BC7BF021728226E007662C2 /* mawstring.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = mawstring.c; sourceTree = "<group>"; };
 		8BCE5AE9172F9D4F0095578F /* GraphicsSoftware.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = GraphicsSoftware.c; sourceTree = "<group>"; };
 		8BCE5AEA172F9D4F0095578F /* GraphicsSoftware.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GraphicsSoftware.h; sourceTree = "<group>"; };
+		8BCE5AF0172FBABF0095578F /* CharInput.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CharInput.h; sourceTree = "<group>"; };
+		8BCE5AF1172FBABF0095578F /* CharInputC.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = CharInputC.c; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -926,6 +930,8 @@
 				0B92B67A1712BB7D002DFDF6 /* BuffDownloader.cpp */,
 				0B92B67B1712BB7D002DFDF6 /* BuffDownloader.h */,
 				0B92B70F1712BB7E002DFDF6 /* CharInput.cpp */,
+				8BCE5AF0172FBABF0095578F /* CharInput.h */,
+				8BCE5AF1172FBABF0095578F /* CharInputC.c */,
 				0B92B7121712BB7E002DFDF6 /* collection_common.h */,
 				0B92B7131712BB7E002DFDF6 /* Connection.cpp */,
 				0B92B7141712BB7E002DFDF6 /* Connection.h */,
@@ -1709,6 +1715,8 @@
 				0B92C8881712BB8A002DFDF6 /* BluetoothConnection.cpp in Sources */,
 				0B92C8891712BB8A002DFDF6 /* BluetoothDiscovery.cpp in Sources */,
 				0B92C88A1712BB8A002DFDF6 /* BuffDownloader.cpp in Sources */,
+				8BCE5AF3172FBAEA0095578F /* CharInput.cpp in Sources */,
+				8BCE5AF2172FBABF0095578F /* CharInputC.c in Sources */,
 				0B92C8BD1712BB8A002DFDF6 /* Connection.cpp in Sources */,
 				0B92C8BF1712BB8A002DFDF6 /* Downloader.cpp in Sources */,
 				0B92C8C01712BB8A002DFDF6 /* Environment.cpp in Sources */,
