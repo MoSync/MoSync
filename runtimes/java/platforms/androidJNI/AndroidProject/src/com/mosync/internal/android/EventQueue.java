@@ -369,6 +369,24 @@ public class EventQueue
 	}
 
 	/**
+	 * Posts an event that describes which item in a custom picker was selected.
+	 *
+	 * @param widgetHandle The custom picker that sends the event.
+	 * @param position The position in the list of the view.
+	 */
+	public void postCustomPickerItemSelectedEvent(int widgetHandle, int position)
+	{
+		int event[] = new int[4];
+
+		event[0] = EVENT_TYPE_WIDGET;
+		event[1] = IX_WIDGET.MAW_EVENT_CUSTOM_PICKER_ITEM_SELECTED;
+		event[2] = widgetHandle;
+		event[3] = position;
+
+		sMoSyncThread.postEvent(event);
+	}
+
+	/**
 	 * Sends a screen orientation changed event.
 	 * @param widgetHandle The screen widget that sends the event.
 	 * @param orientation The new screen orientation.

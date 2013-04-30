@@ -17,7 +17,7 @@
  */
 
 /**
- * @file MoSyncCamController.h
+ * @file MoCameraController.h
  * @author Mircea Vasiliniuc
  * @date 16 March 2013
  *
@@ -30,17 +30,21 @@
 #include "Screens/CameraScreen.h"
 #include "Screens/ImageViewerScreen.h"
 
+#include "MAUtil/Environment.h"
+#include "NativeUI/Camera.h"
+
 namespace MoSyncCamera
 {
-	class MoSyncCamController:
-		public CameraScreenObserver,
-		public ImageViewerScreenObserver,
+	class MoCameraController:
+		public CameraScreenController,
+		public ImageViewerScreenController,
+		public MAUtil::MediaExportListener,
 		public NativeUI::CameraSnapshotListener
 	{
 	public:
-		MoSyncCamController();
+		MoCameraController();
 
-		~MoSyncCamController();
+		virtual ~MoCameraController();
 
 		/**
 		 * Shows the first screen of the application.
@@ -51,7 +55,7 @@ namespace MoSyncCamera
 		 * When notified of this request it
 		 * displays a snapshot on a separate screen.
 		 *
-		 * From CameraScreenObserver
+		 * From CameraScreenController
 		 *
 		 * @param imageDataHandle Snapshot image data handle.
 		 */
@@ -60,6 +64,8 @@ namespace MoSyncCamera
 		/**
 		 * When notified of this request it
 		 * triggers a snapshot operation.
+		 *
+		 * From CameraScreenController
 		 */
 		void snapshotRequested();
 
@@ -67,7 +73,7 @@ namespace MoSyncCamera
 		 * When notified that the image viewer screen is done it
 		 * goes back to the camera screen.
 		 *
-		 * From ImageViewerScreenObserver
+		 * From ImageViewerScreenController
 		 */
 		void imageViewingDone();
 
@@ -75,7 +81,7 @@ namespace MoSyncCamera
 		 * When notified of this the image from the ImageViewerScreen
 		 * will be saved in the photo library of the device.
 		 *
-		 * From ImageViewerScreenObserver
+		 * From ImageViewerScreenController
 		 */
 		void exportImageToGalleryRequested();
 
@@ -86,12 +92,20 @@ namespace MoSyncCamera
          */
         void snapshotFinished( const NativeUI::CameraSnapshotData& imageData );
 
+        /**
+         * Handles the image export operation result.
+         *
+         * From MediaExportListener.
+         */
+        void imageExportToGalleryFinished( const MAHandle& imageHandle,
+			int resultCode);
+
 	private:
 		/**
 		 * Sets the screen transition used when showing/dismissing
 		 * a screen.
 		 */
-		MAWScreenTransitionType setScreenTransitions();
+		void setScreenTransitions();
 
 		/**
 		 * Retains the displayed screen handle.

@@ -358,6 +358,11 @@ namespace NativeUI
      */
     int Widget::addChild(Widget* widget)
     {
+		if (widget == NULL)
+		{
+			return MAW_RES_ERROR;
+		}
+
         // Add the widget object to the list of children.
         mChildren.add(widget);
 
@@ -389,6 +394,16 @@ namespace NativeUI
      */
     int Widget::insertChild(Widget* widget,const int index)
     {
+		if (widget == NULL)
+		{
+			return MAW_RES_ERROR;
+		}
+
+		if (index < 0 || index >= mChildren.size())
+		{
+			return MAW_RES_INVALID_INDEX;
+		}
+
         mChildren.insert(index, widget);
 
         // Add the widget handle as a child, this will add
@@ -420,6 +435,11 @@ namespace NativeUI
      */
     int Widget::removeChild(Widget* widget)
     {
+		if (widget == NULL)
+		{
+			return MAW_RES_ERROR;
+		}
+
         for (int i = 0; i< mChildren.size(); i++)
         {
             if (widget == mChildren[i])
@@ -445,7 +465,7 @@ namespace NativeUI
      */
     Widget* Widget::getChild(const int index) const
     {
-        if (0 > index || index > mChildren.size())
+        if (0 > index || index >= mChildren.size())
         {
             return NULL;
         }

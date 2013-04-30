@@ -33,6 +33,9 @@
 #define BLACK_COLOR 0x000000
 #define SCREEN_TRANSITION_DURATION 300
 
+#define ACTIVITY_INDICATOR_WIDTH 100 // Width of the activity indicator
+#define ACTIVITY_INDICATOR_HEIGHT 100 // Height of the activity indicator
+
 #include <maapi.h>
 
 namespace NativeUI
