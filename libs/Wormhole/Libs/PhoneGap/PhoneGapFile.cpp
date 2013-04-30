@@ -26,7 +26,6 @@ MA 02110-1301, USA.
 #include <mastring.h>
 #include <matime.h>
 #include <conprint.h>
-#include <mavsprintf.h>
 #include <MAUtil/String.h>
 #include <MAUtil/HashDict.h>
 #include "../../Encoder.h"
@@ -304,7 +303,6 @@ namespace Wormhole
 		int exists = maFileExists(file);
 		if (1 != exists)
 		{
-			lprintfln("Truncate error: The file does not exist");
 			// Error.
 			maFileClose(file);
 			return -1;
@@ -313,7 +311,6 @@ namespace Wormhole
 		int fileSize = maFileSize(file);
 		if (fileSize < 0)
 		{
-			lprintfln("Truncate error: The file size could not be determined.");
 			// Error.
 			maFileClose(file);
 			return -1;
@@ -322,7 +319,6 @@ namespace Wormhole
 		if (fileSize < size)
 		{
 			// No need to truncate, return current file size.
-			lprintfln("Truncate: no need to truncate.");
 			maFileClose(file);
 			return fileSize;
 		}
@@ -334,7 +330,6 @@ namespace Wormhole
 			// Success, return truncated size.
 			return size;
 		}
-		lprintfln("Truncate error: unknown.");
 
 		// Error.
 		return -1;
