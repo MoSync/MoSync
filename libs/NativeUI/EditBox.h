@@ -348,6 +348,13 @@ namespace NativeUI
 		MAUtil::String getTextHorizontalAlignment();
 
 		/**
+		 * Enables or disables the clear button to the far right
+		 * of the editbox on iOS
+		 * @param enableFlag true to enable, false to disable
+		 */
+		void enableClearButton(bool enableFlag);
+
+		/**
 		 * Add an edit box event listener.
 		 * @param listener The listener that will receive edit box events.
 		 */

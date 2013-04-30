@@ -213,6 +213,11 @@
  */
 - (NSString*)getInputType:(UIKeyboardType) keyboardType;
 
+/*
+ * Enables and disables the clear button in the edit box
+ */
+- (int)enableClearButton:(NSString*) enableString;
+
 /**
  * Set text field/view delegate to nil.
  */
@@ -307,6 +312,10 @@
 	else if([key isEqualToString:@MAW_EDIT_BOX_TEXT_HORIZONTAL_ALIGNMENT])
     {
         returnedValue = [self setTextHorizontalAlignmentProperty:value];
+    }
+    else if([key isEqualToString:@MAW_EDIT_BOX_ENABLE_CLEAR_BUTTON])
+    {
+        returnedValue = [self enableClearButton:value];
     }
 	else {
 		return [super setPropertyWithKey:key toValue:value];
@@ -1115,6 +1124,18 @@ replacementString:(NSString *)string
             break;
     }
     return [NSString stringWithFormat:@"%d", type];
+}
+
+/*
+ * Enables and disables the clear button in the edit box
+ */
+- (int)enableClearButton:(NSString*) enableString
+{
+    BOOL enableFlag = [enableString boolValue];
+    UITextField* textField = (UITextField*)self.view;
+    textField.clearButtonMode = enableFlag;
+
+    return MAW_RES_OK;
 }
 
 /**

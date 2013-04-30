@@ -318,6 +318,11 @@ namespace NativeUI
 		return this->getPropertyString(MAW_EDIT_BOX_TEXT_HORIZONTAL_ALIGNMENT);
 	}
 
+	void EditBox::enableClearButton(bool enableFlag)
+	{
+		this->setPropertyInt(MAW_EDIT_BOX_ENABLE_CLEAR_BUTTON, enableFlag ? 1 : 0);
+	}
+
 	/**
 	 * Add an edit box event listener.
 	 * @param listener The listener that will receive edit box events.

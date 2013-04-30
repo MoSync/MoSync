@@ -372,6 +372,20 @@ group WidgetEditBox "Edit box" {
 			* \endcode
 			*/
 			TEXT_HORIZONTAL_ALIGNMENT = "textHorizontalAlignment";
+
+			/**
+			* @brief Enables or disables the clear button to the far right of the edit box.
+			*
+			* @validvalue true or false
+			*
+			* @setonly
+			*
+			* @par Example
+			* \code
+			*	maWidgetSetProperty(editBoxHandle, MAW_EDIT_BOX_ENABLE_CLEAR_BUTTON, "1");
+			* \endcode
+			*/
+			ENABLE_CLEAR_BUTTON = "enableClearButton";
 		}
 	} // end of WidgetEditBoxProperties
 } // end of WidgetEditBox
