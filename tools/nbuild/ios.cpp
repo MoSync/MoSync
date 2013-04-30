@@ -37,6 +37,28 @@ int buildIOSNative(Arguments* params) {
 		error("No source files!\n");
 	}
 
+	vector<string> compilerDefines = params->getPrefixedList(MACRO_DEFINES, true);
+	string compilerDefinesList;
+	for (size_t i = 0; i < compilerDefines.size(); i++) {
+		compilerDefinesList += compilerDefines[i];
+		compilerDefinesList += " ";
+	}
+
+	vector<string> additionalIncludes = params->getPrefixedList(ADDITIONAL_INCLUDES, true);
+	string additionalIncludesList;
+	for (size_t i = 0; i < additionalIncludes.size(); i++) {
+		additionalIncludesList += additionalIncludes[i];
+		additionalIncludesList += " ";
+	}
+
+	//Not used yet
+	vector<string> additionalLibPaths = params->getPrefixedList(ADDITIONAL_LIB_PATHS, true);
+	string additionalLibPathsList;
+	for (size_t i = 0; i < additionalLibPaths.size(); i++) {
+		additionalLibPathsList += additionalLibPaths[i];
+		additionalLibPathsList += " ";
+	}
+
 	vector<string> configNames;
 	vector<string> libVariants;
 	split(configNames, require(params, CONFIGURATION), ",");
@@ -93,11 +115,7 @@ int buildIOSNative(Arguments* params) {
 				cmd << "-v "; //verbose output
 			}
 			if (isDebug) {
-				cmd << "-g -O0 -DDEBUG=1 "; //debug mode
-			}
-			else
-			{
-				cmd << "-Os ";
+				cmd << "-g -DDEBUG=1 "; //debug mode
 			}
 
 			cmd << "-arch " + arch << " "; //The architecture to build
@@ -109,6 +127,9 @@ int buildIOSNative(Arguments* params) {
 			cmd << "-I" << nativeHeaderDir << " ";
 			cmd << "-I" << outputDir << " ";
 			cmd << sourceFileList << " ";
+			cmd << additionalIncludesList << " ";
+			cmd << additionalLibPathsList << " ";
+			cmd << compilerDefinesList << " ";
 			cmd << "-o " << outputFile << " ";
 			sh(cmd.str().c_str(), !isVerbose);
 		}
