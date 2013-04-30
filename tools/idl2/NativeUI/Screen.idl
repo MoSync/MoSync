@@ -26,7 +26,7 @@ group WidgetScreenProperties "Screen" {
 		*
 		* @par Example
 		* \code
-		*	maWidgetSetProperty(stackScreenHandle, MAW_SCREEN_SET_BACK_BUTTON_TEXT, toString(navBarButtonWidgetHandle));
+		*	maWidgetSetProperty(stackScreenHandle, MAW_SCREEN_SET_BACK_BUTTON, toString(navBarButtonWidgetHandle));
 		* \endcode
 		*/
 		SET_BACK_BUTTON = "setBackButton";
