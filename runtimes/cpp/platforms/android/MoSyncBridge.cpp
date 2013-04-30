@@ -591,6 +591,11 @@ static void nativePostEvent(JNIEnv* env, jobject jthis, jintArray eventBuffer)
 		{
 			widgetEvent->optionsMenuItem = intArray[3];
 		}
+		//else if (widgetEventType == MAW_EVENT_ACTION_BAR_UP_ITEM_SELECTED)
+		else if (widgetEventType == MAW_EVENT_ACTION_BAR_MENU_ITEM_SELECTED)
+		{
+			widgetEvent->actionBarMenuItem = intArray[3];
+		}
 		else if(widgetEventType == MAW_EVENT_SCREEN_ORIENTATION_DID_CHANGE)
 		{
 			widgetEvent->screenOrientation = intArray[3];

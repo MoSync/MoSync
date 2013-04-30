@@ -310,6 +310,34 @@ public class EventQueue
 		sMoSyncThread.postEvent(event);
 	}
 
+	public void postActionBarItemSelected(int widgetHandle, int index)
+	{
+		int event[] = new int[4];
+
+		event[0] = EVENT_TYPE_WIDGET;
+		event[1] = IX_WIDGET.MAW_EVENT_ACTION_BAR_MENU_ITEM_SELECTED;
+		event[2] = widgetHandle;
+		event[3] = index;
+
+		sMoSyncThread.postEvent(event);
+	}
+
+	/**
+	 * Sends action bar home item selected event, for the current screen.
+	 * TODO send it for all screens instead - no screen handle required.
+	 * @param widgetHandle The current screen handle.
+	 */
+	public void postActionBarHomeSelected(int widgetHandle)
+	{
+		int event[] = new int[3];
+
+		event[0] = EVENT_TYPE_WIDGET;
+		event[1] = IX_WIDGET.MAW_EVENT_ACTION_BAR_UP_ITEM_SELECTED;
+		event[2] = widgetHandle;
+
+		sMoSyncThread.postEvent(event);
+	}
+
 	/**
 	 * Sends the Option menu closed event.
 	 * @param widgetHandle The screen widget handle.

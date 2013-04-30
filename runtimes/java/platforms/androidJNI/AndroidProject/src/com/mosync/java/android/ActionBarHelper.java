@@ -16,6 +16,7 @@
 
 package com.mosync.java.android;
 
+import static com.mosync.internal.android.MoSyncHelpers.SYSLOG;
 import android.app.Activity;
 import android.os.Build;
 import android.os.Bundle;
@@ -53,6 +54,16 @@ public abstract class ActionBarHelper {
 
     protected ActionBarHelper(Activity activity) {
         mActivity = activity;
+    }
+
+    public Boolean checkCompatibility()
+    {
+		if ( Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB )
+		{
+			SYSLOG("@@MoSync ActionBar is not available on current platform");
+			return false;
+		}
+		return true;
     }
 
     /**

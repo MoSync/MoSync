@@ -24,6 +24,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 
 /**
  * An extension of {@link ActionBarHelper} that provides Android 3.0-specific functionality for
@@ -36,6 +37,12 @@ public class ActionBarHelperHoneycomb extends ActionBarHelper {
 
     protected ActionBarHelperHoneycomb(Activity activity) {
         super(activity);
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        //mActivity.requestWindowFeature(Window.FEATURE_ACTION_BAR);
+
     }
 
     @Override

@@ -4558,16 +4558,101 @@ public class MoSyncThread extends Thread
 	* Available only on Android.
 	* @param iconPredefinedId optional icon for the action bar item.
 	*/
-	public int maActionBarAddMenuItem(final String title,
-			final int iconPredefinedId, final int displayFlag)
+	public int maActionBarAddMenuItem(final int handle, final String title,
+			final int iconPredefinedId, final int iconHandle, final int displayFlag)
 	{
 
-		return maWidgetScreenAddOptionsMenuItem(
-				getCurrentScreen().getHandle(), title,
-				MAW_OPTIONS_MENU_ICON_CONSTANT_ADD, iconPredefinedId);
+		return mMoSyncNativeUI.maActionBarAddMenuItem(
+				handle, title,
+				iconPredefinedId, iconHandle, displayFlag);
+	}
 
-//		return ((MoSync)mContext).addActionBarItem(
-//							title, iconPredefinedId, displayFlag);
+	/**
+	 *
+	 * @param screenHandle
+	 * @param itemHandle
+	 * @return
+	 */
+	public int maActionBarRemoveMenuItem(final int screenHandle, final int itemHandle)
+	{
+		return mMoSyncNativeUI.maActionBarRemoveMenuItem(screenHandle, itemHandle);
+	}
+
+	public int maActionBarSetEnabled(int state)
+	{
+		return ((MoSync)getActivity()).setActionBarState(state);
+//		return mMoSyncNativeUI.maAction
+//		return (state ? mMoSyncNativeUI.maActionBarSetEnabled(true): mMoSyncNativeUI.maActionBarSetEnabled(false));
+	}
+
+	public int maActionBarSetVisibility(int visibility)
+	{
+		return mMoSyncNativeUI.maActionBarSetVisibility(visibility);
+	}
+
+	public int maActionBarGetHeight()
+	{
+		return mMoSyncNativeUI.maActionBarGetHeight();
+	}
+
+	public int maActionBarIsShowing()
+	{
+		return mMoSyncNativeUI.maActionBarIsShowing();
+	}
+
+	public int maActionBarSetTitle(final String title)
+	{
+		return mMoSyncNativeUI.maActionBarSetTitle(title);
+	}
+
+	public int maActionBarSetIcon(int iconHandle)
+	{
+		return mMoSyncNativeUI.maActionBarSetIcon(iconHandle);
+	}
+
+	public int maActionBarSetDisplayHomeAsUpEnabled(int enableUp)
+	{
+		return mMoSyncNativeUI.maActionBarSetDisplayHomeAsUpEnabled(enableUp);
+	}
+
+	public int maActionBarShowTitleEnabled(int enable)
+	{
+		if (enable == 1)
+			getActivity().getActionBar().setDisplayShowTitleEnabled(true);
+		else
+			getActivity().getActionBar().setDisplayShowTitleEnabled(false);
+		return 0;
+//		return mMoSyncNativeUI.maActionBarShowTitleEnabled(enable);
+	}
+
+	public int maActionBarShowLogoEnabled(int enable)
+	{
+		if (enable == 1)
+			getActivity().getActionBar().setDisplayUseLogoEnabled(true);
+		else
+			getActivity().getActionBar().setDisplayUseLogoEnabled(true);
+		return 0;
+//		return mMoSyncNativeUI.maActionBarShowLogoEnabled(enable);
+	}
+
+	public int maActionBarSetHomeButtonEnabled(int state)
+	{
+		if ( state == 1)
+			getActivity().getActionBar().setHomeButtonEnabled(true);
+		else
+			getActivity().getActionBar().setHomeButtonEnabled(false);
+		return 0;
+//		return mMoSyncNativeUI.maActionBarSetHomeButtonEnabled(state);
+	}
+
+	public int maActionBarRefresh()
+	{
+		return mMoSyncNativeUI.maActionBarRefresh();
+	}
+
+	public int maActionBarSetBackgroundImage(final int imageHandle)
+	{
+		return mMoSyncNativeUI.maActionBarSetBackgroundImage(imageHandle);
 	}
 
 	/**

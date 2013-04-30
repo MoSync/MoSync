@@ -18,6 +18,8 @@ package com.mosync.java.android;
 
 import android.app.Activity;
 import android.content.Context;
+import android.os.Bundle;
+import android.view.Window;
 
 /**
  * An extension of {@link com.example.android.actionbarcompat.ActionBarHelper} that provides Android
@@ -27,6 +29,11 @@ public class ActionBarHelperICS extends ActionBarHelperHoneycomb {
     protected ActionBarHelperICS(Activity activity) {
         super(activity);
     }
+
+//    @Override
+//    public void onCreate(Bundle savedInstanceState) {
+//    	mActivity.requestWindowFeature(Window.FEATURE_ACTION_BAR);
+//    }
 
     @Override
     protected Context getActionBarThemedContext() {

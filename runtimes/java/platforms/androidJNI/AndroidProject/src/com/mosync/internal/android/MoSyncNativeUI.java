@@ -462,6 +462,76 @@ public class MoSyncNativeUI implements RootViewReplacedListener
 		}
 	}
 
+	public int maActionBarAddMenuItem(final int handle, final String title,
+			final int iconPredefinedId, final int iconHandle, final int displayFlag)
+	{
+
+		return mNativeUI.maActionBarAddMenuItem(
+				handle, title, iconPredefinedId,
+				iconHandle, displayFlag);
+
+//		return ((MoSync)mContext).addActionBarItem(
+//							title, iconPredefinedId, displayFlag);
+	}
+
+	public int maActionBarRemoveMenuItem(final int screenHandle, final int itemHandle)
+	{
+		return mNativeUI.maActionBarRemoveItem(screenHandle, itemHandle);
+	}
+
+	public int maActionBarSetVisibility(int visibility)
+	{
+		return mNativeUI.maActionBarSetVisibility(visibility);
+	}
+
+	public int maActionBarGetHeight()
+	{
+		return mNativeUI.maActionBarGetHeight();
+	}
+
+	public int maActionBarIsShowing()
+	{
+		return mNativeUI.maActionBarIsShowing();
+	}
+
+	public int maActionBarSetTitle(final String title)
+	{
+		return mNativeUI.maActionBarSetTitle(title);
+	}
+
+	public int maActionBarSetIcon(int iconHandle)
+	{
+//		return mNativeUI.maActionBarSetiIcon(iconHandle);
+		return 0;
+	}
+
+	public int maActionBarSetDisplayHomeAsUpEnabled(int enableUp)
+	{
+		if ( enableUp == 1)
+			return mNativeUI.maActionBarSetDisplayHomeAsUpEnabled(true);
+		return mNativeUI.maActionBarSetDisplayHomeAsUpEnabled(true);
+	}
+
+	public int maActionBarShowTitleEnabled(Boolean enable)
+	{
+		return mNativeUI.maActionBarShowTitleEnabled(enable);
+	}
+
+	public int maActionBarSetHomeButtonEnabled(Boolean state)
+	{
+		return mNativeUI.maActionBarSetHomeButtonEnabled(state);
+	}
+
+	public int maActionBarRefresh()
+	{
+		return mNativeUI.maActionBarRefresh();
+	}
+
+	public int maActionBarSetBackgroundImage(final int handle)
+	{
+		return mNativeUI.maActionBarSetBackgroundImage(handle);
+	}
+
 	public ScreenWidget getCurrentScreen()
 	{
 		return mNativeUI.getCurrentScreen();
