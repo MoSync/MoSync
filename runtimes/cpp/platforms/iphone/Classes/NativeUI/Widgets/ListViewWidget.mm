@@ -533,6 +533,34 @@ forRowAtIndexPath:(NSIndexPath *)indexPath
 }
 
 /**
+ * Called when a specified row accessory is selected.
+ * @param tableView A table-view object informing the delegate about the new row selection.
+ * @param indexPath An index path locating the row in tableView.
+ */
+- (void)tableView:(UITableView *)tableView accessoryButtonTappedForRowWithIndexPath:(NSIndexPath *)indexPath
+{
+	MAEvent event;
+	event.type = EVENT_TYPE_WIDGET;
+	MAWidgetEventData *eventData = new MAWidgetEventData;
+
+    if (_type == ListViewTypeDefault)
+    {
+        eventData->eventType = MAW_EVENT_LIST_ITEM_ACCESSORY_CLICKED;
+        eventData->listItemIndex = [indexPath row];
+    }
+    else
+    {
+        eventData->eventType = MAW_EVENT_LIST_ITEM_ACCESSORY_CLICKED;
+        eventData->sectionIndex = indexPath.section;
+        eventData->sectionItemIndex = indexPath.row;
+    }
+
+	eventData->widgetHandle = self.handle;
+	event.data = (int)eventData;
+	Base::gEventQueue.put(event);
+}
+
+/**
  * Changes the default title of the delete-confirmation button.
  * @param tableView The table-view object requesting this information.
  * @param indexPath An index-path object locating the row in its section.

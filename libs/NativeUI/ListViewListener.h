@@ -115,6 +115,18 @@ namespace NativeUI
 			ListViewSection* listViewSection,
 			ListViewItem* listViewItem){};
 
+		/**
+		 * This method is called when an item's accessory item is clicked.
+		 * Platform: iOS
+		 * @param listView The list view object that generated the event.
+		 * @param listViewSection The ListViewSection object that contains the item, NULL if the list is not segmented.
+		 * @param listViewItem The item objet whose delete button was clicked.
+		 */
+		virtual void listViewAccessoryItemClicked(
+			ListView* listView,
+			ListViewSection* listViewSection,
+			ListViewItem* listViewItem){};
+
 	};
 
 } // namespace NativeUI

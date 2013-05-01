@@ -437,6 +437,13 @@ group WidgetEvent "Widget event" {
 			* Available on iOS.
 			*/
 			SEGMENTED_LIST_ITEM_DELETE_BTN = 36;
+
+			/**
+			* @brief Sent by a ListViewItem when its accessory item is clicked.
+			* The event will contain the listItemIndex item.
+			* Available on iOS.
+			*/
+			LIST_ITEM_ACCESSORY_CLICKED = 37;
 		}
 	} // end of WidgetEventTypes
 } // end of WidgetEvent

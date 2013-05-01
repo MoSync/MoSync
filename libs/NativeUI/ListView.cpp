@@ -253,6 +253,10 @@ namespace NativeUI
 		{
 			this->notifyListenersClickedDeleteButton(widgetEventData);
 		}
+		else if (MAW_EVENT_LIST_ITEM_ACCESSORY_CLICKED == widgetEventData->eventType)
+		{
+			this->notifyListenersClickedAccessoryItem(widgetEventData);
+		}
 	}
 
 	/**
@@ -418,6 +422,29 @@ namespace NativeUI
 				this,
 				listViewSection,
 				listViewItem);
+		}
+	}
+
+	void ListView::notifyListenersClickedAccessoryItem(
+                                                      MAWidgetEventData* widgetEventData)
+	{
+		int sectionClickedIndex = widgetEventData->sectionIndex;
+		int itemIndexWithinSection = widgetEventData->sectionItemIndex;
+		ListViewSection* listViewSection = (ListViewSection*)
+		this->getChild(sectionClickedIndex);
+
+		ListViewItem* listViewItem;
+        if (MAW_LIST_VIEW_TYPE_SEGMENTED == this->getPropertyInt(MAW_LIST_VIEW_TYPE))
+            listViewItem = (ListViewItem*)listViewSection->getChild(itemIndexWithinSection);
+        else
+            listViewItem = (ListViewItem*)this->getChild(widgetEventData->listItemIndex);
+
+		for (int i = 0; i < mListViewListeners.size(); i++)
+		{
+			mListViewListeners[i]->listViewAccessoryItemClicked(
+                                                               this,
+                                                               listViewSection,
+                                                               listViewItem);
 		}
 	}
 

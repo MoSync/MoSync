@@ -268,6 +268,12 @@ namespace NativeUI
 		 */
 		void notifyListenersClickedDeleteButton(MAWidgetEventData* widgetEventData);
 
+		/**
+		 * Notify listeners when receiving #MAW_EVENT_LIST_ITEM_ACCESSORY_CLICKED.
+		 * @param widgetEventData Event's data.
+		 */
+		void notifyListenersClickedAccessoryItem(MAWidgetEventData* widgetEventData);
+
 	private:
 		/**
 		 * Array with list view listeners.
