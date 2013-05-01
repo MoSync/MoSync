@@ -173,22 +173,22 @@
 
         NSMutableArray* newButtonArrayR = [navigationItem.rightBarButtonItems mutableCopy];
         [newButtonArrayR removeObject:navBarButton.barButtonItem];
-        [navigationItem setRightBarButtonItems:newButtonArrayR];
+        [navigationItem setRightBarButtonItems:newButtonArrayR animated:YES];
 
         NSMutableArray* newButtonArrayL = [navigationItem.leftBarButtonItems mutableCopy];
         [newButtonArrayL removeObject:navBarButton.barButtonItem];
-        [navigationItem setLeftBarButtonItems:newButtonArrayL];
+        [navigationItem setLeftBarButtonItems:newButtonArrayL animated:YES];
     }
     else if([key isEqualToString:@MAW_SCREEN_REMOVE_NAV_BAR_BUTTONS])
     {
         UINavigationController* navigationController = (UINavigationController*)[self getController];
         if ([value intValue] == MAW_SCREEN_NAV_BAR_SIDE_RIGHT)
         {
-            [navigationController.navigationItem setRightBarButtonItems:[[NSArray alloc] init]];
+            [navigationController.navigationItem setRightBarButtonItems:[[NSArray alloc] init] animated:YES];
         }
         else if ([value intValue] == MAW_SCREEN_NAV_BAR_SIDE_LEFT)
         {
-            [navigationController.navigationItem setLeftBarButtonItems:[[NSArray alloc] init]];
+            [navigationController.navigationItem setLeftBarButtonItems:[[NSArray alloc] init] animated:YES];
         }
     }
 	else
@@ -217,9 +217,9 @@
         [buttons insertObject:buttonItem atIndex:index];
 
     if (side == MAW_SCREEN_NAV_BAR_SIDE_RIGHT)
-        [navigationController.navigationItem setRightBarButtonItems:buttons];
+        [navigationController.navigationItem setRightBarButtonItems:buttons animated:YES];
     else
-        [navigationController.navigationItem setLeftBarButtonItems:buttons];
+        [navigationController.navigationItem setLeftBarButtonItems:buttons animated:YES];
 }
 
 /**
