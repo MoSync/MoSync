@@ -136,12 +136,6 @@ namespace test_mosync
 #endif
 					InitExtensions(machine.GetCore(), machine.GetRuntime());
 					machine.Run();
-
-                    machine.GetRuntime().GetModule<NativeUIModule>().mAppLaunchedTime = DateTime.Now;
-                    System.Diagnostics.Debug.WriteLine("Application launching: " +
-                        DateTime.Now.Minute.ToString() + ":" +
-                        DateTime.Now.Second.ToString() + ":" +
-                        DateTime.Now.Millisecond.ToString());
 				}
             };
 

@@ -20,9 +20,6 @@ namespace MoSync
         private Dictionary<int, Thread> mWidgetThreadDictionary;
         private Dictionary<int, Type> mWidgetTypeDictionary;
 
-        // TODO SA: only for benchmarking - to remove
-        public DateTime mAppLaunchedTime;
-
         #region Widget Add/Get
 
         /*
@@ -110,16 +107,6 @@ namespace MoSync
             {
                 (widget as WidgetBaseWindowsPhone).RunOperationQueue();
             }, false);
-
-            // TODO SA: remove - for benchmarking only
-            System.Diagnostics.Debug.WriteLine("Widget created: " +
-                DateTime.Now.Minute.ToString() + ":" +
-                DateTime.Now.Second.ToString() + ":" +
-                DateTime.Now.Millisecond.ToString());
-            TimeSpan timeDifference = DateTime.Now - mAppLaunchedTime;
-            System.Diagnostics.Debug.WriteLine("Time till app launch: " + timeDifference.Minutes.ToString() + ":" +
-                timeDifference.Seconds.ToString() + ":" +
-                timeDifference.Milliseconds.ToString());
         }
 
         /**
@@ -138,16 +125,6 @@ namespace MoSync
             mWidgets[widgetHandle] = widget;
 
             (widget as WidgetBaseWindowsPhone).RunOperationQueue();
-
-            // TODO SA: remove - for benchmarking only
-            System.Diagnostics.Debug.WriteLine("Widget created: " +
-                DateTime.Now.Minute.ToString() + ":" +
-                DateTime.Now.Second.ToString() + ":" +
-                DateTime.Now.Millisecond.ToString());
-            TimeSpan timeDifference = DateTime.Now - mAppLaunchedTime;
-            System.Diagnostics.Debug.WriteLine("Time till app launch: " + timeDifference.Minutes.ToString() + ":" +
-                timeDifference.Seconds.ToString() + ":" +
-                timeDifference.Milliseconds.ToString());
         }
 
         /**
