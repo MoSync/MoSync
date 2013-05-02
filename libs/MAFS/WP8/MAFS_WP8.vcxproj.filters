@@ -7,15 +7,9 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="LocalNotification.cpp" />
-    <ClCompile Include="NotificationManager.cpp" />
-    <ClCompile Include="PushNotification.cpp" />
+    <ClCompile Include="..\File.c" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="LocalNotification.h" />
-    <ClInclude Include="LocalNotificationListener.h" />
-    <ClInclude Include="NotificationManager.h" />
-    <ClInclude Include="PushNotification.h" />
-    <ClInclude Include="PushNotificationListener.h" />
+    <ClInclude Include="..\File.h" />
   </ItemGroup>
 </Project>

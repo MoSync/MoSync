@@ -11,22 +11,61 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="LocalNotification.cpp" />
-    <ClCompile Include="NotificationManager.cpp" />
-    <ClCompile Include="PushNotification.cpp" />
+    <ClInclude Include="..\Broadcaster.h" />
+    <ClInclude Include="..\CloudMadeMapSource.h" />
+    <ClInclude Include="..\Color.h" />
+    <ClInclude Include="..\DateTime.h" />
+    <ClInclude Include="..\DebugPrintf.h" />
+    <ClInclude Include="..\Enumerator.h" />
+    <ClInclude Include="..\GeoPoint.h" />
+    <ClInclude Include="..\GeoPointDataSource.h" />
+    <ClInclude Include="..\GeoPointLayer.h" />
+    <ClInclude Include="..\GeoPointLayerRenderer.h" />
+    <ClInclude Include="..\GoogleMapSource.h" />
+    <ClInclude Include="..\Layer.h" />
+    <ClInclude Include="..\LayerMapViewport.h" />
+    <ClInclude Include="..\LonLat.h" />
+    <ClInclude Include="..\MapCache.h" />
+    <ClInclude Include="..\MapConfig.h" />
+    <ClInclude Include="..\MapSource.h" />
+    <ClInclude Include="..\MapTile.h" />
+    <ClInclude Include="..\MapTileCoordinate.h" />
+    <ClInclude Include="..\MapViewport.h" />
+    <ClInclude Include="..\MapWidget.h" />
+    <ClInclude Include="..\MemoryMgr.h" />
+    <ClInclude Include="..\OpenStreetMapSource.h" />
+    <ClInclude Include="..\PixelCoordinate.h" />
+    <ClInclude Include="..\Queue.h" />
+    <ClInclude Include="..\TimeSpan.h" />
+    <ClInclude Include="..\TraceScope.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="LocalNotification.h" />
-    <ClInclude Include="LocalNotificationListener.h" />
-    <ClInclude Include="NotificationManager.h" />
-    <ClInclude Include="PushNotification.h" />
-    <ClInclude Include="PushNotificationListener.h" />
+    <ClCompile Include="..\CloudMadeMapSource.cpp" />
+    <ClCompile Include="..\Color.cpp" />
+    <ClCompile Include="..\DateTime.cpp" />
+    <ClCompile Include="..\GeoPoint.cpp" />
+    <ClCompile Include="..\GeoPointLayer.cpp" />
+    <ClCompile Include="..\GoogleMapSource.cpp" />
+    <ClCompile Include="..\Layer.cpp" />
+    <ClCompile Include="..\LayerMapViewport.cpp" />
+    <ClCompile Include="..\LonLat.cpp" />
+    <ClCompile Include="..\MapCache.cpp" />
+    <ClCompile Include="..\MapSource.cpp" />
+    <ClCompile Include="..\MapViewport.cpp" />
+    <ClCompile Include="..\MapWidget.cpp" />
+    <ClCompile Include="..\MemoryMgr.cpp" />
+    <ClCompile Include="..\OpenStreetMapSource.cpp" />
+    <ClCompile Include="..\TimeSpan.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\MAP.vcxproj" />
+    <None Include="..\MAP.vcxproj.filters" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{92543802-8163-4308-ae53-478013dd1289}</ProjectGuid>
+    <ProjectGuid>{9d8bc5ca-1cd2-4130-b523-55eae2d0dab2}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <ProjectName>Notification_WP8</ProjectName>
-    <RootNamespace>Notification</RootNamespace>
+    <ProjectName>MAP_WP8</ProjectName>
+    <RootNamespace>MAP_WP8</RootNamespace>
     <DefaultLanguage>en-US</DefaultLanguage>
     <MinimumVisualStudioVersion>11.0</MinimumVisualStudioVersion>
     <AppContainerApplication>true</AppContainerApplication>
@@ -54,12 +93,12 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
     <GenerateManifest>false</GenerateManifest>
     <OutDir>$(MOSYNCDIR)\lib\windowsPhone8\ARM\Debug</OutDir>
-    <TargetName>Notification</TargetName>
+    <TargetName>MAP</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
     <GenerateManifest>false</GenerateManifest>
     <OutDir>$(MOSYNCDIR)\lib\windowsPhone8\ARM\Release</OutDir>
-    <TargetName>Notification</TargetName>
+    <TargetName>MAP</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|arm'">
     <ClCompile>
@@ -67,9 +106,9 @@
       </PrecompiledHeader>
       <CompileAsWinRT>false</CompileAsWinRT>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>../;../MAStd;</AdditionalIncludeDirectories>
-      <ExceptionHandling />
       <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_DEPRECATE;WINDOWS_PHONE_8_LIB;WINDOWS_PHONE_8;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ExceptionHandling />
+      <AdditionalIncludeDirectories>../../;../../MAStd;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -83,10 +122,10 @@
       </PrecompiledHeader>
       <CompileAsWinRT>false</CompileAsWinRT>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>../;../MAStd;</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_LIB;_CRT_SECURE_NO_DEPRECATE;WINDOWS_PHONE_8_LIB;WINDOWS_PHONE_8;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ExceptionHandling>
       </ExceptionHandling>
-      <PreprocessorDefinitions>WIN32;_LIB;_CRT_SECURE_NO_DEPRECATE;WINDOWS_PHONE_8_LIB;WINDOWS_PHONE_8;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>../../;../../MAStd;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

@@ -11,89 +11,81 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\kazlib\dict.c">
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">CompileAsC</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">CompileAsC</CompileAs>
-    </ClCompile>
-    <ClCompile Include="..\kazlib\hash.c">
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">CompileAsC</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">CompileAsC</CompileAs>
-    </ClCompile>
-    <ClCompile Include="BluetoothConnection.cpp" />
-    <ClCompile Include="BluetoothDiscovery.cpp" />
-    <ClCompile Include="BuffDownloader.cpp" />
-    <ClCompile Include="CharInput.cpp" />
-    <ClCompile Include="CharInputC.c" />
-    <ClCompile Include="Connection.cpp" />
-    <ClCompile Include="Downloader.cpp" />
-    <ClCompile Include="Environment.cpp" />
-    <ClCompile Include="FileLister.cpp" />
-    <ClCompile Include="FrameBuffer.c" />
-    <ClCompile Include="Geometry.cpp" />
-    <ClCompile Include="GLMoblet.cpp" />
-    <ClCompile Include="Graphics.c" />
-    <ClCompile Include="GraphicsOpenGL.c" />
-    <ClCompile Include="GraphicsSoftware.c" />
-    <ClCompile Include="HashMap.cpp" />
-    <ClCompile Include="Moblet.cpp" />
-    <ClCompile Include="PlaceholderPool.cpp" />
-    <ClCompile Include="RefCounted.cpp" />
-    <ClCompile Include="Server.cpp" />
-    <ClCompile Include="String.cpp" />
-    <ClCompile Include="util.cpp" />
+    <ClCompile Include="..\CustomMoblet.cpp" />
+    <ClCompile Include="..\Encoder.cpp" />
+    <ClCompile Include="..\FileUtil.cpp" />
+    <ClCompile Include="..\FunTable.cpp" />
+    <ClCompile Include="..\HighLevelBinaryDownloader.cpp" />
+    <ClCompile Include="..\HighLevelHttpConnection.cpp" />
+    <ClCompile Include="..\HighLevelImageDownloader.cpp" />
+    <ClCompile Include="..\HighLevelTextDownloader.cpp" />
+    <ClCompile Include="..\HybridMoblet.cpp" />
+    <ClCompile Include="..\Libs\JSNativeUI\NativeUIMessageHandler.cpp" />
+    <ClCompile Include="..\Libs\JSNativeUI\ResourceMessageHandler.cpp" />
+    <ClCompile Include="..\Libs\JSONMessage.cpp" />
+    <ClCompile Include="..\Libs\Notification\PushNotificationManager.cpp" />
+    <ClCompile Include="..\Libs\Notification\TCPConnection.cpp" />
+    <ClCompile Include="..\Libs\PhoneGap\PhoneGapCamera.cpp" />
+    <ClCompile Include="..\Libs\PhoneGap\PhoneGapCapture.cpp" />
+    <ClCompile Include="..\Libs\PhoneGap\PhoneGapFile.cpp" />
+    <ClCompile Include="..\Libs\PhoneGap\PhoneGapMessageHandler.cpp" />
+    <ClCompile Include="..\Libs\PhoneGap\PhoneGapSensors.cpp" />
+    <ClCompile Include="..\Libs\W3C\SensorManager.cpp" />
+    <ClCompile Include="..\MessageHandler.cpp" />
+    <ClCompile Include="..\MessageProtocol.cpp" />
+    <ClCompile Include="..\MessageStream.cpp" />
+    <ClCompile Include="..\MessageStreamJSON.cpp" />
+    <ClCompile Include="..\WebAppMoblet.cpp" />
+    <ClCompile Include="..\WebViewMessage.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\kazlib\dict.h" />
-    <ClInclude Include="..\kazlib\hash.h" />
-    <ClInclude Include="BluetoothConnection.h" />
-    <ClInclude Include="BluetoothDiscovery.h" />
-    <ClInclude Include="BuffDownloader.h" />
-    <ClInclude Include="CharInput.h" />
-    <ClInclude Include="collection_common.h" />
-    <ClInclude Include="Connection.h" />
-    <ClInclude Include="DataHandler.h" />
-    <ClInclude Include="Dictionary.h" />
-    <ClInclude Include="Dictionary_impl.h" />
-    <ClInclude Include="Downloader.h" />
-    <ClInclude Include="Environment.h" />
-    <ClInclude Include="ErrorListenable.h" />
-    <ClInclude Include="FileLister.h" />
-    <ClInclude Include="FrameBuffer.h" />
-    <ClInclude Include="Geometry.h" />
-    <ClInclude Include="GLMoblet.h" />
-    <ClInclude Include="Graphics.h" />
-    <ClInclude Include="GraphicsOpenGL.h" />
-    <ClInclude Include="GraphicsSoftware.h" />
-    <ClInclude Include="HashDict.h" />
-    <ClInclude Include="HashDict_impl.h" />
-    <ClInclude Include="HashMap.h" />
-    <ClInclude Include="HashMap_impl.h" />
-    <ClInclude Include="HashSet.h" />
-    <ClInclude Include="List.h" />
-    <ClInclude Include="ListenerSet.h" />
-    <ClInclude Include="Map.h" />
-    <ClInclude Include="mauuid.h" />
-    <ClInclude Include="Moblet.h" />
-    <ClInclude Include="PlaceholderPool.h" />
-    <ClInclude Include="RefCounted.h" />
-    <ClInclude Include="Server.h" />
-    <ClInclude Include="Set.h" />
-    <ClInclude Include="Stack.h" />
-    <ClInclude Include="String.h" />
-    <ClInclude Include="Tokenizer.h" />
-    <ClInclude Include="util.h" />
-    <ClInclude Include="Vector.h" />
+    <ClInclude Include="..\CustomMoblet.h" />
+    <ClInclude Include="..\Encoder.h" />
+    <ClInclude Include="..\FileUtil.h" />
+    <ClInclude Include="..\FunTable.h" />
+    <ClInclude Include="..\HighLevelBinaryDownloader.h" />
+    <ClInclude Include="..\HighLevelHttpConnection.h" />
+    <ClInclude Include="..\HighLevelImageDownloader.h" />
+    <ClInclude Include="..\HighLevelTextDownloader.h" />
+    <ClInclude Include="..\HybridMoblet.h" />
+    <ClInclude Include="..\Libs\JSNativeUI\NativeUIMessageHandler.h" />
+    <ClInclude Include="..\Libs\JSNativeUI\ResourceMessageHandler.h" />
+    <ClInclude Include="..\Libs\JSONMessage.h" />
+    <ClInclude Include="..\Libs\Notification\PushNotificationManager.h" />
+    <ClInclude Include="..\Libs\Notification\TCPConnection.h" />
+    <ClInclude Include="..\Libs\PhoneGap\MimeTypes.h" />
+    <ClInclude Include="..\Libs\PhoneGap\PhoneGapCamera.h" />
+    <ClInclude Include="..\Libs\PhoneGap\PhoneGapCapture.h" />
+    <ClInclude Include="..\Libs\PhoneGap\PhoneGapFile.h" />
+    <ClInclude Include="..\Libs\PhoneGap\PhoneGapMessageHandler.h" />
+    <ClInclude Include="..\Libs\PhoneGap\PhoneGapSensors.h" />
+    <ClInclude Include="..\Libs\W3C\SensorManager.h" />
+    <ClInclude Include="..\MessageHandler.h" />
+    <ClInclude Include="..\MessageProtocol.h" />
+    <ClInclude Include="..\MessageStream.h" />
+    <ClInclude Include="..\MessageStreamJSON.h" />
+    <ClInclude Include="..\WebAppMoblet.h" />
+    <ClInclude Include="..\WebViewMessage.h" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\MAStd\MAStd_WP8.vcxproj">
+    <ProjectReference Include="..\..\MAStd\WP8\MAStd_WP8.vcxproj">
       <Project>{eeed04c3-fd4a-47d1-b918-edcbd5b122be}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\MAUtil\WP8\MAUtil_WP8.vcxproj">
+      <Project>{2856527d-4dc7-4ef5-bc8b-71d53e632730}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\NativeUI\WP8\NativeUI_WP8.vcxproj">
+      <Project>{d505b50e-8649-4030-9d91-965064dbc867}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\yajl\WP8\yajl_WP8.vcxproj">
+      <Project>{e8e93ee7-b75e-4bfe-bbd9-22aa7e69d8c2}</Project>
     </ProjectReference>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{2856527d-4dc7-4ef5-bc8b-71d53e632730}</ProjectGuid>
+    <ProjectGuid>{e0e62826-0317-4855-b4b6-fb5f85ce766a}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <ProjectName>MAUtil_WP8</ProjectName>
-    <RootNamespace>MAUtil</RootNamespace>
+    <ProjectName>Wormhole_WP8</ProjectName>
+    <RootNamespace>Wormhole</RootNamespace>
     <DefaultLanguage>en-US</DefaultLanguage>
     <MinimumVisualStudioVersion>11.0</MinimumVisualStudioVersion>
     <AppContainerApplication>true</AppContainerApplication>
@@ -121,12 +113,12 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
     <GenerateManifest>false</GenerateManifest>
     <OutDir>$(MOSYNCDIR)\lib\windowsPhone8\ARM\Debug</OutDir>
-    <TargetName>MAUtil</TargetName>
+    <TargetName>Wormhole</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
     <GenerateManifest>false</GenerateManifest>
     <OutDir>$(MOSYNCDIR)\lib\windowsPhone8\ARM\Release</OutDir>
-    <TargetName>MAUtil</TargetName>
+    <TargetName>Wormhole</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|arm'">
     <ClCompile>
@@ -134,21 +126,16 @@
       </PrecompiledHeader>
       <CompileAsWinRT>false</CompileAsWinRT>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>../;../MAStd;</AdditionalIncludeDirectories>
-      <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>../../;../../MAStd;</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_DEPRECATE;WINDOWS_PHONE_8_LIB;WINDOWS_PHONE_8;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <MinimalRebuild>true</MinimalRebuild>
-      <ExceptionHandling>false</ExceptionHandling>
+      <ExceptionHandling />
+      <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <GenerateWindowsMetadata>false</GenerateWindowsMetadata>
     </Link>
-    <Lib>
-      <AdditionalDependencies>
-      </AdditionalDependencies>
-    </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|arm'">
     <ClCompile>
@@ -156,21 +143,17 @@
       </PrecompiledHeader>
       <CompileAsWinRT>false</CompileAsWinRT>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>../;../MAStd;</AdditionalIncludeDirectories>
-      <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>../../;../../MAStd;</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_LIB;_CRT_SECURE_NO_DEPRECATE;WINDOWS_PHONE_8_LIB;WINDOWS_PHONE_8;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <MinimalRebuild>true</MinimalRebuild>
-      <ExceptionHandling>false</ExceptionHandling>
+      <ExceptionHandling>
+      </ExceptionHandling>
+      <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <GenerateWindowsMetadata>false</GenerateWindowsMetadata>
     </Link>
-    <Lib>
-      <AdditionalDependencies>
-      </AdditionalDependencies>
-    </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|arm'">
     <ClCompile>

@@ -2,8 +2,8 @@
 #include <mastdlib.h>
 #include <maheap.h>
 #else
-#include "../MAStd/mastdlib.h"
-#include "../MAStd/maheap.h"
+#include "../../../MAStd/mastdlib.h"
+#include "../../../MAStd/maheap.h"
 #endif
 
 void abort(void);

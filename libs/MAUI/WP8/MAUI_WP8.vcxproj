@@ -11,56 +11,49 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\stdlib\stdlib.c" />
-    <ClCompile Include="src\yajl.c" />
-    <ClCompile Include="src\yajl_alloc.c" />
-    <ClCompile Include="src\yajl_buf.c" />
-    <ClCompile Include="src\yajl_encode.c" />
-    <ClCompile Include="src\yajl_gen.c" />
-    <ClCompile Include="src\yajl_lex.c" />
-    <ClCompile Include="src\yajl_parser.c" />
-    <ClCompile Include="src\yajl_version.c" />
-    <ClCompile Include="YAJLDom.cpp">
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">CompileAsCpp</CompileAs>
-    </ClCompile>
+    <ClCompile Include="..\AnimatedImage.cpp" />
+    <ClCompile Include="..\EditBox.cpp" />
+    <ClCompile Include="..\Engine.cpp" />
+    <ClCompile Include="..\Font.cpp" />
+    <ClCompile Include="..\Image.cpp" />
+    <ClCompile Include="..\ImageGenerators.cpp" />
+    <ClCompile Include="..\Label.cpp" />
+    <ClCompile Include="..\Layout.cpp" />
+    <ClCompile Include="..\ListBox.cpp" />
+    <ClCompile Include="..\Scaler.cpp" />
+    <ClCompile Include="..\Screen.cpp" />
+    <ClCompile Include="..\Widget.cpp" />
+    <ClCompile Include="..\WidgetSkin.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\api\yajl_common.h" />
-    <ClInclude Include="src\api\yajl_gen.h" />
-    <ClInclude Include="src\api\yajl_parse.h" />
-    <ClInclude Include="src\api\yajl_version.h" />
-    <ClInclude Include="src\stdlib\assert.h" />
-    <ClInclude Include="src\stdlib\ctype.h" />
-    <ClInclude Include="src\stdlib\errno.h" />
-    <ClInclude Include="src\stdlib\math.h" />
-    <ClInclude Include="src\stdlib\stdio.h" />
-    <ClInclude Include="src\stdlib\stdlib.h" />
-    <ClInclude Include="src\stdlib\string.h" />
-    <ClInclude Include="src\yajl_alloc.h" />
-    <ClInclude Include="src\yajl_buf.h" />
-    <ClInclude Include="src\yajl_bytestack.h" />
-    <ClInclude Include="src\yajl_encode.h" />
-    <ClInclude Include="src\yajl_lex.h" />
-    <ClInclude Include="src\yajl_parser.h" />
-    <ClInclude Include="YAJLDom.h" />
+    <ClInclude Include="..\AnimatedImage.h" />
+    <ClInclude Include="..\EditBox.h" />
+    <ClInclude Include="..\Engine.h" />
+    <ClInclude Include="..\Font.h" />
+    <ClInclude Include="..\Image.h" />
+    <ClInclude Include="..\ImageGenerators.h" />
+    <ClInclude Include="..\InputManager.h" />
+    <ClInclude Include="..\Label.h" />
+    <ClInclude Include="..\Layout.h" />
+    <ClInclude Include="..\ListBox.h" />
+    <ClInclude Include="..\Scaler.h" />
+    <ClInclude Include="..\Screen.h" />
+    <ClInclude Include="..\Widget.h" />
+    <ClInclude Include="..\WidgetSkin.h" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\MAP\MAP_WP8.vcxproj">
-      <Project>{9d8bc5ca-1cd2-4130-b523-55eae2d0dab2}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\MAStd\MAStd_WP8.vcxproj">
+    <ProjectReference Include="..\..\MAStd\WP8\MAStd_WP8.vcxproj">
       <Project>{eeed04c3-fd4a-47d1-b918-edcbd5b122be}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\MAUtil\MAUtil_WP8.vcxproj">
+    <ProjectReference Include="..\..\MAUtil\WP8\MAUtil_WP8.vcxproj">
       <Project>{2856527d-4dc7-4ef5-bc8b-71d53e632730}</Project>
     </ProjectReference>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{e8e93ee7-b75e-4bfe-bbd9-22aa7e69d8c2}</ProjectGuid>
+    <ProjectGuid>{9de05800-4f0a-49df-ad6b-3546014de254}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <ProjectName>yajl_WP8</ProjectName>
-    <RootNamespace>yajl</RootNamespace>
+    <ProjectName>MAUI_WP8</ProjectName>
+    <RootNamespace>MAUI</RootNamespace>
     <DefaultLanguage>en-US</DefaultLanguage>
     <MinimumVisualStudioVersion>11.0</MinimumVisualStudioVersion>
     <AppContainerApplication>true</AppContainerApplication>
@@ -88,12 +81,12 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
     <GenerateManifest>false</GenerateManifest>
     <OutDir>$(MOSYNCDIR)\lib\windowsPhone8\ARM\Debug</OutDir>
-    <TargetName>yajl</TargetName>
+    <TargetName>MAUI</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
     <GenerateManifest>false</GenerateManifest>
     <OutDir>$(MOSYNCDIR)\lib\windowsPhone8\ARM\Release</OutDir>
-    <TargetName>yajl</TargetName>
+    <TargetName>MAUI</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|arm'">
     <ClCompile>
@@ -101,9 +94,10 @@
       </PrecompiledHeader>
       <CompileAsWinRT>false</CompileAsWinRT>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../;../../MAStd;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_DEPRECATE;WINDOWS_PHONE_8_LIB;WINDOWS_PHONE_8;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ExceptionHandling />
+      <PrecompiledHeaderFile>StdAfx.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -117,10 +111,11 @@
       </PrecompiledHeader>
       <CompileAsWinRT>false</CompileAsWinRT>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../;../../MAStd;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_LIB;_CRT_SECURE_NO_DEPRECATE;WINDOWS_PHONE_8_LIB;WINDOWS_PHONE_8;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ExceptionHandling>
       </ExceptionHandling>
+      <PrecompiledHeaderFile>StdAfx.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
