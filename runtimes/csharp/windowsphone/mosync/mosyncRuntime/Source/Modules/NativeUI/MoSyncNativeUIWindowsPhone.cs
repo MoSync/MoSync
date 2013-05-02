@@ -42,11 +42,9 @@ namespace MoSync
         public class WidgetBaseWindowsPhone : WidgetBase
         {
             /**
-             * The FrameworkElement that will contain the actual widget view (changed to FrameworkElement
-             * from UIElement because FrameworkElement sends events that notify us of the view lifetime -
-             * LayoutUpdated for example).
+             * The basic widget view. Every UI widget inherits from UIElement.
              */
-            private FrameworkElement mView;
+            private UIElement mView;
 
             //Width
             protected double mWidth;
@@ -69,13 +67,7 @@ namespace MoSync
 
             #region View property
 
-            /**
-             * Because the mView class variable is private, every widget will have to use this
-             * property when setting/getting the view.
-             * When setting the view, we make sure to add/remove(if necessary) the 'LayoutUpdated'
-             * delegate which will handle the business logic when the view is ready for manipulation.
-             */
-            public FrameworkElement View
+            public UIElement View
             {
                 get { return mView; }
                 set
@@ -84,24 +76,23 @@ namespace MoSync
                 }
             }
 
-            public new void RunOperationQueue()
-            {
-                MoSync.Util.RunActionOnMainThread(() =>
-                {
-                    IWidget a = this;
-                    // run all the pending operations from the widget operation queue
-                    while (mOperationQueue.Count != 0)
-                    {
-                        WidgetOperation currentOperation = mOperationQueue.Dequeue();
-
-                        RunOperation(currentOperation);
-                    }
-                }, true);
-            }
-
             #endregion
 
             #region Widget operation queue methods
+
+            /**
+             * Runs all the operations from the operation queue. Must be run on the UI thread.
+             */
+            public new void RunOperationQueue()
+            {
+                // run all the pending operations from the widget operation queue
+                while (mOperationQueue.Count != 0)
+                {
+                    WidgetOperation currentOperation = mOperationQueue.Dequeue();
+
+                    RunOperation(currentOperation);
+                }
+            }
 
             /**
              * Runs a WidgetOperation on the current widget.
@@ -129,12 +120,16 @@ namespace MoSync
                 }
             }
 
+            /**
+             * Runs a set property operation on the current widget.
+             * @param operation The widget operation that needs to be applied on the current widget.
+             */
             protected void SetProperty(WidgetOperation operation)
             {
                 PropertyInfo pinfo;
                 MoSyncWidgetPropertyAttribute pattr = GetPropertyAttribute(operation.Property, out pinfo);
                 Exception exception = null;
-                // if (pinfo == null) throw new InvalidPropertyNameException();
+                if (pinfo == null) throw new InvalidPropertyNameException();
                 try
                 {
                     SetProperty(pinfo, operation.Value);
@@ -148,18 +143,21 @@ namespace MoSync
                         throw new InvalidPropertyValueException();
             }
 
+            /**
+             * Runs a add child operation on the current widget.
+             * @param operation The widget operation that needs to be applied on the current widget.
+             */
             protected void AddChild(WidgetOperation operation)
             {
                 IWidget child = mRuntime.GetModule<NativeUIModule>().GetChildSync(operation.Handle);
                 child.SetParent(this);
-
-                System.Diagnostics.Debug.WriteLine("WidgetBaseWindowPhone: Add child; Parent: " +
-                        this.GetType().ToString() + "(" + this.GetHandle().ToString() + ")" +
-                        "Child: " +
-                        child.GetType().ToString() + "(" + child.GetHandle().ToString() + ")");
                 this.AddChild(child);
             }
 
+            /**
+             * Runs a insert child operation on the current widget.
+             * @param operation The widget operation that needs to be applied on the current widget.
+             */
             protected void InsertChild(WidgetOperation operation)
             {
                 IWidget child = mRuntime.GetModule<NativeUIModule>().GetChildSync(operation.Handle);
@@ -167,6 +165,10 @@ namespace MoSync
                 this.InsertChild(child, operation.Index);
             }
 
+            /**
+             * Runs a remove child operation on the current widget.
+             * @param operation The widget operation that needs to be applied on the current widget.
+             */
             protected void RemoveChild(WidgetOperation operation)
             {
                 IWidget child = mRuntime.GetModule<NativeUIModule>().GetChildSync(operation.Handle);
@@ -461,12 +463,6 @@ namespace MoSync
              */
             private void WrapContentHorizontally()
             {
-                IWidget a = this;
-                IWidget b = GetParent();
-                if (b != null)
-                {
-                    int i = 2;
-                }
                 mView.ClearValue(Canvas.WidthProperty);
                 mView.SetValue(Canvas.HorizontalAlignmentProperty, HorizontalAlignment.Center);
                 setHorizontalSizePolicyFlags(false, true);
@@ -509,12 +505,6 @@ namespace MoSync
              */
             private void FillSpaceHorizontally()
             {
-                IWidget a = this;
-                IWidget b = GetParent();
-                if (b != null)
-                {
-                    int i = 2;
-                }
                 mView.ClearValue(Canvas.WidthProperty);
                 mView.SetValue(Canvas.HorizontalAlignmentProperty, HorizontalAlignment.Stretch);
                 setHorizontalSizePolicyFlags(true, false);
@@ -561,12 +551,6 @@ namespace MoSync
              */
             private void WrapContentVertically()
             {
-                IWidget a = this;
-                IWidget b = GetParent();
-                if (b != null)
-                {
-                    int i = 2;
-                }
                 mView.ClearValue(Canvas.HeightProperty);
                 mView.SetValue(Canvas.VerticalAlignmentProperty, VerticalAlignment.Center);
                 setVerticalSizePolicyFlags(false, true);
@@ -610,12 +594,6 @@ namespace MoSync
              */
             private void FillSpaceVertically()
             {
-                IWidget a = this;
-                IWidget b = GetParent();
-                if (b != null)
-                {
-                    int i = 2;
-                }
                 mView.ClearValue(Canvas.HeightProperty);
                 mView.SetValue(Canvas.VerticalAlignmentProperty, VerticalAlignment.Stretch);
                 setVerticalSizePolicyFlags(true, false);

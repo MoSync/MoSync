@@ -26,7 +26,6 @@ public:
 	 */
 	virtual ~NativeUIMoblet()
 	{
-		mButton->removeButtonListener(this);
 		// All the children will be deleted.
 		delete mScreen;
 	}
@@ -46,23 +45,16 @@ public:
 		mLayout->fillSpaceHorizontally();
 		mLayout->fillSpaceVertically();
 
-		//Create a Native UI button
-/*		mButton = new Button();
-
-		//Let the button fill it's layout
-		mButton->fillSpaceHorizontally();
-		mButton->fillSpaceVertically(); */
+		mListView = new ListView();
+		mListView->fillSpaceHorizontally();
+		mListView->fillSpaceVertically();
+		mLayout->addChild(mListView);
 
 		//add many buttons and set properties on them in order to test
 		//the asynchronously setting of properties on the windows phone runtime
 		for (int j = 0; j < 50; j++)
 		{
 			Button *button = new Button();
-			button->setText("Press Me " + MAUtil::integerToString(j));
-			button->setText("Press Me " + MAUtil::integerToString(j));
-			button->setText("Press Me " + MAUtil::integerToString(j));
-			button->setText("Press Me " + MAUtil::integerToString(j));
-			button->setText("Press Me " + MAUtil::integerToString(j));
 
 			button->setText("Press Me " + MAUtil::integerToString(j));
 			button->setText("Press Me " + MAUtil::integerToString(j));
@@ -70,21 +62,27 @@ public:
 			button->setText("Press Me " + MAUtil::integerToString(j));
 			button->setText("Press Me " + MAUtil::integerToString(j));
 
-			mLayout->addChild(button);
+			button->setText("Press Me " + MAUtil::integerToString(j));
+			button->setText("Press Me " + MAUtil::integerToString(j));
+			button->setText("Press Me " + MAUtil::integerToString(j));
+			button->setText("Press Me " + MAUtil::integerToString(j));
+			button->setText("Press Me " + MAUtil::integerToString(j));
+
+			button->addButtonListener(this);
+
+			ListViewItem* mListViewItem = new ListViewItem();
+			HorizontalLayout *mHorizontalLayout = new HorizontalLayout();
+			mHorizontalLayout->addChild(button);
+			mListViewItem->addChild(mHorizontalLayout);
+
+			mListView->addChild(mListViewItem);
 		}
-
-		//Set the moblet to receive events from the button
-//		mButton->addButtonListener(this);
-
-		//Add the button to the layout
-		//mLayout->addChild(mButton);
 
 		//Add the layout to the screen
 		mScreen->setMainWidget(mLayout);
 
 		//Show the screen
 		mScreen->show();
-		lprintfln("SCREEN SHOWN!");
 	}
 
 	/**
@@ -110,9 +108,9 @@ public:
 	}
 
 private:
-    Screen* mScreen;			//A Native UI screen
-    VerticalLayout* mLayout;	//A Native UI layout
-    Button* mButton;			//A Native UI button
+    Screen* mScreen;
+    VerticalLayout* mLayout;
+    ListView *mListView;
 };
 
 /**

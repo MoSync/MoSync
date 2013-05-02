@@ -36,6 +36,13 @@ namespace MoSync
                 mFrame = (PhoneApplicationFrame)Application.Current.RootVisual;
             }
 
+            /**
+             * Handles the property setting for a widget. If the widget is not yet created, the
+             * set operation goes into the operation queue.
+             * @param widget The widget that recieved a set property syscall.
+             * @param propertyName The name of the property to be set.
+             * @param propertyValue The value of the property to be set.
+             */
             public void SetProperty(IWidget widget, string propertyName, string propertyValue)
             {
                 if (widget is WidgetBaseMock)
@@ -49,6 +56,13 @@ namespace MoSync
                 }
             }
 
+            /**
+             * Handles the property getting for a widget. If the widget is not yet created, we return
+             * the last valid set for that property. If there is no valid set, we wait for the widget creation
+             * and then we return the value of the property.
+             * @param widget The widget that recieved a get property syscall.
+             * @param propertyName The name of the property for which a value is needed.
+             */
             public String GetProperty(IWidget widget, string propertyName)
             {
                 if (widget is WidgetBaseMock)
@@ -66,6 +80,13 @@ namespace MoSync
                 return widget.GetProperty(propertyName);
             }
 
+            /**
+             * Handles the add child. If the parent is not yet created, the add operation goes into the operation
+             * queue. If the parent exists but the child hasn't been created, we wait for the child creation and then
+             * add it to the parent.
+             * @param parent The parent widget.
+             * @param child The child widget.
+             */
             public void AddChild(IWidget parent, IWidget child)
             {
                 if (parent is WidgetBaseMock)
@@ -79,14 +100,17 @@ namespace MoSync
                     {
                         child = mRuntime.GetModule<NativeUIModule>().GetChildSync(child.GetHandle());
                     }
-                    System.Diagnostics.Debug.WriteLine("MoSyncNativeUIAsync: Add child; Parent: " +
-                        parent.GetType().ToString() + "(" + parent.GetHandle().ToString() + ")" +
-                        "Child: " +
-                        child.GetType().ToString() + "(" + child.GetHandle().ToString() + ")");
                     parent.AddChild(child);
                 }
             }
 
+            /**
+             * Handles the insert child. If the parent is not yet created, the insert operation goes into the operation
+             * queue. If the parent exists but the child hasn't been created, we wait for the child creation and then
+             * insert it into the parent.
+             * @param parent The parent widget.
+             * @param child The child widget.
+             */
             public void InsertChild(IWidget parent, IWidget child, int index)
             {
                 if (parent is WidgetBaseMock)
@@ -104,6 +128,12 @@ namespace MoSync
                 }
             }
 
+            /**
+             * Handles the remove child. If the parent is not yet created, the remove operation goes into the operation
+             * queue. If the parent exists but the child hasn't been created, we wait for the child creation and then
+             * remove it from the parent.
+             * @param child The child widget.
+             */
             public void RemoveChild(IWidget child)
             {
                 if (child.GetParent() is WidgetBaseMock)

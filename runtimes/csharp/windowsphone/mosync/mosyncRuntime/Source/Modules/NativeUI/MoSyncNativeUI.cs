@@ -281,7 +281,7 @@ namespace MoSync
             if (pinfo == null) throw new InvalidPropertyNameException();
             if (pattr.ShouldExecuteOnMainThread)
             {
-                MoSync.Util.RunActionOnMainThreadSync(() =>
+                MoSync.Util.RunActionOnMainThread(() =>
                     {
                         try
                         {
@@ -291,7 +291,7 @@ namespace MoSync
                         {
                             exception = e;
                         }
-                    });
+                    }, false);
                 if (null != exception)
                     if (exception.InnerException is InvalidPropertyValueException)
                         throw new InvalidPropertyValueException();
