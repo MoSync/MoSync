@@ -28,6 +28,7 @@ struct SETTINGS {
 	const char* cppOutputDir;
 	const char* csOutputDir;
 	const char* model;
+	const char* mosyncProjectPath;
 	const char* dst;
 	const char* name;
 	const char* vendor;
@@ -44,6 +45,7 @@ struct SETTINGS {
 	bool debug;
 	bool silent;
 	bool showPasswords;
+	bool native;
 
 	// API specific settings
 	const char* nfc;
