@@ -10,6 +10,7 @@ using System.Windows.Media.Animation;
 using System.Windows.Shapes;
 using Microsoft.Phone.Controls;
 using System.Collections.Generic;
+using System.Reflection;
 
 namespace MoSync
 {
@@ -29,6 +30,11 @@ namespace MoSync
              */
             private Runtime mRuntime;
 
+            /**
+             * Contains the name of the property validation method that should be contained by all widgets.
+             */
+            private const string mValidateMethodName = "ValidateProperty";
+
             public AsyncNativeUIWindowsPhone()
                 : base()
             {
@@ -47,6 +53,10 @@ namespace MoSync
             {
                 if (widget is WidgetBaseMock)
                 {
+                    // we check to see if the property is valid
+                    Type widgetType = mRuntime.GetModule<NativeUIModule>().GetWidgetType(widget.GetHandle());
+                    CheckPropertyValidity(widgetType, propertyName, propertyValue);
+
                     WidgetOperation setOperation = new WidgetOperation(propertyName, propertyValue);
                     widget.AddOperation(setOperation);
                 }
@@ -155,6 +165,92 @@ namespace MoSync
             {
                 this.mRuntime = runtime;
             }
+
+            #region Property validation
+
+            /**
+             * Checks if a property has the correct name and value for a certain widget type.
+             * @param widgetType The widget type on which we need to do the property validity checking.
+             * @param propertyName The name of the property that needs to be checked.
+             * @param propertyValue The value of the property that needs to be checked.
+             * @throws InvalidPropertyNameException This exception is thrown if the set property name is incorrect.
+             * @throws InvalidPropertyValueException This exception is thrown if the set property value is incorrect.
+             */
+            public void CheckPropertyValidity(Type widgetType, String propertyName, String propertyValue)
+            {
+                CheckPropertyName(widgetType, propertyName);
+                CheckPropertyValue(widgetType, propertyName, propertyValue);
+            }
+
+            /**
+             * Using reflection, calls a method on a widget that checks if the name for the property
+             * that needs to be set is correct.
+             * @param widgetType The widget type on which we need to do the property validity checking.
+             * @param propertyName The name of the property that needs to be checked.
+             * @throws InvalidPropertyNameException This exception is thrown if the set property name is incorrect.
+             */
+            private void CheckPropertyName(Type widgetType, String propertyName)
+            {
+                bool propertyExists = false;
+                // we first check to see if the widgetType has that property implemented
+                foreach (PropertyInfo pinfo in widgetType.GetProperties())
+                {
+                    foreach (Attribute attr in pinfo.GetCustomAttributes(false))
+                    {
+                        if (attr.GetType() == typeof(MoSyncWidgetPropertyAttribute))
+                        {
+                            MoSyncWidgetPropertyAttribute e = (MoSyncWidgetPropertyAttribute)attr;
+                            if (e.Name.ToLower().Equals(propertyName.ToLower()))
+                            {
+                                propertyExists = true;
+                            }
+                        }
+                    }
+                }
+
+                // if the property doesn't exist, we throw a InvalidPropertyNameException
+                if (!propertyExists)
+                {
+                    throw new InvalidPropertyNameException();
+                }
+            }
+
+            /**
+             * Using reflection, calls a method on a widget that checks if the value for the property
+             * that needs to be set is correct.
+             * @param widgetType The widget type on which we need to do the property validity checking.
+             * @param propertyName The name of the property that needs to be checked.
+             * @param propertyValue The value of the property that needs to be checked.
+             * @throws InvalidPropertyValueException This exception is thrown if the set property value is incorrect.
+             */
+            private void CheckPropertyValue(Type widgetType, String propertyName, String propertyValue)
+            {
+                try
+                {
+                    if (widgetType.Name.Equals("VerticalLayout"))
+                    {
+                        MethodInfo minfo = widgetType.GetMethod(mValidateMethodName);
+                        string[] validateMethodParams = new string[] { propertyName, propertyValue };
+                        object propertyValueValid = minfo.Invoke(null, validateMethodParams);
+                        // if the widget validation returned false, we throw a InvalidPropertyValueException
+                        if (propertyValueValid.Equals(false))
+                        {
+                            throw new InvalidPropertyValueException();
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    // if the exception caught is InvalidPropertyValueException, we pass it to the
+                    // next level (syscall level)
+                    if (e is InvalidPropertyValueException)
+                    {
+                        throw e;
+                    }
+                }
+            }
+
+            #endregion
         }
 
         #endregion

@@ -105,16 +105,16 @@ namespace MoSync
         protected int mHandle;
         protected Runtime mRuntime;
 
-        public void RunOperationQueue()
-        {
-        }
-
         /**
          * Contains operations that are stacked if the syscalls reach the runtime before
          * the view is created. After the view becomes available for manipulation, the
          * queue is emptied and the operations are triggered on the widget.
          */
         protected Queue<WidgetOperation> mOperationQueue;
+
+        public void RunOperationQueue()
+        {
+        }
 
         public WidgetBase()
         {

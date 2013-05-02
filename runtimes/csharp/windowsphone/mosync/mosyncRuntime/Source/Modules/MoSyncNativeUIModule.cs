@@ -80,6 +80,16 @@ namespace MoSync
         {
             IWidget widget = null;
             IWidget widgetMock = mWidgets[widgetHandle];
+            // if the child was already created we won't create it again
+            // this situation might rise in the following way:
+            // the widget operation queue is run on an already created parent and a add child operation
+            // is applied before the a child is created. The WaitForWidgetCreation method will create
+            // the child on the UI thread (see WaitForWidgetCreation and CreateWidgetSync methods) so
+            // we don't need to recreate the child here
+            if (!(widgetMock is WidgetBaseMock))
+            {
+                return;
+            }
             // create the widget on the UI thread sync
             MoSync.Util.RunActionOnMainThread(() =>
             {
@@ -125,7 +135,6 @@ namespace MoSync
             widget.SetRuntime(widgetMock.GetRuntime());
             // lock the mWidgets array when this thread starts manipulating it
             mWidgets[widgetHandle] = widget;
-            // remove the thread from the widget thread dictionary - the widget has been created
 
             (widget as WidgetBaseWindowsPhone).RunOperationQueue();
 
@@ -190,6 +199,17 @@ namespace MoSync
             WaitForWidgetCreation(widgetHandle);
 
             return mWidgets[widgetHandle];
+        }
+
+        #endregion
+
+        #region Widget type helper methods
+
+        public Type GetWidgetType(int widgetHandle)
+        {
+            Type widgetType = null;
+            mWidgetTypeDictionary.TryGetValue(widgetHandle, out widgetType);
+            return widgetType;
         }
 
         #endregion

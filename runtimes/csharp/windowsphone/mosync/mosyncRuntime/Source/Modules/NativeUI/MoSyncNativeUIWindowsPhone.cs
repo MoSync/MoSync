@@ -129,7 +129,6 @@ namespace MoSync
                 PropertyInfo pinfo;
                 MoSyncWidgetPropertyAttribute pattr = GetPropertyAttribute(operation.Property, out pinfo);
                 Exception exception = null;
-                if (pinfo == null) throw new InvalidPropertyNameException();
                 try
                 {
                     SetProperty(pinfo, operation.Value);
@@ -452,6 +451,21 @@ namespace MoSync
                 {
                     return mView.Opacity;
                 }
+            }
+
+            #endregion
+
+            #region Validate property region
+
+            public static bool ValidateProperty(String propertyName, String propertyValue)
+            {
+                if (propertyName.Equals("enabled") || propertyName.Equals("visible"))
+                {
+                    bool val;
+                    if (!Boolean.TryParse(propertyValue, out val)) return false;
+                }
+
+                return true;
             }
 
             #endregion
