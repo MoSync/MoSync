@@ -37,7 +37,6 @@ class FirstScreen:
 	public ScreenListener,
 	public ButtonListener,
 	public CheckBoxListener
-	//public ActionBarListener
 {
 
 public:
@@ -53,21 +52,24 @@ public:
 
 	void createUI();
 
-    /**
-     * This method is called when the OptionsMenu is being closed
-     * (either by the user canceling the menu with the back/menu
-     * button, or when an item is selected.
-     * @param Screen The screen that generated the event.
-     */
-    virtual void optionsMenuClosed(Screen* screen);
+	void addDefaultActionBarItems();
+
+	void createAddItemDialog();
+
+	void createRemoveItemDialog();
 
     /**
-     * This method is called when an options menu item is selected.
-     * @param index The index on which the item is placed into the
-     * OptionsMenu.
-     *  @param Screen The screen that generated the event.
+     * This method is called when a menu item from the Action Bar is selected.
+     * @param screen The screen that generated the event.
+     * @param itemHandle The handle of the menu item that was selected.
      */
-    virtual void optionsMenuItemSelected(Screen* screen, int index);
+    virtual void actionBarItemSelected(Screen* screen, int itemHandle);
+
+    /**
+     * This method is called when the Up indicator from the Action Bar is selected.
+     * @param screen The screen that generated the event.
+     */
+    virtual void actionBarUpSelected(Screen* screen);
 
     /**
      * This method is called if the touch-up event was inside the
@@ -91,15 +93,18 @@ private:
 	 * Main layout.
 	 */
 	VerticalLayout* mMainLayout;
-	ListView* mEventsList;
-	Button* mClearOptions;
+	ListView* mListView;
 
 	EditBox* mTitleEditBox;
 	Button* mTitleSet;
 	Button* mTitleGet;
 	Label* mTitleLbl;
 
+	CheckBox* mEnableTitle;
+	CheckBox* mDisableTitle;
 
+	CheckBox* mEnableLogo;
+	CheckBox* mDisableLogo;
 
 	Button* mGetHeightBtn;
 	Label* mHeightLbl;
@@ -108,8 +113,26 @@ private:
 	CheckBox* mHideCheckBox;
 	Button* mGetVisibilityBtn;
 	Label* mVisibilityLbl;
-	//todo visibility.
 
+	Button* mDisplayUpIndicator;
+
+	Button* mAddItemBtn;
+	Button* mRemoveItemBtn;
+
+	Dialog* mAddItemDialog;
+	Dialog* mRemoveItemDialog;
+
+	// Widgets from add dialog
+	EditBox* mAddItemTitle;
+	CustomPicker* mFlagPicker;
+	CustomPicker* mUsePredefinedIcon;
+	Button* mAddItemDone;
+
+	// Widgets from remove dialog.
+	CustomPicker* mItemsPicker;
+	Button* mRemoveItemDone;
+	Button* mRemoveAllItemsDone;
+	MAUtil::Vector<MAHandle> mMenuItems;
 };
 
 #endif /* FIRSTSCREEN_H_ */

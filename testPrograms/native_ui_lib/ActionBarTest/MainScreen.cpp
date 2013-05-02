@@ -39,9 +39,6 @@ MainScreen::MainScreen() :
     mFirstScreen = new FirstScreen();
     this->push(mFirstScreen);
 
-    mSecondScreen = new SecondScreen();
-//    this->addTab(mSecondScreen);
-
     addStackScreenListener(this);
 }
 
@@ -57,7 +54,6 @@ void MainScreen::stackScreenScreenPopped(
     Screen* fromScreen,
     Screen* toScreen)
 {
-
 }
 
 

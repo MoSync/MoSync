@@ -14,6 +14,7 @@ group ActionBarFunctions "Action Bar functions" {
 	* Enable or disable the Action bar.
 	* By default, the Action bar is disabled.
 	* Note that the Action bar is only available starting from Android API level 11.
+	* @param showActionBar True to enable it, False to disable it.
 	*
 	* \returns
 	* - #MAW_RES_OK on success, or

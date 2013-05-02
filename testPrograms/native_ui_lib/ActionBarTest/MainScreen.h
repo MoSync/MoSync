@@ -31,7 +31,6 @@ MA 02110-1301, USA.
 #include <NativeUI/Widgets.h>
 
 #include "FirstScreen.h"
-#include "SecondScreen.h"
 
 using namespace NativeUI;
 
@@ -73,7 +72,6 @@ private:
 	 */
 	VerticalLayout* mMainLayout;
 	FirstScreen* mFirstScreen;
-	SecondScreen* mSecondScreen;
 };
 
 #endif /* MAINSCREEN_H_ */
