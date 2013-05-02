@@ -1,22 +1,19 @@
 package com.mosync.pim;
 
 import static com.mosync.internal.android.MoSyncHelpers.DebugPrint;
-
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTRPREFERRED;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_EMAIL_CUSTOM;
 import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_EMAIL_HOME;
-import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_EMAIL_WORK;
 import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_EMAIL_MOBILE;
 import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_EMAIL_OTHER;
-import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_EMAIL_CUSTOM;
-import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTRPREFERRED;
-
-import static com.mosync.internal.generated.IX_PIM.MA_PIM_ERR_NONE;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_EMAIL_WORK;
 import static com.mosync.internal.generated.IX_PIM.MA_PIM_ERR_ATTRIBUTE_COMBO_UNSUPPORTED;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ERR_NONE;
 import static com.mosync.internal.generated.IX_PIM.MA_PIM_FIELD_CONTACT_EMAIL;
 import static com.mosync.internal.generated.IX_PIM.MA_PIM_TYPE_STRING;
-
 import android.provider.ContactsContract.CommonDataKinds.Email;
 
-public class PIMFieldEmail extends PIMField {
+public class PIMFieldEmail extends PIMStringField {
 
 	/**
 	 * Constructor
@@ -85,33 +82,6 @@ public class PIMFieldEmail extends PIMField {
 	boolean hasCustomLabel(int index) {
 		return ((Integer.parseInt(getColumnValue(index, Email.TYPE)) == Email.TYPE_CUSTOM) ? true
 				: false);
-	}
-
-	char[] getData(int index) {
-		String val = getSpecificData(index);
-		char[] buffer = new char[getDataSize(val)];
-		PIMUtil.writeString(val, buffer);
-		return buffer;
-	}
-
-	String getSpecificData(int index) {
-		String[] val = mValues.get(index);
-		return val[1];
-	}
-
-	int getDataSize(String val) {
-		return val.length() + 1;
-	}
-
-	void setData(int index, char[] buffer) {
-		String val = PIMUtil.readString(buffer);
-		setSpecificData(val, index);
-	}
-
-	void setSpecificData(String data, int index) {
-		String[] val = mValues.get(index);
-		val[1] = data;
-		mValues.set(index, val);
 	}
 
 	int setAttribute(int index, int attribute) {

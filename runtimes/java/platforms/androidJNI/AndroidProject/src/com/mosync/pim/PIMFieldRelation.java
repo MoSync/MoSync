@@ -27,7 +27,7 @@ import static com.mosync.internal.generated.IX_PIM.MA_PIM_TYPE_STRING;
 
 import android.provider.ContactsContract.CommonDataKinds.Relation;
 
-public class PIMFieldRelation extends PIMField {
+public class PIMFieldRelation extends PIMStringField {
 
 	/**
 	 * Constructor
@@ -109,33 +109,6 @@ public class PIMFieldRelation extends PIMField {
 	boolean hasCustomLabel(int index) {
 		return ((Integer.parseInt(getColumnValue(index, Relation.TYPE)) == Relation.TYPE_CUSTOM) ? true
 				: false);
-	}
-
-	char[] getData(int index) {
-		String val = getSpecificData(index);
-		char[] buffer = new char[getDataSize(val)];
-		PIMUtil.writeString(val, buffer);
-		return buffer;
-	}
-
-	String getSpecificData(int index) {
-		String[] val = mValues.get(index);
-		return val[1];
-	}
-
-	int getDataSize(String val) {
-		return val.length() + 1;
-	}
-
-	void setData(int index, char[] buffer) {
-		String val = PIMUtil.readString(buffer);
-		setSpecificData(val, index);
-	}
-
-	void setSpecificData(String data, int index) {
-		String[] val = mValues.get(index);
-		val[1] = data;
-		mValues.set(index, val);
 	}
 
 	int setAttribute(int index, int attribute) {
