@@ -17,5 +17,19 @@ group WidgetActivityIndicatorProperties "Activity Indicator" {
 		* \endcode
 		*/
 		IN_PROGRESS = "inProgress";
+
+        /**
+        * @brief Sets a predefined indicator color and style. Default is 2.
+        *
+        * @valuevalue 0 for Large white, 1 for White and 2 for Gray
+        *
+        * @setonly
+        *
+        * @par Example
+        * \code
+        *   maWidgetSetProperty(activityIndicatorHandke, MAW_ACTIVITY_INDICATOR_STYLE, "1");
+        * \endcode
+        */
+        STYLE = "indicatorStyle";
 	}
 } // end of WidgetActivityIndicatorProperties

@@ -67,6 +67,11 @@
             return MAW_RES_INVALID_PROPERTY_VALUE;
         }
     }
+    else if([key isEqualToString:@MAW_ACTIVITY_INDICATOR_STYLE])
+    {
+        UIActivityIndicatorView* activityIndicatorView = (UIActivityIndicatorView*) self.view;
+        activityIndicatorView.activityIndicatorViewStyle = (UIActivityIndicatorViewStyle)[value intValue];
+    }
     else
     {
         return [super setPropertyWithKey:key toValue:value];

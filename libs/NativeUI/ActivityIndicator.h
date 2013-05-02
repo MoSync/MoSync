@@ -40,6 +40,13 @@ MA 02110-1301, USA.
 
 namespace NativeUI
 {
+    enum ActivityIndicatorStyle
+    {
+        ACTIVITY_INDICATOR_STYLE_WHITE_LARGE,
+        ACTIVITY_INDICATOR_STYLE_WHITE,
+        ACTIVITY_INDICATOR_STYLE_GRAY,
+    };
+
     /**
      * \brief An instance of ActivityIndicator is used for displaying the
      * indeterminate progress of a task over time.
@@ -66,6 +73,12 @@ namespace NativeUI
          * Hide the activity indicator.
          */
         virtual void hide();
+
+        /**
+         * Sets a predefined color style
+         * @param style One of the enum values in ActivityIndicatorStyle
+         */
+        virtual void setPredefinedStyle(ActivityIndicatorStyle style);
     };
 
 } // namespace NativeUI

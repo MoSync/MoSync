@@ -58,4 +58,9 @@ namespace NativeUI
         this->setProperty(MAW_ACTIVITY_INDICATOR_IN_PROGRESS, "false");
     }
 
+    void ActivityIndicator::setPredefinedStyle(ActivityIndicatorStyle style)
+    {
+        this->setPropertyInt(MAW_ACTIVITY_INDICATOR_STYLE, style);
+    }
+
 } // namespace NativeUI
