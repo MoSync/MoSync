@@ -82,6 +82,18 @@ namespace NativeUI
          */
         virtual void optionsMenuItemSelected(Screen* screen, int index) {};
 
+        /**
+         * This method is called when a menu item from the Action Bar is selected.
+         * @param screen The screen that generated the event.
+         * @param itemHandle The handle of the menu item that was selected.
+         */
+        virtual void actionBarItemSelected(Screen* screen, int itemHandle) {};
+
+        /**
+         * This method is called when the Up indicator from the Action Bar is selected.
+         * @param screen The screen that generated the event.
+         */
+        virtual void actionBarUpSelected(Screen* screen){};
     };
 
 } // namespace NativeUI
