@@ -140,6 +140,8 @@ int main(int argc, const char** argv) {
 			setString(i, argc, argv, s.icon);
 		} else if(streq(argv[i], "-m") || streq(argv[i], "--model")) {
 			setString(i, argc, argv, s.model);
+		} else if(streq(argv[i], "--mpp") || streq(argv[i], "--mosyncProjectPath")) {
+			setString(i, argc, argv, s.mosyncProjectPath);
 		} else if(streq(argv[i], "-d") || streq(argv[i], "--dst")) {
 			setString(i, argc, argv, s.dst);
 		} else if(streq(argv[i], "-n") || streq(argv[i], "--name")) {
@@ -166,6 +168,8 @@ int main(int argc, const char** argv) {
 			setString(i, argc, argv, s.s60pass);
 		} else if(streq(argv[i], "--debug")) {
 			s.debug = true;
+		} else if(streq(argv[i], "--native")) {
+			s.native = true;
 		} else if(streq(argv[i], "--nfc")) { // NFC specific
 			setString(i, argc, argv, s.nfc);
 		} else if(streq(argv[i], "--ios-cert")) { // iOS specific
