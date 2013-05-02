@@ -152,7 +152,7 @@ buildLib("mosync", { 'src' => bootfiles, 'compiler-flags' => "-Wno-psabi -D_andr
 #buildLib("yajl", { 'src' => "-Syajl/**", 'modules' => "MAStd,MAUtil" })
 #buildLib("Notification", { 'src' => "-SNotification/**", 'modules' => "MAStd,MAUtil" })
 
-libfiles = "-SMAUI -SMAStd/conprint.c -SMAStd/maassert.c -SMAStd/mastring.c -SMAStd/mawstring.c -SMAStd/matime.c -SMAStd/mavsprintf.c -SMAStd/mawvsprintf.c -SMAStd/maxtoa.c -SMAStd/wchar.c -SMAMath/MAVector3.c -SAds -SMinUI -SResCompiler -Skazlib -Syasper -SFacebook/** -SNativeUI -SHybris -SMAFS/** -SMAUtil -XMAUtil/DomParser.cpp -SNotification -STestify -SMATest -SPurchase -SWormhole/** -Syajl/** -XMAUtil/GraphicsOpenGL.c -XMAUtil/XMLDataProvider.cpp -XMAUtil/XPathTokenizer.cpp"
+libfiles = "-SMAP -SMAUI -SMAStd/conprint.c -SMAStd/maassert.c -SMAStd/mastring.c -SMAStd/mawstring.c -SMAStd/matime.c -SMAStd/mavsprintf.c -SMAStd/mawvsprintf.c -SMAStd/maxtoa.c -SMAStd/wchar.c -SMAMath/MAVector3.c -SAds -SMinUI -SResCompiler -Skazlib -Syasper -SFacebook/** -SNativeUI -SHybris -SMAFS/** -SMAUtil -XMAUtil/DomParser.cpp -SNotification -STestify -SMATest -SPurchase -SWormhole/** -Syajl/** -XMAUtil/GraphicsOpenGL.c -XMAUtil/XMLDataProvider.cpp -XMAUtil/XPathTokenizer.cpp"
 #libfiles = "- -Skazlib  -SHybris "
 buildLib("mosynclib", { 'shared' => true,
 	'src' => libfiles,
