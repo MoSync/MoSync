@@ -46,7 +46,7 @@
 #include <madmath.h>
 #endif
 
-#ifdef MAPIP
+#if defined(MAPIP) || (defined(MOSYNC_NATIVE) && defined(__ANDROID__))
 
 //#ifdef KERNEL
 //#define NOFLOAT

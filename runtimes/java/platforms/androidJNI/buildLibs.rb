@@ -128,7 +128,7 @@ puts "Building native Library\n\n"
 # However, we should merge this using Fredrik's approach soon.
 
 # First, we need wchar support
-#buildLib("wchar", { 'src' => "-SMAStd/wchar.c -SMAStd/mawstring.c -SMAStd/mawvsprinf.c", 'bootmodules' => "." })
+#buildLib("wchar", { 'src' => "-SMAStd/wchar.c -SMAStd/mawstring.c -SMAStd/mawvsprintf.c", 'bootmodules' => "." })
 
 bootfiles = "-S./* -S./UTF/* -S../../core/Core.cpp -S../sdl/FileImpl.cpp -S../../base/FileStream.cpp -S../../base/MemStream.cpp -S../../base/Stream.cpp -S../../base/Image.cpp -S../../base/ResourceArray.cpp -S../../base/Syscall.cpp -S../../../../intlibs/helpers/platforms/linux/log.cpp -S../../../../intlibs/hashmap/hashmap.cpp"
 cppDir = "#{ENV['MOSYNC_SRC']}/runtimes/cpp"
