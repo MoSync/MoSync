@@ -349,12 +349,17 @@ public class MoSyncCameraController {
 			{
 				mCurrentCameraIndex = CameraNumber;
 				if (null != mCamera)
+				{
 					mCamera.release();
-				mPreview.mCamera = null;
+				}
+				if ( null != mPreview )
+				{
+					mPreview.mCamera = null;
+				}
 				try {
 					mCamera = cameraOpen(CameraNumber);
-					mPreview.mCameraIndex = mCurrentCameraIndex;
 					mCamera.setParameters(getCurrentParameters());
+					mPreview.mCameraIndex = mCurrentCameraIndex;
 				} catch (Exception e) {
 					SYSLOG("cannot open camera " + e);
 				}

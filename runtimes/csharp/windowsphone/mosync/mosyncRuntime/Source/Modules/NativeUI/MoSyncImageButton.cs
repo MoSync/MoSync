@@ -210,7 +210,11 @@ namespace MoSync
 
                 mBackgroundImage.Stretch = mStretchBackground;
 
-                View = mGrid;
+                // We need to make this view a ContentControl in order to have System.Windows.Controls::Control properties enabled.
+                ContentControl contentControl = new System.Windows.Controls.ContentControl();
+                contentControl.Content = mGrid;
+
+                View = contentControl;
 
                 // the MouseEnter handle for the ImageButton. Used for switching background image.
                 mGrid.MouseEnter += new System.Windows.Input.MouseEventHandler(delegate(Object from, System.Windows.Input.MouseEventArgs evt)
