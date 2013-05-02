@@ -885,6 +885,10 @@ public class MoSyncThread extends Thread implements MoSyncContext
 		return byteBuffer;
 	}
 
+	public boolean isNative() {
+		return isNative;
+	}
+
 	/**
 	 * Create a data object by (indirectly) calling maCreatePlaceholder
 	 * (if no placeholder is supplied), and maCreateData, then copy the
@@ -5914,4 +5918,5 @@ public class MoSyncThread extends Thread implements MoSyncContext
 			}
 		}
 	}
+
 }

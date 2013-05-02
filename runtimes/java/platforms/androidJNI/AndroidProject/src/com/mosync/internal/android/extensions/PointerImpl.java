@@ -7,7 +7,7 @@ public class PointerImpl extends Pointer {
 	private int addr;
 	private TypeDescriptor delegate;
 
-	PointerImpl(TypeDescriptor delegate, int addr) {
+	public PointerImpl(TypeDescriptor delegate, int addr) {
 		this.delegate = delegate;
 		this.addr = addr;
 	}
@@ -26,7 +26,7 @@ public class PointerImpl extends Pointer {
 		return delegate.readFromMemory(addr + ix * size);
 	}
 
-	protected int getAddress() {
+	public int getAddress() {
 		return addr;
 	}
 
@@ -39,6 +39,21 @@ public class PointerImpl extends Pointer {
 	public void set(Object o, int ix) {
 		int size = delegate.size();
 		delegate.writeToMemory(addr + ix * size, o);
+	}
+
+	public boolean isNull() {
+		return addr == 0;
+	}
+
+	public Pointer<Void> offset(int bytes) {
+		if (isNull()) {
+			throw new NullPointerException();
+		}
+		return new PointerImpl(VoidType.getInstance(), addr + bytes);
+	}
+
+	public String toString() {
+		return "(" + delegate.toString() + "*): @0x" + Integer.toHexString(addr);
 	}
 
 }
