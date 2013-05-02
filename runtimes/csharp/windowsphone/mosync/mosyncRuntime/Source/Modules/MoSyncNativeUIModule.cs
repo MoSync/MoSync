@@ -60,12 +60,13 @@ namespace MoSync
             Thread createWidgetThread = new Thread(() => CreateWidgetAsync(widgetHandle, widgetType));
             createWidgetThread.Name = "Creating widget " + widgetType.ToString() + " handle: " + widgetHandle.ToString();
             createWidgetThread.IsBackground = true;
-            createWidgetThread.Start();
 
             // we need to create a map between the widget handle and the thread that handles its creation
             // in order to wait for the thread to finish if a add/remove/insert child syscall reaches the
             // runtime and the child was not created yet
             mWidgetThreadDictionary.Add(widgetHandle, createWidgetThread);
+
+            createWidgetThread.Start();
         }
 
         /**
@@ -108,7 +109,7 @@ namespace MoSync
             MoSync.Util.RunActionOnMainThread(() =>
             {
                 (widget as WidgetBaseWindowsPhone).RunOperationQueue();
-            }, true);
+            }, false);
 
             // TODO SA: remove - for benchmarking only
             System.Diagnostics.Debug.WriteLine("Widget created: " +
@@ -194,7 +195,7 @@ namespace MoSync
          * Waits for a widget creation and returns it.
          * @param widgetHandle The handle of the widget that needs to be returned.
          */
-        public IWidget GetChildSync(int widgetHandle)
+        public IWidget GetWidgetSync(int widgetHandle)
         {
             WaitForWidgetCreation(widgetHandle);
 

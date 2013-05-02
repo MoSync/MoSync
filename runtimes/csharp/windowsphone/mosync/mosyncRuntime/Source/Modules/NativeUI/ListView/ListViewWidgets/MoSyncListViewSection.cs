@@ -194,7 +194,7 @@ namespace MoSync
             /**
              * Returns a child.
              */
-            public IWidget GetChild(int index)
+            public new IWidget GetChild(int index)
             {
                 if (index < mChildren.Count)
                 {
@@ -683,7 +683,7 @@ namespace MoSync
              * @param propertyValue The value of the property to be checked.
              * @returns true if the property is valid, false otherwise.
              */
-            public static bool ValidateProperty(string propertyName, string propertyValue)
+            public new static bool ValidateProperty(string propertyName, string propertyValue)
             {
                 bool isBasePropertyValid = WidgetBaseWindowsPhone.ValidateProperty(propertyName, propertyValue);
                 if (isBasePropertyValid == false)

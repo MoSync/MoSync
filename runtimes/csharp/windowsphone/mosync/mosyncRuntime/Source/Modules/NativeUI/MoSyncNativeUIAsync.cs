@@ -84,7 +84,7 @@ namespace MoSync
                         return propertyValue;
                     }
 
-                    widget = mRuntime.GetModule<NativeUIModule>().GetChildSync(widget.GetHandle());
+                    widget = mRuntime.GetModule<NativeUIModule>().GetWidgetSync(widget.GetHandle());
                 }
 
                 return widget.GetProperty(propertyName);
@@ -108,9 +108,14 @@ namespace MoSync
                 {
                     if (child is WidgetBaseMock)
                     {
-                        child = mRuntime.GetModule<NativeUIModule>().GetChildSync(child.GetHandle());
+                        child = mRuntime.GetModule<NativeUIModule>().GetWidgetSync(child.GetHandle());
                     }
-                    parent.AddChild(child);
+
+                    MoSync.Util.RunActionOnMainThread(() =>
+                    {
+                        child.SetParent(parent);
+                        parent.AddChild(child);
+                    }, false);
                 }
             }
 
@@ -132,9 +137,14 @@ namespace MoSync
                 {
                     if (child is WidgetBaseMock)
                     {
-                        child = mRuntime.GetModule<NativeUIModule>().GetChildSync(child.GetHandle());
+                        child = mRuntime.GetModule<NativeUIModule>().GetWidgetSync(child.GetHandle());
                     }
-                    parent.InsertChild(child, index);
+
+                    MoSync.Util.RunActionOnMainThread(() =>
+                    {
+                        child.SetParent(parent);
+                        parent.InsertChild(child, index);
+                    }, false);
                 }
             }
 
@@ -155,9 +165,13 @@ namespace MoSync
                 {
                     if (child is WidgetBaseMock)
                     {
-                        child = mRuntime.GetModule<NativeUIModule>().GetChildSync(child.GetHandle());
+                        child = mRuntime.GetModule<NativeUIModule>().GetWidgetSync(child.GetHandle());
                     }
-                    child.RemoveFromParent();
+
+                    MoSync.Util.RunActionOnMainThread(() =>
+                    {
+                        child.RemoveFromParent();
+                    }, false);
                 }
             }
 
@@ -227,16 +241,13 @@ namespace MoSync
             {
                 try
                 {
-                    if (widgetType.Name.Equals("VerticalLayout"))
+                    MethodInfo minfo = widgetType.GetMethod(mValidateMethodName);
+                    string[] validateMethodParams = new string[] { propertyName, propertyValue };
+                    object propertyValueValid = minfo.Invoke(null, validateMethodParams);
+                    // if the widget validation returned false, we throw a InvalidPropertyValueException
+                    if (propertyValueValid.Equals(false))
                     {
-                        MethodInfo minfo = widgetType.GetMethod(mValidateMethodName);
-                        string[] validateMethodParams = new string[] { propertyName, propertyValue };
-                        object propertyValueValid = minfo.Invoke(null, validateMethodParams);
-                        // if the widget validation returned false, we throw a InvalidPropertyValueException
-                        if (propertyValueValid.Equals(false))
-                        {
-                            throw new InvalidPropertyValueException();
-                        }
+                        throw new InvalidPropertyValueException();
                     }
                 }
                 catch (Exception e)

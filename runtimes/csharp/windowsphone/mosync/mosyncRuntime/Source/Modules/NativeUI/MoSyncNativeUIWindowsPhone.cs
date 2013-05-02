@@ -148,7 +148,7 @@ namespace MoSync
              */
             protected void AddChild(WidgetOperation operation)
             {
-                IWidget child = mRuntime.GetModule<NativeUIModule>().GetChildSync(operation.Handle);
+                IWidget child = mRuntime.GetModule<NativeUIModule>().GetWidgetSync(operation.Handle);
                 child.SetParent(this);
                 this.AddChild(child);
             }
@@ -159,8 +159,8 @@ namespace MoSync
              */
             protected void InsertChild(WidgetOperation operation)
             {
-                IWidget child = mRuntime.GetModule<NativeUIModule>().GetChildSync(operation.Handle);
-                child.SetParent(this);
+                IWidget child = mRuntime.GetModule<NativeUIModule>().GetWidgetSync(operation.Handle);
+//                child.SetParent(this);
                 this.InsertChild(child, operation.Index);
             }
 
@@ -170,7 +170,7 @@ namespace MoSync
              */
             protected void RemoveChild(WidgetOperation operation)
             {
-                IWidget child = mRuntime.GetModule<NativeUIModule>().GetChildSync(operation.Handle);
+                IWidget child = mRuntime.GetModule<NativeUIModule>().GetWidgetSync(operation.Handle);
                 child.RemoveFromParent();
             }
 

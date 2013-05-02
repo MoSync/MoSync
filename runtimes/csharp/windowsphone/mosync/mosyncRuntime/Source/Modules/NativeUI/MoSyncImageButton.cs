@@ -488,7 +488,7 @@ namespace MoSync
                             mForegroundImagePath = value;
                             mForegroundImageHandle = 0;
                         }
-                        catch (Exception e)
+                        catch
                         {
                             // There was a problem reading the image file.
                             throw new InvalidPropertyValueException();
@@ -529,7 +529,7 @@ namespace MoSync
                             mBackgroundImagePath = value;
                             mBackgroundImageHandle = 0;
                         }
-                        catch (Exception e)
+                        catch
                         {
                             // There was a problem reading the image file.
                             throw new InvalidPropertyValueException();
@@ -570,7 +570,7 @@ namespace MoSync
                             mPressedImagePath = value;
                             mPressedImageHandle = 0;
                         }
-                        catch (Exception e)
+                        catch
                         {
                             // There was a problem reading the image file.
                             throw new InvalidPropertyValueException();
