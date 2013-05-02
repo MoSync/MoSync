@@ -29,6 +29,16 @@
 #include "MoCameraController.h"
 #include "Screens/ScreenUtils.h"
 
+#define SNAPSHOT_TITLE "Capture snapshot"
+#define SNAPSHOT_FAILED_STR "Please try again"
+
+#define SAVE_IMAGE_TITLE "Save to gallery"
+#define SAVE_IMAGE_FAILED_STR "Please try again"
+#define SAVE_IMAGE_SUCCEEDED_STR "Completed"
+#define IMAGE_NAME "MoSyncCameraPic"
+
+#define ALERT_OK_STR "OK"
+
 namespace MoSyncCamera
 {
 	MoCameraController::MoCameraController():
@@ -141,7 +151,7 @@ namespace MoSyncCamera
 		bool snapshotIsAvailable = true;
 		if ( imageData.resultCode != MA_CAMERA_RES_OK )
 		{
-			maAlert("Camera", "Snapshot failed", "OK", NULL, NULL);
+			maAlert(SNAPSHOT_TITLE, SNAPSHOT_FAILED_STR, ALERT_OK_STR, NULL, NULL);
 			snapshotIsAvailable = false;
 
 			if ( mLastSnapshotDataHandle > 0 )
@@ -159,11 +169,11 @@ namespace MoSyncCamera
 		if ( mDisplayedImageHandle > 0 )
 		{
 			mImageViewerScreen->toggleImageSavingInProgress(true);
-			int returnCode = maSaveImageToDeviceGallery(mDisplayedImageHandle, "MoSyncCameraPic");
+			int returnCode = maSaveImageToDeviceGallery(mDisplayedImageHandle, IMAGE_NAME);
 			if ( returnCode != MA_MEDIA_RES_OK )
 			{
 				mImageViewerScreen->toggleImageSavingInProgress(false);
-				maAlert("Save image", "Image saving failed!", "OK", NULL, NULL);
+				maAlert(SAVE_IMAGE_TITLE, SAVE_IMAGE_FAILED_STR, ALERT_OK_STR, NULL, NULL);
 			}
 		}
 	}
@@ -173,16 +183,16 @@ namespace MoSyncCamera
 			const MAHandle& imageHandle,
 			int resultCode)
 	{
-		MAUtil::String message = "Image saved!";
+		MAUtil::String message = SAVE_IMAGE_SUCCEEDED_STR;
 
 		if ( mDisplayedImageHandle != imageHandle &&
 				resultCode != MA_MEDIA_RES_OK )
 		{
-			message = "Image saving failed!";
+			message = SAVE_IMAGE_FAILED_STR;
 		}
 
 		mImageViewerScreen->toggleImageSavingInProgress(false);
-		maAlert("Save image", message.c_str(), "OK", NULL, NULL);
+		maAlert(SAVE_IMAGE_TITLE, message.c_str(), ALERT_OK_STR, NULL, NULL);
 	}
 
 
