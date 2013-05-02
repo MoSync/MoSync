@@ -96,7 +96,7 @@ import com.mosync.nativeui.util.ScreenTransitions;
  *
  * As long as this activity is running the application is running.
  */
-public class MoSync extends ActionBarActivity
+public class MoSync extends Activity
 {
 	/**
 	 * Activity request codes for Camera intent.
@@ -123,11 +123,6 @@ public class MoSync extends ActionBarActivity
 	 * values retrieved when configuration changes.
 	 */
 	private static int mScreenRotation = Surface.ROTATION_0;
-
-	/**
-	 * ActionBar helper.
-	 */
-	final ActionBarHelper mActionBarHelper = ActionBarHelper.createInstance(this);
 
 	/**
 	 * Sets screen and window properties.
@@ -195,16 +190,9 @@ public class MoSync extends ActionBarActivity
 		else
 		{
 			requestWindowFeature(Window.FEATURE_ACTION_BAR);
-			mActionBarHelper.onCreate(savedInstanceState);
 			NativeUI.mActionBarEnabled = true;
+			getActionBar().hide();
 		}
-
-//		requestWindowFeature();
-		// Not used anymore, since action bar will not be supported on pre-Honeycomb devices
-//		mActionBarHelper.onCreate(savedInstanceState);
-		//getActionBar().setDisplayShowTitleEnabled(false);
-		//getActionBar().setDisplayHomeAsUpEnabled(true);
-		//mActionBarHelper.setDisplayShowTitleEnabled(false);
 
 		// Create the view.
 		mMoSyncView = createMoSyncView();
@@ -223,14 +211,22 @@ public class MoSync extends ActionBarActivity
 		registerShutdownListener();
     }
 
-    public int setActionBarState(int state)
+    public int setActionBarState(Boolean state)
     {
         if (checkActionBarCompatibility())
         {
-//    		if ( state == 1)
-//    			/
-
+			if ( state )
+			{
+				getActionBar().show();
+			}
+			else
+			{
+				getActionBar().hide();
+			}
+			return IX_WIDGET.MAW_RES_OK;
         }
+
+        Log.e("@@MoSync", "maActionBarSetEnabled error: selected feature cannot be applied.");
         return IX_WIDGET.MAW_RES_ACTION_BAR_NOT_AVAILABLE;
     }
 
@@ -244,12 +240,18 @@ public class MoSync extends ActionBarActivity
 		return true;
 	}
 
-	public void setActionBarVisibility(int visibility)
+	public int setActionBarVisibility(Boolean visibility)
 	{
-		if (visibility == 1)
-			getActionBar().show();
-		else
-			getActionBar().hide();
+        if (checkActionBarCompatibility())
+        {
+			if (visibility)
+				getActionBar().show();
+			else
+				getActionBar().hide();
+        }
+
+        Log.e("@@MoSync", "maActionBarSetEnabled error: selected feature cannot be applied.");
+        return IX_WIDGET.MAW_RES_ACTION_BAR_NOT_AVAILABLE;
 	}
 
     public MoSyncThread getMoSyncThread()

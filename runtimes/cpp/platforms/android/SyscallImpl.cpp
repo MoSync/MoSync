@@ -1950,7 +1950,8 @@ namespace Base
 		case maIOCtl_maActionBarSetTitle:
 		{
 			SYSLOG("maIOCtl_maActionBarSetTitle");
-			return _maActionBarSetTitle(SYSCALL_THIS->GetValidatedStr(a), mJNIEnv, mJThis);
+			const char *_title = SYSCALL_THIS->GetValidatedStr(a);
+			return _maActionBarSetTitle(_title, mJNIEnv, mJThis);
 		}
 
 		case maIOCtl_maActionBarSetIcon:

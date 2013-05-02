@@ -34,10 +34,10 @@ group ActionBarFunctions "Action Bar functions" {
 	* - #MAW_RES_ACTION_BAR_INVALID_ICON
 	* - #MAW_RES_ACTION_BAR_INVALID_FLAG
 	* - #MAW_RES_INVALID_HANDLE If the screenHandle points to an invalid screen.
-	* - #MAW_RES_ACTION_BAR_DISABLED If the action bar was explicitely disabled.
+	* - #MAW_RES_ACTION_BAR_DISABLED If the action bar was explicitly disabled.
 	* - #MAW_RES_ACTION_BAR_NOT_AVAILABLE If the action bar is not available on the current platform.
 	*/
-	int maActionBarAddMenuItem(in MAHandle screenHandle, in MAString title, in MA_ACTION_BAR_ITEM_ICON  item, in int displayFlag);
+	int maActionBarAddMenuItem(in MAHandle screenHandle, in MAString title, in MA_ACTION_BAR_ITEM_ICON item, in int displayFlag);
 
 	/**
 	* Remove a menu item from the Action bar.
@@ -46,7 +46,7 @@ group ActionBarFunctions "Action Bar functions" {
 	*
 	* \returns #MAW_RES_OK on success, or any of the following result codes:
 	* - #MAW_RES_ACTION_BAR_NOT_AVAILABLE If the action bar is not available on the current platform,
-	* - #MAW_RES_ACTION_BAR_DISABLED If the action bar was explicitely disabled, or
+	* - #MAW_RES_ACTION_BAR_DISABLED If the action bar was explicitly disabled, or
 	* - #MAW_RES_INVALID_HANDLE If the indicated screen has no item on specified handle.
 	*/
 	int maActionBarRemoveMenuItem(in MAHandle screenHandle, in int itemHandle);
@@ -57,7 +57,7 @@ group ActionBarFunctions "Action Bar functions" {
 	*
 	* \returns #MAW_RES_OK on success, or any of the following result codes:
 	* - #MAW_RES_ACTION_BAR_NOT_AVAILABLE If the action bar is not available on the current platform.
-	* - #MAW_RES_ACTION_BAR_DISABLED If the action bar was explicitely disabled.
+	* - #MAW_RES_ACTION_BAR_DISABLED If the action bar was explicitly disabled.
 	*/
 	int maActionBarRefresh();
 
@@ -70,7 +70,7 @@ group ActionBarFunctions "Action Bar functions" {
 	*
 	* \returns #MAW_RES_OK on success, or any of the following result codes:
 	* - #MAW_RES_ACTION_BAR_NOT_AVAILABLE If the action bar is not available on the current platform.
-	* - #MAW_RES_ACTION_BAR_DISABLED If the action bar was explicitely disabled.
+	* - #MAW_RES_ACTION_BAR_DISABLED If the action bar was explicitly disabled.
 	*/
 	int maActionBarSetVisibility(in int showState);
 
@@ -79,16 +79,16 @@ group ActionBarFunctions "Action Bar functions" {
 	*
 	* \returns #MAW_RES_OK on success, or any of the following result codes:
 	* - #MAW_RES_ACTION_BAR_NOT_AVAILABLE If the action bar is not available on the current platform.
-	* - #MAW_RES_ACTION_BAR_DISABLED If the action bar was explicitely disabled.
+	* - #MAW_RES_ACTION_BAR_DISABLED If the action bar was explicitly disabled.
 	*/
 	int maActionBarGetHeight();
 
 	/**
 	* Check if the ActionBar is currently displayed.
 	*
-	* \returns #MAW_RES_OK on success, or any of the following result codes:
+	* \returns 1 if the Action bar is visible, 0 if it was hidden, or any of the following result codes:
 	* - #MAW_RES_ACTION_BAR_NOT_AVAILABLE If the action bar is not available on the current platform.
-	* - #MAW_RES_ACTION_BAR_DISABLED If the action bar was explicitely disabled.
+	* - #MAW_RES_ACTION_BAR_DISABLED If the action bar was explicitly disabled.
 	*/
 	int maActionBarIsShowing();
 
@@ -100,7 +100,7 @@ group ActionBarFunctions "Action Bar functions" {
 	*
 	* \returns #MAW_RES_OK on success, or any of the following result codes:
 	* - #MAW_RES_ACTION_BAR_NOT_AVAILABLE If the action bar is not available on the current platform.
-	* - #MAW_RES_ACTION_BAR_DISABLED If the action bar was explicitely disabled.
+	* - #MAW_RES_ACTION_BAR_DISABLED If the action bar was explicitly disabled.
 	*/
 	int maActionBarSetTitle(in MAString title);
 
@@ -109,8 +109,9 @@ group ActionBarFunctions "Action Bar functions" {
 	* @param iconHandle Drawable to show as the ActionBar icon.
 	*
 	* \returns #MAW_RES_OK on success, or any of the following result codes:
+	* - #MAW_RES_ACTION_BAR_INVALID_ICON If the iconHandle is invalid.
 	* - #MAW_RES_ACTION_BAR_NOT_AVAILABLE If the action bar is not available on the current platform.
-	* - #MAW_RES_ACTION_BAR_DISABLED If the action bar was explicitely disabled.
+	* - #MAW_RES_ACTION_BAR_DISABLED If the action bar was explicitly disabled.
 	*/
 	int maActionBarSetIcon(in MAHandle iconHandle);
 
@@ -120,7 +121,7 @@ group ActionBarFunctions "Action Bar functions" {
 	*
 	* \returns #MAW_RES_OK on success, or any of the following result codes:
 	* - #MAW_RES_ACTION_BAR_NOT_AVAILABLE If the action bar is not available on the current platform.
-	* - #MAW_RES_ACTION_BAR_DISABLED If the action bar was explicitely disabled.
+	* - #MAW_RES_ACTION_BAR_DISABLED If the action bar was explicitly disabled.
 	*/
 	int maActionBarShowTitleEnabled(in int enableTitle);
 
@@ -131,7 +132,7 @@ group ActionBarFunctions "Action Bar functions" {
 	*
 	* \returns #MAW_RES_OK on success, or any of the following result codes:
 	* - #MAW_RES_ACTION_BAR_NOT_AVAILABLE If the action bar is not available on the current platform.
-	* - #MAW_RES_ACTION_BAR_DISABLED If the action bar was explicitely disabled.
+	* - #MAW_RES_ACTION_BAR_DISABLED If the action bar was explicitly disabled.
 	*/
 	int maActionBarShowLogoEnabled(in int enableLogo);
 
@@ -146,43 +147,40 @@ group ActionBarFunctions "Action Bar functions" {
 	*
 	* \returns #MAW_RES_OK on success, or any of the following result codes:
 	* - #MAW_RES_ACTION_BAR_NOT_AVAILABLE If the action bar is not available on the current platform.
-	* - #MAW_RES_ACTION_BAR_DISABLED If the action bar was explicitely disabled.
+	* - #MAW_RES_ACTION_BAR_DISABLED If the action bar was explicitly disabled.
 	*/
 	int maActionBarSetHomeButtonEnabled(in int state);
 
 	/**
 	* Enable or disable the icon for up navigation (which displays the "up" indicator next to the
 	* ActionBar icon.
-	* @param True to enable up navigation, false otherwise. False is the default value.
+	* @param True to show the user that selecting home will return one level up rather than to the top level of the app.
 	*
 	* \returns #MAW_RES_OK on success, or any of the following result codes:
 	* - #MAW_RES_ACTION_BAR_NOT_AVAILABLE If the action bar is not available on the current platform.
-	* - #MAW_RES_ACTION_BAR_DISABLED If the action bar was explicitely disabled.
+	* - #MAW_RES_ACTION_BAR_DISABLED If the action bar was explicitly disabled.
 	*/
-	int maActionBarSetDisplayHomeAsUpEnabled(in int enableUp);
+	int maActionBarSetDisplayHomeAsUpEnabled(in int showHomeAsUp);
 
-	//int maActionBarEnableSplit(in int enableSplit);
 	/**
 	* Set the ActionBar's background. This will be used for the primary action bar.
 	* @param imageHandle The drawable to use for the ActionBar's background.
 	*
 	* \returns #MAW_RES_OK on success, or any of the following result codes:
 	* - #MAW_RES_ACTION_BAR_NOT_AVAILABLE If the action bar is not available on the current platform.
-	* - #MAW_RES_ACTION_BAR_DISABLED If the action bar was explicitely disabled.
+	* - #MAW_RES_ACTION_BAR_DISABLED If the action bar was explicitly disabled.
 	*/
 	int maActionBarSetBackgroundImage(in MAHandle imageHandle);
 
 	/**
 	* \brief Arguments for Action Bar Menu Items.
-	* All arguments are optional.
+	* The icon arguments are optional.
 	* The icon associated with the menu item can be created from the
 	* predefined list or from an internal image handle.
 	* If both iconPredefinedId and iconHandle are ignored, the menu item
 	* will not have an icon.
 	*/
 	struct MA_ACTION_BAR_ITEM_ICON {
-		// The title of the menu item.
-		//MAString title;
 		// The icon for this item as a Drawable, getting it from predefined system resources.
 		// One of the #OptionsMenuIconConstants.
 		int iconPredefinedId;

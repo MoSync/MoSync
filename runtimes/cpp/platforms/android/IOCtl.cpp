@@ -1240,7 +1240,7 @@ namespace Base
 	int _maActionBarIsShowing(JNIEnv* jNIEnv, jobject jThis)
 	{
 		jclass cls = jNIEnv->GetObjectClass(jThis);
-		jmethodID methodID = jNIEnv->GetMethodID(cls, "maActionIsShowing","()I");
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maActionBarIsShowing","()I");
 
 		jint result = -1;
 
@@ -1258,7 +1258,7 @@ namespace Base
 		jstring jstrTitle = jNIEnv->NewStringUTF(title);
 
 		jclass cls = jNIEnv->GetObjectClass(jThis);
-		jmethodID methodID = jNIEnv->GetMethodID(cls, "maActionBarSetTitle", "(Ljava/lang/String)I");
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maActionBarSetTitle", "(Ljava/lang/String;)I");
 
 		jint result = -1;
 

@@ -24,8 +24,6 @@ import java.util.List;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.ViewGroup;
 
 import com.mosync.internal.android.MoSyncThread;
@@ -163,17 +161,6 @@ public class ScreenWidget extends Layout
 	public List<OptionsMenuItem> getMenuItems()
 	{
 		return m_optionsItems;
-	}
-
-	public Menu getMenu()
-	{
-		Menu menu = null;
-		for (int i=0; i < m_optionsItems.size(); i++)
-		{
-			MenuItem item = menu.add(0, i, 0, m_optionsItems.get(i).getTitle());
-			item.setShowAsAction(m_optionsItems.get(i).getShowActionFlag());
-		}
-		return menu;
 	}
 
 	@Override

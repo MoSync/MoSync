@@ -1,7 +1,7 @@
 group ActionBarErrorCodes "Action Bar Error Codes" {
 	constset int MAW_RES_ACTION_BAR_{
 		/**
-		* Indicates that the #maActionBarAddMenuItem() call failed because the iconPredefinedId pointed to an invalid icon.
+		* Indicates that the #maActionBarAddMenuItem() or #maActionBarSetIcon() calls failed because they pointed to an invalid icon,
 		*/
 		INVALID_ICON = -1;
 		/**
@@ -9,11 +9,11 @@ group ActionBarErrorCodes "Action Bar Error Codes" {
 		*/
 		INVALID_FLAG = -2;
 		/**
-		*
+		* Indicates that an action bar related syscall failed because the platform does not support it.
 		*/
 		NOT_AVAILABLE = -3;
 		/**
-		*
+		* Indicates that an action bar related syscall failed because it is not enabled.
 		*/
 		DISABLED = -4;
 	}
@@ -26,7 +26,6 @@ group ActionBarItemDisplayFlag "Action Bar Item Display Flag" {
 	constset int MAW_ACTION_BAR_ITEM_SHOW_ {
 		/**
 		* Show this item as a button in an Action Bar if the system decides there is room for it.
-		* SHOW_AS_ACTION_IF_ROOM
 		*/
 		IF_ROOM = 1;
 		/**
@@ -44,6 +43,6 @@ group ActionBarItemDisplayFlag "Action Bar Item Display Flag" {
 		* This item's action view collapses to a normal menu item.
 		* When expanded, the action view temporarily takes over a larger segment of its container.
 		*/
-		COLLAPSE_ACTION_VIEW =8;
+		COLLAPSE_ACTION_VIEW = 8;
 	}
 } // end of group ActionBarItemDisplayFlag

@@ -306,7 +306,6 @@ namespace Base
 	int _maActionBarIsShowing(JNIEnv* jNIEnv, jobject jThis);
 	int _maActionBarSetTitle(const char* title, JNIEnv* jNIEnv, jobject jThis);
 	int _maActionBarSetIcon(int iconHandle, JNIEnv* jNIEnv, jobject jThis);
-	//int _maActionBarEnableSplit(bool enableSplit);
 	int _maActionBarSetDisplayHomeAsUpEnabled(int enableUp, JNIEnv* jNIEnv, jobject jThis);
 	int _maActionBarShowTitleEnabled(int enable, JNIEnv* jNIEnv, jobject jThis);
 	int _maActionBarShowLogoEnabled(int enable, JNIEnv* jNIEnv, jobject jThis);
