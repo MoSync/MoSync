@@ -51,6 +51,14 @@
 - (void)onTitleBarButtonClicked:(id)selector;
 
 /**
+ * Adds an widget to the end of the children list.
+ * A NavigationBarButtonWidget can have only one child.
+ * @param child Widget to be added.
+ * @return MAW_RES_OK for success, MAW_RES_ERROR if the screen already has an child.
+ */
+- (int)addChild:(IWidget*)child;
+
+/**
  * Set a widget property value.
  * @param key Widget's property name that should be set.
  * @param value Widget's proeprty value that should be set.

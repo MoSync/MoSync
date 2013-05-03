@@ -51,12 +51,16 @@
         NSNumber* buttonTypeNumber = (NSNumber*)param;
         UIBarButtonSystemItem buttonType = (UIBarButtonSystemItem)[buttonTypeNumber intValue];
 
-        if (buttonType != 0xFFFFFFFF) // NAV_BAR_BUTTON_TYPE_NONE
+        if (buttonType < 0xFFFFFF00) // System button
         {
             barButtonItem = [[UIBarButtonItem alloc]
                               initWithBarButtonSystemItem:(UIBarButtonSystemItem)buttonType
                               target:self
                               action:@selector(onTitleBarButtonClicked:)];
+        }
+        else if (buttonType == 0xFFFFFFFE)  // Widget button
+        {
+            barButtonItem = nil;
         }
         else
         {
@@ -84,6 +88,22 @@
     [super sendEvent:MAW_EVENT_CLICKED];
 }
 
+- (int)addChild:(IWidget*)child
+{
+    if ([_children count] > 0)
+    {
+        return MAW_RES_ERROR;
+    }
+
+    child.isMainWidget = TRUE;
+
+    [super addChild:child toSubview:NO];
+
+    barButtonItem = [[UIBarButtonItem alloc] initWithCustomView:child.view];
+
+    return MAW_RES_OK;
+}
+
 - (int)setPropertyWithKey: (NSString*)key toValue:(NSString*)value
 {
     if([key isEqualToString:@MAW_BUTTON_TEXT])
@@ -107,7 +127,10 @@
 {
 	if ([key isEqualToString:@MAW_BUTTON_TEXT])
 	{
-		return [barButtonItem title];
+		if (barButtonItem != nil)
+			return [barButtonItem title];
+
+		return @"";
 	}
 	else
 	{
