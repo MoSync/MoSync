@@ -48,10 +48,10 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "helpers/CPP_IX_CELLID.h"
 
 #ifdef MOSYNC_NATIVE
-#define ARG_NO_4 d
-#define ARG_NO_5 e
-#define ARG_NO_6 f
-#define MA_IOCTL_ELLIPSIS , int d = 0, int e = 0, int f = 0
+#define ARG_NO_4 __d
+#define ARG_NO_5 __e
+#define ARG_NO_6 __f
+#define MA_IOCTL_ELLIPSIS , int __d = 0, int __e = 0, int __f = 0
 #else
 #define ARG_NO_4 SYSCALL_THIS->GetValidatedStackValue(0)
 #define ARG_NO_5 SYSCALL_THIS->GetValidatedStackValue(4)
