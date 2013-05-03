@@ -36,6 +36,7 @@
 #import "ListViewSectionWidget.h"
 #import "ListViewItemWidget.h"
 #import "NSStringExpanded.h"
+#import "UIColorExpanded.h"
 
 /**
  * Private methods for ListViewWidget.
@@ -114,6 +115,15 @@
  * @return "true" if the user can select an item, "false" otherwise.
  */
 -(NSString*) getAllowSelectionProperty;
+
+/**
+ * Replaces the list view background with
+ * a single color background.
+ * @param colorValue A color in hex
+ * - MAW_RES_OK if the bool value was set.
+ * - MAW_RES_INVALID_PROPERTY_VALUE if the colorValue could not be parsed as a valid color.
+ */
+-(int)setBackgroundColor:(NSString*) colorValue;
 
 @end
 
@@ -269,6 +279,10 @@
     {
         returnValue = [self setAllowSelectionProperty:value];
     }
+    else if ([key isEqualToString:@MAW_WIDGET_BACKGROUND_COLOR])
+    {
+        returnValue = [self setBackgroundColor:value];
+   }
     else
     {
         returnValue = [super setPropertyWithKey:key toValue:value];
@@ -889,6 +903,16 @@ forRowAtIndexPath:(NSIndexPath *)indexPath
 -(NSString*) getAllowSelectionProperty
 {
     return self.tableView.allowsSelection ? kWidgetTrueValue : kWidgetFalseValue;
+}
+
+-(int)setBackgroundColor:(NSString*) colorValue
+{
+    UIColor* color = [UIColor colorWithHexString:colorValue];
+    if(!color) return MAW_RES_INVALID_PROPERTY_VALUE;
+
+    UIView* bgView = [[UIView alloc] init];
+    bgView.backgroundColor = color;
+    [self.tableView setBackgroundView:bgView];
 }
 
 @end
