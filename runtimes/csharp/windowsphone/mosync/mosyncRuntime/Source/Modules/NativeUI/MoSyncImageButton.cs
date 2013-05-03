@@ -210,7 +210,11 @@ namespace MoSync
 
                 mBackgroundImage.Stretch = mStretchBackground;
 
-                mView = mGrid;
+                // We need to make this view a ContentControl in order to have System.Windows.Controls::Control properties enabled.
+                ContentControl contentControl = new System.Windows.Controls.ContentControl();
+                contentControl.Content = mGrid;
+
+                mView = contentControl;
 
                 // the MouseEnter handle for the ImageButton. Used for switching background image.
                 mGrid.MouseEnter += new System.Windows.Input.MouseEventHandler(delegate(Object from, System.Windows.Input.MouseEventArgs evt)
@@ -484,7 +488,7 @@ namespace MoSync
                             mForegroundImagePath = value;
                             mForegroundImageHandle = 0;
                         }
-                        catch (Exception e)
+                        catch (Exception)
                         {
                             // There was a problem reading the image file.
                             throw new InvalidPropertyValueException();
@@ -525,7 +529,7 @@ namespace MoSync
                             mBackgroundImagePath = value;
                             mBackgroundImageHandle = 0;
                         }
-                        catch (Exception e)
+                        catch (Exception)
                         {
                             // There was a problem reading the image file.
                             throw new InvalidPropertyValueException();
@@ -566,7 +570,7 @@ namespace MoSync
                             mPressedImagePath = value;
                             mPressedImageHandle = 0;
                         }
-                        catch (Exception e)
+                        catch (Exception)
                         {
                             // There was a problem reading the image file.
                             throw new InvalidPropertyValueException();

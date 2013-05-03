@@ -152,7 +152,7 @@ namespace MoSync
                             mImagePath = value;
                             mImageHandle = 0;
                         }
-                        catch (Exception e)
+                        catch (Exception)
                         {
                             // There was a problem reading the image file.
                             throw new InvalidPropertyValueException();

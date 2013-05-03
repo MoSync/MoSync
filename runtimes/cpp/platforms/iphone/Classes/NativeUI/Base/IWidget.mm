@@ -270,7 +270,7 @@
 
 /**
  * Remove a child from the widget.
- * The child's view will be removed its superview.
+ * The child's view will be removed from its superview.
  * @param child Widget to remove.
  */
 - (void)removeChild: (IWidget*)child
