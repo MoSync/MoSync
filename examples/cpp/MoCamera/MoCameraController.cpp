@@ -25,10 +25,19 @@
  */
 
 #include <NativeUI/Screen.h>
-#include <MAUtil/Environment.h>
 
 #include "MoCameraController.h"
 #include "Screens/ScreenUtils.h"
+
+#define SNAPSHOT_TITLE "Capture snapshot"
+#define SNAPSHOT_FAILED_STR "Please try again"
+
+#define SAVE_IMAGE_TITLE "Save to gallery"
+#define SAVE_IMAGE_FAILED_STR "Please try again"
+#define SAVE_IMAGE_SUCCEEDED_STR "Completed"
+#define IMAGE_NAME "MoSyncCameraPic"
+
+#define ALERT_OK_STR "OK"
 
 namespace MoSyncCamera
 {
@@ -45,6 +54,8 @@ namespace MoSyncCamera
 		mImageViewerScreen = new ImageViewerScreen(*this);
 
 		mCameraScreen->registerCameraListener(this);
+		MAUtil::Environment::getEnvironment().addMediaExportListener(this);
+
 		setScreenTransitions();
 	}
 
@@ -62,6 +73,7 @@ namespace MoSyncCamera
 		}
 
 		mCameraScreen->unregisterCameraListener(this);
+		MAUtil::Environment::getEnvironment().removeMediaExportListener(this);
 
 		delete mCameraScreen;
 		delete mImageViewerScreen;
@@ -102,21 +114,6 @@ namespace MoSyncCamera
 	}
 
 
-	void MoCameraController::snapshotRequested()
-	{
-		mCameraScreen->showSnapshotInProgress();
-
-		if ( mLastSnapshotDataHandle > 0 )
-		{
-			maDestroyPlaceholder(mLastSnapshotDataHandle);
-			mLastSnapshotDataHandle = 0;
-		}
-		mLastSnapshotDataHandle = maCreatePlaceholder();
-
-		mCameraScreen->takeSnapshot(mLastSnapshotDataHandle);
-	}
-
-
 	void MoCameraController::imageViewingDone()
 	{
 		if ( !isDisplayed(*mCameraScreen) )
@@ -134,9 +131,18 @@ namespace MoSyncCamera
 	}
 
 
-	void MoCameraController::exportImageToGalleryRequested()
+	void MoCameraController::snapshotRequested()
 	{
-		maAlert("Save image", "Image saving is not yet available", "OK", NULL, NULL);
+		mCameraScreen->showSnapshotInProgress();
+
+		if ( mLastSnapshotDataHandle > 0 )
+		{
+			maDestroyPlaceholder(mLastSnapshotDataHandle);
+			mLastSnapshotDataHandle = 0;
+		}
+		mLastSnapshotDataHandle = maCreatePlaceholder();
+
+		mCameraScreen->takeSnapshot(mLastSnapshotDataHandle);
 	}
 
 
@@ -145,7 +151,7 @@ namespace MoSyncCamera
 		bool snapshotIsAvailable = true;
 		if ( imageData.resultCode != MA_CAMERA_RES_OK )
 		{
-			maAlert("Camera", "Snapshot failed", "OK", NULL, NULL);
+			maAlert(SNAPSHOT_TITLE, SNAPSHOT_FAILED_STR, ALERT_OK_STR, NULL, NULL);
 			snapshotIsAvailable = false;
 
 			if ( mLastSnapshotDataHandle > 0 )
@@ -155,6 +161,38 @@ namespace MoSyncCamera
 			}
 		}
 		mCameraScreen->hideSnapshotInProgress(snapshotIsAvailable);
+	}
+
+
+	void MoCameraController::exportImageToGalleryRequested()
+	{
+		if ( mDisplayedImageHandle > 0 )
+		{
+			mImageViewerScreen->toggleImageSavingInProgress(true);
+			int returnCode = maSaveImageToDeviceGallery(mDisplayedImageHandle, IMAGE_NAME);
+			if ( returnCode != MA_MEDIA_RES_OK )
+			{
+				mImageViewerScreen->toggleImageSavingInProgress(false);
+				maAlert(SAVE_IMAGE_TITLE, SAVE_IMAGE_FAILED_STR, ALERT_OK_STR, NULL, NULL);
+			}
+		}
+	}
+
+
+	void MoCameraController::imageExportToGalleryFinished(
+			const MAHandle& imageHandle,
+			int resultCode)
+	{
+		MAUtil::String message = SAVE_IMAGE_SUCCEEDED_STR;
+
+		if ( mDisplayedImageHandle != imageHandle &&
+				resultCode != MA_MEDIA_RES_OK )
+		{
+			message = SAVE_IMAGE_FAILED_STR;
+		}
+
+		mImageViewerScreen->toggleImageSavingInProgress(false);
+		maAlert(SAVE_IMAGE_TITLE, message.c_str(), ALERT_OK_STR, NULL, NULL);
 	}
 
 
