@@ -45,7 +45,6 @@ struct SETTINGS {
 	bool debug;
 	bool silent;
 	bool showPasswords;
-	bool native;
 
 	// API specific settings
 	const char* nfc;

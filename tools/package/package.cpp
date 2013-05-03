@@ -49,6 +49,8 @@ static const char* sUsage =
 "             <family>/<variant>\n"
 " -d, --dst <path>             Output: target directory.\n"
 " -n, --name <name>            Output: application name.\n"
+" -z, --project <path>         Input: the project path\n"
+"                              (not all platforms require it)."
 "     --vendor <name>          Output: application vendor's name.\n"
 "     --version <version>      Output: application version.\n"
 "                              Format: major[.minor][.micro][.qualifier]\n"
@@ -56,6 +58,8 @@ static const char* sUsage =
 "     --permissions <perms>    Output: Permissions requested from the platform.\n"
 "                              Comma-separated list containing any combination\n"
 "                              of these strings: <todo>\n"
+"     --output-type            Input: the type of output; can be\n"
+"                              'interpreted', 'rebuilt' or 'native'"
 "     --debug                  Output: use debug runtime.\n"
 "     --s60v3uid <8-digit hex> Output: Symbian UID, 3rd edition.\n"
 "     --s60v2uid <8-digit hex> Output: Symbian UID, 2nd edition.\n"
@@ -144,7 +148,7 @@ int main(int argc, const char** argv) {
 			setString(i, argc, argv, s.icon);
 		} else if(streq(argv[i], "-m") || streq(argv[i], "--model")) {
 			setString(i, argc, argv, s.model);
-		} else if(streq(argv[i], "--mpp") || streq(argv[i], "--mosyncProjectPath")) {
+		} else if(streq(argv[i], "-z") || streq(argv[i], "--project")) {
 			setString(i, argc, argv, s.mosyncProjectPath);
 		} else if(streq(argv[i], "-d") || streq(argv[i], "--dst")) {
 			setString(i, argc, argv, s.dst);
@@ -172,8 +176,6 @@ int main(int argc, const char** argv) {
 			setString(i, argc, argv, s.s60pass);
 		} else if(streq(argv[i], "--debug")) {
 			s.debug = true;
-		} else if(streq(argv[i], "--native")) {
-			s.native = true;
 		} else if(streq(argv[i], "--nfc")) { // NFC specific
 			setString(i, argc, argv, s.nfc);
 		} else if(streq(argv[i], "--ios-cert")) { // iOS specific

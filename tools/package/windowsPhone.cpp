@@ -58,7 +58,9 @@ void packageWindowsPhone(const SETTINGS& s, const RuntimeInfo& ri) {
 	string csprojOutput;
 	string outputType;
 
-	if(s.native)
+	bool isNative = !strcmp("native", s.outputType);
+
+	if(isNative)
 	{
 		dst = s.dst;
 		templateLocation = string(ri.path) + "/template_WP8";
@@ -87,7 +89,7 @@ void packageWindowsPhone(const SETTINGS& s, const RuntimeInfo& ri) {
 		outputType = s.outputType ? string(s.outputType) : string("interpreted");
 	}
 
-	if(s.csOutputDir && !s.native)
+	if(s.csOutputDir && isNative)
 	{
 		outputType = "rebuilt";
 	}
@@ -105,7 +107,7 @@ void packageWindowsPhone(const SETTINGS& s, const RuntimeInfo& ri) {
 		" -input-file " << file(templateFileLocation) <<
 		" -output-file " << file(csprojOutputFile);
 
-	if(s.native)
+	if(isNative)
 	{
 		generateCmd << " -mosync-project-path " << file(s.mosyncProjectPath) <<
 					   " -output-file-library-project " << file(outputLibFile) <<
@@ -135,7 +137,7 @@ void packageWindowsPhone(const SETTINGS& s, const RuntimeInfo& ri) {
 	}
 
 	string resourceFileCopy;
-	if(s.native)
+	if(isNative)
 	{
 		resourceFileCopy = csprojOutput + "/mosync_WP8/resources";
 	}
@@ -152,7 +154,7 @@ void packageWindowsPhone(const SETTINGS& s, const RuntimeInfo& ri) {
 	}
 
 	string maHeaderFileCopy = csprojOutput + "/MoSyncLibrary/MAHeaders.h";
-	if(s.native) //copy MAHeader.h
+	if(isNative) //copy MAHeader.h
 	{
 		int pos = dst.find("package");
 		string maHeaderSource = dst.substr(0, pos) + "MAHeaders.h";
