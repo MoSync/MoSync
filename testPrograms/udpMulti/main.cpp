@@ -91,6 +91,8 @@ public:
 
 		int res = mConn.connect("datagram://" FORCED_PORT);
 		printf("connect: %i\n", res);
+		if(res < 0)
+			return;
 
 		MAConnAddr a;
 		res = mConn.getAddr(&a);
