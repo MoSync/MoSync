@@ -39,6 +39,12 @@ namespace NativeUI
     {
     }
 
+    NavigationBarButton::NavigationBarButton(Widget* widget) :
+        Widget(MAW_NAV_BAR_BUTTON, NAV_BAR_BUTTON_TYPE_WIDGET)
+    {
+        this->addChild(widget);
+    }
+
     NavigationBarButton::~NavigationBarButton()
     {
         mButtonListeners.clear();

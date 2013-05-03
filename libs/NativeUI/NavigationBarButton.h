@@ -74,7 +74,8 @@ namespace NativeUI
         NAV_BAR_BUTTON_TYPE_UNDO,
         NAV_BAR_BUTTON_TYPE_REDO,
         NAV_BAR_BUTTON_TYPE_PAGE_CURL,
-        NAV_BAR_BUTTON_TYPE_NONE = 0xFFFFFFFF,
+        NAV_BAR_BUTTON_TYPE_WIDGET  = 0xFFFFFFFE,
+        NAV_BAR_BUTTON_TYPE_NONE    = 0xFFFFFFFF
     };
 
     /**
@@ -86,7 +87,19 @@ namespace NativeUI
     class NavigationBarButton : public Widget
     {
     public:
+        /**
+         * Initializes the navigation bar button with a system icon
+         * or with regular text if NAV_BAR_BUTTON_TYPE_NONE is used
+         * @param buttonType Type or system button to use, or NAV_BAR_BUTTON_TYPE_NONE if it's text only
+         */
         NavigationBarButton(NavigationBarButtonType buttonType);
+
+        /**
+         * Initializes the navigation bar button with an existing widget
+         * @param widget Widget to show as the navigation bar button
+         */
+        NavigationBarButton(Widget* widget);
+
         virtual ~NavigationBarButton();
 
         /**
