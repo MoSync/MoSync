@@ -1,6 +1,6 @@
 /*
  * This file is auto-generated.  DO NOT MODIFY.
- * Original file: D:\\MoSyncSources\\MoSync\\runtimes\\java\\platforms\\androidJNI\\AndroidProject\\src\\com\\android\\vending\\billing\\IInAppBillingService.aidl
+ * Original file: /Users/mattias/development/mosync/MoSync/runtimes/java/platforms/androidJNI/AndroidProject/src/com/android/vending/billing/IInAppBillingService.aidl
  */
 package com.android.vending.billing;
 /**
@@ -47,13 +47,13 @@ public static com.android.vending.billing.IInAppBillingService asInterface(andro
 if ((obj==null)) {
 return null;
 }
-android.os.IInterface iin = (android.os.IInterface)obj.queryLocalInterface(DESCRIPTOR);
+android.os.IInterface iin = obj.queryLocalInterface(DESCRIPTOR);
 if (((iin!=null)&&(iin instanceof com.android.vending.billing.IInAppBillingService))) {
 return ((com.android.vending.billing.IInAppBillingService)iin);
 }
 return new com.android.vending.billing.IInAppBillingService.Stub.Proxy(obj);
 }
-public android.os.IBinder asBinder()
+@Override public android.os.IBinder asBinder()
 {
 return this;
 }
@@ -177,7 +177,7 @@ Proxy(android.os.IBinder remote)
 {
 mRemote = remote;
 }
-public android.os.IBinder asBinder()
+@Override public android.os.IBinder asBinder()
 {
 return mRemote;
 }
@@ -194,7 +194,7 @@ return DESCRIPTOR;
      *        and "subs" for subscription.
      * @return RESULT_OK(0) on success, corresponding result code on failures
      */
-public int isBillingSupported(int apiVersion, java.lang.String packageName, java.lang.String type) throws android.os.RemoteException
+@Override public int isBillingSupported(int apiVersion, java.lang.String packageName, java.lang.String type) throws android.os.RemoteException
 {
 android.os.Parcel _data = android.os.Parcel.obtain();
 android.os.Parcel _reply = android.os.Parcel.obtain();
@@ -230,7 +230,7 @@ return _result;
      *              '{ "productId" : "exampleSku", "type" : "inapp", "price" : "$5.00",
      *                 "title : "Example Title", "description" : "This is an example description" }'
      */
-public android.os.Bundle getSkuDetails(int apiVersion, java.lang.String packageName, java.lang.String type, android.os.Bundle skusBundle) throws android.os.RemoteException
+@Override public android.os.Bundle getSkuDetails(int apiVersion, java.lang.String packageName, java.lang.String type, android.os.Bundle skusBundle) throws android.os.RemoteException
 {
 android.os.Parcel _data = android.os.Parcel.obtain();
 android.os.Parcel _reply = android.os.Parcel.obtain();
@@ -292,7 +292,7 @@ return _result;
      *                                  was signed with the private key of the developer
      *                                  TODO: change this to app-specific keys.
      */
-public android.os.Bundle getBuyIntent(int apiVersion, java.lang.String packageName, java.lang.String sku, java.lang.String type, java.lang.String developerPayload) throws android.os.RemoteException
+@Override public android.os.Bundle getBuyIntent(int apiVersion, java.lang.String packageName, java.lang.String sku, java.lang.String type, java.lang.String developerPayload) throws android.os.RemoteException
 {
 android.os.Parcel _data = android.os.Parcel.obtain();
 android.os.Parcel _reply = android.os.Parcel.obtain();
@@ -343,7 +343,7 @@ return _result;
      *                                      next set of in-app purchases. Only set if the
      *                                      user has more owned skus than the current list.
      */
-public android.os.Bundle getPurchases(int apiVersion, java.lang.String packageName, java.lang.String type, java.lang.String continuationToken) throws android.os.RemoteException
+@Override public android.os.Bundle getPurchases(int apiVersion, java.lang.String packageName, java.lang.String type, java.lang.String continuationToken) throws android.os.RemoteException
 {
 android.os.Parcel _data = android.os.Parcel.obtain();
 android.os.Parcel _reply = android.os.Parcel.obtain();
@@ -378,7 +378,7 @@ return _result;
      *        to be consumed
      * @return 0 if consumption succeeded. Appropriate error values for failures.
      */
-public int consumePurchase(int apiVersion, java.lang.String packageName, java.lang.String purchaseToken) throws android.os.RemoteException
+@Override public int consumePurchase(int apiVersion, java.lang.String packageName, java.lang.String purchaseToken) throws android.os.RemoteException
 {
 android.os.Parcel _data = android.os.Parcel.obtain();
 android.os.Parcel _reply = android.os.Parcel.obtain();

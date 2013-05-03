@@ -1,5 +1,0 @@
-\obj\
-\ARM\
-\Bin\
-mosyncRuntime.csproj
-mosyncRuntime.csproj.user

@@ -10,8 +10,6 @@ build-one.rb
 
 /githooks
 
-/runtimes/csharp/windowsphone/mosync/packages/WPtoolkit.4.2012.10.30
-
 /examples/cpp/wolf3d
 /examples/cpp/flashback
 /examples/cpp/MoRaw

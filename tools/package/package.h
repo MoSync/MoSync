@@ -28,7 +28,6 @@ struct SETTINGS {
 	const char* cppOutputDir;
 	const char* csOutputDir;
 	const char* model;
-	const char* mosyncProjectPath;
 	const char* dst;
 	const char* name;
 	const char* vendor;
@@ -36,6 +35,7 @@ struct SETTINGS {
 	const char* permissions;
 	const char* extensions;
 	const char* outputType;
+	const char* mosyncProjectPath;
 	const char* s60v3uid;
 	const char* s60v2uid;
 	const char* s60cert;
