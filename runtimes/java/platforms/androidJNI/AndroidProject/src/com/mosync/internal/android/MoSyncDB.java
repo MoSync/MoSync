@@ -141,7 +141,7 @@ public class MoSyncDB
 		ByteBuffer buffer = mosync.getMemorySlice(
 			paramsAddress,
 			paramCount * sizeofMADBValue
-			);
+			).order(null);
 
 		// Set parameter values.
 		// http://stackoverflow.com/questions/9558657/binding-ints-longs-and-blobs-byte-to-android-sql
