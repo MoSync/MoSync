@@ -16,6 +16,7 @@
  */
 
 #include <string>
+#include <cstring>
 #include <list>
 #include <sstream>
 #include <fstream>
