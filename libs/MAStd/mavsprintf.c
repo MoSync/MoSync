@@ -644,7 +644,7 @@ repeat:
       case 's':
         s = va_arg(args, char *);
         if (!s) s = "<NULL>";
-        len = strnlen(s, precision);
+        len = precision > 0 ? strnlen(s, precision) : strlen(s);
         if (!(flags & LEFT)) while (len < field_width--) *str++ = ' ';
         for (i = 0; i < len; ++i) *str++ = *s++;
         while (len < field_width--) *str++ = ' ';
@@ -653,7 +653,7 @@ repeat:
       case 'S':	//Unicode string
         S = va_arg(args, wchar *);
         if (!S) S = L"<NULL>";
-        len = wcsnlen(S, precision);
+        len = precision > 0 ? wcsnlen(S, precision) : wcslen(S);
         if (!(flags & LEFT)) while (len < field_width--) *str++ = ' ';
         for (i = 0; i < len; ++i) *str++ = (char)*S++;
         while (len < field_width--) *str++ = ' ';
