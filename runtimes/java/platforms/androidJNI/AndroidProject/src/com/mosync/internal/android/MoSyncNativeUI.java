@@ -462,6 +462,241 @@ public class MoSyncNativeUI implements RootViewReplacedListener
 		}
 	}
 
+	public int maActionBarSetEnabled(final Boolean state)
+	{
+		try
+		{
+			final AsyncWait<Integer> waiter = new AsyncWait<Integer>();
+			getActivity().runOnUiThread(new Runnable() {
+				public void run()
+				{
+					int result = mNativeUI.maActionBarSetEnabled(state);
+					waiter.setResult(result);
+				}
+			});
+			return waiter.getResult();
+		}
+		catch(InterruptedException ie)
+		{
+			return -1;
+		}
+	}
+
+	public int maActionBarAddMenuItem(final int handle, final String title,
+			final int iconPredefinedId, final int iconHandle, final int displayFlag)
+	{
+
+		return mNativeUI.maActionBarAddMenuItem(
+				handle, title, iconPredefinedId,
+				iconHandle, displayFlag);
+		//todo see if call on ui thread is needed.
+	}
+
+	public int maActionBarRemoveMenuItem(final int screenHandle, final int itemHandle)
+	{
+		try
+		{
+			final AsyncWait<Integer> waiter = new AsyncWait<Integer>();
+			getActivity().runOnUiThread(new Runnable() {
+				public void run()
+				{
+					int result = mNativeUI.maActionBarRemoveItem(screenHandle, itemHandle);
+					waiter.setResult(result);
+				}
+			});
+			return waiter.getResult();
+		}
+		catch(InterruptedException ie)
+		{
+			return -1;
+		}
+	}
+
+	public int maActionBarSetVisibility(final Boolean visibility)
+	{
+		try
+		{
+			final AsyncWait<Integer> waiter = new AsyncWait<Integer>();
+			getActivity().runOnUiThread(new Runnable() {
+				public void run()
+				{
+					int result = mNativeUI.maActionBarSetVisibility(visibility);
+					waiter.setResult(result);
+				}
+			});
+			return waiter.getResult();
+		}
+		catch(InterruptedException ie)
+		{
+			return -1;
+		}
+	}
+
+	public int maActionBarGetHeight()
+	{
+		return mNativeUI.maActionBarGetHeight();
+	}
+
+	public int maActionBarIsShowing()
+	{
+		try
+		{
+			final AsyncWait<Integer> waiter = new AsyncWait<Integer>();
+			getActivity().runOnUiThread(new Runnable() {
+				public void run()
+				{
+					int result = mNativeUI.maActionBarIsShowing();
+					waiter.setResult(result);
+				}
+			});
+			return waiter.getResult();
+		}
+		catch(InterruptedException ie)
+		{
+			return -1;
+		}
+	}
+
+	public int maActionBarSetTitle(final String title)
+	{
+		try
+		{
+			final AsyncWait<Integer> waiter = new AsyncWait<Integer>();
+			getActivity().runOnUiThread(new Runnable() {
+				public void run()
+				{
+					int result = mNativeUI.maActionBarSetTitle(title);
+					waiter.setResult(result);
+				}
+			});
+			return waiter.getResult();
+		}
+		catch(InterruptedException ie)
+		{
+			return -1;
+		}
+	}
+
+	public int maActionBarSetIcon(final int iconHandle)
+	{
+		try
+		{
+			final AsyncWait<Integer> waiter = new AsyncWait<Integer>();
+			getActivity().runOnUiThread(new Runnable() {
+				public void run()
+				{
+					int result = mNativeUI.maActionBarSetIcon(iconHandle);
+					waiter.setResult(result);
+				}
+			});
+			return waiter.getResult();
+		}
+		catch(InterruptedException ie)
+		{
+			return -1;
+		}
+	}
+
+	public int maActionBarSetDisplayHomeAsUpEnabled(final Boolean enableUp)
+	{
+		try
+		{
+			final AsyncWait<Integer> waiter = new AsyncWait<Integer>();
+			getActivity().runOnUiThread(new Runnable() {
+				public void run()
+				{
+					int result = mNativeUI.maActionBarSetDisplayHomeAsUpEnabled(enableUp);
+					waiter.setResult(result);
+				}
+			});
+			return waiter.getResult();
+		}
+		catch(InterruptedException ie)
+		{
+			return -1;
+		}
+	}
+
+	public int maActionBarShowTitleEnabled(final Boolean enable)
+	{
+		try
+		{
+			final AsyncWait<Integer> waiter = new AsyncWait<Integer>();
+			getActivity().runOnUiThread(new Runnable() {
+				public void run()
+				{
+					int result = mNativeUI.maActionBarShowTitleEnabled(enable);
+					waiter.setResult(result);
+				}
+			});
+			return waiter.getResult();
+		}
+		catch(InterruptedException ie)
+		{
+			return -1;
+		}
+	}
+
+	public int maActionBarSetHomeButtonEnabled(final Boolean state)
+	{
+		try
+		{
+			final AsyncWait<Integer> waiter = new AsyncWait<Integer>();
+			getActivity().runOnUiThread(new Runnable() {
+				public void run()
+				{
+					int result = mNativeUI.maActionBarSetHomeButtonEnabled(state);
+					waiter.setResult(result);
+				}
+			});
+			return waiter.getResult();
+		}
+		catch(InterruptedException ie)
+		{
+			return -1;
+		}
+	}
+
+	public int maActionBarRefresh()
+	{
+		try
+		{
+			final AsyncWait<Integer> waiter = new AsyncWait<Integer>();
+			getActivity().runOnUiThread(new Runnable() {
+				public void run()
+				{
+					int result = mNativeUI.maActionBarRefresh();
+					waiter.setResult(result);
+				}
+			});
+			return waiter.getResult();
+		}
+		catch(InterruptedException ie)
+		{
+			return -1;
+		}
+	}
+
+	public int maActionBarSetBackgroundImage(final int handle)
+	{
+		try
+		{
+			final AsyncWait<Integer> waiter = new AsyncWait<Integer>();
+			getActivity().runOnUiThread(new Runnable() {
+				public void run()
+				{
+					int result = mNativeUI.maActionBarSetBackgroundImage(handle);
+					waiter.setResult(result);
+				}
+			});
+			return waiter.getResult();
+		}
+		catch(InterruptedException ie)
+		{
+			return -1;
+		}
+	}
+
 	public ScreenWidget getCurrentScreen()
 	{
 		return mNativeUI.getCurrentScreen();
