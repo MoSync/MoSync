@@ -293,7 +293,19 @@ namespace MoSync
             {
                 set
                 {
-                   mTitle = value;
+                    mTitle = value;
+                    IWidget parent = GetParent();
+                    // if the parent widget is a TabScreen, we need to update the screen
+                    // title if the property has been set after the current screen has been
+                    // added as a pivot element
+                    if (parent is TabScreen)
+                    {
+                        (parent as TabScreen).UpdateScreenTitle(this);
+                    }
+                }
+                get
+                {
+                    return mTitle;
                 }
             }
 

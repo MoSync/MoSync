@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.Map.Entry;
 
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
@@ -85,6 +86,11 @@ public class TabScreenWidget extends ScreenWidget
 
 		int indexOfNewTab = tab.getTabWidget( ).getChildCount( );
 		TabSpec tabSpec = tab.newTabSpec( Integer.toString( indexOfNewTab ) );
+		/**
+		 * MOSYNC-3108: starting with ICS, the tab icon does not fit next to the label,
+		 * when set using tabSpec indicators.
+		 * To solve it, set the label text inside the TabWidget instead.
+		 */
 		setIndicators( tabSpec, screen.getTitle( ), screen.getIcon( ) );
 
 		// Add the screen to the children list.
@@ -105,6 +111,10 @@ public class TabScreenWidget extends ScreenWidget
 		screen.setTitleChangedListener( this );
 		screen.setIconChangedListener( this );
 
+		// Android 4.0 onwards: set the label's text on the tab widget,
+		// so that both icon and text will appear.
+		titleChanged(screen, screen.getTitle());
+
 		return IX_WIDGET.MAW_RES_OK;
 	}
 
@@ -112,7 +122,17 @@ public class TabScreenWidget extends ScreenWidget
 	{
 		if( icon != null )
 		{
-			tabSpec.setIndicator( title, icon );
+			if ( Build.VERSION.SDK_INT < Build.VERSION_CODES.ICE_CREAM_SANDWICH )
+			{
+				// Android 2.1: both icon and text are shown (Label below the Icon as expected)
+				tabSpec.setIndicator( title, icon );
+
+			}
+			else
+			{
+				// Android 4.0 onwards: If both icon and text are set, only the title is visible.
+				tabSpec.setIndicator( "", icon );
+			}
 		}
 		else
 		{
@@ -234,6 +254,7 @@ public class TabScreenWidget extends ScreenWidget
 		int tabIndex = m_tabIndexToScreen.get( screen );
 		TabHost tabHost = (TabHost) getView( );
 		View tabIndicatorView = tabHost.getTabWidget( ).getChildTabViewAt( tabIndex );
+
 		ImageView icon = (ImageView) tabIndicatorView.findViewById(android.R.id.icon);
 		icon.setImageDrawable(newIcon);
 	}

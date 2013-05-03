@@ -66,6 +66,9 @@ build-one.rb
 # files
 
 /examples/parse_example_list.rb
+/examples/cpp/MoGraph/MoGraphWave/resources/font.fnt
+/examples/cpp/MoGraph/MoGraphWave2/resources/font.fnt
+/examples/cpp/MoGraph/MoGraphFinance/resources/font.fnt
 
 /libs/MAStd/api_areas.h
 /libs/MAStd/e_acos.c

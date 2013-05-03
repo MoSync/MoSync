@@ -36,6 +36,17 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "ListenerSet.h"
 
 namespace MAUtil {
+	/*
+	 * Enum containing the available platforms.
+	 */
+	typedef enum
+	{
+		OS_IOS = 0,
+		OS_ANDROID,
+		OS_WIN,
+		OS_UNKNOWN
+	} PLATFORM_TYPE;
+
 	/**
 	* \brief A listener for keypad events.
 	*
@@ -202,17 +213,37 @@ namespace MAUtil {
 		 * photo gallery of the device. This event is triggered by the
 		 * #maSaveImageToDeviceGallery() call.
 		 *
-		 * Note: In order to obtain this notification you must register to
-		 * the Enviroment via #addMediaExportListener. Please remember to
-		 * unregister when finished using #removeMediaExportListener.
+		 * Note: In order to obtain this notification you must register using
+		 * \link Environment::addMediaExportListener() \endlink.
+		 * Please remember to
+		 * unregister when finished using \link Environment::removeMediaExportListener() \endlink.
 		 *
 		 * \param imageHandle Handle of the image that was the subject of the
 		 * export operation.
-		 * \param resultCode The result code of the operation.
+		 * \param resultCode The result code of the operation of exporting an image to gallery.
+		 * Possible values can be found \link #MA_MEDIA_RES_OK here \endlink.
 		 */
 		virtual void imageExportToGalleryFinished( const MAHandle& imageHandle,
 			int resultCode ) {};
 	 };
+
+	/**
+     * \brief A listener for camera events.
+     * \see Environment::addCameraListener()
+     *
+     * Note: If the application uses NativeUI, use listener specific to the
+     * #Camera object.
+     */
+    class CameraListener
+    {
+    public:
+        /**
+         * Called when a camera event was triggered.
+         *
+         * \param cameraEvent a camera related event.
+         */
+        virtual void cameraEvent(const MAEvent& cameraEvent) = 0;
+    };
 
 	/**
 	* \brief A base class for cross-platform event managers.
@@ -367,10 +398,21 @@ namespace MAUtil {
 		void addOrientationListener(OrientationListener* ol);
 		void removeOrientationListener(OrientationListener* ol);
 
+		void addCameraListener(CameraListener* camListener);
+		void removeCameraListener(CameraListener* camListener);
+
 		/**
-		 * Add and remove listeners for media export events.
+		 * Retrieves the current platform.
+		 */
+		PLATFORM_TYPE getCurrentPlatform();
+
+		/**
+		 * Adds listener for media export events.
 		 */
 		void addMediaExportListener(MediaExportListener* meListener);
+		/**
+		 * Removes media export events listener.
+		 */
 		void removeMediaExportListener(MediaExportListener* meListener);
 
 		/**
@@ -483,7 +525,12 @@ namespace MAUtil {
 		void fireOrientationWillChangeEvent();
 
 		/**
-		 * Calls method of all media export listeners. The method called depends
+		* Calls cameraEvent() of all registered camera listeners.
+		*/
+		void fireCameraEvent(const MAEvent& cameraEvent);
+
+		/**
+		 * Calls specific method of all media export listeners. The method called depends
 		 * on the media export operation.
 		 */
 		void fireMediaExportEvent(const MAEvent& mediaExportEvent);
@@ -518,7 +565,9 @@ namespace MAUtil {
 		ListenerSet<TextBoxListener> mTextBoxListeners;
 		ListenerSet<SensorListener> mSensorListeners;
 		ListenerSet<OrientationListener> mOrientationListeners;
+		ListenerSet<CameraListener> mCameraListeners;
 		ListenerSet<MediaExportListener> mMediaExportListeners;
+		PLATFORM_TYPE mCurrentPlatform;
 private:
 		static Environment* sEnvironment;
 	};

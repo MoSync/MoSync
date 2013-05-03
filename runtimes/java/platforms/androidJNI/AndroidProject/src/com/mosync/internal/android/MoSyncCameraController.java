@@ -28,6 +28,7 @@ import static com.mosync.internal.generated.MAAPI_consts.MA_CAMERA_ZOOM_SUPPORTE
 import static com.mosync.internal.generated.MAAPI_consts.MA_CAMERA_FLASH_SUPPORTED;
 import static com.mosync.internal.generated.MAAPI_consts.MA_CAMERA_PREVIEW_FRAME;
 import static com.mosync.internal.generated.MAAPI_consts.MA_CAMERA_PREVIEW_AUTO_FOCUS;
+import static com.mosync.internal.generated.MAAPI_consts.MA_CAMERA_SNAPSHOT_MAX_SIZE;
 
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
@@ -41,6 +42,8 @@ import java.lang.System;
 import android.app.Activity;
 import android.hardware.Camera;
 import android.hardware.Camera.PictureCallback;
+import android.hardware.Camera.ShutterCallback;
+import android.hardware.Camera.Size;
 
 import java.lang.Thread;
 
@@ -90,12 +93,12 @@ public class MoSyncCameraController {
 	 * A flag that indicates the format of the image to be taken
 	 */
 	private boolean rawMode;
+
 	/**
 	 * A private attribute used to keep track of
 	 * the data place holder in each snapshot
 	 */
 	private int resourceIndex;
-
 
 	/**
 	 * Arrays to store user assigned sizes
@@ -108,6 +111,16 @@ public class MoSyncCameraController {
 	 * created by either the NativeUIWidget or the full screen call.
 	 */
 	private MoSyncCameraPreview mPreview;
+
+	/**
+	 * Used to check if snapshot is in progress.
+	 */
+	private boolean mIsSnapshotInProgress = false;
+
+	/**
+	 * We need this to know when to persist with the camera parameters.
+	 */
+	private MoSyncCameraPreview mPreviousPreview;
 
 
 	/**
@@ -139,6 +152,7 @@ public class MoSyncCameraController {
 		mMoSyncThread = thread;
 		lock = new ReentrantLock();
 		mPreview = null;
+		mPreviousPreview = null;
 		condition = lock.newCondition();
 		dataReady = false;
 		userWidths = new ArrayList<Integer>();
@@ -275,6 +289,12 @@ public class MoSyncCameraController {
 		SYSLOG("setPreview");
 		acquireCamera();
 
+		// Retain the previous preview.
+		if ( preview != mPreview )
+		{
+			mPreviousPreview = mPreview;
+		}
+
 		mPreview = preview;
 		if(mPreview.mCamera == null)
 		{
@@ -298,35 +318,13 @@ public class MoSyncCameraController {
 			android.util.Log.e("MOSYNC INTERNAL","No Preview set");
 			return;
 		}
+		Camera.Parameters parameters = getCurrentParameters();
+		Camera.Size size = parameters.getPreviewSize();
 
-		// try
-		// {
-			// //We have to use and static instance of the camera in the
-			// reflection here
-			// mSetPreviewCallbackWithBuffer = mCamera.getClass().getMethod(
-			// "setPreviewCallbackWithBuffer", Camera.PreviewCallback.class);
+		mCallbackBuffer = new byte[size.width * size.height * 4];
 
-			Camera.Parameters parameters = getCurrentParameters();
-			Camera.Size size = parameters.getPreviewSize();
-
-			mCallbackBuffer = new byte[size.width * size.height * 4];
-
-			mCamera.addCallbackBuffer(mCallbackBuffer);
-
-		// mIsUsingPreviewCallbackBuffer = true;
-
-			mCamera.setPreviewCallbackWithBuffer(previewCallback);
-
-
-
-		// }
-		// catch (Exception nsme)
-		// {
-		// mIsUsingPreviewCallbackBuffer = false;
-		//
-		// mCamera.setPreviewCallback(previewCallback);
-		// }
-
+		mCamera.addCallbackBuffer(mCallbackBuffer);
+		mCamera.setPreviewCallbackWithBuffer(previewCallback);
 	}
 
 	/**
@@ -351,12 +349,17 @@ public class MoSyncCameraController {
 			{
 				mCurrentCameraIndex = CameraNumber;
 				if (null != mCamera)
+				{
 					mCamera.release();
-				mPreview.mCamera = null;
+				}
+				if ( null != mPreview )
+				{
+					mPreview.mCamera = null;
+				}
 				try {
 					mCamera = cameraOpen(CameraNumber);
-					mPreview.mCameraIndex = mCurrentCameraIndex;
 					mCamera.setParameters(getCurrentParameters());
+					mPreview.mCameraIndex = mCurrentCameraIndex;
 				} catch (Exception e) {
 					SYSLOG("cannot open camera " + e);
 				}
@@ -379,6 +382,16 @@ public class MoSyncCameraController {
 	}
 
 	/**
+	 * Checks to see if a snapshot is in progress.
+	 *
+	 * @return true if snapshot is in progress, false otherwise.
+	 */
+	public boolean isSnapshotInProgress()
+	{
+		return mIsSnapshotInProgress;
+	}
+
+	/**
 	 *
 	 * @return a reference to the preview that is currently being used for the camera
 	 */
@@ -393,6 +406,7 @@ public class MoSyncCameraController {
 	public int cameraStart()
 	{
 		SYSLOG("cameraStart");
+
 		acquireCamera();
 
 		try
@@ -403,6 +417,22 @@ public class MoSyncCameraController {
 				mPreview.initiateCamera();
 				mPreview.mCameraIndex = mCurrentCameraIndex;
 				setPreviewCallback();
+			}
+			/*
+			 * We need to maintain the old parameters. This is
+			 * mandatory for the case when a zoom level is set
+			 * and a snapshot is taken. Because a close and a reopen
+			 * is mandatory after a snapshot, the zoom level would be
+			 * reset to 0 and not to the previous level.
+			 *
+			 * If we don't have a previous preview or if it's the same as
+			 * the current preview we maintain the camera parameters.
+			 */
+			if ( (mPreviousPreview == null) || (mPreviousPreview == mPreview) )
+			{
+				mCamera.stopPreview();
+				Camera.Parameters param = getCurrentParameters();
+				mCamera.setParameters(param);
 			}
 
 			mCamera.startPreview();
@@ -425,6 +455,12 @@ public class MoSyncCameraController {
 		{
 			mCamera.stopPreview();
 			releaseCamera();
+			if ( mIsSnapshotInProgress )
+			{
+				postCameraSnapshotEvent(resourceIndex, 0,
+						MA_IMAGE_REPRESENTATION_UNKNOWN, MA_CAMERA_RES_FAILED);
+			}
+			mIsSnapshotInProgress = false;
 		}
 		catch (Exception e)
 		{
@@ -441,6 +477,15 @@ public class MoSyncCameraController {
 	 */
 	public int cameraSnapshot(int formatIndex, int placeHolder)
 	{
+		// If the max size constant is provided then we select the biggest size
+		// available
+		if ( MA_CAMERA_SNAPSHOT_MAX_SIZE == formatIndex )
+		{
+			Camera.Parameters parameters = getCurrentParameters();
+			List <Camera.Size> sizeList = parameters.getSupportedPictureSizes();
+			formatIndex = sizeList.size() - 1;
+		}
+
 		if(formatIndex >= 0)
 		{
 			setNewSize(formatIndex);
@@ -471,12 +516,23 @@ public class MoSyncCameraController {
 		}
 	}
 
-	public void cameraSnapshotAsync(int formatIndex)
+	public void cameraSnapshotAsync(int dataPlaceholder, int sizeIndex)
 	{
-		if(formatIndex >= 0)
+		// If the max size constant is provided then we select the biggest size
+		// available
+		if ( MA_CAMERA_SNAPSHOT_MAX_SIZE == sizeIndex )
 		{
-			setNewSize(formatIndex);
+			Camera.Parameters parameters = getCurrentParameters();
+			List <Camera.Size> sizeList = parameters.getSupportedPictureSizes();
+			sizeIndex = sizeList.size() - 1;
 		}
+		if(sizeIndex >= 0)
+		{
+			setNewSize(sizeIndex);
+		}
+
+		resourceIndex = dataPlaceholder;
+		mIsSnapshotInProgress = true;
 		mPreview.mCamera.takePicture(null,
 				rawCallbackWithEventSupport, jpegCallbackWithEventSupport);
 	}
@@ -605,9 +661,14 @@ public class MoSyncCameraController {
 				result = "false";
 		}
 		else
+		{
 			result = param.get(key);
+		}
+
 		if(result == null)
+		{
 			return MA_CAMERA_RES_INVALID_PROPERTY_VALUE;
+		}
 
 		if( result.length( ) + 1 > memBufferSize )
 		{
@@ -619,15 +680,9 @@ public class MoSyncCameraController {
 		byte[] ba = result.getBytes();
 
 		// Write string to MoSync memory.
-
-
 		ByteBuffer buffer = mMoSyncThread.getMemorySlice(memBuffer, ba.length + 1);
 		buffer.put(ba);
 		buffer.put((byte) 0);
-
-		//ByteBuffer slice = mMoSyncThread.getMemorySlice(memBuffer, ba.length+1);
-		//slice.put( ba );
-		//slice.put( (byte)0 );
 
 		return result.length( );
 	}
@@ -664,6 +719,7 @@ public class MoSyncCameraController {
 					mCamera = cameraOpen(mCurrentCameraIndex);
 				}
 				//mPreview.mCamera = mCamera;
+				mCamera.setErrorCallback(cameraErrorCallback);
 			}
 			catch (RuntimeException re)
 			{
@@ -672,11 +728,9 @@ public class MoSyncCameraController {
 				mPreview = null;
 				return;
 			}
-
 			SYSLOG("Camera was aquired");
 			return;
 		}
-
 		SYSLOG("Camera already aquired");
 		return;
 	}
@@ -783,6 +837,21 @@ public class MoSyncCameraController {
 		}
 	};
 
+	ShutterCallback shutterCallback = new ShutterCallback() {
+		@Override
+		public void onShutter() {
+			// If ever needed.
+		}
+	};
+
+	PictureCallback postViewCallback = new PictureCallback() {
+		@Override
+		public void onPictureTaken(byte[] data, Camera camera) {
+			// If ever needed.
+		}
+	};
+
+
 	/**
 	 * Handles snapshot data for JPEG representation and notifies via camera event that snapshot
 	 * operation has been completed.
@@ -797,6 +866,24 @@ public class MoSyncCameraController {
 		}
 	};
 
+	Camera.ErrorCallback cameraErrorCallback = new Camera.ErrorCallback() {
+
+		@Override
+		public void onError(int error, Camera camera) {
+			/*
+			 *  CAMERA_ERROR_SERVER_DIED 100
+			 *  CAMERA_ERROR_UNKNOWN 1
+			 */
+			if ( mIsSnapshotInProgress )
+			{
+				mIsSnapshotInProgress = false;
+				postCameraSnapshotEvent(resourceIndex, 0,
+						MA_IMAGE_REPRESENTATION_UNKNOWN, MA_CAMERA_RES_FAILED);
+			}
+			SYSLOG("Camera failed with error: " + error);
+		}
+	};
+
 	/**
 	 * Handles snapshot data and notifies via camera event that snapshot operation is completed.
 	 *
@@ -805,20 +892,21 @@ public class MoSyncCameraController {
 	 */
 	private void handleSnapshotDataWithEventSupport(byte[] data, int imageReprezentation)
 	{
-		int snapshotImageHandle = 0;
-		int snapshotFormatIndex = 0;
+		mIsSnapshotInProgress = false;
+
+		int snapshotSize = 0;
 		int snapshotImageDataRepresentation = imageReprezentation;
 		int snapshotReturnCode = MA_CAMERA_RES_OK;
 
 		lock.lock();
 		try {
-			snapshotImageHandle = mMoSyncThread.nativeCreatePlaceholder();
-			mMoSyncThread.nativeCreateBinaryResource(snapshotImageHandle, data.length);
-			ByteBuffer byteBuffer = mMoSyncThread.mBinaryResources.get(snapshotImageHandle);
+			mMoSyncThread.nativeCreateBinaryResource(resourceIndex, data.length);
+			ByteBuffer byteBuffer = mMoSyncThread.mBinaryResources.get(resourceIndex);
 			byteBuffer.put(data);
 
 			Camera.Parameters parameters = getCurrentParameters();
-			snapshotFormatIndex = parameters.getPictureFormat();
+			Size pictureSize = parameters.getPictureSize();
+			snapshotSize = EXTENT(pictureSize.width, pictureSize.height);
 		}
 		catch (Exception e) {
 			SYSLOG("Failed to create the data pool");
@@ -828,7 +916,7 @@ public class MoSyncCameraController {
 		}
 		finally {
 			lock.unlock();
-			postCameraSnapshotEvent(snapshotImageHandle, snapshotFormatIndex,
+			postCameraSnapshotEvent(resourceIndex, snapshotSize,
 					snapshotImageDataRepresentation, snapshotReturnCode);
 		}
 	}
@@ -837,20 +925,20 @@ public class MoSyncCameraController {
 	 * Post a message to the MoSync event queue.
 	 * Send the data of the snapshot.
 	 * @param snapshotImageDataHandle Holds the place holder for the data object representing the camera snapshot.
-	 * @param snapshotFormatIndex Holds the snapshot format that is specified when maCameraSnapshot is called.
+	 * @param snapshotSize Holds the snapshot size.
 	 * @param snapshotImageDataRepresentation Holds the snapshot data representation.
 	 * @param snapshotReturnCode Holds the return code of the camera snapshot operation.
 	 */
 	private void postCameraSnapshotEvent(
 			int snapshotImageDataHandle,
-			int snapshotFormatIndex,
+			int snapshotSize,
 			int snapshotImageDataRepresentation,
 			int snapshotReturnCode)
 	{
 		int[] event = new int[5];
 		event[0] = EVENT_TYPE_CAMERA_SNAPSHOT;
 		event[1] = snapshotImageDataHandle;
-		event[2] = snapshotFormatIndex;
+		event[2] = snapshotSize;
 		event[3] = snapshotImageDataRepresentation;
 		event[4] = snapshotReturnCode;
 		mMoSyncThread.postEvent(event);
@@ -1023,7 +1111,6 @@ public class MoSyncCameraController {
 		byte[] array = int2byte(size);
 		ByteBuffer buffer = mMoSyncThread.getMemorySlice(format, array.length + 1);
 		buffer.put(array);
-		buffer.put((byte) 0);
 	}
 
 	public int enablePreviewEvents(

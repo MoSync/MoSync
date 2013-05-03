@@ -18,9 +18,11 @@ MA 02110-1301, USA.
 package com.mosync.nativeui.ui.factories;
 
 import android.app.Activity;
+import android.content.pm.PackageManager;
 
 import android.widget.FrameLayout;
 
+import com.mosync.internal.android.MoSyncThread;
 import com.mosync.nativeui.ui.widgets.CameraPreviewWidget;
 import com.mosync.nativeui.ui.widgets.MoSyncCameraPreview;
 import com.mosync.nativeui.ui.widgets.Widget;
@@ -34,6 +36,17 @@ public class CameraPreviewFactory implements AbstractViewFactory
 	@Override
 	public Widget create(Activity activity, int handle)
 	{
+		MoSyncThread mosyncThread = MoSyncThread.getInstance();
+
+		Boolean isCameraAccessGranted =
+				(PackageManager.PERMISSION_GRANTED ==
+				mosyncThread.getActivity().checkCallingOrSelfPermission("android.permission.CAMERA"));
+		if ( !isCameraAccessGranted )
+		{
+			// TODO When maPanic works from here discuss if is more suited than maAlert.
+			mosyncThread.maAlert("Camera", "Camera permission is not set in the project", "OK", "", "");
+		}
+
 		/*
 		 * we use an android framelayout to hold the actual
 		 * surface view and prevent it from overlapping with others
