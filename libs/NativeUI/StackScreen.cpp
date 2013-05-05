@@ -206,26 +206,11 @@ namespace NativeUI
         return this->setPropertyInt(MAW_STACK_SCREEN_TITLE_FONT_HANDLE, fontHandle);
     }
 
-    /**
-     * Set the background image that will replace the default fade in the title bar.
-     * @param imageHandle An image handle to be used as a background
-     * @return Any of the following result codes:
-     * - #MAW_RES_OK if the property could be set.
-     * - @MAW_RES_INVALID_PROPERTY_VALUE if the image handle was invalid.
-     * - @MAW_RES_ERROR otherwise.
-     */
     int StackScreen::setTitleBackgroundImage(const MAHandle imageHandle)
     {
         return this->setPropertyInt(MAW_STACK_SCREEN_TITLE_BACKGROUND_IMAGE_HANDLE, imageHandle);
     }
 
-    /**
-     * Set the type of scaling that should be applied to the title background.
-     * @param scaleMode The type of scaling.
-     * One of the following:
-     *  IMAGE_SCALE_NONE
-     *  IMAGE_SCALE_REPEAT_XY
-     */
     void StackScreen::setTitleBackgroundScaleMode(const TitleBackgroundScaleMode scaleMode)
     {
         MAUtil::String scaleModeString;
@@ -243,7 +228,34 @@ namespace NativeUI
         this->setProperty(MAW_STACK_SCREEN_TITLE_BACKGROUND_SCALE_MODE, scaleModeString);
     }
 
-    /**
+    void StackScreen::showToolbar(const bool visibleState)
+    {
+        this->setProperty(MAW_STACK_SCREEN_TOOLBAR_VISIBLE, visibleState ? "true" : "false");
+    }
+
+    int StackScreen::setToolbarBackgroundImage(const MAHandle imageHandle)
+    {
+        return this->setPropertyInt(MAW_STACK_SCREEN_TOOLBAR_BACKGROUND_IMAGE_HANDLE, imageHandle);
+    }
+
+    void StackScreen::setToolbarBackgroundScaleMode(const TitleBackgroundScaleMode scaleMode)
+    {
+        MAUtil::String scaleModeString;
+        switch (scaleMode)
+        {
+            case TITLE_BACKGROUND_SCALE_REPEAT_XY:
+                scaleModeString = "scaleAndRepeatXY";
+                break;
+            case TITLE_BACKGROUND_SCALE_NONE:
+            default:
+                scaleModeString = "none";
+                break;
+        }
+
+        this->setProperty(MAW_STACK_SCREEN_TOOLBAR_BACKGROUND_SCALE_MODE, scaleModeString);
+    }
+
+   /**
      *
      * This method is called when there is an event for this widget.
      * It passes on the event to the widget's listener if one is set.

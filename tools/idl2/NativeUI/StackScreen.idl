@@ -100,7 +100,7 @@ group WidgetStackScreenProperties "Stack screen" {
 		TITLE_BACKGROUND_IMAGE_HANDLE = "titleBackgroundImage";
 
 		/**
-		* @brief Specifies what type of scaling should be applied to the title bar.
+		* @brief Specifies what type of scaling should be applied to the title bar background image.
 		*
 		* @validvalue Either 'none' or 'scaleAndRepeatXY'. Default 'none'.
 		*
@@ -112,6 +112,50 @@ group WidgetStackScreenProperties "Stack screen" {
 		* \endcode
 		*/
 		TITLE_BACKGROUND_SCALE_MODE = "titleBackgroundScaleMode";
+
+		/**
+		* @brief Specifies whether the stack screen's build-in toolbar should be visible or not.
+		*
+		* This is iOS specific
+		*
+		* @validvalue A boolean string 'true' or 'false'.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(stackScreenHandle, MAW_STACK_SCREEN_TOOLBAR_VISIBLE, "true");
+		* \endcode
+		*/
+		TOOLBAR_VISIBLE = "toolbarVisible";
+
+		/**
+		* Set the background image that will replace the default fade in the bottom toolbar bar.
+		*
+		* @validvalue MoSync handle to an uncompressed image resource.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(stackScreenHandle, MAW_STACK_SCREEN_TOOLBAR_BACKGROUND_IMAGE_HANDLE, toString(R_MY_IMAGE));
+		* \endcode
+		*/
+		TOOLBAR_BACKGROUND_IMAGE_HANDLE = "toolbarBackgroundImage";
+
+		/**
+		* @brief Specifies what type of scaling should be applied to the bottom toolbar bar background image.
+		*
+		* @validvalue Either 'none' or 'scaleAndRepeatXY'. Default 'none'.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(stackScreenHandle, MAW_STACK_SCREEN_TOOLBAR_BACKGROUND_SCALE_MODE, "scaleAndRepeatXY");
+		* \endcode
+		*/
+		TOOLBAR_BACKGROUND_SCALE_MODE = "toolbarBackgroundScaleMode";
 
 		/**
 		* @brief Stack screen's push transition type.

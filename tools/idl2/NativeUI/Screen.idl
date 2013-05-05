@@ -118,5 +118,10 @@ group WidgetScreenProperties "Screen" {
 		* @brief Represents the left side of the title in the navigation bar.
 		*/
         SIDE_LEFT  = 2;
+
+		/**
+		* @brief Represents the bottom toolbar.
+		*/
+        SIDE_BOTTOM = 3;
     }
 } // end of WidgetScreenProperties

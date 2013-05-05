@@ -23,6 +23,8 @@
     NSMutableArray* stack;
     int navBarImageHandle;
     NSString* navBarScaleMode;
+    int toolBarImageHandle;
+    NSString* toolBarScaleMode;
 }
 
 /**

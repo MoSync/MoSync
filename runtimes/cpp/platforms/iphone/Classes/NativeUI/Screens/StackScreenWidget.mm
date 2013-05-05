@@ -39,6 +39,8 @@
         stack = [[NSMutableArray alloc] init];
         navBarImageHandle = 0;
         navBarScaleMode = nil;
+        toolBarImageHandle = 0;
+        toolBarScaleMode = nil;
         navigationController.viewControllers = [NSArray array];
         navigationController.delegate = self;
     }
@@ -92,7 +94,7 @@
 	ScreenWidget* screen = (ScreenWidget*)child;
 	[navigationController pushViewController:[screen getController] animated:YES];
 	[stack addObject:child];
-	float navBarHeight = navigationController.toolbar.bounds.size.height;
+	float navBarHeight = navigationController.navigationBar.bounds.size.height;
 	float viewHeight = self.height - navBarHeight;
     child.size = CGSizeMake(self.width, viewHeight);
     [child layout];
@@ -219,16 +221,17 @@
         {
             if ([navBarScaleMode isEqualToString:@"scaleAndRepeatXY"])
             {
-                imageScale = imageResource->height / 44.0;
+                UINavigationController* navigationController = (UINavigationController*)_controller;
+                imageScale = imageResource->height / navigationController.navigationBar.bounds.size.height;
             }
         }
 
         UIImage* image = [UIImage imageWithCGImage:imageResource->image scale:imageScale orientation:orientation];
 
         [[UINavigationBar appearance] setBackgroundImage:image
-                                           forBarMetrics:UIBarMetricsDefault];
+											forBarMetrics:UIBarMetricsDefault];
         [[UINavigationBar appearance] setBackgroundImage:image
-                                           forBarMetrics:UIBarMetricsLandscapePhone];
+											forBarMetrics:UIBarMetricsLandscapePhone];
     }
     else if ([key isEqualToString:@MAW_STACK_SCREEN_TITLE_BACKGROUND_SCALE_MODE])
     {
@@ -243,6 +246,91 @@
             {
                 NSString* handleString = [[NSString alloc] initWithString: [NSString stringWithFormat:@"%d", navBarImageHandle]];
                 [self setPropertyWithKey:@MAW_STACK_SCREEN_TITLE_BACKGROUND_IMAGE_HANDLE toValue: handleString];
+                [handleString release];
+            }
+        }
+    }
+    else if ([key isEqualToString:@MAW_STACK_SCREEN_TOOLBAR_VISIBLE])
+    {
+        UINavigationController* navigationController = (UINavigationController*)_controller;
+        [navigationController setToolbarHidden:![value boolValue] animated:YES];
+    }
+    else if ([key isEqualToString:@MAW_STACK_SCREEN_TOOLBAR_BACKGROUND_IMAGE_HANDLE])
+    {
+        int imageHandle = [value intValue];
+        if(imageHandle<=0)
+        {
+            toolBarImageHandle = 0;
+            return MAW_RES_INVALID_PROPERTY_VALUE;
+        }
+
+        toolBarImageHandle = imageHandle;
+        Surface* imageResource = Base::gSyscall->resources.get_RT_IMAGE(imageHandle);
+        UIImageOrientation orientation = UIImageOrientationUp;
+        switch (imageResource->orientation)
+        {
+            case 1:
+                orientation = UIImageOrientationUp;
+                break;
+            case 2:
+                orientation = UIImageOrientationUpMirrored;
+                break;
+            case 3:
+                orientation = UIImageOrientationDown;
+                break;
+            case 4:
+                orientation = UIImageOrientationDownMirrored;
+                break;
+            case 5:
+                orientation = UIImageOrientationLeftMirrored;
+                break;
+            case 6:
+                orientation = UIImageOrientationRight;
+                break;
+            case 7:
+                orientation = UIImageOrientationRightMirrored;
+                break;
+            case 8:
+                orientation = UIImageOrientationLeft;
+                break;
+            default:
+                break;
+        }
+
+        CGFloat imageScale = 1.0;
+
+        UINavigationController* navigationController = (UINavigationController*)_controller;
+        if (toolBarScaleMode)
+        {
+            if ([toolBarScaleMode isEqualToString:@"scaleAndRepeatXY"])
+            {
+                imageScale = imageResource->height / navigationController.toolbar.bounds.size.height;
+            }
+        }
+
+        UIImage* image = [UIImage imageWithCGImage:imageResource->image scale:imageScale orientation:orientation];
+
+        navigationController.toolbar.barStyle = UIBarStyleBlackTranslucent;
+        [navigationController.toolbar setBackgroundImage:image
+                                        forToolbarPosition:UIToolbarPositionAny
+                                        barMetrics:UIBarMetricsDefault];
+        [navigationController.toolbar setBackgroundImage:image
+                                        forToolbarPosition:UIToolbarPositionAny
+                                        barMetrics:UIBarMetricsLandscapePhone];
+    }
+    else if ([key isEqualToString:@MAW_STACK_SCREEN_TOOLBAR_BACKGROUND_SCALE_MODE])
+    {
+        if (toolBarScaleMode != value)
+        {
+            if (toolBarScaleMode)
+                [toolBarScaleMode release];
+
+            toolBarScaleMode = [[NSString alloc] initWithString: value];
+
+            if (toolBarImageHandle != 0)
+            {
+                NSString* handleString = [[NSString alloc] initWithString: [NSString stringWithFormat:@"%d", toolBarImageHandle]];
+                [self setPropertyWithKey:@MAW_STACK_SCREEN_TOOLBAR_BACKGROUND_IMAGE_HANDLE toValue: handleString];
                 [handleString release];
             }
         }
@@ -294,6 +382,9 @@
 {
     if (navBarScaleMode)
         [navBarScaleMode release];
+
+    if (toolBarScaleMode)
+        [toolBarScaleMode release];
 
     [stack release];
     [super dealloc];

@@ -178,17 +178,26 @@
         NSMutableArray* newButtonArrayL = [navigationItem.leftBarButtonItems mutableCopy];
         [newButtonArrayL removeObject:navBarButton.barButtonItem];
         [navigationItem setLeftBarButtonItems:newButtonArrayL animated:YES];
+
+        NSMutableArray* newButtonArrayB = [navigationController.toolbarItems mutableCopy];
+        [newButtonArrayB removeObject:navBarButton.barButtonItem];
+        [navigationController setToolbarItems:newButtonArrayB animated:YES];
     }
     else if([key isEqualToString:@MAW_SCREEN_REMOVE_NAV_BAR_BUTTONS])
     {
         UINavigationController* navigationController = (UINavigationController*)[self getController];
-        if ([value intValue] == MAW_SCREEN_NAV_BAR_SIDE_RIGHT)
+        const int side = [value intValue];
+        if (side == MAW_SCREEN_NAV_BAR_SIDE_RIGHT)
         {
             [navigationController.navigationItem setRightBarButtonItems:[[NSArray alloc] init] animated:YES];
         }
-        else if ([value intValue] == MAW_SCREEN_NAV_BAR_SIDE_LEFT)
+        else if (side == MAW_SCREEN_NAV_BAR_SIDE_LEFT)
         {
             [navigationController.navigationItem setLeftBarButtonItems:[[NSArray alloc] init] animated:YES];
+        }
+        else if (side == MAW_SCREEN_NAV_BAR_SIDE_BOTTOM)
+        {
+            [navigationController setToolbarItems:[[NSArray alloc] init] animated:YES];
         }
     }
 	else
@@ -206,8 +215,10 @@
     NSMutableArray* buttons;
     if (side == MAW_SCREEN_NAV_BAR_SIDE_RIGHT)
         buttons = [navigationController.navigationItem.rightBarButtonItems mutableCopy];
-    else
+    else if (side == MAW_SCREEN_NAV_BAR_SIDE_LEFT)
         buttons = [navigationController.navigationItem.leftBarButtonItems mutableCopy];
+    else if (side == MAW_SCREEN_NAV_BAR_SIDE_BOTTOM)
+        buttons = [navigationController.toolbarItems mutableCopy];
 
     if (!buttons) buttons = [[NSMutableArray alloc] init];
 
@@ -217,9 +228,17 @@
         [buttons insertObject:buttonItem atIndex:index];
 
     if (side == MAW_SCREEN_NAV_BAR_SIDE_RIGHT)
+    {
         [navigationController.navigationItem setRightBarButtonItems:buttons animated:YES];
-    else
+    }
+    else if (side == MAW_SCREEN_NAV_BAR_SIDE_LEFT)
+    {
         [navigationController.navigationItem setLeftBarButtonItems:buttons animated:YES];
+    }
+    else if (side == MAW_SCREEN_NAV_BAR_SIDE_BOTTOM)
+    {
+        [navigationController setToolbarItems:buttons animated:YES];
+    }
 }
 
 /**

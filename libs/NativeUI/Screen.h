@@ -48,8 +48,9 @@ namespace NativeUI
 
 	enum NavBarSide
 	{
-		NAV_BAR_SIDE_RIGHT = 1,
-		NAV_BAR_SIDE_LEFT  = 2,
+		NAV_BAR_SIDE_RIGHT	= 1,
+		NAV_BAR_SIDE_LEFT	= 2,
+		NAV_BAR_SIDE_BOTTOM	= 3,
 	};
 
 	/**

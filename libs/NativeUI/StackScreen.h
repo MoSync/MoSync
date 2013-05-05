@@ -213,7 +213,7 @@ namespace NativeUI
         virtual int setTitleBackgroundImage(const MAHandle imageHandle);
 
         /**
-         * Set the type of scaling that should be applied to the title background.
+         * Set the type of scaling that should be applied to the title background image.
          * @param scaleMode The type of scaling.
          * One of the following:
          *  #TITLE_BACKGROUND_SCALE_NONE
@@ -222,6 +222,32 @@ namespace NativeUI
         virtual void setTitleBackgroundScaleMode(const TitleBackgroundScaleMode scaleMode);
 
         /**
+         * Shows or hides the StackScreen's default toolbar
+         * This is iOS only
+         * @param visibleState True if the toolbar should be shown, false otherwise.
+         */
+        virtual void showToolbar(const bool visibleState);
+
+        /**
+         * Set the background image that will replace the default fade in the toolbar bar.
+         * @param imageHandle An image handle to be used as a background
+         * @return Any of the following result codes:
+         * - #MAW_RES_OK if the property could be set.
+         * - @MAW_RES_INVALID_PROPERTY_VALUE if the image handle was invalid.
+         * - @MAW_RES_ERROR otherwise.
+         */
+        virtual int setToolbarBackgroundImage(const MAHandle imageHandle);
+
+        /**
+         * Set the type of scaling that should be applied to the toolbar background image.
+         * @param scaleMode The type of scaling.
+         * One of the following:
+         *  #TITLE_BACKGROUND_SCALE_NONE
+         *  #TITLE_BACKGROUND_SCALE_REPEAT_XY
+         */
+        virtual void setToolbarBackgroundScaleMode(const TitleBackgroundScaleMode scaleMode);
+
+		/**
          * Add an stack screen event listener.
          * @param listener The listener that will receive stack screen events.
          */
