@@ -547,7 +547,7 @@ static NSString* kReuseIdentifier = @"Cell";
     }
 
     Surface* imageResource = Base::gSyscall->resources.get_RT_IMAGE(handle);
-    self.cell.imageView.image = [UIImage imageWithCGImage:imageResource->image];
+    self.cell.imageView.image = [UIImage imageWithCGImage:imageResource->image scale:getScreenScale() orientation:UIImageOrientationUp];
     return MAW_RES_OK;
 }
 

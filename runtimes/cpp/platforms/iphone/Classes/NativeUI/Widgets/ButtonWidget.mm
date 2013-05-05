@@ -112,7 +112,7 @@
 		if(imageHandle<=0) return MAW_RES_INVALID_PROPERTY_VALUE;
 		UIButton* button = (UIButton*) self.view;
 		Surface* imageResource = Base::gSyscall->resources.get_RT_IMAGE(imageHandle);
-		image = [UIImage imageWithCGImage:imageResource->image];
+		image = [UIImage imageWithCGImage:imageResource->image scale:getScreenScale() orientation:UIImageOrientationUp];
 		[button setBackgroundImage:image forState:UIControlStateNormal];
 		[self layout];
 	}
@@ -122,7 +122,7 @@
         if(imageHandle<=0) return MAW_RES_INVALID_PROPERTY_VALUE;
         UIButton* button = (UIButton*) self.view;
         Surface* imageResource = Base::gSyscall->resources.get_RT_IMAGE(imageHandle);
-        image = [UIImage imageWithCGImage:imageResource->image];
+        image = [UIImage imageWithCGImage:imageResource->image scale:getScreenScale() orientation:UIImageOrientationUp];
         [button setImage:image forState:UIControlStateNormal];
 		[self layout];
     }

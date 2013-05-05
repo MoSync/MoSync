@@ -272,7 +272,7 @@
 
 	UIButton* button = (UIButton*) self.view;
 	Surface* imageResource = Base::gSyscall->resources.get_RT_IMAGE(handle);
-	image = [UIImage imageWithCGImage:imageResource->image];
+	image = [UIImage imageWithCGImage:imageResource->image scale:getScreenScale() orientation:UIImageOrientationUp];
 	[button setBackgroundImage:image forState:UIControlStateHighlighted];
 
 	self.pressedImageHandle = handle;

@@ -157,7 +157,7 @@
 		int imageHandle = [value intValue];
 		if(imageHandle<=0) return MAW_RES_INVALID_PROPERTY_VALUE;
 		Surface* imageResource = Base::gSyscall->resources.get_RT_IMAGE(imageHandle);
-		[_controller.tabBarItem setImage:[UIImage imageWithCGImage:imageResource->image]];
+		[_controller.tabBarItem setImage:[UIImage imageWithCGImage:imageResource->image scale:getScreenScale() orientation:UIImageOrientationUp]];
 	}
     else if([key isEqualToString:@MAW_SCREEN_REMOVE_NAV_BAR_BUTTON_WIDGET])
     {

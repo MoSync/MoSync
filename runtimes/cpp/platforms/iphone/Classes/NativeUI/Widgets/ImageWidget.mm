@@ -115,7 +115,7 @@
 			default:
 				break;
 		}
-		UIImage* image = [UIImage imageWithCGImage:imageResource->image scale:1.0 orientation:orientation];
+		UIImage* image = [UIImage imageWithCGImage:imageResource->image scale:getScreenScale() orientation:orientation];
 		if (_leftCapWidth != 0 || _topCapHeight != 0)
         {
 			image = [image stretchableImageWithLeftCapWidth:_leftCapWidth topCapHeight:_topCapHeight];
