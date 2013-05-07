@@ -27,6 +27,7 @@ MA 02110-1301, USA.
 #include <MAUtil/String.h>
 #include <maxtoa.h>
 #include "PhoneGapMessageHandler.h"
+#include "PhoneGapFileUtils.h"
 #include "PhoneGapCapture.h"
 
 using namespace MAUtil;
@@ -196,11 +197,26 @@ namespace Wormhole
 						eventData.handle,
 						pathBuffer,
 						sizeof(pathBuffer));
+
+					// TODO: What should we do if FileGetSize fails?
+					// Return an error?
+					// Set size to zero for now.
+					int size = FileGetSize(pathBuffer);
+					if (size < 0)
+					{
+						size = 0;
+					}
+					char sizeBuf[64];
+					sprintf(sizeBuf, "%i", size);
+
 					sprintf(
 						messageBuffer,
-						"[{\"fullPath\":\"%s\",\"name\":\"%s\",\"lastModifiedDate\":\"\",\"size\":\"\",\"type\":\"\"}]",
+						"[{\"fullPath\":\"%s\",\"name\":\"%s\",\"lastModifiedDate\":\"%s\",\"size\":\"%s\",\"type\":\"%s\"}]",
 						pathBuffer,
-						FileNameFromPath(pathBuffer));
+						FileNameFromPath(pathBuffer),
+						FileGetDate(pathBuffer).c_str(),
+						sizeBuf,
+						FileGetMimeType(pathBuffer).c_str());
 
 					if (result == MA_CAPTURE_RES_OK)
 					{

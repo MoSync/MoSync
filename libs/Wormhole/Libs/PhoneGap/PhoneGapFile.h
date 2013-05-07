@@ -28,8 +28,7 @@ MA 02110-1301, USA.
 
 #include <NativeUI/WebView.h>
 #include <MAUtil/String.h>
-#include "../JSONMessage.h"
-#include <yajl/YAJLDom.h>
+
 
 namespace Wormhole
 {
