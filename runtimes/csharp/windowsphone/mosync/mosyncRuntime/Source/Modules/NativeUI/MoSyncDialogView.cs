@@ -123,7 +123,7 @@ namespace MoSync
                 // the dialog is not visible at creation
                 visible = false;
 
-                mView = mDialogBackground;
+                View = mDialogBackground;
 
                 // we need to change the width and the height of the mDialogView manually when the orientation changes
                 (Application.Current.RootVisual as Microsoft.Phone.Controls.PhoneApplicationFrame).OrientationChanged += new EventHandler<Microsoft.Phone.Controls.OrientationChangedEventArgs>(OrientationChangedHandler);
@@ -265,6 +265,27 @@ namespace MoSync
                     return mDialogView.Height;
                 }
             }
-        }
-    }
-}
+
+            #region Property validation methods
+
+            /**
+             * Validates a property based on the property name and property value.
+             * @param propertyName The name of the property to be checked.
+             * @param propertyValue The value of the property to be checked.
+             * @returns true if the property is valid, false otherwise.
+             */
+            public new static bool ValidateProperty(string propertyName, string propertyValue)
+            {
+                bool isBasePropertyValid = WidgetBaseWindowsPhone.ValidateProperty(propertyName, propertyValue);
+                if (isBasePropertyValid == false)
+                {
+                    return false;
+                }
+
+                return true;
+            }
+
+            #endregion
+        } // end of ModalDialog class
+    } // end of NativeUI namespace
+} // end of MoSync namespace

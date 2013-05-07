@@ -42,6 +42,37 @@ MA 02110-1301, USA.
 namespace NativeUI
 {
 
+	/**
+	 * \brief Constants indicating how a menu item should display in
+	 * the presence of an Action Bar.
+	 * Platform: Android only.
+	 */
+	enum ActionBarMenuItemDisplayFlag
+	{
+		/**
+		 * @brief Show this item as a button in an Action Bar if the system
+		 * decides there is room for it.
+		 */
+		SHOW_IF_ROOM = 1,
+		/**
+		 * @brief Always show this item as a button in an Action Bar.
+		 * Use sparingly! If too many items are set to always show in the Action Bar it can
+		 * crowd it and degrade the user experience on devices with smaller screens.
+		 * A good rule of thumb is to have no more than 2 items set to always show at a time.
+		 */
+		SHOW_ALWAYS = 2,
+		/**
+		 * @brief When this item is in the action bar, always show it with a text label even
+		 * if it also has an icon specified.
+		 */
+		SHOW_WITH_TEXT = 4,
+		/**
+		 * @brief This item's action view collapses to a normal menu item.
+		 * When expanded, the action view temporarily takes over a larger segment of its container.
+		 */
+		SHOW_COLLAPSE_ACTION_VIEW = 8
+	};
+
 	// Forward declaration.
 	class ScreenListener;
 
@@ -161,7 +192,7 @@ namespace NativeUI
 		* @return The index on which the menu item was added in the options menu,
 		* an error code otherwise.
 		*/
-		int Screen::addOptionsMenuItem(const MAUtil::String title);
+		int addOptionsMenuItem(const MAUtil::String title);
 
 		/**
 		* Add a new menu item to the Options Menu associated to this screen.
@@ -182,7 +213,7 @@ namespace NativeUI
 		* @return The index on which the menu item was added in the options menu,
 		* an error code otherwise.
 		*/
-		int Screen::addOptionsMenuItem(const MAUtil::String title, int resourceIconID);
+		int addOptionsMenuItem(const MAUtil::String title, int resourceIconID);
 
 		/**
 		* Add a new menu item to the Options Menu associated to this screen.
@@ -213,13 +244,68 @@ namespace NativeUI
 		* @return The index on which the menu item was added in the options menu,
 		* an error code otherwise.
 		*/
-		int Screen::addOptionsMenuItem(
+		int addOptionsMenuItem(
 				const MAUtil::String title, const MAUtil::String icon, bool isPath);
 
 		/**
 		 * Remove the options menu from this screen.
 		 */
 		virtual void removeOptionsMenu();
+
+		/**
+		 * Add a menu item to the Action bar, with a given title
+		 * and an icon using either a predefined system image, either
+		 * a resource image.
+		 * NOTE that before making any Action bar specific call,
+		 * it must be enabled using: ActionBar::setEnabled(true);
+		 *
+		 * Remember to call ActionBar::getInstance()->refresh()
+		 * when you finished with menu items changes.
+		 *
+		 * @param itemTitle The title associated for the new item. Can be left null.
+		 * @param iconPredefinedId The icon for this item as a Drawable, getting it from
+		 * predefined system resources. One of the #OptionsMenuIconConstants.
+		 * Can be left to -1 if the item uses a project resource instead.
+		 * @param iconHandle The icon for this item as a Drawable, getting it from resources.
+		 * Can be left to -1 if the item uses a predefined system resource instead.
+		 *
+		 * @return The menu item handle on success, or any of the following result codes:
+		 * - #MAW_RES_ACTION_BAR_NOT_AVAILABLE If the action bar is not available on the current platform,
+		 * - #MAW_RES_ACTION_BAR_DISABLED If the action bar is not enabled, or
+		 * -
+		 */
+		MAHandle addActionBarMenuItem(const MAUtil::String itemTitle, const int iconPredefinedId,
+				const MAHandle iconHandle, const ActionBarMenuItemDisplayFlag flag);
+
+		/**
+		 * Remove a menu item from the Action bar.
+		 * NOTE that before making any Action bar specific call,
+		 * it must be enabled using: ActionBar::setEnabled(true);
+		 *
+		 * Remember to call ActionBar::getInstance()->refresh()
+		 * when you finished with menu items changes.
+		 *
+		 * @returns #MAW_RES_OK on success, or any of the following result codes:
+		 * - #MAW_RES_ACTION_BAR_NOT_AVAILABLE If the action bar is not available on the current platform,
+		 * - #MAW_RES_ACTION_BAR_DISABLED If the action bar is not enabled, or
+		 * - #MAW_RES_INVALID_HANDLE If the indicated screen has no item on specified handle.
+		 */
+		int removeActionBarMenuItem(MAHandle itemHandle);
+
+		/**
+		 * Remove all Action bar menu items from the current screen.
+		 * NOTE that before making any Action bar specific call,
+		 * it must be enabled using: ActionBar::setEnabled(true);
+		 *
+		 * Remember to call ActionBar::getInstance()->refresh()
+		 * when you finished with menu items changes.
+		 *
+		 * @return #MAW_RES_OK on success, or any of the following result codes:
+		 * - #MAW_RES_ACTION_BAR_NOT_AVAILABLE If the Action bar is not available on the current platform,
+		 * - #MAW_RES_ACTION_BAR_DISABLED If the Action bar is not enabled, or
+		 * - #MAW_RES_INVALID_HANDLE If the indicated screen has no menu item on specified handle.
+		 */
+		int removeActionBarItems();
 
 		/**
 		 * Check if a screen is shown.
@@ -257,6 +343,7 @@ namespace NativeUI
          * Array with screen listeners.
          */
         MAUtil::Vector<ScreenListener*> mScreenListeners;
+        MAUtil::Vector<MAHandle> mActionBarItems;
 	};
 
 } // namespace NativeUI

@@ -53,6 +53,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -82,6 +83,7 @@ import com.mosync.internal.android.notifications.LocalNotificationsService;
 import com.mosync.internal.android.notifications.PushNotificationsManager;
 import com.mosync.internal.android.notifications.PushNotificationsUtil;
 import com.mosync.internal.generated.IX_WIDGET;
+import com.mosync.nativeui.core.NativeUI;
 import com.mosync.nativeui.ui.widgets.OptionsMenuItem;
 import com.mosync.nativeui.ui.widgets.ScreenWidget;
 import com.mosync.nativeui.ui.widgets.StackScreenWidget;
@@ -145,9 +147,6 @@ public class MoSync extends Activity
 		// Initialize.
 		mMoSyncView = null;
 
-		// MoSync Android apps do not have a system title bar.
-		requestWindowFeature(Window.FEATURE_NO_TITLE);
-
 		// Default screen orientation is portrait mode.
 		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
@@ -179,6 +178,22 @@ public class MoSync extends Activity
 			SYSLOG("No GCM/C2DM message");
 		}
 
+		// Options Menu is enabled for devices prior to Honeycomb.
+		// ActionBar is disabled by default starting with Honeycomb, and can be
+		// enabled using maActionBarSetEnabled(true)
+		if ( Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB )
+		{
+			// Action bar will not be supported on pre-Honeycomb devices
+			requestWindowFeature(Window.FEATURE_NO_TITLE);
+			NativeUI.mActionBarEnabled = false;
+		}
+		else
+		{
+			requestWindowFeature(Window.FEATURE_ACTION_BAR);
+			NativeUI.mActionBarEnabled = true;
+			getActionBar().hide();
+		}
+
 		// Create the view.
 		mMoSyncView = createMoSyncView();
 		if (null != mMoSyncView)
@@ -195,6 +210,49 @@ public class MoSync extends Activity
 
 		registerShutdownListener();
     }
+
+    public int setActionBarState(Boolean state)
+    {
+        if (checkActionBarCompatibility())
+        {
+			if ( state )
+			{
+				getActionBar().show();
+			}
+			else
+			{
+				getActionBar().hide();
+			}
+			return IX_WIDGET.MAW_RES_OK;
+        }
+
+        Log.e("@@MoSync", "maActionBarSetEnabled error: selected feature cannot be applied.");
+        return IX_WIDGET.MAW_RES_ACTION_BAR_NOT_AVAILABLE;
+    }
+
+	public static Boolean checkActionBarCompatibility()
+	{
+		if ( Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB )
+		{
+			SYSLOG("@@MoSync ActionBar is not available on current platform");
+			return false;
+		}
+		return true;
+	}
+
+	public int setActionBarVisibility(Boolean visibility)
+	{
+        if (checkActionBarCompatibility())
+        {
+			if (visibility)
+				getActionBar().show();
+			else
+				getActionBar().hide();
+        }
+
+        Log.e("@@MoSync", "maActionBarSetEnabled error: selected feature cannot be applied.");
+        return IX_WIDGET.MAW_RES_ACTION_BAR_NOT_AVAILABLE;
+	}
 
     public MoSyncThread getMoSyncThread()
     {
@@ -425,28 +483,24 @@ public class MoSync extends Activity
 		sendCloseEvent();
     }
 
-	@Override
-	/**
-	 * Initialize the content of the Options menu each
-	 * time Menu is pressed, based on the current screen.
-	 */
-	public boolean onPrepareOptionsMenu(Menu menu)
-	{
-		super.onPrepareOptionsMenu(menu);
-
-		// Remove all the items from the menu.
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        Log.e("@@MoSync", "MoSync onCreateOptionsMenu");
 		menu.clear();
 
-		// Get the focused screen widget.
+//		// Get the focused screen widget.
 		ScreenWidget currentScreen = mMoSyncThread.getCurrentScreen();
 		if ( currentScreen != null )
 		{
 			// Get the menu items for that screen.
 			List<OptionsMenuItem> items = currentScreen.getMenuItems();
 			// Add each menu item to the options menu.
+			Log.e("@@MoSync","MoSync onCreateOptionsMenu, with " + items.size() + " items");
 			for (int i=0; i < items.size(); i++)
 			{
 				MenuItem item = menu.add ( 0, items.get(i).getId(), 0, items.get(i).getTitle() );
+				if (NativeUI.mActionBarEnabled)
+					item.setShowAsAction(items.get(i).getShowActionFlag());
 				if ( items.get(i).hasIconFromResources() )
 				{
 					item.setIcon( items.get(i).getIconResId() );
@@ -456,10 +510,80 @@ public class MoSync extends Activity
 					item.setIcon( items.get(i).getIcon() );
 				}
 			}
-			return true;
+//			return true;
 		}
+		else
+			Log.e("@@MoSync"," onCreateOptionsMenu screen is NULL");
+//
+//		return super.onCreateOptionsMenu(menu);
 
-		return false;
+//    	MenuItem item1 = menu.add(0, 1, 0, "btn");
+//    	item1.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+//    	item1.setIcon(17301555);
+//
+//    	MenuItem item2 = menu.add(1,0,0,"t");
+//    	item2.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+//    	item2.setIcon(17301583);
+
+        return super.onCreateOptionsMenu(menu);
+    }
+
+	@Override
+	/**
+	 * Initialize the content of the Options menu each
+	 * time Menu is pressed, based on the current screen.
+	 */
+	public boolean onPrepareOptionsMenu(Menu menu)
+	{
+		Log.e("@@MoSync", "MoSync onPrepareOptionsMenu");
+
+//    	MenuItem item1 = menu.add(0, 1, 0, "btn");
+//    	item1.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+//    	item1.setIcon(17301555);
+//
+//    	MenuItem item2 = menu.add(1,0,0,"t");
+//    	item2.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+//    	item2.setIcon(17301583);
+
+//		return super.onPrepareOptionsMenu(menu);
+
+//		// Remove all the items from the menu.
+		menu.clear();
+
+		// Get the focused screen widget.
+		ScreenWidget currentScreen = mMoSyncThread.getCurrentScreen();
+		if ( currentScreen != null )
+		{
+			Log.e("@@MoSync"," onPrepareOptionsMenu screen is not null");
+			// Get the menu items for that screen.
+			List<OptionsMenuItem> items = currentScreen.getMenuItems();
+			Log.e("@@MoSync","MoSync onPrepareOptionsMenu, with " + items.size() + " items");
+			// Add each menu item to the options menu.
+			for (int i=0; i < items.size(); i++)
+			{
+				MenuItem item = menu.add ( 0, items.get(i).getId(), 0, items.get(i).getTitle() );
+				// When enabled, use ActionBar items.
+				if (NativeUI.mActionBarEnabled)
+				{
+					item.setShowAsAction(items.get(i).getShowActionFlag());
+				}
+
+				if ( items.get(i).hasIconFromResources() )
+				{
+					item.setIcon( items.get(i).getIconResId() );
+				}
+				else if ( items.get(i).hasIconPredefined() )
+				{
+					item.setIcon( items.get(i).getIcon() );
+				}
+			}
+//			return true;
+		}
+		else
+			Log.e("@@MoSync"," onPrepareOptionsMenu screen is NULL");
+
+		return super.onPrepareOptionsMenu(menu);
+//		return false;
 	}
 
 	@Override
@@ -474,9 +598,27 @@ public class MoSync extends Activity
 		ScreenWidget currentScreen = mMoSyncThread.getCurrentScreen();
 		if ( currentScreen != null )
 		{
-			EventQueue.getDefault().postOptionsMenuItemSelected(
-					currentScreen.getHandle(),
-					item.getItemId());
+			if ( NativeUI.mActionBarEnabled )
+			{
+				if (item.getItemId() == android.R.id.home)
+				{
+					EventQueue.getDefault().postActionBarHomeSelected(
+							currentScreen.getHandle());
+				}
+				else
+				{
+					EventQueue.getDefault().postActionBarItemSelected(
+							currentScreen.getHandle(),
+							item.getItemId());
+				}
+			}
+			else
+			{
+				EventQueue.getDefault().postOptionsMenuItemSelected(
+						currentScreen.getHandle(),
+						item.getItemId());
+			}
+
 			return true;
 		}
 
@@ -873,4 +1015,5 @@ public class MoSync extends Activity
     		mEventTypeCloseHasBeenSent = true;
     	}
     }
+
 }
