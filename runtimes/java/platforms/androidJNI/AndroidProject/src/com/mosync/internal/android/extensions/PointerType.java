@@ -31,4 +31,8 @@ public class PointerType extends TypeDescriptor {
 		return 4;
 	}
 
+	public String toString() {
+		return delegate.toString() + "*";
+	}
+
 }

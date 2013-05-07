@@ -28,6 +28,7 @@ struct SETTINGS {
 	const char* cppOutputDir;
 	const char* csOutputDir;
 	const char* model;
+	const char* mosyncProjectPath;
 	const char* dst;
 	const char* name;
 	const char* vendor;

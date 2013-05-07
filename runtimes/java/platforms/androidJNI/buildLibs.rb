@@ -128,7 +128,7 @@ puts "Building native Library\n\n"
 # However, we should merge this using Fredrik's approach soon.
 
 # First, we need wchar support
-#buildLib("wchar", { 'src' => "-SMAStd/wchar.c -SMAStd/mawstring.c -SMAStd/mawvsprinf.c", 'bootmodules' => "." })
+#buildLib("wchar", { 'src' => "-SMAStd/wchar.c -SMAStd/mawstring.c -SMAStd/mawvsprintf.c", 'bootmodules' => "." })
 
 bootfiles = "-S./* -S./UTF/* -S../../core/Core.cpp -S../sdl/FileImpl.cpp -S../../base/FileStream.cpp -S../../base/MemStream.cpp -S../../base/Stream.cpp -S../../base/Image.cpp -S../../base/ResourceArray.cpp -S../../base/Syscall.cpp -S../../../../intlibs/helpers/platforms/linux/log.cpp -S../../../../intlibs/hashmap/hashmap.cpp"
 cppDir = "#{ENV['MOSYNC_SRC']}/runtimes/cpp"
@@ -152,7 +152,7 @@ buildLib("mosync", { 'src' => bootfiles, 'compiler-flags' => "-Wno-psabi -D_andr
 #buildLib("yajl", { 'src' => "-Syajl/**", 'modules' => "MAStd,MAUtil" })
 #buildLib("Notification", { 'src' => "-SNotification/**", 'modules' => "MAStd,MAUtil" })
 
-libfiles = "-SMAUI -SMAStd/conprint.c -SMAStd/maassert.c -SMAStd/mastring.c -SMAStd/mawstring.c -SMAStd/matime.c -SMAStd/mavsprintf.c -SMAStd/mawvsprintf.c -SMAStd/maxtoa.c -SMAStd/wchar.c -SMAMath/MAVector3.c -SAds -SMinUI -SResCompiler -Skazlib -Syasper -SFacebook/** -SNativeUI -SHybris -SMAFS/** -SMAUtil -XMAUtil/DomParser.cpp -SNotification -STestify -SMATest -SPurchase -SWormhole/** -Syajl/** -XMAUtil/GraphicsOpenGL.c -XMAUtil/XMLDataProvider.cpp -XMAUtil/XPathTokenizer.cpp"
+libfiles = "-SMAP -SMAUI -SMAStd/conprint.c -SMAStd/maassert.c -SMAStd/mastring.c -SMAStd/mawstring.c -SMAStd/matime.c -SMAStd/mavsprintf.c -SMAStd/mawvsprintf.c -SMAStd/maxtoa.c -SMAStd/wchar.c -SMAMath/MAVector3.c -SAds -SMinUI -SResCompiler -Skazlib -Syasper -SFacebook/** -SNativeUI -SHybris -SMAFS/** -SMAUtil -XMAUtil/DomParser.cpp -SNotification -STestify -SMATest -SPurchase -SWormhole/** -Syajl/** -XMAUtil/GraphicsOpenGL.c -XMAUtil/XMLDataProvider.cpp -XMAUtil/XPathTokenizer.cpp"
 #libfiles = "- -Skazlib  -SHybris "
 buildLib("mosynclib", { 'shared' => true,
 	'src' => libfiles,

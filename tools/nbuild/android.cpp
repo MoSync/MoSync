@@ -18,7 +18,7 @@ using namespace std;
 int buildAndroidNative(Arguments* params) {
 	int result = 1;
 	if (!params->isFlagSet("--android-execute-makefile")) {
-		result = generateMakefile(params);
+		result = generateMakefiles(params);
 	}
 	if (!params->isFlagSet("--android-generate-makefile")) {
 		result = executeNdkBuild(params);
@@ -26,7 +26,11 @@ int buildAndroidNative(Arguments* params) {
 	return result;
 }
 
-string getTempBuildDir(Arguments* params) {
+/**
+ * Returns the temp build dir, given a config, or
+ * the root temp build dir if the config is empty.
+ */
+string getTempBuildDir(Arguments* params, string* cfg) {
 	string tmpDir = params->getSwitchValue(TEMP_BUILD_DIR);
 	if (tmpDir.empty()) {
 		tmpDir = params->getSwitchValue(PROJECT_DIR);
@@ -35,12 +39,29 @@ string getTempBuildDir(Arguments* params) {
 	} else {
 		toDir(tmpDir);
 	}
+	if (cfg) {
+		tmpDir = tmpDir + (*cfg);
+		toDir(tmpDir);
+	}
 	toOSSlashes(tmpDir);
 	return tmpDir;
 }
 
-int generateMakefile(Arguments* params) {
-	string tmpBuildDir = getTempBuildDir(params);
+int generateMakefiles(Arguments* params) {
+	vector<string> configNames;
+	split(configNames, require(params, CONFIGURATION), ",");
+	int result = 0;
+	string tmpRoot = getTempBuildDir(params);
+	_mkdir(tmpRoot.c_str());
+	for (size_t i = 0; i < configNames.size(); i++) {
+		string configName = configNames[i];
+		result += generateMakefile(params, configName);
+	}
+	return result;
+}
+
+int generateMakefile(Arguments* params, string& configName) {
+	string tmpBuildDir = getTempBuildDir(params, &configName);
 	_mkdir(tmpBuildDir.c_str());
 
 	vector<string> bootstrapModules;
@@ -139,7 +160,6 @@ int generateMakefile(Arguments* params) {
 		}
 		return 1;
 	}
-
 	// Failed!
 	return 2;
 }
@@ -226,7 +246,8 @@ int executeNdkBuild(Arguments* params) {
 			string libVariant = libVariants[i];
 			string arch = archs[j];
 
-			string tmpBuildDir = getTempBuildDir(params);
+			string tmpBuildDir = getTempBuildDir(params, &configName);
+			_mkdir(tmpBuildDir.c_str());
 
 			bool isDebug = libVariant == "debug";
 			bool isVerbose = params->isFlagSet(VERBOSE);
