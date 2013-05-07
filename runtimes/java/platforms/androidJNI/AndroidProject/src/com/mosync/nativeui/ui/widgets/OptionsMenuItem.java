@@ -18,10 +18,13 @@ MA 02110-1301, USA.
 package com.mosync.nativeui.ui.widgets;
 
 import android.graphics.drawable.Drawable;
+import android.view.MenuItem;
 
 /**
  * This class is not a widget, it's just a container for menu items.
  * It holds information like: title and icon.
+ * Starting with Honeycomb, the ActionBar replaces the options menu,
+ * as newest devices do not have the options hardware button.
  *
  * @author emma
  */
@@ -49,9 +52,16 @@ public class OptionsMenuItem
 	private int m_iconResID = -1;
 
 	/**
-	 * The item id(the position in the items list).
+	 * The item id.
+	 * Internal placeholder for ActionBar menu items.
+	 * Index in menu for options menu items.
 	 */
 	private int m_itemId = -1;
+
+	/**
+	 * Sets how an item should display in the presence of an Action Bar.
+	 */
+	private int m_displayFlag = MenuItem.SHOW_AS_ACTION_IF_ROOM;
 
 	/**
 	 * Constructor
@@ -80,9 +90,24 @@ public class OptionsMenuItem
 		m_iconResID = iconRes;
 	}
 
+	public void setShowAsAction(int flag)
+	{
+		m_displayFlag = flag;
+	}
+
+	public int getShowActionFlag()
+	{
+		return m_displayFlag;
+	}
+
 	public Boolean hasIconFromResources()
 	{
 		return m_iconResource;
+	}
+
+	public Boolean hasIconPredefined()
+	{
+		return (m_iconResID != -1 ? true : false );
 	}
 
 	public String getTitle()

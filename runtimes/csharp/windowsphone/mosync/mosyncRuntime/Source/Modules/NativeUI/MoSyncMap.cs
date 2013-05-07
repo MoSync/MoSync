@@ -70,7 +70,7 @@ namespace MoSync
                 mVisibleAreaUpperLeftCorner = new System.Device.Location.GeoCoordinate();
                 mVisibleAreaLowerRightCorner = new System.Device.Location.GeoCoordinate();
 
-                mView = mBingMap;
+                View = mBingMap;
 
                 // occurs when the map visible area is changed (on drag/scroll)
                 mBingMap.MapPan += new EventHandler<MapDragEventArgs>(
@@ -441,6 +441,27 @@ namespace MoSync
                     }
                 }
             }
+
+            #region Property validation methods
+
+            /**
+             * Validates a property based on the property name and property value.
+             * @param propertyName The name of the property to be checked.
+             * @param propertyValue The value of the property to be checked.
+             * @returns true if the property is valid, false otherwise.
+             */
+            public new static bool ValidateProperty(string propertyName, string propertyValue)
+            {
+                bool isBasePropertyValid = WidgetBaseWindowsPhone.ValidateProperty(propertyName, propertyValue);
+                if (isBasePropertyValid == false)
+                {
+                    return false;
+                }
+
+                return true;
+            }
+
+            #endregion
         } // end of Map class
     } // end of NativeUI namespace
 } // end of MoSync namespace

@@ -191,6 +191,11 @@ group WidgetEvent "Widget event" {
 			int optionsMenuItem;
 
 			/**
+			*  The selected action bar menu item handle, when a #MAW_EVENT_ACTION_BAR_MENU_ITEM_SELECTED event is received.
+			*/
+			int actionBarMenuItem;
+
+			/**
 			 * The clicked map pin index, when a #MAW_EVENT_MAP_PIN_CLICKED event is received.
 			 */
 			int mapPinIndex;
@@ -451,6 +456,18 @@ group WidgetEvent "Widget event" {
 			* Available on iOS.
 			*/
 			CUSTOM_PICKER_ITEM_SELECTED = 37;
+
+			/**
+			* @brief Send when the home item from the Action Bar is selected.
+			* Available on Android.
+			*/
+			ACTION_BAR_UP_ITEM_SELECTED = 38;
+
+			/**
+			* @brief Send when an item from the Action Bar is selected.
+			* Available on Android.
+			*/
+			ACTION_BAR_MENU_ITEM_SELECTED = 39;
 		}
 	} // end of WidgetEventTypes
 } // end of WidgetEvent

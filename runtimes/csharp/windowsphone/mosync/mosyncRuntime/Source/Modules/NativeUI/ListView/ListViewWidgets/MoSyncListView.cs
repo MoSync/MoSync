@@ -139,7 +139,7 @@ namespace MoSync
 
                 // if the default constructor is called, the list view is of type MAW_LIST_VIEW_TYPE_DEFAULT
                 mListViewType = ListViewType.Default;
-                mView = mList;
+                View = mList;
 
                 // add the tap event handler on the default list (mList)
                 mList.Tap += new EventHandler<System.Windows.Input.GestureEventArgs>(mList_Tap);
@@ -716,7 +716,7 @@ namespace MoSync
              */
             private void SwitchToLongListSelector()
             {
-                mView = mLongListSelector;
+                View = mLongListSelector;
                 mLongListSelector.ItemsSource = mListSections;
             }
 
@@ -725,9 +725,9 @@ namespace MoSync
              */
             private void SwitchToListBox()
             {
-                if (mView != mList)
+                if (View != mList)
                 {
-                    mView = mList;
+                    View = mList;
                 }
             }
 
@@ -920,6 +920,27 @@ namespace MoSync
                 {
                     mListSections[sectionIndex] = newSection;
                 }
+            }
+
+            #endregion
+
+            #region Property validation methods
+
+            /**
+             * Validates a property based on the property name and property value.
+             * @param propertyName The name of the property to be checked.
+             * @param propertyValue The value of the property to be checked.
+             * @returns true if the property is valid, false otherwise.
+             */
+            public new static bool ValidateProperty(string propertyName, string propertyValue)
+            {
+                bool isBasePropertyValid = WidgetBaseWindowsPhone.ValidateProperty(propertyName, propertyValue);
+                if (isBasePropertyValid == false)
+                {
+                    return false;
+                }
+
+                return true;
             }
 
             #endregion

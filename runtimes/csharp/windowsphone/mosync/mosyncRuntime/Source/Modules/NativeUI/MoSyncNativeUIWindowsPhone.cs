@@ -32,6 +32,8 @@ using System.Windows.Navigation;
 using System;
 using System.Text.RegularExpressions;
 using System.Reflection;
+using System.Collections.Generic;
+using System.Threading;
 
 namespace MoSync
 {
@@ -39,7 +41,142 @@ namespace MoSync
     {
         public class WidgetBaseWindowsPhone : WidgetBase
         {
-            protected UIElement mView;
+            /**
+             * The basic widget view. Every UI widget inherits from UIElement.
+             */
+            private UIElement mView;
+
+            //Width
+            protected double mWidth;
+
+            //Height
+            protected double mHeight;
+
+            #region Constructor
+
+            public WidgetBaseWindowsPhone()
+                : base()
+            {
+                setHorizontalSizePolicyFlags(false, true);
+                setVerticalSizePolicyFlags(false, true);
+                RowNumber = -1;
+                ColumnNumber = -1;
+            }
+
+            #endregion
+
+            #region View property
+
+            public UIElement View
+            {
+                get { return mView; }
+                set
+                {
+                    mView = value;
+                }
+            }
+
+            #endregion
+
+            #region Widget operation queue methods
+
+            /**
+             * Runs all the operations from the operation queue. Must be run on the UI thread.
+             */
+            public new void RunOperationQueue()
+            {
+                // run all the pending operations from the widget operation queue
+                while (mOperationQueue.Count != 0)
+                {
+                    WidgetOperation currentOperation = mOperationQueue.Dequeue();
+
+                    RunOperation(currentOperation);
+                }
+            }
+
+            /**
+             * Runs a WidgetOperation on the current widget.
+             * @param operation The widget operation (could be a ADD, INSERT, REMOVE, SET or GET) that
+             * needs to be applied on the current widget.
+             */
+            protected void RunOperation(WidgetOperation operation)
+            {
+                switch (operation.Type)
+                {
+                    case WidgetOperation.OperationType.SET:
+                        SetProperty(operation);
+                        break;
+                    case WidgetOperation.OperationType.GET:
+                        break;
+                    case WidgetOperation.OperationType.ADD:
+                        AddChild(operation);
+                        break;
+                    case WidgetOperation.OperationType.INSERT:
+                        InsertChild(operation);
+                        break;
+                    case WidgetOperation.OperationType.REMOVE:
+                        RemoveChild(operation);
+                        break;
+                }
+            }
+
+            /**
+             * Runs a set property operation on the current widget.
+             * @param operation The widget operation that needs to be applied on the current widget.
+             */
+            protected void SetProperty(WidgetOperation operation)
+            {
+                PropertyInfo pinfo;
+                MoSyncWidgetPropertyAttribute pattr = GetPropertyAttribute(operation.Property, out pinfo);
+                Exception exception = null;
+                try
+                {
+                    SetProperty(pinfo, operation.Value);
+                }
+                catch (Exception e)
+                {
+                    exception = e;
+                }
+                if (null != exception)
+                    if (exception.InnerException is InvalidPropertyValueException)
+                        throw new InvalidPropertyValueException();
+            }
+
+            /**
+             * Runs a add child operation on the current widget.
+             * @param operation The widget operation that needs to be applied on the current widget.
+             */
+            protected void AddChild(WidgetOperation operation)
+            {
+                IWidget child = mRuntime.GetModule<NativeUIModule>().GetWidgetSync(operation.Handle);
+                child.SetParent(this);
+                this.AddChild(child);
+            }
+
+            /**
+             * Runs a insert child operation on the current widget.
+             * @param operation The widget operation that needs to be applied on the current widget.
+             */
+            protected void InsertChild(WidgetOperation operation)
+            {
+                IWidget child = mRuntime.GetModule<NativeUIModule>().GetWidgetSync(operation.Handle);
+//                child.SetParent(this);
+                this.InsertChild(child, operation.Index);
+            }
+
+            /**
+             * Runs a remove child operation on the current widget.
+             * @param operation The widget operation that needs to be applied on the current widget.
+             */
+            protected void RemoveChild(WidgetOperation operation)
+            {
+                IWidget child = mRuntime.GetModule<NativeUIModule>().GetWidgetSync(operation.Handle);
+                child.RemoveFromParent();
+            }
+
+            #endregion
+
+            #region Properties and methods for setting/getting FILL/WRAP and setting the detault FILL/WRAP values
 
             //Size policies
             public bool FILL_SPACE_V
@@ -81,12 +218,6 @@ namespace MoSync
                 set;
             }
 
-            //Width
-            protected double mWidth;
-
-            //Height
-            protected double mHeight;
-
             protected void setHorizontalSizePolicyFlags(bool fillSpaceHorizontally, bool wrapContentHorizontally)
             {
                 FILL_SPACE_H =  fillSpaceHorizontally;
@@ -99,11 +230,9 @@ namespace MoSync
                 WRAP_CONT_V = wrapContentVertically;
             }
 
-            public UIElement View
-            {
-                get { return mView; }
-                set { mView = value; }
-            }
+            #endregion
+
+            #region Basic widget properties
 
             /**
              * MAW_WIDGET_LEFT implementation
@@ -324,14 +453,24 @@ namespace MoSync
                 }
             }
 
-            public WidgetBaseWindowsPhone()
-                : base()
+            #endregion
+
+            #region Validate property region
+
+            public static bool ValidateProperty(String propertyName, String propertyValue)
             {
-                setHorizontalSizePolicyFlags(false, true);
-                setVerticalSizePolicyFlags(false, true);
-                RowNumber = -1;
-                ColumnNumber = -1;
+                if (propertyName.Equals("enabled") || propertyName.Equals("visible"))
+                {
+                    bool val;
+                    if (!Boolean.TryParse(propertyValue, out val)) return false;
+                }
+
+                return true;
             }
+
+            #endregion
+
+            #region Helper UI methods (wrapping and filling)
 
             /**
              * \brief This functions is called on the wrap content horizontally case
@@ -509,7 +648,11 @@ namespace MoSync
                     }
                 }
             }
+
+            #endregion
         }
+
+        #region UIManagers
 
         public class NativeUIWindowsPhone : UIManager
         {
@@ -521,5 +664,7 @@ namespace MoSync
                 mFrame = (PhoneApplicationFrame)Application.Current.RootVisual;
             }
         }
+
+        #endregion
     }
 }
