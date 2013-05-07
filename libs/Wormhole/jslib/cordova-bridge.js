@@ -57,7 +57,3 @@ mosync.bridge.cordova.send = function(callbackId, service, action, args)
 	// Call into Mosync C++ through bridge library.
 	mosync.bridge.sendJSON(command, null);
 };
-
-mosync.bridge.PhoneGap = mosync.bridge.cordova;
-
-var PhoneGap = window.cordova;
