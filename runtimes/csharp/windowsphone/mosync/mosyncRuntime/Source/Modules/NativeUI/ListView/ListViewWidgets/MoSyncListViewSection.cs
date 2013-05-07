@@ -686,9 +686,38 @@ namespace MoSync
             public new static bool ValidateProperty(string propertyName, string propertyValue)
             {
                 bool isBasePropertyValid = WidgetBaseWindowsPhone.ValidateProperty(propertyName, propertyValue);
-                if (isBasePropertyValid == false)
+                if (isBasePropertyValid == false) return false;
+
+                if (propertyName.Equals("headerBackground") || propertyName.Equals("footerBackground") ||
+                    propertyName.Equals("headerFontColor") || propertyName.Equals("footerFontColor"))
                 {
-                    return false;
+                    System.Windows.Media.SolidColorBrush brush;
+                    try
+                    {
+                        MoSync.Util.convertStringToColor(propertyValue, out brush);
+                    }
+                    catch
+                    {
+                        return false;
+                    }
+                }
+                else if (propertyName.Equals("headerHorizontalAlignment") || propertyName.Equals("footerHorizontalAlignment"))
+                {
+                    if (!(propertyValue.Equals(MoSync.Constants.MAW_ALIGNMENT_LEFT) ||
+                        propertyValue.Equals(MoSync.Constants.MAW_ALIGNMENT_RIGHT) ||
+                        propertyValue.Equals(MoSync.Constants.MAW_ALIGNMENT_CENTER)))
+                    {
+                        return false;
+                    }
+                }
+                else if (propertyName.Equals("headerVerticalAlignment") || propertyName.Equals("footerVerticalAlignment"))
+                {
+                    if (!(propertyValue.Equals(MoSync.Constants.MAW_ALIGNMENT_TOP) ||
+                        propertyValue.Equals(MoSync.Constants.MAW_ALIGNMENT_BOTTOM) ||
+                        propertyValue.Equals(MoSync.Constants.MAW_ALIGNMENT_CENTER)))
+                    {
+                        return false;
+                    }
                 }
 
                 return true;

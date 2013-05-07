@@ -935,9 +935,48 @@ namespace MoSync
             public new static bool ValidateProperty(string propertyName, string propertyValue)
             {
                 bool isBasePropertyValid = WidgetBaseWindowsPhone.ValidateProperty(propertyName, propertyValue);
-                if (isBasePropertyValid == false)
+                if (isBasePropertyValid == false) return false;
+
+                if (propertyName.Equals("type"))
                 {
-                    return false;
+                    int type = -1;
+                    if (int.TryParse(propertyValue, out type))
+                    {
+                        if (!(type == MoSync.Constants.MAW_LIST_VIEW_TYPE_ALPHABETICAL ||
+                            type == MoSync.Constants.MAW_LIST_VIEW_TYPE_DEFAULT ||
+                            type == MoSync.Constants.MAW_LIST_VIEW_TYPE_SEGMENTED))
+                        {
+                            return false;
+                        }
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+                else if (propertyName.Equals("style"))
+                {
+                    int style = -1;
+                    if (int.TryParse(propertyValue, out style))
+                    {
+                        if (!(style == MoSync.Constants.MAW_LIST_VIEW_STYLE_SUBTITLE ||
+                            style == MoSync.Constants.MAW_LIST_VIEW_STYLE_NO_SUBTITLE))
+                        {
+                            return false;
+                        }
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+                else if (propertyName.Equals("allowselection"))
+                {
+                    bool allowSelection = false;
+                    if (!Boolean.TryParse(propertyValue, out allowSelection))
+                    {
+                        return false;
+                    }
                 }
 
                 return true;

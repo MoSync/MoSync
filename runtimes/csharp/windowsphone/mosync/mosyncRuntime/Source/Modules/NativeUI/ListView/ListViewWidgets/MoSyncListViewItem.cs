@@ -421,9 +421,27 @@ namespace MoSync
             public new static bool ValidateProperty(string propertyName, string propertyValue)
             {
                 bool isBasePropertyValid = WidgetBaseWindowsPhone.ValidateProperty(propertyName, propertyValue);
-                if (isBasePropertyValid == false)
+                if (isBasePropertyValid == false) return false;
+
+                if (propertyName.Equals("icon"))
                 {
-                    return false;
+                    int val = 0;
+                    if (!int.TryParse(propertyValue, out val))
+                    {
+                        return false;
+                    }
+                }
+                else if (propertyName.Equals("fontColor"))
+                {
+                    try
+                    {
+                        System.Windows.Media.SolidColorBrush brush;
+                        MoSync.Util.convertStringToColor(propertyValue, out brush);
+                    }
+                    catch
+                    {
+                        return false;
+                    }
                 }
 
                 return true;
