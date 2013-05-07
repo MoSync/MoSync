@@ -1588,7 +1588,11 @@ namespace Wormhole
 			"window.localFileSystem._castEntries");
 	}
 
-	// Deprecated since MoSync 3.3
+	/**
+	 * Handler of PhoneGap FileMgr.testFileExists
+	 * @deprecated Use method actionGetFile.
+	 * @param message JSON data with name of file to test for existence.
+	*/
 	void PhoneGapFile::actionTestFileExists(JSONMessage& message)
 	{
 		String callbackID = message.getParam("PhoneGapCallBackId");
@@ -1607,7 +1611,11 @@ namespace Wormhole
 			exists);
 	}
 
-	// Deprecated since MoSync 3.3
+	/**
+	 * Handler of PhoneGap FileMgr.testDirectoryExists
+	 * @deprecated Use method actionGetDirectory.
+	 * @param message JSON data with path of directory to test for existence.
+	*/
 	void PhoneGapFile::actionTestDirectoryExists(JSONMessage& message)
 	{
 		String callbackID = message.getParam("PhoneGapCallBackId");
@@ -1626,7 +1634,10 @@ namespace Wormhole
 			exists);
 	}
 
-	// Deprecated since MoSync 3.3
+	/**
+	 * Handler of PhoneGap FileMgr.getFreeDiskSpace
+	 * @deprecated Cordova is missing this method.
+	*/
 	void PhoneGapFile::actionGetFreeDiskSpace(JSONMessage& message)
 	{
 		String callbackID = message.getParam("PhoneGapCallBackId");
