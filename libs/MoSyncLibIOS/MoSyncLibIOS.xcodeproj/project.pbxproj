@@ -194,6 +194,7 @@
 		0BC7BEFF1728218F007662C2 /* maxtoa.c in Sources */ = {isa = PBXBuildFile; fileRef = 0BC7BEFE1728218F007662C2 /* maxtoa.c */; };
 		0BC7BF01172821BD007662C2 /* mavsprintf.c in Sources */ = {isa = PBXBuildFile; fileRef = 0BC7BF00172821BD007662C2 /* mavsprintf.c */; };
 		0BC7BF031728226E007662C2 /* mawstring.c in Sources */ = {isa = PBXBuildFile; fileRef = 0BC7BF021728226E007662C2 /* mawstring.c */; };
+		8B3FD681173A350F00419203 /* Camera.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B3FD67F173A350F00419203 /* Camera.cpp */; };
 		8BCE5AEB172F9D4F0095578F /* GraphicsSoftware.c in Sources */ = {isa = PBXBuildFile; fileRef = 8BCE5AE9172F9D4F0095578F /* GraphicsSoftware.c */; };
 		8BCE5AF2172FBABF0095578F /* CharInputC.c in Sources */ = {isa = PBXBuildFile; fileRef = 8BCE5AF1172FBABF0095578F /* CharInputC.c */; };
 		8BCE5AF3172FBAEA0095578F /* CharInput.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0B92B70F1712BB7E002DFDF6 /* CharInput.cpp */; };
@@ -713,6 +714,8 @@
 		0BC7BEFE1728218F007662C2 /* maxtoa.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = maxtoa.c; sourceTree = "<group>"; };
 		0BC7BF00172821BD007662C2 /* mavsprintf.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = mavsprintf.c; sourceTree = "<group>"; };
 		0BC7BF021728226E007662C2 /* mawstring.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = mawstring.c; sourceTree = "<group>"; };
+		8B3FD67F173A350F00419203 /* Camera.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Camera.cpp; sourceTree = "<group>"; };
+		8B3FD680173A350F00419203 /* Camera.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Camera.h; sourceTree = "<group>"; };
 		8BCE5AE9172F9D4F0095578F /* GraphicsSoftware.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = GraphicsSoftware.c; sourceTree = "<group>"; };
 		8BCE5AEA172F9D4F0095578F /* GraphicsSoftware.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GraphicsSoftware.h; sourceTree = "<group>"; };
 		8BCE5AF0172FBABF0095578F /* CharInput.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CharInput.h; sourceTree = "<group>"; };
@@ -994,6 +997,8 @@
 				0B92B8531712BB80002DFDF6 /* Button.cpp */,
 				0B92B8541712BB80002DFDF6 /* Button.h */,
 				0B92B8551712BB80002DFDF6 /* ButtonListener.h */,
+				8B3FD67F173A350F00419203 /* Camera.cpp */,
+				8B3FD680173A350F00419203 /* Camera.h */,
 				0B92B8561712BB80002DFDF6 /* CameraPreview.cpp */,
 				0B92B8571712BB80002DFDF6 /* CameraPreview.h */,
 				0B92B8581712BB80002DFDF6 /* CheckBox.cpp */,
@@ -1886,6 +1891,7 @@
 				0B81C658172928F4006E6E7D /* mawvsprintf.c in Sources */,
 				0BC52146172AC03D00D1D0D8 /* mactype.c in Sources */,
 				8BCE5AEB172F9D4F0095578F /* GraphicsSoftware.c in Sources */,
+				8B3FD681173A350F00419203 /* Camera.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
