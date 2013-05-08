@@ -198,6 +198,22 @@
 		8B3FD689173A4C9000419203 /* entities.c in Sources */ = {isa = PBXBuildFile; fileRef = 8B3FD683173A4C9000419203 /* entities.c */; };
 		8B3FD68A173A4C9000419203 /* MTSax.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B3FD685173A4C9000419203 /* MTSax.cpp */; };
 		8B3FD68B173A4C9000419203 /* MTXml.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B3FD687173A4C9000419203 /* MTXml.cpp */; };
+		8B3FD6B8173A50C400419203 /* CloudMadeMapSource.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B3FD68E173A50C400419203 /* CloudMadeMapSource.cpp */; };
+		8B3FD6B9173A50C400419203 /* Color.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B3FD690173A50C400419203 /* Color.cpp */; };
+		8B3FD6BA173A50C400419203 /* DateTime.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B3FD692173A50C400419203 /* DateTime.cpp */; };
+		8B3FD6BB173A50C400419203 /* GeoPoint.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B3FD696173A50C400419203 /* GeoPoint.cpp */; };
+		8B3FD6BC173A50C400419203 /* GeoPointLayer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B3FD699173A50C400419203 /* GeoPointLayer.cpp */; };
+		8B3FD6BD173A50C400419203 /* GoogleMapSource.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B3FD69C173A50C400419203 /* GoogleMapSource.cpp */; };
+		8B3FD6BE173A50C400419203 /* Layer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B3FD69E173A50C400419203 /* Layer.cpp */; };
+		8B3FD6BF173A50C400419203 /* LayerMapViewport.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B3FD6A0173A50C400419203 /* LayerMapViewport.cpp */; };
+		8B3FD6C0173A50C400419203 /* LonLat.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B3FD6A2173A50C400419203 /* LonLat.cpp */; };
+		8B3FD6C1173A50C400419203 /* MapCache.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B3FD6A4173A50C400419203 /* MapCache.cpp */; };
+		8B3FD6C2173A50C400419203 /* MapSource.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B3FD6A7173A50C400419203 /* MapSource.cpp */; };
+		8B3FD6C3173A50C400419203 /* MapViewport.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B3FD6AB173A50C400419203 /* MapViewport.cpp */; };
+		8B3FD6C4173A50C400419203 /* MapWidget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B3FD6AD173A50C400419203 /* MapWidget.cpp */; };
+		8B3FD6C5173A50C400419203 /* MemoryMgr.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B3FD6AF173A50C400419203 /* MemoryMgr.cpp */; };
+		8B3FD6C6173A50C400419203 /* OpenStreetMapSource.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B3FD6B1173A50C400419203 /* OpenStreetMapSource.cpp */; };
+		8B3FD6C7173A50C400419203 /* TimeSpan.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B3FD6B5173A50C400419203 /* TimeSpan.cpp */; };
 		8BCE5AEB172F9D4F0095578F /* GraphicsSoftware.c in Sources */ = {isa = PBXBuildFile; fileRef = 8BCE5AE9172F9D4F0095578F /* GraphicsSoftware.c */; };
 		8BCE5AF2172FBABF0095578F /* CharInputC.c in Sources */ = {isa = PBXBuildFile; fileRef = 8BCE5AF1172FBABF0095578F /* CharInputC.c */; };
 		8BCE5AF3172FBAEA0095578F /* CharInput.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0B92B70F1712BB7E002DFDF6 /* CharInput.cpp */; };
@@ -725,6 +741,49 @@
 		8B3FD686173A4C9000419203 /* MTSax.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MTSax.h; path = ../../MTXml/MTSax.h; sourceTree = "<group>"; };
 		8B3FD687173A4C9000419203 /* MTXml.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MTXml.cpp; path = ../../MTXml/MTXml.cpp; sourceTree = "<group>"; };
 		8B3FD688173A4C9000419203 /* MTXml.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MTXml.h; path = ../../MTXml/MTXml.h; sourceTree = "<group>"; };
+		8B3FD68D173A50C400419203 /* Broadcaster.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Broadcaster.h; path = ../../MAP/Broadcaster.h; sourceTree = "<group>"; };
+		8B3FD68E173A50C400419203 /* CloudMadeMapSource.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CloudMadeMapSource.cpp; path = ../../MAP/CloudMadeMapSource.cpp; sourceTree = "<group>"; };
+		8B3FD68F173A50C400419203 /* CloudMadeMapSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CloudMadeMapSource.h; path = ../../MAP/CloudMadeMapSource.h; sourceTree = "<group>"; };
+		8B3FD690173A50C400419203 /* Color.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Color.cpp; path = ../../MAP/Color.cpp; sourceTree = "<group>"; };
+		8B3FD691173A50C400419203 /* Color.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Color.h; path = ../../MAP/Color.h; sourceTree = "<group>"; };
+		8B3FD692173A50C400419203 /* DateTime.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = DateTime.cpp; path = ../../MAP/DateTime.cpp; sourceTree = "<group>"; };
+		8B3FD693173A50C400419203 /* DateTime.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DateTime.h; path = ../../MAP/DateTime.h; sourceTree = "<group>"; };
+		8B3FD694173A50C400419203 /* DebugPrintf.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DebugPrintf.h; path = ../../MAP/DebugPrintf.h; sourceTree = "<group>"; };
+		8B3FD695173A50C400419203 /* Enumerator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Enumerator.h; path = ../../MAP/Enumerator.h; sourceTree = "<group>"; };
+		8B3FD696173A50C400419203 /* GeoPoint.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = GeoPoint.cpp; path = ../../MAP/GeoPoint.cpp; sourceTree = "<group>"; };
+		8B3FD697173A50C400419203 /* GeoPoint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GeoPoint.h; path = ../../MAP/GeoPoint.h; sourceTree = "<group>"; };
+		8B3FD698173A50C400419203 /* GeoPointDataSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GeoPointDataSource.h; path = ../../MAP/GeoPointDataSource.h; sourceTree = "<group>"; };
+		8B3FD699173A50C400419203 /* GeoPointLayer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = GeoPointLayer.cpp; path = ../../MAP/GeoPointLayer.cpp; sourceTree = "<group>"; };
+		8B3FD69A173A50C400419203 /* GeoPointLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GeoPointLayer.h; path = ../../MAP/GeoPointLayer.h; sourceTree = "<group>"; };
+		8B3FD69B173A50C400419203 /* GeoPointLayerRenderer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GeoPointLayerRenderer.h; path = ../../MAP/GeoPointLayerRenderer.h; sourceTree = "<group>"; };
+		8B3FD69C173A50C400419203 /* GoogleMapSource.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = GoogleMapSource.cpp; path = ../../MAP/GoogleMapSource.cpp; sourceTree = "<group>"; };
+		8B3FD69D173A50C400419203 /* GoogleMapSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GoogleMapSource.h; path = ../../MAP/GoogleMapSource.h; sourceTree = "<group>"; };
+		8B3FD69E173A50C400419203 /* Layer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Layer.cpp; path = ../../MAP/Layer.cpp; sourceTree = "<group>"; };
+		8B3FD69F173A50C400419203 /* Layer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Layer.h; path = ../../MAP/Layer.h; sourceTree = "<group>"; };
+		8B3FD6A0173A50C400419203 /* LayerMapViewport.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = LayerMapViewport.cpp; path = ../../MAP/LayerMapViewport.cpp; sourceTree = "<group>"; };
+		8B3FD6A1173A50C400419203 /* LayerMapViewport.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = LayerMapViewport.h; path = ../../MAP/LayerMapViewport.h; sourceTree = "<group>"; };
+		8B3FD6A2173A50C400419203 /* LonLat.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = LonLat.cpp; path = ../../MAP/LonLat.cpp; sourceTree = "<group>"; };
+		8B3FD6A3173A50C400419203 /* LonLat.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = LonLat.h; path = ../../MAP/LonLat.h; sourceTree = "<group>"; };
+		8B3FD6A4173A50C400419203 /* MapCache.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MapCache.cpp; path = ../../MAP/MapCache.cpp; sourceTree = "<group>"; };
+		8B3FD6A5173A50C400419203 /* MapCache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MapCache.h; path = ../../MAP/MapCache.h; sourceTree = "<group>"; };
+		8B3FD6A6173A50C400419203 /* MapConfig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MapConfig.h; path = ../../MAP/MapConfig.h; sourceTree = "<group>"; };
+		8B3FD6A7173A50C400419203 /* MapSource.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MapSource.cpp; path = ../../MAP/MapSource.cpp; sourceTree = "<group>"; };
+		8B3FD6A8173A50C400419203 /* MapSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MapSource.h; path = ../../MAP/MapSource.h; sourceTree = "<group>"; };
+		8B3FD6A9173A50C400419203 /* MapTile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MapTile.h; path = ../../MAP/MapTile.h; sourceTree = "<group>"; };
+		8B3FD6AA173A50C400419203 /* MapTileCoordinate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MapTileCoordinate.h; path = ../../MAP/MapTileCoordinate.h; sourceTree = "<group>"; };
+		8B3FD6AB173A50C400419203 /* MapViewport.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MapViewport.cpp; path = ../../MAP/MapViewport.cpp; sourceTree = "<group>"; };
+		8B3FD6AC173A50C400419203 /* MapViewport.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MapViewport.h; path = ../../MAP/MapViewport.h; sourceTree = "<group>"; };
+		8B3FD6AD173A50C400419203 /* MapWidget.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MapWidget.cpp; path = ../../MAP/MapWidget.cpp; sourceTree = "<group>"; };
+		8B3FD6AE173A50C400419203 /* MapWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MapWidget.h; path = ../../MAP/MapWidget.h; sourceTree = "<group>"; };
+		8B3FD6AF173A50C400419203 /* MemoryMgr.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MemoryMgr.cpp; path = ../../MAP/MemoryMgr.cpp; sourceTree = "<group>"; };
+		8B3FD6B0173A50C400419203 /* MemoryMgr.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MemoryMgr.h; path = ../../MAP/MemoryMgr.h; sourceTree = "<group>"; };
+		8B3FD6B1173A50C400419203 /* OpenStreetMapSource.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = OpenStreetMapSource.cpp; path = ../../MAP/OpenStreetMapSource.cpp; sourceTree = "<group>"; };
+		8B3FD6B2173A50C400419203 /* OpenStreetMapSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OpenStreetMapSource.h; path = ../../MAP/OpenStreetMapSource.h; sourceTree = "<group>"; };
+		8B3FD6B3173A50C400419203 /* PixelCoordinate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PixelCoordinate.h; path = ../../MAP/PixelCoordinate.h; sourceTree = "<group>"; };
+		8B3FD6B4173A50C400419203 /* Queue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Queue.h; path = ../../MAP/Queue.h; sourceTree = "<group>"; };
+		8B3FD6B5173A50C400419203 /* TimeSpan.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = TimeSpan.cpp; path = ../../MAP/TimeSpan.cpp; sourceTree = "<group>"; };
+		8B3FD6B6173A50C400419203 /* TimeSpan.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TimeSpan.h; path = ../../MAP/TimeSpan.h; sourceTree = "<group>"; };
+		8B3FD6B7173A50C400419203 /* TraceScope.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TraceScope.h; path = ../../MAP/TraceScope.h; sourceTree = "<group>"; };
 		8BCE5AE9172F9D4F0095578F /* GraphicsSoftware.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = GraphicsSoftware.c; sourceTree = "<group>"; };
 		8BCE5AEA172F9D4F0095578F /* GraphicsSoftware.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GraphicsSoftware.h; sourceTree = "<group>"; };
 		8BCE5AF0172FBABF0095578F /* CharInput.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CharInput.h; sourceTree = "<group>"; };
@@ -780,26 +839,27 @@
 		0B92B4711712BAE1002DFDF6 /* MoSyncLibIOS */ = {
 			isa = PBXGroup;
 			children = (
-				0B92B47D1712BB7B002DFDF6 /* MAStd */,
-				0B92B5F31712BB7D002DFDF6 /* MAFS */,
-				0B92B6011712BB7D002DFDF6 /* MAMath */,
-				0B92B6051712BB7D002DFDF6 /* MAUI */,
-				0B92B6751712BB7D002DFDF6 /* MAUtil */,
-				8B3FD682173A4C6400419203 /* MTXml */,
-				0B92B74E1712BB7E002DFDF6 /* NativeUI */,
-				0B92B8C01712BB80002DFDF6 /* Wormhole */,
-				0B92C0611712BB84002DFDF6 /* Notification */,
-				0B92C0831712BB84002DFDF6 /* Purchase */,
 				0B92C0A21712BB84002DFDF6 /* Ads */,
 				0B92C0B81712BB85002DFDF6 /* Facebook */,
+				0B92C7CE1712BB8A002DFDF6 /* Hybris */,
+				0B92C74F1712BB89002DFDF6 /* kazlib */,
+				8B3FD68C173A509700419203 /* Map */,
+				0B92B5F31712BB7D002DFDF6 /* MAFS */,
+				0B92B6011712BB7D002DFDF6 /* MAMath */,
+				0B92B47D1712BB7B002DFDF6 /* MAStd */,
+				0B92B6051712BB7D002DFDF6 /* MAUI */,
+				0B92B6751712BB7D002DFDF6 /* MAUtil */,
+				0B92C7411712BB89002DFDF6 /* MATest */,
+				0B92C7D81712BB8A002DFDF6 /* MinUI */,
+				8B3FD682173A4C6400419203 /* MTXml */,
+				0B92B74E1712BB7E002DFDF6 /* NativeUI */,
+				0B92C0611712BB84002DFDF6 /* Notification */,
+				0B92C0831712BB84002DFDF6 /* Purchase */,
 				0B92C3351712BB87002DFDF6 /* ResCompiler */,
+				0B92C7631712BB89002DFDF6 /* Testify */,
+				0B92B8C01712BB80002DFDF6 /* Wormhole */,
 				0B92C6DD1712BB89002DFDF6 /* yajl */,
 				0B92C73D1712BB89002DFDF6 /* yasper */,
-				0B92C7411712BB89002DFDF6 /* MATest */,
-				0B92C74F1712BB89002DFDF6 /* kazlib */,
-				0B92C7631712BB89002DFDF6 /* Testify */,
-				0B92C7CE1712BB8A002DFDF6 /* Hybris */,
-				0B92C7D81712BB8A002DFDF6 /* MinUI */,
 				0B92B4721712BAE1002DFDF6 /* Supporting Files */,
 			);
 			path = MoSyncLibIOS;
@@ -1657,6 +1717,56 @@
 			name = MTXml;
 			sourceTree = "<group>";
 		};
+		8B3FD68C173A509700419203 /* Map */ = {
+			isa = PBXGroup;
+			children = (
+				8B3FD68D173A50C400419203 /* Broadcaster.h */,
+				8B3FD68E173A50C400419203 /* CloudMadeMapSource.cpp */,
+				8B3FD68F173A50C400419203 /* CloudMadeMapSource.h */,
+				8B3FD690173A50C400419203 /* Color.cpp */,
+				8B3FD691173A50C400419203 /* Color.h */,
+				8B3FD692173A50C400419203 /* DateTime.cpp */,
+				8B3FD693173A50C400419203 /* DateTime.h */,
+				8B3FD694173A50C400419203 /* DebugPrintf.h */,
+				8B3FD695173A50C400419203 /* Enumerator.h */,
+				8B3FD696173A50C400419203 /* GeoPoint.cpp */,
+				8B3FD697173A50C400419203 /* GeoPoint.h */,
+				8B3FD698173A50C400419203 /* GeoPointDataSource.h */,
+				8B3FD699173A50C400419203 /* GeoPointLayer.cpp */,
+				8B3FD69A173A50C400419203 /* GeoPointLayer.h */,
+				8B3FD69B173A50C400419203 /* GeoPointLayerRenderer.h */,
+				8B3FD69C173A50C400419203 /* GoogleMapSource.cpp */,
+				8B3FD69D173A50C400419203 /* GoogleMapSource.h */,
+				8B3FD69E173A50C400419203 /* Layer.cpp */,
+				8B3FD69F173A50C400419203 /* Layer.h */,
+				8B3FD6A0173A50C400419203 /* LayerMapViewport.cpp */,
+				8B3FD6A1173A50C400419203 /* LayerMapViewport.h */,
+				8B3FD6A2173A50C400419203 /* LonLat.cpp */,
+				8B3FD6A3173A50C400419203 /* LonLat.h */,
+				8B3FD6A4173A50C400419203 /* MapCache.cpp */,
+				8B3FD6A5173A50C400419203 /* MapCache.h */,
+				8B3FD6A6173A50C400419203 /* MapConfig.h */,
+				8B3FD6A7173A50C400419203 /* MapSource.cpp */,
+				8B3FD6A8173A50C400419203 /* MapSource.h */,
+				8B3FD6A9173A50C400419203 /* MapTile.h */,
+				8B3FD6AA173A50C400419203 /* MapTileCoordinate.h */,
+				8B3FD6AB173A50C400419203 /* MapViewport.cpp */,
+				8B3FD6AC173A50C400419203 /* MapViewport.h */,
+				8B3FD6AD173A50C400419203 /* MapWidget.cpp */,
+				8B3FD6AE173A50C400419203 /* MapWidget.h */,
+				8B3FD6AF173A50C400419203 /* MemoryMgr.cpp */,
+				8B3FD6B0173A50C400419203 /* MemoryMgr.h */,
+				8B3FD6B1173A50C400419203 /* OpenStreetMapSource.cpp */,
+				8B3FD6B2173A50C400419203 /* OpenStreetMapSource.h */,
+				8B3FD6B3173A50C400419203 /* PixelCoordinate.h */,
+				8B3FD6B4173A50C400419203 /* Queue.h */,
+				8B3FD6B5173A50C400419203 /* TimeSpan.cpp */,
+				8B3FD6B6173A50C400419203 /* TimeSpan.h */,
+				8B3FD6B7173A50C400419203 /* TraceScope.h */,
+			);
+			name = Map;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -1918,6 +2028,22 @@
 				8B3FD689173A4C9000419203 /* entities.c in Sources */,
 				8B3FD68A173A4C9000419203 /* MTSax.cpp in Sources */,
 				8B3FD68B173A4C9000419203 /* MTXml.cpp in Sources */,
+				8B3FD6B8173A50C400419203 /* CloudMadeMapSource.cpp in Sources */,
+				8B3FD6B9173A50C400419203 /* Color.cpp in Sources */,
+				8B3FD6BA173A50C400419203 /* DateTime.cpp in Sources */,
+				8B3FD6BB173A50C400419203 /* GeoPoint.cpp in Sources */,
+				8B3FD6BC173A50C400419203 /* GeoPointLayer.cpp in Sources */,
+				8B3FD6BD173A50C400419203 /* GoogleMapSource.cpp in Sources */,
+				8B3FD6BE173A50C400419203 /* Layer.cpp in Sources */,
+				8B3FD6BF173A50C400419203 /* LayerMapViewport.cpp in Sources */,
+				8B3FD6C0173A50C400419203 /* LonLat.cpp in Sources */,
+				8B3FD6C1173A50C400419203 /* MapCache.cpp in Sources */,
+				8B3FD6C2173A50C400419203 /* MapSource.cpp in Sources */,
+				8B3FD6C3173A50C400419203 /* MapViewport.cpp in Sources */,
+				8B3FD6C4173A50C400419203 /* MapWidget.cpp in Sources */,
+				8B3FD6C5173A50C400419203 /* MemoryMgr.cpp in Sources */,
+				8B3FD6C6173A50C400419203 /* OpenStreetMapSource.cpp in Sources */,
+				8B3FD6C7173A50C400419203 /* TimeSpan.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
