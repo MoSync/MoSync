@@ -88,6 +88,30 @@ namespace MoSync
                     return false;
                 }
 
+                if (propertyName.Equals("currentHour") || propertyName.Equals("currentMinute"))
+                {
+                    int val;
+                    if (!int.TryParse(propertyValue, out val))
+                    {
+                        return false;
+                    }
+
+                    if (propertyName.Equals("currentHour"))
+                    {
+                        if (val >= 24 || val < 0)
+                        {
+                            return false;
+                        }
+                    }
+                    else if (propertyName.Equals("currentMinute"))
+                    {
+                        if (val >= 60 || val < 0)
+                        {
+                            return false;
+                        }
+                    }
+                }
+
                 return true;
             }
 
