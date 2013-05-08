@@ -9,6 +9,12 @@ import com.mosync.internal.android.extensions.IntType;
 
 public abstract class PIMStringArrayField extends PIMField {
 
+	/**
+	 * Irrelevant fields (id, type, label, is primary) number when trying to
+	 * get/set the specific data.
+	 */
+	final int IGNORED_FIELDS = 4;
+
 	byte[] getData(int index) {
 		String[] val = getSpecificData(index);
 		DebugPrint("DATA SIZE = " + getDataSize(val));
@@ -18,10 +24,9 @@ public abstract class PIMStringArrayField extends PIMField {
 	}
 
 	String[] getSpecificData(int index) {
-		// Ehm... Why is there a -4 here???
 		String[] val = mValues.get(index);
-		String[] ret = new String[val.length - 4];
-		for (int i = 0; i < val.length - 4; i++) {
+		String[] ret = new String[val.length - IGNORED_FIELDS];
+		for (int i = 0; i < val.length - IGNORED_FIELDS; i++) {
 			ret[i] = val[i + 1];
 		}
 		return ret;
