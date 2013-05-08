@@ -30,7 +30,8 @@ public class PIMFieldName extends PIMStringArrayField {
 				StructuredName.PHONETIC_FAMILY_NAME,
 				StructuredName.PHONETIC_GIVEN_NAME,
 				StructuredName.PHONETIC_MIDDLE_NAME,
-				StructuredName.DISPLAY_NAME, StructuredName.IS_PRIMARY };
+				StructuredName.DISPLAY_NAME, StructuredName.IS_PRIMARY, DUMMY,
+				DUMMY };
 	}
 
 	void createMaps() {
