@@ -163,9 +163,16 @@ namespace MoSync
             {
                 set
                 {
-                    System.Windows.Media.SolidColorBrush brush;
-                    MoSync.Util.convertStringToColor(value, out brush);
-                    mButton.Foreground = brush;
+                    try
+                    {
+                        System.Windows.Media.SolidColorBrush brush;
+                        MoSync.Util.convertStringToColor(value, out brush);
+                        mButton.Foreground = brush;
+                    }
+                    catch
+                    {
+                        throw new InvalidPropertyValueException();
+                    }
                 }
             }
 
@@ -195,6 +202,37 @@ namespace MoSync
                 if (isBasePropertyValid == false)
                 {
                     return false;
+                }
+
+                if (propertyName.Equals("textVerticalAlignment"))
+                {
+                    if (!(propertyValue.Equals(MoSync.Constants.MAW_ALIGNMENT_TOP) ||
+                        propertyValue.Equals(MoSync.Constants.MAW_ALIGNMENT_BOTTOM) ||
+                        propertyValue.Equals(MoSync.Constants.MAW_ALIGNMENT_CENTER)))
+                    {
+                        return false;
+                    }
+                }
+                else if (propertyName.Equals("textHorizontalAlignment"))
+                {
+                    if (!(propertyValue.Equals(MoSync.Constants.MAW_ALIGNMENT_LEFT) ||
+                        propertyValue.Equals(MoSync.Constants.MAW_ALIGNMENT_RIGHT) ||
+                        propertyValue.Equals(MoSync.Constants.MAW_ALIGNMENT_CENTER)))
+                    {
+                        return false;
+                    }
+                }
+                else if (propertyName.Equals("fontColor"))
+                {
+                    try
+                    {
+                        System.Windows.Media.SolidColorBrush brush;
+                        MoSync.Util.convertStringToColor(propertyValue, out brush);
+                    }
+                    catch
+                    {
+                        return false;
+                    }
                 }
 
                 return true;

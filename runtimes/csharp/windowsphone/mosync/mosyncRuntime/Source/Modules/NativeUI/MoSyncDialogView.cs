@@ -237,6 +237,10 @@ namespace MoSync
                     {
                         visible = boolValue;
                     }
+                    else
+                    {
+                        throw new InvalidPropertyValueException();
+                    }
                 }
             }
 
@@ -280,6 +284,15 @@ namespace MoSync
                 if (isBasePropertyValid == false)
                 {
                     return false;
+                }
+
+                if (propertyName.Equals("visible"))
+                {
+                    bool boolValue;
+                    if (!Boolean.TryParse(propertyValue, out boolValue))
+                    {
+                        return false;
+                    }
                 }
 
                 return true;

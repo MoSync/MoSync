@@ -111,6 +111,15 @@ namespace MoSync
                     return false;
                 }
 
+                if (propertyName.Equals("checked"))
+                {
+                    bool val;
+                    if (!bool.TryParse(propertyValue, out val))
+                    {
+                        return false;
+                    }
+                }
+
                 return true;
             }
 
