@@ -139,6 +139,19 @@ namespace MoSync
                     return false;
                 }
 
+                if (propertyName.Equals("max"))
+                {
+                    int val;
+                    if (!int.TryParse(propertyValue, out val))
+                    {
+                        return false;
+                    }
+                    if (val < 0)
+                    {
+                        return false;
+                    }
+                }
+
                 return true;
             }
 

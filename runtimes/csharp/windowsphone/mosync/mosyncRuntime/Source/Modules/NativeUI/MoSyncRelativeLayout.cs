@@ -163,6 +163,15 @@ namespace MoSync
                     return false;
                 }
 
+                if (propertyName.Equals("scrollable"))
+                {
+                    bool val;
+                    if (!Boolean.TryParse(propertyValue, out val))
+                    {
+                        return false;
+                    }
+                }
+
                 return true;
             }
 
