@@ -105,7 +105,7 @@ namespace MoSync
                 // by default, the password box is not visible
                 mPasswordBox.Visibility = Visibility.Collapsed;
 
-                createTheEditBoxGrid();
+                CreateTheEditBoxGrid();
 
                 View = mEditBoxGrid;
 
@@ -135,7 +135,7 @@ namespace MoSync
                         {
                             // move the cursor to the first position
                             mEditBox.Select(0, 0);
-                            setWatermarkMode(false);
+                            SetWatermarkMode(false);
                         }
 
                         /**
@@ -165,7 +165,7 @@ namespace MoSync
                         // if no text has been entered by the user than leave the watermark text
                         if (mEditBox.Text.Equals(""))
                         {
-                            setWatermarkMode(true);
+                            SetWatermarkMode(true);
                         }
 
                         /**
@@ -194,7 +194,7 @@ namespace MoSync
                           */
                         if (mFirstChar)
                         {
-                            setWatermarkMode(false);
+                            SetWatermarkMode(false);
                         }
 
                         /**
@@ -291,7 +291,7 @@ namespace MoSync
                     {
                         if (mIsWatermarkMode && !String.IsNullOrEmpty(value))
                         {
-                            setWatermarkMode(false);
+                            SetWatermarkMode(false);
                             mEditBox.Text = value;
                         }
 
@@ -304,7 +304,7 @@ namespace MoSync
                     {
                         if (String.IsNullOrEmpty(value))
                         {
-                            setWatermarkMode(true);
+                            SetWatermarkMode(true);
                         }
                         else
                         {
@@ -356,7 +356,7 @@ namespace MoSync
             {
                 set
                 {
-                    MoSync.Util.convertStringToColor(value, out mWaterMarkBrush);
+                    MoSync.Util.ConvertStringToColor(value, out mWaterMarkBrush);
                     // if we're in watermark mode, we need to change the color of the
                     // placeholder now
                     if (mIsWatermarkMode)
@@ -378,21 +378,25 @@ namespace MoSync
             {
                 set
                 {
-                    if (value.Equals("true"))
+                    bool val;
+                    if (Boolean.TryParse(value, out val))
                     {
-                        mEditBox.Focus();
-                    }
-                    else if (value.Equals("false"))
-                    {
-                        // we need to focus another, non-input element in order to hide the keyboard
-                        try
+                        if (val)
                         {
-                            // the parent is most probable to exist and be a non-input control
-                            System.Windows.Controls.Control ctrl = (System.Windows.Controls.Control)mEditBox.Parent;
-                            ctrl.Focus();
+                            mEditBox.Focus();
                         }
-                        catch
+                        else
                         {
+                            // we need to focus another, non-input element in order to hide the keyboard
+                            try
+                            {
+                                // the parent is most probable to exist and be a non-input control
+                                System.Windows.Controls.Control ctrl = (System.Windows.Controls.Control)mEditBox.Parent;
+                                ctrl.Focus();
+                            }
+                            catch
+                            {
+                            }
                         }
                     }
                     else throw new InvalidPropertyValueException();
@@ -416,28 +420,28 @@ namespace MoSync
                         return;
                     }
 
-                    setPasswordMode(false);
-                    setWatermarkMode(true);
+                    SetPasswordMode(false);
+                    SetWatermarkMode(true);
                     switch (inputType)
                     {
                         case 0:			    //MAW_EDIT_BOX_TYPE_ANY
                             mEditBox.AcceptsReturn = true;
-                            setInputMode(System.Windows.Input.InputScopeNameValue.Text);
+                            SetInputMode(System.Windows.Input.InputScopeNameValue.Text);
                             break;
                         case 1:             //MAW_EDIT_BOX_TYPE_EMAILADDR
-                            setInputMode(System.Windows.Input.InputScopeNameValue.EmailSmtpAddress);
+                            SetInputMode(System.Windows.Input.InputScopeNameValue.EmailSmtpAddress);
                             break;
                         case 2:             //MAW_EDIT_BOX_TYPE_NUMERIC integer value
-                            setInputMode(System.Windows.Input.InputScopeNameValue.Number);
+                            SetInputMode(System.Windows.Input.InputScopeNameValue.Number);
                             break;
                         case 3:             //MAW_EDIT_BOX_TYPE_PHONENUMBER
-                            setInputMode(System.Windows.Input.InputScopeNameValue.TelephoneNumber);
+                            SetInputMode(System.Windows.Input.InputScopeNameValue.TelephoneNumber);
                             break;
                         case 4:             //MAW_EDIT_BOX_TYPE_URL
-                            setInputMode(System.Windows.Input.InputScopeNameValue.Url);
+                            SetInputMode(System.Windows.Input.InputScopeNameValue.Url);
                             break;
                         case 5:             //MAW_EDIT_BOX_TYPE_DECIMAL real number
-                            setInputMode(System.Windows.Input.InputScopeNameValue.Digits);
+                            SetInputMode(System.Windows.Input.InputScopeNameValue.Digits);
                             break;
                         case 6:             //MAW_EDIT_BOX_TYPE_SINGLE_LINE any text except for line breaks
                             mEditBox.AcceptsReturn = false;
@@ -462,33 +466,32 @@ namespace MoSync
                 set
                 {
                     int inputFlag = 0;
-
                     if (!int.TryParse(value, out inputFlag))
                     {
                         return;
                     }
 
                     // by default, the editbox will be visible
-                    setPasswordMode(false);
-                    setWatermarkMode(true);
+                    SetPasswordMode(false);
+                    SetWatermarkMode(true);
                     switch (inputFlag)
                     {
                         case 0:			    //MAW_EDIT_BOX_FLAG_PASSWORD
                             // make the passwordBox visible
-                            setPasswordMode(true);
-                            setInputMode(System.Windows.Input.InputScopeNameValue.Password);
+                            SetPasswordMode(true);
+                            SetInputMode(System.Windows.Input.InputScopeNameValue.Password);
                             break;
                         case 1:             //MAW_EDIT_BOX_FLAG_SENSITIVE
-                            setInputMode(System.Windows.Input.InputScopeNameValue.Default);
+                            SetInputMode(System.Windows.Input.InputScopeNameValue.Default);
                             break;
                         case 2:             //MAW_EDIT_BOX_FLAG_INITIAL_CAPS_WORD
-                            setInputMode(System.Windows.Input.InputScopeNameValue.PersonalFullName);
+                            SetInputMode(System.Windows.Input.InputScopeNameValue.PersonalFullName);
                             break;
                         case 3:             //MAW_EDIT_BOX_FLAG_INITIAL_CAPS_SENTENCE
-                            setInputMode(System.Windows.Input.InputScopeNameValue.PersonalNamePrefix);
+                            SetInputMode(System.Windows.Input.InputScopeNameValue.PersonalNamePrefix);
                             break;
                         case 4:             //MAW_EDIT_BOX_FLAG_INITIAL_CAPS_ALL_CHARACTERS
-                            setInputMode(System.Windows.Input.InputScopeNameValue.PersonalFullName);
+                            SetInputMode(System.Windows.Input.InputScopeNameValue.PersonalFullName);
                             break;
                         default:
                             throw new InvalidPropertyValueException();
@@ -504,7 +507,7 @@ namespace MoSync
                 set
                 {
                     System.Windows.Media.SolidColorBrush brush;
-                    MoSync.Util.convertStringToColor(value, out brush);
+                    MoSync.Util.ConvertStringToColor(value, out brush);
                     mForegroundColor = brush;
 
                     if (!mIsWatermarkMode)
@@ -540,7 +543,7 @@ namespace MoSync
              * @param scopeValue: indicates the type of input that is expected from the user.
              * Can have values like: Url, FullFilePath, FileName, EmailUserName, PostalCode, Password, Numeric
              */
-            protected void setInputMode(System.Windows.Input.InputScopeNameValue scopeValue)
+            protected void SetInputMode(System.Windows.Input.InputScopeNameValue scopeValue)
             {
                 try
                 {
@@ -560,7 +563,7 @@ namespace MoSync
              * @param passwordMode: indicates if we need to switch to passwordMode or not.
              * Values: true (switch to password mode), false (switch to edit mode)
              */
-            protected void setPasswordMode(bool passwordMode)
+            protected void SetPasswordMode(bool passwordMode)
             {
                 mIsPasswordMode = passwordMode;
                 if (passwordMode)
@@ -580,7 +583,7 @@ namespace MoSync
              * @param watermarkMode: indicates if we need to switch to watermarkMode or not.
              * Values: true (switch to watermark mode), false (switch to edit mode)
              */
-            protected void setWatermarkMode(bool watermarkMode)
+            protected void SetWatermarkMode(bool watermarkMode)
             {
                 if (watermarkMode)
                 {
@@ -606,7 +609,7 @@ namespace MoSync
              * when we enter password mode, the edit box visibility is set to Collapsed
              * and the password box visibility to Visible).
              */
-            protected void createTheEditBoxGrid()
+            protected void CreateTheEditBoxGrid()
             {
                 mEditBoxGrid = new System.Windows.Controls.Grid();
 
@@ -653,6 +656,71 @@ namespace MoSync
                 if (isBasePropertyValid == false)
                 {
                     return false;
+                }
+
+                if (propertyName.Equals("placeholderFontColor") ||
+                    propertyName.Equals("fontColor"))
+                {
+                    try
+                    {
+                        Deployment.Current.Dispatcher.BeginInvoke(() =>
+                        {
+                            System.Windows.Media.SolidColorBrush brush;
+                            MoSync.Util.ConvertStringToColor(propertyValue, out brush);
+                        });
+                    }
+                    catch (InvalidPropertyValueException)
+                    {
+                        return false;
+                    }
+                }
+                else if (propertyName.Equals("showKeyboard"))
+                {
+                    bool val;
+                    if (!Boolean.TryParse(propertyValue, out val))
+                    {
+                        return false;
+                    }
+                }
+                else if (propertyName.Equals("inputMode") ||
+                    propertyName.Equals("inputFlag"))
+                {
+                    int value = 0;
+                    if (!int.TryParse(propertyValue, out value))
+                    {
+                        return false;
+                    }
+                    if (propertyName.Equals("inputMode"))
+                    {
+                        if (!(value == MoSync.Constants.MAW_EDIT_BOX_TYPE_ANY ||
+                            value == MoSync.Constants.MAW_EDIT_BOX_TYPE_EMAILADDR ||
+                            value == MoSync.Constants.MAW_EDIT_BOX_TYPE_NUMERIC ||
+                            value == MoSync.Constants.MAW_EDIT_BOX_TYPE_PHONENUMBER ||
+                            value == MoSync.Constants.MAW_EDIT_BOX_TYPE_URL ||
+                            value == MoSync.Constants.MAW_EDIT_BOX_TYPE_DECIMAL ||
+                            value == MoSync.Constants.MAW_EDIT_BOX_TYPE_SINGLE_LINE))
+                        {
+                            return false;
+                        }
+                    }
+                    else if (propertyName.Equals("inputFlag"))
+                    {
+                        if (!(value == MoSync.Constants.MAW_EDIT_BOX_FLAG_PASSWORD ||
+                            value == MoSync.Constants.MAW_EDIT_BOX_FLAG_SENSITIVE ||
+                            value == MoSync.Constants.MAW_EDIT_BOX_FLAG_INITIAL_CAPS_WORD ||
+                            value == MoSync.Constants.MAW_EDIT_BOX_FLAG_INITIAL_CAPS_SENTENCE ||
+                            value == MoSync.Constants.MAW_EDIT_BOX_FLAG_INITIAL_CAPS_ALL_CHARACTERS))
+                        {
+                            return false;
+                        }
+                    }
+                    else if (propertyName.Equals("maxLength"))
+                    {
+                        if (value < 0)
+                        {
+                            return false;
+                        }
+                    }
                 }
 
                 return true;

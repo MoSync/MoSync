@@ -228,7 +228,7 @@ namespace MoSync
 				set
 				{
 					System.Windows.Media.SolidColorBrush brush;
-					MoSync.Util.convertStringToColor(value, out brush);
+					MoSync.Util.ConvertStringToColor(value, out brush);
 					mLabel.Foreground = brush;
 				}
 			}

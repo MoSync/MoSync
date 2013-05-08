@@ -450,6 +450,25 @@ namespace MoSync
                     return false;
                 }
 
+                if (propertyName.Equals("childHorizontalAlignment"))
+                {
+                    if (!(propertyValue.Equals(MoSync.Constants.MAW_ALIGNMENT_LEFT) ||
+                        propertyValue.Equals(MoSync.Constants.MAW_ALIGNMENT_RIGHT) ||
+                        propertyValue.Equals(MoSync.Constants.MAW_ALIGNMENT_CENTER)))
+                    {
+                        return false;
+                    }
+                }
+                else if (propertyName.Equals("childVerticalAlignment"))
+                {
+                    if (!(propertyValue.Equals(MoSync.Constants.MAW_ALIGNMENT_BOTTOM) ||
+                        propertyValue.Equals(MoSync.Constants.MAW_ALIGNMENT_TOP) ||
+                        propertyValue.Equals(MoSync.Constants.MAW_ALIGNMENT_CENTER)))
+                    {
+                        return false;
+                    }
+                }
+
                 return true;
             }
 

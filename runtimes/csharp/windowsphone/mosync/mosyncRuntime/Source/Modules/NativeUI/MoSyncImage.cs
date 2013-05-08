@@ -183,6 +183,40 @@ namespace MoSync
                     return false;
                 }
 
+                if (propertyName.Equals("scaleMode"))
+                {
+                    if (!(propertyValue.Equals("none") ||
+                        propertyValue.Equals("scaleXY") ||
+                        propertyValue.Equals("scalePreserveAspect")))
+                    {
+                        return false;
+                    }
+                }
+                else if (propertyName.Equals("imagePath"))
+                {
+                    //Take the store for the application (an image of the sandbox)
+                    IsolatedStorageFile f = IsolatedStorageFile.GetUserStoreForApplication();
+
+                    //Verify that the file exists on the isolated storage
+                    if (f.FileExists(propertyValue))
+                    {
+                        try
+                        {
+                            //Create a file stream for the required file
+                            IsolatedStorageFileStream fs = new IsolatedStorageFileStream(propertyValue, System.IO.FileMode.Open, f);
+                        }
+                        catch
+                        {
+                            // There was a problem reading the image file.
+                            return false;
+                        }
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+
                 return true;
             }
 

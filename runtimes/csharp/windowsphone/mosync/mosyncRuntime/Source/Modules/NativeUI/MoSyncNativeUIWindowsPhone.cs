@@ -327,7 +327,7 @@ namespace MoSync
                 set
                 {
                     System.Windows.Media.SolidColorBrush brush;
-                    MoSync.Util.convertStringToColor(value, out brush);
+                    MoSync.Util.ConvertStringToColor(value, out brush);
                     if (View is System.Windows.Controls.Control) ((System.Windows.Controls.Control)View).Background = brush;
                     else if (View is System.Windows.Controls.Panel) ((System.Windows.Controls.Panel)View).Background = brush;
                 }
@@ -414,10 +414,10 @@ namespace MoSync
                     System.Windows.Media.GradientStop secondGradientStop = new System.Windows.Media.GradientStop();
 
                     System.Windows.Media.SolidColorBrush firstBrush;
-                    Util.convertStringToColor(value.Split(',')[0], out firstBrush);
+                    Util.ConvertStringToColor(value.Split(',')[0], out firstBrush);
 
                     System.Windows.Media.SolidColorBrush secondBrush;
-                    Util.convertStringToColor(value.Split(',')[1], out secondBrush);
+                    Util.ConvertStringToColor(value.Split(',')[1], out secondBrush);
 
                     firstGradientStop.Color = firstBrush.Color;
                     secondGradientStop.Color = secondBrush.Color;

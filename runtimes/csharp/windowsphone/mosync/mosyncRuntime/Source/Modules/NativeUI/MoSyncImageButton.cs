@@ -112,7 +112,7 @@ namespace MoSync
             /**
              * Function that creates the TextBlock object and setts the alignment of the text
              */
-            private void createTextBlock()
+            private void CreateTextBlock()
             {
                 mText = new System.Windows.Controls.TextBlock();
                 mText.TextWrapping = TextWrapping.NoWrap;
@@ -125,7 +125,7 @@ namespace MoSync
             /**
              * Function that that creates the foreground image
              */
-            private void createForegroundImage()
+            private void CreateForegroundImage()
             {
                 /**
                  * Create the foreground image and display it in the center of the button
@@ -170,7 +170,7 @@ namespace MoSync
             /**
              * Function that creates the background image
              */
-            private void createBackgroundImage()
+            private void CreateBackgroundImage()
             {
                 mBackgroundImage = new System.Windows.Controls.Image();
                 mBackgroundImage.VerticalAlignment = VerticalAlignment.Center;
@@ -188,9 +188,9 @@ namespace MoSync
                 mStretchBackground = new System.Windows.Media.Stretch();
                 mStretchBackground = System.Windows.Media.Stretch.Fill;
 
-                this.createBackgroundImage();
-                this.createTextBlock();
-                this.createForegroundImage();
+                this.CreateBackgroundImage();
+                this.CreateTextBlock();
+                this.CreateForegroundImage();
 
                 /**
                  * Grid object that holds the text and the foreground and background images
@@ -339,7 +339,7 @@ namespace MoSync
                 set
                 {
                     System.Windows.Media.SolidColorBrush brush;
-                    MoSync.Util.convertStringToColor(value, out brush);
+                    MoSync.Util.ConvertStringToColor(value, out brush);
                     mText.Foreground = brush;
                 }
             }
@@ -599,6 +599,63 @@ namespace MoSync
                 if (isBasePropertyValid == false)
                 {
                     return false;
+                }
+
+                if (propertyName.Equals("imagePath") ||
+                    propertyName.Equals("backgroundImagePath") ||
+                    propertyName.Equals("pressedImagePath"))
+                {
+                    //Take the store for the application (an image of the sandbox)
+                    IsolatedStorageFile f = IsolatedStorageFile.GetUserStoreForApplication();
+
+                    //Verify that the file exists on the isolated storage
+                    if (f.FileExists(propertyValue))
+                    {
+                        try
+                        {
+                            //Create a file stream for the required file
+                            IsolatedStorageFileStream fs = new IsolatedStorageFileStream(propertyValue, System.IO.FileMode.Open, f);
+                        }
+                        catch
+                        {
+                            // There was a problem reading the image file.
+                            return false;
+                        }
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+                else if (propertyName.Equals("fontColor"))
+                {
+                    try
+                    {
+                        System.Windows.Media.SolidColorBrush brush;
+                        MoSync.Util.ConvertStringToColor(propertyValue, out brush);
+                    }
+                    catch (InvalidPropertyValueException)
+                    {
+                        return false;
+                    }
+                }
+                else if (propertyName.Equals("textVerticalAlignment"))
+                {
+                    if (!(propertyValue.Equals("MoSync.Constants.MAW_ALIGNMENT_TOP") ||
+                        propertyValue.Equals("MoSync.Constants.MAW_ALIGNMENT_BOTTOM") ||
+                        propertyValue.Equals("MoSync.Constants.MAW_ALIGNMENT_CENTER")))
+                    {
+                        return false;
+                    }
+                }
+                else if (propertyName.Equals("textHorizontalAlignment"))
+                {
+                    if (!(propertyValue.Equals("MoSync.Constants.MAW_ALIGNMENT_LEFT") ||
+                        propertyValue.Equals("MoSync.Constants.MAW_ALIGNMENT_RIGHT") ||
+                        propertyValue.Equals("MoSync.Constants.MAW_ALIGNMENT_CENTER")))
+                    {
+                        return false;
+                    }
                 }
 
                 return true;
