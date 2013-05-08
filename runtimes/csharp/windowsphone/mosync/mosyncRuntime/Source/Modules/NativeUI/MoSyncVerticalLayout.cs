@@ -481,6 +481,42 @@ namespace MoSync
                     return false;
                 }
 
+                if (propertyName.Equals("childVerticalAlignment") || propertyName.Equals("childHorizontalAlignment"))
+                {
+                    int val;
+                    if (!int.TryParse(propertyValue, out val))
+                    {
+                        return false;
+                    }
+
+                    if (propertyName.Equals("childVerticalAlignment"))
+                    {
+                        if (!(propertyValue.Equals(MoSync.Constants.MAW_ALIGNMENT_BOTTOM) ||
+                            propertyValue.Equals(MoSync.Constants.MAW_ALIGNMENT_TOP) ||
+                            propertyValue.Equals(MoSync.Constants.MAW_ALIGNMENT_CENTER)))
+                        {
+                            return false;
+                        }
+                    }
+                    else if (propertyName.Equals("childHorizontalAlignment"))
+                    {
+                        if (!(propertyValue.Equals(MoSync.Constants.MAW_ALIGNMENT_LEFT) ||
+                            propertyValue.Equals(MoSync.Constants.MAW_ALIGNMENT_RIGHT) ||
+                            propertyValue.Equals(MoSync.Constants.MAW_ALIGNMENT_CENTER)))
+                        {
+                            return false;
+                        }
+                    }
+                }
+                else if (propertyName.Equals("scrollable"))
+                {
+                    bool val;
+	                if (!Boolean.TryParse(propertyValue, out val))
+	                {
+                        return false;
+                    }
+                }
+
                 return true;
             }
 

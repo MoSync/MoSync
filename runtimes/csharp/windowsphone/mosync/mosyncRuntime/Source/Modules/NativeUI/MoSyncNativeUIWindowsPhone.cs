@@ -464,6 +464,42 @@ namespace MoSync
                     bool val;
                     if (!Boolean.TryParse(propertyValue, out val)) return false;
                 }
+                else if (propertyName.Equals("backgroundColor"))
+                {
+                    try
+                    {
+                        Deployment.Current.Dispatcher.BeginInvoke(() =>
+                        {
+                            System.Windows.Media.SolidColorBrush brush;
+                            MoSync.Util.ConvertStringToColor(propertyValue, out brush);
+                        });
+                    }
+                    catch (InvalidPropertyValueException)
+                    {
+                        return false;
+                    }
+                }
+                else if (propertyName.Equals("backgroundGradient"))
+                {
+                    try
+                    {
+                        Deployment.Current.Dispatcher.BeginInvoke(() =>
+                        {
+                            System.Windows.Media.GradientStop firstGradientStop = new System.Windows.Media.GradientStop();
+                            System.Windows.Media.GradientStop secondGradientStop = new System.Windows.Media.GradientStop();
+
+                            System.Windows.Media.SolidColorBrush firstBrush;
+                            Util.ConvertStringToColor(propertyValue.Split(',')[0], out firstBrush);
+
+                            System.Windows.Media.SolidColorBrush secondBrush;
+                            Util.ConvertStringToColor(propertyValue.Split(',')[1], out secondBrush);
+                        });
+                    }
+                    catch (InvalidPropertyValueException)
+                    {
+                        return false;
+                    }
+                }
 
                 return true;
             }

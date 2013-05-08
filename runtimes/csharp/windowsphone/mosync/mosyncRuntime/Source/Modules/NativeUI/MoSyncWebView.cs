@@ -400,6 +400,15 @@ namespace MoSync
                     return false;
                 }
 
+                if (propertyName.Equals("navigate"))
+                {
+                    if (!(propertyValue.Equals("back") ||
+                        propertyValue.Equals("forward")))
+                    {
+                        return false;
+                    }
+                }
+
                 return true;
             }
 
