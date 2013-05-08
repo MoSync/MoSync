@@ -195,6 +195,9 @@
 		0BC7BF01172821BD007662C2 /* mavsprintf.c in Sources */ = {isa = PBXBuildFile; fileRef = 0BC7BF00172821BD007662C2 /* mavsprintf.c */; };
 		0BC7BF031728226E007662C2 /* mawstring.c in Sources */ = {isa = PBXBuildFile; fileRef = 0BC7BF021728226E007662C2 /* mawstring.c */; };
 		8B3FD681173A350F00419203 /* Camera.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B3FD67F173A350F00419203 /* Camera.cpp */; };
+		8B3FD689173A4C9000419203 /* entities.c in Sources */ = {isa = PBXBuildFile; fileRef = 8B3FD683173A4C9000419203 /* entities.c */; };
+		8B3FD68A173A4C9000419203 /* MTSax.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B3FD685173A4C9000419203 /* MTSax.cpp */; };
+		8B3FD68B173A4C9000419203 /* MTXml.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B3FD687173A4C9000419203 /* MTXml.cpp */; };
 		8BCE5AEB172F9D4F0095578F /* GraphicsSoftware.c in Sources */ = {isa = PBXBuildFile; fileRef = 8BCE5AE9172F9D4F0095578F /* GraphicsSoftware.c */; };
 		8BCE5AF2172FBABF0095578F /* CharInputC.c in Sources */ = {isa = PBXBuildFile; fileRef = 8BCE5AF1172FBABF0095578F /* CharInputC.c */; };
 		8BCE5AF3172FBAEA0095578F /* CharInput.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0B92B70F1712BB7E002DFDF6 /* CharInput.cpp */; };
@@ -716,6 +719,12 @@
 		0BC7BF021728226E007662C2 /* mawstring.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = mawstring.c; sourceTree = "<group>"; };
 		8B3FD67F173A350F00419203 /* Camera.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Camera.cpp; sourceTree = "<group>"; };
 		8B3FD680173A350F00419203 /* Camera.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Camera.h; sourceTree = "<group>"; };
+		8B3FD683173A4C9000419203 /* entities.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = entities.c; path = ../../MTXml/entities.c; sourceTree = "<group>"; };
+		8B3FD684173A4C9000419203 /* entities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = entities.h; path = ../../MTXml/entities.h; sourceTree = "<group>"; };
+		8B3FD685173A4C9000419203 /* MTSax.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MTSax.cpp; path = ../../MTXml/MTSax.cpp; sourceTree = "<group>"; };
+		8B3FD686173A4C9000419203 /* MTSax.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MTSax.h; path = ../../MTXml/MTSax.h; sourceTree = "<group>"; };
+		8B3FD687173A4C9000419203 /* MTXml.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MTXml.cpp; path = ../../MTXml/MTXml.cpp; sourceTree = "<group>"; };
+		8B3FD688173A4C9000419203 /* MTXml.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MTXml.h; path = ../../MTXml/MTXml.h; sourceTree = "<group>"; };
 		8BCE5AE9172F9D4F0095578F /* GraphicsSoftware.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = GraphicsSoftware.c; sourceTree = "<group>"; };
 		8BCE5AEA172F9D4F0095578F /* GraphicsSoftware.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GraphicsSoftware.h; sourceTree = "<group>"; };
 		8BCE5AF0172FBABF0095578F /* CharInput.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CharInput.h; sourceTree = "<group>"; };
@@ -776,6 +785,7 @@
 				0B92B6011712BB7D002DFDF6 /* MAMath */,
 				0B92B6051712BB7D002DFDF6 /* MAUI */,
 				0B92B6751712BB7D002DFDF6 /* MAUtil */,
+				8B3FD682173A4C6400419203 /* MTXml */,
 				0B92B74E1712BB7E002DFDF6 /* NativeUI */,
 				0B92B8C01712BB80002DFDF6 /* Wormhole */,
 				0B92C0611712BB84002DFDF6 /* Notification */,
@@ -1634,6 +1644,19 @@
 			path = GLES2;
 			sourceTree = "<group>";
 		};
+		8B3FD682173A4C6400419203 /* MTXml */ = {
+			isa = PBXGroup;
+			children = (
+				8B3FD683173A4C9000419203 /* entities.c */,
+				8B3FD684173A4C9000419203 /* entities.h */,
+				8B3FD685173A4C9000419203 /* MTSax.cpp */,
+				8B3FD686173A4C9000419203 /* MTSax.h */,
+				8B3FD687173A4C9000419203 /* MTXml.cpp */,
+				8B3FD688173A4C9000419203 /* MTXml.h */,
+			);
+			name = MTXml;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -1892,6 +1915,9 @@
 				0BC52146172AC03D00D1D0D8 /* mactype.c in Sources */,
 				8BCE5AEB172F9D4F0095578F /* GraphicsSoftware.c in Sources */,
 				8B3FD681173A350F00419203 /* Camera.cpp in Sources */,
+				8B3FD689173A4C9000419203 /* entities.c in Sources */,
+				8B3FD68A173A4C9000419203 /* MTSax.cpp in Sources */,
+				8B3FD68B173A4C9000419203 /* MTXml.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
