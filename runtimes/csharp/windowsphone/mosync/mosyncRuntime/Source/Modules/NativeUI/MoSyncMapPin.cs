@@ -158,6 +158,16 @@ namespace MoSync
                     return false;
                 }
 
+                if (propertyName.Equals("latitude") ||
+                    propertyName.Equals("longitude"))
+                {
+                    double val;
+                    if (!Double.TryParse(propertyValue, out val))
+                    {
+                        return false;
+                    }
+                }
+
                 return true;
             }
 
