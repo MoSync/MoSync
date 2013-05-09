@@ -567,13 +567,19 @@ public class MoSyncCameraController {
 			{
 				if(value.equals(MA_CAMERA_FOCUS_AUTO))
 				{
-					if(false == param.getSupportedFocusModes().contains(value))
+					if ( param.getSupportedFocusModes().contains(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE) )
 					{
-
-						return MA_CAMERA_RES_VALUE_NOTSUPPORTED;
+						mCamera.cancelAutoFocus();
+						value = Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE;
 					}
-
-					mCamera.autoFocus(autoFocusCallback);
+					else
+					{
+						if (false == param.getSupportedFocusModes().contains(value))
+						{
+							return MA_CAMERA_RES_VALUE_NOTSUPPORTED;
+						}
+						mCamera.autoFocus(autoFocusCallback);
+					}
 				}
 				else if(value.equals(MA_CAMERA_FOCUS_MACRO))
 				{
@@ -659,6 +665,17 @@ public class MoSyncCameraController {
 				result = "true";
 			else
 				result = "false";
+		}
+		else if (key.equals(MA_CAMERA_FOCUS_MODE))
+		{
+			if ( param.getFocusMode().equals(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE) )
+			{
+				result = MA_CAMERA_FOCUS_AUTO;
+			}
+			else
+			{
+				result = param.get(key);
+			}
 		}
 		else
 		{
