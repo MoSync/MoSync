@@ -564,6 +564,7 @@ int maWidgetScreenInsertNavBarButton(int side, MAWidgetHandle screenWidgetHandle
             });
     }
     return MAW_RES_OK;
+}
 
 /**
  * Enable or disable the Action bar.

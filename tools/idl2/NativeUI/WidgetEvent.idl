@@ -479,6 +479,7 @@ group WidgetEvent "Widget event" {
 			*/
 			CUSTOM_PICKER_ITEM_SELECTED = 37;
 
+			/**
 			* @brief Send when the home item from the Action Bar is selected.
 			* Available on Android.
 			*/
