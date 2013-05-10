@@ -85,6 +85,13 @@ public class MoSyncCameraController {
 	private int mCurrentCameraIndex;
 
 	/**
+	* Indicates the maximum picture size.
+	* Used only for the result of getSupportedPictureSizes(),
+	* method that will always return a list with at least one element.
+	*/
+	private int mMaxPictureSizeIndex;
+
+	/**
 	* Stores the paramters for each camera
 	*/
 	List<Camera.Parameters> mCameraParametersList;
@@ -162,7 +169,7 @@ public class MoSyncCameraController {
 		initializeCameras();
 		rawMode = false;
 		mCurrentCameraIndex = 0;
-
+		mMaxPictureSizeIndex = 0;
 	}
 
 	/**
@@ -431,11 +438,20 @@ public class MoSyncCameraController {
 			if ( (mPreviousPreview == null) || (mPreviousPreview == mPreview) )
 			{
 				mCamera.stopPreview();
-				Camera.Parameters param = getCurrentParameters();
-				mCamera.setParameters(param);
+				mCamera.setParameters(getCurrentParameters());
 			}
 
+			resetMaxPictureSizeIndex();
+
 			mCamera.startPreview();
+
+			/*
+			 * If focus is set to auto trigger it after the camera starts.
+			 */
+			if ( getCurrentParameters().getFocusMode().equals(Camera.Parameters.FOCUS_MODE_AUTO) )
+			{
+				mCamera.autoFocus(autoFocusCallback);
+			}
 		}
 		catch (Exception e)
 		{
@@ -444,6 +460,27 @@ public class MoSyncCameraController {
 		}
 
 		return MA_CAMERA_RES_OK;
+	}
+
+	/*
+	 * Retrieves the maximum picture size. Used when taking a snapshot.
+	 */
+	private void resetMaxPictureSizeIndex()
+	{
+		mMaxPictureSizeIndex = 0;
+
+		Camera.Parameters params = getCurrentParameters();
+		List <Camera.Size> sizeList = params.getSupportedPictureSizes();
+
+		// getSupportedPictureSizes() will always return a list with at least one element.
+		int maxWidth = sizeList.get(0).width;
+		for ( int i = 1; i < sizeList.size(); i++ )
+		{
+			if ( sizeList.get(i).width > maxWidth )
+			{
+				mMaxPictureSizeIndex = i;
+			}
+		}
 	}
 
 	/**
@@ -481,11 +518,8 @@ public class MoSyncCameraController {
 		// available
 		if ( MA_CAMERA_SNAPSHOT_MAX_SIZE == formatIndex )
 		{
-			Camera.Parameters parameters = getCurrentParameters();
-			List <Camera.Size> sizeList = parameters.getSupportedPictureSizes();
-			formatIndex = sizeList.size() - 1;
+			formatIndex = mMaxPictureSizeIndex;
 		}
-
 		if(formatIndex >= 0)
 		{
 			setNewSize(formatIndex);
@@ -522,9 +556,7 @@ public class MoSyncCameraController {
 		// available
 		if ( MA_CAMERA_SNAPSHOT_MAX_SIZE == sizeIndex )
 		{
-			Camera.Parameters parameters = getCurrentParameters();
-			List <Camera.Size> sizeList = parameters.getSupportedPictureSizes();
-			sizeIndex = sizeList.size() - 1;
+			sizeIndex = mMaxPictureSizeIndex;
 		}
 		if(sizeIndex >= 0)
 		{
