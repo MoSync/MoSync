@@ -320,6 +320,21 @@ namespace NativeUI
 		 */
 		ListViewItemSelectionStyle getSelectionStyle();
 
+		/**
+		 * Set the movable state of an item.
+		 * @param state If true the item will be movable, otherwise it will
+		 * be static. This only applies the the List View is in editing mode.
+		 * Platform: iOS.
+		 */
+		void setMovable(bool state = true);
+
+		/**
+		 * Check if the item is movable.
+		 * Platform: iOS.
+		 * @return True if movable, false otherwise.
+		 */
+		bool isMovable();
+
 	private:
 		/**
 		 * Convert enum to one of the

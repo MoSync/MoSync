@@ -613,6 +613,84 @@ forRowAtIndexPath:(NSIndexPath *)indexPath
     return cellWidget.editingStyle;
 }
 
+/**
+ * Get the movable property of a row at a particular location in a table view
+ * @param tableView The table-view object requesting this information.
+ * @param indexPath An index path locating a row in tableView.
+ * @return The movable property of the cell for the row indentified by indexPath.
+ */
+- (BOOL)tableView:(UITableView *)tableView canMoveRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    ListViewSectionWidget* section = [_children objectAtIndex:indexPath.section];
+    if (!section)
+    {
+        return 0;
+    }
+    ListViewItemWidget* cellWidget = [section cellWidgetAtIndex:indexPath.row];
+    return cellWidget.movable;
+}
+
+/**
+ * Gets a new, restricted path of a proposed move for a row. By default, rows can only be moved
+ * to places where the destination also is movable
+ * @param tableView The table-view object requesting this information.
+ * @param sourceIndexPath An index path locating a row in tableView the user started to move.
+ * @param proposedDestinationIndexPath An index path locating a row in tableView the user is currently hovering
+ * with the movable row.
+ * @return A new index path where the row should end up when the user stops the move.
+ *
+ */
+- (NSIndexPath *)tableView:(UITableView *)tableView targetIndexPathForMoveFromRowAtIndexPath:(NSIndexPath *)sourceIndexPath toProposedIndexPath:(NSIndexPath *)proposedDestinationIndexPath
+{
+	ListViewSectionWidget* section = [_children objectAtIndex:proposedDestinationIndexPath.section];
+	if (!section)
+		return sourceIndexPath;
+
+	ListViewItemWidget* cellWidget = [section cellWidgetAtIndex:proposedDestinationIndexPath.row];
+	if (!cellWidget.movable)
+		return sourceIndexPath;
+
+	return proposedDestinationIndexPath;
+}
+
+/**
+ * Performs a row move.
+ * @param tableView The table-view object requesting the move.
+ * @param sourceIndexPath An index path locating a row in tableView the user started to move.
+ * @param destinationIndexPath An index path locating a row in tableView the user wants to move the row.
+ */
+- (void)tableView:(UITableView *)tableView moveRowAtIndexPath:(NSIndexPath *)sourceIndexPath toIndexPath:(NSIndexPath *)destinationIndexPath
+{
+	if (sourceIndexPath.row == destinationIndexPath.row)
+		return;
+
+	ListViewSectionWidget* fromSection = [_children objectAtIndex:sourceIndexPath.section];
+	if (!fromSection)
+		return;
+
+	ListViewSectionWidget* toSection = [_children objectAtIndex:destinationIndexPath.section];
+	if (!toSection)
+		return;
+
+	NSNumber* insertIndex = [[NSNumber alloc] initWithInteger:destinationIndexPath.row];
+	ListViewItemWidget* cellWidget = [fromSection cellWidgetAtIndex:sourceIndexPath.row];
+	[fromSection removeChild:cellWidget];
+	[toSection insertChild:cellWidget atIndex:insertIndex];
+	[insertIndex release];
+
+	MAEvent event;
+	event.type = EVENT_TYPE_WIDGET;
+	MAWidgetEventData *eventData = new MAWidgetEventData;
+	eventData->eventType = MAW_EVENT_LIST_ITEM_MOVED;
+	eventData->sectionIndexBefore = sourceIndexPath.section;
+	eventData->sectionIndexAfter = destinationIndexPath.section;
+	eventData->sectionItemIndexBefore = sourceIndexPath.row;
+	eventData->sectionItemIndexAfter = destinationIndexPath.row;
+	eventData->widgetHandle = self.handle;
+	event.data = (int)eventData;
+	Base::gEventQueue.put(event);
+}
+
 #pragma mark ListViewDelegate
 
 /**

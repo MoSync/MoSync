@@ -540,6 +540,11 @@ namespace NativeUI
          */
         void setLastErrorCode(int& errCode, const MAUtil::String& cause);
 
+        /**
+         * List of child widgets.
+         */
+        MAUtil::Vector<Widget*> mChildren;
+
     private:
         /**
          * Handle that identifies the widget.
@@ -555,11 +560,6 @@ namespace NativeUI
          * Array with widget listeners.
          */
         MAUtil::Vector<WidgetEventListener*> mWidgetEventListeners;
-
-        /**
-         * List of child widgets.
-         */
-        MAUtil::Vector<Widget*> mChildren;
 
         /**
          * The last error that occurred.

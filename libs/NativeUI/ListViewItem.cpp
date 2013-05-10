@@ -474,4 +474,17 @@ namespace NativeUI
 		return type;
 	}
 
+	void ListViewItem::setMovable(bool state)
+	{
+		const char* value = state ? "true" : "false";
+		this->setProperty(MAW_LIST_VIEW_ITEM_SET_MOVABLE, value);
+	}
+
+	bool ListViewItem::isMovable()
+	{
+		MAUtil::String value = this->getPropertyString(MAW_LIST_VIEW_ITEM_IS_MOVABLE);
+		bool returnValue = (strcmp(value.c_str(), "true")) ? false : true;
+		return returnValue;
+	}
+
 } // namespace NativeUI

@@ -274,6 +274,13 @@ namespace NativeUI
 		 */
 		void notifyListenersClickedAccessoryItem(MAWidgetEventData* widgetEventData);
 
+		/**
+		 * Handle movement of the child ListViewItems internally and
+		 * notify listeners when receiving #MAW_EVENT_LIST_ITEM_ITEM_MOVED.
+		 * @param widgetEventData Event's data.
+		 */
+		void handleItemMove(MAWidgetEventData* widgetEventData);
+
 	private:
 		/**
 		 * Array with list view listeners.

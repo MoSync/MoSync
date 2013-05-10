@@ -448,6 +448,40 @@ group WidgetListViewItem "List View Item" {
 			* \endcode
 			*/
 			SELECTION_STYLE = "selectionStyle";
+
+			/**
+			* @brief Set the movable state of the item.
+			*
+			* Platform: iOS.
+			*
+			* @validvalue "true" if the item should be movable, "false" if it should be static.
+			*
+			* @setonly
+			*
+			* @par Example
+			* \code
+			*	maWidgetSetProperty(listItemHandle, MAW_LIST_VIEW_ITEM_SET_MOVABLE, "true");
+			* \endcode
+			*/
+			SET_MOVABLE = "setMovable";
+
+			/**
+			* @brief Check if the item is movable.
+			*
+			* Platform: iOS.
+			*
+			* @validvalue "true" if the item is movable, "false" otherwise.
+			*
+			* @getonly
+			*
+			* @par Example
+			* \code
+			*	char buffer[BUFFER_SIZE];
+			*	maWidgetGetProperty(listItemHandle, MAW_LIST_VIEW_ITEM_IS_MOVABLE,
+			*						buffer, BUFFER_SIZE);
+			* \endcode
+			*/
+			IS_MOVABLE = "isMovable";
 		}
 	} // end of WidgetListViewItemProperties
 }// end of WidgetListViewItem

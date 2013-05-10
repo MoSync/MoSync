@@ -68,6 +68,36 @@ namespace NativeUI
 			int index){};
 
 		/**
+		 * This method is called when a list view item is moved.
+		 * @param listView The list view object that generated the event.
+		 * @param listViewSectionBefore The ListViewSection object that did contain the moved item.
+		 * @param listViewSectionAfter The ListViewSection object that now contains the moved item.
+		 * @param listViewItem The ListViewItem object that was moved.
+		 * @param indexBefore The index on which the list view item was positioned before the move.
+		 * @param indexAfter The index on which the list view item is positioned now after the move.
+		 */
+		virtual void listViewItemMoved(
+			ListView* listView,
+			ListViewSection* listViewSectionBefore,
+			ListViewSection* listViewSectionAfter,
+			ListViewItem* listViewItem,
+			int indexBefore,
+			int indexAfter){};
+
+		/**
+		 * This method is called when a list view item is moved.
+		 * @param listView The list view object that generated the event.
+		 * @param listViewItem The ListViewItem object that was moved.
+		 * @param indexBefore The index on which the list view item was positioned before the move.
+		 * @param indexAfter The index on which the list view item is positioned now after the move.
+		 */
+		virtual void listViewItemMoved(
+			ListView* listView,
+			ListViewItem* listViewItem,
+			int indexBefore,
+			int indexAfter){};
+
+		/**
 		 * This method is called when a segmented/alphabetical list view item is clicked.
 		 * @param listView The list view object that generated the event.
 		 * @param sectionIndex The index of the section that contains the selected item.

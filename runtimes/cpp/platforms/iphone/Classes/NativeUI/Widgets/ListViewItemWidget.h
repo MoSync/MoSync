@@ -58,6 +58,11 @@
      * Flag for cell editing property.
      */
     BOOL _canEdit;
+
+    /**
+     * Flag for cell movable property.
+     */
+    BOOL _canMove;
 }
 
 /**
@@ -86,6 +91,11 @@
  * Getter and setter for editable property.
  */
 @property(nonatomic, assign) BOOL editable;
+
+/**
+ * Getter and setter for movable property.
+ */
+@property(nonatomic, assign) BOOL movable;
 
 /**
  * Adds an widget to the end of the children list.

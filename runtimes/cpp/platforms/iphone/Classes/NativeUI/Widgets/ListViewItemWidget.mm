@@ -202,6 +202,21 @@
  */
 -(NSString*) getSelectionStyleProperty;
 
+/**
+ * Set cell movable property value.
+ * Setter for MAW_LIST_VIEW_ITEM_SET_MOVABLE.
+ * @param value "true" or "false" values.
+ * @return MAW_RES_OK if value param is valid, or MAW_RES_INVALID_PROEPRTY_VALUE otherwise.
+ */
+-(int) setMovableProperty:(NSString*) value;
+
+/**
+ * Check if cell is movable.
+ * Getter for MAW_LIST_VIEW_ITEM_IS_MOVABLE.
+ * @return "true" is cell is movable, "false" otherwise.
+ */
+-(NSString*) isMovableProperty;
+
 @end
 
 @implementation ListViewItemWidget
@@ -212,6 +227,7 @@ static NSString* kReuseIdentifier = @"Cell";
 @synthesize deleteButtonTitle = _deleteButtonTitle;
 @synthesize editingStyle = _editingStyle;
 @synthesize editable = _canEdit;
+@synthesize movable = _movable;
 
 /**
  * Init function.
@@ -361,6 +377,10 @@ static NSString* kReuseIdentifier = @"Cell";
     {
         return [self setSelectionStyleProperty:value];
     }
+    else if ([key isEqualToString:@MAW_LIST_VIEW_ITEM_SET_MOVABLE])
+    {
+        return [self setMovableProperty:value];
+    }
 	else
     {
 		return [super setPropertyWithKey:key toValue:value];
@@ -421,6 +441,10 @@ static NSString* kReuseIdentifier = @"Cell";
     else if ([key isEqualToString:@MAW_LIST_VIEW_ITEM_SELECTION_STYLE])
     {
         return [[self getSelectionStyleProperty] retain];
+    }
+    else if ([key isEqualToString:@MAW_LIST_VIEW_ITEM_IS_MOVABLE])
+    {
+        return [[self isMovableProperty] retain];
     }
     else
     {
@@ -1005,6 +1029,23 @@ static NSString* kReuseIdentifier = @"Cell";
     }
 
     return [NSString stringWithFormat:@"%d", selectionStyleInt];
+}
+
+-(int) setMovableProperty:(NSString*) value
+{
+    if (![value isEqualToString:kWidgetFalseValue] &&
+        ![value isEqualToString:kWidgetTrueValue])
+    {
+        return MAW_RES_INVALID_PROPERTY_VALUE;
+    }
+
+    self.movable = [value boolValue];
+    return MAW_RES_OK;
+}
+
+-(NSString*) isMovableProperty
+{
+	return (self.movable ? kWidgetTrueValue : kWidgetFalseValue);
 }
 
 @end

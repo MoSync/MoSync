@@ -27,6 +27,7 @@ MA 02110-1301, USA.
 #include "ListView.h"
 #include "ListViewSection.h"
 #include "ListViewListener.h"
+#include "ListViewItem.h"
 
 namespace NativeUI
 {
@@ -257,6 +258,10 @@ namespace NativeUI
 		{
 			this->notifyListenersClickedAccessoryItem(widgetEventData);
 		}
+		else if (MAW_EVENT_LIST_ITEM_MOVED == widgetEventData->eventType)
+		{
+			this->handleItemMove(widgetEventData);
+		}
 	}
 
 	/**
@@ -445,6 +450,51 @@ namespace NativeUI
                                                                this,
                                                                listViewSection,
                                                                listViewItem);
+		}
+	}
+
+	void ListView::handleItemMove(MAWidgetEventData* widgetEventData)
+	{
+		int sectionIndexBefore = widgetEventData->sectionIndexBefore;
+		int sectionIndexAfter = widgetEventData->sectionIndexAfter;
+		int itemIndexWithinSectionBefore = widgetEventData->sectionItemIndexBefore;
+		int itemIndexWithinSectionAfter = widgetEventData->sectionItemIndexAfter;
+
+		if (MAW_LIST_VIEW_TYPE_SEGMENTED == this->getPropertyInt(MAW_LIST_VIEW_TYPE))
+		{
+			ListViewSection* sectionBefore = (ListViewSection*)this->getChild(sectionIndexBefore);
+			ListViewSection* sectionAfter = (ListViewSection*)this->getChild(sectionIndexAfter);
+			ListViewItem* listViewItem = sectionBefore->getItem(itemIndexWithinSectionAfter);
+
+			sectionBefore->mChildren.remove(itemIndexWithinSectionBefore);
+			sectionAfter->mChildren.insert(itemIndexWithinSectionAfter, listViewItem);
+
+			for (int i = 0; i < mListViewListeners.size(); i++)
+			{
+				mListViewListeners[i]->listViewItemMoved(
+														 this,
+														 sectionBefore,
+														 sectionAfter,
+														 listViewItem,
+														 itemIndexWithinSectionBefore,
+														 itemIndexWithinSectionAfter);
+			}
+		}
+		else
+		{
+			ListViewItem* listViewItem = (ListViewItem*)this->getChild(widgetEventData->sectionItemIndexBefore);
+
+			mChildren.remove(itemIndexWithinSectionBefore);
+			mChildren.insert(itemIndexWithinSectionAfter, listViewItem);
+
+			for (int i = 0; i < mListViewListeners.size(); i++)
+			{
+				mListViewListeners[i]->listViewItemMoved(
+														 this,
+														 listViewItem,
+														 itemIndexWithinSectionBefore,
+														 itemIndexWithinSectionAfter);
+			}
 		}
 	}
 

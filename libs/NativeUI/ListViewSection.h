@@ -61,6 +61,7 @@ namespace NativeUI
 
 	// Forward declaration.
 	class ListViewItem;
+	class ListView;
 
 	/**
 	 * @brief A ListViewSection widget is used to group one or more
@@ -68,6 +69,7 @@ namespace NativeUI
 	 */
 	class ListViewSection : public Widget
 	{
+		friend class ListView;
 	public:
 		/**
 		 * Constructor.

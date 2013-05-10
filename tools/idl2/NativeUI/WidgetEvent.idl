@@ -42,6 +42,28 @@ group WidgetEvent "Widget event" {
 			} listViewSectionInfo;
 
 			/**
+			* @brief The parameters for the #MAW_EVENT_LIST_ITEM_MOVED.
+			*/
+			struct {
+				/**
+				* @brief The section index of the item before a move.
+				*/
+				int sectionIndexBefore;
+				/**
+				* @brief The index of the item before a move within its parent section.
+				*/
+				int sectionItemIndexBefore;
+				/**
+				* @brief The section index of the item after a move.
+				*/
+				int sectionIndexAfter;
+				/**
+				* @brief The index of the item after a move within its parent section.
+				*/
+				int sectionItemIndexAfter;
+			} listViewItemMoveInfo;
+
+			/**
 			* @brief The type of button that was clicked when a #MAW_EVENT_CLICKED event is receieved for a searchbar.
 			* The type of searchbar button clicked:
 			* - 0 means 'search'
@@ -459,6 +481,13 @@ group WidgetEvent "Widget event" {
 			*/
 			LIST_ITEM_ACCESSORY_CLICKED = 38;
 
+			/**
+			* @brief Sent by a ListView when an item was moved.
+			* The event will contain the sectionIndexBefore, sectionIndexAfter, sectionItemIndexBefore and sectionItemIndexAfter.
+			* A list view item can only be moved when the list is in edit mode.
+			* Available on IOS.
+			*/
+			LIST_ITEM_MOVED = 39;
 		}
 	} // end of WidgetEventTypes
 } // end of WidgetEvent
