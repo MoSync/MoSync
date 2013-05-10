@@ -98,7 +98,7 @@ namespace MoSync
                 mGrid.ColumnDefinitions.Add(mColDef);
                 mGrid.ColumnDefinitions.Add(mSpacerRight);
 
-                mView = mGrid;
+                View = mGrid;
 
                 mGrid.Margin = new Thickness(0.0);
 
@@ -399,13 +399,13 @@ namespace MoSync
                         {
                             mScrollViewer = new System.Windows.Controls.ScrollViewer();
                             mScrollViewer.Content = mGrid;
-                            mView = mScrollViewer;
+                            View = mScrollViewer;
                         }
                         else
                         {
                             if (null != mScrollViewer)
                             {
-                                mView = mGrid;
+                                View = mGrid;
                             }
                         }
                     }
@@ -464,6 +464,27 @@ namespace MoSync
 
                 return false;
             }
-        }
-    }
-}
+
+            #region Property validation methods
+
+            /**
+             * Validates a property based on the property name and property value.
+             * @param propertyName The name of the property to be checked.
+             * @param propertyValue The value of the property to be checked.
+             * @returns true if the property is valid, false otherwise.
+             */
+            public new static bool ValidateProperty(string propertyName, string propertyValue)
+            {
+                bool isBasePropertyValid = WidgetBaseWindowsPhone.ValidateProperty(propertyName, propertyValue);
+                if (isBasePropertyValid == false)
+                {
+                    return false;
+                }
+
+                return true;
+            }
+
+            #endregion
+        } // end of VerticalLayout class
+    } // end of NativeUI namespace
+} // end of MoSync namespace

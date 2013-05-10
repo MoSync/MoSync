@@ -1,4 +1,4 @@
-﻿/* Copyright (C) 2011 MoSync AB
+/* Copyright (C) 2011 MoSync AB
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License,
@@ -210,7 +210,11 @@ namespace MoSync
 
                 mBackgroundImage.Stretch = mStretchBackground;
 
-                mView = mGrid;
+                // We need to make this view a ContentControl in order to have System.Windows.Controls::Control properties enabled.
+                ContentControl contentControl = new System.Windows.Controls.ContentControl();
+                contentControl.Content = mGrid;
+
+                View = contentControl;
 
                 // the MouseEnter handle for the ImageButton. Used for switching background image.
                 mGrid.MouseEnter += new System.Windows.Input.MouseEventHandler(delegate(Object from, System.Windows.Input.MouseEventArgs evt)
@@ -484,7 +488,7 @@ namespace MoSync
                             mForegroundImagePath = value;
                             mForegroundImageHandle = 0;
                         }
-                        catch (Exception e)
+                        catch
                         {
                             // There was a problem reading the image file.
                             throw new InvalidPropertyValueException();
@@ -525,7 +529,7 @@ namespace MoSync
                             mBackgroundImagePath = value;
                             mBackgroundImageHandle = 0;
                         }
-                        catch (Exception e)
+                        catch
                         {
                             // There was a problem reading the image file.
                             throw new InvalidPropertyValueException();
@@ -566,7 +570,7 @@ namespace MoSync
                             mPressedImagePath = value;
                             mPressedImageHandle = 0;
                         }
-                        catch (Exception e)
+                        catch
                         {
                             // There was a problem reading the image file.
                             throw new InvalidPropertyValueException();
@@ -580,6 +584,27 @@ namespace MoSync
                     return mPressedImagePath;
                 }
             }
-        }
-	}
-}
+
+            #region Property validation methods
+
+            /**
+             * Validates a property based on the property name and property value.
+             * @param propertyName The name of the property to be checked.
+             * @param propertyValue The value of the property to be checked.
+             * @returns true if the property is valid, false otherwise.
+             */
+            public new static bool ValidateProperty(string propertyName, string propertyValue)
+            {
+                bool isBasePropertyValid = WidgetBaseWindowsPhone.ValidateProperty(propertyName, propertyValue);
+                if (isBasePropertyValid == false)
+                {
+                    return false;
+                }
+
+                return true;
+            }
+
+            #endregion
+        } // end of ImageButton class
+    } // end of NativeUI namespace
+} // end of MoSync namespace

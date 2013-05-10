@@ -248,6 +248,8 @@ group WidgetAPIFunctions "Widget functions" {
 	* \returns The the item index on success, or any of the following result codes:
 	* - #MAW_RES_ERROR
 	* - #MAW_RES_INVALID_HANDLE
+	* NOTE: Android no longer requires a dedicated Menu button, some devices don’t have one, and you should migrate away from using it.
+	* Use #maActionBarAddMenuItem() syscall instead.
 	*/
 	int maWidgetScreenAddOptionsMenuItem(in MAWidgetHandle widget, in MAString title, in MAString iconPath, in int iconPredefined);
 
@@ -264,5 +266,4 @@ group WidgetAPIFunctions "Widget functions" {
     * - MAW_RES_ERROR if something else than a screen stack was passed.
     */
     int maWidgetScreenInsertNavBarButton(in MAWNavigationBarButtonSide side, in MAWidgetHandle screenWidget, in MAWidgetHandle navBarButtonWidget, in int index);
-
 } // end of group WidgetAPIFunctions

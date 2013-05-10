@@ -340,6 +340,11 @@ namespace MoSync
 				if (url.StartsWith("btspp"))
 					return MoSync.Constants.CONNERR_UNAVAILABLE;
 				Uri uri = new Uri(url);
+				if (uri.Host.Length == 0)
+				{
+					//throw new Exception("Server connections not supported on Windows Phone 7.");
+					return MoSync.Constants.CONNERR_UNAVAILABLE;
+				}
 				Connection c;
 				if (uri.Scheme.Equals("socket"))
 				{

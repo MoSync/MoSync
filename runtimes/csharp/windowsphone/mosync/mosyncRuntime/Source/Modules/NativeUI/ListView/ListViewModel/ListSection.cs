@@ -522,7 +522,6 @@ namespace MoSync
             #endregion
         }
 
-        // TODO SA: investigate if this is necessary
         public static class EnumerableExtensions
         {
             public static ObservableCollection<T> ToObservableCollection<T>(this IEnumerable<T> collection)

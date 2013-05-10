@@ -564,4 +564,209 @@ int maWidgetScreenInsertNavBarButton(int side, MAWidgetHandle screenWidgetHandle
             });
     }
     return MAW_RES_OK;
+
+/**
+ * Enable or disable the Action bar.
+ * By default, the Action bar is disabled.
+ * Note that the Action bar is only available starting from Android API level 11.
+ * @param showActionBar True to enable it, False to disable it.
+ *
+ * \returns
+ * - #MAW_RES_OK on success, or
+ * - #MAW_RES_ACTION_BAR_NOT_AVAILABLE If the action bar is not available on the current platform.
+ */
+int maActionBarSetEnabled(int showActionBar)
+{
+    return IOCTL_UNAVAILABLE;
+}
+
+
+/**
+ * Add a menu item to the Action bar.
+ * @param screenHandle Handle to the screen widget.
+ * @param MA_ACTION_BAR_ITEM_ICON Arguments for the new menu item.
+ * @param title The title associated for the new item. Can be left null.
+ * @param iconPredefinedId Optional icon for the action bar item. Set it to -1 if the item has no icon.
+ * @param displayFlag One of the \link #MAW_ACTION_BAR_ITEM_SHOW_  \endlink constants.
+ *
+ * \returns The the item handle on success, or any of the following result codes:
+ * - #MAW_RES_ERROR
+ * - #MAW_RES_ACTION_BAR_INVALID_ICON
+ * - #MAW_RES_ACTION_BAR_INVALID_FLAG
+ * - #MAW_RES_INVALID_HANDLE If the screenHandle points to an invalid screen.
+ * - #MAW_RES_ACTION_BAR_DISABLED If the action bar was explicitly disabled.
+ * - #MAW_RES_ACTION_BAR_NOT_AVAILABLE If the action bar is not available on the current platform.
+ */
+int maActionBarAddMenuItem(MAHandle screenHandle, const char* title, const MA_ACTION_BAR_ITEM_ICON* item, int displayFlag)
+{
+    return IOCTL_UNAVAILABLE;
+}
+
+/**
+ * Remove a menu item from the Action bar.
+ * @param screenHandle Handle to the screen widget.
+ * @param itemHandle Handle to the menu item.
+ *
+ * \returns #MAW_RES_OK on success, or any of the following result codes:
+ * - #MAW_RES_ACTION_BAR_NOT_AVAILABLE If the action bar is not available on the current platform,
+ * - #MAW_RES_ACTION_BAR_DISABLED If the action bar was explicitly disabled, or
+ * - #MAW_RES_INVALID_HANDLE If the indicated screen has no item on specified handle.
+ */
+int maActionBarRemoveMenuItem(MAHandle screenHandle,int itemHandle)
+{
+    return IOCTL_UNAVAILABLE;
+}
+
+/**
+ * Call this syscall after you finished adding/removing items to the action bar.
+ * Recommended for performance, so that the action bar does not get redrawn each time one item is changed.
+ *
+ * \returns #MAW_RES_OK on success, or any of the following result codes:
+ * - #MAW_RES_ACTION_BAR_NOT_AVAILABLE If the action bar is not available on the current platform.
+ * - #MAW_RES_ACTION_BAR_DISABLED If the action bar was explicitly disabled.
+ */
+int maActionBarRefresh()
+{
+    return IOCTL_UNAVAILABLE;
+}
+
+/**
+ * Enable or disable the display of the action bar.
+ * Use this when you need the application to get into fullscreen, like for instance in a help screen.
+ * Default value is True if the action bar is enabled on the application.
+ * @param showState True to show the action bar, False to hide it.
+ * If you are hiding the ActionBar through #maScreenSetFullscreen(), you should not call this function directly.
+ *
+ * \returns #MAW_RES_OK on success, or any of the following result codes:
+ * - #MAW_RES_ACTION_BAR_NOT_AVAILABLE If the action bar is not available on the current platform.
+ * - #MAW_RES_ACTION_BAR_DISABLED If the action bar was explicitly disabled.
+ */
+int maActionBarSetVisibility(int showState)
+{
+    return IOCTL_UNAVAILABLE;
+}
+
+/**
+ * Get the current height of the action bar.
+ *
+ * \returns #MAW_RES_OK on success, or any of the following result codes:
+ * - #MAW_RES_ACTION_BAR_NOT_AVAILABLE If the action bar is not available on the current platform.
+ * - #MAW_RES_ACTION_BAR_DISABLED If the action bar was explicitly disabled.
+ */
+int maActionBarGetHeight()
+{
+    return IOCTL_UNAVAILABLE;
+}
+
+/**
+ * Check if the ActionBar is currently displayed.
+ *
+ * \returns 1 if the Action bar is visible, 0 if it was hidden, or any of the following result codes:
+ * - #MAW_RES_ACTION_BAR_NOT_AVAILABLE If the action bar is not available on the current platform.
+ * - #MAW_RES_ACTION_BAR_DISABLED If the action bar was explicitly disabled.
+ */
+int maActionBarIsShowing()
+{
+    return IOCTL_UNAVAILABLE;
+}
+
+/**
+ * Set the action bar's title.
+ * This will only be displayed if #maActionBarShowTitleEnabled(true) is set.
+ * By default, the title is the activity title, in this case application's name.
+ * @param title The ActionBar title to set.
+ *
+ * \returns #MAW_RES_OK on success, or any of the following result codes:
+ * - #MAW_RES_ACTION_BAR_NOT_AVAILABLE If the action bar is not available on the current platform.
+ * - #MAW_RES_ACTION_BAR_DISABLED If the action bar was explicitly disabled.
+ */
+int maActionBarSetTitle(const char* title)
+{
+    return IOCTL_UNAVAILABLE;
+}
+
+/**
+ * Set the icon to display in the 'home' section of the action bar.
+ * @param iconHandle Drawable to show as the ActionBar icon.
+ *
+ * \returns #MAW_RES_OK on success, or any of the following result codes:
+ * - #MAW_RES_ACTION_BAR_INVALID_ICON If the iconHandle is invalid.
+ * - #MAW_RES_ACTION_BAR_NOT_AVAILABLE If the action bar is not available on the current platform.
+ * - #MAW_RES_ACTION_BAR_DISABLED If the action bar was explicitly disabled.
+ */
+int maActionBarSetIcon(MAHandle iconHandle)
+{
+    return IOCTL_UNAVAILABLE;
+}
+
+/**
+ * Set whether an activity title/subtitle should be displayed.
+ * @param enableTitle True to enable the display of the title, False otherwise.
+ *
+ * \returns #MAW_RES_OK on success, or any of the following result codes:
+ * - #MAW_RES_ACTION_BAR_NOT_AVAILABLE If the action bar is not available on the current platform.
+ * - #MAW_RES_ACTION_BAR_DISABLED If the action bar was explicitly disabled.
+ */
+int maActionBarShowTitleEnabled(int enableTitle)
+{
+    return IOCTL_UNAVAILABLE;
+}
+
+/**
+ * Set whether to display the activity logo rather than the activity icon.
+ * A logo is often a wider, more detailed image.
+ * @param enableLogo True to enable logo, False otherwise.
+ *
+ * \returns #MAW_RES_OK on success, or any of the following result codes:
+ * - #MAW_RES_ACTION_BAR_NOT_AVAILABLE If the action bar is not available on the current platform.
+ * - #MAW_RES_ACTION_BAR_DISABLED If the action bar was explicitly disabled.
+ */
+int maActionBarShowLogoEnabled(int enableLogo)
+{
+    return IOCTL_UNAVAILABLE;
+}
+
+/**
+ * Enable or disable the "home" button in the corner of the action bar.
+ * This defaults to true for packages targeting < API 14. For packages targeting API 14 or greater,
+ * the application should call this method to enable interaction with the home/up affordance.
+ * If you're using the ActionBar icon to navigate to the home activity, beware that beginning with Android API level 14,
+ * you must explicitly enable the icon as an action item by calling #maActionBarSetHomeButtonEnabled(true)
+ * (in previous versions, the ActionBar icon was enabled as an action item by default).
+ * @param state True to enable the home button, False to disable the home button.
+ *
+ * \returns #MAW_RES_OK on success, or any of the following result codes:
+ * - #MAW_RES_ACTION_BAR_NOT_AVAILABLE If the action bar is not available on the current platform.
+ * - #MAW_RES_ACTION_BAR_DISABLED If the action bar was explicitly disabled.
+ */
+int maActionBarSetHomeButtonEnabled(int state)
+{
+    return IOCTL_UNAVAILABLE;
+}
+
+/**
+ * Enable or disable the icon for up navigation (which displays the "up" indicator next to the
+ * ActionBar icon.
+ * @param True to show the user that selecting home will return one level up rather than to the top level of the app.
+ *
+ * \returns #MAW_RES_OK on success, or any of the following result codes:
+ * - #MAW_RES_ACTION_BAR_NOT_AVAILABLE If the action bar is not available on the current platform.
+ * - #MAW_RES_ACTION_BAR_DISABLED If the action bar was explicitly disabled.
+ */
+int maActionBarSetDisplayHomeAsUpEnabled(int showHomeAsUp)
+{
+    return IOCTL_UNAVAILABLE;
+}
+
+/**
+ * Set the ActionBar's background. This will be used for the primary action bar.
+ * @param imageHandle The drawable to use for the ActionBar's background.
+ *
+ * \returns #MAW_RES_OK on success, or any of the following result codes:
+ * - #MAW_RES_ACTION_BAR_NOT_AVAILABLE If the action bar is not available on the current platform.
+ * - #MAW_RES_ACTION_BAR_DISABLED If the action bar was explicitly disabled.
+ */
+int maActionBarSetBackgroundImage(MAHandle imageHandle)
+{
+    return IOCTL_UNAVAILABLE;
 }
