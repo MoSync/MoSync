@@ -65,6 +65,18 @@ int CMFontGetGlyphsForUnichars(CGFontRef cgFont, const UniChar buffer[], CGGlyph
     return 1;
 }
 
+int CMFontGetGlyphsForUnichars(CGFontRef cgFont, const UInt32 buffer[], CGGlyph glyphs[], size_t numGlyphs)
+{
+	CMCMap4Ref cmap = CMGetCMapForFont(cgFont);
+    if(!cmap)
+    {
+        return 0;
+    }
+	for (int i = 0; i < numGlyphs; i++) {
+		glyphs[i] = CMCMapGetGlyphIndexForUnichar(cmap, buffer[i]);
+	}
+    return 1;
+}
 
 CMCMap4Ref CMGetCMapForFont(CGFontRef cgFont) {
 	// Create dictionary to cache cmaps
