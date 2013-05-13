@@ -802,6 +802,8 @@ decset(FILE *DependFile, NULL)
 dec(FILE *InFile)
 dec(FILE *CodeFile)
 dec(FILE *HeaderFile)
+decset(int Do_WriteResNames, 0)
+dec(FILE *ResNamesFile)
 
 dec(short DEBUG)
 dec(short LIST)

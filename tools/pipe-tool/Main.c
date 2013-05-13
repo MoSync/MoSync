@@ -342,6 +342,12 @@ int main(int argc,char *argv[])
 			continue;
 		}
 
+        if (Token("resnames"))
+        {
+            Do_WriteResNames = 1;
+            continue;
+        }
+
 		if (Token("gcj="))
 		{
 			GetCmdString();
@@ -750,6 +756,7 @@ Build application (-B) options:\n\
 \n\
 Resource compiler (-R) options:\n\
   -depend=file         output dependencies in makefile syntax\n\
+  -resnames            create MAHeaders.cpp with string to resource mappings\n\
 \n\
 Librarian (-L) options:\n\
   -quiet               don't display the component files\n\
@@ -1089,6 +1096,22 @@ void MainRes(char *input, char *output)
 		ExitApp(1);
 	}
 
+    if(Do_WriteResNames)
+    {
+        if ((ResNamesFile = fopen("MAHeaders.cpp","w") ) == NULL)
+	    {
+		    if (AsmMsg)
+			    printf("Error : Problem creating 'MAHeaders.cpp' file\n");
+
+		    fclose(CodeFile);
+            fclose(HeaderFile);
+		    ExitApp(1);
+	    }
+        fprintf( ResNamesFile, "#include <ma.h>\n\
+#include \"MAHeaders.h\"\n\n\
+int GetResourceID( const char *resourceName )\n{\n" );
+    }
+
 	if(Do_Export_Dependencies)
 	{
 		if ((DependFile = fopen(DependName,"w") ) == NULL)
@@ -1098,6 +1121,7 @@ void MainRes(char *input, char *output)
 
 			fclose(CodeFile);
 			fclose(HeaderFile);
+            if(Do_WriteResNames) fclose(ResNamesFile);
 			ExitApp(1);
 		}
 		fprintf(DependFile, "%s: \\\n", output);
@@ -1112,8 +1136,19 @@ void MainRes(char *input, char *output)
 		ResourceMain();
 	}
 
+    if (Do_WriteResNames && ResNamesFile)
+    {
+        fprintf(ResNamesFile, "    return -1;\n}");
+        fclose(ResNamesFile);
+		printf("Created MAHeaders.cpp with string to resource mappings\n");
+    }
+
 	if (HeaderFile)
+    {
+        if (Do_WriteResNames)
+            fprintf( HeaderFile, "\nint GetResourceID( const char *resourceName );\n" );
 		fclose(HeaderFile);
+    }
 
 	if (CodeFile)
 		fclose(CodeFile);

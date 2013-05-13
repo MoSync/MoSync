@@ -358,9 +358,12 @@ short ResourceCommands()
 
 		infoprintf("%d: index = %d ('%s')\n",IndexCount, IndexOffset, Name);
 
-		if (Pass == 2)
-			if (Name[0])
-				fprintf(HeaderFile,"#define idx_%s %d\n", Name, IndexCount);
+		if( Pass == 2 && Name[0] )
+        {
+			fprintf(HeaderFile,"#define idx_%s %d\n", Name, IndexCount);
+            if( Do_WriteResNames )
+                fprintf(ResNamesFile,"    if( strcmp( resName, \"idx_%s\" ) == 0 ) return idx_%s;\n", Name, Name);
+        }
 
 		IndexCount++;
 		return 1;
@@ -1520,8 +1523,11 @@ void FinalizeResource()
 	if (Pass == 2)
 	{
 		if (ResName[0])
+        {
 			fprintf(HeaderFile,"#define %s %d\n", ResName, CurrentResource);
-		else
+            if( Do_WriteResNames )
+                fprintf(ResNamesFile,"    if( strcmp( resourceName, \"%s\" ) == 0 ) return %s;\n", ResName, ResName);
+        } else
 			fprintf(HeaderFile,"//not defined %d\n", CurrentResource);
 	}
 
