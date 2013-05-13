@@ -40,6 +40,7 @@ int getFreeAmountOfMemory();
 int getTotalAmountOfMemory();
 bool platformRequest(const char *url);
 size_t wcharLength(const wchar* str);
+size_t wchartLength(const wchar_t* str);
 
 void getScreenResolution(int& w, int &h);
 float getScreenScale();

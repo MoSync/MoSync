@@ -434,15 +434,39 @@ int stringLength(const wchar_t* str) {
 
 SYSCALL(void, maDrawTextW(int left, int top, const wchar* str))
 {
-    int numGlyphs = wcharLength(str);
+    int numGlyphs, resultCode;
+	const UniChar* strUnichar;
+	const UInt32* strUInt32;
+
+	if (gNativeMode)
+	{
+		// With native library approach wchar type 32 bits long.
+		strUInt32 = (const UInt32*)str;
+		numGlyphs = wchartLength((const wchar_t*)str);
+	}
+	else
+	{
+		strUnichar = (const UniChar*)str;
+		numGlyphs = wcharLength(str);
+	}
+
     FontInfo *currentFont=sFontList[gCurrentFontHandle-1];
     initCGFont(currentFont);
     if(numGlyphs==0) return;
     CGGlyph* glyphs = new CGGlyph[numGlyphs];
 
-    //Not all fonts in the device are supported for Unicode glyphs
+	if (gNativeMode)
+	{
+		resultCode = CMFontGetGlyphsForUnichars(currentFont->cgFontObject, strUInt32, glyphs, numGlyphs);
+	}
+	else
+	{
+		resultCode = CMFontGetGlyphsForUnichars(currentFont->cgFontObject, strUnichar, glyphs, numGlyphs);
+	}
+
+	//Not all fonts in the device are supported for Unicode glyphs
     //We must check whether the operation was successful
-    if(!CMFontGetGlyphsForUnichars(currentFont->cgFontObject, (const UniChar*)str, glyphs, numGlyphs))
+    if(!resultCode)
     {
         delete glyphs;
         return;

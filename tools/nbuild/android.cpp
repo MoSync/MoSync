@@ -79,10 +79,13 @@ int generateMakefile(Arguments* params, string& configName) {
 
 	DefaultContext rootCtx(NULL);
 	for (size_t i = 0; i < modules.size(); i++) {
-		DefaultContext* moduleCtx = new DefaultContext(&rootCtx);
-		// TODO: Clean up
-		moduleCtx->setParameter("name", modules[i]);
-		rootCtx.addChild("modules", moduleCtx);
+		String moduleName = modules[i];
+		if (!isSTL(moduleName)) {
+			DefaultContext* moduleCtx = new DefaultContext(&rootCtx);
+			// TODO: Clean up
+			moduleCtx->setParameter("name", moduleName);
+			rootCtx.addChild("modules", moduleCtx);
+		}
 	}
 	vector<string> sourceFiles = getSourceFiles(params);
 	string sourceFileList;
@@ -240,6 +243,14 @@ int executeNdkBuild(Arguments* params) {
 		}
 	}
 
+	vector<string> modules;
+	split(modules, params->getSwitchValue(MODULE_LIST), ",");
+	bool useSTL = false;
+	for (size_t i = 0; i < modules.size(); i++) {
+		useSTL |= isSTL(modules[i]);
+		printf("USE STL? %s, %d\n", modules[i].c_str(), useSTL);
+	}
+
 	for (size_t i = 0; i < configNames.size(); i++) {
 		for (size_t j = 0; j < archs.size(); j++) {
 			string configName = configNames[i];
@@ -282,11 +293,12 @@ int executeNdkBuild(Arguments* params) {
 			cmd << arg("MOSYNC_LIB_VARIANT=" + libVariant) << " ";
 			cmd << arg("NDK_PROJECT_PATH=.") << " ";
 			cmd << arg("APP_ABI=" + arch) << " ";
+			if (useSTL) {
+				cmd << arg("APP_STL=stlport_static") << " ";
+			}
 			string androidVersion = getAppPlatform(params);
 			cmd << arg("APP_PLATFORM=android-" + androidVersion) << " ";
 			cmd << arg("MOSYNCDIR=" + toMakefileFile(mosyncdir())) << " ";
-
-//			cmd << arg("APP_STL=stlport_static") << " ";
 
 			bool useStatic = "static" == params->getSwitchValue("--android-lib-type");
 			string fullOutputDir = outputDir + "android_" + arch + "_" + libVariant + "/";
