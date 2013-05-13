@@ -52,8 +52,8 @@ namespace MoSync
              */
             public ToggleButton()
             {
-				mToggleButton = new Microsoft.Phone.Controls.ToggleSwitch();
-				mView = mToggleButton;
+                mToggleButton = new Microsoft.Phone.Controls.ToggleSwitch();
+                View = mToggleButton;
 
                 /**
                  * implementation of the Click event
