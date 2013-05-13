@@ -1,4 +1,4 @@
-﻿/* Copyright (C) 2011 MoSync AB
+/* Copyright (C) 2011 MoSync AB
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License,
@@ -152,7 +152,7 @@ namespace MoSync
                             mImagePath = value;
                             mImageHandle = 0;
                         }
-                        catch (Exception e)
+                        catch
                         {
                             // There was a problem reading the image file.
                             throw new InvalidPropertyValueException();
@@ -166,6 +166,27 @@ namespace MoSync
                     return mImagePath;
                 }
             }
-        }
-    }
-}
+
+            #region Property validation methods
+
+            /**
+             * Validates a property based on the property name and property value.
+             * @param propertyName The name of the property to be checked.
+             * @param propertyValue The value of the property to be checked.
+             * @returns true if the property is valid, false otherwise.
+             */
+            public new static bool ValidateProperty(string propertyName, string propertyValue)
+            {
+                bool isBasePropertyValid = WidgetBaseWindowsPhone.ValidateProperty(propertyName, propertyValue);
+                if (isBasePropertyValid == false)
+                {
+                    return false;
+                }
+
+                return true;
+            }
+
+            #endregion
+        } // end of Image class
+    } // end of NativeUI namespace
+} // end of MoSync namespace

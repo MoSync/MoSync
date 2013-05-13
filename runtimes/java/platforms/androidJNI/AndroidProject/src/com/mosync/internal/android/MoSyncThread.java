@@ -44,7 +44,6 @@ import static com.mosync.internal.generated.MAAPI_consts.TRANS_NONE;
 import static com.mosync.internal.generated.MAAPI_consts.TRANS_ROT180;
 import static com.mosync.internal.generated.MAAPI_consts.TRANS_ROT270;
 import static com.mosync.internal.generated.MAAPI_consts.TRANS_ROT90;
-import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_ALERT;
 import static com.mosync.internal.generated.MAAPI_consts.MA_IMAGE_PICKER_EVENT_RETURN_TYPE_IMAGE_HANDLE;
 
 import static com.mosync.internal.generated.MAAPI_consts.MA_RESOURCE_OPEN;
@@ -52,7 +51,6 @@ import static com.mosync.internal.generated.MAAPI_consts.MA_RESOURCE_CLOSE;
 
 import static com.mosync.internal.generated.MAAPI_consts.MA_WAKE_LOCK_ON;
 import static com.mosync.internal.generated.MAAPI_consts.MA_CAMERA_RES_OK;
-import static com.mosync.internal.generated.MAAPI_consts.MA_CAMERA_RES_FAILED;
 import static com.mosync.internal.generated.MAAPI_consts.MA_CAMERA_RES_SNAPSHOT_IN_PROGRESS;
 
 import static com.mosync.internal.generated.MAAPI_consts.MA_TOAST_DURATION_SHORT;
@@ -4637,6 +4635,109 @@ public class MoSyncThread extends Thread implements MoSyncContext
 	{
 		return mMoSyncNativeUI.maWidgetScreenAddOptionsMenuItem(
 				widgetHandle, title, iconHandle, iconPredefined);
+	}
+
+	/**
+	* The ActionBar is unique per application, therefore all syscalls that
+	* relate to the Action Bar will be handled on that unique instance.
+	* Available only on Android.
+	* @param handle The screen handle.
+	* @param title The menu item title.
+	* @param iconPredefinedId Optional icon for the action bar item.
+	* @param iconHandle ptional icon for the action bar item.
+	* @param displayFlag Where and how to display the menu item.
+	* \returns The the item handle on success, or any of the following result codes:
+	* - #MAW_RES_ERROR
+	* - #MAW_RES_ACTION_BAR_INVALID_ICON
+	* - #MAW_RES_ACTION_BAR_INVALID_FLAG
+	* - #MAW_RES_INVALID_HANDLE If the screenHandle points to an invalid screen.
+	* - #MAW_RES_ACTION_BAR_DISABLED If the action bar was explicitely disabled.
+	* - #MAW_RES_ACTION_BAR_NOT_AVAILABLE If the action bar is not available on the current platform.
+	*/
+	public int maActionBarAddMenuItem(final int handle, final String title,
+			final int iconPredefinedId, final int iconHandle, final int displayFlag)
+	{
+		return mMoSyncNativeUI.maActionBarAddMenuItem(
+				handle, title,
+				iconPredefinedId, iconHandle, displayFlag);
+	}
+
+	/**
+	 * Remove an item from the Action bar.
+	 * @param screenHandle The screen handle.
+	 * @param itemHandle The handle of the menu item to be removed.
+	 * \returns #MAW_RES_OK on success, or any of the following result codes:
+	 * - #MAW_RES_ACTION_BAR_NOT_AVAILABLE If the action bar is not available on the current platform,
+	 * - #MAW_RES_ACTION_BAR_DISABLED If the action bar was explicitely disabled, or
+	 * - #MAW_RES_INVALID_HANDLE If the indicated screen has no item on specified handle.
+	 */
+	public int maActionBarRemoveMenuItem(final int screenHandle, final int itemHandle)
+	{
+		return mMoSyncNativeUI.maActionBarRemoveMenuItem(screenHandle, itemHandle);
+	}
+
+	public int maActionBarSetEnabled(int state)
+	{
+		return mMoSyncNativeUI.maActionBarSetEnabled(state == 1 ? true : false);
+	}
+
+	public int maActionBarSetVisibility(int visibility)
+	{
+		return mMoSyncNativeUI.maActionBarSetVisibility(visibility == 1 ? true : false);
+	}
+
+	public int maActionBarGetHeight()
+	{
+		return mMoSyncNativeUI.maActionBarGetHeight();
+	}
+
+	public int maActionBarIsShowing()
+	{
+		return mMoSyncNativeUI.maActionBarIsShowing();
+	}
+
+	public int maActionBarSetTitle(final String title)
+	{
+		return mMoSyncNativeUI.maActionBarSetTitle(title);
+	}
+
+	public int maActionBarSetIcon(int iconHandle)
+	{
+		return mMoSyncNativeUI.maActionBarSetIcon(iconHandle);
+	}
+
+	public int maActionBarSetDisplayHomeAsUpEnabled(int enableUp)
+	{
+		return mMoSyncNativeUI.maActionBarSetDisplayHomeAsUpEnabled(enableUp == 1 ? true : false);
+	}
+
+	public int maActionBarShowTitleEnabled(int enable)
+	{
+		return mMoSyncNativeUI.maActionBarShowTitleEnabled(enable == 1 ? true : false);
+	}
+
+	public int maActionBarShowLogoEnabled(int enable)
+	{
+		if (enable == 1)
+			getActivity().getActionBar().setDisplayUseLogoEnabled(true);
+		else
+			getActivity().getActionBar().setDisplayUseLogoEnabled(true);
+		return 0;
+	}
+
+	public int maActionBarSetHomeButtonEnabled(int state)
+	{
+		return mMoSyncNativeUI.maActionBarSetHomeButtonEnabled(state == 1 ? true : false);
+	}
+
+	public int maActionBarRefresh()
+	{
+		return mMoSyncNativeUI.maActionBarRefresh();
+	}
+
+	public int maActionBarSetBackgroundImage(final int imageHandle)
+	{
+		return mMoSyncNativeUI.maActionBarSetBackgroundImage(imageHandle);
 	}
 
 	/**
