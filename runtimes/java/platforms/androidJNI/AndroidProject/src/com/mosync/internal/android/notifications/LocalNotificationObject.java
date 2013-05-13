@@ -130,7 +130,7 @@ public class LocalNotificationObject {
 		mIsActive = true;
 		// Set the time to now.
 		mNotification.when = System.currentTimeMillis();
-		mNotification.flags |= Notification.FLAG_AUTO_CANCEL;
+
 		// Set now the default settings like Flashing and Vibration,
 		// because they could override the custom patterns.
 		if ( mFlashingDefault )

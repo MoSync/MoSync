@@ -266,6 +266,15 @@ namespace MoSync
 
 		public static void RunActionOnMainThread(Action action, bool sync)
 		{
+            // if we're already on the UI thread, run the action
+            // TODO SA: verify if this is correct
+            if (Deployment.Current.Dispatcher.CheckAccess())
+            {
+                action();
+                return;
+            }
+
+            // TODO SA: verify if this does something
 			if (Thread.CurrentThread == sStartupThread)
 			{
 				action();
