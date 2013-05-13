@@ -476,9 +476,11 @@ public class MoSyncCameraController {
 		int maxWidth = sizeList.get(0).width;
 		for ( int i = 1; i < sizeList.size(); i++ )
 		{
-			if ( sizeList.get(i).width > maxWidth )
+			int currentWidth = sizeList.get(i).width;
+			if ( currentWidth > maxWidth )
 			{
 				mMaxPictureSizeIndex = i;
+				maxWidth = currentWidth;
 			}
 		}
 	}
