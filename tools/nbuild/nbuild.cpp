@@ -80,6 +80,10 @@ string validateConfiguration(string& configName) {
 	return "";
 }
 
+bool isSTL(string& moduleName) {
+	return "STL" == moduleName;
+}
+
 const char* mosyncdir() {
 	// COPY & PASTED FROM PACKAGE.CPP
 	static const char* md = NULL;

@@ -2,38 +2,25 @@ using System;
 using Microsoft.Phone.Controls;
 using System.Collections.Generic;
 using System.Windows;
+using System.Threading;
+using MoSync.NativeUI;
 
 namespace MoSync
 {
     public class NativeUIModule : IIoctlModule
     {
-        private UIManager mNativeUI;
+        private NativeUI.AsyncNativeUIWindowsPhone mNativeUI;
+
         /**
          * A reference to the last shown screen.
          */
         private IScreen mCurrentScreen = null;
         private List<IWidget> mWidgets = new List<IWidget>();
 
-		public IWidget GetWidget(int handle)
-		{
-			if (handle < 0 || handle >= mWidgets.Count)
-				return null;
-			IWidget w = mWidgets[handle];
-			return w;
-		}
+        private Dictionary<int, Thread> mWidgetThreadDictionary;
+        private Dictionary<int, Type> mWidgetTypeDictionary;
 
-        /**
-         * Handles the back button pressed event.
-         * @return true if the event has been consumed, false otherwise.
-         */
-        public bool HandleBackButtonPressed()
-        {
-            if (mCurrentScreen != null)
-            {
-                return mCurrentScreen.HandleBackButtonPressed();
-            }
-            return false;
-        }
+        #region Widget Add/Get
 
         /*
          * Ads a widget to the widgets array.
@@ -45,10 +32,178 @@ namespace MoSync
             return mWidgets.Count-1;
         }
 
+        public IWidget GetWidget(int handle)
+        {
+            if (handle < 0 || handle >= mWidgets.Count)
+                return null;
+            IWidget w = mWidgets[handle];
+            return w;
+        }
+
+        #endregion
+
+        #region Asynchronous Widget Creation methods
+
+        /**
+         * Starts a new thread that handles a widget creation based on the already set widget handle
+         * and widget type.
+         * @param widgetHandle The handle of the widget that needs to be created.
+         * @param widgetType The type of the widget that needs to be created.
+         */
+        private void StartWidgetCreationThread(int widgetHandle, Type widgetType)
+        {
+            mWidgetTypeDictionary.Add(widgetHandle, widgetType);
+
+            Thread createWidgetThread = new Thread(() => CreateWidgetAsync(widgetHandle, widgetType));
+            createWidgetThread.Name = "Creating widget " + widgetType.ToString() + " handle: " + widgetHandle.ToString();
+            createWidgetThread.IsBackground = true;
+
+            // we need to create a map between the widget handle and the thread that handles its creation
+            // in order to wait for the thread to finish if a add/remove/insert child syscall reaches the
+            // runtime and the child was not created yet
+            mWidgetThreadDictionary.Add(widgetHandle, createWidgetThread);
+
+            createWidgetThread.Start();
+        }
+
+        /**
+         * Run in a new thread, this method creates a new widget based on a widget handle and widget type.
+         * It runs the widget creation on the UI thread synchronously (because the Activator class can only
+         * create UI widgets on the UI thread) and after the creation is over it runs the operation queue
+         * on the UI thread.
+         * @param widgetHandle The handle of the widget that needs to be created.
+         * @param widgetType The type of the widget that needs to be created.
+         */
+        private void CreateWidgetAsync(int widgetHandle, Type widgetType)
+        {
+            IWidget widget = null;
+            IWidget widgetMock = mWidgets[widgetHandle];
+            // if the child was already created we won't create it again
+            // this situation might rise in the following way:
+            // the widget operation queue is run on an already created parent and a add child operation
+            // is applied before the a child is created. The WaitForWidgetCreation method will create
+            // the child on the UI thread (see WaitForWidgetCreation and CreateWidgetSync methods) so
+            // we don't need to recreate the child here
+            if (!(widgetMock is WidgetBaseMock))
+            {
+                return;
+            }
+            // create the widget on the UI thread sync
+            MoSync.Util.RunActionOnMainThread(() =>
+            {
+                widget = Activator.CreateInstance(widgetType) as IWidget;
+            }, true);
+            widget.SetHandle(widgetHandle);
+            widget.AddOperations((widgetMock as WidgetBaseMock).OperationQueue);
+            widget.SetRuntime(widgetMock.GetRuntime());
+            // lock the mWidgets array when this thread starts manipulating it
+            lock (mWidgets)
+            {
+                mWidgets[widgetHandle] = widget;
+            }
+
+            // run the operation queue on the newly created widget
+            MoSync.Util.RunActionOnMainThread(() =>
+            {
+                (widget as WidgetBaseWindowsPhone).RunOperationQueue();
+            }, false);
+        }
+
+        /**
+         * Must be run on the UI thread. Creates a widget in a synchrounous way.
+         * @param widgetHandle The handle of the widget that needs to be created.
+         * @param widgetType The type of the widget that needs to be created.
+         */
+        private void CreateWidgetSync(int widgetHandle, Type widgetType)
+        {
+            IWidget widget = Activator.CreateInstance(widgetType) as IWidget;
+            IWidget widgetMock = mWidgets[widgetHandle];
+            widget.SetHandle(widgetHandle);
+            widget.AddOperations((widgetMock as WidgetBaseMock).OperationQueue);
+            widget.SetRuntime(widgetMock.GetRuntime());
+            // lock the mWidgets array when this thread starts manipulating it
+            mWidgets[widgetHandle] = widget;
+
+            (widget as WidgetBaseWindowsPhone).RunOperationQueue();
+        }
+
+        /**
+         * Waits for the creation of a widget.
+         * @param widgetHandle The handle of the widget that needs to be available after
+         * the call of this method.
+         */
+        public void WaitForWidgetCreation(int widgetHandle)
+        {
+            IWidget widget = mWidgets[widgetHandle];
+            // if the widget was already created, we don't have to wait
+            if (!(widget is WidgetBaseMock))
+                return;
+
+            // if we're on the main thread, we create the widget in a synchrounous way.
+            // this might happen when the operation queue is being run on the main thread and
+            // a child widget hasn't been created. Because the widget creation thread does things
+            // on the UI thread, we can't use the thread 'Join' method so instead we create the
+            // widget in a synchronous way
+            if (Deployment.Current.Dispatcher.CheckAccess())
+            {
+                Type widgetType = null;
+                mWidgetTypeDictionary.TryGetValue(widgetHandle, out widgetType);
+                if (widgetType != null)
+                {
+                    CreateWidgetSync(widgetHandle, widgetType);
+                    return;
+                }
+            }
+            else
+            {
+                // if the widget wasn't created iet, we get its creation thread and join it
+                // with the current thread
+                Thread widgetCreationThread = null;
+                mWidgetThreadDictionary.TryGetValue(widgetHandle, out widgetCreationThread);
+
+                if (widgetCreationThread != null)
+                {
+                    widgetCreationThread.Join();
+                }
+            }
+        }
+
+        /**
+         * Waits for a widget creation and returns it.
+         * @param widgetHandle The handle of the widget that needs to be returned.
+         */
+        public IWidget GetWidgetSync(int widgetHandle)
+        {
+            WaitForWidgetCreation(widgetHandle);
+
+            return mWidgets[widgetHandle];
+        }
+
+        #endregion
+
+        #region Widget type helper methods
+
+        public Type GetWidgetType(int widgetHandle)
+        {
+            Type widgetType = null;
+            mWidgetTypeDictionary.TryGetValue(widgetHandle, out widgetType);
+            return widgetType;
+        }
+
+        #endregion
+
+        #region Ioctls implementation
+
         public void Init(Ioctls ioctls, Core core, Runtime runtime)
         {
-            mNativeUI = new NativeUI.NativeUIWindowsPhone();
+            mNativeUI = new NativeUI.AsyncNativeUIWindowsPhone();
+            mNativeUI.SetRuntime(runtime);
             //mWidgets.Add(null); // why?
+
+            // initialize the widget thread dictionary
+            mWidgetThreadDictionary = new Dictionary<int, Thread>();
+
+            mWidgetTypeDictionary = new Dictionary<int, Type>();
 
             /**
              * This will add a OrientationChanged event handler to the Application.Current.RootVisual, this is application wide.
@@ -92,11 +247,14 @@ namespace MoSync
 
             ioctls.maWidgetCreate = delegate(int _widgetType)
             {
-                String widgetType = core.GetDataMemory().ReadStringAtAddress(_widgetType);
-                IWidget widget = mNativeUI.CreateWidget(widgetType);
-                if (widget == null)
-                    return MoSync.Constants.MAW_RES_INVALID_TYPE_NAME;
+                String widgetTypeName = core.GetDataMemory().ReadStringAtAddress(_widgetType);
 
+                Type widgetType = mNativeUI.VerifyWidget(widgetTypeName);
+                if (widgetType == null)
+                {
+                    return MoSync.Constants.MAW_RES_INVALID_TYPE_NAME;
+                }
+                IWidget widget = new WidgetBaseMock();
                 widget.SetRuntime(runtime);
 
                 for (int i = 0; i < mWidgets.Count; i++)
@@ -105,13 +263,19 @@ namespace MoSync
                     {
                         widget.SetHandle(i);
                         mWidgets[i] = widget;
+
+                        StartWidgetCreationThread(i, widgetType);
+
                         return i;
                     }
                 }
 
                 mWidgets.Add(widget);
                 widget.SetHandle(mWidgets.Count - 1);
-                return mWidgets.Count-1;
+
+                StartWidgetCreationThread(mWidgets.Count - 1, widgetType);
+
+                return mWidgets.Count - 1;
             };
 
             ioctls.maWidgetDestroy = delegate(int _widget)
@@ -135,8 +299,7 @@ namespace MoSync
 				if (_child < 0 || _child >= mWidgets.Count)
 					return MoSync.Constants.MAW_RES_INVALID_HANDLE;
 				IWidget child = mWidgets[_child];
-                child.SetParent(parent);
-                parent.AddChild(child);
+                mNativeUI.AddChild(parent, child);
                 return MoSync.Constants.MAW_RES_OK;
             };
 
@@ -145,7 +308,8 @@ namespace MoSync
 				if (_child < 0 || _child >= mWidgets.Count)
 					return MoSync.Constants.MAW_RES_INVALID_HANDLE;
                 IWidget child = mWidgets[_child];
-                child.RemoveFromParent();
+                // only the child is needed - it has a reference to its parent
+                mNativeUI.RemoveChild(child);
                 return MoSync.Constants.MAW_RES_OK;
             };
 
@@ -157,8 +321,7 @@ namespace MoSync
 				if (_child < 0 || _child >= mWidgets.Count)
 					return MoSync.Constants.MAW_RES_INVALID_HANDLE;
 				IWidget child = mWidgets[_child];
-                child.SetParent(parent);
-                parent.InsertChild(child, index);
+                mNativeUI.InsertChild(parent, child, index);
                 return MoSync.Constants.MAW_RES_OK;
             };
 
@@ -186,7 +349,7 @@ namespace MoSync
                 IWidget widget = mWidgets[_widget];
                 try
                 {
-                    widget.SetProperty(property, value);
+                    mNativeUI.SetProperty(widget, property, value);
                 }
                 catch (InvalidPropertyNameException)
                 {
@@ -210,7 +373,8 @@ namespace MoSync
                 IWidget widget = mWidgets[_widget];
                 try
                 {
-                    String value = widget.GetProperty(property);
+                    // String value = widget.GetProperty(property);
+                    String value = mNativeUI.GetProperty(widget, property);
                     core.GetDataMemory().WriteStringAtAddress(_value, value, _bufSize);
                 }
                 catch (InvalidPropertyNameException e)
@@ -414,5 +578,24 @@ namespace MoSync
                 }
             };
         }
+
+        #endregion
+
+        #region Back button handler
+
+        /**
+         * Handles the back button pressed event.
+         * @return true if the event has been consumed, false otherwise.
+         */
+        public bool HandleBackButtonPressed()
+        {
+            if (mCurrentScreen != null)
+            {
+                return mCurrentScreen.HandleBackButtonPressed();
+            }
+            return false;
+        }
+
+        #endregion
     }
 }

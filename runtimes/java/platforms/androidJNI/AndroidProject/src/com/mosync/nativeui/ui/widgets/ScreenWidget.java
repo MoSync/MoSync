@@ -18,6 +18,7 @@ MA 02110-1301, USA.
 package com.mosync.nativeui.ui.widgets;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import android.graphics.Bitmap;
@@ -65,8 +66,9 @@ public class ScreenWidget extends Layout
 	private IconChangedListener m_iconChangedListener = null;
 
 	/**
-	 * The options menu items. Keep them, and when the menu button
-	 * is pressed check the current focused screen and get this array.
+	 * The menu items.
+	 * Used for the OptionsMenu on older devices, or the ActionBar for newer ones.
+	 * Queried when the options menu button or an ActionBar item were pressed.
 	 */
 	private List<OptionsMenuItem> m_optionsItems = new ArrayList<OptionsMenuItem>();
 
@@ -84,12 +86,12 @@ public class ScreenWidget extends Layout
 	/**
 	 * Add an options menu item.
 	 * @param title The title for this item.
-	 * @param icon The icon drawable.
+	 * @param icon The icon resource id.
 	 * @return The new item index.
 	 */
-	public int addMenuItem(final String title, Drawable icon)
+	public int addOptionsMenuItem(final String title, int iconId)
 	{
-		OptionsMenuItem item = new OptionsMenuItem(m_optionsItems.size(), title, icon);
+		OptionsMenuItem item = new OptionsMenuItem(m_optionsItems.size(), title, iconId);
 		m_optionsItems.add(item);
 		return m_optionsItems.size()-1;
 	}
@@ -97,14 +99,63 @@ public class ScreenWidget extends Layout
 	/**
 	 * Add an options menu item.
 	 * @param title The title for this item.
-	 * @param icon The icon resource id.
+	 * @param icon The icon drawable.
 	 * @return The new item index.
 	 */
-	public int addMenuItem(final String title, int iconId)
+	public int addOptionsMenuItem(final String title, Drawable icon)
 	{
-		OptionsMenuItem item = new OptionsMenuItem(m_optionsItems.size(), title, iconId);
+		OptionsMenuItem item = new OptionsMenuItem(m_optionsItems.size(), title, icon);
 		m_optionsItems.add(item);
 		return m_optionsItems.size()-1;
+	}
+
+	/**
+	 * Add a menu item for the ActionBar.
+	 * @param title The title for this item.
+	 * @param icon The icon drawable.
+	 * @param flag Sets how this item should display in the presence of an Action Bar.
+	 * @return The new item handle.
+	 */
+	public int addActionBarMenuItem(final String title, Drawable icon, int flag)
+	{
+		int itemHandle = MoSyncThread.getInstance().nativeCreatePlaceholder();
+		OptionsMenuItem item = new OptionsMenuItem(itemHandle, title, icon);
+		item.setShowAsAction(flag);
+		m_optionsItems.add(item);
+		return itemHandle;
+	}
+
+	/**
+	 * Add a menu item for the ActionBar.
+	 * @param title The title for this item.
+	 * @param icon The icon resource id.
+	 * @param flag Sets how this item should display in the presence of an Action Bar.
+	 * @return The new item handle.
+	 */
+	public int addActionBarMenuItem(final String title, int iconId, int flag)
+	{
+		int itemHandle = MoSyncThread.getInstance().nativeCreatePlaceholder();
+		OptionsMenuItem item = new OptionsMenuItem(itemHandle, title, iconId);
+		item.setShowAsAction(flag);
+		m_optionsItems.add(item);
+		return itemHandle;
+	}
+
+	public int removeActionBarMenuItem(int itemHandle)
+	{
+		Iterator<OptionsMenuItem> itemsIt = m_optionsItems.iterator();
+		int itemIndex=0;
+		while (itemsIt.hasNext())
+		{
+			if ( itemsIt.next().getId() == itemHandle )
+			{
+				m_optionsItems.remove(itemIndex);
+				return IX_WIDGET.MAW_RES_OK;
+			}
+			itemIndex++;
+		}
+
+		return -1;
 	}
 
 	public List<OptionsMenuItem> getMenuItems()
