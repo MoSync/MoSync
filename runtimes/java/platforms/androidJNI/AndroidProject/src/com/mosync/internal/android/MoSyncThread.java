@@ -771,10 +771,6 @@ public class MoSyncThread extends Thread implements MoSyncContext
 		try
 		{
 			AssetManager assetManager = mContext.getAssets();
-			AssetFileDescriptor pAfd = assetManager.openFd(PROGRAM_FILE);
-			FileDescriptor pFd = pAfd.getFileDescriptor();
-			long pFdOffset = pAfd.getStartOffset();
-
 			FileDescriptor rFd = null;
 			mResourceOffset = 0;
 
@@ -796,23 +792,30 @@ public class MoSyncThread extends Thread implements MoSyncContext
 			// We have a program file so now we sends it to the native side
 			// so it will be loaded into memory. The data section will also be
 			// created and if there are any resources they will be loaded.
-			if (null != pFd)
+			FileDescriptor pFd = null;
+			long pFdOffset = 0;
+			try {
+				AssetFileDescriptor pAfd = assetManager.openFd(PROGRAM_FILE);
+				pFd = pAfd.getFileDescriptor();
+				pFdOffset = pAfd.getStartOffset();
+			} catch (FileNotFoundException fnfe) {
+				logError(
+						"loadProgram - Has no program! exception: "
+								+ fnfe.toString(), fnfe);
+			}
+
+			if (isNative || (null != pFd))
 			{
-				if (false == nativeLoad(pFd, pFdOffset, rFd, mResourceOffset, isNative))
+				if (false == nativeLoad(pFd, pFdOffset, rFd, mResourceOffset,
+						isNative))
 				{
 					logError("loadProgram - "
-						+ "ERROR Load program was unsuccesfull");
+							+ "ERROR Load program was unsuccesfull");
 
-					if (null == mMemDataSection)
-					{
-						threadPanic(
-							0,
-							"This device does not have enough" +
-							"memory to run this application."
-						);
-					}
-					else
-					{
+					if (null == mMemDataSection) {
+						threadPanic(0, "This device does not have enough"
+								+ "memory to run this application.");
+					} else {
 						threadPanic(0, "Unable to load program or resources");
 					}
 
