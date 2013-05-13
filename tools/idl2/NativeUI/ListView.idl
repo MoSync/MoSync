@@ -184,6 +184,24 @@ group WidgetListView "List View" {
 			* \endcode
 			*/
 			REQUEST_FOCUS = "requestFocus";
+
+			/**
+			* @brief Starts and stops a animation batch operation for insert/delete operations.
+			*
+			* @validvalue None needed.
+			*
+			* Platform: iOS.
+			*
+			* @setonly
+			*
+			* @par Example
+			* \code
+			*	maWidgetSetProperty(listViewHandle, BEGIN_ANIMATION, "true");
+			*	maWidgetAddChild(listViewHandle, listViewItemHandle);
+			*	maWidgetSetProperty(listViewHandle, BEGIN_ANIMATION, "false");
+			* \endcode
+			*/
+			BEGIN_ANIMATION = "beginAnimation";
 		}
 	} // end of WidgetSegmentedListViewProperties
 } // end of WidgetListView

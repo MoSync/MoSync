@@ -48,6 +48,38 @@ enum ListViewType
 };
 
 /**
+ * Type of animation a batch operation should trigger
+ */
+enum ListViewItemAnimationType
+{
+	ListViewItemAnimationTypeNone,
+	ListViewItemAnimationTypeInsert,
+	ListViewItemAnimationTypeDelete,
+};
+
+/**
+ * @brief A ListViewItemAnimation is used to show an animation
+ * of an ListViewItem operation (add/insert/delete)
+ */
+@interface ListViewItemAnimation : NSObject
+{
+	ListViewItemAnimationType _type;
+	NSIndexPath* _indexPath;
+};
+
+/**
+ * Setter and getter for animation/operation type
+ */
+@property(nonatomic, assign) ListViewItemAnimationType type;
+
+/**
+ * Setter and getter for a row identifier of which ListViewItem to animate
+ */
+@property(nonatomic, retain) NSIndexPath* indexPath;
+
+@end
+
+/**
  * @brief A ListView widget is used to present an indexed/grouped list of items.
  * Implements UITableViewDelegate and UITableViewDelegate for filling its content.
  */
@@ -57,6 +89,18 @@ enum ListViewType
      * List view type.
      */
     ListViewType _type;
+
+    /**
+     * Property for if the list view is currently inside a
+     * batch animation call.
+     */
+    BOOL _isAnimating;
+
+    /**
+     * List of ListViewItemAnimation objects to process when
+     * #MAW_LIST_VIEW_BEGIN_ANIMATION, false is received.
+     */
+    NSMutableArray* _itemOperations;
 }
 
 /**

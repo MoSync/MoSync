@@ -147,6 +147,16 @@ namespace NativeUI
 		 return listMode;
 	 }
 
+	void ListView::beginAnimation()
+	{
+		setProperty(MAW_LIST_VIEW_BEGIN_ANIMATION, "true");
+	}
+
+	void ListView::endAnimation()
+	{
+		setProperty(MAW_LIST_VIEW_BEGIN_ANIMATION, "false");
+	}
+
 	/**
 	 * Reload all its items.
 	 * Platform: iOS, Android and Windows Phone 7.

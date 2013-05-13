@@ -176,6 +176,22 @@ namespace NativeUI
 		ListViewMode getMode();
 
 		/**
+		 * Start a batch insert/remove operation
+		 * that will animate all the list view
+		 * changes when endAnimation() is called.
+		 * Platform: iOS
+		 */
+		void beginAnimation();
+
+		/**
+		 * Ends a batch insert/remove operation
+		 * that will animate all the list view
+		 * changes since beginAnimation() was called.
+		 * Platform: iOS
+		 */
+		void endAnimation();
+
+		/**
 		 * Reload all its items.
 		 * Platform: iOS, Android and Windows Phone 7.
 		 */

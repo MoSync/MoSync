@@ -38,6 +38,25 @@
 #import "NSStringExpanded.h"
 #import "UIColorExpanded.h"
 
+@implementation ListViewItemAnimation
+
+@synthesize type = _type;
+@synthesize indexPath = _indexPath;
+
+- (id)init
+{
+    self = [super init];
+    if (self)
+    {
+        _type = ListViewItemAnimationTypeNone;
+        _indexPath = nil;
+    }
+
+    return self;
+}
+
+@end
+
 /**
  * Private methods for ListViewWidget.
  */
@@ -125,6 +144,14 @@
  */
 -(int)setBackgroundColor:(NSString*) colorValue;
 
+/**
+ * Starts or stops the animation batch
+ * @param value "true" if the animation batch should start,
+ * "false" if the animation batch is done and the animations should start.
+ * @return Currently, MAW_RES_OK is the only return value.
+ */
+-(int) setAnimationState:(NSString*) value;
+
 @end
 
 @implementation ListViewWidget
@@ -140,6 +167,9 @@
     if (self)
     {
         _type = ListViewTypeDefault;
+        _isAnimating = NO;
+        _itemOperations = [[NSMutableArray alloc] init];
+
         [self createTableView];
     }
 
@@ -247,11 +277,24 @@
  */
 - (void)removeChild: (IWidget*)child
 {
-    [_children removeObjectIdenticalTo:child];
-	[child setParent:nil];
+    int childIndex = -1;
+    if (_type == ListViewTypeDefault)
+    {
+        ListViewSectionWidget* section = (ListViewSectionWidget*)[_children objectAtIndex:0];
+        childIndex = [section indexOfChild:child];
+        [section removeChild:child];
+    }
+    else
+    {
+        [_children removeObjectIdenticalTo:child];
+        [child setParent:nil];
+    }
 
-    UITableView* tableView = (UITableView*) self.view;
-    [tableView reloadData];
+    if (!_isAnimating)
+    {
+        UITableView* tableView = (UITableView*) self.view;
+        [tableView reloadData];
+    }
 }
 
 /**
@@ -282,7 +325,11 @@
     else if ([key isEqualToString:@MAW_WIDGET_BACKGROUND_COLOR])
     {
         returnValue = [self setBackgroundColor:value];
-   }
+    }
+    else if ([key isEqualToString:@MAW_LIST_VIEW_BEGIN_ANIMATION])
+    {
+        returnValue = [self setAnimationState:value];
+    }
     else
     {
         returnValue = [super setPropertyWithKey:key toValue:value];
@@ -699,7 +746,17 @@ forRowAtIndexPath:(NSIndexPath *)indexPath
  */
 -(void)deleteItemAtIndexPath:(NSIndexPath*) indexPath
 {
-    [self.tableView reloadData];
+    if (!_isAnimating)
+    {
+        [self.tableView reloadData];
+    }
+    else
+    {
+        ListViewItemAnimation* anim = [[ListViewItemAnimation alloc] init];
+        anim.type = ListViewItemAnimationTypeDelete;
+        anim.indexPath = indexPath;
+        [_itemOperations addObject:anim];
+    }
 }
 
 /**
@@ -708,7 +765,17 @@ forRowAtIndexPath:(NSIndexPath *)indexPath
  */
 -(void)insertItemAtIndexPath:(NSIndexPath*) indexPath
 {
-    [self.tableView reloadData];
+    if (!_isAnimating)
+    {
+	    [self.tableView reloadData];
+    }
+    else
+    {
+        ListViewItemAnimation* anim = [[ListViewItemAnimation alloc] init];
+        anim.type = ListViewItemAnimationTypeInsert;
+        anim.indexPath = indexPath;
+        [_itemOperations addObject:anim];
+    }
 }
 
 /**
@@ -722,7 +789,8 @@ forRowAtIndexPath:(NSIndexPath *)indexPath
     [self.tableView reloadRowsAtIndexPaths:[NSArray arrayWithObject:indexPath]
                           withRowAnimation:UITableViewRowAnimationNone];
      */
-    [self.tableView reloadData];
+    if (!_isAnimating)
+        [self.tableView reloadData];
 }
 
 /**
@@ -734,7 +802,8 @@ forRowAtIndexPath:(NSIndexPath *)indexPath
      * Note: reloadSectionIndexTitles is not working after the list is loaded.
      * [self.tableView reloadSectionIndexTitles];
      */
-    [self.tableView reloadData];
+    if (!_isAnimating)
+        [self.tableView reloadData];
 }
 
 /**
@@ -756,11 +825,22 @@ forRowAtIndexPath:(NSIndexPath *)indexPath
     return self.tableView.rowHeight;
 }
 
+-(BOOL)isAnimating
+{
+    return _isAnimating;
+}
+
 /**
  * Dealloc method.
  */
 -(void) dealloc
 {
+    for (int i = 0; i < _itemOperations.count; ++i)
+    {
+        [[_itemOperations objectAtIndex:i] release];
+    }
+    [_itemOperations release];
+
     [super dealloc];
 }
 @end
@@ -991,6 +1071,44 @@ forRowAtIndexPath:(NSIndexPath *)indexPath
     UIView* bgView = [[UIView alloc] init];
     bgView.backgroundColor = color;
     [self.tableView setBackgroundView:bgView];
+    return MAW_RES_OK;
+}
+
+-(int) setAnimationState:(NSString*) value
+{
+    UITableView* tableView = (UITableView*) self.view;
+    if ([value isEqualToString:kWidgetTrueValue])
+    {
+        _isAnimating = YES;
+    }
+    else
+    {
+        _isAnimating = NO;
+        [tableView beginUpdates];
+        for (int i = 0; i < _itemOperations.count; ++i)
+        {
+            ListViewItemAnimation* itemAnimation = (ListViewItemAnimation*)[_itemOperations objectAtIndex:i];
+            switch (itemAnimation.type)
+            {
+			case ListViewItemAnimationTypeInsert:
+                [tableView insertRowsAtIndexPaths:[NSArray arrayWithObject:itemAnimation.indexPath] withRowAnimation:UITableViewRowAnimationFade];
+                break;
+
+            case ListViewItemAnimationTypeDelete:
+                [tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:itemAnimation.indexPath] withRowAnimation:UITableViewRowAnimationFade];
+                break;
+
+            default:
+                // Do nothing
+                break;
+            }
+            [itemAnimation release];
+        }
+        [_itemOperations removeAllObjects];
+        [tableView endUpdates];
+    }
+
+    return MAW_RES_OK;
 }
 
 @end

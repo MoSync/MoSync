@@ -106,7 +106,15 @@
 {
     int row = [_children indexOfObject:child];
     NSIndexPath*  indexPath = [NSIndexPath indexPathForRow:row inSection:_index];
-	[self removeChild:child fromSuperview:NO];
+    if ([_delegate isAnimating])
+    {
+        [_children removeObjectIdenticalTo:child];
+        [child setParent:nil];
+    }
+    else
+    {
+        [super removeChild:child fromSuperview:NO];
+    }
     [_delegate deleteItemAtIndexPath:indexPath];
 }
 

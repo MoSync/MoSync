@@ -64,4 +64,10 @@
  */
 - (CGFloat)tableViewRowHeight;
 
+/**
+ * Ask the ListViewWidget if there's an
+ * ongoing batch animation operation in progress.
+ */
+- (BOOL)isAnimating;
+
 @end
