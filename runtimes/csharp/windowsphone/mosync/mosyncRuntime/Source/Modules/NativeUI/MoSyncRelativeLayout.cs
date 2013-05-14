@@ -61,7 +61,7 @@ namespace MoSync
                 mContentHeight = 0;
                 mContentWidth = 0;
 
-                mView = mPanel;
+                View = mPanel;
             }
 
             /**
@@ -130,7 +130,7 @@ namespace MoSync
                             mPanel.Width = mContentWidth;
                             mScrollViewer.Content = mPanel;
 
-                            mView = mScrollViewer;
+                            View = mScrollViewer;
 
                             //the property needs to be recalled since the mView has changed.
                             Height = this.Height;
@@ -139,13 +139,34 @@ namespace MoSync
                         {
                             if (null != mScrollViewer)
                             {
-                                mView = mPanel;
+                                View = mPanel;
                             }
                         }
                     }
                     else throw new InvalidPropertyValueException();
                 }
             }
-        }
-    }
-}
+
+            #region Property validation methods
+
+            /**
+             * Validates a property based on the property name and property value.
+             * @param propertyName The name of the property to be checked.
+             * @param propertyValue The value of the property to be checked.
+             * @returns true if the property is valid, false otherwise.
+             */
+            public new static bool ValidateProperty(string propertyName, string propertyValue)
+            {
+                bool isBasePropertyValid = WidgetBaseWindowsPhone.ValidateProperty(propertyName, propertyValue);
+                if (isBasePropertyValid == false)
+                {
+                    return false;
+                }
+
+                return true;
+            }
+
+            #endregion
+        } // end of RelativeLayout class
+    } // end of NativeUI namespace
+} // end of MoSync namespace

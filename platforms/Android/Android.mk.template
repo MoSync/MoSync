@@ -13,7 +13,7 @@ LOCAL_C_INCLUDES += $(MOSYNC_MODULES)/{{name}}/inc
 LOCAL_LDLIBS += -llog -landroid -lEGL -lGLESv1_CM -lGLESv2
 {{! We share includes between native and VM }}
 {{^no-default-includes}}
-LOCAL_C_INCLUDES += $(MOSYNCDIR)/include
+LOCAL_C_INCLUDES += $(MOSYNCDIR)/include/MAStdNative
 {{/no-default-includes}}
 LOCAL_C_INCLUDES += {{additional-includes}}
 {{! We need to undefine the ANDROID macro }}

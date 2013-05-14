@@ -42,6 +42,8 @@ vector<string> getSourceFiles(Arguments* args);
  */
 string validateConfiguration(string& configName);
 
+bool isSTL(string& name);
+
 const char* mosyncdir();
 int sh(const char* cmd, bool hideOutput = false, const char* shownCmdLine = 0, bool exitOnError = true);
 void error(const char* msg, int errorCode = 1);
