@@ -89,7 +89,6 @@ namespace MoSync
                 while (mOperationQueue.Count != 0)
                 {
                     WidgetOperation currentOperation = mOperationQueue.Dequeue();
-
                     RunOperation(currentOperation);
                 }
             }
@@ -99,7 +98,7 @@ namespace MoSync
              * @param operation The widget operation (could be a ADD, INSERT, REMOVE, SET or GET) that
              * needs to be applied on the current widget.
              */
-            protected void RunOperation(WidgetOperation operation)
+            public new void RunOperation(WidgetOperation operation)
             {
                 switch (operation.Type)
                 {

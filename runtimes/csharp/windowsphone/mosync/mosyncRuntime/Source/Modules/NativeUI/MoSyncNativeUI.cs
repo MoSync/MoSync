@@ -4,6 +4,7 @@ using System.IO;
 using System.Reflection;
 using System.Windows;
 using System.Threading;
+using MoSync.NativeUI;
 
 namespace MoSync
 {
@@ -162,7 +163,24 @@ namespace MoSync
          */
         public void AddOperation(WidgetOperation op)
         {
-            mOperationQueue.Enqueue(op);
+            // we need to check if the widget was already created or not when the AddOperation is called
+            // if so, we'll run the operation on the widget instead of inserting it into the queue
+            IWidget widget = mRuntime.GetModule<NativeUIModule>().GetWidget(this.GetHandle());
+            if (widget is WidgetBaseMock)
+            {
+                mOperationQueue.Enqueue(op);
+            }
+            else
+            {
+                // we need to check if the widget we got from the runtime can be cast to WidgetBaseWindowsPhone
+                if (typeof(WidgetBaseWindowsPhone).IsAssignableFrom(widget.GetType()))
+                {
+                    MoSync.Util.RunActionOnMainThread(() =>
+                    {
+                        (widget as WidgetBaseWindowsPhone).RunOperation(op);
+                    }, true);
+                }
+            }
         }
 
         /**
@@ -175,6 +193,17 @@ namespace MoSync
             {
                 mOperationQueue.Enqueue(queue.Dequeue());
             }
+        }
+
+        /**
+         * Runs a WidgetOperation on the current widget.
+         * @param operation The widget operation (could be a ADD, INSERT, REMOVE, SET or GET) that
+         * needs to be applied on the current widget.
+         */
+        public void RunOperation(WidgetOperation op)
+        {
+            // nothing to do here since this method should be overriden by the subclasses that
+            // have a view on which to run the operation
         }
 
         #endregion

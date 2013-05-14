@@ -92,21 +92,17 @@ namespace MoSync
             MoSync.Util.RunActionOnMainThread(() =>
             {
                 widget = Activator.CreateInstance(widgetType) as IWidget;
-            }, true);
-            widget.SetHandle(widgetHandle);
-            widget.AddOperations((widgetMock as WidgetBaseMock).OperationQueue);
-            widget.SetRuntime(widgetMock.GetRuntime());
-            // lock the mWidgets array when this thread starts manipulating it
-            lock (mWidgets)
-            {
-                mWidgets[widgetHandle] = widget;
-            }
-
-            // run the operation queue on the newly created widget
-            MoSync.Util.RunActionOnMainThread(() =>
-            {
+                widget.SetHandle(widgetHandle);
+                widget.AddOperations((widgetMock as WidgetBaseMock).OperationQueue);
+                widget.SetRuntime(widgetMock.GetRuntime());
+                // lock the mWidgets array when this thread starts manipulating it
+                lock (mWidgets)
+                {
+                    mWidgets[widgetHandle] = widget;
+                }
+                // run the operation queue on the newly created widget
                 (widget as WidgetBaseWindowsPhone).RunOperationQueue();
-            }, false);
+            }, true);
         }
 
         /**
@@ -166,6 +162,28 @@ namespace MoSync
                     widgetCreationThread.Join();
                 }
             }
+        }
+
+        /**
+         * Checks if a widget creation thread is still running (meaning that the widget wasn't created yet).
+         * @param handle The handle of the widget.
+         * @return true if the widget hasn't been created yet and false otherwise
+         */
+        public bool IsWidgetCreated(int handle)
+        {
+            Thread widgetCreationThread = null;
+            mWidgetThreadDictionary.TryGetValue(handle, out widgetCreationThread);
+
+            if (widgetCreationThread == null)
+            {
+                return true;
+            }
+            // if the thread is alive, the widget is not created
+            if (widgetCreationThread.IsAlive)
+            {
+                return false;
+            }
+            return true;
         }
 
         /**
