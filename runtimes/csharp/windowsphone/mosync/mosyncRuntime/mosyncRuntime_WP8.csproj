@@ -59,6 +59,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Source\Modules\Audio\MoSyncMp3Audio.cs" />
+    <Compile Include="Source\Modules\MoSyncSoundModule.cs" />
+    <Compile Include="Source\Modules\NativeUI\MoSyncNativeUIAsync.cs" />
     <Compile Include="Source\MosyncMachineGeneratedCode.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Source\CustomPickerDataSources.cs" />
