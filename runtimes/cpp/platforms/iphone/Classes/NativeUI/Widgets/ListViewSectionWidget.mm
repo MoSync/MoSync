@@ -60,7 +60,17 @@
     {
         return MAW_RES_INVALID_LAYOUT;
     }
-    [super addChild:child toSubview:NO];
+
+    if ([_delegate isAnimating])
+    {
+        [child setParent:self];
+        [_children addObject:child];
+    }
+    else
+    {
+        [super addChild:child toSubview:NO];
+    }
+
     ListViewItemWidget* item = (ListViewItemWidget*)child;
     item.delegate = self;
     int row = [_children count] - 1;
@@ -85,11 +95,27 @@
     {
         return MAW_RES_INVALID_LAYOUT;
     }
-    int result = [super insertChild:child atIndex:index toSubview:NO];
-    if (result != MAW_RES_OK)
+
+    if ([_delegate isAnimating])
     {
-        return result;
+        int indexValue = [index intValue];
+        if (indexValue < 0 || indexValue > [_children count])
+        {
+            return MAW_RES_INVALID_INDEX;
+        }
+
+        [child setParent:self];
+        [_children insertObject:child atIndex:indexValue];
     }
+    else
+    {
+        int result = [super insertChild:child atIndex:index toSubview:NO];
+        if (result != MAW_RES_OK)
+        {
+            return result;
+        }
+    }
+
     NSIndexPath* indexPath = [NSIndexPath indexPathForRow:[index intValue] inSection:_index];
     [_delegate insertItemAtIndexPath:indexPath];
     ListViewItemWidget* item = (ListViewItemWidget*)child;

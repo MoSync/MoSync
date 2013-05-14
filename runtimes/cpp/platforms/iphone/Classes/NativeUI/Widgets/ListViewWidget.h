@@ -63,8 +63,18 @@ enum ListViewItemAnimationType
  */
 @interface ListViewItemAnimation : NSObject
 {
-	ListViewItemAnimationType _type;
-	NSIndexPath* _indexPath;
+    /**
+     * Item animation type
+     */
+    ListViewItemAnimationType _type;
+
+    /**
+     * Adjusted location (row and section) of the ListViewItem
+     * as the list view looked:
+     * - at the start of the animation batch for ListViewItemAnimationTypeDelete
+     * - after all delete operations for ListViewItemAnimationTypeInsert
+     */
+    NSIndexPath* _indexPath;
 };
 
 /**

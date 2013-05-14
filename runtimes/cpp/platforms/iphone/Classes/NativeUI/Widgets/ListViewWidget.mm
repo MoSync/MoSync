@@ -55,6 +55,17 @@
     return self;
 }
 
+- (void) dealloc
+{
+    if (_indexPath != nil)
+    {
+        [_indexPath release];
+        _indexPath = nil;
+    }
+
+    [super dealloc];
+}
+
 @end
 
 /**
@@ -151,6 +162,14 @@
  * @return Currently, MAW_RES_OK is the only return value.
  */
 -(int) setAnimationState:(NSString*) value;
+
+/**
+ * Calculates and stores the proper indexPath depending on the other animation batch operations
+ * currently being played at the same time.
+ * @param type Type of animation (insert, delete, etc)
+ * @param indexPath Index path of the current data source to do the operation on
+ */
+-(void)createAnimationType:(ListViewItemAnimationType)type itemPath:(NSIndexPath*) indexPath;
 
 @end
 
@@ -752,10 +771,7 @@ forRowAtIndexPath:(NSIndexPath *)indexPath
     }
     else
     {
-        ListViewItemAnimation* anim = [[ListViewItemAnimation alloc] init];
-        anim.type = ListViewItemAnimationTypeDelete;
-        anim.indexPath = indexPath;
-        [_itemOperations addObject:anim];
+        [self createAnimationType:ListViewItemAnimationTypeDelete itemPath:indexPath];
     }
 }
 
@@ -771,10 +787,7 @@ forRowAtIndexPath:(NSIndexPath *)indexPath
     }
     else
     {
-        ListViewItemAnimation* anim = [[ListViewItemAnimation alloc] init];
-        anim.type = ListViewItemAnimationTypeInsert;
-        anim.indexPath = indexPath;
-        [_itemOperations addObject:anim];
+        [self createAnimationType:ListViewItemAnimationTypeInsert itemPath:indexPath];
     }
 }
 
@@ -1085,30 +1098,100 @@ forRowAtIndexPath:(NSIndexPath *)indexPath
     {
         _isAnimating = NO;
         [tableView beginUpdates];
+        NSMutableArray* indicesArray = [[NSMutableArray alloc] initWithCapacity:_itemOperations.count];
+
+        // Do delete operations first, indicies from the original table layout
         for (int i = 0; i < _itemOperations.count; ++i)
         {
             ListViewItemAnimation* itemAnimation = (ListViewItemAnimation*)[_itemOperations objectAtIndex:i];
-            switch (itemAnimation.type)
+            if (itemAnimation.type == ListViewItemAnimationTypeDelete)
             {
-			case ListViewItemAnimationTypeInsert:
-                [tableView insertRowsAtIndexPaths:[NSArray arrayWithObject:itemAnimation.indexPath] withRowAnimation:UITableViewRowAnimationFade];
-                break;
-
-            case ListViewItemAnimationTypeDelete:
-                [tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:itemAnimation.indexPath] withRowAnimation:UITableViewRowAnimationFade];
-                break;
-
-            default:
-                // Do nothing
-                break;
+                [indicesArray addObject:itemAnimation.indexPath];
             }
-            [itemAnimation release];
+        }
+        [tableView deleteRowsAtIndexPaths:indicesArray withRowAnimation:UITableViewRowAnimationFade];
+        [indicesArray removeAllObjects];
+
+        // Do insert operations after delete, indices from after the delete operation
+        for (int i = 0; i < _itemOperations.count; ++i)
+        {
+            ListViewItemAnimation* itemAnimation = (ListViewItemAnimation*)[_itemOperations objectAtIndex:i];
+            if (itemAnimation.type == ListViewItemAnimationTypeInsert)
+            {
+                [indicesArray addObject:itemAnimation.indexPath];
+            }
+        }
+        [tableView insertRowsAtIndexPaths:indicesArray withRowAnimation:UITableViewRowAnimationFade];
+        [tableView endUpdates];
+
+        for (int i = 0; i < _itemOperations.count; ++i)
+        {
+            [[_itemOperations objectAtIndex:i] release];
         }
         [_itemOperations removeAllObjects];
-        [tableView endUpdates];
+        [indicesArray release];
     }
 
     return MAW_RES_OK;
+}
+
+-(void)createAnimationType:(ListViewItemAnimationType)type itemPath:(NSIndexPath*) indexPath
+{
+    ListViewItemAnimation* newAnimation = [[ListViewItemAnimation alloc] init];
+    newAnimation.type = type;
+
+    if (type == ListViewItemAnimationTypeDelete)
+    {
+        // Calculate row at animation start
+        int rowAtAnimationStart = indexPath.row;
+        for (int i = 0; i < _itemOperations.count; ++i)
+        {
+            ListViewItemAnimation* previousAnimation = (ListViewItemAnimation*)[_itemOperations objectAtIndex:i];
+            if (indexPath.row > previousAnimation.indexPath.row)
+            {
+                if (previousAnimation.type == ListViewItemAnimationTypeInsert)
+                {
+                    --rowAtAnimationStart;
+                }
+                else if (previousAnimation.type == ListViewItemAnimationTypeDelete)
+                {
+                    ++rowAtAnimationStart;
+                }
+            }
+        }
+
+        newAnimation.indexPath = [NSIndexPath indexPathForRow:rowAtAnimationStart inSection:indexPath.section];
+
+        // Move all insertions below the old row up by one
+        for (int i = 0; i < _itemOperations.count; ++i)
+        {
+            ListViewItemAnimation* previousAnimation = (ListViewItemAnimation*)[_itemOperations objectAtIndex:i];
+            if (newAnimation.indexPath.row < previousAnimation.indexPath.row)
+            {
+                if (previousAnimation.type == ListViewItemAnimationTypeInsert)
+                {
+                    previousAnimation.indexPath = [NSIndexPath indexPathForRow:previousAnimation.indexPath.row-1 inSection:previousAnimation.indexPath.section];
+                }
+            }
+        }
+    }
+    else if (type == ListViewItemAnimationTypeInsert)
+    {
+        newAnimation.indexPath = indexPath;
+
+        // Move all previous insertions below this row one row down
+        for (int i = 0; i < _itemOperations.count; ++i)
+        {
+            ListViewItemAnimation* previousAnimation = (ListViewItemAnimation*)[_itemOperations objectAtIndex:i];
+            if (previousAnimation.indexPath.row >= indexPath.row &&
+                previousAnimation.type == ListViewItemAnimationTypeInsert)
+            {
+                previousAnimation.indexPath = [NSIndexPath indexPathForRow:previousAnimation.indexPath.row+1 inSection:previousAnimation.indexPath.section];
+            }
+        }
+    }
+
+    [_itemOperations addObject:newAnimation];
 }
 
 @end
