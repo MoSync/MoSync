@@ -174,8 +174,6 @@ int MAMain()
 		}
 	}
 
-	maExit(0);
-
 	return 0;
 }
 }

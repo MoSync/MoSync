@@ -1152,6 +1152,7 @@ public class MoSyncThread extends Thread implements MoSyncContext
 				runInitFunction(deferred, mAppLibPaths.get(deferred));
 			}
 			mContext.finish();
+			nativeExit();
 		} else {
 			nativeRun();
 		}
