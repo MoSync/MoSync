@@ -25,6 +25,7 @@ using namespace std;
 #define EXCLUDE_FILES "--exclude-files"
 #define VERBOSE "--verbose"
 #define CLEAN "--clean"
+#define COMPILER_SWITCHES "--compiler-switches"
 
 string require(Arguments* args, string key);
 
