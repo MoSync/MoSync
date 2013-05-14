@@ -1,6 +1,5 @@
 package com.mosync.internal.android;
 
-import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
 
@@ -491,9 +490,9 @@ public class MoSyncDB
 			// Get data as an int value.
 			int value = getCursor(cursorHandle).getInt(columnIndex);
 
-			// Write to MoSync memory. Size of an int is 4.
+			// Write to MoSync memory. Size of an int is 4 - take care of endianess
 			// TODO: Replace with high-level call to write int.
-			ByteBuffer buffer = mosync.getMemorySlice(intValueAddress, 4);
+			ByteBuffer buffer = mosync.getMemorySlice(intValueAddress, 4).order(null);
 			buffer.putInt(value);
 
 			return MA_DB_OK;
@@ -543,9 +542,9 @@ public class MoSyncDB
 			// Get data as a float value.
 			double value = getCursor(cursorHandle).getDouble(columnIndex);
 
-			// Write to MoSync memory. Size of a double is 8.
+			// Write to MoSync memory. Size of a double is 8 - take care of endianess
 			// TODO: Replace with high-level call to write double.
-			ByteBuffer buffer = mosync.getMemorySlice(doubleValueAddress, 8);
+			ByteBuffer buffer = mosync.getMemorySlice(doubleValueAddress, 8).order(null);
 			buffer.putLong(Double.doubleToLongBits(value));
 
 			return MA_DB_OK;
