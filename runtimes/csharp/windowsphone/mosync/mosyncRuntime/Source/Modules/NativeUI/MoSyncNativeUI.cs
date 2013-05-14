@@ -30,6 +30,7 @@ namespace MoSync
         String GetLastValidSet(String property);
         void AddOperations(Queue<WidgetOperation> queue);
         void AddOperation(WidgetOperation op);
+        void RunOperation(WidgetOperation op);
         void RunOperationQueue();
     }
 
