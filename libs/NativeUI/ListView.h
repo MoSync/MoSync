@@ -214,6 +214,22 @@ namespace NativeUI
 		bool isSelectionAllowed();
 
 		/**
+		 * Enable/disable item selection in edit mode.
+		 * If you don't want to allow the user to select any items, set this
+		 * property to false.
+		 * Platform: iOS.
+		 * @param allow true to enable it, false to disable it.
+		 */
+		void allowSelectionDuringEditing(bool allow = true);
+
+		/**
+		 * Check if user is allowed to select an item.
+		 * Platform: iOS.
+		 * @return true if it's allowed, false otherwise.
+		 */
+		bool isSelectionAllowedDuringEditing();
+
+		/**
 		 * Add an list view event listener.
 		 * @param listener The listener that will receive list view events.
 		 */

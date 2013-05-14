@@ -170,6 +170,23 @@ group WidgetListView "List View" {
 			ALLOW_SELECTION = "allowselection";
 
 			/**
+			* @brief Enable/disable item selection when the list is in #MAW_LIST_VIEW_MODE_EDIT.
+			* If you don't want to allow the user to select any item set this property to false.
+			* Platform: iOS.
+			*
+			* @validvalue "true" or "false".
+			* Default value is "false".
+			*
+			* @setandget
+			*
+			* @par Example
+			* \code
+			*	maWidgetSetProperty(listHandle, MAW_LIST_VIEW_ALLOW_SELECTION_DURING_EDITING, "true");
+			* \endcode
+			*/
+			ALLOW_SELECTION_DURING_EDITING = "allowselectionduringediting";
+
+			/**
 			* @brief Enforces the focus on the list. Generally needed when for some reason the list looses it's focus.
 			*
 			* @validvalue None needed.

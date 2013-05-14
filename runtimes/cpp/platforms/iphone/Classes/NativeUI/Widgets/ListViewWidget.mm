@@ -147,6 +147,25 @@
 -(NSString*) getAllowSelectionProperty;
 
 /**
+ * Enable/disable user interaction with an list view item in edit mode.
+ * A boolean value that determines whether the users can select a row will be set.
+ * Setter for MAW_LIST_VIEW_ALLOW_SELECTION_DURING_EDITING.
+ * @param allowSelection "true" will allow the user to select an item, "false" will not
+ * allow the user to select it.
+ * @return One of the following values:
+ * - MAW_RES_OK if the bool value was set.
+ * - MAW_RES_INVALID_PROPERTY_VALUE if the allowSelection param was invalid.
+ */
+-(int)setAllowSelectionDuringEditingProperty:(NSString*) allowSelection;
+
+/**
+ * Check if user can select an list view item in edit mode.
+ * Getter for MAW_LIST_VIEW_ALLOW_SELECTION_DURING_EDITING.
+ * @return "true" if the user can select an item, "false" otherwise.
+ */
+-(NSString*) getAllowSelectionDuringEditingProperty;
+
+/**
  * Replaces the list view background with
  * a single color background.
  * @param colorValue A color in hex
@@ -341,6 +360,10 @@
     {
         returnValue = [self setAllowSelectionProperty:value];
     }
+    else if ([key isEqualToString:@MAW_LIST_VIEW_ALLOW_SELECTION_DURING_EDITING])
+    {
+        returnValue = [self setAllowSelectionDuringEditingProperty:value];
+    }
     else if ([key isEqualToString:@MAW_WIDGET_BACKGROUND_COLOR])
     {
         returnValue = [self setBackgroundColor:value];
@@ -376,6 +399,10 @@
     else if ([key isEqualToString:@MAW_LIST_VIEW_ALLOW_SELECTION])
     {
         return [[self getAllowSelectionProperty] retain];
+    }
+    else if ([key isEqualToString:@MAW_LIST_VIEW_ALLOW_SELECTION_DURING_EDITING])
+    {
+        return [[self getAllowSelectionDuringEditingProperty] retain];
     }
     else
     {
@@ -1074,6 +1101,31 @@ forRowAtIndexPath:(NSIndexPath *)indexPath
 -(NSString*) getAllowSelectionProperty
 {
     return self.tableView.allowsSelection ? kWidgetTrueValue : kWidgetFalseValue;
+}
+
+-(int)setAllowSelectionDuringEditingProperty:(NSString*) allowSelection
+{
+    BOOL allowSelectionBool;
+    if ([allowSelection isEqualToString:kWidgetTrueValue])
+    {
+        allowSelectionBool = YES;
+    }
+    else if ([allowSelection isEqualToString:kWidgetFalseValue])
+    {
+        allowSelectionBool = NO;
+    }
+    else
+    {
+        return MAW_RES_INVALID_PROPERTY_VALUE;
+    }
+
+    self.tableView.allowsSelectionDuringEditing = allowSelectionBool;
+    return MAW_RES_OK;
+}
+
+-(NSString*) getAllowSelectionDuringEditingProperty
+{
+    return self.tableView.allowsSelectionDuringEditing ? kWidgetTrueValue : kWidgetFalseValue;
 }
 
 -(int)setBackgroundColor:(NSString*) colorValue

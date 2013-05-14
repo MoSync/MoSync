@@ -192,6 +192,20 @@ namespace NativeUI
 		return returnValue;
 	}
 
+	void ListView::allowSelectionDuringEditing(bool allow)
+	{
+		const char* value = allow ? "true" : "false";
+		this->setProperty(MAW_LIST_VIEW_ALLOW_SELECTION_DURING_EDITING, value);
+	}
+
+	bool ListView::isSelectionAllowedDuringEditing()
+	{
+		MAUtil::String value = this->getPropertyString(
+                                                       MAW_LIST_VIEW_ALLOW_SELECTION_DURING_EDITING);
+		bool returnValue = (strcmp(value.c_str(), "true")) ? false : true;
+		return returnValue;
+	}
+
 	/**
 	 * Add an list view event listener.
 	 * @param listener The listener that will receive list view events.
