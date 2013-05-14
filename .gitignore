@@ -299,3 +299,4 @@ LocalFiles.bin*
 /runtimes/csharp/windowsphone/mosync/mosyncRuntime/Bin
 /runtimes/csharp/windowsphone/mosync/mosyncRuntime/obj
 /runtimes/csharp/windowsphone/mosync/mosyncRuntime/Service References
+/runtimes/csharp/windowsphone/template_WP8
