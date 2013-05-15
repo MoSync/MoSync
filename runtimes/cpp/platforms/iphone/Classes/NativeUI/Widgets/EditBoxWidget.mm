@@ -129,7 +129,8 @@
 /**
  * Set the edit box mode.
  * Setter for MAW_EDIT_BOX_MODE.
- * @param value MAW_EDIT_BOX_MODE_SINGLE_LINE or MAW_EDIT_BOX_MULTI_LINE.
+ * @param value MAW_EDIT_BOX_MODE_SINGLE_LINE, MAW_EDIT_BOX_MULTI_LINE
+ * or MAW_EDIT_BOX_MODE_SINGLE_LINE_BORDERLESS.
  * @return MAW_RES_OK if the value param is as expected, otherwise MAW_RES_INVALID_PROPERTY_VALUE.
  */
 - (int)setModeProperty:(NSString*) value;
@@ -137,7 +138,8 @@
 /**
  * Get the edit box mode.
  * Getter for MAW_EDIT_BOX_MODE.
- * @return MAW_EDIT_BOX_MODE_SINGLE_LINE or MAW_EDIT_BOX_MULTI_LINE.
+ * @return MAW_EDIT_BOX_MODE_SINGLE_LINE, MAW_EDIT_BOX_MULTI_LINE
+ * or MAW_EDIT_BOX_MODE_SINGLE_LINE_BORDERLESS.
  */
 - (NSString*)modeProperty;
 
@@ -226,9 +228,9 @@
 /**
  * Create an UITextField object and assign it to view.
  * Also set its delegate and properties.
- * Changes edit box mode to MAW_EDIT_BOX_SINGLE_LINE.
+ * Changes edit box mode to MAW_EDIT_BOX_SINGLE_LINE or MAW_EDIT_BOX_SINGLE_LINE_BORDERLESS.
  */
-- (void)createTextField;
+- (void)createTextField:(BOOL)borderless;
 
 /**
  * Create an UITextView object and assign it to view.
@@ -249,7 +251,7 @@
 	self = [super init];
     if (self)
     {
-        [self createTextField];
+        [self createTextField:NO];
         _textColor = [UIColor blackColor];
         _maxTextLength = INT_MAX;
     }
@@ -363,7 +365,8 @@
 - (UITextField*) textField
 {
     UITextField* textField = nil;
-    if (_mode == MAW_EDIT_BOX_MODE_SINGLE_LINE)
+    if (_mode == MAW_EDIT_BOX_MODE_SINGLE_LINE ||
+        _mode == MAW_EDIT_BOX_MODE_SINGLE_LINE_BORDERLESS)
     {
         textField = (UITextField*) self.view;
     }
@@ -509,7 +512,8 @@ replacementString:(NSString *)string
  */
 - (int)setTextProperty:(NSString*)value
 {
-    if (_mode == MAW_EDIT_BOX_MODE_SINGLE_LINE)
+    if (_mode == MAW_EDIT_BOX_MODE_SINGLE_LINE ||
+        _mode == MAW_EDIT_BOX_MODE_SINGLE_LINE_BORDERLESS)
     {
         [self textField].text = value;
     }
@@ -529,7 +533,8 @@ replacementString:(NSString *)string
 - (NSString*)textProperty
 {
     NSString* text = @"";
-    if (_mode == MAW_EDIT_BOX_MODE_SINGLE_LINE)
+    if (_mode == MAW_EDIT_BOX_MODE_SINGLE_LINE ||
+        _mode == MAW_EDIT_BOX_MODE_SINGLE_LINE_BORDERLESS)
     {
         text = self.textField.text;
     }
@@ -550,7 +555,8 @@ replacementString:(NSString *)string
 - (int)setPlaceholderProperty:(NSString*)value
 {
     self.placeholder = value;
-    if (_mode == MAW_EDIT_BOX_MODE_SINGLE_LINE)
+    if (_mode == MAW_EDIT_BOX_MODE_SINGLE_LINE ||
+        _mode == MAW_EDIT_BOX_MODE_SINGLE_LINE_BORDERLESS)
     {
         self.textField.placeholder = self.placeholder;
     }
@@ -574,7 +580,8 @@ replacementString:(NSString *)string
 {
     if ([value isEqualToString:kWidgetTrueValue])
     {
-        if (_mode == MAW_EDIT_BOX_MODE_SINGLE_LINE)
+        if (_mode == MAW_EDIT_BOX_MODE_SINGLE_LINE ||
+            _mode == MAW_EDIT_BOX_MODE_SINGLE_LINE_BORDERLESS)
         {
             [self.textField becomeFirstResponder];
         }
@@ -585,7 +592,8 @@ replacementString:(NSString *)string
     }
     else if ([value isEqualToString:kWidgetFalseValue])
     {
-        if (_mode == MAW_EDIT_BOX_MODE_SINGLE_LINE)
+        if (_mode == MAW_EDIT_BOX_MODE_SINGLE_LINE ||
+            _mode == MAW_EDIT_BOX_MODE_SINGLE_LINE_BORDERLESS)
         {
             [self.textField resignFirstResponder];
         }
@@ -629,7 +637,8 @@ replacementString:(NSString *)string
         return MAW_RES_INVALID_PROPERTY_VALUE;
     }
 
-    if (_mode == MAW_EDIT_BOX_MODE_SINGLE_LINE)
+    if (_mode == MAW_EDIT_BOX_MODE_SINGLE_LINE ||
+        _mode == MAW_EDIT_BOX_MODE_SINGLE_LINE_BORDERLESS)
     {
         self.textField.secureTextEntry = passwordMode;
     }
@@ -658,7 +667,8 @@ replacementString:(NSString *)string
     }
 
     UIKeyboardType keyboardType = [self keyboardTypeFromString:value];
-    if (_mode == MAW_EDIT_BOX_MODE_SINGLE_LINE)
+    if (_mode == MAW_EDIT_BOX_MODE_SINGLE_LINE ||
+        _mode == MAW_EDIT_BOX_MODE_SINGLE_LINE_BORDERLESS)
     {
         self.textField.keyboardType = keyboardType;
     }
@@ -705,6 +715,9 @@ replacementString:(NSString *)string
         case MAW_EDIT_BOX_FLAG_INITIAL_CAPS_SENTENCE:
             autoCapitalizationType = UITextAutocapitalizationTypeSentences;
             break;
+        case MAW_EDIT_BOX_FLAG_NO_CAPS:
+            autoCapitalizationType = UITextAutocapitalizationTypeNone;
+            break;
         default:
             isInputTypeParamValid = NO;
     }
@@ -714,7 +727,8 @@ replacementString:(NSString *)string
         return MAW_RES_INVALID_PROPERTY_VALUE;
     }
 
-    if (_mode == MAW_EDIT_BOX_MODE_SINGLE_LINE)
+    if (_mode == MAW_EDIT_BOX_MODE_SINGLE_LINE ||
+        _mode == MAW_EDIT_BOX_MODE_SINGLE_LINE_BORDERLESS)
     {
         if (isPasswordModeRequired)
         {
@@ -754,7 +768,8 @@ replacementString:(NSString *)string
         return MAW_RES_INVALID_PROPERTY_VALUE;
     }
 
-    if (_mode == MAW_EDIT_BOX_MODE_SINGLE_LINE)
+    if (_mode == MAW_EDIT_BOX_MODE_SINGLE_LINE ||
+        _mode == MAW_EDIT_BOX_MODE_SINGLE_LINE_BORDERLESS)
     {
         self.textField.textColor = color;
     }
@@ -806,7 +821,8 @@ replacementString:(NSString *)string
 /**
  * Set the edit box mode.
  * Setter for MAW_EDIT_BOX_MODE.
- * @param value MAW_EDIT_BOX_MODE_SINGLE_LINE or MAW_EDIT_BOX_MULTI_LINE.
+ * @param value MAW_EDIT_BOX_MODE_SINGLE_LINE, MAW_EDIT_BOX_MULTI_LINE
+ * or MAW_EDIT_BOX_MODE_SINGLE_LINE_BORDERLESS.
  * @return MAW_RES_OK if the value param is as expected, otherwise MAW_RES_INVALID_PROPERTY_VALUE.
  */
 - (int)setModeProperty:(NSString*)value
@@ -819,11 +835,15 @@ replacementString:(NSString *)string
     int mode = [value intValue];
     if (mode == MAW_EDIT_BOX_MODE_SINGLE_LINE)
     {
-        [self createTextField];
+        [self createTextField:NO];
     }
     else if (mode == MAW_EDIT_BOX_MODE_MULTI_LINE)
     {
         [self createTextView];
+    }
+    else if (mode == MAW_EDIT_BOX_MODE_SINGLE_LINE_BORDERLESS)
+    {
+        [self createTextField:YES];
     }
     else
     {
@@ -836,7 +856,8 @@ replacementString:(NSString *)string
 /**
  * Get the edit box mode.
  * Getter for MAW_EDIT_BOX_MODE.
- * @return MAW_EDIT_BOX_MODE_SINGLE_LINE or MAW_EDIT_BOX_MULTI_LINE.
+ * @return MAW_EDIT_BOX_MODE_SINGLE_LINE, MAW_EDIT_BOX_MULTI_LINE
+ * or MAW_EDIT_BOX_MODE_SINGLE_LINE_BORDERLESS.
  */
 - (NSString*)modeProperty
 {
@@ -881,7 +902,8 @@ replacementString:(NSString *)string
         return MAW_RES_INVALID_PROPERTY_VALUE;
     }
 
-    if (_mode == MAW_EDIT_BOX_MODE_SINGLE_LINE)
+    if (_mode == MAW_EDIT_BOX_MODE_SINGLE_LINE ||
+        _mode == MAW_EDIT_BOX_MODE_SINGLE_LINE_BORDERLESS)
     {
         self.textField.autocorrectionType = autoCorrectionType;
     }
@@ -901,7 +923,8 @@ replacementString:(NSString *)string
 - (NSString*)autoCorrectionTypeProperty
 {
     UITextAutocorrectionType autoCorrectionType;
-    if (_mode == MAW_EDIT_BOX_MODE_SINGLE_LINE)
+    if (_mode == MAW_EDIT_BOX_MODE_SINGLE_LINE ||
+        _mode == MAW_EDIT_BOX_MODE_SINGLE_LINE_BORDERLESS)
     {
         autoCorrectionType = self.textField.autocorrectionType;
     }
@@ -955,7 +978,8 @@ replacementString:(NSString *)string
         return MAW_RES_INVALID_PROPERTY_VALUE;
     }
 
-    if (_mode == MAW_EDIT_BOX_MODE_SINGLE_LINE)
+    if (_mode == MAW_EDIT_BOX_MODE_SINGLE_LINE ||
+        _mode == MAW_EDIT_BOX_MODE_SINGLE_LINE_BORDERLESS)
     {
         self.textField.textAlignment = textAlignment;
     }
@@ -975,7 +999,8 @@ replacementString:(NSString *)string
 - (NSString*)textHorizontalAlignmentProperty
 {
     UITextAlignment textAlignment;
-    if (_mode == MAW_EDIT_BOX_MODE_SINGLE_LINE)
+    if (_mode == MAW_EDIT_BOX_MODE_SINGLE_LINE ||
+        _mode == MAW_EDIT_BOX_MODE_SINGLE_LINE_BORDERLESS)
     {
         textAlignment = self.textField.textAlignment;
     }
@@ -1143,7 +1168,8 @@ replacementString:(NSString *)string
  */
 - (void)removeDelegate
 {
-    if (_mode == MAW_EDIT_BOX_MODE_SINGLE_LINE)
+    if (_mode == MAW_EDIT_BOX_MODE_SINGLE_LINE ||
+        _mode == MAW_EDIT_BOX_MODE_SINGLE_LINE_BORDERLESS)
     {
         self.textField.delegate = nil;
         [self.textField removeTarget:self action:@selector(textChanged)
@@ -1158,9 +1184,9 @@ replacementString:(NSString *)string
 /**
  * Create an UITextField object and assign it to view.
  * Also set its delegate and properties.
- * Changes edit box mode to MAW_EDIT_BOX_SINGLE_LINE.
+ * Changes edit box mode to MAW_EDIT_BOX_SINGLE_LINE or MAW_EDIT_BOX_SINGLE_LINE_BORDERLESS.
  */
-- (void)createTextField
+- (void)createTextField:(BOOL)borderless
 {
     [self removeDelegate];
     self.placeholder = nil;
@@ -1178,7 +1204,7 @@ replacementString:(NSString *)string
 
     UITextField* textField = [[UITextField alloc] initWithFrame:rect];
     textField.delegate = self;
-    textField.borderStyle = UITextBorderStyleRoundedRect;
+    textField.borderStyle = ((borderless == YES) ? UITextBorderStyleNone : UITextBorderStyleRoundedRect);
     self.view.contentMode = UIViewContentModeRedraw;
     [textField setOpaque:NO];
 
@@ -1188,7 +1214,7 @@ replacementString:(NSString *)string
 
     self.view = textField;
     [textField release];
-    _mode = MAW_EDIT_BOX_MODE_SINGLE_LINE;
+    _mode = ((borderless == YES) ? MAW_EDIT_BOX_MODE_SINGLE_LINE_BORDERLESS : MAW_EDIT_BOX_MODE_SINGLE_LINE);
     _isPlaceholderShown = NO;
     IWidget* parent = self.parent;
     if (parent)

@@ -44,6 +44,10 @@ namespace NativeUI
 			// Set multi line on Android and Windows Phone 7 platforms.
 			this->setInputMode(EDIT_BOX_INPUT_MODE_ANY);
 		}
+		else if (category == EDIT_BOX_SINGLE_LINE_BORDERLESS)
+		{
+			this->setPropertyInt(MAW_EDIT_BOX_MODE, MAW_EDIT_BOX_MODE_SINGLE_LINE_BORDERLESS);
+		}
 	}
 
 	/**

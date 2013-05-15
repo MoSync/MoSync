@@ -12,6 +12,11 @@ group WidgetEditBox "Edit box" {
 			* Platform: iOS.
 			*/
 			MULTI_LINE = 1;
+			/**
+			* The input text will be single line, but borderless.
+			* Platform: iOS.
+			*/
+			SINGLE_LINE_BORDERLESS = 2;
 		}
 	} // end of WidgetEditBoxMode
 
@@ -85,6 +90,11 @@ group WidgetEditBox "Edit box" {
 			* Not available on Windows Phone 7.1.
 			*/
 			INITIAL_CAPS_ALL_CHARACTERS = 4;
+			/**
+			* Don't capitalize characters automatically.
+			* Only available on iOS.
+			*/
+			NO_CAPS = 5;
 		}
 	} // end of WidgetEditBoxFlag
 

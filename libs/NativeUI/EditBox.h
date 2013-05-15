@@ -122,7 +122,11 @@ namespace NativeUI
 		/**
 		* Capitalize all characters automatically.
 		*/
-		EDIT_BOX_INPUT_GLAG_INITIAL_CAPS_ALL_CHARACTERS = 4
+		EDIT_BOX_INPUT_FLAG_INITIAL_CAPS_ALL_CHARACTERS = 4,
+		/**
+		 * Don't capitalize any characters automatically.
+		 */
+		EDIT_BOX_INPUT_FLAG_NO_CAPS = 5,
 	};
 
 	/**
@@ -164,7 +168,12 @@ namespace NativeUI
 		 * The input text will be multi line.
 		 * Platform: iOS.
 		 */
-		EDIT_BOX_MULTI_LINE
+		EDIT_BOX_MULTI_LINE,
+		/**
+		 * The input text will be single line, but borderless.
+		 * Platform: iOS.
+		 */
+		EDIT_BOX_SINGLE_LINE_BORDERLESS,
 	};
 
 	/**
