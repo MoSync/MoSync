@@ -29,12 +29,12 @@
     <GenerateManifest>false</GenerateManifest>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
-    <IncludePath>$(WP80ToolSetPath)include;$(WindowsSDK_IncludePath);$(MOSYNCDIR)\Include\;</IncludePath>
+    <IncludePath>$(WP80ToolSetPath)include;$(WindowsSDK_IncludePath);$(MOSYNCDIR)\include</IncludePath>
     <LibraryPath>$(WP80ToolSetPath)lib\arm;$(WindowsSDK_LibraryPath_ARM);$(MOSYNCDIR)\lib\windowsPhone8\ARM\Debug</LibraryPath>
     <IgnoreImportLibrary>true</IgnoreImportLibrary>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug_lib_build|ARM'">
-    <IncludePath>$(WP80ToolSetPath)include;$(WindowsSDK_IncludePath);$(MOSYNCDIR)\include\</IncludePath>
+    <IncludePath>$(WP80ToolSetPath)include;$(WindowsSDK_IncludePath);$(MOSYNCDIR)\include</IncludePath>
     <LibraryPath>$(WP80ToolSetPath)lib\arm;$(WindowsSDK_LibraryPath_ARM);$(MOSYNCDIR)\lib\windowsPhone8\ARM\Debug</LibraryPath>
     <IgnoreImportLibrary>true</IgnoreImportLibrary>
   </PropertyGroup>
