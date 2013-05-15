@@ -147,6 +147,19 @@ namespace NativeUI
 		 return listMode;
 	 }
 
+	void ListView::setIndentWhileEditing(bool shouldIndent)
+	{
+		const char* value = shouldIndent ? "true" : "false";
+		this->setProperty(MAW_LIST_VIEW_INDENT_WHILE_EDITING, value);
+	}
+
+	bool ListView::getIndentWhileEditing()
+	{
+		MAUtil::String value = this->getPropertyString(MAW_LIST_VIEW_INDENT_WHILE_EDITING);
+		bool returnValue = (strcmp(value.c_str(), "true")) ? false : true;
+		return returnValue;
+	}
+
 	void ListView::beginAnimation()
 	{
 		setProperty(MAW_LIST_VIEW_BEGIN_ANIMATION, "true");

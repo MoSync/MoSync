@@ -176,6 +176,20 @@ namespace NativeUI
 		ListViewMode getMode();
 
 		/**
+		 * Set if the list view should indent empty list view items in edit mode.
+		 * Platform: iOS.
+		 * @param shouldIndent True if the items should be indented, false if not.
+		 */
+		void setIndentWhileEditing(bool shouldIndent);
+
+		/**
+		 * Get the list view indent mode.
+		 * Platform: iOS.
+		 * @return True if the items are indented, false if not.
+		 */
+		bool getIndentWhileEditing();
+
+		/**
 		 * Start a batch insert/remove operation
 		 * that will animate all the list view
 		 * changes when endAnimation() is called.

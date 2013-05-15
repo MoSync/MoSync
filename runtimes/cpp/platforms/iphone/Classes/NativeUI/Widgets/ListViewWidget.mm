@@ -128,6 +128,25 @@
 -(NSString*) getModeProperty;
 
 /**
+ * Set if the list view should indent ListViewItems with
+ * the edit style set to MAW_LIST_VIEW_ITEM_EDIT_STYLE_NONE.
+ * Setter for MAW_LIST_VIEW_INDENT_WHILE_EDITING.
+ * @param shouldIndent "true" if the items should be indented, "false" if they should not
+ * @return One of the following values:
+ * - MAW_RES_OK if the bool value was set.
+ * - MAW_RES_INVALID_PROPERTY_VALUE if the shouldIndent param was invalid.
+ */
+-(int)setIndentWhileEditingProperty:(NSString*) shouldIndent;
+
+/**
+ * Check if the list view indents items with the style
+ * MAW_LIST_VIEW_ITEM_EDIT_STYLE_NONE set.
+ * Getter for MAW_LIST_VIEW_INDENT_WHILE_EDITING.
+ * @return "true" if the list indents MAW_LIST_VIEW_ITEM_EDIT_STYLE_NONE items, "false" otherwise.
+ */
+-(NSString*) getIndentWhileEditingProperty;
+
+/**
  * Enable/disable user interaction with an list view item.
  * A boolean value that determines whether the users can select a row will be set.
  * Setter for MAW_LIST_VIEW_ALLOW_SELECTION.
@@ -195,6 +214,7 @@
 @implementation ListViewWidget
 
 @synthesize type = _type;
+@synthesize shouldIndentWhileEditing = _shouldIndentWhileEditing;
 
 /**
  * Init function.
@@ -205,6 +225,7 @@
     if (self)
     {
         _type = ListViewTypeDefault;
+        _shouldIndentWhileEditing = YES;
         _isAnimating = NO;
         _itemOperations = [[NSMutableArray alloc] init];
 
@@ -356,6 +377,10 @@
     {
         returnValue = [self setModeProperty:value];
     }
+    else if ([key isEqualToString:@MAW_LIST_VIEW_INDENT_WHILE_EDITING])
+    {
+        returnValue = [self setIndentWhileEditingProperty:value];
+    }
     else if ([key isEqualToString:@MAW_LIST_VIEW_ALLOW_SELECTION])
     {
         returnValue = [self setAllowSelectionProperty:value];
@@ -395,6 +420,10 @@
     else if ([key isEqualToString:@MAW_LIST_VIEW_MODE])
     {
         return [[self getModeProperty] retain];
+    }
+    else if ([key isEqualToString:@MAW_LIST_VIEW_INDENT_WHILE_EDITING])
+    {
+        return [[self getIndentWhileEditingProperty] retain];
     }
     else if ([key isEqualToString:@MAW_LIST_VIEW_ALLOW_SELECTION])
     {
@@ -784,6 +813,11 @@ forRowAtIndexPath:(NSIndexPath *)indexPath
 	Base::gEventQueue.put(event);
 }
 
+- (BOOL)tableView:(UITableView *)tableView shouldIndentWhileEditingRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    return _shouldIndentWhileEditing;
+}
+
 #pragma mark ListViewDelegate
 
 /**
@@ -1061,6 +1095,31 @@ forRowAtIndexPath:(NSIndexPath *)indexPath
 {
     int modeInt = [self.tableView isEditing] ? MAW_LIST_VIEW_MODE_EDIT : MAW_LIST_VIEW_MODE_DISPLAY;
     return [NSString stringWithFormat:@"%d", modeInt];
+}
+
+-(int)setIndentWhileEditingProperty:(NSString*) shouldIndent
+{
+    BOOL shouldIndentBool;
+    if ([shouldIndent isEqualToString:kWidgetTrueValue])
+    {
+        shouldIndentBool = YES;
+    }
+    else if ([shouldIndent isEqualToString:kWidgetFalseValue])
+    {
+        shouldIndentBool = NO;
+    }
+    else
+    {
+        return MAW_RES_INVALID_PROPERTY_VALUE;
+    }
+
+    self.shouldIndentWhileEditing = shouldIndentBool;
+    return MAW_RES_OK;
+}
+
+-(NSString*) getIndentWhileEditingProperty
+{
+    return self.shouldIndentWhileEditing ? kWidgetTrueValue : kWidgetFalseValue;
 }
 
 /**

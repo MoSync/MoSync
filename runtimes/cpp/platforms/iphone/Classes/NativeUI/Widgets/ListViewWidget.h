@@ -101,6 +101,12 @@ enum ListViewItemAnimationType
     ListViewType _type;
 
     /**
+     * YES if the list should indent items in edit mode, NO otherwise.
+     * Default is YES.
+     */
+    BOOL _shouldIndentWhileEditing;
+
+    /**
      * Property for if the list view is currently inside a
      * batch animation call.
      */
@@ -122,6 +128,8 @@ enum ListViewItemAnimationType
  * Getter for the widget's view.
  */
 @property(nonatomic, readonly, getter = tableView) UITableView* tableView;
+
+@property(nonatomic, assign) BOOL shouldIndentWhileEditing;
 
 /**
  * Adds an widget to the end of the children list.

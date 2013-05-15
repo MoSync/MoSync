@@ -138,6 +138,22 @@ group WidgetListView "List View" {
 			MODE= "mode";
 
 			/**
+			* @brief Set or get the list indent mode.
+			* Platform: iOS.
+			*
+			* @validvalue "true" or "false"
+			* Default value is "true".
+			*
+			* @setandget
+			*
+			* @par Example
+			* \code
+			*	maWidgetSetProperty(listHandle, MAW_LIST_VIEW_INDENT_WHILE_EDITING, "false");
+			* \endcode
+			*/
+			INDENT_WHILE_EDITING = "indentWhileEditing";
+
+			/**
 			* @brief Reload all its items.
 			* Platform: iOS, Android and Windows Phone 7.
 			*
