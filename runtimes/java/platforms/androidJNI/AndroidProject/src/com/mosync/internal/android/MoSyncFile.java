@@ -1039,36 +1039,19 @@ public class MoSyncFile {
 		return mNumFileListings;
 	}
 
-	/**
-	* Writes the name of the next file in the list to the specified buffer.
-	*
-	* The buffer may be too small to contain the name and the terminating zero;
-	* in that case, the internal list pointer remains unchanged,
-	* the buffer will not be filled,
-	* and you should allocate a bigger buffer and call this function again.
-	* You may call this function with NULL and 0 to simply retrieve the length
-	* of the name.
-	*
-	* If the name ends with a slash('/'), it is a directory.
-	*
-	* \returns The length of the name, excluding the terminating zero,
-	* or 0 if there are no more files, or \< 0 on error.
-	*/
 	int maFileListNext(int list, int nameBuf, int bufSize)
 	{
 		log("maFileListNext");
-
 		MoSyncFileListing fileListing = mFileListings.get(list);
 
 		if(fileListing.mFiles.length == fileListing.mIndex) return 0;
 
 		File file = fileListing.mFiles[fileListing.mIndex];
 		String name = file.getName();
-
 		log("maFileListNext current path: " + name);
 
-		byte[] nameChars = name.getBytes();
-		int len = nameChars.length+1;
+		byte[] nameBytes = name.getBytes();
+		int len = nameBytes.length+1;
 
 		if(file.isDirectory())
 		{
@@ -1078,11 +1061,11 @@ public class MoSyncFile {
 		if(bufSize == 0) { return len-1; }
 		if(len > bufSize) { return len-1; }
 
-		ByteBuffer buffer = mMoSyncThread.getMemorySlice(nameBuf, nameChars.length + 3);
-		buffer.put(nameChars);
+		ByteBuffer buffer = mMoSyncThread.getMemorySlice(nameBuf, len);
+		buffer.put(nameBytes);
 		if(file.isDirectory())
 		{
-			buffer.putChar('/');
+			buffer.put((byte)'/');
 		}
 		buffer.put((byte)0);
 
@@ -1090,7 +1073,6 @@ public class MoSyncFile {
 
 		return len-1;
 	}
-
 	/**
 	* Closes a file listing, freeing its resources.
 	*
