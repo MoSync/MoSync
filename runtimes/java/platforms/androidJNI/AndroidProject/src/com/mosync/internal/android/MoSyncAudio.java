@@ -17,27 +17,16 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 package com.mosync.internal.android;
 
-import static com.mosync.internal.android.MoSyncHelpers.SYSLOG;
-
-import static com.mosync.internal.generated.MAAPI_consts.MA_AUDIO_DATA_STREAM;
-
 import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_AUDIO_PREPARED;
 import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_AUDIO_COMPLETED;
 
 import static com.mosync.internal.generated.MAAPI_consts.MA_AUDIO_ERR_OK;
 import static com.mosync.internal.generated.MAAPI_consts.MA_AUDIO_ERR_INVALID_INSTANCE;
 import static com.mosync.internal.generated.MAAPI_consts.MA_AUDIO_ERR_INVALID_DATA;
-import static com.mosync.internal.generated.MAAPI_consts.MA_AUDIO_ERR_INVALID_FILENAME;
 import static com.mosync.internal.generated.MAAPI_consts.MA_AUDIO_ERR_INVALID_FILE;
-import static com.mosync.internal.generated.MAAPI_consts.MA_AUDIO_ERR_STREAMING_NOT_SUPPORTED;
 import static com.mosync.internal.generated.MAAPI_consts.MA_AUDIO_ERR_VOLUME_OUT_OF_RANGE;
-import static com.mosync.internal.generated.MAAPI_consts.MA_AUDIO_ERR_POSITION_OUT_OF_RANGE;
-import static com.mosync.internal.generated.MAAPI_consts.MA_AUDIO_ERR_INVALID_SOUND_FORMAT;
-import static com.mosync.internal.generated.MAAPI_consts.MA_AUDIO_ERR_OUT_OF_MEMORY;
 import static com.mosync.internal.generated.MAAPI_consts.MA_AUDIO_ERR_ALREADY_PREPARED;
-import static com.mosync.internal.generated.MAAPI_consts.MA_AUDIO_ERR_IS_PLAYING;
 
-import java.io.File;
 import java.io.FileDescriptor;
 import java.io.FileOutputStream;
 import java.nio.ByteBuffer;
