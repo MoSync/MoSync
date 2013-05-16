@@ -58,6 +58,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.nio.channels.Channels;
@@ -4652,6 +4653,31 @@ public class MoSyncThread extends Thread
 	public int maActionBarSetBackgroundImage(final int imageHandle)
 	{
 		return mMoSyncNativeUI.maActionBarSetBackgroundImage(imageHandle);
+	}
+
+	public void invalidateOptionsMenu(Activity activity) {
+		Class<?> activityClass = null;
+		Method activity_invalidateOptionMenu = null;
+		try {
+			activityClass = Class.forName("android.app.Activity");
+		} catch (Throwable e) {
+			System.err.println(e);
+		}
+
+		// Search for invalidateOptionsMenu into the Activity class.
+		try {
+			activity_invalidateOptionMenu = activityClass
+					.getMethod("invalidateOptionsMenu");
+			/* success, this is a newer device */
+		} catch (NoSuchMethodException nsme) {
+			/* failure, must be older device */
+			Log.i("MoSync", "invalidateOptionsMenu failed");
+		}
+		try {
+			activity_invalidateOptionMenu.invoke(activity);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	/**
