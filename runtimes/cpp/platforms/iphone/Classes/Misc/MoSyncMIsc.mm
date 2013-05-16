@@ -189,9 +189,6 @@ int maGetSystemProperty(const char *key, char *buf, int size)
     } else if (strcmp(key, "mosync.device.model") == 0) {
         BOOL success = [[[UIDevice currentDevice] model] getCString:buf maxLength:size encoding:NSASCIIStringEncoding];
         res = (success)?strlen(buf) + 1: -1;
-    } else if (strcmp(key, "mosync.device.UUID")== 0) {
-        BOOL success = [[[UIDevice currentDevice] uniqueIdentifier] getCString:buf maxLength:size encoding:NSUTF8StringEncoding];
-        res = (success)?strlen(buf) + 1: -1;
     } else if (strcmp(key, "mosync.device.OS")== 0) {
         BOOL success = [[[UIDevice currentDevice] systemName] getCString:buf maxLength:size encoding:NSUTF8StringEncoding];
         res = (success)?strlen(buf) + 1: -1;
