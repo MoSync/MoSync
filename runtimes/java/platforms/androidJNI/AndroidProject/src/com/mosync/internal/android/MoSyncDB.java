@@ -91,9 +91,9 @@ public class MoSyncDB
 	 * query result, a cursor handle is returned.
 	 * @param databaseHandle Handle to the database.
 	 * @param sql The SQL statement.
-	 * @return MA_DB_ERROR on error, MA_DB_OK on success,
-	 * > 0 if there is a cursor to a query result, in this
-	 * case the return value is the cursor handle.
+	 * @return (i)   cursor handler,
+	 * 		   (ii)  MA_DB_OK for success but no cursor or empty cursor,
+	 * 		   (iii) error code.
 	 */
 	public int maDBExecSQL(int databaseHandle, String sql)
 	{
@@ -235,7 +235,9 @@ public class MoSyncDB
 	 * @param databaseHandle
 	 * @param sql
 	 * @param params
-	 * @return Success or error code.
+	 * @return (i)   cursor handler,
+	 * 		   (ii)  MA_DB_OK for success but no cursor or empty cursor,
+	 * 		   (iii) error code.
 	 */
 	protected int execSQLHelper(
 		int databaseHandle,
@@ -261,6 +263,7 @@ public class MoSyncDB
 			}
 			else
 			{
+				// no cursor or empty cursor
 				return MA_DB_OK;
 			}
 		}
@@ -757,9 +760,9 @@ public class MoSyncDB
 				query.close();
 			}
 
-			// If we got a cursor, we return it wrapped in a MoSync
-			// cursor object.
-			if (null == cursor)
+			// a cursor that holds no data is considered a null cursor
+			// if exist, the cursor is wrapped in a mosync cursor
+			if (null == cursor || cursor.getCount() == 0 )
 			{
 				return null;
 			}
