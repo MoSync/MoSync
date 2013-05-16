@@ -27,7 +27,6 @@ import android.util.Log;
 import com.mosync.internal.android.billing.BillingEvent;
 import com.mosync.internal.android.billing.Consts;
 import com.mosync.internal.android.billing.PurchaseManager;
-import com.mosync.nativeui.util.properties.IntConverter;
 import com.mosync.nativeui.util.properties.PropertyConversionException;
 
 import static com.mosync.internal.generated.MAAPI_consts.MA_PURCHASE_RES_INVALID_HANDLE;

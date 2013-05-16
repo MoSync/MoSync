@@ -19,7 +19,6 @@ package com.mosync.internal.android;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.pm.PackageManager;
 import android.os.Build;
 import android.util.Log;
 
@@ -27,7 +26,6 @@ import com.google.android.gcm.GCMRegistrar;
 
 import com.mosync.internal.android.notifications.LocalNotificationsManager;
 import com.mosync.internal.android.notifications.PushNotificationsManager;
-import com.mosync.nativeui.util.properties.IntConverter;
 import com.mosync.nativeui.util.properties.PropertyConversionException;
 
 import static com.mosync.internal.generated.MAAPI_consts.MA_NOTIFICATION_RES_OK;
