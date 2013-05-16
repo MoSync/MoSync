@@ -456,18 +456,14 @@ namespace MoSync
              */
             public new static bool ValidateProperty(string propertyName, string propertyValue)
             {
-                bool isBasePropertyValid = WidgetBaseWindowsPhone.ValidateProperty(propertyName, propertyValue);
-                if (isBasePropertyValid == false)
-                {
-                    return false;
-                }
+                bool isPropertyValid = WidgetBaseWindowsPhone.ValidateProperty(propertyName, propertyValue);
 
                 if (propertyName.Equals("type"))
                 {
                     if (!(propertyValue.Equals(MoSync.Constants.MAW_MAP_TYPE_ROAD) ||
                         propertyValue.Equals(MoSync.Constants.MAW_MAP_TYPE_SATELLITE)))
                     {
-                        return false;
+                        isPropertyValid = false;
                     }
                 }
                 else if (propertyName.Equals("center_latitude") ||
@@ -480,7 +476,7 @@ namespace MoSync
                     double latitude;
                     if (!Double.TryParse(propertyValue, out latitude))
                     {
-                        return false;
+                        isPropertyValid = false;
                     }
                 }
                 else if (propertyName.Equals("center_zoom_level"))
@@ -488,7 +484,7 @@ namespace MoSync
                     int zoomLevel;
                     if (!Int32.TryParse(propertyValue, out zoomLevel))
                     {
-                        return false;
+                        isPropertyValid = false;
                     }
                 }
                 else if (propertyName.Equals("interraction_enabled") ||
@@ -498,11 +494,11 @@ namespace MoSync
                     bool val;
                     if (!Boolean.TryParse(propertyValue, out val))
                     {
-                        return false;
+                        isPropertyValid = false;
                     }
                 }
 
-                return true;
+                return isPropertyValid;
             }
 
             #endregion

@@ -595,11 +595,7 @@ namespace MoSync
              */
             public new static bool ValidateProperty(string propertyName, string propertyValue)
             {
-                bool isBasePropertyValid = WidgetBaseWindowsPhone.ValidateProperty(propertyName, propertyValue);
-                if (isBasePropertyValid == false)
-                {
-                    return false;
-                }
+                bool isPropertyValid = WidgetBaseWindowsPhone.ValidateProperty(propertyName, propertyValue);
 
                 if (propertyName.Equals("imagePath") ||
                     propertyName.Equals("backgroundImagePath") ||
@@ -619,12 +615,12 @@ namespace MoSync
                         catch
                         {
                             // There was a problem reading the image file.
-                            return false;
+                            isPropertyValid = false;
                         }
                     }
                     else
                     {
-                        return false;
+                        isPropertyValid = false;
                     }
                 }
                 else if (propertyName.Equals("fontColor"))
@@ -636,7 +632,7 @@ namespace MoSync
                     }
                     catch (InvalidPropertyValueException)
                     {
-                        return false;
+                        isPropertyValid = false;
                     }
                 }
                 else if (propertyName.Equals("textVerticalAlignment"))
@@ -645,7 +641,7 @@ namespace MoSync
                         propertyValue.Equals("MoSync.Constants.MAW_ALIGNMENT_BOTTOM") ||
                         propertyValue.Equals("MoSync.Constants.MAW_ALIGNMENT_CENTER")))
                     {
-                        return false;
+                        isPropertyValid = false;
                     }
                 }
                 else if (propertyName.Equals("textHorizontalAlignment"))
@@ -654,11 +650,11 @@ namespace MoSync
                         propertyValue.Equals("MoSync.Constants.MAW_ALIGNMENT_RIGHT") ||
                         propertyValue.Equals("MoSync.Constants.MAW_ALIGNMENT_CENTER")))
                     {
-                        return false;
+                        isPropertyValid = false;
                     }
                 }
 
-                return true;
+                return isPropertyValid;
             }
 
             #endregion

@@ -152,11 +152,7 @@ namespace MoSync
              */
             public new static bool ValidateProperty(string propertyName, string propertyValue)
             {
-                bool isBasePropertyValid = WidgetBaseWindowsPhone.ValidateProperty(propertyName, propertyValue);
-                if (isBasePropertyValid == false)
-                {
-                    return false;
-                }
+                bool isPropertyValid = WidgetBaseWindowsPhone.ValidateProperty(propertyName, propertyValue);
 
                 if (propertyName.Equals("latitude") ||
                     propertyName.Equals("longitude"))
@@ -164,11 +160,11 @@ namespace MoSync
                     double val;
                     if (!Double.TryParse(propertyValue, out val))
                     {
-                        return false;
+                        isPropertyValid = false;
                     }
                 }
 
-                return true;
+                return isPropertyValid;
             }
 
             #endregion

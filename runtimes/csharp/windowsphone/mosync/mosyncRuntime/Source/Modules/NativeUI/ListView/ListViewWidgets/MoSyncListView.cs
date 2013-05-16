@@ -934,8 +934,7 @@ namespace MoSync
              */
             public new static bool ValidateProperty(string propertyName, string propertyValue)
             {
-                bool isBasePropertyValid = WidgetBaseWindowsPhone.ValidateProperty(propertyName, propertyValue);
-                if (isBasePropertyValid == false) return false;
+                bool isPropertyValid = WidgetBaseWindowsPhone.ValidateProperty(propertyName, propertyValue);
 
                 if (propertyName.Equals("type"))
                 {
@@ -946,12 +945,12 @@ namespace MoSync
                             type == MoSync.Constants.MAW_LIST_VIEW_TYPE_DEFAULT ||
                             type == MoSync.Constants.MAW_LIST_VIEW_TYPE_SEGMENTED))
                         {
-                            return false;
+                            isPropertyValid = false;
                         }
                     }
                     else
                     {
-                        return false;
+                        isPropertyValid = false;
                     }
                 }
                 else if (propertyName.Equals("style"))
@@ -962,12 +961,12 @@ namespace MoSync
                         if (!(style == MoSync.Constants.MAW_LIST_VIEW_STYLE_SUBTITLE ||
                             style == MoSync.Constants.MAW_LIST_VIEW_STYLE_NO_SUBTITLE))
                         {
-                            return false;
+                            isPropertyValid = false;
                         }
                     }
                     else
                     {
-                        return false;
+                        isPropertyValid = false;
                     }
                 }
                 else if (propertyName.Equals("allowselection"))
@@ -975,11 +974,11 @@ namespace MoSync
                     bool allowSelection = false;
                     if (!Boolean.TryParse(propertyValue, out allowSelection))
                     {
-                        return false;
+                        isPropertyValid = false;
                     }
                 }
 
-                return true;
+                return isPropertyValid;
             }
 
             #endregion

@@ -285,6 +285,7 @@ namespace MoSync
 
         protected void SetProperty(PropertyInfo pinfo, String stringValue)
         {
+            // TODO SA: verify if SetValue throws any exceptions
             switch (pinfo.PropertyType.Name)
             {
                 case "Double":

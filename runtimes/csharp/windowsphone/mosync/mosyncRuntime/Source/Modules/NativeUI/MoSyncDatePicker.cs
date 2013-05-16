@@ -411,11 +411,7 @@ namespace MoSync
              */
             public new static bool ValidateProperty(string propertyName, string propertyValue)
             {
-                bool isBasePropertyValid = WidgetBaseWindowsPhone.ValidateProperty(propertyName, propertyValue);
-                if (isBasePropertyValid == false)
-                {
-                    return false;
-                }
+                bool isPropertyValid = WidgetBaseWindowsPhone.ValidateProperty(propertyName, propertyValue);
 
                 if (propertyName.Equals("maxdateyear") || propertyName.Equals("maxdatemonth") || propertyName.Equals("maxdateday") ||
                     propertyName.Equals("mindateyear") || propertyName.Equals("mindatemonth") || propertyName.Equals("mindateday"))
@@ -423,55 +419,55 @@ namespace MoSync
                     int value;
                     if (!int.TryParse(propertyValue, out value))
                     {
-                        return false;
+                        isPropertyValid = false;
                     }
                     if (propertyName.Equals("maxdateyear"))
                     {
-                        if (MinDate > MaxDate.AddYears(-1 * (MaxDate.Year - value)) || value > MaxYear) return false;
+                        if (MinDate > MaxDate.AddYears(-1 * (MaxDate.Year - value)) || value > MaxYear) isPropertyValid = false;
                     }
                     else if (propertyName.Equals("maxdatemonth"))
                     {
                         if (value <= 12 && value >= 1)
                         {
-                            if (MinDate > MaxDate.AddMonths(-1 * (MaxDate.Month - value))) return false;
+                            if (MinDate > MaxDate.AddMonths(-1 * (MaxDate.Month - value))) isPropertyValid = false;
                         }
                         else
                         {
-                            return false;
+                            isPropertyValid = false;
                         }
                     }
                     else if (propertyName.Equals("maxdateday"))
                     {
                         int month = MaxDate.Month;
-                        if (MinDate > MaxDate.AddDays(value - MaxDate.Day)) return false;
+                        if (MinDate > MaxDate.AddDays(value - MaxDate.Day)) isPropertyValid = false;
                         // If the month have changed it means that the day value was not valid.
-                        if (month != MaxDate.AddDays(value - MaxDate.Day).Month) return false;
+                        if (month != MaxDate.AddDays(value - MaxDate.Day).Month) isPropertyValid = false;
                     }
                     else if (propertyName.Equals("mindateyear"))
                     {
-                        if (MinDate.AddYears(-1 * (MinDate.Year - value)) > MaxDate || value < MinYear) return false;
+                        if (MinDate.AddYears(-1 * (MinDate.Year - value)) > MaxDate || value < MinYear) isPropertyValid = false;
                     }
                     else if (propertyName.Equals("mindatemonth"))
                     {
                         if (value <= 12 && value >= 1)
                         {
-                            if (MinDate.AddMonths(-1 * (MinDate.Month - value)) > MaxDate) return false;
+                            if (MinDate.AddMonths(-1 * (MinDate.Month - value)) > MaxDate) isPropertyValid = false;
                         }
                         else
                         {
-                            return false;
+                            isPropertyValid = false;
                         }
                     }
                     else if (propertyName.Equals("mindateday"))
                     {
                         int month = MinDate.Month;
-                        if (MinDate.AddDays(value - MinDate.Day) > MaxDate) return false;
+                        if (MinDate.AddDays(value - MinDate.Day) > MaxDate) isPropertyValid = false;
                         // IF the month have changed it means that the day value was not valid.
-                        if (month != MinDate.AddDays(value - MinDate.Day).Month) return false;
+                        if (month != MinDate.AddDays(value - MinDate.Day).Month) isPropertyValid = false;
                     }
                 }
 
-                return true;
+                return isPropertyValid;
             }
 
             #endregion

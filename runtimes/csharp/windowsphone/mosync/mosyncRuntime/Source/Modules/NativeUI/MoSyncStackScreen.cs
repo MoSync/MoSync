@@ -334,22 +334,21 @@ namespace MoSync
              */
             public new static bool ValidateProperty(string propertyName, string propertyValue)
             {
-                bool isBasePropertyValid = Screen.ValidateProperty(propertyName, propertyValue);
-                if (isBasePropertyValid == false) return false;
+                bool isPropertyValid = Screen.ValidateProperty(propertyName, propertyValue);
 
                 if (propertyName.Equals("backButtonEnabled"))
                 {
                     bool val;
-                    if (!Boolean.TryParse(propertyValue, out val)) return false;
+                    if (!Boolean.TryParse(propertyValue, out val)) isPropertyValid = false;
                 }
                 else if (propertyName.Equals("pushTransitionType"))
                 {
                     int val;
-                    if (!Int32.TryParse(propertyValue, out val)) return false;
-                    if (!NativeUI.MoSyncScreenTransitions.isTransitionAvailable(val)) return false;
+                    if (!Int32.TryParse(propertyValue, out val)) isPropertyValid = false;
+                    if (!NativeUI.MoSyncScreenTransitions.isTransitionAvailable(val)) isPropertyValid = false;
                 }
 
-                return true;
+                return isPropertyValid;
             }
 
             #endregion

@@ -652,11 +652,7 @@ namespace MoSync
              */
             public new static bool ValidateProperty(string propertyName, string propertyValue)
             {
-                bool isBasePropertyValid = WidgetBaseWindowsPhone.ValidateProperty(propertyName, propertyValue);
-                if (isBasePropertyValid == false)
-                {
-                    return false;
-                }
+                bool isPropertyValid = WidgetBaseWindowsPhone.ValidateProperty(propertyName, propertyValue);
 
                 if (propertyName.Equals("placeholderFontColor") ||
                     propertyName.Equals("fontColor"))
@@ -671,7 +667,7 @@ namespace MoSync
                     }
                     catch (InvalidPropertyValueException)
                     {
-                        return false;
+                        isPropertyValid = false;
                     }
                 }
                 else if (propertyName.Equals("showKeyboard"))
@@ -679,7 +675,7 @@ namespace MoSync
                     bool val;
                     if (!Boolean.TryParse(propertyValue, out val))
                     {
-                        return false;
+                        isPropertyValid = false;
                     }
                 }
                 else if (propertyName.Equals("inputMode") ||
@@ -688,7 +684,7 @@ namespace MoSync
                     int value = 0;
                     if (!int.TryParse(propertyValue, out value))
                     {
-                        return false;
+                        isPropertyValid = false;
                     }
                     if (propertyName.Equals("inputMode"))
                     {
@@ -700,7 +696,7 @@ namespace MoSync
                             value == MoSync.Constants.MAW_EDIT_BOX_TYPE_DECIMAL ||
                             value == MoSync.Constants.MAW_EDIT_BOX_TYPE_SINGLE_LINE))
                         {
-                            return false;
+                            isPropertyValid = false;
                         }
                     }
                     else if (propertyName.Equals("inputFlag"))
@@ -711,19 +707,19 @@ namespace MoSync
                             value == MoSync.Constants.MAW_EDIT_BOX_FLAG_INITIAL_CAPS_SENTENCE ||
                             value == MoSync.Constants.MAW_EDIT_BOX_FLAG_INITIAL_CAPS_ALL_CHARACTERS))
                         {
-                            return false;
+                            isPropertyValid = false;
                         }
                     }
                     else if (propertyName.Equals("maxLength"))
                     {
                         if (value < 0)
                         {
-                            return false;
+                            isPropertyValid = false;
                         }
                     }
                 }
 
-                return true;
+                return isPropertyValid;
             }
 
             #endregion

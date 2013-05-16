@@ -86,7 +86,7 @@ namespace MoSync
             public new void RunOperationQueue()
             {
                 // run all the pending operations from the widget operation queue
-                while (mOperationQueue.Count != 0)
+                while (mOperationQueue.Count > 0)
                 {
                     WidgetOperation currentOperation = mOperationQueue.Dequeue();
                     RunOperation(currentOperation);
@@ -105,8 +105,6 @@ namespace MoSync
                     case WidgetOperation.OperationType.SET:
                         SetProperty(operation);
                         break;
-                    case WidgetOperation.OperationType.GET:
-                        break;
                     case WidgetOperation.OperationType.ADD:
                         AddChild(operation);
                         break;
@@ -115,6 +113,12 @@ namespace MoSync
                         break;
                     case WidgetOperation.OperationType.REMOVE:
                         RemoveChild(operation);
+                        break;
+                    case WidgetOperation.OperationType.GET:
+                        // do nothing - when a get syscall is called and the widget is not created,
+                        // the last valid set value is returned and if it doesn't exist, we wait for
+                        // the widget creation and run the get operation. A get operation never
+                        // gets into the queue
                         break;
                 }
             }
@@ -458,10 +462,11 @@ namespace MoSync
 
             public static bool ValidateProperty(String propertyName, String propertyValue)
             {
+                bool isPropertyValid = true;
                 if (propertyName.Equals("enabled") || propertyName.Equals("visible"))
                 {
                     bool val;
-                    if (!Boolean.TryParse(propertyValue, out val)) return false;
+                    if (!Boolean.TryParse(propertyValue, out val)) isPropertyValid = false;
                 }
                 else if (propertyName.Equals("backgroundColor"))
                 {
@@ -475,7 +480,7 @@ namespace MoSync
                     }
                     catch (InvalidPropertyValueException)
                     {
-                        return false;
+                        isPropertyValid = false;
                     }
                 }
                 else if (propertyName.Equals("backgroundGradient"))
@@ -496,11 +501,11 @@ namespace MoSync
                     }
                     catch (InvalidPropertyValueException)
                     {
-                        return false;
+                        isPropertyValid = false;
                     }
                 }
 
-                return true;
+                return isPropertyValid;
             }
 
             #endregion
