@@ -244,6 +244,22 @@ namespace NativeUI
 		bool isSelectionAllowedDuringEditing();
 
 		/**
+		 * Enable/disable list scrolling.
+		 * If you don't want to allow the user to scroll the list, set this
+		 * property to false.
+		 * Platform: iOS.
+		 * @param allow true to enable it, false to disable it.
+		 */
+		void allowScrolling(bool allow = true);
+
+		/**
+		 * Check if user is allowed to scroll the list.
+		 * Platform: iOS.
+		 * @return true if it's allowed, false otherwise.
+		 */
+		bool isScrollingAllowed();
+
+		/**
 		 * Add an list view event listener.
 		 * @param listener The listener that will receive list view events.
 		 */

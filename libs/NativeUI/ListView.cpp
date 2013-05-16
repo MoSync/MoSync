@@ -219,6 +219,19 @@ namespace NativeUI
 		return returnValue;
 	}
 
+	void ListView::allowScrolling(bool allow)
+	{
+		const char* value = allow ? "true" : "false";
+		this->setProperty(MAW_LIST_VIEW_ALLOW_SCROLLING, value);
+	}
+
+	bool ListView::isScrollingAllowed()
+	{
+		MAUtil::String value = this->getPropertyString(MAW_LIST_VIEW_ALLOW_SCROLLING);
+		bool returnValue = (strcmp(value.c_str(), "true")) ? false : true;
+		return returnValue;
+	}
+
 	/**
 	 * Add an list view event listener.
 	 * @param listener The listener that will receive list view events.

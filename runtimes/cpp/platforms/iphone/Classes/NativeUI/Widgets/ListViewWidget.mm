@@ -185,6 +185,25 @@
 -(NSString*) getAllowSelectionDuringEditingProperty;
 
 /**
+ * Enable/disable user scrolling with a list view.
+ * A boolean value that determines whether the users can scroll the list.
+ * Setter for MAW_LIST_VIEW_ALLOW_SCROLLING.
+ * @param allowScrolling "true" will allow the user to scroll the list, "false" will not
+ * allow the user to select it.
+ * @return One of the following values:
+ * - MAW_RES_OK if the bool value was set.
+ * - MAW_RES_INVALID_PROPERTY_VALUE if the allowSelection param was invalid.
+ */
+-(int)setAllowScrollingProperty:(NSString*) allowScrolling;
+
+/**
+ * Check if user can scroll a list view.
+ * Getter for MAW_LIST_VIEW_ALLOW_SCROLLING.
+ * @return "true" if the user can scroll the list, "false" otherwise.
+ */
+-(NSString*) getAllowScrollingProperty;
+
+/**
  * Replaces the list view background with
  * a single color background.
  * @param colorValue A color in hex
@@ -397,6 +416,10 @@
     {
         returnValue = [self setAnimationState:value];
     }
+    else if ([key isEqualToString:@MAW_LIST_VIEW_ALLOW_SCROLLING])
+    {
+        returnValue = [self setAllowScrollingProperty:value];
+    }
     else
     {
         returnValue = [super setPropertyWithKey:key toValue:value];
@@ -432,6 +455,10 @@
     else if ([key isEqualToString:@MAW_LIST_VIEW_ALLOW_SELECTION_DURING_EDITING])
     {
         return [[self getAllowSelectionDuringEditingProperty] retain];
+    }
+    else if ([key isEqualToString:@MAW_LIST_VIEW_ALLOW_SCROLLING])
+    {
+        return [[self getAllowScrollingProperty] retain];
     }
     else
     {
@@ -1185,6 +1212,31 @@ forRowAtIndexPath:(NSIndexPath *)indexPath
 -(NSString*) getAllowSelectionDuringEditingProperty
 {
     return self.tableView.allowsSelectionDuringEditing ? kWidgetTrueValue : kWidgetFalseValue;
+}
+
+-(int)setAllowScrollingProperty:(NSString*) allowScrolling
+{
+    BOOL allowScrollingBool;
+    if ([allowScrolling isEqualToString:kWidgetTrueValue])
+    {
+        allowScrollingBool = YES;
+    }
+    else if ([allowScrolling isEqualToString:kWidgetFalseValue])
+    {
+        allowScrollingBool = NO;
+    }
+    else
+    {
+        return MAW_RES_INVALID_PROPERTY_VALUE;
+    }
+
+    self.tableView.scrollEnabled = allowScrollingBool;
+    return MAW_RES_OK;
+}
+
+-(NSString*) getAllowScrollingProperty
+{
+    return self.tableView.scrollEnabled ? kWidgetTrueValue : kWidgetFalseValue;
 }
 
 -(int)setBackgroundColor:(NSString*) colorValue

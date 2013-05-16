@@ -235,6 +235,23 @@ group WidgetListView "List View" {
 			* \endcode
 			*/
 			BEGIN_ANIMATION = "beginAnimation";
+
+			/**
+			* @brief Enable/disable scrolling.
+			* If you don't want to allow the user to scroll the list, set this property to false.
+			* Platform: iOS.
+			*
+			* @validvalue "true" or "false".
+			* Default value is "true".
+			*
+			* @setandget
+			*
+			* @par Example
+			* \code
+			*	maWidgetSetProperty(listHandle, MAW_LIST_VIEW_ALLOW_SCROLLING, "false");
+			* \endcode
+			*/
+			ALLOW_SCROLLING = "allowScrolling";
 		}
 	} // end of WidgetSegmentedListViewProperties
 } // end of WidgetListView
