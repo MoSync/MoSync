@@ -156,21 +156,21 @@ public class MoSyncDB
 			if (MA_DB_TYPE_INT == type)
 			{
 				int value = buffer.getInt();
-				params[i] = Integer.valueOf(value);//new Integer(value);
+				params[i] = Integer.valueOf(value);
 				//Log.i("@@@@@", "MA_DB_TYPE_INT params[i]: " + params[i]);
 			}
 			else
 			if (MA_DB_TYPE_INT64 == type)
 			{
 				long value = buffer.getLong();
-				params[i] = Long.valueOf(value);//new Long(value);
+				params[i] = Long.valueOf(value);
 				//Log.i("@@@@@", "MA_DB_TYPE_INT64 params[i]: " + params[i]);
 			}
 			else
 			if (MA_DB_TYPE_DOUBLE == type)
 			{
 				double value = buffer.getDouble();
-				params[i] = Double.valueOf(value);//new Double(value);
+				params[i] = Double.valueOf(value);
 				//Log.i("@@@@@", "MA_DB_TYPE_DOUBLE params[i]: " + params[i]);
 			}
 			else

@@ -39,7 +39,6 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 
-import android.content.res.AssetManager;
 import android.graphics.Typeface;
 import android.util.Log;
 

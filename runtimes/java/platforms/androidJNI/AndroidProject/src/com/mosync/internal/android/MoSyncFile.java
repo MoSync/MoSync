@@ -19,7 +19,6 @@ package com.mosync.internal.android;
 
 
 import java.io.File;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
@@ -40,8 +39,6 @@ import static com.mosync.internal.generated.MAAPI_consts.MA_ACCESS_READ_WRITE;
 import static com.mosync.internal.generated.MAAPI_consts.MA_FERR_GENERIC;
 import static com.mosync.internal.generated.MAAPI_consts.MA_FERR_NOTFOUND;
 import static com.mosync.internal.generated.MAAPI_consts.MA_FERR_FORBIDDEN;
-import static com.mosync.internal.generated.MAAPI_consts.MA_FERR_RENAME_FILESYSTEM;
-import static com.mosync.internal.generated.MAAPI_consts.MA_FERR_RENAME_DIRECTORY;
 import static com.mosync.internal.generated.MAAPI_consts.MA_FERR_WRONG_TYPE;
 
 /**
